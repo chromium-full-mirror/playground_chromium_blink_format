@@ -1954,8 +1954,7 @@ bool FrameLoader::canCachePageContainingThisFrame() {
       return false;
   }
 
-  return m_documentLoader && m_documentLoader->mainDocumentError().isNull() &&
-         !m_frame->tree()->childCount()
+  return m_documentLoader && m_documentLoader->mainDocumentError().isNull()
          // FIXME: If we ever change this so that frames with plug-ins will be
          // cached,
          // we need to make sure that we don't cache frames that have
@@ -2123,10 +2122,6 @@ bool FrameLoader::logCanCacheFrameDecision(int indentLevel) {
     }
     if (!m_documentLoader->mainDocumentError().isNull()) {
       PCLOG("   -Main document has an error");
-      cannotCache = true;
-    }
-    if (m_frame->tree()->childCount()) {
-      PCLOG("   -Frame has child frames");
       cannotCache = true;
     }
     if (m_containsPlugIns) {
