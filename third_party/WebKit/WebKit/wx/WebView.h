@@ -176,7 +176,6 @@ class WXDLLIMPEXP_WEBKIT wxWebView : public wxWindow {
   void OnKeyEvents(wxKeyEvent& event);
   void OnSetFocus(wxFocusEvent& event);
   void OnKillFocus(wxFocusEvent& event);
-  void OnActivate(wxActivateEvent& event);
 
  private:
 // any class wishing to process wxWindows events must use this macro

@@ -30,20 +30,27 @@
 #define WXWEBFRAMEPRIVATE_H
 
 #include "config.h"
-#include "EditCommand.h"
-#include "EditCommandWx.h"
 #include "Frame.h"
-#include "wtf/RefPtr.h"
-#include "wtf/Vector.h"
+#include "HTMLFrameOwnerElement.h"
+#include "KURL.h"
 
 class WebFramePrivate {
  public:
   WebFramePrivate() : frame(0) {}
 
-  WTF::Vector<EditCommandWx> undoStack;
-  WTF::Vector<EditCommandWx> redoStack;
+  WebCore::Frame* frame;
+};
 
-  WTF::RefPtr<WebCore::Frame> frame;
+class WebViewFrameData {
+ public:
+  WebCore::KURL url;
+  WebCore::String name;
+  WebCore::HTMLFrameOwnerElement* ownerElement;
+
+  WebCore::String referrer;
+  bool allowsScrolling;
+  int marginWidth;
+  int marginHeight;
 };
 
 #endif

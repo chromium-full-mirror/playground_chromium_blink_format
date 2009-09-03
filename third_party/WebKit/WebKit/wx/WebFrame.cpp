@@ -76,8 +76,7 @@ wxWebFrame::wxWebFrame(wxWebView* container,
     : m_textMagnifier(1.0),
       m_isEditable(false),
       m_isInitialized(false),
-      m_beingDestroyed(false),
-      m_title(wxEmptyString) {
+      m_beingDestroyed(false) {
   m_impl = new WebFramePrivate();
 
   WebCore::HTMLFrameOwnerElement* parentFrame = 0;
@@ -88,13 +87,16 @@ wxWebFrame::wxWebFrame(wxWebView* container,
 
   WebCore::FrameLoaderClientWx* loaderClient =
       new WebCore::FrameLoaderClientWx();
+  RefPtr<WebCore::Frame> newFrame = WebCore::Frame::create(
+      container->m_impl->page, parentFrame, loaderClient);
 
-  m_impl->frame = WebCore::Frame::create(container->m_impl->page, parentFrame,
-                                         loaderClient);
-  m_impl->frame->deref();
+  m_impl->frame = newFrame.get();
 
-  loaderClient->setFrame(m_impl->frame.get());
+  loaderClient->setFrame(this);
   loaderClient->setWebView(container);
+
+  if (data && data->ownerElement)
+    m_impl->frame->ref();
 
   m_impl->frame->init();
 
@@ -102,12 +104,13 @@ wxWebFrame::wxWebFrame(wxWebView* container,
 }
 
 wxWebFrame::~wxWebFrame() {
-  m_impl->frame->loader()->detachFromParent();
+  if (m_impl)
+    delete m_impl;
 }
 
 WebCore::Frame* wxWebFrame::GetFrame() {
   if (m_impl)
-    return m_impl->frame.get();
+    return m_impl->frame;
 
   return 0;
 }

@@ -305,7 +305,7 @@ IntPoint ChromeClientWx::screenToWindow(const IntPoint& point) const {
 }
 
 PlatformWidget ChromeClientWx::platformWindow() const {
-  return 0;
+  return m_webView;
 }
 
 void ChromeClientWx::contentsSizeChanged(Frame*, const IntSize&) const {
@@ -351,6 +351,7 @@ void ChromeClientWx::reachedMaxAppCacheSize(int64_t spaceNeeded) {
 #endif
 
 void ChromeClientWx::scroll(const IntSize&, const IntRect&, const IntRect&) {
+  m_webView->Refresh();
   notImplemented();
 }
 

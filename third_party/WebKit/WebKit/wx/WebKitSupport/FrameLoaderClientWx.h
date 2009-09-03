@@ -33,6 +33,7 @@
 #include "KURL.h"
 #include "ResourceResponse.h"
 
+class wxWebFrame;
 class wxWebView;
 
 namespace WebCore {
@@ -51,9 +52,8 @@ class FrameLoaderClientWx : public FrameLoaderClient {
  public:
   FrameLoaderClientWx();
   ~FrameLoaderClientWx();
-  void setFrame(Frame* frame);
+  void setFrame(wxWebFrame* frame);
   void setWebView(wxWebView* webview);
-  virtual void detachFrameLoader();
 
   virtual bool hasWebView() const;  // mainly for assertions
 
@@ -266,6 +266,7 @@ class FrameLoaderClientWx : public FrameLoaderClient {
   virtual void registerForIconNotification(bool listen = true);
 
  private:
+  wxWebFrame* m_webFrame;
   Frame* m_frame;
   wxWebView* m_webView;
   ResourceResponse m_response;

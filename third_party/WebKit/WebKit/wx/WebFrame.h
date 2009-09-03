@@ -150,9 +150,6 @@ class WXDLLIMPEXP_WEBKIT wxWebFrame {
   void MakeEditable(bool enable);
   bool IsEditable() const { return m_isEditable; }
 
-  wxString GetPageTitle() const { return m_title; }
-  void SetPageTitle(const wxString& title) { m_title = title; }
-
   WebCore::Frame* GetFrame();
 
   wxWebViewDOMElementInfo HitTest(const wxPoint& post) const;
@@ -163,7 +160,6 @@ class WXDLLIMPEXP_WEBKIT wxWebFrame {
   bool m_isInitialized;
   bool m_beingDestroyed;
   WebFramePrivate* m_impl;
-  wxString m_title;
 };
 
 #endif  // ifndef WXWEBFRAME_H

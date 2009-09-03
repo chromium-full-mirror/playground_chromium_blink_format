@@ -48,10 +48,13 @@
 #include "ResourceResponse.h"
 #include "ScriptController.h"
 #include "ScriptString.h"
+#include <wtf/PassRefPtr.h>
+#include <wtf/RefPtr.h>
 
 #include <stdio.h>
 
 #include "WebFrame.h"
+#include "WebFramePrivate.h"
 #include "WebView.h"
 #include "WebViewPrivate.h"
 
@@ -76,20 +79,17 @@ inline int wxNavTypeFromWebNavType(NavigationType type) {
   return wxWEBVIEW_NAV_OTHER;
 }
 
-FrameLoaderClientWx::FrameLoaderClientWx() : m_frame(0) {}
+FrameLoaderClientWx::FrameLoaderClientWx() : m_webFrame(0) {}
 
 FrameLoaderClientWx::~FrameLoaderClientWx() {}
 
-void FrameLoaderClientWx::setFrame(Frame* frame) {
-  m_frame = frame;
+void FrameLoaderClientWx::setFrame(wxWebFrame* frame) {
+  m_webFrame = frame;
+  m_frame = m_webFrame->m_impl->frame;
 }
 
 void FrameLoaderClientWx::setWebView(wxWebView* webview) {
   m_webView = webview;
-}
-
-void FrameLoaderClientWx::detachFrameLoader() {
-  m_frame = 0;
 }
 
 bool FrameLoaderClientWx::hasWebView() const {
@@ -272,7 +272,7 @@ void FrameLoaderClientWx::cancelPolicyCheck() {
 void FrameLoaderClientWx::dispatchWillSubmitForm(FramePolicyFunction function,
                                                  PassRefPtr<FormState>) {
   // FIXME: Send an event to allow for alerts and cancellation
-  if (!m_frame)
+  if (!m_webFrame)
     return;
   (m_frame->loader()->*function)(PolicyUse);
 }
@@ -397,6 +397,9 @@ void FrameLoaderClientWx::dispatchDidReceiveIcon() {
 }
 
 void FrameLoaderClientWx::frameLoaderDestroyed() {
+  if (m_webFrame)
+    delete m_webFrame;
+  m_webFrame = 0;
   m_frame = 0;
   delete this;
 }
@@ -441,7 +444,7 @@ void FrameLoaderClientWx::setMainDocumentError(WebCore::DocumentLoader*,
 void FrameLoaderClientWx::committedLoad(WebCore::DocumentLoader* loader,
                                         const char* data,
                                         int length) {
-  if (!m_frame)
+  if (!m_webFrame)
     return;
   FrameLoader* fl = loader->frameLoader();
   fl->setEncoding(m_response.textEncodingName(), false);
@@ -607,7 +610,7 @@ void FrameLoaderClientWx::dispatchDecidePolicyForMIMEType(
     FramePolicyFunction function,
     const String& mimetype,
     const ResourceRequest& request) {
-  if (!m_frame)
+  if (!m_webFrame)
     return;
 
   notImplemented();
@@ -620,7 +623,7 @@ void FrameLoaderClientWx::dispatchDecidePolicyForNewWindowAction(
     const ResourceRequest& request,
     PassRefPtr<FormState>,
     const String& targetName) {
-  if (!m_frame)
+  if (!m_webFrame)
     return;
 
   if (m_webView) {
@@ -643,7 +646,7 @@ void FrameLoaderClientWx::dispatchDecidePolicyForNavigationAction(
     const NavigationAction& action,
     const ResourceRequest& request,
     PassRefPtr<FormState>) {
-  if (!m_frame)
+  if (!m_webFrame)
     return;
 
   if (m_webView) {
@@ -676,58 +679,35 @@ PassRefPtr<Frame> FrameLoaderClientWx::createFrame(
     bool allowsScrolling,
     int marginWidth,
     int marginHeight) {
-  /*
-      FIXME: Temporarily disabling code for loading subframes. While most
-      (i)frames load and are destroyed properly, the iframe created by
-      google.com in its new homepage does not get destroyed when
-      document()->detach() is called, as other (i)frames do. It is destroyed on
-      app shutdown, but until that point, this 'in limbo' frame will do things
-      like steal keyboard focus and crash when clicked on. (On some platforms,
-      it is actually a visible object, even though it's not in a valid state.)
+  WebViewFrameData* data = new WebViewFrameData();
+  data->name = name;
+  data->ownerElement = ownerElement;
+  data->url = url;
+  data->referrer = referrer;
+  data->allowsScrolling = allowsScrolling;
+  data->marginWidth = marginWidth;
+  data->marginHeight = marginHeight;
 
-      Since just about every user is probably going to test against Google at
-      some point, I'm disabling this functionality until I have time to track
-     down
-      why it is not being destroyed.
-  */
+  wxWebFrame* newFrame = new wxWebFrame(m_webView, m_webFrame, data);
 
-  /*
-      wxWindow* parent = m_webView;
+  RefPtr<Frame> childFrame = adoptRef(newFrame->m_impl->frame);
 
-      WebViewFrameData* data = new WebViewFrameData();
-      data->name = name;
-      data->ownerElement = ownerElement;
-      data->url = url;
-      data->referrer = referrer;
-      data->marginWidth = marginWidth;
-      data->marginHeight = marginHeight;
+  m_frame->tree()->appendChild(childFrame);
+  childFrame->tree()->setName(name);
+  childFrame->init();
 
-      wxWebView* newWin = new wxWebView(parent, -1, wxDefaultPosition,
-     wxDefaultSize, data);
+  // The creation of the frame may have run arbitrary JavaScript that removed it
+  // from the page already.
+  if (!childFrame->page())
+    return 0;
 
-      RefPtr<Frame> childFrame = newWin->m_impl->frame;
+  childFrame->loader()->loadURLIntoChildFrame(url, referrer, childFrame.get());
 
-      // FIXME: All of the below should probably be moved over into WebCore
-      childFrame->tree()->setName(name);
-      m_frame->tree()->appendChild(childFrame);
-      // ### set override encoding if we have one
+  // The frame's onload handler may have removed it from the document.
+  if (!childFrame->tree()->parent())
+    return 0;
 
-      FrameLoadType loadType = m_frame->loader()->loadType();
-      FrameLoadType childLoadType = FrameLoadTypeInternal;
-
-      childFrame->loader()->load(url, referrer, childLoadType,
-                              String(), 0, 0);
-
-      // The frame's onload handler may have removed it from the document.
-      if (!childFrame->tree()->parent())
-          return 0;
-
-      delete data;
-
-      return childFrame.get();
-  */
-  notImplemented();
-  return 0;
+  return childFrame.release();
 }
 
 ObjectContentType FrameLoaderClientWx::objectContentType(
@@ -807,30 +787,19 @@ void FrameLoaderClientWx::transitionToCommittedFromCachedFrame(CachedFrame*) {
 }
 
 void FrameLoaderClientWx::transitionToCommittedForNewPage() {
+  ASSERT(m_webFrame);
   ASSERT(m_frame);
   ASSERT(m_webView);
 
-  Page* page = m_frame->page();
-  ASSERT(page);
+  IntSize size = IntRect(m_webView->GetRect()).size();
+  // FIXME: This value should be gotten from m_webView->IsTransparent();
+  // but transitionToCommittedForNewPage() can be called while m_webView is
+  // still being initialized.
+  bool transparent = false;
+  Color backgroundColor =
+      transparent ? WebCore::Color::transparent : WebCore::Color::white;
 
-  bool isMainFrame = m_frame == page->mainFrame();
-
-  m_frame->setView(0);
-
-  RefPtr<FrameView> frameView;
-  if (isMainFrame)
-    frameView =
-        FrameView::create(m_frame, IntRect(m_webView->GetRect()).size());
-  else
-    frameView = FrameView::create(m_frame);
-
-  ASSERT(frameView);
-  m_frame->setView(frameView);
-
-  frameView->setPlatformWidget(m_webView);
-
-  if (HTMLFrameOwnerElement* owner = m_frame->ownerElement())
-    m_frame->view()->setScrollbarModes(owner->scrollingMode(),
-                                       owner->scrollingMode());
+  if (m_frame)
+    m_frame->createView(size, backgroundColor, transparent, IntSize(), false);
 }
 }
