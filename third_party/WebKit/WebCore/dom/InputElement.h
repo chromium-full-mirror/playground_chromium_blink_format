@@ -86,7 +86,7 @@ class InputElement {
                                int maxLength);
   static void handleBeforeTextInsertedEvent(InputElementData&,
                                             InputElement*,
-                                            Document*,
+                                            Element*,
                                             Event*);
   static void parseSizeAttribute(InputElementData&, Element*, MappedAttribute*);
   static void parseMaxLengthAttribute(InputElementData&,

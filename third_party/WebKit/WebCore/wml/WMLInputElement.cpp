@@ -282,7 +282,7 @@ void WMLInputElement::defaultEventHandler(Event* evt) {
   }
 
   if (evt->isBeforeTextInsertedEvent())
-    InputElement::handleBeforeTextInsertedEvent(m_data, this, document(), evt);
+    InputElement::handleBeforeTextInsertedEvent(m_data, this, this, evt);
 
   if (renderer() &&
       (evt->isMouseEvent() || evt->isDragEvent() || evt->isWheelEvent() ||
