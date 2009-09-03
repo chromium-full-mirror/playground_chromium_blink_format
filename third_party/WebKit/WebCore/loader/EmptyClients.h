@@ -363,7 +363,8 @@ class EmptyFrameLoaderClient : public FrameLoaderClient {
   virtual bool shouldGoToHistoryItem(HistoryItem*) const { return false; }
   virtual void saveViewStateToItem(HistoryItem*) {}
   virtual bool canCachePage() const { return false; }
-
+  virtual void didDisplayInsecureContent() {}
+  virtual void didRunInsecureContent(SecurityOrigin*) {}
   virtual PassRefPtr<Frame> createFrame(const KURL&,
                                         const String&,
                                         HTMLFrameOwnerElement*,

@@ -597,6 +597,14 @@ bool FrameLoaderClient::shouldGoToHistoryItem(HistoryItem* item) const {
   return item != 0;
 }
 
+void FrameLoaderClient::didDisplayInsecureContent() {
+  notImplemented();
+}
+
+void FrameLoaderClient::didRunInsecureContent(SecurityOrigin*) {
+  notImplemented();
+}
+
 void FrameLoaderClient::makeRepresentation(WebCore::DocumentLoader*) {
   notImplemented();
 }

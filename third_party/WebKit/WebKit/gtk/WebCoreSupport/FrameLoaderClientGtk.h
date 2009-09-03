@@ -198,6 +198,9 @@ class FrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual void updateGlobalHistoryRedirectLinks();
   virtual bool shouldGoToHistoryItem(WebCore::HistoryItem*) const;
 
+  virtual void didDisplayInsecureContent();
+  virtual void didRunInsecureContent(WebCore::SecurityOrigin*);
+
   virtual WebCore::ResourceError cancelledError(
       const WebCore::ResourceRequest&);
   virtual WebCore::ResourceError blockedError(const WebCore::ResourceRequest&);
