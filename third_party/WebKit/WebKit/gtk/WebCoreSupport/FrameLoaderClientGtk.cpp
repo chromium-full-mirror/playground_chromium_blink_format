@@ -460,12 +460,12 @@ PassRefPtr<Frame> FrameLoaderClient::createFrame(
     bool allowsScrolling,
     int marginWidth,
     int marginHeight) {
-  Frame* coreFrame = core(webFrame());
+  Frame* coreFrame = core(m_frame);
 
-  ASSERT(core(getViewFromFrame(webFrame())) == coreFrame->page());
+  ASSERT(core(getViewFromFrame(m_frame)) == coreFrame->page());
 
   RefPtr<Frame> childFrame = webkit_web_frame_init_with_web_view(
-      getViewFromFrame(webFrame()), ownerElement);
+      getViewFromFrame(m_frame), ownerElement);
 
   coreFrame->tree()->appendChild(childFrame);
 
@@ -535,7 +535,7 @@ void FrameLoaderClient::windowObjectCleared() {
   // Is this obsolete now?
   g_signal_emit_by_name(m_frame, "cleared");
 
-  Frame* coreFrame = core(webFrame());
+  Frame* coreFrame = core(m_frame);
   ASSERT(coreFrame);
 
   Settings* settings = coreFrame->settings();
