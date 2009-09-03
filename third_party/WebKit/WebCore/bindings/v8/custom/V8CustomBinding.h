@@ -528,11 +528,15 @@ class V8Custom {
   DECLARE_INDEXED_PROPERTY_GETTER(CanvasPixelArray);
   DECLARE_INDEXED_PROPERTY_SETTER(CanvasPixelArray);
 
+  DECLARE_PROPERTY_ACCESSOR_GETTER(MessageEventPorts);
+  DECLARE_CALLBACK(MessageEventInitMessageEvent);
+
   DECLARE_PROPERTY_ACCESSOR(MessagePortOnmessage);
   DECLARE_PROPERTY_ACCESSOR(MessagePortOnclose);
-  DECLARE_CALLBACK(MessagePortStartConversation);
   DECLARE_CALLBACK(MessagePortAddEventListener);
+  DECLARE_CALLBACK(MessagePortPostMessage);
   DECLARE_CALLBACK(MessagePortRemoveEventListener);
+  DECLARE_CALLBACK(MessagePortStartConversation);
 
   DECLARE_CALLBACK(DatabaseChangeVersion);
   DECLARE_CALLBACK(DatabaseTransaction);
@@ -574,8 +578,10 @@ class V8Custom {
   DECLARE_CALLBACK(AbstractWorkerRemoveEventListener);
 
   DECLARE_PROPERTY_ACCESSOR(DedicatedWorkerContextOnmessage);
+  DECLARE_CALLBACK(DedicatedWorkerContextPostMessage);
 
   DECLARE_PROPERTY_ACCESSOR(WorkerOnmessage);
+  DECLARE_CALLBACK(WorkerPostMessage);
   DECLARE_CALLBACK(WorkerConstructor);
 
   DECLARE_PROPERTY_ACCESSOR_GETTER(WorkerContextSelf);
