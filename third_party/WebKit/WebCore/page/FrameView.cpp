@@ -96,13 +96,10 @@ struct ScheduledEvent {
 
 FrameView::FrameView(Frame* frame)
     : m_frame(frame),
-      m_vmode(ScrollbarAuto),
-      m_hmode(ScrollbarAuto),
       m_slowRepaintObjectCount(0),
       m_layoutTimer(this, &FrameView::layoutTimerFired),
       m_layoutRoot(0),
       m_postLayoutTasksTimer(this, &FrameView::postLayoutTimerFired),
-      m_needToInitScrollbars(true),
       m_isTransparent(false),
       m_baseBackgroundColor(Color::white),
       m_mediaType("screen"),
@@ -208,7 +205,7 @@ void FrameView::resetScrollbars() {
   // floor.
   m_firstLayout = true;
   setScrollbarsSuppressed(true);
-  setScrollbarModes(m_hmode, m_vmode);
+  setScrollbarModes(ScrollbarAuto, ScrollbarAuto);
   setScrollbarsSuppressed(false);
 }
 
@@ -282,19 +279,6 @@ bool FrameView::didFirstLayout() const {
   return !m_firstLayout;
 }
 
-void FrameView::initScrollbars() {
-  if (!m_needToInitScrollbars)
-    return;
-  m_needToInitScrollbars = false;
-  updateDefaultScrollbarState();
-}
-
-void FrameView::updateDefaultScrollbarState() {
-  m_hmode = horizontalScrollbarMode();
-  m_vmode = verticalScrollbarMode();
-  setScrollbarModes(m_hmode, m_vmode);
-}
-
 void FrameView::invalidateRect(const IntRect& rect) {
   if (!parent()) {
     if (hostWindow())
@@ -323,11 +307,6 @@ void FrameView::setMarginWidth(int w) {
 void FrameView::setMarginHeight(int h) {
   // make it update the rendering area when set
   m_margins.setHeight(h);
-}
-
-void FrameView::setCanHaveScrollbars(bool canScroll) {
-  ScrollView::setCanHaveScrollbars(canScroll);
-  scrollbarModes(m_hmode, m_vmode);
 }
 
 PassRefPtr<Scrollbar> FrameView::createScrollbar(
@@ -583,8 +562,9 @@ void FrameView::layout(bool allowSubtree) {
 
   m_nestedLayoutCount++;
 
-  ScrollbarMode hMode = m_hmode;
-  ScrollbarMode vMode = m_vmode;
+  ScrollbarMode hMode;
+  ScrollbarMode vMode;
+  scrollbarModes(hMode, vMode);
 
   if (!subtree) {
     RenderObject* rootRenderer = document->documentElement()

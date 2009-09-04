@@ -71,8 +71,6 @@ class FrameView : public ScrollView {
   void setMarginWidth(int);
   void setMarginHeight(int);
 
-  virtual void setCanHaveScrollbars(bool);
-
   virtual PassRefPtr<Scrollbar> createScrollbar(ScrollbarOrientation);
 
   virtual void setContentsSize(const IntSize&);
@@ -126,8 +124,6 @@ class FrameView : public ScrollView {
   void setShouldUpdateWhileOffscreen(bool);
 
   void adjustViewSize();
-  void initScrollbars();
-  void updateDefaultScrollbarState();
 
   virtual IntRect windowClipRect(bool clipToContents = true) const;
   IntRect windowClipRectForLayer(const RenderLayer*,
@@ -273,8 +269,6 @@ class FrameView : public ScrollView {
 
   bool m_doFullRepaint;
 
-  ScrollbarMode m_vmode;
-  ScrollbarMode m_hmode;
   bool m_useSlowRepaints;
   bool m_isOverlapped;
   bool m_contentIsOpaque;
@@ -294,7 +288,6 @@ class FrameView : public ScrollView {
   bool m_firstLayoutCallbackPending;
 
   bool m_firstLayout;
-  bool m_needToInitScrollbars;
   bool m_isTransparent;
   Color m_baseBackgroundColor;
   IntSize m_lastLayoutSize;

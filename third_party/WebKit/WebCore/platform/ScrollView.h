@@ -111,7 +111,7 @@ class ScrollView : public Widget, public ScrollbarClient {
     scrollbarModes(horizontal, vertical);
     return vertical;
   }
-  virtual void setCanHaveScrollbars(bool flag);
+  void setCanHaveScrollbars(bool flag);
   bool canHaveScrollbars() const {
     return horizontalScrollbarMode() != ScrollbarAlwaysOff ||
            verticalScrollbarMode() != ScrollbarAlwaysOff;

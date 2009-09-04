@@ -1819,7 +1819,6 @@ void Frame::createView(const IntSize& viewportSize,
     frameView = FrameView::create(this);
 
   frameView->setScrollbarModes(horizontalScrollbarMode, verticalScrollbarMode);
-  frameView->updateDefaultScrollbarState();
 
   setView(frameView);
 
