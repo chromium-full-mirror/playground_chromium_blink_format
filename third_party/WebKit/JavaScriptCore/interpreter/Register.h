@@ -55,9 +55,6 @@ class Register : public WTF::FastAllocBase {
 
   JSValue jsValue() const;
 
-  bool marked() const;
-  void markChildren(MarkStack&);
-
   Register(JSActivation*);
   Register(CallFrame*);
   Register(CodeBlock*);
@@ -107,10 +104,6 @@ ALWAYS_INLINE Register::Register(JSValue v) {
 
 ALWAYS_INLINE JSValue Register::jsValue() const {
   return JSValue::decode(u.value);
-}
-
-ALWAYS_INLINE bool Register::marked() const {
-  return jsValue().marked();
 }
 
 // Interpreter functions

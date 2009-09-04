@@ -36,9 +36,14 @@ class JSWrapperObject : public JSObject {
   JSValue internalValue() const { return m_internalValue; }
   void setInternalValue(JSValue);
 
-  virtual void markChildren(MarkStack&);
+  static PassRefPtr<Structure> createStructure(JSValue prototype) {
+    return Structure::create(
+        prototype, TypeInfo(ObjectType, HasStandardGetOwnPropertySlot));
+  }
 
  private:
+  virtual void markChildren(MarkStack&);
+
   JSValue m_internalValue;
 };
 

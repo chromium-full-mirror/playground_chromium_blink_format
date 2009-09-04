@@ -40,6 +40,12 @@ class GlobalEvalFunction : public PrototypeFunction {
                      JSGlobalObject* expectedThisObject);
   JSGlobalObject* cachedGlobalObject() const { return m_cachedGlobalObject; }
 
+  static PassRefPtr<Structure> createStructure(JSValue prototype) {
+    return Structure::create(
+        prototype, TypeInfo(ObjectType, ImplementsHasInstance |
+                                            HasStandardGetOwnPropertySlot));
+  }
+
  private:
   virtual void markChildren(MarkStack&);
 
