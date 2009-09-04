@@ -36,7 +36,6 @@ class AccessibilityController;
 class GCController;
 
 class FrameLoadDelegate : public IWebFrameLoadDelegate,
-                          public IWebFrameLoadDelegatePrivate,
                           public IWebFrameLoadDelegatePrivate2 {
  public:
   FrameLoadDelegate();

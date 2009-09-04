@@ -579,16 +579,17 @@ bool WebFrameLoaderClient::shouldGoToHistoryItem(HistoryItem*) const {
 
 void WebFrameLoaderClient::didDisplayInsecureContent() {
   WebView* webView = m_webFrame->webView();
-  COMPtr<IWebResourceLoadDelegate> resourceLoadDelegate;
-  if (FAILED(webView->resourceLoadDelegate(&resourceLoadDelegate)))
+  COMPtr<IWebFrameLoadDelegatePrivate> frameLoadDelegatePriv;
+  if (FAILED(webView->frameLoadDelegatePrivate(&frameLoadDelegatePriv)) ||
+      !frameLoadDelegatePriv)
     return;
 
-  COMPtr<IWebResourceLoadDelegatePrivate2> resourceLoadDelegatePrivate(
-      Query, resourceLoadDelegate);
-  if (!resourceLoadDelegatePrivate)
+  COMPtr<IWebFrameLoadDelegatePrivate2> frameLoadDelegatePriv2(
+      Query, frameLoadDelegatePriv);
+  if (!frameLoadDelegatePriv2)
     return;
 
-  resourceLoadDelegatePrivate->didDisplayInsecureContent(webView)
+  frameLoadDelegatePriv2->didDisplayInsecureContent(webView)
 }
 
 void WebFrameLoaderClient::didRunInsecureContent(SecurityOrigin* origin) {
@@ -596,17 +597,18 @@ void WebFrameLoaderClient::didRunInsecureContent(SecurityOrigin* origin) {
       WebSecurityOrigin::createInstance(origin);
 
   WebView* webView = m_webFrame->webView();
-  COMPtr<IWebResourceLoadDelegate> resourceLoadDelegate;
-  if (FAILED(webView->resourceLoadDelegate(&resourceLoadDelegate)))
+  COMPtr<IWebFrameLoadDelegatePrivate> frameLoadDelegatePriv;
+  if (FAILED(webView->frameLoadDelegatePrivate(&frameLoadDelegatePriv)) ||
+      !frameLoadDelegatePriv)
     return;
 
-  COMPtr<IWebResourceLoadDelegatePrivate2> resourceLoadDelegatePrivate(
-      Query, resourceLoadDelegate);
-  if (!resourceLoadDelegatePrivate)
+  COMPtr<IWebFrameLoadDelegatePrivate2> frameLoadDelegatePriv2(
+      Query, frameLoadDelegatePriv);
+  if (!frameLoadDelegatePriv2)
     return;
 
-  resourceLoadDelegatePrivate->didRunInsecureContent(webView,
-                                                     webSecurityOrigin.get())
+  frameLoadDelegatePriv2->didRunInsecureContent(webView,
+                                                webSecurityOrigin.get())
 }
 
 PassRefPtr<DocumentLoader> WebFrameLoaderClient::createDocumentLoader(
