@@ -78,7 +78,6 @@ string descriptionSuitableForTestResult(IWebFrame* webFrame) {
   frameName += " \"" + BSTRtoString(frameNameBSTR) + "\"";
 
   SysFreeString(frameNameBSTR);
-
   return frameName;
 }
 
@@ -98,6 +97,8 @@ HRESULT STDMETHODCALLTYPE FrameLoadDelegate::QueryInterface(REFIID riid,
     *ppvObject = static_cast<IWebFrameLoadDelegate*>(this);
   else if (IsEqualGUID(riid, IID_IWebFrameLoadDelegatePrivate))
     *ppvObject = static_cast<IWebFrameLoadDelegatePrivate*>(this);
+  else if (IsEqualGUID(riid, IID_IWebFrameLoadDelegatePrivate2))
+    *ppvObject = static_cast<IWebFrameLoadDelegatePrivate2*>(this);
   else
     return E_NOINTERFACE;
 
@@ -342,5 +343,22 @@ HRESULT STDMETHODCALLTYPE
 FrameLoadDelegate::didFirstVisuallyNonEmptyLayoutInFrame(
     /* [in] */ IWebView* sender,
     /* [in] */ IWebFrame* frame) {
+  return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE FrameLoadDelegate::didDisplayInsecureContent(
+    /* [in] */ IWebView* sender) {
+  if (!done && gLayoutTestController->dumpFrameLoadCallbacks())
+    printf("didDisplayInsecureContent\n");
+
+  return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE FrameLoadDelegate::didRunInsecureContent(
+    /* [in] */ IWebView* sender,
+    /* [in] */ IWebSecurityOrigin* origin) {
+  if (!done && gLayoutTestController->dumpFrameLoadCallbacks())
+    printf("didRunInsecureContent\n");
+
   return S_OK;
 }
