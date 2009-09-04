@@ -39,15 +39,6 @@
 #include "Timer.h"
 #include <wtf/HashCountedSet.h>
 
-// FIXME: We should move Mac off of the old Frame-based user stylesheet loading
-// code and onto the new code in Page. We can't do that until the code in Page
-// supports non-file: URLs, however.
-#if PLATFORM(MAC) || PLATFORM(QT)
-#define FRAME_LOADS_USER_STYLESHEET 1
-#else
-#define FRAME_LOADS_USER_STYLESHEET 0
-#endif
-
 namespace WebCore {
 
 class Attr;
@@ -502,10 +493,6 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   KURL completeURL(const String&) const;
 
   virtual String userAgent(const KURL&) const;
-
-#if FRAME_LOADS_USER_STYLESHEET
-  void setUserStyleSheet(const String& sheet);
-#endif
 
   String userStyleSheet() const;
 
@@ -1075,10 +1062,6 @@ class Document : public ContainerNode, public ScriptExecutionContext {
 
   RefPtr<DocumentType> m_docType;
   mutable RefPtr<DOMImplementation> m_implementation;
-
-#if FRAME_LOADS_USER_STYLESHEET
-  String m_usersheet;
-#endif
 
   // Track the number of currently loading top-level stylesheets.  Sheets
   // loaded using the @import directive are not included in this count.
