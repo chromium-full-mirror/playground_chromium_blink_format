@@ -353,14 +353,16 @@ String HTMLAnchorElement::hash() const {
 }
 
 String HTMLAnchorElement::host() const {
-  return href().host();
-}
-
-String HTMLAnchorElement::hostname() const {
   const KURL& url = href();
   if (url.port() == 0)
     return url.host();
+  if (SecurityOrigin::isDefaultPortForProtocol(url.port(), url.protocol()))
+    return url.host();
   return url.host() + ":" + String::number(url.port());
+}
+
+String HTMLAnchorElement::hostname() const {
+  return href().host();
 }
 
 String HTMLAnchorElement::pathname() const {
