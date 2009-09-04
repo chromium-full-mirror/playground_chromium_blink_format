@@ -105,7 +105,7 @@ class Pasteboard : public Noncopyable {
                                                 bool allowPlainText,
                                                 bool& chosePlainText);
   String plainText(Frame* = 0);
-#if PLATFORM(QT) || PLATFORM(CHROMIUM)
+#if PLATFORM(QT)
   bool isSelectionMode() const;
   void setSelectionMode(bool selectionMode);
 #endif
@@ -128,7 +128,7 @@ class Pasteboard : public Noncopyable {
   HWND m_owner;
 #endif
 
-#if PLATFORM(QT) || PLATFORM(CHROMIUM)
+#if PLATFORM(QT)
   bool m_selectionMode;
 #endif
 
