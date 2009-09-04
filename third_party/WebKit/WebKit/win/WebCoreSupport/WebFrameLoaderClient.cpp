@@ -590,7 +590,7 @@ void WebFrameLoaderClient::didDisplayInsecureContent() {
   if (!frameLoadDelegatePriv2)
     return;
 
-  frameLoadDelegatePriv2->didDisplayInsecureContent(webView)
+  frameLoadDelegatePriv2->didDisplayInsecureContent(webView);
 }
 
 void WebFrameLoaderClient::didRunInsecureContent(SecurityOrigin* origin) {
@@ -609,7 +609,7 @@ void WebFrameLoaderClient::didRunInsecureContent(SecurityOrigin* origin) {
     return;
 
   frameLoadDelegatePriv2->didRunInsecureContent(webView,
-                                                webSecurityOrigin.get())
+                                                webSecurityOrigin.get());
 }
 
 PassRefPtr<DocumentLoader> WebFrameLoaderClient::createDocumentLoader(
