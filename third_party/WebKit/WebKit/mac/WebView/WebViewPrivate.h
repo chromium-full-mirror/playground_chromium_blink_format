@@ -83,6 +83,11 @@ typedef enum {
 } WebDashboardBehavior;
 #endif
 
+typedef enum {
+  WebInjectAtDocumentStart,
+  WebInjectAtDocumentEnd,
+} WebUserScriptInjectionTime;
+
 @interface WebController : NSTreeController {
   IBOutlet WebView* webView;
 }
@@ -521,6 +526,16 @@ backforward list.
 
 // Removes all white list entries created with _whiteListAccessFromOrigin.
 + (void)_resetOriginAccessWhiteLists;
+
++ (void)_addUserScriptToGroup:(NSString*)groupName
+                       source:(NSString*)source
+                          url:(NSURL*)url
+                      worldID:(unsigned)worldID
+                     patterns:(NSArray*)patterns
+                injectionTime:(WebUserScriptInjectionTime)injectionTime;
++ (void)_removeUserContentFromGroup:(NSString*)groupName
+                            worldID:(unsigned)worldID;
++ (void)_removeAllUserContentFromGroup:(NSString*)groupName;
 
 @end
 

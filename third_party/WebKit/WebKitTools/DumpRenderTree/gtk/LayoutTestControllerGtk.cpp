@@ -439,3 +439,7 @@ void LayoutTestController::overridePreference(JSStringRef key,
   g_free(name);
   g_free(strValue);
 }
+
+void LayoutTestController::addUserScript(JSStringRef source, bool runAtStart) {
+  printf("LayoutTestController::addUserScript not implemented.\n");
+}

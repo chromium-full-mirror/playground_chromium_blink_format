@@ -234,3 +234,7 @@ void LayoutTestController::overridePreference(JSStringRef /* key */,
                                               JSStringRef /* value */) {
   // FIXME: implement
 }
+
+void LayoutTestController::addUserScript(JSStringRef source, bool runAtStart) {
+  printf("LayoutTestController::addUserScript not implemented.\n");
+}

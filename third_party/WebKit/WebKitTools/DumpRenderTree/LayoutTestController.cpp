@@ -1351,6 +1351,26 @@ static JSValueRef whiteListAccessFromOriginCallback(
   return JSValueMakeUndefined(context);
 }
 
+static JSValueRef addUserScriptCallback(JSContextRef context,
+                                        JSObjectRef,
+                                        JSObjectRef thisObject,
+                                        size_t argumentCount,
+                                        const JSValueRef arguments[],
+                                        JSValueRef* exception) {
+  if (argumentCount != 2)
+    return JSValueMakeUndefined(context);
+
+  JSRetainPtr<JSStringRef> source(
+      Adopt, JSValueToStringCopy(context, arguments[0], exception));
+  ASSERT(!*exception);
+  bool runAtStart = JSValueToBoolean(context, arguments[1]);
+
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->addUserScript(source.get(), runAtStart);
+  return JSValueMakeUndefined(context);
+}
+
 // Static Values
 
 static JSValueRef getGlobalFlagCallback(JSContextRef context,
@@ -1458,6 +1478,8 @@ JSStaticValue* LayoutTestController::staticValues() {
 JSStaticFunction* LayoutTestController::staticFunctions() {
   static JSStaticFunction staticFunctions[] = {
       {"addDisallowedURL", addDisallowedURLCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"addUserScript", addUserScriptCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"clearAllDatabases", clearAllDatabasesCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},

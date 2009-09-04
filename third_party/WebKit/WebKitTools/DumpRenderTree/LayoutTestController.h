@@ -246,6 +246,8 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
                                  JSStringRef destinationHost,
                                  bool allowDestinationSubdomains);
 
+  void addUserScript(JSStringRef source, bool runAtStart);
+
  private:
   bool m_dumpAsText;
   bool m_dumpAsPDF;

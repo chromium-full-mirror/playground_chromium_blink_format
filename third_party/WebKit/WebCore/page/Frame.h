@@ -42,6 +42,7 @@
 #include "ScrollBehavior.h"
 #include "SelectionController.h"
 #include "TextGranularity.h"
+#include "UserScriptTypes.h"
 
 #if PLATFORM(WIN)
 #include "FrameWin.h"
@@ -138,6 +139,13 @@ class Frame : public RefCounted<Frame> {
                   bool,
                   ScrollbarMode = ScrollbarAuto,
                   ScrollbarMode = ScrollbarAuto);
+
+  void injectUserScripts(UserScriptInjectionTime);
+
+ private:
+  void injectUserScriptsForWorld(unsigned worldID,
+                                 const UserScriptVector&,
+                                 UserScriptInjectionTime);
 
  private:
   Frame(Page*, HTMLFrameOwnerElement*, FrameLoaderClient*);

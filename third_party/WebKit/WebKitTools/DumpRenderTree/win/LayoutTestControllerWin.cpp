@@ -825,3 +825,7 @@ void LayoutTestController::whiteListAccessFromOrigin(
     bool allowDestinationSubdomains) {
   printf("LayoutTestController::whiteListAccessFromOrigin not implemented\n");
 }
+
+void LayoutTestController::addUserScript(JSStringRef source, bool runAtStart) {
+  printf("LayoutTestController::addUserScript not implemented.\n");
+}
