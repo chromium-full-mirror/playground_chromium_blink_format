@@ -135,6 +135,9 @@ class InspectorBackend : public RefCounted<InspectorBackend> {
   void stepOutOfFunctionInDebugger();
 #endif
 
+  void dispatchOnInjectedScript(long callId,
+                                const String& methodName,
+                                const String& arguments);
   void getChildNodes(long callId, long nodeId);
   void setAttribute(long callId,
                     long elementId,

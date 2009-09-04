@@ -337,6 +337,17 @@ void InspectorFrontend::didGetCookies(int callId,
   function->call();
 }
 
+void InspectorFrontend::didDispatchOnInjectedScript(int callId,
+                                                    const String& result,
+                                                    bool isException) {
+  OwnPtr<ScriptFunctionCall> function(
+      newFunctionCall("didDispatchOnInjectedScript"));
+  function->appendArgument(callId);
+  function->appendArgument(result);
+  function->appendArgument(isException);
+  function->call();
+}
+
 #if ENABLE(DATABASE)
 void InspectorFrontend::selectDatabase(Database* database) {
   OwnPtr<ScriptFunctionCall> function(newFunctionCall("selectDatabase"));
