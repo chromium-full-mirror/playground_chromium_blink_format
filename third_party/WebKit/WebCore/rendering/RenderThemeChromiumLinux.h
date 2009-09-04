@@ -50,6 +50,8 @@ class RenderThemeChromiumLinux : public RenderThemeChromiumSkia {
   virtual Color inactiveListBoxSelectionBackgroundColor() const;
   virtual Color inactiveListBoxSelectionForegroundColor() const;
 
+  virtual void adjustSliderThumbSize(RenderObject*) const;
+
   void setFocusRingColor(const Color&);
   virtual Color platformFocusRingColor() const;
 

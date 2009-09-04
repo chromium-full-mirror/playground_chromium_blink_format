@@ -162,6 +162,13 @@ class RenderThemeChromiumSkia : public RenderTheme {
                                    const RenderObject::PaintInfo&,
                                    const IntRect&);
 
+  virtual bool paintSliderTrack(RenderObject*,
+                                const RenderObject::PaintInfo&,
+                                const IntRect&);
+  virtual bool paintSliderThumb(RenderObject*,
+                                const RenderObject::PaintInfo&,
+                                const IntRect&);
+
   // These methods define the padding for the MenuList's inner block.
   virtual int popupInternalPaddingLeft(RenderStyle*) const;
   virtual int popupInternalPaddingRight(RenderStyle*) const;
