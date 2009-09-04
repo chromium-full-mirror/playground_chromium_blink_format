@@ -859,7 +859,6 @@ void Frame::reapplyStyles() {
 }
 
 void Frame::injectUserScripts(UserScriptInjectionTime injectionTime) {
-  ASSERT(m_page);
   if (!m_page)
     return;
 
