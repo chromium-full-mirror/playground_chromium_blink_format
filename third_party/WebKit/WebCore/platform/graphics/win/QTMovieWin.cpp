@@ -62,9 +62,12 @@ static HashSet<QTMovieWinPrivate*>* gTaskList;
 static Vector<CFStringRef>* gSupportedTypes = 0;
 static SInt32 quickTimeVersion = 0;
 
+static QTMovieWin::SetTaskTimerDelayFunc gSetTaskTimerDelay = 0;
+static QTMovieWin::StopTaskTimerFunc gStopTaskTimer = 0;
+
 static void updateTaskTimer(int maxInterval = 1000) {
   if (!gTaskList->size()) {
-    stopSharedTimer();
+    gStopTaskTimer();
     return;
   }
 
@@ -72,7 +75,7 @@ static void updateTaskTimer(int maxInterval = 1000) {
   QTGetTimeUntilNextTask(&intervalInMS, 1000);
   if (intervalInMS > maxInterval)
     intervalInMS = maxInterval;
-  setSharedTimerFireDelay(static_cast<float>(intervalInMS) / 1000);
+  gSetTaskTimerDelay(static_cast<float>(intervalInMS) / 1000);
 }
 
 class QTMovieWinPrivate : public Noncopyable {
@@ -165,7 +168,7 @@ QTMovieWinPrivate::~QTMovieWinPrivate() {
     CFRelease(m_currentURL);
 }
 
-static void taskTimerFired() {
+void QTMovieWin::taskTimerFired() {
   // The hash content might change during task()
   Vector<QTMovieWinPrivate*> tasks;
   copyToVector(*gTaskList, tasks);
@@ -1007,6 +1010,12 @@ void QTMovieWin::getSupportedType(unsigned index,
   str = reinterpret_cast<const UChar*>(staticBuffer);
 }
 
+void QTMovieWin::setTaskTimerFuncs(SetTaskTimerDelayFunc setTaskTimerDelay,
+                                   StopTaskTimerFunc stopTaskTimer) {
+  gSetTaskTimerDelay = setTaskTimerDelay;
+  gStopTaskTimer = stopTaskTimer;
+}
+
 bool QTMovieWin::initializeQuickTime() {
   static bool initialized = false;
   static bool initializationSucceeded = false;
@@ -1029,7 +1038,6 @@ bool QTMovieWin::initializeQuickTime() {
       return false;
     }
     EnterMovies();
-    setSharedTimerFiredFunction(taskTimerFired);
     gMovieDrawingCompleteUPP =
         NewMovieDrawingCompleteUPP(movieDrawingCompleteProc);
     initializationSucceeded = true;
@@ -1040,7 +1048,6 @@ bool QTMovieWin::initializeQuickTime() {
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
   switch (fdwReason) {
     case DLL_PROCESS_ATTACH:
-      setSharedTimerInstanceHandle(hinstDLL);
       return TRUE;
     case DLL_PROCESS_DETACH:
     case DLL_THREAD_ATTACH:

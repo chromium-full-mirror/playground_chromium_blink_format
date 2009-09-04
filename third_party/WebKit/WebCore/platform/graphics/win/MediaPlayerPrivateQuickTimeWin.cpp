@@ -33,6 +33,7 @@
 #include "QTMovieWin.h"
 #include "ScrollView.h"
 #include "StringHash.h"
+#include "Timer.h"
 #include <wtf/HashSet.h>
 #include <wtf/MathExtras.h>
 #include <wtf/StdLibExtras.h>
@@ -83,6 +84,46 @@ MediaPlayerPrivate::MediaPlayerPrivate(MediaPlayer* player)
 
 MediaPlayerPrivate::~MediaPlayerPrivate() {}
 
+class TaskTimer : TimerBase {
+ public:
+  static void initialize();
+
+ private:
+  static void setTaskTimerDelay(double);
+  static void stopTaskTimer();
+
+  void fired();
+
+  static TaskTimer* s_timer;
+};
+
+TaskTimer* TaskTimer::s_timer = 0;
+
+void TaskTimer::initialize() {
+  if (s_timer)
+    return;
+
+  s_timer = new TaskTimer;
+
+  QTMovieWin::setTaskTimerFuncs(setTaskTimerDelay, stopTaskTimer);
+}
+
+void TaskTimer::setTaskTimerDelay(double delayInSeconds) {
+  ASSERT(s_timer);
+
+  s_timer->startOneShot(delayInSeconds);
+}
+
+void TaskTimer::stopTaskTimer() {
+  ASSERT(s_timer);
+
+  s_timer->stop();
+}
+
+void TaskTimer::fired() {
+  QTMovieWin::taskTimerFired();
+}
+
 void MediaPlayerPrivate::load(const String& url) {
   if (!QTMovieWin::initializeQuickTime()) {
     // FIXME: is this the right error to return?
@@ -90,6 +131,9 @@ void MediaPlayerPrivate::load(const String& url) {
     m_player->networkStateChanged();
     return;
   }
+
+  // Initialize the task timer.
+  TaskTimer::initialize();
 
   if (m_networkState != MediaPlayer::Loading) {
     m_networkState = MediaPlayer::Loading;
