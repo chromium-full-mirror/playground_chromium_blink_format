@@ -37,6 +37,8 @@ namespace WebCore {
 
 class Frame;
 class KURL;
+class ScriptExecutionContext;
+class ScriptState;
 class String;
 
 // Use an array to hold dependents. It works like a ref-counted scheme. A value
@@ -55,6 +57,13 @@ void navigateIfAllowed(Frame*,
                        const KURL&,
                        bool lockHistory,
                        bool lockBackForwardList);
+
+ScriptExecutionContext* getScriptExecutionContext(ScriptState*);
+inline ScriptExecutionContext* getScriptExecutionContext() {
+  return getScriptExecutionContext(0);
+}
+
+void reportException(ScriptState*, v8::TryCatch&);
 
 class AllowAllocation {
  public:
