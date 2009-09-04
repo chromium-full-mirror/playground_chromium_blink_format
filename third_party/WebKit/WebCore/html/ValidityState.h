@@ -42,7 +42,7 @@ class ValidityState : public RefCounted<ValidityState> {
   }
 
   bool valueMissing() { return control()->valueMissing(); }
-  bool typeMismatch() { return false; }
+  bool typeMismatch();
   bool patternMismatch() { return control()->patternMismatch(); }
   bool tooLong() { return false; }
   bool rangeUnderflow() { return false; }
@@ -55,6 +55,8 @@ class ValidityState : public RefCounted<ValidityState> {
   ValidityState(HTMLFormControlElement*);
   HTMLFormControlElement* m_control;
   String m_customErrorMessage;
+
+  static bool isValidColorString(const String&);
 };
 
 }  // namespace WebCore

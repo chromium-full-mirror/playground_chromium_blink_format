@@ -57,7 +57,8 @@ class HTMLInputElement : public HTMLFormControlElementWithState,
     EMAIL,
     NUMBER,
     TELEPHONE,
-    URL
+    URL,
+    COLOR
   };
 
   enum AutoCompleteSetting { Uninitialized, On, Off };
@@ -102,7 +103,7 @@ class HTMLInputElement : public HTMLFormControlElementWithState,
   virtual bool isTextField() const {
     return m_type == TEXT || m_type == PASSWORD || m_type == SEARCH ||
            m_type == ISINDEX || m_type == EMAIL || m_type == NUMBER ||
-           m_type == TELEPHONE || m_type == URL;
+           m_type == TELEPHONE || m_type == URL || m_type == COLOR;
   }
   virtual bool isSearchField() const { return m_type == SEARCH; }
   virtual bool isInputTypeHidden() const { return m_type == HIDDEN; }
