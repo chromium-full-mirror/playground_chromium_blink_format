@@ -24,11 +24,12 @@
 #ifndef JSCell_h
 #define JSCell_h
 
-#include <wtf/Noncopyable.h>
-#include "Structure.h"
-#include "JSValue.h"
-#include "JSImmediate.h"
 #include "Collector.h"
+#include "JSImmediate.h"
+#include "JSValue.h"
+#include "MarkStack.h"
+#include "Structure.h"
+#include <wtf/Noncopyable.h>
 
 namespace JSC {
 
@@ -91,9 +92,7 @@ class JSCell : public NoncopyableCustomAllocated {
     return placementNewDestination;
   }
 
-  void markCellDirect();
   virtual void markChildren(MarkStack&);
-  bool marked() const;
 
   // Object operations, with the toObject operation included.
   virtual const ClassInfo* classInfo() const;
@@ -126,6 +125,7 @@ class JSCell : public NoncopyableCustomAllocated {
   Structure* m_structure;
 };
 
+// FIXME: We should deprecate this and just use JSValue::asCell() instead.
 JSCell* asCell(JSValue);
 
 inline JSCell* asCell(JSValue value) {
@@ -157,17 +157,7 @@ inline Structure* JSCell::structure() const {
   return m_structure;
 }
 
-inline bool JSCell::marked() const {
-  return Heap::isCellMarked(this);
-}
-
-inline void JSCell::markCellDirect() {
-  Heap::markCell(this);
-}
-
-inline void JSCell::markChildren(MarkStack&) {
-  ASSERT(marked());
-}
+inline void JSCell::markChildren(MarkStack&) {}
 
 inline void* JSCell::operator new(size_t size, JSGlobalData* globalData) {
 #ifdef JAVASCRIPTCORE_BUILDING_ALL_IN_ONE_FILE
@@ -224,20 +214,6 @@ ALWAYS_INLINE bool JSValue::getUInt32(uint32_t& v) const {
     return v == d;
   }
   return false;
-}
-
-inline void JSValue::markDirect() {
-  ASSERT(!marked());
-  asCell()->markCellDirect();
-}
-
-inline void JSValue::markChildren(MarkStack& markStack) {
-  ASSERT(marked());
-  asCell()->markChildren(markStack);
-}
-
-inline bool JSValue::marked() const {
-  return !isCell() || asCell()->marked();
 }
 
 #if !USE(JSVALUE32_64)
@@ -325,10 +301,6 @@ inline JSValue JSValue::getJSNumber() {
   return JSValue();
 }
 
-inline bool JSValue::hasChildren() const {
-  return asCell()->structure()->typeInfo().type() >= CompoundType;
-}
-
 inline JSObject* JSValue::toObject(ExecState* exec) const {
   return isCell() ? asCell()->toObject(exec) : toObjectSlowCase(exec);
 }
@@ -338,12 +310,23 @@ inline JSObject* JSValue::toThisObject(ExecState* exec) const {
 }
 
 ALWAYS_INLINE void MarkStack::append(JSCell* cell) {
+  ASSERT(!m_isCheckingForDefaultMarkViolation);
   ASSERT(cell);
-  if (cell->marked())
+  if (Heap::isCellMarked(cell))
     return;
-  cell->markCellDirect();
+  Heap::markCell(cell);
   if (cell->structure()->typeInfo().type() >= CompoundType)
     m_values.append(cell);
+}
+
+ALWAYS_INLINE void MarkStack::append(JSValue value) {
+  ASSERT(value);
+  if (value.isCell())
+    append(value.asCell());
+}
+
+inline void Structure::markAggregate(MarkStack& markStack) {
+  markStack.append(m_prototype);
 }
 
 inline Heap* Heap::heap(JSValue v) {

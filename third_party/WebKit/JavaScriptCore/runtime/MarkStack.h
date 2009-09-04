@@ -27,10 +27,10 @@
 #define MarkStack_h
 
 #include "JSValue.h"
-
 #include <wtf/Noncopyable.h>
 
 namespace JSC {
+
 class JSGlobalData;
 class Register;
 
@@ -38,18 +38,17 @@ enum MarkSetProperties { MayContainNullValues, NoNullValues };
 
 class MarkStack : Noncopyable {
  public:
-  MarkStack(void* jsArrayVPtr) : m_jsArrayVPtr(jsArrayVPtr) {}
-
-  ALWAYS_INLINE void append(JSValue value) {
-    ASSERT(value);
-    if (value.marked())
-      return;
-    value.markDirect();
-    if (value.hasChildren())
-      m_values.append(value.asCell());
+  MarkStack(void* jsArrayVPtr)
+      : m_jsArrayVPtr(jsArrayVPtr)
+#ifndef NDEBUG
+        ,
+        m_isCheckingForDefaultMarkViolation(false)
+#endif
+  {
   }
 
-  ALWAYS_INLINE void append(JSCell* cell);
+  ALWAYS_INLINE void append(JSValue);
+  ALWAYS_INLINE void append(JSCell*);
 
   ALWAYS_INLINE void appendValues(Register* values,
                                   size_t count,
@@ -73,6 +72,8 @@ class MarkStack : Noncopyable {
   }
 
  private:
+  void markChildren(JSCell*);
+
   struct MarkSet {
     MarkSet(JSValue* values, JSValue* end, MarkSetProperties properties)
         : m_values(values), m_end(end), m_properties(properties) {
@@ -163,6 +164,11 @@ class MarkStack : Noncopyable {
   MarkStackArray<MarkSet> m_markSets;
   MarkStackArray<JSCell*> m_values;
   static size_t s_pageSize;
+
+#ifndef NDEBUG
+ public:
+  bool m_isCheckingForDefaultMarkViolation;
+#endif
 };
 }
 

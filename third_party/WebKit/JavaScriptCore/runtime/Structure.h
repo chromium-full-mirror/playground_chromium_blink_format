@@ -29,7 +29,6 @@
 #include "Identifier.h"
 #include "JSType.h"
 #include "JSValue.h"
-#include "MarkStack.h"
 #include "PropertyMapHashTable.h"
 #include "StructureChain.h"
 #include "StructureTransitionTable.h"
@@ -46,6 +45,7 @@
 
 namespace JSC {
 
+class MarkStack;
 class PropertyNameArray;
 class PropertyNameArrayData;
 
@@ -88,7 +88,7 @@ class Structure : public RefCounted<Structure> {
 
   ~Structure();
 
-  void markAggregate(MarkStack& markStack) { markStack.append(m_prototype); }
+  void markAggregate(MarkStack&);
 
   // These should be used with caution.
   size_t addPropertyWithoutTransition(const Identifier& propertyName,
