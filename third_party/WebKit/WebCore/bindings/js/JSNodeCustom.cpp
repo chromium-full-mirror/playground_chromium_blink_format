@@ -107,7 +107,11 @@ JSValue JSNode::appendChild(ExecState* exec, const ArgList& args) {
 }
 
 JSValue JSNode::addEventListener(ExecState* exec, const ArgList& args) {
-  JSDOMGlobalObject* globalObject = toJSDOMGlobalObject(impl()->document());
+  Document* document = impl()->document();
+  if (!document)
+    return jsUndefined();
+
+  JSDOMGlobalObject* globalObject = toJSDOMGlobalObject(document);
   if (!globalObject)
     return jsUndefined();
 
@@ -120,7 +124,11 @@ JSValue JSNode::addEventListener(ExecState* exec, const ArgList& args) {
 }
 
 JSValue JSNode::removeEventListener(ExecState* exec, const ArgList& args) {
-  JSDOMGlobalObject* globalObject = toJSDOMGlobalObject(impl()->document());
+  Document* document = impl()->document();
+  if (!document)
+    return jsUndefined();
+
+  JSDOMGlobalObject* globalObject = toJSDOMGlobalObject(document);
   if (!globalObject)
     return jsUndefined();
 

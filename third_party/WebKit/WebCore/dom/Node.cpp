@@ -574,7 +574,8 @@ PassRefPtr<NodeList> Node::childNodes() {
   NodeRareData* data = ensureRareData();
   if (!data->nodeLists()) {
     data->setNodeLists(NodeListsNodeData::create());
-    document()->addNodeListCache();
+    if (document())
+      document()->addNodeListCache();
   }
 
   return ChildNodeList::create(this,
@@ -832,7 +833,7 @@ void Node::registerDynamicNodeList(DynamicNodeList* list) {
   if (!data->nodeLists()) {
     data->setNodeLists(NodeListsNodeData::create());
     document()->addNodeListCache();
-  } else if (!m_document->hasNodeListCaches()) {
+  } else if (!m_document || !m_document->hasNodeListCaches()) {
     // We haven't been receiving notifications while there were no registered
     // lists, so the cache is invalid now.
     data->nodeLists()->invalidateCaches();
@@ -850,7 +851,8 @@ void Node::unregisterDynamicNodeList(DynamicNodeList* list) {
     data->nodeLists()->m_listsWithCaches.remove(list);
     if (data->nodeLists()->isEmpty()) {
       data->clearNodeLists();
-      document()->removeNodeListCache();
+      if (document())
+        document()->removeNodeListCache();
     }
   }
 }
