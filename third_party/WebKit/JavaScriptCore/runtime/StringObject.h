@@ -64,11 +64,6 @@ class StringObject : public JSWrapperObject {
 
  protected:
   StringObject(PassRefPtr<Structure>, JSString*);
-
- private:
-  virtual UString toString(ExecState*) const;
-  virtual UString toThisString(ExecState*) const;
-  virtual JSString* toThisJSString(ExecState*);
 };
 
 StringObject* asStringObject(JSValue);
