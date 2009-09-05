@@ -71,6 +71,12 @@ class DOMObjectWithGlobalPointer : public DOMObject {
     return m_globalObject->scriptExecutionContext();
   }
 
+  static PassRefPtr<JSC::Structure> createStructure(JSC::JSValue prototype) {
+    return JSC::Structure::create(
+        prototype,
+        JSC::TypeInfo(JSC::ObjectType, JSC::HasStandardGetOwnPropertySlot));
+  }
+
  protected:
   DOMObjectWithGlobalPointer(PassRefPtr<JSC::Structure> structure,
                              JSDOMGlobalObject* globalObject)
