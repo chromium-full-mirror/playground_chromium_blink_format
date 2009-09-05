@@ -249,8 +249,6 @@ void WorkerContext::importScripts(const Vector<String>& urls,
     }
     completedURLs.append(url);
   }
-  String securityOrigin =
-      scriptExecutionContext()->securityOrigin()->toString();
   Vector<KURL>::const_iterator end = completedURLs.end();
 
   for (Vector<KURL>::const_iterator it = completedURLs.begin(); it != end;
