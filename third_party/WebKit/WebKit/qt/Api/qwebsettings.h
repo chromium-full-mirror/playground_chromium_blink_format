@@ -50,7 +50,6 @@ class QWEBKIT_EXPORT QWebSettings {
   };
   enum WebAttribute {
     AutoLoadImages,
-    DnsPrefetchEnabled,
     JavascriptEnabled,
     JavaEnabled,
     PluginsEnabled,
@@ -68,7 +67,8 @@ class QWEBKIT_EXPORT QWebSettings {
     LocalStorageDatabaseEnabled = LocalStorageEnabled,
 #endif
     LocalContentCanAccessRemoteUrls,
-    SessionStorageEnabled
+    SessionStorageEnabled,
+    DnsPrefetchEnabled
   };
   enum WebGraphic {
     MissingImageGraphic,
