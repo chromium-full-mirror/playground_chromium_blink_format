@@ -88,19 +88,11 @@ void V8AbstractEventListener::invokeEventHandler(
     tryCatch.Reset();
 
     // Call the event handler.
-    tryCatch.SetVerbose(false);  // We do not want to report the exception to
-                                 // the inspector console.
     returnValue = callListenerFunction(jsEvent, event, isWindowEvent);
-
-    // If an error occurs while handling the event, it should be reported.
-    if (tryCatch.HasCaught()) {
-      reportException(0, tryCatch);
-      tryCatch.Reset();
-    }
+    tryCatch.Reset();
 
     // Restore the old event. This must be done for all exit paths through this
     // method.
-    tryCatch.SetVerbose(true);
     if (savedEvent.IsEmpty())
       v8Context->Global()->SetHiddenValue(eventSymbol, v8::Undefined());
     else
