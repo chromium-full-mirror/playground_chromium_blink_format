@@ -220,7 +220,6 @@
 #include "JSSVGColor.cpp"
 #include "JSSVGComponentTransferFunctionElement.cpp"
 #include "JSSVGCursorElement.cpp"
-#include "JSSVGDefinitionSrcElement.cpp"
 #include "JSSVGDefsElement.cpp"
 #include "JSSVGDescElement.cpp"
 #include "JSSVGDocument.cpp"

@@ -1124,12 +1124,11 @@ V8ClassIndex::V8WrapperType V8DOMWrapper::htmlElementType(
 #endif
 
 #if ENABLE(SVG_FONTS)
-#define FOR_EACH_FONTS_TAG(macro)                                     \
-  macro(definition - src, DEFINITIONSRC) macro(font - face, FONTFACE) \
-      macro(font - face - format, FONTFACEFORMAT)                     \
-          macro(font - face - name, FONTFACENAME)                     \
-              macro(font - face - src, FONTFACESRC)                   \
-                  macro(font - face - uri, FONTFACEURI)
+#define FOR_EACH_FONTS_TAG(macro)                                          \
+  macro(font - face, FONTFACE) macro(font - face - format, FONTFACEFORMAT) \
+      macro(font - face - name, FONTFACENAME)                              \
+          macro(font - face - src, FONTFACESRC)                            \
+              macro(font - face - uri, FONTFACEURI)
 #else
 #define FOR_EACH_FONTS_TAG(marco)
 #endif

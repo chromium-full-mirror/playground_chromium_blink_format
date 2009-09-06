@@ -42,7 +42,6 @@
 #include "SVGColor.cpp"
 #include "SVGComponentTransferFunctionElement.cpp"
 #include "SVGCursorElement.cpp"
-#include "SVGDefinitionSrcElement.cpp"
 #include "SVGDefsElement.cpp"
 #include "SVGDescElement.cpp"
 #include "SVGDocument.cpp"
