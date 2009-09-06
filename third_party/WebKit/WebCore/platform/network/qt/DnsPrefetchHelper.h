@@ -20,9 +20,6 @@
 #define DNSPREFETCHHELPER_H
 
 #include <QObject>
-
-#if QT_VERSION >= 0x040600
-
 #include <QCache>
 #include <QHostInfo>
 #include <QSet>
@@ -70,7 +67,5 @@ class DnsPrefetchHelper : public QObject {
   int currentLookups;
 };
 }
-
-#endif
 
 #endif  // DNSPREFETCHHELPER_H
