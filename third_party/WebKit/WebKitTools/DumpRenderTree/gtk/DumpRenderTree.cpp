@@ -376,6 +376,11 @@ static void setDefaultsToConsistentStateValuesForTesting() {
 #if PLATFORM(X11)
   webkit_web_settings_add_extra_plugin_directory(webView, TEST_PLUGIN_DIR);
 #endif
+
+  gchar* databaseDirectory = g_build_filename(
+      g_get_user_data_dir(), "gtkwebkitdrt", "databases", NULL);
+  webkit_set_web_database_directory_path(databaseDirectory);
+  g_free(databaseDirectory);
 }
 
 static void runTest(const string& testPathOrURL) {
@@ -618,6 +623,27 @@ static gboolean webViewClose(WebKitWebView* view) {
   return TRUE;
 }
 
+static void databaseQuotaExceeded(WebKitWebView* view,
+                                  WebKitWebFrame* frame,
+                                  WebKitWebDatabase* database) {
+  ASSERT(view);
+  ASSERT(frame);
+  ASSERT(database);
+
+  WebKitSecurityOrigin* origin =
+      webkit_web_database_get_security_origin(database);
+  if (gLayoutTestController->dumpDatabaseCallbacks()) {
+    printf(
+        "UI DELEGATE DATABASE CALLBACK: "
+        "exceededDatabaseQuotaForSecurityOrigin:{%s, %s, %i} database:%s\n",
+        webkit_security_origin_get_protocol(origin),
+        webkit_security_origin_get_host(origin),
+        webkit_security_origin_get_port(origin),
+        webkit_web_database_get_name(database));
+  }
+  webkit_security_origin_set_web_database_quota(origin, 5 * 1024 * 1024);
+}
+
 static WebKitWebView* webViewCreate(WebKitWebView*, WebKitWebFrame*);
 
 static WebKitWebView* createWebView() {
@@ -639,7 +665,8 @@ static WebKitWebView* createWebView() {
       webViewNavigationPolicyDecisionRequested, 0,
       "signal::status-bar-text-changed", webViewStatusBarTextChanged, 0,
       "signal::create-web-view", webViewCreate, 0, "signal::close-web-view",
-      webViewClose, 0, NULL);
+      webViewClose, 0, "signal::database-quota-exceeded", databaseQuotaExceeded,
+      0, NULL);
 
   return view;
 }
