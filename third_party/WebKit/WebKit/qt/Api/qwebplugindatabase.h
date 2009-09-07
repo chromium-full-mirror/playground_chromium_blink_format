@@ -27,6 +27,7 @@
 #include <QtCore/qstringlist.h>
 
 namespace WebCore {
+class PluginDatabase;
 class PluginPackage;
 }
 
@@ -39,7 +40,7 @@ class QWEBKIT_EXPORT QWebPluginInfo {
   ~QWebPluginInfo();
 
  private:
-  QWebPluginInfo(WebCore::PluginPackage* plugin);
+  QWebPluginInfo(WebCore::PluginPackage* package);
 
  public:
   typedef QWebPluginFactory::MimeType MimeType;
@@ -62,6 +63,7 @@ class QWEBKIT_EXPORT QWebPluginInfo {
 
  private:
   QWebPluginInfoPrivate* d;
+  WebCore::PluginPackage* m_package;
 };
 
 class QWebPluginDatabasePrivate;
@@ -90,6 +92,7 @@ class QWEBKIT_EXPORT QWebPluginDatabase : public QObject {
 
  private:
   QWebPluginDatabasePrivate* d;
+  WebCore::PluginDatabase* m_database;
 };
 
 #endif  // QWEBPLUGINDATABASE_H
