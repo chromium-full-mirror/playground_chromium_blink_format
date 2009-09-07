@@ -77,9 +77,10 @@ ACCESSOR_GETTER(DOMApplicationCacheEventHandler) {
   DOMApplicationCache* appcache =
       V8DOMWrapper::convertToNativeObject<DOMApplicationCache>(
           V8ClassIndex::DOMAPPLICATIONCACHE, info.Holder());
-  EventListener* listener =
-      appcache->getAttributeEventListener(toEventID(name));
-  return eventListenerToV8Object(listener);
+  if (EventListener* listener =
+          appcache->getAttributeEventListener(toEventID(name)))
+    return eventListenerToV8Object(listener);
+  return v8::Null();
 }
 
 // Handles appcache.onfooevent attribute setting
