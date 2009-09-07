@@ -68,14 +68,14 @@ v8::Handle<v8::Value> V8Custom::WindowSetTimeoutImpl(const v8::Arguments& args,
   DOMWindow* imp = V8DOMWrapper::convertToNativeObject<DOMWindow>(
       V8ClassIndex::DOMWINDOW, args.Holder());
 
-  if (!imp->frame())
-    return v8::Undefined();
-
   if (!V8Proxy::canAccessFrame(imp->frame(), true))
     return v8::Undefined();
 
   ScriptExecutionContext* scriptContext =
-      static_cast<ScriptExecutionContext*>(imp->frame()->document());
+      static_cast<ScriptExecutionContext*>(imp->document());
+
+  if (!scriptContext)
+    return v8::Undefined();
 
   v8::Handle<v8::Value> function = args[0];
 
@@ -161,7 +161,7 @@ ACCESSOR_GETTER(DOMWindowEvent) {
   Frame* frame = V8DOMWrapper::convertToNativeObject<DOMWindow>(
                      V8ClassIndex::DOMWINDOW, holder)
                      ->frame();
-  if (!frame || !V8Proxy::canAccessFrame(frame, true))
+  if (!V8Proxy::canAccessFrame(frame, true))
     return v8::Undefined();
 
   v8::Local<v8::Context> context = V8Proxy::context(frame);
@@ -182,7 +182,7 @@ ACCESSOR_SETTER(DOMWindowEvent) {
   Frame* frame = V8DOMWrapper::convertToNativeObject<DOMWindow>(
                      V8ClassIndex::DOMWINDOW, holder)
                      ->frame();
-  if (!frame || !V8Proxy::canAccessFrame(frame, true))
+  if (!V8Proxy::canAccessFrame(frame, true))
     return;
 
   v8::Local<v8::Context> context = V8Proxy::context(frame);
@@ -238,10 +238,8 @@ CALLBACK_FUNC_DECL(DOMWindowAddEventListener) {
   if (!V8Proxy::canAccessFrame(imp->frame(), true))
     return v8::Undefined();
 
-  if (!imp->frame())
-    return v8::Undefined();  // DOMWindow could be disconnected from the frame
+  Document* doc = imp->document();
 
-  Document* doc = imp->frame()->document();
   if (!doc)
     return v8::Undefined();
 
@@ -271,10 +269,8 @@ CALLBACK_FUNC_DECL(DOMWindowRemoveEventListener) {
   if (!V8Proxy::canAccessFrame(imp->frame(), true))
     return v8::Undefined();
 
-  if (!imp->frame())
-    return v8::Undefined();
+  Document* doc = imp->document();
 
-  Document* doc = imp->frame()->document();
   if (!doc)
     return v8::Undefined();
 
@@ -410,10 +406,9 @@ ACCESSOR_SETTER(DOMWindowEventHandler) {
 
   DOMWindow* imp = V8DOMWrapper::convertToNativeObject<DOMWindow>(
       V8ClassIndex::DOMWINDOW, holder);
-  if (!imp->frame())
-    return;
 
-  Document* doc = imp->frame()->document();
+  Document* doc = imp->document();
+
   if (!doc)
     return;
 
@@ -444,10 +439,9 @@ ACCESSOR_GETTER(DOMWindowEventHandler) {
 
   DOMWindow* imp = V8DOMWrapper::convertToNativeObject<DOMWindow>(
       V8ClassIndex::DOMWINDOW, holder);
-  if (!imp->frame())
-    return v8::Undefined();
 
-  Document* doc = imp->frame()->document();
+  Document* doc = imp->document();
+
   if (!doc)
     return v8::Undefined();
 
@@ -579,7 +573,7 @@ CALLBACK_FUNC_DECL(DOMWindowShowModalDialog) {
       V8ClassIndex::DOMWINDOW, args.Holder());
   Frame* frame = window->frame();
 
-  if (!frame || !V8Proxy::canAccessFrame(frame, true))
+  if (!V8Proxy::canAccessFrame(frame, true))
     return v8::Undefined();
 
   Frame* callingFrame = V8Proxy::retrieveFrameForCallingContext();
@@ -678,7 +672,7 @@ CALLBACK_FUNC_DECL(DOMWindowOpen) {
       V8ClassIndex::DOMWINDOW, args.Holder());
   Frame* frame = parent->frame();
 
-  if (!frame || !V8Proxy::canAccessFrame(frame, true))
+  if (!V8Proxy::canAccessFrame(frame, true))
     return v8::Undefined();
 
   Frame* callingFrame = V8Proxy::retrieveFrameForCallingContext();
@@ -860,6 +854,7 @@ NAMED_PROPERTY_GETTER(DOMWindow) {
 
   // Search named items in the document.
   Document* doc = frame->document();
+
   if (doc) {
     RefPtr<HTMLCollection> items = doc->windowNamedItems(propName);
     if (items->length() >= 1) {
@@ -906,7 +901,9 @@ void V8Custom::ClearTimeoutImpl(const v8::Arguments& args) {
   if (!V8Proxy::canAccessFrame(imp->frame(), true))
     return;
   ScriptExecutionContext* context =
-      static_cast<ScriptExecutionContext*>(imp->frame()->document());
+      static_cast<ScriptExecutionContext*>(imp->document());
+  if (!context)
+    return;
   int handle = toInt32(args[0]);
   DOMTimer::removeById(context, handle);
 }
