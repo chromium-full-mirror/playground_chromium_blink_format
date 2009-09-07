@@ -309,7 +309,7 @@ void SharedWorkerScriptLoader::load(const KURL& url) {
   ASSERT(!hasPendingActivity());
   m_scriptLoader = new WorkerScriptLoader();
   m_scriptLoader->loadAsynchronously(scriptExecutionContext(), url,
-                                     DenyCrossOriginRedirect, this);
+                                     DenyCrossOriginRequests, this);
 
   // Stay alive until the load finishes.
   setPendingActivity(this);
