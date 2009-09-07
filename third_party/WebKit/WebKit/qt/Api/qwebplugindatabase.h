@@ -64,6 +64,7 @@ class QWEBKIT_EXPORT QWebPluginInfo {
  private:
   QWebPluginInfoPrivate* d;
   WebCore::PluginPackage* m_package;
+  mutable QList<MimeType> m_mimeTypes;
 };
 
 class QWebPluginDatabasePrivate;
