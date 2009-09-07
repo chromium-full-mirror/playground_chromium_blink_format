@@ -166,7 +166,6 @@ class DOMApplicationCache : public RefCounted<DOMApplicationCache>,
   virtual void derefEventTarget() { deref(); }
 
   ApplicationCacheHost* applicationCacheHost() const;
-  bool swapCache();
 
   RefPtr<EventListener>
       m_attributeEventListeners[ApplicationCacheHost::OBSOLETE_EVENT + 1];
