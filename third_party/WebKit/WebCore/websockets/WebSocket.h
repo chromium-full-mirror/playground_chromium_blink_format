@@ -31,26 +31,21 @@
 #ifndef WebSocket_h
 #define WebSocket_h
 
-#if ENABLE(WEB_SOCKETS)
-
 #include "ActiveDOMObject.h"
 #include "AtomicStringHash.h"
 #include "EventListener.h"
 #include "EventTarget.h"
 #include "KURL.h"
-#include "WebSocketChannelClient.h"
 #include <wtf/OwnPtr.h>
 #include <wtf/RefCounted.h>
 
 namespace WebCore {
 
 class String;
-class WebSocketChannel;
 
 class WebSocket : public RefCounted<WebSocket>,
                   public EventTarget,
-                  public ActiveDOMObject,
-                  public WebSocketChannelClient {
+                  public ActiveDOMObject {
  public:
   static PassRefPtr<WebSocket> create(ScriptExecutionContext* context) {
     return adoptRef(new WebSocket(context));
@@ -59,8 +54,8 @@ class WebSocket : public RefCounted<WebSocket>,
 
   enum State { CONNECTING = 0, OPEN = 1, CLOSED = 2 };
 
-  void connect(const KURL&, ExceptionCode&);
-  void connect(const KURL&, const String& protocol, ExceptionCode&);
+  void connect(const KURL& url, ExceptionCode&);
+  void connect(const KURL& url, const String& protocol, ExceptionCode&);
 
   bool send(const String& message, ExceptionCode&);
 
@@ -88,9 +83,6 @@ class WebSocket : public RefCounted<WebSocket>,
 
   virtual ScriptExecutionContext* scriptExecutionContext() const;
 
-  typedef Vector<RefPtr<EventListener>> ListenerVector;
-  typedef HashMap<AtomicString, ListenerVector> EventListenersMap;
-
   virtual void addEventListener(const AtomicString& eventType,
                                 PassRefPtr<EventListener>,
                                 bool useCapture);
@@ -98,10 +90,9 @@ class WebSocket : public RefCounted<WebSocket>,
                                    EventListener*,
                                    bool useCapture);
   virtual bool dispatchEvent(PassRefPtr<Event>, ExceptionCode&);
-  EventListenersMap& eventListeners() { return m_eventListeners; }
 
   // ActiveDOMObject
-  //  virtual bool hasPendingActivity() const;
+  // virtual bool hasPendingActivity() const;
   // virtual void contextDestroyed();
   // virtual bool canSuspend() const;
   // virtual void suspend();
@@ -111,27 +102,26 @@ class WebSocket : public RefCounted<WebSocket>,
   using RefCounted<WebSocket>::ref;
   using RefCounted<WebSocket>::deref;
 
-  // WebSocketChannelClient
-  virtual void didConnect();
-  virtual void didReceiveMessage(const String& msg);
-  virtual void didClose();
-
  private:
   WebSocket(ScriptExecutionContext*);
 
   virtual void refEventTarget() { ref(); }
   virtual void derefEventTarget() { deref(); }
 
-  void dispatchOpenEvent(Event*);
-  void dispatchMessageEvent(Event*);
-  void dispatchCloseEvent(Event*);
+  // WebSocketChannelClient
+  void didConnect();
+  void didReceiveMessage(const String& msg);
+  void didClose();
 
-  RefPtr<WebSocketChannel> m_channel;
+  void dispatchOpenEvent();
+  void dispatchMessageEvent(const String& msg);
+  void dispatchCloseEvent();
+
+  // FIXME: add WebSocketChannel.
 
   RefPtr<EventListener> m_onopen;
   RefPtr<EventListener> m_onmessage;
   RefPtr<EventListener> m_onclose;
-  EventListenersMap m_eventListeners;
 
   State m_state;
   KURL m_url;
@@ -139,7 +129,5 @@ class WebSocket : public RefCounted<WebSocket>,
 };
 
 }  // namespace WebCore
-
-#endif  // ENABLE(WEB_SOCKETS)
 
 #endif  // WebSocket_h
