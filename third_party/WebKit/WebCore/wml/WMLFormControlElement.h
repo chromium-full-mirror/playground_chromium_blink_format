@@ -43,6 +43,7 @@ class WMLFormControlElement : public WMLElement {
     m_valueMatchesRenderer = b;
   }
 
+  virtual bool supportsFocus() const;
   virtual bool isFocusable() const;
 
   virtual void attach();

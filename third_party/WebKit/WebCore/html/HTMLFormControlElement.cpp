@@ -218,12 +218,17 @@ void HTMLFormControlElement::recalcStyle(StyleChange change) {
     renderer()->updateFromElement();
 }
 
+bool HTMLFormControlElement::supportsFocus() const {
+  return !disabled();
+}
+
 bool HTMLFormControlElement::isFocusable() const {
-  if (disabled() || !renderer() ||
-      (renderer()->style() && renderer()->style()->visibility() != VISIBLE) ||
-      !renderer()->isBox() || toRenderBox(renderer())->size().isEmpty())
+  if (!renderer() || !renderer()->isBox() ||
+      toRenderBox(renderer())->size().isEmpty())
     return false;
-  return true;
+  // HTMLElement::isFocusable handles visibility and calls suportsFocus which
+  // will cover the disabled case.
+  return HTMLElement::isFocusable();
 }
 
 bool HTMLFormControlElement::isKeyboardFocusable(KeyboardEvent* event) const {
@@ -279,10 +284,6 @@ void HTMLFormControlElement::dispatchBlurEvent() {
     document()->frame()->page()->chrome()->client()->formDidBlur(this);
 
   HTMLElement::dispatchBlurEvent();
-}
-
-bool HTMLFormControlElement::supportsFocus() const {
-  return isFocusable() || (!disabled() && !document()->haveStylesheetsLoaded());
 }
 
 HTMLFormElement* HTMLFormControlElement::virtualForm() const {

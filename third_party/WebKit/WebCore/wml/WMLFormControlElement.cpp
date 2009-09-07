@@ -36,6 +36,10 @@ WMLFormControlElement::WMLFormControlElement(const QualifiedName& tagName,
 
 WMLFormControlElement::~WMLFormControlElement() {}
 
+bool WMLFormControlElement::supportsFocus() const {
+  return true;
+}
+
 bool WMLFormControlElement::isFocusable() const {
   if (!renderer() || !renderer()->isBox())
     return false;
@@ -43,12 +47,7 @@ bool WMLFormControlElement::isFocusable() const {
   if (toRenderBox(renderer())->size().isEmpty())
     return false;
 
-  if (RenderStyle* style = renderer()->style()) {
-    if (style->visibility() != VISIBLE)
-      return false;
-  }
-
-  return true;
+  return WMLElement::isFocusable();
 }
 
 void WMLFormControlElement::attach() {

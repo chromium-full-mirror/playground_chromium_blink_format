@@ -46,8 +46,8 @@ bool HTMLFieldSetElement::checkDTD(const Node* newChild) {
   return newChild->hasTagName(legendTag) || HTMLElement::checkDTD(newChild);
 }
 
-bool HTMLFieldSetElement::isFocusable() const {
-  return HTMLElement::isFocusable();
+bool HTMLFieldSetElement::supportsFocus() const {
+  return HTMLElement::supportsFocus();
 }
 
 const AtomicString& HTMLFieldSetElement::formControlType() const {

@@ -57,7 +57,7 @@ class HTMLFrameElementBase : public HTMLFrameOwnerElement {
  private:
   virtual bool canLazyAttach() { return false; }
 
-  virtual bool isFocusable() const;
+  virtual bool supportsFocus() const;
   virtual void setFocus(bool);
 
   virtual bool isURLAttribute(Attribute*) const;

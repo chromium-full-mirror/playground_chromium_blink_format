@@ -1833,6 +1833,10 @@ bool EventHandler::dispatchMouseEvent(const AtomicString& eventType,
         m_nodeUnderMouse->dispatchMouseEvent(mouseEvent, eventType, clickCount);
 
   if (!swallowEvent && eventType == eventNames().mousedownEvent) {
+    // The layout needs to be up to date to determine if an element is
+    // focusable.
+    m_frame->document()->updateLayoutIgnorePendingStylesheets();
+
     // Blur current focus node when a link/button is clicked; this
     // is expected by some sites that rely on onChange handlers running
     // from form fields before the button click is processed.

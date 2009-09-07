@@ -148,6 +148,8 @@ bool FocusController::advanceFocus(FocusDirection direction,
   if (caretBrowsing && !currentNode)
     currentNode = frame->selection()->start().node();
 
+  document->updateLayoutIgnorePendingStylesheets();
+
   Node* node = (direction == FocusDirectionForward)
                    ? document->nextFocusableNode(currentNode, event)
                    : document->previousFocusableNode(currentNode, event);

@@ -42,6 +42,7 @@ class HTMLOptionElement : public HTMLFormControlElement, public OptionElement {
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusOptional; }
   virtual int tagPriority() const { return 2; }
   virtual bool checkDTD(const Node* newChild);
+  virtual bool supportsFocus() const;
   virtual bool isFocusable() const;
   virtual bool rendererIsNeeded(RenderStyle*) { return false; }
   virtual void attach();

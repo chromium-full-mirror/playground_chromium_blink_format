@@ -659,8 +659,8 @@ void HTMLElement::addHTMLAlignmentToStyledElement(StyledElement* element,
     element->addCSSProperty(attr, CSSPropertyVerticalAlign, verticalAlignValue);
 }
 
-bool HTMLElement::isFocusable() const {
-  return Element::isFocusable() ||
+bool HTMLElement::supportsFocus() const {
+  return Element::supportsFocus() ||
          (isContentEditable() && parent() && !parent()->isContentEditable());
 }
 

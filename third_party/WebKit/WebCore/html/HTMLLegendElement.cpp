@@ -41,8 +41,8 @@ HTMLLegendElement::HTMLLegendElement(const QualifiedName& tagName,
 
 HTMLLegendElement::~HTMLLegendElement() {}
 
-bool HTMLLegendElement::isFocusable() const {
-  return HTMLElement::isFocusable();
+bool HTMLLegendElement::supportsFocus() const {
+  return HTMLElement::supportsFocus();
 }
 
 const AtomicString& HTMLLegendElement::formControlType() const {
