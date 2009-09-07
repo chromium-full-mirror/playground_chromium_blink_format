@@ -68,8 +68,9 @@ void ResourceRequest::updateFromSoupMessage(SoupMessage* soupMessage) {
     m_httpHeaderFields.set(String::fromUTF8(headerName),
                            String::fromUTF8(headerValue));
 
-  m_httpBody = FormData::create(soupMessage->request_body->data,
-                                soupMessage->request_body->length);
+  if (soupMessage->request_body->data)
+    m_httpBody = FormData::create(soupMessage->request_body->data,
+                                  soupMessage->request_body->length);
 
   // FIXME: m_allowCookies and m_firstPartyForCookies should
   // probably be handled here and on doUpdatePlatformRequest

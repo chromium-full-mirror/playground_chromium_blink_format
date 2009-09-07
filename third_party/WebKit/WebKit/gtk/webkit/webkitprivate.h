@@ -47,6 +47,7 @@
 #include "BackForwardList.h"
 #include "CString.h"
 #include <enchant.h>
+#include "GOwnPtr.h"
 #include "HistoryItem.h"
 #include "Settings.h"
 #include "Page.h"
@@ -86,6 +87,8 @@ WebKitWebNavigationReason kit(WebCore::NavigationType type);
 WebCore::NavigationType core(WebKitWebNavigationReason reason);
 
 WebCore::ResourceRequest core(WebKitNetworkRequest* request);
+
+WebCore::ResourceResponse core(WebKitNetworkResponse* response);
 
 WebCore::EditingBehavior core(WebKitEditingBehavior type);
 
@@ -207,6 +210,7 @@ struct _WebKitWebResourcePrivate {
 };
 WebKitWebResource* webkit_web_resource_new_with_core_resource(
     PassRefPtr<WebCore::ArchiveResource>);
+
 // end WebKitWebResource private
 
 void webkit_web_inspector_set_inspector_client(WebKitWebInspector*,
@@ -245,6 +249,9 @@ void webkit_web_policy_decision_cancel(WebKitWebPolicyDecision* decision);
 
 WebKitNetworkRequest* webkit_network_request_new_with_core_request(
     const WebCore::ResourceRequest& resourceRequest);
+
+WebKitNetworkResponse* webkit_network_response_new_with_core_response(
+    const WebCore::ResourceResponse& resourceResponse);
 
 // FIXME: move this to webkitnetworkrequest.h once the API is agreed upon.
 WEBKIT_API SoupMessage* webkit_network_request_get_message(
@@ -322,6 +329,17 @@ WebKitWebDataSource* webkit_web_data_source_new_with_loader(
 WEBKIT_API WebKitWebDatabase* webkit_security_origin_get_web_database(
     WebKitSecurityOrigin* securityOrigin,
     const char* databaseName);
+}
+
+namespace WTF {
+template <>
+void freeOwnedGPtr<SoupMessage>(SoupMessage*);
+template <>
+void freeOwnedGPtr<WebKitNetworkRequest>(WebKitNetworkRequest*);
+template <>
+void freeOwnedGPtr<WebKitNetworkResponse>(WebKitNetworkResponse*);
+template <>
+void freeOwnedGPtr<WebKitWebResource>(WebKitWebResource*);
 }
 
 #endif
