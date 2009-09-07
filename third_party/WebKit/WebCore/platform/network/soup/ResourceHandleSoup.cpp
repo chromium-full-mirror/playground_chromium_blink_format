@@ -429,6 +429,13 @@ static SoupSession* createSoupSession() {
   return soup_session_async_new();
 }
 
+// Values taken from http://stevesouders.com/ua/index.php following
+// the rule "Do What Every Other Modern Browser Is Doing". They seem
+// to significantly improve page loading time compared to soup's
+// default values.
+#define MAX_CONNECTIONS 60
+#define MAX_CONNECTIONS_PER_HOST 6
+
 static void ensureSessionIsInitialized(SoupSession* session) {
   if (g_object_get_data(G_OBJECT(session), "webkit-init"))
     return;
@@ -447,6 +454,9 @@ static void ensureSessionIsInitialized(SoupSession* session) {
     soup_logger_attach(logger, session);
     g_object_unref(logger);
   }
+
+  g_object_set(session, SOUP_SESSION_MAX_CONNS, MAX_CONNECTIONS,
+               SOUP_SESSION_MAX_CONNS_PER_HOST, MAX_CONNECTIONS_PER_HOST, NULL);
 
   g_object_set_data(G_OBJECT(session), "webkit-init",
                     reinterpret_cast<void*>(0xdeadbeef));
