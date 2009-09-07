@@ -219,10 +219,7 @@ void webkit_network_request_set_uri(WebKitNetworkRequest* request,
     return;
 
   SoupURI* soupURI = soup_uri_new(uri);
-  if (!soupURI) {
-    g_warning("Invalid URI: %s", uri);
-    return;
-  }
+  g_return_if_fail(soupURI);
 
   soup_message_set_uri(priv->message, soupURI);
   soup_uri_free(soupURI);
