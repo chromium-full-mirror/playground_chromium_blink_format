@@ -75,7 +75,7 @@ void drawTextWithSpacing(GraphicsContext* graphicsContext,
   CGFontRef cgFont;
 
 #ifdef wxOSX_USE_CORE_TEXT&& wxOSX_USE_CORE_TEXT
-  cgFont = CTFontCopyGraphicsFont((CTFontRef)font->OSXGetCTFont(), NULL);
+  cgFont = CTFontCopyGraphicsFont((CTFontRef)wxfont->OSXGetCTFont(), NULL);
 #else
   ATSFontRef fontRef;
 
