@@ -36,6 +36,7 @@ typedef struct _GdkEventMotion GdkEventMotion;
 #if PLATFORM(QT)
 QT_BEGIN_NAMESPACE
 class QInputEvent;
+class QGraphicsSceneMouseEvent;
 QT_END_NAMESPACE
 #endif
 
@@ -130,6 +131,7 @@ class PlatformMouseEvent {
 
 #if PLATFORM(QT)
   PlatformMouseEvent(QInputEvent*, int clickCount);
+  PlatformMouseEvent(QGraphicsSceneMouseEvent*, int clickCount);
 #endif
 
 #if PLATFORM(WIN)
