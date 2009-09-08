@@ -496,10 +496,12 @@ class Document : public ContainerNode, public ScriptExecutionContext {
 
   virtual String userAgent(const KURL&) const;
 
-  String userStyleSheet() const;
+  CSSStyleSheet* pageUserSheet();
+  void clearPageUserSheet();
 
   CSSStyleSheet* elementSheet();
   CSSStyleSheet* mappedElementSheet();
+
   virtual Tokenizer* createTokenizer();
   Tokenizer* tokenizer() { return m_tokenizer; }
 
@@ -1085,6 +1087,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
 
   RefPtr<CSSStyleSheet> m_elemSheet;
   RefPtr<CSSStyleSheet> m_mappedElementSheet;
+  RefPtr<CSSStyleSheet> m_pageUserSheet;
 
   bool m_printing;
 

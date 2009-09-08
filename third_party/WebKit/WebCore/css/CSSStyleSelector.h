@@ -80,9 +80,9 @@ class MediaQueryResult {
 class CSSStyleSelector : public Noncopyable {
  public:
   CSSStyleSelector(Document*,
-                   const String& userStyleSheet,
-                   StyleSheetList*,
-                   CSSStyleSheet*,
+                   CSSStyleSheet* userStyleSheet,
+                   StyleSheetList* authorSheets,
+                   CSSStyleSheet* mappedElementSheet,
                    bool strictParsing,
                    bool matchAuthorAndUserStyles);
   ~CSSStyleSelector();
@@ -218,7 +218,6 @@ class CSSStyleSelector : public Noncopyable {
 
   CSSRuleSet* m_authorStyle;
   CSSRuleSet* m_userStyle;
-  RefPtr<CSSStyleSheet> m_userSheet;
 
   bool m_hasUAAppearance;
   BorderData m_borderData;

@@ -37,7 +37,7 @@ void PlaceholderDocument::attach() {
   if (!styleSelector()) {
     RefPtr<StyleSheetList> styleSheetList = StyleSheetList::create(this);
     setStyleSelector(new CSSStyleSelector(
-        this, userStyleSheet(), styleSheetList.get(), 0, true, false));
+        this, pageUserSheet(), styleSheetList.get(), 0, true, false));
   }
 
   // Skipping Document::attach().

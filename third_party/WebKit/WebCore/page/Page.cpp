@@ -470,6 +470,12 @@ void Page::userStyleSheetLocationChanged() {
       return;
     }
   }
+
+  for (Frame* frame = mainFrame(); frame;
+       frame = frame->tree()->traverseNext()) {
+    if (frame->document())
+      frame->document()->clearPageUserSheet();
+  }
 }
 
 const String& Page::userStyleSheet() const {

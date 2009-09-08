@@ -1379,7 +1379,7 @@ void Document::attach() {
     if (Settings* docSettings = settings())
       matchAuthorAndUserStyles = docSettings->authorAndUserStylesEnabled();
     m_styleSelector = new CSSStyleSelector(
-        this, userStyleSheet(), m_styleSheets.get(), m_mappedElementSheet.get(),
+        this, pageUserSheet(), m_styleSheets.get(), m_mappedElementSheet.get(),
         !inCompatMode(), matchAuthorAndUserStyles);
   }
 
@@ -1913,11 +1913,27 @@ String Document::userAgent(const KURL& url) const {
   return frame() ? frame()->loader()->userAgent(url) : String();
 }
 
-String Document::userStyleSheet() const {
-  Page* page = this->page();
-  if (!page)
-    return String();
-  return page->userStyleSheet();
+CSSStyleSheet* Document::pageUserSheet() {
+  if (m_pageUserSheet)
+    return m_pageUserSheet.get();
+
+  Page* owningPage = page();
+  if (!owningPage)
+    return 0;
+
+  String userSheetText = owningPage->userStyleSheet();
+  if (userSheetText.isEmpty())
+    return 0;
+
+  // Parse the sheet and cache it.
+  m_pageUserSheet = CSSStyleSheet::create(this);
+  m_pageUserSheet->parseString(userSheetText, !inCompatMode());
+  return m_pageUserSheet.get();
+}
+
+void Document::clearPageUserSheet() {
+  m_pageUserSheet = 0;
+  updateStyleSelector();
 }
 
 CSSStyleSheet* Document::elementSheet() {
@@ -2496,7 +2512,7 @@ void Document::recalcStyleSelector() {
   // Create a new style selector
   delete m_styleSelector;
   m_styleSelector = new CSSStyleSelector(
-      this, userStyleSheet(), m_styleSheets.get(), m_mappedElementSheet.get(),
+      this, pageUserSheet(), m_styleSheets.get(), m_mappedElementSheet.get(),
       !inCompatMode(), matchAuthorAndUserStyles);
   m_didCalculateStyleSelector = true;
 }

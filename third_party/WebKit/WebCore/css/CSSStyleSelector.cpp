@@ -435,7 +435,7 @@ static const MediaQueryEvaluator& printEval() {
 }
 
 CSSStyleSelector::CSSStyleSelector(Document* doc,
-                                   const String& userStyleSheet,
+                                   CSSStyleSheet* userSheet,
                                    StyleSheetList* styleSheets,
                                    CSSStyleSheet* mappedElementSheet,
                                    bool strictParsing,
@@ -483,12 +483,9 @@ CSSStyleSelector::CSSStyleSelector(Document* doc,
   }
 
   // FIXME: This sucks! The user sheet is reparsed every time!
-  if (!userStyleSheet.isEmpty()) {
-    m_userSheet = CSSStyleSheet::create(doc);
-    m_userSheet->parseString(userStyleSheet, strictParsing);
-
+  if (userSheet) {
     m_userStyle = new CSSRuleSet();
-    m_userStyle->addRulesFromSheet(m_userSheet.get(), *m_medium, this);
+    m_userStyle->addRulesFromSheet(userSheet, *m_medium, this);
   }
 
   // add stylesheets from document
