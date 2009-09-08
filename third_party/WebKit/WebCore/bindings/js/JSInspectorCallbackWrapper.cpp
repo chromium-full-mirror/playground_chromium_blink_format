@@ -76,7 +76,7 @@ JSValue JSInspectorCallbackWrapper::wrap(ExecState* unwrappedExec,
   }
   return new (unwrappedExec) JSInspectorCallbackWrapper(
       unwrappedExec, unwrappedObject,
-      asObject(wrap(unwrappedExec, prototype))->inheritorID());
+      createStructure(wrap(unwrappedExec, prototype)));
 }
 
 JSInspectorCallbackWrapper::JSInspectorCallbackWrapper(
