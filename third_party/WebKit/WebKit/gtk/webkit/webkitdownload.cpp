@@ -533,6 +533,10 @@ static void webkit_download_set_response(WebKitDownload* download,
   // FIXME Use WebKitNetworkResponse when it's merged.
   WebKitDownloadPrivate* priv = download->priv;
   priv->networkResponse = new ResourceResponse(response);
+
+  if (!response.isNull() && !response.suggestedFilename().isEmpty())
+    webkit_download_set_suggested_filename(
+        download, response.suggestedFilename().utf8().data());
 }
 
 /**
@@ -567,6 +571,8 @@ void webkit_download_set_suggested_filename(WebKitDownload* download,
   WebKitDownloadPrivate* priv = download->priv;
   g_free(priv->suggestedFilename);
   priv->suggestedFilename = g_strdup(suggestedFilename);
+
+  g_object_notify(G_OBJECT(download), "suggested-filename");
 }
 
 /**
