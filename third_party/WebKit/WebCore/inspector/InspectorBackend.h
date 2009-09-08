@@ -97,6 +97,10 @@ class InspectorBackend : public RefCounted<InspectorBackend> {
 
   const String& platform() const;
 
+  void enableTimeline(bool always);
+  void disableTimeline(bool always);
+  bool timelineEnabled() const;
+
   void getCookies(long callId);
   void deleteCookie(const String& cookieName);
 

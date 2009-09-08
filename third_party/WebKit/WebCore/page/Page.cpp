@@ -42,6 +42,7 @@
 #include "HTMLElement.h"
 #include "HistoryItem.h"
 #include "InspectorController.h"
+#include "InspectorTimelineAgent.h"
 #include "Logging.h"
 #include "Navigator.h"
 #include "NetworkStateNotifier.h"
@@ -638,6 +639,10 @@ void Page::setJavaScriptURLsAreAllowed(bool areAllowed) {
 
 bool Page::javaScriptURLsAreAllowed() const {
   return m_javaScriptURLsAreAllowed;
+}
+
+InspectorTimelineAgent* Page::inspectorTimelineAgent() const {
+  return m_inspectorController->timelineAgent();
 }
 
 }  // namespace WebCore

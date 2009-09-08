@@ -58,6 +58,7 @@ class FocusController;
 class Frame;
 class InspectorClient;
 class InspectorController;
+class InspectorTimelineAgent;
 class Node;
 class PageGroup;
 class PluginData;
@@ -260,6 +261,8 @@ class Page : public Noncopyable {
 
   void setJavaScriptURLsAreAllowed(bool);
   bool javaScriptURLsAreAllowed() const;
+
+  InspectorTimelineAgent* inspectorTimelineAgent() const;
 
  private:
   void initGroup();

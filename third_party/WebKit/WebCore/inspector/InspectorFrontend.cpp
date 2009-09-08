@@ -175,6 +175,20 @@ void InspectorFrontend::resourceTrackingWasDisabled() {
   callSimpleFunction("resourceTrackingWasDisabled");
 }
 
+void InspectorFrontend::timelineWasEnabled() {
+  callSimpleFunction("timelineWasEnabled");
+}
+
+void InspectorFrontend::timelineWasDisabled() {
+  callSimpleFunction("timelineWasDisabled");
+}
+
+void InspectorFrontend::addItemToTimeline(const ScriptObject& itemObj) {
+  OwnPtr<ScriptFunctionCall> function(newFunctionCall("addItemToTimeline"));
+  function->appendArgument(itemObj);
+  function->call();
+}
+
 #if ENABLE(JAVASCRIPT_DEBUGGER)
 void InspectorFrontend::attachDebuggerWhenShown() {
   callSimpleFunction("attachDebuggerWhenShown");

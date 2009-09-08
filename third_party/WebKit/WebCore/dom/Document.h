@@ -35,6 +35,7 @@
 #include "CollectionType.h"
 #include "Color.h"
 #include "DocumentMarker.h"
+#include "Page.h"
 #include "ScriptExecutionContext.h"
 #include "Timer.h"
 #include <wtf/HashCountedSet.h>
@@ -76,12 +77,12 @@ class HTMLFormElement;
 class HTMLHeadElement;
 class HTMLInputElement;
 class HTMLMapElement;
+class InspectorTimelineAgent;
 class IntPoint;
 class JSNode;
 class MouseEventWithHitTestResults;
 class NodeFilter;
 class NodeIterator;
-class Page;
 class PlatformMouseEvent;
 class ProcessingInstruction;
 class Range;
@@ -418,10 +419,11 @@ class Document : public ContainerNode, public ScriptExecutionContext {
                                AtomicStringImpl* type,
                                String& state);
 
-  FrameView* view() const;                  // can be NULL
-  Frame* frame() const { return m_frame; }  // can be NULL
-  Page* page() const;                       // can be NULL
-  Settings* settings() const;               // can be NULL
+  FrameView* view() const;                                 // can be NULL
+  Frame* frame() const { return m_frame; }                 // can be NULL
+  Page* page() const;                                      // can be NULL
+  Settings* settings() const;                              // can be NULL
+  InspectorTimelineAgent* inspectorTimelineAgent() const;  // can be NULL
 
   PassRefPtr<Range> createRange();
 
@@ -1279,6 +1281,10 @@ inline bool Document::hasElementWithId(AtomicStringImpl* id) const {
 
 inline bool Node::isDocumentNode() const {
   return this == m_document;
+}
+
+inline InspectorTimelineAgent* Document::inspectorTimelineAgent() const {
+  return page() ? page()->inspectorTimelineAgent() : 0;
 }
 
 }  // namespace WebCore

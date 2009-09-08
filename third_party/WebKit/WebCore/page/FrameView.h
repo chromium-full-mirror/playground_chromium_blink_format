@@ -26,7 +26,9 @@
 #ifndef FrameView_h
 #define FrameView_h
 
+#include "Frame.h"
 #include "IntSize.h"
+#include "Page.h"
 #include "RenderLayer.h"
 #include "ScrollView.h"
 #include <wtf/Forward.h>
@@ -38,6 +40,7 @@ class Color;
 class Event;
 class Frame;
 class FrameViewPrivate;
+class InspectorTimelineAgent;
 class IntRect;
 class Node;
 class PlatformMouseEvent;
@@ -254,6 +257,8 @@ class FrameView : public ScrollView {
   bool updateWidgets();
   void scrollToAnchor();
 
+  InspectorTimelineAgent* inspectorTimelineAgent() const;
+
   bool hasCustomScrollbars() const;
 
   virtual void updateScrollCorner();
@@ -330,6 +335,10 @@ class FrameView : public ScrollView {
   // Renderer to hold our custom scroll corner.
   RenderScrollbarPart* m_scrollCorner;
 };
+
+inline InspectorTimelineAgent* FrameView::inspectorTimelineAgent() const {
+  return m_frame->page() ? m_frame->page()->inspectorTimelineAgent() : 0;
+}
 
 }  // namespace WebCore
 
