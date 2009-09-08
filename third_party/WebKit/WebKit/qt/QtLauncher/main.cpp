@@ -445,8 +445,7 @@ int main(int argc, char** argv) {
                                                true);
   QWebSettings::globalSettings()->setAttribute(
       QWebSettings::DeveloperExtrasEnabled, true);
-  QWebSettings::globalSettings()->setAttribute(
-      QWebSettings::LocalStorageEnabled, true);
+  QWebSettings::enablePersistentStorage();
 
   const QStringList args = app.arguments();
 

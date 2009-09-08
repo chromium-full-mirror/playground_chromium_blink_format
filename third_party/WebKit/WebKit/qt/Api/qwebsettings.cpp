@@ -37,7 +37,11 @@
 #include "IntSize.h"
 #include "ApplicationCacheStorage.h"
 #include "DatabaseTracker.h"
+#include "FileSystem.h"
 
+#include <QApplication>
+#include <QDesktopServices>
+#include <QDir>
 #include <QHash>
 #include <QSharedData>
 #include <QUrl>
@@ -378,10 +382,10 @@ QWebSettings* QWebSettings::globalSettings() {
         are also drawn when the page is printed.
     \value OfflineStorageDatabaseEnabled Specifies whether support for the HTML
    5
-        offline storage feature is enabled or not.
+        offline storage feature is enabled or not. Disabled by default.
     \value OfflineWebApplicationCacheEnabled Specifies whether support for the
    HTML 5
-        web application cache feature is enabled or not.
+        web application cache feature is enabled or not. Disabled by default.
     \value LocalStorageEnabled Specifies whether support for the HTML 5
         local storage feature is enabled or not. Disabled by default.
     \value LocalContentCanAccessRemoteUrls Specifies whether locally loaded
@@ -413,8 +417,8 @@ QWebSettings::QWebSettings() : d(new QWebSettingsPrivate) {
   d->attributes.insert(QWebSettings::LinksIncludedInFocusChain, true);
   d->attributes.insert(QWebSettings::ZoomTextOnly, false);
   d->attributes.insert(QWebSettings::PrintElementBackgrounds, true);
-  d->attributes.insert(QWebSettings::OfflineStorageDatabaseEnabled, true);
-  d->attributes.insert(QWebSettings::OfflineWebApplicationCacheEnabled, true);
+  d->attributes.insert(QWebSettings::OfflineStorageDatabaseEnabled, false);
+  d->attributes.insert(QWebSettings::OfflineWebApplicationCacheEnabled, false);
   d->attributes.insert(QWebSettings::LocalStorageEnabled, false);
   d->attributes.insert(QWebSettings::LocalContentCanAccessRemoteUrls, false);
   d->attributes.insert(QWebSettings::SessionStorageEnabled, true);
@@ -921,14 +925,50 @@ void QWebSettings::setLocalStoragePath(const QString& path) {
 
     Returns the path for HTML5 local storage.
 
-    The path is initialized to a directory called LocalStorage under
-    the user-specific cache data location specified by
-    \l{QDesktopServices::CacheLocation}{CacheLocation}.
-
     \sa setLocalStoragePath()
 */
 QString QWebSettings::localStoragePath() const {
   return d->localStoragePath;
+}
+
+/*!
+    \since 4.6
+    \relates QWebSettings
+
+    Enables WebKit persistent data and sets the path to \a path.
+    If the \a path is empty the path for persistent data is set to the
+    user-specific data location specified by
+    \l{QDesktopServices::DataLocation}{DataLocation}.
+
+    \sa localStoragePath()
+*/
+void QWebSettings::enablePersistentStorage(const QString& path) {
+  QString storagePath;
+
+  if (path.isEmpty()) {
+    storagePath =
+        QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+
+    if (storagePath.isEmpty())
+      storagePath = WebCore::pathByAppendingComponent(
+          QDir::homePath(), QCoreApplication::applicationName());
+  } else
+    storagePath = path;
+
+  WebCore::makeAllDirectories(storagePath);
+
+  QWebSettings::setIconDatabasePath(storagePath);
+  QWebSettings::setOfflineWebApplicationCachePath(storagePath);
+  QWebSettings::setOfflineStoragePath(
+      WebCore::pathByAppendingComponent(storagePath, "Databases"));
+  QWebSettings::globalSettings()->setLocalStoragePath(
+      WebCore::pathByAppendingComponent(storagePath, "LocalStorage"));
+  QWebSettings::globalSettings()->setAttribute(
+      QWebSettings::LocalStorageEnabled, true);
+  QWebSettings::globalSettings()->setAttribute(
+      QWebSettings::OfflineStorageDatabaseEnabled, true);
+  QWebSettings::globalSettings()->setAttribute(
+      QWebSettings::OfflineWebApplicationCacheEnabled, true);
 }
 
 /*!

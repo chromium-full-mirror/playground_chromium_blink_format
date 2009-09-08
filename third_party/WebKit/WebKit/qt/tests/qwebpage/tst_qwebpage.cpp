@@ -110,6 +110,7 @@ class tst_QWebPage : public QObject {
   void protectBindingsRuntimeObjectsFromCollector();
   void localURLSchemes();
   void testOptionalJSObjects();
+  void testEnablePersistentStorage();
 
  private:
  private:
@@ -1372,6 +1373,39 @@ void tst_QWebPage::testOptionalJSObjects() {
   QCOMPARE(testFlag(webPage2, QWebSettings::SessionStorageEnabled,
                     "sessionStorage", false),
            true);
+}
+
+void tst_QWebPage::testEnablePersistentStorage() {
+  QWebPage webPage;
+
+  // By default all persistent options should be disabled
+  QCOMPARE(webPage.settings()->testAttribute(QWebSettings::LocalStorageEnabled),
+           false);
+  QCOMPARE(webPage.settings()->testAttribute(
+               QWebSettings::OfflineStorageDatabaseEnabled),
+           false);
+  QCOMPARE(webPage.settings()->testAttribute(
+               QWebSettings::OfflineWebApplicationCacheEnabled),
+           false);
+  QVERIFY(webPage.settings()->iconDatabasePath().isEmpty());
+
+  QWebSettings::enablePersistentStorage();
+
+  // Give it some time to initialize - icon database needs it
+  QTest::qWait(1000);
+
+  QCOMPARE(webPage.settings()->testAttribute(QWebSettings::LocalStorageEnabled),
+           true);
+  QCOMPARE(webPage.settings()->testAttribute(
+               QWebSettings::OfflineStorageDatabaseEnabled),
+           true);
+  QCOMPARE(webPage.settings()->testAttribute(
+               QWebSettings::OfflineWebApplicationCacheEnabled),
+           true);
+
+  QVERIFY(!webPage.settings()->offlineStoragePath().isEmpty());
+  QVERIFY(!webPage.settings()->offlineWebApplicationCachePath().isEmpty());
+  QVERIFY(!webPage.settings()->iconDatabasePath().isEmpty());
 }
 
 QTEST_MAIN(tst_QWebPage)
