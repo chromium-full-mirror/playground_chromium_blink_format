@@ -66,9 +66,6 @@ class ResourceResponse : public ResourceResponseBase {
   const KURL& appCacheManifestURL() const { return m_appCacheManifestURL; }
   void setAppCacheManifestURL(const KURL& url) { m_appCacheManifestURL = url; }
 
-  // DEPRECATED - use appCacheID()
-  long long getAppCacheID() { return appCacheID(); }
-
  private:
   friend class ResourceResponseBase;
 
