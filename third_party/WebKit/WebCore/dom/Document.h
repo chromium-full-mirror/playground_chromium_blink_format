@@ -249,6 +249,8 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   }
 
   Element* elementFromPoint(int x, int y) const;
+  PassRefPtr<Range> caretRangeFromPoint(int x, int y);
+
   String readyState() const;
 
   String defaultCharset() const;
