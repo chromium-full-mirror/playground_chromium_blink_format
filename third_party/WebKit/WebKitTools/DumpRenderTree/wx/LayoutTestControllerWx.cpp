@@ -200,6 +200,19 @@ bool LayoutTestController::pauseTransitionAtTimeOnElementWithId(
   return false;
 }
 
+void LayoutTestController::setMockGeolocationPosition(double latitude,
+                                                      double longitude,
+                                                      double accuracy) {
+  // FIXME: Implement for Geolocation layout tests.
+  // See https://bugs.webkit.org/show_bug.cgi?id=28264.
+}
+
+void LayoutTestController::setMockGeolocationError(int code,
+                                                   JSStringRef message) {
+  // FIXME: Implement for Geolocation layout tests.
+  // See https://bugs.webkit.org/show_bug.cgi?id=28264.
+}
+
 void LayoutTestController::setIconDatabaseEnabled(bool iconDatabaseEnabled) {
   // FIXME: implement
 }

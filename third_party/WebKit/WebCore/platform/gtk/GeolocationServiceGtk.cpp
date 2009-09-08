@@ -37,10 +37,13 @@ void freeOwnedGPtr<GeoclueAccuracy>(GeoclueAccuracy* accuracy) {
 
 namespace WebCore {
 
-GeolocationService* GeolocationService::create(
+GeolocationService* GeolocationServiceGtk::create(
     GeolocationServiceClient* client) {
   return new GeolocationServiceGtk(client);
 }
+
+GeolocationService::FactoryFunction* GeolocationService::s_factoryFunction =
+    &GeolocationServiceGtk::create;
 
 GeolocationServiceGtk::GeolocationServiceGtk(GeolocationServiceClient* client)
     : GeolocationService(client),

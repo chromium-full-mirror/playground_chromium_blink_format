@@ -207,8 +207,8 @@ class ChromeClient {
                                     ScrollbarControlPartMask);
   virtual bool paintCustomScrollCorner(GraphicsContext*, const FloatRect&);
 
-  // This is an asynchronous call. The ChromeClient can display UI asking the
-  // user for permission
+  // This can be either a synchronous or asynchronous call. The ChromeClient can
+  // display UI asking the user for permission
   // to use Geolococation. The ChromeClient must call
   // Geolocation::setShouldClearCache() appropriately.
   virtual void requestGeolocationPermissionForFrame(Frame*, Geolocation*) = 0;
