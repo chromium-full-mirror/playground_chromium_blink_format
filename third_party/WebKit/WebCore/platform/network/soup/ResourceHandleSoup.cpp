@@ -462,7 +462,7 @@ static void ensureSessionIsInitialized(SoupSession* session) {
                     reinterpret_cast<void*>(0xdeadbeef));
 }
 
-static bool startHttp(ResourceHandle* handle, String urlString) {
+static bool startHttp(ResourceHandle* handle) {
   ASSERT(handle);
 
   SoupSession* session = handle->defaultSession();
@@ -470,7 +470,12 @@ static bool startHttp(ResourceHandle* handle, String urlString) {
 
   ResourceHandleInternal* d = handle->getInternal();
 
-  d->m_msg = handle->request().toSoupMessage();
+  ResourceRequest request(handle->request());
+  KURL url(request.url());
+  url.removeFragmentIdentifier();
+  request.setURL(url);
+
+  d->m_msg = request.toSoupMessage();
   if (!d->m_msg)
     return false;
 
@@ -591,7 +596,7 @@ bool ResourceHandle::start(Frame* frame) {
 
   if (equalIgnoringCase(protocol, "http") ||
       equalIgnoringCase(protocol, "https")) {
-    if (startHttp(this, urlString))
+    if (startHttp(this))
       return true;
   }
 
