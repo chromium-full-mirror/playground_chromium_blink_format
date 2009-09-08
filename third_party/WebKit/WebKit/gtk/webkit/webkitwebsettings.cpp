@@ -397,7 +397,7 @@ static void webkit_web_settings_class_init(WebKitWebSettingsClass* klass) {
   *
   * This is currently experimental for WebKitGtk.
   *
-  * Since 1.1.2
+  * Since: 1.1.2
   */
   g_object_class_install_property(
       gobject_class, PROP_ENABLE_PRIVATE_BROWSING,
@@ -410,7 +410,7 @@ static void webkit_web_settings_class_init(WebKitWebSettingsClass* klass) {
   *
   * Whether to enable spell checking while typing.
   *
-  * Since 1.1.6
+  * Since: 1.1.6
   */
   g_object_class_install_property(
       gobject_class, PROP_ENABLE_SPELL_CHECKING,
@@ -431,7 +431,7 @@ static void webkit_web_settings_class_init(WebKitWebSettingsClass* klass) {
   * If no value is specified then the value returned by
   * gtk_get_default_language will be used.
   *
-  * Since 1.1.6
+  * Since: 1.1.6
   */
   g_object_class_install_property(
       gobject_class, PROP_SPELL_CHECKING_LANGUAGES,
@@ -445,7 +445,7 @@ static void webkit_web_settings_class_init(WebKitWebSettingsClass* klass) {
   *
   * Whether to enable caret browsing mode.
   *
-  * Since 1.1.6
+  * Since: 1.1.6
   */
   g_object_class_install_property(
       gobject_class, PROP_ENABLE_CARET_BROWSING,
@@ -460,7 +460,7 @@ static void webkit_web_settings_class_init(WebKitWebSettingsClass* klass) {
   * SQL database allows web pages to store structured data and be able to
   * use SQL to manipulate that data asynchronously.
   *
-  * Since 1.1.8
+  * Since: 1.1.8
   */
   g_object_class_install_property(
       gobject_class, PROP_ENABLE_HTML5_DATABASE,
@@ -474,7 +474,7 @@ static void webkit_web_settings_class_init(WebKitWebSettingsClass* klass) {
   * Whether to enable HTML5 localStorage support. localStorage provides
   * simple synchronous storage access.
   *
-  * Since 1.1.8
+  * Since: 1.1.8
   */
   g_object_class_install_property(
       gobject_class, PROP_ENABLE_HTML5_LOCAL_STORAGE,
@@ -487,7 +487,7 @@ static void webkit_web_settings_class_init(WebKitWebSettingsClass* klass) {
   * Whether to enable the XSS Auditor. This feature filters some kinds of
   * reflective XSS attacks on vulnerable web sites.
   *
-  * Since 1.1.11
+  * Since: 1.1.11
   */
   g_object_class_install_property(
       gobject_class, PROP_ENABLE_XSS_AUDITOR,
@@ -519,7 +519,7 @@ static void webkit_web_settings_class_init(WebKitWebSettingsClass* klass) {
   * Whether JavaScript can open popup windows automatically without user
   * intervention.
   *
-  * Since 1.1.11
+  * Since: 1.1.11
   */
   g_object_class_install_property(
       gobject_class, PROP_JAVASCRIPT_CAN_OPEN_WINDOWS_AUTOMATICALLY,
@@ -535,7 +535,7 @@ static void webkit_web_settings_class_init(WebKitWebSettingsClass* klass) {
   * Web Application Cache ensures web applications are available even when
   * the user is not connected to the network.
   *
-  * Since 1.1.13
+  * Since: 1.1.13
   */
   g_object_class_install_property(
       gobject_class, PROP_ENABLE_OFFLINE_WEB_APPLICATION_CACHE,
@@ -566,7 +566,7 @@ static void webkit_web_settings_class_init(WebKitWebSettingsClass* klass) {
   *  at the end of the last line on Mac, but does nothing on
   *  Windows. A similar case exists on the top line.
   *
-  * Since 1.1.13
+  * Since: 1.1.13
   */
   g_object_class_install_property(
       gobject_class, PROP_EDITING_BEHAVIOR,
@@ -581,7 +581,7 @@ static void webkit_web_settings_class_init(WebKitWebSettingsClass* klass) {
    * Whether to allow files loaded through file:// URIs universal access to
    * all pages.
    *
-   * Since 1.1.13
+   * Since: 1.1.13
    */
   g_object_class_install_property(
       gobject_class, PROP_ENABLE_UNIVERSAL_ACCESS_FROM_FILE_URIS,

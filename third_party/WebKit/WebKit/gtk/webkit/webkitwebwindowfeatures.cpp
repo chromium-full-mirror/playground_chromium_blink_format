@@ -358,7 +358,7 @@ static void webkit_web_window_features_get_property(GObject* object,
  *
  * Returns: a new #WebKitWebWindowFeatures instance
  *
- * Since 1.0.3
+ * Since: 1.0.3
  */
 WebKitWebWindowFeatures* webkit_web_window_features_new() {
   return WEBKIT_WEB_WINDOW_FEATURES(
@@ -405,7 +405,7 @@ WebKitWebWindowFeatures* webkit_web_window_features_new_from_core_features(
  * Returns: %TRUE if the instances have the same values, %FALSE
  * otherwise
  *
- * Since 1.0.3
+ * Since: 1.0.3
  */
 gboolean webkit_web_window_features_equal(WebKitWebWindowFeatures* features1,
                                           WebKitWebWindowFeatures* features2) {
