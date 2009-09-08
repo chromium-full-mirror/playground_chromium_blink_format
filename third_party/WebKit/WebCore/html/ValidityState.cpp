@@ -45,9 +45,14 @@ bool ValidityState::typeMismatch() {
   if (value.isEmpty())
     return false;
 
-  if (input->inputType() != HTMLInputElement::COLOR)
-    return false;
-  return !isValidColorString(value);
+  switch (input->inputType()) {
+    case HTMLInputElement::COLOR:
+      return !isValidColorString(value);
+    case HTMLInputElement::NUMBER:
+      return !HTMLInputElement::formStringToDouble(value, 0);
+    default:
+      return false;
+  }
 }
 
 bool ValidityState::valid() {
