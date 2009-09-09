@@ -329,6 +329,8 @@ WebKitWebDataSource* webkit_web_data_source_new_with_loader(
 WEBKIT_API WebKitWebDatabase* webkit_security_origin_get_web_database(
     WebKitSecurityOrigin* securityOrigin,
     const char* databaseName);
+
+WEBKIT_API void webkit_web_frame_layout(WebKitWebFrame* frame);
 }
 
 namespace WTF {
