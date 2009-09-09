@@ -152,7 +152,8 @@ void InsertTextCommand::input(const String& text, bool selectInsertedText) {
   // unrendered whitespace,
   // and so deleteInsignificantText could remove it.  Save the position before
   // the node in case that happens.
-  Position positionBeforeStartNode(positionBeforeNode(startPosition.node()));
+  Position positionBeforeStartNode(
+      positionInParentBeforeNode(startPosition.node()));
   deleteInsignificantText(startPosition.upstream(), startPosition.downstream());
   if (!startPosition.node()->inDocument())
     startPosition = positionBeforeStartNode;

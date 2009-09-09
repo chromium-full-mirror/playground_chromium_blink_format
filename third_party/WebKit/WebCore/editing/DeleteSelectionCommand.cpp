@@ -148,15 +148,16 @@ void DeleteSelectionCommand::initializeStartEnd(Position& start,
 
     // If we're going to expand to include the startSpecialContainer, it must be
     // fully selected.
-
     if (startSpecialContainer && !endSpecialContainer &&
-        comparePositions(positionAfterNode(startSpecialContainer), end) > -1)
+        comparePositions(positionInParentAfterNode(startSpecialContainer),
+                         end) > -1)
       break;
 
     // If we're going to expand to include the endSpecialContainer, it must be
     // fully selected.
     if (endSpecialContainer && !startSpecialContainer &&
-        comparePositions(start, positionBeforeNode(endSpecialContainer)) > -1)
+        comparePositions(start,
+                         positionInParentBeforeNode(endSpecialContainer)) > -1)
       break;
 
     if (startSpecialContainer &&
@@ -379,7 +380,7 @@ static void updatePositionForNodeRemoval(Node* node, Position& position) {
     position =
         Position(position.node(), position.deprecatedEditingOffset() - 1);
   if (position.node() == node || position.node()->isDescendantOf(node))
-    position = positionBeforeNode(node);
+    position = positionInParentBeforeNode(node);
 }
 
 void DeleteSelectionCommand::removeNode(PassRefPtr<Node> node) {

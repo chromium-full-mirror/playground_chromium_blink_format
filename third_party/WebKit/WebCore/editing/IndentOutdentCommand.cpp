@@ -208,8 +208,8 @@ void IndentOutdentCommand::removeUnnecessaryLineBreakAt(
 
   // If the node isn't br or the parent node is empty, then don't remove.
   if (!br->hasTagName(brTag) ||
-      isVisiblyAdjacent(positionBeforeNode(parentNode),
-                        positionAfterNode(parentNode)))
+      isVisiblyAdjacent(positionInParentBeforeNode(parentNode),
+                        positionInParentAfterNode(parentNode)))
     return;
 
   removeNodeAndPruneAncestors(br);

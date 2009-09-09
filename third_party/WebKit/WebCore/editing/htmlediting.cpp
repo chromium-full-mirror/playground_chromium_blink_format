@@ -269,7 +269,7 @@ VisiblePosition firstEditablePositionAfterPositionInRoot(
 
   while (p.node() && !isEditablePosition(p) &&
          p.node()->isDescendantOf(highestRoot))
-    p = isAtomicNode(p.node()) ? positionAfterNode(p.node())
+    p = isAtomicNode(p.node()) ? positionInParentAfterNode(p.node())
                                : nextVisuallyDistinctCandidate(p);
 
   if (p.node() && !p.node()->isDescendantOf(highestRoot))
@@ -294,7 +294,7 @@ VisiblePosition lastEditablePositionBeforePositionInRoot(
 
   while (p.node() && !isEditablePosition(p) &&
          p.node()->isDescendantOf(highestRoot))
-    p = isAtomicNode(p.node()) ? positionBeforeNode(p.node())
+    p = isAtomicNode(p.node()) ? positionInParentBeforeNode(p.node())
                                : previousVisuallyDistinctCandidate(p);
 
   if (p.node() && !p.node()->isDescendantOf(highestRoot))
@@ -335,7 +335,7 @@ Position rangeCompliantEquivalent(const Position& pos) {
   if (pos.deprecatedEditingOffset() <= 0) {
     if (node->parentNode() &&
         (editingIgnoresContent(node) || isTableElement(node)))
-      return positionBeforeNode(node);
+      return positionInParentBeforeNode(node);
     return Position(node, 0);
   }
 
@@ -346,7 +346,7 @@ Position rangeCompliantEquivalent(const Position& pos) {
   int maxCompliantOffset = node->childNodeCount();
   if (pos.deprecatedEditingOffset() > maxCompliantOffset) {
     if (node->parentNode())
-      return positionAfterNode(node);
+      return positionInParentAfterNode(node);
 
     // there is no other option at this point than to
     // use the highest allowed position in the node
@@ -357,12 +357,13 @@ Position rangeCompliantEquivalent(const Position& pos) {
   if ((pos.deprecatedEditingOffset() < maxCompliantOffset) &&
       editingIgnoresContent(node)) {
     ASSERT_NOT_REACHED();
-    return node->parentNode() ? positionBeforeNode(node) : Position(node, 0);
+    return node->parentNode() ? positionInParentBeforeNode(node)
+                              : Position(node, 0);
   }
 
   if (pos.deprecatedEditingOffset() == maxCompliantOffset &&
       (editingIgnoresContent(node) || isTableElement(node)))
-    return positionAfterNode(node);
+    return positionInParentAfterNode(node);
 
   return Position(pos);
 }
@@ -529,7 +530,7 @@ Position positionBeforeContainingSpecialElement(
   Node* n = firstInSpecialElement(pos);
   if (!n)
     return pos;
-  Position result = positionBeforeNode(n);
+  Position result = positionInParentBeforeNode(n);
   if (result.isNull() ||
       result.node()->rootEditableElement() != pos.node()->rootEditableElement())
     return pos;
@@ -548,7 +549,7 @@ Position positionAfterContainingSpecialElement(
   Node* n = lastInSpecialElement(pos);
   if (!n)
     return pos;
-  Position result = positionAfterNode(n);
+  Position result = positionInParentAfterNode(n);
   if (result.isNull() ||
       result.node()->rootEditableElement() != pos.node()->rootEditableElement())
     return pos;
@@ -594,7 +595,7 @@ VisiblePosition visiblePositionBeforeNode(Node* node) {
   if (node->childNodeCount())
     return VisiblePosition(node, 0, DOWNSTREAM);
   ASSERT(node->parentNode());
-  return positionBeforeNode(node);
+  return positionInParentBeforeNode(node);
 }
 
 // Returns the visible position at the ending of a node
@@ -603,7 +604,7 @@ VisiblePosition visiblePositionAfterNode(Node* node) {
   if (node->childNodeCount())
     return VisiblePosition(node, node->childNodeCount(), DOWNSTREAM);
   ASSERT(node->parentNode());
-  return positionAfterNode(node);
+  return positionInParentAfterNode(node);
 }
 
 // Create a range object with two visible positions, start and end.
@@ -840,8 +841,8 @@ bool canMergeLists(Element* firstList, Element* secondList) {
          firstList->rootEditableElement() ==
              secondList
                  ->rootEditableElement()  // don't cross editing boundaries
-         && isVisiblyAdjacent(positionAfterNode(firstList),
-                              positionBeforeNode(secondList));
+         && isVisiblyAdjacent(positionInParentAfterNode(firstList),
+                              positionInParentBeforeNode(secondList));
   // Make sure there is no visible content between this li and the previous list
 }
 
@@ -925,7 +926,7 @@ Position positionBeforeTabSpan(const Position& pos) {
   else if (!isTabSpanNode(node))
     return pos;
 
-  return positionBeforeNode(node);
+  return positionInParentBeforeNode(node);
 }
 
 PassRefPtr<Element> createTabSpanElement(Document* document,

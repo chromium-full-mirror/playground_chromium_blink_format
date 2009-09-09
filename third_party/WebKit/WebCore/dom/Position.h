@@ -220,7 +220,7 @@ inline bool operator!=(const Position& a, const Position& b) {
 // These are inline to prevent ref-churn when returning a Position object.
 // If we ever add a PassPosition we can make these non-inline.
 
-inline Position positionBeforeNode(const Node* node) {
+inline Position positionInParentBeforeNode(const Node* node) {
   // FIXME: This should ASSERT(node->parentNode())
   // At least one caller currently hits this ASSERT though, which indicates
   // that the caller is trying to make a position relative to a disconnected
@@ -231,7 +231,7 @@ inline Position positionBeforeNode(const Node* node) {
                   Position::PositionIsOffsetInAnchor);
 }
 
-inline Position positionAfterNode(const Node* node) {
+inline Position positionInParentAfterNode(const Node* node) {
   ASSERT(node->parentNode());
   return Position(node->parentNode(), node->nodeIndex() + 1,
                   Position::PositionIsOffsetInAnchor);

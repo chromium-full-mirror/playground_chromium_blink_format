@@ -573,7 +573,7 @@ VisiblePosition ReplaceSelectionCommand::positionAtEndOfInsertedContent() {
 VisiblePosition ReplaceSelectionCommand::positionAtStartOfInsertedContent() {
   // Return the inserted content's first VisiblePosition.
   return VisiblePosition(
-      nextCandidate(positionBeforeNode(m_firstNodeInserted.get())));
+      nextCandidate(positionInParentBeforeNode(m_firstNodeInserted.get())));
 }
 
 // Remove style spans before insertion if they are unnecessary.  It's faster
@@ -912,7 +912,7 @@ void ReplaceSelectionCommand::doApply() {
     ASSERT(br->hasTagName(brTag));
     // Insert content between the two blockquotes, but remove the br (since it
     // was just a placeholder).
-    insertionPos = positionBeforeNode(br);
+    insertionPos = positionInParentBeforeNode(br);
     removeNode(br);
   }
 
@@ -945,9 +945,9 @@ void ReplaceSelectionCommand::doApply() {
     if (isEndOfBlock(visibleInsertionPos) &&
         !(isStartOfBlock(visibleInsertionPos) &&
           fragment.hasInterchangeNewlineAtEnd()))
-      insertionPos = positionAfterNode(startBlock);
+      insertionPos = positionInParentAfterNode(startBlock);
     else if (isStartOfBlock(visibleInsertionPos))
-      insertionPos = positionBeforeNode(startBlock);
+      insertionPos = positionInParentBeforeNode(startBlock);
   }
 
   // Paste into run of tabs splits the tab span.

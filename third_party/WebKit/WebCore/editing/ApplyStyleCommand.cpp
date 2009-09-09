@@ -1004,10 +1004,11 @@ void ApplyStyleCommand::applyInlineStyle(CSSMutableStyleDeclaration* style) {
     // properties from the unsplit ancestors.
     if (startUnsplitAncestor &&
         nodeFullySelected(startUnsplitAncestor, removeStart, end))
-      embeddingRemoveStart = positionAfterNode(startUnsplitAncestor);
+      embeddingRemoveStart = positionInParentAfterNode(startUnsplitAncestor);
     if (endUnsplitAncestor &&
         nodeFullySelected(endUnsplitAncestor, removeStart, end))
-      embeddingRemoveEnd = positionBeforeNode(endUnsplitAncestor).downstream();
+      embeddingRemoveEnd =
+          positionInParentBeforeNode(endUnsplitAncestor).downstream();
   }
 
   if (embeddingRemoveStart != removeStart || embeddingRemoveEnd != end) {
@@ -1064,7 +1065,7 @@ void ApplyStyleCommand::applyInlineStyle(CSSMutableStyleDeclaration* style) {
           ASSERT(ancestorUnicodeBidi->isPrimitiveValue());
           if (static_cast<CSSPrimitiveValue*>(ancestorUnicodeBidi.get())
                   ->getIdent() == CSSValueEmbed) {
-            embeddingApplyStart = positionAfterNode(n);
+            embeddingApplyStart = positionInParentAfterNode(n);
             break;
           }
         }
@@ -1080,7 +1081,7 @@ void ApplyStyleCommand::applyInlineStyle(CSSMutableStyleDeclaration* style) {
           ASSERT(ancestorUnicodeBidi->isPrimitiveValue());
           if (static_cast<CSSPrimitiveValue*>(ancestorUnicodeBidi.get())
                   ->getIdent() == CSSValueEmbed) {
-            embeddingApplyEnd = positionBeforeNode(n);
+            embeddingApplyEnd = positionInParentBeforeNode(n);
             break;
           }
         }
