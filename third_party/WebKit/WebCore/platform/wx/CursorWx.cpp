@@ -245,4 +245,9 @@ const Cursor& grabbingCursor() {
   // TODO: Determine if we can find a better cursor for this.
   return pointerCursor();
 }
+
+const Cursor& moveCursor() {
+  static Cursor c = new wxCursor(wxCURSOR_SIZING);
+  return c;
+}
 }
