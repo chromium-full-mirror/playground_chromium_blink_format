@@ -95,7 +95,7 @@ void FrameTree::removeChild(Frame* child) {
           : child->tree()->m_nextSibling->tree()->m_previousSibling;
   swap(newLocationForNext, child->tree()->m_nextSibling);
   // For some inexplicable reason, the following line does not compile without
-  // the explicit std:: namepsace
+  // the explicit std:: namespace
   std::swap(newLocationForPrevious, child->tree()->m_previousSibling);
 
   child->tree()->m_previousSibling = 0;
