@@ -147,8 +147,9 @@ void Geolocation::setIsAllowed(bool allowed) {
     startTimers();
     makeSuccessCallbacks();
   } else {
-    WTF::RefPtr<WebCore::PositionError> error = WebCore::PositionError::create(
+    RefPtr<PositionError> error = PositionError::create(
         PositionError::PERMISSION_DENIED, "User disallowed Geolocation");
+    error->setIsFatal(true);
     handleError(error.get());
   }
 }
@@ -247,6 +248,8 @@ void Geolocation::handleError(PositionError* error) {
   sendErrorToWatchers(error);
 
   m_oneShots.clear();
+  if (error->isFatal())
+    m_watchers.clear();
 
   if (!hasListeners())
     m_service->stopUpdating();
