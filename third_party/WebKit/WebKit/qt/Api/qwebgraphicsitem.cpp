@@ -155,16 +155,16 @@ void QWebGraphicsItem::paint(QPainter* painter,
 /*! \reimp
 */
 bool QWebGraphicsItem::sceneEvent(QEvent* event) {
-  // Swallow reimplementation in order to allows fixing event-related bugs in
-  // patch releases
+  // Re-implemented in order to allows fixing event-related bugs in patch
+  // releases.
   return QGraphicsWidget::sceneEvent(event);
 }
 
 /*! \reimp
 */
 bool QWebGraphicsItem::event(QEvent* event) {
-  // Swallow reimplementation in order to allows fixing event-related bugs in
-  // patch releases
+  // Re-implemented in order to allows fixing event-related bugs in patch
+  // releases.
   return QObject::event(event);
 }
 
