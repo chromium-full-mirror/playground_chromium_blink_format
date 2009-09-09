@@ -86,7 +86,8 @@ class Database : public ThreadSafeShared<Database> {
                      PassRefPtr<VoidCallback> successCallback);
   void transaction(PassRefPtr<SQLTransactionCallback> callback,
                    PassRefPtr<SQLTransactionErrorCallback> errorCallback,
-                   PassRefPtr<VoidCallback> successCallback);
+                   PassRefPtr<VoidCallback> successCallback,
+                   bool readOnly);
 
   // Internal engine support
   static const String& databaseInfoTableName();

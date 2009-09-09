@@ -540,6 +540,7 @@ class V8Custom {
 
   DECLARE_CALLBACK(DatabaseChangeVersion);
   DECLARE_CALLBACK(DatabaseTransaction);
+  DECLARE_CALLBACK(DatabaseReadTransaction);
   DECLARE_CALLBACK(SQLTransactionExecuteSql);
   DECLARE_CALLBACK(SQLResultSetRowListItem);
 
