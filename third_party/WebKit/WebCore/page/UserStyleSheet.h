@@ -56,6 +56,6 @@ class UserStyleSheet {
   unsigned m_worldID;
 };
 
-}  // namsepace WebCore
+}  // namespace WebCore
 
 #endif  // UserStyleSheet_h
