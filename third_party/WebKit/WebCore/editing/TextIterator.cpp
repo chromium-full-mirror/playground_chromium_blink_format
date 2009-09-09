@@ -34,7 +34,6 @@
 #include "HTMLNames.h"
 #include "htmlediting.h"
 #include "InlineTextBox.h"
-#include "Position.h"
 #include "Range.h"
 #include "RenderTableCell.h"
 #include "RenderTableRow.h"
@@ -976,8 +975,7 @@ SimplifiedBackwardsTextIterator::SimplifiedBackwardsTextIterator(const Range* r)
     if (endOffset > 0 &&
         endOffset <= static_cast<int>(endNode->childNodeCount())) {
       endNode = endNode->childNode(endOffset - 1);
-      endOffset = endNode->offsetInCharacters() ? endNode->maxCharacterOffset()
-                                                : endNode->childNodeCount();
+      endOffset = lastOffsetInNode(endNode);
     }
   }
 

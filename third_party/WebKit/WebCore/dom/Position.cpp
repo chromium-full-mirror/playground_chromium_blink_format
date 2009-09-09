@@ -134,12 +134,8 @@ int Position::computeOffsetInContainerNode() const {
     return 0;
 
   switch (anchorType()) {
-    case PositionIsOffsetInAnchor: {
-      int maximumValidOffset = m_anchorNode->offsetInCharacters()
-                                   ? m_anchorNode->maxCharacterOffset()
-                                   : m_anchorNode->childNodeCount();
-      return std::min(maximumValidOffset, m_offset);
-    }
+    case PositionIsOffsetInAnchor:
+      return std::min(lastOffsetInNode(m_anchorNode.get()), m_offset);
     case PositionIsBeforeAnchor:
       return m_anchorNode->nodeIndex();
     case PositionIsAfterAnchor:
