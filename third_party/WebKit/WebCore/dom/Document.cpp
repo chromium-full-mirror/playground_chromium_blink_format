@@ -96,6 +96,7 @@
 #include "NodeWithIndex.h"
 #include "OverflowEvent.h"
 #include "Page.h"
+#include "PageGroup.h"
 #include "PageTransitionEvent.h"
 #include "PlatformKeyboardEvent.h"
 #include "ProcessingInstruction.h"
@@ -374,6 +375,8 @@ Document::Document(Frame* frame, bool isXHTML)
 #endif
 {
   m_document = this;
+
+  m_pageGroupUserSheetCacheValid = false;
 
   m_printing = false;
 
@@ -1422,8 +1425,8 @@ void Document::attach() {
     if (Settings* docSettings = settings())
       matchAuthorAndUserStyles = docSettings->authorAndUserStylesEnabled();
     m_styleSelector = new CSSStyleSelector(
-        this, pageUserSheet(), m_styleSheets.get(), m_mappedElementSheet.get(),
-        !inCompatMode(), matchAuthorAndUserStyles);
+        this, m_styleSheets.get(), m_mappedElementSheet.get(), pageUserSheet(),
+        pageGroupUserSheets(), !inCompatMode(), matchAuthorAndUserStyles);
   }
 
   recalcStyle(Force);
@@ -1976,6 +1979,45 @@ CSSStyleSheet* Document::pageUserSheet() {
 
 void Document::clearPageUserSheet() {
   m_pageUserSheet = 0;
+  updateStyleSelector();
+}
+
+const Vector<RefPtr<CSSStyleSheet>>* Document::pageGroupUserSheets() const {
+  if (m_pageGroupUserSheetCacheValid)
+    return m_pageGroupUserSheets.get();
+
+  m_pageGroupUserSheetCacheValid = true;
+
+  Page* owningPage = page();
+  if (!owningPage)
+    return 0;
+
+  const PageGroup& pageGroup = owningPage->group();
+  const UserStyleSheetMap* sheetsMap = pageGroup.userStyleSheets();
+  if (!sheetsMap)
+    return 0;
+
+  UserStyleSheetMap::const_iterator end = sheetsMap->end();
+  for (UserStyleSheetMap::const_iterator it = sheetsMap->begin(); it != end;
+       ++it) {
+    const UserStyleSheetVector* sheets = it->second;
+    for (unsigned i = 0; i < sheets->size(); ++i) {
+      const UserStyleSheet* sheet = sheets->at(i).get();
+      RefPtr<CSSStyleSheet> parsedSheet =
+          CSSStyleSheet::create(const_cast<Document*>(this));
+      parsedSheet->parseString(sheet->source(), !inCompatMode());
+      if (!m_pageGroupUserSheets)
+        m_pageGroupUserSheets.set(new Vector<RefPtr<CSSStyleSheet>>);
+      m_pageGroupUserSheets->append(parsedSheet.release());
+    }
+  }
+
+  return m_pageGroupUserSheets.get();
+}
+
+void Document::clearPageGroupUserSheets() {
+  m_pageGroupUserSheets.clear();
+  m_pageGroupUserSheetCacheValid = false;
   updateStyleSelector();
 }
 
@@ -2555,8 +2597,8 @@ void Document::recalcStyleSelector() {
   // Create a new style selector
   delete m_styleSelector;
   m_styleSelector = new CSSStyleSelector(
-      this, pageUserSheet(), m_styleSheets.get(), m_mappedElementSheet.get(),
-      !inCompatMode(), matchAuthorAndUserStyles);
+      this, m_styleSheets.get(), m_mappedElementSheet.get(), pageUserSheet(),
+      pageGroupUserSheets(), !inCompatMode(), matchAuthorAndUserStyles);
   m_didCalculateStyleSelector = true;
 }
 

@@ -501,6 +501,9 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   CSSStyleSheet* pageUserSheet();
   void clearPageUserSheet();
 
+  const Vector<RefPtr<CSSStyleSheet>>* pageGroupUserSheets() const;
+  void clearPageGroupUserSheets();
+
   CSSStyleSheet* elementSheet();
   CSSStyleSheet* mappedElementSheet();
 
@@ -1090,6 +1093,8 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   RefPtr<CSSStyleSheet> m_elemSheet;
   RefPtr<CSSStyleSheet> m_mappedElementSheet;
   RefPtr<CSSStyleSheet> m_pageUserSheet;
+  mutable OwnPtr<Vector<RefPtr<CSSStyleSheet>>> m_pageGroupUserSheets;
+  mutable bool m_pageGroupUserSheetCacheValid;
 
   bool m_printing;
 

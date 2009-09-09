@@ -31,6 +31,7 @@
 #include "LinkHash.h"
 #include "StringHash.h"
 #include "UserScript.h"
+#include "UserStyleSheet.h"
 
 namespace WebCore {
 
@@ -76,6 +77,14 @@ class PageGroup : public Noncopyable {
                      UserScriptInjectionTime);
   const UserScriptMap* userScripts() const { return m_userScripts.get(); }
 
+  void addUserStyleSheet(const String& source,
+                         const KURL&,
+                         const Vector<String>& patterns,
+                         unsigned worldID);
+  const UserStyleSheetMap* userStyleSheets() const {
+    return m_userStyleSheets.get();
+  }
+
   void removeUserContentForWorld(unsigned);
   void removeAllUserContent();
 
@@ -95,6 +104,7 @@ class PageGroup : public Noncopyable {
 #endif
 
   OwnPtr<UserScriptMap> m_userScripts;
+  OwnPtr<UserStyleSheetMap> m_userStyleSheets;
 };
 
 }  // namespace WebCore

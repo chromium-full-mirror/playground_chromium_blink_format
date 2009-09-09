@@ -80,9 +80,10 @@ class MediaQueryResult {
 class CSSStyleSelector : public Noncopyable {
  public:
   CSSStyleSelector(Document*,
-                   CSSStyleSheet* userStyleSheet,
                    StyleSheetList* authorSheets,
                    CSSStyleSheet* mappedElementSheet,
+                   CSSStyleSheet* pageUserSheet,
+                   const Vector<RefPtr<CSSStyleSheet>>* pageGroupUserSheets,
                    bool strictParsing,
                    bool matchAuthorAndUserStyles);
   ~CSSStyleSelector();

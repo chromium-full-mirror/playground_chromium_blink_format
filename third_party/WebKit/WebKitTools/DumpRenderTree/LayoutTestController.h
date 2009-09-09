@@ -251,6 +251,7 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
                                  bool allowDestinationSubdomains);
 
   void addUserScript(JSStringRef source, bool runAtStart);
+  void addUserStyleSheet(JSStringRef source);
 
   void setGeolocationPermission(bool allow);
   bool isGeolocationPermissionSet() const {

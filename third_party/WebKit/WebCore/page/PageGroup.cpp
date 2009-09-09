@@ -28,6 +28,7 @@
 
 #include "ChromeClient.h"
 #include "Document.h"
+#include "Frame.h"
 #include "Page.h"
 #include "Settings.h"
 
@@ -201,14 +202,46 @@ void PageGroup::addUserScript(const String& source,
   scriptsInWorld->append(userScript.release());
 }
 
-void PageGroup::removeUserContentForWorld(unsigned worldID) {
-  if (!m_userScripts)
+void PageGroup::addUserStyleSheet(const String& source,
+                                  const KURL& url,
+                                  const Vector<String>& patterns,
+                                  unsigned worldID) {
+  if (worldID == UINT_MAX)
     return;
+  OwnPtr<UserStyleSheet> userStyleSheet(
+      new UserStyleSheet(source, url, patterns, worldID));
+  if (!m_userStyleSheets)
+    m_userStyleSheets.set(new UserStyleSheetMap);
+  UserStyleSheetVector*& styleSheetsInWorld =
+      m_userStyleSheets->add(worldID, 0).first->second;
+  if (!styleSheetsInWorld)
+    styleSheetsInWorld = new UserStyleSheetVector;
+  styleSheetsInWorld->append(userStyleSheet.release());
 
-  UserScriptMap::iterator it = m_userScripts->find(worldID);
-  if (it != m_userScripts->end()) {
-    m_userScripts->remove(it);
-    delete it->second;
+  // Clear our cached sheets and have them just reparse.
+  HashSet<Page*>::const_iterator end = m_pages.end();
+  for (HashSet<Page*>::const_iterator it = m_pages.begin(); it != end; ++it) {
+    for (Frame* frame = (*it)->mainFrame(); frame;
+         frame = frame->tree()->traverseNext())
+      frame->document()->clearPageGroupUserSheets();
+  }
+}
+
+void PageGroup::removeUserContentForWorld(unsigned worldID) {
+  if (m_userScripts) {
+    UserScriptMap::iterator it = m_userScripts->find(worldID);
+    if (it != m_userScripts->end()) {
+      m_userScripts->remove(it);
+      delete it->second;
+    }
+  }
+
+  if (m_userStyleSheets) {
+    UserStyleSheetMap::iterator it = m_userStyleSheets->find(worldID);
+    if (it != m_userStyleSheets->end()) {
+      m_userStyleSheets->remove(it);
+      delete it->second;
+    }
   }
 }
 
@@ -216,6 +249,11 @@ void PageGroup::removeAllUserContent() {
   if (m_userScripts) {
     deleteAllValues(*m_userScripts);
     m_userScripts.clear();
+  }
+
+  if (m_userStyleSheets) {
+    deleteAllValues(*m_userStyleSheets);
+    m_userStyleSheets.clear();
   }
 }
 
