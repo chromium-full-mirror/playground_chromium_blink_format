@@ -39,8 +39,7 @@ JSCustomPositionCallback::JSCustomPositionCallback(JSObject* callback,
                                                    Frame* frame)
     : m_callback(callback), m_frame(frame) {}
 
-void JSCustomPositionCallback::handleEvent(Geoposition* geoposition,
-                                           bool& raisedException) {
+void JSCustomPositionCallback::handleEvent(Geoposition* geoposition) {
   ASSERT(m_callback);
   ASSERT(m_frame);
 
@@ -76,10 +75,8 @@ void JSCustomPositionCallback::handleEvent(Geoposition* geoposition,
   call(exec, function, callType, callData, m_callback, args);
   globalObject->globalData()->timeoutChecker.stop();
 
-  if (exec->hadException()) {
+  if (exec->hadException())
     reportCurrentException(exec);
-    raisedException = true;
-  }
 
   Document::updateStyleForAllDocuments();
 }
