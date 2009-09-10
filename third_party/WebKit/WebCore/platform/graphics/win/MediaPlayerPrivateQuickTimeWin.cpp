@@ -298,8 +298,7 @@ int MediaPlayerPrivate::dataRate() const {
   return 0;
 }
 
-PassRefPtr<TimeRanges> MediaPlayerPrivate::buffered() const;
-{
+PassRefPtr<TimeRanges> MediaPlayerPrivate::buffered() const {
   RefPtr<TimeRanges> timeRanges = TimeRanges::create();
   float loaded = maxTimeLoaded();
   // rtsp streams are not buffered
