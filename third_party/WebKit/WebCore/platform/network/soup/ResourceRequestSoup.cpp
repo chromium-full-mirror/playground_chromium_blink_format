@@ -76,4 +76,11 @@ void ResourceRequest::updateFromSoupMessage(SoupMessage* soupMessage) {
   // probably be handled here and on doUpdatePlatformRequest
   // somehow.
 }
+
+unsigned initializeMaximumHTTPConnectionCountPerHost() {
+  // Soup has its own queue control; it wants to have all requests
+  // given to it, so that it is able to look ahead, and schedule
+  // them in a good way.
+  return 10000;
+}
 }
