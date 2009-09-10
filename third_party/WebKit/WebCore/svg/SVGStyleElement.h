@@ -25,11 +25,14 @@
 #if ENABLE(SVG)
 
 #include <SVGElement.h>
+#include "SVGLangSpace.h"
 #include "StyleElement.h"
 
 namespace WebCore {
 
-class SVGStyleElement : public SVGElement, public StyleElement {
+class SVGStyleElement : public SVGElement,
+                        public SVGLangSpace,
+                        public StyleElement {
  public:
   SVGStyleElement(const QualifiedName&, Document*, bool createdByParser);
 
@@ -43,10 +46,6 @@ class SVGStyleElement : public SVGElement, public StyleElement {
                                int childCountDelta = 0);
 
   virtual void finishParsingChildren();
-
-  // 'SVGStyleElement' functions
-  const AtomicString& xmlspace() const;
-  void setXmlspace(const AtomicString&, ExceptionCode&);
 
   virtual bool sheetLoaded();
 
