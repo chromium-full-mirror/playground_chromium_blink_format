@@ -68,8 +68,6 @@ class Coordinates : public RefCounted<Coordinates> {
   bool canProvideHeading() const { return m_canProvideHeading; }
   bool canProvideSpeed() const { return m_canProvideSpeed; }
 
-  String toString() const;
-
  private:
   Coordinates(double latitude,
               double longitude,
