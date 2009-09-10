@@ -42,7 +42,7 @@ void AXObjectCache::attachWrapper(AccessibilityObject*) {
 }
 
 void AXObjectCache::postPlatformNotification(AccessibilityObject*,
-                                             const String&) {}
+                                             AXNotification) {}
 
 void AXObjectCache::handleFocusedUIElementChanged(RenderObject*,
                                                   RenderObject*) {}

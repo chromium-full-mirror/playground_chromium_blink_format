@@ -978,7 +978,7 @@ void HTMLInputElement::setChecked(bool nowChecked, bool sendChangeEvent) {
   // because of the way the code is structured.
   if (renderer() && AXObjectCache::accessibilityEnabled())
     renderer()->document()->axObjectCache()->postNotification(
-        renderer(), "AXCheckedStateChanged", true);
+        renderer(), AXObjectCache::AXCheckedStateChanged, true);
 
   // Only send a change event for items in the document (avoid firing during
   // parsing) and don't send a change event for a radio button that's getting

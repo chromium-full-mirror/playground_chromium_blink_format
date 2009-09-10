@@ -671,7 +671,7 @@ void FrameView::layout(bool allowSubtree) {
 #if PLATFORM(MAC)
   if (AXObjectCache::accessibilityEnabled())
     root->document()->axObjectCache()->postNotification(
-        root, "AXLayoutComplete", true);
+        root, AXObjectCache::AXLayoutComplete, true);
 #endif
 #if ENABLE(DASHBOARD_SUPPORT)
   updateDashboardRegions();

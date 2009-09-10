@@ -1807,7 +1807,8 @@ void Document::implicitClose() {
     // only safe to call when a layout is not in progress, so it can not be used
     // in postNotification.
     axObjectCache()->getOrCreate(renderObject);
-    axObjectCache()->postNotification(renderObject, "AXLoadComplete", true);
+    axObjectCache()->postNotification(renderObject,
+                                      AXObjectCache::AXLoadComplete, true);
   }
 #endif
 

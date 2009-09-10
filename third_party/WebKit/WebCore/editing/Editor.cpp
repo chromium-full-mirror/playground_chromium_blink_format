@@ -405,7 +405,7 @@ void Editor::respondToChangedContents(const VisibleSelection& endingSelection) {
     Node* node = endingSelection.start().node();
     if (node)
       m_frame->document()->axObjectCache()->postNotification(
-          node->renderer(), "AXValueChanged", false);
+          node->renderer(), AXObjectCache::AXValueChanged, false);
   }
 
   if (client())

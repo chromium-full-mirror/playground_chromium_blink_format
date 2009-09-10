@@ -49,7 +49,7 @@ void AXObjectCache::attachWrapper(AccessibilityObject*) {
 }
 
 void AXObjectCache::postPlatformNotification(AccessibilityObject*,
-                                             const String&) {}
+                                             AXNotification) {}
 
 AXID AXObjectCache::platformGenerateAXID() const {
   static AXID lastUsedID = 0;
