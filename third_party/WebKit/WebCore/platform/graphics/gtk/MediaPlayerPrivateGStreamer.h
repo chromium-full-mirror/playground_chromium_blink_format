@@ -93,7 +93,7 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
   MediaPlayer::NetworkState networkState() const;
   MediaPlayer::ReadyState readyState() const;
 
-  float maxTimeBuffered() const;
+  PassRefPtr<TimeRanges> buffered() const;
   float maxTimeSeekable() const;
   unsigned bytesLoaded() const;
   bool totalBytesKnown() const;
