@@ -33,7 +33,6 @@
 #include "HTMLParamElement.h"
 #include "MIMETypeRegistry.h"
 #include "Page.h"
-#include "PluginData.h"
 #include "RenderView.h"
 #include "Text.h"
 
@@ -140,7 +139,6 @@ void RenderPartObject::updateWidget(bool onlyCreateNonNetscapePlugins) {
 
     // Check for a child EMBED tag.
     HTMLEmbedElement* embed = 0;
-    const PluginData* pluginData = frame->page()->pluginData();
     for (Node* child = o->firstChild(); child;) {
       if (child->hasTagName(embedTag)) {
         embed = static_cast<HTMLEmbedElement*>(child);
