@@ -80,7 +80,7 @@ class StructureTransitionTable {
  public:
   StructureTransitionTable() {
     m_transitions.m_singleTransition.set(0);
-    m_transitions.m_singleTransition.setFlag(0);
+    m_transitions.m_singleTransition.setFlag(usingSingleSlot);
   }
 
   ~StructureTransitionTable() {
@@ -148,7 +148,7 @@ class StructureTransitionTable {
     return m_transitions.m_singleTransition.get();
   }
   bool usingSingleTransitionSlot() const {
-    return m_transitions.m_singleTransition.isFlagSet(0);
+    return m_transitions.m_singleTransition.isFlagSet(usingSingleSlot);
   }
   void setSingleTransition(Structure* structure) {
     ASSERT(usingSingleTransitionSlot());
@@ -167,10 +167,11 @@ class StructureTransitionTable {
   }
   inline void reifySingleTransition();
 
+  enum UsingSingleSlot { usingSingleSlot };
   // Last bit indicates whether we are using the single transition optimisation
   union {
     TransitionTable* m_table;
-    PtrAndFlagsBase<Structure, bool> m_singleTransition;
+    PtrAndFlagsBase<Structure, UsingSingleSlot> m_singleTransition;
   } m_transitions;
 };
 
