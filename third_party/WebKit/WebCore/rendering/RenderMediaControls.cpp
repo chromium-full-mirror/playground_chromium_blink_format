@@ -139,9 +139,9 @@ bool RenderMediaControls::paintMediaControlsPart(
     case MediaPlayButton:
       if (MediaControlPlayButtonElement* btn =
               static_cast<MediaControlPlayButtonElement*>(o->node())) {
-        bool currentlyPlaying = btn->displayType() == MediaPlayButton;
-        paintThemePart(currentlyPlaying ? SafariTheme::MediaPauseButtonPart
-                                        : SafariTheme::MediaPlayButtonPart,
+        bool canPlay = btn->displayType() == MediaPlayButton;
+        paintThemePart(canPlay ? SafariTheme::MediaPlayButtonPart
+                               : SafariTheme::MediaPauseButtonPart,
                        paintInfo.context->platformContext(), r,
                        NSRegularControlSize, determineState(o));
       }
