@@ -29,6 +29,9 @@
  */
 
 #include "config.h"
+
+#if ENABLE(WEB_SOCKETS)
+
 #include "WebSocket.h"
 
 #include "Frame.h"
@@ -261,3 +264,5 @@ CALLBACK_FUNC_DECL(WebSocketClose) {
 }
 
 }  // namespace WebCore
+
+#endif  // ENABLE(WEB_SOCKETS)
