@@ -470,8 +470,10 @@ void Font::drawComplexText(GraphicsContext* graphicsContext,
   // Enforce non-transparent color.
   color =
       SkColorSetRGB(SkColorGetR(color), SkColorGetG(color), SkColorGetB(color));
-  SetTextColor(hdc, skia::SkColorToCOLORREF(color));
-  SetBkMode(hdc, TRANSPARENT);
+  if (hdc) {
+    SetTextColor(hdc, skia::SkColorToCOLORREF(color));
+    SetBkMode(hdc, TRANSPARENT);
+  }
 
   // If there is a non-blur shadow and both the fill color and shadow color
   // are opaque, handle without skia.
