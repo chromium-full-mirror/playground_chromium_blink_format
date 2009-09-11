@@ -42,7 +42,7 @@ class Thumbnailer : public QObject {
 int main(int argc, char* argv[]) {
   QApplication app(argc, argv);
 
-  Thumbnailer thumbnail(QUrl("http://qtsoftware.com"));
+  Thumbnailer thumbnail(QUrl("http://qt.nokia.com"));
 
   QObject::connect(&thumbnail, SIGNAL(finished()), &app, SLOT(quit()));
 
