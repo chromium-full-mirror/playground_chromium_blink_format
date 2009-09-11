@@ -253,8 +253,7 @@ void MediaPlayerPrivate::setEndTime(float endTime) {
   notImplemented();
 }
 
-PassRefPtr<TimeRanges> MediaPlayerPrivate::buffered() const;
-{
+PassRefPtr<TimeRanges> MediaPlayerPrivate::buffered() const {
   notImplemented();
   return TimeRanges::create();
 }
