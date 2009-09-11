@@ -3,6 +3,7 @@
                   2004, 2005, 2006, 2007 Rob Buis <buis@kde.org>
     Copyright (C) 2007 Eric Seidel <eric@webkit.org>
     Copyright (C) 2008 Apple Inc. All rights reserved.
+    Copyright (C) 2009 Cameron McCormack <cam@mcc.id.au>
 
     This file is part of the KDE project
 
@@ -152,25 +153,20 @@ float SVGAnimationElement::getSimpleDuration(ExceptionCode&) const {
   return narrowPrecisionToFloat(simpleDuration().value());
 }
 
-bool SVGAnimationElement::beginElement(ExceptionCode& ec) {
-  return beginElementAt(0, ec);
+void SVGAnimationElement::beginElement() {
+  beginElementAt(0);
 }
 
-bool SVGAnimationElement::beginElementAt(float offset, ExceptionCode&) {
+void SVGAnimationElement::beginElementAt(float offset) {
   addBeginTime(elapsed() + offset);
-  return true;
 }
 
-bool SVGAnimationElement::endElement(ExceptionCode& ec) {
-  return endElementAt(0, ec);
+void SVGAnimationElement::endElement() {
+  endElementAt(0);
 }
 
-bool SVGAnimationElement::endElementAt(float offset, ExceptionCode&) {
-  if (offset < 0)
-    return false;
-
+void SVGAnimationElement::endElementAt(float offset) {
   addEndTime(elapsed() + offset);
-  return true;
 }
 
 SVGAnimationElement::AnimationMode SVGAnimationElement::animationMode() const {
