@@ -1553,17 +1553,10 @@ int GraphicsContext3D::texImage2D(unsigned target,
                                   unsigned format,
                                   unsigned type,
                                   CanvasArray* pixels) {
-  // FIXME: need to implement this form
-  UNUSED_PARAM(target);
-  UNUSED_PARAM(level);
-  UNUSED_PARAM(internalformat);
-  UNUSED_PARAM(width);
-  UNUSED_PARAM(height);
-  UNUSED_PARAM(border);
-  UNUSED_PARAM(format);
-  UNUSED_PARAM(type);
-  UNUSED_PARAM(pixels);
-  return -1;
+  // FIXME: Need to do bounds checking on the buffer here.
+  ::glTexImage2D(target, level, internalformat, width, height, border, format,
+                 type, pixels->baseAddress());
+  return 0;
 }
 
 int GraphicsContext3D::texImage2D(unsigned target,
