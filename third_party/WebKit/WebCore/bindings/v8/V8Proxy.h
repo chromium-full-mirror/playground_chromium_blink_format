@@ -34,6 +34,7 @@
 #include "ChromiumBridge.h"
 #include "ScriptSourceCode.h"  // for WebCore::ScriptSourceCode
 #include "SecurityOrigin.h"    // for WebCore::SecurityOrigin
+#include "SharedPersistent.h"
 #include "V8DOMWrapper.h"
 #include "V8EventListenerList.h"
 #include "V8GCController.h"
@@ -125,6 +126,7 @@ class V8Proxy {
 
   explicit V8Proxy(Frame* frame)
       : m_frame(frame),
+        m_context(SharedPersistent<v8::Context>::create()),
         m_inlineCode(false),
         m_timerCallback(false),
         m_recursion(0) {}
@@ -269,6 +271,7 @@ class V8Proxy {
   // Returns V8 Context of a frame. If none exists, creates
   // a new context. It is potentially slow and consumes memory.
   static v8::Local<v8::Context> context(Frame*);
+  static PassRefPtr<SharedPersistent<v8::Context>> shared_context(Frame*);
   static v8::Local<v8::Context> mainWorldContext(Frame*);
   static v8::Local<v8::Context> currentContext();
 
@@ -315,9 +318,10 @@ class V8Proxy {
   static int sourceLineNumber();
   static String sourceName();
 
-  // Returns a local handle of the context.
-  v8::Local<v8::Context> context() {
-    return v8::Local<v8::Context>::New(m_context);
+  v8::Handle<v8::Context> context() { return m_context->get(); }
+
+  PassRefPtr<SharedPersistent<v8::Context>> shared_context() {
+    return m_context;
   }
 
   bool setContextDebugId(int id);
@@ -401,7 +405,8 @@ class V8Proxy {
 
   Frame* m_frame;
 
-  v8::Persistent<v8::Context> m_context;
+  RefPtr<SharedPersistent<v8::Context>> m_context;
+
   // For each possible type of wrapper, we keep a boilerplate object.
   // The boilerplate is used to create additional wrappers of the same
   // type.  We keep a single persistent handle to an array of the
