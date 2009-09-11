@@ -186,6 +186,11 @@ void MainResourceLoader::willSendRequest(
   // started.
   m_documentLoader->setRequest(newRequest);
 
+  Frame* top = m_frame->tree()->top();
+  if (top != m_frame)
+    frameLoader()->checkIfDisplayInsecureContent(
+        top->document()->securityOrigin(), newRequest.url());
+
   // FIXME: Ideally we'd stop the I/O until we hear back from the navigation
   // policy delegate
   // listener. But there's no way to do that in practice. So instead we cancel
