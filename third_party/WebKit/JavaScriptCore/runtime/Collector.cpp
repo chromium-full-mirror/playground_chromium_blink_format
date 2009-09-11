@@ -664,6 +664,8 @@ void Heap::makeUsableFromMultipleThreads() {
 }
 
 void Heap::registerThread() {
+  ASSERT(!m_globalData->mainThreadOnly || isMainThread());
+
   if (!m_currentThreadRegistrar ||
       pthread_getspecific(m_currentThreadRegistrar))
     return;

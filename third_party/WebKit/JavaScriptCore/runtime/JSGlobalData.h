@@ -155,6 +155,10 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
 
   MarkStack markStack;
 
+#ifndef NDEBUG
+  bool mainThreadOnly;
+#endif
+
  private:
   JSGlobalData(bool isShared, const VPtrSet&);
   static JSGlobalData*& sharedInstanceInternal();

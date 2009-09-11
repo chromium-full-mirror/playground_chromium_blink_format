@@ -154,7 +154,12 @@ JSGlobalData::JSGlobalData(bool isShared, const VPtrSet& vptrSet)
       dynamicGlobalObject(0),
       functionCodeBlockBeingReparsed(0),
       firstStringifierToMark(0),
-      markStack(vptrSet.jsArrayVPtr) {
+      markStack(vptrSet.jsArrayVPtr)
+#ifndef NDEBUG
+      ,
+      mainThreadOnly(false)
+#endif
+{
 #if PLATFORM(MAC)
   startProfilerServerIfNeeded();
 #endif
