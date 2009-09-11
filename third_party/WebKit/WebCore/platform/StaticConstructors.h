@@ -55,6 +55,8 @@
 // Define an global in the normal way.
 #if COMPILER(MSVC7)
 #define DEFINE_GLOBAL(type, name) const type name;
+#elif COMPILER(WINSCW)
+#define DEFINE_GLOBAL(type, name, arg...) const type name;
 #else
 #define DEFINE_GLOBAL(type, name, ...) const type name;
 #endif
@@ -65,6 +67,9 @@
 // alignment issue.
 #if COMPILER(MSVC7)
 #define DEFINE_GLOBAL(type, name) \
+  void* name[(sizeof(type) + sizeof(void*) - 1) / sizeof(void*)];
+#elif COMPILER(WINSCW)
+#define DEFINE_GLOBAL(type, name, arg...) \
   void* name[(sizeof(type) + sizeof(void*) - 1) / sizeof(void*)];
 #else
 #define DEFINE_GLOBAL(type, name, ...) \
