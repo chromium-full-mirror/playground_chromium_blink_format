@@ -32,7 +32,8 @@
 
 namespace WebCore {
 
-class RegularExpression::Private : public RefCounted<Private> {
+class RegularExpression::Private
+    : public RefCounted<RegularExpression::Private> {
  public:
   static PassRefPtr<Private> create(const String& pattern, TextCaseSensitivity);
   ~Private();
