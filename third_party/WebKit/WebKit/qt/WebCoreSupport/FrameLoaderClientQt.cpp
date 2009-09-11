@@ -1080,12 +1080,12 @@ PassRefPtr<Widget> FrameLoaderClientQt::createPlugin(
   QStringList values;
   QString classid(element->getAttribute("classid"));
 
-  for (int i = 0; i < paramNames.size(); ++i) {
+  for (unsigned i = 0; i < paramNames.size(); ++i) {
     params.append(paramNames[i]);
     if (paramNames[i] == "classid")
       classid = paramValues[i];
   }
-  for (int i = 0; i < paramValues.size(); ++i)
+  for (unsigned i = 0; i < paramValues.size(); ++i)
     values.append(paramValues[i]);
 
   QString urlStr(url.string());
@@ -1103,7 +1103,7 @@ PassRefPtr<Widget> FrameLoaderClientQt::createPlugin(
       if (!styleSheet.isEmpty())
         styleSheet += QLatin1Char(';');
 
-      for (int i = 0; i < numqStyleSheetProperties; ++i) {
+      for (unsigned i = 0; i < numqStyleSheetProperties; ++i) {
         CSSPropertyID property = qstyleSheetProperties[i];
 
         styleSheet += QString::fromLatin1(::getPropertyName(property));
