@@ -212,10 +212,6 @@ AtomicString v8NonStringValueToAtomicWebCoreString(
   return AtomicString(v8NonStringValueToWebCoreString(object));
 }
 
-v8::Handle<v8::String> v8String(const String& string) {
-  return v8ExternalString(string);
-}
-
 static bool stringImplCacheEnabled = false;
 
 void enableStringImplCache() {
