@@ -36,6 +36,8 @@
   \brief The QWebHistoryItem class represents one item in the history of a
   QWebPage
 
+  \inmodule QtWebKit
+
   Each QWebHistoryItem instance represents an entry in the history stack of a
   Web page,
   containing information about the page, its location, and when it was last
@@ -192,6 +194,8 @@ bool QWebHistoryItem::isValid() const {
   \class QWebHistory
   \since 4.4
   \brief The QWebHistory class represents the history of a QWebPage
+
+  \inmodule QtWebKit
 
   Each QWebPage instance contains a history of visited pages that can be
   accessed

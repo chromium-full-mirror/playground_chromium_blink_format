@@ -271,6 +271,8 @@ void QWebFramePrivate::renderPrivate(QPainter* painter, const QRegion& clip) {
     \since 4.4
     \brief The QWebFrame class represents a frame in a web page.
 
+    \inmodule QtWebKit
+
     QWebFrame represents a frame inside a web page. Each QWebPage
     object contains at least one frame, the main frame, obtained using
     QWebPage::mainFrame(). Additional frames will be created for HTML
@@ -1364,6 +1366,8 @@ QWebFrame* QWebFramePrivate::kit(WebCore::Frame* coreFrame) {
     \since 4.4
     \brief The QWebHitTestResult class provides information about the web
     page content after a hit test.
+
+    \inmodule QtWebKit
 
     QWebHitTestResult is returned by QWebFrame::hitTestContent() to provide
     information about the content of the web page at the specified position.
