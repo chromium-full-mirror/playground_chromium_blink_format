@@ -55,9 +55,6 @@ class RenderThemeChromiumLinux : public RenderThemeChromiumSkia {
   void setCaretBlinkInterval(double interval);
   virtual double caretBlinkIntervalInternal() const;
 
-  void setFocusRingColor(const Color&);
-  virtual Color platformFocusRingColor() const;
-
  private:
   RenderThemeChromiumLinux();
   virtual ~RenderThemeChromiumLinux();
@@ -66,9 +63,6 @@ class RenderThemeChromiumLinux : public RenderThemeChromiumSkia {
   virtual bool supportsControlTints() const;
 
   double m_caretBlinkInterval;
-
-  Color m_focusRingColor;
-  bool m_useDefaultFocusRingColor;
 };
 
 }  // namespace WebCore

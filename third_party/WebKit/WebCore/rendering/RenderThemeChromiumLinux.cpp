@@ -41,8 +41,7 @@ PassRefPtr<RenderTheme> RenderTheme::themeForPage(Page* page) {
   return rt;
 }
 
-RenderThemeChromiumLinux::RenderThemeChromiumLinux()
-    : m_useDefaultFocusRingColor(true) {
+RenderThemeChromiumLinux::RenderThemeChromiumLinux() {
   m_caretBlinkInterval = RenderTheme::caretBlinkInterval();
 }
 
@@ -97,17 +96,6 @@ void RenderThemeChromiumLinux::adjustSliderThumbSize(RenderObject* o) const {
     o->style()->setHeight(Length(sliderThumbAlongAxis, Fixed));
   } else
     RenderThemeChromiumSkia::adjustSliderThumbSize(o);
-}
-
-void RenderThemeChromiumLinux::setFocusRingColor(const Color& color) {
-  m_focusRingColor = color;
-  m_useDefaultFocusRingColor = false;
-}
-
-Color RenderThemeChromiumLinux::platformFocusRingColor() const {
-  if (m_useDefaultFocusRingColor)
-    return RenderThemeChromiumSkia::platformFocusRingColor();
-  return m_focusRingColor;
 }
 
 bool RenderThemeChromiumLinux::supportsControlTints() const {
