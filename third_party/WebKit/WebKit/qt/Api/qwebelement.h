@@ -154,9 +154,12 @@ class QWEBKIT_EXPORT QWebElement {
   explicit QWebElement(WebCore::Element*);
   explicit QWebElement(WebCore::Node*);
 
+  static QWebElement enclosingElement(WebCore::Node*);
+
   friend class QWebFrame;
   friend class QWebHitTestResult;
   friend class QWebHitTestResultPrivate;
+  friend class QWebPage;
 
   QWebElementPrivate* d;
   WebCore::Element* m_element;

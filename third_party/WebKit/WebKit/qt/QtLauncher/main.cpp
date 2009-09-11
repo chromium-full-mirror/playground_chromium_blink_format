@@ -34,6 +34,7 @@
 #include <qwebframe.h>
 #include <qwebsettings.h>
 #include <qwebelement.h>
+#include <qwebinspector.h>
 
 #include <QtGui>
 #include <QDebug>
@@ -72,12 +73,12 @@ class MainWindow : public QMainWindow {
   MainWindow(QString url = QString()) : currentZoom(100) {
     setAttribute(Qt::WA_DeleteOnClose);
 
-    view = new QWebView(this);
-    setCentralWidget(view);
+    QSplitter* splitter = new QSplitter(Qt::Vertical, this);
+    setCentralWidget(splitter);
 
+    view = new QWebView(splitter);
     WebPage* page = new WebPage(view);
     view->setPage(page);
-
     connect(view, SIGNAL(loadFinished(bool)), this, SLOT(loadFinished()));
     connect(view, SIGNAL(titleChanged(const QString&)), this,
             SLOT(setWindowTitle(const QString&)));
@@ -85,6 +86,13 @@ class MainWindow : public QMainWindow {
             SIGNAL(linkHovered(const QString&, const QString&, const QString&)),
             this, SLOT(showLinkHover(const QString&, const QString&)));
     connect(view->page(), SIGNAL(windowCloseRequested()), this, SLOT(close()));
+
+    inspector = new QWebInspector(splitter);
+    inspector->setPage(page);
+    inspector->hide();
+    connect(this, SIGNAL(destroyed()), inspector, SLOT(deleteLater()));
+    connect(page, SIGNAL(webInspectorTriggered(const QWebElement&)), inspector,
+            SLOT(show()));
 
     setupUI();
 
@@ -327,6 +335,7 @@ class MainWindow : public QMainWindow {
   QWebView* view;
   QLineEdit* urlEdit;
   QProgressBar* progress;
+  QWebInspector* inspector;
 
   QAction* formatMenuAction;
 

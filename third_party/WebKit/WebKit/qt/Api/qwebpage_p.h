@@ -43,6 +43,7 @@ class ContextMenuItem;
 class ContextMenu;
 class EditorClientQt;
 class Element;
+class InspectorController;
 class Node;
 class Page;
 class Frame;
@@ -53,6 +54,8 @@ class QUndoStack;
 class QMenu;
 class QBitArray;
 QT_END_NAMESPACE
+
+class QWebInspector;
 
 class QWebPagePrivate {
  public:
@@ -112,6 +115,10 @@ class QWebPagePrivate {
   void leaveEvent(QEvent*);
   void handleClipboard(QEvent*, Qt::MouseButton);
   bool handleScrolling(QKeyEvent*, WebCore::Frame*);
+
+  void setInspector(QWebInspector*);
+  QWebInspector* getOrCreateInspector();
+  WebCore::InspectorController* inspectorController();
 
 #ifndef QT_NO_SHORTCUT
   static QWebPage::WebAction editorActionForKeyEvent(QKeyEvent* event);
@@ -173,6 +180,11 @@ class QWebPagePrivate {
   QAction* actions[QWebPage::WebActionCount];
 
   QWebPluginFactory* pluginFactory;
+
+  QWidget* inspectorFrontend;
+  QWebInspector* inspector;
+  bool inspectorIsInternalOnly;  // True if created through the Inspect context
+                                 // menu action
 
   static bool drtRun;
 };

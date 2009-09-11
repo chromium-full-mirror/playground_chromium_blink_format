@@ -35,12 +35,12 @@
 #include <QtCore/QString>
 
 class QWebPage;
+class QWebView;
 
 namespace WebCore {
 class Node;
 class Page;
 class String;
-class InspectorClientWebPage;
 
 class InspectorClientQt : public InspectorClient {
  public:
@@ -56,7 +56,6 @@ class InspectorClientQt : public InspectorClient {
 
   virtual void showWindow();
   virtual void closeWindow();
-  virtual bool windowVisible();
 
   virtual void attachWindow();
   virtual void detachWindow();
@@ -78,7 +77,7 @@ class InspectorClientQt : public InspectorClient {
  private:
   void updateWindowTitle();
   QWebPage* m_inspectedWebPage;
-  OwnPtr<InspectorClientWebPage> m_webPage;
+  OwnPtr<QWebView> m_inspectorView;
   QString m_inspectedURL;
 };
 }

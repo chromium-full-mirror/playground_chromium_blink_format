@@ -37,6 +37,7 @@ class QNetworkReply;
 class QNetworkAccessManager;
 QT_END_NAMESPACE
 
+class QWebElement;
 class QWebFrame;
 class QWebNetworkRequest;
 class QWebHistory;
@@ -307,6 +308,7 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
   void windowCloseRequested();
   void printRequested(QWebFrame* frame);
   void linkClicked(const QUrl& url);
+  void webInspectorTriggered(const QWebElement& inspectedElement);
 
   void toolBarVisibilityChangeRequested(bool visible);
   void statusBarVisibilityChangeRequested(bool visible);
@@ -367,6 +369,7 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
   friend class QWebPagePrivate;
   friend class QWebView;
   friend class QWebGraphicsItem;
+  friend class QWebInspector;
   friend class WebCore::ChromeClientQt;
   friend class WebCore::EditorClientQt;
   friend class WebCore::FrameLoaderClientQt;
