@@ -36,7 +36,8 @@ class BooleanObject : public JSWrapperObject {
   static PassRefPtr<Structure> createStructure(JSValue prototype) {
     return Structure::create(
         prototype,
-        TypeInfo(ObjectType, HasStandardGetOwnPropertySlot | HasDefaultMark));
+        TypeInfo(ObjectType, HasStandardGetOwnPropertySlot | HasDefaultMark |
+                                 HasDefaultGetPropertyNames));
   }
 };
 

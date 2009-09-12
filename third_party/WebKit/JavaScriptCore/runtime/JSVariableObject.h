@@ -63,6 +63,12 @@ class JSVariableObject : public JSObject {
 
   Register& registerAt(int index) const { return d->registers[index]; }
 
+  static PassRefPtr<Structure> createStructure(JSValue prototype) {
+    return Structure::create(
+        prototype,
+        TypeInfo(ObjectType, HasStandardGetOwnPropertySlot | HasDefaultMark));
+  }
+
  protected:
   // Subclasses of JSVariableObject can subclass this struct to add data
   // without increasing their own size (since there's a hard limit on the
