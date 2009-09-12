@@ -40,6 +40,8 @@ class CanvasShortArray : public CanvasArray {
   static PassRefPtr<CanvasShortArray>
   create(PassRefPtr<CanvasArrayBuffer> buffer, int offset, unsigned length);
 
+  short* data() { return static_cast<short*>(baseAddress()); }
+
   virtual unsigned length() const;
   virtual unsigned sizeInBytes() const;
 

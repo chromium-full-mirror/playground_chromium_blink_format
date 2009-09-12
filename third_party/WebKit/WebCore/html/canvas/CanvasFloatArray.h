@@ -40,6 +40,8 @@ class CanvasFloatArray : public CanvasArray {
   static PassRefPtr<CanvasFloatArray>
   create(PassRefPtr<CanvasArrayBuffer> buffer, int offset, unsigned length);
 
+  float* data() { return static_cast<float*>(baseAddress()); }
+
   virtual unsigned length() const;
 
   virtual unsigned sizeInBytes() const;

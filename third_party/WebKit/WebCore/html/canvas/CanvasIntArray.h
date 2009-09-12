@@ -41,6 +41,8 @@ class CanvasIntArray : public CanvasArray {
                                            int offset,
                                            unsigned length);
 
+  int* data() { return static_cast<int*>(baseAddress()); }
+
   virtual unsigned length() const;
   virtual unsigned sizeInBytes() const;
 

@@ -43,6 +43,8 @@ class CanvasByteArray : public CanvasArray {
   static PassRefPtr<CanvasByteArray>
   create(PassRefPtr<CanvasArrayBuffer> buffer, int offset, unsigned length);
 
+  char* data() { return static_cast<char*>(baseAddress()); }
+
   virtual unsigned length() const;
   virtual unsigned sizeInBytes() const;
 
