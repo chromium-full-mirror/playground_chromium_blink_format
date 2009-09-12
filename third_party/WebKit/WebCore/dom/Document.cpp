@@ -965,15 +965,25 @@ KURL Document::baseURI() const {
 }
 
 Element* Document::elementFromPoint(int x, int y) const {
+  // FIXME: Share code between this and caretRangeFromPoint.
   if (!renderer())
+    return 0;
+  Frame* frame = this->frame();
+  if (!frame)
+    return 0;
+  FrameView* frameView = frame->view();
+  if (!frameView)
+    return 0;
+
+  float zoomFactor = frame->pageZoomFactor();
+  IntPoint point = roundedIntPoint(FloatPoint(x * zoomFactor, y * zoomFactor)) +
+                   view()->scrollOffset();
+
+  if (!frameView->boundsRect().contains(point))
     return 0;
 
   HitTestRequest request(HitTestRequest::ReadOnly | HitTestRequest::Active);
-
-  float zoomFactor = frame() ? frame()->pageZoomFactor() : 1.0f;
-
-  HitTestResult result(
-      roundedIntPoint(FloatPoint(x * zoomFactor, y * zoomFactor)));
+  HitTestResult result(point);
   renderView()->layer()->hitTest(request, result);
 
   Node* n = result.innerNode();
@@ -985,6 +995,7 @@ Element* Document::elementFromPoint(int x, int y) const {
 }
 
 PassRefPtr<Range> Document::caretRangeFromPoint(int x, int y) {
+  // FIXME: Share code between this and elementFromPoint.
   if (!renderer())
     return 0;
   Frame* frame = this->frame();
