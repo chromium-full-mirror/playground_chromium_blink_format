@@ -118,7 +118,7 @@ static JSValueRef contextClickCallback(JSContextRef context,
   event.button.button = 3;
   event.button.x = lastMousePositionX;
   event.button.y = lastMousePositionY;
-  event.button.window = gtk_widget_get_window(GTK_WIDGET(view));
+  event.button.window = GTK_WIDGET(view)->window;
 
   gboolean return_val;
   down = true;
@@ -160,7 +160,7 @@ static JSValueRef mouseDownCallback(JSContextRef context,
   event.button.button = 1;
   event.button.x = lastMousePositionX;
   event.button.y = lastMousePositionY;
-  event.button.window = gtk_widget_get_window(GTK_WIDGET(view));
+  event.button.window = GTK_WIDGET(view)->window;
 
   updateClickCount(1);
 
@@ -201,7 +201,7 @@ static JSValueRef mouseUpCallback(JSContextRef context,
   event.button.button = 1;
   event.button.x = lastMousePositionX;
   event.button.y = lastMousePositionY;
-  event.button.window = gtk_widget_get_window(GTK_WIDGET(view));
+  event.button.window = GTK_WIDGET(view)->window;
 
   if ((dragMode && !replayingSavedEvents) || msgQueue[endOfQueue].delay) {
     msgQueue[endOfQueue].event = event;
@@ -245,7 +245,7 @@ static JSValueRef mouseMoveToCallback(JSContextRef context,
   event.motion.x = lastMousePositionX;
   event.motion.y = lastMousePositionY;
   event.motion.time = GDK_CURRENT_TIME;
-  event.motion.window = gtk_widget_get_window(GTK_WIDGET(view));
+  event.motion.window = GTK_WIDGET(view)->window;
 
   if (dragMode && down && !replayingSavedEvents) {
     msgQueue[endOfQueue].event = event;
@@ -431,7 +431,7 @@ static JSValueRef keyDownCallback(JSContextRef context,
   memset(&event, 0, sizeof(event));
   event.key.keyval = gdkKeySym;
   event.key.state = state;
-  event.key.window = gtk_widget_get_window(GTK_WIDGET(view));
+  event.key.window = GTK_WIDGET(view)->window;
 
   gboolean return_val;
   event.key.type = GDK_KEY_PRESS;
