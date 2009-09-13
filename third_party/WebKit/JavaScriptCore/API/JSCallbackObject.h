@@ -67,7 +67,7 @@ class JSCallbackObject : public Base {
 
   virtual bool hasInstance(ExecState* exec, JSValue value, JSValue proto);
 
-  virtual void getPropertyNames(ExecState*, PropertyNameArray&);
+  virtual void getOwnPropertyNames(ExecState*, PropertyNameArray&);
 
   virtual double toNumber(ExecState*) const;
   virtual UString toString(ExecState*) const;

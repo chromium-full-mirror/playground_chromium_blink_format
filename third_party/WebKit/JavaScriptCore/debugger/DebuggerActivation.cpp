@@ -73,8 +73,8 @@ bool DebuggerActivation::deleteProperty(ExecState* exec,
   return m_activation->deleteProperty(exec, propertyName);
 }
 
-void DebuggerActivation::getPropertyNames(ExecState* exec,
-                                          PropertyNameArray& propertyNames) {
+void DebuggerActivation::getOwnPropertyNames(ExecState* exec,
+                                             PropertyNameArray& propertyNames) {
   m_activation->getPropertyNames(exec, propertyNames);
 }
 

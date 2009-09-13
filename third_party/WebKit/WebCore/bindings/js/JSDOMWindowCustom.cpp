@@ -559,6 +559,14 @@ void JSDOMWindow::getPropertyNames(ExecState* exec,
   Base::getPropertyNames(exec, propertyNames);
 }
 
+void JSDOMWindow::getOwnPropertyNames(ExecState* exec,
+                                      PropertyNameArray& propertyNames) {
+  // Only allow the window to enumerated by frames in the same origin.
+  if (!allowsAccessFrom(exec))
+    return;
+  Base::getOwnPropertyNames(exec, propertyNames);
+}
+
 bool JSDOMWindow::getPropertyAttributes(ExecState* exec,
                                         const Identifier& propertyName,
                                         unsigned& attributes) const {

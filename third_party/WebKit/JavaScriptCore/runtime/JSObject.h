@@ -147,6 +147,7 @@ class JSObject : public JSCell {
   virtual bool hasInstance(ExecState*, JSValue, JSValue prototypeProperty);
 
   virtual void getPropertyNames(ExecState*, PropertyNameArray&);
+  virtual void getOwnPropertyNames(ExecState*, PropertyNameArray&);
 
   virtual JSValue toPrimitive(ExecState*,
                               PreferredPrimitiveType = NoPreference) const;

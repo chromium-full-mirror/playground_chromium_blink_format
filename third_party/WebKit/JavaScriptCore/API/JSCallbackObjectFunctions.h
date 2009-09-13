@@ -411,7 +411,7 @@ JSValue JSCallbackObject<Base>::call(ExecState* exec,
 }
 
 template <class Base>
-void JSCallbackObject<Base>::getPropertyNames(
+void JSCallbackObject<Base>::getOwnPropertyNames(
     ExecState* exec,
     PropertyNameArray& propertyNames) {
   JSContextRef execRef = toRef(exec);
@@ -451,7 +451,7 @@ void JSCallbackObject<Base>::getPropertyNames(
     }
   }
 
-  Base::getPropertyNames(exec, propertyNames);
+  Base::getOwnPropertyNames(exec, propertyNames);
 }
 
 template <class Base>

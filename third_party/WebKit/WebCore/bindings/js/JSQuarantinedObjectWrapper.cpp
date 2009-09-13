@@ -336,4 +336,12 @@ void JSQuarantinedObjectWrapper::getPropertyNames(ExecState*,
   m_unwrappedObject->getPropertyNames(unwrappedExecState(), array);
 }
 
+void JSQuarantinedObjectWrapper::getOwnPropertyNames(ExecState*,
+                                                     PropertyNameArray& array) {
+  if (!allowsGetPropertyNames())
+    return;
+
+  m_unwrappedObject->getOwnPropertyNames(unwrappedExecState(), array);
+}
+
 }  // namespace WebCore

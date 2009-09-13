@@ -499,8 +499,8 @@ bool JSArray::deleteProperty(ExecState* exec, unsigned i) {
   return false;
 }
 
-void JSArray::getPropertyNames(ExecState* exec,
-                               PropertyNameArray& propertyNames) {
+void JSArray::getOwnPropertyNames(ExecState* exec,
+                                  PropertyNameArray& propertyNames) {
   // FIXME: Filling PropertyNameArray with an identifier for every integer
   // is incredibly inefficient for large arrays. We need a different approach,
   // which almost certainly means a different structure for PropertyNameArray.
@@ -519,7 +519,7 @@ void JSArray::getPropertyNames(ExecState* exec,
       propertyNames.add(Identifier::from(exec, it->first));
   }
 
-  JSObject::getPropertyNames(exec, propertyNames);
+  JSObject::getOwnPropertyNames(exec, propertyNames);
 }
 
 bool JSArray::increaseVectorLength(unsigned newLength) {

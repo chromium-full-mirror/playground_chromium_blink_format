@@ -89,8 +89,8 @@ JSValue UserObjectImp::callAsFunction(ExecState* exec,
   return result;
 }
 
-void UserObjectImp::getPropertyNames(ExecState* exec,
-                                     PropertyNameArray& propertyNames) {
+void UserObjectImp::getOwnPropertyNames(ExecState* exec,
+                                        PropertyNameArray& propertyNames) {
   JSUserObject* ptr = GetJSUserObject();
   if (ptr) {
     CFArrayRef cfPropertyNames = ptr->CopyPropertyNames();
@@ -105,7 +105,7 @@ void UserObjectImp::getPropertyNames(ExecState* exec,
       CFRelease(cfPropertyNames);
     }
   }
-  JSObject::getPropertyNames(exec, propertyNames);
+  JSObject::getOwnPropertyNames(exec, propertyNames);
 }
 
 JSValue UserObjectImp::userObjectGetter(ExecState*,

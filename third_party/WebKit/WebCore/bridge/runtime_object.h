@@ -53,6 +53,7 @@ class RuntimeObjectImp : public JSObject {
   virtual ConstructType getConstructData(ConstructData&);
 
   virtual void getPropertyNames(ExecState*, PropertyNameArray&);
+  virtual void getOwnPropertyNames(ExecState*, PropertyNameArray&);
 
   virtual void invalidate();
   Bindings::Instance* getInternalInstance() const { return instance.get(); }

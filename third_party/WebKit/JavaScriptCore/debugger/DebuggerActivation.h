@@ -50,7 +50,7 @@ class DebuggerActivation : public JSObject {
                                  JSValue,
                                  unsigned attributes);
   virtual bool deleteProperty(ExecState*, const Identifier& propertyName);
-  virtual void getPropertyNames(ExecState*, PropertyNameArray&);
+  virtual void getOwnPropertyNames(ExecState*, PropertyNameArray&);
   virtual bool getPropertyAttributes(ExecState*,
                                      const Identifier& propertyName,
                                      unsigned& attributes) const;

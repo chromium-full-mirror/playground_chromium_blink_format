@@ -52,7 +52,7 @@ class JSVariableObject : public JSObject {
                                  unsigned attributes) = 0;
 
   virtual bool deleteProperty(ExecState*, const Identifier&);
-  virtual void getPropertyNames(ExecState*, PropertyNameArray&);
+  virtual void getOwnPropertyNames(ExecState*, PropertyNameArray&);
 
   virtual bool isVariableObject() const;
   virtual bool isDynamicScope() const = 0;

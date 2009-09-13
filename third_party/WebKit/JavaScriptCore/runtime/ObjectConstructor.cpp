@@ -42,6 +42,10 @@ objectConstructorGetOwnPropertyDescriptor(ExecState*,
                                           JSObject*,
                                           JSValue,
                                           const ArgList&);
+static JSValue JSC_HOST_CALL objectConstructorKeys(ExecState*,
+                                                   JSObject*,
+                                                   JSValue,
+                                                   const ArgList&);
 
 ObjectConstructor::ObjectConstructor(ExecState* exec,
                                      PassRefPtr<Structure> structure,
@@ -69,6 +73,11 @@ ObjectConstructor::ObjectConstructor(ExecState* exec,
                 exec, prototypeFunctionStructure, 2,
                 exec->propertyNames().getOwnPropertyDescriptor,
                 objectConstructorGetOwnPropertyDescriptor),
+      DontEnum);
+  putDirectFunctionWithoutTransition(
+      exec, new (exec) NativeFunctionWrapper(exec, prototypeFunctionStructure,
+                                             1, exec->propertyNames().keys,
+                                             objectConstructorKeys),
       DontEnum);
 }
 
@@ -153,6 +162,22 @@ objectConstructorGetOwnPropertyDescriptor(ExecState* exec,
                          jsBoolean(descriptor.configurable()), 0);
 
   return description;
+}
+
+JSValue JSC_HOST_CALL objectConstructorKeys(ExecState* exec,
+                                            JSObject*,
+                                            JSValue,
+                                            const ArgList& args) {
+  if (!args.at(0).isObject())
+    return throwError(exec, TypeError,
+                      "Requested keys of a value that is not an object.");
+  PropertyNameArray properties(exec);
+  asObject(args.at(0))->getOwnPropertyNames(exec, properties);
+  JSArray* keys = constructEmptyArray(exec);
+  size_t numProperties = properties.size();
+  for (size_t i = 0; i < numProperties; i++)
+    keys->push(exec, jsOwnedString(exec, properties[i].ustring()));
+  return keys;
 }
 
 }  // namespace JSC

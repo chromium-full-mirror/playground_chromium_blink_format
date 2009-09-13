@@ -283,6 +283,14 @@ void Structure::materializePropertyMap() {
   }
 }
 
+void Structure::getOwnEnumerablePropertyNames(ExecState* exec,
+                                              PropertyNameArray& propertyNames,
+                                              JSObject* baseObject) {
+  getEnumerableNamesFromPropertyTable(propertyNames);
+  getEnumerableNamesFromClassInfoTable(exec, baseObject->classInfo(),
+                                       propertyNames);
+}
+
 void Structure::getEnumerablePropertyNames(ExecState* exec,
                                            PropertyNameArray& propertyNames,
                                            JSObject* baseObject) {
@@ -298,15 +306,24 @@ void Structure::getEnumerablePropertyNames(ExecState* exec,
     clearEnumerationCache();
   }
 
-  getEnumerableNamesFromPropertyTable(propertyNames);
-  getEnumerableNamesFromClassInfoTable(exec, baseObject->classInfo(),
-                                       propertyNames);
+  baseObject->getOwnPropertyNames(exec, propertyNames);
 
   if (m_prototype.isObject()) {
     propertyNames.setShouldCache(false);  // No need for our prototypes to waste
                                           // memory on caching, since they're
                                           // not being enumerated directly.
-    asObject(m_prototype)->getPropertyNames(exec, propertyNames);
+    JSObject* prototype = asObject(m_prototype);
+    while (1) {
+      if (!prototype->structure()->typeInfo().hasDefaultGetPropertyNames()) {
+        prototype->getPropertyNames(exec, propertyNames);
+        break;
+      }
+      prototype->getOwnPropertyNames(exec, propertyNames);
+      JSValue nextProto = prototype->prototype();
+      if (!nextProto.isObject())
+        break;
+      prototype = asObject(nextProto);
+    }
   }
 
   if (shouldCache) {

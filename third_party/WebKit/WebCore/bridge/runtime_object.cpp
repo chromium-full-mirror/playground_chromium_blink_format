@@ -323,6 +323,11 @@ void RuntimeObjectImp::getPropertyNames(ExecState* exec,
   instance->end();
 }
 
+void RuntimeObjectImp::getOwnPropertyNames(ExecState* exec,
+                                           PropertyNameArray& propertyNames) {
+  getOwnPropertyNames(exec, propertyNames);
+}
+
 JSObject* RuntimeObjectImp::throwInvalidAccessError(ExecState* exec) {
   return throwError(exec, ReferenceError,
                     "Trying to access object from destroyed plug-in.");

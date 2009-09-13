@@ -92,7 +92,7 @@ class JSNotAnObject : public JSObject {
   virtual bool deleteProperty(ExecState*, const Identifier& propertyName);
   virtual bool deleteProperty(ExecState*, unsigned propertyName);
 
-  virtual void getPropertyNames(ExecState*, PropertyNameArray&);
+  virtual void getOwnPropertyNames(ExecState*, PropertyNameArray&);
 
   JSNotAnObjectErrorStub* m_exception;
 };

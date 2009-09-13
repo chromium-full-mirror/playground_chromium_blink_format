@@ -91,7 +91,7 @@ class JSByteArray : public JSObject {
                    JSC::PutPropertySlot&);
   virtual void put(JSC::ExecState*, unsigned propertyName, JSC::JSValue);
 
-  virtual void getPropertyNames(JSC::ExecState*, JSC::PropertyNameArray&);
+  virtual void getOwnPropertyNames(JSC::ExecState*, JSC::PropertyNameArray&);
 
   virtual const ClassInfo* classInfo() const { return m_classInfo; }
   static const ClassInfo s_defaultInfo;

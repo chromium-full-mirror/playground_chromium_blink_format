@@ -42,8 +42,8 @@ bool JSVariableObject::deleteProperty(ExecState* exec,
   return JSObject::deleteProperty(exec, propertyName);
 }
 
-void JSVariableObject::getPropertyNames(ExecState* exec,
-                                        PropertyNameArray& propertyNames) {
+void JSVariableObject::getOwnPropertyNames(ExecState* exec,
+                                           PropertyNameArray& propertyNames) {
   SymbolTable::const_iterator end = symbolTable().end();
   for (SymbolTable::const_iterator it = symbolTable().begin(); it != end;
        ++it) {
@@ -51,7 +51,7 @@ void JSVariableObject::getPropertyNames(ExecState* exec,
       propertyNames.add(Identifier(exec, it->first.get()));
   }
 
-  JSObject::getPropertyNames(exec, propertyNames);
+  JSObject::getOwnPropertyNames(exec, propertyNames);
 }
 
 bool JSVariableObject::getPropertyAttributes(ExecState* exec,

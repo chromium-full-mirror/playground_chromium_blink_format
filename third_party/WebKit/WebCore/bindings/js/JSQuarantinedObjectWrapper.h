@@ -86,6 +86,7 @@ class JSQuarantinedObjectWrapper : public JSC::JSObject {
   virtual bool hasInstance(JSC::ExecState*, JSC::JSValue, JSC::JSValue proto);
 
   virtual void getPropertyNames(JSC::ExecState*, JSC::PropertyNameArray&);
+  virtual void getOwnPropertyNames(JSC::ExecState*, JSC::PropertyNameArray&);
 
   virtual JSC::UString className() const {
     return m_unwrappedObject->className();

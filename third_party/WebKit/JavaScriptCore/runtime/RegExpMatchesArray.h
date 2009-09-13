@@ -82,10 +82,10 @@ class RegExpMatchesArray : public JSArray {
     return JSArray::deleteProperty(exec, propertyName);
   }
 
-  virtual void getPropertyNames(ExecState* exec, PropertyNameArray& arr) {
+  virtual void getOwnPropertyNames(ExecState* exec, PropertyNameArray& arr) {
     if (lazyCreationData())
       fillArrayInstance(exec);
-    JSArray::getPropertyNames(exec, arr);
+    JSArray::getOwnPropertyNames(exec, arr);
   }
 
   void fillArrayInstance(ExecState*);

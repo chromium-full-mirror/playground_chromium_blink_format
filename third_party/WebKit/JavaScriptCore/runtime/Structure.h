@@ -141,6 +141,7 @@ class Structure : public RefCounted<Structure> {
   }
 
   void getEnumerablePropertyNames(ExecState*, PropertyNameArray&, JSObject*);
+  void getOwnEnumerablePropertyNames(ExecState*, PropertyNameArray&, JSObject*);
 
   bool hasGetterSetterProperties() const { return m_hasGetterSetterProperties; }
   void setHasGetterSetterProperties(bool hasGetterSetterProperties) {
