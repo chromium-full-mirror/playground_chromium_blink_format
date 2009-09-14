@@ -42,6 +42,10 @@ Credential::Credential(const String& user,
       m_password(password.length() ? password : ""),
       m_persistence(persistence) {}
 
+bool Credential::isEmpty() {
+  return m_user.isEmpty() && m_password.isEmpty();
+}
+
 const String& Credential::user() const {
   return m_user;
 }

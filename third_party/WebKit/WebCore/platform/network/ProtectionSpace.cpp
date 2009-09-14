@@ -36,7 +36,13 @@ namespace WebCore {
 // Need to enforce empty, non-null strings due to the pickiness of the String ==
 // String operator
 // combined with the semantics of the String(NSString*) constructor
-ProtectionSpace::ProtectionSpace() : m_host(""), m_realm("") {}
+ProtectionSpace::ProtectionSpace()
+    : m_host(""),
+      m_port(0),
+      m_serverType(ProtectionSpaceServerHTTP),
+      m_realm(""),
+      m_authenticationScheme(ProtectionSpaceAuthenticationSchemeDefault),
+      m_isHashTableDeletedValue(false) {}
 
 // Need to enforce empty, non-null strings due to the pickiness of the String ==
 // String operator
@@ -51,7 +57,8 @@ ProtectionSpace::ProtectionSpace(
       m_port(port),
       m_serverType(serverType),
       m_realm(realm.length() ? realm : ""),
-      m_authenticationScheme(authenticationScheme) {}
+      m_authenticationScheme(authenticationScheme),
+      m_isHashTableDeletedValue(false) {}
 
 const String& ProtectionSpace::host() const {
   return m_host;

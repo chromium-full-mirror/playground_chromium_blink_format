@@ -61,9 +61,7 @@ class ResourceLoadDelegate : public IWebResourceLoadDelegate {
       /* [in] */ IWebView* webView,
       /* [in] */ unsigned long identifier,
       /* [in] */ IWebURLAuthenticationChallenge* challenge,
-      /* [in] */ IWebDataSource* dataSource) {
-    return E_NOTIMPL;
-  }
+      /* [in] */ IWebDataSource* dataSource);
 
   virtual HRESULT STDMETHODCALLTYPE didCancelAuthenticationChallenge(
       /* [in] */ IWebView* webView,

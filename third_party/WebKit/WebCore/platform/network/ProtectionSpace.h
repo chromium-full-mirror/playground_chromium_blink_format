@@ -58,6 +58,12 @@ class ProtectionSpace {
                   const String& realm,
                   ProtectionSpaceAuthenticationScheme);
 
+  // Hash table deleted values, which are only constructed and never copied or
+  // destroyed.
+  ProtectionSpace(WTF::HashTableDeletedValueType)
+      : m_isHashTableDeletedValue(true) {}
+  bool isHashTableDeletedValue() const { return m_isHashTableDeletedValue; }
+
   const String& host() const;
   int port() const;
   ProtectionSpaceServerType serverType() const;
@@ -73,11 +79,14 @@ class ProtectionSpace {
   ProtectionSpaceServerType m_serverType;
   String m_realm;
   ProtectionSpaceAuthenticationScheme m_authenticationScheme;
+  bool m_isHashTableDeletedValue;
 };
 
 bool operator==(const ProtectionSpace& a, const ProtectionSpace& b);
 inline bool operator!=(const ProtectionSpace& a, const ProtectionSpace& b) {
   return !(a == b);
 }
-}
-#endif
+
+}  // namespace WebCore
+
+#endif  // ProtectionSpace_h

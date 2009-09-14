@@ -31,8 +31,9 @@
 
 #include "AuthenticationCF.h"
 #include "AuthenticationChallenge.h"
-#include "CookieStorageWin.h"
 #include "CString.h"
+#include "CookieStorageWin.h"
+#include "CredentialStorage.h"
 #include "DocLoader.h"
 #include "Frame.h"
 #include "FrameLoader.h"
@@ -90,6 +91,9 @@ class WebCoreSynchronousLoader {
   RetainPtr<CFURLRef> m_url;
   RetainPtr<CFStringRef> m_user;
   RetainPtr<CFStringRef> m_pass;
+  // Store the preemptively used initial credential so that if we get an
+  // authentication challenge, we won't use the same one again.
+  Credential m_initialCredential;
   bool m_allowStoredCredentials;
   ResourceResponse& m_response;
   RetainPtr<CFMutableDataRef> m_data;
@@ -437,6 +441,25 @@ bool ResourceHandle::start(Frame* frame) {
     d->m_request.setURL(urlWithCredentials);
   }
 
+  // <rdar://problem/7174050> - For URLs that match the paths of those
+  // previously challenged for HTTP Basic authentication,
+  // try and reuse the credential preemptively, as allowed by RFC 2617.
+  if (!client() ||
+      client()->shouldUseCredentialStorage(this) &&
+          d->m_request.url().protocolInHTTPFamily())
+    d->m_initialCredential =
+        CredentialStorage::getDefaultAuthenticationCredential(
+            d->m_request.url());
+
+  if (!d->m_initialCredential.isEmpty()) {
+    // Apply basic auth header
+    String unencoded =
+        d->m_initialCredential.user() + ":" + d->m_initialCredential.password();
+    CString encoded = unencoded.utf8().base64Encode();
+    String authHeader = String::format("Basic %s", encoded.data());
+    d->m_request.addHTTPHeaderField("Authorization", authHeader);
+  }
+
   RetainPtr<CFURLRequestRef> request(
       AdoptCF, makeFinalRequest(d->m_request, d->m_shouldContentSniff));
 
@@ -522,9 +545,12 @@ void ResourceHandle::didReceiveAuthenticationChallenge(
         AdoptCF,
         CFURLCredentialCreate(kCFAllocatorDefault, user.get(), pass.get(), 0,
                               kCFURLCredentialPersistenceNone));
-    WebCoreCredentialStorage::set(
-        CFURLAuthChallengeGetProtectionSpace(challenge.cfURLAuthChallengeRef()),
-        credential.get());
+
+    KURL urlToStore;
+    if (challenge.failureResponse().httpStatusCode() == 401)
+      urlToStore = d->m_request.url() CredentialStorage::set(
+          core(credential.get()), challenge.protectionSpace(), urlToStore);
+
     CFURLConnectionUseCredential(d->m_connection.get(), credential.get(),
                                  challenge.cfURLAuthChallengeRef());
     d->m_user = String();
@@ -536,13 +562,11 @@ void ResourceHandle::didReceiveAuthenticationChallenge(
 
   if (!challenge.previousFailureCount() &&
       (!client() || client()->shouldUseCredentialStorage(this))) {
-    CFURLCredentialRef credential =
-        WebCoreCredentialStorage::get(CFURLAuthChallengeGetProtectionSpace(
-            challenge.cfURLAuthChallengeRef()));
-    if (credential) {
-      ASSERT(CFURLCredentialGetPersistence(credential) ==
-             kCFURLCredentialPersistenceNone);
-      CFURLConnectionUseCredential(d->m_connection.get(), credential,
+    Credential credential = CredentialStorage::get(challenge.protectionSpace());
+    if (!credential.isEmpty() && credential != d->m_initialCredential) {
+      ASSERT(credential.persistence() == CredentialPersistenceNone);
+      RetainPtr<CFURLCredentialRef> cfCredential(AdoptCF, createCF(credential));
+      CFURLConnectionUseCredential(d->m_connection.get(), cfCredential.get(),
                                    challenge.cfURLAuthChallengeRef());
       return;
     }
@@ -573,9 +597,12 @@ void ResourceHandle::receivedCredential(
                              CredentialPersistenceNone);
     RetainPtr<CFURLCredentialRef> cfCredential(AdoptCF,
                                                createCF(webCredential));
-    WebCoreCredentialStorage::set(
-        CFURLAuthChallengeGetProtectionSpace(challenge.cfURLAuthChallengeRef()),
-        cfCredential.get());
+
+    KURL urlToStore;
+    if (challenge.failureResponse().httpStatusCode() == 401)
+      urlToStore = d->m_request.url() CredentialStorage::set(
+          webCredential, challenge.protectionSpace(), urlToStore);
+
     CFURLConnectionUseCredential(d->m_connection.get(), cfCredential.get(),
                                  challenge.cfURLAuthChallengeRef());
   } else {
@@ -782,25 +809,35 @@ void WebCoreSynchronousLoader::didReceiveChallenge(
       static_cast<WebCoreSynchronousLoader*>(const_cast<void*>(clientInfo));
 
   if (loader->m_user && loader->m_pass) {
-    RetainPtr<CFURLCredentialRef> credential(
-        AdoptCF, CFURLCredentialCreate(
-                     kCFAllocatorDefault, loader->m_user.get(),
-                     loader->m_pass.get(), 0, kCFURLCredentialPersistenceNone));
-    WebCoreCredentialStorage::set(
-        CFURLAuthChallengeGetProtectionSpace(challenge), credential.get());
-    CFURLConnectionUseCredential(conn, credential.get(), challenge);
+    Credential credential(loader->m_user.get(), loader->m_pass.get(),
+                          CredentialPersistenceNone);
+    RetainPtr<CFURLCredentialRef> cfCredential(AdoptCF, createCF(credential));
+
+    CFURLResponseRef urlResponse =
+        CFURLAuthChallengeGetFailureResponse(challenge);
+    CFHTTPMessageRef httpResponse =
+        urlResponse ? CFURLResponseGetHTTPResponse(urlResponse) : 0;
+    KURL urlToStore;
+    if (httpResponse && CFHTTPMessageGetResponseStatusCode(httpResponse) == 401)
+      urlToStore = loader->m_url;
+
+    CredentialStorage::set(
+        credential, core(CFURLAuthChallengeGetProtectionSpace(challenge)),
+        urlToStore);
+
+    CFURLConnectionUseCredential(conn, cfCredential.get(), challenge);
     loader->m_user = 0;
     loader->m_pass = 0;
     return;
   }
   if (!CFURLAuthChallengeGetPreviousFailureCount(challenge) &&
       loader->m_allowStoredCredentials) {
-    CFURLCredentialRef credential = WebCoreCredentialStorage::get(
-        CFURLAuthChallengeGetProtectionSpace(challenge));
-    if (credential) {
-      ASSERT(CFURLCredentialGetPersistence(credential) ==
-             kCFURLCredentialPersistenceNone);
-      CFURLConnectionUseCredential(conn, credential, challenge);
+    Credential credential = CredentialStorage::get(
+        core(CFURLAuthChallengeGetProtectionSpace(challenge)));
+    if (!credential.isEmpty() && credential != loader->m_initialCredential) {
+      ASSERT(credential.persistence() == CredentialPersistenceNone);
+      RetainPtr<CFURLCredentialRef> cfCredential(AdoptCF, createCF(credential));
+      CFURLConnectionUseCredential(conn, cfCredential.get(), challenge);
       return;
     }
   }
@@ -846,9 +883,29 @@ RetainPtr<CFDataRef> WebCoreSynchronousLoader::load(
     cfRequest.adoptCF(makeFinalRequest(requestWithoutCredentials,
                                        ResourceHandle::shouldContentSniffURL(
                                            requestWithoutCredentials.url())));
-  } else
+  } else {
+    // <rdar://problem/7174050> - For URLs that match the paths of those
+    // previously challenged for HTTP Basic authentication,
+    // try and reuse the credential preemptively, as allowed by RFC 2617.
+    ResourceRequest requestWithInitialCredential(request);
+    if (loader.m_allowStoredCredentials && url.protocolInHTTPFamily())
+      m_initialCredential =
+          CredentialStorage::getDefaultAuthenticationCredential(url);
+
+    if (!m_initialCredential.isEmpty()) {
+      // Apply basic auth header
+      String unencoded =
+          m_initialCredential.user() + ":" + m_initialCredential.password();
+      CString encoded = unencoded.utf8().base64Encode();
+      String authHeader = String::format("Basic %s", encoded.data());
+      requestWithInitialCredential.addHTTPHeaderField("Authorization",
+                                                      authHeader);
+    }
+
     cfRequest.adoptCF(makeFinalRequest(
-        request, ResourceHandle::shouldContentSniffURL(request.url())));
+        requestWithInitialCredential, ResourceHandle::shouldContentSniffURL(
+                                          requestWithInitialCredential.url())));
+  }
 
   CFURLConnectionClient_V3 client = {3,
                                      &loader,

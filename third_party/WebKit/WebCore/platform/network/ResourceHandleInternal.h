@@ -162,6 +162,8 @@ class ResourceHandleInternal : public Noncopyable {
   String m_user;
   String m_pass;
 
+  Credential m_initialCredential;
+
   int status;
 
   bool m_defersLoading;
