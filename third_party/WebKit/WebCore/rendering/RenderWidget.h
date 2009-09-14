@@ -67,6 +67,7 @@ class RenderWidget : public RenderReplaced, private OverlapTestRequestClient {
 
   void setWidgetGeometry(const IntRect&);
 
+  friend class RenderWidgetProtector;
   RenderArena* ref() {
     ++m_refCount;
     return renderArena();
