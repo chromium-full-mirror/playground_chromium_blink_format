@@ -59,3 +59,5 @@ AccessibilityUIElement AccessibilityController::rootElement() {
 }
 
 void AccessibilityController::setLogFocusEvents(bool) {}
+
+void AccessibilityController::setLogScrollingStartEvents(bool) {}
