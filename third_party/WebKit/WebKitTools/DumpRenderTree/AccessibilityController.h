@@ -47,6 +47,7 @@ class AccessibilityController {
   AccessibilityUIElement focusedElement();
 
   void setLogFocusEvents(bool);
+  void setLogScrollingStartEvents(bool);
 
   void resetToConsistentState();
 
@@ -55,6 +56,7 @@ class AccessibilityController {
 
 #if PLATFORM(WIN)
   HWINEVENTHOOK m_focusEventHook;
+  HWINEVENTHOOK m_scrollingStartEventHook;
 #endif
 };
 
