@@ -304,6 +304,7 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   virtual AccessibilityObject* parentObject() const = 0;
   virtual AccessibilityObject* parentObjectUnignored() const;
   virtual AccessibilityObject* parentObjectIfExists() const { return 0; }
+  static AccessibilityObject* firstAccessibleObjectFromNode(const Node*);
 
   virtual AccessibilityObject* observableObject() const { return 0; }
   virtual void linkedUIElements(AccessibilityChildrenVector&) const {}

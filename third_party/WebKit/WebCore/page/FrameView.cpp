@@ -1170,6 +1170,10 @@ void FrameView::scrollToAnchor() {
       rect, true, ScrollAlignment::alignToEdgeIfNeeded,
       ScrollAlignment::alignTopAlways);
 
+  if (AXObjectCache::accessibilityEnabled())
+    m_frame->document()->axObjectCache()->handleScrolledToAnchor(
+        anchorNode.get());
+
   // scrollRectToVisible can call into scrollRectIntoViewRecursively(), which
   // resets m_maintainScrollPositionAnchor.
   m_maintainScrollPositionAnchor = anchorNode;

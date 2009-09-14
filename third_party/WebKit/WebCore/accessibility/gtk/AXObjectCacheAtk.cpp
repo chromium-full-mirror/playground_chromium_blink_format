@@ -62,4 +62,6 @@ void AXObjectCache::handleFocusedUIElementChanged(
   }
 }
 
+void AXObjectCache::handleScrolledToAnchor(const Node*) {}
+
 }  // namespace WebCore
