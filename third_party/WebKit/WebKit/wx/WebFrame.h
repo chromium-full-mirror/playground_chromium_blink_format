@@ -154,6 +154,8 @@ class WXDLLIMPEXP_WEBKIT wxWebFrame {
 
   wxWebViewDOMElementInfo HitTest(const wxPoint& post) const;
 
+  bool ShouldClose() const;
+
  private:
   float m_textMagnifier;
   bool m_isEditable;

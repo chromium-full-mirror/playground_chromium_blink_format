@@ -834,3 +834,10 @@ wxWebViewDOMElementInfo wxWebView::HitTest(const wxPoint& pos) const {
 
   return wxWebViewDOMElementInfo();
 }
+
+bool wxWebView::ShouldClose() const {
+  if (m_mainFrame)
+    return m_mainFrame->ShouldClose();
+
+  return true;
+}

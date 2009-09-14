@@ -166,6 +166,8 @@ class WXDLLIMPEXP_WEBKIT wxWebView : public wxWindow {
 
   wxWebViewDOMElementInfo HitTest(const wxPoint& pos) const;
 
+  bool ShouldClose() const;
+
  protected:
   // event handlers (these functions should _not_ be virtual)
   void OnPaint(wxPaintEvent& event);
