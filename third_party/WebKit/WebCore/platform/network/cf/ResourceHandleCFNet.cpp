@@ -870,8 +870,10 @@ RetainPtr<CFDataRef> WebCoreSynchronousLoader::load(
 
   KURL url = request.url();
 
-  loader.m_user.adoptCF(url.user().createCFString());
-  loader.m_pass.adoptCF(url.pass().createCFString());
+  if (url.user().length())
+    loader.m_user.adoptCF(url.user().createCFString());
+  if (url.pass().length())
+    loader.m_pass.adoptCF(url.pass().createCFString());
   loader.m_allowStoredCredentials =
       (storedCredentials == AllowStoredCredentials);
 
