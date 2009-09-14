@@ -298,6 +298,14 @@ class WXDLLIMPEXP_WEBKIT wxWebViewRightClickEvent : public wxCommandEvent {
   wxPoint m_position;
 };
 
+// copied from page/Console.h
+enum wxWebViewConsoleMessageLevel {
+  TipMessageLevel,
+  LogMessageLevel,
+  WarningMessageLevel,
+  ErrorMessageLevel
+};
+
 class WXDLLIMPEXP_WEBKIT wxWebViewConsoleMessageEvent : public wxCommandEvent {
 #ifndef SWIG
   DECLARE_DYNAMIC_CLASS(wxWebViewConsoleMessageEvent)
@@ -316,10 +324,14 @@ class WXDLLIMPEXP_WEBKIT wxWebViewConsoleMessageEvent : public wxCommandEvent {
   wxWebViewConsoleMessageEvent(wxWindow* win = (wxWindow*)NULL);
   wxEvent* Clone(void) const { return new wxWebViewConsoleMessageEvent(*this); }
 
+  wxWebViewConsoleMessageLevel GetLevel() const { return m_level; }
+  void SetLevel(wxWebViewConsoleMessageLevel level) { m_level = level; }
+
  private:
   unsigned int m_lineNumber;
   wxString m_message;
   wxString m_sourceID;
+  wxWebViewConsoleMessageLevel m_level;
 };
 
 class WXDLLIMPEXP_WEBKIT wxWebViewAlertEvent : public wxCommandEvent {
