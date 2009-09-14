@@ -143,8 +143,6 @@ void RenderTextControlSingleLine::hidePopup() {
   ASSERT(node()->isHTMLElement());
   if (m_searchPopup)
     m_searchPopup->hide();
-
-  m_searchPopupIsVisible = false;
 }
 
 void RenderTextControlSingleLine::subtreeHasChanged() {
@@ -746,6 +744,10 @@ int RenderTextControlSingleLine::listSize() const {
 
 int RenderTextControlSingleLine::selectedIndex() const {
   return -1;
+}
+
+void RenderTextControlSingleLine::popupDidHide() {
+  m_searchPopupIsVisible = false;
 }
 
 bool RenderTextControlSingleLine::itemIsSeparator(unsigned listIndex) const {

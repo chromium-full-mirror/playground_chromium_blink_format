@@ -49,7 +49,7 @@ class RenderTextControlSingleLine : public RenderTextControl,
 
   bool popupIsVisible() const { return m_searchPopupIsVisible; }
   void showPopup();
-  virtual void hidePopup();  // PopupMenuClient method
+  void hidePopup();
 
   void forwardEvent(Event*);
 
@@ -123,6 +123,7 @@ class RenderTextControlSingleLine : public RenderTextControl,
   virtual int clientPaddingRight() const;
   virtual int listSize() const;
   virtual int selectedIndex() const;
+  virtual void popupDidHide();
   virtual bool itemIsSeparator(unsigned listIndex) const;
   virtual bool itemIsLabel(unsigned listIndex) const;
   virtual bool itemIsSelected(unsigned listIndex) const;

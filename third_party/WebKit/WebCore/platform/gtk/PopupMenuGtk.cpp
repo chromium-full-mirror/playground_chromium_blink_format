@@ -134,7 +134,7 @@ void PopupMenu::menuItemActivated(GtkMenuItem* item, PopupMenu* that) {
 
 void PopupMenu::menuUnmapped(GtkWidget*, PopupMenu* that) {
   ASSERT(that->client());
-  that->client()->hidePopup();
+  that->client()->popupDidHide();
 }
 
 void PopupMenu::menuPositionFunction(GtkMenu*,
