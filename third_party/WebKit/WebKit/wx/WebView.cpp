@@ -24,6 +24,7 @@
  */
 
 #include "config.h"
+#include "Cache.h"
 #include "CString.h"
 #include "Document.h"
 #include "Element.h"
@@ -209,6 +210,24 @@ wxWebViewDOMElementInfo::wxWebViewDOMElementInfo()
       m_text(wxEmptyString),
       m_imageSrc(wxEmptyString),
       m_link(wxEmptyString) {}
+
+static wxWebViewCachePolicy gs_cachePolicy;
+
+/* static */
+void wxWebView::SetCachePolicy(const wxWebViewCachePolicy& cachePolicy) {
+  WebCore::Cache* globalCache = WebCore::cache();
+  globalCache->setCapacities(cachePolicy.GetMinDeadCapacity(),
+                             cachePolicy.GetMaxDeadCapacity(),
+                             cachePolicy.GetCapacity());
+
+  // store a copy since there is no getter for Cache values
+  gs_cachePolicy = cachePolicy;
+}
+
+/* static */
+wxWebViewCachePolicy wxWebView::GetCachePolicy() {
+  return gs_cachePolicy;
+}
 
 BEGIN_EVENT_TABLE(wxWebView, wxWindow)
 EVT_PAINT(wxWebView::OnPaint)
