@@ -250,7 +250,7 @@ ResourceLoadDelegate::didReceiveAuthenticationChallenge(
     /* [in] */ IWebURLAuthenticationChallenge* challenge,
     /* [in] */ IWebDataSource* dataSource) {
   if (!gLayoutTestController->handlesAuthenticationChallenges())
-    return;
+    return E_FAIL;
 
   const char* user = gLayoutTestController->authenticationUsername().c_str();
   const char* password =

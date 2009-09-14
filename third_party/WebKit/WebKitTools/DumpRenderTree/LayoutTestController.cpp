@@ -847,12 +847,13 @@ static JSValueRef setAuthenticationPasswordCallback(
   ASSERT(!*exception);
 
   size_t maxLength = JSStringGetMaximumUTF8CStringSize(password.get());
-  char passwordBuffer[maxLength + 1];
+  char* passwordBuffer = new char[maxLength + 1];
   JSStringGetUTF8CString(password.get(), passwordBuffer, maxLength + 1);
 
   LayoutTestController* controller =
       static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
   controller->setAuthenticationPassword(passwordBuffer);
+  delete[] passwordBuffer;
 
   return JSValueMakeUndefined(context);
 }
@@ -873,12 +874,13 @@ static JSValueRef setAuthenticationUsernameCallback(
   ASSERT(!*exception);
 
   size_t maxLength = JSStringGetMaximumUTF8CStringSize(username.get());
-  char usernameBuffer[maxLength + 1];
+  char* usernameBuffer = new char[maxLength + 1];
   JSStringGetUTF8CString(username.get(), usernameBuffer, maxLength + 1);
 
   LayoutTestController* controller =
       static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
   controller->setAuthenticationUsername(usernameBuffer);
+  delete[] usernameBuffer;
 
   return JSValueMakeUndefined(context);
 }
