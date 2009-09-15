@@ -394,7 +394,7 @@ void UniscribeHelper::draw(GraphicsContext* graphicsContext,
         } else {
           SkPoint origin;
           origin.fX = curX + +innerOffset;
-          origin.fY = y + m_ascent - shaping.m_ascentOffset;
+          origin.fY = y + m_ascent;
           textOutOk = paintSkiaText(graphicsContext, shaping.m_hfont,
                                     glyphCount, &shaping.m_glyphs[fromGlyph],
                                     &shaping.m_advance[fromGlyph],
