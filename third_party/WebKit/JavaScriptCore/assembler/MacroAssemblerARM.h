@@ -30,7 +30,7 @@
 
 #include <wtf/Platform.h>
 
-#if ENABLE(ASSEMBLER) && PLATFORM(ARM)
+#if ENABLE(ASSEMBLER) && PLATFORM(ARM) && !PLATFORM_ARM_ARCH(7)
 
 #include "ARMAssembler.h"
 #include "AbstractMacroAssembler.h"
@@ -567,10 +567,7 @@ class MacroAssemblerARM : public AbstractMacroAssembler<ARMAssembler> {
   }
 
   // Floating point operators
-  bool supportsFloatingPoint() const {
-    // FIXME: should be a dynamic test: VFP, FPA, or nothing
-    return false;
-  }
+  bool supportsFloatingPoint() const { return s_isVFPPresent; }
 
   bool supportsFloatingPointTruncate() const { return false; }
 
@@ -709,9 +706,11 @@ class MacroAssemblerARM : public AbstractMacroAssembler<ARMAssembler> {
     ARMAssembler::relinkCall(call.dataLocation(),
                              destination.executableAddress());
   }
+
+  static const bool s_isVFPPresent;
 };
 }
 
-#endif
+#endif  // ENABLE(ASSEMBLER) && PLATFORM(ARM) && !PLATFORM_ARM_ARCH(7)
 
 #endif  // MacroAssemblerARM_h
