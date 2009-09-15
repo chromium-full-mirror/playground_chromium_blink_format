@@ -111,6 +111,10 @@
 #include "SVGViewSpec.h"
 #endif
 
+#if PLATFORM(MAC) || PLATFORM(WIN)
+#define PAGE_CACHE_ACCEPTS_UNLOAD_HANDLERS
+#endif
+
 namespace WebCore {
 
 #if ENABLE(SVG)
@@ -1988,9 +1992,11 @@ bool FrameLoader::canCachePageContainingThisFrame() {
          // way that we can recreate
          // the right NPObjects. See <rdar://problem/5197041> for more
          // information.
-         && !m_containsPlugIns && !m_URL.protocolIs("https") &&
-         (!m_frame->domWindow() ||
-          !m_frame->domWindow()->hasEventListener(eventNames().unloadEvent))
+         && !m_containsPlugIns && !m_URL.protocolIs("https")
+#ifndef PAGE_CACHE_ACCEPTS_UNLOAD_HANDLERS
+         && (!m_frame->domWindow() ||
+             !m_frame->domWindow()->hasEventListener(eventNames().unloadEvent))
+#endif
 #if ENABLE(DATABASE)
          && !m_frame->document()->hasOpenDatabases()
 #endif
@@ -2155,11 +2161,13 @@ bool FrameLoader::logCanCacheFrameDecision(int indentLevel) {
       PCLOG("   -Frame is HTTPS");
       cannotCache = true;
     }
+#ifndef PAGE_CACHE_ACCEPTS_UNLOAD_HANDLERS
     if (m_frame->domWindow() &&
         m_frame->domWindow()->hasEventListener(eventNames().unloadEvent)) {
       PCLOG("   -Frame has an unload event listener");
       cannotCache = true;
     }
+#endif
 #if ENABLE(DATABASE)
     if (m_frame->document()->hasOpenDatabases()) {
       PCLOG("   -Frame has open database handles");
