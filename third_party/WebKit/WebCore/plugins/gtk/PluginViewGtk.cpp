@@ -340,7 +340,6 @@ NPError PluginView::getValue(NPNVariable variable, void* value) {
         return NPERR_GENERIC_ERROR;
 #endif
 
-#if ENABLE(NETSCAPE_PLUGIN_API)
     case NPNVWindowNPObject: {
       if (m_isJavaScriptPaused)
         return NPERR_GENERIC_ERROR;
@@ -380,7 +379,6 @@ NPError PluginView::getValue(NPNVariable variable, void* value) {
 
       return NPERR_NO_ERROR;
     }
-#endif
 
     case NPNVnetscapeWindow: {
 #if defined(XP_UNIX)
@@ -388,7 +386,7 @@ NPError PluginView::getValue(NPNVariable variable, void* value) {
       *((XID*)w) = GDK_WINDOW_XWINDOW(
           m_parentFrame->view()->hostWindow()->platformWindow()->window);
 #endif
-#ifdef GDK_WINDOWING_WIN32
+#if defined(GDK_WINDOWING_WIN32)
       HGDIOBJ* w = reinterpret_cast<HGDIOBJ*>(value);
       *w = GDK_WINDOW_HWND(
           m_parentFrame->view()->hostWindow()->platformWindow()->window);
