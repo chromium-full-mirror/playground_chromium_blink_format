@@ -57,7 +57,9 @@
 namespace WebCore {
 
 InspectorDOMAgent::InspectorDOMAgent(InspectorFrontend* frontend)
-    : m_frontend(frontend), m_lastNodeId(1) {}
+    : EventListener(InspectorDOMAgentType),
+      m_frontend(frontend),
+      m_lastNodeId(1) {}
 
 InspectorDOMAgent::~InspectorDOMAgent() {
   setDocument(0);
@@ -534,11 +536,19 @@ bool InspectorDOMAgent::isWhitespace(Node* node) {
          node->nodeValue().stripWhiteSpace().length() == 0;
 }
 
-Document* InspectorDOMAgent::mainFrameDocument() {
-  ListHashSet<RefPtr<Document>>::iterator it = m_documents.begin();
+Document* InspectorDOMAgent::mainFrameDocument() const {
+  ListHashSet<RefPtr<Document>>::const_iterator it = m_documents.begin();
   if (it != m_documents.end())
     return it->get();
   return 0;
+}
+
+bool InspectorDOMAgent::operator==(const EventListener& listener) {
+  if (const InspectorDOMAgent* inspectorDOMAgentListener =
+          InspectorDOMAgent::cast(&listener))
+    return mainFrameDocument() ==
+           inspectorDOMAgentListener->mainFrameDocument();
+  return false;
 }
 
 }  // namespace WebCore

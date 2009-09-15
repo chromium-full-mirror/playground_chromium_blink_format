@@ -36,17 +36,14 @@ namespace WebCore {
 JSEventListener::JSEventListener(JSObject* function,
                                  JSDOMGlobalObject* globalObject,
                                  bool isAttribute)
-    : m_jsFunction(function),
+    : EventListener(JSEventListenerType),
+      m_jsFunction(function),
       m_globalObject(globalObject),
       m_isAttribute(isAttribute) {
-  if (!m_isAttribute && m_jsFunction)
-    globalObject->jsEventListeners().set(m_jsFunction, this);
+  ASSERT(m_globalObject);
 }
 
-JSEventListener::~JSEventListener() {
-  if (!m_isAttribute && m_jsFunction && m_globalObject)
-    m_globalObject->jsEventListeners().remove(m_jsFunction);
-}
+JSEventListener::~JSEventListener() {}
 
 JSObject* JSEventListener::jsFunction() const {
   return m_jsFunction;
@@ -55,8 +52,7 @@ JSObject* JSEventListener::jsFunction() const {
 void JSEventListener::markJSFunction(MarkStack& markStack) {
   if (m_jsFunction)
     markStack.append(m_jsFunction);
-  if (m_globalObject)
-    markStack.append(m_globalObject);
+  markStack.append(m_globalObject);
 }
 
 void JSEventListener::handleEvent(Event* event, bool isWindowEvent) {
@@ -67,15 +63,6 @@ void JSEventListener::handleEvent(Event* event, bool isWindowEvent) {
     return;
 
   JSDOMGlobalObject* globalObject = m_globalObject;
-  // Null check as clearGlobalObject() can clear this and we still get called
-  // back by
-  // xmlhttprequest objects. See http://bugs.webkit.org/show_bug.cgi?id=13275
-  // FIXME: Is this check still necessary? Requests are supposed to be stopped
-  // before clearGlobalObject() is called.
-  ASSERT(globalObject);
-  if (!globalObject)
-    return;
-
   ScriptExecutionContext* scriptExecutionContext =
       globalObject->scriptExecutionContext();
   if (!scriptExecutionContext)
@@ -118,9 +105,6 @@ void JSEventListener::handleEvent(Event* event, bool isWindowEvent) {
     Event* savedEvent = globalObject->currentEvent();
     globalObject->setCurrentEvent(event);
 
-    // If this event handler is the first JavaScript to execute, then the
-    // dynamic global object should be set to the global object of the
-    // window in which the event occurred.
     JSGlobalData* globalData = globalObject->globalData();
     DynamicGlobalObjectScope globalObjectScope(
         exec, globalData->dynamicGlobalObject ? globalData->dynamicGlobalObject
@@ -128,7 +112,7 @@ void JSEventListener::handleEvent(Event* event, bool isWindowEvent) {
 
     JSValue retval;
     if (handleEventFunction) {
-      globalObject->globalData()->timeoutChecker.start();
+      globalData->timeoutChecker.start();
       retval =
           call(exec, handleEventFunction, callType, callData, jsFunction, args);
     } else {
@@ -137,10 +121,10 @@ void JSEventListener::handleEvent(Event* event, bool isWindowEvent) {
         thisValue = globalObject->toThisObject(exec);
       else
         thisValue = toJS(exec, globalObject, event->currentTarget());
-      globalObject->globalData()->timeoutChecker.start();
+      globalData->timeoutChecker.start();
       retval = call(exec, jsFunction, callType, callData, thisValue, args);
     }
-    globalObject->globalData()->timeoutChecker.stop();
+    globalData->timeoutChecker.stop();
 
     globalObject->setCurrentEvent(savedEvent);
 
@@ -172,9 +156,6 @@ bool JSEventListener::reportError(const String& message,
     return false;
 
   JSDOMGlobalObject* globalObject = m_globalObject;
-  if (!globalObject)
-    return false;
-
   ExecState* exec = globalObject->globalExec();
 
   CallData callData;
@@ -188,9 +169,6 @@ bool JSEventListener::reportError(const String& message,
   args.append(jsString(exec, url));
   args.append(jsNumber(exec, lineNumber));
 
-  // If this event handler is the first JavaScript to execute, then the
-  // dynamic global object should be set to the global object of the
-  // window in which the event occurred.
   JSGlobalData* globalData = globalObject->globalData();
   DynamicGlobalObjectScope globalObjectScope(
       exec, globalData->dynamicGlobalObject ? globalData->dynamicGlobalObject
@@ -198,10 +176,10 @@ bool JSEventListener::reportError(const String& message,
 
   JSValue thisValue = globalObject->toThisObject(exec);
 
-  globalObject->globalData()->timeoutChecker.start();
+  globalData->timeoutChecker.start();
   JSValue returnValue =
       call(exec, jsFunction, callType, callData, thisValue, args);
-  globalObject->globalData()->timeoutChecker.stop();
+  globalData->timeoutChecker.stop();
 
   // If an error occurs while handling the script error, it should be bubbled
   // up.
@@ -216,6 +194,13 @@ bool JSEventListener::reportError(const String& message,
 
 bool JSEventListener::virtualisAttribute() const {
   return m_isAttribute;
+}
+
+bool JSEventListener::operator==(const EventListener& listener) {
+  if (const JSEventListener* jsEventListener = JSEventListener::cast(&listener))
+    return m_jsFunction == jsEventListener->m_jsFunction &&
+           m_isAttribute == jsEventListener->m_isAttribute;
+  return false;
 }
 
 }  // namespace WebCore

@@ -64,6 +64,14 @@ class ConditionEventListener : public EventListener {
         new ConditionEventListener(animation, eventBase, condition));
   }
 
+  static const ConditionEventListener* cast(const EventListener* listener) {
+    return listener->type() == ConditionEventListenerType
+               ? static_cast<const ConditionEventListener*>(listener)
+               : 0;
+  }
+
+  virtual bool operator==(const EventListener& other);
+
   void unregister() {
     // If this has only one ref then the event base is dead already and we don't
     // need to remove ourself.
@@ -71,22 +79,36 @@ class ConditionEventListener : public EventListener {
       m_eventBase->removeEventListener(m_condition->m_name, this, false);
   }
 
-  virtual void handleEvent(Event* event, bool) {
-    m_animation->handleConditionEvent(event, m_condition);
-  }
-
  private:
   ConditionEventListener(SVGSMILElement* animation,
                          Element* eventBase,
                          SVGSMILElement::Condition* condition)
-      : m_animation(animation), m_condition(condition), m_eventBase(eventBase) {
+      : EventListener(ConditionEventListenerType),
+        m_animation(animation),
+        m_condition(condition),
+        m_eventBase(eventBase) {
     m_eventBase->addEventListener(m_condition->m_name, this, false);
   }
+
+  virtual void handleEvent(Event*, bool);
 
   SVGSMILElement* m_animation;
   SVGSMILElement::Condition* m_condition;
   Element* m_eventBase;
 };
+
+bool ConditionEventListener::operator==(const EventListener& listener) {
+  if (const ConditionEventListener* conditionEventListener =
+          ConditionEventListener::cast(&listener))
+    return m_animation == conditionEventListener->m_animation &&
+           m_condition == conditionEventListener->m_condition &&
+           m_eventBase == conditionEventListener->m_eventBase;
+  return false;
+}
+
+void ConditionEventListener::handleEvent(Event* event, bool) {
+  m_animation->handleConditionEvent(event, m_condition);
+}
 
 SVGSMILElement::Condition::Condition(Type type,
                                      BeginOrEnd beginOrEnd,

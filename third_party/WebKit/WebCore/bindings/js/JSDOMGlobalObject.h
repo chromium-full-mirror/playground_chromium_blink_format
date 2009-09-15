@@ -50,7 +50,6 @@ class JSDOMGlobalObject : public JSC::JSGlobalObject {
   JSDOMGlobalObject(PassRefPtr<JSC::Structure>,
                     JSDOMGlobalObjectData*,
                     JSC::JSObject* thisValue);
-  virtual ~JSDOMGlobalObject();
 
  public:
   JSDOMStructureMap& structures() { return d()->structures; }
@@ -58,21 +57,9 @@ class JSDOMGlobalObject : public JSC::JSGlobalObject {
 
   virtual ScriptExecutionContext* scriptExecutionContext() const = 0;
 
-  // Finds a wrapper of a GC-unprotected JS EventListener, returns 0 if no
-  // existing one.
-  JSEventListener* findJSEventListener(JSC::JSValue);
-
-  // Finds or creates a wrapper of a JS EventListener. JS EventListener object
-  // is *NOT* GC-protected.
-  PassRefPtr<JSEventListener> findOrCreateJSEventListener(JSC::JSValue);
-
-  // Creates a GC-protected JS EventListener for an "onXXX" event attribute.
-  // These listeners cannot be removed through the removeEventListener API.
+  // Creates a JS EventListener for an "onXXX" event attribute. These
+  // listeners cannot be removed through the removeEventListener API.
   PassRefPtr<JSEventListener> createJSAttributeEventListener(JSC::JSValue);
-
-  typedef HashMap<JSC::JSObject*, JSEventListener*> JSListenersMap;
-
-  JSListenersMap& jsEventListeners();
 
   // Make binding code generation easier.
   JSDOMGlobalObject* globalObject() { return this; }
@@ -89,8 +76,6 @@ class JSDOMGlobalObject : public JSC::JSGlobalObject {
 
     JSDOMStructureMap structures;
     JSDOMConstructorMap constructors;
-
-    JSDOMGlobalObject::JSListenersMap jsEventListeners;
 
     Event* evt;
   };

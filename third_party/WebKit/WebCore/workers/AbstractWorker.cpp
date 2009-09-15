@@ -60,7 +60,7 @@ void AbstractWorker::addEventListener(const AtomicString& eventType,
     ListenerVector& listeners = iter->second;
     for (ListenerVector::iterator listenerIter = listeners.begin();
          listenerIter != listeners.end(); ++listenerIter) {
-      if (*listenerIter == eventListener)
+      if (**listenerIter == *eventListener)
         return;
     }
 
@@ -79,7 +79,7 @@ void AbstractWorker::removeEventListener(const AtomicString& eventType,
   ListenerVector& listeners = iter->second;
   for (ListenerVector::const_iterator listenerIter = listeners.begin();
        listenerIter != listeners.end(); ++listenerIter) {
-    if (*listenerIter == eventListener) {
+    if (**listenerIter == *eventListener) {
       listeners.remove(listenerIter - listeners.begin());
       return;
     }

@@ -36,8 +36,16 @@ class JSEventListener : public EventListener {
                                             bool isAttribute) {
     return adoptRef(new JSEventListener(listener, globalObject, isAttribute));
   }
+
+  static const JSEventListener* cast(const EventListener* listener) {
+    return listener->type() == JSEventListenerType
+               ? static_cast<const JSEventListener*>(listener)
+               : 0;
+  }
+
   virtual ~JSEventListener();
-  void clearGlobalObject() { m_globalObject = 0; }
+
+  virtual bool operator==(const EventListener& other);
 
   // Returns true if this event listener was created for an event handler
   // attribute, like "onload" or "onclick".

@@ -2439,8 +2439,8 @@ void Node::removeEventListener(const AtomicString& eventType,
   size_t size = listeners->size();
   for (size_t i = 0; i < size; ++i) {
     RegisteredEventListener& r = *listeners->at(i);
-    if (r.eventType() == eventType && r.listener() == listener &&
-        r.useCapture() == useCapture) {
+    if (r.eventType() == eventType && r.useCapture() == useCapture &&
+        *r.listener() == *listener) {
       r.setRemoved(true);
       listeners->remove(i);
 
