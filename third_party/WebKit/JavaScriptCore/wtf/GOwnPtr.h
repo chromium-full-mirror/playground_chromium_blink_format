@@ -26,7 +26,6 @@
 #include <glib.h>
 #include <wtf/Assertions.h>
 #include <wtf/Noncopyable.h>
-#include <gio/gio.h>
 
 namespace WTF {
 template <typename T>
@@ -47,8 +46,6 @@ template <>
 void freeOwnedGPtr<GDir>(GDir*);
 template <>
 void freeOwnedGPtr<GHashTable>(GHashTable*);
-template <>
-void freeOwnedGPtr<GFile>(GFile*);
 
 template <typename T>
 class GOwnPtr : public Noncopyable {
