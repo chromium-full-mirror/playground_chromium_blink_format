@@ -225,6 +225,19 @@ WebKitWebResource* webkit_web_resource_new_with_core_resource(
   return webResource;
 }
 
+void webkit_web_resource_init_with_core_resource(
+    WebKitWebResource* webResource,
+    PassRefPtr<ArchiveResource> resource) {
+  ASSERT(resource);
+
+  WebKitWebResourcePrivate* priv = webResource->priv;
+
+  if (priv->resource)
+    priv->resource->deref();
+
+  priv->resource = resource.releaseRef();
+}
+
 /**
  * webkit_web_resource_new:
  * @data: the data to initialize the #WebKitWebResource
@@ -280,6 +293,9 @@ GString* webkit_web_resource_get_data(WebKitWebResource* webResource) {
   g_return_val_if_fail(WEBKIT_IS_WEB_RESOURCE(webResource), NULL);
 
   WebKitWebResourcePrivate* priv = webResource->priv;
+
+  if (!priv->resource)
+    return NULL;
 
   if (!priv->data)
     priv->data = g_string_new_len(priv->resource->data()->data(),
