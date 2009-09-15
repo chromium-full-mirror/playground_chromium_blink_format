@@ -65,6 +65,7 @@ struct PropertyMapHashTable {
   unsigned size;
   unsigned keyCount;
   unsigned deletedSentinelCount;
+  unsigned anonymousSlotCount;
   unsigned lastIndexUsed;
   Vector<unsigned>* deletedOffsets;
   unsigned entryIndices[1];

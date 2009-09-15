@@ -83,6 +83,8 @@ class Structure : public RefCounted<Structure> {
                                                          JSValue prototype);
   static PassRefPtr<Structure> despecifyFunctionTransition(Structure*,
                                                            const Identifier&);
+  static PassRefPtr<Structure> addAnonymousSlotsTransition(Structure*,
+                                                           unsigned count);
   static PassRefPtr<Structure> getterSetterTransition(Structure*);
   static PassRefPtr<Structure> toDictionaryTransition(Structure*);
   static PassRefPtr<Structure> fromDictionaryTransition(Structure*);
@@ -115,6 +117,7 @@ class Structure : public RefCounted<Structure> {
   size_t propertyStorageSize() const {
     return m_propertyTable
                ? m_propertyTable->keyCount +
+                     m_propertyTable->anonymousSlotCount +
                      (m_propertyTable->deletedOffsets
                           ? m_propertyTable->deletedOffsets->size()
                           : 0)
@@ -162,6 +165,7 @@ class Structure : public RefCounted<Structure> {
              unsigned attributes,
              JSCell* specificValue);
   size_t remove(const Identifier& propertyName);
+  void addAnonymousSlots(unsigned slotCount);
   void getEnumerableNamesFromPropertyTable(PropertyNameArray&);
   void getEnumerableNamesFromClassInfoTable(ExecState*,
                                             const ClassInfo*,
@@ -223,6 +227,7 @@ class Structure : public RefCounted<Structure> {
   bool m_isPinnedPropertyTable : 1;
   bool m_hasGetterSetterProperties : 1;
   unsigned m_attributesInPrevious : 7;
+  unsigned m_anonymousSlotsInPrevious : 6;
 };
 
 inline size_t Structure::get(const Identifier& propertyName) {
@@ -322,12 +327,12 @@ bool StructureTransitionTable::hasTransition(
 void StructureTransitionTable::reifySingleTransition() {
   ASSERT(usingSingleTransitionSlot());
   Structure* existingTransition = singleTransition();
-  ASSERT(existingTransition);
   TransitionTable* transitionTable = new TransitionTable;
   setTransitionTable(transitionTable);
-  add(make_pair(existingTransition->m_nameInPrevious.get(),
-                existingTransition->m_attributesInPrevious),
-      existingTransition, existingTransition->m_specificValueInPrevious);
+  if (existingTransition)
+    add(make_pair(existingTransition->m_nameInPrevious.get(),
+                  existingTransition->m_attributesInPrevious),
+        existingTransition, existingTransition->m_specificValueInPrevious);
 }
 }  // namespace JSC
 

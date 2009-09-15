@@ -38,8 +38,9 @@ class JSWrapperObject : public JSObject {
 
   static PassRefPtr<Structure> createStructure(JSValue prototype) {
     return Structure::create(
-        prototype, TypeInfo(ObjectType, HasStandardGetOwnPropertySlot |
-                                            HasDefaultGetPropertyNames));
+        prototype,
+        TypeInfo(ObjectType, HasStandardGetOwnPropertySlot |
+                                 HasDefaultGetPropertyNames | HasDefaultMark));
   }
 
  private:
@@ -49,12 +50,16 @@ class JSWrapperObject : public JSObject {
 };
 
 inline JSWrapperObject::JSWrapperObject(PassRefPtr<Structure> structure)
-    : JSObject(structure) {}
+    : JSObject(structure) {
+  addAnonymousSlots(1);
+  putAnonymousValue(0, jsNull());
+}
 
 inline void JSWrapperObject::setInternalValue(JSValue value) {
   ASSERT(value);
   ASSERT(!value.isObject());
   m_internalValue = value;
+  putAnonymousValue(0, value);
 }
 
 }  // namespace JSC
