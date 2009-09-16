@@ -113,23 +113,23 @@ static const int computedProperties[] = {
 #if ENABLE(DASHBOARD_SUPPORT)
     CSSPropertyWebkitDashboardRegion,
 #endif
-    CSSPropertyWebkitHighlight, CSSPropertyWebkitLineBreak,
-    CSSPropertyWebkitLineClamp, CSSPropertyWebkitMarginBottomCollapse,
-    CSSPropertyWebkitMarginTopCollapse, CSSPropertyWebkitMarqueeDirection,
-    CSSPropertyWebkitMarqueeIncrement, CSSPropertyWebkitMarqueeRepetition,
-    CSSPropertyWebkitMarqueeStyle, CSSPropertyWebkitMaskAttachment,
-    CSSPropertyWebkitMaskBoxImage, CSSPropertyWebkitMaskClip,
-    CSSPropertyWebkitMaskComposite, CSSPropertyWebkitMaskImage,
-    CSSPropertyWebkitMaskOrigin, CSSPropertyWebkitMaskPosition,
-    CSSPropertyWebkitMaskRepeat, CSSPropertyWebkitMaskSize,
-    CSSPropertyWebkitNbspMode, CSSPropertyWebkitPerspective,
-    CSSPropertyWebkitPerspectiveOrigin, CSSPropertyWebkitRtlOrdering,
-    CSSPropertyWebkitTextDecorationsInEffect, CSSPropertyWebkitTextFillColor,
-    CSSPropertyWebkitTextSecurity, CSSPropertyWebkitTextStrokeColor,
-    CSSPropertyWebkitTextStrokeWidth, CSSPropertyWebkitTransform,
-    CSSPropertyWebkitTransformOrigin, CSSPropertyWebkitTransformStyle,
-    CSSPropertyWebkitTransitionDelay, CSSPropertyWebkitTransitionDuration,
-    CSSPropertyWebkitTransitionProperty,
+    CSSPropertyWebkitFontSmoothing, CSSPropertyWebkitHighlight,
+    CSSPropertyWebkitLineBreak, CSSPropertyWebkitLineClamp,
+    CSSPropertyWebkitMarginBottomCollapse, CSSPropertyWebkitMarginTopCollapse,
+    CSSPropertyWebkitMarqueeDirection, CSSPropertyWebkitMarqueeIncrement,
+    CSSPropertyWebkitMarqueeRepetition, CSSPropertyWebkitMarqueeStyle,
+    CSSPropertyWebkitMaskAttachment, CSSPropertyWebkitMaskBoxImage,
+    CSSPropertyWebkitMaskClip, CSSPropertyWebkitMaskComposite,
+    CSSPropertyWebkitMaskImage, CSSPropertyWebkitMaskOrigin,
+    CSSPropertyWebkitMaskPosition, CSSPropertyWebkitMaskRepeat,
+    CSSPropertyWebkitMaskSize, CSSPropertyWebkitNbspMode,
+    CSSPropertyWebkitPerspective, CSSPropertyWebkitPerspectiveOrigin,
+    CSSPropertyWebkitRtlOrdering, CSSPropertyWebkitTextDecorationsInEffect,
+    CSSPropertyWebkitTextFillColor, CSSPropertyWebkitTextSecurity,
+    CSSPropertyWebkitTextStrokeColor, CSSPropertyWebkitTextStrokeWidth,
+    CSSPropertyWebkitTransform, CSSPropertyWebkitTransformOrigin,
+    CSSPropertyWebkitTransformStyle, CSSPropertyWebkitTransitionDelay,
+    CSSPropertyWebkitTransitionDuration, CSSPropertyWebkitTransitionProperty,
     CSSPropertyWebkitTransitionTimingFunction, CSSPropertyWebkitUserDrag,
     CSSPropertyWebkitUserModify, CSSPropertyWebkitUserSelect
 
@@ -1141,6 +1141,8 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
           style->matchNearestMailBlockquoteColor());
     case CSSPropertyResize:
       return CSSPrimitiveValue::create(style->resize());
+    case CSSPropertyWebkitFontSmoothing:
+      return CSSPrimitiveValue::create(style->fontSmoothing());
     case CSSPropertyZIndex:
       if (style->hasAutoZIndex())
         return CSSPrimitiveValue::createIdentifier(CSSValueAuto);
