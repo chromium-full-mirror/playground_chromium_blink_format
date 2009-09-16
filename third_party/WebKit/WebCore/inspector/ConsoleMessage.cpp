@@ -62,8 +62,12 @@ ConsoleMessage::ConsoleMessage(MessageSource s,
                                bool storeTrace)
     : m_source(s),
       m_type(t),
-      m_level(l),
-      m_wrappedArguments(callStack->at(0).argumentCount()),
+      m_level(l)
+#if ENABLE(INSPECTOR)
+      ,
+      m_wrappedArguments(callStack->at(0).argumentCount())
+#endif
+      ,
       m_frames(storeTrace ? callStack->size() : 0),
       m_groupLevel(g),
       m_repeatCount(1) {
@@ -79,11 +83,14 @@ ConsoleMessage::ConsoleMessage(MessageSource s,
       m_frames[i] = callStack->at(i).functionName();
   }
 
+#if ENABLE(INSPECTOR)
   for (unsigned i = 0; i < lastCaller.argumentCount(); ++i)
     m_wrappedArguments[i] =
         quarantineValue(callStack->state(), lastCaller.argumentAt(i));
+#endif
 }
 
+#if ENABLE(INSPECTOR)
 void ConsoleMessage::addToConsole(InspectorFrontend* frontend) {
   ScriptObject jsonObj = frontend->newScriptObject();
   jsonObj.set("source", static_cast<int>(m_source));
@@ -96,8 +103,10 @@ void ConsoleMessage::addToConsole(InspectorFrontend* frontend) {
   frontend->addMessageToConsole(jsonObj, m_frames, m_wrappedArguments,
                                 m_message);
 }
+#endif  // ENABLE(INSPECTOR)
 
 bool ConsoleMessage::isEqual(ScriptState* state, ConsoleMessage* msg) const {
+#if ENABLE(INSPECTOR)
   if (msg->m_wrappedArguments.size() != m_wrappedArguments.size())
     return false;
   if (!state && msg->m_wrappedArguments.size())
@@ -109,6 +118,9 @@ bool ConsoleMessage::isEqual(ScriptState* state, ConsoleMessage* msg) const {
     if (!m_wrappedArguments[i].isEqual(state, msg->m_wrappedArguments[i]))
       return false;
   }
+#else
+  UNUSED_PARAM(state);
+#endif  // ENABLE(INSPECTOR)
 
   size_t frameCount = msg->m_frames.size();
   if (frameCount != m_frames.size())

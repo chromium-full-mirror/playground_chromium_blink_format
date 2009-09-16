@@ -31,6 +31,8 @@
 #include "config.h"
 #include "InspectorTimelineAgent.h"
 
+#if ENABLE(INSPECTOR)
+
 #include "DOMDispatchTimelineItem.h"
 #include "Event.h"
 #include "InspectorFrontend.h"
@@ -128,3 +130,5 @@ double InspectorTimelineAgent::sessionTimeInMilliseconds() {
 }
 
 }  // namespace WebCore
+
+#endif  // ENABLE(INSPECTOR)

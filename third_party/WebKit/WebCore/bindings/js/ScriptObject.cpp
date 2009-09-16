@@ -121,6 +121,7 @@ bool ScriptGlobalObject::set(ScriptState* scriptState,
   return handleException(scriptState);
 }
 
+#if ENABLE(INSPECTOR)
 bool ScriptGlobalObject::set(ScriptState* scriptState,
                              const char* name,
                              InspectorBackend* value) {
@@ -131,6 +132,7 @@ bool ScriptGlobalObject::set(ScriptState* scriptState,
                           toJS(scriptState, globalObject, value));
   return handleException(scriptState);
 }
+#endif  // ENABLE(INSPECTOR)
 
 bool ScriptGlobalObject::get(ScriptState* scriptState,
                              const char* name,

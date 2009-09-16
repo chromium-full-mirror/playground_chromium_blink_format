@@ -257,7 +257,9 @@ class FrameView : public ScrollView {
   bool updateWidgets();
   void scrollToAnchor();
 
+#if ENABLE(INSPECTOR)
   InspectorTimelineAgent* inspectorTimelineAgent() const;
+#endif
 
   bool hasCustomScrollbars() const;
 
@@ -336,9 +338,11 @@ class FrameView : public ScrollView {
   RenderScrollbarPart* m_scrollCorner;
 };
 
+#if ENABLE(INSPECTOR)
 inline InspectorTimelineAgent* FrameView::inspectorTimelineAgent() const {
   return m_frame->page() ? m_frame->page()->inspectorTimelineAgent() : 0;
 }
+#endif
 
 }  // namespace WebCore
 

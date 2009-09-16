@@ -495,9 +495,11 @@ void FrameView::layout(bool allowSubtree) {
   if (isPainting())
     return;
 
+#if ENABLE(INSPECTOR)
   InspectorTimelineAgent* timelineAgent = inspectorTimelineAgent();
   if (timelineAgent)
     timelineAgent->willLayout();
+#endif
 
   if (!allowSubtree && m_layoutRoot) {
     m_layoutRoot->markContainingBlocksForLayout(false);
@@ -704,8 +706,10 @@ void FrameView::layout(bool allowSubtree) {
     ASSERT(m_enqueueEvents);
   }
 
+#if ENABLE(INSPECTOR)
   if (timelineAgent)
     timelineAgent->didLayout();
+#endif
 
   m_nestedLayoutCount--;
 }
@@ -1505,9 +1509,11 @@ void FrameView::paintContents(GraphicsContext* p, const IntRect& rect) {
   if (!frame())
     return;
 
+#if ENABLE(INSPECTOR)
   InspectorTimelineAgent* timelineAgent = inspectorTimelineAgent();
   if (timelineAgent)
     timelineAgent->willPaint();
+#endif
 
   Document* document = frame()->document();
 
@@ -1577,8 +1583,10 @@ void FrameView::paintContents(GraphicsContext* p, const IntRect& rect) {
   if (isTopLevelPainter)
     sCurrentPaintTimeStamp = 0;
 
+#if ENABLE(INSPECTOR)
   if (timelineAgent)
     timelineAgent->didPaint();
+#endif
 }
 
 void FrameView::setPaintRestriction(PaintRestriction pr) {

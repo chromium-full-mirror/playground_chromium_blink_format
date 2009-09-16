@@ -1211,6 +1211,7 @@ bool EventHandler::handleMousePressEvent(const PlatformMouseEvent& mouseEvent) {
 
   m_mousePressNode = mev.targetNode();
 
+#if ENABLE(INSPECTOR)
   if (Page* page = m_frame->page()) {
     InspectorController* inspector = page->inspectorController();
     if (inspector && inspector->enabled() &&
@@ -1220,6 +1221,7 @@ bool EventHandler::handleMousePressEvent(const PlatformMouseEvent& mouseEvent) {
       return true;
     }
   }
+#endif
 
   Frame* subframe = subframeForHitTestResult(mev);
   if (subframe && passMousePressEventToSubframe(mev, subframe)) {

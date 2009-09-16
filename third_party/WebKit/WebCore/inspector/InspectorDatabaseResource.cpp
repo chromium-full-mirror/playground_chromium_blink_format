@@ -29,9 +29,9 @@
  */
 
 #include "config.h"
-#if ENABLE(DATABASE)
 #include "InspectorDatabaseResource.h"
 
+#if ENABLE(DATABASE) && ENABLE(INSPECTOR)
 #include "Database.h"
 #include "Document.h"
 #include "Frame.h"
@@ -73,4 +73,4 @@ void InspectorDatabaseResource::unbind() {
 
 }  // namespace WebCore
 
-#endif  // ENABLE(DATABASE)
+#endif  // ENABLE(DATABASE) && ENABLE(INSPECTOR)

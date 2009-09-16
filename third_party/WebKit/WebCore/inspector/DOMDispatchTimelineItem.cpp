@@ -31,6 +31,8 @@
 #include "config.h"
 #include "DOMDispatchTimelineItem.h"
 
+#if ENABLE(INSPECTOR)
+
 #include "Event.h"
 #include "InspectorFrontend.h"
 
@@ -53,3 +55,5 @@ ScriptObject DOMDispatchTimelineItem::convertToScriptObject(
 }
 
 }  // namespace WebCore
+
+#endif  // ENABLE(INSPECTOR)

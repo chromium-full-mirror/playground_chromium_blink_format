@@ -31,6 +31,8 @@
 #include "config.h"
 #include "InspectorDOMAgent.h"
 
+#if ENABLE(INSPECTOR)
+
 #include "AtomicString.h"
 #include "ContainerNode.h"
 #include "Cookie.h"
@@ -552,3 +554,5 @@ bool InspectorDOMAgent::operator==(const EventListener& listener) {
 }
 
 }  // namespace WebCore
+
+#endif  // ENABLE(INSPECTOR)

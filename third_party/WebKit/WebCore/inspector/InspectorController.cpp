@@ -30,6 +30,8 @@
 #include "config.h"
 #include "InspectorController.h"
 
+#if ENABLE(INSPECTOR)
+
 #include "CString.h"
 #include "CachedResource.h"
 #include "Console.h"
@@ -1633,3 +1635,5 @@ void InspectorController::deleteCookie(const String& cookieName) {
 }
 
 }  // namespace WebCore
+
+#endif  // ENABLE(INSPECTOR)

@@ -118,8 +118,11 @@ Page::Page(ChromeClient* chromeClient,
       m_contextMenuController(
           new ContextMenuController(this, contextMenuClient))
 #endif
+#if ENABLE(INSPECTOR)
       ,
-      m_inspectorController(new InspectorController(this, inspectorClient)),
+      m_inspectorController(new InspectorController(this, inspectorClient))
+#endif
+      ,
       m_settings(new Settings(this)),
       m_progress(new ProgressTracker),
       m_backForwardList(BackForwardList::create(this)),
@@ -132,8 +135,12 @@ Page::Page(ChromeClient* chromeClient,
       m_cookieEnabled(true),
       m_areMemoryCacheClientCallsEnabled(true),
       m_mediaVolume(1),
-      m_javaScriptURLsAreAllowed(true),
-      m_parentInspectorController(0),
+      m_javaScriptURLsAreAllowed(true)
+#if ENABLE(INSPECTOR)
+      ,
+      m_parentInspectorController(0)
+#endif
+      ,
       m_didLoadUserStyleSheet(false),
       m_userStyleSheetModificationTime(0),
       m_group(0),
@@ -146,6 +153,9 @@ Page::Page(ChromeClient* chromeClient,
 #endif
 #if !ENABLE(DRAG_SUPPORT)
   UNUSED_PARAM(dragClient);
+#endif
+#if !ENABLE(INSPECTOR)
+  UNUSED_PARAM(inspectorClient);
 #endif
   if (!allPages) {
     allPages = new HashSet<Page*>;
@@ -174,9 +184,11 @@ Page::~Page() {
     frame->pageDestroyed();
 
   m_editorClient->pageDestroyed();
+#if ENABLE(INSPECTOR)
   if (m_parentInspectorController)
     m_parentInspectorController->pageDestroyed();
   m_inspectorController->inspectedPageDestroyed();
+#endif
 
   m_backForwardList->close();
 
@@ -659,8 +671,10 @@ bool Page::javaScriptURLsAreAllowed() const {
   return m_javaScriptURLsAreAllowed;
 }
 
+#if ENABLE(INSPECTOR)
 InspectorTimelineAgent* Page::inspectorTimelineAgent() const {
   return m_inspectorController->timelineAgent();
 }
+#endif
 
 }  // namespace WebCore
