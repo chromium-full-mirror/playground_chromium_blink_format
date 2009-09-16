@@ -77,10 +77,19 @@ class MainView : public QGraphicsView {
 
   void resizeEvent(QResizeEvent* event) {
     QGraphicsView::resizeEvent(event);
-    QRectF rect(QRect(QPoint(0, 0), event->size()));
     if (!m_mainWidget)
       return;
+    QRectF rect(QPoint(0, 0), event->size());
     m_mainWidget->setGeometry(rect);
+  }
+
+ public slots:
+  void flip() {
+    QSizeF center = m_mainWidget->boundingRect().size() / 2;
+    QPointF centerPoint = QPointF(center.width(), center.height());
+    m_mainWidget->setTransformOriginPoint(centerPoint);
+
+    m_mainWidget->setRotation(m_mainWidget->rotation() ? 0 : 180);
   }
 
  private:
@@ -198,6 +207,8 @@ class MainWindow : public QMainWindow {
     mw->show();
   }
 
+  void flip() { view->flip(); }
+
  private:
   void buildUI() {
     QWebPage* page = scene->webItem()->page();
@@ -214,14 +225,16 @@ class MainWindow : public QMainWindow {
     bar->addWidget(urlEdit);
 
     QMenu* fileMenu = menuBar()->addMenu("&File");
-    QAction* newWindow =
-        fileMenu->addAction("New Window", this, SLOT(newWindow()));
-    QAction* cloneView = fileMenu->addAction("Clone view", this, SLOT(clone()));
+    fileMenu->addAction("New Window", this, SLOT(newWindow()));
+    fileMenu->addAction("Clone view", this, SLOT(clone()));
     fileMenu->addAction("Close", this, SLOT(close()));
 
     QMenu* viewMenu = menuBar()->addMenu("&View");
     viewMenu->addAction(page->action(QWebPage::Stop));
     viewMenu->addAction(page->action(QWebPage::Reload));
+
+    QMenu* fxMenu = menuBar()->addMenu("&Effects");
+    fxMenu->addAction("Flip", this, SLOT(flip()));
   }
 
  private:
