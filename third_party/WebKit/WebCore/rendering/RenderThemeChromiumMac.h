@@ -44,6 +44,10 @@ class RenderThemeChromiumMac : public RenderTheme {
  public:
   static PassRefPtr<RenderTheme> create();
 
+#if ENABLE(VIDEO)
+  virtual String extraMediaControlsStyleSheet();
+#endif
+
   // A method to obtain the baseline position for a "leaf" control.  This will
   // only be used if a baseline
   // position cannot be determined by examining child content. Checkboxes and
@@ -194,27 +198,27 @@ class RenderThemeChromiumMac : public RenderTheme {
                                              const RenderObject::PaintInfo&,
                                              const IntRect&);
 
-  virtual bool paintMediaFullscreenButton(RenderObject*,
-                                          const RenderObject::PaintInfo&,
-                                          const IntRect&);
   virtual bool paintMediaPlayButton(RenderObject*,
                                     const RenderObject::PaintInfo&,
                                     const IntRect&);
   virtual bool paintMediaMuteButton(RenderObject*,
                                     const RenderObject::PaintInfo&,
                                     const IntRect&);
-  virtual bool paintMediaSeekBackButton(RenderObject*,
-                                        const RenderObject::PaintInfo&,
-                                        const IntRect&);
-  virtual bool paintMediaSeekForwardButton(RenderObject*,
-                                           const RenderObject::PaintInfo&,
-                                           const IntRect&);
   virtual bool paintMediaSliderTrack(RenderObject*,
                                      const RenderObject::PaintInfo&,
                                      const IntRect&);
   virtual bool paintMediaSliderThumb(RenderObject*,
                                      const RenderObject::PaintInfo&,
                                      const IntRect&);
+  virtual bool paintMediaVolumeSliderTrack(RenderObject*,
+                                           const RenderObject::PaintInfo&,
+                                           const IntRect&);
+  virtual bool paintMediaVolumeSliderThumb(RenderObject*,
+                                           const RenderObject::PaintInfo&,
+                                           const IntRect&);
+  virtual bool paintMediaControlsBackground(RenderObject*,
+                                            const RenderObject::PaintInfo&,
+                                            const IntRect&);
 
  private:
   RenderThemeChromiumMac();
@@ -300,6 +304,7 @@ class RenderThemeChromiumMac : public RenderTheme {
   mutable HashMap<int, RGBA32> m_systemColorCache;
 
   RetainPtr<WebCoreRenderThemeNotificationObserver> m_notificationObserver;
+  bool paintMediaButtonInternal(GraphicsContext*, const IntRect&, Image*);
 };
 
 }  // namespace WebCore
