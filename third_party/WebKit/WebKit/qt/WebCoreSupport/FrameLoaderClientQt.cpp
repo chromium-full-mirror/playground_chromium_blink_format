@@ -662,7 +662,7 @@ WebCore::ResourceError FrameLoaderClientQt::interruptForPolicyChangeError(
       "Error", WebKitErrorFrameLoadInterruptedByPolicyChange,
       request.url().string(),
       QCoreApplication::translate("QWebFrame",
-                                  "Frame load interruped by policy change", 0,
+                                  "Frame load interrupted by policy change", 0,
                                   QCoreApplication::UnicodeUTF8));
 }
 
