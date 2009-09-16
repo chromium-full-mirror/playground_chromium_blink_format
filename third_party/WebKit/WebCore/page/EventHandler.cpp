@@ -2003,6 +2003,7 @@ bool EventHandler::handleWheelEvent(PlatformWheelEvent& e) {
   return e.isAccepted();
 }
 
+#if ENABLE(CONTEXT_MENUS)
 bool EventHandler::sendContextMenuEvent(const PlatformMouseEvent& event) {
   Document* doc = m_frame->document();
   FrameView* v = m_frame->view();
@@ -2040,6 +2041,7 @@ bool EventHandler::sendContextMenuEvent(const PlatformMouseEvent& event) {
 
   return swallowEvent;
 }
+#endif  // ENABLE(CONTEXT_MENUS)
 
 void EventHandler::scheduleHoverStateUpdate() {
   if (!m_hoverTimer.isActive())

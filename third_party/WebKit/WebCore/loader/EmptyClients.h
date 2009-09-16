@@ -554,6 +554,7 @@ class EmptyEditorClient : public EditorClient {
   virtual void setInputMethodState(bool) {}
 };
 
+#if ENABLE(CONTEXT_MENUS)
 class EmptyContextMenuClient : public ContextMenuClient {
  public:
   virtual ~EmptyContextMenuClient() {}
@@ -576,6 +577,7 @@ class EmptyContextMenuClient : public ContextMenuClient {
   virtual void searchWithSpotlight() {}
 #endif
 };
+#endif  // ENABLE(CONTEXT_MENUS)
 
 #if ENABLE(DRAG_SUPPORT)
 class EmptyDragClient : public DragClient {

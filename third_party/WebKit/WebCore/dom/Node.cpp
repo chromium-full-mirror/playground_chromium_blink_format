@@ -3011,10 +3011,12 @@ void Node::defaultEventHandler(Event* event) {
     int detail =
         event->isUIEvent() ? static_cast<UIEvent*>(event)->detail() : 0;
     dispatchUIEvent(eventNames().DOMActivateEvent, detail, event);
+#if ENABLE(CONTEXT_MENUS)
   } else if (eventType == eventNames().contextmenuEvent) {
     if (Frame* frame = document()->frame())
       if (Page* page = frame->page())
         page->contextMenuController()->handleContextMenuEvent(event);
+#endif
   } else if (eventType == eventNames().textInputEvent) {
     if (event->isTextEvent())
       if (Frame* frame = document()->frame())

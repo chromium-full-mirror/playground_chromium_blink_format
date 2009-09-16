@@ -27,6 +27,8 @@
 #include "config.h"
 #include "ContextMenu.h"
 
+#if ENABLE(CONTEXT_MENUS)
+
 #include "ContextMenuController.h"
 #include "ContextMenuClient.h"
 #include "CSSComputedStyleDeclaration.h"
@@ -895,4 +897,7 @@ void ContextMenu::checkOrEnableIfNeeded(ContextMenuItem& item) const {
   item.setChecked(shouldCheck);
   item.setEnabled(shouldEnable);
 }
-}
+
+}  // namespace WebCore
+
+#endif  // ENABLE(CONTEXT_MENUS)

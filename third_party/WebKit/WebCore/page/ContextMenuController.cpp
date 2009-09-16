@@ -26,6 +26,8 @@
 #include "config.h"
 #include "ContextMenuController.h"
 
+#if ENABLE(CONTEXT_MENUS)
+
 #include "Chrome.h"
 #include "ContextMenu.h"
 #include "ContextMenuClient.h"
@@ -344,3 +346,5 @@ void ContextMenuController::contextMenuItemSelected(ContextMenuItem* item) {
 }
 
 }  // namespace WebCore
+
+#endif  // ENABLE(CONTEXT_MENUS)

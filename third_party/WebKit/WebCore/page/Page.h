@@ -144,9 +144,11 @@ class Page : public Noncopyable {
   DragController* dragController() const { return m_dragController.get(); }
 #endif
   FocusController* focusController() const { return m_focusController.get(); }
+#if ENABLE(CONTEXT_MENUS)
   ContextMenuController* contextMenuController() const {
     return m_contextMenuController.get();
   }
+#endif
   InspectorController* inspectorController() const {
     return m_inspectorController.get();
   }
@@ -275,7 +277,9 @@ class Page : public Noncopyable {
   OwnPtr<DragController> m_dragController;
 #endif
   OwnPtr<FocusController> m_focusController;
+#if ENABLE(CONTEXT_MENUS)
   OwnPtr<ContextMenuController> m_contextMenuController;
+#endif
   OwnPtr<InspectorController> m_inspectorController;
   OwnPtr<Settings> m_settings;
   OwnPtr<ProgressTracker> m_progress;

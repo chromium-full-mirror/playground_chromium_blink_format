@@ -229,8 +229,12 @@ bool SVGImage::dataChanged(bool allDataReceived) {
     static FrameLoaderClient* dummyFrameLoaderClient =
         new EmptyFrameLoaderClient;
     static EditorClient* dummyEditorClient = new EmptyEditorClient;
+#if ENABLE(CONTEXT_MENUS)
     static ContextMenuClient* dummyContextMenuClient =
         new EmptyContextMenuClient;
+#else
+    static ContextMenuClient* dummyContextMenuClient = 0;
+#endif
 #if ENABLE(DRAG_SUPPORT)
     static DragClient* dummyDragClient = new EmptyDragClient;
 #else
