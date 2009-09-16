@@ -81,10 +81,13 @@ class ThreadSpecific : public Noncopyable {
 #if USE(PTHREADS) || PLATFORM(QT) || PLATFORM(WIN_OS)
   struct Data : Noncopyable {
     Data(T* value, ThreadSpecific<T>* owner) : value(value), owner(owner) {}
+#if PLATFORM(QT)
+    ~Data() { owner->destroy(this); }
+#endif
 
     T* value;
     ThreadSpecific<T>* owner;
-#if !USE(PTHREADS)
+#if !USE(PTHREADS) && !PLATFORM(QT)
     void (*destructor)(void*);
 #endif
   };
@@ -131,9 +134,7 @@ inline ThreadSpecific<T>::ThreadSpecific() {}
 
 template <typename T>
 inline ThreadSpecific<T>::~ThreadSpecific() {
-  Data* data = static_cast<Data*>(m_key.localData());
-  if (data)
-    data->destructor(data);
+  // Does not invoke destructor functions. QThreadStorage will do it
 }
 
 template <typename T>
@@ -146,7 +147,6 @@ template <typename T>
 inline void ThreadSpecific<T>::set(T* ptr) {
   ASSERT(!get());
   Data* data = new Data(ptr, this);
-  data->destructor = &ThreadSpecific<T>::destroy;
   m_key.setLocalData(data);
 }
 
@@ -211,6 +211,10 @@ inline void ThreadSpecific<T>::destroy(void* ptr) {
   // destroy(), so we temporarily reset it.
   pthread_setspecific(data->owner->m_key, ptr);
 #endif
+#if PLATFORM(QT)
+  // See comment as above
+  data->owner->m_key.setLocalData(data);
+#endif
 
   data->value->~T();
   fastFree(data->value);
@@ -218,14 +222,16 @@ inline void ThreadSpecific<T>::destroy(void* ptr) {
 #if USE(PTHREADS)
   pthread_setspecific(data->owner->m_key, 0);
 #elif PLATFORM(QT)
-  data->owner->m_key.setLocalData(0);
+// Do nothing here
 #elif PLATFORM(WIN_OS)
   TlsSetValue(tlsKeys()[data->owner->m_index], 0);
 #else
 #error ThreadSpecific is not implemented for this platform.
 #endif
 
+#if !PLATFORM(QT)
   delete data;
+#endif
 }
 
 template <typename T>
