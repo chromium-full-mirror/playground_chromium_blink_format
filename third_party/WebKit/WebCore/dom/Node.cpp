@@ -456,9 +456,6 @@ Node::~Node() {
   liveNodeSet.remove(this);
 #endif
 
-  if (!eventListeners().isEmpty() && !inDocument())
-    document()->unregisterDisconnectedNodeWithEventListeners(this);
-
   if (!hasRareData())
     ASSERT(!NodeRareData::rareDataMap().contains(this));
   else {
@@ -2345,31 +2342,19 @@ const RegisteredEventListenerVector& Node::eventListeners() const {
 }
 
 void Node::insertedIntoDocument() {
-  if (!eventListeners().isEmpty())
-    document()->unregisterDisconnectedNodeWithEventListeners(this);
-
   setInDocument(true);
 }
 
 void Node::removedFromDocument() {
-  if (!eventListeners().isEmpty())
-    document()->registerDisconnectedNodeWithEventListeners(this);
-
   setInDocument(false);
 }
 
 void Node::willMoveToNewOwnerDocument() {
-  if (!eventListeners().isEmpty())
-    document()->unregisterDisconnectedNodeWithEventListeners(this);
-
   ASSERT(!willMoveToNewOwnerDocumentWasCalled);
   setWillMoveToNewOwnerDocumentWasCalled(true);
 }
 
 void Node::didMoveToNewOwnerDocument() {
-  if (!eventListeners().isEmpty())
-    document()->registerDisconnectedNodeWithEventListeners(this);
-
   ASSERT(!didMoveToNewOwnerDocumentWasCalled);
   setDidMoveToNewOwnerDocumentWasCalled(true);
 }
@@ -2417,10 +2402,6 @@ void Node::addEventListener(const AtomicString& eventType,
   // The DOM2 spec says that "duplicate instances are discarded" in this case.
   removeEventListener(eventType, listener.get(), useCapture);
 
-  // adding the first one
-  if (listeners.isEmpty() && !inDocument())
-    document->registerDisconnectedNodeWithEventListeners(this);
-
   listeners.append(
       RegisteredEventListener::create(eventType, listener, useCapture));
   updateSVGElementInstancesAfterEventListenerChange(this);
@@ -2443,10 +2424,6 @@ void Node::removeEventListener(const AtomicString& eventType,
         *r.listener() == *listener) {
       r.setRemoved(true);
       listeners->remove(i);
-
-      // removed last
-      if (listeners->isEmpty() && !inDocument())
-        document()->unregisterDisconnectedNodeWithEventListeners(this);
 
       updateSVGElementInstancesAfterEventListenerChange(this);
       return;
@@ -2991,10 +2968,6 @@ void Node::clearAttributeEventListener(const AtomicString& eventType) {
 
     r.setRemoved(true);
     listeners->remove(i);
-
-    // removed last
-    if (listeners->isEmpty() && !inDocument())
-      document()->unregisterDisconnectedNodeWithEventListeners(this);
 
     updateSVGElementInstancesAfterEventListenerChange(this);
     return;
