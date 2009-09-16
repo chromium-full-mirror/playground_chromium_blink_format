@@ -53,6 +53,8 @@ class V8AbstractEventListener : public EventListener {
  public:
   virtual ~V8AbstractEventListener() {}
 
+  virtual bool operator==(const EventListener& other) { return this == &other; }
+
   // Returns the owner frame of the listener.
   Frame* frame() { return m_frame; }
 
