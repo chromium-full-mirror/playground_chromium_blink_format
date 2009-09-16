@@ -108,14 +108,6 @@ float AccessibilitySlider::minValueForRange() const {
   return getAttribute(minAttr).toFloat();
 }
 
-void AccessibilitySlider::changeValue(float percentChange) {
-  float range = maxValueForRange() - minValueForRange();
-  float value = valueForRange();
-
-  value += range * (percentChange / 100);
-  setValue(String::number(value));
-}
-
 void AccessibilitySlider::setValue(const String& value) {
   HTMLInputElement* input = element();
 
@@ -126,14 +118,6 @@ void AccessibilitySlider::setValue(const String& value) {
 
   // Fire change event manually, as RenderSlider::setValueForPosition does.
   input->dispatchFormControlChangeEvent();
-}
-
-void AccessibilitySlider::increment() {
-  return changeValue(5);
-}
-
-void AccessibilitySlider::decrement() {
-  return changeValue(-5);
 }
 
 HTMLInputElement* AccessibilitySlider::element() const {

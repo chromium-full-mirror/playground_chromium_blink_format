@@ -576,6 +576,20 @@ Element* AccessibilityRenderObject::mouseButtonListener() const {
   return 0;
 }
 
+void AccessibilityRenderObject::increment() {
+  if (roleValue() != SliderRole)
+    return;
+
+  changeValueByPercent(5);
+}
+
+void AccessibilityRenderObject::decrement() {
+  if (roleValue() != SliderRole)
+    return;
+
+  changeValueByPercent(-5);
+}
+
 static Element* siblingWithAriaRole(String role, Node* node) {
   Node* sibling = node->parent()->firstChild();
   while (sibling) {
@@ -1555,7 +1569,21 @@ void AccessibilityRenderObject::setFocused(bool on) {
   }
 }
 
+void AccessibilityRenderObject::changeValueByPercent(float percentChange) {
+  float range = maxValueForRange() - minValueForRange();
+  float value = valueForRange();
+
+  value += range * (percentChange / 100);
+  setValue(String::number(value));
+
+  axObjectCache()->postNotification(m_renderer, AXObjectCache::AXValueChanged,
+                                    true);
+}
+
 void AccessibilityRenderObject::setValue(const String& string) {
+  if (!m_renderer)
+    return;
+
   // FIXME: Do we want to do anything here for ARIA textboxes?
   if (m_renderer->isTextField()) {
     HTMLInputElement* input =
@@ -1565,6 +1593,10 @@ void AccessibilityRenderObject::setValue(const String& string) {
     HTMLTextAreaElement* textArea =
         static_cast<HTMLTextAreaElement*>(m_renderer->node());
     textArea->setValue(string);
+  } else if (roleValue() == SliderRole) {
+    Node* element = m_renderer->node();
+    if (element && element->isElementNode())
+      static_cast<Element*>(element)->setAttribute(aria_valuenowAttr, string);
   }
 }
 
@@ -2411,6 +2443,7 @@ bool AccessibilityRenderObject::canSetFocusAttribute() const {
     case PopUpButtonRole:
     case CheckBoxRole:
     case RadioButtonRole:
+    case SliderRole:
       return true;
     default:
       return false;

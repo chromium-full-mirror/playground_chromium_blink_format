@@ -189,6 +189,9 @@ class AccessibilityRenderObject : public AccessibilityObject {
   virtual void setFocused(bool);
   virtual void setSelectedTextRange(const PlainTextRange&);
   virtual void setValue(const String&);
+  virtual void changeValueByPercent(float percentChange);
+  virtual void increment();
+  virtual void decrement();
 
   virtual void detach();
   virtual void childrenChanged();
