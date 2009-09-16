@@ -49,7 +49,7 @@ class QWebGraphicsItemPrivate {
 };
 
 void QWebGraphicsItemPrivate::_q_doLoadProgress(int progress) {
-  if (qFuzzyCompare(this->progress, progress / 100.))
+  if (qFuzzyCompare(this->progress, qreal(progress / 100.)))
     return;
 
   this->progress = progress / 100.;
