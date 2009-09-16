@@ -24,10 +24,11 @@
 #include <wtf/Platform.h>
 
 /* This file emulates enough of stdint.h on Windows to make JavaScriptCore and
- * WebCore compile. */
+   WebCore
+   compile using MSVC which does not ship with the stdint.h header. */
 
-#if !PLATFORM(WIN_OS)
-#error "This stdint.h file should only be compiled under Windows"
+#if !COMPILER(MSVC)
+#error "This stdint.h file should only be compiled with MSVC"
 #endif
 
 #include <limits.h>
