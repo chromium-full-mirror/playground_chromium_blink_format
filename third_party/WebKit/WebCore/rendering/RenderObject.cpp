@@ -1472,6 +1472,7 @@ Color RenderObject::selectionForegroundColor() const {
   return color;
 }
 
+#if ENABLE(DRAG_SUPPORT)
 Node* RenderObject::draggableNode(bool dhtmlOK,
                                   bool uaOK,
                                   int x,
@@ -1515,6 +1516,7 @@ Node* RenderObject::draggableNode(bool dhtmlOK,
   }
   return 0;
 }
+#endif  // ENABLE(DRAG_SUPPORT)
 
 void RenderObject::selectionStartEnd(int& spos, int& epos) const {
   view()->selectionStartEnd(spos, epos);

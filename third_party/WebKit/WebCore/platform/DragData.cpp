@@ -26,6 +26,7 @@
 #include "config.h"
 #include "DragData.h"
 
+#if ENABLE(DRAG_SUPPORT)
 namespace WebCore {
 
 #if !PLATFORM(MAC)
@@ -38,4 +39,7 @@ DragData::DragData(DragDataRef data,
       m_platformDragData(data),
       m_draggingSourceOperationMask(sourceOperationMask) {}
 #endif
-}
+
+}  // namespace WebCore
+
+#endif  // ENABLE(DRAG_SUPPORT)

@@ -815,11 +815,13 @@ class RenderObject : public CachedResourceClient {
   // Whether or not a given block needs to paint selection gaps.
   virtual bool shouldPaintSelectionGaps() const { return false; }
 
+#if ENABLE(DRAG_SUPPORT)
   Node* draggableNode(bool dhtmlOK,
                       bool uaOK,
                       int x,
                       int y,
                       bool& dhtmlWillDrag) const;
+#endif
 
   /**
    * Returns the local coordinates of the caret within this render object.

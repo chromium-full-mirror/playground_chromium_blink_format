@@ -106,8 +106,12 @@ Page::Page(ChromeClient* chromeClient,
            DragClient* dragClient,
            InspectorClient* inspectorClient)
     : m_chrome(new Chrome(this, chromeClient)),
-      m_dragCaretController(new SelectionController(0, true)),
-      m_dragController(new DragController(this, dragClient)),
+      m_dragCaretController(new SelectionController(0, true))
+#if ENABLE(DRAG_SUPPORT)
+      ,
+      m_dragController(new DragController(this, dragClient))
+#endif
+      ,
       m_focusController(new FocusController(this)),
       m_contextMenuController(
           new ContextMenuController(this, contextMenuClient)),
@@ -133,6 +137,9 @@ Page::Page(ChromeClient* chromeClient,
       m_customHTMLTokenizerTimeDelay(-1),
       m_customHTMLTokenizerChunkSize(-1),
       m_canStartPlugins(true) {
+#if !ENABLE(DRAG_SUPPORT)
+  UNUSED_PARAM(dragClient);
+#endif
   if (!allPages) {
     allPages = new HashSet<Page*>;
 

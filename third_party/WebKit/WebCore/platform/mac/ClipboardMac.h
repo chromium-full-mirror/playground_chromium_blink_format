@@ -69,10 +69,12 @@ class ClipboardMac : public Clipboard, public CachedResourceClient {
   void setDragImageElement(Node*, const IntPoint&);
 
   virtual DragImageRef createDragImage(IntPoint& dragLoc) const;
+#if ENABLE(DRAG_SUPPORT)
   virtual void declareAndWriteDragImage(Element*,
                                         const KURL&,
                                         const String& title,
                                         Frame*);
+#endif
   virtual void writeRange(Range*, Frame* frame);
   virtual void writeURL(const KURL&, const String&, Frame* frame);
 

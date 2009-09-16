@@ -577,6 +577,7 @@ class EmptyContextMenuClient : public ContextMenuClient {
 #endif
 };
 
+#if ENABLE(DRAG_SUPPORT)
 class EmptyDragClient : public DragClient {
  public:
   virtual ~EmptyDragClient() {}
@@ -602,6 +603,7 @@ class EmptyDragClient : public DragClient {
   }
   virtual void dragControllerDestroyed() {}
 };
+#endif  // ENABLE(DRAG_SUPPORT)
 
 class EmptyInspectorClient : public InspectorClient {
  public:
