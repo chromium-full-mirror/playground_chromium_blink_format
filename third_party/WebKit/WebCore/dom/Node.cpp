@@ -2389,11 +2389,8 @@ static inline void updateSVGElementInstancesAfterEventListenerChange(
 void Node::addEventListener(const AtomicString& eventType,
                             PassRefPtr<EventListener> listener,
                             bool useCapture) {
-  Document* document = this->document();
-  if (!document->attached())
-    return;
-
-  document->addListenerTypeIfNeeded(eventType);
+  if (Document* document = this->document())
+    document->addListenerTypeIfNeeded(eventType);
 
   RegisteredEventListenerVector& listeners =
       ensureRareData()->ensureListeners();
