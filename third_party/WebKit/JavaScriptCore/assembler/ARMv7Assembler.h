@@ -209,9 +209,9 @@ class ARMThumbImmediate {
     };
   } PatternBytes;
 
-  ALWAYS_INLINE static int32_t countLeadingZerosPartial(uint32_t& value,
-                                                        int32_t& zeros,
-                                                        const int N) {
+  ALWAYS_INLINE static void countLeadingZerosPartial(uint32_t& value,
+                                                     int32_t& zeros,
+                                                     const int N) {
     if (value &
         ~((1 << N) -
           1))      /* check for any of the top N bits (of 2N bits) are set */

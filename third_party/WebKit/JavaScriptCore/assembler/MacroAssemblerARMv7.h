@@ -498,6 +498,7 @@ class MacroAssemblerARMv7 : public AbstractMacroAssembler<ARMv7Assembler> {
 
   Jump branchTruncateDoubleToInt32(FPRegisterID, RegisterID) {
     ASSERT_NOT_REACHED();
+    return jump();
   }
 
   // Stack manipulation operations:
@@ -952,7 +953,7 @@ class MacroAssemblerARMv7 : public AbstractMacroAssembler<ARMv7Assembler> {
     return addressTempRegister;
   }
 
-  DataLabel32 moveFixedWidthEncoding(Imm32 imm, RegisterID dst) {
+  void moveFixedWidthEncoding(Imm32 imm, RegisterID dst) {
     uint32_t value = imm.m_value;
     m_assembler.movT3(dst, ARMThumbImmediate::makeUInt16(value & 0xffff));
     m_assembler.movt(dst, ARMThumbImmediate::makeUInt16(value >> 16));
