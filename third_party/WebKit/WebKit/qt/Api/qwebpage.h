@@ -360,9 +360,8 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
  private:
   Q_PRIVATE_SLOT(d, void _q_onLoadProgressChanged(int))
   Q_PRIVATE_SLOT(d, void _q_webActionTriggered(bool checked))
-#ifndef NDEBUG
   Q_PRIVATE_SLOT(d, void _q_cleanupLeakMessages())
-#endif
+
   QWebPagePrivate* d;
 
   friend class QWebFrame;
