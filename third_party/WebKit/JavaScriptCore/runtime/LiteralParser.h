@@ -99,7 +99,7 @@ class LiteralParser {
 
    private:
     TokenType lex(LiteralParserToken&);
-    template <ParserMode parserMode>
+    template <ParserMode mode>
     TokenType lexString(LiteralParserToken&);
     TokenType lexNumber(LiteralParserToken&);
     LiteralParserToken m_currentToken;
