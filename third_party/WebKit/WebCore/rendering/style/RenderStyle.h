@@ -524,9 +524,6 @@ class RenderStyle : public RefCounted<RenderStyle> {
     return inherited->font.fontDescription();
   }
   int fontSize() const { return inherited->font.pixelSize(); }
-  FontSmoothing fontSmoothing() const {
-    return inherited->font.fontDescription().fontSmoothing();
-  }
 
   const Color& color() const { return inherited->color; }
   Length textIndent() const { return inherited->indent; }

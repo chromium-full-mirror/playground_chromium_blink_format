@@ -31,6 +31,7 @@
 
 #include "CSSPrimitiveValue.h"
 #include "CSSValueKeywords.h"
+#include "FontSmoothingMode.h"
 #include "GraphicsTypes.h"
 #include "Path.h"
 #include "RenderStyleConstants.h"
@@ -1782,7 +1783,7 @@ inline CSSPrimitiveValue::operator EPointerEvents() const {
 }
 
 template <>
-inline CSSPrimitiveValue::CSSPrimitiveValue(FontSmoothing smoothing)
+inline CSSPrimitiveValue::CSSPrimitiveValue(FontSmoothingMode smoothing)
     : m_type(CSS_IDENT) {
   switch (smoothing) {
     case AutoSmoothing:
@@ -1804,7 +1805,7 @@ inline CSSPrimitiveValue::CSSPrimitiveValue(FontSmoothing smoothing)
 }
 
 template <>
-inline CSSPrimitiveValue::operator FontSmoothing() const {
+inline CSSPrimitiveValue::operator FontSmoothingMode() const {
   switch (m_value.ident) {
     case CSSValueAuto:
       return AutoSmoothing;
