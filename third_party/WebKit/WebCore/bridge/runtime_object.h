@@ -56,7 +56,7 @@ class RuntimeObjectImp : public JSObject {
   virtual void getOwnPropertyNames(ExecState*, PropertyNameArray&);
 
   virtual void invalidate();
-  Bindings::Instance* getInternalInstance() const { return instance.get(); }
+  Bindings::Instance* getInternalInstance() const { return m_instance.get(); }
 
   static JSObject* throwInvalidAccessError(ExecState*);
 
@@ -89,7 +89,7 @@ class RuntimeObjectImp : public JSObject {
                               const Identifier&,
                               const PropertySlot&);
 
-  RefPtr<Bindings::Instance> instance;
+  RefPtr<Bindings::Instance> m_instance;
 };
 
 }  // namespace

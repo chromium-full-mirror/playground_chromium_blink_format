@@ -40,30 +40,31 @@ using namespace Bindings;
 
 const ClassInfo RuntimeObjectImp::s_info = {"RuntimeObject", 0, 0, 0};
 
-RuntimeObjectImp::RuntimeObjectImp(ExecState* exec, PassRefPtr<Instance> i)
+RuntimeObjectImp::RuntimeObjectImp(ExecState* exec,
+                                   PassRefPtr<Instance> instance)
     // FIXME: deprecatedGetDOMStructure uses the prototype off of the wrong
     // global object
     // We need to pass in the right global object for "i".
     : JSObject(deprecatedGetDOMStructure<RuntimeObjectImp>(exec)),
-      instance(i) {
-  instance->rootObject()->addRuntimeObject(this);
+      m_instance(instance) {
+  m_instance->rootObject()->addRuntimeObject(this);
 }
 
 RuntimeObjectImp::RuntimeObjectImp(ExecState*,
                                    PassRefPtr<Structure> structure,
-                                   PassRefPtr<Instance> i)
-    : JSObject(structure), instance(i) {
-  instance->rootObject()->addRuntimeObject(this);
+                                   PassRefPtr<Instance> instance)
+    : JSObject(structure), m_instance(instance) {
+  m_instance->rootObject()->addRuntimeObject(this);
 }
 
 RuntimeObjectImp::~RuntimeObjectImp() {
-  if (instance)
-    instance->rootObject()->removeRuntimeObject(this);
+  if (m_instance)
+    m_instance->rootObject()->removeRuntimeObject(this);
 }
 
 void RuntimeObjectImp::invalidate() {
-  ASSERT(instance);
-  instance = 0;
+  ASSERT(m_instance);
+  m_instance = 0;
 }
 
 JSValue RuntimeObjectImp::fallbackObjectGetter(ExecState* exec,
@@ -71,7 +72,7 @@ JSValue RuntimeObjectImp::fallbackObjectGetter(ExecState* exec,
                                                const PropertySlot& slot) {
   RuntimeObjectImp* thisObj =
       static_cast<RuntimeObjectImp*>(asObject(slot.slotBase()));
-  RefPtr<Instance> instance = thisObj->instance;
+  RefPtr<Instance> instance = thisObj->m_instance;
 
   if (!instance)
     return throwInvalidAccessError(exec);
@@ -91,7 +92,7 @@ JSValue RuntimeObjectImp::fieldGetter(ExecState* exec,
                                       const PropertySlot& slot) {
   RuntimeObjectImp* thisObj =
       static_cast<RuntimeObjectImp*>(asObject(slot.slotBase()));
-  RefPtr<Instance> instance = thisObj->instance;
+  RefPtr<Instance> instance = thisObj->m_instance;
 
   if (!instance)
     return throwInvalidAccessError(exec);
@@ -112,7 +113,7 @@ JSValue RuntimeObjectImp::methodGetter(ExecState* exec,
                                        const PropertySlot& slot) {
   RuntimeObjectImp* thisObj =
       static_cast<RuntimeObjectImp*>(asObject(slot.slotBase()));
-  RefPtr<Instance> instance = thisObj->instance;
+  RefPtr<Instance> instance = thisObj->m_instance;
 
   if (!instance)
     return throwInvalidAccessError(exec);
@@ -131,10 +132,12 @@ JSValue RuntimeObjectImp::methodGetter(ExecState* exec,
 bool RuntimeObjectImp::getOwnPropertySlot(ExecState* exec,
                                           const Identifier& propertyName,
                                           PropertySlot& slot) {
-  if (!instance) {
+  if (!m_instance) {
     throwInvalidAccessError(exec);
     return false;
   }
+
+  RefPtr<Instance> instance = m_instance;
 
   instance->begin();
 
@@ -179,11 +182,12 @@ bool RuntimeObjectImp::getOwnPropertyDescriptor(
     ExecState* exec,
     const Identifier& propertyName,
     PropertyDescriptor& descriptor) {
-  if (!instance) {
+  if (!m_instance) {
     throwInvalidAccessError(exec);
     return false;
   }
 
+  RefPtr<Instance> instance = m_instance;
   instance->begin();
 
   Class* aClass = instance->getClass();
@@ -235,12 +239,12 @@ void RuntimeObjectImp::put(ExecState* exec,
                            const Identifier& propertyName,
                            JSValue value,
                            PutPropertySlot& slot) {
-  if (!instance) {
+  if (!m_instance) {
     throwInvalidAccessError(exec);
     return;
   }
 
-  RefPtr<Instance> protector(instance);
+  RefPtr<Instance> instance = m_instance;
   instance->begin();
 
   // Set the value of the property.
@@ -261,10 +265,11 @@ bool RuntimeObjectImp::deleteProperty(ExecState*, const Identifier&) {
 
 JSValue RuntimeObjectImp::defaultValue(ExecState* exec,
                                        PreferredPrimitiveType hint) const {
-  if (!instance)
+  if (!m_instance)
     return throwInvalidAccessError(exec);
 
-  RefPtr<Instance> protector(instance);
+  RefPtr<Instance> instance = m_instance;
+
   instance->begin();
   JSValue result = instance->defaultValue(exec, hint);
   instance->end();
@@ -284,8 +289,13 @@ static JSValue JSC_HOST_CALL callRuntimeObject(ExecState* exec,
 }
 
 CallType RuntimeObjectImp::getCallData(CallData& callData) {
-  if (!instance || !instance->supportsInvokeDefaultMethod())
+  if (!m_instance)
     return CallTypeNone;
+
+  RefPtr<Instance> instance = m_instance;
+  if (!instance->supportsInvokeDefaultMethod())
+    return CallTypeNone;
+
   callData.native.function = callRuntimeObject;
   return CallTypeHost;
 }
@@ -305,18 +315,25 @@ static JSObject* callRuntimeConstructor(ExecState* exec,
 }
 
 ConstructType RuntimeObjectImp::getConstructData(ConstructData& constructData) {
-  if (!instance || !instance->supportsConstruct())
+  if (!m_instance)
     return ConstructTypeNone;
+
+  RefPtr<Instance> instance = m_instance;
+  if (!instance->supportsConstruct())
+    return ConstructTypeNone;
+
   constructData.native.function = callRuntimeConstructor;
   return ConstructTypeHost;
 }
 
 void RuntimeObjectImp::getPropertyNames(ExecState* exec,
                                         PropertyNameArray& propertyNames) {
-  if (!instance) {
+  if (!m_instance) {
     throwInvalidAccessError(exec);
     return;
   }
+
+  RefPtr<Instance> instance = m_instance;
 
   instance->begin();
   instance->getPropertyNames(exec, propertyNames);
