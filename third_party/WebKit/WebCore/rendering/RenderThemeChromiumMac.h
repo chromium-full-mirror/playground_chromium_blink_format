@@ -3,7 +3,6 @@
  *
  * Copyright (C) 2005 Apple Computer, Inc.
  * Copyright (C) 2008, 2009 Google, Inc.
- * Copyright (C) 2009 Kenneth Rohde Christiansen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -26,7 +25,6 @@
 #define RenderThemeChromiumMac_h
 
 #import "RenderTheme.h"
-#import <AppKit/AppKit.h>
 #import <wtf/HashMap.h>
 #import <wtf/RetainPtr.h>
 
@@ -36,6 +34,9 @@
 class WebCoreRenderThemeNotificationObserver;
 #endif
 
+// This file (and its associated .mm file) is a clone of RenderThemeMac.h. See
+// the .mm file for details.
+
 namespace WebCore {
 
 class RenderStyle;
@@ -43,13 +44,6 @@ class RenderStyle;
 class RenderThemeChromiumMac : public RenderTheme {
  public:
   static PassRefPtr<RenderTheme> create();
-
-  // A method to obtain the baseline position for a "leaf" control.  This will
-  // only be used if a baseline
-  // position cannot be determined by examining child content. Checkboxes and
-  // radio buttons are examples of
-  // controls that need to do this.
-  virtual int baselinePosition(const RenderObject*) const;
 
   // A method asking if the control changes its tint when the window has focus
   // or not.
@@ -68,8 +62,14 @@ class RenderThemeChromiumMac : public RenderTheme {
   virtual Color platformActiveSelectionBackgroundColor() const;
   virtual Color platformInactiveSelectionBackgroundColor() const;
   virtual Color platformActiveListBoxSelectionBackgroundColor() const;
-
+  virtual Color platformActiveListBoxSelectionForegroundColor() const;
+  virtual Color platformInactiveListBoxSelectionBackgroundColor() const;
+  virtual Color platformInactiveListBoxSelectionForegroundColor() const;
   virtual Color platformFocusRingColor() const;
+
+  virtual ScrollbarControlSize scrollbarControlSizeForPart(ControlPart) {
+    return SmallScrollbar;
+  }
 
   virtual void platformColorsDidChange();
 
@@ -85,10 +85,6 @@ class RenderThemeChromiumMac : public RenderTheme {
   virtual int popupInternalPaddingTop(RenderStyle*) const;
   virtual int popupInternalPaddingBottom(RenderStyle*) const;
 
-  virtual ScrollbarControlSize scrollbarControlSizeForPart(ControlPart) {
-    return SmallScrollbar;
-  }
-
   virtual bool paintCapsLockIndicator(RenderObject*,
                                       const RenderObject::PaintInfo&,
                                       const IntRect&);
@@ -97,25 +93,6 @@ class RenderThemeChromiumMac : public RenderTheme {
 
  protected:
   virtual bool supportsSelectionForegroundColors() const { return false; }
-
-  // Methods for each appearance value.
-  virtual bool paintCheckbox(RenderObject*,
-                             const RenderObject::PaintInfo&,
-                             const IntRect&);
-  virtual void setCheckboxSize(RenderStyle*) const;
-
-  virtual bool paintRadio(RenderObject*,
-                          const RenderObject::PaintInfo&,
-                          const IntRect&);
-  virtual void setRadioSize(RenderStyle*) const;
-
-  virtual void adjustButtonStyle(CSSStyleSelector*,
-                                 RenderStyle*,
-                                 WebCore::Element*) const;
-  virtual bool paintButton(RenderObject*,
-                           const RenderObject::PaintInfo&,
-                           const IntRect&);
-  virtual void setButtonSize(RenderStyle*) const;
 
   virtual bool paintTextField(RenderObject*,
                               const RenderObject::PaintInfo&,
@@ -194,6 +171,7 @@ class RenderThemeChromiumMac : public RenderTheme {
                                              const RenderObject::PaintInfo&,
                                              const IntRect&);
 
+#if ENABLE(VIDEO)
   virtual bool paintMediaFullscreenButton(RenderObject*,
                                           const RenderObject::PaintInfo&,
                                           const IntRect&);
@@ -215,6 +193,25 @@ class RenderThemeChromiumMac : public RenderTheme {
   virtual bool paintMediaSliderThumb(RenderObject*,
                                      const RenderObject::PaintInfo&,
                                      const IntRect&);
+  virtual bool paintMediaRewindButton(RenderObject*,
+                                      const RenderObject::PaintInfo&,
+                                      const IntRect&);
+  virtual bool paintMediaReturnToRealtimeButton(RenderObject*,
+                                                const RenderObject::PaintInfo&,
+                                                const IntRect&);
+  virtual bool paintMediaControlsBackground(RenderObject*,
+                                            const RenderObject::PaintInfo&,
+                                            const IntRect&);
+  virtual bool paintMediaCurrentTime(RenderObject*,
+                                     const RenderObject::PaintInfo&,
+                                     const IntRect&);
+  virtual bool paintMediaTimeRemaining(RenderObject*,
+                                       const RenderObject::PaintInfo&,
+                                       const IntRect&);
+
+  // Media controls
+  virtual String extraMediaControlsStyleSheet();
+#endif
 
  private:
   RenderThemeChromiumMac();
@@ -224,6 +221,11 @@ class RenderThemeChromiumMac : public RenderTheme {
                       const IntSize&,
                       const int* margins,
                       float zoomLevel = 1.0f) const;
+
+  FloatRect convertToPaintingRect(const RenderObject* inputRenderer,
+                                  const RenderObject* partRenderer,
+                                  const FloatRect& inputRect,
+                                  const IntRect& r) const;
 
   // Get the control size based off the font.  Used by some of the controls
   // (like buttons).
@@ -247,18 +249,6 @@ class RenderThemeChromiumMac : public RenderTheme {
   void updatePressedState(NSCell*, const RenderObject*);
 
   // Helpers for adjusting appearance and for painting
-  const IntSize* checkboxSizes() const;
-  const int* checkboxMargins() const;
-  void setCheckboxCellState(const RenderObject*, const IntRect&);
-
-  const IntSize* radioSizes() const;
-  const int* radioMargins() const;
-  void setRadioCellState(const RenderObject*, const IntRect&);
-
-  void setButtonPaddingFromControlSize(RenderStyle*, NSControlSize) const;
-  const IntSize* buttonSizes() const;
-  const int* buttonMargins() const;
-  void setButtonCellState(const RenderObject*, const IntRect&);
 
   void setPopupButtonCellState(const RenderObject*, const IntRect&);
   const IntSize* popupButtonSizes() const;
@@ -275,9 +265,6 @@ class RenderThemeChromiumMac : public RenderTheme {
   void setSearchCellState(RenderObject*, const IntRect&);
   void setSearchFieldSize(RenderStyle*) const;
 
-  NSButtonCell* checkbox() const;
-  NSButtonCell* radio() const;
-  NSButtonCell* button() const;
   NSPopUpButtonCell* popupButton() const;
   NSSearchFieldCell* search() const;
   NSMenu* searchMenuTemplate() const;
@@ -285,9 +272,6 @@ class RenderThemeChromiumMac : public RenderTheme {
   NSSliderCell* sliderThumbVertical() const;
 
  private:
-  mutable RetainPtr<NSButtonCell> m_checkbox;
-  mutable RetainPtr<NSButtonCell> m_radio;
-  mutable RetainPtr<NSButtonCell> m_button;
   mutable RetainPtr<NSPopUpButtonCell> m_popupButton;
   mutable RetainPtr<NSSearchFieldCell> m_search;
   mutable RetainPtr<NSMenu> m_searchMenuTemplate;
@@ -304,4 +288,4 @@ class RenderThemeChromiumMac : public RenderTheme {
 
 }  // namespace WebCore
 
-#endif
+#endif  // RenderThemeChromiumMac_h
