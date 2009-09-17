@@ -150,7 +150,12 @@ void RenderTextControlSingleLine::subtreeHasChanged() {
   RenderTextControl::subtreeHasChanged();
 
   InputElement* input = inputElement();
-  input->setValueFromRenderer(input->constrainValue(text()));
+  // We don't need to call sanitizeUserInputValue() function here because
+  // InputElement::handleBeforeTextInsertedEvent() has already called
+  // sanitizeUserInputValue().
+  // sanitizeValue() is needed because IME input doesn't dispatch
+  // BeforeTextInsertedEvent.
+  input->setValueFromRenderer(input->sanitizeValue(text()));
 
   if (m_cancelButton)
     updateCancelButtonVisibility();

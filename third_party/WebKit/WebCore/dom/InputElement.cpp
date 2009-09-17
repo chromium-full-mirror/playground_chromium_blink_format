@@ -47,7 +47,7 @@ namespace WebCore {
 using namespace HTMLNames;
 
 // FIXME: According to HTML4, the length attribute's value can be arbitrarily
-// large. However, due to http://bugs.webkit.org/show_bugs.cgi?id=14536 things
+// large. However, due to https://bugs.webkit.org/show_bug.cgi?id=14536 things
 // get rather sluggish when a text field has a larger number of characters than
 // this, even when just clicking in the text field.
 const int InputElement::s_maximumLength = 524288;
@@ -148,9 +148,9 @@ void InputElement::setValueFromRenderer(InputElementData& data,
                                         InputElement* inputElement,
                                         Element* element,
                                         const String& value) {
-  // Renderer and our event handler are responsible for constraining values.
-  ASSERT(value == inputElement->constrainValue(value) ||
-         inputElement->constrainValue(value).isEmpty());
+  // Renderer and our event handler are responsible for sanitizing values.
+  ASSERT(value == inputElement->sanitizeValue(value) ||
+         inputElement->sanitizeValue(value).isEmpty());
 
   if (inputElement->isTextField())
     updatePlaceholderVisibility(inputElement, element);
@@ -189,13 +189,19 @@ static int numCharactersInGraphemeClusters(StringImpl* s,
   return textBreakCurrent(it);
 }
 
-String InputElement::constrainValue(const InputElement* inputElement,
-                                    const String& proposedValue,
-                                    int maxLength) {
-  String string = proposedValue;
-  if (!inputElement->isTextField())
-    return string;
+String InputElement::sanitizeValue(const InputElement* inputElement,
+                                   const String& proposedValue) {
+  return InputElement::sanitizeUserInputValue(inputElement, proposedValue,
+                                              s_maximumLength);
+}
 
+String InputElement::sanitizeUserInputValue(const InputElement* inputElement,
+                                            const String& proposedValue,
+                                            int maxLength) {
+  if (!inputElement->isTextField())
+    return proposedValue;
+
+  String string = proposedValue;
   string.replace("\r\n", " ");
   string.replace('\r', ' ');
   string.replace('\n', ' ');
@@ -239,8 +245,8 @@ void InputElement::handleBeforeTextInsertedEvent(InputElementData& data,
   // Make sure that the text to be inserted will not violate the maxLength.
 
   // We use RenderTextControlSingleLine::text() instead of InputElement::value()
-  // because they can be mismatched by constrainValue() in
-  // RenderTextControlSingleLine::subtreeHasChanged() in a case of IME input.
+  // because they can be mismatched by sanitizeValue() in
+  // RenderTextControlSingleLine::subtreeHasChanged() in some cases.
   int oldLength = numGraphemeClusters(
       toRenderTextControlSingleLine(element->renderer())->text().impl());
 
@@ -262,8 +268,8 @@ void InputElement::handleBeforeTextInsertedEvent(InputElementData& data,
   // constraints.
   BeforeTextInsertedEvent* textEvent =
       static_cast<BeforeTextInsertedEvent*>(event);
-  textEvent->setText(
-      constrainValue(inputElement, textEvent->text(), appendableLength));
+  textEvent->setText(sanitizeUserInputValue(inputElement, textEvent->text(),
+                                            appendableLength));
 }
 
 void InputElement::parseSizeAttribute(InputElementData& data,
@@ -297,7 +303,7 @@ void InputElement::parseMaxLengthAttribute(InputElementData& data,
 void InputElement::updateValueIfNeeded(InputElementData& data,
                                        InputElement* inputElement) {
   String oldValue = data.value();
-  String newValue = inputElement->constrainValue(oldValue);
+  String newValue = sanitizeValue(inputElement, oldValue);
   if (newValue != oldValue)
     inputElement->setValue(newValue);
 }
