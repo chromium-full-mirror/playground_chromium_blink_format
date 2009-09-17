@@ -1250,16 +1250,9 @@ bool AccessibilityRenderObject::accessibilityIsIgnored() const {
   // find out if this element is inside of a label element.
   // if so, it may be ignored because it's the label for a checkbox or radio
   // button
-  HTMLLabelElement* labelElement = labelElementContainer();
-  if (labelElement) {
-    HTMLElement* correspondingControl = labelElement->correspondingControl();
-    if (correspondingControl && correspondingControl->renderer()) {
-      AccessibilityObject* controlObject =
-          axObjectCache()->getOrCreate(correspondingControl->renderer());
-      if (!controlObject->exposesTitleUIElement())
-        return true;
-    }
-  }
+  AccessibilityObject* controlObject = correspondingControlForLabelElement();
+  if (controlObject && !controlObject->exposesTitleUIElement())
+    return true;
 
   AccessibilityRole ariaRole = ariaRoleAttribute();
   if (ariaRole == TextAreaRole || ariaRole == StaticTextRole) {
@@ -2118,8 +2111,16 @@ AccessibilityObject* AccessibilityRenderObject::doAccessibilityHitTest(
     return static_cast<AccessibilityListBox*>(result)->doAccessibilityHitTest(
         point);
 
-  if (result->accessibilityIsIgnored())
+  if (result->accessibilityIsIgnored()) {
+    // If this element is the label of a control, a hit test should return the
+    // control.
+    AccessibilityObject* controlObject =
+        result->correspondingControlForLabelElement();
+    if (controlObject && !controlObject->exposesTitleUIElement())
+      return controlObject;
+
     result = result->parentObjectUnignored();
+  }
 
   return result;
 }
@@ -2200,6 +2201,19 @@ void AccessibilityRenderObject::handleActiveDescendantChanged() {
     doc->axObjectCache()->postNotification(
         activedescendant->renderer(), AXObjectCache::AXFocusedUIElementChanged,
         true);
+}
+
+AccessibilityObject*
+AccessibilityRenderObject::correspondingControlForLabelElement() const {
+  HTMLLabelElement* labelElement = labelElementContainer();
+  if (!labelElement)
+    return 0;
+
+  HTMLElement* correspondingControl = labelElement->correspondingControl();
+  if (!correspondingControl)
+    return 0;
+
+  return axObjectCache()->getOrCreate(correspondingControl->renderer());
 }
 
 AccessibilityObject* AccessibilityRenderObject::observableObject() const {
