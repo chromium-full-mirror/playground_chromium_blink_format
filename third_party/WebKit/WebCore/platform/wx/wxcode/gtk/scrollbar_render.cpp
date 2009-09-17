@@ -73,6 +73,7 @@ GtkWidget* GetButtonWidget() {
 }
 
 GdkWindow* wxGetGdkWindowForDC(wxWindow* win, wxDC& dc) {
+  GdkWindow* gdk_window = NULL;
 #if wxCHECK_VERSION(2, 9, 0)
   if (dc.IsKindOf(CLASSINFO(wxGCDC)))
     gdk_window = win->GTKGetDrawingWindow();
@@ -82,15 +83,14 @@ GdkWindow* wxGetGdkWindowForDC(wxWindow* win, wxDC& dc) {
       gdk_window = impl->GetGDKWindow();
   }
 #else  // wx < 2.9
-  // The way to get a GdkWindow* from a wxWindow is to use
-  // GTK_PIZZA(win->m_wxwindow)->bin_window, but this approach
-  // won't work when drawing to a wxMemoryDC as it has its own
-  // GdkWindow* for its bitmap. wxWindowDC's GetGDKWindow() was
-  // designed to create a solution for all DCs, but we can't
-  // implement it with wxGCDC since it doesn't retain its wxWindow.
-  // So, to work around this, we use GetGDKWindow whenever possible
-  // and use bin_window for wxGCDC.
-  GdkWindow* gdk_window = NULL;
+// The way to get a GdkWindow* from a wxWindow is to use
+// GTK_PIZZA(win->m_wxwindow)->bin_window, but this approach
+// won't work when drawing to a wxMemoryDC as it has its own
+// GdkWindow* for its bitmap. wxWindowDC's GetGDKWindow() was
+// designed to create a solution for all DCs, but we can't
+// implement it with wxGCDC since it doesn't retain its wxWindow.
+// So, to work around this, we use GetGDKWindow whenever possible
+// and use bin_window for wxGCDC.
 #if wxUSE_GRAPHICS_CONTEXT
   if (dc.IsKindOf(CLASSINFO(wxGCDC)))
     gdk_window = GTK_PIZZA(win->m_wxwindow)->bin_window;
