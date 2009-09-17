@@ -65,6 +65,8 @@ class FrameLoaderClientWx;
 extern WXDLLIMPEXP_WEBKIT const wxChar* wxWebViewNameStr;
 #endif
 
+static const int defaultCacheCapacity = 8192 * 1024;  // mirrors Cache.cpp
+
 class WXDLLIMPEXP_WEBKIT wxWebViewCachePolicy {
  public:
   wxWebViewCachePolicy(unsigned minDead = 0,
@@ -90,7 +92,6 @@ class WXDLLIMPEXP_WEBKIT wxWebViewCachePolicy {
   }
 
  protected:
-  static const int defaultCacheCapacity = 8192 * 1024;  // mirrors Cache.cpp
   unsigned m_capacity;
   unsigned m_minDeadCapacity;
   unsigned m_maxDeadCapacity;
