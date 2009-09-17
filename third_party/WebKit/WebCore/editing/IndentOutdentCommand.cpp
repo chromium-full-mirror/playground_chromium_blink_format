@@ -141,12 +141,6 @@ void IndentOutdentCommand::indentIntoBlockquote(
     targetBlockquote = 0;
 }
 
-bool IndentOutdentCommand::isAtUnsplittableElement(const Position& pos) const {
-  Node* node = pos.node();
-  return node == editableRootForPosition(pos) ||
-         node == enclosingNodeOfType(pos, &isTableCell);
-}
-
 // Enclose all nodes between start and end by newParent, which is a sibling node
 // of nodes between start and end
 // FIXME: moveParagraph is overly complicated.  We need to clean up

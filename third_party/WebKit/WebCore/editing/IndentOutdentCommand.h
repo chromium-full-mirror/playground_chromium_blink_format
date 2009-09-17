@@ -49,8 +49,6 @@ class IndentOutdentCommand : public CompositeEditCommand {
     return m_typeOfAction == Indent ? EditActionIndent : EditActionOutdent;
   }
 
-  // FIXME: Does this belong in htmlediting.cpp?
-  bool isAtUnsplittableElement(const Position&) const;
   void appendParagraphIntoNode(const VisiblePosition& start,
                                const VisiblePosition& end,
                                Node* newParent);
