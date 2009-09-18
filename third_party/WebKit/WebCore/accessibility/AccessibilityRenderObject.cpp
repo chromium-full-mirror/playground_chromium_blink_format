@@ -2696,7 +2696,9 @@ const String& AccessibilityRenderObject::actionVerb() const {
 void AccessibilityRenderObject::updateBackingStore() {
   if (!m_renderer)
     return;
-  m_renderer->view()->layoutIfNeeded();
+
+  // Updating layout may delete m_renderer and this object.
+  m_renderer->document()->updateLayoutIgnorePendingStylesheets();
 }
 
 }  // namespace WebCore
