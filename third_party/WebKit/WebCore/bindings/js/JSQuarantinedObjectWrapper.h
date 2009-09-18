@@ -76,6 +76,10 @@ class JSQuarantinedObjectWrapper : public JSC::JSObject {
                    JSC::JSValue,
                    JSC::PutPropertySlot&);
   virtual void put(JSC::ExecState*, unsigned, JSC::JSValue);
+  virtual bool defineOwnProperty(JSC::ExecState*,
+                                 const JSC::Identifier& propertyName,
+                                 JSC::PropertyDescriptor&,
+                                 bool shouldThrow);
 
   virtual bool deleteProperty(JSC::ExecState*, const JSC::Identifier&);
   virtual bool deleteProperty(JSC::ExecState*, unsigned);

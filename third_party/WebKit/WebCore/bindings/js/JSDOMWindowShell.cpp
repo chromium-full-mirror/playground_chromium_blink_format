@@ -106,6 +106,14 @@ void JSDOMWindowShell::putWithAttributes(ExecState* exec,
   m_window->putWithAttributes(exec, propertyName, value, attributes);
 }
 
+bool JSDOMWindowShell::defineOwnProperty(JSC::ExecState* exec,
+                                         const JSC::Identifier& propertyName,
+                                         JSC::PropertyDescriptor& descriptor,
+                                         bool shouldThrow) {
+  return m_window->defineOwnProperty(exec, propertyName, descriptor,
+                                     shouldThrow);
+}
+
 bool JSDOMWindowShell::deleteProperty(ExecState* exec,
                                       const Identifier& propertyName) {
   return m_window->deleteProperty(exec, propertyName);
@@ -129,14 +137,16 @@ bool JSDOMWindowShell::getPropertyAttributes(JSC::ExecState* exec,
 
 void JSDOMWindowShell::defineGetter(ExecState* exec,
                                     const Identifier& propertyName,
-                                    JSObject* getterFunction) {
-  m_window->defineGetter(exec, propertyName, getterFunction);
+                                    JSObject* getterFunction,
+                                    unsigned attributes) {
+  m_window->defineGetter(exec, propertyName, getterFunction, attributes);
 }
 
 void JSDOMWindowShell::defineSetter(ExecState* exec,
                                     const Identifier& propertyName,
-                                    JSObject* setterFunction) {
-  m_window->defineSetter(exec, propertyName, setterFunction);
+                                    JSObject* setterFunction,
+                                    unsigned attributes) {
+  m_window->defineSetter(exec, propertyName, setterFunction, attributes);
 }
 
 JSValue JSDOMWindowShell::lookupGetter(ExecState* exec,

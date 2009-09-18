@@ -31,15 +31,15 @@
   macro(__defineGetter__) macro(__defineSetter__) macro(__lookupGetter__)      \
       macro(__lookupSetter__) macro(apply) macro(arguments) macro(call) macro( \
           callee) macro(caller) macro(compile) macro(configurable)             \
-          macro(constructor) macro(enumerable) macro(eval) macro(exec) macro(  \
-              fromCharCode) macro(global) macro(get) macro(getPrototypeOf)     \
-              macro(getOwnPropertyDescriptor) macro(hasOwnProperty)            \
-                  macro(ignoreCase) macro(index) macro(input) macro(isArray)   \
-                      macro(isPrototypeOf) macro(keys) macro(length) macro(    \
-                          message) macro(multiline) macro(name) macro(now)     \
-                          macro(parse) macro(propertyIsEnumerable) macro(      \
-                              prototype) macro(set) macro(source) macro(test)  \
-                              macro(toExponential) macro(toFixed)              \
+          macro(constructor) macro(defineProperty) macro(enumerable) macro(    \
+              eval) macro(exec) macro(fromCharCode) macro(global) macro(get)   \
+              macro(getPrototypeOf) macro(getOwnPropertyDescriptor) macro(     \
+                  hasOwnProperty) macro(ignoreCase) macro(index) macro(input)  \
+                  macro(isArray) macro(isPrototypeOf) macro(keys) macro(       \
+                      length) macro(message) macro(multiline) macro(name)      \
+                      macro(now) macro(parse) macro(propertyIsEnumerable)      \
+                          macro(prototype) macro(set) macro(source)            \
+                              macro(test) macro(toExponential) macro(toFixed)  \
                                   macro(toISOString) macro(toJSON)             \
                                       macro(toLocaleString) macro(toPrecision) \
                                           macro(toString) macro(UTC)           \

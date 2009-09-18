@@ -221,11 +221,12 @@ void JSLocation::getOwnPropertyNames(ExecState* exec,
 
 void JSLocation::defineGetter(ExecState* exec,
                               const Identifier& propertyName,
-                              JSObject* getterFunction) {
+                              JSObject* getterFunction,
+                              unsigned attributes) {
   if (propertyName == exec->propertyNames().toString ||
       propertyName == exec->propertyNames().valueOf)
     return;
-  Base::defineGetter(exec, propertyName, getterFunction);
+  Base::defineGetter(exec, propertyName, getterFunction, attributes);
 }
 
 static void navigateIfAllowed(ExecState* exec,
@@ -409,11 +410,12 @@ bool JSLocationPrototype::putDelegate(ExecState* exec,
 
 void JSLocationPrototype::defineGetter(ExecState* exec,
                                        const Identifier& propertyName,
-                                       JSObject* getterFunction) {
+                                       JSObject* getterFunction,
+                                       unsigned attributes) {
   if (propertyName == exec->propertyNames().toString ||
       propertyName == exec->propertyNames().valueOf)
     return;
-  Base::defineGetter(exec, propertyName, getterFunction);
+  Base::defineGetter(exec, propertyName, getterFunction, attributes);
 }
 
 }  // namespace WebCore

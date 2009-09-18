@@ -55,6 +55,11 @@ class DOMObject : public JSC::JSObject {
   explicit DOMObject(PassRefPtr<JSC::Structure> structure)
       : JSObject(structure) {}
 
+  virtual bool defineOwnProperty(JSC::ExecState*,
+                                 const JSC::Identifier&,
+                                 JSC::PropertyDescriptor&,
+                                 bool);
+
 #ifndef NDEBUG
   virtual ~DOMObject();
 #endif

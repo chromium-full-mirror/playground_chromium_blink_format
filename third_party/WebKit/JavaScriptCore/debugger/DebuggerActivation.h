@@ -56,10 +56,12 @@ class DebuggerActivation : public JSObject {
                                      unsigned& attributes) const;
   virtual void defineGetter(ExecState*,
                             const Identifier& propertyName,
-                            JSObject* getterFunction);
+                            JSObject* getterFunction,
+                            unsigned attributes);
   virtual void defineSetter(ExecState*,
                             const Identifier& propertyName,
-                            JSObject* setterFunction);
+                            JSObject* setterFunction,
+                            unsigned attributes);
   virtual JSValue lookupGetter(ExecState*, const Identifier& propertyName);
   virtual JSValue lookupSetter(ExecState*, const Identifier& propertyName);
 

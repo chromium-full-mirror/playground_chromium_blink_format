@@ -88,10 +88,16 @@ class JSDOMWindowShell : public DOMObject {
                                      unsigned& attributes) const;
   virtual void defineGetter(JSC::ExecState*,
                             const JSC::Identifier& propertyName,
-                            JSC::JSObject* getterFunction);
+                            JSC::JSObject* getterFunction,
+                            unsigned attributes);
   virtual void defineSetter(JSC::ExecState*,
                             const JSC::Identifier& propertyName,
-                            JSC::JSObject* setterFunction);
+                            JSC::JSObject* setterFunction,
+                            unsigned attributes);
+  virtual bool defineOwnProperty(JSC::ExecState*,
+                                 const JSC::Identifier& propertyName,
+                                 JSC::PropertyDescriptor&,
+                                 bool shouldThrow);
   virtual JSC::JSValue lookupGetter(JSC::ExecState*,
                                     const JSC::Identifier& propertyName);
   virtual JSC::JSValue lookupSetter(JSC::ExecState*,
