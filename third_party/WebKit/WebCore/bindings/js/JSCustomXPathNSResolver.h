@@ -41,6 +41,7 @@ class JSObject;
 namespace WebCore {
 
 class Frame;
+class JSDOMWindow;
 
 class JSCustomXPathNSResolver : public XPathNSResolver {
  public:
@@ -52,12 +53,12 @@ class JSCustomXPathNSResolver : public XPathNSResolver {
   virtual String lookupNamespaceURI(const String& prefix);
 
  private:
-  JSCustomXPathNSResolver(JSC::JSObject*, Frame*);
+  JSCustomXPathNSResolver(JSC::JSObject*, JSDOMWindow*);
 
-  JSC::JSObject* m_customResolver;  // JSCustomXPathNSResolvers are always
-                                    // temporary, thus no need to GC protect the
-                                    // object.
-  RefPtr<Frame> m_frame;
+  // JSCustomXPathNSResolvers are always temporary, thus no need to GC protect
+  // the objects.
+  JSC::JSObject* m_customResolver;
+  JSDOMWindow* m_globalObject;
 };
 
 }  // namespace WebCore

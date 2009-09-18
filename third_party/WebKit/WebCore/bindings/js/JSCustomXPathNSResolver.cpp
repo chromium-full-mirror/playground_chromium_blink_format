@@ -52,28 +52,21 @@ PassRefPtr<JSCustomXPathNSResolver> JSCustomXPathNSResolver::create(
   }
 
   return adoptRef(new JSCustomXPathNSResolver(
-      resolverObject,
-      asJSDOMWindow(exec->dynamicGlobalObject())->impl()->frame()));
+      resolverObject, asJSDOMWindow(exec->dynamicGlobalObject())));
 }
 
 JSCustomXPathNSResolver::JSCustomXPathNSResolver(JSObject* customResolver,
-                                                 Frame* frame)
-    : m_customResolver(customResolver), m_frame(frame) {}
+                                                 JSDOMWindow* globalObject)
+    : m_customResolver(customResolver), m_globalObject(globalObject) {}
 
 JSCustomXPathNSResolver::~JSCustomXPathNSResolver() {}
 
 String JSCustomXPathNSResolver::lookupNamespaceURI(const String& prefix) {
   ASSERT(m_customResolver);
 
-  if (!m_frame)
-    return String();
-  if (!m_frame->script()->isEnabled())
-    return String();
-
   JSLock lock(SilenceAssertionsOnly);
 
-  JSGlobalObject* globalObject = m_frame->script()->globalObject();
-  ExecState* exec = globalObject->globalExec();
+  ExecState* exec = m_globalObject->globalExec();
 
   JSValue function =
       m_customResolver->get(exec, Identifier(exec, "lookupNamespaceURI"));
@@ -83,7 +76,7 @@ String JSCustomXPathNSResolver::lookupNamespaceURI(const String& prefix) {
     callType = m_customResolver->getCallData(callData);
     if (callType == CallTypeNone) {
       // FIXME: Pass actual line number and source URL.
-      m_frame->domWindow()->console()->addMessage(
+      m_globalObject->impl()->console()->addMessage(
           JSMessageSource, LogMessageType, ErrorMessageLevel,
           "XPathNSResolver does not have a lookupNamespaceURI method.", 0,
           String());
@@ -97,10 +90,10 @@ String JSCustomXPathNSResolver::lookupNamespaceURI(const String& prefix) {
   MarkedArgumentBuffer args;
   args.append(jsString(exec, prefix));
 
-  globalObject->globalData()->timeoutChecker.start();
+  m_globalObject->globalData()->timeoutChecker.start();
   JSValue retval =
       call(exec, function, callType, callData, m_customResolver, args);
-  globalObject->globalData()->timeoutChecker.stop();
+  m_globalObject->globalData()->timeoutChecker.stop();
 
   String result;
   if (exec->hadException())
