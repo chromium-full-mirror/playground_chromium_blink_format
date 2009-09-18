@@ -216,7 +216,7 @@ class JIT : private MacroAssembler {
   static const FPRegisterID fpRegT0 = X86Registers::xmm0;
   static const FPRegisterID fpRegT1 = X86Registers::xmm1;
   static const FPRegisterID fpRegT2 = X86Registers::xmm2;
-#elif PLATFORM_ARM_ARCH(7)
+#elif PLATFORM(ARM_THUMB2)
   static const RegisterID returnValueRegister = ARMRegisters::r0;
   static const RegisterID cachedResultRegister = ARMRegisters::r0;
   static const RegisterID firstArgumentRegister = ARMRegisters::r0;
@@ -232,7 +232,7 @@ class JIT : private MacroAssembler {
   static const FPRegisterID fpRegT0 = ARMRegisters::d0;
   static const FPRegisterID fpRegT1 = ARMRegisters::d1;
   static const FPRegisterID fpRegT2 = ARMRegisters::d2;
-#elif PLATFORM(ARM)
+#elif PLATFORM(ARM_TRADITIONAL)
   static const RegisterID returnValueRegister = ARMRegisters::r0;
   static const RegisterID cachedResultRegister = ARMRegisters::r0;
   static const RegisterID firstArgumentRegister = ARMRegisters::r0;
@@ -774,7 +774,7 @@ class JIT : private MacroAssembler {
   static const int patchOffsetMethodCheckProtoObj = 11;
   static const int patchOffsetMethodCheckProtoStruct = 18;
   static const int patchOffsetMethodCheckPutFunction = 29;
-#elif PLATFORM_ARM_ARCH(7)
+#elif PLATFORM(ARM_THUMB2)
   // These architecture specific value are used to enable patching - see comment
   // on op_put_by_id.
   static const int patchOffsetPutByIdStructure = 10;
@@ -799,7 +799,7 @@ class JIT : private MacroAssembler {
   static const int patchOffsetMethodCheckProtoObj = 18;
   static const int patchOffsetMethodCheckProtoStruct = 28;
   static const int patchOffsetMethodCheckPutFunction = 46;
-#elif PLATFORM(ARM)
+#elif PLATFORM(ARM_TRADITIONAL)
   // These architecture specific value are used to enable patching - see comment
   // on op_put_by_id.
   static const int patchOffsetPutByIdStructure = 4;
@@ -827,7 +827,7 @@ class JIT : private MacroAssembler {
 #endif
 #endif  // USE(JSVALUE32_64)
 
-#if PLATFORM(ARM) && !PLATFORM_ARM_ARCH(7)
+#if PLATFORM(ARM_TRADITIONAL)
   // sequenceOpCall
   static const int sequenceOpCallInstructionSpace = 12;
   static const int sequenceOpCallConstantSpace = 2;

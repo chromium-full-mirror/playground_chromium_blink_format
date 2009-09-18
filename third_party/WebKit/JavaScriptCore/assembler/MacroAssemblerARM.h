@@ -30,7 +30,7 @@
 
 #include <wtf/Platform.h>
 
-#if ENABLE(ASSEMBLER) && PLATFORM(ARM) && !PLATFORM_ARM_ARCH(7)
+#if ENABLE(ASSEMBLER) && PLATFORM(ARM_TRADITIONAL)
 
 #include "ARMAssembler.h"
 #include "AbstractMacroAssembler.h"
@@ -711,6 +711,6 @@ class MacroAssemblerARM : public AbstractMacroAssembler<ARMAssembler> {
 };
 }
 
-#endif  // ENABLE(ASSEMBLER) && PLATFORM(ARM) && !PLATFORM_ARM_ARCH(7)
+#endif  // ENABLE(ASSEMBLER) && PLATFORM(ARM_TRADITIONAL)
 
 #endif  // MacroAssemblerARM_h

@@ -141,7 +141,7 @@ struct JITStackFrame {
 #if COMPILER(MSVC)
 #pragma pack(pop)
 #endif  // COMPILER(MSVC)
-#elif PLATFORM_ARM_ARCH(7)
+#elif PLATFORM(ARM_THUMB2)
 struct JITStackFrame {
   void* reserved;  // Unused
   JITStubArg args[6];
@@ -168,7 +168,7 @@ struct JITStackFrame {
 
   ReturnAddressPtr* returnAddressSlot() { return &thunkReturnAddress; }
 };
-#elif PLATFORM(ARM)
+#elif PLATFORM(ARM_TRADITIONAL)
 struct JITStackFrame {
   JITStubArg padding;  // Unused
   JITStubArg args[7];
