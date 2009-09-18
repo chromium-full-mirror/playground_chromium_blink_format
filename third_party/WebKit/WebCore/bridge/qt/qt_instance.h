@@ -41,7 +41,7 @@ class QtInstance : public Instance {
   ~QtInstance();
 
   virtual Class* getClass() const;
-  virtual RuntimeObjectImp* createRuntimeObject(ExecState*);
+  virtual RuntimeObjectImp* newRuntimeObject(ExecState*);
 
   virtual void begin();
   virtual void end();
