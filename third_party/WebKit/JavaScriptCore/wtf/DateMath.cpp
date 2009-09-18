@@ -64,7 +64,7 @@
 #include <notify.h>
 #endif
 
-#if PLATFORM(WINCE) && !PLATFORM(QT)
+#if PLATFORM(WINCE)
 extern "C" size_t strftime(char* const s,
                            const size_t maxsize,
                            const char* const format,
