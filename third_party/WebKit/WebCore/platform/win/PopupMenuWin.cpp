@@ -926,7 +926,7 @@ LRESULT PopupMenu::wndProc(HWND hWnd,
 
         // Translate the coordinate.
         translatePoint(lParam, m_popup,
-                       client()->hostWindow()->platformWindow());
+                       client()->hostWindow()->platformPageClient());
 
         ::PostMessage(m_popup, WM_HOST_WINDOW_MOUSEMOVE, wParam, lParam);
         break;
