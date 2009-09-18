@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2003, 2008, 2009 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -91,7 +91,9 @@ class Instance : public RefCounted<Instance> {
   void end();
 
   virtual Class* getClass() const = 0;
-  virtual RuntimeObjectImp* createRuntimeObject(ExecState*);
+  RuntimeObjectImp* createRuntimeObject(ExecState*);
+  void willInvalidateRuntimeObject();
+  void willDestroyRuntimeObject();
 
   // Returns false if the value was not set successfully.
   virtual bool setValueOfUndefinedField(ExecState*,
@@ -147,6 +149,11 @@ class Instance : public RefCounted<Instance> {
   virtual void virtualEnd() {}
 
   RefPtr<RootObject> _rootObject;
+
+ private:
+  virtual RuntimeObjectImp* newRuntimeObject(ExecState*);
+
+  RuntimeObjectImp* m_runtimeObject;
 };
 
 class Array : public Noncopyable {
