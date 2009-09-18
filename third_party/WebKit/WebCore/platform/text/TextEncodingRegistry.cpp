@@ -48,7 +48,7 @@
 #if PLATFORM(QT)
 #include "qt/TextCodecQt.h"
 #endif
-#if PLATFORM(WINCE)
+#if PLATFORM(WINCE) && !PLATFORM(QT)
 #include "TextCodecWince.h"
 #endif
 
@@ -191,7 +191,7 @@ static void buildBaseTextCodecMaps() {
   TextCodecICU::registerBaseCodecs(addToTextCodecMap);
 #endif
 
-#if PLATFORM(WINCE)
+#if PLATFORM(WINCE) && !PLATFORM(QT)
   TextCodecWince::registerBaseEncodingNames(addToTextEncodingNameMap);
   TextCodecWince::registerBaseCodecs(addToTextCodecMap);
 #endif
@@ -213,7 +213,7 @@ static void extendTextCodecMaps() {
   TextCodecMac::registerCodecs(addToTextCodecMap);
 #endif
 
-#if PLATFORM(WINCE)
+#if PLATFORM(WINCE) && !PLATFORM(QT)
   TextCodecWince::registerExtendedEncodingNames(addToTextEncodingNameMap);
   TextCodecWince::registerExtendedCodecs(addToTextCodecMap);
 #endif

@@ -283,6 +283,7 @@ void PluginView::stop() {
 
   JSC::JSLock::DropAllLocks dropAllLocks(JSC::SilenceAssertionsOnly);
 
+#if ENABLE(NETSCAPE_PLUGIN_API)
 #if !PLATFORM(WX)  // FIXME: Revisit this when implementing plugins for wx
 #ifdef XP_WIN
   // Unsubclass the window
@@ -304,6 +305,7 @@ void PluginView::stop() {
   }
 #endif  // XP_WIN
 #endif  // !PLATFORM(WX)
+#endif  // ENABLE(NETSCAPE_PLUGIN_API)
 
 #if !defined(XP_MACOSX)
   // Clear the window
