@@ -105,7 +105,7 @@ void PopupMenu::show(const IntRect& r, FrameView* view, int index) {
   if (clientRect().isEmpty())
     return;
 
-  HWND hostWindow = view->hostWindow()->platformWindow();
+  HWND hostWindow = view->hostWindow()->platformPageClient();
 
   if (!m_scrollbar && visibleItems() < client()->listSize()) {
     // We need a scroll bar
@@ -273,7 +273,7 @@ void PopupMenu::calculatePositionAndSize(const IntRect& r, FrameView* v) {
 
   // Then, translate to screen coordinates
   POINT location(rScreenCoords.location());
-  if (!::ClientToScreen(v->hostWindow()->platformWindow(), &location))
+  if (!::ClientToScreen(v->hostWindow()->platformPageClient(), &location))
     return;
 
   rScreenCoords.setLocation(location);
@@ -832,7 +832,7 @@ LRESULT PopupMenu::wndProc(HWND hWnd,
           break;
         }
         case VK_TAB:
-          ::SendMessage(client()->hostWindow()->platformWindow(), message,
+          ::SendMessage(client()->hostWindow()->platformPageClient(), message,
                         wParam, lParam);
           hide();
           break;

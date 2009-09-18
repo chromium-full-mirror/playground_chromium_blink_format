@@ -211,8 +211,8 @@ void PluginView::handleKeyboardEvent(KeyboardEvent* event) {
   npEvent.type = (event->type() == "keydown")
                      ? 2
                      : 3;  // ints as Qt unsets KeyPress and KeyRelease
-  setSharedXEventFields(npEvent,
-                        m_parentFrame->view()->hostWindow()->platformWindow());
+  setSharedXEventFields(
+      npEvent, m_parentFrame->view()->hostWindow()->platformPageClient());
   setXKeyEventSpecificFields(npEvent, event);
 
   if (!dispatchNPEvent(npEvent))
@@ -349,7 +349,7 @@ NPError PluginView::getValue(NPNVariable variable, void* value) {
       else
         *(void**)value = m_parentFrame->view()
                              ->hostWindow()
-                             ->platformWindow()
+                             ->platformPageClient()
                              ->x11Info()
                              .display();
       return NPERR_NO_ERROR;
@@ -402,7 +402,7 @@ NPError PluginView::getValue(NPNVariable variable, void* value) {
     case NPNVnetscapeWindow: {
       void* w = reinterpret_cast<void*>(value);
       *((XID*)w) =
-          m_parentFrame->view()->hostWindow()->platformWindow()->winId();
+          m_parentFrame->view()->hostWindow()->platformPageClient()->winId();
       return NPERR_NO_ERROR;
     }
 
@@ -454,7 +454,7 @@ bool PluginView::platformStart() {
 
   if (m_needsXEmbed) {
     setPlatformWidget(new PluginContainerQt(
-        this, m_parentFrame->view()->hostWindow()->platformWindow()));
+        this, m_parentFrame->view()->hostWindow()->platformPageClient()));
   } else {
     notImplemented();
     return false;

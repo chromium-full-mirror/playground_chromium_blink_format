@@ -59,7 +59,7 @@ void PopupMenu::show(const IntRect& rect, FrameView* view, int index) {
 
   int x, y;
   gdk_window_get_origin(
-      GTK_WIDGET(view->hostWindow()->platformWindow())->window, &x, &y);
+      GTK_WIDGET(view->hostWindow()->platformPageClient())->window, &x, &y);
   m_menuPosition = view->contentsToWindow(rect.location());
   m_menuPosition =
       IntPoint(m_menuPosition.x() + x, m_menuPosition.y() + y + rect.height());

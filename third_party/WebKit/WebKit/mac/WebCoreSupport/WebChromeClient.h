@@ -109,7 +109,7 @@ class WebChromeClient : public WebCore::ChromeClient {
                       const WebCore::IntRect& clipRect);
   virtual WebCore::IntPoint screenToWindow(const WebCore::IntPoint&) const;
   virtual WebCore::IntRect windowToScreen(const WebCore::IntRect&) const;
-  virtual PlatformWidget platformWindow() const;
+  virtual PlatformPageClient platformPageClient() const;
   virtual void contentsSizeChanged(WebCore::Frame*,
                                    const WebCore::IntSize&) const;
   virtual void scrollRectIntoView(const WebCore::IntRect&,

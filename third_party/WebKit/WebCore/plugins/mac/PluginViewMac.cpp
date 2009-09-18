@@ -172,7 +172,7 @@ bool PluginView::platformStart() {
   }
 
   setPlatformPluginWidget(
-      m_parentFrame->view()->hostWindow()->platformWindow());
+      m_parentFrame->view()->hostWindow()->platformPageClient());
 
   show();
 

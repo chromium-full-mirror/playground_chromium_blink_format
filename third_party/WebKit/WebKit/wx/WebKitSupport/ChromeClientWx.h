@@ -116,7 +116,7 @@ class ChromeClientWx : public ChromeClient {
                       const IntRect& clipRect);
   virtual IntPoint screenToWindow(const IntPoint&) const;
   virtual IntRect windowToScreen(const IntRect&) const;
-  virtual PlatformWidget platformWindow() const;
+  virtual PlatformPageClient platformPageClient() const;
   virtual void contentsSizeChanged(Frame*, const IntSize&) const;
 
   virtual void scrollbarsModeDidChange() const {}

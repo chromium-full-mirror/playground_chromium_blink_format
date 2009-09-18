@@ -186,8 +186,8 @@ bool EditorClientWx::isEditable() {
   Frame* frame = m_page->focusController()->focusedOrMainFrame();
 
   if (frame) {
-    wxWebView* webKitWin =
-        dynamic_cast<wxWebView*>(frame->view()->hostWindow()->platformWindow());
+    wxWebView* webKitWin = dynamic_cast<wxWebView*>(
+        frame->view()->hostWindow()->platformPageClient());
     if (webKitWin)
       return webKitWin->IsEditable();
   }
@@ -258,8 +258,8 @@ void EditorClientWx::registerCommandForUndo(PassRefPtr<EditCommand> command) {
   Frame* frame = m_page->focusController()->focusedOrMainFrame();
 
   if (frame) {
-    wxWebView* webKitWin =
-        dynamic_cast<wxWebView*>(frame->view()->hostWindow()->platformWindow());
+    wxWebView* webKitWin = dynamic_cast<wxWebView*>(
+        frame->view()->hostWindow()->platformPageClient());
     if (webKitWin) {
       webKitWin->m_impl->undoStack.append(EditCommandWx(command));
     }
@@ -270,8 +270,8 @@ void EditorClientWx::registerCommandForRedo(PassRefPtr<EditCommand> command) {
   Frame* frame = m_page->focusController()->focusedOrMainFrame();
 
   if (frame) {
-    wxWebView* webKitWin =
-        dynamic_cast<wxWebView*>(frame->view()->hostWindow()->platformWindow());
+    wxWebView* webKitWin = dynamic_cast<wxWebView*>(
+        frame->view()->hostWindow()->platformPageClient());
     if (webKitWin) {
       webKitWin->m_impl->redoStack.insert(0, EditCommandWx(command));
     }
@@ -282,8 +282,8 @@ void EditorClientWx::clearUndoRedoOperations() {
   Frame* frame = m_page->focusController()->focusedOrMainFrame();
 
   if (frame) {
-    wxWebView* webKitWin =
-        dynamic_cast<wxWebView*>(frame->view()->hostWindow()->platformWindow());
+    wxWebView* webKitWin = dynamic_cast<wxWebView*>(
+        frame->view()->hostWindow()->platformPageClient());
     if (webKitWin) {
       webKitWin->m_impl->redoStack.clear();
       webKitWin->m_impl->undoStack.clear();
@@ -295,8 +295,8 @@ bool EditorClientWx::canUndo() const {
   Frame* frame = m_page->focusController()->focusedOrMainFrame();
 
   if (frame) {
-    wxWebView* webKitWin =
-        dynamic_cast<wxWebView*>(frame->view()->hostWindow()->platformWindow());
+    wxWebView* webKitWin = dynamic_cast<wxWebView*>(
+        frame->view()->hostWindow()->platformPageClient());
     if (webKitWin) {
       return webKitWin->m_impl->undoStack.size() != 0;
     }
@@ -308,8 +308,8 @@ bool EditorClientWx::canRedo() const {
   Frame* frame = m_page->focusController()->focusedOrMainFrame();
 
   if (frame) {
-    wxWebView* webKitWin =
-        dynamic_cast<wxWebView*>(frame->view()->hostWindow()->platformWindow());
+    wxWebView* webKitWin = dynamic_cast<wxWebView*>(
+        frame->view()->hostWindow()->platformPageClient());
     if (webKitWin && webKitWin) {
       return webKitWin->m_impl->redoStack.size() != 0;
     }
@@ -321,8 +321,8 @@ void EditorClientWx::undo() {
   Frame* frame = m_page->focusController()->focusedOrMainFrame();
 
   if (frame) {
-    wxWebView* webKitWin =
-        dynamic_cast<wxWebView*>(frame->view()->hostWindow()->platformWindow());
+    wxWebView* webKitWin = dynamic_cast<wxWebView*>(
+        frame->view()->hostWindow()->platformPageClient());
     if (webKitWin) {
       webKitWin->m_impl->undoStack.last().editCommand()->unapply();
       webKitWin->m_impl->undoStack.removeLast();
@@ -334,8 +334,8 @@ void EditorClientWx::redo() {
   Frame* frame = m_page->focusController()->focusedOrMainFrame();
 
   if (frame) {
-    wxWebView* webKitWin =
-        dynamic_cast<wxWebView*>(frame->view()->hostWindow()->platformWindow());
+    wxWebView* webKitWin = dynamic_cast<wxWebView*>(
+        frame->view()->hostWindow()->platformPageClient());
     if (webKitWin) {
       webKitWin->m_impl->redoStack.first().editCommand()->reapply();
       webKitWin->m_impl->redoStack.remove(0);

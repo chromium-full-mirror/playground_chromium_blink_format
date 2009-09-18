@@ -68,7 +68,7 @@ class Chrome : public HostWindow {
                       const IntRect& clipRect);
   virtual IntPoint screenToWindow(const IntPoint&) const;
   virtual IntRect windowToScreen(const IntRect&) const;
-  virtual PlatformWidget platformWindow() const;
+  virtual PlatformPageClient platformPageClient() const;
   virtual void scrollRectIntoView(const IntRect&, const ScrollView*) const;
   virtual void scrollbarsModeDidChange() const;
 

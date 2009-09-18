@@ -173,7 +173,7 @@ bool ScrollbarThemeWx::paint(Scrollbar* scrollbar,
   if (!root)
     return false;
 
-  wxWindow* webview = root->hostWindow()->platformWindow();
+  wxWindow* webview = root->hostWindow()->platformPageClient();
 
   wxRenderer_DrawScrollbar(
       webview, *dc, scrollbar->frameRect(), orientation,

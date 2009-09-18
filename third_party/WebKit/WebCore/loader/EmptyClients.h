@@ -139,7 +139,7 @@ class EmptyChromeClient : public ChromeClient {
   virtual void scroll(const IntSize&, const IntRect&, const IntRect&) {}
   virtual IntPoint screenToWindow(const IntPoint& p) const { return p; }
   virtual IntRect windowToScreen(const IntRect& r) const { return r; }
-  virtual PlatformWidget platformWindow() const { return 0; }
+  virtual PlatformPageClient platformPageClient() const { return 0; }
   virtual void contentsSizeChanged(Frame*, const IntSize&) const {}
 
   virtual void scrollbarsModeDidChange() const {}

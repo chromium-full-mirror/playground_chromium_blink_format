@@ -159,7 +159,7 @@ wxWindow* nativeWindowForRenderObject(RenderObject* o) {
   FrameView* frameView = o->view()->frameView();
   ASSERT(frameView);
   ASSERT(frameView->hostWindow());
-  return frameView->hostWindow()->platformWindow();
+  return frameView->hostWindow()->platformPageClient();
 }
 
 bool RenderThemeWx::isControlStyled(const RenderStyle* style,

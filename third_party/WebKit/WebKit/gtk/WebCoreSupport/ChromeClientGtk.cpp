@@ -380,7 +380,7 @@ IntPoint ChromeClient::screenToWindow(const IntPoint& point) const {
   return result;
 }
 
-PlatformWidget ChromeClient::platformWindow() const {
+PlatformPageClietn ChromeClient::platformPageClient() const {
   return GTK_WIDGET(m_webView);
 }
 
@@ -519,7 +519,7 @@ void ChromeClient::runOpenPanel(Frame*,
 
   GtkWidget* dialog = gtk_file_chooser_dialog_new(
       _("Upload File"),
-      GTK_WINDOW(gtk_widget_get_toplevel(GTK_WIDGET(platformWindow()))),
+      GTK_WINDOW(gtk_widget_get_toplevel(GTK_WIDGET(platformPageClient()))),
       GTK_FILE_CHOOSER_ACTION_OPEN, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
       GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
 

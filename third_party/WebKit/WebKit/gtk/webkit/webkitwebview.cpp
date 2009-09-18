@@ -292,7 +292,7 @@ static gboolean webkit_web_view_popup_menu_handler(GtkWidget* widget) {
 
   int x, y;
   gdk_window_get_origin(
-      GTK_WIDGET(view->hostWindow()->platformWindow())->window, &x, &y);
+      GTK_WIDGET(view->hostWindow()->platformPageClient())->window, &x, &y);
 
   // FIXME: The IntSize(0, -1) is a hack to get the hit-testing to result in the
   // selected element.
