@@ -125,9 +125,9 @@ void RenderLayerBacking::updateLayerTransform() {
 static bool hasNonZeroTransformOrigin(const RenderObject* renderer) {
   RenderStyle* style = renderer->style();
   return (style->transformOriginX().type() == Fixed &&
-          style->transformOriginX().value() != 0) ||
+          style->transformOriginX().value()) ||
          (style->transformOriginY().type() == Fixed &&
-          style->transformOriginY().value() != 0);
+          style->transformOriginY().value());
 }
 
 void RenderLayerBacking::updateCompositedBounds() {
