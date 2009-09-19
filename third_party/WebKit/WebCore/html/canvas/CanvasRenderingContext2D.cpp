@@ -951,15 +951,12 @@ static inline FloatRect normalizeRect(const FloatRect& rect) {
 }
 
 void CanvasRenderingContext2D::checkOrigin(const KURL& url) {
-  RefPtr<SecurityOrigin> origin = SecurityOrigin::create(url);
-  if (!m_canvas->document()->securityOrigin()->canAccess(origin.get()))
+  if (m_canvas->document()->securityOrigin()->taintsCanvas(url))
     m_canvas->setOriginTainted();
 }
 
 void CanvasRenderingContext2D::checkOrigin(const String& url) {
-  RefPtr<SecurityOrigin> origin = SecurityOrigin::createFromString(url);
-  if (!m_canvas->document()->securityOrigin()->canAccess(origin.get()))
-    m_canvas->setOriginTainted();
+  checkOrigin(KURL(KURL(), url));
 }
 
 void CanvasRenderingContext2D::drawImage(HTMLImageElement* image,
@@ -1270,10 +1267,8 @@ PassRefPtr<CanvasPattern> CanvasRenderingContext2D::createPattern(
   if (!cachedImage || !image->cachedImage()->image())
     return CanvasPattern::create(Image::nullImage(), repeatX, repeatY, true);
 
-  RefPtr<SecurityOrigin> origin =
-      SecurityOrigin::createFromString(cachedImage->url());
-  bool originClean =
-      m_canvas->document()->securityOrigin()->canAccess(origin.get());
+  bool originClean = !m_canvas->document()->securityOrigin()->taintsCanvas(
+      KURL(KURL(), cachedImage->url()));
   return CanvasPattern::create(cachedImage->image(), repeatX, repeatY,
                                originClean);
 }
