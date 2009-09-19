@@ -30,7 +30,8 @@
 #include "HTMLCollection.h"
 #include "HTMLFormElement.h"
 #include "JSDOMWindowCustom.h"
-#include "JSNamedNodesCollection.h"
+#include "JSNodeList.h"
+#include "StaticNodeList.h"
 
 using namespace JSC;
 
@@ -54,12 +55,15 @@ JSValue JSHTMLFormElement::nameGetter(ExecState* exec,
   Vector<RefPtr<Node>> namedItems;
   form->getNamedElements(propertyName, namedItems);
 
+  if (namedItems.isEmpty())
+    return jsUndefined();
   if (namedItems.size() == 1)
     return toJS(exec, namedItems[0].get());
-  if (namedItems.size() > 1)
-    return new (exec)
-        JSNamedNodesCollection(exec, jsForm->globalObject(), namedItems);
-  return jsUndefined();
+
+  // FIMXE: HTML5 specifies that this should be a live NodeList subclass called
+  // a RadioNodeList.
+  return toJS(exec, jsForm->globalObject(),
+              StaticNodeList::adopt(namedItems).get());
 }
 
 JSValue JSHTMLFormElement::submit(ExecState* exec, const ArgList&) {
