@@ -641,8 +641,7 @@ void RenderLayerCompositor::rebuildCompositingLayerTree(
     // The compositing state of all our children has been updated already, so
     // now
     // we can compute and cache the composited bounds for this layer.
-    layerBacking->setCompositedBounds(calculateCompositedBounds(layer, layer));
-
+    layerBacking->updateCompositedBounds();
     layerBacking->updateGraphicsLayerConfiguration();
     layerBacking->updateGraphicsLayerGeometry();
 
@@ -726,8 +725,7 @@ void RenderLayerCompositor::updateCompositingDescendantGeometry(
     RenderLayerBacking::UpdateDepth updateDepth) {
   if (layer != compositingAncestor) {
     if (RenderLayerBacking* layerBacking = layer->backing()) {
-      layerBacking->setCompositedBounds(
-          calculateCompositedBounds(layer, layer));
+      layerBacking->updateCompositedBounds();
       layerBacking->updateGraphicsLayerGeometry();
       if (updateDepth == RenderLayerBacking::CompositingChildren)
         return;

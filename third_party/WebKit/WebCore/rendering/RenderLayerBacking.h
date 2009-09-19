@@ -127,6 +127,7 @@ class RenderLayerBacking : public GraphicsLayerClient {
 
   IntRect compositedBounds() const;
   void setCompositedBounds(const IntRect&);
+  void updateCompositedBounds();
 
   FloatPoint graphicsLayerToContentsCoordinates(const GraphicsLayer*,
                                                 const FloatPoint&);
@@ -213,6 +214,8 @@ class RenderLayerBacking : public GraphicsLayerClient {
   IntRect m_compositedBounds;
 
   bool m_hasDirectlyCompositedContent;
+  bool m_artificiallyInflatedBounds;  // bounds had to be made non-zero to make
+                                      // transform-origin work
 };
 
 }  // namespace WebCore
