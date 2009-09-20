@@ -28,19 +28,19 @@
 // them up various
 // ways without repeating the list.
 #define JSC_COMMON_IDENTIFIERS_EACH_PROPERTY_NAME(macro)                       \
-  macro(__defineGetter__) macro(__defineSetter__) macro(__lookupGetter__)      \
-      macro(__lookupSetter__) macro(apply) macro(arguments) macro(call) macro( \
-          callee) macro(caller) macro(compile) macro(configurable)             \
-          macro(constructor) macro(defineProperty) macro(defineProperties)     \
-              macro(enumerable) macro(eval) macro(exec) macro(                 \
-                  fromCharCode) macro(global) macro(get) macro(getPrototypeOf) \
-                  macro(getOwnPropertyDescriptor) macro(hasOwnProperty) macro( \
-                      ignoreCase) macro(index) macro(input) macro(isArray)     \
-                      macro(isPrototypeOf) macro(keys) macro(length) macro(    \
-                          message) macro(multiline) macro(name) macro(now)     \
-                          macro(parse) macro(propertyIsEnumerable) macro(      \
-                              prototype) macro(set) macro(source) macro(test)  \
-                              macro(toExponential) macro(toFixed)              \
+  macro(__defineGetter__) macro(__defineSetter__) macro(                       \
+      __lookupGetter__) macro(__lookupSetter__) macro(apply) macro(arguments)  \
+      macro(call) macro(callee) macro(caller) macro(compile) macro(            \
+          configurable) macro(constructor) macro(create) macro(defineProperty) \
+          macro(defineProperties) macro(enumerable) macro(eval) macro(         \
+              exec) macro(fromCharCode) macro(global) macro(get)               \
+              macro(getPrototypeOf) macro(getOwnPropertyDescriptor) macro(     \
+                  hasOwnProperty) macro(ignoreCase) macro(index) macro(input)  \
+                  macro(isArray) macro(isPrototypeOf) macro(keys) macro(       \
+                      length) macro(message) macro(multiline) macro(name)      \
+                      macro(now) macro(parse) macro(propertyIsEnumerable)      \
+                          macro(prototype) macro(set) macro(source)            \
+                              macro(test) macro(toExponential) macro(toFixed)  \
                                   macro(toISOString) macro(toJSON)             \
                                       macro(toLocaleString) macro(toPrecision) \
                                           macro(toString) macro(UTC)           \

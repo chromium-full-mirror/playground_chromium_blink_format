@@ -56,6 +56,10 @@ static JSValue JSC_HOST_CALL objectConstructorDefineProperties(ExecState*,
                                                                JSObject*,
                                                                JSValue,
                                                                const ArgList&);
+static JSValue JSC_HOST_CALL objectConstructorCreate(ExecState*,
+                                                     JSObject*,
+                                                     JSValue,
+                                                     const ArgList&);
 
 ObjectConstructor::ObjectConstructor(ExecState* exec,
                                      PassRefPtr<Structure> structure,
@@ -100,6 +104,11 @@ ObjectConstructor::ObjectConstructor(ExecState* exec,
       new (exec) NativeFunctionWrapper(exec, prototypeFunctionStructure, 2,
                                        exec->propertyNames().defineProperties,
                                        objectConstructorDefineProperties),
+      DontEnum);
+  putDirectFunctionWithoutTransition(
+      exec, new (exec) NativeFunctionWrapper(exec, prototypeFunctionStructure,
+                                             2, exec->propertyNames().create,
+                                             objectConstructorCreate),
       DontEnum);
 }
 
@@ -374,6 +383,23 @@ JSValue JSC_HOST_CALL objectConstructorDefineProperties(ExecState* exec,
     return throwError(exec, TypeError,
                       "Property descriptor list must be an Object.");
   return defineProperties(exec, asObject(args.at(0)), asObject(args.at(1)));
+}
+
+JSValue JSC_HOST_CALL objectConstructorCreate(ExecState* exec,
+                                              JSObject*,
+                                              JSValue,
+                                              const ArgList& args) {
+  if (!args.at(0).isObject() && !args.at(0).isNull())
+    return throwError(exec, TypeError,
+                      "Object prototype may only be an Object or null.");
+  JSObject* newObject = constructEmptyObject(exec);
+  newObject->setPrototype(args.at(0));
+  if (args.at(1).isUndefined())
+    return newObject;
+  if (!args.at(1).isObject())
+    return throwError(exec, TypeError,
+                      "Property descriptor list must be an Object.");
+  return defineProperties(exec, newObject, asObject(args.at(1)));
 }
 
 }  // namespace JSC
