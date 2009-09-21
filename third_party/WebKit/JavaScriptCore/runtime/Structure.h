@@ -86,8 +86,7 @@ class Structure : public RefCounted<Structure> {
   static PassRefPtr<Structure> addAnonymousSlotsTransition(Structure*,
                                                            unsigned count);
   static PassRefPtr<Structure> getterSetterTransition(Structure*);
-  static PassRefPtr<Structure> toCacheableDictionaryTransition(Structure*);
-  static PassRefPtr<Structure> toUncacheableDictionaryTransition(Structure*);
+  static PassRefPtr<Structure> toDictionaryTransition(Structure*);
   static PassRefPtr<Structure> fromDictionaryTransition(Structure*);
 
   ~Structure();
@@ -103,10 +102,7 @@ class Structure : public RefCounted<Structure> {
     m_prototype = prototype;
   }
 
-  bool isDictionary() const { return m_dictionaryKind != NoneDictionaryKind; }
-  bool isUncacheableDictionary() const {
-    return m_dictionaryKind == UncachedDictionaryKind;
-  }
+  bool isDictionary() const { return m_isDictionary; }
 
   const TypeInfo& typeInfo() const { return m_typeInfo; }
 
@@ -164,14 +160,6 @@ class Structure : public RefCounted<Structure> {
 
  private:
   Structure(JSValue prototype, const TypeInfo&);
-
-  typedef enum {
-    NoneDictionaryKind = 0,
-    CachedDictionaryKind = 1,
-    UncachedDictionaryKind = 2
-  } DictionaryKind;
-  static PassRefPtr<Structure> toDictionaryTransition(Structure*,
-                                                      DictionaryKind);
 
   size_t put(const Identifier& propertyName,
              unsigned attributes,
@@ -235,7 +223,7 @@ class Structure : public RefCounted<Structure> {
   size_t m_propertyStorageCapacity;
   signed char m_offset;
 
-  unsigned m_dictionaryKind : 2;
+  bool m_isDictionary : 1;
   bool m_isPinnedPropertyTable : 1;
   bool m_hasGetterSetterProperties : 1;
 #if COMPILER(WINSCW)
