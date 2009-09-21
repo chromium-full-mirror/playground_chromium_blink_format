@@ -2489,6 +2489,9 @@ void FrameLoader::loadURL(const KURL& newURL,
                           FrameLoadType newLoadType,
                           PassRefPtr<Event> event,
                           PassRefPtr<FormState> prpFormState) {
+  if (m_unloadEventBeingDispatched)
+    return;
+
   RefPtr<FormState> formState = prpFormState;
   bool isFormSubmission = formState;
 
@@ -2658,6 +2661,9 @@ void FrameLoader::loadWithDocumentLoader(DocumentLoader* loader,
   // to parser requiring a FrameView.  We should fix this dependency.
 
   ASSERT(m_frame->view());
+
+  if (m_unloadEventBeingDispatched)
+    return;
 
   m_policyLoadType = type;
   RefPtr<FormState> formState = prpFormState;
