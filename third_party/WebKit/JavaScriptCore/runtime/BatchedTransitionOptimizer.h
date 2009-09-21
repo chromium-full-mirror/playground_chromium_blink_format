@@ -37,7 +37,7 @@ class BatchedTransitionOptimizer : public Noncopyable {
   BatchedTransitionOptimizer(JSObject* object) : m_object(object) {
     if (!m_object->structure()->isDictionary())
       m_object->setStructure(
-          Structure::toDictionaryTransition(m_object->structure()));
+          Structure::toCacheableDictionaryTransition(m_object->structure()));
   }
 
   ~BatchedTransitionOptimizer() {
