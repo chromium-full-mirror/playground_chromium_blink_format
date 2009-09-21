@@ -162,6 +162,8 @@ struct JITStackFrame {
   CallFrame* callFrame;
   JSValue* exception;
 
+  void* padding2;
+
   // These arguments passed on the stack.
   Profiler** enabledProfilerReference;
   JSGlobalData* globalData;

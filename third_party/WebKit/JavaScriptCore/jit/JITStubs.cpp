@@ -491,7 +491,7 @@ asm volatile (
 ".thumb" "\n"
 ".thumb_func " THUMB_FUNC_PARAM(ctiTrampoline) "\n"
 SYMBOL_STRING(ctiTrampoline) ":" "\n"
-    "sub sp, sp, #0x3c" "\n"
+    "sub sp, sp, #0x40" "\n"
     "str lr, [sp, #0x20]" "\n"
     "str r4, [sp, #0x24]" "\n"
     "str r5, [sp, #0x28]" "\n"
@@ -506,7 +506,7 @@ SYMBOL_STRING(ctiTrampoline) ":" "\n"
     "ldr r5, [sp, #0x28]" "\n"
     "ldr r4, [sp, #0x24]" "\n"
     "ldr lr, [sp, #0x20]" "\n"
-    "add sp, sp, #0x3c" "\n"
+    "add sp, sp, #0x40" "\n"
     "bx lr" "\n"
 );
 
@@ -523,7 +523,7 @@ SYMBOL_STRING(ctiVMThrowTrampoline) ":" "\n"
     "ldr r5, [sp, #0x28]" "\n"
     "ldr r4, [sp, #0x24]" "\n"
     "ldr lr, [sp, #0x20]" "\n"
-    "add sp, sp, #0x3c" "\n"
+    "add sp, sp, #0x40" "\n"
     "bx lr" "\n"
 );
 
@@ -684,7 +684,7 @@ JITThunks::JITThunks(JSGlobalData* globalData) {
   ASSERT(OBJECT_OFFSETOF(struct JITStackFrame, exception) == 0x38);
   // The fifth argument is the first item already on the stack.
   ASSERT(OBJECT_OFFSETOF(struct JITStackFrame, enabledProfilerReference) ==
-         0x3c);
+         0x40);
 
   ASSERT(OBJECT_OFFSETOF(struct JITStackFrame, thunkReturnAddress) == 0x1C);
 #endif
