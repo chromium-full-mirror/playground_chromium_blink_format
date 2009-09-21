@@ -36,7 +36,7 @@ namespace JSC {
 
 class SourceCode {
  public:
-  SourceCode() : m_startChar(0), m_endChar(0), m_firstLine(0) {}
+  SourceCode() : m_provider(0), m_startChar(0), m_endChar(0), m_firstLine(0) {}
 
   SourceCode(PassRefPtr<SourceProvider> provider, int firstLine = 1)
       : m_provider(provider),
