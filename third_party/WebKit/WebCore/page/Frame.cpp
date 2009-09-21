@@ -133,7 +133,12 @@ Frame::Frame(Page* page,
       m_editor(this),
       m_eventHandler(this),
       m_animationController(this),
-      m_lifeSupportTimer(this, &Frame::lifeSupportTimerFired),
+      m_lifeSupportTimer(this, &Frame::lifeSupportTimerFired)
+#if ENABLE(ORIENTATION_EVENTS)
+      ,
+      m_orientation(0)
+#endif
+      ,
       m_caretVisible(false),
       m_caretPaint(true),
       m_highlightTextMatches(false),
@@ -272,6 +277,14 @@ void Frame::setDocument(PassRefPtr<Document> newDoc) {
   // Update the cached 'document' property, which is now stale.
   m_script.updateDocument();
 }
+
+#if ENABLE(ORIENTATION_EVENTS)
+void Frame::sendOrientationChangeEvent(int orientation) {
+  m_orientation = orientation;
+  if (Document* doc = document())
+    doc->dispatchWindowEvent(eventNames().orientationchangeEvent, false, false);
+}
+#endif  // ENABLE(ORIENTATION_EVENTS)
 
 Settings* Frame::settings() const {
   return m_page ? m_page->settings() : 0;

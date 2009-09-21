@@ -67,15 +67,16 @@ namespace WebCore {
                                                                   macro(stalled) macro(                     \
                                                                       suspend)                              \
                                                                                                             \
-                                                                      macro(                                \
-                                                                          webkitAnimationEnd)               \
+                                                                      macro(webkitAnimationEnd) macro(      \
+                                                                          webkitAnimationStart)             \
                                                                           macro(                            \
-                                                                              webkitAnimationStart)         \
+                                                                              webkitAnimationIteration)     \
+                                                                                                            \
                                                                               macro(                        \
-                                                                                  webkitAnimationIteration) \
+                                                                                  webkitTransitionEnd)      \
                                                                                                             \
                                                                                   macro(                    \
-                                                                                      webkitTransitionEnd)  \
+                                                                                      orientationchange)    \
                                                                                                             \
       // end of DOM_EVENT_NAMES_FOR_EACH
 

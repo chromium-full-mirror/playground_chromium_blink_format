@@ -464,6 +464,15 @@ void DOMWindow::clear() {
 #endif
 }
 
+#if ENABLE(ORIENTATION_EVENTS)
+int DOMWindow::orientation() const {
+  if (!m_frame)
+    return 0;
+
+  return m_frame->orientation();
+}
+#endif
+
 Screen* DOMWindow::screen() const {
   if (!m_screen)
     m_screen = Screen::create(m_frame);
@@ -1961,6 +1970,17 @@ EventListener* DOMWindow::oninvalid() const {
 void DOMWindow::setOninvalid(PassRefPtr<EventListener> eventListener) {
   setAttributeEventListener(eventNames().invalidEvent, eventListener);
 }
+
+#if ENABLE(ORIENTATION_EVENTS)
+EventListener* DOMWindow::onorientationchange() const {
+  return getAttributeEventListener(eventNames().orientationchangeEvent);
+}
+
+void DOMWindow::setOnorientationchange(
+    PassRefPtr<EventListener> eventListener) {
+  setAttributeEventListener(eventNames().orientationchangeEvent, eventListener);
+}
+#endif
 
 void DOMWindow::captureEvents() {
   // Not implemented.

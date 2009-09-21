@@ -87,6 +87,13 @@ class DOMWindow : public RefCounted<DOMWindow>, public EventTarget {
 
   void clear();
 
+#if ENABLE(ORIENTATION_EVENTS)
+  // This is the interface orientation in degrees. Some examples are:
+  //  0 is straight up; -90 is when the device is rotated 90 clockwise;
+  //  90 is when rotated counter clockwise.
+  int orientation() const;
+#endif
+
   void setSecurityOrigin(SecurityOrigin* securityOrigin) {
     m_securityOrigin = securityOrigin;
   }
@@ -428,6 +435,10 @@ class DOMWindow : public RefCounted<DOMWindow>, public EventTarget {
   void setOncontextmenu(PassRefPtr<EventListener>);
   EventListener* oninvalid() const;
   void setOninvalid(PassRefPtr<EventListener>);
+#if ENABLE(ORIENTATION_EVENTS)
+  EventListener* onorientationchange() const;
+  void setOnorientationchange(PassRefPtr<EventListener>);
+#endif
 
   void captureEvents();
   void releaseEvents();
