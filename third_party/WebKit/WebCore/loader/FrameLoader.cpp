@@ -2536,6 +2536,7 @@ void FrameLoader::loadURL(const KURL& newURL,
   if (shouldScrollToAnchor(isFormSubmission, newLoadType, newURL)) {
     oldDocumentLoader->setTriggeringAction(action);
     stopPolicyCheck();
+    m_policyLoadType = newLoadType;
     checkNavigationPolicy(request, oldDocumentLoader.get(), formState.release(),
                           callContinueFragmentScrollAfterNavigationPolicy,
                           this);
