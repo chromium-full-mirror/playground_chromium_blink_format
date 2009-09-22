@@ -227,6 +227,7 @@ DefaultDownloadDelegate::willSendRequest(IWebDownload* download,
   download = 0;
   redirectResponse = 0;
   *finalRequest = request;
+  (*finalRequest)->AddRef();
   return S_OK;
 }
 
