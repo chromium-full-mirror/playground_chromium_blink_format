@@ -68,61 +68,60 @@ v8::Handle<v8::Value> V8Custom::WindowSetTimeoutImpl(const v8::Arguments& args,
   v8::Handle<v8::Value> function = args[0];
 
   WebCore::String functionString;
-  if (!function->IsFunction())
+  if (!function->IsFunction()) {
     functionString = function->IsString()
                          ? toWebCoreString(function)
                          : toWebCoreString(function->ToString());
 
-  // Don't allow setting timeouts to run empty functions!
-  // (Bug 1009597)
-  if (functionString.length() == 0)
-    return v8::Undefined();
-}
-
-int32_t timeout = 0;
-if (argumentCount >= 2)
-  timeout = args[1]->Int32Value();
-
-DOMWindow* imp =
-    V8DOMWrapper::convertToNativeObject<DOMWindow>(V8ClassIndex::DOMWINDOW,
-                                                   args.Holder());
-
-if (!V8Proxy::canAccessFrame(imp->frame(), true))
-  return v8::Undefined();
-
-ScriptExecutionContext* scriptContext =
-    static_cast<ScriptExecutionContext*>(imp->document());
-
-if (!scriptContext)
-  return v8::Undefined();
-
-int id;
-if (function->IsFunction()) {
-  int paramCount = argumentCount >= 2 ? argumentCount - 2 : 0;
-  v8::Local<v8::Value>* params = 0;
-  if (paramCount > 0) {
-    params = new v8::Local<v8::Value>[paramCount];
-    for (int i = 0; i < paramCount; i++)
-      // parameters must be globalized
-      params[i] = args[i + 2];
+    // Don't allow setting timeouts to run empty functions!
+    // (Bug 1009597)
+    if (functionString.length() == 0)
+      return v8::Undefined();
   }
 
-  // params is passed to action, and released in action's destructor
-  ScheduledAction* action = new ScheduledAction(
-      V8Proxy::context(imp->frame()), v8::Handle<v8::Function>::Cast(function),
-      paramCount, params);
+  int32_t timeout = 0;
+  if (argumentCount >= 2)
+    timeout = args[1]->Int32Value();
 
-  delete[] params;
+  DOMWindow* imp = V8DOMWrapper::convertToNativeObject<DOMWindow>(
+      V8ClassIndex::DOMWINDOW, args.Holder());
 
-  id = DOMTimer::install(scriptContext, action, timeout, singleShot);
-} else {
-  id = DOMTimer::install(
-      scriptContext,
-      new ScheduledAction(V8Proxy::context(imp->frame()), functionString),
-      timeout, singleShot);
-}
+  if (!V8Proxy::canAccessFrame(imp->frame(), true))
+    return v8::Undefined();
 
-return v8::Integer::New(id);
+  ScriptExecutionContext* scriptContext =
+      static_cast<ScriptExecutionContext*>(imp->document());
+
+  if (!scriptContext)
+    return v8::Undefined();
+
+  int id;
+  if (function->IsFunction()) {
+    int paramCount = argumentCount >= 2 ? argumentCount - 2 : 0;
+    v8::Local<v8::Value>* params = 0;
+    if (paramCount > 0) {
+      params = new v8::Local<v8::Value>[paramCount];
+      for (int i = 0; i < paramCount; i++)
+        // parameters must be globalized
+        params[i] = args[i + 2];
+    }
+
+    // params is passed to action, and released in action's destructor
+    ScheduledAction* action = new ScheduledAction(
+        V8Proxy::context(imp->frame()),
+        v8::Handle<v8::Function>::Cast(function), paramCount, params);
+
+    delete[] params;
+
+    id = DOMTimer::install(scriptContext, action, timeout, singleShot);
+  } else {
+    id = DOMTimer::install(
+        scriptContext,
+        new ScheduledAction(V8Proxy::context(imp->frame()), functionString),
+        timeout, singleShot);
+  }
+
+  return v8::Integer::New(id);
 }
 
 static bool isAscii(const String& str) {
