@@ -268,6 +268,12 @@ class ObjectGrouperVisitor : public DOMWrapperMap<Node>::Visitor {
   }
 
   void visitDOMWrapper(Node* node, v8::Persistent<v8::Object> wrapper) {
+    // If the wrapper is clean it will not be detectable if it
+    // goes away and is recreated later so we don't make an effort
+    // to keep it alive here.
+    if (!wrapper->IsDirty())
+      return;
+
     // If the node is in document, put it in the ownerDocument's object group.
     //
     // If an image element was created by JavaScript "new Image",
