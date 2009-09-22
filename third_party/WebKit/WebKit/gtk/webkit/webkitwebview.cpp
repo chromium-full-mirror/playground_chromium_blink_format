@@ -3891,7 +3891,7 @@ WebKitHitTestResult* webkit_web_view_get_hit_test_result(
   g_return_val_if_fail(event, NULL);
 
   PlatformMouseEvent mouseEvent = PlatformMouseEvent(event);
-  Frame* frame = core(webView)->mainFrame();
+  Frame* frame = core(webView)->focusController()->focusedOrMainFrame();
   HitTestRequest request(HitTestRequest::Active);
   IntPoint documentPoint = documentPointForWindowPoint(frame, mouseEvent.pos());
   MouseEventWithHitTestResults mev =
