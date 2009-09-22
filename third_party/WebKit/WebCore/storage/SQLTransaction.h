@@ -87,6 +87,7 @@ class SQLTransaction : public ThreadSafeShared<SQLTransaction> {
   void performPendingCallback();
 
   Database* database() { return m_database.get(); }
+  bool isReadOnly() { return m_readOnly; }
 
  private:
   SQLTransaction(Database*,
