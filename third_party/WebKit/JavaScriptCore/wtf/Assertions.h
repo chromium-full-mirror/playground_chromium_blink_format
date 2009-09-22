@@ -179,7 +179,7 @@ void WTFLogVerbose(const char* file,
 #if ASSERT_DISABLED
 
 #define ASSERT(assertion) ((void)0)
-#if COMPILER(MSVC7)
+#if COMPILER(MSVC7) || COMPILER(WINSCW)
 #define ASSERT_WITH_MESSAGE(assertion) ((void)0)
 #else
 #define ASSERT_WITH_MESSAGE(assertion, ...) ((void)0)
@@ -197,7 +197,7 @@ void WTFLogVerbose(const char* file,
       CRASH();                                                           \
     }                                                                    \
   while (0)
-#if COMPILER(MSVC7)
+#if COMPILER(MSVC7) || COMPILER(WINSCW)
 #define ASSERT_WITH_MESSAGE(assertion) ((void)0)
 #else
 #define ASSERT_WITH_MESSAGE(assertion, ...)                                  \
@@ -245,7 +245,7 @@ void WTFLogVerbose(const char* file,
 
 /* FATAL */
 
-#if FATAL_DISABLED && !COMPILER(MSVC7)
+#if FATAL_DISABLED && !COMPILER(MSVC7) && !COMPILER(WINSCW)
 #define FATAL(...) ((void)0)
 #elif COMPILER(MSVC7)
 #define FATAL() ((void)0)
@@ -259,9 +259,9 @@ void WTFLogVerbose(const char* file,
 
 /* LOG_ERROR */
 
-#if ERROR_DISABLED && !COMPILER(MSVC7)
+#if ERROR_DISABLED && !COMPILER(MSVC7) && !COMPILER(WINSCW)
 #define LOG_ERROR(...) ((void)0)
-#elif COMPILER(MSVC7)
+#elif COMPILER(MSVC7) || COMPILER(WINSCW)
 #define LOG_ERROR() ((void)0)
 #else
 #define LOG_ERROR(...) \
@@ -270,9 +270,9 @@ void WTFLogVerbose(const char* file,
 
 /* LOG */
 
-#if LOG_DISABLED && !COMPILER(MSVC7)
+#if LOG_DISABLED && !COMPILER(MSVC7) && !COMPILER(WINSCW)
 #define LOG(channel, ...) ((void)0)
-#elif COMPILER(MSVC7)
+#elif COMPILER(MSVC7) || COMPILER(WINSCW)
 #define LOG() ((void)0)
 #else
 #define LOG(channel, ...)                                            \
@@ -285,9 +285,9 @@ void WTFLogVerbose(const char* file,
 
 /* LOG_VERBOSE */
 
-#if LOG_DISABLED && !COMPILER(MSVC7)
+#if LOG_DISABLED && !COMPILER(MSVC7) && !COMPILER(WINSCW)
 #define LOG_VERBOSE(channel, ...) ((void)0)
-#elif COMPILER(MSVC7)
+#elif COMPILER(MSVC7) || COMPILER(WINSCW)
 #define LOG_VERBOSE(channel) ((void)0)
 #else
 #define LOG_VERBOSE(channel, ...)                                           \
