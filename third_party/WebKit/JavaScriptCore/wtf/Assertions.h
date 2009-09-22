@@ -179,7 +179,11 @@ void WTFLogVerbose(const char* file,
 #if ASSERT_DISABLED
 
 #define ASSERT(assertion) ((void)0)
+#if COMPILER(MSVC7)
+#define ASSERT_WITH_MESSAGE(assertion) ((void)0)
+#else
 #define ASSERT_WITH_MESSAGE(assertion, ...) ((void)0)
+#endif /* COMPILER(MSVC7) */
 #define ASSERT_NOT_REACHED() ((void)0)
 #define ASSERT_UNUSED(variable, assertion) ((void)variable)
 
@@ -241,7 +245,7 @@ void WTFLogVerbose(const char* file,
 
 /* FATAL */
 
-#if FATAL_DISABLED
+#if FATAL_DISABLED && !COMPILER(MSVC7)
 #define FATAL(...) ((void)0)
 #elif COMPILER(MSVC7)
 #define FATAL() ((void)0)
@@ -255,7 +259,7 @@ void WTFLogVerbose(const char* file,
 
 /* LOG_ERROR */
 
-#if ERROR_DISABLED
+#if ERROR_DISABLED && !COMPILER(MSVC7)
 #define LOG_ERROR(...) ((void)0)
 #elif COMPILER(MSVC7)
 #define LOG_ERROR() ((void)0)
@@ -266,7 +270,7 @@ void WTFLogVerbose(const char* file,
 
 /* LOG */
 
-#if LOG_DISABLED
+#if LOG_DISABLED && !COMPILER(MSVC7)
 #define LOG(channel, ...) ((void)0)
 #elif COMPILER(MSVC7)
 #define LOG() ((void)0)
@@ -281,7 +285,7 @@ void WTFLogVerbose(const char* file,
 
 /* LOG_VERBOSE */
 
-#if LOG_DISABLED
+#if LOG_DISABLED && !COMPILER(MSVC7)
 #define LOG_VERBOSE(channel, ...) ((void)0)
 #elif COMPILER(MSVC7)
 #define LOG_VERBOSE(channel) ((void)0)
