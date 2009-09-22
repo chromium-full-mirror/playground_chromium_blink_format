@@ -30,8 +30,8 @@
 
 namespace WebCore {
 
-SQLiteTransaction::SQLiteTransaction(SQLiteDatabase& db)
-    : m_db(db), m_inProgress(false) {}
+SQLiteTransaction::SQLiteTransaction(SQLiteDatabase& db, bool readOnly)
+    : m_db(db), m_inProgress(false), m_readOnly(readOnly) {}
 
 SQLiteTransaction::~SQLiteTransaction() {
   if (m_inProgress)
@@ -41,7 +41,17 @@ SQLiteTransaction::~SQLiteTransaction() {
 void SQLiteTransaction::begin() {
   if (!m_inProgress) {
     ASSERT(!m_db.m_transactionInProgress);
-    m_inProgress = m_db.executeCommand("BEGIN;");
+    // Call BEGIN IMMEDIATE for a write transaction to acquire
+    // a RESERVED lock on the DB file. Otherwise, another write
+    // transaction (on another connection) could make changes
+    // to the same DB file before this transaction gets to execute
+    // any statements. If that happens, this transaction will fail.
+    // http://www.sqlite.org/lang_transaction.html
+    // http://www.sqlite.org/lockingv3.html#locking
+    if (m_readOnly)
+      m_inProgress = m_db.executeCommand("BEGIN;");
+    else
+      m_inProgress = m_db.executeCommand("BEGIN IMMEDIATE;");
     m_db.m_transactionInProgress = m_inProgress;
   }
 }
