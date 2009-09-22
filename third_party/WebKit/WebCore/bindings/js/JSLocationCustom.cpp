@@ -248,11 +248,11 @@ void JSLocation::setHref(ExecState* exec, JSValue value) {
   Frame* frame = impl()->frame();
   ASSERT(frame);
 
-  if (!shouldAllowNavigation(exec, frame))
-    return;
-
   KURL url = completeURL(exec, value.toString(exec));
   if (url.isNull())
+    return;
+
+  if (!shouldAllowNavigation(exec, frame))
     return;
 
   navigateIfAllowed(exec, frame, url,
@@ -353,11 +353,11 @@ JSValue JSLocation::replace(ExecState* exec, const ArgList& args) {
   if (!frame)
     return jsUndefined();
 
-  if (!shouldAllowNavigation(exec, frame))
-    return jsUndefined();
-
   KURL url = completeURL(exec, args.at(0).toString(exec));
   if (url.isNull())
+    return jsUndefined();
+
+  if (!shouldAllowNavigation(exec, frame))
     return jsUndefined();
 
   navigateIfAllowed(exec, frame, url, true, true);
@@ -379,11 +379,11 @@ JSValue JSLocation::assign(ExecState* exec, const ArgList& args) {
   if (!frame)
     return jsUndefined();
 
-  if (!shouldAllowNavigation(exec, frame))
-    return jsUndefined();
-
   KURL url = completeURL(exec, args.at(0).toString(exec));
   if (url.isNull())
+    return jsUndefined();
+
+  if (!shouldAllowNavigation(exec, frame))
     return jsUndefined();
 
   // We want a new history item if this JS was called via a user gesture
