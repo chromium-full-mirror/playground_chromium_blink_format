@@ -228,6 +228,8 @@ class DECLSPEC_UUID("{A3676398-4485-4a9d-87DC-CB5A40E6351D}") WebFrame
   virtual HRESULT STDMETHODCALLTYPE setExcludeFromTextSearch(
       /* [in] */ BOOL flag);
 
+  virtual HRESULT STDMETHODCALLTYPE reloadFromOrigin();
+
   virtual HRESULT STDMETHODCALLTYPE paintDocumentRectToContext(
       /* [in] */ RECT rect,
       /* [in] */ OLE_HANDLE deviceContext);

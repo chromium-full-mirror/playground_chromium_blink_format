@@ -3725,6 +3725,14 @@ HRESULT STDMETHODCALLTYPE WebView::toggleGrammarChecking(
   return setGrammarCheckingEnabled(enabled ? FALSE : TRUE);
 }
 
+HRESULT STDMETHODCALLTYPE WebView::reloadFromOrigin(
+    /* [in] */ IUnknown* /*sender*/) {
+  if (!m_mainFrame)
+    return E_FAIL;
+
+  return m_mainFrame->reloadFromOrigin();
+}
+
 // IWebViewCSS -----------------------------------------------------------------
 
 HRESULT STDMETHODCALLTYPE WebView::computedStyleForElement(
