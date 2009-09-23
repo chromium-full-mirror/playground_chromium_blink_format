@@ -201,13 +201,7 @@ void ScriptController::evaluateInNewContext(
 ScriptValue ScriptController::evaluate(const ScriptSourceCode& sourceCode) {
   String sourceURL = sourceCode.url();
 
-  if (sourceURL.isNull() &&
-      !m_XSSAuditor->canEvaluateJavaScriptURL(sourceCode.source())) {
-    // This JavaScript URL is not safe to be evaluated.
-    return ScriptValue();
-  }
-
-  if (!sourceURL.isNull() && !m_XSSAuditor->canEvaluate(sourceCode.source())) {
+  if (!m_XSSAuditor->canEvaluate(sourceCode.source())) {
     // This script is not safe to be evaluated.
     return ScriptValue();
   }
