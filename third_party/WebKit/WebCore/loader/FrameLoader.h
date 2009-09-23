@@ -501,15 +501,13 @@ class FrameLoader : public Noncopyable {
   void updateHistoryForAnchorScroll();
 
   void redirectionTimerFired(Timer<FrameLoader>*);
-  void checkCompletedTimerFired(Timer<FrameLoader>*);
-  void checkLoadCompleteTimerFired(Timer<FrameLoader>*);
+  void checkTimerFired(Timer<FrameLoader>*);
 
   void cancelRedirection(bool newLoadInProgress = false);
 
   void started();
 
   void completed();
-  void parentCompleted();
 
   bool shouldUsePlugin(const KURL&,
                        const String& mimeType,
@@ -711,6 +709,7 @@ class FrameLoader : public Noncopyable {
 
   void scheduleCheckCompleted();
   void scheduleCheckLoadComplete();
+  void startCheckCompleteTimer();
 
   KURL originalRequestURL() const;
 
@@ -718,6 +717,7 @@ class FrameLoader : public Noncopyable {
 
   void saveScrollPositionAndViewStateToItem(HistoryItem*);
 
+  bool allAncestorsAreComplete() const;  // including this
   bool allChildrenAreComplete()
       const;  // immediate children, not all descendants
 
@@ -789,8 +789,9 @@ class FrameLoader : public Noncopyable {
   KURL m_submittedFormURL;
 
   Timer<FrameLoader> m_redirectionTimer;
-  Timer<FrameLoader> m_checkCompletedTimer;
-  Timer<FrameLoader> m_checkLoadCompleteTimer;
+  Timer<FrameLoader> m_checkTimer;
+  bool m_shouldCallCheckCompleted;
+  bool m_shouldCallCheckLoadComplete;
 
   Frame* m_opener;
   HashSet<Frame*> m_openedFrames;
