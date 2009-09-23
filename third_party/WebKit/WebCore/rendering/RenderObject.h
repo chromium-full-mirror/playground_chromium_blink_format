@@ -320,6 +320,7 @@ class RenderObject : public CachedResourceClient {
   virtual bool isRenderPath() const { return false; }
   virtual bool isSVGText() const { return false; }
   virtual bool isSVGImage() const { return false; }
+  virtual bool isSVGForeignObject() const { return false; }
 
   // Per SVG 1.1 objectBoundingBox ignores clipping, masking, filter effects,
   // opacity and stroke-width.

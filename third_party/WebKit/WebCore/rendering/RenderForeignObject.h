@@ -60,6 +60,7 @@ class RenderForeignObject : public RenderSVGBlock {
                            int tx,
                            int ty,
                            HitTestAction);
+  virtual bool isSVGForeignObject() const { return true; }
 
  private:
   TransformationMatrix translationForAttributes() const;
