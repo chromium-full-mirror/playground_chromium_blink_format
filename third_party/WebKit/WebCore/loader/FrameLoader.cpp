@@ -138,6 +138,7 @@ struct ScheduledRedirection {
   const bool wasUserGesture;
   const bool wasRefresh;
   const bool wasDuringLoad;
+  bool toldClient;
 
   ScheduledRedirection(double delay,
                        const String& url,
@@ -153,7 +154,8 @@ struct ScheduledRedirection {
         lockBackForwardList(lockBackForwardList),
         wasUserGesture(wasUserGesture),
         wasRefresh(refresh),
-        wasDuringLoad(false) {
+        wasDuringLoad(false),
+        toldClient(false) {
     ASSERT(!url.isEmpty());
   }
 
@@ -173,7 +175,8 @@ struct ScheduledRedirection {
         lockBackForwardList(lockBackForwardList),
         wasUserGesture(wasUserGesture),
         wasRefresh(refresh),
-        wasDuringLoad(duringLoad) {
+        wasDuringLoad(duringLoad),
+        toldClient(false) {
     ASSERT(!url.isEmpty());
   }
 
@@ -185,7 +188,8 @@ struct ScheduledRedirection {
         lockBackForwardList(false),
         wasUserGesture(false),
         wasRefresh(false),
-        wasDuringLoad(false) {}
+        wasDuringLoad(false),
+        toldClient(false) {}
 
   ScheduledRedirection(const FrameLoadRequest& frameRequest,
                        bool lockHistory,
@@ -203,7 +207,8 @@ struct ScheduledRedirection {
         lockBackForwardList(lockBackForwardList),
         wasUserGesture(false),
         wasRefresh(false),
-        wasDuringLoad(duringLoad) {
+        wasDuringLoad(duringLoad),
+        toldClient(false) {
     ASSERT(!frameRequest.isEmpty());
     ASSERT(this->formState);
   }
@@ -661,8 +666,7 @@ void FrameLoader::stopLoading(UnloadEventPolicy unloadEventPolicy,
       m_frame->document()->removeAllEventListeners();
   }
 
-  m_isComplete =
-      true;  // to avoid calling completed() in finishedParsing() (David)
+  m_isComplete = true;  // to avoid calling completed() in finishedParsing()
   m_isLoadingMainResource = false;
   m_didCallImplicitClose = true;  // don't want that one either
 
@@ -723,8 +727,6 @@ void FrameLoader::cancelRedirection(bool cancelWithLoadInProgress) {
   m_cancellingWithLoadInProgress = cancelWithLoadInProgress;
 
   stopRedirectionTimer();
-
-  m_scheduledRedirection.clear();
 }
 
 KURL FrameLoader::iconURL() {
@@ -1333,15 +1335,22 @@ void FrameLoader::loadDone() {
   checkCompleted();
 }
 
+bool FrameLoader::allChildrenAreComplete() const {
+  for (Frame* child = m_frame->tree()->firstChild(); child;
+       child = child->tree()->nextSibling()) {
+    if (!child->loader()->m_isComplete)
+      return false;
+  }
+  return true;
+}
+
 void FrameLoader::checkCompleted() {
   if (m_frame->view())
     m_frame->view()->checkStopDelayingDeferredRepaints();
 
   // Any frame that hasn't completed yet?
-  for (Frame* child = m_frame->tree()->firstChild(); child;
-       child = child->tree()->nextSibling())
-    if (!child->loader()->m_isComplete)
-      return;
+  if (!allChildrenAreComplete())
+    return;
 
   // Have we completed before?
   if (m_isComplete)
@@ -1395,11 +1404,8 @@ void FrameLoader::checkCallImplicitClose() {
   if (m_didCallImplicitClose || m_frame->document()->parsing())
     return;
 
-  for (Frame* child = m_frame->tree()->firstChild(); child;
-       child = child->tree()->nextSibling())
-    if (!child->loader()
-             ->m_isComplete)  // still got a frame running -> too early
-      return;
+  if (!allChildrenAreComplete())
+    return;  // still got a frame running -> too early
 
   m_didCallImplicitClose = true;
   m_wasUnloadEventEmitted = false;
@@ -2296,7 +2302,8 @@ bool FrameLoader::isComplete() const {
   return m_isComplete;
 }
 
-void FrameLoader::scheduleRedirection(ScheduledRedirection* redirection) {
+void FrameLoader::scheduleRedirection(
+    PassOwnPtr<ScheduledRedirection> redirection) {
   ASSERT(m_frame->page());
 
   // If a redirect was scheduled during a load, then stop the current load.
@@ -2309,10 +2316,12 @@ void FrameLoader::scheduleRedirection(ScheduledRedirection* redirection) {
   }
 
   stopRedirectionTimer();
-  m_scheduledRedirection.set(redirection);
-  if (!m_isComplete && redirection->type != ScheduledRedirection::redirection)
+  m_scheduledRedirection = redirection;
+  if (!m_isComplete &&
+      m_scheduledRedirection->type != ScheduledRedirection::redirection)
     completed();
-  if (m_isComplete || redirection->type != ScheduledRedirection::redirection)
+  if (m_isComplete ||
+      m_scheduledRedirection->type != ScheduledRedirection::redirection)
     startRedirectionTimer();
 }
 
@@ -2326,6 +2335,9 @@ void FrameLoader::startRedirectionTimer() {
   switch (m_scheduledRedirection->type) {
     case ScheduledRedirection::locationChange:
     case ScheduledRedirection::redirection:
+      if (m_scheduledRedirection->toldClient)
+        return;
+      m_scheduledRedirection->toldClient = true;
       clientRedirected(KURL(ParsedURLString, m_scheduledRedirection->url),
                        m_scheduledRedirection->delay,
                        currentTime() + m_redirectionTimer.nextFireInterval(),
@@ -2346,30 +2358,11 @@ void FrameLoader::startRedirectionTimer() {
 }
 
 void FrameLoader::stopRedirectionTimer() {
-  if (!m_redirectionTimer.isActive())
-    return;
-
   m_redirectionTimer.stop();
 
-  if (m_scheduledRedirection) {
-    switch (m_scheduledRedirection->type) {
-      case ScheduledRedirection::locationChange:
-      case ScheduledRedirection::redirection:
-        clientRedirectCancelledOrFinished(m_cancellingWithLoadInProgress);
-        return;
-      case ScheduledRedirection::formSubmission:
-        // FIXME: It would make sense to report form submissions as client
-        // redirects too.
-        // But we didn't do that in the past when form submission used a
-        // separate delay
-        // mechanism, so doing it will be a behavior change.
-        return;
-      case ScheduledRedirection::historyNavigation:
-        // Don't report history navigations.
-        return;
-    }
-    ASSERT_NOT_REACHED();
-  }
+  OwnPtr<ScheduledRedirection> redirection(m_scheduledRedirection.release());
+  if (redirection && redirection->toldClient)
+    clientRedirectCancelledOrFinished(m_cancellingWithLoadInProgress);
 }
 
 void FrameLoader::completed() {

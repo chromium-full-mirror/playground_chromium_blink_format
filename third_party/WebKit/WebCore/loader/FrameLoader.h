@@ -36,6 +36,7 @@
 #include "ResourceRequest.h"
 #include "ThreadableLoader.h"
 #include "Timer.h"
+#include <wtf/Forward.h>
 
 namespace WebCore {
 
@@ -610,7 +611,7 @@ class FrameLoader : public Noncopyable {
   bool shouldReloadToHandleUnreachableURL(DocumentLoader*);
   void handleUnimplementablePolicy(const ResourceError&);
 
-  void scheduleRedirection(ScheduledRedirection*);
+  void scheduleRedirection(PassOwnPtr<ScheduledRedirection>);
   void startRedirectionTimer();
   void stopRedirectionTimer();
 
@@ -716,6 +717,9 @@ class FrameLoader : public Noncopyable {
   bool shouldTreatURLAsSameAsCurrent(const KURL&) const;
 
   void saveScrollPositionAndViewStateToItem(HistoryItem*);
+
+  bool allChildrenAreComplete()
+      const;  // immediate children, not all descendants
 
   Frame* m_frame;
   FrameLoaderClient* m_client;
