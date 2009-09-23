@@ -46,6 +46,8 @@ extern const int WebCoreScrollbarAlwaysOn;
   BOOL suppressLayout;
   BOOL suppressScrollers;
   BOOL inUpdateScrollers;
+  BOOL verticallyPinnedByPreviousWheelEvent;
+  BOOL horizontallyPinnedByPreviousWheelEvent;
   unsigned inUpdateScrollersLayoutPass;
 }
 - (void)setAllowsHorizontalScrolling:

@@ -417,6 +417,8 @@ class EventHandler : public Noncopyable {
   RefPtr<Node> m_latchedWheelEventNode;
   bool m_widgetIsLatched;
 
+  RefPtr<Node> m_previousWheelScrolledNode;
+
 #if PLATFORM(MAC)
   NSView* m_mouseDownView;
   bool m_sendingEventToSubview;

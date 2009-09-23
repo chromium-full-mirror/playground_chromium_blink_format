@@ -107,7 +107,8 @@ static inline void scrollAndAcceptEvent(float delta,
                                         ScrollDirection positiveDirection,
                                         ScrollDirection negativeDirection,
                                         PlatformWheelEvent& e,
-                                        Node* node) {
+                                        Node* node,
+                                        Node** stopNode) {
   if (!delta)
     return;
 
@@ -116,13 +117,14 @@ static inline void scrollAndAcceptEvent(float delta,
 
   if (e.granularity() == ScrollByPageWheelEvent) {
     if (enclosingBox->scroll(delta < 0 ? negativeDirection : positiveDirection,
-                             ScrollByPage, 1))
+                             ScrollByPage, 1, stopNode))
       e.accept();
     return;
   }
+
   float pixelsToScroll = delta > 0 ? delta : -delta;
   if (enclosingBox->scroll(delta < 0 ? negativeDirection : positiveDirection,
-                           ScrollByPixel, pixelsToScroll))
+                           ScrollByPixel, pixelsToScroll, stopNode))
     e.accept();
 }
 
@@ -213,6 +215,7 @@ void EventHandler::clear() {
   m_capturesDragging = false;
   m_capturingMouseEventsNode = 0;
   m_latchedWheelEventNode = 0;
+  m_previousWheelScrolledNode = 0;
 }
 
 void EventHandler::selectClosestWordFromMouseEvent(
@@ -1953,6 +1956,8 @@ bool EventHandler::handleWheelEvent(PlatformWheelEvent& e) {
   } else {
     if (m_latchedWheelEventNode)
       m_latchedWheelEventNode = 0;
+    if (m_previousWheelScrolledNode)
+      m_previousWheelScrolledNode = 0;
 
     HitTestRequest request(HitTestRequest::ReadOnly);
     HitTestResult result(vPoint);
@@ -1989,8 +1994,13 @@ bool EventHandler::handleWheelEvent(PlatformWheelEvent& e) {
       // Just break up into two scrolls if we need to.  Diagonal movement on
       // a MacBook pro is an example of a 2-dimensional mouse wheel event (where
       // both deltaX and deltaY can be set).
-      scrollAndAcceptEvent(e.deltaX(), ScrollLeft, ScrollRight, e, node);
-      scrollAndAcceptEvent(e.deltaY(), ScrollUp, ScrollDown, e, node);
+      Node* stopNode = m_previousWheelScrolledNode.get();
+      scrollAndAcceptEvent(e.deltaX(), ScrollLeft, ScrollRight, e, node,
+                           &stopNode);
+      scrollAndAcceptEvent(e.deltaY(), ScrollUp, ScrollDown, e, node,
+                           &stopNode);
+      if (!m_useLatchedWheelEventNode)
+        m_previousWheelScrolledNode = stopNode;
     }
   }
 
