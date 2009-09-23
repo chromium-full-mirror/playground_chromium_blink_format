@@ -36,7 +36,7 @@ namespace JSC {
 Completion checkSyntax(ExecState* exec, const SourceCode& source) {
   JSLock lock(exec);
 
-  ProgramExecutable program(source);
+  ProgramExecutable program(exec, source);
   JSObject* error = program.checkSyntax(exec);
   if (error)
     return Completion(Throw, error);
@@ -50,7 +50,7 @@ Completion evaluate(ExecState* exec,
                     JSValue thisValue) {
   JSLock lock(exec);
 
-  ProgramExecutable program(source);
+  ProgramExecutable program(exec, source);
   JSObject* error = program.compile(exec, scopeChain.node());
   if (error)
     return Completion(Throw, error);

@@ -301,7 +301,7 @@ JSValue JSC_HOST_CALL globalFuncEval(ExecState* exec,
   if (JSValue parsedObject = preparser.tryLiteralParse())
     return parsedObject;
 
-  EvalExecutable eval(makeSource(s));
+  EvalExecutable eval(exec, makeSource(s));
   JSObject* error = eval.compile(
       exec,
       static_cast<JSGlobalObject*>(unwrappedObject)->globalScopeChain().node());

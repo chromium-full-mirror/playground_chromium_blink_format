@@ -539,8 +539,16 @@ class BytecodeGenerator : public FastAllocBase {
   RegisterID* addConstantValue(JSValue);
   unsigned addRegExp(RegExp*);
 
-  PassRefPtr<FunctionExecutable> makeFunction(FunctionBodyNode* body) {
-    return FunctionExecutable::create(body->ident(), body->source(),
+  PassRefPtr<FunctionExecutable> makeFunction(ExecState* exec,
+                                              FunctionBodyNode* body) {
+    return FunctionExecutable::create(exec, body->ident(), body->source(),
+                                      body->usesArguments(), body->parameters(),
+                                      body->lineNo(), body->lastLine());
+  }
+
+  PassRefPtr<FunctionExecutable> makeFunction(JSGlobalData* globalData,
+                                              FunctionBodyNode* body) {
+    return FunctionExecutable::create(globalData, body->ident(), body->source(),
                                       body->usesArguments(), body->parameters(),
                                       body->lineNo(), body->lastLine());
   }

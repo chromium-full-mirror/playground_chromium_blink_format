@@ -294,9 +294,9 @@ PassRefPtr<FunctionExecutable> FunctionExecutable::fromGlobalCode(
 
   FunctionBodyNode* body = static_cast<FuncExprNode*>(funcExpr)->body();
   ASSERT(body);
-  return FunctionExecutable::create(functionName, body->source(),
-                                    body->usesArguments(), body->parameters(),
-                                    body->lineNo(), body->lastLine());
+  return FunctionExecutable::create(
+      &exec->globalData(), functionName, body->source(), body->usesArguments(),
+      body->parameters(), body->lineNo(), body->lastLine());
 }
 
 UString FunctionExecutable::paramString() const {

@@ -38,6 +38,8 @@
 
 namespace JSC {
 
+class ScriptExecutable;
+
 class SamplingFlags {
   friend class JIT;
 
@@ -84,23 +86,23 @@ class Interpreter;
 class ScopeNode;
 struct Instruction;
 
-struct ScopeSampleRecord {
-  ScopeSampleRecord(ScopeNode* scope)
-      : m_scope(scope),
+struct ScriptSampleRecord {
+  ScriptSampleRecord(ScriptExecutable* executable)
+      : m_executable(executable),
         m_codeBlock(0),
         m_sampleCount(0),
         m_opcodeSampleCount(0),
         m_samples(0),
         m_size(0) {}
 
-  ~ScopeSampleRecord() {
+  ~ScriptSampleRecord() {
     if (m_samples)
       free(m_samples);
   }
 
   void sample(CodeBlock*, Instruction*);
 
-  RefPtr<ScopeNode> m_scope;
+  ScriptExecutable* m_executable;
   CodeBlock* m_codeBlock;
   int m_sampleCount;
   int m_opcodeSampleCount;
@@ -108,7 +110,8 @@ struct ScopeSampleRecord {
   unsigned m_size;
 };
 
-typedef WTF::HashMap<ScopeNode*, ScopeSampleRecord*> ScopeSampleRecordMap;
+typedef WTF::HashMap<ScriptExecutable*, ScriptSampleRecord*>
+    ScriptSampleRecordMap;
 
 class SamplingThread {
  public:
@@ -173,7 +176,7 @@ class SamplingTool {
         m_opcodeSampleCount(0)
 #if ENABLE(CODEBLOCK_SAMPLING)
         ,
-        m_scopeSampleMap(new ScopeSampleRecordMap())
+        m_scopeSampleMap(new ScriptSampleRecordMap())
 #endif
   {
     memset(m_opcodeSamples, 0, sizeof(m_opcodeSamples));
@@ -190,7 +193,7 @@ class SamplingTool {
   void setup();
   void dump(ExecState*);
 
-  void notifyOfScope(ScopeNode* scope);
+  void notifyOfScope(ScriptExecutable* scope);
 
   void sample(CodeBlock* codeBlock, Instruction* vPC) {
     ASSERT(!(reinterpret_cast<intptr_t>(vPC) & 0x3));
@@ -247,8 +250,8 @@ class SamplingTool {
   unsigned m_opcodeSamplesInCTIFunctions[numOpcodeIDs];
 
 #if ENABLE(CODEBLOCK_SAMPLING)
-  Mutex m_scopeSampleMapMutex;
-  OwnPtr<ScopeSampleRecordMap> m_scopeSampleMap;
+  Mutex m_scriptSampleMapMutex;
+  OwnPtr<ScriptSampleRecordMap> m_scopeSampleMap;
 #endif
 };
 
