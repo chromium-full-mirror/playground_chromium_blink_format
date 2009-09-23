@@ -895,7 +895,7 @@ bool WebFrameLoaderClient::shouldLoadMediaElementURL(const KURL& url) const {
 
   COMPtr<IWebPolicyDelegatePrivate> policyDelegatePrivate(Query,
                                                           policyDelegate);
-  if (!policyDelegate)
+  if (!policyDelegatePrivate)
     return true;
 
   BOOL retval;
