@@ -39,6 +39,7 @@ class EventListener : public RefCounted<EventListener> {
     JSEventListenerType,
     ImageEventListenerType,
     InspectorDOMAgentType,
+    InspectorDOMStorageResourceType,
     ObjCEventListenerType,
     ConditionEventListenerType
   };

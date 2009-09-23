@@ -74,6 +74,7 @@ class ResourceError;
 class ScriptCallStack;
 class ScriptString;
 class SharedBuffer;
+class Storage;
 class StorageArea;
 
 class ConsoleMessage;
@@ -287,6 +288,13 @@ class InspectorController
   void didUseDOMStorage(StorageArea* storageArea,
                         bool isLocalStorage,
                         Frame* frame);
+  void selectDOMStorage(Storage* storage);
+  void getDOMStorageEntries(int callId, int storageId);
+  void setDOMStorageItem(long callId,
+                         long storageId,
+                         const String& key,
+                         const String& value);
+  void removeDOMStorageItem(long callId, long storageId, const String& key);
 #endif
 
   const ResourcesMap& resources() const { return m_resources; }
@@ -369,6 +377,9 @@ class InspectorController
   void startUserInitiatedProfilingSoon();
   void toggleRecordButton(bool);
   void enableDebuggerFromFrontend(bool always);
+#endif
+#if ENABLE(DOM_STORAGE)
+  InspectorDOMStorageResource* getDOMStorageResourceForId(int storageId);
 #endif
 
   void focusNode();
