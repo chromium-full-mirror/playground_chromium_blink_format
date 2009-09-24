@@ -25,6 +25,8 @@
 #include <QtCore/qglobal.h>
 #include <QtCore/qshareddata.h>
 
+class QWebPagePrivate;
+
 class Q_AUTOTEST_EXPORT QWebHistoryItemPrivate : public QSharedData {
  public:
   static QExplicitlySharedDataPointer<QWebHistoryItemPrivate> get(
@@ -51,6 +53,9 @@ class QWebHistoryPrivate : public QSharedData {
     lst = l;
   }
   ~QWebHistoryPrivate() { lst->deref(); }
+
+  QWebPagePrivate* page();
+
   WebCore::BackForwardList* lst;
 };
 
