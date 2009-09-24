@@ -1925,7 +1925,7 @@ bool EventHandler::dispatchMouseEvent(const AtomicString& eventType,
 
 #if !PLATFORM(GTK)
 bool EventHandler::shouldTurnVerticalTicksIntoHorizontal(
-    const HitTestResult& result) const {
+    const HitTestResult&) const {
   return false;
 }
 #endif
