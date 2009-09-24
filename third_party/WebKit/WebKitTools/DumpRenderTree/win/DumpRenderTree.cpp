@@ -134,7 +134,8 @@ bool setAlwaysAcceptCookies(bool alwaysAcceptCookies) {
   CFHTTPCookieStorageSetCookieAcceptPolicy(cookieStorage, cookieAcceptPolicy);
   return true;
 #else
-// FIXME: Implement!
+  // FIXME: Implement!
+  return false;
 #endif
 }
 
