@@ -59,9 +59,6 @@ class ActiveDOMObject {
   virtual void resume();
   virtual void stop();
 
- protected:
-  virtual ~ActiveDOMObject();
-
   template <class T>
   void setPendingActivity(T* thisObject) {
     ASSERT(thisObject == this);
@@ -75,6 +72,9 @@ class ActiveDOMObject {
     --m_pendingActivityCount;
     thisObject->deref();
   }
+
+ protected:
+  virtual ~ActiveDOMObject();
 
  private:
   ScriptExecutionContext* m_scriptExecutionContext;
