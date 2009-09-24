@@ -1923,6 +1923,13 @@ bool EventHandler::dispatchMouseEvent(const AtomicString& eventType,
   return swallowEvent;
 }
 
+#if !PLATFORM(GTK)
+bool EventHandler::shouldTurnVerticalTicksIntoHorizontal(
+    const HitTestResult& result) const {
+  return false;
+}
+#endif
+
 bool EventHandler::handleWheelEvent(PlatformWheelEvent& e) {
   Document* doc = m_frame->document();
 
@@ -1941,11 +1948,12 @@ bool EventHandler::handleWheelEvent(PlatformWheelEvent& e) {
   bool isOverWidget;
   bool didSetLatchedNode = false;
 
+  HitTestRequest request(HitTestRequest::ReadOnly);
+  HitTestResult result(vPoint);
+  doc->renderView()->layer()->hitTest(request, result);
+
   if (m_useLatchedWheelEventNode) {
     if (!m_latchedWheelEventNode) {
-      HitTestRequest request(HitTestRequest::ReadOnly);
-      HitTestResult result(vPoint);
-      doc->renderView()->layer()->hitTest(request, result);
       m_latchedWheelEventNode = result.innerNode();
       m_widgetIsLatched = result.isOverWidget();
       didSetLatchedNode = true;
@@ -1959,12 +1967,12 @@ bool EventHandler::handleWheelEvent(PlatformWheelEvent& e) {
     if (m_previousWheelScrolledNode)
       m_previousWheelScrolledNode = 0;
 
-    HitTestRequest request(HitTestRequest::ReadOnly);
-    HitTestResult result(vPoint);
-    doc->renderView()->layer()->hitTest(request, result);
     node = result.innerNode();
     isOverWidget = result.isOverWidget();
   }
+
+  if (shouldTurnVerticalTicksIntoHorizontal(result))
+    e.turnVerticalTicksIntoHorizontal();
 
   if (node) {
     // Figure out which view to send the event to.
