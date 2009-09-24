@@ -217,7 +217,7 @@ class Frame : public RefCounted<Frame> {
  public:
   void focusWindow();
   void unfocusWindow();
-  bool shouldClose(RegisteredEventListenerVector* alternateEventListeners = 0);
+  bool shouldClose();
   void scheduleClose();
 
   void setJSStatusBarText(const String&);

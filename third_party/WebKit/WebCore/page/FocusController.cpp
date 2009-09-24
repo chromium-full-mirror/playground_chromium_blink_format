@@ -36,6 +36,7 @@
 #include "Event.h"
 #include "EventHandler.h"
 #include "EventNames.h"
+#include "ExceptionCode.h"
 #include "Frame.h"
 #include "FrameView.h"
 #include "FrameTree.h"
@@ -65,7 +66,8 @@ static inline void dispatchEventsOnWindowAndFocusedNode(Document* document,
   if (!focused && document->focusedNode())
     document->focusedNode()->dispatchBlurEvent();
   document->dispatchWindowEvent(
-      focused ? eventNames().focusEvent : eventNames().blurEvent, false, false);
+      Event::create(focused ? eventNames().focusEvent : eventNames().blurEvent,
+                    false, false));
   if (focused && document->focusedNode())
     document->focusedNode()->dispatchFocusEvent();
 }
@@ -86,14 +88,14 @@ void FocusController::setFocusedFrame(PassRefPtr<Frame> frame) {
   // states of both frames.
   if (oldFrame && oldFrame->view()) {
     oldFrame->selection()->setFocused(false);
-    oldFrame->document()->dispatchWindowEvent(eventNames().blurEvent, false,
-                                              false);
+    oldFrame->document()->dispatchWindowEvent(
+        Event::create(eventNames().blurEvent, false, false));
   }
 
   if (newFrame && newFrame->view() && isFocused()) {
     newFrame->selection()->setFocused(true);
-    newFrame->document()->dispatchWindowEvent(eventNames().focusEvent, false,
-                                              false);
+    newFrame->document()->dispatchWindowEvent(
+        Event::create(eventNames().focusEvent, false, false));
   }
 }
 

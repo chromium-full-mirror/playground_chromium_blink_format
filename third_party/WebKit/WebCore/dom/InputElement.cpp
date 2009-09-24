@@ -166,8 +166,7 @@ void InputElement::setValueFromRenderer(InputElementData& data,
 
   element->setFormControlValueMatchesRenderer(true);
 
-  // Fire the "input" DOM event
-  element->dispatchEvent(eventNames().inputEvent, true, false);
+  element->dispatchEvent(Event::create(eventNames().inputEvent, true, false));
   notifyFormStateChanged(element);
 }
 

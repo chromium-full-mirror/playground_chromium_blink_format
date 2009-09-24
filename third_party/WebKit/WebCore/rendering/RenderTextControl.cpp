@@ -530,7 +530,8 @@ void RenderTextControl::selectionChanged(bool userTriggered) {
 
   if (Frame* frame = document()->frame()) {
     if (frame->selection()->isRange() && userTriggered)
-      node()->dispatchEvent(eventNames().selectEvent, true, false);
+      node()->dispatchEvent(
+          Event::create(eventNames().selectEvent, true, false));
   }
 }
 

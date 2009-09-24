@@ -30,8 +30,10 @@
 #include "ContextMenuController.h"
 #include "DOMWindow.h"
 #include "DragController.h"
+#include "ExceptionCode.h"
 #include "EditorClient.h"
 #include "EventNames.h"
+#include "Event.h"
 #include "FileSystem.h"
 #include "FocusController.h"
 #include "Frame.h"
@@ -97,7 +99,8 @@ static void networkStateChanged() {
                                ? eventNames().onlineEvent
                                : eventNames().offlineEvent;
   for (unsigned i = 0; i < frames.size(); i++)
-    frames[i]->document()->dispatchWindowEvent(eventName, false, false);
+    frames[i]->document()->dispatchWindowEvent(
+        Event::create(eventName, false, false));
 }
 
 Page::Page(ChromeClient* chromeClient,

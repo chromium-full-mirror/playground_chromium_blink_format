@@ -36,15 +36,15 @@ class MutationEvent : public Event {
   static PassRefPtr<MutationEvent> create() {
     return adoptRef(new MutationEvent);
   }
+
   static PassRefPtr<MutationEvent> create(const AtomicString& type,
                                           bool canBubble,
-                                          bool cancelable,
-                                          PassRefPtr<Node> relatedNode,
-                                          const String& prevValue,
-                                          const String& newValue,
-                                          const String& attrName,
-                                          unsigned short attrChange) {
-    return adoptRef(new MutationEvent(type, canBubble, cancelable, relatedNode,
+                                          PassRefPtr<Node> relatedNode = 0,
+                                          const String& prevValue = String(),
+                                          const String& newValue = String(),
+                                          const String& attrName = String(),
+                                          unsigned short attrChange = 0) {
+    return adoptRef(new MutationEvent(type, canBubble, false, relatedNode,
                                       prevValue, newValue, attrName,
                                       attrChange));
   }

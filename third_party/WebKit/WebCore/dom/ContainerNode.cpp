@@ -42,8 +42,8 @@
 
 namespace WebCore {
 
-static void dispatchChildInsertionEvents(Node*, ExceptionCode&);
-static void dispatchChildRemovalEvents(Node*, ExceptionCode&);
+static void dispatchChildInsertionEvents(Node*);
+static void dispatchChildRemovalEvents(Node*);
 
 typedef Vector<std::pair<NodeCallback, RefPtr<Node>>> NodeCallbackQueue;
 static NodeCallbackQueue* s_postAttachCallbackQueue;
@@ -147,7 +147,7 @@ bool ContainerNode::insertBefore(PassRefPtr<Node> newChild,
 
     // Dispatch the mutation events.
     childrenChanged(false, refChildPreviousSibling.get(), next.get(), 1);
-    dispatchChildInsertionEvents(child.get(), ec);
+    dispatchChildInsertionEvents(child.get());
 
     // Add child to the rendering tree.
     if (attached() && !child->attached() && child->parent() == this) {
@@ -260,7 +260,7 @@ bool ContainerNode::replaceChild(PassRefPtr<Node> newChild,
     allowEventDispatch();
 
     // Dispatch the mutation events
-    dispatchChildInsertionEvents(child.get(), ec);
+    dispatchChildInsertionEvents(child.get());
 
     // Add child to the rendering tree
     if (attached() && !child->attached() && child->parent() == this) {
@@ -290,7 +290,7 @@ static ExceptionCode willRemoveChild(Node* child) {
   ExceptionCode ec = 0;
 
   // fire removed from document mutation events.
-  dispatchChildRemovalEvents(child, ec);
+  dispatchChildRemovalEvents(child);
   if (ec)
     return ec;
 
@@ -488,7 +488,7 @@ bool ContainerNode::appendChild(PassRefPtr<Node> newChild,
 
     // Dispatch the mutation events
     childrenChanged(false, prev.get(), 0, 1);
-    dispatchChildInsertionEvents(child.get(), ec);
+    dispatchChildInsertionEvents(child.get());
 
     // Add child to the rendering tree
     if (attached() && !child->attached() && child->parent() == this) {
@@ -871,7 +871,7 @@ Node* ContainerNode::childNode(unsigned index) const {
   return n;
 }
 
-static void dispatchChildInsertionEvents(Node* child, ExceptionCode& ec) {
+static void dispatchChildInsertionEvents(Node* child) {
   ASSERT(!eventDispatchForbidden());
 
   RefPtr<Node> c = child;
@@ -885,29 +885,21 @@ static void dispatchChildInsertionEvents(Node* child, ExceptionCode& ec) {
   document->incDOMTreeVersion();
 
   if (c->parentNode() &&
-      document->hasListenerType(Document::DOMNODEINSERTED_LISTENER)) {
-    ec = 0;
-    c->dispatchMutationEvent(eventNames().DOMNodeInsertedEvent, true,
-                             c->parentNode(), String(), String(), ec);
-    if (ec)
-      return;
-  }
+      document->hasListenerType(Document::DOMNODEINSERTED_LISTENER))
+    c->dispatchEvent(MutationEvent::create(eventNames().DOMNodeInsertedEvent,
+                                           true, c->parentNode()));
 
   // dispatch the DOMNodeInsertedIntoDocument event to all descendants
   if (c->inDocument() &&
       document->hasListenerType(
           Document::DOMNODEINSERTEDINTODOCUMENT_LISTENER)) {
-    for (; c; c = c->traverseNextNode(child)) {
-      ec = 0;
-      c->dispatchMutationEvent(eventNames().DOMNodeInsertedIntoDocumentEvent,
-                               false, 0, String(), String(), ec);
-      if (ec)
-        return;
-    }
+    for (; c; c = c->traverseNextNode(child))
+      c->dispatchEvent(MutationEvent::create(
+          eventNames().DOMNodeInsertedIntoDocumentEvent, false));
   }
 }
 
-static void dispatchChildRemovalEvents(Node* child, ExceptionCode& ec) {
+static void dispatchChildRemovalEvents(Node* child) {
   RefPtr<Node> c = child;
   RefPtr<Document> document = child->document();
 
@@ -919,23 +911,18 @@ static void dispatchChildRemovalEvents(Node* child, ExceptionCode& ec) {
 
   // dispatch pre-removal mutation events
   if (c->parentNode() &&
-      document->hasListenerType(Document::DOMNODEREMOVED_LISTENER)) {
-    ec = 0;
-    c->dispatchMutationEvent(eventNames().DOMNodeRemovedEvent, true,
-                             c->parentNode(), String(), String(), ec);
-    if (ec)
-      return;
-  }
+      document->hasListenerType(Document::DOMNODEREMOVED_LISTENER))
+    c->dispatchEvent(MutationEvent::create(eventNames().DOMNodeRemovedEvent,
+                                           true, c->parentNode()));
 
   // dispatch the DOMNodeRemovedFromDocument event to all descendants
   if (c->inDocument() &&
-      document->hasListenerType(Document::DOMNODEREMOVEDFROMDOCUMENT_LISTENER))
-    for (; c; c = c->traverseNextNode(child)) {
-      ec = 0;
-      c->dispatchMutationEvent(eventNames().DOMNodeRemovedFromDocumentEvent,
-                               false, 0, String(), String(), ec);
-      if (ec)
-        return;
-    }
+      document->hasListenerType(
+          Document::DOMNODEREMOVEDFROMDOCUMENT_LISTENER)) {
+    for (; c; c = c->traverseNextNode(child))
+      c->dispatchEvent(MutationEvent::create(
+          eventNames().DOMNodeRemovedFromDocumentEvent, false));
+  }
 }
-}
+
+}  // namespace WebCore

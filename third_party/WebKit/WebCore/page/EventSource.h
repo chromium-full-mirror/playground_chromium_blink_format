@@ -50,6 +50,7 @@
 
 namespace WebCore {
 
+class MessageEvent;
 class ResourceResponse;
 class TextResourceDecoder;
 class ThreadableLoader;
@@ -78,26 +79,9 @@ class EventSource : public RefCounted<EventSource>,
 
   State readyState() const;
 
-  void setOnopen(PassRefPtr<EventListener> eventListener) {
-    m_attributeListeners.set(eventNames().openEvent, eventListener);
-  }
-  EventListener* onopen() const {
-    return m_attributeListeners.get(eventNames().openEvent).get();
-  }
-
-  void setOnmessage(PassRefPtr<EventListener> eventListener) {
-    m_attributeListeners.set(eventNames().messageEvent, eventListener);
-  }
-  EventListener* onmessage() const {
-    return m_attributeListeners.get(eventNames().messageEvent).get();
-  }
-
-  void setOnerror(PassRefPtr<EventListener> eventListener) {
-    m_attributeListeners.set(eventNames().errorEvent, eventListener);
-  }
-  EventListener* onerror() const {
-    return m_attributeListeners.get(eventNames().errorEvent).get();
-  }
+  DEFINE_ATTRIBUTE_EVENT_LISTENER(open);
+  DEFINE_ATTRIBUTE_EVENT_LISTENER(message);
+  DEFINE_ATTRIBUTE_EVENT_LISTENER(error);
 
   void close();
 
@@ -106,18 +90,6 @@ class EventSource : public RefCounted<EventSource>,
 
   virtual EventSource* toEventSource() { return this; }
   virtual ScriptExecutionContext* scriptExecutionContext() const;
-
-  typedef Vector<RefPtr<EventListener>> ListenerVector;
-  typedef HashMap<AtomicString, ListenerVector> EventListenersMap;
-
-  virtual void addEventListener(const AtomicString& eventType,
-                                PassRefPtr<EventListener>,
-                                bool useCapture);
-  virtual void removeEventListener(const AtomicString& eventType,
-                                   EventListener*,
-                                   bool useCapture);
-  virtual bool dispatchEvent(PassRefPtr<Event>, ExceptionCode&);
-  EventListenersMap& eventListeners() { return m_eventListeners; }
 
   virtual void stop();
 
@@ -128,6 +100,8 @@ class EventSource : public RefCounted<EventSource>,
 
   virtual void refEventTarget() { ref(); }
   virtual void derefEventTarget() { deref(); }
+  virtual EventTargetData* eventTargetData();
+  virtual EventTargetData* ensureEventTargetData();
 
   virtual void didReceiveResponse(const ResourceResponse& response);
   virtual void didReceiveData(const char* data, int length);
@@ -141,14 +115,10 @@ class EventSource : public RefCounted<EventSource>,
   void reconnectTimerFired(Timer<EventSource>*);
   void parseEventStream();
   void parseEventStreamLine(unsigned int pos, int fieldLength, int lineLength);
-  void dispatchGenericEvent(const AtomicString& type);
-  void dispatchMessageEvent();
+  PassRefPtr<MessageEvent> createMessageEvent();
 
   KURL m_url;
   State m_state;
-
-  HashMap<AtomicString, RefPtr<EventListener>> m_attributeListeners;
-  EventListenersMap m_eventListeners;
 
   RefPtr<TextResourceDecoder> m_decoder;
   RefPtr<ThreadableLoader> m_loader;
@@ -162,6 +132,8 @@ class EventSource : public RefCounted<EventSource>,
   String m_lastEventId;
   unsigned long long m_reconnectDelay;
   String m_origin;
+
+  EventTargetData m_eventTargetData;
 };
 
 }  // namespace WebCore

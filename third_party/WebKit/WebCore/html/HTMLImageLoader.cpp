@@ -25,6 +25,7 @@
 #include "CSSHelper.h"
 #include "CachedImage.h"
 #include "Element.h"
+#include "Event.h"
 #include "EventNames.h"
 #include "HTMLNames.h"
 #include "HTMLObjectElement.h"
@@ -42,9 +43,9 @@ void HTMLImageLoader::dispatchLoadEvent() {
         element()->hasTagName(HTMLNames::objectTag);  // An <object> considers a
                                                       // 404 to be an error and
                                                       // should fire onerror.
-  element()->dispatchEvent(
+  element()->dispatchEvent(Event::create(
       errorOccurred ? eventNames().errorEvent : eventNames().loadEvent, false,
-      false);
+      false));
 }
 
 String HTMLImageLoader::sourceURI(const AtomicString& attr) const {

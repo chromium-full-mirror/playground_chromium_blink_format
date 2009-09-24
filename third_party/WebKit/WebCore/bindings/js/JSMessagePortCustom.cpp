@@ -44,8 +44,6 @@ namespace WebCore {
 void JSMessagePort::markChildren(MarkStack& markStack) {
   Base::markChildren(markStack);
 
-  markIfNotNull(markStack, m_impl->onmessage());
-
   // If we have a locally entangled port, we can directly mark it as reachable.
   // Ports that are remotely entangled are marked in-use by
   // markActiveObjectsForContext().
@@ -56,15 +54,7 @@ void JSMessagePort::markChildren(MarkStack& markStack) {
       markStack.append(wrapper);
   }
 
-  typedef MessagePort::EventListenersMap EventListenersMap;
-  typedef MessagePort::ListenerVector ListenerVector;
-  EventListenersMap& eventListeners = m_impl->eventListeners();
-  for (EventListenersMap::iterator mapIter = eventListeners.begin();
-       mapIter != eventListeners.end(); ++mapIter) {
-    for (ListenerVector::iterator vecIter = mapIter->second.begin();
-         vecIter != mapIter->second.end(); ++vecIter)
-      (*vecIter)->markJSFunction(markStack);
-  }
+  m_impl->markEventListeners(markStack);
 }
 
 JSValue JSMessagePort::addEventListener(ExecState* exec, const ArgList& args) {

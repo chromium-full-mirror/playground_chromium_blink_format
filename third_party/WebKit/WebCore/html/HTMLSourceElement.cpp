@@ -28,6 +28,7 @@
 #if ENABLE(VIDEO)
 #include "HTMLSourceElement.h"
 
+#include "Event.h"
 #include "EventNames.h"
 #include "HTMLDocument.h"
 #include "HTMLMediaElement.h"
@@ -94,7 +95,7 @@ void HTMLSourceElement::cancelPendingErrorEvent() {
 }
 
 void HTMLSourceElement::errorEventTimerFired(Timer<HTMLSourceElement>*) {
-  dispatchEvent(eventNames().errorEvent, false, true);
+  dispatchEvent(Event::create(eventNames().errorEvent, false, true));
 }
 }
 #endif

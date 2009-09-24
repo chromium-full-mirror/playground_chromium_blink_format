@@ -55,7 +55,7 @@ class JSEventListener : public EventListener {
 
  private:
   virtual void markJSFunction(JSC::MarkStack&);
-  virtual void handleEvent(Event*, bool isWindowEvent);
+  virtual void handleEvent(Event*);
   virtual bool reportError(const String& message,
                            const String& url,
                            int lineNumber);

@@ -35,6 +35,8 @@
 #include "DedicatedWorkerThread.h"
 #include "DOMWindow.h"
 #include "Document.h"
+#include "ErrorEvent.h"
+#include "ExceptionCode.h"
 #include "GenericWorkerTask.h"
 #include "MessageEvent.h"
 #include "ScriptExecutionContext.h"
@@ -61,7 +63,7 @@ class MessageWorkerContextTask : public ScriptExecutionContext::Task {
         static_cast<DedicatedWorkerContext*>(scriptContext);
     OwnPtr<MessagePortArray> ports =
         MessagePort::entanglePorts(*scriptContext, m_channels.release());
-    context->dispatchMessage(m_message, ports.release());
+    context->dispatchEvent(MessageEvent::create(ports.release(), m_message));
     context->thread()->workerObjectProxy().confirmMessageFromWorkerObject(
         context->hasPendingActivity());
   }
@@ -95,7 +97,8 @@ class MessageWorkerTask : public ScriptExecutionContext::Task {
 
     OwnPtr<MessagePortArray> ports =
         MessagePort::entanglePorts(*scriptContext, m_channels.release());
-    workerObject->dispatchMessage(m_message, ports.release());
+    workerObject->dispatchEvent(
+        MessageEvent::create(ports.release(), m_message));
   }
 
  private:
@@ -136,9 +139,8 @@ class WorkerExceptionTask : public ScriptExecutionContext::Task {
     // because terminated workers no longer deliver messages (section 4.6 of the
     // WebWorker spec), but they do report exceptions.
 
-    bool errorHandled = workerObject->dispatchScriptErrorEvent(
-        m_errorMessage, m_sourceURL, m_lineNumber);
-
+    bool errorHandled = !workerObject->dispatchEvent(
+        ErrorEvent::create(m_errorMessage, m_sourceURL, m_lineNumber));
     if (!errorHandled)
       context->reportException(m_errorMessage, m_lineNumber, m_sourceURL);
   }

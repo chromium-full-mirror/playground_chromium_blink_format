@@ -36,6 +36,7 @@
 #include "ActiveDOMObject.h"
 #include "AtomicStringHash.h"
 #include "EventListener.h"
+#include "EventNames.h"
 #include "EventTarget.h"
 #include "KURL.h"
 #include "WebSocketChannelClient.h"
@@ -70,35 +71,14 @@ class WebSocket : public RefCounted<WebSocket>,
   State readyState() const;
   unsigned long bufferedAmount() const;
 
-  void setOnopen(PassRefPtr<EventListener> eventListener) {
-    m_onopen = eventListener;
-  }
-  EventListener* onopen() const { return m_onopen.get(); }
-  void setOnmessage(PassRefPtr<EventListener> eventListener) {
-    m_onmessage = eventListener;
-  }
-  EventListener* onmessage() const { return m_onmessage.get(); }
-  void setOnclose(PassRefPtr<EventListener> eventListener) {
-    m_onclose = eventListener;
-  }
-  EventListener* onclose() const { return m_onclose.get(); }
+  DEFINE_ATTRIBUTE_EVENT_LISTENER(open);
+  DEFINE_ATTRIBUTE_EVENT_LISTENER(message);
+  DEFINE_ATTRIBUTE_EVENT_LISTENER(close);
 
   // EventTarget
   virtual WebSocket* toWebSocket() { return this; }
 
   virtual ScriptExecutionContext* scriptExecutionContext() const;
-
-  typedef Vector<RefPtr<EventListener>> ListenerVector;
-  typedef HashMap<AtomicString, ListenerVector> EventListenersMap;
-
-  virtual void addEventListener(const AtomicString& eventType,
-                                PassRefPtr<EventListener>,
-                                bool useCapture);
-  virtual void removeEventListener(const AtomicString& eventType,
-                                   EventListener*,
-                                   bool useCapture);
-  virtual bool dispatchEvent(PassRefPtr<Event>, ExceptionCode&);
-  EventListenersMap& eventListeners() { return m_eventListeners; }
 
   // ActiveDOMObject
   //  virtual bool hasPendingActivity() const;
@@ -121,6 +101,8 @@ class WebSocket : public RefCounted<WebSocket>,
 
   virtual void refEventTarget() { ref(); }
   virtual void derefEventTarget() { deref(); }
+  virtual EventTargetData* eventTargetData();
+  virtual EventTargetData* ensureEventTargetData();
 
   void dispatchOpenEvent(Event*);
   void dispatchMessageEvent(Event*);
@@ -128,14 +110,10 @@ class WebSocket : public RefCounted<WebSocket>,
 
   RefPtr<WebSocketChannel> m_channel;
 
-  RefPtr<EventListener> m_onopen;
-  RefPtr<EventListener> m_onmessage;
-  RefPtr<EventListener> m_onclose;
-  EventListenersMap m_eventListeners;
-
   State m_state;
   KURL m_url;
   String m_protocol;
+  EventTargetData m_eventTargetData;
 };
 
 }  // namespace WebCore

@@ -42,11 +42,11 @@ class MessageEvent : public Event {
   static PassRefPtr<MessageEvent> create() {
     return adoptRef(new MessageEvent);
   }
-  static PassRefPtr<MessageEvent> create(const String& data,
-                                         const String& origin,
-                                         const String& lastEventId,
-                                         PassRefPtr<DOMWindow> source,
-                                         PassOwnPtr<MessagePortArray> ports) {
+  static PassRefPtr<MessageEvent> create(PassOwnPtr<MessagePortArray> ports,
+                                         const String& data = "",
+                                         const String& origin = "",
+                                         const String& lastEventId = "",
+                                         PassRefPtr<DOMWindow> source = 0) {
     return adoptRef(new MessageEvent(data, origin, lastEventId, source, ports));
   }
   virtual ~MessageEvent();

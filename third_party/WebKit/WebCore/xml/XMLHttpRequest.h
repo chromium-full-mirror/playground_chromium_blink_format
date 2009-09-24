@@ -24,6 +24,7 @@
 #include "ActiveDOMObject.h"
 #include "AtomicStringHash.h"
 #include "EventListener.h"
+#include "EventNames.h"
 #include "EventTarget.h"
 #include "FormData.h"
 #include "ResourceResponse.h"
@@ -104,51 +105,12 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
   XMLHttpRequestUpload* upload();
   XMLHttpRequestUpload* optionalUpload() const { return m_upload.get(); }
 
-  void setOnreadystatechange(PassRefPtr<EventListener> eventListener) {
-    m_onReadyStateChangeListener = eventListener;
-  }
-  EventListener* onreadystatechange() const {
-    return m_onReadyStateChangeListener.get();
-  }
-
-  void setOnabort(PassRefPtr<EventListener> eventListener) {
-    m_onAbortListener = eventListener;
-  }
-  EventListener* onabort() const { return m_onAbortListener.get(); }
-
-  void setOnerror(PassRefPtr<EventListener> eventListener) {
-    m_onErrorListener = eventListener;
-  }
-  EventListener* onerror() const { return m_onErrorListener.get(); }
-
-  void setOnload(PassRefPtr<EventListener> eventListener) {
-    m_onLoadListener = eventListener;
-  }
-  EventListener* onload() const { return m_onLoadListener.get(); }
-
-  void setOnloadstart(PassRefPtr<EventListener> eventListener) {
-    m_onLoadStartListener = eventListener;
-  }
-  EventListener* onloadstart() const { return m_onLoadStartListener.get(); }
-
-  void setOnprogress(PassRefPtr<EventListener> eventListener) {
-    m_onProgressListener = eventListener;
-  }
-  EventListener* onprogress() const { return m_onProgressListener.get(); }
-
-  typedef Vector<RefPtr<EventListener>> ListenerVector;
-  typedef HashMap<AtomicString, ListenerVector> EventListenersMap;
-
-  // useCapture is not used, even for add/remove pairing (for Firefox
-  // compatibility).
-  virtual void addEventListener(const AtomicString& eventType,
-                                PassRefPtr<EventListener>,
-                                bool useCapture);
-  virtual void removeEventListener(const AtomicString& eventType,
-                                   EventListener*,
-                                   bool useCapture);
-  virtual bool dispatchEvent(PassRefPtr<Event>, ExceptionCode&);
-  EventListenersMap& eventListeners() { return m_eventListeners; }
+  DEFINE_ATTRIBUTE_EVENT_LISTENER(readystatechange);
+  DEFINE_ATTRIBUTE_EVENT_LISTENER(abort);
+  DEFINE_ATTRIBUTE_EVENT_LISTENER(error);
+  DEFINE_ATTRIBUTE_EVENT_LISTENER(load);
+  DEFINE_ATTRIBUTE_EVENT_LISTENER(loadstart);
+  DEFINE_ATTRIBUTE_EVENT_LISTENER(progress);
 
   using RefCounted<XMLHttpRequest>::ref;
   using RefCounted<XMLHttpRequest>::deref;
@@ -158,6 +120,8 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
 
   virtual void refEventTarget() { ref(); }
   virtual void derefEventTarget() { deref(); }
+  virtual EventTargetData* eventTargetData();
+  virtual EventTargetData* ensureEventTargetData();
 
   Document* document() const;
 
@@ -173,8 +137,6 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
   virtual void didFail(const ResourceError&);
   virtual void didFailRedirectCheck();
   virtual void didReceiveAuthenticationCancellation(const ResourceResponse&);
-
-  void updateAndDispatchOnProgress(unsigned int len);
 
   String responseMIMEType() const;
   bool responseIsXML() const;
@@ -197,26 +159,6 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
   void genericError();
   void networkError();
   void abortError();
-
-  void dispatchReadyStateChangeEvent();
-  void dispatchXMLHttpRequestProgressEvent(EventListener* listener,
-                                           const AtomicString& type,
-                                           bool lengthComputable,
-                                           unsigned loaded,
-                                           unsigned total);
-  void dispatchAbortEvent();
-  void dispatchErrorEvent();
-  void dispatchLoadEvent();
-  void dispatchLoadStartEvent();
-  void dispatchProgressEvent(long long expectedLength);
-
-  RefPtr<EventListener> m_onReadyStateChangeListener;
-  RefPtr<EventListener> m_onAbortListener;
-  RefPtr<EventListener> m_onErrorListener;
-  RefPtr<EventListener> m_onLoadListener;
-  RefPtr<EventListener> m_onLoadStartListener;
-  RefPtr<EventListener> m_onProgressListener;
-  EventListenersMap m_eventListeners;
 
   RefPtr<XMLHttpRequestUpload> m_upload;
 
@@ -265,6 +207,8 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
   unsigned m_lastSendLineNumber;
   String m_lastSendURL;
   ExceptionCode m_exceptionCode;
+
+  EventTargetData m_eventTargetData;
 };
 
 }  // namespace WebCore

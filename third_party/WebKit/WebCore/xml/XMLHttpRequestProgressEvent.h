@@ -39,9 +39,9 @@ class XMLHttpRequestProgressEvent : public ProgressEvent {
   }
   static PassRefPtr<XMLHttpRequestProgressEvent> create(
       const AtomicString& type,
-      bool lengthComputable,
-      unsigned loaded,
-      unsigned total) {
+      bool lengthComputable = false,
+      unsigned loaded = 0,
+      unsigned total = 0) {
     return adoptRef(
         new XMLHttpRequestProgressEvent(type, lengthComputable, loaded, total));
   }

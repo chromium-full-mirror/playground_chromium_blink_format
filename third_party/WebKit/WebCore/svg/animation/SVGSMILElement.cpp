@@ -90,7 +90,7 @@ class ConditionEventListener : public EventListener {
     m_eventBase->addEventListener(m_condition->m_name, this, false);
   }
 
-  virtual void handleEvent(Event*, bool);
+  virtual void handleEvent(Event*);
 
   SVGSMILElement* m_animation;
   SVGSMILElement::Condition* m_condition;
@@ -106,7 +106,7 @@ bool ConditionEventListener::operator==(const EventListener& listener) {
   return false;
 }
 
-void ConditionEventListener::handleEvent(Event* event, bool) {
+void ConditionEventListener::handleEvent(Event* event) {
   m_animation->handleConditionEvent(event, m_condition);
 }
 

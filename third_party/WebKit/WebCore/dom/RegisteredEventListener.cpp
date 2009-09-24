@@ -25,15 +25,4 @@
 
 #include "EventListener.h"
 
-namespace WebCore {
-
-RegisteredEventListener::RegisteredEventListener(
-    const AtomicString& eventType,
-    PassRefPtr<EventListener> listener,
-    bool useCapture)
-    : m_eventType(eventType),
-      m_listener(listener),
-      m_useCapture(useCapture),
-      m_removed(false) {}
-
-}  // namespace WebCore
+namespace WebCore {}  // namespace WebCore

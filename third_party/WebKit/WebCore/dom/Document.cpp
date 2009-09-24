@@ -1516,9 +1516,11 @@ void Document::detach() {
 }
 
 void Document::removeAllEventListeners() {
+  EventTarget::removeAllEventListeners();
+
   if (DOMWindow* domWindow = this->domWindow())
     domWindow->removeAllEventListeners();
-  for (Node* node = this; node; node = node->traverseNextNode())
+  for (Node* node = firstChild(); node; node = node->traverseNextNode())
     node->removeAllEventListeners();
 }
 
@@ -1756,8 +1758,9 @@ void Document::implicitClose() {
     f->animation()->resumeAnimations(this);
 
   ImageLoader::dispatchPendingLoadEvents();
-  dispatchLoadEvent();
-  dispatchPageTransitionEvent(EventNames().pageshowEvent, false);
+  dispatchWindowLoadEvent();
+  dispatchWindowEvent(
+      PageTransitionEvent::create(eventNames().pageshowEvent, false), this);
   if (f)
     f->loader()->handledOnloadEvents();
 #ifdef INSTRUMENT_LAYOUT_SCHEDULING
@@ -2701,7 +2704,8 @@ bool Document::setFocusedNode(PassRefPtr<Node> newFocusedNode) {
     // edited
     RenderObject* r = oldFocusedNode->renderer();
     if (r && r->isTextControl() && toRenderTextControl(r)->isEdited()) {
-      oldFocusedNode->dispatchEvent(eventNames().changeEvent, true, false);
+      oldFocusedNode->dispatchEvent(
+          Event::create(eventNames().changeEvent, true, false));
       r = oldFocusedNode->renderer();
       if (r && r->isTextControl())
         toRenderTextControl(r)->setEdited(false);
@@ -2929,40 +2933,21 @@ EventListener* Document::getWindowAttributeEventListener(
   return domWindow->getAttributeEventListener(eventType);
 }
 
-void Document::dispatchWindowEvent(PassRefPtr<Event> event) {
+void Document::dispatchWindowEvent(PassRefPtr<Event> event,
+                                   PassRefPtr<EventTarget> target) {
   ASSERT(!eventDispatchForbidden());
   DOMWindow* domWindow = this->domWindow();
   if (!domWindow)
     return;
-  ExceptionCode ec;
-  domWindow->dispatchEvent(event, ec);
+  domWindow->dispatchEvent(event, target);
 }
 
-void Document::dispatchWindowEvent(const AtomicString& eventType,
-                                   bool canBubbleArg,
-                                   bool cancelableArg) {
-  ASSERT(!eventDispatchForbidden());
-  DOMWindow* domWindow = this->domWindow();
-  if (!domWindow)
-    return;
-  domWindow->dispatchEvent(eventType, canBubbleArg, cancelableArg);
-}
-
-void Document::dispatchLoadEvent() {
+void Document::dispatchWindowLoadEvent() {
   ASSERT(!eventDispatchForbidden());
   DOMWindow* domWindow = this->domWindow();
   if (!domWindow)
     return;
   domWindow->dispatchLoadEvent();
-}
-
-void Document::dispatchPageTransitionEvent(const AtomicString& eventType,
-                                           bool persisted) {
-  ASSERT(!eventDispatchForbidden());
-  DOMWindow* domWindow = this->domWindow();
-  if (!domWindow)
-    return;
-  domWindow->dispatchPageTransitionEvent(eventType, persisted);
 }
 
 PassRefPtr<Event> Document::createEvent(const String& eventType,
@@ -4090,11 +4075,7 @@ CollectionCache* Document::nameCollectionInfo(CollectionType type,
 
 void Document::finishedParsing() {
   setParsing(false);
-
-  ExceptionCode ec = 0;
-  dispatchEvent(Event::create(eventNames().DOMContentLoadedEvent, true, false),
-                ec);
-
+  dispatchEvent(Event::create(eventNames().DOMContentLoadedEvent, true, false));
   if (Frame* f = frame())
     f->loader()->finishedParsing();
 }

@@ -25,6 +25,7 @@
 #if ENABLE(SVG)
 #include "SVGImageLoader.h"
 
+#include "Event.h"
 #include "EventNames.h"
 #include "SVGImageElement.h"
 #include "RenderImage.h"
@@ -37,7 +38,8 @@ SVGImageLoader::~SVGImageLoader() {}
 
 void SVGImageLoader::dispatchLoadEvent() {
   if (image()->errorOccurred())
-    element()->dispatchEvent(eventNames().errorEvent, false, false);
+    element()->dispatchEvent(
+        Event::create(eventNames().errorEvent, false, false));
   else {
     SVGImageElement* imageElement = static_cast<SVGImageElement*>(element());
     if (imageElement->externalResourcesRequiredBaseValue())
