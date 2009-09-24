@@ -65,6 +65,22 @@ void Pasteboard::writeSelection(Range* selectedRange,
   clipboard.Unlock();
 }
 
+void Pasteboard::writePlainText(const String& text) {
+  BClipboard clipboard("WebKit");
+  if (!clipboard.Lock())
+    return;
+
+  clipboard.Clear();
+  BMessage* data = clipboard.Data();
+  if (!data)
+    return;
+
+  data->AddString("text/plain", BString(text));
+  clipboard.Commit();
+
+  clipboard.Unlock();
+}
+
 bool Pasteboard::canSmartReplace() {
   notImplemented();
   return false;

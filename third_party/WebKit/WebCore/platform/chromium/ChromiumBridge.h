@@ -82,6 +82,7 @@ class ChromiumBridge {
                                       const KURL&,
                                       const String&,
                                       bool);
+  static void clipboardWritePlainText(const String&);
   static void clipboardWriteURL(const KURL&, const String&);
   static void clipboardWriteImage(const NativeImageSkia*,
                                   const KURL&,
