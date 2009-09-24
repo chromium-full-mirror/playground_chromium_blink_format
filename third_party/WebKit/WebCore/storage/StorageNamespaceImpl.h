@@ -46,7 +46,7 @@ class StorageNamespaceImpl : public StorageNamespace {
   static PassRefPtr<StorageNamespace> sessionStorageNamespace();
 
   virtual ~StorageNamespaceImpl();
-  virtual PassRefPtr<StorageArea> storageArea(SecurityOrigin*);
+  virtual PassRefPtr<StorageArea> storageArea(PassRefPtr<SecurityOrigin>);
   virtual PassRefPtr<StorageNamespace> copy();
   virtual void close();
   virtual void unlock();

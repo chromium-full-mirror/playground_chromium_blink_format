@@ -30,6 +30,7 @@
 
 #include "StorageArea.h"
 
+#include <wtf/PassRefPtr.h>
 #include <wtf/RefPtr.h>
 
 namespace WebCore {
@@ -40,9 +41,9 @@ class StorageAreaSync;
 
 class StorageAreaImpl : public StorageArea {
  public:
-  StorageAreaImpl(StorageType,
-                  PassRefPtr<SecurityOrigin>,
-                  PassRefPtr<StorageSyncManager>);
+  static PassRefPtr<StorageAreaImpl> create(StorageType,
+                                            PassRefPtr<SecurityOrigin>,
+                                            PassRefPtr<StorageSyncManager>);
   virtual ~StorageAreaImpl();
 
   // The HTML5 DOM Storage API (and contains)
@@ -65,6 +66,9 @@ class StorageAreaImpl : public StorageArea {
   SecurityOrigin* securityOrigin();
 
  private:
+  StorageAreaImpl(StorageType,
+                  PassRefPtr<SecurityOrigin>,
+                  PassRefPtr<StorageSyncManager>);
   StorageAreaImpl(StorageAreaImpl*);
 
   void blockUntilImportComplete() const;
