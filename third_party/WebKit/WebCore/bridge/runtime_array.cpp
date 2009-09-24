@@ -28,6 +28,7 @@
 
 #include <runtime/ArrayPrototype.h>
 #include <runtime/Error.h>
+#include <runtime/PropertyNameArray.h>
 #include "JSDOMBinding.h"
 
 using namespace WebCore;
@@ -148,5 +149,14 @@ bool RuntimeArray::deleteProperty(ExecState*, const Identifier&) {
 
 bool RuntimeArray::deleteProperty(ExecState*, unsigned) {
   return false;
+}
+
+void RuntimeArray::getPropertyNames(ExecState* exec,
+                                    PropertyNameArray& propertyNames) {
+  const unsigned int length = getLength();
+  for (unsigned i = 0; i < length; ++i)
+    propertyNames.add(Identifier::from(exec, i));
+
+  JSObject::getPropertyNames(exec, propertyNames);
 }
 }
