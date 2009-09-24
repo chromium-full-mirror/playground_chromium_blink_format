@@ -136,6 +136,48 @@ static DOMWindowSet& windowsWithBeforeUnloadEventListeners() {
   return windowsWithBeforeUnloadEventListeners;
 }
 
+static void addUnloadEventListener(DOMWindow* domWindow) {
+  DOMWindowSet& set = windowsWithUnloadEventListeners();
+  if (set.isEmpty())
+    disableSuddenTermination();
+  set.add(domWindow);
+}
+
+static void removeUnloadEventListener(DOMWindow* domWindow) {
+  DOMWindowSet& set = windowsWithUnloadEventListeners();
+  set.remove(domWindow);
+  if (set.isEmpty())
+    enableSuddenTermination();
+}
+
+static void removeAllUnloadEventListeners(DOMWindow* domWindow) {
+  DOMWindowSet& set = windowsWithUnloadEventListeners();
+  set.removeAll(domWindow);
+  if (set.isEmpty())
+    enableSuddenTermination();
+}
+
+static void addBeforeUnloadEventListener(DOMWindow* domWindow) {
+  DOMWindowSet& set = windowsWithBeforeUnloadEventListeners();
+  if (set.isEmpty())
+    disableSuddenTermination();
+  set.add(domWindow);
+}
+
+static void removeBeforeUnloadEventListener(DOMWindow* domWindow) {
+  DOMWindowSet& set = windowsWithBeforeUnloadEventListeners();
+  set.remove(domWindow);
+  if (set.isEmpty())
+    enableSuddenTermination();
+}
+
+static void removeAllBeforeUnloadEventListeners(DOMWindow* domWindow) {
+  DOMWindowSet& set = windowsWithBeforeUnloadEventListeners();
+  set.removeAll(domWindow);
+  if (set.isEmpty())
+    enableSuddenTermination();
+}
+
 static bool allowsBeforeUnloadListeners(DOMWindow* window) {
   ASSERT_ARG(window, window);
   Frame* frame = window->frame();
@@ -188,7 +230,7 @@ unsigned DOMWindow::pendingUnloadEventListeners() const {
 }
 
 void DOMWindow::dispatchAllPendingUnloadEvents() {
-  DOMWindowSet& set = windowsWithBeforeUnloadEventListeners();
+  DOMWindowSet& set = windowsWithUnloadEventListeners();
   if (set.isEmpty())
     return;
 
@@ -324,8 +366,8 @@ DOMWindow::~DOMWindow() {
   if (m_frame)
     m_frame->clearFormerDOMWindow(this);
 
-  windowsWithUnloadEventListeners().clear(this);
-  windowsWithBeforeUnloadEventListeners().clear(this);
+  removeAllUnloadEventListeners(this);
+  removeAllBeforeUnloadEventListeners(this);
 }
 
 ScriptExecutionContext* DOMWindow::scriptExecutionContext() const {
@@ -1184,10 +1226,10 @@ bool DOMWindow::addEventListener(const AtomicString& eventType,
     document->addListenerTypeIfNeeded(eventType);
 
   if (eventType == eventNames().unloadEvent)
-    windowsWithUnloadEventListeners().add(this);
+    addUnloadEventListener(this);
   else if (eventType == eventNames().beforeunloadEvent &&
            allowsBeforeUnloadListeners(this))
-    windowsWithBeforeUnloadEventListeners().add(this);
+    addBeforeUnloadEventListener(this);
 
   return true;
 }
@@ -1199,10 +1241,10 @@ bool DOMWindow::removeEventListener(const AtomicString& eventType,
     return false;
 
   if (eventType == eventNames().unloadEvent)
-    windowsWithUnloadEventListeners().remove(this);
+    removeUnloadEventListener(this);
   else if (eventType == eventNames().beforeunloadEvent &&
            allowsBeforeUnloadListeners(this))
-    windowsWithBeforeUnloadEventListeners().remove(this);
+    removeBeforeUnloadEventListener(this);
 
   return true;
 }
@@ -1238,8 +1280,8 @@ bool DOMWindow::dispatchEvent(PassRefPtr<Event> prpEvent,
 void DOMWindow::removeAllEventListeners() {
   EventTarget::removeAllEventListeners();
 
-  windowsWithUnloadEventListeners().clear(this);
-  windowsWithBeforeUnloadEventListeners().clear(this);
+  removeAllUnloadEventListeners(this);
+  removeAllBeforeUnloadEventListeners(this);
 }
 
 void DOMWindow::captureEvents() {
