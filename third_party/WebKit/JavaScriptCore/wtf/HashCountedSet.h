@@ -67,6 +67,11 @@ class HashCountedSet : public FastAllocBase {
   void remove(const ValueType& value);
   void remove(iterator it);
 
+  // removes the value, regardless of its count
+  void clear(iterator it);
+  void clear(const ValueType& value);
+
+  // clears the whole set
   void clear();
 
  private:
@@ -164,6 +169,20 @@ inline void HashCountedSet<Value, HashFunctions, Traits>::remove(iterator it) {
     m_impl.remove(it);
   else
     it->second = newVal;
+}
+
+template <typename Value, typename HashFunctions, typename Traits>
+inline void HashCountedSet<Value, HashFunctions, Traits>::clear(
+    const ValueType& value) {
+  clear(find(value));
+}
+
+template <typename Value, typename HashFunctions, typename Traits>
+inline void HashCountedSet<Value, HashFunctions, Traits>::clear(iterator it) {
+  if (it == end())
+    return;
+
+  m_impl.remove(it);
 }
 
 template <typename Value, typename HashFunctions, typename Traits>
