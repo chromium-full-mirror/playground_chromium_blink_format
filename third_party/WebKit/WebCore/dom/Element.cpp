@@ -29,6 +29,8 @@
 
 #include "AXObjectCache.h"
 #include "Attr.h"
+#include "CSSParser.h"
+#include "CSSSelectorList.h"
 #include "CSSStyleSelector.h"
 #include "CString.h"
 #include "ClientRect.h"
@@ -1438,6 +1440,39 @@ unsigned Element::childElementCount() const {
     n = n->nextSibling();
   }
   return count;
+}
+
+bool Element::webkitMatchesSelector(const String& selector, ExceptionCode& ec) {
+  if (selector.isEmpty()) {
+    ec = SYNTAX_ERR;
+    return false;
+  }
+
+  bool strictParsing = !document()->inCompatMode();
+  CSSParser p(strictParsing);
+
+  CSSSelectorList selectorList;
+  p.parseSelector(selector, document(), selectorList);
+
+  if (!selectorList.first()) {
+    ec = SYNTAX_ERR;
+    return false;
+  }
+
+  // Throw a NAMESPACE_ERR if the selector includes any namespace prefixes.
+  if (selectorList.selectorsNeedNamespaceResolution()) {
+    ec = NAMESPACE_ERR;
+    return false;
+  }
+
+  CSSStyleSelector::SelectorChecker selectorChecker(document(), strictParsing);
+  for (CSSSelector* selector = selectorList.first(); selector;
+       selector = CSSSelectorList::next(selector)) {
+    if (selectorChecker.checkSelector(selector, this))
+      return true;
+  }
+
+  return false;
 }
 
 KURL Element::getURLAttribute(const QualifiedName& name) const {

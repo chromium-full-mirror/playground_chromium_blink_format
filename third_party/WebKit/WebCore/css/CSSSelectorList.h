@@ -47,6 +47,8 @@ class CSSSelectorList : public Noncopyable {
     return m_selectorArray ? m_selectorArray->isLastInSelectorList() : false;
   }
 
+  bool selectorsNeedNamespaceResolution();
+
  private:
   void deleteSelectors();
 
@@ -54,6 +56,7 @@ class CSSSelectorList : public Noncopyable {
   // item.
   CSSSelector* m_selectorArray;
 };
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // CSSSelectorList_h

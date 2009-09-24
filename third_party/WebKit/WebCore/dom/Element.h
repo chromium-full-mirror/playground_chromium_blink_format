@@ -251,6 +251,8 @@ class Element : public ContainerNode {
   Element* nextElementSibling() const;
   unsigned childElementCount() const;
 
+  bool webkitMatchesSelector(const String& selectors, ExceptionCode&);
+
   virtual bool isFormControlElement() const { return false; }
   virtual bool isEnabledFormControl() const { return true; }
   virtual bool isReadOnlyFormControl() const { return false; }
