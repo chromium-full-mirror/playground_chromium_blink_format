@@ -83,8 +83,7 @@ class V8LazyEventListener : public V8AbstractEventListener {
 
   virtual v8::Local<v8::Value> callListenerFunction(
       v8::Handle<v8::Value> jsEvent,
-      Event*,
-      bool isWindowEvent);
+      Event*);
 
   v8::Local<v8::Function> getListenerFunction();
 };

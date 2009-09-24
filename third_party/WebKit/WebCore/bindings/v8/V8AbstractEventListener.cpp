@@ -65,8 +65,7 @@ V8AbstractEventListener::V8AbstractEventListener(Frame* frame, bool isAttribute)
 void V8AbstractEventListener::invokeEventHandler(
     v8::Handle<v8::Context> v8Context,
     Event* event,
-    v8::Handle<v8::Value> jsEvent,
-    bool isWindowEvent) {
+    v8::Handle<v8::Value> jsEvent) {
   // We push the event being processed into the global object, so that it can be
   // exposed by DOMWindow's bindings.
   v8::Local<v8::String> eventSymbol = v8::String::NewSymbol("event");
@@ -96,7 +95,7 @@ void V8AbstractEventListener::invokeEventHandler(
     // Call the event handler.
     tryCatch.SetVerbose(false);  // We do not want to report the exception to
                                  // the inspector console.
-    returnValue = callListenerFunction(jsEvent, event, isWindowEvent);
+    returnValue = callListenerFunction(jsEvent, event);
     if (!tryCatch.CanContinue())
       return;
 
@@ -134,7 +133,7 @@ void V8AbstractEventListener::invokeEventHandler(
     event->preventDefault();
 }
 
-void V8AbstractEventListener::handleEvent(Event* event, bool isWindowEvent) {
+void V8AbstractEventListener::handleEvent(Event* event) {
   // EventListener could be disconnected from the frame.
   if (disconnected())
     return;
@@ -166,7 +165,7 @@ void V8AbstractEventListener::handleEvent(Event* event, bool isWindowEvent) {
   // Get the V8 wrapper for the event object.
   v8::Handle<v8::Value> jsEvent = V8DOMWrapper::convertEventToV8Object(event);
 
-  invokeEventHandler(v8Context, event, jsEvent, isWindowEvent);
+  invokeEventHandler(v8Context, event, jsEvent);
 
   Document::updateStyleForAllDocuments();
 }
@@ -181,14 +180,9 @@ void V8AbstractEventListener::disposeListenerObject() {
   }
 }
 
-v8::Local<v8::Object> V8AbstractEventListener::getReceiverObject(
-    Event* event,
-    bool isWindowEvent) {
+v8::Local<v8::Object> V8AbstractEventListener::getReceiverObject(Event* event) {
   if (!m_listener.IsEmpty() && !m_listener->IsFunction())
     return v8::Local<v8::Object>::New(m_listener);
-
-  if (isWindowEvent)
-    return v8::Context::GetCurrent()->Global();
 
   EventTarget* target = event->currentTarget();
   v8::Handle<v8::Value> value =

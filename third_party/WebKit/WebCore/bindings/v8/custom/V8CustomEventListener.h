@@ -62,8 +62,7 @@ class V8EventListener : public V8AbstractEventListener {
  private:
   virtual v8::Local<v8::Value> callListenerFunction(
       v8::Handle<v8::Value> jsEvent,
-      Event*,
-      bool isWindowEvent);
+      Event*);
   virtual bool virtualisAttribute() const { return m_isAttribute; }
 };
 

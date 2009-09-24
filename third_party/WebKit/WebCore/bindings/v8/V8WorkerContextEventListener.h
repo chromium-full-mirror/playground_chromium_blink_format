@@ -56,7 +56,7 @@ class V8WorkerContextEventListener : public V8EventListener {
                                bool isInline);
 
   virtual ~V8WorkerContextEventListener();
-  virtual void handleEvent(Event*, bool isWindowEvent);
+  virtual void handleEvent(Event*);
   virtual bool reportError(const String& message,
                            const String& url,
                            int lineNumber);
@@ -68,9 +68,8 @@ class V8WorkerContextEventListener : public V8EventListener {
  private:
   virtual v8::Local<v8::Value> callListenerFunction(
       v8::Handle<v8::Value> jsEvent,
-      Event*,
-      bool isWindowEvent);
-  v8::Local<v8::Object> getReceiverObject(Event*, bool isWindowEvent);
+      Event*);
+  v8::Local<v8::Object> getReceiverObject(Event*);
   WorkerContextExecutionProxy* m_proxy;
 };
 

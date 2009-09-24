@@ -230,6 +230,7 @@ inline void EventTarget::invalidateEventListeners() {
 
   d->eventListenerMap.clear();
 }
+#endif
 
 inline bool EventTarget::isFiringEventListeners() {
   EventTargetData* d = eventTargetData();
@@ -251,8 +252,6 @@ inline bool EventTarget::hasEventListeners(const AtomicString& eventType) {
     return false;
   return d->eventListenerMap.contains(eventType);
 }
-
-#endif
 
 }  // namespace WebCore
 

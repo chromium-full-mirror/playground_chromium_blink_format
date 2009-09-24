@@ -58,11 +58,10 @@ class V8AbstractEventListener : public EventListener {
   // Returns the owner frame of the listener.
   Frame* frame() { return m_frame; }
 
-  virtual void handleEvent(Event*, bool isWindowEvent);
+  virtual void handleEvent(Event*);
   void invokeEventHandler(v8::Handle<v8::Context>,
                           Event*,
-                          v8::Handle<v8::Value> jsEvent,
-                          bool isWindowEvent);
+                          v8::Handle<v8::Value> jsEvent);
 
   // Returns the listener object, either a function or an object.
   virtual v8::Local<v8::Object> getListenerObject() {
@@ -87,11 +86,10 @@ class V8AbstractEventListener : public EventListener {
 
   virtual v8::Local<v8::Value> callListenerFunction(
       v8::Handle<v8::Value> jsevent,
-      Event*,
-      bool isWindowEvent) = 0;
+      Event*) = 0;
 
   // Get the receiver object to use for event listener call.
-  v8::Local<v8::Object> getReceiverObject(Event*, bool isWindowEvent);
+  v8::Local<v8::Object> getReceiverObject(Event*);
 
   // Frame to which the event listener is attached to. An event listener must be
   // destroyed before its owner frame is

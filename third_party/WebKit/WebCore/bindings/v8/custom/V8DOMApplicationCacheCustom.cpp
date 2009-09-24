@@ -64,11 +64,10 @@ static v8::Local<v8::Object> eventListenerToV8Object(EventListener* listener) {
   return (static_cast<V8ObjectEventListener*>(listener))->getListenerObject();
 }
 
-static inline ApplicationCacheHost::EventID toEventID(
-    v8::Local<v8::String> value) {
+static inline String toEventID(v8::Local<v8::String> value) {
   String key = toWebCoreString(value);
   ASSERT(key.startsWith("on"));
-  return DOMApplicationCache::toEventID(key.substring(2));
+  return key.substring(2);
 }
 
 // Handles appcache.onfooevent attribute getting
@@ -89,7 +88,7 @@ ACCESSOR_SETTER(DOMApplicationCacheEventHandler) {
   DOMApplicationCache* appcache =
       V8DOMWrapper::convertToNativeObject<DOMApplicationCache>(
           V8ClassIndex::DOMAPPLICATIONCACHE, info.Holder());
-  ApplicationCacheHost::EventID eventType = toEventID(name);
+  String eventType = toEventID(name);
 
   if (EventListener* oldListener =
           appcache->getAttributeEventListener(eventType)) {
