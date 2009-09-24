@@ -929,6 +929,8 @@ void FrameLoaderClient::dispatchDidFailProvisionalLoad(
 }
 
 void FrameLoaderClient::dispatchDidFailLoad(const ResourceError& error) {
+  notifyStatus(m_frame, WEBKIT_LOAD_FAILED);
+
   WebKitWebView* webView = getViewFromFrame(m_frame);
   GError* webError = g_error_new_literal(
       g_quark_from_string(error.domain().utf8().data()), error.errorCode(),
