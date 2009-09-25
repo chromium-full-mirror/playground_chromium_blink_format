@@ -115,9 +115,10 @@ void Pasteboard::writeSelection(Range* selectedRange,
 }
 
 void Pasteboard::writePlainText(const String& text) {
+  CString utf8 = text.utf8();
   GtkClipboard* clipboard = gtk_clipboard_get_for_display(
       gdk_display_get_default(), GDK_SELECTION_CLIPBOARD);
-  gtk_clipboard_set_text(clipboard, text.utf8().data(), text.utf8().length());
+  gtk_clipboard_set_text(clipboard, utf8.data(), utf8.length());
 }
 
 void Pasteboard::writeURL(const KURL& url, const String&, Frame* frame) {
@@ -126,10 +127,9 @@ void Pasteboard::writeURL(const KURL& url, const String&, Frame* frame) {
 
   GtkClipboard* clipboard = m_helper->getClipboard(frame);
   GtkClipboard* primary = m_helper->getPrimary(frame);
-  gtk_clipboard_set_text(clipboard, url.string().utf8().data(),
-                         url.string().utf8().length());
-  gtk_clipboard_set_text(primary, url.string().utf8().data(),
-                         url.string().utf8().length());
+  CString utf8 = url.string().utf8();
+  gtk_clipboard_set_text(clipboard, utf8.data(), utf8.length());
+  gtk_clipboard_set_text(primary, utf8.data(), utf8.length());
 }
 
 void Pasteboard::writeImage(Node* node, const KURL&, const String&) {
