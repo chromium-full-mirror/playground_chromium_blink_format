@@ -753,7 +753,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   String referrer() const;
 
   String domain() const;
-  void setDomain(const String& newDomain);
+  void setDomain(const String& newDomain, ExceptionCode&);
 
   String lastModified() const;
 
