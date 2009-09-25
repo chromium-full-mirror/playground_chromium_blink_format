@@ -1270,7 +1270,7 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_get_by_id_method_check) {
     if (slot.slotBase() == baseValue) {
       JIT::patchMethodCallProto(
           codeBlock, methodCallLinkInfo, callee, structure,
-          callFrame->scopeChain()->globalObject()->methodCallDummy(),
+          callFrame->scopeChain()->globalObject->methodCallDummy(),
           STUB_RETURN_ADDRESS);
       return JSValue::encode(result);
     }
@@ -1885,7 +1885,7 @@ DEFINE_STUB_FUNCTION(JSObject*, op_construct_JSConstruct) {
     structure = asObject(stackFrame.args[3].jsValue())->inheritorID();
   else
     structure =
-        constructor->scope().node()->globalObject()->emptyObjectStructure();
+        constructor->scope().node()->globalObject->emptyObjectStructure();
   return new (stackFrame.globalData) JSObject(structure);
 }
 
@@ -2835,7 +2835,7 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_call_eval) {
   Register* newCallFrame = callFrame->registers() + registerOffset;
   Register* argv = newCallFrame - RegisterFile::CallFrameHeaderSize - argCount;
   JSValue thisValue = argv[0].jsValue();
-  JSGlobalObject* globalObject = callFrame->scopeChain()->globalObject();
+  JSGlobalObject* globalObject = callFrame->scopeChain()->globalObject;
 
   if (thisValue == globalObject && funcVal == globalObject->evalFunction()) {
     JSValue exceptionValue;

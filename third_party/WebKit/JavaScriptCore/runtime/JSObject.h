@@ -348,8 +348,6 @@ class JSObject : public JSCell {
   RefPtr<Structure> m_inheritorID;
 };
 
-JSObject* constructEmptyObject(ExecState*);
-
 inline JSObject* asObject(JSCell* cell) {
   ASSERT(cell->isObject());
   return static_cast<JSObject*>(cell);

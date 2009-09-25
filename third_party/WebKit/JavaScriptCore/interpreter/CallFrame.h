@@ -55,13 +55,13 @@ class ExecState : private Register {
   // Differs from dynamicGlobalObject() during function calls across web browser
   // frames.
   JSGlobalObject* lexicalGlobalObject() const {
-    return scopeChain()->globalObject();
+    return scopeChain()->globalObject;
   }
 
   // Differs from lexicalGlobalObject because this will have DOM window shell
   // rather than
   // the actual DOM window, which can't be "this" for security reasons.
-  JSObject* globalThisValue() const { return scopeChain()->globalThisObject(); }
+  JSObject* globalThisValue() const { return scopeChain()->globalThis; }
 
   // FIXME: Elsewhere, we use JSGlobalData* rather than JSGlobalData&.
   // We should make this more uniform and either use a reference everywhere

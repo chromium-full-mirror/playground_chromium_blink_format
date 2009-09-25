@@ -44,7 +44,7 @@ class CachedCall : public Noncopyable {
         m_globalObjectScope(callFrame,
                             callFrame->globalData().dynamicGlobalObject
                                 ? callFrame->globalData().dynamicGlobalObject
-                                : function->scope().node()->globalObject()) {
+                                : function->scope().globalObject()) {
     ASSERT(!function->isHostFunction());
     m_closure = m_interpreter->prepareForRepeatCall(
         function->jsExecutable(), callFrame, function, argCount,

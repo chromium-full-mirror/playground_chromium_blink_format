@@ -110,7 +110,7 @@ JSObject* constructFunction(ExecState* exec,
                       source.provider()->asID(), source.provider()->url());
 
   JSGlobalObject* globalObject = exec->lexicalGlobalObject();
-  ScopeChain scopeChain(globalObject, globalObject->globalData(),
+  ScopeChain scopeChain(globalObject, globalObject->globalData(), globalObject,
                         exec->globalThisValue());
   return new (exec) JSFunction(exec, function, scopeChain.node());
 }

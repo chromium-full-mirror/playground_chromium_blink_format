@@ -433,8 +433,7 @@ void Interpreter::dumpRegisters(CallFrame* callFrame) {
 
   CodeBlock* codeBlock = callFrame->codeBlock();
   RegisterFile* registerFile = &callFrame->scopeChain()
-                                    ->globalObject()
-                                    ->globalData()
+                                    ->globalObject->globalData()
                                     ->interpreter->registerFile();
   const Register* it;
   const Register* end;
@@ -771,7 +770,7 @@ JSValue Interpreter::execute(ProgramExecutable* program,
   }
 
   DynamicGlobalObjectScope globalObjectScope(callFrame,
-                                             scopeChain->globalObject());
+                                             scopeChain->globalObject);
 
   JSGlobalObject* lastGlobalObject = m_registerFile.globalObject();
   JSGlobalObject* globalObject = callFrame->dynamicGlobalObject();
@@ -843,7 +842,7 @@ JSValue Interpreter::execute(FunctionExecutable* functionExecutable,
   DynamicGlobalObjectScope globalObjectScope(
       callFrame, callFrame->globalData().dynamicGlobalObject
                      ? callFrame->globalData().dynamicGlobalObject
-                     : scopeChain->globalObject());
+                     : scopeChain->globalObject);
 
   CallFrame* newCallFrame = CallFrame::create(oldEnd);
   size_t dst = 0;
@@ -1008,7 +1007,7 @@ JSValue Interpreter::execute(EvalExecutable* eval,
   DynamicGlobalObjectScope globalObjectScope(
       callFrame, callFrame->globalData().dynamicGlobalObject
                      ? callFrame->globalData().dynamicGlobalObject
-                     : scopeChain->globalObject());
+                     : scopeChain->globalObject);
 
   EvalCodeBlock* codeBlock = &eval->bytecode(callFrame, scopeChain);
 
@@ -1475,7 +1474,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
       int dst = (++vPC)->u.operand;
       int regExp = (++vPC)->u.operand;
       callFrame->r(dst) = JSValue(new (globalData) RegExpObject(
-          callFrame->scopeChain()->globalObject()->regExpStructure(),
+          callFrame->scopeChain()->globalObject->regExpStructure(),
           callFrame->codeBlock()->regexp(regExp)));
 
       ++vPC;
@@ -3330,7 +3329,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
       Register* argv =
           newCallFrame - RegisterFile::CallFrameHeaderSize - argCount;
       JSValue thisValue = argv[0].jsValue();
-      JSGlobalObject* globalObject = callFrame->scopeChain()->globalObject();
+      JSGlobalObject* globalObject = callFrame->scopeChain()->globalObject;
 
       if (thisValue == globalObject &&
           funcVal == globalObject->evalFunction()) {
@@ -3831,8 +3830,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
         if (prototype.isObject())
           structure = asObject(prototype)->inheritorID();
         else
-          structure =
-              callDataScopeChain->globalObject()->emptyObjectStructure();
+          structure = callDataScopeChain->globalObject->emptyObjectStructure();
         JSObject* newObject = new (globalData) JSObject(structure);
 
         callFrame->r(thisRegister) = JSValue(newObject);  // "this" value

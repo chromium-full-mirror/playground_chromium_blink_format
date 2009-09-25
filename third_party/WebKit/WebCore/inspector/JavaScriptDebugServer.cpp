@@ -231,7 +231,7 @@ bool JavaScriptDebugServer::hasBreakpoint(intptr_t sourceID,
     return false;
   }
   return result.toBoolean(
-      m_currentCallFrame->scopeChain()->globalObject()->globalExec());
+      m_currentCallFrame->scopeChain()->globalObject->globalExec());
 }
 
 void JavaScriptDebugServer::clearBreakpoints() {

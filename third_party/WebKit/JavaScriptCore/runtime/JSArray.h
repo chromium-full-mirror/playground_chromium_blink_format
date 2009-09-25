@@ -136,11 +136,6 @@ class JSArray : public JSObject {
 
 JSArray* asArray(JSValue);
 
-JSArray* constructEmptyArray(ExecState*);
-JSArray* constructEmptyArray(ExecState*, unsigned initialLength);
-JSArray* constructArray(ExecState*, JSValue singleItemValue);
-JSArray* constructArray(ExecState*, const ArgList& values);
-
 inline JSArray* asArray(JSCell* cell) {
   ASSERT(cell->inherits(&JSArray::info));
   return static_cast<JSArray*>(cell);
