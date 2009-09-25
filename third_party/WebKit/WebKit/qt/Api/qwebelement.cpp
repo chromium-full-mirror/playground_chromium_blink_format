@@ -676,7 +676,7 @@ static bool setupScriptObject(WebCore::Element* element,
 
     \sa callFunction()
 */
-QVariant QWebElement::evaluateScript(const QString& scriptSource) {
+QVariant QWebElement::evaluateJavaScript(const QString& scriptSource) {
   if (scriptSource.isEmpty())
     return QVariant();
 

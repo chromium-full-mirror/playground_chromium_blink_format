@@ -68,7 +68,7 @@ class tst_QWebElement : public QObject {
   void classes();
   void namespaceURI();
   void foreachManipulation();
-  void evaluateScript();
+  void evaluateJavaScript();
   void callFunction();
   void callFunctionSubmitForm();
   void functionNames();
@@ -271,26 +271,26 @@ void tst_QWebElement::foreachManipulation() {
   QCOMPARE(body.findAll("div").count(), 4);
 }
 
-void tst_QWebElement::evaluateScript() {
+void tst_QWebElement::evaluateJavaScript() {
   QVariant result;
   m_mainFrame->setHtml("<body><p>test");
   QWebElement para = m_mainFrame->findFirstElement("p");
 
-  result = para.evaluateScript("this.tagName");
+  result = para.evaluateJavaScript("this.tagName");
   QVERIFY(result.isValid());
   QVERIFY(result.type() == QVariant::String);
   QCOMPARE(result.toString(), QLatin1String("P"));
 
   QVERIFY(para.functions().contains("hasAttributes"));
-  result = para.evaluateScript("this.hasAttributes()");
+  result = para.evaluateJavaScript("this.hasAttributes()");
   QVERIFY(result.isValid());
   QVERIFY(result.type() == QVariant::Bool);
   QVERIFY(!result.toBool());
 
-  para.evaluateScript("this.setAttribute('align', 'left');");
+  para.evaluateJavaScript("this.setAttribute('align', 'left');");
   QCOMPARE(para.attribute("align"), QLatin1String("left"));
 
-  result = para.evaluateScript("this.hasAttributes()");
+  result = para.evaluateJavaScript("this.hasAttributes()");
   QVERIFY(result.isValid());
   QVERIFY(result.type() == QVariant::Bool);
   QVERIFY(result.toBool());
