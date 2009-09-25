@@ -30,7 +30,8 @@
 
 namespace WebCore {
 
-struct RegisteredEventListener {
+class RegisteredEventListener {
+ public:
   RegisteredEventListener(PassRefPtr<EventListener> listener, bool useCapture)
       : listener(listener), useCapture(useCapture) {}
 
