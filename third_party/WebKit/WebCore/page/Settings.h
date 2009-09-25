@@ -328,6 +328,12 @@ class Settings {
   }
 #endif
 
+  void setPluginHalterEnabled(bool);
+  bool pluginHalterEnabled() const { return m_pluginHalterEnabled; }
+
+  void setPluginAllowedRunTime(unsigned);
+  unsigned pluginAllowedRunTime() const { return m_pluginAllowedRunTime; }
+
  private:
   Page* m_page;
 
@@ -348,6 +354,7 @@ class Settings {
   int m_defaultFontSize;
   int m_defaultFixedFontSize;
   size_t m_maximumDecodedImageSize;
+  unsigned m_pluginAllowedRunTime;
   bool m_isJavaEnabled : 1;
   bool m_loadsImagesAutomatically : 1;
   bool m_privateBrowsingEnabled : 1;
@@ -393,6 +400,7 @@ class Settings {
   bool m_xssAuditorEnabled : 1;
   bool m_acceleratedCompositingEnabled : 1;
   bool m_experimentalNotificationsEnabled : 1;
+  bool m_pluginHalterEnabled : 1;
 
 #if USE(SAFARI_THEME)
   static bool gShouldPaintNativeControls;

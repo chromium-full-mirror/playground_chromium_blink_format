@@ -241,6 +241,8 @@ bool SVGImage::dataChanged(bool allDataReceived) {
     static DragClient* dummyDragClient = 0;
 #endif
     static InspectorClient* dummyInspectorClient = new EmptyInspectorClient;
+    static PluginHalterClient* dummyPluginHalterClient =
+        new EmptyPluginHalterClient;
 
     m_chromeClient.set(new SVGImageChromeClient(this));
 
@@ -249,7 +251,7 @@ bool SVGImage::dataChanged(bool allDataReceived) {
     // holding Frames and won't know to break the cycle. But
     m_page.set(new Page(m_chromeClient.get(), dummyContextMenuClient,
                         dummyEditorClient, dummyDragClient,
-                        dummyInspectorClient));
+                        dummyInspectorClient, dummyPluginHalterClient));
     m_page->settings()->setJavaScriptEnabled(false);
     m_page->settings()->setPluginsEnabled(false);
 
