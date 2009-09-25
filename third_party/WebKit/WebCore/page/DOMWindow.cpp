@@ -133,14 +133,20 @@ static void addUnloadEventListener(DOMWindow* domWindow) {
 
 static void removeUnloadEventListener(DOMWindow* domWindow) {
   DOMWindowSet& set = windowsWithUnloadEventListeners();
-  set.remove(domWindow);
+  DOMWindowSet::iterator it = set.find(domWindow);
+  if (it == set.end())
+    return;
+  set.remove(it);
   if (set.isEmpty())
     enableSuddenTermination();
 }
 
 static void removeAllUnloadEventListeners(DOMWindow* domWindow) {
   DOMWindowSet& set = windowsWithUnloadEventListeners();
-  set.removeAll(domWindow);
+  DOMWindowSet::iterator it = set.find(domWindow);
+  if (it == set.end())
+    return;
+  set.removeAll(it);
   if (set.isEmpty())
     enableSuddenTermination();
 }
@@ -154,14 +160,20 @@ static void addBeforeUnloadEventListener(DOMWindow* domWindow) {
 
 static void removeBeforeUnloadEventListener(DOMWindow* domWindow) {
   DOMWindowSet& set = windowsWithBeforeUnloadEventListeners();
-  set.remove(domWindow);
+  DOMWindowSet::iterator it = set.find(domWindow);
+  if (it == set.end())
+    return;
+  set.remove(it);
   if (set.isEmpty())
     enableSuddenTermination();
 }
 
 static void removeAllBeforeUnloadEventListeners(DOMWindow* domWindow) {
   DOMWindowSet& set = windowsWithBeforeUnloadEventListeners();
-  set.removeAll(domWindow);
+  DOMWindowSet::iterator it = set.find(domWindow);
+  if (it == set.end())
+    return;
+  set.removeAll(it);
   if (set.isEmpty())
     enableSuddenTermination();
 }
