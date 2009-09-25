@@ -127,14 +127,6 @@ class QWEBKIT_EXPORT QWebElement {
 
   QVariant evaluateJavaScript(const QString& scriptSource);
 
-  QVariant callFunction(const QString& functionName,
-                        const QVariantList& arguments = QVariantList());
-  QStringList functions() const;
-
-  QVariant scriptableProperty(const QString& name) const;
-  void setScriptableProperty(const QString& name, const QVariant& value);
-  QStringList scriptableProperties() const;
-
   enum StyleResolveStrategy {
     InlineStyle,
     CascadedStyle,
