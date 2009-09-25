@@ -248,6 +248,9 @@ void WebPreferences::initializeDefaultSettings() {
                        kCFBooleanTrue);
   CFDictionaryAddValue(defaults, CFSTR(WebKitLocalStorageEnabledPreferenceKey),
                        kCFBooleanTrue);
+  CFDictionaryAddValue(
+      defaults, CFSTR(WebKitExperimentalNotificationsEnabledPreferenceKey),
+      kCFBooleanFalse);
   CFDictionaryAddValue(defaults, CFSTR(WebKitAllowAnimatedImagesPreferenceKey),
                        kCFBooleanTrue);
   CFDictionaryAddValue(defaults,
@@ -1290,6 +1293,20 @@ WebPreferences::localStorageDatabasePath(BSTR* location) {
 HRESULT STDMETHODCALLTYPE
 WebPreferences::setLocalStorageDatabasePath(BSTR location) {
   setStringValue(CFSTR(WebKitLocalStorageDatabasePathPreferenceKey), location);
+  return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE
+WebPreferences::setExperimentalNotificationsEnabled(BOOL enabled) {
+  setBoolValue(CFSTR(WebKitExperimentalNotificationsEnabledPreferenceKey),
+               enabled);
+  return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE
+WebPreferences::experimentalNotificationsEnabled(BOOL* enabled) {
+  *enabled = boolValueForKey(
+      CFSTR(WebKitExperimentalNotificationsEnabledPreferenceKey));
   return S_OK;
 }
 

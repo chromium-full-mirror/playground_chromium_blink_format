@@ -67,6 +67,8 @@
   @"WebKitDatabasesEnabledPreferenceKey"
 #define WebKitLocalStorageEnabledPreferenceKey \
   @"WebKitLocalStorageEnabledPreferenceKey"
+#define WebKitExperimentalNotificationsEnabledPreferenceKey \
+  @"WebKitExperimentalNotificationsEnabledPreferenceKey"
 #define WebKitAllowAnimatedImagesPreferenceKey \
   @"WebKitAllowAnimatedImagesPreferenceKey"
 #define WebKitAllowAnimatedImageLoopingPreferenceKey \
