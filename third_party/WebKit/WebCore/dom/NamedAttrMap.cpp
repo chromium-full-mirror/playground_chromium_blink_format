@@ -183,7 +183,6 @@ Attribute* NamedNodeMap::getAttributeItem(
     if (!m_attributes[i]->name().hasPrefix() &&
         m_attributes[i]->name().localName() == name)
       return m_attributes[i].get();
-
     if (shouldIgnoreAttributeCase
             ? equalIgnoringCase(m_attributes[i]->name().toString(), name)
             : name == m_attributes[i]->name().toString())
@@ -207,11 +206,14 @@ void NamedNodeMap::clearAttributes() {
 }
 
 void NamedNodeMap::detachFromElement() {
-  // we allow a NamedNodeMap w/o an element in case someone still has a
-  // reference
-  // to if after the element gets deleted - but the map is now invalid
+  // This can't happen if the holder of the map is JavaScript, because we mark
+  // the
+  // element if the map is alive. So it has no impact on web page behavior.
+  // Because
+  // of that, we can simply clear all the attributes to avoid accessing stale
+  // pointers to do things like create Attr objects.
   m_element = 0;
-  detachAttributesFromElement();
+  clearAttributes();
 }
 
 void NamedNodeMap::setAttributes(const NamedNodeMap& other) {
@@ -255,7 +257,7 @@ void NamedNodeMap::addAttribute(PassRefPtr<Attribute> prpAttribute) {
 
   // Notify the element that the attribute has been added, and dispatch
   // appropriate mutation events
-  // Note that element may be null here if we are called from insertAttr()
+  // Note that element may be null here if we are called from insertAttribute()
   // during parsing
   if (m_element) {
     m_element->attributeChanged(attribute.get());
@@ -270,12 +272,13 @@ void NamedNodeMap::addAttribute(PassRefPtr<Attribute> prpAttribute) {
 
 void NamedNodeMap::removeAttribute(const QualifiedName& name) {
   unsigned len = length();
-  unsigned index = len + 1;
-  for (unsigned i = 0; i < len; ++i)
+  unsigned index = len;
+  for (unsigned i = 0; i < len; ++i) {
     if (m_attributes[i]->name().matches(name)) {
       index = i;
       break;
     }
+  }
 
   if (index >= len)
     return;
