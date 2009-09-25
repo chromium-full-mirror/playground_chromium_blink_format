@@ -135,20 +135,14 @@ class QWEBKIT_EXPORT QWebElement {
   void setScriptableProperty(const QString& name, const QVariant& value);
   QStringList scriptableProperties() const;
 
-  enum ResolveRule { IgnoreCascadingStyles, RespectCascadingStyles };
-  QString styleProperty(const QString& name,
-                        ResolveRule = IgnoreCascadingStyles) const;
-
-  enum StylePriority {
-    NormalStylePriority,
-    DeclaredStylePriority,
-    ImportantStylePriority
+  enum StyleResolveStrategy {
+    InlineStyle,
+    CascadedStyle,
+    ComputedStyle,
   };
-  void setStyleProperty(const QString& name,
-                        const QString& value,
-                        StylePriority = DeclaredStylePriority);
-
-  QString computedStyleProperty(const QString& name) const;
+  QString styleProperty(const QString& name,
+                        StyleResolveStrategy strategy) const;
+  void setStyleProperty(const QString& name, const QString& value);
 
  private:
   explicit QWebElement(WebCore::Element*);
