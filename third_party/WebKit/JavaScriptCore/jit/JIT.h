@@ -489,17 +489,21 @@ class JIT : private MacroAssembler {
 
   enum CompileOpStrictEqType { OpStrictEq, OpNStrictEq };
   void compileOpStrictEq(Instruction* instruction, CompileOpStrictEqType type);
+  bool isOperandConstantImmediateDouble(unsigned src);
+
+  void emitLoadDouble(unsigned index, FPRegisterID value);
+  void emitLoadInt32ToDouble(unsigned index, FPRegisterID value);
+
+  Address addressFor(unsigned index, RegisterID base = callFrameRegister);
 
 #if USE(JSVALUE32_64)
   Address tagFor(unsigned index, RegisterID base = callFrameRegister);
   Address payloadFor(unsigned index, RegisterID base = callFrameRegister);
-  Address addressFor(unsigned index, RegisterID base = callFrameRegister);
 
   bool getOperandConstantImmediateInt(unsigned op1,
                                       unsigned op2,
                                       unsigned& op,
                                       int32_t& constant);
-  bool isOperandConstantImmediateDouble(unsigned src);
 
   void emitLoadTag(unsigned index, RegisterID tag);
   void emitLoadPayload(unsigned index, RegisterID payload);
@@ -515,8 +519,6 @@ class JIT : private MacroAssembler {
                  unsigned index2,
                  RegisterID tag2,
                  RegisterID payload2);
-  void emitLoadDouble(unsigned index, FPRegisterID value);
-  void emitLoadInt32ToDouble(unsigned index, FPRegisterID value);
 
   void emitStore(unsigned index,
                  RegisterID tag,
@@ -671,6 +673,7 @@ class JIT : private MacroAssembler {
   JIT::Jump emitJumpIfNotImmediateInteger(RegisterID);
   JIT::Jump emitJumpIfNotImmediateIntegers(RegisterID, RegisterID, RegisterID);
   void emitJumpSlowCaseIfNotImmediateInteger(RegisterID);
+  void emitJumpSlowCaseIfNotImmediateNumber(RegisterID);
   void emitJumpSlowCaseIfNotImmediateIntegers(RegisterID,
                                               RegisterID,
                                               RegisterID);
