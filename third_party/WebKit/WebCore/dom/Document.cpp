@@ -1984,7 +1984,9 @@ CSSStyleSheet* Document::pageUserSheet() {
     return 0;
 
   // Parse the sheet and cache it.
-  m_pageUserSheet = CSSStyleSheet::create(this);
+  m_pageUserSheet =
+      CSSStyleSheet::create(this, settings()->userStyleSheetLocation());
+  m_pageUserSheet->setIsUserStyleSheet(true);
   m_pageUserSheet->parseString(userSheetText, !inCompatMode());
   return m_pageUserSheet.get();
 }
@@ -2016,7 +2018,8 @@ const Vector<RefPtr<CSSStyleSheet>>* Document::pageGroupUserSheets() const {
     for (unsigned i = 0; i < sheets->size(); ++i) {
       const UserStyleSheet* sheet = sheets->at(i).get();
       RefPtr<CSSStyleSheet> parsedSheet =
-          CSSStyleSheet::create(const_cast<Document*>(this));
+          CSSStyleSheet::create(const_cast<Document*>(this), sheet->url());
+      parsedSheet->setIsUserStyleSheet(true);
       parsedSheet->parseString(sheet->source(), !inCompatMode());
       if (!m_pageGroupUserSheets)
         m_pageGroupUserSheets.set(new Vector<RefPtr<CSSStyleSheet>>);

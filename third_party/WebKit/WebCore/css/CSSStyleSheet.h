@@ -98,6 +98,9 @@ class CSSStyleSheet : public StyleSheet {
   void setStrictParsing(bool b) { m_strictParsing = b; }
   bool useStrictParsing() const { return m_strictParsing; }
 
+  void setIsUserStyleSheet(bool b) { m_isUserStyleSheet = b; }
+  bool isUserStyleSheet() const { return m_isUserStyleSheet; }
+
  private:
   CSSStyleSheet(Node* ownerNode, const String& href, const String& charset);
   CSSStyleSheet(CSSStyleSheet* parentSheet,
@@ -113,6 +116,7 @@ class CSSStyleSheet : public StyleSheet {
   String m_charset;
   bool m_loadCompleted : 1;
   bool m_strictParsing : 1;
+  bool m_isUserStyleSheet : 1;
 };
 
 }  // namespace
