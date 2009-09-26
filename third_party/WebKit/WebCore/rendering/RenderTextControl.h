@@ -60,7 +60,7 @@ class RenderTextControl : public RenderBlock {
   void updatePlaceholderVisibility(bool, bool);
 
  protected:
-  RenderTextControl(Node*);
+  RenderTextControl(Node*, bool);
 
   int scrollbarThickness() const;
   void adjustInnerTextStyle(const RenderStyle* startStyle,

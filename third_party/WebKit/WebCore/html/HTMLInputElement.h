@@ -37,7 +37,7 @@ class HTMLOptionElement;
 class KURL;
 class VisibleSelection;
 
-class HTMLInputElement : public HTMLFormControlElementWithState,
+class HTMLInputElement : public HTMLTextFormControlElement,
                          public InputElement {
  public:
   enum InputType {
@@ -72,8 +72,6 @@ class HTMLInputElement : public HTMLFormControlElementWithState,
   virtual bool isKeyboardFocusable(KeyboardEvent*) const;
   virtual bool isMouseFocusable() const;
   virtual bool isEnumeratable() const { return inputType() != IMAGE; }
-  virtual void dispatchFocusEvent();
-  virtual void dispatchBlurEvent();
   virtual void updateFocusAppearance(bool restorePreviousSelection);
   virtual void aboutToUnload();
   virtual bool shouldUseInputMethod() const;
@@ -239,8 +237,6 @@ class HTMLInputElement : public HTMLFormControlElementWithState,
 
   virtual bool willValidate() const;
 
-  virtual bool placeholderShouldBeVisible() const;
-
   // Converts the specified string to a floating number.
   // If the conversion fails, the return value is false. Take care that leading
   // or trailing unnecessary characters make failures.  This returns false for
@@ -252,16 +248,17 @@ class HTMLInputElement : public HTMLFormControlElementWithState,
   virtual void willMoveToNewOwnerDocument();
   virtual void didMoveToNewOwnerDocument();
 
-  void updatePlaceholderVisibility() {
-    InputElement::updatePlaceholderVisibility(this, this, true);
-  }
-
  private:
   bool storesValueSeparateFromAttribute() const;
 
   bool needsActivationCallback();
   void registerForActivationCallbackIfNeeded();
   void unregisterForActivationCallbackIfNeeded();
+
+  virtual bool supportsPlaceholder() const { return isTextField(); }
+  virtual bool isEmptyValue() const { return value().isEmpty(); }
+  virtual void handleFocusEvent();
+  virtual void handleBlurEvent();
 
   virtual bool isOptionalFormControl() const {
     return !isRequiredFormControl();

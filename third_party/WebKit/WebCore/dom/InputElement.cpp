@@ -57,8 +57,6 @@ void InputElement::dispatchFocusEvent(InputElement* inputElement,
   if (!inputElement->isTextField())
     return;
 
-  updatePlaceholderVisibility(inputElement, element);
-
   Document* document = element->document();
   if (inputElement->isPasswordField() && document->frame())
     document->setUseSecureKeyboardEntryWhenActive(true);
@@ -74,30 +72,10 @@ void InputElement::dispatchBlurEvent(InputElement* inputElement,
   if (!frame)
     return;
 
-  updatePlaceholderVisibility(inputElement, element);
-
   if (inputElement->isPasswordField())
     document->setUseSecureKeyboardEntryWhenActive(false);
 
   frame->textFieldDidEndEditing(element);
-}
-
-bool InputElement::placeholderShouldBeVisible(const InputElement* inputElement,
-                                              const Element* element) {
-  return inputElement->value().isEmpty() &&
-         element->document()->focusedNode() != element &&
-         !inputElement->placeholder().isEmpty();
-}
-
-void InputElement::updatePlaceholderVisibility(InputElement* inputElement,
-                                               Element* element,
-                                               bool placeholderValueChanged) {
-  ASSERT(inputElement->isTextField());
-  bool placeholderVisible = inputElement->placeholderShouldBeVisible();
-  if (element->renderer())
-    toRenderTextControlSingleLine(element->renderer())
-        ->updatePlaceholderVisibility(placeholderVisible,
-                                      placeholderValueChanged);
 }
 
 void InputElement::updateFocusAppearance(InputElementData& data,
@@ -148,11 +126,8 @@ void InputElement::setValueFromRenderer(InputElementData& data,
                                         Element* element,
                                         const String& value) {
   // Renderer and our event handler are responsible for sanitizing values.
-  ASSERT(value == inputElement->sanitizeValue(value) ||
-         inputElement->sanitizeValue(value).isEmpty());
-
-  if (inputElement->isTextField())
-    updatePlaceholderVisibility(inputElement, element);
+  ASSERT_UNUSED(inputElement, value == inputElement->sanitizeValue(value) ||
+                                  inputElement->sanitizeValue(value).isEmpty());
 
   // Workaround for bug where trailing \n is included in the result of
   // textContent.

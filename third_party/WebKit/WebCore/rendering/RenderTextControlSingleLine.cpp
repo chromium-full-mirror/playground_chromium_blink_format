@@ -49,15 +49,15 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-RenderTextControlSingleLine::RenderTextControlSingleLine(Node* node)
-    : RenderTextControl(node),
+RenderTextControlSingleLine::RenderTextControlSingleLine(
+    Node* node,
+    bool placeholderVisible)
+    : RenderTextControl(node, placeholderVisible),
       m_searchPopupIsVisible(false),
       m_shouldDrawCapsLockIndicator(false),
       m_searchEventTimer(this,
                          &RenderTextControlSingleLine::searchEventTimerFired),
-      m_searchPopup(0) {
-  m_placeholderVisible = inputElement()->placeholderShouldBeVisible();
-}
+      m_searchPopup(0) {}
 
 RenderTextControlSingleLine::~RenderTextControlSingleLine() {
   if (m_searchPopup) {
@@ -489,7 +489,8 @@ void RenderTextControlSingleLine::updateFromElement() {
 
   if (m_placeholderVisible) {
     ExceptionCode ec = 0;
-    innerTextElement()->setInnerText(inputElement()->placeholder(), ec);
+    innerTextElement()->setInnerText(
+        static_cast<Element*>(node())->getAttribute(placeholderAttr), ec);
     ASSERT(!ec);
   } else
     setInnerTextValue(inputElement()->value());
