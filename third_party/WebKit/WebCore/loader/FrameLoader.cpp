@@ -2511,9 +2511,6 @@ void FrameLoader::loadURL(const KURL& newURL,
                           FrameLoadType newLoadType,
                           PassRefPtr<Event> event,
                           PassRefPtr<FormState> prpFormState) {
-  if (m_unloadEventBeingDispatched)
-    return;
-
   RefPtr<FormState> formState = prpFormState;
   bool isFormSubmission = formState;
 
@@ -2540,6 +2537,9 @@ void FrameLoader::loadURL(const KURL& newURL,
                                    newLoadType, event, formState.release());
     return;
   }
+
+  if (m_unloadEventBeingDispatched)
+    return;
 
   NavigationAction action(newURL, newLoadType, isFormSubmission, event);
 
