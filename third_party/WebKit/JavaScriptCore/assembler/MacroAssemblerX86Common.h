@@ -270,6 +270,10 @@ class MacroAssemblerX86Common : public AbstractMacroAssembler<X86Assembler> {
                         address.scale, dest);
   }
 
+  void load32WithUnalignedHalfWords(BaseIndex address, RegisterID dest) {
+    load32(address, dest);
+  }
+
   DataLabel32 load32WithAddressOffsetPatch(Address address, RegisterID dest) {
     m_assembler.movl_mr_disp32(address.offset, address.base, dest);
     return DataLabel32(this);
@@ -514,6 +518,12 @@ class MacroAssemblerX86Common : public AbstractMacroAssembler<X86Assembler> {
     m_assembler.cmpl_im(right.m_value, left.offset, left.base, left.index,
                         left.scale);
     return Jump(m_assembler.jCC(x86Condition(cond)));
+  }
+
+  Jump branch32WithUnalignedHalfWords(Condition cond,
+                                      BaseIndex left,
+                                      Imm32 right) {
+    return branch32(cond, left, right);
   }
 
   Jump branch16(Condition cond, BaseIndex left, RegisterID right) {

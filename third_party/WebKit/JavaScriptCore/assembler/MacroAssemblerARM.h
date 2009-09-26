@@ -179,6 +179,14 @@ class MacroAssemblerARM : public AbstractMacroAssembler<ARMAssembler> {
                                     address.offset);
   }
 
+#if defined(ARM_REQUIRE_NATURAL_ALIGNMENT) && ARM_REQUIRE_NATURAL_ALIGNMENT
+  void load32WithUnalignedHalfWords(BaseIndex address, RegisterID dest);
+#else
+  void load32WithUnalignedHalfWords(BaseIndex address, RegisterID dest) {
+    load32(address, dest);
+  }
+#endif
+
   DataLabel32 load32WithAddressOffsetPatch(Address address, RegisterID dest) {
     DataLabel32 dataLabel(this);
     m_assembler.ldr_un_imm(ARMRegisters::S0, 0);
@@ -323,6 +331,13 @@ class MacroAssemblerARM : public AbstractMacroAssembler<ARMAssembler> {
 
   Jump branch32(Condition cond, BaseIndex left, Imm32 right) {
     load32(left, ARMRegisters::S1);
+    return branch32(cond, ARMRegisters::S1, right);
+  }
+
+  Jump branch32WithUnalignedHalfWords(Condition cond,
+                                      BaseIndex left,
+                                      Imm32 right) {
+    load32WithUnalignedHalfWords(left, ARMRegisters::S1);
     return branch32(cond, ARMRegisters::S1, right);
   }
 

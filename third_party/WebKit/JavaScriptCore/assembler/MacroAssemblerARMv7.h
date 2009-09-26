@@ -347,6 +347,10 @@ class MacroAssemblerARMv7 : public AbstractMacroAssembler<ARMv7Assembler> {
     load32(setupArmAddress(address), dest);
   }
 
+  void load32WithUnalignedHalfWords(BaseIndex address, RegisterID dest) {
+    load32(setupArmAddress(address), dest);
+  }
+
   void load32(void* address, RegisterID dest) {
     move(ImmPtr(address), addressTempRegister);
     m_assembler.ldr(dest, addressTempRegister,
@@ -657,6 +661,15 @@ class MacroAssemblerARMv7 : public AbstractMacroAssembler<ARMv7Assembler> {
     // use addressTempRegister incase the branch32 we call uses
     // dataTempRegister. :-/
     load32(left, addressTempRegister);
+    return branch32(cond, addressTempRegister, right);
+  }
+
+  Jump branch32WithUnalignedHalfWords(Condition cond,
+                                      BaseIndex left,
+                                      Imm32 right) {
+    // use addressTempRegister incase the branch32 we call uses
+    // dataTempRegister. :-/
+    load32WithUnalignedHalfWords(left, addressTempRegister);
     return branch32(cond, addressTempRegister, right);
   }
 
