@@ -55,7 +55,7 @@ JSValue JSEventSource::addEventListener(ExecState* exec, const ArgList& args) {
 
   impl()->addEventListener(
       args.at(0).toString(exec),
-      JSEventListener::create(asObject(listener), false).get(),
+      JSEventListener::create(asObject(listener), globalObject, false).get(),
       args.at(2).toBoolean(exec));
   return jsUndefined();
 }
@@ -73,7 +73,7 @@ JSValue JSEventSource::removeEventListener(ExecState* exec,
 
   impl()->removeEventListener(
       args.at(0).toString(exec),
-      JSEventListener::create(asObject(listener), false).get(),
+      JSEventListener::create(asObject(listener), globalObject, false).get(),
       args.at(2).toBoolean(exec));
   return jsUndefined();
 }

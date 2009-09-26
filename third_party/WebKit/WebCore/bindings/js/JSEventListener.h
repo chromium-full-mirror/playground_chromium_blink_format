@@ -32,8 +32,9 @@ class JSDOMGlobalObject;
 class JSEventListener : public EventListener {
  public:
   static PassRefPtr<JSEventListener> create(JSC::JSObject* listener,
+                                            JSDOMGlobalObject* globalObject,
                                             bool isAttribute) {
-    return adoptRef(new JSEventListener(listener, isAttribute));
+    return adoptRef(new JSEventListener(listener, globalObject, isAttribute));
   }
 
   static const JSEventListener* cast(const EventListener* listener) {
@@ -50,22 +51,24 @@ class JSEventListener : public EventListener {
   // attribute, like "onload" or "onclick".
   bool isAttribute() const { return m_isAttribute; }
 
-  virtual JSC::JSObject* jsFunction(ScriptExecutionContext*) const;
+  virtual JSC::JSObject* jsFunction() const;
 
  private:
   virtual void markJSFunction(JSC::MarkStack&);
-  virtual void handleEvent(ScriptExecutionContext*, Event*);
-  virtual bool reportError(ScriptExecutionContext*,
-                           const String& message,
+  virtual void handleEvent(Event*);
+  virtual bool reportError(const String& message,
                            const String& url,
                            int lineNumber);
   virtual bool virtualisAttribute() const;
   void clearJSFunctionInline();
 
  protected:
-  JSEventListener(JSC::JSObject* function, bool isAttribute);
+  JSEventListener(JSC::JSObject* function,
+                  JSDOMGlobalObject*,
+                  bool isAttribute);
 
   mutable JSC::JSObject* m_jsFunction;
+  JSDOMGlobalObject* m_globalObject;
   bool m_isAttribute;
 };
 

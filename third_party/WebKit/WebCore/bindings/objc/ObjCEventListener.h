@@ -53,7 +53,7 @@ class ObjCEventListener : public EventListener {
   ObjCEventListener(id<DOMEventListener>);
   virtual ~ObjCEventListener();
 
-  virtual void handleEvent(ScriptExecutionContext*, Event*);
+  virtual void handleEvent(Event*);
 
   id<DOMEventListener> m_listener;
 };

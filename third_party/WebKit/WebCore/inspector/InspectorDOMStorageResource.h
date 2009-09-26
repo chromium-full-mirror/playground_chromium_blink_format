@@ -66,7 +66,7 @@ class InspectorDOMStorageResource : public EventListener {
   void unbind();
   void startReportingChangesToFrontend();
 
-  virtual void handleEvent(ScriptExecutionContext*, Event*);
+  virtual void handleEvent(Event*);
   virtual bool operator==(const EventListener& listener);
 
   bool isSameHostAndType(Frame*, bool isLocalStorage) const;
