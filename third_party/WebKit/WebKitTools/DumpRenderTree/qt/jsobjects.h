@@ -55,6 +55,7 @@ class LayoutTestController : public QObject {
   bool shouldWaitUntilDone() const { return m_waitForDone; }
   bool canOpenWindows() const { return m_canOpenWindows; }
   bool shouldDumpTitleChanges() const { return m_dumpTitleChanges; }
+  bool waitForPolicy() const { return m_waitForPolicy; }
 
   void reset();
 
@@ -112,6 +113,8 @@ class LayoutTestController : public QObject {
   void setDatabaseQuota(int size);
   void clearAllDatabases();
 
+  void waitForPolicyDelegate();
+
  private slots:
   void processWork();
 
@@ -124,6 +127,7 @@ class LayoutTestController : public QObject {
   bool m_waitForDone;
   bool m_dumpTitleChanges;
   bool m_dumpDatabaseCallbacks;
+  bool m_waitForPolicy;
   QBasicTimer m_timeoutTimer;
   QWebFrame* m_topLoadingFrame;
   WebCore::DumpRenderTree* m_drt;

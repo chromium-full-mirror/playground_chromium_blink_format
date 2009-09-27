@@ -45,6 +45,7 @@
 #include <QUrl>
 #include <QFocusEvent>
 #include <QFontDatabase>
+#include <QNetworkRequest>
 
 #include <qwebpage.h>
 #include <qwebframe.h>
@@ -90,6 +91,11 @@ class WebPage : public QWebPage {
 
  public slots:
   bool shouldInterruptJavaScript() { return false; }
+
+ protected:
+  bool acceptNavigationRequest(QWebFrame* frame,
+                               const QNetworkRequest& request,
+                               NavigationType type);
 
  private slots:
   void setViewGeometry(const QRect& r) {
@@ -150,6 +156,44 @@ bool WebPage::javaScriptPrompt(QWebFrame*,
           defaultValue.toUtf8().constData());
   *result = defaultValue;
   return true;
+}
+
+bool WebPage::acceptNavigationRequest(QWebFrame* frame,
+                                      const QNetworkRequest& request,
+                                      NavigationType type) {
+  if (m_drt->layoutTestController()->waitForPolicy()) {
+    QString url = QString::fromUtf8(request.url().toEncoded());
+    QString typeDescription;
+
+    switch (type) {
+      case NavigationTypeLinkClicked:
+        typeDescription = "link clicked";
+        break;
+      case NavigationTypeFormSubmitted:
+        typeDescription = "form submitted";
+        break;
+      case NavigationTypeBackOrForward:
+        typeDescription = "back/forward";
+        break;
+      case NavigationTypeReload:
+        typeDescription = "reload";
+        break;
+      case NavigationTypeFormResubmitted:
+        typeDescription = "form resubmitted";
+        break;
+      case NavigationTypeOther:
+        typeDescription = "other";
+        break;
+      default:
+        typeDescription = "illegal value";
+    }
+
+    fprintf(stdout,
+            "Policy delegate: attempt to load %s with navigation type '%s'\n",
+            url.toUtf8().constData(), typeDescription.toUtf8().constData());
+    m_drt->layoutTestController()->notifyDone();
+  }
+  return QWebPage::acceptNavigationRequest(frame, request, type);
 }
 
 DumpRenderTree::DumpRenderTree()
