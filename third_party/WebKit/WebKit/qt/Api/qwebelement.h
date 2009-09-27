@@ -79,6 +79,9 @@ class QWEBKIT_EXPORT QWebElement {
   void removeClass(const QString& name);
   void toggleClass(const QString& name);
 
+  bool hasFocus() const;
+  void setFocus();
+
   QRect geometry() const;
 
   QString tagName() const;
