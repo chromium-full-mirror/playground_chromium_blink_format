@@ -1020,7 +1020,8 @@ void RenderBox::mapLocalToContainer(RenderBoxModelObject* repaintContainer,
   if (style()->position() == FixedPosition)
     fixed = true;
 
-  RenderObject* o = container();
+  bool containerSkipped;
+  RenderObject* o = container(repaintContainer, &containerSkipped);
   if (!o)
     return;
 
@@ -1043,6 +1044,18 @@ void RenderBox::mapLocalToContainer(RenderBoxModelObject* repaintContainer,
     transformState.move(containerOffset.width(), containerOffset.height(),
                         preserve3D ? TransformState::AccumulateTransform
                                    : TransformState::FlattenTransform);
+
+  if (containerSkipped) {
+    // There can't be a transfrom between repaintContainer and o, because
+    // transforms create containers, so it should be safe
+    // to just subtract the delta between the repaintContainer and o.
+    IntSize repaintContainerOffset = repaintContainer->offsetFromContainer(o);
+    transformState.move(-repaintContainerOffset.width(),
+                        -repaintContainerOffset.height(),
+                        preserve3D ? TransformState::AccumulateTransform
+                                   : TransformState::FlattenTransform);
+    return;
+  }
 
   o->mapLocalToContainer(repaintContainer, fixed, useTransforms,
                          transformState);
@@ -1234,7 +1247,8 @@ void RenderBox::computeRectForRepaint(RenderBoxModelObject* repaintContainer,
   if (repaintContainer == this)
     return;
 
-  RenderObject* o = container();
+  bool containerSkipped;
+  RenderObject* o = container(repaintContainer, &containerSkipped);
   if (!o)
     return;
 
@@ -1303,6 +1317,14 @@ void RenderBox::computeRectForRepaint(RenderBoxModelObject* repaintContainer,
       return;
   } else
     rect.setLocation(topLeft);
+
+  if (containerSkipped) {
+    // If the repaintContainer is below o, then we need to map the rect into
+    // repaintContainer's coordinates.
+    IntSize containerOffset = repaintContainer->offsetFromContainer(o);
+    rect.move(-containerOffset);
+    return;
+  }
 
   o->computeRectForRepaint(repaintContainer, rect, fixed);
 }
