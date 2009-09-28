@@ -49,7 +49,6 @@
 #include <wtf/Platform.h>
 #include <wtf/Vector.h>
 
-#include "KURL.h"
 #include "PlatformString.h"
 
 typedef const struct __CFData* CFDataRef;
@@ -161,9 +160,6 @@ String filenameForDisplay(const String&);
 
 #if PLATFORM(CHROMIUM)
 String pathGetDisplayFileName(const String&);
-String getAbsolutePath(const String&);
-bool isDirectory(const String&);
-KURL filePathToURL(const String&);
 #endif
 
 }  // namespace WebCore
