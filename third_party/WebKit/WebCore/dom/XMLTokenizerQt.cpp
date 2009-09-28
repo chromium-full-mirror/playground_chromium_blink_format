@@ -51,6 +51,7 @@
 #include "ScriptSourceCode.h"
 #include "ScriptValue.h"
 #include "TextResourceDecoder.h"
+#include "TransformSource.h"
 #include <QDebug>
 #include <wtf/Platform.h>
 #include <wtf/StringExtras.h>
@@ -250,48 +251,22 @@ void XMLTokenizer::initializeParserContext(const char* chunk) {
 
 void XMLTokenizer::doEnd() {
 #if ENABLE(XSLT)
-#warning Look at XMLTokenizerLibXml.cpp
+  if (m_sawXSLTransform) {
+    m_doc->setTransformSource(
+        new TransformSource(m_originalSourceForTransform));
+    m_doc->setParsing(
+        false);  // Make the doc think it's done, so it will apply xsl sheets.
+    m_doc->updateStyleSelector();
+    m_doc->setParsing(true);
+    m_parserStopped = true;
+  }
 #endif
 
   if (m_stream.error() == QXmlStreamReader::PrematureEndOfDocumentError ||
-      (m_wroteText && !m_sawFirstElement)) {
+      (m_wroteText && !m_sawFirstElement && !m_sawXSLTransform))
     handleError(fatal, qPrintable(m_stream.errorString()), lineNumber(),
                 columnNumber());
-  }
 }
-
-#if ENABLE(XSLT)
-void* xmlDocPtrForString(DocLoader* docLoader,
-                         const String& source,
-                         const String& url) {
-  if (source.isEmpty())
-    return 0;
-
-  // Parse in a single chunk into an xmlDocPtr
-  // FIXME: Hook up error handlers so that a failure to parse the main document
-  // results in
-  // good error messages.
-  const UChar BOM = 0xFEFF;
-  const unsigned char BOMHighByte =
-      *reinterpret_cast<const unsigned char*>(&BOM);
-
-  xmlGenericErrorFunc oldErrorFunc = xmlGenericError;
-  void* oldErrorContext = xmlGenericErrorContext;
-
-  setLoaderForLibXMLCallbacks(docLoader);
-  xmlSetGenericErrorFunc(0, errorFunc);
-
-  xmlDocPtr sourceDoc = xmlReadMemory(
-      reinterpret_cast<const char*>(source.characters()),
-      source.length() * sizeof(UChar), url.latin1().data(),
-      BOMHighByte == 0xFF ? "UTF-16LE" : "UTF-16BE", XSLT_PARSE_OPTIONS);
-
-  setLoaderForLibXMLCallbacks(0);
-  xmlSetGenericErrorFunc(oldErrorContext, oldErrorFunc);
-
-  return sourceDoc;
-}
-#endif
 
 int XMLTokenizer::lineNumber() const {
   return m_stream.lineNumber();
@@ -683,8 +658,8 @@ void XMLTokenizer::parseProcessingInstruction() {
 
 #if ENABLE(XSLT)
   m_sawXSLTransform = !m_sawFirstElement && pi->isXSL();
-  if (m_sawXSLTransform && !m_doc->transformSourceDocument()))
-        stopParsing();
+  if (m_sawXSLTransform && !m_doc->transformSourceDocument())
+    stopParsing();
 #endif
 }
 
