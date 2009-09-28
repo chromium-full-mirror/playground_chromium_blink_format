@@ -73,11 +73,7 @@ class XSLTProcessor : public RefCounted<XSLTProcessor> {
   void removeParameter(const String& namespaceURI, const String& localName);
   void clearParameters() { m_parameters.clear(); }
 
-  void reset() {
-    m_stylesheet.clear();
-    m_stylesheetRootNode.clear();
-    m_parameters.clear();
-  }
+  void reset();
 
   static void parseErrorFunc(void* userData, xmlError*);
   static void genericErrorFunc(void* userData, const char* msg, ...);
