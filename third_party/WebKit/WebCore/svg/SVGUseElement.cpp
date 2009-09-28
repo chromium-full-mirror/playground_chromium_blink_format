@@ -2,6 +2,8 @@
     Copyright (C) 2004, 2005, 2006, 2007, 2008 Nikolas Zimmermann
    <zimmermann@kde.org>
                   2004, 2005, 2006, 2007 Rob Buis <buis@kde.org>
+    Copyright (C) Research In Motion Limited 2009, All rights reserved. Charles
+   Wei <charles.wei@torchmobile.com.cn>
 
     This file is part of the KDE project
 
@@ -153,6 +155,10 @@ void SVGUseElement::childrenChanged(bool changedByParser,
 }
 
 static bool shadowTreeContainsChangedNodes(SVGElementInstance* target) {
+  if (!target)  // when use is referencing an non-existing element, there will
+                // be no Instance tree built
+    return false;
+
   if (target->needsUpdate())
     return true;
 
