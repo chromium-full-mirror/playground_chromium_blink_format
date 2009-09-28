@@ -107,6 +107,9 @@ class ChromiumBridge {
   static String pathByAppendingComponent(const String& path,
                                          const String& component);
   static bool makeAllDirectories(const String& path);
+  static String getAbsolutePath(const String&);
+  static bool isDirectory(const String&);
+  static KURL filePathToURL(const String&);
 
 // Font ---------------------------------------------------------------
 #if PLATFORM(WIN_OS)
