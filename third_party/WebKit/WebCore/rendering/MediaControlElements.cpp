@@ -137,8 +137,12 @@ PassRefPtr<RenderStyle> MediaControlElement::styleForElement() {
 }
 
 bool MediaControlElement::rendererIsNeeded(RenderStyle* style) {
+  ASSERT(document()->page());
+
   return HTMLDivElement::rendererIsNeeded(style) && parent() &&
-         parent()->renderer();
+         parent()->renderer() &&
+         document()->page()->theme()->shouldRenderMediaControlPart(
+             style->appearance(), m_mediaElement);
 }
 
 void MediaControlElement::attach() {
@@ -362,8 +366,12 @@ PassRefPtr<RenderStyle> MediaControlInputElement::styleForElement() {
 }
 
 bool MediaControlInputElement::rendererIsNeeded(RenderStyle* style) {
+  ASSERT(document()->page());
+
   return HTMLInputElement::rendererIsNeeded(style) && parent() &&
-         parent()->renderer();
+         parent()->renderer() &&
+         document()->page()->theme()->shouldRenderMediaControlPart(
+             style->appearance(), m_mediaElement);
 }
 
 void MediaControlInputElement::attach() {
@@ -445,14 +453,6 @@ void MediaControlMuteButtonElement::defaultEventHandler(Event* event) {
 
 void MediaControlMuteButtonElement::updateDisplayType() {
   setDisplayType(m_mediaElement->muted() ? MediaUnMuteButton : MediaMuteButton);
-}
-
-bool MediaControlMuteButtonElement::disabled() const {
-  return !m_mediaElement->hasAudio();
-}
-
-bool MediaControlMuteButtonElement::rendererIsNeeded(RenderStyle* style) {
-  return MediaControlInputElement::rendererIsNeeded(style) && !disabled();
 }
 
 // ----------------------------
@@ -558,11 +558,6 @@ void MediaControlRewindButtonElement::defaultEventHandler(Event* event) {
   HTMLInputElement::defaultEventHandler(event);
 }
 
-bool MediaControlRewindButtonElement::rendererIsNeeded(RenderStyle* style) {
-  return MediaControlInputElement::rendererIsNeeded(style) &&
-         m_mediaElement->movieLoadType() != MediaPlayer::LiveStream;
-}
-
 // ----------------------------
 
 MediaControlReturnToRealtimeButtonElement::
@@ -580,12 +575,6 @@ void MediaControlReturnToRealtimeButtonElement::defaultEventHandler(
     event->setDefaultHandled();
   }
   HTMLInputElement::defaultEventHandler(event);
-}
-
-bool MediaControlReturnToRealtimeButtonElement::rendererIsNeeded(
-    RenderStyle* style) {
-  return MediaControlInputElement::rendererIsNeeded(style) &&
-         m_mediaElement->movieLoadType() == MediaPlayer::LiveStream;
 }
 
 // ----------------------------
@@ -681,11 +670,6 @@ void MediaControlFullscreenButtonElement::defaultEventHandler(Event* event) {
     event->setDefaultHandled();
   }
   HTMLInputElement::defaultEventHandler(event);
-}
-
-bool MediaControlFullscreenButtonElement::rendererIsNeeded(RenderStyle* style) {
-  return MediaControlInputElement::rendererIsNeeded(style) &&
-         m_mediaElement->supportsFullscreen();
 }
 
 // ----------------------------
