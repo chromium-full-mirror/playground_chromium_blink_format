@@ -252,17 +252,6 @@ bool InspectorBackend::timelineEnabled() const {
   return false;
 }
 
-void InspectorBackend::getCookies(long callId) {
-  if (InspectorDOMAgent* domAgent = inspectorDOMAgent())
-    domAgent->getCookies(callId);
-}
-
-void InspectorBackend::deleteCookie(const String& cookieName) {
-  if (!m_inspectorController)
-    return;
-  m_inspectorController->deleteCookie(cookieName);
-}
-
 #if ENABLE(JAVASCRIPT_DEBUGGER)
 const ProfilesArray& InspectorBackend::profiles() const {
   if (m_inspectorController)
@@ -417,12 +406,28 @@ void InspectorBackend::setTextNodeValue(long callId,
     domAgent->setTextNodeValue(callId, nodeId, value);
 }
 
+void InspectorBackend::getEventListenersForNode(long callId, long nodeId) {
+  if (InspectorDOMAgent* domAgent = inspectorDOMAgent())
+    domAgent->getEventListenersForNode(callId, nodeId);
+}
+
 void InspectorBackend::copyNode(long nodeId) {
   Node* node = nodeForId(nodeId);
   if (!node)
     return;
   String markup = createMarkup(node);
   Pasteboard::generalPasteboard()->writePlainText(markup);
+}
+
+void InspectorBackend::getCookies(long callId) {
+  if (InspectorDOMAgent* domAgent = inspectorDOMAgent())
+    domAgent->getCookies(callId);
+}
+
+void InspectorBackend::deleteCookie(const String& cookieName) {
+  if (!m_inspectorController)
+    return;
+  m_inspectorController->deleteCookie(cookieName);
 }
 
 void InspectorBackend::highlight(long nodeId) {

@@ -230,6 +230,9 @@ class Node : public EventTarget, public TreeShared<Node> {
   // The node's parent for the purpose of event capture and bubbling.
   virtual ContainerNode* eventParentNode();
 
+  // Node ancestors when concerned about event flow
+  void eventAncestors(Vector<RefPtr<ContainerNode>>& ancestors);
+
   bool isBlockFlow() const;
   bool isBlockFlowOrBlockTable() const;
 
