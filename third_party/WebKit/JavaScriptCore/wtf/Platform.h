@@ -233,7 +233,7 @@
 #endif
 #define ARM_ARCH_VERSION 3
 #if defined(__ARM_ARCH_4__) || defined(__ARM_ARCH_4T__) || \
-    defined(__MARM_ARMV4__)
+    defined(__MARM_ARMV4__) || defined(_ARMV4I_)
 #undef ARM_ARCH_VERSION
 #define ARM_ARCH_VERSION 4
 #endif
