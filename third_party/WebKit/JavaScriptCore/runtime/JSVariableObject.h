@@ -90,7 +90,8 @@ class JSVariableObject : public JSObject {
     JSVariableObjectData& operator=(const JSVariableObjectData&);
   };
 
-  JSVariableObject(PassRefPtr<Structure> structure, JSVariableObjectData* data)
+  JSVariableObject(NonNullPassRefPtr<Structure> structure,
+                   JSVariableObjectData* data)
       : JSObject(structure),
         d(data)  // Subclass owns this pointer.
   {}

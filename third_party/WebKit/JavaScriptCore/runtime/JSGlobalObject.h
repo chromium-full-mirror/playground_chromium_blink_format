@@ -155,7 +155,7 @@ class JSGlobalObject : public JSVariableObject {
   }
 
  protected:
-  JSGlobalObject(PassRefPtr<Structure> structure,
+  JSGlobalObject(NonNullPassRefPtr<Structure> structure,
                  JSGlobalObjectData* data,
                  JSObject* thisValue)
       : JSVariableObject(structure, data) {

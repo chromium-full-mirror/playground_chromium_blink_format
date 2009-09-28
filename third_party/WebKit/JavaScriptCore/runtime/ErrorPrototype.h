@@ -31,7 +31,7 @@ class ObjectPrototype;
 class ErrorPrototype : public ErrorInstance {
  public:
   ErrorPrototype(ExecState*,
-                 PassRefPtr<Structure>,
+                 NonNullPassRefPtr<Structure>,
                  Structure* prototypeFunctionStructure);
 };
 

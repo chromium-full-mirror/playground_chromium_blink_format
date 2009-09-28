@@ -180,7 +180,7 @@ const ClassInfo ArrayPrototype::info = {"Array", &JSArray::info, 0,
 */
 
 // ECMA 15.4.4
-ArrayPrototype::ArrayPrototype(PassRefPtr<Structure> structure)
+ArrayPrototype::ArrayPrototype(NonNullPassRefPtr<Structure> structure)
     : JSArray(structure) {}
 
 bool ArrayPrototype::getOwnPropertySlot(ExecState* exec,

@@ -62,7 +62,7 @@ static JSValue JSC_HOST_CALL objectConstructorCreate(ExecState*,
                                                      const ArgList&);
 
 ObjectConstructor::ObjectConstructor(ExecState* exec,
-                                     PassRefPtr<Structure> structure,
+                                     NonNullPassRefPtr<Structure> structure,
                                      ObjectPrototype* objectPrototype,
                                      Structure* prototypeFunctionStructure)
     : InternalFunction(&exec->globalData(),

@@ -563,7 +563,8 @@ const ClassInfo DatePrototype::info = {"Date", &DateInstance::info, 0,
 
 // ECMA 15.9.4
 
-DatePrototype::DatePrototype(ExecState* exec, PassRefPtr<Structure> structure)
+DatePrototype::DatePrototype(ExecState* exec,
+                             NonNullPassRefPtr<Structure> structure)
     : DateInstance(structure) {
   setInternalValue(jsNaN(exec));
   // The constructor will be added later, after DateConstructor has been built.

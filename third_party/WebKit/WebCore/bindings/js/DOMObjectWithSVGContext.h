@@ -40,7 +40,7 @@ class DOMObjectWithSVGContext : public DOMObject {
   SVGElement* context() const { return m_context.get(); }
 
  protected:
-  DOMObjectWithSVGContext(PassRefPtr<JSC::Structure> structure,
+  DOMObjectWithSVGContext(NonNullPassRefPtr<JSC::Structure> structure,
                           JSDOMGlobalObject*,
                           SVGElement* context)
       : DOMObject(structure), m_context(context) {

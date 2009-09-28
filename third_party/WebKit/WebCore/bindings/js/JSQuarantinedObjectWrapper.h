@@ -56,7 +56,7 @@ class JSQuarantinedObjectWrapper : public JSC::JSObject {
  protected:
   JSQuarantinedObjectWrapper(JSC::ExecState* unwrappedExec,
                              JSC::JSObject* unwrappedObject,
-                             PassRefPtr<JSC::Structure>);
+                             NonNullPassRefPtr<JSC::Structure>);
 
   virtual void markChildren(JSC::MarkStack&);
 

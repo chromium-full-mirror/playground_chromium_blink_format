@@ -36,7 +36,7 @@ const ClassInfo NativeErrorConstructor::info = {"Function",
 
 NativeErrorConstructor::NativeErrorConstructor(
     ExecState* exec,
-    PassRefPtr<Structure> structure,
+    NonNullPassRefPtr<Structure> structure,
     NativeErrorPrototype* nativeErrorPrototype)
     : InternalFunction(
           &exec->globalData(),

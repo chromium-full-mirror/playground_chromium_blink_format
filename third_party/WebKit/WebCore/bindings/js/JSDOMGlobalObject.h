@@ -47,7 +47,7 @@ class JSDOMGlobalObject : public JSC::JSGlobalObject {
  protected:
   struct JSDOMGlobalObjectData;
 
-  JSDOMGlobalObject(PassRefPtr<JSC::Structure>,
+  JSDOMGlobalObject(NonNullPassRefPtr<JSC::Structure>,
                     JSDOMGlobalObjectData*,
                     JSC::JSObject* thisValue);
 

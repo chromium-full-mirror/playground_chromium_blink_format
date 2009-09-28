@@ -49,7 +49,7 @@ class PropertyNameArrayData : public RefCounted<PropertyNameArrayData> {
   Structure* cachedStructure() const { return m_cachedStructure; }
 
   void setCachedPrototypeChain(
-      PassRefPtr<StructureChain> cachedPrototypeChain) {
+      NonNullPassRefPtr<StructureChain> cachedPrototypeChain) {
     m_cachedPrototypeChain = cachedPrototypeChain;
   }
   StructureChain* cachedPrototypeChain() {

@@ -80,7 +80,7 @@ JSValue JSInspectedObjectWrapper::wrap(ExecState* unwrappedExec,
 JSInspectedObjectWrapper::JSInspectedObjectWrapper(
     ExecState* unwrappedExec,
     JSObject* unwrappedObject,
-    PassRefPtr<Structure> structure)
+    NonNullPassRefPtr<Structure> structure)
     : JSQuarantinedObjectWrapper(unwrappedExec, unwrappedObject, structure) {
   WrapperMap* wrapperMap = wrappers().get(unwrappedGlobalObject());
   if (!wrapperMap) {

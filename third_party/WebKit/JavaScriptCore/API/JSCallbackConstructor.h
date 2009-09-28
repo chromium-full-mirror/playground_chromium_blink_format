@@ -33,7 +33,7 @@ namespace JSC {
 
 class JSCallbackConstructor : public JSObject {
  public:
-  JSCallbackConstructor(PassRefPtr<Structure>,
+  JSCallbackConstructor(NonNullPassRefPtr<Structure>,
                         JSClassRef,
                         JSObjectCallAsConstructorCallback);
   virtual ~JSCallbackConstructor();

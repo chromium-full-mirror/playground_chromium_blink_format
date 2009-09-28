@@ -31,7 +31,7 @@ class ObjectPrototype;
 class ObjectConstructor : public InternalFunction {
  public:
   ObjectConstructor(ExecState*,
-                    PassRefPtr<Structure>,
+                    NonNullPassRefPtr<Structure>,
                     ObjectPrototype*,
                     Structure* prototypeFunctionStructure);
 

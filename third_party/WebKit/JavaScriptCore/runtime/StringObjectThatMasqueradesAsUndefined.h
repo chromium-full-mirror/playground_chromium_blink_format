@@ -40,7 +40,7 @@ class StringObjectThatMasqueradesAsUndefined : public StringObject {
 
  private:
   StringObjectThatMasqueradesAsUndefined(ExecState* exec,
-                                         PassRefPtr<Structure> structure,
+                                         NonNullPassRefPtr<Structure> structure,
                                          const UString& string)
       : StringObject(exec, structure, string) {}
 

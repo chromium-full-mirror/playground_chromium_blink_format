@@ -29,7 +29,7 @@ namespace JSC {
 class BooleanPrototype : public BooleanObject {
  public:
   BooleanPrototype(ExecState*,
-                   PassRefPtr<Structure>,
+                   NonNullPassRefPtr<Structure>,
                    Structure* prototypeFunctionStructure);
 };
 

@@ -30,7 +30,7 @@ class ObjectPrototype;
 
 class StringPrototype : public StringObject {
  public:
-  StringPrototype(ExecState*, PassRefPtr<Structure>);
+  StringPrototype(ExecState*, NonNullPassRefPtr<Structure>);
 
   virtual bool getOwnPropertySlot(ExecState*,
                                   const Identifier& propertyName,

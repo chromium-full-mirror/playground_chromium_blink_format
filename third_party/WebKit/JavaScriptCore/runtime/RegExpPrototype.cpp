@@ -60,7 +60,7 @@ static JSValue JSC_HOST_CALL regExpProtoFuncToString(ExecState*,
 const ClassInfo RegExpPrototype::info = {"RegExpPrototype", 0, 0, 0};
 
 RegExpPrototype::RegExpPrototype(ExecState* exec,
-                                 PassRefPtr<Structure> structure,
+                                 NonNullPassRefPtr<Structure> structure,
                                  Structure* prototypeFunctionStructure)
     : JSObject(structure) {
   putDirectFunctionWithoutTransition(

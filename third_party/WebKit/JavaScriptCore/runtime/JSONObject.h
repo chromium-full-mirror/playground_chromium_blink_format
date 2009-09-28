@@ -34,7 +34,7 @@ class Stringifier;
 
 class JSONObject : public JSObject {
  public:
-  JSONObject(PassRefPtr<Structure> structure) : JSObject(structure) {}
+  JSONObject(NonNullPassRefPtr<Structure> structure) : JSObject(structure) {}
 
   static PassRefPtr<Structure> createStructure(JSValue prototype) {
     return Structure::create(

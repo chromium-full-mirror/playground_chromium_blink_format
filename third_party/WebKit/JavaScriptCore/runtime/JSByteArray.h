@@ -71,7 +71,7 @@ class JSByteArray : public JSObject {
   }
 
   JSByteArray(ExecState* exec,
-              PassRefPtr<Structure>,
+              NonNullPassRefPtr<Structure>,
               WTF::ByteArray* storage,
               const JSC::ClassInfo* = &s_defaultInfo);
   static PassRefPtr<Structure> createStructure(JSValue prototype);

@@ -84,7 +84,7 @@ JSValue JSInspectorCallbackWrapper::wrap(ExecState* unwrappedExec,
 JSInspectorCallbackWrapper::JSInspectorCallbackWrapper(
     ExecState* unwrappedExec,
     JSObject* unwrappedObject,
-    PassRefPtr<Structure> structure)
+    NonNullPassRefPtr<Structure> structure)
     : JSQuarantinedObjectWrapper(unwrappedExec, unwrappedObject, structure) {
   ASSERT(!wrappers().contains(unwrappedObject));
   wrappers().set(unwrappedObject, this);

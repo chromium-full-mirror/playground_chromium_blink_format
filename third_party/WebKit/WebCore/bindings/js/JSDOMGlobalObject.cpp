@@ -43,7 +43,7 @@ namespace WebCore {
 JSDOMGlobalObject::JSDOMGlobalObjectData::JSDOMGlobalObjectData() : evt(0) {}
 
 JSDOMGlobalObject::JSDOMGlobalObject(
-    PassRefPtr<Structure> structure,
+    NonNullPassRefPtr<Structure> structure,
     JSDOMGlobalObject::JSDOMGlobalObjectData* data,
     JSObject* thisValue)
     : JSGlobalObject(structure, data, thisValue) {}

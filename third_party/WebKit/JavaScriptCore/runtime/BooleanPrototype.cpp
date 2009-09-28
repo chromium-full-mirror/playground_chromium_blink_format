@@ -45,7 +45,7 @@ static JSValue JSC_HOST_CALL booleanProtoFuncValueOf(ExecState*,
 // ECMA 15.6.4
 
 BooleanPrototype::BooleanPrototype(ExecState* exec,
-                                   PassRefPtr<Structure> structure,
+                                   NonNullPassRefPtr<Structure> structure,
                                    Structure* prototypeFunctionStructure)
     : BooleanObject(structure) {
   setInternalValue(jsBoolean(false));

@@ -70,7 +70,7 @@ static JSValue JSC_HOST_CALL objectProtoFuncToLocaleString(ExecState*,
                                                            const ArgList&);
 
 ObjectPrototype::ObjectPrototype(ExecState* exec,
-                                 PassRefPtr<Structure> stucture,
+                                 NonNullPassRefPtr<Structure> stucture,
                                  Structure* prototypeFunctionStructure)
     : JSObject(stucture), m_hasNoPropertiesWithUInt32Names(true) {
   putDirectFunctionWithoutTransition(

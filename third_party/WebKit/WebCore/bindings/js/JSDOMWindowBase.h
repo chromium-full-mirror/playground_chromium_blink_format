@@ -46,7 +46,7 @@ class JSDOMWindowBase : public JSDOMGlobalObject {
   typedef JSDOMGlobalObject Base;
 
  protected:
-  JSDOMWindowBase(PassRefPtr<JSC::Structure>,
+  JSDOMWindowBase(NonNullPassRefPtr<JSC::Structure>,
                   PassRefPtr<DOMWindow>,
                   JSDOMWindowShell*);
 

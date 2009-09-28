@@ -31,7 +31,7 @@ class StringPrototype;
 class StringConstructor : public InternalFunction {
  public:
   StringConstructor(ExecState*,
-                    PassRefPtr<Structure>,
+                    NonNullPassRefPtr<Structure>,
                     Structure* prototypeFunctionStructure,
                     StringPrototype*);
 

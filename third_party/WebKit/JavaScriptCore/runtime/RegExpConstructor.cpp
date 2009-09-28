@@ -143,7 +143,7 @@ struct RegExpConstructorPrivate : FastAllocBase {
 };
 
 RegExpConstructor::RegExpConstructor(ExecState* exec,
-                                     PassRefPtr<Structure> structure,
+                                     NonNullPassRefPtr<Structure> structure,
                                      RegExpPrototype* regExpPrototype)
     : InternalFunction(&exec->globalData(),
                        structure,

@@ -30,7 +30,7 @@ class NumberPrototype;
 
 class NumberConstructor : public InternalFunction {
  public:
-  NumberConstructor(ExecState*, PassRefPtr<Structure>, NumberPrototype*);
+  NumberConstructor(ExecState*, NonNullPassRefPtr<Structure>, NumberPrototype*);
 
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   virtual bool getOwnPropertyDescriptor(ExecState*,

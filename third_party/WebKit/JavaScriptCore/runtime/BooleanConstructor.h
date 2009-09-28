@@ -30,7 +30,9 @@ class BooleanPrototype;
 
 class BooleanConstructor : public InternalFunction {
  public:
-  BooleanConstructor(ExecState*, PassRefPtr<Structure>, BooleanPrototype*);
+  BooleanConstructor(ExecState*,
+                     NonNullPassRefPtr<Structure>,
+                     BooleanPrototype*);
 
  private:
   virtual ConstructType getConstructData(ConstructData&);

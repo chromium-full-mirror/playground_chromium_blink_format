@@ -29,7 +29,7 @@ namespace JSC {
 class NumberPrototype : public NumberObject {
  public:
   NumberPrototype(ExecState*,
-                  PassRefPtr<Structure>,
+                  NonNullPassRefPtr<Structure>,
                   Structure* prototypeFunctionStructure);
 };
 

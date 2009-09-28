@@ -51,7 +51,7 @@ static JSValue JSC_HOST_CALL stringFromCharCode(ExecState* exec,
 ASSERT_CLASS_FITS_IN_CELL(StringConstructor);
 
 StringConstructor::StringConstructor(ExecState* exec,
-                                     PassRefPtr<Structure> structure,
+                                     NonNullPassRefPtr<Structure> structure,
                                      Structure* prototypeFunctionStructure,
                                      StringPrototype* stringPrototype)
     : InternalFunction(

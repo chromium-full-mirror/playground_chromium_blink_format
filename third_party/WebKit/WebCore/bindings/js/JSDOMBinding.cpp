@@ -612,7 +612,7 @@ Structure* getCachedDOMStructure(JSDOMGlobalObject* globalObject,
 }
 
 Structure* cacheDOMStructure(JSDOMGlobalObject* globalObject,
-                             PassRefPtr<Structure> structure,
+                             NonNullPassRefPtr<Structure> structure,
                              const ClassInfo* classInfo) {
   JSDOMStructureMap& structures = globalObject->structures();
   ASSERT(!structures.contains(classInfo));
@@ -625,7 +625,7 @@ Structure* getCachedDOMStructure(ExecState* exec, const ClassInfo* classInfo) {
 }
 
 Structure* cacheDOMStructure(ExecState* exec,
-                             PassRefPtr<Structure> structure,
+                             NonNullPassRefPtr<Structure> structure,
                              const ClassInfo* classInfo) {
   return cacheDOMStructure(
       static_cast<JSDOMGlobalObject*>(exec->lexicalGlobalObject()), structure,

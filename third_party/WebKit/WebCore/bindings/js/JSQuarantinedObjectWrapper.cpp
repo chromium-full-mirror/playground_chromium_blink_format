@@ -62,7 +62,7 @@ JSValue JSQuarantinedObjectWrapper::cachedValueGetter(
 JSQuarantinedObjectWrapper::JSQuarantinedObjectWrapper(
     ExecState* unwrappedExec,
     JSObject* unwrappedObject,
-    PassRefPtr<Structure> structure)
+    NonNullPassRefPtr<Structure> structure)
     : JSObject(structure),
       m_unwrappedGlobalObject(unwrappedExec->lexicalGlobalObject()),
       m_unwrappedObject(unwrappedObject) {

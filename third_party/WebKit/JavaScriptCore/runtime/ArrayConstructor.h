@@ -31,7 +31,7 @@ class ArrayPrototype;
 class ArrayConstructor : public InternalFunction {
  public:
   ArrayConstructor(ExecState*,
-                   PassRefPtr<Structure>,
+                   NonNullPassRefPtr<Structure>,
                    ArrayPrototype*,
                    Structure*);
 

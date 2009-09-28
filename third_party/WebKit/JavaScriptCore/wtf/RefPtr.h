@@ -31,6 +31,8 @@ enum PlacementNewAdoptType { PlacementNewAdopt };
 
 template <typename T>
 class PassRefPtr;
+template <typename T>
+class NonNullPassRefPtr;
 
 enum HashTableDeletedValueType { HashTableDeletedValue };
 
@@ -49,6 +51,8 @@ class RefPtr : public FastAllocBase {
   // see comment in PassRefPtr.h for why this takes const reference
   template <typename U>
   RefPtr(const PassRefPtr<U>&);
+  template <typename U>
+  RefPtr(const NonNullPassRefPtr<U>&);
 
   // Special constructor for cases where we overwrite an object in place.
   RefPtr(PlacementNewAdoptType) {}
@@ -93,10 +97,13 @@ class RefPtr : public FastAllocBase {
   RefPtr& operator=(const RefPtr&);
   RefPtr& operator=(T*);
   RefPtr& operator=(const PassRefPtr<T>&);
+  RefPtr& operator=(const NonNullPassRefPtr<T>&);
   template <typename U>
   RefPtr& operator=(const RefPtr<U>&);
   template <typename U>
   RefPtr& operator=(const PassRefPtr<U>&);
+  template <typename U>
+  RefPtr& operator=(const NonNullPassRefPtr<U>&);
 
   void swap(RefPtr&);
 
@@ -109,6 +116,11 @@ class RefPtr : public FastAllocBase {
 template <typename T>
 template <typename U>
 inline RefPtr<T>::RefPtr(const PassRefPtr<U>& o) : m_ptr(o.releaseRef()) {}
+
+template <typename T>
+template <typename U>
+inline RefPtr<T>::RefPtr(const NonNullPassRefPtr<U>& o)
+    : m_ptr(o.releaseRef()) {}
 
 template <typename T>
 inline RefPtr<T>& RefPtr<T>::operator=(const RefPtr<T>& o) {
@@ -156,8 +168,27 @@ inline RefPtr<T>& RefPtr<T>::operator=(const PassRefPtr<T>& o) {
 }
 
 template <typename T>
+inline RefPtr<T>& RefPtr<T>::operator=(const NonNullPassRefPtr<T>& o) {
+  T* ptr = m_ptr;
+  m_ptr = o.releaseRef();
+  if (ptr)
+    ptr->deref();
+  return *this;
+}
+
+template <typename T>
 template <typename U>
 inline RefPtr<T>& RefPtr<T>::operator=(const PassRefPtr<U>& o) {
+  T* ptr = m_ptr;
+  m_ptr = o.releaseRef();
+  if (ptr)
+    ptr->deref();
+  return *this;
+}
+
+template <typename T>
+template <typename U>
+inline RefPtr<T>& RefPtr<T>::operator=(const NonNullPassRefPtr<U>& o) {
   T* ptr = m_ptr;
   m_ptr = o.releaseRef();
   if (ptr)

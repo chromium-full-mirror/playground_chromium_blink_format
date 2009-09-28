@@ -73,7 +73,7 @@ class RuntimeObjectImp : public JSObject {
 
  protected:
   RuntimeObjectImp(ExecState*,
-                   PassRefPtr<Structure>,
+                   NonNullPassRefPtr<Structure>,
                    PassRefPtr<Bindings::Instance>);
 
  private:

@@ -42,11 +42,13 @@ class JSFunction : public InternalFunction {
 
  public:
   JSFunction(ExecState*,
-             PassRefPtr<Structure>,
+             NonNullPassRefPtr<Structure>,
              int length,
              const Identifier&,
              NativeFunction);
-  JSFunction(ExecState*, PassRefPtr<FunctionExecutable>, ScopeChainNode*);
+  JSFunction(ExecState*,
+             NonNullPassRefPtr<FunctionExecutable>,
+             ScopeChainNode*);
   virtual ~JSFunction();
 
   JSObject* construct(ExecState*, const ArgList&);
@@ -76,7 +78,7 @@ class JSFunction : public InternalFunction {
   virtual CallType getCallData(CallData&);
 
  private:
-  JSFunction(PassRefPtr<Structure>);
+  JSFunction(NonNullPassRefPtr<Structure>);
 
   bool isHostFunctionNonInline() const;
 

@@ -34,7 +34,7 @@ namespace JSC {
 ASSERT_CLASS_FITS_IN_CELL(GlobalEvalFunction);
 
 GlobalEvalFunction::GlobalEvalFunction(ExecState* exec,
-                                       PassRefPtr<Structure> structure,
+                                       NonNullPassRefPtr<Structure> structure,
                                        int len,
                                        const Identifier& name,
                                        NativeFunction function,

@@ -507,7 +507,7 @@ class CodeBlock : public FastAllocBase {
     return m_constantRegisters[index - FirstConstantRegisterIndex].jsValue();
   }
 
-  unsigned addFunctionDecl(PassRefPtr<FunctionExecutable> n) {
+  unsigned addFunctionDecl(NonNullPassRefPtr<FunctionExecutable> n) {
     unsigned size = m_functionDecls.size();
     m_functionDecls.append(n);
     return size;
@@ -516,7 +516,7 @@ class CodeBlock : public FastAllocBase {
     return m_functionDecls[index].get();
   }
   int numberOfFunctionDecls() { return m_functionDecls.size(); }
-  unsigned addFunctionExpr(PassRefPtr<FunctionExecutable> n) {
+  unsigned addFunctionExpr(NonNullPassRefPtr<FunctionExecutable> n) {
     unsigned size = m_functionExprs.size();
     m_functionExprs.append(n);
     return size;

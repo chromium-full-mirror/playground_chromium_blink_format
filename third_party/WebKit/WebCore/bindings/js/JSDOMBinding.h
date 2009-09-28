@@ -52,7 +52,7 @@ class SVGElement;
 // Base class for all objects in this binding except Window.
 class DOMObject : public JSC::JSObject {
  protected:
-  explicit DOMObject(PassRefPtr<JSC::Structure> structure)
+  explicit DOMObject(NonNullPassRefPtr<JSC::Structure> structure)
       : JSObject(structure) {}
 
   virtual bool defineOwnProperty(JSC::ExecState*,
@@ -83,7 +83,7 @@ class DOMObjectWithGlobalPointer : public DOMObject {
   }
 
  protected:
-  DOMObjectWithGlobalPointer(PassRefPtr<JSC::Structure> structure,
+  DOMObjectWithGlobalPointer(NonNullPassRefPtr<JSC::Structure> structure,
                              JSDOMGlobalObject* globalObject)
       : DOMObject(structure), m_globalObject(globalObject) {
     // FIXME: This ASSERT is valid, but fires in fast/dom/gc-6.html when trying
@@ -115,7 +115,7 @@ class DOMConstructorObject : public DOMObjectWithGlobalPointer {
   }
 
  protected:
-  DOMConstructorObject(PassRefPtr<JSC::Structure> structure,
+  DOMConstructorObject(NonNullPassRefPtr<JSC::Structure> structure,
                        JSDOMGlobalObject* globalObject)
       : DOMObjectWithGlobalPointer(structure, globalObject) {}
 };
@@ -129,7 +129,7 @@ class DOMConstructorWithDocument : public DOMConstructorObject {
   }
 
  protected:
-  DOMConstructorWithDocument(PassRefPtr<JSC::Structure> structure,
+  DOMConstructorWithDocument(NonNullPassRefPtr<JSC::Structure> structure,
                              JSDOMGlobalObject* globalObject)
       : DOMConstructorObject(structure, globalObject) {
     ASSERT(globalObject->scriptExecutionContext()->isDocument());
@@ -158,11 +158,11 @@ void markDOMObjectWrapper(JSC::MarkStack&,
 JSC::Structure* getCachedDOMStructure(JSDOMGlobalObject*,
                                       const JSC::ClassInfo*);
 JSC::Structure* cacheDOMStructure(JSDOMGlobalObject*,
-                                  PassRefPtr<JSC::Structure>,
+                                  NonNullPassRefPtr<JSC::Structure>,
                                   const JSC::ClassInfo*);
 JSC::Structure* getCachedDOMStructure(JSC::ExecState*, const JSC::ClassInfo*);
 JSC::Structure* cacheDOMStructure(JSC::ExecState*,
-                                  PassRefPtr<JSC::Structure>,
+                                  NonNullPassRefPtr<JSC::Structure>,
                                   const JSC::ClassInfo*);
 
 JSC::JSObject* getCachedDOMConstructor(JSC::ExecState*, const JSC::ClassInfo*);

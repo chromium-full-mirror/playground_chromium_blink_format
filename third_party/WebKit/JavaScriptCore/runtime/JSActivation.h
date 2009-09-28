@@ -44,7 +44,7 @@ class JSActivation : public JSVariableObject {
   typedef JSVariableObject Base;
 
  public:
-  JSActivation(CallFrame*, PassRefPtr<FunctionExecutable>);
+  JSActivation(CallFrame*, NonNullPassRefPtr<FunctionExecutable>);
   virtual ~JSActivation();
 
   virtual void markChildren(MarkStack&);
@@ -76,7 +76,7 @@ class JSActivation : public JSVariableObject {
 
  private:
   struct JSActivationData : public JSVariableObjectData {
-    JSActivationData(PassRefPtr<FunctionExecutable> _functionExecutable,
+    JSActivationData(NonNullPassRefPtr<FunctionExecutable> _functionExecutable,
                      Register* registers)
         : JSVariableObjectData(
               _functionExecutable->generatedBytecode().symbolTable(),

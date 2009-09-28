@@ -67,7 +67,7 @@ static JSValue JSC_HOST_CALL dateUTC(ExecState*,
                                      const ArgList&);
 
 DateConstructor::DateConstructor(ExecState* exec,
-                                 PassRefPtr<Structure> structure,
+                                 NonNullPassRefPtr<Structure> structure,
                                  Structure* prototypeFunctionStructure,
                                  DatePrototype* datePrototype)
     : InternalFunction(

@@ -41,7 +41,7 @@ static JSValue JSC_HOST_CALL arrayConstructorIsArray(ExecState*,
                                                      const ArgList&);
 
 ArrayConstructor::ArrayConstructor(ExecState* exec,
-                                   PassRefPtr<Structure> structure,
+                                   NonNullPassRefPtr<Structure> structure,
                                    ArrayPrototype* arrayPrototype,
                                    Structure* prototypeFunctionStructure)
     : InternalFunction(

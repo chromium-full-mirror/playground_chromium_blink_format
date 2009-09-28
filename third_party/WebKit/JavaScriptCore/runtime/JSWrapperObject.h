@@ -30,7 +30,7 @@ namespace JSC {
 // Number, Boolean and Date which are wrappers for primitive types.
 class JSWrapperObject : public JSObject {
  protected:
-  explicit JSWrapperObject(PassRefPtr<Structure>);
+  explicit JSWrapperObject(NonNullPassRefPtr<Structure>);
 
  public:
   JSValue internalValue() const { return m_internalValue; }
@@ -49,7 +49,7 @@ class JSWrapperObject : public JSObject {
   JSValue m_internalValue;
 };
 
-inline JSWrapperObject::JSWrapperObject(PassRefPtr<Structure> structure)
+inline JSWrapperObject::JSWrapperObject(NonNullPassRefPtr<Structure> structure)
     : JSObject(structure) {
   addAnonymousSlots(1);
   putAnonymousValue(0, jsNull());

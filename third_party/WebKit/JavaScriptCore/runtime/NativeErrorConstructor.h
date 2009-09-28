@@ -33,7 +33,7 @@ class NativeErrorPrototype;
 class NativeErrorConstructor : public InternalFunction {
  public:
   NativeErrorConstructor(ExecState*,
-                         PassRefPtr<Structure>,
+                         NonNullPassRefPtr<Structure>,
                          NativeErrorPrototype*);
 
   static const ClassInfo info;

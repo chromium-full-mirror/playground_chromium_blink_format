@@ -49,7 +49,7 @@ static JSValue JSC_HOST_CALL functionProtoFuncCall(ExecState*,
                                                    const ArgList&);
 
 FunctionPrototype::FunctionPrototype(ExecState* exec,
-                                     PassRefPtr<Structure> structure)
+                                     NonNullPassRefPtr<Structure> structure)
     : InternalFunction(&exec->globalData(),
                        structure,
                        exec->propertyNames().nullIdentifier) {
