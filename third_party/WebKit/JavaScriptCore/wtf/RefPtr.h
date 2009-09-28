@@ -60,10 +60,7 @@ class RefPtr : public FastAllocBase {
     return m_ptr == hashTableDeletedValue();
   }
 
-  ~RefPtr() {
-    if (T* ptr = m_ptr)
-      ptr->deref();
-  }
+  ~RefPtr() { derefIfNotNull(m_ptr); }
 
   template <typename U>
   RefPtr(const RefPtr<U>& o) : m_ptr(o.get()) {
@@ -74,8 +71,7 @@ class RefPtr : public FastAllocBase {
   T* get() const { return m_ptr; }
 
   void clear() {
-    if (T* ptr = m_ptr)
-      ptr->deref();
+    derefIfNotNull(m_ptr);
     m_ptr = 0;
   }
   PassRefPtr<T> release() {
@@ -89,14 +85,10 @@ class RefPtr : public FastAllocBase {
 
   bool operator!() const { return !m_ptr; }
 
-// This conversion operator allows implicit conversion to bool but not to other
-// integer types.
-#if COMPILER(WINSCW)
-  operator bool() const { return m_ptr; }
-#else
-  typedef T* RefPtr::*UnspecifiedBoolType;
+  // This conversion operator allows implicit conversion to bool but not to
+  // other integer types.
+  typedef T*(RefPtr::*UnspecifiedBoolType);
   operator UnspecifiedBoolType() const { return m_ptr ? &RefPtr::m_ptr : 0; }
-#endif
 
   RefPtr& operator=(const RefPtr&);
   RefPtr& operator=(T*);

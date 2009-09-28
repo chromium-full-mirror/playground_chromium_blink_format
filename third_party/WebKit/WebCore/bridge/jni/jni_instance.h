@@ -46,15 +46,16 @@ class JObjectWrapper {
   friend class JavaInstance;
   friend class JavaMethod;
 
- protected:
-  JObjectWrapper(jobject instance);
-  ~JObjectWrapper();
-
+ public:
   void ref() { _refCount++; }
   void deref() {
     if (--_refCount == 0)
       delete this;
   }
+
+ protected:
+  JObjectWrapper(jobject instance);
+  ~JObjectWrapper();
 
   jobject _instance;
 
