@@ -85,8 +85,8 @@ class HTMLTextAreaElement : public HTMLTextFormControlElement {
   String defaultValue() const;
   void setDefaultValue(const String&);
   int textLength() const { return value().length(); }
-  unsigned maxLength() const;
-  void setMaxLength(unsigned);
+  int maxLength() const;
+  void setMaxLength(int, ExceptionCode&);
 
   void rendererWillBeDestroyed();
 

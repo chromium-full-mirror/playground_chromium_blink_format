@@ -210,7 +210,7 @@ class HTMLInputElement : public HTMLTextFormControlElement,
 #endif
 
   int maxLength() const;
-  void setMaxLength(int);
+  void setMaxLength(int, ExceptionCode&);
 
   bool multiple() const;
   void setMultiple(bool);
