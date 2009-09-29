@@ -460,7 +460,7 @@ String localizedMediaControlElementHelpText(const String& name) {
     return QCoreApplication::translate("QWebPage", "Current movie time",
                                        "Media controller element");
   if (name == "TimeRemainingDisplay")
-    return QCoreApplication::translate("QWebPage", "Remaining move time",
+    return QCoreApplication::translate("QWebPage", "Remaining movie time",
                                        "Media controller element");
   if (name == "StatusDisplay")
     return QCoreApplication::translate("QWebPage", "Current movie status",
