@@ -1517,6 +1517,7 @@ QWebPage::QWebPage(QObject* parent)
     Destroys the web page.
 */
 QWebPage::~QWebPage() {
+  d->createMainFrame();
   FrameLoader* loader = d->mainFrame->d->frame->loader();
   if (loader)
     loader->detachFromParent();
@@ -1545,6 +1546,7 @@ QWebFrame* QWebPage::mainFrame() const {
     \sa mainFrame(), frameCreated()
 */
 QWebFrame* QWebPage::currentFrame() const {
+  d->createMainFrame();
   return static_cast<WebCore::FrameLoaderClientQt*>(d->page->focusController()
                                                         ->focusedOrMainFrame()
                                                         ->loader()
@@ -1571,6 +1573,7 @@ QWebFrame* QWebPage::frameAt(const QPoint& pos) const {
     Returns a pointer to the view's history of navigated web pages.
 */
 QWebHistory* QWebPage::history() const {
+  d->createMainFrame();
   return &d->history;
 }
 
@@ -2005,6 +2008,7 @@ bool QWebPage::acceptNavigationRequest(QWebFrame* frame,
     \sa selectionChanged()
 */
 QString QWebPage::selectedText() const {
+  d->createMainFrame();
   return d->page->focusController()->focusedOrMainFrame()->selectedText();
 }
 
@@ -2568,6 +2572,7 @@ void QWebPage::updatePositionDependentActions(const QPoint& pos) {
     }
   }
 
+  d->createMainFrame();
   WebCore::Frame* focusedFrame =
       d->page->focusController()->focusedOrMainFrame();
   HitTestResult result = focusedFrame->eventHandler()->hitTestResultAtPoint(
