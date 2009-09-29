@@ -65,6 +65,14 @@ class WebPage : public QWebPage {
                                 const QUrl&,
                                 const QStringList&,
                                 const QStringList&);
+  virtual bool supportsExtension(QWebPage::Extension extension) const {
+    if (extension == QWebPage::ErrorPageExtension)
+      return true;
+    return false;
+  }
+  virtual bool extension(Extension extension,
+                         const ExtensionOption* option,
+                         ExtensionReturn* output);
 };
 
 class MainWindow : public QMainWindow {
@@ -211,6 +219,7 @@ class MainWindow : public QMainWindow {
     QString str =
         QInputDialog::getText(this, "Select elements", "Choose elements",
                               QLineEdit::Normal, "a", &ok);
+
     if (ok && !str.isEmpty()) {
       QList<QWebElement> result =
           view->page()->mainFrame()->findAllElements(str);
@@ -342,6 +351,23 @@ class MainWindow : public QMainWindow {
   QStringList urlList;
   QStringListModel urlModel;
 };
+
+bool WebPage::extension(Extension extension,
+                        const ExtensionOption* option,
+                        ExtensionReturn* output) {
+  const QWebPage::ErrorPageExtensionOption* info =
+      static_cast<const QWebPage::ErrorPageExtensionOption*>(option);
+  QWebPage::ErrorPageExtensionReturn* errorPage =
+      static_cast<QWebPage::ErrorPageExtensionReturn*>(output);
+
+  errorPage->content = QString(
+                           "<html><head><title>Failed loading "
+                           "page</title></head><body>%1</body></html>")
+                           .arg(info->errorString)
+                           .toUtf8();
+
+  return true;
+}
 
 QWebPage* WebPage::createWindow(QWebPage::WebWindowType) {
   MainWindow* mw = new MainWindow;

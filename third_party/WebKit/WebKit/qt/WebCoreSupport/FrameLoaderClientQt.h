@@ -59,6 +59,7 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
 
   friend class ::QWebFrame;
   void callPolicyFunction(FramePolicyFunction function, PolicyAction action);
+  void callErrorPageExtension(const ResourceError&);
  signals:
   void loadStarted();
   void loadProgress(int d);

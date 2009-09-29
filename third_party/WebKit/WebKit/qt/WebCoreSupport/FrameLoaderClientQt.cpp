@@ -623,10 +623,13 @@ void FrameLoaderClientQt::committedLoad(WebCore::DocumentLoader* loader,
 
 WebCore::ResourceError FrameLoaderClientQt::cancelledError(
     const WebCore::ResourceRequest& request) {
-  return ResourceError(
-      "Error", -999, request.url().prettyURL(),
+  ResourceError error = ResourceError(
+      "QtNetwork", QNetworkReply::OperationCanceledError,
+      request.url().prettyURL(),
       QCoreApplication::translate("QWebFrame", "Request cancelled", 0,
                                   QCoreApplication::UnicodeUTF8));
+  error.setIsCancellation(true);
+  return error;
 }
 
 // copied from WebKit/Misc/WebKitErrors[Private].h
@@ -643,7 +646,7 @@ enum {
 WebCore::ResourceError FrameLoaderClientQt::blockedError(
     const WebCore::ResourceRequest& request) {
   return ResourceError(
-      "Error", WebKitErrorCannotUseRestrictedPort, request.url().prettyURL(),
+      "WebKit", WebKitErrorCannotUseRestrictedPort, request.url().prettyURL(),
       QCoreApplication::translate("QWebFrame", "Request blocked", 0,
                                   QCoreApplication::UnicodeUTF8));
 }
@@ -651,7 +654,7 @@ WebCore::ResourceError FrameLoaderClientQt::blockedError(
 WebCore::ResourceError FrameLoaderClientQt::cannotShowURLError(
     const WebCore::ResourceRequest& request) {
   return ResourceError(
-      "Error", WebKitErrorCannotShowURL, request.url().string(),
+      "WebKit", WebKitErrorCannotShowURL, request.url().string(),
       QCoreApplication::translate("QWebFrame", "Cannot show URL", 0,
                                   QCoreApplication::UnicodeUTF8));
 }
@@ -659,7 +662,7 @@ WebCore::ResourceError FrameLoaderClientQt::cannotShowURLError(
 WebCore::ResourceError FrameLoaderClientQt::interruptForPolicyChangeError(
     const WebCore::ResourceRequest& request) {
   return ResourceError(
-      "Error", WebKitErrorFrameLoadInterruptedByPolicyChange,
+      "WebKit", WebKitErrorFrameLoadInterruptedByPolicyChange,
       request.url().string(),
       QCoreApplication::translate("QWebFrame",
                                   "Frame load interrupted by policy change", 0,
@@ -669,7 +672,7 @@ WebCore::ResourceError FrameLoaderClientQt::interruptForPolicyChangeError(
 WebCore::ResourceError FrameLoaderClientQt::cannotShowMIMETypeError(
     const WebCore::ResourceResponse& response) {
   return ResourceError(
-      "Error", WebKitErrorCannotShowMIMEType, response.url().string(),
+      "WebKit", WebKitErrorCannotShowMIMEType, response.url().string(),
       QCoreApplication::translate("QWebFrame", "Cannot show mimetype", 0,
                                   QCoreApplication::UnicodeUTF8));
 }
@@ -677,7 +680,7 @@ WebCore::ResourceError FrameLoaderClientQt::cannotShowMIMETypeError(
 WebCore::ResourceError FrameLoaderClientQt::fileDoesNotExistError(
     const WebCore::ResourceResponse& response) {
   return ResourceError(
-      "Error", -998 /* ### */, response.url().string(),
+      "QtNetwork", QNetworkReply::ContentNotFoundError, response.url().string(),
       QCoreApplication::translate("QWebFrame", "File does not exist", 0,
                                   QCoreApplication::UnicodeUTF8));
 }
@@ -818,6 +821,40 @@ void FrameLoaderClientQt::dispatchDidLoadResourceByXMLHttpRequest(
   notImplemented();
 }
 
+void FrameLoaderClientQt::callErrorPageExtension(
+    const WebCore::ResourceError& error) {
+  QWebPage* page = m_webFrame->page();
+  if (page->supportsExtension(QWebPage::ErrorPageExtension)) {
+    QWebPage::ErrorPageExtensionOption option;
+
+    if (error.domain() == "QtNetwork")
+      option.domain = QWebPage::QtNetwork;
+    else if (error.domain() == "HTTP")
+      option.domain = QWebPage::Http;
+    else if (error.domain() == "WebKit")
+      option.domain = QWebPage::WebKit;
+    else
+      return;
+
+    option.error = error.errorCode();
+    option.errorString = error.localizedDescription();
+
+    QWebPage::ErrorPageExtensionReturn output;
+    if (!page->extension(QWebPage::ErrorPageExtension, &option, &output))
+      return;
+
+    KURL baseUrl(output.baseUrl);
+    KURL failingUrl(QUrl(error.failingURL()));
+
+    WebCore::ResourceRequest request(baseUrl);
+    WTF::RefPtr<WebCore::SharedBuffer> buffer = WebCore::SharedBuffer::create(
+        output.content.constData(), output.content.length());
+    WebCore::SubstituteData substituteData(buffer, output.contentType,
+                                           output.encoding, failingUrl);
+    m_frame->loader()->load(request, substituteData, false);
+  }
+}
+
 void FrameLoaderClientQt::dispatchDidFailProvisionalLoad(
     const WebCore::ResourceError& error) {
   if (dumpFrameLoaderCallbacks)
@@ -825,6 +862,8 @@ void FrameLoaderClientQt::dispatchDidFailProvisionalLoad(
            qPrintable(drtDescriptionSuitableForTestResult(m_frame)));
 
   m_loadError = error;
+  if (!error.isNull() && !error.isCancellation())
+    callErrorPageExtension(error);
 }
 
 void FrameLoaderClientQt::dispatchDidFailLoad(
@@ -834,6 +873,8 @@ void FrameLoaderClientQt::dispatchDidFailLoad(
            qPrintable(drtDescriptionSuitableForTestResult(m_frame)));
 
   m_loadError = error;
+  if (!error.isNull() && !error.isCancellation())
+    callErrorPageExtension(error);
 }
 
 WebCore::Frame* FrameLoaderClientQt::dispatchCreatePage() {
