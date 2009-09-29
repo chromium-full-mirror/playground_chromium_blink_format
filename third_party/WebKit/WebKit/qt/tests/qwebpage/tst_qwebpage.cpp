@@ -486,14 +486,19 @@ void tst_QWebPage::database() {
       "function(tx, error) { });");
   QTest::qWait(200);
 
+  // Remove all databases.
   QWebSecurityOrigin origin = m_page->mainFrame()->securityOrigin();
   QList<QWebDatabase> dbs = origin.databases();
-  if (dbs.count() > 0) {
-    QString fileName = dbs[0].fileName();
+  for (int i = 0; i < dbs.count(); i++) {
+    QString fileName = dbs[i].fileName();
     QVERIFY(QFile::exists(fileName));
-    QWebDatabase::removeDatabase(dbs[0]);
+    QWebDatabase::removeDatabase(dbs[i]);
     QVERIFY(!QFile::exists(fileName));
   }
+  QVERIFY(!origin.databases().size());
+  // Remove removed test :-)
+  QWebDatabase::removeAllDatabases();
+  QVERIFY(!origin.databases().size());
   QTest::qWait(1000);
 }
 
