@@ -120,7 +120,7 @@ JSGlobalObject::~JSGlobalObject() {
     registerFile.setGlobalObject(0);
     registerFile.setNumGlobals(0);
   }
-  delete d();
+  d()->destructor(d());
 }
 
 void JSGlobalObject::init(JSObject* thisValue) {
@@ -606,6 +606,10 @@ void* JSGlobalObject::operator new(size_t size, JSGlobalData* globalData) {
 #else
   return globalData->heap.allocate(size);
 #endif
+}
+
+void JSGlobalObject::destroyJSGlobalObjectData(void* jsGlobalObjectData) {
+  delete static_cast<JSGlobalObjectData*>(jsGlobalObjectData);
 }
 
 }  // namespace JSC

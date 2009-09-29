@@ -40,6 +40,10 @@ JSGlueGlobalObject::JSGlueGlobalObject(PassRefPtr<Structure> structure,
   d()->userObjectStructure = UserObjectImp::createStructure(jsNull());
 }
 
+void JSGlueGlobalObject::destroyData(void* data) {
+  delete static_cast<Data*>(data);
+}
+
 JSRun::JSRun(CFStringRef source, JSFlags inFlags)
     : JSBase(kJSRunTypeID),
       fSource(CFStringToUString(source)),

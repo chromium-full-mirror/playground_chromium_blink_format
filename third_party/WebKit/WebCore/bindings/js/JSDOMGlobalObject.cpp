@@ -40,8 +40,6 @@ using namespace JSC;
 
 namespace WebCore {
 
-JSDOMGlobalObject::JSDOMGlobalObjectData::JSDOMGlobalObjectData() : evt(0) {}
-
 JSDOMGlobalObject::JSDOMGlobalObject(
     NonNullPassRefPtr<Structure> structure,
     JSDOMGlobalObject::JSDOMGlobalObjectData* data,
@@ -75,6 +73,11 @@ void JSDOMGlobalObject::setCurrentEvent(Event* evt) {
 
 Event* JSDOMGlobalObject::currentEvent() const {
   return d()->evt;
+}
+
+void JSDOMGlobalObject::destroyJSDOMGlobalObjectData(
+    void* jsDOMGlobalObjectData) {
+  delete static_cast<JSDOMGlobalObjectData*>(jsDOMGlobalObjectData);
 }
 
 JSDOMGlobalObject* toJSDOMGlobalObject(Document* document) {

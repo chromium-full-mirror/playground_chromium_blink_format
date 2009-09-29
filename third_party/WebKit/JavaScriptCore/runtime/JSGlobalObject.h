@@ -58,8 +58,16 @@ class JSGlobalObject : public JSVariableObject {
   using JSVariableObject::JSVariableObjectData;
 
   struct JSGlobalObjectData : public JSVariableObjectData {
-    JSGlobalObjectData()
+    // We use an explicit destructor function pointer instead of a
+    // virtual destructor because we want to avoid adding a vtable
+    // pointer to this struct. Adding a vtable pointer would force the
+    // compiler to emit costly pointer fixup code when casting from
+    // JSVariableObjectData* to JSGlobalObjectData*.
+    typedef void (*Destructor)(void*);
+
+    JSGlobalObjectData(Destructor destructor)
         : JSVariableObjectData(&symbolTable, 0),
+          destructor(destructor),
           registerArraySize(0),
           globalScopeChain(NoScopeChain()),
           regExpConstructor(0),
@@ -83,7 +91,7 @@ class JSGlobalObject : public JSVariableObject {
           regExpPrototype(0),
           methodCallDummy(0) {}
 
-    virtual ~JSGlobalObjectData() {}
+    Destructor destructor;
 
     size_t registerArraySize;
 
@@ -150,7 +158,7 @@ class JSGlobalObject : public JSVariableObject {
 
   explicit JSGlobalObject()
       : JSVariableObject(JSGlobalObject::createStructure(jsNull()),
-                         new JSGlobalObjectData) {
+                         new JSGlobalObjectData(destroyJSGlobalObjectData)) {
     init(this);
   }
 
@@ -321,6 +329,8 @@ class JSGlobalObject : public JSVariableObject {
   void addStaticGlobals(GlobalPropertyInfo*, int count);
 
  private:
+  static void destroyJSGlobalObjectData(void*);
+
   // FIXME: Fold reset into init.
   void init(JSObject* thisValue);
   void reset(JSValue prototype);
