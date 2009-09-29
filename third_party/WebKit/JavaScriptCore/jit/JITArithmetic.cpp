@@ -574,6 +574,14 @@ void JIT::emit_op_add(Instruction* currentInstruction) {
   unsigned op2 = currentInstruction[3].u.operand;
   OperandTypes types = OperandTypes::fromInt(currentInstruction[4].u.operand);
 
+  if (!types.first().mightBeNumber() || !types.second().mightBeNumber()) {
+    JITStubCall stubCall(this, cti_op_add);
+    stubCall.addArgument(op1);
+    stubCall.addArgument(op2);
+    stubCall.call(dst);
+    return;
+  }
+
   JumpList notInt32Op1;
   JumpList notInt32Op2;
 
@@ -640,6 +648,9 @@ void JIT::emitSlow_op_add(Instruction* currentInstruction,
   unsigned op1 = currentInstruction[2].u.operand;
   unsigned op2 = currentInstruction[3].u.operand;
   OperandTypes types = OperandTypes::fromInt(currentInstruction[4].u.operand);
+
+  if (!types.first().mightBeNumber() || !types.second().mightBeNumber())
+    return;
 
   unsigned op;
   int32_t constant;
@@ -2096,6 +2107,10 @@ void JIT::emitSlow_op_add(Instruction* currentInstruction,
   unsigned result = currentInstruction[1].u.operand;
   unsigned op1 = currentInstruction[2].u.operand;
   unsigned op2 = currentInstruction[3].u.operand;
+  OperandTypes types = OperandTypes::fromInt(currentInstruction[4].u.operand);
+
+  if (!types.first().mightBeNumber() || !types.second().mightBeNumber())
+    return;
 
   if (isOperandConstantImmediateInt(op1) ||
       isOperandConstantImmediateInt(op2)) {
@@ -2484,6 +2499,14 @@ void JIT::emit_op_add(Instruction* currentInstruction) {
   unsigned op1 = currentInstruction[2].u.operand;
   unsigned op2 = currentInstruction[3].u.operand;
 
+  if (!types.first().mightBeNumber() || !types.second().mightBeNumber()) {
+    JITStubCall stubCall(this, cti_op_add);
+    stubCall.addArgument(op1);
+    stubCall.addArgument(op2);
+    stubCall.call(dst);
+    return;
+  }
+
   if (isOperandConstantImmediateInt(op1)) {
     emitGetVirtualRegister(op2, regT0);
     emitJumpSlowCaseIfNotImmediateInteger(regT0);
@@ -2522,6 +2545,9 @@ void JIT::emitSlow_op_add(Instruction* currentInstruction,
   unsigned result = currentInstruction[1].u.operand;
   unsigned op1 = currentInstruction[2].u.operand;
   unsigned op2 = currentInstruction[3].u.operand;
+
+  if (!types.first().mightBeNumber() || !types.second().mightBeNumber())
+    return;
 
   if (isOperandConstantImmediateInt(op1)) {
     Jump notImm = getSlowCase(iter);
