@@ -345,6 +345,8 @@ class EventHandler : public Noncopyable {
 
   void updateLastScrollbarUnderMouse(Scrollbar*, bool);
 
+  void setFrameWasScrolledByUser();
+
   bool capturesDragging() const { return m_capturesDragging; }
 
 #if PLATFORM(MAC) && defined(__OBJC__)
