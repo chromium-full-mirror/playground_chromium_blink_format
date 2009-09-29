@@ -255,7 +255,7 @@ void WebPreferences::initializeDefaultSettings() {
       kCFBooleanFalse);
   CFDictionaryAddValue(defaults,
                        CFSTR(WebKitExperimentalWebSocketsEnabledPreferenceKey),
-                       kCFBooleanFaluse);
+                       kCFBooleanFalse);
   CFDictionaryAddValue(defaults, CFSTR(WebKitAllowAnimatedImagesPreferenceKey),
                        kCFBooleanTrue);
   CFDictionaryAddValue(defaults,
