@@ -259,4 +259,16 @@ const Vector<Instruction>& JSGlobalData::numericCompareFunction(
 
 JSGlobalData::ClientData::~ClientData() {}
 
+void JSGlobalData::startSampling() {
+  interpreter->startSampling();
+}
+
+void JSGlobalData::stopSampling() {
+  interpreter->stopSampling();
+}
+
+void JSGlobalData::dumpSampleData(ExecState* exec) {
+  interpreter->dumpSampleData(exec);
+}
+
 }  // namespace JSC

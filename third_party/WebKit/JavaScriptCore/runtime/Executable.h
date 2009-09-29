@@ -151,9 +151,6 @@ class ScriptExecutable : public ExecutableBase {
 
 class EvalExecutable : public ScriptExecutable {
  public:
-  EvalExecutable(ExecState* exec, const SourceCode& source)
-      : ScriptExecutable(exec, source), m_evalCodeBlock(0) {}
-
   ~EvalExecutable();
 
   EvalCodeBlock& bytecode(ExecState* exec, ScopeChainNode* scopeChainNode) {
@@ -175,6 +172,8 @@ class EvalExecutable : public ScriptExecutable {
   }
 
  private:
+  EvalExecutable(ExecState* exec, const SourceCode& source)
+      : ScriptExecutable(exec, source), m_evalCodeBlock(0) {}
   EvalCodeBlock* m_evalCodeBlock;
 
 #if ENABLE(JIT)
@@ -192,8 +191,10 @@ class EvalExecutable : public ScriptExecutable {
 
 class ProgramExecutable : public ScriptExecutable {
  public:
-  ProgramExecutable(ExecState* exec, const SourceCode& source)
-      : ScriptExecutable(exec, source), m_programCodeBlock(0) {}
+  static PassRefPtr<ProgramExecutable> create(ExecState* exec,
+                                              const SourceCode& source) {
+    return adoptRef(new ProgramExecutable(exec, source));
+  }
 
   ~ProgramExecutable();
 
@@ -218,6 +219,8 @@ class ProgramExecutable : public ScriptExecutable {
   }
 
  private:
+  ProgramExecutable(ExecState* exec, const SourceCode& source)
+      : ScriptExecutable(exec, source), m_programCodeBlock(0) {}
   ProgramCodeBlock* m_programCodeBlock;
 
 #if ENABLE(JIT)

@@ -102,14 +102,15 @@ JSValue evaluateInGlobalCallFrame(const UString& script,
                                   JSGlobalObject* globalObject) {
   CallFrame* globalCallFrame = globalObject->globalExec();
 
-  EvalExecutable eval(globalCallFrame, makeSource(script));
+  RefPtr<EvalExecutable> eval =
+      EvalExecutable::create(globalCallFrame, makeSource(script));
   JSObject* error =
-      eval.compile(globalCallFrame, globalCallFrame->scopeChain());
+      eval->compile(globalCallFrame, globalCallFrame->scopeChain());
   if (error)
     return error;
 
   return globalObject->globalData()->interpreter->execute(
-      &eval, globalCallFrame, globalObject, globalCallFrame->scopeChain(),
+      eval.get(), globalCallFrame, globalObject, globalCallFrame->scopeChain(),
       &exception);
 }
 

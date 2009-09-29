@@ -301,15 +301,15 @@ JSValue JSC_HOST_CALL globalFuncEval(ExecState* exec,
   if (JSValue parsedObject = preparser.tryLiteralParse())
     return parsedObject;
 
-  EvalExecutable eval(exec, makeSource(s));
-  JSObject* error = eval.compile(
+  RefPtr<EvalExecutable> eval = EvalExecutable::create(exec, makeSource(s));
+  JSObject* error = eval->compile(
       exec,
       static_cast<JSGlobalObject*>(unwrappedObject)->globalScopeChain().node());
   if (error)
     return throwError(exec, error);
 
   return exec->interpreter()->execute(
-      &eval, exec, thisObject,
+      eval.get(), exec, thisObject,
       static_cast<JSGlobalObject*>(unwrappedObject)->globalScopeChain().node(),
       exec->exceptionSlot());
 }

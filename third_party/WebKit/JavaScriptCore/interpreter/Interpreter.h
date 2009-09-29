@@ -126,8 +126,7 @@ class Interpreter : public FastAllocBase {
                         Register*& argv,
                         int& argc);
 
-  void setSampler(SamplingTool* sampler) { m_sampler = sampler; }
-  SamplingTool* sampler() { return m_sampler; }
+  SamplingTool* sampler() { return m_sampler.get(); }
 
   NEVER_INLINE JSValue callEval(CallFrame*,
                                 RegisterFile*,
@@ -140,6 +139,10 @@ class Interpreter : public FastAllocBase {
                                            unsigned bytecodeOffset,
                                            bool);
   NEVER_INLINE void debug(CallFrame*, DebugHookID, int firstLine, int lastLine);
+
+  void dumpSampleData(ExecState* exec);
+  void startSampling();
+  void stopSampling();
 
  private:
   enum ExecutionFlag { Normal, InitializeAndReturn };
@@ -220,7 +223,9 @@ class Interpreter : public FastAllocBase {
            opcode == getOpcode(op_call_eval);
   }
 
-  SamplingTool* m_sampler;
+  void enableSampler();
+  int m_sampleEntryDepth;
+  OwnPtr<SamplingTool> m_sampler;
 
   int m_reentryDepth;
 

@@ -159,6 +159,10 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
   bool mainThreadOnly;
 #endif
 
+  void startSampling();
+  void stopSampling();
+  void dumpSampleData(ExecState* exec);
+
  private:
   JSGlobalData(bool isShared, const VPtrSet&);
   static JSGlobalData*& sharedInstanceInternal();

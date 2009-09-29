@@ -75,13 +75,15 @@ JSValue DebuggerCallFrame::evaluate(const UString& script,
   if (!m_callFrame->codeBlock())
     return JSValue();
 
-  EvalExecutable eval(m_callFrame, makeSource(script));
-  JSObject* error = eval.compile(m_callFrame, m_callFrame->scopeChain());
+  RefPtr<EvalExecutable> eval =
+      EvalExecutable::create(m_callFrame, makeSource(script));
+  JSObject* error = eval->compile(m_callFrame, m_callFrame->scopeChain());
   if (error)
     return error;
 
   return m_callFrame->scopeChain()->globalData->interpreter->execute(
-      &eval, m_callFrame, thisObject(), m_callFrame->scopeChain(), &exception);
+      eval.get(), m_callFrame, thisObject(), m_callFrame->scopeChain(),
+      &exception);
 }
 
 }  // namespace JSC

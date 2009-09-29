@@ -449,11 +449,8 @@ static bool runWithScripts(GlobalObject* globalObject,
   if (dump)
     BytecodeGenerator::setDumpsGeneratedCode(true);
 
-#if ENABLE(OPCODE_SAMPLING)
-  Interpreter* interpreter = globalObject->globalData()->interpreter;
-  interpreter->setSampler(new SamplingTool(interpreter));
-  interpreter->sampler()->setup();
-#endif
+  JSGlobalData* globalData = globalObject->globalData();
+
 #if ENABLE(SAMPLING_FLAGS)
   SamplingFlags::start();
 #endif
@@ -470,9 +467,7 @@ static bool runWithScripts(GlobalObject* globalObject,
       fileName = "[Command Line]";
     }
 
-#if ENABLE(SAMPLING_THREAD)
-    SamplingThread::start();
-#endif
+    globalData->startSampling();
 
     Completion completion =
         evaluate(globalObject->globalExec(), globalObject->globalScopeChain(),
@@ -487,20 +482,14 @@ static bool runWithScripts(GlobalObject* globalObject,
                completion.value().toString(globalObject->globalExec()).ascii());
     }
 
-#if ENABLE(SAMPLING_THREAD)
-    SamplingThread::stop();
-#endif
-
+    globalData->stopSampling();
     globalObject->globalExec()->clearException();
   }
 
 #if ENABLE(SAMPLING_FLAGS)
   SamplingFlags::stop();
 #endif
-#if ENABLE(OPCODE_SAMPLING)
-  interpreter->sampler()->dump(globalObject->globalExec());
-  delete interpreter->sampler();
-#endif
+  globalData->dumpSampleData(globalObject->globalExec());
 #if ENABLE(SAMPLING_COUNTERS)
   AbstractSamplingCounter::dump();
 #endif

@@ -36,8 +36,8 @@ namespace JSC {
 Completion checkSyntax(ExecState* exec, const SourceCode& source) {
   JSLock lock(exec);
 
-  ProgramExecutable program(exec, source);
-  JSObject* error = program.checkSyntax(exec);
+  RefPtr<ProgramExecutable> program = ProgramExecutable::create(exec, source);
+  JSObject* error = program->checkSyntax(exec);
   if (error)
     return Completion(Throw, error);
 
@@ -50,8 +50,8 @@ Completion evaluate(ExecState* exec,
                     JSValue thisValue) {
   JSLock lock(exec);
 
-  ProgramExecutable program(exec, source);
-  JSObject* error = program.compile(exec, scopeChain.node());
+  RefPtr<ProgramExecutable> program = ProgramExecutable::create(exec, source);
+  JSObject* error = program->compile(exec, scopeChain.node());
   if (error)
     return Completion(Throw, error);
 
@@ -61,7 +61,7 @@ Completion evaluate(ExecState* exec,
 
   JSValue exception;
   JSValue result = exec->interpreter()->execute(
-      &program, exec, scopeChain.node(), thisObj, &exception);
+      program.get(), exec, scopeChain.node(), thisObj, &exception);
 
   if (exception) {
     if (exception.isObject() && asObject(exception)->isWatchdogException())
