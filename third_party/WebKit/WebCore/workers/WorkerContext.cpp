@@ -237,7 +237,8 @@ void WorkerContext::reportException(const String& errorMessage,
                                     const String& sourceURL) {
   bool errorHandled = false;
   if (onerror())
-    errorHandled = onerror()->reportError(errorMessage, sourceURL, lineNumber);
+    errorHandled =
+        onerror()->reportError(this, errorMessage, sourceURL, lineNumber);
 
   if (!errorHandled)
     thread()->workerReportingProxy().postExceptionToWorkerObject(

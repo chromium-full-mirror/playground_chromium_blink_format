@@ -99,7 +99,8 @@ void InspectorDOMStorageResource::startReportingChangesToFrontend() {
   }
 }
 
-void InspectorDOMStorageResource::handleEvent(Event* event) {
+void InspectorDOMStorageResource::handleEvent(ScriptExecutionContext*,
+                                              Event* event) {
   ASSERT(m_frontend);
   ASSERT(eventNames().storageEvent == event->type());
   StorageEvent* storageEvent = static_cast<StorageEvent*>(event);
