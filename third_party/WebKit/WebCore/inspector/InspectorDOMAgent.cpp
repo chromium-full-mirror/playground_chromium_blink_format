@@ -557,7 +557,8 @@ ScriptObject InspectorDOMAgent::buildObjectForEventListener(
   value.set("useCapture", registeredEventListener.useCapture);
   value.set("isAttribute", eventListener->isAttribute());
   value.set("nodeId", static_cast<long long>(pushNodePathToFrontend(node)));
-  value.set("listener", getEventListenerHandlerBody(m_frontend->scriptState(),
+  value.set("listener", getEventListenerHandlerBody(node->document(),
+                                                    m_frontend->scriptState(),
                                                     eventListener.get()));
   return value;
 }

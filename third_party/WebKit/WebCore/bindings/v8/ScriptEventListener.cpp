@@ -77,7 +77,8 @@ PassRefPtr<V8LazyEventListener> createAttributeEventListener(Frame* frame,
                                      frame->document()->isSVGDocument());
 }
 
-String getEventListenerHandlerBody(ScriptState* scriptState,
+String getEventListenerHandlerBody(ScriptExecutionContext*,
+                                   ScriptState* scriptState,
                                    EventListener* listener) {
   if (listener->type() != EventListener::JSEventListenerType)
     return "";

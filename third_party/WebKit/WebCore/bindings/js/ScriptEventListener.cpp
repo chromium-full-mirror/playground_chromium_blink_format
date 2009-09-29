@@ -104,9 +104,10 @@ PassRefPtr<JSLazyEventListener> createAttributeEventListener(Frame* frame,
       sourceURL, lineNumber);
 }
 
-String getEventListenerHandlerBody(ScriptState* scriptState,
+String getEventListenerHandlerBody(ScriptExecutionContext* context,
+                                   ScriptState* scriptState,
                                    EventListener* eventListener) {
-  JSC::JSObject* functionObject = eventListener->jsFunction();
+  JSC::JSObject* functionObject = eventListener->jsFunction(context);
   if (!functionObject)
     return "";
   return functionObject->toString(scriptState);
