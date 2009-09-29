@@ -133,7 +133,9 @@ void V8AbstractEventListener::invokeEventHandler(
     event->preventDefault();
 }
 
-void V8AbstractEventListener::handleEvent(Event* event) {
+void V8AbstractEventListener::handleEvent(
+    ScriptExecutionContext* scriptExecutionContext,
+    Event* event) {
   // EventListener could be disconnected from the frame.
   if (disconnected())
     return;

@@ -52,7 +52,8 @@ V8WorkerContextEventListener::~V8WorkerContextEventListener() {
   disposeListenerObject();
 }
 
-void V8WorkerContextEventListener::handleEvent(Event* event) {
+void V8WorkerContextEventListener::handleEvent(ScriptExecutionContext*,
+                                               Event* event) {
   // Is the EventListener disconnected?
   if (disconnected())
     return;
