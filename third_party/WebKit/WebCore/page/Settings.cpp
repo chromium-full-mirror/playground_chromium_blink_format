@@ -123,8 +123,12 @@ Settings::Settings(Page* page)
       m_xssAuditorEnabled(false),
       m_acceleratedCompositingEnabled(true),
       m_experimentalNotificationsEnabled(false),
-      m_pluginHalterEnabled(false),
-      m_experimentalWebSocketsEnabled(false) {
+      m_pluginHalterEnabled(false)
+#if ENABLE(WEB_SOCKETS)
+      ,
+      m_experimentalWebSocketsEnabled(false)
+#endif
+{
   // A Frame may not have been created yet, so we initialize the AtomicString
   // hash before trying to use it.
   AtomicString::init();
