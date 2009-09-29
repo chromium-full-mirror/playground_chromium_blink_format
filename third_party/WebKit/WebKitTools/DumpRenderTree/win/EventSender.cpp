@@ -242,11 +242,13 @@ static void doMouseUp(MSG msg) {
         DWORD effect = 0;
         webViewDropTarget->Drop(draggingInfo->dataObject(), 0,
                                 pointl(screenPoint), &effect);
+        draggingInfo->setPerformedDropEffect(effect);
       } else
         webViewDropTarget->DragLeave();
 
-      delete draggingInfo;
-      draggingInfo = 0;
+      // Reset didDragEnter so that another drag started within the same frame
+      // works properly.
+      didDragEnter = false;
     }
   }
 }
