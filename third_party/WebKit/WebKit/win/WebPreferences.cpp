@@ -253,6 +253,9 @@ void WebPreferences::initializeDefaultSettings() {
   CFDictionaryAddValue(
       defaults, CFSTR(WebKitExperimentalNotificationsEnabledPreferenceKey),
       kCFBooleanFalse);
+  CFDictionaryAddValue(defaults,
+                       CFSTR(WebKitExperimentalWebSocketsEnabledPreferenceKey),
+                       kCFBooleanFaluse);
   CFDictionaryAddValue(defaults, CFSTR(WebKitAllowAnimatedImagesPreferenceKey),
                        kCFBooleanTrue);
   CFDictionaryAddValue(defaults,
@@ -1318,6 +1321,20 @@ HRESULT STDMETHODCALLTYPE
 WebPreferences::experimentalNotificationsEnabled(BOOL* enabled) {
   *enabled = boolValueForKey(
       CFSTR(WebKitExperimentalNotificationsEnabledPreferenceKey));
+  return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE
+WebPreferences::setExperimentalWebSocketsEnabled(BOOL enabled) {
+  setBoolValue(CFSTR(WebKitExperimentalWebSocketsEnabledPreferenceKey),
+               enabled);
+  return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE
+WebPreferences::experimentalWebSocketsEnabled(BOOL* enabled) {
+  *enabled =
+      boolValueForKey(CFSTR(WebKitExperimentalWebSocketsEnabledPreferenceKey));
   return S_OK;
 }
 

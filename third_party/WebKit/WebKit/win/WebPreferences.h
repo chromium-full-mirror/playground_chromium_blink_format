@@ -334,6 +334,12 @@ class WebPreferences : public IWebPreferences, public IWebPreferencesPrivate {
   virtual HRESULT STDMETHODCALLTYPE setExperimentalNotificationsEnabled(
       /* [in] */ BOOL enabled);
 
+  virtual HRESULT STDMETHODCALLTYPE experimentalWebSocketsEnabled(
+      /* [retval][out] */ BOOL* enabled);
+
+  virtual HRESULT STDMETHODCALLTYPE setExperimentalWebSocketsEnabled(
+      /* [in] */ BOOL enabled);
+
   virtual HRESULT STDMETHODCALLTYPE setShouldPaintNativeControls(
       /* [in] */ BOOL shouldPaint);
 
