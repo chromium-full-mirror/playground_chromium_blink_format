@@ -123,7 +123,8 @@ Settings::Settings(Page* page)
       m_xssAuditorEnabled(false),
       m_acceleratedCompositingEnabled(true),
       m_experimentalNotificationsEnabled(false),
-      m_pluginHalterEnabled(false)
+      m_pluginHalterEnabled(false),
+      m_experimentalWebGLEnabled(false)
 #if ENABLE(WEB_SOCKETS)
       ,
       m_experimentalWebSocketsEnabled(false)
@@ -493,6 +494,10 @@ void Settings::setShouldUseHighResolutionTimers(
   gShouldUseHighResolutionTimers = shouldUseHighResolutionTimers;
 }
 #endif
+
+void Settings::setExperimentalWebGLEnabled(bool enabled) {
+  m_experimentalWebGLEnabled = enabled;
+}
 
 #if ENABLE(WEB_SOCKETS)
 void Settings::setExperimentalWebSocketsEnabled(bool enabled) {
