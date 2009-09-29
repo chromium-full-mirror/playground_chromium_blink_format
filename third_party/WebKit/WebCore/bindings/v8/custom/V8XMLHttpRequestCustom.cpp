@@ -45,24 +45,28 @@
 
 namespace WebCore {
 
+enum EventListenerType { AttributeEventListenerType, ObjectEventListenerType };
+
 static PassRefPtr<EventListener> getEventListener(
     XMLHttpRequest* xmlHttpRequest,
     v8::Local<v8::Value> value,
+    EventListenerType type,
     bool findOnly) {
+  bool isAttribute = type == AttributeEventListenerType;
 #if ENABLE(WORKERS)
   WorkerContextExecutionProxy* workerContextProxy =
       WorkerContextExecutionProxy::retrieve();
   if (workerContextProxy)
-    return workerContextProxy->findOrCreateObjectEventListener(value, false,
-                                                               findOnly);
+    return workerContextProxy->findOrCreateObjectEventListener(
+        value, isAttribute, findOnly);
 #endif
 
   V8Proxy* proxy = V8Proxy::retrieve(xmlHttpRequest->scriptExecutionContext());
   if (proxy) {
     V8EventListenerList* list = proxy->objectListeners();
-    return findOnly ? list->findWrapper(value, false)
+    return findOnly ? list->findWrapper(value, isAttribute)
                     : list->findOrCreateWrapper<V8ObjectEventListener>(
-                          proxy->frame(), value, false);
+                          proxy->frame(), value, isAttribute);
   }
 
   return PassRefPtr<EventListener>();
@@ -99,8 +103,8 @@ ACCESSOR_SETTER(XMLHttpRequestOnabort) {
     // Clear the listener.
     xmlHttpRequest->setOnabort(0);
   } else {
-    RefPtr<EventListener> listener =
-        getEventListener(xmlHttpRequest, value, false);
+    RefPtr<EventListener> listener = getEventListener(
+        xmlHttpRequest, value, AttributeEventListenerType, false);
     if (listener) {
       xmlHttpRequest->setOnabort(listener);
       createHiddenDependency(info.Holder(), value,
@@ -140,8 +144,8 @@ ACCESSOR_SETTER(XMLHttpRequestOnerror) {
     // Clear the listener.
     xmlHttpRequest->setOnerror(0);
   } else {
-    RefPtr<EventListener> listener =
-        getEventListener(xmlHttpRequest, value, false);
+    RefPtr<EventListener> listener = getEventListener(
+        xmlHttpRequest, value, AttributeEventListenerType, false);
     if (listener) {
       xmlHttpRequest->setOnerror(listener);
       createHiddenDependency(info.Holder(), value,
@@ -181,8 +185,8 @@ ACCESSOR_SETTER(XMLHttpRequestOnload) {
     xmlHttpRequest->setOnload(0);
 
   } else {
-    RefPtr<EventListener> listener =
-        getEventListener(xmlHttpRequest, value, false);
+    RefPtr<EventListener> listener = getEventListener(
+        xmlHttpRequest, value, AttributeEventListenerType, false);
     if (listener) {
       xmlHttpRequest->setOnload(listener.get());
       createHiddenDependency(info.Holder(), value,
@@ -222,8 +226,8 @@ ACCESSOR_SETTER(XMLHttpRequestOnloadstart) {
     // Clear the listener.
     xmlHttpRequest->setOnloadstart(0);
   } else {
-    RefPtr<EventListener> listener =
-        getEventListener(xmlHttpRequest, value, false);
+    RefPtr<EventListener> listener = getEventListener(
+        xmlHttpRequest, value, AttributeEventListenerType, false);
     if (listener) {
       xmlHttpRequest->setOnloadstart(listener);
       createHiddenDependency(info.Holder(), value,
@@ -263,8 +267,8 @@ ACCESSOR_SETTER(XMLHttpRequestOnprogress) {
     // Clear the listener.
     xmlHttpRequest->setOnprogress(0);
   } else {
-    RefPtr<EventListener> listener =
-        getEventListener(xmlHttpRequest, value, false);
+    RefPtr<EventListener> listener = getEventListener(
+        xmlHttpRequest, value, AttributeEventListenerType, false);
     if (listener) {
       xmlHttpRequest->setOnprogress(listener);
       createHiddenDependency(info.Holder(), value,
@@ -304,8 +308,8 @@ ACCESSOR_SETTER(XMLHttpRequestOnreadystatechange) {
     // Clear the listener.
     xmlHttpRequest->setOnreadystatechange(0);
   } else {
-    RefPtr<EventListener> listener =
-        getEventListener(xmlHttpRequest, value, false);
+    RefPtr<EventListener> listener = getEventListener(
+        xmlHttpRequest, value, AttributeEventListenerType, false);
     if (listener) {
       xmlHttpRequest->setOnreadystatechange(listener.get());
       createHiddenDependency(info.Holder(), value,
@@ -331,7 +335,7 @@ CALLBACK_FUNC_DECL(XMLHttpRequestAddEventListener) {
           V8ClassIndex::XMLHTTPREQUEST, args.Holder());
 
   RefPtr<EventListener> listener =
-      getEventListener(xmlHttpRequest, args[1], false);
+      getEventListener(xmlHttpRequest, args[1], ObjectEventListenerType, false);
   if (listener) {
     String type = toWebCoreString(args[0]);
     bool useCapture = args[2]->BooleanValue();
@@ -350,7 +354,7 @@ CALLBACK_FUNC_DECL(XMLHttpRequestRemoveEventListener) {
           V8ClassIndex::XMLHTTPREQUEST, args.Holder());
 
   RefPtr<EventListener> listener =
-      getEventListener(xmlHttpRequest, args[1], true);
+      getEventListener(xmlHttpRequest, args[1], ObjectEventListenerType, true);
   if (listener) {
     String type = toWebCoreString(args[0]);
     bool useCapture = args[2]->BooleanValue();
