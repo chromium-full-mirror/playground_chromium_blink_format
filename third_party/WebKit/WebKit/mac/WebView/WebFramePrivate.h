@@ -130,4 +130,6 @@ typedef enum {
                              smartReplace:(BOOL)smartReplace;
 
 - (NSMutableDictionary*)_cacheabilityDictionary;
+
+- (BOOL)_allowsFollowingLink:(NSURL*)URL;
 @end

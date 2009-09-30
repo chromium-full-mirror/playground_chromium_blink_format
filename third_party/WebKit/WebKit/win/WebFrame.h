@@ -250,6 +250,10 @@ class DECLSPEC_UUID("{A3676398-4485-4a9d-87DC-CB5A40E6351D}") WebFrame
 
   virtual HRESULT STDMETHODCALLTYPE isDisplayingStandaloneImage(BOOL*);
 
+  virtual HRESULT STDMETHODCALLTYPE allowsFollowingLink(
+      /* [in] */ BSTR url,
+      /* [retval][out] */ BOOL* result);
+
   // IWebDocumentText
   virtual HRESULT STDMETHODCALLTYPE supportsTextEncoding(
       /* [retval][out] */ BOOL* result);
