@@ -162,7 +162,7 @@ void WTFLogVerbose(const char* file,
   do {                                  \
     __DEBUGGER();                       \
     User::Panic(_L("Webkit CRASH"), 0); \
-    while (false)
+  } while (false)
 #else
 #define CRASH()                                                      \
   do {                                                               \
