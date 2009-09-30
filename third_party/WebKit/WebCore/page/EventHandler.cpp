@@ -1645,11 +1645,12 @@ bool EventHandler::updateDragAndDrop(const PlatformMouseEvent& event,
     // it is sometimes incorrect when dragging within subframes, as seen with
     // LayoutTests/fast/events/drag-in-frames.html.
     if (newTarget) {
-      if (newTarget->hasTagName(frameTag) || newTarget->hasTagName(iframeTag))
-        accept = static_cast<HTMLFrameElementBase*>(newTarget)
-                     ->contentFrame()
-                     ->eventHandler()
-                     ->updateDragAndDrop(event, clipboard);
+      Frame* frame =
+          (newTarget->hasTagName(frameTag) || newTarget->hasTagName(iframeTag))
+              ? static_cast<HTMLFrameElementBase*>(newTarget)->contentFrame()
+              : 0;
+      if (frame)
+        accept = frame->eventHandler()->updateDragAndDrop(event, clipboard);
       else
         accept = dispatchDragEvent(eventNames().dragenterEvent, newTarget,
                                    event, clipboard);
@@ -1670,11 +1671,12 @@ bool EventHandler::updateDragAndDrop(const PlatformMouseEvent& event,
     }
   } else {
     if (newTarget) {
-      if (newTarget->hasTagName(frameTag) || newTarget->hasTagName(iframeTag))
-        accept = static_cast<HTMLFrameElementBase*>(newTarget)
-                     ->contentFrame()
-                     ->eventHandler()
-                     ->updateDragAndDrop(event, clipboard);
+      Frame* frame =
+          (newTarget->hasTagName(frameTag) || newTarget->hasTagName(iframeTag))
+              ? static_cast<HTMLFrameElementBase*>(newTarget)->contentFrame()
+              : 0;
+      if (frame)
+        accept = frame->eventHandler()->updateDragAndDrop(event, clipboard);
       else
         accept = dispatchDragEvent(eventNames().dragoverEvent, newTarget, event,
                                    clipboard);
