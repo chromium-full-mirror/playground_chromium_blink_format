@@ -99,7 +99,7 @@ String TextCodecQt::decode(const char* bytes,
 #endif
   const char* buf = bytes;
   const char* end = buf + length;
-  String unicode;
+  String unicode("");  // a non-null string is expected
 
   while (buf < end) {
     int size = end - buf;
