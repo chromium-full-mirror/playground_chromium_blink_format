@@ -692,12 +692,23 @@ class JIT : private MacroAssembler {
                             unsigned src1,
                             unsigned src2,
                             OperandTypes opi);
+#if USE(JSVALUE64)
   void compileBinaryArithOpSlowCase(OpcodeID,
                                     Vector<SlowCaseEntry>::iterator&,
                                     unsigned dst,
                                     unsigned src1,
                                     unsigned src2,
-                                    OperandTypes opi);
+                                    OperandTypes,
+                                    bool op1HasImmediateIntFastCase,
+                                    bool op2HasImmediateIntFastCase);
+#else
+  void compileBinaryArithOpSlowCase(OpcodeID,
+                                    Vector<SlowCaseEntry>::iterator&,
+                                    unsigned dst,
+                                    unsigned src1,
+                                    unsigned src2,
+                                    OperandTypes);
+#endif
 
 #if ENABLE(JIT_OPTIMIZE_PROPERTY_ACCESS)
   void compileGetByIdHotPath(int resultVReg,
