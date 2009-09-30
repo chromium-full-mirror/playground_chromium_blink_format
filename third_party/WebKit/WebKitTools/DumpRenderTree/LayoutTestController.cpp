@@ -40,22 +40,22 @@
 
 LayoutTestController::LayoutTestController(const std::string& testPathOrURL,
                                            const std::string& expectedPixelHash)
-    : m_dumpAsText(false),
-      m_dumpAsPDF(false),
+    : m_dumpAsPDF(false),
+      m_dumpAsText(false),
       m_dumpBackForwardList(false),
       m_dumpChildFrameScrollPositions(false),
       m_dumpChildFramesAsText(false),
-      m_dumpDatabaseCallbacks(false),
       m_dumpDOMAsWebArchive(false),
+      m_dumpDatabaseCallbacks(false),
+      m_dumpEditingCallbacks(false),
+      m_dumpFrameLoadCallbacks(false),
+      m_dumpResourceLoadCallbacks(false),
+      m_dumpResourceResponseMIMETypes(false),
       m_dumpSelectionRect(false),
       m_dumpSourceAsWebArchive(false),
       m_dumpStatusCallbacks(false),
       m_dumpTitleChanges(false),
-      m_dumpEditingCallbacks(false),
-      m_dumpResourceLoadCallbacks(false),
-      m_dumpResourceResponseMIMETypes(false),
       m_dumpWillCacheResponse(false),
-      m_dumpFrameLoadCallbacks(false),
       m_callCloseOnWebViews(true),
       m_canOpenWindows(false),
       m_closeRemainingWindowsWhenComplete(true),
@@ -75,18 +75,6 @@ LayoutTestController::LayoutTestController(const std::string& testPathOrURL,
 
 // Static Functions
 
-static JSValueRef dumpAsTextCallback(JSContextRef context,
-                                     JSObjectRef function,
-                                     JSObjectRef thisObject,
-                                     size_t argumentCount,
-                                     const JSValueRef arguments[],
-                                     JSValueRef* exception) {
-  LayoutTestController* controller =
-      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
-  controller->setDumpAsText(true);
-  return JSValueMakeUndefined(context);
-}
-
 static JSValueRef dumpAsPDFCallback(JSContextRef context,
                                     JSObjectRef function,
                                     JSObjectRef thisObject,
@@ -96,6 +84,18 @@ static JSValueRef dumpAsPDFCallback(JSContextRef context,
   LayoutTestController* controller =
       static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
   controller->setDumpAsPDF(true);
+  return JSValueMakeUndefined(context);
+}
+
+static JSValueRef dumpAsTextCallback(JSContextRef context,
+                                     JSObjectRef function,
+                                     JSObjectRef thisObject,
+                                     size_t argumentCount,
+                                     const JSValueRef arguments[],
+                                     JSValueRef* exception) {
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->setDumpAsText(true);
   return JSValueMakeUndefined(context);
 }
 
@@ -172,6 +172,18 @@ static JSValueRef dumpEditingCallbacksCallback(JSContextRef context,
   return JSValueMakeUndefined(context);
 }
 
+static JSValueRef dumpFrameLoadCallbacksCallback(JSContextRef context,
+                                                 JSObjectRef function,
+                                                 JSObjectRef thisObject,
+                                                 size_t argumentCount,
+                                                 const JSValueRef arguments[],
+                                                 JSValueRef* exception) {
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->setDumpFrameLoadCallbacks(true);
+  return JSValueMakeUndefined(context);
+}
+
 static JSValueRef dumpResourceLoadCallbacksCallback(
     JSContextRef context,
     JSObjectRef function,
@@ -182,18 +194,6 @@ static JSValueRef dumpResourceLoadCallbacksCallback(
   LayoutTestController* controller =
       static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
   controller->setDumpResourceLoadCallbacks(true);
-  return JSValueMakeUndefined(context);
-}
-
-static JSValueRef dumpFrameLoadCallbacksCallback(JSContextRef context,
-                                                 JSObjectRef function,
-                                                 JSObjectRef thisObject,
-                                                 size_t argumentCount,
-                                                 const JSValueRef arguments[],
-                                                 JSValueRef* exception) {
-  LayoutTestController* controller =
-      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
-  controller->setDumpFrameLoadCallbacks(true);
   return JSValueMakeUndefined(context);
 }
 
@@ -1664,9 +1664,9 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"dumpEditingCallbacks", dumpEditingCallbacksCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
-      {"dumpResourceLoadCallbacks", dumpResourceLoadCallbacksCallback,
-       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"dumpFrameLoadCallbacks", dumpFrameLoadCallbacksCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"dumpResourceLoadCallbacks", dumpResourceLoadCallbacksCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"dumpResourceResponseMIMETypes", dumpResourceResponseMIMETypesCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
