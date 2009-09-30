@@ -1046,12 +1046,11 @@ void RenderBox::mapLocalToContainer(RenderBoxModelObject* repaintContainer,
                                    : TransformState::FlattenTransform);
 
   if (containerSkipped) {
-    // There can't be a transfrom between repaintContainer and o, because
+    // There can't be a transform between repaintContainer and o, because
     // transforms create containers, so it should be safe
     // to just subtract the delta between the repaintContainer and o.
-    IntSize repaintContainerOffset = repaintContainer->offsetFromContainer(o);
-    transformState.move(-repaintContainerOffset.width(),
-                        -repaintContainerOffset.height(),
+    IntSize containerOffset = repaintContainer->offsetFromAncestorContainer(o);
+    transformState.move(-containerOffset.width(), -containerOffset.height(),
                         preserve3D ? TransformState::AccumulateTransform
                                    : TransformState::FlattenTransform);
     return;
@@ -1321,7 +1320,7 @@ void RenderBox::computeRectForRepaint(RenderBoxModelObject* repaintContainer,
   if (containerSkipped) {
     // If the repaintContainer is below o, then we need to map the rect into
     // repaintContainer's coordinates.
-    IntSize containerOffset = repaintContainer->offsetFromContainer(o);
+    IntSize containerOffset = repaintContainer->offsetFromAncestorContainer(o);
     rect.move(-containerOffset);
     return;
   }

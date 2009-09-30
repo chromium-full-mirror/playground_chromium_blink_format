@@ -1914,6 +1914,24 @@ IntSize RenderObject::offsetFromContainer(RenderObject* o) const {
   return offset;
 }
 
+IntSize RenderObject::offsetFromAncestorContainer(
+    RenderObject* container) const {
+  IntSize offset;
+  const RenderObject* currContainer = this;
+  do {
+    RenderObject* nextContainer = currContainer->container();
+    ASSERT(nextContainer);  // This means we reached the top without finding
+                            // container.
+    if (!nextContainer)
+      break;
+    ASSERT(!currContainer->hasTransform());
+    offset += currContainer->offsetFromContainer(nextContainer);
+    currContainer = nextContainer;
+  } while (currContainer != container);
+
+  return offset;
+}
+
 IntRect RenderObject::localCaretRect(InlineBox*,
                                      int,
                                      int* extraWidthToEndOfLine) {
