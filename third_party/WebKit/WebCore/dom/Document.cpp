@@ -121,6 +121,7 @@
 #include "TransformSource.h"
 #include "TreeWalker.h"
 #include "UIEvent.h"
+#include "UserContentURLPattern.h"
 #include "WebKitAnimationEvent.h"
 #include "WebKitTransitionEvent.h"
 #include "WheelEvent.h"
@@ -2009,6 +2010,8 @@ const Vector<RefPtr<CSSStyleSheet>>* Document::pageGroupUserSheets() const {
     const UserStyleSheetVector* sheets = it->second;
     for (unsigned i = 0; i < sheets->size(); ++i) {
       const UserStyleSheet* sheet = sheets->at(i).get();
+      if (!UserContentURLPattern::matchesPatterns(url(), sheet->patterns()))
+        continue;
       RefPtr<CSSStyleSheet> parsedSheet =
           CSSStyleSheet::create(const_cast<Document*>(this), sheet->url());
       parsedSheet->setIsUserStyleSheet(true);

@@ -74,6 +74,7 @@
 #include "Settings.h"
 #include "TextIterator.h"
 #include "TextResourceDecoder.h"
+#include "UserContentURLPattern.h"
 #include "XMLNames.h"
 #include "htmlediting.h"
 #include "markup.h"
@@ -888,12 +889,17 @@ void Frame::injectUserScriptsForWorld(unsigned worldID,
   if (userScripts.isEmpty())
     return;
 
+  Document* doc = document();
+  if (!doc)
+    return;
+
   // FIXME: Need to implement pattern checking.
   Vector<ScriptSourceCode> sourceCode;
   unsigned count = userScripts.size();
   for (unsigned i = 0; i < count; ++i) {
     UserScript* script = userScripts[i].get();
-    if (script->injectionTime() == injectionTime)
+    if (script->injectionTime() == injectionTime &&
+        UserContentURLPattern::matchesPatterns(doc->url(), script->patterns()))
       sourceCode.append(ScriptSourceCode(script->source(), script->url()));
   }
   script()->evaluateInIsolatedWorld(worldID, sourceCode);
