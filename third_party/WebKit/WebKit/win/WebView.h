@@ -763,6 +763,8 @@ class WebView : public IWebView,
                            unsigned patternsCount,
                            BSTR* patterns);
   virtual HRESULT STDMETHODCALLTYPE
+  removeUserContentWithURLFromGroup(BSTR groupName, unsigned worldID, BSTR url);
+  virtual HRESULT STDMETHODCALLTYPE
   removeUserContentFromGroup(BSTR groupName, unsigned worldID);
   virtual HRESULT STDMETHODCALLTYPE
   removeAllUserContentFromGroup(BSTR groupName);

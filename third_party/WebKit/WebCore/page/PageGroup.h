@@ -86,6 +86,7 @@ class PageGroup : public Noncopyable {
   }
 
   void removeUserContentForWorld(unsigned);
+  void removeUserContentWithURLForWorld(const KURL&, unsigned);
   void removeAllUserContent();
 
  private:

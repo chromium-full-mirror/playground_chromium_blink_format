@@ -553,6 +553,9 @@ backforward list.
                           worldID:(unsigned)worldID
                          patterns:(NSArray*)patterns;
 + (void)_removeUserContentFromGroup:(NSString*)groupName
+                                url:(NSURL*)url
+                            worldID:(unsigned)worldID;
++ (void)_removeUserContentFromGroup:(NSString*)groupName
                             worldID:(unsigned)worldID;
 + (void)_removeAllUserContentFromGroup:(NSString*)groupName;
 
