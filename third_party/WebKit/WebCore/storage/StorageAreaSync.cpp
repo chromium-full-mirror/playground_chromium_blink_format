@@ -60,6 +60,7 @@ StorageAreaSync::StorageAreaSync(
       m_clearItemsWhileSyncing(false),
       m_syncScheduled(false),
       m_importComplete(false) {
+  ASSERT(isMainThread());
   ASSERT(m_storageArea);
   ASSERT(m_syncManager);
 
@@ -71,6 +72,7 @@ StorageAreaSync::StorageAreaSync(
 }
 
 StorageAreaSync::~StorageAreaSync() {
+  ASSERT(isMainThread());
   ASSERT(!m_syncTimer.isActive());
 }
 

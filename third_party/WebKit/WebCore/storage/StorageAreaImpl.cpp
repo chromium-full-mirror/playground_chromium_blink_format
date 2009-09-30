@@ -38,7 +38,9 @@
 
 namespace WebCore {
 
-StorageAreaImpl::~StorageAreaImpl() {}
+StorageAreaImpl::~StorageAreaImpl() {
+  ASSERT(isMainThread());
+}
 
 PassRefPtr<StorageAreaImpl> StorageAreaImpl::create(
     StorageType storageType,
@@ -59,6 +61,7 @@ StorageAreaImpl::StorageAreaImpl(StorageType storageType,
       m_isShutdown(false)
 #endif
 {
+  ASSERT(isMainThread());
   ASSERT(m_securityOrigin);
   ASSERT(m_storageMap);
 
@@ -86,6 +89,7 @@ StorageAreaImpl::StorageAreaImpl(StorageAreaImpl* area)
       m_isShutdown(area->m_isShutdown)
 #endif
 {
+  ASSERT(isMainThread());
   ASSERT(m_securityOrigin);
   ASSERT(m_storageMap);
   ASSERT(!m_isShutdown);

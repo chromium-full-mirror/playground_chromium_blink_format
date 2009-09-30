@@ -48,12 +48,15 @@ PassRefPtr<StorageSyncManager> StorageSyncManager::create(const String& path) {
 
 StorageSyncManager::StorageSyncManager(const String& path)
     : m_path(path.copy()) {
+  ASSERT(isMainThread());
   ASSERT(!m_path.isEmpty());
   m_thread = LocalStorageThread::create();
   m_thread->start();
 }
 
-StorageSyncManager::~StorageSyncManager() {}
+StorageSyncManager::~StorageSyncManager() {
+  ASSERT(isMainThread());
+}
 
 String StorageSyncManager::fullDatabaseFilename(SecurityOrigin* origin) {
   ASSERT(origin);
@@ -80,7 +83,7 @@ bool StorageSyncManager::scheduleImport(PassRefPtr<StorageAreaSync> area) {
   ASSERT(isMainThread());
 
   if (m_thread)
-    m_thread->scheduleImport(area);
+    m_thread->scheduleImport(area.get());
 
   return m_thread;
 }
@@ -89,7 +92,7 @@ void StorageSyncManager::scheduleSync(PassRefPtr<StorageAreaSync> area) {
   ASSERT(isMainThread());
 
   if (m_thread)
-    m_thread->scheduleSync(area);
+    m_thread->scheduleSync(area.get());
 }
 
 }  // namespace WebCore

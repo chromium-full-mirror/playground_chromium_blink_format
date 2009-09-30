@@ -33,15 +33,14 @@
 
 namespace WebCore {
 
-LocalStorageTask::LocalStorageTask(Type type, PassRefPtr<StorageAreaSync> area)
-    : m_type(type), m_area(area) {
+LocalStorageTask::LocalStorageTask(Type type, StorageAreaSync* area)
+    : m_type(type), m_area(area), m_thread(0) {
   ASSERT(m_area);
   ASSERT(m_type == AreaImport || m_type == AreaSync);
 }
 
-LocalStorageTask::LocalStorageTask(Type type,
-                                   PassRefPtr<LocalStorageThread> thread)
-    : m_type(type), m_thread(thread) {
+LocalStorageTask::LocalStorageTask(Type type, LocalStorageThread* thread)
+    : m_type(type), m_area(0), m_thread(thread) {
   ASSERT(m_thread);
   ASSERT(m_type == TerminateThread);
 }
@@ -51,11 +50,9 @@ LocalStorageTask::~LocalStorageTask() {}
 void LocalStorageTask::performTask() {
   switch (m_type) {
     case AreaImport:
-      ASSERT(m_area);
       m_area->performImport();
       break;
     case AreaSync:
-      ASSERT(m_area);
       m_area->performSync();
       break;
     case TerminateThread:
