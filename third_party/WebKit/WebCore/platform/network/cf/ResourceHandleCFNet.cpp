@@ -162,6 +162,17 @@ CFURLRequestRef willSendRequest(CFURLConnectionRef conn,
             AdoptCF, CFURLRequestCreateMutableCopy(0, cfRequest));
         CFURLRequestSetHTTPRequestMethod(mutableRequest.get(),
                                          originalMethod.get());
+
+        FormData* body = handle->request().httpBody();
+        if (!equalIgnoringCase(handle->request().httpMethod(), "GET") && body &&
+            !body->isEmpty())
+          WebCore::setHTTPBody(mutableRequest, body);
+
+        String originalContentType = m_handle->request.httpContentType();
+        if (!originalContentType->isEmpty())
+          CFURLRequestSetHTTPHeaderFieldValue(
+              mutableRequest.get(), CFSTR("Content-Type"), originalContentType);
+
         request = mutableRequest.get();
       }
     }
