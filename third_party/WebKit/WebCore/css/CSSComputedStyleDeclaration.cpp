@@ -66,13 +66,13 @@ static const int computedProperties[] = {
     CSSPropertyBorderRightStyle, CSSPropertyBorderRightWidth,
     CSSPropertyBorderTopColor, CSSPropertyBorderTopLeftRadius,
     CSSPropertyBorderTopRightRadius, CSSPropertyBorderTopStyle,
-    CSSPropertyBorderTopWidth, CSSPropertyBottom, CSSPropertyBoxShadow,
-    CSSPropertyCaptionSide, CSSPropertyClear, CSSPropertyClip, CSSPropertyColor,
-    CSSPropertyCursor, CSSPropertyDirection, CSSPropertyDisplay,
-    CSSPropertyEmptyCells, CSSPropertyFloat, CSSPropertyFontFamily,
-    CSSPropertyFontSize, CSSPropertyFontStyle, CSSPropertyFontVariant,
-    CSSPropertyFontWeight, CSSPropertyHeight, CSSPropertyLeft,
-    CSSPropertyLetterSpacing, CSSPropertyLineHeight, CSSPropertyListStyleImage,
+    CSSPropertyBorderTopWidth, CSSPropertyBottom, CSSPropertyCaptionSide,
+    CSSPropertyClear, CSSPropertyClip, CSSPropertyColor, CSSPropertyCursor,
+    CSSPropertyDirection, CSSPropertyDisplay, CSSPropertyEmptyCells,
+    CSSPropertyFloat, CSSPropertyFontFamily, CSSPropertyFontSize,
+    CSSPropertyFontStyle, CSSPropertyFontVariant, CSSPropertyFontWeight,
+    CSSPropertyHeight, CSSPropertyLeft, CSSPropertyLetterSpacing,
+    CSSPropertyLineHeight, CSSPropertyListStyleImage,
     CSSPropertyListStylePosition, CSSPropertyListStyleType,
     CSSPropertyMarginBottom, CSSPropertyMarginLeft, CSSPropertyMarginRight,
     CSSPropertyMarginTop, CSSPropertyMaxHeight, CSSPropertyMaxWidth,
@@ -104,12 +104,12 @@ static const int computedProperties[] = {
     CSSPropertyWebkitBoxFlex, CSSPropertyWebkitBoxFlexGroup,
     CSSPropertyWebkitBoxLines, CSSPropertyWebkitBoxOrdinalGroup,
     CSSPropertyWebkitBoxOrient, CSSPropertyWebkitBoxPack,
-    CSSPropertyWebkitBoxReflect, CSSPropertyWebkitBoxSizing,
-    CSSPropertyWebkitColumnBreakAfter, CSSPropertyWebkitColumnBreakBefore,
-    CSSPropertyWebkitColumnBreakInside, CSSPropertyWebkitColumnCount,
-    CSSPropertyWebkitColumnGap, CSSPropertyWebkitColumnRuleColor,
-    CSSPropertyWebkitColumnRuleStyle, CSSPropertyWebkitColumnRuleWidth,
-    CSSPropertyWebkitColumnWidth,
+    CSSPropertyWebkitBoxReflect, CSSPropertyWebkitBoxShadow,
+    CSSPropertyWebkitBoxSizing, CSSPropertyWebkitColumnBreakAfter,
+    CSSPropertyWebkitColumnBreakBefore, CSSPropertyWebkitColumnBreakInside,
+    CSSPropertyWebkitColumnCount, CSSPropertyWebkitColumnGap,
+    CSSPropertyWebkitColumnRuleColor, CSSPropertyWebkitColumnRuleStyle,
+    CSSPropertyWebkitColumnRuleWidth, CSSPropertyWebkitColumnWidth,
 #if ENABLE(DASHBOARD_SUPPORT)
     CSSPropertyWebkitDashboardRegion,
 #endif
@@ -738,7 +738,7 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
     }
     case CSSPropertyWebkitBoxReflect:
       return valueForReflection(style->boxReflect());
-    case CSSPropertyBoxShadow:
+    case CSSPropertyWebkitBoxShadow:
       return valueForShadow(style->boxShadow(),
                             static_cast<CSSPropertyID>(propertyID));
     case CSSPropertyCaptionSide:
