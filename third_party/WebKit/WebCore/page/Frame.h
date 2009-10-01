@@ -68,6 +68,7 @@ class CSSMutableStyleDeclaration;
 class Editor;
 class EventHandler;
 class FrameLoader;
+class RedirectScheduler;
 class FrameLoaderClient;
 class FrameTree;
 class FrameView;
@@ -113,6 +114,7 @@ class Frame : public RefCounted<Frame> {
   Editor* editor() const;
   EventHandler* eventHandler() const;
   FrameLoader* loader() const;
+  RedirectScheduler* redirectScheduler() const;
   SelectionController* selection() const;
   FrameTree* tree() const;
   AnimationController* animation() const;
@@ -376,6 +378,7 @@ class Frame : public RefCounted<Frame> {
   Page* m_page;
   mutable FrameTree m_treeNode;
   mutable FrameLoader m_loader;
+  mutable RedirectScheduler m_redirectScheduler;
 
   mutable RefPtr<DOMWindow> m_domWindow;
   HashSet<DOMWindow*> m_liveFormerWindows;
