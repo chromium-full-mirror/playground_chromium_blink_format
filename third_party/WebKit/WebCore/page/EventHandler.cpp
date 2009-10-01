@@ -2385,7 +2385,7 @@ void EventHandler::freeClipboard() {
 }
 
 bool EventHandler::shouldDragAutoNode(Node* node, const IntPoint& point) const {
-  if (!node || node->hasChildNodes() || !m_frame->view())
+  if (!node || !m_frame->view())
     return false;
   Page* page = m_frame->page();
   return page &&
