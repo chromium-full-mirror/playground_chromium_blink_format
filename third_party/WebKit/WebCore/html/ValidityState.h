@@ -44,7 +44,7 @@ class ValidityState : public RefCounted<ValidityState> {
   bool valueMissing() { return control()->valueMissing(); }
   bool typeMismatch();
   bool patternMismatch() { return control()->patternMismatch(); }
-  bool tooLong() { return false; }
+  bool tooLong() { return control()->tooLong(); }
   bool rangeUnderflow() { return false; }
   bool rangeOverflow() { return false; }
   bool stepMismatch() { return false; }

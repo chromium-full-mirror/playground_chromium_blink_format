@@ -70,7 +70,8 @@ HTMLTextAreaElement::HTMLTextAreaElement(const QualifiedName& tagName,
       m_cols(defaultCols),
       m_wrap(SoftWrap),
       m_cachedSelectionStart(-1),
-      m_cachedSelectionEnd(-1) {
+      m_cachedSelectionEnd(-1),
+      m_isDirty(false) {
   ASSERT(hasTagName(textareaTag));
   setFormControlValueMatchesRenderer(true);
   notifyFormStateChanged(this);
@@ -235,6 +236,7 @@ bool HTMLTextAreaElement::appendFormData(FormDataList& encoding, bool) {
 
 void HTMLTextAreaElement::reset() {
   setValue(defaultValue());
+  m_isDirty = false;
 }
 
 bool HTMLTextAreaElement::isKeyboardFocusable(KeyboardEvent*) const {
@@ -327,6 +329,7 @@ void HTMLTextAreaElement::updateValue() const {
   const_cast<HTMLTextAreaElement*>(this)->setFormControlValueMatchesRenderer(
       true);
   notifyFormStateChanged(this);
+  m_isDirty = true;
 }
 
 String HTMLTextAreaElement::value() const {
@@ -418,12 +421,22 @@ int HTMLTextAreaElement::maxLength() const {
   return ok && value >= 0 ? value : -1;
 }
 
-void HTMLTextAreaElement::setMaxLength(int newValue,
-                                       ExceptionCode& exceptionCode) {
+void HTMLTextAreaElement::setMaxLength(int newValue, ExceptionCode& ec) {
   if (newValue < 0)
-    exceptionCode = INDEX_SIZE_ERR;
+    ec = INDEX_SIZE_ERR;
   else
     setAttribute(maxlengthAttr, String::number(newValue));
+}
+
+bool HTMLTextAreaElement::tooLong() const {
+  // Return false for the default value even if it is longer than maxLength.
+  if (!m_isDirty)
+    return false;
+
+  int max = maxLength();
+  if (max < 0)
+    return false;
+  return value().length() > static_cast<unsigned>(max);
 }
 
 void HTMLTextAreaElement::accessKeyAction(bool) {
