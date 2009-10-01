@@ -387,7 +387,7 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
   friend class QWebFrame;
   friend class QWebPagePrivate;
   friend class QWebView;
-  friend class QWebGraphicsItem;
+  friend class QGraphicsWebView;
   friend class QWebInspector;
   friend class WebCore::ChromeClientQt;
   friend class WebCore::EditorClientQt;

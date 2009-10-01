@@ -44,7 +44,7 @@
 #include <cstdio>
 #include <qwebelement.h>
 #include <qwebframe.h>
-#include <qwebgraphicsitem.h>
+#include <qgraphicswebview.h>
 #include <qwebpage.h>
 #include <qwebsettings.h>
 #include <qwebview.h>
@@ -103,7 +103,7 @@ class SharedScene : public QSharedData {
   SharedScene() {
     m_scene = new QGraphicsScene;
 
-    m_item = new QWebGraphicsItem;
+    m_item = new QGraphicsWebView;
     m_item->setPage(new WebPage());
 
     m_scene->addItem(m_item);
@@ -116,11 +116,11 @@ class SharedScene : public QSharedData {
   }
 
   QGraphicsScene* scene() const { return m_scene; }
-  QWebGraphicsItem* webItem() const { return m_item; }
+  QGraphicsWebView* webView() const { return m_item; }
 
  private:
   QGraphicsScene* m_scene;
-  QWebGraphicsItem* m_item;
+  QGraphicsWebView* m_item;
 };
 
 class MainWindow : public QMainWindow {
@@ -145,13 +145,13 @@ class MainWindow : public QMainWindow {
     view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     setCentralWidget(view);
 
-    view->setMainWidget(scene->webItem());
+    view->setMainWidget(scene->webView());
 
-    connect(scene->webItem(), SIGNAL(loadFinished()), this,
+    connect(scene->webView(), SIGNAL(loadFinished()), this,
             SLOT(loadFinished()));
-    connect(scene->webItem(), SIGNAL(titleChanged(const QString&)), this,
+    connect(scene->webView(), SIGNAL(titleChanged(const QString&)), this,
             SLOT(setWindowTitle(const QString&)));
-    connect(scene->webItem()->page(), SIGNAL(windowCloseRequested()), this,
+    connect(scene->webView()->page(), SIGNAL(windowCloseRequested()), this,
             SLOT(close()));
 
     resize(640, 480);
@@ -164,8 +164,8 @@ class MainWindow : public QMainWindow {
       deducedUrl = QUrl("http://" + url + "/");
 
     urlEdit->setText(deducedUrl.toEncoded());
-    scene->webItem()->load(deducedUrl);
-    scene->webItem()->setFocus(Qt::OtherFocusReason);
+    scene->webView()->load(deducedUrl);
+    scene->webView()->setFocus(Qt::OtherFocusReason);
   }
 
   QUrl guessUrlFromString(const QString& string) {
@@ -177,13 +177,13 @@ class MainWindow : public QMainWindow {
     return QWebView::guessUrlFromString(input);
   }
 
-  QWebPage* page() const { return scene->webItem()->page(); }
+  QWebPage* page() const { return scene->webView()->page(); }
 
  protected slots:
   void changeLocation() { load(urlEdit->text()); }
 
   void loadFinished() {
-    QUrl url = scene->webItem()->url();
+    QUrl url = scene->webView()->url();
     urlEdit->setText(url.toString());
 
     QUrl::FormattingOptions opts;
@@ -213,7 +213,7 @@ class MainWindow : public QMainWindow {
 
  private:
   void buildUI() {
-    QWebPage* page = scene->webItem()->page();
+    QWebPage* page = scene->webView()->page();
     urlEdit = new QLineEdit(this);
     urlEdit->setSizePolicy(QSizePolicy::Expanding,
                            urlEdit->sizePolicy().verticalPolicy());

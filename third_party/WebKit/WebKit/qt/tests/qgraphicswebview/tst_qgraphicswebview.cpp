@@ -19,17 +19,17 @@
 
 #include <QtTest/QtTest>
 
-#include <qwebgraphicsitem.h>
+#include <qgraphicswebview.h>
 
-class tst_QWebGraphicsItem : public QObject {
+class tst_QGraphicsWebView : public QObject {
   Q_OBJECT
 
  private slots:
-  void qwebgraphicsitem();
+  void qgraphicswebview();
 };
 
-void tst_QWebGraphicsItem::qwebgraphicsitem() {
-  QWebGraphicsItem item;
+void tst_QGraphicsWebView::qgraphicswebview() {
+  QGraphicsWebView item;
   item.url();
   item.title();
   item.icon();
@@ -51,6 +51,6 @@ void tst_QWebGraphicsItem::qwebgraphicsitem() {
   item.setContent(QByteArray());
 }
 
-QTEST_MAIN(tst_QWebGraphicsItem)
+QTEST_MAIN(tst_QGraphicsWebView)
 
-#include "tst_qwebgraphicsitem.moc"
+#include "tst_qgraphicswebview.moc"
