@@ -222,7 +222,8 @@ class JSValue {
   enum { FalseTag = 0xfffffffc };
   enum { NullTag = 0xfffffffb };
   enum { UndefinedTag = 0xfffffffa };
-  enum { DeletedValueTag = 0xfffffff9 };
+  enum { EmptyValueTag = 0xfffffff9 };
+  enum { DeletedValueTag = 0xfffffff8 };
 
   enum { LowestTag = DeletedValueTag };
 
@@ -425,7 +426,7 @@ inline JSValue JSValue::decode(EncodedJSValue encodedJSValue) {
 }
 
 inline JSValue::JSValue() {
-  u.asBits.tag = CellTag;
+  u.asBits.tag = EmptyValueTag;
   u.asBits.payload = 0;
 }
 
@@ -455,17 +456,24 @@ inline JSValue::JSValue(HashTableDeletedValueTag) {
 }
 
 inline JSValue::JSValue(JSCell* ptr) {
-  u.asBits.tag = CellTag;
+  if (ptr)
+    u.asBits.tag = CellTag;
+  else
+    u.asBits.tag = EmptyValueTag;
   u.asBits.payload = reinterpret_cast<int32_t>(ptr);
 }
 
 inline JSValue::JSValue(const JSCell* ptr) {
-  u.asBits.tag = CellTag;
+  if (ptr)
+    u.asBits.tag = CellTag;
+  else
+    u.asBits.tag = EmptyValueTag;
   u.asBits.payload = reinterpret_cast<int32_t>(const_cast<JSCell*>(ptr));
 }
 
 inline JSValue::operator bool() const {
-  return u.asBits.payload || tag() != CellTag;
+  ASSERT(tag() != DeletedValueTag);
+  return tag() != EmptyValueTag;
 }
 
 inline bool JSValue::operator==(const JSValue& other) const {
