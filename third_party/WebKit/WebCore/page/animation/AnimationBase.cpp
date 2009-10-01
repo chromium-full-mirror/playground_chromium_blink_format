@@ -412,6 +412,10 @@ class PropertyWrapperMaybeInvalidColor : public PropertyWrapperBase {
   virtual bool equals(const RenderStyle* a, const RenderStyle* b) const {
     Color fromColor = (a->*m_getter)();
     Color toColor = (b->*m_getter)();
+
+    if (!fromColor.isValid() && !toColor.isValid())
+      return true;
+
     if (!fromColor.isValid())
       fromColor = a->color();
     if (!toColor.isValid())
@@ -427,6 +431,10 @@ class PropertyWrapperMaybeInvalidColor : public PropertyWrapperBase {
                      double progress) const {
     Color fromColor = (a->*m_getter)();
     Color toColor = (b->*m_getter)();
+
+    if (!fromColor.isValid() && !toColor.isValid())
+      return;
+
     if (!fromColor.isValid())
       fromColor = a->color();
     if (!toColor.isValid())
