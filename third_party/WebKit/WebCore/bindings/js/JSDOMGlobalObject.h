@@ -75,6 +75,9 @@ class JSDOMGlobalObject : public JSC::JSGlobalObject {
     JSDOMGlobalObjectData()
         : JSGlobalObjectData(destroyJSDOMGlobalObjectData), evt(0) {}
 
+    JSDOMGlobalObjectData(Destructor destructor)
+        : JSGlobalObjectData(destructor), evt(0) {}
+
     JSDOMStructureMap structures;
     JSDOMConstructorMap constructors;
 
