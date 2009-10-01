@@ -151,6 +151,7 @@ class EventSender : public QObject {
                const QStringList& modifiers = QStringList());
   void clearKillRing() {}
   void contextClick();
+  void scheduleAsynchronousClick();
 
  private:
   QPoint m_mousePos;
