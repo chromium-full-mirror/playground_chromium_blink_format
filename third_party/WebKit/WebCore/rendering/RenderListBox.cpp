@@ -524,7 +524,8 @@ bool RenderListBox::listIndexIsVisible(int index) {
 
 bool RenderListBox::scroll(ScrollDirection direction,
                            ScrollGranularity granularity,
-                           float multiplier) {
+                           float multiplier,
+                           Node**) {
   return m_vBar && m_vBar->scroll(direction, granularity, multiplier);
 }
 

@@ -824,11 +824,12 @@ void RenderTextControlSingleLine::setScrollTop(int newTop) {
 
 bool RenderTextControlSingleLine::scroll(ScrollDirection direction,
                                          ScrollGranularity granularity,
-                                         float multiplier) {
+                                         float multiplier,
+                                         Node** stopNode) {
   RenderLayer* layer = innerTextElement()->renderBox()->layer();
   if (layer && layer->scroll(direction, granularity, multiplier))
     return true;
-  return RenderBlock::scroll(direction, granularity, multiplier);
+  return RenderBlock::scroll(direction, granularity, multiplier, stopNode);
 }
 
 PassRefPtr<Scrollbar> RenderTextControlSingleLine::createScrollbar(
