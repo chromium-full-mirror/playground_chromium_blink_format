@@ -440,8 +440,10 @@ void CoreTextController::collectCoreTextRunsForCharacters(
       CFStringCreateWithCharactersNoCopy(NULL, cp, length, kCFAllocatorNull));
 
   RetainPtr<CFAttributedStringRef> attributedString(
-      AdoptCF, CFAttributedStringCreate(NULL, string.get(),
-                                        fontData->getCFStringAttributes()));
+      AdoptCF, CFAttributedStringCreate(
+                   NULL, string.get(),
+                   fontData->getCFStringAttributes(
+                       m_font.fontDescription().textRenderingMode())));
 
   RetainPtr<CTTypesetterRef> typesetter;
 

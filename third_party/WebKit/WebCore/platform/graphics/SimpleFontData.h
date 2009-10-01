@@ -28,6 +28,7 @@
 #include "FontPlatformData.h"
 #include "GlyphPageTreeNode.h"
 #include "GlyphWidthMap.h"
+#include "TextRenderingMode.h"
 #include <wtf/OwnPtr.h>
 
 #if USE(ATSUI)
@@ -126,7 +127,7 @@ class SimpleFontData : public FontData {
 
 #if USE(CORE_TEXT)
   CTFontRef getCTFont() const;
-  CFDictionaryRef getCFStringAttributes() const;
+  CFDictionaryRef getCFStringAttributes(TextRenderingMode) const;
 #endif
 
 #if USE(ATSUI)

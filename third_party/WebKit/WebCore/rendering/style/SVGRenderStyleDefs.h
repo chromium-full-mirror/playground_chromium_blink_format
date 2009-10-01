@@ -90,13 +90,6 @@ enum EShapeRendering {
   SR_GEOMETRICPRECISION
 };
 
-enum ETextRendering {
-  TR_AUTO,
-  TR_OPTIMIZESPEED,
-  TR_OPTIMIZELEGIBILITY,
-  TR_GEOMETRICPRECISION
-};
-
 enum EWritingMode { WM_LRTB, WM_LR, WM_RLTB, WM_RL, WM_TBRL, WM_TB };
 
 enum EGlyphOrientation { GO_0DEG, GO_90DEG, GO_180DEG, GO_270DEG, GO_AUTO };

@@ -30,6 +30,7 @@
 #include "FontRenderingMode.h"
 #include "FontSmoothingMode.h"
 #include "FontTraitsMask.h"
+#include "TextRenderingMode.h"
 
 namespace WebCore {
 
@@ -70,7 +71,8 @@ class FontDescription {
         m_usePrinterFont(false),
         m_renderingMode(NormalRenderingMode),
         m_keywordSize(0),
-        m_fontSmoothing(AutoSmoothing) {}
+        m_fontSmoothing(AutoSmoothing),
+        m_textRendering(AutoTextRendering) {}
 
   bool operator==(const FontDescription&) const;
   bool operator!=(const FontDescription& other) const {
@@ -105,6 +107,9 @@ class FontDescription {
   FontSmoothingMode fontSmoothing() const {
     return static_cast<FontSmoothingMode>(m_fontSmoothing);
   }
+  TextRenderingMode textRenderingMode() const {
+    return static_cast<TextRenderingMode>(m_textRendering);
+  }
 
   FontTraitsMask traitsMask() const;
 
@@ -123,6 +128,9 @@ class FontDescription {
   void setKeywordSize(unsigned s) { m_keywordSize = s; }
   void setFontSmoothing(FontSmoothingMode smoothing) {
     m_fontSmoothing = smoothing;
+  }
+  void setTextRenderingMode(TextRenderingMode rendering) {
+    m_textRendering = rendering;
   }
 
  private:
@@ -154,6 +162,7 @@ class FontDescription {
   // HTML size values for <font>).
 
   unsigned m_fontSmoothing : 2;  // FontSmoothingMode
+  unsigned m_textRendering : 2;  // TextRenderingMode
 };
 
 inline bool FontDescription::operator==(const FontDescription& other) const {
@@ -167,7 +176,8 @@ inline bool FontDescription::operator==(const FontDescription& other) const {
          m_usePrinterFont == other.m_usePrinterFont &&
          m_renderingMode == other.m_renderingMode &&
          m_keywordSize == other.m_keywordSize &&
-         m_fontSmoothing == other.m_fontSmoothing;
+         m_fontSmoothing == other.m_fontSmoothing &&
+         m_textRendering == other.m_textRendering;
 }
 }
 

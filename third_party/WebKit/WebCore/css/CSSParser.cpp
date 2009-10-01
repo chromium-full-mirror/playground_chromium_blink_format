@@ -1531,6 +1531,12 @@ bool CSSParser::parseValue(int propId, bool important) {
           id == CSSValueDotDotDash || id == CSSValueWave)
         valid_primitive = true;
       break;
+    case CSSPropertyTextRendering:  // auto | optimizeSpeed | optimizeLegibility
+                                    // | geometricPrecision
+      if (id == CSSValueAuto || id == CSSValueOptimizespeed ||
+          id == CSSValueOptimizelegibility || id == CSSValueGeometricprecision)
+        valid_primitive = true;
+      break;
     case CSSPropertyTextLineThroughWidth:
     case CSSPropertyTextOverlineWidth:
     case CSSPropertyTextUnderlineWidth:

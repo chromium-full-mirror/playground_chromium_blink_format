@@ -84,12 +84,12 @@ static const int computedProperties[] = {
     CSSPropertyPageBreakBefore, CSSPropertyPageBreakInside,
     CSSPropertyPointerEvents, CSSPropertyPosition, CSSPropertyResize,
     CSSPropertyRight, CSSPropertyTableLayout, CSSPropertyTextAlign,
-    CSSPropertyTextDecoration, CSSPropertyTextIndent, CSSPropertyTextShadow,
-    CSSPropertyTextOverflow, CSSPropertyTextTransform, CSSPropertyTop,
-    CSSPropertyUnicodeBidi, CSSPropertyVerticalAlign, CSSPropertyVisibility,
-    CSSPropertyWhiteSpace, CSSPropertyWidows, CSSPropertyWidth,
-    CSSPropertyWordBreak, CSSPropertyWordSpacing, CSSPropertyWordWrap,
-    CSSPropertyZIndex, CSSPropertyZoom,
+    CSSPropertyTextDecoration, CSSPropertyTextIndent, CSSPropertyTextRendering,
+    CSSPropertyTextShadow, CSSPropertyTextOverflow, CSSPropertyTextTransform,
+    CSSPropertyTop, CSSPropertyUnicodeBidi, CSSPropertyVerticalAlign,
+    CSSPropertyVisibility, CSSPropertyWhiteSpace, CSSPropertyWidows,
+    CSSPropertyWidth, CSSPropertyWordBreak, CSSPropertyWordSpacing,
+    CSSPropertyWordWrap, CSSPropertyZIndex, CSSPropertyZoom,
 
     CSSPropertyWebkitAnimationDelay, CSSPropertyWebkitAnimationDirection,
     CSSPropertyWebkitAnimationDuration,
@@ -145,11 +145,10 @@ static const int computedProperties[] = {
     CSSPropertyStroke, CSSPropertyStrokeDasharray, CSSPropertyStrokeDashoffset,
     CSSPropertyStrokeLinecap, CSSPropertyStrokeLinejoin,
     CSSPropertyStrokeMiterlimit, CSSPropertyStrokeOpacity,
-    CSSPropertyStrokeWidth, CSSPropertyTextRendering,
-    CSSPropertyAlignmentBaseline, CSSPropertyBaselineShift,
-    CSSPropertyDominantBaseline, CSSPropertyKerning, CSSPropertyTextAnchor,
-    CSSPropertyWritingMode, CSSPropertyGlyphOrientationHorizontal,
-    CSSPropertyGlyphOrientationVertical
+    CSSPropertyStrokeWidth, CSSPropertyAlignmentBaseline,
+    CSSPropertyBaselineShift, CSSPropertyDominantBaseline, CSSPropertyKerning,
+    CSSPropertyTextAnchor, CSSPropertyWritingMode,
+    CSSPropertyGlyphOrientationHorizontal, CSSPropertyGlyphOrientationVertical
 #endif
 };
 
@@ -1066,6 +1065,9 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
     case CSSPropertyTextShadow:
       return valueForShadow(style->textShadow(),
                             static_cast<CSSPropertyID>(propertyID));
+    case CSSPropertyTextRendering:
+      return CSSPrimitiveValue::create(
+          style->fontDescription().textRenderingMode());
     case CSSPropertyTextOverflow:
       if (style->textOverflow())
         return CSSPrimitiveValue::createIdentifier(CSSValueEllipsis);

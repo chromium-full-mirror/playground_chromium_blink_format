@@ -96,10 +96,6 @@ class SVGRenderStyle : public RefCounted<SVGRenderStyle> {
                                     TextAnchor,
                                     textAnchor,
                                     TA_START)
-  SVG_RS_DEFINE_ATTRIBUTE_INHERITED(ETextRendering,
-                                    TextRendering,
-                                    textRendering,
-                                    TR_AUTO)
   SVG_RS_DEFINE_ATTRIBUTE_INHERITED(EWritingMode,
                                     WritingMode,
                                     writingMode,
@@ -268,7 +264,6 @@ class SVGRenderStyle : public RefCounted<SVGRenderStyle> {
       return (_colorRendering == other._colorRendering) &&
              (_imageRendering == other._imageRendering) &&
              (_shapeRendering == other._shapeRendering) &&
-             (_textRendering == other._textRendering) &&
              (_clipRule == other._clipRule) && (_fillRule == other._fillRule) &&
              (_capStyle == other._capStyle) &&
              (_joinStyle == other._joinStyle) &&
@@ -288,7 +283,6 @@ class SVGRenderStyle : public RefCounted<SVGRenderStyle> {
     unsigned _colorRendering : 2;              // EColorRendering
     unsigned _imageRendering : 2;              // EImageRendering
     unsigned _shapeRendering : 2;              // EShapeRendering
-    unsigned _textRendering : 2;               // ETextRendering
     unsigned _clipRule : 1;                    // WindRule
     unsigned _fillRule : 1;                    // WindRule
     unsigned _capStyle : 2;                    // LineCap
@@ -348,7 +342,6 @@ class SVGRenderStyle : public RefCounted<SVGRenderStyle> {
     svg_inherited_flags._fillRule = initialFillRule();
     svg_inherited_flags._imageRendering = initialImageRendering();
     svg_inherited_flags._shapeRendering = initialShapeRendering();
-    svg_inherited_flags._textRendering = initialTextRendering();
     svg_inherited_flags._textAnchor = initialTextAnchor();
     svg_inherited_flags._capStyle = initialCapStyle();
     svg_inherited_flags._joinStyle = initialJoinStyle();

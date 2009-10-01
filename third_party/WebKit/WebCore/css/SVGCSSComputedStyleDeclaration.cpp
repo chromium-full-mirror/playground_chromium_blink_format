@@ -100,8 +100,6 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getSVGPropertyCSSValue(
     case CSSPropertyStrokeOpacity:
       return CSSPrimitiveValue::create(svgStyle->strokeOpacity(),
                                        CSSPrimitiveValue::CSS_NUMBER);
-    case CSSPropertyTextRendering:
-      return CSSPrimitiveValue::create(svgStyle->textRendering());
     case CSSPropertyAlignmentBaseline:
       return CSSPrimitiveValue::create(svgStyle->alignmentBaseline());
     case CSSPropertyDominantBaseline:
