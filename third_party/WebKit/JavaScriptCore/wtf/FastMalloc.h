@@ -221,6 +221,9 @@ using WTF::fastMallocAllow;
 // operator
 // new by accident.
 
+// We musn't customize the global operator new and delete for the Qt port.
+#if !PLATFORM(QT)
+
 WTF_PRIVATE_INLINE void* operator new(size_t size) {
   return fastMalloc(size);
 }
@@ -248,6 +251,8 @@ WTF_PRIVATE_INLINE void operator delete[](void* p,
                                           const std::nothrow_t&) throw() {
   fastFree(p);
 }
+
+#endif
 
 #endif
 
