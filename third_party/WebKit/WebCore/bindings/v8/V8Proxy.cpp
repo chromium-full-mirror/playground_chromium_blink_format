@@ -227,20 +227,6 @@ void V8Proxy::destroyGlobal() {
   }
 }
 
-static void disconnectEventListenersInList(V8EventListenerList& list) {
-  V8EventListenerList::iterator it = list.begin();
-  while (it != list.end()) {
-    (*it)->disconnectFrame();
-    ++it;
-  }
-  list.clear();
-}
-
-void V8Proxy::disconnectEventListeners() {
-  disconnectEventListenersInList(m_eventListeners);
-  disconnectEventListenersInList(m_objectListeners);
-}
-
 v8::Handle<v8::Script> V8Proxy::compileScript(v8::Handle<v8::String> code,
                                               const String& fileName,
                                               int baseLine) {
@@ -566,9 +552,7 @@ V8Proxy* V8Proxy::retrieve(ScriptExecutionContext* context) {
   return retrieve(static_cast<Document*>(context)->frame());
 }
 
-void V8Proxy::disconnectFrame() {
-  disconnectEventListeners();
-}
+void V8Proxy::disconnectFrame() {}
 
 bool V8Proxy::isEnabled() {
   Settings* settings = m_frame->settings();
@@ -707,8 +691,6 @@ void V8Proxy::clearForClose() {
 }
 
 void V8Proxy::clearForNavigation() {
-  disconnectEventListeners();
-
   if (!context().IsEmpty()) {
     v8::HandleScope handle;
     clearDocumentWrapper();

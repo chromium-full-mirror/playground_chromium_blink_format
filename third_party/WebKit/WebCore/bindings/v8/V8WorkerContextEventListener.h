@@ -55,7 +55,6 @@ class V8WorkerContextEventListener : public V8EventListener {
                                v8::Local<v8::Object> listener,
                                bool isInline);
 
-  virtual ~V8WorkerContextEventListener();
   virtual void handleEvent(ScriptExecutionContext*, Event*);
   virtual bool reportError(const String& message,
                            const String& url,

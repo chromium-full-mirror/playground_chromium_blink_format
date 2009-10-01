@@ -172,6 +172,13 @@ class V8Custom {
       kDefaultWrapperInternalFieldCount + 1;
 #endif
 
+#if ENABLE(SVG)
+  static const int kSVGElementInstanceEventListenerCacheIndex =
+      kDefaultWrapperInternalFieldCount + 0;
+  static const int kSVGElementInstanceInternalFieldCount =
+      kDefaultWrapperInternalFieldCount + 1;
+#endif
+
   static const int kDOMWindowConsoleIndex =
       kDefaultWrapperInternalFieldCount + 0;
   static const int kDOMWindowHistoryIndex =
@@ -198,8 +205,10 @@ class V8Custom {
       kDefaultWrapperInternalFieldCount + 11;
   static const int kDOMWindowDOMSelectionIndex =
       kDefaultWrapperInternalFieldCount + 12;
-  static const int kDOMWindowInternalFieldCount =
+  static const int kDOMWindowEventListenerCacheIndex =
       kDefaultWrapperInternalFieldCount + 13;
+  static const int kDOMWindowInternalFieldCount =
+      kDefaultWrapperInternalFieldCount + 14;
 
   static const int kStyleSheetOwnerNodeIndex =
       kDefaultWrapperInternalFieldCount + 0;

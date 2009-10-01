@@ -36,7 +36,6 @@
 #include "SecurityOrigin.h"    // for WebCore::SecurityOrigin
 #include "SharedPersistent.h"
 #include "V8DOMWrapper.h"
-#include "V8EventListenerList.h"
 #include "V8GCController.h"
 #include "V8Index.h"
 #include <v8.h>
@@ -165,9 +164,6 @@ class V8Proxy {
   void disconnectFrame();
 
   bool isEnabled();
-
-  V8EventListenerList* eventListeners() { return &m_eventListeners; }
-  V8EventListenerList* objectListeners() { return &m_objectListeners; }
 
 #if ENABLE(SVG)
   static void setSVGContext(void*, SVGElement*);
@@ -355,7 +351,6 @@ class V8Proxy {
   static const char* kContextDebugDataType;
   static const char* kContextDebugDataValue;
 
-  void disconnectEventListeners();
   void setSecurityToken();
   void clearDocumentWrapper();
 
@@ -420,14 +415,6 @@ class V8Proxy {
   static v8::Persistent<v8::Context> m_utilityContext;
 
   int m_handlerLineNumber;
-
-  // A list of event listeners created for this frame,
-  // the list gets cleared when removing all timeouts.
-  V8EventListenerList m_eventListeners;
-
-  // A list of event listeners create for XMLHttpRequest object for this frame,
-  // the list gets cleared when removing all timeouts.
-  V8EventListenerList m_objectListeners;
 
   // True for <a href="javascript:foo()"> and false for <script>foo()</script>.
   // Only valid during execution.

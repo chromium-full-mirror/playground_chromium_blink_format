@@ -50,17 +50,14 @@ CALLBACK_FUNC_DECL(SVGElementInstanceAddEventListener) {
       V8DOMWrapper::convertDOMWrapperToNative<SVGElementInstance>(
           args.Holder());
 
-  V8Proxy* proxy = V8Proxy::retrieve(instance->scriptExecutionContext());
-  if (!proxy)
-    return v8::Undefined();
-
-  RefPtr<EventListener> listener =
-      proxy->eventListeners()->findOrCreateWrapper<V8EventListener>(
-          proxy->frame(), args[1], false);
+  RefPtr<EventListener> listener = V8DOMWrapper::getEventListener(
+      instance, args[1], false, ListenerFindOrCreate);
   if (listener) {
     String type = toWebCoreString(args[0]);
     bool useCapture = args[2]->BooleanValue();
     instance->addEventListener(type, listener, useCapture);
+    createHiddenDependency(args.Holder(), args[1],
+                           V8Custom::kNodeEventListenerCacheIndex);
   }
 
   return v8::Undefined();
@@ -72,16 +69,14 @@ CALLBACK_FUNC_DECL(SVGElementInstanceRemoveEventListener) {
       V8DOMWrapper::convertDOMWrapperToNative<SVGElementInstance>(
           args.Holder());
 
-  V8Proxy* proxy = V8Proxy::retrieve(instance->scriptExecutionContext());
-  if (!proxy)
-    return v8::Undefined();
-
-  RefPtr<EventListener> listener =
-      proxy->eventListeners()->findWrapper(args[1], false);
+  RefPtr<EventListener> listener = V8DOMWrapper::getEventListener(
+      instance, args[1], false, ListenerFindOnly);
   if (listener) {
     String type = toWebCoreString(args[0]);
     bool useCapture = args[2]->BooleanValue();
     instance->removeEventListener(type, listener.get(), useCapture);
+    removeHiddenDependency(args.Holder(), args[1],
+                           V8Custom::kNodeEventListenerCacheIndex);
   }
 
   return v8::Undefined();

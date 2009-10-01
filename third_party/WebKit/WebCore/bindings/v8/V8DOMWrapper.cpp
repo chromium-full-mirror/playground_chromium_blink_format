@@ -36,18 +36,19 @@
 #include "DOMObjectsInclude.h"
 #include "DocumentLoader.h"
 #include "FrameLoaderClient.h"
+#include "Notification.h"
 #include "SVGElementInstance.h"
 #include "ScriptController.h"
 #include "V8AbstractEventListener.h"
 #include "V8Binding.h"
 #include "V8Collection.h"
 #include "V8CustomBinding.h"
+#include "V8CustomEventListener.h"
 #include "V8DOMMap.h"
 #include "V8DOMWindow.h"
 #include "V8EventListenerList.h"
 #include "V8Index.h"
 #include "V8IsolatedWorld.h"
-#include "V8ObjectEventListener.h"
 #include "V8Proxy.h"
 #include "WorkerContextExecutionProxy.h"
 
@@ -485,6 +486,17 @@ v8::Persistent<v8::FunctionTemplate> V8DOMWrapper::getTemplate(
       break;
     }
 #endif  // NOTIFICATIONS
+
+#if ENABLE(SVG)
+    case V8ClassIndex::SVGELEMENTINSTANCE: {
+      // Reserve one more internal field for keeping event listeners.
+      v8::Local<v8::ObjectTemplate> instanceTemplate =
+          descriptor->InstanceTemplate();
+      instanceTemplate->SetInternalFieldCount(
+          V8Custom::kSVGElementInstanceInternalFieldCount);
+      break;
+    }
+#endif
 
 #if ENABLE(WORKERS)
     case V8ClassIndex::ABSTRACTWORKER: {
@@ -1509,7 +1521,7 @@ PassRefPtr<EventListener> V8DOMWrapper::getEventListener(
     Node* node,
     v8::Local<v8::Value> value,
     bool isAttribute,
-    bool findOnly) {
+    ListenerLookupType lookup) {
   ScriptExecutionContext* context = node->scriptExecutionContext();
   if (!context)
     return 0;
@@ -1520,12 +1532,11 @@ PassRefPtr<EventListener> V8DOMWrapper::getEventListener(
   if (!proxy)
     proxy = V8Proxy::retrieve(V8Proxy::retrieveFrameForEnteredContext());
 
-  if (proxy) {
-    V8EventListenerList* list = proxy->objectListeners();
-    return findOnly ? list->findWrapper(value, isAttribute)
-                    : list->findOrCreateWrapper<V8ObjectEventListener>(
-                          proxy->frame(), value, isAttribute);
-  }
+  if (proxy)
+    return (lookup == ListenerFindOnly)
+               ? V8EventListenerList::findWrapper(value, isAttribute)
+               : V8EventListenerList::findOrCreateWrapper<V8EventListener>(
+                     proxy->frame(), value, isAttribute);
 
   return 0;
 }
@@ -1534,9 +1545,117 @@ PassRefPtr<EventListener> V8DOMWrapper::getEventListener(
     SVGElementInstance* element,
     v8::Local<v8::Value> value,
     bool isAttribute,
-    bool findOnly) {
+    ListenerLookupType lookup) {
   return getEventListener(element->correspondingElement(), value, isAttribute,
-                          findOnly);
+                          lookup);
+}
+
+PassRefPtr<EventListener> V8DOMWrapper::getEventListener(
+    AbstractWorker* worker,
+    v8::Local<v8::Value> value,
+    bool isAttribute,
+    ListenerLookupType lookup) {
+  if (worker->scriptExecutionContext()->isWorkerContext()) {
+    WorkerContextExecutionProxy* workerContextProxy =
+        WorkerContextExecutionProxy::retrieve();
+    ASSERT(workerContextProxy);
+    return workerContextProxy->findOrCreateEventListener(
+        value, isAttribute, lookup == ListenerFindOnly);
+  }
+
+  V8Proxy* proxy = V8Proxy::retrieve(worker->scriptExecutionContext());
+  if (proxy)
+    return (lookup == ListenerFindOnly)
+               ? V8EventListenerList::findWrapper(value, isAttribute)
+               : V8EventListenerList::findOrCreateWrapper<V8EventListener>(
+                     proxy->frame(), value, isAttribute);
+
+  return 0;
+}
+
+#if ENABLE(NOTIFICATIONS)
+PassRefPtr<EventListener> V8DOMWrapper::getEventListener(
+    Notification* notification,
+    v8::Local<v8::Value> value,
+    bool isAttribute,
+    ListenerLookupType lookup) {
+  if (notification->scriptExecutionContext()->isWorkerContext()) {
+    WorkerContextExecutionProxy* workerContextProxy =
+        WorkerContextExecutionProxy::retrieve();
+    ASSERT(workerContextProxy);
+    return workerContextProxy->findOrCreateEventListener(
+        value, isAttribute, lookup == ListenerFindOnly);
+  }
+
+  V8Proxy* proxy = V8Proxy::retrieve(notification->scriptExecutionContext());
+  if (proxy)
+    return (lookup == ListenerFindOnly)
+               ? V8EventListenerList::findWrapper(value, isAttribute)
+               : V8EventListenerList::findOrCreateWrapper<V8EventListener>(
+                     proxy->frame(), value, isAttribute);
+
+  return 0;
+}
+#endif
+
+PassRefPtr<EventListener> V8DOMWrapper::getEventListener(
+    WorkerContext* workerContext,
+    v8::Local<v8::Value> value,
+    bool isAttribute,
+    ListenerLookupType lookup) {
+  WorkerContextExecutionProxy* workerContextProxy =
+      workerContext->script()->proxy();
+  if (workerContextProxy)
+    return workerContextProxy->findOrCreateEventListener(
+        value, isAttribute, lookup == ListenerFindOnly);
+
+  return 0;
+}
+
+PassRefPtr<EventListener> V8DOMWrapper::getEventListener(
+    XMLHttpRequestUpload* upload,
+    v8::Local<v8::Value> value,
+    bool isAttribute,
+    ListenerLookupType lookup) {
+  return getEventListener(upload->associatedXMLHttpRequest(), value,
+                          isAttribute, lookup);
+}
+
+PassRefPtr<EventListener> V8DOMWrapper::getEventListener(
+    EventTarget* eventTarget,
+    v8::Local<v8::Value> value,
+    bool isAttribute,
+    ListenerLookupType lookup) {
+  V8Proxy* proxy = V8Proxy::retrieve(eventTarget->scriptExecutionContext());
+  if (proxy)
+    return (lookup == ListenerFindOnly)
+               ? V8EventListenerList::findWrapper(value, isAttribute)
+               : V8EventListenerList::findOrCreateWrapper<V8EventListener>(
+                     proxy->frame(), value, isAttribute);
+
+#if ENABLE(WORKERS)
+  WorkerContextExecutionProxy* workerContextProxy =
+      WorkerContextExecutionProxy::retrieve();
+  if (workerContextProxy)
+    return workerContextProxy->findOrCreateEventListener(
+        value, isAttribute, lookup == ListenerFindOnly);
+#endif
+
+  return 0;
+}
+
+PassRefPtr<EventListener> V8DOMWrapper::getEventListener(
+    V8Proxy* proxy,
+    v8::Local<v8::Value> value,
+    bool isAttribute,
+    ListenerLookupType lookup) {
+  if (proxy)
+    return (lookup == ListenerFindOnly)
+               ? V8EventListenerList::findWrapper(value, isAttribute)
+               : V8EventListenerList::findOrCreateWrapper<V8EventListener>(
+                     proxy->frame(), value, isAttribute);
+
+  return 0;
 }
 
 v8::Handle<v8::Value> V8DOMWrapper::convertDOMImplementationToV8Object(

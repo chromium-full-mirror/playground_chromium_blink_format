@@ -46,12 +46,6 @@ V8WorkerContextEventListener::V8WorkerContextEventListener(
     bool isInline)
     : V8EventListener(0, listener, isInline), m_proxy(proxy) {}
 
-V8WorkerContextEventListener::~V8WorkerContextEventListener() {
-  if (m_proxy)
-    m_proxy->removeEventListener(this);
-  disposeListenerObject();
-}
-
 void V8WorkerContextEventListener::handleEvent(ScriptExecutionContext*,
                                                Event* event) {
   // Is the EventListener disconnected?
@@ -99,6 +93,7 @@ bool V8WorkerContextEventListener::reportError(const String& message,
   // Enter the V8 context in which to perform the event handling.
   v8::Context::Scope scope(context);
 
+  v8::Local<v8::Object> listener = getListenerObject();
   v8::Local<v8::Value> returnValue;
   {
     // Catch exceptions thrown in calling the function so they do not propagate
@@ -107,9 +102,9 @@ bool V8WorkerContextEventListener::reportError(const String& message,
     tryCatch.SetVerbose(true);
 
     // Call the function.
-    if (!m_listener.IsEmpty() && m_listener->IsFunction()) {
-      v8::Local<v8::Function> callFunction = v8::Local<v8::Function>::New(
-          v8::Persistent<v8::Function>::Cast(m_listener));
+    if (!listener.IsEmpty() && listener->IsFunction()) {
+      v8::Local<v8::Function> callFunction =
+          v8::Local<v8::Function>::Cast(listener);
       v8::Local<v8::Object> thisValue = v8::Context::GetCurrent()->Global();
 
       v8::Handle<v8::Value> parameters[3] = {v8String(message), v8String(url),
@@ -150,8 +145,10 @@ v8::Local<v8::Value> V8WorkerContextEventListener::callListenerFunction(
 
 v8::Local<v8::Object> V8WorkerContextEventListener::getReceiverObject(
     Event* event) {
-  if (!m_listener.IsEmpty() && !m_listener->IsFunction())
-    return v8::Local<v8::Object>::New(m_listener);
+  v8::Local<v8::Object> listener = getListenerObject();
+
+  if (!listener.IsEmpty() && !listener->IsFunction())
+    return listener;
 
   EventTarget* target = event->currentTarget();
   v8::Handle<v8::Value> value =
