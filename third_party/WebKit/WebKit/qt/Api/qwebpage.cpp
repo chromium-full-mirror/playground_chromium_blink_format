@@ -262,7 +262,8 @@ QWebPagePrivate::QWebPagePrivate(QWebPage* qq)
       inspectorFrontend(0),
       inspector(0),
       inspectorIsInternalOnly(false),
-      viewportSize(QSize(0, 0)) {
+      viewportSize(QSize(0, 0)),
+      clickCausedFocus(false) {
   WebCore::InitializeLoggingChannelsIfNecessary();
   JSC::initializeThreading();
   WebCore::FrameLoader::setLocalLoadPolicy(
@@ -644,6 +645,12 @@ void QWebPagePrivate::mousePressEvent(QMouseEvent* ev) {
   if (!frame->view())
     return;
 
+  RefPtr<WebCore::Node> oldNode;
+  if (page->focusController()->focusedFrame() &&
+      page->focusController()->focusedFrame()->document())
+    oldNode =
+        page->focusController()->focusedFrame()->document()->focusedNode();
+
   if (tripleClickTimer.isActive() &&
       (ev->pos() - tripleClick).manhattanLength() <
           QApplication::startDragDistance()) {
@@ -657,6 +664,15 @@ void QWebPagePrivate::mousePressEvent(QMouseEvent* ev) {
   if (mev.button() != NoButton)
     accepted = frame->eventHandler()->handleMousePressEvent(mev);
   ev->setAccepted(accepted);
+
+  RefPtr<WebCore::Node> newNode;
+  if (page->focusController()->focusedFrame() &&
+      page->focusController()->focusedFrame()->document())
+    newNode =
+        page->focusController()->focusedFrame()->document()->focusedNode();
+
+  if (newNode && oldNode != newNode)
+    clickCausedFocus = true;
 }
 
 void QWebPagePrivate::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* ev) {
@@ -758,6 +774,21 @@ void QWebPagePrivate::mouseReleaseEvent(QGraphicsSceneMouseEvent* ev) {
   ev->setAccepted(accepted);
 
   handleClipboard(ev, ev->button());
+
+#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
+  if (view && view->testAttribute(Qt::WA_InputMethodEnabled) &&
+      ev->button() == Qt::LeftButton && qApp->autoSipEnabled()) {
+    QStyle::RequestSoftwareInputPanel behavior =
+        QStyle::RequestSoftwareInputPanel(
+            view->style()->styleHint(QStyle::SH_RequestSoftwareInputPanel));
+    if (!clickCausedFocus || behavior == QStyle::RSIP_OnMouseClick) {
+      QEvent event(QEvent::RequestSoftwareInputPanel);
+      QApplication::sendEvent(view, &event);
+    }
+  }
+
+  clickCausedFocus = false;
+#endif
 }
 
 void QWebPagePrivate::mouseReleaseEvent(QMouseEvent* ev) {
