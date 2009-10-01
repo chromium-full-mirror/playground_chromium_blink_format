@@ -93,6 +93,7 @@ class LayoutTestController : public QObject {
   void setJavaScriptProfilingEnabled(bool enable);
   void setFixedContentsSize(int width, int height);
   void setPrivateBrowsingEnabled(bool enable);
+  void setPopupBlockingEnabled(bool enable);
 
   bool pauseAnimationAtTimeOnElementWithId(const QString& animationName,
                                            double time,

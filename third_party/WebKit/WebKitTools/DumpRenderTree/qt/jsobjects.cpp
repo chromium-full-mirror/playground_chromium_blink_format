@@ -277,6 +277,11 @@ void LayoutTestController::setPrivateBrowsingEnabled(bool enable) {
       QWebSettings::PrivateBrowsingEnabled, enable);
 }
 
+void LayoutTestController::setPopupBlockingEnabled(bool enable) {
+  QWebSettings::globalSettings()->setAttribute(
+      QWebSettings::JavascriptCanOpenWindows, !enable);
+}
+
 bool LayoutTestController::pauseAnimationAtTimeOnElementWithId(
     const QString& animationName,
     double time,
