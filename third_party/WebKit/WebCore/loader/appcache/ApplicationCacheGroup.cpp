@@ -166,7 +166,7 @@ void ApplicationCacheGroup::selectCache(Frame* frame,
       // as part of the initial load.
       // The navigation will not result in the same resource being loaded,
       // because "foreign" entries are never picked during navigation.
-      frame->loader()->scheduleLocationChange(
+      frame->redirectScheduler()->scheduleLocationChange(
           documentLoader->url(), frame->loader()->referrer(), true);
     }
 

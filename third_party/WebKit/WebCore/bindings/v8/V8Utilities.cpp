@@ -106,7 +106,7 @@ void navigateIfAllowed(Frame* frame,
     return;
 
   if (!protocolIsJavaScript(url) || ScriptController::isSafeScript(frame))
-    frame->loader()->scheduleLocationChange(
+    frame->redirectScheduler()->scheduleLocationChange(
         url.string(), callingFrame->loader()->outgoingReferrer(), lockHistory,
         lockBackForwardList, processingUserGesture());
 }

@@ -134,14 +134,14 @@ class RedirectScheduler : public Noncopyable {
   void scheduleRedirect(double delay, const String& url);
   void scheduleLocationChange(const String& url,
                               const String& referrer,
-                              bool lockHistory,
-                              bool lockBackForwardList,
-                              bool wasUserGesture);
+                              bool lockHistory = true,
+                              bool lockBackForwardList = true,
+                              bool userGesture = false);
   void scheduleFormSubmission(const FrameLoadRequest&,
                               bool lockHistory,
                               PassRefPtr<Event>,
                               PassRefPtr<FormState>);
-  void scheduleRefresh(bool wasUserGesture);
+  void scheduleRefresh(bool userGesture = false);
   void scheduleHistoryNavigation(int steps);
 
   void startTimer();
@@ -378,16 +378,6 @@ class FrameLoader : public Noncopyable {
   void commitIconURLToIconDatabase(const KURL&);
 
   KURL baseURL() const;
-
-  bool isScheduledLocationChangePending() const;
-  void scheduleHTTPRedirection(double delay, const String& url);
-  void scheduleLocationChange(const String& url,
-                              const String& referrer,
-                              bool lockHistory = true,
-                              bool lockBackForwardList = true,
-                              bool userGesture = false);
-  void scheduleRefresh(bool userGesture = false);
-  void scheduleHistoryNavigation(int steps);
 
   bool canGoBackOrForward(int distance) const;
   void goBackOrForward(int distance);
@@ -668,11 +658,6 @@ class FrameLoader : public Noncopyable {
                                        unsigned long identifier,
                                        int length);
   void dispatchDidFinishLoading(DocumentLoader*, unsigned long identifier);
-
-  void scheduleFormSubmission(const FrameLoadRequest&,
-                              bool lockHistory,
-                              PassRefPtr<Event>,
-                              PassRefPtr<FormState>);
 
   void loadWithDocumentLoader(
       DocumentLoader*,
