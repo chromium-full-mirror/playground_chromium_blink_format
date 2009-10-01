@@ -340,9 +340,12 @@ void JIT::emitSlow_op_get_by_val(Instruction* currentInstruction,
   load32(BaseIndex(regT0, regT2, TimesEight,
                    OBJECT_OFFSETOF(ArrayStorage, m_vector[0])),
          regT0);  // payload
-  branch32(Equal, regT1, Imm32(JSValue::EmptyValueTag))
-      .linkTo(callGetByValJITStub, this);
 
+  // FIXME: Maybe we can optimize this comparison to JSValue().
+  Jump skip = branch32(NotEqual, regT0, Imm32(0));
+  branch32(Equal, regT1, Imm32(JSValue::CellTag), callGetByValJITStub);
+
+  skip.link(this);
   emitStore(dst, regT1, regT0);
 }
 
@@ -372,10 +375,15 @@ void JIT::emit_op_put_by_val(Instruction* currentInstruction) {
   // this would be the first write to this location.
   // FIXME: should be able to handle initial write to array; increment the the
   // number of items in the array, and potentially update fast access cutoff.
-  addSlowCase(
-      branch32(Equal, BaseIndex(regT3, regT2, TimesEight,
-                                OBJECT_OFFSETOF(ArrayStorage, m_vector[0]) + 4),
-               Imm32(JSValue::EmptyValueTag)));
+  Jump skip = branch32(
+      NotEqual, BaseIndex(regT3, regT2, TimesEight,
+                          OBJECT_OFFSETOF(ArrayStorage, m_vector[0]) + 4),
+      Imm32(JSValue::CellTag));
+  addSlowCase(branch32(Equal,
+                       BaseIndex(regT3, regT2, TimesEight,
+                                 OBJECT_OFFSETOF(ArrayStorage, m_vector[0])),
+                       Imm32(0)));
+  skip.link(this);
 
   inFastVector.link(this);
 
