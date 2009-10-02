@@ -33,6 +33,7 @@
 
 #include "CachePolicy.h"
 #include "FrameLoaderTypes.h"
+#include "RedirectScheduler.h"
 #include "ResourceRequest.h"
 #include "ThreadableLoader.h"
 #include "Timer.h"
@@ -73,7 +74,6 @@ class TextResourceDecoder;
 class Widget;
 
 struct FrameLoadRequest;
-struct ScheduledRedirection;
 struct WindowFeatures;
 
 bool isBackForwardLoadType(FrameLoadType);
@@ -121,43 +121,6 @@ class PolicyCheck {
   NewWindowPolicyDecisionFunction m_newWindowFunction;
   ContentPolicyDecisionFunction m_contentFunction;
   void* m_argument;
-};
-
-class RedirectScheduler : public Noncopyable {
- public:
-  RedirectScheduler(Frame*);
-  ~RedirectScheduler();
-
-  bool redirectScheduledDuringLoad();
-  bool locationChangePending();
-
-  void scheduleRedirect(double delay, const String& url);
-  void scheduleLocationChange(const String& url,
-                              const String& referrer,
-                              bool lockHistory = true,
-                              bool lockBackForwardList = true,
-                              bool userGesture = false);
-  void scheduleFormSubmission(const FrameLoadRequest&,
-                              bool lockHistory,
-                              PassRefPtr<Event>,
-                              PassRefPtr<FormState>);
-  void scheduleRefresh(bool userGesture = false);
-  void scheduleHistoryNavigation(int steps);
-
-  void startTimer();
-
-  void cancel(bool newLoadInProgress = false);
-  void clear();
-
- private:
-  void timerFired(Timer<RedirectScheduler>*);
-  void schedule(PassOwnPtr<ScheduledRedirection> redirection);
-
-  static bool mustLockBackForwardList(Frame* targetFrame);
-
-  Frame* m_frame;
-  Timer<RedirectScheduler> m_timer;
-  OwnPtr<ScheduledRedirection> m_scheduledRedirection;
 };
 
 class FrameLoader : public Noncopyable {
