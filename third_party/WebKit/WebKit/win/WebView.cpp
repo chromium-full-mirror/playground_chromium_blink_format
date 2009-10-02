@@ -5528,10 +5528,11 @@ HRESULT WebView::addUserScriptToGroup(
 
   pageGroup->addUserScript(String(source, SysStringLen(source)),
                            KURL(KURL(), String(url, SysStringLen(url))),
-                           toStringVector(whitelist), toStringVector(blacklist),
-                           worldID, injectionTime == WebInjectAtDocumentStart
-                                        ? InjectAtDocumentStart
-                                        : InjectAtDocumentEnd);
+                           toStringVector(whitelistCount, whitelist),
+                           toStringVector(blacklistCount, blacklist), worldID,
+                           injectionTime == WebInjectAtDocumentStart
+                               ? InjectAtDocumentStart
+                               : InjectAtDocumentEnd);
 
   return S_OK;
 }
@@ -5554,8 +5555,9 @@ HRESULT WebView::addUserStyleSheetToGroup(BSTR groupName,
 
   pageGroup->addUserStyleSheet(String(source, SysStringLen(source)),
                                KURL(KURL(), String(url, SysStringLen(url))),
-                               toStringVector(whitelist),
-                               toStringVector(blacklist), worldID);
+                               toStringVector(whitelistCount, whitelist),
+                               toStringVector(blacklistCount, blacklist),
+                               worldID);
 
   return S_OK;
 }
