@@ -30,14 +30,19 @@
 
 namespace WebCore {
 
-PassRefPtr<StorageMap> StorageMap::create() {
-  return adoptRef(new StorageMap);
+PassRefPtr<StorageMap> StorageMap::create(unsigned quota) {
+  return adoptRef(new StorageMap(quota));
 }
 
-StorageMap::StorageMap() : m_iterator(m_map.end()), m_iteratorIndex(UINT_MAX) {}
+StorageMap::StorageMap(unsigned quota)
+    : m_iterator(m_map.end()),
+      m_iteratorIndex(UINT_MAX),
+      m_quotaSize(quota)  // quota measured in bytes
+      ,
+      m_currentLength(0) {}
 
 PassRefPtr<StorageMap> StorageMap::copy() {
-  RefPtr<StorageMap> newMap = create();
+  RefPtr<StorageMap> newMap = create(m_quotaSize);
   newMap->m_map = m_map;
   return newMap.release();
 }
@@ -90,8 +95,10 @@ String StorageMap::getItem(const String& key) const {
 
 PassRefPtr<StorageMap> StorageMap::setItem(const String& key,
                                            const String& value,
-                                           String& oldValue) {
+                                           String& oldValue,
+                                           bool& quotaException) {
   ASSERT(!value.isNull());
+  quotaException = false;
 
   // Implement copy-on-write semantics here.  We're guaranteed that the only
   // refs of StorageMaps belong to Storage objects
@@ -99,20 +106,28 @@ PassRefPtr<StorageMap> StorageMap::setItem(const String& key,
   // it.
   if (refCount() > 1) {
     RefPtr<StorageMap> newStorageMap = copy();
-    newStorageMap->setItem(key, value, oldValue);
+    newStorageMap->setItem(key, value, oldValue, quotaException);
     return newStorageMap.release();
   }
 
+  // Quota tracking.  If the quota is enabled and this would go over it, bail.
+  oldValue = m_map.get(key);
+  unsigned newLength = m_currentLength + value.length() - oldValue.length();
+  bool overQuota = newLength > m_quotaSize / sizeof(UChar);
+  bool overflow =
+      (newLength > m_currentLength) != (value.length() > oldValue.length());
+  ASSERT(!overflow);  // If we're debugging, make a fuss.  But it's still worth
+                      // checking this in the following if statement.
+  if (m_quotaSize != noQuota && (overflow || overQuota)) {
+    quotaException = true;
+    return 0;
+  }
+  m_currentLength = newLength;
+
   pair<HashMap<String, String>::iterator, bool> addResult =
       m_map.add(key, value);
-
-  if (addResult.second) {
-    // There was no "oldValue" so null it out.
-    oldValue = String();
-  } else {
-    oldValue = addResult.first->second;
+  if (!addResult.second)
     addResult.first->second = value;
-  }
 
   invalidateIterator();
 
@@ -135,6 +150,10 @@ PassRefPtr<StorageMap> StorageMap::removeItem(const String& key,
   if (!oldValue.isNull())
     invalidateIterator();
 
+  // Update quota.
+  ASSERT(m_currentLength - oldValue.length() <= m_currentLength);
+  m_currentLength -= oldValue.length();
+
   return 0;
 }
 
@@ -151,6 +170,10 @@ void StorageMap::importItem(const String& key, const String& value) {
 
   if (result.second)
     result.first->second = value.copy();
+
+  // Update quota.
+  ASSERT(m_currentLength + value.length() >= m_currentLength);
+  m_currentLength += value.length();
 }
 }
 

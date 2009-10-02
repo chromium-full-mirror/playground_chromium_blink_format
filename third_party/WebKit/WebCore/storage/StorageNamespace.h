@@ -42,7 +42,8 @@ class StorageArea;
 // proxied between processes.
 class StorageNamespace : public RefCounted<StorageNamespace> {
  public:
-  static PassRefPtr<StorageNamespace> localStorageNamespace(const String& path);
+  static PassRefPtr<StorageNamespace> localStorageNamespace(const String& path,
+                                                            unsigned quota);
   static PassRefPtr<StorageNamespace> sessionStorageNamespace();
 
   virtual ~StorageNamespace() {}

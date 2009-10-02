@@ -38,8 +38,9 @@
 namespace WebCore {
 
 PassRefPtr<StorageNamespace> StorageNamespace::localStorageNamespace(
-    const String& path) {
-  return StorageNamespaceImpl::localStorageNamespace(path);
+    const String& path,
+    unsigned quota) {
+  return StorageNamespaceImpl::localStorageNamespace(path, quota);
 }
 
 PassRefPtr<StorageNamespace> StorageNamespace::sessionStorageNamespace() {

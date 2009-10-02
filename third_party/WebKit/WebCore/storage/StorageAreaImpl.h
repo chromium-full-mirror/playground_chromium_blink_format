@@ -43,7 +43,8 @@ class StorageAreaImpl : public StorageArea {
  public:
   static PassRefPtr<StorageAreaImpl> create(StorageType,
                                             PassRefPtr<SecurityOrigin>,
-                                            PassRefPtr<StorageSyncManager>);
+                                            PassRefPtr<StorageSyncManager>,
+                                            unsigned quota);
   virtual ~StorageAreaImpl();
 
   // The HTML5 DOM Storage API (and contains)
@@ -68,7 +69,8 @@ class StorageAreaImpl : public StorageArea {
  private:
   StorageAreaImpl(StorageType,
                   PassRefPtr<SecurityOrigin>,
-                  PassRefPtr<StorageSyncManager>);
+                  PassRefPtr<StorageSyncManager>,
+                  unsigned quota);
   StorageAreaImpl(StorageAreaImpl*);
 
   void blockUntilImportComplete() const;
