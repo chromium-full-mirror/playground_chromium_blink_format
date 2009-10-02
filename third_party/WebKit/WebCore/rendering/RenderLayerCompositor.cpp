@@ -576,6 +576,7 @@ void RenderLayerCompositor::computeCompositingRequirements(
 
 void RenderLayerCompositor::setCompositingParent(RenderLayer* childLayer,
                                                  RenderLayer* parentLayer) {
+  ASSERT(!parentLayer || childLayer->ancestorCompositingLayer() == parentLayer);
   ASSERT(childLayer->isComposited());
 
   // It's possible to be called with a parent that isn't yet composited when
