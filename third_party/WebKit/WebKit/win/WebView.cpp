@@ -5540,7 +5540,8 @@ HRESULT WebView::addUserScriptToGroup(
 HRESULT WebView::addUserStyleSheetToGroup(BSTR groupName,
                                           unsigned worldID,
                                           BSTR source,
-                                          BSTR url unsigned whitelistCount,
+                                          BSTR url,
+                                          unsigned whitelistCount,
                                           BSTR* whitelist,
                                           unsigned blacklistCount,
                                           BSTR* blacklist) {
