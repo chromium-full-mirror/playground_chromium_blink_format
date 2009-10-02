@@ -545,13 +545,15 @@ backforward list.
                        source:(NSString*)source
                           url:(NSURL*)url
                       worldID:(unsigned)worldID
-                     patterns:(NSArray*)patterns
+                    whitelist:(NSArray*)whitelist
+                    blacklist:(NSArray*)blacklist
                 injectionTime:(WebUserScriptInjectionTime)injectionTime;
 + (void)_addUserStyleSheetToGroup:(NSString*)groupName
                            source:(NSString*)source
                               url:(NSURL*)url
                           worldID:(unsigned)worldID
-                         patterns:(NSArray*)patterns;
+                        whitelist:(NSArray*)whitelist
+                        blacklist:(NSArray*)blacklist;
 + (void)_removeUserContentFromGroup:(NSString*)groupName
                                 url:(NSURL*)url
                             worldID:(unsigned)worldID;

@@ -752,16 +752,20 @@ class WebView : public IWebView,
                        unsigned worldID,
                        BSTR source,
                        BSTR url,
-                       unsigned patternsCount,
-                       BSTR* patterns,
+                       unsigned whitelistCount,
+                       BSTR* whitelist,
+                       unsigned blacklistCount,
+                       BSTR* blacklist,
                        WebUserScriptInjectionTime);
   virtual HRESULT STDMETHODCALLTYPE
   addUserStyleSheetToGroup(BSTR groupName,
                            unsigned worldID,
                            BSTR source,
                            BSTR url,
-                           unsigned patternsCount,
-                           BSTR* patterns);
+                           unsigned whitelistCount,
+                           BSTR* whitelist,
+                           unsigned blacklistCount,
+                           BSTR* blacklist);
   virtual HRESULT STDMETHODCALLTYPE
   removeUserContentWithURLFromGroup(BSTR groupName, unsigned worldID, BSTR url);
   virtual HRESULT STDMETHODCALLTYPE

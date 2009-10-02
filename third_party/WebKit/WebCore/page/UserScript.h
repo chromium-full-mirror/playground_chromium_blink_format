@@ -29,6 +29,7 @@
 #include "KURL.h"
 #include "UserScriptTypes.h"
 #include <wtf/OwnPtr.h>
+#include <wtf/PassOwnPtr.h>
 #include <wtf/Vector.h>
 
 namespace WebCore {
@@ -37,25 +38,29 @@ class UserScript {
  public:
   UserScript(const String& source,
              const KURL& url,
-             const Vector<String>& patterns,
+             PassOwnPtr<Vector<String>> whitelist,
+             PassOwnPtr<Vector<String>> blacklist,
              unsigned worldID,
              UserScriptInjectionTime injectionTime)
       : m_source(source),
         m_url(url),
-        m_patterns(patterns),
+        m_whitelist(whitelist),
+        m_blacklist(blacklist),
         m_worldID(worldID),
         m_injectionTime(injectionTime) {}
 
   const String& source() const { return m_source; }
   const KURL& url() const { return m_url; }
-  const Vector<String>& patterns() const { return m_patterns; }
+  const Vector<String>* whitelist() const { return m_whitelist.get(); }
+  const Vector<String>* blacklist() const { return m_blacklist.get(); }
   unsigned worldID() const { return m_worldID; }
   UserScriptInjectionTime injectionTime() const { return m_injectionTime; }
 
  private:
   String m_source;
   KURL m_url;
-  Vector<String> m_patterns;
+  OwnPtr<Vector<String>> m_whitelist;
+  OwnPtr<Vector<String>> m_blacklist;
   unsigned m_worldID;
   UserScriptInjectionTime m_injectionTime;
 };

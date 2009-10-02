@@ -898,13 +898,13 @@ void Frame::injectUserScriptsForWorld(unsigned worldID,
   if (!doc)
     return;
 
-  // FIXME: Need to implement pattern checking.
   Vector<ScriptSourceCode> sourceCode;
   unsigned count = userScripts.size();
   for (unsigned i = 0; i < count; ++i) {
     UserScript* script = userScripts[i].get();
     if (script->injectionTime() == injectionTime &&
-        UserContentURLPattern::matchesPatterns(doc->url(), script->patterns()))
+        UserContentURLPattern::matchesPatterns(doc->url(), script->whitelist(),
+                                               script->blacklist()))
       sourceCode.append(ScriptSourceCode(script->source(), script->url()));
   }
   script()->evaluateInIsolatedWorld(worldID, sourceCode);

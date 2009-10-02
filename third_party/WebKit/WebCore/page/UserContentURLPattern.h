@@ -47,7 +47,9 @@ class UserContentURLPattern {
 
   bool matchSubdomains() const { return m_matchSubdomains; }
 
-  static bool matchesPatterns(const KURL&, const Vector<String>&);
+  static bool matchesPatterns(const KURL&,
+                              const Vector<String>* whitelist,
+                              const Vector<String>* blacklist);
 
  private:
   bool parse(const String& pattern);

@@ -72,14 +72,16 @@ class PageGroup : public Noncopyable {
 
   void addUserScript(const String& source,
                      const KURL&,
-                     const Vector<String>& patterns,
+                     PassOwnPtr<Vector<String>> whitelist,
+                     PassOwnPtr<Vector<String>> blacklist,
                      unsigned worldID,
                      UserScriptInjectionTime);
   const UserScriptMap* userScripts() const { return m_userScripts.get(); }
 
   void addUserStyleSheet(const String& source,
                          const KURL&,
-                         const Vector<String>& patterns,
+                         PassOwnPtr<Vector<String>> whitelist,
+                         PassOwnPtr<Vector<String>> blacklist,
                          unsigned worldID);
   const UserStyleSheetMap* userStyleSheets() const {
     return m_userStyleSheets.get();

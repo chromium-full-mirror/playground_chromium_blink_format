@@ -5496,13 +5496,26 @@ HRESULT WebView::setCanStartPlugins(BOOL canStartPlugins) {
   return S_OK;
 }
 
+static PassOwnPtr<Vector<String>> toStringVector(unsigned patternsCount,
+                                                 BSTR* patterns) {
+  // Convert the patterns into a Vector.
+  if (patternsCount == 0)
+    return 0;
+  Vector<String>* patternsVector = new Vector<String>;
+  for (unsigned i = 0; i < patternsCount; ++i)
+    patternsVector.append(String(patterns[i], SysStringLen(patterns[i])));
+  return patternsVector;
+}
+
 HRESULT WebView::addUserScriptToGroup(
     BSTR groupName,
     unsigned worldID,
     BSTR source,
     BSTR url,
-    unsigned patternsCount,
-    BSTR* patterns,
+    unsigned whitelistCount,
+    BSTR* whitelist,
+    unsigned blacklistCount,
+    BSTR* blacklist,
     WebUserScriptInjectionTime injectionTime) {
   String group(groupName, SysStringLen(groupName));
   if (group.isEmpty() || !worldID || worldID == numeric_limits<unsigned>::max())
@@ -5513,16 +5526,12 @@ HRESULT WebView::addUserScriptToGroup(
   if (!pageGroup)
     return E_FAIL;
 
-  // Convert the patterns into a Vector.
-  Vector<String> patternsVector;
-  for (unsigned i = 0; i < patternsCount; ++i)
-    patternsVector.append(String(patterns[i], SysStringLen(patterns[i])));
-
-  pageGroup->addUserScript(
-      String(source, SysStringLen(source)),
-      KURL(KURL(), String(url, SysStringLen(url))), patternsVector, worldID,
-      injectionTime == WebInjectAtDocumentStart ? InjectAtDocumentStart
-                                                : InjectAtDocumentEnd);
+  pageGroup->addUserScript(String(source, SysStringLen(source)),
+                           KURL(KURL(), String(url, SysStringLen(url))),
+                           toStringVector(whitelist), toStringVector(blacklist),
+                           worldID, injectionTime == WebInjectAtDocumentStart
+                                        ? InjectAtDocumentStart
+                                        : InjectAtDocumentEnd);
 
   return S_OK;
 }
@@ -5530,9 +5539,10 @@ HRESULT WebView::addUserScriptToGroup(
 HRESULT WebView::addUserStyleSheetToGroup(BSTR groupName,
                                           unsigned worldID,
                                           BSTR source,
-                                          BSTR url,
-                                          unsigned patternsCount,
-                                          BSTR* patterns) {
+                                          BSTR url unsigned whitelistCount,
+                                          BSTR* whitelist,
+                                          unsigned blacklistCount,
+                                          BSTR* blacklist) {
   String group(groupName, SysStringLen(groupName));
   if (group.isEmpty() || !worldID || worldID == numeric_limits<unsigned>::max())
     return E_INVALIDARG;
@@ -5542,14 +5552,10 @@ HRESULT WebView::addUserStyleSheetToGroup(BSTR groupName,
   if (!pageGroup)
     return E_FAIL;
 
-  // Convert the patterns into a Vector.
-  Vector<String> patternsVector;
-  for (unsigned i = 0; i < patternsCount; ++i)
-    patternsVector.append(String(patterns[i], SysStringLen(patterns[i])));
-
   pageGroup->addUserStyleSheet(String(source, SysStringLen(source)),
                                KURL(KURL(), String(url, SysStringLen(url))),
-                               patternsVector, worldID);
+                               toStringVector(whitelist),
+                               toStringVector(blacklist), worldID);
 
   return S_OK;
 }
