@@ -4079,8 +4079,13 @@ CollectionCache* Document::nameCollectionInfo(CollectionType type,
 void Document::finishedParsing() {
   setParsing(false);
   dispatchEvent(Event::create(eventNames().DOMContentLoadedEvent, true, false));
-  if (Frame* f = frame())
+  if (Frame* f = frame()) {
     f->loader()->finishedParsing();
+
+    if (InspectorController* controller = page()->inspectorController())
+      controller->mainResourceFiredDOMContentEvent(
+          f->loader()->documentLoader(), url());
+  }
 }
 
 Vector<String> Document::formElementsState() const {

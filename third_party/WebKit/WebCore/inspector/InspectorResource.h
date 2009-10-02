@@ -100,6 +100,8 @@ class InspectorResource : public RefCounted<InspectorResource> {
 
   void startTiming();
   void markResponseReceivedTime();
+  void markLoadEventTime();
+  void markDOMContentEventTime();
   void endTiming();
 
   void markFailed();
@@ -160,6 +162,8 @@ class InspectorResource : public RefCounted<InspectorResource> {
   double m_startTime;
   double m_responseReceivedTime;
   double m_endTime;
+  double m_loadEventTime;
+  double m_domContentEventTime;
   ScriptString m_xmlHttpResponseText;
   Changes m_changes;
   bool m_isMainResource;

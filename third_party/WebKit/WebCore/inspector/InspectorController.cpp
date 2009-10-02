@@ -923,6 +923,25 @@ void InspectorController::identifierForInitialRequest(
     resource->createScriptObject(m_frontend.get());
 }
 
+void InspectorController::mainResourceFiredDOMContentEvent(
+    DocumentLoader* loader,
+    const KURL& url) {
+  if (!enabled() || !isMainResourceLoader(loader, url))
+    return;
+
+  if (m_mainResource)
+    m_mainResource->markDOMContentEventTime();
+}
+
+void InspectorController::mainResourceFiredLoadEvent(DocumentLoader* loader,
+                                                     const KURL& url) {
+  if (!enabled() || !isMainResourceLoader(loader, url))
+    return;
+
+  if (m_mainResource)
+    m_mainResource->markLoadEventTime();
+}
+
 bool InspectorController::isMainResourceLoader(DocumentLoader* loader,
                                                const KURL& requestUrl) {
   return loader->frame() == m_inspectedPage->mainFrame() &&

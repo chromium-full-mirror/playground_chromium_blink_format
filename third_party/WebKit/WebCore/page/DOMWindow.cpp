@@ -1263,6 +1263,10 @@ void DOMWindow::dispatchLoadEvent() {
     ownerEvent->setTarget(ownerElement);
     ownerElement->dispatchGenericEvent(ownerEvent.release());
   }
+
+  if (InspectorController* controller = frame()->page()->inspectorController())
+    controller->mainResourceFiredLoadEvent(frame()->loader()->documentLoader(),
+                                           url());
 }
 
 bool DOMWindow::dispatchEvent(PassRefPtr<Event> prpEvent,
