@@ -42,7 +42,9 @@ class CachedResourceHandleBase {
 
   // This conversion operator allows implicit conversion to bool but not to
   // other integer types.
-  typedef CachedResource* CachedResourceHandleBase::*UnspecifiedBoolType;
+  // Parenthesis is needed for winscw compiler to resolve class qualifier in
+  // this case.
+  typedef CachedResource*(CachedResourceHandleBase::*UnspecifiedBoolType);
   operator UnspecifiedBoolType() const {
     return m_resource ? &CachedResourceHandleBase::m_resource : 0;
   }
