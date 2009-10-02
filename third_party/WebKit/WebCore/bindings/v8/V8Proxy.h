@@ -35,6 +35,7 @@
 #include "ScriptSourceCode.h"  // for WebCore::ScriptSourceCode
 #include "SecurityOrigin.h"    // for WebCore::SecurityOrigin
 #include "SharedPersistent.h"
+#include "V8AbstractEventListener.h"
 #include "V8DOMWrapper.h"
 #include "V8GCController.h"
 #include "V8Index.h"
@@ -57,7 +58,6 @@ class SVGElement;
 class ScriptExecutionContext;
 class String;
 class V8EventListener;
-class V8ObjectEventListener;
 
 // FIXME: use standard logging facilities in WebCore.
 void logInfo(Frame*, const String& message, const String& url);
@@ -122,12 +122,7 @@ class V8Proxy {
     GeneralError
   };
 
-  explicit V8Proxy(Frame* frame)
-      : m_frame(frame),
-        m_context(SharedPersistent<v8::Context>::create()),
-        m_inlineCode(false),
-        m_timerCallback(false),
-        m_recursion(0) {}
+  explicit V8Proxy(Frame*);
 
   ~V8Proxy();
 
@@ -319,6 +314,8 @@ class V8Proxy {
     return m_context;
   }
 
+  PassRefPtr<V8ListenerGuard> listenerGuard() { return m_listenerGuard; }
+
   bool setContextDebugId(int id);
   static int contextDebugId(v8::Handle<v8::Context>);
 
@@ -368,6 +365,8 @@ class V8Proxy {
   // the storage mutex.
   void releaseStorageMutex();
 
+  void disconnectEventListeners();
+
   static bool canAccessPrivate(DOMWindow*);
 
   static const char* rangeExceptionName(int exceptionCode);
@@ -401,6 +400,8 @@ class V8Proxy {
   Frame* m_frame;
 
   RefPtr<SharedPersistent<v8::Context>> m_context;
+
+  RefPtr<V8ListenerGuard> m_listenerGuard;
 
   // For each possible type of wrapper, we keep a boilerplate object.
   // The boilerplate is used to create additional wrappers of the same

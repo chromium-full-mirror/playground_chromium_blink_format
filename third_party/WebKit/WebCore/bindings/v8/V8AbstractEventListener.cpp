@@ -38,6 +38,7 @@
 #include "Tokenizer.h"
 #include "V8Binding.h"
 #include "V8EventListenerList.h"
+#include "V8Proxy.h"
 #include "V8Utilities.h"
 
 namespace WebCore {
@@ -49,11 +50,15 @@ static void weakEventListenerCallback(v8::Persistent<v8::Value>,
   listener->disposeListenerObject();
 }
 
-V8AbstractEventListener::V8AbstractEventListener(Frame* frame, bool isAttribute)
+V8AbstractEventListener::V8AbstractEventListener(
+    Frame* frame,
+    PassRefPtr<V8ListenerGuard> guard,
+    bool isAttribute)
     : EventListener(JSEventListenerType),
       m_isWeak(true),
       m_isAttribute(isAttribute),
       m_frame(frame),
+      m_guard(guard),
       m_lineNumber(0),
       m_columnNumber(0) {
   if (!m_frame)
