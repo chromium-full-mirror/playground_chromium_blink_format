@@ -57,6 +57,7 @@
 #include "runtime.h"
 #include "runtime_root.h"
 #include "QWebPageClient.h"
+#include <QApplication>
 #include <QKeyEvent>
 #include <QWidget>
 #include <QX11Info>
@@ -271,6 +272,8 @@ void PluginView::setNPWindowIfNeeded() {
   m_npWindow.clipRect.top = m_clipRect.y();
   m_npWindow.clipRect.right = m_clipRect.width();
   m_npWindow.clipRect.bottom = m_clipRect.height();
+
+  QApplication::syncX();
 
   PluginView::setCurrentPluginView(this);
   JSC::JSLock::DropAllLocks dropAllLocks(JSC::SilenceAssertionsOnly);
