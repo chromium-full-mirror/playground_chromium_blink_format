@@ -115,6 +115,7 @@ class LayoutTestController : public QObject {
   void clearAllDatabases();
 
   void waitForPolicyDelegate();
+  void overridePreference(const QString& name, const QVariant& value);
 
  private slots:
   void processWork();

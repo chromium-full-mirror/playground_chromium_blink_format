@@ -132,8 +132,6 @@ void LayoutTestController::reset() {
   m_waitForPolicy = false;
   qt_dump_editing_callbacks(false);
   qt_dump_resource_load_callbacks(false);
-  QWebSettings::globalSettings()->setAttribute(
-      QWebSettings::PrivateBrowsingEnabled, false);
 }
 
 void LayoutTestController::processWork() {
@@ -273,12 +271,12 @@ void LayoutTestController::setFixedContentsSize(int width, int height) {
 }
 
 void LayoutTestController::setPrivateBrowsingEnabled(bool enable) {
-  QWebSettings::globalSettings()->setAttribute(
+  m_drt->webPage()->settings()->setAttribute(
       QWebSettings::PrivateBrowsingEnabled, enable);
 }
 
 void LayoutTestController::setPopupBlockingEnabled(bool enable) {
-  QWebSettings::globalSettings()->setAttribute(
+  m_drt->webPage()->settings()->setAttribute(
       QWebSettings::JavascriptCanOpenWindows, !enable);
 }
 
@@ -339,6 +337,22 @@ void LayoutTestController::whiteListAccessFromOrigin(
 void LayoutTestController::waitForPolicyDelegate() {
   m_waitForPolicy = true;
   waitUntilDone();
+}
+
+void LayoutTestController::overridePreference(const QString& name,
+                                              const QVariant& value) {
+  QWebSettings* settings = m_topLoadingFrame->page()->settings();
+
+  if (name == "WebKitJavaScriptEnabled")
+    settings->setAttribute(QWebSettings::JavascriptEnabled, value.toBool());
+  else if (name == "WebKitTabToLinksPreferenceKey")
+    settings->setAttribute(QWebSettings::LinksIncludedInFocusChain,
+                           value.toBool());
+  else if (name == "WebKitOfflineWebApplicationCacheEnabled")
+    settings->setAttribute(QWebSettings::OfflineWebApplicationCacheEnabled,
+                           value.toBool());
+  else if (name == "WebKitDefaultFontSize")
+    settings->setFontSize(QWebSettings::DefaultFontSize, value.toInt());
 }
 
 EventSender::EventSender(QWebPage* parent) : QObject(parent) {
