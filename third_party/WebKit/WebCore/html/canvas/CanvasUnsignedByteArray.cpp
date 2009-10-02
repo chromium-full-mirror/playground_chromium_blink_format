@@ -52,10 +52,11 @@ PassRefPtr<CanvasUnsignedByteArray> CanvasUnsignedByteArray::create(
     PassRefPtr<CanvasArrayBuffer> buffer,
     int offset,
     unsigned length) {
-  // Check to make sure we are talking about a valid region of
-  // the given CanvasArrayBuffer's storage.
-  if ((offset + (length * sizeof(unsigned char))) > buffer->byteLength()) {
-    return NULL;
+  if (buffer) {
+    // Check to make sure we are talking about a valid region of
+    // the given CanvasArrayBuffer's storage.
+    if ((offset + (length * sizeof(unsigned char))) > buffer->byteLength())
+      return NULL;
   }
 
   return adoptRef(new CanvasUnsignedByteArray(buffer, offset, length));
