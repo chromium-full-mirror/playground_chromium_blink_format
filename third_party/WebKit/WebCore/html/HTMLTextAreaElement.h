@@ -58,15 +58,6 @@ class HTMLTextAreaElement : public HTMLTextFormControlElement {
            value().isEmpty();
   }
 
-  int selectionStart();
-  int selectionEnd();
-
-  void setSelectionStart(int);
-  void setSelectionEnd(int);
-
-  void select();
-  void setSelectionRange(int, int);
-
   virtual void childrenChanged(bool changedByParser = false,
                                Node* beforeChange = 0,
                                Node* afterChange = 0,
@@ -103,7 +94,6 @@ class HTMLTextAreaElement : public HTMLTextFormControlElement {
     m_cachedSelectionStart = s;
     m_cachedSelectionEnd = e;
   };
-  VisibleSelection selection() const;
 
   virtual bool shouldUseInputMethod() const;
 
@@ -116,6 +106,8 @@ class HTMLTextAreaElement : public HTMLTextFormControlElement {
 
   virtual bool supportsPlaceholder() const { return true; }
   virtual bool isEmptyValue() const { return value().isEmpty(); }
+  virtual int cachedSelectionStart() const { return m_cachedSelectionStart; }
+  virtual int cachedSelectionEnd() const { return m_cachedSelectionEnd; }
 
   virtual bool isOptionalFormControl() const {
     return !isRequiredFormControl();

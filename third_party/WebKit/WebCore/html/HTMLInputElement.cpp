@@ -566,56 +566,6 @@ bool HTMLInputElement::canHaveSelection() const {
   return isTextField();
 }
 
-int HTMLInputElement::selectionStart() const {
-  if (!isTextField())
-    return 0;
-  if (document()->focusedNode() != this && m_data.cachedSelectionStart() != -1)
-    return m_data.cachedSelectionStart();
-  if (!renderer())
-    return 0;
-  return toRenderTextControl(renderer())->selectionStart();
-}
-
-int HTMLInputElement::selectionEnd() const {
-  if (!isTextField())
-    return 0;
-  if (document()->focusedNode() != this && m_data.cachedSelectionEnd() != -1)
-    return m_data.cachedSelectionEnd();
-  if (!renderer())
-    return 0;
-  return toRenderTextControl(renderer())->selectionEnd();
-}
-
-static bool isTextFieldWithRenderer(HTMLInputElement* element) {
-  if (!element->isTextField())
-    return false;
-
-  element->document()->updateLayoutIgnorePendingStylesheets();
-  if (!element->renderer())
-    return false;
-
-  return true;
-}
-
-void HTMLInputElement::setSelectionStart(int start) {
-  if (isTextFieldWithRenderer(this))
-    toRenderTextControl(renderer())->setSelectionStart(start);
-}
-
-void HTMLInputElement::setSelectionEnd(int end) {
-  if (isTextFieldWithRenderer(this))
-    toRenderTextControl(renderer())->setSelectionEnd(end);
-}
-
-void HTMLInputElement::select() {
-  if (isTextFieldWithRenderer(this))
-    toRenderTextControl(renderer())->select();
-}
-
-void HTMLInputElement::setSelectionRange(int start, int end) {
-  InputElement::updateSelectionRange(this, this, start, end);
-}
-
 void HTMLInputElement::accessKeyAction(bool sendToAnyElement) {
   switch (inputType()) {
     case BUTTON:
@@ -729,18 +679,6 @@ void HTMLInputElement::parseMappedAttribute(MappedAttribute* attr) {
   } else if (attr->name() == heightAttr) {
     if (respectHeightAndWidthAttrs())
       addCSSLength(attr, CSSPropertyHeight, attr->value());
-  } else if (attr->name() == onfocusAttr) {
-    setAttributeEventListener(eventNames().focusEvent,
-                              createAttributeEventListener(this, attr));
-  } else if (attr->name() == onblurAttr) {
-    setAttributeEventListener(eventNames().blurEvent,
-                              createAttributeEventListener(this, attr));
-  } else if (attr->name() == onselectAttr) {
-    setAttributeEventListener(eventNames().selectEvent,
-                              createAttributeEventListener(this, attr));
-  } else if (attr->name() == onchangeAttr) {
-    setAttributeEventListener(eventNames().changeEvent,
-                              createAttributeEventListener(this, attr));
   }
   // Search field and slider attributes all just cause updateFromElement to be
   // called through style
@@ -761,8 +699,6 @@ void HTMLInputElement::parseMappedAttribute(MappedAttribute* attr) {
       attach();
     }
     setNeedsStyleRecalc();
-  } else if (attr->name() == placeholderAttr) {
-    updatePlaceholderVisibility(true);
   } else if (attr->name() == autosaveAttr || attr->name() == incrementalAttr ||
              attr->name() == minAttr || attr->name() == maxAttr ||
              attr->name() == multipleAttr || attr->name() == precisionAttr)
@@ -774,7 +710,7 @@ void HTMLInputElement::parseMappedAttribute(MappedAttribute* attr) {
 // appearance.
 #endif
   else
-    HTMLFormControlElementWithState::parseMappedAttribute(attr);
+    HTMLTextFormControlElement::parseMappedAttribute(attr);
 }
 
 bool HTMLInputElement::rendererIsNeeded(RenderStyle* style) {
@@ -1757,14 +1693,6 @@ void HTMLInputElement::onSearch() {
   if (renderer())
     toRenderTextControlSingleLine(renderer())->stopSearchEventTimer();
   dispatchEvent(Event::create(eventNames().searchEvent, true, false));
-}
-
-VisibleSelection HTMLInputElement::selection() const {
-  if (!renderer() || !isTextField() || m_data.cachedSelectionStart() == -1 ||
-      m_data.cachedSelectionEnd() == -1)
-    return VisibleSelection();
-  return toRenderTextControl(renderer())
-      ->selection(m_data.cachedSelectionStart(), m_data.cachedSelectionEnd());
 }
 
 void HTMLInputElement::documentDidBecomeActive() {
