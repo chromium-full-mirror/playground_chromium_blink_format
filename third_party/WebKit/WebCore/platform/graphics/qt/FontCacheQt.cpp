@@ -46,8 +46,7 @@ FontCache* fontCache() {
 
 FontCache::FontCache() {}
 
-void FontCache::getTraitsInFamily(const AtomicString& familyName,
-                                  Vector<unsigned>& traitsMasks) {}
+void FontCache::getTraitsInFamily(const AtomicString&, Vector<unsigned>&) {}
 
 // This type must be consistent with FontPlatformData's ctor - the one which
 // gets FontDescription as it's parameter.
@@ -174,8 +173,8 @@ static FontPlatformDataCache* gFontPlatformDataCache = 0;
 
 FontPlatformData* FontCache::getCachedFontPlatformData(
     const FontDescription& description,
-    const AtomicString& family,
-    bool checkingAlternateName) {
+    const AtomicString&,
+    bool) {
   if (!gFontPlatformDataCache)
     gFontPlatformDataCache = new FontPlatformDataCache;
 

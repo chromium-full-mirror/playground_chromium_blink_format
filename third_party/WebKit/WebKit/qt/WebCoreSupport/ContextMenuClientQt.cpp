@@ -51,7 +51,7 @@ void ContextMenuClientQt::contextMenuItemSelected(ContextMenuItem*,
   notImplemented();
 }
 
-void ContextMenuClientQt::downloadURL(const KURL& url) {
+void ContextMenuClientQt::downloadURL(const KURL&) {
   notImplemented();
 }
 

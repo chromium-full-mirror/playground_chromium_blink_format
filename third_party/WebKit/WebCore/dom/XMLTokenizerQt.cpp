@@ -242,7 +242,7 @@ void XMLTokenizer::doWrite(const String& parseString) {
   return;
 }
 
-void XMLTokenizer::initializeParserContext(const char* chunk) {
+void XMLTokenizer::initializeParserContext(const char*) {
   m_parserStopped = false;
   m_sawError = false;
   m_sawXSLTransform = false;

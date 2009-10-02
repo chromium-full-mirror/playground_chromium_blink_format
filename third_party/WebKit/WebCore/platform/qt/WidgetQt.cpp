@@ -92,7 +92,7 @@ void Widget::hide() {
     platformWidget()->hide();
 }
 
-void Widget::paint(GraphicsContext*, const IntRect& rect) {}
+void Widget::paint(GraphicsContext*, const IntRect&) {}
 
 void Widget::setIsSelected(bool) {
   notImplemented();

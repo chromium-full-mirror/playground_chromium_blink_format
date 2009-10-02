@@ -111,7 +111,7 @@ bool DragData::containsURL() const {
   return m_platformDragData->hasUrls();
 }
 
-String DragData::asURL(String* title) const {
+String DragData::asURL(String*) const {
   if (!m_platformDragData)
     return String();
   QList<QUrl> urls = m_platformDragData->urls();

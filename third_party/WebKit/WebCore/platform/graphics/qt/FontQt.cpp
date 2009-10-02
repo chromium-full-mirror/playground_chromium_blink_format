@@ -205,7 +205,7 @@ float Font::floatWidthForComplexText(const TextRun& run,
 
 int Font::offsetForPositionForComplexText(const TextRun& run,
                                           int position,
-                                          bool includePartialGlyphs) const {
+                                          bool) const {
   const QString string = fixSpacing(qstring(run));
   QTextLayout layout(string, font());
   QTextLine line = setupLayout(&layout, run);

@@ -1385,7 +1385,7 @@ void QtRuntimeMetaMethod::markChildren(MarkStack& markStack) {
 
 JSValue QtRuntimeMetaMethod::call(ExecState* exec,
                                   JSObject* functionObject,
-                                  JSValue thisValue,
+                                  JSValue,
                                   const ArgList& args) {
   QtRuntimeMetaMethodData* d =
       static_cast<QtRuntimeMetaMethod*>(functionObject)->d_func();
@@ -1503,7 +1503,7 @@ QtRuntimeConnectionMethod::QtRuntimeConnectionMethod(
 
 JSValue QtRuntimeConnectionMethod::call(ExecState* exec,
                                         JSObject* functionObject,
-                                        JSValue thisValue,
+                                        JSValue,
                                         const ArgList& args) {
   QtRuntimeConnectionMethodData* d =
       static_cast<QtRuntimeConnectionMethod*>(functionObject)->d_func();

@@ -273,8 +273,8 @@ IntRect ChromeClientQt::windowResizerRect() const {
 
 void ChromeClientQt::repaint(const IntRect& windowRect,
                              bool contentChanged,
-                             bool immediate,
-                             bool repaintContentOnly) {
+                             bool,
+                             bool) {
   // No double buffer, so only update the QWidget if content changed.
   if (contentChanged) {
     if (platformPageClient()) {
@@ -320,7 +320,7 @@ void ChromeClientQt::contentsSizeChanged(Frame* frame,
 }
 
 void ChromeClientQt::mouseDidMoveOverElement(const HitTestResult& result,
-                                             unsigned modifierFlags) {
+                                             unsigned) {
   TextDirection dir;
   if (result.absoluteLinkURL() != lastHoverURL ||
       result.title(dir) != lastHoverTitle ||
@@ -372,7 +372,7 @@ void ChromeClientQt::exceededDatabaseQuota(Frame* frame,
 #endif
 
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
-void ChromeClientQt::reachedMaxAppCacheSize(int64_t spaceNeeded) {
+void ChromeClientQt::reachedMaxAppCacheSize(int64_t) {
   // FIXME: Free some space.
   notImplemented();
 }

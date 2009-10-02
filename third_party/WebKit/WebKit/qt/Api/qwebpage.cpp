@@ -971,7 +971,7 @@ void QWebPagePrivate::keyReleaseEvent(QKeyEvent* ev) {
   ev->setAccepted(handled);
 }
 
-void QWebPagePrivate::focusInEvent(QFocusEvent* ev) {
+void QWebPagePrivate::focusInEvent(QFocusEvent*) {
   FocusController* focusController = page->focusController();
   Frame* frame = focusController->focusedFrame();
   focusController->setActive(true);
@@ -981,7 +981,7 @@ void QWebPagePrivate::focusInEvent(QFocusEvent* ev) {
     focusController->setFocusedFrame(QWebFramePrivate::core(mainFrame));
 }
 
-void QWebPagePrivate::focusOutEvent(QFocusEvent* ev) {
+void QWebPagePrivate::focusOutEvent(QFocusEvent*) {
   // only set the focused frame inactive so that we stop painting the caret
   // and the focus frame. But don't tell the focus controller so that upon
   // focusInEvent() we can re-activate the frame.
@@ -1082,7 +1082,7 @@ void QWebPagePrivate::dropEvent(QDropEvent* ev) {
 #endif
 }
 
-void QWebPagePrivate::leaveEvent(QEvent* ev) {
+void QWebPagePrivate::leaveEvent(QEvent*) {
   // Fake a mouse move event just outside of the widget, since all
   // the interesting mouse-out behavior like invalidating scrollbars
   // is handled by the WebKit event handler's mouseMoved function.
@@ -1767,6 +1767,7 @@ void QWebPage::javaScriptConsoleMessage(const QString& message,
    QMessageBox::information.
 */
 void QWebPage::javaScriptAlert(QWebFrame* frame, const QString& msg) {
+  Q_UNUSED(frame)
 #ifndef QT_NO_MESSAGEBOX
   QMessageBox::information(
       d->view, tr("JavaScript Alert - %1").arg(mainFrame()->url().host()), msg,
@@ -1784,6 +1785,7 @@ void QWebPage::javaScriptAlert(QWebFrame* frame, const QString& msg) {
    with QMessageBox::Yes and QMessageBox::No buttons.
 */
 bool QWebPage::javaScriptConfirm(QWebFrame* frame, const QString& msg) {
+  Q_UNUSED(frame)
 #ifdef QT_NO_MESSAGEBOX
   return true;
 #else
@@ -1811,6 +1813,7 @@ bool QWebPage::javaScriptPrompt(QWebFrame* frame,
                                 const QString& msg,
                                 const QString& defaultValue,
                                 QString* result) {
+  Q_UNUSED(frame)
   bool ok = false;
 #ifndef QT_NO_INPUTDIALOG
   QString x = QInputDialog::getText(
@@ -1925,7 +1928,7 @@ static void openNewWindow(const QUrl& url, WebCore::Frame* frame) {
 
     \sa action()
 */
-void QWebPage::triggerAction(WebAction action, bool checked) {
+void QWebPage::triggerAction(WebAction action, bool) {
   WebCore::Frame* frame = d->page->focusController()->focusedOrMainFrame();
   if (!frame)
     return;
@@ -2122,6 +2125,7 @@ bool QWebPage::acceptNavigationRequest(QWebFrame* frame,
                                        QWebPage::NavigationType type)
 #endif
 {
+  Q_UNUSED(frame)
   if (type == NavigationTypeLinkClicked) {
     switch (d->linkPolicy) {
       case DontDelegateLinks:
@@ -2932,6 +2936,7 @@ QWebSettings* QWebPage::settings() const {
 */
 QString QWebPage::chooseFile(QWebFrame* parentFrame,
                              const QString& suggestedFile) {
+  Q_UNUSED(parentFrame)
 #ifndef QT_NO_FILEDIALOG
   return QFileDialog::getOpenFileName(d->view, QString::null, suggestedFile);
 #else

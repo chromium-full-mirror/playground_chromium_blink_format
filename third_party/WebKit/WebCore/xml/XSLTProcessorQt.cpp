@@ -59,7 +59,7 @@ XSLTMessageHandler::XSLTMessageHandler(Document* document)
 
 void XSLTMessageHandler::handleMessage(QtMsgType type,
                                        const QString& description,
-                                       const QUrl& identifier,
+                                       const QUrl&,
                                        const QSourceLocation& sourceLocation) {
   if (!m_document->frame())
     return;
@@ -87,9 +87,9 @@ void XSLTMessageHandler::handleMessage(QtMsgType type,
 }
 
 bool XSLTProcessor::transformToString(Node* sourceNode,
-                                      String& mimeType,
+                                      String&,
                                       String& resultString,
-                                      String& resultEncoding) {
+                                      String&) {
   bool success = false;
 
   RefPtr<XSLStyleSheet> stylesheet = m_stylesheet;

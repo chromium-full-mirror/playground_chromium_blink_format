@@ -40,7 +40,9 @@ class StillImage : public Image {
 
   // FIXME: StillImages are underreporting decoded sizes and will be unable
   // to prune because these functions are not implemented yet.
-  virtual void destroyDecodedData(bool destroyAll = true) {}
+  virtual void destroyDecodedData(bool destroyAll = true) {
+    Q_UNUSED(destroyAll);
+  }
   virtual unsigned decodedSize() const { return 0; }
 
   virtual IntSize size() const;

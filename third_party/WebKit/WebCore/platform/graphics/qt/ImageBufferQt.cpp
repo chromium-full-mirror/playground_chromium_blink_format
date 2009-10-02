@@ -66,9 +66,7 @@ ImageBufferData::ImageBufferData(const IntSize& size) : m_pixmap(size) {
   painter->setCompositionMode(QPainter::CompositionMode_SourceOver);
 }
 
-ImageBuffer::ImageBuffer(const IntSize& size,
-                         ImageColorSpace imageColorSpace,
-                         bool& success)
+ImageBuffer::ImageBuffer(const IntSize& size, ImageColorSpace, bool& success)
     : m_data(size), m_size(size) {
   m_context.set(new GraphicsContext(m_data.m_painter.get()));
   success = true;
