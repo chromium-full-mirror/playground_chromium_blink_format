@@ -854,7 +854,7 @@ void LayoutTestController::addUserScript(JSStringRef source, bool runAtStart) {
 
   webView->addUserScriptToGroup(
       _bstr_t(L"org.webkit.DumpRenderTree").GetBSTR(), 1,
-      bstrT(source).GetBSTR(), 0, 0, 0,
+      bstrT(source).GetBSTR(), 0, 0, 0, 0, 0,
       runAtStart ? WebInjectAtDocumentStart : WebInjectAtDocumentEnd);
 }
 
@@ -866,5 +866,5 @@ void LayoutTestController::addUserStyleSheet(JSStringRef source) {
 
   webView->addUserStyleSheetToGroup(
       _bstr_t(L"org.webkit.DumpRenderTree").GetBSTR(), 1,
-      bstrT(source).GetBSTR(), 0, 0, 0);
+      bstrT(source).GetBSTR(), 0, 0, 0, 0, 0);
 }
