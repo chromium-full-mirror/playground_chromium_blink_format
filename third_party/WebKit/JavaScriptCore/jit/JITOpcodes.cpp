@@ -311,11 +311,9 @@ void JIT::privateCompileCTIMachineTrampolines(
          stackPointerRegister);
 
   // Check for an exception
-  // FIXME: Maybe we can optimize this comparison to JSValue().
   move(ImmPtr(&globalData->exception), regT2);
-  Jump sawException1 =
-      branch32(NotEqual, tagFor(0, regT2), Imm32(JSValue::CellTag));
-  Jump sawException2 = branch32(NonZero, payloadFor(0, regT2), Imm32(0));
+  Jump sawException =
+      branch32(NotEqual, tagFor(0, regT2), Imm32(JSValue::EmptyValueTag));
 
   // Grab the return address.
   emitGetFromCallFrameHeaderPtr(RegisterFile::ReturnPC, regT3);
@@ -328,8 +326,7 @@ void JIT::privateCompileCTIMachineTrampolines(
   ret();
 
   // Handle an exception
-  sawException1.link(this);
-  sawException2.link(this);
+  sawException.link(this);
   // Grab the return address.
   emitGetFromCallFrameHeaderPtr(RegisterFile::ReturnPC, regT1);
   move(ImmPtr(&globalData->exceptionLocation), regT2);
@@ -1329,7 +1326,7 @@ void JIT::emit_op_to_jsnumber(Instruction* currentInstruction) {
   emitLoad(src, regT1, regT0);
 
   Jump isInt32 = branch32(Equal, regT1, Imm32(JSValue::Int32Tag));
-  addSlowCase(branch32(AboveOrEqual, regT1, Imm32(JSValue::DeletedValueTag)));
+  addSlowCase(branch32(AboveOrEqual, regT1, Imm32(JSValue::EmptyValueTag)));
   isInt32.link(this);
 
   if (src != dst)
@@ -1468,11 +1465,9 @@ void JIT::emit_op_enter_with_activation(Instruction* currentInstruction) {
 }
 
 void JIT::emit_op_create_arguments(Instruction*) {
-  Jump argsNotCell = branch32(
+  Jump argsCreated = branch32(
       NotEqual, tagFor(RegisterFile::ArgumentsRegister, callFrameRegister),
-      Imm32(JSValue::CellTag));
-  Jump argsNotNull = branchTestPtr(
-      NonZero, payloadFor(RegisterFile::ArgumentsRegister, callFrameRegister));
+      Imm32(JSValue::EmptyValueTag));
 
   // If we get here the arguments pointer is a null cell - i.e. arguments need
   // lazy creation.
@@ -1481,8 +1476,7 @@ void JIT::emit_op_create_arguments(Instruction*) {
   else
     JITStubCall(this, cti_op_create_arguments).call();
 
-  argsNotCell.link(this);
-  argsNotNull.link(this);
+  argsCreated.link(this);
 }
 
 void JIT::emit_op_init_arguments(Instruction*) {

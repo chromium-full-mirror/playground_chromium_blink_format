@@ -246,16 +246,14 @@ void JIT::compileOpCall(OpcodeID opcodeID, Instruction* instruction, unsigned) {
   int argCount = instruction[3].u.operand;
   int registerOffset = instruction[4].u.operand;
 
-  Jump wasEval1;
-  Jump wasEval2;
+  Jump wasEval;
   if (opcodeID == op_call_eval) {
     JITStubCall stubCall(this, cti_op_call_eval);
     stubCall.addArgument(callee);
     stubCall.addArgument(JIT::Imm32(registerOffset));
     stubCall.addArgument(JIT::Imm32(argCount));
     stubCall.call();
-    wasEval1 = branchTest32(NonZero, regT0);
-    wasEval2 = branch32(NotEqual, regT1, Imm32(JSValue::CellTag));
+    wasEval = branch32(Equal, regT1, Imm32(JSValue::EmptyValueTag));
   }
 
   emitLoad(callee, regT1, regT2);
@@ -287,10 +285,8 @@ void JIT::compileOpCall(OpcodeID opcodeID, Instruction* instruction, unsigned) {
 
   emitNakedCall(m_globalData->jitStubs.ctiVirtualCall());
 
-  if (opcodeID == op_call_eval) {
-    wasEval1.link(this);
-    wasEval2.link(this);
-  }
+  if (opcodeID == op_call_eval)
+    wasEval.link(this);
 
   emitStore(dst, regT1, regT0);
   ;
@@ -330,16 +326,14 @@ void JIT::compileOpCall(OpcodeID opcodeID,
   int argCount = instruction[3].u.operand;
   int registerOffset = instruction[4].u.operand;
 
-  Jump wasEval1;
-  Jump wasEval2;
+  Jump wasEval;
   if (opcodeID == op_call_eval) {
     JITStubCall stubCall(this, cti_op_call_eval);
     stubCall.addArgument(callee);
     stubCall.addArgument(JIT::Imm32(registerOffset));
     stubCall.addArgument(JIT::Imm32(argCount));
     stubCall.call();
-    wasEval1 = branchTest32(NonZero, regT0);
-    wasEval2 = branch32(NotEqual, regT1, Imm32(JSValue::CellTag));
+    wasEval = branch32(NotEqual, regT1, Imm32(JSValue::EmptyValueTag));
   }
 
   emitLoad(callee, regT1, regT0);
@@ -401,10 +395,8 @@ void JIT::compileOpCall(OpcodeID opcodeID,
   m_callStructureStubCompilationInfo[callLinkInfoIndex].hotPathOther =
       emitNakedCall();
 
-  if (opcodeID == op_call_eval) {
-    wasEval1.link(this);
-    wasEval2.link(this);
-  }
+  if (opcodeID == op_call_eval)
+    wasEval.link(this);
 
   // Put the return value in dst. In the interpreter, op_ret does this.
   emitStore(dst, regT1, regT0);
