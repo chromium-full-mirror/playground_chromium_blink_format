@@ -687,6 +687,10 @@ NPError PluginView::handlePostReadFile(Vector<char>& buffer,
   return NPERR_NO_ERROR;
 }
 
+void PluginView::halt() {}
+
+void PluginView::restart() {}
+
 }  // namespace WebCore
 
 #else

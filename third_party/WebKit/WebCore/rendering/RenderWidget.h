@@ -40,6 +40,8 @@ class RenderWidget : public RenderReplaced, private OverlapTestRequestClient {
 
   void updateWidgetPosition();
 
+  void showSubstituteImage(PassRefPtr<Image>);
+
  protected:
   RenderWidget(Node*);
 
@@ -75,6 +77,7 @@ class RenderWidget : public RenderReplaced, private OverlapTestRequestClient {
   void deref(RenderArena*);
 
   RefPtr<Widget> m_widget;
+  RefPtr<Image> m_substituteImage;
   FrameView* m_frameView;
   int m_refCount;
 };

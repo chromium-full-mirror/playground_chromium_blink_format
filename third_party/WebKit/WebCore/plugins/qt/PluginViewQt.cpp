@@ -498,4 +498,8 @@ void PluginView::platformDestroy() {
     delete platformPluginWidget();
 }
 
+void PluginView::halt() {}
+
+void PluginView::restart() {}
+
 }  // namespace WebCore

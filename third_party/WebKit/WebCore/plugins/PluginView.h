@@ -29,6 +29,7 @@
 
 #include "CString.h"
 #include "FrameLoadRequest.h"
+#include "HaltablePlugin.h"
 #include "IntRect.h"
 #include "KURL.h"
 #include "PlatformString.h"
@@ -115,7 +116,8 @@ class PluginManualLoader {
 
 class PluginView : public Widget,
                    private PluginStreamClient,
-                   public PluginManualLoader {
+                   public PluginManualLoader,
+                   private HaltablePlugin {
  public:
   static PassRefPtr<PluginView> create(Frame* parentFrame,
                                        const IntSize&,
@@ -222,6 +224,11 @@ class PluginView : public Widget,
   void didReceiveData(const char*, int);
   void didFinishLoading();
   void didFail(const ResourceError&);
+
+  // HaltablePlugin
+  virtual void halt();
+  virtual void restart();
+  virtual Node* node() const;
 
   static bool isCallingPlugin();
 
@@ -347,6 +354,9 @@ class PluginView : public Widget,
   }
 #else
  public:
+  void setPlatformPluginWidget(PlatformPluginWidget widget) {
+    setPlatformWidget(widget);
+  }
   PlatformPluginWidget platformPluginWidget() const { return platformWidget(); }
 #endif
 

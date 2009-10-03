@@ -180,6 +180,11 @@ void RenderWidget::styleDidChange(StyleDifference diff,
   }
 }
 
+void RenderWidget::showSubstituteImage(PassRefPtr<Image> prpImage) {
+  m_substituteImage = prpImage;
+  repaint();
+}
+
 void RenderWidget::paint(PaintInfo& paintInfo, int tx, int ty) {
   if (!shouldPaint(paintInfo, tx, ty))
     return;
@@ -237,7 +242,11 @@ void RenderWidget::paint(PaintInfo& paintInfo, int tx, int ty) {
     // allowed
     // to paint itself.  That way it will composite properly with z-indexed
     // layers.
-    m_widget->paint(paintInfo.context, paintInfo.rect);
+    if (m_substituteImage)
+      paintInfo.context->drawImage(m_substituteImage.get(),
+                                   m_widget->frameRect());
+    else
+      m_widget->paint(paintInfo.context, paintInfo.rect);
 
     if (m_widget->isFrameView() && paintInfo.overlapTestRequests &&
         !static_cast<FrameView*>(m_widget.get())->useSlowRepaints()) {
