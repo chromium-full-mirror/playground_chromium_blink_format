@@ -236,8 +236,6 @@ class NetscapePluginInstanceProxy
                   data_t& resolvedURLData,
                   mach_msg_type_number_t& resolvedURLLength);
 
-  void didDraw();
-
   // Reply structs
   struct Reply {
     enum Type {
@@ -380,7 +378,6 @@ class NetscapePluginInstanceProxy
   bool m_shouldStopSoon;
   uint32_t m_currentRequestID;
   bool m_inDestroy;
-  bool m_pluginIsWaitingForDraw;
 
   RefPtr<HostedNetscapePluginStream> m_manualStream;
 };
