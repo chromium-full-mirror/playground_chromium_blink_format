@@ -503,6 +503,12 @@ void InspectorBackend::removeDOMStorageItem(long callId,
 }
 #endif
 
+void InspectorBackend::didEvaluateForTestInFrontend(long callId,
+                                                    const String& jsonResult) {
+  if (m_inspectorController)
+    m_inspectorController->didEvaluateForTestInFrontend(callId, jsonResult);
+}
+
 InspectorDOMAgent* InspectorBackend::inspectorDOMAgent() {
   if (!m_inspectorController)
     return 0;

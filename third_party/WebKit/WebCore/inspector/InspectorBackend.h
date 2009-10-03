@@ -171,6 +171,7 @@ class InspectorBackend : public RefCounted<InspectorBackend> {
                          const String& value);
   void removeDOMStorageItem(long callId, long storageId, const String& key);
 #endif
+  void didEvaluateForTestInFrontend(long callId, const String& jsonResult);
 
  private:
   InspectorBackend(InspectorController* inspectorController,
