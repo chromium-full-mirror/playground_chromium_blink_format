@@ -156,9 +156,7 @@ JSArray::JSArray(NonNullPassRefPtr<Structure> structure) : JSObject(structure) {
 
   m_storage = static_cast<ArrayStorage*>(
       fastZeroedMalloc(storageSize(initialCapacity)));
-  m_storage->m_vectorLength = initialCapacity;
-
-  m_fastAccessCutoff = 0;
+  m_vectorLength = initialCapacity;
 
   checkConsistency();
 }
@@ -170,7 +168,7 @@ JSArray::JSArray(NonNullPassRefPtr<Structure> structure, unsigned initialLength)
   m_storage =
       static_cast<ArrayStorage*>(fastMalloc(storageSize(initialCapacity)));
   m_storage->m_length = initialLength;
-  m_storage->m_vectorLength = initialCapacity;
+  m_vectorLength = initialCapacity;
   m_storage->m_numValuesInVector = 0;
   m_storage->m_sparseValueMap = 0;
   m_storage->lazyCreationData = 0;
@@ -178,8 +176,6 @@ JSArray::JSArray(NonNullPassRefPtr<Structure> structure, unsigned initialLength)
   JSValue* vector = m_storage->m_vector;
   for (size_t i = 0; i < initialCapacity; ++i)
     vector[i] = JSValue();
-
-  m_fastAccessCutoff = 0;
 
   checkConsistency();
 
@@ -193,7 +189,7 @@ JSArray::JSArray(NonNullPassRefPtr<Structure> structure, const ArgList& list)
   m_storage =
       static_cast<ArrayStorage*>(fastMalloc(storageSize(initialCapacity)));
   m_storage->m_length = initialCapacity;
-  m_storage->m_vectorLength = initialCapacity;
+  m_vectorLength = initialCapacity;
   m_storage->m_numValuesInVector = initialCapacity;
   m_storage->m_sparseValueMap = 0;
 
@@ -201,8 +197,6 @@ JSArray::JSArray(NonNullPassRefPtr<Structure> structure, const ArgList& list)
   ArgList::const_iterator end = list.end();
   for (ArgList::const_iterator it = list.begin(); it != end; ++it, ++i)
     m_storage->m_vector[i] = *it;
-
-  m_fastAccessCutoff = initialCapacity;
 
   checkConsistency();
 
@@ -227,7 +221,7 @@ bool JSArray::getOwnPropertySlot(ExecState* exec,
     return false;
   }
 
-  if (i < storage->m_vectorLength) {
+  if (i < m_vectorLength) {
     JSValue& valueSlot = storage->m_vector[i];
     if (valueSlot) {
       slot.setValueSlot(&valueSlot);
@@ -275,8 +269,8 @@ bool JSArray::getOwnPropertyDescriptor(ExecState* exec,
   if (isArrayIndex) {
     if (i >= m_storage->m_length)
       return false;
-    if (i < m_storage->m_vectorLength) {
-      JSValue value = m_storage->m_vector[i];
+    if (i < m_vectorLength) {
+      JSValue& value = m_storage->m_vector[i];
       if (value) {
         descriptor.setDescriptor(value, 0);
         return true;
@@ -328,7 +322,7 @@ void JSArray::put(ExecState* exec, unsigned i, JSValue value) {
     m_storage->m_length = length;
   }
 
-  if (i < m_storage->m_vectorLength) {
+  if (i < m_vectorLength) {
     JSValue& valueSlot = m_storage->m_vector[i];
     if (valueSlot) {
       valueSlot = value;
@@ -336,8 +330,7 @@ void JSArray::put(ExecState* exec, unsigned i, JSValue value) {
       return;
     }
     valueSlot = value;
-    if (++m_storage->m_numValuesInVector == m_storage->m_length)
-      m_fastAccessCutoff = m_storage->m_length;
+    ++m_storage->m_numValuesInVector;
     checkConsistency();
     return;
   }
@@ -380,8 +373,7 @@ NEVER_INLINE void JSArray::putSlowCase(ExecState* exec,
     if (increaseVectorLength(i + 1)) {
       storage = m_storage;
       storage->m_vector[i] = value;
-      if (++storage->m_numValuesInVector == storage->m_length)
-        m_fastAccessCutoff = storage->m_length;
+      ++storage->m_numValuesInVector;
       checkConsistency();
     } else
       throwOutOfMemoryError(exec);
@@ -391,7 +383,7 @@ NEVER_INLINE void JSArray::putSlowCase(ExecState* exec,
   // Decide how many values it would be best to move from the map.
   unsigned newNumValuesInVector = storage->m_numValuesInVector + 1;
   unsigned newVectorLength = increasedVectorLength(i + 1);
-  for (unsigned j = max(storage->m_vectorLength, MIN_SPARSE_ARRAY_INDEX);
+  for (unsigned j = max(m_vectorLength, MIN_SPARSE_ARRAY_INDEX);
        j < newVectorLength; ++j)
     newNumValuesInVector += map->contains(j);
   if (i >= MIN_SPARSE_ARRAY_INDEX)
@@ -420,7 +412,7 @@ NEVER_INLINE void JSArray::putSlowCase(ExecState* exec,
     return;
   }
 
-  unsigned vectorLength = storage->m_vectorLength;
+  unsigned vectorLength = m_vectorLength;
 
   Heap::heap(this)->reportExtraMemoryCost(storageSize(newVectorLength) -
                                           storageSize(vectorLength));
@@ -441,7 +433,7 @@ NEVER_INLINE void JSArray::putSlowCase(ExecState* exec,
 
   storage->m_vector[i] = value;
 
-  storage->m_vectorLength = newVectorLength;
+  m_vectorLength = newVectorLength;
   storage->m_numValuesInVector = newNumValuesInVector;
 
   m_storage = storage;
@@ -466,7 +458,7 @@ bool JSArray::deleteProperty(ExecState* exec, unsigned i) {
 
   ArrayStorage* storage = m_storage;
 
-  if (i < storage->m_vectorLength) {
+  if (i < m_vectorLength) {
     JSValue& valueSlot = storage->m_vector[i];
     if (!valueSlot) {
       checkConsistency();
@@ -474,8 +466,6 @@ bool JSArray::deleteProperty(ExecState* exec, unsigned i) {
     }
     valueSlot = JSValue();
     --storage->m_numValuesInVector;
-    if (m_fastAccessCutoff > i)
-      m_fastAccessCutoff = i;
     checkConsistency();
     return true;
   }
@@ -507,7 +497,7 @@ void JSArray::getOwnPropertyNames(ExecState* exec,
 
   ArrayStorage* storage = m_storage;
 
-  unsigned usedVectorLength = min(storage->m_length, storage->m_vectorLength);
+  unsigned usedVectorLength = min(storage->m_length, m_vectorLength);
   for (unsigned i = 0; i < usedVectorLength; ++i) {
     if (storage->m_vector[i])
       propertyNames.add(Identifier::from(exec, i));
@@ -530,7 +520,7 @@ bool JSArray::increaseVectorLength(unsigned newLength) {
 
   ArrayStorage* storage = m_storage;
 
-  unsigned vectorLength = storage->m_vectorLength;
+  unsigned vectorLength = m_vectorLength;
   ASSERT(newLength > vectorLength);
   ASSERT(newLength <= MAX_STORAGE_VECTOR_INDEX);
   unsigned newVectorLength = increasedVectorLength(newLength);
@@ -540,7 +530,7 @@ bool JSArray::increaseVectorLength(unsigned newLength) {
 
   Heap::heap(this)->reportExtraMemoryCost(storageSize(newVectorLength) -
                                           storageSize(vectorLength));
-  storage->m_vectorLength = newVectorLength;
+  m_vectorLength = newVectorLength;
 
   for (unsigned i = vectorLength; i < newVectorLength; ++i)
     storage->m_vector[i] = JSValue();
@@ -557,10 +547,7 @@ void JSArray::setLength(unsigned newLength) {
   unsigned length = m_storage->m_length;
 
   if (newLength < length) {
-    if (m_fastAccessCutoff > newLength)
-      m_fastAccessCutoff = newLength;
-
-    unsigned usedVectorLength = min(length, storage->m_vectorLength);
+    unsigned usedVectorLength = min(length, m_vectorLength);
     for (unsigned i = newLength; i < usedVectorLength; ++i) {
       JSValue& valueSlot = storage->m_vector[i];
       bool hadValue = valueSlot;
@@ -598,20 +585,13 @@ JSValue JSArray::pop() {
 
   JSValue result;
 
-  if (m_fastAccessCutoff > length) {
+  if (length < m_vectorLength) {
     JSValue& valueSlot = m_storage->m_vector[length];
-    result = valueSlot;
-    ASSERT(result);
-    valueSlot = JSValue();
-    --m_storage->m_numValuesInVector;
-    m_fastAccessCutoff = length;
-  } else if (length < m_storage->m_vectorLength) {
-    JSValue& valueSlot = m_storage->m_vector[length];
-    result = valueSlot;
-    valueSlot = JSValue();
-    if (result)
+    if (valueSlot) {
       --m_storage->m_numValuesInVector;
-    else
+      result = valueSlot;
+      valueSlot = JSValue();
+    } else
       result = jsUndefined();
   } else {
     result = jsUndefined();
@@ -638,11 +618,10 @@ JSValue JSArray::pop() {
 void JSArray::push(ExecState* exec, JSValue value) {
   checkConsistency();
 
-  if (m_storage->m_length < m_storage->m_vectorLength) {
-    ASSERT(!m_storage->m_vector[m_storage->m_length]);
+  if (m_storage->m_length < m_vectorLength) {
     m_storage->m_vector[m_storage->m_length] = value;
-    if (++m_storage->m_numValuesInVector == ++m_storage->m_length)
-      m_fastAccessCutoff = m_storage->m_length;
+    ++m_storage->m_numValuesInVector;
+    ++m_storage->m_length;
     checkConsistency();
     return;
   }
@@ -652,8 +631,8 @@ void JSArray::push(ExecState* exec, JSValue value) {
     if (!map || map->isEmpty()) {
       if (increaseVectorLength(m_storage->m_length + 1)) {
         m_storage->m_vector[m_storage->m_length] = value;
-        if (++m_storage->m_numValuesInVector == ++m_storage->m_length)
-          m_fastAccessCutoff = m_storage->m_length;
+        ++m_storage->m_numValuesInVector;
+        ++m_storage->m_length;
         checkConsistency();
         return;
       }
@@ -898,8 +877,7 @@ void JSArray::sort(ExecState* exec,
   if (!m_storage->m_length)
     return;
 
-  unsigned usedVectorLength =
-      min(m_storage->m_length, m_storage->m_vectorLength);
+  unsigned usedVectorLength = min(m_storage->m_length, m_vectorLength);
 
   AVLTree<AVLTreeAbstractorForArrayCompare, 44>
       tree;  // Depth 44 is enough for 2^31 items
@@ -954,7 +932,7 @@ void JSArray::sort(ExecState* exec,
 
   if (SparseArrayValueMap* map = m_storage->m_sparseValueMap) {
     newUsedVectorLength += map->size();
-    if (newUsedVectorLength > m_storage->m_vectorLength) {
+    if (newUsedVectorLength > m_vectorLength) {
       // Check that it is possible to allocate an array large enough to hold all
       // the entries.
       if ((newUsedVectorLength > MAX_STORAGE_VECTOR_LENGTH) ||
@@ -997,17 +975,22 @@ void JSArray::sort(ExecState* exec,
   for (unsigned i = newUsedVectorLength; i < usedVectorLength; ++i)
     m_storage->m_vector[i] = JSValue();
 
-  m_fastAccessCutoff = newUsedVectorLength;
   m_storage->m_numValuesInVector = newUsedVectorLength;
 
   checkConsistency(SortConsistencyCheck);
 }
 
 void JSArray::fillArgList(ExecState* exec, MarkedArgumentBuffer& args) {
-  unsigned fastAccessLength = min(m_storage->m_length, m_fastAccessCutoff);
+  JSValue* vector = m_storage->m_vector;
+  unsigned vectorEnd = min(m_storage->m_length, m_vectorLength);
   unsigned i = 0;
-  for (; i < fastAccessLength; ++i)
-    args.append(getIndex(i));
+  for (; i < vectorEnd; ++i) {
+    JSValue& v = vector[i];
+    if (!v)
+      break;
+    args.append(v);
+  }
+
   for (; i < m_storage->m_length; ++i)
     args.append(get(exec, i));
 }
@@ -1017,12 +1000,17 @@ void JSArray::copyToRegisters(ExecState* exec,
                               uint32_t maxSize) {
   ASSERT(m_storage->m_length == maxSize);
   UNUSED_PARAM(maxSize);
-  unsigned fastAccessLength = min(m_storage->m_length, m_fastAccessCutoff);
+  JSValue* vector = m_storage->m_vector;
+  unsigned vectorEnd = min(m_storage->m_length, m_vectorLength);
   unsigned i = 0;
-  for (; i < fastAccessLength; ++i)
-    buffer[i] = getIndex(i);
-  uint32_t size = m_storage->m_length;
-  for (; i < size; ++i)
+  for (; i < vectorEnd; ++i) {
+    JSValue& v = vector[i];
+    if (!v)
+      break;
+    buffer[i] = v;
+  }
+
+  for (; i < m_storage->m_length; ++i)
     buffer[i] = get(exec, i);
 }
 
@@ -1031,7 +1019,7 @@ unsigned JSArray::compactForSorting() {
 
   ArrayStorage* storage = m_storage;
 
-  unsigned usedVectorLength = min(m_storage->m_length, storage->m_vectorLength);
+  unsigned usedVectorLength = min(m_storage->m_length, m_vectorLength);
 
   unsigned numDefined = 0;
   unsigned numUndefined = 0;
@@ -1055,7 +1043,7 @@ unsigned JSArray::compactForSorting() {
 
   if (SparseArrayValueMap* map = storage->m_sparseValueMap) {
     newUsedVectorLength += map->size();
-    if (newUsedVectorLength > storage->m_vectorLength) {
+    if (newUsedVectorLength > m_vectorLength) {
       // Check that it is possible to allocate an array large enough to hold all
       // the entries - if not,
       // exception is thrown by caller.
@@ -1078,7 +1066,6 @@ unsigned JSArray::compactForSorting() {
   for (unsigned i = newUsedVectorLength; i < usedVectorLength; ++i)
     storage->m_vector[i] = JSValue();
 
-  m_fastAccessCutoff = newUsedVectorLength;
   storage->m_numValuesInVector = newUsedVectorLength;
 
   checkConsistency(SortConsistencyCheck);
@@ -1101,23 +1088,20 @@ void JSArray::checkConsistency(ConsistencyCheckType type) {
   if (type == SortConsistencyCheck)
     ASSERT(!m_storage->m_sparseValueMap);
 
-  ASSERT(m_fastAccessCutoff <= m_storage->m_length);
-  ASSERT(m_fastAccessCutoff <= m_storage->m_numValuesInVector);
-
   unsigned numValuesInVector = 0;
-  for (unsigned i = 0; i < m_storage->m_vectorLength; ++i) {
+  for (unsigned i = 0; i < m_vectorLength; ++i) {
     if (JSValue value = m_storage->m_vector[i]) {
       ASSERT(i < m_storage->m_length);
       if (type != DestructorConsistencyCheck)
         value->type();  // Likely to crash if the object was deallocated.
       ++numValuesInVector;
     } else {
-      ASSERT(i >= m_fastAccessCutoff);
       if (type == SortConsistencyCheck)
         ASSERT(i >= m_storage->m_numValuesInVector);
     }
   }
   ASSERT(numValuesInVector == m_storage->m_numValuesInVector);
+  ASSERT(numValuesInVector <= m_storage->m_length);
 
   if (m_storage->m_sparseValueMap) {
     SparseArrayValueMap::iterator end = m_storage->m_sparseValueMap->end();
@@ -1126,7 +1110,7 @@ void JSArray::checkConsistency(ConsistencyCheckType type) {
          it != end; ++it) {
       unsigned index = it->first;
       ASSERT(index < m_storage->m_length);
-      ASSERT(index >= m_storage->m_vectorLength);
+      ASSERT(index >= m_vectorLength);
       ASSERT(index <= MAX_ARRAY_INDEX);
       ASSERT(it->second);
       if (type != DestructorConsistencyCheck)
