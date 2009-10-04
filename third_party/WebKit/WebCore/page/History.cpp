@@ -44,7 +44,9 @@ void History::disconnectFrame() {
 unsigned History::length() const {
   if (!m_frame)
     return 0;
-  return m_frame->loader()->getHistoryLength();
+  if (!m_frame->page())
+    return 0;
+  return m_frame->page()->getHistoryLength();
 }
 
 void History::back() {
