@@ -117,6 +117,7 @@
 #define WebKitAcceleratedCompositingEnabledPreferenceKey \
   @"WebKitAcceleratedCompositingEnabled"
 #define WebKitWebGLEnabledPreferenceKey @"WebKitWebGLEnabled"
+#define WebKitPluginHalterEnabledPreferenceKey @"WebKitPluginHalterEnabled"
 
 // These are private both because callers should be using the cover methods and
 // because the
