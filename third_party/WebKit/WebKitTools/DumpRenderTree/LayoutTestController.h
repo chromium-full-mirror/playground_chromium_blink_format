@@ -281,6 +281,10 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
   }
   bool geolocationPermission() const { return m_geolocationPermission; }
 
+  void showWebInspector();
+  void closeWebInspector();
+  void evaluateInWebInspector(long callId, JSStringRef script);
+
  private:
   bool m_dumpAsPDF;
   bool m_dumpAsText;

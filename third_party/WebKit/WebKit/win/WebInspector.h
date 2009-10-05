@@ -34,7 +34,9 @@
 
 class WebView;
 
-class WebInspector : public IWebInspector, public Noncopyable {
+class WebInspector : public IWebInspector,
+                     public IWebInspectorPrivate,
+                     public Noncopyable {
  public:
   static WebInspector* createInstance(WebView*);
 
@@ -60,6 +62,9 @@ class WebInspector : public IWebInspector, public Noncopyable {
   virtual HRESULT STDMETHODCALLTYPE
   isJavaScriptProfilingEnabled(BOOL* isProfilingEnabled);
   virtual HRESULT STDMETHODCALLTYPE setJavaScriptProfilingEnabled(BOOL);
+
+  virtual HRESULT STDMETHODCALLTYPE evaluateInFrontend(ULONG callId,
+                                                       BSTR script);
 
  private:
   WebInspector(WebView*);

@@ -1359,6 +1359,48 @@ static JSValueRef setStopProvisionalFrameLoadsCallback(
   return JSValueMakeUndefined(context);
 }
 
+static JSValueRef showWebInspectorCallback(JSContextRef context,
+                                           JSObjectRef function,
+                                           JSObjectRef thisObject,
+                                           size_t argumentCount,
+                                           const JSValueRef arguments[],
+                                           JSValueRef* exception) {
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->showWebInspector();
+  return JSValueMakeUndefined(context);
+}
+
+static JSValueRef closeWebInspectorCallback(JSContextRef context,
+                                            JSObjectRef function,
+                                            JSObjectRef thisObject,
+                                            size_t argumentCount,
+                                            const JSValueRef arguments[],
+                                            JSValueRef* exception) {
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->closeWebInspector();
+  return JSValueMakeUndefined(context);
+}
+
+static JSValueRef evaluateInWebInspectorCallback(JSContextRef context,
+                                                 JSObjectRef function,
+                                                 JSObjectRef thisObject,
+                                                 size_t argumentCount,
+                                                 const JSValueRef arguments[],
+                                                 JSValueRef* exception) {
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  double callId = JSValueToNumber(context, arguments[0], exception);
+  ASSERT(!*exception);
+  JSRetainPtr<JSStringRef> script(
+      Adopt, JSValueToStringCopy(context, arguments[1], exception));
+  ASSERT(!*exception);
+
+  controller->evaluateInWebInspector(static_cast<long>(callId), script.get());
+  return JSValueMakeUndefined(context);
+}
+
 static JSValueRef elementDoesAutoCompleteForElementWithIdCallback(
     JSContextRef context,
     JSObjectRef function,
@@ -1642,6 +1684,8 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"clearPersistentUserStyleSheet", clearPersistentUserStyleSheetCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"closeWebInspector", closeWebInspectorCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"decodeHostName", decodeHostNameCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"disableImageLoading", disableImageLoadingCallback,
@@ -1684,6 +1728,8 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
        elementDoesAutoCompleteForElementWithIdCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"encodeHostName", encodeHostNameCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"evaluateInWebInspector", evaluateInWebInspectorCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"execCommand", execCommandCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
@@ -1793,6 +1839,8 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
        setWillSendRequestReturnsNullOnRedirectCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setWindowIsKey", setWindowIsKeyCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"showWebInspector", showWebInspectorCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"testOnscreen", testOnscreenCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
