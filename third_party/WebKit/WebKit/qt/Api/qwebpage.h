@@ -56,6 +56,7 @@ class FrameLoaderClientQt;
 class InspectorClientQt;
 class ResourceHandle;
 class HitTestResult;
+class QNetworkReplyHandler;
 
 struct FrameLoadRequest;
 }
@@ -347,6 +348,8 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
   void saveFrameStateRequested(QWebFrame* frame, QWebHistoryItem* item);
   void restoreFrameStateRequested(QWebFrame* frame);
 
+  void networkRequestStarted(QWebFrame* frame, QNetworkRequest* request);
+
  protected:
   virtual QWebPage* createWindow(WebWindowType type);
   virtual QObject* createPlugin(const QString& classid,
@@ -395,6 +398,7 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
   friend class WebCore::FrameLoaderClientQt;
   friend class WebCore::InspectorClientQt;
   friend class WebCore::ResourceHandle;
+  friend class WebCore::QNetworkReplyHandler;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QWebPage::FindFlags)
