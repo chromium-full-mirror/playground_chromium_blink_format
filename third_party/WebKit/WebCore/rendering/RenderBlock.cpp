@@ -860,8 +860,9 @@ void RenderBlock::layoutBlock(bool relayoutChildren) {
   if (!didFullRepaint && repaintTop != repaintBottom &&
       (style()->visibility() == VISIBLE ||
        enclosingLayer()->hasVisibleContent())) {
-    IntRect repaintRect(leftVisibleOverflow(), repaintTop,
-                        rightVisibleOverflow() - leftVisibleOverflow(),
+    int repaintLeft = min(leftVisualOverflow(), leftLayoutOverflow());
+    int repaintRight = max(rightVisualOverflow(), rightLayoutOverflow());
+    IntRect repaintRect(repaintLeft, repaintTop, repaintRight - repaintLeft,
                         repaintBottom - repaintTop);
 
     // FIXME: Deal with multiple column repainting.  We have to split the
