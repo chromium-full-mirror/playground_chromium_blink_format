@@ -87,7 +87,7 @@ void InspectorFrontend::addMessageToConsole(
   } else if (!wrappedArguments.isEmpty()) {
     for (unsigned i = 0; i < wrappedArguments.size(); ++i)
       function->appendArgument(
-          m_inspectorController->wrapObject(wrappedArguments[i]));
+          m_inspectorController->wrapObject(wrappedArguments[i], "console"));
   } else
     function->appendArgument(message);
   function->call();
