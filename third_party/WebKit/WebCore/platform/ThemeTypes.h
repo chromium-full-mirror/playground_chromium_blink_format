@@ -53,6 +53,7 @@ enum ControlPart {
   ButtonPart,
   ButtonBevelPart,
   DefaultButtonPart,
+  ListButtonPart,
   ListboxPart,
   ListItemPart,
   MediaFullscreenButtonPart,
