@@ -587,6 +587,15 @@ static PassRefPtr<CSSValue> fillRepeatToCSSValue(EFillRepeat xRepeat,
   return list.release();
 }
 
+static void logUnimplementedPropertyID(int propertyID) {
+  DEFINE_STATIC_LOCAL(HashSet<int>, propertyIDSet, ());
+  if (!propertyIDSet.add(propertyID).second)
+    return;
+
+  LOG_ERROR("WebKit does not yet implement getComputedStyle for '%s'.",
+            getPropertyName(static_cast<CSSPropertyID>(propertyID)));
+}
+
 PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
     int propertyID,
     EUpdateLayout updateLayout) const {
@@ -1470,7 +1479,7 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
 #endif
   }
 
-  LOG_ERROR("unimplemented propertyID: %d", propertyID);
+  logUnimplementedPropertyID(propertyID);
   return 0;
 }
 
