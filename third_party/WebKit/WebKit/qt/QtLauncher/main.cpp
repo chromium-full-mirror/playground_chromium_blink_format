@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2009 Nokia Corporation and/or its subsidiary(-ies)
+ * Copyright (C) 2009 Girish Ramakrishnan <girish@forwardbias.in>
  * Copyright (C) 2006 George Staikos <staikos@kde.org>
  * Copyright (C) 2006 Dirk Mueller <mueller@kde.org>
  * Copyright (C) 2006 Zack Rusin <zack@kde.org>
@@ -207,6 +208,21 @@ class MainWindow : public QMainWindow {
 #endif
   }
 
+  void screenshot() {
+    QPixmap pixmap = QPixmap::grabWidget(view);
+    QLabel* label = new QLabel;
+    label->setAttribute(Qt::WA_DeleteOnClose);
+    label->setWindowTitle("Screenshot - Preview");
+    label->setPixmap(pixmap);
+    label->show();
+
+    QString fileName = QFileDialog::getSaveFileName(label, "Screenshot");
+    if (!fileName.isEmpty()) {
+      pixmap.save(fileName, "png");
+      label->setWindowTitle(QString("Screenshot - Saved at %1").arg(fileName));
+    }
+  }
+
   void setEditable(bool on) {
     view->page()->setContentEditable(on);
     formatMenuAction->setVisible(on);
@@ -277,6 +293,8 @@ class MainWindow : public QMainWindow {
 #if QT_VERSION >= 0x040400
     fileMenu->addAction(tr("Print"), this, SLOT(print()));
 #endif
+    QAction* screenshot =
+        fileMenu->addAction("Screenshot", this, SLOT(screenshot()));
     fileMenu->addAction("Close", this, SLOT(close()));
 
     QMenu* editMenu = menuBar()->addMenu("&Edit");
@@ -320,6 +338,7 @@ class MainWindow : public QMainWindow {
         view->pageAction(QWebPage::SetTextDirectionRightToLeft));
 
     newWindow->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_N));
+    screenshot->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_S));
     view->pageAction(QWebPage::Back)->setShortcut(QKeySequence::Back);
     view->pageAction(QWebPage::Stop)->setShortcut(Qt::Key_Escape);
     view->pageAction(QWebPage::Forward)->setShortcut(QKeySequence::Forward);
