@@ -63,7 +63,7 @@ class ImageData;
 class WebKitCSSMatrix;
 
 // FIXME: ideally this would be used on all platforms.
-#if PLATFORM(SKIA)
+#if PLATFORM(CHROMIUM)
 class GraphicsContext3DInternal;
 #endif
 
@@ -79,7 +79,7 @@ class GraphicsContext3D : Noncopyable {
     return m_contextObj;
   }
   Platform3DObject platformTexture() const { return m_texture; }
-#elif PLATFORM(SKIA)
+#elif PLATFORM(CHROMIUM)
   PlatformGraphicsContext3D platformGraphicsContext3D() const;
   Platform3DObject platformTexture() const;
 #else
@@ -440,7 +440,7 @@ class GraphicsContext3D : Noncopyable {
 #endif
 
 // FIXME: ideally this would be used on all platforms.
-#if PLATFORM(SKIA)
+#if PLATFORM(CHROMIUM)
   friend class GraphicsContext3DInternal;
   OwnPtr<GraphicsContext3DInternal> m_internal;
 #endif
