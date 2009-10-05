@@ -49,6 +49,8 @@ class QGraphicsWebViewPrivate : public QWebPageClient {
   virtual int screenNumber() const;
   virtual WId winId() const;
 
+  virtual QObject* pluginParent() const;
+
   void _q_doLoadProgress(int progress);
   void _q_doLoadFinished(bool success);
   void _q_setStatusBarMessage(const QString& message);
@@ -119,6 +121,10 @@ WId QGraphicsWebViewPrivate::winId() const {
     return views.at(0)->winId();
 
   return 0;
+}
+
+QObject* QGraphicsWebViewPrivate::pluginParent() const {
+  return q;
 }
 
 void QGraphicsWebViewPrivate::_q_setStatusBarMessage(const QString& s) {
