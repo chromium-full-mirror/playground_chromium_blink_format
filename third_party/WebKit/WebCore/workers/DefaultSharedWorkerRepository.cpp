@@ -379,6 +379,11 @@ void DefaultSharedWorkerRepository::workerScriptLoaded(
   proxy.thread()->runLoop().postTask(SharedWorkerConnectTask::create(port));
 }
 
+bool SharedWorkerRepository::isAvailable() {
+  // SharedWorkers are enabled on the default WebKit platform.
+  return true;
+}
+
 void SharedWorkerRepository::connect(PassRefPtr<SharedWorker> worker,
                                      PassOwnPtr<MessagePortChannel> port,
                                      const KURL& url,
