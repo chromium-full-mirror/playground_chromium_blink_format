@@ -31,6 +31,7 @@
 
 #import "WebNetscapePluginPackage.h"
 #import "WebPluginContainerCheck.h"
+#import <wtf/OwnPtr.h>
 #import <wtf/PassRefPtr.h>
 #import <wtf/RefPtr.h>
 #import <wtf/RetainPtr.h>
@@ -44,6 +45,8 @@ namespace WebCore {
 class CString;
 class HTMLPlugInElement;
 }
+
+class WebHaltablePlugin;
 
 @interface WebBaseNetscapePluginView : NSView {
   RetainPtr<WebNetscapePluginPackage> _pluginPackage;
@@ -63,6 +66,8 @@ class HTMLPlugInElement;
   RetainPtr<NSString> _MIMEType;
   RetainPtr<NSURL> _baseURL;
   RetainPtr<NSURL> _sourceURL;
+
+  OwnPtr<WebHaltablePlugin> _haltable;
 
   NSTrackingRectTag _trackingTag;
 }
@@ -100,6 +105,7 @@ class HTMLPlugInElement;
 - (void)startTimers;
 - (void)restartTimers;
 
+- (void)start;
 - (void)stop;
 
 - (void)addWindowObservers;
