@@ -409,9 +409,12 @@ PassRefPtr<CSSMutableStyleDeclaration> editingStyleAtPosition(
     ShouldIncludeTypingStyle shouldIncludeTypingStyle) {
   RefPtr<CSSComputedStyleDeclaration> computedStyleAtPosition =
       pos.computedStyle();
-  RefPtr<CSSMutableStyleDeclaration> style =
-      computedStyleAtPosition->copyPropertiesInSet(editingStyleProperties,
-                                                   numEditingStyleProperties);
+  RefPtr<CSSMutableStyleDeclaration> style;
+  if (!computedStyleAtPosition)
+    style = CSSMutableStyleDeclaration::create();
+  else
+    style = computedStyleAtPosition->copyPropertiesInSet(
+        editingStyleProperties, numEditingStyleProperties);
 
   if (style && pos.node() && pos.node()->computedStyle()) {
     RenderStyle* renderStyle = pos.node()->computedStyle();
