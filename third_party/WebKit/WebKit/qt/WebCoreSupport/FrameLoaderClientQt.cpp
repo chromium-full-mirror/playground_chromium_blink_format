@@ -838,6 +838,7 @@ void FrameLoaderClientQt::callErrorPageExtension(
       return;
 
     option.url = QUrl(error.failingURL());
+    option.frame = m_webFrame;
     option.error = error.errorCode();
     option.errorString = error.localizedDescription();
 

@@ -285,6 +285,7 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
   class ErrorPageExtensionOption : public ExtensionOption {
    public:
     QUrl url;
+    QWebFrame* frame;
     ErrorDomain domain;
     int error;
     QString errorString;
