@@ -381,6 +381,8 @@ class PluginView : public Widget,
 #if defined(Q_WS_X11)
   bool m_hasPendingGeometryChange;
   Pixmap m_drawable;
+  Visual* m_visual;
+  Colormap m_colormap;
   Display* m_pluginDisplay;
 
   void initXEvent(XEvent* event);

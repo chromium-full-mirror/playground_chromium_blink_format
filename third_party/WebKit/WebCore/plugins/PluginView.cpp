@@ -857,6 +857,8 @@ PluginView::PluginView(Frame* parentFrame,
       ,
       m_hasPendingGeometryChange(false),
       m_drawable(0),
+      m_visual(0),
+      m_colormap(0),
       m_pluginDisplay(0)
 #endif
       ,
