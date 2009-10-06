@@ -129,7 +129,7 @@ enum {
 - (void)webView:(WebView*)sender
     saveFrameView:(WebFrameView*)frameView
      showingPanel:(BOOL)showingPanel;
-
+- (BOOL)webView:(WebView*)sender shouldHaltPlugin:(DOMNode*)pluginNode;
 /*!
     @method webView:frame:exceededDatabaseQuotaForSecurityOrigin:database:
     @param sender The WebView sending the delegate method.
