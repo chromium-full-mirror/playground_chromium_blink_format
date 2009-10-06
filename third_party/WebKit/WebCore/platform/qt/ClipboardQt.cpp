@@ -227,8 +227,6 @@ void ClipboardQt::declareAndWriteDragImage(Element* element,
                                            const String& title,
                                            Frame* frame) {
   ASSERT(frame);
-  Q_UNUSED(url);
-  Q_UNUSED(title);
 
   // WebCore::writeURL(m_writableDataObject.get(), url, title, true, false);
   if (!m_writableData)
@@ -250,8 +248,10 @@ void ClipboardQt::declareAndWriteDragImage(Element* element,
     return;
 
   QList<QUrl> urls;
+  urls.append(url);
   urls.append(fullURL);
 
+  m_writableData->setText(title);
   m_writableData->setUrls(urls);
 #ifndef QT_NO_CLIPBOARD
   if (!isForDragging())
