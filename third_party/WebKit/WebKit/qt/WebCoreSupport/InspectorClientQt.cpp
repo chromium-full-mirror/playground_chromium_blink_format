@@ -79,9 +79,6 @@ void InspectorClientQt::inspectorDestroyed() {
 }
 
 Page* InspectorClientQt::createPage() {
-  if (m_inspectorView)
-    return m_inspectorView->page()->d->page;
-
   QWebView* inspectorView = new QWebView;
   InspectorClientWebPage* inspectorPage =
       new InspectorClientWebPage(inspectorView);
