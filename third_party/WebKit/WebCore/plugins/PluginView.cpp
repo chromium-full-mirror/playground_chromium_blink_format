@@ -856,6 +856,7 @@ PluginView::PluginView(Frame* parentFrame,
 #if defined(Q_WS_X11)
       ,
       m_hasPendingGeometryChange(false),
+      m_drawable(0),
       m_pluginDisplay(0)
 #endif
       ,
