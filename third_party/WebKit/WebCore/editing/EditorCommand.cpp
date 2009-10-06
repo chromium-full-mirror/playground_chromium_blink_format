@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2006, 2007, 2008 Apple Inc. All rights reserved.
  * Copyright (C) 2008 Nokia Corporation and/or its subsidiary(-ies)
+ * Copyright (C) 2009 Igalia S.L.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -1514,6 +1515,22 @@ static bool enabledVisibleSelection(Frame* frame,
          selection.isRange();
 }
 
+static bool caretBrowsingEnabled(Frame* frame) {
+  return frame->settings() && frame->settings()->caretBrowsingEnabled();
+}
+
+static EditorCommandSource dummyEditorCommandSource =
+    static_cast<EditorCommandSource>(0);
+
+static bool enabledVisibleSelectionOrCaretBrowsing(Frame* frame,
+                                                   Event* event,
+                                                   EditorCommandSource) {
+  // The EditorCommandSource parameter is unused in enabledVisibleSelection, so
+  // just pass a dummy variable
+  return caretBrowsingEnabled(frame) ||
+         enabledVisibleSelection(frame, event, dummyEditorCommandSource);
+}
+
 static bool enabledVisibleSelectionAndMark(Frame* frame,
                                            Event* event,
                                            EditorCommandSource) {
@@ -1563,6 +1580,15 @@ static bool enabledInEditableText(Frame* frame,
                                   Event* event,
                                   EditorCommandSource) {
   return frame->editor()->selectionForCommand(event).isContentEditable();
+}
+
+static bool enabledInEditableTextOrCaretBrowsing(Frame* frame,
+                                                 Event* event,
+                                                 EditorCommandSource) {
+  // The EditorCommandSource parameter is unused in enabledInEditableText, so
+  // just pass a dummy variable
+  return caretBrowsingEnabled(frame) ||
+         enabledInEditableText(frame, event, dummyEditorCommandSource);
 }
 
 static bool enabledInRichlyEditableText(Frame* frame,
@@ -1885,13 +1911,13 @@ static const CommandMap& createCommandMap() {
         enabledVisibleSelection, stateNone, valueNull, notTextInsertion,
         doNotAllowExecutionWhenDisabled}},
       {"MoveDown",
-       {executeMoveDown, supportedFromMenuOrKeyBinding, enabledInEditableText,
-        stateNone, valueNull, notTextInsertion,
-        doNotAllowExecutionWhenDisabled}},
+       {executeMoveDown, supportedFromMenuOrKeyBinding,
+        enabledInEditableTextOrCaretBrowsing, stateNone, valueNull,
+        notTextInsertion, doNotAllowExecutionWhenDisabled}},
       {"MoveDownAndModifySelection",
        {executeMoveDownAndModifySelection, supportedFromMenuOrKeyBinding,
-        enabledVisibleSelection, stateNone, valueNull, notTextInsertion,
-        doNotAllowExecutionWhenDisabled}},
+        enabledVisibleSelectionOrCaretBrowsing, stateNone, valueNull,
+        notTextInsertion, doNotAllowExecutionWhenDisabled}},
       {"MoveForward",
        {executeMoveForward, supportedFromMenuOrKeyBinding,
         enabledInEditableText, stateNone, valueNull, notTextInsertion,
@@ -1901,13 +1927,13 @@ static const CommandMap& createCommandMap() {
         enabledVisibleSelection, stateNone, valueNull, notTextInsertion,
         doNotAllowExecutionWhenDisabled}},
       {"MoveLeft",
-       {executeMoveLeft, supportedFromMenuOrKeyBinding, enabledInEditableText,
-        stateNone, valueNull, notTextInsertion,
-        doNotAllowExecutionWhenDisabled}},
+       {executeMoveLeft, supportedFromMenuOrKeyBinding,
+        enabledInEditableTextOrCaretBrowsing, stateNone, valueNull,
+        notTextInsertion, doNotAllowExecutionWhenDisabled}},
       {"MoveLeftAndModifySelection",
        {executeMoveLeftAndModifySelection, supportedFromMenuOrKeyBinding,
-        enabledVisibleSelection, stateNone, valueNull, notTextInsertion,
-        doNotAllowExecutionWhenDisabled}},
+        enabledVisibleSelectionOrCaretBrowsing, stateNone, valueNull,
+        notTextInsertion, doNotAllowExecutionWhenDisabled}},
       {"MovePageDown",
        {executeMovePageDown, supportedFromMenuOrKeyBinding,
         enabledInEditableText, stateNone, valueNull, notTextInsertion,
@@ -1926,20 +1952,22 @@ static const CommandMap& createCommandMap() {
         doNotAllowExecutionWhenDisabled}},
       {"MoveParagraphBackwardAndModifySelection",
        {executeMoveParagraphBackwardAndModifySelection,
-        supportedFromMenuOrKeyBinding, enabledVisibleSelection, stateNone,
-        valueNull, notTextInsertion, doNotAllowExecutionWhenDisabled}},
-      {"MoveParagraphForwardAndModifySelection",
-       {executeMoveParagraphForwardAndModifySelection,
-        supportedFromMenuOrKeyBinding, enabledVisibleSelection, stateNone,
-        valueNull, notTextInsertion, doNotAllowExecutionWhenDisabled}},
-      {"MoveRight",
-       {executeMoveRight, supportedFromMenuOrKeyBinding, enabledInEditableText,
+        supportedFromMenuOrKeyBinding, enabledVisibleSelectionOrCaretBrowsing,
         stateNone, valueNull, notTextInsertion,
         doNotAllowExecutionWhenDisabled}},
+      {"MoveParagraphForwardAndModifySelection",
+       {executeMoveParagraphForwardAndModifySelection,
+        supportedFromMenuOrKeyBinding, enabledVisibleSelectionOrCaretBrowsing,
+        stateNone, valueNull, notTextInsertion,
+        doNotAllowExecutionWhenDisabled}},
+      {"MoveRight",
+       {executeMoveRight, supportedFromMenuOrKeyBinding,
+        enabledInEditableTextOrCaretBrowsing, stateNone, valueNull,
+        notTextInsertion, doNotAllowExecutionWhenDisabled}},
       {"MoveRightAndModifySelection",
        {executeMoveRightAndModifySelection, supportedFromMenuOrKeyBinding,
-        enabledVisibleSelection, stateNone, valueNull, notTextInsertion,
-        doNotAllowExecutionWhenDisabled}},
+        enabledVisibleSelectionOrCaretBrowsing, stateNone, valueNull,
+        notTextInsertion, doNotAllowExecutionWhenDisabled}},
       {"MoveToBeginningOfDocument",
        {executeMoveToBeginningOfDocument, supportedFromMenuOrKeyBinding,
         enabledInEditableText, stateNone, valueNull, notTextInsertion,
@@ -2021,13 +2049,13 @@ static const CommandMap& createCommandMap() {
         supportedFromMenuOrKeyBinding, enabledInEditableText, stateNone,
         valueNull, notTextInsertion, doNotAllowExecutionWhenDisabled}},
       {"MoveUp",
-       {executeMoveUp, supportedFromMenuOrKeyBinding, enabledInEditableText,
-        stateNone, valueNull, notTextInsertion,
-        doNotAllowExecutionWhenDisabled}},
+       {executeMoveUp, supportedFromMenuOrKeyBinding,
+        enabledInEditableTextOrCaretBrowsing, stateNone, valueNull,
+        notTextInsertion, doNotAllowExecutionWhenDisabled}},
       {"MoveUpAndModifySelection",
        {executeMoveUpAndModifySelection, supportedFromMenuOrKeyBinding,
-        enabledVisibleSelection, stateNone, valueNull, notTextInsertion,
-        doNotAllowExecutionWhenDisabled}},
+        enabledVisibleSelectionOrCaretBrowsing, stateNone, valueNull,
+        notTextInsertion, doNotAllowExecutionWhenDisabled}},
       {"MoveWordBackward",
        {executeMoveWordBackward, supportedFromMenuOrKeyBinding,
         enabledInEditableText, stateNone, valueNull, notTextInsertion,
@@ -2046,20 +2074,20 @@ static const CommandMap& createCommandMap() {
         doNotAllowExecutionWhenDisabled}},
       {"MoveWordLeft",
        {executeMoveWordLeft, supportedFromMenuOrKeyBinding,
-        enabledInEditableText, stateNone, valueNull, notTextInsertion,
-        doNotAllowExecutionWhenDisabled}},
+        enabledInEditableTextOrCaretBrowsing, stateNone, valueNull,
+        notTextInsertion, doNotAllowExecutionWhenDisabled}},
       {"MoveWordLeftAndModifySelection",
        {executeMoveWordLeftAndModifySelection, supportedFromMenuOrKeyBinding,
-        enabledVisibleSelection, stateNone, valueNull, notTextInsertion,
-        doNotAllowExecutionWhenDisabled}},
+        enabledVisibleSelectionOrCaretBrowsing, stateNone, valueNull,
+        notTextInsertion, doNotAllowExecutionWhenDisabled}},
       {"MoveWordRight",
        {executeMoveWordRight, supportedFromMenuOrKeyBinding,
-        enabledInEditableText, stateNone, valueNull, notTextInsertion,
-        doNotAllowExecutionWhenDisabled}},
+        enabledInEditableTextOrCaretBrowsing, stateNone, valueNull,
+        notTextInsertion, doNotAllowExecutionWhenDisabled}},
       {"MoveWordRightAndModifySelection",
        {executeMoveWordRightAndModifySelection, supportedFromMenuOrKeyBinding,
-        enabledVisibleSelection, stateNone, valueNull, notTextInsertion,
-        doNotAllowExecutionWhenDisabled}},
+        enabledVisibleSelectionOrCaretBrowsing, stateNone, valueNull,
+        notTextInsertion, doNotAllowExecutionWhenDisabled}},
       {"Outdent",
        {executeOutdent, supported, enabledInRichlyEditableText, stateNone,
         valueNull, notTextInsertion, doNotAllowExecutionWhenDisabled}},
