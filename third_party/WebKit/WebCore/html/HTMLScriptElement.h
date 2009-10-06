@@ -80,6 +80,8 @@ class HTMLScriptElement : public HTMLElement, public ScriptElement {
 
   bool haveFiredLoadEvent() const { return m_data.haveFiredLoadEvent(); }
 
+  virtual bool dispatchBeforeLoadEvent(const String& sourceURL);
+
  protected:
   virtual String sourceAttributeValue() const;
   virtual String charsetAttributeValue() const;

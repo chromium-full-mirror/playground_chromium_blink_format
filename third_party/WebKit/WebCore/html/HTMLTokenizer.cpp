@@ -466,6 +466,7 @@ HTMLTokenizer::State HTMLTokenizer::scriptHandler(State state) {
         // in an earlier script.
         // If so, we don't want to load scripts.
         if (!m_parserStopped &&
+            m_scriptNode->dispatchBeforeLoadEvent(m_scriptTagSrcAttrValue) &&
             (cs = m_doc->docLoader()->requestScript(
                  m_scriptTagSrcAttrValue, m_scriptTagCharsetAttrValue)))
           m_pendingScripts.append(cs);
