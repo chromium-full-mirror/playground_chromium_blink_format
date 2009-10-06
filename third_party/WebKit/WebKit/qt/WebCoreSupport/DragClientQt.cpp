@@ -66,6 +66,8 @@ void DragClientQt::startDrag(DragImageRef,
   QWidget* view = m_webPage->view();
   if (view) {
     QDrag* drag = new QDrag(view);
+    if (clipboardData->hasImage())
+      drag->setPixmap(qvariant_cast<QPixmap>(clipboardData->imageData()));
     drag->setMimeData(clipboardData);
     drag->start();
   }
