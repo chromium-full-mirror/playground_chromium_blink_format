@@ -573,8 +573,9 @@ void InspectorController::setFrontendProxyObject(
   m_domAgent = new InspectorDOMAgent(m_frontend.get());
 
   Setting timelineEnabled = setting(timelineEnabledSettingName);
-  if (timelineEnabled.type() == Setting::BooleanType &&
-      timelineEnabled.booleanValue())
+  if (m_timelineAgent.get() ||
+      (timelineEnabled.type() == Setting::BooleanType &&
+       timelineEnabled.booleanValue()))
     m_timelineAgent = new InspectorTimelineAgent(m_frontend.get());
 }
 
