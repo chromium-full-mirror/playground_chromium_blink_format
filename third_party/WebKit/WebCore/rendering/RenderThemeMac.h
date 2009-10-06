@@ -207,6 +207,8 @@ class RenderThemeMac : public RenderTheme {
 
   // Media controls
   virtual String extraMediaControlsStyleSheet();
+
+  virtual bool shouldRenderMediaControlPart(ControlPart, Element*);
 #endif
 
  private:

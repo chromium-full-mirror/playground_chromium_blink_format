@@ -57,6 +57,7 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   virtual bool rendererIsNeeded(RenderStyle*);
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual void insertedIntoDocument();
+  virtual void willRemove();
   virtual void removedFromDocument();
   virtual void attach();
   virtual void recalcStyle(StyleChange);
@@ -73,6 +74,8 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   // Eventually overloaded in HTMLVideoElement
   virtual bool supportsFullscreen() const { return false; };
   virtual bool supportsSave() const;
+
+  PlatformMedia platformMedia() const;
 
   void scheduleLoad();
 
@@ -153,6 +156,8 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   void beginScrubbing();
   void endScrubbing();
 
+  const IntRect screenRect();
+
   bool canPlay() const;
 
   float percentLoaded() const;
@@ -170,6 +175,9 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   bool hasSingleSecurityOrigin() const {
     return !m_player || m_player->hasSingleSecurityOrigin();
   }
+
+  void enterFullscreen();
+  void exitFullscreen();
 
  protected:
   float getTimeOffsetAttribute(const QualifiedName&, float valueOnError) const;
@@ -338,6 +346,8 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   // Not all media engines provide enough information about a file to be able to
   // support progress events so setting m_sendProgressEvents disables them
   bool m_sendProgressEvents : 1;
+
+  bool m_isFullscreen : 1;
 
 #if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
   bool m_needWidgetUpdate : 1;

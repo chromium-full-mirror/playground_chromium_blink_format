@@ -65,7 +65,7 @@ class NullMediaPlayerPrivate : public MediaPlayerPrivateInterface {
   virtual void play() {}
   virtual void pause() {}
 
-  virtual bool supportsFullscreen() const { return false; }
+  virtual PlatformMedia platformMedia() const { return NoPlatformMedia; }
 
   virtual IntSize naturalSize() const { return IntSize(0, 0); }
 
@@ -332,6 +332,10 @@ bool MediaPlayer::inMediaDocument() {
   Document* document = frame ? frame->document() : 0;
 
   return document && document->isMediaDocument();
+}
+
+PlatformMedia MediaPlayer::platformMedia() const {
+  return m_private->platformMedia();
 }
 
 MediaPlayer::NetworkState MediaPlayer::networkState() {

@@ -287,6 +287,21 @@ void WKDrawMediaSliderTrack(int themeStyle,
                             float currentTime,
                             float duration,
                             unsigned state);
+NSView* WKCreateMediaUIBackgroundView(void);
+
+typedef enum {
+  WKMediaUIControlTimeline,
+  WKMediaUIControlSlider,
+  WKMediaUIControlPlayPauseButton,
+  WKMediaUIControlExitFullscreenButton,
+  WKMediaUIControlRewindButton,
+  WKMediaUIControlFastForwardButton,
+  WKMediaUIControlVolumeUpButton,
+  WKMediaUIControlVolumeDownButton
+
+} WKMediaUIControlType;
+
+NSControl* WKCreateMediaUIControl(int controlType);
 
 #if !defined(BUILDING_ON_TIGER) && !defined(BUILDING_ON_LEOPARD) && \
     defined(__x86_64__)
@@ -320,6 +335,13 @@ unsigned WKInitializeMaximumHTTPConnectionCountPerHost(
     unsigned preferredConnectionCount);
 
 BOOL WKIsLatchingWheelEvent(NSEvent*);
+
+#ifndef BUILDING_ON_TIGER
+void WKWindowSetAlpha(NSWindow* window, float alphaValue);
+void WKWindowSetScaledFrame(NSWindow* window,
+                            NSRect scaleFrame,
+                            NSRect nonScaledFrame);
+#endif
 
 #ifdef __cplusplus
 }

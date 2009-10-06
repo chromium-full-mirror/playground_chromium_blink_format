@@ -38,7 +38,21 @@
 #include <wtf/OwnPtr.h>
 #include <wtf/Noncopyable.h>
 
+#ifdef __OBJC__
+@class QTMovie;
+#else
+class QTMovie;
+#endif
+
 namespace WebCore {
+
+// Structure that will hold every native
+// types supported by the current media player.
+// We have to do that has multiple media players
+// backend can live at runtime.
+typedef struct PlatformMedia { QTMovie* qtMovie; } PlatformMedia;
+
+static const PlatformMedia NoPlatformMedia = {0};
 
 class ContentType;
 class FrameView;
@@ -114,6 +128,8 @@ class MediaPlayer : public Noncopyable {
 
   bool supportsFullscreen() const;
   bool supportsSave() const;
+  PlatformMedia platformMedia() const;
+
   IntSize naturalSize();
   bool hasVideo() const;
   bool hasAudio() const;
