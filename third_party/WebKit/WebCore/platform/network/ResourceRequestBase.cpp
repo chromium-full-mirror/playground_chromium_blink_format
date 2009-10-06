@@ -76,7 +76,7 @@ auto_ptr<CrossThreadResourceRequestData> ResourceRequestBase::copyData() const {
   data->m_cachePolicy = cachePolicy();
   data->m_timeoutInterval = timeoutInterval();
   data->m_firstPartyForCookies = firstPartyForCookies().copy();
-  data->m_httpMethod = httpMethod().copy();
+  data->m_httpMethod = httpMethod().crossThreadString();
   data->m_httpHeaders.adopt(httpHeaderFields().copyData());
 
   data->m_responseContentDispositionEncodingFallbackArray
@@ -86,7 +86,8 @@ auto_ptr<CrossThreadResourceRequestData> ResourceRequestBase::copyData() const {
       m_responseContentDispositionEncodingFallbackArray.size();
   for (size_t index = 0; index < encodingArraySize; ++index) {
     data->m_responseContentDispositionEncodingFallbackArray.append(
-        m_responseContentDispositionEncodingFallbackArray[index].copy());
+        m_responseContentDispositionEncodingFallbackArray[index]
+            .crossThreadString());
   }
   if (m_httpBody)
     data->m_httpBody = m_httpBody->deepCopy();

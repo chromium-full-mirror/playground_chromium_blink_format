@@ -59,7 +59,7 @@ SQLStatement::SQLStatement(const String& statement,
                            PassRefPtr<SQLStatementCallback> callback,
                            PassRefPtr<SQLStatementErrorCallback> errorCallback,
                            bool readOnly)
-    : m_statement(statement.copy()),
+    : m_statement(statement.crossThreadString()),
       m_arguments(arguments),
       m_statementCallback(callback),
       m_statementErrorCallback(errorCallback),

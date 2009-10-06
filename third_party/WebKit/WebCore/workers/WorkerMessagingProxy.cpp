@@ -55,7 +55,7 @@ class MessageWorkerContextTask : public ScriptExecutionContext::Task {
  private:
   MessageWorkerContextTask(const String& message,
                            PassOwnPtr<MessagePortChannelArray> channels)
-      : m_message(message.copy()), m_channels(channels) {}
+      : m_message(message.crossThreadString()), m_channels(channels) {}
 
   virtual void performTask(ScriptExecutionContext* scriptContext) {
     ASSERT(scriptContext->isWorkerContext());
@@ -86,7 +86,7 @@ class MessageWorkerTask : public ScriptExecutionContext::Task {
   MessageWorkerTask(const String& message,
                     PassOwnPtr<MessagePortChannelArray> channels,
                     WorkerMessagingProxy* messagingProxy)
-      : m_message(message.copy()),
+      : m_message(message.crossThreadString()),
         m_channels(channels),
         m_messagingProxy(messagingProxy) {}
 
@@ -123,9 +123,9 @@ class WorkerExceptionTask : public ScriptExecutionContext::Task {
                       int lineNumber,
                       const String& sourceURL,
                       WorkerMessagingProxy* messagingProxy)
-      : m_errorMessage(errorMessage.copy()),
+      : m_errorMessage(errorMessage.crossThreadString()),
         m_lineNumber(lineNumber),
-        m_sourceURL(sourceURL.copy()),
+        m_sourceURL(sourceURL.crossThreadString()),
         m_messagingProxy(messagingProxy) {}
 
   virtual void performTask(ScriptExecutionContext* context) {

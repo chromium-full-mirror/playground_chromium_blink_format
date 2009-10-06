@@ -70,8 +70,12 @@ class SharedWorkerProxy : public ThreadSafeShared<SharedWorkerProxy>,
   void setThread(PassRefPtr<SharedWorkerThread> thread) { m_thread = thread; }
   SharedWorkerThread* thread() { return m_thread.get(); }
   bool isClosing() const { return m_closing; }
-  KURL url() const { return m_url.copy(); }
-  String name() const { return m_name.copy(); }
+  KURL url() const {
+    // Don't use m_url.copy() because it isn't a threadsafe method.
+    return KURL(ParsedURLString, m_url.string().threadsafeCopy());
+  }
+
+  String name() const { return m_name.threadsafeCopy(); }
   bool matches(const String& name,
                PassRefPtr<SecurityOrigin> origin,
                const KURL& urlToMatch) const;
@@ -132,7 +136,7 @@ SharedWorkerProxy::SharedWorkerProxy(const String& name,
                                      const KURL& url,
                                      PassRefPtr<SecurityOrigin> origin)
     : m_closing(false),
-      m_name(name.copy()),
+      m_name(name.crossThreadString()),
       m_url(url.copy()),
       m_origin(origin) {
   // We should be the sole owner of the SecurityOrigin, as we will free it on
@@ -460,9 +464,11 @@ PassRefPtr<SharedWorkerProxy> DefaultSharedWorkerRepository::getProxy(
     const String& name,
     const KURL& url) {
   // Look for an existing worker, and create one if it doesn't exist.
-  // Items in the cache are freed on another thread, so copy the URL before
-  // creating the origin, to make sure no references to external strings linger.
-  RefPtr<SecurityOrigin> origin = SecurityOrigin::create(url.copy());
+  // Items in the cache are freed on another thread, so do a threadsafe copy of
+  // the URL before creating the origin,
+  // to make sure no references to external strings linger.
+  RefPtr<SecurityOrigin> origin = SecurityOrigin::create(
+      KURL(ParsedURLString, url.string().threadsafeCopy()));
   for (unsigned i = 0; i < m_proxies.size(); i++) {
     if (!m_proxies[i]->isClosing() && m_proxies[i]->matches(name, origin, url))
       return m_proxies[i];

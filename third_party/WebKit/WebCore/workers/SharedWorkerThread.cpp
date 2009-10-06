@@ -62,7 +62,7 @@ SharedWorkerThread::SharedWorkerThread(
                    sourceCode,
                    workerLoaderProxy,
                    workerReportingProxy),
-      m_name(name.copy()) {}
+      m_name(name.crossThreadString()) {}
 
 SharedWorkerThread::~SharedWorkerThread() {}
 

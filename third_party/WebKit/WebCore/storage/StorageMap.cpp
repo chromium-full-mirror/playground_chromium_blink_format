@@ -166,10 +166,10 @@ void StorageMap::importItem(const String& key, const String& value) {
   // are destined
   // to cross a thread boundary
   pair<HashMap<String, String>::iterator, bool> result =
-      m_map.add(key.copy(), String());
+      m_map.add(key.threadsafeCopy(), String());
 
   if (result.second)
-    result.first->second = value.copy();
+    result.first->second = value.threadsafeCopy();
 
   // Update quota.
   ASSERT(m_currentLength + value.length() >= m_currentLength);

@@ -106,7 +106,7 @@ WorkerThreadableLoader::MainThreadBridge::MainThreadBridge(
     const ThreadableLoaderOptions& options)
     : m_workerClientWrapper(workerClientWrapper),
       m_loaderProxy(loaderProxy),
-      m_taskMode(taskMode.copy()) {
+      m_taskMode(taskMode.crossThreadString()) {
   ASSERT(m_workerClientWrapper.get());
   m_loaderProxy.postTaskToLoader(createCallbackTask(
       &MainThreadBridge::mainThreadCreateLoader, this, request, options));

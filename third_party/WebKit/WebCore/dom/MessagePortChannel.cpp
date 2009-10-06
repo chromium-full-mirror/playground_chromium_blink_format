@@ -41,6 +41,6 @@ PassOwnPtr<MessagePortChannel::EventData> MessagePortChannel::EventData::create(
 MessagePortChannel::EventData::EventData(
     const String& message,
     PassOwnPtr<MessagePortChannelArray> channels)
-    : m_message(message.copy()), m_channels(channels) {}
+    : m_message(message.crossThreadString()), m_channels(channels) {}
 
 }  // namespace WebCore

@@ -75,13 +75,6 @@ class CrossThreadRefCounted : public Noncopyable {
            (m_threadSafeRefCounter && !m_threadSafeRefCounter->hasOneRef());
   }
 
-#ifndef NDEBUG
-  bool mayBePassedToAnotherThread() const {
-    ASSERT(!m_threadId);
-    return m_refCounter.hasOneRef();
-  }
-#endif
-
  private:
   CrossThreadRefCounted(T* data, ThreadSafeSharedBase* threadedCounter)
       : m_threadSafeRefCounter(threadedCounter),
@@ -100,6 +93,12 @@ class CrossThreadRefCounted : public Noncopyable {
 
   void threadSafeDeref();
 
+#ifndef NDEBUG
+  bool isOwnedByCurrentThread() const {
+    return !m_threadId || m_threadId == currentThread();
+  }
+#endif
+
   RefCountedBase m_refCounter;
   ThreadSafeSharedBase* m_threadSafeRefCounter;
   T* m_data;
@@ -110,7 +109,7 @@ class CrossThreadRefCounted : public Noncopyable {
 
 template <class T>
 void CrossThreadRefCounted<T>::ref() {
-  ASSERT(!m_threadId || m_threadId == currentThread());
+  ASSERT(isOwnedByCurrentThread());
   m_refCounter.ref();
 #ifndef NDEBUG
   // Store the threadId as soon as the ref count gets to 2.
@@ -125,7 +124,7 @@ void CrossThreadRefCounted<T>::ref() {
 
 template <class T>
 void CrossThreadRefCounted<T>::deref() {
-  ASSERT(!m_threadId || m_threadId == currentThread());
+  ASSERT(isOwnedByCurrentThread());
   if (m_refCounter.derefBase()) {
     threadSafeDeref();
     delete this;
@@ -151,10 +150,12 @@ T* CrossThreadRefCounted<T>::release() {
 template <class T>
 PassRefPtr<CrossThreadRefCounted<T>>
 CrossThreadRefCounted<T>::crossThreadCopy() {
+  ASSERT(isOwnedByCurrentThread());
   if (m_threadSafeRefCounter)
     m_threadSafeRefCounter->ref();
   else
     m_threadSafeRefCounter = new ThreadSafeSharedBase(2);
+
   return adoptRef(new CrossThreadRefCounted<T>(m_data, m_threadSafeRefCounter));
 }
 

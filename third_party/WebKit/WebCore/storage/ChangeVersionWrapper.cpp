@@ -35,7 +35,8 @@ namespace WebCore {
 
 ChangeVersionWrapper::ChangeVersionWrapper(const String& oldVersion,
                                            const String& newVersion)
-    : m_oldVersion(oldVersion.copy()), m_newVersion(newVersion.copy()) {}
+    : m_oldVersion(oldVersion.crossThreadString()),
+      m_newVersion(newVersion.crossThreadString()) {}
 
 bool ChangeVersionWrapper::performPreflight(SQLTransaction* transaction) {
   ASSERT(transaction && transaction->database());

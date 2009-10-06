@@ -257,12 +257,6 @@ String String::substring(unsigned pos, unsigned len) const {
   return m_impl->substring(pos, len);
 }
 
-String String::substringCopy(unsigned pos, unsigned len) const {
-  if (!m_impl)
-    return String();
-  return m_impl->substringCopy(pos, len);
-}
-
 String String::lower() const {
   if (!m_impl)
     return String();
@@ -552,10 +546,16 @@ float String::toFloat(bool* ok) const {
   return m_impl->toFloat(ok);
 }
 
-String String::copy() const {
+String String::threadsafeCopy() const {
   if (!m_impl)
     return String();
-  return m_impl->copy();
+  return m_impl->threadsafeCopy();
+}
+
+String String::crossThreadString() const {
+  if (!m_impl)
+    return String();
+  return m_impl->crossThreadString();
 }
 
 bool String::isEmpty() const {

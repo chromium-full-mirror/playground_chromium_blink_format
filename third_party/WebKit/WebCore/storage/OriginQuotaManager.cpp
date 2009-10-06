@@ -76,7 +76,8 @@ void OriginQuotaManager::addDatabase(SecurityOrigin* origin,
   OriginUsageRecord* usageRecord = m_usageMap.get(origin);
   ASSERT(usageRecord);
 
-  usageRecord->addDatabase(databaseIdentifier.copy(), fullPath.copy());
+  usageRecord->addDatabase(databaseIdentifier.threadsafeCopy(),
+                           fullPath.threadsafeCopy());
 }
 
 void OriginQuotaManager::removeDatabase(SecurityOrigin* origin,
