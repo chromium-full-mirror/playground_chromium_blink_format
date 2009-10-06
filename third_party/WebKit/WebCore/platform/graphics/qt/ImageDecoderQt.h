@@ -28,10 +28,11 @@
 #define ImageDecoderQt_h
 
 #include "ImageDecoder.h"
-#include <QtGui/QImage>
+#include <QtGui/QImageReader>
 #include <QtGui/QPixmap>
 #include <QtCore/QList>
 #include <QtCore/QHash>
+#include <QtCore/QBuffer>
 
 namespace WebCore {
 
@@ -54,10 +55,18 @@ class ImageDecoderQt : public ImageDecoder {
   ImageDecoderQt(const ImageDecoderQt&);
   ImageDecoderQt& operator=(const ImageDecoderQt&);
 
-  class ReadContext;
+ private:
+  void internalDecodeSize();
+  void internalReadImage(size_t);
+  void internalHandleCurrentImage(size_t);
+  void forceLoadEverything();
+  void failRead();
 
-  int m_loopCount;
-  String m_imageFormat;
+ private:
+  String m_format;
+  QBuffer* m_buffer;
+  QImageReader* m_reader;
+  mutable int m_repetitionCount;
 };
 }
 

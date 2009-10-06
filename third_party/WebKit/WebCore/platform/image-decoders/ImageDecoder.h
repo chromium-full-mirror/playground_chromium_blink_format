@@ -176,7 +176,7 @@ class RGBA32Buffer {
 #if PLATFORM(SKIA)
   NativeImageSkia m_bitmap;
 #elif PLATFORM(QT)
-  QImage m_image;
+  mutable QImage m_image;
   bool m_hasAlpha;
   IntSize m_size;
 #else
