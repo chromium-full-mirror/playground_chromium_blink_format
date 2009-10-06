@@ -1643,14 +1643,6 @@ void FrameLoader::setOpener(Frame* opener) {
   }
 }
 
-bool FrameLoader::openedByDOM() const {
-  return m_openedByDOM;
-}
-
-void FrameLoader::setOpenedByDOM() {
-  m_openedByDOM = true;
-}
-
 void FrameLoader::handleFallbackContent() {
   HTMLFrameOwnerElement* owner = m_frame->ownerElement();
   if (!owner || !owner->hasTagName(objectTag))
@@ -4170,7 +4162,7 @@ void FrameLoader::continueLoadAfterNewWindowPolicy(
   if (frameName != "_blank")
     mainFrame->tree()->setName(frameName);
 
-  mainFrame->loader()->setOpenedByDOM();
+  mainFrame->page()->setOpenedByDOM();
   mainFrame->loader()->m_client->dispatchShow();
   mainFrame->loader()->setOpener(frame.get());
   mainFrame->loader()->loadWithNavigationAction(

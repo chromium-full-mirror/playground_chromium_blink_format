@@ -864,7 +864,7 @@ static Frame* createWindow(ExecState* exec,
     return 0;
 
   newFrame->loader()->setOpener(openerFrame);
-  newFrame->loader()->setOpenedByDOM();
+  newFrame->page()->setOpenedByDOM();
 
   JSDOMWindow* newWindow = toJSDOMWindow(newFrame);
 

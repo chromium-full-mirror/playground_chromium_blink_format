@@ -338,8 +338,6 @@ class FrameLoader : public Noncopyable {
 
   Frame* opener();
   void setOpener(Frame*);
-  bool openedByDOM() const;
-  void setOpenedByDOM();
 
   bool isProcessingUserGesture();
 
