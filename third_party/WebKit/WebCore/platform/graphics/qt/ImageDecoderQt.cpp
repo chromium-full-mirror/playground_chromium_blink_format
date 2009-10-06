@@ -48,8 +48,7 @@ ImageDecoder* ImageDecoder::create(const SharedBuffer& data) {
   if (!buffer.open(QBuffer::ReadOnly))
     return 0;
 
-  QString imageFormat =
-      QString::fromLatin1(QImageReader::imageFormat(&buffer).toLower());
+  QByteArray imageFormat = QImageReader::imageFormat(&buffer);
   if (imageFormat.isEmpty())
     return 0;  // Image format not supported
 
@@ -159,8 +158,8 @@ ImageDecoderQt::ReadContext::readImageLines(ImageData& imageData) {
   return IncrementalReadComplete;
 }
 
-ImageDecoderQt::ImageDecoderQt(const QString& imageFormat)
-    : m_hasAlphaChannel(false), m_imageFormat(imageFormat) {}
+ImageDecoderQt::ImageDecoderQt(const QByteArray& imageFormat)
+    : m_hasAlphaChannel(false), m_imageFormat(imageFormat.constData()) {}
 
 ImageDecoderQt::~ImageDecoderQt() {}
 
