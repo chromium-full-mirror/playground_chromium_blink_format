@@ -287,7 +287,7 @@ void HTMLLinkElement::setCSSStyleSheet(const String& url,
     // There are two variants of KHTMLFixes.css. One is equal to
     // mediaWikiKHTMLFixesStyleSheet,
     // while the other lacks the second trailing newline.
-    if (url.endsWith(slashKHTMLFixesDotCss) &&
+    if (url.endsWith(slashKHTMLFixesDotCss) && !sheetText.isNull() &&
         mediaWikiKHTMLFixesStyleSheet.startsWith(sheetText) &&
         sheetText.length() >= mediaWikiKHTMLFixesStyleSheet.length() - 1) {
       ASSERT(m_sheet->length() == 1);
