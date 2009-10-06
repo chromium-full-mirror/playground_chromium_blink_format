@@ -85,6 +85,8 @@ class ContainerNode : public Node {
 
   void cloneChildNodes(ContainerNode* clone);
 
+  bool dispatchBeforeLoadEvent(const String& sourceURL);
+
  protected:
   ContainerNode(Document*, ConstructionType = CreateContainer);
 
