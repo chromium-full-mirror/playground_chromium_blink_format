@@ -17,8 +17,8 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef WEBKIT_WEB_WINDOW_FEATURES_H
-#define WEBKIT_WEB_WINDOW_FEATURES_H
+#ifndef webkitwebwindowfeatures_h
+#define webkitwebwindowfeatures_h
 
 #include <glib-object.h>
 
@@ -71,4 +71,4 @@ webkit_web_window_features_equal(WebKitWebWindowFeatures* features1,
 
 G_END_DECLS
 
-#endif /* WEBKIT_WEB_WINDOW_FEATURES_H */
+#endif /* webkitwebwindowfeatures_h */

@@ -17,8 +17,8 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef WEBKIT_WEB_RESOURCE_H
-#define WEBKIT_WEB_RESOURCE_H
+#ifndef webkitwebresource_h
+#define webkitwebresource_h
 
 #include <glib.h>
 #include <glib-object.h>
@@ -87,4 +87,4 @@ WEBKIT_API G_CONST_RETURN gchar* webkit_web_resource_get_frame_name(
 
 G_END_DECLS
 
-#endif /* WEBKIT_WEB_RESOURCE_H */
+#endif /* webkitwebresource_h */

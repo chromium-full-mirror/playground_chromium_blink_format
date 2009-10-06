@@ -17,8 +17,8 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef __WEBKIT_WEB_INSPECTOR_H__
-#define __WEBKIT_WEB_INSPECTOR_H__
+#ifndef webkitwebinspector_h
+#define webkitwebinspector_h
 
 #include <glib-object.h>
 
@@ -69,4 +69,4 @@ WEBKIT_API const gchar* webkit_web_inspector_get_inspected_uri(
 
 G_END_DECLS
 
-#endif /* __WEBKIT_WEB_INSPECTOR_H__ */
+#endif /* webkitwebinspector_h */

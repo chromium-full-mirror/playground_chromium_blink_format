@@ -18,8 +18,8 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef __WEBKIT_WEB_SETTINGS_H__
-#define __WEBKIT_WEB_SETTINGS_H__
+#ifndef webkitwebsettings_h
+#define webkitwebsettings_h
 
 #include <glib-object.h>
 
@@ -78,4 +78,4 @@ WEBKIT_API G_CONST_RETURN gchar* webkit_web_settings_get_user_agent(
 
 G_END_DECLS
 
-#endif /* __WEBKIT_WEB_SETTINGS_H__ */
+#endif /* webkitwebsettings_h */

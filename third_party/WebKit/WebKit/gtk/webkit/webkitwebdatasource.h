@@ -17,8 +17,8 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef WEBKIT_WEB_DATA_SOURCE_H
-#define WEBKIT_WEB_DATA_SOURCE_H
+#ifndef webkitwebdatasource_h
+#define webkitwebdatasource_h
 
 #include <glib.h>
 #include <glib-object.h>
@@ -99,4 +99,4 @@ WEBKIT_API GList* webkit_web_data_source_get_subresources(
 
 G_END_DECLS
 
-#endif /* WEBKIT_WEB_DATA_SOURCE_H */
+#endif /* webkitwebdatasource_h */

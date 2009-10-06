@@ -17,8 +17,8 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef WEBKIT_WEB_HISTORY_ITEM_H
-#define WEBKIT_WEB_HISTORY_ITEM_H
+#ifndef webkitwebhistoryitem_h
+#define webkitwebhistoryitem_h
 
 #include <glib.h>
 #include <glib-object.h>
@@ -90,4 +90,4 @@ WEBKIT_API gdouble webkit_web_history_item_get_last_visited_time(
 
 G_END_DECLS
 
-#endif /* WEBKIT_WEB_HISTORY_ITEM_H */
+#endif /* webkitwebhistoryitem_h */
