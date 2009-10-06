@@ -62,6 +62,7 @@ class NullMediaPlayerPrivate : public MediaPlayerPrivateInterface {
   virtual void load(const String&) {}
   virtual void cancelLoad() {}
 
+  virtual void prepareToPlay() {}
   virtual void play() {}
   virtual void pause() {}
 
@@ -110,8 +111,10 @@ class NullMediaPlayerPrivate : public MediaPlayerPrivateInterface {
 
   virtual void paint(GraphicsContext*, const IntRect&) {}
 
+  virtual bool canLoadPoster() const { return false; }
+  virtual void setPoster(const String&) {}
+
 #if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
-  virtual void setPoster(const String& /*url*/) {}
   virtual void deliverNotification(MediaPlayerProxyNotificationType) {}
   virtual void setMediaPlayerProxy(WebMediaPlayerProxy*) {}
 #endif
@@ -265,14 +268,20 @@ void MediaPlayer::load(const String& url, const ContentType& contentType) {
     m_private.set(createNullMediaPlayer(this));
 }
 
-#if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
+bool MediaPlayer::canLoadPoster() const {
+  return m_private->canLoadPoster();
+}
+
 void MediaPlayer::setPoster(const String& url) {
   m_private->setPoster(url);
 }
-#endif
 
 void MediaPlayer::cancelLoad() {
   m_private->cancelLoad();
+}
+
+void MediaPlayer::prepareToPlay() {
+  m_private->prepareToPlay();
 }
 
 void MediaPlayer::play() {

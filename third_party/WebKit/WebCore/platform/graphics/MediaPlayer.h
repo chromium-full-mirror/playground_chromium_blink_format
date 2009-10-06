@@ -147,6 +147,7 @@ class MediaPlayer : public Noncopyable {
   bool visible() const;
   void setVisible(bool);
 
+  void prepareToPlay();
   void play();
   void pause();
 
@@ -220,8 +221,10 @@ class MediaPlayer : public Noncopyable {
 
   MediaPlayerClient* mediaPlayerClient() const { return m_mediaPlayerClient; }
 
+  bool canLoadPoster() const;
+  void setPoster(const String&);
+
 #if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
-  void setPoster(const String& url);
   void deliverNotification(MediaPlayerProxyNotificationType notification);
   void setMediaPlayerProxy(WebMediaPlayerProxy* proxy);
 #endif

@@ -603,6 +603,12 @@ void HTMLMediaElement::loadResource(const KURL& url, ContentType& contentType) {
 
   m_player->load(m_currentSrc, contentType);
 
+  if (isVideo() && m_player->canLoadPoster()) {
+    KURL posterUrl = static_cast<HTMLVideoElement*>(this)->poster();
+    if (!posterUrl.isEmpty())
+      m_player->setPoster(posterUrl);
+  }
+
   if (renderer())
     renderer()->updateFromElement();
 }
@@ -1514,8 +1520,12 @@ PassRefPtr<TimeRanges> HTMLMediaElement::seekable() const {
 }
 
 bool HTMLMediaElement::potentiallyPlaying() const {
-  return !paused() && m_readyState >= HAVE_FUTURE_DATA && !endedPlayback() &&
-         !stoppedDueToErrors() && !pausedForUserInteraction();
+  return m_readyState >= HAVE_FUTURE_DATA && couldPlayIfEnoughData();
+}
+
+bool HTMLMediaElement::couldPlayIfEnoughData() const {
+  return !paused() && !endedPlayback() && !stoppedDueToErrors() &&
+         !pausedForUserInteraction();
 }
 
 bool HTMLMediaElement::endedPlayback() const {
@@ -1595,7 +1605,8 @@ void HTMLMediaElement::updatePlayState() {
     float time = currentTime();
     if (time > m_lastSeekTime)
       addPlayedRange(m_lastSeekTime, time);
-  }
+  } else if (couldPlayIfEnoughData() && playerPaused)
+    m_player->prepareToPlay();
 
   if (renderer())
     renderer()->updateFromElement();
