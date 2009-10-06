@@ -25,20 +25,18 @@
 
 #import <WebCore/PluginHalterClient.h>
 
-@class WebView;
-
 namespace WebCore {
-
 class Node;
+}
+
+@class WebView;
 
 class WebPluginHalterClient : public WebCore::PluginHalterClient {
  public:
   WebPluginHalterClient(WebView*);
 
-  virtual bool shouldHaltPlugin(Node*) const;
+  virtual bool shouldHaltPlugin(WebCore::Node*) const;
 
  private:
   WebView* m_webView;
 };
-
-}  // namespace WebCore
