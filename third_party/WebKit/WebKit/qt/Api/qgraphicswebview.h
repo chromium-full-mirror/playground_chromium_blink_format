@@ -104,8 +104,7 @@ class QWEBKIT_EXPORT QGraphicsWebView : public QGraphicsWidget {
 
  Q_SIGNALS:
   void loadStarted();
-  void loadFinished();
-  void loadFailed();
+  void loadFinished(bool);
 
   void progressChanged(qreal);
   void interactivityChanged();
