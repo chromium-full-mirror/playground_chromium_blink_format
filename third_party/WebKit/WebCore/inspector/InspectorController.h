@@ -30,7 +30,9 @@
 #define InspectorController_h
 
 #include "Console.h"
+#include "Cookie.h"
 #include "PlatformString.h"
+#include "ScriptArray.h"
 #include "ScriptObject.h"
 #include "ScriptState.h"
 #include "ScriptValue.h"
@@ -39,6 +41,7 @@
 
 #include <wtf/HashMap.h>
 #include <wtf/HashSet.h>
+#include <wtf/ListHashSet.h>
 #include <wtf/RefCounted.h>
 #include <wtf/Vector.h>
 
@@ -284,6 +287,8 @@ class InspectorController
   void mainResourceFiredLoadEvent(DocumentLoader*, const KURL&);
   void mainResourceFiredDOMContentEvent(DocumentLoader*, const KURL&);
 
+  void getCookies(long callId, const String& url);
+
 #if ENABLE(DATABASE)
   void didOpenDatabase(Database*,
                        const String& domain,
@@ -380,7 +385,7 @@ class InspectorController
 
   void resetInjectedScript();
 
-  void deleteCookie(const String& cookieName);
+  void deleteCookie(const String& cookieName, const String& domain);
 
 #if ENABLE(JAVASCRIPT_DEBUGGER)
   void startUserInitiatedProfilingSoon();
@@ -394,6 +399,9 @@ class InspectorController
 #if ENABLE(DOM_STORAGE)
   InspectorDOMStorageResource* getDOMStorageResourceForId(int storageId);
 #endif
+
+  ScriptObject buildObjectForCookie(const Cookie&);
+  ScriptArray buildArrayForCookies(ListHashSet<Cookie>&);
 
   void focusNode();
 

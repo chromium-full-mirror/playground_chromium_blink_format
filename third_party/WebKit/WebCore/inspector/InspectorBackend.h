@@ -150,8 +150,8 @@ class InspectorBackend : public RefCounted<InspectorBackend> {
   void getEventListenersForNode(long callId, long nodeId);
   void copyNode(long nodeId);
 
-  void getCookies(long callId);
-  void deleteCookie(const String& cookieName);
+  void getCookies(long callId, const String& domain);
+  void deleteCookie(const String& cookieName, const String& domain);
 
   // Generic code called from custom implementations.
   void highlight(long nodeId);

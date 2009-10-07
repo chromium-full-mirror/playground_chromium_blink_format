@@ -53,8 +53,6 @@ class NameNodeMap;
 class Node;
 class Page;
 
-struct Cookie;
-
 struct EventListenerInfo {
   EventListenerInfo(Node* node,
                     const AtomicString& eventType,
@@ -90,7 +88,6 @@ class InspectorDOMAgent : public EventListener {
   void removeAttribute(long callId, long elementId, const String& name);
   void setTextNodeValue(long callId, long nodeId, const String& value);
   void getEventListenersForNode(long callId, long nodeId);
-  void getCookies(long callId);
 
   // Methods called from the InspectorController.
   void setDocument(Document* document);
@@ -122,9 +119,6 @@ class InspectorDOMAgent : public EventListener {
       const RegisteredEventListener& registeredEventListener,
       const AtomicString& eventType,
       Node* node);
-
-  ScriptObject buildObjectForCookie(const Cookie& cookie);
-  ScriptArray buildArrayForCookies(const Vector<Cookie>& cookiesList);
 
   // We represent embedded doms as a part of the same hierarchy. Hence we treat
   // children of frame owners differently.
