@@ -6,6 +6,7 @@
  * Copyright (C) 2006 Simon Hausmann <hausmann@kde.org>
  * Copyright (C) 2009 Kenneth Christiansen <kenneth@webkit.org>
  * Copyright (C) 2009 Antonio Gomes <antonio.gomes@openbossa.org>
+ * Copyright (C) 2009 Girish Ramakrishnan <girish@forwardbias.in>
  *
  * All rights reserved.
  *
@@ -91,6 +92,21 @@ class MainView : public QGraphicsView {
     m_mainWidget->setTransformOriginPoint(centerPoint);
 
     m_mainWidget->setRotation(m_mainWidget->rotation() ? 0 : 180);
+#endif
+  }
+
+  void animatedFlip() {
+#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
+    QSizeF center = m_mainWidget->boundingRect().size() / 2;
+    QPointF centerPoint = QPointF(center.width(), center.height());
+    m_mainWidget->setTransformOriginPoint(centerPoint);
+
+    QPropertyAnimation* animation =
+        new QPropertyAnimation(m_mainWidget, "rotation", this);
+    animation->setDuration(1000);
+    animation->setStartValue(m_mainWidget->rotation());
+    animation->setEndValue(m_mainWidget->rotation() + 180);
+    animation->start(QAbstractAnimation::DeleteWhenStopped);
 #endif
   }
 
@@ -211,6 +227,8 @@ class MainWindow : public QMainWindow {
 
   void flip() { view->flip(); }
 
+  void animatedFlip() { view->animatedFlip(); }
+
  private:
   void buildUI() {
     QWebPage* page = scene->webView()->page();
@@ -237,6 +255,7 @@ class MainWindow : public QMainWindow {
 
     QMenu* fxMenu = menuBar()->addMenu("&Effects");
     fxMenu->addAction("Flip", this, SLOT(flip()));
+    fxMenu->addAction("Animated Flip", this, SLOT(animatedFlip()));
   }
 
  private:
