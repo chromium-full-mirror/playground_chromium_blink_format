@@ -414,6 +414,8 @@ v8::Persistent<v8::FunctionTemplate> V8DOMWrapper::getTemplate(
           USE_NAMED_PROPERTY_GETTER(DOMWindow));
       descriptor->PrototypeTemplate()->SetIndexedPropertyHandler(
           USE_INDEXED_PROPERTY_GETTER(DOMWindow));
+      descriptor->PrototypeTemplate()->SetInternalFieldCount(
+          V8Custom::kDOMWindowInternalFieldCount);
 
       descriptor->SetHiddenPrototype(true);
 
