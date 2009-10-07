@@ -34,7 +34,7 @@ namespace JSC {
 class ParserArenaDeletable;
 class ParserArenaRefCounted;
 
-class IdentifierArena {
+class IdentifierArena : public FastAllocBase {
  public:
   ALWAYS_INLINE const Identifier& makeIdentifier(JSGlobalData*,
                                                  const UChar* characters,
