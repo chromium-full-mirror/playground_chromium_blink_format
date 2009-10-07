@@ -642,6 +642,7 @@ qreal QWebView::textSizeMultiplier() const {
   return page()->mainFrame()->textSizeMultiplier();
 }
 
+#if !defined(Q_OS_SYMBIAN)
 /*!
     \property QWebView::renderHints
     \since 4.6
@@ -653,6 +654,7 @@ qreal QWebView::textSizeMultiplier() const {
 
     \sa QPainter::renderHints()
 */
+#endif
 QPainter::RenderHints QWebView::renderHints() const {
   return d->renderHints;
 }
