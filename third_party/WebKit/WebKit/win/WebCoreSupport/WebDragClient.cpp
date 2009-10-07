@@ -33,6 +33,7 @@
 
 #pragma warning(push, 0)
 #include <WebCore/ClipboardWin.h>
+#include <WebCore/DragController.h>
 #include <WebCore/DragData.h>
 #include <WebCore/Font.h>
 #include <WebCore/FontDescription.h>
@@ -67,6 +68,21 @@ void deallocContext(PlatformGraphicsContext* target);
 #define DRAG_LINK_URL_FONT_SIZE 10
 
 using namespace WebCore;
+
+static DWORD draggingSourceOperationMaskToDragCursors(DragOperation op) {
+  DWORD result = DROPEFFECT_NONE;
+  if (op == DragOperationEvery)
+    return DROPEFFECT_COPY | DROPEFFECT_LINK | DROPEFFECT_MOVE;
+  if (op & DragOperationCopy)
+    result |= DROPEFFECT_COPY;
+  if (op & DragOperationLink)
+    result |= DROPEFFECT_LINK;
+  if (op & DragOperationMove)
+    result |= DROPEFFECT_MOVE;
+  if (op & DragOperationGeneric)
+    result |= DROPEFFECT_MOVE;
+  return result;
+}
 
 WebDragClient::WebDragClient(WebView* webView) : m_webView(webView) {
   ASSERT(webView);
@@ -168,8 +184,8 @@ void WebDragClient::startDrag(DragImageRef image,
       }
     }
 
-    // FIXME: Ensure correct drag ops are available <rdar://problem/5015957>
-    DWORD okEffect = DROPEFFECT_COPY | DROPEFFECT_LINK | DROPEFFECT_MOVE;
+    DWORD okEffect = draggingSourceOperationMaskToDragCursors(
+        m_webView->page()->dragController()->sourceDragOperation());
     DWORD effect;
     COMPtr<IWebUIDelegate> ui;
     if (SUCCEEDED(m_webView->uiDelegate(&ui))) {
