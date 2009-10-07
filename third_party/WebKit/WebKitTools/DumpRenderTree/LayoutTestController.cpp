@@ -1043,6 +1043,25 @@ static JSValueRef setHandlesAuthenticationChallengesCallback(
   return JSValueMakeUndefined(context);
 }
 
+static JSValueRef setPOSIXLocaleCallback(JSContextRef context,
+                                         JSObjectRef function,
+                                         JSObjectRef thisObject,
+                                         size_t argumentCount,
+                                         const JSValueRef arguments[],
+                                         JSValueRef* exception) {
+  if (argumentCount < 1)
+    return JSValueMakeUndefined(context);
+
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  JSRetainPtr<JSStringRef> locale(
+      Adopt, JSValueToStringCopy(context, arguments[0], exception));
+  ASSERT(!*exception);
+  controller->setPOSIXLocale(locale.get());
+
+  return JSValueMakeUndefined(context);
+}
+
 static JSValueRef setIconDatabaseEnabledCallback(JSContextRef context,
                                                  JSObjectRef function,
                                                  JSObjectRef thisObject,
@@ -1800,6 +1819,8 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
       {"setHandlesAuthenticationChallenges",
        setHandlesAuthenticationChallengesCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"setPOSIXLocale", setPOSIXLocaleCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setIconDatabaseEnabled", setIconDatabaseEnabledCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setJavaScriptProfilingEnabled", setJavaScriptProfilingEnabledCallback,
@@ -1905,4 +1926,10 @@ void LayoutTestController::waitToDumpWatchdogTimerFired() {
 void LayoutTestController::setGeolocationPermission(bool allow) {
   m_isGeolocationPermissionSet = true;
   m_geolocationPermission = allow;
+}
+
+void LayoutTestController::setPOSIXLocale(JSStringRef locale) {
+  char localeBuf[32];
+  JSStringGetUTF8CString(locale, localeBuf, sizeof(localeBuf));
+  setlocale(LC_ALL, localeBuf);
 }

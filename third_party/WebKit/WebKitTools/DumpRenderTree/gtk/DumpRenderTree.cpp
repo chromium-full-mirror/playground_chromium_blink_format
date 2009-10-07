@@ -339,6 +339,8 @@ static void resetDefaultsToConsistentValues() {
                NULL);
 
   webkit_reset_origin_access_white_lists();
+
+  setlocale(LC_ALL, "");
 }
 
 void dump() {

@@ -769,6 +769,8 @@ static void resetDefaultsToConsistentValues(IWebPreferences* preferences) {
     prefsPrivate->setOfflineWebApplicationCacheEnabled(TRUE);
   }
   setAlwaysAcceptCookies(false);
+
+  setlocale(LC_ALL, "");
 }
 
 static void resetWebViewToConsistentStateBeforeTesting() {
