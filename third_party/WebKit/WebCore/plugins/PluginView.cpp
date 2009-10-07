@@ -53,6 +53,7 @@
 #include "JSDOMBinding.h"
 #include "ScriptController.h"
 #include "ScriptValue.h"
+#include "SecurityOrigin.h"
 #include "PluginDatabase.h"
 #include "PluginDebug.h"
 #include "PluginMainThreadScheduler.h"
@@ -533,7 +534,8 @@ NPError PluginView::load(const FrameLoadRequest& frameLoadRequest,
     if (!targetFrameName.isNull() &&
         m_parentFrame->tree()->find(targetFrameName) != m_parentFrame)
       return NPERR_INVALID_PARAM;
-  } else if (!FrameLoader::canLoad(url, String(), m_parentFrame->document())) {
+  } else if (!SecurityOrigin::canLoad(url, String(), m_parentFrame->document()),
+             0) {
     return NPERR_GENERIC_ERROR;
   }
 
