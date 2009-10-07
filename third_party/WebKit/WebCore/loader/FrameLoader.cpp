@@ -413,12 +413,12 @@ Frame* FrameLoader::loadSubframe(HTMLFrameOwnerElement* ownerElement,
     marginHeight = o->getMarginHeight();
   }
 
-  if (!canLoad(url, referrer)) {
+  if (!SecurityOrigin::canLoad(url, referrer, 0)) {
     FrameLoader::reportLocalLoadFailed(m_frame, url.string());
     return 0;
   }
 
-  bool hideReferrer = shouldHideReferrer(url, referrer);
+  bool hideReferrer = SecurityOrigin::shouldHideReferrer(url, referrer);
   RefPtr<Frame> frame = m_client->createFrame(
       url, name, ownerElement, hideReferrer ? String() : referrer,
       allowsScrolling, marginWidth, marginHeight);
@@ -1558,7 +1558,7 @@ bool FrameLoader::loadPlugin(RenderPart* renderer,
   if (renderer && !useFallback) {
     HTMLPlugInElement* element = toPlugInElement(renderer->node());
 
-    if (!canLoad(url, String(), frame()->document())) {
+    if (!SecurityOrigin::canLoad(url, String(), frame()->document())) {
       FrameLoader::reportLocalLoadFailed(m_frame, url.string());
       return false;
     }
@@ -2074,14 +2074,14 @@ void FrameLoader::loadFrameRequest(const FrameLoadRequest& request,
   ASSERT(frame()->document());
   if (SecurityOrigin::shouldTreatURLAsLocal(url.string()) &&
       !isFeedWithNestedProtocolInHTTPFamily(url)) {
-    if (!canLoad(url, String(), frame()->document()) &&
-        !canLoad(url, referrer)) {
+    if (!SecurityOrigin::canLoad(url, String(), frame()->document()) &&
+        !SecurityOrigin::canLoad(url, referrer, 0)) {
       FrameLoader::reportLocalLoadFailed(m_frame, url.string());
       return;
     }
   }
 
-  if (shouldHideReferrer(url, referrer))
+  if (SecurityOrigin::shouldHideReferrer(url, referrer))
     referrer = String();
 
   FrameLoadType loadType;
@@ -2326,29 +2326,6 @@ void FrameLoader::loadWithDocumentLoader(DocumentLoader* loader,
   }
 }
 
-bool FrameLoader::canLoad(const KURL& url,
-                          const String& referrer,
-                          const Document* doc) {
-  return canLoad(url, referrer, doc ? doc->securityOrigin() : 0);
-}
-
-bool FrameLoader::canLoad(const KURL& url,
-                          const String& referrer,
-                          const SecurityOrigin* securityOrigin) {
-  // We can always load any URL that isn't considered local (e.g. http URLs).
-  if (!SecurityOrigin::shouldTreatURLAsLocal(url.string()))
-    return true;
-
-  // If we were provided a document, we let its local file policy dictate the
-  // result,
-  // otherwise we allow local loads only if the supplied referrer is also local.
-  if (securityOrigin)
-    return securityOrigin->canLoadLocalResources();
-  if (!referrer.isEmpty())
-    return SecurityOrigin::shouldTreatURLAsLocal(referrer);
-  return false;
-}
-
 void FrameLoader::reportLocalLoadFailed(Frame* frame, const String& url) {
   ASSERT(!url.isEmpty());
   if (!frame)
@@ -2357,21 +2334,6 @@ void FrameLoader::reportLocalLoadFailed(Frame* frame, const String& url) {
   frame->domWindow()->console()->addMessage(
       JSMessageSource, LogMessageType, ErrorMessageLevel,
       "Not allowed to load local resource: " + url, 0, String());
-}
-
-bool FrameLoader::shouldHideReferrer(const KURL& url, const String& referrer) {
-  bool referrerIsSecureURL = protocolIs(referrer, "https");
-  bool referrerIsWebURL = referrerIsSecureURL || protocolIs(referrer, "http");
-
-  if (!referrerIsWebURL)
-    return true;
-
-  if (!referrerIsSecureURL)
-    return false;
-
-  bool URLIsSecureURL = url.protocolIs("https");
-
-  return !URLIsSecureURL;
 }
 
 const ResourceRequest& FrameLoader::initialRequest() const {
@@ -3700,7 +3662,7 @@ unsigned long FrameLoader::loadResourceSynchronously(
     ResourceResponse& response,
     Vector<char>& data) {
   String referrer = m_outgoingReferrer;
-  if (shouldHideReferrer(request.url(), referrer))
+  if (SecurityOrigin::shouldHideReferrer(request.url(), referrer))
     referrer = String();
 
   ResourceRequest initialRequest = request;
@@ -5197,7 +5159,7 @@ PassRefPtr<Widget> FrameLoader::createJavaAppletWidget(
 
   if (!codeBaseURLString.isEmpty()) {
     KURL codeBaseURL = completeURL(codeBaseURLString);
-    if (!canLoad(codeBaseURL, String(), element->document())) {
+    if (!SecurityOrigin::canLoad(codeBaseURL, String(), element->document())) {
       FrameLoader::reportLocalLoadFailed(m_frame, codeBaseURL.string());
       return 0;
     }

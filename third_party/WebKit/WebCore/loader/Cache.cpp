@@ -109,7 +109,7 @@ CachedResource* Cache::requestResource(DocLoader* docLoader,
     return 0;
 
   if (SecurityOrigin::restrictAccessToLocal() &&
-      !FrameLoader::canLoad(url, String(), docLoader->doc())) {
+      !SecurityOrigin::canLoad(url, String(), docLoader->doc())) {
     Document* doc = docLoader->doc();
     if (doc && !requestIsPreload)
       FrameLoader::reportLocalLoadFailed(doc->frame(), url.string());
