@@ -53,6 +53,7 @@ class ScriptObject : public ScriptValue {
   bool set(const char* name, double);
   bool set(const char* name, long long);
   bool set(const char* name, int);
+  bool set(const char* name, unsigned);
   bool set(const char* name, bool);
 
   static ScriptObject createNew(ScriptState*);
