@@ -580,6 +580,7 @@ struct DeserializingTreeWalker : public BaseWalker {
                                         const RefPtr<StringImpl>& propertyName,
                                         unsigned propertyIndex) {
     ASSERT(object->names()[propertyIndex] == propertyName);
+    UNUSED_PARAM(propertyName);
     return object->values()[propertyIndex];
   }
 
@@ -703,6 +704,7 @@ struct TeardownTreeWalker {
                                         const RefPtr<StringImpl>& propertyName,
                                         unsigned propertyIndex) {
     ASSERT(object->names()[propertyIndex] == propertyName);
+    UNUSED_PARAM(propertyName);
     return object->values()[propertyIndex];
   }
 
