@@ -269,6 +269,7 @@ void RenderPartObject::updateWidget(bool onlyCreateNonNetscapePlugins) {
     }
 
     bool success =
+        o->dispatchBeforeLoadEvent(url) &&
         frame->loader()->requestObject(this, url, o->getAttribute(nameAttr),
                                        serviceType, paramNames, paramValues);
     if (!success && m_hasFallbackContent)
@@ -304,8 +305,9 @@ void RenderPartObject::updateWidget(bool onlyCreateNonNetscapePlugins) {
         return;
     }
 
-    frame->loader()->requestObject(this, url, o->getAttribute(nameAttr),
-                                   serviceType, paramNames, paramValues);
+    if (o->dispatchBeforeLoadEvent(url))
+      frame->loader()->requestObject(this, url, o->getAttribute(nameAttr),
+                                     serviceType, paramNames, paramValues);
   }
 #if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
   else if (node()->hasTagName(videoTag) || node()->hasTagName(audioTag)) {
@@ -328,8 +330,10 @@ void RenderPartObject::updateWidget(bool onlyCreateNonNetscapePlugins) {
     }
 
     serviceType = "application/x-media-element-proxy-plugin";
-    frame->loader()->requestObject(this, url, nullAtom, serviceType, paramNames,
-                                   paramValues);
+
+    if (o->dispatchBeforeLoadEvent(url))
+      frame->loader()->requestObject(this, url, nullAtom, serviceType,
+                                     paramNames, paramValues);
   }
 #endif
 }
