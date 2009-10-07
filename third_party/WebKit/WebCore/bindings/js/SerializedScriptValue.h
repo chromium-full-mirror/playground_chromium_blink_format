@@ -171,10 +171,10 @@ class SerializedScriptValue : public RefCounted<SerializedScriptValue> {
 
  private:
   SerializedScriptValue(SerializedScriptValueData value)
-      : m_value(value), m_mustCopy(false) {}
-  SerializedScriptValueData m_value;
-  bool m_mustCopy;
-};
+      : m_value(value), m_mustCopy(false) {
+    SerializedScriptValueData m_value;
+    bool m_mustCopy;
+  };
 }
 
-#endif
+#endif  // SerializedScriptValue_h
