@@ -101,16 +101,6 @@ void RenderMediaControls::adjustMediaSliderThumbSize(RenderObject* o) {
       Length(static_cast<int>(mediaSliderThumbHeight * zoomLevel), Fixed));
 }
 
-static HTMLMediaElement* parentMediaElement(RenderObject* o) {
-  Node* node = o->node();
-  Node* mediaNode = node ? node->shadowAncestorNode() : 0;
-  if (!mediaNode || (!mediaNode->hasTagName(HTMLNames::videoTag) &&
-                     !mediaNode->hasTagName(HTMLNames::audioTag)))
-    return 0;
-
-  return static_cast<HTMLMediaElement*>(mediaNode);
-}
-
 bool RenderMediaControls::paintMediaControlsPart(
     MediaControlElementType part,
     RenderObject* o,
@@ -157,7 +147,7 @@ bool RenderMediaControls::paintMediaControlsPart(
                      NSRegularControlSize, determineState(o));
       break;
     case MediaSlider: {
-      if (HTMLMediaElement* mediaElement = parentMediaElement(o))
+      if (HTMLMediaElement* mediaElement = toParentMediaElement(o))
         STPaintProgressIndicator(
             SafariTheme::MediaType, paintInfo.context->platformContext(), r,
             NSRegularControlSize, 0, mediaElement->percentLoaded());

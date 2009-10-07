@@ -172,6 +172,7 @@ class RenderThemeChromiumMac : public RenderTheme {
                                              const IntRect&);
 
 #if ENABLE(VIDEO)
+  virtual bool shouldRenderMediaControlPart(ControlPart, Element*);
   virtual bool paintMediaPlayButton(RenderObject*,
                                     const RenderObject::PaintInfo&,
                                     const IntRect&);
