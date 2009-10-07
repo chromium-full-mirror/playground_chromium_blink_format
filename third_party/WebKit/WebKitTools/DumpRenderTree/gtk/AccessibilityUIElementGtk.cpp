@@ -63,9 +63,9 @@ void AccessibilityUIElement::getChildren(
 
 void AccessibilityUIElement::getChildrenWithRange(
     Vector<AccessibilityUIElement>& elementVector,
-    unsigned location,
-    unsigned length) {
-  for (unsigned i = location; i < length; i++) {
+    unsigned start,
+    unsigned end) {
+  for (unsigned i = start; i < end; i++) {
     AtkObject* child =
         atk_object_ref_accessible_child(ATK_OBJECT(m_element), i);
     elementVector.append(AccessibilityUIElement(child));
@@ -88,7 +88,7 @@ AccessibilityUIElement AccessibilityUIElement::elementAtPoint(int x, int y) {
 
 AccessibilityUIElement AccessibilityUIElement::getChildAtIndex(unsigned index) {
   Vector<AccessibilityUIElement> children;
-  getChildrenWithRange(children, index, 1);
+  getChildrenWithRange(children, index, index + 1);
 
   if (children.size() == 1)
     return children.at(0);
