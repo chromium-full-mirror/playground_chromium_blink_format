@@ -266,8 +266,8 @@ QWebPagePrivate::QWebPagePrivate(QWebPage* qq)
       clickCausedFocus(false) {
   WebCore::InitializeLoggingChannelsIfNecessary();
   JSC::initializeThreading();
-  WebCore::FrameLoader::setLocalLoadPolicy(
-      WebCore::FrameLoader::AllowLocalLoadsForLocalAndSubstituteData);
+  WebCore::SecurityOrigin::setLocalLoadPolicy(
+      WebCore::SecurityOrigin::AllowLocalLoadsForLocalAndSubstituteData);
 
   chromeClient = new ChromeClientQt(q);
   contextMenuClient = new ContextMenuClientQt();

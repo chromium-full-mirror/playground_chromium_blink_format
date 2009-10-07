@@ -33,6 +33,7 @@
 #include "Frame.h"
 #include "FrameLoader.h"
 #include "ResourceHandle.h"
+#include "SecurityOrigin.h"
 #include "SubresourceLoaderClient.h"
 #include <wtf/RefCountedLeakCounter.h>
 
@@ -78,7 +79,7 @@ PassRefPtr<SubresourceLoader> SubresourceLoader::create(
 
   ResourceRequest newRequest = request;
 
-  if (!skipCanLoadCheck && FrameLoader::restrictAccessToLocal() &&
+  if (!skipCanLoadCheck && SecurityOrigin::restrictAccessToLocal() &&
       !FrameLoader::canLoad(request.url(), String(), frame->document())) {
     FrameLoader::reportLocalLoadFailed(frame, request.url().string());
     return 0;

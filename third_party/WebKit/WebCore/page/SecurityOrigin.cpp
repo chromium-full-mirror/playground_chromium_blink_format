@@ -30,12 +30,14 @@
 #include "SecurityOrigin.h"
 
 #include "CString.h"
-#include "FrameLoader.h"
 #include "KURL.h"
 #include "OriginAccessEntry.h"
 #include <wtf/StdLibExtras.h>
 
 namespace WebCore {
+
+static SecurityOrigin::LocalLoadPolicy localLoadPolicy =
+    SecurityOrigin::AllowLocalLoadsForLocalOnly;
 
 typedef Vector<OriginAccessEntry> OriginAccessWhiteList;
 typedef HashMap<String, OriginAccessWhiteList*> OriginAccessMap;
@@ -230,7 +232,7 @@ void SecurityOrigin::grantLoadLocalResources() {
   // in a SecurityOrigin is a security hazard because the documents without
   // the privilege can obtain the privilege by injecting script into the
   // documents that have been granted the privilege.
-  ASSERT(FrameLoader::allowSubstituteDataAccessToLocal());
+  ASSERT(allowSubstituteDataAccessToLocal());
   m_canLoadLocalResources = true;
 }
 
@@ -357,12 +359,10 @@ bool SecurityOrigin::isSameSchemeHostPort(const SecurityOrigin* other) const {
   return true;
 }
 
-// static
 void SecurityOrigin::registerURLSchemeAsLocal(const String& scheme) {
   localSchemes().add(scheme);
 }
 
-// static
 void SecurityOrigin::removeURLSchemeRegisteredAsLocal(const String& scheme) {
   if (scheme == "file")
     return;
@@ -377,12 +377,10 @@ void SecurityOrigin::removeURLSchemeRegisteredAsLocal(const String& scheme) {
   localSchemes().remove(scheme);
 }
 
-// static
 const URLSchemesMap& SecurityOrigin::localURLSchemes() {
   return localSchemes();
 }
 
-// static
 bool SecurityOrigin::shouldTreatURLAsLocal(const String& url) {
   // This avoids an allocation of another String and the HashSet contains()
   // call for the file: and http: schemes.
@@ -402,7 +400,6 @@ bool SecurityOrigin::shouldTreatURLAsLocal(const String& url) {
   return localSchemes().contains(scheme);
 }
 
-// static
 bool SecurityOrigin::shouldTreatURLSchemeAsLocal(const String& scheme) {
   // This avoids an allocation of another String and the HashSet contains()
   // call for the file: and http: schemes.
@@ -420,14 +417,24 @@ bool SecurityOrigin::shouldTreatURLSchemeAsLocal(const String& scheme) {
   return localSchemes().contains(scheme);
 }
 
-// static
 void SecurityOrigin::registerURLSchemeAsNoAccess(const String& scheme) {
   noAccessSchemes().add(scheme);
 }
 
-// static
 bool SecurityOrigin::shouldTreatURLSchemeAsNoAccess(const String& scheme) {
   return noAccessSchemes().contains(scheme);
+}
+
+void SecurityOrigin::setLocalLoadPolicy(LocalLoadPolicy policy) {
+  localLoadPolicy = policy;
+}
+
+bool SecurityOrigin::restrictAccessToLocal() {
+  return localLoadPolicy != SecurityOrigin::AllowLocalLoadsForAll;
+}
+
+bool SecurityOrigin::allowSubstituteDataAccessToLocal() {
+  return localLoadPolicy != SecurityOrigin::AllowLocalLoadsForLocalOnly;
 }
 
 void SecurityOrigin::whiteListAccessFromOrigin(

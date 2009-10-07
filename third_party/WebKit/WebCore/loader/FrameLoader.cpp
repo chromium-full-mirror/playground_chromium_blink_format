@@ -134,8 +134,6 @@ static const char defaultAcceptHeader[] =
     "plain;q=0.8,image/png,*/*;q=0.5";
 #endif
 static double storedTimeOfLastCompletedLoad;
-static FrameLoader::LocalLoadPolicy localLoadPolicy =
-    FrameLoader::AllowLocalLoadsForLocalOnly;
 
 bool isBackForwardLoadType(FrameLoadType type) {
   switch (type) {
@@ -1145,18 +1143,6 @@ void FrameLoader::startIconLoader() {
     m_iconLoader.set(IconLoader::create(m_frame).release());
 
   m_iconLoader->startLoading();
-}
-
-void FrameLoader::setLocalLoadPolicy(LocalLoadPolicy policy) {
-  localLoadPolicy = policy;
-}
-
-bool FrameLoader::restrictAccessToLocal() {
-  return localLoadPolicy != FrameLoader::AllowLocalLoadsForAll;
-}
-
-bool FrameLoader::allowSubstituteDataAccessToLocal() {
-  return localLoadPolicy != FrameLoader::AllowLocalLoadsForLocalOnly;
 }
 
 void FrameLoader::commitIconURLToIconDatabase(const KURL& icon) {
