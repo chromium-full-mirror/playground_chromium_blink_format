@@ -704,8 +704,6 @@ class FrameLoader : public Noncopyable {
   Frame* m_opener;
   HashSet<Frame*> m_openedFrames;
 
-  bool m_openedByDOM;
-
   bool m_creatingInitialEmptyDocument;
   bool m_isDisplayingInitialEmptyDocument;
   bool m_committedFirstRealDocumentLoad;
