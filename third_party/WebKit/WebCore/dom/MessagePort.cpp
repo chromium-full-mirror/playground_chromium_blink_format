@@ -55,7 +55,7 @@ MessagePort::~MessagePort() {
 }
 
 // FIXME: remove this when we update the ObjC bindings (bug #28774).
-void MessagePort::postMessage(const String& message,
+void MessagePort::postMessage(PassRefPtr<SerializedScriptValue> message,
                               MessagePort* port,
                               ExceptionCode& ec) {
   MessagePortArray ports;
@@ -64,11 +64,12 @@ void MessagePort::postMessage(const String& message,
   postMessage(message, &ports, ec);
 }
 
-void MessagePort::postMessage(const String& message, ExceptionCode& ec) {
+void MessagePort::postMessage(PassRefPtr<SerializedScriptValue> message,
+                              ExceptionCode& ec) {
   postMessage(message, static_cast<MessagePortArray*>(0), ec);
 }
 
-void MessagePort::postMessage(const String& message,
+void MessagePort::postMessage(PassRefPtr<SerializedScriptValue> message,
                               const MessagePortArray* ports,
                               ExceptionCode& ec) {
   if (!m_entangledChannel)

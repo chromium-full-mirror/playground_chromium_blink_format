@@ -59,14 +59,14 @@ class WorkerMessagingProxy : public WorkerContextProxy,
                                   const String& userAgent,
                                   const String& sourceCode);
   virtual void terminateWorkerContext();
-  virtual void postMessageToWorkerContext(const String&,
+  virtual void postMessageToWorkerContext(PassRefPtr<SerializedScriptValue>,
                                           PassOwnPtr<MessagePortChannelArray>);
   virtual bool hasPendingActivity() const;
   virtual void workerObjectDestroyed();
 
   // Implementations of WorkerObjectProxy.
   // (Only use these methods in the worker context thread.)
-  virtual void postMessageToWorkerObject(const String&,
+  virtual void postMessageToWorkerObject(PassRefPtr<SerializedScriptValue>,
                                          PassOwnPtr<MessagePortChannelArray>);
   virtual void postExceptionToWorkerObject(const String& errorMessage,
                                            int lineNumber,

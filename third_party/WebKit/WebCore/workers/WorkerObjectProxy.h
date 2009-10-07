@@ -45,7 +45,7 @@ class MessagePortChannel;
 class WorkerObjectProxy : public WorkerReportingProxy {
  public:
   virtual void postMessageToWorkerObject(
-      const String&,
+      PassRefPtr<SerializedScriptValue>,
       PassOwnPtr<MessagePortChannelArray>) = 0;
 
   virtual void confirmMessageFromWorkerObject(bool hasPendingActivity) = 0;

@@ -59,6 +59,7 @@ class Node;
 class NotificationCenter;
 class PostMessageTimer;
 class ScheduledAction;
+class SerializedScriptValue;
 class Screen;
 class WebKitPoint;
 
@@ -240,13 +241,13 @@ class DOMWindow : public RefCounted<DOMWindow>, public EventTarget {
   NotificationCenter* webkitNotifications() const;
 #endif
 
-  void postMessage(const String& message,
+  void postMessage(PassRefPtr<SerializedScriptValue> message,
                    const MessagePortArray*,
                    const String& targetOrigin,
                    DOMWindow* source,
                    ExceptionCode&);
   // FIXME: remove this when we update the ObjC bindings (bug #28774).
-  void postMessage(const String& message,
+  void postMessage(PassRefPtr<SerializedScriptValue> message,
                    MessagePort*,
                    const String& targetOrigin,
                    DOMWindow* source,

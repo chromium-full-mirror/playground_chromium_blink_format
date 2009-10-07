@@ -60,12 +60,14 @@ class MessagePort : public RefCounted<MessagePort>, public EventTarget {
   }
   ~MessagePort();
 
-  void postMessage(const String& message, ExceptionCode&);
-  void postMessage(const String& message,
+  void postMessage(PassRefPtr<SerializedScriptValue> message, ExceptionCode&);
+  void postMessage(PassRefPtr<SerializedScriptValue> message,
                    const MessagePortArray*,
                    ExceptionCode&);
   // FIXME: remove this when we update the ObjC bindings (bug #28774).
-  void postMessage(const String& message, MessagePort*, ExceptionCode&);
+  void postMessage(PassRefPtr<SerializedScriptValue> message,
+                   MessagePort*,
+                   ExceptionCode&);
 
   void start();
   void close();

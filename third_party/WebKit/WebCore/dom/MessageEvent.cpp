@@ -33,9 +33,9 @@
 
 namespace WebCore {
 
-MessageEvent::MessageEvent() {}
+MessageEvent::MessageEvent() : m_data(SerializedScriptValue::create()) {}
 
-MessageEvent::MessageEvent(const String& data,
+MessageEvent::MessageEvent(PassRefPtr<SerializedScriptValue> data,
                            const String& origin,
                            const String& lastEventId,
                            PassRefPtr<DOMWindow> source,
@@ -52,7 +52,7 @@ MessageEvent::~MessageEvent() {}
 void MessageEvent::initMessageEvent(const AtomicString& type,
                                     bool canBubble,
                                     bool cancelable,
-                                    const String& data,
+                                    PassRefPtr<SerializedScriptValue> data,
                                     const String& origin,
                                     const String& lastEventId,
                                     DOMWindow* source,
@@ -80,7 +80,7 @@ MessagePort* MessageEvent::messagePort() {
 void MessageEvent::initMessageEvent(const AtomicString& type,
                                     bool canBubble,
                                     bool cancelable,
-                                    const String& data,
+                                    PassRefPtr<SerializedScriptValue> data,
                                     const String& origin,
                                     const String& lastEventId,
                                     DOMWindow* source,

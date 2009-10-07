@@ -42,6 +42,12 @@ const ClassInfo DateInstance::info = {"Date", 0, 0, 0};
 DateInstance::DateInstance(NonNullPassRefPtr<Structure> structure)
     : JSWrapperObject(structure), m_cache(0) {}
 
+DateInstance::DateInstance(ExecState* exec, double time)
+    : JSWrapperObject(exec->lexicalGlobalObject()->dateStructure()),
+      m_cache(0) {
+  setInternalValue(jsNumber(exec, timeClip(time)));
+}
+
 DateInstance::~DateInstance() {
   delete m_cache;
 }

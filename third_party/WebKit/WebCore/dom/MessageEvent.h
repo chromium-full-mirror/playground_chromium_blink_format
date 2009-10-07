@@ -32,6 +32,7 @@
 #include "DOMWindow.h"
 #include "Event.h"
 #include "MessagePort.h"
+#include "SerializedScriptValue.h"
 
 namespace WebCore {
 
@@ -42,11 +43,12 @@ class MessageEvent : public Event {
   static PassRefPtr<MessageEvent> create() {
     return adoptRef(new MessageEvent);
   }
-  static PassRefPtr<MessageEvent> create(PassOwnPtr<MessagePortArray> ports,
-                                         const String& data = "",
-                                         const String& origin = "",
-                                         const String& lastEventId = "",
-                                         PassRefPtr<DOMWindow> source = 0) {
+  static PassRefPtr<MessageEvent> create(
+      PassOwnPtr<MessagePortArray> ports,
+      PassRefPtr<SerializedScriptValue> data = 0,
+      const String& origin = "",
+      const String& lastEventId = "",
+      PassRefPtr<DOMWindow> source = 0) {
     return adoptRef(new MessageEvent(data, origin, lastEventId, source, ports));
   }
   virtual ~MessageEvent();
@@ -54,13 +56,13 @@ class MessageEvent : public Event {
   void initMessageEvent(const AtomicString& type,
                         bool canBubble,
                         bool cancelable,
-                        const String& data,
+                        PassRefPtr<SerializedScriptValue> data,
                         const String& origin,
                         const String& lastEventId,
                         DOMWindow* source,
                         PassOwnPtr<MessagePortArray>);
 
-  const String& data() const { return m_data; }
+  SerializedScriptValue* data() const { return m_data.get(); }
   const String& origin() const { return m_origin; }
   const String& lastEventId() const { return m_lastEventId; }
   DOMWindow* source() const { return m_source.get(); }
@@ -72,7 +74,7 @@ class MessageEvent : public Event {
   void initMessageEvent(const AtomicString& type,
                         bool canBubble,
                         bool cancelable,
-                        const String& data,
+                        PassRefPtr<SerializedScriptValue> data,
                         const String& origin,
                         const String& lastEventId,
                         DOMWindow* source,
@@ -82,13 +84,13 @@ class MessageEvent : public Event {
 
  private:
   MessageEvent();
-  MessageEvent(const String& data,
+  MessageEvent(PassRefPtr<SerializedScriptValue> data,
                const String& origin,
                const String& lastEventId,
                PassRefPtr<DOMWindow> source,
                PassOwnPtr<MessagePortArray>);
 
-  String m_data;
+  RefPtr<SerializedScriptValue> m_data;
   String m_origin;
   String m_lastEventId;
   RefPtr<DOMWindow> m_source;

@@ -63,6 +63,10 @@ JSValue createStackOverflowError(ExecState* exec) {
   return createError(exec, RangeError, "Maximum call stack size exceeded.");
 }
 
+JSValue createTypeError(ExecState* exec, const char* message) {
+  return createError(exec, TypeError, message);
+}
+
 JSValue createUndefinedVariableError(ExecState* exec,
                                      const Identifier& ident,
                                      unsigned bytecodeOffset,

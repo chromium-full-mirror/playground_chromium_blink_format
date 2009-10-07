@@ -56,7 +56,7 @@ class WorkerContextProxy {
   virtual void terminateWorkerContext() = 0;
 
   virtual void postMessageToWorkerContext(
-      const String&,
+      PassRefPtr<SerializedScriptValue>,
       PassOwnPtr<MessagePortChannelArray>) = 0;
 
   virtual bool hasPendingActivity() const = 0;
