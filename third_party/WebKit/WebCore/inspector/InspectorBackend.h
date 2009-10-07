@@ -138,7 +138,8 @@ class InspectorBackend : public RefCounted<InspectorBackend> {
 
   void dispatchOnInjectedScript(long callId,
                                 const String& methodName,
-                                const String& arguments);
+                                const String& arguments,
+                                bool async);
   void getChildNodes(long callId, long nodeId);
   void setAttribute(long callId,
                     long elementId,
@@ -161,7 +162,9 @@ class InspectorBackend : public RefCounted<InspectorBackend> {
   long pushNodePathToFrontend(Node* node, bool selectInUI);
   void addNodesToSearchResult(const String& nodeIds);
 #if ENABLE(DATABASE)
+  Database* databaseForId(long databaseId);
   void selectDatabase(Database* database);
+  void getDatabaseTableNames(long callId, long databaseId);
 #endif
 #if ENABLE(DOM_STORAGE)
   void selectDOMStorage(Storage* storage);
@@ -172,6 +175,9 @@ class InspectorBackend : public RefCounted<InspectorBackend> {
                          const String& value);
   void removeDOMStorageItem(long callId, long storageId, const String& key);
 #endif
+  void reportDidDispatchOnInjectedScript(long callId,
+                                         const String& result,
+                                         bool isException);
   void didEvaluateForTestInFrontend(long callId, const String& jsonResult);
 
  private:

@@ -56,6 +56,8 @@ class InspectorDatabaseResource : public RefCounted<InspectorDatabaseResource> {
 
   void bind(InspectorFrontend* frontend);
   void unbind();
+  Database* database() { return m_database.get(); }
+  long id() const { return m_id; }
 
  private:
   InspectorDatabaseResource(Database*,
@@ -64,10 +66,13 @@ class InspectorDatabaseResource : public RefCounted<InspectorDatabaseResource> {
                             const String& version);
 
   RefPtr<Database> m_database;
+  int m_id;
   String m_domain;
   String m_name;
   String m_version;
   bool m_scriptObjectCreated;
+
+  static int s_nextUnusedId;
 };
 
 }  // namespace WebCore

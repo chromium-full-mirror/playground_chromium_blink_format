@@ -520,6 +520,7 @@ class V8Custom {
   DECLARE_CALLBACK(InspectorBackendAddSourceToFrame);
   DECLARE_CALLBACK(InspectorBackendSearch);
   DECLARE_CALLBACK(InspectorBackendSetting);
+  DECLARE_CALLBACK(InspectorBackendDatabaseForId);
   DECLARE_CALLBACK(InspectorBackendInspectedWindow);
   DECLARE_CALLBACK(InspectorBackendSetSetting);
   DECLARE_CALLBACK(InspectorBackendCurrentCallFrame);
@@ -531,7 +532,6 @@ class V8Custom {
   DECLARE_CALLBACK(InspectorBackendUnwrapObject);
   DECLARE_CALLBACK(InspectorBackendPushNodePathToFrontend);
 #if ENABLE(DATABASE)
-  DECLARE_CALLBACK(InspectorBackendDatabaseTableNames);
   DECLARE_CALLBACK(InspectorBackendSelectDatabase);
 #endif
 #if ENABLE(DOM_STORAGE)
