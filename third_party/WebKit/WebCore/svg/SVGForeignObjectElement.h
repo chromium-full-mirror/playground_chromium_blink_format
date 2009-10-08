@@ -76,6 +76,14 @@ class SVGForeignObjectElement : public SVGStyledTransformableElement,
                                  SVGLength,
                                  Height,
                                  height)
+
+  // SVGURIReference
+  ANIMATED_PROPERTY_DECLARATIONS(SVGForeignObjectElement,
+                                 SVGURIReferenceIdentifier,
+                                 XLinkNames::hrefAttrString,
+                                 String,
+                                 Href,
+                                 href)
 };
 
 }  // namespace WebCore

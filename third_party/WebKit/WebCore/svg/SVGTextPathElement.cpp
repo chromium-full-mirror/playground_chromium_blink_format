@@ -41,7 +41,8 @@ SVGTextPathElement::SVGTextPathElement(const QualifiedName& tagName,
       SVGURIReference(),
       m_startOffset(this, SVGNames::startOffsetAttr, LengthModeOther),
       m_method(this, SVGNames::methodAttr, SVG_TEXTPATH_METHODTYPE_ALIGN),
-      m_spacing(this, SVGNames::spacingAttr, SVG_TEXTPATH_SPACINGTYPE_EXACT) {}
+      m_spacing(this, SVGNames::spacingAttr, SVG_TEXTPATH_SPACINGTYPE_EXACT),
+      m_href(this, XLinkNames::hrefAttr) {}
 
 SVGTextPathElement::~SVGTextPathElement() {}
 

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005, 2008 Nikolas Zimmermann <zimmermann@kde.org>
+    Copyright (C) 2004, 2005, 2008, 2009 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
@@ -42,15 +42,9 @@ class SVGURIReference {
 
   static String getTarget(const String& url);
 
-  virtual const SVGElement* contextElement() const = 0;
-
- private:
-  ANIMATED_PROPERTY_DECLARATIONS(SVGURIReference,
-                                 SVGURIReferenceIdentifier,
-                                 XLinkNames::hrefAttrString,
-                                 String,
-                                 Href,
-                                 href)
+ protected:
+  virtual void setHrefBaseValue(
+      SVGAnimatedTypeValue<String>::DecoratedType type) = 0;
 };
 
 }  // namespace WebCore

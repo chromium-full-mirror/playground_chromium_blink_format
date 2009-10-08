@@ -72,7 +72,8 @@ SVGPatternElement::SVGPatternElement(const QualifiedName& tagName,
       m_patternTransform(
           this,
           SVGNames::patternTransformAttr,
-          SVGTransformList::create(SVGNames::patternTransformAttr)) {}
+          SVGTransformList::create(SVGNames::patternTransformAttr)),
+      m_href(this, XLinkNames::hrefAttr) {}
 
 SVGPatternElement::~SVGPatternElement() {}
 

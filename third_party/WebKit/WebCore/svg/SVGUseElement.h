@@ -101,6 +101,14 @@ class SVGUseElement : public SVGStyledTransformableElement,
                                  Height,
                                  height)
 
+  // SVGURIReference
+  ANIMATED_PROPERTY_DECLARATIONS(SVGUseElement,
+                                 SVGURIReferenceIdentifier,
+                                 XLinkNames::hrefAttrString,
+                                 String,
+                                 Href,
+                                 href)
+
  private:
   // Instance tree handling
   void buildInstanceTree(SVGElement* target,

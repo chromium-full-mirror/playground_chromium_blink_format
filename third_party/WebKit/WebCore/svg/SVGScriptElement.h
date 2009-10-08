@@ -76,6 +76,15 @@ class SVGScriptElement : public SVGElement,
   virtual void dispatchErrorEvent();
 
  private:
+  // SVGURIReference
+  ANIMATED_PROPERTY_DECLARATIONS(SVGScriptElement,
+                                 SVGURIReferenceIdentifier,
+                                 XLinkNames::hrefAttrString,
+                                 String,
+                                 Href,
+                                 href)
+
+ private:
   ScriptElementData m_data;
   String m_type;
 };

@@ -39,7 +39,8 @@ SVGCursorElement::SVGCursorElement(const QualifiedName& tagName, Document* doc)
       SVGExternalResourcesRequired(),
       SVGURIReference(),
       m_x(this, SVGNames::xAttr, LengthModeWidth),
-      m_y(this, SVGNames::yAttr, LengthModeHeight) {}
+      m_y(this, SVGNames::yAttr, LengthModeHeight),
+      m_href(this, XLinkNames::hrefAttr) {}
 
 SVGCursorElement::~SVGCursorElement() {
   HashSet<SVGElement*>::iterator end = m_clients.end();

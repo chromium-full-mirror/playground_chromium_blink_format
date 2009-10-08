@@ -67,6 +67,14 @@ class SVGCursorElement : public SVGElement,
                                  Y,
                                  y)
 
+  // SVGURIReference
+  ANIMATED_PROPERTY_DECLARATIONS(SVGCursorElement,
+                                 SVGURIReferenceIdentifier,
+                                 XLinkNames::hrefAttrString,
+                                 String,
+                                 Href,
+                                 href)
+
   HashSet<SVGElement*> m_clients;
 };
 

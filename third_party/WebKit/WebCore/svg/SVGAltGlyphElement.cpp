@@ -35,7 +35,8 @@ namespace WebCore {
 
 SVGAltGlyphElement::SVGAltGlyphElement(const QualifiedName& tagName,
                                        Document* doc)
-    : SVGTextPositioningElement(tagName, doc) {}
+    : SVGTextPositioningElement(tagName, doc),
+      m_href(this, XLinkNames::hrefAttr) {}
 
 SVGAltGlyphElement::~SVGAltGlyphElement() {}
 

@@ -108,6 +108,14 @@ class SVGPatternElement : public SVGStyledElement,
                                  PatternTransform,
                                  patternTransform)
 
+  // SVGURIReference
+  ANIMATED_PROPERTY_DECLARATIONS(SVGPatternElement,
+                                 SVGURIReferenceIdentifier,
+                                 XLinkNames::hrefAttrString,
+                                 String,
+                                 Href,
+                                 href)
+
   mutable RefPtr<SVGPaintServerPattern> m_resource;
 
  private:

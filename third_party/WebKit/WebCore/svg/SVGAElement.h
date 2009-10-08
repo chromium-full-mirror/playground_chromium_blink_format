@@ -70,6 +70,14 @@ class SVGAElement : public SVGStyledTransformableElement,
                                  String,
                                  Target,
                                  target)
+
+  // SVGURIReference
+  ANIMATED_PROPERTY_DECLARATIONS(SVGAElement,
+                                 SVGURIReferenceIdentifier,
+                                 XLinkNames::hrefAttrString,
+                                 String,
+                                 Href,
+                                 href)
 };
 
 }  // namespace WebCore

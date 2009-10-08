@@ -84,6 +84,14 @@ class SVGGradientElement : public SVGStyledElement,
                                  SVGTransformList,
                                  GradientTransform,
                                  gradientTransform)
+
+  // SVGURIReference
+  ANIMATED_PROPERTY_DECLARATIONS(SVGGradientElement,
+                                 SVGURIReferenceIdentifier,
+                                 XLinkNames::hrefAttrString,
+                                 String,
+                                 Href,
+                                 href)
 };
 
 }  // namespace WebCore

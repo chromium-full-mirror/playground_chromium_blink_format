@@ -60,6 +60,14 @@ class SVGFEImageElement : public SVGFilterPrimitiveStandardAttributes,
                                  PreserveAspectRatio,
                                  preserveAspectRatio)
 
+  // SVGURIReference
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFEImageElement,
+                                 SVGURIReferenceIdentifier,
+                                 XLinkNames::hrefAttrString,
+                                 String,
+                                 Href,
+                                 href)
+
   CachedResourceHandle<CachedImage> m_cachedImage;
 };
 

@@ -104,6 +104,14 @@ class SVGFilterElement : public SVGStyledElement,
                                  FilterResY,
                                  filterResY)
 
+  // SVGURIReference
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFilterElement,
+                                 SVGURIReferenceIdentifier,
+                                 XLinkNames::hrefAttrString,
+                                 String,
+                                 Href,
+                                 href)
+
   RefPtr<SVGResourceFilter> m_filter;
 };
 

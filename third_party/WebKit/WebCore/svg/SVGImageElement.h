@@ -95,6 +95,14 @@ class SVGImageElement : public SVGStyledTransformableElement,
                                  PreserveAspectRatio,
                                  preserveAspectRatio)
 
+  // SVGURIReference
+  ANIMATED_PROPERTY_DECLARATIONS(SVGImageElement,
+                                 SVGURIReferenceIdentifier,
+                                 XLinkNames::hrefAttrString,
+                                 String,
+                                 Href,
+                                 href)
+
   SVGImageLoader m_imageLoader;
 };
 

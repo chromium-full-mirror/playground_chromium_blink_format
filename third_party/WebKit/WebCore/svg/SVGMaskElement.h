@@ -99,6 +99,14 @@ class SVGMaskElement : public SVGStyledLocatableElement,
                                  Height,
                                  height)
 
+  // SVGURIReference
+  ANIMATED_PROPERTY_DECLARATIONS(SVGMaskElement,
+                                 SVGURIReferenceIdentifier,
+                                 XLinkNames::hrefAttrString,
+                                 String,
+                                 Href,
+                                 href)
+
   RefPtr<SVGResourceMasker> m_masker;
 };
 
