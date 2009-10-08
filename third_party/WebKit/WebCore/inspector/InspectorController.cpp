@@ -941,8 +941,11 @@ void InspectorController::mainResourceFiredDOMContentEvent(
   if (!enabled() || !isMainResourceLoader(loader, url))
     return;
 
-  if (m_mainResource)
+  if (m_mainResource) {
     m_mainResource->markDOMContentEventTime();
+    if (m_frontend)
+      m_mainResource->updateScriptObject(m_frontend.get());
+  }
 }
 
 void InspectorController::mainResourceFiredLoadEvent(DocumentLoader* loader,
@@ -950,8 +953,11 @@ void InspectorController::mainResourceFiredLoadEvent(DocumentLoader* loader,
   if (!enabled() || !isMainResourceLoader(loader, url))
     return;
 
-  if (m_mainResource)
+  if (m_mainResource) {
     m_mainResource->markLoadEventTime();
+    if (m_frontend)
+      m_mainResource->updateScriptObject(m_frontend.get());
+  }
 }
 
 bool InspectorController::isMainResourceLoader(DocumentLoader* loader,
