@@ -47,7 +47,6 @@ typedef const struct __CFString* CFStringRef;
 
 namespace WebCore {
 
-class AtomicString;
 class StringBuffer;
 
 struct CStringTranslator;
@@ -60,7 +59,6 @@ enum TextCaseSensitivity { TextCaseSensitive, TextCaseInsensitive };
 typedef bool (*CharacterMatchFunctionPtr)(UChar);
 
 class StringImpl : public RefCounted<StringImpl> {
-  friend class AtomicString;
   friend struct CStringTranslator;
   friend struct HashAndCharactersTranslator;
   friend struct UCharBufferTranslator;
@@ -69,12 +67,14 @@ class StringImpl : public RefCounted<StringImpl> {
   friend class ThreadGlobalData;
   StringImpl();
 
-  struct AdoptBuffer {};
-  StringImpl(UChar*, unsigned length, AdoptBuffer);
+  // This adopts the UChar* without copying the buffer.
+  StringImpl(const UChar*, unsigned length);
 
-  // For AtomicString.
-  StringImpl(const UChar*, unsigned length, unsigned hash);
-  StringImpl(const char*, unsigned length, unsigned hash);
+  // For use only by AtomicString's XXXTranslator helpers.
+  void setHash(unsigned hash) {
+    ASSERT(!m_hash);
+    m_hash = hash;
+  }
 
   typedef CrossThreadRefCounted<OwnFastMallocPtr<UChar>> SharedUChar;
 
