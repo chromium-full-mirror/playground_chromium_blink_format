@@ -45,4 +45,8 @@
                               toURL:(NSString*)destinationURL
                             inFrame:(WebFrame*)webFrame;
 
+- (void)webView:(WebView*)webView
+    updateHistoryTitle:(NSString*)title
+                forURL:(NSString*)url;
+
 @end
