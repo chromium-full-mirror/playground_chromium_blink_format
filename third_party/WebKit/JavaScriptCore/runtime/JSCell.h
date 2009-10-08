@@ -325,6 +325,10 @@ ALWAYS_INLINE void MarkStack::append(JSValue value) {
     append(value.asCell());
 }
 
+inline void Structure::markAggregate(MarkStack& markStack) {
+  markStack.append(m_prototype);
+}
+
 inline Heap* Heap::heap(JSValue v) {
   if (!v.isCell())
     return 0;
