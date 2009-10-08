@@ -676,7 +676,7 @@ void CanvasRenderingContext2D::clip() {
     return;
   if (!state().m_invertibleCTM)
     return;
-  c->canvasClip(m_path);
+  c->clip(m_path);
 #if ENABLE(DASHBOARD_SUPPORT)
   clearPathForDashboardBackwardCompatibilityMode();
 #endif
