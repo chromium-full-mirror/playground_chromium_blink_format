@@ -28,8 +28,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef PolicyCheck_h
-#define PolicyCheck_h
+#ifndef PolicyCallback_h
+#define PolicyCallback_h
 
 #include "FrameLoaderTypes.h"
 #include "PlatformString.h"
@@ -51,10 +51,10 @@ typedef void (*NewWindowPolicyDecisionFunction)(void* argument,
                                                 bool shouldContinue);
 typedef void (*ContentPolicyDecisionFunction)(void* argument, PolicyAction);
 
-class PolicyCheck {
+class PolicyCallback {
  public:
-  PolicyCheck();
-  ~PolicyCheck();
+  PolicyCallback();
+  ~PolicyCallback();
 
   void clear();
   void set(const ResourceRequest&,
@@ -88,4 +88,4 @@ class PolicyCheck {
 
 }  // namespace WebCore
 
-#endif  // PolicyCheck_h
+#endif  // PolicyCallback_h
