@@ -799,6 +799,9 @@ bool PluginView::platformStart() {
           m_parentFrame->view()->hostWindow()->platformPageClient();
       setPlatformWidget(
           new PluginContainerQt(this, QWidget::find(client->winId())));
+      // sync our XEmbed container window creation before sending the xid to
+      // plugins.
+      QApplication::syncX();
     } else {
       notImplemented();
       m_status = PluginStatusCanNotLoadPlugin;
