@@ -59,6 +59,9 @@ class SVGMarkerElement : public SVGStyledElement,
   SVGMarkerElement(const QualifiedName&, Document*);
   virtual ~SVGMarkerElement();
 
+  TransformationMatrix viewBoxToViewTransform(float viewWidth,
+                                              float viewHeight) const;
+
   void setOrientToAuto();
   void setOrientToAngle(PassRefPtr<SVGAngle>);
 
@@ -126,6 +129,20 @@ class SVGMarkerElement : public SVGStyledElement,
                                  bool,
                                  ExternalResourcesRequired,
                                  externalResourcesRequired)
+
+  // SVGFitToViewBox
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFitToViewBox,
+                                 SVGFitToViewBoxIdentifier,
+                                 SVGNames::viewBoxAttrString,
+                                 FloatRect,
+                                 ViewBox,
+                                 viewBox)
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFitToViewBox,
+                                 SVGFitToViewBoxIdentifier,
+                                 SVGNames::preserveAspectRatioAttrString,
+                                 SVGPreserveAspectRatio,
+                                 PreserveAspectRatio,
+                                 preserveAspectRatio)
 
   RefPtr<SVGResourceMarker> m_marker;
 };

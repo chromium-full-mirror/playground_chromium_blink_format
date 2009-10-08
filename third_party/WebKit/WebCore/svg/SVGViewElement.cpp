@@ -42,7 +42,11 @@ SVGViewElement::SVGViewElement(const QualifiedName& tagName, Document* doc)
       SVGZoomAndPan(),
       m_externalResourcesRequired(this,
                                   SVGNames::externalResourcesRequiredAttr,
-                                  false) {}
+                                  false),
+      m_viewBox(this, SVGNames::viewBoxAttr),
+      m_preserveAspectRatio(this,
+                            SVGNames::preserveAspectRatioAttr,
+                            SVGPreserveAspectRatio::create()) {}
 
 SVGViewElement::~SVGViewElement() {}
 
