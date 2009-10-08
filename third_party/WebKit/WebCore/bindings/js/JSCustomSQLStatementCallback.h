@@ -31,9 +31,8 @@
 
 #if ENABLE(DATABASE)
 
-#include "JSDOMGlobalObject.h"
+#include "JSCallbackData.h"
 #include "SQLStatementCallback.h"
-#include <runtime/Protect.h>
 #include <wtf/Forward.h>
 
 namespace WebCore {
@@ -48,6 +47,8 @@ class JSCustomSQLStatementCallback : public SQLStatementCallback {
     return adoptRef(new JSCustomSQLStatementCallback(callback, globalObject));
   }
 
+  virtual ~JSCustomSQLStatementCallback();
+
   virtual void handleEvent(SQLTransaction*,
                            SQLResultSet*,
                            bool& raisedException);
@@ -55,8 +56,7 @@ class JSCustomSQLStatementCallback : public SQLStatementCallback {
  private:
   JSCustomSQLStatementCallback(JSC::JSObject* callback, JSDOMGlobalObject*);
 
-  JSC::ProtectedPtr<JSC::JSObject> m_callback;
-  JSC::ProtectedPtr<JSDOMGlobalObject> m_globalObject;
+  JSCallbackData* m_data;
 };
 }
 

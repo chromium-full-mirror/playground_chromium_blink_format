@@ -26,9 +26,8 @@
 #ifndef JSCustomPositionErrorCallback_h
 #define JSCustomPositionErrorCallback_h
 
+#include "JSCallbackData.h"
 #include "PositionErrorCallback.h"
-#include "JSDOMGlobalObject.h"
-#include <runtime/Protect.h>
 #include <wtf/Forward.h>
 
 namespace WebCore {
@@ -48,8 +47,7 @@ class JSCustomPositionErrorCallback : public PositionErrorCallback {
                                 JSDOMGlobalObject* globalObject);
   virtual void handleEvent(PositionError*);
 
-  JSC::ProtectedPtr<JSC::JSObject> m_callback;
-  JSC::ProtectedPtr<JSDOMGlobalObject> m_globalObject;
+  JSCallbackData m_data;
 };
 
 }  // namespace WebCore
