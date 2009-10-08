@@ -284,7 +284,6 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
                                  PassRefPtr<WebCore::FormState>) const;
 
   virtual bool canCachePage() const;
-  virtual bool shouldLoadMediaElementURL(const WebCore::KURL&) const;
 
   RetainPtr<WebFrame> m_webFrame;
 
