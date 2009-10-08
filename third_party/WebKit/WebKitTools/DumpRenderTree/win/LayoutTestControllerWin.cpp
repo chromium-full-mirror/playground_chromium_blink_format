@@ -905,7 +905,13 @@ void LayoutTestController::evaluateInWebInspector(long callId,
                                   reinterpret_cast<void**>(&webView))))
     return;
 
-  COMPtr<IWebInspectorPrivate> inspector;
-  if (SUCCEEDED(webView->inspectorPrivate(&inspector)))
-    inspector->evaluateInFrontend(callId, bstrT(script).GetBSTR());
+  COMPtr<IWebInspector> inspector;
+  if (FAILED(webView->inspector(&inspector)))
+    return;
+
+  COMPtr<IWebInspectorPrivate> inspectorPrivate(Query, inspector);
+  if (!inspectorPrivate)
+    return;
+
+  inspectorPrivate->evaluateInFrontend(callId, bstrT(script).GetBSTR());
 }

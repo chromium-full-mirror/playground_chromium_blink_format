@@ -680,9 +680,6 @@ class WebView : public IWebView,
   virtual HRESULT STDMETHODCALLTYPE inspector(
       /* [retval][out] */ IWebInspector**);
 
-  virtual HRESULT STDMETHODCALLTYPE inspectorPrivate(
-      /* [retval][out] */ IWebInspectorPrivate**);
-
   virtual HRESULT STDMETHODCALLTYPE clearUndoRedoOperations(void);
   virtual HRESULT STDMETHODCALLTYPE shouldClose(
       /* [retval][out] */ BOOL* result);
