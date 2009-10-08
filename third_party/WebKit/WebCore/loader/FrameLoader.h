@@ -79,6 +79,75 @@ struct WindowFeatures;
 
 bool isBackForwardLoadType(FrameLoadType);
 
+class PolicyChecker : public Noncopyable {
+ public:
+  PolicyChecker(Frame*);
+
+  void checkNavigationPolicy(const ResourceRequest&,
+                             DocumentLoader*,
+                             PassRefPtr<FormState>,
+                             NavigationPolicyDecisionFunction,
+                             void* argument);
+  void checkNavigationPolicy(const ResourceRequest&,
+                             NavigationPolicyDecisionFunction,
+                             void* argument);
+  void checkNewWindowPolicy(const NavigationAction&,
+                            NewWindowPolicyDecisionFunction,
+                            const ResourceRequest&,
+                            PassRefPtr<FormState>,
+                            const String& frameName,
+                            void* argument);
+  void checkContentPolicy(const String& MIMEType,
+                          ContentPolicyDecisionFunction,
+                          void* argument);
+
+  // FIXME: These are different.  They could use better names.
+  void cancelCheck();
+  void stopCheck();
+
+  void cannotShowMIMEType(const ResourceResponse&);
+
+  FrameLoadType loadType() const { return m_loadType; }
+  void setLoadType(FrameLoadType loadType) { m_loadType = loadType; }
+
+  bool delegateIsDecidingNavigationPolicy() const {
+    return m_delegateIsDecidingNavigationPolicy;
+  }
+  bool delegateIsHandlingUnimplementablePolicy() const {
+    return m_delegateIsHandlingUnimplementablePolicy;
+  }
+
+  // FIXME: This function is a cheat.  Basically, this is just an asynchronouc
+  // callback
+  // from the FrameLoaderClient, but this callback uses the policy types and so
+  // has to
+  // live on this object.  In the long term, we should create a type for
+  // non-policy
+  // callbacks from the FrameLoaderClient and remove this vestige.  I just don't
+  // have
+  // the heart to hack on all the platforms to make that happen right now.
+  void continueLoadAfterWillSubmitForm(PolicyAction);
+
+ private:
+  void continueAfterNavigationPolicy(PolicyAction);
+  void continueAfterNewWindowPolicy(PolicyAction);
+  void continueAfterContentPolicy(PolicyAction);
+
+  void handleUnimplementablePolicy(const ResourceError&);
+
+  Frame* m_frame;
+
+  bool m_delegateIsDecidingNavigationPolicy;
+  bool m_delegateIsHandlingUnimplementablePolicy;
+
+  // This identifies the type of navigation action which prompted this load.
+  // Note
+  // that WebKit conveys this value as the WebActionNavigationTypeKey value
+  // on navigation action delegate callbacks.
+  FrameLoadType m_loadType;
+  PolicyCheck m_policyCheck;
+};
+
 class FrameLoader : public Noncopyable {
  public:
   FrameLoader(Frame*, FrameLoaderClient*);
@@ -87,6 +156,8 @@ class FrameLoader : public Noncopyable {
   void init();
 
   Frame* frame() const { return m_frame; }
+
+  PolicyChecker* policyChecker() { return &m_policyChecker; }
 
   // FIXME: This is not cool, people. There are too many different functions
   // that all start loads.
@@ -196,8 +267,6 @@ class FrameLoader : public Noncopyable {
   ResourceError fileDoesNotExistError(const ResourceResponse&) const;
   ResourceError blockedError(const ResourceRequest&) const;
   ResourceError cannotShowURLError(const ResourceRequest&) const;
-
-  void cannotShowMIMEType(const ResourceResponse&);
   ResourceError interruptionForPolicyChangeError(const ResourceRequest&);
 
   bool isHostedByObjectElement() const;
@@ -205,14 +274,6 @@ class FrameLoader : public Noncopyable {
   bool canShowMIMEType(const String& MIMEType) const;
   bool representationExistsForURLScheme(const String& URLScheme);
   String generatedMIMETypeForURLScheme(const String& URLScheme);
-
-  void checkNavigationPolicy(const ResourceRequest&,
-                             NavigationPolicyDecisionFunction function,
-                             void* argument);
-  void checkContentPolicy(const String& MIMEType,
-                          ContentPolicyDecisionFunction,
-                          void* argument);
-  void cancelContentPolicyCheck();
 
   void reload(bool endToEndReload = false);
   void reloadWithOverrideEncoding(const String& overrideEncoding);
@@ -407,6 +468,14 @@ class FrameLoader : public Noncopyable {
                         bool lockBackForwardList);
   void clientRedirectCancelledOrFinished(bool cancelWithLoadInProgress);
 
+  // FIXME: This is public because this asynchronous callback from the
+  // FrameLoaderClient
+  // uses the policy machinery (and therefore is called via the PolicyChecker).
+  // Once we
+  // introduce a proper callback type for this function, we should make it
+  // private again.
+  void continueLoadAfterWillSubmitForm();
+
  private:
   PassRefPtr<HistoryItem> createHistoryItem(bool useOriginal);
   PassRefPtr<HistoryItem> createHistoryItemTree(Frame* targetFrame,
@@ -476,48 +545,33 @@ class FrameLoader : public Noncopyable {
 
   void setLoadType(FrameLoadType);
 
-  void checkNavigationPolicy(const ResourceRequest&,
-                             DocumentLoader*,
-                             PassRefPtr<FormState>,
-                             NavigationPolicyDecisionFunction,
-                             void* argument);
-  void checkNewWindowPolicy(const NavigationAction&,
-                            const ResourceRequest&,
-                            PassRefPtr<FormState>,
-                            const String& frameName);
-
-  void continueAfterNavigationPolicy(PolicyAction);
-  void continueAfterNewWindowPolicy(PolicyAction);
-  void continueAfterContentPolicy(PolicyAction);
-  void continueLoadAfterWillSubmitForm(PolicyAction = PolicyUse);
-
   static void callContinueLoadAfterNavigationPolicy(void*,
                                                     const ResourceRequest&,
                                                     PassRefPtr<FormState>,
                                                     bool shouldContinue);
-  void continueLoadAfterNavigationPolicy(const ResourceRequest&,
-                                         PassRefPtr<FormState>,
-                                         bool shouldContinue);
   static void callContinueLoadAfterNewWindowPolicy(void*,
                                                    const ResourceRequest&,
                                                    PassRefPtr<FormState>,
                                                    const String& frameName,
                                                    bool shouldContinue);
-  void continueLoadAfterNewWindowPolicy(const ResourceRequest&,
-                                        PassRefPtr<FormState>,
-                                        const String& frameName,
-                                        bool shouldContinue);
   static void callContinueFragmentScrollAfterNavigationPolicy(
       void*,
       const ResourceRequest&,
       PassRefPtr<FormState>,
       bool shouldContinue);
+
+  void continueLoadAfterNavigationPolicy(const ResourceRequest&,
+                                         PassRefPtr<FormState>,
+                                         bool shouldContinue);
+  void continueLoadAfterNewWindowPolicy(const ResourceRequest&,
+                                        PassRefPtr<FormState>,
+                                        const String& frameName,
+                                        bool shouldContinue);
   void continueFragmentScrollAfterNavigationPolicy(const ResourceRequest&,
                                                    bool shouldContinue);
+
   bool shouldScrollToAnchor(bool isFormSubmission, FrameLoadType, const KURL&);
   void addHistoryItemForFragmentScroll();
-
-  void stopPolicyCheck();
 
   void checkLoadCompleteForThisFrame();
 
@@ -537,7 +591,6 @@ class FrameLoader : public Noncopyable {
              bool clearFrameView = true);
 
   bool shouldReloadToHandleUnreachableURL(DocumentLoader*);
-  void handleUnimplementablePolicy(const ResourceError&);
 
   void dispatchDidCommitLoad();
   void dispatchAssignIdentifierToInitialRequest(unsigned long identifier,
@@ -635,6 +688,8 @@ class FrameLoader : public Noncopyable {
   Frame* m_frame;
   FrameLoaderClient* m_client;
 
+  PolicyChecker m_policyChecker;
+
   FrameState m_state;
   FrameLoadType m_loadType;
 
@@ -649,16 +704,7 @@ class FrameLoader : public Noncopyable {
   RefPtr<DocumentLoader> m_provisionalDocumentLoader;
   RefPtr<DocumentLoader> m_policyDocumentLoader;
 
-  // This identifies the type of navigation action which prompted this load.
-  // Note
-  // that WebKit conveys this value as the WebActionNavigationTypeKey value
-  // on navigation action delegate callbacks.
-  FrameLoadType m_policyLoadType;
-  PolicyCheck m_policyCheck;
-
   bool m_delegateIsHandlingProvisionalLoadError;
-  bool m_delegateIsDecidingNavigationPolicy;
-  bool m_delegateIsHandlingUnimplementablePolicy;
 
   bool m_firstLayoutDone;
   bool m_quickRedirectComing;

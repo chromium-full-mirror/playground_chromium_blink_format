@@ -130,7 +130,7 @@ void FrameLoaderClient::dispatchWillSubmitForm(
   ASSERT(policyFunction);
   if (!policyFunction)
     return;
-  (core(m_frame)->loader()->*policyFunction)(PolicyUse);
+  (core(m_frame)->loader()->policyChecker()->*policyFunction)(PolicyUse);
 }
 
 void FrameLoaderClient::committedLoad(WebCore::DocumentLoader* loader,
@@ -301,7 +301,7 @@ void FrameLoaderClient::dispatchDecidePolicyForMIMEType(
     return;
 
   if (resourceRequest.isNull()) {
-    (core(m_frame)->loader()->*policyFunction)(PolicyIgnore);
+    (core(m_frame)->loader()->policyChecker()->*policyFunction)(PolicyIgnore);
     return;
   }
 
@@ -375,7 +375,7 @@ void FrameLoaderClient::dispatchDecidePolicyForNewWindowAction(
     return;
 
   if (resourceRequest.isNull()) {
-    (core(m_frame)->loader()->*policyFunction)(PolicyIgnore);
+    (core(m_frame)->loader()->policyChecker()->*policyFunction)(PolicyIgnore);
     return;
   }
 
@@ -403,7 +403,7 @@ void FrameLoaderClient::dispatchDecidePolicyForNewWindowAction(
   // FIXME: I think Qt version marshals this to another thread so when we
   // have multi-threaded download, we might need to do the same
   if (!isHandled)
-    (core(m_frame)->loader()->*policyFunction)(PolicyUse);
+    (core(m_frame)->loader()->policyChecker()->*policyFunction)(PolicyUse);
 }
 
 void FrameLoaderClient::dispatchDecidePolicyForNavigationAction(
@@ -416,7 +416,7 @@ void FrameLoaderClient::dispatchDecidePolicyForNavigationAction(
     return;
 
   if (resourceRequest.isNull()) {
-    (core(m_frame)->loader()->*policyFunction)(PolicyIgnore);
+    (core(m_frame)->loader()->policyChecker()->*policyFunction)(PolicyIgnore);
     return;
   }
 
@@ -435,7 +435,7 @@ void FrameLoaderClient::dispatchDecidePolicyForNavigationAction(
                         &response);
 
   if (response == WEBKIT_NAVIGATION_RESPONSE_IGNORE) {
-    (core(m_frame)->loader()->*policyFunction)(PolicyIgnore);
+    (core(m_frame)->loader()->policyChecker()->*policyFunction)(PolicyIgnore);
     g_object_unref(request);
     return;
   }

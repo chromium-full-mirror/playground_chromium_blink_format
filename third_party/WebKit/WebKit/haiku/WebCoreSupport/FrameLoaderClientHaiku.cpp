@@ -250,7 +250,7 @@ void FrameLoaderClientHaiku::dispatchWillSubmitForm(
   // FIXME: Send an event to allow for alerts and cancellation.
   if (!m_frame)
     return;
-  (m_frame->loader()->*function)(PolicyUse);
+  (m_frame->loader()->policyChecker()->*function)(PolicyUse);
 }
 
 void FrameLoaderClientHaiku::dispatchDidLoadMainResource(DocumentLoader*) {
@@ -593,7 +593,7 @@ void FrameLoaderClientHaiku::dispatchDecidePolicyForMIMEType(
     return;
 
   notImplemented();
-  (m_frame->loader()->*function)(PolicyUse);
+  (m_frame->loader()->policyChecker()->*function)(PolicyUse);
 }
 
 void FrameLoaderClientHaiku::dispatchDecidePolicyForNewWindowAction(
@@ -609,12 +609,12 @@ void FrameLoaderClientHaiku::dispatchDecidePolicyForNewWindowAction(
     BMessage message(NEW_WINDOW_REQUESTED);
     message.AddString("url", request.url().string());
     if (m_messenger->SendMessage(&message)) {
-      (m_frame->loader()->*function)(PolicyIgnore);
+      (m_frame->loader()->policyChecker()->*function)(PolicyIgnore);
       return;
     }
   }
 
-  (m_frame->loader()->*function)(PolicyUse);
+  (m_frame->loader()->policyChecker()->*function)(PolicyUse);
 }
 
 void FrameLoaderClientHaiku::dispatchDecidePolicyForNavigationAction(
@@ -630,7 +630,7 @@ void FrameLoaderClientHaiku::dispatchDecidePolicyForNavigationAction(
     message.AddString("url", request.url().string());
     m_messenger->SendMessage(&message);
 
-    (m_frame->loader()->*function)(PolicyUse);
+    (m_frame->loader()->policyChecker()->*function)(PolicyUse);
   }
 }
 

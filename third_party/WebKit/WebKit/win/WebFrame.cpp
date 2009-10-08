@@ -1300,7 +1300,7 @@ void WebFrame::dispatchWillSubmitForm(FramePolicyFunction function,
   COMPtr<IWebFormDelegate> formDelegate;
 
   if (FAILED(d->webView->formDelegate(&formDelegate))) {
-    (coreFrame->loader()->*function)(PolicyUse);
+    (coreFrame->loader()->policyChecker()->*function)(PolicyUse);
     return;
   }
 
@@ -1323,7 +1323,7 @@ void WebFrame::dispatchWillSubmitForm(FramePolicyFunction function,
     return;
 
   // FIXME: Add a sane default implementation
-  (coreFrame->loader()->*function)(PolicyUse);
+  (coreFrame->loader()->policyChecker()->*function)(PolicyUse);
 }
 
 void WebFrame::revertToProvisionalState(DocumentLoader*) {
@@ -1478,7 +1478,7 @@ void WebFrame::receivedPolicyDecision(PolicyAction action) {
   Frame* coreFrame = core(this);
   ASSERT(coreFrame);
 
-  (coreFrame->loader()->*function)(action);
+  (coreFrame->loader()->policyChecker()->*function)(action);
 }
 
 void WebFrame::dispatchDecidePolicyForMIMEType(FramePolicyFunction function,
@@ -1499,7 +1499,7 @@ void WebFrame::dispatchDecidePolicyForMIMEType(FramePolicyFunction function,
           setUpPolicyListener(function).get())))
     return;
 
-  (coreFrame->loader()->*function)(PolicyUse);
+  (coreFrame->loader()->policyChecker()->*function)(PolicyUse);
 }
 
 void WebFrame::dispatchDecidePolicyForNewWindowAction(
@@ -1526,7 +1526,7 @@ void WebFrame::dispatchDecidePolicyForNewWindowAction(
           BString(frameName), setUpPolicyListener(function).get())))
     return;
 
-  (coreFrame->loader()->*function)(PolicyUse);
+  (coreFrame->loader()->policyChecker()->*function)(PolicyUse);
 }
 
 void WebFrame::dispatchDecidePolicyForNavigationAction(
@@ -1552,7 +1552,7 @@ void WebFrame::dispatchDecidePolicyForNavigationAction(
           setUpPolicyListener(function).get())))
     return;
 
-  (coreFrame->loader()->*function)(PolicyUse);
+  (coreFrame->loader()->policyChecker()->*function)(PolicyUse);
 }
 
 void WebFrame::dispatchUnableToImplementPolicy(const ResourceError& error) {
