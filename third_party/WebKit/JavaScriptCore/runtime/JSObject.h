@@ -817,7 +817,7 @@ ALWAYS_INLINE void JSObject::allocatePropertyStorageInline(size_t oldSize,
 ALWAYS_INLINE void JSObject::markChildrenDirect(MarkStack& markStack) {
   JSCell::markChildren(markStack);
 
-  m_structure->markAggregate(markStack);
+  markStack.append(prototype());
 
   PropertyStorage storage = propertyStorage();
   size_t storageSize = m_structure->propertyStorageSize();

@@ -30,6 +30,7 @@
 #include "JSType.h"
 #include "JSValue.h"
 #include "PropertyMapHashTable.h"
+#include "PropertyNameArray.h"
 #include "StructureChain.h"
 #include "StructureTransitionTable.h"
 #include "JSTypeInfo.h"
@@ -92,8 +93,6 @@ class Structure : public RefCounted<Structure> {
 
   ~Structure();
 
-  void markAggregate(MarkStack&);
-
   // These should be used with caution.
   size_t addPropertyWithoutTransition(const Identifier& propertyName,
                                       unsigned attributes,
@@ -147,9 +146,6 @@ class Structure : public RefCounted<Structure> {
     return hasTransition(propertyName._ustring.rep(), attributes);
   }
 
-  void getEnumerablePropertyNames(ExecState*, PropertyNameArray&, JSObject*);
-  void getOwnEnumerablePropertyNames(ExecState*, PropertyNameArray&, JSObject*);
-
   bool hasGetterSetterProperties() const { return m_hasGetterSetterProperties; }
   void setHasGetterSetterProperties(bool hasGetterSetterProperties) {
     m_hasGetterSetterProperties = hasGetterSetterProperties;
@@ -161,6 +157,15 @@ class Structure : public RefCounted<Structure> {
 
   JSCell* specificValue() { return m_specificValueInPrevious; }
   void despecifyDictionaryFunction(const Identifier& propertyName);
+
+  void setEnumerationCache(PassRefPtr<PropertyNameArrayData> data) {
+    m_cachedPropertyNameArrayData = data;
+  }
+  PropertyNameArrayData* enumerationCache() {
+    return m_cachedPropertyNameArrayData.get();
+  }
+  void clearEnumerationCache();
+  void getEnumerablePropertyNames(PropertyNameArray&);
 
  private:
   Structure(JSValue prototype, const TypeInfo&);
@@ -178,10 +183,6 @@ class Structure : public RefCounted<Structure> {
              JSCell* specificValue);
   size_t remove(const Identifier& propertyName);
   void addAnonymousSlots(unsigned slotCount);
-  void getEnumerableNamesFromPropertyTable(PropertyNameArray&);
-  void getEnumerableNamesFromClassInfoTable(ExecState*,
-                                            const ClassInfo*,
-                                            PropertyNameArray&);
 
   void expandPropertyMapHashTable();
   void rehashPropertyMapHashTable();
@@ -200,8 +201,6 @@ class Structure : public RefCounted<Structure> {
       return;
     materializePropertyMap();
   }
-
-  void clearEnumerationCache();
 
   signed char transitionCount() const {
     // Since the number of transitions is always the same as m_offset, we keep
