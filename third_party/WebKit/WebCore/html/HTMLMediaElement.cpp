@@ -166,6 +166,9 @@ void HTMLMediaElement::parseMappedAttribute(MappedAttribute* attr) {
   } else if (attrName == onabortAttr)
     setAttributeEventListener(eventNames().abortEvent,
                               createAttributeEventListener(this, attr));
+  else if (attrName == onbeforeloadAttr)
+    setAttributeEventListener(eventNames().beforeloadEvent,
+                              createAttributeEventListener(this, attr));
   else if (attrName == oncanplayAttr)
     setAttributeEventListener(eventNames().canplayEvent,
                               createAttributeEventListener(this, attr));
@@ -549,7 +552,8 @@ void HTMLMediaElement::selectMediaResource() {
   ContentType contentType("");
   if (!mediaSrc.isEmpty()) {
     KURL mediaURL = document()->completeURL(mediaSrc);
-    if (isSafeToLoadURL(mediaURL, Complain)) {
+    if (isSafeToLoadURL(mediaURL, Complain) &&
+        dispatchBeforeLoadEvent(mediaURL.string())) {
       m_loadState = LoadingFromSrcAttr;
       loadResource(mediaURL, contentType);
     } else
@@ -1384,7 +1388,8 @@ KURL HTMLMediaElement::selectNextSourceChild(
 
     // Is it safe to load this url?
     mediaURL = source->src();
-    if (!mediaURL.isValid() || !isSafeToLoadURL(mediaURL, actionIfInvalid))
+    if (!mediaURL.isValid() || !isSafeToLoadURL(mediaURL, actionIfInvalid) ||
+        !dispatchBeforeLoadEvent(mediaURL.string()))
       goto check_again;
 
     // Making it this far means the <source> looks reasonable
