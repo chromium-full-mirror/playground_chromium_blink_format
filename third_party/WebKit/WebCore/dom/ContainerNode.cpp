@@ -930,7 +930,7 @@ bool ContainerNode::dispatchBeforeLoadEvent(const String& sourceURL) {
   RefPtr<ContainerNode> protector(this);
   RefPtr<BeforeLoadEvent> beforeLoadEvent = BeforeLoadEvent::create(sourceURL);
   dispatchEvent(beforeLoadEvent.get());
-  return inDocument() && !beforeLoadEvent->defaultPrevented();
+  return !beforeLoadEvent->defaultPrevented();
 }
 
 }  // namespace WebCore
