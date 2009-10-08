@@ -832,18 +832,25 @@ unsigned LayoutTestController::numberOfActiveAnimations() const {
   return number;
 }
 
+static _bstr_t bstrT(JSStringRef jsString) {
+  // The false parameter tells the _bstr_t constructor to adopt the BSTR we pass
+  // it.
+  return _bstr_t(JSStringCopyBSTR(jsString), false);
+}
+
 void LayoutTestController::whiteListAccessFromOrigin(
     JSStringRef sourceOrigin,
     JSStringRef destinationProtocol,
     JSStringRef destinationHost,
     bool allowDestinationSubdomains) {
-  printf("LayoutTestController::whiteListAccessFromOrigin not implemented\n");
-}
+  COMPtr<IWebViewPrivate> webView;
+  if (FAILED(WebKitCreateInstance(__uuidof(WebView), 0, __uuidof(webView),
+                                  reinterpret_cast<void**>(&webView))))
+    return;
 
-static _bstr_t bstrT(JSStringRef jsString) {
-  // The false parameter tells the _bstr_t constructor to adopt the BSTR we pass
-  // it.
-  return _bstr_t(JSStringCopyBSTR(jsString), false);
+  webView->whiteListAccessFromOrigin(
+      bstrT(sourceOrigin).GetBSTR(), bstrT(destinationProtocol).GetBSTR(),
+      bstrT(destinationHost).GetBSTR(), allowDestinationSubdomains);
 }
 
 void LayoutTestController::addUserScript(JSStringRef source, bool runAtStart) {

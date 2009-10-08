@@ -811,6 +811,7 @@ static void resetWebViewToConsistentStateBeforeTesting() {
     SetFocus(viewWindow);
 
   webViewPrivate->clearMainFrameName();
+  webViewPrivate->resetOriginAccessWhiteLists();
 
   sharedUIDelegate->resetUndoManager();
 
