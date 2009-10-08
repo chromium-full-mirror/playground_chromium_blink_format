@@ -181,14 +181,14 @@ bool ScriptController::processingUserGesture() const {
 void ScriptController::evaluateInIsolatedWorld(
     unsigned worldID,
     const Vector<ScriptSourceCode>& sources) {
-  // FIXME: Get rid of extensionGroup here.
-  m_proxy->evaluateInNewWorld(sources, 1);
+  m_proxy->evaluateInIsolatedWorld(worldID, sources, 0);
 }
 
-void ScriptController::evaluateInNewWorld(
+void ScriptController::evaluateInIsolatedWorld(
+    unsigned worldID,
     const Vector<ScriptSourceCode>& sources,
     int extensionGroup) {
-  m_proxy->evaluateInNewWorld(sources, extensionGroup);
+  m_proxy->evaluateInIsolatedWorld(worldID, sources, extensionGroup);
 }
 
 void ScriptController::evaluateInNewContext(
