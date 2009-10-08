@@ -41,7 +41,10 @@ SVGPolyElement::SVGPolyElement(const QualifiedName& tagName, Document* doc)
       SVGTests(),
       SVGLangSpace(),
       SVGExternalResourcesRequired(),
-      SVGAnimatedPoints() {}
+      SVGAnimatedPoints(),
+      m_externalResourcesRequired(this,
+                                  SVGNames::externalResourcesRequiredAttr,
+                                  false) {}
 
 SVGPolyElement::~SVGPolyElement() {}
 

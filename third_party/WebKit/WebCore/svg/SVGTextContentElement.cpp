@@ -52,7 +52,10 @@ SVGTextContentElement::SVGTextContentElement(const QualifiedName& tagName,
       SVGLangSpace(),
       SVGExternalResourcesRequired(),
       m_textLength(this, SVGNames::textLengthAttr, LengthModeOther),
-      m_lengthAdjust(this, SVGNames::lengthAdjustAttr, LENGTHADJUST_SPACING) {}
+      m_lengthAdjust(this, SVGNames::lengthAdjustAttr, LENGTHADJUST_SPACING),
+      m_externalResourcesRequired(this,
+                                  SVGNames::externalResourcesRequiredAttr,
+                                  false) {}
 
 SVGTextContentElement::~SVGTextContentElement() {}
 

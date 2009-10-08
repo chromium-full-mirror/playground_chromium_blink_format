@@ -30,7 +30,11 @@
 namespace WebCore {
 
 SVGMPathElement::SVGMPathElement(const QualifiedName& qname, Document* doc)
-    : SVGElement(qname, doc), m_href(this, XLinkNames::hrefAttr) {}
+    : SVGElement(qname, doc),
+      m_href(this, XLinkNames::hrefAttr),
+      m_externalResourcesRequired(this,
+                                  SVGNames::externalResourcesRequiredAttr,
+                                  false) {}
 
 SVGMPathElement::~SVGMPathElement() {}
 

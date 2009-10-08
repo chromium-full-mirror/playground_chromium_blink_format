@@ -174,6 +174,14 @@ class SVGSVGElement : public SVGStyledLocatableElement,
                                  Height,
                                  height)
 
+  // SVGExternalResourcesRequired
+  ANIMATED_PROPERTY_DECLARATIONS(SVGExternalResourcesRequired,
+                                 SVGExternalResourcesRequiredIdentifier,
+                                 SVGNames::externalResourcesRequiredAttrString,
+                                 bool,
+                                 ExternalResourcesRequired,
+                                 externalResourcesRequired)
+
   virtual void documentWillBecomeInactive();
   virtual void documentDidBecomeActive();
 

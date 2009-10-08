@@ -79,6 +79,14 @@ class SVGLineElement : public SVGStyledTransformableElement,
                                  SVGLength,
                                  Y2,
                                  y2)
+
+  // SVGExternalResourcesRequired
+  ANIMATED_PROPERTY_DECLARATIONS(SVGExternalResourcesRequired,
+                                 SVGExternalResourcesRequiredIdentifier,
+                                 SVGNames::externalResourcesRequiredAttrString,
+                                 bool,
+                                 ExternalResourcesRequired,
+                                 externalResourcesRequired)
 };
 
 }  // namespace WebCore

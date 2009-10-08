@@ -33,7 +33,10 @@ SVGGElement::SVGGElement(const QualifiedName& tagName, Document* doc)
     : SVGStyledTransformableElement(tagName, doc),
       SVGTests(),
       SVGLangSpace(),
-      SVGExternalResourcesRequired() {}
+      SVGExternalResourcesRequired(),
+      m_externalResourcesRequired(this,
+                                  SVGNames::externalResourcesRequiredAttr,
+                                  false) {}
 
 SVGGElement::~SVGGElement() {}
 

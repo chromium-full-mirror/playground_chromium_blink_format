@@ -39,7 +39,11 @@ namespace WebCore {
 using namespace SVGNames;
 
 SVGFontElement::SVGFontElement(const QualifiedName& tagName, Document* doc)
-    : SVGStyledElement(tagName, doc), m_isGlyphCacheValid(false) {}
+    : SVGStyledElement(tagName, doc),
+      m_externalResourcesRequired(this,
+                                  SVGNames::externalResourcesRequiredAttr,
+                                  false),
+      m_isGlyphCacheValid(false) {}
 
 SVGFontElement::~SVGFontElement() {}
 

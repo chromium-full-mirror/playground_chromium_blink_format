@@ -84,6 +84,14 @@ class SVGScriptElement : public SVGElement,
                                  Href,
                                  href)
 
+  // SVGExternalResourcesRequired
+  ANIMATED_PROPERTY_DECLARATIONS(SVGExternalResourcesRequired,
+                                 SVGExternalResourcesRequiredIdentifier,
+                                 SVGNames::externalResourcesRequiredAttrString,
+                                 bool,
+                                 ExternalResourcesRequired,
+                                 externalResourcesRequired)
+
  private:
   ScriptElementData m_data;
   String m_type;

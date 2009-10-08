@@ -58,7 +58,10 @@ SVGFilterElement::SVGFilterElement(const QualifiedName& tagName, Document* doc)
       m_height(this, SVGNames::heightAttr, LengthModeHeight, "120%"),
       m_filterResX(this, SVGNames::filterResAttr),
       m_filterResY(this, SVGNames::filterResAttr),
-      m_href(this, XLinkNames::hrefAttr) {
+      m_href(this, XLinkNames::hrefAttr),
+      m_externalResourcesRequired(this,
+                                  SVGNames::externalResourcesRequiredAttr,
+                                  false) {
   // Spec: If the x/y attribute is not specified, the effect is as if a value of
   // "-10%" were specified.
   // Spec: If the width/height attribute is not specified, the effect is as if a

@@ -49,7 +49,10 @@ SVGPathElement::SVGPathElement(const QualifiedName& tagName, Document* doc)
       SVGTests(),
       SVGLangSpace(),
       SVGExternalResourcesRequired(),
-      m_pathLength(this, SVGNames::pathLengthAttr, 0.0f) {}
+      m_pathLength(this, SVGNames::pathLengthAttr, 0.0f),
+      m_externalResourcesRequired(this,
+                                  SVGNames::externalResourcesRequiredAttr,
+                                  false) {}
 
 SVGPathElement::~SVGPathElement() {}
 

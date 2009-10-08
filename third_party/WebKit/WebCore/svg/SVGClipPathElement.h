@@ -63,6 +63,14 @@ class SVGClipPathElement : public SVGStyledTransformableElement,
                                  ClipPathUnits,
                                  clipPathUnits)
 
+  // SVGExternalResourcesRequired
+  ANIMATED_PROPERTY_DECLARATIONS(SVGExternalResourcesRequired,
+                                 SVGExternalResourcesRequiredIdentifier,
+                                 SVGNames::externalResourcesRequiredAttrString,
+                                 bool,
+                                 ExternalResourcesRequired,
+                                 externalResourcesRequired)
+
   RefPtr<SVGResourceClipper> m_clipper;
 };
 

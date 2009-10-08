@@ -53,7 +53,10 @@ SVGAElement::SVGAElement(const QualifiedName& tagName, Document* doc)
       SVGLangSpace(),
       SVGExternalResourcesRequired(),
       m_target(this, SVGNames::targetAttr),
-      m_href(this, XLinkNames::hrefAttr) {}
+      m_href(this, XLinkNames::hrefAttr),
+      m_externalResourcesRequired(this,
+                                  SVGNames::externalResourcesRequiredAttr,
+                                  false) {}
 
 SVGAElement::~SVGAElement() {}
 

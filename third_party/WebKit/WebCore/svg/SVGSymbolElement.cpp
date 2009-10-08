@@ -33,7 +33,10 @@ SVGSymbolElement::SVGSymbolElement(const QualifiedName& tagName, Document* doc)
     : SVGStyledElement(tagName, doc),
       SVGLangSpace(),
       SVGExternalResourcesRequired(),
-      SVGFitToViewBox() {}
+      SVGFitToViewBox(),
+      m_externalResourcesRequired(this,
+                                  SVGNames::externalResourcesRequiredAttr,
+                                  false) {}
 
 SVGSymbolElement::~SVGSymbolElement() {}
 

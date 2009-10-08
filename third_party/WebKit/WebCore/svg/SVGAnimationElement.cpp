@@ -54,6 +54,9 @@ SVGAnimationElement::SVGAnimationElement(const QualifiedName& tagName,
     : SVGSMILElement(tagName, doc),
       SVGTests(),
       SVGExternalResourcesRequired(),
+      m_externalResourcesRequired(this,
+                                  SVGNames::externalResourcesRequiredAttr,
+                                  false),
       m_animationValid(false) {}
 
 SVGAnimationElement::~SVGAnimationElement() {}

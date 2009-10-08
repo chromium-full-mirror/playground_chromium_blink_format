@@ -112,6 +112,14 @@ class SVGFilterElement : public SVGStyledElement,
                                  Href,
                                  href)
 
+  // SVGExternalResourcesRequired
+  ANIMATED_PROPERTY_DECLARATIONS(SVGExternalResourcesRequired,
+                                 SVGExternalResourcesRequiredIdentifier,
+                                 SVGNames::externalResourcesRequiredAttrString,
+                                 bool,
+                                 ExternalResourcesRequired,
+                                 externalResourcesRequired)
+
   RefPtr<SVGResourceFilter> m_filter;
 };
 

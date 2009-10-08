@@ -46,7 +46,10 @@ SVGFEImageElement::SVGFEImageElement(const QualifiedName& tagName,
       m_preserveAspectRatio(this,
                             SVGNames::preserveAspectRatioAttr,
                             SVGPreserveAspectRatio::create()),
-      m_href(this, XLinkNames::hrefAttr) {}
+      m_href(this, XLinkNames::hrefAttr),
+      m_externalResourcesRequired(this,
+                                  SVGNames::externalResourcesRequiredAttr,
+                                  false) {}
 
 SVGFEImageElement::~SVGFEImageElement() {
   if (m_cachedImage)

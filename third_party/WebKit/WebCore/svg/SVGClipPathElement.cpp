@@ -42,7 +42,10 @@ SVGClipPathElement::SVGClipPathElement(const QualifiedName& tagName,
       SVGExternalResourcesRequired(),
       m_clipPathUnits(this,
                       SVGNames::clipPathUnitsAttr,
-                      SVGUnitTypes::SVG_UNIT_TYPE_USERSPACEONUSE) {}
+                      SVGUnitTypes::SVG_UNIT_TYPE_USERSPACEONUSE),
+      m_externalResourcesRequired(this,
+                                  SVGNames::externalResourcesRequiredAttr,
+                                  false) {}
 
 SVGClipPathElement::~SVGClipPathElement() {}
 

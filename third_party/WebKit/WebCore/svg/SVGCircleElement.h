@@ -69,6 +69,14 @@ class SVGCircleElement : public SVGStyledTransformableElement,
                                  SVGLength,
                                  R,
                                  r)
+
+  // SVGExternalResourcesRequired
+  ANIMATED_PROPERTY_DECLARATIONS(SVGExternalResourcesRequired,
+                                 SVGExternalResourcesRequiredIdentifier,
+                                 SVGNames::externalResourcesRequiredAttrString,
+                                 bool,
+                                 ExternalResourcesRequired,
+                                 externalResourcesRequired)
 };
 
 }  // namespace WebCore

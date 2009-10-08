@@ -119,6 +119,14 @@ class SVGMarkerElement : public SVGStyledElement,
                                  OrientAngle,
                                  orientAngle)
 
+  // SVGExternalResourcesRequired
+  ANIMATED_PROPERTY_DECLARATIONS(SVGExternalResourcesRequired,
+                                 SVGExternalResourcesRequiredIdentifier,
+                                 SVGNames::externalResourcesRequiredAttrString,
+                                 bool,
+                                 ExternalResourcesRequired,
+                                 externalResourcesRequired)
+
   RefPtr<SVGResourceMarker> m_marker;
 };
 

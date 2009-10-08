@@ -103,6 +103,14 @@ class SVGImageElement : public SVGStyledTransformableElement,
                                  Href,
                                  href)
 
+  // SVGExternalResourcesRequired
+  ANIMATED_PROPERTY_DECLARATIONS(SVGExternalResourcesRequired,
+                                 SVGExternalResourcesRequiredIdentifier,
+                                 SVGNames::externalResourcesRequiredAttrString,
+                                 bool,
+                                 ExternalResourcesRequired,
+                                 externalResourcesRequired)
+
   SVGImageLoader m_imageLoader;
 };
 

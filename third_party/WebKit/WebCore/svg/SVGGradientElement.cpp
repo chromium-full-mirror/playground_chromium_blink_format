@@ -54,7 +54,10 @@ SVGGradientElement::SVGGradientElement(const QualifiedName& tagName,
           this,
           SVGNames::gradientTransformAttr,
           SVGTransformList::create(SVGNames::gradientTransformAttr)),
-      m_href(this, XLinkNames::hrefAttr) {}
+      m_href(this, XLinkNames::hrefAttr),
+      m_externalResourcesRequired(this,
+                                  SVGNames::externalResourcesRequiredAttr,
+                                  false) {}
 
 SVGGradientElement::~SVGGradientElement() {}
 

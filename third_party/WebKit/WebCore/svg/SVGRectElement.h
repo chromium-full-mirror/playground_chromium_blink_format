@@ -87,6 +87,14 @@ class SVGRectElement : public SVGStyledTransformableElement,
                                  SVGLength,
                                  Ry,
                                  ry)
+
+  // SVGExternalResourcesRequired
+  ANIMATED_PROPERTY_DECLARATIONS(SVGExternalResourcesRequired,
+                                 SVGExternalResourcesRequiredIdentifier,
+                                 SVGNames::externalResourcesRequiredAttrString,
+                                 bool,
+                                 ExternalResourcesRequired,
+                                 externalResourcesRequired)
 };
 
 }  // namespace WebCore

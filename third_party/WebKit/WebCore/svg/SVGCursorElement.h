@@ -75,6 +75,14 @@ class SVGCursorElement : public SVGElement,
                                  Href,
                                  href)
 
+  // SVGExternalResourcesRequired
+  ANIMATED_PROPERTY_DECLARATIONS(SVGExternalResourcesRequired,
+                                 SVGExternalResourcesRequiredIdentifier,
+                                 SVGNames::externalResourcesRequiredAttrString,
+                                 bool,
+                                 ExternalResourcesRequired,
+                                 externalResourcesRequired)
+
   HashSet<SVGElement*> m_clients;
 };
 

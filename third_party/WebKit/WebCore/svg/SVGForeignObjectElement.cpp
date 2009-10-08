@@ -44,7 +44,10 @@ SVGForeignObjectElement::SVGForeignObjectElement(const QualifiedName& tagName,
       m_y(this, SVGNames::yAttr, LengthModeHeight),
       m_width(this, SVGNames::widthAttr, LengthModeWidth),
       m_height(this, SVGNames::heightAttr, LengthModeHeight),
-      m_href(this, XLinkNames::hrefAttr) {}
+      m_href(this, XLinkNames::hrefAttr),
+      m_externalResourcesRequired(this,
+                                  SVGNames::externalResourcesRequiredAttr,
+                                  false) {}
 
 SVGForeignObjectElement::~SVGForeignObjectElement() {}
 
