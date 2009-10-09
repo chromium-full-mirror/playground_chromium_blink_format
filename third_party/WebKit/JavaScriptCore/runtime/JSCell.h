@@ -160,11 +160,7 @@ inline Structure* JSCell::structure() const {
 inline void JSCell::markChildren(MarkStack&) {}
 
 inline void* JSCell::operator new(size_t size, JSGlobalData* globalData) {
-#ifdef JAVASCRIPTCORE_BUILDING_ALL_IN_ONE_FILE
-  return globalData->heap.inlineAllocate(size);
-#else
   return globalData->heap.allocate(size);
-#endif
 }
 
 // --- JSValue inlines ----------------------------

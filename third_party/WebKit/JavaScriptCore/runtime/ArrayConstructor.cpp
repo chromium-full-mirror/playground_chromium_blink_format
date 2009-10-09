@@ -64,8 +64,8 @@ ArrayConstructor::ArrayConstructor(ExecState* exec,
       DontEnum);
 }
 
-static JSObject* constructArrayWithSizeQuirk(ExecState* exec,
-                                             const ArgList& args) {
+static inline JSObject* constructArrayWithSizeQuirk(ExecState* exec,
+                                                    const ArgList& args) {
   // a single numeric argument denotes the array size (!)
   if (args.size() == 1 && args.at(0).isNumber()) {
     uint32_t n = args.at(0).toUInt32(exec);
