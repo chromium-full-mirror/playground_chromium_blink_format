@@ -31,15 +31,15 @@ namespace WebCore {
 enum MorphologyOperatorType {
   FEMORPHOLOGY_OPERATOR_UNKNOWN = 0,
   FEMORPHOLOGY_OPERATOR_ERODE = 1,
-  FEMORPHOLOGY_OPERATOR_DIALATE = 2
+  FEMORPHOLOGY_OPERATOR_DILATE = 2
 };
 
 class FEMorphology : public FilterEffect {
  public:
-  PassRefPtr<FEMorphology> create(FilterEffect*,
-                                  MorphologyOperatorType,
-                                  const float&,
-                                  const float&);
+  static PassRefPtr<FEMorphology> create(FilterEffect*,
+                                         MorphologyOperatorType,
+                                         float radiusX,
+                                         float radiusY);
   MorphologyOperatorType morphologyOperator() const;
   void setMorphologyOperator(MorphologyOperatorType);
 
@@ -59,8 +59,8 @@ class FEMorphology : public FilterEffect {
  private:
   FEMorphology(FilterEffect*,
                MorphologyOperatorType,
-               const float&,
-               const float&);
+               float radiusX,
+               float radiusY);
 
   RefPtr<FilterEffect> m_in;
   MorphologyOperatorType m_type;

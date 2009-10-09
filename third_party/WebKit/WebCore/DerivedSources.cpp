@@ -245,6 +245,7 @@
 #include "JSSVGFEImageElement.cpp"
 #include "JSSVGFEMergeElement.cpp"
 #include "JSSVGFEMergeNodeElement.cpp"
+#include "JSSVGFEMorphologyElement.cpp"
 #include "JSSVGFEOffsetElement.cpp"
 #include "JSSVGFEPointLightElement.cpp"
 #include "JSSVGFESpecularLightingElement.cpp"
