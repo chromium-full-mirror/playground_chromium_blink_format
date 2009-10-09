@@ -87,6 +87,10 @@ class FilterEffect : public RefCounted<FilterEffect> {
   FloatRect calculateDrawingRect(const FloatRect&);
   IntRect calculateDrawingIntRect(const FloatRect&);
 
+  // black image with different alpha values
+  bool isAlphaImage() { return m_alphaImage; }
+  void setIsAlphaImage(bool alphaImage) { m_alphaImage = alphaImage; }
+
   virtual FloatRect uniteChildEffectSubregions(Filter* filter) {
     return filter->filterRegion();
   }
@@ -111,6 +115,8 @@ class FilterEffect : public RefCounted<FilterEffect> {
   bool m_hasY : 1;
   bool m_hasWidth : 1;
   bool m_hasHeight : 1;
+
+  bool m_alphaImage;
 
   FloatRect m_subRegion;
   FloatRect m_unionOfChildEffectSubregions;

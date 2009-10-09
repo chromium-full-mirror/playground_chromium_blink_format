@@ -32,7 +32,8 @@ FilterEffect::FilterEffect()
       m_hasX(false),
       m_hasY(false),
       m_hasWidth(false),
-      m_hasHeight(false) {}
+      m_hasHeight(false),
+      m_alphaImage(false) {}
 
 FilterEffect::~FilterEffect() {}
 
