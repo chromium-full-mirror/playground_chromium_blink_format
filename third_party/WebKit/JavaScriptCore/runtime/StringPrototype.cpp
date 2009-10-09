@@ -352,7 +352,7 @@ JSValue JSC_HOST_CALL stringProtoFuncReplace(ExecState* exec,
         return jsNull();
       while (true) {
         int matchIndex;
-        int matchLen;
+        int matchLen = 0;
         int* ovector;
         regExpConstructor->performMatch(reg, source, startPosition, matchIndex,
                                         matchLen, &ovector);
@@ -396,7 +396,7 @@ JSValue JSC_HOST_CALL stringProtoFuncReplace(ExecState* exec,
     } else {
       do {
         int matchIndex;
-        int matchLen;
+        int matchLen = 0;
         int* ovector;
         regExpConstructor->performMatch(reg, source, startPosition, matchIndex,
                                         matchLen, &ovector);
@@ -669,7 +669,7 @@ JSValue JSC_HOST_CALL stringProtoFuncSearch(ExecState* exec,
   RegExpConstructor* regExpConstructor =
       exec->lexicalGlobalObject()->regExpConstructor();
   int pos;
-  int matchLength;
+  int matchLength = 0;
   regExpConstructor->performMatch(reg.get(), u, 0, pos, matchLength);
   return jsNumber(exec, pos);
 }
