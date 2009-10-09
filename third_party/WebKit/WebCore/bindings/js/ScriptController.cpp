@@ -49,6 +49,7 @@ ScriptController::ScriptController(Frame* frame)
     : m_frame(frame),
       m_handlerLineNumber(0),
       m_sourceURL(0),
+      m_inExecuteScript(false),
       m_processingTimerCallback(false),
       m_paused(false),
       m_allowPopupsFromPlugin(false)

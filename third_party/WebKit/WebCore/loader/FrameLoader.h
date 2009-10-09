@@ -283,6 +283,8 @@ class FrameLoader : public Noncopyable {
 
   KURL baseURL() const;
 
+  void replaceDocument(const String&);
+
   void begin();
   void begin(const KURL&,
              bool dispatchWindowObjectAvailable = true,
@@ -295,10 +297,6 @@ class FrameLoader : public Noncopyable {
 
   void setEncoding(const String& encoding, bool userChosen);
   String encoding() const;
-
-  ScriptValue executeScript(const ScriptSourceCode&);
-  ScriptValue executeScript(const String& script,
-                            bool forceUserGesture = false);
 
   void gotoAnchor();
 
@@ -593,11 +591,6 @@ class FrameLoader : public Noncopyable {
                       const String& name,
                       const String& referrer);
 
-  // Returns true if argument is a JavaScript URL.
-  bool executeIfJavaScriptURL(const KURL&,
-                              bool userGesture = false,
-                              bool replaceDocument = true);
-
   bool gotoAnchor(const String& name);  // returns true if the anchor was found
   void scrollToAnchor(const KURL&);
 
@@ -646,7 +639,6 @@ class FrameLoader : public Noncopyable {
   String m_outgoingReferrer;
 
   bool m_isExecutingJavaScriptFormAction;
-  bool m_isRunningScript;
 
   String m_responseMIMEType;
 

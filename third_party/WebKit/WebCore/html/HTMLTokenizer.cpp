@@ -596,7 +596,7 @@ HTMLTokenizer::State HTMLTokenizer::scriptExecution(
 #endif
 
   m_state = state;
-  m_doc->frame()->loader()->executeScript(sourceCode);
+  m_doc->frame()->script()->executeScript(sourceCode);
   state = m_state;
 
   state.setAllowYield(true);

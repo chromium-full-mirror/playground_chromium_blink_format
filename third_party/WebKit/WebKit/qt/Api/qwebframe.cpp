@@ -1253,7 +1253,7 @@ QVariant QWebFrame::evaluateJavaScript(const QString& scriptSource) {
   ScriptController* proxy = d->frame->script();
   QVariant rc;
   if (proxy) {
-    JSC::JSValue v = d->frame->loader()
+    JSC::JSValue v = d->frame->script()
                          ->executeScript(ScriptSourceCode(scriptSource))
                          .jsValue();
     int distance = 0;

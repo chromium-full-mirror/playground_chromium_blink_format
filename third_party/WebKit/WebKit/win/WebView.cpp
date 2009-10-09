@@ -3001,7 +3001,7 @@ HRESULT STDMETHODCALLTYPE WebView::stringByEvaluatingJavaScriptFromString(
     return E_FAIL;
 
   JSC::JSValue scriptExecutionResult =
-      coreFrame->loader()
+      coreFrame->script()
           ->executeScript(WebCore::String(script), true)
           .jsValue();
   if (!scriptExecutionResult)
