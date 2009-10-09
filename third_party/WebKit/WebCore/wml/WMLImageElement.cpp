@@ -87,11 +87,11 @@ void WMLImageElement::parseMappedAttribute(MappedAttribute* attr) {
 void WMLImageElement::attach() {
   WMLElement::attach();
 
-  if (renderer() && renderer()->isImage()) {
+  if (renderer() && renderer()->isImage() &&
+      m_imageLoader.haveFiredBeforeLoadEvent()) {
     RenderImage* imageObj = toRenderImage(renderer());
     if (imageObj->hasImage())
       return;
-
     imageObj->setCachedImage(m_imageLoader.image());
 
     // If we have no image at all because we have no src attribute, set

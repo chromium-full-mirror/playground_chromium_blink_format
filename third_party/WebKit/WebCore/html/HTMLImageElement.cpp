@@ -119,6 +119,9 @@ void HTMLImageElement::parseMappedAttribute(MappedAttribute* attr) {
   else if (attrName == onloadAttr)
     setAttributeEventListener(eventNames().loadEvent,
                               createAttributeEventListener(this, attr));
+  else if (attrName == onbeforeloadAttr)
+    setAttributeEventListener(eventNames().beforeloadEvent,
+                              createAttributeEventListener(this, attr));
   else if (attrName == compositeAttr) {
     if (!parseCompositeOperator(attr->value(), m_compositeOperator))
       m_compositeOperator = CompositeSourceOver;
@@ -166,7 +169,8 @@ RenderObject* HTMLImageElement::createRenderer(RenderArena* arena,
 void HTMLImageElement::attach() {
   HTMLElement::attach();
 
-  if (renderer() && renderer()->isImage()) {
+  if (renderer() && renderer()->isImage() &&
+      m_imageLoader.haveFiredBeforeLoadEvent()) {
     RenderImage* imageObj = toRenderImage(renderer());
     if (imageObj->hasImage())
       return;
