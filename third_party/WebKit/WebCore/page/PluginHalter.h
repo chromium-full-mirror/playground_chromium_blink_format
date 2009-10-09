@@ -26,13 +26,14 @@
 #ifndef PluginHalter_h
 #define PluginHalter_h
 
+#include "PluginHalterClient.h"
 #include "Timer.h"
 #include <wtf/HashMap.h>
+#include <wtf/OwnPtr.h>
 
 namespace WebCore {
 
 class HaltablePlugin;
-class PluginHalterClient;
 
 class PluginHalter {
  public:
@@ -49,7 +50,7 @@ class PluginHalter {
   void timerFired(Timer<PluginHalter>*);
   void startTimerIfNecessary();
 
-  PluginHalterClient* m_client;
+  OwnPtr<PluginHalterClient> m_client;
   Timer<PluginHalter> m_timer;
   unsigned m_pluginAllowedRunTime;
   double m_oldestStartTime;

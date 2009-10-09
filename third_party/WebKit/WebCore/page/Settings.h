@@ -331,9 +331,6 @@ class Settings {
   }
 #endif
 
-  void setPluginHalterEnabled(bool);
-  bool pluginHalterEnabled() const { return m_pluginHalterEnabled; }
-
   void setPluginAllowedRunTime(unsigned);
   unsigned pluginAllowedRunTime() const { return m_pluginAllowedRunTime; }
 
@@ -414,7 +411,6 @@ class Settings {
   bool m_xssAuditorEnabled : 1;
   bool m_acceleratedCompositingEnabled : 1;
   bool m_experimentalNotificationsEnabled : 1;
-  bool m_pluginHalterEnabled : 1;
   bool m_webGLEnabled : 1;
 
 #if ENABLE(WEB_SOCKETS)

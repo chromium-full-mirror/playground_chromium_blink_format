@@ -230,7 +230,6 @@ class Page : public Noncopyable {
   void didStartPlugin(HaltablePlugin*);
   void didStopPlugin(HaltablePlugin*);
   void pluginAllowedRunTimeChanged();
-  void pluginHalterEnabledStateChanged();
 
   static void setDebuggerForAllPages(JSC::Debugger*);
   void setDebugger(JSC::Debugger*);
@@ -352,7 +351,6 @@ class Page : public Noncopyable {
   HashSet<PluginView*> m_unstartedPlugins;
 
   OwnPtr<PluginHalter> m_pluginHalter;
-  PluginHalterClient* m_pluginHalterClient;
 
 #if ENABLE(DOM_STORAGE)
   RefPtr<StorageNamespace> m_sessionStorage;

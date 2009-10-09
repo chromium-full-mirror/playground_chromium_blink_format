@@ -165,6 +165,4 @@
 #define WebKitUseHighResolutionTimersPreferenceKey \
   "WebKitUseHighResolutionTimers"
 
-#define WebKitPluginHalterEnabledPreferenceKey "WebKitPluginHalterEnabled"
-
 #define WebKitPluginAllowedRunTimePreferenceKey "WebKitPluginAllowedRunTime"
