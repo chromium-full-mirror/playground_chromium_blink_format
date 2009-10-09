@@ -214,7 +214,7 @@ static inline POINTL pointl(const POINT& point) {
   return result;
 }
 
-static void doMouseUp(MSG msg) {
+static void doMouseUp(MSG msg, HRESULT* oleDragAndDropReturnValue = 0) {
   COMPtr<IWebFramePrivate> framePrivate;
   if (SUCCEEDED(frame->QueryInterface(&framePrivate)))
     framePrivate->layout();
@@ -237,6 +237,8 @@ static void doMouseUp(MSG msg) {
         didDragEnter = true;
       }
       HRESULT hr = draggingInfo->dropSource()->QueryContinueDrag(0, 0);
+      if (oleDragAndDropReturnValue)
+        *oleDragAndDropReturnValue = hr;
       webViewDropTarget->DragOver(0, pointl(screenPoint), &effect);
       if (hr == DRAGDROP_S_DROP && effect != DROPEFFECT_NONE) {
         DWORD effect = 0;
@@ -351,7 +353,7 @@ static JSValueRef mouseMoveToCallback(JSContextRef context,
   return JSValueMakeUndefined(context);
 }
 
-void replaySavedEvents() {
+void replaySavedEvents(HRESULT* oleDragAndDropReturnValue) {
   replayingSavedEvents = true;
 
   MSG msg = {0};
@@ -362,7 +364,7 @@ void replaySavedEvents() {
       case WM_LBUTTONUP:
       case WM_RBUTTONUP:
       case WM_MBUTTONUP:
-        doMouseUp(msg);
+        doMouseUp(msg, oleDragAndDropReturnValue);
         break;
       case WM_MOUSEMOVE:
         doMouseMove(msg);
@@ -406,7 +408,7 @@ void replaySavedEvents() {
       case WM_LBUTTONUP:
       case WM_RBUTTONUP:
       case WM_MBUTTONUP:
-        doMouseUp(msg);
+        doMouseUp(msg, oleDragAndDropReturnValue);
         break;
       case WM_MOUSEMOVE:
         doMouseMove(msg);
