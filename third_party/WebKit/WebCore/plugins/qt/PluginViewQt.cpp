@@ -207,7 +207,7 @@ void PluginView::paint(GraphicsContext* context, const IntRect& rect) {
     QWebPageClient* client =
         m_parentFrame->view()->hostWindow()->platformPageClient();
     const bool backingStoreHasUntransformedContents =
-        qobject_cast<QWidget*>(client->pluginParent());
+        client && qobject_cast<QWidget*>(client->pluginParent());
 
     if (hasValidBackingStore && backingStorePixmap->depth() == drawableDepth &&
         backingStoreHasUntransformedContents) {
