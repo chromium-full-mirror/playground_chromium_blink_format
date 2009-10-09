@@ -56,7 +56,7 @@ struct CSSParserValue {
   PassRefPtr<CSSValue> createCSSValue();
 };
 
-class CSSParserValueList {
+class CSSParserValueList : public FastAllocBase {
  public:
   CSSParserValueList() : m_current(0), m_variablesCount(0) {}
   ~CSSParserValueList();
