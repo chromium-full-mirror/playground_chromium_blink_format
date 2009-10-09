@@ -55,6 +55,7 @@ LayoutTestController::LayoutTestController(const std::string& testPathOrURL,
       m_dumpSourceAsWebArchive(false),
       m_dumpStatusCallbacks(false),
       m_dumpTitleChanges(false),
+      m_dumpVisitedLinksCallback(false),
       m_dumpWillCacheResponse(false),
       m_callCloseOnWebViews(true),
       m_canOpenWindows(false),
@@ -291,6 +292,19 @@ static JSValueRef pathToLocalResourceCallback(JSContextRef context,
     return JSValueMakeUndefined(context);
 
   return JSValueMakeString(context, convertedPath.get());
+}
+
+static JSValueRef removeAllVisitedLinksCallback(JSContextRef context,
+                                                JSObjectRef function,
+                                                JSObjectRef thisObject,
+                                                size_t argumentCount,
+                                                const JSValueRef arguments[],
+                                                JSValueRef* exception) {
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->setDumpVisitedLinksCallback(true);
+  controller->removeAllVisitedLinks();
+  return JSValueMakeUndefined(context);
 }
 
 static JSValueRef repaintSweepHorizontallyCallback(JSContextRef context,
@@ -1786,6 +1800,8 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
       {"queueNonLoadingScript", queueNonLoadingScriptCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"queueReload", queueReloadCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"removeAllVisitedLinks", removeAllVisitedLinksCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"repaintSweepHorizontally", repaintSweepHorizontallyCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},

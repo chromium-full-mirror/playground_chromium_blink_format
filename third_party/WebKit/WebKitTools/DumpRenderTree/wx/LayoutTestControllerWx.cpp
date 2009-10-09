@@ -268,3 +268,7 @@ void LayoutTestController::evaluateInWebInspector(long callId,
                                                   JSStringRef script) {
   // FIXME: Implement this.
 }
+
+void LayoutTestController::removeAllVisitedLinks() {
+  // FIXME: Implement this.
+}

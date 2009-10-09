@@ -227,6 +227,9 @@ incremental searching), NO to begin search after the selected text.
 - (void)setMediaVolume:(float)volume;
 - (float)mediaVolume;
 
+// Add visited links
+- (void)addVisitedLinks:(NSArray*)visitedLinks;
+
 @end
 
 @interface WebView (WebPrivate)

@@ -49,4 +49,6 @@
     updateHistoryTitle:(NSString*)title
                 forURL:(NSString*)url;
 
+- (void)populateVisitedLinksForWebView:(WebView*)webView;
+
 @end
