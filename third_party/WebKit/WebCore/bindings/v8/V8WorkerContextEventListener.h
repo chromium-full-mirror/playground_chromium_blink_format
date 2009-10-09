@@ -54,7 +54,8 @@ class V8WorkerContextEventListener : public V8EventListener {
   }
 
   virtual void handleEvent(ScriptExecutionContext*, Event*);
-  virtual bool reportError(const String& message,
+  virtual bool reportError(ScriptExecutionContext*,
+                           const String& message,
                            const String& url,
                            int lineNumber);
 

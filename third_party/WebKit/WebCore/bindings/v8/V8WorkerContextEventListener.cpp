@@ -74,7 +74,8 @@ void V8WorkerContextEventListener::handleEvent(ScriptExecutionContext*,
   invokeEventHandler(context, event, jsEvent);
 }
 
-bool V8WorkerContextEventListener::reportError(const String& message,
+bool V8WorkerContextEventListener::reportError(ScriptExecutionContext*,
+                                               const String& message,
                                                const String& url,
                                                int lineNumber) {
   // Is the EventListener disconnected?
