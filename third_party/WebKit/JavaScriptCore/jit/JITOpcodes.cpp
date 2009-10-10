@@ -414,13 +414,13 @@ void JIT::emit_op_end(Instruction* currentInstruction) {
 
 void JIT::emit_op_jmp(Instruction* currentInstruction) {
   unsigned target = currentInstruction[1].u.operand;
-  addJump(jump(), target + 1);
+  addJump(jump(), target);
 }
 
 void JIT::emit_op_loop(Instruction* currentInstruction) {
   unsigned target = currentInstruction[1].u.operand;
   emitTimeoutCheck();
-  addJump(jump(), target + 1);
+  addJump(jump(), target);
 }
 
 void JIT::emit_op_loop_if_less(Instruction* currentInstruction) {
@@ -435,7 +435,7 @@ void JIT::emit_op_loop_if_less(Instruction* currentInstruction) {
     addSlowCase(branch32(NotEqual, regT1, Imm32(JSValue::Int32Tag)));
     addJump(
         branch32(GreaterThan, regT0, Imm32(getConstantOperand(op1).asInt32())),
-        target + 3);
+        target);
     return;
   }
 
@@ -443,14 +443,14 @@ void JIT::emit_op_loop_if_less(Instruction* currentInstruction) {
     emitLoad(op1, regT1, regT0);
     addSlowCase(branch32(NotEqual, regT1, Imm32(JSValue::Int32Tag)));
     addJump(branch32(LessThan, regT0, Imm32(getConstantOperand(op2).asInt32())),
-            target + 3);
+            target);
     return;
   }
 
   emitLoad2(op1, regT1, regT0, op2, regT3, regT2);
   addSlowCase(branch32(NotEqual, regT1, Imm32(JSValue::Int32Tag)));
   addSlowCase(branch32(NotEqual, regT3, Imm32(JSValue::Int32Tag)));
-  addJump(branch32(LessThan, regT0, regT2), target + 3);
+  addJump(branch32(LessThan, regT0, regT2), target);
 }
 
 void JIT::emitSlow_op_loop_if_less(Instruction* currentInstruction,
@@ -468,7 +468,7 @@ void JIT::emitSlow_op_loop_if_less(Instruction* currentInstruction,
   stubCall.addArgument(op1);
   stubCall.addArgument(op2);
   stubCall.call();
-  emitJumpSlowToHot(branchTest32(NonZero, regT0), target + 3);
+  emitJumpSlowToHot(branchTest32(NonZero, regT0), target);
 }
 
 void JIT::emit_op_loop_if_lesseq(Instruction* currentInstruction) {
@@ -483,7 +483,7 @@ void JIT::emit_op_loop_if_lesseq(Instruction* currentInstruction) {
     addSlowCase(branch32(NotEqual, regT1, Imm32(JSValue::Int32Tag)));
     addJump(branch32(GreaterThanOrEqual, regT0,
                      Imm32(getConstantOperand(op1).asInt32())),
-            target + 3);
+            target);
     return;
   }
 
@@ -492,14 +492,14 @@ void JIT::emit_op_loop_if_lesseq(Instruction* currentInstruction) {
     addSlowCase(branch32(NotEqual, regT1, Imm32(JSValue::Int32Tag)));
     addJump(branch32(LessThanOrEqual, regT0,
                      Imm32(getConstantOperand(op2).asInt32())),
-            target + 3);
+            target);
     return;
   }
 
   emitLoad2(op1, regT1, regT0, op2, regT3, regT2);
   addSlowCase(branch32(NotEqual, regT1, Imm32(JSValue::Int32Tag)));
   addSlowCase(branch32(NotEqual, regT3, Imm32(JSValue::Int32Tag)));
-  addJump(branch32(LessThanOrEqual, regT0, regT2), target + 3);
+  addJump(branch32(LessThanOrEqual, regT0, regT2), target);
 }
 
 void JIT::emitSlow_op_loop_if_lesseq(Instruction* currentInstruction,
@@ -517,7 +517,7 @@ void JIT::emitSlow_op_loop_if_lesseq(Instruction* currentInstruction,
   stubCall.addArgument(op1);
   stubCall.addArgument(op2);
   stubCall.call();
-  emitJumpSlowToHot(branchTest32(NonZero, regT0), target + 3);
+  emitJumpSlowToHot(branchTest32(NonZero, regT0), target);
 }
 
 void JIT::emit_op_new_object(Instruction* currentInstruction) {
@@ -761,12 +761,12 @@ void JIT::emit_op_loop_if_true(Instruction* currentInstruction) {
   emitLoad(cond, regT1, regT0);
 
   Jump isNotInteger = branch32(NotEqual, regT1, Imm32(JSValue::Int32Tag));
-  addJump(branch32(NotEqual, regT0, Imm32(0)), target + 2);
+  addJump(branch32(NotEqual, regT0, Imm32(0)), target);
   Jump isNotZero = jump();
 
   isNotInteger.link(this);
 
-  addJump(branch32(Equal, regT1, Imm32(JSValue::TrueTag)), target + 2);
+  addJump(branch32(Equal, regT1, Imm32(JSValue::TrueTag)), target);
   addSlowCase(branch32(NotEqual, regT1, Imm32(JSValue::FalseTag)));
 
   isNotZero.link(this);
@@ -782,7 +782,7 @@ void JIT::emitSlow_op_loop_if_true(Instruction* currentInstruction,
   JITStubCall stubCall(this, cti_op_jtrue);
   stubCall.addArgument(cond);
   stubCall.call();
-  emitJumpSlowToHot(branchTest32(NonZero, regT0), target + 2);
+  emitJumpSlowToHot(branchTest32(NonZero, regT0), target);
 }
 
 void JIT::emit_op_resolve_base(Instruction* currentInstruction) {
@@ -876,11 +876,11 @@ void JIT::emit_op_jfalse(Instruction* currentInstruction) {
   emitLoad(cond, regT1, regT0);
 
   Jump isTrue = branch32(Equal, regT1, Imm32(JSValue::TrueTag));
-  addJump(branch32(Equal, regT1, Imm32(JSValue::FalseTag)), target + 2);
+  addJump(branch32(Equal, regT1, Imm32(JSValue::FalseTag)), target);
 
   Jump isNotInteger = branch32(NotEqual, regT1, Imm32(JSValue::Int32Tag));
   Jump isTrue2 = branch32(NotEqual, regT0, Imm32(0));
-  addJump(jump(), target + 2);
+  addJump(jump(), target);
 
   if (supportsFloatingPoint()) {
     isNotInteger.link(this);
@@ -889,7 +889,7 @@ void JIT::emit_op_jfalse(Instruction* currentInstruction) {
 
     zeroDouble(fpRegT0);
     emitLoadDouble(cond, fpRegT1);
-    addJump(branchDouble(DoubleEqual, fpRegT0, fpRegT1), target + 2);
+    addJump(branchDouble(DoubleEqual, fpRegT0, fpRegT1), target);
   } else
     addSlowCase(isNotInteger);
 
@@ -906,7 +906,7 @@ void JIT::emitSlow_op_jfalse(Instruction* currentInstruction,
   JITStubCall stubCall(this, cti_op_jtrue);
   stubCall.addArgument(cond);
   stubCall.call();
-  emitJumpSlowToHot(branchTest32(Zero, regT0), target + 2);  // Inverted.
+  emitJumpSlowToHot(branchTest32(Zero, regT0), target);  // Inverted.
 }
 
 void JIT::emit_op_jtrue(Instruction* currentInstruction) {
@@ -916,11 +916,11 @@ void JIT::emit_op_jtrue(Instruction* currentInstruction) {
   emitLoad(cond, regT1, regT0);
 
   Jump isFalse = branch32(Equal, regT1, Imm32(JSValue::FalseTag));
-  addJump(branch32(Equal, regT1, Imm32(JSValue::TrueTag)), target + 2);
+  addJump(branch32(Equal, regT1, Imm32(JSValue::TrueTag)), target);
 
   Jump isNotInteger = branch32(NotEqual, regT1, Imm32(JSValue::Int32Tag));
   Jump isFalse2 = branch32(Equal, regT0, Imm32(0));
-  addJump(jump(), target + 2);
+  addJump(jump(), target);
 
   if (supportsFloatingPoint()) {
     isNotInteger.link(this);
@@ -929,7 +929,7 @@ void JIT::emit_op_jtrue(Instruction* currentInstruction) {
 
     zeroDouble(fpRegT0);
     emitLoadDouble(cond, fpRegT1);
-    addJump(branchDouble(DoubleNotEqual, fpRegT0, fpRegT1), target + 2);
+    addJump(branchDouble(DoubleNotEqual, fpRegT0, fpRegT1), target);
   } else
     addSlowCase(isNotInteger);
 
@@ -946,7 +946,7 @@ void JIT::emitSlow_op_jtrue(Instruction* currentInstruction,
   JITStubCall stubCall(this, cti_op_jtrue);
   stubCall.addArgument(cond);
   stubCall.call();
-  emitJumpSlowToHot(branchTest32(NonZero, regT0), target + 2);
+  emitJumpSlowToHot(branchTest32(NonZero, regT0), target);
 }
 
 void JIT::emit_op_jeq_null(Instruction* currentInstruction) {
@@ -964,7 +964,7 @@ void JIT::emit_op_jeq_null(Instruction* currentInstruction) {
               NonZero,
               Address(regT2, OBJECT_OFFSETOF(Structure, m_typeInfo.m_flags)),
               Imm32(MasqueradesAsUndefined)),
-          target + 2);
+          target);
 
   Jump wasNotImmediate = jump();
 
@@ -975,7 +975,7 @@ void JIT::emit_op_jeq_null(Instruction* currentInstruction) {
   set32(Equal, regT1, Imm32(JSValue::UndefinedTag), regT1);
   or32(regT2, regT1);
 
-  addJump(branchTest32(NonZero, regT1), target + 2);
+  addJump(branchTest32(NonZero, regT1), target);
 
   wasNotImmediate.link(this);
 }
@@ -994,7 +994,7 @@ void JIT::emit_op_jneq_null(Instruction* currentInstruction) {
   addJump(branchTest32(Zero, Address(regT2, OBJECT_OFFSETOF(
                                                 Structure, m_typeInfo.m_flags)),
                        Imm32(MasqueradesAsUndefined)),
-          target + 2);
+          target);
 
   Jump wasNotImmediate = jump();
 
@@ -1005,7 +1005,7 @@ void JIT::emit_op_jneq_null(Instruction* currentInstruction) {
   set32(Equal, regT1, Imm32(JSValue::UndefinedTag), regT1);
   or32(regT2, regT1);
 
-  addJump(branchTest32(Zero, regT1), target + 2);
+  addJump(branchTest32(Zero, regT1), target);
 
   wasNotImmediate.link(this);
 }
@@ -1016,8 +1016,8 @@ void JIT::emit_op_jneq_ptr(Instruction* currentInstruction) {
   unsigned target = currentInstruction[3].u.operand;
 
   emitLoad(src, regT1, regT0);
-  addJump(branch32(NotEqual, regT1, Imm32(JSValue::CellTag)), target + 3);
-  addJump(branchPtr(NotEqual, regT0, ImmPtr(ptr)), target + 3);
+  addJump(branch32(NotEqual, regT1, Imm32(JSValue::CellTag)), target);
+  addJump(branchPtr(NotEqual, regT0, ImmPtr(ptr)), target);
 }
 
 void JIT::emit_op_jsr(Instruction* currentInstruction) {
@@ -1025,7 +1025,7 @@ void JIT::emit_op_jsr(Instruction* currentInstruction) {
   int target = currentInstruction[2].u.operand;
   DataLabelPtr storeLocation = storePtrWithPatch(
       ImmPtr(0), Address(callFrameRegister, sizeof(Register) * retAddrDst));
-  addJump(jump(), target + 2);
+  addJump(jump(), target);
   m_jsrSites.append(JSRInfo(storeLocation, label()));
 }
 
@@ -1305,7 +1305,7 @@ void JIT::emit_op_next_pname(Instruction* currentInstruction) {
   Jump endOfIter = branchTestPtr(Zero, regT0);
   emitStore(dst, regT1, regT0);
   map(m_bytecodeIndex + OPCODE_LENGTH(op_next_pname), dst, regT1, regT0);
-  addJump(jump(), target + 3);
+  addJump(jump(), target);
   endOfIter.link(this);
 }
 
@@ -1372,7 +1372,7 @@ void JIT::emit_op_jmp_scopes(Instruction* currentInstruction) {
   JITStubCall stubCall(this, cti_op_jmp_scopes);
   stubCall.addArgument(Imm32(currentInstruction[1].u.operand));
   stubCall.call();
-  addJump(jump(), currentInstruction[2].u.operand + 2);
+  addJump(jump(), currentInstruction[2].u.operand);
 }
 
 void JIT::emit_op_switch_imm(Instruction* currentInstruction) {
@@ -1993,15 +1993,15 @@ void JIT::emit_op_end(Instruction* currentInstruction) {
 
 void JIT::emit_op_jmp(Instruction* currentInstruction) {
   unsigned target = currentInstruction[1].u.operand;
-  addJump(jump(), target + 1);
-  RECORD_JUMP_TARGET(target + 1);
+  addJump(jump(), target);
+  RECORD_JUMP_TARGET(target);
 }
 
 void JIT::emit_op_loop(Instruction* currentInstruction) {
   emitTimeoutCheck();
 
   unsigned target = currentInstruction[1].u.operand;
-  addJump(jump(), target + 1);
+  addJump(jump(), target);
 }
 
 void JIT::emit_op_loop_if_less(Instruction* currentInstruction) {
@@ -2019,7 +2019,7 @@ void JIT::emit_op_loop_if_less(Instruction* currentInstruction) {
     int32_t op2imm =
         static_cast<int32_t>(JSImmediate::rawValue(getConstantOperand(op2)));
 #endif
-    addJump(branch32(LessThan, regT0, Imm32(op2imm)), target + 3);
+    addJump(branch32(LessThan, regT0, Imm32(op2imm)), target);
   } else if (isOperandConstantImmediateInt(op1)) {
     emitGetVirtualRegister(op2, regT0);
     emitJumpSlowCaseIfNotImmediateInteger(regT0);
@@ -2029,12 +2029,12 @@ void JIT::emit_op_loop_if_less(Instruction* currentInstruction) {
     int32_t op1imm =
         static_cast<int32_t>(JSImmediate::rawValue(getConstantOperand(op1)));
 #endif
-    addJump(branch32(GreaterThan, regT0, Imm32(op1imm)), target + 3);
+    addJump(branch32(GreaterThan, regT0, Imm32(op1imm)), target);
   } else {
     emitGetVirtualRegisters(op1, regT0, op2, regT1);
     emitJumpSlowCaseIfNotImmediateInteger(regT0);
     emitJumpSlowCaseIfNotImmediateInteger(regT1);
-    addJump(branch32(LessThan, regT0, regT1), target + 3);
+    addJump(branch32(LessThan, regT0, regT1), target);
   }
 }
 
@@ -2053,12 +2053,12 @@ void JIT::emit_op_loop_if_lesseq(Instruction* currentInstruction) {
     int32_t op2imm =
         static_cast<int32_t>(JSImmediate::rawValue(getConstantOperand(op2)));
 #endif
-    addJump(branch32(LessThanOrEqual, regT0, Imm32(op2imm)), target + 3);
+    addJump(branch32(LessThanOrEqual, regT0, Imm32(op2imm)), target);
   } else {
     emitGetVirtualRegisters(op1, regT0, op2, regT1);
     emitJumpSlowCaseIfNotImmediateInteger(regT0);
     emitJumpSlowCaseIfNotImmediateInteger(regT1);
-    addJump(branch32(LessThanOrEqual, regT0, regT1), target + 3);
+    addJump(branch32(LessThanOrEqual, regT0, regT1), target);
   }
 }
 
@@ -2295,10 +2295,10 @@ void JIT::emit_op_loop_if_true(Instruction* currentInstruction) {
 
   Jump isZero = branchPtr(Equal, regT0,
                           ImmPtr(JSValue::encode(jsNumber(m_globalData, 0))));
-  addJump(emitJumpIfImmediateInteger(regT0), target + 2);
+  addJump(emitJumpIfImmediateInteger(regT0), target);
 
   addJump(branchPtr(Equal, regT0, ImmPtr(JSValue::encode(jsBoolean(true)))),
-          target + 2);
+          target);
   addSlowCase(
       branchPtr(NotEqual, regT0, ImmPtr(JSValue::encode(jsBoolean(false)))));
 
@@ -2375,16 +2375,16 @@ void JIT::emit_op_jfalse(Instruction* currentInstruction) {
 
   addJump(branchPtr(Equal, regT0,
                     ImmPtr(JSValue::encode(jsNumber(m_globalData, 0)))),
-          target + 2);
+          target);
   Jump isNonZero = emitJumpIfImmediateInteger(regT0);
 
   addJump(branchPtr(Equal, regT0, ImmPtr(JSValue::encode(jsBoolean(false)))),
-          target + 2);
+          target);
   addSlowCase(
       branchPtr(NotEqual, regT0, ImmPtr(JSValue::encode(jsBoolean(true)))));
 
   isNonZero.link(this);
-  RECORD_JUMP_TARGET(target + 2);
+  RECORD_JUMP_TARGET(target);
 };
 void JIT::emit_op_jeq_null(Instruction* currentInstruction) {
   unsigned src = currentInstruction[1].u.operand;
@@ -2400,17 +2400,16 @@ void JIT::emit_op_jeq_null(Instruction* currentInstruction) {
               NonZero,
               Address(regT2, OBJECT_OFFSETOF(Structure, m_typeInfo.m_flags)),
               Imm32(MasqueradesAsUndefined)),
-          target + 2);
+          target);
   Jump wasNotImmediate = jump();
 
   // Now handle the immediate cases - undefined & null
   isImmediate.link(this);
   andPtr(Imm32(~JSImmediate::ExtendedTagBitUndefined), regT0);
-  addJump(branchPtr(Equal, regT0, ImmPtr(JSValue::encode(jsNull()))),
-          target + 2);
+  addJump(branchPtr(Equal, regT0, ImmPtr(JSValue::encode(jsNull()))), target);
 
   wasNotImmediate.link(this);
-  RECORD_JUMP_TARGET(target + 2);
+  RECORD_JUMP_TARGET(target);
 };
 void JIT::emit_op_jneq_null(Instruction* currentInstruction) {
   unsigned src = currentInstruction[1].u.operand;
@@ -2425,17 +2424,17 @@ void JIT::emit_op_jneq_null(Instruction* currentInstruction) {
   addJump(branchTest32(Zero, Address(regT2, OBJECT_OFFSETOF(
                                                 Structure, m_typeInfo.m_flags)),
                        Imm32(MasqueradesAsUndefined)),
-          target + 2);
+          target);
   Jump wasNotImmediate = jump();
 
   // Now handle the immediate cases - undefined & null
   isImmediate.link(this);
   andPtr(Imm32(~JSImmediate::ExtendedTagBitUndefined), regT0);
   addJump(branchPtr(NotEqual, regT0, ImmPtr(JSValue::encode(jsNull()))),
-          target + 2);
+          target);
 
   wasNotImmediate.link(this);
-  RECORD_JUMP_TARGET(target + 2);
+  RECORD_JUMP_TARGET(target);
 }
 
 void JIT::emit_op_jneq_ptr(Instruction* currentInstruction) {
@@ -2445,9 +2444,9 @@ void JIT::emit_op_jneq_ptr(Instruction* currentInstruction) {
 
   emitGetVirtualRegister(src, regT0);
   addJump(branchPtr(NotEqual, regT0, ImmPtr(JSValue::encode(JSValue(ptr)))),
-          target + 3);
+          target);
 
-  RECORD_JUMP_TARGET(target + 3);
+  RECORD_JUMP_TARGET(target);
 }
 
 void JIT::emit_op_jsr(Instruction* currentInstruction) {
@@ -2455,10 +2454,10 @@ void JIT::emit_op_jsr(Instruction* currentInstruction) {
   int target = currentInstruction[2].u.operand;
   DataLabelPtr storeLocation = storePtrWithPatch(
       ImmPtr(0), Address(callFrameRegister, sizeof(Register) * retAddrDst));
-  addJump(jump(), target + 2);
+  addJump(jump(), target);
   m_jsrSites.append(JSRInfo(storeLocation, label()));
   killLastResultRegister();
-  RECORD_JUMP_TARGET(target + 2);
+  RECORD_JUMP_TARGET(target);
 }
 
 void JIT::emit_op_sret(Instruction* currentInstruction) {
@@ -2509,15 +2508,15 @@ void JIT::emit_op_jtrue(Instruction* currentInstruction) {
 
   Jump isZero = branchPtr(Equal, regT0,
                           ImmPtr(JSValue::encode(jsNumber(m_globalData, 0))));
-  addJump(emitJumpIfImmediateInteger(regT0), target + 2);
+  addJump(emitJumpIfImmediateInteger(regT0), target);
 
   addJump(branchPtr(Equal, regT0, ImmPtr(JSValue::encode(jsBoolean(true)))),
-          target + 2);
+          target);
   addSlowCase(
       branchPtr(NotEqual, regT0, ImmPtr(JSValue::encode(jsBoolean(false)))));
 
   isZero.link(this);
-  RECORD_JUMP_TARGET(target + 2);
+  RECORD_JUMP_TARGET(target);
 }
 
 void JIT::emit_op_neq(Instruction* currentInstruction) {
@@ -2572,7 +2571,7 @@ void JIT::emit_op_next_pname(Instruction* currentInstruction) {
   stubCall.call();
   Jump endOfIter = branchTestPtr(Zero, regT0);
   emitPutVirtualRegister(currentInstruction[1].u.operand);
-  addJump(jump(), currentInstruction[3].u.operand + 3);
+  addJump(jump(), currentInstruction[3].u.operand);
   endOfIter.link(this);
 }
 
@@ -2654,8 +2653,8 @@ void JIT::emit_op_jmp_scopes(Instruction* currentInstruction) {
   JITStubCall stubCall(this, cti_op_jmp_scopes);
   stubCall.addArgument(Imm32(currentInstruction[1].u.operand));
   stubCall.call();
-  addJump(jump(), currentInstruction[2].u.operand + 2);
-  RECORD_JUMP_TARGET(currentInstruction[2].u.operand + 2);
+  addJump(jump(), currentInstruction[2].u.operand);
+  RECORD_JUMP_TARGET(currentInstruction[2].u.operand);
 }
 
 void JIT::emit_op_switch_imm(Instruction* currentInstruction) {
@@ -2906,14 +2905,14 @@ void JIT::emitSlow_op_loop_if_less(Instruction* currentInstruction,
     stubCall.addArgument(regT0);
     stubCall.addArgument(op2, regT2);
     stubCall.call();
-    emitJumpSlowToHot(branchTest32(NonZero, regT0), target + 3);
+    emitJumpSlowToHot(branchTest32(NonZero, regT0), target);
   } else if (isOperandConstantImmediateInt(op1)) {
     linkSlowCase(iter);
     JITStubCall stubCall(this, cti_op_loop_if_less);
     stubCall.addArgument(op1, regT2);
     stubCall.addArgument(regT0);
     stubCall.call();
-    emitJumpSlowToHot(branchTest32(NonZero, regT0), target + 3);
+    emitJumpSlowToHot(branchTest32(NonZero, regT0), target);
   } else {
     linkSlowCase(iter);
     linkSlowCase(iter);
@@ -2921,7 +2920,7 @@ void JIT::emitSlow_op_loop_if_less(Instruction* currentInstruction,
     stubCall.addArgument(regT0);
     stubCall.addArgument(regT1);
     stubCall.call();
-    emitJumpSlowToHot(branchTest32(NonZero, regT0), target + 3);
+    emitJumpSlowToHot(branchTest32(NonZero, regT0), target);
   }
 }
 
@@ -2935,7 +2934,7 @@ void JIT::emitSlow_op_loop_if_lesseq(Instruction* currentInstruction,
     stubCall.addArgument(regT0);
     stubCall.addArgument(currentInstruction[2].u.operand, regT2);
     stubCall.call();
-    emitJumpSlowToHot(branchTest32(NonZero, regT0), target + 3);
+    emitJumpSlowToHot(branchTest32(NonZero, regT0), target);
   } else {
     linkSlowCase(iter);
     linkSlowCase(iter);
@@ -2943,7 +2942,7 @@ void JIT::emitSlow_op_loop_if_lesseq(Instruction* currentInstruction,
     stubCall.addArgument(regT0);
     stubCall.addArgument(regT1);
     stubCall.call();
-    emitJumpSlowToHot(branchTest32(NonZero, regT0), target + 3);
+    emitJumpSlowToHot(branchTest32(NonZero, regT0), target);
   }
 }
 
@@ -2972,7 +2971,7 @@ void JIT::emitSlow_op_loop_if_true(Instruction* currentInstruction,
   stubCall.addArgument(regT0);
   stubCall.call();
   emitJumpSlowToHot(branchTest32(NonZero, regT0),
-                    currentInstruction[2].u.operand + 2);
+                    currentInstruction[2].u.operand);
 }
 
 void JIT::emitSlow_op_not(Instruction* currentInstruction,
@@ -2991,7 +2990,7 @@ void JIT::emitSlow_op_jfalse(Instruction* currentInstruction,
   stubCall.addArgument(regT0);
   stubCall.call();
   emitJumpSlowToHot(branchTest32(Zero, regT0),
-                    currentInstruction[2].u.operand + 2);  // inverted!
+                    currentInstruction[2].u.operand);  // inverted!
 }
 
 void JIT::emitSlow_op_bitnot(Instruction* currentInstruction,
@@ -3009,7 +3008,7 @@ void JIT::emitSlow_op_jtrue(Instruction* currentInstruction,
   stubCall.addArgument(regT0);
   stubCall.call();
   emitJumpSlowToHot(branchTest32(NonZero, regT0),
-                    currentInstruction[2].u.operand + 2);
+                    currentInstruction[2].u.operand);
 }
 
 void JIT::emitSlow_op_bitxor(Instruction* currentInstruction,

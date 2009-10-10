@@ -175,9 +175,6 @@ class Interpreter : public FastAllocBase {
   NEVER_INLINE bool resolveBaseAndProperty(CallFrame*,
                                            Instruction*,
                                            JSValue& exceptionValue);
-  NEVER_INLINE bool resolveBaseAndFunc(CallFrame*,
-                                       Instruction*,
-                                       JSValue& exceptionValue);
   NEVER_INLINE ScopeChainNode* createExceptionScope(CallFrame*,
                                                     const Instruction* vPC);
 
