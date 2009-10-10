@@ -102,7 +102,7 @@ static bool lowerCaseEqualsASCII(const char* begin,
                                  const char* end,
                                  const char* str) {
   while (begin != end && *str) {
-    ASSERT(isASCIILower(*str));
+    ASSERT(toASCIILower(*str) == *str);
     if (toASCIILower(*begin++) != *str++)
       return false;
   }
