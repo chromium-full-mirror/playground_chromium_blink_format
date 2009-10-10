@@ -4877,7 +4877,10 @@ HRESULT STDMETHODCALLTYPE WebView::loadBackForwardListFromOtherView(
       // since that might have changed since loading and it is normally not
       // saved
       // until we leave that page.
-      otherWebView->m_page->mainFrame()->loader()->saveDocumentAndScrollState();
+      otherWebView->m_page->mainFrame()
+          ->loader()
+          ->history()
+          ->saveDocumentAndScrollState();
     }
     RefPtr<HistoryItem> newItem = otherBackForwardList->itemAtIndex(i)->copy();
     if (!i)
