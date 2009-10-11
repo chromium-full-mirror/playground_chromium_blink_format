@@ -4091,8 +4091,8 @@ void Document::finishedParsing() {
     if (InspectorController* controller = page()->inspectorController())
       controller->mainResourceFiredDOMContentEvent(
           f->loader()->documentLoader(), url());
-  }
 #endif
+  }
 }
 
 Vector<String> Document::formElementsState() const {
@@ -4572,8 +4572,8 @@ void Document::scriptImported(unsigned long identifier,
   if (page())
     page()->inspectorController()->scriptImported(identifier, sourceString);
 #else
-    UNUSED_PARAM(identifier);
-    UNUSED_PARAM(sourceString);
+  UNUSED_PARAM(identifier);
+  UNUSED_PARAM(sourceString);
 #endif
 }
 
