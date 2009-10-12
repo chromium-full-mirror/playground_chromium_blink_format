@@ -29,33 +29,33 @@
 namespace WebCore {
 struct LinearGradientAttributes : GradientAttributes {
   LinearGradientAttributes()
-      : m_x1(0.0),
-        m_y1(0.0),
-        m_x2(1.0),
-        m_y2(0.0),
+      : m_x1(),
+        m_y1(),
+        m_x2(LengthModeWidth, "100%"),
+        m_y2(),
         m_x1Set(false),
         m_y1Set(false),
         m_x2Set(false),
         m_y2Set(false) {}
 
-  double x1() const { return m_x1; }
-  double y1() const { return m_y1; }
-  double x2() const { return m_x2; }
-  double y2() const { return m_y2; }
+  SVGLength x1() const { return m_x1; }
+  SVGLength y1() const { return m_y1; }
+  SVGLength x2() const { return m_x2; }
+  SVGLength y2() const { return m_y2; }
 
-  void setX1(double value) {
+  void setX1(const SVGLength& value) {
     m_x1 = value;
     m_x1Set = true;
   }
-  void setY1(double value) {
+  void setY1(const SVGLength& value) {
     m_y1 = value;
     m_y1Set = true;
   }
-  void setX2(double value) {
+  void setX2(const SVGLength& value) {
     m_x2 = value;
     m_x2Set = true;
   }
-  void setY2(double value) {
+  void setY2(const SVGLength& value) {
     m_y2 = value;
     m_y2Set = true;
   }
@@ -67,10 +67,10 @@ struct LinearGradientAttributes : GradientAttributes {
 
  private:
   // Properties
-  double m_x1;
-  double m_y1;
-  double m_x2;
-  double m_y2;
+  SVGLength m_x1;
+  SVGLength m_y1;
+  SVGLength m_x2;
+  SVGLength m_y2;
 
   // Property states
   bool m_x1Set : 1;
