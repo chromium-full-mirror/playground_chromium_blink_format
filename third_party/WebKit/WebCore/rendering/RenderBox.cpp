@@ -141,6 +141,9 @@ void RenderBox::styleWillChange(StyleDifference diff,
       markContainingBlocksForLayout();
       if (style()->position() == StaticPosition)
         repaint();
+      else if (newStyle->position() == AbsolutePosition ||
+               newStyle->position() == FixedPosition)
+        parent()->setChildNeedsLayout(true);
       if (isFloating() && !isPositioned() &&
           (newStyle->position() == AbsolutePosition ||
            newStyle->position() == FixedPosition))
