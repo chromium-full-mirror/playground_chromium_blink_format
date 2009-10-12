@@ -42,6 +42,8 @@ bool SVGFEMergeElement::build(SVGResourceFilter* filterResource) {
     if (n->hasTagName(SVGNames::feMergeNodeTag)) {
       FilterEffect* mergeEffect = filterResource->builder()->getEffectById(
           static_cast<SVGFEMergeNodeElement*>(n)->in1());
+      if (!mergeEffect)
+        return false;
       mergeInputs.append(mergeEffect);
     }
   }
