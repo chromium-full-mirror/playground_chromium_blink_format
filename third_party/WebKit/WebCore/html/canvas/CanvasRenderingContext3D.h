@@ -242,9 +242,12 @@ class CanvasRenderingContext3D : public CanvasRenderingContext {
   void pixelStorei(unsigned long pname, long param);
   void polygonOffset(double factor, double units);
 
-  // TBD
-  // void readPixels(long x, long y, unsigned long width, unsigned long height,
-  // unsigned long format, unsigned long type, void* pixels);
+  PassRefPtr<CanvasArray> readPixels(long x,
+                                     long y,
+                                     unsigned long width,
+                                     unsigned long height,
+                                     unsigned long format,
+                                     unsigned long type);
 
   void releaseShaderCompiler();
   void renderbufferStorage(unsigned long target,
