@@ -70,8 +70,8 @@ static bool isIllegalURICharacter(UChar c) {
   //
   // If the request does not contain these characters then we can assume that no
   // inline scripts have been injected
-  // into response page, because it is impossible to write an inline script of
-  // the form <script>...</script>
+  // into the response page, because it is impossible to write an inline script
+  // of the form <script>...</script>
   // without "<", ">".
   return (c == '\'' || c == '"' || c == '<' || c == '>');
 }
@@ -79,16 +79,19 @@ static bool isIllegalURICharacter(UChar c) {
 String XSSAuditor::CachingURLCanonicalizer::canonicalizeURL(
     const String& url,
     const TextEncoding& encoding,
-    bool decodeEntities) {
-  if (decodeEntities == m_decodeEntities && encoding == m_encoding &&
-      url == m_inputURL)
+    bool decodeEntities,
+    bool decodeURLEscapeSequencesTwice) {
+  if (decodeEntities == m_decodeEntities &&
+      decodeURLEscapeSequencesTwice == m_decodeURLEscapeSequencesTwice &&
+      encoding == m_encoding && url == m_inputURL)
     return m_cachedCanonicalizedURL;
 
-  m_cachedCanonicalizedURL =
-      canonicalize(decodeURL(url, encoding, decodeEntities));
+  m_cachedCanonicalizedURL = canonicalize(
+      decodeURL(url, encoding, decodeEntities, decodeURLEscapeSequencesTwice));
   m_inputURL = url;
   m_encoding = encoding;
   m_decodeEntities = decodeEntities;
+  m_decodeURLEscapeSequencesTwice = decodeURLEscapeSequencesTwice;
   return m_cachedCanonicalizedURL;
 }
 
@@ -121,7 +124,7 @@ bool XSSAuditor::canEvaluateJavaScriptURL(const String& code) const {
   if (!isEnabled())
     return true;
 
-  if (findInRequest(code)) {
+  if (findInRequest(code, true, false, true)) {
     DEFINE_STATIC_LOCAL(String, consoleMessage,
                         ("Refused to execute a JavaScript script. Source code "
                          "of script found within request.\n"));
@@ -208,7 +211,8 @@ String XSSAuditor::canonicalize(const String& string) {
 
 String XSSAuditor::decodeURL(const String& string,
                              const TextEncoding& encoding,
-                             bool decodeEntities) {
+                             bool decodeEntities,
+                             bool decodeURLEscapeSequencesTwice) {
   String result;
   String url = string;
 
@@ -218,6 +222,13 @@ String XSSAuditor::decodeURL(const String& string,
   String decodedResult = encoding.decode(utf8Url.data(), utf8Url.length());
   if (!decodedResult.isEmpty())
     result = decodedResult;
+  if (decodeURLEscapeSequencesTwice) {
+    result = decodeURLEscapeSequences(result);
+    utf8Url = result.utf8();
+    decodedResult = encoding.decode(utf8Url.data(), utf8Url.length());
+    if (!decodedResult.isEmpty())
+      result = decodedResult;
+  }
   if (decodeEntities)
     result = decodeHTMLEntities(result);
   return result;
@@ -262,26 +273,28 @@ String XSSAuditor::decodeHTMLEntities(const String& string,
   return String::adopt(result);
 }
 
-bool XSSAuditor::findInRequest(
-    const String& string,
-    bool decodeEntities,
-    bool allowRequestIfNoIllegalURICharacters) const {
+bool XSSAuditor::findInRequest(const String& string,
+                               bool decodeEntities,
+                               bool allowRequestIfNoIllegalURICharacters,
+                               bool decodeURLEscapeSequencesTwice) const {
   bool result = false;
   Frame* parentFrame = m_frame->tree()->parent();
   if (parentFrame && m_frame->document()->url() == blankURL())
     result = findInRequest(parentFrame, string, decodeEntities,
-                           allowRequestIfNoIllegalURICharacters);
+                           allowRequestIfNoIllegalURICharacters,
+                           decodeURLEscapeSequencesTwice);
   if (!result)
     result = findInRequest(m_frame, string, decodeEntities,
-                           allowRequestIfNoIllegalURICharacters);
+                           allowRequestIfNoIllegalURICharacters,
+                           decodeURLEscapeSequencesTwice);
   return result;
 }
 
-bool XSSAuditor::findInRequest(
-    Frame* frame,
-    const String& string,
-    bool decodeEntities,
-    bool allowRequestIfNoIllegalURICharacters) const {
+bool XSSAuditor::findInRequest(Frame* frame,
+                               const String& string,
+                               bool decodeEntities,
+                               bool allowRequestIfNoIllegalURICharacters,
+                               bool decodeURLEscapeSequencesTwice) const {
   ASSERT(frame->document());
 
   if (!frame->document()->decoder()) {
@@ -321,7 +334,8 @@ bool XSSAuditor::findInRequest(
   if (string.length() < pageURL.length()) {
     // The string can actually fit inside the pageURL.
     String decodedPageURL = m_cache.canonicalizeURL(
-        pageURL, frame->document()->decoder()->encoding(), decodeEntities);
+        pageURL, frame->document()->decoder()->encoding(), decodeEntities,
+        decodeURLEscapeSequencesTwice);
 
     if (allowRequestIfNoIllegalURICharacters &&
         (!formDataObj || formDataObj->isEmpty()) &&
@@ -341,7 +355,8 @@ bool XSSAuditor::findInRequest(
       // code is less than or equal to the length of the url-encoded
       // string.
       String decodedFormData = m_cache.canonicalizeURL(
-          formData, frame->document()->decoder()->encoding(), decodeEntities);
+          formData, frame->document()->decoder()->encoding(), decodeEntities,
+          decodeURLEscapeSequencesTwice);
       if (decodedFormData.find(canonicalizedString, 0, false) != -1)
         return true;  // We found the string in the POST data.
     }

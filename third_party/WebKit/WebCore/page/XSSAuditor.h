@@ -104,16 +104,19 @@ class XSSAuditor {
  private:
   class CachingURLCanonicalizer {
    public:
-    CachingURLCanonicalizer() : m_decodeEntities(false) {}
+    CachingURLCanonicalizer()
+        : m_decodeEntities(false), m_decodeURLEscapeSequencesTwice(false) {}
     String canonicalizeURL(const String& url,
                            const TextEncoding& encoding,
-                           bool decodeEntities);
+                           bool decodeEntities,
+                           bool decodeURLEscapeSequencesTwice);
 
    private:
     // The parameters we were called with last.
     String m_inputURL;
     TextEncoding m_encoding;
     bool m_decodeEntities;
+    bool m_decodeURLEscapeSequencesTwice;
 
     // The cached result.
     String m_cachedCanonicalizedURL;
@@ -122,18 +125,21 @@ class XSSAuditor {
   static String canonicalize(const String&);
   static String decodeURL(const String& url,
                           const TextEncoding& encoding,
-                          bool decodeEntities);
+                          bool decodeEntities,
+                          bool decodeURLEscapeSequencesTwice = false);
   static String decodeHTMLEntities(
       const String&,
       bool leaveUndecodableEntitiesUntouched = true);
 
   bool findInRequest(const String&,
                      bool decodeEntities = true,
-                     bool allowRequestIfNoIllegalURICharacters = false) const;
+                     bool allowRequestIfNoIllegalURICharacters = false,
+                     bool decodeURLEscapeSequencesTwice = false) const;
   bool findInRequest(Frame*,
                      const String&,
                      bool decodeEntities = true,
-                     bool allowRequestIfNoIllegalURICharacters = false) const;
+                     bool allowRequestIfNoIllegalURICharacters = false,
+                     bool decodeURLEscapeSequencesTwice = false) const;
 
   // The frame to audit.
   Frame* m_frame;
