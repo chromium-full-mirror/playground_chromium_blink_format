@@ -33,19 +33,10 @@ class SVGFEFloodElement : public SVGFilterPrimitiveStandardAttributes {
   SVGFEFloodElement(const QualifiedName&, Document*);
   virtual ~SVGFEFloodElement();
 
-  virtual void parseMappedAttribute(MappedAttribute*);
   virtual bool build(SVGResourceFilter*);
-
- private:
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFEFloodElement,
-                                 SVGNames::feFloodTagString,
-                                 SVGNames::inAttrString,
-                                 String,
-                                 In1,
-                                 in1)
 };
 
 }  // namespace WebCore
 
-#endif  // ENABLE(SVG)
+#endif  // ENABLE(SVG) && ENABLE(FILTERS)
 #endif
