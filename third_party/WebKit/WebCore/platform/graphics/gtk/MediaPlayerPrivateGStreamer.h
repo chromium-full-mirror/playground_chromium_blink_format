@@ -30,8 +30,10 @@
 #include <cairo.h>
 #include <glib.h>
 
-typedef struct _GstElement GstElement;
+typedef struct _WebKitVideoSink WebKitVideoSink;
+typedef struct _GstBuffer GstBuffer;
 typedef struct _GstMessage GstMessage;
+typedef struct _GstElement GstElement;
 typedef struct _GstBus GstBus;
 
 namespace WebCore {
@@ -61,6 +63,10 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
   friend gboolean mediaPlayerPrivateStateCallback(GstBus* bus,
                                                   GstMessage* message,
                                                   gpointer data);
+  friend void mediaPlayerPrivateRepaintCallback(
+      WebKitVideoSink*,
+      GstBuffer* buffer,
+      MediaPlayerPrivate* playerPrivate);
 
  public:
   static void registerMediaEngine(MediaEngineRegistrar);
@@ -149,7 +155,7 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
   mutable bool m_isStreaming;
   IntSize m_size;
   bool m_visible;
-  cairo_surface_t* m_surface;
+  GstBuffer* m_buffer;
 
   bool m_paused;
   bool m_seeking;
