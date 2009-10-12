@@ -54,6 +54,7 @@ class QWebViewPrivate : public QWebPageClient {
   virtual void updateCursor(const QCursor& cursor);
 #endif
 
+  virtual QPalette palette() const;
   virtual int screenNumber() const;
   virtual WId winId() const;
 
@@ -96,6 +97,10 @@ void QWebViewPrivate::updateCursor(const QCursor& cursor) {
   view->setCursor(cursor);
 }
 #endif
+
+QPalette QWebViewPrivate::palette() const {
+  return view->palette();
+}
 
 int QWebViewPrivate::screenNumber() const {
 #if defined(Q_WS_X11)
