@@ -949,7 +949,8 @@ void RenderLayerBacking::paintIntoLayer(
   if (paintingRoot && !renderer()->isDescendantOf(paintingRoot))
     paintingRootForRenderer = paintingRoot;
 
-  bool shouldPaint = m_owningLayer->hasVisibleContent() &&
+  bool shouldPaint = (m_owningLayer->hasVisibleContent() ||
+                      m_owningLayer->hasVisibleDescendant()) &&
                      m_owningLayer->isSelfPaintingLayer();
 
   if (shouldPaint && (paintingPhase & GraphicsLayerPaintBackground)) {

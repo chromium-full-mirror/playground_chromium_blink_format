@@ -355,6 +355,7 @@ class RenderLayer : public ScrollbarClient {
   Vector<RenderLayer*>* normalFlowList() const { return m_normalFlowList; }
 
   bool hasVisibleContent() const { return m_hasVisibleContent; }
+  bool hasVisibleDescendant() const { return m_hasVisibleDescendant; }
   void setHasVisibleContent(bool);
   void dirtyVisibleContentStatus();
 
