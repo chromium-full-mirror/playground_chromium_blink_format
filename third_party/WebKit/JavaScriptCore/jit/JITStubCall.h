@@ -26,7 +26,7 @@
 #ifndef JITStubCall_h
 #define JITStubCall_h
 
-#include <wtf/Platform.h>
+#include "MacroAssemblerCodeRef.h"
 
 #if ENABLE(JIT)
 
@@ -36,45 +36,45 @@ class JITStubCall {
  public:
   JITStubCall(JIT* jit, JSObject*(JIT_STUB* stub)(STUB_ARGS_DECLARATION))
       : m_jit(jit),
-        m_stub(reinterpret_cast<void*>(stub)),
+        m_stub(stub),
         m_returnType(Cell),
         m_stackIndex(stackIndexStart) {}
 
   JITStubCall(JIT* jit,
               JSPropertyNameIterator*(JIT_STUB* stub)(STUB_ARGS_DECLARATION))
       : m_jit(jit),
-        m_stub(reinterpret_cast<void*>(stub)),
+        m_stub(stub),
         m_returnType(Cell),
         m_stackIndex(stackIndexStart) {}
 
   JITStubCall(JIT* jit, void*(JIT_STUB* stub)(STUB_ARGS_DECLARATION))
       : m_jit(jit),
-        m_stub(reinterpret_cast<void*>(stub)),
+        m_stub(stub),
         m_returnType(VoidPtr),
         m_stackIndex(stackIndexStart) {}
 
   JITStubCall(JIT* jit, int(JIT_STUB* stub)(STUB_ARGS_DECLARATION))
       : m_jit(jit),
-        m_stub(reinterpret_cast<void*>(stub)),
+        m_stub(stub),
         m_returnType(Int),
         m_stackIndex(stackIndexStart) {}
 
   JITStubCall(JIT* jit, bool(JIT_STUB* stub)(STUB_ARGS_DECLARATION))
       : m_jit(jit),
-        m_stub(reinterpret_cast<void*>(stub)),
+        m_stub(stub),
         m_returnType(Int),
         m_stackIndex(stackIndexStart) {}
 
   JITStubCall(JIT* jit, void(JIT_STUB* stub)(STUB_ARGS_DECLARATION))
       : m_jit(jit),
-        m_stub(reinterpret_cast<void*>(stub)),
+        m_stub(stub),
         m_returnType(Void),
         m_stackIndex(stackIndexStart) {}
 
 #if USE(JSVALUE32_64)
   JITStubCall(JIT* jit, EncodedJSValue(JIT_STUB* stub)(STUB_ARGS_DECLARATION))
       : m_jit(jit),
-        m_stub(reinterpret_cast<void*>(stub)),
+        m_stub(stub),
         m_returnType(Value),
         m_stackIndex(stackIndexStart) {}
 #endif
@@ -156,7 +156,8 @@ class JITStubCall {
 
     m_jit->restoreArgumentReference();
     JIT::Call call = m_jit->call();
-    m_jit->m_calls.append(CallRecord(call, m_jit->m_bytecodeIndex, m_stub));
+    m_jit->m_calls.append(
+        CallRecord(call, m_jit->m_bytecodeIndex, m_stub.value()));
 
 #if ENABLE(OPCODE_SAMPLING)
     if (m_jit->m_bytecodeIndex != (unsigned)-1)
@@ -216,7 +217,7 @@ class JITStubCall {
       1;  // Index 0 is reserved for restoreArgumentReference().
 
   JIT* m_jit;
-  void* m_stub;
+  FunctionPtr m_stub;
   enum { Void, VoidPtr, Int, Value, Cell } m_returnType;
   size_t m_stackIndex;
 };
