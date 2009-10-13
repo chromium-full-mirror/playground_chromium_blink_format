@@ -57,6 +57,7 @@ class ValidityState : public RefCounted<ValidityState> {
   String m_customErrorMessage;
 
   static bool isValidColorString(const String&);
+  bool isValidEmailAddress(const String&);
 };
 
 }  // namespace WebCore
