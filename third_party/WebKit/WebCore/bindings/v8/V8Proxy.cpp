@@ -74,17 +74,8 @@ void batchConfigureAttributes(v8::Handle<v8::ObjectTemplate> instance,
                               v8::Handle<v8::ObjectTemplate> proto,
                               const BatchedAttribute* attributes,
                               size_t attributeCount) {
-  for (size_t i = 0; i < attributeCount; ++i) {
-    const BatchedAttribute* attribute = &attributes[i];
-    (attribute->onProto ? proto : instance)
-        ->SetAccessor(
-            v8::String::New(attribute->name), attribute->getter,
-            attribute->setter,
-            attribute->data == V8ClassIndex::INVALID_CLASS_INDEX
-                ? v8::Handle<v8::Value>()
-                : v8::Integer::New(V8ClassIndex::ToInt(attribute->data)),
-            attribute->settings, attribute->attribute);
-  }
+  for (size_t i = 0; i < attributeCount; ++i)
+    configureAttribute(instance, proto, attributes[i]);
 }
 
 void batchConfigureConstants(

@@ -84,6 +84,8 @@ struct NPObject;
       v8::Local<v8::Object> host, uint32_t index, v8::AccessType type, \
       v8::Local<v8::Value> data)
 
+#define ACCESSOR_RUNTIME_ENABLER(NAME) bool V8Custom::v8##NAME##Enabled()
+
 namespace WebCore {
 
 class DOMWindow;
@@ -298,6 +300,8 @@ class V8Custom {
       v8::Local<v8::Object> host, uint32_t index, v8::AccessType type, \
       v8::Local<v8::Value> data)
 
+#define DECLARE_ACCESSOR_RUNTIME_ENABLER(NAME) static bool v8##NAME##Enabled()
+
   DECLARE_PROPERTY_ACCESSOR(CanvasRenderingContext2DStrokeStyle);
   DECLARE_PROPERTY_ACCESSOR(CanvasRenderingContext2DFillStyle);
   DECLARE_PROPERTY_ACCESSOR(DOMWindowEvent);
@@ -307,6 +311,7 @@ class V8Custom {
 
 #if ENABLE(VIDEO)
   DECLARE_PROPERTY_ACCESSOR_GETTER(DOMWindowAudio);
+  DECLARE_ACCESSOR_RUNTIME_ENABLER(DOMWindowAudio);
 #endif
 
   DECLARE_PROPERTY_ACCESSOR_GETTER(DOMWindowImage);
