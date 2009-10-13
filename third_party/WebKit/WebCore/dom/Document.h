@@ -528,7 +528,6 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   void write(const String& text, Document* ownerDocument = 0);
   void writeln(const String& text, Document* ownerDocument = 0);
   void finishParsing();
-  void clear();
 
   bool wellFormed() const { return m_wellFormed; }
 
