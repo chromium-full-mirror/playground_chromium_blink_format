@@ -51,7 +51,8 @@ class NetscapePluginHostManager {
       NSArray* attributeValues,
       NSString* userAgent,
       NSURL* sourceURL,
-      bool fullFrame);
+      bool fullFrame,
+      bool isPrivateBrowsingEnabled);
 
   void pluginHostDied(NetscapePluginHostProxy*);
 

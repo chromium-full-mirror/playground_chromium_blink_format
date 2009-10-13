@@ -237,6 +237,7 @@ class NetscapePluginInstanceProxy
                   mach_msg_type_number_t& resolvedURLLength);
 
   void didDraw();
+  void privateBrowsingModeDidChange(bool isPrivateBrowsingEnabled);
 
   // Reply structs
   struct Reply {
