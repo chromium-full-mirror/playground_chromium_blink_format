@@ -27,15 +27,9 @@
 #include "config.h"
 #include "PluginData.h"
 
-#include "NotImplemented.h"
-
 namespace WebCore {
 
-void PluginData::initPlugins() {
-  notImplemented();
-}
+void PluginData::initPlugins() {}
 
-void PluginData::refresh() {
-  notImplemented();
-}
+void PluginData::refresh() {}
 };
