@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2008 Nokia Corporation and/or its subsidiary(-ies)
     Copyright (C) 2008 Holger Hans Peter Freyther
+    Copyright (C) 2009 Girish Ramakrishnan <girish@forwardbias.in>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -56,7 +57,7 @@ class QWebViewPrivate : public QWebPageClient {
 
   virtual QPalette palette() const;
   virtual int screenNumber() const;
-  virtual WId winId() const;
+  virtual QWidget* ownerWidget() const;
 
   virtual QObject* pluginParent() const;
 
@@ -111,11 +112,8 @@ int QWebViewPrivate::screenNumber() const {
   return 0;
 }
 
-WId QWebViewPrivate::winId() const {
-  if (view)
-    return view->winId();
-
-  return 0;
+QWidget* QWebViewPrivate::ownerWidget() const {
+  return view;
 }
 
 QObject* QWebViewPrivate::pluginParent() const {
