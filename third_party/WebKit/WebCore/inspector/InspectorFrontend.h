@@ -129,6 +129,7 @@ class InspectorFrontend {
   void didGetEventListenersForNode(int callId,
                                    int nodeId,
                                    ScriptArray& listenersArray);
+  void didRemoveNode(int callId, int nodeId);
 
   void timelineWasEnabled();
   void timelineWasDisabled();
