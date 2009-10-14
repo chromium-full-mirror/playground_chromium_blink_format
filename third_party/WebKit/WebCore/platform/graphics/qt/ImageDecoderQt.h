@@ -38,7 +38,7 @@ namespace WebCore {
 
 class ImageDecoderQt : public ImageDecoder {
  public:
-  ImageDecoderQt(const QByteArray& imageFormat);
+  ImageDecoderQt();
   ~ImageDecoderQt();
 
   virtual void setData(SharedBuffer* data, bool allDataReceived);
@@ -63,7 +63,7 @@ class ImageDecoderQt : public ImageDecoder {
   void failRead();
 
  private:
-  String m_format;
+  QByteArray m_format;
   QBuffer* m_buffer;
   QImageReader* m_reader;
   mutable int m_repetitionCount;
