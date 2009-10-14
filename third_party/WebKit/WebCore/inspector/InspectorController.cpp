@@ -1400,11 +1400,11 @@ void InspectorController::addProfile(PassRefPtr<Profile> prpProfile,
     return;
 
   RefPtr<Profile> profile = prpProfile;
-  m_profiles.add(profile->uid(), profile);
+  m_profiles.append(profile);
 
   if (m_frontend) {
     JSLock lock(SilenceAssertionsOnly);
-    m_frontend->addProfileHeader(createProfileHeader(*profile));
+    m_frontend->addProfile(toJS(m_scriptState, profile.get()));
   }
 
   addProfileFinishedMessageToConsole(profile, lineNumber, sourceURL);
@@ -1438,33 +1438,6 @@ void InspectorController::addStartProfilingMessageToConsole(
   message += "#0\" started.";
   addMessageToConsole(JSMessageSource, LogMessageType, LogMessageLevel, message,
                       lineNumber, sourceURL);
-}
-
-void InspectorController::getProfileHeaders(long callId) {
-  if (!m_frontend)
-    return;
-  ScriptArray result = m_frontend->newScriptArray();
-  ProfilesMap::iterator profilesEnd = m_profiles.end();
-  int i = 0;
-  for (ProfilesMap::iterator it = m_profiles.begin(); it != profilesEnd; ++it)
-    result.set(i++, createProfileHeader(*it->second));
-  m_frontend->didGetProfileHeaders(callId, result);
-}
-
-void InspectorController::getProfile(long callId, unsigned uid) {
-  if (!m_frontend)
-    return;
-  ProfilesMap::iterator it = m_profiles.find(uid);
-  if (it != m_profiles.end())
-    m_frontend->didGetProfile(callId, toJS(m_scriptState, it->second.get()));
-}
-
-ScriptObject InspectorController::createProfileHeader(
-    const JSC::Profile& profile) {
-  ScriptObject header = m_frontend->newScriptObject();
-  header.set("title", profile.title());
-  header.set("uid", profile.uid());
-  return header;
 }
 
 UString InspectorController::getCurrentUserInitiatedProfileName(
