@@ -214,6 +214,11 @@ void LayoutTestController::setPopupBlockingEnabled(bool enable) {
       QWebSettings::JavascriptCanOpenWindows, !enable);
 }
 
+void LayoutTestController::setPOSIXLocale(const QString& locale) {
+  QLocale qlocale(locale);
+  QLocale::setDefault(qlocale);
+}
+
 bool LayoutTestController::pauseAnimationAtTimeOnElementWithId(
     const QString& animationName,
     double time,

@@ -105,6 +105,7 @@ class LayoutTestController : public QObject {
   void setFixedContentsSize(int width, int height);
   void setPrivateBrowsingEnabled(bool enable);
   void setPopupBlockingEnabled(bool enable);
+  void setPOSIXLocale(const QString& locale);
 
   bool pauseAnimationAtTimeOnElementWithId(const QString& animationName,
                                            double time,
