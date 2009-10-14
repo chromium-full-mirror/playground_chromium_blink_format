@@ -44,11 +44,6 @@ using namespace JSC;
 namespace WebCore {
 
 JSValue JSEventSource::addEventListener(ExecState* exec, const ArgList& args) {
-  JSDOMGlobalObject* globalObject =
-      toJSDOMGlobalObject(impl()->scriptExecutionContext());
-  if (!globalObject)
-    return jsUndefined();
-
   JSValue listener = args.at(1);
   if (!listener.isObject())
     return jsUndefined();
@@ -62,11 +57,6 @@ JSValue JSEventSource::addEventListener(ExecState* exec, const ArgList& args) {
 
 JSValue JSEventSource::removeEventListener(ExecState* exec,
                                            const ArgList& args) {
-  JSDOMGlobalObject* globalObject =
-      toJSDOMGlobalObject(impl()->scriptExecutionContext());
-  if (!globalObject)
-    return jsUndefined();
-
   JSValue listener = args.at(1);
   if (!listener.isObject())
     return jsUndefined();

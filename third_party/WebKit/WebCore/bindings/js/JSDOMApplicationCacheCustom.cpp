@@ -84,11 +84,6 @@ JSValue JSDOMApplicationCache::remove(ExecState* exec, const ArgList& args) {
 
 JSValue JSDOMApplicationCache::addEventListener(ExecState* exec,
                                                 const ArgList& args) {
-  JSDOMGlobalObject* globalObject =
-      toJSDOMGlobalObject(impl()->scriptExecutionContext());
-  if (!globalObject)
-    return jsUndefined();
-
   JSValue listener = args.at(1);
   if (!listener.isObject())
     return jsUndefined();
@@ -101,11 +96,6 @@ JSValue JSDOMApplicationCache::addEventListener(ExecState* exec,
 
 JSValue JSDOMApplicationCache::removeEventListener(ExecState* exec,
                                                    const ArgList& args) {
-  JSDOMGlobalObject* globalObject =
-      toJSDOMGlobalObject(impl()->scriptExecutionContext());
-  if (!globalObject)
-    return jsUndefined();
-
   JSValue listener = args.at(1);
   if (!listener.isObject())
     return jsUndefined();
