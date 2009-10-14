@@ -893,10 +893,9 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
         // On the other hand, since font-size doesn't include the zoom factor,
         // we really can't do
         // that here either.
+        // The line height returned is rounded to the nearest integer.
         return CSSPrimitiveValue::create(
-            static_cast<int>(length.percent() *
-                             style->fontDescription().specifiedSize()) /
-                100,
+            length.calcMinValue(style->fontDescription().specifiedSize(), true),
             CSSPrimitiveValue::CSS_PX);
       return CSSPrimitiveValue::create(length.value(),
                                        CSSPrimitiveValue::CSS_PX);
