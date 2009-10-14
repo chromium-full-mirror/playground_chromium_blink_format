@@ -279,9 +279,9 @@ class InspectorController
   bool resourceTrackingEnabled() const { return m_resourceTrackingEnabled; }
   void ensureResourceTrackingSettingsLoaded();
 
-  void enableTimeline(bool always = false);
-  void disableTimeline(bool always = false);
-  bool timelineEnabled() const;
+  void startTimelineProfiler();
+  void stopTimelineProfiler();
+  bool timelineProfilerEnabled() const;
   InspectorTimelineAgent* timelineAgent() { return m_timelineAgent.get(); }
 
   void mainResourceFiredLoadEvent(DocumentLoader*, const KURL&);

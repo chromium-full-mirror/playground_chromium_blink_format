@@ -187,12 +187,12 @@ void InspectorFrontend::resourceTrackingWasDisabled() {
   callSimpleFunction("resourceTrackingWasDisabled");
 }
 
-void InspectorFrontend::timelineWasEnabled() {
-  callSimpleFunction("timelineWasEnabled");
+void InspectorFrontend::timelineProfilerWasStarted() {
+  callSimpleFunction("timelineProfilerWasStarted");
 }
 
-void InspectorFrontend::timelineWasDisabled() {
-  callSimpleFunction("timelineWasDisabled");
+void InspectorFrontend::timelineProfilerWasStopped() {
+  callSimpleFunction("timelineProfilerWasStopped");
 }
 
 void InspectorFrontend::addItemToTimeline(const ScriptObject& itemObj) {

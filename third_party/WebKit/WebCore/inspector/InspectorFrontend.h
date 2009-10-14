@@ -131,8 +131,8 @@ class InspectorFrontend {
                                    ScriptArray& listenersArray);
   void didRemoveNode(int callId, int nodeId);
 
-  void timelineWasEnabled();
-  void timelineWasDisabled();
+  void timelineProfilerWasStarted();
+  void timelineProfilerWasStopped();
   void addItemToTimeline(const ScriptObject& itemObj);
 
   void didGetCookies(int callId,

@@ -97,9 +97,9 @@ class InspectorBackend : public RefCounted<InspectorBackend> {
 
   const String& platform() const;
 
-  void enableTimeline(bool always);
-  void disableTimeline(bool always);
-  bool timelineEnabled() const;
+  void startTimelineProfiler();
+  void stopTimelineProfiler();
+  bool timelineProfilerEnabled() const;
 
 #if ENABLE(JAVASCRIPT_DEBUGGER)
   const ProfilesArray& profiles() const;
