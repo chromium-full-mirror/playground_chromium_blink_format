@@ -120,7 +120,11 @@ class SVGFilterElement : public SVGStyledElement,
                                  ExternalResourcesRequired,
                                  externalResourcesRequired)
 
-  RefPtr<SVGResourceFilter> m_filter;
+  mutable RefPtr<SVGResourceFilter> m_filter;
+
+ private:
+  friend class SVGResourceFilter;
+  void buildFilter(const FloatRect& targetRect) const;
 };
 
 }  // namespace WebCore

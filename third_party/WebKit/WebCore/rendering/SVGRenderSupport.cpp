@@ -248,7 +248,7 @@ FloatRect SVGRenderBase::filterBoundingBoxForRenderer(
   SVGResourceFilter* filter =
       getFilterById(object->document(), object->style()->svgStyle()->filter());
   if (filter)
-    return filter->filterBBoxForItemBBox(object->objectBoundingBox());
+    return filter->filterBoundingBox();
 #else
   UNUSED_PARAM(object);
 #endif
