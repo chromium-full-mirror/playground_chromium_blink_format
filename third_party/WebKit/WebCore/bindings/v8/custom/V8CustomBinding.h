@@ -531,7 +531,6 @@ class V8Custom {
   DECLARE_CALLBACK(TreeWalkerNextSibling);
   DECLARE_CALLBACK(TreeWalkerPreviousSibling);
 
-  DECLARE_CALLBACK(InspectorBackendProfiles);
   DECLARE_CALLBACK(InspectorBackendHighlightDOMNode);
   DECLARE_CALLBACK(InspectorBackendAddResourceSourceToFrame);
   DECLARE_CALLBACK(InspectorBackendAddSourceToFrame);
