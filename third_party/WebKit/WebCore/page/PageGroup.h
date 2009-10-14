@@ -70,26 +70,30 @@ class PageGroup : public Noncopyable {
   bool hasLocalStorage() { return m_localStorage; }
 #endif
 
-  void addUserScript(const String& source,
-                     const KURL&,
-                     PassOwnPtr<Vector<String>> whitelist,
-                     PassOwnPtr<Vector<String>> blacklist,
-                     unsigned worldID,
-                     UserScriptInjectionTime);
-  const UserScriptMap* userScripts() const { return m_userScripts.get(); }
+  void addUserScriptToWorld(unsigned worldID,
+                            const String& source,
+                            const KURL&,
+                            PassOwnPtr<Vector<String>> whitelist,
+                            PassOwnPtr<Vector<String>> blacklist,
+                            UserScriptInjectionTime);
+  void addUserStyleSheetToWorld(unsigned worldID,
+                                const String& source,
+                                const KURL&,
+                                PassOwnPtr<Vector<String>> whitelist,
+                                PassOwnPtr<Vector<String>> blacklist);
 
-  void addUserStyleSheet(const String& source,
-                         const KURL&,
-                         PassOwnPtr<Vector<String>> whitelist,
-                         PassOwnPtr<Vector<String>> blacklist,
-                         unsigned worldID);
+  void removeUserScriptFromWorld(unsigned, const KURL&);
+  void removeUserStyleSheetFromWorld(unsigned, const KURL&);
+
+  void removeUserScriptsFromWorld(unsigned);
+  void removeUserStyleSheetsFromWorld(unsigned);
+
+  void removeAllUserContent();
+
+  const UserScriptMap* userScripts() const { return m_userScripts.get(); }
   const UserStyleSheetMap* userStyleSheets() const {
     return m_userStyleSheets.get();
   }
-
-  void removeUserContentForWorld(unsigned);
-  void removeUserContentWithURLForWorld(const KURL&, unsigned);
-  void removeAllUserContent();
 
  private:
   void addVisitedLink(LinkHash stringHash);

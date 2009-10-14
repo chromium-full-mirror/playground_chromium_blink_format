@@ -5561,9 +5561,9 @@ HRESULT WebView::addUserStyleSheetToGroup(BSTR groupName,
   return S_OK;
 }
 
-HRESULT WebView::removeUserContentWithURLFromGroup(BSTR groupName,
-                                                   unsigned worldID,
-                                                   BSTR url) {
+HRESULT WebView::removeUserScriptFromGroup(BSTR groupName,
+                                           unsigned worldID,
+                                           BSTR url) {
   String group(groupName, SysStringLen(groupName));
   if (group.isEmpty() || !worldID || worldID == numeric_limits<unsigned>::max())
     return E_INVALIDARG;
@@ -5573,13 +5573,15 @@ HRESULT WebView::removeUserContentWithURLFromGroup(BSTR groupName,
   if (!pageGroup)
     return E_FAIL;
 
-  pageGroup->removeUserContentWithURLForWorld(
-      KURL(KURL(), String(url, SysStringLen(url))), worldID);
+  pageGroup->removeUserScriptFromWorld(
+      worldID, KURL(KURL(), String(url, SysStringLen(url))));
 
   return S_OK;
 }
 
-HRESULT WebView::removeUserContentFromGroup(BSTR groupName, unsigned worldID) {
+HRESULT WebView::removeUserStyleSheetFromGroup(BSTR groupName,
+                                               unsigned worldID,
+                                               BSTR url) {
   String group(groupName, SysStringLen(groupName));
   if (group.isEmpty() || !worldID || worldID == numeric_limits<unsigned>::max())
     return E_INVALIDARG;
@@ -5589,7 +5591,38 @@ HRESULT WebView::removeUserContentFromGroup(BSTR groupName, unsigned worldID) {
   if (!pageGroup)
     return E_FAIL;
 
-  pageGroup->removeUserContentForWorld(worldID);
+  pageGroup->removeUserStyleSheetFromWorld(
+      worldID, KURL(KURL(), String(url, SysStringLen(url))));
+
+  return S_OK;
+}
+
+HRESULT WebView::removeUserScriptFromGroup(BSTR groupName, unsigned worldID) {
+  String group(groupName, SysStringLen(groupName));
+  if (group.isEmpty() || !worldID || worldID == numeric_limits<unsigned>::max())
+    return E_INVALIDARG;
+
+  PageGroup* pageGroup = PageGroup::pageGroup(group);
+  ASSERT(pageGroup);
+  if (!pageGroup)
+    return E_FAIL;
+
+  pageGroup->removeUserScriptFromWorld(worldID);
+  return S_OK;
+}
+
+HRESULT WebView::removeUserStyleSheetFromGroup(BSTR groupName,
+                                               unsigned worldID) {
+  String group(groupName, SysStringLen(groupName));
+  if (group.isEmpty() || !worldID || worldID == numeric_limits<unsigned>::max())
+    return E_INVALIDARG;
+
+  PageGroup* pageGroup = PageGroup::pageGroup(group);
+  ASSERT(pageGroup);
+  if (!pageGroup)
+    return E_FAIL;
+
+  pageGroup->removeUserStyleSheetFromWorld(worldID);
   return S_OK;
 }
 
