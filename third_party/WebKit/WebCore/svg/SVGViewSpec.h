@@ -1,8 +1,6 @@
 /*
     Copyright (C) 2007 Rob Buis <buis@kde.org>
 
-    This file is part of the KDE project
-
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
@@ -52,17 +50,17 @@ class SVGViewSpec : public SVGFitToViewBox, public SVGZoomAndPan {
   String viewTargetString() const { return m_viewTargetString; }
   SVGElement* viewTarget() const;
 
-  virtual const SVGElement* contextElement() const;
+  const SVGElement* contextElement() const;
 
  private:
   // SVGFitToViewBox
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFitToViewBox,
+  ANIMATED_PROPERTY_DECLARATIONS(SVGViewSpec,
                                  SVGFitToViewBoxIdentifier,
                                  SVGNames::viewBoxAttrString,
                                  FloatRect,
                                  ViewBox,
                                  viewBox)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFitToViewBox,
+  ANIMATED_PROPERTY_DECLARATIONS(SVGViewSpec,
                                  SVGFitToViewBoxIdentifier,
                                  SVGNames::preserveAspectRatioAttrString,
                                  SVGPreserveAspectRatio,

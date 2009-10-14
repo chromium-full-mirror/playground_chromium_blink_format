@@ -1,8 +1,6 @@
 /*
     Copyright (C) 2006 Apple Computer, Inc.
 
-    This file is part of the WebKit project
-
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
@@ -48,9 +46,6 @@ class SVGForeignObjectElement : public SVGStyledTransformableElement,
   bool childShouldCreateRenderer(Node*) const;
   virtual RenderObject* createRenderer(RenderArena* arena, RenderStyle* style);
 
- protected:
-  virtual const SVGElement* contextElement() const { return this; }
-
  private:
   ANIMATED_PROPERTY_DECLARATIONS(SVGForeignObjectElement,
                                  SVGNames::foreignObjectTagString,
@@ -86,7 +81,7 @@ class SVGForeignObjectElement : public SVGStyledTransformableElement,
                                  href)
 
   // SVGExternalResourcesRequired
-  ANIMATED_PROPERTY_DECLARATIONS(SVGExternalResourcesRequired,
+  ANIMATED_PROPERTY_DECLARATIONS(SVGForeignObjectElement,
                                  SVGExternalResourcesRequiredIdentifier,
                                  SVGNames::externalResourcesRequiredAttrString,
                                  bool,

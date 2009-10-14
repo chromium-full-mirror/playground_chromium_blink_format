@@ -2,8 +2,6 @@
     Copyright (C) 2004, 2005, 2008 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2007 Rob Buis <buis@kde.org>
 
-    This file is part of the KDE project
-
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
@@ -63,7 +61,6 @@ class SVGScriptElement : public SVGElement,
   virtual bool shouldExecuteAsJavaScript() const { return false; }
 
  protected:
-  virtual const SVGElement* contextElement() const { return this; }
   virtual bool haveLoadedRequiredResources();
 
   virtual String sourceAttributeValue() const;
@@ -85,7 +82,7 @@ class SVGScriptElement : public SVGElement,
                                  href)
 
   // SVGExternalResourcesRequired
-  ANIMATED_PROPERTY_DECLARATIONS(SVGExternalResourcesRequired,
+  ANIMATED_PROPERTY_DECLARATIONS(SVGScriptElement,
                                  SVGExternalResourcesRequiredIdentifier,
                                  SVGNames::externalResourcesRequiredAttrString,
                                  bool,

@@ -3,8 +3,6 @@
                   2004, 2005 Rob Buis <buis@kde.org>
                   2007 Eric Seidel <eric@webkit.org>
 
-    This file is part of the KDE project
-
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
@@ -60,9 +58,6 @@ class SVGAElement : public SVGStyledTransformableElement,
 
   virtual bool childShouldCreateRenderer(Node*) const;
 
- protected:
-  virtual const SVGElement* contextElement() const { return this; }
-
  private:
   ANIMATED_PROPERTY_DECLARATIONS(SVGAElement,
                                  SVGNames::aTagString,
@@ -80,7 +75,7 @@ class SVGAElement : public SVGStyledTransformableElement,
                                  href)
 
   // SVGExternalResourcesRequired
-  ANIMATED_PROPERTY_DECLARATIONS(SVGExternalResourcesRequired,
+  ANIMATED_PROPERTY_DECLARATIONS(SVGAElement,
                                  SVGExternalResourcesRequiredIdentifier,
                                  SVGNames::externalResourcesRequiredAttrString,
                                  bool,

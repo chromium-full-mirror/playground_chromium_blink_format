@@ -2,8 +2,6 @@
     Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006, 2007 Rob Buis <buis@kde.org>
 
-    This file is part of the KDE project
-
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
@@ -139,8 +137,6 @@ class SVGSVGElement : public SVGStyledLocatableElement,
   void inheritViewAttributes(SVGViewElement*);
 
  protected:
-  virtual const SVGElement* contextElement() const { return this; }
-
   friend class RenderSVGRoot;
   friend class RenderSVGViewportContainer;
 
@@ -175,7 +171,7 @@ class SVGSVGElement : public SVGStyledLocatableElement,
                                  height)
 
   // SVGExternalResourcesRequired
-  ANIMATED_PROPERTY_DECLARATIONS(SVGExternalResourcesRequired,
+  ANIMATED_PROPERTY_DECLARATIONS(SVGSVGElement,
                                  SVGExternalResourcesRequiredIdentifier,
                                  SVGNames::externalResourcesRequiredAttrString,
                                  bool,
@@ -183,13 +179,13 @@ class SVGSVGElement : public SVGStyledLocatableElement,
                                  externalResourcesRequired)
 
   // SVGFitToViewBox
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFitToViewBox,
+  ANIMATED_PROPERTY_DECLARATIONS(SVGSVGElement,
                                  SVGFitToViewBoxIdentifier,
                                  SVGNames::viewBoxAttrString,
                                  FloatRect,
                                  ViewBox,
                                  viewBox)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFitToViewBox,
+  ANIMATED_PROPERTY_DECLARATIONS(SVGSVGElement,
                                  SVGFitToViewBoxIdentifier,
                                  SVGNames::preserveAspectRatioAttrString,
                                  SVGPreserveAspectRatio,

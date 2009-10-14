@@ -75,9 +75,6 @@ class SVGMarkerElement : public SVGStyledElement,
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual SVGResource* canvasResource();
 
- protected:
-  virtual const SVGElement* contextElement() const { return this; }
-
  private:
   ANIMATED_PROPERTY_DECLARATIONS(SVGMarkerElement,
                                  SVGNames::markerTagString,
@@ -123,7 +120,7 @@ class SVGMarkerElement : public SVGStyledElement,
                                  orientAngle)
 
   // SVGExternalResourcesRequired
-  ANIMATED_PROPERTY_DECLARATIONS(SVGExternalResourcesRequired,
+  ANIMATED_PROPERTY_DECLARATIONS(SVGMarkerElement,
                                  SVGExternalResourcesRequiredIdentifier,
                                  SVGNames::externalResourcesRequiredAttrString,
                                  bool,
@@ -131,13 +128,13 @@ class SVGMarkerElement : public SVGStyledElement,
                                  externalResourcesRequired)
 
   // SVGFitToViewBox
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFitToViewBox,
+  ANIMATED_PROPERTY_DECLARATIONS(SVGMarkerElement,
                                  SVGFitToViewBoxIdentifier,
                                  SVGNames::viewBoxAttrString,
                                  FloatRect,
                                  ViewBox,
                                  viewBox)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFitToViewBox,
+  ANIMATED_PROPERTY_DECLARATIONS(SVGMarkerElement,
                                  SVGFitToViewBoxIdentifier,
                                  SVGNames::preserveAspectRatioAttrString,
                                  SVGPreserveAspectRatio,

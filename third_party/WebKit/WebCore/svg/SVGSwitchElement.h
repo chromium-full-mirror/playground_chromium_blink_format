@@ -1,8 +1,6 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
-
-    This file is part of the KDE project
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -22,8 +20,8 @@
 
 #ifndef SVGSwitchElement_h
 #define SVGSwitchElement_h
-#if ENABLE(SVG)
 
+#if ENABLE(SVG)
 #include "SVGExternalResourcesRequired.h"
 #include "SVGLangSpace.h"
 #include "SVGStyledTransformableElement.h"
@@ -44,12 +42,9 @@ class SVGSwitchElement : public SVGStyledTransformableElement,
 
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
 
- protected:
-  virtual const SVGElement* contextElement() const { return this; }
-
  private:
   // SVGExternalResourcesRequired
-  ANIMATED_PROPERTY_DECLARATIONS(SVGExternalResourcesRequired,
+  ANIMATED_PROPERTY_DECLARATIONS(SVGSwitchElement,
                                  SVGExternalResourcesRequiredIdentifier,
                                  SVGNames::externalResourcesRequiredAttrString,
                                  bool,
@@ -61,5 +56,3 @@ class SVGSwitchElement : public SVGStyledTransformableElement,
 
 #endif  // ENABLE(SVG)
 #endif
-
-// vim:ts=4:noet

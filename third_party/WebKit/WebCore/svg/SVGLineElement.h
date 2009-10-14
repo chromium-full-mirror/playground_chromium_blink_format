@@ -2,8 +2,6 @@
     Copyright (C) 2004, 2005, 2006, 2008 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
 
-    This file is part of the KDE project
-
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
@@ -51,7 +49,6 @@ class SVGLineElement : public SVGStyledTransformableElement,
   virtual bool supportsMarkers() const { return true; }
 
  protected:
-  virtual const SVGElement* contextElement() const { return this; }
   virtual bool hasRelativeValues() const;
 
  private:
@@ -81,7 +78,7 @@ class SVGLineElement : public SVGStyledTransformableElement,
                                  y2)
 
   // SVGExternalResourcesRequired
-  ANIMATED_PROPERTY_DECLARATIONS(SVGExternalResourcesRequired,
+  ANIMATED_PROPERTY_DECLARATIONS(SVGLineElement,
                                  SVGExternalResourcesRequiredIdentifier,
                                  SVGNames::externalResourcesRequiredAttrString,
                                  bool,

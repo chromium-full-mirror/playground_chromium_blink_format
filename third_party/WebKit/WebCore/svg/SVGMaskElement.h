@@ -1,8 +1,6 @@
 /*
     Copyright (C) 2005 Alexander Kellett <lypanov@kde.org>
 
-    This file is part of the KDE project
-
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
@@ -58,9 +56,6 @@ class SVGMaskElement : public SVGStyledLocatableElement,
   PassOwnPtr<ImageBuffer> drawMaskerContent(const FloatRect& targetRect,
                                             FloatRect& maskRect) const;
 
- protected:
-  virtual const SVGElement* contextElement() const { return this; }
-
  private:
   ANIMATED_PROPERTY_DECLARATIONS(SVGMaskElement,
                                  SVGNames::maskTagString,
@@ -108,7 +103,7 @@ class SVGMaskElement : public SVGStyledLocatableElement,
                                  href)
 
   // SVGExternalResourcesRequired
-  ANIMATED_PROPERTY_DECLARATIONS(SVGExternalResourcesRequired,
+  ANIMATED_PROPERTY_DECLARATIONS(SVGMaskElement,
                                  SVGExternalResourcesRequiredIdentifier,
                                  SVGNames::externalResourcesRequiredAttrString,
                                  bool,

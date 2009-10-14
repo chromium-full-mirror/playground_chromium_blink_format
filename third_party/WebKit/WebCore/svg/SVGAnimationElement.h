@@ -1,11 +1,9 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
     Copyright (C) 2007 Eric Seidel <eric@webkit.org>
     Copyright (C) 2008 Apple Inc. All rights reserved.
     Copyright (C) 2008 Cameron McCormack <cam@mcc.id.au>
-
-    This file is part of the KDE project
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -66,8 +64,6 @@ class SVGAnimationElement : public SVGSMILElement,
   static bool attributeIsCSS(const String& attributeName);
 
  protected:
-  virtual const SVGElement* contextElement() const { return this; }
-
   enum CalcMode {
     CalcModeDiscrete,
     CalcModeLinear,
@@ -138,7 +134,7 @@ class SVGAnimationElement : public SVGSMILElement,
 
  protected:
   // SVGExternalResourcesRequired
-  ANIMATED_PROPERTY_DECLARATIONS(SVGExternalResourcesRequired,
+  ANIMATED_PROPERTY_DECLARATIONS(SVGAnimationElement,
                                  SVGExternalResourcesRequiredIdentifier,
                                  SVGNames::externalResourcesRequiredAttrString,
                                  bool,

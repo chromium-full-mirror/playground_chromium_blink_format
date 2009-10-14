@@ -2,8 +2,6 @@
     Copyright (C) 2004, 2005, 2007 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005 Rob Buis <buis@kde.org>
 
-    This file is part of the KDE project
-
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
@@ -49,9 +47,6 @@ class SVGFEImageElement : public SVGFilterPrimitiveStandardAttributes,
   virtual void addSubresourceAttributeURLs(ListHashSet<KURL>&) const;
   virtual bool build(SVGResourceFilter*);
 
- protected:
-  virtual const SVGElement* contextElement() const { return this; }
-
  private:
   ANIMATED_PROPERTY_DECLARATIONS(SVGFEImageElement,
                                  SVGNames::feImageTagString,
@@ -69,7 +64,7 @@ class SVGFEImageElement : public SVGFilterPrimitiveStandardAttributes,
                                  href)
 
   // SVGExternalResourcesRequired
-  ANIMATED_PROPERTY_DECLARATIONS(SVGExternalResourcesRequired,
+  ANIMATED_PROPERTY_DECLARATIONS(SVGFEImageElement,
                                  SVGExternalResourcesRequiredIdentifier,
                                  SVGNames::externalResourcesRequiredAttrString,
                                  bool,
