@@ -142,6 +142,13 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
     m_dumpFrameLoadCallbacks = dumpFrameLoadCallbacks;
   }
 
+  bool dumpHistoryDelegateCallbacks() const {
+    return m_dumpHistoryDelegateCallbacks;
+  }
+  void setDumpHistoryDelegateCallbacks(bool dumpHistoryDelegateCallbacks) {
+    m_dumpHistoryDelegateCallbacks = dumpHistoryDelegateCallbacks;
+  }
+
   bool dumpResourceLoadCallbacks() const { return m_dumpResourceLoadCallbacks; }
   void setDumpResourceLoadCallbacks(bool dumpResourceLoadCallbacks) {
     m_dumpResourceLoadCallbacks = dumpResourceLoadCallbacks;
@@ -303,6 +310,7 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
   bool m_dumpDatabaseCallbacks;
   bool m_dumpEditingCallbacks;
   bool m_dumpFrameLoadCallbacks;
+  bool m_dumpHistoryDelegateCallbacks;
   bool m_dumpResourceLoadCallbacks;
   bool m_dumpResourceResponseMIMETypes;
   bool m_dumpSelectionRect;

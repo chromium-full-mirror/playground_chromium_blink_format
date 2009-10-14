@@ -926,5 +926,18 @@ void LayoutTestController::evaluateInWebInspector(long callId,
 }
 
 void LayoutTestController::removeAllVisitedLinks() {
-  // FIXME: Implement this.
+  COMPtr<IWebHistory> history;
+  if (FAILED(WebKitCreateInstance(CLSID_WebHistory, 0, __uuidof(history),
+                                  reinterpret_cast<void**>(&history))))
+    return;
+
+  COMPtr<IWebHistory> sharedHistory;
+  if (FAILED(history->optionalSharedHistory(&sharedHistory)) || !sharedHistory)
+    return;
+
+  COMPtr<IWebHistoryPrivate> sharedHistoryPrivate;
+  if (FAILED(sharedHistory->QueryInterface(&sharedHistoryPrivate)))
+    return;
+
+  sharedHistoryPrivate->removeAllVisitedLinks();
 }

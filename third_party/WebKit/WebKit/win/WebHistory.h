@@ -118,6 +118,10 @@ class WebHistory : public IWebHistory, public IWebHistoryPrivate {
 
   virtual HRESULT STDMETHODCALLTYPE data(IStream**);
 
+  virtual HRESULT STDMETHODCALLTYPE
+  setVisitedLinkTrackingEnabled(BOOL visitedLinkTrackingEnable);
+  virtual HRESULT STDMETHODCALLTYPE removeAllVisitedLinks();
+
   // WebHistory
   static WebHistory* sharedHistory();
   void visitedURL(const WebCore::KURL&,

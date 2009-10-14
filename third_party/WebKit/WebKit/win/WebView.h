@@ -11,7 +11,7 @@
  *    documentation and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY APPLE COMPUTER, INC. ``AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * EXPRESS OR IMPLIED WARRANTIES, INCfLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL APPLE COMPUTER, INC. OR
  * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
@@ -792,6 +792,13 @@ class WebView : public IWebView,
                             BOOL allowDestinationSubdomains);
   virtual HRESULT STDMETHODCALLTYPE resetOriginAccessWhiteLists();
 
+  virtual HRESULT STDMETHODCALLTYPE
+  setHistoryDelegate(IWebHistoryDelegate* historyDelegate);
+  virtual HRESULT STDMETHODCALLTYPE
+  historyDelegate(IWebHistoryDelegate** historyDelegate);
+  virtual HRESULT STDMETHODCALLTYPE addVisitedLinks(BSTR* visitedURLs,
+                                                    unsigned visitedURLCount);
+
   // WebView
   bool shouldUseEmbeddedView(const WebCore::String& mimeType) const;
 
@@ -957,6 +964,7 @@ class WebView : public IWebView,
   COMPtr<IWebPolicyDelegate> m_policyDelegate;
   COMPtr<IWebResourceLoadDelegate> m_resourceLoadDelegate;
   COMPtr<IWebDownloadDelegate> m_downloadDelegate;
+  COMPtr<IWebHistoryDelegate> m_historyDelegate;
   COMPtr<WebPreferences> m_preferences;
   COMPtr<WebInspector> m_webInspector;
   COMPtr<IWebPluginHalterDelegate> m_pluginHalterDelegate;
