@@ -1140,9 +1140,6 @@ IWebView* createWebViewAndOffscreenWindow(HWND* webViewWindow) {
           webView->setResourceLoadDelegate(sharedResourceLoadDelegate.get())))
     return 0;
 
-  if (FAILED(viewPrivate->setHistoryDelegate(sharedHistoryDelegate.get())))
-    return 0;
-
   openWindows().append(hostWindow);
   windowToWebViewMap().set(hostWindow, webView);
   return webView;
