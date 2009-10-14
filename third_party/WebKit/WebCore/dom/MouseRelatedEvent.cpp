@@ -54,7 +54,7 @@ static int contentsX(AbstractView* abstractView) {
   FrameView* frameView = frame->view();
   if (!frameView)
     return 0;
-  return frameView->scrollX();
+  return frameView->scrollX() / frame->pageZoomFactor();
 }
 
 static int contentsY(AbstractView* abstractView) {
@@ -66,7 +66,7 @@ static int contentsY(AbstractView* abstractView) {
   FrameView* frameView = frame->view();
   if (!frameView)
     return 0;
-  return frameView->scrollY();
+  return frameView->scrollY() / frame->pageZoomFactor();
 }
 
 MouseRelatedEvent::MouseRelatedEvent(const AtomicString& eventType,
