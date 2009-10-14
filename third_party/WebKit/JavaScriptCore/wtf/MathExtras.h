@@ -115,6 +115,12 @@ inline bool signbit(double x) {
 
 #if COMPILER(MSVC) || COMPILER(RVCT)
 
+inline long long llround(double num) {
+  return static_cast<long long>(num > 0 ? num + 0.5 : ceil(num - 0.5));
+}
+inline long long llroundf(float num) {
+  return static_cast<long long>(num > 0 ? num + 0.5f : ceil(num - 0.5f));
+}
 inline long lround(double num) {
   return static_cast<long>(num > 0 ? num + 0.5 : ceil(num - 0.5));
 }
