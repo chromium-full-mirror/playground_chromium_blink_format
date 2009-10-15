@@ -300,8 +300,6 @@ class FrameLoader : public Noncopyable {
   void setEncoding(const String& encoding, bool userChosen);
   String encoding() const;
 
-  void gotoAnchor();
-
   void tokenizerProcessedData();
 
   void handledOnloadEvents();
@@ -570,7 +568,6 @@ class FrameLoader : public Noncopyable {
                       const String& name,
                       const String& referrer);
 
-  bool gotoAnchor(const String& name);  // returns true if the anchor was found
   void scrollToAnchor(const KURL&);
 
   void provisionalLoadStarted();

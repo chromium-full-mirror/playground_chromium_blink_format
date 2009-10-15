@@ -1110,24 +1110,6 @@ void FrameLoader::commitIconURLToIconDatabase(const KURL& icon) {
                                        originalRequestURL().string());
 }
 
-void FrameLoader::gotoAnchor() {
-  // If our URL has no ref, then we have no place we need to jump to.
-  // OTOH If CSS target was set previously, we want to set it to 0, recalc
-  // and possibly repaint because :target pseudo class may have been
-  // set (see bug 11321).
-  if (!m_URL.hasFragmentIdentifier() && !m_frame->document()->cssTarget())
-    return;
-
-  String fragmentIdentifier = m_URL.fragmentIdentifier();
-  if (gotoAnchor(fragmentIdentifier))
-    return;
-
-  // Try again after decoding the ref, based on the document's encoding.
-  if (m_decoder)
-    gotoAnchor(
-        decodeURLEscapeSequences(fragmentIdentifier, m_decoder->encoding()));
-}
-
 void FrameLoader::finishedParsing() {
   if (m_creatingInitialEmptyDocument)
     return;
@@ -1152,8 +1134,7 @@ void FrameLoader::finishedParsing() {
   // Check if the scrollbars are really needed for the content.
   // If not, remove them, relayout, and repaint.
   m_frame->view()->restoreScrollbar();
-
-  gotoAnchor();
+  m_frame->view()->scrollToFragment(m_URL);
 }
 
 void FrameLoader::loadDone() {
@@ -1331,61 +1312,6 @@ String FrameLoader::encoding() const {
     return m_decoder->encoding().name();
   Settings* settings = m_frame->settings();
   return settings ? settings->defaultTextEncodingName() : String();
-}
-
-bool FrameLoader::gotoAnchor(const String& name) {
-  ASSERT(m_frame->document());
-
-  if (!m_frame->document()->haveStylesheetsLoaded()) {
-    m_frame->document()->setGotoAnchorNeededAfterStylesheetsLoad(true);
-    return false;
-  }
-
-  m_frame->document()->setGotoAnchorNeededAfterStylesheetsLoad(false);
-
-  Element* anchorNode = m_frame->document()->findAnchor(name);
-
-#if ENABLE(SVG)
-  if (m_frame->document()->isSVGDocument()) {
-    if (name.startsWith("xpointer(")) {
-      // We need to parse the xpointer reference here
-    } else if (name.startsWith("svgView(")) {
-      RefPtr<SVGSVGElement> svg =
-          static_cast<SVGDocument*>(m_frame->document())->rootElement();
-      if (!svg->currentView()->parseViewSpec(name))
-        return false;
-      svg->setUseCurrentView(true);
-    } else {
-      if (anchorNode && anchorNode->hasTagName(SVGNames::viewTag)) {
-        RefPtr<SVGViewElement> viewElement =
-            anchorNode->hasTagName(SVGNames::viewTag)
-                ? static_cast<SVGViewElement*>(anchorNode)
-                : 0;
-        if (viewElement.get()) {
-          RefPtr<SVGSVGElement> svg = static_cast<SVGSVGElement*>(
-              SVGLocatable::nearestViewportElement(viewElement.get()));
-          svg->inheritViewAttributes(viewElement.get());
-        }
-      }
-    }
-    // FIXME: need to decide which <svg> to focus on, and zoom to that one
-    // FIXME: need to actually "highlight" the viewTarget(s)
-  }
-#endif
-
-  m_frame->document()->setCSSTarget(
-      anchorNode);  // Setting to null will clear the current target.
-
-  // Implement the rule that "" and "top" both mean top of page as in other
-  // browsers.
-  if (!anchorNode && !(name.isEmpty() || equalIgnoringCase(name, "top")))
-    return false;
-
-  if (FrameView* view = m_frame->view())
-    view->maintainScrollPositionAtAnchor(
-        anchorNode ? static_cast<Node*>(anchorNode) : m_frame->document());
-
-  return true;
 }
 
 bool FrameLoader::requestObject(RenderPart* renderer,
@@ -1930,7 +1856,8 @@ void FrameLoader::scrollToAnchor(const KURL& url) {
   // following the link to the anchor
   m_frame->eventHandler()->stopAutoscrollTimer();
   started();
-  gotoAnchor();
+  if (FrameView* view = m_frame->view())
+    view->scrollToFragment(m_URL);
 
   // It's important to model this as a load that starts and immediately
   // finishes.
