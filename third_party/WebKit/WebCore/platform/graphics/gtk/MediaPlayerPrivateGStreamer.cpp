@@ -25,9 +25,9 @@
 #if ENABLE(VIDEO)
 
 #include "MediaPlayerPrivateGStreamer.h"
-#include "DataSourceGStreamer.h"
 
 #include "CString.h"
+#include "DataSourceGStreamer.h"
 #include "GraphicsContext.h"
 #include "IntRect.h"
 #include "KURL.h"
@@ -35,9 +35,9 @@
 #include "MediaPlayer.h"
 #include "NotImplemented.h"
 #include "ScrollView.h"
+#include "TimeRanges.h"
 #include "VideoSinkGStreamer.h"
 #include "Widget.h"
-#include "TimeRanges.h"
 
 #include <gst/gst.h>
 #include <gst/interfaces/mixer.h>
@@ -51,59 +51,46 @@ using namespace std;
 
 namespace WebCore {
 
-gboolean mediaPlayerPrivateErrorCallback(GstBus* bus,
-                                         GstMessage* message,
-                                         gpointer data) {
-  if (GST_MESSAGE_TYPE(message) == GST_MESSAGE_ERROR) {
-    GOwnPtr<GError> err;
-    GOwnPtr<gchar> debug;
+gboolean mediaPlayerPrivateMessageCallback(GstBus* bus,
+                                           GstMessage* message,
+                                           gpointer data) {
+  GOwnPtr<GError> err;
+  GOwnPtr<gchar> debug;
+  MediaPlayer::NetworkState error;
+  MediaPlayerPrivate* mp = reinterpret_cast<MediaPlayerPrivate*>(data);
+  gint percent = 0;
 
-    gst_message_parse_error(message, &err.outPtr(), &debug.outPtr());
-    LOG_VERBOSE(Media, "Error: %d, %s", err->code, err->message);
+  switch (GST_MESSAGE_TYPE(message)) {
+    case GST_MESSAGE_ERROR:
+      gst_message_parse_error(message, &err.outPtr(), &debug.outPtr());
+      LOG_VERBOSE(Media, "Error: %d, %s", err->code, err->message);
 
-    MediaPlayer::NetworkState error = MediaPlayer::Empty;
-    if (err->domain == GST_CORE_ERROR || err->domain == GST_LIBRARY_ERROR)
-      error = MediaPlayer::DecodeError;
-    else if (err->domain == GST_RESOURCE_ERROR)
-      error = MediaPlayer::FormatError;
-    else if (err->domain == GST_STREAM_ERROR)
-      error = MediaPlayer::NetworkError;
+      error = MediaPlayer::Empty;
+      if (err->domain == GST_CORE_ERROR || err->domain == GST_LIBRARY_ERROR)
+        error = MediaPlayer::DecodeError;
+      else if (err->domain == GST_RESOURCE_ERROR)
+        error = MediaPlayer::FormatError;
+      else if (err->domain == GST_STREAM_ERROR)
+        error = MediaPlayer::NetworkError;
 
-    MediaPlayerPrivate* mp = reinterpret_cast<MediaPlayerPrivate*>(data);
-    if (mp)
-      mp->loadingFailed(error);
-  }
-  return true;
-}
-
-gboolean mediaPlayerPrivateEOSCallback(GstBus* bus,
-                                       GstMessage* message,
-                                       gpointer data) {
-  if (GST_MESSAGE_TYPE(message) == GST_MESSAGE_EOS) {
-    LOG_VERBOSE(Media, "End of Stream");
-    MediaPlayerPrivate* mp = reinterpret_cast<MediaPlayerPrivate*>(data);
-    mp->didEnd();
-  }
-  return true;
-}
-
-gboolean mediaPlayerPrivateStateCallback(GstBus* bus,
-                                         GstMessage* message,
-                                         gpointer data) {
-  if (GST_MESSAGE_TYPE(message) == GST_MESSAGE_STATE_CHANGED) {
-    MediaPlayerPrivate* mp = reinterpret_cast<MediaPlayerPrivate*>(data);
-    mp->updateStates();
-  }
-  return true;
-}
-
-gboolean mediaPlayerPrivateBufferingCallback(GstBus* bus,
-                                             GstMessage* message,
-                                             gpointer data) {
-  if (GST_MESSAGE_TYPE(message) == GST_MESSAGE_BUFFERING) {
-    gint percent = 0;
-    gst_message_parse_buffering(message, &percent);
-    LOG_VERBOSE(Media, "Buffering %d", percent);
+      if (mp)
+        mp->loadingFailed(error);
+      break;
+    case GST_MESSAGE_EOS:
+      LOG_VERBOSE(Media, "End of Stream");
+      mp->didEnd();
+      break;
+    case GST_MESSAGE_STATE_CHANGED:
+      mp->updateStates();
+      break;
+    case GST_MESSAGE_BUFFERING:
+      gst_message_parse_buffering(message, &percent);
+      LOG_VERBOSE(Media, "Buffering %d", percent);
+      break;
+    default:
+      LOG_VERBOSE(Media, "Unhandled GStreamer message type: %s",
+                  GST_MESSAGE_TYPE_NAME(message));
+      break;
   }
   return true;
 }
@@ -791,14 +778,8 @@ void MediaPlayerPrivate::createGSTPlayBin(String url) {
 
   GstBus* bus = gst_pipeline_get_bus(GST_PIPELINE(m_playBin));
   gst_bus_add_signal_watch(bus);
-  g_signal_connect(bus, "message::error",
-                   G_CALLBACK(mediaPlayerPrivateErrorCallback), this);
-  g_signal_connect(bus, "message::eos",
-                   G_CALLBACK(mediaPlayerPrivateEOSCallback), this);
-  g_signal_connect(bus, "message::state-changed",
-                   G_CALLBACK(mediaPlayerPrivateStateCallback), this);
-  g_signal_connect(bus, "message::buffering",
-                   G_CALLBACK(mediaPlayerPrivateBufferingCallback), this);
+  g_signal_connect(bus, "message",
+                   G_CALLBACK(mediaPlayerPrivateMessageCallback), this);
   gst_object_unref(bus);
 
   g_object_set(G_OBJECT(m_playBin), "uri", url.utf8().data(), NULL);
