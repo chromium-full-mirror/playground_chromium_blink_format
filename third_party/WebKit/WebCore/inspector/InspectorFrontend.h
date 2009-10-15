@@ -96,8 +96,10 @@ class InspectorFrontend {
   void failedToParseScriptSource(const JSC::SourceCode&,
                                  int errorLine,
                                  const JSC::UString& errorMessage);
-  void addProfile(const JSC::JSValue& profile);
+  void addProfileHeader(const ScriptValue& profile);
   void setRecordingProfile(bool isProfiling);
+  void didGetProfileHeaders(int callId, const ScriptArray& headers);
+  void didGetProfile(int callId, const ScriptValue& profile);
   void pausedScript(const ScriptValue& callFrames);
   void resumedScript();
 #endif

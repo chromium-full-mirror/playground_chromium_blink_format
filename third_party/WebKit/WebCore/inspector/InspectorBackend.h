@@ -102,14 +102,15 @@ class InspectorBackend : public RefCounted<InspectorBackend> {
   bool timelineProfilerEnabled() const;
 
 #if ENABLE(JAVASCRIPT_DEBUGGER)
-  const ProfilesArray& profiles() const;
-
   void startProfiling();
   void stopProfiling();
 
   void enableProfiler(bool always);
   void disableProfiler(bool always);
   bool profilerEnabled();
+
+  void getProfileHeaders(long callId);
+  void getProfile(long callId, unsigned uid);
 
   void enableDebugger(bool always);
   void disableDebugger(bool always);
@@ -189,9 +190,6 @@ class InspectorBackend : public RefCounted<InspectorBackend> {
 
   InspectorController* m_inspectorController;
   InspectorClient* m_client;
-#if ENABLE(JAVASCRIPT_DEBUGGER)
-  ProfilesArray m_emptyProfiles;
-#endif
 };
 
 }  // namespace WebCore
