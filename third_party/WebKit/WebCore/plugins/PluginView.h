@@ -230,6 +230,8 @@ class PluginView : public Widget,
   virtual void restart();
   virtual Node* node() const;
 
+  bool isHalted() const { return m_isHalted; }
+
   static bool isCallingPlugin();
 
   bool start();
@@ -395,6 +397,8 @@ class PluginView : public Widget,
   RefPtr<PluginStream> m_manualStream;
 
   bool m_isJavaScriptPaused;
+
+  bool m_isHalted;
 
   static PluginView* s_currentPluginView;
 };

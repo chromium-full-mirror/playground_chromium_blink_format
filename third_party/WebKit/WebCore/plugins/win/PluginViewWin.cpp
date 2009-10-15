@@ -1053,6 +1053,9 @@ void PluginView::platformDestroy() {
 }
 
 void PluginView::halt() {
+  ASSERT(!m_isHalted);
+  ASSERT(m_isStarted);
+
 #if !PLATFORM(QT)
   // Show a screenshot of the plug-in.
   OwnPtr<HBITMAP> nodeImage(m_parentFrame->nodeImage(m_element));
@@ -1060,16 +1063,20 @@ void PluginView::halt() {
       ->showSubstituteImage(BitmapImage::create(nodeImage.get()));
 #endif
 
+  m_isHalted = true;
+
   stop();
   platformDestroy();
 }
 
 void PluginView::restart() {
   ASSERT(!m_isStarted);
+  ASSERT(m_isHalted);
 
   // Clear any substitute image.
   toRenderWidget(m_element->renderer())->showSubstituteImage(0);
 
+  m_isHalted = false;
   m_haveUpdatedPluginWidget = false;
   start();
 }
