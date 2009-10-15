@@ -101,7 +101,8 @@ class JSArray : public JSObject {
 
   static PassRefPtr<Structure> createStructure(JSValue prototype) {
     return Structure::create(prototype,
-                             TypeInfo(ObjectType, OverridesGetOwnPropertySlot));
+                             TypeInfo(ObjectType, OverridesGetOwnPropertySlot |
+                                                      OverridesMarkChildren));
   }
 
   inline void markChildrenDirect(MarkStack& markStack);
@@ -178,7 +179,7 @@ inline void JSArray::markChildrenDirect(MarkStack& markStack) {
 
 inline void MarkStack::markChildren(JSCell* cell) {
   ASSERT(Heap::isCellMarked(cell));
-  if (cell->structure()->typeInfo().hasDefaultMark()) {
+  if (!cell->structure()->typeInfo().overridesMarkChildren()) {
 #ifdef NDEBUG
     asObject(cell)->markChildrenDirect(*this);
 #else

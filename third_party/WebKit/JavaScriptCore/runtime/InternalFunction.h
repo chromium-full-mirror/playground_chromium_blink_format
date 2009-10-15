@@ -41,8 +41,8 @@ class InternalFunction : public JSObject {
   const UString calculatedDisplayName(JSGlobalData*);
 
   static PassRefPtr<Structure> createStructure(JSValue proto) {
-    return Structure::create(
-        proto, TypeInfo(ObjectType, ImplementsHasInstance | HasDefaultMark));
+    return Structure::create(proto,
+                             TypeInfo(ObjectType, ImplementsHasInstance));
   }
 
  protected:

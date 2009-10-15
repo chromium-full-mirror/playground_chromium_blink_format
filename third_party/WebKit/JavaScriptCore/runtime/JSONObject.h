@@ -38,9 +38,8 @@ class JSONObject : public JSObject {
 
   static PassRefPtr<Structure> createStructure(JSValue prototype) {
     return Structure::create(
-        prototype,
-        TypeInfo(ObjectType, OverridesGetOwnPropertySlot | HasDefaultMark |
-                                 HasDefaultGetPropertyNames));
+        prototype, TypeInfo(ObjectType, OverridesGetOwnPropertySlot |
+                                            HasDefaultGetPropertyNames));
   }
 
   static void markStringifiers(MarkStack&, Stringifier*);

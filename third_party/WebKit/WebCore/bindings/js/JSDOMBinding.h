@@ -77,7 +77,8 @@ class DOMObjectWithGlobalPointer : public DOMObject {
   }
 
   static PassRefPtr<JSC::Structure> createStructure(JSC::JSValue prototype) {
-    return JSC::Structure::create(prototype, JSC::TypeInfo(JSC::ObjectType));
+    return JSC::Structure::create(
+        prototype, JSC::TypeInfo(JSC::ObjectType, JSC::OverridesMarkChildren));
   }
 
  protected:
@@ -107,7 +108,9 @@ class DOMConstructorObject : public DOMObjectWithGlobalPointer {
  public:
   static PassRefPtr<JSC::Structure> createStructure(JSC::JSValue prototype) {
     return JSC::Structure::create(
-        prototype, JSC::TypeInfo(JSC::ObjectType, JSC::ImplementsHasInstance));
+        prototype,
+        JSC::TypeInfo(JSC::ObjectType,
+                      JSC::ImplementsHasInstance | JSC::OverridesMarkChildren));
   }
 
  protected:

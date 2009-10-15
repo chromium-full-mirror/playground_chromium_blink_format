@@ -53,9 +53,9 @@ class JSCallbackObject : public Base {
 
   static PassRefPtr<Structure> createStructure(JSValue proto) {
     return Structure::create(
-        proto,
-        TypeInfo(ObjectType, OverridesGetOwnPropertySlot |
-                                 ImplementsHasInstance | OverridesHasInstance));
+        proto, TypeInfo(ObjectType,
+                        OverridesGetOwnPropertySlot | ImplementsHasInstance |
+                            OverridesHasInstance | OverridesMarkChildren));
   }
 
  private:

@@ -61,7 +61,8 @@ class JSDOMWindowShell : public DOMObject {
   static PassRefPtr<JSC::Structure> createStructure(JSC::JSValue prototype) {
     return JSC::Structure::create(
         prototype,
-        JSC::TypeInfo(JSC::ObjectType, JSC::OverridesGetOwnPropertySlot));
+        JSC::TypeInfo(JSC::ObjectType, JSC::OverridesGetOwnPropertySlot |
+                                           JSC::OverridesMarkChildren));
   }
 
  private:

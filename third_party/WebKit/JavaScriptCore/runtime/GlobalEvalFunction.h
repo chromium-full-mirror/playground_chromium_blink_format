@@ -41,8 +41,9 @@ class GlobalEvalFunction : public PrototypeFunction {
   JSGlobalObject* cachedGlobalObject() const { return m_cachedGlobalObject; }
 
   static PassRefPtr<Structure> createStructure(JSValue prototype) {
-    return Structure::create(prototype,
-                             TypeInfo(ObjectType, ImplementsHasInstance));
+    return Structure::create(
+        prototype,
+        TypeInfo(ObjectType, ImplementsHasInstance | OverridesMarkChildren));
   }
 
  private:

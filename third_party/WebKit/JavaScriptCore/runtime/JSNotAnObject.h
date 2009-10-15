@@ -57,7 +57,9 @@ class JSNotAnObject : public JSObject {
         m_exception(exception) {}
 
   static PassRefPtr<Structure> createStructure(JSValue prototype) {
-    return Structure::create(prototype, TypeInfo(ObjectType));
+    return Structure::create(prototype,
+                             TypeInfo(ObjectType, OverridesGetOwnPropertySlot |
+                                                      OverridesMarkChildren));
   }
 
  private:

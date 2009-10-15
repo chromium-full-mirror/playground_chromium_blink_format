@@ -72,8 +72,9 @@ class JSActivation : public JSVariableObject {
 
   static PassRefPtr<Structure> createStructure(JSValue proto) {
     return Structure::create(
-        proto, TypeInfo(ObjectType,
-                        OverridesGetOwnPropertySlot | NeedsThisConversion));
+        proto,
+        TypeInfo(ObjectType, OverridesGetOwnPropertySlot | NeedsThisConversion |
+                                 OverridesMarkChildren));
   }
 
  private:

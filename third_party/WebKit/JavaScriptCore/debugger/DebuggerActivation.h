@@ -68,7 +68,8 @@ class DebuggerActivation : public JSObject {
   static PassRefPtr<Structure> createStructure(JSValue prototype) {
     return Structure::create(
         prototype, TypeInfo(ObjectType, OverridesGetOwnPropertySlot |
-                                            HasDefaultGetPropertyNames));
+                                            HasDefaultGetPropertyNames |
+                                            OverridesMarkChildren));
   }
 
  private:

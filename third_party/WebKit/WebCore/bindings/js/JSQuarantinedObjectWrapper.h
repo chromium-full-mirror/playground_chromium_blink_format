@@ -51,7 +51,8 @@ class JSQuarantinedObjectWrapper : public JSC::JSObject {
     return JSC::Structure::create(
         proto, JSC::TypeInfo(JSC::ObjectType, JSC::OverridesGetOwnPropertySlot |
                                                   JSC::ImplementsHasInstance |
-                                                  JSC::OverridesHasInstance));
+                                                  JSC::OverridesHasInstance |
+                                                  JSC::OverridesMarkChildren));
   }
 
  protected:

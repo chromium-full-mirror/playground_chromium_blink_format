@@ -315,7 +315,8 @@ class JSGlobalObject : public JSVariableObject {
 
   static PassRefPtr<Structure> createStructure(JSValue prototype) {
     return Structure::create(prototype,
-                             TypeInfo(ObjectType, OverridesGetOwnPropertySlot));
+                             TypeInfo(ObjectType, OverridesGetOwnPropertySlot |
+                                                      OverridesMarkChildren));
   }
 
  protected:
