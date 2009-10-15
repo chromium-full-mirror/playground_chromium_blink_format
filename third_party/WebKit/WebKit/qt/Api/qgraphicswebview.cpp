@@ -178,8 +178,10 @@ QGraphicsWebView::QGraphicsWebView(QGraphicsItem* parent)
     Destroys the web graphicsitem.
 */
 QGraphicsWebView::~QGraphicsWebView() {
-  if (d->page)
+  if (d->page) {
     d->page->d->view = 0;
+    d->page->d->client = 0;  // unset the page client
+  }
 
   if (d->page && d->page->parent() == this)
     delete d->page;
