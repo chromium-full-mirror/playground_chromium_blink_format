@@ -2324,7 +2324,8 @@ static void webkit_web_view_update_settings(WebKitWebView* webView) {
       enablePlugins, enableDeveloperExtras, resizableTextAreas,
       enablePrivateBrowsing, enableCaretBrowsing, enableHTML5Database,
       enableHTML5LocalStorage, enableXSSAuditor, javascriptCanOpenWindows,
-      enableOfflineWebAppCache, enableUniversalAccessFromFileURI;
+      enableOfflineWebAppCache, enableUniversalAccessFromFileURI,
+      enableWebSockets;
 
   WebKitEditingBehavior editingBehavior;
 
@@ -2347,7 +2348,8 @@ static void webkit_web_view_update_settings(WebKitWebView* webView) {
       "enable-offline-web-application-cache", &enableOfflineWebAppCache,
       "editing-behavior", &editingBehavior,
       "enable-universal-access-from-file-uris",
-      &enableUniversalAccessFromFileURI, NULL);
+      &enableUniversalAccessFromFileURI, "enable-web-sockets",
+      &enableWebSockets, NULL);
 
   settings->setDefaultTextEncodingName(defaultEncoding);
   settings->setCursiveFontFamily(cursiveFontFamily);
@@ -2374,6 +2376,7 @@ static void webkit_web_view_update_settings(WebKitWebView* webView) {
   settings->setEditingBehavior(core(editingBehavior));
   settings->setAllowUniversalAccessFromFileURLs(
       enableUniversalAccessFromFileURI);
+  settings->setExperimentalWebSocketsEnabled(enableWebSockets);
 
   g_free(defaultEncoding);
   g_free(cursiveFontFamily);
@@ -2467,6 +2470,8 @@ static void webkit_web_view_settings_notify(WebKitWebSettings* webSettings,
         core(static_cast<WebKitEditingBehavior>(g_value_get_enum(&value))));
   else if (name == g_intern_string("enable-universal-access-from-file-uris"))
     settings->setAllowUniversalAccessFromFileURLs(g_value_get_boolean(&value));
+  else if (name == g_intern_string("enable-web-sockets"))
+    settings->setExperimentalWebSocketsEnabled(g_value_get_boolean(&value));
   else if (!g_object_class_find_property(G_OBJECT_GET_CLASS(webSettings), name))
     g_warning("Unexpected setting '%s'", name);
   g_value_unset(&value);
