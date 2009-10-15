@@ -877,6 +877,11 @@ void FrameLoaderClient::dispatchDidFinishLoading(
   WebKitWebResource* webResource =
       webkit_web_view_get_resource(webView, identifierString.get());
 
+  // A NULL WebResource means the load has been interrupted, and
+  // replaced by another one while this resource was being loaded.
+  if (!webResource)
+    return;
+
   const char* uri = webkit_web_resource_get_uri(webResource);
   RefPtr<ArchiveResource> coreResource(loader->subresource(KURL(KURL(), uri)));
 
