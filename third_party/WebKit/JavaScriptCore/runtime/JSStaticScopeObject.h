@@ -62,7 +62,9 @@ class JSStaticScopeObject : public JSVariableObject {
                          unsigned attributes);
 
   static PassRefPtr<Structure> createStructure(JSValue proto) {
-    return Structure::create(proto, TypeInfo(ObjectType, NeedsThisConversion));
+    return Structure::create(
+        proto, TypeInfo(ObjectType,
+                        OverridesGetOwnPropertySlot | NeedsThisConversion));
   }
 
  private:

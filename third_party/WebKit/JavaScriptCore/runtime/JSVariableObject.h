@@ -64,9 +64,7 @@ class JSVariableObject : public JSObject {
   Register& registerAt(int index) const { return d->registers[index]; }
 
   static PassRefPtr<Structure> createStructure(JSValue prototype) {
-    return Structure::create(
-        prototype,
-        TypeInfo(ObjectType, HasStandardGetOwnPropertySlot | HasDefaultMark));
+    return Structure::create(prototype, TypeInfo(ObjectType, HasDefaultMark));
   }
 
  protected:

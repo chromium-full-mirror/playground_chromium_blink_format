@@ -59,7 +59,8 @@ class StringObject : public JSWrapperObject {
   }
 
   static PassRefPtr<Structure> createStructure(JSValue prototype) {
-    return Structure::create(prototype, TypeInfo(ObjectType));
+    return Structure::create(prototype,
+                             TypeInfo(ObjectType, OverridesGetOwnPropertySlot));
   }
 
  protected:

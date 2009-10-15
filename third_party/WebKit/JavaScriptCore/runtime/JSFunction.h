@@ -67,7 +67,8 @@ class JSFunction : public InternalFunction {
 
   static PassRefPtr<Structure> createStructure(JSValue prototype) {
     return Structure::create(prototype,
-                             TypeInfo(ObjectType, ImplementsHasInstance));
+                             TypeInfo(ObjectType, OverridesGetOwnPropertySlot |
+                                                      ImplementsHasInstance));
   }
 
   NativeFunction nativeFunction() {

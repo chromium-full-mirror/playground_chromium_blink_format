@@ -39,8 +39,7 @@ class FunctionPrototype : public InternalFunction {
   static PassRefPtr<Structure> createStructure(JSValue proto) {
     return Structure::create(
         proto,
-        TypeInfo(ObjectType, HasStandardGetOwnPropertySlot | HasDefaultMark |
-                                 HasDefaultGetPropertyNames));
+        TypeInfo(ObjectType, HasDefaultMark | HasDefaultGetPropertyNames));
   }
 
  private:

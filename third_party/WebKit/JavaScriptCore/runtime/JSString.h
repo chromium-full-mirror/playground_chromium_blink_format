@@ -109,7 +109,8 @@ class JSString : public JSCell {
 
   static PassRefPtr<Structure> createStructure(JSValue proto) {
     return Structure::create(
-        proto, TypeInfo(StringType, NeedsThisConversion | HasDefaultMark));
+        proto, TypeInfo(StringType, OverridesGetOwnPropertySlot |
+                                        NeedsThisConversion | HasDefaultMark));
   }
 
  private:

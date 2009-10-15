@@ -49,7 +49,8 @@ class JSQuarantinedObjectWrapper : public JSC::JSObject {
 
   static PassRefPtr<JSC::Structure> createStructure(JSC::JSValue proto) {
     return JSC::Structure::create(
-        proto, JSC::TypeInfo(JSC::ObjectType, JSC::ImplementsHasInstance |
+        proto, JSC::TypeInfo(JSC::ObjectType, JSC::OverridesGetOwnPropertySlot |
+                                                  JSC::ImplementsHasInstance |
                                                   JSC::OverridesHasInstance));
   }
 

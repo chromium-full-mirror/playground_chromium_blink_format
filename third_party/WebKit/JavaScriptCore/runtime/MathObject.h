@@ -41,7 +41,8 @@ class MathObject : public JSObject {
   static PassRefPtr<Structure> createStructure(JSValue prototype) {
     return Structure::create(
         prototype,
-        TypeInfo(ObjectType, HasDefaultMark | HasDefaultGetPropertyNames));
+        TypeInfo(ObjectType, OverridesGetOwnPropertySlot | HasDefaultMark |
+                                 HasDefaultGetPropertyNames));
   }
 };
 
