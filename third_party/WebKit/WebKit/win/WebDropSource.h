@@ -31,6 +31,12 @@
 
 class WebView;
 
+namespace WebCore {
+class PlatformMouseEvent;
+}
+
+WebCore::PlatformMouseEvent generateMouseEvent(WebView*, bool isDrag);
+
 class WebDropSource : public IDropSource {
  public:
   virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid,
