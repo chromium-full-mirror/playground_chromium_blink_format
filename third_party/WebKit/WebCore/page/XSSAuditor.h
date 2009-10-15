@@ -131,11 +131,13 @@ class XSSAuditor {
       const String&,
       bool leaveUndecodableEntitiesUntouched = true);
 
-  bool findInRequest(const String&,
+  bool findInRequest(const String& context,
+                     const String&,
                      bool decodeEntities = true,
                      bool allowRequestIfNoIllegalURICharacters = false,
                      bool decodeURLEscapeSequencesTwice = false) const;
   bool findInRequest(Frame*,
+                     const String& context,
                      const String&,
                      bool decodeEntities = true,
                      bool allowRequestIfNoIllegalURICharacters = false,
