@@ -85,16 +85,8 @@ class AnimationControllerPrivate {
 
   double beginAnimationUpdateTime();
   void setBeginAnimationUpdateTime(double t) { m_beginAnimationUpdateTime = t; }
-  void endAnimationUpdate() {
-    styleAvailable();
-    if (!m_waitingForAResponse)
-      startTimeResponse(beginAnimationUpdateTime());
-  }
-
-  void receivedStartTimeResponse(double t) {
-    m_waitingForAResponse = false;
-    startTimeResponse(t);
-  }
+  void endAnimationUpdate();
+  void receivedStartTimeResponse(double);
 
   void addToStyleAvailableWaitList(AnimationBase*);
   void removeFromStyleAvailableWaitList(AnimationBase*);
@@ -131,7 +123,7 @@ class AnimationControllerPrivate {
 
   AnimationBase* m_responseWaiters;
   AnimationBase* m_lastResponseWaiter;
-  bool m_waitingForAResponse;
+  bool m_waitingForResponse;
 };
 
 }  // namespace WebCore
