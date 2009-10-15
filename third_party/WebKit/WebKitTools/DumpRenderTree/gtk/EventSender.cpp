@@ -157,6 +157,8 @@ static JSValueRef mouseDownCallback(JSContextRef context,
   GdkEvent event;
   memset(&event, 0, sizeof(event));
   event.type = GDK_BUTTON_PRESS;
+  event.button.button = 1;
+
   if (argumentCount == 1) {
     event.button.button =
         (int)JSValueToNumber(context, arguments[0], exception) + 1;
@@ -203,6 +205,8 @@ static JSValueRef mouseUpCallback(JSContextRef context,
   GdkEvent event;
   memset(&event, 0, sizeof(event));
   event.type = GDK_BUTTON_RELEASE;
+  event.button.button = 1;
+
   if (argumentCount == 1) {
     event.button.button =
         (int)JSValueToNumber(context, arguments[0], exception) + 1;
