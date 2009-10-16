@@ -96,7 +96,8 @@ static bool paintMediaPlayButton(RenderObject* object,
   static Image* mediaPause = platformResource("mediaPause");
   static Image* mediaPlayDisabled = platformResource("mediaPlayDisabled");
 
-  if (mediaElement->networkState() == HTMLMediaElement::NETWORK_NO_SOURCE)
+  if (mediaElement->networkState() == HTMLMediaElement::NETWORK_EMPTY ||
+      mediaElement->networkState() == HTMLMediaElement::NETWORK_NO_SOURCE)
     return paintMediaButton(paintInfo.context, rect, mediaPlayDisabled);
 
   return paintMediaButton(paintInfo.context, rect,
