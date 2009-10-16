@@ -128,11 +128,9 @@ static bool paintMediaSlider(RenderObject* object,
 
   // Draw the buffered ranges.
   // FIXME: Draw multiple ranges if there are multiple buffered ranges.
-  // FIXME: percentLoaded() doesn't always hit 1.0 so we're using round().
   IntRect bufferedRect = rect;
   bufferedRect.inflate(-style->borderLeftWidth());
-  bufferedRect.setWidth(
-      round((bufferedRect.width() * mediaElement->percentLoaded())));
+  bufferedRect.setWidth((bufferedRect.width() * mediaElement->percentLoaded()));
 
   // Don't bother drawing an empty area.
   if (!bufferedRect.isEmpty()) {
