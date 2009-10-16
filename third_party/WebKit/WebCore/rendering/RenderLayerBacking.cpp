@@ -1126,11 +1126,6 @@ bool RenderLayerBacking::startAnimation(double beginTime,
   if (!hasOpacity && !hasTransform)
     return false;
 
-  // Don't start animations if we're not rooted, because we won't get the
-  // callback that the animation started.
-  if (!m_graphicsLayer->hasAncestor(compositor()->rootPlatformLayer()))
-    return false;
-
   KeyframeValueList transformVector(AnimatedPropertyWebkitTransform);
   KeyframeValueList opacityVector(AnimatedPropertyOpacity);
 
@@ -1184,11 +1179,6 @@ bool RenderLayerBacking::startTransition(double beginTime,
                                          const RenderStyle* toStyle) {
   bool didAnimate = false;
   ASSERT(property != cAnimateAll);
-
-  // Don't start animations if we're not rooted, because we won't get the
-  // callback that the animation started.
-  if (!m_graphicsLayer->hasAncestor(compositor()->rootPlatformLayer()))
-    return false;
 
   if (property == (int)CSSPropertyOpacity) {
     const Animation* opacityAnim =
