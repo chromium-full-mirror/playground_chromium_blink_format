@@ -76,6 +76,9 @@ class ExecutablePool : public RefCounted<ExecutablePool> {
   struct Allocation {
     char* pages;
     size_t size;
+#if PLATFORM(SYMBIAN)
+    RChunk* chunk;
+#endif
   };
   typedef Vector<Allocation, 2> AllocationList;
 
