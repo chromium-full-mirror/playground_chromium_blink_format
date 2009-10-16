@@ -199,10 +199,11 @@ void ResourceLoader::willSendRequest(ResourceRequest& request,
   if (m_sendResourceLoadCallbacks) {
     if (!m_identifier) {
       m_identifier = m_frame->page()->progress()->createUniqueIdentifier();
-      frameLoader()->assignIdentifierToInitialRequest(m_identifier, request);
+      frameLoader()->notifier()->assignIdentifierToInitialRequest(m_identifier,
+                                                                  request);
     }
 
-    frameLoader()->willSendRequest(this, request, redirectResponse);
+    frameLoader()->notifier()->willSendRequest(this, request, redirectResponse);
   }
 
   m_request = request;
@@ -224,7 +225,7 @@ void ResourceLoader::didReceiveResponse(const ResourceResponse& r) {
     data->removeGeneratedFilesIfNeeded();
 
   if (m_sendResourceLoadCallbacks)
-    frameLoader()->didReceiveResponse(this, m_response);
+    frameLoader()->notifier()->didReceiveResponse(this, m_response);
 }
 
 void ResourceLoader::didReceiveData(const char* data,
@@ -249,8 +250,8 @@ void ResourceLoader::didReceiveData(const char* data,
   // practice.
   // Could be an issue with a giant local file.
   if (m_sendResourceLoadCallbacks && m_frame)
-    frameLoader()->didReceiveData(this, data, length,
-                                  static_cast<int>(lengthReceived));
+    frameLoader()->notifier()->didReceiveData(this, data, length,
+                                              static_cast<int>(lengthReceived));
 }
 
 void ResourceLoader::willStopBufferingData(const char* data, int length) {
@@ -281,7 +282,7 @@ void ResourceLoader::didFinishLoadingOnePart() {
     return;
   m_calledDidFinishLoad = true;
   if (m_sendResourceLoadCallbacks)
-    frameLoader()->didFinishLoad(this);
+    frameLoader()->notifier()->didFinishLoad(this);
 }
 
 void ResourceLoader::didFail(const ResourceError& error) {
@@ -298,7 +299,7 @@ void ResourceLoader::didFail(const ResourceError& error) {
     data->removeGeneratedFilesIfNeeded();
 
   if (m_sendResourceLoadCallbacks && !m_calledDidFinishLoad)
-    frameLoader()->didFailToLoad(this, error);
+    frameLoader()->notifier()->didFailToLoad(this, error);
 
   releaseResources();
 }
@@ -326,7 +327,7 @@ void ResourceLoader::didCancel(const ResourceError& error) {
     m_handle = 0;
   }
   if (m_sendResourceLoadCallbacks && !m_calledDidFinishLoad)
-    frameLoader()->didFailToLoad(this, error);
+    frameLoader()->notifier()->didFailToLoad(this, error);
 
   releaseResources();
 }
@@ -426,7 +427,7 @@ void ResourceLoader::didReceiveAuthenticationChallenge(
   // anything including possibly derefing this; one example of this is Radar
   // 3266216.
   RefPtr<ResourceLoader> protector(this);
-  frameLoader()->didReceiveAuthenticationChallenge(this, challenge);
+  frameLoader()->notifier()->didReceiveAuthenticationChallenge(this, challenge);
 }
 
 void ResourceLoader::didCancelAuthenticationChallenge(
@@ -435,7 +436,7 @@ void ResourceLoader::didCancelAuthenticationChallenge(
   // anything including possibly derefing this; one example of this is Radar
   // 3266216.
   RefPtr<ResourceLoader> protector(this);
-  frameLoader()->didCancelAuthenticationChallenge(this, challenge);
+  frameLoader()->notifier()->didCancelAuthenticationChallenge(this, challenge);
 }
 
 void ResourceLoader::receivedCancellation(const AuthenticationChallenge&) {
