@@ -1417,6 +1417,8 @@ bool FrameLoader::loadPlugin(RenderPart* renderer,
       return false;
     }
 
+    checkIfRunInsecureContent(m_frame->document()->securityOrigin(), url);
+
     widget = m_client->createPlugin(
         IntSize(renderer->contentWidth(), renderer->contentHeight()), element,
         url, paramNames, paramValues, mimeType,
