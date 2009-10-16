@@ -39,8 +39,9 @@ class JSAPIValueWrapper : public JSCell {
   virtual bool isAPIValueWrapper() const { return true; }
 
   static PassRefPtr<Structure> createStructure(JSValue prototype) {
-    return Structure::create(prototype,
-                             TypeInfo(CompoundType, OverridesMarkChildren));
+    return Structure::create(
+        prototype, TypeInfo(CompoundType,
+                            OverridesMarkChildren | OverridesGetPropertyNames));
   }
 
  private:

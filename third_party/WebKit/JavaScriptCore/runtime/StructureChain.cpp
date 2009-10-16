@@ -59,7 +59,7 @@ bool StructureChain::isCacheable() const {
     // cache them
     if (m_vector[i]->isDictionary())
       return false;
-    if (!m_vector[i++]->typeInfo().hasDefaultGetPropertyNames())
+    if (m_vector[i++]->typeInfo().overridesGetPropertyNames())
       return false;
   }
   return true;

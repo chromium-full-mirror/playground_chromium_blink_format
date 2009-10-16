@@ -68,8 +68,9 @@ class RuntimeObjectImp : public JSObject {
   }
 
   static PassRefPtr<Structure> createStructure(JSValue prototype) {
-    return Structure::create(prototype,
-                             TypeInfo(ObjectType, OverridesGetOwnPropertySlot));
+    return Structure::create(
+        prototype, TypeInfo(ObjectType, OverridesGetOwnPropertySlot |
+                                            OverridesGetPropertyNames));
   }
 
  protected:

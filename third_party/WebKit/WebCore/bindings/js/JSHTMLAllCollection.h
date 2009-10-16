@@ -42,9 +42,11 @@ class JSHTMLAllCollection : public JSHTMLCollection {
 
   static PassRefPtr<JSC::Structure> createStructure(JSC::JSValue proto) {
     return JSC::Structure::create(
-        proto, JSC::TypeInfo(JSC::ObjectType, JSC::OverridesGetOwnPropertySlot |
-                                                  JSC::MasqueradesAsUndefined |
-                                                  JSC::OverridesMarkChildren));
+        proto,
+        JSC::TypeInfo(JSC::ObjectType, JSC::OverridesGetOwnPropertySlot |
+                                           JSC::MasqueradesAsUndefined |
+                                           JSC::OverridesMarkChildren |
+                                           JSC::OverridesGetPropertyNames));
   }
 
   static const JSC::ClassInfo s_info;

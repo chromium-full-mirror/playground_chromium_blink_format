@@ -37,8 +37,7 @@ class JSWrapperObject : public JSObject {
   void setInternalValue(JSValue);
 
   static PassRefPtr<Structure> createStructure(JSValue prototype) {
-    return Structure::create(prototype,
-                             TypeInfo(ObjectType, HasDefaultGetPropertyNames));
+    return Structure::create(prototype, TypeInfo(ObjectType));
   }
 
  private:

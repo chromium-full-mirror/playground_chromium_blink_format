@@ -62,7 +62,8 @@ class JSDOMWindowShell : public DOMObject {
     return JSC::Structure::create(
         prototype,
         JSC::TypeInfo(JSC::ObjectType, JSC::OverridesGetOwnPropertySlot |
-                                           JSC::OverridesMarkChildren));
+                                           JSC::OverridesMarkChildren |
+                                           JSC::OverridesGetPropertyNames));
   }
 
  private:

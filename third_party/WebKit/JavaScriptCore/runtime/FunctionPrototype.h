@@ -37,8 +37,7 @@ class FunctionPrototype : public InternalFunction {
                              NativeFunctionWrapper** applyFunction);
 
   static PassRefPtr<Structure> createStructure(JSValue proto) {
-    return Structure::create(proto,
-                             TypeInfo(ObjectType, HasDefaultGetPropertyNames));
+    return Structure::create(proto, TypeInfo(ObjectType));
   }
 
  private:

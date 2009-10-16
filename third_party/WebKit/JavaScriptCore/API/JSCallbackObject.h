@@ -55,7 +55,8 @@ class JSCallbackObject : public Base {
     return Structure::create(
         proto, TypeInfo(ObjectType,
                         OverridesGetOwnPropertySlot | ImplementsHasInstance |
-                            OverridesHasInstance | OverridesMarkChildren));
+                            OverridesHasInstance | OverridesMarkChildren |
+                            OverridesGetPropertyNames));
   }
 
  private:

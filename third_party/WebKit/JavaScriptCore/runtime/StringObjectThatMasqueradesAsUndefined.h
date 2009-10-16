@@ -46,8 +46,9 @@ class StringObjectThatMasqueradesAsUndefined : public StringObject {
 
   static PassRefPtr<Structure> createStructure(JSValue proto) {
     return Structure::create(
-        proto, TypeInfo(ObjectType,
-                        OverridesGetOwnPropertySlot | MasqueradesAsUndefined));
+        proto, TypeInfo(ObjectType, OverridesGetOwnPropertySlot |
+                                        MasqueradesAsUndefined |
+                                        OverridesGetPropertyNames));
   }
 
   virtual bool toBoolean(ExecState*) const { return false; }

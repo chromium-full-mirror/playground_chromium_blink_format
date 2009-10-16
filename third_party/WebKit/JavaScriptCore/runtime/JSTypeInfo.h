@@ -43,7 +43,7 @@ static const unsigned ImplementsDefaultHasInstance = 1 << 3;
 static const unsigned NeedsThisConversion = 1 << 4;
 static const unsigned OverridesGetOwnPropertySlot = 1 << 5;
 static const unsigned OverridesMarkChildren = 1 << 6;
-static const unsigned HasDefaultGetPropertyNames = 1 << 7;
+static const unsigned OverridesGetPropertyNames = 1 << 7;
 
 class TypeInfo {
   friend class JIT;
@@ -71,8 +71,8 @@ class TypeInfo {
     return m_flags & OverridesGetOwnPropertySlot;
   }
   bool overridesMarkChildren() const { return m_flags & OverridesMarkChildren; }
-  bool hasDefaultGetPropertyNames() const {
-    return m_flags & HasDefaultGetPropertyNames;
+  bool overridesGetPropertyNames() const {
+    return m_flags & OverridesGetPropertyNames;
   }
   unsigned flags() const { return m_flags; }
 

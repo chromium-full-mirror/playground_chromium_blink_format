@@ -271,8 +271,7 @@ class JSObject : public JSCell {
   static const size_t nonInlineBaseStorageCapacity = 16;
 
   static PassRefPtr<Structure> createStructure(JSValue prototype) {
-    return Structure::create(prototype,
-                             TypeInfo(ObjectType, HasDefaultGetPropertyNames));
+    return Structure::create(prototype, TypeInfo(ObjectType));
   }
 
  protected:
