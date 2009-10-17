@@ -56,13 +56,8 @@ static Image* platformResource(const char* name) {
 static bool paintMediaButton(GraphicsContext* context,
                              const IntRect& rect,
                              Image* image) {
-  // Create a destination rectangle for the image that is centered in the
-  // drawing rectangle, rounded left, and down.
   IntRect imageRect = image->rect();
-  imageRect.setY(rect.y() + (rect.height() - image->height() + 1) / 2);
-  imageRect.setX(rect.x() + (rect.width() - image->width() + 1) / 2);
-
-  context->drawImage(image, imageRect);
+  context->drawImage(image, rect);
   return true;
 }
 
@@ -301,9 +296,12 @@ void RenderMediaControlsChromium::adjustMediaSliderThumbSize(
   else if (object->style()->appearance() == MediaVolumeSliderThumbPart)
     thumbImage = mediaVolumeSliderThumb;
 
+  float zoomLevel = object->style()->effectiveZoom();
   if (thumbImage) {
-    object->style()->setWidth(Length(thumbImage->width(), Fixed));
-    object->style()->setHeight(Length(thumbImage->height(), Fixed));
+    object->style()->setWidth(
+        Length(static_cast<int>(thumbImage->width() * zoomLevel), Fixed));
+    object->style()->setHeight(
+        Length(static_cast<int>(thumbImage->height() * zoomLevel), Fixed));
   }
 }
 
