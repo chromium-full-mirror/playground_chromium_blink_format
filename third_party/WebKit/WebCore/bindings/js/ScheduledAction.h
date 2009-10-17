@@ -23,6 +23,7 @@
 #define ScheduledAction_h
 
 #include "PlatformString.h"
+#include <runtime/JSCell.h>
 #include <runtime/Protect.h>
 #include <wtf/Vector.h>
 

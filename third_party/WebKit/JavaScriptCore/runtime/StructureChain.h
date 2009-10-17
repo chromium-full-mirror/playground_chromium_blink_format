@@ -36,12 +36,13 @@ namespace JSC {
 class Structure;
 
 class StructureChain : public RefCounted<StructureChain> {
+  friend class JIT;
+
  public:
   static PassRefPtr<StructureChain> create(Structure* head) {
     return adoptRef(new StructureChain(head));
   }
   RefPtr<Structure>* head() { return m_vector.get(); }
-  bool isCacheable() const;
 
  private:
   StructureChain(Structure* head);
