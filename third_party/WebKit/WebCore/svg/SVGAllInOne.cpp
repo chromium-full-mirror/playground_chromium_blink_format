@@ -151,3 +151,4 @@
 #include "SVGViewSpec.cpp"
 #include "SVGZoomAndPan.cpp"
 #include "SVGZoomEvent.cpp"
+#include "SynchronizablePropertyController.cpp"

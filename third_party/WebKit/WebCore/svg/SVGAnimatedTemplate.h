@@ -165,7 +165,7 @@ PassRefPtr<Type> lookupOrCreateWrapper(
 
   if (!wrapper) {
     wrapper = Type::create(creator, element, attrName);
-    element->addSVGPropertySynchronizer(attrName, creator);
+    element->propertyController().setPropertyNeedsSynchronization(attrName);
     Type::wrapperCache()->set(key, wrapper.get());
   }
 

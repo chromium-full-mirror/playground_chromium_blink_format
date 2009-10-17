@@ -50,9 +50,11 @@ class SVGViewSpec : public SVGFitToViewBox, public SVGZoomAndPan {
   String viewTargetString() const { return m_viewTargetString; }
   SVGElement* viewTarget() const;
 
-  const SVGElement* contextElement() const;
+  const SVGSVGElement* contextElement() const { return m_contextElement; }
 
  private:
+  const SVGSVGElement* m_contextElement;
+
   // SVGFitToViewBox
   ANIMATED_PROPERTY_DECLARATIONS(SVGViewSpec,
                                  SVGFitToViewBoxIdentifier,
@@ -68,7 +70,6 @@ class SVGViewSpec : public SVGFitToViewBox, public SVGZoomAndPan {
                                  preserveAspectRatio)
 
   mutable RefPtr<SVGTransformList> m_transform;
-  const SVGSVGElement* m_contextElement;
   String m_viewTargetString;
 };
 
