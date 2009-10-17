@@ -602,7 +602,6 @@ void QGraphicsWebView::hoverMoveEvent(QGraphicsSceneHoverEvent* ev) {
     const bool accepted = ev->isAccepted();
     QMouseEvent me = QMouseEvent(QEvent::MouseMove, ev->pos().toPoint(),
                                  Qt::NoButton, Qt::NoButton, Qt::NoModifier);
-    d->page->setView(ev->widget());
     d->page->event(&me);
     ev->setAccepted(accepted);
   }
