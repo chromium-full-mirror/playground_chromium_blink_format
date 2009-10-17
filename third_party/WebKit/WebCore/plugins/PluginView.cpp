@@ -865,7 +865,8 @@ PluginView::PluginView(Frame* parentFrame,
       m_loadManually(loadManually),
       m_manualStream(0),
       m_isJavaScriptPaused(false),
-      m_isHalted(false) {
+      m_isHalted(false),
+      m_hasBeenHalted(false) {
   if (!m_plugin) {
     m_status = PluginStatusCanNotFindPlugin;
     return;

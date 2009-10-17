@@ -1064,6 +1064,7 @@ void PluginView::halt() {
 #endif
 
   m_isHalted = true;
+  m_hasBeenHalted = true;
 
   stop();
   platformDestroy();

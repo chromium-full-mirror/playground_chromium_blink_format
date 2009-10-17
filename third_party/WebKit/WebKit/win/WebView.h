@@ -801,6 +801,8 @@ class WebView : public IWebView,
 
   virtual HRESULT STDMETHODCALLTYPE isNodeHaltedPlugin(IDOMNode*, BOOL*);
   virtual HRESULT STDMETHODCALLTYPE restartHaltedPluginForNode(IDOMNode*);
+  virtual HRESULT STDMETHODCALLTYPE hasPluginForNodeBeenHalted(IDOMNode*,
+                                                               BOOL*);
 
   // WebView
   bool shouldUseEmbeddedView(const WebCore::String& mimeType) const;
