@@ -405,10 +405,15 @@ class BytecodeGenerator : public FastAllocBase {
   PassRefPtr<Label> emitJumpSubroutine(RegisterID* retAddrDst, Label*);
   void emitSubroutineReturn(RegisterID* retAddrSrc);
 
-  RegisterID* emitGetPropertyNames(RegisterID* dst, RegisterID* base) {
-    return emitUnaryOp(op_get_pnames, dst, base);
-  }
+  RegisterID* emitGetPropertyNames(RegisterID* dst,
+                                   RegisterID* base,
+                                   RegisterID* i,
+                                   RegisterID* size,
+                                   Label* breakTarget);
   RegisterID* emitNextPropertyName(RegisterID* dst,
+                                   RegisterID* base,
+                                   RegisterID* i,
+                                   RegisterID* size,
                                    RegisterID* iter,
                                    Label* target);
 

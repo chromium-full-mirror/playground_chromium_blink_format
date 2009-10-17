@@ -31,6 +31,7 @@
 #include "JSValue.h"
 #include "PropertyMapHashTable.h"
 #include "PropertyNameArray.h"
+#include "Protect.h"
 #include "StructureChain.h"
 #include "StructureTransitionTable.h"
 #include "JSTypeInfo.h"
@@ -158,13 +159,12 @@ class Structure : public RefCounted<Structure> {
   JSCell* specificValue() { return m_specificValueInPrevious; }
   void despecifyDictionaryFunction(const Identifier& propertyName);
 
-  void setEnumerationCache(PassRefPtr<PropertyNameArrayData> data) {
-    m_cachedPropertyNameArrayData = data;
+  void setEnumerationCache(
+      JSPropertyNameIterator*
+          enumerationCache);  // Defined in JSPropertyNameIterator.h.
+  JSPropertyNameIterator* enumerationCache() {
+    return m_enumerationCache.get();
   }
-  PropertyNameArrayData* enumerationCache() {
-    return m_cachedPropertyNameArrayData.get();
-  }
-  void clearEnumerationCache();
   void getEnumerablePropertyNames(PropertyNameArray&);
 
  private:
@@ -227,7 +227,7 @@ class Structure : public RefCounted<Structure> {
 
   StructureTransitionTable table;
 
-  RefPtr<PropertyNameArrayData> m_cachedPropertyNameArrayData;
+  ProtectedPtr<JSPropertyNameIterator> m_enumerationCache;
 
   PropertyMapHashTable* m_propertyTable;
 

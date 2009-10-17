@@ -48,7 +48,7 @@ class MarkStack : Noncopyable {
   }
 
   ALWAYS_INLINE void append(JSValue);
-  ALWAYS_INLINE void append(JSCell*);
+  void append(JSCell*);
 
   ALWAYS_INLINE void appendValues(Register* values,
                                   size_t count,

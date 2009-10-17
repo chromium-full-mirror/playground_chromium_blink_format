@@ -125,13 +125,6 @@ class JSCell : public NoncopyableCustomAllocated {
   Structure* m_structure;
 };
 
-// FIXME: We should deprecate this and just use JSValue::asCell() instead.
-JSCell* asCell(JSValue);
-
-inline JSCell* asCell(JSValue value) {
-  return value.asCell();
-}
-
 inline JSCell::JSCell(Structure* structure) : m_structure(structure) {}
 
 // Only used for initializing Collector blocks.
