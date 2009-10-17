@@ -42,9 +42,12 @@ class JSCallbackConstructor : public JSObject {
   static const ClassInfo info;
 
   static PassRefPtr<Structure> createStructure(JSValue proto) {
-    return Structure::create(proto,
-                             TypeInfo(ObjectType, ImplementsHasInstance));
+    return Structure::create(proto, TypeInfo(ObjectType, StructureFlags));
   }
+
+ protected:
+  static const unsigned StructureFlags =
+      ImplementsHasInstance | JSObject::StructureFlags;
 
  private:
   virtual ConstructType getConstructData(ConstructData&);

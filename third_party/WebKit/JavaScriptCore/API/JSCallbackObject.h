@@ -52,12 +52,14 @@ class JSCallbackObject : public Base {
   bool inherits(JSClassRef) const;
 
   static PassRefPtr<Structure> createStructure(JSValue proto) {
-    return Structure::create(
-        proto, TypeInfo(ObjectType,
-                        OverridesGetOwnPropertySlot | ImplementsHasInstance |
-                            OverridesHasInstance | OverridesMarkChildren |
-                            OverridesGetPropertyNames));
+    return Structure::create(proto, TypeInfo(ObjectType, StructureFlags));
   }
+
+ protected:
+  static const unsigned StructureFlags =
+      OverridesGetOwnPropertySlot | ImplementsHasInstance |
+      OverridesHasInstance | OverridesMarkChildren | OverridesGetPropertyNames |
+      Base::StructureFlags;
 
  private:
   virtual UString className() const;

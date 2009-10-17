@@ -39,9 +39,12 @@ class MathObject : public JSObject {
   static const ClassInfo info;
 
   static PassRefPtr<Structure> createStructure(JSValue prototype) {
-    return Structure::create(prototype,
-                             TypeInfo(ObjectType, OverridesGetOwnPropertySlot));
+    return Structure::create(prototype, TypeInfo(ObjectType, StructureFlags));
   }
+
+ protected:
+  static const unsigned StructureFlags =
+      OverridesGetOwnPropertySlot | JSObject::StructureFlags;
 };
 
 }  // namespace JSC

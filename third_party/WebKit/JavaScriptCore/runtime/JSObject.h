@@ -271,10 +271,12 @@ class JSObject : public JSCell {
   static const size_t nonInlineBaseStorageCapacity = 16;
 
   static PassRefPtr<Structure> createStructure(JSValue prototype) {
-    return Structure::create(prototype, TypeInfo(ObjectType));
+    return Structure::create(prototype, TypeInfo(ObjectType, StructureFlags));
   }
 
  protected:
+  static const unsigned StructureFlags = 0;
+
   void addAnonymousSlots(unsigned count);
   void putAnonymousValue(unsigned index, JSValue value) {
     *locationForOffset(index) = value;

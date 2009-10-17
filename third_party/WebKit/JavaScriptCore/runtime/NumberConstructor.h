@@ -41,12 +41,15 @@ class NumberConstructor : public InternalFunction {
   static const ClassInfo info;
 
   static PassRefPtr<Structure> createStructure(JSValue proto) {
-    return Structure::create(
-        proto, TypeInfo(ObjectType,
-                        OverridesGetOwnPropertySlot | ImplementsHasInstance));
+    return Structure::create(proto, TypeInfo(ObjectType, StructureFlags));
   }
 
   enum { NaNValue, NegInfinity, PosInfinity, MaxValue, MinValue };
+
+ protected:
+  static const unsigned StructureFlags = OverridesGetOwnPropertySlot |
+                                         ImplementsHasInstance |
+                                         InternalFunction::StructureFlags;
 
  private:
   virtual ConstructType getConstructData(ConstructData&);

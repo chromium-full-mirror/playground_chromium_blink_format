@@ -314,13 +314,14 @@ class JSGlobalObject : public JSVariableObject {
   }
 
   static PassRefPtr<Structure> createStructure(JSValue prototype) {
-    return Structure::create(
-        prototype, TypeInfo(ObjectType, OverridesGetOwnPropertySlot |
-                                            OverridesMarkChildren |
-                                            OverridesGetPropertyNames));
+    return Structure::create(prototype, TypeInfo(ObjectType, StructureFlags));
   }
 
  protected:
+  static const unsigned StructureFlags =
+      OverridesGetOwnPropertySlot | OverridesMarkChildren |
+      OverridesGetPropertyNames | JSVariableObject::StructureFlags;
+
   struct GlobalPropertyInfo {
     GlobalPropertyInfo(const Identifier& i, JSValue v, unsigned a)
         : identifier(i), value(v), attributes(a) {}

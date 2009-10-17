@@ -71,11 +71,14 @@ class JSActivation : public JSVariableObject {
   static const ClassInfo info;
 
   static PassRefPtr<Structure> createStructure(JSValue proto) {
-    return Structure::create(
-        proto, TypeInfo(ObjectType,
-                        OverridesGetOwnPropertySlot | NeedsThisConversion |
-                            OverridesMarkChildren | OverridesGetPropertyNames));
+    return Structure::create(proto, TypeInfo(ObjectType, StructureFlags));
   }
+
+ protected:
+  static const unsigned StructureFlags =
+      OverridesGetOwnPropertySlot | NeedsThisConversion |
+      OverridesMarkChildren | OverridesGetPropertyNames |
+      JSVariableObject::StructureFlags;
 
  private:
   struct JSActivationData : public JSVariableObjectData {

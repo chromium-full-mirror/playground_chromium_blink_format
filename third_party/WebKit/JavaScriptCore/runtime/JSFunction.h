@@ -66,11 +66,7 @@ class JSFunction : public InternalFunction {
   static JS_EXPORTDATA const ClassInfo info;
 
   static PassRefPtr<Structure> createStructure(JSValue prototype) {
-    return Structure::create(
-        prototype,
-        TypeInfo(ObjectType, OverridesGetOwnPropertySlot |
-                                 ImplementsHasInstance | OverridesMarkChildren |
-                                 OverridesGetPropertyNames));
+    return Structure::create(prototype, TypeInfo(ObjectType, StructureFlags));
   }
 
   NativeFunction nativeFunction() {
@@ -79,6 +75,12 @@ class JSFunction : public InternalFunction {
 
   virtual ConstructType getConstructData(ConstructData&);
   virtual CallType getCallData(CallData&);
+
+ protected:
+  const static unsigned StructureFlags =
+      OverridesGetOwnPropertySlot | ImplementsHasInstance |
+      OverridesMarkChildren | OverridesGetPropertyNames |
+      InternalFunction::StructureFlags;
 
  private:
   JSFunction(NonNullPassRefPtr<Structure>);

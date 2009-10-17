@@ -59,13 +59,13 @@ class StringObject : public JSWrapperObject {
   }
 
   static PassRefPtr<Structure> createStructure(JSValue prototype) {
-    return Structure::create(
-        prototype, TypeInfo(ObjectType, OverridesGetOwnPropertySlot |
-                                            OverridesMarkChildren |
-                                            OverridesGetPropertyNames));
+    return Structure::create(prototype, TypeInfo(ObjectType, StructureFlags));
   }
 
  protected:
+  static const unsigned StructureFlags =
+      OverridesGetOwnPropertySlot | OverridesMarkChildren |
+      OverridesGetPropertyNames | JSWrapperObject::StructureFlags;
   StringObject(NonNullPassRefPtr<Structure>, JSString*);
 };
 

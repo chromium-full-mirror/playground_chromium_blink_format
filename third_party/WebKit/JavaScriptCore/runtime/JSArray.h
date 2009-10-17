@@ -100,15 +100,15 @@ class JSArray : public JSObject {
   void copyToRegisters(ExecState*, Register*, uint32_t);
 
   static PassRefPtr<Structure> createStructure(JSValue prototype) {
-    return Structure::create(
-        prototype, TypeInfo(ObjectType, OverridesGetOwnPropertySlot |
-                                            OverridesMarkChildren |
-                                            OverridesGetPropertyNames));
+    return Structure::create(prototype, TypeInfo(ObjectType, StructureFlags));
   }
 
   inline void markChildrenDirect(MarkStack& markStack);
 
  protected:
+  static const unsigned StructureFlags =
+      OverridesGetOwnPropertySlot | OverridesMarkChildren |
+      OverridesGetPropertyNames | JSObject::StructureFlags;
   virtual void put(ExecState*,
                    const Identifier& propertyName,
                    JSValue,
