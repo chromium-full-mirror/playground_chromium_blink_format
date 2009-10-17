@@ -1748,18 +1748,15 @@ RegisterID* ForInNode::emitBytecode(BytecodeGenerator& generator,
     return emitThrowError(generator, ReferenceError,
                           "Left side of for-in statement is not a reference.");
 
+  RefPtr<Label> continueTarget = generator.newLabel();
+
   generator.emitDebugHook(WillExecuteStatement, firstLine(), lastLine());
 
   if (m_init)
     generator.emitNode(generator.ignoredResult(), m_init);
-
-  RefPtr<RegisterID> base = generator.newTemporary();
-  generator.emitNode(base.get(), m_expr);
-  RefPtr<RegisterID> i = generator.newTemporary();
-  RefPtr<RegisterID> size = generator.newTemporary();
+  RegisterID* forInBase = generator.emitNode(m_expr);
   RefPtr<RegisterID> iter =
-      generator.emitGetPropertyNames(generator.newTemporary(), base.get(),
-                                     i.get(), size.get(), scope->breakTarget());
+      generator.emitGetPropertyNames(generator.newTemporary(), forInBase);
   generator.emitJump(scope->continueTarget());
 
   RefPtr<Label> loopStart = generator.newLabel();
@@ -1805,8 +1802,7 @@ RegisterID* ForInNode::emitBytecode(BytecodeGenerator& generator,
   generator.emitNode(dst, m_statement);
 
   generator.emitLabel(scope->continueTarget());
-  generator.emitNextPropertyName(propertyName, base.get(), i.get(), size.get(),
-                                 iter.get(), loopStart.get());
+  generator.emitNextPropertyName(propertyName, iter.get(), loopStart.get());
   generator.emitDebugHook(WillExecuteStatement, firstLine(), lastLine());
   generator.emitLabel(scope->breakTarget());
   return dst;

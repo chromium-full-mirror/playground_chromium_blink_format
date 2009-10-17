@@ -200,7 +200,6 @@ objectConstructorGetOwnPropertyDescriptor(ExecState* exec,
   return description;
 }
 
-// FIXME: Use the enumeration cache.
 JSValue JSC_HOST_CALL objectConstructorKeys(ExecState* exec,
                                             JSObject*,
                                             JSValue,

@@ -379,13 +379,6 @@ inline uint32_t toUInt32(double val) {
   return static_cast<uint32_t>(val);
 }
 
-// FIXME: We should deprecate this and just use JSValue::asCell() instead.
-JSCell* asCell(JSValue);
-
-inline JSCell* asCell(JSValue value) {
-  return value.asCell();
-}
-
 ALWAYS_INLINE int32_t JSValue::toInt32(ExecState* exec) const {
   if (isInt32())
     return asInt32();

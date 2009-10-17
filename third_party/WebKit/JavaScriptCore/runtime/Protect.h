@@ -21,8 +21,8 @@
 #ifndef Protect_h
 #define Protect_h
 
+#include "JSCell.h"
 #include "Collector.h"
-#include "JSValue.h"
 
 namespace JSC {
 
