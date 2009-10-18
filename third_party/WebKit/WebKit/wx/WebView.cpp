@@ -68,6 +68,10 @@
 #include <runtime/JSValue.h>
 #include <runtime/UString.h>
 
+#if ENABLE(DATABASE)
+#include "DatabaseTracker.h"
+#endif
+
 #include "wx/wxprec.h"
 #ifndef WX_PRECOMP
 #include "wx/wx.h"
@@ -321,6 +325,10 @@ bool wxWebView::Create(wxWindow* parent,
   settings->setSansSerifFontFamily("Arial");
   settings->setStandardFontFamily("Times New Roman");
   settings->setJavaScriptEnabled(true);
+
+#if ENABLE(DATABASE)
+  settings->setDatabasesEnabled(true);
+#endif
 
   m_isInitialized = true;
 
@@ -873,4 +881,21 @@ bool wxWebView::ShouldClose() const {
     return m_mainFrame->ShouldClose();
 
   return true;
+}
+
+/* static */
+void wxWebView::SetDatabaseDirectory(const wxString& databaseDirectory) {
+#if ENABLE(DATABASE)
+  WebCore::DatabaseTracker::tracker().setDatabaseDirectoryPath(
+      databaseDirectory);
+#endif
+}
+
+/* static */
+wxString wxWebView::GetDatabaseDirectory() {
+#if ENABLE(DATABASE)
+  return WebCore::DatabaseTracker::tracker().databaseDirectoryPath();
+#else
+  return wxEmptyString;
+#endif
 }

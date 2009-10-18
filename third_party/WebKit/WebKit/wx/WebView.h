@@ -208,6 +208,9 @@ class WXDLLIMPEXP_WEBKIT wxWebView : public wxWindow {
   }
   bool GetMouseWheelZooms() const { return m_mouseWheelZooms; }
 
+  static void SetDatabaseDirectory(const wxString& databaseDirectory);
+  static wxString GetDatabaseDirectory();
+
  protected:
   // event handlers (these functions should _not_ be virtual)
   void OnPaint(wxPaintEvent& event);
