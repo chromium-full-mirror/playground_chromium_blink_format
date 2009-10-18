@@ -108,6 +108,8 @@ enum {
   WebKitErrorJavaUnavailable = 202,
 };
 
+enum wxProxyType { HTTP, Socks4, Socks4A, Socks5, Socks5Hostname };
+
 class WXDLLIMPEXP_WEBKIT wxWebView : public wxWindow {
   // ChromeClientWx needs to get the Page* stored by the wxWebView
   // for the createWindow function.
@@ -210,6 +212,12 @@ class WXDLLIMPEXP_WEBKIT wxWebView : public wxWindow {
 
   static void SetDatabaseDirectory(const wxString& databaseDirectory);
   static wxString GetDatabaseDirectory();
+
+  static void SetProxyInfo(const wxString& host = wxEmptyString,
+                           unsigned long port = 0,
+                           wxProxyType type = HTTP,
+                           const wxString& username = wxEmptyString,
+                           const wxString& password = wxEmptyString);
 
  protected:
   // event handlers (these functions should _not_ be virtual)
