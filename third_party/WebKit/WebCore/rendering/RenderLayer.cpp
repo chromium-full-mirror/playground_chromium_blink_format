@@ -311,12 +311,21 @@ void RenderLayer::updateLayerPositions(UpdateLayerPositionsFlags flags) {
   if (m_reflection)
     m_reflection->layout();
 
+#if USE(ACCELERATED_COMPOSITING)
+  // Clear the IsCompositingUpdateRoot flag once we've found the first
+  // compositing layer in this update.
+  bool isUpdateRoot = (flags & IsCompositingUpdateRoot);
+  if (isComposited())
+    flags &= ~IsCompositingUpdateRoot;
+#endif
+
   for (RenderLayer* child = firstChild(); child; child = child->nextSibling())
     child->updateLayerPositions(flags);
 
 #if USE(ACCELERATED_COMPOSITING)
   if ((flags & UpdateCompositingLayers) && isComposited())
-    backing()->updateAfterLayout(RenderLayerBacking::CompositingChildren);
+    backing()->updateAfterLayout(RenderLayerBacking::CompositingChildren,
+                                 isUpdateRoot);
 #endif
 
   // With all our children positioned, now update our marquee if we need to.
@@ -1184,9 +1193,11 @@ void RenderLayer::scrollToOffset(int x,
 
 #if USE(ACCELERATED_COMPOSITING)
   if (compositor()->inCompositingMode()) {
-    if (RenderLayer* compositingAncestor = ancestorCompositingLayer())
+    if (RenderLayer* compositingAncestor = ancestorCompositingLayer()) {
+      bool isUpdateRoot = true;
       compositingAncestor->backing()->updateAfterLayout(
-          RenderLayerBacking::AllDescendants);
+          RenderLayerBacking::AllDescendants, isUpdateRoot);
+    }
   }
 #endif
 
