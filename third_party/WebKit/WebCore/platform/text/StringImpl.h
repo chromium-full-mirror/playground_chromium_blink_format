@@ -156,7 +156,6 @@ class StringImpl : public RefCounted<StringImpl> {
   double toDouble(bool* ok = 0);
   float toFloat(bool* ok = 0);
 
-  bool isLower();
   PassRefPtr<StringImpl> lower();
   PassRefPtr<StringImpl> upper();
   PassRefPtr<StringImpl> secure(UChar aChar);

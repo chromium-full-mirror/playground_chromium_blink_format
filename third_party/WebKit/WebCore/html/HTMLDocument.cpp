@@ -290,11 +290,8 @@ PassRefPtr<Element> HTMLDocument::createElement(const AtomicString& name,
     ec = INVALID_CHARACTER_ERR;
     return 0;
   }
-  AtomicString lowerName = name.string().impl()->isLower()
-                               ? name
-                               : AtomicString(name.string().lower());
   return HTMLElementFactory::createHTMLElement(
-      QualifiedName(nullAtom, lowerName, xhtmlNamespaceURI), this, 0, false);
+      QualifiedName(nullAtom, name.lower(), xhtmlNamespaceURI), this, 0, false);
 }
 
 static void addItemToMap(HashCountedSet<AtomicStringImpl*>& map,

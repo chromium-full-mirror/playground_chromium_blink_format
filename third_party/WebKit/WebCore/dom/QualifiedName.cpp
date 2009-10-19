@@ -102,4 +102,10 @@ void QualifiedName::init() {
     initialized = true;
   }
 }
+
+const AtomicString& QualifiedName::localNameUpper() const {
+  if (!m_impl->m_localNameUpper)
+    m_impl->m_localNameUpper = m_impl->m_localName.upper();
+  return m_impl->m_localNameUpper;
+}
 }
