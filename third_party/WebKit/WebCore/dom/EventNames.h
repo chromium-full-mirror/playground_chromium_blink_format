@@ -36,8 +36,8 @@ namespace WebCore {
           macro(drag) macro(dragend) macro(dragenter) macro(dragleave) macro(                                \
               dragover) macro(dragstart) macro(drop) macro(error) macro(focus)                               \
               macro(hashchange) macro(input) macro(invalid) macro(keydown) macro(                            \
-                  keypress) macro(keyup) macro(load) macro(loadend) macro(loadstart)                         \
-                  macro(message) macro(mousedown) macro(mousemove) macro(mouseout) macro(                    \
+                  keypress) macro(keyup) macro(load) macro(loadstart) macro(message)                         \
+                  macro(mousedown) macro(mousemove) macro(mouseout) macro(                                   \
                       mouseover) macro(mouseup) macro(mousewheel) macro(noupdate)                            \
                       macro(obsolete) macro(offline) macro(online) macro(open) macro(                        \
                           overflowchanged) macro(pagehide) macro(pageshow) macro(paste)                      \
