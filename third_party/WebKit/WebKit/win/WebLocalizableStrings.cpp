@@ -37,6 +37,7 @@
 #include <wtf/Assertions.h>
 #include <wtf/HashMap.h>
 #include <wtf/RetainPtr.h>
+#include <wtf/StdLibExtras.h>
 #include <CoreFoundation/CoreFoundation.h>
 
 class LocalizedString;
@@ -46,8 +47,17 @@ using namespace WebCore;
 WebLocalizableStringsBundle WebKitLocalizableStringsBundle = {
     "com.apple.WebKit", 0};
 
-static HashMap<String, LocalizedString*> mainBundleLocStrings;
-static HashMap<String, LocalizedString*> frameworkLocStrings;
+typedef HashMap<String, LocalizedString*> LocalizedStringMap;
+
+static LocalizedStringMap& mainBundleLocStrings() {
+  DEFINE_STATIC_LOCAL(LocalizedStringMap, map, ());
+  return map;
+}
+
+static LocalizedStringMap frameworkLocStrings() {
+  DEFINE_STATIC_LOCAL(LocalizedStringMap, map, ());
+  return map;
+}
 
 class LocalizedString : public Noncopyable {
  public:
@@ -169,10 +179,10 @@ static LocalizedString* findCachedString(
     WebLocalizableStringsBundle* stringsBundle,
     const String& key) {
   if (!stringsBundle)
-    return mainBundleLocStrings.get(key);
+    return mainBundleLocStrings().get(key);
 
   if (stringsBundle->bundle == WebKitLocalizableStringsBundle.bundle)
-    return frameworkLocStrings.get(key);
+    return frameworkLocStrings().get(key);
 
   return 0;
 }
@@ -181,11 +191,11 @@ static void cacheString(WebLocalizableStringsBundle* stringsBundle,
                         const String& key,
                         LocalizedString* value) {
   if (!stringsBundle) {
-    mainBundleLocStrings.set(key, value);
+    mainBundleLocStrings().set(key, value);
     return;
   }
 
-  frameworkLocStrings.set(key, value);
+  frameworkLocStrings().set(key, value);
 }
 
 static const LocalizedString& localizedString(
