@@ -114,6 +114,7 @@ static bool paintMediaSlider(RenderObject* object,
   // first.
   // https://bugs.webkit.org/show_bug.cgi?id=30143
   context->save();
+  context->setShouldAntialias(true);
   context->setStrokeStyle(SolidStroke);
   context->setStrokeColor(style->borderLeftColor());
   context->setStrokeThickness(style->borderLeftWidth());
