@@ -19,10 +19,10 @@
     Boston, MA 02110-1301, USA.
 */
 
-#ifndef SVGFEGaussianBlur_h
-#define SVGFEGaussianBlur_h
+#ifndef FEGaussianBlur_h
+#define FEGaussianBlur_h
 
-#if ENABLE(SVG) && ENABLE(FILTERS)
+#if ENABLE(FILTERS)
 #include "FilterEffect.h"
 #include "Filter.h"
 
@@ -45,7 +45,6 @@ class FEGaussianBlur : public FilterEffect {
   }
   void apply(Filter*);
   void dump();
-  TextStream& externalRepresentation(TextStream& ts) const;
 
  private:
   FEGaussianBlur(FilterEffect*, const float&, const float&);
@@ -57,6 +56,6 @@ class FEGaussianBlur : public FilterEffect {
 
 }  // namespace WebCore
 
-#endif  // ENABLE(SVG) && ENABLE(FILTERS)
+#endif  // ENABLE(FILTERS)
 
-#endif  // SVGFEGaussianBlur_h
+#endif  // FEGaussianBlur_h
