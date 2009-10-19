@@ -31,6 +31,10 @@ class Element;
 class Node;
 }
 
+QT_BEGIN_NAMESPACE
+class QPainter;
+QT_END_NAMESPACE
+
 class QWebFrame;
 class QWebElementPrivate;
 
@@ -138,6 +142,8 @@ class QWEBKIT_EXPORT QWebElement {
   QString styleProperty(const QString& name,
                         StyleResolveStrategy strategy) const;
   void setStyleProperty(const QString& name, const QString& value);
+
+  void render(QPainter* painter);
 
  private:
   explicit QWebElement(WebCore::Element*);
