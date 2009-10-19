@@ -77,13 +77,14 @@
 
 #if PLATFORM(QT)
 #include "QWebPageClient.h"
+#include <QWidget>
 #endif
 
 static inline HWND windowHandleForPageClient(PlatformPageClient client) {
 #if PLATFORM(QT)
   if (!client)
     return 0;
-  return client->winId();
+  return client->ownerWidget()->winId();
 #else
   return client;
 #endif
