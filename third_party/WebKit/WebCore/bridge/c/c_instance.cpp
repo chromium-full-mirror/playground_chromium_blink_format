@@ -115,16 +115,20 @@ JSValue CInstance::invokeMethod(ExecState* exec,
     convertValueToNPVariant(exec, args.at(i), &cArgs[i]);
 
   // Invoke the 'C' method.
+  bool retval = true;
   NPVariant resultVariant;
   VOID_TO_NPVARIANT(resultVariant);
 
   {
     JSLock::DropAllLocks dropAllLocks(SilenceAssertionsOnly);
     ASSERT(globalExceptionString().isNull());
-    _object->_class->invoke(_object, ident, cArgs.data(), count,
-                            &resultVariant);
+    retval = _object->_class->invoke(_object, ident, cArgs.data(), count,
+                                     &resultVariant);
     moveGlobalExceptionToExecState(exec);
   }
+
+  if (!retval)
+    throwError(exec, GeneralError, "Error calling method on NPObject!");
 
   for (i = 0; i < count; i++)
     _NPN_ReleaseVariantValue(&cArgs[i]);
@@ -147,15 +151,19 @@ JSValue CInstance::invokeDefaultMethod(ExecState* exec, const ArgList& args) {
     convertValueToNPVariant(exec, args.at(i), &cArgs[i]);
 
   // Invoke the 'C' method.
+  bool retval = true;
   NPVariant resultVariant;
   VOID_TO_NPVARIANT(resultVariant);
   {
     JSLock::DropAllLocks dropAllLocks(SilenceAssertionsOnly);
     ASSERT(globalExceptionString().isNull());
-    _object->_class->invokeDefault(_object, cArgs.data(), count,
-                                   &resultVariant);
+    retval = _object->_class->invokeDefault(_object, cArgs.data(), count,
+                                            &resultVariant);
     moveGlobalExceptionToExecState(exec);
   }
+
+  if (!retval)
+    throwError(exec, GeneralError, "Error calling method on NPObject!");
 
   for (i = 0; i < count; i++)
     _NPN_ReleaseVariantValue(&cArgs[i]);
@@ -182,14 +190,19 @@ JSValue CInstance::invokeConstruct(ExecState* exec, const ArgList& args) {
     convertValueToNPVariant(exec, args.at(i), &cArgs[i]);
 
   // Invoke the 'C' method.
+  bool retval = true;
   NPVariant resultVariant;
   VOID_TO_NPVARIANT(resultVariant);
   {
     JSLock::DropAllLocks dropAllLocks(SilenceAssertionsOnly);
     ASSERT(globalExceptionString().isNull());
-    _object->_class->construct(_object, cArgs.data(), count, &resultVariant);
+    retval = _object->_class->construct(_object, cArgs.data(), count,
+                                        &resultVariant);
     moveGlobalExceptionToExecState(exec);
   }
+
+  if (!retval)
+    throwError(exec, GeneralError, "Error calling method on NPObject!");
 
   for (i = 0; i < count; i++)
     _NPN_ReleaseVariantValue(&cArgs[i]);
