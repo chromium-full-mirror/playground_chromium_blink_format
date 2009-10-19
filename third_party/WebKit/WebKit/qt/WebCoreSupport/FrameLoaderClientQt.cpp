@@ -199,13 +199,13 @@ void FrameLoaderClientQt::transitionToCommittedForNewPage() {
       brush.style() == Qt::SolidPattern ? brush.color() : QColor();
 
   QWebPage* page = m_webFrame->page();
-  const QSize fixedLayoutSize = page->fixedContentsSize();
+  const QSize preferredLayoutSize = page->preferredContentsSize();
 
   m_frame->createView(
       m_webFrame->page()->viewportSize(), backgroundColor,
       !backgroundColor.alpha(),
-      fixedLayoutSize.isValid() ? IntSize(fixedLayoutSize) : IntSize(),
-      fixedLayoutSize.isValid(),
+      preferredLayoutSize.isValid() ? IntSize(preferredLayoutSize) : IntSize(),
+      preferredLayoutSize.isValid(),
       (ScrollbarMode)m_webFrame->scrollBarPolicy(Qt::Horizontal),
       (ScrollbarMode)m_webFrame->scrollBarPolicy(Qt::Vertical));
 }
