@@ -1923,7 +1923,7 @@ void QWebPage::triggerAction(WebAction action, bool) {
         targetFrame->d->frame->loader()->loadFrameRequest(
             frameLoadRequest(d->hitTestResult.linkUrl(), wcFrame.get()),
             /*lockHistory*/ false, /*lockBackForwardList*/ false, /*event*/ 0,
-            /*FormState*/ 0);
+            /*FormState*/ 0, SendReferrer);
         break;
       }
     // fall through
