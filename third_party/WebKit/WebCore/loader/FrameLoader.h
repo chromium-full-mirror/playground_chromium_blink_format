@@ -113,7 +113,8 @@ class FrameLoader : public Noncopyable {
                                                    // calls loadPostRequest and
                                                    // loadURL.
                         PassRefPtr<Event>,
-                        PassRefPtr<FormState>);
+                        PassRefPtr<FormState>,
+                        ReferrerPolicy);
 
   void load(const ResourceRequest&, bool lockHistory);  // Called by WebFrame,
                                                         // calls
@@ -245,7 +246,8 @@ class FrameLoader : public Noncopyable {
                    PassRefPtr<Event>,
                    bool lockHistory,
                    bool lockBackForwardList,
-                   bool userGesture);
+                   bool userGesture,
+                   ReferrerPolicy);
   bool requestFrame(HTMLFrameOwnerElement*,
                     const String& url,
                     const AtomicString& frameName);
@@ -628,6 +630,7 @@ class FrameLoader : public Noncopyable {
 
   bool m_didPerformFirstNavigation;
   bool m_loadingFromCachedPage;
+  bool m_suppressOpenerInNewFrame;
 
 #ifndef NDEBUG
   bool m_didDispatchDidCommitLoad;

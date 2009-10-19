@@ -27,6 +27,7 @@
 #include "DNS.h"
 #include "EventNames.h"
 #include "Frame.h"
+#include "FrameLoaderTypes.h"
 #include "HTMLImageElement.h"
 #include "HTMLNames.h"
 #include "KeyboardEvent.h"
@@ -43,7 +44,8 @@ using namespace HTMLNames;
 HTMLAnchorElement::HTMLAnchorElement(const QualifiedName& tagName,
                                      Document* document)
     : HTMLElement(tagName, document, CreateElement),
-      m_wasShiftKeyDownOnMouseDown(false) {}
+      m_wasShiftKeyDownOnMouseDown(false),
+      m_linkRelations(0) {}
 
 PassRefPtr<HTMLAnchorElement> HTMLAnchorElement::create(Document* document) {
   return adoptRef(new HTMLAnchorElement(aTag, document));
@@ -205,9 +207,9 @@ void HTMLAnchorElement::defaultEventHandler(Event* evt) {
     }
 
     if (!evt->defaultPrevented() && document()->frame())
-      document()->frame()->loader()->urlSelected(document()->completeURL(url),
-                                                 getAttribute(targetAttr), evt,
-                                                 false, false, true);
+      document()->frame()->loader()->urlSelected(
+          document()->completeURL(url), getAttribute(targetAttr), evt, false,
+          false, true, hasRel(RelationNoReferrer) ? NoReferrer : SendReferrer);
 
     evt->setDefaultHandled();
   } else if (isLink() && isContentEditable()) {
@@ -287,10 +289,11 @@ void HTMLAnchorElement::parseMappedAttribute(MappedAttribute* attr) {
         attr->setValue(nullAtom);
       }
     }
-  } else if (attr->name() == nameAttr || attr->name() == titleAttr ||
-             attr->name() == relAttr) {
+  } else if (attr->name() == nameAttr || attr->name() == titleAttr) {
     // Do nothing.
-  } else
+  } else if (attr->name() == relAttr)
+    setRel(attr->value());
+  else
     HTMLElement::parseMappedAttribute(attr);
 }
 
@@ -326,6 +329,18 @@ KURL HTMLAnchorElement::href() const {
 
 void HTMLAnchorElement::setHref(const AtomicString& value) {
   setAttribute(hrefAttr, value);
+}
+
+bool HTMLAnchorElement::hasRel(uint32_t relation) const {
+  return m_linkRelations & relation;
+}
+
+void HTMLAnchorElement::setRel(const String& value) {
+  m_linkRelations = 0;
+  ClassNames newLinkRelations(value, true);
+  // FIXME: Add link relations as they are implemented
+  if (newLinkRelations.contains("noreferrer"))
+    m_linkRelations |= RelationNoReferrer;
 }
 
 const AtomicString& HTMLAnchorElement::name() const {

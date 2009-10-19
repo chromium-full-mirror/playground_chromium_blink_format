@@ -97,6 +97,8 @@ enum UnloadEventPolicy {
   UnloadEventPolicyUnloadOnly,
   UnloadEventPolicyUnloadAndPageHide
 };
+
+enum ReferrerPolicy { SendReferrer, NoReferrer };
 }
 
 #endif

@@ -33,6 +33,7 @@
 #include "EventNames.h"
 #include "Frame.h"
 #include "FrameLoader.h"
+#include "FrameLoaderTypes.h"
 #include "KeyboardEvent.h"
 #include "MappedAttribute.h"
 #include "MouseEvent.h"
@@ -152,8 +153,9 @@ void SVGAElement::defaultEventHandler(Event* evt) {
       }
 #endif
       if (document()->frame())
-        document()->frame()->loader()->urlSelected(
-            document()->completeURL(url), target, evt, false, false, true);
+        document()->frame()->loader()->urlSelected(document()->completeURL(url),
+                                                   target, evt, false, false,
+                                                   true, SendReferrer);
     }
 
     evt->setDefaultHandled();

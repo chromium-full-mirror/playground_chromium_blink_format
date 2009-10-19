@@ -223,7 +223,7 @@ void ContextMenuController::contextMenuItemSelected(ContextMenuItem* item) {
         targetFrame->loader()->loadFrameRequest(
             FrameLoadRequest(ResourceRequest(
                 result.absoluteLinkURL(), frame->loader()->outgoingReferrer())),
-            false, false, 0, 0);
+            false, false, 0, 0, SendReferrer);
       else
         openNewWindow(result.absoluteLinkURL(), frame);
       break;
