@@ -265,6 +265,7 @@ class ScrollView : public Widget, public ScrollbarClient {
   // Widget override.  Handles painting of the contents of the view as well as
   // the scrollbars.
   virtual void paint(GraphicsContext*, const IntRect&);
+  void paintScrollbars(GraphicsContext*, const IntRect&);
 
   // Widget overrides to ensure that our children's visibility status is kept up
   // to date when we get shown and hidden.
@@ -276,6 +277,7 @@ class ScrollView : public Widget, public ScrollbarClient {
   static const int noPanScrollRadius = 15;
   void addPanScrollIcon(const IntPoint&);
   void removePanScrollIcon();
+  void paintPanScrollIcon(GraphicsContext*);
 
   virtual bool isPointInScrollbarCorner(const IntPoint&);
   virtual bool scrollbarCornerPresent() const;
