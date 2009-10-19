@@ -91,15 +91,11 @@ class FormDataIODevice : public QIODevice {
   FormDataIODevice(FormData*);
   ~FormDataIODevice();
 
-  void setParent(QNetworkReply*);
   bool isSequential() const;
 
  protected:
   qint64 readData(char*, qint64);
   qint64 writeData(const char*, qint64);
-
- private Q_SLOTS:
-  void slotFinished();
 
  private:
   void moveToNextElement();
