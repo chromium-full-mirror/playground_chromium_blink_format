@@ -143,7 +143,7 @@ static bool paintMediaSlider(RenderObject* object,
     context->save();
     context->setStrokeStyle(NoStroke);
     context->setFillGradient(gradient);
-    context->drawRect(bufferedRect);
+    context->fillRect(bufferedRect);
     context->restore();
   }
 
