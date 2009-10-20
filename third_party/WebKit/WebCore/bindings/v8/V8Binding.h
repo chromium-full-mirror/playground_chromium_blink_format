@@ -59,7 +59,7 @@ inline AtomicString v8ValueToAtomicWebCoreString(v8::Handle<v8::Value> value) {
   return v8NonStringValueToAtomicWebCoreString(value);
 }
 
-inline String toString(const String& string) {
+inline const String& toString(const String& string) {
   return string;
 }
 
