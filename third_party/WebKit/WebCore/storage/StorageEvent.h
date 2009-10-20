@@ -33,7 +33,6 @@
 
 namespace WebCore {
 
-class DOMWindow;
 class Storage;
 
 class StorageEvent : public Event {
@@ -44,14 +43,12 @@ class StorageEvent : public Event {
                                          const String& oldValue,
                                          const String& newValue,
                                          const String& uri,
-                                         PassRefPtr<DOMWindow> source,
                                          Storage* storageArea);
 
   const String& key() const { return m_key; }
   const String& oldValue() const { return m_oldValue; }
   const String& newValue() const { return m_newValue; }
   const String& uri() const { return m_uri; }
-  DOMWindow* source() const { return m_source.get(); }
   Storage* storageArea() const { return m_storageArea.get(); }
 
   void initStorageEvent(const AtomicString& type,
@@ -61,14 +58,13 @@ class StorageEvent : public Event {
                         const String& oldValue,
                         const String& newValue,
                         const String& uri,
-                        PassRefPtr<DOMWindow> source,
                         Storage* storageArea);
 
   // Needed once we support init<blank>EventNS
   // void initStorageEventNS(in DOMString namespaceURI, in DOMString typeArg, in
   // boolean canBubbleArg, in boolean cancelableArg, in DOMString keyArg, in
-  // DOMString oldValueArg, in DOMString newValueArg, in DOMString uriArg, in
-  // Window sourceArg,  Storage storageAreaArg);
+  // DOMString oldValueArg, in DOMString newValueArg, in DOMString uriArg,
+  // Storage storageAreaArg);
 
   virtual bool isStorageEvent() const { return true; }
 
@@ -79,14 +75,12 @@ class StorageEvent : public Event {
                const String& oldValue,
                const String& newValue,
                const String& uri,
-               PassRefPtr<DOMWindow> source,
                Storage* storageArea);
 
   String m_key;
   String m_oldValue;
   String m_newValue;
   String m_uri;
-  RefPtr<DOMWindow> m_source;
   RefPtr<Storage> m_storageArea;
 };
 

@@ -28,7 +28,6 @@
 
 #if ENABLE(DOM_STORAGE)
 
-#include "DOMWindow.h"
 #include "Storage.h"
 
 namespace WebCore {
@@ -44,10 +43,9 @@ PassRefPtr<StorageEvent> StorageEvent::create(const AtomicString& type,
                                               const String& oldValue,
                                               const String& newValue,
                                               const String& uri,
-                                              PassRefPtr<DOMWindow> source,
                                               Storage* storageArea) {
-  return adoptRef(new StorageEvent(type, key, oldValue, newValue, uri, source,
-                                   storageArea));
+  return adoptRef(
+      new StorageEvent(type, key, oldValue, newValue, uri, storageArea));
 }
 
 StorageEvent::StorageEvent(const AtomicString& type,
@@ -55,14 +53,12 @@ StorageEvent::StorageEvent(const AtomicString& type,
                            const String& oldValue,
                            const String& newValue,
                            const String& uri,
-                           PassRefPtr<DOMWindow> source,
                            Storage* storageArea)
     : Event(type, false, true),
       m_key(key),
       m_oldValue(oldValue),
       m_newValue(newValue),
       m_uri(uri),
-      m_source(source),
       m_storageArea(storageArea) {}
 
 void StorageEvent::initStorageEvent(const AtomicString& type,
@@ -72,7 +68,6 @@ void StorageEvent::initStorageEvent(const AtomicString& type,
                                     const String& oldValue,
                                     const String& newValue,
                                     const String& uri,
-                                    PassRefPtr<DOMWindow> source,
                                     Storage* storageArea) {
   if (dispatched())
     return;
@@ -83,7 +78,6 @@ void StorageEvent::initStorageEvent(const AtomicString& type,
   m_oldValue = oldValue;
   m_newValue = newValue;
   m_uri = uri;
-  m_source = source;
   m_storageArea = storageArea;
 }
 

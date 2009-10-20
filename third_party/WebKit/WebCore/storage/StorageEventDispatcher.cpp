@@ -61,10 +61,10 @@ void StorageEventDispatcher::dispatch(const String& key,
     }
 
     for (unsigned i = 0; i < frames.size(); ++i)
-      frames[i]->document()->dispatchWindowEvent(StorageEvent::create(
-          eventNames().storageEvent, key, oldValue, newValue,
-          sourceFrame->document()->documentURI(), sourceFrame->domWindow(),
-          frames[i]->domWindow()->sessionStorage()));
+      frames[i]->document()->dispatchWindowEvent(
+          StorageEvent::create(eventNames().storageEvent, key, oldValue,
+                               newValue, sourceFrame->document()->documentURI(),
+                               frames[i]->domWindow()->sessionStorage()));
   } else {
     // Send events to every page.
     const HashSet<Page*>& pages = page->group().pages();
@@ -78,10 +78,10 @@ void StorageEventDispatcher::dispatch(const String& key,
     }
 
     for (unsigned i = 0; i < frames.size(); ++i)
-      frames[i]->document()->dispatchWindowEvent(StorageEvent::create(
-          eventNames().storageEvent, key, oldValue, newValue,
-          sourceFrame->document()->documentURI(), sourceFrame->domWindow(),
-          frames[i]->domWindow()->localStorage()));
+      frames[i]->document()->dispatchWindowEvent(
+          StorageEvent::create(eventNames().storageEvent, key, oldValue,
+                               newValue, sourceFrame->document()->documentURI(),
+                               frames[i]->domWindow()->localStorage()));
   }
 }
 }
