@@ -94,6 +94,7 @@ class QWEBKIT_EXPORT QGraphicsWebView : public QGraphicsWidget {
   virtual void paint(QPainter*,
                      const QStyleOptionGraphicsItem* options,
                      QWidget* widget = 0);
+  virtual QVariant itemChange(GraphicsItemChange change, const QVariant& value);
   virtual bool event(QEvent*);
 
  public Q_SLOTS:
