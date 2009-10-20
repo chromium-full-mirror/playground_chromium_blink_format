@@ -48,7 +48,11 @@ class JavaScriptCallFrame : public RefCounted<JavaScriptCallFrame> {
         new JavaScriptCallFrame(debuggerCallFrame, caller, sourceID, line));
   }
 
-  void invalidate() { m_isValid = false; }
+  void invalidate() {
+    m_isValid = false;
+    m_debuggerCallFrame = 0;
+  }
+
   bool isValid() const { return m_isValid; }
 
   JavaScriptCallFrame* caller();
@@ -61,6 +65,7 @@ class JavaScriptCallFrame : public RefCounted<JavaScriptCallFrame> {
     m_debuggerCallFrame = debuggerCallFrame;
     m_line = line;
     m_sourceID = sourceID;
+    m_isValid = true;
   }
 
   String functionName() const;
