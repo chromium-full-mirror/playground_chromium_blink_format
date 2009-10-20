@@ -2696,7 +2696,7 @@ void JIT::emit_op_next_pname(Instruction* currentInstruction) {
   loadPtr(Address(regT1, OBJECT_OFFSETOF(JSPropertyNameIterator, m_jsStrings)),
           regT2);
 
-#if PLATFORM(X86_64)
+#if USE(JSVALUE64)
   loadPtr(BaseIndex(regT2, regT0, TimesEight), regT2);
 #else
   loadPtr(BaseIndex(regT2, regT0, TimesFour), regT2);
