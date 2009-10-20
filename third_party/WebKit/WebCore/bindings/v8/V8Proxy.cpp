@@ -280,6 +280,9 @@ void V8Proxy::evaluateInIsolatedWorld(int worldID,
     } else {
       world = new V8IsolatedWorld(this, extensionGroup);
       m_isolatedWorlds.set(worldID, world);
+
+      // Setup context id for JS debugger.
+      setInjectedScriptContextDebugId(world->context());
     }
   } else {
     world = new V8IsolatedWorld(this, extensionGroup);
@@ -315,17 +318,7 @@ void V8Proxy::evaluateInNewContext(const Vector<ScriptSourceCode>& sources,
   v8::Context::Scope contextScope(context);
 
   // Setup context id for JS debugger.
-  v8::Handle<v8::Object> contextData = v8::Object::New();
-  v8::Handle<v8::Value> windowContextData = windowContext->GetData();
-  if (windowContextData->IsObject()) {
-    v8::Handle<v8::String> propertyName =
-        v8::String::New(kContextDebugDataValue);
-    contextData->Set(propertyName,
-                     v8::Object::Cast(*windowContextData)->Get(propertyName));
-  }
-  contextData->Set(v8::String::New(kContextDebugDataType),
-                   v8::String::New("injected"));
-  context->SetData(contextData);
+  setInjectedScriptContextDebugId(context);
 
   v8::Handle<v8::Object> global = context->Global();
 
@@ -349,6 +342,24 @@ void V8Proxy::evaluateInNewContext(const Vector<ScriptSourceCode>& sources,
   // changes.
   context->UseDefaultSecurityToken();
   context.Dispose();
+}
+
+void V8Proxy::setInjectedScriptContextDebugId(
+    v8::Handle<v8::Context> targetContext) {
+  // Setup context id for JS debugger.
+  v8::Context::Scope contextScope(targetContext);
+  v8::Handle<v8::Object> contextData = v8::Object::New();
+
+  v8::Handle<v8::Value> windowContextData = context()->GetData();
+  if (windowContextData->IsObject()) {
+    v8::Handle<v8::String> propertyName =
+        v8::String::New(kContextDebugDataValue);
+    contextData->Set(propertyName,
+                     v8::Object::Cast(*windowContextData)->Get(propertyName));
+  }
+  contextData->Set(v8::String::New(kContextDebugDataType),
+                   v8::String::New("injected"));
+  targetContext->SetData(contextData);
 }
 
 v8::Local<v8::Value> V8Proxy::evaluate(const ScriptSourceCode& source,
