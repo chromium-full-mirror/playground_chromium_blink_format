@@ -393,6 +393,8 @@ class FrameLoader : public Noncopyable {
   // private again.
   void continueLoadAfterWillSubmitForm();
 
+  bool suppressOpenerInNewFrame() const { return m_suppressOpenerInNewFrame; }
+
  private:
   bool canCachePageContainingThisFrame();
 #ifndef NDEBUG
