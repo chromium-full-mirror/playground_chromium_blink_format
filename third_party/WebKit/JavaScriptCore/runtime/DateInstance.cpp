@@ -54,30 +54,35 @@ DateInstance::~DateInstance() {
   delete m_cache;
 }
 
-void DateInstance::msToGregorianDateTime(double milli,
-                                         bool outputIsUTC,
-                                         GregorianDateTime& t) const {
+bool DateInstance::getGregorianDateTime(bool outputIsUTC,
+                                        GregorianDateTime& t) const {
   if (!m_cache) {
     m_cache = new Cache;
     m_cache->m_gregorianDateTimeCachedForMS = NaN;
     m_cache->m_gregorianDateTimeUTCCachedForMS = NaN;
   }
 
+  double milli = internalNumber();
+  if (isnan(milli))
+    return false;
+
   if (outputIsUTC) {
     if (m_cache->m_gregorianDateTimeUTCCachedForMS != milli) {
-      WTF::msToGregorianDateTime(milli, true,
+      WTF::msToGregorianDateTime(internalNumber(), true,
                                  m_cache->m_cachedGregorianDateTimeUTC);
       m_cache->m_gregorianDateTimeUTCCachedForMS = milli;
     }
     t.copyFrom(m_cache->m_cachedGregorianDateTimeUTC);
   } else {
     if (m_cache->m_gregorianDateTimeCachedForMS != milli) {
-      WTF::msToGregorianDateTime(milli, false,
+      WTF::msToGregorianDateTime(internalNumber(), false,
                                  m_cache->m_cachedGregorianDateTime);
       m_cache->m_gregorianDateTimeCachedForMS = milli;
     }
     t.copyFrom(m_cache->m_cachedGregorianDateTime);
   }
+
+  return true;
 }
 
 bool DateInstance::getTime(GregorianDateTime& t, int& offset) const {
