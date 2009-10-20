@@ -151,6 +151,9 @@ class Event : public RefCounted<Event> {
 
   virtual Clipboard* clipboard() const { return 0; }
 
+  bool createdByDOM() const { return m_createdByDOM; }
+  void setCreatedByDOM(bool createdByDOM) { m_createdByDOM = createdByDOM; }
+
  protected:
   Event();
   Event(const AtomicString& type, bool canBubble, bool cancelable);
@@ -167,6 +170,9 @@ class Event : public RefCounted<Event> {
   bool m_defaultPrevented;
   bool m_defaultHandled;
   bool m_cancelBubble;
+
+  // Whether this event was created by document.createEvent().
+  bool m_createdByDOM;
 
   unsigned short m_eventPhase;
   EventTarget* m_currentTarget;
