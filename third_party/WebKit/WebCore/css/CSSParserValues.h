@@ -87,7 +87,7 @@ class CSSParserValueList : public FastAllocBase {
   unsigned m_variablesCount;
 };
 
-struct CSSParserFunction {
+struct CSSParserFunction : FastAllocBase {
   CSSParserString name;
   CSSParserValueList* args;
 
