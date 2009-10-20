@@ -70,8 +70,7 @@ class QWebFramePrivate {
         page(0),
         allowsScrolling(true),
         marginWidth(-1),
-        marginHeight(-1),
-        clipRenderToViewport(true) {}
+        marginHeight(-1) {}
   void init(QWebFrame* qframe, QWebFrameData* frameData);
 
   inline QWebFrame* parentFrame() {
@@ -96,7 +95,6 @@ class QWebFramePrivate {
   bool allowsScrolling;
   int marginWidth;
   int marginHeight;
-  bool clipRenderToViewport;
 };
 
 class QWebHitTestResultPrivate {
