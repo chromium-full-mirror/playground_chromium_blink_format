@@ -84,7 +84,7 @@ class QWebFramePrivate {
   static WebCore::Frame* core(QWebFrame*);
   static QWebFrame* kit(WebCore::Frame*);
 
-  void renderPrivate(QPainter* painter, const QRegion& clip);
+  void renderPrivate(QPainter*, QWebFrame::RenderLayer, const QRegion& clip);
 
   QWebFrame* q;
   Qt::ScrollBarPolicy horizontalScrollBarPolicy;
