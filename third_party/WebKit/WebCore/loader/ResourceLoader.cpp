@@ -199,8 +199,8 @@ void ResourceLoader::willSendRequest(ResourceRequest& request,
   if (m_sendResourceLoadCallbacks) {
     if (!m_identifier) {
       m_identifier = m_frame->page()->progress()->createUniqueIdentifier();
-      frameLoader()->notifier()->assignIdentifierToInitialRequest(m_identifier,
-                                                                  request);
+      frameLoader()->notifier()->assignIdentifierToInitialRequest(
+          m_identifier, documentLoader(), request);
     }
 
     frameLoader()->notifier()->willSendRequest(this, request, redirectResponse);

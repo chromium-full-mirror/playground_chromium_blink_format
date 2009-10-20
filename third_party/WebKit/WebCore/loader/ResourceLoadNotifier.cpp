@@ -59,13 +59,6 @@ void ResourceLoadNotifier::didCancelAuthenticationChallenge(
       loader->documentLoader(), loader->identifier(), currentWebChallenge);
 }
 
-void ResourceLoadNotifier::assignIdentifierToInitialRequest(
-    unsigned long identifier,
-    const ResourceRequest& clientRequest) {
-  dispatchAssignIdentifierToInitialRequest(identifier, activeDocumentLoader(),
-                                           clientRequest);
-}
-
 void ResourceLoadNotifier::willSendRequest(
     ResourceLoader* loader,
     ResourceRequest& clientRequest,
@@ -78,7 +71,7 @@ void ResourceLoadNotifier::willSendRequest(
 
 void ResourceLoadNotifier::didReceiveResponse(ResourceLoader* loader,
                                               const ResourceResponse& r) {
-  activeDocumentLoader()->addResponse(r);
+  loader->documentLoader()->addResponse(r);
 
   if (Page* page = m_frame->page())
     page->progress()->incrementProgress(loader->identifier(), r);
@@ -120,7 +113,7 @@ void ResourceLoadNotifier::didLoadResourceByXMLHttpRequest(
       identifier, sourceString);
 }
 
-void ResourceLoadNotifier::dispatchAssignIdentifierToInitialRequest(
+void ResourceLoadNotifier::assignIdentifierToInitialRequest(
     unsigned long identifier,
     DocumentLoader* loader,
     const ResourceRequest& request) {
@@ -211,10 +204,6 @@ void ResourceLoadNotifier::sendRemainingDelegateMessages(
   else
     m_frame->loader()->client()->dispatchDidFailLoading(loader, identifier,
                                                         error);
-}
-
-DocumentLoader* ResourceLoadNotifier::activeDocumentLoader() const {
-  return m_frame->loader()->activeDocumentLoader();
 }
 
 }  // namespace WebCore

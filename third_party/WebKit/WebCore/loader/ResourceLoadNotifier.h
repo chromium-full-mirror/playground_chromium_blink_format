@@ -53,8 +53,6 @@ class ResourceLoadNotifier : public Noncopyable {
   void didCancelAuthenticationChallenge(ResourceLoader*,
                                         const AuthenticationChallenge&);
 
-  void assignIdentifierToInitialRequest(unsigned long identifier,
-                                        const ResourceRequest&);
   void willSendRequest(ResourceLoader*,
                        ResourceRequest&,
                        const ResourceResponse& redirectResponse);
@@ -65,9 +63,9 @@ class ResourceLoadNotifier : public Noncopyable {
   void didLoadResourceByXMLHttpRequest(unsigned long identifier,
                                        const ScriptString& sourceString);
 
-  void dispatchAssignIdentifierToInitialRequest(unsigned long identifier,
-                                                DocumentLoader*,
-                                                const ResourceRequest&);
+  void assignIdentifierToInitialRequest(unsigned long identifier,
+                                        DocumentLoader*,
+                                        const ResourceRequest&);
   void dispatchWillSendRequest(DocumentLoader*,
                                unsigned long identifier,
                                ResourceRequest&,
@@ -87,8 +85,6 @@ class ResourceLoadNotifier : public Noncopyable {
                                      const ResourceError&);
 
  private:
-  inline DocumentLoader* activeDocumentLoader() const;
-
   Frame* m_frame;
 };
 
