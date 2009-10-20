@@ -49,6 +49,14 @@ class DateInstance : public JSWrapperObject {
                              bool outputIsUTC,
                              WTF::GregorianDateTime&) const;
 
+  static PassRefPtr<Structure> createStructure(JSValue prototype) {
+    return Structure::create(prototype, TypeInfo(ObjectType, StructureFlags));
+  }
+
+ protected:
+  static const unsigned StructureFlags =
+      OverridesMarkChildren | JSWrapperObject::StructureFlags;
+
  private:
   virtual const ClassInfo* classInfo() const { return &info; }
 
