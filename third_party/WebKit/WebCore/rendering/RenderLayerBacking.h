@@ -166,8 +166,8 @@ class RenderLayerBacking : public GraphicsLayerClient {
   // Result is perspective origin in pixels.
   FloatPoint computePerspectiveOrigin(const IntRect& borderBox) const;
 
-  void updateLayerOpacity();
-  void updateLayerTransform();
+  void updateLayerOpacity(const RenderStyle*);
+  void updateLayerTransform(const RenderStyle*);
 
   // Return the opacity value that this layer should use for compositing.
   float compositingOpacity(float rendererOpacity) const;
