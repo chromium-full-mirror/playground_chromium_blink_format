@@ -80,6 +80,12 @@ class ResourceLoadNotifier : public Noncopyable {
                                        int length);
   void dispatchDidFinishLoading(DocumentLoader*, unsigned long identifier);
 
+  void sendRemainingDelegateMessages(DocumentLoader*,
+                                     unsigned long identifier,
+                                     const ResourceResponse&,
+                                     int length,
+                                     const ResourceError&);
+
  private:
   inline DocumentLoader* activeDocumentLoader() const;
 

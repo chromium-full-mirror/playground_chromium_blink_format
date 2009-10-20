@@ -2250,9 +2250,9 @@ bool FrameLoader::willLoadMediaElementURL(KURL& url) {
   unsigned long identifier;
   ResourceError error;
   requestFromDelegate(request, identifier, error);
-  sendRemainingDelegateMessages(
-      identifier, ResourceResponse(url, String(), -1, String(), String()), -1,
-      error);
+  notifier()->sendRemainingDelegateMessages(
+      m_documentLoader.get(), identifier,
+      ResourceResponse(url, String(), -1, String(), String()), -1, error);
 
   url = request.url();
 
@@ -2648,8 +2648,8 @@ void FrameLoader::commitProvisionalLoad(PassRefPtr<CachedPage> prpCachedPage) {
       // However, with today's computers and networking speeds, this won't
       // happen in practice.
       // Could be an issue with a giant local file.
-      sendRemainingDelegateMessages(
-          identifier, response,
+      notifier()->sendRemainingDelegateMessages(
+          m_documentLoader.get(), identifier, response,
           static_cast<int>(response.expectedContentLength()), error);
     }
 
@@ -3553,7 +3553,8 @@ unsigned long FrameLoader::loadResourceSynchronously(
 #endif
   }
 
-  sendRemainingDelegateMessages(identifier, response, data.size(), error);
+  notifier()->sendRemainingDelegateMessages(m_documentLoader.get(), identifier,
+                                            response, data.size(), error);
   return identifier;
 }
 
@@ -3818,25 +3819,6 @@ void FrameLoader::continueLoadAfterNewWindowPolicy(
       request, NavigationAction(), false, FrameLoadTypeStandard, formState);
 }
 
-void FrameLoader::sendRemainingDelegateMessages(
-    unsigned long identifier,
-    const ResourceResponse& response,
-    int length,
-    const ResourceError& error) {
-  if (!response.isNull())
-    notifier()->dispatchDidReceiveResponse(m_documentLoader.get(), identifier,
-                                           response);
-
-  if (length > 0)
-    notifier()->dispatchDidReceiveContentLength(m_documentLoader.get(),
-                                                identifier, length);
-
-  if (error.isNull())
-    notifier()->dispatchDidFinishLoading(m_documentLoader.get(), identifier);
-  else
-    m_client->dispatchDidFailLoading(m_documentLoader.get(), identifier, error);
-}
-
 void FrameLoader::requestFromDelegate(ResourceRequest& request,
                                       unsigned long& identifier,
                                       ResourceError& error) {
@@ -3894,8 +3876,9 @@ void FrameLoader::loadedResourceFromMemoryCache(
   unsigned long identifier;
   ResourceError error;
   requestFromDelegate(request, identifier, error);
-  sendRemainingDelegateMessages(identifier, resource->response(),
-                                resource->encodedSize(), error);
+  notifier()->sendRemainingDelegateMessages(m_documentLoader.get(), identifier,
+                                            resource->response(),
+                                            resource->encodedSize(), error);
 }
 
 void FrameLoader::applyUserAgent(ResourceRequest& request) {

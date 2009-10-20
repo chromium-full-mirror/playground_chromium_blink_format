@@ -194,6 +194,25 @@ void ResourceLoadNotifier::dispatchDidFinishLoading(DocumentLoader* loader,
 #endif
 }
 
+void ResourceLoadNotifier::sendRemainingDelegateMessages(
+    DocumentLoader* loader,
+    unsigned long identifier,
+    const ResourceResponse& response,
+    int length,
+    const ResourceError& error) {
+  if (!response.isNull())
+    dispatchDidReceiveResponse(loader, identifier, response);
+
+  if (length > 0)
+    dispatchDidReceiveContentLength(loader, identifier, length);
+
+  if (error.isNull())
+    dispatchDidFinishLoading(loader, identifier);
+  else
+    m_frame->loader()->client()->dispatchDidFailLoading(loader, identifier,
+                                                        error);
+}
+
 DocumentLoader* ResourceLoadNotifier::activeDocumentLoader() const {
   return m_frame->loader()->activeDocumentLoader();
 }
