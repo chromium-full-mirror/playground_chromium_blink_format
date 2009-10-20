@@ -29,7 +29,7 @@
 
 namespace WebCore {
 
-class CSSProperty {
+class CSSProperty : public FastAllocBase {
  public:
   CSSProperty(int propID,
               PassRefPtr<CSSValue> value,
