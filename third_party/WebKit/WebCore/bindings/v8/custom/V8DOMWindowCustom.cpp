@@ -53,6 +53,7 @@
 #include "SerializedScriptValue.h"
 #include "Settings.h"
 #include "SharedWorkerRepository.h"
+#include "WebSocket.h"
 #include "WindowFeatures.h"
 
 // Horizontal and vertical offset, from the parent content area, around newly
@@ -270,6 +271,12 @@ ACCESSOR_RUNTIME_ENABLER(DOMWindowMediaError) {
 #if ENABLE(SHARED_WORKERS)
 ACCESSOR_RUNTIME_ENABLER(DOMWindowSharedWorker) {
   return SharedWorkerRepository::isAvailable();
+}
+#endif
+
+#if ENABLE(WEB_SOCKETS)
+ACCESSOR_RUNTIME_ENABLER(DOMWindowWebSocket) {
+  return WebSocket::isAvailable();
 }
 #endif
 

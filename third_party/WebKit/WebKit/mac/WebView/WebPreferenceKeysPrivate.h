@@ -69,8 +69,6 @@
   @"WebKitLocalStorageEnabledPreferenceKey"
 #define WebKitExperimentalNotificationsEnabledPreferenceKey \
   @"WebKitExperimentalNotificationsEnabledPreferenceKey"
-#define WebKitExperimentalWebSocketsEnabledPreferenceKey \
-  @"WebKitExperimentalWebSocketsEnabledPreferenceKey"
 #define WebKitAllowAnimatedImagesPreferenceKey \
   @"WebKitAllowAnimatedImagesPreferenceKey"
 #define WebKitAllowAnimatedImageLoopingPreferenceKey \

@@ -53,6 +53,10 @@ class WebSocket : public RefCounted<WebSocket>,
                   public ActiveDOMObject,
                   public WebSocketChannelClient {
  public:
+#if USE(V8)
+  static void setIsAvailable(bool);
+  static bool isAvailable();
+#endif
   static PassRefPtr<WebSocket> create(ScriptExecutionContext* context) {
     return adoptRef(new WebSocket(context));
   }
