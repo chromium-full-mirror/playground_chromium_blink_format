@@ -46,13 +46,13 @@ class RuntimeMethod : public InternalFunction {
   }
 
   static PassRefPtr<Structure> createStructure(JSValue prototype) {
-    return Structure::create(prototype,
-                             TypeInfo(ObjectType, OverridesGetOwnPropertySlot |
-                                                      ImplementsHasInstance |
-                                                      OverridesMarkChildren));
+    return Structure::create(prototype, TypeInfo(ObjectType, StructureFlags));
   }
 
  private:
+  static const unsigned StructureFlags =
+      OverridesGetOwnPropertySlot | ImplementsHasInstance |
+      OverridesMarkChildren | InternalFunction::StructureFlags;
   static JSValue lengthGetter(ExecState*,
                               const Identifier&,
                               const PropertySlot&);

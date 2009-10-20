@@ -60,13 +60,14 @@ class JSDOMWindowShell : public DOMObject {
 
   static PassRefPtr<JSC::Structure> createStructure(JSC::JSValue prototype) {
     return JSC::Structure::create(
-        prototype,
-        JSC::TypeInfo(JSC::ObjectType, JSC::OverridesGetOwnPropertySlot |
-                                           JSC::OverridesMarkChildren |
-                                           JSC::OverridesGetPropertyNames));
+        prototype, JSC::TypeInfo(JSC::ObjectType, StructureFlags));
   }
 
  private:
+  static const unsigned StructureFlags =
+      JSC::OverridesGetOwnPropertySlot | JSC::OverridesMarkChildren |
+      JSC::OverridesGetPropertyNames | DOMObject::StructureFlags;
+
   virtual void markChildren(JSC::MarkStack&);
   virtual JSC::UString className() const;
   virtual bool getOwnPropertySlot(JSC::ExecState*,
