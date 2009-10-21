@@ -687,6 +687,10 @@ class V8Custom {
   DECLARE_CALLBACK(WorkerContextClearInterval);
   DECLARE_CALLBACK(WorkerContextAddEventListener);
   DECLARE_CALLBACK(WorkerContextRemoveEventListener);
+
+#if ENABLE(NOTIFICATIONS)
+  DECLARE_ACCESSOR_RUNTIME_ENABLER(WorkerContextWebkitNotifications);
+#endif
 #endif  // ENABLE(WORKERS)
 
 #if ENABLE(NOTIFICATIONS)
@@ -708,6 +712,10 @@ class V8Custom {
 #if ENABLE(SHARED_WORKERS)
   DECLARE_CALLBACK(SharedWorkerConstructor);
   DECLARE_ACCESSOR_RUNTIME_ENABLER(DOMWindowSharedWorker);
+#endif
+
+#if ENABLE(NOTIFICATIONS)
+  DECLARE_ACCESSOR_RUNTIME_ENABLER(DOMWindowWebkitNotifications);
 #endif
 
 #if ENABLE(WEB_SOCKETS)

@@ -34,6 +34,7 @@
 
 #include "DOMTimer.h"
 #include "ExceptionCode.h"
+#include "NotificationCenter.h"
 #include "ScheduledAction.h"
 #include "V8Binding.h"
 #include "V8CustomBinding.h"
@@ -44,6 +45,12 @@
 #include "WorkerContextExecutionProxy.h"
 
 namespace WebCore {
+
+#if ENABLE(NOTIFICATIONS)
+ACCESSOR_RUNTIME_ENABLER(WorkerContextWebkitNotifications) {
+  return NotificationCenter::isAvailable();
+}
+#endif
 
 ACCESSOR_GETTER(WorkerContextSelf) {
   INC_STATS(L"DOM.WorkerContext.self._get");

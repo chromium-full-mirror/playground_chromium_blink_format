@@ -48,6 +48,10 @@ class ScriptExecutionContext;
 class NotificationCenter : public RefCounted<NotificationCenter>,
                            public ActiveDOMObject {
  public:
+#if USE(V8)
+  static void setIsAvailable(bool);
+  static bool isAvailable();
+#endif
   static PassRefPtr<NotificationCenter> create(
       ScriptExecutionContext* context,
       NotificationPresenter* presenter) {
