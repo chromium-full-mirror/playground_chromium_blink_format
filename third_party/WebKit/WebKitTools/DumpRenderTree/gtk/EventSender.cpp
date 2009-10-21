@@ -136,7 +136,7 @@ static JSValueRef contextClickCallback(JSContextRef context,
 static void updateClickCount(int /* button */) {
   // FIXME: take the last clicked button number and the time of last click into
   // account.
-  if (lastClickPositionX != lastMousePositionX &&
+  if (lastClickPositionX != lastMousePositionX ||
       lastClickPositionY != lastMousePositionY)
     clickCount = 1;
   else
