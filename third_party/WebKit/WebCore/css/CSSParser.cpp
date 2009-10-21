@@ -1858,6 +1858,17 @@ void CSSParser::addFillValue(RefPtr<CSSValue>& lval,
     lval = rval;
 }
 
+static bool parseBackgroundClip(CSSParserValue* parserValue,
+                                RefPtr<CSSValue>& cssValue) {
+  if (parserValue->id == CSSValueBorderBox ||
+      parserValue->id == CSSValuePaddingBox ||
+      parserValue->id == CSSValueWebkitText) {
+    cssValue = CSSPrimitiveValue::createIdentifier(parserValue->id);
+    return true;
+  }
+  return false;
+}
+
 const int cMaxFillProperties = 9;
 
 bool CSSParser::parseFillShorthand(int propId,
@@ -1917,6 +1928,7 @@ bool CSSParser::parseFillShorthand(int propId,
         RefPtr<CSSValue> val1;
         RefPtr<CSSValue> val2;
         int propId1, propId2;
+        CSSParserValue* parserValue = m_valueList->current();
         if (parseFillProperty(properties[i], propId1, propId2, val1, val2)) {
           parsedProperty[i] = found = true;
           addFillValue(values[i], val1.release());
@@ -1929,8 +1941,7 @@ bool CSSParser::parseFillShorthand(int propId,
           if (properties[i] == CSSPropertyBackgroundOrigin ||
               properties[i] == CSSPropertyWebkitMaskOrigin) {
             // Reparse the value as a clip, and see if we succeed.
-            if (parseFillProperty(CSSPropertyBackgroundClip, propId1, propId2,
-                                  val1, val2))
+            if (parseBackgroundClip(parserValue, val1))
               addFillValue(
                   clipValue,
                   val1.release());  // The property parsed successfully.
@@ -2629,11 +2640,8 @@ bool CSSParser::parseFillProperty(int propId,
           }
           break;
         case CSSPropertyBackgroundClip:
-          if (val->id == CSSValueBorderBox || val->id == CSSValuePaddingBox ||
-              val->id == CSSValueWebkitText) {
-            currValue = CSSPrimitiveValue::createIdentifier(val->id);
+          if (parseBackgroundClip(val, currValue))
             m_valueList->next();
-          }
           break;
         case CSSPropertyBackgroundOrigin:
           if (val->id == CSSValueBorderBox || val->id == CSSValuePaddingBox ||
