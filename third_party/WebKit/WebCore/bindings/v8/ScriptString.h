@@ -40,8 +40,8 @@ namespace WebCore {
 class ScriptString {
  public:
   ScriptString() : m_impl(0) {}
-  ScriptString(const String& s) : m_impl(new ScriptStringImpl(s)) {}
-  ScriptString(const char* s) : m_impl(new ScriptStringImpl(s)) {}
+  ScriptString(const String& s) : m_impl(ScriptStringImpl::create(s)) {}
+  ScriptString(const char* s) : m_impl(ScriptStringImpl::create(s)) {}
 
   operator String() const { return m_impl->toString(); }
 
@@ -49,7 +49,7 @@ class ScriptString {
   size_t size() const { return m_impl->size(); }
 
   ScriptString& operator=(const char* s) {
-    m_impl = new ScriptStringImpl(s);
+    m_impl = ScriptStringImpl::create(s);
     return *this;
   }
 
