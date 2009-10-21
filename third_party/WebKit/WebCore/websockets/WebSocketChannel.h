@@ -52,7 +52,7 @@ class WebSocketChannel : public RefCounted<WebSocketChannel>,
                                              WebSocketChannelClient* client,
                                              const KURL& url,
                                              const String& protocol) {
-    return new WebSocketChannel(context, client, url, protocol);
+    return adoptRef(new WebSocketChannel(context, client, url, protocol));
   }
   virtual ~WebSocketChannel();
 
