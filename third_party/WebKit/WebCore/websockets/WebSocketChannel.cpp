@@ -175,7 +175,7 @@ void WebSocketChannel::didReceiveData(SocketStreamHandle* handle,
           handle->close();
           return;
         }
-        length = length * 128 + *p & 0x7f;
+        length = length * 128 + (*p & 0x7f);
         ++p;
       }
       if (p + length < end) {
