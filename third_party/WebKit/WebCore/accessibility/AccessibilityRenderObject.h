@@ -135,6 +135,7 @@ class AccessibilityRenderObject : public AccessibilityObject {
   virtual bool exposesTitleUIElement() const;
   virtual AccessibilityObject* titleUIElement() const;
   virtual AccessibilityObject* correspondingControlForLabelElement() const;
+  virtual AccessibilityObject* correspondingLabelForControlElement() const;
 
   virtual AccessibilityRole ariaRoleAttribute() const;
   virtual bool isPresentationalChildOfAriaRole() const;
