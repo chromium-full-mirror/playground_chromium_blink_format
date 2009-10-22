@@ -113,10 +113,8 @@ class GraphicsLayerCA : public GraphicsLayer {
 
   virtual PlatformLayer* platformLayer() const;
 
-#ifndef NDEBUG
   virtual void setDebugBackgroundColor(const Color&);
   virtual void setDebugBorder(const Color&, float borderWidth);
-#endif
 
   virtual void setGeometryOrientation(CompositingCoordinatesOrientation);
 

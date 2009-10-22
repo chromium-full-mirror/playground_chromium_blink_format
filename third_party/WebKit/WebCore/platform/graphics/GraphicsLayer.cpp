@@ -57,12 +57,8 @@ void KeyframeValueList::insert(const AnimationValue* value) {
 GraphicsLayer::GraphicsLayer(GraphicsLayerClient* client)
     : m_client(client),
       m_anchorPoint(0.5f, 0.5f, 0),
-      m_opacity(1)
-#ifndef NDEBUG
-      ,
-      m_zPosition(0)
-#endif
-      ,
+      m_opacity(1),
+      m_zPosition(0),
       m_backgroundColorSet(false),
       m_contentsOpaque(false),
       m_preserves3D(false),
@@ -74,13 +70,8 @@ GraphicsLayer::GraphicsLayer(GraphicsLayerClient* client)
       m_geometryOrientation(CompositingCoordinatesTopDown),
       m_contentsOrientation(CompositingCoordinatesTopDown),
       m_parent(0),
-      m_maskLayer(0)
-#ifndef NDEBUG
-      ,
-      m_repaintCount(0)
-#endif
-{
-}
+      m_maskLayer(0),
+      m_repaintCount(0) {}
 
 GraphicsLayer::~GraphicsLayer() {
   removeAllChildren();
@@ -219,7 +210,6 @@ void GraphicsLayer::suspendAnimations(double) {}
 
 void GraphicsLayer::resumeAnimations() {}
 
-#ifndef NDEBUG
 void GraphicsLayer::updateDebugIndicators() {
   if (GraphicsLayer::showDebugBorders()) {
     if (drawsContent()) {
@@ -240,7 +230,6 @@ void GraphicsLayer::updateDebugIndicators() {
 void GraphicsLayer::setZPosition(float position) {
   m_zPosition = position;
 }
-#endif
 
 float GraphicsLayer::accumulatedOpacity() const {
   if (!preserves3D())
