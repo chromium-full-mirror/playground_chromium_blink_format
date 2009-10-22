@@ -61,6 +61,7 @@ class Instance;
 namespace WebCore {
 class Element;
 class Frame;
+class Image;
 class KeyboardEvent;
 class MouseEvent;
 class KURL;
@@ -275,7 +276,7 @@ class PluginView : public Widget,
   void invalidateWindowlessPluginRect(const IntRect&);
 
 #if PLATFORM(WIN_OS) && !PLATFORM(WX) && ENABLE(NETSCAPE_PLUGIN_API)
-  void paintWindowedPluginIntoContext(GraphicsContext*, const IntRect&) const;
+  void paintWindowedPluginIntoContext(GraphicsContext*, const IntRect&);
   static HDC WINAPI hookedBeginPaint(HWND, PAINTSTRUCT*);
   static BOOL WINAPI hookedEndPaint(HWND, const PAINTSTRUCT*);
 #endif
@@ -310,6 +311,11 @@ class PluginView : public Widget,
 #if defined(Q_WS_X11) && ENABLE(NETSCAPE_PLUGIN_API)
   void handleFocusInEvent();
   void handleFocusOutEvent();
+#endif
+
+#if PLATFORM(WIN_OS)
+  void paintIntoTransformedContext(HDC);
+  PassRefPtr<Image> snapshot();
 #endif
 
   int m_mode;
