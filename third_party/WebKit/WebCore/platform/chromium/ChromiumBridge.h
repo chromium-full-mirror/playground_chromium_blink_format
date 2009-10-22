@@ -32,11 +32,10 @@
 #define ChromiumBridge_h
 
 #include "FileSystem.h"
+#include "ImageSource.h"
 #include "LinkHash.h"
 #include "PassRefPtr.h"
 #include "PasteboardPrivate.h"
-
-class NativeImageSkia;
 
 typedef struct NPObject NPObject;
 typedef struct _NPP NPP_t;
@@ -84,9 +83,7 @@ class ChromiumBridge {
                                       bool);
   static void clipboardWritePlainText(const String&);
   static void clipboardWriteURL(const KURL&, const String&);
-  static void clipboardWriteImage(const NativeImageSkia*,
-                                  const KURL&,
-                                  const String&);
+  static void clipboardWriteImage(NativeImagePtr, const KURL&, const String&);
 
   // Cookies ------------------------------------------------------------
   static void setCookies(const KURL& url,
