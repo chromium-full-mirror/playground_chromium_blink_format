@@ -80,7 +80,15 @@ class WebPage : public QWebPage {
   virtual QWebPage* createWindow(QWebPage::WebWindowType);
 
  private:
-  void applyProxy();
+  void applyProxy() {
+    QUrl proxyUrl = QWebView::guessUrlFromString(qgetenv("http_proxy"));
+
+    if (proxyUrl.isValid() && !proxyUrl.host().isEmpty()) {
+      int proxyPort = (proxyUrl.port() > 0) ? proxyUrl.port() : 8080;
+      networkAccessManager()->setProxy(
+          QNetworkProxy(QNetworkProxy::HttpProxy, proxyUrl.host(), proxyPort));
+    }
+  }
 };
 
 class MainView : public QGraphicsView {
@@ -90,6 +98,9 @@ class MainView : public QGraphicsView {
   MainView(QWidget* parent) : QGraphicsView(parent), m_mainWidget(0) {
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    setFrameShape(QFrame::NoFrame);
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   }
 
   void setMainWidget(QGraphicsWidget* widget) {
@@ -189,8 +200,7 @@ class MainWindow : public QMainWindow {
     setAttribute(Qt::WA_DeleteOnClose);
 
     view->setScene(scene->scene());
-    view->setFrameShape(QFrame::NoFrame);
-    view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
     setCentralWidget(view);
 
     view->setMainWidget(scene->webView());
@@ -342,16 +352,6 @@ QWebPage* WebPage::createWindow(QWebPage::WebWindowType) {
   MainWindow* mw = new MainWindow;
   mw->show();
   return mw->page();
-}
-
-void WebPage::applyProxy() {
-  QUrl proxyUrl = QWebView::guessUrlFromString(qgetenv("http_proxy"));
-
-  if (proxyUrl.isValid() && !proxyUrl.host().isEmpty()) {
-    int proxyPort = (proxyUrl.port() > 0) ? proxyUrl.port() : 8080;
-    networkAccessManager()->setProxy(
-        QNetworkProxy(QNetworkProxy::HttpProxy, proxyUrl.host(), proxyPort));
-  }
 }
 
 int main(int argc, char** argv) {
