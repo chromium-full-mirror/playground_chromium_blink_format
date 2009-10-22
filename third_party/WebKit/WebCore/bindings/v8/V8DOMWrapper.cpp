@@ -1524,6 +1524,7 @@ v8::Handle<v8::Value> V8DOMWrapper::convertEventTargetToV8Object(
 }
 
 v8::Handle<v8::Value> V8DOMWrapper::convertEventListenerToV8Object(
+    ScriptExecutionContext* context,
     EventListener* listener) {
   if (!listener)
     return v8::Null();
@@ -1531,7 +1532,7 @@ v8::Handle<v8::Value> V8DOMWrapper::convertEventListenerToV8Object(
   // FIXME: can a user take a lazy event listener and set to other places?
   V8AbstractEventListener* v8listener =
       static_cast<V8AbstractEventListener*>(listener);
-  return v8listener->getListenerObject();
+  return v8listener->getListenerObject(context);
 }
 
 PassRefPtr<EventListener> V8DOMWrapper::getEventListener(
@@ -1553,8 +1554,7 @@ PassRefPtr<EventListener> V8DOMWrapper::getEventListener(
     return (lookup == ListenerFindOnly)
                ? V8EventListenerList::findWrapper(value, isAttribute)
                : V8EventListenerList::findOrCreateWrapper<V8EventListener>(
-                     proxy->frame(), proxy->listenerGuard(), value,
-                     isAttribute);
+                     proxy->listenerGuard(), value, isAttribute);
 
   return 0;
 }
@@ -1586,8 +1586,7 @@ PassRefPtr<EventListener> V8DOMWrapper::getEventListener(
     return (lookup == ListenerFindOnly)
                ? V8EventListenerList::findWrapper(value, isAttribute)
                : V8EventListenerList::findOrCreateWrapper<V8EventListener>(
-                     proxy->frame(), proxy->listenerGuard(), value,
-                     isAttribute);
+                     proxy->listenerGuard(), value, isAttribute);
 
   return 0;
 }
@@ -1611,8 +1610,7 @@ PassRefPtr<EventListener> V8DOMWrapper::getEventListener(
     return (lookup == ListenerFindOnly)
                ? V8EventListenerList::findWrapper(value, isAttribute)
                : V8EventListenerList::findOrCreateWrapper<V8EventListener>(
-                     proxy->frame(), proxy->listenerGuard(), value,
-                     isAttribute);
+                     proxy->listenerGuard(), value, isAttribute);
 
   return 0;
 }
@@ -1651,8 +1649,7 @@ PassRefPtr<EventListener> V8DOMWrapper::getEventListener(
     return (lookup == ListenerFindOnly)
                ? V8EventListenerList::findWrapper(value, isAttribute)
                : V8EventListenerList::findOrCreateWrapper<V8EventListener>(
-                     proxy->frame(), proxy->listenerGuard(), value,
-                     isAttribute);
+                     proxy->listenerGuard(), value, isAttribute);
 
 #if ENABLE(WORKERS)
   WorkerContextExecutionProxy* workerContextProxy =
@@ -1674,8 +1671,7 @@ PassRefPtr<EventListener> V8DOMWrapper::getEventListener(
     return (lookup == ListenerFindOnly)
                ? V8EventListenerList::findWrapper(value, isAttribute)
                : V8EventListenerList::findOrCreateWrapper<V8EventListener>(
-                     proxy->frame(), proxy->listenerGuard(), value,
-                     isAttribute);
+                     proxy->listenerGuard(), value, isAttribute);
 
   return 0;
 }

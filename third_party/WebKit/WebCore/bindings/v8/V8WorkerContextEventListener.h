@@ -45,12 +45,11 @@ class WorkerContextExecutionProxy;
 class V8WorkerContextEventListener : public V8EventListener {
  public:
   static PassRefPtr<V8WorkerContextEventListener> create(
-      WorkerContextExecutionProxy* proxy,
       PassRefPtr<V8ListenerGuard> guard,
       v8::Local<v8::Object> listener,
       bool isInline) {
     return adoptRef(
-        new V8WorkerContextEventListener(proxy, guard, listener, isInline));
+        new V8WorkerContextEventListener(guard, listener, isInline));
   }
 
   virtual void handleEvent(ScriptExecutionContext*, Event*);
@@ -59,19 +58,16 @@ class V8WorkerContextEventListener : public V8EventListener {
                            const String& url,
                            int lineNumber);
 
-  WorkerContextExecutionProxy* proxy() const { return m_proxy; }
-
  private:
-  V8WorkerContextEventListener(WorkerContextExecutionProxy*,
-                               PassRefPtr<V8ListenerGuard>,
+  V8WorkerContextEventListener(PassRefPtr<V8ListenerGuard>,
                                v8::Local<v8::Object> listener,
                                bool isInline);
 
   virtual v8::Local<v8::Value> callListenerFunction(
+      ScriptExecutionContext*,
       v8::Handle<v8::Value> jsEvent,
       Event*);
-  v8::Local<v8::Object> getReceiverObject(Event*);
-  WorkerContextExecutionProxy* m_proxy;
+  v8::Local<v8::Object> getReceiverObject(ScriptExecutionContext*, Event*);
 };
 
 }  // namespace WebCore

@@ -36,18 +36,25 @@
 
 #include "Event.h"
 #include "V8Binding.h"
+#include "WorkerContext.h"
 #include "WorkerContextExecutionProxy.h"
 
 namespace WebCore {
 
+static WorkerContextExecutionProxy* workerProxy(
+    ScriptExecutionContext* context) {
+  ASSERT(context->isWorkerContext());
+  WorkerContext* workerContext = static_cast<WorkerContext*>(context);
+  return workerContext->script()->proxy();
+}
+
 V8WorkerContextEventListener::V8WorkerContextEventListener(
-    WorkerContextExecutionProxy* proxy,
     PassRefPtr<V8ListenerGuard> guard,
     v8::Local<v8::Object> listener,
     bool isInline)
-    : V8EventListener(0, guard, listener, isInline), m_proxy(proxy) {}
+    : V8EventListener(guard, listener, isInline) {}
 
-void V8WorkerContextEventListener::handleEvent(ScriptExecutionContext*,
+void V8WorkerContextEventListener::handleEvent(ScriptExecutionContext* context,
                                                Event* event) {
   // Is the EventListener disconnected?
   if (disconnected())
@@ -60,12 +67,16 @@ void V8WorkerContextEventListener::handleEvent(ScriptExecutionContext*,
 
   v8::HandleScope handleScope;
 
-  v8::Handle<v8::Context> context = m_proxy->context();
-  if (context.IsEmpty())
+  WorkerContextExecutionProxy* proxy = workerProxy(context);
+  if (!proxy)
+    return;
+
+  v8::Handle<v8::Context> v8Context = proxy->context();
+  if (v8Context.IsEmpty())
     return;
 
   // Enter the V8 context in which to perform the event handling.
-  v8::Context::Scope scope(context);
+  v8::Context::Scope scope(v8Context);
 
   // Get the V8 wrapper for the event object.
   v8::Handle<v8::Value> jsEvent =
@@ -74,7 +85,7 @@ void V8WorkerContextEventListener::handleEvent(ScriptExecutionContext*,
   invokeEventHandler(context, event, jsEvent);
 }
 
-bool V8WorkerContextEventListener::reportError(ScriptExecutionContext*,
+bool V8WorkerContextEventListener::reportError(ScriptExecutionContext* context,
                                                const String& message,
                                                const String& url,
                                                int lineNumber) {
@@ -88,14 +99,18 @@ bool V8WorkerContextEventListener::reportError(ScriptExecutionContext*,
 
   v8::HandleScope handleScope;
 
-  v8::Handle<v8::Context> context = m_proxy->context();
-  if (context.IsEmpty())
+  WorkerContextExecutionProxy* proxy = workerProxy(context);
+  if (!proxy)
+    return false;
+
+  v8::Handle<v8::Context> v8Context = proxy->context();
+  if (v8Context.IsEmpty())
     return false;
 
   // Enter the V8 context in which to perform the event handling.
-  v8::Context::Scope scope(context);
+  v8::Context::Scope scope(v8Context);
 
-  v8::Local<v8::Object> listener = getListenerObject();
+  v8::Local<v8::Object> listener = getListenerObject(context);
   v8::Local<v8::Value> returnValue;
   {
     // Catch exceptions thrown in calling the function so they do not propagate
@@ -130,24 +145,27 @@ bool V8WorkerContextEventListener::reportError(ScriptExecutionContext*,
 }
 
 v8::Local<v8::Value> V8WorkerContextEventListener::callListenerFunction(
+    ScriptExecutionContext* context,
     v8::Handle<v8::Value> jsEvent,
     Event* event) {
-  v8::Local<v8::Function> handlerFunction = getListenerFunction();
-  v8::Local<v8::Object> receiver = getReceiverObject(event);
+  v8::Local<v8::Function> handlerFunction = getListenerFunction(context);
+  v8::Local<v8::Object> receiver = getReceiverObject(context, event);
   if (handlerFunction.IsEmpty() || receiver.IsEmpty())
     return v8::Local<v8::Value>();
 
   v8::Handle<v8::Value> parameters[1] = {jsEvent};
   v8::Local<v8::Value> result = handlerFunction->Call(receiver, 1, parameters);
 
-  m_proxy->trackEvent(event);
+  if (WorkerContextExecutionProxy* proxy = workerProxy(context))
+    proxy->trackEvent(event);
 
   return result;
 }
 
 v8::Local<v8::Object> V8WorkerContextEventListener::getReceiverObject(
+    ScriptExecutionContext* context,
     Event* event) {
-  v8::Local<v8::Object> listener = getListenerObject();
+  v8::Local<v8::Object> listener = getListenerObject(context);
 
   if (!listener.IsEmpty() && !listener->IsFunction())
     return listener;

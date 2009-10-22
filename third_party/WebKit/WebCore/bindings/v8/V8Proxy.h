@@ -275,7 +275,6 @@ class V8Proxy {
   // Returns V8 Context of a frame. If none exists, creates
   // a new context. It is potentially slow and consumes memory.
   static v8::Local<v8::Context> context(Frame*);
-  static PassRefPtr<SharedPersistent<v8::Context>> shared_context(Frame*);
   static v8::Local<v8::Context> mainWorldContext(Frame*);
   static v8::Local<v8::Context> currentContext();
 
@@ -322,11 +321,7 @@ class V8Proxy {
   static int sourceLineNumber();
   static String sourceName();
 
-  v8::Handle<v8::Context> context() { return m_context->get(); }
-
-  PassRefPtr<SharedPersistent<v8::Context>> shared_context() {
-    return m_context;
-  }
+  v8::Local<v8::Context> context();
 
   PassRefPtr<V8ListenerGuard> listenerGuard() { return m_listenerGuard; }
 
@@ -417,7 +412,7 @@ class V8Proxy {
 
   Frame* m_frame;
 
-  RefPtr<SharedPersistent<v8::Context>> m_context;
+  v8::Persistent<v8::Context> m_context;
 
   RefPtr<V8ListenerGuard> m_listenerGuard;
 
@@ -477,6 +472,8 @@ v8::Handle<v8::Value> V8Proxy::constructDOMObject(const v8::Arguments& args) {
       obj.get(), v8::Persistent<v8::Object>::New(args.Holder()));
   return args.Holder();
 }
+
+v8::Local<v8::Context> toV8Context(ScriptExecutionContext*);
 
 // Used by an interceptor callback that it hasn't found anything to
 // intercept.

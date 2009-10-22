@@ -87,7 +87,7 @@ class V8IsolatedWorld {
   }
 
   v8::Handle<v8::Context> context() { return m_context->get(); }
-  PassRefPtr<SharedPersistent<v8::Context>> shared_context() {
+  PassRefPtr<SharedPersistent<v8::Context>> sharedContext() {
     return m_context;
   }
 

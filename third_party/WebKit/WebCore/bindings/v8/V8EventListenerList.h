@@ -55,9 +55,8 @@ class V8EventListenerList {
     return doFindWrapper(v8::Local<v8::Object>::Cast(value), wrapperProperty);
   }
 
-  template <typename WrapperType, typename ContextType>
+  template <typename WrapperType>
   static PassRefPtr<V8EventListener> findOrCreateWrapper(
-      ContextType*,
       PassRefPtr<V8ListenerGuard>,
       v8::Local<v8::Value>,
       bool isAttribute);
@@ -86,9 +85,8 @@ class V8EventListenerList {
   }
 };
 
-template <typename WrapperType, typename ContextType>
+template <typename WrapperType>
 PassRefPtr<V8EventListener> V8EventListenerList::findOrCreateWrapper(
-    ContextType* context,
     PassRefPtr<V8ListenerGuard> guard,
     v8::Local<v8::Value> value,
     bool isAttribute) {
@@ -104,7 +102,7 @@ PassRefPtr<V8EventListener> V8EventListenerList::findOrCreateWrapper(
     return wrapper;
 
   PassRefPtr<V8EventListener> wrapperPtr =
-      WrapperType::create(context, guard, object, isAttribute);
+      WrapperType::create(guard, object, isAttribute);
   if (wrapperPtr)
     object->SetHiddenValue(wrapperProperty,
                            v8::External::Wrap(wrapperPtr.get()));

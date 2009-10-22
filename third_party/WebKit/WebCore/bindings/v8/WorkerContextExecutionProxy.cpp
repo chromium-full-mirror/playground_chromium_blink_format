@@ -429,8 +429,8 @@ WorkerContextExecutionProxy::findOrCreateEventListener(
     bool findOnly) {
   return findOnly ? V8EventListenerList::findWrapper(object, isInline)
                   : V8EventListenerList::findOrCreateWrapper<
-                        V8WorkerContextEventListener>(this, m_listenerGuard,
-                                                      object, isInline);
+                        V8WorkerContextEventListener>(m_listenerGuard, object,
+                                                      isInline);
 }
 
 void WorkerContextExecutionProxy::trackEvent(Event* event) {
