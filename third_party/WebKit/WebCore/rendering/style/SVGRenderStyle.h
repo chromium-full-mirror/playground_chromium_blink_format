@@ -30,6 +30,7 @@
 #include "GraphicsTypes.h"
 #include "SVGPaint.h"
 #include "SVGRenderStyleDefs.h"
+#include "ShadowData.h"
 
 #include <wtf/Platform.h>
 
@@ -245,6 +246,13 @@ class SVGRenderStyle : public RefCounted<SVGRenderStyle> {
                                                           baselineShiftValue,
                                                           0)
 
+  SVG_RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL_OWNPTR(ShadowData,
+                                                      shadowSVG,
+                                                      shadow,
+                                                      Shadow,
+                                                      shadow,
+                                                      0)
+
   // convenience
   bool hasStroke() const {
     return (strokePaint()->paintType() != SVGPaint::SVG_PAINTTYPE_NONE);
@@ -328,6 +336,7 @@ class SVGRenderStyle : public RefCounted<SVGRenderStyle> {
   DataRef<StyleClipData> clip;
   DataRef<StyleMaskData> mask;
   DataRef<StyleMiscData> misc;
+  DataRef<StyleShadowSVGData> shadowSVG;
 
  private:
   enum CreateDefaultType { CreateDefault };

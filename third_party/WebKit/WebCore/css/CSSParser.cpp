@@ -3993,7 +3993,11 @@ bool CSSParser::parseShadow(int propId, bool important) {
         // shadow
         // value.  Treat as invalid.
         return false;
-
+#if ENABLE(SVG)
+      // -webkit-shadow does not support multiple values.
+      if (static_cast<CSSPropertyID>(propId) == CSSPropertyWebkitShadow)
+        return false;
+#endif
       // The value is good.  Commit it.
       context.commitValue();
     } else if (validUnit(val, FLength, true)) {

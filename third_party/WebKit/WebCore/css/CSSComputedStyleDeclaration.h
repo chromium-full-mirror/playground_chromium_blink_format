@@ -27,6 +27,7 @@
 namespace WebCore {
 
 class CSSMutableStyleDeclaration;
+class ShadowData;
 
 enum EUpdateLayout { DoNotUpdateLayout = false, UpdateLayout = true };
 
@@ -70,6 +71,8 @@ class CSSComputedStyleDeclaration : public CSSStyleDeclaration {
                            const String& value,
                            bool important,
                            ExceptionCode&);
+
+  PassRefPtr<CSSValue> valueForShadow(const ShadowData*, int) const;
 
   RefPtr<Node> m_node;
 };
