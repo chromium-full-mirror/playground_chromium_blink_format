@@ -77,6 +77,7 @@
 #include "LocalizedStrings.h"
 #include "Cache.h"
 #include "runtime/InitializeThreading.h"
+#include "PageGroup.h"
 
 #include <QApplication>
 #include <QBasicTimer>
@@ -298,6 +299,8 @@ QWebPagePrivate::QWebPagePrivate(QWebPage* qq)
 
   history.d = new QWebHistoryPrivate(page->backForwardList());
   memset(actions, 0, sizeof(actions));
+
+  PageGroup::setShouldTrackVisitedLinks(true);
 }
 
 QWebPagePrivate::~QWebPagePrivate() {
