@@ -31,21 +31,26 @@
 #include "config.h"
 #include "SSLKeyGenerator.h"
 
+#include "ChromiumBridge.h"
+#include "PlatformString.h"
+
 namespace WebCore {
 
-// These are defined in webkit/glue/localized_strings.cpp.
+// These are defined in webkit/api/src/LocalizedStrings.cpp.
 String keygenMenuHighGradeKeySize();
 String keygenMenuMediumGradeKeySize();
 
-// Returns the key sizes supported by the HTML keygen tag.  The first string
-// is displayed as the default key size in the keygen menu.
-Vector<String> supportedKeySizes() {
-  Vector<String> sizes(2);
+void getSupportedKeySizes(Vector<String>& sizes) {
+  sizes.resize(2);
   sizes[0] = keygenMenuHighGradeKeySize();
   sizes[1] = keygenMenuMediumGradeKeySize();
-  return sizes;
 }
 
-// FIXME: implement signedPublicKeyAndChallengeString here.
+String signedPublicKeyAndChallengeString(unsigned keySizeIndex,
+                                         const String& challengeString,
+                                         const KURL& url) {
+  return ChromiumBridge::signedPublicKeyAndChallengeString(
+      keySizeIndex, challengeString, url);
+}
 
 }  // namespace WebCore

@@ -36,14 +36,6 @@
 
 namespace WebCore {
 
-String signedPublicKeyAndChallengeString(unsigned, const String&, const KURL&) {
-  notImplemented();
-  return String();
-}
-void getSupportedKeySizes(Vector<String>&) {
-  notImplemented();
-}
-
 String KURL::fileSystemPath() const {
   notImplemented();
   return String();
