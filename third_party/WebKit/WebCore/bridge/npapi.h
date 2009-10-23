@@ -54,6 +54,12 @@
 #endif /* XP_WIN */
 #endif /* _WIN32 */
 
+#ifdef __SYMBIAN32__
+#ifndef XP_SYMBIAN
+#define XP_SYMBIAN 1
+#endif
+#endif /* __SYMBIAN32__ */
+
 #ifdef __MWERKS__
 #define _declspec __declspec
 #ifdef macintosh
@@ -62,19 +68,14 @@
 #endif /* XP_MAC */
 #endif /* macintosh */
 #ifdef __INTEL__
+#ifndef XP_SYMBIAN
 #undef NULL
 #ifndef XP_WIN
 #define XP_WIN 1
+#endif /* XP_WIN */
+#endif /* XP_SYMBIAN */
 #endif /* __INTEL__ */
-#endif /* XP_PC */
 #endif /* __MWERKS__ */
-
-#ifdef __SYMBIAN32__
-#ifndef XP_SYMBIAN
-#define XP_SYMBIAN 1
-#undef XP_WIN
-#endif
-#endif /* __SYMBIAN32__ */
 
 #if defined(__APPLE_CC__) && !defined(__MACOS_CLASSIC__) && !defined(XP_UNIX)
 #define XP_MACOSX
