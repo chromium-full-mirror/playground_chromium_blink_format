@@ -33,6 +33,7 @@
 
 #if ENABLE(INSPECTOR)
 
+#include "Cache.h"
 #include "CachedResource.h"
 #include "DocLoader.h"
 #include "DocumentLoader.h"
@@ -222,6 +223,20 @@ void InspectorResource::releaseScriptObject(InspectorFrontend* frontend,
   frontend->removeResource(m_identifier);
 }
 
+CachedResource* InspectorResource::cachedResource() const {
+  // Try hard to find a corresponding CachedResource. During preloading,
+  // DocLoader may not have the resource in document resources set yet,
+  // but Inspector will already try to fetch data that is only available via
+  // CachedResource (and it won't update once the resource is added,
+  // because m_changes will not have the appropriate bits set).
+  const String& url = requestURL();
+  CachedResource* cachedResource =
+      m_frame->document()->docLoader()->cachedResource(url);
+  if (!cachedResource)
+    cachedResource = cache()->resourceForURL(url);
+  return cachedResource;
+}
+
 InspectorResource::Type InspectorResource::type() const {
   if (!m_xmlHttpResponseText.isNull())
     return XHR;
@@ -233,8 +248,7 @@ InspectorResource::Type InspectorResource::type() const {
       m_requestURL == m_loader->frameLoader()->iconURL())
     return Image;
 
-  CachedResource* cachedResource =
-      m_frame->document()->docLoader()->cachedResource(requestURL());
+  CachedResource* cachedResource = this->cachedResource();
   if (!cachedResource)
     return Other;
 
@@ -282,8 +296,7 @@ PassRefPtr<SharedBuffer> InspectorResource::resourceData(
     return m_loader->mainResourceData();
   }
 
-  CachedResource* cachedResource =
-      m_frame->document()->docLoader()->cachedResource(requestURL());
+  CachedResource* cachedResource = this->cachedResource();
   if (!cachedResource)
     return 0;
 
