@@ -2130,6 +2130,10 @@ static LRESULT CALLBACK WebViewWndProc(HWND hWnd,
       // Send blur events unless we're losing focus to a child of ours.
       if (!IsChild(hWnd, newFocusWnd))
         focusController->setFocused(false);
+
+      // If we are pan-scrolling when we lose focus, stop the pan scrolling.
+      frame->eventHandler()->stopAutoscrollTimer();
+
       break;
     }
     case WM_WINDOWPOSCHANGED:
