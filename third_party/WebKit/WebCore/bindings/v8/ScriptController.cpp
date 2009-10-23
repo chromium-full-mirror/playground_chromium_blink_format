@@ -412,4 +412,9 @@ void ScriptController::updateDocument() {
   m_proxy->updateDocument();
 }
 
+// FIXME: Stub method so we compile.  Currently called from FrameLoader.cpp.
+DOMWrapperWorld* mainThreadNormalWorld() {
+  return 0;
+}
+
 }  // namespace WebCore

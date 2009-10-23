@@ -119,7 +119,9 @@ class ScriptExecutionContext {
   void removeTimeout(int timeoutId);
   DOMTimer* findTimeout(int timeoutId);
 
+#if USE(JSC)
   JSC::JSGlobalData* globalData();
+#endif
 
  protected:
   // Explicitly override the security origin for this script context.

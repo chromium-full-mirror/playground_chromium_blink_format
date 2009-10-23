@@ -48,7 +48,9 @@
 #include <wtf/RefCountedLeakCounter.h>
 
 #if USE(JSC)
+#include "JSDOMBinding.h"
 #include "JSDOMWindow.h"
+#include <runtime/Protect.h>
 #endif
 
 namespace WebCore {
