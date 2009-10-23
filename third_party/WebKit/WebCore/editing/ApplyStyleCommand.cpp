@@ -388,17 +388,29 @@ RefPtr<CSSMutableStyleDeclaration> getPropertiesNotInComputedStyle(
 // FIXME: The current editingStyleProperties contains all inheritableProperties
 // but we may not need to preserve all inheritable properties
 static const int editingStyleProperties[] = {
-    CSSPropertyBackgroundColor,
     // CSS inheritable properties
-    CSSPropertyBorderCollapse, CSSPropertyColor, CSSPropertyFontFamily,
-    CSSPropertyFontSize, CSSPropertyFontStyle, CSSPropertyFontVariant,
-    CSSPropertyFontWeight, CSSPropertyLetterSpacing, CSSPropertyLineHeight,
-    CSSPropertyOrphans, CSSPropertyTextAlign, CSSPropertyTextIndent,
-    CSSPropertyTextTransform, CSSPropertyWhiteSpace, CSSPropertyWidows,
-    CSSPropertyWordSpacing, CSSPropertyWebkitBorderHorizontalSpacing,
+    CSSPropertyBorderCollapse,
+    CSSPropertyColor,
+    CSSPropertyFontFamily,
+    CSSPropertyFontSize,
+    CSSPropertyFontStyle,
+    CSSPropertyFontVariant,
+    CSSPropertyFontWeight,
+    CSSPropertyLetterSpacing,
+    CSSPropertyLineHeight,
+    CSSPropertyOrphans,
+    CSSPropertyTextAlign,
+    CSSPropertyTextIndent,
+    CSSPropertyTextTransform,
+    CSSPropertyWhiteSpace,
+    CSSPropertyWidows,
+    CSSPropertyWordSpacing,
+    CSSPropertyWebkitBorderHorizontalSpacing,
     CSSPropertyWebkitBorderVerticalSpacing,
-    CSSPropertyWebkitTextDecorationsInEffect, CSSPropertyWebkitTextFillColor,
-    CSSPropertyWebkitTextSizeAdjust, CSSPropertyWebkitTextStrokeColor,
+    CSSPropertyWebkitTextDecorationsInEffect,
+    CSSPropertyWebkitTextFillColor,
+    CSSPropertyWebkitTextSizeAdjust,
+    CSSPropertyWebkitTextStrokeColor,
     CSSPropertyWebkitTextStrokeWidth,
 };
 size_t numEditingStyleProperties =

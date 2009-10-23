@@ -52,8 +52,6 @@ class IndentOutdentCommand : public CompositeEditCommand {
   void indentRegion();
   void outdentRegion();
   void outdentParagraph();
-  PassRefPtr<Element> prepareBlockquoteLevelForInsertion(const VisiblePosition&,
-                                                         RefPtr<Element>&);
   bool tryIndentingAsListItem(const VisiblePosition&);
   void indentIntoBlockquote(const VisiblePosition&,
                             const VisiblePosition&,

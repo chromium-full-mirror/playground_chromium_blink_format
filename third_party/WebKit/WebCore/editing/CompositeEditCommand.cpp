@@ -797,6 +797,145 @@ void CompositeEditCommand::pushPartiallySelectedAnchorElementsDown() {
   setEndingSelection(originalSelection);
 }
 
+// Clone the paragraph between start and end under blockElement,
+// preserving the hierarchy up to outerNode.
+
+void CompositeEditCommand::cloneParagraphUnderNewElement(
+    Position& start,
+    Position& end,
+    Node* outerNode,
+    Element* blockElement) {
+  // First we clone the outerNode
+
+  RefPtr<Node> lastNode = outerNode->cloneNode(isTableElement(outerNode));
+  appendNode(lastNode, blockElement);
+
+  if (start.node() != outerNode) {
+    Vector<RefPtr<Node>> ancestors;
+
+    // Insert each node from innerNode to outerNode (excluded) in a list.
+    for (Node* n = start.node(); n && n != outerNode; n = n->parentNode())
+      ancestors.append(n);
+
+    // Clone every node between start.node() and outerBlock.
+
+    for (size_t i = ancestors.size(); i != 0; --i) {
+      Node* item = ancestors[i - 1].get();
+      RefPtr<Node> child = item->cloneNode(isTableElement(item));
+      appendNode(child, static_cast<Element*>(lastNode.get()));
+      lastNode = child.release();
+    }
+  }
+
+  // Handle the case of paragraphs with more than one node,
+  // cloning all the siblings until end.node() is reached.
+
+  if (start.node() != end.node()) {
+    for (Node* n = start.node()->nextSibling(); n != NULL;
+         n = n->nextSibling()) {
+      RefPtr<Node> clonedNode = n->cloneNode(true);
+      insertNodeAfter(clonedNode, lastNode);
+      lastNode = clonedNode.release();
+      if (n == end.node())
+        break;
+    }
+  }
+}
+
+// There are bugs in deletion when it removes a fully selected table/list.
+// It expands and removes the entire table/list, but will let content
+// before and after the table/list collapse onto one line.
+// Deleting a paragraph will leave a placeholder. Remove it (and prune
+// empty or unrendered parents).
+
+void CompositeEditCommand::cleanupAfterDeletion() {
+  VisiblePosition caretAfterDelete = endingSelection().visibleStart();
+  if (isStartOfParagraph(caretAfterDelete) &&
+      isEndOfParagraph(caretAfterDelete)) {
+    // Note: We want the rightmost candidate.
+    Position position = caretAfterDelete.deepEquivalent().downstream();
+    Node* node = position.node();
+    // Normally deletion will leave a br as a placeholder.
+    if (node->hasTagName(brTag))
+      removeNodeAndPruneAncestors(node);
+    // If the selection to move was empty and in an empty block that
+    // doesn't require a placeholder to prop itself open (like a bordered
+    // div or an li), remove it during the move (the list removal code
+    // expects this behavior).
+    else if (isBlock(node))
+      removeNodeAndPruneAncestors(node);
+    else if (lineBreakExistsAtPosition(position)) {
+      // There is a preserved '\n' at caretAfterDelete.
+      // We can safely assume this is a text node.
+      Text* textNode = static_cast<Text*>(node);
+      if (textNode->length() == 1)
+        removeNodeAndPruneAncestors(node);
+      else
+        deleteTextFromNode(textNode, position.deprecatedEditingOffset(), 1);
+    }
+  }
+}
+
+// This is a version of moveParagraph that preserves style by keeping the
+// original markup
+// It is currently used only by IndentOutdentCommand but it is meant to be used
+// in the
+// future by several other commands such as InsertList and the align commands.
+// The blockElement parameter is the element to move the paragraph to,
+// outerNode is the top element of the paragraph hierarchy.
+
+void CompositeEditCommand::moveParagraphWithClones(
+    const VisiblePosition& startOfParagraphToMove,
+    const VisiblePosition& endOfParagraphToMove,
+    Element* blockElement,
+    Node* outerNode) {
+  ASSERT(outerNode);
+  ASSERT(blockElement);
+
+  VisiblePosition beforeParagraph = startOfParagraphToMove.previous();
+  VisiblePosition afterParagraph(endOfParagraphToMove.next());
+
+  // We upstream() the end and downstream() the start so that we don't include
+  // collapsed whitespace in the move.
+  // When we paste a fragment, spaces after the end and before the start are
+  // treated as though they were rendered.
+  Position start = startOfParagraphToMove.deepEquivalent().downstream();
+  Position end = endOfParagraphToMove.deepEquivalent().upstream();
+
+  cloneParagraphUnderNewElement(start, end, outerNode, blockElement);
+
+  setEndingSelection(VisibleSelection(start, end, DOWNSTREAM));
+  deleteSelection(false, false, false, false);
+
+  // There are bugs in deletion when it removes a fully selected table/list.
+  // It expands and removes the entire table/list, but will let content
+  // before and after the table/list collapse onto one line.
+
+  cleanupAfterDeletion();
+
+  // Add a br if pruning an empty block level element caused a collapse.  For
+  // example:
+  // foo^
+  // <div>bar</div>
+  // baz
+  // Imagine moving 'bar' to ^.  'bar' will be deleted and its div pruned.  That
+  // would
+  // cause 'baz' to collapse onto the line with 'foobar' unless we insert a br.
+  // Must recononicalize these two VisiblePositions after the pruning above.
+  beforeParagraph = VisiblePosition(beforeParagraph.deepEquivalent());
+  afterParagraph = VisiblePosition(afterParagraph.deepEquivalent());
+
+  if (beforeParagraph.isNotNull() &&
+      !isTableElement(beforeParagraph.deepEquivalent().node()) &&
+      (!isEndOfParagraph(beforeParagraph) ||
+       beforeParagraph == afterParagraph)) {
+    // FIXME: Trim text between beforeParagraph and afterParagraph if they
+    // aren't equal.
+    insertNodeAt(createBreakElement(document()),
+                 beforeParagraph.deepEquivalent());
+  }
+}
+
 // This moves a paragraph preserving its style.
 void CompositeEditCommand::moveParagraph(
     const VisiblePosition& startOfParagraphToMove,
@@ -877,7 +1016,7 @@ void CompositeEditCommand::moveParagraphs(
       endRangeCompliant.deprecatedEditingOffset());
 
   // FIXME: This is an inefficient way to preserve style on nodes in the
-  // paragraph to move.  It
+  // paragraph to move. It
   // shouldn't matter though, since moved paragraphs will usually be quite
   // small.
   RefPtr<DocumentFragment> fragment =
@@ -910,43 +1049,14 @@ void CompositeEditCommand::moveParagraphs(
 
   ASSERT(destination.deepEquivalent().node()->inDocument());
 
-  // There are bugs in deletion when it removes a fully selected table/list.
-  // It expands and removes the entire table/list, but will let content
-  // before and after the table/list collapse onto one line.
+  cleanupAfterDeletion();
 
-  // Deleting a paragraph will leave a placeholder.  Remove it (and prune
-  // empty or unrendered parents).
-  VisiblePosition caretAfterDelete = endingSelection().visibleStart();
-  if (isStartOfParagraph(caretAfterDelete) &&
-      isEndOfParagraph(caretAfterDelete)) {
-    // Note: We want the rightmost candidate.
-    Position position = caretAfterDelete.deepEquivalent().downstream();
-    Node* node = position.node();
-    // Normally deletion will leave a br as a placeholder.
-    if (node->hasTagName(brTag))
-      removeNodeAndPruneAncestors(node);
-    // If the selection to move was empty and in an empty block that
-    // doesn't require a placeholder to prop itself open (like a bordered
-    // div or an li), remove it during the move (the list removal code
-    // expects this behavior).
-    else if (isBlock(node))
-      removeNodeAndPruneAncestors(node);
-    else if (lineBreakExistsAtVisiblePosition(caretAfterDelete)) {
-      // There is a preserved '\n' at caretAfterDelete.
-      Text* textNode = static_cast<Text*>(node);
-      if (textNode->length() == 1)
-        removeNodeAndPruneAncestors(node);
-      else
-        deleteTextFromNode(textNode, position.deprecatedEditingOffset(), 1);
-    }
-  }
-
-  // Add a br if pruning an empty block level element caused a collapse.  For
+  // Add a br if pruning an empty block level element caused a collapse. For
   // example:
   // foo^
   // <div>bar</div>
   // baz
-  // Imagine moving 'bar' to ^.  'bar' will be deleted and its div pruned.  That
+  // Imagine moving 'bar' to ^. 'bar' will be deleted and its div pruned. That
   // would
   // cause 'baz' to collapse onto the line with 'foobar' unless we insert a br.
   // Must recononicalize these two VisiblePositions after the pruning above.
