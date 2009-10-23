@@ -165,6 +165,7 @@ ThreadIdentifier createThreadInternal(ThreadFunction entryPoint,
                      static_cast<void*>(threadData))) {
     LOG_ERROR("Failed to create pthread at entry point %p with data %p",
               entryPoint, data);
+    delete threadData;
     return 0;
   }
   return establishIdentifierForPthreadHandle(threadHandle);
