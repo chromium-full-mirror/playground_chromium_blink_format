@@ -768,8 +768,11 @@ void FrameLoaderClientWx::windowObjectCleared() {
     wxWebViewWindowObjectClearedEvent wkEvent(m_webView);
     Frame* coreFrame = m_webView->GetMainFrame()->GetFrame();
     JSGlobalContextRef context =
-        toGlobalRef(coreFrame->script()->globalObject()->globalExec());
-    JSObjectRef windowObject = toRef(coreFrame->script()->globalObject());
+        toGlobalRef(coreFrame->script()
+                        ->globalObject(mainThreadNormalWorld())
+                        ->globalExec());
+    JSObjectRef windowObject =
+        toRef(coreFrame->script()->globalObject(mainThreadNormalWorld()));
     wkEvent.SetJSContext(context);
     wkEvent.SetWindowObject(windowObject);
     m_webView->GetEventHandler()->ProcessEvent(wkEvent);

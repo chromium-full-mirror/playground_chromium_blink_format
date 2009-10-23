@@ -191,7 +191,10 @@ wxString wxWebFrame::RunScript(const wxString& javascript) {
         m_impl->frame->script()->executeScript(javascript, true).jsValue();
     if (result)
       returnValue = wxString(
-          result.toString(m_impl->frame->script()->globalObject()->globalExec())
+          result
+              .toString(m_impl->frame->script()
+                            ->globalObject(WebCore::mainThreadNormalWorld())
+                            ->globalExec())
               .UTF8String()
               .c_str(),
           wxConvUTF8);
