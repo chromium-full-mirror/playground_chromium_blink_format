@@ -73,6 +73,7 @@ class FrameView;
 class HitTestRequest;
 class HTMLCanvasElement;
 class HTMLCollection;
+class HTMLAllCollection;
 class HTMLDocument;
 class HTMLElement;
 class HTMLFormElement;
@@ -341,11 +342,12 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   PassRefPtr<HTMLCollection> links();
   PassRefPtr<HTMLCollection> forms();
   PassRefPtr<HTMLCollection> anchors();
-  PassRefPtr<HTMLCollection> all();
   PassRefPtr<HTMLCollection> objects();
   PassRefPtr<HTMLCollection> scripts();
   PassRefPtr<HTMLCollection> windowNamedItems(const String& name);
   PassRefPtr<HTMLCollection> documentNamedItems(const String& name);
+
+  PassRefPtr<HTMLAllCollection> all();
 
   // Find first anchor with the given name.
   // First searches for an element with the given ID, but if that fails, then

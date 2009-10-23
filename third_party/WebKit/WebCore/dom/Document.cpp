@@ -60,6 +60,7 @@
 #include "FrameLoader.h"
 #include "FrameTree.h"
 #include "FrameView.h"
+#include "HTMLAllCollection.h"
 #include "HTMLAnchorElement.h"
 #include "HTMLBodyElement.h"
 #include "HTMLCanvasElement.h"
@@ -4064,8 +4065,8 @@ PassRefPtr<HTMLCollection> Document::anchors() {
   return HTMLCollection::create(this, DocAnchors);
 }
 
-PassRefPtr<HTMLCollection> Document::all() {
-  return HTMLCollection::create(this, DocAll);
+PassRefPtr<HTMLAllCollection> Document::all() {
+  return HTMLAllCollection::create(this);
 }
 
 PassRefPtr<HTMLCollection> Document::windowNamedItems(const String& name) {
