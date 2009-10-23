@@ -240,6 +240,7 @@ class MediaControlVolumeSliderElement : public MediaControlInputElement {
  public:
   MediaControlVolumeSliderElement(Document*, HTMLMediaElement*);
   virtual void defaultEventHandler(Event*);
+  virtual void update();
 };
 
 // ----------------------------
