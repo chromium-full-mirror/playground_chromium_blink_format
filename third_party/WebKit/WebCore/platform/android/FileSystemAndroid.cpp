@@ -30,12 +30,12 @@
 
 #include "CString.h"
 #include "StringBuilder.h"
-#include <fnmatch.h>
-#include <dlfcn.h>
-#include <dirent.h>
-#include <errno.h>
-#include <sys/stat.h>
 #include "cutils/log.h"
+#include <dirent.h>
+#include <dlfcn.h>
+#include <errno.h>
+#include <fnmatch.h>
+#include <sys/stat.h>
 
 namespace WebCore {
 
@@ -70,7 +70,7 @@ CString openTemporaryFile(const char* prefix, PlatformFileHandle& handle) {
 }
 
 bool unloadModule(PlatformModule module) {
-  return dlclose(module) == 0;
+  return !dlclose(module);
 }
 
 void closeFile(PlatformFileHandle& handle) {
@@ -87,7 +87,7 @@ int writeToFile(PlatformFileHandle handle, const char* data, int length) {
         write(handle, data, (size_t)(length - totalBytesWritten));
     if (bytesWritten < 0 && errno != EINTR)
       return -1;
-    else if (bytesWritten > 0)
+    if (bytesWritten > 0)
       totalBytesWritten += bytesWritten;
   }
 
