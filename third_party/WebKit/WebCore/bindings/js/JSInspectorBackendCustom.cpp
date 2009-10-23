@@ -133,8 +133,10 @@ JSValue JSInspectorBackend::databaseForId(ExecState* exec,
   Database* database = impl()->databaseForId(args.at(0).toInt32(exec));
   if (!database)
     return jsUndefined();
+  // Could use currentWorld(exec) ... but which exec!  The following mixed use
+  // of exec & inspectedWindow->globalExec() scares me!
   JSDOMWindow* inspectedWindow =
-      toJSDOMWindow(ic->inspectedPage()->mainFrame());
+      toJSDOMWindow(ic->inspectedPage()->mainFrame(), debuggerWorld());
   return JSInspectedObjectWrapper::wrap(inspectedWindow->globalExec(),
                                         toJS(exec, database));
 }
@@ -145,7 +147,7 @@ JSValue JSInspectorBackend::inspectedWindow(ExecState*, const ArgList&) {
   if (!ic)
     return jsUndefined();
   JSDOMWindow* inspectedWindow =
-      toJSDOMWindow(ic->inspectedPage()->mainFrame());
+      toJSDOMWindow(ic->inspectedPage()->mainFrame(), debuggerWorld());
   return JSInspectedObjectWrapper::wrap(inspectedWindow->globalExec(),
                                         inspectedWindow);
 }
@@ -267,7 +269,7 @@ JSValue JSInspectorBackend::nodeForId(ExecState* exec, const ArgList& args) {
 
   JSLock lock(SilenceAssertionsOnly);
   JSDOMWindow* inspectedWindow =
-      toJSDOMWindow(ic->inspectedPage()->mainFrame());
+      toJSDOMWindow(ic->inspectedPage()->mainFrame(), debuggerWorld());
   return JSInspectedObjectWrapper::wrap(
       inspectedWindow->globalExec(),
       toJS(exec,

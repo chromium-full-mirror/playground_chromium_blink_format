@@ -34,6 +34,7 @@ class AtomicString;
 class DOMWindow;
 class Event;
 class Frame;
+class DOMWrapperWorld;
 class JSDOMWindow;
 class JSDOMWindowShell;
 class JSLocation;
@@ -51,7 +52,7 @@ class JSDOMWindowBase : public JSDOMGlobalObject {
                   JSDOMWindowShell*);
 
  public:
-  void updateDocument();
+  void updateDocument(DOMWrapperWorld*);
 
   DOMWindow* impl() const { return d()->impl.get(); }
   virtual ScriptExecutionContext* scriptExecutionContext() const;
@@ -108,7 +109,7 @@ JSC::JSValue toJS(JSC::ExecState*, JSDOMGlobalObject*, DOMWindow*);
 JSC::JSValue toJS(JSC::ExecState*, DOMWindow*);
 
 // Returns JSDOMWindow or 0
-JSDOMWindow* toJSDOMWindow(Frame*);
+JSDOMWindow* toJSDOMWindow(Frame*, DOMWrapperWorld*);
 JSDOMWindow* toJSDOMWindow(JSC::JSValue);
 
 }  // namespace WebCore

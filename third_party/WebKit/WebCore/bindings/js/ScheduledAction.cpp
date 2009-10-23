@@ -48,22 +48,26 @@ using namespace JSC;
 
 namespace WebCore {
 
-ScheduledAction* ScheduledAction::create(ExecState* exec, const ArgList& args) {
+ScheduledAction* ScheduledAction::create(ExecState* exec,
+                                         const ArgList& args,
+                                         DOMWrapperWorld* isolatedWorld) {
   JSValue v = args.at(0);
   CallData callData;
   if (v.getCallData(callData) == CallTypeNone) {
     UString string = v.toString(exec);
     if (exec->hadException())
       return 0;
-    return new ScheduledAction(string);
+    return new ScheduledAction(string, isolatedWorld);
   }
   ArgList argsTail;
   args.getSlice(2, argsTail);
-  return new ScheduledAction(v, argsTail);
+  return new ScheduledAction(v, argsTail, isolatedWorld);
 }
 
-ScheduledAction::ScheduledAction(JSValue function, const ArgList& args)
-    : m_function(function) {
+ScheduledAction::ScheduledAction(JSValue function,
+                                 const ArgList& args,
+                                 DOMWrapperWorld* isolatedWorld)
+    : m_function(function), m_isolatedWorld(isolatedWorld) {
   ArgList::const_iterator end = args.end();
   for (ArgList::const_iterator it = args.begin(); it != end; ++it)
     m_args.append(*it);
@@ -100,7 +104,8 @@ void ScheduledAction::executeFunctionInContext(JSGlobalObject* globalObject,
     args.append(m_args[i]);
 
   globalObject->globalData()->timeoutChecker.start();
-  call(exec, m_function, callType, callData, thisValue, args);
+  callInWorld(exec, m_function, callType, callData, thisValue, args,
+              m_isolatedWorld.get());
   globalObject->globalData()->timeoutChecker.stop();
 
   if (exec->hadException())
@@ -108,7 +113,7 @@ void ScheduledAction::executeFunctionInContext(JSGlobalObject* globalObject,
 }
 
 void ScheduledAction::execute(Document* document) {
-  JSDOMWindow* window = toJSDOMWindow(document->frame());
+  JSDOMWindow* window = toJSDOMWindow(document->frame(), m_isolatedWorld.get());
   if (!window)
     return;
 
@@ -122,7 +127,8 @@ void ScheduledAction::execute(Document* document) {
     executeFunctionInContext(window, window->shell());
     Document::updateStyleForAllDocuments();
   } else
-    frame->script()->executeScript(m_code);
+    frame->script()->executeScriptInIsolatedWorld(m_isolatedWorld.get(),
+                                                  m_code);
 
   frame->script()->setProcessingTimerCallback(false);
 }

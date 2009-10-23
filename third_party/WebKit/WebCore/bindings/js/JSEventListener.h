@@ -32,8 +32,9 @@ class JSDOMGlobalObject;
 class JSEventListener : public EventListener {
  public:
   static PassRefPtr<JSEventListener> create(JSC::JSObject* listener,
-                                            bool isAttribute) {
-    return adoptRef(new JSEventListener(listener, isAttribute));
+                                            bool isAttribute,
+                                            DOMWrapperWorld* isolatedWorld) {
+    return adoptRef(new JSEventListener(listener, isAttribute, isolatedWorld));
   }
 
   static const JSEventListener* cast(const EventListener* listener) {
@@ -63,10 +64,13 @@ class JSEventListener : public EventListener {
   void clearJSFunctionInline();
 
  protected:
-  JSEventListener(JSC::JSObject* function, bool isAttribute);
+  JSEventListener(JSC::JSObject* function,
+                  bool isAttribute,
+                  DOMWrapperWorld* isolatedWorld);
 
   mutable JSC::JSObject* m_jsFunction;
   bool m_isAttribute;
+  RefPtr<DOMWrapperWorld> m_isolatedWorld;
 };
 
 }  // namespace WebCore

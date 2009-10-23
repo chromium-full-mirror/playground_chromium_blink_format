@@ -73,7 +73,7 @@ bool getQuarantinedScriptObject(Database* database,
   if (!frame)
     return false;
 
-  JSDOMGlobalObject* globalObject = toJSDOMWindow(frame);
+  JSDOMGlobalObject* globalObject = toJSDOMWindow(frame, debuggerWorld());
   ExecState* exec = globalObject->globalExec();
 
   JSLock lock(SilenceAssertionsOnly);
@@ -92,7 +92,7 @@ bool getQuarantinedScriptObject(Storage* storage,
   Frame* frame = storage->frame();
   ASSERT(frame);
 
-  JSDOMGlobalObject* globalObject = toJSDOMWindow(frame);
+  JSDOMGlobalObject* globalObject = toJSDOMWindow(frame, debuggerWorld());
   ExecState* exec = globalObject->globalExec();
 
   JSLock lock(SilenceAssertionsOnly);
@@ -123,7 +123,7 @@ bool getQuarantinedScriptObject(DOMWindow* domWindow,
                                 ScriptObject& quarantinedObject) {
   ASSERT(domWindow);
 
-  JSDOMWindow* window = toJSDOMWindow(domWindow->frame());
+  JSDOMWindow* window = toJSDOMWindow(domWindow->frame(), debuggerWorld());
   ExecState* exec = window->globalExec();
 
   JSLock lock(SilenceAssertionsOnly);

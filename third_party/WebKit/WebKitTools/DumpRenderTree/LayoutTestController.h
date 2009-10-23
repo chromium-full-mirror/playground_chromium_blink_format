@@ -297,6 +297,9 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
   void showWebInspector();
   void closeWebInspector();
   void evaluateInWebInspector(long callId, JSStringRef script);
+  void evaluateScriptInIsolatedWorld(unsigned worldId,
+                                     JSObjectRef globalObject,
+                                     JSStringRef script);
 
   void setPOSIXLocale(JSStringRef locale);
 

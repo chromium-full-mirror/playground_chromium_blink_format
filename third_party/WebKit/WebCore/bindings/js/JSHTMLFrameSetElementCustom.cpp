@@ -48,7 +48,7 @@ bool JSHTMLFrameSetElement::canGetItemsForName(ExecState*,
   return frame && frame->hasTagName(frameTag);
 }
 
-JSValue JSHTMLFrameSetElement::nameGetter(ExecState*,
+JSValue JSHTMLFrameSetElement::nameGetter(ExecState* exec,
                                           const Identifier& propertyName,
                                           const PropertySlot& slot) {
   JSHTMLElement* thisObj =
@@ -58,7 +58,8 @@ JSValue JSHTMLFrameSetElement::nameGetter(ExecState*,
   Node* frame = element->children()->namedItem(propertyName);
   if (Document* doc =
           static_cast<HTMLFrameElement*>(frame)->contentDocument()) {
-    if (JSDOMWindowShell* window = toJSDOMWindowShell(doc->frame()))
+    if (JSDOMWindowShell* window =
+            toJSDOMWindowShell(doc->frame(), currentWorld(exec)))
       return window;
   }
 

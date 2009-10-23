@@ -34,6 +34,7 @@
 #include "c_utility.h"
 #include "c_instance.h"
 #include "IdentifierRep.h"
+#include "JSDOMBinding.h"
 #include "npruntime_impl.h"
 #include "npruntime_priv.h"
 #include "runtime_root.h"
@@ -129,8 +130,8 @@ bool _NPN_InvokeDefault(NPP,
     getListFromVariantArgs(exec, args, argCount, rootObject, argList);
     ProtectedPtr<JSGlobalObject> globalObject = rootObject->globalObject();
     globalObject->globalData()->timeoutChecker.start();
-    JSValue resultV =
-        call(exec, function, callType, callData, function, argList);
+    JSValue resultV = callInWorld(exec, function, callType, callData, function,
+                                  argList, pluginWorld());
     globalObject->globalData()->timeoutChecker.stop();
 
     // Convert and return the result of the function call.
@@ -186,8 +187,8 @@ bool _NPN_Invoke(NPP npp,
     getListFromVariantArgs(exec, args, argCount, rootObject, argList);
     ProtectedPtr<JSGlobalObject> globalObject = rootObject->globalObject();
     globalObject->globalData()->timeoutChecker.start();
-    JSValue resultV =
-        call(exec, function, callType, callData, obj->imp, argList);
+    JSValue resultV = callInWorld(exec, function, callType, callData, obj->imp,
+                                  argList, pluginWorld());
     globalObject->globalData()->timeoutChecker.stop();
 
     // Convert and return the result of the function call.
@@ -216,9 +217,9 @@ bool _NPN_Evaluate(NPP, NPObject* o, NPString* s, NPVariant* variant) {
     String scriptString = convertNPStringToUTF16(s);
     ProtectedPtr<JSGlobalObject> globalObject = rootObject->globalObject();
     globalObject->globalData()->timeoutChecker.start();
-    Completion completion = JSC::evaluate(globalObject->globalExec(),
-                                          globalObject->globalScopeChain(),
-                                          makeSource(scriptString));
+    Completion completion = evaluateInWorld(
+        globalObject->globalExec(), globalObject->globalScopeChain(),
+        makeSource(scriptString), JSC::JSValue(), pluginWorld());
     globalObject->globalData()->timeoutChecker.stop();
     ComplType type = completion.complType();
 
@@ -469,8 +470,8 @@ bool _NPN_Construct(NPP,
     getListFromVariantArgs(exec, args, argCount, rootObject, argList);
     ProtectedPtr<JSGlobalObject> globalObject = rootObject->globalObject();
     globalObject->globalData()->timeoutChecker.start();
-    JSValue resultV =
-        construct(exec, constructor, constructType, constructData, argList);
+    JSValue resultV = constructInWorld(exec, constructor, constructType,
+                                       constructData, argList, pluginWorld());
     globalObject->globalData()->timeoutChecker.stop();
 
     // Convert and return the result.

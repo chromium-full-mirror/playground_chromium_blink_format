@@ -92,7 +92,8 @@ String JSCustomXPathNSResolver::lookupNamespaceURI(const String& prefix) {
 
   m_globalObject->globalData()->timeoutChecker.start();
   JSValue retval =
-      call(exec, function, callType, callData, m_customResolver, args);
+      callInWorld(exec, function, callType, callData, m_customResolver, args,
+                  currentWorld(m_globalObject->globalExec()));
   m_globalObject->globalData()->timeoutChecker.stop();
 
   String result;

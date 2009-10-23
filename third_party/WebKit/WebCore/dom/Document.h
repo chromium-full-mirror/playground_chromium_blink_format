@@ -81,6 +81,7 @@ class HTMLInputElement;
 class HTMLMapElement;
 class InspectorTimelineAgent;
 class IntPoint;
+class DOMWrapperWorld;
 class JSNode;
 class MouseEventWithHitTestResults;
 class NodeFilter;
@@ -955,7 +956,14 @@ class Document : public ContainerNode, public ScriptExecutionContext {
                                             // thread asynchronously.
 
   typedef HashMap<WebCore::Node*, JSNode*> JSWrapperCache;
-  JSWrapperCache& wrapperCache() { return m_wrapperCache; }
+  typedef HashMap<DOMWrapperWorld*, JSWrapperCache*> JSWrapperCacheMap;
+  JSWrapperCacheMap& wrapperCacheMap() { return m_wrapperCacheMap; }
+  JSWrapperCache* getWrapperCache(DOMWrapperWorld* world) {
+    if (JSWrapperCache* wrapperCache = m_wrapperCacheMap.get(world))
+      return wrapperCache;
+    return createWrapperCache(world);
+  }
+  JSWrapperCache* createWrapperCache(DOMWrapperWorld*);
 
   virtual void finishedParsing();
 
@@ -1308,7 +1316,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
 
   unsigned m_numNodeListCaches;
 
-  JSWrapperCache m_wrapperCache;
+  JSWrapperCacheMap m_wrapperCacheMap;
 
 #if ENABLE(DATABASE)
   RefPtr<DatabaseThread> m_databaseThread;

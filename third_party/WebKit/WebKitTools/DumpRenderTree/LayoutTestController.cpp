@@ -31,6 +31,7 @@
 
 #include "WorkQueue.h"
 #include "WorkQueueItem.h"
+#include <JavaScriptCore/JSContextRef.h>
 #include <JavaScriptCore/JSObjectRef.h>
 #include <JavaScriptCore/JSRetainPtr.h>
 #include <stdio.h>
@@ -1435,6 +1436,27 @@ static JSValueRef evaluateInWebInspectorCallback(JSContextRef context,
   return JSValueMakeUndefined(context);
 }
 
+static JSValueRef evaluateScriptInIsolatedWorldCallback(
+    JSContextRef context,
+    JSObjectRef function,
+    JSObjectRef thisObject,
+    size_t argumentCount,
+    const JSValueRef arguments[],
+    JSValueRef* exception) {
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  double worldID = JSValueToNumber(context, arguments[0], exception);
+  ASSERT(!*exception);
+  JSRetainPtr<JSStringRef> script(
+      Adopt, JSValueToStringCopy(context, arguments[1], exception));
+  ASSERT(!*exception);
+
+  controller->evaluateScriptInIsolatedWorld(static_cast<unsigned>(worldID),
+                                            JSContextGetGlobalObject(context),
+                                            script.get());
+  return JSValueMakeUndefined(context);
+}
+
 static JSValueRef elementDoesAutoCompleteForElementWithIdCallback(
     JSContextRef context,
     JSObjectRef function,
@@ -1764,6 +1786,8 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
       {"encodeHostName", encodeHostNameCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"evaluateInWebInspector", evaluateInWebInspectorCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"evaluateScriptInIsolatedWorld", evaluateScriptInIsolatedWorldCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"execCommand", execCommandCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},

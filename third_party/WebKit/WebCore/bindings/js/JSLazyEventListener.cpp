@@ -42,8 +42,9 @@ JSLazyEventListener::JSLazyEventListener(const String& functionName,
                                          const String& code,
                                          Node* node,
                                          const String& sourceURL,
-                                         int lineNumber)
-    : JSEventListener(0, true),
+                                         int lineNumber,
+                                         DOMWrapperWorld* isolatedWorld)
+    : JSEventListener(0, true, isolatedWorld),
       m_functionName(functionName),
       m_eventParameterName(eventParameterName),
       m_code(code),
@@ -99,7 +100,8 @@ void JSLazyEventListener::parseCode(
   if (!scriptController->isEnabled())
     return;
 
-  JSDOMGlobalObject* globalObject = toJSDOMGlobalObject(executionContext);
+  JSDOMGlobalObject* globalObject =
+      toJSDOMGlobalObject(executionContext, m_isolatedWorld.get());
   if (!globalObject)
     return;
 

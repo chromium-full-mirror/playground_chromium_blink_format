@@ -52,12 +52,8 @@ namespace WebCore {
 void JSXMLHttpRequest::markChildren(MarkStack& markStack) {
   Base::markChildren(markStack);
 
-  if (XMLHttpRequestUpload* upload = m_impl->optionalUpload()) {
-    DOMObject* wrapper =
-        getCachedDOMObjectWrapper(*Heap::heap(this)->globalData(), upload);
-    if (wrapper)
-      markStack.append(wrapper);
-  }
+  if (XMLHttpRequestUpload* upload = m_impl->optionalUpload())
+    markDOMObjectWrapper(markStack, *Heap::heap(this)->globalData(), upload);
 
   m_impl->markEventListeners(markStack);
 }
@@ -158,9 +154,10 @@ JSValue JSXMLHttpRequest::addEventListener(ExecState* exec,
   if (!listener.isObject())
     return jsUndefined();
 
-  impl()->addEventListener(args.at(0).toString(exec),
-                           JSEventListener::create(asObject(listener), false),
-                           args.at(2).toBoolean(exec));
+  impl()->addEventListener(
+      args.at(0).toString(exec),
+      JSEventListener::create(asObject(listener), false, currentWorld(exec)),
+      args.at(2).toBoolean(exec));
   return jsUndefined();
 }
 
@@ -172,7 +169,8 @@ JSValue JSXMLHttpRequest::removeEventListener(ExecState* exec,
 
   impl()->removeEventListener(
       args.at(0).toString(exec),
-      JSEventListener::create(asObject(listener), false).get(),
+      JSEventListener::create(asObject(listener), false, currentWorld(exec))
+          .get(),
       args.at(2).toBoolean(exec));
   return jsUndefined();
 }

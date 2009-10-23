@@ -114,7 +114,7 @@ class JSDOMWindowShell : public DOMObject {
 };
 
 JSC::JSValue toJS(JSC::ExecState*, Frame*);
-JSDOMWindowShell* toJSDOMWindowShell(Frame*);
+JSDOMWindowShell* toJSDOMWindowShell(Frame*, DOMWrapperWorld*);
 
 }  // namespace WebCore
 

@@ -254,6 +254,12 @@ class DECLSPEC_UUID("{A3676398-4485-4a9d-87DC-CB5A40E6351D}") WebFrame
       /* [in] */ BSTR url,
       /* [retval][out] */ BOOL* result);
 
+  virtual HRESULT STDMETHODCALLTYPE stringByEvaluatingJavaScriptInIsolatedWorld(
+      /* [in] */ unsigned int worldID,
+      /* [in] */ OLE_HANDLE jsGlobalObject,
+      /* [in] */ BSTR script,
+      /* [retval][out] */ BSTR* evaluationResult);
+
   // IWebDocumentText
   virtual HRESULT STDMETHODCALLTYPE supportsTextEncoding(
       /* [retval][out] */ BOOL* result);

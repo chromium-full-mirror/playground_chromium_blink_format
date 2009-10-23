@@ -44,12 +44,8 @@ namespace WebCore {
 void JSSharedWorker::markChildren(MarkStack& markStack) {
   Base::markChildren(markStack);
 
-  if (MessagePort* port = impl()->port()) {
-    DOMObject* wrapper =
-        getCachedDOMObjectWrapper(*Heap::heap(this)->globalData(), port);
-    if (wrapper)
-      markStack.append(wrapper);
-  }
+  if (MessagePort* port = impl()->port())
+    markDOMObjectWrapper(markStack, *Heap::heap(this)->globalData(), port);
 }
 
 }  // namespace WebCore

@@ -62,6 +62,8 @@ class WorkerScriptController : public Noncopyable {
 
   void forbidExecution();
 
+  JSC::JSGlobalData* globalData() { return m_globalData.get(); }
+
  private:
   void initScriptIfNeeded() {
     if (!m_workerContextWrapper)

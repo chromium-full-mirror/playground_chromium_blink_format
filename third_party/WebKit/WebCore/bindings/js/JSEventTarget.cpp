@@ -131,7 +131,7 @@ JSValue toJS(ExecState* exec,
 
   if (DedicatedWorkerContext* workerContext =
           target->toDedicatedWorkerContext())
-    return toJSDOMGlobalObject(workerContext);
+    return toJSDOMGlobalObject(workerContext, exec);
 #endif
 
 #if ENABLE(SHARED_WORKERS)
@@ -139,7 +139,7 @@ JSValue toJS(ExecState* exec,
     return toJS(exec, globalObject, sharedWorker);
 
   if (SharedWorkerContext* workerContext = target->toSharedWorkerContext())
-    return toJSDOMGlobalObject(workerContext);
+    return toJSDOMGlobalObject(workerContext, exec);
 #endif
 
 #if ENABLE(NOTIFICATIONS)

@@ -75,7 +75,7 @@ PassRefPtr<JSLazyEventListener> createAttributeEventListener(Node* node,
 
   return JSLazyEventListener::create(
       attr->localName().string(), eventParameterName(node->isSVGElement()),
-      attr->value(), node, sourceURL, lineNumber);
+      attr->value(), node, sourceURL, lineNumber, mainThreadNormalWorld());
 }
 
 PassRefPtr<JSLazyEventListener> createAttributeEventListener(Frame* frame,
@@ -101,7 +101,7 @@ PassRefPtr<JSLazyEventListener> createAttributeEventListener(Frame* frame,
   return JSLazyEventListener::create(
       attr->localName().string(),
       eventParameterName(frame->document()->isSVGDocument()), attr->value(), 0,
-      sourceURL, lineNumber);
+      sourceURL, lineNumber, mainThreadNormalWorld());
 }
 
 String getEventListenerHandlerBody(ScriptExecutionContext* context,
