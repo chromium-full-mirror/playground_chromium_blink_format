@@ -164,7 +164,6 @@ class XMLTokenizer : public Tokenizer, public CachedResourceClient {
   Vector<xmlChar> m_bufferedText;
 #endif
   Node* m_currentNode;
-  bool m_currentNodeIsReferenced;
 
   bool m_sawError;
   bool m_sawXSLTransform;

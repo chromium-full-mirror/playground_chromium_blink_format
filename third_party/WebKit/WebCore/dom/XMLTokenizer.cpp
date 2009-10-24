@@ -80,13 +80,11 @@ bool XMLTokenizer::isWMLDocument() const {
 #endif
 
 void XMLTokenizer::setCurrentNode(Node* n) {
-  bool nodeNeedsReference = n && n != m_doc;
-  if (nodeNeedsReference)
+  if (n && n != m_doc)
     n->ref();
-  if (m_currentNodeIsReferenced)
+  if (m_currentNode && m_currentNode != m_doc)
     m_currentNode->deref();
   m_currentNode = n;
-  m_currentNodeIsReferenced = nodeNeedsReference;
 }
 
 void XMLTokenizer::write(const SegmentedString& s, bool /*appendData*/) {
