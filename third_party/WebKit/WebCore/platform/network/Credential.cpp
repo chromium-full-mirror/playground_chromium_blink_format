@@ -30,7 +30,8 @@ namespace WebCore {
 // Need to enforce empty, non-null strings due to the pickiness of the String ==
 // String operator
 // combined with the semantics of the String(NSString*) constructor
-Credential::Credential() : m_user(""), m_password("") {}
+Credential::Credential()
+    : m_user(""), m_password(""), m_persistence(CredentialPersistenceNone) {}
 
 // Need to enforce empty, non-null strings due to the pickiness of the String ==
 // String operator
@@ -42,7 +43,7 @@ Credential::Credential(const String& user,
       m_password(password.length() ? password : ""),
       m_persistence(persistence) {}
 
-bool Credential::isEmpty() {
+bool Credential::isEmpty() const {
   return m_user.isEmpty() && m_password.isEmpty();
 }
 

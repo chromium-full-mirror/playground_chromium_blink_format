@@ -40,7 +40,7 @@ class Credential {
   Credential();
   Credential(const String& user, const String& password, CredentialPersistence);
 
-  bool isEmpty();
+  bool isEmpty() const;
 
   const String& user() const;
   const String& password() const;
