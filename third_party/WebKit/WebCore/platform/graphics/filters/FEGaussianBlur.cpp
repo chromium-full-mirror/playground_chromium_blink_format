@@ -58,14 +58,14 @@ void FEGaussianBlur::setStdDeviationY(float y) {
   m_y = y;
 }
 
-void boxBlur(CanvasPixelArray*& srcPixelArray,
-             CanvasPixelArray*& dstPixelArray,
-             unsigned dx,
-             int stride,
-             int strideLine,
-             int effectWidth,
-             int effectHeight,
-             bool alphaImage) {
+static void boxBlur(CanvasPixelArray*& srcPixelArray,
+                    CanvasPixelArray*& dstPixelArray,
+                    unsigned dx,
+                    int stride,
+                    int strideLine,
+                    int effectWidth,
+                    int effectHeight,
+                    bool alphaImage) {
   int dxLeft = static_cast<int>(floor(dx / 2));
   int dxRight = dx - dxLeft;
 
