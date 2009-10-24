@@ -173,6 +173,11 @@ static PassRefPtr<IsolatedWorld> findWorld(unsigned worldID) {
   return newWorld;
 }
 
+JSDOMWindow* ScriptController::globalObject(unsigned worldID) {
+  RefPtr<DOMWrapperWorld> world = findWorld(worldID);
+  return windowShell(world.get())->window();
+}
+
 ScriptValue ScriptController::evaluateInIsolatedWorld(
     unsigned worldID,
     const ScriptSourceCode& sourceCode) {

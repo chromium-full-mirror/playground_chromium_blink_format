@@ -83,6 +83,8 @@ class ScriptController {
   JSDOMWindow* globalObject(DOMWrapperWorld* world) {
     return windowShell(world)->window();
   }
+  JSDOMWindow* globalObject(unsigned worldID);
+
   void forgetWorld(DOMWrapperWorld* world) { m_windowShells.remove(world); }
 
   ScriptValue executeScript(const ScriptSourceCode&);

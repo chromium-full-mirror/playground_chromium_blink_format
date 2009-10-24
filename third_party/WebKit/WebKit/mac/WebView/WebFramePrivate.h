@@ -104,6 +104,7 @@ typedef enum {
                                          WithGlobalObject:
                                              (JSObjectRef)globalObject
                                                FromString:(NSString*)string;
+- (JSGlobalContextRef)contextForWorldID:(unsigned)worldID;
 
 // Pause a given CSS animation or transition on the target node at a specific
 // time.
