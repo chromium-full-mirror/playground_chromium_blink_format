@@ -168,6 +168,14 @@ class V8DOMWrapper {
 
   static v8::Handle<v8::Value> convertDocumentToV8Object(Document*);
 
+  static v8::Handle<v8::Value> convertNewNodeToV8Object(PassRefPtr<Node> node) {
+    return convertNewNodeToV8Object(node.get());
+  }
+
+  static v8::Handle<v8::Value> convertNewNodeToV8Object(Node* node) {
+    return convertNewNodeToV8Object(node, 0, getDOMNodeMap());
+  }
+
   static v8::Handle<v8::Value> convertNewNodeToV8Object(Node*,
                                                         V8Proxy*,
                                                         DOMWrapperMap<Node>&);
