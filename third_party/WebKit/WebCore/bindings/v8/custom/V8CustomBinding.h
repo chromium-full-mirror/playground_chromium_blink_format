@@ -367,6 +367,10 @@ class V8Custom {
   DECLARE_CALLBACK(HTMLCollectionNamedItem);
   DECLARE_CALLBACK(HTMLCollectionCallAsFunction);
 
+  DECLARE_CALLBACK(HTMLAllCollectionItem);
+  DECLARE_CALLBACK(HTMLAllCollectionNamedItem);
+  DECLARE_CALLBACK(HTMLAllCollectionCallAsFunction);
+
   DECLARE_CALLBACK(HTMLSelectElementRemove);
 
   DECLARE_CALLBACK(HTMLOptionsCollectionRemove);
@@ -591,6 +595,7 @@ class V8Custom {
   DECLARE_INDEXED_PROPERTY_SETTER(HTMLOptionsCollection);
   DECLARE_NAMED_PROPERTY_GETTER(HTMLSelectElementCollection);
   DECLARE_INDEXED_PROPERTY_SETTER(HTMLSelectElementCollection);
+  DECLARE_NAMED_PROPERTY_GETTER(HTMLAllCollection);
   DECLARE_NAMED_PROPERTY_GETTER(HTMLCollection);
 
 #if ENABLE(3D_CANVAS)
