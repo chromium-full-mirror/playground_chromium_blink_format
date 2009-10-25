@@ -157,8 +157,6 @@ class DECLSPEC_UUID("{A3676398-4485-4a9d-87DC-CB5A40E6351D}") WebFrame
       /* [retval][out] */ IDOMElement** formElement);
 
   virtual /* [local] */ JSGlobalContextRef STDMETHODCALLTYPE globalContext();
-  virtual /* [local] */ JSGlobalContextRef STDMETHODCALLTYPE contextForWorldID(
-      /* [in] */ unsigned worldID);
 
   // IWebFramePrivate
   virtual HRESULT STDMETHODCALLTYPE renderTreeAsExternalRepresentation(
@@ -261,6 +259,9 @@ class DECLSPEC_UUID("{A3676398-4485-4a9d-87DC-CB5A40E6351D}") WebFrame
       /* [in] */ OLE_HANDLE jsGlobalObject,
       /* [in] */ BSTR script,
       /* [retval][out] */ BSTR* evaluationResult);
+
+  virtual /* [local] */ JSGlobalContextRef STDMETHODCALLTYPE contextForWorldID(
+      /* [in] */ unsigned worldID);
 
   // IWebDocumentText
   virtual HRESULT STDMETHODCALLTYPE supportsTextEncoding(
