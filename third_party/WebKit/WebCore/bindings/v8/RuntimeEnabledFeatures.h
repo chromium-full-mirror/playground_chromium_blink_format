@@ -41,10 +41,23 @@ class RuntimeEnabledFeatures {
   }
   static bool databaseEnabled() { return isDatabaseEnabled; }
 
+  static void setLocalStorageEnabled(bool isEnabled) {
+    isLocalStorageEnabled = isEnabled;
+  }
+  static bool localStorageEnabled() { return isLocalStorageEnabled; }
+
+  static void setSessionStorageEnabled(bool isEnabled) {
+    isSessionStorageEnabled = isEnabled;
+  }
+  static bool sessionStorageEnabled() { return isSessionStorageEnabled; }
+
  private:
+  // Never instantiate.
   RuntimeEnabledFeatures() {}
 
   static bool isDatabaseEnabled;
+  static bool isLocalStorageEnabled;
+  static bool isSessionStorageEnabled;
 };
 
 }  // namespace WebCore

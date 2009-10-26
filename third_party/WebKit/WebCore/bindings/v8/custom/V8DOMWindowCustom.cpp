@@ -291,11 +291,11 @@ ACCESSOR_RUNTIME_ENABLER(DOMWindowOpenDatabase) {
 
 #if ENABLE(DOM_STORAGE)
 ACCESSOR_RUNTIME_ENABLER(DOMWindowLocalStorage) {
-  return Storage::localStorageAvailable();
+  return RuntimeEnabledFeatures::localStorageEnabled();
 }
 
 ACCESSOR_RUNTIME_ENABLER(DOMWindowSessionStorage) {
-  return Storage::sessionStorageAvailable();
+  return RuntimeEnabledFeatures::sessionStorageEnabled();
 }
 #endif
 
