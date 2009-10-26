@@ -140,7 +140,10 @@ class XMLTokenizer : public Tokenizer, public CachedResourceClient {
                                        Element* parent);
 
   void initializeParserContext(const char* chunk = 0);
-  void setCurrentNode(Node*);
+
+  void pushCurrentNode(Node*);
+  void popCurrentNode();
+  void clearCurrentNodeStack();
 
   void insertErrorMessageBlock();
 
@@ -164,6 +167,7 @@ class XMLTokenizer : public Tokenizer, public CachedResourceClient {
   Vector<xmlChar> m_bufferedText;
 #endif
   Node* m_currentNode;
+  Vector<Node*> m_currentNodeStack;
 
   bool m_sawError;
   bool m_sawXSLTransform;
