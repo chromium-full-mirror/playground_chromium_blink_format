@@ -55,8 +55,9 @@ static void swapInNodePreservingAttributesAndChildren(Node* newNode,
   parentNode->insertBefore(newNode, nodeToReplace, ec);
   ASSERT(!ec);
 
-  for (Node* child = nodeToReplace->firstChild(); child;
-       child = child->nextSibling()) {
+  Node* nextChild;
+  for (Node* child = nodeToReplace->firstChild(); child; child = nextChild) {
+    nextChild = child->nextSibling();
     newNode->appendChild(child, ec);
     ASSERT(!ec);
   }
