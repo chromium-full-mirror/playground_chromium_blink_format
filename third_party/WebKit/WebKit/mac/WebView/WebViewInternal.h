@@ -70,6 +70,7 @@ class Node;
 @interface WebView (WebViewInternal)
 
 - (WebCore::Frame*)_mainCoreFrame;
+- (WebFrame*)_selectedOrMainFrame;
 
 - (WebCore::String)_userAgentForURL:(const WebCore::KURL&)url;
 - (WebCore::KeyboardUIMode)_keyboardUIMode;
@@ -81,12 +82,7 @@ class Node;
 - (void)_dispatchDidReceiveIconFromWebFrame:(WebFrame*)webFrame;
 #endif
 
-- (void)_setMouseDownEvent:(NSEvent*)event;
-- (void)_cancelUpdateMouseoverTimer;
-- (void)_stopAutoscrollTimer;
-- (void)_updateMouseoverWithFakeEvent;
 - (void)_selectionChanged;
-- (void)_setToolTip:(NSString*)toolTip;
 
 #if USE(ACCELERATED_COMPOSITING)
 - (BOOL)_needsOneShotDrawingSynchronization;
@@ -99,6 +95,14 @@ class Node;
 @end
 
 #endif
+
+@interface WebView (WebViewEventHandling)
+- (void)_closingEventHandling;
+- (void)_updateMouseoverWithFakeEvent;
+- (void)_cancelUpdateMouseoverTimer;
+- (void)_stopAutoscrollTimer;
+- (void)_setToolTip:(NSString*)toolTip;
+@end
 
 // FIXME: Temporary way to expose methods that are in the wrong category inside
 // WebView.
