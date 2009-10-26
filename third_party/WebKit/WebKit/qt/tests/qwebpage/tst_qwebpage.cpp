@@ -1361,7 +1361,7 @@ void tst_QWebPage::inputMethods() {
       "</body></html>");
   m_view->page()->mainFrame()->setFocus();
 
-  QList<QWebElement> inputs =
+  QWebElementCollection inputs =
       m_view->page()->mainFrame()->documentElement().findAll("input");
 
   QMouseEvent evpres(QEvent::MouseButtonPress, inputs.at(0).geometry().center(),

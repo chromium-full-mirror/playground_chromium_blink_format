@@ -250,7 +250,7 @@ class MainWindow : public QMainWindow {
                               QLineEdit::Normal, "a", &ok);
 
     if (ok && !str.isEmpty()) {
-      QList<QWebElement> result =
+      QWebElementCollection result =
           view->page()->mainFrame()->findAllElements(str);
       foreach (QWebElement e, result)
         e.setStyleProperty("background-color", "yellow");

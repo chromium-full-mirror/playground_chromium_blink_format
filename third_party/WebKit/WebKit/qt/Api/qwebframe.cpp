@@ -1143,7 +1143,7 @@ QWebElement QWebFrame::documentElement() const {
 
     \sa QWebElement::findAll()
 */
-QList<QWebElement> QWebFrame::findAllElements(
+QWebElementCollection QWebFrame::findAllElements(
     const QString& selectorQuery) const {
   return documentElement().findAll(selectorQuery);
 }

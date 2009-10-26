@@ -50,6 +50,7 @@ class QWebHitTestResult;
 class QWebHistoryItem;
 class QWebSecurityOrigin;
 class QWebElement;
+class QWebElementCollection;
 
 namespace WebCore {
 class WidgetPrivate;
@@ -197,7 +198,7 @@ class QWEBKIT_EXPORT QWebFrame : public QObject {
   QSize contentsSize() const;
 
   QWebElement documentElement() const;
-  QList<QWebElement> findAllElements(const QString& selectorQuery) const;
+  QWebElementCollection findAllElements(const QString& selectorQuery) const;
   QWebElement findFirstElement(const QString& selectorQuery) const;
 
   QWebHitTestResult hitTestContent(const QPoint& pos) const;
