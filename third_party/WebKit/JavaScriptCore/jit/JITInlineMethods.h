@@ -157,7 +157,7 @@ ALWAYS_INLINE void JIT::endUninterruptedSequence(int insnSpace,
 
 #endif
 
-#if PLATFORM(ARM_THUMB2)
+#if PLATFORM(ARM)
 
 ALWAYS_INLINE void JIT::preserveReturnAddressAfterCall(RegisterID reg) {
   move(linkRegister, reg);
@@ -171,7 +171,7 @@ ALWAYS_INLINE void JIT::restoreReturnAddressBeforeReturn(Address address) {
   loadPtr(address, linkRegister);
 }
 
-#else  // PLATFORM(X86) || PLATFORM(X86_64) || PLATFORM(ARM_TRADITIONAL)
+#else  // PLATFORM(X86) || PLATFORM(X86_64)
 
 ALWAYS_INLINE void JIT::preserveReturnAddressAfterCall(RegisterID reg) {
   pop(reg);
@@ -198,15 +198,12 @@ ALWAYS_INLINE void JIT::restoreArgumentReference() {
   move(stackPointerRegister, firstArgumentRegister);
   poke(callFrameRegister,
        OBJECT_OFFSETOF(struct JITStackFrame, callFrame) / sizeof(void*));
-#if PLATFORM(ARM_TRADITIONAL)
-  move(ctiReturnRegister, ARMRegisters::lr);
-#endif
 }
 ALWAYS_INLINE void JIT::restoreArgumentReferenceForTrampoline() {
 #if PLATFORM(X86)
   // Within a trampoline the return address will be on the stack at this point.
   addPtr(Imm32(sizeof(void*)), stackPointerRegister, firstArgumentRegister);
-#elif PLATFORM(ARM_THUMB2)
+#elif PLATFORM(ARM)
   move(stackPointerRegister, firstArgumentRegister);
 #endif
   // In the trampoline on x86-64, the first argument register is not

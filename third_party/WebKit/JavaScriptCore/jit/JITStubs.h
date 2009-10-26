@@ -176,6 +176,8 @@ struct JITStackFrame {
   JITStubArg padding;  // Unused
   JITStubArg args[7];
 
+  ReturnAddressPtr thunkReturnAddress;
+
   void* preservedR4;
   void* preservedR5;
   void* preservedR6;
@@ -186,14 +188,14 @@ struct JITStackFrame {
   RegisterFile* registerFile;
   CallFrame* callFrame;
   JSValue* exception;
+
+  // These arguments passed on the stack.
   Profiler** enabledProfilerReference;
   JSGlobalData* globalData;
 
   // When JIT code makes a call, it pushes its return address just below the
   // rest of the stack.
-  ReturnAddressPtr* returnAddressSlot() {
-    return reinterpret_cast<ReturnAddressPtr*>(this) - 1;
-  }
+  ReturnAddressPtr* returnAddressSlot() { return &thunkReturnAddress; }
 };
 #else
 #error "JITStackFrame not defined for this platform."
