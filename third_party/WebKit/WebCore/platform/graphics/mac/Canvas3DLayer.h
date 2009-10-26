@@ -42,6 +42,8 @@ class GraphicsLayer;
 
 - (id)initWithContext:(CGLContextObj)context texture:(GLuint)texture;
 
+- (CGImageRef)copyImageSnapshotWithColorSpace:(CGColorSpaceRef)colorSpace;
+
 @end
 
 #endif  // USE(ACCELERATED_COMPOSITING)
