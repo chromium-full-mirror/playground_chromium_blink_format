@@ -359,7 +359,6 @@ typedef v8::Persistent<v8::FunctionTemplate> (*FunctionTemplateFactory)();
   V(HTMLOPTIONSCOLLECTION, HTMLOptionsCollection)       \
   V(IMAGEDATA, ImageData)                               \
   V(CANVASPIXELARRAY, CanvasPixelArray)                 \
-  V(INSPECTORBACKEND, InspectorBackend)                 \
   V(KEYBOARDEVENT, KeyboardEvent)                       \
   V(LOCATION, Location)                                 \
   V(MEDIA, Media)                                       \
@@ -406,12 +405,6 @@ typedef v8::Persistent<v8::FunctionTemplate> (*FunctionTemplateFactory)();
   V(XMLHTTPREQUESTEXCEPTION, XMLHttpRequestException)         \
   V(XMLHTTPREQUESTPROGRESSEVENT, XMLHttpRequestProgressEvent) \
   V(XMLSERIALIZER, XMLSerializer)                             \
-  V(XPATHEVALUATOR, XPathEvaluator)                           \
-  V(XPATHEXCEPTION, XPathException)                           \
-  V(XPATHEXPRESSION, XPathExpression)                         \
-  V(XPATHNSRESOLVER, XPathNSResolver)                         \
-  V(XPATHRESULT, XPathResult)                                 \
-  V(XSLTPROCESSOR, XSLTProcessor)                             \
   ACTIVE_DOM_OBJECT_TYPES(V)                                  \
   APPLICATIONCACHE_NONNODE_WRAPPER_TYPES(V)                   \
   DATAGRID_NONNODE_TYPES(V)                                   \
@@ -468,13 +461,39 @@ typedef v8::Persistent<v8::FunctionTemplate> (*FunctionTemplateFactory)();
 #define DOM_OBJECT_3D_CANVAS_TYPES(V)
 #endif
 
-#define DOM_OBJECT_TYPES(V)    \
-  DOM_OBJECT_TYPES_1(V)        \
-  DOM_OBJECT_TYPES_2(V)        \
-  DOM_OBJECT_DATABASE_TYPES(V) \
-  DOM_OBJECT_STORAGE_TYPES(V)  \
-  DOM_OBJECT_WORKERS_TYPES(V)  \
-  DOM_OBJECT_3D_CANVAS_TYPES(V)
+#if ENABLE(XPATH)
+#define DOM_OBJECT_XPATH_TYPES(V)     \
+  V(XPATHEVALUATOR, XPathEvaluator)   \
+  V(XPATHEXCEPTION, XPathException)   \
+  V(XPATHEXPRESSION, XPathExpression) \
+  V(XPATHNSRESOLVER, XPathNSResolver) \
+  V(XPATHRESULT, XPathResult)
+#else
+#define DOM_OBJECT_XPATH_TYPES(V)
+#endif
+
+#if ENABLE(XSLT)
+#define DOM_OBJECT_XSLT_TYPES(V) V(XSLTPROCESSOR, XSLTProcessor)
+#else
+#define DOM_OBJECT_XSLT_TYPES(V)
+#endif
+
+#if ENABLE(INSPECTOR)
+#define DOM_OBJECT_INSPECTOR_TYPES(V) V(INSPECTORBACKEND, InspectorBackend)
+#else
+#define DOM_OBJECT_INSPECTOR_TYPES(V)
+#endif
+
+#define DOM_OBJECT_TYPES(V)     \
+  DOM_OBJECT_TYPES_1(V)         \
+  DOM_OBJECT_TYPES_2(V)         \
+  DOM_OBJECT_DATABASE_TYPES(V)  \
+  DOM_OBJECT_STORAGE_TYPES(V)   \
+  DOM_OBJECT_WORKERS_TYPES(V)   \
+  DOM_OBJECT_3D_CANVAS_TYPES(V) \
+  DOM_OBJECT_XPATH_TYPES(V)     \
+  DOM_OBJECT_XSLT_TYPES(V)      \
+  DOM_OBJECT_INSPECTOR_TYPES(V)
 
 #if ENABLE(SVG)
 // SVG_OBJECT_TYPES are svg non-node, non-pod types.
