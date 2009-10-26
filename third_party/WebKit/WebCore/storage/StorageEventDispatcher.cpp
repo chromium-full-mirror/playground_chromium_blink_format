@@ -63,7 +63,7 @@ void StorageEventDispatcher::dispatch(const String& key,
     for (unsigned i = 0; i < frames.size(); ++i)
       frames[i]->document()->dispatchWindowEvent(
           StorageEvent::create(eventNames().storageEvent, key, oldValue,
-                               newValue, sourceFrame->document()->documentURI(),
+                               newValue, sourceFrame->document()->url(),
                                frames[i]->domWindow()->sessionStorage()));
   } else {
     // Send events to every page.
@@ -80,7 +80,7 @@ void StorageEventDispatcher::dispatch(const String& key,
     for (unsigned i = 0; i < frames.size(); ++i)
       frames[i]->document()->dispatchWindowEvent(
           StorageEvent::create(eventNames().storageEvent, key, oldValue,
-                               newValue, sourceFrame->document()->documentURI(),
+                               newValue, sourceFrame->document()->url(),
                                frames[i]->domWindow()->localStorage()));
   }
 }
