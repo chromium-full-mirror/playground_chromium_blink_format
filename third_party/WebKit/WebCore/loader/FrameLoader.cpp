@@ -366,10 +366,9 @@ void FrameLoader::urlSelected(const ResourceRequest& request,
 
   FrameLoadRequest frameRequest(request, target);
 
-  if (referrerPolicy == NoReferrer) {
+  if (referrerPolicy == NoReferrer)
     m_suppressOpenerInNewFrame = true;
-    setOpener(0);
-  } else if (frameRequest.resourceRequest().httpReferrer().isEmpty())
+  else if (frameRequest.resourceRequest().httpReferrer().isEmpty())
     frameRequest.resourceRequest().setHTTPReferrer(m_outgoingReferrer);
   addHTTPOriginIfNeeded(frameRequest.resourceRequest(), outgoingOrigin());
 
