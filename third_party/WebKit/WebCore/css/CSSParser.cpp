@@ -924,6 +924,7 @@ bool CSSParser::parseValue(int propId, bool important) {
     case CSSPropertyBackgroundPositionX:
     case CSSPropertyBackgroundPositionY:
     case CSSPropertyBackgroundSize:
+    case CSSPropertyWebkitBackgroundSize:
     case CSSPropertyBackgroundRepeat:
     case CSSPropertyBackgroundRepeatX:
     case CSSPropertyBackgroundRepeatY:
@@ -2525,7 +2526,7 @@ void CSSParser::parseFillRepeat(RefPtr<CSSValue>& value1,
   }
 }
 
-PassRefPtr<CSSValue> CSSParser::parseFillSize(bool& allowComma) {
+PassRefPtr<CSSValue> CSSParser::parseFillSize(int propId, bool& allowComma) {
   allowComma = true;
   CSSParserValue* value = m_valueList->current();
 
@@ -2543,7 +2544,8 @@ PassRefPtr<CSSValue> CSSParser::parseFillSize(bool& allowComma) {
         value->fValue, (CSSPrimitiveValue::UnitTypes)value->unit);
   }
 
-  RefPtr<CSSPrimitiveValue> parsedValue2 = parsedValue1;
+  CSSPropertyID property = static_cast<CSSPropertyID>(propId);
+  RefPtr<CSSPrimitiveValue> parsedValue2;
   if ((value = m_valueList->next())) {
     if (value->id == CSSValueAuto)
       parsedValue2 =
@@ -2556,6 +2558,14 @@ PassRefPtr<CSSValue> CSSParser::parseFillSize(bool& allowComma) {
       parsedValue2 = CSSPrimitiveValue::create(
           value->fValue, (CSSPrimitiveValue::UnitTypes)value->unit);
     }
+  }
+  if (!parsedValue2) {
+    if (property == CSSPropertyWebkitBackgroundSize ||
+        property == CSSPropertyWebkitMaskSize)
+      parsedValue2 = parsedValue1;
+    else
+      parsedValue2 =
+          CSSPrimitiveValue::create(0, CSSPrimitiveValue::CSS_UNKNOWN);
   }
 
   return CSSPrimitiveValue::create(
@@ -2685,8 +2695,9 @@ bool CSSParser::parseFillProperty(int propId,
           // parseFillRepeat advances the m_valueList pointer
           break;
         case CSSPropertyBackgroundSize:
+        case CSSPropertyWebkitBackgroundSize:
         case CSSPropertyWebkitMaskSize: {
-          currValue = parseFillSize(allowComma);
+          currValue = parseFillSize(propId, allowComma);
           if (currValue)
             m_valueList->next();
           break;
@@ -5522,12 +5533,6 @@ static int cssPropertyID(const UChar* propertyName, unsigned length) {
         const char* const opacity = "opacity";
         name = opacity;
         length = strlen(opacity);
-      } else if (strcmp(buffer, "-webkit-background-size") == 0) {
-        // CSS Backgrounds/Borders.  -webkit-background-size worked in Safari 4
-        // and earlier.
-        const char* const backgroundSize = "background-size";
-        name = backgroundSize;
-        length = strlen(backgroundSize);
       } else if (hasPrefix(buffer + 7, length - 7, "-border-")) {
         // -webkit-border-*-*-radius worked in Safari 4 and earlier.
         // -webkit-border-radius syntax

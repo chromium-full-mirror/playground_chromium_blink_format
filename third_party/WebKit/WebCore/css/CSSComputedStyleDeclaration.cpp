@@ -98,18 +98,19 @@ static const int computedProperties[] = {
     CSSPropertyWebkitAnimationTimingFunction, CSSPropertyWebkitAppearance,
     CSSPropertyWebkitBackfaceVisibility, CSSPropertyWebkitBackgroundClip,
     CSSPropertyWebkitBackgroundComposite, CSSPropertyWebkitBackgroundOrigin,
-    CSSPropertyWebkitBorderFit, CSSPropertyWebkitBorderHorizontalSpacing,
-    CSSPropertyWebkitBorderImage, CSSPropertyWebkitBorderVerticalSpacing,
-    CSSPropertyWebkitBoxAlign, CSSPropertyWebkitBoxDirection,
-    CSSPropertyWebkitBoxFlex, CSSPropertyWebkitBoxFlexGroup,
-    CSSPropertyWebkitBoxLines, CSSPropertyWebkitBoxOrdinalGroup,
-    CSSPropertyWebkitBoxOrient, CSSPropertyWebkitBoxPack,
-    CSSPropertyWebkitBoxReflect, CSSPropertyWebkitBoxShadow,
-    CSSPropertyWebkitBoxSizing, CSSPropertyWebkitColumnBreakAfter,
-    CSSPropertyWebkitColumnBreakBefore, CSSPropertyWebkitColumnBreakInside,
-    CSSPropertyWebkitColumnCount, CSSPropertyWebkitColumnGap,
-    CSSPropertyWebkitColumnRuleColor, CSSPropertyWebkitColumnRuleStyle,
-    CSSPropertyWebkitColumnRuleWidth, CSSPropertyWebkitColumnWidth,
+    CSSPropertyWebkitBackgroundSize, CSSPropertyWebkitBorderFit,
+    CSSPropertyWebkitBorderHorizontalSpacing, CSSPropertyWebkitBorderImage,
+    CSSPropertyWebkitBorderVerticalSpacing, CSSPropertyWebkitBoxAlign,
+    CSSPropertyWebkitBoxDirection, CSSPropertyWebkitBoxFlex,
+    CSSPropertyWebkitBoxFlexGroup, CSSPropertyWebkitBoxLines,
+    CSSPropertyWebkitBoxOrdinalGroup, CSSPropertyWebkitBoxOrient,
+    CSSPropertyWebkitBoxPack, CSSPropertyWebkitBoxReflect,
+    CSSPropertyWebkitBoxShadow, CSSPropertyWebkitBoxSizing,
+    CSSPropertyWebkitColumnBreakAfter, CSSPropertyWebkitColumnBreakBefore,
+    CSSPropertyWebkitColumnBreakInside, CSSPropertyWebkitColumnCount,
+    CSSPropertyWebkitColumnGap, CSSPropertyWebkitColumnRuleColor,
+    CSSPropertyWebkitColumnRuleStyle, CSSPropertyWebkitColumnRuleWidth,
+    CSSPropertyWebkitColumnWidth,
 #if ENABLE(DASHBOARD_SUPPORT)
     CSSPropertyWebkitDashboardRegion,
 #endif
@@ -634,7 +635,8 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       if (style->backgroundImage())
         return style->backgroundImage()->cssValue();
       return CSSPrimitiveValue::createIdentifier(CSSValueNone);
-    case CSSPropertyBackgroundSize: {
+    case CSSPropertyBackgroundSize:
+    case CSSPropertyWebkitBackgroundSize: {
       EFillSizeType size = style->backgroundSizeType();
       if (size == Contain)
         return CSSPrimitiveValue::createIdentifier(CSSValueContain);

@@ -89,7 +89,7 @@ class CSSParser {
   PassRefPtr<CSSValue> parseFillPositionXY(bool& xFound, bool& yFound);
   void parseFillPosition(RefPtr<CSSValue>&, RefPtr<CSSValue>&);
   void parseFillRepeat(RefPtr<CSSValue>&, RefPtr<CSSValue>&);
-  PassRefPtr<CSSValue> parseFillSize(bool& allowComma);
+  PassRefPtr<CSSValue> parseFillSize(int propId, bool& allowComma);
 
   bool parseFillProperty(int propId,
                          int& propId1,
