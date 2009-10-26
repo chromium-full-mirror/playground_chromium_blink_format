@@ -2584,7 +2584,7 @@ void AccessibilityRenderObject::addChildren() {
       for (Node* current = map->firstChild(); current;
            current = current->traverseNextNode(map)) {
         // add an <area> element for this child if it has a link
-        if (current->isLink()) {
+        if (current->hasTagName(areaTag) && current->isLink()) {
           AccessibilityImageMapLink* areaObject =
               static_cast<AccessibilityImageMapLink*>(
                   m_renderer->document()->axObjectCache()->getOrCreate(
