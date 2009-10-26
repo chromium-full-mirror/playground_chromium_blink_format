@@ -419,7 +419,7 @@ String String::number(unsigned long n) {
 }
 
 String String::number(long long n) {
-#if PLATFORM(WIN_OS)
+#if PLATFORM(WIN_OS) && !PLATFORM(QT)
   return String::format("%I64i", n);
 #else
   return String::format("%lli", n);
@@ -427,7 +427,7 @@ String String::number(long long n) {
 }
 
 String String::number(unsigned long long n) {
-#if PLATFORM(WIN_OS)
+#if PLATFORM(WIN_OS) && !PLATFORM(QT)
   return String::format("%I64u", n);
 #else
   return String::format("%llu", n);
