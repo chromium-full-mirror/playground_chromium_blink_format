@@ -60,6 +60,7 @@ class ConsoleMessage {
 
 #if ENABLE(INSPECTOR)
   void addToConsole(InspectorFrontend* frontend);
+  void updateRepeatCountInConsole(InspectorFrontend* frontend);
 #endif
   void incrementCount() { ++m_repeatCount; };
   bool isEqual(ScriptState*, ConsoleMessage* msg) const;

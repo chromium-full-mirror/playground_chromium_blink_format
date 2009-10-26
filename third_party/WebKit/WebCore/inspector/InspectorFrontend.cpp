@@ -74,12 +74,12 @@ void InspectorFrontend::didCommitLoad() {
   callSimpleFunction("didCommitLoad");
 }
 
-void InspectorFrontend::addMessageToConsole(
+void InspectorFrontend::addConsoleMessage(
     const ScriptObject& messageObj,
     const Vector<ScriptString>& frames,
     const Vector<ScriptValue> wrappedArguments,
     const String& message) {
-  OwnPtr<ScriptFunctionCall> function(newFunctionCall("addMessageToConsole"));
+  OwnPtr<ScriptFunctionCall> function(newFunctionCall("addConsoleMessage"));
   function->appendArgument(messageObj);
   if (!frames.isEmpty()) {
     for (unsigned i = 0; i < frames.size(); ++i)
@@ -90,6 +90,13 @@ void InspectorFrontend::addMessageToConsole(
           m_inspectorController->wrapObject(wrappedArguments[i], "console"));
   } else
     function->appendArgument(message);
+  function->call();
+}
+
+void InspectorFrontend::updateConsoleMessageRepeatCount(const int count) {
+  OwnPtr<ScriptFunctionCall> function(
+      newFunctionCall("updateConsoleMessageRepeatCount"));
+  function->appendArgument(count);
   function->call();
 }
 
