@@ -46,6 +46,16 @@ class TimelineItemFactory {
                                                     double startTime,
                                                     const Event&);
 
+  static ScriptObject createGenericTimerTimelineItem(InspectorFrontend*,
+                                                     double startTime,
+                                                     int timerId);
+
+  static ScriptObject createTimerInstallTimelineItem(InspectorFrontend*,
+                                                     double startTime,
+                                                     int timerId,
+                                                     int timeout,
+                                                     bool singleShot);
+
  private:
   TimelineItemFactory() {}
 };

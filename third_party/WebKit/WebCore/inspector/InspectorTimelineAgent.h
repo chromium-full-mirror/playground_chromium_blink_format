@@ -31,9 +31,10 @@
 #ifndef InspectorTimelineAgent_h
 #define InspectorTimelineAgent_h
 
+#include "Document.h"
+#include "ScriptExecutionContext.h"
 #include "ScriptObject.h"
 #include "ScriptArray.h"
-
 #include <wtf/Vector.h>
 
 namespace WebCore {
@@ -47,6 +48,9 @@ enum TimelineItemType {
   RecalculateStylesTimelineItemType = 2,
   PaintTimelineItemType = 3,
   ParseHTMLTimelineItemType = 4,
+  TimerInstallTimelineItemType = 5,
+  TimerRemoveTimelineItemType = 6,
+  TimerFireTimelineItemType = 7,
 };
 
 class InspectorTimelineAgent {
@@ -59,14 +63,25 @@ class InspectorTimelineAgent {
   // Methods called from WebCore.
   void willDispatchDOMEvent(const Event&);
   void didDispatchDOMEvent();
+
   void willLayout();
   void didLayout();
+
   void willRecalculateStyle();
   void didRecalculateStyle();
+
   void willPaint();
   void didPaint();
-  void didWriteHTML();
+
   void willWriteHTML();
+  void didWriteHTML();
+
+  void didInstallTimer(int timerId, int timeout, bool singleShot);
+  void didRemoveTimer(int timerId);
+  void willFireTimer(int timerId);
+  void didFireTimer();
+
+  static InspectorTimelineAgent* retrieve(ScriptExecutionContext*);
 
  private:
   struct TimelineItemEntry {
@@ -83,12 +98,21 @@ class InspectorTimelineAgent {
 
   static double currentTimeInMilliseconds();
 
-  void didCompleteCurrentRecord(TimelineItemType);
+  void didCompleteCurrentTimelineItem(TimelineItemType);
+
+  void addItemToTimeline(ScriptObject, TimelineItemType);
 
   InspectorFrontend* m_frontend;
 
   Vector<TimelineItemEntry> m_itemStack;
 };
+
+inline InspectorTimelineAgent* InspectorTimelineAgent::retrieve(
+    ScriptExecutionContext* context) {
+  if (context->isDocument())
+    return static_cast<Document*>(context)->inspectorTimelineAgent();
+  return 0;
+}
 
 }  // namespace WebCore
 
