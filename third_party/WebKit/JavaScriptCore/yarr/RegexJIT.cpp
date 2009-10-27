@@ -1373,7 +1373,7 @@ class RegexGenerator : private MacroAssembler {
     //
     // FIXME: a nice improvement here may be to stop trying to match sooner,
     // based on the least
-    // of the minimum-alterantive-lengths.  E.g. if I have two alternatives of
+    // of the minimum-alternative-lengths.  E.g. if I have two alternatives of
     // length 200 and 150,
     // and a string of length 100, we'll end up looping index from 0 to 100,
     // checking whether there
