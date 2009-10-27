@@ -321,15 +321,23 @@ unsigned PluginPackage::hash() const {
 bool PluginPackage::equal(const PluginPackage& a, const PluginPackage& b) {
   return a.m_description == b.m_description;
 }
+#endif
 
 int PluginPackage::compareFileVersion(
     const PlatformModuleVersion& compareVersion) const {
-  // return -1, 0, or 1 if plug-in version is less than, equal to, or greater
-  // than
-  // the passed version
+// return -1, 0, or 1 if plug-in version is less than, equal to, or greater than
+// the passed version
+
+#if PLATFORM(WIN_OS)
+  if (m_moduleVersion.mostSig != compareVersion.mostSig)
+    return m_moduleVersion.mostSig > compareVersion.mostSig ? 1 : -1;
+  if (m_moduleVersion.leastSig != compareVersion.leastSig)
+    return m_moduleVersion.leastSig > compareVersion.leastSig ? 1 : -1;
+#else
   if (m_moduleVersion != compareVersion)
     return m_moduleVersion > compareVersion ? 1 : -1;
+#endif
+
   return 0;
 }
-#endif
 }
