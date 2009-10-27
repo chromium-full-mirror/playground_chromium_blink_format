@@ -34,7 +34,6 @@ class DateInstance : public JSWrapperObject {
  public:
   DateInstance(ExecState*, double);
   explicit DateInstance(NonNullPassRefPtr<Structure>);
-  virtual ~DateInstance();
 
   double internalNumber() const { return internalValue().uncheckedGetNumber(); }
 
@@ -45,7 +44,9 @@ class DateInstance : public JSWrapperObject {
 
   static JS_EXPORTDATA const ClassInfo info;
 
-  bool getGregorianDateTime(bool outputIsUTC, WTF::GregorianDateTime&) const;
+  bool getGregorianDateTime(ExecState*,
+                            bool outputIsUTC,
+                            WTF::GregorianDateTime&) const;
 
   static PassRefPtr<Structure> createStructure(JSValue prototype) {
     return Structure::create(prototype, TypeInfo(ObjectType, StructureFlags));
@@ -58,8 +59,7 @@ class DateInstance : public JSWrapperObject {
  private:
   virtual const ClassInfo* classInfo() const { return &info; }
 
-  struct Cache;
-  mutable Cache* m_cache;
+  mutable RefPtr<DateInstanceData> m_data;
 };
 
 DateInstance* asDateInstance(JSValue);

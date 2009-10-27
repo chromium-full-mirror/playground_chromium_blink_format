@@ -30,6 +30,7 @@
 #define JSGlobalData_h
 
 #include "Collector.h"
+#include "DateInstanceCache.h"
 #include "ExecutableAllocator.h"
 #include "JITStubs.h"
 #include "JSValue.h"
@@ -120,6 +121,7 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
                                           // nothing to mark.
   SmallStrings smallStrings;
   NumericStrings numericStrings;
+  DateInstanceCache dateInstanceCache;
 
 #if ENABLE(ASSEMBLER)
   ExecutableAllocator executableAllocator;
