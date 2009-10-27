@@ -31,6 +31,8 @@
 #ifndef TimelineRecordFactory_h
 #define TimelineRecordFactory_h
 
+#include "PlatformString.h"
+
 namespace WebCore {
 
 class Event;
@@ -54,6 +56,16 @@ class TimelineRecordFactory {
                                                int timerId,
                                                int timeout,
                                                bool singleShot);
+
+  static ScriptObject createXHRReadyStateChangeTimelineRecord(
+      InspectorFrontend*,
+      double startTime,
+      const String& url,
+      int readyState);
+
+  static ScriptObject createXHRLoadTimelineRecord(InspectorFrontend*,
+                                                  double startTime,
+                                                  const String& url);
 
  private:
   TimelineRecordFactory() {}
