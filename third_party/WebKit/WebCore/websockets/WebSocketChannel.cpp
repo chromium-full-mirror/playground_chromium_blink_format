@@ -70,6 +70,7 @@ void WebSocketChannel::connect() {
   LOG(Network, "WebSocketChannel %p connect", this);
   ASSERT(!m_handle.get());
   m_handshake.reset();
+  ref();
   m_handle = SocketStreamHandle::create(m_handshake.url(), this);
 }
 
@@ -99,6 +100,13 @@ void WebSocketChannel::close() {
     m_handle->close();  // will call didClose()
 }
 
+void WebSocketChannel::disconnect() {
+  LOG(Network, "WebSocketChannel %p disconnect", this);
+  m_client = 0;
+  if (m_handle.get())
+    m_handle->close();
+}
+
 void WebSocketChannel::willOpenStream(SocketStreamHandle*, const KURL&) {}
 
 void WebSocketChannel::willSendData(SocketStreamHandle*, const char*, int) {}
@@ -116,13 +124,15 @@ void WebSocketChannel::didOpen(SocketStreamHandle* handle) {
 void WebSocketChannel::didClose(SocketStreamHandle* handle) {
   LOG(Network, "WebSocketChannel %p didClose", this);
   ASSERT(handle == m_handle.get() || !m_handle.get());
-  if (!m_handle.get())
-    return;
-  m_unhandledBufferSize = handle->bufferedAmount();
-  WebSocketChannelClient* client = m_client;
-  m_client = 0;
-  m_handle = 0;
-  client->didClose();
+  if (m_handle.get()) {
+    m_unhandledBufferSize = handle->bufferedAmount();
+    WebSocketChannelClient* client = m_client;
+    m_client = 0;
+    m_handle = 0;
+    if (client)
+      client->didClose();
+  }
+  deref();
 }
 
 void WebSocketChannel::didReceiveData(SocketStreamHandle* handle,
@@ -131,6 +141,10 @@ void WebSocketChannel::didReceiveData(SocketStreamHandle* handle,
   LOG(Network, "WebSocketChannel %p didReceiveData %d", this, len);
   ASSERT(handle == m_handle.get());
   if (!appendToBuffer(data, len)) {
+    handle->close();
+    return;
+  }
+  if (!m_client) {
     handle->close();
     return;
   }
