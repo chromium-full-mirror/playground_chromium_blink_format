@@ -99,8 +99,11 @@ class Database : public ThreadSafeShared<Database> {
   Vector<String> tableNames();
 
   Document* document() const { return m_document.get(); }
-  PassRefPtr<SecurityOrigin> securityOriginCopy() const;
+  SecurityOrigin* securityOrigin() const;
   String stringIdentifier() const;
+  String displayName() const;
+  unsigned long estimatedSize() const;
+  String fileName() const;
 
   bool getVersionFromDatabase(String&);
   bool setVersionInDatabase(const String&);
@@ -134,7 +137,9 @@ class Database : public ThreadSafeShared<Database> {
  private:
   Database(Document* document,
            const String& name,
-           const String& expectedVersion);
+           const String& expectedVersion,
+           const String& displayName,
+           unsigned long estimatedSize);
 
   bool openAndVerifyVersion(ExceptionCode&);
 
@@ -150,10 +155,13 @@ class Database : public ThreadSafeShared<Database> {
   static void deliverPendingCallback(void*);
 
   RefPtr<Document> m_document;
-  RefPtr<SecurityOrigin> m_securityOrigin;
+  RefPtr<SecurityOrigin> m_mainThreadSecurityOrigin;
+  RefPtr<SecurityOrigin> m_databaseThreadSecurityOrigin;
   String m_name;
   int m_guid;
   String m_expectedVersion;
+  String m_displayName;
+  unsigned long long m_estimatedSize;
   String m_filename;
 
   bool m_deleted;
@@ -167,7 +175,7 @@ class Database : public ThreadSafeShared<Database> {
 
 #ifndef NDEBUG
   String databaseDebugName() const {
-    return m_securityOrigin->toString() + "::" + m_name;
+    return m_mainThreadSecurityOrigin->toString() + "::" + m_name;
   }
 #endif
 };

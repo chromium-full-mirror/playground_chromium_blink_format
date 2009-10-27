@@ -47,7 +47,7 @@ void SQLTransactionClient::didCommitTransaction(SQLTransaction* transaction) {
          transaction->database()->document()->databaseThread()->getThreadID());
   Database* database = transaction->database();
   DatabaseTracker::tracker().scheduleNotifyDatabaseChanged(
-      database->document()->securityOrigin(), database->stringIdentifier());
+      database->securityOrigin(), database->stringIdentifier());
 }
 
 void SQLTransactionClient::didExecuteStatement(SQLTransaction* transaction) {
@@ -64,14 +64,12 @@ bool SQLTransactionClient::didExceedQuota(SQLTransaction* transaction) {
   Page* page = database->document()->page();
   ASSERT(page);
 
-  RefPtr<SecurityOrigin> origin = database->securityOriginCopy();
-
   unsigned long long currentQuota =
-      DatabaseTracker::tracker().quotaForOrigin(origin.get());
+      DatabaseTracker::tracker().quotaForOrigin(database->securityOrigin());
   page->chrome()->client()->exceededDatabaseQuota(database->document()->frame(),
                                                   database->stringIdentifier());
   unsigned long long newQuota =
-      DatabaseTracker::tracker().quotaForOrigin(origin.get());
+      DatabaseTracker::tracker().quotaForOrigin(database->securityOrigin());
   return (newQuota > currentQuota);
 }
 }

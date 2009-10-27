@@ -94,6 +94,8 @@ class DatabaseTracker {
 
   bool hasEntryForOrigin(SecurityOrigin*);
 
+  unsigned long long getMaxSizeForDatabase(const Database*);
+
  private:
   DatabaseTracker();
 
