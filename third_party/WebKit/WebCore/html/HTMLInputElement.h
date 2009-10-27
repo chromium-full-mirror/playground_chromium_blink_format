@@ -271,6 +271,8 @@ class HTMLInputElement : public HTMLTextFormControlElement,
   }
   virtual bool isRequiredFormControl() const;
 
+  PassRefPtr<HTMLFormElement> createTemporaryFormForIsIndex();
+
 #if ENABLE(DATALIST)
   HTMLDataListElement* dataList() const;
 #endif
