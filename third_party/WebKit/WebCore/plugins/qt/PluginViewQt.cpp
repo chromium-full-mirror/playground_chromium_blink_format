@@ -187,7 +187,7 @@ void PluginView::paint(GraphicsContext* context, const IntRect& rect) {
       ((NPSetWindowCallbackStruct*)m_npWindow.ws_info)->depth;
   ASSERT(drawableDepth == qtDrawable.depth());
 
-  // When printing, Qt uses a QPicture the capture the output in preview mode.
+  // When printing, Qt uses a QPicture to capture the output in preview mode.
   // The
   // QPicture holds a reference to the X Pixmap. As a result, the print preview
   // would
