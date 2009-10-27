@@ -565,8 +565,7 @@ const ClassInfo DatePrototype::info = {"Date", &DateInstance::info, 0,
 
 DatePrototype::DatePrototype(ExecState* exec,
                              NonNullPassRefPtr<Structure> structure)
-    : DateInstance(structure) {
-  setInternalValue(jsNaN(exec));
+    : DateInstance(exec, structure) {
   // The constructor will be added later, after DateConstructor has been built.
 }
 
