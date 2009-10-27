@@ -45,6 +45,10 @@ extern bool qt_drt_pauseTransitionOfProperty(QWebFrame*,
                                              double time,
                                              const QString& elementId);
 extern int qt_drt_numberOfActiveAnimations(QWebFrame*);
+extern void qt_drt_whiteListAccessFromOrigin(const QString& sourceOrigin,
+                                             const QString& destinationProtocol,
+                                             const QString& destinationHost,
+                                             bool allowDestinationSubdomains);
 
 LayoutTestController::LayoutTestController(WebCore::DumpRenderTree* drt)
     : QObject(), m_drt(drt) {
@@ -272,9 +276,8 @@ void LayoutTestController::whiteListAccessFromOrigin(
     const QString& destinationProtocol,
     const QString& destinationHost,
     bool allowDestinationSubdomains) {
-  QWebSecurityOrigin::whiteListAccessFromOrigin(
-      sourceOrigin, destinationProtocol, destinationHost,
-      allowDestinationSubdomains);
+  qt_drt_whiteListAccessFromOrigin(sourceOrigin, destinationProtocol,
+                                   destinationHost, allowDestinationSubdomains);
 }
 
 void LayoutTestController::waitForPolicyDelegate() {
