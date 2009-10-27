@@ -780,6 +780,8 @@ bool SelectionController::modify(EAlteration alter,
   if (userTriggered)
     m_frame->setSelectionGranularity(CharacterGranularity);
 
+  m_lastChangeWasHorizontalExtension = alter == EXTEND;
+
   return true;
 }
 
