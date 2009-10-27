@@ -457,8 +457,8 @@ class RenderBox : public RenderBoxModelObject {
   }
 
   virtual void mapLocalToContainer(RenderBoxModelObject* repaintContainer,
-                                   bool useTransforms,
                                    bool fixed,
+                                   bool useTransforms,
                                    TransformState&) const;
   virtual void mapAbsoluteToLocalPoint(bool fixed,
                                        bool useTransforms,
