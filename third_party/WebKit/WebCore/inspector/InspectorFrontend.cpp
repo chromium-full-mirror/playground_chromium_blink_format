@@ -202,9 +202,9 @@ void InspectorFrontend::timelineProfilerWasStopped() {
   callSimpleFunction("timelineProfilerWasStopped");
 }
 
-void InspectorFrontend::addItemToTimeline(const ScriptObject& itemObj) {
-  OwnPtr<ScriptFunctionCall> function(newFunctionCall("addItemToTimeline"));
-  function->appendArgument(itemObj);
+void InspectorFrontend::addRecordToTimeline(const ScriptObject& record) {
+  OwnPtr<ScriptFunctionCall> function(newFunctionCall("addRecordToTimeline"));
+  function->appendArgument(record);
   function->call();
 }
 
