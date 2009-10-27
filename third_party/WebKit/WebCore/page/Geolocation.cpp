@@ -71,6 +71,41 @@ void Geolocation::GeoNotifier::timerFired(Timer<GeoNotifier>*) {
   m_geolocation->requestTimedOut(this);
 }
 
+void Geolocation::Watchers::set(int id, PassRefPtr<GeoNotifier> notifier) {
+  m_idToNotifierMap.set(id, notifier);
+  m_notifierToIdMap.set(notifier, id);
+}
+
+void Geolocation::Watchers::remove(int id) {
+  IdToNotifierMap::iterator iter = m_idToNotifierMap.find(id);
+  if (iter == m_idToNotifierMap.end())
+    return;
+  m_notifierToIdMap.remove(iter->second);
+  m_idToNotifierMap.remove(iter);
+}
+
+void Geolocation::Watchers::remove(GeoNotifier* notifier) {
+  NotifierToIdMap::iterator iter = m_notifierToIdMap.find(notifier);
+  if (iter == m_notifierToIdMap.end())
+    return;
+  m_idToNotifierMap.remove(iter->second);
+  m_notifierToIdMap.remove(iter);
+}
+
+void Geolocation::Watchers::clear() {
+  m_idToNotifierMap.clear();
+  m_notifierToIdMap.clear();
+}
+
+bool Geolocation::Watchers::isEmpty() const {
+  return m_idToNotifierMap.isEmpty();
+}
+
+void Geolocation::Watchers::getNotifiersVector(
+    Vector<RefPtr<GeoNotifier>>& copy) const {
+  copyValuesToVector(m_idToNotifierMap, copy);
+}
+
 Geolocation::Geolocation(Frame* frame)
     : m_frame(frame),
       m_service(GeolocationService::create(this)),
@@ -129,11 +164,9 @@ int Geolocation::watchPosition(PassRefPtr<PositionCallback> successCallback,
     return 0;
   }
 
-  static int sIdentifier = 0;
-
-  m_watchers.set(++sIdentifier, notifier);
-
-  return sIdentifier;
+  static int nextAvailableWatchId = 1;
+  m_watchers.set(nextAvailableWatchId, notifier.release());
+  return nextAvailableWatchId++;
 }
 
 void Geolocation::requestTimedOut(GeoNotifier* notifier) {
@@ -216,7 +249,7 @@ void Geolocation::stopTimersForOneShots() {
 
 void Geolocation::stopTimersForWatchers() {
   Vector<RefPtr<GeoNotifier>> copy;
-  copyValuesToVector(m_watchers, copy);
+  m_watchers.getNotifiersVector(copy);
 
   stopTimer(copy);
 }
@@ -233,7 +266,7 @@ void Geolocation::handleError(PositionError* error) {
   copyToVector(m_oneShots, oneShotsCopy);
 
   Vector<RefPtr<GeoNotifier>> watchersCopy;
-  copyValuesToVector(m_watchers, watchersCopy);
+  m_watchers.getNotifiersVector(watchersCopy);
 
   // Clear the lists before we make the callbacks, to avoid clearing notifiers
   // added by calls to Geolocation methods from the callbacks, and to prevent
@@ -294,7 +327,7 @@ void Geolocation::makeSuccessCallbacks() {
   copyToVector(m_oneShots, oneShotsCopy);
 
   Vector<RefPtr<GeoNotifier>> watchersCopy;
-  copyValuesToVector(m_watchers, watchersCopy);
+  m_watchers.getNotifiersVector(watchersCopy);
 
   // Clear the lists before we make the callbacks, to avoid clearing notifiers
   // added by calls to Geolocation methods from the callbacks, and to prevent

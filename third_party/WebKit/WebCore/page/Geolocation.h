@@ -108,6 +108,22 @@ class Geolocation : public RefCounted<Geolocation>,
                 PassRefPtr<PositionOptions>);
   };
 
+  class Watchers {
+   public:
+    void set(int id, PassRefPtr<GeoNotifier>);
+    void remove(int id);
+    void remove(GeoNotifier*);
+    void clear();
+    bool isEmpty() const;
+    void getNotifiersVector(Vector<RefPtr<GeoNotifier>>&) const;
+
+   private:
+    typedef HashMap<int, RefPtr<GeoNotifier>> IdToNotifierMap;
+    typedef HashMap<RefPtr<GeoNotifier>, int> NotifierToIdMap;
+    IdToNotifierMap m_idToNotifierMap;
+    NotifierToIdMap m_notifierToIdMap;
+  };
+
   bool hasListeners() const {
     return !m_oneShots.isEmpty() || !m_watchers.isEmpty();
   }
@@ -132,10 +148,9 @@ class Geolocation : public RefCounted<Geolocation>,
   void requestTimedOut(GeoNotifier*);
 
   typedef HashSet<RefPtr<GeoNotifier>> GeoNotifierSet;
-  typedef HashMap<int, RefPtr<GeoNotifier>> GeoNotifierMap;
 
   GeoNotifierSet m_oneShots;
-  GeoNotifierMap m_watchers;
+  Watchers m_watchers;
   Frame* m_frame;
   OwnPtr<GeolocationService> m_service;
 
