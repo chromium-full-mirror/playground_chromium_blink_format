@@ -28,6 +28,7 @@
 
 #include "GeolocationService.h"
 #include "PositionCallback.h"
+#include "PositionError.h"
 #include "PositionErrorCallback.h"
 #include "PositionOptions.h"
 #include "Timer.h"
@@ -71,6 +72,7 @@ class Geolocation : public RefCounted<Geolocation>,
 
   void setIsAllowed(bool);
   bool isAllowed() const { return m_allowGeolocation == Yes; }
+  bool isDenied() const { return m_allowGeolocation == No; }
 
   void setShouldClearCache(bool shouldClearCache) {
     m_shouldClearCache = shouldClearCache;
@@ -91,6 +93,7 @@ class Geolocation : public RefCounted<Geolocation>,
                                       positionErrorCallback, options));
     }
 
+    void setFatalError(PassRefPtr<PositionError>);
     bool hasZeroTimeout() const;
     void startTimerIfNeeded();
     void timerFired(Timer<GeoNotifier>*);
@@ -100,6 +103,7 @@ class Geolocation : public RefCounted<Geolocation>,
     RefPtr<PositionErrorCallback> m_errorCallback;
     RefPtr<PositionOptions> m_options;
     Timer<GeoNotifier> m_timer;
+    RefPtr<PositionError> m_fatalError;
 
    private:
     GeoNotifier(Geolocation*,
@@ -145,6 +149,11 @@ class Geolocation : public RefCounted<Geolocation>,
   virtual void geolocationServicePositionChanged(GeolocationService*);
   virtual void geolocationServiceErrorOccurred(GeolocationService*);
 
+  PassRefPtr<GeoNotifier> startRequest(PassRefPtr<PositionCallback>,
+                                       PassRefPtr<PositionErrorCallback>,
+                                       PassRefPtr<PositionOptions>);
+
+  void fatalErrorOccurred(GeoNotifier*);
   void requestTimedOut(GeoNotifier*);
 
   typedef HashSet<RefPtr<GeoNotifier>> GeoNotifierSet;

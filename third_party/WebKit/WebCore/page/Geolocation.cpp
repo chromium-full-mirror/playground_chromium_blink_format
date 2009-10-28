@@ -31,9 +31,10 @@
 #include "Document.h"
 #include "Frame.h"
 #include "Page.h"
-#include "PositionError.h"
 
 namespace WebCore {
+
+static const char permissionDeniedErrorMessage[] = "User denied Geolocation";
 
 Geolocation::GeoNotifier::GeoNotifier(
     Geolocation* geolocation,
@@ -45,10 +46,18 @@ Geolocation::GeoNotifier::GeoNotifier(
       m_errorCallback(errorCallback),
       m_options(options),
       m_timer(this, &Geolocation::GeoNotifier::timerFired) {
+  ASSERT(m_geolocation);
   ASSERT(m_successCallback);
   // If no options were supplied from JS, we should have created a default set
   // of options in JSGeolocationCustom.cpp.
   ASSERT(m_options);
+}
+
+void Geolocation::GeoNotifier::setFatalError(PassRefPtr<PositionError> error) {
+  // This method is called at most once on a given GeoNotifier object.
+  ASSERT(!m_fatalError);
+  m_fatalError = error;
+  m_timer.startOneShot(0);
 }
 
 bool Geolocation::GeoNotifier::hasZeroTimeout() const {
@@ -62,6 +71,14 @@ void Geolocation::GeoNotifier::startTimerIfNeeded() {
 
 void Geolocation::GeoNotifier::timerFired(Timer<GeoNotifier>*) {
   m_timer.stop();
+
+  if (m_fatalError) {
+    if (m_errorCallback)
+      m_errorCallback->handleEvent(m_fatalError.get());
+    // This will cause this notifier to be deleted.
+    m_geolocation->fatalErrorOccurred(this);
+    return;
+  }
 
   if (m_errorCallback) {
     RefPtr<PositionError> error =
@@ -129,19 +146,9 @@ void Geolocation::getCurrentPosition(
     PassRefPtr<PositionErrorCallback> errorCallback,
     PassRefPtr<PositionOptions> options) {
   RefPtr<GeoNotifier> notifier =
-      GeoNotifier::create(this, successCallback, errorCallback, options);
-
-  if (notifier->hasZeroTimeout() ||
-      m_service->startUpdating(notifier->m_options.get()))
-    notifier->startTimerIfNeeded();
-  else {
-    if (notifier->m_errorCallback) {
-      RefPtr<PositionError> error = PositionError::create(
-          PositionError::PERMISSION_DENIED, "Unable to Start");
-      notifier->m_errorCallback->handleEvent(error.get());
-    }
+      startRequest(successCallback, errorCallback, options);
+  if (!notifier)
     return;
-  }
 
   m_oneShots.add(notifier);
 }
@@ -150,23 +157,52 @@ int Geolocation::watchPosition(PassRefPtr<PositionCallback> successCallback,
                                PassRefPtr<PositionErrorCallback> errorCallback,
                                PassRefPtr<PositionOptions> options) {
   RefPtr<GeoNotifier> notifier =
-      GeoNotifier::create(this, successCallback, errorCallback, options);
-
-  if (notifier->hasZeroTimeout() ||
-      m_service->startUpdating(notifier->m_options.get()))
-    notifier->startTimerIfNeeded();
-  else {
-    if (notifier->m_errorCallback) {
-      RefPtr<PositionError> error = PositionError::create(
-          PositionError::PERMISSION_DENIED, "Unable to Start");
-      notifier->m_errorCallback->handleEvent(error.get());
-    }
+      startRequest(successCallback, errorCallback, options);
+  if (!notifier)
     return 0;
-  }
 
   static int nextAvailableWatchId = 1;
   m_watchers.set(nextAvailableWatchId, notifier.release());
   return nextAvailableWatchId++;
+}
+
+PassRefPtr<Geolocation::GeoNotifier> Geolocation::startRequest(
+    PassRefPtr<PositionCallback> successCallback,
+    PassRefPtr<PositionErrorCallback> errorCallback,
+    PassRefPtr<PositionOptions> options) {
+  RefPtr<GeoNotifier> notifier =
+      GeoNotifier::create(this, successCallback, errorCallback, options);
+
+  // Check whether permissions have already been denied. Note that if this is
+  // the case,
+  // the permission state can not change again in the lifetime of this page.
+  if (isDenied())
+    notifier->setFatalError(PositionError::create(
+        PositionError::PERMISSION_DENIED, permissionDeniedErrorMessage));
+  else {
+    if (notifier->hasZeroTimeout() ||
+        m_service->startUpdating(notifier->m_options.get()))
+      notifier->startTimerIfNeeded();
+    else {
+      if (notifier->m_errorCallback) {
+        RefPtr<PositionError> error = PositionError::create(
+            PositionError::PERMISSION_DENIED, "Unable to Start");
+        notifier->m_errorCallback->handleEvent(error.get());
+      }
+      return 0;
+    }
+  }
+
+  return notifier.release();
+}
+
+void Geolocation::fatalErrorOccurred(Geolocation::GeoNotifier* notifier) {
+  // This request has failed fatally. Remove it from our lists.
+  m_oneShots.remove(notifier);
+  m_watchers.remove(notifier);
+
+  if (!hasListeners())
+    m_service->stopUpdating();
 }
 
 void Geolocation::requestTimedOut(GeoNotifier* notifier) {
@@ -201,7 +237,7 @@ void Geolocation::setIsAllowed(bool allowed) {
     makeSuccessCallbacks();
   else {
     RefPtr<PositionError> error = PositionError::create(
-        PositionError::PERMISSION_DENIED, "User disallowed Geolocation");
+        PositionError::PERMISSION_DENIED, permissionDeniedErrorMessage);
     error->setIsFatal(true);
     handleError(error.get());
   }
