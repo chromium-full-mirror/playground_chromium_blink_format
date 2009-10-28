@@ -62,10 +62,14 @@ class TimelineRecordFactory {
       double startTime,
       const String& url,
       int readyState);
-
   static ScriptObject createXHRLoadTimelineRecord(InspectorFrontend*,
                                                   double startTime,
                                                   const String& url);
+
+  static ScriptObject createEvaluateScriptTagTimelineRecord(InspectorFrontend*,
+                                                            double startTime,
+                                                            const String&,
+                                                            double lineNumber);
 
  private:
   TimelineRecordFactory() {}

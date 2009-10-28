@@ -47,7 +47,8 @@ class ScriptSourceCode {
       : m_provider(StringSourceProvider::create(
             source,
             url.isNull() ? String() : url.string())),
-        m_code(m_provider, startLine) {}
+        m_code(m_provider, startLine),
+        m_url(url) {}
 
   ScriptSourceCode(CachedScript* cs)
       : m_provider(CachedScriptSourceProvider::create(cs)),
@@ -59,10 +60,16 @@ class ScriptSourceCode {
 
   const String& source() const { return m_provider->source(); }
 
+  int startLine() const { return m_code.firstLine(); }
+
+  const KURL& url() const { return m_url; }
+
  private:
   RefPtr<ScriptSourceProvider> m_provider;
 
   JSC::SourceCode m_code;
+
+  KURL m_url;
 };
 
 }  // namespace WebCore

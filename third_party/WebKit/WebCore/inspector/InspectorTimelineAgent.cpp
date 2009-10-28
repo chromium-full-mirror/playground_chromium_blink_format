@@ -145,6 +145,18 @@ void InspectorTimelineAgent::didLoadXHR() {
   didCompleteCurrentRecord(XHRLoadRecordType);
 }
 
+void InspectorTimelineAgent::willEvaluateScriptTag(const String& url,
+                                                   int lineNumber) {
+  pushCurrentRecord(
+      TimelineRecordFactory::createEvaluateScriptTagTimelineRecord(
+          m_frontend, currentTimeInMilliseconds(), url, lineNumber),
+      EvaluateScriptTagTimelineRecordType);
+}
+
+void InspectorTimelineAgent::didEvaluateScriptTag() {
+  didCompleteCurrentRecord(EvaluateScriptTagTimelineRecordType);
+}
+
 void InspectorTimelineAgent::reset() {
   m_recordStack.clear();
 }
