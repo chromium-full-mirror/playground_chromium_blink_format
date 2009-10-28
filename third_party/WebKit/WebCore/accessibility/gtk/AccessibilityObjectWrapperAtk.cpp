@@ -1296,12 +1296,10 @@ static guint16 getInterfaceMaskFromObject(AccessibilityObject* coreObject) {
 
   if (role == StaticTextRole)
     interfaceMask |= 1 << WAI_TEXT;
-
-  if (coreObject->isAccessibilityRenderObject() &&
-      coreObject->isTextControl()) {
-    if (coreObject->isReadOnly())
-      interfaceMask |= 1 << WAI_TEXT;
-    else
+  else if (coreObject->isAccessibilityRenderObject() &&
+           coreObject->isTextControl()) {
+    interfaceMask |= 1 << WAI_TEXT;
+    if (!coreObject->isReadOnly())
       interfaceMask |= 1 << WAI_EDITABLE_TEXT;
   }
 
