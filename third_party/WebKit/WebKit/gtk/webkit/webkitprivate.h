@@ -236,6 +236,11 @@ void webkit_web_inspector_set_web_view(WebKitWebInspector* web_inspector,
 void webkit_web_inspector_set_inspected_uri(WebKitWebInspector* web_inspector,
                                             const gchar* inspected_uri);
 
+WEBKIT_API void webkit_web_inspector_execute_script(
+    WebKitWebInspector* inspector,
+    long callId,
+    const gchar* script);
+
 WebKitWebWindowFeatures* webkit_web_window_features_new_from_core_features(
     const WebCore::WindowFeatures& features);
 

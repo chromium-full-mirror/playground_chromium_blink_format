@@ -745,6 +745,11 @@ static void databaseQuotaExceeded(WebKitWebView* view,
 
 static WebKitWebView* webViewCreate(WebKitWebView*, WebKitWebFrame*);
 
+static WebKitWebView* webInspectorInspectWebView(WebKitWebInspector*,
+                                                 gpointer data) {
+  return WEBKIT_WEB_VIEW(webkit_web_view_new());
+}
+
 static WebKitWebView* createWebView() {
   WebKitWebView* view = WEBKIT_WEB_VIEW(webkit_web_view_new());
 
@@ -766,6 +771,10 @@ static WebKitWebView* createWebView() {
       "signal::create-web-view", webViewCreate, 0, "signal::close-web-view",
       webViewClose, 0, "signal::database-quota-exceeded", databaseQuotaExceeded,
       0, NULL);
+
+  WebKitWebInspector* inspector = webkit_web_view_get_inspector(view);
+  g_signal_connect(inspector, "inspect-web-view",
+                   G_CALLBACK(webInspectorInspectWebView), 0);
 
   return view;
 }

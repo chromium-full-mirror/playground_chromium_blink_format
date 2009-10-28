@@ -3,6 +3,7 @@
  * Copyright (C) 2007 Eric Seidel <eric@webkit.org>
  * Copyright (C) 2008 Nuanti Ltd.
  * Copyright (C) 2009 Jan Michael Alonzo <jmalonzo@gmail.com>
+ * Copyright (C) 2009 Collabora Ltd.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -64,6 +65,9 @@ void webkit_white_list_access_from_origin(const gchar* sourceOrigin,
                                           bool allowDestinationSubdomains);
 gchar* webkit_web_frame_counter_value_for_element_by_id(WebKitWebFrame* frame,
                                                         const gchar* id);
+void webkit_web_inspector_execute_script(WebKitWebInspector* inspector,
+                                         long callId,
+                                         const gchar* script);
 }
 
 static gchar* copyWebSettingKey(gchar* preferenceKey) {
@@ -479,16 +483,31 @@ void LayoutTestController::addUserStyleSheet(JSStringRef source) {
 }
 
 void LayoutTestController::showWebInspector() {
-  // FIXME: Implement this.
+  WebKitWebView* webView = webkit_web_frame_get_web_view(mainFrame);
+  WebKitWebSettings* webSettings = webkit_web_view_get_settings(webView);
+  WebKitWebInspector* inspector = webkit_web_view_get_inspector(webView);
+
+  g_object_set(webSettings, "enable-developer-extras", TRUE, NULL);
+  webkit_web_inspector_inspect_coordinates(inspector, 0, 0);
 }
 
 void LayoutTestController::closeWebInspector() {
-  // FIXME: Implement this.
+  WebKitWebView* webView = webkit_web_frame_get_web_view(mainFrame);
+  WebKitWebSettings* webSettings = webkit_web_view_get_settings(webView);
+  WebKitWebInspector* inspector = webkit_web_view_get_inspector(webView);
+
+  webkit_web_inspector_close(inspector);
+  g_object_set(webSettings, "enable-developer-extras", FALSE, NULL);
 }
 
 void LayoutTestController::evaluateInWebInspector(long callId,
                                                   JSStringRef script) {
-  // FIXME: Implement this.
+  WebKitWebView* webView = webkit_web_frame_get_web_view(mainFrame);
+  WebKitWebInspector* inspector = webkit_web_view_get_inspector(webView);
+  char* scriptString = JSStringCopyUTF8CString(script);
+
+  webkit_web_inspector_execute_script(inspector, callId, scriptString);
+  g_free(scriptString);
 }
 
 void LayoutTestController::evaluateScriptInIsolatedWorld(
