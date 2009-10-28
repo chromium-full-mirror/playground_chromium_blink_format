@@ -1413,7 +1413,8 @@ ObjectContentType FrameLoader::defaultObjectContentType(
   if (MIMETypeRegistry::isSupportedImageMIMEType(mimeType))
     return WebCore::ObjectContentImage;
 
-#if !PLATFORM(MAC)  // Mac has no PluginDatabase
+#if !PLATFORM(MAC) && \
+    !PLATFORM(CHROMIUM)  // Mac has no PluginDatabase, nor does Chromium
   if (PluginDatabase::installedPlugins()->isMIMETypeRegistered(mimeType))
     return WebCore::ObjectContentNetscapePlugin;
 #endif
