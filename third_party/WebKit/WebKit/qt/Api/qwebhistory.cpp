@@ -31,6 +31,11 @@
 #include <QSharedData>
 #include <QDebug>
 
+enum {
+  InitialHistoryVersion = 1,
+  DefaultHistoryVersion = InitialHistoryVersion
+};
+
 /*!
   \class QWebHistoryItem
   \since 4.4
@@ -456,13 +461,6 @@ void QWebHistory::setMaximumItemCount(int count) {
 }
 
 /*!
-   \enum QWebHistory::HistoryStateVersion
-
-   \value HistoryVersion_1 Version 1 (Qt 4.6)
-   \value DefaultHistoryVersion The current default version in 1.
-*/
-
-/*!
   \since 4.6
   \fn QDataStream& operator<<(QDataStream& stream, const QWebHistory& history)
   \relates QWebHistory
@@ -477,25 +475,18 @@ QDataStream& operator<<(QDataStream& target, const QWebHistory& history) {
 
   QByteArray buffer;
   QDataStream stream(&buffer, QIODevice::WriteOnly);
-  int version = QWebHistory::DefaultHistoryVersion;
+
+  int version = DefaultHistoryVersion;
+
   stream << version;
+  stream << history.count() << history.currentItemIndex();
 
-  switch (version) {
-    case QWebHistory::HistoryVersion_1: {
-      stream << history.count() << history.currentItemIndex();
+  const WebCore::HistoryItemVector& items = d->lst->entries();
+  for (unsigned i = 0; i < items.size(); i++)
+    items[i].get()->saveState(stream, version);
 
-      const WebCore::HistoryItemVector& items = d->lst->entries();
-      for (unsigned i = 0; i < items.size(); i++)
-        items[i].get()->saveState(stream, version);
-
-      if (stream.status() != QDataStream::Ok)
-        buffer =
-            QByteArray();  // make buffer isNull()==true and isEmpty()==true
-      break;
-    }
-    default:
-      buffer.clear();
-  }
+  if (stream.status() != QDataStream::Ok)
+    buffer = QByteArray();  // make buffer isNull()==true and isEmpty()==true
 
   return target << buffer;
 }
@@ -518,34 +509,28 @@ QDataStream& operator>>(QDataStream& source, QWebHistory& history) {
 
   QDataStream stream(buffer);
   int version;
-  bool result = false;
+
   stream >> version;
 
-  switch (version) {
-    case QWebHistory::HistoryVersion_1: {
-      int count;
-      int currentIndex;
-      stream >> count >> currentIndex;
+  if (version == 1) {
+    int count;
+    int currentIndex;
+    stream >> count >> currentIndex;
 
-      history.clear();
-      // only if there are elements
-      if (count) {
-        // after clear() is new clear HistoryItem (at the end we had to remove
-        // it)
-        WebCore::HistoryItem* nullItem = d->lst->currentItem();
-        for (int i = 0; i < count; i++) {
-          WTF::PassRefPtr<WebCore::HistoryItem> item =
-              WebCore::HistoryItem::create();
-          item->restoreState(stream, version);
-          d->lst->addItem(item);
-        }
-        d->lst->removeItem(nullItem);
-        history.goToItem(history.itemAt(currentIndex));
-        result = stream.status() == QDataStream::Ok;
+    history.clear();
+    // only if there are elements
+    if (count) {
+      // after clear() is new clear HistoryItem (at the end we had to remove it)
+      WebCore::HistoryItem* nullItem = d->lst->currentItem();
+      for (int i = 0; i < count; i++) {
+        WTF::PassRefPtr<WebCore::HistoryItem> item =
+            WebCore::HistoryItem::create();
+        item->restoreState(stream, version);
+        d->lst->addItem(item);
       }
-      break;
+      d->lst->removeItem(nullItem);
+      history.goToItem(history.itemAt(currentIndex));
     }
-    default: {}  // result is false;
   }
 
   d->page()->updateNavigationActions();
