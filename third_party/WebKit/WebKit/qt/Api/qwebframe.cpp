@@ -1430,7 +1430,6 @@ QWebHitTestResultPrivate::QWebHitTestResultPrivate(
   if (!hitTest.innerNode())
     return;
   pos = hitTest.point();
-  boundingRect = hitTest.boundingBox();
   WebCore::TextDirection dir;
   title = hitTest.title(dir);
   linkText = hitTest.textContent();
@@ -1440,6 +1439,10 @@ QWebHitTestResultPrivate::QWebHitTestResultPrivate(
   imageUrl = hitTest.absoluteImageURL();
   innerNode = hitTest.innerNode();
   innerNonSharedNode = hitTest.innerNonSharedNode();
+  boundingRect =
+      innerNonSharedNode
+          ? innerNonSharedNode->renderer()->absoluteBoundingBoxRect(true)
+          : IntRect();
   WebCore::Image* img = hitTest.image();
   if (img) {
     QPixmap* pix = img->nativeImageForCurrentFrame();

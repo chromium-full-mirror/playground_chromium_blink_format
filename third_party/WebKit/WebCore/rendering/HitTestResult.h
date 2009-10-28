@@ -63,7 +63,6 @@ class HitTestResult {
   void setIsOverWidget(bool b) { m_isOverWidget = b; }
 
   Frame* targetFrame() const;
-  IntRect boundingBox() const;
   bool isSelected() const;
   String spellingToolTip(TextDirection&) const;
   String replacedString() const;
