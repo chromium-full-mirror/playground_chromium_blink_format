@@ -28,6 +28,7 @@
 
 namespace WebCore {
 
+class Element;
 class RenderObject;
 class String;
 class TextStream;
@@ -37,6 +38,8 @@ void write(TextStream&, const RenderObject&, int indent = 0);
 
 // Helper function shared with SVGRenderTreeAsText
 String quoteAndEscapeNonPrintables(const String&);
+
+String counterValueForElement(Element*);
 
 }  // namespace WebCore
 

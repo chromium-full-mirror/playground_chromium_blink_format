@@ -62,6 +62,8 @@ void webkit_white_list_access_from_origin(const gchar* sourceOrigin,
                                           const gchar* destinationProtocol,
                                           const gchar* destinationHost,
                                           bool allowDestinationSubdomains);
+gchar* webkit_web_frame_counter_value_for_element_by_id(WebKitWebFrame* frame,
+                                                        const gchar* id);
 }
 
 static gchar* copyWebSettingKey(gchar* preferenceKey) {
@@ -123,6 +125,19 @@ void LayoutTestController::dispatchPendingLoadRequests() {
 
 void LayoutTestController::display() {
   displayWebView();
+}
+
+JSRetainPtr<JSStringRef> LayoutTestController::counterValueForElementById(
+    JSStringRef id) {
+  gchar* idGChar = JSStringCopyUTF8CString(id);
+  gchar* counterValueGChar =
+      webkit_web_frame_counter_value_for_element_by_id(mainFrame, idGChar);
+  g_free(idGChar);
+  if (!counterValueGChar)
+    return 0;
+  JSRetainPtr<JSStringRef> counterValue(
+      Adopt, JSStringCreateWithUTF8CString(counterValueGChar));
+  return counterValue;
 }
 
 void LayoutTestController::keepWebHistory() {

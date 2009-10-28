@@ -293,6 +293,10 @@ WEBKIT_API gchar* webkit_web_frame_get_inner_text(WebKitWebFrame* frame);
 
 WEBKIT_API gchar* webkit_web_frame_dump_render_tree(WebKitWebFrame* frame);
 
+WEBKIT_API gchar* webkit_web_frame_counter_value_for_element_by_id(
+    WebKitWebFrame* frame,
+    const gchar* id);
+
 WEBKIT_API guint
 webkit_web_frame_get_pending_unload_event_count(WebKitWebFrame* frame);
 

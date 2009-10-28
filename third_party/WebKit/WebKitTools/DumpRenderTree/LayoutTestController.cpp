@@ -569,6 +569,30 @@ static JSValueRef execCommandCallback(JSContextRef context,
   return JSValueMakeUndefined(context);
 }
 
+static JSValueRef counterValueForElementByIdCallback(
+    JSContextRef context,
+    JSObjectRef function,
+    JSObjectRef thisObject,
+    size_t argumentCount,
+    const JSValueRef arguments[],
+    JSValueRef* exception) {
+  if (argumentCount < 1)
+    return JSValueMakeUndefined(context);
+
+  JSRetainPtr<JSStringRef> elementId(
+      Adopt, JSValueToStringCopy(context, arguments[0], exception));
+  if (*exception)
+    return JSValueMakeUndefined(context);
+
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  JSRetainPtr<JSStringRef> counterValue(
+      controller->counterValueForElementById(elementId.get()));
+  if (!counterValue.get())
+    return JSValueMakeUndefined(context);
+  return JSValueMakeString(context, counterValue.get());
+}
+
 static JSValueRef grantDesktopNotificationPermissionCallback(
     JSContextRef context,
     JSObjectRef function,
@@ -1790,6 +1814,8 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
       {"evaluateScriptInIsolatedWorld", evaluateScriptInIsolatedWorldCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"execCommand", execCommandCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"counterValueForElementById", counterValueForElementByIdCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"grantDesktopNotificationPermission",
        grantDesktopNotificationPermissionCallback,

@@ -162,6 +162,10 @@ class DECLSPEC_UUID("{A3676398-4485-4a9d-87DC-CB5A40E6351D}") WebFrame
   virtual HRESULT STDMETHODCALLTYPE renderTreeAsExternalRepresentation(
       /* [retval][out] */ BSTR* result);
 
+  virtual HRESULT STDMETHODCALLTYPE counterValueForElementById(
+      /* [in] */ BSTR id,
+      /* [retval][out] */ BSTR* result);
+
   virtual HRESULT STDMETHODCALLTYPE scrollOffset(
       /* [retval][out] */ SIZE* offset);
 
