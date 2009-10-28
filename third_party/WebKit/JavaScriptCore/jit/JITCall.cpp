@@ -695,8 +695,8 @@ void JIT::compileOpCall(OpcodeID opcodeID,
   END_UNINTERRUPTED_SEQUENCE(sequenceOpCall);
 
   addSlowCase(jumpToSlow);
-  ASSERT(differenceBetween(addressOfLinkedFunctionCheck, jumpToSlow) ==
-         patchOffsetOpCallCompareToJump);
+  ASSERT_JIT_OFFSET(differenceBetween(addressOfLinkedFunctionCheck, jumpToSlow),
+                    patchOffsetOpCallCompareToJump);
   m_callStructureStubCompilationInfo[callLinkInfoIndex].hotPathBegin =
       addressOfLinkedFunctionCheck;
 
