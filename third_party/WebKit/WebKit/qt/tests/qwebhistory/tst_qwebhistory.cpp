@@ -51,12 +51,9 @@ class tst_QWebHistory : public QObject {
   void itemAt();
   void goToItem();
   void items();
-  void serialize_1();       // QWebHistory countity
-  void serialize_2();       // QWebHistory index
-  void serialize_3();       // QWebHistoryItem
-  void saveAndRestore_1();  // simple checks saveState and restoreState
-  void saveAndRestore_2();  // bad parameters saveState and restoreState
-  void saveAndRestore_3();  // try use different version
+  void serialize_1();  // QWebHistory countity
+  void serialize_2();  // QWebHistory index
+  void serialize_3();  // QWebHistoryItem
   void saveAndRestore_crash_1();
   void saveAndRestore_crash_2();
   void saveAndRestore_crash_3();
@@ -277,80 +274,54 @@ void tst_QWebHistory::serialize_3() {
   QVERIFY(load.atEnd());
 }
 
-/** Simple checks should be a bit redundant to streaming operators */
-void tst_QWebHistory::saveAndRestore_1() {
-  QAction* actionBack = page->action(QWebPage::Back);
-  hist->back();
-  waitForLoadFinished.exec();
-  QVERIFY(actionBack->isEnabled());
-  QByteArray buffer(hist->saveState());
-  hist->clear();
-  QVERIFY(!actionBack->isEnabled());
-  QVERIFY(hist->count() == 1);
-  hist->restoreState(buffer);
-
-  // check only few values, do not make full test
-  // because most of the code is shared with streaming operators
-  // and these are checked before
-  QCOMPARE(hist->count(), histsize);
-  QCOMPARE(hist->currentItemIndex(), histsize - 2);
-  QCOMPARE(hist->itemAt(0).title(), QString("page1"));
-  QCOMPARE(hist->itemAt(histsize - 1).title(),
-           QString("page") + QString::number(histsize));
-  QVERIFY(actionBack->isEnabled());
+static void saveHistory(QWebHistory* history, QByteArray* in) {
+  in->clear();
+  QDataStream save(in, QIODevice::WriteOnly);
+  save << *history;
 }
 
-/** Check returns value if there are bad parameters. Actually, result
-  * is no so importent. The test shouldn't crash :-) */
-void tst_QWebHistory::saveAndRestore_2() {
-  QByteArray buffer;
-  hist->restoreState(buffer);
-  QVERIFY(hist->count() == 1);
-  QVERIFY(hist->itemAt(0).isValid());
-}
-
-/** Try to use bad version value */
-void tst_QWebHistory::saveAndRestore_3() {
-  QByteArray tmp = hist->saveState((QWebHistory::HistoryStateVersion)29999);
-  QVERIFY(hist->saveState((QWebHistory::HistoryStateVersion)29999).isEmpty());
-  QVERIFY(hist->count() == histsize);
-  QVERIFY(hist->itemAt(3).isValid());
+static void restoreHistory(QWebHistory* history, QByteArray* out) {
+  QDataStream load(out, QIODevice::ReadOnly);
+  load >> *history;
 }
 
 /** The test shouldn't crash */
 void tst_QWebHistory::saveAndRestore_crash_1() {
-  QByteArray tmp = hist->saveState();
+  QByteArray buffer;
+  saveHistory(hist, &buffer);
   for (unsigned i = 0; i < 5; i++) {
-    hist->restoreState(tmp);
-    hist->saveState();
+    restoreHistory(hist, &buffer);
+    saveHistory(hist, &buffer);
   }
 }
 
 /** The test shouldn't crash */
 void tst_QWebHistory::saveAndRestore_crash_2() {
-  QByteArray tmp = hist->saveState();
+  QByteArray buffer;
+  saveHistory(hist, &buffer);
   QWebPage* page2 = new QWebPage(this);
   QWebHistory* hist2 = page2->history();
   for (unsigned i = 0; i < 5; i++) {
-    hist2->restoreState(tmp);
-    hist2->saveState();
+    restoreHistory(hist2, &buffer);
+    saveHistory(hist2, &buffer);
   }
   delete page2;
 }
 
 /** The test shouldn't crash */
 void tst_QWebHistory::saveAndRestore_crash_3() {
-  QByteArray tmp = hist->saveState();
+  QByteArray buffer;
+  saveHistory(hist, &buffer);
   QWebPage* page2 = new QWebPage(this);
   QWebHistory* hist1 = hist;
   QWebHistory* hist2 = page2->history();
   for (unsigned i = 0; i < 5; i++) {
-    hist1->restoreState(tmp);
-    hist2->restoreState(tmp);
+    restoreHistory(hist1, &buffer);
+    restoreHistory(hist2, &buffer);
     QVERIFY(hist1->count() == hist2->count());
     QVERIFY(hist1->count() == histsize);
     hist2->back();
-    tmp = hist2->saveState();
+    saveHistory(hist2, &buffer);
     hist2->clear();
   }
   delete page2;
@@ -358,9 +329,11 @@ void tst_QWebHistory::saveAndRestore_crash_3() {
 
 /** ::clear */
 void tst_QWebHistory::clear() {
+  QByteArray buffer;
+
   QAction* actionBack = page->action(QWebPage::Back);
   QVERIFY(actionBack->isEnabled());
-  hist->saveState();
+  saveHistory(hist, &buffer);
   QVERIFY(hist->count() > 1);
   hist->clear();
   QVERIFY(hist->count() == 1);  // Leave current item.
