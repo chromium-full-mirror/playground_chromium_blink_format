@@ -144,7 +144,6 @@ class QWEBKIT_EXPORT QWebFrame : public QObject {
   QString toHtml() const;
   QString toPlainText() const;
   QString renderTreeDump() const;
-  QString counterValueForElementById(const QString& id) const;
 
   QString title() const;
   void setUrl(const QUrl& url);
