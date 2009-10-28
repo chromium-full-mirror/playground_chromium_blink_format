@@ -213,6 +213,24 @@ void ResourceRequestBase::setHTTPHeaderField(const AtomicString& name,
     m_platformRequestUpdated = false;
 }
 
+void ResourceRequestBase::clearHTTPReferrer() {
+  updateResourceRequest();
+
+  m_httpHeaderFields.remove("Referer");
+
+  if (url().protocolInHTTPFamily())
+    m_platformRequestUpdated = false;
+}
+
+void ResourceRequestBase::clearHTTPOrigin() {
+  updateResourceRequest();
+
+  m_httpHeaderFields.remove("Origin");
+
+  if (url().protocolInHTTPFamily())
+    m_platformRequestUpdated = false;
+}
+
 void ResourceRequestBase::setResponseContentDispositionEncodingFallbackArray(
     const String& encoding1,
     const String& encoding2,
