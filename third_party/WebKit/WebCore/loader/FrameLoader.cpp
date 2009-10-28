@@ -3,6 +3,8 @@
  * Copyright (C) 2008 Nokia Corporation and/or its subsidiary(-ies)
  * Copyright (C) 2008, 2009 Torch Mobile Inc. All rights reserved.
  * (http://www.torchmobile.com/)
+ * Copyright (C) 2008 Alp Toker <alp@atoker.com>
+ * Copyright (C) Research In Motion Limited 2009. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -76,6 +78,7 @@
 #include "PageTransitionEvent.h"
 #include "PlaceholderDocument.h"
 #include "PluginData.h"
+#include "PluginDatabase.h"
 #include "PluginDocument.h"
 #include "ProgressTracker.h"
 #include "RenderPart.h"
@@ -1391,6 +1394,32 @@ bool FrameLoader::shouldUsePlugin(const KURL& url,
   return objectType == ObjectContentNone ||
          objectType == ObjectContentNetscapePlugin ||
          objectType == ObjectContentOtherPlugin;
+}
+
+ObjectContentType FrameLoader::defaultObjectContentType(
+    const KURL& url,
+    const String& mimeTypeIn) {
+  String mimeType = mimeTypeIn;
+  // We don't use MIMETypeRegistry::getMIMETypeForPath() because it returns
+  // "application/octet-stream" upon failure
+  if (mimeType.isEmpty())
+    mimeType = MIMETypeRegistry::getMIMETypeForExtension(
+        url.path().substring(url.path().reverseFind('.') + 1));
+
+  if (mimeType.isEmpty())
+    return ObjectContentFrame;  // Go ahead and hope that we can display the
+                                // content.
+
+  if (MIMETypeRegistry::isSupportedImageMIMEType(mimeType))
+    return WebCore::ObjectContentImage;
+
+  if (PluginDatabase::installedPlugins()->isMIMETypeRegistered(mimeType))
+    return WebCore::ObjectContentNetscapePlugin;
+
+  if (MIMETypeRegistry::isSupportedNonImageMIMEType(mimeType))
+    return WebCore::ObjectContentFrame;
+
+  return WebCore::ObjectContentNone;
 }
 
 static HTMLPlugInElement* toPlugInElement(Node* node) {
