@@ -48,7 +48,7 @@
 @interface WebWindowFadeAnimation : NSAnimation {
  @private
   CGFloat _initialAlpha, _finalAlpha;
-  NSWindow* _window;  // (retain)
+  NSWindow* _window;  // (assign)
   BOOL _isStopped;
 }
 - (id)initWithDuration:(NSTimeInterval)duration

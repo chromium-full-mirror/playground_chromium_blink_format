@@ -267,14 +267,11 @@ void HTMLMediaElement::insertedIntoDocument() {
     scheduleLoad();
 }
 
-void HTMLMediaElement::willRemove() {
-  if (m_isFullscreen)
-    exitFullscreen();
-  HTMLElement::willRemove();
-}
 void HTMLMediaElement::removedFromDocument() {
   if (m_networkState > NETWORK_EMPTY)
     pause();
+  if (m_isFullscreen)
+    exitFullscreen();
   HTMLElement::removedFromDocument();
 }
 
@@ -1657,6 +1654,9 @@ void HTMLMediaElement::userCancelledLoad() {
 }
 
 void HTMLMediaElement::documentWillBecomeInactive() {
+  if (m_isFullscreen)
+    exitFullscreen();
+
   m_inActiveDocument = false;
   userCancelledLoad();
 
