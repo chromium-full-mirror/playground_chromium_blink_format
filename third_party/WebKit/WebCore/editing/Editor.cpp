@@ -1062,6 +1062,16 @@ bool Editor::insertParagraphSeparator() {
   return true;
 }
 
+static bool nodeIsInTextFormControl(Node* node) {
+  if (!node)
+    return false;
+  Node* ancestor = node->shadowAncestorNode();
+  if (ancestor == node)
+    return false;
+  return ancestor->isElementNode() &&
+         static_cast<Element*>(ancestor)->isTextFormControl();
+}
+
 void Editor::cut() {
   if (tryDHTMLCut())
     return;  // DHTML did the whole operation
@@ -1071,8 +1081,11 @@ void Editor::cut() {
   }
   RefPtr<Range> selection = selectedRange();
   if (shouldDeleteRange(selection.get())) {
-    Pasteboard::generalPasteboard()->writeSelection(
-        selection.get(), canSmartCopyOrDelete(), m_frame);
+    if (nodeIsInTextFormControl(m_frame->selection()->start().node()))
+      Pasteboard::generalPasteboard()->writePlainText(m_frame->selectedText());
+    else
+      Pasteboard::generalPasteboard()->writeSelection(
+          selection.get(), canSmartCopyOrDelete(), m_frame);
     didWriteSelectionToPasteboard();
     deleteSelectionWithSmartDelete(canSmartCopyOrDelete());
   }
@@ -1086,13 +1099,18 @@ void Editor::copy() {
     return;
   }
 
-  Document* document = m_frame->document();
-  if (HTMLImageElement* imageElement = imageElementFromImageDocument(document))
-    Pasteboard::generalPasteboard()->writeImage(imageElement, document->url(),
-                                                document->title());
-  else
-    Pasteboard::generalPasteboard()->writeSelection(
-        selectedRange().get(), canSmartCopyOrDelete(), m_frame);
+  if (nodeIsInTextFormControl(m_frame->selection()->start().node()))
+    Pasteboard::generalPasteboard()->writePlainText(m_frame->selectedText());
+  else {
+    Document* document = m_frame->document();
+    if (HTMLImageElement* imageElement =
+            imageElementFromImageDocument(document))
+      Pasteboard::generalPasteboard()->writeImage(imageElement, document->url(),
+                                                  document->title());
+    else
+      Pasteboard::generalPasteboard()->writeSelection(
+          selectedRange().get(), canSmartCopyOrDelete(), m_frame);
+  }
 
   didWriteSelectionToPasteboard();
 }
