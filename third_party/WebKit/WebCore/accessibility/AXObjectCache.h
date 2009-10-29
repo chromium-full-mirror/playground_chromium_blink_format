@@ -55,7 +55,7 @@ struct TextMarkerData {
   EAffinity affinity;
 };
 
-class AXObjectCache {
+class AXObjectCache : public Noncopyable {
  public:
   AXObjectCache();
   ~AXObjectCache();
