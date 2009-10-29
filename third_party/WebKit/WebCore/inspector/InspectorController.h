@@ -102,9 +102,10 @@ class InspectorController
     CurrentPanel,
     ConsolePanel,
     ElementsPanel,
-    ProfilesPanel,
     ResourcesPanel,
     ScriptsPanel,
+    TimelinePanel,
+    ProfilesPanel,
     StoragePanel
   } SpecialPanels;
 
