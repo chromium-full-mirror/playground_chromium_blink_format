@@ -186,6 +186,7 @@ class ComplexTextController {
   unsigned m_numGlyphsSoFar;
   size_t m_currentRun;
   unsigned m_glyphInCurrentRun;
+  unsigned m_characterInCurrentGlyph;
   float m_finalRoundingWidth;
   float m_padding;
   float m_padPerSpace;

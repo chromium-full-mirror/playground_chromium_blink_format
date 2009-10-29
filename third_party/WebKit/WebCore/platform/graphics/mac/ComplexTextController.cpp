@@ -32,6 +32,8 @@
 #include "Font.h"
 #include "TextBreakIterator.h"
 
+using namespace std;
+
 namespace WebCore {
 
 static inline CGFloat roundCGFloat(CGFloat f) {
@@ -61,6 +63,7 @@ ComplexTextController::ComplexTextController(
       m_numGlyphsSoFar(0),
       m_currentRun(0),
       m_glyphInCurrentRun(0),
+      m_characterInCurrentGlyph(0),
       m_finalRoundingWidth(0),
       m_fallbackFonts(fallbackFonts),
       m_lastRoundingGlyph(0) {
@@ -84,12 +87,6 @@ ComplexTextController::ComplexTextController(
 }
 
 int ComplexTextController::offsetForPosition(int h, bool includePartialGlyphs) {
-  // FIXME: For positions occurring within a ligature, we should return the
-  // closest "ligature caret" or
-  // approximate it by dividing the width of the ligature by the number of
-  // characters it encompasses.
-  // However, Core Text does not expose a low-level API for directly finding
-  // out how many characters a ligature encompasses (the "attachment count").
   if (h >= m_totalWidth)
     return m_run.ltr() ? m_end : 0;
   if (h < 0)
@@ -105,8 +102,28 @@ int ComplexTextController::offsetForPosition(int h, bool includePartialGlyphs) {
     for (unsigned j = 0; j < complexTextRun.glyphCount(); ++j) {
       CGFloat adjustedAdvance =
           m_adjustedAdvances[offsetIntoAdjustedGlyphs + j].width;
-      if (x <= adjustedAdvance) {
-        CFIndex hitIndex = complexTextRun.indexAt(j);
+      if (x < adjustedAdvance) {
+        CFIndex hitGlyphStart = complexTextRun.indexAt(j);
+        CFIndex hitGlyphEnd;
+        if (m_run.ltr())
+          hitGlyphEnd =
+              max<CFIndex>(hitGlyphStart, j + 1 < complexTextRun.glyphCount()
+                                              ? complexTextRun.indexAt(j + 1)
+                                              : complexTextRun.stringLength());
+        else
+          hitGlyphEnd = max<CFIndex>(hitGlyphStart,
+                                     j > 0 ? complexTextRun.indexAt(j - 1)
+                                           : complexTextRun.stringLength());
+
+        // FIXME: Instead of dividing the glyph's advance equially between the
+        // characters, this
+        // could use the glyph's "ligature carets". However, there is no Core
+        // Text API to get the
+        // ligature carets.
+        CFIndex hitIndex =
+            hitGlyphStart +
+            (hitGlyphEnd - hitGlyphStart) *
+                (m_run.ltr() ? x / adjustedAdvance : 1 - x / adjustedAdvance);
         int stringLength = complexTextRun.stringLength();
         TextBreakIterator* cursorPositionIterator =
             cursorMovementIterator(complexTextRun.characters(), stringLength);
@@ -126,13 +143,14 @@ int ComplexTextController::offsetForPosition(int h, bool includePartialGlyphs) {
         if (clusterEnd == TextBreakDone)
           clusterEnd = stringLength;
 
-        CGFloat clusterWidth = adjustedAdvance;
+        CGFloat clusterWidth;
         // FIXME: The search stops at the boundaries of complexTextRun. In
         // theory, it should go on into neighboring ComplexTextRuns
         // derived from the same CTLine. In practice, we do not expect there to
         // be more than one CTRun in a CTLine, as no
         // reordering and on font fallback should occur within a CTLine.
         if (clusterEnd - clusterStart > 1) {
+          clusterWidth = adjustedAdvance;
           int firstGlyphBeforeCluster = j - 1;
           while (firstGlyphBeforeCluster >= 0 &&
                  complexTextRun.indexAt(firstGlyphBeforeCluster) >=
@@ -155,6 +173,10 @@ int ComplexTextController::offsetForPosition(int h, bool includePartialGlyphs) {
                                 .width;
             firstGlyphAfterCluster++;
           }
+        } else {
+          clusterWidth = adjustedAdvance / (hitGlyphEnd - hitGlyphStart);
+          x -= clusterWidth * (m_run.ltr() ? hitIndex - hitGlyphStart
+                                           : hitGlyphEnd - hitIndex - 1);
         }
         if (x <= clusterWidth / 2)
           return complexTextRun.stringLocation() +
@@ -300,14 +322,6 @@ void ComplexTextController::collectComplexTextRuns() {
 }
 
 void ComplexTextController::advance(unsigned offset, GlyphBuffer* glyphBuffer) {
-  // FIXME: For offsets falling inside a ligature, we should advance only as far
-  // as the appropriate "ligature caret"
-  // or divide the width of the ligature by the number of offsets it encompasses
-  // and make an advance proportional
-  // to the offsets into the ligature. However, Core Text does not expose a
-  // low-level API for
-  // directly finding out how many characters a ligature encompasses (the
-  // "attachment count").
   if (static_cast<int>(offset) > m_end)
     offset = m_end;
 
@@ -329,16 +343,48 @@ void ComplexTextController::advance(unsigned offset, GlyphBuffer* glyphBuffer) {
     unsigned g =
         ltr ? m_glyphInCurrentRun : glyphCount - 1 - m_glyphInCurrentRun;
     while (m_glyphInCurrentRun < glyphCount) {
-      if (complexTextRun.indexAt(g) + complexTextRun.stringLocation() >=
+      unsigned glyphStartOffset = complexTextRun.indexAt(g);
+      unsigned glyphEndOffset;
+      if (ltr)
+        glyphEndOffset =
+            max<unsigned>(glyphStartOffset,
+                          g + 1 < glyphCount ? complexTextRun.indexAt(g + 1)
+                                             : complexTextRun.stringLength());
+      else
+        glyphEndOffset = max<unsigned>(glyphStartOffset,
+                                       g > 0 ? complexTextRun.indexAt(g - 1)
+                                             : complexTextRun.stringLength());
+
+      CGSize adjustedAdvance = m_adjustedAdvances[k];
+
+      if (glyphStartOffset + complexTextRun.stringLocation() >=
           m_currentCharacter)
         return;
-      CGSize adjustedAdvance = m_adjustedAdvances[k];
-      if (glyphBuffer)
+
+      if (glyphBuffer && !m_characterInCurrentGlyph)
         glyphBuffer->add(m_adjustedGlyphs[k], complexTextRun.fontData(),
                          adjustedAdvance);
-      m_runWidthSoFar += adjustedAdvance.width;
+
+      unsigned oldCharacterInCurrentGlyph = m_characterInCurrentGlyph;
+      m_characterInCurrentGlyph =
+          min(m_currentCharacter - complexTextRun.stringLocation(),
+              glyphEndOffset) -
+          glyphStartOffset;
+      // FIXME: Instead of dividing the glyph's advance equially between the
+      // characters, this
+      // could use the glyph's "ligature carets". However, there is no Core Text
+      // API to get the
+      // ligature carets.
+      m_runWidthSoFar += adjustedAdvance.width * (m_characterInCurrentGlyph -
+                                                  oldCharacterInCurrentGlyph) /
+                         (glyphEndOffset - glyphStartOffset);
+
+      if (glyphEndOffset + complexTextRun.stringLocation() > m_currentCharacter)
+        return;
+
       m_numGlyphsSoFar++;
       m_glyphInCurrentRun++;
+      m_characterInCurrentGlyph = 0;
       if (ltr) {
         g++;
         k++;
