@@ -326,7 +326,7 @@ int cssPropertyID(const CSSParserString&);
 int cssPropertyID(const String&);
 int cssValueKeywordID(const CSSParserString&);
 
-class ShorthandScope {
+class ShorthandScope : public FastAllocBase {
  public:
   ShorthandScope(CSSParser* parser, int propId) : m_parser(parser) {
     if (!(m_parser->m_inParseShorthand++))
