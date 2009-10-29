@@ -234,7 +234,7 @@ class CSSSelector : public Noncopyable {
 
   void extractPseudoType() const;
 
-  struct RareData {
+  struct RareData : Noncopyable {
     RareData(CSSSelector* tagHistory)
         : m_tagHistory(tagHistory),
           m_simpleSelector(0),
