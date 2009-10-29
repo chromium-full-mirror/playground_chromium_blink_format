@@ -29,6 +29,15 @@
 #include "Font.h"
 #include "ShapeArabic.h"
 
+#ifdef __LP64__
+// ATSUTextInserted() is SPI in 64-bit.
+extern "C" {
+OSStatus ATSUTextInserted(ATSUTextLayout iTextLayout,
+                          UniCharArrayOffset iInsertionLocation,
+                          UniCharCount iInsertionLength);
+}
+#endif
+
 using namespace WTF::Unicode;
 
 namespace WebCore {
@@ -284,7 +293,7 @@ static bool fontHasMirroringInfo(ATSUFontID fontID) {
   else if (status != kATSInvalidFontTableAccess)  // anything other than a
                                                   // missing table is logged as
                                                   // an error
-    LOG_ERROR("ATSFontGetTable failed (%ld)", status);
+    LOG_ERROR("ATSFontGetTable failed (%d)", static_cast<int>(status));
 
   return false;
 }
@@ -305,8 +314,8 @@ static void disableLigatures(const SimpleFontData* fontData,
   OSStatus status = ATSUSetFontFeatures(fontData->m_ATSUStyle, 1, featureTypes,
                                         featureSelectors);
   if (status != noErr)
-    LOG_ERROR("ATSUSetFontFeatures failed (%ld) -- ligatures remain enabled",
-              status);
+    LOG_ERROR("ATSUSetFontFeatures failed (%d) -- ligatures remain enabled",
+              static_cast<int>(status));
 }
 
 static void initializeATSUStyle(const SimpleFontData* fontData,
@@ -323,7 +332,7 @@ static void initializeATSUStyle(const SimpleFontData* fontData,
 
   OSStatus status = ATSUCreateStyle(&fontData->m_ATSUStyle);
   if (status != noErr)
-    LOG_ERROR("ATSUCreateStyle failed (%ld)", status);
+    LOG_ERROR("ATSUCreateStyle failed (%d)", static_cast<int>(status));
 
   Fixed fontSize = FloatToFixed(fontData->platformData().m_size);
   Fract kerningInhibitFactor = FloatToFract(1);
@@ -343,7 +352,7 @@ static void initializeATSUStyle(const SimpleFontData* fontData,
   status = ATSUSetAttributes(fontData->m_ATSUStyle, allowKerning ? 3 : 4,
                              styleTags, styleSizes, styleValues);
   if (status != noErr)
-    LOG_ERROR("ATSUSetAttributes failed (%ld)", status);
+    LOG_ERROR("ATSUSetAttributes failed (%d)", static_cast<int>(status));
 
   fontData->m_ATSUMirrors = fontHasMirroringInfo(fontID);
 
@@ -377,7 +386,8 @@ void ComplexTextController::collectComplexTextRunsForCharacters(
       ATSUCreateTextLayoutWithTextPtr(cp, 0, length, length, 1, &runLength,
                                       &fontData->m_ATSUStyle, &atsuTextLayout);
   if (status != noErr) {
-    LOG_ERROR("ATSUCreateTextLayoutWithTextPtr failed with error %ld", status);
+    LOG_ERROR("ATSUCreateTextLayoutWithTextPtr failed with error %d",
+              static_cast<int>(status));
     return;
   }
   m_complexTextRuns.append(
