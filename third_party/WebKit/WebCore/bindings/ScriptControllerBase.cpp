@@ -64,6 +64,9 @@ bool ScriptController::executeIfJavaScriptURL(const KURL& url,
   if (m_frame->page() && !m_frame->page()->javaScriptURLsAreAllowed())
     return true;
 
+  if (m_frame->inViewSourceMode())
+    return true;
+
   const int javascriptSchemeLength = sizeof("javascript:") - 1;
 
   String script =
