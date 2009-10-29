@@ -99,7 +99,6 @@ class InspectorBackend : public RefCounted<InspectorBackend> {
 
   void startTimelineProfiler();
   void stopTimelineProfiler();
-  bool timelineProfilerEnabled() const;
 
 #if ENABLE(JAVASCRIPT_DEBUGGER)
   void startProfiling();

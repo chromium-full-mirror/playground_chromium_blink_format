@@ -247,12 +247,6 @@ void InspectorBackend::stopTimelineProfiler() {
     m_inspectorController->stopTimelineProfiler();
 }
 
-bool InspectorBackend::timelineProfilerEnabled() const {
-  if (m_inspectorController)
-    return m_inspectorController->timelineProfilerEnabled();
-  return false;
-}
-
 #if ENABLE(JAVASCRIPT_DEBUGGER)
 void InspectorBackend::startProfiling() {
   if (m_inspectorController)
