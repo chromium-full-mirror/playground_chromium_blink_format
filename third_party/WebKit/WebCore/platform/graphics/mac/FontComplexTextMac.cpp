@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006, 2007, 2008 Apple Inc.  All rights reserved.
+ * Copyright (C) 2006, 2007, 2008, 2009 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -10,25 +10,25 @@
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
  *
- * THIS SOFTWARE IS PROVIDED BY APPLE COMPUTER, INC. ``AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL APPLE COMPUTER, INC. OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
- * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY APPLE INC. AND ITS CONTRIBUTORS ``AS IS'' AND
+ * ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL APPLE INC. OR ITS CONTRIBUTORS BE LIABLE FOR
+ * ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON
+ * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "config.h"
 #include "Font.h"
 
-#if USE(CORE_TEXT)
-
-#include "CoreTextController.h"
+#include "ComplexTextController.h"
 #include "FontFallbackList.h"
 #include "GlyphBuffer.h"
 #include "GraphicsContext.h"
@@ -43,7 +43,7 @@ FloatRect Font::selectionRectForComplexText(const TextRun& run,
                                             int h,
                                             int from,
                                             int to) const {
-  CoreTextController controller(this, run);
+  ComplexTextController controller(this, run);
   controller.advance(from);
   float beforeWidth = controller.runWidthSoFar();
   controller.advance(to);
@@ -71,7 +71,7 @@ void Font::drawComplexText(GraphicsContext* context,
   GlyphBuffer glyphBuffer;
 
   float startX = point.x();
-  CoreTextController controller(this, run);
+  ComplexTextController controller(this, run);
   controller.advance(from);
   float beforeWidth = controller.runWidthSoFar();
   controller.advance(to, &glyphBuffer);
@@ -99,15 +99,15 @@ void Font::drawComplexText(GraphicsContext* context,
 float Font::floatWidthForComplexText(
     const TextRun& run,
     HashSet<const SimpleFontData*>* fallbackFonts) const {
-  CoreTextController controller(this, run, true, fallbackFonts);
+  ComplexTextController controller(this, run, true, fallbackFonts);
   return controller.totalWidth();
 }
 
 int Font::offsetForPositionForComplexText(const TextRun& run,
                                           int x,
                                           bool includePartialGlyphs) const {
-  CoreTextController controller(this, run);
+  ComplexTextController controller(this, run);
   return controller.offsetForPosition(x, includePartialGlyphs);
 }
-}
-#endif  // USE(CORE_TEXT)
+
+}  // namespace WebCore
