@@ -1400,7 +1400,7 @@ v8::Handle<v8::Value> V8DOMWrapper::convertNewNodeToV8Object(
     else
       type = V8ClassIndex::DOCUMENT;
   } else {
-    ASSERT(nodeType < sizeof(mapping) / sizeof(mapping[0]));
+    ASSERT(nodeType < static_cast<int>(sizeof(mapping) / sizeof(mapping[0])));
     type = mapping[nodeType];
     ASSERT(type != V8ClassIndex::INVALID_CLASS_INDEX);
   }

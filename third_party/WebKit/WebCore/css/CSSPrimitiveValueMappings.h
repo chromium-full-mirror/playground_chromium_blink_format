@@ -200,11 +200,11 @@ inline CSSPrimitiveValue::CSSPrimitiveValue(ControlPart e) : m_type(CSS_IDENT) {
     case ListboxPart:
       m_value.ident = CSSValueListbox;
       break;
-#if ENABLE(DATALIST)
     case ListButtonPart:
+#if ENABLE(DATALIST)
       m_value.ident = CSSValueListButton;
-      break;
 #endif
+      break;
     case ListItemPart:
       m_value.ident = CSSValueListitem;
       break;

@@ -2255,12 +2255,12 @@ AccessibilityObject* AccessibilityRenderObject::observableObject() const {
 
 typedef HashMap<String, AccessibilityRole, CaseFoldingHash> ARIARoleMap;
 
-static const ARIARoleMap& createARIARoleMap() {
-  struct RoleEntry {
-    String ariaRole;
-    AccessibilityRole webcoreRole;
-  };
+struct RoleEntry {
+  String ariaRole;
+  AccessibilityRole webcoreRole;
+};
 
+static const ARIARoleMap& createARIARoleMap() {
   const RoleEntry roles[] = {
       {"application", LandmarkApplicationRole},
       {"article", DocumentArticleRole},

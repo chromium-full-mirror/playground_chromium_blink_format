@@ -1708,12 +1708,12 @@ static String valueForeColor(Frame* frame, Event*) {
 
 // Map of functions
 
-static const CommandMap& createCommandMap() {
-  struct CommandEntry {
-    const char* name;
-    EditorInternalCommand command;
-  };
+struct CommandEntry {
+  const char* name;
+  EditorInternalCommand command;
+};
 
+static const CommandMap& createCommandMap() {
   static const CommandEntry commands[] = {
       {"AlignCenter",
        {executeJustifyCenter, supportedFromMenuOrKeyBinding,
