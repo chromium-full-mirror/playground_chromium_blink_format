@@ -117,8 +117,8 @@ class Structure : public RefCounted<Structure> {
   Structure* previousID() const { return m_previous.get(); }
 
   void growPropertyStorageCapacity();
-  size_t propertyStorageCapacity() const { return m_propertyStorageCapacity; }
-  size_t propertyStorageSize() const {
+  unsigned propertyStorageCapacity() const { return m_propertyStorageCapacity; }
+  unsigned propertyStorageSize() const {
     return m_propertyTable
                ? m_propertyTable->keyCount +
                      m_propertyTable->anonymousSlotCount +
@@ -150,6 +150,14 @@ class Structure : public RefCounted<Structure> {
   bool hasGetterSetterProperties() const { return m_hasGetterSetterProperties; }
   void setHasGetterSetterProperties(bool hasGetterSetterProperties) {
     m_hasGetterSetterProperties = hasGetterSetterProperties;
+  }
+
+  bool hasNonEnumerableProperties() const {
+    return m_hasNonEnumerableProperties;
+  }
+
+  bool hasAnonymousSlots() const {
+    return m_propertyTable && m_propertyTable->anonymousSlotCount;
   }
 
   bool isEmpty() const {
@@ -231,12 +239,13 @@ class Structure : public RefCounted<Structure> {
 
   PropertyMapHashTable* m_propertyTable;
 
-  size_t m_propertyStorageCapacity;
+  uint32_t m_propertyStorageCapacity;
   signed char m_offset;
 
   unsigned m_dictionaryKind : 2;
   bool m_isPinnedPropertyTable : 1;
   bool m_hasGetterSetterProperties : 1;
+  bool m_hasNonEnumerableProperties : 1;
 #if COMPILER(WINSCW)
   // Workaround for Symbian WINSCW compiler that cannot resolve unsigned type of
   // the declared

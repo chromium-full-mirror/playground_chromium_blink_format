@@ -61,6 +61,13 @@ struct ControlFlowContext {
   FinallyContext finallyContext;
 };
 
+struct ForInContext {
+  RefPtr<RegisterID> expectedSubscriptRegister;
+  RefPtr<RegisterID> iterRegister;
+  RefPtr<RegisterID> indexRegister;
+  RefPtr<RegisterID> propertyRegister;
+};
+
 class BytecodeGenerator : public FastAllocBase {
  public:
   typedef DeclarationStacks::VarStack VarStack;
@@ -435,6 +442,16 @@ class BytecodeGenerator : public FastAllocBase {
   void pushFinallyContext(Label* target, RegisterID* returnAddrDst);
   void popFinallyContext();
 
+  void pushOptimisedForIn(RegisterID* expectedBase,
+                          RegisterID* iter,
+                          RegisterID* index,
+                          RegisterID* propertyRegister) {
+    ForInContext context = {expectedBase, iter, index, propertyRegister};
+    m_forInContextStack.append(context);
+  }
+
+  void popOptimisedForIn() { m_forInContextStack.removeLast(); }
+
   LabelScope* breakTarget(const Identifier&);
   LabelScope* continueTarget(const Identifier&);
 
@@ -603,6 +620,7 @@ class BytecodeGenerator : public FastAllocBase {
 
   Vector<ControlFlowContext> m_scopeContextStack;
   Vector<SwitchInfo> m_switchContextStack;
+  Vector<ForInContext> m_forInContextStack;
 
   int m_nextGlobalIndex;
   int m_nextParameterIndex;

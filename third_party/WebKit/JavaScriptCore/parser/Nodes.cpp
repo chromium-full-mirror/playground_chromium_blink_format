@@ -1757,6 +1757,7 @@ RegisterID* ForInNode::emitBytecode(BytecodeGenerator& generator,
   generator.emitNode(base.get(), m_expr);
   RefPtr<RegisterID> i = generator.newTemporary();
   RefPtr<RegisterID> size = generator.newTemporary();
+  RefPtr<RegisterID> expectedSubscript;
   RefPtr<RegisterID> iter =
       generator.emitGetPropertyNames(generator.newTemporary(), base.get(),
                                      i.get(), size.get(), scope->breakTarget());
@@ -1766,6 +1767,7 @@ RegisterID* ForInNode::emitBytecode(BytecodeGenerator& generator,
   generator.emitLabel(loopStart.get());
 
   RegisterID* propertyName;
+  bool optimizedForinAccess = false;
   if (m_lexpr->isResolveNode()) {
     const Identifier& ident = static_cast<ResolveNode*>(m_lexpr)->identifier();
     propertyName = generator.registerFor(ident);
@@ -1777,6 +1779,12 @@ RegisterID* ForInNode::emitBytecode(BytecodeGenerator& generator,
 
       generator.emitExpressionInfo(divot(), startOffset(), endOffset());
       generator.emitPutById(base, ident, propertyName);
+    } else {
+      expectedSubscript =
+          generator.emitMove(generator.newTemporary(), propertyName);
+      generator.pushOptimisedForIn(expectedSubscript.get(), iter.get(), i.get(),
+                                   propertyName);
+      optimizedForinAccess = true;
     }
   } else if (m_lexpr->isDotAccessorNode()) {
     DotAccessorNode* assignNode = static_cast<DotAccessorNode*>(m_lexpr);
@@ -1803,6 +1811,9 @@ RegisterID* ForInNode::emitBytecode(BytecodeGenerator& generator,
   }
 
   generator.emitNode(dst, m_statement);
+
+  if (optimizedForinAccess)
+    generator.popOptimisedForIn();
 
   generator.emitLabel(scope->continueTarget());
   generator.emitNextPropertyName(propertyName, base.get(), i.get(), size.get(),

@@ -943,6 +943,19 @@ void CodeBlock::dump(ExecState* exec,
              registerName(r2).c_str());
       break;
     }
+    case op_get_by_pname: {
+      int r0 = (++it)->u.operand;
+      int r1 = (++it)->u.operand;
+      int r2 = (++it)->u.operand;
+      int r3 = (++it)->u.operand;
+      int r4 = (++it)->u.operand;
+      int r5 = (++it)->u.operand;
+      printf("[%4d] get_by_pname\t %s, %s, %s, %s, %s, %s\n", location,
+             registerName(r0).c_str(), registerName(r1).c_str(),
+             registerName(r2).c_str(), registerName(r3).c_str(),
+             registerName(r4).c_str(), registerName(r5).c_str());
+      break;
+    }
     case op_put_by_val: {
       int r0 = (++it)->u.operand;
       int r1 = (++it)->u.operand;
@@ -1170,15 +1183,20 @@ void CodeBlock::dump(ExecState* exec,
       break;
     }
     case op_get_pnames: {
-      int r0 = it[0].u.operand;
-      int r1 = it[1].u.operand;
-      printf("[%4d] get_pnames\t %s, %s\n", location, registerName(r0).c_str(),
-             registerName(r1).c_str());
+      int r0 = it[1].u.operand;
+      int r1 = it[2].u.operand;
+      int r2 = it[3].u.operand;
+      int r3 = it[4].u.operand;
+      int offset = it[5].u.operand;
+      printf("[%4d] get_pnames\t %s, %s, %s, %s, %d(->%d)\n", location,
+             registerName(r0).c_str(), registerName(r1).c_str(),
+             registerName(r2).c_str(), registerName(r3).c_str(), offset,
+             location + offset);
       it += OPCODE_LENGTH(op_get_pnames) - 1;
       break;
     }
     case op_next_pname: {
-      int dest = it[0].u.operand;
+      int dest = it[1].u.operand;
       int iter = it[4].u.operand;
       int offset = it[5].u.operand;
       printf("[%4d] next_pname\t %s, %s, %d(->%d)\n", location,
