@@ -67,6 +67,7 @@ class LocalStorageThread : public ThreadSafeShared<LocalStorageThread> {
 
   Mutex m_terminateLock;
   ThreadCondition m_terminateCondition;
+  bool m_terminated;
 };
 
 }  // namespace WebCore
