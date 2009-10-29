@@ -905,11 +905,15 @@ class MacroAssemblerARMv7 : public AbstractMacroAssembler<ARMv7Assembler> {
   }
 
  protected:
-  ARMv7Assembler::JmpSrc makeJump() { return m_assembler.b(); }
+  ARMv7Assembler::JmpSrc makeJump() {
+    moveFixedWidthEncoding(Imm32(0), dataTempRegister);
+    return m_assembler.bx(dataTempRegister);
+  }
 
   ARMv7Assembler::JmpSrc makeBranch(ARMv7Assembler::Condition cond) {
-    m_assembler.it(cond);
-    return m_assembler.b();
+    m_assembler.it(cond, true, true);
+    moveFixedWidthEncoding(Imm32(0), dataTempRegister);
+    return m_assembler.bx(dataTempRegister);
   }
   ARMv7Assembler::JmpSrc makeBranch(Condition cond) {
     return makeBranch(armV7Condition(cond));
