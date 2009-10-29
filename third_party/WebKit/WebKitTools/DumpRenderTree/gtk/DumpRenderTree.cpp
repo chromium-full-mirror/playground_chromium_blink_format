@@ -414,6 +414,7 @@ void dump() {
   fflush(stderr);
 
   done = true;
+  gtk_main_quit();
 }
 
 static void setDefaultsToConsistentStateValuesForTesting() {
@@ -494,8 +495,7 @@ static void runTest(const string& testPathOrURL) {
   g_free(url);
   url = NULL;
 
-  while (!done)
-    g_main_context_iteration(NULL, TRUE);
+  gtk_main();
 
   // Also check if we still have opened webViews and free them.
   if (gLayoutTestController->closeRemainingWindowsWhenComplete() ||
