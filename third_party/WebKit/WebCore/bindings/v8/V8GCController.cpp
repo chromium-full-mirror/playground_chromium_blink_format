@@ -214,9 +214,9 @@ class GCPrologueVisitor : public DOMWrapperMap<void>::Visitor {
         // once for each pair (see ASSERT in MessagePort::unentangle()).
         if (port1 < port2) {
           v8::Handle<v8::Value> port1Wrapper =
-              V8DOMWrapper::convertToV8Object(V8ClassIndex::MESSAGEPORT, port1);
+              V8DOMWrapper::jsWrapperForActiveDOMObject(port1);
           v8::Handle<v8::Value> port2Wrapper =
-              V8DOMWrapper::convertToV8Object(V8ClassIndex::MESSAGEPORT, port2);
+              V8DOMWrapper::jsWrapperForActiveDOMObject(port2);
           ASSERT(port1Wrapper->IsObject());
           v8::Handle<v8::Object>::Cast(port1Wrapper)
               ->SetInternalField(V8Custom::kMessagePortEntangledPortIndex,
@@ -230,7 +230,7 @@ class GCPrologueVisitor : public DOMWrapperMap<void>::Visitor {
         // Remove the wrapper entanglement when a port is not entangled.
         if (V8DOMWrapper::domObjectHasJSWrapper(port1)) {
           v8::Handle<v8::Value> wrapper =
-              V8DOMWrapper::convertToV8Object(V8ClassIndex::MESSAGEPORT, port1);
+              V8DOMWrapper::jsWrapperForActiveDOMObject(port1);
           ASSERT(wrapper->IsObject());
           v8::Handle<v8::Object>::Cast(wrapper)->SetInternalField(
               V8Custom::kMessagePortEntangledPortIndex, v8::Undefined());
