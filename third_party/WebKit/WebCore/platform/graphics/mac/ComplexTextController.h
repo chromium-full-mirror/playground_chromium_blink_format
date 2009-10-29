@@ -129,6 +129,9 @@ class ComplexTextController {
                    bool ltr);
 
 #if USE(ATSUI)
+#ifdef BUILDING_ON_TIGER
+    typedef UInt32 URefCon;
+#endif
     static OSStatus overrideLayoutOperation(ATSULayoutOperationSelector,
                                             ATSULineRef,
                                             URefCon,
