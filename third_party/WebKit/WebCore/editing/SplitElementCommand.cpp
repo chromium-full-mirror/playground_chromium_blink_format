@@ -41,9 +41,7 @@ SplitElementCommand::SplitElementCommand(PassRefPtr<Element> element,
   ASSERT(m_atChild->parentNode() == m_element2);
 }
 
-void SplitElementCommand::doApply() {
-  RefPtr<Element> prefixElement = m_element2->cloneElementWithoutChildren();
-
+void SplitElementCommand::executeApply() {
   if (m_atChild->parentNode() != m_element2)
     return;
 
@@ -57,14 +55,19 @@ void SplitElementCommand::doApply() {
   Node* parent = m_element2->parentNode();
   if (!parent)
     return;
-  parent->insertBefore(prefixElement.get(), m_element2.get(), ec);
+  parent->insertBefore(m_element1.get(), m_element2.get(), ec);
   if (ec)
     return;
-  m_element1 = prefixElement.release();
 
   size_t size = children.size();
   for (size_t i = 0; i < size; ++i)
     m_element1->appendChild(children[i], ec);
+}
+
+void SplitElementCommand::doApply() {
+  m_element1 = m_element2->cloneElementWithoutChildren();
+
+  executeApply();
 }
 
 void SplitElementCommand::doUnapply() {
@@ -84,7 +87,13 @@ void SplitElementCommand::doUnapply() {
     m_element2->insertBefore(children[i].get(), refChild.get(), ec);
 
   m_element1->remove(ec);
-  m_element1 = 0;
+}
+
+void SplitElementCommand::doReapply() {
+  if (!m_element1)
+    return;
+
+  executeApply();
 }
 
 }  // namespace WebCore
