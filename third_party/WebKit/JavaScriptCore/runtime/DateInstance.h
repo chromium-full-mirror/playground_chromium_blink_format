@@ -39,9 +39,8 @@ class DateInstance : public JSWrapperObject {
 
   static JS_EXPORTDATA const ClassInfo info;
 
-  bool getGregorianDateTime(ExecState*,
-                            bool outputIsUTC,
-                            WTF::GregorianDateTime&) const;
+  const WTF::GregorianDateTime* gregorianDateTime(ExecState*,
+                                                  bool outputIsUTC) const;
 
   static PassRefPtr<Structure> createStructure(JSValue prototype) {
     return Structure::create(prototype, TypeInfo(ObjectType, StructureFlags));

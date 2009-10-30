@@ -409,9 +409,10 @@ static JSCell* formatLocaleDate(ExecState* exec,
                                 double,
                                 LocaleDateTimeFormat format,
                                 const ArgList&) {
-  GregorianDateTime gregorianDateTime;
   const bool outputIsUTC = false;
-  if (!dateObject->getGregorianDateTime(exec, outputIsUTC, gregorianDateTime))
+  const GregorianDateTime* gregorianDateTime =
+      dateObject->gregorianDateTime(exec, outputIsUTC);
+  if (!gregorianDateTime)
     return jsNontrivialString(exec, "Invalid Date");
   return formatLocaleDate(exec, gregorianDateTime, format);
 }
@@ -596,11 +597,13 @@ JSValue JSC_HOST_CALL dateProtoFuncToString(ExecState* exec,
 
   DateInstance* thisDateObj = asDateInstance(thisValue);
 
-  GregorianDateTime t;
-  if (!thisDateObj->getGregorianDateTime(exec, outputIsUTC, t))
+  const GregorianDateTime* gregorianDateTime =
+      thisDateObj->gregorianDateTime(exec, outputIsUTC);
+  if (!gregorianDateTime)
     return jsNontrivialString(exec, "Invalid Date");
   return jsNontrivialString(exec,
-                            formatDate(t) + " " + formatTime(t, outputIsUTC));
+                            formatDate(*gregorianDateTime) + " " +
+                                formatTime(*gregorianDateTime, outputIsUTC));
 }
 
 JSValue JSC_HOST_CALL dateProtoFuncToUTCString(ExecState* exec,
@@ -614,11 +617,13 @@ JSValue JSC_HOST_CALL dateProtoFuncToUTCString(ExecState* exec,
 
   DateInstance* thisDateObj = asDateInstance(thisValue);
 
-  GregorianDateTime t;
-  if (!thisDateObj->getGregorianDateTime(exec, outputIsUTC, t))
+  const GregorianDateTime* gregorianDateTime =
+      thisDateObj->gregorianDateTime(exec, outputIsUTC);
+  if (!gregorianDateTime)
     return jsNontrivialString(exec, "Invalid Date");
-  return jsNontrivialString(
-      exec, formatDateUTCVariant(t) + " " + formatTime(t, outputIsUTC));
+  return jsNontrivialString(exec,
+                            formatDateUTCVariant(*gregorianDateTime) + " " +
+                                formatTime(*gregorianDateTime, outputIsUTC));
 }
 
 JSValue JSC_HOST_CALL dateProtoFuncToISOString(ExecState* exec,
@@ -632,8 +637,9 @@ JSValue JSC_HOST_CALL dateProtoFuncToISOString(ExecState* exec,
 
   DateInstance* thisDateObj = asDateInstance(thisValue);
 
-  GregorianDateTime t;
-  if (!thisDateObj->getGregorianDateTime(exec, outputIsUTC, t))
+  const GregorianDateTime* gregorianDateTime =
+      thisDateObj->gregorianDateTime(exec, outputIsUTC);
+  if (!gregorianDateTime)
     return jsNontrivialString(exec, "Invalid Date");
   // Maximum amount of space we need in buffer: 6 (max. digits in year) + 2 * 5
   // (2 characters each for month, day, hour, minute, second) + 4 (. + 3 digits
@@ -642,7 +648,9 @@ JSValue JSC_HOST_CALL dateProtoFuncToISOString(ExecState* exec,
   // character to allow us to force null termination.
   char buffer[28];
   snprintf(buffer, sizeof(buffer) - 1, "%04d-%02d-%02dT%02d:%02d:%02d.%03dZ",
-           1900 + t.year, t.month + 1, t.monthDay, t.hour, t.minute, t.second,
+           1900 + gregorianDateTime->year, gregorianDateTime->month + 1,
+           gregorianDateTime->monthDay, gregorianDateTime->hour,
+           gregorianDateTime->minute, gregorianDateTime->second,
            static_cast<int>(fmod(thisDateObj->internalNumber(), 1000)));
   buffer[sizeof(buffer) - 1] = 0;
   return jsNontrivialString(exec, buffer);
@@ -659,10 +667,11 @@ JSValue JSC_HOST_CALL dateProtoFuncToDateString(ExecState* exec,
 
   DateInstance* thisDateObj = asDateInstance(thisValue);
 
-  GregorianDateTime t;
-  if (!thisDateObj->getGregorianDateTime(exec, outputIsUTC, t))
+  const GregorianDateTime* gregorianDateTime =
+      thisDateObj->gregorianDateTime(exec, outputIsUTC);
+  if (!gregorianDateTime)
     return jsNontrivialString(exec, "Invalid Date");
-  return jsNontrivialString(exec, formatDate(t));
+  return jsNontrivialString(exec, formatDate(*gregorianDateTime));
 }
 
 JSValue JSC_HOST_CALL dateProtoFuncToTimeString(ExecState* exec,
@@ -676,10 +685,11 @@ JSValue JSC_HOST_CALL dateProtoFuncToTimeString(ExecState* exec,
 
   DateInstance* thisDateObj = asDateInstance(thisValue);
 
-  GregorianDateTime t;
-  if (!thisDateObj->getGregorianDateTime(exec, outputIsUTC, t))
+  const GregorianDateTime* gregorianDateTime =
+      thisDateObj->gregorianDateTime(exec, outputIsUTC);
+  if (!gregorianDateTime)
     return jsNontrivialString(exec, "Invalid Date");
-  return jsNontrivialString(exec, formatTime(t, outputIsUTC));
+  return jsNontrivialString(exec, formatTime(*gregorianDateTime, outputIsUTC));
 }
 
 JSValue JSC_HOST_CALL dateProtoFuncToLocaleString(ExecState* exec,
@@ -739,10 +749,11 @@ JSValue JSC_HOST_CALL dateProtoFuncGetFullYear(ExecState* exec,
 
   DateInstance* thisDateObj = asDateInstance(thisValue);
 
-  GregorianDateTime t;
-  if (!thisDateObj->getGregorianDateTime(exec, outputIsUTC, t))
+  const GregorianDateTime* gregorianDateTime =
+      thisDateObj->gregorianDateTime(exec, outputIsUTC);
+  if (!gregorianDateTime)
     return jsNaN(exec);
-  return jsNumber(exec, 1900 + t.year);
+  return jsNumber(exec, 1900 + gregorianDateTime->year);
 }
 
 JSValue JSC_HOST_CALL dateProtoFuncGetUTCFullYear(ExecState* exec,
@@ -756,10 +767,11 @@ JSValue JSC_HOST_CALL dateProtoFuncGetUTCFullYear(ExecState* exec,
 
   DateInstance* thisDateObj = asDateInstance(thisValue);
 
-  GregorianDateTime t;
-  if (!thisDateObj->getGregorianDateTime(exec, outputIsUTC, t))
+  const GregorianDateTime* gregorianDateTime =
+      thisDateObj->gregorianDateTime(exec, outputIsUTC);
+  if (!gregorianDateTime)
     return jsNaN(exec);
-  return jsNumber(exec, 1900 + t.year);
+  return jsNumber(exec, 1900 + gregorianDateTime->year);
 }
 
 JSValue JSC_HOST_CALL dateProtoFuncToGMTString(ExecState* exec,
@@ -773,11 +785,13 @@ JSValue JSC_HOST_CALL dateProtoFuncToGMTString(ExecState* exec,
 
   DateInstance* thisDateObj = asDateInstance(thisValue);
 
-  GregorianDateTime t;
-  if (!thisDateObj->getGregorianDateTime(exec, outputIsUTC, t))
+  const GregorianDateTime* gregorianDateTime =
+      thisDateObj->gregorianDateTime(exec, outputIsUTC);
+  if (!gregorianDateTime)
     return jsNontrivialString(exec, "Invalid Date");
-  return jsNontrivialString(
-      exec, formatDateUTCVariant(t) + " " + formatTime(t, outputIsUTC));
+  return jsNontrivialString(exec,
+                            formatDateUTCVariant(*gregorianDateTime) + " " +
+                                formatTime(*gregorianDateTime, outputIsUTC));
 }
 
 JSValue JSC_HOST_CALL dateProtoFuncGetMonth(ExecState* exec,
@@ -791,10 +805,11 @@ JSValue JSC_HOST_CALL dateProtoFuncGetMonth(ExecState* exec,
 
   DateInstance* thisDateObj = asDateInstance(thisValue);
 
-  GregorianDateTime t;
-  if (!thisDateObj->getGregorianDateTime(exec, outputIsUTC, t))
+  const GregorianDateTime* gregorianDateTime =
+      thisDateObj->gregorianDateTime(exec, outputIsUTC);
+  if (!gregorianDateTime)
     return jsNaN(exec);
-  return jsNumber(exec, t.month);
+  return jsNumber(exec, gregorianDateTime->month);
 }
 
 JSValue JSC_HOST_CALL dateProtoFuncGetUTCMonth(ExecState* exec,
@@ -808,10 +823,11 @@ JSValue JSC_HOST_CALL dateProtoFuncGetUTCMonth(ExecState* exec,
 
   DateInstance* thisDateObj = asDateInstance(thisValue);
 
-  GregorianDateTime t;
-  if (!thisDateObj->getGregorianDateTime(exec, outputIsUTC, t))
+  const GregorianDateTime* gregorianDateTime =
+      thisDateObj->gregorianDateTime(exec, outputIsUTC);
+  if (!gregorianDateTime)
     return jsNaN(exec);
-  return jsNumber(exec, t.month);
+  return jsNumber(exec, gregorianDateTime->month);
 }
 
 JSValue JSC_HOST_CALL dateProtoFuncGetDate(ExecState* exec,
@@ -825,10 +841,11 @@ JSValue JSC_HOST_CALL dateProtoFuncGetDate(ExecState* exec,
 
   DateInstance* thisDateObj = asDateInstance(thisValue);
 
-  GregorianDateTime t;
-  if (!thisDateObj->getGregorianDateTime(exec, outputIsUTC, t))
+  const GregorianDateTime* gregorianDateTime =
+      thisDateObj->gregorianDateTime(exec, outputIsUTC);
+  if (!gregorianDateTime)
     return jsNaN(exec);
-  return jsNumber(exec, t.monthDay);
+  return jsNumber(exec, gregorianDateTime->monthDay);
 }
 
 JSValue JSC_HOST_CALL dateProtoFuncGetUTCDate(ExecState* exec,
@@ -842,10 +859,11 @@ JSValue JSC_HOST_CALL dateProtoFuncGetUTCDate(ExecState* exec,
 
   DateInstance* thisDateObj = asDateInstance(thisValue);
 
-  GregorianDateTime t;
-  if (!thisDateObj->getGregorianDateTime(exec, outputIsUTC, t))
+  const GregorianDateTime* gregorianDateTime =
+      thisDateObj->gregorianDateTime(exec, outputIsUTC);
+  if (!gregorianDateTime)
     return jsNaN(exec);
-  return jsNumber(exec, t.monthDay);
+  return jsNumber(exec, gregorianDateTime->monthDay);
 }
 
 JSValue JSC_HOST_CALL dateProtoFuncGetDay(ExecState* exec,
@@ -859,10 +877,11 @@ JSValue JSC_HOST_CALL dateProtoFuncGetDay(ExecState* exec,
 
   DateInstance* thisDateObj = asDateInstance(thisValue);
 
-  GregorianDateTime t;
-  if (!thisDateObj->getGregorianDateTime(exec, outputIsUTC, t))
+  const GregorianDateTime* gregorianDateTime =
+      thisDateObj->gregorianDateTime(exec, outputIsUTC);
+  if (!gregorianDateTime)
     return jsNaN(exec);
-  return jsNumber(exec, t.weekDay);
+  return jsNumber(exec, gregorianDateTime->weekDay);
 }
 
 JSValue JSC_HOST_CALL dateProtoFuncGetUTCDay(ExecState* exec,
@@ -876,10 +895,11 @@ JSValue JSC_HOST_CALL dateProtoFuncGetUTCDay(ExecState* exec,
 
   DateInstance* thisDateObj = asDateInstance(thisValue);
 
-  GregorianDateTime t;
-  if (!thisDateObj->getGregorianDateTime(exec, outputIsUTC, t))
+  const GregorianDateTime* gregorianDateTime =
+      thisDateObj->gregorianDateTime(exec, outputIsUTC);
+  if (!gregorianDateTime)
     return jsNaN(exec);
-  return jsNumber(exec, t.weekDay);
+  return jsNumber(exec, gregorianDateTime->weekDay);
 }
 
 JSValue JSC_HOST_CALL dateProtoFuncGetHours(ExecState* exec,
@@ -893,10 +913,11 @@ JSValue JSC_HOST_CALL dateProtoFuncGetHours(ExecState* exec,
 
   DateInstance* thisDateObj = asDateInstance(thisValue);
 
-  GregorianDateTime t;
-  if (!thisDateObj->getGregorianDateTime(exec, outputIsUTC, t))
+  const GregorianDateTime* gregorianDateTime =
+      thisDateObj->gregorianDateTime(exec, outputIsUTC);
+  if (!gregorianDateTime)
     return jsNaN(exec);
-  return jsNumber(exec, t.hour);
+  return jsNumber(exec, gregorianDateTime->hour);
 }
 
 JSValue JSC_HOST_CALL dateProtoFuncGetUTCHours(ExecState* exec,
@@ -910,10 +931,11 @@ JSValue JSC_HOST_CALL dateProtoFuncGetUTCHours(ExecState* exec,
 
   DateInstance* thisDateObj = asDateInstance(thisValue);
 
-  GregorianDateTime t;
-  if (!thisDateObj->getGregorianDateTime(exec, outputIsUTC, t))
+  const GregorianDateTime* gregorianDateTime =
+      thisDateObj->gregorianDateTime(exec, outputIsUTC);
+  if (!gregorianDateTime)
     return jsNaN(exec);
-  return jsNumber(exec, t.hour);
+  return jsNumber(exec, gregorianDateTime->hour);
 }
 
 JSValue JSC_HOST_CALL dateProtoFuncGetMinutes(ExecState* exec,
@@ -927,10 +949,11 @@ JSValue JSC_HOST_CALL dateProtoFuncGetMinutes(ExecState* exec,
 
   DateInstance* thisDateObj = asDateInstance(thisValue);
 
-  GregorianDateTime t;
-  if (!thisDateObj->getGregorianDateTime(exec, outputIsUTC, t))
+  const GregorianDateTime* gregorianDateTime =
+      thisDateObj->gregorianDateTime(exec, outputIsUTC);
+  if (!gregorianDateTime)
     return jsNaN(exec);
-  return jsNumber(exec, t.minute);
+  return jsNumber(exec, gregorianDateTime->minute);
 }
 
 JSValue JSC_HOST_CALL dateProtoFuncGetUTCMinutes(ExecState* exec,
@@ -944,10 +967,11 @@ JSValue JSC_HOST_CALL dateProtoFuncGetUTCMinutes(ExecState* exec,
 
   DateInstance* thisDateObj = asDateInstance(thisValue);
 
-  GregorianDateTime t;
-  if (!thisDateObj->getGregorianDateTime(exec, outputIsUTC, t))
+  const GregorianDateTime* gregorianDateTime =
+      thisDateObj->gregorianDateTime(exec, outputIsUTC);
+  if (!gregorianDateTime)
     return jsNaN(exec);
-  return jsNumber(exec, t.minute);
+  return jsNumber(exec, gregorianDateTime->minute);
 }
 
 JSValue JSC_HOST_CALL dateProtoFuncGetSeconds(ExecState* exec,
@@ -961,10 +985,11 @@ JSValue JSC_HOST_CALL dateProtoFuncGetSeconds(ExecState* exec,
 
   DateInstance* thisDateObj = asDateInstance(thisValue);
 
-  GregorianDateTime t;
-  if (!thisDateObj->getGregorianDateTime(exec, outputIsUTC, t))
+  const GregorianDateTime* gregorianDateTime =
+      thisDateObj->gregorianDateTime(exec, outputIsUTC);
+  if (!gregorianDateTime)
     return jsNaN(exec);
-  return jsNumber(exec, t.second);
+  return jsNumber(exec, gregorianDateTime->second);
 }
 
 JSValue JSC_HOST_CALL dateProtoFuncGetUTCSeconds(ExecState* exec,
@@ -978,10 +1003,11 @@ JSValue JSC_HOST_CALL dateProtoFuncGetUTCSeconds(ExecState* exec,
 
   DateInstance* thisDateObj = asDateInstance(thisValue);
 
-  GregorianDateTime t;
-  if (!thisDateObj->getGregorianDateTime(exec, outputIsUTC, t))
+  const GregorianDateTime* gregorianDateTime =
+      thisDateObj->gregorianDateTime(exec, outputIsUTC);
+  if (!gregorianDateTime)
     return jsNaN(exec);
-  return jsNumber(exec, t.second);
+  return jsNumber(exec, gregorianDateTime->second);
 }
 
 JSValue JSC_HOST_CALL dateProtoFuncGetMilliSeconds(ExecState* exec,
@@ -1029,10 +1055,11 @@ JSValue JSC_HOST_CALL dateProtoFuncGetTimezoneOffset(ExecState* exec,
 
   DateInstance* thisDateObj = asDateInstance(thisValue);
 
-  GregorianDateTime t;
-  if (!thisDateObj->getGregorianDateTime(exec, outputIsUTC, t))
+  const GregorianDateTime* gregorianDateTime =
+      thisDateObj->gregorianDateTime(exec, outputIsUTC);
+  if (!gregorianDateTime)
     return jsNaN(exec);
-  return jsNumber(exec, -gmtoffset(t) / minutesPerHour);
+  return jsNumber(exec, -gregorianDateTime->utcOffset / minutesPerHour);
 }
 
 JSValue JSC_HOST_CALL dateProtoFuncSetTime(ExecState* exec,
@@ -1070,16 +1097,22 @@ static JSValue setNewValueFromTimeArgs(ExecState* exec,
   double secs = floor(milli / msPerSecond);
   double ms = milli - secs * msPerSecond;
 
-  GregorianDateTime t;
-  thisDateObj->getGregorianDateTime(exec, inputIsUTC, t);
+  const GregorianDateTime* other =
+      thisDateObj->gregorianDateTime(exec, inputIsUTC);
+  if (!other)
+    return jsNaN(exec);
 
-  if (!fillStructuresUsingTimeArgs(exec, args, numArgsToUse, &ms, &t)) {
+  GregorianDateTime gregorianDateTime;
+  gregorianDateTime.copyFrom(*other);
+  if (!fillStructuresUsingTimeArgs(exec, args, numArgsToUse, &ms,
+                                   &gregorianDateTime)) {
     JSValue result = jsNaN(exec);
     thisDateObj->setInternalValue(result);
     return result;
   }
 
-  JSValue result = jsNumber(exec, gregorianDateTimeToMS(t, ms, inputIsUTC));
+  JSValue result =
+      jsNumber(exec, gregorianDateTimeToMS(gregorianDateTime, ms, inputIsUTC));
   thisDateObj->setInternalValue(result);
   return result;
 }
@@ -1100,26 +1133,30 @@ static JSValue setNewValueFromDateArgs(ExecState* exec,
   }
 
   double milli = thisDateObj->internalNumber();
-  double ms = 0;
-
-  GregorianDateTime t;
-  if (numArgsToUse == 3 && isnan(milli))
-    // Based on ECMA 262 15.9.5.40 - .41 (set[UTC]FullYear)
-    // the time must be reset to +0 if it is NaN.
-    WTF::msToGregorianDateTime(0, true, t);
-  else {
-    double secs = floor(milli / msPerSecond);
-    ms = milli - secs * msPerSecond;
-    thisDateObj->getGregorianDateTime(exec, inputIsUTC, t);
+  if (numArgsToUse == 3 && isnan(milli)) {
+    JSValue result = jsNumber(exec, 0);
+    thisDateObj->setInternalValue(result);
+    return result;
   }
 
-  if (!fillStructuresUsingDateArgs(exec, args, numArgsToUse, &ms, &t)) {
+  const GregorianDateTime* other =
+      thisDateObj->gregorianDateTime(exec, inputIsUTC);
+  if (!other)
+    return jsNaN(exec);
+
+  GregorianDateTime gregorianDateTime;
+  gregorianDateTime.copyFrom(*other);
+
+  double ms = milli - floor(milli / msPerSecond) * msPerSecond;
+  if (!fillStructuresUsingDateArgs(exec, args, numArgsToUse, &ms,
+                                   &gregorianDateTime)) {
     JSValue result = jsNaN(exec);
     thisDateObj->setInternalValue(result);
     return result;
   }
 
-  JSValue result = jsNumber(exec, gregorianDateTimeToMS(t, ms, inputIsUTC));
+  JSValue result =
+      jsNumber(exec, gregorianDateTimeToMS(gregorianDateTime, ms, inputIsUTC));
   thisDateObj->setInternalValue(result);
   return result;
 }
@@ -1255,15 +1292,17 @@ JSValue JSC_HOST_CALL dateProtoFuncSetYear(ExecState* exec,
   double milli = thisDateObj->internalNumber();
   double ms = 0;
 
-  GregorianDateTime t;
+  GregorianDateTime gregorianDateTime;
   if (isnan(milli))
     // Based on ECMA 262 B.2.5 (setYear)
     // the time must be reset to +0 if it is NaN.
-    WTF::msToGregorianDateTime(0, true, t);
+    msToGregorianDateTime(0, true, gregorianDateTime);
   else {
     double secs = floor(milli / msPerSecond);
     ms = milli - secs * msPerSecond;
-    thisDateObj->getGregorianDateTime(exec, outputIsUTC, t);
+    if (const GregorianDateTime* other =
+            thisDateObj->gregorianDateTime(exec, outputIsUTC))
+      gregorianDateTime.copyFrom(*other);
   }
 
   bool ok = true;
@@ -1274,8 +1313,9 @@ JSValue JSC_HOST_CALL dateProtoFuncSetYear(ExecState* exec,
     return result;
   }
 
-  t.year = (year > 99 || year < 0) ? year - 1900 : year;
-  JSValue result = jsNumber(exec, gregorianDateTimeToMS(t, ms, outputIsUTC));
+  gregorianDateTime.year = (year > 99 || year < 0) ? year - 1900 : year;
+  JSValue result =
+      jsNumber(exec, gregorianDateTimeToMS(gregorianDateTime, ms, outputIsUTC));
   thisDateObj->setInternalValue(result);
   return result;
 }
@@ -1291,12 +1331,13 @@ JSValue JSC_HOST_CALL dateProtoFuncGetYear(ExecState* exec,
 
   DateInstance* thisDateObj = asDateInstance(thisValue);
 
-  GregorianDateTime t;
-  if (!thisDateObj->getGregorianDateTime(exec, outputIsUTC, t))
+  const GregorianDateTime* gregorianDateTime =
+      thisDateObj->gregorianDateTime(exec, outputIsUTC);
+  if (!gregorianDateTime)
     return jsNaN(exec);
 
   // NOTE: IE returns the full year even in getYear.
-  return jsNumber(exec, t.year);
+  return jsNumber(exec, gregorianDateTime->year);
 }
 
 JSValue JSC_HOST_CALL dateProtoFuncToJSON(ExecState* exec,
