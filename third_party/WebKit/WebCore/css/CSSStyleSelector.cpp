@@ -362,7 +362,7 @@ using namespace HTMLNames;
     return;                                                 \
   }
 
-class CSSRuleSet {
+class CSSRuleSet : public Noncopyable {
  public:
   CSSRuleSet();
   ~CSSRuleSet();
