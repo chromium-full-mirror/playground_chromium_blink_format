@@ -174,9 +174,3 @@ void QWebInspectorPrivate::adjustFrontendSize(const QSize& size) {
   if (frontend)
     frontend->resize(size);
 }
-
-/*!
-    \fn void QWebInspector::windowTitleChanged(const QString& newTitle);
-
-    This is emitted to signal that this widget's title changed to \a newTitle.
-*/

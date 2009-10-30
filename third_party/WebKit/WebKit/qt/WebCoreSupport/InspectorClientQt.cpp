@@ -155,7 +155,6 @@ void InspectorClientQt::updateWindowTitle() {
         QCoreApplication::translate("QWebPage", "Web Inspector - %2")
             .arg(m_inspectedURL);
     m_inspectedWebPage->d->inspector->setWindowTitle(caption);
-    emit m_inspectedWebPage->d->inspector->windowTitleChanged(caption);
   }
 }
 

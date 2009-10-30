@@ -39,9 +39,6 @@ class QWEBKIT_EXPORT QWebInspector : public QWidget {
   QSize sizeHint() const;
   bool event(QEvent*);
 
- Q_SIGNALS:
-  void windowTitleChanged(const QString& newTitle);
-
  protected:
   void resizeEvent(QResizeEvent* event);
   void showEvent(QShowEvent* event);
