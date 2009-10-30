@@ -45,6 +45,7 @@
 #include "RenderBox.h"
 #include "RenderTheme.h"
 #include "UserAgentStyleSheets.h"
+#include "QWebPageClient.h"
 #include "qwebpage.h"
 
 #include <QApplication>
@@ -750,13 +751,13 @@ ControlPart RenderThemeQt::applyTheme(QStyleOption& option,
   if (result == RadioPart || result == CheckboxPart)
     option.state |= (isChecked(o) ? QStyle::State_On : QStyle::State_Off);
 
-  // If the webview has a custom palette, use it
+  // If the owner widget has a custom palette, use it
   Page* page = o->document()->page();
   if (page) {
-    QWidget* view = static_cast<ChromeClientQt*>(page->chrome()->client())
-                        ->m_webPage->view();
-    if (view)
-      option.palette = view->palette();
+    ChromeClient* client = page->chrome()->client();
+    QWebPageClient* pageClient = client->platformPageClient();
+    if (pageClient)
+      option.palette = pageClient->palette();
   }
 
   return result;
