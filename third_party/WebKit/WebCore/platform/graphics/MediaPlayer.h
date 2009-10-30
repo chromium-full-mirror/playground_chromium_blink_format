@@ -37,6 +37,7 @@
 #include <wtf/HashSet.h>
 #include <wtf/OwnPtr.h>
 #include <wtf/Noncopyable.h>
+#include <wtf/PassOwnPtr.h>
 
 #ifdef __OBJC__
 @class QTMovie;
@@ -117,7 +118,9 @@ class MediaPlayerClient {
 
 class MediaPlayer : public Noncopyable {
  public:
-  MediaPlayer(MediaPlayerClient*);
+  static PassOwnPtr<MediaPlayer> create(MediaPlayerClient* client) {
+    return new MediaPlayer(client);
+  }
   virtual ~MediaPlayer();
 
   // media engine support
@@ -241,6 +244,8 @@ class MediaPlayer : public Noncopyable {
   bool hasSingleSecurityOrigin() const;
 
  private:
+  MediaPlayer(MediaPlayerClient*);
+
   static void initializeMediaEngines();
 
   MediaPlayerClient* m_mediaPlayerClient;
