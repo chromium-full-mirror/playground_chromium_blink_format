@@ -377,3 +377,8 @@ void AccessibilityUIElement::increment() {
 void AccessibilityUIElement::decrement() {
   // FIXME: implement
 }
+
+JSStringRef AccessibilityUIElement::accessibilityValue() const {
+  // FIXME: implement
+  return JSStringCreateWithCharacters(0, 0);
+}

@@ -544,6 +544,15 @@ static JSValueRef getValueDescriptionCallback(JSContextRef context,
   return JSValueMakeString(context, valueDescription.get());
 }
 
+static JSValueRef getAccessibilityValueCallback(JSContextRef context,
+                                                JSObjectRef thisObject,
+                                                JSStringRef propertyName,
+                                                JSValueRef* exception) {
+  JSRetainPtr<JSStringRef> accessibilityValue(
+      Adopt, toAXElement(thisObject)->accessibilityValue());
+  return JSValueMakeString(context, accessibilityValue.get());
+}
+
 // Destruction
 
 static void finalize(JSObjectRef thisObject) {
@@ -561,6 +570,8 @@ JSObjectRef AccessibilityUIElement::makeJSAccessibilityUIElement(
 
 JSClassRef AccessibilityUIElement::getJSClass() {
   static JSStaticValue staticValues[] = {
+      {"accessibilityValue", getAccessibilityValueCallback, 0,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"role", getRoleCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"subrole", getSubroleCallback, 0,
