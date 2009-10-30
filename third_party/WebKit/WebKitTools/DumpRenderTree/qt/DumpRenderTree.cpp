@@ -309,7 +309,15 @@ void DumpRenderTree::resetToConsistentStateBeforeTesting() {
   m_page->blockSignals(false);
 
   m_page->mainFrame()->setZoomFactor(1.0);
-  m_page->history()->clear();
+
+  // clear leaves current page, so remove it as well by
+  // setting max item count to 0, and then setting it back
+  // to it's original value.
+  QWebHistory* history = m_page->history();
+  history->clear();
+  int itemCount = history->maximumItemCount();
+  history->setMaximumItemCount(0);
+  history->setMaximumItemCount(itemCount);
 
   static_cast<WebPage*>(m_page)->resetSettings();
   qt_drt_clearFrameName(m_page->mainFrame());
