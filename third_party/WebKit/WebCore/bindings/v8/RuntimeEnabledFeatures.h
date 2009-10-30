@@ -51,6 +51,11 @@ class RuntimeEnabledFeatures {
   }
   static bool sessionStorageEnabled() { return isSessionStorageEnabled; }
 
+  static void setNotificationsEnabled(bool isEnabled) {
+    isNotificationsEnabled = isEnabled;
+  }
+  static bool notificationsEnabled() { return isNotificationsEnabled; }
+
  private:
   // Never instantiate.
   RuntimeEnabledFeatures() {}
@@ -58,6 +63,7 @@ class RuntimeEnabledFeatures {
   static bool isDatabaseEnabled;
   static bool isLocalStorageEnabled;
   static bool isSessionStorageEnabled;
+  static bool isNotificationsEnabled;
 };
 
 }  // namespace WebCore
