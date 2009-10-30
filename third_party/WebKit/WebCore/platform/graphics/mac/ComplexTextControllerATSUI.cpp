@@ -81,9 +81,6 @@ OSStatus ComplexTextController::ComplexTextRun::overrideLayoutOperation(
 
   for (ItemCount i = 0; i < count; ++i, ++j) {
     if (layoutRecords[j].glyphID == kATSDeletedGlyphcode) {
-      if (!complexTextRun->m_ltr && !(layoutRecords[j].flags & 0x800))
-        complexTextRun->m_indices[complexTextRun->m_indices.size() - 1] =
-            layoutRecords[j].originalOffset / 2 + indexOffset;
       complexTextRun->m_glyphCount--;
       continue;
     }
