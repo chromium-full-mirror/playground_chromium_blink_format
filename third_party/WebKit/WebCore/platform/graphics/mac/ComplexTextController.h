@@ -157,7 +157,10 @@ class ComplexTextController {
     const CGGlyph* m_glyphs;
     Vector<CGSize, 64> m_advancesVector;
     const CGSize* m_advances;
+#if USE(ATSUI)
+    bool m_ltr;
     bool m_directionalOverride;
+#endif
   };
 
   void collectComplexTextRuns();
