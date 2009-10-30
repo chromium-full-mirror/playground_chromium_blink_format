@@ -49,15 +49,13 @@ static WorkerContextExecutionProxy* workerProxy(
 }
 
 V8WorkerContextEventListener::V8WorkerContextEventListener(
-    PassRefPtr<V8ListenerGuard> guard,
     v8::Local<v8::Object> listener,
     bool isInline)
-    : V8EventListener(guard, listener, isInline) {}
+    : V8EventListener(listener, isInline) {}
 
 void V8WorkerContextEventListener::handleEvent(ScriptExecutionContext* context,
                                                Event* event) {
-  // Is the EventListener disconnected?
-  if (disconnected())
+  if (!context)
     return;
 
   // The callback function on XMLHttpRequest can clear the event listener and
@@ -89,8 +87,7 @@ bool V8WorkerContextEventListener::reportError(ScriptExecutionContext* context,
                                                const String& message,
                                                const String& url,
                                                int lineNumber) {
-  // Is the EventListener disconnected?
-  if (disconnected())
+  if (!context)
     return false;
 
   // The callback function can clear the event listener and destroy 'this'

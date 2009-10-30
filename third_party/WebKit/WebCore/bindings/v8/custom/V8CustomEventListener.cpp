@@ -35,10 +35,9 @@
 
 namespace WebCore {
 
-V8EventListener::V8EventListener(PassRefPtr<V8ListenerGuard> guard,
-                                 v8::Local<v8::Object> listener,
+V8EventListener::V8EventListener(v8::Local<v8::Object> listener,
                                  bool isAttribute)
-    : V8AbstractEventListener(guard, isAttribute) {
+    : V8AbstractEventListener(isAttribute) {
   setListenerObject(listener);
 }
 

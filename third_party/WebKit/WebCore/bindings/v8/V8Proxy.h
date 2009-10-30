@@ -331,8 +331,6 @@ class V8Proxy {
 
   v8::Local<v8::Context> context();
 
-  PassRefPtr<V8ListenerGuard> listenerGuard() { return m_listenerGuard; }
-
   bool setContextDebugId(int id);
   static int contextDebugId(v8::Handle<v8::Context>);
 
@@ -382,8 +380,6 @@ class V8Proxy {
   // the storage mutex.
   void releaseStorageMutex();
 
-  void disconnectEventListeners();
-
   void resetIsolatedWorlds();
 
   void setInjectedScriptContextDebugId(v8::Handle<v8::Context> targetContext);
@@ -421,8 +417,6 @@ class V8Proxy {
   Frame* m_frame;
 
   v8::Persistent<v8::Context> m_context;
-
-  RefPtr<V8ListenerGuard> m_listenerGuard;
 
   // For each possible type of wrapper, we keep a boilerplate object.
   // The boilerplate is used to create additional wrappers of the same

@@ -70,9 +70,7 @@ static void reportFatalErrorInV8(const char* location, const char* message) {
 
 WorkerContextExecutionProxy::WorkerContextExecutionProxy(
     WorkerContext* workerContext)
-    : m_workerContext(workerContext),
-      m_recursion(0),
-      m_listenerGuard(V8ListenerGuard::create()) {
+    : m_workerContext(workerContext), m_recursion(0) {
   initV8IfNeeded();
 }
 
@@ -81,8 +79,6 @@ WorkerContextExecutionProxy::~WorkerContextExecutionProxy() {
 }
 
 void WorkerContextExecutionProxy::dispose() {
-  m_listenerGuard->disconnectListeners();
-
   // Detach all events from their JS wrappers.
   for (size_t eventIndex = 0; eventIndex < m_events.size(); ++eventIndex) {
     Event* event = m_events[eventIndex];
@@ -429,8 +425,7 @@ WorkerContextExecutionProxy::findOrCreateEventListener(
     bool findOnly) {
   return findOnly ? V8EventListenerList::findWrapper(object, isInline)
                   : V8EventListenerList::findOrCreateWrapper<
-                        V8WorkerContextEventListener>(m_listenerGuard, object,
-                                                      isInline);
+                        V8WorkerContextEventListener>(object, isInline);
 }
 
 void WorkerContextExecutionProxy::trackEvent(Event* event) {

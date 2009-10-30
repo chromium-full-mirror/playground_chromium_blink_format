@@ -46,7 +46,7 @@ V8LazyEventListener::V8LazyEventListener(const String& functionName,
                                          const String sourceURL,
                                          int lineNumber,
                                          int columnNumber)
-    : V8AbstractEventListener(0, true),
+    : V8AbstractEventListener(true),
       m_functionName(functionName),
       m_isSVGEvent(isSVGEvent),
       m_code(code),
