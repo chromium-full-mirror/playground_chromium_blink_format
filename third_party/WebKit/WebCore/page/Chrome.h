@@ -42,6 +42,7 @@ class Frame;
 class Geolocation;
 class HitTestResult;
 class IntRect;
+class Node;
 class Page;
 class String;
 #if ENABLE(NOTIFICATIONS)
@@ -86,6 +87,8 @@ class Chrome : public HostWindow {
 
   bool canTakeFocus(FocusDirection) const;
   void takeFocus(FocusDirection) const;
+
+  void focusedNodeChanged(Node*) const;
 
   Page* createWindow(Frame*,
                      const FrameLoadRequest&,

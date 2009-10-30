@@ -123,6 +123,8 @@ void ChromeClientQt::takeFocus(FocusDirection) {
   // here.
 }
 
+void ChromeClientQt::focusedNodeChanged(WebCore::Node*) {}
+
 Page* ChromeClientQt::createWindow(Frame*,
                                    const FrameLoadRequest& request,
                                    const WindowFeatures& features) {

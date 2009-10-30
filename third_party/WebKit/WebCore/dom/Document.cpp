@@ -2803,6 +2803,8 @@ bool Document::setFocusedNode(PassRefPtr<Node> newFocusedNode) {
                                                    newFocusedRenderer);
   }
 #endif
+  if (!focusChangeBlocked)
+    page()->chrome()->focusedNodeChanged(m_focusedNode.get());
 
 SetFocusedNodeDone:
   updateStyleIfNeeded();

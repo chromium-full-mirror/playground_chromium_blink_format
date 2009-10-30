@@ -152,6 +152,8 @@ void WebChromeClient::takeFocus(FocusDirection direction) {
   }
 }
 
+void WebChromeClient::focusedNodeChanged(Node*) {}
+
 static COMPtr<IPropertyBag> createWindowFeaturesPropertyBag(
     const WindowFeatures& features) {
   HashMap<String, COMVariant> map;

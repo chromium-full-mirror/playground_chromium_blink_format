@@ -230,6 +230,8 @@ void ChromeClient::takeFocus(FocusDirection) {
   unfocus();
 }
 
+void ChromeClient::focusedNodeChanged(Node*) {}
+
 bool ChromeClient::canRunBeforeUnloadConfirmPanel() {
   return true;
 }

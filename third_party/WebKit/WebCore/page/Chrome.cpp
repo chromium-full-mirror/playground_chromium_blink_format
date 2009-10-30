@@ -134,6 +134,10 @@ void Chrome::takeFocus(FocusDirection direction) const {
   m_client->takeFocus(direction);
 }
 
+void Chrome::focusedNodeChanged(Node* node) const {
+  m_client->focusedNodeChanged(node);
+}
+
 Page* Chrome::createWindow(Frame* frame,
                            const FrameLoadRequest& request,
                            const WindowFeatures& features) const {
