@@ -165,6 +165,7 @@ Database::Database(Document* document,
                    const String& displayName,
                    unsigned long estimatedSize)
     : m_transactionInProgress(false),
+      m_isTransactionQueueEnabled(true),
       m_document(document),
       m_name(name.crossThreadString()),
       m_guid(0),
@@ -219,15 +220,15 @@ bool Database::openAndVerifyVersion(ExceptionCode& e) {
     return false;
   m_databaseAuthorizer = DatabaseAuthorizer::create();
 
-  RefPtr<DatabaseOpenTask> task = DatabaseOpenTask::create(this);
+  bool success = false;
+  DatabaseTaskSynchronizer synchronizer;
+  RefPtr<DatabaseOpenTask> task =
+      DatabaseOpenTask::create(this, &synchronizer, e, success);
 
-  task->lockForSynchronousScheduling();
   m_document->databaseThread()->scheduleImmediateTask(task);
-  task->waitForSynchronousCompletion();
+  synchronizer.waitForTaskCompletion();
 
-  ASSERT(task->isComplete());
-  e = task->exceptionCode();
-  return task->openSuccessful();
+  return success;
 }
 
 static bool retrieveTextResultFromDatabase(SQLiteDatabase& db,
@@ -348,11 +349,12 @@ void Database::markAsDeletedAndClose() {
 
   m_document->databaseThread()->unscheduleDatabaseTasks(this);
 
-  RefPtr<DatabaseCloseTask> task = DatabaseCloseTask::create(this);
+  DatabaseTaskSynchronizer synchronizer;
+  RefPtr<DatabaseCloseTask> task =
+      DatabaseCloseTask::create(this, &synchronizer);
 
-  task->lockForSynchronousScheduling();
   m_document->databaseThread()->scheduleImmediateTask(task);
-  task->waitForSynchronousCompletion();
+  synchronizer.waitForTaskCompletion();
 }
 
 void Database::close() {
@@ -394,7 +396,7 @@ void Database::stop() {
 
   {
     MutexLocker locker(m_transactionInProgressMutex);
-    m_transactionQueue.kill();
+    m_isTransactionQueueEnabled = false;
     m_transactionInProgress = false;
   }
 }
@@ -583,8 +585,13 @@ void Database::transaction(
 void Database::scheduleTransaction() {
   ASSERT(!m_transactionInProgressMutex.tryLock());  // Locked by caller.
   RefPtr<SQLTransaction> transaction;
-  if (m_transactionQueue.tryGetMessage(transaction) &&
-      m_document->databaseThread()) {
+
+  if (m_isTransactionQueueEnabled && !m_transactionQueue.isEmpty()) {
+    transaction = m_transactionQueue.first();
+    m_transactionQueue.removeFirst();
+  }
+
+  if (transaction && m_document->databaseThread()) {
     RefPtr<DatabaseTransactionTask> task =
         DatabaseTransactionTask::create(transaction);
     LOG(StorageAPI,
@@ -670,15 +677,22 @@ void Database::deliverPendingCallback(void* context) {
 }
 
 Vector<String> Database::tableNames() {
+  // FIXME: Not using threadsafeCopy on these strings looks ok since threads
+  // take strict turns
+  // in dealing with them. However, if the code changes, this may not be true
+  // anymore.
+  Vector<String> result;
   if (!m_document->databaseThread())
-    return Vector<String>();
-  RefPtr<DatabaseTableNamesTask> task = DatabaseTableNamesTask::create(this);
+    return result;
 
-  task->lockForSynchronousScheduling();
+  DatabaseTaskSynchronizer synchronizer;
+  RefPtr<DatabaseTableNamesTask> task =
+      DatabaseTableNamesTask::create(this, &synchronizer, result);
+
   m_document->databaseThread()->scheduleImmediateTask(task);
-  task->waitForSynchronousCompletion();
+  synchronizer.waitForTaskCompletion();
 
-  return task->tableNames();
+  return result;
 }
 
 void Database::setExpectedVersion(const String& version) {
