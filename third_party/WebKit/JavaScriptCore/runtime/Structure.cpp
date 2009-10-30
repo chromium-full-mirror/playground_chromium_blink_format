@@ -603,8 +603,6 @@ size_t Structure::addPropertyWithoutTransition(const Identifier& propertyName,
   materializePropertyMapIfNecessary();
 
   m_isPinnedPropertyTable = true;
-  if (attributes & DontEnum)
-    m_hasNonEnumerableProperties = true;
 
   size_t offset = put(propertyName, attributes, specificValue);
   if (propertyStorageSize() > propertyStorageCapacity())
@@ -789,6 +787,9 @@ size_t Structure::put(const Identifier& propertyName,
   ASSERT(get(propertyName) == notFound);
 
   checkConsistency();
+
+  if (attributes & DontEnum)
+    m_hasNonEnumerableProperties = true;
 
   UString::Rep* rep = propertyName._ustring.rep();
 
@@ -1077,6 +1078,8 @@ void Structure::getEnumerablePropertyNames(PropertyNameArray& propertyNames) {
     unsigned entryCount =
         m_propertyTable->keyCount + m_propertyTable->deletedSentinelCount;
     for (unsigned k = 1; k <= entryCount; k++) {
+      ASSERT(m_hasNonEnumerableProperties ||
+             !(m_propertyTable->entries()[k].attributes & DontEnum));
       if (m_propertyTable->entries()[k].key &&
           !(m_propertyTable->entries()[k].attributes & DontEnum)) {
         PropertyMapEntry* value = &m_propertyTable->entries()[k];
@@ -1172,6 +1175,8 @@ void Structure::checkConsistency() {
   for (unsigned c = 1;
        c <= m_propertyTable->keyCount + m_propertyTable->deletedSentinelCount;
        ++c) {
+    ASSERT(m_hasNonEnumerableProperties ||
+           !(m_propertyTable->entries()[c].attributes & DontEnum));
     UString::Rep* rep = m_propertyTable->entries()[c].key;
     if (!rep)
       continue;
