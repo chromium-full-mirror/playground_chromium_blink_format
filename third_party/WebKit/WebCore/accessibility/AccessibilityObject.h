@@ -481,7 +481,9 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   unsigned doAXLineForIndex(unsigned);
 
   virtual String stringValueForMSAA() const { return String(); }
+  virtual String stringRoleForMSAA() const { return String(); }
   virtual String nameForMSAA() const { return String(); }
+  virtual String descriptionForMSAA() const { return String(); }
 
 #if HAVE(ACCESSIBILITY)
 #if PLATFORM(GTK)

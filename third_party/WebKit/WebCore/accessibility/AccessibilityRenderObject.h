@@ -231,7 +231,9 @@ class AccessibilityRenderObject : public AccessibilityObject {
   virtual void updateBackingStore();
 
   virtual String stringValueForMSAA() const;
+  virtual String stringRoleForMSAA() const;
   virtual String nameForMSAA() const;
+  virtual String descriptionForMSAA() const;
 
  protected:
   RenderObject* m_renderer;
@@ -246,6 +248,7 @@ class AccessibilityRenderObject : public AccessibilityObject {
   void ariaListboxSelectedChildren(AccessibilityChildrenVector&);
   void ariaListboxVisibleChildren(AccessibilityChildrenVector&);
   bool ariaIsHidden() const;
+  String positionalDescriptionForMSAA() const;
 
   Element* menuElementForMenuButton() const;
   Element* menuItemElementForMenu() const;
