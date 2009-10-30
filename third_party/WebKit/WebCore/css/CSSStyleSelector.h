@@ -348,7 +348,7 @@ class CSSStyleSelector : public Noncopyable {
       m_resolvedVariablesDeclarations;
 };
 
-class CSSRuleData {
+class CSSRuleData : public Noncopyable {
  public:
   CSSRuleData(unsigned pos,
               CSSStyleRule* r,
