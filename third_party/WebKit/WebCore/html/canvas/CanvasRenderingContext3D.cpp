@@ -123,43 +123,70 @@ void CanvasRenderingContext3D::activeTexture(unsigned long texture) {
 }
 
 void CanvasRenderingContext3D::attachShader(CanvasProgram* program,
-                                            CanvasShader* shader) {
-  if (!program || !shader)
+                                            CanvasShader* shader,
+                                            ExceptionCode& ec) {
+  if (!program || program->context() != this || !shader ||
+      shader->context() != this) {
+    ec = TYPE_MISMATCH_ERR;
     return;
+  }
   m_context->attachShader(program, shader);
   cleanupAfterGraphicsCall(false);
 }
 
 void CanvasRenderingContext3D::bindAttribLocation(CanvasProgram* program,
                                                   unsigned long index,
-                                                  const String& name) {
-  if (!program)
+                                                  const String& name,
+                                                  ExceptionCode& ec) {
+  if (!program || program->context() != this) {
+    ec = TYPE_MISMATCH_ERR;
     return;
+  }
   m_context->bindAttribLocation(program, index, name);
   cleanupAfterGraphicsCall(false);
 }
 
 void CanvasRenderingContext3D::bindBuffer(unsigned long target,
-                                          CanvasBuffer* buffer) {
+                                          CanvasBuffer* buffer,
+                                          ExceptionCode& ec) {
+  if (!buffer || buffer->context() != this) {
+    ec = TYPE_MISMATCH_ERR;
+    return;
+  }
   m_context->bindBuffer(target, buffer);
   cleanupAfterGraphicsCall(false);
 }
 
 void CanvasRenderingContext3D::bindFramebuffer(unsigned long target,
-                                               CanvasFramebuffer* buffer) {
+                                               CanvasFramebuffer* buffer,
+                                               ExceptionCode& ec) {
+  if (!buffer || buffer->context() != this) {
+    ec = TYPE_MISMATCH_ERR;
+    return;
+  }
   m_context->bindFramebuffer(target, buffer);
   cleanupAfterGraphicsCall(false);
 }
 
 void CanvasRenderingContext3D::bindRenderbuffer(
     unsigned long target,
-    CanvasRenderbuffer* renderbuffer) {
-  m_context->bindRenderbuffer(target, renderbuffer);
+    CanvasRenderbuffer* renderBuffer,
+    ExceptionCode& ec) {
+  if (!renderBuffer || renderBuffer->context() != this) {
+    ec = TYPE_MISMATCH_ERR;
+    return;
+  }
+  m_context->bindRenderbuffer(target, renderBuffer);
   cleanupAfterGraphicsCall(false);
 }
 
 void CanvasRenderingContext3D::bindTexture(unsigned long target,
-                                           CanvasTexture* texture) {
+                                           CanvasTexture* texture,
+                                           ExceptionCode& ec) {
+  if (!texture || texture->context() != this) {
+    ec = TYPE_MISMATCH_ERR;
+    return;
+  }
   m_context->bindTexture(target, texture);
   cleanupAfterGraphicsCall(false);
 }
@@ -263,7 +290,12 @@ void CanvasRenderingContext3D::colorMask(bool red,
   cleanupAfterGraphicsCall(false);
 }
 
-void CanvasRenderingContext3D::compileShader(CanvasShader* shader) {
+void CanvasRenderingContext3D::compileShader(CanvasShader* shader,
+                                             ExceptionCode& ec) {
+  if (!shader || shader->context() != this) {
+    ec = TYPE_MISMATCH_ERR;
+    return;
+  }
   m_context->compileShader(shader);
   cleanupAfterGraphicsCall(false);
 }
@@ -403,10 +435,13 @@ void CanvasRenderingContext3D::depthRange(double zNear, double zFar) {
 }
 
 void CanvasRenderingContext3D::detachShader(CanvasProgram* program,
-                                            CanvasShader* shader) {
-  if (!program || !shader)
+                                            CanvasShader* shader,
+                                            ExceptionCode& ec) {
+  if (!program || program->context() != this || !shader ||
+      shader->context() != this) {
+    ec = TYPE_MISMATCH_ERR;
     return;
-
+  }
   m_context->detachShader(program, shader);
   cleanupAfterGraphicsCall(false);
 }
@@ -460,10 +495,12 @@ void CanvasRenderingContext3D::framebufferRenderbuffer(
     unsigned long target,
     unsigned long attachment,
     unsigned long renderbuffertarget,
-    CanvasRenderbuffer* buffer) {
-  if (!buffer)
+    CanvasRenderbuffer* buffer,
+    ExceptionCode& ec) {
+  if (!buffer || buffer->context() != this) {
+    ec = TYPE_MISMATCH_ERR;
     return;
-
+  }
   m_context->framebufferRenderbuffer(target, attachment, renderbuffertarget,
                                      buffer);
   cleanupAfterGraphicsCall(false);
@@ -473,10 +510,12 @@ void CanvasRenderingContext3D::framebufferTexture2D(unsigned long target,
                                                     unsigned long attachment,
                                                     unsigned long textarget,
                                                     CanvasTexture* texture,
-                                                    long level) {
-  if (!texture)
+                                                    long level,
+                                                    ExceptionCode& ec) {
+  if (!texture || texture->context() != this) {
+    ec = TYPE_MISMATCH_ERR;
     return;
-
+  }
   m_context->framebufferTexture2D(target, attachment, textarget, texture,
                                   level);
   cleanupAfterGraphicsCall(false);
@@ -603,7 +642,13 @@ PassRefPtr<CanvasIntArray> CanvasRenderingContext3D::getIntegerv(
 }
 
 int CanvasRenderingContext3D::getProgrami(CanvasProgram* program,
-                                          unsigned long pname) {
+                                          unsigned long pname,
+                                          ExceptionCode& ec) {
+  if (!program || program->context() != this) {
+    ec = TYPE_MISMATCH_ERR;
+    return 0;
+  }
+
   int result = m_context->getProgrami(program, pname);
   cleanupAfterGraphicsCall(false);
   return result;
@@ -611,13 +656,23 @@ int CanvasRenderingContext3D::getProgrami(CanvasProgram* program,
 
 PassRefPtr<CanvasIntArray> CanvasRenderingContext3D::getProgramiv(
     CanvasProgram* program,
-    unsigned long pname) {
+    unsigned long pname,
+    ExceptionCode& ec) {
+  if (!program || program->context() != this) {
+    ec = TYPE_MISMATCH_ERR;
+    return 0;
+  }
   RefPtr<CanvasIntArray> array = m_context->getProgramiv(program, pname);
   cleanupAfterGraphicsCall(false);
   return array;
 }
 
-String CanvasRenderingContext3D::getProgramInfoLog(CanvasProgram* program) {
+String CanvasRenderingContext3D::getProgramInfoLog(CanvasProgram* program,
+                                                   ExceptionCode& ec) {
+  if (!program || program->context() != this) {
+    ec = TYPE_MISMATCH_ERR;
+    return "";
+  }
   String s = m_context->getProgramInfoLog(program);
   cleanupAfterGraphicsCall(false);
   return s;
@@ -640,7 +695,12 @@ PassRefPtr<CanvasIntArray> CanvasRenderingContext3D::getRenderbufferParameteriv(
 }
 
 int CanvasRenderingContext3D::getShaderi(CanvasShader* shader,
-                                         unsigned long pname) {
+                                         unsigned long pname,
+                                         ExceptionCode& ec) {
+  if (!shader || shader->context() != this) {
+    ec = TYPE_MISMATCH_ERR;
+    return 0;
+  }
   int result = m_context->getShaderi(shader, pname);
   cleanupAfterGraphicsCall(false);
   return result;
@@ -648,19 +708,34 @@ int CanvasRenderingContext3D::getShaderi(CanvasShader* shader,
 
 PassRefPtr<CanvasIntArray> CanvasRenderingContext3D::getShaderiv(
     CanvasShader* shader,
-    unsigned long pname) {
+    unsigned long pname,
+    ExceptionCode& ec) {
+  if (!shader || shader->context() != this) {
+    ec = TYPE_MISMATCH_ERR;
+    return 0;
+  }
   RefPtr<CanvasIntArray> array = m_context->getShaderiv(shader, pname);
   cleanupAfterGraphicsCall(false);
   return array;
 }
 
-String CanvasRenderingContext3D::getShaderInfoLog(CanvasShader* shader) {
+String CanvasRenderingContext3D::getShaderInfoLog(CanvasShader* shader,
+                                                  ExceptionCode& ec) {
+  if (!shader || shader->context() != this) {
+    ec = TYPE_MISMATCH_ERR;
+    return "";
+  }
   String s = m_context->getShaderInfoLog(shader);
   cleanupAfterGraphicsCall(false);
   return s;
 }
 
-String CanvasRenderingContext3D::getShaderSource(CanvasShader* shader) {
+String CanvasRenderingContext3D::getShaderSource(CanvasShader* shader,
+                                                 ExceptionCode& ec) {
+  if (!shader || shader->context() != this) {
+    ec = TYPE_MISMATCH_ERR;
+    return "";
+  }
   String s = m_context->getShaderSource(shader);
   cleanupAfterGraphicsCall(false);
   return s;
@@ -701,7 +776,12 @@ PassRefPtr<CanvasIntArray> CanvasRenderingContext3D::getTexParameteriv(
 }
 
 float CanvasRenderingContext3D::getUniformf(CanvasProgram* program,
-                                            long location) {
+                                            long location,
+                                            ExceptionCode& ec) {
+  if (!program || program->context() != this) {
+    ec = TYPE_MISMATCH_ERR;
+    return 0;
+  }
   float result = m_context->getUniformf(program, location);
   cleanupAfterGraphicsCall(false);
   return result;
@@ -709,14 +789,24 @@ float CanvasRenderingContext3D::getUniformf(CanvasProgram* program,
 
 PassRefPtr<CanvasFloatArray> CanvasRenderingContext3D::getUniformfv(
     CanvasProgram* program,
-    long location) {
+    long location,
+    ExceptionCode& ec) {
+  if (!program || program->context() != this) {
+    ec = TYPE_MISMATCH_ERR;
+    return 0;
+  }
   RefPtr<CanvasFloatArray> array = m_context->getUniformfv(program, location);
   cleanupAfterGraphicsCall(false);
   return array;
 }
 
 long CanvasRenderingContext3D::getUniformi(CanvasProgram* program,
-                                           long location) {
+                                           long location,
+                                           ExceptionCode& ec) {
+  if (!program || program->context() != this) {
+    ec = TYPE_MISMATCH_ERR;
+    return 0;
+  }
   long result = m_context->getUniformi(program, location);
   cleanupAfterGraphicsCall(false);
   return result;
@@ -724,14 +814,24 @@ long CanvasRenderingContext3D::getUniformi(CanvasProgram* program,
 
 PassRefPtr<CanvasIntArray> CanvasRenderingContext3D::getUniformiv(
     CanvasProgram* program,
-    long location) {
+    long location,
+    ExceptionCode& ec) {
+  if (!program || program->context() != this) {
+    ec = TYPE_MISMATCH_ERR;
+    return 0;
+  }
   RefPtr<CanvasIntArray> array = m_context->getUniformiv(program, location);
   cleanupAfterGraphicsCall(false);
   return array;
 }
 
 long CanvasRenderingContext3D::getUniformLocation(CanvasProgram* program,
-                                                  const String& name) {
+                                                  const String& name,
+                                                  ExceptionCode& ec) {
+  if (!program || program->context() != this) {
+    ec = TYPE_MISMATCH_ERR;
+    return 0;
+  }
   return m_context->getUniformLocation(program, name);
 }
 
@@ -814,9 +914,12 @@ void CanvasRenderingContext3D::lineWidth(double width) {
   cleanupAfterGraphicsCall(false);
 }
 
-void CanvasRenderingContext3D::linkProgram(CanvasProgram* program) {
-  if (!program)
+void CanvasRenderingContext3D::linkProgram(CanvasProgram* program,
+                                           ExceptionCode& ec) {
+  if (!program || program->context() != this) {
+    ec = TYPE_MISMATCH_ERR;
     return;
+  }
 
   m_context->linkProgram(program);
   cleanupAfterGraphicsCall(false);
@@ -872,7 +975,12 @@ void CanvasRenderingContext3D::scissor(long x,
 }
 
 void CanvasRenderingContext3D::shaderSource(CanvasShader* shader,
-                                            const String& string) {
+                                            const String& string,
+                                            ExceptionCode& ec) {
+  if (!shader || shader->context() != this) {
+    ec = TYPE_MISMATCH_ERR;
+    return;
+  }
   m_context->shaderSource(shader, string);
   cleanupAfterGraphicsCall(false);
 }
