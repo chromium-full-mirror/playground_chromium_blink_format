@@ -37,6 +37,8 @@
 #include "CanvasTexture.h"
 #include "CanvasShader.h"
 #include "HTMLCanvasElement.h"
+#include "HTMLImageElement.h"
+#include "ImageBuffer.h"
 #include "RenderBox.h"
 #include "RenderLayer.h"
 
@@ -1066,9 +1068,19 @@ void CanvasRenderingContext3D::texImage2D(unsigned target,
                                           bool flipY,
                                           bool premultiplyAlpha,
                                           ExceptionCode& ec) {
-  // FIXME: For now we ignore any errors returned
   ec = 0;
-  m_context->texImage2D(target, level, image, flipY, premultiplyAlpha);
+  if (!image) {
+    ec = TYPE_MISMATCH_ERR;
+    return;
+  }
+
+  CachedImage* cachedImage = image->cachedImage();
+  if (!cachedImage)
+    return;
+
+  // FIXME: For now we ignore any errors returned
+  m_context->texImage2D(target, level, cachedImage->image(), flipY,
+                        premultiplyAlpha);
   cleanupAfterGraphicsCall(false);
 }
 
@@ -1078,9 +1090,19 @@ void CanvasRenderingContext3D::texImage2D(unsigned target,
                                           bool flipY,
                                           bool premultiplyAlpha,
                                           ExceptionCode& ec) {
-  // FIXME: For now we ignore any errors returned
   ec = 0;
-  m_context->texImage2D(target, level, canvas, flipY, premultiplyAlpha);
+  if (!canvas) {
+    ec = TYPE_MISMATCH_ERR;
+    return;
+  }
+
+  ImageBuffer* buffer = canvas->buffer();
+  if (!buffer)
+    return;
+
+  // FIXME: For now we ignore any errors returned
+  m_context->texImage2D(target, level, buffer->image(), flipY,
+                        premultiplyAlpha);
   cleanupAfterGraphicsCall(false);
 }
 
@@ -1156,8 +1178,17 @@ void CanvasRenderingContext3D::texSubImage2D(unsigned target,
                                              ExceptionCode& ec) {
   // FIXME: For now we ignore any errors returned
   ec = 0;
+  if (!image) {
+    ec = TYPE_MISMATCH_ERR;
+    return;
+  }
+
+  CachedImage* cachedImage = image->cachedImage();
+  if (!cachedImage)
+    return;
+
   m_context->texSubImage2D(target, level, xoffset, yoffset, width, height,
-                           image, flipY, premultiplyAlpha);
+                           cachedImage->image(), flipY, premultiplyAlpha);
   cleanupAfterGraphicsCall(false);
 }
 
@@ -1171,10 +1202,19 @@ void CanvasRenderingContext3D::texSubImage2D(unsigned target,
                                              bool flipY,
                                              bool premultiplyAlpha,
                                              ExceptionCode& ec) {
-  // FIXME: For now we ignore any errors returned
   ec = 0;
+  if (!canvas) {
+    ec = TYPE_MISMATCH_ERR;
+    return;
+  }
+
+  ImageBuffer* buffer = canvas->buffer();
+  if (!buffer)
+    return;
+
+  // FIXME: For now we ignore any errors returned
   m_context->texSubImage2D(target, level, xoffset, yoffset, width, height,
-                           canvas, flipY, premultiplyAlpha);
+                           buffer->image(), flipY, premultiplyAlpha);
   cleanupAfterGraphicsCall(false);
 }
 

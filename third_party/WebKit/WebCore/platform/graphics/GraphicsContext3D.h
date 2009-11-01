@@ -58,8 +58,7 @@ class CanvasRenderbuffer;
 class CanvasRenderingContext3D;
 class CanvasShader;
 class CanvasTexture;
-class HTMLCanvasElement;
-class HTMLImageElement;
+class Image;
 class HTMLVideoElement;
 class ImageData;
 class WebKitCSSMatrix;
@@ -320,12 +319,7 @@ class GraphicsContext3D : public Noncopyable {
                  ImageData* pixels);
   int texImage2D(unsigned target,
                  unsigned level,
-                 HTMLImageElement* image,
-                 bool flipY,
-                 bool premultiplyAlpha);
-  int texImage2D(unsigned target,
-                 unsigned level,
-                 HTMLCanvasElement* canvas,
+                 Image* image,
                  bool flipY,
                  bool premultiplyAlpha);
   int texImage2D(unsigned target,
@@ -361,16 +355,7 @@ class GraphicsContext3D : public Noncopyable {
                     unsigned yoffset,
                     unsigned width,
                     unsigned height,
-                    HTMLImageElement* image,
-                    bool flipY,
-                    bool premultiplyAlpha);
-  int texSubImage2D(unsigned target,
-                    unsigned level,
-                    unsigned xoffset,
-                    unsigned yoffset,
-                    unsigned width,
-                    unsigned height,
-                    HTMLCanvasElement* canvas,
+                    Image* image,
                     bool flipY,
                     bool premultiplyAlpha);
   int texSubImage2D(unsigned target,
