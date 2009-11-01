@@ -264,11 +264,11 @@ QWebPagePrivate::QWebPagePrivate(QWebPage* qq)
       view(0)
 #endif
       ,
+      clickCausedFocus(false),
+      viewportSize(QSize(0, 0)),
       inspectorFrontend(0),
       inspector(0),
-      inspectorIsInternalOnly(false),
-      viewportSize(QSize(0, 0)),
-      clickCausedFocus(false) {
+      inspectorIsInternalOnly(false) {
   WebCore::InitializeLoggingChannelsIfNecessary();
   JSC::initializeThreading();
   WebCore::SecurityOrigin::setLocalLoadPolicy(
