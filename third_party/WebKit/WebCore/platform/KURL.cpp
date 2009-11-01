@@ -1322,8 +1322,8 @@ void KURL::parse(const char* url, const String* originalString) {
         p - buffer.data();
 
   // For canonicalization, ensure we have a '/' for no path.
-  // Only do this for http and https.
-  if (m_protocolInHTTPFamily && pathEnd - pathStart == 0)
+  // Do this only for hierarchical URL with protocol http or https.
+  if (m_protocolInHTTPFamily && hierarchical && pathEnd == pathStart)
     *p++ = '/';
 
   // add path, escaping bad characters
