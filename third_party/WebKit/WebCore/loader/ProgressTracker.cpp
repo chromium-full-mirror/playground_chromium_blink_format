@@ -178,7 +178,9 @@ void ProgressTracker::incrementProgress(unsigned long identifier,
   if (!item)
     return;
 
-  m_originatingProgressFrame->loader()->client()->willChangeEstimatedProgress();
+  RefPtr<Frame> frame = m_originatingProgressFrame;
+
+  frame->loader()->client()->willChangeEstimatedProgress();
 
   unsigned bytesReceived = length;
   double increment, percentOfRemainingBytes;
@@ -192,7 +194,7 @@ void ProgressTracker::incrementProgress(unsigned long identifier,
   }
 
   int numPendingOrLoadingRequests =
-      m_originatingProgressFrame->loader()->numPendingOrLoadingRequests(true);
+      frame->loader()->numPendingOrLoadingRequests(true);
   estimatedBytesForPendingRequests =
       progressItemDefaultEstimatedLength * numPendingOrLoadingRequests;
   remainingBytes =
@@ -207,9 +209,8 @@ void ProgressTracker::incrementProgress(unsigned long identifier,
   // half-way point.
   // FIXME: The hasHTMLView function is a sort of roundabout way of asking "do
   // you use WebCore's layout system".
-  bool useClampedMaxProgress =
-      m_originatingProgressFrame->loader()->client()->hasHTMLView() &&
-      !m_originatingProgressFrame->loader()->firstLayoutDone();
+  bool useClampedMaxProgress = frame->loader()->client()->hasHTMLView() &&
+                               !frame->loader()->firstLayoutDone();
   double maxProgressValue = useClampedMaxProgress ? 0.5 : finalProgressValue;
   increment = (maxProgressValue - m_progressValue) * percentOfRemainingBytes;
   m_progressValue += increment;
@@ -233,16 +234,14 @@ void ProgressTracker::incrementProgress(unsigned long identifier,
       if (m_progressValue == 1)
         m_finalProgressChangedSent = true;
 
-      m_originatingProgressFrame->loader()
-          ->client()
-          ->postProgressEstimateChangedNotification();
+      frame->loader()->client()->postProgressEstimateChangedNotification();
 
       m_lastNotifiedProgressValue = m_progressValue;
       m_lastNotifiedProgressTime = now;
     }
   }
 
-  m_originatingProgressFrame->loader()->client()->didChangeEstimatedProgress();
+  frame->loader()->client()->didChangeEstimatedProgress();
 }
 
 void ProgressTracker::completeProgress(unsigned long identifier) {
