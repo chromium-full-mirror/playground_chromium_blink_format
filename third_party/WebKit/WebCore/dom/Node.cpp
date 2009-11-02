@@ -1734,9 +1734,10 @@ bool Node::isEqualNode(Node* other) const {
   return true;
 }
 
-bool Node::isDefaultNamespace(const AtomicString& namespaceURI) const {
-  // Implemented according to
-  // http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/namespaces-algorithms.html#isDefaultNamespaceAlgo
+bool Node::isDefaultNamespace(
+    const AtomicString& namespaceURIMaybeEmpty) const {
+  const AtomicString& namespaceURI =
+      namespaceURIMaybeEmpty.isEmpty() ? nullAtom : namespaceURIMaybeEmpty;
 
   switch (nodeType()) {
     case ELEMENT_NODE: {
