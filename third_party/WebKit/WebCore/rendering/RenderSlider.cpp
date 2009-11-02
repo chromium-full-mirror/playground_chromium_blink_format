@@ -364,9 +364,8 @@ void RenderSlider::layout() {
       thumb->repaintDuringLayoutIfMoved(oldThumbRect);
 
     statePusher.pop();
+    addOverflowFromChild(thumb);
   }
-
-  addOverflowFromChild(thumb);
 
   repainter.repaintAfterLayout();
 
