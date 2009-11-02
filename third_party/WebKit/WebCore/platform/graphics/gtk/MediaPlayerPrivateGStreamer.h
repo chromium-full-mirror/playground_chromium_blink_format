@@ -29,6 +29,7 @@
 
 #include <cairo.h>
 #include <glib.h>
+#include <gst/gst.h>
 
 typedef struct _WebKitVideoSink WebKitVideoSink;
 typedef struct _GstBuffer GstBuffer;
@@ -132,6 +133,7 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
   GstElement* m_playBin;
   GstElement* m_videoSink;
   GstElement* m_source;
+  GstClockTime m_seekTime;
   float m_endTime;
   bool m_isEndReached;
   MediaPlayer::NetworkState m_networkState;
