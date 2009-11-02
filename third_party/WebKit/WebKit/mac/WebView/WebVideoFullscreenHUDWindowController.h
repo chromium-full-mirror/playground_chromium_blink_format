@@ -40,10 +40,10 @@ class HTMLMediaElement;
   BOOL _mouseIsInHUD;
   BOOL _isEndingFullscreen;
 
-  NSSlider* _timeline;
+  NSControl* _timeline;
   NSTextField* _remainingTimeText;
   NSTextField* _elapsedTimeText;
-  NSSlider* _volumeSlider;
+  NSControl* _volumeSlider;
   NSButton* _playButton;
 }
 
