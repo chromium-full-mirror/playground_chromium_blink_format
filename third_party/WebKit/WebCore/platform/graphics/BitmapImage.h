@@ -142,8 +142,10 @@ class BitmapImage : public Image {
   virtual CGImageRef getCGImageRef();
 #endif
 
-#if PLATFORM(WIN)
+#if PLATFORM(WIN) || (PLATFORM(QT) && PLATFORM(WIN_OS))
   static PassRefPtr<BitmapImage> create(HBITMAP);
+#endif
+#if PLATFORM(WIN)
   virtual bool getHBITMAP(HBITMAP);
   virtual bool getHBITMAPOfSize(HBITMAP, LPSIZE);
 #endif
