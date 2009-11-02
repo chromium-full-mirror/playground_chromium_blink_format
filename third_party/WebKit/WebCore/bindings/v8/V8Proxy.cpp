@@ -37,6 +37,7 @@
 #include "DOMObjectsInclude.h"
 #include "DocumentLoader.h"
 #include "FrameLoaderClient.h"
+#include "InspectorTimelineAgent.h"
 #include "Page.h"
 #include "PageGroup.h"
 #include "ScriptController.h"
@@ -377,6 +378,15 @@ v8::Local<v8::Value> V8Proxy::evaluate(const ScriptSourceCode& source,
                                        Node* node) {
   ASSERT(v8::Context::InContext());
 
+#if ENABLE(INSPECTOR)
+  InspectorTimelineAgent* timelineAgent =
+      m_frame->page() ? m_frame->page()->inspectorTimelineAgent() : 0;
+  if (timelineAgent)
+    timelineAgent->willEvaluateScript(
+        source.url().isNull() ? String() : source.url().string(),
+        source.startLine());
+#endif
+
   v8::Local<v8::Value> result;
   {
     // Isolate exceptions that occur when compiling and executing
@@ -403,6 +413,12 @@ v8::Local<v8::Value> V8Proxy::evaluate(const ScriptSourceCode& source,
     result = runScript(script, source.url().string().isNull());
   }
   ChromiumBridge::traceEventEnd("v8.run", node, "");
+
+#if ENABLE(INSPECTOR)
+  if (timelineAgent)
+    timelineAgent->didEvaluateScript();
+#endif
+
   return result;
 }
 

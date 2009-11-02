@@ -53,7 +53,7 @@ enum TimelineRecordType {
   TimerFireTimelineRecordType = 7,
   XHRReadyStateChangeRecordType = 8,
   XHRLoadRecordType = 9,
-  EvaluateScriptTagTimelineRecordType = 10,
+  EvaluateScriptTimelineRecordType = 10,
 };
 
 class InspectorTimelineAgent {
@@ -90,8 +90,8 @@ class InspectorTimelineAgent {
   void willLoadXHR(const String&);
   void didLoadXHR();
 
-  void willEvaluateScriptTag(const String&, int);
-  void didEvaluateScriptTag();
+  void willEvaluateScript(const String&, int);
+  void didEvaluateScript();
 
   static InspectorTimelineAgent* retrieve(ScriptExecutionContext*);
 

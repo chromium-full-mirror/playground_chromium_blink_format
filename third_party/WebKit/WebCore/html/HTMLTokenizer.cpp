@@ -587,14 +587,6 @@ HTMLTokenizer::State HTMLTokenizer::scriptExecution(
     return state;
   m_executingScript++;
 
-#if ENABLE(INSPECTOR)
-  InspectorTimelineAgent* timelineAgent = m_doc->inspectorTimelineAgent();
-  if (timelineAgent)
-    timelineAgent->willEvaluateScriptTag(
-        sourceCode.url().isNull() ? String() : sourceCode.url().string(),
-        sourceCode.startLine());
-#endif
-
   SegmentedString* savedPrependingSrc = m_currentPrependingSrc;
   SegmentedString prependingSrc;
   m_currentPrependingSrc = &prependingSrc;
@@ -651,11 +643,6 @@ HTMLTokenizer::State HTMLTokenizer::scriptExecution(
   }
 
   m_currentPrependingSrc = savedPrependingSrc;
-
-#if ENABLE(INSPECTOR)
-  if (timelineAgent)
-    timelineAgent->didEvaluateScriptTag();
-#endif
 
   return state;
 }

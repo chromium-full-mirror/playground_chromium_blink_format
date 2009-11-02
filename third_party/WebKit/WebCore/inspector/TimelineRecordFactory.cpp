@@ -115,7 +115,7 @@ ScriptObject TimelineRecordFactory::createXHRLoadTimelineRecord(
 }
 
 // static
-ScriptObject TimelineRecordFactory::createEvaluateScriptTagTimelineRecord(
+ScriptObject TimelineRecordFactory::createEvaluateScriptTimelineRecord(
     InspectorFrontend* frontend,
     double startTime,
     const String& url,

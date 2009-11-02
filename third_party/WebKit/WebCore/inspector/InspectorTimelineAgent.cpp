@@ -145,16 +145,16 @@ void InspectorTimelineAgent::didLoadXHR() {
   didCompleteCurrentRecord(XHRLoadRecordType);
 }
 
-void InspectorTimelineAgent::willEvaluateScriptTag(const String& url,
-                                                   int lineNumber) {
+void InspectorTimelineAgent::willEvaluateScript(const String& url,
+                                                int lineNumber) {
   pushCurrentRecord(
-      TimelineRecordFactory::createEvaluateScriptTagTimelineRecord(
+      TimelineRecordFactory::createEvaluateScriptTimelineRecord(
           m_frontend, currentTimeInMilliseconds(), url, lineNumber),
-      EvaluateScriptTagTimelineRecordType);
+      EvaluateScriptTimelineRecordType);
 }
 
-void InspectorTimelineAgent::didEvaluateScriptTag() {
-  didCompleteCurrentRecord(EvaluateScriptTagTimelineRecordType);
+void InspectorTimelineAgent::didEvaluateScript() {
+  didCompleteCurrentRecord(EvaluateScriptTimelineRecordType);
 }
 
 void InspectorTimelineAgent::reset() {

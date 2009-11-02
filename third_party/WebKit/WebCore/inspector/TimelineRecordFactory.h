@@ -66,10 +66,10 @@ class TimelineRecordFactory {
                                                   double startTime,
                                                   const String& url);
 
-  static ScriptObject createEvaluateScriptTagTimelineRecord(InspectorFrontend*,
-                                                            double startTime,
-                                                            const String&,
-                                                            double lineNumber);
+  static ScriptObject createEvaluateScriptTimelineRecord(InspectorFrontend*,
+                                                         double startTime,
+                                                         const String&,
+                                                         double lineNumber);
 
  private:
   TimelineRecordFactory() {}
