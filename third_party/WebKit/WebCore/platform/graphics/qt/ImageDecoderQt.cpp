@@ -135,16 +135,7 @@ RGBA32Buffer* ImageDecoderQt::frameBufferAtIndex(size_t index) {
   return &frame;
 }
 
-void ImageDecoderQt::clearFrameBufferCache(size_t index) {
-  // Currently QImageReader will be asked to read everything. This
-  // might change when we read gif images on demand. For now we
-  // can have a rather simple implementation.
-  if (index > m_frameBufferCache.size())
-    return;
-
-  for (size_t i = 0; i < index; ++index)
-    m_frameBufferCache[index].clear();
-}
+void ImageDecoderQt::clearFrameBufferCache(size_t /*index*/) {}
 
 void ImageDecoderQt::internalDecodeSize() {
   ASSERT(m_reader);
