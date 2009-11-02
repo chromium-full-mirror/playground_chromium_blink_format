@@ -2472,7 +2472,7 @@ bool Node::dispatchGenericEvent(PassRefPtr<Event> prpEvent) {
   bool timelineAgentIsActive =
       timelineAgent && eventHasListeners(event->type(), this, ancestors);
   if (timelineAgentIsActive)
-    timelineAgent->willDispatchDOMEvent(*event);
+    timelineAgent->willDispatchEvent(*event);
 #endif
 
   // Set up a pointer to indicate whether / where to dispatch window events.
@@ -2576,7 +2576,7 @@ doneDispatching:
 doneWithDefault:
 #if ENABLE(INSPECTOR)
   if (timelineAgentIsActive)
-    timelineAgent->didDispatchDOMEvent();
+    timelineAgent->didDispatchEvent();
 #endif
 
   Document::updateStyleForAllDocuments();

@@ -48,14 +48,14 @@ InspectorTimelineAgent::InspectorTimelineAgent(InspectorFrontend* frontend)
 
 InspectorTimelineAgent::~InspectorTimelineAgent() {}
 
-void InspectorTimelineAgent::willDispatchDOMEvent(const Event& event) {
-  pushCurrentRecord(TimelineRecordFactory::createDOMDispatchRecord(
+void InspectorTimelineAgent::willDispatchEvent(const Event& event) {
+  pushCurrentRecord(TimelineRecordFactory::createEventDispatchRecord(
                         m_frontend, currentTimeInMilliseconds(), event),
-                    DOMDispatchTimelineRecordType);
+                    EventDispatchTimelineRecordType);
 }
 
-void InspectorTimelineAgent::didDispatchDOMEvent() {
-  didCompleteCurrentRecord(DOMDispatchTimelineRecordType);
+void InspectorTimelineAgent::didDispatchEvent() {
+  didCompleteCurrentRecord(EventDispatchTimelineRecordType);
 }
 
 void InspectorTimelineAgent::willLayout() {

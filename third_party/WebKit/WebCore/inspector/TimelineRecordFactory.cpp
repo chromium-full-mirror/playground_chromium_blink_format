@@ -39,7 +39,6 @@
 #include "ScriptObject.h"
 namespace WebCore {
 
-// static
 ScriptObject TimelineRecordFactory::createGenericRecord(
     InspectorFrontend* frontend,
     double startTime) {
@@ -48,8 +47,7 @@ ScriptObject TimelineRecordFactory::createGenericRecord(
   return record;
 }
 
-// static
-ScriptObject TimelineRecordFactory::createDOMDispatchRecord(
+ScriptObject TimelineRecordFactory::createEventDispatchRecord(
     InspectorFrontend* frontend,
     double startTime,
     const Event& event) {
@@ -60,7 +58,6 @@ ScriptObject TimelineRecordFactory::createDOMDispatchRecord(
   return record;
 }
 
-// static
 ScriptObject TimelineRecordFactory::createGenericTimerRecord(
     InspectorFrontend* frontend,
     double startTime,
@@ -72,7 +69,6 @@ ScriptObject TimelineRecordFactory::createGenericTimerRecord(
   return record;
 }
 
-// static
 ScriptObject TimelineRecordFactory::createTimerInstallRecord(
     InspectorFrontend* frontend,
     double startTime,
@@ -88,7 +84,6 @@ ScriptObject TimelineRecordFactory::createTimerInstallRecord(
   return record;
 }
 
-// static
 ScriptObject TimelineRecordFactory::createXHRReadyStateChangeTimelineRecord(
     InspectorFrontend* frontend,
     double startTime,
@@ -102,7 +97,6 @@ ScriptObject TimelineRecordFactory::createXHRReadyStateChangeTimelineRecord(
   return record;
 }
 
-// static
 ScriptObject TimelineRecordFactory::createXHRLoadTimelineRecord(
     InspectorFrontend* frontend,
     double startTime,
@@ -114,7 +108,6 @@ ScriptObject TimelineRecordFactory::createXHRLoadTimelineRecord(
   return record;
 }
 
-// static
 ScriptObject TimelineRecordFactory::createEvaluateScriptTimelineRecord(
     InspectorFrontend* frontend,
     double startTime,

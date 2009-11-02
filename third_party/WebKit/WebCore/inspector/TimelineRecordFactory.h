@@ -43,9 +43,9 @@ class TimelineRecordFactory {
  public:
   static ScriptObject createGenericRecord(InspectorFrontend*, double startTime);
 
-  static ScriptObject createDOMDispatchRecord(InspectorFrontend*,
-                                              double startTime,
-                                              const Event&);
+  static ScriptObject createEventDispatchRecord(InspectorFrontend*,
+                                                double startTime,
+                                                const Event&);
 
   static ScriptObject createGenericTimerRecord(InspectorFrontend*,
                                                double startTime,
