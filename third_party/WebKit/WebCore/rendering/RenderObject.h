@@ -5,6 +5,7 @@
  *           (C) 2004 Allan Sandfeld Jensen (kde@carewolf.com)
  * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009 Apple Inc. All rights
  * reserved.
+ * Copyright (C) 2009 Google Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -278,6 +279,10 @@ class RenderObject : public CachedResourceClient {
   virtual bool isRenderInline() const { return false; }
   virtual bool isRenderPart() const { return false; }
   virtual bool isRenderView() const { return false; }
+  virtual bool isRuby() const { return false; }
+  virtual bool isRubyBase() const { return false; }
+  virtual bool isRubyRun() const { return false; }
+  virtual bool isRubyText() const { return false; }
   virtual bool isSlider() const { return false; }
   virtual bool isTable() const { return false; }
   virtual bool isTableCell() const { return false; }

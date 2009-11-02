@@ -61,16 +61,6 @@ static const int verticalLineClickFudgeFactor = 3;
 
 using namespace HTMLNames;
 
-static void moveChild(RenderObject* to,
-                      RenderObjectChildList* toChildList,
-                      RenderObject* from,
-                      RenderObjectChildList* fromChildList,
-                      RenderObject* child) {
-  ASSERT(from == child->parent());
-  toChildList->appendChildNode(
-      to, fromChildList->removeChildNode(from, child, false), false);
-}
-
 struct ColumnInfo {
   ColumnInfo() : m_desiredColumnWidth(0), m_desiredColumnCount(1) {}
   int m_desiredColumnWidth;
@@ -446,6 +436,24 @@ RootInlineBox* RenderBlock::createAndAppendRootInlineBox() {
   return rootBox;
 }
 
+void RenderBlock::moveChildTo(RenderObject* to,
+                              RenderObjectChildList* toChildList,
+                              RenderObject* child) {
+  ASSERT(this == child->parent());
+  toChildList->appendChildNode(
+      to, children()->removeChildNode(this, child, false), false);
+}
+
+void RenderBlock::moveChildTo(RenderObject* to,
+                              RenderObjectChildList* toChildList,
+                              RenderObject* beforeChild,
+                              RenderObject* child) {
+  ASSERT(this == child->parent());
+  ASSERT(!beforeChild || to == beforeChild->parent());
+  toChildList->insertChildNode(
+      to, children()->removeChildNode(this, child, false), beforeChild, false);
+}
+
 void RenderBlock::makeChildrenNonInline(RenderObject* insertionPoint) {
   // makeChildrenNonInline takes a block whose children are *all* inline and it
   // makes sure that inline children are coalesced under anonymous
@@ -485,9 +493,9 @@ void RenderBlock::makeChildrenNonInline(RenderObject* insertionPoint) {
       RenderObject* no = o;
       o = no->nextSibling();
 
-      moveChild(block, block->children(), this, children(), no);
+      moveChildTo(block, block->children(), no);
     }
-    moveChild(block, block->children(), this, children(), inlineRunEnd);
+    moveChildTo(block, block->children(), inlineRunEnd);
   }
 
 #ifndef NDEBUG
@@ -562,8 +570,7 @@ void RenderBlock::removeChild(RenderObject* oldChild) {
     while (o) {
       RenderObject* no = o;
       o = no->nextSibling();
-      moveChild(prevBlock, prevBlock->children(), nextBlock,
-                nextBlock->children(), no);
+      nextBlock->moveChildTo(prevBlock, prevBlock->children(), no);
     }
 
     nextBlock->deleteLineBoxTree();
@@ -588,7 +595,7 @@ void RenderBlock::removeChild(RenderObject* oldChild) {
     while (o) {
       RenderObject* no = o;
       o = no->nextSibling();
-      moveChild(this, children(), anonBlock, anonBlock->children(), no);
+      anonBlock->moveChildTo(this, children(), no);
     }
 
     // Delete the now-empty block's lines and nuke it.

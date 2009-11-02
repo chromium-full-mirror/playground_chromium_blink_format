@@ -185,6 +185,14 @@ class RenderBlock : public RenderBox {
   RenderBlock* createAnonymousBlock(bool isFlexibleBox = false) const;
 
  protected:
+  void moveChildTo(RenderObject* to,
+                   RenderObjectChildList* toChildList,
+                   RenderObject* child);
+  void moveChildTo(RenderObject* to,
+                   RenderObjectChildList* toChildList,
+                   RenderObject* beforeChild,
+                   RenderObject* child);
+
   int maxTopPosMargin() const {
     return m_maxMargin ? m_maxMargin->m_topPos : MaxMargin::topPosDefault(this);
   }
