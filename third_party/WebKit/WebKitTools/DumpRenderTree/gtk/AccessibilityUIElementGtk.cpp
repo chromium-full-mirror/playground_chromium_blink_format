@@ -164,6 +164,11 @@ JSStringRef AccessibilityUIElement::description() {
   return JSStringCreateWithUTF8CString(description);
 }
 
+JSStringRef AccessibilityUIElement::stringValue() {
+  // FIXME: implement
+  return JSStringCreateWithCharacters(0, 0);
+}
+
 JSStringRef AccessibilityUIElement::language() {
   // FIXME: implement
   return JSStringCreateWithCharacters(0, 0);
@@ -278,6 +283,11 @@ bool AccessibilityUIElement::isActionSupported(JSStringRef action) {
 }
 
 bool AccessibilityUIElement::isRequired() const {
+  // FIXME: implement
+  return false;
+}
+
+bool AccessibilityUIElement::isSelected() const {
   // FIXME: implement
   return false;
 }

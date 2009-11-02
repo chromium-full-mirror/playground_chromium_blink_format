@@ -121,6 +121,7 @@ class AccessibilityRenderObject : public AccessibilityObject {
   virtual float maxValueForRange() const;
   virtual float minValueForRange() const;
   virtual AccessibilityObject* selectedRadioButton();
+  virtual AccessibilityObject* selectedTabItem();
   virtual int layoutCount() const;
 
   virtual AccessibilityObject* doAccessibilityHitTest(const IntPoint&) const;
@@ -169,7 +170,6 @@ class AccessibilityRenderObject : public AccessibilityObject {
   virtual PlainTextRange selectedTextRange() const;
   virtual VisibleSelection selection() const;
   virtual String stringValue() const;
-  virtual String ariaAccessibilityName(const String&) const;
   virtual String ariaLabeledByAttribute() const;
   virtual String title() const;
   virtual String ariaDescribedByAttribute() const;
@@ -203,6 +203,7 @@ class AccessibilityRenderObject : public AccessibilityObject {
   virtual bool canHaveChildren() const;
   virtual void selectedChildren(AccessibilityChildrenVector&);
   virtual void visibleChildren(AccessibilityChildrenVector&);
+  virtual void tabChildren(AccessibilityChildrenVector&);
   virtual bool shouldFocusActiveDescendant() const;
   virtual AccessibilityObject* activeDescendant() const;
   virtual void handleActiveDescendantChanged();
@@ -241,6 +242,7 @@ class AccessibilityRenderObject : public AccessibilityObject {
   mutable bool m_childrenDirty;
 
   void setRenderObject(RenderObject* renderer) { m_renderer = renderer; }
+  void ariaLabeledByElements(Vector<Element*>& elements) const;
 
   virtual bool isDetached() const { return !m_renderer; }
 
@@ -255,6 +257,7 @@ class AccessibilityRenderObject : public AccessibilityObject {
   AccessibilityRole determineAccessibilityRole();
   AccessibilityRole determineAriaRoleAttribute() const;
 
+  bool isTabItemSelected() const;
   IntRect checkboxOrRadioRect() const;
   void addRadioButtonGroupMembers(
       AccessibilityChildrenVector& linkedUIElements) const;
@@ -263,6 +266,10 @@ class AccessibilityRenderObject : public AccessibilityObject {
                                                     const IntPoint&) const;
   AccessibilityObject* accessibilityParentForImageMap(
       HTMLMapElement* map) const;
+
+  String accessibilityDescriptionForElements(Vector<Element*>& elements) const;
+  void elementsFromAttribute(Vector<Element*>& elements,
+                             const QualifiedName& name) const;
 
   void markChildrenDirty() const { m_childrenDirty = true; }
 };

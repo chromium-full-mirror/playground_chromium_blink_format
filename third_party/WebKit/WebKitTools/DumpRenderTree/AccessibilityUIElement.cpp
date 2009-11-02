@@ -426,6 +426,15 @@ static JSValueRef getDescriptionCallback(JSContextRef context,
   return JSValueMakeString(context, description.get());
 }
 
+static JSValueRef getStringValueCallback(JSContextRef context,
+                                         JSObjectRef thisObject,
+                                         JSStringRef propertyName,
+                                         JSValueRef* exception) {
+  JSRetainPtr<JSStringRef> stringValue(Adopt,
+                                       toAXElement(thisObject)->stringValue());
+  return JSValueMakeString(context, stringValue.get());
+}
+
 static JSValueRef getLanguageCallback(JSContextRef context,
                                       JSObjectRef thisObject,
                                       JSStringRef propertyName,
@@ -535,6 +544,13 @@ static JSValueRef getIsRequiredCallback(JSContextRef context,
   return JSValueMakeBoolean(context, toAXElement(thisObject)->isRequired());
 }
 
+static JSValueRef getIsSelectedCallback(JSContextRef context,
+                                        JSObjectRef thisObject,
+                                        JSStringRef,
+                                        JSValueRef*) {
+  return JSValueMakeBoolean(context, toAXElement(thisObject)->isSelected());
+}
+
 static JSValueRef getValueDescriptionCallback(JSContextRef context,
                                               JSObjectRef thisObject,
                                               JSStringRef propertyName,
@@ -582,6 +598,8 @@ JSClassRef AccessibilityUIElement::getJSClass() {
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"language", getLanguageCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"stringValue", getStringValueCallback, 0,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"x", getXCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"y", getYCallback, 0,
@@ -609,6 +627,8 @@ JSClassRef AccessibilityUIElement::getJSClass() {
       {"isEnabled", getIsEnabledCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"isRequired", getIsRequiredCallback, 0,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"isSelected", getIsSelectedCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"valueDescription", getValueDescriptionCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},

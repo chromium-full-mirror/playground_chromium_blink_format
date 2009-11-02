@@ -162,6 +162,9 @@ enum AccessibilityRole {
   AnnotationRole,
   SliderThumbRole,
   IgnoredRole,
+  TabRole,
+  TabListRole,
+  TabPanelRole,
 
   // ARIA Grouping roles
   LandmarkApplicationRole,
@@ -261,6 +264,8 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   virtual bool isTableCell() const { return false; };
   virtual bool isFieldset() const { return false; };
   virtual bool isGroup() const { return false; };
+  bool isTabList() const { return roleValue() == TabListRole; }
+  bool isTabItem() const { return roleValue() == TabRole; }
   bool isRadioGroup() const { return roleValue() == RadioGroupRole; }
 
   virtual bool isChecked() const { return false; };
@@ -296,6 +301,7 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   virtual float maxValueForRange() const { return 0.0f; }
   virtual float minValueForRange() const { return 0.0f; }
   virtual AccessibilityObject* selectedRadioButton() { return 0; }
+  virtual AccessibilityObject* selectedTabItem() { return 0; }
   virtual int layoutCount() const { return 0; }
   static bool isARIAControl(AccessibilityRole);
   static bool isARIAInput(AccessibilityRole);
@@ -328,7 +334,6 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
 
   void setRoleValue(AccessibilityRole role) { m_role = role; }
   virtual AccessibilityRole roleValue() const { return m_role; }
-  virtual String ariaAccessibilityName(const String&) const { return String(); }
   virtual String ariaLabeledByAttribute() const { return String(); }
   virtual String ariaDescribedByAttribute() const { return String(); }
   virtual String accessibilityDescription() const { return String(); }
@@ -389,6 +394,7 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   virtual bool hasChildren() const { return m_haveChildren; }
   virtual void selectedChildren(AccessibilityChildrenVector&) {}
   virtual void visibleChildren(AccessibilityChildrenVector&) {}
+  virtual void tabChildren(AccessibilityChildrenVector&) {}
   virtual bool shouldFocusActiveDescendant() const { return false; }
   virtual AccessibilityObject* activeDescendant() const { return 0; }
   virtual void handleActiveDescendantChanged() {}
