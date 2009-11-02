@@ -1857,8 +1857,8 @@ void FrameLoader::setFirstPartyForCookies(const KURL& url) {
 
 class HashChangeEventTask : public ScriptExecutionContext::Task {
  public:
-  static PassRefPtr<HashChangeEventTask> create(PassRefPtr<Document> document) {
-    return adoptRef(new HashChangeEventTask(document));
+  static PassOwnPtr<HashChangeEventTask> create(PassRefPtr<Document> document) {
+    return new HashChangeEventTask(document);
   }
 
   virtual void performTask(ScriptExecutionContext* context) {

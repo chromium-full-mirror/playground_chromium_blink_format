@@ -4595,7 +4595,7 @@ void Document::scriptImported(unsigned long identifier,
 class ScriptExecutionContextTaskTimer : public TimerBase {
  public:
   ScriptExecutionContextTaskTimer(PassRefPtr<Document> context,
-                                  PassRefPtr<ScriptExecutionContext::Task> task)
+                                  PassOwnPtr<ScriptExecutionContext::Task> task)
       : m_context(context), m_task(task) {}
 
  private:
@@ -4605,17 +4605,17 @@ class ScriptExecutionContextTaskTimer : public TimerBase {
   }
 
   RefPtr<Document> m_context;
-  RefPtr<ScriptExecutionContext::Task> m_task;
+  OwnPtr<ScriptExecutionContext::Task> m_task;
 };
 
 struct PerformTaskContext {
   PerformTaskContext(ScriptExecutionContext* scriptExecutionContext,
-                     PassRefPtr<ScriptExecutionContext::Task> task)
+                     PassOwnPtr<ScriptExecutionContext::Task> task)
       : scriptExecutionContext(scriptExecutionContext), task(task) {}
 
   ScriptExecutionContext*
       scriptExecutionContext;  // The context should exist until task execution.
-  RefPtr<ScriptExecutionContext::Task> task;
+  OwnPtr<ScriptExecutionContext::Task> task;
 };
 
 static void performTask(void* ctx) {
@@ -4624,7 +4624,7 @@ static void performTask(void* ctx) {
   delete ptctx;
 }
 
-void Document::postTask(PassRefPtr<Task> task) {
+void Document::postTask(PassOwnPtr<Task> task) {
   if (isMainThread()) {
     ScriptExecutionContextTaskTimer* timer =
         new ScriptExecutionContextTaskTimer(static_cast<Document*>(this), task);

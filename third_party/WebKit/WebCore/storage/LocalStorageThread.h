@@ -63,7 +63,7 @@ class LocalStorageThread : public ThreadSafeShared<LocalStorageThread> {
   ThreadIdentifier m_threadID;
   RefPtr<LocalStorageThread> m_selfRef;
 
-  MessageQueue<RefPtr<LocalStorageTask>> m_queue;
+  MessageQueue<LocalStorageTask> m_queue;
 
   Mutex m_terminateLock;
   ThreadCondition m_terminateCondition;

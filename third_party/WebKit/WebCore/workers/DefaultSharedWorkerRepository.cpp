@@ -81,9 +81,9 @@ class SharedWorkerProxy : public ThreadSafeShared<SharedWorkerProxy>,
                const KURL& urlToMatch) const;
 
   // WorkerLoaderProxy
-  virtual void postTaskToLoader(PassRefPtr<ScriptExecutionContext::Task>);
+  virtual void postTaskToLoader(PassOwnPtr<ScriptExecutionContext::Task>);
   virtual void postTaskForModeToWorkerContext(
-      PassRefPtr<ScriptExecutionContext::Task>,
+      PassOwnPtr<ScriptExecutionContext::Task>,
       const String&);
 
   // WorkerReportingProxy
@@ -161,7 +161,7 @@ bool SharedWorkerProxy::matches(const String& name,
 }
 
 void SharedWorkerProxy::postTaskToLoader(
-    PassRefPtr<ScriptExecutionContext::Task> task) {
+    PassOwnPtr<ScriptExecutionContext::Task> task) {
   MutexLocker lock(m_workerDocumentsLock);
 
   if (isClosing())
@@ -179,7 +179,7 @@ void SharedWorkerProxy::postTaskToLoader(
 }
 
 void SharedWorkerProxy::postTaskForModeToWorkerContext(
-    PassRefPtr<ScriptExecutionContext::Task> task,
+    PassOwnPtr<ScriptExecutionContext::Task> task,
     const String& mode) {
   if (isClosing())
     return;
@@ -275,9 +275,9 @@ void SharedWorkerProxy::close() {
 
 class SharedWorkerConnectTask : public ScriptExecutionContext::Task {
  public:
-  static PassRefPtr<SharedWorkerConnectTask> create(
+  static PassOwnPtr<SharedWorkerConnectTask> create(
       PassOwnPtr<MessagePortChannel> channel) {
-    return adoptRef(new SharedWorkerConnectTask(channel));
+    return new SharedWorkerConnectTask(channel);
   }
 
  private:

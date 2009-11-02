@@ -79,7 +79,7 @@ class WorkerContext : public RefCounted<WorkerContext>,
   virtual void scriptImported(unsigned long identifier,
                               const String& sourceString);
 
-  virtual void postTask(PassRefPtr<Task>);  // Executes the task on context's
+  virtual void postTask(PassOwnPtr<Task>);  // Executes the task on context's
                                             // thread asynchronously.
 
   // WorkerGlobalScope

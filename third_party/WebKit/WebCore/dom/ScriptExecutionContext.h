@@ -105,13 +105,13 @@ class ScriptExecutionContext {
   void ref() { refScriptExecutionContext(); }
   void deref() { derefScriptExecutionContext(); }
 
-  class Task : public ThreadSafeShared<Task> {
+  class Task : public Noncopyable {
    public:
     virtual ~Task();
     virtual void performTask(ScriptExecutionContext*) = 0;
   };
 
-  virtual void postTask(PassRefPtr<Task>) = 0;  // Executes the task on
+  virtual void postTask(PassOwnPtr<Task>) = 0;  // Executes the task on
                                                 // context's thread
                                                 // asynchronously.
 

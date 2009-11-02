@@ -73,7 +73,7 @@ ThreadIdentifier createThread(ThreadFunction entryPoint,
   NewThreadContext* context = new NewThreadContext(entryPoint, data, name);
 
   // Prevent the thread body from executing until we've established the thread
-  // identifier
+  // identifier.
   MutexLocker locker(context->creationMutex);
 
   return createThreadInternal(threadEntryPoint, context, name);

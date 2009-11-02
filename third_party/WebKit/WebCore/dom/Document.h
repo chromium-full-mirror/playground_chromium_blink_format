@@ -954,7 +954,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
       unsigned long identifier,
       const ScriptString& sourceString);
   virtual void scriptImported(unsigned long, const String&);
-  virtual void postTask(PassRefPtr<Task>);  // Executes the task on context's
+  virtual void postTask(PassOwnPtr<Task>);  // Executes the task on context's
                                             // thread asynchronously.
 
   typedef HashMap<WebCore::Node*, JSNode*> JSWrapperCache;

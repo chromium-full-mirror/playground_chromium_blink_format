@@ -62,26 +62,6 @@ class WorkerSharedTimer : public SharedTimer {
   double m_nextFireTime;
 };
 
-class WorkerRunLoop::Task : public RefCounted<Task> {
- public:
-  static PassRefPtr<Task> create(PassRefPtr<ScriptExecutionContext::Task> task,
-                                 const String& mode) {
-    return adoptRef(new Task(task, mode));
-  }
-
-  const String& mode() const { return m_mode; }
-  void performTask(ScriptExecutionContext* context) {
-    m_task->performTask(context);
-  }
-
- private:
-  Task(PassRefPtr<ScriptExecutionContext::Task> task, const String& mode)
-      : m_task(task), m_mode(mode.crossThreadString()) {}
-
-  RefPtr<ScriptExecutionContext::Task> m_task;
-  String m_mode;
-};
-
 class ModePredicate {
  public:
   ModePredicate(const String& mode)
@@ -89,7 +69,7 @@ class ModePredicate {
 
   bool isDefaultMode() const { return m_defaultMode; }
 
-  bool operator()(PassRefPtr<WorkerRunLoop::Task> task) const {
+  bool operator()(WorkerRunLoop::Task* task) const {
     return m_defaultMode || m_mode == task->mode();
   }
 
@@ -154,10 +134,10 @@ MessageQueueWaitResult WorkerRunLoop::runInMode(
 
   double absoluteTime = (predicate.isDefaultMode() && m_sharedTimer->isActive())
                             ? m_sharedTimer->fireTime()
-                            : MessageQueue<RefPtr<Task>>::infiniteTime();
-  RefPtr<Task> task;
-  MessageQueueWaitResult result =
-      m_messageQueue.waitForMessageFilteredWithTimeout(task, predicate,
+                            : MessageQueue<Task>::infiniteTime();
+  MessageQueueWaitResult result;
+  OwnPtr<WorkerRunLoop::Task> task =
+      m_messageQueue.waitForMessageFilteredWithTimeout(result, predicate,
                                                        absoluteTime);
 
   // If the context is closing, don't dispatch any further tasks (per section
@@ -185,15 +165,29 @@ void WorkerRunLoop::terminate() {
   m_messageQueue.kill();
 }
 
-void WorkerRunLoop::postTask(PassRefPtr<ScriptExecutionContext::Task> task) {
+void WorkerRunLoop::postTask(PassOwnPtr<ScriptExecutionContext::Task> task) {
   postTaskForMode(task, defaultMode());
 }
 
 void WorkerRunLoop::postTaskForMode(
-    PassRefPtr<ScriptExecutionContext::Task> task,
+    PassOwnPtr<ScriptExecutionContext::Task> task,
     const String& mode) {
   m_messageQueue.append(Task::create(task, mode.crossThreadString()));
 }
+
+PassOwnPtr<WorkerRunLoop::Task> WorkerRunLoop::Task::create(
+    PassOwnPtr<ScriptExecutionContext::Task> task,
+    const String& mode) {
+  return new Task(task, mode);
+}
+
+void WorkerRunLoop::Task::performTask(ScriptExecutionContext* context) {
+  m_task->performTask(context);
+}
+
+WorkerRunLoop::Task::Task(PassOwnPtr<ScriptExecutionContext::Task> task,
+                          const String& mode)
+    : m_task(task), m_mode(mode.crossThreadString()) {}
 
 }  // namespace WebCore
 

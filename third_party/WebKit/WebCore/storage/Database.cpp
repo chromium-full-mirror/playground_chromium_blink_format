@@ -222,10 +222,10 @@ bool Database::openAndVerifyVersion(ExceptionCode& e) {
 
   bool success = false;
   DatabaseTaskSynchronizer synchronizer;
-  RefPtr<DatabaseOpenTask> task =
+  OwnPtr<DatabaseOpenTask> task =
       DatabaseOpenTask::create(this, &synchronizer, e, success);
 
-  m_document->databaseThread()->scheduleImmediateTask(task);
+  m_document->databaseThread()->scheduleImmediateTask(task.release());
   synchronizer.waitForTaskCompletion();
 
   return success;
@@ -350,10 +350,10 @@ void Database::markAsDeletedAndClose() {
   m_document->databaseThread()->unscheduleDatabaseTasks(this);
 
   DatabaseTaskSynchronizer synchronizer;
-  RefPtr<DatabaseCloseTask> task =
+  OwnPtr<DatabaseCloseTask> task =
       DatabaseCloseTask::create(this, &synchronizer);
 
-  m_document->databaseThread()->scheduleImmediateTask(task);
+  m_document->databaseThread()->scheduleImmediateTask(task.release());
   synchronizer.waitForTaskCompletion();
 }
 
@@ -592,7 +592,7 @@ void Database::scheduleTransaction() {
   }
 
   if (transaction && m_document->databaseThread()) {
-    RefPtr<DatabaseTransactionTask> task =
+    OwnPtr<DatabaseTransactionTask> task =
         DatabaseTransactionTask::create(transaction);
     LOG(StorageAPI,
         "Scheduling DatabaseTransactionTask %p for transaction %p\n",
@@ -608,7 +608,7 @@ void Database::scheduleTransactionStep(SQLTransaction* transaction,
   if (!m_document->databaseThread())
     return;
 
-  RefPtr<DatabaseTransactionTask> task =
+  OwnPtr<DatabaseTransactionTask> task =
       DatabaseTransactionTask::create(transaction);
   LOG(StorageAPI,
       "Scheduling DatabaseTransactionTask %p for the transaction step\n",
@@ -686,10 +686,10 @@ Vector<String> Database::tableNames() {
     return result;
 
   DatabaseTaskSynchronizer synchronizer;
-  RefPtr<DatabaseTableNamesTask> task =
+  OwnPtr<DatabaseTableNamesTask> task =
       DatabaseTableNamesTask::create(this, &synchronizer, result);
 
-  m_document->databaseThread()->scheduleImmediateTask(task);
+  m_document->databaseThread()->scheduleImmediateTask(task.release());
   synchronizer.waitForTaskCompletion();
 
   return result;

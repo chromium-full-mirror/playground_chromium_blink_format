@@ -86,13 +86,8 @@ void* DatabaseThread::databaseThread() {
   }
 
   AutodrainedPool pool;
-  while (true) {
-    RefPtr<DatabaseTask> task;
-    if (!m_queue.waitForMessage(task))
-      break;
-
+  while (OwnPtr<DatabaseTask> task = m_queue.waitForMessage()) {
     task->performTask();
-
     pool.cycle();
   }
 
@@ -142,18 +137,18 @@ void DatabaseThread::recordDatabaseClosed(Database* database) {
   m_openDatabaseSet.remove(database);
 }
 
-void DatabaseThread::scheduleTask(PassRefPtr<DatabaseTask> task) {
+void DatabaseThread::scheduleTask(PassOwnPtr<DatabaseTask> task) {
   m_queue.append(task);
 }
 
-void DatabaseThread::scheduleImmediateTask(PassRefPtr<DatabaseTask> task) {
+void DatabaseThread::scheduleImmediateTask(PassOwnPtr<DatabaseTask> task) {
   m_queue.prepend(task);
 }
 
 class SameDatabasePredicate {
  public:
   SameDatabasePredicate(const Database* database) : m_database(database) {}
-  bool operator()(RefPtr<DatabaseTask>& task) const {
+  bool operator()(DatabaseTask* task) const {
     return task->database() == m_database;
   }
 

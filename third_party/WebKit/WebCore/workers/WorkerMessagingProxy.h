@@ -86,9 +86,9 @@ class WorkerMessagingProxy : public WorkerContextProxy,
   // Implementation of WorkerLoaderProxy.
   // These methods are called on different threads to schedule loading
   // requests and to send callbacks back to WorkerContext.
-  virtual void postTaskToLoader(PassRefPtr<ScriptExecutionContext::Task>);
+  virtual void postTaskToLoader(PassOwnPtr<ScriptExecutionContext::Task>);
   virtual void postTaskForModeToWorkerContext(
-      PassRefPtr<ScriptExecutionContext::Task>,
+      PassOwnPtr<ScriptExecutionContext::Task>,
       const String& mode);
 
   void workerThreadCreated(PassRefPtr<DedicatedWorkerThread>);
@@ -121,7 +121,7 @@ class WorkerMessagingProxy : public WorkerContextProxy,
 
   bool m_askedToTerminate;
 
-  Vector<RefPtr<ScriptExecutionContext::Task>> m_queuedEarlyTasks;  // Tasks are
+  Vector<OwnPtr<ScriptExecutionContext::Task>> m_queuedEarlyTasks;  // Tasks are
                                                                     // queued
                                                                     // here
                                                                     // until

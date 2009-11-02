@@ -34,6 +34,7 @@
 #include <wtf/HashSet.h>
 #include <wtf/MessageQueue.h>
 #include <wtf/OwnPtr.h>
+#include <wtf/PassOwnPtr.h>
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefPtr.h>
 #include <wtf/Threading.h>
@@ -57,8 +58,8 @@ class DatabaseThread : public ThreadSafeShared<DatabaseThread> {
   void requestTermination();
   bool terminationRequested() const;
 
-  void scheduleTask(PassRefPtr<DatabaseTask>);
-  void scheduleImmediateTask(PassRefPtr<DatabaseTask>);  // This just adds the
+  void scheduleTask(PassOwnPtr<DatabaseTask>);
+  void scheduleImmediateTask(PassOwnPtr<DatabaseTask>);  // This just adds the
                                                          // task to the front of
                                                          // the queue - the
                                                          // caller needs to be
@@ -90,7 +91,7 @@ class DatabaseThread : public ThreadSafeShared<DatabaseThread> {
   ThreadIdentifier m_threadID;
   RefPtr<DatabaseThread> m_selfRef;
 
-  MessageQueue<RefPtr<DatabaseTask>> m_queue;
+  MessageQueue<DatabaseTask> m_queue;
 
   // This set keeps track of the open databases that have been used on this
   // thread.
