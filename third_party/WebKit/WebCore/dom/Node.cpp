@@ -2442,7 +2442,7 @@ static bool eventHasListeners(const AtomicString& eventType,
   if (node->hasEventListeners(eventType))
     return true;
 
-  for (ssize_t i = (ancestors.size() - 1); i >= 0; --i) {
+  for (unsigned i = (ancestors.size() - 1); i >= 0; --i) {
     ContainerNode* ancestor = ancestors[i].get();
     if (ancestor->hasEventListeners(eventType))
       return true;
