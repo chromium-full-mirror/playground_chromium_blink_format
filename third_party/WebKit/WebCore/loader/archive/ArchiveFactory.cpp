@@ -29,11 +29,12 @@
 #include "config.h"
 #include "ArchiveFactory.h"
 
-#if PLATFORM(CF) && (PLATFORM(MAC) || PLATFORM(CHROMIUM))
-#include "LegacyWebArchive.h"
-#endif
 #include "MIMETypeRegistry.h"
 #include "PlatformString.h"
+
+#if PLATFORM(CF) && !PLATFORM(QT)
+#include "LegacyWebArchive.h"
+#endif
 
 #include <wtf/HashMap.h>
 #include <wtf/HashSet.h>
@@ -60,7 +61,7 @@ static ArchiveMIMETypesMap& archiveMIMETypes() {
   if (initialized)
     return mimeTypes;
 
-#if PLATFORM(CF) && (PLATFORM(MAC) || PLATFORM(CHROMIUM))
+#if PLATFORM(CF) & !PLATFORM(QT)
   mimeTypes.set("application/x-webarchive",
                 archiveFactoryCreate<LegacyWebArchive>);
 #endif
