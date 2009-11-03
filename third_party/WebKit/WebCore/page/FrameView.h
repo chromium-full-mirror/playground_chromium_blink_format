@@ -224,6 +224,7 @@ class FrameView : public ScrollView {
 
   friend class RenderWidget;
   bool useSlowRepaints() const;
+  bool useSlowRepaintsIfNotOverlapped() const;
 
   void applyOverflowToViewport(RenderObject*,
                                ScrollbarMode& hMode,

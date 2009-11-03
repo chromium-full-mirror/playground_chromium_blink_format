@@ -757,6 +757,11 @@ bool FrameView::useSlowRepaints() const {
          !m_contentIsOpaque;
 }
 
+bool FrameView::useSlowRepaintsIfNotOverlapped() const {
+  return m_useSlowRepaints || m_slowRepaintObjectCount > 0 ||
+         !m_contentIsOpaque;
+}
+
 void FrameView::setUseSlowRepaints() {
   m_useSlowRepaints = true;
   setCanBlitOnScroll(false);

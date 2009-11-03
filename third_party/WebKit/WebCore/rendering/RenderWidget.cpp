@@ -271,7 +271,8 @@ void RenderWidget::paint(PaintInfo& paintInfo, int tx, int ty) {
       m_widget->paint(paintInfo.context, paintInfo.rect);
 
     if (m_widget->isFrameView() && paintInfo.overlapTestRequests &&
-        !static_cast<FrameView*>(m_widget.get())->useSlowRepaints()) {
+        !static_cast<FrameView*>(m_widget.get())
+             ->useSlowRepaintsIfNotOverlapped()) {
       ASSERT(!paintInfo.overlapTestRequests->contains(this));
       paintInfo.overlapTestRequests->set(this, m_widget->frameRect());
     }
