@@ -867,7 +867,9 @@ void RenderText::setSelectionState(SelectionState state) {
     }
   }
 
-  containingBlock()->setSelectionState(state);
+  // The returned value can be null in case of an orphaned tree.
+  if (RenderBlock* cb = containingBlock())
+    cb->setSelectionState(state);
 }
 
 void RenderText::setTextWithOffset(PassRefPtr<StringImpl> text,
