@@ -816,6 +816,12 @@ NEVER_INLINE void JITThunks::tryCacheGetByID(CallFrame* callFrame,
     return;
   }
 
+  if (structure->isDictionary()) {
+    ctiPatchCallByReturnAddress(codeBlock, returnAddress,
+                                FunctionPtr(cti_op_get_by_id_generic));
+    return;
+  }
+
   if (slot.slotBase() == structure->prototypeForLookup(callFrame)) {
     ASSERT(slot.slotBase().isObject());
 
