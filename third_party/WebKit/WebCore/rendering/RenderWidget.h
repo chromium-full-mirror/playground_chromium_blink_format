@@ -42,6 +42,9 @@ class RenderWidget : public RenderReplaced, private OverlapTestRequestClient {
 
   void showSubstituteImage(PassRefPtr<Image>);
 
+  static void suspendWidgetHierarchyUpdates();
+  static void resumeWidgetHierarchyUpdates();
+
  protected:
   RenderWidget(Node*);
 

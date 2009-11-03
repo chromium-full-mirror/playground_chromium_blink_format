@@ -1272,6 +1272,7 @@ void Document::recalcStyle(StyleChange change) {
 
   m_inStyleRecalc = true;
   suspendPostAttachCallbacks();
+  RenderWidget::suspendWidgetHierarchyUpdates();
   if (view())
     view()->pauseScheduledEvents();
 
@@ -1339,6 +1340,7 @@ bail_out:
 
   if (view())
     view()->resumeScheduledEvents();
+  RenderWidget::resumeWidgetHierarchyUpdates();
   resumePostAttachCallbacks();
   m_inStyleRecalc = false;
 
