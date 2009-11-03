@@ -34,7 +34,6 @@
 #include <qwebview.h>
 #include <qwebframe.h>
 #include <qwebsettings.h>
-#include <qwebplugindatabase.h>
 #include <qwebelement.h>
 #include <qwebinspector.h>
 
@@ -238,15 +237,17 @@ class MainWindow : public QMainWindow {
     formatMenuAction->setVisible(on);
   }
 
+  /*
   void dumpPlugins() {
-    QList<QWebPluginInfo> plugins = QWebSettings::pluginDatabase()->plugins();
-    foreach (const QWebPluginInfo plugin, plugins) {
-      qDebug() << "Plugin:" << plugin.name();
-      foreach (const QWebPluginInfo::MimeType mime, plugin.mimeTypes()) {
-        qDebug() << "   " << mime.name;
+      QList<QWebPluginInfo> plugins = QWebSettings::pluginDatabase()->plugins();
+      foreach (const QWebPluginInfo plugin, plugins) {
+          qDebug() << "Plugin:" << plugin.name();
+          foreach (const QWebPluginInfo::MimeType mime, plugin.mimeTypes()) {
+              qDebug() << "   " << mime.name;
+          }
       }
-    }
   }
+  */
 
   void dumpHtml() {
     qDebug() << "HTML: " << view->page()->mainFrame()->toHtml();
@@ -343,7 +344,7 @@ class MainWindow : public QMainWindow {
     zoomTextOnly->setChecked(false);
     viewMenu->addSeparator();
     viewMenu->addAction("Dump HTML", this, SLOT(dumpHtml()));
-    viewMenu->addAction("Dump plugins", this, SLOT(dumpPlugins()));
+    // viewMenu->addAction("Dump plugins", this, SLOT(dumpPlugins()));
 
     QMenu* formatMenu = new QMenu("F&ormat", this);
     formatMenuAction = menuBar()->addMenu(formatMenu);
