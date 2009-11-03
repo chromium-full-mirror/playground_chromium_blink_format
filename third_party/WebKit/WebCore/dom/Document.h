@@ -35,7 +35,6 @@
 #include "CollectionType.h"
 #include "Color.h"
 #include "DocumentMarker.h"
-#include "Page.h"
 #include "ScriptExecutionContext.h"
 #include "Timer.h"
 #include <wtf/HashCountedSet.h>
@@ -87,6 +86,7 @@ class JSNode;
 class MouseEventWithHitTestResults;
 class NodeFilter;
 class NodeIterator;
+class Page;
 class PlatformMouseEvent;
 class ProcessingInstruction;
 class Range;
@@ -1343,12 +1343,6 @@ inline bool Document::hasElementWithId(AtomicStringImpl* id) const {
 inline bool Node::isDocumentNode() const {
   return this == m_document;
 }
-
-#if ENABLE(INSPECTOR)
-inline InspectorTimelineAgent* Document::inspectorTimelineAgent() const {
-  return page() ? page()->inspectorTimelineAgent() : 0;
-}
-#endif
 
 }  // namespace WebCore
 
