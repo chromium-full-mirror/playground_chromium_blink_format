@@ -21,7 +21,7 @@
 #include "config.h"
 #include "StringImpl.h"
 
-#if PLATFORM(CF) || (PLATFORM(QT) && PLATFORM(DARWIN))
+#if PLATFORM(CF)
 
 #include <CoreFoundation/CoreFoundation.h>
 #include <wtf/MainThread.h>
@@ -166,4 +166,4 @@ CFStringRef StringImpl::createCFString() {
 // allocator, so it's probably not urgent optimize that case.
 }
 
-#endif  // PLATFORM(CF) || (PLATFORM(QT) && PLATFORM(DARWIN))
+#endif  // PLATFORM(CF)

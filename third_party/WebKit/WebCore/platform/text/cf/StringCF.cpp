@@ -21,7 +21,7 @@
 #include "config.h"
 #include "PlatformString.h"
 
-#if PLATFORM(CF) || (PLATFORM(QT) && PLATFORM(DARWIN))
+#if PLATFORM(CF)
 
 #include <CoreFoundation/CoreFoundation.h>
 
@@ -49,4 +49,4 @@ CFStringRef String::createCFString() const {
 }
 }
 
-#endif  // PLATFORM(CF) || (PLATFORM(QT) && PLATFORM(DARWIN))
+#endif  // PLATFORM(CF)
