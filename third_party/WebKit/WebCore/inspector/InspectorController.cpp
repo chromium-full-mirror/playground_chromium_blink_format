@@ -1461,6 +1461,7 @@ ScriptObject InspectorController::createProfileHeader(
   ScriptObject header = m_frontend->newScriptObject();
   header.set("title", profile.title());
   header.set("uid", profile.uid());
+  header.set("typeId", UString(CPUProfileType));
   return header;
 }
 
