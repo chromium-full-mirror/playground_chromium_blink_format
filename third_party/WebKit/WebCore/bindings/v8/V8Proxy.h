@@ -171,8 +171,6 @@ class V8Proxy {
   // and clears all timeouts on the DOM window.
   void disconnectFrame();
 
-  bool isEnabled();
-
 #if ENABLE(SVG)
   static void setSVGContext(void*, SVGElement*);
   static SVGElement* svgContext(void*);

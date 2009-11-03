@@ -325,6 +325,10 @@ class FrameLoaderClient {
     return false;
   }
   virtual bool shouldLoadMediaElementURL(const KURL&) const { return true; }
+
+  virtual bool allowJavaScript(bool enabledPerSettings) {
+    return enabledPerSettings;
+  }
 };
 
 }  // namespace WebCore

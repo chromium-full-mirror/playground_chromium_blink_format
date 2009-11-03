@@ -174,9 +174,6 @@ class ChromiumBridge {
   static NPObject* pluginScriptableObject(Widget*);
   static bool popupsAllowed(NPP);
 
-  // Protocol -----------------------------------------------------------
-  static String uiResourceProtocol();  // deprecated
-
   // Resources ----------------------------------------------------------
   static PassRefPtr<Image> loadPlatformImageResource(const char* name);
 
