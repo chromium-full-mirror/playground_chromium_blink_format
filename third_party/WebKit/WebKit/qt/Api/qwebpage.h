@@ -348,8 +348,6 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
   void saveFrameStateRequested(QWebFrame* frame, QWebHistoryItem* item);
   void restoreFrameStateRequested(QWebFrame* frame);
 
-  void networkRequestStarted(QWebFrame* frame, QNetworkRequest* request);
-
  protected:
   virtual QWebPage* createWindow(WebWindowType type);
   virtual QObject* createPlugin(const QString& classid,
