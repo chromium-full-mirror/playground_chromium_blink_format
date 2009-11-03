@@ -23,8 +23,8 @@
 #include "config.h"
 #include "RenderWidget.h"
 
-#include "AnimationController.h"
 #include "AXObjectCache.h"
+#include "AnimationController.h"
 #include "GraphicsContext.h"
 #include "HitTestResult.h"
 #include "RenderView.h"
@@ -43,14 +43,13 @@ static HashMap<const Widget*, RenderWidget*>& widgetRendererMap() {
 RenderWidget::RenderWidget(Node* node)
     : RenderReplaced(node),
       m_widget(0),
-      m_frameView(node->document()->view()),
-      m_refCount(0) {
+      m_frameView(node->document()->view())
+      // Reference counting is used to prevent the widget from being
+      // destroyed while inside the Widget code, which might not be
+      // able to handle that.
+      ,
+      m_refCount(1) {
   view()->addWidget(this);
-
-  // Reference counting is used to prevent the widget from being
-  // destroyed while inside the Widget code, which might not be
-  // able to handle that.
-  ref();
 }
 
 void RenderWidget::destroy() {
@@ -82,11 +81,7 @@ void RenderWidget::destroy() {
   }
   remove();
 
-  if (m_widget) {
-    if (m_frameView)
-      m_frameView->removeChild(m_widget.get());
-    widgetRendererMap().remove(m_widget.get());
-  }
+  setWidget(0);
 
   // removes from override size map
   if (hasOverrideSize())
@@ -128,38 +123,41 @@ RenderWidget::~RenderWidget() {
   clearWidget();
 }
 
-void RenderWidget::setWidgetGeometry(const IntRect& frame) {
-  if (node() && m_widget->frameRect() != frame) {
-    RenderWidgetProtector protector(this);
-    RefPtr<Node> protectedNode(node());
-    m_widget->setFrameRect(frame);
-  }
+bool RenderWidget::setWidgetGeometry(const IntRect& frame) {
+  if (!node() || m_widget->frameRect() == frame)
+    return false;
+
+  RenderWidgetProtector protector(this);
+  RefPtr<Node> protectedNode(node());
+  m_widget->setFrameRect(frame);
+  return true;
 }
 
 void RenderWidget::setWidget(PassRefPtr<Widget> widget) {
-  if (widget != m_widget) {
-    if (m_widget) {
-      m_widget->removeFromParent();
-      widgetRendererMap().remove(m_widget.get());
-      clearWidget();
+  if (widget == m_widget)
+    return;
+
+  if (m_widget) {
+    m_widget->removeFromParent();
+    widgetRendererMap().remove(m_widget.get());
+    clearWidget();
+  }
+  m_widget = widget;
+  if (m_widget) {
+    widgetRendererMap().add(m_widget.get(), this);
+    // If we've already received a layout, apply the calculated space to the
+    // widget immediately, but we have to have really been fully constructed
+    // (with a non-null
+    // style pointer).
+    if (style()) {
+      if (!needsLayout())
+        setWidgetGeometry(absoluteContentBox());
+      if (style()->visibility() != VISIBLE)
+        m_widget->hide();
+      else
+        m_widget->show();
     }
-    m_widget = widget;
-    if (m_widget) {
-      widgetRendererMap().add(m_widget.get(), this);
-      // if we've already received a layout, apply the calculated space to the
-      // widget immediately, but we have to have really been full constructed
-      // (with a non-null
-      // style pointer).
-      if (style()) {
-        if (!needsLayout())
-          setWidgetGeometry(absoluteContentBox());
-        if (style()->visibility() != VISIBLE)
-          m_widget->hide();
-        else
-          m_widget->show();
-      }
-      m_frameView->addChild(m_widget.get());
-    }
+    m_frameView->addChild(m_widget.get());
   }
 }
 
@@ -289,14 +287,7 @@ void RenderWidget::updateWidgetPosition() {
   int h =
       height() - borderTop() - borderBottom() - paddingTop() - paddingBottom();
 
-  IntRect newBounds(absPos.x(), absPos.y(), w, h);
-  IntRect oldBounds(m_widget->frameRect());
-  bool boundsChanged = newBounds != oldBounds;
-  if (boundsChanged) {
-    RenderWidgetProtector protector(this);
-    RefPtr<Node> protectedNode(node());
-    m_widget->setFrameRect(newBounds);
-  }
+  bool boundsChanged = setWidgetGeometry(IntRect(absPos.x(), absPos.y(), w, h));
 
   // if the frame bounds got changed, or if view needs layout (possibly
   // indicating
