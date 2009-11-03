@@ -127,6 +127,15 @@ class Chrome : public HostWindow {
   void setStatusbarText(Frame*, const String&);
   bool shouldInterruptJavaScript();
 
+  void registerProtocolHandler(const String& scheme,
+                               const String& baseURL,
+                               const String& url,
+                               const String& title);
+  void registerContentHandler(const String& mimeType,
+                              const String& baseURL,
+                              const String& url,
+                              const String& title);
+
   IntRect windowResizerRect() const;
 
   void mouseDidMoveOverElement(const HitTestResult&, unsigned modifierFlags);

@@ -34,6 +34,8 @@ class PluginData;
 class PluginArray;
 class String;
 
+typedef int ExceptionCode;
+
 class Navigator : public NavigatorBase, public RefCounted<Navigator> {
  public:
   static PassRefPtr<Navigator> create(Frame* frame) {
@@ -61,6 +63,15 @@ class Navigator : public NavigatorBase, public RefCounted<Navigator> {
   // Relinquishes the storage lock, if one exists.
   void getStorageUpdates();
 #endif
+
+  void registerProtocolHandler(const String& scheme,
+                               const String& url,
+                               const String& title,
+                               ExceptionCode& ec);
+  void registerContentHandler(const String& mimeType,
+                              const String& url,
+                              const String& title,
+                              ExceptionCode& ec);
 
  private:
   Navigator(Frame*);
