@@ -76,7 +76,7 @@ typedef Vector<FiringEventIterator, 1> FiringEventIteratorVector;
 typedef Vector<RegisteredEventListener, 1> EventListenerVector;
 typedef HashMap<AtomicString, EventListenerVector> EventListenerMap;
 
-struct EventTargetData {
+struct EventTargetData : Noncopyable {
   EventListenerMap eventListenerMap;
   FiringEventIteratorVector firingEventIterators;
 };
