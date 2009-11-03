@@ -151,7 +151,7 @@ void CanvasRenderingContext3D::bindAttribLocation(CanvasProgram* program,
 void CanvasRenderingContext3D::bindBuffer(unsigned long target,
                                           CanvasBuffer* buffer,
                                           ExceptionCode& ec) {
-  if (!buffer || buffer->context() != this) {
+  if (buffer && buffer->context() != this) {
     ec = TYPE_MISMATCH_ERR;
     return;
   }
@@ -162,7 +162,7 @@ void CanvasRenderingContext3D::bindBuffer(unsigned long target,
 void CanvasRenderingContext3D::bindFramebuffer(unsigned long target,
                                                CanvasFramebuffer* buffer,
                                                ExceptionCode& ec) {
-  if (!buffer || buffer->context() != this) {
+  if (buffer && buffer->context() != this) {
     ec = TYPE_MISMATCH_ERR;
     return;
   }
@@ -174,7 +174,7 @@ void CanvasRenderingContext3D::bindRenderbuffer(
     unsigned long target,
     CanvasRenderbuffer* renderBuffer,
     ExceptionCode& ec) {
-  if (!renderBuffer || renderBuffer->context() != this) {
+  if (renderBuffer && renderBuffer->context() != this) {
     ec = TYPE_MISMATCH_ERR;
     return;
   }
@@ -185,7 +185,7 @@ void CanvasRenderingContext3D::bindRenderbuffer(
 void CanvasRenderingContext3D::bindTexture(unsigned long target,
                                            CanvasTexture* texture,
                                            ExceptionCode& ec) {
-  if (!texture || texture->context() != this) {
+  if (texture && texture->context() != this) {
     ec = TYPE_MISMATCH_ERR;
     return;
   }
@@ -499,7 +499,7 @@ void CanvasRenderingContext3D::framebufferRenderbuffer(
     unsigned long renderbuffertarget,
     CanvasRenderbuffer* buffer,
     ExceptionCode& ec) {
-  if (!buffer || buffer->context() != this) {
+  if (buffer && buffer->context() != this) {
     ec = TYPE_MISMATCH_ERR;
     return;
   }
@@ -514,7 +514,7 @@ void CanvasRenderingContext3D::framebufferTexture2D(unsigned long target,
                                                     CanvasTexture* texture,
                                                     long level,
                                                     ExceptionCode& ec) {
-  if (!texture || texture->context() != this) {
+  if (texture && texture->context() != this) {
     ec = TYPE_MISMATCH_ERR;
     return;
   }
