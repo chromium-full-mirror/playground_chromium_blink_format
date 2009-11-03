@@ -81,7 +81,10 @@ namespace WebCore {
 using namespace HTMLNames;
 
 AccessibilityRenderObject::AccessibilityRenderObject(RenderObject* renderer)
-    : AccessibilityObject(), m_renderer(renderer), m_ariaRole(UnknownRole) {
+    : AccessibilityObject(),
+      m_renderer(renderer),
+      m_ariaRole(UnknownRole),
+      m_childrenDirty(false) {
   updateAccessibilityRole();
 #ifndef NDEBUG
   m_renderer->setHasAXObject(true);
