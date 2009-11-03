@@ -29,8 +29,8 @@
 #include "config.h"
 #include "AccessibilityObject.h"
 
-#include "AccessibilityRenderObject.h"
 #include "AXObjectCache.h"
+#include "AccessibilityRenderObject.h"
 #include "CharacterNames.h"
 #include "FloatRect.h"
 #include "FocusController.h"
@@ -84,8 +84,9 @@ void AccessibilityObject::detach() {
 AccessibilityObject* AccessibilityObject::parentObjectUnignored() const {
   AccessibilityObject* parent;
   for (parent = parentObject(); parent && parent->accessibilityIsIgnored();
-       parent = parent->parentObject())
-    ;
+       parent = parent->parentObject()) {
+  }
+
   return parent;
 }
 
@@ -393,9 +394,8 @@ static bool replacedNodeNeedsCharacter(Node* replacedNode) {
   // we should always be given a rendered node and a replaced node, but be safe
   // replaced nodes are either attachments (widgets) or images
   if (!replacedNode || !replacedNode->renderer() ||
-      !replacedNode->renderer()->isReplaced() || replacedNode->isTextNode()) {
+      !replacedNode->renderer()->isReplaced() || replacedNode->isTextNode())
     return false;
-  }
 
   // create an AX object, but skip it if it is not supposed to be seen
   AccessibilityObject* object =
@@ -466,7 +466,7 @@ String AccessibilityObject::stringForVisiblePositionRange(
   for (TextIterator it(range.get()); !it.atEnd(); it.advance()) {
     // non-zero length means textual node, zero length means replaced node (AKA
     // "attachments" in AX)
-    if (it.length() != 0) {
+    if (it.length()) {
       // Add a textual representation for list marker text
       String listMarkerText = listMarkerTextForNodeAndPosition(
           it.node(), visiblePositionRange.start);
@@ -482,9 +482,8 @@ String AccessibilityObject::stringForVisiblePositionRange(
       ASSERT(node == it.range()->endContainer(exception));
       int offset = it.range()->startOffset(exception);
 
-      if (replacedNodeNeedsCharacter(node->childNode(offset))) {
+      if (replacedNodeNeedsCharacter(node->childNode(offset)))
         resultVector.append(objectReplacementCharacter);
-      }
     }
   }
 
@@ -503,9 +502,9 @@ int AccessibilityObject::lengthForVisiblePositionRange(
   for (TextIterator it(range.get()); !it.atEnd(); it.advance()) {
     // non-zero length means textual node, zero length means replaced node (AKA
     // "attachments" in AX)
-    if (it.length() != 0) {
+    if (it.length())
       length += it.length();
-    } else {
+    else {
       // locate the node and starting offset for this replaced range
       int exception = 0;
       Node* node = it.range()->startContainer(exception);

@@ -30,8 +30,8 @@
 #include "AccessibilityRenderObject.h"
 
 #include "AXObjectCache.h"
-#include "AccessibilityListBox.h"
 #include "AccessibilityImageMapLink.h"
+#include "AccessibilityListBox.h"
 #include "CharacterNames.h"
 #include "EventNames.h"
 #include "FloatRect.h"
@@ -1828,7 +1828,7 @@ VisiblePositionRange AccessibilityRenderObject::visiblePositionRange() const {
 
 VisiblePositionRange AccessibilityRenderObject::visiblePositionRangeForLine(
     unsigned lineCount) const {
-  if (lineCount == 0 || !m_renderer)
+  if (!lineCount || !m_renderer)
     return VisiblePositionRange();
 
   // iterate over the lines
@@ -1838,7 +1838,7 @@ VisiblePositionRange AccessibilityRenderObject::visiblePositionRangeForLine(
   VisiblePosition visiblePos =
       m_renderer->document()->renderer()->positionForCoordinates(0, 0);
   VisiblePosition savedVisiblePos;
-  while (--lineCount != 0) {
+  while (--lineCount) {
     savedVisiblePos = visiblePos;
     visiblePos = nextLinePosition(visiblePos, 0);
     if (visiblePos.isNull() || visiblePos == savedVisiblePos)
@@ -1961,9 +1961,9 @@ void AccessibilityRenderObject::setSelectedVisiblePositionRange(
 
   // make selection and tell the document to use it. if it's zero length, then
   // move to that position
-  if (range.start == range.end) {
+  if (range.start == range.end)
     m_renderer->document()->frame()->selection()->moveTo(range.start, true);
-  } else {
+  else {
     VisibleSelection newSelection = VisibleSelection(range.start, range.end);
     m_renderer->document()->frame()->selection()->setSelection(newSelection);
   }
@@ -2061,7 +2061,7 @@ PlainTextRange AccessibilityRenderObject::doAXRangeForLine(
   // iterate to the specified line
   VisiblePosition visiblePos = visiblePositionForIndex(0);
   VisiblePosition savedVisiblePos;
-  for (unsigned lineCount = lineNumber; lineCount != 0; lineCount -= 1) {
+  for (unsigned lineCount = lineNumber; lineCount; lineCount -= 1) {
     savedVisiblePos = visiblePos;
     visiblePos = nextLinePosition(visiblePos, 0);
     if (visiblePos.isNull() || visiblePos == savedVisiblePos)
@@ -2122,8 +2122,8 @@ String AccessibilityRenderObject::doAXStringForRange(
   if (isPasswordField())
     return String();
 
-  if (range.length == 0)
-    return "";
+  if (!range.length)
+    return String();
 
   if (!isTextControl())
     return String();
@@ -2500,7 +2500,7 @@ AccessibilityRole AccessibilityRenderObject::determineAccessibilityRole() {
   if (m_renderer->isMenuList())
     return PopUpButtonRole;
 
-  if (headingLevel() != 0)
+  if (headingLevel())
     return HeadingRole;
 
   if (node && node->hasTagName(ddTag))
@@ -2523,8 +2523,9 @@ bool AccessibilityRenderObject::isPresentationalChildOfAriaRole() const {
   AccessibilityObject* parent;
   for (parent = parentObject();
        parent && !parent->ariaRoleHasPresentationalChildren();
-       parent = parent->parentObject())
-    ;
+       parent = parent->parentObject()) {
+  }
+
   return parent;
 }
 

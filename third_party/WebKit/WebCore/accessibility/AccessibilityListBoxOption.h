@@ -63,7 +63,7 @@ class AccessibilityListBoxOption : public AccessibilityObject {
   virtual IntRect elementRect() const;
   virtual IntSize size() const;
   virtual AccessibilityObject* parentObject() const;
-  bool isListBoxOption() const { return true; };
+  bool isListBoxOption() const { return true; }
 
  private:
   HTMLElement* m_optionElement;

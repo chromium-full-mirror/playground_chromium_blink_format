@@ -63,7 +63,7 @@ class AccessibilityRenderObject : public AccessibilityObject {
   static PassRefPtr<AccessibilityRenderObject> create(RenderObject*);
   virtual ~AccessibilityRenderObject();
 
-  bool isAccessibilityRenderObject() const { return true; };
+  bool isAccessibilityRenderObject() const { return true; }
 
   virtual bool isAnchor() const;
   virtual bool isAttachment() const;

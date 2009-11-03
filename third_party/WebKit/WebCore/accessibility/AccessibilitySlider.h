@@ -48,7 +48,7 @@ class AccessibilitySlider : public AccessibilityRenderObject {
   virtual const AccessibilityChildrenVector& children();
   virtual void addChildren();
 
-  virtual bool canSetValueAttribute() const { return true; };
+  virtual bool canSetValueAttribute() const { return true; }
   const AtomicString& getAttribute(const QualifiedName& attribute) const;
 
   virtual void setValue(const String&);

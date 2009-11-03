@@ -29,7 +29,7 @@
 #ifndef AccessibilityObjectWrapper_h
 #define AccessibilityObjectWrapper_h
 
-#import <wtf/RefPtr.h>
+#include <wtf/RefPtr.h>
 
 #ifdef __OBJC__
 @class WebCoreTextMarker;

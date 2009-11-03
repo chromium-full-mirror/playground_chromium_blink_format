@@ -136,7 +136,7 @@ class AXObjectCache : public Noncopyable {
   void notificationPostTimerFired(Timer<AXObjectCache>*);
 
   AXID getAXID(AccessibilityObject*);
-  bool nodeIsAriaType(Node* node, String role);
+  bool nodeIsAriaType(Node*, String role);
 };
 
 #if !HAVE(ACCESSIBILITY)
