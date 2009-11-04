@@ -142,7 +142,7 @@ HRESULT STDMETHODCALLTYPE WebActionPropertyBag::Read(LPCOLESTR pszPropName,
   if (isEqual(pszPropName, WebActionModifierFlagsKey)) {
     if (const UIEventWithKeyState* keyEvent =
             findEventWithKeyState(const_cast<Event*>(m_action.event()))) {
-      int modifiers = 0;
+      unsigned modifiers = 0;
 
       if (keyEvent->ctrlKey())
         modifiers |= MK_CONTROL;
@@ -151,8 +151,8 @@ HRESULT STDMETHODCALLTYPE WebActionPropertyBag::Read(LPCOLESTR pszPropName,
       if (keyEvent->altKey())
         modifiers |= MK_ALT;
 
-      V_VT(pVar) = VT_I4;
-      V_I4(pVar) = modifiers;
+      V_VT(pVar) = VT_UI4;
+      V_UI4(pVar) = modifiers;
       return S_OK;
     }
   }
