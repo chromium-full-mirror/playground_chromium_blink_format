@@ -104,6 +104,7 @@ class AccessibilityRenderObject : public AccessibilityObject {
   virtual bool isVisited() const;
   virtual bool isRequired() const;
   virtual bool isLinked() const;
+  virtual bool isExpanded() const;
 
   const AtomicString& getAttribute(const QualifiedName&) const;
   virtual bool canSetFocusAttribute() const;
@@ -146,6 +147,7 @@ class AccessibilityRenderObject : public AccessibilityObject {
 
   virtual AXObjectCache* axObjectCache() const;
 
+  virtual void expandObject() const;
   virtual Element* actionElement() const;
   Element* mouseButtonListener() const;
   FrameView* frameViewIfRenderView() const;

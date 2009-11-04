@@ -292,6 +292,11 @@ bool AccessibilityUIElement::isSelected() const {
   return false;
 }
 
+bool AccessibilityUIElement::isExpanded() const {
+  // FIXME: implement
+  return false;
+}
+
 JSStringRef AccessibilityUIElement::attributesOfColumnHeaders() {
   // FIXME: implement
   return JSStringCreateWithCharacters(0, 0);
@@ -385,6 +390,10 @@ void AccessibilityUIElement::increment() {
 }
 
 void AccessibilityUIElement::decrement() {
+  // FIXME: implement
+}
+
+void AccessibilityUIElement::showMenu() {
   // FIXME: implement
 }
 

@@ -225,6 +225,13 @@ double AccessibilityUIElement::clickPointY() {
 JSStringRef AccessibilityUIElement::valueDescription() {
   return 0;
 }
+bool AccessibilityUIElement::isSelected() const {
+  return false;
+}
+
+bool AccessibilityUIElement::isExpanded() const {
+  return false;
+}
 
 double AccessibilityUIElement::intValue() {
   BSTR valueBSTR;
@@ -253,10 +260,6 @@ bool AccessibilityUIElement::isEnabled() {
 }
 
 bool AccessibilityUIElement::isRequired() const {
-  return false;
-}
-
-bool AccessibilityUIElement::isSelected() const {
   return false;
 }
 
@@ -337,6 +340,8 @@ bool AccessibilityUIElement::isAttributeSettable(JSStringRef attribute) {
 void AccessibilityUIElement::increment() {}
 
 void AccessibilityUIElement::decrement() {}
+
+void AccessibilityUIElement::showMenu() {}
 
 JSStringRef AccessibilityUIElement::accessibilityValue() const {
   BSTR valueBSTR;
