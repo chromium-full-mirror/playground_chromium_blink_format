@@ -242,7 +242,6 @@ EVT_PAINT(wxWebView::OnPaint)
 EVT_SIZE(wxWebView::OnSize)
 EVT_MOUSE_EVENTS(wxWebView::OnMouseEvents)
 EVT_CONTEXT_MENU(wxWebView::OnContextMenuEvents)
-EVT_MENU(wxID_ANY, wxWebView::OnMenuSelectEvents)
 EVT_KEY_DOWN(wxWebView::OnKeyEvents)
 EVT_KEY_UP(wxWebView::OnKeyEvents)
 EVT_CHAR(wxWebView::OnKeyEvents)
@@ -338,6 +337,9 @@ bool wxWebView::Create(wxWindow* parent,
 
 wxWebView::~wxWebView() {
   m_beingDestroyed = true;
+
+  while (HasCapture())
+    ReleaseMouse();
 
   if (m_mainFrame && m_mainFrame->GetFrame())
     m_mainFrame->GetFrame()->loader()->detachFromParent();
@@ -619,6 +621,8 @@ void wxWebView::OnMouseEvents(wxMouseEvent& event) {
 }
 
 void wxWebView::OnContextMenuEvents(wxContextMenuEvent& event) {
+  Connect(wxEVT_COMMAND_MENU_SELECTED,
+          wxCommandEventHandler(wxWebView::OnMenuSelectEvents), NULL, this);
   m_impl->page->contextMenuController()->clearContextMenu();
   wxPoint localEventPoint = ScreenToClient(event.GetPosition());
 
@@ -651,9 +655,19 @@ void wxWebView::OnContextMenuEvents(wxContextMenuEvent& event) {
     return;
 
   PopupMenu(menuWx, localEventPoint);
+
+  Disconnect(wxEVT_COMMAND_MENU_SELECTED,
+             wxCommandEventHandler(wxWebView::OnMenuSelectEvents), NULL, this);
 }
 
 void wxWebView::OnMenuSelectEvents(wxCommandEvent& event) {
+  // we shouldn't hit this unless there's a context menu showing
+  WebCore::ContextMenu* coreMenu =
+      m_impl->page->contextMenuController()->contextMenu();
+  ASSERT(coreMenu);
+  if (!coreMenu)
+    return;
+
   WebCore::ContextMenuItem* item =
       WebCore::ContextMenu::itemWithId(event.GetId());
   if (!item)
