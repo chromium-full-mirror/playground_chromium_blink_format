@@ -50,12 +50,6 @@ static GstStaticPadTemplate sinktemplate = GST_STATIC_PAD_TEMPLATE(
 GST_DEBUG_CATEGORY_STATIC(webkit_video_sink_debug);
 #define GST_CAT_DEFAULT webkit_video_sink_debug
 
-static GstElementDetails webkit_video_sink_details = GST_ELEMENT_DETAILS(
-    (gchar*)"WebKit video sink",
-    (gchar*)"Sink/Video",
-    (gchar*)"Sends video data from a GStreamer pipeline to a Cairo surface",
-    (gchar*)"Alp Toker <alp@atoker.com>");
-
 enum { REPAINT_REQUESTED, LAST_SIGNAL };
 
 enum { PROP_0 };
@@ -96,7 +90,10 @@ static void webkit_video_sink_base_init(gpointer g_class) {
 
   gst_element_class_add_pad_template(
       element_class, gst_static_pad_template_get(&sinktemplate));
-  gst_element_class_set_details(element_class, &webkit_video_sink_details);
+  gst_element_class_set_details_simple(
+      element_class, "WebKit video sink", "Sink/Video",
+      "Sends video data from a GStreamer pipeline to a Cairo surface",
+      "Alp Toker <alp@atoker.com>");
 }
 
 static void webkit_video_sink_init(WebKitVideoSink* sink,
