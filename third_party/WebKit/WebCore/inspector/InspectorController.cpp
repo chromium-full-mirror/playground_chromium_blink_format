@@ -982,10 +982,14 @@ bool InspectorController::isMainResourceLoader(DocumentLoader* loader,
 }
 
 void InspectorController::willSendRequest(
-    DocumentLoader*,
+    DocumentLoader* loader,
     unsigned long identifier,
     ResourceRequest& request,
     const ResourceResponse& redirectResponse) {
+  if (m_timelineAgent)
+    m_timelineAgent->willSendResourceRequest(
+        identifier, isMainResourceLoader(loader, request.url()), request);
+
   RefPtr<InspectorResource> resource = getTrackedResource(identifier);
   if (!resource)
     return;
@@ -1004,6 +1008,9 @@ void InspectorController::willSendRequest(
 void InspectorController::didReceiveResponse(DocumentLoader*,
                                              unsigned long identifier,
                                              const ResourceResponse& response) {
+  if (m_timelineAgent)
+    m_timelineAgent->didReceiveResourceResponse(identifier, response);
+
   RefPtr<InspectorResource> resource = getTrackedResource(identifier);
   if (!resource)
     return;
@@ -1030,6 +1037,9 @@ void InspectorController::didReceiveContentLength(DocumentLoader*,
 
 void InspectorController::didFinishLoading(DocumentLoader*,
                                            unsigned long identifier) {
+  if (m_timelineAgent)
+    m_timelineAgent->didFinishLoadingResource(identifier, false);
+
   RefPtr<InspectorResource> resource = getTrackedResource(identifier);
   if (!resource)
     return;
@@ -1051,6 +1061,9 @@ void InspectorController::didFinishLoading(DocumentLoader*,
 void InspectorController::didFailLoading(DocumentLoader*,
                                          unsigned long identifier,
                                          const ResourceError& /*error*/) {
+  if (m_timelineAgent)
+    m_timelineAgent->didFinishLoadingResource(identifier, true);
+
   RefPtr<InspectorResource> resource = getTrackedResource(identifier);
   if (!resource)
     return;
