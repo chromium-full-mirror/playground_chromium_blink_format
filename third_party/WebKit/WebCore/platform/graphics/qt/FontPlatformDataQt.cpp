@@ -29,7 +29,7 @@ namespace WebCore {
 FontPlatformData::FontPlatformData(const FontDescription& description,
                                    int wordSpacing,
                                    int letterSpacing)
-    : m_size(0.0f), m_bold(false), m_oblique(false), m_isDeletedValue(false) {
+    : m_size(0.0f), m_bold(false), m_oblique(false) {
   QString familyName;
   const FontFamily* family = &description.family();
   while (family) {
@@ -54,22 +54,15 @@ FontPlatformData::FontPlatformData(const FontDescription& description,
 }
 
 FontPlatformData::FontPlatformData(const QFont& font, bool bold)
-    : m_font(font),
-      m_size(font.pointSize()),
-      m_bold(bold),
-      m_oblique(false),
-      m_isDeletedValue(false) {}
+    : m_size(font.pointSize()), m_bold(bold), m_oblique(false), m_font(font) {}
 
 #if ENABLE(SVG_FONTS)
 FontPlatformData::FontPlatformData(float size, bool bold, bool oblique)
-    : m_size(size), m_bold(bold), m_oblique(oblique), m_isDeletedValue(false) {}
+    : m_size(size), m_bold(bold), m_oblique(oblique) {}
 #endif
 
 FontPlatformData::FontPlatformData()
-    : m_size(m_font.pointSize()),
-      m_bold(false),
-      m_oblique(false),
-      m_isDeletedValue(false) {}
+    : m_size(0.0f), m_bold(false), m_oblique(false) {}
 
 #ifndef NDEBUG
 String FontPlatformData::description() const {
