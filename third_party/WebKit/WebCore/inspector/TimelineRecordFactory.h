@@ -60,44 +60,41 @@ class TimelineRecordFactory {
                                                int timeout,
                                                bool singleShot);
 
-  static ScriptObject createXHRReadyStateChangeTimelineRecord(
-      InspectorFrontend*,
-      double startTime,
-      const String& url,
-      int readyState);
-  static ScriptObject createXHRLoadTimelineRecord(InspectorFrontend*,
-                                                  double startTime,
-                                                  const String& url);
+  static ScriptObject createXHRReadyStateChangeRecord(InspectorFrontend*,
+                                                      double startTime,
+                                                      const String& url,
+                                                      int readyState);
+  static ScriptObject createXHRLoadRecord(InspectorFrontend*,
+                                          double startTime,
+                                          const String& url);
 
-  static ScriptObject createEvaluateScriptTimelineRecord(InspectorFrontend*,
-                                                         double startTime,
-                                                         const String&,
-                                                         double lineNumber);
+  static ScriptObject createEvaluateScriptRecord(InspectorFrontend*,
+                                                 double startTime,
+                                                 const String&,
+                                                 double lineNumber);
 
   static ScriptObject createMarkTimelineRecord(InspectorFrontend*,
                                                double startTime,
                                                const String&);
 
-  static ScriptObject createResourceSendRequestTimelineRecord(
-      InspectorFrontend*,
-      double startTime,
-      unsigned long identifier,
-      bool isMainResource,
-      const ResourceRequest&);
-  static ScriptObject createResourceReceiveResponseTimelineRecord(
+  static ScriptObject createResourceSendRequestRecord(InspectorFrontend*,
+                                                      double startTime,
+                                                      unsigned long identifier,
+                                                      bool isMainResource,
+                                                      const ResourceRequest&);
+  static ScriptObject createResourceReceiveResponseRecord(
       InspectorFrontend*,
       double startTime,
       unsigned long identifier,
       const ResourceResponse&);
-  static ScriptObject createResourceFinishTimelineRecord(
-      InspectorFrontend*,
-      double startTime,
-      unsigned long identifier,
-      bool didFail);
+  static ScriptObject createResourceFinishRecord(InspectorFrontend*,
+                                                 double startTime,
+                                                 unsigned long identifier,
+                                                 bool didFail);
 
-  static ScriptObject createPaintTimelineRecord(InspectorFrontend*,
-                                                double startTime,
-                                                const IntRect&);
+  static ScriptObject createPaintRecord(InspectorFrontend*,
+                                        double startTime,
+                                        const IntRect&);
 
  private:
   TimelineRecordFactory() {}

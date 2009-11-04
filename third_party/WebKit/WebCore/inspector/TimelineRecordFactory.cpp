@@ -88,7 +88,7 @@ ScriptObject TimelineRecordFactory::createTimerInstallRecord(
   return record;
 }
 
-ScriptObject TimelineRecordFactory::createXHRReadyStateChangeTimelineRecord(
+ScriptObject TimelineRecordFactory::createXHRReadyStateChangeRecord(
     InspectorFrontend* frontend,
     double startTime,
     const String& url,
@@ -101,7 +101,7 @@ ScriptObject TimelineRecordFactory::createXHRReadyStateChangeTimelineRecord(
   return record;
 }
 
-ScriptObject TimelineRecordFactory::createXHRLoadTimelineRecord(
+ScriptObject TimelineRecordFactory::createXHRLoadRecord(
     InspectorFrontend* frontend,
     double startTime,
     const String& url) {
@@ -112,31 +112,31 @@ ScriptObject TimelineRecordFactory::createXHRLoadTimelineRecord(
   return record;
 }
 
-ScriptObject TimelineRecordFactory::createEvaluateScriptTimelineRecord(
+ScriptObject TimelineRecordFactory::createEvaluateScriptRecord(
     InspectorFrontend* frontend,
     double startTime,
     const String& url,
     double lineNumber) {
-  ScriptObject item = createGenericRecord(frontend, startTime);
+  ScriptObject record = createGenericRecord(frontend, startTime);
   ScriptObject data = frontend->newScriptObject();
   data.set("url", url);
   data.set("lineNumber", lineNumber);
-  item.set("data", data);
-  return item;
+  record.set("data", data);
+  return record;
 }
 
 ScriptObject TimelineRecordFactory::createMarkTimelineRecord(
     InspectorFrontend* frontend,
     double startTime,
     const String& message) {
-  ScriptObject item = createGenericRecord(frontend, startTime);
+  ScriptObject record = createGenericRecord(frontend, startTime);
   ScriptObject data = frontend->newScriptObject();
   data.set("message", message);
-  item.set("data", data);
-  return item;
+  record.set("data", data);
+  return record;
 }
 
-ScriptObject TimelineRecordFactory::createResourceSendRequestTimelineRecord(
+ScriptObject TimelineRecordFactory::createResourceSendRequestRecord(
     InspectorFrontend* frontend,
     double startTime,
     unsigned long identifier,
@@ -152,7 +152,7 @@ ScriptObject TimelineRecordFactory::createResourceSendRequestTimelineRecord(
   return record;
 }
 
-ScriptObject TimelineRecordFactory::createResourceReceiveResponseTimelineRecord(
+ScriptObject TimelineRecordFactory::createResourceReceiveResponseRecord(
     InspectorFrontend* frontend,
     double startTime,
     unsigned long identifier,
@@ -167,7 +167,7 @@ ScriptObject TimelineRecordFactory::createResourceReceiveResponseTimelineRecord(
   return record;
 }
 
-ScriptObject TimelineRecordFactory::createResourceFinishTimelineRecord(
+ScriptObject TimelineRecordFactory::createResourceFinishRecord(
     InspectorFrontend* frontend,
     double startTime,
     unsigned long identifier,
@@ -180,7 +180,7 @@ ScriptObject TimelineRecordFactory::createResourceFinishTimelineRecord(
   return record;
 }
 
-ScriptObject TimelineRecordFactory::createPaintTimelineRecord(
+ScriptObject TimelineRecordFactory::createPaintRecord(
     InspectorFrontend* frontend,
     double startTime,
     const IntRect& rect) {

@@ -82,7 +82,7 @@ void InspectorTimelineAgent::didRecalculateStyle() {
 }
 
 void InspectorTimelineAgent::willPaint(const IntRect& rect) {
-  pushCurrentRecord(TimelineRecordFactory::createPaintTimelineRecord(
+  pushCurrentRecord(TimelineRecordFactory::createPaintRecord(
                         m_frontend, currentTimeInMilliseconds(), rect),
                     PaintTimelineRecordType);
 }
@@ -129,7 +129,7 @@ void InspectorTimelineAgent::didFireTimer() {
 void InspectorTimelineAgent::willChangeXHRReadyState(const String& url,
                                                      int readyState) {
   pushCurrentRecord(
-      TimelineRecordFactory::createXHRReadyStateChangeTimelineRecord(
+      TimelineRecordFactory::createXHRReadyStateChangeRecord(
           m_frontend, currentTimeInMilliseconds(), url, readyState),
       XHRReadyStateChangeRecordType);
 }
@@ -139,7 +139,7 @@ void InspectorTimelineAgent::didChangeXHRReadyState() {
 }
 
 void InspectorTimelineAgent::willLoadXHR(const String& url) {
-  pushCurrentRecord(TimelineRecordFactory::createXHRLoadTimelineRecord(
+  pushCurrentRecord(TimelineRecordFactory::createXHRLoadRecord(
                         m_frontend, currentTimeInMilliseconds(), url),
                     XHRLoadRecordType);
 }
@@ -151,7 +151,7 @@ void InspectorTimelineAgent::didLoadXHR() {
 void InspectorTimelineAgent::willEvaluateScript(const String& url,
                                                 int lineNumber) {
   pushCurrentRecord(
-      TimelineRecordFactory::createEvaluateScriptTimelineRecord(
+      TimelineRecordFactory::createEvaluateScriptRecord(
           m_frontend, currentTimeInMilliseconds(), url, lineNumber),
       EvaluateScriptTimelineRecordType);
 }
@@ -164,10 +164,9 @@ void InspectorTimelineAgent::willSendResourceRequest(
     unsigned long identifier,
     bool isMainResource,
     const ResourceRequest& request) {
-  ScriptObject record =
-      TimelineRecordFactory::createResourceSendRequestTimelineRecord(
-          m_frontend, currentTimeInMilliseconds(), identifier, isMainResource,
-          request);
+  ScriptObject record = TimelineRecordFactory::createResourceSendRequestRecord(
+      m_frontend, currentTimeInMilliseconds(), identifier, isMainResource,
+      request);
   record.set("type", ResourceSendRequestTimelineRecordType);
   m_frontend->addRecordToTimeline(record);
 }
@@ -176,7 +175,7 @@ void InspectorTimelineAgent::didReceiveResourceResponse(
     unsigned long identifier,
     const ResourceResponse& response) {
   ScriptObject record =
-      TimelineRecordFactory::createResourceReceiveResponseTimelineRecord(
+      TimelineRecordFactory::createResourceReceiveResponseRecord(
           m_frontend, currentTimeInMilliseconds(), identifier, response);
   record.set("type", ResourceReceiveResponseTimelineRecordType);
   m_frontend->addRecordToTimeline(record);
@@ -184,9 +183,8 @@ void InspectorTimelineAgent::didReceiveResourceResponse(
 
 void InspectorTimelineAgent::didFinishLoadingResource(unsigned long identifier,
                                                       bool didFail) {
-  ScriptObject record =
-      TimelineRecordFactory::createResourceFinishTimelineRecord(
-          m_frontend, currentTimeInMilliseconds(), identifier, didFail);
+  ScriptObject record = TimelineRecordFactory::createResourceFinishRecord(
+      m_frontend, currentTimeInMilliseconds(), identifier, didFail);
   record.set("type", ResourceFinishTimelineRecordType);
   m_frontend->addRecordToTimeline(record);
 }
