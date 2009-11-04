@@ -37,6 +37,7 @@ namespace WebCore {
 
 class Event;
 class InspectorFrontend;
+class IntRect;
 class ScriptObject;
 
 class TimelineRecordFactory {
@@ -70,6 +71,10 @@ class TimelineRecordFactory {
                                                          double startTime,
                                                          const String&,
                                                          double lineNumber);
+
+  static ScriptObject createPaintTimelineRecord(InspectorFrontend*,
+                                                double startTime,
+                                                const IntRect&);
 
   static ScriptObject createMarkTimelineRecord(InspectorFrontend*,
                                                double startTime,
