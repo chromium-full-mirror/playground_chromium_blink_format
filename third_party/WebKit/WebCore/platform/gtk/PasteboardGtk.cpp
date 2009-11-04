@@ -106,8 +106,8 @@ void Pasteboard::writeSelection(Range* selectedRange,
   PasteboardSelectionData* data = new PasteboardSelectionData(text, markup);
 
   gint n_targets;
-  GtkTargetEntry* targets = gtk_target_table_new_from_list(
-      m_helper->getCopyTargetList(frame), &n_targets);
+  GtkTargetEntry* targets =
+      gtk_target_table_new_from_list(m_helper->targetList(), &n_targets);
   gtk_clipboard_set_with_data(clipboard, targets, n_targets,
                               clipboard_get_contents_cb,
                               clipboard_clear_contents_cb, data);

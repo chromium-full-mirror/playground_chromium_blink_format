@@ -143,6 +143,11 @@ WebKitHitTestResult* kit(const WebCore::HitTestResult& result) {
       imageURI.get(), "media-uri", mediaURI.get(), "context", context, NULL));
 }
 
+PasteboardHelperGtk* pasteboardHelperInstance() {
+  static PasteboardHelperGtk* helper = new PasteboardHelperGtk();
+  return helper;
+}
+
 } /** end namespace WebKit */
 
 namespace WTF {
@@ -230,7 +235,8 @@ void webkit_init() {
 
   PageGroup::setShouldTrackVisitedLinks(true);
 
-  Pasteboard::generalPasteboard()->setHelper(new WebKit::PasteboardHelperGtk());
+  Pasteboard::generalPasteboard()->setHelper(
+      WebKit::pasteboardHelperInstance());
 
   SoupSession* session = webkit_get_default_session();
 
