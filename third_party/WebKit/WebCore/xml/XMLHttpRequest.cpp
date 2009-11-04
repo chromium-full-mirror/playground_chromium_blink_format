@@ -250,12 +250,15 @@ void XMLHttpRequest::callReadyStateChangeListener() {
       XMLHttpRequestProgressEvent::create(eventNames().readystatechangeEvent));
 
 #if ENABLE(INSPECTOR)
-  if (callTimelineAgentOnReadyStateChange)
+  if (callTimelineAgentOnReadyStateChange &&
+      (timelineAgent =
+           InspectorTimelineAgent::retrieve(scriptExecutionContext())))
     timelineAgent->didChangeXHRReadyState();
 #endif
 
   if (m_state == DONE && !m_error) {
 #if ENABLE(INSPECTOR)
+    timelineAgent = InspectorTimelineAgent::retrieve(scriptExecutionContext());
     bool callTimelineAgentOnLoad =
         timelineAgent && hasEventListeners(eventNames().loadEvent);
     if (callTimelineAgentOnLoad)
@@ -265,7 +268,9 @@ void XMLHttpRequest::callReadyStateChangeListener() {
     dispatchEvent(XMLHttpRequestProgressEvent::create(eventNames().loadEvent));
 
 #if ENABLE(INSPECTOR)
-    if (callTimelineAgentOnLoad)
+    if (callTimelineAgentOnLoad &&
+        (timelineAgent =
+             InspectorTimelineAgent::retrieve(scriptExecutionContext())))
       timelineAgent->didLoadXHR();
 #endif
   }

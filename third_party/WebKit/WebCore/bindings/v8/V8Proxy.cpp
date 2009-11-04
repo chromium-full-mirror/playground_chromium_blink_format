@@ -379,9 +379,8 @@ v8::Local<v8::Value> V8Proxy::evaluate(const ScriptSourceCode& source,
   ASSERT(v8::Context::InContext());
 
 #if ENABLE(INSPECTOR)
-  InspectorTimelineAgent* timelineAgent =
-      m_frame->page() ? m_frame->page()->inspectorTimelineAgent() : 0;
-  if (timelineAgent)
+  if (InspectorTimelineAgent* timelineAgent =
+          m_frame->page() ? m_frame->page()->inspectorTimelineAgent() : 0)
     timelineAgent->willEvaluateScript(
         source.url().isNull() ? String() : source.url().string(),
         source.startLine());
@@ -415,7 +414,8 @@ v8::Local<v8::Value> V8Proxy::evaluate(const ScriptSourceCode& source,
   ChromiumBridge::traceEventEnd("v8.run", node, "");
 
 #if ENABLE(INSPECTOR)
-  if (timelineAgent)
+  if (InspectorTimelineAgent* timelineAgent =
+          m_frame->page() ? m_frame->page()->inspectorTimelineAgent() : 0)
     timelineAgent->didEvaluateScript();
 #endif
 

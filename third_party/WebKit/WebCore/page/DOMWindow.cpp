@@ -1273,6 +1273,12 @@ void DOMWindow::dispatchLoadEvent() {
 #endif
 }
 
+InspectorTimelineAgent* DOMWindow::inspectorTimelineAgent() {
+  if (frame() && frame()->page())
+    return frame()->page()->inspectorTimelineAgent();
+  return 0;
+}
+
 bool DOMWindow::dispatchEvent(PassRefPtr<Event> prpEvent,
                               PassRefPtr<EventTarget> prpTarget) {
   RefPtr<EventTarget> protect = this;
@@ -1283,9 +1289,7 @@ bool DOMWindow::dispatchEvent(PassRefPtr<Event> prpEvent,
   event->setEventPhase(Event::AT_TARGET);
 
 #if ENABLE(INSPECTOR)
-  InspectorTimelineAgent* timelineAgent = 0;
-  if (frame() && frame()->page())
-    timelineAgent = frame()->page()->inspectorTimelineAgent();
+  InspectorTimelineAgent* timelineAgent = inspectorTimelineAgent();
   bool timelineAgentIsActive =
       timelineAgent && hasEventListeners(event->type());
   if (timelineAgentIsActive)
@@ -1295,8 +1299,11 @@ bool DOMWindow::dispatchEvent(PassRefPtr<Event> prpEvent,
   bool result = fireEventListeners(event.get());
 
 #if ENABLE(INSPECTOR)
-  if (timelineAgentIsActive)
-    timelineAgent->didDispatchEvent();
+  if (timelineAgentIsActive) {
+    timelineAgent = inspectorTimelineAgent();
+    if (timelineAgent)
+      timelineAgent->didDispatchEvent();
+  }
 #endif
 
   return result;

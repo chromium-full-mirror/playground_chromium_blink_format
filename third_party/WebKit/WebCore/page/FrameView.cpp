@@ -507,8 +507,7 @@ void FrameView::layout(bool allowSubtree) {
     return;
 
 #if ENABLE(INSPECTOR)
-  InspectorTimelineAgent* timelineAgent = inspectorTimelineAgent();
-  if (timelineAgent)
+  if (InspectorTimelineAgent* timelineAgent = inspectorTimelineAgent())
     timelineAgent->willLayout();
 #endif
 
@@ -719,7 +718,7 @@ void FrameView::layout(bool allowSubtree) {
   }
 
 #if ENABLE(INSPECTOR)
-  if (timelineAgent)
+  if (InspectorTimelineAgent* timelineAgent = inspectorTimelineAgent())
     timelineAgent->didLayout();
 #endif
 
@@ -1619,8 +1618,7 @@ void FrameView::paintContents(GraphicsContext* p, const IntRect& rect) {
     return;
 
 #if ENABLE(INSPECTOR)
-  InspectorTimelineAgent* timelineAgent = inspectorTimelineAgent();
-  if (timelineAgent)
+  if (InspectorTimelineAgent* timelineAgent = inspectorTimelineAgent())
     timelineAgent->willPaint(rect);
 #endif
 
@@ -1693,7 +1691,7 @@ void FrameView::paintContents(GraphicsContext* p, const IntRect& rect) {
     sCurrentPaintTimeStamp = 0;
 
 #if ENABLE(INSPECTOR)
-  if (timelineAgent)
+  if (InspectorTimelineAgent* timelineAgent = inspectorTimelineAgent())
     timelineAgent->didPaint();
 #endif
 }

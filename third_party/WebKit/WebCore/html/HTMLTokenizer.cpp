@@ -1766,8 +1766,7 @@ void HTMLTokenizer::write(const SegmentedString& str, bool appendData) {
   double startTime = currentTime();
 
 #if ENABLE(INSPECTOR)
-  InspectorTimelineAgent* timelineAgent = m_doc->inspectorTimelineAgent();
-  if (timelineAgent)
+  if (InspectorTimelineAgent* timelineAgent = m_doc->inspectorTimelineAgent())
     timelineAgent->willWriteHTML();
 #endif
 
@@ -1898,7 +1897,7 @@ void HTMLTokenizer::write(const SegmentedString& str, bool appendData) {
 #endif
 
 #if ENABLE(INSPECTOR)
-  if (timelineAgent)
+  if (InspectorTimelineAgent* timelineAgent = m_doc->inspectorTimelineAgent())
     timelineAgent->didWriteHTML();
 #endif
 
