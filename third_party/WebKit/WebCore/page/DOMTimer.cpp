@@ -128,9 +128,8 @@ void DOMTimer::fired() {
   timerNestingLevel = m_nestingLevel;
 
 #if ENABLE(INSPECTOR)
-  InspectorTimelineAgent* timelineAgent =
-      InspectorTimelineAgent::retrieve(context);
-  if (timelineAgent)
+  if (InspectorTimelineAgent* timelineAgent =
+          InspectorTimelineAgent::retrieve(context))
     timelineAgent->willFireTimer(m_timeoutId);
 #endif
 
@@ -145,7 +144,8 @@ void DOMTimer::fired() {
     // No access to member variables after this point, it can delete the timer.
     m_action->execute(context);
 #if ENABLE(INSPECTOR)
-    if (timelineAgent)
+    if (InspectorTimelineAgent* timelineAgent =
+            InspectorTimelineAgent::retrieve(context))
       timelineAgent->didFireTimer();
 #endif
     return;
@@ -159,7 +159,8 @@ void DOMTimer::fired() {
 
   action->execute(context);
 #if ENABLE(INSPECTOR)
-  if (timelineAgent)
+  if (InspectorTimelineAgent* timelineAgent =
+          InspectorTimelineAgent::retrieve(context))
     timelineAgent->didFireTimer();
 #endif
   delete action;
