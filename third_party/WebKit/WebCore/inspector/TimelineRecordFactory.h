@@ -71,6 +71,10 @@ class TimelineRecordFactory {
                                                          const String&,
                                                          double lineNumber);
 
+  static ScriptObject createMarkTimelineRecord(InspectorFrontend*,
+                                               double startTime,
+                                               const String&);
+
  private:
   TimelineRecordFactory() {}
 };

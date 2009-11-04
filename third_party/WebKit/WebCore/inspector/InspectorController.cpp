@@ -430,6 +430,11 @@ void InspectorController::endGroup(MessageSource source,
                             String(), lineNumber, sourceURL, m_groupLevel));
 }
 
+void InspectorController::markTimeline(const String& message) {
+  if (timelineAgent())
+    timelineAgent()->didMarkTimeline(message);
+}
+
 static unsigned constrainedAttachedWindowHeight(unsigned preferredHeight,
                                                 unsigned totalWindowHeight) {
   return roundf(

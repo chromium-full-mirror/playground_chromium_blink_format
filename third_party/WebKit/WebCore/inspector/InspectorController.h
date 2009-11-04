@@ -322,6 +322,8 @@ class InspectorController
                 unsigned lineNumber,
                 const String& sourceURL);
 
+  void markTimeline(const String& message);
+
 #if ENABLE(JAVASCRIPT_DEBUGGER)
   void addProfile(PassRefPtr<JSC::Profile>,
                   unsigned lineNumber,
