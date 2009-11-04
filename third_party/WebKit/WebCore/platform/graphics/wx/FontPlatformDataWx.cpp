@@ -102,13 +102,12 @@ unsigned FontPlatformData::computeHash() const {
   // make a hash that is unique for this font, but not globally unique - that
   // is,
   // a font whose properties are equal should generate the same hash
-  uintptr_t hashCodes[6] = {
-      thisFont->GetPointSize(),
-      thisFont->GetFamily(),
-      thisFont->GetStyle(),
-      thisFont->GetWeight(),
-      thisFont->GetUnderlined(),
-      StringImpl::computeHash(thisFont->GetFaceName().mb_str(wxConvUTF8))};
+  uintptr_t hashCodes[6] = {thisFont->GetPointSize(),
+                            thisFont->GetFamily(),
+                            thisFont->GetStyle(),
+                            thisFont->GetWeight(),
+                            thisFont->GetUnderlined(),
+                            StringImpl::computeHash(thisFont->GetFaceName())};
 
   return StringImpl::computeHash(reinterpret_cast<UChar*>(hashCodes),
                                  sizeof(hashCodes) / sizeof(UChar));
