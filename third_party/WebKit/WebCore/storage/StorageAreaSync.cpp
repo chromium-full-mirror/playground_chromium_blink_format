@@ -46,21 +46,22 @@ static const double StorageSyncInterval = 1.0;
 
 PassRefPtr<StorageAreaSync> StorageAreaSync::create(
     PassRefPtr<StorageSyncManager> storageSyncManager,
-    PassRefPtr<StorageAreaImpl> storageArea) {
-  return adoptRef(new StorageAreaSync(storageSyncManager, storageArea));
+    PassRefPtr<StorageAreaImpl> storageArea,
+    String databaseIdentifier) {
+  return adoptRef(
+      new StorageAreaSync(storageSyncManager, storageArea, databaseIdentifier));
 }
 
 StorageAreaSync::StorageAreaSync(
     PassRefPtr<StorageSyncManager> storageSyncManager,
-    PassRefPtr<StorageAreaImpl> storageArea)
+    PassRefPtr<StorageAreaImpl> storageArea,
+    String databaseIdentifier)
     : m_syncTimer(this, &StorageAreaSync::syncTimerFired),
       m_itemsCleared(false),
       m_finalSyncScheduled(false),
       m_storageArea(storageArea),
       m_syncManager(storageSyncManager),
-      m_databaseIdentifier(storageArea->securityOrigin()
-                               ->databaseIdentifier()
-                               .crossThreadString()),
+      m_databaseIdentifier(databaseIdentifier.crossThreadString()),
       m_clearItemsWhileSyncing(false),
       m_syncScheduled(false),
       m_importComplete(false) {

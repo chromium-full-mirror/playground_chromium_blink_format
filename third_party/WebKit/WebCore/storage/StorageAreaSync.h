@@ -44,7 +44,8 @@ class StorageAreaSync : public RefCounted<StorageAreaSync> {
  public:
   static PassRefPtr<StorageAreaSync> create(
       PassRefPtr<StorageSyncManager> storageSyncManager,
-      PassRefPtr<StorageAreaImpl> storageArea);
+      PassRefPtr<StorageAreaImpl> storageArea,
+      String databaseIdentifier);
   ~StorageAreaSync();
 
   void scheduleFinalSync();
@@ -55,7 +56,8 @@ class StorageAreaSync : public RefCounted<StorageAreaSync> {
 
  private:
   StorageAreaSync(PassRefPtr<StorageSyncManager> storageSyncManager,
-                  PassRefPtr<StorageAreaImpl> storageArea);
+                  PassRefPtr<StorageAreaImpl> storageArea,
+                  String databaseIdentifier);
 
   void dispatchStorageEvent(const String& key,
                             const String& oldValue,

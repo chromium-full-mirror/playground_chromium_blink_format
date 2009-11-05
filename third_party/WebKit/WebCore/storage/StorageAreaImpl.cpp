@@ -72,7 +72,8 @@ StorageAreaImpl::StorageAreaImpl(StorageType storageType,
   // behavior should be that of private browsing,
   // not silently ignoring it.  https://bugs.webkit.org/show_bug.cgi?id=25894
   if (m_storageSyncManager) {
-    m_storageAreaSync = StorageAreaSync::create(m_storageSyncManager, this);
+    m_storageAreaSync = StorageAreaSync::create(
+        m_storageSyncManager, this, m_securityOrigin->databaseIdentifier());
     ASSERT(m_storageAreaSync);
   }
 }
@@ -216,10 +217,6 @@ bool StorageAreaImpl::contains(const String& key) const {
 void StorageAreaImpl::importItem(const String& key, const String& value) {
   ASSERT(!m_isShutdown);
   m_storageMap->importItem(key, value);
-}
-
-SecurityOrigin* StorageAreaImpl::securityOrigin() {
-  return m_securityOrigin.get();
 }
 
 void StorageAreaImpl::close() {
