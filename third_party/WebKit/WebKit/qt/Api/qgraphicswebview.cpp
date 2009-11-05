@@ -37,7 +37,7 @@
 class QGraphicsWebViewPrivate : public QWebPageClient {
  public:
   QGraphicsWebViewPrivate(QGraphicsWebView* parent)
-      : q(parent), page(0), interactive(true), progress(1.0) {}
+      : q(parent), page(0), interactive(true) {}
 
   virtual void scroll(int dx, int dy, const QRect&);
   virtual void update(const QRect& dirtyRect);
@@ -57,26 +57,13 @@ class QGraphicsWebViewPrivate : public QWebPageClient {
 
   virtual QObject* pluginParent() const;
 
-  void _q_doLoadProgress(int progress);
   void _q_doLoadFinished(bool success);
-  void _q_setStatusBarMessage(const QString& message);
 
   QGraphicsWebView* q;
   QWebPage* page;
 
-  QString statusBarMessage;
   bool interactive;
-  qreal progress;
 };
-
-void QGraphicsWebViewPrivate::_q_doLoadProgress(int progress) {
-  if (qFuzzyCompare(this->progress, qreal(progress / 100.)))
-    return;
-
-  this->progress = progress / 100.;
-
-  emit q->progressChanged(this->progress);
-}
 
 void QGraphicsWebViewPrivate::_q_doLoadFinished(bool success) {
   // If the page had no title, still make sure it gets the signal
@@ -140,11 +127,6 @@ QWidget* QGraphicsWebViewPrivate::ownerWidget() const {
 
 QObject* QGraphicsWebViewPrivate::pluginParent() const {
   return q;
-}
-
-void QGraphicsWebViewPrivate::_q_setStatusBarMessage(const QString& s) {
-  statusBarMessage = s;
-  emit q->statusChanged();
 }
 
 /*!
@@ -339,12 +321,11 @@ void QGraphicsWebView::setPage(QWebPage* page) {
   connect(mainFrame, SIGNAL(urlChanged(const QUrl&)), this,
           SIGNAL(urlChanged(const QUrl&)));
   connect(d->page, SIGNAL(loadStarted()), this, SIGNAL(loadStarted()));
-  connect(d->page, SIGNAL(loadProgress(int)), this,
-          SLOT(_q_doLoadProgress(int)));
+  connect(d->page, SIGNAL(loadProgress(int)), this, SIGNAL(loadProgress(int)));
   connect(d->page, SIGNAL(loadFinished(bool)), this,
           SLOT(_q_doLoadFinished(bool)));
   connect(d->page, SIGNAL(statusBarMessage(const QString&)), this,
-          SLOT(_q_setStatusBarMessage(const QString&)));
+          SIGNAL(statusBarMessage(const QString&)));
 }
 
 /*!
@@ -444,20 +425,6 @@ void QGraphicsWebView::setGeometry(const QRectF& rect) {
 }
 
 /*!
-    \property QGraphicsWebView::status
-    \brief the load status message.
-
-    Provides the latest status message set during the load of a URL.
-    Commonly shown by Status Bar widgets.
-
-    \sa statusChanged()
-*/
-
-QString QGraphicsWebView::status() const {
-  return d->statusBarMessage;
-}
-
-/*!
     Convenience slot that stops loading the document.
 
     \sa reload(), loadFinished()
@@ -497,14 +464,6 @@ void QGraphicsWebView::forward() {
 void QGraphicsWebView::reload() {
   if (d->page)
     d->page->triggerAction(QWebPage::Reload);
-}
-
-/*!
-    \property QGraphicsWebView::progress
-    \brief the progress of loading the current URL, from 0 to 1.
-*/
-qreal QGraphicsWebView::progress() const {
-  return d->progress;
 }
 
 /*!
