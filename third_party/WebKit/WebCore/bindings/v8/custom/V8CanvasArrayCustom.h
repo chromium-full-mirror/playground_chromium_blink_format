@@ -97,6 +97,9 @@ v8::Handle<v8::Value> constructCanvasArray(const v8::Arguments& args,
           "int)");
     // Transform the holder into a wrapper object for the array.
     V8DOMWrapper::setDOMWrapper(args.Holder(), classIndex, array.get());
+    V8DOMWrapper::setIndexedPropertiesToExternalArray(
+        args.Holder(), classIndex, array.get()->baseAddress(),
+        array.get()->length());
     return toV8(array.release(), args.Holder());
   }
 
@@ -133,6 +136,9 @@ v8::Handle<v8::Value> constructCanvasArray(const v8::Arguments& args,
 
   // Transform the holder into a wrapper object for the array.
   V8DOMWrapper::setDOMWrapper(args.Holder(), classIndex, array.get());
+  V8DOMWrapper::setIndexedPropertiesToExternalArray(args.Holder(), classIndex,
+                                                    array.get()->baseAddress(),
+                                                    array.get()->length());
   return toV8(array.release(), args.Holder());
 }
 }
