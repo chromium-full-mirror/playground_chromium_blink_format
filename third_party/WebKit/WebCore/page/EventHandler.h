@@ -206,6 +206,12 @@ class EventHandler : public Noncopyable {
 
  private:
 #if ENABLE(DRAG_SUPPORT)
+  enum DragAndDropHandleType {
+    UpdateDragAndDrop,
+    CancelDragAndDrop,
+    PerformDragAndDrop
+  };
+
   struct EventHandlerDragState {
     RefPtr<Node> m_dragSrc;  // element that may be a drag source, for the
                              // current mouse gesture
@@ -221,6 +227,12 @@ class EventHandler : public Noncopyable {
   };
   static EventHandlerDragState& dragState();
   static const double TextDragDelay;
+
+  bool handleDragAndDropForTarget(DragAndDropHandleType,
+                                  Node* target,
+                                  const AtomicString& eventType,
+                                  const PlatformMouseEvent&,
+                                  Clipboard*);
 
   PassRefPtr<Clipboard> createDraggingClipboard() const;
 #endif  // ENABLE(DRAG_SUPPORT)
