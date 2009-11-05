@@ -84,8 +84,9 @@ void QGraphicsWebViewPrivate::update(const QRect& dirtyRect) {
 }
 
 void QGraphicsWebViewPrivate::setInputMethodEnabled(bool enable) {
-  q->setAttribute(Qt::WA_InputMethodEnabled, enable);
+  q->setFlag(QGraphicsItem::ItemAcceptsInputMethod, enable);
 }
+
 #if QT_VERSION >= 0x040600
 void QGraphicsWebViewPrivate::setInputMethodHint(Qt::InputMethodHint hint,
                                                  bool enable) {
