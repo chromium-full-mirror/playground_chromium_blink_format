@@ -48,6 +48,8 @@ class QWEBKIT_EXPORT QGraphicsWebView : public QGraphicsWidget {
   Q_PROPERTY(bool interactive READ isInteractive WRITE setInteractive NOTIFY
                  interactivityChanged)
 
+  Q_PROPERTY(bool modified READ isModified)
+
  public:
   QGraphicsWebView(QGraphicsItem* parent = 0);
   ~QGraphicsWebView();
@@ -66,6 +68,8 @@ class QWEBKIT_EXPORT QGraphicsWebView : public QGraphicsWidget {
 
   bool isInteractive() const;
   void setInteractive(bool);
+
+  bool isModified() const;
 
   void load(const QUrl& url);
   void load(const QNetworkRequest& request,
