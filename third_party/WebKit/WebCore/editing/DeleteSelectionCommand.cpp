@@ -719,6 +719,18 @@ void DeleteSelectionCommand::mergeParagraphs() {
     return;
   }
 
+  // Block images, tables and horizontal rules cannot be made inline with
+  // content at mergeDestination.  If there is
+  // any (!isStartOfParagraph(mergeDestination)), don't merge, just move the
+  // caret to just before the selection we deleted.
+  // See https://bugs.webkit.org/show_bug.cgi?id=25439
+  if (isRenderedAsNonInlineTableImageOrHR(
+          startOfParagraphToMove.deepEquivalent().node()) &&
+      !isStartOfParagraph(mergeDestination)) {
+    m_endingPosition = m_upstreamStart;
+    return;
+  }
+
   RefPtr<Range> range = Range::create(
       document(),
       rangeCompliantEquivalent(startOfParagraphToMove.deepEquivalent()),

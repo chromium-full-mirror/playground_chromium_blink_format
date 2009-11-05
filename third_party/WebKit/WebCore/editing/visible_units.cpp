@@ -850,12 +850,6 @@ VisiblePosition nextSentencePosition(const VisiblePosition& c) {
   return c.honorEditableBoundaryAtOrBefore(next);
 }
 
-static bool renderedAsNonInlineTableOrHR(RenderObject* renderer) {
-  return renderer &&
-         ((renderer->isTable() && !renderer->isInline()) || renderer->isHR());
-}
-
-// FIXME: Broken for positions before/after images that aren't inline (5027702)
 VisiblePosition startOfParagraph(const VisiblePosition& c) {
   Position p = c.deepEquivalent();
   Node* startNode = p.node();
@@ -863,8 +857,7 @@ VisiblePosition startOfParagraph(const VisiblePosition& c) {
   if (!startNode)
     return VisiblePosition();
 
-  if (renderedAsNonInlineTableOrHR(startNode->renderer()) &&
-      p.atLastEditingPositionForNode())
+  if (isRenderedAsNonInlineTableImageOrHR(startNode))
     return firstDeepEditingPositionForNode(startNode);
 
   Node* startBlock = enclosingBlock(startNode);
@@ -916,7 +909,6 @@ VisiblePosition startOfParagraph(const VisiblePosition& c) {
   return VisiblePosition(node, offset, DOWNSTREAM);
 }
 
-// FIXME: Broken for positions before/after images that aren't inline (5027702)
 VisiblePosition endOfParagraph(const VisiblePosition& c) {
   if (c.isNull())
     return VisiblePosition();
@@ -924,8 +916,7 @@ VisiblePosition endOfParagraph(const VisiblePosition& c) {
   Position p = c.deepEquivalent();
   Node* startNode = p.node();
 
-  if (renderedAsNonInlineTableOrHR(startNode->renderer()) &&
-      p.atFirstEditingPositionForNode())
+  if (isRenderedAsNonInlineTableImageOrHR(startNode))
     return lastDeepEditingPositionForNode(startNode);
 
   Node* startBlock = enclosingBlock(startNode);
