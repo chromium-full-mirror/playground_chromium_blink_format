@@ -413,6 +413,16 @@ class GCEpilogueVisitor : public DOMWrapperMap<void>::Visitor {
   }
 };
 
+int V8GCController::workingSetEstimateMB = 0;
+
+namespace {
+
+int getMemoryUsageInMB() {
+  return ChromiumBridge::memoryUsageMB();
+}
+
+}  // anonymous namespace
+
 void V8GCController::gcEpilogue() {
   v8::HandleScope scope;
 
@@ -420,6 +430,8 @@ void V8GCController::gcEpilogue() {
   // again.
   GCEpilogueVisitor epilogueVisitor;
   visitActiveDOMObjectsInCurrentThread(&epilogueVisitor);
+
+  workingSetEstimateMB = getMemoryUsageInMB();
 
 #ifndef NDEBUG
   // Check all survivals are weak.
@@ -432,6 +444,23 @@ void V8GCController::gcEpilogue() {
   enumerateDOMObjectMap(gcProtectedMap());
   enumerateGlobalHandles();
 #endif
+}
+
+void V8GCController::checkMemoryUsage() {
+  const int lowUsageMB = 256;    // If memory usage is below this threshold, do
+                                 // not bother forcing GC.
+  const int highUsageMB = 1024;  // If memory usage is above this threshold,
+                                 // force GC more aggresively.
+  const int highUsageDeltaMB = 128;  // Delta of memory usage growth (vs. last
+                                     // workingSetEstimateMB) to force GC when
+                                     // memory usage is high.
+
+  int memoryUsageMB = getMemoryUsageInMB();
+  if ((memoryUsageMB > lowUsageMB &&
+       memoryUsageMB > 2 * workingSetEstimateMB) ||
+      (memoryUsageMB > highUsageMB &&
+       memoryUsageMB > workingSetEstimateMB + highUsageDeltaMB))
+    v8::V8::LowMemoryNotification();
 }
 
 }  // namespace WebCore
