@@ -416,10 +416,18 @@ void EditorClientQt::handleKeyboardEvent(KeyboardEvent* event) {
             frame->editor()->command("MoveDown").execute();
           break;
         case VK_PRIOR:  // PageUp
-          frame->editor()->command("MovePageUp").execute();
+          if (kevent->shiftKey())
+            frame->editor()->command("MovePageUpAndModifySelection").execute();
+          else
+            frame->editor()->command("MovePageUp").execute();
           break;
         case VK_NEXT:  // PageDown
-          frame->editor()->command("MovePageDown").execute();
+          if (kevent->shiftKey())
+            frame->editor()
+                ->command("MovePageDownAndModifySelection")
+                .execute();
+          else
+            frame->editor()->command("MovePageDown").execute();
           break;
         case VK_TAB:
           return;
