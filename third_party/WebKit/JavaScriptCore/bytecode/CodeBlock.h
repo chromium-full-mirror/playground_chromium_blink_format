@@ -500,7 +500,7 @@ class CodeBlock : public FastAllocBase {
   Register& constantRegister(int index) {
     return m_constantRegisters[index - FirstConstantRegisterIndex];
   }
-  ALWAYS_INLINE bool isConstantRegisterIndex(int index) {
+  ALWAYS_INLINE bool isConstantRegisterIndex(int index) const {
     return index >= FirstConstantRegisterIndex;
   }
   ALWAYS_INLINE JSValue getConstant(int index) const {
@@ -601,6 +601,29 @@ class CodeBlock : public FastAllocBase {
   void dump(ExecState*,
             const Vector<Instruction>::const_iterator& begin,
             Vector<Instruction>::const_iterator&) const;
+
+  CString registerName(ExecState*, int r) const;
+  void printUnaryOp(ExecState*,
+                    int location,
+                    Vector<Instruction>::const_iterator&,
+                    const char* op) const;
+  void printBinaryOp(ExecState*,
+                     int location,
+                     Vector<Instruction>::const_iterator&,
+                     const char* op) const;
+  void printConditionalJump(ExecState*,
+                            const Vector<Instruction>::const_iterator&,
+                            Vector<Instruction>::const_iterator&,
+                            int location,
+                            const char* op) const;
+  void printGetByIdOp(ExecState*,
+                      int location,
+                      Vector<Instruction>::const_iterator&,
+                      const char* op) const;
+  void printPutByIdOp(ExecState*,
+                      int location,
+                      Vector<Instruction>::const_iterator&,
+                      const char* op) const;
 #endif
 
   void reparseForExceptionInfoIfNecessary(CallFrame*);
