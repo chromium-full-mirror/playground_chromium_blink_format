@@ -1365,15 +1365,15 @@ void tst_QWebPage::inputMethods_data() {
 #endif
 }
 
-static Qt::InputMethodHints inputMethodHints(QObject* object) {
 #if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
+static Qt::InputMethodHints inputMethodHints(QObject* object) {
   if (QGraphicsObject* o = qobject_cast<QGraphicsObject*>(object))
     return o->inputMethodHints();
-#endif
   if (QWidget* w = qobject_cast<QWidget*>(object))
     return w->inputMethodHints();
   return Qt::InputMethodHints();
 }
+#endif
 
 static bool inputMethodEnabled(QObject* object) {
 #if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
