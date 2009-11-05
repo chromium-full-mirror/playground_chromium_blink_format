@@ -31,6 +31,7 @@
 #include "CString.h"
 #include "EventNames.h"
 #include "HTMLElement.h"
+#include "SecurityOrigin.h"
 #include "SQLiteStatement.h"
 #include "StorageAreaImpl.h"
 #include "StorageSyncManager.h"
@@ -57,6 +58,9 @@ StorageAreaSync::StorageAreaSync(
       m_finalSyncScheduled(false),
       m_storageArea(storageArea),
       m_syncManager(storageSyncManager),
+      m_databaseIdentifier(storageArea->securityOrigin()
+                               ->databaseIdentifier()
+                               .crossThreadString()),
       m_clearItemsWhileSyncing(false),
       m_syncScheduled(false),
       m_importComplete(false) {
@@ -171,7 +175,7 @@ void StorageAreaSync::performImport() {
   ASSERT(!m_database.isOpen());
 
   String databaseFilename =
-      m_syncManager->fullDatabaseFilename(m_storageArea->securityOrigin());
+      m_syncManager->fullDatabaseFilename(m_databaseIdentifier);
 
   if (databaseFilename.isEmpty()) {
     LOG_ERROR(
