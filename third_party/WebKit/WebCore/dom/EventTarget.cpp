@@ -65,6 +65,10 @@ bool eventDispatchForbidden() {
 }
 #endif  // NDEBUG
 
+EventTargetData::~EventTargetData() {
+  deleteAllValues(eventListenerMap);
+}
+
 EventTarget::~EventTarget() {}
 
 EventSource* EventTarget::toEventSource() {
@@ -140,16 +144,19 @@ bool EventTarget::addEventListener(const AtomicString& eventType,
   EventTargetData* d = ensureEventTargetData();
 
   pair<EventListenerMap::iterator, bool> result =
-      d->eventListenerMap.add(eventType, EventListenerVector());
-  EventListenerVector& entry = result.first->second;
+      d->eventListenerMap.add(eventType, 0);
+  EventListenerVector*& entry = result.first->second;
+  const bool isNewEntry = result.second;
+  if (isNewEntry)
+    entry = new EventListenerVector();
 
   RegisteredEventListener registeredListener(listener, useCapture);
-  if (!result.second) {                              // pre-existing entry
-    if (entry.find(registeredListener) != notFound)  // duplicate listener
+  if (!isNewEntry) {
+    if (entry->find(registeredListener) != notFound)  // duplicate listener
       return false;
   }
 
-  entry.append(registeredListener);
+  entry->append(registeredListener);
   return true;
 }
 
@@ -163,16 +170,18 @@ bool EventTarget::removeEventListener(const AtomicString& eventType,
   EventListenerMap::iterator result = d->eventListenerMap.find(eventType);
   if (result == d->eventListenerMap.end())
     return false;
-  EventListenerVector& entry = result->second;
+  EventListenerVector* entry = result->second;
 
   RegisteredEventListener registeredListener(listener, useCapture);
-  size_t index = entry.find(registeredListener);
+  size_t index = entry->find(registeredListener);
   if (index == notFound)
     return false;
 
-  entry.remove(index);
-  if (!entry.size())
+  entry->remove(index);
+  if (entry->isEmpty()) {
+    delete entry;
     d->eventListenerMap.remove(result);
+  }
 
   // Notify firing events planning to invoke the listener at 'index' that
   // they have one less listener to invoke.
@@ -247,7 +256,7 @@ bool EventTarget::fireEventListeners(Event* event) {
   EventListenerMap::iterator result = d->eventListenerMap.find(event->type());
   if (result == d->eventListenerMap.end())
     return false;
-  EventListenerVector& entry = result->second;
+  EventListenerVector& entry = *result->second;
 
   RefPtr<EventTarget> protect = this;
 
@@ -286,13 +295,14 @@ const EventListenerVector& EventTarget::getEventListeners(
   EventListenerMap::iterator it = d->eventListenerMap.find(eventType);
   if (it == d->eventListenerMap.end())
     return emptyVector;
-  return it->second;
+  return *it->second;
 }
 
 void EventTarget::removeAllEventListeners() {
   EventTargetData* d = eventTargetData();
   if (!d)
     return;
+  deleteAllValues(d->eventListenerMap);
   d->eventListenerMap.clear();
 
   // Notify firing events planning to invoke the listener at 'index' that

@@ -848,7 +848,7 @@ void SVGUseElement::transferEventListenersToShadowTree(
       EventListenerMap& map = d->eventListenerMap;
       EventListenerMap::iterator end = map.end();
       for (EventListenerMap::iterator it = map.begin(); it != end; ++it) {
-        EventListenerVector& entry = it->second;
+        EventListenerVector& entry = *it->second;
         for (size_t i = 0; i < entry.size(); ++i) {
           // Event listeners created from markup have already been transfered to
           // the shadow tree during cloning.

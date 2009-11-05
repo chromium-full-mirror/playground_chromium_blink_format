@@ -74,9 +74,11 @@ struct FiringEventIterator {
 typedef Vector<FiringEventIterator, 1> FiringEventIteratorVector;
 
 typedef Vector<RegisteredEventListener, 1> EventListenerVector;
-typedef HashMap<AtomicString, EventListenerVector> EventListenerMap;
+typedef HashMap<AtomicString, EventListenerVector*> EventListenerMap;
 
 struct EventTargetData : Noncopyable {
+  ~EventTargetData();
+
   EventListenerMap eventListenerMap;
   FiringEventIteratorVector firingEventIterators;
 };
@@ -220,7 +222,7 @@ inline void EventTarget::markEventListeners(JSC::MarkStack& markStack) {
   EventListenerMap::iterator end = d->eventListenerMap.end();
   for (EventListenerMap::iterator it = d->eventListenerMap.begin(); it != end;
        ++it) {
-    EventListenerVector& entry = it->second;
+    EventListenerVector& entry = *it->second;
     for (size_t i = 0; i < entry.size(); ++i)
       entry[i].listener->markJSFunction(markStack);
   }
@@ -231,6 +233,7 @@ inline void EventTarget::invalidateEventListeners() {
   if (!d)
     return;
 
+  deleteAllValues(d->eventListenerMap);
   d->eventListenerMap.clear();
 }
 #endif
