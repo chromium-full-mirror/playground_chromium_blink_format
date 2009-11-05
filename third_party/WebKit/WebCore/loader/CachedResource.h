@@ -49,7 +49,7 @@ class PurgeableBuffer;
 // data has arrived.
 // This class also does the actual communication with the loader to obtain the
 // resource from the network.
-class CachedResource {
+class CachedResource : public Noncopyable {
   friend class Cache;
   friend class InspectorResource;
 
