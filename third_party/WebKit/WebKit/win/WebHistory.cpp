@@ -96,8 +96,9 @@ static bool areEqualOrClose(double d1, double d2) {
   return (diff < .000001 && diff > -.000001);
 }
 
-static CFDictionaryPropertyBag* createUserInfoFromArray(BSTR notificationStr,
-                                                        CFArrayRef arrayItem) {
+static COMPtr<CFDictionaryPropertyBag> createUserInfoFromArray(
+    BSTR notificationStr,
+    CFArrayRef arrayItem) {
   RetainPtr<CFMutableDictionaryRef> dictionary(
       AdoptCF, CFDictionaryCreateMutable(0, 0, &kCFTypeDictionaryKeyCallBacks,
                                          &kCFTypeDictionaryValueCallBacks));
@@ -106,12 +107,13 @@ static CFDictionaryPropertyBag* createUserInfoFromArray(BSTR notificationStr,
       AdoptCF, MarshallingHelpers::BSTRToCFStringRef(notificationStr));
   CFDictionaryAddValue(dictionary.get(), key.get(), arrayItem);
 
-  CFDictionaryPropertyBag* result = CFDictionaryPropertyBag::createInstance();
+  COMPtr<CFDictionaryPropertyBag> result =
+      CFDictionaryPropertyBag::createInstance();
   result->setDictionary(dictionary.get());
   return result;
 }
 
-static CFDictionaryPropertyBag* createUserInfoFromHistoryItem(
+static COMPtr<CFDictionaryPropertyBag> createUserInfoFromHistoryItem(
     BSTR notificationStr,
     IWebHistoryItem* item) {
   // reference counting of item added to the array is managed by the CFArray
@@ -119,18 +121,9 @@ static CFDictionaryPropertyBag* createUserInfoFromHistoryItem(
   RetainPtr<CFArrayRef> itemList(
       AdoptCF, CFArrayCreate(0, (const void**)&item, 1,
                              &MarshallingHelpers::kIUnknownArrayCallBacks));
-  CFDictionaryPropertyBag* info =
+  COMPtr<CFDictionaryPropertyBag> info =
       createUserInfoFromArray(notificationStr, itemList.get());
   return info;
-}
-
-static void releaseUserInfo(CFDictionaryPropertyBag* userInfo) {
-  // free the dictionary
-  userInfo->setDictionary(0);
-  int result = userInfo->Release();
-  (void)result;
-  ASSERT(result ==
-         0);  // make sure no one else holds a reference to the userInfo.
 }
 
 // WebHistory -----------------------------------------------------------------
@@ -263,13 +256,12 @@ HRESULT STDMETHODCALLTYPE WebHistory::loadFromURL(
     goto exit;
 
   if (CFArrayGetCount(discardedItems.get()) > 0) {
-    CFDictionaryPropertyBag* userInfo = createUserInfoFromArray(
+    COMPtr<CFDictionaryPropertyBag> userInfo = createUserInfoFromArray(
         getNotificationString(
             kWebHistoryItemsDiscardedWhileLoadingNotification),
         discardedItems.get());
     hr = postNotification(kWebHistoryItemsDiscardedWhileLoadingNotification,
-                          userInfo);
-    releaseUserInfo(userInfo);
+                          userInfo.get());
     if (FAILED(hr))
       goto exit;
   }
@@ -482,10 +474,11 @@ HRESULT STDMETHODCALLTYPE WebHistory::removeAllItems(void) {
 
   PageGroup::removeAllVisitedLinks();
 
-  CFDictionaryPropertyBag* userInfo = createUserInfoFromArray(
+  COMPtr<CFDictionaryPropertyBag> userInfo = createUserInfoFromArray(
       getNotificationString(kWebHistoryAllItemsRemovedNotification),
       allItems.get());
-  return postNotification(kWebHistoryAllItemsRemovedNotification, userInfo);
+  return postNotification(kWebHistoryAllItemsRemovedNotification,
+                          userInfo.get());
 }
 
 HRESULT STDMETHODCALLTYPE WebHistory::orderedLastVisitedDays(
@@ -666,10 +659,9 @@ HRESULT WebHistory::removeItem(IWebHistoryItem* entry) {
   if (FAILED(hr))
     return hr;
 
-  CFDictionaryPropertyBag* userInfo = createUserInfoFromHistoryItem(
+  COMPtr<CFDictionaryPropertyBag> userInfo = createUserInfoFromHistoryItem(
       getNotificationString(kWebHistoryItemsRemovedNotification), entry);
-  hr = postNotification(kWebHistoryItemsRemovedNotification, userInfo);
-  releaseUserInfo(userInfo);
+  hr = postNotification(kWebHistoryItemsRemovedNotification, userInfo.get());
 
   return hr;
 }
@@ -720,10 +712,9 @@ HRESULT WebHistory::addItem(IWebHistoryItem* entry,
 
   CFDictionarySetValue(m_entriesByURL.get(), urlString.get(), entry);
 
-  CFDictionaryPropertyBag* userInfo = createUserInfoFromHistoryItem(
+  COMPtr<CFDictionaryPropertyBag> userInfo = createUserInfoFromHistoryItem(
       getNotificationString(kWebHistoryItemsAddedNotification), entry);
-  hr = postNotification(kWebHistoryItemsAddedNotification, userInfo);
-  releaseUserInfo(userInfo);
+  hr = postNotification(kWebHistoryItemsAddedNotification, userInfo.get());
 
   if (added)
     *added = true;
@@ -786,10 +777,9 @@ void WebHistory::visitedURL(const KURL& url,
   COMPtr<WebHistoryItem> item(Query, entry);
   item->historyItem()->setRedirectURLs(0);
 
-  CFDictionaryPropertyBag* userInfo = createUserInfoFromHistoryItem(
+  COMPtr<CFDictionaryPropertyBag> userInfo = createUserInfoFromHistoryItem(
       getNotificationString(kWebHistoryItemsAddedNotification), entry);
-  postNotification(kWebHistoryItemsAddedNotification, userInfo);
-  releaseUserInfo(userInfo);
+  postNotification(kWebHistoryItemsAddedNotification, userInfo.get());
 }
 
 HRESULT WebHistory::itemForURLString(

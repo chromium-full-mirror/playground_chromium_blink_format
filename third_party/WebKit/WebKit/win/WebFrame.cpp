@@ -1676,8 +1676,8 @@ PassRefPtr<Widget> WebFrame::createJavaAppletWidget(
   if (FAILED(d->webView->resourceLoadDelegate(&resourceLoadDelegate)))
     return pluginView;
 
-  COMPtr<CFDictionaryPropertyBag> userInfoBag(
-      AdoptCOM, CFDictionaryPropertyBag::createInstance());
+  COMPtr<CFDictionaryPropertyBag> userInfoBag =
+      CFDictionaryPropertyBag::createInstance();
 
   ResourceError resourceError(String(WebKitErrorDomain),
                               WebKitErrorJavaUnavailable, String(), String());

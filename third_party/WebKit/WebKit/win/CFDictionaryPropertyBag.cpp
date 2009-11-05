@@ -32,7 +32,7 @@
 
 // CFDictionaryPropertyBag -----------------------------------------------
 
-CFDictionaryPropertyBag::CFDictionaryPropertyBag() : m_refCount(1) {
+CFDictionaryPropertyBag::CFDictionaryPropertyBag() : m_refCount(0) {
   gClassCount++;
   gClassNameCount.add("CFDictionaryPropertyBag");
 }
@@ -42,9 +42,8 @@ CFDictionaryPropertyBag::~CFDictionaryPropertyBag() {
   gClassNameCount.remove("CFDictionaryPropertyBag");
 }
 
-CFDictionaryPropertyBag* CFDictionaryPropertyBag::createInstance() {
-  CFDictionaryPropertyBag* instance = new CFDictionaryPropertyBag();
-  return instance;
+COMPtr<CFDictionaryPropertyBag> CFDictionaryPropertyBag::createInstance() {
+  return new CFDictionaryPropertyBag;
 }
 
 void CFDictionaryPropertyBag::setDictionary(CFMutableDictionaryRef dictionary) {
