@@ -43,7 +43,8 @@ inline ProcessingInstruction::ProcessingInstruction(Document* document,
       m_data(data),
       m_cachedSheet(0),
       m_loading(false),
-      m_alternate(false)
+      m_alternate(false),
+      m_createdByParser(false)
 #if ENABLE(XSLT)
       ,
       m_isXSL(false)
