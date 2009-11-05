@@ -547,6 +547,9 @@ Storage* DOMWindow::sessionStorage() const {
   if (!page)
     return 0;
 
+  if (!page->settings()->sessionStorageEnabled())
+    return 0;
+
   RefPtr<StorageArea> storageArea =
       page->sessionStorage()->storageArea(document->securityOrigin());
 #if ENABLE(INSPECTOR)
