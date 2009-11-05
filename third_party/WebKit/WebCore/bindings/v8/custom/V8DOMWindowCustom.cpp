@@ -304,6 +304,12 @@ ACCESSOR_RUNTIME_ENABLER(DOMWindowWebkitNotifications) {
 }
 #endif
 
+#if ENABLE(OFFLINE_WEB_APPLICATIONS)
+ACCESSOR_RUNTIME_ENABLER(DOMWindowApplicationCache) {
+  return RuntimeEnabledFeatures::applicationCacheEnabled();
+}
+#endif
+
 ACCESSOR_GETTER(DOMWindowImage) {
   DOMWindow* window = V8DOMWrapper::convertToNativeObject<DOMWindow>(
       V8ClassIndex::DOMWINDOW, info.Holder());
