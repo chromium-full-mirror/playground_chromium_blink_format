@@ -473,8 +473,8 @@ QVariant convertValueToQVariant(ExecState* exec,
     case QMetaType::QTime:
       if (type == Date) {
         DateInstance* date = static_cast<DateInstance*>(object);
-        WTF::GregorianDateTime gdt;
-        WTF::msToGregorianDateTime(date->internalNumber(), true, gdt);
+        GregorianDateTime gdt;
+        msToGregorianDateTime(date->internalNumber(), true, gdt);
         if (hint == QMetaType::QDateTime) {
           ret = QDateTime(QDate(gdt.year + 1900, gdt.month + 1, gdt.monthDay),
                           QTime(gdt.hour, gdt.minute, gdt.second), Qt::UTC);
@@ -488,7 +488,7 @@ QVariant convertValueToQVariant(ExecState* exec,
         }
       } else if (type == Number) {
         double b = value.toNumber(exec);
-        WTF::GregorianDateTime gdt;
+        GregorianDateTime gdt;
         msToGregorianDateTime(b, true, gdt);
         if (hint == QMetaType::QDateTime) {
           ret = QDateTime(QDate(gdt.year + 1900, gdt.month + 1, gdt.monthDay),
@@ -852,7 +852,7 @@ JSValue convertQVariantToValue(ExecState* exec,
     }
 
     // Dates specified this way are in local time (we convert DateTimes above)
-    WTF::GregorianDateTime dt;
+    GregorianDateTime dt;
     dt.year = date.year() - 1900;
     dt.month = date.month() - 1;
     dt.monthDay = date.day();
@@ -860,8 +860,7 @@ JSValue convertQVariantToValue(ExecState* exec,
     dt.minute = time.minute();
     dt.second = time.second();
     dt.isDST = -1;
-    double ms =
-        WTF::gregorianDateTimeToMS(dt, time.msec(), /*inputIsUTC*/ false);
+    double ms = gregorianDateTimeToMS(dt, time.msec(), /*inputIsUTC*/ false);
 
     return new (exec) DateInstance(exec, trunc(ms));
   }

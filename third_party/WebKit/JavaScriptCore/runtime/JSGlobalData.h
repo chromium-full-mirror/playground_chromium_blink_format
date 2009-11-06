@@ -157,6 +157,8 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
 
   MarkStack markStack;
 
+  double cachedUTCOffset;
+
 #ifndef NDEBUG
   bool mainThreadOnly;
 #endif
