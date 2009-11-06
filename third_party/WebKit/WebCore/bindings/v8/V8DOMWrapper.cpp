@@ -1521,6 +1521,12 @@ v8::Handle<v8::Value> V8DOMWrapper::convertEventTargetToV8Object(
     return convertToV8Object(V8ClassIndex::WORKER, worker);
 #endif  // WORKERS
 
+#if ENABLE(SHARED_WORKERS)
+  SharedWorker* sharedWorker = target->toSharedWorker();
+  if (sharedWorker)
+    return convertToV8Object(V8ClassIndex::SHAREDWORKER, sharedWorker);
+#endif  // SHARED_WORKERS
+
 #if ENABLE(NOTIFICATIONS)
   Notification* notification = target->toNotification();
   if (notification)
