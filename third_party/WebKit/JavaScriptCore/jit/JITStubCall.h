@@ -38,45 +38,45 @@ class JITStubCall {
       : m_jit(jit),
         m_stub(stub),
         m_returnType(Cell),
-        m_stackIndex(stackIndexStart) {}
+        m_stackIndex(JITSTACKFRAME_ARGS_INDEX) {}
 
   JITStubCall(JIT* jit,
               JSPropertyNameIterator*(JIT_STUB* stub)(STUB_ARGS_DECLARATION))
       : m_jit(jit),
         m_stub(stub),
         m_returnType(Cell),
-        m_stackIndex(stackIndexStart) {}
+        m_stackIndex(JITSTACKFRAME_ARGS_INDEX) {}
 
   JITStubCall(JIT* jit, void*(JIT_STUB* stub)(STUB_ARGS_DECLARATION))
       : m_jit(jit),
         m_stub(stub),
         m_returnType(VoidPtr),
-        m_stackIndex(stackIndexStart) {}
+        m_stackIndex(JITSTACKFRAME_ARGS_INDEX) {}
 
   JITStubCall(JIT* jit, int(JIT_STUB* stub)(STUB_ARGS_DECLARATION))
       : m_jit(jit),
         m_stub(stub),
         m_returnType(Int),
-        m_stackIndex(stackIndexStart) {}
+        m_stackIndex(JITSTACKFRAME_ARGS_INDEX) {}
 
   JITStubCall(JIT* jit, bool(JIT_STUB* stub)(STUB_ARGS_DECLARATION))
       : m_jit(jit),
         m_stub(stub),
         m_returnType(Int),
-        m_stackIndex(stackIndexStart) {}
+        m_stackIndex(JITSTACKFRAME_ARGS_INDEX) {}
 
   JITStubCall(JIT* jit, void(JIT_STUB* stub)(STUB_ARGS_DECLARATION))
       : m_jit(jit),
         m_stub(stub),
         m_returnType(Void),
-        m_stackIndex(stackIndexStart) {}
+        m_stackIndex(JITSTACKFRAME_ARGS_INDEX) {}
 
 #if USE(JSVALUE32_64)
   JITStubCall(JIT* jit, EncodedJSValue(JIT_STUB* stub)(STUB_ARGS_DECLARATION))
       : m_jit(jit),
         m_stub(stub),
         m_returnType(Value),
-        m_stackIndex(stackIndexStart) {}
+        m_stackIndex(JITSTACKFRAME_ARGS_INDEX) {}
 #endif
 
   // Arguments are added first to last.
@@ -124,7 +124,8 @@ class JITStubCall {
   void getArgument(size_t argumentNumber,
                    JIT::RegisterID tag,
                    JIT::RegisterID payload) {
-    size_t stackIndex = stackIndexStart + (argumentNumber * stackIndexStep);
+    size_t stackIndex =
+        JITSTACKFRAME_ARGS_INDEX + (argumentNumber * stackIndexStep);
     m_jit->peek(payload, stackIndex);
     m_jit->peek(tag, stackIndex + 1);
   }
@@ -213,8 +214,6 @@ class JITStubCall {
  private:
   static const size_t stackIndexStep =
       sizeof(EncodedJSValue) == 2 * sizeof(void*) ? 2 : 1;
-  static const size_t stackIndexStart =
-      1;  // Index 0 is reserved for restoreArgumentReference().
 
   JIT* m_jit;
   FunctionPtr m_stub;

@@ -38,7 +38,8 @@ namespace JSC {
 ALWAYS_INLINE void JIT::emitPutJITStubArg(RegisterID src,
                                           unsigned argumentNumber) {
   unsigned argumentStackOffset =
-      (argumentNumber * (sizeof(JSValue) / sizeof(void*))) + 1;
+      (argumentNumber * (sizeof(JSValue) / sizeof(void*))) +
+      JITSTACKFRAME_ARGS_INDEX;
   poke(src, argumentStackOffset);
 }
 
@@ -47,7 +48,8 @@ ALWAYS_INLINE void JIT::emitPutJITStubArg(RegisterID src,
 ALWAYS_INLINE void JIT::emitPutJITStubArgConstant(unsigned value,
                                                   unsigned argumentNumber) {
   unsigned argumentStackOffset =
-      (argumentNumber * (sizeof(JSValue) / sizeof(void*))) + 1;
+      (argumentNumber * (sizeof(JSValue) / sizeof(void*))) +
+      JITSTACKFRAME_ARGS_INDEX;
   poke(Imm32(value), argumentStackOffset);
 }
 
@@ -56,7 +58,8 @@ ALWAYS_INLINE void JIT::emitPutJITStubArgConstant(unsigned value,
 ALWAYS_INLINE void JIT::emitPutJITStubArgConstant(void* value,
                                                   unsigned argumentNumber) {
   unsigned argumentStackOffset =
-      (argumentNumber * (sizeof(JSValue) / sizeof(void*))) + 1;
+      (argumentNumber * (sizeof(JSValue) / sizeof(void*))) +
+      JITSTACKFRAME_ARGS_INDEX;
   poke(ImmPtr(value), argumentStackOffset);
 }
 
@@ -65,7 +68,8 @@ ALWAYS_INLINE void JIT::emitPutJITStubArgConstant(void* value,
 ALWAYS_INLINE void JIT::emitGetJITStubArg(unsigned argumentNumber,
                                           RegisterID dst) {
   unsigned argumentStackOffset =
-      (argumentNumber * (sizeof(JSValue) / sizeof(void*))) + 1;
+      (argumentNumber * (sizeof(JSValue) / sizeof(void*))) +
+      JITSTACKFRAME_ARGS_INDEX;
   peek(dst, argumentStackOffset);
 }
 
@@ -611,7 +615,8 @@ ALWAYS_INLINE void JIT::emitPutJITStubArg(RegisterID tag,
                                           RegisterID payload,
                                           unsigned argumentNumber) {
   unsigned argumentStackOffset =
-      (argumentNumber * (sizeof(JSValue) / sizeof(void*))) + 1;
+      (argumentNumber * (sizeof(JSValue) / sizeof(void*))) +
+      JITSTACKFRAME_ARGS_INDEX;
   poke(payload, argumentStackOffset);
   poke(tag, argumentStackOffset + 1);
 }
@@ -624,7 +629,8 @@ ALWAYS_INLINE void JIT::emitPutJITStubArgFromVirtualRegister(
     RegisterID scratch1,
     RegisterID scratch2) {
   unsigned argumentStackOffset =
-      (argumentNumber * (sizeof(JSValue) / sizeof(void*))) + 1;
+      (argumentNumber * (sizeof(JSValue) / sizeof(void*))) +
+      JITSTACKFRAME_ARGS_INDEX;
   if (m_codeBlock->isConstantRegisterIndex(src)) {
     JSValue constant = m_codeBlock->getConstant(src);
     poke(Imm32(constant.payload()), argumentStackOffset);
@@ -873,7 +879,8 @@ ALWAYS_INLINE void JIT::emitPutJITStubArgFromVirtualRegister(
     unsigned argumentNumber,
     RegisterID scratch) {
   unsigned argumentStackOffset =
-      (argumentNumber * (sizeof(JSValue) / sizeof(void*))) + 1;
+      (argumentNumber * (sizeof(JSValue) / sizeof(void*))) +
+      JITSTACKFRAME_ARGS_INDEX;
   if (m_codeBlock->isConstantRegisterIndex(src)) {
     JSValue value = m_codeBlock->getConstant(src);
     poke(ImmPtr(JSValue::encode(value)), argumentStackOffset);
