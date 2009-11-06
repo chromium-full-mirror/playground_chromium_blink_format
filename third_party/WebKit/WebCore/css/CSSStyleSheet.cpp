@@ -28,6 +28,7 @@
 #include "Document.h"
 #include "ExceptionCode.h"
 #include "Node.h"
+#include "SecurityOrigin.h"
 #include "TextEncoding.h"
 #include <wtf/Deque.h>
 
@@ -121,6 +122,8 @@ int CSSStyleSheet::addRule(const String& selector,
 }
 
 PassRefPtr<CSSRuleList> CSSStyleSheet::cssRules(bool omitCharsetRules) {
+  if (doc() && !doc()->securityOrigin()->canRequest(baseURL()))
+    return 0;
   return CSSRuleList::create(this, omitCharsetRules);
 }
 
