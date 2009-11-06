@@ -474,7 +474,7 @@ QVariant convertValueToQVariant(ExecState* exec,
       if (type == Date) {
         DateInstance* date = static_cast<DateInstance*>(object);
         GregorianDateTime gdt;
-        msToGregorianDateTime(date->internalNumber(), true, gdt);
+        msToGregorianDateTime(exec, date->internalNumber(), true, gdt);
         if (hint == QMetaType::QDateTime) {
           ret = QDateTime(QDate(gdt.year + 1900, gdt.month + 1, gdt.monthDay),
                           QTime(gdt.hour, gdt.minute, gdt.second), Qt::UTC);
@@ -489,7 +489,7 @@ QVariant convertValueToQVariant(ExecState* exec,
       } else if (type == Number) {
         double b = value.toNumber(exec);
         GregorianDateTime gdt;
-        msToGregorianDateTime(b, true, gdt);
+        msToGregorianDateTime(exec, b, true, gdt);
         if (hint == QMetaType::QDateTime) {
           ret = QDateTime(QDate(gdt.year + 1900, gdt.month + 1, gdt.monthDay),
                           QTime(gdt.hour, gdt.minute, gdt.second), Qt::UTC);
@@ -860,7 +860,8 @@ JSValue convertQVariantToValue(ExecState* exec,
     dt.minute = time.minute();
     dt.second = time.second();
     dt.isDST = -1;
-    double ms = gregorianDateTimeToMS(dt, time.msec(), /*inputIsUTC*/ false);
+    double ms =
+        gregorianDateTimeToMS(exec, dt, time.msec(), /*inputIsUTC*/ false);
 
     return new (exec) DateInstance(exec, trunc(ms));
   }
