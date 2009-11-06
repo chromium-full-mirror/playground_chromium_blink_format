@@ -35,7 +35,6 @@
 #include "PlatformString.h"
 #include <wtf/DateMath.h>
 
-using namespace JSC;
 using namespace WTF;
 
 namespace WebCore {
@@ -122,7 +121,7 @@ bool parseHTTPRefresh(const String& refresh,
 }
 
 double parseDate(const String& value) {
-  return parseDateFromNullTerminatedCharacters(value.utf8().data(), 0);
+  return parseDateFromNullTerminatedCharacters(value.utf8().data());
 }
 
 String filenameFromHTTPContentDisposition(const String& value) {

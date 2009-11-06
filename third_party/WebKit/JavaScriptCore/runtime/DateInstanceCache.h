@@ -42,9 +42,9 @@ class DateInstanceData : public RefCounted<DateInstanceData> {
   }
 
   double m_gregorianDateTimeCachedForMS;
-  GregorianDateTime m_cachedGregorianDateTime;
+  WTF::GregorianDateTime m_cachedGregorianDateTime;
   double m_gregorianDateTimeUTCCachedForMS;
-  GregorianDateTime m_cachedGregorianDateTimeUTC;
+  WTF::GregorianDateTime m_cachedGregorianDateTimeUTC;
 
  private:
   DateInstanceData()

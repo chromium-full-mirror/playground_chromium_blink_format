@@ -154,8 +154,7 @@ JSGlobalData::JSGlobalData(bool isShared, const VPtrSet& vptrSet)
       dynamicGlobalObject(0),
       functionCodeBlockBeingReparsed(0),
       firstStringifierToMark(0),
-      markStack(vptrSet.jsArrayVPtr),
-      cachedUTCOffset(NaN)
+      markStack(vptrSet.jsArrayVPtr)
 #ifndef NDEBUG
       ,
       mainThreadOnly(false)

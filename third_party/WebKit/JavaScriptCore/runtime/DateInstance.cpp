@@ -57,7 +57,7 @@ const GregorianDateTime* DateInstance::gregorianDateTime(
 
   if (outputIsUTC) {
     if (m_data->m_gregorianDateTimeUTCCachedForMS != milli) {
-      msToGregorianDateTime(exec, internalNumber(), true,
+      msToGregorianDateTime(internalNumber(), true,
                             m_data->m_cachedGregorianDateTimeUTC);
       m_data->m_gregorianDateTimeUTCCachedForMS = milli;
     }
@@ -65,7 +65,7 @@ const GregorianDateTime* DateInstance::gregorianDateTime(
   }
 
   if (m_data->m_gregorianDateTimeCachedForMS != milli) {
-    msToGregorianDateTime(exec, internalNumber(), false,
+    msToGregorianDateTime(internalNumber(), false,
                           m_data->m_cachedGregorianDateTime);
     m_data->m_gregorianDateTimeCachedForMS = milli;
   }
