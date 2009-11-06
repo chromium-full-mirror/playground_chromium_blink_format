@@ -503,7 +503,8 @@ class MacroAssemblerX86Common : public AbstractMacroAssembler<X86Assembler> {
   }
 
   void swap(RegisterID reg1, RegisterID reg2) {
-    m_assembler.xchgq_rr(reg1, reg2);
+    if (reg1 != reg2)
+      m_assembler.xchgq_rr(reg1, reg2);
   }
 
   void signExtend32ToPtr(RegisterID src, RegisterID dest) {

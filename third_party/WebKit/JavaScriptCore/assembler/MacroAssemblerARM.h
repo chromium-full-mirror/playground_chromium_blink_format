@@ -117,12 +117,16 @@ class MacroAssemblerARM : public AbstractMacroAssembler<ARMAssembler> {
       m_assembler.ands_r(dest, dest, w);
   }
 
-  void lshift32(Imm32 imm, RegisterID dest) {
-    m_assembler.movs_r(dest, m_assembler.lsl(dest, imm.m_value & 0x1f));
+  void lshift32(RegisterID shift_amount, RegisterID dest) {
+    ARMWord w = m_assembler.getImm(0x1f, ARMRegisters::S0, true);
+    ASSERT(!(w & ARMAssembler::OP2_INV_IMM));
+    m_assembler.ands_r(ARMRegisters::S0, shift_amount, w);
+
+    m_assembler.movs_r(dest, m_assembler.lsl_r(dest, ARMRegisters::S0));
   }
 
-  void lshift32(RegisterID shift_amount, RegisterID dest) {
-    m_assembler.movs_r(dest, m_assembler.lsl_r(dest, shift_amount));
+  void lshift32(Imm32 imm, RegisterID dest) {
+    m_assembler.movs_r(dest, m_assembler.lsl(dest, imm.m_value & 0x1f));
   }
 
   void mul32(RegisterID src, RegisterID dest) {
@@ -150,7 +154,11 @@ class MacroAssemblerARM : public AbstractMacroAssembler<ARMAssembler> {
   }
 
   void rshift32(RegisterID shift_amount, RegisterID dest) {
-    m_assembler.movs_r(dest, m_assembler.asr_r(dest, shift_amount));
+    ARMWord w = m_assembler.getImm(0x1f, ARMRegisters::S0, true);
+    ASSERT(!(w & ARMAssembler::OP2_INV_IMM));
+    m_assembler.ands_r(ARMRegisters::S0, shift_amount, w);
+
+    m_assembler.movs_r(dest, m_assembler.asr_r(dest, ARMRegisters::S0));
   }
 
   void rshift32(Imm32 imm, RegisterID dest) {
