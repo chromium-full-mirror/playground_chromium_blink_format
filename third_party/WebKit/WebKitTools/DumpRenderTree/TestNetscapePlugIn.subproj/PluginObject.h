@@ -38,6 +38,8 @@ typedef struct {
   NPBool cachedPrivateBrowsingMode;
   NPObject* testObject;
   NPStream* stream;
+  NPBool testDocumentOpenInDestroyStream;
+  NPBool testWindowOpen;
   char* onStreamLoad;
   char* onStreamDestroy;
   char* onDestroy;
@@ -61,3 +63,5 @@ extern void notifyStream(PluginObject* object,
                          const char* headers);
 extern void testNPRuntime(NPP npp);
 extern void pluginLog(NPP instance, const char* format, ...);
+extern bool testDocumentOpen(NPP npp);
+extern bool testWindowOpen(NPP npp);
