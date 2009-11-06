@@ -83,7 +83,7 @@ bool GeolocationServiceGtk::startUpdating(PositionOptions* options) {
   g_object_unref(master);
 
   if (!client) {
-    setError(PositionError::UNKNOWN_ERROR,
+    setError(PositionError::POSITION_UNAVAILABLE,
              "Could not connect to location provider.");
     return false;
   }
@@ -102,7 +102,7 @@ bool GeolocationServiceGtk::startUpdating(PositionOptions* options) {
       &error.outPtr());
 
   if (!result) {
-    setError(PositionError::UNKNOWN_ERROR, error->message);
+    setError(PositionError::POSITION_UNAVAILABLE, error->message);
     g_object_unref(client);
     return false;
   }
@@ -110,7 +110,7 @@ bool GeolocationServiceGtk::startUpdating(PositionOptions* options) {
   m_geocluePosition =
       geoclue_master_client_create_position(client, &error.outPtr());
   if (!m_geocluePosition) {
-    setError(PositionError::UNKNOWN_ERROR, error->message);
+    setError(PositionError::POSITION_UNAVAILABLE, error->message);
     g_object_unref(client);
     return false;
   }
