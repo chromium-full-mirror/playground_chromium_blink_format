@@ -80,12 +80,6 @@ class V8GCController {
 
   static void gcPrologue();
   static void gcEpilogue();
-
-  static void checkMemoryUsage();
-
- private:
-  // Estimate of current working set.
-  static int workingSetEstimateMB;
 };
 }
 
