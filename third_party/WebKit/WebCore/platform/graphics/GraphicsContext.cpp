@@ -109,13 +109,9 @@ void GraphicsContext::setStrokeStyle(const StrokeStyle& style) {
 }
 
 void GraphicsContext::setStrokeColor(const Color& color) {
-  m_common->state.strokeColorSpace = SolidColorSpace;
+  m_common->state.strokeType = SolidColorType;
   m_common->state.strokeColor = color;
   setPlatformStrokeColor(color);
-}
-
-ColorSpace GraphicsContext::strokeColorSpace() const {
-  return m_common->state.strokeColorSpace;
 }
 
 void GraphicsContext::setShadow(const IntSize& size,
@@ -164,7 +160,7 @@ void GraphicsContext::setFillRule(WindRule fillRule) {
 }
 
 void GraphicsContext::setFillColor(const Color& color) {
-  m_common->state.fillColorSpace = SolidColorSpace;
+  m_common->state.fillType = SolidColorType;
   m_common->state.fillColor = color;
   setPlatformFillColor(color);
 }
@@ -188,7 +184,7 @@ void GraphicsContext::setStrokePattern(PassRefPtr<Pattern> pattern) {
     setStrokeColor(Color::black);
     return;
   }
-  m_common->state.strokeColorSpace = PatternColorSpace;
+  m_common->state.strokeType = PatternType;
   m_common->state.strokePattern = pattern;
   setPlatformStrokePattern(m_common->state.strokePattern.get());
 }
@@ -199,7 +195,7 @@ void GraphicsContext::setFillPattern(PassRefPtr<Pattern> pattern) {
     setFillColor(Color::black);
     return;
   }
-  m_common->state.fillColorSpace = PatternColorSpace;
+  m_common->state.fillType = PatternType;
   m_common->state.fillPattern = pattern;
   setPlatformFillPattern(m_common->state.fillPattern.get());
 }
@@ -210,7 +206,7 @@ void GraphicsContext::setStrokeGradient(PassRefPtr<Gradient> gradient) {
     setStrokeColor(Color::black);
     return;
   }
-  m_common->state.strokeColorSpace = GradientColorSpace;
+  m_common->state.strokeType = GradientType;
   m_common->state.strokeGradient = gradient;
   setPlatformStrokeGradient(m_common->state.strokeGradient.get());
 }
@@ -221,17 +217,13 @@ void GraphicsContext::setFillGradient(PassRefPtr<Gradient> gradient) {
     setFillColor(Color::black);
     return;
   }
-  m_common->state.fillColorSpace = GradientColorSpace;
+  m_common->state.fillType = GradientType;
   m_common->state.fillGradient = gradient;
   setPlatformFillGradient(m_common->state.fillGradient.get());
 }
 
 Gradient* GraphicsContext::fillGradient() const {
   return m_common->state.fillGradient.get();
-}
-
-ColorSpace GraphicsContext::fillColorSpace() const {
-  return m_common->state.fillColorSpace;
 }
 
 Gradient* GraphicsContext::strokeGradient() const {

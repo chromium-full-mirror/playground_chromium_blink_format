@@ -38,39 +38,34 @@ struct GraphicsContextState {
   GraphicsContextState()
       : textDrawingMode(cTextFill),
         strokeStyle(SolidStroke),
-        strokeThickness(0)
-#if PLATFORM(CAIRO)
-        ,
-        globalAlpha(1.0f)
-#endif
-        ,
-        strokeColorSpace(SolidColorSpace),
+        strokeThickness(0),
+        strokeType(SolidColorType),
         strokeColor(Color::black),
         fillRule(RULE_NONZERO),
-        fillColorSpace(SolidColorSpace),
+        fillType(SolidColorType),
         fillColor(Color::black),
         shouldAntialias(true),
         paintingDisabled(false),
         shadowBlur(0),
-        shadowsIgnoreTransforms(false) {
+        shadowsIgnoreTransforms(false)
+#if PLATFORM(CAIRO)
+        ,
+        globalAlpha(1.0f)
+#endif
+  {
   }
 
   int textDrawingMode;
 
   StrokeStyle strokeStyle;
   float strokeThickness;
-#if PLATFORM(CAIRO)
-  float globalAlpha;
-#elif PLATFORM(QT)
-  TransformationMatrix pathTransform;
-#endif
-  ColorSpace strokeColorSpace;
+  FillOrStrokeType strokeType;
   Color strokeColor;
   RefPtr<Gradient> strokeGradient;
   RefPtr<Pattern> strokePattern;
 
   WindRule fillRule;
-  ColorSpace fillColorSpace;
+  FillOrStrokeType fillType;
   Color fillColor;
   RefPtr<Gradient> fillGradient;
   RefPtr<Pattern> fillPattern;
@@ -84,6 +79,11 @@ struct GraphicsContextState {
   Color shadowColor;
 
   bool shadowsIgnoreTransforms;
+#if PLATFORM(CAIRO)
+  float globalAlpha;
+#elif PLATFORM(QT)
+  TransformationMatrix pathTransform;
+#endif
 };
 
 class GraphicsContextPrivate {
