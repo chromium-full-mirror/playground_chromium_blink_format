@@ -671,8 +671,6 @@ void GraphicsContext::fillPath() {
     return;
 
   const GraphicsContextState& state = m_common->state;
-  ColorType colorSpace = state.fillType;
-
   path.setFillType(state.fillRule == RULE_EVENODD ? SkPath::kEvenOdd_FillType
                                                   : SkPath::kWinding_FillType);
 
@@ -693,7 +691,6 @@ void GraphicsContext::fillRect(const FloatRect& rect) {
   }
 
   const GraphicsContextState& state = m_common->state;
-  ColorType colorSpace = state.fillType;
 
   SkPaint paint;
   platformContext()->setupPaintForFilling(&paint);
@@ -1061,7 +1058,6 @@ void GraphicsContext::strokePath() {
     return;
 
   const GraphicsContextState& state = m_common->state;
-  ColorType colorSpace = state.strokeType;
 
   SkPaint paint;
   platformContext()->setupPaintForStroking(&paint, 0, 0);
@@ -1077,7 +1073,6 @@ void GraphicsContext::strokeRect(const FloatRect& rect, float lineWidth) {
     return;
 
   const GraphicsContextState& state = m_common->state;
-  ColorType colorSpace = state.strokeType;
 
   SkPaint paint;
   platformContext()->setupPaintForStroking(&paint, 0, 0);
