@@ -33,7 +33,8 @@
 
 namespace WebCore {
 
-struct ResourceRequest : ResourceRequestBase {
+class ResourceRequest : public ResourceRequestBase {
+ public:
   ResourceRequest(const String& url)
       : ResourceRequestBase(KURL(ParsedURLString, url),
                             UseProtocolCachePolicy) {}
@@ -59,7 +60,7 @@ struct ResourceRequest : ResourceRequestBase {
   void updateFromSoupMessage(SoupMessage* soupMessage);
 
  private:
-  friend struct ResourceRequestBase;
+  friend class ResourceRequestBase;
 
   void doUpdatePlatformRequest(){};
   void doUpdateResourceRequest(){};

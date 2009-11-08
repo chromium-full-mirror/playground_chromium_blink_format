@@ -45,7 +45,7 @@ class DocumentLoader;
 class KURL;
 class ResourceLoader;
 class ResourceError;
-struct ResourceRequest;
+class ResourceRequest;
 class ResourceResponse;
 class SubstituteData;
 #if PLATFORM(CHROMIUM)

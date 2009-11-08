@@ -50,7 +50,7 @@ class Credential;
 class KURL;
 class ResourceHandle;
 class ResourceError;
-struct ResourceRequest;
+class ResourceRequest;
 class ResourceResponse;
 
 enum CacheStoragePolicy {

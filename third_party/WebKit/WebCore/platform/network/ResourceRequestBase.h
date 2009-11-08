@@ -48,7 +48,7 @@ enum ResourceRequestCachePolicy {
 
 const int unspecifiedTimeoutInterval = INT_MAX;
 
-struct ResourceRequest;
+class ResourceRequest;
 struct CrossThreadResourceRequestData;
 
 // Do not use this type directly.  Use ResourceRequest instead.

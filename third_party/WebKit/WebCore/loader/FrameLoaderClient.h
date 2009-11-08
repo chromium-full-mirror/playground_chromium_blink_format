@@ -64,7 +64,7 @@ class PolicyChecker;
 class ResourceError;
 class ResourceHandle;
 class ResourceLoader;
-struct ResourceRequest;
+class ResourceRequest;
 class ResourceResponse;
 class ScriptString;
 class SecurityOrigin;
