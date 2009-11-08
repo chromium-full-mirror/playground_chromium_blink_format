@@ -960,7 +960,11 @@ void RenderBlock::adjustPositionedBlock(RenderBox* child,
       }
       y += (collapsedTopPos - collapsedTopNeg) - marginTop;
     }
-    child->layer()->setStaticY(y);
+    RenderLayer* childLayer = child->layer();
+    if (childLayer->staticY() != y) {
+      child->layer()->setStaticY(y);
+      child->setChildNeedsLayout(true, false);
+    }
   }
 }
 
