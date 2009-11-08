@@ -50,8 +50,6 @@
 #include "MathExtras.h"
 #include "StringExtras.h"
 
-#include "CallFrame.h"
-
 #include <algorithm>
 #include <limits.h>
 #include <limits>
@@ -76,6 +74,10 @@ extern "C" struct tm* localtime(const time_t* timer);
 
 #if HAVE(SYS_TIMEB_H)
 #include <sys/timeb.h>
+#endif
+
+#if USE(JSC)
+#include "CallFrame.h"
 #endif
 
 #define NaN std::numeric_limits<double>::quiet_NaN()
@@ -374,6 +376,7 @@ static int32_t calculateUTCOffset() {
   return static_cast<int32_t>(utcOffset * 1000);
 }
 
+#if USE(JSC)
 /*
  * Get the difference in milliseconds between this time zone and UTC (GMT)
  * NOT including DST.
@@ -385,6 +388,7 @@ double getUTCOffset(ExecState* exec) {
   exec->globalData().cachedUTCOffset = calculateUTCOffset();
   return exec->globalData().cachedUTCOffset;
 }
+#endif
 
 /*
  * Get the DST offset for the time passed in.  Takes
