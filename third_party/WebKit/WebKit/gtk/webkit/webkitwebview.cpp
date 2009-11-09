@@ -2321,7 +2321,7 @@ static void webkit_web_view_update_settings(WebKitWebView* webView) {
       enablePrivateBrowsing, enableCaretBrowsing, enableHTML5Database,
       enableHTML5LocalStorage, enableXSSAuditor, javascriptCanOpenWindows,
       enableOfflineWebAppCache, enableUniversalAccessFromFileURI,
-      enableDOMPaste;
+      enableDOMPaste, tabKeyCyclesThroughElements;
 
   WebKitEditingBehavior editingBehavior;
 
@@ -2345,7 +2345,7 @@ static void webkit_web_view_update_settings(WebKitWebView* webView) {
       "editing-behavior", &editingBehavior,
       "enable-universal-access-from-file-uris",
       &enableUniversalAccessFromFileURI, "enable-dom-paste", &enableDOMPaste,
-      NULL);
+      "tab-key-cycles-through-elements", &tabKeyCyclesThroughElements, NULL);
 
   settings->setDefaultTextEncodingName(defaultEncoding);
   settings->setCursiveFontFamily(cursiveFontFamily);
@@ -2373,6 +2373,10 @@ static void webkit_web_view_update_settings(WebKitWebView* webView) {
   settings->setAllowUniversalAccessFromFileURLs(
       enableUniversalAccessFromFileURI);
   settings->setDOMPasteAllowed(enableDOMPaste);
+
+  Page* page = core(webView);
+  if (page)
+    page->setTabKeyCyclesThroughElements(tabKeyCyclesThroughElements);
 
   g_free(defaultEncoding);
   g_free(cursiveFontFamily);
@@ -2468,7 +2472,12 @@ static void webkit_web_view_settings_notify(WebKitWebSettings* webSettings,
     settings->setAllowUniversalAccessFromFileURLs(g_value_get_boolean(&value));
   else if (name == g_intern_string("enable-dom-paste"))
     settings->setDOMPasteAllowed(g_value_get_boolean(&value));
-  else if (!g_object_class_find_property(G_OBJECT_GET_CLASS(webSettings), name))
+  else if (name == g_intern_string("tab-key-cycles-through-elements")) {
+    Page* page = core(webView);
+    if (page)
+      page->setTabKeyCyclesThroughElements(g_value_get_boolean(&value));
+  } else if (!g_object_class_find_property(G_OBJECT_GET_CLASS(webSettings),
+                                           name))
     g_warning("Unexpected setting '%s'", name);
   g_value_unset(&value);
 }
