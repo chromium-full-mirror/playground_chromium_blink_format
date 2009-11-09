@@ -48,7 +48,7 @@ class FileChooserClient {
 class FileChooser : public RefCounted<FileChooser> {
  public:
   static PassRefPtr<FileChooser> create(FileChooserClient*,
-                                        const String& initialFilename);
+                                        const Vector<String>& initialFilenames);
   ~FileChooser();
 
   void disconnectClient() { m_client = 0; }
@@ -69,9 +69,7 @@ class FileChooser : public RefCounted<FileChooser> {
   }
 
  private:
-  FileChooser(FileChooserClient*, const String& initialfilename);
-  static PassRefPtr<Icon> chooseIcon(const String& filename);
-  static PassRefPtr<Icon> chooseIcon(Vector<String> filenames);
+  FileChooser(FileChooserClient*, const Vector<String>& initialFilenames);
 
   FileChooserClient* m_client;
   Vector<String> m_filenames;

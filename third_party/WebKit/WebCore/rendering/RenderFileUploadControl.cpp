@@ -61,9 +61,13 @@ class HTMLFileUploadInnerButtonElement : public HTMLInputElement {
 };
 
 RenderFileUploadControl::RenderFileUploadControl(HTMLInputElement* input)
-    : RenderBlock(input),
-      m_button(0),
-      m_fileChooser(FileChooser::create(this, input->value())) {}
+    : RenderBlock(input), m_button(0) {
+  Vector<String> filenames;
+  // FIXME: The following code passes only the first file even if the input has
+  // multiple files.
+  filenames.append(input->value());
+  m_fileChooser = FileChooser::create(this, filenames);
+}
 
 RenderFileUploadControl::~RenderFileUploadControl() {
   if (m_button)

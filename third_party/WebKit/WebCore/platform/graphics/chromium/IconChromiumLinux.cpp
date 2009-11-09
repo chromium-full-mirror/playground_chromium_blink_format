@@ -41,11 +41,6 @@ Icon::Icon(const PlatformIcon& icon) : m_icon(icon) {}
 
 Icon::~Icon() {}
 
-PassRefPtr<Icon> Icon::createIconForFile(const String&) {
-  notImplemented();
-  return 0;
-}
-
 PassRefPtr<Icon> Icon::createIconForFiles(const Vector<String>&) {
   notImplemented();
   return 0;

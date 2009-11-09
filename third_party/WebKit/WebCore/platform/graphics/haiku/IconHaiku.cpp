@@ -34,11 +34,6 @@ Icon::~Icon() {
   notImplemented();
 }
 
-PassRefPtr<Icon> Icon::createIconForFile(const String& filename) {
-  notImplemented();
-  return 0;
-}
-
 PassRefPtr<Icon> Icon::createIconForFiles(const Vector<String>& filenames) {
   notImplemented();
   return 0;

@@ -44,20 +44,23 @@ Icon::~Icon() {
   DestroyIcon(m_hIcon);
 }
 
-PassRefPtr<Icon> Icon::createIconForFile(const String& filename) {
-  SHFILEINFO sfi;
-  memset(&sfi, 0, sizeof(sfi));
-
-  String tmpFilename = filename;
-  if (!SHGetFileInfo(tmpFilename.charactersWithNullTermination(), 0, &sfi,
-                     sizeof(sfi),
-                     SHGFI_ICON | SHGFI_SHELLICONSIZE | SHGFI_SMALLICON))
+PassRefPtr<Icon> Icon::createIconForFiles(const Vector<String>& filenames) {
+  if (filenames.isEmpty())
     return 0;
 
-  return adoptRef(new Icon(sfi.hIcon));
-}
+  if (filenames.size() == 1) {
+    SHFILEINFO sfi;
+    memset(&sfi, 0, sizeof(sfi));
 
-PassRefPtr<Icon> Icon::createIconForFiles(const Vector<String>&) {
+    String tmpFilename = filenames[0];
+    if (!SHGetFileInfo(tmpFilename.charactersWithNullTermination(), 0, &sfi,
+                       sizeof(sfi),
+                       SHGFI_ICON | SHGFI_SHELLICONSIZE | SHGFI_SMALLICON))
+      return 0;
+
+    return adoptRef(new Icon(sfi.hIcon));
+  }
+
 #if PLATFORM(WINCE)
   return 0;
 #else
