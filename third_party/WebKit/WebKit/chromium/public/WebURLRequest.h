@@ -36,7 +36,7 @@
 
 #if defined(WEBKIT_IMPLEMENTATION)
 namespace WebCore {
-struct ResourceRequest;
+class ResourceRequest;
 }
 #endif
 
