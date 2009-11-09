@@ -21,6 +21,7 @@
 #define QWEBELEMENT_H
 
 #include <QString>
+#include <QStringList>
 #include <QRect>
 #include <QVariant>
 #include <QExplicitlySharedDataPointer>
@@ -77,6 +78,7 @@ class QWEBKIT_EXPORT QWebElement {
   void removeAttribute(const QString& name);
   void removeAttributeNS(const QString& namespaceUri, const QString& name);
   bool hasAttributes() const;
+  QStringList attributeNames(const QString& namespaceUri = QString()) const;
 
   QStringList classes() const;
   bool hasClass(const QString& name) const;
