@@ -207,12 +207,19 @@ Database::Database(Document* document,
   m_document->addOpenDatabase(this);
 }
 
+static void derefDocument(void* document) {
+  static_cast<Document*>(document)->deref();
+}
+
 Database::~Database() {
   if (m_document->databaseThread())
     m_document->databaseThread()->unscheduleDatabaseTasks(this);
 
   DatabaseTracker::tracker().removeOpenDatabase(this);
   m_document->removeOpenDatabase(this);
+
+  // Deref m_document on the main thread.
+  callOnMainThread(derefDocument, m_document.release().releaseRef());
 }
 
 bool Database::openAndVerifyVersion(ExceptionCode& e) {
