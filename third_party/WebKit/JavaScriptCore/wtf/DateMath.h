@@ -49,27 +49,13 @@
 #include <wtf/Noncopyable.h>
 #include <wtf/UnusedParam.h>
 
-namespace JSC {
-
-class ExecState;
-struct GregorianDateTime;
-
+namespace WTF {
 void initializeDates();
-void msToGregorianDateTime(ExecState*,
-                           double,
-                           bool outputIsUTC,
-                           GregorianDateTime&);
-double gregorianDateTimeToMS(ExecState*,
-                             const GregorianDateTime&,
-                             double,
-                             bool inputIsUTC);
-double getUTCOffset(ExecState*);
 int equivalentYearForDST(int year);
 
 // Not really math related, but this is currently the only shared place to put
 // these.
-double parseDateFromNullTerminatedCharacters(const char* dateString,
-                                             ExecState* exec);  // exec may be 0
+double parseDateFromNullTerminatedCharacters(const char* dateString);
 double timeClip(double);
 
 inline double jsCurrentTime() {
@@ -91,8 +77,27 @@ const double msPerMinute = 60.0 * 1000.0;
 const double msPerHour = 60.0 * 60.0 * 1000.0;
 const double msPerDay = 24.0 * 60.0 * 60.0 * 1000.0;
 
-// Intentionally overridding the default tm of the system
-// Tee members of tm differ on various operating systems.
+}  // namespace WTF
+
+#if USE(JSC)
+namespace JSC {
+class ExecState;
+struct GregorianDateTime;
+
+void msToGregorianDateTime(ExecState*,
+                           double,
+                           bool outputIsUTC,
+                           GregorianDateTime&);
+double gregorianDateTimeToMS(ExecState*,
+                             const GregorianDateTime&,
+                             double,
+                             bool inputIsUTC);
+double getUTCOffset(ExecState*);
+double parseDateFromNullTerminatedCharacters(const char* dateString,
+                                             ExecState*);
+
+// Intentionally overridding the default tm of the system.
+// The members of tm differ on various operating systems.
 struct GregorianDateTime : Noncopyable {
   GregorianDateTime()
       : second(0),
@@ -195,7 +200,7 @@ struct GregorianDateTime : Noncopyable {
 static inline int gmtoffset(const GregorianDateTime& t) {
   return t.utcOffset;
 }
-
 }  // namespace JSC
+#endif  // USE(JSC)
 
 #endif  // DateMath_h
