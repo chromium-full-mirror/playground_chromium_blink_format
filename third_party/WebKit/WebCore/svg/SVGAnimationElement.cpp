@@ -495,7 +495,8 @@ void SVGAnimationElement::startedActiveInterval() {
         (calcMode == CalcModeDiscrete || !m_keyTimes.size() ||
          m_keyTimes.last() == 1.0) &&
         (calcMode != CalcModeSpline ||
-         (m_keySplines.size() && (m_keySplines.size() == m_values.size() - 1) ||
+         ((m_keySplines.size() &&
+           (m_keySplines.size() == m_values.size() - 1)) ||
           m_keySplines.size() == m_keyPoints.size() - 1)) &&
         (!hasAttribute(SVGNames::keyPointsAttr) ||
          (m_keyTimes.size() > 1 && m_keyTimes.size() == m_keyPoints.size()));

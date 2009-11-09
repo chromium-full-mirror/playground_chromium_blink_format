@@ -68,9 +68,9 @@ bool RenderTextControlMultiLine::nodeAtPoint(const HitTestRequest& request,
     return false;
 
   bool resultIsTextValueOrPlaceholder =
-      !m_placeholderVisible && result.innerNode() == innerTextElement() ||
-      m_placeholderVisible &&
-          result.innerNode()->isDescendantOf(innerTextElement());
+      (!m_placeholderVisible && result.innerNode() == innerTextElement()) ||
+      (m_placeholderVisible &&
+       result.innerNode()->isDescendantOf(innerTextElement()));
   if (result.innerNode() == node() || resultIsTextValueOrPlaceholder)
     hitInnerTextElement(result, x, y, tx, ty);
 

@@ -696,10 +696,10 @@ void ApplicationCacheGroup::didFinishLoadingManifest() {
 
     if (!m_manifestResource ||  // The resource will be null if HTTP response
                                 // was 304 Not Modified.
-        newestManifest->data()->size() == m_manifestResource->data()->size() &&
-            !memcmp(newestManifest->data()->data(),
-                    m_manifestResource->data()->data(),
-                    newestManifest->data()->size())) {
+        (newestManifest->data()->size() == m_manifestResource->data()->size() &&
+         !memcmp(newestManifest->data()->data(),
+                 m_manifestResource->data()->data(),
+                 newestManifest->data()->size()))) {
       m_completionType = NoUpdate;
       m_manifestResource = 0;
       deliverDelayedMainResources();

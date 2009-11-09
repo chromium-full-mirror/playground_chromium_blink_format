@@ -179,7 +179,7 @@ bool RedirectScheduler::mustLockBackForwardList(Frame* targetFrame) {
        ancestor = ancestor->tree()->parent()) {
     Document* document = ancestor->document();
     if (!ancestor->loader()->isComplete() ||
-        document && document->processingLoadEvent())
+        (document && document->processingLoadEvent()))
       return true;
   }
   return false;

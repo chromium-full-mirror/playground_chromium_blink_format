@@ -217,7 +217,7 @@ static void pushFullyClippedState(BitStack& stack, Node* node) {
   // fully
   // clipped and this is not a node that ignores its container's clip.
   stack.push(fullyClipsContents(node) ||
-             stack.top() && !ignoresContainerClip(node));
+             (stack.top() && !ignoresContainerClip(node)));
 }
 
 static void setUpFullyClippedStack(BitStack& stack, Node* node) {

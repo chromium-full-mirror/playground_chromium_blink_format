@@ -201,9 +201,8 @@ void HTMLLinkElement::process() {
   // Stylesheet
   // This was buggy and would incorrectly match <link rel="alternate">, which
   // has a different specified meaning. -dwh
-  if (m_disabledState != 2 &&
-      (m_isStyleSheet ||
-       acceptIfTypeContainsTextCSS && type.contains("text/css")) &&
+  if (m_disabledState != 2 && (m_isStyleSheet || (acceptIfTypeContainsTextCSS &&
+                                                  type.contains("text/css"))) &&
       document()->frame() && m_url.isValid()) {
     // also, don't load style sheets for standalone documents
 

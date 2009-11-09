@@ -480,10 +480,10 @@ StyleDifference RenderStyle::diff(
   if (inherited->m_effectiveZoom != other->inherited->m_effectiveZoom)
     return StyleDifferenceLayout;
 
-  if (rareNonInheritedData->opacity == 1 &&
-          other->rareNonInheritedData->opacity < 1 ||
-      rareNonInheritedData->opacity < 1 &&
-          other->rareNonInheritedData->opacity == 1) {
+  if ((rareNonInheritedData->opacity == 1 &&
+       other->rareNonInheritedData->opacity < 1) ||
+      (rareNonInheritedData->opacity < 1 &&
+       other->rareNonInheritedData->opacity == 1)) {
     // FIXME: We should add an optimized form of layout that just recomputes
     // visual overflow.
     return StyleDifferenceLayout;

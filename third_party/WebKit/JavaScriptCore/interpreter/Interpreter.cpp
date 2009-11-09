@@ -1726,7 +1726,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
       JSValue src1 = callFrame->r(vPC[2].u.operand).jsValue();
       JSValue src2 = callFrame->r(vPC[3].u.operand).jsValue();
       if (src1.isInt32() && src2.isInt32() &&
-          !(src1.asInt32() | src2.asInt32() & 0xc0000000))  // no overflow
+          !(src1.asInt32() | (src2.asInt32() & 0xc0000000)))  // no overflow
         callFrame->r(dst) =
             jsNumber(callFrame, src1.asInt32() + src2.asInt32());
       else {
@@ -1820,7 +1820,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
       JSValue src1 = callFrame->r(vPC[2].u.operand).jsValue();
       JSValue src2 = callFrame->r(vPC[3].u.operand).jsValue();
       if (src1.isInt32() && src2.isInt32() &&
-          !(src1.asInt32() | src2.asInt32() & 0xc0000000))  // no overflow
+          !(src1.asInt32() | (src2.asInt32() & 0xc0000000)))  // no overflow
         callFrame->r(dst) =
             jsNumber(callFrame, src1.asInt32() - src2.asInt32());
       else {

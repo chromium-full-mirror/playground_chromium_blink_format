@@ -1631,15 +1631,14 @@ void RenderBox::calcHeight() {
   // without this quirk, the
   // height has nothing to be a percentage of, and it ends up being 0. That is
   // bad.
-  bool printingNeedsBaseHeight =
-      document()->printing() && h.isPercent() && (isRoot() ||
-                                                  isBody() &&
-                                                      document()
-                                                          ->documentElement()
-                                                          ->renderer()
-                                                          ->style()
-                                                          ->height()
-                                                          .isPercent());
+  bool printingNeedsBaseHeight = document()->printing() && h.isPercent() &&
+                                 (isRoot() || (isBody() &&
+                                               document()
+                                                   ->documentElement()
+                                                   ->renderer()
+                                                   ->style()
+                                                   ->height()
+                                                   .isPercent()));
   if (stretchesToViewHeight() || printingNeedsBaseHeight) {
     int margins = collapsedMarginTop() + collapsedMarginBottom();
     int visHeight = document()->printing()
