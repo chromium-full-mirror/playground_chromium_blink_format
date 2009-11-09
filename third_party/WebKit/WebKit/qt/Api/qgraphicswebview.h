@@ -45,9 +45,6 @@ class QWEBKIT_EXPORT QGraphicsWebView : public QGraphicsWidget {
   Q_PROPERTY(QString html READ toHtml WRITE setHtml)
   Q_PROPERTY(QUrl url READ url WRITE setUrl NOTIFY urlChanged)
 
-  Q_PROPERTY(bool interactive READ isInteractive WRITE setInteractive NOTIFY
-                 interactivityChanged)
-
   Q_PROPERTY(bool modified READ isModified)
 
  public:
@@ -65,9 +62,6 @@ class QWEBKIT_EXPORT QGraphicsWebView : public QGraphicsWidget {
 
   qreal zoomFactor() const;
   void setZoomFactor(qreal);
-
-  bool isInteractive() const;
-  void setInteractive(bool);
 
   bool isModified() const;
 
@@ -106,7 +100,6 @@ class QWEBKIT_EXPORT QGraphicsWebView : public QGraphicsWidget {
   void loadFinished(bool);
 
   void loadProgress(int progress);
-  void interactivityChanged();
   void urlChanged(const QUrl&);
   void titleChanged(const QString&);
   void iconChanged();

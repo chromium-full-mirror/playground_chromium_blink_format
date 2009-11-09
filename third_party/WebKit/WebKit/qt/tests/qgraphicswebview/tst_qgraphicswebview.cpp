@@ -62,7 +62,6 @@ void tst_QGraphicsWebView::qgraphicswebview() {
   item.title();
   item.icon();
   item.zoomFactor();
-  item.isInteractive();
   item.toHtml();
   item.history();
   item.settings();
@@ -71,7 +70,6 @@ void tst_QGraphicsWebView::qgraphicswebview() {
   item.page();
   item.setUrl(QUrl());
   item.setZoomFactor(0);
-  item.setInteractive(true);
   item.load(QUrl());
   item.setHtml(QString());
   item.setContent(QByteArray());
