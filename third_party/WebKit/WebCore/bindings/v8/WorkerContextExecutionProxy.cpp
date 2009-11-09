@@ -147,9 +147,12 @@ void WorkerContextExecutionProxy::initContextIfNeeded() {
 
   // Create a new JS object and use it as the prototype for the shadow global
   // object.
+  V8ClassIndex::V8WrapperType contextType =
+      m_workerContext->isDedicatedWorkerContext()
+          ? V8ClassIndex::DEDICATEDWORKERCONTEXT
+          : V8ClassIndex::SHAREDWORKERCONTEXT;
   v8::Handle<v8::Function> workerContextConstructor =
-      V8DOMWrapper::getConstructorForContext(
-          V8ClassIndex::DEDICATEDWORKERCONTEXT, context);
+      V8DOMWrapper::getConstructorForContext(contextType, context);
   v8::Local<v8::Object> jsWorkerContext =
       SafeAllocation::newInstance(workerContextConstructor);
   // Bail out if allocation failed.
@@ -159,10 +162,8 @@ void WorkerContextExecutionProxy::initContextIfNeeded() {
   }
 
   // Wrap the object.
-  V8DOMWrapper::setDOMWrapper(
-      jsWorkerContext,
-      V8ClassIndex::ToInt(V8ClassIndex::DEDICATEDWORKERCONTEXT),
-      m_workerContext);
+  V8DOMWrapper::setDOMWrapper(jsWorkerContext, V8ClassIndex::ToInt(contextType),
+                              m_workerContext);
 
   V8DOMWrapper::setJSWrapperForDOMObject(
       m_workerContext, v8::Persistent<v8::Object>::New(jsWorkerContext));
@@ -179,7 +180,8 @@ v8::Handle<v8::Value> WorkerContextExecutionProxy::convertToV8Object(
   if (!impl)
     return v8::Null();
 
-  if (type == V8ClassIndex::DEDICATEDWORKERCONTEXT)
+  if (type == V8ClassIndex::DEDICATEDWORKERCONTEXT ||
+      type == V8ClassIndex::SHAREDWORKERCONTEXT)
     return convertWorkerContextToV8Object(static_cast<WorkerContext*>(impl));
 
   bool isActiveDomObject = false;
@@ -295,9 +297,17 @@ v8::Handle<v8::Value> WorkerContextExecutionProxy::convertEventTargetToV8Object(
   if (workerContext)
     return convertWorkerContextToV8Object(workerContext);
 
+  SharedWorkerContext* sharedWorkerContext = target->toSharedWorkerContext();
+  if (sharedWorkerContext)
+    return convertWorkerContextToV8Object(sharedWorkerContext);
+
   Worker* worker = target->toWorker();
   if (worker)
     return convertToV8Object(V8ClassIndex::WORKER, worker);
+
+  SharedWorker* sharedWorker = target->toSharedWorker();
+  if (sharedWorker)
+    return convertToV8Object(V8ClassIndex::SHAREDWORKER, sharedWorker);
 
   XMLHttpRequest* xhr = target->toXMLHttpRequest();
   if (xhr)
