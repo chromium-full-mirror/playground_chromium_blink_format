@@ -38,6 +38,7 @@ class QGraphicsWebViewPrivate : public QWebPageClient {
  public:
   QGraphicsWebViewPrivate(QGraphicsWebView* parent) : q(parent), page(0) {}
 
+  virtual ~QGraphicsWebViewPrivate();
   virtual void scroll(int dx, int dy, const QRect&);
   virtual void update(const QRect& dirtyRect);
   virtual void setInputMethodEnabled(bool enable);
@@ -61,6 +62,8 @@ class QGraphicsWebViewPrivate : public QWebPageClient {
   QGraphicsWebView* q;
   QWebPage* page;
 };
+
+QGraphicsWebViewPrivate::~QGraphicsWebViewPrivate() {}
 
 void QGraphicsWebViewPrivate::_q_doLoadFinished(bool success) {
   // If the page had no title, still make sure it gets the signal
