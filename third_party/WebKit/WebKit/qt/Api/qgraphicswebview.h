@@ -94,6 +94,8 @@ class QWEBKIT_EXPORT QGraphicsWebView : public QGraphicsWidget {
 
   virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF& constraint) const;
 
+  virtual QVariant inputMethodQuery(Qt::InputMethodQuery query) const;
+
  public Q_SLOTS:
   void stop();
   void back();
