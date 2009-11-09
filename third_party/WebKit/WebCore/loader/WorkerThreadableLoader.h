@@ -111,7 +111,7 @@ class WorkerThreadableLoader : public RefCounted<WorkerThreadableLoader>,
   //    done in createCallbackTask), so the ThreadableLoaderClientWrapper
   //    instance is there until all
   //    tasks are executed.
-  class MainThreadBridge : public ThreadableLoaderClient {
+  class MainThreadBridge : ThreadableLoaderClient {
    public:
     // All executed on the worker context's thread.
     MainThreadBridge(PassRefPtr<ThreadableLoaderClientWrapper>,

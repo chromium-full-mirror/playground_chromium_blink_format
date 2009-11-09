@@ -45,7 +45,7 @@
 
 namespace WebCore {
 
-struct ScheduledRedirection : Noncopyable {
+struct ScheduledRedirection {
   enum Type { redirection, locationChange, historyNavigation, formSubmission };
 
   const Type type;
