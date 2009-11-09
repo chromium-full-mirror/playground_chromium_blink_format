@@ -473,6 +473,10 @@ void InspectorBackend::deleteCookie(const String& cookieName,
   m_inspectorController->deleteCookie(cookieName, domain);
 }
 
+void InspectorBackend::copyText(const String& text) {
+  Pasteboard::generalPasteboard()->writePlainText(text);
+}
+
 void InspectorBackend::highlight(long nodeId) {
   if (Node* node = nodeForId(nodeId))
     m_inspectorController->highlight(node);
