@@ -131,6 +131,7 @@ class XSSAuditor {
       const String&,
       bool leaveUndecodableEntitiesUntouched = true);
 
+  bool isSameOriginResource(const String& url) const;
   bool findInRequest(const String&,
                      bool decodeEntities = true,
                      bool allowRequestIfNoIllegalURICharacters = false,
