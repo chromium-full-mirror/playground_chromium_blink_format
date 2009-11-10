@@ -361,6 +361,12 @@ inline bool equalIgnoringCase(const char* a, const String& b) {
   return equalIgnoringCase(a, b.impl());
 }
 
+inline bool equalPossiblyIgnoringCase(const String& a,
+                                      const String& b,
+                                      bool ignoreCase) {
+  return ignoreCase ? equalIgnoringCase(a, b) : (a == b);
+}
+
 inline bool equalIgnoringNullity(const String& a, const String& b) {
   return equalIgnoringNullity(a.impl(), b.impl());
 }
