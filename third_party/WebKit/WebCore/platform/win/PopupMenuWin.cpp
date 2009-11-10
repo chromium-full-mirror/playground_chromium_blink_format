@@ -617,14 +617,14 @@ void PopupMenu::paint(const IntRect& damageRect, HDC hdc) {
 
     // Draw the background for this menu item
     if (itemStyle.isVisible())
-      context.fillRect(itemRect, optionBackgroundColor);
+      context.fillRect(itemRect, optionBackgroundColor, DeviceColorSpace);
 
     if (client()->itemIsSeparator(index)) {
       IntRect separatorRect(
           itemRect.x() + separatorPadding,
           itemRect.y() + (itemRect.height() - separatorHeight) / 2,
           itemRect.width() - 2 * separatorPadding, separatorHeight);
-      context.fillRect(separatorRect, optionTextColor);
+      context.fillRect(separatorRect, optionTextColor, DeviceColorSpace);
       continue;
     }
 
@@ -636,7 +636,7 @@ void PopupMenu::paint(const IntRect& damageRect, HDC hdc) {
         string, length, false, 0, 0,
         itemText.defaultWritingDirection() == WTF::Unicode::RightToLeft);
 
-    context.setFillColor(optionTextColor);
+    context.setFillColor(optionTextColor, DeviceColorSpace);
 
     Font itemFont = client()->menuStyle().font();
     if (client()->itemIsLabel(index)) {
