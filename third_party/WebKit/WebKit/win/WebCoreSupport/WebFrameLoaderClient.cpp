@@ -147,7 +147,7 @@ void WebFrameLoaderClient::dispatchDidReceiveAuthenticationChallenge(
     unsigned long identifier,
     const AuthenticationChallenge& challenge) {
 #if USE(CFNETWORK)
-  ASSERT(challenge.sourceHandle());
+  ASSERT(challenge.authenticationClient());
 
   WebView* webView = m_webFrame->webView();
   COMPtr<IWebResourceLoadDelegate> resourceLoadDelegate;
@@ -163,7 +163,7 @@ void WebFrameLoaderClient::dispatchDidReceiveAuthenticationChallenge(
   // tell the ResourceHandle
   // to continue without credential - this is the best approximation of Mac
   // behavior
-  challenge.sourceHandle()->receivedRequestToContinueWithoutCredential(
+  challenge.authenticationClient()->receivedRequestToContinueWithoutCredential(
       challenge);
 #else
   notImplemented();

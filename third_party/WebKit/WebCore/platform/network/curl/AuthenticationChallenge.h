@@ -26,12 +26,10 @@
 #define AuthenticationChallenge_h
 
 #include "AuthenticationChallengeBase.h"
-#include "ResourceHandle.h"
+#include "AuthenticationClient.h"
 #include <wtf/RefPtr.h>
 
 namespace WebCore {
-
-class ResourceHandle;
 
 class AuthenticationChallenge : public AuthenticationChallengeBase {
  public:
@@ -48,9 +46,11 @@ class AuthenticationChallenge : public AuthenticationChallengeBase {
                                     response,
                                     error) {}
 
-  ResourceHandle* sourceHandle() const { return m_sourceHandle.get(); }
+  AuthenticationClient* authenticationClient() const {
+    return m_authenticationClient.get();
+  }
 
-  RefPtr<ResourceHandle> m_sourceHandle;
+  RefPtr<AuthenticationClient> m_authenticationClient;
 };
 }
 

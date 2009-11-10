@@ -26,14 +26,12 @@
 #define AuthenticationChallenge_h
 
 #include "AuthenticationChallengeBase.h"
-#include "ResourceHandle.h"
+#include "AuthenticationClient.h"
 #include <wtf/RefPtr.h>
 
 typedef struct _CFURLAuthChallenge* CFURLAuthChallengeRef;
 
 namespace WebCore {
-
-class ResourceHandle;
 
 class AuthenticationChallenge : public AuthenticationChallengeBase {
  public:
@@ -43,9 +41,11 @@ class AuthenticationChallenge : public AuthenticationChallengeBase {
                           unsigned previousFailureCount,
                           const ResourceResponse& response,
                           const ResourceError& error);
-  AuthenticationChallenge(CFURLAuthChallengeRef, ResourceHandle* sourceHandle);
+  AuthenticationChallenge(CFURLAuthChallengeRef, AuthenticationClient*);
 
-  ResourceHandle* sourceHandle() const { return m_sourceHandle.get(); }
+  AuthenticationClient* authenticationClient() const {
+    return m_authenticationClient.get();
+  }
   CFURLAuthChallengeRef cfURLAuthChallengeRef() const {
     return m_cfChallenge.get();
   }
@@ -55,7 +55,7 @@ class AuthenticationChallenge : public AuthenticationChallengeBase {
   static bool platformCompare(const AuthenticationChallenge& a,
                               const AuthenticationChallenge& b);
 
-  RefPtr<ResourceHandle> m_sourceHandle;
+  RefPtr<AuthenticationClient> m_authenticationClient;
   RetainPtr<CFURLAuthChallengeRef> m_cfChallenge;
 };
 }

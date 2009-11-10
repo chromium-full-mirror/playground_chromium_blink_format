@@ -181,7 +181,7 @@ WebURLAuthenticationChallenge::initWithAuthenticationChallenge(
 #if USE(CFNETWORK)
   m_authenticationChallenge = AuthenticationChallenge(
       webChallenge->authenticationChallenge().cfURLAuthChallengeRef(),
-      webSender->resourceHandle());
+      webSender->authenticationClient());
 
   return S_OK;
 #else
@@ -226,9 +226,10 @@ HRESULT STDMETHODCALLTYPE WebURLAuthenticationChallenge::protectionSpace(
 HRESULT STDMETHODCALLTYPE WebURLAuthenticationChallenge::sender(
     /* [out, retval] */ IWebURLAuthenticationChallengeSender** sender) {
   if (!m_sender) {
-    ResourceHandle* handle = m_authenticationChallenge.sourceHandle();
+    AuthenticationClient* client =
+        m_authenticationChallenge.authenticationClient();
     m_sender.adoptRef(
-        WebURLAuthenticationChallengeSender::createInstance(handle));
+        WebURLAuthenticationChallengeSender::createInstance(client));
   }
 
   return m_sender.copyRefTo(sender);

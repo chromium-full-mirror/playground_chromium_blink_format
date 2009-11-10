@@ -34,7 +34,7 @@
 #include "WebURLCredential.h"
 
 #pragma warning(push, 0)
-#include <WebCore/ResourceHandle.h>
+#include <WebCore/AuthenticationClient.h>
 #pragma warning(pop)
 
 using namespace WebCore;
@@ -49,7 +49,7 @@ WebURLAuthenticationChallengeSender::cancelAuthenticationChallenge(
   if (!webChallenge)
     return E_FAIL;
 
-  m_handle->receivedCancellation(webChallenge->authenticationChallenge());
+  m_client->receivedCancellation(webChallenge->authenticationChallenge());
   return S_OK;
 }
 
@@ -60,7 +60,7 @@ HRESULT STDMETHODCALLTYPE WebURLAuthenticationChallengeSender::
   if (!webChallenge)
     return E_FAIL;
 
-  m_handle->receivedRequestToContinueWithoutCredential(
+  m_client->receivedRequestToContinueWithoutCredential(
       webChallenge->authenticationChallenge());
   return S_OK;
 }
@@ -77,7 +77,7 @@ HRESULT STDMETHODCALLTYPE WebURLAuthenticationChallengeSender::useCredential(
                          __uuidof(WebURLCredential), (void**)&webCredential)))
     return E_FAIL;
 
-  m_handle->receivedCredential(webChallenge->authenticationChallenge(),
+  m_client->receivedCredential(webChallenge->authenticationChallenge(),
                                webCredential->credential());
   return S_OK;
 }
