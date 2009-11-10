@@ -260,6 +260,11 @@ const Vector<Instruction>& JSGlobalData::numericCompareFunction(
 
 JSGlobalData::ClientData::~ClientData() {}
 
+void JSGlobalData::resetDateCache() {
+  cachedUTCOffset = NaN;
+  cachedDateString = UString();
+}
+
 void JSGlobalData::startSampling() {
   interpreter->startSampling();
 }

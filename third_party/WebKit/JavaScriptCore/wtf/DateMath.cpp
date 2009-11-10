@@ -878,8 +878,8 @@ void msToGregorianDateTime(ExecState* exec,
   tm.timeZone = NULL;
 }
 
-double parseDateFromNullTerminatedCharacters(const char* dateString,
-                                             ExecState* exec) {
+double parseDateFromNullTerminatedCharacters(ExecState* exec,
+                                             const char* dateString) {
   ASSERT(exec);
   bool haveTZ;
   int offset;

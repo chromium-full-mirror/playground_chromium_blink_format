@@ -93,8 +93,8 @@ double gregorianDateTimeToMS(ExecState*,
                              double,
                              bool inputIsUTC);
 double getUTCOffset(ExecState*);
-double parseDateFromNullTerminatedCharacters(const char* dateString,
-                                             ExecState*);
+double parseDateFromNullTerminatedCharacters(ExecState*,
+                                             const char* dateString);
 
 // Intentionally overridding the default tm of the system.
 // The members of tm differ on various operating systems.
