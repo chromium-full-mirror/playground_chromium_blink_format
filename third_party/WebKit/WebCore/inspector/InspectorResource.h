@@ -123,7 +123,7 @@ class InspectorResource : public RefCounted<InspectorResource> {
     Changes() : m_change(NoChange) {}
 
     inline bool hasChange(ChangeType change) {
-      return (m_change & change) || !(m_change + change);
+      return m_change & change || (m_change == NoChange && change == NoChange);
     }
     inline void set(ChangeType change) {
       m_change = static_cast<ChangeType>(static_cast<unsigned>(m_change) |
