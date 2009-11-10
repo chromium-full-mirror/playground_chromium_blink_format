@@ -315,7 +315,7 @@ IntSize MediaPlayerPrivate::naturalSize() const {
     gint pixelAspectRatioNumerator, pixelAspectRatioDenominator;
 
     if (!GST_IS_CAPS(caps) || !gst_caps_is_fixed(caps) ||
-        !gst_video_format_parse_caps(caps, NULL, &width, &height) ||
+        !gst_video_format_parse_caps(caps, 0, &width, &height) ||
         !gst_video_parse_caps_pixel_aspect_ratio(
             caps, &pixelAspectRatioNumerator, &pixelAspectRatioDenominator)) {
       gst_object_unref(GST_OBJECT(pad));
@@ -685,7 +685,7 @@ void MediaPlayerPrivate::paint(GraphicsContext* context, const IntRect& rect) {
       doublePixelAspectRatioDenominator / doublePixelAspectRatioNumerator;
 
   // Calculate the largest scale factor that would fill the target surface
-  scale = MIN(rect.width() / displayWidth, rect.height() / displayHeight);
+  scale = std::min(rect.width() / displayWidth, rect.height() / displayHeight);
   // And calculate the new display width/height
   displayWidth *= scale;
   displayHeight *= scale;
