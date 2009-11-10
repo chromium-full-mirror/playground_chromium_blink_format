@@ -327,9 +327,8 @@ static void resetDefaultsToConsistentValues() {
                "javascript-can-open-windows-automatically", TRUE,
                "enable-offline-web-application-cache", TRUE,
                "enable-universal-access-from-file-uris", TRUE, "enable-scripts",
-               TRUE, "enable-web-sockets", TRUE, "enable-dom-paste", TRUE,
-               "default-font-family", "Times", "monospace-font-family",
-               "Courier", "serif-font-family", "Times",
+               TRUE, "enable-dom-paste", TRUE, "default-font-family", "Times",
+               "monospace-font-family", "Courier", "serif-font-family", "Times",
                "sans-serif-font-family", "Helvetica", "default-font-size", 16,
                "default-monospace-font-size", 13, "minimum-font-size", 1, NULL);
 
