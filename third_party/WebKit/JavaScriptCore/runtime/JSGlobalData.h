@@ -63,6 +63,22 @@ struct HashTable;
 struct Instruction;
 struct VPtrSet;
 
+struct DSTOffsetCache {
+  DSTOffsetCache() { reset(); }
+
+  void reset() {
+    offset = 0.0;
+    start = 0.0;
+    end = -1.0;
+    increment = 0.0;
+  }
+
+  double offset;
+  double start;
+  double end;
+  double increment;
+};
+
 class JSGlobalData : public RefCounted<JSGlobalData> {
  public:
   struct ClientData {
@@ -158,6 +174,7 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
   MarkStack markStack;
 
   double cachedUTCOffset;
+  DSTOffsetCache dstOffsetCache;
 
   UString cachedDateString;
   double cachedDateStringValue;
