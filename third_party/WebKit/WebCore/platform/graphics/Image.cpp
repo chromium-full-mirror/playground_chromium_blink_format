@@ -78,7 +78,7 @@ void Image::fillWithSolidColor(GraphicsContext* ctxt,
   ctxt->save();
   ctxt->setCompositeOperation(
       !color.hasAlpha() && op == CompositeSourceOver ? CompositeCopy : op);
-  ctxt->fillRect(dstRect, color);
+  ctxt->fillRect(dstRect, color, DeviceColorSpace);
   ctxt->restore();
 }
 

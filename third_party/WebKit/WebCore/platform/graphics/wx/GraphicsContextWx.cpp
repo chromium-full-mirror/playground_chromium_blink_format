@@ -244,7 +244,9 @@ void GraphicsContext::drawConvexPolygon(size_t npoints,
   delete[] polygon;
 }
 
-void GraphicsContext::fillRect(const FloatRect& rect, const Color& color) {
+void GraphicsContext::fillRect(const FloatRect& rect,
+                               const Color& color,
+                               ColorSpace colorSpace) {
   if (paintingDisabled())
     return;
 
@@ -259,7 +261,8 @@ void GraphicsContext::fillRoundedRect(const IntRect& rect,
                                       const IntSize& topRight,
                                       const IntSize& bottomLeft,
                                       const IntSize& bottomRight,
-                                      const Color& color) {
+                                      const Color& color,
+                                      ColorSpace colorSpace) {
   if (paintingDisabled())
     return;
 
@@ -419,7 +422,8 @@ void GraphicsContext::addPath(const Path& path) {
   notImplemented();
 }
 
-void GraphicsContext::setPlatformStrokeColor(const Color& color) {
+void GraphicsContext::setPlatformStrokeColor(const Color& color,
+                                             ColorSpace colorSpace) {
   if (paintingDisabled())
     return;
 
@@ -437,7 +441,8 @@ void GraphicsContext::setPlatformStrokeThickness(float thickness) {
                                   strokeStyleToWxPenStyle(strokeStyle())));
 }
 
-void GraphicsContext::setPlatformFillColor(const Color& color) {
+void GraphicsContext::setPlatformFillColor(const Color& color,
+                                           ColorSpace colorSpace) {
   if (paintingDisabled())
     return;
 

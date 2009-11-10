@@ -27,6 +27,7 @@
 #ifndef GraphicsContext_h
 #define GraphicsContext_h
 
+#include "ColorSpace.h"
 #include "DashArray.h"
 #include "FloatRect.h"
 #include "Image.h"
@@ -149,7 +150,8 @@ class GraphicsContext : public Noncopyable {
   StrokeStyle strokeStyle() const;
   void setStrokeStyle(const StrokeStyle& style);
   Color strokeColor() const;
-  void setStrokeColor(const Color&);
+  ColorSpace strokeColorSpace() const;
+  void setStrokeColor(const Color&, ColorSpace);
 
   void setStrokePattern(PassRefPtr<Pattern>);
   Pattern* strokePattern() const;
@@ -160,7 +162,8 @@ class GraphicsContext : public Noncopyable {
   WindRule fillRule() const;
   void setFillRule(WindRule);
   Color fillColor() const;
-  void setFillColor(const Color&);
+  ColorSpace fillColorSpace() const;
+  void setFillColor(const Color&, ColorSpace);
 
   void setFillPattern(PassRefPtr<Pattern>);
   Pattern* fillPattern() const;
@@ -201,14 +204,15 @@ class GraphicsContext : public Noncopyable {
   void strokeArc(const IntRect&, int startAngle, int angleSpan);
 
   void fillRect(const FloatRect&);
-  void fillRect(const FloatRect&, const Color&);
+  void fillRect(const FloatRect&, const Color&, ColorSpace);
   void fillRect(const FloatRect&, Generator&);
   void fillRoundedRect(const IntRect&,
                        const IntSize& topLeft,
                        const IntSize& topRight,
                        const IntSize& bottomLeft,
                        const IntSize& bottomRight,
-                       const Color&);
+                       const Color&,
+                       ColorSpace);
 
   void clearRect(const FloatRect&);
 
@@ -282,6 +286,7 @@ class GraphicsContext : public Noncopyable {
                             const IntPoint&,
                             int h,
                             const Color& backgroundColor,
+                            ColorSpace,
                             int from = 0,
                             int to = -1);
 
@@ -476,13 +481,13 @@ class GraphicsContext : public Noncopyable {
   void setPlatformTextDrawingMode(int);
   void setPlatformFont(const Font& font);
 
-  void setPlatformStrokeColor(const Color&);
+  void setPlatformStrokeColor(const Color&, ColorSpace);
   void setPlatformStrokeStyle(const StrokeStyle&);
   void setPlatformStrokeThickness(float);
   void setPlatformStrokeGradient(Gradient*);
   void setPlatformStrokePattern(Pattern*);
 
-  void setPlatformFillColor(const Color&);
+  void setPlatformFillColor(const Color&, ColorSpace);
   void setPlatformFillGradient(Gradient*);
   void setPlatformFillPattern(Pattern*);
 

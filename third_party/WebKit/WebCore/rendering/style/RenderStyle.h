@@ -37,6 +37,7 @@
 #include "CachedImage.h"
 #include "CollapsedBorderValue.h"
 #include "Color.h"
+#include "ColorSpace.h"
 #include "ContentData.h"
 #include "CounterDirectives.h"
 #include "CursorList.h"
@@ -764,6 +765,9 @@ class RenderStyle : public RefCounted<RenderStyle> {
   const Color& textFillColor() const {
     return rareInheritedData->textFillColor;
   }
+  ColorSpace colorSpace() const {
+    return static_cast<ColorSpace>(rareInheritedData->colorSpace);
+  }
   float opacity() const { return rareNonInheritedData->opacity; }
   ControlPart appearance() const {
     return static_cast<ControlPart>(rareNonInheritedData->m_appearance);
@@ -1370,6 +1374,9 @@ class RenderStyle : public RefCounted<RenderStyle> {
   }
   void setTextFillColor(const Color& c) {
     SET_VAR(rareInheritedData, textFillColor, c)
+  }
+  void setColorSpace(ColorSpace space) {
+    SET_VAR(rareInheritedData, colorSpace, space)
   }
   void setOpacity(float f) { SET_VAR(rareNonInheritedData, opacity, f); }
   void setAppearance(ControlPart a) {

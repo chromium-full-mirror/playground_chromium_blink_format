@@ -84,23 +84,25 @@ void CanvasStyle::applyStrokeColor(GraphicsContext* context) {
     case ColorString: {
       Color c = Color(m_color);
       if (c.isValid()) {
-        context->setStrokeColor(c.rgb());
+        context->setStrokeColor(c.rgb(), DeviceColorSpace);
         break;
       }
       RGBA32 color = 0;  // default is transparent black
       if (CSSParser::parseColor(color, m_color))
-        context->setStrokeColor(color);
+        context->setStrokeColor(color, DeviceColorSpace);
       break;
     }
     case ColorStringWithAlpha: {
       Color c = Color(m_color);
       if (c.isValid()) {
-        context->setStrokeColor(colorWithOverrideAlpha(c.rgb(), m_alpha));
+        context->setStrokeColor(colorWithOverrideAlpha(c.rgb(), m_alpha),
+                                DeviceColorSpace);
         break;
       }
       RGBA32 color = 0;  // default is transparent black
       if (CSSParser::parseColor(color, m_color))
-        context->setStrokeColor(colorWithOverrideAlpha(color, m_alpha));
+        context->setStrokeColor(colorWithOverrideAlpha(color, m_alpha),
+                                DeviceColorSpace);
       break;
     }
     case GrayLevel:
@@ -108,10 +110,12 @@ void CanvasStyle::applyStrokeColor(GraphicsContext* context) {
       // even part of HTML5, I don't expect anyone will care.  If they do
       // we'll make a fancier Color abstraction.
       context->setStrokeColor(
-          Color(m_grayLevel, m_grayLevel, m_grayLevel, m_alpha));
+          Color(m_grayLevel, m_grayLevel, m_grayLevel, m_alpha),
+          DeviceColorSpace);
       break;
     case RGBA:
-      context->setStrokeColor(Color(m_red, m_green, m_blue, m_alpha));
+      context->setStrokeColor(Color(m_red, m_green, m_blue, m_alpha),
+                              DeviceColorSpace);
       break;
     case CMYKA: {
 // FIXME: Do this through platform-independent GraphicsContext API.
@@ -147,23 +151,25 @@ void CanvasStyle::applyFillColor(GraphicsContext* context) {
     case ColorString: {
       Color c = Color(m_color);
       if (c.isValid()) {
-        context->setFillColor(c.rgb());
+        context->setFillColor(c.rgb(), DeviceColorSpace);
         break;
       }
       RGBA32 rgba = 0;  // default is transparent black
       if (CSSParser::parseColor(rgba, m_color))
-        context->setFillColor(rgba);
+        context->setFillColor(rgba, DeviceColorSpace);
       break;
     }
     case ColorStringWithAlpha: {
       Color c = Color(m_color);
       if (c.isValid()) {
-        context->setFillColor(colorWithOverrideAlpha(c.rgb(), m_alpha));
+        context->setFillColor(colorWithOverrideAlpha(c.rgb(), m_alpha),
+                              DeviceColorSpace);
         break;
       }
       RGBA32 color = 0;  // default is transparent black
       if (CSSParser::parseColor(color, m_color))
-        context->setFillColor(colorWithOverrideAlpha(color, m_alpha));
+        context->setFillColor(colorWithOverrideAlpha(color, m_alpha),
+                              DeviceColorSpace);
       break;
     }
     case GrayLevel:
@@ -171,10 +177,12 @@ void CanvasStyle::applyFillColor(GraphicsContext* context) {
       // even part of HTML5, I don't expect anyone will care.  If they do
       // we'll make a fancier Color abstraction.
       context->setFillColor(
-          Color(m_grayLevel, m_grayLevel, m_grayLevel, m_alpha));
+          Color(m_grayLevel, m_grayLevel, m_grayLevel, m_alpha),
+          DeviceColorSpace);
       break;
     case RGBA:
-      context->setFillColor(Color(m_red, m_green, m_blue, m_alpha));
+      context->setFillColor(Color(m_red, m_green, m_blue, m_alpha),
+                            DeviceColorSpace);
       break;
     case CMYKA: {
 // FIXME: Do this through platform-independent GraphicsContext API.
@@ -190,7 +198,8 @@ void CanvasStyle::applyFillColor(GraphicsContext* context) {
       context->platformContext()->setBrush(currentBrush);
 #else
       context->setFillColor(
-          Color(m_cyan, m_magenta, m_yellow, m_black, m_alpha));
+          Color(m_cyan, m_magenta, m_yellow, m_black, m_alpha),
+          DeviceColorSpace);
 #endif
       break;
     }

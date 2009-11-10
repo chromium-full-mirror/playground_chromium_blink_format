@@ -114,7 +114,7 @@ void RenderScrollbarTheme::paintScrollCorner(ScrollView*,
                                              GraphicsContext* context,
                                              const IntRect& cornerRect) {
   // FIXME: Implement.
-  context->fillRect(cornerRect, Color::white);
+  context->fillRect(cornerRect, Color::white, DeviceColorSpace);
 }
 
 void RenderScrollbarTheme::paintScrollbarBackground(GraphicsContext* context,

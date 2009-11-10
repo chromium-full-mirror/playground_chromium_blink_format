@@ -756,7 +756,9 @@ void GraphicsContext::fillRect(const FloatRect& rect) {
   }
 }
 
-void GraphicsContext::fillRect(const FloatRect& rect, const Color& c) {
+void GraphicsContext::fillRect(const FloatRect& rect,
+                               const Color& c,
+                               ColorSpace colorSpace) {
   if (paintingDisabled())
     return;
 
@@ -771,7 +773,8 @@ void GraphicsContext::fillRoundedRect(const IntRect& rect,
                                       const IntSize& topRight,
                                       const IntSize& bottomLeft,
                                       const IntSize& bottomRight,
-                                      const Color& color) {
+                                      const Color& color,
+                                      ColorSpace colorSpace) {
   if (paintingDisabled() || !color.alpha())
     return;
 
@@ -1210,7 +1213,8 @@ void GraphicsContext::setURLForRect(const KURL&, const IntRect&) {
   notImplemented();
 }
 
-void GraphicsContext::setPlatformStrokeColor(const Color& color) {
+void GraphicsContext::setPlatformStrokeColor(const Color& color,
+                                             ColorSpace colorSpace) {
   if (paintingDisabled())
     return;
   QPainter* p = m_data->p();
@@ -1237,7 +1241,8 @@ void GraphicsContext::setPlatformStrokeThickness(float thickness) {
   p->setPen(newPen);
 }
 
-void GraphicsContext::setPlatformFillColor(const Color& color) {
+void GraphicsContext::setPlatformFillColor(const Color& color,
+                                           ColorSpace colorSpace) {
   if (paintingDisabled())
     return;
   m_data->p()->setBrush(QBrush(color));

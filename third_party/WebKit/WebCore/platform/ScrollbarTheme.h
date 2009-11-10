@@ -85,7 +85,7 @@ class ScrollbarTheme {
   virtual void paintScrollCorner(ScrollView*,
                                  GraphicsContext* context,
                                  const IntRect& cornerRect) {
-    context->fillRect(cornerRect, Color::white);
+    context->fillRect(cornerRect, Color::white, DeviceColorSpace);
   }
 
   virtual bool shouldCenterOnThumb(Scrollbar*, const PlatformMouseEvent&) {

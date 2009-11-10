@@ -38,7 +38,8 @@ StyleRareInheritedData::StyleRareInheritedData()
       khtmlLineBreak(LBNORMAL),
       textSizeAdjust(RenderStyle::initialTextSizeAdjust()),
       resize(RenderStyle::initialResize()),
-      userSelect(RenderStyle::initialUserSelect()) {}
+      userSelect(RenderStyle::initialUserSelect()),
+      colorSpace(DeviceColorSpace) {}
 
 StyleRareInheritedData::StyleRareInheritedData(const StyleRareInheritedData& o)
     : RefCounted<StyleRareInheritedData>(),
@@ -55,7 +56,8 @@ StyleRareInheritedData::StyleRareInheritedData(const StyleRareInheritedData& o)
       khtmlLineBreak(o.khtmlLineBreak),
       textSizeAdjust(o.textSizeAdjust),
       resize(o.resize),
-      userSelect(o.userSelect) {}
+      userSelect(o.userSelect),
+      colorSpace(o.colorSpace) {}
 
 StyleRareInheritedData::~StyleRareInheritedData() {
   delete textShadow;
@@ -70,7 +72,7 @@ bool StyleRareInheritedData::operator==(const StyleRareInheritedData& o) const {
          wordWrap == o.wordWrap && nbspMode == o.nbspMode &&
          khtmlLineBreak == o.khtmlLineBreak &&
          textSizeAdjust == o.textSizeAdjust && resize == o.resize &&
-         userSelect == o.userSelect;
+         userSelect == o.userSelect && colorSpace == o.colorSpace;
 }
 
 bool StyleRareInheritedData::shadowDataEquivalent(

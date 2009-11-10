@@ -968,7 +968,9 @@ void GraphicsContext::drawConvexPolygon(size_t npoints,
   }
 }
 
-void GraphicsContext::fillRect(const FloatRect& rect, const Color& color) {
+void GraphicsContext::fillRect(const FloatRect& rect,
+                               const Color& color,
+                               ColorSpace colorSpace) {
   if (paintingDisabled() || !m_data->m_opacity)
     return;
 
@@ -1075,11 +1077,13 @@ void GraphicsContext::drawLineForMisspellingOrBadGrammar(const IntPoint&,
   notImplemented();
 }
 
-void GraphicsContext::setPlatformFillColor(const Color& col) {
+void GraphicsContext::setPlatformFillColor(const Color& col,
+                                           ColorSpace colorSpace) {
   notImplemented();
 }
 
-void GraphicsContext::setPlatformStrokeColor(const Color& col) {
+void GraphicsContext::setPlatformStrokeColor(const Color& col,
+                                             ColorSpace colorSpace) {
   notImplemented();
 }
 
@@ -1107,7 +1111,7 @@ void GraphicsContext::clearRect(const FloatRect& rect) {
     return;
   }
 
-  fillRect(rect, Color(Color::white));
+  fillRect(rect, Color(Color::white), DeviceColorSpace);
 }
 
 void GraphicsContext::strokeRect(const FloatRect& rect, float width) {
@@ -1237,7 +1241,8 @@ void GraphicsContext::fillRoundedRect(const IntRect& fillRect,
                                       const IntSize& topRight,
                                       const IntSize& bottomLeft,
                                       const IntSize& bottomRight,
-                                      const Color& c) {
+                                      const Color& c,
+                                      ColorSpace colorSpace) {
   ScopeDCProvider dcProvider(m_data);
   if (!m_data->m_dc)
     return;
@@ -1460,7 +1465,7 @@ void GraphicsContext::fillRect(const FloatRect& r, const Gradient* gradient) {
   if (numStops == 1) {
     const Gradient::ColorStop& stop = stops.first();
     Color color(stop.red, stop.green, stop.blue, stop.alpha);
-    fillRect(r, color);
+    fillRect(r, color, DeviceColorSpace);
     return;
   }
 
@@ -1552,10 +1557,13 @@ void GraphicsContext::fillRect(const FloatRect& rect) {
   if (m_common->state.fillType == GradientType && m_common->state.fillGradient)
     fillRect(rect, m_common->state.fillGradient.get());
   else
-    fillRect(rect, fillColor());
+    fillRect(rect, fillColor(), DeviceColorSpace);
 }
 
-void GraphicsContext::setPlatformShadow(const IntSize&, int, const Color&) {
+void GraphicsContext::setPlatformShadow(const IntSize&,
+                                        int,
+                                        const Color&,
+                                        ColorSpace colorSpace) {
   notImplemented();
 }
 

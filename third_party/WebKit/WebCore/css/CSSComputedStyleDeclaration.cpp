@@ -106,11 +106,11 @@ static const int computedProperties[] = {
     CSSPropertyWebkitBoxOrdinalGroup, CSSPropertyWebkitBoxOrient,
     CSSPropertyWebkitBoxPack, CSSPropertyWebkitBoxReflect,
     CSSPropertyWebkitBoxShadow, CSSPropertyWebkitBoxSizing,
-    CSSPropertyWebkitColumnBreakAfter, CSSPropertyWebkitColumnBreakBefore,
-    CSSPropertyWebkitColumnBreakInside, CSSPropertyWebkitColumnCount,
-    CSSPropertyWebkitColumnGap, CSSPropertyWebkitColumnRuleColor,
-    CSSPropertyWebkitColumnRuleStyle, CSSPropertyWebkitColumnRuleWidth,
-    CSSPropertyWebkitColumnWidth,
+    CSSPropertyWebkitColorCorrection, CSSPropertyWebkitColumnBreakAfter,
+    CSSPropertyWebkitColumnBreakBefore, CSSPropertyWebkitColumnBreakInside,
+    CSSPropertyWebkitColumnCount, CSSPropertyWebkitColumnGap,
+    CSSPropertyWebkitColumnRuleColor, CSSPropertyWebkitColumnRuleStyle,
+    CSSPropertyWebkitColumnRuleWidth, CSSPropertyWebkitColumnWidth,
 #if ENABLE(DASHBOARD_SUPPORT)
     CSSPropertyWebkitDashboardRegion,
 #endif
@@ -1400,6 +1400,8 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       return getTimingFunctionValue(style->transitions());
     case CSSPropertyPointerEvents:
       return CSSPrimitiveValue::create(style->pointerEvents());
+    case CSSPropertyWebkitColorCorrection:
+      return CSSPrimitiveValue::create(style->colorSpace());
 
     /* Shorthand properties, currently not supported see bug 13658*/
     case CSSPropertyBackground:

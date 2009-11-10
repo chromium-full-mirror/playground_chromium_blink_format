@@ -736,7 +736,7 @@ void RenderObject::drawLineForBoxSide(GraphicsContext* graphicsContext,
       return;
     case DOTTED:
     case DASHED:
-      graphicsContext->setStrokeColor(c);
+      graphicsContext->setStrokeColor(c, m_style->colorSpace());
       graphicsContext->setStrokeThickness(width);
       graphicsContext->setStrokeStyle(style == DASHED ? DashedStroke
                                                       : DottedStroke);
@@ -760,7 +760,7 @@ void RenderObject::drawLineForBoxSide(GraphicsContext* graphicsContext,
 
       if (adjbw1 == 0 && adjbw2 == 0) {
         graphicsContext->setStrokeStyle(NoStroke);
-        graphicsContext->setFillColor(c);
+        graphicsContext->setFillColor(c, m_style->colorSpace());
         switch (s) {
           case BSTop:
           case BSBottom:
@@ -892,7 +892,7 @@ void RenderObject::drawLineForBoxSide(GraphicsContext* graphicsContext,
     // fall through
     case SOLID: {
       graphicsContext->setStrokeStyle(NoStroke);
-      graphicsContext->setFillColor(c);
+      graphicsContext->setFillColor(c, m_style->colorSpace());
       ASSERT(x2 >= x1);
       ASSERT(y2 >= y1);
       if (!adjbw1 && !adjbw2) {
@@ -961,7 +961,7 @@ void RenderObject::drawArcForBoxSide(GraphicsContext* graphicsContext,
       return;
     case DOTTED:
     case DASHED:
-      graphicsContext->setStrokeColor(c);
+      graphicsContext->setStrokeColor(c, m_style->colorSpace());
       graphicsContext->setStrokeStyle(style == DOTTED ? DottedStroke
                                                       : DashedStroke);
       graphicsContext->setStrokeThickness(thickness);
@@ -987,7 +987,7 @@ void RenderObject::drawArcForBoxSide(GraphicsContext* graphicsContext,
       }
 
       graphicsContext->setStrokeStyle(SolidStroke);
-      graphicsContext->setStrokeColor(c);
+      graphicsContext->setStrokeColor(c, m_style->colorSpace());
       graphicsContext->setStrokeThickness(third);
       graphicsContext->strokeArc(
           IntRect(x, outerY, radius.width() * 2, outerHeight), angleStart,
@@ -1011,7 +1011,7 @@ void RenderObject::drawArcForBoxSide(GraphicsContext* graphicsContext,
       }
 
       graphicsContext->setStrokeStyle(SolidStroke);
-      graphicsContext->setStrokeColor(c);
+      graphicsContext->setStrokeColor(c, m_style->colorSpace());
       graphicsContext->setStrokeThickness(thickness);
       graphicsContext->strokeArc(
           IntRect(x, y, radius.width() * 2, radius.height() * 2), angleStart,
@@ -1019,7 +1019,7 @@ void RenderObject::drawArcForBoxSide(GraphicsContext* graphicsContext,
 
       float halfThickness = (thickness + 1.0f) / 4.0f;
       int shiftForInner = static_cast<int>(halfThickness * 1.5f);
-      graphicsContext->setStrokeColor(c2);
+      graphicsContext->setStrokeColor(c2, m_style->colorSpace());
       graphicsContext->setStrokeThickness(halfThickness > 2 ? halfThickness - 1
                                                             : halfThickness);
       graphicsContext->strokeArc(IntRect(x + shiftForInner, y + shiftForInner,
@@ -1036,7 +1036,7 @@ void RenderObject::drawArcForBoxSide(GraphicsContext* graphicsContext,
         c = c.dark();
     case SOLID:
       graphicsContext->setStrokeStyle(SolidStroke);
-      graphicsContext->setStrokeColor(c);
+      graphicsContext->setStrokeColor(c, m_style->colorSpace());
       graphicsContext->setStrokeThickness(thickness);
       graphicsContext->strokeArc(
           IntRect(x, y, radius.width() * 2, radius.height() * 2), angleStart,

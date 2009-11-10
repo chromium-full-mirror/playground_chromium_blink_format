@@ -141,7 +141,9 @@ void GraphicsContext::drawConvexPolygon(size_t pointsLength,
                                   getHaikuStrokeStyle());
 }
 
-void GraphicsContext::fillRect(const FloatRect& rect, const Color& color) {
+void GraphicsContext::fillRect(const FloatRect& rect,
+                               const Color& color,
+                               ColorSpace colorSpace) {
   if (paintingDisabled())
     return;
 
@@ -161,7 +163,8 @@ void GraphicsContext::fillRoundedRect(const IntRect& rect,
                                       const IntSize& topRight,
                                       const IntSize& bottomLeft,
                                       const IntSize& bottomRight,
-                                      const Color& color) {
+                                      const Color& color,
+                                      ColorSpace colorSpace) {
   if (paintingDisabled() || !color.alpha())
     return;
 
@@ -443,7 +446,8 @@ void GraphicsContext::setPlatformFont(const Font& font) {
   m_data->m_view->SetFont(font.primaryFont()->platformData().font());
 }
 
-void GraphicsContext::setPlatformStrokeColor(const Color& color) {
+void GraphicsContext::setPlatformStrokeColor(const Color& color,
+                                             ColorSPace colorSpace) {
   if (paintingDisabled())
     return;
 
@@ -481,7 +485,8 @@ void GraphicsContext::setPlatformStrokeThickness(float thickness) {
   m_data->m_view->SetPenSize(thickness);
 }
 
-void GraphicsContext::setPlatformFillColor(const Color& color) {
+void GraphicsContext::setPlatformFillColor(const Color& color,
+                                           ColorSpace colorSpace) {
   if (paintingDisabled())
     return;
 

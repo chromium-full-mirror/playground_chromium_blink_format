@@ -156,7 +156,8 @@ void RenderReplaced::paint(PaintInfo& paintInfo, int tx, int ty) {
     IntRect selectionPaintingRect = localSelectionRect();
     selectionPaintingRect.move(tx, ty);
     paintInfo.context->fillRect(selectionPaintingRect,
-                                selectionBackgroundColor());
+                                selectionBackgroundColor(),
+                                style()->colorSpace());
   }
 }
 

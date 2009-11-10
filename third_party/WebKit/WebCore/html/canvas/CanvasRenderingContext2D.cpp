@@ -1621,9 +1621,9 @@ void CanvasRenderingContext2D::drawTextInternal(const String& text,
     GraphicsContext* maskImageContext = maskImage->context();
 
     if (fill)
-      maskImageContext->setFillColor(Color::black);
+      maskImageContext->setFillColor(Color::black, DeviceColorSpace);
     else {
-      maskImageContext->setStrokeColor(Color::black);
+      maskImageContext->setStrokeColor(Color::black, DeviceColorSpace);
       maskImageContext->setStrokeThickness(c->strokeThickness());
     }
 
