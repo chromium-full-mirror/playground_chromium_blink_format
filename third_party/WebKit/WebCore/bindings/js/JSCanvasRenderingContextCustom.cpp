@@ -29,8 +29,8 @@
 #include "CanvasRenderingContext2D.h"
 #include "JSCanvasRenderingContext2D.h"
 #if ENABLE(3D_CANVAS)
-#include "CanvasRenderingContext3D.h"
-#include "JSCanvasRenderingContext3D.h"
+#include "WebGLRenderingContext.h"
+#include "JSWebGLRenderingContext.h"
 #endif
 
 using namespace JSC;
@@ -45,8 +45,8 @@ JSC::JSValue toJS(JSC::ExecState* exec,
 
 #if ENABLE(3D_CANVAS)
   if (object->is3d())
-    return getDOMObjectWrapper<JSCanvasRenderingContext3D>(
-        exec, globalObject, static_cast<CanvasRenderingContext3D*>(object));
+    return getDOMObjectWrapper<JSWebGLRenderingContext>(
+        exec, globalObject, static_cast<WebGLRenderingContext*>(object));
 #endif
   ASSERT(object->is2d());
   return getDOMObjectWrapper<JSCanvasRenderingContext2D>(

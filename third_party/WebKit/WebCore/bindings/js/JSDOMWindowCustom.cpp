@@ -53,14 +53,14 @@
 #endif
 
 #if ENABLE(3D_CANVAS)
-#include "JSCanvasArrayBufferConstructor.h"
-#include "JSCanvasByteArrayConstructor.h"
-#include "JSCanvasUnsignedByteArrayConstructor.h"
-#include "JSCanvasIntArrayConstructor.h"
-#include "JSCanvasUnsignedIntArrayConstructor.h"
-#include "JSCanvasShortArrayConstructor.h"
-#include "JSCanvasUnsignedShortArrayConstructor.h"
-#include "JSCanvasFloatArrayConstructor.h"
+#include "JSWebGLArrayBufferConstructor.h"
+#include "JSWebGLByteArrayConstructor.h"
+#include "JSWebGLUnsignedByteArrayConstructor.h"
+#include "JSWebGLIntArrayConstructor.h"
+#include "JSWebGLUnsignedIntArrayConstructor.h"
+#include "JSWebGLShortArrayConstructor.h"
+#include "JSWebGLUnsignedShortArrayConstructor.h"
+#include "JSWebGLFloatArrayConstructor.h"
 #endif
 #include "JSWebKitCSSMatrixConstructor.h"
 #include "JSWebKitPointConstructor.h"
@@ -740,36 +740,36 @@ JSValue JSDOMWindow::webKitCSSMatrix(ExecState* exec) const {
 }
 
 #if ENABLE(3D_CANVAS)
-JSValue JSDOMWindow::canvasArrayBuffer(ExecState* exec) const {
-  return getDOMConstructor<JSCanvasArrayBufferConstructor>(exec, this);
+JSValue JSDOMWindow::webGLArrayBuffer(ExecState* exec) const {
+  return getDOMConstructor<JSWebGLArrayBufferConstructor>(exec, this);
 }
 
-JSValue JSDOMWindow::canvasByteArray(ExecState* exec) const {
-  return getDOMConstructor<JSCanvasByteArrayConstructor>(exec, this);
+JSValue JSDOMWindow::webGLByteArray(ExecState* exec) const {
+  return getDOMConstructor<JSWebGLByteArrayConstructor>(exec, this);
 }
 
-JSValue JSDOMWindow::canvasUnsignedByteArray(ExecState* exec) const {
-  return getDOMConstructor<JSCanvasUnsignedByteArrayConstructor>(exec, this);
+JSValue JSDOMWindow::webGLUnsignedByteArray(ExecState* exec) const {
+  return getDOMConstructor<JSWebGLUnsignedByteArrayConstructor>(exec, this);
 }
 
-JSValue JSDOMWindow::canvasIntArray(ExecState* exec) const {
-  return getDOMConstructor<JSCanvasIntArrayConstructor>(exec, this);
+JSValue JSDOMWindow::webGLIntArray(ExecState* exec) const {
+  return getDOMConstructor<JSWebGLIntArrayConstructor>(exec, this);
 }
 
-JSValue JSDOMWindow::canvasUnsignedIntArray(ExecState* exec) const {
-  return getDOMConstructor<JSCanvasUnsignedIntArrayConstructor>(exec, this);
+JSValue JSDOMWindow::webGLUnsignedIntArray(ExecState* exec) const {
+  return getDOMConstructor<JSWebGLUnsignedIntArrayConstructor>(exec, this);
 }
 
-JSValue JSDOMWindow::canvasShortArray(ExecState* exec) const {
-  return getDOMConstructor<JSCanvasShortArrayConstructor>(exec, this);
+JSValue JSDOMWindow::webGLShortArray(ExecState* exec) const {
+  return getDOMConstructor<JSWebGLShortArrayConstructor>(exec, this);
 }
 
-JSValue JSDOMWindow::canvasUnsignedShortArray(ExecState* exec) const {
-  return getDOMConstructor<JSCanvasUnsignedShortArrayConstructor>(exec, this);
+JSValue JSDOMWindow::webGLUnsignedShortArray(ExecState* exec) const {
+  return getDOMConstructor<JSWebGLUnsignedShortArrayConstructor>(exec, this);
 }
 
-JSValue JSDOMWindow::canvasFloatArray(ExecState* exec) const {
-  return getDOMConstructor<JSCanvasFloatArrayConstructor>(exec, this);
+JSValue JSDOMWindow::webGLFloatArray(ExecState* exec) const {
+  return getDOMConstructor<JSWebGLFloatArrayConstructor>(exec, this);
 }
 #endif
 

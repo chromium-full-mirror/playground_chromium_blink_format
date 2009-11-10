@@ -33,7 +33,7 @@
 
 namespace WebCore {
 
-class CanvasRenderingContext3D;
+class WebGLRenderingContext;
 
 class CanvasObject : public RefCounted<CanvasObject> {
  public:
@@ -48,15 +48,15 @@ class CanvasObject : public RefCounted<CanvasObject> {
     m_context = 0;
   }
 
-  CanvasRenderingContext3D* context() const { return m_context; }
+  WebGLRenderingContext* context() const { return m_context; }
 
  protected:
-  CanvasObject(CanvasRenderingContext3D*);
+  CanvasObject(WebGLRenderingContext*);
   virtual void _deleteObject(Platform3DObject) = 0;
 
  private:
   Platform3DObject m_object;
-  CanvasRenderingContext3D* m_context;
+  WebGLRenderingContext* m_context;
 };
 
 }  // namespace WebCore
