@@ -54,8 +54,8 @@ CALLBACK_FUNC_DECL(HTMLCanvasElementGetContext) {
         V8ClassIndex::CANVASRENDERINGCONTEXT2D, result);
 #if ENABLE(3D_CANVAS)
   else if (result->is3d())
-    return V8DOMWrapper::convertToV8Object(
-        V8ClassIndex::CANVASRENDERINGCONTEXT3D, result);
+    return V8DOMWrapper::convertToV8Object(V8ClassIndex::WEBGLRENDERINGCONTEXT,
+                                           result);
 #endif
   ASSERT_NOT_REACHED();
   return v8::Undefined();
