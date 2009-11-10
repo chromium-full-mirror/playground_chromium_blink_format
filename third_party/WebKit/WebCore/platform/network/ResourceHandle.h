@@ -92,8 +92,12 @@ class SharedBuffer;
 template <typename T>
 class Timer;
 
-class ResourceHandle : public RefCounted<ResourceHandle>,
-                       public AuthenticationClient {
+class ResourceHandle : public RefCounted<ResourceHandle>
+#if PLATFORM(MAC) || USE(CFNETWORK) || USE(CURL)
+                       ,
+                       public AuthenticationClient
+#endif
+{
  private:
   ResourceHandle(const ResourceRequest&,
                  ResourceHandleClient*,
