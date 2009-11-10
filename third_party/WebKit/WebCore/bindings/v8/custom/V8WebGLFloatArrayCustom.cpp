@@ -47,7 +47,7 @@ CALLBACK_FUNC_DECL(WebGLFloatArrayConstructor) {
   INC_STATS("DOM.WebGLFloatArray.Contructor");
 
   return constructCanvasArray<WebGLFloatArray>(
-      args, V8ClassIndex::ToInt(V8ClassIndex::CANVASFLOATARRAY));
+      args, V8ClassIndex::ToInt(V8ClassIndex::WEBGLFLOATARRAY));
 }
 
 // Get the specified value from the array and return it wrapped as a JavaScript
@@ -56,7 +56,7 @@ CALLBACK_FUNC_DECL(WebGLFloatArrayConstructor) {
 INDEXED_PROPERTY_GETTER(WebGLFloatArray) {
   INC_STATS("DOM.WebGLFloatArray.IndexedPropertyGetter");
   WebGLFloatArray* array = V8DOMWrapper::convertToNativeObject<WebGLFloatArray>(
-      V8ClassIndex::CANVASFLOATARRAY, info.Holder());
+      V8ClassIndex::WEBGLFLOATARRAY, info.Holder());
 
   if ((index < 0) || (index >= array->length()))
     return v8::Undefined();
@@ -71,7 +71,7 @@ INDEXED_PROPERTY_GETTER(WebGLFloatArray) {
 INDEXED_PROPERTY_SETTER(WebGLFloatArray) {
   INC_STATS("DOM.WebGLFloatArray.IndexedPropertySetter");
   WebGLFloatArray* array = V8DOMWrapper::convertToNativeObject<WebGLFloatArray>(
-      V8ClassIndex::CANVASFLOATARRAY, info.Holder());
+      V8ClassIndex::WEBGLFLOATARRAY, info.Holder());
 
   if ((index >= 0) && (index < array->length()))
     array->set(index, value->NumberValue());

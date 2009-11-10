@@ -71,7 +71,7 @@ v8::Handle<v8::Value> constructCanvasArray(const v8::Arguments& args,
 
     WebGLArrayBuffer* buf =
         V8DOMWrapper::convertToNativeObject<WebGLArrayBuffer>(
-            V8ClassIndex::CANVASARRAYBUFFER, args[0]->ToObject());
+            V8ClassIndex::WEBGLARRAYBUFFER, args[0]->ToObject());
     if (buf == NULL)
       return throwError("Could not convert argument 0 to a WebGLArrayBuffer");
     bool ok;

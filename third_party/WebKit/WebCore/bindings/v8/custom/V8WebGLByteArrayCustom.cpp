@@ -47,7 +47,7 @@ CALLBACK_FUNC_DECL(WebGLByteArrayConstructor) {
   INC_STATS("DOM.WebGLByteArray.Contructor");
 
   return constructCanvasArray<WebGLByteArray>(
-      args, V8ClassIndex::ToInt(V8ClassIndex::CANVASBYTEARRAY));
+      args, V8ClassIndex::ToInt(V8ClassIndex::WEBGLBYTEARRAY));
 }
 
 // Get the specified value from the byte buffer and return it wrapped as a
@@ -57,7 +57,7 @@ INDEXED_PROPERTY_GETTER(WebGLByteArray) {
   INC_STATS("DOM.WebGLByteArray.IndexedPropertyGetter");
   WebGLByteArray* byteBuffer =
       V8DOMWrapper::convertToNativeObject<WebGLByteArray>(
-          V8ClassIndex::CANVASBYTEARRAY, info.Holder());
+          V8ClassIndex::WEBGLBYTEARRAY, info.Holder());
 
   if ((index < 0) || (index >= byteBuffer->length()))
     return v8::Undefined();
@@ -72,7 +72,7 @@ INDEXED_PROPERTY_GETTER(WebGLByteArray) {
 INDEXED_PROPERTY_SETTER(WebGLByteArray) {
   INC_STATS("DOM.WebGLByteArray.IndexedPropertySetter");
   WebGLByteArray* array = V8DOMWrapper::convertToNativeObject<WebGLByteArray>(
-      V8ClassIndex::CANVASBYTEARRAY, info.Holder());
+      V8ClassIndex::WEBGLBYTEARRAY, info.Holder());
 
   if ((index >= 0) && (index < array->length())) {
     if (!value->IsNumber())

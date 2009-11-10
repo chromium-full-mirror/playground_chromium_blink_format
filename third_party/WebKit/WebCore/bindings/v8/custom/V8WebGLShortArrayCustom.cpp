@@ -47,7 +47,7 @@ CALLBACK_FUNC_DECL(WebGLShortArrayConstructor) {
   INC_STATS("DOM.WebGLShortArray.Contructor");
 
   return constructCanvasArray<WebGLShortArray>(
-      args, V8ClassIndex::ToInt(V8ClassIndex::CANVASSHORTARRAY));
+      args, V8ClassIndex::ToInt(V8ClassIndex::WEBGLSHORTARRAY));
 }
 
 // Get the specified value from the array and return it wrapped as a JavaScript
@@ -56,7 +56,7 @@ CALLBACK_FUNC_DECL(WebGLShortArrayConstructor) {
 INDEXED_PROPERTY_GETTER(WebGLShortArray) {
   INC_STATS("DOM.WebGLShortArray.IndexedPropertyGetter");
   WebGLShortArray* array = V8DOMWrapper::convertToNativeObject<WebGLShortArray>(
-      V8ClassIndex::CANVASSHORTARRAY, info.Holder());
+      V8ClassIndex::WEBGLSHORTARRAY, info.Holder());
 
   if ((index < 0) || (index >= array->length()))
     return v8::Undefined();
@@ -71,7 +71,7 @@ INDEXED_PROPERTY_GETTER(WebGLShortArray) {
 INDEXED_PROPERTY_SETTER(WebGLShortArray) {
   INC_STATS("DOM.WebGLShortArray.IndexedPropertySetter");
   WebGLShortArray* array = V8DOMWrapper::convertToNativeObject<WebGLShortArray>(
-      V8ClassIndex::CANVASSHORTARRAY, info.Holder());
+      V8ClassIndex::WEBGLSHORTARRAY, info.Holder());
 
   if ((index >= 0) && (index < array->length())) {
     if (!value->IsNumber())

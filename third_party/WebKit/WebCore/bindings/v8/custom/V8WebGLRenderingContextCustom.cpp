@@ -2,7 +2,8 @@
  * Copyright (C) 2009 Google Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
+ * modification, are permitted provided that the following conditions
+ * areV8ClassIndex::WEBGL
  * met:
  *
  *     * Redistributions of source code must retain the above copyright
@@ -124,7 +125,7 @@ CALLBACK_FUNC_DECL(WebGLRenderingContextBufferData) {
     context->bufferData(target, size, usage);
   } else if (V8WebGLArray::HasInstance(args[1])) {
     WebGLArray* array = V8DOMWrapper::convertToNativeObject<WebGLArray>(
-        V8ClassIndex::CANVASARRAY, args[1]->ToObject());
+        V8ClassIndex::WEBGLARRAY, args[1]->ToObject());
     context->bufferData(target, array, usage);
   } else {
     V8Proxy::setDOMException(SYNTAX_ERR);
@@ -162,7 +163,7 @@ CALLBACK_FUNC_DECL(WebGLRenderingContextBufferSubData) {
     return notHandledByInterceptor();
   }
   WebGLArray* array = V8DOMWrapper::convertToNativeObject<WebGLArray>(
-      V8ClassIndex::CANVASARRAY, args[2]->ToObject());
+      V8ClassIndex::WEBGLARRAY, args[2]->ToObject());
   context->bufferSubData(target, offset, array);
   return v8::Undefined();
 }
@@ -255,7 +256,7 @@ CALLBACK_FUNC_DECL(WebGLRenderingContextTexImage2D) {
     v8::Handle<v8::Value> arg = args[8];
     if (V8WebGLArray::HasInstance(arg)) {
       WebGLArray* array = V8DOMWrapper::convertToNativeObject<WebGLArray>(
-          V8ClassIndex::CANVASARRAY, arg->ToObject());
+          V8ClassIndex::WEBGLARRAY, arg->ToObject());
       // FIXME: must do validation similar to JOGL's to ensure that
       // the incoming array is of the appropriate length and type
       context->texImage2D(target, level, internalformat, width, height, border,
@@ -335,7 +336,7 @@ static v8::Handle<v8::Value> vertexAttribAndUniformHelperf(
   if (V8WebGLFloatArray::HasInstance(args[1])) {
     WebGLFloatArray* array =
         V8DOMWrapper::convertToNativeObject<WebGLFloatArray>(
-            V8ClassIndex::CANVASFLOATARRAY, args[1]->ToObject());
+            V8ClassIndex::WEBGLFLOATARRAY, args[1]->ToObject());
     ASSERT(array != NULL);
     switch (functionToCall) {
       case kUniform1v:
@@ -442,7 +443,7 @@ static v8::Handle<v8::Value> uniformHelperi(const v8::Arguments& args,
   }
   if (V8WebGLIntArray::HasInstance(args[1])) {
     WebGLIntArray* array = V8DOMWrapper::convertToNativeObject<WebGLIntArray>(
-        V8ClassIndex::CANVASINTARRAY, args[1]->ToObject());
+        V8ClassIndex::WEBGLINTARRAY, args[1]->ToObject());
     ASSERT(array != NULL);
     switch (functionToCall) {
       case kUniform1v:
@@ -569,7 +570,7 @@ static v8::Handle<v8::Value> uniformMatrixHelper(const v8::Arguments& args,
   if (V8WebGLFloatArray::HasInstance(args[2])) {
     WebGLFloatArray* array =
         V8DOMWrapper::convertToNativeObject<WebGLFloatArray>(
-            V8ClassIndex::CANVASFLOATARRAY, args[2]->ToObject());
+            V8ClassIndex::WEBGLFLOATARRAY, args[2]->ToObject());
     ASSERT(array != NULL);
     switch (matrixSize) {
       case 2:

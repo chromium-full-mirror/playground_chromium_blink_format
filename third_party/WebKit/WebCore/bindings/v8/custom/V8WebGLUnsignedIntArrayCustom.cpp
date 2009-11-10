@@ -47,7 +47,7 @@ CALLBACK_FUNC_DECL(WebGLUnsignedIntArrayConstructor) {
   INC_STATS("DOM.WebGLUnsignedIntArray.Contructor");
 
   return constructCanvasArray<WebGLUnsignedIntArray>(
-      args, V8ClassIndex::ToInt(V8ClassIndex::CANVASUNSIGNEDINTARRAY));
+      args, V8ClassIndex::ToInt(V8ClassIndex::WEBGLUNSIGNEDINTARRAY));
 }
 
 // Get the specified value from the integer array and return it wrapped as a
@@ -57,7 +57,7 @@ INDEXED_PROPERTY_GETTER(WebGLUnsignedIntArray) {
   INC_STATS("DOM.WebGLUnsignedIntArray.IndexedPropertyGetter");
   WebGLUnsignedIntArray* array =
       V8DOMWrapper::convertToNativeObject<WebGLUnsignedIntArray>(
-          V8ClassIndex::CANVASUNSIGNEDINTARRAY, info.Holder());
+          V8ClassIndex::WEBGLUNSIGNEDINTARRAY, info.Holder());
 
   if ((index < 0) || (index >= array->length()))
     return v8::Undefined();
@@ -73,7 +73,7 @@ INDEXED_PROPERTY_SETTER(WebGLUnsignedIntArray) {
   INC_STATS("DOM.WebGLUnsignedIntArray.IndexedPropertySetter");
   WebGLUnsignedIntArray* array =
       V8DOMWrapper::convertToNativeObject<WebGLUnsignedIntArray>(
-          V8ClassIndex::CANVASUNSIGNEDINTARRAY, info.Holder());
+          V8ClassIndex::WEBGLUNSIGNEDINTARRAY, info.Holder());
 
   if ((index >= 0) && (index < array->length())) {
     if (!value->IsNumber())

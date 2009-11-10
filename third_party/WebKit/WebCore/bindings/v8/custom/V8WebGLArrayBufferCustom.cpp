@@ -64,7 +64,7 @@ CALLBACK_FUNC_DECL(WebGLArrayBufferConstructor) {
   RefPtr<WebGLArrayBuffer> buffer = WebGLArrayBuffer::create(len);
   // Transform the holder into a wrapper object for the array.
   V8DOMWrapper::setDOMWrapper(
-      args.Holder(), V8ClassIndex::ToInt(V8ClassIndex::CANVASARRAYBUFFER),
+      args.Holder(), V8ClassIndex::ToInt(V8ClassIndex::WEBGLARRAYBUFFER),
       buffer.get());
   return toV8(buffer.release(), args.Holder());
 }
