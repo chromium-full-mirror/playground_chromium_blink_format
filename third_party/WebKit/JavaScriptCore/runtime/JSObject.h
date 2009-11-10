@@ -274,6 +274,10 @@ class JSObject : public JSCell {
     return Structure::create(prototype, TypeInfo(ObjectType, StructureFlags));
   }
 
+  void flattenDictionaryObject() {
+    m_structure->flattenDictionaryStructure(this);
+  }
+
  protected:
   static const unsigned StructureFlags = 0;
 

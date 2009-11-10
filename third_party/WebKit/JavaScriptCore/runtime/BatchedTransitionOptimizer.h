@@ -40,10 +40,7 @@ class BatchedTransitionOptimizer : public Noncopyable {
           Structure::toCacheableDictionaryTransition(m_object->structure()));
   }
 
-  ~BatchedTransitionOptimizer() {
-    m_object->setStructure(
-        Structure::fromDictionaryTransition(m_object->structure()));
-  }
+  ~BatchedTransitionOptimizer() { m_object->flattenDictionaryObject(); }
 
  private:
   JSObject* m_object;

@@ -830,8 +830,7 @@ NEVER_INLINE void JITThunks::tryCacheGetByID(CallFrame* callFrame,
     // Since we're accessing a prototype in a loop, it's a good bet that it
     // should not be treated as a dictionary.
     if (slotBaseObject->structure()->isDictionary())
-      slotBaseObject->setStructure(
-          Structure::fromDictionaryTransition(slotBaseObject->structure()));
+      slotBaseObject->flattenDictionaryObject();
 
     stubInfo->initGetByIdProto(structure, slotBaseObject->structure());
 
@@ -1258,8 +1257,7 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_get_by_id_method_check) {
     // Since we're accessing a prototype in a loop, it's a good bet that it
     // should not be treated as a dictionary.
     if (slotBaseObject->structure()->isDictionary())
-      slotBaseObject->setStructure(
-          Structure::fromDictionaryTransition(slotBaseObject->structure()));
+      slotBaseObject->flattenDictionaryObject();
 
     // The result fetched should always be the callee!
     ASSERT(result == JSValue(callee));
@@ -1436,8 +1434,7 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_get_by_id_proto_list) {
     // Since we're accessing a prototype in a loop, it's a good bet that it
     // should not be treated as a dictionary.
     if (slotBaseObject->structure()->isDictionary())
-      slotBaseObject->setStructure(
-          Structure::fromDictionaryTransition(slotBaseObject->structure()));
+      slotBaseObject->flattenDictionaryObject();
 
     int listIndex;
     PolymorphicAccessStructureList* prototypeStructureList =
