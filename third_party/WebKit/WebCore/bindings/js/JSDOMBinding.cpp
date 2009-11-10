@@ -47,6 +47,7 @@
 #include "KURL.h"
 #include "MessagePort.h"
 #include "RangeException.h"
+#include "ScriptCachedFrameData.h"
 #include "ScriptController.h"
 #include "Settings.h"
 #include "XMLHttpRequestException.h"
@@ -159,6 +160,10 @@ DOMWrapperWorld::~DOMWrapperWorld() {
   for (HashSet<ScriptController*>::iterator iter =
            scriptControllersWithShells.begin();
        iter != scriptControllersWithShells.end(); ++iter)
+    (*iter)->forgetWorld(this);
+  for (HashSet<ScriptCachedFrameData*>::iterator iter =
+           backForwardCachesWithShells.begin();
+       iter != backForwardCachesWithShells.end(); ++iter)
     (*iter)->forgetWorld(this);
 }
 

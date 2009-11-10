@@ -44,6 +44,7 @@ class KURL;
 class Node;
 class String;
 class ScriptController;
+class ScriptCachedFrameData;
 
 typedef int ExceptionCode;
 
@@ -160,6 +161,12 @@ class DOMWrapperWorld : public RefCounted<DOMWrapperWorld> {
   void forgetScriptController(ScriptController* scriptController) {
     scriptControllersWithShells.remove(scriptController);
   }
+  void rememberScriptCachedFrameData(ScriptCachedFrameData* backForwardCache) {
+    backForwardCachesWithShells.add(backForwardCache);
+  }
+  void forgetScriptCachedFrameData(ScriptCachedFrameData* backForwardCache) {
+    backForwardCachesWithShells.remove(backForwardCache);
+  }
 
   // FIXME: can we make this private?
   DOMObjectWrapperMap m_wrappers;
@@ -168,6 +175,7 @@ class DOMWrapperWorld : public RefCounted<DOMWrapperWorld> {
   JSC::JSGlobalData* m_globalData;
   HashSet<Document*> documentsWithWrappers;
   HashSet<ScriptController*> scriptControllersWithShells;
+  HashSet<ScriptCachedFrameData*> backForwardCachesWithShells;
 };
 
 // Map from static HashTable instances to per-GlobalData ones.
