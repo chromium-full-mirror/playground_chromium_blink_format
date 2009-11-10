@@ -97,7 +97,6 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
   void setSize(const IntSize&);
 
   void loadStateChanged();
-  void rateChanged();
   void sizeChanged();
   void timeChanged();
   void volumeChanged();
@@ -134,6 +133,7 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
   GstElement* m_videoSink;
   GstElement* m_source;
   GstClockTime m_seekTime;
+  bool m_changingRate;
   float m_endTime;
   bool m_isEndReached;
   MediaPlayer::NetworkState m_networkState;
