@@ -82,10 +82,6 @@ ScriptController::ScriptController(Frame* frame)
 
 ScriptController::~ScriptController() {
   if (!m_windowShells.isEmpty()) {
-    for (ShellMap::iterator iter = m_windowShells.begin();
-         iter != m_windowShells.end(); ++iter)
-      iter->first->forgetScriptController(this);
-
     m_windowShells.clear();
 
     // It's likely that releasing the global object has created a lot of
@@ -226,7 +222,7 @@ void ScriptController::clearWindowShell() {
 
   for (ShellMap::iterator iter = m_windowShells.begin();
        iter != m_windowShells.end(); ++iter) {
-    DOMWrapperWorld* world = iter->first;
+    DOMWrapperWorld* world = iter->first.get();
     JSDOMWindowShell* windowShell = iter->second;
     windowShell->window()->willRemoveFromWindowShell();
     windowShell->setWindow(m_frame->domWindow());
@@ -249,7 +245,6 @@ JSDOMWindowShell* ScriptController::initScript(DOMWrapperWorld* world) {
 
   JSDOMWindowShell* windowShell = new JSDOMWindowShell(m_frame->domWindow());
   m_windowShells.add(world, windowShell);
-  world->rememberScriptController(this);
   windowShell->window()->updateDocument(world);
 
   if (Page* page = m_frame->page()) {
@@ -355,7 +350,7 @@ void ScriptController::updateDocument() {
   JSLock lock(SilenceAssertionsOnly);
   for (ShellMap::iterator iter = m_windowShells.begin();
        iter != m_windowShells.end(); ++iter)
-    iter->second->window()->updateDocument(iter->first);
+    iter->second->window()->updateDocument(iter->first.get());
 }
 
 void ScriptController::updateSecurityOrigin() {

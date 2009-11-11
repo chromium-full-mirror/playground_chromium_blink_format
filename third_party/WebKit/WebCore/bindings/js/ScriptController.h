@@ -65,7 +65,8 @@ typedef HashMap<void*, RefPtr<JSC::Bindings::RootObject>> RootObjectMap;
 
 class ScriptController {
   friend class ScriptCachedFrameData;
-  typedef WTF::HashMap<DOMWrapperWorld*, JSC::ProtectedPtr<JSDOMWindowShell>>
+  typedef WTF::HashMap<RefPtr<DOMWrapperWorld>,
+                       JSC::ProtectedPtr<JSDOMWindowShell>>
       ShellMap;
 
  public:
@@ -85,8 +86,6 @@ class ScriptController {
     return windowShell(world)->window();
   }
   JSDOMWindow* globalObject(unsigned worldID);
-
-  void forgetWorld(DOMWrapperWorld* world) { m_windowShells.remove(world); }
 
   ScriptValue executeScript(const ScriptSourceCode&);
   ScriptValue executeScript(const String& script,

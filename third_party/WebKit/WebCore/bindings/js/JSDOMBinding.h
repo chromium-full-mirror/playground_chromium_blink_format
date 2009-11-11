@@ -155,18 +155,6 @@ class DOMWrapperWorld : public RefCounted<DOMWrapperWorld> {
   void forgetDocument(Document* document) {
     documentsWithWrappers.remove(document);
   }
-  void rememberScriptController(ScriptController* scriptController) {
-    scriptControllersWithShells.add(scriptController);
-  }
-  void forgetScriptController(ScriptController* scriptController) {
-    scriptControllersWithShells.remove(scriptController);
-  }
-  void rememberScriptCachedFrameData(ScriptCachedFrameData* backForwardCache) {
-    backForwardCachesWithShells.add(backForwardCache);
-  }
-  void forgetScriptCachedFrameData(ScriptCachedFrameData* backForwardCache) {
-    backForwardCachesWithShells.remove(backForwardCache);
-  }
 
   // FIXME: can we make this private?
   DOMObjectWrapperMap m_wrappers;
@@ -174,8 +162,6 @@ class DOMWrapperWorld : public RefCounted<DOMWrapperWorld> {
  private:
   JSC::JSGlobalData* m_globalData;
   HashSet<Document*> documentsWithWrappers;
-  HashSet<ScriptController*> scriptControllersWithShells;
-  HashSet<ScriptCachedFrameData*> backForwardCachesWithShells;
 };
 
 // Map from static HashTable instances to per-GlobalData ones.

@@ -41,7 +41,7 @@ class DOMWindow;
 class DOMWrapperWorld;
 
 class ScriptCachedFrameData {
-  typedef HashMap<DOMWrapperWorld*, JSC::ProtectedPtr<JSDOMWindow>>
+  typedef HashMap<RefPtr<DOMWrapperWorld>, JSC::ProtectedPtr<JSDOMWindow>>
       JSDOMWindowSet;
 
  public:
@@ -51,7 +51,6 @@ class ScriptCachedFrameData {
   void restore(Frame*);
   void clear();
   DOMWindow* domWindow() const;
-  void forgetWorld(DOMWrapperWorld*);
 
  private:
   JSDOMWindowSet m_windows;
