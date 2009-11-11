@@ -1219,14 +1219,13 @@ PassRefPtr<Widget> FrameLoaderClientQt::createPlugin(
   if (object) {
     QWidget* widget = qobject_cast<QWidget*>(object);
     if (widget) {
-      QWidget* parentWidget;
+      QWidget* parentWidget = 0;
       if (m_webFrame->page()->d->client)
         parentWidget = qobject_cast<QWidget*>(
             m_webFrame->page()->d->client->pluginParent());
-      else
-        parentWidget = 0;  // The plug-in won't be fully functional because the
-                           // QWebView doesn't exist.
-      widget->setParent(parentWidget);
+      if (parentWidget)  // don't reparent to nothing (i.e. keep whatever parent
+                         // QWebPage::createPlugin() chose.
+        widget->setParent(parentWidget);
       RefPtr<QtPluginWidget> w = adoptRef(new QtPluginWidget());
       w->setPlatformWidget(widget);
       // Make sure it's invisible until properly placed into the layout
@@ -1236,15 +1235,14 @@ PassRefPtr<Widget> FrameLoaderClientQt::createPlugin(
 #if QT_VERSION >= 0x040600
     QGraphicsWidget* graphicsWidget = qobject_cast<QGraphicsWidget*>(object);
     if (graphicsWidget) {
-      QGraphicsObject* parentWidget;
+      QGraphicsObject* parentWidget = 0;
       if (m_webFrame->page()->d->client)
         parentWidget = qobject_cast<QGraphicsObject*>(
             m_webFrame->page()->d->client->pluginParent());
-      else
-        parentWidget = 0;  // The plug-in won't be fully functional because the
-                           // QWebView doesn't exist.
       graphicsWidget->hide();
-      graphicsWidget->setParentItem(parentWidget);
+      if (parentWidget)  // don't reparent to nothing (i.e. keep whatever parent
+                         // QWebPage::createPlugin() chose.
+        graphicsWidget->setParentItem(parentWidget);
       RefPtr<QtPluginGraphicsWidget> w =
           QtPluginGraphicsWidget::create(graphicsWidget);
       // Make sure it's invisible until properly placed into the layout
