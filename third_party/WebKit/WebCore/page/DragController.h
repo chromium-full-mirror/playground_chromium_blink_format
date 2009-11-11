@@ -47,7 +47,7 @@ class PlatformMouseEvent;
 class Range;
 class SelectionController;
 
-class DragController {
+class DragController : public Noncopyable {
  public:
   DragController(Page*, DragClient*);
   ~DragController();

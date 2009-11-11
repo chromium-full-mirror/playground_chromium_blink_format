@@ -100,7 +100,7 @@ static const double deferredRepaintDelayIncrementDuringLoading = 0;
 // returning.
 static const unsigned maxUpdateWidgetsIterations = 2;
 
-struct ScheduledEvent {
+struct ScheduledEvent : Noncopyable {
   RefPtr<Event> m_event;
   RefPtr<Node> m_eventTarget;
 };

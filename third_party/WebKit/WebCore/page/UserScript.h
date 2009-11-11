@@ -34,7 +34,7 @@
 
 namespace WebCore {
 
-class UserScript {
+class UserScript : public Noncopyable {
  public:
   UserScript(const String& source,
              const KURL& url,

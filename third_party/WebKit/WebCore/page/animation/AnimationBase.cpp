@@ -230,7 +230,7 @@ class PropertyWrapperBase;
 static void addShorthandProperties();
 static PropertyWrapperBase* wrapperForProperty(int propertyID);
 
-class PropertyWrapperBase {
+class PropertyWrapperBase : public Noncopyable {
  public:
   PropertyWrapperBase(int prop) : m_prop(prop) {}
 

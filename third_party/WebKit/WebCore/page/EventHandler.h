@@ -211,7 +211,7 @@ class EventHandler : public Noncopyable {
     PerformDragAndDrop
   };
 
-  struct EventHandlerDragState {
+  struct EventHandlerDragState : Noncopyable {
     RefPtr<Node> m_dragSrc;  // element that may be a drag source, for the
                              // current mouse gesture
     bool m_dragSrcIsLink;

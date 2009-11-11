@@ -64,7 +64,7 @@ class ScriptSourceCode;
 // event handlers.
 // * HTMLTokenizer::scriptHandler - used to load external JavaScript scripts.
 //
-class XSSAuditor {
+class XSSAuditor : public Noncopyable {
  public:
   XSSAuditor(Frame*);
   ~XSSAuditor();
