@@ -182,6 +182,9 @@ void SharedWorkerRepository::connect(PassRefPtr<SharedWorker> worker,
     return;
   }
 
+  WebKit::webKitClient()->sharedWorkerRepository()->addSharedWorker(
+      webWorker.get(), getId(document));
+
   // The loader object manages its own lifecycle (and the lifecycles of the two
   // worker objects).
   // It will free itself once loading is completed.
