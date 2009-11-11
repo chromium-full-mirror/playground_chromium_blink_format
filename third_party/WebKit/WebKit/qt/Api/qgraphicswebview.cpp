@@ -42,6 +42,7 @@ class QGraphicsWebViewPrivate : public QWebPageClient {
   virtual void scroll(int dx, int dy, const QRect&);
   virtual void update(const QRect& dirtyRect);
   virtual void setInputMethodEnabled(bool enable);
+  virtual bool inputMethodEnabled() const;
 #if QT_VERSION >= 0x040600
   virtual void setInputMethodHint(Qt::InputMethodHint hint, bool enable);
 #endif
@@ -86,6 +87,14 @@ void QGraphicsWebViewPrivate::update(const QRect& dirtyRect) {
 void QGraphicsWebViewPrivate::setInputMethodEnabled(bool enable) {
 #if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
   q->setFlag(QGraphicsItem::ItemAcceptsInputMethod, enable);
+#endif
+}
+
+bool QGraphicsWebViewPrivate::inputMethodEnabled() const {
+#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
+  return q->flags() & QGraphicsItem::ItemAcceptsInputMethod;
+#else
+  return false;
 #endif
 }
 

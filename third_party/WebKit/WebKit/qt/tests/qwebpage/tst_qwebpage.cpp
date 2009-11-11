@@ -82,6 +82,17 @@ static bool waitForSignal(QObject* obj,
   return timeoutSpy.isEmpty();
 }
 
+class EventSpy : public QObject, public QList<QEvent::Type> {
+  Q_OBJECT
+ public:
+  EventSpy(QObject* objectToSpy) { objectToSpy->installEventFilter(this); }
+
+  virtual bool eventFilter(QObject* receiver, QEvent* event) {
+    append(event->type());
+    return false;
+  }
+};
+
 class tst_QWebPage : public QObject {
   Q_OBJECT
 
@@ -1421,6 +1432,8 @@ void tst_QWebPage::inputMethods() {
       "</body></html>");
   page->mainFrame()->setFocus();
 
+  EventSpy viewEventSpy(container);
+
   QWebElementCollection inputs =
       page->mainFrame()->documentElement().findAll("input");
 
@@ -1431,6 +1444,18 @@ void tst_QWebPage::inputMethods() {
                     inputs.at(0).geometry().center(), Qt::LeftButton,
                     Qt::NoButton, Qt::NoModifier);
   page->event(&evrel);
+
+#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
+  QVERIFY(!viewEventSpy.contains(QEvent::RequestSoftwareInputPanel));
+#endif
+  viewEventSpy.clear();
+
+  page->event(&evpres);
+  page->event(&evrel);
+
+#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
+  QVERIFY(viewEventSpy.contains(QEvent::RequestSoftwareInputPanel));
+#endif
 
   // ImMicroFocus
   QVariant variant = page->inputMethodQuery(Qt::ImMicroFocus);
