@@ -99,10 +99,7 @@ STDMETHODIMP WebDropSource::QueryContinueDrag(BOOL fEscapePressed,
   if (fEscapePressed || !(grfKeyState & (MK_LBUTTON | MK_RBUTTON))) {
     m_dropped = !fEscapePressed;
     return fEscapePressed ? DRAGDROP_S_CANCEL : DRAGDROP_S_DROP;
-  } else if (Page* page = m_webView->page())
-    if (Frame* frame = page->mainFrame())
-      frame->eventHandler()->dragSourceMovedTo(
-          generateMouseEvent(m_webView.get(), true));
+  }
 
   return S_OK;
 }

@@ -171,7 +171,6 @@ class EventHandler : public Noncopyable {
 #if ENABLE(DRAG_SUPPORT)
   bool eventMayStartDrag(const PlatformMouseEvent&) const;
 
-  void dragSourceMovedTo(const PlatformMouseEvent&);
   void dragSourceEndedAt(const PlatformMouseEvent&, DragOperation);
 #endif
 
@@ -228,11 +227,11 @@ class EventHandler : public Noncopyable {
   static EventHandlerDragState& dragState();
   static const double TextDragDelay;
 
-  bool handleDragAndDropForTarget(DragAndDropHandleType,
-                                  Node* target,
-                                  const AtomicString& eventType,
-                                  const PlatformMouseEvent&,
-                                  Clipboard*);
+  bool canHandleDragAndDropForTarget(DragAndDropHandleType,
+                                     Node* target,
+                                     const PlatformMouseEvent&,
+                                     Clipboard*,
+                                     bool* accepted = 0);
 
   PassRefPtr<Clipboard> createDraggingClipboard() const;
 #endif  // ENABLE(DRAG_SUPPORT)
@@ -418,6 +417,7 @@ class EventHandler : public Noncopyable {
 
 #if ENABLE(DRAG_SUPPORT)
   RefPtr<Node> m_dragTarget;
+  bool m_shouldOnlyFireDragOverEvent;
 #endif
 
   RefPtr<HTMLFrameSetElement> m_frameSetBeingResized;
