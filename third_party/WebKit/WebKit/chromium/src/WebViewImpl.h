@@ -124,8 +124,6 @@ class WebViewImpl : public WebView, public RefCounted<WebViewImpl> {
   virtual void dragSourceEndedAt(const WebPoint& clientPoint,
                                  const WebPoint& screenPoint,
                                  WebDragOperation operation);
-  virtual void dragSourceMovedTo(const WebPoint& clientPoint,
-                                 const WebPoint& screenPoint);
   virtual void dragSourceSystemDragEnded();
   virtual WebDragOperation dragTargetDragEnter(
       const WebDragData& dragData,

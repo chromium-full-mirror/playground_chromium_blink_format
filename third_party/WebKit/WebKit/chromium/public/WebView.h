@@ -161,11 +161,6 @@ class WebView : public WebWidget {
                                  const WebPoint& screenPoint,
                                  WebDragOperation operation) = 0;
 
-  // Notifies the WebView that a drag and drop operation is in progress, with
-  // dropable items over the view.
-  virtual void dragSourceMovedTo(const WebPoint& clientPoint,
-                                 const WebPoint& screenPoint) = 0;
-
   // Notfies the WebView that the system drag and drop operation has ended.
   virtual void dragSourceSystemDragEnded() = 0;
 
