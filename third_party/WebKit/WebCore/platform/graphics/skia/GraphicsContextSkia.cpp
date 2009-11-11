@@ -697,7 +697,9 @@ void GraphicsContext::fillRect(const FloatRect& rect) {
   platformContext()->canvas()->drawRect(r, paint);
 }
 
-void GraphicsContext::fillRect(const FloatRect& rect, const Color& color) {
+void GraphicsContext::fillRect(const FloatRect& rect,
+                               const Color& color,
+                               ColorSpace colorSpace) {
   if (paintingDisabled())
     return;
 
@@ -727,7 +729,8 @@ void GraphicsContext::fillRoundedRect(const IntRect& rect,
                                       const IntSize& topRight,
                                       const IntSize& bottomLeft,
                                       const IntSize& bottomRight,
-                                      const Color& color) {
+                                      const Color& color,
+                                      ColorSpace colorSpace) {
   if (paintingDisabled())
     return;
 
@@ -743,7 +746,7 @@ void GraphicsContext::fillRoundedRect(const IntRect& rect,
     // Not all the radii fit, return a rect. This matches the behavior of
     // Path::createRoundedRectangle. Without this we attempt to draw a round
     // shadow for a square box.
-    fillRect(rect, color);
+    fillRect(rect, color, colorSpace);
     return;
   }
 
@@ -902,7 +905,8 @@ void GraphicsContext::setMiterLimit(float limit) {
   platformContext()->setMiterLimit(limit);
 }
 
-void GraphicsContext::setPlatformFillColor(const Color& color) {
+void GraphicsContext::setPlatformFillColor(const Color& color,
+                                           ColorSpace colorSpace) {
   if (paintingDisabled())
     return;
   platformContext()->setFillColor(color.rgb());
@@ -967,7 +971,8 @@ void GraphicsContext::setPlatformShadow(const IntSize& size,
   dl->unref();
 }
 
-void GraphicsContext::setPlatformStrokeColor(const Color& strokecolor) {
+void GraphicsContext::setPlatformStrokeColor(const Color& strokecolor,
+                                             ColorSpace colorSpace) {
   if (paintingDisabled())
     return;
 
