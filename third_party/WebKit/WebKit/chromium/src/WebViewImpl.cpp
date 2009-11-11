@@ -1287,13 +1287,6 @@ void WebViewImpl::dragSourceEndedAt(const WebPoint& clientPoint,
       pme, static_cast<DragOperation>(operation));
 }
 
-void WebViewImpl::dragSourceMovedTo(const WebPoint& clientPoint,
-                                    const WebPoint& screenPoint) {
-  PlatformMouseEvent pme(clientPoint, screenPoint, LeftButton, MouseEventMoved,
-                         0, false, false, false, false, 0);
-  m_page->mainFrame()->eventHandler()->dragSourceMovedTo(pme);
-}
-
 void WebViewImpl::dragSourceSystemDragEnded() {
   // It's possible for us to get this callback while not doing a drag if
   // it's from a previous page that got unloaded.
