@@ -43,11 +43,6 @@ class SocketStreamHandleClient {
  public:
   virtual ~SocketStreamHandleClient() {}
 
-  virtual void willOpenStream(SocketStreamHandle*, const KURL&) {}
-  virtual void willSendData(SocketStreamHandle*,
-                            const char* /*data*/,
-                            int /*length*/) {}
-
   virtual void didOpen(SocketStreamHandle*) {}
   virtual void didClose(SocketStreamHandle*) {}
   virtual void didReceiveData(SocketStreamHandle*,
@@ -62,8 +57,6 @@ class SocketStreamHandleClient {
   virtual void didCancelAuthenticationChallenge(
       SocketStreamHandle*,
       const AuthenticationChallenge&) {}
-  virtual void receivedCancellation(SocketStreamHandle*,
-                                    const AuthenticationChallenge&) {}
 };
 
 }  // namespace WebCore
