@@ -35,6 +35,7 @@
 
 namespace WebCore {
 
+class EventListener;
 class Frame;
 class KURL;
 class ScriptExecutionContext;
@@ -49,6 +50,12 @@ void createHiddenDependency(v8::Handle<v8::Object>,
 void removeHiddenDependency(v8::Handle<v8::Object>,
                             v8::Local<v8::Value>,
                             int cacheIndex);
+
+// Combo create/remove, for generated event-handler-setter bindings:
+void transferHiddenDependency(v8::Handle<v8::Object>,
+                              EventListener* oldValue,
+                              v8::Local<v8::Value> newValue,
+                              int cacheIndex);
 
 bool processingUserGesture();
 bool shouldAllowNavigation(Frame*);
