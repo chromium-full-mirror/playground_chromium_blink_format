@@ -46,6 +46,8 @@ NPError NP_GetValue(void* future, NPPVariable variable, void* value);
 char* NP_GetMIMEDescription(void);
 }
 
+static void executeScript(const PluginObject* obj, const char* script);
+
 static NPError webkit_test_plugin_new_instance(NPMIMEType /*mimetype*/,
                                                NPP instance,
                                                uint16_t /*mode*/,
@@ -79,10 +81,15 @@ static NPError webkit_test_plugin_new_instance(NPMIMEType /*mimetype*/,
         for (int i = 0; i < argc; i++)
           if (strcasecmp(argn[i], "src") == 0)
             pluginLog(instance, "src: %s", argv[i]);
-      } else if (strcasecmp(argn[i], "testwindowopen") == 0)
+      } else if (strcasecmp(argn[i], "cleardocumentduringnew") == 0)
+        executeScript(obj, "document.body.innerHTML = ''");
+      else if (!strcasecmp(argn[i], "ondestroy"))
+        obj->onDestroy = strdup(argv[i]);
+      else if (strcasecmp(argn[i], "testdocumentopenindestroystream") == 0)
+        obj->testDocumentOpenInDestroyStream = TRUE;
+      else if (strcasecmp(argn[i], "testwindowopen") == 0)
         obj->testWindowOpen = TRUE;
     }
-
     instance->pdata = obj;
   }
 
@@ -93,6 +100,11 @@ static NPError webkit_test_plugin_destroy_instance(NPP instance,
                                                    NPSavedData** /*save*/) {
   PluginObject* obj = static_cast<PluginObject*>(instance->pdata);
   if (obj) {
+    if (obj->onDestroy) {
+      executeScript(obj, obj->onDestroy);
+      free(obj->onDestroy);
+    }
+
     if (obj->onStreamLoad)
       free(obj->onStreamLoad);
 
@@ -171,6 +183,11 @@ static NPError webkit_test_plugin_destroy_stream(NPP instance,
 
   if (obj->onStreamDestroy)
     executeScript(obj, obj->onStreamDestroy);
+
+  if (obj->testDocumentOpenInDestroyStream) {
+    testDocumentOpen(instance);
+    obj->testDocumentOpenInDestroyStream = FALSE;
+  }
 
   return NPERR_NO_ERROR;
 }
