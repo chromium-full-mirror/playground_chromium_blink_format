@@ -120,11 +120,7 @@ static RHeap* userChunk = 0;
 #if PLATFORM(DARWIN)
 typedef mach_port_t PlatformThread;
 #elif PLATFORM(WIN_OS)
-struct PlatformThread {
-  PlatformThread(DWORD _id, HANDLE _handle) : id(_id), handle(_handle) {}
-  DWORD id;
-  HANDLE handle;
-};
+typedef HANDLE PlatformThread;
 #endif
 
 class Heap::Thread {
@@ -662,8 +658,7 @@ static inline PlatformThread getCurrentPlatformThread() {
 #if PLATFORM(DARWIN)
   return pthread_mach_thread_np(pthread_self());
 #elif PLATFORM(WIN_OS)
-  HANDLE threadHandle = pthread_getw32threadhandle_np(pthread_self());
-  return PlatformThread(GetCurrentThreadId(), threadHandle);
+  return pthread_getw32threadhandle_np(pthread_self());
 #endif
 }
 
@@ -822,7 +817,7 @@ static inline void suspendThread(const PlatformThread& platformThread) {
 #if PLATFORM(DARWIN)
   thread_suspend(platformThread);
 #elif PLATFORM(WIN_OS)
-  SuspendThread(platformThread.handle);
+  SuspendThread(platformThread);
 #else
 #error Need a way to suspend threads on this platform
 #endif
@@ -832,7 +827,7 @@ static inline void resumeThread(const PlatformThread& platformThread) {
 #if PLATFORM(DARWIN)
   thread_resume(platformThread);
 #elif PLATFORM(WIN_OS)
-  ResumeThread(platformThread.handle);
+  ResumeThread(platformThread);
 #else
 #error Need a way to resume threads on this platform
 #endif
@@ -901,7 +896,7 @@ static size_t getPlatformThreadRegisters(const PlatformThread& platformThread,
 
 #elif PLATFORM(WIN_OS) && PLATFORM(X86)
   regs.ContextFlags = CONTEXT_INTEGER | CONTEXT_CONTROL | CONTEXT_SEGMENTS;
-  GetThreadContext(platformThread.handle, &regs);
+  GetThreadContext(platformThread, &regs);
   return sizeof(CONTEXT);
 #else
 #error Need a way to get thread registers on this platform
