@@ -2864,6 +2864,17 @@ void QWebPage::updatePositionDependentActions(const QPoint& pos) {
    where multiple
     file selection is allowed.
 
+    \omitvalue ErrorPageExtension (introduced in Qt 4.6)
+*/
+
+/*!
+    \enum QWebPage::ErrorDomain
+    \since 4.6
+    \internal
+
+    \value QtNetwork
+    \value Http
+    \value WebKit
 */
 
 /*!
@@ -2919,6 +2930,12 @@ void QWebPage::updatePositionDependentActions(const QPoint& pos) {
     \a baseUrl.
 
     \sa QWebPage::ErrorPageExtensionOption, QString::toUtf8()
+*/
+
+/*!
+    \fn QWebPage::ErrorPageExtensionReturn::ErrorPageExtensionReturn()
+
+    Constructs a new error page object.
 */
 
 /*!
