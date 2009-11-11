@@ -113,6 +113,15 @@ static bool lowerCaseEqualsASCII(const char* begin,
   return begin == end && !*str;
 }
 
+static inline bool isSchemeFirstChar(char c) {
+  return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+}
+
+static inline bool isSchemeChar(char c) {
+  return isSchemeFirstChar(c) || (c >= '0' && c <= '9') || c == '.' ||
+         c == '-' || c == '*';
+}
+
 // KURLGooglePrivate -----------------------------------------------------------
 
 KURLGooglePrivate::KURLGooglePrivate()
@@ -404,6 +413,10 @@ bool KURL::isValid() const {
   return m_url.m_isValid;
 }
 
+bool KURL::hasPort() const {
+  return hostEnd() < pathStart();
+}
+
 bool KURL::protocolInHTTPFamily() const {
   return m_url.m_protocolInHTTPFamily;
 }
@@ -545,6 +558,14 @@ void KURL::setHostAndPort(const String& s) {
   m_url.replaceComponents(replacements);
 }
 
+void KURL::removePort() {
+  if (hasPort()) {
+    String urlWithoutPort =
+        m_url.string().left(hostEnd()) + m_url.string().substring(pathStart());
+    m_url.setUtf8(urlWithoutPort.utf8());
+  }
+}
+
 void KURL::setPort(unsigned short i) {
   KURLGooglePrivate::Replacements replacements;
   String portStr;
@@ -653,6 +674,17 @@ String KURL::prettyURL() const {
 
 bool protocolIsJavaScript(const String& url) {
   return protocolIs(url, "javascript");
+}
+
+bool protocolIsValid(const String& protocol) {
+  if (!isSchemeFirstChar(protocol[0]))
+    return false;
+  unsigned protocolLength = protocol.length();
+  for (unsigned i = 1; i < protocolLength; i++) {
+    if (!isSchemeChar(protocol[i]))
+      return false;
+  }
+  return true;
 }
 
 // We copied the KURL version here on Sept 12, 2008 while doing a WebKit
