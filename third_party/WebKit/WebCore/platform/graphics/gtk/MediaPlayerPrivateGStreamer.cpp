@@ -114,8 +114,8 @@ static float playbackPosition(GstElement* playbin) {
 
   // Position is available only if the pipeline is not in NULL or
   // READY state.
-  if (position != GST_CLOCK_TIME_NONE)
-    ret = (float)(position / 1000000000.0);
+  if (position != static_cast<gint64>(GST_CLOCK_TIME_NONE))
+    ret = static_cast<float>(position) / static_cast<float>(GST_SECOND);
 
   LOG_VERBOSE(Media, "Position %" GST_TIME_FORMAT, GST_TIME_ARGS(position));
 
@@ -368,8 +368,9 @@ void MediaPlayerPrivate::setRate(float rate) {
   GstState state;
   GstState pending;
 
-  gst_element_get_state(m_playBin, &state, &pending, 250 * GST_NSECOND);
-  if (state != GST_STATE_PLAYING && state != GST_STATE_PAUSED)
+  gst_element_get_state(m_playBin, &state, &pending, 0);
+  if ((state != GST_STATE_PLAYING && state != GST_STATE_PAUSED) ||
+      (pending == GST_STATE_PAUSED))
     return;
 
   if (m_isStreaming)
@@ -394,7 +395,7 @@ void MediaPlayerPrivate::setRate(float rate) {
 
     // If we are at beginning of media, start from the end to
     // avoid immediate EOS.
-    if (currentPosition == 0 || currentPosition == -1)
+    if (currentPosition <= 0)
       end = duration() * GST_SECOND;
     else
       end = currentPosition;
@@ -405,11 +406,8 @@ void MediaPlayerPrivate::setRate(float rate) {
   if (!gst_element_seek(m_playBin, rate, GST_FORMAT_TIME, flags,
                         GST_SEEK_TYPE_SET, start, GST_SEEK_TYPE_SET, end))
     LOG_VERBOSE(Media, "Set rate to %f failed", rate);
-  else {
+  else
     g_object_set(m_playBin, "mute", mute, NULL);
-    // Wait some time for the seek to complete.
-    gst_element_get_state(m_playBin, 0, 0, 40 * GST_MSECOND);
-  }
 }
 
 int MediaPlayerPrivate::dataRate() const {
