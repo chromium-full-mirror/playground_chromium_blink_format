@@ -144,6 +144,12 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   void play();
   void pause();
 
+  // fullscreen
+  void webkitEnterFullScreen(ExceptionCode&);
+  void webkitExitFullScreen();
+  bool webkitSupportsFullscreen();
+  bool webkitDisplayingFullscreen();
+
   // controls
   bool controls() const;
   void setControls(bool);
