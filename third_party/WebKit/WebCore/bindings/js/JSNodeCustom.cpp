@@ -163,11 +163,8 @@ void JSNode::markChildren(MarkStack& markStack) {
   // Mark the whole tree subtree.
   root->setInSubtreeMark(true);
   for (Node* nodeToMark = root; nodeToMark;
-       nodeToMark = nodeToMark->traverseNextNode()) {
-    JSNode* wrapper = getCachedDOMNodeWrapper(m_impl->document(), nodeToMark);
-    if (wrapper)
-      markStack.append(wrapper);
-  }
+       nodeToMark = nodeToMark->traverseNextNode())
+    markDOMNodeWrapper(markStack, m_impl->document(), nodeToMark);
   root->setInSubtreeMark(false);
 }
 

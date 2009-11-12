@@ -251,6 +251,9 @@ void markActiveObjectsForContext(JSC::MarkStack&,
 void markDOMObjectWrapper(JSC::MarkStack&,
                           JSC::JSGlobalData& globalData,
                           void* object);
+void markDOMNodeWrapper(JSC::MarkStack& markStack,
+                        Document* document,
+                        Node* node);
 
 JSC::Structure* getCachedDOMStructure(JSDOMGlobalObject*,
                                       const JSC::ClassInfo*);

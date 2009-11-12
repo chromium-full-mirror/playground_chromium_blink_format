@@ -43,11 +43,8 @@ void JSSVGElementInstance::markChildren(MarkStack& markStack) {
 
   // Mark the wrapper for our corresponding element, so it can mark its event
   // handlers.
-  JSNode* correspondingWrapper =
-      getCachedDOMNodeWrapper(impl()->correspondingElement()->document(),
-                              impl()->correspondingElement());
-  if (correspondingWrapper)
-    markStack.append(correspondingWrapper);
+  markDOMNodeWrapper(markStack, impl()->correspondingElement()->document(),
+                     impl()->correspondingElement());
 }
 
 JSValue JSSVGElementInstance::addEventListener(ExecState* exec,

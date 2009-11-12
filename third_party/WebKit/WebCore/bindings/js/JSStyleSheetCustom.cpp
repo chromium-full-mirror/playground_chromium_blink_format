@@ -76,11 +76,8 @@ void JSStyleSheet::markChildren(MarkStack& markStack) {
   // there's
   // a lot of disentangling of the CSS DOM objects that would need to happen
   // first.
-  if (Node* ownerNode = sheet->ownerNode()) {
-    if (JSNode* ownerNodeWrapper =
-            getCachedDOMNodeWrapper(ownerNode->document(), ownerNode))
-      markStack.append(ownerNodeWrapper);
-  }
+  if (Node* ownerNode = sheet->ownerNode())
+    markDOMNodeWrapper(markStack, ownerNode->document(), ownerNode);
 }
 
 }  // namespace WebCore
