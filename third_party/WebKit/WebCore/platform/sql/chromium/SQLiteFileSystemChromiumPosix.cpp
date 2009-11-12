@@ -108,7 +108,8 @@ int chromiumOpen(sqlite3_vfs* vfs,
   // SQLite is trying to open.
   int fileType = desiredFlags & 0x00007F00;
   int noLock = (fileType != SQLITE_OPEN_MAIN_DB);
-  result = fillInUnixFile(vfs, fd, dirfd, id, fileName, noLock);
+  result = chromium_sqlite3_fill_in_unix_sqlite3_file(vfs, fd, dirfd, id,
+                                                      fileName, noLock);
   if (result != SQLITE_OK)
     chromium_sqlite3_destroy_reusable_file_handle(id);
   return result;
