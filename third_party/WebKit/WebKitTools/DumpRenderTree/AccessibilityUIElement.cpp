@@ -253,6 +253,50 @@ static JSValueRef childAtIndexCallback(JSContextRef context,
       context, toAXElement(thisObject)->getChildAtIndex(indexNumber));
 }
 
+static JSValueRef disclosedRowAtIndexCallback(JSContextRef context,
+                                              JSObjectRef function,
+                                              JSObjectRef thisObject,
+                                              size_t argumentCount,
+                                              const JSValueRef arguments[],
+                                              JSValueRef* exception) {
+  int indexNumber = 0;
+  if (argumentCount == 1)
+    indexNumber = JSValueToNumber(context, arguments[0], exception);
+
+  return AccessibilityUIElement::makeJSAccessibilityUIElement(
+      context, toAXElement(thisObject)->disclosedRowAtIndex(indexNumber));
+}
+
+static JSValueRef selectedRowAtIndexCallback(JSContextRef context,
+                                             JSObjectRef function,
+                                             JSObjectRef thisObject,
+                                             size_t argumentCount,
+                                             const JSValueRef arguments[],
+                                             JSValueRef* exception) {
+  int indexNumber = 0;
+  if (argumentCount == 1)
+    indexNumber = JSValueToNumber(context, arguments[0], exception);
+
+  return AccessibilityUIElement::makeJSAccessibilityUIElement(
+      context, toAXElement(thisObject)->selectedRowAtIndex(indexNumber));
+}
+
+static JSValueRef isEqualCallback(JSContextRef context,
+                                  JSObjectRef function,
+                                  JSObjectRef thisObject,
+                                  size_t argumentCount,
+                                  const JSValueRef arguments[],
+                                  JSValueRef* exception) {
+  JSObjectRef otherElement = 0;
+  if (argumentCount == 1)
+    otherElement = JSValueToObject(context, arguments[0], exception);
+  else
+    return JSValueMakeBoolean(context, false);
+
+  return JSValueMakeBoolean(
+      context, toAXElement(thisObject)->isEqual(toAXElement(otherElement)));
+}
+
 static JSValueRef elementAtPointCallback(JSContextRef context,
                                          JSObjectRef function,
                                          JSObjectRef thisObject,
@@ -279,7 +323,7 @@ static JSValueRef isAttributeSettableCallback(JSContextRef context,
   JSStringRef attribute = NULL;
   if (argumentCount == 1)
     attribute = JSValueToStringCopy(context, arguments[0], exception);
-  JSValueRef result = JSValueMakeNumber(
+  JSValueRef result = JSValueMakeBoolean(
       context, toAXElement(thisObject)->isAttributeSettable(attribute));
   if (attribute)
     JSStringRelease(attribute);
@@ -295,7 +339,7 @@ static JSValueRef isActionSupportedCallback(JSContextRef context,
   JSStringRef action = 0;
   if (argumentCount == 1)
     action = JSValueToStringCopy(context, arguments[0], exception);
-  JSValueRef result = JSValueMakeNumber(
+  JSValueRef result = JSValueMakeBoolean(
       context, toAXElement(thisObject)->isActionSupported(action));
   if (action)
     JSStringRelease(action);
@@ -353,6 +397,16 @@ static JSValueRef parentElementCallback(JSContextRef context,
                                         JSValueRef* exception) {
   return AccessibilityUIElement::makeJSAccessibilityUIElement(
       context, toAXElement(thisObject)->parentElement());
+}
+
+static JSValueRef disclosedByRowCallback(JSContextRef context,
+                                         JSObjectRef function,
+                                         JSObjectRef thisObject,
+                                         size_t argumentCount,
+                                         const JSValueRef arguments[],
+                                         JSValueRef* exception) {
+  return AccessibilityUIElement::makeJSAccessibilityUIElement(
+      context, toAXElement(thisObject)->disclosedByRow());
 }
 
 static JSValueRef setSelectedTextRangeCallback(JSContextRef context,
@@ -568,6 +622,14 @@ static JSValueRef getIsExpandedCallback(JSContextRef context,
   return JSValueMakeBoolean(context, toAXElement(thisObject)->isExpanded());
 }
 
+static JSValueRef hierarchicalLevelCallback(JSContextRef context,
+                                            JSObjectRef thisObject,
+                                            JSStringRef,
+                                            JSValueRef*) {
+  return JSValueMakeNumber(context,
+                           toAXElement(thisObject)->hierarchicalLevel());
+}
+
 static JSValueRef getValueDescriptionCallback(JSContextRef context,
                                               JSObjectRef thisObject,
                                               JSStringRef propertyName,
@@ -651,6 +713,8 @@ JSClassRef AccessibilityUIElement::getJSClass() {
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"valueDescription", getValueDescriptionCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"hierarchicalLevel", hierarchicalLevelCallback, 0,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {0, 0, 0, 0}};
 
   static JSStaticFunction staticFunctions[] = {
@@ -706,11 +770,19 @@ JSClassRef AccessibilityUIElement::getJSClass() {
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"parentElement", parentElementCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"disclosedByRow", disclosedByRowCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"increment", incrementCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"decrement", decrementCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"showMenu", showMenuCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"disclosedRowAtIndex", disclosedRowAtIndexCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"selectedRowAtIndex", selectedRowAtIndexCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"isEqual", isEqualCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {0, 0, 0}};
 
