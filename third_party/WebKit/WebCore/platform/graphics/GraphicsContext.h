@@ -306,7 +306,7 @@ class GraphicsContext : public Noncopyable {
   void beginTransparencyLayer(float opacity);
   void endTransparencyLayer();
 
-  void setShadow(const IntSize&, int blur, const Color&);
+  void setShadow(const IntSize&, int blur, const Color&, ColorSpace);
   bool getShadow(IntSize&, int&, Color&) const;
   void clearShadow();
 
@@ -493,7 +493,7 @@ class GraphicsContext : public Noncopyable {
 
   void setPlatformShouldAntialias(bool b);
 
-  void setPlatformShadow(const IntSize&, int blur, const Color&);
+  void setPlatformShadow(const IntSize&, int blur, const Color&, ColorSpace);
   void clearPlatformShadow();
 
   static void adjustLineToPixelBoundaries(FloatPoint& p1,

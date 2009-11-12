@@ -894,7 +894,8 @@ FloatRect GraphicsContext::roundToDevicePixels(const FloatRect& frect) {
 
 void GraphicsContext::setPlatformShadow(const IntSize& size,
                                         int,
-                                        const Color&) {
+                                        const Color&,
+                                        ColorSpace) {
   // Qt doesn't support shadows natively, they are drawn manually in the draw*
   // functions
 
