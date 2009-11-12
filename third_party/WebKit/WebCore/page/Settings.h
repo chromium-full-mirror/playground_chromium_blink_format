@@ -334,16 +334,6 @@ class Settings : public Noncopyable {
   void setWebGLEnabled(bool);
   bool webGLEnabled() const { return m_webGLEnabled; }
 
-  void setPrintingMinimumShrinkFactor(float);
-  float printingMinimumShrinkFactor() const {
-    return m_printingMinimumShrinkFactor;
-  }
-
-  void setPrintingMaximumShrinkFactor(float);
-  float printingMaximumShrinkFactor() const {
-    return m_printingMaximumShrinkFactor;
-  }
-
  private:
   Page* m_page;
 
@@ -366,8 +356,6 @@ class Settings : public Noncopyable {
   size_t m_maximumDecodedImageSize;
   unsigned m_localStorageQuota;
   unsigned m_pluginAllowedRunTime;
-  float m_printingMinimumShrinkFactor;
-  float m_printingMaximumShrinkFactor;
   bool m_isJavaEnabled : 1;
   bool m_loadsImagesAutomatically : 1;
   bool m_privateBrowsingEnabled : 1;
