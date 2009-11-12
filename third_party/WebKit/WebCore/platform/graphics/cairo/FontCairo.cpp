@@ -166,7 +166,7 @@ void Font::drawGlyphs(GraphicsContext* context,
 
   // Re-enable the platform shadow we disabled earlier
   if (hasShadow)
-    context->setShadow(shadowSize, shadowBlur, shadowColor);
+    context->setShadow(shadowSize, shadowBlur, shadowColor, DeviceColorSpace);
 
   cairo_restore(cr);
 }
