@@ -318,6 +318,9 @@ void CanvasRenderingContext2D::scale(float sx, float sy) {
   if (!state().m_invertibleCTM)
     return;
 
+  if (!isfinite(sx) | !isfinite(sy))
+    return;
+
   TransformationMatrix newTransform = state().m_transform;
   newTransform.scaleNonUniform(sx, sy);
   if (!newTransform.isInvertible()) {
@@ -335,6 +338,9 @@ void CanvasRenderingContext2D::rotate(float angleInRadians) {
   if (!c)
     return;
   if (!state().m_invertibleCTM)
+    return;
+
+  if (!isfinite(angleInRadians))
     return;
 
   TransformationMatrix newTransform = state().m_transform;
@@ -355,6 +361,9 @@ void CanvasRenderingContext2D::translate(float tx, float ty) {
   if (!c)
     return;
   if (!state().m_invertibleCTM)
+    return;
+
+  if (!isfinite(tx) | !isfinite(ty))
     return;
 
   TransformationMatrix newTransform = state().m_transform;
@@ -381,7 +390,6 @@ void CanvasRenderingContext2D::transform(float m11,
   if (!state().m_invertibleCTM)
     return;
 
-  // HTML5 3.14.11.1 -- ignore any calls that pass non-finite numbers
   if (!isfinite(m11) | !isfinite(m21) | !isfinite(dx) | !isfinite(m12) |
       !isfinite(m22) | !isfinite(dy))
     return;
@@ -408,7 +416,6 @@ void CanvasRenderingContext2D::setTransform(float m11,
   if (!c)
     return;
 
-  // HTML5 3.14.11.1 -- ignore any calls that pass non-finite numbers
   if (!isfinite(m11) | !isfinite(m21) | !isfinite(dx) | !isfinite(m12) |
       !isfinite(m22) | !isfinite(dy))
     return;
