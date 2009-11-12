@@ -132,6 +132,8 @@ COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleIgnored, IgnoredRole);
 COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleTab, TabRole);
 COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleTabList, TabListRole);
 COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleTabPanel, TabPanelRole);
+COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleTreeRole, TreeRole);
+COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleTreeItemRole, TreeItemRole);
 COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleLandmarkApplication,
                              LandmarkApplicationRole);
 COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleLandmarkBanner,
@@ -146,6 +148,12 @@ COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleLandmarkNavigation,
                              LandmarkNavigationRole);
 COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleLandmarkSearch,
                              LandmarkSearchRole);
+COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleApplicationAlert,
+                             ApplicationAlertRole);
+COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleApplicationAlertDialog,
+                             ApplicationAlertDialogRole);
+COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleApplicationDialog,
+                             ApplicationDialogRole);
 COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleApplicationLog,
                              ApplicationLogRole);
 COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleApplicationMarquee,
