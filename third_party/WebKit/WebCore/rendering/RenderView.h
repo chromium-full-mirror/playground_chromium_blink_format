@@ -89,12 +89,15 @@ class RenderView : public RenderBlock {
   void setTruncatedAt(int y) {
     m_truncatedAt = y;
     m_bestTruncatedAt = m_truncatorWidth = 0;
+    m_minimumColumnHeight = 0;
     m_forcedPageBreak = false;
   }
   void setBestTruncatedAt(int y,
                           RenderBoxModelObject* forRenderer,
                           bool forcedBreak = false);
+  void setMinimumColumnHeight(int height) { m_minimumColumnHeight = height; }
   int bestTruncatedAt() const { return m_bestTruncatedAt; }
+  int minimumColumnHeight() const { return m_minimumColumnHeight; }
 
   int truncatedAt() const { return m_truncatedAt; }
 
@@ -227,6 +230,7 @@ class RenderView : public RenderBlock {
 
   int m_bestTruncatedAt;
   int m_truncatorWidth;
+  int m_minimumColumnHeight;
   bool m_forcedPageBreak;
   LayoutState* m_layoutState;
   unsigned m_layoutStateDisableCount;
