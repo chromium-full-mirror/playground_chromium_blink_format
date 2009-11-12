@@ -5534,6 +5534,14 @@ HRESULT WebView::setCanStartPlugins(BOOL canStartPlugins) {
   return S_OK;
 }
 
+static String toString(BSTR bstr) {
+  return String(bstr, SysStringLen(bstr));
+}
+
+static KURL toKURL(BSTR bstr) {
+  return KURL(KURL(), toString(bstr));
+}
+
 static PassOwnPtr<Vector<String>> toStringVector(unsigned patternsCount,
                                                  BSTR* patterns) {
   // Convert the patterns into a Vector.
@@ -5541,7 +5549,7 @@ static PassOwnPtr<Vector<String>> toStringVector(unsigned patternsCount,
     return 0;
   Vector<String>* patternsVector = new Vector<String>;
   for (unsigned i = 0; i < patternsCount; ++i)
-    patternsVector->append(String(patterns[i], SysStringLen(patterns[i])));
+    patternsVector->append(toString(patterns[i]));
   return patternsVector;
 }
 
@@ -5555,7 +5563,7 @@ HRESULT WebView::addUserScriptToGroup(
     unsigned blacklistCount,
     BSTR* blacklist,
     WebUserScriptInjectionTime injectionTime) {
-  String group(groupName, SysStringLen(groupName));
+  String group = toString(groupName);
   if (group.isEmpty() || !worldID || worldID == numeric_limits<unsigned>::max())
     return E_INVALIDARG;
 
@@ -5564,8 +5572,7 @@ HRESULT WebView::addUserScriptToGroup(
   if (!pageGroup)
     return E_FAIL;
 
-  pageGroup->addUserScriptToWorld(worldID, String(source, SysStringLen(source)),
-                                  KURL(KURL(), String(url, SysStringLen(url))),
+  pageGroup->addUserScriptToWorld(worldID, toString(source), toKURL(url),
                                   toStringVector(whitelistCount, whitelist),
                                   toStringVector(blacklistCount, blacklist),
                                   injectionTime == WebInjectAtDocumentStart
@@ -5583,7 +5590,7 @@ HRESULT WebView::addUserStyleSheetToGroup(BSTR groupName,
                                           BSTR* whitelist,
                                           unsigned blacklistCount,
                                           BSTR* blacklist) {
-  String group(groupName, SysStringLen(groupName));
+  String group = toString(groupName);
   if (group.isEmpty() || !worldID || worldID == numeric_limits<unsigned>::max())
     return E_INVALIDARG;
 
@@ -5593,8 +5600,7 @@ HRESULT WebView::addUserStyleSheetToGroup(BSTR groupName,
     return E_FAIL;
 
   pageGroup->addUserStyleSheetToWorld(
-      worldID, String(source, SysStringLen(source)),
-      KURL(KURL(), String(url, SysStringLen(url))),
+      worldID, toString(source), toKURL(url),
       toStringVector(whitelistCount, whitelist),
       toStringVector(blacklistCount, blacklist));
 
@@ -5604,7 +5610,7 @@ HRESULT WebView::addUserStyleSheetToGroup(BSTR groupName,
 HRESULT WebView::removeUserScriptFromGroup(BSTR groupName,
                                            unsigned worldID,
                                            BSTR url) {
-  String group(groupName, SysStringLen(groupName));
+  String group = toString(groupName);
   if (group.isEmpty() || !worldID || worldID == numeric_limits<unsigned>::max())
     return E_INVALIDARG;
 
@@ -5613,8 +5619,7 @@ HRESULT WebView::removeUserScriptFromGroup(BSTR groupName,
   if (!pageGroup)
     return E_FAIL;
 
-  pageGroup->removeUserScriptFromWorld(
-      worldID, KURL(KURL(), String(url, SysStringLen(url))));
+  pageGroup->removeUserScriptFromWorld(worldID, toKURL(url));
 
   return S_OK;
 }
@@ -5622,7 +5627,7 @@ HRESULT WebView::removeUserScriptFromGroup(BSTR groupName,
 HRESULT WebView::removeUserStyleSheetFromGroup(BSTR groupName,
                                                unsigned worldID,
                                                BSTR url) {
-  String group(groupName, SysStringLen(groupName));
+  String group = toString(groupName);
   if (group.isEmpty() || !worldID || worldID == numeric_limits<unsigned>::max())
     return E_INVALIDARG;
 
@@ -5631,14 +5636,13 @@ HRESULT WebView::removeUserStyleSheetFromGroup(BSTR groupName,
   if (!pageGroup)
     return E_FAIL;
 
-  pageGroup->removeUserStyleSheetFromWorld(
-      worldID, KURL(KURL(), String(url, SysStringLen(url))));
+  pageGroup->removeUserStyleSheetFromWorld(worldID, toKURL(url));
 
   return S_OK;
 }
 
 HRESULT WebView::removeUserScriptsFromGroup(BSTR groupName, unsigned worldID) {
-  String group(groupName, SysStringLen(groupName));
+  String group = toString(groupName);
   if (group.isEmpty() || !worldID || worldID == numeric_limits<unsigned>::max())
     return E_INVALIDARG;
 
@@ -5653,7 +5657,7 @@ HRESULT WebView::removeUserScriptsFromGroup(BSTR groupName, unsigned worldID) {
 
 HRESULT WebView::removeUserStyleSheetsFromGroup(BSTR groupName,
                                                 unsigned worldID) {
-  String group(groupName, SysStringLen(groupName));
+  String group = toString(groupName);
   if (group.isEmpty() || !worldID || worldID == numeric_limits<unsigned>::max())
     return E_INVALIDARG;
 
@@ -5667,7 +5671,7 @@ HRESULT WebView::removeUserStyleSheetsFromGroup(BSTR groupName,
 }
 
 HRESULT WebView::removeAllUserContentFromGroup(BSTR groupName) {
-  String group(groupName, SysStringLen(groupName));
+  String group = toString(groupName);
   if (group.isEmpty())
     return E_INVALIDARG;
 
