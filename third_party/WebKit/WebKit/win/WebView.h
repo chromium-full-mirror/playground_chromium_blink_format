@@ -749,7 +749,7 @@ class WebView : public IWebView,
 
   virtual HRESULT STDMETHODCALLTYPE
   addUserScriptToGroup(BSTR groupName,
-                       unsigned worldID,
+                       IWebScriptWorld*,
                        BSTR source,
                        BSTR url,
                        unsigned whitelistCount,
@@ -759,7 +759,7 @@ class WebView : public IWebView,
                        WebUserScriptInjectionTime);
   virtual HRESULT STDMETHODCALLTYPE
   addUserStyleSheetToGroup(BSTR groupName,
-                           unsigned worldID,
+                           IWebScriptWorld*,
                            BSTR source,
                            BSTR url,
                            unsigned whitelistCount,
@@ -767,14 +767,14 @@ class WebView : public IWebView,
                            unsigned blacklistCount,
                            BSTR* blacklist);
   virtual HRESULT STDMETHODCALLTYPE removeUserScriptFromGroup(BSTR groupName,
-                                                              unsigned worldID,
+                                                              IWebScriptWorld*,
                                                               BSTR url);
   virtual HRESULT STDMETHODCALLTYPE
-  removeUserStyleSheetFromGroup(BSTR groupName, unsigned worldID, BSTR url);
+  removeUserStyleSheetFromGroup(BSTR groupName, IWebScriptWorld*, BSTR url);
   virtual HRESULT STDMETHODCALLTYPE
-  removeUserScriptsFromGroup(BSTR groupName, unsigned worldID);
+  removeUserScriptsFromGroup(BSTR groupName, IWebScriptWorld*);
   virtual HRESULT STDMETHODCALLTYPE
-  removeUserStyleSheetsFromGroup(BSTR groupName, unsigned worldID);
+  removeUserStyleSheetsFromGroup(BSTR groupName, IWebScriptWorld*);
   virtual HRESULT STDMETHODCALLTYPE
   removeAllUserContentFromGroup(BSTR groupName);
 

@@ -141,7 +141,7 @@ class Frame : public RefCounted<Frame> {
   void injectUserScripts(UserScriptInjectionTime);
 
  private:
-  void injectUserScriptsForWorld(unsigned worldID,
+  void injectUserScriptsForWorld(DOMWrapperWorld*,
                                  const UserScriptVector&,
                                  UserScriptInjectionTime);
 

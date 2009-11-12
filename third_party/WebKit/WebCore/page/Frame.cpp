@@ -890,10 +890,10 @@ void Frame::injectUserScripts(UserScriptInjectionTime injectionTime) {
     return;
   UserScriptMap::const_iterator end = userScripts->end();
   for (UserScriptMap::const_iterator it = userScripts->begin(); it != end; ++it)
-    injectUserScriptsForWorld(it->first, *it->second, injectionTime);
+    injectUserScriptsForWorld(it->first.get(), *it->second, injectionTime);
 }
 
-void Frame::injectUserScriptsForWorld(unsigned worldID,
+void Frame::injectUserScriptsForWorld(DOMWrapperWorld* world,
                                       const UserScriptVector& userScripts,
                                       UserScriptInjectionTime injectionTime) {
   if (userScripts.isEmpty())
@@ -910,9 +910,9 @@ void Frame::injectUserScriptsForWorld(unsigned worldID,
     if (script->injectionTime() == injectionTime &&
         UserContentURLPattern::matchesPatterns(doc->url(), script->whitelist(),
                                                script->blacklist()))
-      sourceCode.append(ScriptSourceCode(script->source(), script->url()));
+      m_script.evaluateInWorld(
+          ScriptSourceCode(script->source(), script->url()), world);
   }
-  script()->evaluateInIsolatedWorld(worldID, sourceCode);
 }
 
 bool Frame::shouldChangeSelection(const VisibleSelection& newSelection) const {

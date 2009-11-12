@@ -31,17 +31,17 @@
 #include "DOMCoreClasses.h"
 #include "MarshallingHelpers.h"
 #include "SoftLinking.h"
-#include "WebDatabaseManager.h"
-#include "WebDocumentLoader.h"
-#include "WebDownload.h"
-#include "WebEditorClient.h"
-#include "WebElementPropertyBag.h"
-#include "WebFrame.h"
 #include "WebBackForwardList.h"
 #include "WebChromeClient.h"
 #include "WebContextMenuClient.h"
 #include "WebCoreTextRenderer.h"
+#include "WebDatabaseManager.h"
+#include "WebDocumentLoader.h"
+#include "WebDownload.h"
 #include "WebDragClient.h"
+#include "WebEditorClient.h"
+#include "WebElementPropertyBag.h"
+#include "WebFrame.h"
 #include "WebIconDatabase.h"
 #include "WebInspector.h"
 #include "WebInspectorClient.h"
@@ -52,6 +52,7 @@
 #include "WebNotificationCenter.h"
 #include "WebPluginHalterClient.h"
 #include "WebPreferences.h"
+#include "WebScriptWorld.h"
 #include "WindowsTouch.h"
 #pragma warning(push, 0)
 #include <WebCore/ApplicationCacheStorage.h>
@@ -5555,7 +5556,7 @@ static PassOwnPtr<Vector<String>> toStringVector(unsigned patternsCount,
 
 HRESULT WebView::addUserScriptToGroup(
     BSTR groupName,
-    unsigned worldID,
+    IWebScriptWorld* iWorld,
     BSTR source,
     BSTR url,
     unsigned whitelistCount,
@@ -5563,8 +5564,12 @@ HRESULT WebView::addUserScriptToGroup(
     unsigned blacklistCount,
     BSTR* blacklist,
     WebUserScriptInjectionTime injectionTime) {
+  COMPtr<WebScriptWorld> world(Query, iWorld);
+  if (!world)
+    return E_POINTER;
+
   String group = toString(groupName);
-  if (group.isEmpty() || !worldID || worldID == numeric_limits<unsigned>::max())
+  if (group.isEmpty())
     return E_INVALIDARG;
 
   PageGroup* pageGroup = PageGroup::pageGroup(group);
@@ -5572,7 +5577,7 @@ HRESULT WebView::addUserScriptToGroup(
   if (!pageGroup)
     return E_FAIL;
 
-  pageGroup->addUserScriptToWorld(worldID, toString(source), toKURL(url),
+  pageGroup->addUserScriptToWorld(world->world(), toString(source), toKURL(url),
                                   toStringVector(whitelistCount, whitelist),
                                   toStringVector(blacklistCount, blacklist),
                                   injectionTime == WebInjectAtDocumentStart
@@ -5583,15 +5588,19 @@ HRESULT WebView::addUserScriptToGroup(
 }
 
 HRESULT WebView::addUserStyleSheetToGroup(BSTR groupName,
-                                          unsigned worldID,
+                                          IWebScriptWorld* iWorld,
                                           BSTR source,
                                           BSTR url,
                                           unsigned whitelistCount,
                                           BSTR* whitelist,
                                           unsigned blacklistCount,
                                           BSTR* blacklist) {
+  COMPtr<WebScriptWorld> world(Query, iWorld);
+  if (!world)
+    return E_POINTER;
+
   String group = toString(groupName);
-  if (group.isEmpty() || !worldID || worldID == numeric_limits<unsigned>::max())
+  if (group.isEmpty())
     return E_INVALIDARG;
 
   PageGroup* pageGroup = PageGroup::pageGroup(group);
@@ -5600,7 +5609,7 @@ HRESULT WebView::addUserStyleSheetToGroup(BSTR groupName,
     return E_FAIL;
 
   pageGroup->addUserStyleSheetToWorld(
-      worldID, toString(source), toKURL(url),
+      world->world(), toString(source), toKURL(url),
       toStringVector(whitelistCount, whitelist),
       toStringVector(blacklistCount, blacklist));
 
@@ -5608,10 +5617,14 @@ HRESULT WebView::addUserStyleSheetToGroup(BSTR groupName,
 }
 
 HRESULT WebView::removeUserScriptFromGroup(BSTR groupName,
-                                           unsigned worldID,
+                                           IWebScriptWorld* iWorld,
                                            BSTR url) {
+  COMPtr<WebScriptWorld> world(Query, iWorld);
+  if (!world)
+    return E_POINTER;
+
   String group = toString(groupName);
-  if (group.isEmpty() || !worldID || worldID == numeric_limits<unsigned>::max())
+  if (group.isEmpty())
     return E_INVALIDARG;
 
   PageGroup* pageGroup = PageGroup::pageGroup(group);
@@ -5619,16 +5632,20 @@ HRESULT WebView::removeUserScriptFromGroup(BSTR groupName,
   if (!pageGroup)
     return E_FAIL;
 
-  pageGroup->removeUserScriptFromWorld(worldID, toKURL(url));
+  pageGroup->removeUserScriptFromWorld(world->world(), toKURL(url));
 
   return S_OK;
 }
 
 HRESULT WebView::removeUserStyleSheetFromGroup(BSTR groupName,
-                                               unsigned worldID,
+                                               IWebScriptWorld* iWorld,
                                                BSTR url) {
+  COMPtr<WebScriptWorld> world(Query, iWorld);
+  if (!world)
+    return E_POINTER;
+
   String group = toString(groupName);
-  if (group.isEmpty() || !worldID || worldID == numeric_limits<unsigned>::max())
+  if (group.isEmpty())
     return E_INVALIDARG;
 
   PageGroup* pageGroup = PageGroup::pageGroup(group);
@@ -5636,14 +5653,19 @@ HRESULT WebView::removeUserStyleSheetFromGroup(BSTR groupName,
   if (!pageGroup)
     return E_FAIL;
 
-  pageGroup->removeUserStyleSheetFromWorld(worldID, toKURL(url));
+  pageGroup->removeUserStyleSheetFromWorld(world->world(), toKURL(url));
 
   return S_OK;
 }
 
-HRESULT WebView::removeUserScriptsFromGroup(BSTR groupName, unsigned worldID) {
+HRESULT WebView::removeUserScriptsFromGroup(BSTR groupName,
+                                            IWebScriptWorld* iWorld) {
+  COMPtr<WebScriptWorld> world(Query, iWorld);
+  if (!world)
+    return E_POINTER;
+
   String group = toString(groupName);
-  if (group.isEmpty() || !worldID || worldID == numeric_limits<unsigned>::max())
+  if (group.isEmpty())
     return E_INVALIDARG;
 
   PageGroup* pageGroup = PageGroup::pageGroup(group);
@@ -5651,14 +5673,18 @@ HRESULT WebView::removeUserScriptsFromGroup(BSTR groupName, unsigned worldID) {
   if (!pageGroup)
     return E_FAIL;
 
-  pageGroup->removeUserScriptsFromWorld(worldID);
+  pageGroup->removeUserScriptsFromWorld(world->world());
   return S_OK;
 }
 
 HRESULT WebView::removeUserStyleSheetsFromGroup(BSTR groupName,
-                                                unsigned worldID) {
+                                                IWebScriptWorld* iWorld) {
+  COMPtr<WebScriptWorld> world(Query, iWorld);
+  if (!world)
+    return E_POINTER;
+
   String group = toString(groupName);
-  if (group.isEmpty() || !worldID || worldID == numeric_limits<unsigned>::max())
+  if (group.isEmpty())
     return E_INVALIDARG;
 
   PageGroup* pageGroup = PageGroup::pageGroup(group);
@@ -5666,7 +5692,7 @@ HRESULT WebView::removeUserStyleSheetsFromGroup(BSTR groupName,
   if (!pageGroup)
     return E_FAIL;
 
-  pageGroup->removeUserStyleSheetsFromWorld(worldID);
+  pageGroup->removeUserStyleSheetsFromWorld(world->world());
   return S_OK;
 }
 

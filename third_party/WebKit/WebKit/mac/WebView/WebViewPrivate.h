@@ -45,6 +45,7 @@
 @class WebFrame;
 @class WebInspector;
 @class WebPreferences;
+@class WebScriptWorld;
 @class WebTextIterator;
 
 @protocol WebFormDelegate;
@@ -550,28 +551,28 @@ backforward list.
 + (void)_resetOriginAccessWhiteLists;
 
 + (void)_addUserScriptToGroup:(NSString*)groupName
-                      worldID:(unsigned)worldID
+                        world:(WebScriptWorld*)world
                        source:(NSString*)source
                           url:(NSURL*)url
                     whitelist:(NSArray*)whitelist
                     blacklist:(NSArray*)blacklist
                 injectionTime:(WebUserScriptInjectionTime)injectionTime;
 + (void)_addUserStyleSheetToGroup:(NSString*)groupName
-                          worldID:(unsigned)worldID
+                            world:(WebScriptWorld*)world
                            source:(NSString*)source
                               url:(NSURL*)url
                         whitelist:(NSArray*)whitelist
                         blacklist:(NSArray*)blacklist;
 + (void)_removeUserScriptFromGroup:(NSString*)groupName
-                           worldID:(unsigned)worldID
+                             world:(WebScriptWorld*)world
                                url:(NSURL*)url;
 + (void)_removeUserStyleSheetFromGroup:(NSString*)groupName
-                               worldID:(unsigned)worldID
+                                 world:(WebScriptWorld*)world
                                    url:(NSURL*)url;
 + (void)_removeUserScriptsFromGroup:(NSString*)groupName
-                            worldID:(unsigned)worldID;
+                              world:(WebScriptWorld*)world;
 + (void)_removeUserStyleSheetsFromGroup:(NSString*)groupName
-                                worldID:(unsigned)worldID;
+                                  world:(WebScriptWorld*)world;
 + (void)_removeAllUserContentFromGroup:(NSString*)groupName;
 
 /*!

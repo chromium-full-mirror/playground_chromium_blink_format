@@ -49,7 +49,8 @@
                   macro(WebURLProtectionSpace) macro(WebURLRequest)            \
                       macro(WebURLResponse) macro(WebView) macro(WebArchive)   \
                           macro(WebCoreStatistics) macro(WebCookieManager)     \
-                              macro(WebWorkersPrivate)  // end of macro
+                              macro(WebWorkersPrivate)                         \
+                                  macro(WebScriptWorld)  // end of macro
 
 // Everything below this point is deprecated. Please do not use.
 

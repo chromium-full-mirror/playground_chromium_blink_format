@@ -264,8 +264,8 @@ class DECLSPEC_UUID("{A3676398-4485-4a9d-87DC-CB5A40E6351D}") WebFrame
       /* [in] */ BSTR script,
       /* [retval][out] */ BSTR* evaluationResult);
 
-  virtual /* [local] */ JSGlobalContextRef STDMETHODCALLTYPE contextForWorldID(
-      /* [in] */ unsigned worldID);
+  virtual JSGlobalContextRef STDMETHODCALLTYPE
+  globalContextForScriptWorld(IWebScriptWorld*);
 
   // IWebDocumentText
   virtual HRESULT STDMETHODCALLTYPE supportsTextEncoding(
