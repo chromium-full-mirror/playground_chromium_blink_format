@@ -119,8 +119,8 @@ void WebDrawText(WebTextRenderInfo* info) {
     if (info->structSize == sizeof(WebTextRenderInfo) &&
         (info->shadowOffset.cx || info->shadowOffset.cy || info->shadowBlur ||
          info->shadowColor))
-      context.setShadow(info->shadowOffset, info->shadowBlur,
-                        info->shadowColor);
+      context.setShadow(info->shadowOffset, info->shadowBlur, info->shadowColor,
+                        DeviceColorSpace);
 
     WebCoreDrawTextAtPoint(context, drawString, info->pt,
                            makeFont(*(info->description)), info->color,
