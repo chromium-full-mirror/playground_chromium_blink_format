@@ -151,11 +151,11 @@ QObject* QGraphicsWebViewPrivate::pluginParent() const {
    data, using
     features of the QtWebKit module.
 
-    If the width and height of the item is not set, they will dynamically adjust
-   to
-    a size appropriate for the content. This width may be large (e.g., 980
-   pixels or
-    more) for typical online Web pages.
+    If the width and height of the item are not set, they will default to 800
+   and 600,
+    respectively. If the Web page contents is larger than that, scrollbars will
+   be shown
+    if not disabled explicitly.
 
     \section1 Browser Features
 
