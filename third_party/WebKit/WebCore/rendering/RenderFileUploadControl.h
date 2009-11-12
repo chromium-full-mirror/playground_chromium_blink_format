@@ -39,6 +39,8 @@ class RenderFileUploadControl : public RenderBlock, private FileChooserClient {
   RenderFileUploadControl(HTMLInputElement*);
   virtual ~RenderFileUploadControl();
 
+  virtual bool isFileUploadControl() const { return true; }
+
   void click();
 
   void valueChanged();
@@ -46,7 +48,7 @@ class RenderFileUploadControl : public RenderBlock, private FileChooserClient {
   void receiveDroppedFiles(const Vector<String>&);
 
   String buttonValue();
-  String fileTextValue();
+  String fileTextValue() const;
 
   bool allowsMultipleFiles();
 
@@ -69,8 +71,14 @@ class RenderFileUploadControl : public RenderBlock, private FileChooserClient {
 
 inline RenderFileUploadControl* toRenderFileUploadControl(
     RenderObject* object) {
-  ASSERT(!object || !strcmp(object->renderName(), "RenderFileUploadControl"));
+  ASSERT(!object || object->isFileUploadControl());
   return static_cast<RenderFileUploadControl*>(object);
+}
+
+inline const RenderFileUploadControl* toRenderFileUploadControl(
+    const RenderObject* object) {
+  ASSERT(!object || object->isFileUploadControl());
+  return static_cast<const RenderFileUploadControl*>(object);
 }
 
 // This will catch anyone doing an unnecessary cast.

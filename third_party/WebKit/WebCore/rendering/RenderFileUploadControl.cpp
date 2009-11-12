@@ -187,8 +187,7 @@ void RenderFileUploadControl::paintObject(PaintInfo& paintInfo,
   }
 
   if (paintInfo.phase == PaintPhaseForeground) {
-    const String& displayedFilename =
-        m_fileChooser->basenameForWidth(style()->font(), maxFilenameWidth());
+    const String& displayedFilename = fileTextValue();
     unsigned length = displayedFilename.length();
     const UChar* string = displayedFilename.characters();
     TextRun textRun(string, length, false, 0, 0, style()->direction() == RTL,
@@ -304,7 +303,7 @@ String RenderFileUploadControl::buttonValue() {
   return m_button->value();
 }
 
-String RenderFileUploadControl::fileTextValue() {
+String RenderFileUploadControl::fileTextValue() const {
   return m_fileChooser->basenameForWidth(style()->font(), maxFilenameWidth());
 }
 
