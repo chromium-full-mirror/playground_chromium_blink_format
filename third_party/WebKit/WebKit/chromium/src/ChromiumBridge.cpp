@@ -282,23 +282,24 @@ String ChromiumBridge::getFontFamilyForCharacters(const UChar* characters,
 
 #if ENABLE(DATABASE)
 PlatformFileHandle ChromiumBridge::databaseOpenFile(
-    const String& fileName,
+    const String& vfsFileName,
     int desiredFlags,
     PlatformFileHandle* dirHandle) {
-  return webKitClient()->databaseOpenFile(WebString(fileName), desiredFlags,
+  return webKitClient()->databaseOpenFile(WebString(vfsFileName), desiredFlags,
                                           dirHandle);
 }
 
-int ChromiumBridge::databaseDeleteFile(const String& fileName, bool syncDir) {
-  return webKitClient()->databaseDeleteFile(WebString(fileName), syncDir);
+int ChromiumBridge::databaseDeleteFile(const String& vfsFileName,
+                                       bool syncDir) {
+  return webKitClient()->databaseDeleteFile(WebString(vfsFileName), syncDir);
 }
 
-long ChromiumBridge::databaseGetFileAttributes(const String& fileName) {
-  return webKitClient()->databaseGetFileAttributes(WebString(fileName));
+long ChromiumBridge::databaseGetFileAttributes(const String& vfsFileName) {
+  return webKitClient()->databaseGetFileAttributes(WebString(vfsFileName));
 }
 
-long long ChromiumBridge::databaseGetFileSize(const String& fileName) {
-  return webKitClient()->databaseGetFileSize(WebString(fileName));
+long long ChromiumBridge::databaseGetFileSize(const String& vfsFileName) {
+  return webKitClient()->databaseGetFileSize(WebString(vfsFileName));
 }
 #endif
 
