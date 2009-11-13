@@ -207,7 +207,7 @@ static void showTreeAndMark(const CounterNode* node) {
     root = root->parent();
 
   for (const CounterNode* current = root; current;
-       current = nextInPreOrder(current)) {
+       current = current->nextInPreOrder()) {
     fwrite((current == node) ? "*" : " ", 1, 1, stderr);
     for (const CounterNode* parent = current; parent && parent != root;
          parent = parent->parent())
