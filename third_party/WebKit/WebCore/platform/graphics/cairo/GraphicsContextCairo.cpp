@@ -75,6 +75,7 @@ static inline void setColor(cairo_t* cr, const Color& col) {
 static inline void setPlatformFill(GraphicsContext* context,
                                    cairo_t* cr,
                                    GraphicsContextPrivate* gcp) {
+  cairo_save(cr);
   switch (gcp->state.fillType) {
     case SolidColorType: {
       Color fillColor = colorWithOverrideAlpha(
@@ -98,11 +99,13 @@ static inline void setPlatformFill(GraphicsContext* context,
       cairo_paint_with_alpha(cr, gcp->state.globalAlpha);
       break;
   }
+  cairo_restore(cr);
 }
 
 static inline void setPlatformStroke(GraphicsContext* context,
                                      cairo_t* cr,
                                      GraphicsContextPrivate* gcp) {
+  cairo_save(cr);
   switch (gcp->state.strokeType) {
     case SolidColorType: {
       Color strokeColor = colorWithOverrideAlpha(
@@ -128,6 +131,7 @@ static inline void setPlatformStroke(GraphicsContext* context,
     cairo_pop_group_to_source(cr);
   }
   cairo_stroke_preserve(cr);
+  cairo_restore(cr);
 }
 
 // A fillRect helper
