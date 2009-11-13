@@ -131,7 +131,7 @@ void SocketStreamHandle::readStreamCallback(CFReadStreamRef stream,
                                             void* clientCallBackInfo) {
   SocketStreamHandle* handle =
       static_cast<SocketStreamHandle*>(clientCallBackInfo);
-  ASSERT(stream == handle->m_readStream.get());
+  ASSERT_UNUSED(stream, stream == handle->m_readStream.get());
   handle->readStreamCallback(type);
 }
 
@@ -140,7 +140,7 @@ void SocketStreamHandle::writeStreamCallback(CFWriteStreamRef stream,
                                              void* clientCallBackInfo) {
   SocketStreamHandle* handle =
       static_cast<SocketStreamHandle*>(clientCallBackInfo);
-  ASSERT(stream == handle->m_writeStream.get());
+  ASSERT_UNUSED(stream, stream == handle->m_writeStream.get());
   handle->writeStreamCallback(type);
 }
 
