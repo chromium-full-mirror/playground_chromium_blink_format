@@ -57,7 +57,8 @@ int SQLiteFileSystem::openDatabase(const String& fileName, sqlite3** database) {
   // be SQLite's default VFS
   return sqlite3_open_v2(
       fileName.utf8().data(), database,
-      SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX, 0);
+      SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX,
+      "chromium_vfs");
 }
 
 String SQLiteFileSystem::getFileNameForNewDatabase(
