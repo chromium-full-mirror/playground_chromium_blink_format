@@ -828,6 +828,9 @@ double parseDateFromNullTerminatedCharacters(const char* dateString) {
   bool haveTZ;
   int offset;
   double ms = parseDateFromNullTerminatedCharacters(dateString, haveTZ, offset);
+  if (isnan(ms))
+    return NaN;
+
   // fall back to local timezone
   if (!haveTZ) {
     double utcOffset = calculateUTCOffset();
@@ -974,6 +977,9 @@ double parseDateFromNullTerminatedCharacters(ExecState* exec,
   int offset;
   double ms =
       WTF::parseDateFromNullTerminatedCharacters(dateString, haveTZ, offset);
+  if (isnan(ms))
+    return NaN;
+
   // fall back to local timezone
   if (!haveTZ) {
     double utcOffset = getUTCOffset(exec);
