@@ -300,7 +300,7 @@ QWebSettings* QWebSettings::globalSettings() {
    quota
     for each application by calling setOfflineStorageDefaultQuota().
 
-    \sa QWebPage::settings(), QWebView::settings(), {Browser}
+    \sa QWebPage::settings(), QWebView::settings(), {Web Browser}
 */
 
 /*!
@@ -590,7 +590,7 @@ QIcon QWebSettings::iconForUrl(const QUrl& url) {
   return *icon;
 }
 
-/*!
+/*
     Returns the plugin database object.
 
 QWebPluginDatabase *QWebSettings::pluginDatabase()
