@@ -317,4 +317,6 @@ void LayoutTestController::overridePreference(const QString& name,
                            value.toBool());
   else if (name == "WebKitDefaultFontSize")
     settings->setFontSize(QWebSettings::DefaultFontSize, value.toInt());
+  else if (name == "WebKitUsesPageCachePreferenceKey")
+    QWebSettings::setMaximumPagesInCache(value.toInt());
 }

@@ -231,6 +231,7 @@ void QWebSettingsPrivate::apply() {
                          global->attributes.value(
                              QWebSettings::LocalContentCanAccessRemoteUrls));
     settings->setAllowUniversalAccessFromFileURLs(value);
+    settings->setUsesPageCache(WebCore::pageCache()->capacity());
   } else {
     QList<QWebSettingsPrivate*> settings = *::allSettings();
     for (int i = 0; i < settings.count(); ++i)
@@ -673,7 +674,9 @@ void QWebSettings::clearMemoryCaches() {
     http://webkit.org/blog/427/webkit-page-cache-i-the-basics/
 */
 void QWebSettings::setMaximumPagesInCache(int pages) {
+  QWebSettingsPrivate* global = QWebSettings::globalSettings()->d;
   WebCore::pageCache()->setCapacity(qMax(0, pages));
+  global->apply();
 }
 
 /*!
