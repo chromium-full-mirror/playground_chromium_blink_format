@@ -268,6 +268,16 @@ StringType v8StringToWebCoreString(v8::Handle<v8::String> v8String,
   return result;
 }
 
+// Explicitly instantiate the above template with the expected
+// parameterizations,
+// to ensure the compiler generates the code; otherwise link errors can result
+// in GCC 4.4.
+template String v8StringToWebCoreString<String>(v8::Handle<v8::String>,
+                                                ExternalMode);
+template AtomicString v8StringToWebCoreString<AtomicString>(
+    v8::Handle<v8::String>,
+    ExternalMode);
+
 String v8NonStringValueToWebCoreString(v8::Handle<v8::Value> object) {
   ASSERT(!object->IsString());
   if (object->IsInt32()) {
