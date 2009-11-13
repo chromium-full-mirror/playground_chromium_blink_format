@@ -30,6 +30,7 @@
 
 namespace WebCore {
 
+class AtomicString;
 class RenderObject;
 
 class RenderObjectChildList {
@@ -61,7 +62,7 @@ class RenderObjectChildList {
   void updateBeforeAfterContent(RenderObject* owner,
                                 PseudoId type,
                                 RenderObject* styledObject = 0);
-  void invalidateCounters(RenderObject* owner);
+  void invalidateCounters(RenderObject* owner, const AtomicString& identifier);
 
  private:
   RenderObject* m_firstChild;
