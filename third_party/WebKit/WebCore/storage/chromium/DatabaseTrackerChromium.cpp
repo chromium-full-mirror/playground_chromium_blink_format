@@ -40,6 +40,7 @@
 #include "SecurityOrigin.h"
 #include "SQLiteFileSystem.h"
 #include <wtf/HashSet.h>
+#include <wtf/StdLibExtras.h>
 
 namespace WebCore {
 
@@ -71,7 +72,7 @@ void DatabaseTracker::setDatabaseDetails(SecurityOrigin*,
 String DatabaseTracker::fullPathForDatabase(SecurityOrigin* origin,
                                             const String& name,
                                             bool) {
-  return origin->databaseIdentifier() + "/" + name;
+  return origin->databaseIdentifier() + "/" + name + "#";
 }
 
 void DatabaseTracker::addOpenDatabase(Database* database) {
@@ -80,12 +81,14 @@ void DatabaseTracker::addOpenDatabase(Database* database) {
 }
 
 void DatabaseTracker::removeOpenDatabase(Database* database) {
-  ASSERT(isMainThread());
-  DatabaseObserver::databaseClosed(database);
+  // FIXME: once we know how to use this information, figure out
+  //        how to get this method called on the main thread
+  // ASSERT(isMainThread());
+  // DatabaseObserver::databaseClosed(database);
 }
 
 unsigned long long DatabaseTracker::getMaxSizeForDatabase(
-    const Database* database) const {
+    const Database* database) {
   ASSERT(currentThread() ==
          database->document()->databaseThread()->getThreadID());
   unsigned long long spaceAvailable = 0;

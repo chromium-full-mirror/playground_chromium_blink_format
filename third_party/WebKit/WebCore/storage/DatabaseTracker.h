@@ -31,28 +31,33 @@
 
 #if ENABLE(DATABASE)
 
-#include "DatabaseDetails.h"
 #include "PlatformString.h"
+
+#if !PLATFORM(CHROMIUM)
+#include "DatabaseDetails.h"
 #include "SQLiteDatabase.h"
 #include "StringHash.h"
 #include <wtf/HashSet.h>
 #include <wtf/OwnPtr.h>
+#endif  // !PLATFORM(CHROMIUM)
 
 namespace WebCore {
 
 class Database;
-class DatabaseTrackerClient;
 class Document;
-class OriginQuotaManager;
 class SecurityOrigin;
+
+#if !PLATFORM(CHROMIUM)
+class DatabaseTrackerClient;
+class OriginQuotaManager;
 
 struct SecurityOriginHash;
 struct SecurityOriginTraits;
+#endif  // !PLATFORM(CHROMIUM)
 
 class DatabaseTracker {
  public:
-  void setDatabaseDirectoryPath(const String&);
-  const String& databaseDirectoryPath() const;
+  static DatabaseTracker& tracker();
 
   bool canEstablishDatabase(Document*,
                             const String& name,
@@ -66,13 +71,23 @@ class DatabaseTracker {
                              const String& name,
                              bool createIfDoesNotExist = true);
 
+  void addOpenDatabase(Database*);
+  void removeOpenDatabase(Database*);
+
+  unsigned long long getMaxSizeForDatabase(const Database*);
+
+ private:
+  DatabaseTracker();
+
+#if !PLATFORM(CHROMIUM)
+ public:
+  void setDatabaseDirectoryPath(const String&);
+  const String& databaseDirectoryPath() const;
+
   void origins(Vector<RefPtr<SecurityOrigin>>& result);
   bool databaseNamesForOrigin(SecurityOrigin*, Vector<String>& result);
 
   DatabaseDetails detailsForNameAndOrigin(const String&, SecurityOrigin*);
-
-  void addOpenDatabase(Database*);
-  void removeOpenDatabase(Database*);
 
   unsigned long long usageForDatabase(const String&, SecurityOrigin*);
   unsigned long long usageForOrigin(SecurityOrigin*);
@@ -90,15 +105,9 @@ class DatabaseTracker {
 
   OriginQuotaManager& originQuotaManager();
 
-  static DatabaseTracker& tracker();
-
   bool hasEntryForOrigin(SecurityOrigin*);
 
-  unsigned long long getMaxSizeForDatabase(const Database*);
-
  private:
-  DatabaseTracker();
-
   String trackerDatabasePath() const;
   void openTrackerDatabase(bool createIfDoesNotExist);
 
@@ -142,6 +151,7 @@ class DatabaseTracker {
 
   static void scheduleForNotification();
   static void notifyDatabasesChanged(void*);
+#endif  // !PLATFORM(CHROMIUM)
 };
 
 }  // namespace WebCore
