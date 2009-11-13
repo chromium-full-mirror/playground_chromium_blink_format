@@ -574,7 +574,8 @@ static void writeSelection(TextStream& ts, const RenderObject* o) {
        << nodePosition(selection.end().node()) << "\n";
 }
 
-String externalRepresentation(RenderObject* o) {
+String externalRepresentation(Frame* frame) {
+  RenderObject* o = frame->contentRenderer();
   if (!o)
     return String();
 
