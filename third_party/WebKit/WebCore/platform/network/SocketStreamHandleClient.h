@@ -51,6 +51,7 @@ class SocketStreamHandleClient {
 
   virtual void didFail(SocketStreamHandle*, const SocketStreamError&) {}
 
+  // No authentication for streams per se, but proxy may ask for credentials.
   virtual void didReceiveAuthenticationChallenge(
       SocketStreamHandle*,
       const AuthenticationChallenge&) {}
