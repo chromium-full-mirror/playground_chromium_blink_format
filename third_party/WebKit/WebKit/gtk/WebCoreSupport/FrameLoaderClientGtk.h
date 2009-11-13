@@ -174,7 +174,7 @@ class FrameLoaderClient : public WebCore::FrameLoaderClient {
       const WTF::Vector<WebCore::String>& paramNames,
       const WTF::Vector<WebCore::String>& paramValues);
   virtual WebCore::String overrideMediaType() const;
-  virtual void windowObjectCleared();
+  virtual void dispatchDidClearWindowObjectInWorld(WebCore::DOMWrapperWorld*);
   virtual void documentElementAvailable();
   virtual void didPerformFirstNavigation() const;
 

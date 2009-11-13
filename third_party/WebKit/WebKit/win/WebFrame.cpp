@@ -119,6 +119,7 @@ void CGContextSetBaseCTM(CGContextRef c, CGAffineTransform m);
 
 using namespace WebCore;
 using namespace HTMLNames;
+using namespace std;
 
 using JSC::JSGlobalObject;
 using JSC::JSLock;
@@ -1706,7 +1707,7 @@ String WebFrame::overrideMediaType() const {
   return String();
 }
 
-void WebFrame::windowObjectCleared() {
+void WebFrame::dispatchDidClearWindowObjectInWorld(DOMWrapperWorld* world) {
   Frame* coreFrame = core(this);
   ASSERT(coreFrame);
 
@@ -1715,19 +1716,29 @@ void WebFrame::windowObjectCleared() {
     return;
 
   COMPtr<IWebFrameLoadDelegate> frameLoadDelegate;
-  if (SUCCEEDED(d->webView->frameLoadDelegate(&frameLoadDelegate))) {
-    JSContextRef context = toRef(coreFrame->script()
-                                     ->globalObject(mainThreadNormalWorld())
-                                     ->globalExec());
-    JSObjectRef windowObject =
-        toRef(coreFrame->script()->globalObject(mainThreadNormalWorld()));
-    ASSERT(windowObject);
+  if (FAILED(d->webView->frameLoadDelegate(&frameLoadDelegate)))
+    return;
 
-    if (FAILED(frameLoadDelegate->didClearWindowObject(d->webView, context,
-                                                       windowObject, this)))
-      frameLoadDelegate->windowScriptObjectAvailable(d->webView, context,
-                                                     windowObject);
+  COMPtr<IWebFrameLoadDelegatePrivate2> delegatePrivate(Query,
+                                                        frameLoadDelegate);
+  if (delegatePrivate) {
+    delegatePrivate->didClearWindowObjectForFrameInScriptWorld(
+        d->webView, this, WebScriptWorld::findOrCreateWorld(world).get());
+    return;
   }
+
+  if (world != mainThreadNormalWorld())
+    return;
+
+  JSContextRef context =
+      toRef(coreFrame->script()->globalObject(world)->globalExec());
+  JSObjectRef windowObject = toRef(coreFrame->script()->globalObject(world));
+  ASSERT(windowObject);
+
+  if (FAILED(frameLoadDelegate->didClearWindowObject(d->webView, context,
+                                                     windowObject, this)))
+    frameLoadDelegate->windowScriptObjectAvailable(d->webView, context,
+                                                   windowObject);
 }
 
 void WebFrame::documentElementAvailable() {}

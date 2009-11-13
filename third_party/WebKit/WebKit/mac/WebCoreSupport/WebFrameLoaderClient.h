@@ -264,7 +264,7 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
       const WebCore::String& mimeType);
   virtual WebCore::String overrideMediaType() const;
 
-  virtual void windowObjectCleared();
+  virtual void dispatchDidClearWindowObjectInWorld(WebCore::DOMWrapperWorld*);
   virtual void documentElementAvailable();
   virtual void didPerformFirstNavigation() const;
 

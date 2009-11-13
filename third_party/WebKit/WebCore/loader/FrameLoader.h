@@ -51,6 +51,7 @@ class AuthenticationChallenge;
 class CachedFrameBase;
 class CachedPage;
 class CachedResource;
+class DOMWrapperWorld;
 class Document;
 class DocumentLoader;
 class Event;
@@ -299,7 +300,7 @@ class FrameLoader : public Noncopyable {
       HTMLAppletElement*,
       const HashMap<String, String>& args);
 
-  void dispatchWindowObjectAvailable();
+  void dispatchDidClearWindowObjectInWorld(DOMWrapperWorld*);
   void dispatchDocumentElementAvailable();
 
   // Mixed content related functions.
@@ -494,6 +495,7 @@ class FrameLoader : public Noncopyable {
   bool shouldReloadToHandleUnreachableURL(DocumentLoader*);
 
   void dispatchDidCommitLoad();
+  void dispatchDidClearWindowObjectsInAllWorlds();
 
   void loadWithDocumentLoader(
       DocumentLoader*,

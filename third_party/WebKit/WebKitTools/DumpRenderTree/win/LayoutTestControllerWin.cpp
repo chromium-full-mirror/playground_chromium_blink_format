@@ -957,6 +957,22 @@ void LayoutTestController::evaluateInWebInspector(long callId,
   inspectorPrivate->evaluateInFrontend(callId, bstrT(script).GetBSTR());
 }
 
+typedef HashMap<unsigned, COMPtr<IWebScriptWorld>> WorldMap;
+static WorldMap& worldMap() {
+  static WorldMap& map = *new WorldMap;
+  return map;
+}
+
+unsigned worldIDForWorld(IWebScriptWorld* world) {
+  WorldMap::const_iterator end = worldMap().end();
+  for (WorldMap::const_iterator it = worldMap().begin(); it != end; ++it) {
+    if (it->second == world)
+      return it->first;
+  }
+
+  return 0;
+}
+
 void LayoutTestController::evaluateScriptInIsolatedWorld(
     unsigned worldID,
     JSObjectRef globalObject,
@@ -975,9 +991,8 @@ void LayoutTestController::evaluateScriptInIsolatedWorld(
                                     reinterpret_cast<void**>(&world))))
       return;
   } else {
-    typedef HashMap<unsigned, COMPtr<IWebScriptWorld>> WorldMap;
-    static WorldMap& worldMap = *new WorldMap;
-    COMPtr<IWebScriptWorld>& worldSlot = worldMap.add(worldID, 0).first->second;
+    COMPtr<IWebScriptWorld>& worldSlot =
+        worldMap().add(worldID, 0).first->second;
     if (!worldSlot && FAILED(WebKitCreateInstance(
                           __uuidof(WebScriptWorld), 0, __uuidof(worldSlot),
                           reinterpret_cast<void**>(&worldSlot))))

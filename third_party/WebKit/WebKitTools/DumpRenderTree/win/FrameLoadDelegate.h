@@ -152,7 +152,16 @@ class FrameLoadDelegate : public IWebFrameLoadDelegate,
       /* [in] */ IWebView* sender,
       /* [in] */ IWebSecurityOrigin* origin);
 
- protected:
+  virtual HRESULT STDMETHODCALLTYPE
+  didClearWindowObjectForFrameInScriptWorld(IWebView*,
+                                            IWebFrame*,
+                                            IWebScriptWorld*);
+
+ private:
+  void didClearWindowObjectForFrameInIsolatedWorld(IWebFrame*,
+                                                   IWebScriptWorld*);
+  void didClearWindowObjectForFrameInStandardWorld(IWebFrame*);
+
   void locationChangeDone(IWebError*, IWebFrame*);
 
   ULONG m_refCount;

@@ -361,7 +361,7 @@ class DECLSPEC_UUID("{A3676398-4485-4a9d-87DC-CB5A40E6351D}") WebFrame
       const WebCore::String& mimeType);
   virtual WebCore::String overrideMediaType() const;
 
-  virtual void windowObjectCleared();
+  virtual void dispatchDidClearWindowObjectInWorld(WebCore::DOMWrapperWorld*);
   virtual void documentElementAvailable();
   virtual void didPerformFirstNavigation() const;
 

@@ -205,6 +205,10 @@ class WebCoreJSClientData : public JSC::JSGlobalData::ClientData {
   DOMWrapperWorld* currentWorld() { return m_worldStack.last(); }
   DOMWrapperWorld* normalWorld() { return &m_normalWorld; }
 
+  void getAllWorlds(Vector<DOMWrapperWorld*>& worlds) {
+    copyToVector(m_worldSet, worlds);
+  }
+
   void rememberWorld(DOMWrapperWorld* world) {
     ASSERT(!m_worldSet.contains(world));
     m_worldSet.add(world);

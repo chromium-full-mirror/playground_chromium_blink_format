@@ -804,7 +804,7 @@ void FrameLoader::receivedFirstData() {
   begin(m_workingURL, false);
 
   dispatchDidCommitLoad();
-  dispatchWindowObjectAvailable();
+  dispatchDidClearWindowObjectsInAllWorlds();
 
   if (m_documentLoader) {
     String ptitle = m_documentLoader->title();
@@ -897,7 +897,7 @@ void FrameLoader::begin(const KURL& url,
   m_frame->domWindow()->setSecurityOrigin(document->securityOrigin());
 
   if (dispatch)
-    dispatchWindowObjectAvailable();
+    dispatchDidClearWindowObjectsInAllWorlds();
 
   updateFirstPartyForCookies();
 
@@ -4247,15 +4247,27 @@ void FrameLoader::dispatchDocumentElementAvailable() {
   m_client->documentElementAvailable();
 }
 
-void FrameLoader::dispatchWindowObjectAvailable() {
-  // FIXME: should this be isolated-worlds-aware?
-  if (!m_frame->script()->isEnabled() ||
-      !m_frame->script()->existingWindowShell(mainThreadNormalWorld()))
+void FrameLoader::dispatchDidClearWindowObjectsInAllWorlds() {
+  if (!m_frame->script()->isEnabled())
     return;
 
-  m_client->windowObjectCleared();
+  Vector<DOMWrapperWorld*> worlds;
+  ScriptController::getAllWorlds(worlds);
+  for (size_t i = 0; i < worlds.size(); ++i)
+    dispatchDidClearWindowObjectInWorld(worlds[i]);
+}
+
+void FrameLoader::dispatchDidClearWindowObjectInWorld(DOMWrapperWorld* world) {
+  if (!m_frame->script()->isEnabled() ||
+      !m_frame->script()->existingWindowShell(world))
+    return;
+
+  m_client->dispatchDidClearWindowObjectInWorld(world);
 
 #if ENABLE(INSPECTOR)
+  if (world != mainThreadNormalWorld())
+    return;
+
   if (Page* page = m_frame->page()) {
     if (InspectorController* inspector = page->inspectorController())
       inspector->inspectedWindowScriptObjectCleared(m_frame);

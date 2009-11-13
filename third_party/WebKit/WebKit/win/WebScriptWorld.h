@@ -36,9 +36,10 @@ class DOMWrapperWorld;
 
 class WebScriptWorld : public Noncopyable, public IWebScriptWorld {
  public:
+  static WebScriptWorld* standardWorld();
   static COMPtr<WebScriptWorld> createInstance();
-  static COMPtr<WebScriptWorld> createInstance(
-      PassRefPtr<WebCore::DOMWrapperWorld>);
+
+  static COMPtr<WebScriptWorld> findOrCreateWorld(WebCore::DOMWrapperWorld*);
 
   virtual ULONG STDMETHODCALLTYPE AddRef();
   virtual ULONG STDMETHODCALLTYPE Release();
@@ -46,6 +47,9 @@ class WebScriptWorld : public Noncopyable, public IWebScriptWorld {
   WebCore::DOMWrapperWorld* world() const { return m_world.get(); }
 
  private:
+  static COMPtr<WebScriptWorld> createInstance(
+      PassRefPtr<WebCore::DOMWrapperWorld>);
+
   WebScriptWorld(PassRefPtr<WebCore::DOMWrapperWorld>);
   ~WebScriptWorld();
 

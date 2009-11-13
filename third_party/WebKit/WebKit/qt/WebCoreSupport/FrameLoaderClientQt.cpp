@@ -53,8 +53,9 @@
 #include "QNetworkReplyHandler.h"
 #include "ResourceHandleInternal.h"
 #include "ResourceHandle.h"
-#include "Settings.h"
+#include "ScriptController.h"
 #include "ScriptString.h"
+#include "Settings.h"
 #include "QWebPageClient.h"
 
 #include "qwebpage.h"
@@ -527,7 +528,11 @@ bool FrameLoaderClientQt::canHandleRequest(
   return true;
 }
 
-void FrameLoaderClientQt::windowObjectCleared() {
+void FrameLoaderClientQt::dispatchDidClearWindowObjectInWorld(
+    DOMWrapperWorld* world) {
+  if (world != mainThreadNormalWorld())
+    return;
+
   if (dumpFrameLoaderCallbacks)
     printf("%s - didClearWindowObjectForFrame\n",
            qPrintable(drtDescriptionSuitableForTestResult(m_frame)));
