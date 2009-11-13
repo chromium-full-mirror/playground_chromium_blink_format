@@ -306,8 +306,8 @@ void DumpRenderTree::resetToConsistentStateBeforeTesting() {
 
   m_page->undoStack()->clear();
 
-  QLocale qlocale;
-  QLocale::setDefault(qlocale);
+  QLocale::setDefault(QLocale::c());
+  setlocale(LC_ALL, "");
 }
 
 void DumpRenderTree::open(const QUrl& aurl) {
