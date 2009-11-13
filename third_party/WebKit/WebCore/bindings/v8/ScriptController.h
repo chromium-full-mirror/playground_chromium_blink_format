@@ -39,6 +39,7 @@
 #include <v8.h>
 
 #include <wtf/HashMap.h>
+#include <wtf/RefCounted.h>
 #include <wtf/Vector.h>
 
 namespace WebCore {
@@ -179,6 +180,9 @@ class ScriptController {
   NPObject* windowScriptNPObject();
 #endif
 
+  // Dummy method to avoid a bunch of ifdef's in WebCore.
+  void evaluateInWorld(const ScriptSourceCode&, DOMWrapperWorld*) {}
+
  private:
   Frame* m_frame;
   const String* m_sourceURL;
@@ -204,6 +208,9 @@ class ScriptController {
 };
 
 DOMWrapperWorld* mainThreadNormalWorld();
+
+// Dummy class to avoid a bunch of ifdef's in WebCore.
+class DOMWrapperWorld : public RefCounted<DOMWrapperWorld> {};
 
 }  // namespace WebCore
 
