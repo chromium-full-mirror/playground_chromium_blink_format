@@ -215,6 +215,15 @@ void createCallback(v8::Local<v8::ObjectTemplate> proto,
                     v8::Handle<v8::Signature>,
                     v8::PropertyAttribute attributes = v8::DontDelete);
 
+v8::Handle<v8::Value> getElementStringAttr(const v8::AccessorInfo&,
+                                           const QualifiedName&);
+void setElementStringAttr(const v8::AccessorInfo&,
+                          const QualifiedName&,
+                          v8::Local<v8::Value>);
+
+v8::Handle<v8::Value> getElementEventHandlerAttr(const v8::AccessorInfo&,
+                                                 const AtomicString&);
+
 }  // namespace WebCore
 
 #endif  // V8Binding_h
