@@ -118,6 +118,8 @@ class AccessibilityUIElement {
   int hierarchicalLevel() const;
   double clickPointX();
   double clickPointY();
+  JSStringRef documentEncoding();
+  JSStringRef documentURI();
 
   // Table-specific attributes
   JSStringRef attributesOfColumnHeaders();
