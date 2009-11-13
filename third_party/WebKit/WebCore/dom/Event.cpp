@@ -88,6 +88,10 @@ bool Event::isTextEvent() const {
   return false;
 }
 
+bool Event::isCompositionEvent() const {
+  return false;
+}
+
 bool Event::isDragEvent() const {
   return false;
 }
