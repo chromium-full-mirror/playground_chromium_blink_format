@@ -48,7 +48,9 @@ TextBreakIterator* lineBreakIterator(const UChar*, int length);
 TextBreakIterator* sentenceBreakIterator(const UChar*, int length);
 
 int textBreakFirst(TextBreakIterator*);
+int textBreakLast(TextBreakIterator*);
 int textBreakNext(TextBreakIterator*);
+int textBreakPrevious(TextBreakIterator*);
 int textBreakCurrent(TextBreakIterator*);
 int textBreakPreceding(TextBreakIterator*, int);
 int textBreakFollowing(TextBreakIterator*, int);
