@@ -146,6 +146,7 @@ extern void (*wkMeasureMediaUIPart)(int part,
                                     int themeStyle,
                                     CGRect* bounds,
                                     CGSize* naturalSize);
+extern BOOL (*wkMediaControllerThemeAvailable)(int themeStyle);
 extern void (*wkPopupMenu)(NSMenu*,
                            NSPoint location,
                            float width,
