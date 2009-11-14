@@ -288,7 +288,7 @@ class FrameLoaderClient {
                                               const String& mimeType) = 0;
   virtual String overrideMediaType() const = 0;
 
-  virtual void dispatchDidClearWindowObjectInWorld(DOMWrapperWorld*) = 0;
+  virtual void dispatchDidClearWindowObjectInWorld(DOMWrapperWorld*) {}
   virtual void documentElementAvailable() = 0;
   virtual void didPerformFirstNavigation() const = 0;  // "Navigation" here
                                                        // means a transition
