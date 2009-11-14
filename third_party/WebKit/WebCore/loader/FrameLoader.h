@@ -301,6 +301,7 @@ class FrameLoader : public Noncopyable {
       const HashMap<String, String>& args);
 
   void dispatchDidClearWindowObjectInWorld(DOMWrapperWorld*);
+  void dispatchDidClearWindowObjectsInAllWorlds();
   void dispatchDocumentElementAvailable();
 
   // Mixed content related functions.
@@ -495,7 +496,6 @@ class FrameLoader : public Noncopyable {
   bool shouldReloadToHandleUnreachableURL(DocumentLoader*);
 
   void dispatchDidCommitLoad();
-  void dispatchDidClearWindowObjectsInAllWorlds();
 
   void loadWithDocumentLoader(
       DocumentLoader*,
