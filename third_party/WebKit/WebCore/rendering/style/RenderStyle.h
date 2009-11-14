@@ -50,6 +50,7 @@
 #include "Length.h"
 #include "LengthBox.h"
 #include "LengthSize.h"
+#include "LineClampValue.h"
 #include "NinePieceImage.h"
 #include "OutlineValue.h"
 #include "Pair.h"
@@ -993,7 +994,9 @@ class RenderStyle : public RefCounted<RenderStyle> {
   }
 #endif
 
-  int lineClamp() const { return rareNonInheritedData->lineClamp; }
+  const LineClampValue& lineClamp() const {
+    return rareNonInheritedData->lineClamp;
+  }
   bool textSizeAdjust() const { return rareInheritedData->textSizeAdjust; }
   ETextSecurity textSecurity() const {
     return static_cast<ETextSecurity>(rareInheritedData->textSecurity);
@@ -1562,7 +1565,9 @@ class RenderStyle : public RefCounted<RenderStyle> {
   }
 #endif
 
-  void setLineClamp(int c) { SET_VAR(rareNonInheritedData, lineClamp, c); }
+  void setLineClamp(LineClampValue c) {
+    SET_VAR(rareNonInheritedData, lineClamp, c);
+  }
   void setTextSizeAdjust(bool b) {
     SET_VAR(rareInheritedData, textSizeAdjust, b);
   }
@@ -1788,7 +1793,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
   static Color initialBackgroundColor() { return Color::transparent; }
 
   // Keep these at the end.
-  static int initialLineClamp() { return -1; }
+  static LineClampValue initialLineClamp() { return LineClampValue(); }
   static bool initialTextSizeAdjust() { return true; }
   static ETextSecurity initialTextSecurity() { return TSNONE; }
 #if ENABLE(DASHBOARD_SUPPORT)
