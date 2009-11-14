@@ -103,7 +103,8 @@ void FrameLoaderClientImpl::frameLoaderDestroyed() {
   m_webFrame->deref();
 }
 
-void FrameLoaderClientImpl::windowObjectCleared() {
+void FrameLoaderClientImpl::dispatchDidClearWindowObjectInWorld(
+    DOMWrapperWorld*) {
   if (m_webFrame->client())
     m_webFrame->client()->didClearWindowObject(m_webFrame);
 
