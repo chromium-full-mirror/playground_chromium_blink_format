@@ -39,7 +39,6 @@ JSC::MacroAssemblerX86Common::SSE2CheckState
 #include "CodeBlock.h"
 #include "Interpreter.h"
 #include "JITInlineMethods.h"
-#include "JITStubs.h"
 #include "JITStubCall.h"
 #include "JSArray.h"
 #include "JSFunction.h"
