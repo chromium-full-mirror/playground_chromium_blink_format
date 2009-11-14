@@ -349,6 +349,10 @@ void ScriptController::cleanupScriptObjectsForPlugin(Widget* nativeHandle) {
   m_pluginObjects.remove(it);
 }
 
+void ScriptController::getAllWorlds(Vector<DOMWrapperWorld*>& worlds) {
+  worlds.append(mainThreadWorld());
+}
+
 static NPObject* createNoScriptObject() {
   notImplemented();
   return 0;
