@@ -267,6 +267,7 @@ typedef enum {
   WKMediaControllerFlagDrawEndCaps = 1 << 3,
 } WKMediaControllerThemeState;
 
+BOOL WKMediaControllerThemeAvailable(int themeStyle);
 BOOL WKHitTestMediaUIPart(int part,
                           int themeStyle,
                           CGRect bounds,
