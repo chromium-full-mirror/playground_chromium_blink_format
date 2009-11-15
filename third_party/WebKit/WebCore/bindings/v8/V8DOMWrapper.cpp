@@ -1621,6 +1621,7 @@ PassRefPtr<EventListener> V8DOMWrapper::getEventListener(
                    value, isAttribute);
 }
 
+#if ENABLE(SVG)
 PassRefPtr<EventListener> V8DOMWrapper::getEventListener(
     SVGElementInstance* element,
     v8::Local<v8::Value> value,
@@ -1629,6 +1630,7 @@ PassRefPtr<EventListener> V8DOMWrapper::getEventListener(
   return getEventListener(element->correspondingElement(), value, isAttribute,
                           lookup);
 }
+#endif
 
 PassRefPtr<EventListener> V8DOMWrapper::getEventListener(
     AbstractWorker* worker,
