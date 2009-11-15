@@ -447,7 +447,7 @@ void GraphicsContext::setPlatformFont(const Font& font) {
 }
 
 void GraphicsContext::setPlatformStrokeColor(const Color& color,
-                                             ColorSPace colorSpace) {
+                                             ColorSpace colorSpace) {
   if (paintingDisabled())
     return;
 
