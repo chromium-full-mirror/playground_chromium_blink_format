@@ -145,7 +145,8 @@ AccessibilityObject* AXObjectCache::getOrCreate(RenderObject* renderer) {
 
     // If the node is aria role="list" or the aria role is empty and its a
     // ul/ol/dl type (it shouldn't be a list if aria says otherwise).
-    else if (node && (nodeIsAriaType(node, "list") ||
+    else if (node && ((nodeIsAriaType(node, "list") ||
+                       nodeIsAriaType(node, "directory")) ||
                       (nodeIsAriaType(node, nullAtom) &&
                        (node->hasTagName(ulTag) || node->hasTagName(olTag) ||
                         node->hasTagName(dlTag)))))

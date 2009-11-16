@@ -2450,6 +2450,7 @@ static const ARIARoleMap& createARIARoleMap() {
       {"complementary", LandmarkComplementaryRole},
       {"contentinfo", LandmarkContentInfoRole},
       {"dialog", ApplicationDialogRole},
+      {"directory", DirectoryRole},
       {"grid", TableRole},
       {"gridcell", CellRole},
       {"columnheader", ColumnHeaderRole},
