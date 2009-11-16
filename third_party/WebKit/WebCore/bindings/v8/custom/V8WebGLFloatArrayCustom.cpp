@@ -38,6 +38,7 @@
 #include "V8Binding.h"
 #include "V8WebGLArrayBuffer.h"
 #include "V8WebGLArrayCustom.h"
+#include "V8WebGLFloatArray.h"
 #include "V8CustomBinding.h"
 #include "V8Proxy.h"
 
@@ -46,7 +47,7 @@ namespace WebCore {
 CALLBACK_FUNC_DECL(WebGLFloatArrayConstructor) {
   INC_STATS("DOM.WebGLFloatArray.Contructor");
 
-  return constructCanvasArray<WebGLFloatArray>(
+  return constructWebGLArray<WebGLFloatArray>(
       args, V8ClassIndex::ToInt(V8ClassIndex::WEBGLFLOATARRAY));
 }
 
@@ -76,6 +77,18 @@ INDEXED_PROPERTY_SETTER(WebGLFloatArray) {
   if ((index >= 0) && (index < array->length()))
     array->set(index, value->NumberValue());
   return value;
+}
+
+CALLBACK_FUNC_DECL(WebGLFloatArrayGet) {
+  INC_STATS("DOM.WebGLFloatArray.get()");
+  return getWebGLArrayElement<WebGLFloatArray, float>(
+      args, V8ClassIndex::WEBGLFLOATARRAY);
+}
+
+CALLBACK_FUNC_DECL(WebGLFloatArraySet) {
+  INC_STATS("DOM.WebGLFloatArray.set()");
+  return setWebGLArray<WebGLFloatArray, V8WebGLFloatArray>(
+      args, V8ClassIndex::WEBGLFLOATARRAY);
 }
 
 }  // namespace WebCore

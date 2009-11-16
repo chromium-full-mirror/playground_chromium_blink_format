@@ -331,7 +331,7 @@ void GraphicsContext3D::bufferData(unsigned long target,
     return;
 
   ensureContext(m_contextObj);
-  ::glBufferData(target, array->sizeInBytes(), array->baseAddress(), usage);
+  ::glBufferData(target, array->byteLength(), array->baseAddress(), usage);
 }
 
 void GraphicsContext3D::bufferSubData(unsigned long target,
@@ -341,7 +341,7 @@ void GraphicsContext3D::bufferSubData(unsigned long target,
     return;
 
   ensureContext(m_contextObj);
-  ::glBufferSubData(target, offset, array->sizeInBytes(), array->baseAddress());
+  ::glBufferSubData(target, offset, array->byteLength(), array->baseAddress());
 }
 
 unsigned long GraphicsContext3D::checkFramebufferStatus(unsigned long target) {

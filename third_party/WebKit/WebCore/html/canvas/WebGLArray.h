@@ -26,12 +26,14 @@
 #ifndef WebGLArray_h
 #define WebGLArray_h
 
+#include "ExceptionCode.h"
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 #include <wtf/RefPtr.h>
 #include "WebGLArrayBuffer.h"
 
 namespace WebCore {
+
 class WebGLArray : public RefCounted<WebGLArray> {
  public:
   virtual bool isByteArray() const { return false; }
@@ -46,19 +48,24 @@ class WebGLArray : public RefCounted<WebGLArray> {
 
   void* baseAddress() { return m_baseAddress; }
 
-  unsigned offset() const { return m_offset; }
+  unsigned byteOffset() const { return m_byteOffset; }
 
   virtual unsigned length() const = 0;
-  virtual unsigned sizeInBytes() const = 0;
-  virtual unsigned alignedSizeInBytes() const;
+  virtual unsigned byteLength() const = 0;
+  virtual PassRefPtr<WebGLArray> slice(unsigned offset, unsigned length) = 0;
+
   virtual ~WebGLArray();
 
  protected:
-  WebGLArray(PassRefPtr<WebGLArrayBuffer> buffer, unsigned offset);
+  WebGLArray(PassRefPtr<WebGLArrayBuffer> buffer, unsigned byteOffset);
 
-  // This is the address of the WebGLArrayBuffer's storage, plus the offset.
+  void setImpl(WebGLArray* array, unsigned byteOffset, ExceptionCode& ec);
+
+  // This is the address of the WebGLArrayBuffer's storage, plus the byte
+  // offset.
   void* m_baseAddress;
-  unsigned m_offset;
+
+  unsigned m_byteOffset;
 
  private:
   RefPtr<WebGLArrayBuffer> m_buffer;

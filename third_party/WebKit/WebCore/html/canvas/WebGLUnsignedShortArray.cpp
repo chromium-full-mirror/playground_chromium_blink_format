@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2009 Apple Inc. All rights reserved.
+ * Copyright (C) 2009 Google Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -50,35 +51,53 @@ PassRefPtr<WebGLUnsignedShortArray> WebGLUnsignedShortArray::create(
 
 PassRefPtr<WebGLUnsignedShortArray> WebGLUnsignedShortArray::create(
     PassRefPtr<WebGLArrayBuffer> buffer,
-    int offset,
+    int byteOffset,
     unsigned length) {
   // Make sure the offset results in valid alignment.
-  if ((offset % sizeof(unsigned short)) != 0) {
+  if ((byteOffset % sizeof(unsigned short)) != 0) {
     return NULL;
   }
 
   if (buffer) {
     // Check to make sure we are talking about a valid region of
     // the given WebGLArrayBuffer's storage.
-    if ((offset + (length * sizeof(unsigned short))) > buffer->byteLength())
+    if ((byteOffset + (length * sizeof(unsigned short))) > buffer->byteLength())
       return NULL;
   }
 
-  return adoptRef(new WebGLUnsignedShortArray(buffer, offset, length));
+  return adoptRef(new WebGLUnsignedShortArray(buffer, byteOffset, length));
 }
 
 WebGLUnsignedShortArray::WebGLUnsignedShortArray(
     PassRefPtr<WebGLArrayBuffer> buffer,
-    int offset,
+    int byteOffset,
     unsigned length)
-    : WebGLArray(buffer, offset), m_size(length) {}
+    : WebGLArray(buffer, byteOffset), m_size(length) {}
 
 unsigned WebGLUnsignedShortArray::length() const {
   return m_size;
 }
 
-unsigned WebGLUnsignedShortArray::sizeInBytes() const {
-  return length() * sizeof(unsigned short);
+unsigned WebGLUnsignedShortArray::byteLength() const {
+  return m_size * sizeof(unsigned short);
+}
+
+PassRefPtr<WebGLArray> WebGLUnsignedShortArray::slice(unsigned offset,
+                                                      unsigned length) {
+  // Check to make sure the specified region is within the bounds of
+  // the WebGLArrayBuffer.
+  unsigned startByte = m_byteOffset + offset * sizeof(unsigned short);
+  unsigned limitByte = startByte + length * sizeof(unsigned short);
+  unsigned bufferLength = buffer()->byteLength();
+  if (startByte >= bufferLength || limitByte > bufferLength)
+    return 0;
+  return create(buffer(), startByte, length);
+}
+
+void WebGLUnsignedShortArray::set(WebGLUnsignedShortArray* array,
+                                  unsigned offset,
+                                  ExceptionCode& ec) {
+  setImpl(array, offset * sizeof(unsigned short), ec);
 }
 }
 

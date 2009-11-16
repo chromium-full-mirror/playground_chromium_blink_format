@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2009 Apple Inc. All rights reserved.
+ * Copyright (C) 2009 Google Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -47,33 +48,50 @@ PassRefPtr<WebGLIntArray> WebGLIntArray::create(int* array, unsigned length) {
 
 PassRefPtr<WebGLIntArray> WebGLIntArray::create(
     PassRefPtr<WebGLArrayBuffer> buffer,
-    int offset,
+    int byteOffset,
     unsigned length) {
   // Make sure the offset results in valid alignment.
-  if ((offset % sizeof(int)) != 0)
+  if ((byteOffset % sizeof(int)) != 0)
     return NULL;
 
   if (buffer) {
     // Check to make sure we are talking about a valid region of
     // the given WebGLArrayBuffer's storage.
-    if ((offset + (length * sizeof(int))) > buffer->byteLength())
+    if ((byteOffset + (length * sizeof(int))) > buffer->byteLength())
       return NULL;
   }
 
-  return adoptRef(new WebGLIntArray(buffer, offset, length));
+  return adoptRef(new WebGLIntArray(buffer, byteOffset, length));
 }
 
 WebGLIntArray::WebGLIntArray(PassRefPtr<WebGLArrayBuffer> buffer,
-                             int offset,
+                             int byteOffset,
                              unsigned length)
-    : WebGLArray(buffer, offset), m_size(length) {}
+    : WebGLArray(buffer, byteOffset), m_size(length) {}
 
 unsigned WebGLIntArray::length() const {
   return m_size;
 }
 
-unsigned WebGLIntArray::sizeInBytes() const {
-  return length() * sizeof(int);
+unsigned WebGLIntArray::byteLength() const {
+  return m_size * sizeof(int);
+}
+
+PassRefPtr<WebGLArray> WebGLIntArray::slice(unsigned offset, unsigned length) {
+  // Check to make sure the specified region is within the bounds of
+  // the WebGLArrayBuffer.
+  unsigned startByte = m_byteOffset + offset * sizeof(int);
+  unsigned limitByte = startByte + length * sizeof(int);
+  unsigned bufferLength = buffer()->byteLength();
+  if (startByte >= bufferLength || limitByte > bufferLength)
+    return 0;
+  return create(buffer(), startByte, length);
+}
+
+void WebGLIntArray::set(WebGLIntArray* array,
+                        unsigned offset,
+                        ExceptionCode& ec) {
+  setImpl(array, offset * sizeof(int), ec);
 }
 }
 

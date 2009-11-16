@@ -48,33 +48,51 @@ PassRefPtr<WebGLShortArray> WebGLShortArray::create(short* array,
 
 PassRefPtr<WebGLShortArray> WebGLShortArray::create(
     PassRefPtr<WebGLArrayBuffer> buffer,
-    int offset,
+    int byteOffset,
     unsigned length) {
   // Make sure the offset results in valid alignment.
-  if ((offset % sizeof(short)) != 0)
+  if ((byteOffset % sizeof(short)) != 0)
     return NULL;
 
   if (buffer) {
     // Check to make sure we are talking about a valid region of
     // the given WebGLArrayBuffer's storage.
-    if ((offset + (length * sizeof(short))) > buffer->byteLength())
+    if ((byteOffset + (length * sizeof(short))) > buffer->byteLength())
       return NULL;
   }
 
-  return adoptRef(new WebGLShortArray(buffer, offset, length));
+  return adoptRef(new WebGLShortArray(buffer, byteOffset, length));
 }
 
 WebGLShortArray::WebGLShortArray(PassRefPtr<WebGLArrayBuffer> buffer,
-                                 int offset,
+                                 int byteOffset,
                                  unsigned length)
-    : WebGLArray(buffer, offset), m_size(length) {}
+    : WebGLArray(buffer, byteOffset), m_size(length) {}
 
 unsigned WebGLShortArray::length() const {
   return m_size;
 }
 
-unsigned WebGLShortArray::sizeInBytes() const {
-  return length() * sizeof(short);
+unsigned WebGLShortArray::byteLength() const {
+  return m_size * sizeof(short);
+}
+
+PassRefPtr<WebGLArray> WebGLShortArray::slice(unsigned offset,
+                                              unsigned length) {
+  // Check to make sure the specified region is within the bounds of
+  // the WebGLArrayBuffer.
+  unsigned startByte = m_byteOffset + offset * sizeof(short);
+  unsigned limitByte = startByte + length * sizeof(short);
+  unsigned bufferLength = buffer()->byteLength();
+  if (startByte >= bufferLength || limitByte > bufferLength)
+    return 0;
+  return create(buffer(), startByte, length);
+}
+
+void WebGLShortArray::set(WebGLShortArray* array,
+                          unsigned offset,
+                          ExceptionCode& ec) {
+  setImpl(array, offset * sizeof(short), ec);
 }
 }
 

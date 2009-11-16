@@ -38,6 +38,7 @@
 #include "V8Binding.h"
 #include "V8WebGLArrayBuffer.h"
 #include "V8WebGLArrayCustom.h"
+#include "V8WebGLUnsignedShortArray.h"
 #include "V8CustomBinding.h"
 #include "V8Proxy.h"
 
@@ -46,7 +47,7 @@ namespace WebCore {
 CALLBACK_FUNC_DECL(WebGLUnsignedShortArrayConstructor) {
   INC_STATS("DOM.WebGLUnsignedShortArray.Contructor");
 
-  return constructCanvasArray<WebGLUnsignedShortArray>(
+  return constructWebGLArray<WebGLUnsignedShortArray>(
       args, V8ClassIndex::ToInt(V8ClassIndex::WEBGLUNSIGNEDSHORTARRAY));
 }
 
@@ -81,6 +82,18 @@ INDEXED_PROPERTY_SETTER(WebGLUnsignedShortArray) {
     array->set(index, value->NumberValue());
   }
   return value;
+}
+
+CALLBACK_FUNC_DECL(WebGLUnsignedShortArrayGet) {
+  INC_STATS("DOM.WebGLUnsignedShortArray.get()");
+  return getWebGLArrayElement<WebGLUnsignedShortArray, unsigned short>(
+      args, V8ClassIndex::WEBGLUNSIGNEDSHORTARRAY);
+}
+
+CALLBACK_FUNC_DECL(WebGLUnsignedShortArraySet) {
+  INC_STATS("DOM.WebGLUnsignedShortArray.set()");
+  return setWebGLArray<WebGLUnsignedShortArray, V8WebGLUnsignedShortArray>(
+      args, V8ClassIndex::WEBGLUNSIGNEDSHORTARRAY);
 }
 
 }  // namespace WebCore

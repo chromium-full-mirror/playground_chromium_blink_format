@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2009 Apple Inc. All rights reserved.
+ * Copyright (C) 2009 Google Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -43,13 +44,14 @@ class WebGLByteArray : public WebGLArray {
   static PassRefPtr<WebGLByteArray> create(unsigned length);
   static PassRefPtr<WebGLByteArray> create(signed char* array, unsigned length);
   static PassRefPtr<WebGLByteArray> create(PassRefPtr<WebGLArrayBuffer> buffer,
-                                           int offset,
+                                           int byteOffset,
                                            unsigned length);
 
   char* data() { return static_cast<char*>(baseAddress()); }
 
   virtual unsigned length() const;
-  virtual unsigned sizeInBytes() const;
+  virtual unsigned byteLength() const;
+  virtual PassRefPtr<WebGLArray> slice(unsigned offset, unsigned length);
 
   void set(unsigned index, double value) {
     if (index >= m_size)
@@ -72,11 +74,15 @@ class WebGLByteArray : public WebGLArray {
     return true;
   }
 
+  signed char get(unsigned index) const { return item(index); }
+
   signed char item(unsigned index) const {
     ASSERT(index < m_size);
     signed char* storage = static_cast<signed char*>(m_baseAddress);
     return storage[index];
   }
+
+  void set(WebGLByteArray* array, unsigned offset, ExceptionCode& ec);
 
  private:
   WebGLByteArray(PassRefPtr<WebGLArrayBuffer> buffer,
