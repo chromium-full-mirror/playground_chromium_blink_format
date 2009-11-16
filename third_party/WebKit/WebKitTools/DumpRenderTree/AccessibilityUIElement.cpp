@@ -457,6 +457,19 @@ static JSValueRef showMenuCallback(JSContextRef context,
 
 // Static Value Getters
 
+static JSValueRef getIsValidCallback(JSContextRef context,
+                                     JSObjectRef thisObject,
+                                     JSStringRef propertyName,
+                                     JSValueRef* exception) {
+  AccessibilityUIElement* uiElement = toAXElement(thisObject);
+  if (!uiElement->platformUIElement())
+    return JSValueMakeBoolean(context, false);
+
+  // There might be other platform logic that one could check here...
+
+  return JSValueMakeBoolean(context, true);
+}
+
 static JSValueRef getRoleCallback(JSContextRef context,
                                   JSObjectRef thisObject,
                                   JSStringRef propertyName,
@@ -736,6 +749,8 @@ JSClassRef AccessibilityUIElement::getJSClass() {
       {"documentEncoding", getDocumentEncodingCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"documentURI", getDocumentURICallback, 0,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"isValid", getIsValidCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {0, 0, 0, 0}};
 
