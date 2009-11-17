@@ -132,13 +132,13 @@ bool JSCallbackObject<Base>::getOwnPropertySlot(ExecState* exec,
         JSLock::DropAllLocks dropAllLocks(exec);
         value = getProperty(ctx, thisRef, propertyNameRef.get(), &exception);
       }
-      exec->setException(toJS(exec, exception));
-      if (value) {
-        slot.setValue(toJS(exec, value));
+      if (exception) {
+        exec->setException(toJS(exec, exception));
+        slot.setValue(jsUndefined());
         return true;
       }
-      if (exception) {
-        slot.setValue(jsUndefined());
+      if (value) {
+        slot.setValue(toJS(exec, value));
         return true;
       }
     }
@@ -192,7 +192,8 @@ void JSCallbackObject<Base>::put(ExecState* exec,
         result = setProperty(ctx, thisRef, propertyNameRef.get(), valueRef,
                              &exception);
       }
-      exec->setException(toJS(exec, exception));
+      if (exception)
+        exec->setException(toJS(exec, exception));
       if (result || exception)
         return;
     }
@@ -213,7 +214,8 @@ void JSCallbackObject<Base>::put(ExecState* exec,
             result = setProperty(ctx, thisRef, propertyNameRef.get(), valueRef,
                                  &exception);
           }
-          exec->setException(toJS(exec, exception));
+          if (exception)
+            exec->setException(toJS(exec, exception));
           if (result || exception)
             return;
         } else
@@ -258,7 +260,8 @@ bool JSCallbackObject<Base>::deleteProperty(ExecState* exec,
         result =
             deleteProperty(ctx, thisRef, propertyNameRef.get(), &exception);
       }
-      exec->setException(toJS(exec, exception));
+      if (exception)
+        exec->setException(toJS(exec, exception));
       if (result || exception)
         return true;
     }
@@ -329,7 +332,8 @@ JSObject* JSCallbackObject<Base>::construct(ExecState* exec,
         result = toJS(callAsConstructor(execRef, constructorRef, argumentCount,
                                         arguments.data(), &exception));
       }
-      exec->setException(toJS(exec, exception));
+      if (exception)
+        exec->setException(toJS(exec, exception));
       return result;
     }
   }
@@ -356,7 +360,8 @@ bool JSCallbackObject<Base>::hasInstance(ExecState* exec,
         JSLock::DropAllLocks dropAllLocks(exec);
         result = hasInstance(execRef, thisRef, valueRef, &exception);
       }
-      exec->setException(toJS(exec, exception));
+      if (exception)
+        exec->setException(toJS(exec, exception));
       return result;
     }
   }
@@ -401,7 +406,8 @@ JSValue JSCallbackObject<Base>::call(ExecState* exec,
             exec, callAsFunction(execRef, functionRef, thisObjRef,
                                  argumentCount, arguments.data(), &exception));
       }
-      exec->setException(toJS(exec, exception));
+      if (exception)
+        exec->setException(toJS(exec, exception));
       return result;
     }
   }
@@ -478,7 +484,8 @@ double JSCallbackObject<Base>::toNumber(ExecState* exec) const {
       }
 
       double dValue;
-      return toJS(exec, value).getNumber(dValue) ? dValue : NaN;
+      if (value)
+        return toJS(exec, value).getNumber(dValue) ? dValue : NaN;
     }
 
   return Base::toNumber(exec);
@@ -501,7 +508,8 @@ UString JSCallbackObject<Base>::toString(ExecState* exec) const {
         exec->setException(toJS(exec, exception));
         return "";
       }
-      return toJS(exec, value).getString();
+      if (value)
+        return toJS(exec, value).getString();
     }
 
   return Base::toString(exec);
@@ -552,11 +560,12 @@ JSValue JSCallbackObject<Base>::staticValueGetter(
             value = getProperty(toRef(exec), thisRef, propertyNameRef.get(),
                                 &exception);
           }
-          exec->setException(toJS(exec, exception));
+          if (exception) {
+            exec->setException(toJS(exec, exception));
+            return jsUndefined();
+          }
           if (value)
             return toJS(exec, value);
-          if (exception)
-            return jsUndefined();
         }
 
   return throwError(
@@ -619,11 +628,12 @@ JSValue JSCallbackObject<Base>::callbackGetter(ExecState* exec,
         value = getProperty(toRef(exec), thisRef, propertyNameRef.get(),
                             &exception);
       }
-      exec->setException(toJS(exec, exception));
+      if (exception) {
+        exec->setException(toJS(exec, exception));
+        return jsUndefined();
+      }
       if (value)
         return toJS(exec, value);
-      if (exception)
-        return jsUndefined();
     }
 
   return throwError(

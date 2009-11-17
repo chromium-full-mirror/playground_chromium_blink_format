@@ -422,7 +422,7 @@ static JSValueRef setSelectedTextRangeCallback(JSContextRef context,
   }
 
   toAXElement(thisObject)->setSelectedTextRange(location, length);
-  return 0;
+  return JSValueMakeUndefined(context);
 }
 
 static JSValueRef incrementCallback(JSContextRef context,
@@ -432,7 +432,7 @@ static JSValueRef incrementCallback(JSContextRef context,
                                     const JSValueRef arguments[],
                                     JSValueRef* exception) {
   toAXElement(thisObject)->increment();
-  return 0;
+  return JSValueMakeUndefined(context);
 }
 
 static JSValueRef decrementCallback(JSContextRef context,
@@ -442,7 +442,7 @@ static JSValueRef decrementCallback(JSContextRef context,
                                     const JSValueRef arguments[],
                                     JSValueRef* exception) {
   toAXElement(thisObject)->decrement();
-  return 0;
+  return JSValueMakeUndefined(context);
 }
 
 static JSValueRef showMenuCallback(JSContextRef context,
@@ -452,7 +452,7 @@ static JSValueRef showMenuCallback(JSContextRef context,
                                    const JSValueRef arguments[],
                                    JSValueRef* exception) {
   toAXElement(thisObject)->showMenu();
-  return 0;
+  return JSValueMakeUndefined(context);
 }
 
 // Static Value Getters

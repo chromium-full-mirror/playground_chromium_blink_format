@@ -50,14 +50,18 @@ typedef struct OpaqueJSValue* JSObjectRef;
 /* Opaque typing convenience methods */
 
 inline JSC::ExecState* toJS(JSContextRef c) {
+  ASSERT(c);
   return reinterpret_cast<JSC::ExecState*>(const_cast<OpaqueJSContext*>(c));
 }
 
 inline JSC::ExecState* toJS(JSGlobalContextRef c) {
+  ASSERT(c);
   return reinterpret_cast<JSC::ExecState*>(c);
 }
 
-inline JSC::JSValue toJS(JSC::ExecState*, JSValueRef v) {
+inline JSC::JSValue toJS(JSC::ExecState* exec, JSValueRef v) {
+  ASSERT_UNUSED(exec, exec);
+  ASSERT(v);
 #if USE(JSVALUE32_64)
   JSC::JSCell* jsCell =
       reinterpret_cast<JSC::JSCell*>(const_cast<OpaqueJSValue*>(v));
@@ -72,7 +76,9 @@ inline JSC::JSValue toJS(JSC::ExecState*, JSValueRef v) {
 #endif
 }
 
-inline JSC::JSValue toJSForGC(JSC::ExecState*, JSValueRef v) {
+inline JSC::JSValue toJSForGC(JSC::ExecState* exec, JSValueRef v) {
+  ASSERT_UNUSED(exec, exec);
+  ASSERT(v);
 #if USE(JSVALUE32_64)
   JSC::JSCell* jsCell =
       reinterpret_cast<JSC::JSCell*>(const_cast<OpaqueJSValue*>(v));
