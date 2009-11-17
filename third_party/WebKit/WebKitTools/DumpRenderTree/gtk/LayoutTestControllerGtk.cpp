@@ -237,6 +237,14 @@ void LayoutTestController::setTabKeyCyclesThroughElements(bool cycles) {
                NULL);
 }
 
+void LayoutTestController::setTimelineProfilingEnabled(bool flag) {
+  WebKitWebView* view = webkit_web_frame_get_web_view(mainFrame);
+  ASSERT(view);
+
+  WebKitWebInspector* inspector = webkit_web_view_get_inspector(view);
+  g_object_set(G_OBJECT(inspector), "timeline-profiling-enabled", flag, NULL);
+}
+
 void LayoutTestController::setUseDashboardCompatibilityMode(bool flag) {
   // FIXME: implement
 }

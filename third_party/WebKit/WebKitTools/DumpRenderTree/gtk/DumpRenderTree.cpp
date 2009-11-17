@@ -117,6 +117,10 @@ static bool shouldLogFrameLoadDelegates(const char* pathOrURL) {
   return strstr(pathOrURL, "loading/");
 }
 
+static bool shouldOpenWebInspector(const char* pathOrURL) {
+  return strstr(pathOrURL, "inspector/");
+}
+
 void dumpFrameScrollPosition(WebKitWebFrame* frame) {}
 
 void displayWebView() {}
@@ -464,6 +468,9 @@ static void runTest(const string& testPathOrURL) {
   if (shouldLogFrameLoadDelegates(pathOrURL.c_str()))
     gLayoutTestController->setDumpFrameLoadCallbacks(true);
 
+  if (shouldOpenWebInspector(pathOrURL.c_str()))
+    gLayoutTestController->showWebInspector();
+
   WorkQueue::shared()->clear();
   WorkQueue::shared()->setFrozen(false);
 
@@ -496,6 +503,9 @@ static void runTest(const string& testPathOrURL) {
   url = NULL;
 
   gtk_main();
+
+  if (shouldOpenWebInspector(pathOrURL.c_str()))
+    gLayoutTestController->closeWebInspector();
 
   // Also check if we still have opened webViews and free them.
   if (gLayoutTestController->closeRemainingWindowsWhenComplete() ||

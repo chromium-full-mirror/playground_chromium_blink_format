@@ -66,6 +66,9 @@ class WebInspector : public IWebInspector,
   virtual HRESULT STDMETHODCALLTYPE evaluateInFrontend(ULONG callId,
                                                        BSTR script);
 
+  virtual HRESULT STDMETHODCALLTYPE isTimelineProfilingEnabled(BOOL* isEnabled);
+  virtual HRESULT STDMETHODCALLTYPE setTimelineProfilingEnabled(BOOL);
+
  private:
   WebInspector(WebView*);
   ~WebInspector();

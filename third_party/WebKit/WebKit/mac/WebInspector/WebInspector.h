@@ -48,6 +48,8 @@
 
 - (BOOL)isJavaScriptProfilingEnabled;
 - (void)setJavaScriptProfilingEnabled:(BOOL)enabled;
+- (BOOL)isTimelineProfilingEnabled;
+- (void)setTimelineProfilingEnabled:(BOOL)enabled;
 
 - (BOOL)isProfilingJavaScript;
 - (void)toggleProfilingJavaScript:(id)sender;

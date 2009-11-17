@@ -298,6 +298,7 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
 
   void showWebInspector();
   void closeWebInspector();
+  void setTimelineProfilingEnabled(bool enabled);
   void evaluateInWebInspector(long callId, JSStringRef script);
   void evaluateScriptInIsolatedWorld(unsigned worldId,
                                      JSObjectRef globalObject,
