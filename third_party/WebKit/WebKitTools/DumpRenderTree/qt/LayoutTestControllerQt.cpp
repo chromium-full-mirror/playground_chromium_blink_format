@@ -115,7 +115,7 @@ void LayoutTestController::maybeDump(bool success) {
 void LayoutTestController::waitUntilDone() {
   // qDebug() << ">>>>waitForDone";
   m_waitForDone = true;
-  m_timeoutTimer.start(11000, this);
+  m_timeoutTimer.start(15000, this);
 }
 
 QString LayoutTestController::counterValueForElementById(const QString& id) {
@@ -128,13 +128,15 @@ void LayoutTestController::keepWebHistory() {
 
 void LayoutTestController::notifyDone() {
   qDebug() << ">>>>notifyDone";
+
+  m_isLoading = false;
+  m_waitForDone = false;
+  m_waitForPolicy = false;
+
   if (!m_timeoutTimer.isActive())
     return;
   m_timeoutTimer.stop();
   emit done();
-  m_isLoading = false;
-  m_waitForDone = false;
-  m_waitForPolicy = false;
 }
 
 int LayoutTestController::windowCount() {
@@ -202,7 +204,10 @@ void LayoutTestController::provisionalLoad() {
 
 void LayoutTestController::timerEvent(QTimerEvent* ev) {
   if (ev->timerId() == m_timeoutTimer.timerId()) {
-    // qDebug() << ">>>>>>>>>>>>> timeout";
+    const char* message =
+        "FAIL: Timed out waiting for notifyDone to be called\n";
+    fprintf(stderr, "%s", message);
+    fprintf(stdout, "%s", message);
     notifyDone();
   } else
     QObject::timerEvent(ev);
