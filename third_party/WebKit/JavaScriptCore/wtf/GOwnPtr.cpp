@@ -20,6 +20,8 @@
 #include "config.h"
 #include "GOwnPtr.h"
 
+#include <glib.h>
+
 namespace WTF {
 
 template <>

@@ -23,15 +23,24 @@
 #define GOwnPtr_h
 
 #include <algorithm>
-#include <glib.h>
 #include <wtf/Assertions.h>
 #include <wtf/Noncopyable.h>
 
+// Forward delcarations at this point avoid the need to include GLib includes
+// in WTF headers.
+typedef struct _GError GError;
+typedef struct _GList GList;
+typedef struct _GCond GCond;
+typedef struct _GMutex GMutex;
+typedef struct _GPatternSpec GPatternSpec;
+typedef struct _GDir GDir;
+typedef struct _GHashTable GHashTable;
+extern "C" void g_free(void*);
+
 namespace WTF {
+
 template <typename T>
-inline void freeOwnedGPtr(T* ptr) {
-  g_free(reinterpret_cast<void*>(ptr));
-}
+inline void freeOwnedGPtr(T* ptr);
 template <>
 void freeOwnedGPtr<GError>(GError*);
 template <>
@@ -59,6 +68,7 @@ class GOwnPtr : public Noncopyable {
     m_ptr = 0;
     return ptr;
   }
+
   T*& outPtr() {
     ASSERT(!m_ptr);
     return m_ptr;
@@ -69,6 +79,7 @@ class GOwnPtr : public Noncopyable {
     freeOwnedGPtr(m_ptr);
     m_ptr = ptr;
   }
+
   void clear() {
     freeOwnedGPtr(m_ptr);
     m_ptr = 0;
@@ -78,6 +89,7 @@ class GOwnPtr : public Noncopyable {
     ASSERT(m_ptr);
     return *m_ptr;
   }
+
   T* operator->() const {
     ASSERT(m_ptr);
     return m_ptr;
@@ -124,6 +136,11 @@ inline bool operator!=(T* a, const GOwnPtr<U>& b) {
 template <typename T>
 inline typename GOwnPtr<T>::PtrType getPtr(const GOwnPtr<T>& p) {
   return p.get();
+}
+
+template <typename T>
+inline void freeOwnedGPtr(T* ptr) {
+  g_free(ptr);
 }
 
 }  // namespace WTF
