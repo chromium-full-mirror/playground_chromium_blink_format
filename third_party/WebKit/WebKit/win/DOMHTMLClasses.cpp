@@ -1179,12 +1179,26 @@ HRESULT STDMETHODCALLTYPE DOMHTMLInputElement::rectOnScreen(
 }
 
 HRESULT STDMETHODCALLTYPE DOMHTMLInputElement::replaceCharactersInRange(
-    /* [in] */ int /*startTarget*/,
-    /* [in] */ int /*endTarget*/,
-    /* [in] */ BSTR /*replacementString*/,
-    /* [in] */ int /*index*/) {
-  ASSERT_NOT_REACHED();
-  return E_NOTIMPL;
+    /* [in] */ int startTarget,
+    /* [in] */ int endTarget,
+    /* [in] */ BSTR replacementString,
+    /* [in] */ int index) {
+  if (!replacementString)
+    return E_POINTER;
+
+  ASSERT(m_element);
+  ASSERT(m_element->hasTagName(inputTag));
+  HTMLInputElement* inputElement = static_cast<HTMLInputElement*>(m_element);
+
+  String newValue = inputElement->value();
+  String webCoreReplacementString(static_cast<UChar*>(replacementString),
+                                  SysStringLen(replacementString));
+  newValue.replace(startTarget, endTarget - startTarget,
+                   webCoreReplacementString);
+  inputElement->setValue(newValue);
+  inputElement->setSelectionRange(index, newValue.length());
+
+  return S_OK;
 }
 
 HRESULT STDMETHODCALLTYPE DOMHTMLInputElement::selectedRange(
