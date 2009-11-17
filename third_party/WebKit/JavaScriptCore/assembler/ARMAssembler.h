@@ -459,8 +459,8 @@ class ARMAssembler {
     emitInst(static_cast<ARMWord>(cc) | FMSR, rn, dd, 0);
   }
 
-  void fmrs_r(int dd, int rn, Condition cc = AL) {
-    emitInst(static_cast<ARMWord>(cc) | FMRS, rn, dd, 0);
+  void fmrs_r(int rd, int dn, Condition cc = AL) {
+    emitInst(static_cast<ARMWord>(cc) | FMRS, rd, dn, 0);
   }
 
   void fsitod_r(int dd, int dm, Condition cc = AL) {
