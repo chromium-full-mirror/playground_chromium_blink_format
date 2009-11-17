@@ -34,6 +34,7 @@
 
 namespace WebCore {
 class HTMLCollection;
+class HTMLOptionsCollection;
 }
 
 class DOMHTMLCollection : public DOMObject, public IDOMHTMLCollection {
@@ -115,6 +116,10 @@ class DOMHTMLCollection : public DOMObject, public IDOMHTMLCollection {
 
 class DOMHTMLOptionsCollection : public DOMObject,
                                  public IDOMHTMLOptionsCollection {
+ public:
+  static IDOMHTMLOptionsCollection* createInstance(
+      WebCore::HTMLOptionsCollection*);
+
   // IUnknown
   virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid,
                                                    void** ppvObject);
@@ -182,7 +187,12 @@ class DOMHTMLOptionsCollection : public DOMObject,
 
   virtual HRESULT STDMETHODCALLTYPE namedItem(
       /* [in] */ BSTR name,
-      /* [retval][out] */ IDOMNode* result);
+      /* [retval][out] */ IDOMNode** result);
+
+ private:
+  DOMHTMLOptionsCollection(WebCore::HTMLOptionsCollection*);
+
+  RefPtr<WebCore::HTMLOptionsCollection> m_collection;
 };
 
 class DOMHTMLDocument : public DOMDocument, public IDOMHTMLDocument {
