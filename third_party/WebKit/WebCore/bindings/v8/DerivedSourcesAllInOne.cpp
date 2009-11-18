@@ -32,6 +32,10 @@
 // to
 // reduce bloat and allow us to link release builds on 32-bit Windows.
 
+// Require explicit conversion to AtomicString. This helps catch cases where
+// the generated bindings cause an expensive implicit conversion.
+#define NO_IMPLICIT_ATOMICSTRING
+
 #include "bindings/V8Attr.cpp"
 #include "bindings/V8BarInfo.cpp"
 #include "bindings/V8BeforeLoadEvent.cpp"

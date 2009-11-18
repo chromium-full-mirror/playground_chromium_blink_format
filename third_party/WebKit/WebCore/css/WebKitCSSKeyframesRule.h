@@ -60,7 +60,7 @@ class WebKitCSSKeyframesRule : public CSSRule {
   // This version of setName does not call styleSheetChanged to avoid
   // unnecessary work. It assumes callers will either make that call
   // themselves, or know that it will get called later.
-  void setNameInternal(const String& name) { m_name = name; }
+  void setNameInternal(const String& name) { m_name = AtomicString(name); }
 
   CSSRuleList* cssRules() { return m_lstCSSRules.get(); }
 
