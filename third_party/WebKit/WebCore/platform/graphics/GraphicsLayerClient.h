@@ -68,6 +68,9 @@ class GraphicsLayerClient {
                              GraphicsContext&,
                              GraphicsLayerPaintingPhase,
                              const IntRect& inClip) = 0;
+
+  virtual bool showDebugBorders() const = 0;
+  virtual bool showRepaintCounter() const = 0;
 };
 
 }  // namespace WebCore

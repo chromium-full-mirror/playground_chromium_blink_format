@@ -114,6 +114,8 @@
 #define WebKitXSSAuditorEnabledPreferenceKey @"WebKitXSSAuditorEnabled"
 #define WebKitAcceleratedCompositingEnabledPreferenceKey \
   @"WebKitAcceleratedCompositingEnabled"
+#define WebKitShowDebugBordersPreferenceKey @"WebKitShowDebugBorders"
+#define WebKitShowRepaintCounterPreferenceKey @"WebKitShowRepaintCounter"
 #define WebKitWebGLEnabledPreferenceKey @"WebKitWebGLEnabled"
 #define WebKitPluginAllowedRunTimePreferenceKey @"WebKitPluginAllowedRunTime"
 

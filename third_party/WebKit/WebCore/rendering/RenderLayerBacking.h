@@ -143,6 +143,9 @@ class RenderLayerBacking : public GraphicsLayerClient {
                              GraphicsLayerPaintingPhase,
                              const IntRect& clip);
 
+  virtual bool showDebugBorders() const;
+  virtual bool showRepaintCounter() const;
+
   IntRect contentsBox() const;
 
  private:

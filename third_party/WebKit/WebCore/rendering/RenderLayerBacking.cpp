@@ -42,6 +42,7 @@
 #include "RenderLayerCompositor.h"
 #include "RenderVideo.h"
 #include "RenderView.h"
+#include "Settings.h"
 
 #include "RenderLayerBacking.h"
 
@@ -1114,6 +1115,14 @@ void RenderLayerBacking::paintContents(const GraphicsLayer*,
 
   paintIntoLayer(m_owningLayer, &context, dirtyRect, PaintRestrictionNone,
                  paintingPhase, renderer());
+}
+
+bool RenderLayerBacking::showDebugBorders() const {
+  return compositor() ? compositor()->showDebugBorders() : false;
+}
+
+bool RenderLayerBacking::showRepaintCounter() const {
+  return compositor() ? compositor()->showRepaintCounter() : false;
 }
 
 bool RenderLayerBacking::startAnimation(double beginTime,
