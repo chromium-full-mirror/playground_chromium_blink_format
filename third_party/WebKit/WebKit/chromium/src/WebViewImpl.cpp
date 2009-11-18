@@ -570,12 +570,10 @@ bool WebViewImpl::sendContextMenuEvent(const WebKeyboardEvent& event) {
   Position start = mainFrameImpl->selection()->selection().start();
   Position end = mainFrameImpl->selection()->selection().end();
 
-  if (!start.node() || !end.node()) {
-    location =
-        IntPoint(rightAligned ? view->contentsWidth() - kContextMenuMargin
-                              : kContextMenuMargin,
-                 kContextMenuMargin);
-  } else {
+  Frame* focusedFrame = page()->focusController()->focusedOrMainFrame();
+  Node* focusedNode = focusedFrame->document()->focusedNode();
+
+  if (start.node() && end.node()) {
     RenderObject* renderer = start.node()->renderer();
     if (!renderer)
       return false;
@@ -585,6 +583,13 @@ bool WebViewImpl::sendContextMenuEvent(const WebKeyboardEvent& event) {
 
     int x = rightAligned ? firstRect.right() : firstRect.x();
     location = IntPoint(x, firstRect.bottom());
+  } else if (focusedNode)
+    location = focusedNode->getRect().bottomLeft();
+  else {
+    location =
+        IntPoint(rightAligned ? view->contentsWidth() - kContextMenuMargin
+                              : kContextMenuMargin,
+                 kContextMenuMargin);
   }
 
   location = view->contentsToWindow(location);
@@ -601,7 +606,6 @@ bool WebViewImpl::sendContextMenuEvent(const WebKeyboardEvent& event) {
   // not run.
   page()->contextMenuController()->clearContextMenu();
 
-  Frame* focusedFrame = page()->focusController()->focusedOrMainFrame();
   focusedFrame->view()->setCursor(pointerCursor());
   WebMouseEvent mouseEvent;
   mouseEvent.button = WebMouseEvent::ButtonRight;
