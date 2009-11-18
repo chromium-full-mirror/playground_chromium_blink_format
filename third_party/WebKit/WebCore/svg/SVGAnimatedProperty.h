@@ -679,7 +679,8 @@ struct PropertySynchronizer<OwnerElement, DecoratedType, true> : Noncopyable {
   static void synchronize(const OwnerElement* ownerElement,
                           const QualifiedName& attributeName,
                           DecoratedType baseValue) {
-    String value(SVGAnimatedTypeValue<DecoratedType>::toString(baseValue));
+    AtomicString value(
+        SVGAnimatedTypeValue<DecoratedType>::toString(baseValue));
 
     NamedNodeMap* namedAttrMap = ownerElement->attributes(false);
     Attribute* old = namedAttrMap->getAttributeItem(attributeName);
@@ -689,7 +690,7 @@ struct PropertySynchronizer<OwnerElement, DecoratedType, true> : Noncopyable {
       namedAttrMap->addAttribute(const_cast<OwnerElement*>(ownerElement)
                                      ->createAttribute(attributeName, value));
     else if (old && !value.isNull())
-      old->setValue(AtomicString(value));
+      old->setValue(value);
   }
 };
 
