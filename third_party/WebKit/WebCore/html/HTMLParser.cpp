@@ -207,6 +207,22 @@ void HTMLParser::setCurrent(Node* newCurrent) {
   m_didRefCurrent = didRefNewCurrent;
 }
 
+inline static int tagPriorityOfNode(Node* n) {
+  return n->isHTMLElement() ? static_cast<HTMLElement*>(n)->tagPriority() : 0;
+}
+
+inline void HTMLParser::limitBlockDepth(int tagPriority) {
+  if (tagPriority >= minBlockLevelTagPriority) {
+    while (m_blocksInStack >= cMaxBlockDepth)
+      popBlock(m_blockStack->tagName);
+  }
+}
+
+inline bool HTMLParser::insertNodeAfterLimitBlockDepth(Node* n, bool flat) {
+  limitBlockDepth(tagPriorityOfNode(n));
+  return insertNode(n, flat);
+}
+
 PassRefPtr<Node> HTMLParser::parseToken(Token* t) {
   if (!m_skipModeTag.isNull()) {
     if (!t->beginTag && t->tagName == m_skipModeTag)
@@ -248,7 +264,7 @@ PassRefPtr<Node> HTMLParser::parseToken(Token* t) {
     while (charsLeft) {
       // split large blocks of text to nodes of manageable size
       n = Text::createWithLengthLimit(m_document, text, charsLeft);
-      if (!insertNode(n.get(), t->selfClosingTag))
+      if (!insertNodeAfterLimitBlockDepth(n.get(), t->selfClosingTag))
         return 0;
     }
     return n;
@@ -279,7 +295,7 @@ PassRefPtr<Node> HTMLParser::parseToken(Token* t) {
     }
   }
 
-  if (!insertNode(n.get(), t->selfClosingTag)) {
+  if (!insertNodeAfterLimitBlockDepth(n.get(), t->selfClosingTag)) {
     // we couldn't insert the node
 
     if (n->isElementNode()) {
@@ -336,8 +352,6 @@ bool HTMLParser::insertNode(Node* n, bool flat) {
   RefPtr<Node> protectNode(n);
 
   const AtomicString& localName = n->localName();
-  int tagPriority =
-      n->isHTMLElement() ? static_cast<HTMLElement*>(n)->tagPriority() : 0;
 
   // <table> is never allowed inside stray table content.  Always pop out of the
   // stray table content
@@ -345,13 +359,10 @@ bool HTMLParser::insertNode(Node* n, bool flat) {
   if (m_inStrayTableContent && localName == tableTag)
     popBlock(tableTag);
 
-  if (tagPriority >= minBlockLevelTagPriority) {
-    while (m_blocksInStack >= cMaxBlockDepth)
-      popBlock(m_blockStack->tagName);
-  }
-
   if (m_parserQuirks && !m_parserQuirks->shouldInsertNode(m_current, n))
     return false;
+
+  int tagPriority = tagPriorityOfNode(n);
 
   // let's be stupid and just try to insert it.
   // this should work if the document is well-formed
