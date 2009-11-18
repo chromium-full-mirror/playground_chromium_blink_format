@@ -378,12 +378,10 @@ class PluginView : public Widget,
   void setNPWindowIfNeeded();
 #elif defined(XP_MACOSX)
   NP_CGContext m_npCgContext;
-  OwnPtr<Timer<PluginView>> m_nullEventTimer;
   NPDrawingModel m_drawingModel;
   NPEventModel m_eventModel;
 
   void setNPWindowIfNeeded();
-  void nullEventTimerFired(Timer<PluginView>*);
   Point globalMousePosForPlugin() const;
 #endif
 
