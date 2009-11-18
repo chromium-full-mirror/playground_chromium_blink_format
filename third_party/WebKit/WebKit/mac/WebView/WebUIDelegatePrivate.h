@@ -90,8 +90,13 @@ enum {
   WebMenuItemTagChangeBack,
   WebMenuItemTagBaseApplication = 10000
 };
-@class WebGeolocation;
+
 @class WebSecurityOrigin;
+
+@protocol WebGeolocationPolicyListener<NSObject>
+- (void)allow;
+- (void)deny;
+@end
 
 @interface NSObject (WebUIDelegatePrivate)
 
@@ -151,10 +156,20 @@ enum {
      usingGeneratedFilename:(NSString**)filename;
 - (NSString*)webView:(WebView*)sender generateReplacementFile:(NSString*)path;
 
-- (BOOL)webView:(WebView*)sender
-                           frame:(WebFrame*)frame
-    requestGeolocationPermission:(WebGeolocation*)geolocation
-                  securityOrigin:(WebSecurityOrigin*)origin;
+/*!
+    @method webView:decidePolicyForGeolocationRequestFromOrigin:frame:listener:
+    @abstract
+    @param webView The WebView sending the delegate method.
+    @param origin The security origin that would like to use Geolocation.
+    @param frame The WebFrame whose JavaScript initiated this call.
+    @param listener The object to call when the decision is made
+*/
+- (void)webView:(WebView*)webView
+    decidePolicyForGeolocationRequestFromOrigin:(WebSecurityOrigin*)origin
+                                          frame:(WebFrame*)frame
+                                       listener:
+                                           (id<WebGeolocationPolicyListener>)
+                                               listener;
 
 - (void)webView:(WebView*)sender formStateDidChangeForNode:(DOMNode*)node;
 - (void)webView:(WebView*)sender formDidFocusNode:(DOMNode*)node;
