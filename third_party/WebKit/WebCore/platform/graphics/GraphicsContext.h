@@ -455,7 +455,7 @@ class GraphicsContext : public Noncopyable {
   void drawWindowsBitmap(WindowsBitmap*, const IntPoint&);
 #endif
 
-#if PLATFORM(QT) && defined(Q_WS_WIN)
+#if (PLATFORM(QT) && defined(Q_WS_WIN)) || (PLATFORM(WX) && PLATFORM(WIN_OS))
   HDC getWindowsContext(const IntRect&,
                         bool supportAlphaBlend = true,
                         bool mayCreateBitmap = true);
@@ -464,6 +464,10 @@ class GraphicsContext : public Noncopyable {
                              bool supportAlphaBlend = true,
                              bool mayCreateBitmap = true);
   bool shouldIncludeChildWindows() const { return false; }
+#endif
+
+#if PLATFORM(WX)
+  bool inTransparencyLayer() const { return false; }
 #endif
 
 #if PLATFORM(QT)
