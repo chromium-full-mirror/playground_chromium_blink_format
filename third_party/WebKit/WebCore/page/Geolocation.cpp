@@ -88,9 +88,11 @@ void Geolocation::GeoNotifier::timerFired(Timer<GeoNotifier>*) {
   m_geolocation->requestTimedOut(this);
 }
 
-void Geolocation::Watchers::set(int id, PassRefPtr<GeoNotifier> notifier) {
-  m_idToNotifierMap.set(id, notifier);
-  m_notifierToIdMap.set(notifier, id);
+void Geolocation::Watchers::set(int id, PassRefPtr<GeoNotifier> prpNotifier) {
+  RefPtr<GeoNotifier> notifier = prpNotifier;
+
+  m_idToNotifierMap.set(id, notifier.get());
+  m_notifierToIdMap.set(notifier.release(), id);
 }
 
 void Geolocation::Watchers::remove(int id) {
