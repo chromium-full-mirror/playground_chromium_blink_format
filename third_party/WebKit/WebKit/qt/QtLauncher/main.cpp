@@ -40,6 +40,7 @@
 #include <QtGui>
 #include <QDebug>
 #include <QtNetwork/QNetworkProxy>
+#include <QtNetwork/QNetworkRequest>
 #if QT_VERSION >= 0x040400 && !defined(QT_NO_PRINTER)
 #include <QPrintPreviewDialog>
 #endif
@@ -65,6 +66,49 @@ static QUrl urlFromUserInput(const QString& input) {
 #endif
 }
 
+class WebView : public QWebView {
+  Q_OBJECT
+ public:
+  WebView(QWidget* parent) : QWebView(parent) {}
+
+ protected:
+  virtual void contextMenuEvent(QContextMenuEvent* event) {
+    QMenu* menu = page()->createStandardContextMenu();
+
+    QWebHitTestResult r = page()->mainFrame()->hitTestContent(event->pos());
+
+    if (!r.linkUrl().isEmpty()) {
+      QAction* newTabAction =
+          menu->addAction(tr("Open in Default &Browser"), this,
+                          SLOT(openUrlInDefaultBrowser()));
+      newTabAction->setData(r.linkUrl());
+      menu->insertAction(menu->actions().at(2), newTabAction);
+    }
+
+    menu->exec(mapToGlobal(event->pos()));
+    delete menu;
+  }
+
+  virtual void mousePressEvent(QMouseEvent* event) {
+    mouseButtons = event->buttons();
+    keyboardModifiers = event->modifiers();
+
+    QWebView::mousePressEvent(event);
+  }
+
+ public slots:
+  void openUrlInDefaultBrowser(const QUrl& url = QUrl()) {
+    if (QAction* action = qobject_cast<QAction*>(sender()))
+      QDesktopServices::openUrl(action->data().toUrl());
+    else
+      QDesktopServices::openUrl(url);
+  }
+
+ public:
+  Qt::MouseButtons mouseButtons;
+  Qt::KeyboardModifiers keyboardModifiers;
+};
+
 class WebPage : public QWebPage {
  public:
   WebPage(QWidget* parent) : QWebPage(parent) {}
@@ -82,6 +126,22 @@ class WebPage : public QWebPage {
   virtual bool extension(Extension extension,
                          const ExtensionOption* option,
                          ExtensionReturn* output);
+
+  virtual bool acceptNavigationRequest(QWebFrame* frame,
+                                       const QNetworkRequest& request,
+                                       NavigationType type) {
+    WebView* webView = static_cast<WebView*>(view());
+    if (webView->keyboardModifiers & Qt::ShiftModifier) {
+      QWebPage* page = createWindow(QWebPage::WebBrowserWindow);
+      page->mainFrame()->load(request);
+      return false;
+    } else if (webView->keyboardModifiers & Qt::AltModifier) {
+      webView->openUrlInDefaultBrowser(request.url());
+      return false;
+    }
+
+    return QWebPage::acceptNavigationRequest(frame, request, type);
+  }
 };
 
 class MainWindow : public QMainWindow {
@@ -95,7 +155,7 @@ class MainWindow : public QMainWindow {
     QSplitter* splitter = new QSplitter(Qt::Vertical, this);
     setCentralWidget(splitter);
 
-    view = new QWebView(splitter);
+    view = new WebView(splitter);
     WebPage* page = new WebPage(view);
     view->setPage(page);
     connect(view, SIGNAL(loadFinished(bool)), this, SLOT(loadFinished()));
