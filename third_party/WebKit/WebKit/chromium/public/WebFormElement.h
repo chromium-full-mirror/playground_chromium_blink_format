@@ -66,10 +66,10 @@ class WebFormElement : public WebElement {
   operator WTF::PassRefPtr<WebCore::HTMLFormElement>() const;
 #endif
 
-  bool autoComplete() const;
-  WebString action();
-  void submit();
-  void getNamedElements(const WebString&, WebVector<WebNode>&);
+  WEBKIT_API bool autoComplete() const;
+  WEBKIT_API WebString action() const;
+  WEBKIT_API void submit();
+  WEBKIT_API void getNamedElements(const WebString&, WebVector<WebNode>&);
 };
 
 }  // namespace WebKit
