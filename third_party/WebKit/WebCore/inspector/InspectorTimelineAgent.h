@@ -31,6 +31,8 @@
 #ifndef InspectorTimelineAgent_h
 #define InspectorTimelineAgent_h
 
+#if ENABLE(INSPECTOR)
+
 #include "Document.h"
 #include "ScriptExecutionContext.h"
 #include "ScriptObject.h"
@@ -143,4 +145,5 @@ inline InspectorTimelineAgent* InspectorTimelineAgent::retrieve(
 
 }  // namespace WebCore
 
+#endif  // !ENABLE(INSPECTOR)
 #endif  // !defined(InspectorTimelineAgent_h)
