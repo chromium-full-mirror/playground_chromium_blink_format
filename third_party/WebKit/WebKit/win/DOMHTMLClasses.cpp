@@ -1233,7 +1233,7 @@ HRESULT STDMETHODCALLTYPE DOMHTMLInputElement::isUserEdited(
   if (FAILED(isTextField(&textField)) || !textField)
     return S_OK;
   RenderObject* renderer = m_element->renderer();
-  if (renderer && toRenderTextControl(renderer)->isUserEdited())
+  if (renderer && toRenderTextControl(renderer)->lastChangeWasUserEdit())
     *result = TRUE;
   return S_OK;
 }
@@ -1414,7 +1414,7 @@ HRESULT STDMETHODCALLTYPE DOMHTMLTextAreaElement::isUserEdited(
   *result = FALSE;
   ASSERT(m_element);
   RenderObject* renderer = m_element->renderer();
-  if (renderer && toRenderTextControl(renderer)->isUserEdited())
+  if (renderer && toRenderTextControl(renderer)->lastChangeWasUserEdit())
     *result = TRUE;
   return S_OK;
 }
