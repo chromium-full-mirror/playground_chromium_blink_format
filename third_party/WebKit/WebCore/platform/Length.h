@@ -22,6 +22,7 @@
 #define Length_h
 
 #include <wtf/Assertions.h>
+#include <wtf/FastAllocBase.h>
 #include <wtf/MathExtras.h>
 
 namespace WebCore {
@@ -41,7 +42,7 @@ enum LengthType {
   MinIntrinsic
 };
 
-struct Length {
+struct Length : FastAllocBase {
   Length() : m_value(0) {}
 
   Length(LengthType t) : m_value(t) {}

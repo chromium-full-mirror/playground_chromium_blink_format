@@ -49,7 +49,7 @@ class FontDescription;
 class FontSelector;
 class SimpleFontData;
 
-class FontCache {
+class FontCache : public Noncopyable {
  public:
   friend FontCache* fontCache();
 

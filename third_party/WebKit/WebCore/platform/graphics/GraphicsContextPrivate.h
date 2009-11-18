@@ -92,7 +92,7 @@ struct GraphicsContextState {
 #endif
 };
 
-class GraphicsContextPrivate {
+class GraphicsContextPrivate : public Noncopyable {
  public:
   GraphicsContextPrivate()
       : m_focusRingWidth(0),

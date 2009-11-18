@@ -27,6 +27,7 @@
 #define DeprecatedPtrList_h
 
 #include "DeprecatedPtrListImpl.h"
+#include <wtf/FastAllocBase.h>
 
 namespace WebCore {
 
@@ -34,7 +35,7 @@ template <class T>
 class DeprecatedPtrListIterator;
 
 template <class T>
-class DeprecatedPtrList {
+class DeprecatedPtrList : public FastAllocBase {
  public:
   DeprecatedPtrList() : impl(deleteFunc), del_item(false) {}
   ~DeprecatedPtrList() { impl.clear(del_item); }
