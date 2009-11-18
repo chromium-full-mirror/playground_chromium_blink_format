@@ -192,7 +192,7 @@ static inline void drawPathShadow(GraphicsContext* context,
   if (!context->getShadow(shadowSize, shadowBlur, shadowColor))
     return;
 
-  // calculate filter values
+  // Calculate filter values to create appropriate shadow.
   cairo_t* cr = context->platformContext();
   cairo_path_t* path = cairo_copy_path(cr);
   double x0, x1, y0, y1;
@@ -204,14 +204,14 @@ static inline void drawPathShadow(GraphicsContext* context,
 
   IntSize shadowBufferSize;
   FloatRect shadowRect;
-  float kernelSize(0.0);
+  float kernelSize = 0;
   GraphicsContext::calculateShadowBufferDimensions(
       shadowBufferSize, shadowRect, kernelSize, rect, shadowSize, shadowBlur);
 
-  // create suitably-sized ImageBuffer to hold the shadow
+  // Create suitably-sized ImageBuffer to hold the shadow.
   OwnPtr<ImageBuffer> shadowBuffer = ImageBuffer::create(shadowBufferSize);
 
-  // draw shadow into a new ImageBuffer
+  // Draw shadow into a new ImageBuffer.
   cairo_t* shadowContext = shadowBuffer->context()->platformContext();
   copyContextProperties(cr, shadowContext);
   cairo_translate(shadowContext, -rect.x() + kernelSize,
@@ -599,14 +599,13 @@ static void drawBorderlessRectShadow(GraphicsContext* context,
   if (!context->getShadow(shadowSize, shadowBlur, shadowColor))
     return;
 
-  // calculate filter values
   IntSize shadowBufferSize;
   FloatRect shadowRect;
-  float kernelSize = 0.0;
+  float kernelSize = 0;
   GraphicsContext::calculateShadowBufferDimensions(
       shadowBufferSize, shadowRect, kernelSize, rect, shadowSize, shadowBlur);
 
-  // draw shadow into a new ImageBuffer
+  // Draw shadow into a new ImageBuffer
   OwnPtr<ImageBuffer> shadowBuffer = ImageBuffer::create(shadowBufferSize);
   GraphicsContext* shadowContext = shadowBuffer->context();
   shadowContext->fillRect(
