@@ -511,7 +511,7 @@ void RenderLayerCompositor::computeCompositingRequirements(
         // have a contents layer
         // (since we need to ensure that the -ve z-order child renders
         // underneath our contents).
-        if (childState.m_subtreeIsCompositing) {
+        if (!willBeComposited && childState.m_subtreeIsCompositing) {
           // make layer compositing
           layer->setMustOverlapCompositedLayers(true);
           childState.m_compositingAncestor = layer;
@@ -548,7 +548,7 @@ void RenderLayerCompositor::computeCompositingRequirements(
   // be composited. Also, if we have opacity < 1, then we need to be a layer so
   // that
   // the child layers are opaque, then rendered with opacity on this layer.
-  if (childState.m_subtreeIsCompositing &&
+  if (!willBeComposited && childState.m_subtreeIsCompositing &&
       requiresCompositingWhenDescendantsAreCompositing(layer->renderer())) {
     layer->setMustOverlapCompositedLayers(true);
     if (overlapMap)
