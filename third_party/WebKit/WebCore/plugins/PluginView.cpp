@@ -1244,7 +1244,8 @@ void PluginView::paintMissingPluginIcon(GraphicsContext* context,
 
   context->save();
   context->clip(windowClipRect());
-  context->drawImage(nullPluginImage.get(), imageRect.location());
+  context->drawImage(nullPluginImage.get(), DeviceColorSpace,
+                     imageRect.location());
   context->restore();
 }
 
