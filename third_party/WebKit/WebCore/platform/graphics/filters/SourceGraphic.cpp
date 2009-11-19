@@ -54,7 +54,8 @@ void SourceGraphic::apply(Filter* filter) {
   if (!filterContext)
     return;
 
-  filterContext->drawImage(filter->sourceImage()->image(), IntPoint());
+  filterContext->drawImage(filter->sourceImage()->image(), IntPoint(),
+                           DeviceColorSpace);
 }
 
 void SourceGraphic::dump() {}

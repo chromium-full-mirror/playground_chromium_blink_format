@@ -174,11 +174,13 @@ class BitmapImage : public Image {
   virtual void drawFrameMatchingSourceSize(GraphicsContext*,
                                            const FloatRect& dstRect,
                                            const IntSize& srcSize,
+                                           ColorSpace styleColorSpace,
                                            CompositeOperator);
 #endif
   virtual void draw(GraphicsContext*,
                     const FloatRect& dstRect,
                     const FloatRect& srcRect,
+                    ColorSpace styleColorSpace,
                     CompositeOperator);
 
 #if PLATFORM(WX) || (PLATFORM(WINCE) && !PLATFORM(QT))
@@ -186,6 +188,7 @@ class BitmapImage : public Image {
                            const FloatRect& srcRect,
                            const TransformationMatrix& patternTransform,
                            const FloatPoint& phase,
+                           ColorSpace styleColorSpace,
                            CompositeOperator,
                            const FloatRect& destRect);
 #endif

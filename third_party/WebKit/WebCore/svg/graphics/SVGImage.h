@@ -66,6 +66,7 @@ class SVGImage : public Image {
   virtual void draw(GraphicsContext*,
                     const FloatRect& fromRect,
                     const FloatRect& toRect,
+                    ColorSpace styleColorSpace,
                     CompositeOperator);
 
   virtual NativeImagePtr nativeImageForCurrentFrame();

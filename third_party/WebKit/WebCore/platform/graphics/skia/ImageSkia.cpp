@@ -316,6 +316,7 @@ void Image::drawPattern(GraphicsContext* context,
                         const FloatRect& floatSrcRect,
                         const TransformationMatrix& patternTransform,
                         const FloatPoint& phase,
+                        ColorSpace styleColorSpace,
                         CompositeOperator compositeOp,
                         const FloatRect& destRect) {
   FloatRect normSrcRect = normalizeRect(floatSrcRect);
@@ -419,6 +420,7 @@ void BitmapImage::checkForSolidColor() {
 void BitmapImage::draw(GraphicsContext* ctxt,
                        const FloatRect& dstRect,
                        const FloatRect& srcRect,
+                       ColorSpace,
                        CompositeOperator compositeOp) {
   if (!m_source.initialized())
     return;
@@ -447,6 +449,7 @@ void BitmapImage::draw(GraphicsContext* ctxt,
 void BitmapImageSingleFrameSkia::draw(GraphicsContext* ctxt,
                                       const FloatRect& dstRect,
                                       const FloatRect& srcRect,
+                                      ColorSpace styleColorSpace,
                                       CompositeOperator compositeOp) {
   FloatRect normDstRect = normalizeRect(dstRect);
   FloatRect normSrcRect = normalizeRect(srcRect);

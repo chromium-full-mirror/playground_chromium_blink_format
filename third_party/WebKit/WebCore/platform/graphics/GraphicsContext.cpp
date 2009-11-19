@@ -274,31 +274,37 @@ bool GraphicsContext::paintingDisabled() const {
 }
 
 void GraphicsContext::drawImage(Image* image,
+                                ColorSpace styleColorSpace,
                                 const IntPoint& p,
                                 CompositeOperator op) {
-  drawImage(image, p, IntRect(0, 0, -1, -1), op);
+  drawImage(image, styleColorSpace, p, IntRect(0, 0, -1, -1), op);
 }
 
 void GraphicsContext::drawImage(Image* image,
+                                ColorSpace styleColorSpace,
                                 const IntRect& r,
                                 CompositeOperator op,
                                 bool useLowQualityScale) {
-  drawImage(image, r, IntRect(0, 0, -1, -1), op, useLowQualityScale);
+  drawImage(image, styleColorSpace, r, IntRect(0, 0, -1, -1), op,
+            useLowQualityScale);
 }
 
 void GraphicsContext::drawImage(Image* image,
+                                ColorSpace styleColorSpace,
                                 const IntPoint& dest,
                                 const IntRect& srcRect,
                                 CompositeOperator op) {
-  drawImage(image, IntRect(dest, srcRect.size()), srcRect, op);
+  drawImage(image, styleColorSpace, IntRect(dest, srcRect.size()), srcRect, op);
 }
 
 void GraphicsContext::drawImage(Image* image,
+                                ColorSpace styleColorSpace,
                                 const IntRect& dest,
                                 const IntRect& srcRect,
                                 CompositeOperator op,
                                 bool useLowQualityScale) {
-  drawImage(image, FloatRect(dest), srcRect, op, useLowQualityScale);
+  drawImage(image, styleColorSpace, FloatRect(dest), srcRect, op,
+            useLowQualityScale);
 }
 
 #if !PLATFORM(WINCE) || PLATFORM(QT)
@@ -414,6 +420,7 @@ const Vector<IntRect>& GraphicsContext::focusRingRects() const {
 }
 
 void GraphicsContext::drawImage(Image* image,
+                                ColorSpace styleColorSpace,
                                 const FloatRect& dest,
                                 const FloatRect& src,
                                 CompositeOperator op,
@@ -441,12 +448,14 @@ void GraphicsContext::drawImage(Image* image,
     setImageInterpolationQuality(InterpolationNone);
   }
   image->draw(this, FloatRect(dest.location(), FloatSize(tw, th)),
-              FloatRect(src.location(), FloatSize(tsw, tsh)), op);
+              FloatRect(src.location(), FloatSize(tsw, tsh)), styleColorSpace,
+              op);
   if (useLowQualityScale)
     restore();
 }
 
 void GraphicsContext::drawTiledImage(Image* image,
+                                     ColorSpace styleColorSpace,
                                      const IntRect& rect,
                                      const IntPoint& srcPoint,
                                      const IntSize& tileSize,
@@ -454,10 +463,11 @@ void GraphicsContext::drawTiledImage(Image* image,
   if (paintingDisabled() || !image)
     return;
 
-  image->drawTiled(this, rect, srcPoint, tileSize, op);
+  image->drawTiled(this, rect, srcPoint, tileSize, styleColorSpace, op);
 }
 
 void GraphicsContext::drawTiledImage(Image* image,
+                                     ColorSpace styleColorSpace,
                                      const IntRect& dest,
                                      const IntRect& srcRect,
                                      Image::TileRule hRule,
@@ -468,9 +478,9 @@ void GraphicsContext::drawTiledImage(Image* image,
 
   if (hRule == Image::StretchTile && vRule == Image::StretchTile)
     // Just do a scale.
-    return drawImage(image, dest, srcRect, op);
+    return drawImage(image, styleColorSpace, dest, srcRect, op);
 
-  image->drawTiled(this, dest, srcRect, hRule, vRule, op);
+  image->drawTiled(this, dest, srcRect, hRule, vRule, styleColorSpace, op);
 }
 
 void GraphicsContext::addRoundedRectClip(const IntRect& rect,

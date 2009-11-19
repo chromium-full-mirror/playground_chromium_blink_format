@@ -266,6 +266,7 @@ void RenderWidget::paint(PaintInfo& paintInfo, int tx, int ty) {
     // layers.
     if (m_substituteImage)
       paintInfo.context->drawImage(m_substituteImage.get(),
+                                   style()->colorSpace(),
                                    m_widget->frameRect());
     else
       m_widget->paint(paintInfo.context, paintInfo.rect);

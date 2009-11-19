@@ -156,6 +156,7 @@ int PDFDocumentImage::pageCount() const {
 void PDFDocumentImage::draw(GraphicsContext* context,
                             const FloatRect& dstRect,
                             const FloatRect& srcRect,
+                            ColorSpace,
                             CompositeOperator op) {
   if (!m_document || m_currentPage == -1)
     return;

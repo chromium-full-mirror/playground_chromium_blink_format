@@ -94,6 +94,7 @@ void Image::drawPattern(GraphicsContext* ctxt,
                         const FloatRect& tileRect,
                         const TransformationMatrix& patternTransform,
                         const FloatPoint& phase,
+                        ColorSpace,
                         CompositeOperator op,
                         const FloatRect& destRect) {
   QPixmap* framePixmap = nativeImageForCurrentFrame();
@@ -161,6 +162,7 @@ void BitmapImage::invalidatePlatformData() {}
 void BitmapImage::draw(GraphicsContext* ctxt,
                        const FloatRect& dst,
                        const FloatRect& src,
+                       ColorSpace styleColorSpace,
                        CompositeOperator op) {
   startAnimation();
 
@@ -169,7 +171,7 @@ void BitmapImage::draw(GraphicsContext* ctxt,
     return;
 
   if (mayFillWithSolidColor()) {
-    fillWithSolidColor(ctxt, dst, solidColor(), op);
+    fillWithSolidColor(ctxt, dst, solidColor(), styleColorSpace, op);
     return;
   }
 

@@ -509,7 +509,8 @@ void RenderBoxModelObject::paintFillLayerExtended(const PaintInfo& paintInfo,
         }
       }
       context->drawTiledImage(bg->image(clientForBackgroundImage, tileSize),
-                              destRect, phase, tileSize, compositeOp);
+                              style()->colorSpace(), destRect, phase, tileSize,
+                              compositeOp);
     }
   }
 
@@ -787,6 +788,7 @@ bool RenderBoxModelObject::paintNinePieceImage(
                     (h - topWidth - bottomWidth) > 0;
 
   Image* image = styleImage->image(this, imageSize);
+  ColorSpace colorSpace = style->colorSpace();
 
   if (drawLeft) {
     // Paint the top and bottom left corners.
@@ -795,7 +797,8 @@ bool RenderBoxModelObject::paintNinePieceImage(
     // The rect to use from within the image is obtained from our slice, and is
     // (0, 0, leftSlice, topSlice)
     if (drawTop)
-      graphicsContext->drawImage(image, IntRect(tx, ty, leftWidth, topWidth),
+      graphicsContext->drawImage(image, colorSpace,
+                                 IntRect(tx, ty, leftWidth, topWidth),
                                  IntRect(0, 0, leftSlice, topSlice), op);
 
     // The bottom left corner rect is (tx, ty + h - bottomWidth, leftWidth,
@@ -804,13 +807,14 @@ bool RenderBoxModelObject::paintNinePieceImage(
     // leftSlice, botomSlice)
     if (drawBottom)
       graphicsContext->drawImage(
-          image, IntRect(tx, ty + h - bottomWidth, leftWidth, bottomWidth),
+          image, colorSpace,
+          IntRect(tx, ty + h - bottomWidth, leftWidth, bottomWidth),
           IntRect(0, imageHeight - bottomSlice, leftSlice, bottomSlice), op);
 
     // Paint the left edge.
     // Have to scale and tile into the border rect.
     graphicsContext->drawTiledImage(
-        image,
+        image, colorSpace,
         IntRect(tx, ty + topWidth, leftWidth, h - topWidth - bottomWidth),
         IntRect(0, topSlice, leftSlice, imageHeight - topSlice - bottomSlice),
         Image::StretchTile, (Image::TileRule)vRule, op);
@@ -824,7 +828,8 @@ bool RenderBoxModelObject::paintNinePieceImage(
     // (imageWidth - rightSlice, 0, rightSlice, topSlice)
     if (drawTop)
       graphicsContext->drawImage(
-          image, IntRect(tx + w - rightWidth, ty, rightWidth, topWidth),
+          image, colorSpace,
+          IntRect(tx + w - rightWidth, ty, rightWidth, topWidth),
           IntRect(imageWidth - rightSlice, 0, rightSlice, topSlice), op);
 
     // The bottom right corner rect is (tx + w - rightWidth, ty + h -
@@ -833,16 +838,16 @@ bool RenderBoxModelObject::paintNinePieceImage(
     // imageHeight - bottomSlice, rightSlice, bottomSlice)
     if (drawBottom)
       graphicsContext->drawImage(
-          image, IntRect(tx + w - rightWidth, ty + h - bottomWidth, rightWidth,
-                         bottomWidth),
+          image, colorSpace, IntRect(tx + w - rightWidth, ty + h - bottomWidth,
+                                     rightWidth, bottomWidth),
           IntRect(imageWidth - rightSlice, imageHeight - bottomSlice,
                   rightSlice, bottomSlice),
           op);
 
     // Paint the right edge.
     graphicsContext->drawTiledImage(
-        image, IntRect(tx + w - rightWidth, ty + topWidth, rightWidth,
-                       h - topWidth - bottomWidth),
+        image, colorSpace, IntRect(tx + w - rightWidth, ty + topWidth,
+                                   rightWidth, h - topWidth - bottomWidth),
         IntRect(imageWidth - rightSlice, topSlice, rightSlice,
                 imageHeight - topSlice - bottomSlice),
         Image::StretchTile, (Image::TileRule)vRule, op);
@@ -851,7 +856,7 @@ bool RenderBoxModelObject::paintNinePieceImage(
   // Paint the top edge.
   if (drawTop)
     graphicsContext->drawTiledImage(
-        image,
+        image, colorSpace,
         IntRect(tx + leftWidth, ty, w - leftWidth - rightWidth, topWidth),
         IntRect(leftSlice, 0, imageWidth - rightSlice - leftSlice, topSlice),
         (Image::TileRule)hRule, Image::StretchTile, op);
@@ -859,8 +864,8 @@ bool RenderBoxModelObject::paintNinePieceImage(
   // Paint the bottom edge.
   if (drawBottom)
     graphicsContext->drawTiledImage(
-        image, IntRect(tx + leftWidth, ty + h - bottomWidth,
-                       w - leftWidth - rightWidth, bottomWidth),
+        image, colorSpace, IntRect(tx + leftWidth, ty + h - bottomWidth,
+                                   w - leftWidth - rightWidth, bottomWidth),
         IntRect(leftSlice, imageHeight - bottomSlice,
                 imageWidth - rightSlice - leftSlice, bottomSlice),
         (Image::TileRule)hRule, Image::StretchTile, op);
@@ -868,8 +873,9 @@ bool RenderBoxModelObject::paintNinePieceImage(
   // Paint the middle.
   if (drawMiddle)
     graphicsContext->drawTiledImage(
-        image, IntRect(tx + leftWidth, ty + topWidth,
-                       w - leftWidth - rightWidth, h - topWidth - bottomWidth),
+        image, colorSpace,
+        IntRect(tx + leftWidth, ty + topWidth, w - leftWidth - rightWidth,
+                h - topWidth - bottomWidth),
         IntRect(leftSlice, topSlice, imageWidth - rightSlice - leftSlice,
                 imageHeight - topSlice - bottomSlice),
         (Image::TileRule)hRule, (Image::TileRule)vRule, op);

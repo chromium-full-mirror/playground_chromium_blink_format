@@ -1030,7 +1030,7 @@ void CanvasRenderingContext2D::drawImage(HTMLImageElement* image,
   FloatRect sourceRect = c->roundToDevicePixels(srcRect);
   FloatRect destRect = c->roundToDevicePixels(dstRect);
   willDraw(destRect);
-  c->drawImage(cachedImage->image(), destRect, sourceRect,
+  c->drawImage(cachedImage->image(), DeviceColorSpace, destRect, sourceRect,
                state().m_globalComposite);
 }
 
@@ -1088,7 +1088,7 @@ void CanvasRenderingContext2D::drawImage(HTMLCanvasElement* sourceCanvas,
   if (!sourceCanvas->originClean())
     canvas()->setOriginTainted();
 
-  c->drawImage(buffer->image(), destRect, sourceRect,
+  c->drawImage(buffer->image(), DeviceColorSpace, destRect, sourceRect,
                state().m_globalComposite);
   willDraw(destRect);  // This call comes after drawImage, since the buffer we
                        // draw into may be our own, and we need to make sure it
@@ -1202,7 +1202,8 @@ void CanvasRenderingContext2D::drawImageFromRect(
 
   FloatRect destRect = FloatRect(dx, dy, dw, dh);
   willDraw(destRect);
-  c->drawImage(cachedImage->image(), destRect, FloatRect(sx, sy, sw, sh), op);
+  c->drawImage(cachedImage->image(), DeviceColorSpace, destRect,
+               FloatRect(sx, sy, sw, sh), op);
 }
 
 void CanvasRenderingContext2D::setAlpha(float alpha) {

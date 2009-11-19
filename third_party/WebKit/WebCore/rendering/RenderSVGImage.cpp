@@ -175,7 +175,7 @@ void RenderSVGImage::paint(PaintInfo& paintInfo, int, int) {
       adjustRectsForAspectRatio(destRect, srcRect,
                                 imageElt->preserveAspectRatio());
 
-    paintInfo.context->drawImage(image(), destRect, srcRect);
+    paintInfo.context->drawImage(image(), DeviceColorSpace, destRect, srcRect);
     finishRenderSVGContent(this, paintInfo, filter, savedInfo.context);
   }
 

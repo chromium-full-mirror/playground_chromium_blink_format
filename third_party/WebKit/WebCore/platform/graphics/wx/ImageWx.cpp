@@ -86,12 +86,13 @@ void BitmapImage::initPlatformData() {
 void BitmapImage::draw(GraphicsContext* ctxt,
                        const FloatRect& dst,
                        const FloatRect& src,
+                       ColorSpace styleColorSpace,
                        CompositeOperator op) {
   if (!m_source.initialized())
     return;
 
   if (mayFillWithSolidColor()) {
-    fillWithSolidColor(ctxt, dst, solidColor(), op);
+    fillWithSolidColor(ctxt, dst, solidColor(), styleColorSpace, op);
     return;
   }
 
@@ -185,6 +186,7 @@ void BitmapImage::drawPattern(GraphicsContext* ctxt,
                               const FloatRect& srcRect,
                               const TransformationMatrix& patternTransform,
                               const FloatPoint& phase,
+                              ColorSpace,
                               CompositeOperator,
                               const FloatRect& dstRect) {
   if (!m_source.initialized())

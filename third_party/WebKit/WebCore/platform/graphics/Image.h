@@ -28,6 +28,7 @@
 #define Image_h
 
 #include "Color.h"
+#include "ColorSpace.h"
 #include "GraphicsTypes.h"
 #include "ImageSource.h"
 #include "IntRect.h"
@@ -159,31 +160,37 @@ class Image : public RefCounted<Image> {
  protected:
   Image(ImageObserver* = 0);
 
-  static void fillWithSolidColor(GraphicsContext* ctxt,
+  static void fillWithSolidColor(GraphicsContext*,
                                  const FloatRect& dstRect,
-                                 const Color& color,
-                                 CompositeOperator op);
+                                 const Color&,
+                                 ColorSpace styleColorSpace,
+                                 CompositeOperator);
 
+// The ColorSpace parameter will only be used for untagged images.
 #if PLATFORM(WIN)
   virtual void drawFrameMatchingSourceSize(GraphicsContext*,
                                            const FloatRect& dstRect,
                                            const IntSize& srcSize,
+                                           ColorSpace styleColorSpace,
                                            CompositeOperator) {}
 #endif
   virtual void draw(GraphicsContext*,
                     const FloatRect& dstRect,
                     const FloatRect& srcRect,
+                    ColorSpace styleColorSpace,
                     CompositeOperator) = 0;
   void drawTiled(GraphicsContext*,
                  const FloatRect& dstRect,
                  const FloatPoint& srcPoint,
                  const FloatSize& tileSize,
+                 ColorSpace styleColorSpace,
                  CompositeOperator);
   void drawTiled(GraphicsContext*,
                  const FloatRect& dstRect,
                  const FloatRect& srcRect,
                  TileRule hRule,
                  TileRule vRule,
+                 ColorSpace styleColorSpace,
                  CompositeOperator);
 
   // Supporting tiled drawing
@@ -194,6 +201,7 @@ class Image : public RefCounted<Image> {
                            const FloatRect& srcRect,
                            const TransformationMatrix& patternTransform,
                            const FloatPoint& phase,
+                           ColorSpace styleColorSpace,
                            CompositeOperator,
                            const FloatRect& destRect);
 

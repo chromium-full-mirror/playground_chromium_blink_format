@@ -396,7 +396,8 @@ void RenderImage::paintReplaced(PaintInfo& paintInfo, int tx, int ty) {
           centerY = 0;
         imageX = leftBorder + leftPad + centerX + 1;
         imageY = topBorder + topPad + centerY + 1;
-        context->drawImage(image(), IntPoint(tx + imageX, ty + imageY));
+        context->drawImage(image(), style()->colorSpace(),
+                           IntPoint(tx + imageX, ty + imageY));
         errorPictureDrawn = true;
       }
 
@@ -443,8 +444,8 @@ void RenderImage::paintReplaced(PaintInfo& paintInfo, int tx, int ty) {
                                      : 0;
     CompositeOperator compositeOperator =
         imageElt ? imageElt->compositeOperator() : CompositeSourceOver;
-    context->drawImage(image(cWidth, cHeight), rect, compositeOperator,
-                       useLowQualityScaling);
+    context->drawImage(image(cWidth, cHeight), style()->colorSpace(), rect,
+                       compositeOperator, useLowQualityScaling);
   }
 }
 

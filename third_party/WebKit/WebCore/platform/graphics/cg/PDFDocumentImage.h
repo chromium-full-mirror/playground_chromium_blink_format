@@ -60,6 +60,7 @@ class PDFDocumentImage : public Image {
   virtual void draw(GraphicsContext*,
                     const FloatRect& dstRect,
                     const FloatRect& srcRect,
+                    ColorSpace styleColorSpace,
                     CompositeOperator);
 
   void setCurrentPage(int);

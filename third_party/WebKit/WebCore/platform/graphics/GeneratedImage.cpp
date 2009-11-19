@@ -37,6 +37,7 @@ namespace WebCore {
 void GeneratedImage::draw(GraphicsContext* context,
                           const FloatRect& dstRect,
                           const FloatRect& srcRect,
+                          ColorSpace,
                           CompositeOperator compositeOp) {
   context->save();
   context->setCompositeOperation(compositeOp);
@@ -54,6 +55,7 @@ void GeneratedImage::drawPattern(GraphicsContext* context,
                                  const FloatRect& srcRect,
                                  const TransformationMatrix& patternTransform,
                                  const FloatPoint& phase,
+                                 ColorSpace styleColorSpace,
                                  CompositeOperator compositeOp,
                                  const FloatRect& destRect) {
   // Create a BitmapImage and call drawPattern on it.
@@ -69,7 +71,7 @@ void GeneratedImage::drawPattern(GraphicsContext* context,
   Image* bitmap = imageBuffer->image();
 
   // Now just call drawTiled on that image.
-  bitmap->drawPattern(context, srcRect, patternTransform, phase, compositeOp,
-                      destRect);
+  bitmap->drawPattern(context, srcRect, patternTransform, phase,
+                      styleColorSpace, compositeOp, destRect);
 }
 }

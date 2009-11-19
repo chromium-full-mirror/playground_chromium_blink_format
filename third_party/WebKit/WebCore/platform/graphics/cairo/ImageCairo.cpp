@@ -91,6 +91,7 @@ BitmapImage::BitmapImage(cairo_surface_t* surface, ImageObserver* observer)
 void BitmapImage::draw(GraphicsContext* context,
                        const FloatRect& dst,
                        const FloatRect& src,
+                       ColorSpace styleColorSpace,
                        CompositeOperator op) {
   FloatRect srcRect(src);
   FloatRect dstRect(dst);
@@ -106,7 +107,7 @@ void BitmapImage::draw(GraphicsContext* context,
     return;
 
   if (mayFillWithSolidColor()) {
-    fillWithSolidColor(context, dstRect, solidColor(), op);
+    fillWithSolidColor(context, dstRect, solidColor(), styleColorSpace, op);
     return;
   }
 
@@ -180,6 +181,7 @@ void Image::drawPattern(GraphicsContext* context,
                         const FloatRect& tileRect,
                         const TransformationMatrix& patternTransform,
                         const FloatPoint& phase,
+                        ColorSpace,
                         CompositeOperator op,
                         const FloatRect& destRect) {
   cairo_surface_t* image = nativeImageForCurrentFrame();

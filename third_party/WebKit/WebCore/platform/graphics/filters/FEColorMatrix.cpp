@@ -170,7 +170,8 @@ void FEColorMatrix::apply(Filter* filter) {
     return;
 
   filterContext->drawImage(m_in->resultImage()->image(),
-                           calculateDrawingRect(m_in->subRegion()));
+                           calculateDrawingRect(m_in->subRegion()),
+                           DeviceColorSpace);
 
   IntRect imageRect(IntPoint(), resultImage()->size());
   PassRefPtr<ImageData> imageData(
