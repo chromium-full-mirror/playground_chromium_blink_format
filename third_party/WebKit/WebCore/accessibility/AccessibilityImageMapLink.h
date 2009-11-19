@@ -47,7 +47,7 @@ class AccessibilityImageMapLink : public AccessibilityObject {
   void setHTMLMapElement(HTMLMapElement* element) { m_mapElement = element; }
   void setParent(AccessibilityObject* parent) { m_parent = parent; }
 
-  virtual AccessibilityRole roleValue() const { return WebCoreLinkRole; }
+  virtual AccessibilityRole roleValue() const;
   virtual bool accessibilityIsIgnored() const { return false; }
   virtual bool isEnabled() const { return true; }
 
