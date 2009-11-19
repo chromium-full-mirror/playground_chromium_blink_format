@@ -113,9 +113,8 @@ MediaPlayerPrivate::MediaPlayerPrivate(MediaPlayer* player)
   connect(m_mediaObject, SIGNAL(bufferStatus(int)), this,
           SLOT(bufferStatus(int)));
   connect(m_mediaObject, SIGNAL(finished()), this, SLOT(finished()));
-  connect(m_mediaObject,
-          SIGNAL(currentSourceChanged(const Phonon::MediaSource&)), this,
-          SLOT(currentSourceChanged(const Phonon::MediaSource&)));
+  connect(m_mediaObject, SIGNAL(currentSourceChanged(Phonon::MediaSource)),
+          this, SLOT(currentSourceChanged(Phonon::MediaSource)));
   connect(m_mediaObject, SIGNAL(aboutToFinish()), this, SLOT(aboutToFinish()));
   connect(m_mediaObject, SIGNAL(totalTimeChanged(qint64)), this,
           SLOT(totalTimeChanged(qint64)));

@@ -163,8 +163,8 @@ void FrameLoaderClientQt::setFrame(QWebFrame* webFrame, Frame* frame) {
           SIGNAL(loadFinished(bool)));
   connect(this, SIGNAL(loadFinished(bool)), m_webFrame,
           SIGNAL(loadFinished(bool)));
-  connect(this, SIGNAL(titleChanged(const QString&)), m_webFrame,
-          SIGNAL(titleChanged(const QString&)));
+  connect(this, SIGNAL(titleChanged(QString)), m_webFrame,
+          SIGNAL(titleChanged(QString)));
 }
 
 QWebFrame* FrameLoaderClientQt::webFrame() const {

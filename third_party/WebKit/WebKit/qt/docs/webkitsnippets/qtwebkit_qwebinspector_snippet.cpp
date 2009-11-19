@@ -8,7 +8,7 @@ void wrapInFunction() {
   QWebInspector* inspector = new QWebInspector;
   inspector->setPage(page);
 
-  connect(page, SIGNAL(webInspectorTriggered(const QWebElement&)), inspector,
+  connect(page, SIGNAL(webInspectorTriggered(QWebElement)), inspector,
           SLOT(show()));
   //! [0]
 }
