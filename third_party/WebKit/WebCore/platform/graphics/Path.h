@@ -29,6 +29,7 @@
 #define Path_h
 
 #include <algorithm>
+#include <wtf/FastAllocBase.h>
 
 #if PLATFORM(CG)
 typedef struct CGPath PlatformPath;
@@ -87,7 +88,7 @@ struct PathElement {
 
 typedef void (*PathApplierFunction)(void* info, const PathElement*);
 
-class Path {
+class Path : public FastAllocBase {
  public:
   Path();
   ~Path();

@@ -202,7 +202,7 @@ class RGBA32Buffer {
 // (e.g., GIF, JPG, PNG, ICO) to derive from.  All decoders decode into RGBA32
 // format
 // and the base class manages the RGBA32 frame cache.
-class ImageDecoder {
+class ImageDecoder : public Noncopyable {
  public:
   // ENABLE(IMAGE_DECODER_DOWN_SAMPLING) allows image decoders to write directly
   // to
