@@ -21,8 +21,6 @@
 
 #include <QObject>
 
-#if QT_VERSION >= 0x040400
-
 #include <QNetworkRequest>
 #include <QNetworkAccessManager>
 
@@ -106,7 +104,5 @@ class FormDataIODevice : public QIODevice {
   qint64 m_currentDelta;
 };
 }
-
-#endif
 
 #endif  // QNETWORKREPLYHANDLER_H

@@ -153,22 +153,10 @@ class QWebPagePrivate {
 
   bool clickCausedFocus;
 
-#if QT_VERSION < 0x040400
-  bool acceptNavigationRequest(QWebFrame* frame,
-                               const QWebNetworkRequest& request,
-                               QWebPage::NavigationType type);
-
-  QWebNetworkInterface* networkInterface;
-#ifndef QT_NO_NETWORKPROXY
-  QNetworkProxy networkProxy;
-#endif
-
-#else
   bool acceptNavigationRequest(QWebFrame* frame,
                                const QNetworkRequest& request,
                                QWebPage::NavigationType type);
   QNetworkAccessManager* networkManager;
-#endif
 
   bool forwardUnsupportedContent;
   QWebPage::LinkDelegationPolicy linkPolicy;

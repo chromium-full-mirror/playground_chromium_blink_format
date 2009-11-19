@@ -27,9 +27,7 @@
 #include <QtGui/qicon.h>
 #include <QtGui/qpainter.h>
 #include <QtCore/qurl.h>
-#if QT_VERSION >= 0x040400
 #include <QtNetwork/qnetworkaccessmanager.h>
-#endif
 
 QT_BEGIN_NAMESPACE
 class QNetworkRequest;
@@ -71,14 +69,10 @@ class QWEBKIT_EXPORT QWebView : public QWidget {
   void setPage(QWebPage* page);
 
   void load(const QUrl& url);
-#if QT_VERSION < 0x040400 && !defined(qdoc)
-  void load(const QWebNetworkRequest& request);
-#else
   void load(const QNetworkRequest& request,
             QNetworkAccessManager::Operation operation =
                 QNetworkAccessManager::GetOperation,
             const QByteArray& body = QByteArray());
-#endif
   void setHtml(const QString& html, const QUrl& baseUrl = QUrl());
   void setContent(const QByteArray& data,
                   const QString& mimeType = QString(),

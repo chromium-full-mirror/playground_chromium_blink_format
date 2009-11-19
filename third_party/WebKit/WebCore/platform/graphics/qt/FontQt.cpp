@@ -42,7 +42,6 @@
 
 #include <limits.h>
 
-#if QT_VERSION >= 0x040400
 namespace WebCore {
 
 static const QString qstring(const TextRun& run) {
@@ -236,5 +235,3 @@ QFont Font::font() const {
   return f;
 }
 }
-
-#endif

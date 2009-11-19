@@ -209,20 +209,8 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
   QUndoStack* undoStack() const;
 #endif
 
-#if QT_VERSION < 0x040400 && !defined(qdoc)
-  void setNetworkInterface(QWebNetworkInterface* interface);
-  QWebNetworkInterface* networkInterface() const;
-
-// #### why is this in the page itself?
-#ifndef QT_NO_NETWORKPROXY
-  void setNetworkProxy(const QNetworkProxy& proxy);
-  QNetworkProxy networkProxy() const;
-#endif
-
-#else
   void setNetworkAccessManager(QNetworkAccessManager* manager);
   QNetworkAccessManager* networkAccessManager() const;
-#endif
 
   void setPluginFactory(QWebPluginFactory* factory);
   QWebPluginFactory* pluginFactory() const;
@@ -335,10 +323,8 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
   void statusBarVisibilityChangeRequested(bool visible);
   void menuBarVisibilityChangeRequested(bool visible);
 
-#if QT_VERSION >= 0x040400
   void unsupportedContent(QNetworkReply* reply);
   void downloadRequested(const QNetworkRequest& request);
-#endif
 
   void microFocusChanged();
   void contentsChanged();
@@ -354,15 +340,9 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
                                 const QStringList& paramNames,
                                 const QStringList& paramValues);
 
-#if QT_VERSION >= 0x040400
   virtual bool acceptNavigationRequest(QWebFrame* frame,
                                        const QNetworkRequest& request,
                                        NavigationType type);
-#else
-  virtual bool acceptNavigationRequest(QWebFrame* frame,
-                                       const QWebNetworkRequest& request,
-                                       NavigationType type);
-#endif
   virtual QString chooseFile(QWebFrame* originatingFrame,
                              const QString& oldFile);
   virtual void javaScriptAlert(QWebFrame* originatingFrame, const QString& msg);

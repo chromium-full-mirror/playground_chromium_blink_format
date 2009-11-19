@@ -69,14 +69,10 @@
 
 #include <QCoreApplication>
 #include <QDebug>
-#if QT_VERSION >= 0x040400
 #include <QGraphicsScene>
 #include <QGraphicsWidget>
 #include <QNetworkRequest>
 #include <QNetworkReply>
-#else
-#include "qwebnetworkinterface_p.h"
-#endif
 #include "qwebhistory_p.h"
 
 static bool dumpFrameLoaderCallbacks = false;
@@ -721,7 +717,6 @@ void FrameLoaderClientQt::download(WebCore::ResourceHandle* handle,
                                    const WebCore::ResourceRequest&,
                                    const WebCore::ResourceRequest&,
                                    const WebCore::ResourceResponse&) {
-#if QT_VERSION >= 0x040400
   if (!m_webFrame)
     return;
 
@@ -734,7 +729,6 @@ void FrameLoaderClientQt::download(WebCore::ResourceHandle* handle,
     else
       reply->abort();
   }
-#endif
 }
 
 void FrameLoaderClientQt::assignIdentifierToInitialRequest(
@@ -916,11 +910,7 @@ void FrameLoaderClientQt::dispatchDecidePolicyForNewWindowAction(
     PassRefPtr<WebCore::FormState>,
     const WebCore::String&) {
   Q_ASSERT(m_webFrame);
-#if QT_VERSION < 0x040400
-  QWebNetworkRequest r(request);
-#else
   QNetworkRequest r(request.toNetworkRequest(m_webFrame));
-#endif
   QWebPage* page = m_webFrame->page();
 
   if (!page->d->acceptNavigationRequest(
@@ -947,11 +937,7 @@ void FrameLoaderClientQt::dispatchDecidePolicyForNavigationAction(
     const WebCore::ResourceRequest& request,
     PassRefPtr<WebCore::FormState>) {
   Q_ASSERT(m_webFrame);
-#if QT_VERSION < 0x040400
-  QWebNetworkRequest r(request);
-#else
   QNetworkRequest r(request.toNetworkRequest(m_webFrame));
-#endif
   QWebPage* page = m_webFrame->page();
 
   if (!page->d->acceptNavigationRequest(
@@ -979,13 +965,11 @@ void FrameLoaderClientQt::dispatchUnableToImplementPolicy(
 
 void FrameLoaderClientQt::startDownload(
     const WebCore::ResourceRequest& request) {
-#if QT_VERSION >= 0x040400
   if (!m_webFrame)
     return;
 
   emit m_webFrame->page()->downloadRequested(
       request.toNetworkRequest(m_webFrame));
-#endif
 }
 
 PassRefPtr<Frame> FrameLoaderClientQt::createFrame(
@@ -1213,13 +1197,11 @@ PassRefPtr<Widget> FrameLoaderClientQt::createPlugin(
 #endif  // QT_NO_STYLE_STYLESHEET
   }
 
-#if QT_VERSION >= 0x040400
   if (!object) {
     QWebPluginFactory* factory = m_webFrame->page()->pluginFactory();
     if (factory)
       object = factory->create(mimeType, qurl, params, values);
   }
-#endif
 
   if (object) {
     QWidget* widget = qobject_cast<QWidget*>(object);

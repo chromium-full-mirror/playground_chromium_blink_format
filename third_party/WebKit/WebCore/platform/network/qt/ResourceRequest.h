@@ -54,9 +54,7 @@ class ResourceRequest : public ResourceRequestBase {
 
   ResourceRequest() : ResourceRequestBase(KURL(), UseProtocolCachePolicy) {}
 
-#if QT_VERSION >= 0x040400
   QNetworkRequest toNetworkRequest(QObject* originatingObject) const;
-#endif
 
  private:
   friend class ResourceRequestBase;

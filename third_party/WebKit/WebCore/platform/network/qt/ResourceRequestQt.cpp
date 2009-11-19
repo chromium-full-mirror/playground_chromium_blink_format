@@ -21,7 +21,6 @@
 #include "ResourceRequest.h"
 
 #include <qglobal.h>
-#if QT_VERSION >= 0x040400
 
 #include <QNetworkRequest>
 #include <QUrl>
@@ -72,5 +71,3 @@ QNetworkRequest ResourceRequest::toNetworkRequest(
   return request;
 }
 }
-
-#endif
