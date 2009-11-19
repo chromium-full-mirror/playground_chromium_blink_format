@@ -114,6 +114,7 @@ class HTMLFormControlElement : public HTMLElement {
   virtual short tabIndex() const;
 
   virtual bool willValidate() const;
+  String validationMessage();
   bool checkValidity();
   void updateValidity();
   void setCustomValidity(const String&);

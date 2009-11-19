@@ -141,6 +141,14 @@ String mediaElementLiveBroadcastStateText();
 String localizedMediaControlElementString(const String&);
 String localizedMediaControlElementHelpText(const String&);
 String localizedMediaTimeDescription(float);
+
+String validationMessageValueMissingText();
+String validationMessageTypeMismatchText();
+String validationMessagePatternMismatchText();
+String validationMessageTooLongText();
+String validationMessageRangeUnderflowText();
+String validationMessageRangeOverflowText();
+String validationMessageStepMismatchText();
 }
 
 #endif
