@@ -81,6 +81,8 @@ static WebGraphicHash* graphics() {
     hash->insert(
         QWebSettings::TextAreaSizeGripCornerGraphic,
         QPixmap(QLatin1String(":webkit/resources/textAreaResizeCorner.png")));
+    hash->insert(QWebSettings::DeleteButtonGraphic,
+                 QPixmap(QLatin1String(":webkit/resources/deleteButton.png")));
   }
 
   return hash;
