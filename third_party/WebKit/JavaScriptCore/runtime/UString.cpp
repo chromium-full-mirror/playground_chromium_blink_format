@@ -36,6 +36,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <wtf/ASCIICType.h>
 #include <wtf/Assertions.h>
 #include <wtf/MathExtras.h>
@@ -44,9 +45,6 @@
 #include <wtf/unicode/UTF8.h>
 #include <wtf/StringExtras.h>
 
-#if HAVE(STRING_H)
-#include <string.h>
-#endif
 #if HAVE(STRINGS_H)
 #include <strings.h>
 #endif
