@@ -34,6 +34,7 @@ class FileList;
 class HTMLDataListElement;
 class HTMLImageLoader;
 class HTMLOptionElement;
+class ISODateTime;
 class KURL;
 class VisibleSelection;
 
@@ -256,6 +257,12 @@ class HTMLInputElement : public HTMLTextFormControlElement,
   // an empty string input.
   // The double* parameter may be 0.
   static bool formStringToDouble(const String&, double*);
+  // Parses the specified string as the InputType, and returns true if it is
+  // successfully parsed.
+  // An instance pointed by the ISODateTime* parameter will have parsed values
+  // and be
+  // modified even if the parsing fails.  The ISODateTime* parameter may be 0.
+  static bool formStringToISODateTime(InputType, const String&, ISODateTime*);
 
  protected:
   virtual void willMoveToNewOwnerDocument();
