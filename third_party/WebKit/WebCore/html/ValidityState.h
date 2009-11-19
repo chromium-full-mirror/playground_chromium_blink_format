@@ -47,7 +47,7 @@ class ValidityState : public RefCounted<ValidityState> {
   bool tooLong() { return control()->tooLong(); }
   bool rangeUnderflow();
   bool rangeOverflow();
-  bool stepMismatch() { return false; }
+  bool stepMismatch();
   bool customError() { return !m_customErrorMessage.isEmpty(); }
   bool valid();
 
