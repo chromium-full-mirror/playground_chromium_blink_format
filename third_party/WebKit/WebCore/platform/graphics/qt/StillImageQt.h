@@ -50,6 +50,7 @@ class StillImage : public Image {
   virtual void draw(GraphicsContext*,
                     const FloatRect& dstRect,
                     const FloatRect& srcRect,
+                    ColorSpace styleColorSpace,
                     CompositeOperator);
 
  private:
