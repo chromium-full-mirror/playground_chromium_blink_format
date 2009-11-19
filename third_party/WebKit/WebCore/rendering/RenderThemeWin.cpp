@@ -863,7 +863,7 @@ bool RenderThemeWin::paintSearchFieldCancelButton(
   static Image* cancelPressedImage =
       Image::loadPlatformResource("searchCancelPressed").releaseRef();
   paintInfo.context->drawImage(isPressed(o) ? cancelPressedImage : cancelImage,
-                               bounds);
+                               o->style()->colorSpace(), bounds);
   return false;
 }
 
@@ -929,7 +929,8 @@ bool RenderThemeWin::paintSearchFieldResultsDecoration(
 
   static Image* magnifierImage =
       Image::loadPlatformResource("searchMagnifier").releaseRef();
-  paintInfo.context->drawImage(magnifierImage, bounds);
+  paintInfo.context->drawImage(magnifierImage, o->style()->colorSpace(),
+                               bounds);
   return false;
 }
 
@@ -979,7 +980,8 @@ bool RenderThemeWin::paintSearchFieldResultsButton(
 
   static Image* magnifierImage =
       Image::loadPlatformResource("searchMagnifierResults").releaseRef();
-  paintInfo.context->drawImage(magnifierImage, bounds);
+  paintInfo.context->drawImage(magnifierImage, o->style()->colorSpace(),
+                               bounds);
   return false;
 }
 
