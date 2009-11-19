@@ -177,8 +177,12 @@ template <typename DataType>
 template <typename Predicate>
 inline void MessageQueue<DataType>::removeIf(Predicate& predicate) {
   MutexLocker lock(m_mutex);
-  DequeConstIterator<DataType*> found = m_queue.end();
-  while ((found = m_queue.findIf(predicate)) != m_queue.end()) {
+  // See bug 31657 for why this loop looks so weird
+  while (true) {
+    DequeConstIterator<DataType*> found = m_queue.findIf(predicate);
+    if (found == m_queue.end())
+      break;
+
     DataType* message = *found;
     m_queue.remove(found);
     delete message;
