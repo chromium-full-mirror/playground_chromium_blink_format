@@ -1367,10 +1367,9 @@ Color gradientAverageColor(const Gradient* gradient) {
 }
 
 void GraphicsContext::fillPath() {
-  Color c =
-      m_common->state.fillType == GradientType && m_common->state.fillGradient
-          ? gradientAverageColor(m_common->state.fillGradient.get())
-          : fillColor();
+  Color c = m_common->state.fillGradient
+                ? gradientAverageColor(m_common->state.fillGradient.get())
+                : fillColor();
 
   if (!c.alpha() || !m_data->m_opacity)
     return;
@@ -1554,7 +1553,7 @@ void GraphicsContext::clipToImageBuffer(const FloatRect&, const ImageBuffer*) {
 }
 
 void GraphicsContext::fillRect(const FloatRect& rect) {
-  if (m_common->state.fillType == GradientType && m_common->state.fillGradient)
+  if (m_common->state.fillGradient)
     fillRect(rect, m_common->state.fillGradient.get());
   else
     fillRect(rect, fillColor(), DeviceColorSpace);

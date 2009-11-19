@@ -76,27 +76,15 @@ static inline void setPlatformFill(GraphicsContext* context,
                                    cairo_t* cr,
                                    GraphicsContextPrivate* gcp) {
   cairo_save(cr);
-  switch (gcp->state.fillType) {
-    case SolidColorType: {
-      setColor(cr, context->fillColor());
-      cairo_clip_preserve(cr);
-      cairo_paint_with_alpha(cr, gcp->state.globalAlpha);
-      break;
-    }
-    case PatternType: {
-      TransformationMatrix affine;
-      cairo_set_source(cr,
-                       gcp->state.fillPattern->createPlatformPattern(affine));
-      cairo_clip_preserve(cr);
-      cairo_paint_with_alpha(cr, gcp->state.globalAlpha);
-      break;
-    }
-    case GradientType:
-      cairo_set_source(cr, gcp->state.fillGradient->platformGradient());
-      cairo_clip_preserve(cr);
-      cairo_paint_with_alpha(cr, gcp->state.globalAlpha);
-      break;
-  }
+  if (gcp->state.fillPattern) {
+    TransformationMatrix affine;
+    cairo_set_source(cr, gcp->state.fillPattern->createPlatformPattern(affine));
+  } else if (gcp->state.fillGradient)
+    cairo_set_source(cr, gcp->state.fillGradient->platformGradient());
+  else
+    setColor(cr, context->fillColor());
+  cairo_clip_preserve(cr);
+  cairo_paint_with_alpha(cr, gcp->state.globalAlpha);
   cairo_restore(cr);
 }
 
@@ -104,26 +92,20 @@ static inline void setPlatformStroke(GraphicsContext* context,
                                      cairo_t* cr,
                                      GraphicsContextPrivate* gcp) {
   cairo_save(cr);
-  switch (gcp->state.strokeType) {
-    case SolidColorType: {
-      Color strokeColor = colorWithOverrideAlpha(
-          context->strokeColor().rgb(),
-          context->strokeColor().alpha() / 255.f * gcp->state.globalAlpha);
-      setColor(cr, strokeColor);
-      break;
-    }
-    case PatternType: {
-      TransformationMatrix affine;
-      cairo_set_source(cr,
-                       gcp->state.strokePattern->createPlatformPattern(affine));
-      break;
-    }
-    case GradientType:
-      cairo_set_source(cr, gcp->state.strokeGradient->platformGradient());
-      break;
+  if (gcp->state.strokePattern) {
+    TransformationMatrix affine;
+    cairo_set_source(cr,
+                     gcp->state.strokePattern->createPlatformPattern(affine));
+  } else if (gcp->state.strokeGradient)
+    cairo_set_source(cr, gcp->state.strokeGradient->platformGradient());
+  else {
+    Color strokeColor = colorWithOverrideAlpha(
+        context->strokeColor().rgb(),
+        context->strokeColor().alpha() / 255.f * gcp->state.globalAlpha);
+    setColor(cr, strokeColor);
   }
   if (gcp->state.globalAlpha < 1.0f &&
-      gcp->state.strokeType != SolidColorType) {
+      (gcp->state.strokePattern || gcp->state.strokeGradient)) {
     cairo_push_group(cr);
     cairo_paint_with_alpha(cr, gcp->state.globalAlpha);
     cairo_pop_group_to_source(cr);

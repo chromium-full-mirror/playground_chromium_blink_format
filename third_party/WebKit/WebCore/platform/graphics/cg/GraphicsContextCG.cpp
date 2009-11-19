@@ -476,8 +476,7 @@ void GraphicsContext::applyStrokePattern() {
   CGContextRef cgContext = platformContext();
 
   RetainPtr<CGPatternRef> platformPattern(
-      AdoptCF,
-      m_common->state.strokePattern.get()->createPlatformPattern(getCTM()));
+      AdoptCF, m_common->state.strokePattern->createPlatformPattern(getCTM()));
   if (!platformPattern)
     return;
 
@@ -493,8 +492,7 @@ void GraphicsContext::applyFillPattern() {
   CGContextRef cgContext = platformContext();
 
   RetainPtr<CGPatternRef> platformPattern(
-      AdoptCF,
-      m_common->state.fillPattern.get()->createPlatformPattern(getCTM()));
+      AdoptCF, m_common->state.fillPattern->createPlatformPattern(getCTM()));
   if (!platformPattern)
     return;
 
@@ -508,10 +506,9 @@ void GraphicsContext::applyFillPattern() {
 
 static inline bool calculateDrawingMode(const GraphicsContextState& state,
                                         CGPathDrawingMode& mode) {
-  bool shouldFill = state.fillType == PatternType || state.fillColor.alpha();
-  bool shouldStroke =
-      state.strokeType == PatternType ||
-      (state.strokeStyle != NoStroke && state.strokeColor.alpha());
+  bool shouldFill = state.fillPattern || state.fillColor.alpha();
+  bool shouldStroke = state.strokePattern || (state.strokeStyle != NoStroke &&
+                                              state.strokeColor.alpha());
   bool useEOFill = state.fillRule == RULE_EVENODD;
 
   if (shouldFill) {
@@ -543,16 +540,16 @@ void GraphicsContext::drawPath() {
   CGContextRef context = platformContext();
   const GraphicsContextState& state = m_common->state;
 
-  if (state.fillType == GradientType || state.strokeType == GradientType) {
+  if (state.fillGradient || state.strokeGradient) {
     // We don't have any optimized way to fill & stroke a path using gradients
     fillPath();
     strokePath();
     return;
   }
 
-  if (state.fillType == PatternType)
+  if (state.fillPattern)
     applyFillPattern();
-  if (state.strokeType == PatternType)
+  if (state.strokePattern)
     applyStrokePattern();
 
   CGPathDrawingMode drawingMode;
@@ -573,29 +570,28 @@ void GraphicsContext::fillPath() {
     return;
 
   CGContextRef context = platformContext();
+
+  // FIXME: Is this helpful and correct in the fillPattern and fillGradient
+  // cases?
   setCGFillColorSpace(context, m_common->state.fillColorSpace);
 
-  switch (m_common->state.fillType) {
-    case SolidColorType:
-      fillPathWithFillRule(context, fillRule());
-      break;
-    case PatternType:
-      applyFillPattern();
-      fillPathWithFillRule(context, fillRule());
-      break;
-    case GradientType:
-      CGContextSaveGState(context);
-      if (fillRule() == RULE_EVENODD)
-        CGContextEOClip(context);
-      else
-        CGContextClip(context);
-      CGContextConcatCTM(
-          context, m_common->state.fillGradient->gradientSpaceTransform());
-      CGContextDrawShading(context,
-                           m_common->state.fillGradient->platformGradient());
-      CGContextRestoreGState(context);
-      break;
+  if (m_common->state.fillGradient) {
+    CGContextSaveGState(context);
+    if (fillRule() == RULE_EVENODD)
+      CGContextEOClip(context);
+    else
+      CGContextClip(context);
+    CGContextConcatCTM(context,
+                       m_common->state.fillGradient->gradientSpaceTransform());
+    CGContextDrawShading(context,
+                         m_common->state.fillGradient->platformGradient());
+    CGContextRestoreGState(context);
+    return;
   }
+
+  if (m_common->state.fillPattern)
+    applyFillPattern();
+  fillPathWithFillRule(context, fillRule());
 }
 
 void GraphicsContext::strokePath() {
@@ -603,27 +599,26 @@ void GraphicsContext::strokePath() {
     return;
 
   CGContextRef context = platformContext();
+
+  // FIXME: Is this helpful and correct in the strokePattern and strokeGradient
+  // cases?
   setCGStrokeColorSpace(context, m_common->state.strokeColorSpace);
 
-  switch (m_common->state.strokeType) {
-    case SolidColorType:
-      CGContextStrokePath(context);
-      break;
-    case PatternType:
-      applyStrokePattern();
-      CGContextStrokePath(context);
-      break;
-    case GradientType:
-      CGContextSaveGState(context);
-      CGContextReplacePathWithStrokedPath(context);
-      CGContextClip(context);
-      CGContextConcatCTM(
-          context, m_common->state.strokeGradient->gradientSpaceTransform());
-      CGContextDrawShading(context,
-                           m_common->state.strokeGradient->platformGradient());
-      CGContextRestoreGState(context);
-      break;
+  if (m_common->state.strokeGradient) {
+    CGContextSaveGState(context);
+    CGContextReplacePathWithStrokedPath(context);
+    CGContextClip(context);
+    CGContextConcatCTM(
+        context, m_common->state.strokeGradient->gradientSpaceTransform());
+    CGContextDrawShading(context,
+                         m_common->state.strokeGradient->platformGradient());
+    CGContextRestoreGState(context);
+    return;
   }
+
+  if (m_common->state.strokePattern)
+    applyStrokePattern();
+  CGContextStrokePath(context);
 }
 
 void GraphicsContext::fillRect(const FloatRect& rect) {
@@ -631,26 +626,25 @@ void GraphicsContext::fillRect(const FloatRect& rect) {
     return;
 
   CGContextRef context = platformContext();
+
+  // FIXME: Is this helpful and correct in the fillPattern and fillGradient
+  // cases?
   setCGFillColorSpace(context, m_common->state.fillColorSpace);
 
-  switch (m_common->state.fillType) {
-    case SolidColorType:
-      CGContextFillRect(context, rect);
-      break;
-    case PatternType:
-      applyFillPattern();
-      CGContextFillRect(context, rect);
-      break;
-    case GradientType:
-      CGContextSaveGState(context);
-      CGContextClipToRect(context, rect);
-      CGContextConcatCTM(
-          context, m_common->state.fillGradient->gradientSpaceTransform());
-      CGContextDrawShading(context,
-                           m_common->state.fillGradient->platformGradient());
-      CGContextRestoreGState(context);
-      break;
+  if (m_common->state.fillGradient) {
+    CGContextSaveGState(context);
+    CGContextClipToRect(context, rect);
+    CGContextConcatCTM(context,
+                       m_common->state.fillGradient->gradientSpaceTransform());
+    CGContextDrawShading(context,
+                         m_common->state.fillGradient->platformGradient());
+    CGContextRestoreGState(context);
+    return;
   }
+
+  if (m_common->state.fillPattern)
+    applyFillPattern();
+  CGContextFillRect(context, rect);
 }
 
 void GraphicsContext::fillRect(const FloatRect& rect,
@@ -881,27 +875,26 @@ void GraphicsContext::strokeRect(const FloatRect& r, float lineWidth) {
     return;
 
   CGContextRef context = platformContext();
+
+  // FIXME: Is this helpful and correct in the strokePattern and strokeGradient
+  // cases?
   setCGStrokeColorSpace(context, m_common->state.strokeColorSpace);
 
-  switch (m_common->state.strokeType) {
-    case SolidColorType:
-      CGContextStrokeRectWithWidth(context, r, lineWidth);
-      break;
-    case PatternType:
-      applyStrokePattern();
-      CGContextStrokeRectWithWidth(context, r, lineWidth);
-      break;
-    case GradientType:
-      CGContextSaveGState(context);
-      setStrokeThickness(lineWidth);
-      CGContextAddRect(context, r);
-      CGContextReplacePathWithStrokedPath(context);
-      CGContextClip(context);
-      CGContextDrawShading(context,
-                           m_common->state.strokeGradient->platformGradient());
-      CGContextRestoreGState(context);
-      break;
+  if (m_common->state.strokeGradient) {
+    CGContextSaveGState(context);
+    setStrokeThickness(lineWidth);
+    CGContextAddRect(context, r);
+    CGContextReplacePathWithStrokedPath(context);
+    CGContextClip(context);
+    CGContextDrawShading(context,
+                         m_common->state.strokeGradient->platformGradient());
+    CGContextRestoreGState(context);
+    return;
   }
+
+  if (m_common->state.strokePattern)
+    applyStrokePattern();
+  CGContextStrokeRectWithWidth(context, r, lineWidth);
 }
 
 void GraphicsContext::setLineCap(LineCap cap) {

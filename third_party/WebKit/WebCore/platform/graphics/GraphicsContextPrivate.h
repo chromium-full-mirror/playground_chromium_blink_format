@@ -34,18 +34,14 @@
 
 namespace WebCore {
 
-enum FillOrStrokeType { SolidColorType, PatternType, GradientType };
-
 struct GraphicsContextState {
   GraphicsContextState()
       : textDrawingMode(cTextFill),
         strokeStyle(SolidStroke),
         strokeThickness(0),
-        strokeType(SolidColorType),
         strokeColor(Color::black),
         strokeColorSpace(DeviceColorSpace),
         fillRule(RULE_NONZERO),
-        fillType(SolidColorType),
         fillColor(Color::black),
         fillColorSpace(DeviceColorSpace),
         shouldAntialias(true),
@@ -63,14 +59,12 @@ struct GraphicsContextState {
 
   StrokeStyle strokeStyle;
   float strokeThickness;
-  FillOrStrokeType strokeType;
   Color strokeColor;
   ColorSpace strokeColorSpace;
   RefPtr<Gradient> strokeGradient;
   RefPtr<Pattern> strokePattern;
 
   WindRule fillRule;
-  FillOrStrokeType fillType;
   Color fillColor;
   ColorSpace fillColorSpace;
   RefPtr<Gradient> fillGradient;
