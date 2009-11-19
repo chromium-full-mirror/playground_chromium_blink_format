@@ -47,6 +47,8 @@ class RenderRubyRun : public RenderBlock {
   RenderRubyRun(Node*);
   virtual ~RenderRubyRun();
 
+  virtual void destroy();
+
   virtual const char* renderName() const { return "RenderRubyRun (anonymous)"; }
 
   virtual bool isRubyRun() const { return true; }
@@ -70,6 +72,9 @@ class RenderRubyRun : public RenderBlock {
 
  protected:
   RenderRubyBase* createRubyBase() const;
+
+ private:
+  bool m_beingDestroyed;
 };
 
 }  // namespace WebCore
