@@ -365,6 +365,9 @@ class RenderLayer : public ScrollbarClient {
   // the <html> layer and the root layer).
   RenderLayer* enclosingPositionedAncestor() const;
 
+  // The layer relative to which clipping rects for this layer are computed.
+  RenderLayer* clippingRoot() const;
+
 #if USE(ACCELERATED_COMPOSITING)
   // Enclosing compositing layer; if includeSelf is true, may return this.
   RenderLayer* enclosingCompositingLayer(bool includeSelf = true) const;
