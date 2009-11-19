@@ -35,6 +35,13 @@ class String;
 String preferredExtensionForImageSourceType(const String& type);
 
 String MIMETypeForImageSourceType(const String& type);
+
+#if !PLATFORM(MAC)
+size_t sharedBufferGetBytesAtPosition(void* info,
+                                      void* buffer,
+                                      off_t position,
+                                      size_t count);
+#endif
 }
 
 #endif  // ImageSourceCG_h
