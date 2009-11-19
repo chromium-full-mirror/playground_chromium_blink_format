@@ -181,6 +181,9 @@ class MediaPlayer : public Noncopyable {
   float volume() const;
   void setVolume(float);
 
+  bool hasClosedCaptions() const;
+  void setClosedCaptionsVisible(bool closedCaptionsVisible);
+
   int dataRate() const;
 
   bool autobuffer() const;

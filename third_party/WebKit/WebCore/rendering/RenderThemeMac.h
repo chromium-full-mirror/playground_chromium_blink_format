@@ -195,6 +195,10 @@ class RenderThemeMac : public RenderTheme {
   virtual bool paintMediaReturnToRealtimeButton(RenderObject*,
                                                 const RenderObject::PaintInfo&,
                                                 const IntRect&);
+  virtual bool paintMediaToggleClosedCaptionsButton(
+      RenderObject*,
+      const RenderObject::PaintInfo&,
+      const IntRect&);
   virtual bool paintMediaControlsBackground(RenderObject*,
                                             const RenderObject::PaintInfo&,
                                             const IntRect&);

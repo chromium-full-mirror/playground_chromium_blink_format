@@ -2811,6 +2811,9 @@ bool CSSStyleSelector::SelectorChecker::checkOneSelector(
       case CSSSelector::PseudoMediaControlsReturnToRealtimeButton:
         dynamicPseudo = MEDIA_CONTROLS_RETURN_TO_REALTIME_BUTTON;
         return true;
+      case CSSSelector::PseudoMediaControlsToggleClosedCaptions:
+        dynamicPseudo = MEDIA_CONTROLS_TOGGLE_CLOSED_CAPTIONS_BUTTON;
+        return true;
       case CSSSelector::PseudoMediaControlsStatusDisplay:
         dynamicPseudo = MEDIA_CONTROLS_STATUS_DISPLAY;
         return true;

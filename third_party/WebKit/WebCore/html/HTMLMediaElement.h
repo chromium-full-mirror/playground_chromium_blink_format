@@ -150,6 +150,11 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   bool webkitSupportsFullscreen();
   bool webkitDisplayingFullscreen();
 
+  // captions
+  bool webkitHasClosedCaptions() const;
+  bool webkitClosedCaptionsVisible() const;
+  void setWebkitClosedCaptionsVisible(bool);
+
   // controls
   bool controls() const;
   void setControls(bool);
@@ -183,6 +188,10 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
 
   void enterFullscreen();
   void exitFullscreen();
+
+  bool hasClosedCaptions() const;
+  bool closedCaptionsVisible() const;
+  void setClosedCaptionsVisible(bool);
 
  protected:
   float getTimeOffsetAttribute(const QualifiedName&, float valueOnError) const;
@@ -354,6 +363,7 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   bool m_sendProgressEvents : 1;
 
   bool m_isFullscreen : 1;
+  bool m_closedCaptionsVisible : 1;
 
 #if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
   bool m_needWidgetUpdate : 1;

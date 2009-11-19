@@ -2,7 +2,8 @@
  * Copyright (C) 2000 Lars Knoll (knoll@kde.org)
  *           (C) 2000 Antti Koivisto (koivisto@kde.org)
  *           (C) 2000 Dirk Mueller (mueller@kde.org)
- * Copyright (C) 2003, 2005, 2006, 2007, 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2003, 2005, 2006, 2007, 2008, 2009 Apple Inc. All rights
+ * reserved.
  * Copyright (C) 2006 Graham Dennis (graham.dennis@gmail.com)
  * Copyright (C) 2009 Torch Mobile Inc. All rights reserved.
  * (http://www.torchmobile.com/)
@@ -101,6 +102,7 @@ enum PseudoId {
   MEDIA_CONTROLS_FULLSCREEN_BUTTON,
   MEDIA_CONTROLS_REWIND_BUTTON,
   MEDIA_CONTROLS_RETURN_TO_REALTIME_BUTTON,
+  MEDIA_CONTROLS_TOGGLE_CLOSED_CAPTIONS_BUTTON,
   MEDIA_CONTROLS_STATUS_DISPLAY,
   SCROLLBAR_THUMB,
   SCROLLBAR_BUTTON,

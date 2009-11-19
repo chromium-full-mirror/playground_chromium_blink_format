@@ -40,6 +40,7 @@ class MediaControlPlayButtonElement;
 class MediaControlSeekButtonElement;
 class MediaControlRewindButtonElement;
 class MediaControlReturnToRealtimeButtonElement;
+class MediaControlToggleClosedCaptionsButtonElement;
 class MediaControlTimelineElement;
 class MediaControlVolumeSliderElement;
 class MediaControlFullscreenButtonElement;
@@ -101,6 +102,7 @@ class RenderMedia : public RenderReplaced {
   void createSeekForwardButton();
   void createRewindButton();
   void createReturnToRealtimeButton();
+  void createToggleClosedCaptionsButton();
   void createStatusDisplay();
   void createTimelineContainer();
   void createTimeline();
@@ -128,6 +130,8 @@ class RenderMedia : public RenderReplaced {
   RefPtr<MediaControlSeekButtonElement> m_seekForwardButton;
   RefPtr<MediaControlRewindButtonElement> m_rewindButton;
   RefPtr<MediaControlReturnToRealtimeButtonElement> m_returnToRealtimeButton;
+  RefPtr<MediaControlToggleClosedCaptionsButtonElement>
+      m_toggleClosedCaptionsButton;
   RefPtr<MediaControlTimelineElement> m_timeline;
   RefPtr<MediaControlVolumeSliderElement> m_volumeSlider;
   RefPtr<MediaControlFullscreenButtonElement> m_fullscreenButton;

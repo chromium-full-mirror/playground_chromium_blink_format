@@ -63,6 +63,7 @@ enum ControlPart {
   MediaSeekForwardButtonPart,
   MediaRewindButtonPart,
   MediaReturnToRealtimeButtonPart,
+  MediaToggleClosedCaptionsButtonPart,
   MediaSliderPart,
   MediaSliderThumbPart,
   MediaVolumeSliderContainerPart,

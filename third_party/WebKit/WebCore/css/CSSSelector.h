@@ -169,6 +169,7 @@ class CSSSelector : public Noncopyable {
     PseudoMediaControlsVolumeSliderContainer,
     PseudoMediaControlsCurrentTimeDisplay,
     PseudoMediaControlsTimeRemainingDisplay,
+    PseudoMediaControlsToggleClosedCaptions,
     PseudoMediaControlsTimeline,
     PseudoMediaControlsVolumeSlider,
     PseudoMediaControlsSeekBackButton,

@@ -421,6 +421,12 @@ class RenderTheme : public RefCounted<RenderTheme> {
                                                 const IntRect&) {
     return true;
   }
+  virtual bool paintMediaToggleClosedCaptionsButton(
+      RenderObject*,
+      const RenderObject::PaintInfo&,
+      const IntRect&) {
+    return true;
+  }
   virtual bool paintMediaControlsBackground(RenderObject*,
                                             const RenderObject::PaintInfo&,
                                             const IntRect&) {

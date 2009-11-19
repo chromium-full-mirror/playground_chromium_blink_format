@@ -117,7 +117,8 @@ HTMLMediaElement::HTMLMediaElement(const QualifiedName& tagName, Document* doc)
       m_sentEndEvent(false),
       m_pausedInternal(false),
       m_sendProgressEvents(true),
-      m_isFullscreen(false)
+      m_isFullscreen(false),
+      m_closedCaptionsVisible(false)
 #if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
       ,
       m_needWidgetUpdate(false)
@@ -494,6 +495,7 @@ void HTMLMediaElement::loadInternal() {
   m_autoplaying = true;
   m_playedTimeRanges = TimeRanges::create();
   m_lastSeekTime = 0;
+  m_closedCaptionsVisible = false;
 
   // 6
   setPlaybackRate(defaultPlaybackRate());
@@ -1822,6 +1824,36 @@ bool HTMLMediaElement::webkitSupportsFullscreen() {
 
 bool HTMLMediaElement::webkitDisplayingFullscreen() {
   return m_isFullscreen;
+}
+
+bool HTMLMediaElement::hasClosedCaptions() const {
+  return m_player && m_player->hasClosedCaptions();
+}
+
+bool HTMLMediaElement::closedCaptionsVisible() const {
+  return m_closedCaptionsVisible;
+}
+
+void HTMLMediaElement::setClosedCaptionsVisible(bool closedCaptionVisible) {
+  if (!m_player || !hasClosedCaptions())
+    return;
+
+  m_closedCaptionsVisible = closedCaptionVisible;
+  m_player->setClosedCaptionsVisible(closedCaptionVisible);
+  if (renderer())
+    renderer()->updateFromElement();
+}
+
+void HTMLMediaElement::setWebkitClosedCaptionsVisible(bool visible) {
+  setClosedCaptionsVisible(visible);
+}
+
+bool HTMLMediaElement::webkitClosedCaptionsVisible() const {
+  return closedCaptionsVisible();
+}
+
+bool HTMLMediaElement::webkitHasClosedCaptions() const {
+  return hasClosedCaptions();
 }
 }
 
