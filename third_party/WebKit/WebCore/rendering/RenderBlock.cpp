@@ -1716,7 +1716,8 @@ void RenderBlock::paint(PaintInfo& paintInfo, int tx, int ty) {
   // sit above the background/border.
   if (hasOverflowClip() && style()->visibility() == VISIBLE &&
       (phase == PaintPhaseBlockBackground ||
-       phase == PaintPhaseChildBlockBackground))
+       phase == PaintPhaseChildBlockBackground) &&
+      shouldPaintWithinRoot(paintInfo))
     layer()->paintOverflowControls(paintInfo.context, tx, ty, paintInfo.rect);
 }
 
