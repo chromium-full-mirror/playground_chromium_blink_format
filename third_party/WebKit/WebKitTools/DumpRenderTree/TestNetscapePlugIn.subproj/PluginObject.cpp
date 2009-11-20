@@ -182,6 +182,8 @@ enum {
   ID_TEST_THROW_EXCEPTION_METHOD,
   ID_TEST_FAIL_METHOD,
   ID_DESTROY_NULL_STREAM,
+  ID_TEST_RELOAD_PLUGINS_NO_PAGES,
+  ID_TEST_RELOAD_PLUGINS_AND_PAGES,
   NUM_METHOD_IDENTIFIERS
 };
 
@@ -197,7 +199,8 @@ static const NPUTF8* pluginMethodIdentifierNames[NUM_METHOD_IDENTIFIERS] = {
     "testIdentifierToString", "testIdentifierToInt",
     "testPostURLFile",        "testConstruct",
     "testThrowException",     "testFail",
-    "destroyNullStream"};
+    "destroyNullStream",      "reloadPluginsNoPages",
+    "reloadPluginsAndPages"};
 
 static NPUTF8* createCStringFromNPVariant(const NPVariant* variant) {
   size_t length = NPVARIANT_TO_STRING(*variant).UTF8Length;
@@ -856,6 +859,14 @@ static bool pluginInvoke(NPObject* header,
                     result);
   } else if (name == pluginMethodIdentifiers[ID_DESTROY_NULL_STREAM])
     return destroyNullStream(plugin, args, argCount, result);
+  else if (name == pluginMethodIdentifiers[ID_TEST_RELOAD_PLUGINS_NO_PAGES]) {
+    browser->reloadplugins(false);
+    return true;
+  } else if (name ==
+             pluginMethodIdentifiers[ID_TEST_RELOAD_PLUGINS_AND_PAGES]) {
+    browser->reloadplugins(true);
+    return true;
+  }
 
   return false;
 }
