@@ -29,6 +29,9 @@
 
 #include "ScriptValue.h"
 
+typedef const struct OpaqueJSContext* JSContextRef;
+typedef const struct OpaqueJSValue* JSValueRef;
+
 namespace WebCore {
 class SerializedObject;
 class SerializedArray;
@@ -138,6 +141,10 @@ class SerializedScriptValue : public RefCounted<SerializedScriptValue> {
         SerializedScriptValueData::serialize(exec, value)));
   }
 
+  static PassRefPtr<SerializedScriptValue> create(JSContextRef,
+                                                  JSValueRef value,
+                                                  JSValueRef* exception);
+
   static PassRefPtr<SerializedScriptValue> create(String string) {
     return adoptRef(
         new SerializedScriptValue(SerializedScriptValueData(string)));
@@ -167,7 +174,8 @@ class SerializedScriptValue : public RefCounted<SerializedScriptValue> {
     return m_value.deserialize(exec, m_mustCopy);
   }
 
-  ~SerializedScriptValue() {}
+  JSValueRef deserialize(JSContextRef, JSValueRef* exception);
+  ~SerializedScriptValue();
 
  private:
   SerializedScriptValue(SerializedScriptValueData value)
