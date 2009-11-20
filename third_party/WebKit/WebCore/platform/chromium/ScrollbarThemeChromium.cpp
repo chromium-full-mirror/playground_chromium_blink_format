@@ -118,7 +118,7 @@ void ScrollbarThemeChromium::paintTickmarks(GraphicsContext* context,
     const int yPos = rect.topLeft().y() + (rect.height() * percent);
 
     IntPoint tick(scrollbar->x(), yPos);
-    context->drawImage(dash.get(), tick);
+    context->drawImage(dash.get(), DeviceColorSpace, tick);
   }
 
   context->restore();
