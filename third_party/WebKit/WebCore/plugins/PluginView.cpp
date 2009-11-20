@@ -849,7 +849,9 @@ PluginView::PluginView(Frame* parentFrame,
 #if defined(XP_MACOSX)
       ,
       m_drawingModel(NPDrawingModel(-1)),
-      m_eventModel(NPEventModel(-1))
+      m_eventModel(NPEventModel(-1)),
+      m_contextRef(0),
+      m_fakeWindow(0)
 #endif
 #if defined(Q_WS_X11) && ENABLE(NETSCAPE_PLUGIN_API)
       ,
