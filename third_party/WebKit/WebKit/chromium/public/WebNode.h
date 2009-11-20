@@ -72,7 +72,7 @@ class WebNode {
 
   WEBKIT_API WebNode parentNode() const;
   WEBKIT_API WebString nodeName() const;
-  WEBKIT_API WebFrame* frame();
+  WEBKIT_API WebFrame* frame() const;
 
   template <typename T>
   T toElement() {
