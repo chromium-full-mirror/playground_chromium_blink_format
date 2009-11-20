@@ -39,9 +39,12 @@ namespace WTF {
 struct FunctionWithContext {
   MainThreadFunction* function;
   void* context;
+  ThreadCondition* syncFlag;
 
-  FunctionWithContext(MainThreadFunction* function = 0, void* context = 0)
-      : function(function), context(context) {}
+  FunctionWithContext(MainThreadFunction* function = 0,
+                      void* context = 0,
+                      ThreadCondition* syncFlag = 0)
+      : function(function), context(context), syncFlag(syncFlag) {}
 };
 
 typedef Deque<FunctionWithContext> FunctionQueue;
@@ -87,6 +90,8 @@ void dispatchFunctionsFromMainThread() {
     }
 
     invocation.function(invocation.context);
+    if (invocation.syncFlag)
+      invocation.syncFlag->signal();
 
     // If we are running accumulated functions for too long so UI may become
     // unresponsive, we need to
@@ -112,6 +117,23 @@ void callOnMainThread(MainThreadFunction* function, void* context) {
   }
   if (needToSchedule)
     scheduleDispatchFunctionsOnMainThread();
+}
+
+void callOnMainThreadAndWait(MainThreadFunction* function, void* context) {
+  ASSERT(function);
+
+  if (isMainThread()) {
+    function(context);
+    return;
+  }
+
+  ThreadCondition syncFlag;
+  Mutex& functionQueueMutex = mainThreadFunctionQueueMutex();
+  MutexLocker locker(functionQueueMutex);
+  functionQueue().append(FunctionWithContext(function, context, &syncFlag));
+  if (functionQueue().size() == 1)
+    scheduleDispatchFunctionsOnMainThread();
+  syncFlag.wait(functionQueueMutex);
 }
 
 void setMainThreadCallbacksPaused(bool paused) {

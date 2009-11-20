@@ -74,7 +74,10 @@ class SocketStreamHandle : public RefCounted<SocketStreamHandle>,
   static void writeStreamCallback(CFWriteStreamRef,
                                   CFStreamEventType,
                                   void* clientCallBackInfo);
-
+#if PLATFORM(WIN)
+  static void readStreamCallbackMainThread(void* invocation);
+  static void writeStreamCallbackMainThread(void* invocation);
+#endif
   void readStreamCallback(CFStreamEventType);
   void writeStreamCallback(CFStreamEventType);
 

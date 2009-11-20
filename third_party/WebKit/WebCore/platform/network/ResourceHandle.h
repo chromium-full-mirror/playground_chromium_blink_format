@@ -154,7 +154,6 @@ class ResourceHandle : public RefCounted<ResourceHandle>
   void schedule(SchedulePair*);
   void unschedule(SchedulePair*);
 #elif USE(CFNETWORK)
-  static CFRunLoopRef loaderRunLoop();
   CFURLConnectionRef connection() const;
   CFURLConnectionRef releaseConnectionForDownload();
   static void setHostAllowsAnyHTTPSCertificate(const String&);
