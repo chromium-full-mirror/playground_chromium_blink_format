@@ -117,8 +117,8 @@ void SVGResourceFilter::applyFilter(GraphicsContext*& context,
       ColorSpace colorSpace = DeviceColorSpace;
       if (object)
         colorSpace = object->style()->colorSpace();
-      context->drawImage(resultImage->image(), lastEffect->subRegion(),
-                         colorSpace);
+      context->drawImage(resultImage->image(), colorSpace,
+                         lastEffect->subRegion());
     }
   }
 
