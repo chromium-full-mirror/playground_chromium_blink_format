@@ -227,7 +227,7 @@ bool RenderThemeChromiumSkia::paintCheckbox(RenderObject* o,
   else
     image = this->isChecked(o) ? disabledCheckedImage : disabledUncheckedImage;
 
-  i.context->drawImage(image, rect);
+  i.context->drawImage(image, o->style()->colorSpace(), rect);
   return false;
 }
 
@@ -263,7 +263,7 @@ bool RenderThemeChromiumSkia::paintRadio(RenderObject* o,
   else
     image = this->isChecked(o) ? disabledCheckedImage : disabledUncheckedImage;
 
-  i.context->drawImage(image, rect);
+  i.context->drawImage(image, o->style()->colorSpace(), rect);
   return false;
 }
 
@@ -411,7 +411,8 @@ bool RenderThemeChromiumSkia::paintSearchFieldCancelButton(
       Image::loadPlatformResource("searchCancel").releaseRef();
   static Image* cancelPressedImage =
       Image::loadPlatformResource("searchCancelPressed").releaseRef();
-  i.context->drawImage(isPressed(o) ? cancelPressedImage : cancelImage, bounds);
+  i.context->drawImage(isPressed(o) ? cancelPressedImage : cancelImage,
+                       o->style()->colorSpace(), bounds);
   return false;
 }
 
@@ -464,7 +465,7 @@ bool RenderThemeChromiumSkia::paintSearchFieldResultsDecoration(
 
   static Image* magnifierImage =
       Image::loadPlatformResource("searchMagnifier").releaseRef();
-  i.context->drawImage(magnifierImage, bounds);
+  i.context->drawImage(magnifierImage, o->style()->colorSpace(), bounds);
   return false;
 }
 
@@ -514,7 +515,7 @@ bool RenderThemeChromiumSkia::paintSearchFieldResultsButton(
 
   static Image* magnifierImage =
       Image::loadPlatformResource("searchMagnifierResults").releaseRef();
-  i.context->drawImage(magnifierImage, bounds);
+  i.context->drawImage(magnifierImage, o->style()->colorSpace(), bounds);
   return false;
 }
 
