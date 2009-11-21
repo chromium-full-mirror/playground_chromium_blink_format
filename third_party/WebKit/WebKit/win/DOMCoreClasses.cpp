@@ -777,9 +777,15 @@ HRESULT STDMETHODCALLTYPE DOMElement::lineBoxRects(
 // IDOMElement ----------------------------------------------------------------
 
 HRESULT STDMETHODCALLTYPE DOMElement::tagName(
-    /* [retval][out] */ BSTR* /*result*/) {
-  ASSERT_NOT_REACHED();
-  return E_NOTIMPL;
+    /* [retval][out] */ BSTR* result) {
+  if (!m_element)
+    return E_FAIL;
+
+  if (!result)
+    return E_POINTER;
+
+  *result = BString(m_element->tagName()).release();
+  return S_OK;
 }
 
 HRESULT STDMETHODCALLTYPE DOMElement::getAttribute(
