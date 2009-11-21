@@ -156,9 +156,15 @@ HRESULT STDMETHODCALLTYPE DOMNode::parentNode(
 }
 
 HRESULT STDMETHODCALLTYPE DOMNode::childNodes(
-    /* [retval][out] */ IDOMNodeList** /*result*/) {
-  ASSERT_NOT_REACHED();
-  return E_NOTIMPL;
+    /* [retval][out] */ IDOMNodeList** result) {
+  if (!m_node)
+    return E_FAIL;
+
+  if (!result)
+    return E_POINTER;
+
+  *result = DOMNodeList::createInstance(m_node->childNodes().get());
+  return *result ? S_OK : E_FAIL;
 }
 
 HRESULT STDMETHODCALLTYPE DOMNode::firstChild(
