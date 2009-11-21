@@ -137,6 +137,9 @@ class AccessibilityUIElement {
   AccessibilityUIElement disclosedByRow();
   AccessibilityUIElement disclosedRowAtIndex(unsigned);
 
+  // ARIA specific
+  AccessibilityUIElement ariaOwnsElementAtIndex(unsigned);
+
   // Parameterized attributes
   int lineForIndex(int);
   JSStringRef boundsForRange(unsigned location, unsigned length);

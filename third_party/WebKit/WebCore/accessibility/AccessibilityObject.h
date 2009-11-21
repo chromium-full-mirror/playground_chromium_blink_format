@@ -318,6 +318,8 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   virtual int layoutCount() const { return 0; }
   static bool isARIAControl(AccessibilityRole);
   static bool isARIAInput(AccessibilityRole);
+  virtual bool supportsARIAOwns() const { return false; }
+  virtual void ariaOwnsElements(AccessibilityChildrenVector&) const {};
 
   virtual AccessibilityObject* doAccessibilityHitTest(const IntPoint&) const {
     return 0;
