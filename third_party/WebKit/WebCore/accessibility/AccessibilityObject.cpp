@@ -925,6 +925,7 @@ static ARIARoleMap* createARIARoleMap() {
       // the parent element's role
       {"main", LandmarkMainRole},
       {"marquee", ApplicationMarqueeRole},
+      {"math", DocumentMathRole},
       {"menu", MenuRole},
       {"menubar", GroupRole},
       // "menuitem" isn't here because it may map to different roles depending
