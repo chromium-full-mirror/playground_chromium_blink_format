@@ -168,6 +168,8 @@ COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleApplicationTimer,
 COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleDocument, DocumentRole);
 COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleDocumentArticle,
                              DocumentArticleRole);
+COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleDocumentMath,
+                             DocumentMathRole);
 COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleDocumentNote,
                              DocumentNoteRole);
 COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleDocumentRegion,
