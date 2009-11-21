@@ -99,7 +99,7 @@ class KeyboardEvent : public UIEventWithKeyState {
 
   bool altGraphKey() const { return m_altGraphKey; }
 
-  const PlatformKeyboardEvent* keyEvent() const { return m_keyEvent; }
+  const PlatformKeyboardEvent* keyEvent() const { return m_keyEvent.get(); }
 
   int keyCode()
       const;  // key code for keydown and keyup, character for keypress
@@ -128,7 +128,7 @@ class KeyboardEvent : public UIEventWithKeyState {
                 bool metaKey,
                 bool altGraphKey);
 
-  PlatformKeyboardEvent* m_keyEvent;
+  OwnPtr<PlatformKeyboardEvent> m_keyEvent;
   String m_keyIdentifier;
   unsigned m_keyLocation;
   bool m_altGraphKey : 1;

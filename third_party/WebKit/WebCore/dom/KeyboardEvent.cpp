@@ -101,9 +101,7 @@ KeyboardEvent::KeyboardEvent(const AtomicString& eventType,
       m_keyLocation(keyLocation),
       m_altGraphKey(altGraphKey) {}
 
-KeyboardEvent::~KeyboardEvent() {
-  delete m_keyEvent;
-}
+KeyboardEvent::~KeyboardEvent() {}
 
 void KeyboardEvent::initKeyboardEvent(const AtomicString& type,
                                       bool canBubble,
