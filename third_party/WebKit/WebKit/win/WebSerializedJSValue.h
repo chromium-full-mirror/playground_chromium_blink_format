@@ -50,7 +50,7 @@ class WebSerializedJSValue : public Noncopyable, public IWebSerializedJSValue {
                                                 JSValueRef* result);
 
  private:
-  WebSerializedJSValue(JSContextRef, JSValueRef);
+  WebSerializedJSValue(JSContextRef, JSValueRef, JSValueRef*);
   ~WebSerializedJSValue();
 
   virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID, void** ppvObject);

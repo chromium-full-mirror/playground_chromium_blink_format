@@ -29,7 +29,7 @@
 #include "WebKitDLL.h"
 #include "WebSerializedJSValue.h"
 
-#include <WebCore/SeralizedScriptValue.h>
+#include <WebCore/SerializedScriptValue.h>
 
 using namespace WebCore;
 
@@ -93,10 +93,10 @@ HRESULT WebSerializedJSValue::deserialize(JSContextRef destinationContext,
   if (!outValue)
     return E_POINTER;
 
-  if (!_private->m_value)
+  if (m_value)
     *outValue = 0;
   else
-    *outValue = _private->value->deserialize(destinationContext, 0);
+    *outValue = m_value->deserialize(destinationContext, 0);
 
   return S_OK;
 }
