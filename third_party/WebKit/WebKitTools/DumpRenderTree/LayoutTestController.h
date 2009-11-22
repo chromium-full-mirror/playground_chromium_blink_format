@@ -70,6 +70,7 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
   void removeAllVisitedLinks();
   void setAcceptsEditing(bool acceptsEditing);
   void setAppCacheMaximumSize(unsigned long long quota);
+  void setAllowUniversalAccessFromFileURLs(bool);
   void setAuthorAndUserStylesEnabled(bool);
   void setCacheModel(int);
   void setCustomPolicyDelegate(bool setDelegate, bool permissive);

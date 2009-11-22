@@ -1214,6 +1214,25 @@ static JSValueRef setXSSAuditorEnabledCallback(JSContextRef context,
   return JSValueMakeUndefined(context);
 }
 
+static JSValueRef setAllowUniversalAccessFromFileURLsCallback(
+    JSContextRef context,
+    JSObjectRef function,
+    JSObjectRef thisObject,
+    size_t argumentCount,
+    const JSValueRef arguments[],
+    JSValueRef* exception) {
+  // Has mac & windows implementation
+  if (argumentCount < 1)
+    return JSValueMakeUndefined(context);
+
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->setAllowUniversalAccessFromFileURLs(
+      JSValueToBoolean(context, arguments[0]));
+
+  return JSValueMakeUndefined(context);
+}
+
 static JSValueRef setTabKeyCyclesThroughElementsCallback(
     JSContextRef context,
     JSObjectRef function,
@@ -1875,6 +1894,9 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
       {"repaintSweepHorizontally", repaintSweepHorizontallyCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setAcceptsEditing", setAcceptsEditingCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"setAllowUniversalAccessFromFileURLs",
+       setAllowUniversalAccessFromFileURLsCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setAlwaysAcceptCookies", setAlwaysAcceptCookiesCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
