@@ -271,7 +271,7 @@ DumpRenderTree::DumpRenderTree()
           SLOT(connectFrame(QWebFrame*)));
   connectFrame(m_page->mainFrame());
 
-  connect(m_page->mainFrame(), SIGNAL(loadFinished(bool)), m_controller,
+  connect(m_page, SIGNAL(loadFinished(bool)), m_controller,
           SLOT(maybeDump(bool)));
 
   connect(m_page->mainFrame(), SIGNAL(titleChanged(const QString&)),
