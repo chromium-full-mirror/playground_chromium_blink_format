@@ -103,7 +103,7 @@ WebSocket::WebSocket(ScriptExecutionContext* context)
     : ActiveDOMObject(context, this), m_state(CONNECTING) {}
 
 WebSocket::~WebSocket() {
-  if (m_channel.get())
+  if (m_channel)
     m_channel->disconnect();
 }
 
