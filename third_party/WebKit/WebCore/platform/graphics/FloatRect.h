@@ -130,7 +130,8 @@ class FloatRect {
     inflateX(d);
     inflateY(d);
   }
-  void scale(float s);
+  void scale(float s) { scale(s, s); }
+  void scale(float sx, float sy);
 
 #if PLATFORM(CG)
   FloatRect(const CGRect&);

@@ -97,7 +97,7 @@ void SVGFilterPrimitiveStandardAttributes::setStandardAttributes(
     effectBBox = FloatRect(x().value(this), y().value(this),
                            width().value(this), height().value(this));
 
-  filterEffect->setSubRegion(effectBBox);
+  filterEffect->setEffectBoundaries(effectBBox);
 }
 }
 

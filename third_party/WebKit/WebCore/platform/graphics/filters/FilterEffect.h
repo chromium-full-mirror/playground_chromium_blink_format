@@ -48,6 +48,16 @@ class FilterEffect : public RefCounted<FilterEffect> {
   FloatRect subRegion() const { return m_subRegion; }
   void setSubRegion(const FloatRect& subRegion) { m_subRegion = subRegion; }
 
+  FloatRect scaledSubRegion() const { return m_scaledSubRegion; }
+  void setScaledSubRegion(const FloatRect& scaledSubRegion) {
+    m_scaledSubRegion = scaledSubRegion;
+  }
+
+  FloatRect effectBoundaries() const { return m_effectBoundaries; }
+  void setEffectBoundaries(const FloatRect& effectBoundaries) {
+    m_effectBoundaries = effectBoundaries;
+  }
+
   bool hasX() { return m_hasX; }
   void setHasX(bool value) { m_hasX = value; }
 
@@ -106,7 +116,9 @@ class FilterEffect : public RefCounted<FilterEffect> {
 
   bool m_alphaImage;
 
+  FloatRect m_effectBoundaries;
   FloatRect m_subRegion;
+  FloatRect m_scaledSubRegion;
   FloatRect m_unionOfChildEffectSubregions;
 
   mutable OwnPtr<ImageBuffer> m_effectBuffer;

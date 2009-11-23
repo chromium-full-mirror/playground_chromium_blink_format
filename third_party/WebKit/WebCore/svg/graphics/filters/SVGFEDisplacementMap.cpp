@@ -94,13 +94,14 @@ void FEDisplacementMap::apply(Filter* filter) {
   if (!getEffectContext())
     return;
 
-  IntRect effectADrawingRect = calculateDrawingIntRect(m_in->subRegion());
+  IntRect effectADrawingRect = calculateDrawingIntRect(m_in->scaledSubRegion());
   RefPtr<CanvasPixelArray> srcPixelArrayA(
       m_in->resultImage()
           ->getPremultipliedImageData(effectADrawingRect)
           ->data());
 
-  IntRect effectBDrawingRect = calculateDrawingIntRect(m_in2->subRegion());
+  IntRect effectBDrawingRect =
+      calculateDrawingIntRect(m_in2->scaledSubRegion());
   RefPtr<CanvasPixelArray> srcPixelArrayB(
       m_in2->resultImage()
           ->getUnmultipliedImageData(effectBDrawingRect)
@@ -112,8 +113,12 @@ void FEDisplacementMap::apply(Filter* filter) {
 
   ASSERT(srcPixelArrayA->length() == srcPixelArrayB->length());
 
-  float scale = m_scale / 255.f;
-  float scaleAdjustment = 0.5f - 0.5f * m_scale;
+  float scaleX = m_scale / 255.f * filter->filterResolution().width();
+  float scaleY = m_scale / 255.f * filter->filterResolution().height();
+  float scaleAdjustmentX =
+      (0.5f - 0.5f * m_scale) * filter->filterResolution().width();
+  float scaleAdjustmentY =
+      (0.5f - 0.5f * m_scale) * filter->filterResolution().height();
   int stride = imageRect.width() * 4;
   for (int y = 0; y < imageRect.height(); ++y) {
     int line = y * stride;
@@ -122,13 +127,13 @@ void FEDisplacementMap::apply(Filter* filter) {
       int srcX =
           x +
           static_cast<int>(
-              scale * srcPixelArrayB->get(dstIndex + m_xChannelSelector - 1) +
-              scaleAdjustment);
+              scaleX * srcPixelArrayB->get(dstIndex + m_xChannelSelector - 1) +
+              scaleAdjustmentX);
       int srcY =
           y +
           static_cast<int>(
-              scale * srcPixelArrayB->get(dstIndex + m_yChannelSelector - 1) +
-              scaleAdjustment);
+              scaleY * srcPixelArrayB->get(dstIndex + m_yChannelSelector - 1) +
+              scaleAdjustmentY);
       for (unsigned channel = 0; channel < 4; ++channel) {
         if (srcX < 0 || srcX >= imageRect.width() || srcY < 0 ||
             srcY >= imageRect.height())

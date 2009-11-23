@@ -90,7 +90,7 @@ void FEMorphology::apply(Filter* filter) {
     return;
 
   IntRect imageRect(IntPoint(), resultImage()->size());
-  IntRect effectDrawingRect = calculateDrawingIntRect(m_in->subRegion());
+  IntRect effectDrawingRect = calculateDrawingIntRect(m_in->scaledSubRegion());
   RefPtr<CanvasPixelArray> srcPixelArray(
       m_in->resultImage()
           ->getPremultipliedImageData(effectDrawingRect)
@@ -98,8 +98,10 @@ void FEMorphology::apply(Filter* filter) {
   RefPtr<ImageData> imageData =
       ImageData::create(imageRect.width(), imageRect.height());
 
-  int radiusX = static_cast<int>(m_radiusX);
-  int radiusY = static_cast<int>(m_radiusY);
+  int radiusX =
+      static_cast<int>(m_radiusX * filter->filterResolution().width());
+  int radiusY =
+      static_cast<int>(m_radiusY * filter->filterResolution().height());
   int effectWidth = effectDrawingRect.width() * 4;
 
   // Limit the radius size to effect width

@@ -134,47 +134,49 @@ void FEComposite::apply(Filter* filter) {
   switch (m_type) {
     case FECOMPOSITE_OPERATOR_OVER:
       filterContext->drawImage(m_in2->resultImage()->image(), DeviceColorSpace,
-                               calculateDrawingRect(m_in2->subRegion()));
+                               calculateDrawingRect(m_in2->scaledSubRegion()));
       filterContext->drawImage(m_in->resultImage()->image(), DeviceColorSpace,
-                               calculateDrawingRect(m_in->subRegion()));
+                               calculateDrawingRect(m_in->scaledSubRegion()));
       break;
     case FECOMPOSITE_OPERATOR_IN:
       filterContext->save();
-      filterContext->clipToImageBuffer(calculateDrawingRect(m_in2->subRegion()),
-                                       m_in2->resultImage());
+      filterContext->clipToImageBuffer(
+          calculateDrawingRect(m_in2->scaledSubRegion()), m_in2->resultImage());
       filterContext->drawImage(m_in->resultImage()->image(), DeviceColorSpace,
-                               calculateDrawingRect(m_in->subRegion()));
+                               calculateDrawingRect(m_in->scaledSubRegion()));
       filterContext->restore();
       break;
     case FECOMPOSITE_OPERATOR_OUT:
       filterContext->drawImage(m_in->resultImage()->image(), DeviceColorSpace,
-                               calculateDrawingRect(m_in->subRegion()));
+                               calculateDrawingRect(m_in->scaledSubRegion()));
       filterContext->drawImage(m_in2->resultImage()->image(), DeviceColorSpace,
-                               calculateDrawingRect(m_in2->subRegion()),
+                               calculateDrawingRect(m_in2->scaledSubRegion()),
                                srcRect, CompositeDestinationOut);
       break;
     case FECOMPOSITE_OPERATOR_ATOP:
       filterContext->drawImage(m_in2->resultImage()->image(), DeviceColorSpace,
-                               calculateDrawingRect(m_in2->subRegion()));
+                               calculateDrawingRect(m_in2->scaledSubRegion()));
       filterContext->drawImage(m_in->resultImage()->image(), DeviceColorSpace,
-                               calculateDrawingRect(m_in->subRegion()), srcRect,
-                               CompositeSourceAtop);
+                               calculateDrawingRect(m_in->scaledSubRegion()),
+                               srcRect, CompositeSourceAtop);
       break;
     case FECOMPOSITE_OPERATOR_XOR:
       filterContext->drawImage(m_in2->resultImage()->image(), DeviceColorSpace,
-                               calculateDrawingRect(m_in2->subRegion()));
+                               calculateDrawingRect(m_in2->scaledSubRegion()));
       filterContext->drawImage(m_in->resultImage()->image(), DeviceColorSpace,
-                               calculateDrawingRect(m_in->subRegion()), srcRect,
-                               CompositeXOR);
+                               calculateDrawingRect(m_in->scaledSubRegion()),
+                               srcRect, CompositeXOR);
       break;
     case FECOMPOSITE_OPERATOR_ARITHMETIC: {
-      IntRect effectADrawingRect = calculateDrawingIntRect(m_in->subRegion());
+      IntRect effectADrawingRect =
+          calculateDrawingIntRect(m_in->scaledSubRegion());
       RefPtr<CanvasPixelArray> srcPixelArrayA(
           m_in->resultImage()
               ->getPremultipliedImageData(effectADrawingRect)
               ->data());
 
-      IntRect effectBDrawingRect = calculateDrawingIntRect(m_in2->subRegion());
+      IntRect effectBDrawingRect =
+          calculateDrawingIntRect(m_in2->scaledSubRegion());
       RefPtr<ImageData> imageData(
           m_in2->resultImage()->getPremultipliedImageData(effectBDrawingRect));
       CanvasPixelArray* srcPixelArrayB(imageData->data());
