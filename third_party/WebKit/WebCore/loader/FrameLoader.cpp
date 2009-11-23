@@ -569,7 +569,7 @@ void FrameLoader::stopLoading(UnloadEventPolicy unloadEventPolicy,
         if (m_frame->domWindow()) {
           if (unloadEventPolicy == UnloadEventPolicyUnloadAndPageHide)
             m_frame->domWindow()->dispatchEvent(
-                PageTransitionEvent::create(EventNames().pagehideEvent,
+                PageTransitionEvent::create(eventNames().pagehideEvent,
                                             m_frame->document()->inPageCache()),
                 m_frame->document());
           if (!m_frame->document()->inPageCache())
@@ -3976,7 +3976,7 @@ void FrameLoader::pageHidden() {
   m_unloadEventBeingDispatched = true;
   if (m_frame->domWindow())
     m_frame->domWindow()->dispatchEvent(
-        PageTransitionEvent::create(EventNames().pagehideEvent, true),
+        PageTransitionEvent::create(eventNames().pagehideEvent, true),
         m_frame->document());
   m_unloadEventBeingDispatched = false;
 

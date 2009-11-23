@@ -274,7 +274,7 @@ String HTMLFormControlElement::validationMessage() {
 
 bool HTMLFormControlElement::checkValidity() {
   if (willValidate() && !isValidFormControlElement()) {
-    dispatchEvent(Event::create(EventNames().invalidEvent, false, true));
+    dispatchEvent(Event::create(eventNames().invalidEvent, false, true));
     return false;
   }
 

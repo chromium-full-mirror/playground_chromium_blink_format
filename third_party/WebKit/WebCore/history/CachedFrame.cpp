@@ -96,7 +96,7 @@ void CachedFrameBase::restore() {
     m_childFrames[i]->open();
 
   m_document->dispatchWindowEvent(
-      PageTransitionEvent::create(EventNames().pageshowEvent, true),
+      PageTransitionEvent::create(eventNames().pageshowEvent, true),
       m_document);
 }
 
