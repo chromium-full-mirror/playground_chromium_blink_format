@@ -63,20 +63,28 @@ class SocketStreamHandle : public RefCounted<SocketStreamHandle>,
 
   SocketStreamHandle(const KURL&, SocketStreamHandleClient*);
   void createStreams();
+  void scheduleStreams();
   void chooseProxy();
+#ifndef BUILDING_ON_TIGER
+  void chooseProxyFromArray(CFArrayRef);
+  void executePACFileURL(CFURLRef);
+  void removePACRunLoopSource();
+  RetainPtr<CFRunLoopSourceRef> m_pacRunLoopSource;
+  static void pacExecutionCallback(void* client,
+                                   CFArrayRef proxyList,
+                                   CFErrorRef error);
+  static void pacExecutionCallbackMainThread(void*);
+  static CFStringRef copyPACExecutionDescription(void*);
+#endif
 
   bool shouldUseSSL() const { return m_url.protocolIs("wss"); }
 
-  static CFStringRef copyCFStreamDescription(void* streamInfo);
-  static void readStreamCallback(CFReadStreamRef,
-                                 CFStreamEventType,
-                                 void* clientCallBackInfo);
-  static void writeStreamCallback(CFWriteStreamRef,
-                                  CFStreamEventType,
-                                  void* clientCallBackInfo);
+  static CFStringRef copyCFStreamDescription(void*);
+  static void readStreamCallback(CFReadStreamRef, CFStreamEventType, void*);
+  static void writeStreamCallback(CFWriteStreamRef, CFStreamEventType, void*);
 #if PLATFORM(WIN)
-  static void readStreamCallbackMainThread(void* invocation);
-  static void writeStreamCallbackMainThread(void* invocation);
+  static void readStreamCallbackMainThread(void*);
+  static void writeStreamCallbackMainThread(void*);
 #endif
   void readStreamCallback(CFStreamEventType);
   void writeStreamCallback(CFStreamEventType);
@@ -93,7 +101,7 @@ class SocketStreamHandle : public RefCounted<SocketStreamHandle>,
 
   enum ConnectingSubstate {
     New,
-    FetchingProxyAutoConfigurationFile,
+    ExecutingPACFile,
     WaitingForCredentials,
     WaitingForConnect,
     Connected
@@ -109,7 +117,7 @@ class SocketStreamHandle : public RefCounted<SocketStreamHandle>,
   RetainPtr<CFReadStreamRef> m_readStream;
   RetainPtr<CFWriteStreamRef> m_writeStream;
 
-  RetainPtr<CFURLRef> m_httpURL;  // ws(s): replaced with http(s):
+  RetainPtr<CFURLRef> m_httpsURL;  // ws(s): replaced with https:
 };
 
 }  // namespace WebCore
