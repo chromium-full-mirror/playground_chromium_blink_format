@@ -309,7 +309,12 @@ class Frame : public RefCounted<Frame> {
   void clearTypingStyle();
 
   FloatRect selectionBounds(bool clipToVisibleContent = true) const;
+  enum SelectionRectRespectTransforms {
+    RespectTransforms = true,
+    IgnoreTransforms = false
+  };
   void selectionTextRects(Vector<FloatRect>&,
+                          SelectionRectRespectTransforms respectTransforms,
                           bool clipToVisibleContent = true) const;
 
   HTMLFormElement* currentForm() const;

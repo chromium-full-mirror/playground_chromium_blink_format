@@ -175,19 +175,19 @@ class InlineTextBox : public InlineRunBox {
   void paintSpellingOrGrammarMarker(GraphicsContext*,
                                     int tx,
                                     int ty,
-                                    DocumentMarker,
+                                    const DocumentMarker&,
                                     RenderStyle*,
                                     const Font&,
                                     bool grammar);
   void paintTextMatchMarker(GraphicsContext*,
                             int tx,
                             int ty,
-                            DocumentMarker,
+                            const DocumentMarker&,
                             RenderStyle*,
                             const Font&);
   void computeRectForReplacementMarker(int tx,
                                        int ty,
-                                       DocumentMarker,
+                                       const DocumentMarker&,
                                        RenderStyle*,
                                        const Font&);
 };

@@ -824,7 +824,7 @@ void InlineTextBox::paintDecoration(GraphicsContext* context,
 void InlineTextBox::paintSpellingOrGrammarMarker(GraphicsContext* pt,
                                                  int tx,
                                                  int ty,
-                                                 DocumentMarker marker,
+                                                 const DocumentMarker& marker,
                                                  RenderStyle* style,
                                                  const Font& font,
                                                  bool grammar) {
@@ -870,9 +870,14 @@ void InlineTextBox::paintSpellingOrGrammarMarker(GraphicsContext* pt,
     // Store rendered rects for bad grammar markers, so we can hit-test against
     // it elsewhere in order to
     // display a toolTip. We don't do this for misspelling markers.
-    if (grammar)
+    if (grammar) {
+      markerRect.move(-tx, -ty);
+      markerRect = renderer()
+                       ->localToAbsoluteQuad(FloatRect(markerRect))
+                       .enclosingBoundingBox();
       renderer()->document()->setRenderedRectForMarker(renderer()->node(),
                                                        marker, markerRect);
+    }
   }
 
   // IMPORTANT: The misspelling underline is not considered when calculating the
@@ -905,7 +910,7 @@ void InlineTextBox::paintSpellingOrGrammarMarker(GraphicsContext* pt,
 void InlineTextBox::paintTextMatchMarker(GraphicsContext* pt,
                                          int tx,
                                          int ty,
-                                         DocumentMarker marker,
+                                         const DocumentMarker& marker,
                                          RenderStyle* style,
                                          const Font& font) {
   // Use same y positioning and height as for selection, so that when the
@@ -919,11 +924,15 @@ void InlineTextBox::paintTextMatchMarker(GraphicsContext* pt,
   TextRun run(textRenderer()->text()->characters() + m_start, m_len,
               textRenderer()->allowTabs(), textPos(), m_toAdd,
               direction() == RTL, m_dirOverride || style->visuallyOrdered());
-  IntPoint startPoint = IntPoint(m_x + tx, y + ty);
 
-  // Always compute and store the rect associated with this marker
+  // Always compute and store the rect associated with this marker. The computed
+  // rect is in absolute coordinates.
   IntRect markerRect = enclosingIntRect(
-      font.selectionRectForText(run, startPoint, h, sPos, ePos));
+      font.selectionRectForText(run, IntPoint(m_x, y), h, sPos, ePos));
+  markerRect = root()
+                   ->block()
+                   ->localToAbsoluteQuad(FloatRect(markerRect))
+                   .enclosingBoundingBox();
   renderer()->document()->setRenderedRectForMarker(renderer()->node(), marker,
                                                    markerRect);
 
@@ -937,17 +946,18 @@ void InlineTextBox::paintTextMatchMarker(GraphicsContext* pt,
     updateGraphicsContext(pt, color, color, 0,
                           style->colorSpace());  // Don't draw text at all!
     pt->clip(IntRect(tx + m_x, ty + y, m_width, h));
-    pt->drawHighlightForText(font, run, startPoint, h, color,
+    pt->drawHighlightForText(font, run, IntPoint(m_x + tx, y + ty), h, color,
                              style->colorSpace(), sPos, ePos);
     pt->restore();
   }
 }
 
-void InlineTextBox::computeRectForReplacementMarker(int tx,
-                                                    int ty,
-                                                    DocumentMarker marker,
-                                                    RenderStyle* style,
-                                                    const Font& font) {
+void InlineTextBox::computeRectForReplacementMarker(
+    int /*tx*/,
+    int /*ty*/,
+    const DocumentMarker& marker,
+    RenderStyle* style,
+    const Font& font) {
   // Replacement markers are not actually drawn, but their rects need to be
   // computed for hit testing.
   int y = selectionTop();
@@ -958,11 +968,15 @@ void InlineTextBox::computeRectForReplacementMarker(int tx,
   TextRun run(textRenderer()->text()->characters() + m_start, m_len,
               textRenderer()->allowTabs(), textPos(), m_toAdd,
               direction() == RTL, m_dirOverride || style->visuallyOrdered());
-  IntPoint startPoint = IntPoint(m_x + tx, y + ty);
+  IntPoint startPoint = IntPoint(m_x, y);
 
   // Compute and store the rect associated with this marker.
   IntRect markerRect = enclosingIntRect(
       font.selectionRectForText(run, startPoint, h, sPos, ePos));
+  markerRect = root()
+                   ->block()
+                   ->localToAbsoluteQuad(FloatRect(markerRect))
+                   .enclosingBoundingBox();
   renderer()->document()->setRenderedRectForMarker(renderer()->node(), marker,
                                                    markerRect);
 }
@@ -985,7 +999,7 @@ void InlineTextBox::paintDocumentMarkers(GraphicsContext* pt,
   // Note end() points at the last char, not one past it like endOffset and
   // ranges do.
   for (; markerIt != markers.end(); markerIt++) {
-    DocumentMarker marker = *markerIt;
+    const DocumentMarker& marker = *markerIt;
 
     // Paint either the background markers or the foreground markers, but not
     // both
