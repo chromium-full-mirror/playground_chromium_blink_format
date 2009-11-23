@@ -1232,6 +1232,8 @@ void AccessibilityRenderObject::addRadioButtonGroupMembers(
 // or an internal anchor connection
 void AccessibilityRenderObject::linkedUIElements(
     AccessibilityChildrenVector& linkedUIElements) const {
+  ariaFlowToElements(linkedUIElements);
+
   if (isAnchor()) {
     AccessibilityObject* linkedAXElement = internalLinkElement();
     if (linkedAXElement)
@@ -1251,6 +1253,26 @@ bool AccessibilityRenderObject::hasTextAlternative() const {
     return true;
 
   return false;
+}
+
+bool AccessibilityRenderObject::supportsARIAFlowTo() const {
+  return !getAttribute(aria_flowtoAttr).string().isEmpty();
+}
+
+void AccessibilityRenderObject::ariaFlowToElements(
+    AccessibilityChildrenVector& flowTo) const {
+  Vector<Element*> elements;
+  elementsFromAttribute(elements, aria_flowtoAttr);
+
+  AXObjectCache* cache = axObjectCache();
+  unsigned count = elements.size();
+  for (unsigned k = 0; k < count; ++k) {
+    Element* element = elements[k];
+    AccessibilityObject* flowToElement =
+        cache->getOrCreate(element->renderer());
+    if (flowToElement)
+      flowTo.append(flowToElement);
+  }
 }
 
 bool AccessibilityRenderObject::exposesTitleUIElement() const {

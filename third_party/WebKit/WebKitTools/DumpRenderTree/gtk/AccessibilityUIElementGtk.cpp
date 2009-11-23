@@ -412,6 +412,11 @@ AccessibilityUIElement AccessibilityUIElement::ariaOwnsElementAtIndex(
   return 0;
 }
 
+AccessibilityUIElement AccessibilityUIElement::ariaFlowToElementAtIndex(
+    unsigned index) {
+  return 0;
+}
+
 AccessibilityUIElement AccessibilityUIElement::selectedRowAtIndex(
     unsigned index) {
   return 0;

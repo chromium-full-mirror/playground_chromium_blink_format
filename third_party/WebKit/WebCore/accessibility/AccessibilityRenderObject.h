@@ -222,6 +222,8 @@ class AccessibilityRenderObject : public AccessibilityObject {
       const VisiblePositionRange&) const;
   virtual void setSelectedVisiblePositionRange(
       const VisiblePositionRange&) const;
+  virtual bool supportsARIAFlowTo() const;
+  virtual void ariaFlowToElements(AccessibilityChildrenVector&) const;
 
   virtual VisiblePosition visiblePositionForPoint(const IntPoint&) const;
   virtual VisiblePosition visiblePositionForIndex(unsigned indexValue,
