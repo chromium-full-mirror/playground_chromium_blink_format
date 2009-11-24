@@ -781,15 +781,6 @@ void GraphicsContext3DInternal::beginPaint(WebGLRenderingContext* context) {
 #endif  // RENDER_TO_DEBUGGING_WINDOW
 }
 
-bool GraphicsContext3DInternal::validateTextureTarget(int target) {
-  return (target == GL_TEXTURE_2D || target == GL_TEXTURE_CUBE_MAP);
-}
-
-bool GraphicsContext3DInternal::validateTextureParameter(int param) {
-  return (param == GL_TEXTURE_MAG_FILTER || param == GL_TEXTURE_MIN_FILTER ||
-          param == GL_TEXTURE_WRAP_S || param == GL_TEXTURE_WRAP_T);
-}
-
 void GraphicsContext3DInternal::activeTexture(unsigned long texture) {
   // FIXME: query number of textures available.
   if (texture < GL_TEXTURE0 || texture > GL_TEXTURE0 + 32)
@@ -1078,8 +1069,8 @@ unsigned GraphicsContext3D::createBuffer() {
 
 unsigned GraphicsContext3D::createFramebuffer() {
   makeContextCurrent();
-  GLuint o;
-  glGenFramebuffers(1, &o);
+  GLuint o = 0;
+  glGenFramebuffersEXT(1, &o);
   return o;
 }
 
@@ -1091,7 +1082,7 @@ unsigned GraphicsContext3D::createProgram() {
 unsigned GraphicsContext3D::createRenderbuffer() {
   makeContextCurrent();
   GLuint o;
-  glGenRenderbuffers(1, &o);
+  glGenRenderbuffersEXT(1, &o);
   return o;
 }
 
@@ -1115,7 +1106,7 @@ void GraphicsContext3D::deleteBuffer(unsigned buffer) {
 
 void GraphicsContext3D::deleteFramebuffer(unsigned framebuffer) {
   makeContextCurrent();
-  glDeleteFramebuffers(1, &framebuffer);
+  glDeleteFramebuffersEXT(1, &framebuffer);
 }
 
 void GraphicsContext3D::deleteProgram(unsigned program) {
@@ -1125,7 +1116,7 @@ void GraphicsContext3D::deleteProgram(unsigned program) {
 
 void GraphicsContext3D::deleteRenderbuffer(unsigned renderbuffer) {
   makeContextCurrent();
-  glDeleteRenderbuffers(1, &renderbuffer);
+  glDeleteRenderbuffersEXT(1, &renderbuffer);
 }
 
 void GraphicsContext3D::deleteShader(unsigned shader) {
@@ -1157,12 +1148,12 @@ void GraphicsContext3D::bindBuffer(unsigned long target, WebGLBuffer* buffer) {
   m_internal->bindBuffer(target, buffer);
 }
 
-GL_SAME_METHOD_2_X2(BindFramebuffer,
+GL_SAME_METHOD_2_X2(BindFramebufferEXT,
                     bindFramebuffer,
                     unsigned long,
                     WebGLFramebuffer*)
 
-GL_SAME_METHOD_2_X2(BindRenderbuffer,
+GL_SAME_METHOD_2_X2(BindRenderbufferEXT,
                     bindRenderbuffer,
                     unsigned long,
                     WebGLRenderbuffer*)
@@ -1229,7 +1220,7 @@ void GraphicsContext3D::bufferSubData(unsigned long target,
 
 unsigned long GraphicsContext3D::checkFramebufferStatus(unsigned long target) {
   makeContextCurrent();
-  return glCheckFramebufferStatus(target);
+  return glCheckFramebufferStatusEXT(target);
 }
 
 GL_SAME_METHOD_1(Clear, clear, unsigned long)
@@ -1349,14 +1340,14 @@ GL_SAME_METHOD_0(Finish, finish)
 
 GL_SAME_METHOD_0(Flush, flush)
 
-GL_SAME_METHOD_4_X4(FramebufferRenderbuffer,
+GL_SAME_METHOD_4_X4(FramebufferRenderbufferEXT,
                     framebufferRenderbuffer,
                     unsigned long,
                     unsigned long,
                     unsigned long,
                     WebGLRenderbuffer*)
 
-GL_SAME_METHOD_5_X4(FramebufferTexture2D,
+GL_SAME_METHOD_5_X4(FramebufferTexture2DEXT,
                     framebufferTexture2D,
                     unsigned long,
                     unsigned long,
@@ -1442,35 +1433,16 @@ int GraphicsContext3D::getAttribLocation(WebGLProgram* program,
   return glGetAttribLocation(EXTRACT(program), name.utf8().data());
 }
 
-bool GraphicsContext3D::getBoolean(unsigned long pname) {
+void GraphicsContext3D::getBooleanv(unsigned long pname, unsigned char* value) {
   makeContextCurrent();
-  GLboolean val;
-  // FIXME: validate pname to ensure it returns only a single value.
-  glGetBooleanv(pname, &val);
-  return static_cast<bool>(val);
+  glGetBooleanv(pname, value);
 }
 
-PassRefPtr<WebGLUnsignedByteArray> GraphicsContext3D::getBooleanv(
-    unsigned long pname) {
-  // FIXME: implement.
-  notImplemented();
-  return 0;
-}
-
-int GraphicsContext3D::getBufferParameteri(unsigned long target,
-                                           unsigned long pname) {
+void GraphicsContext3D::getBufferParameteriv(unsigned long target,
+                                             unsigned long pname,
+                                             int* value) {
   makeContextCurrent();
-  GLint data;
-  glGetBufferParameteriv(target, pname, &data);
-  return static_cast<int>(data);
-}
-
-PassRefPtr<WebGLIntArray> GraphicsContext3D::getBufferParameteriv(
-    unsigned long target,
-    unsigned long pname) {
-  // FIXME: implement.
-  notImplemented();
-  return 0;
+  glGetBufferParameteriv(target, pname, value);
 }
 
 unsigned long GraphicsContext3D::getError() {
@@ -1478,65 +1450,30 @@ unsigned long GraphicsContext3D::getError() {
   return glGetError();
 }
 
-float GraphicsContext3D::getFloat(unsigned long pname) {
+void GraphicsContext3D::getFloatv(unsigned long pname, float* value) {
   makeContextCurrent();
-  GLfloat val;
-  // FIXME: validate pname to ensure it returns only a single value.
-  glGetFloatv(pname, &val);
-  return static_cast<float>(val);
+  glGetFloatv(pname, value);
 }
 
-PassRefPtr<WebGLFloatArray> GraphicsContext3D::getFloatv(unsigned long pname) {
-  // FIXME: implement.
-  notImplemented();
-  return 0;
-}
-
-int GraphicsContext3D::getFramebufferAttachmentParameteri(
+void GraphicsContext3D::getFramebufferAttachmentParameteriv(
     unsigned long target,
     unsigned long attachment,
-    unsigned long pname) {
+    unsigned long pname,
+    int* value) {
   makeContextCurrent();
-  GLint data;
-  glGetFramebufferAttachmentParameteriv(target, attachment, pname, &data);
-  return static_cast<int>(data);
+  glGetFramebufferAttachmentParameterivEXT(target, attachment, pname, value);
 }
 
-PassRefPtr<WebGLIntArray>
-GraphicsContext3D::getFramebufferAttachmentParameteriv(unsigned long target,
-                                                       unsigned long attachment,
-                                                       unsigned long pname) {
-  // FIXME: implement.
-  notImplemented();
-  return 0;
-}
-
-int GraphicsContext3D::getInteger(unsigned long pname) {
+void GraphicsContext3D::getIntegerv(unsigned long pname, int* value) {
   makeContextCurrent();
-  GLint val;
-  // FIXME: validate pname to ensure it returns only a single value.
-  glGetIntegerv(pname, &val);
-  return static_cast<int>(val);
+  glGetIntegerv(pname, value);
 }
 
-PassRefPtr<WebGLIntArray> GraphicsContext3D::getIntegerv(unsigned long pname) {
-  // FIXME: implement.
-  notImplemented();
-  return 0;
-}
-
-int GraphicsContext3D::getProgrami(WebGLProgram* program, unsigned long pname) {
+void GraphicsContext3D::getProgramiv(WebGLProgram* program,
+                                     unsigned long pname,
+                                     int* value) {
   makeContextCurrent();
-  GLint param;
-  glGetProgramiv(EXTRACT(program), pname, &param);
-  return static_cast<int>(param);
-}
-
-PassRefPtr<WebGLIntArray> GraphicsContext3D::getProgramiv(WebGLProgram* program,
-                                                          unsigned long pname) {
-  // FIXME: implement.
-  notImplemented();
-  return 0;
+  glGetProgramiv(EXTRACT(program), pname, value);
 }
 
 String GraphicsContext3D::getProgramInfoLog(WebGLProgram* program) {
@@ -1557,34 +1494,18 @@ String GraphicsContext3D::getProgramInfoLog(WebGLProgram* program) {
   return res;
 }
 
-int GraphicsContext3D::getRenderbufferParameteri(unsigned long target,
-                                                 unsigned long pname) {
+void GraphicsContext3D::getRenderbufferParameteriv(unsigned long target,
+                                                   unsigned long pname,
+                                                   int* value) {
   makeContextCurrent();
-  GLint param;
-  glGetRenderbufferParameteriv(target, pname, &param);
-  return static_cast<int>(param);
+  glGetRenderbufferParameterivEXT(target, pname, value);
 }
 
-PassRefPtr<WebGLIntArray> GraphicsContext3D::getRenderbufferParameteriv(
-    unsigned long target,
-    unsigned long pname) {
-  // FIXME: implement.
-  notImplemented();
-  return 0;
-}
-
-int GraphicsContext3D::getShaderi(WebGLShader* shader, unsigned long pname) {
+void GraphicsContext3D::getShaderiv(WebGLShader* shader,
+                                    unsigned long pname,
+                                    int* value) {
   makeContextCurrent();
-  GLint param;
-  glGetShaderiv(EXTRACT(shader), pname, &param);
-  return static_cast<int>(param);
-}
-
-PassRefPtr<WebGLIntArray> GraphicsContext3D::getShaderiv(WebGLShader* shader,
-                                                         unsigned long pname) {
-  // FIXME: implement.
-  notImplemented();
-  return 0;
+  glGetShaderiv(EXTRACT(shader), pname, value);
 }
 
 String GraphicsContext3D::getShaderInfoLog(WebGLShader* shader) {
@@ -1628,83 +1549,32 @@ String GraphicsContext3D::getString(unsigned long name) {
   return String(reinterpret_cast<const char*>(glGetString(name)));
 }
 
-float GraphicsContext3D::getTexParameterf(unsigned long target,
-                                          unsigned long pname) {
+void GraphicsContext3D::getTexParameterfv(unsigned long target,
+                                          unsigned long pname,
+                                          float* value) {
   makeContextCurrent();
-  if (!m_internal->validateTextureTarget(target)) {
-    // FIXME: throw exception.
-    return 0;
-  }
-
-  if (!m_internal->validateTextureParameter(pname)) {
-    // FIXME: throw exception.
-    return 0;
-  }
-
-  GLfloat param;
-  glGetTexParameterfv(target, pname, &param);
-  return static_cast<float>(param);
+  glGetTexParameterfv(target, pname, value);
 }
 
-PassRefPtr<WebGLFloatArray> GraphicsContext3D::getTexParameterfv(
-    unsigned long target,
-    unsigned long pname) {
-  // FIXME: implement.
-  notImplemented();
-  return 0;
-}
-
-int GraphicsContext3D::getTexParameteri(unsigned long target,
-                                        unsigned long pname) {
+void GraphicsContext3D::getTexParameteriv(unsigned long target,
+                                          unsigned long pname,
+                                          int* value) {
   makeContextCurrent();
-  if (!m_internal->validateTextureTarget(target)) {
-    // FIXME: throw exception.
-    return 0;
-  }
-
-  if (!m_internal->validateTextureParameter(pname)) {
-    // FIXME: throw exception.
-    return 0;
-  }
-
-  GLint param;
-  glGetTexParameteriv(target, pname, &param);
-  return static_cast<int>(param);
+  glGetTexParameteriv(target, pname, value);
 }
 
-PassRefPtr<WebGLIntArray> GraphicsContext3D::getTexParameteriv(
-    unsigned long target,
-    unsigned long pname) {
-  // FIXME: implement.
-  notImplemented();
-  return 0;
+void GraphicsContext3D::getUniformfv(WebGLProgram* program,
+                                     long location,
+                                     float* value) {
+  makeContextCurrent();
+  glGetUniformfv(EXTRACT(program), location, value);
 }
 
-float GraphicsContext3D::getUniformf(WebGLProgram* program, long location) {
-  // FIXME: implement.
-  notImplemented();
-  return 0;
-}
-
-PassRefPtr<WebGLFloatArray> GraphicsContext3D::getUniformfv(
-    WebGLProgram* program,
-    long location) {
-  // FIXME: implement.
-  notImplemented();
-  return 0;
-}
-
-int GraphicsContext3D::getUniformi(WebGLProgram* program, long location) {
-  // FIXME: implement.
-  notImplemented();
-  return 0;
-}
-
-PassRefPtr<WebGLIntArray> GraphicsContext3D::getUniformiv(WebGLProgram* program,
-                                                          long location) {
-  // FIXME: implement.
-  notImplemented();
-  return 0;
+void GraphicsContext3D::getUniformiv(WebGLProgram* program,
+                                     long location,
+                                     int* value) {
+  makeContextCurrent();
+  glGetUniformiv(EXTRACT(program), location, value);
 }
 
 long GraphicsContext3D::getUniformLocation(WebGLProgram* program,
@@ -1716,34 +1586,18 @@ long GraphicsContext3D::getUniformLocation(WebGLProgram* program,
   return glGetUniformLocation(EXTRACT(program), name.utf8().data());
 }
 
-float GraphicsContext3D::getVertexAttribf(unsigned long index,
-                                          unsigned long pname) {
-  // FIXME: implement.
-  notImplemented();
-  return 0;
+void GraphicsContext3D::getVertexAttribfv(unsigned long index,
+                                          unsigned long pname,
+                                          float* value) {
+  makeContextCurrent();
+  glGetVertexAttribfv(index, pname, value);
 }
 
-PassRefPtr<WebGLFloatArray> GraphicsContext3D::getVertexAttribfv(
-    unsigned long index,
-    unsigned long pname) {
-  // FIXME: implement.
-  notImplemented();
-  return 0;
-}
-
-int GraphicsContext3D::getVertexAttribi(unsigned long index,
-                                        unsigned long pname) {
-  // FIXME: implement.
-  notImplemented();
-  return 0;
-}
-
-PassRefPtr<WebGLIntArray> GraphicsContext3D::getVertexAttribiv(
-    unsigned long index,
-    unsigned long pname) {
-  // FIXME: implement.
-  notImplemented();
-  return 0;
+void GraphicsContext3D::getVertexAttribiv(unsigned long index,
+                                          unsigned long pname,
+                                          int* value) {
+  makeContextCurrent();
+  glGetVertexAttribiv(index, pname, value);
 }
 
 long GraphicsContext3D::getVertexAttribOffset(unsigned long index,
@@ -1767,7 +1621,7 @@ bool GraphicsContext3D::isEnabled(unsigned long cap) {
 
 bool GraphicsContext3D::isFramebuffer(WebGLFramebuffer* framebuffer) {
   makeContextCurrent();
-  return glIsFramebuffer(EXTRACT(framebuffer));
+  return glIsFramebufferEXT(EXTRACT(framebuffer));
 }
 
 bool GraphicsContext3D::isProgram(WebGLProgram* program) {
@@ -1777,7 +1631,7 @@ bool GraphicsContext3D::isProgram(WebGLProgram* program) {
 
 bool GraphicsContext3D::isRenderbuffer(WebGLRenderbuffer* renderbuffer) {
   makeContextCurrent();
-  return glIsRenderbuffer(EXTRACT(renderbuffer));
+  return glIsRenderbufferEXT(EXTRACT(renderbuffer));
 }
 
 bool GraphicsContext3D::isShader(WebGLShader* shader) {
@@ -1825,7 +1679,7 @@ PassRefPtr<WebGLArray> GraphicsContext3D::readPixels(long x,
 
 void GraphicsContext3D::releaseShaderCompiler() {}
 
-GL_SAME_METHOD_4(RenderbufferStorage,
+GL_SAME_METHOD_4(RenderbufferStorageEXT,
                  renderbufferStorage,
                  unsigned long,
                  unsigned long,
