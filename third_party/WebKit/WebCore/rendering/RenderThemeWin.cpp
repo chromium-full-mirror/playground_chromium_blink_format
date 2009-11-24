@@ -1114,5 +1114,14 @@ bool RenderThemeWin::paintMediaSliderThumb(
   return RenderMediaControls::paintMediaControlsPart(MediaSliderThumb, o,
                                                      paintInfo, r);
 }
+
+bool RenderThemeWin::paintMediaToggleClosedCaptionsButton(
+    RenderObject* o,
+    const RenderObject::PaintInfo& paintInfo,
+    const IntRect& r) {
+  return RenderMediaControls::paintMediaControlsPart(
+      MediaShowClosedCaptionsButton, o, paintInfo, r);
+}
+
 #endif
 }

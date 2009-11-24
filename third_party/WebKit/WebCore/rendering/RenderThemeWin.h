@@ -198,6 +198,10 @@ class RenderThemeWin : public RenderTheme {
   virtual bool paintMediaSliderThumb(RenderObject*,
                                      const RenderObject::PaintInfo&,
                                      const IntRect&);
+  virtual bool paintMediaToggleClosedCaptionsButton(
+      RenderObject*,
+      const RenderObject::PaintInfo&,
+      const IntRect&);
 #endif
 
  private:
