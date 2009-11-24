@@ -390,7 +390,7 @@ class RenderLayer : public ScrollbarClient {
   // layers that intersect the point from front to back.
   void paint(GraphicsContext*,
              const IntRect& damageRect,
-             PaintRestriction = PaintRestrictionNone,
+             PaintBehavior = PaintBehaviorNormal,
              RenderObject* paintingRoot = 0);
   bool hitTest(const HitTestRequest&, HitTestResult&);
 
@@ -527,7 +527,7 @@ class RenderLayer : public ScrollbarClient {
   void paintLayer(RenderLayer* rootLayer,
                   GraphicsContext*,
                   const IntRect& paintDirtyRect,
-                  PaintRestriction,
+                  PaintBehavior,
                   RenderObject* paintingRoot,
                   RenderObject::OverlapTestRequestMap* = 0,
                   PaintLayerFlags paintFlags = 0);

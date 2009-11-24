@@ -909,7 +909,7 @@ void RenderLayerBacking::paintIntoLayer(
     RenderLayer* rootLayer,
     GraphicsContext* context,
     const IntRect& paintDirtyRect,  // in the coords of rootLayer
-    PaintRestriction paintRestriction,
+    PaintBehavior paintBehavior,
     GraphicsLayerPaintingPhase paintingPhase,
     RenderObject* paintingRoot) {
   if (paintingGoesToWindow()) {
@@ -924,7 +924,7 @@ void RenderLayerBacking::paintIntoLayer(
     // Mark that we are now inside replica painting.
     m_owningLayer->setPaintingInsideReflection(true);
     m_owningLayer->reflectionLayer()->paintLayer(
-        rootLayer, context, paintDirtyRect, paintRestriction, paintingRoot, 0,
+        rootLayer, context, paintDirtyRect, paintBehavior, paintingRoot, 0,
         RenderLayer::PaintLayerPaintingReflection);
     m_owningLayer->setPaintingInsideReflection(false);
   }
@@ -1007,11 +1007,8 @@ void RenderLayerBacking::paintIntoLayer(
     restoreClip(context, paintDirtyRect, damageRect);
   }
 
-  bool forceBlackText =
-      paintRestriction == PaintRestrictionSelectionOnlyBlackText;
-  bool selectionOnly =
-      paintRestriction == PaintRestrictionSelectionOnly ||
-      paintRestriction == PaintRestrictionSelectionOnlyBlackText;
+  bool forceBlackText = paintBehavior & PaintBehaviorForceBlackText;
+  bool selectionOnly = paintBehavior & PaintBehaviorSelectionOnly;
 
   if (shouldPaint && (paintingPhase & GraphicsLayerPaintForeground)) {
     // Now walk the sorted list of children with negative z-indices. Only
@@ -1021,7 +1018,7 @@ void RenderLayerBacking::paintIntoLayer(
     if (negZOrderList) {
       for (Vector<RenderLayer*>::iterator it = negZOrderList->begin();
            it != negZOrderList->end(); ++it)
-        it[0]->paintLayer(rootLayer, context, paintDirtyRect, paintRestriction,
+        it[0]->paintLayer(rootLayer, context, paintDirtyRect, paintBehavior,
                           paintingRoot);
     }
 
@@ -1062,7 +1059,7 @@ void RenderLayerBacking::paintIntoLayer(
     if (normalFlowList) {
       for (Vector<RenderLayer*>::iterator it = normalFlowList->begin();
            it != normalFlowList->end(); ++it)
-        it[0]->paintLayer(rootLayer, context, paintDirtyRect, paintRestriction,
+        it[0]->paintLayer(rootLayer, context, paintDirtyRect, paintBehavior,
                           paintingRoot);
     }
 
@@ -1071,7 +1068,7 @@ void RenderLayerBacking::paintIntoLayer(
     if (posZOrderList) {
       for (Vector<RenderLayer*>::iterator it = posZOrderList->begin();
            it != posZOrderList->end(); ++it)
-        it[0]->paintLayer(rootLayer, context, paintDirtyRect, paintRestriction,
+        it[0]->paintLayer(rootLayer, context, paintDirtyRect, paintBehavior,
                           paintingRoot);
     }
   }
@@ -1130,7 +1127,7 @@ void RenderLayerBacking::paintContents(const GraphicsLayer*,
   IntRect dirtyRect = enclosingBBox;
   dirtyRect.intersect(clipRect);
 
-  paintIntoLayer(m_owningLayer, &context, dirtyRect, PaintRestrictionNone,
+  paintIntoLayer(m_owningLayer, &context, dirtyRect, PaintBehaviorNormal,
                  paintingPhase, renderer());
 
 #if ENABLE(INSPECTOR)

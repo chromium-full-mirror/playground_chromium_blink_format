@@ -193,7 +193,7 @@ class RenderLayerBacking : public GraphicsLayerClient {
   void paintIntoLayer(RenderLayer* rootLayer,
                       GraphicsContext*,
                       const IntRect& paintDirtyRect,
-                      PaintRestriction paintRestriction,
+                      PaintBehavior paintBehavior,
                       GraphicsLayerPaintingPhase,
                       RenderObject* paintingRoot);
 
