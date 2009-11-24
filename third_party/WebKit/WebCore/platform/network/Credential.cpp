@@ -57,6 +57,20 @@ Credential::Credential(const String& user,
 {
 }
 
+Credential::Credential(const Credential& original,
+                       CredentialPersistence persistence)
+    : m_user(original.user()),
+      m_password(original.password()),
+      m_persistence(persistence)
+#if CERTIFICATE_CREDENTIALS_SUPPORTED
+      ,
+      m_identity(original.identity()),
+      m_certificates(original.certificates()),
+      m_type(original.type())
+#endif
+{
+}
+
 bool Credential::isEmpty() const {
 #if CERTIFICATE_CREDENTIALS_SUPPORTED
   if (m_type == CredentialTypeClientCertificate &&
