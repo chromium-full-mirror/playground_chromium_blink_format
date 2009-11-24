@@ -1231,7 +1231,7 @@ void InspectorController::getCookies(long callId, const String& host) {
           getRawCookies(document, document->cookieURL(), docCookiesList);
 
       if (!rawCookiesImplemented)
-        // FIXME: We need duplication checking for the String representation of
+        // FIXME:We need duplication checking for the String representation of
         // cookies.
         stringCookiesList += document->cookie();
       else {
