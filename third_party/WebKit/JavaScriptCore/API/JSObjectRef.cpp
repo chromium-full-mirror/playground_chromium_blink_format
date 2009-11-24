@@ -435,7 +435,8 @@ JSValueRef JSObjectCallAsFunction(JSContextRef ctx,
   exec->globalData().heap.registerThread();
   JSLock lock(exec);
 
-  exec->globalData().clientData->willExecute(exec);
+  if (JSGlobalData::ClientData* clientData = exec->globalData().clientData)
+    clientData->willExecute(exec);
 
   JSObject* jsObject = toJS(object);
   JSObject* jsThisObject = toJS(thisObject);
@@ -462,7 +463,8 @@ JSValueRef JSObjectCallAsFunction(JSContextRef ctx,
     }
   }
 
-  exec->globalData().clientData->didExecute(exec);
+  if (JSGlobalData::ClientData* clientData = exec->globalData().clientData)
+    clientData->didExecute(exec);
   return result;
 }
 

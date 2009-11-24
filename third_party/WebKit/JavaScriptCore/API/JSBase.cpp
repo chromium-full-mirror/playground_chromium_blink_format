@@ -50,7 +50,8 @@ JSValueRef JSEvaluateScript(JSContextRef ctx,
   exec->globalData().heap.registerThread();
   JSLock lock(exec);
 
-  exec->globalData().clientData->willExecute(exec);
+  if (JSGlobalData::ClientData* clientData = exec->globalData().clientData)
+    clientData->willExecute(exec);
 
   JSObject* jsThisObject = toJS(thisObject);
 
@@ -72,7 +73,8 @@ JSValueRef JSEvaluateScript(JSContextRef ctx,
         // statement
     result = toRef(exec, jsUndefined());
 
-  exec->globalData().clientData->didExecute(exec);
+  if (JSGlobalData::ClientData* clientData = exec->globalData().clientData)
+    clientData->didExecute(exec);
   return result;
 }
 
