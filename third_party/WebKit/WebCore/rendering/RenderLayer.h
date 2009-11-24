@@ -201,7 +201,9 @@ class RenderLayer : public ScrollbarClient {
 
   bool isTransparent() const;
   RenderLayer* transparentPaintingAncestor();
-  void beginTransparencyLayers(GraphicsContext*, const RenderLayer* rootLayer);
+  void beginTransparencyLayers(GraphicsContext*,
+                               const RenderLayer* rootLayer,
+                               PaintBehavior);
 
   bool hasReflection() const { return renderer()->hasReflection(); }
   RenderReplica* reflection() const { return m_reflection; }
@@ -454,6 +456,7 @@ class RenderLayer : public ScrollbarClient {
   // have a transform,
   // returns the identity matrix.
   TransformationMatrix currentTransform() const;
+  TransformationMatrix renderableTransform(PaintBehavior) const;
 
   // Get the perspective transform, which is applied to transformed sublayers.
   // Returns true if the layer has a -webkit-perspective.
@@ -486,11 +489,17 @@ class RenderLayer : public ScrollbarClient {
   bool hasCompositedMask() const { return false; }
 #endif
 
-  bool paintsWithTransparency() const {
-    return isTransparent() && !isComposited();
+  bool paintsWithTransparency(PaintBehavior paintBehavior) const {
+    return isTransparent() &&
+           ((paintBehavior & PaintBehaviorFlattenCompositingLayers) ||
+            !isComposited());
   }
 
-  bool paintsWithTransform() const { return transform() && !isComposited(); }
+  bool paintsWithTransform(PaintBehavior paintBehavior) const {
+    return transform() &&
+           ((paintBehavior & PaintBehaviorFlattenCompositingLayers) ||
+            !isComposited());
+  }
 
  private:
   // The normal operator new is disallowed on all render objects.

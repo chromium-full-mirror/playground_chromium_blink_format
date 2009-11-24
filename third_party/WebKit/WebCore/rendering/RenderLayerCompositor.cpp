@@ -348,7 +348,7 @@ IntRect RenderLayerCompositor::calculateCompositedBounds(
     }
   }
 
-  if (layer->paintsWithTransform()) {
+  if (layer->paintsWithTransform(PaintBehaviorNormal)) {
     TransformationMatrix* affineTrans = layer->transform();
     boundingBoxRect = affineTrans->mapRect(boundingBoxRect);
     unionBounds = affineTrans->mapRect(unionBounds);

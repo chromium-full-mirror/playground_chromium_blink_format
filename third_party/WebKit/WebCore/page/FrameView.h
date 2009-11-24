@@ -176,6 +176,7 @@ class FrameView : public ScrollView {
 
   virtual void paintContents(GraphicsContext*, const IntRect& damageRect);
   void setPaintBehavior(PaintBehavior);
+  PaintBehavior paintBehavior() const { return m_paintBehavior; }
   bool isPainting() const;
   void setNodeToDraw(Node*);
 
