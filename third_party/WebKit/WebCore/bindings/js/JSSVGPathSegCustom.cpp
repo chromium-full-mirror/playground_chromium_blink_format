@@ -66,8 +66,7 @@ JSValue toJS(ExecState* exec,
   if (!object)
     return jsNull();
 
-  if (DOMObject* wrapper =
-          getCachedDOMObjectWrapper(exec->globalData(), object))
+  if (DOMObject* wrapper = getCachedDOMObjectWrapper(exec, object))
     return wrapper;
 
   switch (object->pathSegType()) {

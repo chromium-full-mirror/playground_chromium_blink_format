@@ -151,7 +151,7 @@ JSValue toJSNewlyCreated(ExecState* exec,
   if (!element)
     return jsNull();
 
-  ASSERT(!getCachedDOMNodeWrapper(element->document(), element));
+  ASSERT(!getCachedDOMNodeWrapper(exec, element->document(), element));
 
   JSNode* wrapper;
   if (element->isHTMLElement())
