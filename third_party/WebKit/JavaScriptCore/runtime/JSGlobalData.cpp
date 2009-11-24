@@ -71,6 +71,10 @@ extern JSC_CONST_HASHTABLE HashTable regExpTable;
 extern JSC_CONST_HASHTABLE HashTable regExpConstructorTable;
 extern JSC_CONST_HASHTABLE HashTable stringTable;
 
+void JSGlobalData::ClientData::willExecute(ExecState*) {}
+
+void JSGlobalData::ClientData::didExecute(ExecState*) {}
+
 struct VPtrSet {
   VPtrSet();
 
