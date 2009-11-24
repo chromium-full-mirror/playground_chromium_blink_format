@@ -41,7 +41,7 @@ class JSDOMWindowShell : public DOMObject {
   typedef DOMObject Base;
 
  public:
-  JSDOMWindowShell(PassRefPtr<DOMWindow>);
+  JSDOMWindowShell(PassRefPtr<DOMWindow>, DOMWrapperWorld* world);
   virtual ~JSDOMWindowShell();
 
   JSDOMWindow* window() const { return m_window; }
@@ -62,6 +62,8 @@ class JSDOMWindowShell : public DOMObject {
     return JSC::Structure::create(
         prototype, JSC::TypeInfo(JSC::ObjectType, StructureFlags));
   }
+
+  DOMWrapperWorld* world() { return m_world.get(); }
 
  private:
   static const unsigned StructureFlags =
@@ -111,6 +113,7 @@ class JSDOMWindowShell : public DOMObject {
   virtual const JSC::ClassInfo* classInfo() const { return &s_info; }
 
   JSDOMWindow* m_window;
+  RefPtr<DOMWrapperWorld> m_world;
 };
 
 JSC::JSValue toJS(JSC::ExecState*, Frame*);

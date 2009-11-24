@@ -215,7 +215,8 @@ JSDOMWindowShell* ScriptController::initScript(DOMWrapperWorld* world) {
 
   JSLock lock(SilenceAssertionsOnly);
 
-  JSDOMWindowShell* windowShell = new JSDOMWindowShell(m_frame->domWindow());
+  JSDOMWindowShell* windowShell =
+      new JSDOMWindowShell(m_frame->domWindow(), world);
   m_windowShells.add(world, windowShell);
   windowShell->window()->updateDocument(world);
 

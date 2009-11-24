@@ -70,19 +70,20 @@ class JSDOMGlobalObject : public JSC::JSGlobalObject {
 
   virtual void markChildren(JSC::MarkStack&);
 
+  DOMWrapperWorld* world() { return d()->m_world.get(); }
+
  protected:
   struct JSDOMGlobalObjectData
       : public JSC::JSGlobalObject::JSGlobalObjectData {
-    JSDOMGlobalObjectData()
-        : JSGlobalObjectData(destroyJSDOMGlobalObjectData), evt(0) {}
-
-    JSDOMGlobalObjectData(Destructor destructor)
-        : JSGlobalObjectData(destructor), evt(0) {}
+    JSDOMGlobalObjectData(DOMWrapperWorld* world,
+                          Destructor destructor = destroyJSDOMGlobalObjectData)
+        : JSGlobalObjectData(destructor), evt(0), m_world(world) {}
 
     JSDOMStructureMap structures;
     JSDOMConstructorMap constructors;
 
     Event* evt;
+    RefPtr<DOMWrapperWorld> m_world;
   };
 
  private:

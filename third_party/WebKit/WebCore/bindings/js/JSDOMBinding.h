@@ -218,6 +218,9 @@ class WebCoreJSClientData : public JSC::JSGlobalData::ClientData {
     m_worldSet.remove(world);
   }
 
+  virtual void willExecute(JSC::ExecState*);
+  virtual void didExecute(JSC::ExecState*);
+
   DOMObjectHashTableMap hashTableMap;
 
  private:
