@@ -875,26 +875,6 @@ bool QTMovieWin::hasAudio() const {
                            movieTrackCharacteristic | movieTrackEnabledOnly));
 }
 
-bool QTMovieWin::hasClosedCaptions() const {
-  if (!m_private->m_movie)
-    return false;
-  return GetMovieIndTrackType(m_private->m_movie, 1, 'clcp',
-                              movieTrackMediaType);
-}
-
-void QTMovieWin::setClosedCaptionsVisible(bool visible) {
-  if (!m_private->m_movie)
-    return;
-
-  Track ccTrack =
-      GetMovieIndTrackType(m_private->m_movie, 1, 'clcp', movieTrackMediaType);
-  if (!ccTrack)
-    return;
-
-  Boolean doDisplay = visible;
-  QTSetTrackProperty(ccTrack, 'clcp', 'disp', sizeof(doDisplay), &doDisplay);
-}
-
 pascal OSErr movieDrawingCompleteProc(Movie movie, long data) {
   UppParam param;
   param.longValue = data;
