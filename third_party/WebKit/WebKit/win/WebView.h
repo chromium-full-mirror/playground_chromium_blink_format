@@ -34,6 +34,8 @@
 #include <WebCore/IntRect.h>
 #include <WebCore/Timer.h>
 #include <WebCore/WindowMessageListener.h>
+#include <WebCore/WKCACFLayer.h>
+#include <WebCore/WKCACFLayerRenderer.h>
 #include <wtf/HashSet.h>
 #include <wtf/OwnPtr.h>
 
@@ -909,6 +911,14 @@ class WebView : public IWebView,
 
   void downloadURL(const WebCore::KURL&);
 
+#if USE(ACCELERATED_COMPOSITING)
+  bool isAcceleratedCompositing() const { return m_isAcceleratedCompositing; }
+  void resizeLayerRenderer() { m_layerRenderer.resize(); }
+  void layerRendererBecameVisible() { m_layerRenderer.createRenderer(); }
+  void setRootLayerNeedsDisplay() { m_layerRenderer.setNeedsDisplay(); }
+  void setRootChildLayer(WebCore::PlatformLayer* layer);
+#endif
+
  private:
   void setZoomMultiplier(float multiplier, bool isTextOnly);
   float zoomMultiplier(bool isTextOnly);
@@ -1027,6 +1037,14 @@ class WebView : public IWebView,
   long m_lastPanY;
   long m_xOverpan;
   long m_yOverpan;
+
+#if USE(ACCELERATED_COMPOSITING)
+  void setAcceleratedCompositing(bool);
+  void updateRootLayerContents();
+
+  WebCore::WKCACFLayerRenderer m_layerRenderer;
+  bool m_isAcceleratedCompositing;
+#endif
 };
 
 #endif
