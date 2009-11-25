@@ -121,7 +121,12 @@ class MessagePort : public RefCounted<MessagePort>, public EventTarget {
   // not be able to determine ownership of the remote port (since it may live
   // cross-process) - those platforms may always return null.
   MessagePort* locallyEntangledPort();
-  bool isEntangled() { return m_entangledChannel; }
+  // A port starts out its life entangled, and remains entangled until it is
+  // closed or is cloned.
+  bool isEntangled() { return !m_closed && !isCloned(); }
+  // A port is cloned if its entangled channel has been removed and sent to a
+  // new owner via postMessage().
+  bool isCloned() { return !m_entangledChannel; }
 
  private:
   MessagePort(ScriptExecutionContext&);
@@ -134,6 +139,7 @@ class MessagePort : public RefCounted<MessagePort>, public EventTarget {
   OwnPtr<MessagePortChannel> m_entangledChannel;
 
   bool m_started;
+  bool m_closed;
 
   ScriptExecutionContext* m_scriptExecutionContext;
   EventTargetData m_eventTargetData;

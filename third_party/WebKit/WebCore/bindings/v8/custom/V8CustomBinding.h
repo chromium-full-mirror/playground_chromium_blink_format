@@ -140,10 +140,8 @@ class V8Custom {
 
   static const int kMessagePortRequestCacheIndex =
       kDefaultWrapperInternalFieldCount + 0;
-  static const int kMessagePortEntangledPortIndex =
-      kDefaultWrapperInternalFieldCount + 1;
   static const int kMessagePortInternalFieldCount =
-      kDefaultWrapperInternalFieldCount + 2;
+      kDefaultWrapperInternalFieldCount + 1;
 
 #if ENABLE(WORKERS)
   static const int kAbstractWorkerRequestCacheIndex =
