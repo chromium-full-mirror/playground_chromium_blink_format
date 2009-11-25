@@ -63,6 +63,11 @@ class RenderThemeAndroid : public RenderTheme {
   virtual Color platformInactiveSelectionForegroundColor() const;
   virtual Color platformTextSearchHighlightColor() const;
 
+  virtual Color platformActiveListBoxSelectionBackgroundColor() const;
+  virtual Color platformInactiveListBoxSelectionBackgroundColor() const;
+  virtual Color platformActiveListBoxSelectionForegroundColor() const;
+  virtual Color platformInactiveListBoxSelectionForegroundColor() const;
+
   virtual void systemFont(int, WebCore::FontDescription&) const {}
 
   virtual int minimumMenuListSize(RenderStyle*) const { return 0; }
