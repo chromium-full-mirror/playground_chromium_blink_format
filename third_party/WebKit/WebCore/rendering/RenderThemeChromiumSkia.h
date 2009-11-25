@@ -88,6 +88,9 @@ class RenderThemeChromiumSkia : public RenderTheme {
                              const RenderObject::PaintInfo&,
                              const IntRect&);
 
+  virtual void adjustSearchFieldStyle(CSSStyleSelector*,
+                                      RenderStyle*,
+                                      Element*) const;
   virtual bool paintSearchField(RenderObject*,
                                 const RenderObject::PaintInfo&,
                                 const IntRect&);

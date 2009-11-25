@@ -364,6 +364,13 @@ bool RenderThemeChromiumSkia::paintTextArea(RenderObject* o,
   return paintTextField(o, i, r);
 }
 
+void RenderThemeChromiumSkia::adjustSearchFieldStyle(CSSStyleSelector*,
+                                                     RenderStyle* style,
+                                                     Element*) const {
+  // Ignore line-height.
+  style->setLineHeight(RenderStyle::initialLineHeight());
+}
+
 bool RenderThemeChromiumSkia::paintSearchField(RenderObject* o,
                                                const RenderObject::PaintInfo& i,
                                                const IntRect& r) {
