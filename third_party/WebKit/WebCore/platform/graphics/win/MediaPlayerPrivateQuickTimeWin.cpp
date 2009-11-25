@@ -293,6 +293,18 @@ void MediaPlayerPrivate::setPreservesPitch(bool preservesPitch) {
   m_qtMovie->setPreservesPitch(preservesPitch);
 }
 
+bool MediaPlayerPrivate::hasClosedCaptions() const {
+  if (!m_qtMovie)
+    return false;
+  return m_qtMovie->hasClosedCaptions();
+}
+
+void MediaPlayerPrivate::setClosedCaptionsVisible(bool visible) {
+  if (!m_qtMovie)
+    return;
+  m_qtMovie->setClosedCaptionsVisible(visible);
+}
+
 int MediaPlayerPrivate::dataRate() const {
   // This is not used at the moment
   return 0;

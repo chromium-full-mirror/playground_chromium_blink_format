@@ -51,6 +51,9 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface,
 
   ~MediaPlayerPrivate();
 
+ private:
+  MediaPlayerPrivate(MediaPlayer*);
+
   IntSize naturalSize() const;
   bool hasVideo() const;
   bool hasAudio() const;
@@ -94,8 +97,8 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface,
 
   bool hasSingleSecurityOrigin() const;
 
- private:
-  MediaPlayerPrivate(MediaPlayer*);
+  bool hasClosedCaptions() const;
+  void setClosedCaptionsVisible(bool);
 
   void updateStates();
   void doSeek();

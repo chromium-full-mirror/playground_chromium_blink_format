@@ -177,6 +177,7 @@ class RenderThemeWin : public RenderTheme {
   virtual bool supportsFocusRing(const RenderStyle*) const;
 
 #if ENABLE(VIDEO)
+  virtual bool shouldRenderMediaControlPart(ControlPart, Element*);
   virtual bool paintMediaFullscreenButton(RenderObject*,
                                           const RenderObject::PaintInfo&,
                                           const IntRect&);
@@ -198,6 +199,10 @@ class RenderThemeWin : public RenderTheme {
   virtual bool paintMediaSliderThumb(RenderObject*,
                                      const RenderObject::PaintInfo&,
                                      const IntRect&);
+  virtual bool paintMediaToggleClosedCaptionsButton(
+      RenderObject*,
+      const RenderObject::PaintInfo&,
+      const IntRect&);
 #endif
 
  private:
