@@ -332,6 +332,12 @@ void QNetworkReplyHandler::sendResponseIfNeeded() {
       newRequest.setHTTPMethod("GET");
     }
 
+    // Should not set Referer after a redirect from a secure resource to
+    // non-secure one.
+    if (!newRequest.url().protocolIs("https") &&
+        protocolIs(newRequest.httpReferrer(), "https"))
+      newRequest.clearHTTPReferrer();
+
     client->willSendRequest(m_resourceHandle, newRequest, response);
     m_redirected = true;
     m_request =
