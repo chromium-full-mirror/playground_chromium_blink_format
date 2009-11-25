@@ -215,6 +215,8 @@ static T callJNIMethodV(jobject obj,
     if (cls != NULL) {
       jmethodID mid = env->GetMethodID(cls, name, sig);
       if (mid != NULL) {
+        // Avoids references to cls without popping the local frame.
+        env->DeleteLocalRef(cls);
         return JNICaller<T>::callV(obj, mid, args);
       } else {
         fprintf(stderr, "%s: Could not find method: %s for %p\n",

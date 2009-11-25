@@ -46,6 +46,10 @@ class JObjectWrapper {
   friend class JavaInstance;
   friend class JavaMethod;
 
+ public:
+  jobject instance() const { return _instance; }
+  void setInstance(jobject instance) { _instance = instance; }
+
  protected:
   JObjectWrapper(jobject instance);
   ~JObjectWrapper();
@@ -88,11 +92,9 @@ class JavaInstance : public Instance {
   JSValue booleanValue() const;
 
  protected:
+  JavaInstance(jobject instance, PassRefPtr<RootObject>);
   virtual void virtualBegin();
   virtual void virtualEnd();
-
- private:
-  JavaInstance(jobject instance, PassRefPtr<RootObject>);
 
   RefPtr<JObjectWrapper> _instance;
   mutable JavaClass* _class;
