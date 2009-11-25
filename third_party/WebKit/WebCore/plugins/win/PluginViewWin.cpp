@@ -155,7 +155,7 @@ HDC WINAPI PluginView::hookedBeginPaint(HWND hWnd, PAINTSTRUCT* lpPaint) {
       "push    %3\n"
       "call    *%4\n"
       : "=a"(result)
-      : "a"(beginPaintSysCall), "g"(lpPaint), "g"(hWnd), "m"(*beginPaint)
+      : "a"(beginPaintSysCall), "g"(lpPaint), "g"(hWnd), "m"(beginPaint)
       : "memory");
   return result;
 #elif defined(_M_IX86)
@@ -182,7 +182,7 @@ BOOL WINAPI PluginView::hookedEndPaint(HWND hWnd, const PAINTSTRUCT* lpPaint) {
       "push   %3\n"
       "call   *%4\n"
       : "=a"(result)
-      : "a"(endPaintSysCall), "g"(lpPaint), "g"(hWnd), "m"(*endPaint));
+      : "a"(endPaintSysCall), "g"(lpPaint), "g"(hWnd), "m"(endPaint));
   return result;
 #elif defined(_M_IX86)
   // Call through to the original EndPaint.
