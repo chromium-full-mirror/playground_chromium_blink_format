@@ -127,6 +127,10 @@ void WebSettingsImpl::setDeveloperExtrasEnabled(bool enabled) {
   m_settings->setDeveloperExtrasEnabled(enabled);
 }
 
+void WebSettingsImpl::setNeedsSiteSpecificQuirks(bool enabled) {
+  m_settings->setNeedsSiteSpecificQuirks(enabled);
+}
+
 void WebSettingsImpl::setShrinksStandaloneImagesToFit(bool shrinkImages) {
   m_settings->setShrinksStandaloneImagesToFit(shrinkImages);
 }
