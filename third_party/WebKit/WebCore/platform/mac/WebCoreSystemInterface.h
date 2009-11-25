@@ -176,6 +176,14 @@ extern void (*wkSignalCFReadStreamError)(CFReadStreamRef stream,
 extern void (*wkSignalCFReadStreamHasBytes)(CFReadStreamRef stream);
 extern unsigned (*wkInitializeMaximumHTTPConnectionCountPerHost)(
     unsigned preferredConnectionCount);
+extern void (*wkSetCONNECTProxyForStream)(CFReadStreamRef,
+                                          CFStringRef proxyHost,
+                                          CFNumberRef proxyPort);
+extern void (*wkSetCONNECTProxyAuthorizationForStream)(
+    CFReadStreamRef,
+    CFStringRef proxyAuthorizationString);
+extern CFHTTPMessageRef (*wkCopyCONNECTProxyResponse)(CFReadStreamRef,
+                                                      CFURLRef responseURL);
 extern BOOL (*wkIsLatchingWheelEvent)(NSEvent*);
 
 #ifndef BUILDING_ON_TIGER
