@@ -549,7 +549,7 @@ class RenderBlock : public RenderBox {
 
   void updateScrollInfoAfterLayout();
 
-  struct FloatingObject {
+  struct FloatingObject : Noncopyable {
     enum Type { FloatLeft, FloatRight };
 
     FloatingObject(Type type)
@@ -694,7 +694,7 @@ class RenderBlock : public RenderBox {
   RenderInline* m_inlineContinuation;
 
   // Allocated only when some of these fields have non-default values
-  struct MaxMargin {
+  struct MaxMargin : Noncopyable {
     MaxMargin(const RenderBlock* o)
         : m_topPos(topPosDefault(o)),
           m_topNeg(topNegDefault(o)),

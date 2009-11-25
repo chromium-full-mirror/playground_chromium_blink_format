@@ -84,7 +84,7 @@ enum PluginStatus {
   PluginStatusLoadedSuccessfully
 };
 
-class PluginRequest {
+class PluginRequest : public Noncopyable {
  public:
   PluginRequest(const FrameLoadRequest& frameLoadRequest,
                 bool sendNotification,

@@ -61,7 +61,7 @@ static const int verticalLineClickFudgeFactor = 3;
 
 using namespace HTMLNames;
 
-struct ColumnInfo {
+struct ColumnInfo : public Noncopyable {
   ColumnInfo() : m_desiredColumnWidth(0), m_desiredColumnCount(1) {}
   int m_desiredColumnWidth;
   unsigned m_desiredColumnCount;

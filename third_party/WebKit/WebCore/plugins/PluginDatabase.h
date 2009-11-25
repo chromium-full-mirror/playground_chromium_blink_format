@@ -45,7 +45,7 @@ class PluginPackage;
 
 typedef HashSet<RefPtr<PluginPackage>, PluginPackageHash> PluginSet;
 
-class PluginDatabase {
+class PluginDatabase : public Noncopyable {
  public:
   PluginDatabase();
 
