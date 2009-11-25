@@ -102,6 +102,12 @@ void InspectorResource::updateRequest(const ResourceRequest& request) {
 void InspectorResource::updateResponse(const ResourceResponse& response) {
   m_expectedContentLength = response.expectedContentLength();
   m_mimeType = response.mimeType();
+  if (m_mimeType.isEmpty() && response.httpStatusCode() == 304) {
+    CachedResource* cachedResource =
+        cache()->resourceForURL(response.url().string());
+    if (cachedResource)
+      m_mimeType = cachedResource->response().mimeType();
+  }
   m_responseHeaderFields = response.httpHeaderFields();
   m_responseStatusCode = response.httpStatusCode();
   m_suggestedFilename = response.suggestedFilename();
