@@ -133,7 +133,7 @@ class WebGLRenderingContext : public CanvasRenderingContext {
   PassRefPtr<WebGLFramebuffer> createFramebuffer();
   PassRefPtr<WebGLProgram> createProgram();
   PassRefPtr<WebGLRenderbuffer> createRenderbuffer();
-  PassRefPtr<WebGLShader> createShader(unsigned long type);
+  PassRefPtr<WebGLShader> createShader(unsigned long type, ExceptionCode&);
   PassRefPtr<WebGLTexture> createTexture();
 
   void cullFace(unsigned long mode);
