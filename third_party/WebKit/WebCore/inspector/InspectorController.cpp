@@ -974,14 +974,13 @@ bool InspectorController::isMainResourceLoader(DocumentLoader* loader,
 }
 
 void InspectorController::willSendRequest(
+    DocumentLoader* loader,
     unsigned long identifier,
-    const ResourceRequest& request,
+    ResourceRequest& request,
     const ResourceResponse& redirectResponse) {
-  bool isMainResource =
-      (m_mainResource && m_mainResource->identifier() == identifier);
   if (m_timelineAgent)
-    m_timelineAgent->willSendResourceRequest(identifier, isMainResource,
-                                             request);
+    m_timelineAgent->willSendResourceRequest(
+        identifier, isMainResourceLoader(loader, request.url()), request);
 
   RefPtr<InspectorResource> resource = getTrackedResource(identifier);
   if (!resource)
@@ -998,7 +997,8 @@ void InspectorController::willSendRequest(
     resource->createScriptObject(m_frontend.get());
 }
 
-void InspectorController::didReceiveResponse(unsigned long identifier,
+void InspectorController::didReceiveResponse(DocumentLoader*,
+                                             unsigned long identifier,
                                              const ResourceResponse& response) {
   if (m_timelineAgent)
     m_timelineAgent->didReceiveResourceResponse(identifier, response);
@@ -1014,7 +1014,8 @@ void InspectorController::didReceiveResponse(unsigned long identifier,
     resource->updateScriptObject(m_frontend.get());
 }
 
-void InspectorController::didReceiveContentLength(unsigned long identifier,
+void InspectorController::didReceiveContentLength(DocumentLoader*,
+                                                  unsigned long identifier,
                                                   int lengthReceived) {
   RefPtr<InspectorResource> resource = getTrackedResource(identifier);
   if (!resource)
@@ -1026,7 +1027,8 @@ void InspectorController::didReceiveContentLength(unsigned long identifier,
     resource->updateScriptObject(m_frontend.get());
 }
 
-void InspectorController::didFinishLoading(unsigned long identifier) {
+void InspectorController::didFinishLoading(DocumentLoader*,
+                                           unsigned long identifier) {
   if (m_timelineAgent)
     m_timelineAgent->didFinishLoadingResource(identifier, false);
 
@@ -1044,7 +1046,8 @@ void InspectorController::didFinishLoading(unsigned long identifier) {
     resource->updateScriptObject(m_frontend.get());
 }
 
-void InspectorController::didFailLoading(unsigned long identifier,
+void InspectorController::didFailLoading(DocumentLoader*,
+                                         unsigned long identifier,
                                          const ResourceError& /*error*/) {
   if (m_timelineAgent)
     m_timelineAgent->didFinishLoadingResource(identifier, true);
