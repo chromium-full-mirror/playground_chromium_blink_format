@@ -219,8 +219,10 @@ class V8Custom {
       kDefaultWrapperInternalFieldCount + 12;
   static const int kDOMWindowEventListenerCacheIndex =
       kDefaultWrapperInternalFieldCount + 13;
-  static const int kDOMWindowInternalFieldCount =
+  static const int kDOMWindowEnteredIsolatedWorldIndex =
       kDefaultWrapperInternalFieldCount + 14;
+  static const int kDOMWindowInternalFieldCount =
+      kDefaultWrapperInternalFieldCount + 15;
 
   static const int kStyleSheetOwnerNodeIndex =
       kDefaultWrapperInternalFieldCount + 0;

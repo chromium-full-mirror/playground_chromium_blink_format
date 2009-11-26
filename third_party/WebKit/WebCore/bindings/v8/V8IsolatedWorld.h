@@ -84,7 +84,12 @@ class V8IsolatedWorld {
     // worlds at all.
     if (!isolatedWorldCount)
       return 0;
-    return getEnteredImpl();
+    if (!v8::Context::InContext())
+      return 0;
+    return reinterpret_cast<V8IsolatedWorld*>(
+        getGlobalObject(v8::Context::GetEntered())
+            ->GetPointerFromInternalField(
+                V8Custom::kDOMWindowEnteredIsolatedWorldIndex));
   }
 
   v8::Handle<v8::Context> context() { return m_context->get(); }
@@ -95,7 +100,10 @@ class V8IsolatedWorld {
   DOMDataStore* getDOMDataStore() const { return m_domDataStore.getStore(); }
 
  private:
-  static V8IsolatedWorld* getEnteredImpl();
+  static v8::Handle<v8::Object> getGlobalObject(
+      v8::Handle<v8::Context> context) {
+    return v8::Handle<v8::Object>::Cast(context->Global()->GetPrototype());
+  }
 
   // Called by the garbage collector when our JavaScript context is about
   // to be destroyed.
