@@ -162,6 +162,11 @@ class WebPage : public QWebPage {
                          const ExtensionOption* option,
                          ExtensionReturn* output);
 
+  QObject* createPlugin(const QString&,
+                        const QUrl&,
+                        const QStringList&,
+                        const QStringList&);
+
  public slots:
   bool shouldInterruptJavaScript() { return false; }
 

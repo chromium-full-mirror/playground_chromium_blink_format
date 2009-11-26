@@ -60,6 +60,10 @@
 #include <qwebsettings.h>
 #include <qwebsecurityorigin.h>
 
+#ifndef QT_NO_UITOOLS
+#include <QtUiTools/QUiLoader>
+#endif
+
 #ifdef Q_WS_X11
 #include <fontconfig/fontconfig.h>
 #endif
@@ -277,6 +281,22 @@ bool WebPage::extension(Extension extension,
   errorPage->content = QString("data:text/html,<body/>").toUtf8();
 
   return true;
+}
+
+QObject* WebPage::createPlugin(const QString& classId,
+                               const QUrl& url,
+                               const QStringList& paramNames,
+                               const QStringList& paramValues) {
+  Q_UNUSED(url);
+  Q_UNUSED(paramNames);
+  Q_UNUSED(paramValues);
+#ifndef QT_NO_UITOOLS
+  QUiLoader loader;
+  return loader.createWidget(classId, view());
+#else
+  Q_UNUSED(classId);
+  return 0;
+#endif
 }
 
 DumpRenderTree::DumpRenderTree()
