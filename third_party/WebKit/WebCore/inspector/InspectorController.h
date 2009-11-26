@@ -257,20 +257,13 @@ class InspectorController
   void identifierForInitialRequest(unsigned long identifier,
                                    DocumentLoader*,
                                    const ResourceRequest&);
-  void willSendRequest(DocumentLoader*,
-                       unsigned long identifier,
-                       ResourceRequest&,
+  void willSendRequest(unsigned long identifier,
+                       const ResourceRequest&,
                        const ResourceResponse& redirectResponse);
-  void didReceiveResponse(DocumentLoader*,
-                          unsigned long identifier,
-                          const ResourceResponse&);
-  void didReceiveContentLength(DocumentLoader*,
-                               unsigned long identifier,
-                               int lengthReceived);
-  void didFinishLoading(DocumentLoader*, unsigned long identifier);
-  void didFailLoading(DocumentLoader*,
-                      unsigned long identifier,
-                      const ResourceError&);
+  void didReceiveResponse(unsigned long identifier, const ResourceResponse&);
+  void didReceiveContentLength(unsigned long identifier, int lengthReceived);
+  void didFinishLoading(unsigned long identifier);
+  void didFailLoading(unsigned long identifier, const ResourceError&);
   void resourceRetrievedByXMLHttpRequest(unsigned long identifier,
                                          const ScriptString& sourceString);
   void scriptImported(unsigned long identifier, const String& sourceString);
