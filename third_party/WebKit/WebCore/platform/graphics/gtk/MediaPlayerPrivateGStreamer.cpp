@@ -45,7 +45,7 @@
 #include <gst/video/video.h>
 #include <limits>
 #include <math.h>
-#include <wtf/GOwnPtr.h>
+#include <wtf/gtk/GOwnPtr.h>
 
 using namespace std;
 
