@@ -79,6 +79,9 @@ class RenderThemeChromiumSkia : public RenderTheme {
   virtual bool paintButton(RenderObject*,
                            const RenderObject::PaintInfo&,
                            const IntRect&);
+  virtual void adjustButtonStyle(CSSStyleSelector*,
+                                 RenderStyle*,
+                                 Element*) const;
 
   virtual bool paintTextField(RenderObject*,
                               const RenderObject::PaintInfo&,

@@ -352,6 +352,16 @@ bool RenderThemeChromiumSkia::paintButton(RenderObject* o,
   return false;
 }
 
+void RenderThemeChromiumSkia::adjustButtonStyle(CSSStyleSelector*,
+                                                RenderStyle* style,
+                                                Element*) const;
+{
+  if (style->appearance() == PushButtonPart) {
+    // Ignore line-height.
+    style->setLineHeight(RenderStyle::initialLineHeight());
+  }
+}
+
 bool RenderThemeChromiumSkia::paintTextField(RenderObject* o,
                                              const RenderObject::PaintInfo& i,
                                              const IntRect& rect) {
