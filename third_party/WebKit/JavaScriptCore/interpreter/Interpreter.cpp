@@ -3029,7 +3029,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
       int target = vPC[2].u.operand;
       JSValue srcValue = callFrame->r(src).jsValue();
 
-      if (!srcValue.isUndefinedOrNull() || (srcValue.isCell() &&
+      if (!srcValue.isUndefinedOrNull() && (!srcValue.isCell() ||
                                             !srcValue.asCell()
                                                  ->structure()
                                                  ->typeInfo()
