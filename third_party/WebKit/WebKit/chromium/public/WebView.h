@@ -187,6 +187,12 @@ class WebView : public WebWidget {
   // (accept false) effect.  Return true on success.
   virtual bool setDropEffect(bool accept) = 0;
 
+  // Support for resource loading initiated by plugins -------------------
+
+  // Returns next unused request identifier which is unique within the
+  // parent Page.
+  virtual unsigned long createUniqueIdentifierForRequest() = 0;
+
   // Developer tools -----------------------------------------------------
 
   // Inspect a particular point in the WebView.  (x = -1 || y = -1) is a
