@@ -379,7 +379,7 @@ void InspectorBackend::dispatchOnInjectedScript(long callId,
   function.appendArgument(methodName);
   function.appendArgument(arguments);
   if (async)
-    function.appendArgument(static_cast<int>(callId));
+    function.appendArgument(callId);
   bool hadException = false;
   ScriptValue result = function.call(hadException);
   if (async)

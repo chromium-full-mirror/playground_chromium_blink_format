@@ -76,6 +76,12 @@ bool ScriptObject::set(const char* name, double value) {
   return scope.success();
 }
 
+bool ScriptObject::set(const char* name, long value) {
+  ScriptScope scope(m_scriptState);
+  v8Object()->Set(v8::String::New(name), v8::Number::New(value));
+  return scope.success();
+}
+
 bool ScriptObject::set(const char* name, long long value) {
   ScriptScope scope(m_scriptState);
   v8Object()->Set(v8::String::New(name), v8::Number::New(value));
@@ -89,6 +95,12 @@ bool ScriptObject::set(const char* name, int value) {
 }
 
 bool ScriptObject::set(const char* name, unsigned value) {
+  ScriptScope scope(m_scriptState);
+  v8Object()->Set(v8::String::New(name), v8::Number::New(value));
+  return scope.success();
+}
+
+bool ScriptObject::set(const char* name, unsigned long value) {
   ScriptScope scope(m_scriptState);
   v8Object()->Set(v8::String::New(name), v8::Number::New(value));
   return scope.success();

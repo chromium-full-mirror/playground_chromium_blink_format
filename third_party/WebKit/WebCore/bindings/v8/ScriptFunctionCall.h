@@ -52,8 +52,10 @@ class ScriptFunctionCall {
   void appendArgument(const ScriptString&);
   void appendArgument(const ScriptValue&);
   void appendArgument(const String&);
+  void appendArgument(long);
   void appendArgument(long long);
   void appendArgument(unsigned int);
+  void appendArgument(unsigned long);
   void appendArgument(int);
   void appendArgument(bool);
   ScriptValue call(bool& hadException, bool reportExceptions = true);

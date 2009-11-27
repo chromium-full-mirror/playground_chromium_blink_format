@@ -144,7 +144,7 @@ ScriptObject TimelineRecordFactory::createResourceSendRequestRecord(
     const ResourceRequest& request) {
   ScriptObject record = createGenericRecord(frontend, startTime);
   ScriptObject data = frontend->newScriptObject();
-  data.set("identifier", static_cast<long long>(identifier));
+  data.set("identifier", identifier);
   data.set("url", request.url().string());
   data.set("requestMethod", request.httpMethod());
   data.set("isMainResource", isMainResource);
@@ -159,7 +159,7 @@ ScriptObject TimelineRecordFactory::createResourceReceiveResponseRecord(
     const ResourceResponse& response) {
   ScriptObject record = createGenericRecord(frontend, startTime);
   ScriptObject data = frontend->newScriptObject();
-  data.set("identifier", static_cast<long long>(identifier));
+  data.set("identifier", identifier);
   data.set("statusCode", response.httpStatusCode());
   data.set("mimeType", response.mimeType());
   data.set("expectedContentLength", response.expectedContentLength());
@@ -174,7 +174,7 @@ ScriptObject TimelineRecordFactory::createResourceFinishRecord(
     bool didFail) {
   ScriptObject record = createGenericRecord(frontend, startTime);
   ScriptObject data = frontend->newScriptObject();
-  data.set("identifier", static_cast<long long>(identifier));
+  data.set("identifier", identifier);
   data.set("didFail", didFail);
   record.set("data", data);
   return record;

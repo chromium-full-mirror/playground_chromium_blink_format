@@ -62,6 +62,7 @@
 #include "InspectorResource.h"
 #include "JavaScriptProfile.h"
 #include "Page.h"
+#include "ProgressTracker.h"
 #include "Range.h"
 #include "RenderInline.h"
 #include "ResourceRequest.h"
@@ -131,7 +132,6 @@ InspectorController::InspectorController(Page* page, InspectorClient* client)
       m_scriptState(0),
       m_windowVisible(false),
       m_showAfterVisible(CurrentPanel),
-      m_nextIdentifier(-2),
       m_groupLevel(0),
       m_searchingForNode(false),
       m_previousMessage(0),
@@ -865,7 +865,7 @@ void InspectorController::removeResource(InspectorResource* resource) {
 }
 
 InspectorResource* InspectorController::getTrackedResource(
-    long long identifier) {
+    unsigned long identifier) {
   if (!enabled())
     return 0;
 
@@ -899,7 +899,8 @@ void InspectorController::didLoadResourceFromMemoryCache(
     return;
 
   RefPtr<InspectorResource> resource = InspectorResource::createCached(
-      m_nextIdentifier--, loader, cachedResource);
+      m_inspectedPage->progress()->createUniqueIdentifier(), loader,
+      cachedResource);
 
   if (isMainResource) {
     m_mainResource = resource;
@@ -1663,7 +1664,7 @@ void InspectorController::didEvaluateForTestInFrontend(
   ScriptGlobalObject::get(scriptState, "window", window);
   ScriptFunctionCall function(scriptState, window,
                               "didEvaluateForTestInFrontend");
-  function.appendArgument(static_cast<int>(callId));
+  function.appendArgument(callId);
   function.appendArgument(jsonResult);
   function.call();
 }
