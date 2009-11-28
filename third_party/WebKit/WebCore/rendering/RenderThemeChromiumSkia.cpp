@@ -354,8 +354,7 @@ bool RenderThemeChromiumSkia::paintButton(RenderObject* o,
 
 void RenderThemeChromiumSkia::adjustButtonStyle(CSSStyleSelector*,
                                                 RenderStyle* style,
-                                                Element*) const;
-{
+                                                Element*) const {
   if (style->appearance() == PushButtonPart) {
     // Ignore line-height.
     style->setLineHeight(RenderStyle::initialLineHeight());
