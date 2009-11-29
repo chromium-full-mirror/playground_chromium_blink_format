@@ -43,7 +43,7 @@ namespace WebCore {
 
 // This object is allocated only when some of these fields have non-default
 // values in the owning box.
-class RenderOverflow {
+class RenderOverflow : public Noncopyable {
  public:
   RenderOverflow(const IntRect& defaultRect = IntRect())
       : m_topLayoutOverflow(defaultRect.y()),

@@ -31,7 +31,7 @@
 
 namespace WebCore {
 
-class RenderSelectionInfoBase {
+class RenderSelectionInfoBase : public Noncopyable {
  public:
   RenderSelectionInfoBase()
       : m_object(0),

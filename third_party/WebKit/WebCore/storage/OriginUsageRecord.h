@@ -42,7 +42,7 @@ namespace WebCore {
 // synchronization.
 // String arguments are also supposed to be deeply copied by the caller when
 // necessary.
-class OriginUsageRecord {
+class OriginUsageRecord : public Noncopyable {
  public:
   OriginUsageRecord();
 
