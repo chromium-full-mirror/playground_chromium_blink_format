@@ -361,6 +361,9 @@ PassRefPtr<Scrollbar> FrameView::createScrollbar(
 }
 
 void FrameView::setContentsSize(const IntSize& size) {
+  if (size == contentsSize())
+    return;
+
   m_deferSetNeedsLayouts++;
 
   ScrollView::setContentsSize(size);
