@@ -543,9 +543,6 @@ void WebFrameLoaderClient::updateGlobalHistory() {
   webView->historyDelegate(&historyDelegate);
 
   if (historyDelegate) {
-    BString url(loader->urlForHistory());
-    BString title(loader->title());
-    BString redirectSource(loader->clientRedirectSourceForHistory());
     COMPtr<IWebURLResponse> urlResponse(
         AdoptCOM, WebURLResponse::createInstance(loader->response()));
     COMPtr<IWebURLRequest> urlRequest(
@@ -553,9 +550,11 @@ void WebFrameLoaderClient::updateGlobalHistory() {
         WebMutableURLRequest::createInstance(loader->originalRequestCopy()));
 
     COMPtr<IWebNavigationData> navigationData(
-        AdoptCOM, WebNavigationData::createInstance(
-                      url, title, urlRequest.get(), urlResponse.get(),
-                      loader->substituteData().isValid(), redirectSource));
+        AdoptCOM,
+        WebNavigationData::createInstance(
+            loader->urlForHistory(), loader->title(), urlRequest.get(),
+            urlResponse.get(), loader->substituteData().isValid(),
+            loader->clientRedirectSourceForHistory()));
 
     historyDelegate->didNavigateWithNavigationData(
         webView, navigationData.get(), m_webFrame);

@@ -27,8 +27,7 @@
 #include "WebKitDLL.h"
 #include "WebNavigationData.h"
 
-#include <WebCore/BString.h>
-using WebCore::BString;
+using namespace WebCore;
 
 // IUnknown -------------------------------------------------------------------
 
@@ -61,24 +60,23 @@ ULONG STDMETHODCALLTYPE WebNavigationData::Release(void) {
 // WebNavigationData
 // -------------------------------------------------------------------
 
-WebNavigationData::WebNavigationData(BSTR url,
-                                     BSTR title,
+WebNavigationData::WebNavigationData(const String& url,
+                                     const String& title,
                                      IWebURLRequest* request,
                                      IWebURLResponse* response,
                                      bool hasSubstituteData,
-                                     BSTR clientRedirectSource)
+                                     const String& clientRedirectSource)
     : m_refCount(0),
+      m_url(url),
+      m_title(title),
       m_request(request),
       m_response(response),
-      m_hasSubstituteData(hasSubstituteData)
+      m_hasSubstituteData(hasSubstituteData),
+      m_clientRedirectSource(clientRedirectSource)
 
 {
   gClassCount++;
   gClassNameCount.add("WebNavigationData");
-
-  m_url.adoptBSTR(url);
-  m_title.adoptBSTR(title);
-  m_clientRedirectSource.adoptBSTR(clientRedirectSource);
 }
 
 WebNavigationData::~WebNavigationData() {
@@ -87,12 +85,12 @@ WebNavigationData::~WebNavigationData() {
 }
 
 WebNavigationData* WebNavigationData::createInstance(
-    BSTR url,
-    BSTR title,
+    const String& url,
+    const String& title,
     IWebURLRequest* request,
     IWebURLResponse* response,
     bool hasSubstituteData,
-    BSTR clientRedirectSource) {
+    const String& clientRedirectSource) {
   WebNavigationData* instance = new WebNavigationData(
       url, title, request, response, hasSubstituteData, clientRedirectSource);
   instance->AddRef();
