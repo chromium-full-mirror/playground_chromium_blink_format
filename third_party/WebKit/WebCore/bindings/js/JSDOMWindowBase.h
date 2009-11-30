@@ -52,7 +52,7 @@ class JSDOMWindowBase : public JSDOMGlobalObject {
                   JSDOMWindowShell*);
 
  public:
-  void updateDocument(DOMWrapperWorld*);
+  void updateDocument();
 
   DOMWindow* impl() const { return d()->impl.get(); }
   virtual ScriptExecutionContext* scriptExecutionContext() const;

@@ -71,9 +71,12 @@ class NodeFilter : public RefCounted<NodeFilter> {
     m_condition->markAggregate(markStack);
   };
 
-  // For non-JS bindings. Silently ignores the JavaScript exception if any.
+  // Do not call these functions. They are just scaffolding to support the
+  // Objective-C bindings.
+  // They operate in the main thread normal world, and they swallow JS
+  // exceptions.
   short acceptNode(Node* node) const {
-    return acceptNode(scriptStateFromNode(node), node);
+    return acceptNode(scriptStateFromNode(mainThreadNormalWorld(), node), node);
   }
 
  private:

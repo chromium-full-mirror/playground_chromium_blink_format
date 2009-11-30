@@ -46,9 +46,7 @@ class JSCallbackData {
   static void deleteData(void*);
 
   JSCallbackData(JSC::JSObject* callback, JSDOMGlobalObject* globalObject)
-      : m_callback(callback),
-        m_globalObject(globalObject),
-        m_isolatedWorld(currentWorld(globalObject->globalExec())) {}
+      : m_callback(callback), m_globalObject(globalObject) {}
 
   ~JSCallbackData() { ASSERT(isMainThread()); }
 
@@ -61,7 +59,6 @@ class JSCallbackData {
  private:
   JSC::ProtectedPtr<JSC::JSObject> m_callback;
   JSC::ProtectedPtr<JSDOMGlobalObject> m_globalObject;
-  RefPtr<DOMWrapperWorld> m_isolatedWorld;
 };
 
 }  // namespace WebCore

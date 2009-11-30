@@ -102,8 +102,7 @@ JSValue JavaScriptCallFrame::evaluate(const UString& script,
     return jsNull();
 
   JSLock lock(SilenceAssertionsOnly);
-  return DebuggerCallFrame_evaluateInWorld(m_debuggerCallFrame, script,
-                                           exception);
+  return m_debuggerCallFrame.evaluate(script, exception);
 }
 
 }  // namespace WebCore

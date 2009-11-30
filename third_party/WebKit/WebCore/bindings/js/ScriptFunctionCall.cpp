@@ -121,9 +121,8 @@ ScriptValue ScriptFunctionCall::call(bool& hadException,
   if (callType == CallTypeNone)
     return ScriptValue();
 
-  // FIXME: Should this function take a worldID? - only used by inspector?
-  JSValue result = callInWorld(m_exec, function, callType, callData, thisObject,
-                               m_arguments, debuggerWorld());
+  JSValue result =
+      JSC::call(m_exec, function, callType, callData, thisObject, m_arguments);
   if (m_exec->hadException()) {
     if (reportExceptions)
       reportException(m_exec, m_exec->exception());
@@ -161,11 +160,8 @@ ScriptObject ScriptFunctionCall::construct(bool& hadException,
   if (constructType == ConstructTypeNone)
     return ScriptObject();
 
-  // FIXME: Currently this method constructs objects in debuggerWorld().  We
-  // could use the current world, or pass a worldID to this function?
-  JSValue result =
-      constructInWorld(m_exec, constructor, constructType, constructData,
-                       m_arguments, debuggerWorld());
+  JSValue result = JSC::construct(m_exec, constructor, constructType,
+                                  constructData, m_arguments);
   if (m_exec->hadException()) {
     if (reportExceptions)
       reportException(m_exec, m_exec->exception());

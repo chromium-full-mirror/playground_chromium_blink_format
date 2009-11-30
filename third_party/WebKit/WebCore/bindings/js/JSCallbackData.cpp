@@ -46,14 +46,8 @@ JSValue JSCallbackData::invokeCallback(MarkedArgumentBuffer& args,
   ASSERT(globalObject());
 
   ExecState* exec = globalObject()->globalExec();
+  JSValue function = callback()->get(exec, Identifier(exec, "handleEvent"));
 
-  JSValue function;
-  {
-    // Switch worlds, just in case handleEvent is a getter and causes JS
-    // execution!
-    EnterDOMWrapperWorld worldEntry(exec, m_isolatedWorld.get());
-    function = callback()->get(exec, Identifier(exec, "handleEvent"));
-  }
   CallData callData;
   CallType callType = function.getCallData(callData);
   if (callType == CallTypeNone) {
@@ -64,8 +58,8 @@ JSValue JSCallbackData::invokeCallback(MarkedArgumentBuffer& args,
   }
 
   globalObject()->globalData()->timeoutChecker.start();
-  JSValue result = callInWorld(exec, function, callType, callData, callback(),
-                               args, m_isolatedWorld.get());
+  JSValue result =
+      JSC::call(exec, function, callType, callData, callback(), args);
   globalObject()->globalData()->timeoutChecker.stop();
 
   Document::updateStyleForAllDocuments();

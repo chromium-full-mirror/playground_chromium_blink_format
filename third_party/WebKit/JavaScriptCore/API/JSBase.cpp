@@ -50,9 +50,6 @@ JSValueRef JSEvaluateScript(JSContextRef ctx,
   exec->globalData().heap.registerThread();
   JSLock lock(exec);
 
-  if (JSGlobalData::ClientData* clientData = exec->globalData().clientData)
-    clientData->willExecute(exec);
-
   JSObject* jsThisObject = toJS(thisObject);
 
   // evaluate sets "this" to the global object if it is NULL
@@ -63,19 +60,17 @@ JSValueRef JSEvaluateScript(JSContextRef ctx,
       evaluate(globalObject->globalExec(), globalObject->globalScopeChain(),
                source, jsThisObject);
 
-  JSValueRef result = 0;
   if (completion.complType() == Throw) {
     if (exception)
       *exception = toRef(exec, completion.value());
-  } else if (completion.value())
-    result = toRef(exec, completion.value());
-  else  // happens, for example, when the only statement is an empty (';')
-        // statement
-    result = toRef(exec, jsUndefined());
+    return 0;
+  }
 
-  if (JSGlobalData::ClientData* clientData = exec->globalData().clientData)
-    clientData->didExecute(exec);
-  return result;
+  if (completion.value())
+    return toRef(exec, completion.value());
+
+  // happens, for example, when the only statement is an empty (';') statement
+  return toRef(exec, jsUndefined());
 }
 
 bool JSCheckScriptSyntax(JSContextRef ctx,
