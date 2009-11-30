@@ -53,6 +53,7 @@ class GraphicsLayerCA : public GraphicsLayer {
   // for hosting this GraphicsLayer in a native layer hierarchy
   virtual NativeLayer nativeLayer() const;
 
+  virtual bool setChildren(const Vector<GraphicsLayer*>&);
   virtual void addChild(GraphicsLayer*);
   virtual void addChildAtIndex(GraphicsLayer*, int index);
   virtual void addChildAbove(GraphicsLayer* layer, GraphicsLayer* sibling);
