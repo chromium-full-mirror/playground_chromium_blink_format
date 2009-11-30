@@ -24,7 +24,6 @@
 #define CSSStyleSelector_h
 
 #include "CSSFontSelector.h"
-#include "KeyframeList.h"
 #include "LinkHash.h"
 #include "MediaQueryExp.h"
 #include "RenderStyle.h"
@@ -57,6 +56,7 @@ class Element;
 class Frame;
 class FrameView;
 class KURL;
+class KeyframeList;
 class MediaQueryEvaluator;
 class Node;
 class Settings;
