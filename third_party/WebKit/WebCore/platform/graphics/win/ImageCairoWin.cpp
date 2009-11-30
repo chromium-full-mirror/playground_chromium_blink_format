@@ -86,7 +86,7 @@ bool BitmapImage::getHBITMAPOfSize(HBITMAP bmp, LPSIZE size) {
   else
     draw(&gc, FloatRect(0.0f, 0.0f, bmpInfo.bmWidth, bmpInfo.bmHeight),
          FloatRect(0.0f, 0.0f, imageSize.width(), imageSize.height()),
-         CompositeCopy);
+         DeviceColorSpace, CompositeCopy);
 
   // Do cleanup
   cairo_destroy(targetRef);
@@ -110,7 +110,7 @@ void BitmapImage::drawFrameMatchingSourceSize(GraphicsContext* ctxt,
       m_currentFrame = i;
       draw(ctxt, dstRect,
            FloatRect(0.0f, 0.0f, srcSize.width(), srcSize.height()),
-           compositeOp);
+           DeviceColorSpace, compositeOp);
       m_currentFrame = currentFrame;
       return;
     }
@@ -121,7 +121,7 @@ void BitmapImage::drawFrameMatchingSourceSize(GraphicsContext* ctxt,
   IntSize imageSize = BitmapImage::size();
   draw(ctxt, dstRect,
        FloatRect(0.0f, 0.0f, imageSize.width(), imageSize.height()),
-       compositeOp);
+       DeviceColorSpace, compositeOp);
 }
 
 }  // namespace WebCore
