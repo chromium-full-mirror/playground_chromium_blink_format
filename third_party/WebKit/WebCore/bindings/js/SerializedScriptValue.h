@@ -33,6 +33,7 @@ typedef const struct OpaqueJSContext* JSContextRef;
 typedef const struct OpaqueJSValue* JSValueRef;
 
 namespace WebCore {
+class File;
 class SerializedObject;
 class SerializedArray;
 
@@ -54,7 +55,8 @@ class SerializedScriptValueData {
     ImmediateType,
     ObjectType,
     ArrayType,
-    StringType
+    StringType,
+    FileType
   };
 
   SerializedType type() const { return m_type; }
@@ -73,6 +75,8 @@ class SerializedScriptValueData {
         m_string(string.crossThreadString())  // FIXME: Should be able to just
                                               // share the Rep
   {}
+
+  explicit SerializedScriptValueData(const File*);
 
   explicit SerializedScriptValueData(JSC::JSValue value)
       : m_type(ImmediateType) {
@@ -98,7 +102,7 @@ class SerializedScriptValueData {
   }
 
   String asString() const {
-    ASSERT(m_type == StringType);
+    ASSERT(m_type == StringType || m_type == FileType);
     return m_string;
   }
 
