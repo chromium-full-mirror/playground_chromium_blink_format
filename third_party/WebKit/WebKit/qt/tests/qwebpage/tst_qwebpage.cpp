@@ -1774,8 +1774,6 @@ class ErrorPage : public QWebPage {
   virtual bool extension(Extension,
                          const ExtensionOption* option,
                          ExtensionReturn* output) {
-    const ErrorPageExtensionOption* info =
-        static_cast<const ErrorPageExtensionOption*>(option);
     ErrorPageExtensionReturn* errorPage =
         static_cast<ErrorPageExtensionReturn*>(output);
 
