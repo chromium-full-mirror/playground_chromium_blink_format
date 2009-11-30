@@ -288,7 +288,7 @@ v8::Persistent<v8::FunctionTemplate> V8DOMWrapper::getTemplate(
       descriptor->InstanceTemplate()->SetNamedPropertyHandler(
           USE_NAMED_PROPERTY_GETTER(CSSStyleDeclaration),
           USE_NAMED_PROPERTY_SETTER(CSSStyleDeclaration));
-      setCollectionStringOrNullIndexedGetter<CSSStyleDeclaration>(descriptor);
+      setCollectionStringIndexedGetter<CSSStyleDeclaration>(descriptor);
       break;
     case V8ClassIndex::CSSRULELIST:
       setCollectionIndexedGetter<CSSRuleList, CSSRule>(descriptor,
@@ -299,8 +299,7 @@ v8::Persistent<v8::FunctionTemplate> V8DOMWrapper::getTemplate(
           descriptor, V8ClassIndex::CSSVALUE);
       break;
     case V8ClassIndex::CSSVARIABLESDECLARATION:
-      setCollectionStringOrNullIndexedGetter<CSSVariablesDeclaration>(
-          descriptor);
+      setCollectionStringIndexedGetter<CSSVariablesDeclaration>(descriptor);
       break;
     case V8ClassIndex::WEBKITCSSTRANSFORMVALUE:
       setCollectionIndexedGetter<WebKitCSSTransformValue, CSSValue>(

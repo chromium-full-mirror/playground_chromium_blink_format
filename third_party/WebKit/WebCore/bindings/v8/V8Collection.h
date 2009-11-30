@@ -218,6 +218,21 @@ static v8::Handle<v8::Value> collectionStringOrNullIndexedPropertyGetter(
   return v8StringOrNull(result);
 }
 
+// A template for indexed getters on collections of strings.
+template <class Collection>
+static v8::Handle<v8::Value> collectionStringIndexedPropertyGetter(
+    uint32_t index,
+    const v8::AccessorInfo& info) {
+  // FIXME: assert that object must be a collection type
+  ASSERT(V8DOMWrapper::maybeDOMWrapper(info.Holder()));
+  V8ClassIndex::V8WrapperType wrapperType =
+      V8DOMWrapper::domWrapperType(info.Holder());
+  Collection* collection = V8DOMWrapper::convertToNativeObject<Collection>(
+      wrapperType, info.Holder());
+  String result = collection->item(index);
+  return v8String(result);
+}
+
 // Add indexed getter to the function template for a collection.
 template <class Collection, class ItemType>
 static void setCollectionIndexedGetter(v8::Handle<v8::FunctionTemplate> desc,
@@ -261,6 +276,16 @@ static void setCollectionStringOrNullIndexedGetter(
     v8::Handle<v8::FunctionTemplate> desc) {
   desc->InstanceTemplate()->SetIndexedPropertyHandler(
       collectionStringOrNullIndexedPropertyGetter<Collection>, 0, 0, 0,
+      collectionIndexedPropertyEnumerator<Collection>);
+}
+
+// Add indexed getter returning a string to a function template for a
+// collection.
+template <class Collection>
+static void setCollectionStringIndexedGetter(
+    v8::Handle<v8::FunctionTemplate> desc) {
+  desc->InstanceTemplate()->SetIndexedPropertyHandler(
+      collectionStringIndexedPropertyGetter<Collection>, 0, 0, 0,
       collectionIndexedPropertyEnumerator<Collection>);
 }
 
