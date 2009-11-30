@@ -128,7 +128,7 @@ class ResourceHandle : public RefCounted<ResourceHandle>
   static bool didSendBodyDataDelegateExists();
 #endif
 
-  ~ResourceHandle();
+  virtual ~ResourceHandle();
 
 #if PLATFORM(MAC) || USE(CFNETWORK)
   void willSendRequest(ResourceRequest&,

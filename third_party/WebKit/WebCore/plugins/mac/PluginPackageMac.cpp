@@ -194,8 +194,7 @@ bool PluginPackage::fetchInfo() {
       WTF::RetainPtr<CFDictionaryRef> extensionsDict =
           (CFDictionaryRef)values[i];
 
-    WTF:
-      RetainPtr<CFNumberRef> enabled = (CFNumberRef)CFDictionaryGetValue(
+      WTF::RetainPtr<CFNumberRef> enabled = (CFNumberRef)CFDictionaryGetValue(
           extensionsDict.get(), CFSTR("WebPluginTypeEnabled"));
       if (enabled) {
         int enabledValue = 0;
