@@ -158,6 +158,7 @@ class RenderText : public RenderObject {
   void checkConsistency() const;
 
   virtual void calcPrefWidths(int leadWidth);
+  bool isAllCollapsibleWhitespace();
 
  protected:
   virtual void styleWillChange(StyleDifference, const RenderStyle*) {}

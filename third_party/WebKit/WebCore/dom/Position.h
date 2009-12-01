@@ -56,6 +56,11 @@ class Position {
     PositionIsBeforeAnchor
   };
 
+  enum EditingBoundaryCrossingRule {
+    CanCrossEditingBoundary,
+    CannotCrossEditingBoundary
+  };
+
   Position()
       : m_offset(0),
         m_anchorType(PositionIsOffsetInAnchor),
@@ -145,6 +150,10 @@ class Position {
   bool atFirstEditingPositionForNode() const;
   bool atLastEditingPositionForNode() const;
 
+  // Retuns true if the visually equivalent positions around have different
+  // editability
+  bool atEditingBoundary() const;
+
   bool atStartOfTree() const;
   bool atEndOfTree() const;
 
@@ -160,8 +169,10 @@ class Position {
       bool considerNonCollapsibleWhitespace = false) const;
 
   // These return useful visually equivalent positions.
-  Position upstream() const;
-  Position downstream() const;
+  Position upstream(
+      EditingBoundaryCrossingRule = CannotCrossEditingBoundary) const;
+  Position downstream(
+      EditingBoundaryCrossingRule = CannotCrossEditingBoundary) const;
 
   bool isCandidate() const;
   bool inRenderedText() const;

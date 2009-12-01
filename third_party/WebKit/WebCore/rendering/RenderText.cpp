@@ -813,6 +813,16 @@ void RenderText::calcPrefWidths(int leadWidth,
   setPrefWidthsDirty(false);
 }
 
+bool RenderText::isAllCollapsibleWhitespace() {
+  int length = textLength();
+  const UChar* text = characters();
+  for (int i = 0; i < length; i++) {
+    if (!style()->isCollapsibleWhiteSpace(text[i]))
+      return false;
+  }
+  return true;
+}
+
 bool RenderText::containsOnlyWhitespace(unsigned from, unsigned len) const {
   unsigned currPos;
   for (currPos = from; currPos < from + len && ((*m_text)[currPos] == '\n' ||

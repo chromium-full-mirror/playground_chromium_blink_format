@@ -161,10 +161,16 @@ bool PositionIterator::isCandidate() const {
     return (atStartOfNode() || atEndOfNode()) &&
            !Position::nodeIsUserSelectNone(m_anchorNode->parent());
 
-  if (!m_anchorNode->hasTagName(htmlTag) && renderer->isBlockFlow() &&
-      !Position::hasRenderedNonAnonymousDescendantsWithHeight(renderer) &&
-      (toRenderBlock(renderer)->height() || m_anchorNode->hasTagName(bodyTag)))
-    return atStartOfNode() && !Position::nodeIsUserSelectNone(m_anchorNode);
+  if (!m_anchorNode->hasTagName(htmlTag) && renderer->isBlockFlow()) {
+    if (toRenderBlock(renderer)->height() ||
+        m_anchorNode->hasTagName(bodyTag)) {
+      if (!Position::hasRenderedNonAnonymousDescendantsWithHeight(renderer))
+        return atStartOfNode() && !Position::nodeIsUserSelectNone(m_anchorNode);
+      return m_anchorNode->isContentEditable() &&
+             !Position::nodeIsUserSelectNone(m_anchorNode) &&
+             Position(*this).atEditingBoundary();
+    }
+  }
 
   return false;
 }
