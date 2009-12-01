@@ -208,11 +208,6 @@ class ScriptController {
   OwnPtr<XSSAuditor> m_XSSAuditor;
 };
 
-DOMWrapperWorld* mainThreadNormalWorld();
-
-// Dummy class to avoid a bunch of ifdef's in WebCore.
-class DOMWrapperWorld : public RefCounted<DOMWrapperWorld> {};
-
 }  // namespace WebCore
 
 #endif  // ScriptController_h
