@@ -47,6 +47,7 @@ typedef struct __CFHTTPMessage* CFHTTPMessageRef;
 typedef const struct __CFNumber* CFNumberRef;
 typedef struct __CFReadStream* CFReadStreamRef;
 typedef const struct __CFURL* CFURLRef;
+typedef struct _CFURLProtectionSpace* CFURLProtectionSpaceRef;
 
 void wkSetFontSmoothingLevel(int type);
 int wkGetFontSmoothingLevel();
@@ -100,6 +101,9 @@ void wkSetCONNECTProxyAuthorizationForStream(
     CFStringRef proxyAuthorizationString);
 CFHTTPMessageRef wkCopyCONNECTProxyResponse(CFReadStreamRef,
                                             CFURLRef responseURL);
+
+CFURLCredentialRef wkCopyCredentialFromCFPersistentStorage(
+    CFURLProtectionSpaceRef);
 
 CFStringRef wkCFNetworkErrorGetLocalizedDescription(CFIndex errorCode);
 
