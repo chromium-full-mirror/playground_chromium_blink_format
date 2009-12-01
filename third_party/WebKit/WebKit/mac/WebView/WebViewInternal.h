@@ -72,7 +72,6 @@ class Node;
 - (WebCore::Frame*)_mainCoreFrame;
 - (WebFrame*)_selectedOrMainFrame;
 
-- (WebCore::String)_userAgentForURL:(const WebCore::KURL&)url;
 - (WebCore::KeyboardUIMode)_keyboardUIMode;
 
 - (BOOL)_becomingFirstResponderFromOutside;
