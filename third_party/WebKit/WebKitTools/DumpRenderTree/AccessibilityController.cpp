@@ -123,9 +123,7 @@ JSClassRef AccessibilityController::getJSClass() {
                                               0,
                                               0};
 
-  static JSClassRef accessibilityControllerClass =
-      JSClassCreate(&classDefinition);
-  return accessibilityControllerClass;
+  return JSClassCreate(&classDefinition);
 }
 
 void AccessibilityController::resetToConsistentState() {

@@ -47,7 +47,6 @@ class GCController {
 
  private:
   static JSClassRef getJSClass();
-  static JSStaticFunction* staticFunctions();
 };
 
 #endif  // GCController_h

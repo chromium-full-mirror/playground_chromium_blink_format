@@ -94,35 +94,6 @@ void GCController::makeWindowObject(JSContextRef context,
 }
 
 JSClassRef GCController::getJSClass() {
-  static JSClassRef gcControllerClass = 0;
-
-  if (!gcControllerClass) {
-    JSStaticFunction* staticFunctions = GCController::staticFunctions();
-    JSClassDefinition classDefinition = {0,
-                                         kJSClassAttributeNone,
-                                         "GCController",
-                                         0,
-                                         0,
-                                         staticFunctions,
-                                         0,
-                                         0,
-                                         0,
-                                         0,
-                                         0,
-                                         0,
-                                         0,
-                                         0,
-                                         0,
-                                         0,
-                                         0};
-
-    gcControllerClass = JSClassCreate(&classDefinition);
-  }
-
-  return gcControllerClass;
-}
-
-JSStaticFunction* GCController::staticFunctions() {
   static JSStaticFunction staticFunctions[] = {
       {"collect", collectCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
@@ -132,5 +103,23 @@ JSStaticFunction* GCController::staticFunctions() {
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {0, 0, 0}};
 
-  return staticFunctions;
+  static JSClassDefinition classDefinition = {0,
+                                              kJSClassAttributeNone,
+                                              "GCController",
+                                              0,
+                                              0,
+                                              staticFunctions,
+                                              0,
+                                              0,
+                                              0,
+                                              0,
+                                              0,
+                                              0,
+                                              0,
+                                              0,
+                                              0,
+                                              0,
+                                              0};
+
+  return JSClassCreate(&classDefinition);
 }
