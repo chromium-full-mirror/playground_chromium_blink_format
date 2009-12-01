@@ -757,6 +757,13 @@ class V8Custom {
   DECLARE_ACCESSOR_RUNTIME_ENABLER(DOMWindowWebSocket);
 #endif
 
+  DECLARE_CALLBACK(GeolocationGetCurrentPosition);
+  DECLARE_CALLBACK(GeolocationWatchPosition);
+  DECLARE_PROPERTY_ACCESSOR_GETTER(CoordinatesAltitude);
+  DECLARE_PROPERTY_ACCESSOR_GETTER(CoordinatesAltitudeAccuracy);
+  DECLARE_PROPERTY_ACCESSOR_GETTER(CoordinatesHeading);
+  DECLARE_PROPERTY_ACCESSOR_GETTER(CoordinatesSpeed);
+
 #undef DECLARE_INDEXED_ACCESS_CHECK
 #undef DECLARE_NAMED_ACCESS_CHECK
 
