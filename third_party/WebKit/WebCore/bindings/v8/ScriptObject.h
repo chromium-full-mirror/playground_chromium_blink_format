@@ -36,7 +36,9 @@
 #include <v8.h>
 
 namespace WebCore {
+class InjectedScriptHost;
 class InspectorBackend;
+class InspectorFrontendHost;
 class ScriptState;
 
 class ScriptObject : public ScriptValue {
@@ -68,6 +70,8 @@ class ScriptGlobalObject {
  public:
   static bool set(ScriptState*, const char* name, const ScriptObject&);
   static bool set(ScriptState*, const char* name, InspectorBackend*);
+  static bool set(ScriptState*, const char* name, InspectorFrontendHost*);
+  static bool set(ScriptState*, const char* name, InjectedScriptHost*);
   static bool get(ScriptState*, const char* name, ScriptObject&);
   static bool remove(ScriptState*, const char* name);
 

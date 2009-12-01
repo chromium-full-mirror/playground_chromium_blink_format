@@ -31,7 +31,7 @@
  */
 
 #include "config.h"
-#include "JSInspectorBackend.h"
+#include "JSInjectedScriptHost.h"
 
 #if ENABLE(INSPECTOR)
 
@@ -43,7 +43,7 @@
 #include "ExceptionCode.h"
 #include "Frame.h"
 #include "FrameLoader.h"
-#include "InspectorBackend.h"
+#include "InjectedScriptHost.h"
 #include "InspectorController.h"
 #include "InspectorResource.h"
 #include "JSDOMWindow.h"
@@ -73,56 +73,9 @@ using namespace JSC;
 
 namespace WebCore {
 
-JSValue JSInspectorBackend::highlightDOMNode(JSC::ExecState* exec,
-                                             const JSC::ArgList& args) {
-  if (args.size() < 1)
-    return jsUndefined();
-
-  impl()->highlight(args.at(0).toInt32(exec));
-  return jsUndefined();
-}
-
-JSValue JSInspectorBackend::search(ExecState* exec, const ArgList& args) {
-  if (args.size() < 2)
-    return jsUndefined();
-
-  Node* node = toNode(args.at(0));
-  if (!node)
-    return jsUndefined();
-
-  String target = args.at(1).toString(exec);
-  if (exec->hadException())
-    return jsUndefined();
-
-  MarkedArgumentBuffer result;
-  RefPtr<Range> searchRange(rangeOfContents(node));
-
-  ExceptionCode ec = 0;
-  do {
-    RefPtr<Range> resultRange(
-        findPlainText(searchRange.get(), target, true, false));
-    if (resultRange->collapsed(ec))
-      break;
-
-    // A non-collapsed result range can in some funky whitespace cases still not
-    // advance the range's start position (4509328). Break to avoid infinite
-    // loop.
-    VisiblePosition newStart =
-        endVisiblePosition(resultRange.get(), DOWNSTREAM);
-    if (newStart == startVisiblePosition(searchRange.get(), DOWNSTREAM))
-      break;
-
-    result.append(toJS(exec, resultRange.get()));
-
-    setStart(searchRange.get(), newStart);
-  } while (true);
-
-  return constructArray(exec, result);
-}
-
 #if ENABLE(DATABASE)
-JSValue JSInspectorBackend::databaseForId(ExecState* exec,
-                                          const ArgList& args) {
+JSValue JSInjectedScriptHost::databaseForId(ExecState* exec,
+                                            const ArgList& args) {
   if (args.size() < 1)
     return jsUndefined();
 
@@ -142,7 +95,7 @@ JSValue JSInspectorBackend::databaseForId(ExecState* exec,
 }
 #endif
 
-JSValue JSInspectorBackend::inspectedWindow(ExecState*, const ArgList&) {
+JSValue JSInjectedScriptHost::inspectedWindow(ExecState*, const ArgList&) {
   InspectorController* ic = impl()->inspectorController();
   if (!ic)
     return jsUndefined();
@@ -152,87 +105,8 @@ JSValue JSInspectorBackend::inspectedWindow(ExecState*, const ArgList&) {
                                         inspectedWindow);
 }
 
-JSValue JSInspectorBackend::setting(ExecState* exec, const ArgList& args) {
-  if (args.size() < 1)
-    return jsUndefined();
-
-  String key = args.at(0).toString(exec);
-  if (exec->hadException())
-    return jsUndefined();
-
-  InspectorController* ic = impl()->inspectorController();
-  if (!ic)
-    return jsUndefined();
-  const InspectorController::Setting& setting = ic->setting(key);
-
-  switch (setting.type()) {
-    default:
-    case InspectorController::Setting::NoType:
-      return jsUndefined();
-    case InspectorController::Setting::StringType:
-      return jsString(exec, setting.string());
-    case InspectorController::Setting::DoubleType:
-      return jsNumber(exec, setting.doubleValue());
-    case InspectorController::Setting::IntegerType:
-      return jsNumber(exec, setting.integerValue());
-    case InspectorController::Setting::BooleanType:
-      return jsBoolean(setting.booleanValue());
-    case InspectorController::Setting::StringVectorType: {
-      MarkedArgumentBuffer stringsArray;
-      const Vector<String>& strings = setting.stringVector();
-      const unsigned length = strings.size();
-      for (unsigned i = 0; i < length; ++i)
-        stringsArray.append(jsString(exec, strings[i]));
-      return constructArray(exec, stringsArray);
-    }
-  }
-}
-
-JSValue JSInspectorBackend::setSetting(ExecState* exec, const ArgList& args) {
-  if (args.size() < 2)
-    return jsUndefined();
-
-  String key = args.at(0).toString(exec);
-  if (exec->hadException())
-    return jsUndefined();
-
-  InspectorController::Setting setting;
-
-  JSValue value = args.at(1);
-  if (value.isUndefined() || value.isNull()) {
-    // Do nothing. The setting is already NoType.
-    ASSERT(setting.type() == InspectorController::Setting::NoType);
-  } else if (value.isString())
-    setting.set(value.toString(exec));
-  else if (value.isNumber())
-    setting.set(value.toNumber(exec));
-  else if (value.isBoolean())
-    setting.set(value.toBoolean(exec));
-  else {
-    JSArray* jsArray = asArray(value);
-    if (!jsArray)
-      return jsUndefined();
-    Vector<String> strings;
-    for (unsigned i = 0; i < jsArray->length(); ++i) {
-      String item = jsArray->get(exec, i).toString(exec);
-      if (exec->hadException())
-        return jsUndefined();
-      strings.append(item);
-    }
-    setting.set(strings);
-  }
-
-  if (exec->hadException())
-    return jsUndefined();
-
-  InspectorController* ic = impl()->inspectorController();
-  if (ic)
-    ic->setSetting(key, setting);
-
-  return jsUndefined();
-}
-
-JSValue JSInspectorBackend::wrapCallback(ExecState* exec, const ArgList& args) {
+JSValue JSInjectedScriptHost::wrapCallback(ExecState* exec,
+                                           const ArgList& args) {
   if (args.size() < 1)
     return jsUndefined();
 
@@ -241,7 +115,8 @@ JSValue JSInspectorBackend::wrapCallback(ExecState* exec, const ArgList& args) {
 
 #if ENABLE(JAVASCRIPT_DEBUGGER)
 
-JSValue JSInspectorBackend::currentCallFrame(ExecState* exec, const ArgList&) {
+JSValue JSInjectedScriptHost::currentCallFrame(ExecState* exec,
+                                               const ArgList&) {
   JavaScriptCallFrame* callFrame = impl()->currentCallFrame();
   if (!callFrame || !callFrame->isValid())
     return jsUndefined();
@@ -255,7 +130,7 @@ JSValue JSInspectorBackend::currentCallFrame(ExecState* exec, const ArgList&) {
 
 #endif
 
-JSValue JSInspectorBackend::nodeForId(ExecState* exec, const ArgList& args) {
+JSValue JSInjectedScriptHost::nodeForId(ExecState* exec, const ArgList& args) {
   if (args.size() < 1)
     return jsUndefined();
 
@@ -277,7 +152,7 @@ JSValue JSInspectorBackend::nodeForId(ExecState* exec, const ArgList& args) {
            node));
 }
 
-JSValue JSInspectorBackend::wrapObject(ExecState* exec, const ArgList& args) {
+JSValue JSInjectedScriptHost::wrapObject(ExecState* exec, const ArgList& args) {
   if (args.size() < 2)
     return jsUndefined();
 
@@ -286,15 +161,16 @@ JSValue JSInspectorBackend::wrapObject(ExecState* exec, const ArgList& args) {
       .jsValue();
 }
 
-JSValue JSInspectorBackend::unwrapObject(ExecState* exec, const ArgList& args) {
+JSValue JSInjectedScriptHost::unwrapObject(ExecState* exec,
+                                           const ArgList& args) {
   if (args.size() < 1)
     return jsUndefined();
 
   return impl()->unwrapObject(args.at(0).toString(exec)).jsValue();
 }
 
-JSValue JSInspectorBackend::pushNodePathToFrontend(ExecState* exec,
-                                                   const ArgList& args) {
+JSValue JSInjectedScriptHost::pushNodePathToFrontend(ExecState* exec,
+                                                     const ArgList& args) {
   if (args.size() < 2)
     return jsUndefined();
 
@@ -312,7 +188,7 @@ JSValue JSInspectorBackend::pushNodePathToFrontend(ExecState* exec,
 }
 
 #if ENABLE(DATABASE)
-JSValue JSInspectorBackend::selectDatabase(ExecState*, const ArgList& args) {
+JSValue JSInjectedScriptHost::selectDatabase(ExecState*, const ArgList& args) {
   if (args.size() < 1)
     return jsUndefined();
 
@@ -329,7 +205,8 @@ JSValue JSInspectorBackend::selectDatabase(ExecState*, const ArgList& args) {
 #endif
 
 #if ENABLE(DOM_STORAGE)
-JSValue JSInspectorBackend::selectDOMStorage(ExecState*, const ArgList& args) {
+JSValue JSInjectedScriptHost::selectDOMStorage(ExecState*,
+                                               const ArgList& args) {
   if (args.size() < 1)
     return jsUndefined();
   InspectorController* ic = impl()->inspectorController();

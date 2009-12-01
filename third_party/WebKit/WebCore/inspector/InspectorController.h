@@ -62,10 +62,12 @@ class Document;
 class DocumentLoader;
 class GraphicsContext;
 class HitTestResult;
+class InjectedScriptHost;
 class InspectorBackend;
 class InspectorClient;
 class InspectorDOMAgent;
 class InspectorFrontend;
+class InspectorFrontendHost;
 class InspectorTimelineAgent;
 class JavaScriptCallFrame;
 class KURL;
@@ -193,6 +195,12 @@ class InspectorController
   ~InspectorController();
 
   InspectorBackend* inspectorBackend() { return m_inspectorBackend.get(); }
+  InspectorFrontendHost* inspectorFrontendHost() {
+    return m_inspectorFrontendHost.get();
+  }
+  InjectedScriptHost* injectedScriptHost() {
+    return m_injectedScriptHost.get();
+  }
 
   void inspectedPageDestroyed();
   void pageDestroyed() { m_page = 0; }
@@ -359,6 +367,8 @@ class InspectorController
 
  private:
   friend class InspectorBackend;
+  friend class InspectorFrontendHost;
+  friend class InjectedScriptHost;
   // Following are used from InspectorBackend and internally.
   void scriptObjectReady();
   void moveWindowBy(float x, float y) const;
@@ -453,6 +463,8 @@ class InspectorController
   bool m_resourceTrackingEnabled;
   bool m_resourceTrackingSettingsLoaded;
   RefPtr<InspectorBackend> m_inspectorBackend;
+  RefPtr<InspectorFrontendHost> m_inspectorFrontendHost;
+  RefPtr<InjectedScriptHost> m_injectedScriptHost;
   HashMap<String, ScriptValue> m_idToWrappedObject;
   ObjectGroupsMap m_objectGroups;
 
