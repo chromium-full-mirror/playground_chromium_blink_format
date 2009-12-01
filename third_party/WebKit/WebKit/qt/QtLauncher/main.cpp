@@ -187,6 +187,8 @@ class MainWindow : public QMainWindow {
       url = fi.absoluteFilePath();
 
     QUrl qurl = urlFromUserInput(url);
+    if (qurl.scheme().isEmpty())
+      qurl = QUrl("http://" + url + "/");
     if (qurl.isValid()) {
       urlEdit->setText(qurl.toEncoded());
       view->load(qurl);
@@ -207,11 +209,13 @@ class MainWindow : public QMainWindow {
   void changeLocation() {
     QString string = urlEdit->text();
     QUrl url = urlFromUserInput(string);
-    if (!url.isValid())
+    if (url.scheme().isEmpty())
       url = QUrl("http://" + string + "/");
-    urlEdit->setText(url.toEncoded());
-    view->load(url);
-    view->setFocus(Qt::OtherFocusReason);
+    if (url.isValid()) {
+      urlEdit->setText(url.toEncoded());
+      view->load(url);
+      view->setFocus(Qt::OtherFocusReason);
+    }
   }
 
   void loadFinished() {
@@ -563,8 +567,9 @@ int launcherMain(const QApplication& app) {
 
 int main(int argc, char** argv) {
   QApplication app(argc, argv);
-  QString url =
-      QString("%1/%2").arg(QDir::homePath()).arg(QLatin1String("index.html"));
+  QString url = QString("file://%1/%2")
+                    .arg(QDir::homePath())
+                    .arg(QLatin1String("index.html"));
 
   QWebSettings::setMaximumPagesInCache(4);
 
