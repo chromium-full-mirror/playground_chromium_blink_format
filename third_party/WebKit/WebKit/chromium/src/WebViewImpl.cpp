@@ -1203,6 +1203,7 @@ void WebViewImpl::clearFocusedNode() {
   }
 }
 
+// DEPRECATED
 void WebViewImpl::zoomIn(bool textOnly) {
   Frame* frame = mainFrameImpl()->frame();
   double multiplier =
@@ -1215,6 +1216,7 @@ void WebViewImpl::zoomIn(bool textOnly) {
   }
 }
 
+// DEPRECATED
 void WebViewImpl::zoomOut(bool textOnly) {
   Frame* frame = mainFrameImpl()->frame();
   double multiplier =
@@ -1227,12 +1229,30 @@ void WebViewImpl::zoomOut(bool textOnly) {
   }
 }
 
+// DEPRECATED
 void WebViewImpl::zoomDefault() {
   // We don't change the zoom mode (text only vs. full page) here. We just want
   // to reset whatever is already set.
   m_zoomLevel = 0;
   mainFrameImpl()->frame()->setZoomFactor(
       1.0f, mainFrameImpl()->frame()->isZoomFactorTextOnly());
+}
+
+int WebViewImpl::zoomLevel() {
+  return m_zoomLevel;
+}
+
+int WebViewImpl::setZoomLevel(bool textOnly, int zoomLevel) {
+  float zoomFactor = static_cast<float>(
+      std::max(std::min(std::pow(textSizeMultiplierRatio, zoomLevel),
+                        maxTextSizeMultiplier),
+               minTextSizeMultiplier));
+  Frame* frame = mainFrameImpl()->frame();
+  if (zoomFactor != frame->zoomFactor()) {
+    m_zoomLevel = zoomLevel;
+    frame->setZoomFactor(zoomFactor, textOnly);
+  }
+  return m_zoomLevel;
 }
 
 void WebViewImpl::performMediaPlayerAction(const WebMediaPlayerAction& action,
