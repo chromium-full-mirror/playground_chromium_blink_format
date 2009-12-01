@@ -1022,10 +1022,13 @@ String GraphicsContext3D::getProgramInfoLog(WebGLProgram* program) {
   ::glGetProgramiv((GLuint)program->object(), GL_INFO_LOG_LENGTH, &length);
 
   GLsizei size;
-  GLchar* info = (GLchar*)malloc(length);
+  GLchar* info = (GLchar*)fastMalloc(length);
+  if (!info)
+    return "";
+
   ::glGetProgramInfoLog((GLuint)program->object(), length, &size, info);
   String s(info);
-  free(info);
+  fastFree(info);
   return s;
 }
 
@@ -1053,10 +1056,13 @@ String GraphicsContext3D::getShaderInfoLog(WebGLShader* shader) {
   ::glGetShaderiv((GLuint)shader->object(), GL_INFO_LOG_LENGTH, &length);
 
   GLsizei size;
-  GLchar* info = (GLchar*)malloc(length);
+  GLchar* info = (GLchar*)fastMalloc(length);
+  if (!info)
+    return "";
+
   ::glGetShaderInfoLog((GLuint)shader->object(), length, &size, info);
   String s(info);
-  free(info);
+  fastFree(info);
   return s;
 }
 
@@ -1068,10 +1074,13 @@ String GraphicsContext3D::getShaderSource(WebGLShader* shader) {
   ::glGetShaderiv((GLuint)shader->object(), GL_SHADER_SOURCE_LENGTH, &length);
 
   GLsizei size;
-  GLchar* info = (GLchar*)malloc(length);
+  GLchar* info = (GLchar*)fastMalloc(length);
+  if (!info)
+    return "";
+
   ::glGetShaderSource((GLuint)shader->object(), length, &size, info);
   String s(info);
-  free(info);
+  fastFree(info);
   return s;
 }
 
@@ -1146,7 +1155,10 @@ static void imageToTexture(Image* image, unsigned target, unsigned level) {
   size_t textureWidth = CGImageGetWidth(textureImage);
   size_t textureHeight = CGImageGetHeight(textureImage);
 
-  GLubyte* textureData = (GLubyte*)malloc(textureWidth * textureHeight * 4);
+  GLubyte* textureData = (GLubyte*)fastMalloc(textureWidth * textureHeight * 4);
+  if (!textureData)
+    return;
+
   CGContextRef textureContext = CGBitmapContextCreate(
       textureData, textureWidth, textureHeight, 8, textureWidth * 4,
       CGImageGetColorSpace(textureImage), kCGImageAlphaPremultipliedLast);
@@ -1158,7 +1170,7 @@ static void imageToTexture(Image* image, unsigned target, unsigned level) {
 
   ::glTexImage2D(target, level, GL_RGBA, textureWidth, textureHeight, 0,
                  GL_RGBA, GL_UNSIGNED_BYTE, textureData);
-  free(textureData);
+  fastFree(textureData);
 }
 
 int GraphicsContext3D::texImage2D(unsigned target,
