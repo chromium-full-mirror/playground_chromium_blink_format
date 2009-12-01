@@ -412,11 +412,6 @@ void dump() {
 
   // FIXME: call displayWebView here when we support --paint
 
-  puts("#EOF");  // terminate the (possibly empty) pixels block
-
-  fflush(stdout);
-  fflush(stderr);
-
   done = true;
   gtk_main_quit();
 }
@@ -438,6 +433,13 @@ static void setDefaultsToConsistentStateValuesForTesting() {
       g_get_user_data_dir(), "gtkwebkitdrt", "databases", NULL);
   webkit_set_web_database_directory_path(databaseDirectory);
   g_free(databaseDirectory);
+}
+
+static void sendPixelResultsEOF() {
+  puts("#EOF");
+
+  fflush(stdout);
+  fflush(stderr);
 }
 
 static void runTest(const string& testPathOrURL) {
@@ -523,6 +525,9 @@ static void runTest(const string& testPathOrURL) {
 
   gLayoutTestController->deref();
   gLayoutTestController = 0;
+
+  // terminate the (possibly empty) pixels block after all the state reset
+  sendPixelResultsEOF();
 }
 
 void webViewLoadStarted(WebKitWebView* view, WebKitWebFrame* frame, void*) {
