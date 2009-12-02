@@ -2722,8 +2722,8 @@ bool Document::setFocusedNode(PassRefPtr<Node> newFocusedNode) {
     RenderObject* r = oldFocusedNode->renderer();
     if (r && r->isTextControl() &&
         toRenderTextControl(r)->wasChangedSinceLastChangeEvent()) {
-      oldFocusedNode->dispatchEvent(
-          Event::create(eventNames().changeEvent, true, false));
+      static_cast<Element*>(oldFocusedNode.get())
+          ->dispatchFormControlChangeEvent();
       r = oldFocusedNode->renderer();
       if (r && r->isTextControl())
         toRenderTextControl(r)->setChangedSinceLastChangeEvent(false);
