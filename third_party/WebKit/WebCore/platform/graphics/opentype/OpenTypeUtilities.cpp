@@ -470,7 +470,7 @@ HANDLE renameAndActivateFont(SharedBuffer* fontData, const String& fontName) {
   HANDLE fontHandle = AddFontMemResourceEx(
       rewrittenFontData.data(), fontData->size() + nameTableSize, 0, &numFonts);
 
-  if (fontHandle && numFonts != 1) {
+  if (fontHandle && numFonts < 1) {
     RemoveFontMemResourceEx(fontHandle);
     return 0;
   }
