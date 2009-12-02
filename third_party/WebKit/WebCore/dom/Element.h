@@ -186,6 +186,9 @@ class Element : public ContainerNode {
   // convenience methods which ignore exceptions
   void setAttribute(const QualifiedName&, const AtomicString& value);
   void setBooleanAttribute(const QualifiedName& name, bool);
+  // Please don't use setCStringAttribute in performance-sensitive code;
+  // use a static AtomicString value instead to avoid the conversion overhead.
+  void setCStringAttribute(const QualifiedName&, const char* cStringValue);
 
   virtual NamedNodeMap* attributes() const;
   NamedNodeMap* attributes(bool readonly) const;

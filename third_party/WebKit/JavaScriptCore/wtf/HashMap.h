@@ -93,6 +93,30 @@ class HashMap : public FastAllocBase {
 
   MappedType take(const KeyType&);  // efficient combination of get with remove
 
+  // An alternate version of find() that finds the object by hashing and
+  // comparing
+  // with some other type, to avoid the cost of type conversion. HashTranslator
+  // must have the following function members:
+  //   static unsigned hash(const T&);
+  //   static bool equal(const ValueType&, const T&);
+  template <typename T, typename HashTranslator>
+  iterator find(const T&);
+  template <typename T, typename HashTranslator>
+  const_iterator find(const T&) const;
+  template <typename T, typename HashTranslator>
+  bool contains(const T&) const;
+
+  // An alternate version of add() that finds the object by hashing and
+  // comparing
+  // with some other type, to avoid the cost of type conversion if the object is
+  // already
+  // in the table. HashTranslator must have the following function members:
+  //   static unsigned hash(const T&);
+  //   static bool equal(const ValueType&, const T&);
+  //   static translate(ValueType&, const T&, unsigned hashCode);
+  template <typename T, typename HashTranslator>
+  pair<iterator, bool> add(const T&, const MappedType&);
+
  private:
   pair<iterator, bool> inlineAdd(const KeyType&, const MappedType&);
 
@@ -120,6 +144,26 @@ struct HashMapTranslator {
                         const MappedType& mapped) {
     location.first = key;
     location.second = mapped;
+  }
+};
+
+template <typename ValueType,
+          typename ValueTraits,
+          typename T,
+          typename Translator>
+struct HashMapTranslatorAdapter {
+  typedef typename ValueType::first_type KeyType;
+  typedef typename ValueType::second_type MappedType;
+
+  static unsigned hash(const T& key) { return Translator::hash(key); }
+  static bool equal(const KeyType& a, const T& b) {
+    return Translator::equal(a, b);
+  }
+  static void translate(ValueType& location,
+                        const T& key,
+                        const MappedType&,
+                        unsigned hashCode) {
+    Translator::translate(location.first, key, hashCode);
   }
 };
 
@@ -184,6 +228,32 @@ inline bool HashMap<T, U, V, W, X>::contains(const KeyType& key) const {
 }
 
 template <typename T, typename U, typename V, typename W, typename X>
+template <typename TYPE, typename HashTranslator>
+inline typename HashMap<T, U, V, W, X>::iterator HashMap<T, U, V, W, X>::find(
+    const TYPE& value) {
+  typedef HashMapTranslatorAdapter<ValueType, ValueTraits, TYPE, HashTranslator>
+      Adapter;
+  return m_impl.template find<TYPE, Adapter>(value);
+}
+
+template <typename T, typename U, typename V, typename W, typename X>
+template <typename TYPE, typename HashTranslator>
+inline typename HashMap<T, U, V, W, X>::const_iterator
+HashMap<T, U, V, W, X>::find(const TYPE& value) const {
+  typedef HashMapTranslatorAdapter<ValueType, ValueTraits, TYPE, HashTranslator>
+      Adapter;
+  return m_impl.template find<TYPE, Adapter>(value);
+}
+
+template <typename T, typename U, typename V, typename W, typename X>
+template <typename TYPE, typename HashTranslator>
+inline bool HashMap<T, U, V, W, X>::contains(const TYPE& value) const {
+  typedef HashMapTranslatorAdapter<ValueType, ValueTraits, TYPE, HashTranslator>
+      Adapter;
+  return m_impl.template contains<TYPE, Adapter>(value);
+}
+
+template <typename T, typename U, typename V, typename W, typename X>
 inline pair<typename HashMap<T, U, V, W, X>::iterator, bool>
 HashMap<T, U, V, W, X>::inlineAdd(const KeyType& key,
                                   const MappedType& mapped) {
@@ -201,6 +271,16 @@ HashMap<T, U, V, W, X>::set(const KeyType& key, const MappedType& mapped) {
     result.first->second = mapped;
   }
   return result;
+}
+
+template <typename T, typename U, typename V, typename W, typename X>
+template <typename TYPE, typename HashTranslator>
+pair<typename HashMap<T, U, V, W, X>::iterator, bool>
+HashMap<T, U, V, W, X>::add(const TYPE& key, const MappedType& value) {
+  typedef HashMapTranslatorAdapter<ValueType, ValueTraits, TYPE, HashTranslator>
+      Adapter;
+  return m_impl.template addPassingHashCode<TYPE, MappedType, Adapter>(key,
+                                                                       value);
 }
 
 template <typename T, typename U, typename V, typename W, typename X>

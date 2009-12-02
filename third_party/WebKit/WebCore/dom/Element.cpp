@@ -133,6 +133,12 @@ void Element::setAttribute(const QualifiedName& name,
   setAttribute(name, value, ec);
 }
 
+void Element::setCStringAttribute(const QualifiedName& name,
+                                  const char* cStringValue) {
+  ExceptionCode ec;
+  setAttribute(name, AtomicString(cStringValue), ec);
+}
+
 void Element::setBooleanAttribute(const QualifiedName& name, bool b) {
   if (b)
     setAttribute(name, name.localName());
