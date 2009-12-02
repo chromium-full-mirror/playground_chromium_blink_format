@@ -71,10 +71,10 @@ JSValue JSInspectedObjectWrapper::wrap(ExecState* unwrappedExec,
     return new (unwrappedExec) JSInspectedObjectWrapper(
         unwrappedExec, unwrappedObject,
         JSQuarantinedObjectWrapper::createStructure(jsNull()));
-  return new (unwrappedExec)
-      JSInspectedObjectWrapper(unwrappedExec, unwrappedObject,
-                               JSQuarantinedObjectWrapper::createStructure(
-                                   asObject(wrap(unwrappedExec, prototype))));
+  ProtectedJSValue wrappedProto = wrap(unwrappedExec, prototype);
+  return new (unwrappedExec) JSInspectedObjectWrapper(
+      unwrappedExec, unwrappedObject,
+      JSQuarantinedObjectWrapper::createStructure(asObject(wrappedProto)));
 }
 
 JSInspectedObjectWrapper::JSInspectedObjectWrapper(
