@@ -142,6 +142,9 @@ CSSParser::CSSParser(bool strictParsing)
       m_defaultNamespace(starAtom),
       m_data(0),
       yy_start(1),
+      m_allowImportRules(true),
+      m_allowVariablesRules(true),
+      m_allowNamespaceDeclarations(true),
       m_floatingMediaQuery(0),
       m_floatingMediaQueryExp(0),
       m_floatingMediaQueryExpList(0) {
@@ -230,6 +233,7 @@ void CSSParser::parseSheet(CSSStyleSheet* sheet, const String& string) {
 PassRefPtr<CSSRule> CSSParser::parseRule(CSSStyleSheet* sheet,
                                          const String& string) {
   m_styleSheet = sheet;
+  m_allowNamespaceDeclarations = false;
   setupParser("@-webkit-rule{", string, "} ");
   cssyyparse(this);
   return m_rule.release();
@@ -5301,7 +5305,7 @@ CSSRule* CSSParser::createCharsetRule(const CSSParserString& charset) {
 
 CSSRule* CSSParser::createImportRule(const CSSParserString& url,
                                      MediaList* media) {
-  if (!media || !m_styleSheet)
+  if (!media || !m_styleSheet || !m_allowImportRules)
     return 0;
   RefPtr<CSSImportRule> rule = CSSImportRule::create(m_styleSheet, url, media);
   CSSImportRule* result = rule.get();
@@ -5312,6 +5316,8 @@ CSSRule* CSSParser::createImportRule(const CSSParserString& url,
 CSSRule* CSSParser::createMediaRule(MediaList* media, CSSRuleList* rules) {
   if (!media || !rules || !m_styleSheet)
     return 0;
+  m_allowImportRules = m_allowNamespaceDeclarations = m_allowVariablesRules =
+      false;
   RefPtr<CSSMediaRule> rule = CSSMediaRule::create(m_styleSheet, media, rules);
   CSSMediaRule* result = rule.get();
   m_parsedStyleObjects.append(rule.release());
@@ -5327,6 +5333,8 @@ CSSRuleList* CSSParser::createRuleList() {
 }
 
 WebKitCSSKeyframesRule* CSSParser::createKeyframesRule() {
+  m_allowImportRules = m_allowNamespaceDeclarations = m_allowVariablesRules =
+      false;
   RefPtr<WebKitCSSKeyframesRule> rule =
       WebKitCSSKeyframesRule::create(m_styleSheet);
   WebKitCSSKeyframesRule* rulePtr = rule.get();
@@ -5335,6 +5343,8 @@ WebKitCSSKeyframesRule* CSSParser::createKeyframesRule() {
 }
 
 CSSRule* CSSParser::createStyleRule(Vector<CSSSelector*>* selectors) {
+  m_allowImportRules = m_allowNamespaceDeclarations = m_allowVariablesRules =
+      false;
   CSSStyleRule* result = 0;
   if (selectors) {
     RefPtr<CSSStyleRule> rule = CSSStyleRule::create(m_styleSheet);
@@ -5351,6 +5361,8 @@ CSSRule* CSSParser::createStyleRule(Vector<CSSSelector*>* selectors) {
 }
 
 CSSRule* CSSParser::createFontFaceRule() {
+  m_allowImportRules = m_allowNamespaceDeclarations = m_allowVariablesRules =
+      false;
   RefPtr<CSSFontFaceRule> rule = CSSFontFaceRule::create(m_styleSheet);
   for (unsigned i = 0; i < m_numParsedProperties; ++i) {
     CSSProperty* property = m_parsedProperties[i];
@@ -5372,6 +5384,15 @@ CSSRule* CSSParser::createFontFaceRule() {
   return result;
 }
 
+void CSSParser::addNamespace(const AtomicString& prefix,
+                             const AtomicString& uri) {
+  if (!m_styleSheet || !m_allowNamespaceDeclarations)
+    return;
+  m_allowImportRules = false;
+  m_allowVariablesRules = false;
+  m_styleSheet->addNamespace(this, prefix, uri);
+}
+
 #if !ENABLE(CSS_VARIABLES)
 
 CSSRule* CSSParser::createVariablesRule(MediaList*, bool) {
@@ -5390,6 +5411,9 @@ bool CSSParser::addVariableDeclarationBlock(const CSSParserString&) {
 
 CSSRule* CSSParser::createVariablesRule(MediaList* mediaList,
                                         bool variablesKeyword) {
+  if (!m_allowVariablesRules)
+    return 0;
+  m_allowImportRules = false;
   RefPtr<CSSVariablesRule> rule =
       CSSVariablesRule::create(m_styleSheet, mediaList, variablesKeyword);
   rule->setDeclaration(CSSVariablesDeclaration::create(

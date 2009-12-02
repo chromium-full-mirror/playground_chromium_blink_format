@@ -224,6 +224,8 @@ class CSSParser {
   MediaQuery* createFloatingMediaQuery(Vector<MediaQueryExp*>*);
   MediaQuery* sinkFloatingMediaQuery(MediaQuery*);
 
+  void addNamespace(const AtomicString& prefix, const AtomicString& uri);
+
   bool addVariable(const CSSParserString&, CSSParserValueList*);
   bool addVariableDeclarationBlock(const CSSParserString&);
   bool checkForVariables(CSSParserValueList*);
@@ -287,6 +289,10 @@ class CSSParser {
   int yyleng;
   int yyTok;
   int yy_start;
+
+  bool m_allowImportRules;
+  bool m_allowVariablesRules;
+  bool m_allowNamespaceDeclarations;
 
   Vector<RefPtr<StyleBase>> m_parsedStyleObjects;
   Vector<RefPtr<CSSRuleList>> m_parsedRuleLists;
