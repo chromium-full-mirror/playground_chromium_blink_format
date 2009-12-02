@@ -1589,6 +1589,32 @@ static JSValueRef pauseTransitionAtTimeOnElementWithIdCallback(
                                 propertyName.get(), time, elementId.get()));
 }
 
+static JSValueRef sampleSVGAnimationForElementAtTimeCallback(
+    JSContextRef context,
+    JSObjectRef function,
+    JSObjectRef thisObject,
+    size_t argumentCount,
+    const JSValueRef arguments[],
+    JSValueRef* exception) {
+  if (argumentCount != 3)
+    return JSValueMakeUndefined(context);
+
+  JSRetainPtr<JSStringRef> animationId(
+      Adopt, JSValueToStringCopy(context, arguments[0], exception));
+  ASSERT(!*exception);
+  double time = JSValueToNumber(context, arguments[1], exception);
+  ASSERT(!*exception);
+  JSRetainPtr<JSStringRef> elementId(
+      Adopt, JSValueToStringCopy(context, arguments[2], exception));
+  ASSERT(!*exception);
+
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  return JSValueMakeBoolean(context,
+                            controller->sampleSVGAnimationForElementAtTime(
+                                animationId.get(), time, elementId.get()));
+}
+
 static JSValueRef numberOfActiveAnimationsCallback(JSContextRef context,
                                                    JSObjectRef function,
                                                    JSObjectRef thisObject,
@@ -1870,6 +1896,9 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"pauseTransitionAtTimeOnElementWithId",
        pauseTransitionAtTimeOnElementWithIdCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"sampleSVGAnimationForElementAtTime",
+       sampleSVGAnimationForElementAtTimeCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"printToPDF", dumpAsPDFCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},

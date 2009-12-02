@@ -315,6 +315,11 @@ WEBKIT_API bool webkit_web_frame_pause_transition(WebKitWebFrame* frame,
                                                   double time,
                                                   const gchar* element);
 
+WEBKIT_API bool webkit_web_frame_pause_svg_animation(WebKitWebFrame* frame,
+                                                     const gchar* animationId,
+                                                     double time,
+                                                     const gchar* elementId);
+
 WEBKIT_API unsigned int webkit_web_frame_number_of_active_animations(
     WebKitWebFrame* frame);
 

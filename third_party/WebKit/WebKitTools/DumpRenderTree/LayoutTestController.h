@@ -281,6 +281,9 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
   bool pauseTransitionAtTimeOnElementWithId(JSStringRef propertyName,
                                             double time,
                                             JSStringRef elementId);
+  bool sampleSVGAnimationForElementAtTime(JSStringRef animationId,
+                                          double time,
+                                          JSStringRef elementId);
   unsigned numberOfActiveAnimations() const;
 
   void whiteListAccessFromOrigin(JSStringRef sourceOrigin,

@@ -62,6 +62,9 @@ class SMILTimeContainer : public RefCounted<SMILTimeContainer> {
 
   void setDocumentOrderIndexesDirty() { m_documentOrderIndexesDirty = true; }
 
+  // Move to a specific time. Only used for DRT testing purposes.
+  void sampleAnimationAtTime(const String& elementId, double seconds);
+
  private:
   SMILTimeContainer(SVGSVGElement* owner);
 
@@ -78,6 +81,8 @@ class SMILTimeContainer : public RefCounted<SMILTimeContainer> {
   double m_beginTime;
   double m_pauseTime;
   double m_accumulatedPauseTime;
+  double m_nextManualSampleTime;
+  String m_nextSamplingTarget;
 
   bool m_documentOrderIndexesDirty;
 

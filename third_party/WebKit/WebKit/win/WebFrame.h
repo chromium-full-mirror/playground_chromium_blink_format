@@ -250,6 +250,11 @@ class DECLSPEC_UUID("{A3676398-4485-4a9d-87DC-CB5A40E6351D}") WebFrame
                                                     IDOMNode*,
                                                     double secondsFromNow,
                                                     BOOL* transitionWasRunning);
+  virtual HRESULT STDMETHODCALLTYPE
+  pauseSVGAnimation(BSTR elementId,
+                    IDOMNode*,
+                    double secondsFromNow,
+                    BOOL* animationWasRunning);
   virtual HRESULT STDMETHODCALLTYPE numberOfActiveAnimations(UINT*);
 
   virtual HRESULT STDMETHODCALLTYPE isDisplayingStandaloneImage(BOOL*);
