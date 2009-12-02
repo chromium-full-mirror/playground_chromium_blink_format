@@ -119,8 +119,10 @@ class LayoutTestController : public QObject {
   bool pauseTransitionAtTimeOnElementWithId(const QString& propertyName,
                                             double time,
                                             const QString& elementId);
-  bool pauseSVGAnimationAtTimeOnElementWithId(double time,
-                                              const QString& elementId);
+  bool sampleSVGAnimationForElementAtTime(const QString& animationId,
+                                          double time,
+                                          const QString& elementId);
+
   unsigned numberOfActiveAnimations() const;
 
   void whiteListAccessFromOrigin(const QString& sourceOrigin,
