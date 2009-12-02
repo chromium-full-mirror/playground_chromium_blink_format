@@ -51,6 +51,7 @@ class HTMLAppletElement : public HTMLPlugInElement {
   virtual RenderWidget* renderWidgetForJSBindings() const;
 
   void setupApplet() const;
+  bool canEmbedJava() const;
 
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();

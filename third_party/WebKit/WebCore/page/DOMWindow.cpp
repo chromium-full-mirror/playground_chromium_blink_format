@@ -543,6 +543,9 @@ Storage* DOMWindow::sessionStorage() const {
   if (!document)
     return 0;
 
+  if (!document->securityOrigin()->canAccessStorage())
+    return 0;
+
   Page* page = document->page();
   if (!page)
     return 0;
@@ -564,6 +567,9 @@ Storage* DOMWindow::localStorage() const {
 
   Document* document = this->document();
   if (!document)
+    return 0;
+
+  if (!document->securityOrigin()->canAccessStorage())
     return 0;
 
   Page* page = document->page();
@@ -1079,14 +1085,16 @@ PassRefPtr<Database> DOMWindow::openDatabase(const String& name,
   if (!m_frame)
     return 0;
 
-  Document* doc = m_frame->document();
+  Document* document = m_frame->document();
+  if (!document->securityOrigin()->canAccessDatabase())
+    return 0;
 
   Settings* settings = m_frame->settings();
   if (!settings || !settings->databasesEnabled())
     return 0;
 
-  return Database::openDatabase(doc, name, version, displayName, estimatedSize,
-                                ec);
+  return Database::openDatabase(document, name, version, displayName,
+                                estimatedSize, ec);
 }
 #endif
 

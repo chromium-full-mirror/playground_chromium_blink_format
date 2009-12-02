@@ -756,8 +756,8 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   void setTitle(const String&, Element* titleElement = 0);
   void removeTitle(Element* titleElement);
 
-  String cookie() const;
-  void setCookie(const String&);
+  String cookie(ExceptionCode&) const;
+  void setCookie(const String&, ExceptionCode&);
 
   String referrer() const;
 
@@ -1026,6 +1026,8 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   // Note: It is dangerous to change the security origin of a document
   //       that already contains content.
   void setSecurityOrigin(SecurityOrigin*);
+
+  void updateSandboxFlags();  // Set sandbox flags as determined by the frame.
 
   bool processingLoadEvent() const { return m_processingLoadEvent; }
 

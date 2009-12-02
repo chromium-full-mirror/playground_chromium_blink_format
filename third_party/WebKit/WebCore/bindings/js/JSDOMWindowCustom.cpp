@@ -827,6 +827,10 @@ static Frame* createWindow(ExecState* exec,
   ASSERT(lexicalFrame);
   ASSERT(dynamicFrame);
 
+  // Sandboxed iframes cannot open new auxiliary browsing contexts.
+  if (lexicalFrame && lexicalFrame->loader()->isSandboxed(SandboxNavigation))
+    return 0;
+
   ResourceRequest request;
 
   // For whatever reason, Firefox uses the dynamicGlobalObject to determine
