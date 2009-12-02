@@ -225,6 +225,12 @@ class AccessibilityRenderObject : public AccessibilityObject {
   virtual bool supportsARIAFlowTo() const;
   virtual void ariaFlowToElements(AccessibilityChildrenVector&) const;
 
+  virtual bool supportsARIADropping();
+  virtual bool supportsARIADragging();
+  virtual bool isARIAGrabbed();
+  virtual void setARIAGrabbed(bool);
+  virtual void determineARIADropEffects(Vector<String>&);
+
   virtual VisiblePosition visiblePositionForPoint(const IntPoint&) const;
   virtual VisiblePosition visiblePositionForIndex(unsigned indexValue,
                                                   bool lastIndexOK) const;

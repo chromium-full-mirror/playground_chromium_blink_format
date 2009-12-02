@@ -323,6 +323,13 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   virtual bool supportsARIAFlowTo() const { return false; }
   virtual void ariaFlowToElements(AccessibilityChildrenVector&) const {}
 
+  // ARIA drag and drop
+  virtual bool supportsARIADropping() { return false; }
+  virtual bool supportsARIADragging() { return false; }
+  virtual bool isARIAGrabbed() { return false; }
+  virtual void setARIAGrabbed(bool) {}
+  virtual void determineARIADropEffects(Vector<String>&) {}
+
   virtual AccessibilityObject* doAccessibilityHitTest(const IntPoint&) const {
     return 0;
   }
