@@ -950,6 +950,7 @@ static ARIARoleMap* createARIARoleMap() {
       {"tab", TabRole},
       {"tablist", TabListRole},
       {"tabpanel", TabPanelRole},
+      {"text", StaticTextRole},
       {"textbox", TextAreaRole},
       {"timer", ApplicationTimerRole},
       {"toolbar", ToolbarRole},
