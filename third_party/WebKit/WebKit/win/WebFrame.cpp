@@ -92,7 +92,7 @@
 #include <WebCore/RenderView.h>
 #include <WebCore/RenderTreeAsText.h>
 #include <WebCore/Settings.h>
-#include <WebCore/svg/animation/SVGSMILElement.h>
+#include <WebCore/SVGSMILElement.h>
 #include <WebCore/TextIterator.h>
 #include <WebCore/JSDOMBinding.h>
 #include <WebCore/ScriptController.h>
@@ -1138,13 +1138,13 @@ HRESULT WebFrame::pauseSVGAnimation(BSTR elementId,
     return E_FAIL;
 
   COMPtr<DOMNode> domNode(Query, node);
-  if (!domNode || !SVGSMILElement::isSMILElement(domNode))
+  if (!domNode || !SVGSMILElement::isSMILElement(domNode->node()))
     return E_FAIL;
 
 #if ENABLE(SVG)
   *animationWasRunning = document->accessSVGExtensions()->sampleAnimationAtTime(
       String(elementId, SysStringLen(elementId)),
-      static_cast<SVGSMILElement*>(domNode), secondsFromNow);
+      static_cast<SVGSMILElement*>(domNode->node()), secondsFromNow);
 #else
   *animationWasRunning = FALSE;
 #endif
