@@ -264,6 +264,8 @@ class CSSParser {
   int lex();
 
  private:
+  void recheckAtKeyword(const UChar* str, int len);
+
   void clearProperties();
 
   void setupParser(const char* prefix, const String&, const char* suffix);
