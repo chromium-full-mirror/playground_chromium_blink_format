@@ -110,7 +110,7 @@ enum SandboxFlag {
   SandboxAll = -1  // Mask with all bits set to 1.
 };
 
-typedef unsigned SandboxFlags;
+typedef int SandboxFlags;
 }
 
 #endif
