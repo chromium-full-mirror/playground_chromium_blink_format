@@ -589,11 +589,11 @@ bool WebGLRenderingContext::validateIndexArray(unsigned long count,
 
   if (type == GraphicsContext3D::UNSIGNED_SHORT) {
     // For an unsigned short array, offset must be divisible by 2 for alignment
-    // reasons
-    if (uoffset & 1 != 0)
+    // reasons.
+    if (uoffset & 1)
       return false;
 
-    // Make uoffset an element offset
+    // Make uoffset an element offset.
     uoffset /= 2;
 
     unsigned long n = m_boundElementArrayBuffer->byteLength(
@@ -624,7 +624,7 @@ bool WebGLRenderingContext::validateIndexArray(unsigned long count,
     }
   }
 
-  // Then set the last index in the index array and make sure it is valid
+  // Then set the last index in the index array and make sure it is valid.
   numElements = lastIndex + 1;
   return numElements > 0;
 }
