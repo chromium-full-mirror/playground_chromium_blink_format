@@ -81,6 +81,8 @@ class InspectorDOMAgent : public EventListener {
   InspectorDOMAgent(InspectorFrontend* frontend);
   ~InspectorDOMAgent();
 
+  void reset();
+
   virtual bool operator==(const EventListener& other);
 
   // Methods called from the frontend.
@@ -98,6 +100,7 @@ class InspectorDOMAgent : public EventListener {
   void releaseDanglingNodes();
 
   Node* nodeForId(long nodeId);
+  Node* nodeForPath(const String& path);
   long pushNodePathToFrontend(Node* node);
 
  private:
@@ -110,7 +113,7 @@ class InspectorDOMAgent : public EventListener {
   long bind(Node* node, NodeToIdMap* nodesMap);
   void unbind(Node* node, NodeToIdMap* nodesMap);
 
-  void pushDocumentToFrontend();
+  bool pushDocumentToFrontend();
   void pushChildNodesToFrontend(long nodeId);
 
   ScriptObject buildObjectForNode(Node* node, int depth, NodeToIdMap* nodesMap);
@@ -131,7 +134,7 @@ class InspectorDOMAgent : public EventListener {
   Node* innerFirstChild(Node* node);
   Node* innerNextSibling(Node* node);
   Node* innerPreviousSibling(Node* node);
-  int innerChildNodeCount(Node* node);
+  unsigned innerChildNodeCount(Node* node);
   Node* innerParentNode(Node* node);
   bool isWhitespace(Node* node);
 

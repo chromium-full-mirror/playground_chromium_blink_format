@@ -65,12 +65,10 @@ InspectorDOMAgent::InspectorDOMAgent(InspectorFrontend* frontend)
       m_lastNodeId(1) {}
 
 InspectorDOMAgent::~InspectorDOMAgent() {
-  setDocument(0);
+  reset();
 }
 
-void InspectorDOMAgent::setDocument(Document* doc) {
-  if (doc == mainFrameDocument())
-    return;
+void InspectorDOMAgent::reset() {
   discardBindings();
 
   ListHashSet<RefPtr<Document>> copy = m_documents;
@@ -79,13 +77,20 @@ void InspectorDOMAgent::setDocument(Document* doc) {
     stopListening((*it).get());
 
   ASSERT(!m_documents.size());
+}
+
+void InspectorDOMAgent::setDocument(Document* doc) {
+  if (doc == mainFrameDocument())
+    return;
+
+  reset();
 
   if (doc) {
     startListening(doc);
-    if (doc->documentElement()) {
+    if (doc->documentElement())
       pushDocumentToFrontend();
-    }
-  }
+  } else
+    m_frontend->setDocument(ScriptObject());
 }
 
 void InspectorDOMAgent::releaseDanglingNodes() {
@@ -233,11 +238,14 @@ void InspectorDOMAgent::unbind(Node* node, NodeToIdMap* nodesMap) {
   }
 }
 
-void InspectorDOMAgent::pushDocumentToFrontend() {
+bool InspectorDOMAgent::pushDocumentToFrontend() {
   Document* document = mainFrameDocument();
+  if (!document)
+    return false;
   if (!m_documentNodeToIdMap.contains(document))
     m_frontend->setDocument(
         buildObjectForNode(document, 2, &m_documentNodeToIdMap));
+  return true;
 }
 
 void InspectorDOMAgent::pushChildNodesToFrontend(long nodeId) {
@@ -271,6 +279,34 @@ Node* InspectorDOMAgent::nodeForId(long id) {
   return 0;
 }
 
+Node* InspectorDOMAgent::nodeForPath(const String& path) {
+  // The path is of form "1,HTML,2,BODY,1,DIV"
+  Node* node = mainFrameDocument();
+  if (!node)
+    return 0;
+
+  Vector<String> pathTokens;
+  path.split(",", false, pathTokens);
+  for (size_t i = 0; i < pathTokens.size() - 1; i += 2) {
+    bool success = true;
+    unsigned childNumber = pathTokens[i].toUInt(&success);
+    if (!success)
+      return 0;
+    if (childNumber >= innerChildNodeCount(node))
+      return 0;
+
+    Node* child = innerFirstChild(node);
+    String childName = pathTokens[i + 1];
+    for (size_t j = 0; child && j < childNumber; ++j)
+      child = innerNextSibling(child);
+
+    if (!child || child->nodeName() != childName)
+      return 0;
+    node = child;
+  }
+  return node;
+}
+
 void InspectorDOMAgent::getChildNodes(long callId, long nodeId) {
   pushChildNodesToFrontend(nodeId);
   m_frontend->didGetChildNodes(callId);
@@ -281,7 +317,8 @@ long InspectorDOMAgent::pushNodePathToFrontend(Node* nodeToPush) {
 
   // If we are sending information to the client that is currently being
   // created. Send root node first.
-  pushDocumentToFrontend();
+  if (!pushDocumentToFrontend())
+    return 0;
 
   // Return id in case the node is known.
   long result = m_documentNodeToIdMap.get(nodeToPush);
@@ -580,8 +617,8 @@ Node* InspectorDOMAgent::innerPreviousSibling(Node* node) {
   return node;
 }
 
-int InspectorDOMAgent::innerChildNodeCount(Node* node) {
-  int count = 0;
+unsigned InspectorDOMAgent::innerChildNodeCount(Node* node) {
+  unsigned count = 0;
   Node* child = innerFirstChild(node);
   while (child) {
     count++;

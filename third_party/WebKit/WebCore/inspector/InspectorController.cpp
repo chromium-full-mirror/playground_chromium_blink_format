@@ -642,9 +642,9 @@ void InspectorController::close() {
 #endif
   closeWindow();
 
-  m_frontend.set(0);
   m_injectedScriptObj = ScriptObject();
   releaseDOMAgent();
+  m_frontend.set(0);
   m_timelineAgent = 0;
   m_scriptState = 0;
   if (m_page) {
@@ -687,7 +687,7 @@ void InspectorController::releaseDOMAgent() {
   // m_domAgent is RefPtr. Remove DOM listeners first to ensure that there are
   // no references to the DOM agent from the DOM tree.
   if (m_domAgent)
-    m_domAgent->setDocument(0);
+    m_domAgent->reset();
   m_domAgent = 0;
 }
 
@@ -756,7 +756,7 @@ void InspectorController::resetScriptObjects() {
     m_timelineAgent->reset();
 
   m_frontend->reset();
-  m_domAgent->setDocument(0);
+  m_domAgent->reset();
   m_objectGroups.clear();
   m_idToWrappedObject.clear();
 }
