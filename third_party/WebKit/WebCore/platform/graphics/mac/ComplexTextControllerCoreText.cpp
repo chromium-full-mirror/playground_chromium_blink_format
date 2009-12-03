@@ -32,6 +32,15 @@
 
 #include "Font.h"
 
+#if defined(BUILDING_ON_LEOPARD)
+// The following symbols are SPI in 10.5.
+extern "C" {
+void CTRunGetAdvances(CTRunRef run, CFRange range, CGSize buffer[]);
+const CGSize* CTRunGetAdvancesPtr(CTRunRef run);
+extern const CFStringRef kCTTypesetterOptionForcedEmbeddingLevel;
+}
+#endif
+
 namespace WebCore {
 
 ComplexTextController::ComplexTextRun::ComplexTextRun(
