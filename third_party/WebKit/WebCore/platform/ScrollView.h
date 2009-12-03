@@ -117,6 +117,13 @@ class ScrollView : public Widget, public ScrollbarClient {
            verticalScrollbarMode() != ScrollbarAlwaysOff;
   }
 
+  // By default you only receive paint events for the area that is visible. In
+  // the case of using a
+  // tiled backing store, this method can be set, so that the view paints the
+  // entire contents.
+  bool paintsEntireContents() const { return m_paintsEntireContents; }
+  void setPaintsEntireContents(bool);
+
   // Overridden by FrameView to create custom CSS scrollbars if applicable.
   virtual PassRefPtr<Scrollbar> createScrollbar(ScrollbarOrientation);
 
@@ -336,6 +343,8 @@ class ScrollView : public Widget, public ScrollbarClient {
   IntPoint m_panScrollIconPoint;
   bool m_drawPanScrollIcon;
   bool m_useFixedLayout;
+
+  bool m_paintsEntireContents;
 
   void init();
   void destroy();
