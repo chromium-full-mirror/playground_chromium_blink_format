@@ -34,6 +34,7 @@
 #include "JSONObject.h"
 #include "JSString.h"
 #include "JSValue.h"
+#include "JSZombie.h"
 #include "MarkStack.h"
 #include "Nodes.h"
 #include "Tracing.h"
@@ -194,11 +195,13 @@ void Heap::destroy() {
   m_markListSet = 0;
 
   sweep<PrimaryHeap>();
-  // No need to sweep number heap, because the JSNumber destructor doesn't do
-  // anything.
-
+// No need to sweep number heap, because the JSNumber destructor doesn't do
+// anything.
+#if ENABLE(JSC_ZOMBIES)
+  ASSERT(primaryHeap.numLiveObjects == primaryHeap.numZombies);
+#else
   ASSERT(!primaryHeap.numLiveObjects);
-
+#endif
   freeBlocks(&primaryHeap);
   freeBlocks(&numberHeap);
 
@@ -1055,17 +1058,26 @@ size_t Heap::sweep() {
             // assumes the object has a valid vptr.)
             if (cell->u.freeCell.zeroIfFree == 0)
               continue;
-
+#if ENABLE(JSC_ZOMBIES)
+            if (!imp->isZombie()) {
+              const ClassInfo* info = imp->classInfo();
+              imp->~JSCell();
+              new (imp) JSZombie(info, JSZombie::leakedZombieStructure());
+              heap.numZombies++;
+            }
+#else
             imp->~JSCell();
+#endif
           }
-
-          --usedCells;
           --numLiveObjects;
+#if !ENABLE(JSC_ZOMBIES)
+          --usedCells;
 
           // put cell on the free list
           cell->u.freeCell.zeroIfFree = 0;
           cell->u.freeCell.next = freeList - (cell + 1);
           freeList = cell;
+#endif
         }
       }
     } else {
@@ -1081,8 +1093,18 @@ size_t Heap::sweep() {
                                     HeapConstants<heapType>::bitmapShift)) {
             if (heapType != NumberHeap) {
               JSCell* imp = reinterpret_cast<JSCell*>(cell);
+#if ENABLE(JSC_ZOMBIES)
+              if (!imp->isZombie()) {
+                const ClassInfo* info = imp->classInfo();
+                imp->~JSCell();
+                new (imp) JSZombie(info, JSZombie::leakedZombieStructure());
+                heap.numZombies++;
+              }
+#else
               imp->~JSCell();
+#endif
             }
+#if !ENABLE(JSC_ZOMBIES)
             --usedCells;
             --numLiveObjects;
 
@@ -1090,6 +1112,7 @@ size_t Heap::sweep() {
             cell->u.freeCell.zeroIfFree = 0;
             cell->u.freeCell.next = freeList - (cell + 1);
             freeList = cell;
+#endif
           }
         }
       }

@@ -171,6 +171,10 @@ class JSValue {
   uint32_t toUInt32(ExecState*) const;
   uint32_t toUInt32(ExecState*, bool& ok) const;
 
+#if ENABLE(JSC_ZOMBIES)
+  bool isZombie() const;
+#endif
+
   // Floating point conversions (this is a convenience method for webcore;
   // signle precision float is not a representation used in JS or JSC).
   float toFloat(ExecState* exec) const {
@@ -435,6 +439,9 @@ inline EncodedJSValue JSValue::encode(JSValue value) {
 inline JSValue JSValue::decode(EncodedJSValue encodedJSValue) {
   JSValue v;
   v.u.asEncodedJSValue = encodedJSValue;
+#if ENABLE(JSC_ZOMBIES)
+  ASSERT(!v.isZombie());
+#endif
   return v;
 }
 
@@ -474,6 +481,9 @@ inline JSValue::JSValue(JSCell* ptr) {
   else
     u.asBits.tag = EmptyValueTag;
   u.asBits.payload = reinterpret_cast<int32_t>(ptr);
+#if ENABLE(JSC_ZOMBIES)
+  ASSERT(!isZombie());
+#endif
 }
 
 inline JSValue::JSValue(const JSCell* ptr) {
@@ -482,6 +492,9 @@ inline JSValue::JSValue(const JSCell* ptr) {
   else
     u.asBits.tag = EmptyValueTag;
   u.asBits.payload = reinterpret_cast<int32_t>(const_cast<JSCell*>(ptr));
+#if ENABLE(JSC_ZOMBIES)
+  ASSERT(!isZombie());
+#endif
 }
 
 inline JSValue::operator bool() const {
@@ -704,7 +717,7 @@ inline bool JSValue::getNumber(double& result) const {
   return false;
 }
 
-#else   // USE(JSVALUE32_64)
+#else  // USE(JSVALUE32_64)
 
 // JSValue member functions.
 inline EncodedJSValue JSValue::encode(JSValue value) {
@@ -732,9 +745,17 @@ inline JSValue::JSValue() : m_ptr(0) {}
 inline JSValue::JSValue(HashTableDeletedValueTag)
     : m_ptr(reinterpret_cast<JSCell*>(0x4)) {}
 
-inline JSValue::JSValue(JSCell* ptr) : m_ptr(ptr) {}
+inline JSValue::JSValue(JSCell* ptr) : m_ptr(ptr) {
+#if ENABLE(JSC_ZOMBIES)
+  ASSERT(!isZombie());
+#endif
+}
 
-inline JSValue::JSValue(const JSCell* ptr) : m_ptr(const_cast<JSCell*>(ptr)) {}
+inline JSValue::JSValue(const JSCell* ptr) : m_ptr(const_cast<JSCell*>(ptr)) {
+#if ENABLE(JSC_ZOMBIES)
+  ASSERT(!isZombie());
+#endif
+}
 
 inline JSValue::operator bool() const {
   return m_ptr;

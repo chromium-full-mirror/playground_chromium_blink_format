@@ -43,6 +43,7 @@ class JSCell : public NoncopyableCustomAllocated {
   friend class JSString;
   friend class JSValue;
   friend class JSAPIValueWrapper;
+  friend class JSZombie;
   friend struct VPtrSet;
 
  private:
@@ -94,6 +95,9 @@ class JSCell : public NoncopyableCustomAllocated {
   }
 
   virtual void markChildren(MarkStack&);
+#if ENABLE(JSC_ZOMBIES)
+  virtual bool isZombie() const { return false; }
+#endif
 
   // Object operations, with the toObject operation included.
   virtual const ClassInfo* classInfo() const;
@@ -325,6 +329,11 @@ inline Heap* Heap::heap(JSCell* c) {
   return cellBlock(c)->heap;
 }
 
+#if ENABLE(JSC_ZOMBIES)
+inline bool JSValue::isZombie() const {
+  return isCell() && asCell() && asCell()->isZombie();
+}
+#endif
 }  // namespace JSC
 
 #endif  // JSCell_h

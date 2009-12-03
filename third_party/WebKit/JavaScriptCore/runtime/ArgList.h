@@ -103,6 +103,10 @@ class MarkedArgumentBuffer : public Noncopyable {
   void append(JSValue v) {
     ASSERT(!m_isReadOnly);
 
+#if ENABLE(JSC_ZOMBIES)
+    ASSERT(!v.isZombie());
+#endif
+
     if (m_isUsingInlineBuffer && m_size < inlineCapacity) {
       m_vector.uncheckedAppend(v);
       ++m_size;
@@ -171,7 +175,12 @@ class ArgList {
   ArgList() : m_args(0), m_argCount(0) {}
 
   ArgList(JSValue* args, unsigned argCount)
-      : m_args(args), m_argCount(argCount) {}
+      : m_args(args), m_argCount(argCount) {
+#if ENABLE(JSC_ZOMBIES)
+    for (size_t i = 0; i < argCount; i++)
+      ASSERT(!m_args[i].isZombie());
+#endif
+  }
 
   ArgList(Register* args, int argCount)
       : m_args(reinterpret_cast<JSValue*>(args)), m_argCount(argCount) {

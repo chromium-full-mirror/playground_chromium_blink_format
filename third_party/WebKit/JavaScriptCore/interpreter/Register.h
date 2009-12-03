@@ -99,6 +99,9 @@ ALWAYS_INLINE Register::Register() {
 }
 
 ALWAYS_INLINE Register::Register(JSValue v) {
+#if ENABLE(JSC_ZOMBIES)
+  ASSERT(!v.isZombie());
+#endif
   u.value = JSValue::encode(v);
 }
 
