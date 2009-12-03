@@ -126,7 +126,8 @@ Settings::Settings(Page* page)
       m_showDebugBorders(false),
       m_showRepaintCounter(false),
       m_experimentalNotificationsEnabled(false),
-      m_webGLEnabled(false) {
+      m_webGLEnabled(false),
+      m_geolocationEnabled(true) {
   // A Frame may not have been created yet, so we initialize the AtomicString
   // hash before trying to use it.
   AtomicString::init();
@@ -501,6 +502,10 @@ void Settings::setShouldUseHighResolutionTimers(
 
 void Settings::setWebGLEnabled(bool enabled) {
   m_webGLEnabled = enabled;
+}
+
+void Settings::setGeolocationEnabled(bool enabled) {
+  m_geolocationEnabled = enabled;
 }
 
 }  // namespace WebCore
