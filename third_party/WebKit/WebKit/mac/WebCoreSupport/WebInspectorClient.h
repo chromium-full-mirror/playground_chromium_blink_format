@@ -63,10 +63,9 @@ class WebInspectorClient : public WebCore::InspectorClient {
   virtual void inspectedURLChanged(const WebCore::String& newURL);
 
   virtual void populateSetting(const WebCore::String& key,
-                               WebCore::InspectorController::Setting&);
+                               WebCore::String* value);
   virtual void storeSetting(const WebCore::String& key,
-                            const WebCore::InspectorController::Setting&);
-  virtual void removeSetting(const WebCore::String& key);
+                            const WebCore::String& value);
 
   virtual void inspectorWindowObjectCleared();
 

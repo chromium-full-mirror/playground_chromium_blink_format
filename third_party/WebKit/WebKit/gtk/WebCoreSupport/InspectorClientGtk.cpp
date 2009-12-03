@@ -197,18 +197,11 @@ void InspectorClient::inspectorWindowObjectCleared() {
   notImplemented();
 }
 
-void InspectorClient::populateSetting(const String& key,
-                                      InspectorController::Setting& setting) {
+void InspectorClient::populateSetting(const String& key, String* value) {
   notImplemented();
 }
 
-void InspectorClient::storeSetting(
-    const String& key,
-    const InspectorController::Setting& setting) {
-  notImplemented();
-}
-
-void InspectorClient::removeSetting(const String& key) {
+void InspectorClient::storeSetting(const String& key, const String& value) {
   notImplemented();
 }
 }
