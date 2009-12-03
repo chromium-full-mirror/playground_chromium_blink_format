@@ -336,6 +336,7 @@ class V8DOMWrapper {
   // Returns the JS wrapper of a window object, initializes the environment
   // of the window frame if needed.
   static v8::Handle<v8::Value> convertWindowToV8Object(DOMWindow*);
+  static v8::Handle<v8::Value> convertNamedNodeMapToV8Object(NamedNodeMap*);
 
 #if ENABLE(SVG)
   static v8::Handle<v8::Value> convertSVGElementInstanceToV8Object(

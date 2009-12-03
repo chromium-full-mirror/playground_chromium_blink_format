@@ -228,6 +228,10 @@ class V8Custom {
       kDefaultWrapperInternalFieldCount + 0;
   static const int kStyleSheetInternalFieldCount =
       kDefaultWrapperInternalFieldCount + 1;
+  static const int kNamedNodeMapOwnerNodeIndex =
+      kDefaultWrapperInternalFieldCount + 0;
+  static const int kNamedNodeMapInternalFieldCount =
+      kDefaultWrapperInternalFieldCount + 1;
 
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
   static const int kDOMApplicationCacheCacheIndex =
