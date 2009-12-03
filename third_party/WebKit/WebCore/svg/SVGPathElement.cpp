@@ -67,8 +67,9 @@ FloatPoint SVGPathElement::getPointAtLength(float length) {
   return toPathData().pointAtLength(length, ok);
 }
 
-unsigned long SVGPathElement::getPathSegAtLength(float length) {
-  return pathSegList()->getPathSegAtLength(length);
+unsigned long SVGPathElement::getPathSegAtLength(float length,
+                                                 ExceptionCode& ec) {
+  return pathSegList()->getPathSegAtLength(length, ec);
 }
 
 PassRefPtr<SVGPathSegClosePath> SVGPathElement::createSVGPathSegClosePath() {

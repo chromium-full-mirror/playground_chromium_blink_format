@@ -56,6 +56,10 @@ class SVGList : public RefCounted<SVGList<Item>> {
   void clear(ExceptionCode&) { m_vector.clear(); }
 
   Item initialize(Item newItem, ExceptionCode& ec) {
+    if (!newItem) {
+      ec = TYPE_MISMATCH_ERR;
+      return TypeOperations::nullItem();
+    }
     clear(ec);
     return appendItem(newItem, ec);
   }
@@ -88,7 +92,12 @@ class SVGList : public RefCounted<SVGList<Item>> {
     return m_vector[index];
   }
 
-  Item insertItemBefore(Item newItem, unsigned int index, ExceptionCode&) {
+  Item insertItemBefore(Item newItem, unsigned int index, ExceptionCode& ec) {
+    if (!newItem) {
+      ec = TYPE_MISMATCH_ERR;
+      return TypeOperations::nullItem();
+    }
+
     if (index < m_vector.size()) {
       m_vector.insert(index, newItem);
     } else {
@@ -100,6 +109,11 @@ class SVGList : public RefCounted<SVGList<Item>> {
   Item replaceItem(Item newItem, unsigned int index, ExceptionCode& ec) {
     if (index >= m_vector.size()) {
       ec = INDEX_SIZE_ERR;
+      return TypeOperations::nullItem();
+    }
+
+    if (!newItem) {
+      ec = TYPE_MISMATCH_ERR;
       return TypeOperations::nullItem();
     }
 
@@ -118,7 +132,12 @@ class SVGList : public RefCounted<SVGList<Item>> {
     return item;
   }
 
-  Item appendItem(Item newItem, ExceptionCode&) {
+  Item appendItem(Item newItem, ExceptionCode& ec) {
+    if (!newItem) {
+      ec = TYPE_MISMATCH_ERR;
+      return TypeOperations::nullItem();
+    }
+
     m_vector.append(newItem);
     return newItem;
   }

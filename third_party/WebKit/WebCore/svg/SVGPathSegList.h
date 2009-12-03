@@ -38,7 +38,7 @@ class SVGPathSegList : public SVGList<RefPtr<SVGPathSeg>> {
   }
   virtual ~SVGPathSegList();
 
-  unsigned getPathSegAtLength(double);
+  unsigned getPathSegAtLength(double, ExceptionCode&);
   Path toPathData();
 
   static PassRefPtr<SVGPathSegList> createAnimated(
