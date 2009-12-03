@@ -46,7 +46,7 @@ InsertNodeBeforeCommand::InsertNodeBeforeCommand(PassRefPtr<Node> insertChild,
 
 void InsertNodeBeforeCommand::doApply() {
   Node* parent = m_refChild->parentNode();
-  if (!parent)
+  if (!parent || !parent->isContentEditable())
     return;
 
   ExceptionCode ec;
@@ -54,6 +54,9 @@ void InsertNodeBeforeCommand::doApply() {
 }
 
 void InsertNodeBeforeCommand::doUnapply() {
+  if (!m_insertChild->isContentEditable())
+    return;
+
   ExceptionCode ec;
   m_insertChild->remove(ec);
 }

@@ -44,6 +44,10 @@ void JoinTextNodesCommand::doApply() {
   if (m_text1->nextSibling() != m_text2)
     return;
 
+  Node* parent = m_text2->parentNode();
+  if (!parent || !parent->isContentEditable())
+    return;
+
   ExceptionCode ec = 0;
   m_text2->insertData(0, m_text1->data(), ec);
   if (ec)
@@ -57,7 +61,7 @@ void JoinTextNodesCommand::doUnapply() {
     return;
 
   Node* parent = m_text2->parentNode();
-  if (!parent)
+  if (!parent || !parent->isContentEditable())
     return;
 
   ExceptionCode ec = 0;

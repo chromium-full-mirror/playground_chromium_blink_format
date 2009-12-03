@@ -43,11 +43,17 @@ InsertIntoTextNodeCommand::InsertIntoTextNodeCommand(PassRefPtr<Text> node,
 }
 
 void InsertIntoTextNodeCommand::doApply() {
+  if (!m_node->isContentEditable())
+    return;
+
   ExceptionCode ec;
   m_node->insertData(m_offset, m_text, ec);
 }
 
 void InsertIntoTextNodeCommand::doUnapply() {
+  if (!m_node->isContentEditable())
+    return;
+
   ExceptionCode ec;
   m_node->deleteData(m_offset, m_text.length(), ec);
 }
