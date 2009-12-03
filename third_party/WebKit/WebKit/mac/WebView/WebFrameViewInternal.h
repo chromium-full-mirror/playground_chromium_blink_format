@@ -41,7 +41,9 @@
 - (float)_verticalPageScrollDistance;
 + (NSMutableDictionary*)_viewTypesAllowImageTypeOmission:
     (BOOL)allowImageTypeOmission;
-+ (Class)_viewClassForMIMEType:(NSString*)MIMEType;
+- (Class)_viewClassForMIMEType:(NSString*)MIMEType;
++ (Class)_viewClassForMIMEType:(NSString*)MIMEType
+               allowingPlugins:(BOOL)allowPlugins;
 + (BOOL)_canShowMIMETypeAsHTML:(NSString*)MIMEType;
 - (WebDynamicScrollBarsView*)_scrollView;
 - (void)_install;
