@@ -35,6 +35,7 @@
 #include "Logging.h"
 #include "Page.h"
 #include "PageCache.h"
+#include "SerializedScriptValue.h"
 
 using namespace std;
 
@@ -55,12 +56,17 @@ BackForwardList::~BackForwardList() {
 }
 
 void BackForwardList::addItem(PassRefPtr<HistoryItem> prpItem) {
+  insertItemAfterCurrent(prpItem, true);
+}
+
+void BackForwardList::insertItemAfterCurrent(PassRefPtr<HistoryItem> prpItem,
+                                             bool removeForwardList) {
   ASSERT(prpItem);
   if (m_capacity == 0 || !m_enabled)
     return;
 
   // Toss anything in the forward list
-  if (m_current != NoCurrentItemIndex) {
+  if (removeForwardList && m_current != NoCurrentItemIndex) {
     unsigned targetSize = m_current + 1;
     while (m_entries.size() > targetSize) {
       RefPtr<HistoryItem> item = m_entries.last();
@@ -83,8 +89,8 @@ void BackForwardList::addItem(PassRefPtr<HistoryItem> prpItem) {
         item.get());
   }
 
-  m_entries.append(prpItem);
-  m_entryHash.add(m_entries.last());
+  m_entryHash.add(prpItem.get());
+  m_entries.insert(m_current + 1, prpItem);
   m_current++;
   m_page->mainFrame()->loader()->client()->dispatchDidAddBackForwardItem(
       currentItem());
@@ -230,6 +236,29 @@ HistoryItem* BackForwardList::itemAtIndex(int index) {
 
 HistoryItemVector& BackForwardList::entries() {
   return m_entries;
+}
+
+void BackForwardList::pushStateItem(PassRefPtr<HistoryItem> newItem) {
+  ASSERT(newItem);
+  ASSERT(newItem->document());
+  ASSERT(newItem->stateObject());
+
+  RefPtr<HistoryItem> current = currentItem();
+  ASSERT(current);
+
+  Document* newItemDocument = newItem->document();
+  while (HistoryItem* item = forwardItem()) {
+    if (item->document() != newItemDocument)
+      break;
+    removeItem(item);
+  }
+
+  insertItemAfterCurrent(newItem, false);
+
+  if (!current->document()) {
+    current->setDocument(newItemDocument);
+    current->setStateObject(SerializedScriptValue::create());
+  }
 }
 
 void BackForwardList::close() {

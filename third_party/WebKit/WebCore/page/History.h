@@ -26,12 +26,16 @@
 #ifndef History_h
 #define History_h
 
+#include "KURL.h"
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 
 namespace WebCore {
 
 class Frame;
+class SerializedScriptValue;
+class String;
+typedef int ExceptionCode;
 
 class History : public RefCounted<History> {
  public:
@@ -47,8 +51,17 @@ class History : public RefCounted<History> {
   void forward();
   void go(int distance);
 
+  enum StateObjectType { StateObjectPush, StateObjectReplace };
+  void stateObjectAdded(PassRefPtr<SerializedScriptValue>,
+                        const String& title,
+                        const String& url,
+                        StateObjectType,
+                        ExceptionCode&);
+
  private:
   History(Frame*);
+
+  KURL urlForState(const String& url);
 
   Frame* m_frame;
 };

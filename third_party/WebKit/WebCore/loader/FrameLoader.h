@@ -74,6 +74,7 @@ class ScriptSourceCode;
 class ScriptString;
 class ScriptValue;
 class SecurityOrigin;
+class SerializedScriptValue;
 class SharedBuffer;
 class SubstituteData;
 class TextResourceDecoder;
@@ -428,6 +429,9 @@ class FrameLoader : public Noncopyable {
                   const Vector<String>& paramValues,
                   bool useFallback);
 
+  void navigateWithinDocument(HistoryItem*);
+  void navigateToDifferentDocument(HistoryItem*, FrameLoadType);
+
   bool loadProvisionalItemFromCachedPage();
   void cachePageForHistoryItem(HistoryItem*);
   void pageHidden();
@@ -551,7 +555,9 @@ class FrameLoader : public Noncopyable {
                       const String& name,
                       const String& referrer);
 
-  void scrollToAnchor(const KURL&);
+  void loadInSameDocument(const KURL&,
+                          SerializedScriptValue* stateObject,
+                          bool isNewNavigation);
 
   void provisionalLoadStarted();
 

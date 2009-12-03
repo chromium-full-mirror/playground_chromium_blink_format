@@ -174,6 +174,10 @@ void HTMLFrameSetElement::parseMappedAttribute(MappedAttribute* attr) {
     document()->setWindowAttributeEventListener(
         eventNames().offlineEvent,
         createAttributeEventListener(document()->frame(), attr));
+  else if (attr->name() == onpopstateAttr)
+    document()->setWindowAttributeEventListener(
+        eventNames().popstateEvent,
+        createAttributeEventListener(document()->frame(), attr));
   else
     HTMLElement::parseMappedAttribute(attr);
 }

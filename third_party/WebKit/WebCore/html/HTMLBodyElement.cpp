@@ -146,6 +146,10 @@ void HTMLBodyElement::parseMappedAttribute(MappedAttribute* attr) {
     document()->setWindowAttributeEventListener(
         eventNames().pageshowEvent,
         createAttributeEventListener(document()->frame(), attr));
+  else if (attr->name() == onpopstateAttr)
+    document()->setWindowAttributeEventListener(
+        eventNames().popstateEvent,
+        createAttributeEventListener(document()->frame(), attr));
   else if (attr->name() == onblurAttr)
     document()->setWindowAttributeEventListener(
         eventNames().blurEvent,

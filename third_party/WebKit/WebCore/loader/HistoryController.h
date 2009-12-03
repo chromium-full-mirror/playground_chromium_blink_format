@@ -40,6 +40,7 @@ namespace WebCore {
 
 class Frame;
 class HistoryItem;
+class SerializedScriptValue;
 
 class HistoryController : public Noncopyable {
  public:
@@ -66,7 +67,7 @@ class HistoryController : public Noncopyable {
   void updateForRedirectWithLockedBackForwardList();
   void updateForClientRedirect();
   void updateForCommit();
-  void updateForAnchorScroll();
+  void updateForSameDocumentNavigation();
   void updateForFrameLoadCompleted();
 
   HistoryItem* currentItem() const { return m_currentItem.get(); }
@@ -75,6 +76,13 @@ class HistoryController : public Noncopyable {
 
   HistoryItem* provisionalItem() const { return m_provisionalItem.get(); }
   void setProvisionalItem(HistoryItem*);
+
+  void pushState(PassRefPtr<SerializedScriptValue>,
+                 const String& title,
+                 const String& url);
+  void replaceState(PassRefPtr<SerializedScriptValue>,
+                    const String& title,
+                    const String& url);
 
  private:
   PassRefPtr<HistoryItem> createItem(bool useOriginal);

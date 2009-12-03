@@ -583,6 +583,18 @@ void FrameLoaderClientImpl::dispatchDidChangeLocationWithinPage() {
     webView->client()->didStopLoading();
 }
 
+void FrameLoaderClientImpl::dispatchDidPushStateWithinPage() {
+  // FIXME
+}
+
+void FrameLoaderClientImpl::dispatchDidReplaceStateWithinPage() {
+  // FIXME
+}
+
+void FrameLoaderClientImpl::dispatchDidPopStateWithinPage() {
+  // FIXME
+}
+
 void FrameLoaderClientImpl::dispatchWillClose() {
   if (m_webFrame->client())
     m_webFrame->client()->willClose(m_webFrame);

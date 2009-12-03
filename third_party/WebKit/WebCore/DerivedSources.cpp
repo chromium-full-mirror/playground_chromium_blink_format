@@ -182,6 +182,7 @@
 #include "JSPageTransitionEvent.cpp"
 #include "JSPlugin.cpp"
 #include "JSPluginArray.cpp"
+#include "JSPopStateEvent.cpp"
 #include "JSProcessingInstruction.cpp"
 #include "JSProgressEvent.cpp"
 #include "JSRange.cpp"

@@ -41,10 +41,10 @@ namespace WebCore {
                       mouseout) macro(mouseover) macro(mouseup) macro(mousewheel)                                \
                       macro(noupdate) macro(obsolete) macro(offline) macro(online) macro(                        \
                           open) macro(overflowchanged) macro(pagehide) macro(pageshow)                           \
-                          macro(paste) macro(readystatechange) macro(reset) macro(                               \
-                              resize) macro(scroll) macro(search) macro(select)                                  \
-                              macro(selectstart) macro(storage) macro(submit) macro(                             \
-                                  textInput) macro(unload) macro(updateready) macro(zoom)                        \
+                          macro(paste) macro(popstate) macro(readystatechange) macro(                            \
+                              reset) macro(resize) macro(scroll) macro(search)                                   \
+                              macro(select) macro(selectstart) macro(storage) macro(                             \
+                                  submit) macro(textInput) macro(unload) macro(updateready) macro(zoom)          \
                                                                                                                  \
                                   macro(DOMActivate) macro(DOMAttrModified) macro(                               \
                                       DOMCharacterDataModified) macro(DOMFocusIn)                                \
