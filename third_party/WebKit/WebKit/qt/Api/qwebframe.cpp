@@ -164,6 +164,9 @@ bool QWEBKIT_EXPORT qt_drt_pauseSVGAnimation(QWebFrame* qframe,
                                              const QString& animationId,
                                              double time,
                                              const QString& elementId) {
+#if !ENABLE(SVG)
+  return false;
+#else
   Frame* frame = QWebFramePrivate::core(qframe);
   if (!frame)
     return false;
@@ -178,11 +181,8 @@ bool QWEBKIT_EXPORT qt_drt_pauseSVGAnimation(QWebFrame* qframe,
   if (!coreNode || !SVGSMILElement::isSMILElement(coreNode))
     return false;
 
-#if ENABLE(SVG)
   return doc->accessSVGExtensions()->sampleAnimationAtTime(
       elementId, static_cast<SVGSMILElement*>(coreNode), time);
-#else
-  return false;
 #endif
 }
 
