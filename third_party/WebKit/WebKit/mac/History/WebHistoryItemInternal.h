@@ -37,7 +37,7 @@ class HistoryItem;
 WebCore::HistoryItem* core(WebHistoryItem* item);
 WebHistoryItem* kit(WebCore::HistoryItem* item);
 
-extern void WKNotifyHistoryItemChanged();
+extern void WKNotifyHistoryItemChanged(WebCore::HistoryItem*);
 
 @interface WebHistoryItem (WebInternal)
 
