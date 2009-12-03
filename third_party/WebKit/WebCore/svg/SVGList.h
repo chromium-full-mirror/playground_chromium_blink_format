@@ -38,6 +38,9 @@ struct SVGListTypeOperations {
   static Item nullItem() {
     return SVGListTraits<UsesDefaultInitializer<Item>::value, Item>::nullItem();
   }
+  static bool isNull(const Item& it) {
+    return SVGListTraits<UsesDefaultInitializer<Item>::value, Item>::isNull(it);
+  }
 };
 
 template <typename Item>
@@ -56,7 +59,7 @@ class SVGList : public RefCounted<SVGList<Item>> {
   void clear(ExceptionCode&) { m_vector.clear(); }
 
   Item initialize(Item newItem, ExceptionCode& ec) {
-    if (!newItem) {
+    if (TypeOperations::isNull(newItem)) {
       ec = TYPE_MISMATCH_ERR;
       return TypeOperations::nullItem();
     }
@@ -93,7 +96,7 @@ class SVGList : public RefCounted<SVGList<Item>> {
   }
 
   Item insertItemBefore(Item newItem, unsigned int index, ExceptionCode& ec) {
-    if (!newItem) {
+    if (TypeOperations::isNull(newItem)) {
       ec = TYPE_MISMATCH_ERR;
       return TypeOperations::nullItem();
     }
@@ -112,7 +115,7 @@ class SVGList : public RefCounted<SVGList<Item>> {
       return TypeOperations::nullItem();
     }
 
-    if (!newItem) {
+    if (TypeOperations::isNull(newItem)) {
       ec = TYPE_MISMATCH_ERR;
       return TypeOperations::nullItem();
     }
@@ -133,7 +136,7 @@ class SVGList : public RefCounted<SVGList<Item>> {
   }
 
   Item appendItem(Item newItem, ExceptionCode& ec) {
-    if (!newItem) {
+    if (TypeOperations::isNull(newItem)) {
       ec = TYPE_MISMATCH_ERR;
       return TypeOperations::nullItem();
     }
