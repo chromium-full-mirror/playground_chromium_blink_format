@@ -40,7 +40,9 @@
 #include <QSslError>
 #endif
 
+#include <qwebframe.h>
 #include <qwebpage.h>
+#include <qwebview.h>
 
 QT_BEGIN_NAMESPACE
 class QUrl;
@@ -115,6 +117,7 @@ class DumpRenderTree : public QObject {
   QString m_expectedHash;
 
   WebPage* m_page;
+  QWebView* m_mainView;
 
   EventSender* m_eventSender;
   TextInputController* m_textInputController;
@@ -123,7 +126,7 @@ class DumpRenderTree : public QObject {
   QFile* m_stdin;
   QSocketNotifier* m_notifier;
 
-  QList<QWidget*> windows;
+  QList<QObject*> windows;
   bool m_enableTextOutput;
 };
 
@@ -141,7 +144,7 @@ class NetworkAccessManager : public QNetworkAccessManager {
 class WebPage : public QWebPage {
   Q_OBJECT
  public:
-  WebPage(QWidget* parent, DumpRenderTree* drt);
+  WebPage(QObject* parent, DumpRenderTree*);
 
   QWebPage* createWindow(QWebPage::WebWindowType);
 
