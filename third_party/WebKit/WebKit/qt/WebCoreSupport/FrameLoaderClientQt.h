@@ -188,7 +188,9 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
   virtual void updateGlobalHistory();
   virtual void updateGlobalHistoryRedirectLinks();
   virtual bool shouldGoToHistoryItem(HistoryItem*) const;
-
+  virtual void dispatchDidAddBackForwardItem(HistoryItem*) const;
+  virtual void dispatchDidRemoveBackForwardItem(HistoryItem*) const;
+  virtual void dispatchDidChangeBackForwardIndex() const;
   virtual void didDisplayInsecureContent();
   virtual void didRunInsecureContent(SecurityOrigin*);
 

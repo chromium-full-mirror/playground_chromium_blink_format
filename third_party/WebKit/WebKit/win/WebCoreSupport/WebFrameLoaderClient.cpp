@@ -622,6 +622,13 @@ bool WebFrameLoaderClient::shouldGoToHistoryItem(HistoryItem*) const {
   return true;
 }
 
+void WebFrameLoaderClient::dispatchDidAddBackForwardItem(HistoryItem*) const {}
+
+void WebFrameLoaderClient::dispatchDidRemoveBackForwardItem(
+    HistoryItem*) const {}
+
+void WebFrameLoaderClient::dispatchDidChangeBackForwardIndex() const {}
+
 void WebFrameLoaderClient::didDisplayInsecureContent() {
   WebView* webView = m_webFrame->webView();
   COMPtr<IWebFrameLoadDelegatePrivate> frameLoadDelegatePriv;

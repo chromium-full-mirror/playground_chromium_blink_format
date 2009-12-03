@@ -404,6 +404,14 @@ bool FrameLoaderClientHaiku::shouldGoToHistoryItem(
   return true;
 }
 
+void FrameLoaderClientHaiku::dispatchDidAddBackForwardItem(
+    WebCore::HistoryItem*) const {}
+
+void FrameLoaderClientHaiku::dispatchDidRemoveBackForwardItem(
+    WebCore::HistoryItem*) const {}
+
+void FrameLoaderClientHaiku::dispatchDidChangeBackForwardIndex() const {}
+
 void FrameLoaderClientHaiku::saveScrollPositionAndViewStateToItem(
     WebCore::HistoryItem*) {
   notImplemented();

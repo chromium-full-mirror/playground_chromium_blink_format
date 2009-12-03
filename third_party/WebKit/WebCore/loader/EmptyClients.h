@@ -364,6 +364,9 @@ class EmptyFrameLoaderClient : public FrameLoaderClient {
   virtual void updateGlobalHistory() {}
   virtual void updateGlobalHistoryRedirectLinks() {}
   virtual bool shouldGoToHistoryItem(HistoryItem*) const { return false; }
+  virtual void dispatchDidAddBackForwardItem(HistoryItem*) const {}
+  virtual void dispatchDidRemoveBackForwardItem(HistoryItem*) const {};
+  virtual void dispatchDidChangeBackForwardIndex() const {}
   virtual void saveViewStateToItem(HistoryItem*) {}
   virtual bool canCachePage() const { return false; }
   virtual void didDisplayInsecureContent() {}

@@ -1018,6 +1018,13 @@ bool FrameLoaderClientImpl::shouldGoToHistoryItem(HistoryItem*) const {
   return true;
 }
 
+void FrameLoaderClientImpl::dispatchDidAddBackForwardItem(HistoryItem*) const {}
+
+void FrameLoaderClientImpl::dispatchDidRemoveBackForwardItem(
+    HistoryItem*) const {}
+
+void FrameLoaderClientImpl::dispatchDidChangeBackForwardIndex() const {}
+
 void FrameLoaderClientImpl::didDisplayInsecureContent() {
   if (m_webFrame->client())
     m_webFrame->client()->didDisplayInsecureContent(m_webFrame);
