@@ -68,6 +68,11 @@ void ScriptFunctionCall::appendArgument(const String& argument) {
   m_arguments.append(v8String(argument));
 }
 
+void ScriptFunctionCall::appendArgument(const char* argument) {
+  ScriptScope scope(m_scriptState);
+  m_arguments.append(v8String(argument));
+}
+
 void ScriptFunctionCall::appendArgument(long argument) {
   ScriptScope scope(m_scriptState);
   m_arguments.append(v8::Number::New(argument));
