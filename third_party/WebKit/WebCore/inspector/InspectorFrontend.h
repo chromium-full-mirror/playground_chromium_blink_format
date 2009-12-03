@@ -151,7 +151,6 @@ class InspectorFrontend {
   void evaluateForTestInFrontend(int callId, const String& script);
 
  private:
-  PassOwnPtr<ScriptFunctionCall> newFunctionCall(const String& functionName);
   void callSimpleFunction(const String& functionName);
   InspectorController* m_inspectorController;
   ScriptState* m_scriptState;

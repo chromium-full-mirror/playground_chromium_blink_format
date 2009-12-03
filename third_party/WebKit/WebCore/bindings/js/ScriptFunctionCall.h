@@ -57,6 +57,7 @@ class ScriptFunctionCall {
   void appendArgument(const ScriptString&);
   void appendArgument(const ScriptValue&);
   void appendArgument(const String&);
+  void appendArgument(const char*);
   void appendArgument(const JSC::UString&);
   void appendArgument(JSC::JSValue);
   void appendArgument(long);
@@ -74,6 +75,18 @@ class ScriptFunctionCall {
   ScriptObject m_thisObject;
   String m_name;
   JSC::MarkedArgumentBuffer m_arguments;
+
+ private:
+  // MarkedArgumentBuffer must be stack allocated, so prevent heap
+  // alloc of ScriptFunctionCall as well.
+  void* operator new(size_t) {
+    ASSERT_NOT_REACHED();
+    return reinterpret_cast<void*>(0xbadbeef);
+  }
+  void* operator new[](size_t) {
+    ASSERT_NOT_REACHED();
+    return reinterpret_cast<void*>(0xbadbeef);
+  }
 };
 
 }  // namespace WebCore
