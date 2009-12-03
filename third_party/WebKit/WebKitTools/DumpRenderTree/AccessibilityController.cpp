@@ -58,8 +58,12 @@ void AccessibilityController::makeWindowObject(JSContextRef context,
                                                JSValueRef* exception) {
   JSRetainPtr<JSStringRef> accessibilityControllerStr(
       Adopt, JSStringCreateWithUTF8CString("accessibilityController"));
+
+  JSClassRef classRef = getJSClass();
   JSValueRef accessibilityControllerObject =
-      JSObjectMake(context, getJSClass(), this);
+      JSObjectMake(context, classRef, this);
+  JSClassRelease(classRef);
+
   JSObjectSetProperty(
       context, windowObject, accessibilityControllerStr.get(),
       accessibilityControllerObject,
