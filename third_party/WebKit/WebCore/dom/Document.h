@@ -508,7 +508,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   void updateLayoutIgnorePendingStylesheets();
   static void updateStyleForAllDocuments();  // FIXME: Try to reduce the # of
                                              // calls to this function.
-  DocLoader* docLoader() { return m_docLoader; }
+  DocLoader* docLoader() { return m_docLoader.get(); }
 
   virtual void attach();
   virtual void detach();
@@ -1110,7 +1110,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   bool m_didCalculateStyleSelector;
 
   Frame* m_frame;
-  DocLoader* m_docLoader;
+  OwnPtr<DocLoader> m_docLoader;
   Tokenizer* m_tokenizer;
   bool m_wellFormed;
 
