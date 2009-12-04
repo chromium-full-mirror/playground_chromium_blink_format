@@ -159,6 +159,10 @@ JSStringRef AccessibilityUIElement::subrole() {
   return 0;
 }
 
+JSStringRef AccessibilityUIElement::roleDescription() {
+  return 0;
+}
+
 JSStringRef AccessibilityUIElement::title() {
   BSTR titleBSTR;
   if (FAILED(m_element->get_accName(self(), &titleBSTR)) || !titleBSTR)

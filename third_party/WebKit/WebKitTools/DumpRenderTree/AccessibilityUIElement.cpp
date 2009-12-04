@@ -530,6 +530,15 @@ static JSValueRef getSubroleCallback(JSContextRef context,
   return JSValueMakeString(context, role.get());
 }
 
+static JSValueRef getRoleDescriptionCallback(JSContextRef context,
+                                             JSObjectRef thisObject,
+                                             JSStringRef propertyName,
+                                             JSValueRef* exception) {
+  JSRetainPtr<JSStringRef> roleDesc(Adopt,
+                                    toAXElement(thisObject)->roleDescription());
+  return JSValueMakeString(context, roleDesc.get());
+}
+
 static JSValueRef getTitleCallback(JSContextRef context,
                                    JSObjectRef thisObject,
                                    JSStringRef propertyName,
@@ -754,6 +763,8 @@ JSClassRef AccessibilityUIElement::getJSClass() {
       {"role", getRoleCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"subrole", getSubroleCallback, 0,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"roleDescription", getRoleDescriptionCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"title", getTitleCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
