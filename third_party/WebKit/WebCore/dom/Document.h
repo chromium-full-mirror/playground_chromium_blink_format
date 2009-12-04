@@ -877,7 +877,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
 
 #if ENABLE(XBL)
   // XBL methods
-  XBLBindingManager* bindingManager() const { return m_bindingManager; }
+  XBLBindingManager* bindingManager() const { return m_bindingManager.get(); }
 #endif
 
   void incDOMTreeVersion() { ++m_domtree_version; }
@@ -1252,9 +1252,9 @@ class Document : public ContainerNode, public ScriptExecutionContext {
 #endif
 
 #if ENABLE(XBL)
-  XBLBindingManager* m_bindingManager;  // The access point through which
-                                        // documents and elements communicate
-                                        // with XBL.
+  OwnPtr<XBLBindingManager> m_bindingManager;  // The access point through which
+                                               // documents and elements
+                                               // communicate with XBL.
 #endif
 
   typedef HashMap<AtomicStringImpl*, HTMLMapElement*> ImageMapsByName;
