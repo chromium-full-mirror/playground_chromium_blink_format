@@ -175,6 +175,14 @@ void IndentOutdentCommand::indentRegion(const VisiblePosition& startOfSelection,
     else
       indentIntoBlockquote(endOfCurrentParagraph, endOfNextParagraph,
                            blockquoteForNextIndent);
+
+    // indentIntoBlockquote could move more than one paragraph if the paragraph
+    // is in a list item or a table. As a result, endAfterSelection could refer
+    // to a position
+    // no longer in the document.
+    if (endAfterSelection.isNotNull() &&
+        !endAfterSelection.deepEquivalent().node()->inDocument())
+      break;
     // Sanity check: Make sure our moveParagraph calls didn't remove
     // endOfNextParagraph.deepEquivalent().node()
     // If somehow we did, return to prevent crashes.
