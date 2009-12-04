@@ -45,14 +45,14 @@ struct SVGListTraits {};
 
 template <typename ItemPtr>
 struct SVGListTraits<true, ItemPtr*> {
-  static ItemPtr nullItem() { return 0; }
-  static bool isNull(ItemPtr it) { return !it; }
+  static ItemPtr* nullItem() { return 0; }
+  static bool isNull(ItemPtr* it) { return !it; }
 };
 
 template <typename ItemPtr>
 struct SVGListTraits<true, RefPtr<ItemPtr>> {
   static RefPtr<ItemPtr> nullItem() { return 0; }
-  static bool isNull(RefPtr<ItemPtr> it) { return !it; }
+  static bool isNull(const RefPtr<ItemPtr>& it) { return !it; }
 };
 
 template <typename Item>
@@ -70,7 +70,7 @@ struct SVGListTraits<false, double> {
 template <>
 struct SVGListTraits<false, float> {
   static float nullItem() { return 0; }
-  static bool isNull(double) { return false; }
+  static bool isNull(float) { return false; }
 };
 
 }  // namespace WebCore
