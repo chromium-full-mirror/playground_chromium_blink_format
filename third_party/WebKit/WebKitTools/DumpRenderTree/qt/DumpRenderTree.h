@@ -41,6 +41,7 @@
 #endif
 
 #include <qwebframe.h>
+#include <qwebinspector.h>
 #include <qwebpage.h>
 #include <qwebview.h>
 
@@ -145,6 +146,8 @@ class WebPage : public QWebPage {
   Q_OBJECT
  public:
   WebPage(QObject* parent, DumpRenderTree*);
+  virtual ~WebPage();
+  QWebInspector* webInspector();
 
   QWebPage* createWindow(QWebPage::WebWindowType);
 
@@ -187,6 +190,7 @@ class WebPage : public QWebPage {
   }
 
  private:
+  QWebInspector* m_webInspector;
   DumpRenderTree* m_drt;
 };
 }
