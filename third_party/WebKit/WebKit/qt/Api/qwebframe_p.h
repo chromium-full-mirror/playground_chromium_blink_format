@@ -25,6 +25,7 @@
 #include "qwebpage_p.h"
 
 #include "EventHandler.h"
+#include "GraphicsContext.h"
 #include "KURL.h"
 #include "PlatformString.h"
 #include "qwebelement.h"
@@ -83,7 +84,11 @@ class QWebFramePrivate {
   static WebCore::Frame* core(QWebFrame*);
   static QWebFrame* kit(WebCore::Frame*);
 
-  void renderPrivate(QPainter*, QWebFrame::RenderLayer, const QRegion& clip);
+  void renderRelativeCoords(WebCore::GraphicsContext*,
+                            QWebFrame::RenderLayer,
+                            const QRegion& clip);
+  void renderContentsLayerAbsoluteCoords(WebCore::GraphicsContext*,
+                                         const QRegion& clip);
 
   QWebFrame* q;
   Qt::ScrollBarPolicy horizontalScrollBarPolicy;
