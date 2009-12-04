@@ -101,6 +101,7 @@ class AccessibilityUIElement {
   JSStringRef language();
   JSStringRef stringValue();
   JSStringRef accessibilityValue() const;
+  JSStringRef orientation() const;
   double x();
   double y();
   double width();

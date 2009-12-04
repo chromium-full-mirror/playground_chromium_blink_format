@@ -797,7 +797,7 @@ String AccessibilityRenderObject::valueDescription() const {
 }
 
 float AccessibilityRenderObject::valueForRange() const {
-  if (!isProgressIndicator() && !isSlider())
+  if (!isProgressIndicator() && !isSlider() && !isScrollbar())
     return 0.0f;
 
   return getAttribute(aria_valuenowAttr).toFloat();
@@ -2656,6 +2656,17 @@ AccessibilityRole AccessibilityRenderObject::determineAccessibilityRole() {
   return UnknownRole;
 }
 
+AccessibilityOrientation AccessibilityRenderObject::orientation() const {
+  const AtomicString& ariaOrientation =
+      getAttribute(aria_orientationAttr).string();
+  if (equalIgnoringCase(ariaOrientation, "horizontal"))
+    return AccessibilityOrientationHorizontal;
+  if (equalIgnoringCase(ariaOrientation, "vertical"))
+    return AccessibilityOrientationVertical;
+
+  return AccessibilityObject::orientation();
+}
+
 bool AccessibilityRenderObject::isPresentationalChildOfAriaRole() const {
   // Walk the parent chain looking for a parent that has presentational children
   AccessibilityObject* parent;
@@ -2767,6 +2778,7 @@ bool AccessibilityRenderObject::canHaveChildren() const {
     case TabRole:
     case StaticTextRole:
     case ListBoxOptionRole:
+    case ScrollBarRole:
       return false;
     default:
       return true;

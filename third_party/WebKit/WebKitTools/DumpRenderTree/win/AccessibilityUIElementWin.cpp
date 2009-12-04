@@ -245,6 +245,10 @@ bool AccessibilityUIElement::isExpanded() const {
   return false;
 }
 
+JSStringRef AccessibilityUIElement::orientation() const {
+  return 0;
+}
+
 double AccessibilityUIElement::intValue() {
   BSTR valueBSTR;
   if (FAILED(m_element->get_accValue(self(), &valueBSTR)) || !valueBSTR)

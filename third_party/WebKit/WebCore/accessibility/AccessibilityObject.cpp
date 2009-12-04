@@ -942,6 +942,7 @@ static ARIARoleMap* createARIARoleMap() {
       {"region", DocumentRegionRole},
       {"row", RowRole},
       {"range", SliderRole},
+      {"scrollbar", ScrollBarRole},
       {"search", LandmarkSearchRole},
       {"separator", SplitterRole},
       {"slider", SliderRole},
