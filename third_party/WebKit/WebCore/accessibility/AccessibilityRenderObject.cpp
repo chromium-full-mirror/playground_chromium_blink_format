@@ -2438,15 +2438,15 @@ bool AccessibilityRenderObject::shouldFocusActiveDescendant() const {
     case ProgressIndicatorRole:
     case ToolbarRole:
     case OutlineRole:
+    case TreeRole:
+    case GridRole:
       /* FIXME: replace these with actual roles when they are added to
       AccessibilityRole
       composite
       alert
       alertdialog
-      grid
       status
       timer
-      tree
       */
       return true;
     default:
@@ -2455,22 +2455,23 @@ bool AccessibilityRenderObject::shouldFocusActiveDescendant() const {
 }
 
 AccessibilityObject* AccessibilityRenderObject::activeDescendant() const {
-  if (renderer()->node() && !renderer()->node()->isElementNode())
+  if (!m_renderer)
     return 0;
-  Element* element = static_cast<Element*>(renderer()->node());
+
+  if (m_renderer->node() && !m_renderer->node()->isElementNode())
+    return 0;
+  Element* element = static_cast<Element*>(m_renderer->node());
 
   String activeDescendantAttrStr =
       element->getAttribute(aria_activedescendantAttr).string();
   if (activeDescendantAttrStr.isNull() || activeDescendantAttrStr.isEmpty())
     return 0;
 
-  Element* target =
-      renderer()->document()->getElementById(activeDescendantAttrStr);
+  Element* target = document()->getElementById(activeDescendantAttrStr);
   if (!target)
     return 0;
 
-  AccessibilityObject* obj =
-      renderer()->document()->axObjectCache()->getOrCreate(target->renderer());
+  AccessibilityObject* obj = axObjectCache()->getOrCreate(target->renderer());
   if (obj && obj->isAccessibilityRenderObject())
     // an activedescendant is only useful if it has a renderer, because that's
     // what's needed to post the notification
@@ -2491,8 +2492,7 @@ void AccessibilityRenderObject::handleActiveDescendantChanged() {
 
   if (activedescendant && shouldFocusActiveDescendant())
     doc->axObjectCache()->postNotification(
-        activedescendant->renderer(), AXObjectCache::AXFocusedUIElementChanged,
-        true);
+        m_renderer, AXObjectCache::AXActiveDescendantChanged, true);
 }
 
 AccessibilityObject*
@@ -2849,6 +2849,14 @@ void AccessibilityRenderObject::ariaTreeSelectedRows(
 
   // Determine which rows are selected.
   bool isMultiselectable = elementAttributeValue(aria_multiselectableAttr);
+
+  // Prefer active descendant over aria-selected.
+  AccessibilityObject* activeDesc = activeDescendant();
+  if (activeDesc && activeDesc->isTreeItem()) {
+    result.append(activeDesc);
+    if (!isMultiselectable)
+      return;
+  }
 
   unsigned count = allRows.size();
   for (unsigned k = 0; k < count; ++k) {

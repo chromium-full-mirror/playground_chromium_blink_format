@@ -107,6 +107,7 @@ class AXObjectCache : public Noncopyable {
   static VisiblePosition visiblePositionForTextMarkerData(TextMarkerData&);
 
   enum AXNotification {
+    AXActiveDescendantChanged,
     AXCheckedStateChanged,
     AXFocusedUIElementChanged,
     AXLayoutComplete,

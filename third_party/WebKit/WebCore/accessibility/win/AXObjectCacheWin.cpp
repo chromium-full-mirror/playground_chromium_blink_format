@@ -72,6 +72,7 @@ void AXObjectCache::postPlatformNotification(AccessibilityObject* obj,
   DWORD msaaEvent;
   switch (notification) {
     case AXFocusedUIElementChanged:
+    case AXActiveDescendantChanged:
       msaaEvent = EVENT_OBJECT_FOCUS;
       break;
 
