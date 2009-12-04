@@ -513,7 +513,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   virtual void attach();
   virtual void detach();
 
-  RenderArena* renderArena() { return m_renderArena; }
+  RenderArena* renderArena() { return m_renderArena.get(); }
 
   RenderView* renderView() const;
 
@@ -1223,7 +1223,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   bool m_titleSetExplicitly;
   RefPtr<Element> m_titleElement;
 
-  RenderArena* m_renderArena;
+  OwnPtr<RenderArena> m_renderArena;
 
   typedef std::pair<Vector<DocumentMarker>, Vector<IntRect>>
       MarkerMapVectorPair;

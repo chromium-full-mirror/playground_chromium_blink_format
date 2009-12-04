@@ -392,7 +392,6 @@ Document::Document(Frame* frame, bool isXHTML)
   m_ignoreAutofocus = false;
 
   m_frame = frame;
-  m_renderArena = 0;
 
   m_axObjectCache = 0;
 
@@ -400,7 +399,6 @@ Document::Document(Frame* frame, bool isXHTML)
 
   visuallyOrdered = false;
   m_bParsing = false;
-  m_tokenizer = 0;
   m_wellFormed = false;
 
   setParseMode(Strict);
@@ -512,10 +510,7 @@ Document::~Document() {
   delete m_styleSelector;
   m_docLoader.clear();
 
-  if (m_renderArena) {
-    delete m_renderArena;
-    m_renderArena = 0;
-  }
+  m_renderArena.clear();
 
 #if ENABLE(XBL)
   delete m_bindingManager;
@@ -1450,7 +1445,7 @@ void Document::attach() {
     m_renderArena = new RenderArena();
 
   // Create the rendering tree
-  setRenderer(new (m_renderArena) RenderView(this, view()));
+  setRenderer(new (m_renderArena.get()) RenderView(this, view()));
 #if USE(ACCELERATED_COMPOSITING)
   renderView()->didMoveOnscreen();
 #endif
@@ -1529,11 +1524,7 @@ void Document::detach() {
   // or this setting of the frame to 0 could be made explicit in each of the
   // callers of Document::detach().
   m_frame = 0;
-
-  if (m_renderArena) {
-    delete m_renderArena;
-    m_renderArena = 0;
-  }
+  m_renderArena.clear();
 }
 
 void Document::removeAllEventListeners() {
