@@ -32,7 +32,9 @@ class SVGElement;
 class SVGSVGElement;
 class SVGTransformList;
 
-class SVGViewSpec : public SVGFitToViewBox, public SVGZoomAndPan {
+class SVGViewSpec : public SVGFitToViewBox,
+                    public SVGZoomAndPan,
+                    public Noncopyable {
  public:
   SVGViewSpec(const SVGSVGElement*);
   virtual ~SVGViewSpec();

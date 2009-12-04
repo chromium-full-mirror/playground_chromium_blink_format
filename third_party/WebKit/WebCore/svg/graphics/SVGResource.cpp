@@ -37,7 +37,7 @@ namespace WebCore {
 
 SVGResource::SVGResource() {}
 
-struct ResourceSet {
+struct ResourceSet : Noncopyable {
   ResourceSet() {
     for (int i = 0; i < _ResourceTypeCount; i++)
       resources[i] = 0;
