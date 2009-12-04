@@ -2564,8 +2564,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
       JSValue baseValue = callFrame->r(base).jsValue();
       if (LIKELY(isJSString(globalData, baseValue))) {
         int dst = vPC[1].u.operand;
-        callFrame->r(dst) =
-            jsNumber(callFrame, asString(baseValue)->value().size());
+        callFrame->r(dst) = jsNumber(callFrame, asString(baseValue)->length());
         vPC += OPCODE_LENGTH(op_get_string_length);
         NEXT_INSTRUCTION();
       }
