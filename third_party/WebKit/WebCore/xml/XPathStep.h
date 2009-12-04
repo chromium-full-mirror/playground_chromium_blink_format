@@ -57,7 +57,7 @@ class Step : public ParseNode, public Noncopyable {
     SelfAxis
   };
 
-  class NodeTest {
+  class NodeTest : public FastAllocBase {
    public:
     enum Kind {
       TextNodeTest,
