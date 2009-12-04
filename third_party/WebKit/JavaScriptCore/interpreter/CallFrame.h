@@ -42,6 +42,7 @@ class ExecState : private Register {
     return this[RegisterFile::CodeBlock].Register::codeBlock();
   }
   ScopeChainNode* scopeChain() const {
+    ASSERT(this[RegisterFile::ScopeChain].Register::scopeChain());
     return this[RegisterFile::ScopeChain].Register::scopeChain();
   }
   int argumentCount() const { return this[RegisterFile::ArgumentCount].i(); }
@@ -66,7 +67,10 @@ class ExecState : private Register {
   // FIXME: Elsewhere, we use JSGlobalData* rather than JSGlobalData&.
   // We should make this more uniform and either use a reference everywhere
   // or a pointer everywhere.
-  JSGlobalData& globalData() const { return *scopeChain()->globalData; }
+  JSGlobalData& globalData() const {
+    ASSERT(scopeChain()->globalData);
+    return *scopeChain()->globalData;
+  }
 
   // Convenience functions for access to global data.
   // It takes a few memory references to get from a call frame to the global
