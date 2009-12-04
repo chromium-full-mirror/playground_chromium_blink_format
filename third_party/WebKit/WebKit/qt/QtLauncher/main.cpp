@@ -30,15 +30,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <qwebpage.h>
-#include <qwebview.h>
-#include <qwebframe.h>
-#include <qwebsettings.h>
-#include <qwebelement.h>
-#include <qwebinspector.h>
-
 #include <QtGui>
-#include <QDebug>
 #include <QtNetwork/QNetworkProxy>
 #include <QtNetwork/QNetworkRequest>
 #if !defined(QT_NO_PRINTER)
@@ -49,10 +41,18 @@
 #include <QtUiTools/QUiLoader>
 #endif
 
-#include <QVector>
-#include <QTextStream>
+#include <QDebug>
 #include <QFile>
+#include <QTextStream>
+#include <QVector>
+
 #include <cstdio>
+#include <qwebelement.h>
+#include <qwebframe.h>
+#include <qwebinspector.h>
+#include <qwebpage.h>
+#include <qwebsettings.h>
+#include <qwebview.h>
 
 #ifndef NDEBUG
 void QWEBKIT_EXPORT qt_drt_garbageCollector_collect();
@@ -135,7 +135,8 @@ class WebPage : public QWebPage {
       QWebPage* page = createWindow(QWebPage::WebBrowserWindow);
       page->mainFrame()->load(request);
       return false;
-    } else if (webView->keyboardModifiers & Qt::AltModifier) {
+    }
+    if (webView->keyboardModifiers & Qt::AltModifier) {
       webView->openUrlInDefaultBrowser(request.url());
       return false;
     }
