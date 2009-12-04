@@ -278,6 +278,7 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   bool isTree() const { return roleValue() == TreeRole; }
   bool isTreeItem() const { return roleValue() == TreeItemRole; }
   bool isScrollbar() const { return roleValue() == ScrollBarRole; }
+  bool isButton() const { return roleValue() == ButtonRole; }
 
   virtual bool isChecked() const { return false; }
   virtual bool isEnabled() const { return false; }
