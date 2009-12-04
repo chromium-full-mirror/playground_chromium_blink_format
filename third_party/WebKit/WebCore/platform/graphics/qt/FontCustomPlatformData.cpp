@@ -45,7 +45,7 @@ FontPlatformData FontCustomPlatformData::fontPlatformData(int size,
     font.setWeight(QFont::Bold);
   font.setItalic(italic);
 
-  return FontPlatformData(font, bold);
+  return FontPlatformData(font);
 }
 
 FontCustomPlatformData* createFontCustomPlatformData(SharedBuffer* buffer) {
