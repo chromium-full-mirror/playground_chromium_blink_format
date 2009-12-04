@@ -107,6 +107,10 @@ HistoryItem* BackForwardList::itemAtIndex(int index) {
   return m_client->itemAtIndex(index);
 }
 
+void BackForwardList::pushStateItem(PassRefPtr<HistoryItem> newItem) {
+  // FIXME: Need to implement state support for chromium.
+}
+
 HistoryItemVector& BackForwardList::entries() {
   static HistoryItemVector noEntries;
   return noEntries;
