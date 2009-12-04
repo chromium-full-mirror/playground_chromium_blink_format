@@ -45,6 +45,7 @@
 #include "RenderView.h"
 #include "SelectionController.h"
 #include "Settings.h"
+#include "TransformState.h"
 #include <wtf/StdLibExtras.h>
 
 using namespace std;
@@ -2150,24 +2151,26 @@ bool RenderBlock::isSelectionRoot() const {
 }
 
 GapRects RenderBlock::selectionGapRectsForRepaint(
-    RenderBoxModelObject* /*repaintContainer*/) {
+    RenderBoxModelObject* repaintContainer) {
   ASSERT(!needsLayout());
 
   if (!shouldPaintSelectionGaps())
     return GapRects();
 
-  // FIXME: this is broken with transforms and a non-null repaintContainer
-  FloatPoint absContentPoint = localToAbsolute(FloatPoint());
-  if (hasOverflowClip())
-    absContentPoint -= layer()->scrolledContentOffset();
+  // FIXME: this is broken with transforms
+  TransformState transformState(TransformState::ApplyTransformDirection,
+                                FloatPoint());
+  mapLocalToContainer(repaintContainer, false, false, transformState);
+  FloatPoint offsetFromRepaintContainer = transformState.mappedPoint();
 
   int lastTop = 0;
   int lastLeft = leftSelectionOffset(this, lastTop);
   int lastRight = rightSelectionOffset(this, lastTop);
 
-  return fillSelectionGaps(this, absContentPoint.x(), absContentPoint.y(),
-                           absContentPoint.x(), absContentPoint.y(), lastTop,
-                           lastLeft, lastRight);
+  return fillSelectionGaps(
+      this, offsetFromRepaintContainer.x(), offsetFromRepaintContainer.y(),
+      offsetFromRepaintContainer.x(), offsetFromRepaintContainer.y(), lastTop,
+      lastLeft, lastRight);
 }
 
 void RenderBlock::paintSelection(PaintInfo& paintInfo, int tx, int ty) {
