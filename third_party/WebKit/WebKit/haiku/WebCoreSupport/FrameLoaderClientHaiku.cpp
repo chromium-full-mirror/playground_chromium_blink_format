@@ -182,6 +182,18 @@ void FrameLoaderClientHaiku::dispatchDidChangeLocationWithinPage() {
   notImplemented();
 }
 
+void FrameLoaderClientHaiku::dispatchDidPushStateWithinPage() {
+  notImplemented();
+}
+
+void FrameLoaderClientHaiku::dispatchDidReplaceStateWithinPage() {
+  notImplemented();
+}
+
+void FrameLoaderClientHaiku::dispatchDidPopStateWithinPage() {
+  notImplemented();
+}
+
 void FrameLoaderClientHaiku::dispatchWillClose() {
   notImplemented();
 }
