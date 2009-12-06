@@ -212,6 +212,23 @@ class BytecodeGenerator : public FastAllocBase {
 
   RegisterID* emitNode(Node* n) { return emitNode(0, n); }
 
+  void emitNodeInConditionContext(ExpressionNode* n,
+                                  Label* trueTarget,
+                                  Label* falseTarget,
+                                  bool fallThroughMeansTrue) {
+    if (!m_codeBlock->numberOfLineInfos() ||
+        m_codeBlock->lastLineInfo().lineNumber != n->lineNo()) {
+      LineInfo info = {instructions().size(), n->lineNo()};
+      m_codeBlock->addLineInfo(info);
+    }
+    if (m_emitNodeDepth >= s_maxEmitNodeDepth)
+      emitThrowExpressionTooDeepException();
+    ++m_emitNodeDepth;
+    n->emitBytecodeInConditionContext(*this, trueTarget, falseTarget,
+                                      fallThroughMeansTrue);
+    --m_emitNodeDepth;
+  }
+
   void emitExpressionInfo(unsigned divot,
                           unsigned startOffset,
                           unsigned endOffset) {

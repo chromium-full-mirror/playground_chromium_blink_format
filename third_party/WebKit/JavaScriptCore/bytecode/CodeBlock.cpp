@@ -1022,6 +1022,10 @@ void CodeBlock::dump(ExecState* exec,
       printConditionalJump(exec, begin, it, location, "loop_if_true");
       break;
     }
+    case op_loop_if_false: {
+      printConditionalJump(exec, begin, it, location, "loop_if_false");
+      break;
+    }
     case op_jfalse: {
       printConditionalJump(exec, begin, it, location, "jfalse");
       break;
@@ -1066,6 +1070,15 @@ void CodeBlock::dump(ExecState* exec,
       int r1 = (++it)->u.operand;
       int offset = (++it)->u.operand;
       printf("[%4d] loop_if_less\t %s, %s, %d(->%d)\n", location,
+             registerName(exec, r0).c_str(), registerName(exec, r1).c_str(),
+             offset, location + offset);
+      break;
+    }
+    case op_jless: {
+      int r0 = (++it)->u.operand;
+      int r1 = (++it)->u.operand;
+      int offset = (++it)->u.operand;
+      printf("[%4d] jless\t\t %s, %s, %d(->%d)\n", location,
              registerName(exec, r0).c_str(), registerName(exec, r1).c_str(),
              offset, location + offset);
       break;

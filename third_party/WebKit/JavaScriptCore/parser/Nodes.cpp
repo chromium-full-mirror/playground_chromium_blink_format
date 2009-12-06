@@ -958,6 +958,21 @@ RegisterID* UnaryOpNode::emitBytecode(BytecodeGenerator& generator,
                                src);
 }
 
+// ------------------------------ LogicalNotNode
+// -----------------------------------
+
+void LogicalNotNode::emitBytecodeInConditionContext(
+    BytecodeGenerator& generator,
+    Label* trueTarget,
+    Label* falseTarget,
+    bool fallThroughMeansTrue) {
+  ASSERT(expr()->hasConditionContextCodegen());
+
+  // reverse the true and false targets
+  generator.emitNodeInConditionContext(expr(), falseTarget, trueTarget,
+                                       !fallThroughMeansTrue);
+}
+
 // ------------------------------ Binary Operation Nodes
 // -----------------------------------
 
@@ -1227,6 +1242,39 @@ RegisterID* LogicalOpNode::emitBytecode(BytecodeGenerator& generator,
   return generator.moveToDestinationIfNeeded(dst, temp.get());
 }
 
+void LogicalOpNode::emitBytecodeInConditionContext(BytecodeGenerator& generator,
+                                                   Label* trueTarget,
+                                                   Label* falseTarget,
+                                                   bool fallThroughMeansTrue) {
+  if (m_expr1->hasConditionContextCodegen()) {
+    RefPtr<Label> afterExpr1 = generator.newLabel();
+    if (m_operator == OpLogicalAnd)
+      generator.emitNodeInConditionContext(m_expr1, afterExpr1.get(),
+                                           falseTarget, true);
+    else
+      generator.emitNodeInConditionContext(m_expr1, trueTarget,
+                                           afterExpr1.get(), false);
+    generator.emitLabel(afterExpr1.get());
+  } else {
+    RegisterID* temp = generator.emitNode(m_expr1);
+    if (m_operator == OpLogicalAnd)
+      generator.emitJumpIfFalse(temp, falseTarget);
+    else
+      generator.emitJumpIfTrue(temp, trueTarget);
+  }
+
+  if (m_expr2->hasConditionContextCodegen())
+    generator.emitNodeInConditionContext(m_expr2, trueTarget, falseTarget,
+                                         fallThroughMeansTrue);
+  else {
+    RegisterID* temp = generator.emitNode(m_expr2);
+    if (fallThroughMeansTrue)
+      generator.emitJumpIfFalse(temp, falseTarget);
+    else
+      generator.emitJumpIfTrue(temp, trueTarget);
+  }
+}
+
 // ------------------------------ ConditionalNode ------------------------------
 
 RegisterID* ConditionalNode::emitBytecode(BytecodeGenerator& generator,
@@ -1235,8 +1283,15 @@ RegisterID* ConditionalNode::emitBytecode(BytecodeGenerator& generator,
   RefPtr<Label> beforeElse = generator.newLabel();
   RefPtr<Label> afterElse = generator.newLabel();
 
-  RegisterID* cond = generator.emitNode(m_logical);
-  generator.emitJumpIfFalse(cond, beforeElse.get());
+  if (m_logical->hasConditionContextCodegen()) {
+    RefPtr<Label> beforeThen = generator.newLabel();
+    generator.emitNodeInConditionContext(m_logical, beforeThen.get(),
+                                         beforeElse.get(), true);
+    generator.emitLabel(beforeThen.get());
+  } else {
+    RegisterID* cond = generator.emitNode(m_logical);
+    generator.emitJumpIfFalse(cond, beforeElse.get());
+  }
 
   generator.emitNode(newDst.get(), m_expr1);
   generator.emitJump(afterElse.get());
@@ -1616,8 +1671,15 @@ RegisterID* IfNode::emitBytecode(BytecodeGenerator& generator,
 
   RefPtr<Label> afterThen = generator.newLabel();
 
-  RegisterID* cond = generator.emitNode(m_condition);
-  generator.emitJumpIfFalse(cond, afterThen.get());
+  if (m_condition->hasConditionContextCodegen()) {
+    RefPtr<Label> beforeThen = generator.newLabel();
+    generator.emitNodeInConditionContext(m_condition, beforeThen.get(),
+                                         afterThen.get(), true);
+    generator.emitLabel(beforeThen.get());
+  } else {
+    RegisterID* cond = generator.emitNode(m_condition);
+    generator.emitJumpIfFalse(cond, afterThen.get());
+  }
 
   generator.emitNode(dst, m_ifBlock);
   generator.emitLabel(afterThen.get());
@@ -1637,8 +1699,15 @@ RegisterID* IfElseNode::emitBytecode(BytecodeGenerator& generator,
   RefPtr<Label> beforeElse = generator.newLabel();
   RefPtr<Label> afterElse = generator.newLabel();
 
-  RegisterID* cond = generator.emitNode(m_condition);
-  generator.emitJumpIfFalse(cond, beforeElse.get());
+  if (m_condition->hasConditionContextCodegen()) {
+    RefPtr<Label> beforeThen = generator.newLabel();
+    generator.emitNodeInConditionContext(m_condition, beforeThen.get(),
+                                         beforeElse.get(), true);
+    generator.emitLabel(beforeThen.get());
+  } else {
+    RegisterID* cond = generator.emitNode(m_condition);
+    generator.emitJumpIfFalse(cond, beforeElse.get());
+  }
 
   generator.emitNode(dst, m_ifBlock);
   generator.emitJump(afterElse.get());
@@ -1670,8 +1739,13 @@ RegisterID* DoWhileNode::emitBytecode(BytecodeGenerator& generator,
   generator.emitLabel(scope->continueTarget());
   generator.emitDebugHook(WillExecuteStatement, m_expr->lineNo(),
                           m_expr->lineNo());
-  RegisterID* cond = generator.emitNode(m_expr);
-  generator.emitJumpIfTrue(cond, topOfLoop.get());
+  if (m_expr->hasConditionContextCodegen())
+    generator.emitNodeInConditionContext(m_expr, topOfLoop.get(),
+                                         scope->breakTarget(), false);
+  else {
+    RegisterID* cond = generator.emitNode(m_expr);
+    generator.emitJumpIfTrue(cond, topOfLoop.get());
+  }
 
   generator.emitLabel(scope->breakTarget());
   return result.get();
@@ -1693,8 +1767,14 @@ RegisterID* WhileNode::emitBytecode(BytecodeGenerator& generator,
   generator.emitLabel(scope->continueTarget());
   generator.emitDebugHook(WillExecuteStatement, m_expr->lineNo(),
                           m_expr->lineNo());
-  RegisterID* cond = generator.emitNode(m_expr);
-  generator.emitJumpIfTrue(cond, topOfLoop.get());
+
+  if (m_expr->hasConditionContextCodegen())
+    generator.emitNodeInConditionContext(m_expr, topOfLoop.get(),
+                                         scope->breakTarget(), false);
+  else {
+    RegisterID* cond = generator.emitNode(m_expr);
+    generator.emitJumpIfTrue(cond, topOfLoop.get());
+  }
 
   generator.emitLabel(scope->breakTarget());
 
@@ -1729,8 +1809,13 @@ RegisterID* ForNode::emitBytecode(BytecodeGenerator& generator,
 
   generator.emitLabel(condition.get());
   if (m_expr2) {
-    RegisterID* cond = generator.emitNode(m_expr2);
-    generator.emitJumpIfTrue(cond, topOfLoop.get());
+    if (m_expr2->hasConditionContextCodegen())
+      generator.emitNodeInConditionContext(m_expr2, topOfLoop.get(),
+                                           scope->breakTarget(), false);
+    else {
+      RegisterID* cond = generator.emitNode(m_expr2);
+      generator.emitJumpIfTrue(cond, topOfLoop.get());
+    }
   } else
     generator.emitJump(topOfLoop.get());
 
