@@ -1765,7 +1765,7 @@ void JIT::emitSlow_op_jless(Instruction* currentInstruction,
     stubCall.addArgument(regT0);
     stubCall.addArgument(regT1);
     stubCall.call();
-    emitJumpSlowToHot(branchTest32(NotZero, regT0), target);
+    emitJumpSlowToHot(branchTest32(NonZero, regT0), target);
   }
 }
 
