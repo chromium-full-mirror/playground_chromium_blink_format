@@ -340,6 +340,10 @@ class RenderLayer : public ScrollbarClient {
   void clearClipRectsIncludingDescendants();
   void clearClipRects();
 
+  void addBlockSelectionGapsBounds(const IntRect&);
+  void clearBlockSelectionGapsBounds();
+  void repaintBlockSelectionGaps();
+
   // Get the enclosing stacking context for this layer.  A stacking context is a
   // layer
   // that has a non-auto z-index.
@@ -756,6 +760,9 @@ class RenderLayer : public ScrollbarClient {
   // Renderers to hold our custom scroll corner and resizer.
   RenderScrollbarPart* m_scrollCorner;
   RenderScrollbarPart* m_resizer;
+
+ private:
+  IntRect m_blockSelectionGapsBounds;
 
 #if USE(ACCELERATED_COMPOSITING)
   OwnPtr<RenderLayerBacking> m_backing;
