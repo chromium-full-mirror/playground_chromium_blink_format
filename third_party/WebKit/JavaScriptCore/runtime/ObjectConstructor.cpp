@@ -227,7 +227,7 @@ static bool toPropertyDescriptor(ExecState* exec,
   }
   JSObject* description = asObject(in);
 
-  PropertySlot enumerableSlot;
+  PropertySlot enumerableSlot(description);
   if (description->getPropertySlot(exec, exec->propertyNames().enumerable,
                                    enumerableSlot)) {
     desc.setEnumerable(
@@ -237,7 +237,7 @@ static bool toPropertyDescriptor(ExecState* exec,
       return false;
   }
 
-  PropertySlot configurableSlot;
+  PropertySlot configurableSlot(description);
   if (description->getPropertySlot(exec, exec->propertyNames().configurable,
                                    configurableSlot)) {
     desc.setConfigurable(
@@ -248,7 +248,7 @@ static bool toPropertyDescriptor(ExecState* exec,
   }
 
   JSValue value;
-  PropertySlot valueSlot;
+  PropertySlot valueSlot(description);
   if (description->getPropertySlot(exec, exec->propertyNames().value,
                                    valueSlot)) {
     desc.setValue(valueSlot.getValue(exec, exec->propertyNames().value));
@@ -256,7 +256,7 @@ static bool toPropertyDescriptor(ExecState* exec,
       return false;
   }
 
-  PropertySlot writableSlot;
+  PropertySlot writableSlot(description);
   if (description->getPropertySlot(exec, exec->propertyNames().writable,
                                    writableSlot)) {
     desc.setWritable(writableSlot.getValue(exec, exec->propertyNames().writable)
@@ -265,7 +265,7 @@ static bool toPropertyDescriptor(ExecState* exec,
       return false;
   }
 
-  PropertySlot getSlot;
+  PropertySlot getSlot(description);
   if (description->getPropertySlot(exec, exec->propertyNames().get, getSlot)) {
     JSValue get = getSlot.getValue(exec, exec->propertyNames().get);
     if (exec->hadException())
@@ -281,7 +281,7 @@ static bool toPropertyDescriptor(ExecState* exec,
     desc.setGetter(get);
   }
 
-  PropertySlot setSlot;
+  PropertySlot setSlot(description);
   if (description->getPropertySlot(exec, exec->propertyNames().set, setSlot)) {
     JSValue set = setSlot.getValue(exec, exec->propertyNames().set);
     if (exec->hadException())
