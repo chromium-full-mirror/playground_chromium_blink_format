@@ -59,11 +59,6 @@ class Worker;
 class XMLHttpRequest;
 class XMLHttpRequestUpload;
 
-#if ENABLE(SHARED_SCRIPT)
-class SharedScriptContext;
-class WebKitSharedScript;
-#endif
-
 typedef int ExceptionCode;
 
 struct FiringEventIterator {
@@ -119,11 +114,6 @@ class EventTarget {
 
 #if ENABLE(NOTIFICATIONS)
   virtual Notification* toNotification();
-#endif
-
-#if ENABLE(SHARED_SCRIPT)
-  virtual WebKitSharedScript* toWebKitSharedScript();
-  virtual SharedScriptContext* toSharedScriptContext();
 #endif
 
   virtual ScriptExecutionContext* scriptExecutionContext() const = 0;
