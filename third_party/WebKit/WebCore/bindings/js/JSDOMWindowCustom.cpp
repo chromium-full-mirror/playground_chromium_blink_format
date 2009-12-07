@@ -344,11 +344,9 @@ bool JSDOMWindow::getOwnPropertySlot(ExecState* exec,
 bool JSDOMWindow::getOwnPropertyDescriptor(ExecState* exec,
                                            const Identifier& propertyName,
                                            PropertyDescriptor& descriptor) {
-  // When accessing a Window cross-domain, functions are always the native
-  // built-in ones, and they
-  // are not affected by properties changed on the Window or anything in its
-  // prototype chain.
-  // This is consistent with the behavior of Firefox.
+  // Never allow cross-domain getOwnPropertyDescriptor
+  if (!allowsAccessFrom(exec))
+    return false;
 
   const HashEntry* entry;
 
@@ -381,12 +379,6 @@ bool JSDOMWindow::getOwnPropertyDescriptor(ExecState* exec,
     return true;
   }
 
-  String errorMessage;
-  bool allowsAccess = allowsAccessFrom(exec, errorMessage);
-  if (allowsAccess &&
-      JSGlobalObject::getOwnPropertyDescriptor(exec, propertyName, descriptor))
-    return true;
-
   // We need this code here because otherwise JSDOMWindowBase will stop the
   // search before we even get to the
   // prototype due to the blanket same origin (allowsAccessFrom) check at the
@@ -398,60 +390,11 @@ bool JSDOMWindow::getOwnPropertyDescriptor(ExecState* exec,
                                                                   propertyName);
   if (entry) {
     if (entry->attributes() & Function) {
-      if (entry->function() == jsDOMWindowPrototypeFunctionBlur) {
-        if (!allowsAccess) {
-          PropertySlot slot;
-          slot.setCustom(this, nonCachingStaticFunctionGetter<
-                                   jsDOMWindowPrototypeFunctionBlur, 0>);
-          descriptor.setDescriptor(slot.getValue(exec, propertyName),
-                                   ReadOnly | DontDelete | DontEnum);
-          return true;
-        }
-      } else if (entry->function() == jsDOMWindowPrototypeFunctionClose) {
-        if (!allowsAccess) {
-          PropertySlot slot;
-          slot.setCustom(this, nonCachingStaticFunctionGetter<
-                                   jsDOMWindowPrototypeFunctionClose, 0>);
-          descriptor.setDescriptor(slot.getValue(exec, propertyName),
-                                   ReadOnly | DontDelete | DontEnum);
-          return true;
-        }
-      } else if (entry->function() == jsDOMWindowPrototypeFunctionFocus) {
-        if (!allowsAccess) {
-          PropertySlot slot;
-          slot.setCustom(this, nonCachingStaticFunctionGetter<
-                                   jsDOMWindowPrototypeFunctionFocus, 0>);
-          descriptor.setDescriptor(slot.getValue(exec, propertyName),
-                                   ReadOnly | DontDelete | DontEnum);
-          return true;
-        }
-      } else if (entry->function() == jsDOMWindowPrototypeFunctionPostMessage) {
-        if (!allowsAccess) {
-          PropertySlot slot;
-          slot.setCustom(this, nonCachingStaticFunctionGetter<
-                                   jsDOMWindowPrototypeFunctionPostMessage, 2>);
-          descriptor.setDescriptor(slot.getValue(exec, propertyName),
-                                   ReadOnly | DontDelete | DontEnum);
-          return true;
-        }
-      } else if (entry->function() ==
-                 jsDOMWindowPrototypeFunctionShowModalDialog) {
+      if (entry->function() == jsDOMWindowPrototypeFunctionShowModalDialog) {
         if (!DOMWindow::canShowModalDialog(impl()->frame())) {
           descriptor.setUndefined();
           return true;
         }
-      }
-    }
-  } else {
-    // Allow access to toString() cross-domain, but always
-    // Object.prototype.toString.
-    if (propertyName == exec->propertyNames().toString) {
-      if (!allowsAccess) {
-        PropertySlot slot;
-        slot.setCustom(this, objectToStringFunctionGetter);
-        descriptor.setDescriptor(slot.getValue(exec, propertyName),
-                                 ReadOnly | DontDelete | DontEnum);
-        return true;
       }
     }
   }
@@ -483,14 +426,8 @@ bool JSDOMWindow::getOwnPropertyDescriptor(ExecState* exec,
   // precedence over the index and name getters.
   JSValue proto = prototype();
   if (proto.isObject()) {
-    if (asObject(proto)->getPropertyDescriptor(exec, propertyName,
-                                               descriptor)) {
-      if (!allowsAccess) {
-        printErrorMessage(errorMessage);
-        descriptor.setUndefined();
-      }
+    if (asObject(proto)->getPropertyDescriptor(exec, propertyName, descriptor))
       return true;
-    }
   }
 
   bool ok;
