@@ -334,6 +334,7 @@ static void webkit_web_inspector_set_property(GObject* object,
 
   switch (prop_id) {
     case PROP_JAVASCRIPT_PROFILING_ENABLED: {
+#if ENABLE(JAVASCRIPT_DEBUGGER)
       bool enabled = g_value_get_boolean(value);
       WebCore::InspectorController* controller =
           priv->page->inspectorController();
@@ -341,6 +342,11 @@ static void webkit_web_inspector_set_property(GObject* object,
         controller->enableProfiler();
       else
         controller->disableProfiler();
+#else
+      g_message(
+          "PROP_JAVASCRIPT_PROFILING_ENABLED is not work because of the "
+          "javascript debugger is disabled\n");
+#endif
       break;
     }
     case PROP_TIMELINE_PROFILING_ENABLED: {
@@ -374,8 +380,14 @@ static void webkit_web_inspector_get_property(GObject* object,
       g_value_set_string(value, priv->inspected_uri);
       break;
     case PROP_JAVASCRIPT_PROFILING_ENABLED:
+#if ENABLE(JAVASCRIPT_DEBUGGER)
       g_value_set_boolean(value,
                           priv->page->inspectorController()->profilerEnabled());
+#else
+      g_message(
+          "PROP_JAVASCRIPT_PROFILING_ENABLED is not work because of the "
+          "javascript debugger is disabled\n");
+#endif
       break;
     case PROP_TIMELINE_PROFILING_ENABLED:
       g_value_set_boolean(
