@@ -950,7 +950,7 @@ RegisterID* BytecodeGenerator::emitEqualityOp(OpcodeID opcodeID,
         m_codeBlock->constantRegister(src2->index()).jsValue().isString()) {
       const UString& value =
           asString(m_codeBlock->constantRegister(src2->index()).jsValue())
-              ->value();
+              ->tryGetValue();
       if (value == "undefined") {
         rewindUnaryOp();
         emitOpcode(op_is_undefined);

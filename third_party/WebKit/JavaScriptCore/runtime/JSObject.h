@@ -296,7 +296,7 @@ class JSObject : public JSCell {
   using JSCell::isGetterSetter;
   using JSCell::toObject;
   void getObject();
-  void getString();
+  void getString(ExecState* exec);
   void isObject();
   void isString();
 #if USE(JSVALUE32)

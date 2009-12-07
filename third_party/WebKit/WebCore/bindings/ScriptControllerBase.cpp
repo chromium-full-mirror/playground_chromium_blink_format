@@ -76,7 +76,9 @@ bool ScriptController::executeIfJavaScriptURL(const KURL& url,
     result = executeScript(script, userGesture);
 
   String scriptResult;
-  if (!result.getString(scriptResult))
+  JSDOMWindowShell* shell = windowShell(mainThreadNormalWorld());
+  JSC::ExecState* exec = shell->window()->globalExec();
+  if (!result.getString(exec, scriptResult))
     return true;
 
   // FIXME: We should always replace the document, but doing so

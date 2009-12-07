@@ -335,7 +335,7 @@ NEVER_INLINE JSValue Interpreter::callEval(CallFrame* callFrame,
   if (!program.isString())
     return program;
 
-  UString programSource = asString(program)->value();
+  UString programSource = asString(program)->value(callFrame);
 
   LiteralParser preparser(callFrame, programSource,
                           LiteralParser::NonStrictJSON);
@@ -1534,7 +1534,8 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
       int dst = vPC[1].u.operand;
       JSValue src1 = callFrame->r(vPC[2].u.operand).jsValue();
       JSValue src2 = callFrame->r(vPC[3].u.operand).jsValue();
-      callFrame->r(dst) = jsBoolean(JSValue::strictEqual(src1, src2));
+      callFrame->r(dst) =
+          jsBoolean(JSValue::strictEqual(callFrame, src1, src2));
 
       vPC += OPCODE_LENGTH(op_stricteq);
       NEXT_INSTRUCTION();
@@ -1549,7 +1550,8 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
       int dst = vPC[1].u.operand;
       JSValue src1 = callFrame->r(vPC[2].u.operand).jsValue();
       JSValue src2 = callFrame->r(vPC[3].u.operand).jsValue();
-      callFrame->r(dst) = jsBoolean(!JSValue::strictEqual(src1, src2));
+      callFrame->r(dst) =
+          jsBoolean(!JSValue::strictEqual(callFrame, src1, src2));
 
       vPC += OPCODE_LENGTH(op_nstricteq);
       NEXT_INSTRUCTION();
@@ -2790,7 +2792,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
             result = jsArray->JSArray::get(callFrame, i);
         } else if (isJSString(globalData, baseValue) &&
                    asString(baseValue)->canGetIndex(i))
-          result = asString(baseValue)->getIndex(&callFrame->globalData(), i);
+          result = asString(baseValue)->getIndex(callFrame, i);
         else if (isJSByteArray(globalData, baseValue) &&
                  asByteArray(baseValue)->canAccessIndex(i))
           result = asByteArray(baseValue)->getIndex(callFrame, i);
@@ -3247,7 +3249,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
       if (!scrutinee.isString())
         vPC += defaultOffset;
       else {
-        UString::Rep* value = asString(scrutinee)->value().rep();
+        UString::Rep* value = asString(scrutinee)->value(callFrame).rep();
         if (value->size() != 1)
           vPC += defaultOffset;
         else
@@ -3274,7 +3276,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
       else
         vPC += callFrame->codeBlock()
                    ->stringSwitchJumpTable(tableIndex)
-                   .offsetForValue(asString(scrutinee)->value().rep(),
+                   .offsetForValue(asString(scrutinee)->value(callFrame).rep(),
                                    defaultOffset);
       NEXT_INSTRUCTION();
     }
@@ -3934,6 +3936,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
 
       callFrame->r(dst) =
           concatenateStrings(callFrame, &callFrame->registers()[src], count);
+      CHECK_FOR_EXCEPTION();
       vPC += OPCODE_LENGTH(op_strcat);
 
       NEXT_INSTRUCTION();

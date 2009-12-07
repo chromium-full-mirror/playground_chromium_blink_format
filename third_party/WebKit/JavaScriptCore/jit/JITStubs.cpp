@@ -1124,7 +1124,11 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_add) {
   bool leftIsString = v1.isString();
   if (leftIsString && v2.isString()) {
     if (asString(v1)->isRope() || asString(v2)->isRope()) {
-      RefPtr<JSString::Rope> rope = JSString::Rope::create(2);
+      RefPtr<JSString::Rope> rope = JSString::Rope::createOrNull(2);
+      if (UNLIKELY(!rope)) {
+        throwOutOfMemoryError(callFrame);
+        VM_THROW_EXCEPTION();
+      }
       rope->initializeFiber(0, asString(v1));
       rope->initializeFiber(1, asString(v2));
       JSGlobalData* globalData = &callFrame->globalData();
@@ -1133,7 +1137,8 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_add) {
     }
 
     RefPtr<UString::Rep> value =
-        concatenate(asString(v1)->value().rep(), asString(v2)->value().rep());
+        concatenate(asString(v1)->value(callFrame).rep(),
+                    asString(v2)->value(callFrame).rep());
     if (UNLIKELY(!value)) {
       throwOutOfMemoryError(callFrame);
       VM_THROW_EXCEPTION();
@@ -1144,8 +1149,9 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_add) {
 
   if (rightIsNumber & leftIsString) {
     RefPtr<UString::Rep> value =
-        v2.isInt32() ? concatenate(asString(v1)->value().rep(), v2.asInt32())
-                     : concatenate(asString(v1)->value().rep(), right);
+        v2.isInt32()
+            ? concatenate(asString(v1)->value(callFrame).rep(), v2.asInt32())
+            : concatenate(asString(v1)->value(callFrame).rep(), right);
 
     if (UNLIKELY(!value)) {
       throwOutOfMemoryError(callFrame);
@@ -2040,7 +2046,7 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_get_by_val) {
       // immediately to avoid exception checks.
       ctiPatchCallByReturnAddress(callFrame->codeBlock(), STUB_RETURN_ADDRESS,
                                   FunctionPtr(cti_op_get_by_val_string));
-      result = asString(baseValue)->getIndex(stackFrame.globalData, i);
+      result = asString(baseValue)->getIndex(callFrame, i);
     } else if (isJSByteArray(globalData, baseValue) &&
                asByteArray(baseValue)->canAccessIndex(i)) {
       // All fast byte array accesses are safe from exceptions so return
@@ -2074,7 +2080,7 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_get_by_val_string) {
     uint32_t i = subscript.asUInt32();
     if (isJSString(globalData, baseValue) &&
         asString(baseValue)->canGetIndex(i))
-      result = asString(baseValue)->getIndex(stackFrame.globalData, i);
+      result = asString(baseValue)->getIndex(callFrame, i);
     else {
       result = baseValue.get(callFrame, i);
       if (!isJSString(globalData, baseValue))
@@ -2614,23 +2620,29 @@ start:
 
   if (cell1->isString()) {
     if (src2.isInt32())
-      return static_cast<JSString*>(cell1)->value().toDouble() ==
-             src2.asInt32();
+      return static_cast<JSString*>(cell1)
+                 ->value(stackFrame.callFrame)
+                 .toDouble() == src2.asInt32();
 
     if (src2.isDouble())
-      return static_cast<JSString*>(cell1)->value().toDouble() ==
-             src2.asDouble();
+      return static_cast<JSString*>(cell1)
+                 ->value(stackFrame.callFrame)
+                 .toDouble() == src2.asDouble();
 
     if (src2.isTrue())
-      return static_cast<JSString*>(cell1)->value().toDouble() == 1.0;
+      return static_cast<JSString*>(cell1)
+                 ->value(stackFrame.callFrame)
+                 .toDouble() == 1.0;
 
     if (src2.isFalse())
-      return static_cast<JSString*>(cell1)->value().toDouble() == 0.0;
+      return static_cast<JSString*>(cell1)
+                 ->value(stackFrame.callFrame)
+                 .toDouble() == 0.0;
 
     JSCell* cell2 = asCell(src2);
     if (cell2->isString())
-      return static_cast<JSString*>(cell1)->value() ==
-             static_cast<JSString*>(cell2)->value();
+      return static_cast<JSString*>(cell1)->value(stackFrame.callFrame) ==
+             static_cast<JSString*>(cell2)->value(stackFrame.callFrame);
 
     src2 = asObject(cell2)->toPrimitive(stackFrame.callFrame);
     CHECK_FOR_EXCEPTION();
@@ -2652,7 +2664,8 @@ DEFINE_STUB_FUNCTION(int, op_eq_strings) {
 
   ASSERT(string1->isString());
   ASSERT(string2->isString());
-  return string1->value() == string2->value();
+  return string1->value(stackFrame.callFrame) ==
+         string2->value(stackFrame.callFrame);
 }
 
 #else  // USE(JSVALUE32_64)
@@ -2957,8 +2970,9 @@ DEFINE_STUB_FUNCTION(int, has_property) {
 
   JSObject* base = stackFrame.args[0].jsObject();
   JSString* property = stackFrame.args[1].jsString();
-  return base->hasProperty(stackFrame.callFrame,
-                           Identifier(stackFrame.callFrame, property->value()));
+  return base->hasProperty(
+      stackFrame.callFrame,
+      Identifier(stackFrame.callFrame, property->value(stackFrame.callFrame)));
 }
 
 DEFINE_STUB_FUNCTION(JSObject*, op_push_scope) {
@@ -3033,7 +3047,8 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_stricteq) {
   JSValue src1 = stackFrame.args[0].jsValue();
   JSValue src2 = stackFrame.args[1].jsValue();
 
-  return JSValue::encode(jsBoolean(JSValue::strictEqual(src1, src2)));
+  return JSValue::encode(
+      jsBoolean(JSValue::strictEqual(stackFrame.callFrame, src1, src2)));
 }
 
 DEFINE_STUB_FUNCTION(EncodedJSValue, op_to_primitive) {
@@ -3046,10 +3061,12 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_to_primitive) {
 DEFINE_STUB_FUNCTION(EncodedJSValue, op_strcat) {
   STUB_INIT_STACK_FRAME(stackFrame);
 
-  return JSValue::encode(concatenateStrings(
+  JSValue result = concatenateStrings(
       stackFrame.callFrame,
       &stackFrame.callFrame->registers()[stackFrame.args[0].int32()],
-      stackFrame.args[1].int32()));
+      stackFrame.args[1].int32());
+  CHECK_FOR_EXCEPTION_AT_END();
+  return JSValue::encode(result);
 }
 
 DEFINE_STUB_FUNCTION(EncodedJSValue, op_nstricteq) {
@@ -3058,7 +3075,8 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_nstricteq) {
   JSValue src1 = stackFrame.args[0].jsValue();
   JSValue src2 = stackFrame.args[1].jsValue();
 
-  return JSValue::encode(jsBoolean(!JSValue::strictEqual(src1, src2)));
+  return JSValue::encode(
+      jsBoolean(!JSValue::strictEqual(stackFrame.callFrame, src1, src2)));
 }
 
 DEFINE_STUB_FUNCTION(EncodedJSValue, op_to_jsnumber) {
@@ -3172,7 +3190,7 @@ DEFINE_STUB_FUNCTION(void*, op_switch_char) {
                      .ctiDefault.executableAddress();
 
   if (scrutinee.isString()) {
-    UString::Rep* value = asString(scrutinee)->value().rep();
+    UString::Rep* value = asString(scrutinee)->value(callFrame).rep();
     if (value->size() == 1)
       result = codeBlock->characterSwitchJumpTable(tableIndex)
                    .ctiForValue(value->data()[0])
@@ -3194,7 +3212,7 @@ DEFINE_STUB_FUNCTION(void*, op_switch_string) {
                      .ctiDefault.executableAddress();
 
   if (scrutinee.isString()) {
-    UString::Rep* value = asString(scrutinee)->value().rep();
+    UString::Rep* value = asString(scrutinee)->value(callFrame).rep();
     result = codeBlock->stringSwitchJumpTable(tableIndex)
                  .ctiForValue(value)
                  .executableAddress();

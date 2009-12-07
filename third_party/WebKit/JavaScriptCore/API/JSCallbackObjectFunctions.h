@@ -509,7 +509,7 @@ UString JSCallbackObject<Base>::toString(ExecState* exec) const {
         return "";
       }
       if (value)
-        return toJS(exec, value).getString();
+        return toJS(exec, value).getString(exec);
     }
 
   return Base::toString(exec);

@@ -1207,7 +1207,7 @@ JSValue JSC_HOST_CALL arrayProtoFuncIndexOf(ExecState* exec,
     JSValue e = getProperty(exec, thisObj, index);
     if (!e)
       continue;
-    if (JSValue::strictEqual(searchElement, e))
+    if (JSValue::strictEqual(exec, searchElement, e))
       return jsNumber(exec, index);
   }
 
@@ -1242,7 +1242,7 @@ JSValue JSC_HOST_CALL arrayProtoFuncLastIndexOf(ExecState* exec,
     JSValue e = getProperty(exec, thisObj, index);
     if (!e)
       continue;
-    if (JSValue::strictEqual(searchElement, e))
+    if (JSValue::strictEqual(exec, searchElement, e))
       return jsNumber(exec, index);
   }
 

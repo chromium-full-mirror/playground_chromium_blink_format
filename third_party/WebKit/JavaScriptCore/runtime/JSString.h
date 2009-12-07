@@ -105,8 +105,12 @@ class JSString : public JSCell {
     // Creates a Rope comprising of 'ropeLength' Fibers.
     // The Rope is constructed in an uninitialized state - initialize must be
     // called for each Fiber in the Rope.
-    static PassRefPtr<Rope> create(unsigned ropeLength) {
-      return adoptRef(new (ropeLength) Rope(ropeLength));
+    static PassRefPtr<Rope> createOrNull(unsigned ropeLength) {
+      void* allocation;
+      if (tryFastMalloc(sizeof(Rope) + (ropeLength - 1) * sizeof(Fiber))
+              .getValue(allocation))
+        return adoptRef(new (allocation) Rope(ropeLength));
+      return 0;
     }
 
     ~Rope();
@@ -134,10 +138,7 @@ class JSString : public JSCell {
 
    private:
     Rope(unsigned ropeLength) : m_ropeLength(ropeLength), m_stringLength(0) {}
-    void* operator new(size_t, unsigned ropeLength) {
-      return fastMalloc(sizeof(Rope) +
-                        (ropeLength - 1) * sizeof(UString::Rep*));
-    }
+    void* operator new(size_t, void* inPlace) { return inPlace; }
 
     unsigned m_ropeLength;
     unsigned m_stringLength;
@@ -167,9 +168,14 @@ class JSString : public JSCell {
         m_length(rope->stringLength()),
         m_rope(rope) {}
 
-  const UString& value() const {
+  const UString& value(ExecState* exec) const {
     if (m_rope)
-      resolveRope();
+      resolveRope(exec);
+    return m_value;
+  }
+  const UString tryGetValue() const {
+    if (m_rope)
+      UString();
     return m_value;
   }
   unsigned length() { return m_length; }
@@ -193,7 +199,7 @@ class JSString : public JSCell {
                                    PropertyDescriptor&);
 
   bool canGetIndex(unsigned i) { return i < m_length; }
-  JSString* getIndex(JSGlobalData*, unsigned);
+  JSString* getIndex(ExecState*, unsigned);
 
   static PassRefPtr<Structure> createStructure(JSValue proto) {
     return Structure::create(
@@ -205,7 +211,7 @@ class JSString : public JSCell {
   enum VPtrStealingHackType { VPtrStealingHack };
   JSString(VPtrStealingHackType) : JSCell(0) {}
 
-  void resolveRope() const;
+  void resolveRope(ExecState*) const;
 
   virtual JSValue toPrimitive(ExecState*, PreferredPrimitiveType) const;
   virtual bool getPrimitiveNumber(ExecState*, double& number, JSValue& value);
@@ -276,9 +282,9 @@ inline JSString* jsNontrivialString(JSGlobalData* globalData,
   return new (globalData) JSString(globalData, s);
 }
 
-inline JSString* JSString::getIndex(JSGlobalData* globalData, unsigned i) {
+inline JSString* JSString::getIndex(ExecState* exec, unsigned i) {
   ASSERT(canGetIndex(i));
-  return jsSingleCharacterSubstring(globalData, value(), i);
+  return jsSingleCharacterSubstring(&exec->globalData(), value(exec), i);
 }
 
 inline JSString* jsString(JSGlobalData* globalData, const UString& s) {
@@ -365,7 +371,7 @@ ALWAYS_INLINE bool JSString::getStringPropertySlot(
   bool isStrictUInt32;
   unsigned i = propertyName.toStrictUInt32(&isStrictUInt32);
   if (isStrictUInt32 && i < m_length) {
-    slot.setValue(jsSingleCharacterSubstring(exec, value(), i));
+    slot.setValue(jsSingleCharacterSubstring(exec, value(exec), i));
     return true;
   }
 
@@ -376,7 +382,7 @@ ALWAYS_INLINE bool JSString::getStringPropertySlot(ExecState* exec,
                                                    unsigned propertyName,
                                                    PropertySlot& slot) {
   if (propertyName < m_length) {
-    slot.setValue(jsSingleCharacterSubstring(exec, value(), propertyName));
+    slot.setValue(jsSingleCharacterSubstring(exec, value(exec), propertyName));
     return true;
   }
 
@@ -396,7 +402,7 @@ inline JSString* JSValue::toThisJSString(ExecState* exec) {
 
 inline UString JSValue::toString(ExecState* exec) const {
   if (isString())
-    return static_cast<JSString*>(asCell())->value();
+    return static_cast<JSString*>(asCell())->value(exec);
   if (isInt32())
     return exec->globalData().numericStrings.add(asInt32());
   if (isDouble())

@@ -65,7 +65,7 @@ class PropertyDescriptor {
   }
   bool setterPresent() const { return m_setter; }
   bool getterPresent() const { return m_getter; }
-  bool equalTo(const PropertyDescriptor& other) const;
+  bool equalTo(ExecState* exec, const PropertyDescriptor& other) const;
   bool attributesEqual(const PropertyDescriptor& other) const;
   unsigned attributesWithOverride(const PropertyDescriptor& other) const;
 

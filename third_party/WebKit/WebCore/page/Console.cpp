@@ -199,7 +199,7 @@ void Console::addMessage(MessageType type,
 
   for (unsigned i = 0; i < lastCaller.argumentCount(); ++i) {
     String argAsString;
-    if (lastCaller.argumentAt(i).getString(argAsString))
+    if (lastCaller.argumentAt(i).getString(callStack->state(), argAsString))
       printf(" %s", argAsString.utf8().data());
   }
   printf("\n");

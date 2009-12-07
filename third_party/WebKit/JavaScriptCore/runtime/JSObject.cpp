@@ -555,15 +555,14 @@ void JSObject::removeDirect(const Identifier& propertyName) {
 void JSObject::putDirectFunction(ExecState* exec,
                                  InternalFunction* function,
                                  unsigned attr) {
-  putDirectFunction(Identifier(exec, function->name(&exec->globalData())),
-                    function, attr);
+  putDirectFunction(Identifier(exec, function->name(exec)), function, attr);
 }
 
 void JSObject::putDirectFunctionWithoutTransition(ExecState* exec,
                                                   InternalFunction* function,
                                                   unsigned attr) {
-  putDirectFunctionWithoutTransition(
-      Identifier(exec, function->name(&exec->globalData())), function, attr);
+  putDirectFunctionWithoutTransition(Identifier(exec, function->name(exec)),
+                                     function, attr);
 }
 
 NEVER_INLINE void JSObject::fillGetterPropertySlot(PropertySlot& slot,
@@ -646,7 +645,7 @@ bool JSObject::defineOwnProperty(ExecState* exec,
   if (descriptor.isEmpty())
     return true;
 
-  if (current.equalTo(descriptor))
+  if (current.equalTo(exec, descriptor))
     return true;
 
   // Filter out invalid changes
@@ -707,7 +706,7 @@ bool JSObject::defineOwnProperty(ExecState* exec,
       }
       if (!current.writable()) {
         if (descriptor.value() ||
-            !JSValue::strictEqual(current.value(), descriptor.value())) {
+            !JSValue::strictEqual(exec, current.value(), descriptor.value())) {
           if (throwException)
             throwError(exec, TypeError,
                        "Attempting to change value of a readonly property.");
@@ -734,7 +733,7 @@ bool JSObject::defineOwnProperty(ExecState* exec,
   if (!current.configurable()) {
     if (descriptor.setterPresent() &&
         !(current.setter() &&
-          JSValue::strictEqual(current.setter(), descriptor.setter()))) {
+          JSValue::strictEqual(exec, current.setter(), descriptor.setter()))) {
       if (throwException)
         throwError(
             exec, TypeError,
@@ -743,7 +742,7 @@ bool JSObject::defineOwnProperty(ExecState* exec,
     }
     if (descriptor.getterPresent() &&
         !(current.getter() &&
-          JSValue::strictEqual(current.getter(), descriptor.getter()))) {
+          JSValue::strictEqual(exec, current.getter(), descriptor.getter()))) {
       if (throwException)
         throwError(
             exec, TypeError,

@@ -120,15 +120,15 @@ JSValue JSC_HOST_CALL functionProtoFuncToString(ExecState* exec,
       FunctionExecutable* executable = function->jsExecutable();
       UString sourceString = executable->source().toString();
       insertSemicolonIfNeeded(sourceString);
-      return jsString(exec, "function " + function->name(&exec->globalData()) +
-                                "(" + executable->paramString() + ") " +
+      return jsString(exec, "function " + function->name(exec) + "(" +
+                                executable->paramString() + ") " +
                                 sourceString);
     }
   }
 
   if (thisValue.inherits(&InternalFunction::info)) {
     InternalFunction* function = asInternalFunction(thisValue);
-    return jsString(exec, "function " + function->name(&exec->globalData()) +
+    return jsString(exec, "function " + function->name(exec) +
                               "() {\n    [native code]\n}");
   }
 

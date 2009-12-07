@@ -48,7 +48,7 @@ class ScriptValue {
   virtual ~ScriptValue() {}
 
   JSC::JSValue jsValue() const { return m_value.get(); }
-  bool getString(String& result) const;
+  bool getString(ScriptState*, String& result) const;
   String toString(ScriptState* scriptState) const {
     return m_value.get().toString(scriptState);
   }

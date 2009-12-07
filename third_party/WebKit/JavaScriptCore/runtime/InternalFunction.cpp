@@ -45,27 +45,28 @@ InternalFunction::InternalFunction(JSGlobalData* globalData,
             DontDelete | ReadOnly | DontEnum);
 }
 
-const UString& InternalFunction::name(JSGlobalData* globalData) {
-  return asString(getDirect(globalData->propertyNames->name))->value();
+const UString& InternalFunction::name(ExecState* exec) {
+  return asString(getDirect(exec->globalData().propertyNames->name))
+      ->value(exec);
 }
 
-const UString InternalFunction::displayName(JSGlobalData* globalData) {
-  JSValue displayName = getDirect(globalData->propertyNames->displayName);
+const UString InternalFunction::displayName(ExecState* exec) {
+  JSValue displayName =
+      getDirect(exec->globalData().propertyNames->displayName);
 
-  if (displayName && isJSString(globalData, displayName))
-    return asString(displayName)->value();
+  if (displayName && isJSString(&exec->globalData(), displayName))
+    return asString(displayName)->value(exec);
 
   return UString::null();
 }
 
-const UString InternalFunction::calculatedDisplayName(
-    JSGlobalData* globalData) {
-  const UString explicitName = displayName(globalData);
+const UString InternalFunction::calculatedDisplayName(ExecState* exec) {
+  const UString explicitName = displayName(exec);
 
   if (!explicitName.isEmpty())
     return explicitName;
 
-  return name(globalData);
+  return name(exec);
 }
 
 }  // namespace JSC

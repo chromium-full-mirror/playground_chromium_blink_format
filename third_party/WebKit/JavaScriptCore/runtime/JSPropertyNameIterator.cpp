@@ -82,7 +82,8 @@ JSValue JSPropertyNameIterator::get(ExecState* exec, JSObject* base, size_t i) {
       m_cachedPrototypeChain == base->structure()->prototypeChain(exec))
     return identifier;
 
-  if (!base->hasProperty(exec, Identifier(exec, asString(identifier)->value())))
+  if (!base->hasProperty(exec,
+                         Identifier(exec, asString(identifier)->value(exec))))
     return JSValue();
   return identifier;
 }

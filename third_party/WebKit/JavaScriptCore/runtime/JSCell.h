@@ -66,10 +66,10 @@ class JSCell : public NoncopyableCustomAllocated {
   Structure* structure() const;
 
   // Extracting the value.
-  bool getString(UString&) const;
-  UString getString() const;          // null string if not a string
-  JSObject* getObject();              // NULL if not an object
-  const JSObject* getObject() const;  // NULL if not an object
+  bool getString(ExecState* exec, UString&) const;
+  UString getString(ExecState* exec) const;  // null string if not a string
+  JSObject* getObject();                     // NULL if not an object
+  const JSObject* getObject() const;         // NULL if not an object
 
   virtual CallType getCallData(CallData&);
   virtual ConstructType getConstructData(ConstructData&);
@@ -175,12 +175,12 @@ inline bool JSValue::isObject() const {
   return isCell() && asCell()->isObject();
 }
 
-inline bool JSValue::getString(UString& s) const {
-  return isCell() && asCell()->getString(s);
+inline bool JSValue::getString(ExecState* exec, UString& s) const {
+  return isCell() && asCell()->getString(exec, s);
 }
 
-inline UString JSValue::getString() const {
-  return isCell() ? asCell()->getString() : UString();
+inline UString JSValue::getString(ExecState* exec) const {
+  return isCell() ? asCell()->getString(exec) : UString();
 }
 
 inline JSObject* JSValue::getObject() const {

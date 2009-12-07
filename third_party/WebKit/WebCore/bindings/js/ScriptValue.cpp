@@ -49,12 +49,12 @@ ScriptValue ScriptValue::quarantineValue(ScriptState* scriptState,
       JSInspectedObjectWrapper::wrap(scriptState, value.jsValue()));
 }
 
-bool ScriptValue::getString(String& result) const {
+bool ScriptValue::getString(ScriptState* scriptState, String& result) const {
   if (!m_value)
     return false;
   JSLock lock(SilenceAssertionsOnly);
   UString ustring;
-  if (!m_value.get().getString(ustring))
+  if (!m_value.get().getString(scriptState, ustring))
     return false;
   result = ustring;
   return true;
