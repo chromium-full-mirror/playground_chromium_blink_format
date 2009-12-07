@@ -47,16 +47,20 @@ FontPlatformData::FontPlatformData(const FontPlatformData& other)
 }
 
 FontPlatformData::FontPlatformData(const FontDescription& description,
+                                   const AtomicString& familyName,
                                    int wordSpacing,
                                    int letterSpacing)
     : m_data(new FontPlatformDataPrivate()) {
-  QString familyName;
+  QString familyNames(familyName);
+  if (!familyName.isEmpty())
+    familyNames += QLatin1Char(',');
+
   const FontFamily* family = &description.family();
   while (family) {
-    familyName += family->family();
+    familyNames += family->family();
     family = family->next();
     if (family)
-      familyName += QLatin1Char(',');
+      familyNames += QLatin1Char(',');
   }
   QFont& font = m_data->font;
   font.setFamily(familyName);

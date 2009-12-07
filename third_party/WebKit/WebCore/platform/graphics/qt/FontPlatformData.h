@@ -59,6 +59,7 @@ class FontPlatformData : public FastAllocBase {
   FontPlatformData(float size, bool bold, bool oblique);
   FontPlatformData(const FontPlatformData&);
   FontPlatformData(const FontDescription&,
+                   const AtomicString& familyName,
                    int wordSpacing = 0,
                    int letterSpacing = 0);
   FontPlatformData(const QFont& font)
