@@ -3049,8 +3049,9 @@ HRESULT STDMETHODCALLTYPE WebView::stringByEvaluatingJavaScriptFromString(
     return E_FAIL;
   else if (scriptExecutionResult.isString()) {
     JSLock lock(JSC::SilenceAssertionsOnly);
-    JSC::ExecState* exec =
-        coreFrame->script()->globalObject(mainThreadNormalWorld());
+    JSC::ExecState* exec = coreFrame->script()
+                               ->globalObject(mainThreadNormalWorld())
+                               ->globalExec();
     *result = BString(String(scriptExecutionResult.getString(exec)));
   }
 
