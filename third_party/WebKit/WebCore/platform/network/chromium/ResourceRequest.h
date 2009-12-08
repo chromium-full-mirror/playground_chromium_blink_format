@@ -37,35 +37,24 @@ class Frame;
 
 class ResourceRequest : public ResourceRequestBase {
  public:
-  enum TargetType {
-    TargetIsMainFrame,
-    TargetIsSubFrame,
-    TargetIsSubResource,
-    TargetIsObject,
-    TargetIsMedia
-  };
-
   ResourceRequest(const String& url)
       : ResourceRequestBase(KURL(ParsedURLString, url), UseProtocolCachePolicy),
         m_requestorID(0),
         m_requestorProcessID(0),
-        m_appCacheHostID(0),
-        m_targetType(TargetIsSubResource) {}
+        m_appCacheHostID(0) {}
 
   ResourceRequest(const KURL& url, const CString& securityInfo)
       : ResourceRequestBase(url, UseProtocolCachePolicy),
         m_requestorID(0),
         m_requestorProcessID(0),
         m_appCacheHostID(0),
-        m_targetType(TargetIsSubResource),
         m_securityInfo(securityInfo) {}
 
   ResourceRequest(const KURL& url)
       : ResourceRequestBase(url, UseProtocolCachePolicy),
         m_requestorID(0),
         m_requestorProcessID(0),
-        m_appCacheHostID(0),
-        m_targetType(TargetIsSubResource) {}
+        m_appCacheHostID(0) {}
 
   ResourceRequest(const KURL& url,
                   const String& referrer,
@@ -73,8 +62,7 @@ class ResourceRequest : public ResourceRequestBase {
       : ResourceRequestBase(url, policy),
         m_requestorID(0),
         m_requestorProcessID(0),
-        m_appCacheHostID(0),
-        m_targetType(TargetIsSubResource) {
+        m_appCacheHostID(0) {
     setHTTPReferrer(referrer);
   }
 
@@ -82,16 +70,11 @@ class ResourceRequest : public ResourceRequestBase {
       : ResourceRequestBase(KURL(), UseProtocolCachePolicy),
         m_requestorID(0),
         m_requestorProcessID(0),
-        m_appCacheHostID(0),
-        m_targetType(TargetIsSubResource) {}
+        m_appCacheHostID(0) {}
 
   // Allows the request to be matched up with its requestor.
   int requestorID() const { return m_requestorID; }
   void setRequestorID(int requestorID) { m_requestorID = requestorID; }
-
-  // What this request is for.
-  TargetType targetType() const { return m_targetType; }
-  void setTargetType(TargetType type) { m_targetType = type; }
 
   // The process id of the process from which this request originated. In
   // the case of out-of-process plugins, this allows to link back the
@@ -124,7 +107,6 @@ class ResourceRequest : public ResourceRequestBase {
   int m_requestorID;
   int m_requestorProcessID;
   int m_appCacheHostID;
-  TargetType m_targetType;
   CString m_securityInfo;
 };
 

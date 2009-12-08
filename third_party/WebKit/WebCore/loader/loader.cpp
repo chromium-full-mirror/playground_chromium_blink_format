@@ -61,11 +61,34 @@ Loader::Loader()
       m_isSuspendingPendingRequests(false) {
   m_nonHTTPProtocolHost =
       Host::create(AtomicString(), maxRequestsInFlightForNonHTTPProtocols);
+#if REQUEST_MANAGEMENT_ENABLED
   maxRequestsInFlightPerHost = initializeMaximumHTTPConnectionCountPerHost();
+#endif
 }
 
 Loader::~Loader() {
   ASSERT_NOT_REACHED();
+}
+
+ResourceRequest::TargetType cachedResourceTypeToTargetType(
+    CachedResource::Type type) {
+  switch (type) {
+    case CachedResource::CSSStyleSheet:
+#if ENABLE(XSLT)
+    case CachedResource::XSLStyleSheet:
+#endif
+#if ENABLE(XBL)
+    case CachedResource::XBL:
+#endif
+      return ResourceRequest::TargetIsStyleSheet;
+    case CachedResource::Script:
+      return ResourceRequest::TargetIsScript;
+    case CachedResource::FontResource:
+      return ResourceRequest::TargetIsFontResource;
+    case CachedResource::ImageResource:
+      return ResourceRequest::TargetIsImage;
+  }
+  return ResourceRequest::TargetIsSubresource;
 }
 
 Loader::Priority Loader::determinePriority(
@@ -295,6 +318,8 @@ void Loader::Host::servePendingRequests(RequestQueue& requestsPending,
     requestsPending.removeFirst();
 
     ResourceRequest resourceRequest(request->cachedResource()->url());
+    resourceRequest.setTargetType(
+        cachedResourceTypeToTargetType(request->cachedResource()->type()));
 
     if (!request->cachedResource()->accept().isEmpty())
       resourceRequest.setHTTPAccept(request->cachedResource()->accept());
