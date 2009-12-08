@@ -223,9 +223,9 @@ static ResourceRequest::TargetType determineTargetTypeFromLoader(
   if (loader == loader->frameLoader()->provisionalDocumentLoader()) {
     if (loader->frameLoader()->isLoadingMainFrame())
       return ResourceRequest::TargetIsMainFrame;
-    return ResourceRequest::TargetIsSubFrame;
+    return ResourceRequest::TargetIsSubframe;
   }
-  return ResourceRequest::TargetIsSubResource;
+  return ResourceRequest::TargetIsSubresource;
 }
 
 void FrameLoaderClientImpl::dispatchWillSendRequest(
