@@ -30,20 +30,13 @@
 
 namespace WebCore {
 
-SharedBuffer::SharedBuffer() {
-  // Currently, this class is shared cross-thread in IconDatabase.
-  disableThreadVerification();
-}
+SharedBuffer::SharedBuffer() {}
 
 SharedBuffer::SharedBuffer(const char* data, int size) {
-  // Currently, this class is shared cross-thread in IconDatabase.
-  disableThreadVerification();
   m_buffer.append(data, size);
 }
 
 SharedBuffer::SharedBuffer(const unsigned char* data, int size) {
-  // Currently, this class is shared cross-thread in IconDatabase.
-  disableThreadVerification();
   m_buffer.append(data, size);
 }
 
