@@ -55,6 +55,13 @@ class RenderThemeChromiumLinux : public RenderThemeChromiumSkia {
   void setCaretBlinkInterval(double interval);
   virtual double caretBlinkIntervalInternal() const;
 
+  static void setScrollbarColors(unsigned inactive_color,
+                                 unsigned active_color,
+                                 unsigned track_color);
+  static unsigned thumbInactiveColor() { return m_thumbInactiveColor; }
+  static unsigned thumbActiveColor() { return m_thumbActiveColor; }
+  static unsigned trackColor() { return m_trackColor; }
+
  private:
   RenderThemeChromiumLinux();
   virtual ~RenderThemeChromiumLinux();
@@ -63,6 +70,10 @@ class RenderThemeChromiumLinux : public RenderThemeChromiumSkia {
   virtual bool supportsControlTints() const;
 
   double m_caretBlinkInterval;
+
+  static unsigned m_thumbInactiveColor;
+  static unsigned m_thumbActiveColor;
+  static unsigned m_trackColor;
 };
 
 }  // namespace WebCore

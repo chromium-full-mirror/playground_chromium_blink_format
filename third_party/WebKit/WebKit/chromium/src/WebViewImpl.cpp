@@ -97,6 +97,9 @@
 #include "KeyboardCodesWin.h"
 #include "RenderThemeChromiumWin.h"
 #else
+#if PLATFORM(LINUX)
+#include "RenderThemeChromiumLinux.h"
+#endif
 #include "KeyboardCodesPosix.h"
 #include "RenderTheme.h"
 #endif
@@ -1539,6 +1542,15 @@ bool WebViewImpl::isActive() const {
   return (page() && page()->focusController())
              ? page()->focusController()->isActive()
              : false;
+}
+
+void WebViewImpl::setScrollbarColors(unsigned inactiveColor,
+                                     unsigned activeColor,
+                                     unsigned trackColor) {
+#if PLATFORM(LINUX)
+  RenderThemeChromiumLinux::setScrollbarColors(inactiveColor, activeColor,
+                                               trackColor);
+#endif
 }
 
 void WebViewImpl::didCommitLoad(bool* isNewNavigation) {
