@@ -123,7 +123,7 @@ class InspectorBackend : public RefCounted<InspectorBackend> {
   void highlightDOMNode(long nodeId);
   void hideDOMNodeHighlight();
 
-  void getCookies(long callId, const String& domain);
+  void getCookies(long callId);
   void deleteCookie(const String& cookieName, const String& domain);
 
   // Generic code called from custom implementations.

@@ -208,7 +208,7 @@ class InspectorController
   void mainResourceFiredLoadEvent(DocumentLoader*, const KURL&);
   void mainResourceFiredDOMContentEvent(DocumentLoader*, const KURL&);
 
-  void getCookies(long callId, const String& url);
+  void getCookies(long callId);
 
 #if ENABLE(DATABASE)
   void didOpenDatabase(Database*,

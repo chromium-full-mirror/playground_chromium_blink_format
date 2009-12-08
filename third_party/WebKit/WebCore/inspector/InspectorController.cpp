@@ -1179,7 +1179,7 @@ void InspectorController::didOpenDatabase(Database* database,
 }
 #endif
 
-void InspectorController::getCookies(long callId, const String& host) {
+void InspectorController::getCookies(long callId) {
   if (!m_frontend)
     return;
 
@@ -1198,26 +1198,24 @@ void InspectorController::getCookies(long callId, const String& host) {
   for (ResourcesMap::iterator it = m_resources.begin(); it != resourcesEnd;
        ++it) {
     Document* document = it->second->frame()->document();
-    if (document->url().host() == host) {
-      Vector<Cookie> docCookiesList;
-      rawCookiesImplemented =
-          getRawCookies(document, document->cookieURL(), docCookiesList);
+    Vector<Cookie> docCookiesList;
+    rawCookiesImplemented =
+        getRawCookies(document, document->cookieURL(), docCookiesList);
 
-      if (!rawCookiesImplemented) {
-        // FIXME: We need duplication checking for the String representation of
-        // cookies.
-        ExceptionCode ec = 0;
-        stringCookiesList += document->cookie(ec);
-        // Exceptions are thrown by cookie() in sandboxed frames. That won't
-        // happen here
-        // because "document" is the document of the main frame of the page.
-        ASSERT(!ec);
-      } else {
-        int cookiesSize = docCookiesList.size();
-        for (int i = 0; i < cookiesSize; i++) {
-          if (!rawCookiesList.contains(docCookiesList[i]))
-            rawCookiesList.add(docCookiesList[i]);
-        }
+    if (!rawCookiesImplemented) {
+      // FIXME: We need duplication checking for the String representation of
+      // cookies.
+      ExceptionCode ec = 0;
+      stringCookiesList += document->cookie(ec);
+      // Exceptions are thrown by cookie() in sandboxed frames. That won't
+      // happen here
+      // because "document" is the document of the main frame of the page.
+      ASSERT(!ec);
+    } else {
+      int cookiesSize = docCookiesList.size();
+      for (int i = 0; i < cookiesSize; i++) {
+        if (!rawCookiesList.contains(docCookiesList[i]))
+          rawCookiesList.add(docCookiesList[i]);
       }
     }
   }
