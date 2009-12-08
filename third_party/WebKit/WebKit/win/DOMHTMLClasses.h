@@ -2855,6 +2855,9 @@ class DOMHTMLInputElement : public DOMHTMLElement,
   virtual HRESULT STDMETHODCALLTYPE setAutofilled(
       /* [in] */ BOOL filled);
 
+  virtual HRESULT STDMETHODCALLTYPE isAutofilled(
+      /* [retval][out] */ BOOL* result);
+
   // IFormPromptAdditions
   virtual HRESULT STDMETHODCALLTYPE isUserEdited(
       /* [retval][out] */ BOOL* result);
