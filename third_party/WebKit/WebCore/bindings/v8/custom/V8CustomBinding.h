@@ -568,8 +568,7 @@ class V8Custom {
 #endif
 
   DECLARE_CALLBACK(InspectorFrontendHostSearch);
-  DECLARE_CALLBACK(InspectorFrontendHostSetting);
-  DECLARE_CALLBACK(InspectorFrontendHostSetSetting);
+  DECLARE_CALLBACK(InspectorFrontendHostShowContextMenu);
 
   DECLARE_CALLBACK(ConsoleProfile);
   DECLARE_CALLBACK(ConsoleProfileEnd);

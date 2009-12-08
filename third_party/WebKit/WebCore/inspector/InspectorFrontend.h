@@ -146,6 +146,9 @@ class InspectorFrontend {
 
   void addNodesToSearchResult(const String& nodeIds);
 
+  void contextMenuItemSelected(int itemId);
+  void contextMenuCleared();
+
   ScriptState* scriptState() const { return m_scriptState; }
 
   void evaluateForTestInFrontend(int callId, const String& script);
