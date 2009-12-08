@@ -331,6 +331,16 @@ void FrameLoaderClient::dispatchDecidePolicyForMIMEType(
   if (isHandled)
     return;
 
+  GOwnPtr<WebKitNetworkResponse> networkResponse(
+      webkit_web_frame_get_network_response(m_frame));
+  if (networkResponse) {
+    ResourceResponse response = core(networkResponse.get());
+    if (response.isAttachment()) {
+      webkit_web_policy_decision_download(policyDecision);
+      return;
+    }
+  }
+
   if (canShowMIMEType(mimeType))
     webkit_web_policy_decision_use(policyDecision);
   else

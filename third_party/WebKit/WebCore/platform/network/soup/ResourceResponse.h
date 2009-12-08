@@ -47,7 +47,12 @@ class ResourceResponse : public ResourceResponseBase {
                              textEncodingName,
                              filename) {}
 
+  ResourceResponse(SoupMessage* soupMessage) : ResourceResponseBase() {
+    updateFromSoupMessage(soupMessage);
+  }
+
   SoupMessage* toSoupMessage() const;
+  void updateFromSoupMessage(SoupMessage* soupMessage);
 
  private:
   friend class ResourceResponseBase;

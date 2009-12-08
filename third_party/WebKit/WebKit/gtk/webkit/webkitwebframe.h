@@ -166,6 +166,9 @@ WEBKIT_API WebKitWebDataSource* webkit_web_frame_get_provisional_data_source(
 WEBKIT_API WebKitSecurityOrigin* webkit_web_frame_get_security_origin(
     WebKitWebFrame* frame);
 
+WEBKIT_API WebKitNetworkResponse* webkit_web_frame_get_network_response(
+    WebKitWebFrame* frame);
+
 G_END_DECLS
 
 #endif
