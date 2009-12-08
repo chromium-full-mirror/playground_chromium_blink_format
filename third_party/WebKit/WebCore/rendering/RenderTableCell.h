@@ -115,14 +115,6 @@ class RenderTableCell : public RenderBlock {
   virtual void styleWillChange(StyleDifference, const RenderStyle* newStyle);
   virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);
 
-  virtual void mapLocalToContainer(RenderBoxModelObject* repaintContainer,
-                                   bool useTransforms,
-                                   bool fixed,
-                                   TransformState&) const;
-  virtual void mapAbsoluteToLocalPoint(bool fixed,
-                                       bool useTransforms,
-                                       TransformState&) const;
-
  private:
   virtual const char* renderName() const {
     return isAnonymous() ? "RenderTableCell (anonymous)" : "RenderTableCell";
@@ -142,6 +134,7 @@ class RenderTableCell : public RenderBlock {
   virtual void paintBoxDecorations(PaintInfo&, int tx, int ty);
   virtual void paintMask(PaintInfo&, int tx, int ty);
 
+  virtual IntSize offsetFromContainer(RenderObject*) const;
   virtual IntRect clippedOverflowRectForRepaint(
       RenderBoxModelObject* repaintContainer);
   virtual void computeRectForRepaint(RenderBoxModelObject* repaintContainer,
