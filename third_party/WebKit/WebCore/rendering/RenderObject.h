@@ -242,6 +242,16 @@ class RenderObject : public CachedResourceClient {
  public:
 #ifndef NDEBUG
   void showTreeForThis() const;
+
+  void showRenderObject() const;
+  // We don't make printedCharacters an optional parameter so that
+  // showRenderObject can be called from gdb easily.
+  void showRenderObject(int printedCharacters) const;
+  void showRenderTreeAndMark(const RenderObject* markedObject1 = 0,
+                             const char* markedLabel1 = 0,
+                             const RenderObject* markedObject2 = 0,
+                             const char* markedLabel2 = 0,
+                             int depth = 0) const;
 #endif
 
   static RenderObject* createObject(Node*, RenderStyle*);
@@ -1233,6 +1243,11 @@ inline void adjustFloatQuadForAbsoluteZoom(FloatQuad& quad,
 #ifndef NDEBUG
 // Outside the WebCore namespace for ease of invocation from gdb.
 void showTree(const WebCore::RenderObject*);
+void showRenderTree(const WebCore::RenderObject* object1);
+// We don't make object2 an optional parameter so that showRenderTree
+// can be called from gdb easily.
+void showRenderTree(const WebCore::RenderObject* object1,
+                    const WebCore::RenderObject* object2);
 #endif
 
 #endif  // RenderObject_h
