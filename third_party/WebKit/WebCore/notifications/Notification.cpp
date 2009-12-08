@@ -50,6 +50,7 @@ Notification::Notification(const String& url,
       m_isHTML(true),
       m_isShowing(false),
       m_presenter(provider) {
+  ASSERT(m_presenter);
   if (m_presenter->checkPermission(context->securityOrigin()) !=
       NotificationPresenter::PermissionAllowed) {
     ec = SECURITY_ERR;
@@ -72,6 +73,7 @@ Notification::Notification(const NotificationContents& contents,
       m_contents(contents),
       m_isShowing(false),
       m_presenter(provider) {
+  ASSERT(m_presenter);
   if (m_presenter->checkPermission(context->securityOrigin()) !=
       NotificationPresenter::PermissionAllowed) {
     ec = SECURITY_ERR;

@@ -89,16 +89,16 @@ CALLBACK_FUNC_DECL(NotificationCenterCreateHTMLNotification) {
   NotificationCenter* notificationCenter =
       V8DOMWrapper::convertToNativeObject<NotificationCenter>(
           V8ClassIndex::NOTIFICATIONCENTER, args.Holder());
-  ScriptExecutionContext* context = notificationCenter->context();
+
   ExceptionCode ec = 0;
   String url = toWebCoreString(args[0]);
   RefPtr<Notification> notification =
-      Notification::create(url, context, ec, notificationCenter->presenter());
+      notificationCenter->createHTMLNotification(url, ec);
 
   if (ec)
     return throwError(ec);
 
-  if (context->isWorkerContext())
+  if (notificationCenter->context()->isWorkerContext())
     return WorkerContextExecutionProxy::convertToV8Object(
         V8ClassIndex::NOTIFICATION, notification.get());
 
@@ -111,19 +111,16 @@ CALLBACK_FUNC_DECL(NotificationCenterCreateNotification) {
   NotificationCenter* notificationCenter =
       V8DOMWrapper::convertToNativeObject<NotificationCenter>(
           V8ClassIndex::NOTIFICATIONCENTER, args.Holder());
-  NotificationContents contents(toWebCoreString(args[0]),
-                                toWebCoreString(args[1]),
-                                toWebCoreString(args[2]));
 
-  ScriptExecutionContext* context = notificationCenter->context();
   ExceptionCode ec = 0;
-  RefPtr<Notification> notification = Notification::create(
-      contents, context, ec, notificationCenter->presenter());
+  RefPtr<Notification> notification = notificationCenter->createNotification(
+      toWebCoreString(args[0]), toWebCoreString(args[1]),
+      toWebCoreString(args[2]), ec);
 
   if (ec)
     return throwError(ec);
 
-  if (context->isWorkerContext())
+  if (notificationCenter->context()->isWorkerContext())
     return WorkerContextExecutionProxy::convertToV8Object(
         V8ClassIndex::NOTIFICATION, notification.get());
 
