@@ -226,6 +226,10 @@ class WebView : public WebWidget {
   // Hides the autofill popup if any are showing.
   virtual void hideAutofillPopup() = 0;
 
+  // Context menu --------------------------------------------------------
+
+  virtual void performCustomContextMenuAction(unsigned action) = 0;
+
   // Visited link state --------------------------------------------------
 
   // Tells all WebView instances to update the visited link state for the

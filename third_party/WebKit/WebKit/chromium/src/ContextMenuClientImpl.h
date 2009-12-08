@@ -35,6 +35,7 @@
 
 namespace WebKit {
 
+class WebContextMenuData;
 class WebViewImpl;
 
 class ContextMenuClientImpl : public WebCore::ContextMenuClient {
@@ -56,6 +57,7 @@ class ContextMenuClientImpl : public WebCore::ContextMenuClient {
   virtual void stopSpeaking() {}
 
  private:
+  void populateCustomMenuItems(WebCore::ContextMenu*, WebContextMenuData*);
   WebViewImpl* m_webView;
 };
 
