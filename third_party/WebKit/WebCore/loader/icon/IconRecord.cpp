@@ -40,7 +40,10 @@
 namespace WebCore {
 
 IconRecord::IconRecord(const String& url)
-    : m_iconURL(url), m_stamp(0), m_dataSet(false) {}
+    : m_iconURL(url), m_stamp(0), m_dataSet(false) {
+  // Currently, this class is shared cross-thread in IconDatabase.
+  disableThreadVerification();
+}
 
 IconRecord::~IconRecord() {
   LOG(IconDatabase, "Destroying IconRecord for icon url %s",

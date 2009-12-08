@@ -75,6 +75,10 @@ void StringImpl::operator delete(void* address) {
 
 // This constructor is used only to create the empty string.
 StringImpl::StringImpl() : m_data(0), m_length(0), m_hash(0) {
+  // FIXME: It should be possible to check for proper cross-thread usage (see
+  // crossThreadString).
+  disableThreadVerification();
+
   // Ensure that the hash is computed so that AtomicStringHash can call
   // existingHash()
   // with impunity. The empty string is special because it is never entered into
@@ -86,6 +90,9 @@ inline StringImpl::StringImpl(const UChar* characters, unsigned length)
     : m_data(characters), m_length(length), m_hash(0) {
   ASSERT(characters);
   ASSERT(length);
+  // FIXME: It should be possible to check for proper cross-thread usage (see
+  // crossThreadString).
+  disableThreadVerification();
 }
 
 StringImpl::~StringImpl() {
