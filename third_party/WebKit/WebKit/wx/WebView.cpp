@@ -330,7 +330,7 @@ bool wxWebView::Create(wxWindow* parent,
   settings->setDatabasesEnabled(true);
 #endif
 
-#if __WXMSW__
+#if __WXMSW__ || __WXMAC__
   settings->setPluginsEnabled(true);
 #endif
 

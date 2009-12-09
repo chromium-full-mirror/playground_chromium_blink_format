@@ -37,9 +37,9 @@
 #include "FrameLoaderTypes.h"
 #include "FrameView.h"
 #include "FrameTree.h"
+#include "PluginView.h"
 #include "HTMLFormElement.h"
 #include "HTMLFrameOwnerElement.h"
-#include "HTMLPluginElement.h"
 #include "NotImplemented.h"
 #include "Page.h"
 #include "PlatformString.h"
@@ -781,7 +781,7 @@ PassRefPtr<Widget> FrameLoaderClientWx::createPlugin(
     const Vector<String>& paramValues,
     const String& mimeType,
     bool loadManually) {
-#if PLATFORM(WIN_OS)
+#if __WXMSW__ || __WXMAC__
   RefPtr<PluginView> pv =
       PluginView::create(m_frame, size, element, url, paramNames, paramValues,
                          mimeType, loadManually);

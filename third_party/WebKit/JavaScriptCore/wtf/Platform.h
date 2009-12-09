@@ -536,6 +536,9 @@
 
 #if PLATFORM(WX)
 #define ENABLE_ASSEMBLER 1
+#if PLATFORM(DARWIN)
+#define WTF_PLATFORM_CF 1
+#endif
 #endif
 
 #if PLATFORM(GTK)
