@@ -655,18 +655,19 @@ static v8::Handle<v8::Value> vertexAttribAndUniformHelperf(
         V8DOMWrapper::convertToNativeObject<WebGLFloatArray>(
             V8ClassIndex::WEBGLFLOATARRAY, args[1]->ToObject());
     ASSERT(array != NULL);
+    ExceptionCode ec = 0;
     switch (functionToCall) {
       case kUniform1v:
-        context->uniform1fv(location, array);
+        context->uniform1fv(location, array, ec);
         break;
       case kUniform2v:
-        context->uniform2fv(location, array);
+        context->uniform2fv(location, array, ec);
         break;
       case kUniform3v:
-        context->uniform3fv(location, array);
+        context->uniform3fv(location, array, ec);
         break;
       case kUniform4v:
-        context->uniform4fv(location, array);
+        context->uniform4fv(location, array, ec);
         break;
       case kVertexAttrib1v:
         context->vertexAttrib1fv(index, array);
@@ -684,6 +685,8 @@ static v8::Handle<v8::Value> vertexAttribAndUniformHelperf(
         ASSERT_NOT_REACHED();
         break;
     }
+    if (ec)
+      V8Proxy::setDOMException(ec);
     return v8::Undefined();
   }
 
@@ -699,18 +702,19 @@ static v8::Handle<v8::Value> vertexAttribAndUniformHelperf(
     V8Proxy::setDOMException(SYNTAX_ERR);
     return notHandledByInterceptor();
   }
+  ExceptionCode ec = 0;
   switch (functionToCall) {
     case kUniform1v:
-      context->uniform1fv(location, data, len);
+      context->uniform1fv(location, data, len, ec);
       break;
     case kUniform2v:
-      context->uniform2fv(location, data, len);
+      context->uniform2fv(location, data, len, ec);
       break;
     case kUniform3v:
-      context->uniform3fv(location, data, len);
+      context->uniform3fv(location, data, len, ec);
       break;
     case kUniform4v:
-      context->uniform4fv(location, data, len);
+      context->uniform4fv(location, data, len, ec);
       break;
     case kVertexAttrib1v:
       context->vertexAttrib1fv(index, data, len);
@@ -729,6 +733,8 @@ static v8::Handle<v8::Value> vertexAttribAndUniformHelperf(
       break;
   }
   fastFree(data);
+  if (ec)
+    V8Proxy::setDOMException(ec);
   return v8::Undefined();
 }
 
@@ -763,23 +769,26 @@ static v8::Handle<v8::Value> uniformHelperi(const v8::Arguments& args,
     WebGLIntArray* array = V8DOMWrapper::convertToNativeObject<WebGLIntArray>(
         V8ClassIndex::WEBGLINTARRAY, args[1]->ToObject());
     ASSERT(array != NULL);
+    ExceptionCode ec = 0;
     switch (functionToCall) {
       case kUniform1v:
-        context->uniform1iv(location, array);
+        context->uniform1iv(location, array, ec);
         break;
       case kUniform2v:
-        context->uniform2iv(location, array);
+        context->uniform2iv(location, array, ec);
         break;
       case kUniform3v:
-        context->uniform3iv(location, array);
+        context->uniform3iv(location, array, ec);
         break;
       case kUniform4v:
-        context->uniform4iv(location, array);
+        context->uniform4iv(location, array, ec);
         break;
       default:
         ASSERT_NOT_REACHED();
         break;
     }
+    if (ec)
+      V8Proxy::setDOMException(ec);
     return v8::Undefined();
   }
 
@@ -795,24 +804,27 @@ static v8::Handle<v8::Value> uniformHelperi(const v8::Arguments& args,
     V8Proxy::setDOMException(SYNTAX_ERR);
     return notHandledByInterceptor();
   }
+  ExceptionCode ec = 0;
   switch (functionToCall) {
     case kUniform1v:
-      context->uniform1iv(location, data, len);
+      context->uniform1iv(location, data, len, ec);
       break;
     case kUniform2v:
-      context->uniform2iv(location, data, len);
+      context->uniform2iv(location, data, len, ec);
       break;
     case kUniform3v:
-      context->uniform3iv(location, data, len);
+      context->uniform3iv(location, data, len, ec);
       break;
     case kUniform4v:
-      context->uniform4iv(location, data, len);
+      context->uniform4iv(location, data, len, ec);
       break;
     default:
       ASSERT_NOT_REACHED();
       break;
   }
   fastFree(data);
+  if (ec)
+    V8Proxy::setDOMException(ec);
   return v8::Undefined();
 }
 
@@ -892,20 +904,23 @@ static v8::Handle<v8::Value> uniformMatrixHelper(const v8::Arguments& args,
         V8DOMWrapper::convertToNativeObject<WebGLFloatArray>(
             V8ClassIndex::WEBGLFLOATARRAY, args[2]->ToObject());
     ASSERT(array != NULL);
+    ExceptionCode ec = 0;
     switch (matrixSize) {
       case 2:
-        context->uniformMatrix2fv(location, transpose, array);
+        context->uniformMatrix2fv(location, transpose, array, ec);
         break;
       case 3:
-        context->uniformMatrix3fv(location, transpose, array);
+        context->uniformMatrix3fv(location, transpose, array, ec);
         break;
       case 4:
-        context->uniformMatrix4fv(location, transpose, array);
+        context->uniformMatrix4fv(location, transpose, array, ec);
         break;
       default:
         ASSERT_NOT_REACHED();
         break;
     }
+    if (ec)
+      V8Proxy::setDOMException(ec);
     return v8::Undefined();
   }
 
@@ -921,21 +936,24 @@ static v8::Handle<v8::Value> uniformMatrixHelper(const v8::Arguments& args,
     V8Proxy::setDOMException(SYNTAX_ERR);
     return notHandledByInterceptor();
   }
+  ExceptionCode ec = 0;
   switch (matrixSize) {
     case 2:
-      context->uniformMatrix2fv(location, transpose, data, len);
+      context->uniformMatrix2fv(location, transpose, data, len, ec);
       break;
     case 3:
-      context->uniformMatrix3fv(location, transpose, data, len);
+      context->uniformMatrix3fv(location, transpose, data, len, ec);
       break;
     case 4:
-      context->uniformMatrix4fv(location, transpose, data, len);
+      context->uniformMatrix4fv(location, transpose, data, len, ec);
       break;
     default:
       ASSERT_NOT_REACHED();
       break;
   }
   fastFree(data);
+  if (ec)
+    V8Proxy::setDOMException(ec);
   return v8::Undefined();
 }
 
