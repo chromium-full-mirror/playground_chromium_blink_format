@@ -1248,7 +1248,7 @@ V8ClassIndex::V8WrapperType V8DOMWrapper::htmlElementType(
 #define FOR_EACH_ANIMATION_TAG(macro)
 #endif
 
-#if ENABLE(SVG_FILTERS)
+#if ENABLE(SVG) && ENABLE(FILTERS)
 #define FOR_EACH_FILTERS_TAG(macro)                                           \
   macro(feBlend, FEBLEND) macro(feColorMatrix, FECOLORMATRIX)                 \
       macro(feComponentTransfer, FECOMPONENTTRANSFER) macro(                  \
