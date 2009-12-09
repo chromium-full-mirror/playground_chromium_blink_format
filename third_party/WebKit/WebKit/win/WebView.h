@@ -912,10 +912,10 @@ class WebView : public IWebView,
   void downloadURL(const WebCore::KURL&);
 
 #if USE(ACCELERATED_COMPOSITING)
-  bool isAcceleratedCompositing() const { return m_isAcceleratedCompositing; }
-  void resizeLayerRenderer() { m_layerRenderer.resize(); }
-  void layerRendererBecameVisible() { m_layerRenderer.createRenderer(); }
-  void setRootLayerNeedsDisplay() { m_layerRenderer.setNeedsDisplay(); }
+  void setRootLayerNeedsDisplay() {
+    if (m_layerRenderer)
+      m_layerRenderer->setNeedsDisplay();
+  }
   void setRootChildLayer(WebCore::PlatformLayer* layer);
 #endif
 
@@ -952,6 +952,12 @@ class WebView : public IWebView,
   DWORD m_lastDropEffect;
 
  protected:
+  static bool registerWebViewWindowClass();
+  static LRESULT CALLBACK WebViewWndProc(HWND hWnd,
+                                         UINT message,
+                                         WPARAM wParam,
+                                         LPARAM lParam);
+
   HIMC getIMMContext();
   void releaseIMMContext(HIMC);
   static bool allowSiteSpecificHacks() { return s_allowSiteSpecificHacks; }
@@ -1039,10 +1045,13 @@ class WebView : public IWebView,
   long m_yOverpan;
 
 #if USE(ACCELERATED_COMPOSITING)
+  bool isAcceleratedCompositing() const { return m_isAcceleratedCompositing; }
   void setAcceleratedCompositing(bool);
   void updateRootLayerContents();
+  void resizeLayerRenderer() { m_layerRenderer->resize(); }
+  void layerRendererBecameVisible() { m_layerRenderer->createRenderer(); }
 
-  WebCore::WKCACFLayerRenderer m_layerRenderer;
+  OwnPtr<WebCore::WKCACFLayerRenderer> m_layerRenderer;
   bool m_isAcceleratedCompositing;
 #endif
 };

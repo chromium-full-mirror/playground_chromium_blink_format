@@ -295,10 +295,6 @@ static const int maxToolTipWidth = 250;
 static const int delayBeforeDeletingBackingStoreMsec = 5000;
 
 static ATOM registerWebView();
-static LRESULT CALLBACK WebViewWndProc(HWND hWnd,
-                                       UINT message,
-                                       WPARAM wParam,
-                                       LPARAM lParam);
 
 static void initializeStaticObservers();
 
@@ -1962,7 +1958,7 @@ bool WebView::keyPress(WPARAM charCode, LPARAM keyData, bool systemKeyDown) {
   return frame->eventHandler()->keyEvent(keyEvent);
 }
 
-static bool registerWebViewWindowClass() {
+bool WebView::registerWebViewWindowClass() {
   static bool haveRegisteredWindowClass = false;
   if (haveRegisteredWindowClass)
     return true;
@@ -2006,10 +2002,10 @@ static HWND findTopLevelParent(HWND window) {
   return 0;
 }
 
-static LRESULT CALLBACK WebViewWndProc(HWND hWnd,
-                                       UINT message,
-                                       WPARAM wParam,
-                                       LPARAM lParam) {
+LRESULT CALLBACK WebView::WebViewWndProc(HWND hWnd,
+                                         UINT message,
+                                         WPARAM wParam,
+                                         LPARAM lParam) {
   LRESULT lResult = 0;
   LONG_PTR longPtr = GetWindowLongPtr(hWnd, 0);
   WebView* webView = reinterpret_cast<WebView*>(longPtr);
@@ -5819,27 +5815,33 @@ void WebView::downloadURL(const KURL& url) {
 #if USE(ACCELERATED_COMPOSITING)
 void WebView::setRootChildLayer(WebCore::PlatformLayer* layer) {
   setAcceleratedCompositing(layer ? true : false);
-  m_layerRenderer.setRootChildLayer(layer);
+  if (m_layerRenderer)
+    m_layerRenderer->setRootChildLayer(layer);
 }
 
 void WebView::setAcceleratedCompositing(bool accelerated) {
-  if (m_isAcceleratedCompositing == accelerated)
+  if (m_isAcceleratedCompositing == accelerated ||
+      !WKCACFLayerRenderer::acceleratedCompositingAvailable())
     return;
 
-  m_isAcceleratedCompositing = accelerated;
-  if (m_isAcceleratedCompositing) {
-    // Create the root layer
-    ASSERT(m_viewWindow);
-    m_layerRenderer.setHostWindow(m_viewWindow);
-    updateRootLayerContents();
+  if (accelerated) {
+    m_layerRenderer = WKCACFLayerRenderer::create();
+    if (m_layerRenderer) {
+      m_isAcceleratedCompositing = true;
+
+      // Create the root layer
+      ASSERT(m_viewWindow);
+      m_layerRenderer->setHostWindow(m_viewWindow);
+      updateRootLayerContents();
+    }
   } else {
-    // Tear down the root layer
-    m_layerRenderer.destroyRenderer();
+    m_layerRenderer = 0;
+    m_isAcceleratedCompositing = false;
   }
 }
 
 void WebView::updateRootLayerContents() {
-  if (!m_backingStoreBitmap)
+  if (!m_backingStoreBitmap || !m_layerRenderer)
     return;
 
   // Get the backing store into a CGImage
@@ -5860,7 +5862,7 @@ void WebView::updateRootLayerContents() {
                     cgData.get(), 0, false, kCGRenderingIntentDefault));
 
   // Hand the CGImage to CACF for compositing
-  m_layerRenderer.setRootContents(backingStoreImage.get());
+  m_layerRenderer->setRootContents(backingStoreImage.get());
 
   // Set the frame and scroll position
   Frame* coreFrame = core(m_mainFrame);
@@ -5868,9 +5870,9 @@ void WebView::updateRootLayerContents() {
     return;
   FrameView* frameView = coreFrame->view();
 
-  m_layerRenderer.setScrollFrame(frameView->layoutWidth(),
-                                 frameView->layoutHeight(),
-                                 frameView->scrollX(), frameView->scrollY());
+  m_layerRenderer->setScrollFrame(frameView->layoutWidth(),
+                                  frameView->layoutHeight(),
+                                  frameView->scrollX(), frameView->scrollY());
 }
 #endif
 
