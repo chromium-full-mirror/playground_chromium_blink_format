@@ -720,7 +720,7 @@ void CSSStyleSelector::matchRules(CSSRuleSet* rules,
                       firstRuleIndex, lastRuleIndex);
   if (m_element->hasClass()) {
     ASSERT(m_styledElement);
-    const ClassNames& classNames = m_styledElement->classNames();
+    const SpaceSplitString& classNames = m_styledElement->classNames();
     size_t size = classNames.size();
     for (size_t i = 0; i < size; ++i)
       matchRulesForList(rules->getClassRules(classNames[i].impl()),

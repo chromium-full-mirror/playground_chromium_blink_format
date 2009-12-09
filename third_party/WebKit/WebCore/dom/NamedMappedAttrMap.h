@@ -27,8 +27,8 @@
 #ifndef NamedMappedAttrMap_h
 #define NamedMappedAttrMap_h
 
-#include "ClassNames.h"
 #include "NamedNodeMap.h"
+#include "SpaceSplitString.h"
 
 namespace WebCore {
 
@@ -40,7 +40,7 @@ class NamedMappedAttrMap : public NamedNodeMap {
 
   void clearClass() { m_classNames.clear(); }
   void setClass(const String&);
-  const ClassNames& classNames() const { return m_classNames; }
+  const SpaceSplitString& classNames() const { return m_classNames; }
 
   bool hasMappedAttributes() const { return m_mappedAttributeCount > 0; }
   void declRemoved() { m_mappedAttributeCount--; }
@@ -57,7 +57,7 @@ class NamedMappedAttrMap : public NamedNodeMap {
 
   int declCount() const;
 
-  ClassNames m_classNames;
+  SpaceSplitString m_classNames;
   int m_mappedAttributeCount;
 };
 

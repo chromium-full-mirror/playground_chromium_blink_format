@@ -19,7 +19,7 @@
  */
 
 #include "config.h"
-#include "ClassNames.h"
+#include "SpaceSplitString.h"
 
 #include <wtf/ASCIICType.h>
 
@@ -40,7 +40,7 @@ static bool hasNonASCIIOrUpper(const String& string) {
   return hasUpper || (ored & ~0x7F);
 }
 
-void ClassNamesData::createVector() {
+void SpaceSplitStringData::createVector() {
   ASSERT(!m_createdVector);
   ASSERT(m_vector.isEmpty());
 
@@ -68,7 +68,7 @@ void ClassNamesData::createVector() {
   m_createdVector = true;
 }
 
-bool ClassNamesData::containsAll(ClassNamesData& other) {
+bool SpaceSplitStringData::containsAll(SpaceSplitStringData& other) {
   ensureVector();
   other.ensureVector();
   size_t thisSize = m_vector.size();

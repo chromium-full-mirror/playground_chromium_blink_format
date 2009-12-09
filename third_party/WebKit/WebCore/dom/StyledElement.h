@@ -92,7 +92,7 @@ class StyledElement : public Element {
   CSSStyleDeclaration* style();
   void invalidateStyleAttribute();
 
-  const ClassNames& classNames() const {
+  const SpaceSplitString& classNames() const {
     ASSERT(hasClass());
     ASSERT(mappedAttributes());
     return mappedAttributes()->classNames();
