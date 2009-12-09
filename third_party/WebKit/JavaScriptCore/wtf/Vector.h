@@ -95,7 +95,7 @@ void swap(AlignedBuffer<size, alignment>& a,
 }
 
 template <bool needsDestruction, typename T>
-class VectorDestructor;
+struct VectorDestructor;
 
 template <typename T>
 struct VectorDestructor<false, T> {
@@ -111,7 +111,7 @@ struct VectorDestructor<true, T> {
 };
 
 template <bool needsInitialization, bool canInitializeWithMemset, typename T>
-class VectorInitializer;
+struct VectorInitializer;
 
 template <bool ignore, typename T>
 struct VectorInitializer<false, ignore, T> {
@@ -135,7 +135,7 @@ struct VectorInitializer<true, true, T> {
 };
 
 template <bool canMoveWithMemcpy, typename T>
-class VectorMover;
+struct VectorMover;
 
 template <typename T>
 struct VectorMover<false, T> {
@@ -175,7 +175,7 @@ struct VectorMover<true, T> {
 };
 
 template <bool canCopyWithMemcpy, typename T>
-class VectorCopier;
+struct VectorCopier;
 
 template <typename T>
 struct VectorCopier<false, T> {
@@ -197,7 +197,7 @@ struct VectorCopier<true, T> {
 };
 
 template <bool canFillWithMemset, typename T>
-class VectorFiller;
+struct VectorFiller;
 
 template <typename T>
 struct VectorFiller<false, T> {
@@ -218,7 +218,7 @@ struct VectorFiller<true, T> {
 };
 
 template <bool canCompareWithMemcmp, typename T>
-class VectorComparer;
+struct VectorComparer;
 
 template <typename T>
 struct VectorComparer<false, T> {
