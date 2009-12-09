@@ -42,12 +42,14 @@ using namespace JSC;
 
 namespace WebCore {
 
+#if ENABLE(INSPECTOR)
 ScriptValue ScriptValue::quarantineValue(ScriptState* scriptState,
                                          const ScriptValue& value) {
   JSLock lock(SilenceAssertionsOnly);
   return ScriptValue(
       JSInspectedObjectWrapper::wrap(scriptState, value.jsValue()));
 }
+#endif
 
 bool ScriptValue::getString(ScriptState* scriptState, String& result) const {
   if (!m_value)
