@@ -49,6 +49,7 @@
 #include "V8WebGLProgram.h"
 #include "V8WebGLShader.h"
 #include "V8WebGLShortArray.h"
+#include "V8WebGLUniformLocation.h"
 #include "V8WebGLUnsignedByteArray.h"
 #include "V8WebGLUnsignedIntArray.h"
 #include "V8WebGLUnsignedShortArray.h"
@@ -271,49 +272,19 @@ static v8::Handle<v8::Value> getObjectParameter(const v8::Arguments& args,
   return toV8(info);
 }
 
-enum WhichProgramCall { kProgramParameter, kUniform };
-
-static v8::Handle<v8::Value> getProgramParameter(const v8::Arguments& args,
-                                                 WhichProgramCall programCall) {
-  if (args.Length() != 2) {
-    V8Proxy::setDOMException(SYNTAX_ERR);
-    return notHandledByInterceptor();
+static WebGLUniformLocation* toWebGLUniformLocation(v8::Handle<v8::Value> value,
+                                                    bool& ok) {
+  ok = false;
+  WebGLUniformLocation* location = 0;
+  if (V8WebGLUniformLocation::HasInstance(value)) {
+    location = V8DOMWrapper::convertToNativeObject<WebGLUniformLocation>(
+        V8ClassIndex::WEBGLUNIFORMLOCATION, value->ToObject());
+    ok = true;
   }
-
-  ExceptionCode ec = 0;
-  WebGLRenderingContext* context =
-      V8DOMWrapper::convertDOMWrapperToNative<WebGLRenderingContext>(
-          args.Holder());
-  WebGLProgram* program =
-      V8WebGLProgram::HasInstance(args[0])
-          ? v8DOMWrapperTo<WebGLProgram>(V8ClassIndex::WEBGLPROGRAM,
-                                         v8::Handle<v8::Object>::Cast(args[0]))
-          : 0;
-  bool ok;
-  unsigned pname = toInt32(args[1], ok);
-  if (!ok) {
-    V8Proxy::setDOMException(SYNTAX_ERR);
-    return notHandledByInterceptor();
-  }
-  WebGLGetInfo info;
-  switch (programCall) {
-    case kProgramParameter:
-      info = context->getProgramParameter(program, pname, ec);
-      break;
-    case kUniform:
-      // pname -> location
-      info = context->getUniform(program, pname, ec);
-      break;
-    default:
-      notImplemented();
-      break;
-  }
-  if (ec) {
-    V8Proxy::setDOMException(ec);
-    return v8::Undefined();
-  }
-  return toV8(info);
+  return location;
 }
+
+enum WhichProgramCall { kProgramParameter, kUniform };
 
 CALLBACK_FUNC_DECL(WebGLRenderingContextGetBufferParameter) {
   INC_STATS("DOM.WebGLRenderingContext.getBufferParameter()");
@@ -385,7 +356,33 @@ CALLBACK_FUNC_DECL(WebGLRenderingContextGetParameter) {
 
 CALLBACK_FUNC_DECL(WebGLRenderingContextGetProgramParameter) {
   INC_STATS("DOM.WebGLRenderingContext.getProgramParameter()");
-  return getProgramParameter(args, kProgramParameter);
+
+  if (args.Length() != 2) {
+    V8Proxy::setDOMException(SYNTAX_ERR);
+    return notHandledByInterceptor();
+  }
+
+  ExceptionCode ec = 0;
+  WebGLRenderingContext* context =
+      V8DOMWrapper::convertDOMWrapperToNative<WebGLRenderingContext>(
+          args.Holder());
+  WebGLProgram* program =
+      V8WebGLProgram::HasInstance(args[0])
+          ? v8DOMWrapperTo<WebGLProgram>(V8ClassIndex::WEBGLPROGRAM,
+                                         v8::Handle<v8::Object>::Cast(args[0]))
+          : 0;
+  bool ok;
+  unsigned pname = toInt32(args[1], ok);
+  if (!ok) {
+    V8Proxy::setDOMException(SYNTAX_ERR);
+    return notHandledByInterceptor();
+  }
+  WebGLGetInfo info = context->getProgramParameter(program, pname, ec);
+  if (ec) {
+    V8Proxy::setDOMException(ec);
+    return v8::Undefined();
+  }
+  return toV8(info);
 }
 
 CALLBACK_FUNC_DECL(WebGLRenderingContextGetRenderbufferParameter) {
@@ -431,7 +428,35 @@ CALLBACK_FUNC_DECL(WebGLRenderingContextGetTexParameter) {
 
 CALLBACK_FUNC_DECL(WebGLRenderingContextGetUniform) {
   INC_STATS("DOM.WebGLRenderingContext.getUniform()");
-  return getProgramParameter(args, kUniform);
+
+  if (args.Length() != 2) {
+    V8Proxy::setDOMException(SYNTAX_ERR);
+    return notHandledByInterceptor();
+  }
+
+  ExceptionCode ec = 0;
+  WebGLRenderingContext* context =
+      V8DOMWrapper::convertDOMWrapperToNative<WebGLRenderingContext>(
+          args.Holder());
+  WebGLProgram* program =
+      V8WebGLProgram::HasInstance(args[0])
+          ? v8DOMWrapperTo<WebGLProgram>(V8ClassIndex::WEBGLPROGRAM,
+                                         v8::Handle<v8::Object>::Cast(args[0]))
+          : 0;
+
+  bool ok = false;
+  WebGLUniformLocation* location = toWebGLUniformLocation(args[1], ok);
+
+  if (!ok) {
+    V8Proxy::setDOMException(SYNTAX_ERR);
+    return notHandledByInterceptor();
+  }
+  WebGLGetInfo info = context->getUniform(program, location, ec);
+  if (ec) {
+    V8Proxy::setDOMException(ec);
+    return v8::Undefined();
+  }
+  return toV8(info);
 }
 
 CALLBACK_FUNC_DECL(WebGLRenderingContextGetVertexAttrib) {
@@ -569,37 +594,58 @@ enum FunctionToCall {
   kVertexAttrib4v
 };
 
+bool isFunctionToCallForAttribute(FunctionToCall functionToCall) {
+  switch (functionToCall) {
+    case kVertexAttrib1v:
+    case kVertexAttrib2v:
+    case kVertexAttrib3v:
+    case kVertexAttrib4v:
+      return true;
+    default:
+      break;
+  }
+  return false;
+}
+
 static v8::Handle<v8::Value> vertexAttribAndUniformHelperf(
     const v8::Arguments& args,
     FunctionToCall functionToCall) {
   // Forms:
-  // * glUniform1fv(GLint location, Array data);
-  // * glUniform1fv(GLint location, WebGLFloatArray data);
-  // * glUniform2fv(GLint location, Array data);
-  // * glUniform2fv(GLint location, WebGLFloatArray data);
-  // * glUniform3fv(GLint location, Array data);
-  // * glUniform3fv(GLint location, WebGLFloatArray data);
-  // * glUniform4fv(GLint location, Array data);
-  // * glUniform4fv(GLint location, WebGLFloatArray data);
-  // * glVertexAttrib1fv(GLint location, Array data);
-  // * glVertexAttrib1fv(GLint location, WebGLFloatArray data);
-  // * glVertexAttrib2fv(GLint location, Array data);
-  // * glVertexAttrib2fv(GLint location, WebGLFloatArray data);
-  // * glVertexAttrib3fv(GLint location, Array data);
-  // * glVertexAttrib3fv(GLint location, WebGLFloatArray data);
-  // * glVertexAttrib4fv(GLint location, Array data);
-  // * glVertexAttrib4fv(GLint location, WebGLFloatArray data);
+  // * glUniform1fv(WebGLUniformLocation location, Array data);
+  // * glUniform1fv(WebGLUniformLocation location, WebGLFloatArray data);
+  // * glUniform2fv(WebGLUniformLocation location, Array data);
+  // * glUniform2fv(WebGLUniformLocation location, WebGLFloatArray data);
+  // * glUniform3fv(WebGLUniformLocation location, Array data);
+  // * glUniform3fv(WebGLUniformLocation location, WebGLFloatArray data);
+  // * glUniform4fv(WebGLUniformLocation location, Array data);
+  // * glUniform4fv(WebGLUniformLocation location, WebGLFloatArray data);
+  // * glVertexAttrib1fv(GLint index, Array data);
+  // * glVertexAttrib1fv(GLint index, WebGLFloatArray data);
+  // * glVertexAttrib2fv(GLint index, Array data);
+  // * glVertexAttrib2fv(GLint index, WebGLFloatArray data);
+  // * glVertexAttrib3fv(GLint index, Array data);
+  // * glVertexAttrib3fv(GLint index, WebGLFloatArray data);
+  // * glVertexAttrib4fv(GLint index, Array data);
+  // * glVertexAttrib4fv(GLint index, WebGLFloatArray data);
 
   if (args.Length() != 3) {
     V8Proxy::setDOMException(SYNTAX_ERR);
     return notHandledByInterceptor();
   }
 
+  bool ok = false;
+  int index = -1;
+  WebGLUniformLocation* location = 0;
+
+  if (isFunctionToCallForAttribute(functionToCall))
+    index = toInt32(args[0], ok);
+  else
+    location = toWebGLUniformLocation(args[0], ok);
+
   WebGLRenderingContext* context =
       V8DOMWrapper::convertDOMWrapperToNative<WebGLRenderingContext>(
           args.Holder());
-  bool ok;
-  int location = toInt32(args[0], ok);
+
   if (!ok) {
     V8Proxy::setDOMException(SYNTAX_ERR);
     return notHandledByInterceptor();
@@ -623,16 +669,16 @@ static v8::Handle<v8::Value> vertexAttribAndUniformHelperf(
         context->uniform4fv(location, array);
         break;
       case kVertexAttrib1v:
-        context->vertexAttrib1fv(location, array);
+        context->vertexAttrib1fv(index, array);
         break;
       case kVertexAttrib2v:
-        context->vertexAttrib2fv(location, array);
+        context->vertexAttrib2fv(index, array);
         break;
       case kVertexAttrib3v:
-        context->vertexAttrib3fv(location, array);
+        context->vertexAttrib3fv(index, array);
         break;
       case kVertexAttrib4v:
-        context->vertexAttrib4fv(location, array);
+        context->vertexAttrib4fv(index, array);
         break;
       default:
         ASSERT_NOT_REACHED();
@@ -667,16 +713,16 @@ static v8::Handle<v8::Value> vertexAttribAndUniformHelperf(
       context->uniform4fv(location, data, len);
       break;
     case kVertexAttrib1v:
-      context->vertexAttrib1fv(location, data, len);
+      context->vertexAttrib1fv(index, data, len);
       break;
     case kVertexAttrib2v:
-      context->vertexAttrib2fv(location, data, len);
+      context->vertexAttrib2fv(index, data, len);
       break;
     case kVertexAttrib3v:
-      context->vertexAttrib3fv(location, data, len);
+      context->vertexAttrib3fv(index, data, len);
       break;
     case kVertexAttrib4v:
-      context->vertexAttrib4fv(location, data, len);
+      context->vertexAttrib4fv(index, data, len);
       break;
     default:
       ASSERT_NOT_REACHED();
@@ -689,14 +735,14 @@ static v8::Handle<v8::Value> vertexAttribAndUniformHelperf(
 static v8::Handle<v8::Value> uniformHelperi(const v8::Arguments& args,
                                             FunctionToCall functionToCall) {
   // Forms:
-  // * glUniform1iv(GLint location, Array data);
-  // * glUniform1iv(GLint location, WebGLIntArray data);
-  // * glUniform2iv(GLint location, Array data);
-  // * glUniform2iv(GLint location, WebGLIntArray data);
-  // * glUniform3iv(GLint location, Array data);
-  // * glUniform3iv(GLint location, WebGLIntArray data);
-  // * glUniform4iv(GLint location, Array data);
-  // * glUniform4iv(GLint location, WebGLIntArray data);
+  // * glUniform1iv(GLUniformLocation location, Array data);
+  // * glUniform1iv(GLUniformLocation location, WebGLIntArray data);
+  // * glUniform2iv(GLUniformLocation location, Array data);
+  // * glUniform2iv(GLUniformLocation location, WebGLIntArray data);
+  // * glUniform3iv(GLUniformLocation location, Array data);
+  // * glUniform3iv(GLUniformLocation location, WebGLIntArray data);
+  // * glUniform4iv(GLUniformLocation location, Array data);
+  // * glUniform4iv(GLUniformLocation location, WebGLIntArray data);
 
   if (args.Length() != 3) {
     V8Proxy::setDOMException(SYNTAX_ERR);
@@ -706,8 +752,9 @@ static v8::Handle<v8::Value> uniformHelperi(const v8::Arguments& args,
   WebGLRenderingContext* context =
       V8DOMWrapper::convertDOMWrapperToNative<WebGLRenderingContext>(
           args.Holder());
-  bool ok;
-  int location = toInt32(args[0], ok);
+  bool ok = false;
+  WebGLUniformLocation* location = toWebGLUniformLocation(args[0], ok);
+
   if (!ok) {
     V8Proxy::setDOMException(SYNTAX_ERR);
     return notHandledByInterceptor();
@@ -831,8 +878,10 @@ static v8::Handle<v8::Value> uniformMatrixHelper(const v8::Arguments& args,
   WebGLRenderingContext* context =
       V8DOMWrapper::convertDOMWrapperToNative<WebGLRenderingContext>(
           args.Holder());
-  bool ok;
-  int location = toInt32(args[0], ok);
+
+  bool ok = false;
+  WebGLUniformLocation* location = toWebGLUniformLocation(args[0], ok);
+
   if (!ok) {
     V8Proxy::setDOMException(SYNTAX_ERR);
     return notHandledByInterceptor();
