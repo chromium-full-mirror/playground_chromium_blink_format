@@ -51,7 +51,7 @@ class WebDevToolsAgentClient {
   virtual void forceRepaint() {}
 
   // Returns the identifier of the entity hosting this agent.
-  virtual int hostIdentifier() {}
+  virtual int hostIdentifier() { return -1; }
 
   // Notifies host upon runtime feature being enabled/disabled.
   virtual void runtimeFeatureStateChanged(const WebString& feature,
