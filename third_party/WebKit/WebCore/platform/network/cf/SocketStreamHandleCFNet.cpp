@@ -589,7 +589,14 @@ void SocketStreamHandle::readStreamCallback(CFStreamEventType type) {
       if (m_connectingSubstate == WaitingForConnect) {
         m_connectingSubstate = Connected;
         m_state = Open;
+
+        RefPtr<SocketStreamHandle> protect(this);  // The client can close the
+                                                   // handle, potentially
+                                                   // removing the last
+                                                   // reference.
         m_client->didOpen(this);
+        if (m_state == Closed)
+          break;
         // Fall through.
       } else if (m_state == Closed)
         break;
@@ -648,6 +655,11 @@ void SocketStreamHandle::writeStreamCallback(CFStreamEventType type) {
       if (m_connectingSubstate == WaitingForConnect) {
         m_connectingSubstate = Connected;
         m_state = Open;
+
+        RefPtr<SocketStreamHandle> protect(this);  // The client can close the
+                                                   // handle, potentially
+                                                   // removing the last
+                                                   // reference.
         m_client->didOpen(this);
         break;
       }
