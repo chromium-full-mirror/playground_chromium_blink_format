@@ -465,7 +465,8 @@ static double calculateDSTOffset(double ms, double utcOffset) {
 void initializeDates() {
 #ifndef NDEBUG
   static bool alreadyInitialized;
-  ASSERT(!alreadyInitialized++);
+  ASSERT(!alreadyInitialized);
+  alreadyInitialized = true;
 #endif
 
   equivalentYearForDST(

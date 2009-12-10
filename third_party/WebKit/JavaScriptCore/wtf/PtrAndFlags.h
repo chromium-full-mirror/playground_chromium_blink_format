@@ -75,7 +75,7 @@ class PtrAndFlags : public PtrAndFlagsBase<T, FlagEnum> {
   PtrAndFlags() { PtrAndFlagsBase<T, FlagEnum>::m_ptrAndFlags = 0; }
   PtrAndFlags(T* ptr) {
     PtrAndFlagsBase<T, FlagEnum>::m_ptrAndFlags = 0;
-    set(ptr);
+    PtrAndFlagsBase<T, FlagEnum>::set(ptr);
   }
 };
 }  // namespace WTF
