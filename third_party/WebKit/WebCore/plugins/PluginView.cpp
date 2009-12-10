@@ -1287,4 +1287,8 @@ Node* PluginView::node() const {
   return m_element;
 }
 
+String PluginView::pluginName() const {
+  return m_plugin->name();
+}
+
 }  // namespace WebCore

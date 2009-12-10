@@ -32,14 +32,16 @@
 #include <WebCore/Node.h>
 #include <wtf/Assertions.h>
 
-using WebCore::Node;
+using namespace WebCore;
 
 WebPluginHalterClient::WebPluginHalterClient(WebView* webView)
     : m_webView(webView) {
   ASSERT_ARG(webView, webView);
 }
 
-bool WebPluginHalterClient::shouldHaltPlugin(WebCore::Node* n) const {
+bool WebPluginHalterClient::shouldHaltPlugin(Node* n,
+                                             bool isWindowed,
+                                             const String& pluginName) const {
   ASSERT_ARG(n, n);
 
   IWebPluginHalterDelegate* d;
@@ -49,7 +51,8 @@ bool WebPluginHalterClient::shouldHaltPlugin(WebCore::Node* n) const {
   COMPtr<IDOMNode> domNode(AdoptCOM, DOMNode::createInstance(n));
 
   BOOL shouldHalt;
-  if (FAILED(d->shouldHaltPlugin(m_webView, domNode.get(), &shouldHalt)))
+  if (FAILED(d->shouldHaltPlugin(m_webView, domNode.get(), isWindowed,
+                                 BString(pluginName), &shouldHalt)))
     return false;
 
   return shouldHalt;
