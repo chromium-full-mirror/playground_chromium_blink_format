@@ -29,7 +29,7 @@ class SVGFESpotLightElement : public SVGFELightElement {
   SVGFESpotLightElement(const QualifiedName&, Document*);
   virtual ~SVGFESpotLightElement();
 
-  virtual LightSource* lightSource() const;
+  virtual PassRefPtr<LightSource> lightSource() const;
 };
 
 }  // namespace WebCore

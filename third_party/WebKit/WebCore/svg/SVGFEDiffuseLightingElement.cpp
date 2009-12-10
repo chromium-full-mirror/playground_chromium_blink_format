@@ -85,19 +85,17 @@ bool SVGFEDiffuseLightingElement::build(SVGResourceFilter* filterResource) {
   return true;
 }
 
-LightSource* SVGFEDiffuseLightingElement::findLights() const {
-  LightSource* light = 0;
+PassRefPtr<LightSource> SVGFEDiffuseLightingElement::findLights() const {
   for (Node* n = firstChild(); n; n = n->nextSibling()) {
     if (n->hasTagName(SVGNames::feDistantLightTag) ||
         n->hasTagName(SVGNames::fePointLightTag) ||
         n->hasTagName(SVGNames::feSpotLightTag)) {
       SVGFELightElement* lightNode = static_cast<SVGFELightElement*>(n);
-      light = lightNode->lightSource();
-      break;
+      return lightNode->lightSource();
     }
   }
 
-  return light;
+  return 0;
 }
 }
 

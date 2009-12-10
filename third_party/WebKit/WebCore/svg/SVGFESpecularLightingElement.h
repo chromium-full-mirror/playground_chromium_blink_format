@@ -80,7 +80,7 @@ class SVGFESpecularLightingElement
                                  KernelUnitLengthY,
                                  kernelUnitLengthY)
 
-  LightSource* findLights() const;
+  PassRefPtr<LightSource> findLights() const;
 };
 
 }  // namespace WebCore

@@ -31,7 +31,7 @@ SVGFESpotLightElement::SVGFESpotLightElement(const QualifiedName& tagName,
 
 SVGFESpotLightElement::~SVGFESpotLightElement() {}
 
-LightSource* SVGFESpotLightElement::lightSource() const {
+PassRefPtr<LightSource> SVGFESpotLightElement::lightSource() const {
   FloatPoint3D pos(x(), y(), z());
 
   // convert lookAt to a direction
@@ -39,8 +39,8 @@ LightSource* SVGFESpotLightElement::lightSource() const {
                          pointsAtZ() - pos.z());
 
   direction.normalize();
-  return new SpotLightSource(pos, direction, specularExponent(),
-                             limitingConeAngle());
+  return SpotLightSource::create(pos, direction, specularExponent(),
+                                 limitingConeAngle());
 }
 }
 

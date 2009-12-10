@@ -39,7 +39,7 @@ class FESpecularLighting : public FilterEffect {
                                                const float&,
                                                const float&,
                                                const float&,
-                                               LightSource*);
+                                               PassRefPtr<LightSource>);
   virtual ~FESpecularLighting();
 
   Color lightingColor() const;
@@ -61,7 +61,7 @@ class FESpecularLighting : public FilterEffect {
   void setKernelUnitLengthY(float);
 
   const LightSource* lightSource() const;
-  void setLightSource(LightSource*);
+  void setLightSource(PassRefPtr<LightSource>);
 
   virtual FloatRect uniteEffectRect(Filter* filter) {
     return calculateUnionOfChildEffectSubregions(filter, m_in.get());
@@ -78,7 +78,7 @@ class FESpecularLighting : public FilterEffect {
                      const float&,
                      const float&,
                      const float&,
-                     LightSource*);
+                     PassRefPtr<LightSource>);
 
   RefPtr<FilterEffect> m_in;
   Color m_lightingColor;
