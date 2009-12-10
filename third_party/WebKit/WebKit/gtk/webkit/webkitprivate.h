@@ -148,6 +148,8 @@ struct _WebKitWebViewPrivate {
   char* encoding;
   char* customEncoding;
 
+  char* iconURI;
+
   gboolean disposing;
   gboolean usePrimaryForPaste;
 

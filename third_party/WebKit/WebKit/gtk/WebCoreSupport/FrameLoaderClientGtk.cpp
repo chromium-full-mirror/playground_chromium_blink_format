@@ -610,7 +610,7 @@ void FrameLoaderClient::documentElementAvailable() {}
 
 void FrameLoaderClient::didPerformFirstNavigation() const {}
 
-void FrameLoaderClient::registerForIconNotification(bool) {
+void FrameLoaderClient::registerForIconNotification(bool shouldRegister) {
   notImplemented();
 }
 
@@ -734,7 +734,13 @@ void FrameLoaderClient::dispatchWillClose() {
 void FrameLoaderClient::dispatchDidReceiveIcon() {
   WebKitWebView* webView = getViewFromFrame(m_frame);
 
-  g_signal_emit_by_name(webView, "icon-loaded", m_frame);
+  // Avoid reporting favicons for non-main frames.
+  if (m_frame != webkit_web_view_get_main_frame(webView))
+    return;
+
+  g_object_notify(G_OBJECT(webView), "icon-uri");
+  g_signal_emit_by_name(webView, "icon-loaded",
+                        webkit_web_view_get_icon_uri(webView));
 }
 
 void FrameLoaderClient::dispatchDidStartProvisionalLoad() {

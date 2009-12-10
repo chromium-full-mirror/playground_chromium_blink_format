@@ -28,6 +28,7 @@
 #include "FrameLoader.h"
 #include "FrameLoaderClientGtk.h"
 #include "HitTestResult.h"
+#include "IconDatabase.h"
 #include <libintl.h>
 #include "Logging.h"
 #include "PageCache.h"
@@ -40,6 +41,7 @@
 #include "ResourceResponse.h"
 #include <runtime/InitializeThreading.h>
 #include "SecurityOrigin.h"
+#include <stdlib.h>
 #include "webkitnetworkresponse.h"
 
 #if ENABLE(DATABASE)
@@ -214,6 +216,10 @@ static GtkWidget* currentToplevelCallback(WebKitSoupAuthDialog* feature,
     return NULL;
 }
 
+static void closeIconDatabaseOnExit() {
+  iconDatabase()->close();
+}
+
 void webkit_init() {
   static bool isInitialized = false;
   if (isInitialized)
@@ -247,6 +253,14 @@ void webkit_init() {
 
   Pasteboard::generalPasteboard()->setHelper(
       WebKit::pasteboardHelperInstance());
+
+  iconDatabase()->setEnabled(true);
+
+  GOwnPtr<gchar> iconDatabasePath(
+      g_build_filename(g_get_user_data_dir(), "webkit", "icondatabase", NULL));
+  iconDatabase()->open(iconDatabasePath.get());
+
+  atexit(closeIconDatabaseOnExit);
 
   SoupSession* session = webkit_get_default_session();
 
