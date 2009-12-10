@@ -123,7 +123,9 @@ static bool shouldOpenWebInspector(const char* pathOrURL) {
 
 void dumpFrameScrollPosition(WebKitWebFrame* frame) {}
 
-void displayWebView() {}
+void displayWebView() {
+  gtk_widget_queue_draw(GTK_WIDGET(webView));
+}
 
 static void appendString(gchar*& target, gchar* string) {
   gchar* oldString = target;
