@@ -45,13 +45,17 @@ class Frame;
 // that can handle the event.
 class V8EventListener : public V8AbstractEventListener {
  public:
-  static PassRefPtr<V8EventListener> create(v8::Local<v8::Object> listener,
-                                            bool isAttribute) {
-    return adoptRef(new V8EventListener(listener, isAttribute));
+  static PassRefPtr<V8EventListener> create(
+      v8::Local<v8::Object> listener,
+      bool isAttribute,
+      const WorldContextHandle& worldContext) {
+    return adoptRef(new V8EventListener(listener, isAttribute, worldContext));
   }
 
  protected:
-  V8EventListener(v8::Local<v8::Object> listener, bool isAttribute);
+  V8EventListener(v8::Local<v8::Object> listener,
+                  bool isAttribute,
+                  const WorldContextHandle& worldContext);
 
   v8::Local<v8::Function> getListenerFunction(ScriptExecutionContext*);
 

@@ -46,8 +46,10 @@ class V8WorkerContextEventListener : public V8EventListener {
  public:
   static PassRefPtr<V8WorkerContextEventListener> create(
       v8::Local<v8::Object> listener,
-      bool isInline) {
-    return adoptRef(new V8WorkerContextEventListener(listener, isInline));
+      bool isInline,
+      const WorldContextHandle& worldContext) {
+    return adoptRef(
+        new V8WorkerContextEventListener(listener, isInline, worldContext));
   }
 
   virtual void handleEvent(ScriptExecutionContext*, Event*);
@@ -57,7 +59,9 @@ class V8WorkerContextEventListener : public V8EventListener {
                            int lineNumber);
 
  private:
-  V8WorkerContextEventListener(v8::Local<v8::Object> listener, bool isInline);
+  V8WorkerContextEventListener(v8::Local<v8::Object> listener,
+                               bool isInline,
+                               const WorldContextHandle& worldContext);
 
   virtual v8::Local<v8::Value> callListenerFunction(
       ScriptExecutionContext*,

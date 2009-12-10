@@ -36,8 +36,9 @@
 namespace WebCore {
 
 V8EventListener::V8EventListener(v8::Local<v8::Object> listener,
-                                 bool isAttribute)
-    : V8AbstractEventListener(isAttribute) {
+                                 bool isAttribute,
+                                 const WorldContextHandle& worldContext)
+    : V8AbstractEventListener(isAttribute, worldContext) {
   setListenerObject(listener);
 }
 

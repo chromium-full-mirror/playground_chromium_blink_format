@@ -59,6 +59,7 @@ class ScriptExecutionContext;
 class String;
 class V8EventListener;
 class V8IsolatedWorld;
+class WorldContextHandle;
 
 // FIXME: use standard logging facilities in WebCore.
 void logInfo(Frame*, const String& message, const String& url);
@@ -366,6 +367,7 @@ class V8Proxy {
   static bool sourceName(String& result);
 
   v8::Local<v8::Context> context();
+  v8::Local<v8::Context> mainWorldContext();
 
   bool setContextDebugId(int id);
   static int contextDebugId(v8::Handle<v8::Context>);
@@ -509,7 +511,8 @@ v8::Handle<v8::Value> V8Proxy::constructDOMObject(const v8::Arguments& args) {
   return args.Holder();
 }
 
-v8::Local<v8::Context> toV8Context(ScriptExecutionContext*);
+v8::Local<v8::Context> toV8Context(ScriptExecutionContext*,
+                                   const WorldContextHandle& worldContext);
 
 // Used by an interceptor callback that it hasn't found anything to
 // intercept.

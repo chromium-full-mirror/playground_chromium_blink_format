@@ -50,8 +50,9 @@ static WorkerContextExecutionProxy* workerProxy(
 
 V8WorkerContextEventListener::V8WorkerContextEventListener(
     v8::Local<v8::Object> listener,
-    bool isInline)
-    : V8EventListener(listener, isInline) {}
+    bool isInline,
+    const WorldContextHandle& worldContext)
+    : V8EventListener(listener, isInline, worldContext) {}
 
 void V8WorkerContextEventListener::handleEvent(ScriptExecutionContext* context,
                                                Event* event) {

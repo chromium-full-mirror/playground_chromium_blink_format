@@ -173,7 +173,8 @@ void reportException(ScriptState* scriptState, v8::TryCatch& exceptionCatcher) {
   // FIXME (31171): need better design to solve the duplicate error message
   // reporting problem.
   ScriptExecutionContext* context = getScriptExecutionContext(scriptState);
-  if (!context->isDocument())
+  // During the frame teardown, there may not be a valid context.
+  if (context && !context->isDocument())
     context->reportException(errorMessage, lineNumber, sourceURL);
   exceptionCatcher.Reset();
 }
