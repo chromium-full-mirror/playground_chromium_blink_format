@@ -106,7 +106,7 @@ void ImageBuffer::platformTransformColorSpace(const Vector<int>& lookUpTable) {
     for (int x = 0; x < m_size.width(); ++x) {
       SkColor color = SkPMColorToColor(srcRow[x]);
       srcRow[x] = SkPreMultiplyARGB(
-          lookUpTable[SkColorGetA(color)], lookUpTable[SkColorGetR(color)],
+          SkColorGetA(color), lookUpTable[SkColorGetR(color)],
           lookUpTable[SkColorGetG(color)], lookUpTable[SkColorGetB(color)]);
     }
   }
