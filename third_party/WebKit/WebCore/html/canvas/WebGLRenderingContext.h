@@ -535,7 +535,6 @@ class WebGLRenderingContext : public CanvasRenderingContext {
 
   void markContextChanged();
   void cleanupAfterGraphicsCall(bool changed) {
-    m_context->checkError();
     if (changed)
       markContextChanged();
   }
