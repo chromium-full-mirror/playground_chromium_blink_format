@@ -440,8 +440,9 @@ static void errorFunc(void*, const char*, ...) {
 
 static bool didInit = false;
 
-static xmlParserCtxtPtr createStringParser(xmlSAXHandlerPtr handlers,
-                                           void* userData) {
+PassRefPtr<XMLParserContext> XMLParserContext::createStringParser(
+    xmlSAXHandlerPtr handlers,
+    void* userData) {
   if (!didInit) {
     xmlInitParser();
     xmlRegisterInputCallbacks(matchFunc, openFunc, readFunc, closeFunc);
@@ -459,13 +460,14 @@ static xmlParserCtxtPtr createStringParser(xmlSAXHandlerPtr handlers,
   xmlSwitchEncoding(parser, BOMHighByte == 0xFF ? XML_CHAR_ENCODING_UTF16LE
                                                 : XML_CHAR_ENCODING_UTF16BE);
 
-  return parser;
+  return adoptRef(new XMLParserContext(parser));
 }
 
 // Chunk should be encoded in UTF-8
-static xmlParserCtxtPtr createMemoryParser(xmlSAXHandlerPtr handlers,
-                                           void* userData,
-                                           const char* chunk) {
+PassRefPtr<XMLParserContext> XMLParserContext::createMemoryParser(
+    xmlSAXHandlerPtr handlers,
+    void* userData,
+    const char* chunk) {
   if (!didInit) {
     xmlInitParser();
     xmlRegisterInputCallbacks(matchFunc, openFunc, readFunc, closeFunc);
@@ -497,7 +499,7 @@ static xmlParserCtxtPtr createMemoryParser(xmlSAXHandlerPtr handlers,
   parser->str_xml_ns = xmlDictLookup(parser->dict, XML_XML_NAMESPACE, 36);
   parser->_private = userData;
 
-  return parser;
+  return adoptRef(new XMLParserContext(parser));
 }
 
 // --------------------------------
@@ -591,19 +593,26 @@ XMLTokenizer::XMLTokenizer(DocumentFragment* fragment, Element* parentElement)
     m_defaultNamespaceURI = parentElement->namespaceURI();
 }
 
+XMLParserContext::~XMLParserContext() {
+  if (m_context->myDoc)
+    xmlFreeDoc(m_context->myDoc);
+  xmlFreeParserCtxt(m_context);
+}
+
 XMLTokenizer::~XMLTokenizer() {
   clearCurrentNodeStack();
   if (m_parsingFragment && m_doc)
     m_doc->deref();
   if (m_pendingScript)
     m_pendingScript->removeClient(this);
-  if (m_context)
-    xmlFreeParserCtxt(m_context);
 }
 
 void XMLTokenizer::doWrite(const String& parseString) {
   if (!m_context)
     initializeParserContext();
+
+  // Protect the libxml context from deletion during a callback
+  RefPtr<XMLParserContext> context = m_context;
 
   // libXML throws an error if you try to switch the encoding for an empty
   // string.
@@ -615,19 +624,20 @@ void XMLTokenizer::doWrite(const String& parseString) {
     const UChar BOM = 0xFEFF;
     const unsigned char BOMHighByte =
         *reinterpret_cast<const unsigned char*>(&BOM);
-    xmlSwitchEncoding(m_context, BOMHighByte == 0xFF
-                                     ? XML_CHAR_ENCODING_UTF16LE
-                                     : XML_CHAR_ENCODING_UTF16BE);
+    xmlSwitchEncoding(context->context(), BOMHighByte == 0xFF
+                                              ? XML_CHAR_ENCODING_UTF16LE
+                                              : XML_CHAR_ENCODING_UTF16BE);
 
     XMLTokenizerScope scope(m_doc->docLoader());
-    xmlParseChunk(m_context,
+    xmlParseChunk(context->context(),
                   reinterpret_cast<const char*>(parseString.characters()),
                   sizeof(UChar) * parseString.length(), 0);
   }
 
   if (m_doc->decoder() && m_doc->decoder()->sawError()) {
     // If the decoder saw an error, report it as fatal (stops parsing)
-    handleError(fatal, "Encoding error", lineNumber(), columnNumber());
+    handleError(fatal, "Encoding error", context->context()->input->line,
+                context->context()->input->col);
   }
 
   return;
@@ -1293,9 +1303,9 @@ void XMLTokenizer::initializeParserContext(const char* chunk) {
 
   XMLTokenizerScope scope(m_doc->docLoader());
   if (m_parsingFragment)
-    m_context = createMemoryParser(&sax, this, chunk);
+    m_context = XMLParserContext::createMemoryParser(&sax, this, chunk);
   else
-    m_context = createStringParser(&sax, this);
+    m_context = XMLParserContext::createStringParser(&sax, this);
 }
 
 void XMLTokenizer::doEnd() {
@@ -1318,12 +1328,9 @@ void XMLTokenizer::doEnd() {
     // Tell libxml we're done.
     {
       XMLTokenizerScope scope(m_doc->docLoader());
-      xmlParseChunk(m_context, 0, 0, 1);
+      xmlParseChunk(context(), 0, 0, 1);
     }
 
-    if (m_context->myDoc)
-      xmlFreeDoc(m_context->myDoc);
-    xmlFreeParserCtxt(m_context);
     m_context = 0;
   }
 }
@@ -1353,16 +1360,17 @@ void* xmlDocPtrForString(DocLoader* docLoader,
 #endif
 
 int XMLTokenizer::lineNumber() const {
-  return m_context ? m_context->input->line : 1;
+  return context() ? context()->input->line : 1;
 }
 
 int XMLTokenizer::columnNumber() const {
-  return m_context ? m_context->input->col : 1;
+  return context() ? context()->input->col : 1;
 }
 
 void XMLTokenizer::stopParsing() {
   Tokenizer::stopParsing();
-  xmlStopParser(m_context);
+  if (context())
+    xmlStopParser(context());
 }
 
 void XMLTokenizer::resumeParsing() {
@@ -1401,19 +1409,19 @@ bool parseXMLDocumentFragment(const String& chunk,
   CString chunkAsUtf8 = chunk.utf8();
   tokenizer.initializeParserContext(chunkAsUtf8.data());
 
-  xmlParseContent(tokenizer.m_context);
+  xmlParseContent(tokenizer.context());
 
   tokenizer.endDocument();
 
   // Check if all the chunk has been processed.
-  long bytesProcessed = xmlByteConsumed(tokenizer.m_context);
+  long bytesProcessed = xmlByteConsumed(tokenizer.context());
   if (bytesProcessed == -1 ||
       ((unsigned long)bytesProcessed) != chunkAsUtf8.length())
     return false;
 
   // No error if the chunk is well formed or it is not but we have no error.
-  return tokenizer.m_context->wellFormed ||
-         xmlCtxtGetLastError(tokenizer.m_context) == 0;
+  return tokenizer.context()->wellFormed ||
+         xmlCtxtGetLastError(tokenizer.context()) == 0;
 }
 
 // --------------------------------
@@ -1463,13 +1471,12 @@ HashMap<String, String> parseAttributes(const String& string, bool& attrsOK) {
   memset(&sax, 0, sizeof(sax));
   sax.startElementNs = attributesStartElementNsHandler;
   sax.initialized = XML_SAX2_MAGIC;
-  xmlParserCtxtPtr parser = createStringParser(&sax, &state);
+  RefPtr<XMLParserContext> parser =
+      XMLParserContext::createStringParser(&sax, &state);
   String parseString = "<?xml version=\"1.0\"?><attrs " + string + " />";
-  xmlParseChunk(parser, reinterpret_cast<const char*>(parseString.characters()),
+  xmlParseChunk(parser->context(),
+                reinterpret_cast<const char*>(parseString.characters()),
                 parseString.length() * sizeof(UChar), 1);
-  if (parser->myDoc)
-    xmlFreeDoc(parser->myDoc);
-  xmlFreeParserCtxt(parser);
   attrsOK = state.gotAttributes;
   return state.attributes;
 }
