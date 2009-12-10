@@ -114,11 +114,13 @@ class JSString : public JSCell {
     }
 
     ~Rope();
+    void destructNonRecursive();
 
-    void initializeFiber(unsigned index, UString::Rep* string) {
-      string->ref();
-      m_fibers[index] = Fiber(string);
-      m_stringLength += string->len;
+    void initializeFiber(unsigned index, const UString& string) {
+      UString::Rep* rep = string.rep();
+      rep->ref();
+      m_fibers[index] = Fiber(rep);
+      m_stringLength += rep->len;
     }
     void initializeFiber(unsigned index, Rope* rope) {
       rope->ref();
@@ -129,7 +131,7 @@ class JSString : public JSCell {
       if (jsString->isRope())
         initializeFiber(index, jsString->rope());
       else
-        initializeFiber(index, jsString->string().rep());
+        initializeFiber(index, jsString->string());
     }
 
     unsigned ropeLength() { return m_ropeLength; }
