@@ -154,7 +154,8 @@ void FrameLoaderClient::committedLoad(WebCore::DocumentLoader* loader,
       frameLoader->addData(data, length);
 
     Frame* coreFrame = loader->frame();
-    if (coreFrame->document() && coreFrame->document()->isMediaDocument())
+    if (coreFrame && coreFrame->document() &&
+        coreFrame->document()->isMediaDocument())
       loader->cancelMainResourceLoad(
           frameLoader->client()->pluginWillHandleLoadError(loader->response()));
   }
