@@ -53,8 +53,9 @@ class ImplicitAnimation : public AnimationBase {
   int animatingProperty() const { return m_animatingProperty; }
 
   virtual void onAnimationEnd(double elapsedTime);
-  virtual bool startAnimation(double beginTime);
-  virtual void endAnimation(bool reset);
+  virtual bool startAnimation(double timeOffset);
+  virtual void pauseAnimation(double /*timeOffset*/) {}
+  virtual void endAnimation();
 
   virtual void animate(CompositeAnimation*,
                        RenderObject*,

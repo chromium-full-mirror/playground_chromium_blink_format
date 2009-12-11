@@ -1148,7 +1148,7 @@ bool RenderLayerBacking::showRepaintCounter() const {
   return compositor() ? compositor()->showRepaintCounter() : false;
 }
 
-bool RenderLayerBacking::startAnimation(double beginTime,
+bool RenderLayerBacking::startAnimation(double timeOffset,
                                         const Animation* anim,
                                         const KeyframeList& keyframes) {
   bool hasOpacity = keyframes.containsProperty(CSSPropertyOpacity);
@@ -1189,12 +1189,12 @@ bool RenderLayerBacking::startAnimation(double beginTime,
   if (hasTransform &&
       m_graphicsLayer->addAnimation(
           transformVector, toRenderBox(renderer())->borderBoxRect().size(),
-          anim, keyframes.animationName(), beginTime))
+          anim, keyframes.animationName(), timeOffset))
     didAnimateTransform = true;
 
   if (hasOpacity &&
       m_graphicsLayer->addAnimation(opacityVector, IntSize(), anim,
-                                    keyframes.animationName(), beginTime))
+                                    keyframes.animationName(), timeOffset))
     didAnimateOpacity = true;
 
   bool runningAcceleratedAnimation = didAnimateTransform && didAnimateOpacity;
@@ -1204,7 +1204,7 @@ bool RenderLayerBacking::startAnimation(double beginTime,
   return runningAcceleratedAnimation;
 }
 
-bool RenderLayerBacking::startTransition(double beginTime,
+bool RenderLayerBacking::startTransition(double timeOffset,
                                          int property,
                                          const RenderStyle* fromStyle,
                                          const RenderStyle* toStyle) {
@@ -1223,7 +1223,7 @@ bool RenderLayerBacking::startTransition(double beginTime,
       // The boxSize param is only used for transform animations (which can only
       // run on RenderBoxes), so we pass an empty size here.
       if (m_graphicsLayer->addAnimation(opacityVector, IntSize(), opacityAnim,
-                                        String(), beginTime)) {
+                                        String(), timeOffset)) {
         // To ensure that the correct opacity is visible when the animation
         // ends, also set the final opacity.
         updateLayerOpacity(toStyle);
@@ -1244,7 +1244,7 @@ bool RenderLayerBacking::startTransition(double beginTime,
           new TransformAnimationValue(1, &toStyle->transform()));
       if (m_graphicsLayer->addAnimation(
               transformVector, toRenderBox(renderer())->borderBoxRect().size(),
-              transformAnim, String(), beginTime)) {
+              transformAnim, String(), timeOffset)) {
         // To ensure that the correct transform is visible when the animation
         // ends, also set the final opacity.
         updateLayerTransform(toStyle);
@@ -1273,8 +1273,9 @@ void RenderLayerBacking::animationFinished(const String& animationName) {
   m_graphicsLayer->removeAnimationsForKeyframes(animationName);
 }
 
-void RenderLayerBacking::animationPaused(const String& animationName) {
-  m_graphicsLayer->pauseAnimation(animationName);
+void RenderLayerBacking::animationPaused(double timeOffset,
+                                         const String& animationName) {
+  m_graphicsLayer->pauseAnimation(animationName, timeOffset);
 }
 
 void RenderLayerBacking::transitionFinished(int property) {

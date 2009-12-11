@@ -101,10 +101,10 @@ class GraphicsLayerCA : public GraphicsLayer {
                             const IntSize& boxSize,
                             const Animation*,
                             const String& keyframesName,
-                            double beginTime);
+                            double timeOffset);
   virtual void removeAnimationsForProperty(AnimatedPropertyID);
   virtual void removeAnimationsForKeyframes(const String& keyframesName);
-  virtual void pauseAnimation(const String& keyframesName);
+  virtual void pauseAnimation(const String& keyframesName, double timeOffset);
 
   virtual void setContentsToImage(Image*);
   virtual void setContentsToVideo(PlatformLayer*);
@@ -140,11 +140,11 @@ class GraphicsLayerCA : public GraphicsLayer {
   bool createAnimationFromKeyframes(const KeyframeValueList&,
                                     const Animation*,
                                     const String& keyframesName,
-                                    double beginTime);
+                                    double timeOffset);
   bool createTransformAnimationsFromKeyframes(const KeyframeValueList&,
                                               const Animation*,
                                               const String& keyframesName,
-                                              double beginTime,
+                                              double timeOffset,
                                               const IntSize& boxSize);
 
   // Return autoreleased animation (use RetainPtr?)
@@ -224,9 +224,9 @@ class GraphicsLayerCA : public GraphicsLayer {
   void setAnimationOnLayer(CAPropertyAnimation*,
                            AnimatedPropertyID,
                            int index,
-                           double beginTime);
+                           double timeOffset);
   bool removeAnimationFromLayer(AnimatedPropertyID, int index);
-  void pauseAnimationOnLayer(AnimatedPropertyID, int index);
+  void pauseAnimationOnLayer(AnimatedPropertyID, int index, double timeOffset);
 
   enum LayerChange {
     NoChange = 0,
@@ -287,18 +287,18 @@ class GraphicsLayerCA : public GraphicsLayer {
                    const String& keyframesName,
                    AnimatedPropertyID property,
                    int index,
-                   double beginTime)
+                   double timeOffset)
         : m_animation(caAnim),
           m_keyframesName(keyframesName),
           m_property(property),
           m_index(index),
-          m_beginTime(beginTime) {}
+          m_timeOffset(timeOffset) {}
 
     RetainPtr<CAPropertyAnimation*> m_animation;
     String m_keyframesName;
     AnimatedPropertyID m_property;
     int m_index;
-    double m_beginTime;
+    double m_timeOffset;
   };
 
   Vector<LayerAnimation> m_uncomittedAnimations;
@@ -310,8 +310,13 @@ class GraphicsLayerCA : public GraphicsLayer {
 
   HashSet<AnimatedProperty> m_transitionPropertiesToRemove;
 
-  enum { Remove, Pause };
-  typedef int AnimationProcessingAction;
+  enum Action { Remove, Pause };
+  struct AnimationProcessingAction {
+    AnimationProcessingAction(Action action = Remove, double timeOffset = 0)
+        : action(action), timeOffset(timeOffset) {}
+    Action action;
+    double timeOffset;  // only used for pause
+  };
   typedef HashMap<String, AnimationProcessingAction> AnimationsToProcessMap;
   AnimationsToProcessMap m_keyframeAnimationsToProcess;
 

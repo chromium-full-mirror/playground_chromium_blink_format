@@ -270,13 +270,14 @@ class GraphicsLayer {
                             const IntSize& /*boxSize*/,
                             const Animation*,
                             const String& /*keyframesName*/,
-                            double /*beginTime*/) {
+                            double /*timeOffset*/) {
     return false;
   }
   virtual void removeAnimationsForProperty(AnimatedPropertyID) {}
   virtual void removeAnimationsForKeyframes(const String& /* keyframesName */) {
   }
-  virtual void pauseAnimation(const String& /* keyframesName */) {}
+  virtual void pauseAnimation(const String& /* keyframesName */,
+                              double /*timeOffset*/) {}
 
   virtual void suspendAnimations(double time);
   virtual void resumeAnimations();

@@ -111,15 +111,15 @@ class RenderLayerBacking : public GraphicsLayerClient {
   void rendererContentChanged();
 
   // Interface to start, finish, suspend and resume animations and transitions
-  bool startAnimation(double beginTime,
+  bool startAnimation(double timeOffset,
                       const Animation* anim,
                       const KeyframeList& keyframes);
-  bool startTransition(double beginTime,
+  bool startTransition(double timeOffset,
                        int property,
                        const RenderStyle* fromStyle,
                        const RenderStyle* toStyle);
   void animationFinished(const String& name);
-  void animationPaused(const String& name);
+  void animationPaused(double timeOffset, const String& name);
   void transitionFinished(int property);
 
   void suspendAnimations(double time = 0);

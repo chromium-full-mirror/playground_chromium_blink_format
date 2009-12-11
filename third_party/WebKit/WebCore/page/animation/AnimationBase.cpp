@@ -1071,7 +1071,7 @@ void AnimationBase::updateStateMachine(AnimStateInput input, double param) {
     m_pauseTime = -1;
     m_requestedStartTime = 0;
     m_nextIterationDuration = -1;
-    endAnimation(false);
+    endAnimation();
     return;
   }
 
@@ -1083,7 +1083,7 @@ void AnimationBase::updateStateMachine(AnimStateInput input, double param) {
     m_pauseTime = -1;
     m_requestedStartTime = 0;
     m_nextIterationDuration = -1;
-    endAnimation(false);
+    endAnimation();
 
     if (!paused())
       updateStateMachine(AnimationStateInputStartAnimation, -1);
@@ -1094,7 +1094,7 @@ void AnimationBase::updateStateMachine(AnimStateInput input, double param) {
     if (m_animState == AnimationStateStartWaitStyleAvailable)
       m_compAnim->animationController()->removeFromStyleAvailableWaitList(this);
     m_animState = AnimationStateDone;
-    endAnimation(true);
+    endAnimation();
     return;
   }
 
@@ -1103,7 +1103,7 @@ void AnimationBase::updateStateMachine(AnimStateInput input, double param) {
       // If we are in AnimationStateStartWaitResponse, the animation will get
       // canceled before
       // we get a response, so move to the next state.
-      endAnimation(false);
+      endAnimation();
       updateStateMachine(AnimationStateInputStartTimeSet,
                          beginAnimationUpdateTime());
     }
@@ -1114,7 +1114,7 @@ void AnimationBase::updateStateMachine(AnimStateInput input, double param) {
     if (m_animState == AnimationStateLooping ||
         m_animState == AnimationStateEnding) {
       // Start the animation
-      startAnimation(m_startTime);
+      startAnimation(beginAnimationUpdateTime() - m_startTime);
     }
     return;
   }
@@ -1204,7 +1204,7 @@ void AnimationBase::updateStateMachine(AnimStateInput input, double param) {
         // animation and wait. When
         // we unpause, we will act as though the start timer just fired
         m_pauseTime = -1;
-        endAnimation(false);
+        pauseAnimation(beginAnimationUpdateTime() - m_startTime);
         m_animState = AnimationStatePausedWaitResponse;
       }
       break;
@@ -1222,7 +1222,7 @@ void AnimationBase::updateStateMachine(AnimStateInput input, double param) {
       } else {
         // We are pausing while running. Cancel the animation and wait
         m_pauseTime = beginAnimationUpdateTime();
-        endAnimation(false);
+        pauseAnimation(beginAnimationUpdateTime() - m_startTime);
         m_animState = AnimationStatePausedRun;
       }
       break;
@@ -1247,7 +1247,7 @@ void AnimationBase::updateStateMachine(AnimStateInput input, double param) {
       } else {
         // We are pausing while running. Cancel the animation and wait
         m_pauseTime = beginAnimationUpdateTime();
-        endAnimation(false);
+        pauseAnimation(beginAnimationUpdateTime() - m_startTime);
         m_animState = AnimationStatePausedRun;
       }
       // |this| may be deleted here
@@ -1307,7 +1307,7 @@ void AnimationBase::updateStateMachine(AnimStateInput input, double param) {
                            beginAnimationUpdateTime());
         m_fallbackAnimating = true;
       } else {
-        bool started = startAnimation(m_startTime);
+        bool started = startAnimation(beginAnimationUpdateTime() - m_startTime);
         m_compAnim->animationController()->addToStartTimeResponseWaitList(
             this, started);
         m_fallbackAnimating = !started;
