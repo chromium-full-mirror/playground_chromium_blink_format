@@ -564,7 +564,7 @@ class EmptyEditorClient : public EditorClient {
 };
 
 #if ENABLE(CONTEXT_MENUS)
-class EmptyContextMenuClient : public ContextMenuClient {
+class EmptyContextMenuClient : public ContextMenuClient, public Noncopyable {
  public:
   virtual ~EmptyContextMenuClient() {}
   virtual void contextMenuDestroyed() {}
@@ -589,7 +589,7 @@ class EmptyContextMenuClient : public ContextMenuClient {
 #endif  // ENABLE(CONTEXT_MENUS)
 
 #if ENABLE(DRAG_SUPPORT)
-class EmptyDragClient : public DragClient {
+class EmptyDragClient : public DragClient, public Noncopyable {
  public:
   virtual ~EmptyDragClient() {}
   virtual void willPerformDragDestinationAction(DragDestinationAction,
