@@ -58,6 +58,11 @@ class WebSecurityPolicy {
       bool allowDestinationSubdomains);
   WEBKIT_API static void resetOriginAccessWhiteLists();
 
+  // Returns whether the url should be allowed to see the referrer
+  // based on their respective protocols.
+  WEBKIT_API static bool shouldHideReferrer(const WebURL& url,
+                                            const WebString& referrer);
+
  private:
   WebSecurityPolicy();
 };
