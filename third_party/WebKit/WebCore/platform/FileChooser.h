@@ -42,6 +42,7 @@ class FileChooserClient {
  public:
   virtual void valueChanged() = 0;
   virtual bool allowsMultipleFiles() = 0;
+  virtual String acceptTypes() = 0;
   virtual ~FileChooserClient();
 };
 
@@ -66,6 +67,11 @@ class FileChooser : public RefCounted<FileChooser> {
 
   bool allowsMultipleFiles() const {
     return m_client ? m_client->allowsMultipleFiles() : false;
+  }
+  // Acceptable MIME types.  It's an 'accept' attribute value of the
+  // corresponding INPUT element.
+  String acceptTypes() const {
+    return m_client ? m_client->acceptTypes() : String();
   }
 
  private:

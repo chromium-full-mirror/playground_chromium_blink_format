@@ -103,6 +103,10 @@ bool RenderFileUploadControl::allowsMultipleFiles() {
   return !input->getAttribute(multipleAttr).isNull();
 }
 
+String RenderFileUploadControl::acceptTypes() {
+  return static_cast<HTMLInputElement*>(node())->accept();
+}
+
 void RenderFileUploadControl::click() {
   Frame* frame = node()->document()->frame();
   if (!frame)
