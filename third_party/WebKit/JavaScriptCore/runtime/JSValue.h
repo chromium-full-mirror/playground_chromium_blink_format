@@ -161,6 +161,7 @@ class JSValue {
   JSValue toJSNumber(ExecState*) const;  // Fast path for when you expect that
                                          // the value is an immediate number.
   UString toString(ExecState*) const;
+  UString toPrimitiveString(ExecState*) const;
   JSObject* toObject(ExecState*) const;
 
   // Integer conversions.
