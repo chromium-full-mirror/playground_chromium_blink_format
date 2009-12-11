@@ -35,7 +35,7 @@
 #include "ContextMenu.h"
 #include "ContextMenuItem.h"
 #include "ContextMenuController.h"
-#include "ContextMenuSelectionHandler.h"
+#include "ContextMenuProvider.h"
 #include "Element.h"
 #include "Frame.h"
 #include "FrameLoader.h"
@@ -56,12 +56,11 @@ namespace WebCore {
 InspectorFrontendHost::InspectorFrontendHost(
     InspectorController* inspectorController,
     InspectorClient* client)
-    : m_inspectorController(inspectorController),
-      m_client(client),
-      m_menuSelectionHandler(MenuSelectionHandler::create(this)) {}
+    : m_inspectorController(inspectorController), m_client(client) {}
 
 InspectorFrontendHost::~InspectorFrontendHost() {
-  m_menuSelectionHandler->disconnect();
+  if (m_menuProvider)
+    m_menuProvider->disconnect();
 }
 
 void InspectorFrontendHost::loaded() {
@@ -196,16 +195,18 @@ void InspectorFrontendHost::setSetting(const String& key, const String& value) {
     m_inspectorController->setSetting(key, value);
 }
 
-void InspectorFrontendHost::showContextMenu(Event* event,
-                                            Vector<ContextMenuItem>& items) {
+void InspectorFrontendHost::showContextMenu(
+    Event* event,
+    const Vector<ContextMenuItem*>& items) {
   if (!m_inspectorController)
     return;
   if (!m_inspectorController->windowVisible())
     return;
 
+  m_menuProvider = MenuProvider::create(this, items);
   ContextMenuController* menuController =
       m_inspectorController->m_page->contextMenuController();
-  menuController->showContextMenu(event, items, m_menuSelectionHandler);
+  menuController->showContextMenu(event, m_menuProvider);
 }
 
 void InspectorFrontendHost::contextMenuItemSelected(ContextMenuItem* item) {
@@ -216,6 +217,7 @@ void InspectorFrontendHost::contextMenuItemSelected(ContextMenuItem* item) {
 }
 
 void InspectorFrontendHost::contextMenuCleared() {
+  m_menuProvider = 0;
   if (m_inspectorController && m_inspectorController->windowVisible())
     m_inspectorController->m_frontend->contextMenuCleared();
 }

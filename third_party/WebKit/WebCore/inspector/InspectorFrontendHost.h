@@ -30,7 +30,8 @@
 #define InspectorFrontendHost_h
 
 #include "Console.h"
-#include "ContextMenuSelectionHandler.h"
+#include "ContextMenu.h"
+#include "ContextMenuProvider.h"
 #include "InspectorController.h"
 #include "PlatformString.h"
 
@@ -81,21 +82,25 @@ class InspectorFrontendHost : public RefCounted<InspectorFrontendHost> {
   void setSetting(const String& key, const String& value);
 
   // Called from [Custom] implementations.
-  void showContextMenu(Event*, Vector<ContextMenuItem>& items);
-  void contextMenuItemSelected(ContextMenuItem*);
-  void contextMenuCleared();
+  void showContextMenu(Event*, const Vector<ContextMenuItem*>& items);
 
  private:
-  class MenuSelectionHandler : public ContextMenuSelectionHandler {
+  class MenuProvider : public ContextMenuProvider {
    public:
-    static PassRefPtr<MenuSelectionHandler> create(
-        InspectorFrontendHost* frontendHost) {
-      return adoptRef(new MenuSelectionHandler(frontendHost));
+    static PassRefPtr<MenuProvider> create(
+        InspectorFrontendHost* frontendHost,
+        const Vector<ContextMenuItem*>& items) {
+      return adoptRef(new MenuProvider(frontendHost, items));
     }
 
-    virtual ~MenuSelectionHandler() {}
+    virtual ~MenuProvider() { contextMenuCleared(); }
 
     void disconnect() { m_frontendHost = 0; }
+
+    virtual void populateContextMenu(ContextMenu* menu) {
+      for (size_t i = 0; i < m_items.size(); ++i)
+        menu->appendItem(*m_items[i]);
+    }
 
     virtual void contextMenuItemSelected(ContextMenuItem* item) {
       if (m_frontendHost)
@@ -105,20 +110,27 @@ class InspectorFrontendHost : public RefCounted<InspectorFrontendHost> {
     virtual void contextMenuCleared() {
       if (m_frontendHost)
         m_frontendHost->contextMenuCleared();
+      deleteAllValues(m_items);
+      m_items.clear();
     }
 
    private:
-    MenuSelectionHandler(InspectorFrontendHost* frontendHost)
-        : m_frontendHost(frontendHost) {}
+    MenuProvider(InspectorFrontendHost* frontendHost,
+                 const Vector<ContextMenuItem*>& items)
+        : m_frontendHost(frontendHost), m_items(items) {}
     InspectorFrontendHost* m_frontendHost;
+    Vector<ContextMenuItem*> m_items;
   };
 
   InspectorFrontendHost(InspectorController* inspectorController,
                         InspectorClient* client);
 
+  void contextMenuItemSelected(ContextMenuItem*);
+  void contextMenuCleared();
+
   InspectorController* m_inspectorController;
   InspectorClient* m_client;
-  RefPtr<MenuSelectionHandler> m_menuSelectionHandler;
+  RefPtr<MenuProvider> m_menuProvider;
 };
 
 }  // namespace WebCore
