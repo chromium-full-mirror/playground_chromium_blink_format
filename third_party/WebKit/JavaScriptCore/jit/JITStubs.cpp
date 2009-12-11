@@ -908,6 +908,8 @@ NEVER_INLINE void JITThunks::tryCacheGetByID(CallFrame* callFrame,
 
     stubInfo->initGetByIdProto(structure, slotBaseObject->structure());
 
+    ASSERT(!structure->isDictionary());
+    ASSERT(!slotBaseObject->structure()->isDictionary());
     JIT::compileGetByIdProto(callFrame->scopeChain()->globalData, callFrame,
                              codeBlock, stubInfo, structure,
                              slotBaseObject->structure(), slot.cachedOffset(),
@@ -1467,7 +1469,7 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_get_by_id_proto_list) {
   CHECK_FOR_EXCEPTION();
 
   if (!baseValue.isCell() || !slot.isCacheable() ||
-      asCell(baseValue)->structure()->isUncacheableDictionary()) {
+      asCell(baseValue)->structure()->isDictionary()) {
     ctiPatchCallByReturnAddress(callFrame->codeBlock(), STUB_RETURN_ADDRESS,
                                 FunctionPtr(cti_op_get_by_id_proto_fail));
     return JSValue::encode(result);
@@ -1485,6 +1487,7 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_get_by_id_proto_list) {
                                 FunctionPtr(cti_op_get_by_id_proto_fail));
   else if (slot.slotBase() ==
            asCell(baseValue)->structure()->prototypeForLookup(callFrame)) {
+    ASSERT(!asCell(baseValue)->structure()->isDictionary());
     // Since we're accessing a prototype in a loop, it's a good bet that it
     // should not be treated as a dictionary.
     if (slotBaseObject->structure()->isDictionary())
@@ -1505,6 +1508,7 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_get_by_id_proto_list) {
           FunctionPtr(cti_op_get_by_id_proto_list_full));
   } else if (size_t count = normalizePrototypeChain(callFrame, baseValue,
                                                     slot.slotBase())) {
+    ASSERT(!asCell(baseValue)->structure()->isDictionary());
     int listIndex;
     PolymorphicAccessStructureList* prototypeStructureList =
         getPolymorphicAccessStructureListSlot(stubInfo, listIndex);
