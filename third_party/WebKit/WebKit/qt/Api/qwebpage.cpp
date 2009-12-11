@@ -108,6 +108,11 @@
 #include <QX11Info>
 #endif
 
+#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
+#include <QTouchEvent>
+#include "PlatformTouchEvent.h"
+#endif
+
 using namespace WebCore;
 
 void QWEBKIT_EXPORT qt_drt_overwritePluginDirectories() {
@@ -1331,6 +1336,18 @@ bool QWebPagePrivate::handleScrolling(QKeyEvent* ev, Frame* frame) {
 
   return frame->eventHandler()->scrollRecursively(direction, granularity);
 }
+
+#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
+void QWebPagePrivate::touchEvent(QTouchEvent* event) {
+  WebCore::Frame* frame = QWebFramePrivate::core(mainFrame);
+  if (!frame->view())
+    return;
+
+  bool accepted =
+      frame->eventHandler()->handleTouchEvent(PlatformTouchEvent(event));
+  event->setAccepted(accepted);
+}
+#endif
 
 /*!
   This method is used by the input method to query a set of properties of the
@@ -2620,6 +2637,13 @@ bool QWebPage::event(QEvent* ev) {
     case QEvent::Leave:
       d->leaveEvent(ev);
       break;
+#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
+    case QEvent::TouchBegin:
+    case QEvent::TouchUpdate:
+    case QEvent::TouchEnd:
+      d->touchEvent(static_cast<QTouchEvent*>(ev));
+      break;
+#endif
     default:
       return QObject::event(ev);
   }

@@ -116,6 +116,10 @@ class QWebPagePrivate {
   void handleSoftwareInputPanel(Qt::MouseButton);
   bool handleScrolling(QKeyEvent*, WebCore::Frame*);
 
+#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
+  void touchEvent(QTouchEvent*);
+#endif
+
   void setInspector(QWebInspector*);
   QWebInspector* getOrCreateInspector();
   WebCore::InspectorController* inspectorController();
