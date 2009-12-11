@@ -728,6 +728,13 @@ void EventHandler::autoscrollTimerFired(Timer<EventHandler>*) {
 
 #if ENABLE(PAN_SCROLLING)
 
+void EventHandler::startPanScrolling(RenderObject* renderer) {
+  m_panScrollInProgress = true;
+  m_panScrollButtonPressed = true;
+  handleAutoscroll(renderer);
+  invalidateClick();
+}
+
 void EventHandler::updatePanScrollState() {
   FrameView* view = m_frame->view();
   if (!view)
@@ -1257,28 +1264,6 @@ bool EventHandler::handleMousePressEvent(const PlatformMouseEvent& mouseEvent) {
     stopAutoscrollTimer();
     invalidateClick();
     return true;
-  }
-
-  if (mouseEvent.button() == MiddleButton && !mev.isOverLink()) {
-    RenderObject* renderer = mev.targetNode()->renderer();
-
-    while (renderer &&
-           (!renderer->isBox() ||
-            !toRenderBox(renderer)->canBeScrolledAndHasScrollableArea())) {
-      if (!renderer->parent() && renderer->node() == renderer->document() &&
-          renderer->document()->ownerElement())
-        renderer = renderer->document()->ownerElement()->renderer();
-      else
-        renderer = renderer->parent();
-    }
-
-    if (renderer) {
-      m_panScrollInProgress = true;
-      m_panScrollButtonPressed = true;
-      handleAutoscroll(renderer);
-      invalidateClick();
-      return true;
-    }
   }
 #endif
 
