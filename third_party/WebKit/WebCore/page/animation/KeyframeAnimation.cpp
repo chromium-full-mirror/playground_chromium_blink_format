@@ -224,7 +224,7 @@ bool KeyframeAnimation::startAnimation(double timeOffset) {
                                               m_keyframes);
   }
 #else
-  UNUSED_PARAM(beginTime);
+  UNUSED_PARAM(timeOffset);
 #endif
   return false;
 }
