@@ -160,9 +160,6 @@ class JSObject : public JSCell {
   virtual JSObject* toThisObject(ExecState*) const;
   virtual JSObject* unwrappedObject();
 
-  virtual bool getPropertyAttributes(ExecState*,
-                                     const Identifier& propertyName,
-                                     unsigned& attributes) const;
   bool getPropertySpecificValue(ExecState* exec,
                                 const Identifier& propertyName,
                                 JSCell*& specificFunction) const;

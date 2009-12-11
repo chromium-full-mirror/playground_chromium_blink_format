@@ -78,10 +78,11 @@ void DebuggerActivation::getOwnPropertyNames(ExecState* exec,
   m_activation->getPropertyNames(exec, propertyNames);
 }
 
-bool DebuggerActivation::getPropertyAttributes(JSC::ExecState* exec,
-                                               const Identifier& propertyName,
-                                               unsigned& attributes) const {
-  return m_activation->getPropertyAttributes(exec, propertyName, attributes);
+bool DebuggerActivation::getOwnPropertyDescriptor(
+    ExecState* exec,
+    const Identifier& propertyName,
+    PropertyDescriptor& descriptor) {
+  return m_activation->getOwnPropertyDescriptor(exec, propertyName, descriptor);
 }
 
 void DebuggerActivation::defineGetter(ExecState* exec,

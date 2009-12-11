@@ -132,12 +132,6 @@ void JSDOMWindowShell::getOwnPropertyNames(ExecState* exec,
   m_window->getOwnPropertyNames(exec, propertyNames);
 }
 
-bool JSDOMWindowShell::getPropertyAttributes(JSC::ExecState* exec,
-                                             const Identifier& propertyName,
-                                             unsigned& attributes) const {
-  return m_window->getPropertyAttributes(exec, propertyName, attributes);
-}
-
 void JSDOMWindowShell::defineGetter(ExecState* exec,
                                     const Identifier& propertyName,
                                     JSObject* getterFunction,
