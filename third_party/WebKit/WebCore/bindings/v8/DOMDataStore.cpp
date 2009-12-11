@@ -142,7 +142,8 @@ void DOMDataStore::weakDOMObjectCallback(v8::Persistent<v8::Value> v8Object,
   v8::HandleScope scope;
   ASSERT(v8Object->IsObject());
   DOMData::handleWeakObject(DOMDataStore::DOMObjectMap,
-                            v8::Handle<v8::Object>::Cast(v8Object), domObject);
+                            v8::Persistent<v8::Object>::Cast(v8Object),
+                            domObject);
 }
 
 void DOMDataStore::weakActiveDOMObjectCallback(
@@ -151,7 +152,8 @@ void DOMDataStore::weakActiveDOMObjectCallback(
   v8::HandleScope scope;
   ASSERT(v8Object->IsObject());
   DOMData::handleWeakObject(DOMDataStore::ActiveDOMObjectMap,
-                            v8::Handle<v8::Object>::Cast(v8Object), domObject);
+                            v8::Persistent<v8::Object>::Cast(v8Object),
+                            domObject);
 }
 
 void DOMDataStore::weakNodeCallback(v8::Persistent<v8::Value> v8Object,
@@ -164,15 +166,11 @@ void DOMDataStore::weakNodeCallback(v8::Persistent<v8::Value> v8Object,
   DOMDataList& list = DOMDataStore::allStores();
   for (size_t i = 0; i < list.size(); ++i) {
     DOMDataStore* store = list[i];
-    HashMap<Node*, v8::Object*>& domMapImpl = store->domNodeMap().impl();
-    HashMap<Node*, v8::Object*>::iterator it = domMapImpl.find(node);
-    if (it == domMapImpl.end() || it->second != *v8Object)
-      continue;
-    ASSERT(store->domData()->owningThread() == WTF::currentThread());
-    v8Object.Dispose();
-    domMapImpl.remove(it);
-    node->deref();  // Nobody overrides Node::deref so it's safe
-    break;  // There might be at most one wrapper for the node in world's maps
+    if (store->domNodeMap().removeIfPresent(node, v8Object)) {
+      ASSERT(store->domData()->owningThread() == WTF::currentThread());
+      node->deref();  // Nobody overrides Node::deref so it's safe
+      break;  // There might be at most one wrapper for the node in world's maps
+    }
   }
 }
 
@@ -184,7 +182,7 @@ void DOMDataStore::weakSVGElementInstanceCallback(
   v8::HandleScope scope;
   ASSERT(v8Object->IsObject());
   DOMData::handleWeakObject(DOMDataStore::DOMSVGElementInstanceMap,
-                            v8::Handle<v8::Object>::Cast(v8Object),
+                            v8::Persistent<v8::Object>::Cast(v8Object),
                             static_cast<SVGElementInstance*>(domObject));
 }
 
@@ -194,7 +192,8 @@ void DOMDataStore::weakSVGObjectWithContextCallback(
   v8::HandleScope scope;
   ASSERT(v8Object->IsObject());
   DOMData::handleWeakObject(DOMDataStore::DOMSVGObjectWithContextMap,
-                            v8::Handle<v8::Object>::Cast(v8Object), domObject);
+                            v8::Persistent<v8::Object>::Cast(v8Object),
+                            domObject);
 }
 
 #endif  // ENABLE(SVG)
