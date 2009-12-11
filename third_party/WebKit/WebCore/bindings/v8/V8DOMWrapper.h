@@ -130,15 +130,21 @@ class V8DOMWrapper {
   // and cast to the specified type.
   template <class C>
   static C* convertDOMWrapperToNative(v8::Handle<v8::Object> object) {
+#ifndef NDEBUG
+    v8::HandleScope handleScope;
     ASSERT(maybeDOMWrapper(object));
+#endif
     return reinterpret_cast<C*>(
         object->GetPointerFromInternalField(V8Custom::kDOMWrapperObjectIndex));
   }
 
   template <class C>
   static C* convertDOMWrapperToNode(v8::Handle<v8::Object> object) {
+#ifndef NDEBUG
+    v8::HandleScope handleScope;
     ASSERT(maybeDOMWrapper(object));
     ASSERT(domWrapperType(object) == V8ClassIndex::NODE);
+#endif
     return convertDOMWrapperToNative<C>(object);
   }
 
