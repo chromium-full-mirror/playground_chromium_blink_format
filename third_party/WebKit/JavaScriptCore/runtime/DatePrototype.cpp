@@ -597,8 +597,11 @@ JSValue JSC_HOST_CALL dateProtoFuncToString(ExecState* exec,
       thisDateObj->gregorianDateTime(exec);
   if (!gregorianDateTime)
     return jsNontrivialString(exec, "Invalid Date");
-  return jsNontrivialString(exec, formatDate(*gregorianDateTime) + " " +
-                                      formatTime(*gregorianDateTime));
+  DateConversionBuffer date;
+  DateConversionBuffer time;
+  formatDate(*gregorianDateTime, date);
+  formatTime(*gregorianDateTime, time);
+  return jsNontrivialString(exec, makeString(date, " ", time));
 }
 
 JSValue JSC_HOST_CALL dateProtoFuncToUTCString(ExecState* exec,
@@ -614,8 +617,11 @@ JSValue JSC_HOST_CALL dateProtoFuncToUTCString(ExecState* exec,
       thisDateObj->gregorianDateTimeUTC(exec);
   if (!gregorianDateTime)
     return jsNontrivialString(exec, "Invalid Date");
-  return jsNontrivialString(exec, formatDateUTCVariant(*gregorianDateTime) +
-                                      " " + formatTimeUTC(*gregorianDateTime));
+  DateConversionBuffer date;
+  DateConversionBuffer time;
+  formatDateUTCVariant(*gregorianDateTime, date);
+  formatTimeUTC(*gregorianDateTime, time);
+  return jsNontrivialString(exec, makeString(date, " ", time));
 }
 
 JSValue JSC_HOST_CALL dateProtoFuncToISOString(ExecState* exec,
@@ -659,7 +665,9 @@ JSValue JSC_HOST_CALL dateProtoFuncToDateString(ExecState* exec,
       thisDateObj->gregorianDateTime(exec);
   if (!gregorianDateTime)
     return jsNontrivialString(exec, "Invalid Date");
-  return jsNontrivialString(exec, formatDate(*gregorianDateTime));
+  DateConversionBuffer date;
+  formatDate(*gregorianDateTime, date);
+  return jsNontrivialString(exec, date);
 }
 
 JSValue JSC_HOST_CALL dateProtoFuncToTimeString(ExecState* exec,
@@ -675,7 +683,9 @@ JSValue JSC_HOST_CALL dateProtoFuncToTimeString(ExecState* exec,
       thisDateObj->gregorianDateTime(exec);
   if (!gregorianDateTime)
     return jsNontrivialString(exec, "Invalid Date");
-  return jsNontrivialString(exec, formatTime(*gregorianDateTime));
+  DateConversionBuffer time;
+  formatTime(*gregorianDateTime, time);
+  return jsNontrivialString(exec, time);
 }
 
 JSValue JSC_HOST_CALL dateProtoFuncToLocaleString(ExecState* exec,
@@ -769,8 +779,11 @@ JSValue JSC_HOST_CALL dateProtoFuncToGMTString(ExecState* exec,
       thisDateObj->gregorianDateTimeUTC(exec);
   if (!gregorianDateTime)
     return jsNontrivialString(exec, "Invalid Date");
-  return jsNontrivialString(exec, formatDateUTCVariant(*gregorianDateTime) +
-                                      " " + formatTimeUTC(*gregorianDateTime));
+  DateConversionBuffer date;
+  DateConversionBuffer time;
+  formatDateUTCVariant(*gregorianDateTime, date);
+  formatTimeUTC(*gregorianDateTime, time);
+  return jsNontrivialString(exec, makeString(date, " ", time));
 }
 
 JSValue JSC_HOST_CALL dateProtoFuncGetMonth(ExecState* exec,

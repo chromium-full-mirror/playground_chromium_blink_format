@@ -939,7 +939,7 @@ JSValue JSC_HOST_CALL stringProtoFuncBig(ExecState* exec,
                                          JSValue thisValue,
                                          const ArgList&) {
   UString s = thisValue.toThisString(exec);
-  return jsNontrivialString(exec, "<big>" + s + "</big>");
+  return jsNontrivialString(exec, makeString("<big>", s, "</big>"));
 }
 
 JSValue JSC_HOST_CALL stringProtoFuncSmall(ExecState* exec,
@@ -947,7 +947,7 @@ JSValue JSC_HOST_CALL stringProtoFuncSmall(ExecState* exec,
                                            JSValue thisValue,
                                            const ArgList&) {
   UString s = thisValue.toThisString(exec);
-  return jsNontrivialString(exec, "<small>" + s + "</small>");
+  return jsNontrivialString(exec, makeString("<small>", s, "</small>"));
 }
 
 JSValue JSC_HOST_CALL stringProtoFuncBlink(ExecState* exec,
@@ -955,7 +955,7 @@ JSValue JSC_HOST_CALL stringProtoFuncBlink(ExecState* exec,
                                            JSValue thisValue,
                                            const ArgList&) {
   UString s = thisValue.toThisString(exec);
-  return jsNontrivialString(exec, "<blink>" + s + "</blink>");
+  return jsNontrivialString(exec, makeString("<blink>", s, "</blink>"));
 }
 
 JSValue JSC_HOST_CALL stringProtoFuncBold(ExecState* exec,
@@ -963,7 +963,7 @@ JSValue JSC_HOST_CALL stringProtoFuncBold(ExecState* exec,
                                           JSValue thisValue,
                                           const ArgList&) {
   UString s = thisValue.toThisString(exec);
-  return jsNontrivialString(exec, "<b>" + s + "</b>");
+  return jsNontrivialString(exec, makeString("<b>", s, "</b>"));
 }
 
 JSValue JSC_HOST_CALL stringProtoFuncFixed(ExecState* exec,
@@ -971,7 +971,7 @@ JSValue JSC_HOST_CALL stringProtoFuncFixed(ExecState* exec,
                                            JSValue thisValue,
                                            const ArgList&) {
   UString s = thisValue.toThisString(exec);
-  return jsString(exec, "<tt>" + s + "</tt>");
+  return jsString(exec, makeString("<tt>", s, "</tt>"));
 }
 
 JSValue JSC_HOST_CALL stringProtoFuncItalics(ExecState* exec,
@@ -979,7 +979,7 @@ JSValue JSC_HOST_CALL stringProtoFuncItalics(ExecState* exec,
                                              JSValue thisValue,
                                              const ArgList&) {
   UString s = thisValue.toThisString(exec);
-  return jsNontrivialString(exec, "<i>" + s + "</i>");
+  return jsNontrivialString(exec, makeString("<i>", s, "</i>"));
 }
 
 JSValue JSC_HOST_CALL stringProtoFuncStrike(ExecState* exec,
@@ -987,7 +987,7 @@ JSValue JSC_HOST_CALL stringProtoFuncStrike(ExecState* exec,
                                             JSValue thisValue,
                                             const ArgList&) {
   UString s = thisValue.toThisString(exec);
-  return jsNontrivialString(exec, "<strike>" + s + "</strike>");
+  return jsNontrivialString(exec, makeString("<strike>", s, "</strike>"));
 }
 
 JSValue JSC_HOST_CALL stringProtoFuncSub(ExecState* exec,
@@ -995,7 +995,7 @@ JSValue JSC_HOST_CALL stringProtoFuncSub(ExecState* exec,
                                          JSValue thisValue,
                                          const ArgList&) {
   UString s = thisValue.toThisString(exec);
-  return jsNontrivialString(exec, "<sub>" + s + "</sub>");
+  return jsNontrivialString(exec, makeString("<sub>", s, "</sub>"));
 }
 
 JSValue JSC_HOST_CALL stringProtoFuncSup(ExecState* exec,
@@ -1003,7 +1003,7 @@ JSValue JSC_HOST_CALL stringProtoFuncSup(ExecState* exec,
                                          JSValue thisValue,
                                          const ArgList&) {
   UString s = thisValue.toThisString(exec);
-  return jsNontrivialString(exec, "<sup>" + s + "</sup>");
+  return jsNontrivialString(exec, makeString("<sup>", s, "</sup>"));
 }
 
 JSValue JSC_HOST_CALL stringProtoFuncFontcolor(ExecState* exec,
@@ -1013,7 +1013,8 @@ JSValue JSC_HOST_CALL stringProtoFuncFontcolor(ExecState* exec,
   UString s = thisValue.toThisString(exec);
   JSValue a0 = args.at(0);
   return jsNontrivialString(
-      exec, "<font color=\"" + a0.toString(exec) + "\">" + s + "</font>");
+      exec,
+      makeString("<font color=\"", a0.toString(exec), "\">", s, "</font>"));
 }
 
 JSValue JSC_HOST_CALL stringProtoFuncFontsize(ExecState* exec,
@@ -1056,8 +1057,8 @@ JSValue JSC_HOST_CALL stringProtoFuncFontsize(ExecState* exec,
     return jsNontrivialString(exec, UString(buffer, bufferSize, false));
   }
 
-  return jsNontrivialString(
-      exec, "<font size=\"" + a0.toString(exec) + "\">" + s + "</font>");
+  return jsNontrivialString(exec, makeString("<font size=\"", a0.toString(exec),
+                                             "\">", s, "</font>"));
 }
 
 JSValue JSC_HOST_CALL stringProtoFuncAnchor(ExecState* exec,
@@ -1067,7 +1068,7 @@ JSValue JSC_HOST_CALL stringProtoFuncAnchor(ExecState* exec,
   UString s = thisValue.toThisString(exec);
   JSValue a0 = args.at(0);
   return jsNontrivialString(
-      exec, "<a name=\"" + a0.toString(exec) + "\">" + s + "</a>");
+      exec, makeString("<a name=\"", a0.toString(exec), "\">", s, "</a>"));
 }
 
 JSValue JSC_HOST_CALL stringProtoFuncLink(ExecState* exec,

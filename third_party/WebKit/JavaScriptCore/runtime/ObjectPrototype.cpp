@@ -255,7 +255,8 @@ JSValue JSC_HOST_CALL objectProtoFuncToString(ExecState* exec,
                                               JSValue thisValue,
                                               const ArgList&) {
   return jsNontrivialString(
-      exec, "[object " + thisValue.toThisObject(exec)->className() + "]");
+      exec,
+      makeString("[object ", thisValue.toThisObject(exec)->className(), "]"));
 }
 
 }  // namespace JSC
