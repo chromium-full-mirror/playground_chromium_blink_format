@@ -162,6 +162,12 @@ bool Event::isErrorEvent() const {
 }
 #endif
 
+#if ENABLE(TOUCH_EVENTS)
+bool Event::isTouchEvent() const {
+  return false;
+}
+#endif
+
 bool Event::storesResultAsString() const {
   return false;
 }

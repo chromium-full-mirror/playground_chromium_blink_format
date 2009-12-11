@@ -267,6 +267,15 @@ void HTMLElement::parseMappedAttribute(MappedAttribute* attr) {
   } else if (attr->name() == oninvalidAttr) {
     setAttributeEventListener(eventNames().invalidEvent,
                               createAttributeEventListener(this, attr));
+  } else if (attr->name() == ontouchstartAttr) {
+    setAttributeEventListener(eventNames().touchstartEvent,
+                              createAttributeEventListener(this, attr));
+  } else if (attr->name() == ontouchmoveAttr) {
+    setAttributeEventListener(eventNames().touchmoveEvent,
+                              createAttributeEventListener(this, attr));
+  } else if (attr->name() == ontouchendAttr) {
+    setAttributeEventListener(eventNames().touchendEvent,
+                              createAttributeEventListener(this, attr));
   }
 }
 
