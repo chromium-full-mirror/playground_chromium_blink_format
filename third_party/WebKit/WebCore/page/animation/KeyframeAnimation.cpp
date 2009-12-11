@@ -240,6 +240,8 @@ void KeyframeAnimation::pauseAnimation(double timeOffset) {
       layer->backing()->animationPaused(timeOffset,
                                         m_keyframes.animationName());
   }
+#else
+  UNUSED_PARAM(timeOffset);
 #endif
   // Restore the original (unanimated) style
   if (!paused())
