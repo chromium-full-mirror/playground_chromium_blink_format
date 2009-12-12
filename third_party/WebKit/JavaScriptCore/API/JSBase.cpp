@@ -115,7 +115,7 @@ void JSGarbageCollect(JSContextRef ctx) {
                                           : SilenceAssertionsOnly);
 
   if (!globalData.heap.isBusy())
-    globalData.heap.collect();
+    globalData.heap.collectAllGarbage();
 
   // FIXME: Perhaps we should trigger a second mark and sweep
   // once the garbage collector is done if this is called when
