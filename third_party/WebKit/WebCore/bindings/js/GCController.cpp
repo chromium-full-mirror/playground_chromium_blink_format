@@ -40,15 +40,11 @@ using namespace JSC;
 
 namespace WebCore {
 
-#if USE(PTHREADS)
-
 static void* collect(void*) {
   JSLock lock(SilenceAssertionsOnly);
   JSDOMWindow::commonJSGlobalData()->heap.collectAllGarbage();
   return 0;
 }
-
-#endif
 
 GCController& gcController() {
   DEFINE_STATIC_LOCAL(GCController, staticGCController, ());
