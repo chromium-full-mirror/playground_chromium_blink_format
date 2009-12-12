@@ -288,8 +288,6 @@ class Frame : public RefCounted<Frame> {
   void selectionLayoutChanged();
   void notifyRendererOfSelectionChange(bool userTriggered);
 
-  void invalidateSelection();
-
   void setCaretVisible(bool = true);
   void paintCaret(GraphicsContext*,
                   int tx,

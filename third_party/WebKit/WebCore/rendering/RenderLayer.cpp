@@ -1250,7 +1250,7 @@ void RenderLayer::scrollToOffset(int x,
   // The caret rect needs to be invalidated after scrolling
   Frame* frame = renderer()->document()->frame();
   if (frame)
-    frame->invalidateSelection();
+    frame->selection()->setNeedsLayout();
 
   // Just schedule a full repaint of our object.
   if (repaint)
