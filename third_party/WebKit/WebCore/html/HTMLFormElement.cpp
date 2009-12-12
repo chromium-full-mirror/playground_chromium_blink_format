@@ -309,7 +309,7 @@ bool HTMLFormElement::prepareSubmit(Event* event) {
   m_insubmit = false;
 
   if (m_doingsubmit)
-    submit(event, true);
+    submit(event, true, false, NotSubmittedByJavaScript);
 
   return m_doingsubmit;
 }
@@ -339,9 +339,19 @@ static void transferMailtoPostFormDataToURL(RefPtr<FormData>& data,
   url.setQuery(query);
 }
 
+void HTMLFormElement::submit(Frame* javaScriptActiveFrame) {
+  if (javaScriptActiveFrame)
+    submit(0, false,
+           !javaScriptActiveFrame->script()->anyPageIsProcessingUserGesture(),
+           SubmittedByJavaScript);
+  else
+    submit(0, false, false, NotSubmittedByJavaScript);
+}
+
 void HTMLFormElement::submit(Event* event,
                              bool activateSubmitButton,
-                             bool lockHistory) {
+                             bool lockHistory,
+                             FormSubmissionTrigger formSubmissionTrigger) {
   FrameView* view = document()->view();
   Frame* frame = document()->frame();
   if (!view || !frame)
@@ -379,7 +389,8 @@ void HTMLFormElement::submit(Event* event,
     }
   }
 
-  RefPtr<FormState> formState = FormState::create(this, formValues, frame);
+  RefPtr<FormState> formState =
+      FormState::create(this, formValues, frame, formSubmissionTrigger);
 
   if (needButtonActivation && firstSuccessfulSubmitButton)
     firstSuccessfulSubmitButton->setActivatedSubmit(true);
