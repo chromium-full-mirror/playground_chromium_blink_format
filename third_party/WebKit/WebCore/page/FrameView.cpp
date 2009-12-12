@@ -339,8 +339,8 @@ PassRefPtr<Scrollbar> FrameView::createScrollbar(
   Element* body = doc ? doc->body() : 0;
   if (body && body->renderer() &&
       body->renderer()->style()->hasPseudoStyle(SCROLLBAR))
-    return RenderScrollbar::createCustomScrollbar(this, orientation,
-                                                  body->renderBox());
+    return RenderScrollbar::createCustomScrollbar(
+        this, orientation, body->renderer()->enclosingBox());
 
   // If the <body> didn't have a custom style, then the root element might.
   Element* docElement = doc ? doc->documentElement() : 0;
@@ -613,7 +613,7 @@ void FrameView::layout(bool allowSubtree) {
         hMode = ScrollbarAlwaysOff;
       } else if (body->hasTagName(bodyTag)) {
         if (!m_firstLayout && m_size.height() != layoutHeight() &&
-            toRenderBox(body->renderer())->stretchesToViewHeight())
+            body->renderer()->enclosingBox()->stretchesToViewHeight())
           body->renderer()->setChildNeedsLayout(true);
         // It's sufficient to just check the X overflow,
         // since it's illegal to have visible in only one direction.
