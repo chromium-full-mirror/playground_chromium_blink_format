@@ -104,7 +104,7 @@ void ImageBuffer::platformTransformColorSpace(const Vector<int>& lookUpTable) {
     for (int x = 0; x < m_size.width(); x++) {
       QRgb value = image.pixel(x, y);
       value = qRgba(lookUpTable[qRed(value)], lookUpTable[qGreen(value)],
-                    lookUpTable[qBlue(value)], lookUpTable[qAlpha(value)]);
+                    lookUpTable[qBlue(value)], qAlpha(value));
       image.setPixel(x, y, value);
     }
   }

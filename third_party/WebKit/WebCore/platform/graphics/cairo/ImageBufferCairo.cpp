@@ -121,9 +121,9 @@ void ImageBuffer::platformTransformColorSpace(const Vector<int>& lookUpTable) {
     for (int x = 0; x < m_size.width(); x++) {
       unsigned* pixel = row + x;
       Color pixelColor = colorFromPremultipliedARGB(*pixel);
-      pixelColor = Color(
-          lookUpTable[pixelColor.red()], lookUpTable[pixelColor.green()],
-          lookUpTable[pixelColor.blue()], lookUpTable[pixelColor.alpha()]);
+      pixelColor =
+          Color(lookUpTable[pixelColor.red()], lookUpTable[pixelColor.green()],
+                lookUpTable[pixelColor.blue()], pixelColor.alpha());
       *pixel = premultipliedARGBFromColor(pixelColor);
     }
   }
