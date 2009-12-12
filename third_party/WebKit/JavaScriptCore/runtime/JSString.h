@@ -443,8 +443,7 @@ inline JSString* jsSubstring(JSGlobalData* globalData,
       return globalData->smallStrings.singleCharacterString(globalData, c);
   }
   return new (globalData) JSString(
-      globalData, UString(UString::Rep::create(s.rep(), offset, length)),
-      JSString::HasOtherOwner);
+      globalData, UString(UString::Rep::create(s.rep(), offset, length)));
 }
 
 inline JSString* jsOwnedString(JSGlobalData* globalData, const UString& s) {

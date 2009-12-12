@@ -125,15 +125,15 @@ static void removeWrapper(DOMObject* wrapper) {
 }
 
 static void removeWrappers(const JSWrapperCache& wrappers) {
-  JSWrapperCache::const_iterator wrappersEnd = wrappers.uncheckedEnd();
-  for (JSWrapperCache::const_iterator it = wrappers.uncheckedBegin();
-       it != wrappersEnd; ++it)
+  JSWrapperCache::const_iterator wrappersEnd = wrappers.end();
+  for (JSWrapperCache::const_iterator it = wrappers.begin(); it != wrappersEnd;
+       ++it)
     removeWrapper(it->second);
 }
 
 static inline void removeWrappers(const DOMObjectWrapperMap& wrappers) {
-  DOMObjectWrapperMap::const_iterator wrappersEnd = wrappers.uncheckedEnd();
-  for (DOMObjectWrapperMap::const_iterator it = wrappers.uncheckedBegin();
+  DOMObjectWrapperMap::const_iterator wrappersEnd = wrappers.end();
+  for (DOMObjectWrapperMap::const_iterator it = wrappers.begin();
        it != wrappersEnd; ++it)
     removeWrapper(it->second);
 }
@@ -223,20 +223,10 @@ static inline DOMObjectWrapperMap& DOMObjectWrapperMapFor(
   return currentWorld(exec)->m_wrappers;
 }
 
-bool hasCachedDOMObjectWrapperUnchecked(JSGlobalData* globalData,
-                                        void* objectHandle) {
-  for (JSGlobalDataWorldIterator worldIter(globalData); worldIter;
-       ++worldIter) {
-    if (worldIter->m_wrappers.uncheckedGet(objectHandle))
-      return true;
-  }
-  return false;
-}
-
 bool hasCachedDOMObjectWrapper(JSGlobalData* globalData, void* objectHandle) {
   for (JSGlobalDataWorldIterator worldIter(globalData); worldIter;
        ++worldIter) {
-    if (worldIter->m_wrappers.get(objectHandle))
+    if (worldIter->m_wrappers.contains(objectHandle))
       return true;
   }
   return false;
@@ -253,15 +243,14 @@ void cacheDOMObjectWrapper(JSC::ExecState* exec,
   DOMObjectWrapperMapFor(exec).set(objectHandle, wrapper);
 }
 
-bool hasCachedDOMNodeWrapperUnchecked(Document* document, Node* node) {
+bool hasCachedDOMNodeWrapper(Document* document, Node* node) {
   if (!document)
-    return hasCachedDOMObjectWrapperUnchecked(JSDOMWindow::commonJSGlobalData(),
-                                              node);
+    return hasCachedDOMObjectWrapper(JSDOMWindow::commonJSGlobalData(), node);
 
   JSWrapperCacheMap& wrapperCacheMap = document->wrapperCacheMap();
   for (JSWrapperCacheMap::iterator iter = wrapperCacheMap.begin();
        iter != wrapperCacheMap.end(); ++iter) {
-    if (iter->second->uncheckedGet(node))
+    if (iter->second->contains(node))
       return true;
   }
   return false;
@@ -279,13 +268,20 @@ void forgetDOMObject(DOMObject* wrapper, void* objectHandle) {
   JSC::JSGlobalData* globalData = Heap::heap(wrapper)->globalData();
   for (JSGlobalDataWorldIterator worldIter(globalData); worldIter;
        ++worldIter) {
-    if (worldIter->m_wrappers.uncheckedRemove(objectHandle, wrapper))
-      break;
+    DOMObjectWrapperMap& wrappers = worldIter->m_wrappers;
+    DOMObjectWrapperMap::iterator iter = wrappers.find(objectHandle);
+    if ((iter != wrappers.end()) && (iter->second == wrapper)) {
+      removeWrapper(wrapper);
+      wrappers.remove(iter);
+      return;
+    }
   }
-  removeWrapper(wrapper);
+
+  // If the world went away, it should have removed this wrapper from the set.
+  ASSERT(!wrapperSet().contains(wrapper));
 }
 
-void forgetDOMNode(JSNode* wrapper, Node* node, Document* document) {
+void forgetDOMNode(DOMObject* wrapper, Node* node, Document* document) {
   if (!document) {
     forgetDOMObject(wrapper, node);
     return;
@@ -294,10 +290,17 @@ void forgetDOMNode(JSNode* wrapper, Node* node, Document* document) {
   JSWrapperCacheMap& wrapperCacheMap = document->wrapperCacheMap();
   for (JSWrapperCacheMap::iterator wrappersIter = wrapperCacheMap.begin();
        wrappersIter != wrapperCacheMap.end(); ++wrappersIter) {
-    if (wrappersIter->second->uncheckedRemove(node, wrapper))
-      break;
+    JSWrapperCache* wrappers = wrappersIter->second;
+    JSWrapperCache::iterator iter = wrappers->find(node);
+    if ((iter != wrappers->end()) && (iter->second == wrapper)) {
+      wrappers->remove(iter);
+      removeWrapper(wrapper);
+      return;
+    }
   }
-  removeWrapper(wrapper);
+
+  // If the world went away, it should have removed this wrapper from the set.
+  ASSERT(!wrapperSet().contains(wrapper));
 }
 
 void cacheDOMNodeWrapper(JSC::ExecState* exec,
@@ -365,7 +368,7 @@ static inline bool isObservableThroughDOM(JSNode* jsNode,
     if (node->isElementNode()) {
       if (NamedNodeMap* attributes =
               static_cast<Element*>(node)->attributeMap()) {
-        if (DOMObject* wrapper = world->m_wrappers.uncheckedGet(attributes)) {
+        if (DOMObject* wrapper = world->m_wrappers.get(attributes)) {
           if (wrapper->hasCustomProperties())
             return true;
         }
@@ -373,7 +376,7 @@ static inline bool isObservableThroughDOM(JSNode* jsNode,
       if (node->isStyledElement()) {
         if (CSSMutableStyleDeclaration* style =
                 static_cast<StyledElement*>(node)->inlineStyleDecl()) {
-          if (DOMObject* wrapper = world->m_wrappers.uncheckedGet(style)) {
+          if (DOMObject* wrapper = world->m_wrappers.get(style)) {
             if (wrapper->hasCustomProperties())
               return true;
           }
@@ -382,7 +385,7 @@ static inline bool isObservableThroughDOM(JSNode* jsNode,
       if (static_cast<Element*>(node)->hasTagName(canvasTag)) {
         if (CanvasRenderingContext* context =
                 static_cast<HTMLCanvasElement*>(node)->renderingContext()) {
-          if (DOMObject* wrapper = world->m_wrappers.uncheckedGet(context)) {
+          if (DOMObject* wrapper = world->m_wrappers.get(context)) {
             if (wrapper->hasCustomProperties())
               return true;
           }
@@ -424,9 +427,9 @@ void markDOMNodesForDocument(MarkStack& markStack, Document* document) {
     DOMWrapperWorld* world = wrappersIter->first;
     JSWrapperCache* nodeDict = wrappersIter->second;
 
-    JSWrapperCache::iterator nodeEnd = nodeDict->uncheckedEnd();
-    for (JSWrapperCache::iterator nodeIt = nodeDict->uncheckedBegin();
-         nodeIt != nodeEnd; ++nodeIt) {
+    JSWrapperCache::iterator nodeEnd = nodeDict->end();
+    for (JSWrapperCache::iterator nodeIt = nodeDict->begin(); nodeIt != nodeEnd;
+         ++nodeIt) {
       JSNode* jsNode = nodeIt->second;
       if (isObservableThroughDOM(jsNode, world))
         markStack.append(jsNode);
@@ -528,7 +531,7 @@ void markDOMObjectWrapper(MarkStack& markStack,
 
   for (JSGlobalDataWorldIterator worldIter(&globalData); worldIter;
        ++worldIter) {
-    if (DOMObject* wrapper = worldIter->m_wrappers.uncheckedGet(object))
+    if (DOMObject* wrapper = worldIter->m_wrappers.get(object))
       markStack.append(wrapper);
   }
 }
@@ -538,7 +541,7 @@ void markDOMNodeWrapper(MarkStack& markStack, Document* document, Node* node) {
     JSWrapperCacheMap& wrapperCacheMap = document->wrapperCacheMap();
     for (JSWrapperCacheMap::iterator iter = wrapperCacheMap.begin();
          iter != wrapperCacheMap.end(); ++iter) {
-      if (JSNode* wrapper = iter->second->uncheckedGet(node))
+      if (JSNode* wrapper = iter->second->get(node))
         markStack.append(wrapper);
     }
     return;
@@ -546,7 +549,7 @@ void markDOMNodeWrapper(MarkStack& markStack, Document* document, Node* node) {
 
   for (JSGlobalDataWorldIterator worldIter(JSDOMWindow::commonJSGlobalData());
        worldIter; ++worldIter) {
-    if (DOMObject* wrapper = worldIter->m_wrappers.uncheckedGet(node))
+    if (DOMObject* wrapper = worldIter->m_wrappers.get(node))
       markStack.append(wrapper);
   }
 }

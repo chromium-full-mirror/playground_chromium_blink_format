@@ -25,10 +25,9 @@
 #define JSDOMBinding_h
 
 #include "JSDOMGlobalObject.h"
-#include "Document.h"
+#include "Document.h"  // For DOMConstructorWithDocument
 #include <runtime/Completion.h>
 #include <runtime/Lookup.h>
-#include <runtime/WeakGCMap.h>
 #include <wtf/Noncopyable.h>
 
 namespace JSC {
@@ -143,7 +142,7 @@ class DOMConstructorWithDocument : public DOMConstructorObject {
   }
 };
 
-typedef JSC::WeakGCMap<void*, DOMObject*> DOMObjectWrapperMap;
+typedef HashMap<void*, DOMObject*> DOMObjectWrapperMap;
 
 class DOMWrapperWorld : public RefCounted<DOMWrapperWorld> {
  public:
@@ -223,20 +222,20 @@ class WebCoreJSClientData : public JSC::JSGlobalData::ClientData {
   DOMWrapperWorld m_normalWorld;
 };
 
-DOMObject* getCachedDOMObjectWrapper(JSC::ExecState*, void* objectHandle);
 bool hasCachedDOMObjectWrapper(JSC::JSGlobalData*, void* objectHandle);
+DOMObject* getCachedDOMObjectWrapper(JSC::ExecState*, void* objectHandle);
 void cacheDOMObjectWrapper(JSC::ExecState*,
                            void* objectHandle,
                            DOMObject* wrapper);
-void forgetDOMNode(JSNode* wrapper, Node* node, Document* document);
+void forgetDOMNode(DOMObject* wrapper, Node* node, Document* document);
 void forgetDOMObject(DOMObject* wrapper, void* objectHandle);
 
+bool hasCachedDOMNodeWrapper(Document*, Node*);
 JSNode* getCachedDOMNodeWrapper(JSC::ExecState*, Document*, Node*);
 void cacheDOMNodeWrapper(JSC::ExecState*, Document*, Node*, JSNode* wrapper);
 void forgetAllDOMNodesForDocument(Document*);
 void forgetWorldOfDOMNodesForDocument(Document*, DOMWrapperWorld*);
 void updateDOMNodeDocument(Node*, Document* oldDocument, Document* newDocument);
-
 void markDOMNodesForDocument(JSC::MarkStack&, Document*);
 void markActiveObjectsForContext(JSC::MarkStack&,
                                  JSC::JSGlobalData&,
@@ -247,8 +246,6 @@ void markDOMObjectWrapper(JSC::MarkStack&,
 void markDOMNodeWrapper(JSC::MarkStack& markStack,
                         Document* document,
                         Node* node);
-bool hasCachedDOMObjectWrapperUnchecked(JSC::JSGlobalData*, void* objectHandle);
-bool hasCachedDOMNodeWrapperUnchecked(Document*, Node*);
 
 JSC::Structure* getCachedDOMStructure(JSDOMGlobalObject*,
                                       const JSC::ClassInfo*);

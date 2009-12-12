@@ -119,7 +119,6 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
   RefPtr<Structure> propertyNameIteratorStructure;
   RefPtr<Structure> getterSetterStructure;
   RefPtr<Structure> apiWrapperStructure;
-  RefPtr<Structure> dummyMarkableCellStructure;
 
 #if USE(JSVALUE32)
   RefPtr<Structure> numberStructure;
