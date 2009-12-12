@@ -54,7 +54,9 @@
 #include "JSDOMBinding.h"
 #include "ScriptController.h"
 #include "SubstituteData.h"
+#if ENABLE(SVG)
 #include "SVGSMILElement.h"
+#endif
 
 #include <atk/atk.h>
 #include <JavaScriptCore/APICast.h>
@@ -971,13 +973,13 @@ bool webkit_web_frame_pause_svg_animation(WebKitWebFrame* frame,
                                           double time,
                                           const gchar* elementId) {
   ASSERT(core(frame));
+#if ENABLE(SVG)
   Document* document = core(frame)->document();
   if (!document || !document->svgExtensions())
     return false;
   Element* coreElement = document->getElementById(AtomicString(animationId));
   if (!coreElement || !SVGSMILElement::isSMILElement(coreElement))
     return false;
-#if ENABLE(SVG)
   return document->accessSVGExtensions()->sampleAnimationAtTime(
       elementId, static_cast<SVGSMILElement*>(coreElement), time);
 #else
