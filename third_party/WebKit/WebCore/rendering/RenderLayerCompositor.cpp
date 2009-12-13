@@ -1026,6 +1026,8 @@ bool RenderLayerCompositor::requiresCompositingForVideo(
     RenderVideo* video = toRenderVideo(renderer);
     return canAccelerateVideoRendering(video);
   }
+#else
+  UNUSED_PARAM(renderer);
 #endif
   return false;
 }
