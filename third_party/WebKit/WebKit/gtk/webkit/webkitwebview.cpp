@@ -216,8 +216,14 @@ static gboolean webkit_web_view_forward_context_menu_event(
     return FALSE;
 
   ContextMenu* coreMenu = page->contextMenuController()->contextMenu();
-  if (!coreMenu)
+  if (!coreMenu) {
+    Frame* frame = core(webView)->mainFrame();
+    if (frame->view() &&
+        frame->eventHandler()->handleMousePressEvent(PlatformMouseEvent(event)))
+      return TRUE;
+
     return FALSE;
+  }
 
   GtkMenu* menu = GTK_MENU(coreMenu->platformDescription());
   if (!menu)
