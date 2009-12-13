@@ -31,6 +31,8 @@
 #include "config.h"
 #include "SQLTransactionCoordinator.h"
 
+#if ENABLE(DATABASE)
+
 #include "CString.h"
 #include "Database.h"
 #include "SQLTransaction.h"
@@ -111,4 +113,7 @@ void SQLTransactionCoordinator::shutdown() {
   // Clean up all pending transactions for all databases
   m_coordinationInfoMap.clear();
 }
-}
+
+}  // namespace WebCore
+
+#endif  // ENABLE(DATABASE)

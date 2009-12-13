@@ -31,6 +31,8 @@
 #include "config.h"
 #include "SQLTransactionClient.h"
 
+#if ENABLE(DATABASE)
+
 #include "ChromeClient.h"
 #include "Database.h"
 #include "DatabaseThread.h"
@@ -73,3 +75,5 @@ bool SQLTransactionClient::didExceedQuota(SQLTransaction* transaction) {
   return (newQuota > currentQuota);
 }
 }
+
+#endif  // ENABLE(DATABASE)
