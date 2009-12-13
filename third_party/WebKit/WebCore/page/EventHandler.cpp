@@ -133,7 +133,7 @@ static inline void scrollAndAcceptEvent(float delta,
     e.accept();
 }
 
-#if !PLATFORM(MAC)
+#if !PLATFORM(MAC) || ENABLE(EXPERIMENTAL_SINGLE_VIEW_MODE)
 
 inline bool EventHandler::eventLoopHandleMouseUp(
     const MouseEventWithHitTestResults&) {
@@ -181,7 +181,7 @@ EventHandler::EventHandler(Frame* frame)
       m_mouseDownTimestamp(0),
       m_useLatchedWheelEventNode(false),
       m_widgetIsLatched(false)
-#if PLATFORM(MAC)
+#if PLATFORM(MAC) && !ENABLE(EXPERIMENTAL_SINGLE_VIEW_MODE)
       ,
       m_mouseDownView(nil),
       m_sendingEventToSubview(false),
@@ -1751,7 +1751,7 @@ void EventHandler::clearDragState() {
   m_dragTarget = 0;
   m_capturingMouseEventsNode = 0;
   m_shouldOnlyFireDragOverEvent = false;
-#if PLATFORM(MAC)
+#if PLATFORM(MAC) && !ENABLE(EXPERIMENTAL_SINGLE_VIEW_MODE)
   m_sendingEventToSubview = false;
 #endif
 }
