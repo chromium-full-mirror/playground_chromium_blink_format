@@ -121,6 +121,8 @@ class JSSVGDynamicPODTypeWrapper : public JSSVGPODTypeWrapper<PODType> {
     ASSERT(m_setter);
   }
 
+  virtual ~JSSVGDynamicPODTypeWrapper();
+
   // Update callbacks
   RefPtr<PODTypeCreator> m_creator;
   GetterMethod m_getter;
@@ -342,6 +344,7 @@ struct PODTypeWrapperCacheInfoTraits
   }
 };
 
+// Used for dynamic read-write attributes
 template <typename PODType, typename PODTypeCreator>
 class JSSVGDynamicPODTypeWrapperCache {
  public:
@@ -354,50 +357,45 @@ class JSSVGDynamicPODTypeWrapperCache {
       CacheInfoTraits;
 
   typedef JSSVGPODTypeWrapper<PODType> WrapperBase;
-  typedef JSSVGDynamicPODTypeWrapper<PODType, PODTypeCreator> DynamicWrapper;
-  typedef HashMap<CacheInfo, DynamicWrapper*, CacheInfoHash, CacheInfoTraits>
-      DynamicWrapperHashMap;
-  typedef typename DynamicWrapperHashMap::const_iterator
-      DynamicWrapperHashMapIterator;
+  typedef JSSVGDynamicPODTypeWrapper<PODType, PODTypeCreator> Wrapper;
+  typedef HashMap<CacheInfo, Wrapper*, CacheInfoHash, CacheInfoTraits>
+      WrapperMap;
 
-  static DynamicWrapperHashMap& dynamicWrapperHashMap() {
-    DEFINE_STATIC_LOCAL(DynamicWrapperHashMap, s_dynamicWrapperHashMap, ());
-    return s_dynamicWrapperHashMap;
+  static WrapperMap& wrapperMap() {
+    DEFINE_STATIC_LOCAL(WrapperMap, s_wrapperMap, ());
+    return s_wrapperMap;
   }
 
-  // Used for readwrite attributes only
   static PassRefPtr<WrapperBase> lookupOrCreateWrapper(PODTypeCreator* creator,
                                                        GetterMethod getter,
                                                        SetterMethod setter) {
-    DynamicWrapperHashMap& map(dynamicWrapperHashMap());
     CacheInfo info(creator, getter, setter);
+    pair<typename WrapperMap::iterator, bool> result =
+        wrapperMap().add(info, 0);
+    if (!result.second)  // pre-existing entry
+      return result.first->second;
 
-    if (map.contains(info))
-      return map.get(info);
-
-    RefPtr<DynamicWrapper> wrapper =
-        DynamicWrapper::create(creator, getter, setter);
-    map.set(info, wrapper.get());
+    RefPtr<Wrapper> wrapper = Wrapper::create(creator, getter, setter);
+    result.first->second = wrapper.get();
     return wrapper.release();
   }
 
-  static void forgetWrapper(WrapperBase* wrapper) {
-    DynamicWrapperHashMap& map(dynamicWrapperHashMap());
-
-    DynamicWrapperHashMapIterator it = map.begin();
-    DynamicWrapperHashMapIterator end = map.end();
-
-    for (; it != end; ++it) {
-      if (it->second != wrapper)
-        continue;
-
-      // It's guaranteed that there's just one object we need to take care of.
-      map.remove(it->first);
-      break;
-    }
+  static void forgetWrapper(PODTypeCreator* creator,
+                            GetterMethod getter,
+                            SetterMethod setter) {
+    CacheInfo info(creator, getter, setter);
+    wrapperMap().remove(info);
   }
 };
-};
+
+template <typename PODType, typename PODTypeCreator>
+JSSVGDynamicPODTypeWrapper<PODType,
+                           PODTypeCreator>::~JSSVGDynamicPODTypeWrapper() {
+  JSSVGDynamicPODTypeWrapperCache<PODType, PODTypeCreator>::forgetWrapper(
+      m_creator.get(), m_getter, m_setter);
+}
+
+}  // namespace WebCore
 
 #endif  // ENABLE(SVG)
 #endif  // JSSVGPODTypeWrapper_h

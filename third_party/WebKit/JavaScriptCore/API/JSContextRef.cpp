@@ -135,7 +135,7 @@ void JSGlobalContextRelease(JSGlobalContextRef ctx) {
     ASSERT(!globalData.heap.isBusy());
     globalData.heap.destroy();
   } else
-    globalData.heap.collect();
+    globalData.heap.collectAllGarbage();
 
   globalData.deref();
 }
