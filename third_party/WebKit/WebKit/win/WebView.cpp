@@ -2543,10 +2543,10 @@ HRESULT STDMETHODCALLTYPE WebView::initWithFrame(
           &useHighResolutionTimer)))
     Settings::setShouldUseHighResolutionTimers(useHighResolutionTimer);
 
-  m_page =
-      new Page(new WebChromeClient(this), new WebContextMenuClient(this),
-               new WebEditorClient(this), new WebDragClient(this),
-               new WebInspectorClient(this), new WebPluginHalterClient(this));
+  m_page = new Page(new WebChromeClient(this), new WebContextMenuClient(this),
+                    new WebEditorClient(this), new WebDragClient(this),
+                    new WebInspectorClient(this),
+                    new WebPluginHalterClient(this), 0);
 
   BSTR localStoragePath;
   if (SUCCEEDED(m_preferences->localStorageDatabasePath(&localStoragePath))) {

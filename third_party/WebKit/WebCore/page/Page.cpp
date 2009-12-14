@@ -78,6 +78,10 @@
 #include "WMLPageState.h"
 #endif
 
+#if ENABLE(CLIENT_BASED_GEOLOCATION)
+#include "GeolocationController.h"
+#endif
+
 namespace WebCore {
 
 static HashSet<Page*>* allPages;
@@ -110,7 +114,8 @@ Page::Page(ChromeClient* chromeClient,
            EditorClient* editorClient,
            DragClient* dragClient,
            InspectorClient* inspectorClient,
-           PluginHalterClient* pluginHalterClient)
+           PluginHalterClient* pluginHalterClient,
+           GeolocationControllerClient* geolocationControllerClient)
     : m_chrome(new Chrome(this, chromeClient)),
       m_dragCaretController(new SelectionController(0, true))
 #if ENABLE(DRAG_SUPPORT)
@@ -127,6 +132,11 @@ Page::Page(ChromeClient* chromeClient,
 #if ENABLE(INSPECTOR)
       ,
       m_inspectorController(new InspectorController(this, inspectorClient))
+#endif
+#if ENABLE(CLIENT_BASED_GEOLOCATION)
+      ,
+      m_geolocationController(
+          new GeolocationController(this, geolocationControllerClient))
 #endif
       ,
       m_settings(new Settings(this)),
@@ -164,6 +174,10 @@ Page::Page(ChromeClient* chromeClient,
 #if !ENABLE(INSPECTOR)
   UNUSED_PARAM(inspectorClient);
 #endif
+#if !ENABLE(CLIENT_BASED_GEOLOCATION)
+  UNUSED_PARAM(geolocationControllerClient);
+#endif
+
   if (!allPages) {
     allPages = new HashSet<Page*>;
 

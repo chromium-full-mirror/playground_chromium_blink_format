@@ -56,6 +56,8 @@ class DragController;
 class EditorClient;
 class FocusController;
 class Frame;
+class GeolocationController;
+class GeolocationControllerClient;
 class HaltablePlugin;
 class InspectorClient;
 class InspectorController;
@@ -92,7 +94,8 @@ class Page : public Noncopyable {
        EditorClient*,
        DragClient*,
        InspectorClient*,
-       PluginHalterClient*);
+       PluginHalterClient*,
+       GeolocationControllerClient*);
   ~Page();
 
   RenderTheme* theme() const { return m_theme.get(); };
@@ -162,6 +165,11 @@ class Page : public Noncopyable {
 #if ENABLE(INSPECTOR)
   InspectorController* inspectorController() const {
     return m_inspectorController.get();
+  }
+#endif
+#if ENABLE(CLIENT_BASED_GEOLOCATION)
+  GeolocationController* geolocationController() const {
+    return m_geolocationController.get();
   }
 #endif
   Settings* settings() const { return m_settings.get(); }
@@ -301,6 +309,9 @@ class Page : public Noncopyable {
 #endif
 #if ENABLE(INSPECTOR)
   OwnPtr<InspectorController> m_inspectorController;
+#endif
+#if ENABLE(CLIENT_BASED_GEOLOCATION)
+  OwnPtr<GeolocationController> m_geolocationController;
 #endif
   OwnPtr<Settings> m_settings;
   OwnPtr<ProgressTracker> m_progress;
