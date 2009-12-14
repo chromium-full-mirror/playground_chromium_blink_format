@@ -378,7 +378,7 @@ void ResourceRequestBase::updateResourceRequest() const {
 }
 
 #if !PLATFORM(MAC) && !USE(CFNETWORK) && !USE(SOUP) && !PLATFORM(CHROMIUM) && \
-    !PLATFORM(ANDROID)
+    !PLATFORM(ANDROID) && !PLATFORM(QT)
 unsigned initializeMaximumHTTPConnectionCountPerHost() {
   // This is used by the loader to control the number of issued parallel load
   // requests.
