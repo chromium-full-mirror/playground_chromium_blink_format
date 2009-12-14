@@ -30,6 +30,7 @@
 #include "JSArray.h"
 #include "JSFunction.h"
 #include "ObjectPrototype.h"
+#include "Operations.h"
 #include "PropertyNameArray.h"
 #include "RegExpConstructor.h"
 #include "RegExpObject.h"
@@ -251,14 +252,15 @@ bool StringPrototype::getOwnPropertyDescriptor(ExecState* exec,
 
 // ------------------------------ Functions --------------------------
 
-static inline UString substituteBackreferences(const UString& replacement,
-                                               const UString& source,
-                                               const int* ovector,
-                                               RegExp* reg) {
-  UString substitutedReplacement;
+static NEVER_INLINE UString
+substituteBackreferencesSlow(const UString& replacement,
+                             const UString& source,
+                             const int* ovector,
+                             RegExp* reg,
+                             int i) {
+  Vector<UChar> substitutedReplacement;
   int offset = 0;
-  int i = -1;
-  while ((i = replacement.find('$', i + 1)) != -1) {
+  do {
     if (i + 1 == replacement.size())
       break;
 
@@ -311,16 +313,25 @@ static inline UString substituteBackreferences(const UString& replacement,
     i += 1 + advance;
     offset = i + 1;
     substitutedReplacement.append(source.data() + backrefStart, backrefLength);
-  }
-
-  if (!offset)
-    return replacement;
+  } while ((i = replacement.find('$', i + 1)) != -1);
 
   if (replacement.size() - offset)
     substitutedReplacement.append(replacement.data() + offset,
                                   replacement.size() - offset);
 
-  return substitutedReplacement;
+  substitutedReplacement.shrinkToFit();
+  unsigned size = substitutedReplacement.size();
+  return UString(substitutedReplacement.releaseBuffer(), size, false);
+}
+
+static inline UString substituteBackreferences(const UString& replacement,
+                                               const UString& source,
+                                               const int* ovector,
+                                               RegExp* reg) {
+  int i = replacement.find('$', 0);
+  if (UNLIKELY(i != -1))
+    return substituteBackreferencesSlow(replacement, source, ovector, reg, i);
+  return replacement;
 }
 
 static inline int localeCompare(const UString& a, const UString& b) {
@@ -555,12 +566,13 @@ JSValue JSC_HOST_CALL stringProtoFuncConcat(ExecState* exec,
                                             JSObject*,
                                             JSValue thisValue,
                                             const ArgList& args) {
-  UString s = thisValue.toThisString(exec);
+  if (thisValue.isString() && (args.size() == 1)) {
+    JSValue v = args.at(0);
+    return v.isString() ? jsString(exec, asString(thisValue), asString(v))
+                        : jsString(exec, asString(thisValue), v.toString(exec));
+  }
 
-  ArgList::const_iterator end = args.end();
-  for (ArgList::const_iterator it = args.begin(); it != end; ++it)
-    s += (*it).toString(exec);
-  return jsString(exec, s);
+  return jsString(exec, thisValue, args);
 }
 
 JSValue JSC_HOST_CALL stringProtoFuncIndexOf(ExecState* exec,

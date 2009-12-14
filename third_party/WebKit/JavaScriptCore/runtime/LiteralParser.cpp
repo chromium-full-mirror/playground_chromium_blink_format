@@ -29,6 +29,7 @@
 #include "JSArray.h"
 #include "JSString.h"
 #include "Lexer.h"
+#include "StringBuilder.h"
 #include <wtf/ASCIICType.h>
 #include <wtf/dtoa.h>
 
@@ -140,48 +141,48 @@ inline LiteralParser::TokenType LiteralParser::Lexer::lexString(
     LiteralParserToken& token) {
   ++m_ptr;
   const UChar* runStart;
-  token.stringToken = UString();
+  StringBuilder builder;
   do {
     runStart = m_ptr;
     while (m_ptr < m_end && isSafeStringCharacter<mode>(*m_ptr))
       ++m_ptr;
     if (runStart < m_ptr)
-      token.stringToken.append(runStart, m_ptr - runStart);
+      builder.append(runStart, m_ptr - runStart);
     if ((mode == StrictJSON) && m_ptr < m_end && *m_ptr == '\\') {
       ++m_ptr;
       if (m_ptr >= m_end)
         return TokError;
       switch (*m_ptr) {
         case '"':
-          token.stringToken.append('"');
+          builder.append('"');
           m_ptr++;
           break;
         case '\\':
-          token.stringToken.append('\\');
+          builder.append('\\');
           m_ptr++;
           break;
         case '/':
-          token.stringToken.append('/');
+          builder.append('/');
           m_ptr++;
           break;
         case 'b':
-          token.stringToken.append('\b');
+          builder.append('\b');
           m_ptr++;
           break;
         case 'f':
-          token.stringToken.append('\f');
+          builder.append('\f');
           m_ptr++;
           break;
         case 'n':
-          token.stringToken.append('\n');
+          builder.append('\n');
           m_ptr++;
           break;
         case 'r':
-          token.stringToken.append('\r');
+          builder.append('\r');
           m_ptr++;
           break;
         case 't':
-          token.stringToken.append('\t');
+          builder.append('\t');
           m_ptr++;
           break;
 
@@ -192,8 +193,8 @@ inline LiteralParser::TokenType LiteralParser::Lexer::lexString(
             if (!isASCIIHexDigit(m_ptr[i]))
               return TokError;
           }
-          token.stringToken.append(JSC::Lexer::convertUnicode(
-              m_ptr[1], m_ptr[2], m_ptr[3], m_ptr[4]));
+          builder.append(JSC::Lexer::convertUnicode(m_ptr[1], m_ptr[2],
+                                                    m_ptr[3], m_ptr[4]));
           m_ptr += 5;
           break;
 
@@ -207,6 +208,7 @@ inline LiteralParser::TokenType LiteralParser::Lexer::lexString(
   if (m_ptr >= m_end || *m_ptr != '"')
     return TokError;
 
+  token.stringToken = builder.release();
   token.type = TokString;
   token.end = ++m_ptr;
   return TokString;
