@@ -1917,8 +1917,8 @@ void HTMLTokenizer::write(const SegmentedString& str, bool appendData) {
       !m_executingScript && !m_timer.isActive())
     end();  // this actually causes us to be deleted
 
-  // After parsing, go ahead and dispatch image beforeload/load events.
-  ImageLoader::dispatchPendingEvents();
+  // After parsing, go ahead and dispatch image beforeload events.
+  ImageLoader::dispatchPendingBeforeLoadEvents();
 }
 
 void HTMLTokenizer::stopParsing() {
