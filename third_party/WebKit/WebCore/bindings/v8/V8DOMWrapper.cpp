@@ -289,22 +289,6 @@ v8::Persistent<v8::FunctionTemplate> V8DOMWrapper::getTemplate(
       descriptor->InstanceTemplate()->SetNamedPropertyHandler(
           USE_NAMED_PROPERTY_GETTER(CSSStyleDeclaration),
           USE_NAMED_PROPERTY_SETTER(CSSStyleDeclaration));
-      setCollectionStringIndexedGetter<CSSStyleDeclaration>(descriptor);
-      break;
-    case V8ClassIndex::CSSRULELIST:
-      setCollectionIndexedGetter<CSSRuleList, CSSRule>(descriptor,
-                                                       V8ClassIndex::CSSRULE);
-      break;
-    case V8ClassIndex::CSSVALUELIST:
-      setCollectionIndexedGetter<CSSValueList, CSSValue>(
-          descriptor, V8ClassIndex::CSSVALUE);
-      break;
-    case V8ClassIndex::CSSVARIABLESDECLARATION:
-      setCollectionStringIndexedGetter<CSSVariablesDeclaration>(descriptor);
-      break;
-    case V8ClassIndex::WEBKITCSSTRANSFORMVALUE:
-      setCollectionIndexedGetter<WebKitCSSTransformValue, CSSValue>(
-          descriptor, V8ClassIndex::CSSVALUE);
       break;
     case V8ClassIndex::HTMLALLCOLLECTION:
       descriptor->InstanceTemplate()->MarkAsUndetectable();  // fall through
@@ -313,8 +297,6 @@ v8::Persistent<v8::FunctionTemplate> V8DOMWrapper::getTemplate(
           USE_NAMED_PROPERTY_GETTER(HTMLCollection));
       descriptor->InstanceTemplate()->SetCallAsFunctionHandler(
           USE_CALLBACK(HTMLCollectionCallAsFunction));
-      setCollectionIndexedGetter<HTMLCollection, Node>(descriptor,
-                                                       V8ClassIndex::NODE);
       break;
     case V8ClassIndex::HTMLOPTIONSCOLLECTION:
       descriptor->InstanceTemplate()->SetNamedPropertyHandler(
@@ -409,12 +391,9 @@ v8::Persistent<v8::FunctionTemplate> V8DOMWrapper::getTemplate(
           V8Custom::kStyleSheetInternalFieldCount);
       break;
     }
-    case V8ClassIndex::MEDIALIST:
-      setCollectionStringOrNullIndexedGetter<MediaList>(descriptor);
-      break;
     case V8ClassIndex::MIMETYPEARRAY:
-      setCollectionIndexedAndNamedGetters<MimeTypeArray, MimeType>(
-          descriptor, V8ClassIndex::MIMETYPE);
+      setCollectionNamedGetter<MimeTypeArray, MimeType>(descriptor,
+                                                        V8ClassIndex::MIMETYPE);
       break;
     case V8ClassIndex::NAMEDNODEMAP: {
       // We add an extra internal field to hold a reference to the owner node.
@@ -446,24 +425,20 @@ v8::Persistent<v8::FunctionTemplate> V8DOMWrapper::getTemplate(
       break;
 #endif
     case V8ClassIndex::NODELIST:
-      setCollectionIndexedGetter<NodeList, Node>(descriptor,
-                                                 V8ClassIndex::NODE);
       descriptor->InstanceTemplate()->SetNamedPropertyHandler(
           USE_NAMED_PROPERTY_GETTER(NodeList));
       break;
     case V8ClassIndex::PLUGIN:
-      setCollectionIndexedAndNamedGetters<Plugin, MimeType>(
-          descriptor, V8ClassIndex::MIMETYPE);
+      setCollectionNamedGetter<Plugin, MimeType>(descriptor,
+                                                 V8ClassIndex::MIMETYPE);
       break;
     case V8ClassIndex::PLUGINARRAY:
-      setCollectionIndexedAndNamedGetters<PluginArray, Plugin>(
-          descriptor, V8ClassIndex::PLUGIN);
+      setCollectionNamedGetter<PluginArray, Plugin>(descriptor,
+                                                    V8ClassIndex::PLUGIN);
       break;
     case V8ClassIndex::STYLESHEETLIST:
       descriptor->InstanceTemplate()->SetNamedPropertyHandler(
           USE_NAMED_PROPERTY_GETTER(StyleSheetList));
-      setCollectionIndexedGetter<StyleSheetList, StyleSheet>(
-          descriptor, V8ClassIndex::STYLESHEET);
       break;
     case V8ClassIndex::DOMWINDOW: {
       v8::Local<v8::Signature> defaultSignature =
