@@ -146,7 +146,7 @@ bool ScrollbarThemeQt::paint(Scrollbar* scrollbar,
   p.painter->save();
   QStyleOptionSlider* opt = styleOptionSlider(scrollbar, p.widget);
 
-  p.painter->setClipRect(opt->rect.intersected(damageRect));
+  p.painter->setClipRect(opt->rect.intersected(damageRect), Qt::IntersectClip);
 
 #ifdef Q_WS_MAC
   p.drawComplexControl(QStyle::CC_ScrollBar, *opt);
