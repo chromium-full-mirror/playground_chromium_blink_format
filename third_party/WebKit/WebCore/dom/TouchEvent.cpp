@@ -39,7 +39,11 @@ TouchEvent::TouchEvent(TouchList* touches,
                        int screenX,
                        int screenY,
                        int pageX,
-                       int pageY)
+                       int pageY,
+                       bool ctrlKey,
+                       bool altKey,
+                       bool shiftKey,
+                       bool metaKey)
     : MouseRelatedEvent(type,
                         true,
                         true,
@@ -49,10 +53,10 @@ TouchEvent::TouchEvent(TouchList* touches,
                         screenY,
                         pageX,
                         pageY,
-                        false,
-                        false,
-                        false,
-                        false),
+                        ctrlKey,
+                        altKey,
+                        shiftKey,
+                        metaKey),
       m_touches(touches),
       m_targetTouches(targetTouches),
       m_changedTouches(changedTouches) {}
@@ -65,7 +69,11 @@ void TouchEvent::initTouchEvent(TouchList* touches,
                                 int screenX,
                                 int screenY,
                                 int clientX,
-                                int clientY) {
+                                int clientY,
+                                bool ctrlKey,
+                                bool altKey,
+                                bool shiftKey,
+                                bool metaKey) {
   if (dispatched())
     return;
 
@@ -73,6 +81,10 @@ void TouchEvent::initTouchEvent(TouchList* touches,
 
   m_screenX = screenX;
   m_screenY = screenY;
+  m_ctrlKey = ctrlKey;
+  m_altKey = altKey;
+  m_shiftKey = shiftKey;
+  m_metaKey = metaKey;
   initCoordinates(clientX, clientY);
 }
 

@@ -44,9 +44,14 @@ class TouchEvent : public MouseRelatedEvent {
                                        int screenX,
                                        int screenY,
                                        int pageX,
-                                       int pageY) {
+                                       int pageY,
+                                       bool ctrlKey,
+                                       bool altKey,
+                                       bool shiftKey,
+                                       bool metaKey) {
     return adoptRef(new TouchEvent(touches, targetTouches, changedTouches, type,
-                                   view, screenX, screenY, pageX, pageY));
+                                   view, screenX, screenY, pageX, pageY,
+                                   ctrlKey, altKey, shiftKey, metaKey));
   }
 
   void initTouchEvent(TouchList* touches,
@@ -57,7 +62,11 @@ class TouchEvent : public MouseRelatedEvent {
                       int screenX,
                       int screenY,
                       int clientX,
-                      int clientY);
+                      int clientY,
+                      bool ctrlKey,
+                      bool altKey,
+                      bool shiftKey,
+                      bool metaKey);
 
   TouchList* touches() const { return m_touches.get(); }
   TouchList* targetTouches() const { return m_targetTouches.get(); }
@@ -73,7 +82,11 @@ class TouchEvent : public MouseRelatedEvent {
              int screenX,
              int screenY,
              int pageX,
-             int pageY);
+             int pageY,
+             bool ctrlKey,
+             bool altKey,
+             bool shiftKey,
+             bool metaKey);
 
   virtual bool isTouchEvent() const { return true; }
 

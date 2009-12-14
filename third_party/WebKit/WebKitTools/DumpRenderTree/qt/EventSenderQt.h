@@ -61,6 +61,7 @@ class EventSender : public QObject {
   void scheduleAsynchronousClick();
   void addTouchPoint(int x, int y);
   void updateTouchPoint(int index, int x, int y);
+  void setTouchModifier(const QString& modifier, bool enable);
   void touchStart();
   void touchMove();
   void touchEnd();
@@ -75,6 +76,7 @@ class EventSender : public QObject {
   QWebFrame* frameUnderMouse() const;
 #if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
   QList<QTouchEvent::TouchPoint> m_touchPoints;
+  Qt::KeyboardModifiers m_touchModifiers;
 #endif
 };
 #endif  //  EventSenderQt_h
