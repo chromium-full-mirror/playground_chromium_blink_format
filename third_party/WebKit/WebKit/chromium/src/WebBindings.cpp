@@ -44,6 +44,7 @@
 #include "MouseEvent.h"
 #include "NPV8Object.h"  // for PrivateIdentifier
 #include "Range.h"
+#include "V8BindingState.h"
 #include "V8DOMWrapper.h"
 #include "V8Helpers.h"
 #include "V8Proxy.h"
@@ -253,7 +254,8 @@ static bool getDragDataImpl(NPObject* npobj, int* eventId, WebDragData* data) {
   V8Proxy* current =
       V8Proxy::retrieve(V8Proxy::retrieveFrameForCurrentContext());
   Frame* frame = V8Proxy::retrieveFrame(context);
-  if (!current || !current->canAccessFrame(frame, false))
+  if (!current ||
+      !V8BindingSecurity::canAccessFrame(V8BindingState::Only(), frame, false))
     return false;
 
   const EventNames& names(eventNames());

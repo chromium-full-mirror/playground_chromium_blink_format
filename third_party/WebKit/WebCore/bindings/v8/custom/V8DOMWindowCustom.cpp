@@ -32,6 +32,7 @@
 #include "DOMWindow.h"
 
 #include "V8Binding.h"
+#include "V8BindingState.h"
 #include "V8CustomBinding.h"
 #include "V8CustomEventListener.h"
 #include "V8MessagePortCustom.h"
@@ -102,7 +103,8 @@ v8::Handle<v8::Value> V8Custom::WindowSetTimeoutImpl(const v8::Arguments& args,
   DOMWindow* imp = V8DOMWrapper::convertToNativeObject<DOMWindow>(
       V8ClassIndex::DOMWINDOW, args.Holder());
 
-  if (!V8Proxy::canAccessFrame(imp->frame(), true))
+  if (!V8BindingSecurity::canAccessFrame(V8BindingState::Only(), imp->frame(),
+                                         true))
     return v8::Undefined();
 
   ScriptExecutionContext* scriptContext =
@@ -178,7 +180,7 @@ ACCESSOR_GETTER(DOMWindowEvent) {
   Frame* frame = V8DOMWrapper::convertToNativeObject<DOMWindow>(
                      V8ClassIndex::DOMWINDOW, holder)
                      ->frame();
-  if (!V8Proxy::canAccessFrame(frame, true))
+  if (!V8BindingSecurity::canAccessFrame(V8BindingState::Only(), frame, true))
     return v8::Undefined();
 
   v8::Local<v8::Context> context = V8Proxy::context(frame);
@@ -202,7 +204,7 @@ ACCESSOR_SETTER(DOMWindowEvent) {
   Frame* frame = V8DOMWrapper::convertToNativeObject<DOMWindow>(
                      V8ClassIndex::DOMWINDOW, holder)
                      ->frame();
-  if (!V8Proxy::canAccessFrame(frame, true))
+  if (!V8BindingSecurity::canAccessFrame(V8BindingState::Only(), frame, true))
     return;
 
   v8::Local<v8::Context> context = V8Proxy::context(frame);
@@ -228,7 +230,8 @@ ACCESSOR_SETTER(DOMWindowOpener) {
   DOMWindow* imp = V8DOMWrapper::convertToNativeObject<DOMWindow>(
       V8ClassIndex::DOMWINDOW, info.Holder());
 
-  if (!V8Proxy::canAccessFrame(imp->frame(), true))
+  if (!V8BindingSecurity::canAccessFrame(V8BindingState::Only(), imp->frame(),
+                                         true))
     return;
 
   // Opener can be shadowed if it is in the same domain.
@@ -339,7 +342,8 @@ CALLBACK_FUNC_DECL(DOMWindowAddEventListener) {
   DOMWindow* imp = V8DOMWrapper::convertToNativeObject<DOMWindow>(
       V8ClassIndex::DOMWINDOW, args.Holder());
 
-  if (!V8Proxy::canAccessFrame(imp->frame(), true))
+  if (!V8BindingSecurity::canAccessFrame(V8BindingState::Only(), imp->frame(),
+                                         true))
     return v8::Undefined();
 
   Document* doc = imp->document();
@@ -373,7 +377,8 @@ CALLBACK_FUNC_DECL(DOMWindowRemoveEventListener) {
   DOMWindow* imp = V8DOMWrapper::convertToNativeObject<DOMWindow>(
       V8ClassIndex::DOMWINDOW, args.Holder());
 
-  if (!V8Proxy::canAccessFrame(imp->frame(), true))
+  if (!V8BindingSecurity::canAccessFrame(V8BindingState::Only(), imp->frame(),
+                                         true))
     return v8::Undefined();
 
   Document* doc = imp->document();
@@ -441,7 +446,8 @@ CALLBACK_FUNC_DECL(DOMWindowAtob) {
   DOMWindow* imp = V8DOMWrapper::convertToNativeObject<DOMWindow>(
       V8ClassIndex::DOMWINDOW, args.Holder());
 
-  if (!V8Proxy::canAccessFrame(imp->frame(), true))
+  if (!V8BindingSecurity::canAccessFrame(V8BindingState::Only(), imp->frame(),
+                                         true))
     return v8::Undefined();
 
   if (args.Length() < 1)
@@ -460,7 +466,8 @@ CALLBACK_FUNC_DECL(DOMWindowBtoa) {
   DOMWindow* imp = V8DOMWrapper::convertToNativeObject<DOMWindow>(
       V8ClassIndex::DOMWINDOW, args.Holder());
 
-  if (!V8Proxy::canAccessFrame(imp->frame(), true))
+  if (!V8BindingSecurity::canAccessFrame(V8BindingState::Only(), imp->frame(),
+                                         true))
     return v8::Undefined();
 
   if (args.Length() < 1)
@@ -617,7 +624,7 @@ CALLBACK_FUNC_DECL(DOMWindowShowModalDialog) {
       V8ClassIndex::DOMWINDOW, args.Holder());
   Frame* frame = window->frame();
 
-  if (!V8Proxy::canAccessFrame(frame, true))
+  if (!V8BindingSecurity::canAccessFrame(V8BindingState::Only(), frame, true))
     return v8::Undefined();
 
   Frame* callingFrame = V8Proxy::retrieveFrameForCallingContext();
@@ -718,7 +725,7 @@ CALLBACK_FUNC_DECL(DOMWindowOpen) {
       V8ClassIndex::DOMWINDOW, args.Holder());
   Frame* frame = parent->frame();
 
-  if (!V8Proxy::canAccessFrame(frame, true))
+  if (!V8BindingSecurity::canAccessFrame(V8BindingState::Only(), frame, true))
     return v8::Undefined();
 
   Frame* enteredFrame = V8Proxy::retrieveFrameForEnteredContext();
@@ -934,7 +941,8 @@ void V8Custom::ClearTimeoutImpl(const v8::Arguments& args) {
   v8::Handle<v8::Object> holder = args.Holder();
   DOMWindow* imp = V8DOMWrapper::convertToNativeObject<DOMWindow>(
       V8ClassIndex::DOMWINDOW, holder);
-  if (!V8Proxy::canAccessFrame(imp->frame(), true))
+  if (!V8BindingSecurity::canAccessFrame(V8BindingState::Only(), imp->frame(),
+                                         true))
     return;
   ScriptExecutionContext* context =
       static_cast<ScriptExecutionContext*>(imp->document());
@@ -980,7 +988,8 @@ NAMED_ACCESS_CHECK(DOMWindow) {
       return true;
   }
 
-  return V8Proxy::canAccessFrame(target, false);
+  return V8BindingSecurity::canAccessFrame(V8BindingState::Only(), target,
+                                           false);
 }
 
 INDEXED_ACCESS_CHECK(DOMWindow) {
@@ -1004,7 +1013,8 @@ INDEXED_ACCESS_CHECK(DOMWindow) {
       target->tree()->child(index))
     return true;
 
-  return V8Proxy::canAccessFrame(target, false);
+  return V8BindingSecurity::canAccessFrame(V8BindingState::Only(), target,
+                                           false);
 }
 
 }  // namespace WebCore
