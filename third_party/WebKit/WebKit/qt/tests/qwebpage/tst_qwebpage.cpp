@@ -1448,6 +1448,7 @@ void tst_QWebPage::inputMethods() {
   else
     QVERIFY2(false, "Unknown view type");
 
+  page->settings()->setFontFamily(QWebSettings::SerifFont, "FooSerifFont");
   page->mainFrame()->setHtml(
       "<html><body>"
       "<input type='text' id='input1' style='font-family: serif' value='' "
@@ -1489,7 +1490,8 @@ void tst_QWebPage::inputMethods() {
   // ImFont
   variant = page->inputMethodQuery(Qt::ImFont);
   QFont font = variant.value<QFont>();
-  QCOMPARE(QString("-webkit-serif"), font.family());
+  QCOMPARE(page->settings()->fontFamily(QWebSettings::SerifFont),
+           font.family());
 
   QList<QInputMethodEvent::Attribute> inputAttributes;
 
