@@ -51,17 +51,6 @@ FontPlatformData::FontPlatformData(const FontDescription& description,
                                    int wordSpacing,
                                    int letterSpacing)
     : m_data(new FontPlatformDataPrivate()) {
-  QString familyNames(familyName);
-  if (!familyName.isEmpty())
-    familyNames += QLatin1Char(',');
-
-  const FontFamily* family = &description.family();
-  while (family) {
-    familyNames += family->family();
-    family = family->next();
-    if (family)
-      familyNames += QLatin1Char(',');
-  }
   QFont& font = m_data->font;
   font.setFamily(familyName);
   font.setPixelSize(qRound(description.computedSize()));
