@@ -1898,7 +1898,10 @@ bool QWebPage::javaScriptConfirm(QWebFrame* frame, const QString& msg) {
 
     If the prompt was cancelled by the user the implementation should return
    false; otherwise the
-    result should be written to \a result and true should be returned.
+    result should be written to \a result and true should be returned. If the
+   prompt was not cancelled by the
+    user, the implementation should return true and the result string must not
+   be null.
 
     The default implementation uses QInputDialog::getText.
 */
