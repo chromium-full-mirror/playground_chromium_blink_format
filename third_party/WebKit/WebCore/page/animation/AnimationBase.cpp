@@ -463,7 +463,8 @@ class FillLayerPropertyWrapperBase {
 };
 
 template <typename T>
-class FillLayerPropertyWrapperGetter : public FillLayerPropertyWrapperBase {
+class FillLayerPropertyWrapperGetter : public FillLayerPropertyWrapperBase,
+                                       public Noncopyable {
  public:
   FillLayerPropertyWrapperGetter(T (FillLayer::*getter)() const)
       : m_getter(getter) {}
