@@ -148,8 +148,6 @@ class PopupMenu : public RefCounted<PopupMenu>
 
   RetainPtr<NSPopUpButtonCell> m_popup;
 #elif PLATFORM(QT)
-  void clear();
-  void populate(const IntRect&);
   QWebPopup* m_popup;
 #elif PLATFORM(WIN)
   // ScrollBarClient
