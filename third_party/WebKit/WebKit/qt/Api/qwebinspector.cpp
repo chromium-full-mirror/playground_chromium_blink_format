@@ -147,7 +147,10 @@ void QWebInspector::showEvent(QShowEvent* event) {
 }
 
 /*! \reimp */
-void QWebInspector::hideEvent(QHideEvent* event) {
+void QWebInspector::hideEvent(QHideEvent* event) {}
+
+/*! \reimp */
+void QWebInspector::closeEvent(QCloseEvent* event) {
   if (d->page)
     d->page->d->inspectorController()->setWindowVisible(false);
 }
