@@ -50,7 +50,7 @@ FontCache* fontCache() {
 
 FontCache::FontCache() {}
 
-struct FontPlatformDataCacheKey {
+struct FontPlatformDataCacheKey : FastAllocBase {
   FontPlatformDataCacheKey(
       const AtomicString& family = AtomicString(),
       unsigned size = 0,
