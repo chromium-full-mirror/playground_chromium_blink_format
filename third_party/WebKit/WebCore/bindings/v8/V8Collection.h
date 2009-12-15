@@ -75,7 +75,7 @@ static v8::Handle<v8::Value> getNamedPropertyOfCollection(
   ASSERT(wrapperType != V8ClassIndex::NODE);
   Collection* collection =
       V8DOMWrapper::convertToNativeObject<Collection>(wrapperType, object);
-  String propertyName = toWebCoreString(name);
+  AtomicString propertyName = toAtomicWebCoreStringWithNullCheck(name);
   return getV8Object<ItemType>(collection->namedItem(propertyName),
                                implementationType);
 }
