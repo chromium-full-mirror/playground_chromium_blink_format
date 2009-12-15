@@ -80,6 +80,8 @@ class PluginDatabase : public Noncopyable {
   static Vector<String> defaultPluginDirectories();
   Vector<String> pluginDirectories() const { return m_pluginDirectories; }
 
+  String MIMETypeForExtension(const String& extension) const;
+
  private:
   void getPluginPathsInDirectories(HashSet<String>&) const;
   void getDeletedPlugins(PluginSet&) const;
@@ -88,8 +90,6 @@ class PluginDatabase : public Noncopyable {
   // it's a duplicate of an existing plugin).
   bool add(PassRefPtr<PluginPackage>);
   void remove(PluginPackage*);
-
-  String MIMETypeForExtension(const String& extension) const;
 
   Vector<String> m_pluginDirectories;
   HashSet<String> m_registeredMIMETypes;

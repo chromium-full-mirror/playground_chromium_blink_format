@@ -102,6 +102,10 @@ class MainResourceLoader : public ResourceLoader {
   void continueAfterContentPolicy(PolicyAction);
   void continueAfterContentPolicy(PolicyAction, const ResourceResponse&);
 
+#if PLATFORM(QT)
+  void substituteMIMETypeFromPluginDatabase(const ResourceResponse&);
+#endif
+
   ResourceRequest m_initialRequest;
   SubstituteData m_substituteData;
 
