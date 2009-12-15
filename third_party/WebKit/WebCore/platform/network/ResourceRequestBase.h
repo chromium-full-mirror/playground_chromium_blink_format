@@ -52,7 +52,7 @@ class ResourceRequest;
 struct CrossThreadResourceRequestData;
 
 // Do not use this type directly.  Use ResourceRequest instead.
-class ResourceRequestBase {
+class ResourceRequestBase : public FastAllocBase {
  public:
   // The type of this ResourceRequest, based on how the resource will be used.
   enum TargetType {
