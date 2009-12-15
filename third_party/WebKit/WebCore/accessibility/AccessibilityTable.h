@@ -64,7 +64,6 @@ class AccessibilityTable : public AccessibilityRenderObject {
   AccessibilityChildrenVector& columns();
   AccessibilityChildrenVector& rows();
 
-  virtual bool supportsSelectedRows() { return false; }
   unsigned columnCount();
   unsigned rowCount();
 
