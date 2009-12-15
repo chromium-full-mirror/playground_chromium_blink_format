@@ -104,7 +104,7 @@ FontPlatformData FontCustomPlatformData::fontPlatformData(
     bool bold,
     bool italic,
     FontRenderingMode renderingMode) {
-  ASSERT(m_cgFont);
+  ASSERT(wkCanCreateCGFontWithLOGFONT() || m_cgFont);
   ASSERT(m_fontReference);
   ASSERT(T2embedLibrary());
 
@@ -132,6 +132,14 @@ FontPlatformData FontCustomPlatformData::fontPlatformData(
   logFont.lfWeight = bold ? 700 : 400;
 
   HFONT hfont = CreateFontIndirect(&logFont);
+
+  if (wkCanCreateCGFontWithLOGFONT()) {
+    RetainPtr<CGFontRef> cgFont(AdoptCF,
+                                CGFontCreateWithPlatformFont(&logFont));
+    return FontPlatformData(hfont, cgFont.get(), size, bold, italic,
+                            renderingMode == AlternateRenderingMode);
+  }
+
   wkSetFontPlatformInfo(m_cgFont, &logFont, free);
   return FontPlatformData(hfont, m_cgFont, size, bold, italic,
                           renderingMode == AlternateRenderingMode);
@@ -240,15 +248,18 @@ FontCustomPlatformData* createFontCustomPlatformData(SharedBuffer* buffer) {
   ASSERT_ARG(buffer, buffer);
   ASSERT(T2embedLibrary());
 
-  // Get CG to create the font.
-  CGDataProviderDirectAccessCallbacks callbacks = {&getData, &releaseData,
-                                                   &getBytesWithOffset, NULL};
-  RetainPtr<CGDataProviderRef> dataProvider(
-      AdoptCF,
-      CGDataProviderCreateDirectAccess(buffer, buffer->size(), &callbacks));
-  CGFontRef cgFont = CGFontCreateWithDataProvider(dataProvider.get());
-  if (!cgFont)
-    return 0;
+  RetainPtr<CGFontRef> cgFont;
+  if (!wkCanCreateCGFontWithLOGFONT()) {
+    // Get CG to create the font.
+    CGDataProviderDirectAccessCallbacks callbacks = {&getData, &releaseData,
+                                                     &getBytesWithOffset, NULL};
+    RetainPtr<CGDataProviderRef> dataProvider(
+        AdoptCF,
+        CGDataProviderCreateDirectAccess(buffer, buffer->size(), &callbacks));
+    cgFont.adoptCF(CGFontCreateWithDataProvider(dataProvider.get()));
+    if (!cgFont)
+      return 0;
+  }
 
   // Introduce the font to GDI. AddFontMemResourceEx cannot be used, because it
   // will pollute the process's
@@ -267,10 +278,8 @@ FontCustomPlatformData* createFontCustomPlatformData(SharedBuffer* buffer) {
   size_t overlayDst;
   size_t overlaySrc;
   size_t overlayLength;
-  if (!getEOTHeader(buffer, eotHeader, overlayDst, overlaySrc, overlayLength)) {
-    CGFontRelease(cgFont);
+  if (!getEOTHeader(buffer, eotHeader, overlayDst, overlaySrc, overlayLength))
     return 0;
-  }
 
   HANDLE fontReference;
   ULONG privStatus;
@@ -285,12 +294,11 @@ FontCustomPlatformData* createFontCustomPlatformData(SharedBuffer* buffer) {
     fontName = String();
   else {
     fontReference = renameAndActivateFont(buffer, fontName);
-    if (!fontReference) {
-      CGFontRelease(cgFont);
+    if (!fontReference)
       return 0;
-    }
   }
 
-  return new FontCustomPlatformData(cgFont, fontReference, fontName);
+  return new FontCustomPlatformData(cgFont.releaseRef(), fontReference,
+                                    fontName);
 }
 }

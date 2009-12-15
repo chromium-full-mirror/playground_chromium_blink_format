@@ -362,8 +362,10 @@ void Font::drawGlyphs(GraphicsContext* graphicsContext,
   }
 
   if (font->platformData().useGDI()) {
+    static bool canCreateCGFontWithLOGFONT = wkCanCreateCGFontWithLOGFONT();
     if (!shouldUseFontSmoothing ||
-        (graphicsContext->textDrawingMode() & cTextStroke)) {
+        !canCreateCGFontWithLOGFONT &&
+            (graphicsContext->textDrawingMode() & cTextStroke)) {
       drawGDIGlyphs(graphicsContext, font, glyphBuffer, from, numGlyphs, point);
       return;
     }

@@ -119,6 +119,13 @@ void FontPlatformData::platformDataInit(HFONT font,
                                         float size,
                                         HDC hdc,
                                         WCHAR* faceName) {
+  if (wkCanCreateCGFontWithLOGFONT()) {
+    LOGFONT logfont;
+    GetObject(font, sizeof(logfont), &logfont);
+    m_cgFont.adoptCF(CGFontCreateWithPlatformFont(&logfont));
+    return;
+  }
+
   // Try the face name first.  Windows may end up localizing this name, and CG
   // doesn't know about
   // the localization.  If the create fails, we'll try the PostScript name.

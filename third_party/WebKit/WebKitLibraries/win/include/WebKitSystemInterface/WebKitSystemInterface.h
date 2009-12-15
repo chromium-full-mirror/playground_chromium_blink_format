@@ -66,6 +66,7 @@ void wkGetGlyphAdvances(CGFontRef,
                         CGGlyph,
                         CGSize& advance);
 void wkGetGlyphs(CGFontRef, const UChar[], CGGlyph[], size_t count);
+bool wkCanCreateCGFontWithLOGFONT();
 void wkSetFontPlatformInfo(CGFontRef, LOGFONT*, void (*)(void*));
 void wkSetUpFontCache(size_t s);
 void wkAddFontsInDirectory(CFStringRef);
@@ -103,7 +104,7 @@ CFHTTPMessageRef wkCopyCONNECTProxyResponse(CFReadStreamRef,
                                             CFURLRef responseURL);
 
 CFURLCredentialRef wkCopyCredentialFromCFPersistentStorage(
-    CFURLProtectionSpaceRef);
+    CFURLProtectionSpaceRef protectionSpace);
 
 CFStringRef wkCFNetworkErrorGetLocalizedDescription(CFIndex errorCode);
 

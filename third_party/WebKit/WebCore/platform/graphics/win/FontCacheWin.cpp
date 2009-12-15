@@ -441,7 +441,8 @@ static int CALLBACK matchImprovingEnumProc(CONST LOGFONT* candidate,
 static HFONT createGDIFont(const AtomicString& family,
                            LONG desiredWeight,
                            bool desiredItalic,
-                           int size) {
+                           int size,
+                           bool synthesizeItalic) {
   HDC hdc = GetDC(0);
 
   LOGFONT logFont;
@@ -475,6 +476,9 @@ static HFONT createGDIFont(const AtomicString& family,
 #endif
   matchData.m_chosen.lfQuality = DEFAULT_QUALITY;
   matchData.m_chosen.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
+
+  if (desiredItalic && !matchData.m_chosen.lfItalic && synthesizeItalic)
+    matchData.m_chosen.lfItalic = 1;
 
   HFONT result = CreateFontIndirect(&matchData.m_chosen);
   if (!result)
@@ -580,7 +584,8 @@ FontPlatformData* FontCache::createFontPlatformData(
       adjustedGDIFontWeight(toGDIFontWeight(fontDescription.weight()), family);
   HFONT hfont =
       createGDIFont(family, weight, fontDescription.italic(),
-                    fontDescription.computedPixelSize() * (useGDI ? 1 : 32));
+                    fontDescription.computedPixelSize() * (useGDI ? 1 : 32),
+                    useGDI && wkCanCreateCGFontWithLOGFONT());
 
   if (!hfont)
     return 0;
