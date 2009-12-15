@@ -59,8 +59,9 @@ class InspectorResource : public RefCounted<InspectorResource> {
   enum Type { Doc, Stylesheet, Image, Font, Script, XHR, Media, Other };
 
   static PassRefPtr<InspectorResource> create(unsigned long identifier,
-                                              DocumentLoader* loader) {
-    return adoptRef(new InspectorResource(identifier, loader));
+                                              DocumentLoader* loader,
+                                              const KURL& requestURL) {
+    return adoptRef(new InspectorResource(identifier, loader, requestURL));
   }
 
   static PassRefPtr<InspectorResource> createCached(unsigned long identifier,
@@ -69,10 +70,8 @@ class InspectorResource : public RefCounted<InspectorResource> {
 
   ~InspectorResource();
 
-  PassRefPtr<InspectorResource> appendRedirect(
-      unsigned long identifier,
-      const ResourceRequest&,
-      const ResourceResponse& redirectResponse);
+  PassRefPtr<InspectorResource> appendRedirect(unsigned long identifier,
+                                               const KURL& redirectURL);
   void updateScriptObject(InspectorFrontend* frontend);
   void releaseScriptObject(InspectorFrontend* frontend,
                            bool callRemoveResource);
@@ -145,7 +144,9 @@ class InspectorResource : public RefCounted<InspectorResource> {
     ChangeType m_change;
   };
 
-  InspectorResource(unsigned long identifier, DocumentLoader*);
+  InspectorResource(unsigned long identifier,
+                    DocumentLoader*,
+                    const KURL& requestURL);
   Type type() const;
 
   Type cachedResourceType() const;

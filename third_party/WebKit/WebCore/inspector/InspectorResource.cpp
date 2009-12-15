@@ -47,10 +47,12 @@
 namespace WebCore {
 
 InspectorResource::InspectorResource(unsigned long identifier,
-                                     DocumentLoader* loader)
+                                     DocumentLoader* loader,
+                                     const KURL& requestURL)
     : m_identifier(identifier),
       m_loader(loader),
       m_frame(loader->frame()),
+      m_requestURL(requestURL),
       m_expectedContentLength(0),
       m_cached(false),
       m_finished(false),
@@ -68,22 +70,17 @@ InspectorResource::~InspectorResource() {}
 
 PassRefPtr<InspectorResource> InspectorResource::appendRedirect(
     unsigned long identifier,
-    const ResourceRequest& request,
-    const ResourceResponse& redirectResponse) {
+    const KURL& redirectURL) {
   // Last redirect is always a container of all previous ones. Pass this
   // container here.
   RefPtr<InspectorResource> redirect =
-      InspectorResource::create(m_identifier, m_loader.get());
+      InspectorResource::create(m_identifier, m_loader.get(), redirectURL);
   redirect->m_redirects = m_redirects;
   redirect->m_redirects.append(this);
   redirect->m_changes.set(RedirectsChange);
-  redirect->updateRequest(request);
 
   m_identifier = identifier;
   m_redirects.clear();
-  updateResponse(redirectResponse);
-  markResponseReceivedTime();
-  endTiming();
   return redirect;
 }
 
@@ -91,11 +88,11 @@ PassRefPtr<InspectorResource> InspectorResource::createCached(
     unsigned long identifier,
     DocumentLoader* loader,
     const CachedResource* cachedResource) {
-  PassRefPtr<InspectorResource> resource = create(identifier, loader);
+  PassRefPtr<InspectorResource> resource =
+      create(identifier, loader, KURL(ParsedURLString, cachedResource->url()));
 
   resource->m_finished = true;
 
-  resource->m_requestURL = KURL(ParsedURLString, cachedResource->url());
   resource->updateResponse(cachedResource->response());
 
   resource->m_length = cachedResource->encodedSize();
@@ -111,7 +108,6 @@ PassRefPtr<InspectorResource> InspectorResource::createCached(
 
 void InspectorResource::updateRequest(const ResourceRequest& request) {
   m_requestHeaderFields = request.httpHeaderFields();
-  m_requestURL = request.url();
   m_requestMethod = request.httpMethod();
   if (request.httpBody() && !request.httpBody()->isEmpty())
     m_requestFormData = request.httpBody()->flattenToString();
@@ -220,13 +216,13 @@ void InspectorResource::releaseScriptObject(InspectorFrontend* frontend,
                                             bool callRemoveResource) {
   m_changes.setAll();
 
+  for (size_t i = 0; i < m_redirects.size(); ++i)
+    m_redirects[i]->releaseScriptObject(frontend, callRemoveResource);
+
   if (!callRemoveResource)
     return;
 
   frontend->removeResource(m_identifier);
-
-  for (size_t i = 0; i < m_redirects.size(); ++i)
-    m_redirects[i]->releaseScriptObject(frontend, callRemoveResource);
 }
 
 CachedResource* InspectorResource::cachedResource() const {
