@@ -662,7 +662,7 @@ void InspectorController::populateScriptObjects() {
   ResourcesMap::iterator resourcesEnd = m_resources.end();
   for (ResourcesMap::iterator it = m_resources.begin(); it != resourcesEnd;
        ++it)
-    it->second->createScriptObject(m_frontend.get());
+    it->second->updateScriptObject(m_frontend.get());
 
   unsigned messageCount = m_consoleMessages.size();
   for (unsigned i = 0; i < messageCount; ++i)
@@ -777,7 +777,7 @@ void InspectorController::didCommitLoad(DocumentLoader* loader) {
         // needed to keep the load for a user-entered URL from showing up in the
         // list of resources for the page they are navigating away from.
         if (windowVisible())
-          m_mainResource->createScriptObject(m_frontend.get());
+          m_mainResource->updateScriptObject(m_frontend.get());
       } else {
         // Pages loaded from the page cache are committed before
         // m_mainResource is the right resource for this load, so we
@@ -886,7 +886,7 @@ void InspectorController::didLoadResourceFromMemoryCache(
   addResource(resource.get());
 
   if (windowVisible())
-    resource->createScriptObject(m_frontend.get());
+    resource->updateScriptObject(m_frontend.get());
 }
 
 void InspectorController::identifierForInitialRequest(
@@ -916,7 +916,7 @@ void InspectorController::identifierForInitialRequest(
 
   if (windowVisible() && loader->frameLoader()->isLoadingFromCachedPage() &&
       resource == m_mainResource)
-    resource->createScriptObject(m_frontend.get());
+    resource->updateScriptObject(m_frontend.get());
 }
 
 void InspectorController::mainResourceFiredDOMContentEvent(
@@ -964,15 +964,24 @@ void InspectorController::willSendRequest(
   if (!resource)
     return;
 
-  resource->startTiming();
-
   if (!redirectResponse.isNull()) {
-    resource->updateRequest(request);
-    resource->updateResponse(redirectResponse);
+    // We always store last redirect by the original id key. Rest of the
+    // redirects are stored within the last one.
+    unsigned long id = m_inspectedPage->progress()->createUniqueIdentifier();
+    RefPtr<InspectorResource> withRedirect =
+        resource->appendRedirect(id, request, redirectResponse);
+    removeResource(resource.get());
+    addResource(withRedirect.get());
+    if (isMainResource) {
+      m_mainResource = withRedirect;
+      withRedirect->markMainResource();
+    }
+    resource = withRedirect;
   }
 
+  resource->startTiming();
   if (resource != m_mainResource && windowVisible())
-    resource->createScriptObject(m_frontend.get());
+    resource->updateScriptObject(m_frontend.get());
 }
 
 void InspectorController::didReceiveResponse(unsigned long identifier,
@@ -987,7 +996,7 @@ void InspectorController::didReceiveResponse(unsigned long identifier,
   resource->updateResponse(response);
   resource->markResponseReceivedTime();
 
-  if (windowVisible())
+  if (resource != m_mainResource && windowVisible())
     resource->updateScriptObject(m_frontend.get());
 }
 
@@ -999,7 +1008,7 @@ void InspectorController::didReceiveContentLength(unsigned long identifier,
 
   resource->addLength(lengthReceived);
 
-  if (windowVisible())
+  if (resource != m_mainResource && windowVisible())
     resource->updateScriptObject(m_frontend.get());
 }
 
@@ -1011,13 +1020,9 @@ void InspectorController::didFinishLoading(unsigned long identifier) {
   if (!resource)
     return;
 
-  removeResource(resource.get());
-
   resource->endTiming();
 
-  addResource(resource.get());
-
-  if (windowVisible())
+  if (resource != m_mainResource && windowVisible())
     resource->updateScriptObject(m_frontend.get());
 }
 
@@ -1030,14 +1035,10 @@ void InspectorController::didFailLoading(unsigned long identifier,
   if (!resource)
     return;
 
-  removeResource(resource.get());
-
   resource->markFailed();
   resource->endTiming();
 
-  addResource(resource.get());
-
-  if (windowVisible())
+  if (resource != m_mainResource && windowVisible())
     resource->updateScriptObject(m_frontend.get());
 }
 
