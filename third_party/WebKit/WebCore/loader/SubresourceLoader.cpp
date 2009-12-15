@@ -66,20 +66,22 @@ PassRefPtr<SubresourceLoader> SubresourceLoader::create(
     Frame* frame,
     SubresourceLoaderClient* client,
     const ResourceRequest& request,
-    bool skipCanLoadCheck,
+    SecurityCheckPolicy securityCheck,
     bool sendResourceLoadCallbacks,
     bool shouldContentSniff) {
   if (!frame)
     return 0;
 
   FrameLoader* fl = frame->loader();
-  if (!skipCanLoadCheck && (fl->state() == FrameStateProvisional ||
-                            fl->activeDocumentLoader()->isStopping()))
+  if (securityCheck == DoSecurityCheck &&
+      (fl->state() == FrameStateProvisional ||
+       fl->activeDocumentLoader()->isStopping()))
     return 0;
 
   ResourceRequest newRequest = request;
 
-  if (!skipCanLoadCheck && SecurityOrigin::restrictAccessToLocal() &&
+  if (securityCheck == DoSecurityCheck &&
+      SecurityOrigin::restrictAccessToLocal() &&
       !SecurityOrigin::canLoad(request.url(), String(), frame->document())) {
     FrameLoader::reportLocalLoadFailed(frame, request.url().string());
     return 0;

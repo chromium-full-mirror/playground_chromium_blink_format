@@ -24,6 +24,7 @@
 
 #include "AtomicString.h"
 #include "AtomicStringImpl.h"
+#include "FrameLoaderTypes.h"
 #include "PlatformString.h"
 #include "SubresourceLoaderClient.h"
 #include "Timer.h"
@@ -46,7 +47,7 @@ class Loader : public Noncopyable {
   void load(DocLoader*,
             CachedResource*,
             bool incremental = true,
-            bool skipCanLoadCheck = false,
+            SecurityCheckPolicy = DoSecurityCheck,
             bool sendResourceLoadCallbacks = true);
 
   void cancelRequests(DocLoader*);

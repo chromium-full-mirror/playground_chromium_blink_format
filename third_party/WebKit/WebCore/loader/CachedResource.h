@@ -24,6 +24,7 @@
 #define CachedResource_h
 
 #include "CachePolicy.h"
+#include "FrameLoaderTypes.h"
 #include "PlatformString.h"
 #include "ResourceResponse.h"
 #include "SharedBuffer.h"
@@ -81,11 +82,11 @@ class CachedResource : public Noncopyable {
   virtual ~CachedResource();
 
   virtual void load(DocLoader* docLoader) {
-    load(docLoader, false, false, true);
+    load(docLoader, false, DoSecurityCheck, true);
   }
   void load(DocLoader*,
             bool incremental,
-            bool skipCanLoadCheck,
+            SecurityCheckPolicy,
             bool sendResourceLoadCallbacks);
 
   virtual void setEncoding(const String&) {}

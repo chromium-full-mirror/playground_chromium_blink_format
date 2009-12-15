@@ -119,11 +119,11 @@ Loader::Priority Loader::determinePriority(
 void Loader::load(DocLoader* docLoader,
                   CachedResource* resource,
                   bool incremental,
-                  bool skipCanLoadCheck,
+                  SecurityCheckPolicy securityCheck,
                   bool sendResourceLoadCallbacks) {
   ASSERT(docLoader);
   Request* request = new Request(docLoader, resource, incremental,
-                                 skipCanLoadCheck, sendResourceLoadCallbacks);
+                                 securityCheck, sendResourceLoadCallbacks);
 
   RefPtr<Host> host;
   KURL url(ParsedURLString, resource->url());
@@ -349,8 +349,7 @@ void Loader::Host::servePendingRequests(RequestQueue& requestsPending,
 
     RefPtr<SubresourceLoader> loader = SubresourceLoader::create(
         docLoader->doc()->frame(), this, resourceRequest,
-        request->shouldSkipCanLoadCheck(),
-        request->sendResourceLoadCallbacks());
+        request->shouldDoSecurityCheck(), request->sendResourceLoadCallbacks());
     if (loader) {
       m_requestsLoading.add(loader.release(), request);
       request->cachedResource()->setRequestedFromNetworkingLayer();
