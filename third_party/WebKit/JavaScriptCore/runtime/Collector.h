@@ -50,21 +50,20 @@ class MarkedArgumentBuffer;
 class MarkStack;
 
 enum OperationInProgress { NoOperation, Allocation, Collection };
-enum HeapType { PrimaryHeap, NumberHeap };
 
-template <HeapType>
 class LiveObjectIterator;
 
 struct CollectorHeap {
   size_t nextBlock;
   size_t nextCell;
-
   CollectorBlock** blocks;
+
+  void* nextNumber;
+
   size_t numBlocks;
   size_t usedBlocks;
 
   size_t extraCost;
-
   bool didShrink;
 
   OperationInProgress operationInProgress;
@@ -122,15 +121,11 @@ class Heap : public Noncopyable {
   JSGlobalData* globalData() const { return m_globalData; }
   static bool isNumber(JSCell*);
 
-  LiveObjectIterator<PrimaryHeap> primaryHeapBegin();
-  LiveObjectIterator<PrimaryHeap> primaryHeapEnd();
+  LiveObjectIterator primaryHeapBegin();
+  LiveObjectIterator primaryHeapEnd();
 
  private:
-  template <HeapType heapType>
-  void* heapAllocate(size_t);
   void reset();
-  void collectRemainingGarbage();
-  template <HeapType heapType>
   void sweep();
   static CollectorBlock* cellBlock(const JSCell*);
   static size_t cellOffset(const JSCell*);
@@ -139,32 +134,20 @@ class Heap : public Noncopyable {
   Heap(JSGlobalData*);
   ~Heap();
 
-  template <HeapType heapType>
   NEVER_INLINE CollectorBlock* allocateBlock();
-  template <HeapType heapType>
   NEVER_INLINE void freeBlock(size_t);
-  NEVER_INLINE void freeBlock(CollectorBlock*);
-  template <HeapType heapType>
+  NEVER_INLINE void freeBlockPtr(CollectorBlock*);
   void freeBlocks();
-  template <HeapType heapType>
   void resizeBlocks();
-  template <HeapType heapType>
   void growBlocks(size_t neededBlocks);
-  template <HeapType heapType>
   void shrinkBlocks(size_t neededBlocks);
-  template <HeapType heapType>
   void clearMarkBits();
-  template <HeapType heapType>
   void clearMarkBits(CollectorBlock*);
-  template <HeapType heapType>
   size_t markedCells(size_t startBlock = 0, size_t startCell = 0) const;
 
   void recordExtraCost(size_t);
 
-  template <HeapType heapType>
   void addToStatistics(Statistics&) const;
-  template <HeapType heapType>
-  size_t objectCount() const;
 
   void markRoots();
   void markProtectedObjects(MarkStack&);
@@ -175,8 +158,7 @@ class Heap : public Noncopyable {
 
   typedef HashCountedSet<JSCell*> ProtectCountSet;
 
-  CollectorHeap primaryHeap;
-  CollectorHeap numberHeap;
+  CollectorHeap m_heap;
 
   ProtectCountSet m_protectedValues;
 
@@ -236,10 +218,9 @@ const size_t SMALL_CELL_SIZE = CELL_SIZE / 2;
 const size_t CELL_MASK = CELL_SIZE - 1;
 const size_t CELL_ALIGN_MASK = ~CELL_MASK;
 const size_t CELLS_PER_BLOCK =
-    (BLOCK_SIZE - sizeof(Heap*) - sizeof(HeapType)) * 8 * CELL_SIZE /
-    (8 * CELL_SIZE + 1) / CELL_SIZE;  // one bitmap byte can represent 8 cells.
+    (BLOCK_SIZE - sizeof(Heap*)) * 8 * CELL_SIZE / (8 * CELL_SIZE + 1) /
+    CELL_SIZE;  // one bitmap byte can represent 8 cells.
 
-const size_t SMALL_CELLS_PER_BLOCK = 2 * CELLS_PER_BLOCK;
 const size_t BITMAP_SIZE = (CELLS_PER_BLOCK + 7) / 8;
 const size_t BITMAP_WORDS = (BITMAP_SIZE + 3) / sizeof(uint32_t);
 
@@ -272,54 +253,23 @@ struct CollectorCell {
   double memory[CELL_ARRAY_LENGTH];
 };
 
-struct SmallCollectorCell {
-  double memory[CELL_ARRAY_LENGTH / 2];
-};
-
 class CollectorBlock {
  public:
   CollectorCell cells[CELLS_PER_BLOCK];
   CollectorBitmap marked;
   Heap* heap;
-  HeapType type;
 };
 
-class SmallCellCollectorBlock {
- public:
-  SmallCollectorCell cells[SMALL_CELLS_PER_BLOCK];
-  CollectorBitmap marked;
-  Heap* heap;
-  HeapType type;
-};
-
-template <HeapType heapType>
-struct HeapConstants;
-
-template <>
-struct HeapConstants<PrimaryHeap> {
+struct HeapConstants {
   static const size_t cellSize = CELL_SIZE;
   static const size_t cellsPerBlock = CELLS_PER_BLOCK;
-  static const size_t bitmapShift = 0;
   typedef CollectorCell Cell;
   typedef CollectorBlock Block;
-};
-
-template <>
-struct HeapConstants<NumberHeap> {
-  static const size_t cellSize = SMALL_CELL_SIZE;
-  static const size_t cellsPerBlock = SMALL_CELLS_PER_BLOCK;
-  static const size_t bitmapShift = 1;
-  typedef SmallCollectorCell Cell;
-  typedef SmallCellCollectorBlock Block;
 };
 
 inline CollectorBlock* Heap::cellBlock(const JSCell* cell) {
   return reinterpret_cast<CollectorBlock*>(reinterpret_cast<uintptr_t>(cell) &
                                            BLOCK_MASK);
-}
-
-inline bool Heap::isNumber(JSCell* cell) {
-  return Heap::cellBlock(cell)->type == NumberHeap;
 }
 
 inline size_t Heap::cellOffset(const JSCell* cell) {
@@ -337,6 +287,17 @@ inline void Heap::markCell(JSCell* cell) {
 inline void Heap::reportExtraMemoryCost(size_t cost) {
   if (cost > minExtraCost)
     recordExtraCost(cost);
+}
+
+inline void* Heap::allocateNumber(size_t s) {
+  if (void* result = m_heap.nextNumber) {
+    m_heap.nextNumber = 0;
+    return result;
+  }
+
+  void* result = allocate(s);
+  m_heap.nextNumber = static_cast<char*>(result) + (CELL_SIZE / 2);
+  return result;
 }
 
 }  // namespace JSC
