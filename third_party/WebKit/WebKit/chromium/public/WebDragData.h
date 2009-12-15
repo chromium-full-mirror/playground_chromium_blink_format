@@ -77,6 +77,9 @@ class WebDragData {
   WEBKIT_API WebString urlTitle() const;
   WEBKIT_API void setURLTitle(const WebString&);
 
+  WEBKIT_API WebURL downloadURL() const;
+  WEBKIT_API void setDownloadURL(const WebURL&);
+
   WEBKIT_API WebString fileExtension() const;
   WEBKIT_API void setFileExtension(const WebString&);
 

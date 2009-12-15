@@ -57,6 +57,8 @@ class ChromiumDataObject : public RefCounted<ChromiumDataObject> {
   KURL url;
   String urlTitle;
 
+  KURL downloadURL;
+
   String fileExtension;
   Vector<String> filenames;
 

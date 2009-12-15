@@ -57,7 +57,8 @@ using namespace HTMLNames;
 enum ClipboardDataType {
   ClipboardDataTypeNone,
   ClipboardDataTypeURL,
-  ClipboardDataTypeText
+  ClipboardDataTypeText,
+  ClipboardDataTypeDownloadURL
 };
 
 static ClipboardDataType clipboardTypeFromMIMEType(const String& type) {
@@ -69,6 +70,8 @@ static ClipboardDataType clipboardTypeFromMIMEType(const String& type) {
     return ClipboardDataTypeText;
   if (cleanType == "url" || cleanType == "text/uri-list")
     return ClipboardDataTypeURL;
+  if (cleanType == "downloadurl")
+    return ClipboardDataTypeDownloadURL;
 
   return ClipboardDataTypeNone;
 }
@@ -154,6 +157,14 @@ bool ClipboardChromium::setData(const String& type, const String& data) {
   if (winType == ClipboardDataTypeText) {
     m_dataObject->plainText = data;
     return true;
+  }
+
+  if (winType == ClipboardDataTypeDownloadURL) {
+    KURL url = KURL(ParsedURLString, data);
+    if (url.isValid()) {
+      m_dataObject->downloadURL = url;
+      return true;
+    }
   }
 
   return false;

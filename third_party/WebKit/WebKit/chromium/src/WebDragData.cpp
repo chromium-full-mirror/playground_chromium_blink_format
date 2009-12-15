@@ -81,6 +81,16 @@ void WebDragData::setURLTitle(const WebString& urlTitle) {
   m_private->urlTitle = urlTitle;
 }
 
+WebURL WebDragData::downloadURL() const {
+  ASSERT(!isNull());
+  return m_private->downloadURL;
+}
+
+void WebDragData::setDownloadURL(const WebURL& downloadURL) {
+  ensureMutable();
+  m_private->downloadURL = downloadURL;
+}
+
 WebString WebDragData::fileExtension() const {
   ASSERT(!isNull());
   return m_private->fileExtension;
