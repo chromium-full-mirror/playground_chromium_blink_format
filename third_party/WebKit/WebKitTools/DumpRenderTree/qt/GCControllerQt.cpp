@@ -28,17 +28,17 @@
  */
 
 #include "config.h"
-#include "jsobjects.h"
+#include "GCControllerQt.h"
 
 #include <qwebpage.h>
-
-GCController::GCController(QWebPage* parent) : QObject(parent) {}
 
 extern int qt_drt_javaScriptObjectsCount();
 extern void qt_drt_garbageCollector_collect();
 
 extern void qt_drt_garbageCollector_collectOnAlternateThread(
     bool waitUntilDone);
+
+GCController::GCController(QWebPage* parent) : QObject(parent) {}
 
 void GCController::collect() const {
   qt_drt_garbageCollector_collect();

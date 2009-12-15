@@ -27,8 +27,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef WorkQueueItem_h
-#define WorkQueueItem_h
+#ifndef WorkQueueItemQt_h
+#define WorkQueueItemQt_h
 
 #include <QPointer>
 #include <QString>
@@ -120,4 +120,4 @@ class ForwardItem : public BackForwardItem {
       : BackForwardItem(howFar, page) {}
 };
 
-#endif  // !defined(WorkQueueItem_h)
+#endif  // !defined(WorkQueueItemQt_h)
