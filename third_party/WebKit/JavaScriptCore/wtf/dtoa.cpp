@@ -548,7 +548,7 @@ Exactly one of IEEE_8087, IEEE_ARM or
     aRef = c;
   }
 
-  struct P5Node {
+  struct P5Node : Noncopyable {
     BigInt val;
     P5Node* next;
   };
