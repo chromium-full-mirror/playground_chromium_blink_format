@@ -82,12 +82,14 @@ class CSSFontFace : public RefCounted<CSSFontFace> {
   };
 
  private:
-  CSSFontFace(FontTraitsMask traitsMask) : m_traitsMask(traitsMask) {}
+  CSSFontFace(FontTraitsMask traitsMask)
+      : m_traitsMask(traitsMask), m_activeSource(0) {}
 
   FontTraitsMask m_traitsMask;
   Vector<UnicodeRange> m_ranges;
   HashSet<CSSSegmentedFontFace*> m_segmentedFontFaces;
   Vector<CSSFontFaceSource*> m_sources;
+  CSSFontFaceSource* m_activeSource;
 };
 }
 
