@@ -315,7 +315,6 @@ PassRefPtr<Image> Image::loadPlatformResource(const char* name) {
 void Image::drawPattern(GraphicsContext* context,
                         const FloatRect& floatSrcRect,
                         const TransformationMatrix& patternTransform,
-                        const FloatPoint& phase,
                         ColorSpace styleColorSpace,
                         CompositeOperator compositeOp,
                         const FloatRect& destRect) {
@@ -380,10 +379,8 @@ void Image::drawPattern(GraphicsContext* context,
   // the coordinate system origin as the base for the patter. If WebKit wants
   // a shifted image, it will shift it from there using the patternTransform.
   float adjustedX =
-      phase.x() +
       normSrcRect.x() * narrowPrecisionToFloat(patternTransform.a());
   float adjustedY =
-      phase.y() +
       normSrcRect.y() * narrowPrecisionToFloat(patternTransform.d());
   matrix.postTranslate(SkFloatToScalar(adjustedX), SkFloatToScalar(adjustedY));
   shader->setLocalMatrix(matrix);

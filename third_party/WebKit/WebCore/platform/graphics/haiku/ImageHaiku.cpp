@@ -109,11 +109,9 @@ void BitmapImage::draw(GraphicsContext* ctxt,
 void Image::drawPattern(GraphicsContext* context,
                         const FloatRect& tileRect,
                         const TransformationMatrix& patternTransform,
-                        const FloatPoint& srcPoint,
                         ColorSpace,
                         CompositeOperator op,
                         const FloatRect& dstRect) {
-  // FIXME: finish this to support also phased position (srcPoint)
   startAnimation();
 
   BBitmap* image = nativeImageForCurrentFrame();
