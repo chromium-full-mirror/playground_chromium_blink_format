@@ -64,9 +64,11 @@ void EventSender::mouseDown(int button) {
       break;
   }
 
+  m_mouseButtons |= mouseButton;
+
   //     qDebug() << "EventSender::mouseDown" << frame;
-  QMouseEvent event(QEvent::MouseButtonPress, m_mousePos, mouseButton,
-                    mouseButton, Qt::NoModifier);
+  QMouseEvent event(QEvent::MouseButtonPress, m_mousePos, m_mousePos,
+                    mouseButton, m_mouseButtons, Qt::NoModifier);
   QApplication::sendEvent(m_page, &event);
 }
 
@@ -92,17 +94,19 @@ void EventSender::mouseUp(int button) {
       break;
   }
 
+  m_mouseButtons &= ~mouseButton;
+
   //     qDebug() << "EventSender::mouseUp" << frame;
-  QMouseEvent event(QEvent::MouseButtonRelease, m_mousePos, mouseButton,
-                    mouseButton, Qt::NoModifier);
+  QMouseEvent event(QEvent::MouseButtonRelease, m_mousePos, m_mousePos,
+                    mouseButton, m_mouseButtons, Qt::NoModifier);
   QApplication::sendEvent(m_page, &event);
 }
 
 void EventSender::mouseMoveTo(int x, int y) {
   //     qDebug() << "EventSender::mouseMoveTo" << x << y;
   m_mousePos = QPoint(x, y);
-  QMouseEvent event(QEvent::MouseMove, m_mousePos, Qt::NoButton, Qt::NoButton,
-                    Qt::NoModifier);
+  QMouseEvent event(QEvent::MouseMove, m_mousePos, m_mousePos, Qt::NoButton,
+                    m_mouseButtons, Qt::NoModifier);
   QApplication::sendEvent(m_page, &event);
 }
 
