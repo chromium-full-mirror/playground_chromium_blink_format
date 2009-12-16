@@ -42,7 +42,7 @@ typedef struct HDC__* HDC;
 typedef struct HBITMAP__* HBITMAP;
 #elif PLATFORM(QT)
 namespace WebCore {
-class QWebPopup;
+class QtAbstractWebPopup;
 }
 #elif PLATFORM(GTK)
 typedef struct _GtkMenu GtkMenu;
@@ -148,7 +148,7 @@ class PopupMenu : public RefCounted<PopupMenu>
 
   RetainPtr<NSPopUpButtonCell> m_popup;
 #elif PLATFORM(QT)
-  QWebPopup* m_popup;
+  QtAbstractWebPopup* m_popup;
 #elif PLATFORM(WIN)
   // ScrollBarClient
   virtual void valueChanged(Scrollbar*);

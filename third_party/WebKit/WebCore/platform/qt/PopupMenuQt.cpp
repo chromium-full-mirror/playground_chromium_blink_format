@@ -2,7 +2,7 @@
  * This file is part of the popup menu implementation for <select> elements in
  * WebCore.
  *
- * Copyright (C) 2008 Nokia Corporation and/or its subsidiary(-ies)
+ * Copyright (C) 2008, 2009 Nokia Corporation and/or its subsidiary(-ies)
  * Copyright (C) 2006 Apple Computer, Inc.
  * Copyright (C) 2006 Michael Emmel mike.emmel@gmail.com
  * Coypright (C) 2006 Nikolas Zimmermann <zimmermann@kde.org>
@@ -29,12 +29,13 @@
 
 #include "FrameView.h"
 #include "PopupMenuClient.h"
-#include "QWebPopup.h"
+#include "QtAbstractWebPopup.h"
+#include "QtFallbackWebPopup.h"
 
 namespace WebCore {
 
 PopupMenu::PopupMenu(PopupMenuClient* client) : m_popupClient(client) {
-  m_popup = new QWebPopup(client);
+  m_popup = new QtFallbackWebPopup(client);
 }
 
 PopupMenu::~PopupMenu() {
