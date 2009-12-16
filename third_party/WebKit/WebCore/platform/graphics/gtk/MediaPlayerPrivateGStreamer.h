@@ -99,8 +99,8 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
   void loadStateChanged();
   void sizeChanged();
   void timeChanged();
+  void volumeChanged();
   void didEnd();
-  void durationChanged();
   void loadingFailed(MediaPlayer::NetworkState);
 
   void repaint();
