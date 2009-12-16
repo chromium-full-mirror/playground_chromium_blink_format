@@ -48,6 +48,7 @@ class InputElement {
   virtual bool searchEventsShouldBeDispatched() const = 0;
 
   virtual int size() const = 0;
+  virtual const String& suggestedValue() const = 0;
   virtual String value() const = 0;
   virtual void setValue(const String&, bool sendChangeEvent = false) = 0;
   virtual void setValueForUser(const String&) = 0;
@@ -106,6 +107,9 @@ class InputElementData {
   String value() const { return m_value; }
   void setValue(const String& value) { m_value = value; }
 
+  const String& suggestedValue() const { return m_suggestedValue; }
+  void setSuggestedValue(const String& value) { m_suggestedValue = value; }
+
   int size() const { return m_size; }
   void setSize(int value) { m_size = value; }
 
@@ -121,6 +125,7 @@ class InputElementData {
  private:
   AtomicString m_name;
   String m_value;
+  String m_suggestedValue;
   int m_size;
   int m_maxLength;
   int m_cachedSelectionStart;

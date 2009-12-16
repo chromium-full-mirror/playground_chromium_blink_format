@@ -1283,6 +1283,21 @@ void HTMLInputElement::setValueForUser(const String& value) {
   setValue(value, true);
 }
 
+const String& HTMLInputElement::suggestedValue() const {
+  return m_data.suggestedValue();
+}
+
+void HTMLInputElement::setSuggestedValue(const String& value) {
+  if (inputType() != TEXT)
+    return;
+  setFormControlValueMatchesRenderer(false);
+  m_data.setSuggestedValue(sanitizeValue(value));
+  updatePlaceholderVisibility(false);
+  if (renderer())
+    renderer()->updateFromElement();
+  setNeedsStyleRecalc();
+}
+
 void HTMLInputElement::setValue(const String& value, bool sendChangeEvent) {
   // For security reasons, we don't allow setting the filename, but we do allow
   // clearing it.
@@ -1317,6 +1332,7 @@ void HTMLInputElement::setValue(const String& value, bool sendChangeEvent) {
       InputElement::updateSelectionRange(this, this, max, max);
     else
       cacheSelection(max, max);
+    m_data.setSuggestedValue(String());
   }
 
   // Don't dispatch the change event when focused, it will be dispatched
@@ -1343,6 +1359,7 @@ bool HTMLInputElement::searchEventsShouldBeDispatched() const {
 void HTMLInputElement::setValueFromRenderer(const String& value) {
   // File upload controls will always use setFileListFromRenderer.
   ASSERT(inputType() != FILE);
+  m_data.setSuggestedValue(String());
   updatePlaceholderVisibility(false);
   InputElement::setValueFromRenderer(m_data, this, this, value);
   updateValidity();
