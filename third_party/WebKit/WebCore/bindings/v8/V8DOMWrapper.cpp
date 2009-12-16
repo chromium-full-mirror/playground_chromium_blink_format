@@ -309,10 +309,10 @@ v8::Persistent<v8::FunctionTemplate> V8DOMWrapper::getTemplate(
       break;
     case V8ClassIndex::HTMLSELECTELEMENT:
       descriptor->InstanceTemplate()->SetNamedPropertyHandler(
-          USE_NAMED_PROPERTY_GETTER(HTMLSelectElementCollection));
+          USE_NAMED_PROPERTY_GETTER(HTMLSelectElement));
       descriptor->InstanceTemplate()->SetIndexedPropertyHandler(
-          nodeCollectionIndexedPropertyGetter<HTMLSelectElement>,
-          USE_INDEXED_PROPERTY_SETTER(HTMLSelectElementCollection), 0, 0,
+          USE_INDEXED_PROPERTY_GETTER(HTMLSelectElement),
+          USE_INDEXED_PROPERTY_SETTER(HTMLSelectElement), 0, 0,
           nodeCollectionIndexedPropertyEnumerator<HTMLSelectElement>,
           v8::Integer::New(V8ClassIndex::NODE));
       break;
