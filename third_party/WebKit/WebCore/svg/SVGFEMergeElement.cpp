@@ -35,7 +35,7 @@ SVGFEMergeElement::SVGFEMergeElement(const QualifiedName& tagName,
 SVGFEMergeElement::~SVGFEMergeElement() {}
 
 bool SVGFEMergeElement::build(SVGResourceFilter* filterResource) {
-  Vector<FilterEffect*> mergeInputs;
+  Vector<RefPtr<FilterEffect>> mergeInputs;
   for (Node* n = firstChild(); n != 0; n = n->nextSibling()) {
     if (n->hasTagName(SVGNames::feMergeNodeTag)) {
       FilterEffect* mergeEffect = filterResource->builder()->getEffectById(
