@@ -49,10 +49,6 @@ class RenderRubyRun : public RenderBlock {
 
   virtual void destroy();
 
-  virtual const char* renderName() const { return "RenderRubyRun (anonymous)"; }
-
-  virtual bool isRubyRun() const { return true; }
-
   bool hasRubyText() const;
   bool hasRubyBase() const;
   bool isEmpty() const;
@@ -74,6 +70,11 @@ class RenderRubyRun : public RenderBlock {
   RenderRubyBase* createRubyBase() const;
 
  private:
+  virtual bool isRubyRun() const { return true; }
+  virtual const char* renderName() const { return "RenderRubyRun (anonymous)"; }
+  virtual bool createsAnonymousWrapper() const { return true; }
+  virtual void removeLeftoverAnonymousBlock(RenderBlock*) {}
+
   bool m_beingDestroyed;
 };
 
