@@ -20,11 +20,12 @@
 #include "config.h"
 #include "QtAbstractWebPopup.h"
 
-#include "PopupMenuStyle.h"
+#include "PopupMenuClient.h"
+#include "QtFallbackWebPopup.h"
 
 namespace WebCore {
 
-// QAbstractWebPopup
+QtAbstractWebPopupFactory* QtAbstractWebPopup::m_factory = 0;
 
 QtAbstractWebPopup::QtAbstractWebPopup(PopupMenuClient* client)
     : m_client(client) {
@@ -35,6 +36,14 @@ QtAbstractWebPopup::~QtAbstractWebPopup() {}
 
 PopupMenuClient* QtAbstractWebPopup::client() {
   return m_client;
+}
+
+void QtAbstractWebPopup::setFactory(QtAbstractWebPopupFactory* factory) {
+  m_factory = factory;
+}
+
+QtAbstractWebPopup* QtAbstractWebPopup::create(PopupMenuClient* client) {
+  return m_factory ? m_factory->create(client) : new QtFallbackWebPopup(client);
 }
 
 }  // namespace WebCore
