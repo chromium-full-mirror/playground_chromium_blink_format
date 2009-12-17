@@ -122,6 +122,7 @@
 #include "TextIterator.h"
 #include "WebConsoleMessage.h"
 #include "WebDataSourceImpl.h"
+#include "WebDocument.h"
 #include "WebFindOptions.h"
 #include "WebFormElement.h"
 #include "WebFrameClient.h"
@@ -328,6 +329,11 @@ WebFrame* WebFrame::frameForCurrentContext() {
   return WebFrameImpl::fromFrame(frame);
 }
 
+WebFrame* WebFrame::fromFrameOwnerElement(const WebElement& element) {
+  return WebFrameImpl::fromFrameOwnerElement(
+      PassRefPtr<Element>(element).get());
+}
+
 WebString WebFrameImpl::name() const {
   return m_frame->tree()->name();
 }
@@ -368,6 +374,10 @@ WebURL WebFrameImpl::openSearchDescriptionURL() const {
     }
   }
   return WebURL();
+}
+
+WebString WebFrameImpl::encoding() const {
+  return frame()->loader()->encoding();
 }
 
 WebSize WebFrameImpl::scrollOffset() const {
@@ -475,6 +485,12 @@ WebFrame* WebFrameImpl::findChildByExpression(const WebString& xpath) const {
   HTMLFrameOwnerElement* frameElement =
       static_cast<HTMLFrameOwnerElement*>(node);
   return fromFrame(frameElement->contentFrame());
+}
+
+WebDocument WebFrameImpl::document() const {
+  if (!m_frame || !m_frame->document())
+    return WebDocument();
+  return WebDocument(m_frame->document());
 }
 
 void WebFrameImpl::forms(WebVector<WebFormElement>& results) const {
@@ -1519,6 +1535,17 @@ WebFrameImpl* WebFrameImpl::fromFrame(Frame* frame) {
 
   return static_cast<FrameLoaderClientImpl*>(frame->loader()->client())
       ->webFrame();
+}
+
+WebFrameImpl* WebFrameImpl::fromFrameOwnerElement(Element* element) {
+  if (!element || !element->isFrameOwnerElement() ||
+      (!element->hasTagName(HTMLNames::iframeTag) &&
+       !element->hasTagName(HTMLNames::frameTag)))
+    return 0;
+
+  HTMLFrameOwnerElement* frameElement =
+      static_cast<HTMLFrameOwnerElement*>(element);
+  return fromFrame(frameElement->contentFrame());
 }
 
 WebViewImpl* WebFrameImpl::viewImpl() const {

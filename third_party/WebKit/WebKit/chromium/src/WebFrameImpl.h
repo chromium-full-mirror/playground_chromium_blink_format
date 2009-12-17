@@ -65,6 +65,7 @@ class WebFrameImpl : public WebFrame, public RefCounted<WebFrameImpl> {
   virtual WebURL url() const;
   virtual WebURL favIconURL() const;
   virtual WebURL openSearchDescriptionURL() const;
+  virtual WebString encoding() const;
   virtual WebSize scrollOffset() const;
   virtual WebSize contentsSize() const;
   virtual int contentsPreferredWidth() const;
@@ -82,6 +83,7 @@ class WebFrameImpl : public WebFrame, public RefCounted<WebFrameImpl> {
   virtual WebFrame* traversePrevious(bool wrap) const;
   virtual WebFrame* findChildByName(const WebString&) const;
   virtual WebFrame* findChildByExpression(const WebString&) const;
+  virtual WebDocument document() const;
   virtual void forms(WebVector<WebFormElement>&) const;
   virtual WebSecurityOrigin securityOrigin() const;
   virtual void grantUniversalAccess();
@@ -168,7 +170,6 @@ class WebFrameImpl : public WebFrame, public RefCounted<WebFrameImpl> {
   virtual WebURL completeURL(const WebString& url) const;
   virtual WebString contentAsText(size_t maxChars) const;
   virtual WebString contentAsMarkup() const;
-
   static PassRefPtr<WebFrameImpl> create(WebFrameClient* client);
   ~WebFrameImpl();
 
@@ -185,6 +186,7 @@ class WebFrameImpl : public WebFrame, public RefCounted<WebFrameImpl> {
   void createFrameView();
 
   static WebFrameImpl* fromFrame(WebCore::Frame* frame);
+  static WebFrameImpl* fromFrameOwnerElement(WebCore::Element* element);
 
   WebViewImpl* viewImpl() const;
 

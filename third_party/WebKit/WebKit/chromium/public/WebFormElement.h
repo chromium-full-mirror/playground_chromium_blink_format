@@ -55,7 +55,7 @@ class WebFormElement : public WebElement {
   WebFormElement() : WebElement() {}
   WebFormElement(const WebFormElement& e) : WebElement(e) {}
 
-  WebElement& operator=(const WebFormElement& e) {
+  WebFormElement& operator=(const WebFormElement& e) {
     WebElement::assign(e);
     return *this;
   }
