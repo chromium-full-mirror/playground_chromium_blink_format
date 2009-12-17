@@ -30,6 +30,6 @@ namespace JSC {
 
 void startProfilerServerIfNeeded();
 
-} // namespace JSC
+}  // namespace JSC
 
-#endif // ProfileServer_h
+#endif  // ProfileServer_h
