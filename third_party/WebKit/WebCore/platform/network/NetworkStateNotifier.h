@@ -48,6 +48,10 @@ typedef const struct __SCDynamicStore* SCDynamicStoreRef;
 
 namespace WebCore {
 
+#if (PLATFORM(QT) && ENABLE(QT_BEARER))
+class NetworkStateNotifierPrivate;
+#endif
+
 class NetworkStateNotifier : public Noncopyable {
  public:
   NetworkStateNotifier();
@@ -82,10 +86,15 @@ class NetworkStateNotifier : public Noncopyable {
 
 #elif PLATFORM(CHROMIUM)
   NetworkStateNotifierPrivate p;
+
+#elif PLATFORM(QT) && ENABLE(QT_BEARER)
+  friend class NetworkStateNotifierPrivate;
+  NetworkStateNotifierPrivate* p;
 #endif
 };
 
-#if !PLATFORM(MAC) && !PLATFORM(WIN) && !PLATFORM(CHROMIUM)
+#if !PLATFORM(MAC) && !PLATFORM(WIN) && !PLATFORM(CHROMIUM) && \
+    !(PLATFORM(QT) && ENABLE(QT_BEARER))
 
 inline NetworkStateNotifier::NetworkStateNotifier()
     : m_isOnLine(true), m_networkStateChangedFunction(0) {}
