@@ -238,6 +238,9 @@ QGraphicsWebView::QGraphicsWebView(QGraphicsItem* parent)
 #endif
   setAcceptDrops(true);
   setAcceptHoverEvents(true);
+#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
+  setAcceptTouchEvents(true);
+#endif
   setFocusPolicy(Qt::StrongFocus);
 }
 
@@ -293,8 +296,19 @@ void QGraphicsWebView::paint(QPainter* painter,
 /*! \reimp
 */
 bool QGraphicsWebView::sceneEvent(QEvent* event) {
-  // Re-implemented in order to allows fixing event-related bugs in patch
-  // releases.
+// Re-implemented in order to allows fixing event-related bugs in patch
+// releases.
+
+#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
+  if (d->page && (event->type() == QEvent::TouchBegin ||
+                  event->type() == QEvent::TouchEnd ||
+                  event->type() == QEvent::TouchUpdate)) {
+    d->page->event(event);
+    if (event->isAccepted())
+      return true;
+  }
+#endif
+
   return QGraphicsWidget::sceneEvent(event);
 }
 
