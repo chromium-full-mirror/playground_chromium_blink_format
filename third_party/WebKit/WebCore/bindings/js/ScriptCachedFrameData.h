@@ -40,7 +40,7 @@ class JSDOMWindow;
 class DOMWindow;
 class DOMWrapperWorld;
 
-class ScriptCachedFrameData {
+class ScriptCachedFrameData : public Noncopyable {
   typedef HashMap<RefPtr<DOMWrapperWorld>, JSC::ProtectedPtr<JSDOMWindow>>
       JSDOMWindowSet;
 

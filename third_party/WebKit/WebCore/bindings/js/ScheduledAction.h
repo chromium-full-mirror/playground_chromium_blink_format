@@ -42,7 +42,7 @@ class WorkerContext;
  * time interval, either once or repeatedly. Used for window.setTimeout()
  * and window.setInterval()
  */
-class ScheduledAction {
+class ScheduledAction : public Noncopyable {
  public:
   static ScheduledAction* create(JSC::ExecState*,
                                  const JSC::ArgList&,
