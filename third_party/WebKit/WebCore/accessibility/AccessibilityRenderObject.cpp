@@ -84,7 +84,8 @@ AccessibilityRenderObject::AccessibilityRenderObject(RenderObject* renderer)
     : AccessibilityObject(),
       m_renderer(renderer),
       m_ariaRole(UnknownRole),
-      m_childrenDirty(false) {
+      m_childrenDirty(false),
+      m_roleForMSAA(UnknownRole) {
   updateAccessibilityRole();
 #ifndef NDEBUG
   m_renderer->setHasAXObject(true);
@@ -3123,6 +3124,18 @@ String AccessibilityRenderObject::descriptionForMSAA() const {
   }
 
   return String();
+}
+
+AccessibilityRole AccessibilityRenderObject::roleValueForMSAA() const {
+  if (m_roleForMSAA != UnknownRole)
+    return m_roleForMSAA;
+
+  if (m_renderer && m_renderer->isText())
+    m_roleForMSAA = EditableTextRole;
+  else
+    m_roleForMSAA = m_role;
+
+  return m_roleForMSAA;
 }
 
 }  // namespace WebCore
