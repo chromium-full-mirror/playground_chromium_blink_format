@@ -183,7 +183,7 @@ FOR_EACH_OPCODE_ID(VERIFY_OPCODE_ID);
 #undef VERIFY_OPCODE_ID
 
 #if HAVE(COMPUTED_GOTO)
-typedef void* Opcode;
+typedef const void* Opcode;
 #else
 typedef OpcodeID Opcode;
 #endif
