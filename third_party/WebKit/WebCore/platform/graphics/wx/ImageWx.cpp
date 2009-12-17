@@ -185,6 +185,7 @@ void BitmapImage::draw(GraphicsContext* ctxt,
 void BitmapImage::drawPattern(GraphicsContext* ctxt,
                               const FloatRect& srcRect,
                               const TransformationMatrix& patternTransform,
+                              const FloatPoint& phase,
                               ColorSpace,
                               CompositeOperator,
                               const FloatRect& dstRect) {
@@ -212,8 +213,10 @@ void BitmapImage::drawPattern(GraphicsContext* ctxt,
 #if USE(WXGC)
   wxGraphicsContext* gc = context->GetGraphicsContext();
 
-  float adjustedX = srcRect.x() * narrowPrecisionToFloat(patternTransform.a());
-  float adjustedY = srcRect.y() * narrowPrecisionToFloat(patternTransform.d());
+  float adjustedX =
+      phase.x() + srcRect.x() * narrowPrecisionToFloat(patternTransform.a());
+  float adjustedY =
+      phase.y() + srcRect.y() * narrowPrecisionToFloat(patternTransform.d());
 
   gc->ConcatTransform(patternTransform);
 #else
@@ -273,6 +276,7 @@ void BitmapImage::invalidatePlatformData() {}
 void Image::drawPattern(GraphicsContext*,
                         const FloatRect& srcRect,
                         const TransformationMatrix& patternTransform,
+                        const FloatPoint& phase,
                         ColorSpace,
                         CompositeOperator,
                         const FloatRect& destRect) {

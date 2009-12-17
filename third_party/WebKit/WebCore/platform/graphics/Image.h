@@ -200,6 +200,7 @@ class Image : public RefCounted<Image> {
   virtual void drawPattern(GraphicsContext*,
                            const FloatRect& srcRect,
                            const TransformationMatrix& patternTransform,
+                           const FloatPoint& phase,
                            ColorSpace styleColorSpace,
                            CompositeOperator,
                            const FloatRect& destRect);

@@ -46,6 +46,7 @@ class BufferedImage : public Image {
   virtual void drawPattern(GraphicsContext*,
                            const FloatRect& srcRect,
                            const TransformationMatrix& patternTransform,
+                           const FloatPoint& phase,
                            CompositeOperator,
                            const FloatRect& destRect);
 
@@ -64,9 +65,10 @@ void BufferedImage::draw(GraphicsContext* ctxt,
 void BufferedImage::drawPattern(GraphicsContext* ctxt,
                                 const FloatRect& tileRectIn,
                                 const TransformationMatrix& patternTransform,
+                                const FloatPoint& phase,
                                 CompositeOperator op,
                                 const FloatRect& destRect) {
-  m_data->m_bitmap->drawPattern(ctxt, tileRectIn, patternTransform, op,
+  m_data->m_bitmap->drawPattern(ctxt, tileRectIn, patternTransform, phase, op,
                                 destRect, size());
 }
 

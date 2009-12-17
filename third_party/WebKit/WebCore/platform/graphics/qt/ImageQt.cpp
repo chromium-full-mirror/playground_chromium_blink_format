@@ -93,6 +93,7 @@ PassRefPtr<Image> Image::loadPlatformResource(const char* name) {
 void Image::drawPattern(GraphicsContext* ctxt,
                         const FloatRect& tileRect,
                         const TransformationMatrix& patternTransform,
+                        const FloatPoint& phase,
                         ColorSpace,
                         CompositeOperator op,
                         const FloatRect& destRect) {
@@ -114,6 +115,7 @@ void Image::drawPattern(GraphicsContext* ctxt,
   if (!pixmap.hasAlpha() &&
       p->compositionMode() == QPainter::CompositionMode_SourceOver)
     p->setCompositionMode(QPainter::CompositionMode_Source);
+  p->setBrushOrigin(phase);
   p->fillRect(destRect, b);
   ctxt->restore();
 
