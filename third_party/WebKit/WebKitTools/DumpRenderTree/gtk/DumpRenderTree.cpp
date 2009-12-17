@@ -337,7 +337,8 @@ static void resetDefaultsToConsistentValues() {
                TRUE, "enable-dom-paste", TRUE, "default-font-family", "Times",
                "monospace-font-family", "Courier", "serif-font-family", "Times",
                "sans-serif-font-family", "Helvetica", "default-font-size", 16,
-               "default-monospace-font-size", 13, "minimum-font-size", 1, NULL);
+               "default-monospace-font-size", 13, "minimum-font-size", 1,
+               "enable-caret-browsing", FALSE, NULL);
 
   webkit_web_frame_clear_main_frame_name(mainFrame);
 

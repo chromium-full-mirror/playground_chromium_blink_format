@@ -85,6 +85,8 @@ static gchar* copyWebSettingKey(gchar* preferenceKey) {
                         g_strdup("enable-scripts"));
     g_hash_table_insert(keyTable, g_strdup("WebKitDefaultFontSize"),
                         g_strdup("default-font-size"));
+    g_hash_table_insert(keyTable, g_strdup("WebKitEnableCaretBrowsing"),
+                        g_strdup("enable-caret-browsing"));
   }
 
   return g_strdup(
