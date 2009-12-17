@@ -34,7 +34,6 @@
 #include "FrameView.h"
 #include "FrameTree.h"
 #include "GOwnPtr.h"
-#include "GRefPtr.h"
 #include "GtkPluginWidget.h"
 #include "HTMLAppletElement.h"
 #include "HTMLFormElement.h"
@@ -493,8 +492,8 @@ PassRefPtr<Widget> FrameLoaderClient::createPlugin(
   CString mimeTypeString = mimeType.utf8();
 
   ASSERT(paramNames.size() == paramValues.size());
-  GRefPtr<GHashTable> hash =
-      adoptGRef(g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free));
+  GOwnPtr<GHashTable> hash(
+      g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free));
   for (unsigned i = 0; i < paramNames.size(); ++i) {
     g_hash_table_insert(hash.get(), g_strdup(paramNames[i].utf8().data()),
                         g_strdup(paramValues[i].utf8().data()));
