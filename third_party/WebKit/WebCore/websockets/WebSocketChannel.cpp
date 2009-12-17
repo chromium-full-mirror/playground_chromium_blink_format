@@ -146,7 +146,7 @@ void WebSocketChannel::didReceiveData(SocketStreamHandle* handle,
     handle->close();
     return;
   }
-  if (m_handshake.mode() != WebSocketHandshake::Connected) {
+  if (m_handshake.mode() == WebSocketHandshake::Incomplete) {
     int headerLength = m_handshake.readServerHandshake(m_buffer, m_bufferSize);
     if (headerLength <= 0)
       return;
@@ -175,6 +175,8 @@ void WebSocketChannel::didReceiveData(SocketStreamHandle* handle,
       return;
     LOG(Network, "remaining in read buf %ul", m_bufferSize);
   }
+  if (m_handshake.mode() != WebSocketHandshake::Connected)
+    return;
 
   const char* nextFrame = m_buffer;
   const char* p = m_buffer;
