@@ -2389,7 +2389,7 @@ static void webkit_web_view_update_settings(WebKitWebView* webView) {
       enablePrivateBrowsing, enableCaretBrowsing, enableHTML5Database,
       enableHTML5LocalStorage, enableXSSAuditor, javascriptCanOpenWindows,
       enableOfflineWebAppCache, enableUniversalAccessFromFileURI,
-      enableDOMPaste, tabKeyCyclesThroughElements;
+      enableDOMPaste, tabKeyCyclesThroughElements, enableSiteSpecificQuirks;
 
   WebKitEditingBehavior editingBehavior;
 
@@ -2413,7 +2413,8 @@ static void webkit_web_view_update_settings(WebKitWebView* webView) {
       "editing-behavior", &editingBehavior,
       "enable-universal-access-from-file-uris",
       &enableUniversalAccessFromFileURI, "enable-dom-paste", &enableDOMPaste,
-      "tab-key-cycles-through-elements", &tabKeyCyclesThroughElements, NULL);
+      "tab-key-cycles-through-elements", &tabKeyCyclesThroughElements,
+      "enable-site-specific-quirks", &enableSiteSpecificQuirks, NULL);
 
   settings->setDefaultTextEncodingName(defaultEncoding);
   settings->setCursiveFontFamily(cursiveFontFamily);
@@ -2441,6 +2442,7 @@ static void webkit_web_view_update_settings(WebKitWebView* webView) {
   settings->setAllowUniversalAccessFromFileURLs(
       enableUniversalAccessFromFileURI);
   settings->setDOMPasteAllowed(enableDOMPaste);
+  settings->setNeedsSiteSpecificQuirks(enableSiteSpecificQuirks);
 
   Page* page = core(webView);
   if (page)
@@ -2544,8 +2546,9 @@ static void webkit_web_view_settings_notify(WebKitWebSettings* webSettings,
     Page* page = core(webView);
     if (page)
       page->setTabKeyCyclesThroughElements(g_value_get_boolean(&value));
-  } else if (!g_object_class_find_property(G_OBJECT_GET_CLASS(webSettings),
-                                           name))
+  } else if (name == g_intern_string("enable-site-specific-quirks"))
+    settings->setNeedsSiteSpecificQuirks(g_value_get_boolean(&value));
+  else if (!g_object_class_find_property(G_OBJECT_GET_CLASS(webSettings), name))
     g_warning("Unexpected setting '%s'", name);
   g_value_unset(&value);
 }

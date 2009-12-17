@@ -99,6 +99,7 @@ struct _WebKitWebSettingsPrivate {
   gboolean enable_dom_paste;
   gboolean tab_key_cycles_through_elements;
   gboolean enable_default_context_menu;
+  gboolean enable_site_specific_quirks;
 };
 
 #define WEBKIT_WEB_SETTINGS_GET_PRIVATE(obj)                    \
@@ -143,7 +144,8 @@ enum {
   PROP_ENABLE_UNIVERSAL_ACCESS_FROM_FILE_URIS,
   PROP_ENABLE_DOM_PASTE,
   PROP_TAB_KEY_CYCLES_THROUGH_ELEMENTS,
-  PROP_ENABLE_DEFAULT_CONTEXT_MENU
+  PROP_ENABLE_DEFAULT_CONTEXT_MENU,
+  PROP_ENABLE_SITE_SPECIFIC_QUIRKS
 };
 
 // Create a default user agent string
@@ -648,6 +650,25 @@ static void webkit_web_settings_class_init(WebKitWebSettingsClass* klass) {
                              "creation of the default context menu"),
                            TRUE, flags));
 
+  /**
+   * WebKitWebSettings::enable-site-specific-quirks
+   *
+   * Whether to turn on site-specific hacks.  Turning this on will
+   * tell WebKitGTK+ to use some site-specific workarounds for
+   * better web compatibility.  For example, older versions of
+   * MediaWiki will incorrectly send WebKit a css file with KHTML
+   * workarounds.  By turning on site-specific quirks, WebKit will
+   * special-case this and other cases to make the sites work.
+   *
+   * Since: 1.1.18
+   */
+  g_object_class_install_property(
+      gobject_class, PROP_ENABLE_SITE_SPECIFIC_QUIRKS,
+      g_param_spec_boolean(
+          "enable-site-specific-quirks", _("Enable Site Specific Quirks"),
+          _("Enables the site-specific compatibility workarounds"), FALSE,
+          flags));
+
   g_type_class_add_private(klass, sizeof(WebKitWebSettingsPrivate));
 }
 
@@ -854,6 +875,9 @@ static void webkit_web_settings_set_property(GObject* object,
     case PROP_ENABLE_DEFAULT_CONTEXT_MENU:
       priv->enable_default_context_menu = g_value_get_boolean(value);
       break;
+    case PROP_ENABLE_SITE_SPECIFIC_QUIRKS:
+      priv->enable_site_specific_quirks = g_value_get_boolean(value);
+      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
       break;
@@ -977,6 +1001,9 @@ static void webkit_web_settings_get_property(GObject* object,
     case PROP_ENABLE_DEFAULT_CONTEXT_MENU:
       g_value_set_boolean(value, priv->enable_default_context_menu);
       break;
+    case PROP_ENABLE_SITE_SPECIFIC_QUIRKS:
+      g_value_set_boolean(value, priv->enable_site_specific_quirks);
+      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
       break;
@@ -1039,7 +1066,8 @@ WebKitWebSettings* webkit_web_settings_copy(WebKitWebSettings* web_settings) {
       priv->enable_universal_access_from_file_uris, "enable-dom-paste",
       priv->enable_dom_paste, "tab-key-cycles-through-elements",
       priv->tab_key_cycles_through_elements, "enable-default-context-menu",
-      priv->enable_default_context_menu, NULL));
+      priv->enable_default_context_menu, "enable-site-specific-quirks",
+      priv->enable_site_specific_quirks, NULL));
 
   return copy;
 }
