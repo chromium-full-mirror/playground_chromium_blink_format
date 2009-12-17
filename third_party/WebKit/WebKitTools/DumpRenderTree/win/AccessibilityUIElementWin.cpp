@@ -409,3 +409,8 @@ JSStringRef AccessibilityUIElement::documentEncoding() {
 JSStringRef AccessibilityUIElement::documentURI() {
   return JSStringCreateWithCharacters(0, 0);
 }
+
+JSStringRef AccessibilityUIElement::url() {
+  // FIXME: implement
+  return JSStringCreateWithCharacters(0, 0);
+}

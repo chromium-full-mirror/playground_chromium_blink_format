@@ -757,6 +757,14 @@ static JSValueRef getDocumentURICallback(JSContextRef context,
   return JSValueMakeString(context, documentURI.get());
 }
 
+static JSValueRef getURLCallback(JSContextRef context,
+                                 JSObjectRef thisObject,
+                                 JSStringRef propertyName,
+                                 JSValueRef* exception) {
+  JSRetainPtr<JSStringRef> url(Adopt, toAXElement(thisObject)->url());
+  return JSValueMakeString(context, url.get());
+}
+
 // Destruction
 
 static void finalize(JSObjectRef thisObject) {
@@ -829,6 +837,8 @@ JSClassRef AccessibilityUIElement::getJSClass() {
       {"documentEncoding", getDocumentEncodingCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"documentURI", getDocumentURICallback, 0,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"url", getURLCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"isValid", getIsValidCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},

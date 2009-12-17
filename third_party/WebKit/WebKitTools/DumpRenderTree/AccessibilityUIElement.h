@@ -123,6 +123,7 @@ class AccessibilityUIElement {
   double clickPointY();
   JSStringRef documentEncoding();
   JSStringRef documentURI();
+  JSStringRef url();
 
   // Table-specific attributes
   JSStringRef attributesOfColumnHeaders();
