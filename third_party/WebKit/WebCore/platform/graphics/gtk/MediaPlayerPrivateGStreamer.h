@@ -47,6 +47,9 @@ class String;
 gboolean mediaPlayerPrivateMessageCallback(GstBus* bus,
                                            GstMessage* message,
                                            gpointer data);
+void mediaPlayerPrivateVolumeChangedCallback(GObject* element,
+                                             GParamSpec* pspec,
+                                             gpointer data);
 
 class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
   friend gboolean mediaPlayerPrivateMessageCallback(GstBus* bus,
@@ -81,6 +84,7 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
 
   void setRate(float);
   void setVolume(float);
+  void volumeChanged();
 
   int dataRate() const;
 
@@ -99,8 +103,8 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
   void loadStateChanged();
   void sizeChanged();
   void timeChanged();
-  void volumeChanged();
   void didEnd();
+  void durationChanged();
   void loadingFailed(MediaPlayer::NetworkState);
 
   void repaint();
@@ -146,6 +150,7 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
   bool m_paused;
   bool m_seeking;
   bool m_errorOccured;
+  guint m_volumeIdleId;
 };
 }
 
