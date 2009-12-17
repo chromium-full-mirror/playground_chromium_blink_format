@@ -241,7 +241,7 @@ class MainWindow : public QMainWindow {
 
     QTouchEvent touchEv(type);
     touchEv.setTouchPoints(touchPoints);
-    view->page()->event(&touchEv);
+    QCoreApplication::sendEvent(view, &touchEv);
 
     // After sending the event, remove all touchpoints that were released
     if (touchPoints[0].state() == Qt::TouchPointReleased)
