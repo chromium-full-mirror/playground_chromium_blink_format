@@ -27,6 +27,7 @@
 #include "AXObjectCache.h"
 
 #include "AccessibilityObject.h"
+#include "Chrome.h"
 #include "Document.h"
 #include "Page.h"
 #include "RenderObject.h"

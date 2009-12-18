@@ -24,6 +24,7 @@
 #include "config.h"
 #include "Navigator.h"
 
+#include "Chrome.h"
 #include "CookieJar.h"
 #include "ExceptionCode.h"
 #include "Frame.h"

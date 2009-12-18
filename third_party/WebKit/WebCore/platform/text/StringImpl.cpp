@@ -35,6 +35,7 @@
 #include "TextBreakIterator.h"
 #include "TextEncoding.h"
 #include "ThreadGlobalData.h"
+#include <runtime/UString.h>
 #include <wtf/dtoa.h>
 #include <wtf/Assertions.h>
 #include <wtf/Threading.h>

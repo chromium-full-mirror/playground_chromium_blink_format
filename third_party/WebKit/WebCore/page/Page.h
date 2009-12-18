@@ -22,14 +22,11 @@
 #ifndef Page_h
 #define Page_h
 
-#include "BackForwardList.h"
-#include "Chrome.h"
-#include "ContextMenuController.h"
 #include "FrameLoaderTypes.h"
-#include "LinkHash.h"
 #include "PlatformString.h"
+#include <wtf/Forward.h>
 #include <wtf/HashSet.h>
-#include <wtf/OwnPtr.h>
+#include <wtf/Noncopyable.h>
 
 #if PLATFORM(MAC)
 #include "SchedulePair.h"
@@ -46,6 +43,7 @@ class Debugger;
 
 namespace WebCore {
 
+class BackForwardList;
 class Chrome;
 class ChromeClient;
 class ContextMenuClient;
@@ -59,6 +57,7 @@ class Frame;
 class GeolocationController;
 class GeolocationControllerClient;
 class HaltablePlugin;
+class HistoryItem;
 class InspectorClient;
 class InspectorController;
 class InspectorTimelineAgent;
@@ -82,6 +81,8 @@ class WMLPageState;
 #if ENABLE(NOTIFICATIONS)
 class NotificationPresenter;
 #endif
+
+typedef uint64_t LinkHash;
 
 enum FindDirection { FindDirectionForward, FindDirectionBackward };
 

@@ -32,6 +32,7 @@
 #include "config.h"
 #include "HistoryController.h"
 
+#include "BackForwardList.h"
 #include "CachedPage.h"
 #include "CString.h"
 #include "DocumentLoader.h"

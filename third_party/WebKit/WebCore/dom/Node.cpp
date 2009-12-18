@@ -39,6 +39,7 @@
 #include "CString.h"
 #include "ChildNodeList.h"
 #include "ClassNodeList.h"
+#include "ContextMenuController.h"
 #include "DOMImplementation.h"
 #include "Document.h"
 #include "DynamicNodeList.h"
