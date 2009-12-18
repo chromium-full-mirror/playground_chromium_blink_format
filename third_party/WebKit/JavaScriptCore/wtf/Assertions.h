@@ -192,8 +192,10 @@ void WTFLogVerbose(const char* file,
 #if ASSERT_DISABLED
 
 #define ASSERT(assertion) ((void)0)
-#if COMPILER(MSVC7) || COMPILER(WINSCW)
+#if COMPILER(MSVC7)
 #define ASSERT_WITH_MESSAGE(assertion) ((void)0)
+#elif COMPILER(WINSCW)
+#define ASSERT_WITH_MESSAGE(assertion, arg...) ((void)0)
 #else
 #define ASSERT_WITH_MESSAGE(assertion, ...) ((void)0)
 #endif /* COMPILER(MSVC7) */
@@ -210,8 +212,10 @@ void WTFLogVerbose(const char* file,
       CRASH();                                                           \
     }                                                                    \
   while (0)
-#if COMPILER(MSVC7) || COMPILER(WINSCW)
+#if COMPILER(MSVC7)
 #define ASSERT_WITH_MESSAGE(assertion) ((void)0)
+#elif COMPILER(WINSCW)
+#define ASSERT_WITH_MESSAGE(assertion, arg...) ((void)0)
 #else
 #define ASSERT_WITH_MESSAGE(assertion, ...)                                  \
   do                                                                         \
@@ -274,8 +278,10 @@ void WTFLogVerbose(const char* file,
 
 #if ERROR_DISABLED && !COMPILER(MSVC7) && !COMPILER(WINSCW)
 #define LOG_ERROR(...) ((void)0)
-#elif COMPILER(MSVC7) || COMPILER(WINSCW)
+#elif COMPILER(MSVC7)
 #define LOG_ERROR() ((void)0)
+#elif COMPILER(WINSCW)
+#define LOG_ERROR(arg...) ((void)0)
 #else
 #define LOG_ERROR(...) \
   WTFReportError(__FILE__, __LINE__, WTF_PRETTY_FUNCTION, __VA_ARGS__)
@@ -285,8 +291,10 @@ void WTFLogVerbose(const char* file,
 
 #if LOG_DISABLED && !COMPILER(MSVC7) && !COMPILER(WINSCW)
 #define LOG(channel, ...) ((void)0)
-#elif COMPILER(MSVC7) || COMPILER(WINSCW)
+#elif COMPILER(MSVC7)
 #define LOG() ((void)0)
+#elif COMPILER(WINSCW)
+#define LOG(arg...) ((void)0)
 #else
 #define LOG(channel, ...)                                            \
   WTFLog(&JOIN_LOG_CHANNEL_WITH_PREFIX(LOG_CHANNEL_PREFIX, channel), \
@@ -300,8 +308,10 @@ void WTFLogVerbose(const char* file,
 
 #if LOG_DISABLED && !COMPILER(MSVC7) && !COMPILER(WINSCW)
 #define LOG_VERBOSE(channel, ...) ((void)0)
-#elif COMPILER(MSVC7) || COMPILER(WINSCW)
+#elif COMPILER(MSVC7)
 #define LOG_VERBOSE(channel) ((void)0)
+#elif COMPILER(WINSCW)
+#define LOG_VERBOSE(channel, arg...) ((void)0)
 #else
 #define LOG_VERBOSE(channel, ...)                                           \
   WTFLogVerbose(__FILE__, __LINE__, WTF_PRETTY_FUNCTION,                    \
