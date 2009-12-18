@@ -33,6 +33,7 @@
 
 #include "PlatformString.h"
 #include <runtime/UString.h>
+#include <runtime/StringBuilder.h>
 
 namespace WebCore {
 
@@ -55,7 +56,10 @@ class ScriptString {
   }
 
   ScriptString& operator+=(const String& s) {
-    m_str += s;
+    JSC::StringBuilder buffer;
+    buffer.append(m_str);
+    buffer.append(s);
+    m_str = buffer.release();
     return *this;
   }
 
