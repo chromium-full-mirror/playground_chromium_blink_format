@@ -52,7 +52,7 @@ class PageGroup;
 class JavaScriptCallFrame;
 class JavaScriptDebugListener;
 
-class JavaScriptDebugServer : JSC::Debugger {
+class JavaScriptDebugServer : JSC::Debugger, public Noncopyable {
  public:
   static JavaScriptDebugServer& shared();
 

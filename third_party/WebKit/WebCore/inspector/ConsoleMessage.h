@@ -42,7 +42,7 @@ class InspectorFrontend;
 class ScriptCallStack;
 class ScriptString;
 
-class ConsoleMessage {
+class ConsoleMessage : public Noncopyable {
  public:
   ConsoleMessage(MessageSource,
                  MessageType,
