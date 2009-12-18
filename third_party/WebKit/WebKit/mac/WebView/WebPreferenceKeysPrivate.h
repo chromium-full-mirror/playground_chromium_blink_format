@@ -117,6 +117,8 @@
 #define WebKitShowDebugBordersPreferenceKey @"WebKitShowDebugBorders"
 #define WebKitShowRepaintCounterPreferenceKey @"WebKitShowRepaintCounter"
 #define WebKitWebGLEnabledPreferenceKey @"WebKitWebGLEnabled"
+#define WebKitUsesProxiedOpenPanelPreferenceKey \
+  @"WebKitUsesProxiedOpenPanelPreferenceKey"
 #define WebKitPluginAllowedRunTimePreferenceKey @"WebKitPluginAllowedRunTime"
 
 // These are private both because callers should be using the cover methods and
