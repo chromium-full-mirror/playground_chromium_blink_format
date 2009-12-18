@@ -596,7 +596,7 @@ static bool executeInsertHorizontalRule(Frame* frame,
                                         const String& value) {
   RefPtr<HTMLHRElement> hr = new HTMLHRElement(hrTag, frame->document());
   if (!value.isEmpty())
-    hr->setAttribute(idAttr, value);
+    hr->setAttribute(hr->idAttributeName(), value);
   return executeInsertNode(frame, hr.release());
 }
 

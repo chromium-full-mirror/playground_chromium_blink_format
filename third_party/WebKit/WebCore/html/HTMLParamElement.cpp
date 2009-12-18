@@ -39,7 +39,7 @@ HTMLParamElement::HTMLParamElement(const QualifiedName& tagName, Document* doc)
 HTMLParamElement::~HTMLParamElement() {}
 
 void HTMLParamElement::parseMappedAttribute(MappedAttribute* attr) {
-  if (attr->name() == idAttr) {
+  if (attr->name() == idAttributeName()) {
     // Must call base class so that hasID bit gets set.
     HTMLElement::parseMappedAttribute(attr);
     if (document()->isHTMLDocument())

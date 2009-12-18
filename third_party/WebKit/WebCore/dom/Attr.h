@@ -54,6 +54,8 @@ class Attr : public ContainerNode {
   Attribute* attr() const { return m_attribute.get(); }
   const QualifiedName& qualifiedName() const { return m_attribute->name(); }
 
+  bool isId() const;
+
   // An extension to get presentational information for attributes.
   CSSStyleDeclaration* style() { return m_attribute->style(); }
 

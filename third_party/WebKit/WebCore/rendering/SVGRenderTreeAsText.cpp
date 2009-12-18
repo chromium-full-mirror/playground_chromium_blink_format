@@ -529,7 +529,7 @@ void writeRenderResources(TextStream& ts, Node* parent) {
     if (!resource)
       continue;
 
-    String elementId = svgElement->getAttribute(HTMLNames::idAttr);
+    String elementId = svgElement->getAttribute(svgElement->idAttributeName());
     // FIXME: These names are lies!
     if (resource->isPaintServer()) {
       RefPtr<SVGPaintServer> paintServer =

@@ -265,7 +265,7 @@ bool HTMLCollection::checkForNameMatch(Element* element,
 
   HTMLElement* e = static_cast<HTMLElement*>(element);
   if (!checkName)
-    return e->getAttribute(idAttr) == name;
+    return e->getAttribute(e->idAttributeName()) == name;
 
   // document.all returns only images, forms, applets, objects and embeds
   // by name (though everything by id)
@@ -276,7 +276,8 @@ bool HTMLCollection::checkForNameMatch(Element* element,
         e->hasLocalName(selectTag)))
     return false;
 
-  return e->getAttribute(nameAttr) == name && e->getAttribute(idAttr) != name;
+  return e->getAttribute(nameAttr) == name &&
+         e->getAttribute(e->idAttributeName()) != name;
 }
 
 Node* HTMLCollection::namedItem(const AtomicString& name) const {
@@ -316,7 +317,7 @@ void HTMLCollection::updateNameCache() const {
     if (!element->isHTMLElement())
       continue;
     HTMLElement* e = static_cast<HTMLElement*>(element);
-    const AtomicString& idAttrVal = e->getAttribute(idAttr);
+    const AtomicString& idAttrVal = e->getAttribute(e->idAttributeName());
     const AtomicString& nameAttrVal = e->getAttribute(nameAttr);
     if (!idAttrVal.isEmpty()) {
       // add to id cache

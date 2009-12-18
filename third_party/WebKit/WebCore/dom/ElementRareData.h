@@ -27,6 +27,8 @@
 
 namespace WebCore {
 
+using namespace HTMLNames;
+
 class ElementRareData : public NodeRareData {
  public:
   ElementRareData();
@@ -38,6 +40,7 @@ class ElementRareData : public NodeRareData {
 
   IntSize m_minimumSizeForResizing;
   RefPtr<RenderStyle> m_computedStyle;
+  QualifiedName m_idAttributeName;
 };
 
 inline IntSize defaultMinimumSizeForResizing() {
@@ -45,7 +48,8 @@ inline IntSize defaultMinimumSizeForResizing() {
 }
 
 inline ElementRareData::ElementRareData()
-    : m_minimumSizeForResizing(defaultMinimumSizeForResizing()) {}
+    : m_minimumSizeForResizing(defaultMinimumSizeForResizing()),
+      m_idAttributeName(idAttr) {}
 
 inline void ElementRareData::resetComputedStyle() {
   m_computedStyle.clear();

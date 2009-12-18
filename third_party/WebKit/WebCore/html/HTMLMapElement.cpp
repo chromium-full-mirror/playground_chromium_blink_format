@@ -77,9 +77,9 @@ bool HTMLMapElement::mapMouseEvent(int x,
 
 void HTMLMapElement::parseMappedAttribute(MappedAttribute* attr) {
   const QualifiedName& attrName = attr->name();
-  if (attrName == idAttr || attrName == nameAttr) {
+  if (attrName == idAttributeName() || attrName == nameAttr) {
     Document* doc = document();
-    if (attrName == idAttr) {
+    if (attrName == idAttributeName()) {
       // Call base class so that hasID bit gets set.
       HTMLElement::parseMappedAttribute(attr);
       if (doc->isHTMLDocument())

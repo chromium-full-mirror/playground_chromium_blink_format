@@ -108,7 +108,7 @@ void HTMLFrameElementBase::openURL() {
 void HTMLFrameElementBase::parseMappedAttribute(MappedAttribute* attr) {
   if (attr->name() == srcAttr)
     setLocation(deprecatedParseURL(attr->value()));
-  else if (attr->name() == idAttr) {
+  else if (attr->name() == idAttributeName()) {
     // Important to call through to base for the id attribute so the hasID bit
     // gets set.
     HTMLFrameOwnerElement::parseMappedAttribute(attr);
@@ -157,7 +157,7 @@ void HTMLFrameElementBase::parseMappedAttribute(MappedAttribute* attr) {
 void HTMLFrameElementBase::setNameAndOpenURL() {
   m_frameName = getAttribute(nameAttr);
   if (m_frameName.isNull())
-    m_frameName = getAttribute(idAttr);
+    m_frameName = getAttribute(idAttributeName());
 
   if (Frame* parentFrame = document()->frame())
     m_frameName = parentFrame->tree()->uniqueChildName(m_frameName);

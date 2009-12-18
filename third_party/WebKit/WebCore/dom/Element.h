@@ -27,6 +27,7 @@
 #define Element_h
 
 #include "ContainerNode.h"
+#include "HTMLNames.h"
 #include "QualifiedName.h"
 #include "ScrollTypes.h"
 
@@ -120,6 +121,8 @@ class Element : public ContainerNode {
                       const AtomicString& qualifiedName,
                       const AtomicString& value,
                       ExceptionCode&);
+
+  const QualifiedName& idAttributeName() const;
 
   void scrollIntoView(bool alignToTop = true);
   void scrollIntoViewIfNeeded(bool centerIfNeeded = true);
@@ -308,6 +311,7 @@ class Element : public ContainerNode {
 
   virtual PassRefPtr<Attribute> createAttribute(const QualifiedName&,
                                                 const AtomicString& value);
+  const QualifiedName& rareIDAttributeName() const;
 
 #ifndef NDEBUG
   virtual void formatForDebugger(char* buffer, unsigned length) const;
@@ -363,6 +367,10 @@ inline NamedNodeMap* Node::attributes() const {
 inline Element* Node::parentElement() const {
   Node* parent = parentNode();
   return parent && parent->isElementNode() ? static_cast<Element*>(parent) : 0;
+}
+
+inline const QualifiedName& Element::idAttributeName() const {
+  return hasRareData() ? rareIDAttributeName() : HTMLNames::idAttr;
 }
 
 }  // namespace

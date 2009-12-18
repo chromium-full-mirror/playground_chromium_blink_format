@@ -517,7 +517,7 @@ void Element::setAttribute(const AtomicString& name,
 
   document()->incDOMTreeVersion();
 
-  if (localName == idAttr.localName())
+  if (localName == idAttributeName().localName())
     updateId(old ? old->value() : nullAtom, value);
 
   if (old && value.isNull())
@@ -539,7 +539,7 @@ void Element::setAttribute(const QualifiedName& name,
   // allocate attributemap if necessary
   Attribute* old = attributes(false)->getAttributeItem(name);
 
-  if (name == idAttr)
+  if (name == idAttributeName())
     updateId(old ? old->value() : nullAtom, value);
 
   if (old && value.isNull())
@@ -596,8 +596,9 @@ void Element::setAttributeMap(PassRefPtr<NamedNodeMap> list) {
   // If setting the whole map changes the id attribute, we need to call
   // updateId.
 
-  Attribute* oldId = namedAttrMap ? namedAttrMap->getAttributeItem(idAttr) : 0;
-  Attribute* newId = list ? list->getAttributeItem(idAttr) : 0;
+  const QualifiedName& idName = idAttributeName();
+  Attribute* oldId = namedAttrMap ? namedAttrMap->getAttributeItem(idName) : 0;
+  Attribute* newId = list ? list->getAttributeItem(idName) : 0;
 
   if (oldId || newId)
     updateId(oldId ? oldId->value() : nullAtom,
@@ -694,7 +695,7 @@ void Element::insertedIntoDocument() {
 
   if (hasID()) {
     if (NamedNodeMap* attrs = namedAttrMap.get()) {
-      Attribute* idItem = attrs->getAttributeItem(idAttr);
+      Attribute* idItem = attrs->getAttributeItem(idAttributeName());
       if (idItem && !idItem->isNull())
         updateId(nullAtom, idItem->value());
     }
@@ -704,7 +705,7 @@ void Element::insertedIntoDocument() {
 void Element::removedFromDocument() {
   if (hasID()) {
     if (NamedNodeMap* attrs = namedAttrMap.get()) {
-      Attribute* idItem = attrs->getAttributeItem(idAttr);
+      Attribute* idItem = attrs->getAttributeItem(idAttributeName());
       if (idItem && !idItem->isNull())
         updateId(idItem->value(), nullAtom);
     }
@@ -1110,7 +1111,7 @@ void Element::formatForDebugger(char* buffer, unsigned length) const {
     result += s;
   }
 
-  s = getAttribute(idAttr);
+  s = getAttribute(idAttributeName());
   if (s.length() > 0) {
     if (result.length() > 0)
       result += "; ";
@@ -1460,6 +1461,10 @@ KURL Element::getURLAttribute(const QualifiedName& name) const {
   }
 #endif
   return document()->completeURL(deprecatedParseURL(getAttribute(name)));
+}
+
+const QualifiedName& Element::rareIDAttributeName() const {
+  return rareData()->m_idAttributeName;
 }
 
 }  // namespace WebCore
