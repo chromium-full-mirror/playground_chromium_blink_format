@@ -31,10 +31,8 @@ using namespace std;
 namespace WebCore {
 
 SoupMessage* ResourceRequest::toSoupMessage() const {
-  KURL noFragment = url();
-  noFragment.removeFragmentIdentifier();
-  SoupMessage* soupMessage = soup_message_new(
-      httpMethod().utf8().data(), noFragment.string().utf8().data());
+  SoupMessage* soupMessage = soup_message_new(httpMethod().utf8().data(),
+                                              url().string().utf8().data());
   if (!soupMessage)
     return 0;
 
