@@ -3640,7 +3640,7 @@ void RenderLayer::styleChanged(StyleDifference diff, const RenderStyle*) {
   }
 
   if (renderer()->style()->overflowX() == OMARQUEE &&
-      renderer()->style()->marqueeBehavior() != MNONE) {
+      renderer()->style()->marqueeBehavior() != MNONE && renderer()->isBox()) {
     if (!m_marquee)
       m_marquee = new RenderMarquee(this);
     m_marquee->updateMarqueeStyle();
