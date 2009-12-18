@@ -446,9 +446,11 @@ class MainWindow : public QMainWindow {
     }
   }
 
+  void setTouchMocking(bool on) {
 #if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
-  void setTouchMocking(bool on) { touchMocking = on; }
+    touchMocking = on;
 #endif
+  }
 
  public slots:
 
