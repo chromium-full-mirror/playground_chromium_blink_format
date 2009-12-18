@@ -141,13 +141,14 @@ class ExecState : private Register {
   Instruction* returnPC() const { return this[RegisterFile::ReturnPC].vPC(); }
 
   void setCalleeArguments(JSValue arguments) {
-    this[RegisterFile::OptionalCalleeArguments] = arguments;
+    static_cast<Register*>(this)[RegisterFile::OptionalCalleeArguments] =
+        arguments;
   }
   void setCallerFrame(CallFrame* callerFrame) {
-    this[RegisterFile::CallerFrame] = callerFrame;
+    static_cast<Register*>(this)[RegisterFile::CallerFrame] = callerFrame;
   }
   void setScopeChain(ScopeChainNode* scopeChain) {
-    this[RegisterFile::ScopeChain] = scopeChain;
+    static_cast<Register*>(this)[RegisterFile::ScopeChain] = scopeChain;
   }
 
   ALWAYS_INLINE void init(CodeBlock* codeBlock,
@@ -163,10 +164,10 @@ class ExecState : private Register {
     setCodeBlock(codeBlock);
     setScopeChain(scopeChain);
     setCallerFrame(callerFrame);
-    this[RegisterFile::ReturnPC] = vPC;  // This is either an Instruction* or a
-                                         // pointer into JIT generated code
-                                         // stored as an Instruction*.
-    this[RegisterFile::ReturnValueRegister] =
+    static_cast<Register*>(this)[RegisterFile::ReturnPC] =
+        vPC;  // This is either an Instruction* or a pointer into JIT generated
+              // code stored as an Instruction*.
+    static_cast<Register*>(this)[RegisterFile::ReturnValueRegister] =
         Register::withInt(returnValueRegister);
     setArgumentCount(argc);  // original argument count (for the sake of the
                              // "arguments" object)
@@ -198,11 +199,14 @@ class ExecState : private Register {
 
  private:
   void setArgumentCount(int count) {
-    this[RegisterFile::ArgumentCount] = Register::withInt(count);
+    static_cast<Register*>(this)[RegisterFile::ArgumentCount] =
+        Register::withInt(count);
   }
-  void setCallee(JSFunction* callee) { this[RegisterFile::Callee] = callee; }
+  void setCallee(JSFunction* callee) {
+    static_cast<Register*>(this)[RegisterFile::Callee] = callee;
+  }
   void setCodeBlock(CodeBlock* codeBlock) {
-    this[RegisterFile::CodeBlock] = codeBlock;
+    static_cast<Register*>(this)[RegisterFile::CodeBlock] = codeBlock;
   }
 
   static const intptr_t HostCallFrameFlag = 1;
