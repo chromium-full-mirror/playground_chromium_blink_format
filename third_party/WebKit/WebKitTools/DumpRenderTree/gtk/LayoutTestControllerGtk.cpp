@@ -87,6 +87,8 @@ static gchar* copyWebSettingKey(gchar* preferenceKey) {
                         g_strdup("default-font-size"));
     g_hash_table_insert(keyTable, g_strdup("WebKitEnableCaretBrowsing"),
                         g_strdup("enable-caret-browsing"));
+    g_hash_table_insert(keyTable, g_strdup("WebKitUsesPageCachePreferenceKey"),
+                        g_strdup("enable-page-cache"));
   }
 
   return g_strdup(
@@ -493,8 +495,11 @@ void LayoutTestController::overridePreference(JSStringRef key,
       g_object_set_property(G_OBJECT(settings), webSettingKey,
                             const_cast<GValue*>(&propValue));
     } else if (G_VALUE_HOLDS_BOOLEAN(&propValue)) {
+      char* lowered = g_utf8_strdown(strValue, -1);
       g_object_set(G_OBJECT(settings), webSettingKey,
-                   g_str_equal(g_utf8_strdown(strValue, -1), "true"), NULL);
+                   g_str_equal(lowered, "true") || g_str_equal(strValue, "1"),
+                   NULL);
+      g_free(lowered);
     } else if (G_VALUE_HOLDS_INT(&propValue)) {
       std::string str(strValue);
       std::stringstream ss(str);
