@@ -54,7 +54,7 @@ OpaqueJSClass::OpaqueJSClass(const JSClassDefinition* definition,
       callAsConstructor(definition->callAsConstructor),
       hasInstance(definition->hasInstance),
       convertToType(definition->convertToType),
-      m_className(UString::Rep::createFromUTF8(definition->className)),
+      m_className(UString::createFromUTF8(definition->className).rep()->ref()),
       m_staticValues(0),
       m_staticFunctions(0) {
   initializeThreading();
@@ -62,10 +62,11 @@ OpaqueJSClass::OpaqueJSClass(const JSClassDefinition* definition,
   if (const JSStaticValue* staticValue = definition->staticValues) {
     m_staticValues = new OpaqueJSClassStaticValuesTable();
     while (staticValue->name) {
-      m_staticValues->add(UString::Rep::createFromUTF8(staticValue->name),
-                          new StaticValueEntry(staticValue->getProperty,
-                                               staticValue->setProperty,
-                                               staticValue->attributes));
+      m_staticValues->add(
+          UString::createFromUTF8(staticValue->name).rep()->ref(),
+          new StaticValueEntry(staticValue->getProperty,
+                               staticValue->setProperty,
+                               staticValue->attributes));
       ++staticValue;
     }
   }
@@ -74,7 +75,7 @@ OpaqueJSClass::OpaqueJSClass(const JSClassDefinition* definition,
     m_staticFunctions = new OpaqueJSClassStaticFunctionsTable();
     while (staticFunction->name) {
       m_staticFunctions->add(
-          UString::Rep::createFromUTF8(staticFunction->name),
+          UString::createFromUTF8(staticFunction->name).rep()->ref(),
           new StaticFunctionEntry(staticFunction->callAsFunction,
                                   staticFunction->attributes));
       ++staticFunction;

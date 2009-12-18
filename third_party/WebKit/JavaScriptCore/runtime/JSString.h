@@ -109,7 +109,7 @@ class JSString : public JSCell {
       unsigned refAndGetLength() {
         if (isString()) {
           UString::Rep* rep = string();
-          return rep->ref()->len;
+          return rep->ref()->size();
         } else {
           Rope* r = rope();
           r->ref();
@@ -149,7 +149,7 @@ class JSString : public JSCell {
     void append(unsigned& index, const UString& string) {
       UString::Rep* rep = string.rep();
       m_fibers[index++] = Fiber(rep);
-      m_stringLength += rep->ref()->len;
+      m_stringLength += rep->ref()->size();
     }
     void append(unsigned& index, JSString* jsString) {
       if (jsString->isRope()) {
