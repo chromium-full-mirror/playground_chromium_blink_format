@@ -583,14 +583,14 @@ FontPlatformData* FontCache::createFontPlatformData(
 #if PLATFORM(CG)
   bool canCreateCGFontWithLOGFONT = wkCanCreateCGFontWithLOGFONT();
 #else
-  bool canCreateCGFontWIthLOGFONT = true;
+  bool canCreateCGFontWithLOGFONT = true;
 #endif
   LONG weight =
       adjustedGDIFontWeight(toGDIFontWeight(fontDescription.weight()), family);
   HFONT hfont =
       createGDIFont(family, weight, fontDescription.italic(),
                     fontDescription.computedPixelSize() * (useGDI ? 1 : 32),
-                    useGDI && canCreateCGFontWIthLOGFONT);
+                    useGDI && canCreateCGFontWithLOGFONT);
 
   if (!hfont)
     return 0;
