@@ -30,6 +30,8 @@
 #include "config.h"
 #include "Threading.h"
 
+#if ENABLE(SINGLE_THREADED)
+
 namespace WTF {
 
 void initializeThreading() {}
@@ -69,3 +71,5 @@ void lockAtomicallyInitializedStaticMutex() {}
 void unlockAtomicallyInitializedStaticMutex() {}
 
 }  // namespace WebCore
+
+#endif

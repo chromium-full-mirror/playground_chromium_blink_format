@@ -24,8 +24,9 @@
  */
 
 #include "config.h"
-
 #include "MarkStack.h"
+
+#if PLATFORM(WIN_OS)
 
 #include "windows.h"
 
@@ -46,3 +47,5 @@ void MarkStack::releaseStack(void* addr, size_t) {
   VirtualFree(addr, 0, MEM_RELEASE);
 }
 }
+
+#endif
