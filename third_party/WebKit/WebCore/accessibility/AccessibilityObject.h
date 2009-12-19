@@ -170,6 +170,7 @@ enum AccessibilityRole {
   TreeItemRole,
   DirectoryRole,
   EditableTextRole,
+  ListItemRole,
 
   // ARIA Grouping roles
   LandmarkApplicationRole,
