@@ -24,16 +24,15 @@
 #define RenderSVGImage_h
 
 #if ENABLE(SVG)
-
-#include "TransformationMatrix.h"
 #include "FloatRect.h"
 #include "RenderImage.h"
+#include "SVGPreserveAspectRatio.h"
 #include "SVGRenderSupport.h"
+#include "TransformationMatrix.h"
 
 namespace WebCore {
 
 class SVGImageElement;
-class SVGPreserveAspectRatio;
 
 class RenderSVGImage : public RenderImage, SVGRenderBase {
  public:
@@ -68,7 +67,7 @@ class RenderSVGImage : public RenderImage, SVGRenderBase {
   virtual void imageChanged(WrappedImagePtr, const IntRect* = 0);
   void adjustRectsForAspectRatio(FloatRect& destRect,
                                  FloatRect& srcRect,
-                                 SVGPreserveAspectRatio*);
+                                 const SVGPreserveAspectRatio&);
 
   virtual void layout();
   virtual void paint(PaintInfo&, int parentX, int parentY);

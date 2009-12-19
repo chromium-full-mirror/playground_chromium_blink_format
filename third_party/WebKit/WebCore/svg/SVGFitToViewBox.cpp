@@ -85,16 +85,15 @@ bool SVGFitToViewBox::parseViewBox(Document* doc,
 
 TransformationMatrix SVGFitToViewBox::viewBoxToViewTransform(
     const FloatRect& viewBoxRect,
-    SVGPreserveAspectRatio* preserveAspectRatio,
+    const SVGPreserveAspectRatio& preserveAspectRatio,
     float viewWidth,
     float viewHeight) {
-  ASSERT(preserveAspectRatio);
   if (!viewBoxRect.width() || !viewBoxRect.height())
     return TransformationMatrix();
 
-  return preserveAspectRatio->getCTM(viewBoxRect.x(), viewBoxRect.y(),
-                                     viewBoxRect.width(), viewBoxRect.height(),
-                                     0, 0, viewWidth, viewHeight);
+  return preserveAspectRatio.getCTM(viewBoxRect.x(), viewBoxRect.y(),
+                                    viewBoxRect.width(), viewBoxRect.height(),
+                                    0, 0, viewWidth, viewHeight);
 }
 
 bool SVGFitToViewBox::parseMappedAttribute(Document* document,
@@ -107,9 +106,7 @@ bool SVGFitToViewBox::parseMappedAttribute(Document* document,
       setViewBoxBaseValue(FloatRect(x, y, w, h));
     return true;
   } else if (attr->name() == SVGNames::preserveAspectRatioAttr) {
-    const UChar* c = attr->value().characters();
-    const UChar* end = c + attr->value().length();
-    preserveAspectRatioBaseValue()->parsePreserveAspectRatio(c, end);
+    SVGPreserveAspectRatio::parsePreserveAspectRatio(this, attr->value());
     return true;
   }
 

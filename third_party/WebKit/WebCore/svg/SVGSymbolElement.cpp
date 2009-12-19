@@ -36,9 +36,7 @@ SVGSymbolElement::SVGSymbolElement(const QualifiedName& tagName, Document* doc)
                                   SVGNames::externalResourcesRequiredAttr,
                                   false),
       m_viewBox(this, SVGNames::viewBoxAttr),
-      m_preserveAspectRatio(this,
-                            SVGNames::preserveAspectRatioAttr,
-                            SVGPreserveAspectRatio::create()) {}
+      m_preserveAspectRatio(this, SVGNames::preserveAspectRatioAttr) {}
 
 SVGSymbolElement::~SVGSymbolElement() {}
 

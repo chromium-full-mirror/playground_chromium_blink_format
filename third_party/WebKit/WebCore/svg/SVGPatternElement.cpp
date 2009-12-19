@@ -76,9 +76,7 @@ SVGPatternElement::SVGPatternElement(const QualifiedName& tagName,
                                   SVGNames::externalResourcesRequiredAttr,
                                   false),
       m_viewBox(this, SVGNames::viewBoxAttr),
-      m_preserveAspectRatio(this,
-                            SVGNames::preserveAspectRatioAttr,
-                            SVGPreserveAspectRatio::create()) {}
+      m_preserveAspectRatio(this, SVGNames::preserveAspectRatioAttr) {}
 
 SVGPatternElement::~SVGPatternElement() {}
 

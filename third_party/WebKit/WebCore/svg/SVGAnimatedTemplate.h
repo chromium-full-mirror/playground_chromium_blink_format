@@ -25,7 +25,9 @@
 #if ENABLE(SVG)
 #include "AtomicString.h"
 #include "FloatRect.h"
+#include "SVGAngle.h"
 #include "SVGLength.h"
+#include "SVGPreserveAspectRatio.h"
 #include <wtf/HashMap.h>
 
 namespace WebCore {
@@ -212,12 +214,32 @@ struct SVGAnimatedTypeValue<long> : Noncopyable {
 };
 
 template <>
+struct SVGAnimatedTypeValue<SVGAngle> : Noncopyable {
+  typedef SVGAngle StorableType;
+  typedef SVGAngle DecoratedType;
+
+  static SVGAngle null() { return SVGAngle(); }
+  static String toString(const SVGAngle& type) { return type.valueAsString(); }
+};
+
+template <>
 struct SVGAnimatedTypeValue<SVGLength> : Noncopyable {
   typedef SVGLength StorableType;
   typedef SVGLength DecoratedType;
 
   static SVGLength null() { return SVGLength(); }
   static String toString(const SVGLength& type) { return type.valueAsString(); }
+};
+
+template <>
+struct SVGAnimatedTypeValue<SVGPreserveAspectRatio> : Noncopyable {
+  typedef SVGPreserveAspectRatio StorableType;
+  typedef SVGPreserveAspectRatio DecoratedType;
+
+  static SVGPreserveAspectRatio null() { return SVGPreserveAspectRatio(); }
+  static String toString(const SVGPreserveAspectRatio& type) {
+    return type.valueAsString();
+  }
 };
 
 template <>
@@ -251,7 +273,7 @@ struct SVGAnimatedTypeValue<String> : Noncopyable {
 };
 
 // Common type definitions, to ease IDL generation.
-typedef SVGAnimatedTemplate<SVGAngle*> SVGAnimatedAngle;
+typedef SVGAnimatedTemplate<SVGAngle> SVGAnimatedAngle;
 typedef SVGAnimatedTemplate<bool> SVGAnimatedBoolean;
 typedef SVGAnimatedTemplate<int> SVGAnimatedEnumeration;
 typedef SVGAnimatedTemplate<long> SVGAnimatedInteger;
@@ -259,7 +281,7 @@ typedef SVGAnimatedTemplate<SVGLength> SVGAnimatedLength;
 typedef SVGAnimatedTemplate<SVGLengthList*> SVGAnimatedLengthList;
 typedef SVGAnimatedTemplate<float> SVGAnimatedNumber;
 typedef SVGAnimatedTemplate<SVGNumberList*> SVGAnimatedNumberList;
-typedef SVGAnimatedTemplate<SVGPreserveAspectRatio*>
+typedef SVGAnimatedTemplate<SVGPreserveAspectRatio>
     SVGAnimatedPreserveAspectRatio;
 typedef SVGAnimatedTemplate<FloatRect> SVGAnimatedRect;
 typedef SVGAnimatedTemplate<String> SVGAnimatedString;

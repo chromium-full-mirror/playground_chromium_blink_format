@@ -27,7 +27,6 @@
 #include "MappedAttribute.h"
 #include "PlatformString.h"
 #include "RenderSVGViewportContainer.h"
-#include "SVGAngle.h"
 #include "SVGFitToViewBox.h"
 #include "SVGLength.h"
 #include "SVGNames.h"
@@ -52,14 +51,12 @@ SVGMarkerElement::SVGMarkerElement(const QualifiedName& tagName, Document* doc)
                     SVGNames::markerUnitsAttr,
                     SVG_MARKERUNITS_STROKEWIDTH),
       m_orientType(this, SVGNames::orientAttr, SVG_MARKER_ORIENT_ANGLE),
-      m_orientAngle(this, SVGNames::orientAttr, SVGAngle::create()),
+      m_orientAngle(this, SVGNames::orientAttr),
       m_externalResourcesRequired(this,
                                   SVGNames::externalResourcesRequiredAttr,
                                   false),
       m_viewBox(this, SVGNames::viewBoxAttr),
-      m_preserveAspectRatio(this,
-                            SVGNames::preserveAspectRatioAttr,
-                            SVGPreserveAspectRatio::create()) {
+      m_preserveAspectRatio(this, SVGNames::preserveAspectRatioAttr) {
   // Spec: If the markerWidth/markerHeight attribute is not specified, the
   // effect is as if a value of "3" were specified.
 }
@@ -97,16 +94,16 @@ void SVGMarkerElement::parseMappedAttribute(MappedAttribute* attr) {
   else if (attr->name() == SVGNames::markerHeightAttr)
     setMarkerHeightBaseValue(SVGLength(LengthModeHeight, attr->value()));
   else if (attr->name() == SVGNames::orientAttr) {
-    RefPtr<SVGAngle> angle = SVGAngle::create();
+    SVGAngle angle;
 
     if (attr->value() == "auto")
       setOrientTypeBaseValue(SVG_MARKER_ORIENT_AUTO);
     else {
-      angle->setValueAsString(attr->value());
+      angle.setValueAsString(attr->value());
       setOrientTypeBaseValue(SVG_MARKER_ORIENT_ANGLE);
     }
 
-    setOrientAngleBaseValue(angle.get());
+    setOrientAngleBaseValue(angle);
   } else {
     if (SVGLangSpace::parseMappedAttribute(attr))
       return;
@@ -158,9 +155,7 @@ void SVGMarkerElement::childrenChanged(bool changedByParser,
 
 void SVGMarkerElement::setOrientToAuto() {
   setOrientTypeBaseValue(SVG_MARKER_ORIENT_AUTO);
-
-  RefPtr<SVGAngle> angle = SVGAngle::create();
-  setOrientAngleBaseValue(angle.get());
+  setOrientAngleBaseValue(SVGAngle());
 
   if (!m_marker)
     return;
@@ -171,9 +166,9 @@ void SVGMarkerElement::setOrientToAuto() {
   m_marker->invalidate();
 }
 
-void SVGMarkerElement::setOrientToAngle(PassRefPtr<SVGAngle> angle) {
+void SVGMarkerElement::setOrientToAngle(const SVGAngle& angle) {
   setOrientTypeBaseValue(SVG_MARKER_ORIENT_ANGLE);
-  setOrientAngleBaseValue(angle.get());
+  setOrientAngleBaseValue(angle);
 
   if (!m_marker)
     return;
@@ -190,10 +185,9 @@ SVGResource* SVGMarkerElement::canvasResource() {
 
   m_marker->setMarker(toRenderSVGViewportContainer(renderer()));
 
-  if (orientType() == SVG_MARKER_ORIENT_ANGLE) {
-    if (orientAngle())
-      m_marker->setAngle(orientAngle()->value());
-  } else
+  if (orientType() == SVG_MARKER_ORIENT_ANGLE)
+    m_marker->setAngle(orientAngle().value());
+  else
     m_marker->setAutoAngle();
 
   m_marker->setRef(refX().value(this), refY().value(this));

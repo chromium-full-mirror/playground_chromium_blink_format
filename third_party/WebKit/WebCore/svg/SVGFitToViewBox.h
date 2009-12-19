@@ -46,21 +46,17 @@ class SVGFitToViewBox {
                     bool validate = true);
   static TransformationMatrix viewBoxToViewTransform(
       const FloatRect& viewBoxRect,
-      SVGPreserveAspectRatio*,
+      const SVGPreserveAspectRatio&,
       float viewWidth,
       float viewHeight);
 
   bool parseMappedAttribute(Document*, MappedAttribute*);
   bool isKnownAttribute(const QualifiedName&);
 
- protected:
-  virtual SVGAnimatedTypeValue<FloatRect>::DecoratedType viewBoxBaseValue()
-      const = 0;
   virtual void setViewBoxBaseValue(
-      SVGAnimatedTypeValue<FloatRect>::DecoratedType type) = 0;
-
-  virtual SVGAnimatedTypeValue<SVGPreserveAspectRatio>::DecoratedType
-  preserveAspectRatioBaseValue() const = 0;
+      SVGAnimatedTypeValue<FloatRect>::DecoratedType) = 0;
+  virtual void setPreserveAspectRatioBaseValue(
+      SVGAnimatedTypeValue<SVGPreserveAspectRatio>::DecoratedType) = 0;
 };
 
 }  // namespace WebCore

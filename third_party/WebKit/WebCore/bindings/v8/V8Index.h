@@ -511,7 +511,6 @@ typedef v8::Persistent<v8::FunctionTemplate> (*FunctionTemplateFactory)();
 #if ENABLE(SVG)
 // SVG_OBJECT_TYPES are svg non-node, non-pod types.
 #define SVG_OBJECT_TYPES(V)                                                   \
-  V(SVGANGLE, SVGAngle)                                                       \
   V(SVGANIMATEDANGLE, SVGAnimatedAngle)                                       \
   V(SVGANIMATEDBOOLEAN, SVGAnimatedBoolean)                                   \
   V(SVGANIMATEDENUMERATION, SVGAnimatedEnumeration)                           \
@@ -553,7 +552,6 @@ typedef v8::Persistent<v8::FunctionTemplate> (*FunctionTemplateFactory)();
   V(SVGPATHSEGMOVETOABS, SVGPathSegMovetoAbs)                                 \
   V(SVGPATHSEGMOVETOREL, SVGPathSegMovetoRel)                                 \
   V(SVGPOINTLIST, SVGPointList)                                               \
-  V(SVGPRESERVEASPECTRATIO, SVGPreserveAspectRatio)                           \
   V(SVGRENDERINGINTENT, SVGRenderingIntent)                                   \
   V(SVGSTRINGLIST, SVGStringList)                                             \
   V(SVGTRANSFORMLIST, SVGTransformList)                                       \
@@ -561,21 +559,25 @@ typedef v8::Persistent<v8::FunctionTemplate> (*FunctionTemplateFactory)();
   V(SVGZOOMEVENT, SVGZoomEvent)
 
 // SVG POD types should list all types whose IDL has PODType declaration.
-#define SVG_POD_TYPES(V)        \
-  V(SVGLENGTH, SVGLength)       \
-  V(SVGTRANSFORM, SVGTransform) \
-  V(SVGMATRIX, SVGMatrix)       \
-  V(SVGNUMBER, SVGNumber)       \
-  V(SVGPOINT, SVGPoint)         \
+#define SVG_POD_TYPES(V)                            \
+  V(SVGANGLE, SVGAngle)                             \
+  V(SVGLENGTH, SVGLength)                           \
+  V(SVGPRESERVEASPECTRATIO, SVGPreserveAspectRatio) \
+  V(SVGTRANSFORM, SVGTransform)                     \
+  V(SVGMATRIX, SVGMatrix)                           \
+  V(SVGNUMBER, SVGNumber)                           \
+  V(SVGPOINT, SVGPoint)                             \
   V(SVGRECT, SVGRect)
 
 // POD types can have different implementation names, see CodeGenerateV8.pm.
-#define SVG_POD_NATIVE_TYPES(V)      \
-  V(SVGLENGTH, SVGLength)            \
-  V(SVGTRANSFORM, SVGTransform)      \
-  V(SVGMATRIX, TransformationMatrix) \
-  V(SVGNUMBER, float)                \
-  V(SVGPOINT, FloatPoint)            \
+#define SVG_POD_NATIVE_TYPES(V)                     \
+  V(SVGANGLE, SVGAngle)                             \
+  V(SVGLENGTH, SVGLength)                           \
+  V(SVGPRESERVEASPECTRATIO, SVGPreserveAspectRatio) \
+  V(SVGTRANSFORM, SVGTransform)                     \
+  V(SVGMATRIX, TransformationMatrix)                \
+  V(SVGNUMBER, float)                               \
+  V(SVGPOINT, FloatPoint)                           \
   V(SVGRECT, FloatRect)
 
 // Shouldn't generate code for these two types.

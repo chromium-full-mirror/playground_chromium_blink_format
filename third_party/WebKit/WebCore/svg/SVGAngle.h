@@ -29,9 +29,9 @@ namespace WebCore {
 
 class SVGStyledElement;
 
-class SVGAngle : public RefCounted<SVGAngle> {
+class SVGAngle {
  public:
-  static PassRefPtr<SVGAngle> create() { return adoptRef(new SVGAngle); }
+  SVGAngle();
   virtual ~SVGAngle();
 
   enum SVGAngleType {
@@ -64,8 +64,6 @@ class SVGAngle : public RefCounted<SVGAngle> {
   }
 
  private:
-  SVGAngle();
-
   SVGAngleType m_unitType;
   float m_value;
   float m_valueInSpecifiedUnits;
