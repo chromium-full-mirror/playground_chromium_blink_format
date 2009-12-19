@@ -148,14 +148,12 @@ void SVGRenderBase::prepareToRenderSVGContent(
   SVGResourceClipper* clipper = getClipperById(document, clipperId);
   SVGResourceMasker* masker = getMaskerById(document, maskerId);
 
-#if ENABLE(FILTERS)
-  if (filter) {
-    filter->addClient(styledElement);
-    filter->prepareFilter(paintInfo.context, object);
-  } else if (!filterId.isEmpty())
+  if (masker) {
+    masker->addClient(styledElement);
+    masker->applyMask(paintInfo.context, boundingBox);
+  } else if (!maskerId.isEmpty())
     svgElement->document()->accessSVGExtensions()->addPendingResource(
-        filterId, styledElement);
-#endif
+        maskerId, styledElement);
 
   if (clipper) {
     clipper->addClient(styledElement);
@@ -164,12 +162,14 @@ void SVGRenderBase::prepareToRenderSVGContent(
     svgElement->document()->accessSVGExtensions()->addPendingResource(
         clipperId, styledElement);
 
-  if (masker) {
-    masker->addClient(styledElement);
-    masker->applyMask(paintInfo.context, boundingBox);
-  } else if (!maskerId.isEmpty())
+#if ENABLE(FILTERS)
+  if (filter) {
+    filter->addClient(styledElement);
+    filter->prepareFilter(paintInfo.context, object);
+  } else if (!filterId.isEmpty())
     svgElement->document()->accessSVGExtensions()->addPendingResource(
-        maskerId, styledElement);
+        filterId, styledElement);
+#endif
 }
 
 void SVGRenderBase::finishRenderSVGContent(RenderObject* object,
