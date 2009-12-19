@@ -3146,7 +3146,7 @@ AccessibilityRole AccessibilityRenderObject::roleValueForMSAA() const {
   m_roleForMSAA = msaaRoleForRenderer(m_renderer);
 
   if (m_roleForMSAA == UnknownRole)
-    m_roleForMSAA = m_role;
+    m_roleForMSAA = roleValue();
 
   return m_roleForMSAA;
 }
