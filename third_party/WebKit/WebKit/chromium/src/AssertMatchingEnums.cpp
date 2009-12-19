@@ -142,6 +142,7 @@ COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleTreeItemRole, TreeItemRole);
 COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleDirectory, DirectoryRole);
 COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleEditableText,
                              EditableTextRole);
+COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleListItem, ListItemRole);
 COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleLandmarkApplication,
                              LandmarkApplicationRole);
 COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleLandmarkBanner,
