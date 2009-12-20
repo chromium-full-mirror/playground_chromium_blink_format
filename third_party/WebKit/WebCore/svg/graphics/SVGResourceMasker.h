@@ -65,7 +65,6 @@ class SVGResourceMasker : public SVGResource {
 
   OwnPtr<ImageBuffer> m_mask;
   FloatRect m_maskRect;
-  IntRect m_paintRect;
 };
 
 SVGResourceMasker* getMaskerById(Document*, const AtomicString&);
