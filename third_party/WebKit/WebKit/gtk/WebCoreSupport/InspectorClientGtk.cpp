@@ -41,13 +41,8 @@ InspectorClient::InspectorClient(WebKitWebView* webView)
     : m_webView(0), m_inspectedWebView(webView), m_webInspector(0) {}
 
 void InspectorClient::inspectorDestroyed() {
-  if (m_webView) {
-    gboolean handled = FALSE;
-    g_signal_emit_by_name(m_webInspector, "destroy", &handled);
-
-    /* we can now dispose our own reference */
+  if (m_webInspector)
     g_object_unref(m_webInspector);
-  }
 
   delete this;
 }
@@ -60,6 +55,7 @@ void InspectorClient::webViewDestroyed() {
   // something else, and the inspector will be referenced again,
   // there.
   g_object_unref(m_webInspector);
+  m_webInspector = 0;
 }
 
 Page* InspectorClient::createPage() {
