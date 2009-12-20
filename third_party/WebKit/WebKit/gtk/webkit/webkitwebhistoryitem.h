@@ -88,6 +88,9 @@ WEBKIT_API G_CONST_RETURN gchar* webkit_web_history_item_get_original_uri(
 WEBKIT_API gdouble webkit_web_history_item_get_last_visited_time(
     WebKitWebHistoryItem* web_history_item);
 
+WEBKIT_API WebKitWebHistoryItem* webkit_web_history_item_copy(
+    WebKitWebHistoryItem* web_history_item);
+
 G_END_DECLS
 
 #endif /* webkitwebhistoryitem_h */
