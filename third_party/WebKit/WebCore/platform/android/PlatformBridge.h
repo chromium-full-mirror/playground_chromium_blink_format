@@ -52,6 +52,10 @@ class PlatformBridge {
   static String getSignedPublicKeyAndChallengeString(unsigned index,
                                                      const String& challenge,
                                                      const KURL&);
+  // Cookies
+  static void setCookies(const KURL&, const String& value);
+  static String cookies(const KURL&);
+  static bool cookiesEnabled();
 };
 }
 #endif  // PlatformBridge_h
