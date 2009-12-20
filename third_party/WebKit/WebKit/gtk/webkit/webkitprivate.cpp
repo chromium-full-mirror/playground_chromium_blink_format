@@ -242,7 +242,7 @@ void webkit_init() {
   // (Research indicates that value / page drops substantially after 3 pages.)
   // FIXME: Expose this with an API and/or calculate based on available
   // resources
-  WebCore::pageCache()->setCapacity(3);
+  webkit_set_cache_model(WEBKIT_CACHE_MODEL_WEB_BROWSER);
 
 #if ENABLE(DATABASE)
   gchar* databaseDirectory =
