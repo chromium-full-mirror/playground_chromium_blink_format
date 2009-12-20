@@ -691,7 +691,7 @@ static void webkit_web_settings_class_init(WebKitWebSettingsClass* klass) {
   g_object_class_install_property(
       gobject_class, PROP_ENABLE_PAGE_CACHE,
       g_param_spec_boolean("enable-page-cache", _("Enable page cache"),
-                           _("Whether the page cache should be used"), TRUE,
+                           _("Whether the page cache should be used"), FALSE,
                            flags));
 
   g_type_class_add_private(klass, sizeof(WebKitWebSettingsPrivate));
