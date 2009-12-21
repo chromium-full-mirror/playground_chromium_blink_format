@@ -24,6 +24,7 @@
 #if ENABLE(WML)
 #include "WMLDocument.h"
 
+#include "BackForwardList.h"
 #include "Frame.h"
 #include "Page.h"
 #include "Tokenizer.h"
