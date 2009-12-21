@@ -199,6 +199,10 @@ v8::Handle<v8::Value> v8StringOrUndefined(const String& str);
 
 v8::Handle<v8::Value> v8StringOrFalse(const String& str);
 
+double toWebCoreDate(v8::Handle<v8::Value> object);
+
+v8::Handle<v8::Value> v8DateOrNull(double value);
+
 v8::Persistent<v8::FunctionTemplate> createRawTemplate();
 
 struct BatchedAttribute;

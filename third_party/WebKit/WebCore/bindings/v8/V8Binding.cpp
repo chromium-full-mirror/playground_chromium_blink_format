@@ -226,6 +226,18 @@ v8::Handle<v8::Value> v8StringOrFalse(const String& str) {
                       : v8::Handle<v8::Value>(v8String(str));
 }
 
+double toWebCoreDate(v8::Handle<v8::Value> object) {
+  return (object->IsDate() || object->IsNumber())
+             ? object->NumberValue()
+             : std::numeric_limits<double>::quiet_NaN();
+}
+
+v8::Handle<v8::Value> v8DateOrNull(double value) {
+  if (isfinite(value))
+    return v8::Date::New(value);
+  return v8::Null();
+}
+
 template <class S>
 struct StringTraits {
   static S fromStringResource(WebCoreStringResource* resource);
