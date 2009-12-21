@@ -2839,6 +2839,12 @@ bool CSSStyleSelector::SelectorChecker::checkOneSelector(
       case CSSSelector::PseudoResizer:
         dynamicPseudo = RESIZER;
         return true;
+      case CSSSelector::PseudoInnerSpinButton:
+        dynamicPseudo = INNER_SPIN_BUTTON;
+        return true;
+      case CSSSelector::PseudoOuterSpinButton:
+        dynamicPseudo = OUTER_SPIN_BUTTON;
+        return true;
       case CSSSelector::PseudoUnknown:
       case CSSSelector::PseudoNotParsed:
       default:

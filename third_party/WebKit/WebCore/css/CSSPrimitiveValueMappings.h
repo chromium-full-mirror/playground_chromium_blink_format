@@ -198,6 +198,9 @@ inline CSSPrimitiveValue::CSSPrimitiveValue(ControlPart e) : m_type(CSS_IDENT) {
     case DefaultButtonPart:
       m_value.ident = CSSValueDefaultButton;
       break;
+    case InnerSpinButtonPart:
+      m_value.ident = CSSValueInnerSpinButton;
+      break;
     case ListboxPart:
       m_value.ident = CSSValueListbox;
       break;
@@ -268,6 +271,9 @@ inline CSSPrimitiveValue::CSSPrimitiveValue(ControlPart e) : m_type(CSS_IDENT) {
       break;
     case MenulistTextFieldPart:
       m_value.ident = CSSValueMenulistTextfield;
+      break;
+    case OuterSpinButtonPart:
+      m_value.ident = CSSValueOuterSpinButton;
       break;
     case SliderHorizontalPart:
       m_value.ident = CSSValueSliderHorizontal;

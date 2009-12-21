@@ -178,7 +178,9 @@ class CSSSelector : public Noncopyable {
     PseudoMediaControlsReturnToRealtimeButton,
     PseudoMediaControlsStatusDisplay,
     PseudoMediaControlsFullscreenButton,
-    PseudoInputListButton
+    PseudoInputListButton,
+    PseudoInnerSpinButton,
+    PseudoOuterSpinButton,
   };
 
   PseudoType pseudoType() const {

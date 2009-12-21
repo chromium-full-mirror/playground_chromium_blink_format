@@ -38,6 +38,7 @@ enum ControlState {
   DefaultState = 1 << 6,
   WindowInactiveState = 1 << 7,
   IndeterminateState = 1 << 8,
+  SpinUpState = 1 << 9,  // Sub-state for HoverState and PressedState.
   AllStates = 0xffffffff
 };
 
@@ -53,6 +54,7 @@ enum ControlPart {
   ButtonPart,
   ButtonBevelPart,
   DefaultButtonPart,
+  InnerSpinButtonPart,
   ListButtonPart,
   ListboxPart,
   ListItemPart,
@@ -76,6 +78,7 @@ enum ControlPart {
   MenulistButtonPart,
   MenulistTextPart,
   MenulistTextFieldPart,
+  OuterSpinButtonPart,
   SliderHorizontalPart,
   SliderVerticalPart,
   SliderThumbHorizontalPart,

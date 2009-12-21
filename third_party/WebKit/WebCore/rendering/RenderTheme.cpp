@@ -96,6 +96,8 @@ void RenderTheme::adjustStyle(CSSStyleSelector* selector,
   switch (part) {
     case ListButtonPart:
     case CheckboxPart:
+    case InnerSpinButtonPart:
+    case OuterSpinButtonPart:
     case RadioPart:
     case PushButtonPart:
     case SquareButtonPart:
@@ -194,6 +196,10 @@ void RenderTheme::adjustStyle(CSSStyleSelector* selector,
     case DefaultButtonPart:
     case ButtonPart:
       return adjustButtonStyle(selector, style, e);
+    case InnerSpinButtonPart:
+      return adjustInnerSpinButtonStyle(selector, style, e);
+    case OuterSpinButtonPart:
+      return adjustOuterSpinButtonStyle(selector, style, e);
 #endif
     case TextFieldPart:
       return adjustTextFieldStyle(selector, style, e);
@@ -253,6 +259,8 @@ bool RenderTheme::paint(RenderObject* o,
     case ListButtonPart:
     case DefaultButtonPart:
     case ButtonPart:
+    case InnerSpinButtonPart:
+    case OuterSpinButtonPart:
       m_theme->paint(part, controlStatesForRenderer(o),
                      const_cast<GraphicsContext*>(paintInfo.context), r,
                      o->style()->effectiveZoom(), o->view()->frameView());
@@ -275,6 +283,10 @@ bool RenderTheme::paint(RenderObject* o,
     case DefaultButtonPart:
     case ButtonPart:
       return paintButton(o, paintInfo, r);
+    case InnerSpinButtonPart:
+      return paintInnerSpinButton(o, paintInfo, r);
+    case OuterSpinButtonPart:
+      return paintOuterSpinButton(o, paintInfo, r);
 #endif
     case MenulistPart:
       return paintMenuList(o, paintInfo, r);
@@ -790,6 +802,14 @@ void RenderTheme::adjustButtonStyle(CSSStyleSelector*,
   // desired vertical size.
   setButtonSize(style);
 }
+
+void RenderTheme::adjustInnerSpinButtonStyle(CSSStyleSelector*,
+                                             RenderStyle*,
+                                             Element*) const {}
+
+void RenderTheme::adjustOuterSpinButtonStyle(CSSStyleSelector*,
+                                             RenderStyle*,
+                                             Element*) const {}
 
 #endif
 
