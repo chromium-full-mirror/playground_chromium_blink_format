@@ -3560,10 +3560,10 @@ quint64 QWebPage::bytesReceived() const {
 /*!
     \fn void QWebPage::unsupportedContent(QNetworkReply *reply)
 
-    This signals is emitted when webkit cannot handle a link the user navigated
+    This signal is emitted when WebKit cannot handle a link the user navigated
    to.
 
-    At signal emissions time the meta data of the QNetworkReply \a reply is
+    At signal emission time the meta-data of the QNetworkReply \a reply is
    available.
 
     \note This signal is only emitted if the forwardUnsupportedContent property
