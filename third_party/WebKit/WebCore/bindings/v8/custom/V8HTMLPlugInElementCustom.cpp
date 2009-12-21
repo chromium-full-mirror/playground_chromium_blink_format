@@ -29,8 +29,9 @@
 */
 
 #include "config.h"
-#include "HTMLPlugInElement.h"
+#include "V8HTMLPlugInElementCustom.h"
 
+#include "HTMLPlugInElement.h"
 #include "ScriptInstance.h"
 
 #include "V8Binding.h"
@@ -72,7 +73,8 @@ NAMED_PROPERTY_SETTER(HTMLPlugInElement) {
   return npObjectSetNamedProperty(instance, name, value);
 }
 
-CALLBACK_FUNC_DECL(HTMLPlugInElement) {
+v8::Handle<v8::Value> V8HTMLPlugInElement::defaultCallback(
+    const v8::Arguments& args) {
   INC_STATS("DOM.HTMLPluginElement()");
   return npObjectInvokeDefaultHandler(args);
 }

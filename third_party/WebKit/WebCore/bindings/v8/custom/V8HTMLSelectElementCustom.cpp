@@ -39,6 +39,7 @@
 #include "V8Collection.h"
 #include "V8CustomBinding.h"
 #include "V8HTMLOptionElement.h"
+#include "V8HTMLSelectElement.h"
 #include "V8NamedNodesCollection.h"
 #include "V8Proxy.h"
 
@@ -92,7 +93,8 @@ INDEXED_PROPERTY_SETTER(HTMLSelectElement) {
   return toOptionsCollectionSetter(index, value, select);
 }
 
-CALLBACK_FUNC_DECL(HTMLSelectElementRemove) {
+v8::Handle<v8::Value> V8HTMLSelectElement::removeCallback(
+    const v8::Arguments& args) {
   INC_STATS("DOM.HTMLSelectElement.remove");
   HTMLSelectElement* imp =
       V8DOMWrapper::convertDOMWrapperToNode<HTMLSelectElement>(args.Holder());

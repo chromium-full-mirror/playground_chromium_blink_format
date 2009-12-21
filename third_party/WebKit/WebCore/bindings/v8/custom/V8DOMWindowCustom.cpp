@@ -29,7 +29,7 @@
  */
 
 #include "config.h"
-#include "DOMWindow.h"
+#include "V8DOMWindow.h"
 
 #include "V8Binding.h"
 #include "V8BindingState.h"
@@ -43,6 +43,7 @@
 #include "Chrome.h"
 #include "ExceptionCode.h"
 #include "DOMTimer.h"
+#include "DOMWindow.h"
 #include "Frame.h"
 #include "FrameLoadRequest.h"
 #include "FrameView.h"
@@ -68,8 +69,8 @@ static const int popupTilePixels = 10;
 
 namespace WebCore {
 
-v8::Handle<v8::Value> V8Custom::WindowSetTimeoutImpl(const v8::Arguments& args,
-                                                     bool singleShot) {
+v8::Handle<v8::Value> WindowSetTimeoutImpl(const v8::Arguments& args,
+                                           bool singleShot) {
   int argumentCount = args.Length();
 
   if (argumentCount < 1)
@@ -224,7 +225,7 @@ ACCESSOR_GETTER(DOMWindowCrypto) {
 ACCESSOR_SETTER(DOMWindowLocation) {
   DOMWindow* imp = V8DOMWrapper::convertToNativeObject<DOMWindow>(
       V8ClassIndex::DOMWINDOW, info.Holder());
-  WindowSetLocation(imp, toWebCoreString(value));
+  V8Custom::WindowSetLocation(imp, toWebCoreString(value));
 }
 
 ACCESSOR_SETTER(DOMWindowOpener) {
@@ -334,7 +335,8 @@ ACCESSOR_GETTER(DOMWindowOption) {
   return V8DOMWrapper::getConstructor(V8ClassIndex::OPTION, window);
 }
 
-CALLBACK_FUNC_DECL(DOMWindowAddEventListener) {
+v8::Handle<v8::Value> V8DOMWindow::addEventListenerCallback(
+    const v8::Arguments& args) {
   INC_STATS("DOM.DOMWindow.addEventListener()");
 
   String eventType = toWebCoreString(args[0]);
@@ -369,7 +371,8 @@ CALLBACK_FUNC_DECL(DOMWindowAddEventListener) {
   return v8::Undefined();
 }
 
-CALLBACK_FUNC_DECL(DOMWindowRemoveEventListener) {
+v8::Handle<v8::Value> V8DOMWindow::removeEventListenerCallback(
+    const v8::Arguments& args) {
   INC_STATS("DOM.DOMWindow.removeEventListener()");
 
   String eventType = toWebCoreString(args[0]);
@@ -403,7 +406,8 @@ CALLBACK_FUNC_DECL(DOMWindowRemoveEventListener) {
   return v8::Undefined();
 }
 
-CALLBACK_FUNC_DECL(DOMWindowPostMessage) {
+v8::Handle<v8::Value> V8DOMWindow::postMessageCallback(
+    const v8::Arguments& args) {
   INC_STATS("DOM.DOMWindow.postMessage()");
   DOMWindow* window = V8DOMWrapper::convertToNativeObject<DOMWindow>(
       V8ClassIndex::DOMWINDOW, args.Holder());
@@ -437,7 +441,7 @@ CALLBACK_FUNC_DECL(DOMWindowPostMessage) {
   return throwError(ec);
 }
 
-CALLBACK_FUNC_DECL(DOMWindowAtob) {
+v8::Handle<v8::Value> V8DOMWindow::atobCallback(const v8::Arguments& args) {
   INC_STATS("DOM.DOMWindow.atob()");
 
   if (args[0]->IsNull())
@@ -457,7 +461,7 @@ CALLBACK_FUNC_DECL(DOMWindowAtob) {
   return convertBase64(str, false);
 }
 
-CALLBACK_FUNC_DECL(DOMWindowBtoa) {
+v8::Handle<v8::Value> V8DOMWindow::btoaCallback(const v8::Arguments& args) {
   INC_STATS("DOM.DOMWindow.btoa()");
 
   if (args[0]->IsNull())
@@ -481,7 +485,7 @@ CALLBACK_FUNC_DECL(DOMWindowBtoa) {
 // fix this by calling toString function on the receiver.
 // However, V8 implements toString in JavaScript, which requires
 // switching context of receiver. I consider it is dangerous.
-CALLBACK_FUNC_DECL(DOMWindowToString) {
+v8::Handle<v8::Value> V8DOMWindow::toStringCallback(const v8::Arguments& args) {
   INC_STATS("DOM.DOMWindow.toString()");
   v8::Handle<v8::Object> domWrapper =
       V8DOMWrapper::lookupDOMWrapper(V8ClassIndex::DOMWINDOW, args.This());
@@ -490,7 +494,14 @@ CALLBACK_FUNC_DECL(DOMWindowToString) {
   return domWrapper->ObjectProtoToString();
 }
 
-CALLBACK_FUNC_DECL(DOMWindowNOP) {
+v8::Handle<v8::Value> V8DOMWindow::releaseEventsCallback(
+    const v8::Arguments& args) {
+  INC_STATS("DOM.DOMWindow.nop()");
+  return v8::Undefined();
+}
+
+v8::Handle<v8::Value> V8DOMWindow::captureEventsCallback(
+    const v8::Arguments& args) {
   INC_STATS("DOM.DOMWindow.nop()");
   return v8::Undefined();
 }
@@ -614,7 +625,8 @@ static Frame* createWindow(Frame* callingFrame,
   return newFrame;
 }
 
-CALLBACK_FUNC_DECL(DOMWindowShowModalDialog) {
+v8::Handle<v8::Value> V8DOMWindow::showModalDialogCallback(
+    const v8::Arguments& args) {
   INC_STATS("DOM.DOMWindow.showModalDialog()");
 
   String url = toWebCoreStringWithNullOrUndefinedCheck(args[0]);
@@ -714,7 +726,7 @@ CALLBACK_FUNC_DECL(DOMWindowShowModalDialog) {
   return v8::Undefined();
 }
 
-CALLBACK_FUNC_DECL(DOMWindowOpen) {
+v8::Handle<v8::Value> V8DOMWindow::openCallback(const v8::Arguments& args) {
   INC_STATS("DOM.DOMWindow.open()");
 
   String urlString = toWebCoreStringWithNullOrUndefinedCheck(args[0]);
@@ -926,17 +938,19 @@ void V8Custom::WindowSetLocation(DOMWindow* window, const String& relativeURL) {
   navigateIfAllowed(frame, url, false, false);
 }
 
-CALLBACK_FUNC_DECL(DOMWindowSetTimeout) {
+v8::Handle<v8::Value> V8DOMWindow::setTimeoutCallback(
+    const v8::Arguments& args) {
   INC_STATS("DOM.DOMWindow.setTimeout()");
   return WindowSetTimeoutImpl(args, true);
 }
 
-CALLBACK_FUNC_DECL(DOMWindowSetInterval) {
+v8::Handle<v8::Value> V8DOMWindow::setIntervalCallback(
+    const v8::Arguments& args) {
   INC_STATS("DOM.DOMWindow.setInterval()");
   return WindowSetTimeoutImpl(args, false);
 }
 
-void V8Custom::ClearTimeoutImpl(const v8::Arguments& args) {
+void ClearTimeoutImpl(const v8::Arguments& args) {
   int handle = toInt32(args[0]);
 
   v8::Handle<v8::Object> holder = args.Holder();
@@ -952,13 +966,15 @@ void V8Custom::ClearTimeoutImpl(const v8::Arguments& args) {
   DOMTimer::removeById(context, handle);
 }
 
-CALLBACK_FUNC_DECL(DOMWindowClearTimeout) {
+v8::Handle<v8::Value> V8DOMWindow::clearTimeoutCallback(
+    const v8::Arguments& args) {
   INC_STATS("DOM.DOMWindow.clearTimeout");
   ClearTimeoutImpl(args);
   return v8::Undefined();
 }
 
-CALLBACK_FUNC_DECL(DOMWindowClearInterval) {
+v8::Handle<v8::Value> V8DOMWindow::clearIntervalCallback(
+    const v8::Arguments& args) {
   INC_STATS("DOM.DOMWindow.clearInterval");
   ClearTimeoutImpl(args);
   return v8::Undefined();

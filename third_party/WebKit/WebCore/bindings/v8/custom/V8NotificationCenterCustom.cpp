@@ -31,6 +31,7 @@
 #include "config.h"
 
 #if ENABLE(NOTIFICATIONS)
+#include "V8NotificationCenter.h"
 
 #include "NotImplemented.h"
 #include "Notification.h"
@@ -39,6 +40,7 @@
 #include "V8CustomBinding.h"
 #include "V8CustomEventListener.h"
 #include "V8CustomVoidCallback.h"
+#include "V8Notification.h"
 #include "V8Proxy.h"
 #include "V8Utilities.h"
 #include "WorkerContext.h"
@@ -46,7 +48,8 @@
 
 namespace WebCore {
 
-CALLBACK_FUNC_DECL(NotificationAddEventListener) {
+v8::Handle<v8::Value> V8Notification::addEventListenerCallback(
+    const v8::Arguments& args) {
   INC_STATS("DOM.Notification.addEventListener()");
   Notification* notification =
       V8DOMWrapper::convertToNativeObject<Notification>(
@@ -65,7 +68,8 @@ CALLBACK_FUNC_DECL(NotificationAddEventListener) {
   return v8::Undefined();
 }
 
-CALLBACK_FUNC_DECL(NotificationRemoveEventListener) {
+v8::Handle<v8::Value> V8Notification::removeEventListenerCallback(
+    const v8::Arguments& args) {
   INC_STATS("DOM.Notification.removeEventListener()");
   Notification* notification =
       V8DOMWrapper::convertToNativeObject<Notification>(
@@ -84,7 +88,8 @@ CALLBACK_FUNC_DECL(NotificationRemoveEventListener) {
   return v8::Undefined();
 }
 
-CALLBACK_FUNC_DECL(NotificationCenterCreateHTMLNotification) {
+v8::Handle<v8::Value> V8NotificationCenter::createHTMLNotificationCallback(
+    const v8::Arguments& args) {
   INC_STATS(L"DOM.NotificationCenter.CreateHTMLNotification()");
   NotificationCenter* notificationCenter =
       V8DOMWrapper::convertToNativeObject<NotificationCenter>(
@@ -106,7 +111,8 @@ CALLBACK_FUNC_DECL(NotificationCenterCreateHTMLNotification) {
                                          notification.get());
 }
 
-CALLBACK_FUNC_DECL(NotificationCenterCreateNotification) {
+v8::Handle<v8::Value> V8NotificationCenter::createNotificationCallback(
+    const v8::Arguments& args) {
   INC_STATS(L"DOM.NotificationCenter.CreateNotification()");
   NotificationCenter* notificationCenter =
       V8DOMWrapper::convertToNativeObject<NotificationCenter>(
@@ -128,7 +134,8 @@ CALLBACK_FUNC_DECL(NotificationCenterCreateNotification) {
                                          notification.get());
 }
 
-CALLBACK_FUNC_DECL(NotificationCenterRequestPermission) {
+v8::Handle<v8::Value> V8NotificationCenter::requestPermissionCallback(
+    const v8::Arguments& args) {
   INC_STATS(L"DOM.NotificationCenter.RequestPermission()");
   NotificationCenter* notificationCenter =
       V8DOMWrapper::convertToNativeObject<NotificationCenter>(

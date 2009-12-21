@@ -44,7 +44,7 @@
 
 namespace WebCore {
 
-CALLBACK_FUNC_DECL(SVGMatrixMultiply) {
+v8::Handle<v8::Value> V8SVGMatrix::multiplyCallback(const v8::Arguments& args) {
   INC_STATS("DOM.SVGMatrix.multiply()");
   if (args.Length() < 1)
     return throwError("Not enough arguments");
@@ -64,7 +64,7 @@ CALLBACK_FUNC_DECL(SVGMatrixMultiply) {
       V8SVGStaticPODTypeWrapper<TransformationMatrix>::create(m1.multLeft(m2)));
 }
 
-CALLBACK_FUNC_DECL(SVGMatrixInverse) {
+v8::Handle<v8::Value> V8SVGMatrix::inverseCallback(const v8::Arguments& args) {
   INC_STATS("DOM.SVGMatrix.inverse()");
   TransformationMatrix matrix = *V8DOMWrapper::convertToNativeObject<
       V8SVGPODTypeWrapper<TransformationMatrix>>(V8ClassIndex::SVGMATRIX,
@@ -85,7 +85,8 @@ CALLBACK_FUNC_DECL(SVGMatrixInverse) {
       V8SVGStaticPODTypeWrapper<TransformationMatrix>::create(result));
 }
 
-CALLBACK_FUNC_DECL(SVGMatrixRotateFromVector) {
+v8::Handle<v8::Value> V8SVGMatrix::rotateFromVectorCallback(
+    const v8::Arguments& args) {
   INC_STATS("DOM.SVGMatrix.rotateFromVector()");
   TransformationMatrix matrix = *V8DOMWrapper::convertToNativeObject<
       V8SVGPODTypeWrapper<TransformationMatrix>>(V8ClassIndex::SVGMATRIX,

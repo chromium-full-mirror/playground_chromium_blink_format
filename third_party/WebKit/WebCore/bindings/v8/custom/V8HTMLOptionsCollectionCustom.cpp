@@ -29,8 +29,9 @@
  */
 
 #include "config.h"
-#include "HTMLOptionsCollection.h"
+#include "V8HTMLOptionsCollection.h"
 
+#include "HTMLOptionsCollection.h"
 #include "HTMLOptionElement.h"
 #include "ExceptionCode.h"
 
@@ -43,7 +44,8 @@
 
 namespace WebCore {
 
-CALLBACK_FUNC_DECL(HTMLOptionsCollectionRemove) {
+v8::Handle<v8::Value> V8HTMLOptionsCollection::removeCallback(
+    const v8::Arguments& args) {
   INC_STATS("DOM.HTMLOptionsCollection.remove()");
   HTMLOptionsCollection* imp =
       V8DOMWrapper::convertToNativeObject<HTMLOptionsCollection>(
@@ -52,7 +54,8 @@ CALLBACK_FUNC_DECL(HTMLOptionsCollectionRemove) {
   return removeElement(base, args);
 }
 
-CALLBACK_FUNC_DECL(HTMLOptionsCollectionAdd) {
+v8::Handle<v8::Value> V8HTMLOptionsCollection::addCallback(
+    const v8::Arguments& args) {
   INC_STATS("DOM.HTMLOptionsCollection.add()");
   if (!V8HTMLOptionElement::HasInstance(args[0])) {
     V8Proxy::setDOMException(TYPE_MISMATCH_ERR);

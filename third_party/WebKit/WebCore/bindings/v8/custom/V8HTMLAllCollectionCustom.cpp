@@ -29,6 +29,8 @@
  */
 
 #include "config.h"
+#include "V8HTMLAllCollection.h"
+
 #include "HTMLAllCollection.h"
 
 #include "V8Binding.h"
@@ -91,7 +93,8 @@ NAMED_PROPERTY_GETTER(HTMLAllCollection) {
   return getNamedItems(imp, v8StringToAtomicWebCoreString(name));
 }
 
-CALLBACK_FUNC_DECL(HTMLAllCollectionItem) {
+v8::Handle<v8::Value> V8HTMLAllCollection::itemCallback(
+    const v8::Arguments& args) {
   INC_STATS("DOM.HTMLAllCollection.item()");
   HTMLAllCollection* imp =
       V8DOMWrapper::convertToNativeObject<HTMLAllCollection>(
@@ -99,7 +102,8 @@ CALLBACK_FUNC_DECL(HTMLAllCollectionItem) {
   return getItem(imp, args[0]);
 }
 
-CALLBACK_FUNC_DECL(HTMLAllCollectionNamedItem) {
+v8::Handle<v8::Value> V8HTMLAllCollection::namedItemCallback(
+    const v8::Arguments& args) {
   INC_STATS("DOM.HTMLAllCollection.namedItem()");
   HTMLAllCollection* imp =
       V8DOMWrapper::convertToNativeObject<HTMLAllCollection>(
@@ -112,7 +116,8 @@ CALLBACK_FUNC_DECL(HTMLAllCollectionNamedItem) {
   return result;
 }
 
-CALLBACK_FUNC_DECL(HTMLAllCollectionCallAsFunction) {
+v8::Handle<v8::Value> V8HTMLAllCollection::callAsFunctionCallback(
+    const v8::Arguments& args) {
   INC_STATS("DOM.HTMLAllCollection.callAsFunction()");
   if (args.Length() < 1)
     return v8::Undefined();

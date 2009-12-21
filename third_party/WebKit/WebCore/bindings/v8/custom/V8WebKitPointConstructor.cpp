@@ -41,7 +41,8 @@
 
 namespace WebCore {
 
-CALLBACK_FUNC_DECL(WebKitPointConstructor) {
+v8::Handle<v8::Value> V8Custom::v8WebKitPointConstructorCallback(
+    const v8::Arguments& args) {
   INC_STATS("DOM.WebKitPoint.Constructor");
   float x = 0;
   float y = 0;

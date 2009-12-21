@@ -47,6 +47,8 @@
 #include "V8DOMMap.h"
 #include "V8DOMWindow.h"
 #include "V8EventListenerList.h"
+#include "V8HTMLCollection.h"
+#include "V8HTMLPlugInElementCustom.h"
 #include "V8Index.h"
 #include "V8IsolatedWorld.h"
 #include "V8Proxy.h"
@@ -286,7 +288,7 @@ v8::Persistent<v8::FunctionTemplate> V8DOMWrapper::getTemplate(
       descriptor->InstanceTemplate()->MarkAsUndetectable();  // fall through
     case V8ClassIndex::HTMLCOLLECTION:
       descriptor->InstanceTemplate()->SetCallAsFunctionHandler(
-          USE_CALLBACK(HTMLCollectionCallAsFunction));
+          V8HTMLCollection::callAsFunctionCallback);
       break;
     case V8ClassIndex::HTMLOPTIONSCOLLECTION:
       descriptor->InstanceTemplate()->SetNamedPropertyHandler(
@@ -295,7 +297,7 @@ v8::Persistent<v8::FunctionTemplate> V8DOMWrapper::getTemplate(
           USE_INDEXED_PROPERTY_GETTER(HTMLOptionsCollection),
           USE_INDEXED_PROPERTY_SETTER(HTMLOptionsCollection));
       descriptor->InstanceTemplate()->SetCallAsFunctionHandler(
-          USE_CALLBACK(HTMLCollectionCallAsFunction));
+          V8HTMLCollection::callAsFunctionCallback);
       break;
     case V8ClassIndex::HTMLSELECTELEMENT:
       descriptor->InstanceTemplate()->SetIndexedPropertyHandler(
@@ -353,7 +355,7 @@ v8::Persistent<v8::FunctionTemplate> V8DOMWrapper::getTemplate(
           USE_INDEXED_PROPERTY_GETTER(HTMLPlugInElement),
           USE_INDEXED_PROPERTY_SETTER(HTMLPlugInElement));
       descriptor->InstanceTemplate()->SetCallAsFunctionHandler(
-          USE_CALLBACK(HTMLPlugInElement));
+          V8HTMLPlugInElement::defaultCallback);
       break;
     case V8ClassIndex::HTMLFRAMESETELEMENT:
       descriptor->InstanceTemplate()->SetNamedPropertyHandler(

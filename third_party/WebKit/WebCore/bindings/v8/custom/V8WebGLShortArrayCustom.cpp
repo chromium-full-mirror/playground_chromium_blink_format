@@ -44,7 +44,8 @@
 
 namespace WebCore {
 
-CALLBACK_FUNC_DECL(WebGLShortArrayConstructor) {
+v8::Handle<v8::Value> V8Custom::v8WebGLShortArrayConstructorCallback(
+    const v8::Arguments& args) {
   INC_STATS("DOM.WebGLShortArray.Contructor");
 
   return constructWebGLArray<WebGLShortArray>(
@@ -82,13 +83,15 @@ INDEXED_PROPERTY_SETTER(WebGLShortArray) {
   return value;
 }
 
-CALLBACK_FUNC_DECL(WebGLShortArrayGet) {
+v8::Handle<v8::Value> V8WebGLShortArray::getCallback(
+    const v8::Arguments& args) {
   INC_STATS("DOM.WebGLShortArray.get()");
   return getWebGLArrayElement<WebGLShortArray, short>(
       args, V8ClassIndex::WEBGLSHORTARRAY);
 }
 
-CALLBACK_FUNC_DECL(WebGLShortArraySet) {
+v8::Handle<v8::Value> V8WebGLShortArray::setCallback(
+    const v8::Arguments& args) {
   INC_STATS("DOM.WebGLShortArray.set()");
   return setWebGLArray<WebGLShortArray, V8WebGLShortArray>(
       args, V8ClassIndex::WEBGLSHORTARRAY);
