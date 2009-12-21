@@ -359,8 +359,7 @@ void WKWindowSetScaledFrame(NSWindow* window,
                             NSRect nonScaledFrame);
 #endif
 
-#if !defined(BUILDING_ON_TIGER) && !defined(BUILDING_ON_LEOPARD) && \
-    !defined(BUILDING_ON_SNOW_LEOPARD)
+#if !defined(BUILDING_ON_TIGER) && !defined(BUILDING_ON_LEOPARD)
 NSMutableArray* WKNoteOpenPanelFiles(NSArray* paths);
 #endif
 
