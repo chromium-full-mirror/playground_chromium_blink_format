@@ -164,3 +164,6 @@
   "WebKitUseHighResolutionTimers"
 
 #define WebKitPluginAllowedRunTimePreferenceKey "WebKitPluginAllowedRunTime"
+
+#define WebKitAcceleratedCompositingEnabledPreferenceKey \
+  "WebKitAcceleratedCompositingEnabled"
