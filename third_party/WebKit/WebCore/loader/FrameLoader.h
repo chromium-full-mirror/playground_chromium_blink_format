@@ -404,10 +404,6 @@ class FrameLoader : public Noncopyable {
 
   bool suppressOpenerInNewFrame() const { return m_suppressOpenerInNewFrame; }
 
-  bool isDispatchingUnloadFamilyEvent() const {
-    return m_isDispatchingBeforeUnloadEvent || m_isDispatchingUnloadEvent;
-  }
-
   static ObjectContentType defaultObjectContentType(const KURL& url,
                                                     const String& mimeType);
 
@@ -615,8 +611,7 @@ class FrameLoader : public Noncopyable {
 
   bool m_didCallImplicitClose;
   bool m_wasUnloadEventEmitted;
-  bool m_isDispatchingBeforeUnloadEvent;
-  bool m_isDispatchingUnloadEvent;
+  bool m_unloadEventBeingDispatched;
   bool m_isComplete;
   bool m_isLoadingMainResource;
 
