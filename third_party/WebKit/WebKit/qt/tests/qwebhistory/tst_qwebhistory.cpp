@@ -35,7 +35,7 @@ class tst_QWebHistory : public QObject {
 
  protected:
   void loadPage(int nr) {
-    frame->load(QUrl("qrc:/data/page" + QString::number(nr) + ".html"));
+    frame->load(QUrl("qrc:/resources/page" + QString::number(nr) + ".html"));
     waitForLoadFinished.exec();
   }
 

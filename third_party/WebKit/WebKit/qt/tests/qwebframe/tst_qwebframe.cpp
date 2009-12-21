@@ -37,10 +37,6 @@
 #endif
 #include "../util.h"
 
-#if defined(Q_OS_SYMBIAN)
-#define SRCDIR ""
-#endif
-
 struct CustomType {
   QString string;
 };
@@ -608,7 +604,6 @@ void tst_QWebFrame::init() {
   m_page = m_view->page();
   m_myObject = new MyQObject();
   m_page->mainFrame()->addToJavaScriptWindowObject("myObject", m_myObject);
-  QDir::setCurrent(SRCDIR);
 }
 
 void tst_QWebFrame::cleanup() {
@@ -2461,6 +2456,15 @@ void tst_QWebFrame::setHtmlWithResource() {
 }
 
 void tst_QWebFrame::setHtmlWithBaseURL() {
+  if (!QDir(TESTS_SOURCE_DIR).exists())
+    QSKIP(QString("This test requires access to resources found in '%1'")
+              .arg(TESTS_SOURCE_DIR)
+              .toLatin1()
+              .constData(),
+          SkipAll);
+
+  QDir::setCurrent(TESTS_SOURCE_DIR);
+
   QString html(
       "<html><body><p>hello world</p><img "
       "src='resources/image2.png'/></body></html>");
@@ -2471,7 +2475,7 @@ void tst_QWebFrame::setHtmlWithBaseURL() {
   // in few seconds, the image should be completey loaded
   QSignalSpy spy(&page, SIGNAL(loadFinished(bool)));
 
-  frame->setHtml(html, QUrl::fromLocalFile(QDir::currentPath()));
+  frame->setHtml(html, QUrl::fromLocalFile(TESTS_SOURCE_DIR));
   waitForSignal(frame, SIGNAL(loadFinished(bool)), 200);
   QCOMPARE(spy.count(), 1);
 
@@ -2581,6 +2585,7 @@ void tst_QWebFrame::popupFocus() {
   QTest::mouseClick(&view, Qt::LeftButton, 0, QPoint(25, 25));
   QObject* webpopup = firstChildByClassName(&view, "WebCore::QWebPopup");
   QComboBox* combo = qobject_cast<QComboBox*>(webpopup);
+  QVERIFY(combo != 0);
   QTRY_VERIFY(!view.hasFocus() &&
               combo->view()->hasFocus());  // Focus should be on the popup
 
