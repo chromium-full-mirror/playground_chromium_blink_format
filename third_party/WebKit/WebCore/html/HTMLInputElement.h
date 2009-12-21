@@ -150,6 +150,9 @@ class HTMLInputElement : public HTMLTextFormControlElement,
   virtual void setValue(const String&, bool sendChangeEvent = false);
   virtual void setValueForUser(const String&);
 
+  double valueAsDate() const;
+  void setValueAsDate(double, ExceptionCode&);
+
   virtual String placeholder() const;
   virtual void setPlaceholder(const String&);
 
