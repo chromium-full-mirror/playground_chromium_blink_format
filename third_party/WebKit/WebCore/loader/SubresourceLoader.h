@@ -30,6 +30,7 @@
 #define SubresourceLoader_h
 
 #include "FrameLoaderTypes.h"
+#include "Request.h"
 #include "ResourceLoader.h"
 
 namespace WebCore {
@@ -44,6 +45,7 @@ class SubresourceLoader : public ResourceLoader {
       SubresourceLoaderClient*,
       const ResourceRequest&,
       SecurityCheckPolicy = DoSecurityCheck,
+      OutlivePagePolicy = DoNotOutlivePage,
       bool sendResourceLoadCallbacks = true,
       bool shouldContentSniff = true);
 

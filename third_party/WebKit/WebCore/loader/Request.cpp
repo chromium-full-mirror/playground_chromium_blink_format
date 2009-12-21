@@ -25,6 +25,8 @@
 #include "Request.h"
 
 #include "CachedResource.h"
+#include "DocLoader.h"
+#include "Frame.h"
 
 namespace WebCore {
 
@@ -32,6 +34,7 @@ Request::Request(DocLoader* docLoader,
                  CachedResource* object,
                  bool incremental,
                  SecurityCheckPolicy shouldDoSecurityCheck,
+                 OutlivePagePolicy outlivePagePolicy,
                  bool sendResourceLoadCallbacks)
     : m_object(object),
       m_docLoader(docLoader),
@@ -40,10 +43,18 @@ Request::Request(DocLoader* docLoader,
       m_shouldDoSecurityCheck(shouldDoSecurityCheck),
       m_sendResourceLoadCallbacks(sendResourceLoadCallbacks) {
   m_object->setRequest(this);
+  if (outlivePagePolicy == OutlivePage)
+    m_frameForRequestThatCanOutlivePage = docLoader->frame();
 }
 
 Request::~Request() {
   m_object->setRequest(0);
+}
+
+Frame* Request::frame() const {
+  return m_frameForRequestThatCanOutlivePage
+             ? m_frameForRequestThatCanOutlivePage.get()
+             : m_docLoader->frame();
 }
 
 }  // namespace WebCore
