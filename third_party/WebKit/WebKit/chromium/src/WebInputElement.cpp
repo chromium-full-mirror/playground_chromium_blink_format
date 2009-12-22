@@ -54,6 +54,10 @@ WebInputElement::operator WTF::PassRefPtr<HTMLInputElement>() const {
       static_cast<HTMLInputElement*>(m_private));
 }
 
+bool WebInputElement::autoComplete() const {
+  return constUnwrap<HTMLInputElement>()->autoComplete();
+}
+
 bool WebInputElement::isEnabledFormControl() const {
   return constUnwrap<HTMLInputElement>()->isEnabledFormControl();
 }
