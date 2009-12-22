@@ -920,7 +920,7 @@ void XMLTokenizer::error(ErrorType type, const char* message, va_list args) {
   else
     handleError(type, m, lineNumber(), columnNumber());
 
-#if !COMPILER(MSVC)
+#if !COMPILER(MSVC) && !COMPILER(RVCT)
   free(m);
 #endif
 }
