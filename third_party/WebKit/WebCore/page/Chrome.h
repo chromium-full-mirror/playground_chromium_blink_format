@@ -150,7 +150,7 @@ class Chrome : public HostWindow {
 
   bool setCursor(PlatformCursorHandle);
 
-#if PLATFORM(MAC) && !ENABLE(EXPERIMENTAL_SINGLE_VIEW_MODE)
+#if PLATFORM(MAC)
   void focusNSView(NSView*);
 #endif
 

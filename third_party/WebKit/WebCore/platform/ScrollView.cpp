@@ -999,8 +999,7 @@ void ScrollView::platformDestroy() {}
 
 #endif
 
-#if (!PLATFORM(WX) && !PLATFORM(GTK) && !PLATFORM(QT) && !PLATFORM(MAC)) || \
-    ENABLE(EXPERIMENTAL_SINGLE_VIEW_MODE)
+#if !PLATFORM(WX) && !PLATFORM(GTK) && !PLATFORM(QT) && !PLATFORM(MAC)
 
 void ScrollView::platformAddChild(Widget*) {}
 
@@ -1008,13 +1007,13 @@ void ScrollView::platformRemoveChild(Widget*) {}
 
 #endif
 
-#if !PLATFORM(MAC) || ENABLE(EXPERIMENTAL_SINGLE_VIEW_MODE)
+#if !PLATFORM(MAC)
 
 void ScrollView::platformSetScrollbarsSuppressed(bool) {}
 
 #endif
 
-#if (!PLATFORM(MAC) && !PLATFORM(WX)) || ENABLE(EXPERIMENTAL_SINGLE_VIEW_MODE)
+#if !PLATFORM(MAC) && !PLATFORM(WX)
 
 void ScrollView::platformSetScrollbarModes() {}
 
