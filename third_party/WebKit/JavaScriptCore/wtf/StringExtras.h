@@ -100,4 +100,11 @@ inline char* strnstr(const char* buffer,
 
 #endif
 
+#if COMPILER(RVCT) && __ARMCC_VERSION < 400000
+
+int strcasecmp(const char* s1, const char* s2);
+int strncasecmp(const char* s1, const char* s2, size_t len);
+
+#endif
+
 #endif  // WTF_StringExtras_h
