@@ -68,7 +68,7 @@ class UntypedPtrAndBitfield {
   }
 
  private:
-  static const uintptr_t s_alignmentMask = ~0x7u;
+  static const uintptr_t s_alignmentMask = ~static_cast<uintptr_t>(0x7);
   uintptr_t m_value;
 };
 
