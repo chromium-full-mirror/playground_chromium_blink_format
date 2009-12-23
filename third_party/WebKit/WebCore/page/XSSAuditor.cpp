@@ -180,7 +180,7 @@ bool XSSAuditor::canLoadObject(const String& url) const {
   if (isSameOriginResource(url))
     return true;
 
-  if (findInRequest(url)) {
+  if (findInRequest(url, true, true)) {
     String consoleMessage = String::format(
         "Refused to load an object. URL found within request: \"%s\".\n",
         url.utf8().data());
