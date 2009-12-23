@@ -25,6 +25,7 @@
 #ifndef Font_h
 #define Font_h
 
+#include "CharacterNames.h"
 #include "TextRun.h"
 #include "FontDescription.h"
 #include "SimpleFontData.h"
@@ -247,6 +248,18 @@ class Font {
     return c < 0x20 || (c >= 0x7F && c < 0xA0) || c == 0x200e || c == 0x200f ||
            (c >= 0x202a && c <= 0x202e) || c == 0xFFFC;
   }
+
+  static inline UChar normalizeSpaces(UChar character) {
+    if (treatAsSpace(character))
+      return space;
+
+    if (treatAsZeroWidthSpace(character))
+      return zeroWidthSpace;
+
+    return character;
+  }
+
+  static String normalizeSpaces(const String&);
 
 #if ENABLE(SVG_FONTS)
   bool isSVGFont() const;
