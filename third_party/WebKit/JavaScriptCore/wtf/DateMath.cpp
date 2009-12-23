@@ -307,7 +307,7 @@ static inline double timeToMS(double hour, double min, double sec, double ms) {
           ms);
 }
 
-static double dateToDaysFrom1970(int year, int month, int day) {
+double dateToDaysFrom1970(int year, int month, int day) {
   year += month / 12;
 
   month %= 12;

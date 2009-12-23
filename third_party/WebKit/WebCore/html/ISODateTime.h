@@ -31,6 +31,7 @@
 #ifndef ISODateTime_h
 #define ISODateTime_h
 
+#include <limits>
 #include <wtf/unicode/Unicode.h>
 
 namespace WebCore {
@@ -52,7 +53,8 @@ class ISODateTime {
         m_monthDay(0),
         m_month(0),
         m_year(0),
-        m_week(0) {}
+        m_week(0),
+        m_type(Invalid) {}
 
   int millisecond() const { return m_millisecond; }
   int second() const { return m_second; }
@@ -104,6 +106,14 @@ class ISODateTime {
                      unsigned start,
                      unsigned& end);
 
+  // Returns the number of milliseconds from 1970-01-01 00:00:00 UTC.
+  // For an ISODateTime initialized with parseDateTimeLocal(),
+  // millisecondsSinceEpoch() returns a value for UTC timezone.
+  double millisecondsSinceEpoch() const;
+  static inline double invalidMilliseconds() {
+    return std::numeric_limits<double>::quiet_NaN();
+  }
+
  private:
   // Returns the maximum week number in this ISODateTime's year.
   // The result is either of 52 and 53.
@@ -118,6 +128,8 @@ class ISODateTime {
                      unsigned length,
                      unsigned start,
                      unsigned& end);
+  // Helper for millisecondsSinceEpoch().
+  double millisecondsSinceEpochForTime() const;
 
   // m_weekDay values
   enum {
@@ -138,6 +150,17 @@ class ISODateTime {
   int m_month;     // 0:January - 11:December
   int m_year;      //  1582 -
   int m_week;      // 1 - 53
+
+  enum Type {
+    Invalid,
+    Date,
+    DateTime,
+    DateTimeLocal,
+    Month,
+    Time,
+    Week,
+  };
+  Type m_type;
 };
 
 }  // namespace WebCore

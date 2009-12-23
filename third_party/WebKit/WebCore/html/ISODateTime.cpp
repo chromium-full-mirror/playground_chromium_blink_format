@@ -33,6 +33,7 @@
 
 #include <limits.h>
 #include <wtf/ASCIICType.h>
+#include <wtf/DateMath.h>
 
 namespace WebCore {
 
@@ -303,6 +304,7 @@ bool ISODateTime::parseMonth(const UChar* src,
     return false;
   m_month = month;
   end = index + 2;
+  m_type = Month;
   return true;
 }
 
@@ -331,6 +333,7 @@ bool ISODateTime::parseDate(const UChar* src,
     return false;
   m_monthDay = day;
   end = index + 2;
+  m_type = Date;
   return true;
 }
 
@@ -362,6 +365,7 @@ bool ISODateTime::parseWeek(const UChar* src,
     return false;
   m_week = week;
   end = index + 2;
+  m_type = Week;
   return true;
 }
 
@@ -419,6 +423,7 @@ bool ISODateTime::parseTime(const UChar* src,
   m_second = second;
   m_millisecond = millisecond;
   end = index;
+  m_type = Time;
   return true;
 }
 
@@ -435,7 +440,10 @@ bool ISODateTime::parseDateTimeLocal(const UChar* src,
   if (src[index] != 'T')
     return false;
   ++index;
-  return parseTime(src, length, index, end);
+  if (!parseTime(src, length, index, end))
+    return false;
+  m_type = DateTimeLocal;
+  return true;
 }
 
 bool ISODateTime::parseDateTime(const UChar* src,
@@ -453,7 +461,46 @@ bool ISODateTime::parseDateTime(const UChar* src,
   ++index;
   if (!parseTime(src, length, index, index))
     return false;
-  return parseTimeZone(src, length, index, end);
+  if (!parseTimeZone(src, length, index, end))
+    return false;
+  m_type = DateTime;
+  return true;
+}
+
+double ISODateTime::millisecondsSinceEpochForTime() const {
+  ASSERT(m_type == Time || m_type == DateTime);
+  return ((m_hour * minutesPerHour + m_minute) * secondsPerMinute + m_second) *
+             msPerSecond +
+         m_millisecond;
+}
+
+double ISODateTime::millisecondsSinceEpoch() const {
+  switch (m_type) {
+    case Date:
+      return dateToDaysFrom1970(m_year, m_month, m_monthDay) * msPerDay;
+    case DateTime:
+    case DateTimeLocal:
+      return dateToDaysFrom1970(m_year, m_month, m_monthDay) * msPerDay +
+             millisecondsSinceEpochForTime();
+    case Month:
+      return dateToDaysFrom1970(m_year, m_month, 1) * msPerDay;
+    case Time:
+      return millisecondsSinceEpochForTime();
+    case Week: {
+      // Offset from January 1st to Monday of the ISO 8601's first week.
+      //   ex. If January 1st is Friday, such Monday is 3 days later.
+      int offsetTo1stWeekStart = 1 - dayOfWeek(m_year, 0, 1);
+      if (offsetTo1stWeekStart <= -4)
+        offsetTo1stWeekStart += 7;
+      return (dateToDaysFrom1970(m_year, 0, 1) + offsetTo1stWeekStart +
+              (m_week - 1) * 7) *
+             msPerDay;
+    }
+    case Invalid:
+      break;
+  }
+  ASSERT_NOT_REACHED();
+  return invalidMilliseconds();
 }
 
 }  // namespace WebCore
