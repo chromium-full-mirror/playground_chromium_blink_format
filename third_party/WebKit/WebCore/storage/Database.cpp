@@ -141,6 +141,8 @@ PassRefPtr<Database> Database::openDatabase(Document* document,
         "Failed to open and verify version (expected %s) of database %s",
         expectedVersion.ascii().data(),
         database->databaseDebugName().ascii().data());
+    document->removeOpenDatabase(database.get());
+    DatabaseTracker::tracker().removeOpenDatabase(database.get());
     return 0;
   }
 
