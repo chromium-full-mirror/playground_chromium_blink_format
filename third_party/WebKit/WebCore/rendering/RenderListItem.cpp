@@ -50,7 +50,7 @@ void RenderListItem::styleDidChange(StyleDifference diff,
                                     const RenderStyle* oldStyle) {
   RenderBlock::styleDidChange(diff, oldStyle);
 
-  if (style()->listStyleType() != LNONE ||
+  if (style()->listStyleType() != NoneListStyle ||
       (style()->listStyleImage() &&
        !style()->listStyleImage()->errorOccurred())) {
     RefPtr<RenderStyle> newStyle = RenderStyle::create();

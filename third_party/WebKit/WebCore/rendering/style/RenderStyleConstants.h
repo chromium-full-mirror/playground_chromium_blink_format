@@ -253,27 +253,27 @@ enum EMatchNearestMailBlockquoteColor { BCNORMAL, MATCH };
 enum EResize { RESIZE_NONE, RESIZE_BOTH, RESIZE_HORIZONTAL, RESIZE_VERTICAL };
 
 enum EListStyleType {
-  DISC,
-  CIRCLE,
-  SQUARE,
-  LDECIMAL,
-  DECIMAL_LEADING_ZERO,
-  LOWER_ROMAN,
-  UPPER_ROMAN,
-  LOWER_GREEK,
-  LOWER_ALPHA,
-  LOWER_LATIN,
-  UPPER_ALPHA,
-  UPPER_LATIN,
-  HEBREW,
-  ARMENIAN,
-  GEORGIAN,
-  CJK_IDEOGRAPHIC,
-  HIRAGANA,
-  KATAKANA,
-  HIRAGANA_IROHA,
-  KATAKANA_IROHA,
-  LNONE
+  Disc,
+  Circle,
+  Square,
+  DecimalListStyle,
+  DecimalLeadingZero,
+  LowerRoman,
+  UpperRoman,
+  LowerGreek,
+  LowerAlpha,
+  LowerLatin,
+  UpperAlpha,
+  UpperLatin,
+  Hebrew,
+  Armenian,
+  Georgian,
+  CJKIdeographic,
+  Hiragana,
+  Katakana,
+  HiraganaIroha,
+  KatakanaIroha,
+  NoneListStyle
 };
 
 enum StyleContentType {
