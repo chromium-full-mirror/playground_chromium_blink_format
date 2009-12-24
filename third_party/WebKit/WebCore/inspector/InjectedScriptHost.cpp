@@ -74,6 +74,11 @@ InjectedScriptHost::InjectedScriptHost(InspectorController* inspectorController)
 
 InjectedScriptHost::~InjectedScriptHost() {}
 
+void InjectedScriptHost::clearConsoleMessages() {
+  if (m_inspectorController)
+    m_inspectorController->clearConsoleMessages();
+}
+
 void InjectedScriptHost::copyText(const String& text) {
   Pasteboard::generalPasteboard()->writePlainText(text);
 }

@@ -73,11 +73,6 @@ InspectorBackend::InspectorBackend(InspectorController* inspectorController)
 
 InspectorBackend::~InspectorBackend() {}
 
-void InspectorBackend::clearMessages(bool clearUI) {
-  if (m_inspectorController)
-    m_inspectorController->clearConsoleMessages(clearUI);
-}
-
 void InspectorBackend::storeLastActivePanel(const String& panelName) {
   if (m_inspectorController)
     m_inspectorController->storeLastActivePanel(panelName);

@@ -57,6 +57,8 @@ class InjectedScriptHost : public RefCounted<InjectedScriptHost> {
   InspectorController* inspectorController() { return m_inspectorController; }
   void disconnectController() { m_inspectorController = 0; }
 
+  void clearConsoleMessages();
+
   void copyText(const String& text);
   Node* nodeForId(long nodeId);
   ScriptValue wrapObject(const ScriptValue& object, const String& objectGroup);
