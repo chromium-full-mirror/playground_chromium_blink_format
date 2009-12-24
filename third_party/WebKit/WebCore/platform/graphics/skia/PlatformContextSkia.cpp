@@ -228,6 +228,7 @@ void PlatformContextSkia::beginLayerClippedToImage(
                    SkFloatToScalar(rect.right()),
                    SkFloatToScalar(rect.bottom())};
 
+  canvas()->clipRect(bounds);
   canvas()->saveLayerAlpha(
       &bounds, 255,
       static_cast<SkCanvas::SaveFlags>(SkCanvas::kHasAlphaLayer_SaveFlag |
