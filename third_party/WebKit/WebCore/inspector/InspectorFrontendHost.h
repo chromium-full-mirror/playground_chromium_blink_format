@@ -78,9 +78,6 @@ class InspectorFrontendHost : public RefCounted<InspectorFrontendHost> {
                         const String& source,
                         Node* frame);
 
-  String setting(const String& key);
-  void setSetting(const String& key, const String& value);
-
   // Called from [Custom] implementations.
   void showContextMenu(Event*, const Vector<ContextMenuItem*>& items);
 

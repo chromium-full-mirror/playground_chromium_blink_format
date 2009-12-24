@@ -289,6 +289,7 @@ class InspectorController
   void evaluateForTestInFrontend(long callId, const String& script);
 
  private:
+  static const char* const FrontendSettingsSettingName;
   friend class InspectorBackend;
   friend class InspectorFrontendHost;
   friend class InjectedScriptHost;

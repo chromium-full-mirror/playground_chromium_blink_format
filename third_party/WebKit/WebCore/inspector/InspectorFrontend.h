@@ -66,6 +66,8 @@ class InspectorFrontend : public Noncopyable {
 
   void didCommitLoad();
 
+  void populateFrontendSettings(const String& settings);
+
   void updateConsoleMessageExpiredCount(unsigned count);
   void addConsoleMessage(const ScriptObject& messageObj,
                          const Vector<ScriptString>& frames,

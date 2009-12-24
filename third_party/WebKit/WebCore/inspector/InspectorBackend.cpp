@@ -73,6 +73,12 @@ InspectorBackend::InspectorBackend(InspectorController* inspectorController)
 
 InspectorBackend::~InspectorBackend() {}
 
+void InspectorBackend::saveFrontendSettings(const String& settings) {
+  if (m_inspectorController)
+    m_inspectorController->setSetting(
+        InspectorController::FrontendSettingsSettingName, settings);
+}
+
 void InspectorBackend::storeLastActivePanel(const String& panelName) {
   if (m_inspectorController)
     m_inspectorController->storeLastActivePanel(panelName);

@@ -186,15 +186,6 @@ bool InspectorFrontendHost::addSourceToFrame(const String& mimeType,
   return true;
 }
 
-String InspectorFrontendHost::setting(const String& key) {
-  return m_inspectorController ? m_inspectorController->setting(key) : "";
-}
-
-void InspectorFrontendHost::setSetting(const String& key, const String& value) {
-  if (m_inspectorController)
-    m_inspectorController->setSetting(key, value);
-}
-
 void InspectorFrontendHost::showContextMenu(
     Event* event,
     const Vector<ContextMenuItem*>& items) {
