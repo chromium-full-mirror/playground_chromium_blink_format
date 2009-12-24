@@ -65,6 +65,8 @@ class InlineTextBox : public InlineRunBox {
   void setFallbackFonts(const HashSet<const SimpleFontData*>&);
   void takeFallbackFonts(Vector<const SimpleFontData*>&);
 
+  unsigned short truncation() { return m_truncation; }
+
  private:
   virtual int selectionTop();
   virtual int selectionHeight();
