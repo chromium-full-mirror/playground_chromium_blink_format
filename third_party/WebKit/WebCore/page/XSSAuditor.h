@@ -126,6 +126,19 @@ class XSSAuditor : public Noncopyable {
     String m_cachedCanonicalizedURL;
   };
 
+  struct FindTask {
+    FindTask()
+        : decodeEntities(true),
+          allowRequestIfNoIllegalURICharacters(false),
+          decodeURLEscapeSequencesTwice(false) {}
+
+    String context;
+    String string;
+    bool decodeEntities;
+    bool allowRequestIfNoIllegalURICharacters;
+    bool decodeURLEscapeSequencesTwice;
+  };
+
   static String canonicalize(const String&);
   static String decodeURL(const String& url,
                           const TextEncoding& encoding,
@@ -136,15 +149,8 @@ class XSSAuditor : public Noncopyable {
       bool leaveUndecodableEntitiesUntouched = true);
 
   bool isSameOriginResource(const String& url) const;
-  bool findInRequest(const String&,
-                     bool decodeEntities = true,
-                     bool allowRequestIfNoIllegalURICharacters = false,
-                     bool decodeURLEscapeSequencesTwice = false) const;
-  bool findInRequest(Frame*,
-                     const String&,
-                     bool decodeEntities = true,
-                     bool allowRequestIfNoIllegalURICharacters = false,
-                     bool decodeURLEscapeSequencesTwice = false) const;
+  bool findInRequest(const FindTask&) const;
+  bool findInRequest(Frame*, const FindTask&) const;
 
   // The frame to audit.
   Frame* m_frame;
