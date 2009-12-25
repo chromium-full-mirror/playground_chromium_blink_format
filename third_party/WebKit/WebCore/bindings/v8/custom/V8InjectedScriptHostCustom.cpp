@@ -115,7 +115,7 @@ v8::Handle<v8::Value> V8InjectedScriptHost::unwrapObjectCallback(
 v8::Handle<v8::Value> V8InjectedScriptHost::pushNodePathToFrontendCallback(
     const v8::Arguments& args) {
   INC_STATS("InjectedScriptHost.pushNodePathToFrontend()");
-  if (args.Length() < 2)
+  if (args.Length() < 3)
     return v8::Undefined();
 
   InjectedScriptHost* host =
@@ -123,9 +123,11 @@ v8::Handle<v8::Value> V8InjectedScriptHost::pushNodePathToFrontendCallback(
           V8ClassIndex::INJECTEDSCRIPTHOST, args.Holder());
   Node* node = V8DOMWrapper::convertDOMWrapperToNode<Node>(
       v8::Handle<v8::Object>::Cast(args[0]));
-  bool selectInUI = args[1]->ToBoolean()->Value();
+  bool withChildren = args[1]->ToBoolean()->Value();
+  bool selectInUI = args[2]->ToBoolean()->Value();
   if (node)
-    return v8::Number::New(host->pushNodePathToFrontend(node, selectInUI));
+    return v8::Number::New(
+        host->pushNodePathToFrontend(node, withChildren, selectInUI));
 
   return v8::Undefined();
 }

@@ -63,7 +63,7 @@ class InjectedScriptHost : public RefCounted<InjectedScriptHost> {
   Node* nodeForId(long nodeId);
   ScriptValue wrapObject(const ScriptValue& object, const String& objectGroup);
   ScriptValue unwrapObject(const String& objectId);
-  long pushNodePathToFrontend(Node* node, bool selectInUI);
+  long pushNodePathToFrontend(Node* node, bool withChildren, bool selectInUI);
 
   void addNodesToSearchResult(const String& nodeIds);
   long pushNodeByPathToFrontend(const String& path);
