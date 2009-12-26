@@ -92,8 +92,8 @@ int HTMLElement::tagPriority() const {
       hasLocalName(noscriptTag) || hasLocalName(rpTag) || hasLocalName(rtTag))
     return 3;
   if (hasLocalName(centerTag) || hasLocalName(nobrTag) ||
-      hasLocalName(rubyTag) || hasLocalName(navTag))
-    return 5;
+      hasLocalName(rubyTag) || hasLocalName(navTag) || hasLocalName(sectionTag))
+    return 5;  // Same as <div>.
   if (hasLocalName(noembedTag) || hasLocalName(noframesTag))
     return 10;
 
@@ -944,6 +944,7 @@ static HashSet<AtomicStringImpl*>* blockTagList() {
     tagList.add(pTag.localName().impl());
     tagList.add(plaintextTag.localName().impl());
     tagList.add(preTag.localName().impl());
+    tagList.add(sectionTag.localName().impl());
     tagList.add(tableTag.localName().impl());
     tagList.add(ulTag.localName().impl());
     tagList.add(xmpTag.localName().impl());
