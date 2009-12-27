@@ -87,7 +87,7 @@ static void initializeOffScreenTimerWindow() {
 
   timerWindowHandle =
       CreateWindow(kTimerWindowClassName, 0, 0, CW_USEDEFAULT, 0, CW_USEDEFAULT,
-                   0, HWND_MESSAGE, 0, Page::instanceHandle(), 0);
+                   0, 0, 0, Page::instanceHandle(), 0);
 }
 
 void setSharedTimerFiredFunction(void (*f)()) {
