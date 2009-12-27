@@ -22,6 +22,7 @@
 #define SVGPatternElement_h
 
 #if ENABLE(SVG)
+#include "RenderObject.h"
 #include "SVGExternalResourcesRequired.h"
 #include "SVGFitToViewBox.h"
 #include "SVGLangSpace.h"
@@ -57,7 +58,7 @@ class SVGPatternElement : public SVGStyledElement,
                                int childCountDelta = 0);
 
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
-  virtual SVGResource* canvasResource();
+  virtual SVGResource* canvasResource(const RenderObject*);
 
  private:
   ANIMATED_PROPERTY_DECLARATIONS(SVGPatternElement,

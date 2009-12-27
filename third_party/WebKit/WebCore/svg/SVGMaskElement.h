@@ -27,6 +27,7 @@
 #include "SVGStyledLocatableElement.h"
 #include "SVGTests.h"
 #include "SVGURIReference.h"
+#include <wtf/HashMap.h>
 #include <wtf/PassOwnPtr.h>
 
 namespace WebCore {
@@ -51,7 +52,7 @@ class SVGMaskElement : public SVGStyledLocatableElement,
                                int childCountDelta = 0);
 
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
-  virtual SVGResource* canvasResource();
+  virtual SVGResource* canvasResource(const RenderObject*);
 
   PassOwnPtr<ImageBuffer> drawMaskerContent(const FloatRect& targetRect,
                                             FloatRect& maskRect) const;
@@ -110,7 +111,7 @@ class SVGMaskElement : public SVGStyledLocatableElement,
                                  ExternalResourcesRequired,
                                  externalResourcesRequired)
 
-  RefPtr<SVGResourceMasker> m_masker;
+  HashMap<const RenderObject*, RefPtr<SVGResourceMasker>> m_masker;
 };
 
 }  // namespace WebCore

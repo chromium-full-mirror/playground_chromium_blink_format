@@ -206,8 +206,10 @@ TextStream& SVGResourceFilter::externalRepresentation(TextStream& ts) const {
   return ts;
 }
 
-SVGResourceFilter* getFilterById(Document* document, const AtomicString& id) {
-  SVGResource* resource = getResourceById(document, id);
+SVGResourceFilter* getFilterById(Document* document,
+                                 const AtomicString& id,
+                                 const RenderObject* object) {
+  SVGResource* resource = getResourceById(document, id, object);
   if (resource && resource->isFilter())
     return static_cast<SVGResourceFilter*>(resource);
 

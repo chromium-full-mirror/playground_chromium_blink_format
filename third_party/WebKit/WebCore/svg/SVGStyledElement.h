@@ -50,7 +50,7 @@ class SVGStyledElement : public SVGElement, public SVGStylable {
   bool isKnownAttribute(const QualifiedName&);
 
   virtual bool rendererIsNeeded(RenderStyle*);
-  virtual SVGResource* canvasResource() { return 0; }
+  virtual SVGResource* canvasResource(const RenderObject*) { return 0; }
 
   virtual bool mapToEntry(const QualifiedName&, MappedAttributeEntry&) const;
   virtual void parseMappedAttribute(MappedAttribute*);

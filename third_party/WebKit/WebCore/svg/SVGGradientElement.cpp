@@ -120,7 +120,7 @@ RenderObject* SVGGradientElement::createRenderer(RenderArena* arena,
   return new (arena) RenderSVGHiddenContainer(this);
 }
 
-SVGResource* SVGGradientElement::canvasResource() {
+SVGResource* SVGGradientElement::canvasResource(const RenderObject*) {
   if (!m_resource) {
     if (gradientType() == LinearGradientPaintServer)
       m_resource = SVGPaintServerLinearGradient::create(this);

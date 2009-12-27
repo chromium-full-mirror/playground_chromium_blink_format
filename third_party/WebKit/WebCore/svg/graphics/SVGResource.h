@@ -28,6 +28,7 @@
 
 #if ENABLE(SVG)
 #include "PlatformString.h"
+#include "RenderObject.h"
 #include "StringHash.h"
 
 #include <wtf/HashMap.h>
@@ -93,7 +94,9 @@ class SVGResource : public RefCounted<SVGResource> {
   HashSet<SVGStyledElement*> m_clients;
 };
 
-SVGResource* getResourceById(Document*, const AtomicString&);
+SVGResource* getResourceById(Document*,
+                             const AtomicString&,
+                             const RenderObject*);
 
 TextStream& operator<<(TextStream&, const SVGResource&);
 

@@ -29,6 +29,7 @@
 #if ENABLE(SVG)
 
 #include "DashArray.h"
+#include "RenderObject.h"
 #include "SVGResource.h"
 
 #if PLATFORM(CG)
@@ -96,7 +97,9 @@ class SVGPaintServer : public SVGResource {
 
 TextStream& operator<<(TextStream&, const SVGPaintServer&);
 
-SVGPaintServer* getPaintServerById(Document*, const AtomicString&);
+SVGPaintServer* getPaintServerById(Document*,
+                                   const AtomicString&,
+                                   const RenderObject*);
 
 void applyStrokeStyleToContext(GraphicsContext*,
                                RenderStyle*,

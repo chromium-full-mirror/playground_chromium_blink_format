@@ -77,7 +77,9 @@ class SVGResourceMarker : public SVGResource {
   bool m_useStrokeWidth;
 };
 
-SVGResourceMarker* getMarkerById(Document*, const AtomicString&);
+SVGResourceMarker* getMarkerById(Document*,
+                                 const AtomicString&,
+                                 const RenderObject*);
 
 }  // namespace WebCore
 

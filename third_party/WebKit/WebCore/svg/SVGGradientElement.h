@@ -22,6 +22,7 @@
 #define SVGGradientElement_h
 
 #if ENABLE(SVG)
+#include "RenderObject.h"
 #include "SVGPaintServerGradient.h"
 #include "SVGExternalResourcesRequired.h"
 #include "SVGStyledElement.h"
@@ -48,7 +49,7 @@ class SVGGradientElement : public SVGStyledElement,
                                int childCountDelta = 0);
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
 
-  virtual SVGResource* canvasResource();
+  virtual SVGResource* canvasResource(const RenderObject*);
 
  protected:
   friend class SVGPaintServerGradient;

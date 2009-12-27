@@ -52,8 +52,10 @@ TextStream& operator<<(TextStream& ts, const SVGPaintServer& paintServer) {
   return paintServer.externalRepresentation(ts);
 }
 
-SVGPaintServer* getPaintServerById(Document* document, const AtomicString& id) {
-  SVGResource* resource = getResourceById(document, id);
+SVGPaintServer* getPaintServerById(Document* document,
+                                   const AtomicString& id,
+                                   const RenderObject* object) {
+  SVGResource* resource = getResourceById(document, id, object);
   if (resource && resource->isPaintServer())
     return static_cast<SVGPaintServer*>(resource);
 
@@ -79,7 +81,7 @@ SVGPaintServer* SVGPaintServer::fillPaintServer(const RenderStyle* style,
   if (paintType == SVGPaint::SVG_PAINTTYPE_URI ||
       paintType == SVGPaint::SVG_PAINTTYPE_URI_RGBCOLOR) {
     AtomicString id(SVGURIReference::getTarget(fill->uri()));
-    fillPaintServer = getPaintServerById(item->document(), id);
+    fillPaintServer = getPaintServerById(item->document(), id, item);
 
     SVGElement* svgElement = static_cast<SVGElement*>(item->node());
     ASSERT(svgElement && svgElement->document() && svgElement->isStyled());
@@ -123,7 +125,7 @@ SVGPaintServer* SVGPaintServer::strokePaintServer(const RenderStyle* style,
   if (paintType == SVGPaint::SVG_PAINTTYPE_URI ||
       paintType == SVGPaint::SVG_PAINTTYPE_URI_RGBCOLOR) {
     AtomicString id(SVGURIReference::getTarget(stroke->uri()));
-    strokePaintServer = getPaintServerById(item->document(), id);
+    strokePaintServer = getPaintServerById(item->document(), id, item);
 
     SVGElement* svgElement = static_cast<SVGElement*>(item->node());
     ASSERT(svgElement && svgElement->document() && svgElement->isStyled());

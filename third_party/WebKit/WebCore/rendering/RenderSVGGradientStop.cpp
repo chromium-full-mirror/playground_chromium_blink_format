@@ -47,7 +47,7 @@ void RenderSVGGradientStop::styleDidChange(StyleDifference diff,
   // but I can imagine a few cases we might not be catching, so let's not crash
   // if our parent isn't a gradient.
   if (SVGGradientElement* gradient = gradientElement()) {
-    if (SVGResource* resource = gradient->canvasResource())
+    if (SVGResource* resource = gradient->canvasResource(this))
       resource->invalidate();
   }
 }

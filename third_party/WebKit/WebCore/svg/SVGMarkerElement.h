@@ -23,7 +23,7 @@
 #define SVGMarkerElement_h
 
 #if ENABLE(SVG)
-
+#include "RenderObject.h"
 #include "SVGAngle.h"
 #include "SVGExternalResourcesRequired.h"
 #include "SVGFitToViewBox.h"
@@ -72,7 +72,7 @@ class SVGMarkerElement : public SVGStyledElement,
                                int childCountDelta = 0);
 
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
-  virtual SVGResource* canvasResource();
+  virtual SVGResource* canvasResource(const RenderObject*);
 
  private:
   ANIMATED_PROPERTY_DECLARATIONS(SVGMarkerElement,
