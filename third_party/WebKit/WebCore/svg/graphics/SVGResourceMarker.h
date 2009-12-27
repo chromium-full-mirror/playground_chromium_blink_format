@@ -29,11 +29,11 @@
 #if ENABLE(SVG)
 
 #include "FloatRect.h"
+#include "RenderObject.h"
 #include "SVGResource.h"
 
 namespace WebCore {
 
-class GraphicsContext;
 class RenderSVGViewportContainer;
 
 class SVGResourceMarker : public SVGResource {
@@ -59,8 +59,7 @@ class SVGResourceMarker : public SVGResource {
   bool useStrokeWidth() const { return m_useStrokeWidth; }
 
   FloatRect cachedBounds() const;
-  void draw(GraphicsContext*,
-            const FloatRect&,
+  void draw(RenderObject::PaintInfo&,
             double x,
             double y,
             double strokeWidth = 1,

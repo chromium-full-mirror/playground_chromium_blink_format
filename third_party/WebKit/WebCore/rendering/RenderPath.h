@@ -66,9 +66,7 @@ class RenderPath : public RenderSVGModelObject {
                                 const FloatPoint& pointInParent,
                                 HitTestAction);
 
-  FloatRect drawMarkersIfNeeded(GraphicsContext*,
-                                const FloatRect&,
-                                const Path&) const;
+  FloatRect drawMarkersIfNeeded(PaintInfo&, const Path&) const;
 
  private:
   virtual TransformationMatrix localTransform() const;
