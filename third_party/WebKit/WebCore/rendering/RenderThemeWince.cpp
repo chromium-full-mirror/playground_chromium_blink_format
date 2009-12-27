@@ -28,6 +28,7 @@
 #include "CSSValueKeywords.h"
 #include "Document.h"
 #include "GraphicsContext.h"
+#include "NotImplemented.h"
 #if ENABLE(VIDEO)
 #include "HTMLMediaElement.h"
 #endif
@@ -418,12 +419,12 @@ bool RenderThemeWince::paintSearchFieldCancelButton(
   paintInfo.context->save();
   paintInfo.context->addRoundedRectClip(
       cancelBounds, cancelRadius, cancelRadius, cancelRadius, cancelRadius);
-  paintInfo.context->fillRect(cancelBounds, buttonColor);
+  paintInfo.context->fillRect(cancelBounds, buttonColor, DeviceColorSpace);
 
   // Draw the 'x'
   IntSize xSize(3, 3);
   IntRect xBounds(cancelBounds.location() + IntSize(3, 3), xSize);
-  paintInfo.context->setStrokeColor(Color::white);
+  paintInfo.context->setStrokeColor(Color::white, DeviceColorSpace);
   paintInfo.context->drawLine(xBounds.location(),
                               xBounds.location() + xBounds.size());
   paintInfo.context->drawLine(IntPoint(xBounds.right(), xBounds.y()),
@@ -554,8 +555,8 @@ bool RenderThemeWince::paintSliderTrack(RenderObject* o,
   bool rc = RenderTheme::paintSliderTrack(o, i, r);
   IntPoint left = IntPoint(r.x() + 2, (r.y() + r.bottom()) / 2);
   i.context->save();
-  i.context->setStrokeColor(Color::gray);
-  i.context->setFillColor(Color::gray);
+  i.context->setStrokeColor(Color::gray, DeviceColorSpace);
+  i.context->setFillColor(Color::gray, DeviceColorSpace);
   i.context->fillRect(r);
 #if ENABLE(VIDEO)
   HTMLMediaElement* mediaElement = mediaElementParent(o->node());
@@ -568,7 +569,7 @@ bool RenderThemeWince::paintSliderTrack(RenderObject* o,
     left = right;
   }
 #endif
-  i.context->setStrokeColor(Color::black);
+  i.context->setStrokeColor(Color::black, DeviceColorSpace);
   i.context->drawLine(left, IntPoint(r.right() - 2, left.y()));
   i.context->restore();
   return rc;
@@ -579,8 +580,8 @@ bool RenderThemeWince::paintSliderThumb(RenderObject* o,
                                         const IntRect& r) {
   bool rc = RenderTheme::paintSliderThumb(o, i, r);
   i.context->save();
-  i.context->setStrokeColor(Color::black);
-  i.context->setFillColor(Color::black);
+  i.context->setStrokeColor(Color::black, DeviceColorSpace);
+  i.context->setFillColor(Color::black, DeviceColorSpace);
 #if ENABLE(VIDEO)
   HTMLMediaElement* mediaElement = mediaElementParent(o->node());
   if (mediaElement) {
