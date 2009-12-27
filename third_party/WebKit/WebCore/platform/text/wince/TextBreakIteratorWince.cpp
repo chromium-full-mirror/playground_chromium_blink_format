@@ -23,6 +23,7 @@
 #include "TextBreakIterator.h"
 
 #include "PlatformString.h"
+#include <wtf/StdLibExtras.h>
 #include <wtf/unicode/Unicode.h>
 
 using namespace WTF::Unicode;
@@ -279,4 +280,5 @@ bool isTextBreak(TextBreakIterator*, int) {
 TextBreakIterator* cursorMovementIterator(const UChar* string, int length) {
   return characterBreakIterator(string, length);
 }
-}
+
+}  // namespace WebCore
