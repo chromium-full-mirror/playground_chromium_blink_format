@@ -57,7 +57,7 @@ class SVGResourceMasker : public SVGResource {
   virtual TextStream& externalRepresentation(TextStream&) const;
 
   // To be implemented by the specific rendering devices
-  void applyMask(GraphicsContext*, const FloatRect& boundingBox);
+  bool applyMask(GraphicsContext*, const FloatRect& boundingBox);
 
  private:
   SVGResourceMasker(const SVGMaskElement*);
@@ -66,6 +66,7 @@ class SVGResourceMasker : public SVGResource {
 
   OwnPtr<ImageBuffer> m_mask;
   FloatRect m_maskRect;
+  bool m_emptyMask;
 };
 
 SVGResourceMasker* getMaskerById(Document*,

@@ -81,7 +81,7 @@ void SVGRenderBase::mapLocalToContainer(const RenderObject* object,
                                         transformState);
 }
 
-void SVGRenderBase::prepareToRenderSVGContent(
+bool SVGRenderBase::prepareToRenderSVGContent(
     RenderObject* object,
     RenderObject::PaintInfo& paintInfo,
     const FloatRect& boundingBox,
@@ -150,7 +150,8 @@ void SVGRenderBase::prepareToRenderSVGContent(
 
   if (masker) {
     masker->addClient(styledElement);
-    masker->applyMask(paintInfo.context, boundingBox);
+    if (!masker->applyMask(paintInfo.context, boundingBox))
+      return false;
   } else if (!maskerId.isEmpty())
     svgElement->document()->accessSVGExtensions()->addPendingResource(
         maskerId, styledElement);
@@ -165,11 +166,14 @@ void SVGRenderBase::prepareToRenderSVGContent(
 #if ENABLE(FILTERS)
   if (filter) {
     filter->addClient(styledElement);
-    filter->prepareFilter(paintInfo.context, object);
+    if (!filter->prepareFilter(paintInfo.context, object))
+      return false;
   } else if (!filterId.isEmpty())
     svgElement->document()->accessSVGExtensions()->addPendingResource(
         filterId, styledElement);
 #endif
+
+  return true;
 }
 
 void SVGRenderBase::finishRenderSVGContent(RenderObject* object,

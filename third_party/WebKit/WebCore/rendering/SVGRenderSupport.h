@@ -41,7 +41,7 @@ class SVGRenderBase {
   // FIXME: These are only public for SVGRootInlineBox.
   // It's unclear if these should be exposed or not.  SVGRootInlineBox may
   // pass the wrong RenderObject* and boundingBox to these functions.
-  static void prepareToRenderSVGContent(RenderObject*,
+  static bool prepareToRenderSVGContent(RenderObject*,
                                         RenderObject::PaintInfo&,
                                         const FloatRect& boundingBox,
                                         SVGResourceFilter*&,

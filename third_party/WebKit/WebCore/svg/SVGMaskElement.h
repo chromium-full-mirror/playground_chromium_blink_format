@@ -55,7 +55,8 @@ class SVGMaskElement : public SVGStyledLocatableElement,
   virtual SVGResource* canvasResource(const RenderObject*);
 
   PassOwnPtr<ImageBuffer> drawMaskerContent(const FloatRect& targetRect,
-                                            FloatRect& maskRect) const;
+                                            FloatRect& maskRect,
+                                            bool& emptyMask) const;
 
  private:
   ANIMATED_PROPERTY_DECLARATIONS(SVGMaskElement,
