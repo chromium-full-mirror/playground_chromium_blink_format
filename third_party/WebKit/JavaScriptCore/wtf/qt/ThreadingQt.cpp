@@ -62,6 +62,18 @@ void ThreadPrivate::run() {
   m_returnValue = m_entryPoint(m_data);
 }
 
+class ThreadMonitor : public QObject {
+  Q_OBJECT
+ public:
+  static ThreadMonitor* instance() {
+    static ThreadMonitor* instance = new ThreadMonitor();
+    return instance;
+  }
+
+ public Q_SLOTS:
+  void threadFinished() { sender()->deleteLater(); }
+};
+
 static Mutex* atomicallyInitializedStaticMutex;
 
 static ThreadIdentifier mainThreadIdentifier;
@@ -145,6 +157,10 @@ ThreadIdentifier createThreadInternal(ThreadFunction entryPoint,
               entryPoint, data);
     return 0;
   }
+
+  QObject::connect(thread, SIGNAL(finished()), ThreadMonitor::instance(),
+                   SLOT(threadFinished()));
+
   thread->start();
 
   QThread* threadRef = static_cast<QThread*>(thread);
@@ -168,7 +184,10 @@ int waitForThreadCompletion(ThreadIdentifier threadID, void** result) {
   return !res;
 }
 
-void detachThread(ThreadIdentifier) {}
+void detachThread(ThreadIdentifier threadID) {
+  ASSERT(threadID);
+  clearThreadForIdentifier(threadID);
+}
 
 ThreadIdentifier currentThread() {
   QThread* currentThread = QThread::currentThread();
@@ -237,5 +256,7 @@ void ThreadCondition::broadcast() {
 }
 
 }  // namespace WebCore
+
+#include "ThreadingQt.moc"
 
 #endif
