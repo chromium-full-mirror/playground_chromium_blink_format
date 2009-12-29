@@ -27,15 +27,14 @@
 #define SVGResourceMarker_h
 
 #if ENABLE(SVG)
+
 #include "FloatRect.h"
-#include "FloatPoint.h"
 #include "RenderObject.h"
 #include "SVGResource.h"
 
 namespace WebCore {
 
 class RenderSVGViewportContainer;
-class TransformationMatrix;
 
 class SVGResourceMarker : public SVGResource {
  public:
@@ -44,14 +43,11 @@ class SVGResourceMarker : public SVGResource {
   }
   virtual ~SVGResourceMarker();
 
-  FloatRect markerBoundaries() const;
-  TransformationMatrix markerTransformation(const FloatPoint& origin,
-                                            float angle,
-                                            float strokeWidth) const;
-  void setRenderer(RenderSVGViewportContainer* marker) { m_renderer = marker; }
+  void setMarker(RenderSVGViewportContainer*);
 
-  void setReferencePoint(const FloatPoint& point) { m_referencePoint = point; }
-  FloatPoint referencePoint() const { return m_referencePoint; }
+  void setRef(double refX, double refY);
+  double refX() const { return m_refX; }
+  double refY() const { return m_refY; }
 
   void setAngle(float angle) { m_angle = angle; }
   void setAutoAngle() { m_angle = -1; }
@@ -62,17 +58,22 @@ class SVGResourceMarker : public SVGResource {
   }
   bool useStrokeWidth() const { return m_useStrokeWidth; }
 
-  void draw(RenderObject::PaintInfo&, const TransformationMatrix&);
+  FloatRect cachedBounds() const;
+  void draw(RenderObject::PaintInfo&,
+            double x,
+            double y,
+            double strokeWidth = 1,
+            double angle = 0);
 
   virtual SVGResourceType resourceType() const { return MarkerResourceType; }
   virtual TextStream& externalRepresentation(TextStream&) const;
 
  private:
   SVGResourceMarker();
-
-  FloatPoint m_referencePoint;
+  double m_refX, m_refY;
+  FloatRect m_cachedBounds;
   float m_angle;
-  RenderSVGViewportContainer* m_renderer;
+  RenderSVGViewportContainer* m_marker;
   bool m_useStrokeWidth;
 };
 

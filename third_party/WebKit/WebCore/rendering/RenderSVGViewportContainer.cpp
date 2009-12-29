@@ -36,20 +36,21 @@ namespace WebCore {
 RenderSVGViewportContainer::RenderSVGViewportContainer(SVGStyledElement* node)
     : RenderSVGContainer(node) {}
 
-TransformationMatrix RenderSVGViewportContainer::markerContentTransformation(
-    const TransformationMatrix& contentTransformation,
-    const FloatPoint& origin,
-    float strokeWidth) const {
-  // The 'origin' coordinate maps to SVGs refX/refY, given in coordinates
-  // relative to the viewport established by the marker
-  FloatPoint mappedOrigin = viewportTransform().mapPoint(origin);
+void RenderSVGViewportContainer::paint(PaintInfo& paintInfo,
+                                       int parentX,
+                                       int parentY) {
+  // FIXME: The if statement here evaluates to false. isEmpty() is exactly the
+  // same
+  // as what is on the right side, so it's basically !isEmpty && isEmpty. So
+  // this
+  // function does nothing.
 
-  TransformationMatrix transformation = contentTransformation;
-  if (strokeWidth != -1)
-    transformation.scaleNonUniform(strokeWidth, strokeWidth);
+  // A value of zero disables rendering of the element.
+  if (!m_viewport.isEmpty() &&
+      (m_viewport.width() <= 0. || m_viewport.height() <= 0.))
+    return;
 
-  transformation.translate(-mappedOrigin.x(), -mappedOrigin.y());
-  return transformation;
+  RenderSVGContainer::paint(paintInfo, parentX, parentY);
 }
 
 void RenderSVGViewportContainer::applyViewportClip(PaintInfo& paintInfo) {
@@ -127,3 +128,5 @@ bool RenderSVGViewportContainer::pointIsInsideViewportClip(
 }
 
 #endif  // ENABLE(SVG)
+
+// vim:ts=4:noet

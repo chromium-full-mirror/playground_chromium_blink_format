@@ -24,6 +24,7 @@
 #define RenderSVGViewportContainer_h
 
 #if ENABLE(SVG)
+
 #include "RenderSVGContainer.h"
 
 namespace WebCore {
@@ -36,14 +37,11 @@ class RenderSVGViewportContainer : public RenderSVGContainer {
  public:
   RenderSVGViewportContainer(SVGStyledElement*);
 
-  // Generates a transformation matrix usable to render marker content. Handles
-  // scaling the marker content
-  // acording to SVGs markerUnits="strokeWidth" concept, when a strokeWidth
-  // value != -1 is passed in.
-  TransformationMatrix markerContentTransformation(
-      const TransformationMatrix& contentTransformation,
-      const FloatPoint& origin,
-      float strokeWidth = -1) const;
+  // FIXME: This is only public for SVGResourceMarker::draw, likely the callsite
+  // should be changed.
+  TransformationMatrix viewportTransform() const;
+
+  virtual void paint(PaintInfo&, int parentX, int parentY);
 
  private:
   virtual bool isSVGContainer() const { return true; }
@@ -51,7 +49,6 @@ class RenderSVGViewportContainer : public RenderSVGContainer {
     return "RenderSVGViewportContainer";
   }
 
-  TransformationMatrix viewportTransform() const;
   virtual TransformationMatrix localToParentTransform() const;
 
   // FIXME: This override should be removed once callers of
@@ -80,3 +77,5 @@ void toRenderSVGViewportContainer(const RenderSVGViewportContainer*);
 
 #endif  // ENABLE(SVG)
 #endif  // RenderSVGViewportContainer_h
+
+// vim:ts=4:noet
