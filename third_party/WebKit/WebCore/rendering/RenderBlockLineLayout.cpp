@@ -2185,6 +2185,7 @@ InlineIterator RenderBlock::findNextLineBreak(InlineBidiResolver& resolver,
             if (lineWasTooWide || w + tmpW > width) {
               if (lBreak.obj && shouldPreserveNewline(lBreak.obj) &&
                   lBreak.obj->isText() &&
+                  toRenderText(lBreak.obj)->textLength() &&
                   !toRenderText(lBreak.obj)->isWordBreak() &&
                   toRenderText(lBreak.obj)->characters()[lBreak.pos] == '\n') {
                 if (!stoppedIgnoringSpaces && pos > 0) {
