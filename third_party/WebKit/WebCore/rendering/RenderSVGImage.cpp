@@ -265,13 +265,12 @@ void RenderSVGImage::mapLocalToContainer(RenderBoxModelObject* repaintContainer,
                                      useTransforms, transformState);
 }
 
-void RenderSVGImage::addFocusRingRects(GraphicsContext* graphicsContext,
-                                       int,
-                                       int) {
+void RenderSVGImage::addFocusRingRects(Vector<IntRect>& rects, int, int) {
   // this is called from paint() after the localTransform has already been
   // applied
   IntRect contentRect = enclosingIntRect(repaintRectInLocalCoordinates());
-  graphicsContext->addFocusRingRect(contentRect);
+  if (!contentRect.isEmpty())
+    rects.append(contentRect);
 }
 
 void RenderSVGImage::absoluteRects(Vector<IntRect>& rects, int, int) {

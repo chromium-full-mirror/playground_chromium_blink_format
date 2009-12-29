@@ -935,7 +935,7 @@ class RenderObject : public CachedResourceClient {
                                  const IntSize& offsetInContainer,
                                  TransformationMatrix&) const;
 
-  virtual void addFocusRingRects(GraphicsContext*, int /*tx*/, int /*ty*/){};
+  virtual void addFocusRingRects(Vector<IntRect>&, int /*tx*/, int /*ty*/){};
 
   IntRect absoluteOutlineBounds() const { return outlineBoundsForRepaint(0); }
 

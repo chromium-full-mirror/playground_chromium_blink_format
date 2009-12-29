@@ -269,7 +269,10 @@ void GraphicsContext::fillRoundedRect(const IntRect& rect,
   notImplemented();
 }
 
-void GraphicsContext::drawFocusRing(const Color& color) {
+void GraphicsContext::drawFocusRing(const Vector<IntRect>& rects,
+                                    int width,
+                                    int offset,
+                                    const Color& color) {
   if (paintingDisabled())
     return;
 

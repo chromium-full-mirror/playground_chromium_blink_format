@@ -537,10 +537,11 @@ void RenderTextControl::selectionChanged(bool userTriggered) {
   }
 }
 
-void RenderTextControl::addFocusRingRects(GraphicsContext* graphicsContext,
+void RenderTextControl::addFocusRingRects(Vector<IntRect>& rects,
                                           int tx,
                                           int ty) {
-  graphicsContext->addFocusRingRect(IntRect(tx, ty, width(), height()));
+  if (width() && height())
+    rects.append(IntRect(tx, ty, width(), height()));
 }
 
 HTMLElement* RenderTextControl::innerTextElement() const {

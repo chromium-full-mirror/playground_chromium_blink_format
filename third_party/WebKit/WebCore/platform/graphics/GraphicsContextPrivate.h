@@ -50,7 +50,7 @@ struct GraphicsContextState {
         shadowsIgnoreTransforms(false)
 #if PLATFORM(CAIRO)
         ,
-        globalAlpha(1.0f)
+        globalAlpha(1)
 #endif
   {
   }
@@ -88,16 +88,10 @@ struct GraphicsContextState {
 
 class GraphicsContextPrivate : public Noncopyable {
  public:
-  GraphicsContextPrivate()
-      : m_focusRingWidth(0),
-        m_focusRingOffset(0),
-        m_updatingControlTints(false) {}
+  GraphicsContextPrivate() : m_updatingControlTints(false) {}
 
   GraphicsContextState state;
   Vector<GraphicsContextState> stack;
-  Vector<IntRect> m_focusRingRects;
-  int m_focusRingWidth;
-  int m_focusRingOffset;
   bool m_updatingControlTints;
 };
 

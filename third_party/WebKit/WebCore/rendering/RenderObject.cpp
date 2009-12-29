@@ -1081,14 +1081,12 @@ void RenderObject::paintOutline(GraphicsContext* graphicsContext,
     if (!theme()->supportsFocusRing(style)) {
       // Only paint the focus ring by hand if the theme isn't able to draw the
       // focus ring.
-      graphicsContext->initFocusRing(ow, offset);
-      addFocusRingRects(graphicsContext, tx, ty);
+      Vector<IntRect> focusRingRects;
+      addFocusRingRects(focusRingRects, tx, ty);
       if (style->outlineStyleIsAuto())
-        graphicsContext->drawFocusRing(oc);
+        graphicsContext->drawFocusRing(focusRingRects, ow, offset, oc);
       else
-        addPDFURLRect(graphicsContext,
-                      graphicsContext->focusRingBoundingRect());
-      graphicsContext->clearFocusRing();
+        addPDFURLRect(graphicsContext, unionRect(focusRingRects));
     }
   }
 
