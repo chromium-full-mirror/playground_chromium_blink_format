@@ -91,6 +91,8 @@ class DumpRenderTree : public QObject {
   QWebPage* createWindow();
   int windowCount() const;
 
+  void switchFocus(bool focused);
+
   WebPage* webPage() const { return m_page; }
 
 #if defined(Q_WS_X11)

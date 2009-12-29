@@ -113,6 +113,8 @@ class LayoutTestController : public QObject {
   void setPopupBlockingEnabled(bool enable);
   void setPOSIXLocale(const QString& locale);
   void resetLoadFinished() { m_loadFinished = false; }
+  void setWindowIsKey(bool isKey);
+  void setMainFrameIsFirstResponder(bool isFirst);
 
   bool pauseAnimationAtTimeOnElementWithId(const QString& animationName,
                                            double time,
