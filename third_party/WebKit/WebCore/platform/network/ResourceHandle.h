@@ -193,7 +193,7 @@ class ResourceHandle : public RefCounted<ResourceHandle>
                                                  LPARAM);
 #endif
 
-#if PLATFORM(QT) || USE(CURL) || USE(SOUP)
+#if PLATFORM(QT) || USE(CURL) || USE(SOUP) || PLATFORM(ANDROID)
   ResourceHandleInternal* getInternal() { return d.get(); }
 #endif
 
