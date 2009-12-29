@@ -47,6 +47,7 @@ using namespace Phonon;
 #define LOG_MEDIAOBJECT() \
   (LOG(Media, "%s", debugMediaObject(this, *m_mediaObject).constData()))
 
+#if !LOG_DISABLED
 static QByteArray debugMediaObject(WebCore::MediaPlayerPrivate* mediaPlayer,
                                    const MediaObject& mediaObject) {
   QByteArray byteArray;
@@ -75,6 +76,7 @@ static QByteArray debugMediaObject(WebCore::MediaPlayerPrivate* mediaPlayer,
 
   return byteArray;
 }
+#endif
 
 using namespace WTF;
 
@@ -475,7 +477,7 @@ void MediaPlayerPrivate::aboutToFinish() {
 }
 
 void MediaPlayerPrivate::totalTimeChanged(qint64 totalTime) {
-  LOG(Media, "MediaPlayerPrivatePhonon::totalTimeChanged(%d)", totalTime);
+  LOG(Media, "MediaPlayerPrivatePhonon::totalTimeChanged(%lld)", totalTime);
   LOG_MEDIAOBJECT();
 }
 
