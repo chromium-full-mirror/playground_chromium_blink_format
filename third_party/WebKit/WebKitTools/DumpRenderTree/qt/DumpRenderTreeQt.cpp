@@ -615,6 +615,10 @@ static const char* methodNameStringForFailedTest(
 }
 
 void DumpRenderTree::dump() {
+  // Prevent any further frame load callbacks from appearing after we dump the
+  // result.
+  qt_dump_frame_loader(false);
+
   QWebFrame* mainFrame = m_page->mainFrame();
 
   // fprintf(stderr, "    Dumping\n");

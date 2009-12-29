@@ -298,11 +298,7 @@ void FrameLoaderClientQt::dispatchDidPopStateWithinPage() {
   notImplemented();
 }
 
-void FrameLoaderClientQt::dispatchWillClose() {
-  if (dumpFrameLoaderCallbacks)
-    printf("%s - willCloseFrame\n",
-           qPrintable(drtDescriptionSuitableForTestResult(m_frame)));
-}
+void FrameLoaderClientQt::dispatchWillClose() {}
 
 void FrameLoaderClientQt::dispatchDidStartProvisionalLoad() {
   if (dumpFrameLoaderCallbacks)
@@ -527,10 +523,6 @@ String FrameLoaderClientQt::userAgent(const KURL& url) {
 }
 
 void FrameLoaderClientQt::dispatchDidReceiveIcon() {
-  if (dumpFrameLoaderCallbacks)
-    printf("%s - didReceiveIconForFrame\n",
-           qPrintable(drtDescriptionSuitableForTestResult(m_frame)));
-
   if (m_webFrame) {
     emit m_webFrame->iconChanged();
   }
@@ -553,10 +545,6 @@ void FrameLoaderClientQt::dispatchDidClearWindowObjectInWorld(
     DOMWrapperWorld* world) {
   if (world != mainThreadNormalWorld())
     return;
-
-  if (dumpFrameLoaderCallbacks)
-    printf("%s - didClearWindowObjectForFrame\n",
-           qPrintable(drtDescriptionSuitableForTestResult(m_frame)));
 
   if (m_webFrame)
     emit m_webFrame->javaScriptWindowObjectCleared();
