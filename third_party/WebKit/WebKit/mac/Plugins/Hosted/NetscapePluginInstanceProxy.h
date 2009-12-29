@@ -49,11 +49,13 @@ class RootObject;
 }
 }
 @class WebHostedNetscapePluginView;
+@class WebFrame;
 
 namespace WebKit {
 
 class HostedNetscapePluginStream;
 class NetscapePluginHostProxy;
+class PluginRequest;
 class ProxyInstance;
 
 class NetscapePluginInstanceProxy
@@ -315,6 +317,8 @@ class NetscapePluginInstanceProxy
     return std::auto_ptr<T>(static_cast<T*>(reply));
   }
 
+  void webFrameDidFinishLoadWithReason(WebFrame*, NPReason);
+
  private:
   NetscapePluginInstanceProxy(NetscapePluginHostProxy*,
                               WebHostedNetscapePluginView*,
@@ -337,7 +341,7 @@ class NetscapePluginInstanceProxy
 
   void requestTimerFired(WebCore::Timer<NetscapePluginInstanceProxy>*);
   WebCore::Timer<NetscapePluginInstanceProxy> m_requestTimer;
-  Deque<PluginRequest*> m_pluginRequests;
+  Deque<RefPtr<PluginRequest>> m_pluginRequests;
 
   HashMap<uint32_t, RefPtr<HostedNetscapePluginStream>> m_streams;
 
@@ -384,6 +388,9 @@ class NetscapePluginInstanceProxy
   bool m_pluginIsWaitingForDraw;
 
   RefPtr<HostedNetscapePluginStream> m_manualStream;
+
+  typedef HashMap<WebFrame*, RefPtr<PluginRequest>> FrameLoadMap;
+  FrameLoadMap m_pendingFrameLoads;
 };
 
 }  // namespace WebKit

@@ -78,6 +78,8 @@ class HostedNetscapePluginStream
 
   void cancelLoad(NPReason reason);
 
+  static NPReason reasonForError(NSError* error);
+
  private:
   NSError* errorForReason(NPReason) const;
   void cancelLoad(NSError*);
