@@ -756,7 +756,7 @@ void RenderStyle::addBindingURI(StringImpl* uri) {
 #endif
 
 void RenderStyle::setTextShadow(ShadowData* val, bool add) {
-  ASSERT(!val || !val->spread && val->style == Normal);
+  ASSERT(!val || (!val->spread && val->style == Normal));
 
   StyleRareInheritedData* rareData = rareInheritedData.access();
   if (!add) {

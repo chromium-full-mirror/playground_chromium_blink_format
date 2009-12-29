@@ -89,8 +89,8 @@ inline RenderSVGContainer* toRenderSVGContainer(RenderObject* object) {
   // Note: isSVGContainer is also true for RenderSVGViewportContainer, which is
   // not derived from this.
   ASSERT(!object ||
-         object->isSVGContainer() &&
-             strcmp(object->renderName(), "RenderSVGViewportContainer"));
+         (object->isSVGContainer() &&
+          strcmp(object->renderName(), "RenderSVGViewportContainer")));
   return static_cast<RenderSVGContainer*>(object);
 }
 
@@ -99,8 +99,8 @@ inline const RenderSVGContainer* toRenderSVGContainer(
   // Note: isSVGContainer is also true for RenderSVGViewportContainer, which is
   // not derived from this.
   ASSERT(!object ||
-         object->isSVGContainer() &&
-             strcmp(object->renderName(), "RenderSVGViewportContainer"));
+         (object->isSVGContainer() &&
+          strcmp(object->renderName(), "RenderSVGViewportContainer")));
   return static_cast<const RenderSVGContainer*>(object);
 }
 

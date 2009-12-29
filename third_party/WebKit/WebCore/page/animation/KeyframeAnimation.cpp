@@ -301,7 +301,7 @@ bool KeyframeAnimation::sendAnimationEvent(const AtomicString& eventType,
       element = static_cast<Element*>(m_object->node());
 
     ASSERT(!element ||
-           element->document() && !element->document()->inPageCache());
+           (element->document() && !element->document()->inPageCache()));
     if (!element)
       return false;
 
