@@ -980,10 +980,8 @@ PassRefPtr<Node> HTMLParser::getNode(Token* t) {
                      &HTMLParser::noembedCreateErrorCheck);
     gFunctionMap.set(noframesTag.localName().impl(),
                      &HTMLParser::noframesCreateErrorCheck);
-#if !ENABLE(XHTMLMP)
     gFunctionMap.set(noscriptTag.localName().impl(),
                      &HTMLParser::noscriptCreateErrorCheck);
-#endif
     gFunctionMap.set(olTag.localName().impl(),
                      &HTMLParser::pCloserCreateErrorCheck);
     gFunctionMap.set(pTag.localName().impl(),
