@@ -66,6 +66,10 @@
 #include "WMLNames.h"
 #endif
 
+#if ENABLE(SVG)
+#include "SVGRenderSupport.h"
+#endif
+
 using namespace std;
 
 namespace WebCore {
@@ -2667,6 +2671,10 @@ VisiblePosition RenderObject::createVisiblePosition(const Position& position) {
 }
 
 #if ENABLE(SVG)
+const SVGRenderBase* RenderObject::toSVGRenderBase() const {
+  ASSERT_NOT_REACHED();
+  return 0;
+}
 
 FloatRect RenderObject::objectBoundingBox() const {
   ASSERT_NOT_REACHED();

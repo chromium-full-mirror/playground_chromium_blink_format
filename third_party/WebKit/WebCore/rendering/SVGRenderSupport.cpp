@@ -2,7 +2,8 @@
  * Copyright (C) 2007, 2008 Rob Buis <buis@kde.org>
  *           (C) 2007 Nikolas Zimmermann <zimmermann@kde.org>
  *           (C) 2007 Eric Seidel <eric@webkit.org>
- * Copyright (C) 2009 Google, Inc.  All rights reserved.
+ *           (C) 2009 Google, Inc.  All rights reserved.
+ *           (C) 2009 Dirk Schulze <krit@webkit.org>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -40,6 +41,8 @@
 #include <wtf/UnusedParam.h>
 
 namespace WebCore {
+
+SVGRenderBase::~SVGRenderBase() {}
 
 IntRect SVGRenderBase::clippedOverflowRectForRepaint(
     RenderObject* object,
@@ -84,7 +87,7 @@ void SVGRenderBase::mapLocalToContainer(const RenderObject* object,
 bool SVGRenderBase::prepareToRenderSVGContent(
     RenderObject* object,
     RenderObject::PaintInfo& paintInfo,
-    const FloatRect& boundingBox,
+    const FloatRect& repaintRect,
     SVGResourceFilter*& filter,
     SVGResourceFilter* rootFilter) {
 #if !ENABLE(FILTERS)
@@ -106,7 +109,7 @@ bool SVGRenderBase::prepareToRenderSVGContent(
   // Setup transparency layers before setting up filters!
   float opacity = style->opacity();
   if (opacity < 1.0f) {
-    paintInfo.context->clip(enclosingIntRect(boundingBox));
+    paintInfo.context->clip(enclosingIntRect(repaintRect));
     paintInfo.context->beginTransparencyLayer(opacity);
   }
 
@@ -116,8 +119,8 @@ bool SVGRenderBase::prepareToRenderSVGContent(
     int widthShift = shadow->x < 0 ? 0 : shadow->x;
     int heightShift = shadow->y < 0 ? 0 : shadow->y;
     FloatRect shadowRect = FloatRect(
-        boundingBox.x() + xShift, boundingBox.y() + yShift,
-        boundingBox.width() + widthShift, boundingBox.height() + heightShift);
+        repaintRect.x() + xShift, repaintRect.y() + yShift,
+        repaintRect.width() + widthShift, repaintRect.height() + heightShift);
     paintInfo.context->clip(enclosingIntRect(shadowRect));
     paintInfo.context->setShadow(IntSize(shadow->x, shadow->y), shadow->blur,
                                  shadow->color, style->colorSpace());
@@ -150,7 +153,7 @@ bool SVGRenderBase::prepareToRenderSVGContent(
 
   if (masker) {
     masker->addClient(styledElement);
-    if (!masker->applyMask(paintInfo.context, boundingBox))
+    if (!masker->applyMask(paintInfo.context, object))
       return false;
   } else if (!maskerId.isEmpty())
     svgElement->document()->accessSVGExtensions()->addPendingResource(
@@ -158,7 +161,7 @@ bool SVGRenderBase::prepareToRenderSVGContent(
 
   if (clipper) {
     clipper->addClient(styledElement);
-    clipper->applyClip(paintInfo.context, boundingBox);
+    clipper->applyClip(paintInfo.context, object->objectBoundingBox());
   } else if (!clipperId.isEmpty())
     svgElement->document()->accessSVGExtensions()->addPendingResource(
         clipperId, styledElement);
@@ -267,15 +270,35 @@ FloatRect SVGRenderBase::computeContainerBoundingBox(
 }
 
 FloatRect SVGRenderBase::filterBoundingBoxForRenderer(
-    const RenderObject* object) {
+    const RenderObject* object) const {
 #if ENABLE(FILTERS)
   SVGResourceFilter* filter = getFilterById(
       object->document(), object->style()->svgStyle()->filter(), object);
   if (filter)
-    return filter->filterBoundingBox();
+    return filter->filterBoundingBox(object->objectBoundingBox());
 #else
   UNUSED_PARAM(object);
 #endif
+  return FloatRect();
+}
+
+FloatRect SVGRenderBase::clipperBoundingBoxForRenderer(
+    const RenderObject* object) const {
+  SVGResourceClipper* clipper = getClipperById(
+      object->document(), object->style()->svgStyle()->clipPath(), object);
+  if (clipper)
+    return clipper->clipperBoundingBox(object->objectBoundingBox());
+
+  return FloatRect();
+}
+
+FloatRect SVGRenderBase::maskerBoundingBoxForRenderer(
+    const RenderObject* object) const {
+  SVGResourceMasker* masker = getMaskerById(
+      object->document(), object->style()->svgStyle()->maskElement(), object);
+  if (masker)
+    return masker->maskerBoundingBox(object->objectBoundingBox());
+
   return FloatRect();
 }
 

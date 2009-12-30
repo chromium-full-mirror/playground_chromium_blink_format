@@ -35,6 +35,8 @@ namespace WebCore {
 extern char SVGFilterResXIdentifier[];
 extern char SVGFilterResYIdentifier[];
 
+class SVGResourceFilter;
+
 class SVGFilterElement : public SVGStyledElement,
                          public SVGURIReference,
                          public SVGLangSpace,
@@ -120,6 +122,7 @@ class SVGFilterElement : public SVGStyledElement,
 
  private:
   friend class SVGResourceFilter;
+  FloatRect filterBoundingBox(const FloatRect&) const;
   void buildFilter(const FloatRect& targetRect) const;
 };
 

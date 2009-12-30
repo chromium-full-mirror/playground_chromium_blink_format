@@ -40,6 +40,8 @@ class RenderSVGText : public RenderSVGBlock {
  private:
   virtual const char* renderName() const { return "RenderSVGText"; }
 
+  virtual const SVGRenderBase* toSVGRenderBase() const { return this; }
+
   virtual bool isSVGText() const { return true; }
 
   virtual TransformationMatrix localToParentTransform() const {
@@ -77,6 +79,7 @@ class RenderSVGText : public RenderSVGBlock {
                                    TransformState&) const;
 
   virtual FloatRect objectBoundingBox() const;
+  virtual FloatRect strokeBoundingBox() const;
   virtual FloatRect repaintRectInLocalCoordinates() const;
 
   // FIXME: This can be removed when localTransform() is removed from

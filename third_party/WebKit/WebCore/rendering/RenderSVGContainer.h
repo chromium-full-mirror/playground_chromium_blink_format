@@ -60,6 +60,7 @@ class RenderSVGContainer : public RenderSVGModelObject {
   virtual void addFocusRingRects(Vector<IntRect>&, int tx, int ty);
 
   virtual FloatRect objectBoundingBox() const;
+  virtual FloatRect strokeBoundingBox() const;
   virtual FloatRect repaintRectInLocalCoordinates() const;
 
   virtual bool nodeAtFloatPoint(const HitTestRequest&,

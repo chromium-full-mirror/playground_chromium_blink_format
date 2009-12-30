@@ -38,6 +38,10 @@ class ImageBuffer;
 // all SVG renderers inherit from RenderSVGModelObject.
 class SVGRenderBase {
  public:
+  virtual ~SVGRenderBase();
+
+  virtual const SVGRenderBase* toSVGRenderBase() const { return this; }
+
   // FIXME: These are only public for SVGRootInlineBox.
   // It's unclear if these should be exposed or not.  SVGRootInlineBox may
   // pass the wrong RenderObject* and boundingBox to these functions.
@@ -50,6 +54,15 @@ class SVGRenderBase {
                                      RenderObject::PaintInfo&,
                                      SVGResourceFilter*&,
                                      GraphicsContext* savedContext);
+
+  virtual FloatRect strokeBoundingBox() const { return FloatRect(); }
+  virtual FloatRect markerBoundingBox() const { return FloatRect(); }
+
+  // returns the bounding box of filter, clipper, marker and masker (or the
+  // empty rect if no filter) in local coordinates
+  FloatRect filterBoundingBoxForRenderer(const RenderObject*) const;
+  FloatRect clipperBoundingBoxForRenderer(const RenderObject*) const;
+  FloatRect maskerBoundingBoxForRenderer(const RenderObject*) const;
 
  protected:
   static IntRect clippedOverflowRectForRepaint(
@@ -70,10 +83,6 @@ class SVGRenderBase {
   // and repaintRectInLocalCoordinates in RenderSVGRoot and RenderSVGContainer
   static FloatRect computeContainerBoundingBox(const RenderObject* container,
                                                bool includeAllPaintedContent);
-
-  // returns the filter bounding box (or the empty rect if no filter) in local
-  // coordinates
-  static FloatRect filterBoundingBoxForRenderer(const RenderObject*);
 };
 
 // FIXME: This should move to RenderObject or PaintInfo

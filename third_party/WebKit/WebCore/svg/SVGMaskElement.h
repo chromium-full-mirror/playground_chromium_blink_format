@@ -21,6 +21,7 @@
 #define SVGMaskElement_h
 
 #if ENABLE(SVG)
+#include "RenderObject.h"
 #include "SVGResourceMasker.h"
 #include "SVGExternalResourcesRequired.h"
 #include "SVGLangSpace.h"
@@ -33,6 +34,7 @@
 namespace WebCore {
 
 class SVGLength;
+class SVGResourceMasker;
 
 class SVGMaskElement : public SVGStyledLocatableElement,
                        public SVGURIReference,
@@ -44,6 +46,7 @@ class SVGMaskElement : public SVGStyledLocatableElement,
   virtual ~SVGMaskElement();
   virtual bool isValid() const { return SVGTests::isValid(); }
 
+  FloatRect maskBoundingBox(const FloatRect&) const;
   virtual void parseMappedAttribute(MappedAttribute*);
   virtual void svgAttributeChanged(const QualifiedName&);
   virtual void childrenChanged(bool changedByParser = false,
@@ -54,7 +57,7 @@ class SVGMaskElement : public SVGStyledLocatableElement,
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual SVGResource* canvasResource(const RenderObject*);
 
-  PassOwnPtr<ImageBuffer> drawMaskerContent(const FloatRect& targetRect,
+  PassOwnPtr<ImageBuffer> drawMaskerContent(const RenderObject*,
                                             FloatRect& maskRect,
                                             bool& emptyMask) const;
 
