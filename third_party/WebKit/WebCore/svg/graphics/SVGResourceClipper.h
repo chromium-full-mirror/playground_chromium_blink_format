@@ -69,6 +69,8 @@ class SVGResourceClipper : public SVGResource {
   }
   virtual ~SVGResourceClipper();
 
+  virtual void invalidate();
+
   void resetClipData();
   void addClipData(const Path&, WindRule, bool bboxUnits);
 

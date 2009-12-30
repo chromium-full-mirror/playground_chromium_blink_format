@@ -45,6 +45,12 @@ SVGResourceClipper::~SVGResourceClipper() {}
 
 void SVGResourceClipper::resetClipData() {
   m_clipData.clear();
+  m_clipperBoundingBox = FloatRect();
+}
+
+void SVGResourceClipper::invalidate() {
+  SVGResource::invalidate();
+  resetClipData();
 }
 
 FloatRect SVGResourceClipper::clipperBoundingBox(
