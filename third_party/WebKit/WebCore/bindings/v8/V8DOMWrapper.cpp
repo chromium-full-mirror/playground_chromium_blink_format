@@ -641,7 +641,8 @@ v8::Local<v8::Function> V8DOMWrapper::getConstructorForContext(
   // Enter the scope for this context to get the correct constructor.
   v8::Context::Scope scope(context);
 
-  return getConstructor(type, V8Proxy::getHiddenObjectPrototype(context));
+  return getConstructor(type,
+                        V8DOMWindowShell::getHiddenObjectPrototype(context));
 }
 
 v8::Local<v8::Function> V8DOMWrapper::getConstructor(
@@ -948,7 +949,8 @@ v8::Local<v8::Object> V8DOMWrapper::instantiateV8Object(
 
   v8::Local<v8::Object> instance;
   if (proxy)
-    instance = proxy->createWrapperFromCache(descriptorType);
+    // FIXME: Fix this to work properly with isolated worlds (see above).
+    instance = proxy->windowShell()->createWrapperFromCache(descriptorType);
   else {
     v8::Local<v8::Function> function =
         getTemplate(descriptorType)->GetFunction();
@@ -1305,7 +1307,7 @@ v8::Handle<v8::Value> V8DOMWrapper::convertDocumentToV8Object(
   // checking if the node already has a wrapper.
   V8Proxy* proxy = V8Proxy::retrieve(document->frame());
   if (proxy)
-    proxy->initContextIfNeeded();
+    proxy->windowShell()->initContextIfNeeded();
 
   DOMWrapperMap<Node>& domNodeMap = getDOMNodeMap();
   v8::Handle<v8::Object> wrapper = domNodeMap.get(document);
@@ -1397,7 +1399,7 @@ v8::Handle<v8::Value> V8DOMWrapper::convertNewNodeToV8Object(
 
   if (isDocument) {
     if (proxy)
-      proxy->updateDocumentWrapper(result);
+      proxy->windowShell()->updateDocumentWrapper(result);
 
     if (type == V8ClassIndex::HTMLDOCUMENT) {
       // Create marker object and insert it in two internal fields.

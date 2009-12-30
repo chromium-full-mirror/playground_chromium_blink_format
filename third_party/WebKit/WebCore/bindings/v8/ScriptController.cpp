@@ -134,7 +134,7 @@ void ScriptController::clearScriptObjects() {
 }
 
 void ScriptController::updateSecurityOrigin() {
-  m_proxy->updateSecurityOrigin();
+  m_proxy->windowShell()->updateSecurityOrigin();
 }
 
 void ScriptController::updatePlatformScriptObjects() {
@@ -295,7 +295,7 @@ void ScriptController::lowMemoryNotification() {
 }
 
 bool ScriptController::haveInterpreter() const {
-  return m_proxy->isContextInitialized();
+  return m_proxy->windowShell()->isContextInitialized();
 }
 
 bool ScriptController::isEnabled() const {
@@ -454,7 +454,7 @@ void ScriptController::attachDebugger(void*) {
 }
 
 void ScriptController::updateDocument() {
-  m_proxy->updateDocument();
+  m_proxy->windowShell()->updateDocument();
 }
 
 }  // namespace WebCore

@@ -36,6 +36,7 @@
 #include "SecurityOrigin.h"    // for WebCore::SecurityOrigin
 #include "SharedPersistent.h"
 #include "V8AbstractEventListener.h"
+#include "V8DOMWindowShell.h"
 #include "V8DOMWrapper.h"
 #include "V8GCController.h"
 #include "V8Index.h"
@@ -156,21 +157,8 @@ class V8Proxy {
 
   Frame* frame() { return m_frame; }
 
-  // Clear page-specific data, but keep the global object identify.
   void clearForNavigation();
-
-  // Clear page-specific data before shutting down the proxy object.
   void clearForClose();
-
-  // Update document object of the frame.
-  void updateDocument();
-
-  // Update the security origin of a document
-  // (e.g., after setting docoument.domain).
-  void updateSecurityOrigin();
-
-  // Destroy the global object.
-  void destroyGlobal();
 
   // FIXME: Need comment. User Gesture related.
   bool inlineCode() const { return m_inlineCode; }
@@ -178,9 +166,6 @@ class V8Proxy {
 
   bool timerCallback() const { return m_timerCallback; }
   void setTimerCallback(bool value) { m_timerCallback = value; }
-
-  // Has the context for this proxy been initialized?
-  bool isContextInitialized();
 
   // Disconnects the proxy from its owner frame,
   // and clears all timeouts on the DOM window.
@@ -255,17 +240,6 @@ class V8Proxy {
   v8::Local<v8::Value> newInstance(v8::Handle<v8::Function>,
                                    int argc,
                                    v8::Handle<v8::Value> argv[]);
-
-  // To create JS Wrapper objects, we create a cache of a 'boiler plate'
-  // object, and then simply Clone that object each time we need a new one.
-  // This is faster than going through the full object creation process.
-  v8::Local<v8::Object> createWrapperFromCache(
-      V8ClassIndex::V8WrapperType type) {
-    int classIndex = V8ClassIndex::ToInt(type);
-    v8::Local<v8::Object> clone(
-        m_wrapperBoilerplates->CloneElementAt(classIndex));
-    return clone.IsEmpty() ? createWrapperFromCacheSlowCase(type) : clone;
-  }
 
   // Returns the window object associated with a context.
   static DOMWindow* retrieveWindow(v8::Handle<v8::Context>);
@@ -365,13 +339,11 @@ class V8Proxy {
   v8::Local<v8::Context> context();
   v8::Local<v8::Context> mainWorldContext();
 
+  // FIXME: This should eventually take DOMWrapperWorld argument!
+  V8DOMWindowShell* windowShell() const { return m_windowShell.get(); }
+
   bool setContextDebugId(int id);
   static int contextDebugId(v8::Handle<v8::Context>);
-
-  static v8::Handle<v8::Value> getHiddenObjectPrototype(
-      v8::Handle<v8::Context>);
-  // WARNING: Call |installHiddenObjectPrototype| only on fresh contexts!
-  static void installHiddenObjectPrototype(v8::Handle<v8::Context>);
 
   // Registers a v8 extension to be available on webpages. The two forms
   // offer various restrictions on what types of contexts the extension is
@@ -384,32 +356,15 @@ class V8Proxy {
                                 const String& schemeRestriction);
   static void registerExtension(v8::Extension*, int extensionGroup);
 
-  // FIXME: Separate these concerns from V8Proxy?
-  v8::Persistent<v8::Context> createNewContext(v8::Handle<v8::Object> global,
-                                               int extensionGroup);
-  static bool installDOMWindow(v8::Handle<v8::Context> context,
-                               DOMWindow* window);
+  static void registerExtensionWithV8(v8::Extension*);
+  static bool registeredExtensionWithV8(v8::Extension*);
 
-  void initContextIfNeeded();
-  void updateDocumentWrapper(v8::Handle<v8::Value> wrapper);
+  static const V8Extensions& extensions() { return m_extensions; }
 
   // Report an unsafe attempt to access the given frame on the console.
   static void reportUnsafeAccessTo(Frame* target, DelayReporting delay);
 
  private:
-  void setSecurityToken();
-  void clearDocumentWrapper();
-
-  // The JavaScript wrapper for the document object is cached on the global
-  // object for fast access. UpdateDocumentWrapperCache sets the wrapper
-  // for the current document on the global object. ClearDocumentWrapperCache
-  // deletes the document wrapper from the global object.
-  void updateDocumentWrapperCache();
-  void clearDocumentWrapperCache();
-
-  // Dispose global handles of m_contexts and friends.
-  void disposeContextHandles();
-
   // If m_recursionCount is 0, let LocalStorage know so we can release
   // the storage mutex.
   void releaseStorageMutex();
@@ -441,24 +396,11 @@ class V8Proxy {
     return v8::Local<v8::Context>::New(m_utilityContext);
   }
 
-  v8::Local<v8::Object> createWrapperFromCacheSlowCase(
-      V8ClassIndex::V8WrapperType);
-
-  static void registerExtensionWithV8(v8::Extension*);
-  static bool registeredExtensionWithV8(v8::Extension*);
-
   Frame* m_frame;
 
-  v8::Persistent<v8::Context> m_context;
-
-  // For each possible type of wrapper, we keep a boilerplate object.
-  // The boilerplate is used to create additional wrappers of the same
-  // type.  We keep a single persistent handle to an array of the
-  // activated boilerplates.
-  v8::Persistent<v8::Array> m_wrapperBoilerplates;
-
-  v8::Persistent<v8::Object> m_global;
-  v8::Persistent<v8::Value> m_document;
+  // For the moment, we have one of these.  Soon we will have one per
+  // DOMWrapperWorld.
+  RefPtr<V8DOMWindowShell> m_windowShell;
 
   // Utility context holding JavaScript functions used internally.
   static v8::Persistent<v8::Context> m_utilityContext;
