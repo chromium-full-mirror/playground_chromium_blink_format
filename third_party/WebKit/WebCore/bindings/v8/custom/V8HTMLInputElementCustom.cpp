@@ -39,7 +39,9 @@
 
 namespace WebCore {
 
-ACCESSOR_GETTER(HTMLInputElementSelectionStart) {
+v8::Handle<v8::Value> V8HTMLInputElement::selectionStartAccessorGetter(
+    v8::Local<v8::String> name,
+    const v8::AccessorInfo& info) {
   INC_STATS("DOM.HTMLInputElement.selectionStart._get");
   v8::Handle<v8::Object> holder = info.Holder();
   HTMLInputElement* imp =
@@ -54,7 +56,10 @@ ACCESSOR_GETTER(HTMLInputElementSelectionStart) {
   return v8::Integer::New(v);
 }
 
-ACCESSOR_SETTER(HTMLInputElementSelectionStart) {
+void V8HTMLInputElement::selectionStartAccessorSetter(
+    v8::Local<v8::String> name,
+    v8::Local<v8::Value> value,
+    const v8::AccessorInfo& info) {
   INC_STATS("DOM.HTMLInputElement.selectionStart._set");
   v8::Handle<v8::Object> holder = info.Holder();
   HTMLInputElement* imp =
@@ -69,7 +74,9 @@ ACCESSOR_SETTER(HTMLInputElementSelectionStart) {
   imp->setSelectionStart(value->Int32Value());
 }
 
-ACCESSOR_GETTER(HTMLInputElementSelectionEnd) {
+v8::Handle<v8::Value> V8HTMLInputElement::selectionEndAccessorGetter(
+    v8::Local<v8::String> name,
+    const v8::AccessorInfo& info) {
   INC_STATS("DOM.HTMLInputElement.selectionEnd._get");
   v8::Handle<v8::Object> holder = info.Holder();
   HTMLInputElement* imp =
@@ -84,7 +91,10 @@ ACCESSOR_GETTER(HTMLInputElementSelectionEnd) {
   return v8::Integer::New(v);
 }
 
-ACCESSOR_SETTER(HTMLInputElementSelectionEnd) {
+void V8HTMLInputElement::selectionEndAccessorSetter(
+    v8::Local<v8::String> name,
+    v8::Local<v8::Value> value,
+    const v8::AccessorInfo& info) {
   INC_STATS("DOM.HTMLInputElement.selectionEnd._set");
   v8::Handle<v8::Object> holder = info.Holder();
   HTMLInputElement* imp =

@@ -22,17 +22,20 @@
  */
 
 #include "config.h"
-#include "V8CustomBinding.h"
+#include "V8Document.h"
 
 #include "DOMWindow.h"
 #include "Frame.h"
 #include "V8Binding.h"
+#include "V8CustomBinding.h"
 #include "V8Document.h"
 #include "V8Proxy.h"
 
 namespace WebCore {
 
-ACCESSOR_GETTER(DocumentLocation) {
+v8::Handle<v8::Value> V8Document::locationAccessorGetter(
+    v8::Local<v8::String> name,
+    const v8::AccessorInfo& info) {
   Document* document =
       V8DOMWrapper::convertDOMWrapperToNative<Document>(info.Holder());
   if (!document->frame())
@@ -43,7 +46,9 @@ ACCESSOR_GETTER(DocumentLocation) {
                                          window->location());
 }
 
-ACCESSOR_SETTER(DocumentLocation) {
+void V8Document::locationAccessorSetter(v8::Local<v8::String> name,
+                                        v8::Local<v8::Value> value,
+                                        const v8::AccessorInfo& info) {
   Document* document =
       V8DOMWrapper::convertDOMWrapperToNative<Document>(info.Holder());
   if (!document->frame())
@@ -51,7 +56,7 @@ ACCESSOR_SETTER(DocumentLocation) {
 
   DOMWindow* window = document->frame()->domWindow();
   // WindowSetLocation does security checks. // XXXMB- verify!
-  WindowSetLocation(window, toWebCoreString(value));
+  V8Custom::WindowSetLocation(window, toWebCoreString(value));
 }
 
 }  // namespace WebCore

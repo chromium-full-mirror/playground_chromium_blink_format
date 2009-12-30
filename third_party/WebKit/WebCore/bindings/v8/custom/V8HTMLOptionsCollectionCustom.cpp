@@ -91,7 +91,9 @@ v8::Handle<v8::Value> V8HTMLOptionsCollection::addCallback(
   return v8::Undefined();
 }
 
-ACCESSOR_GETTER(HTMLOptionsCollectionLength) {
+v8::Handle<v8::Value> V8HTMLOptionsCollection::lengthAccessorGetter(
+    v8::Local<v8::String> name,
+    const v8::AccessorInfo& info) {
   INC_STATS("DOM.HTMLOptionsCollection.length._get");
   HTMLOptionsCollection* imp =
       V8DOMWrapper::convertToNativeObject<HTMLOptionsCollection>(
@@ -100,7 +102,10 @@ ACCESSOR_GETTER(HTMLOptionsCollectionLength) {
   return v8::Integer::New(v);
 }
 
-ACCESSOR_SETTER(HTMLOptionsCollectionLength) {
+void V8HTMLOptionsCollection::lengthAccessorSetter(
+    v8::Local<v8::String> name,
+    v8::Local<v8::Value> value,
+    const v8::AccessorInfo& info) {
   INC_STATS("DOM.HTMLOptionsCollection.length._set");
   HTMLOptionsCollection* imp =
       V8DOMWrapper::convertToNativeObject<HTMLOptionsCollection>(

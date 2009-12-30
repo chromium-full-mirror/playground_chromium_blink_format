@@ -186,7 +186,9 @@ v8::Handle<v8::Value> V8HTMLDocument::openCallback(const v8::Arguments& args) {
   return args.Holder();
 }
 
-ACCESSOR_GETTER(HTMLDocumentAll) {
+v8::Handle<v8::Value> V8HTMLDocument::allAccessorGetter(
+    v8::Local<v8::String> name,
+    const v8::AccessorInfo& info) {
   INC_STATS("DOM.HTMLDocument.all._get");
   v8::HandleScope scope;
   v8::Handle<v8::Object> holder = info.Holder();
@@ -196,12 +198,14 @@ ACCESSOR_GETTER(HTMLDocumentAll) {
                                          htmlDocument->all());
 }
 
-ACCESSOR_SETTER(HTMLDocumentAll) {
+void V8HTMLDocument::allAccessorSetter(v8::Local<v8::String> name,
+                                       v8::Local<v8::Value> value,
+                                       const v8::AccessorInfo& info) {
   INC_STATS("DOM.HTMLDocument.all._set");
   v8::Handle<v8::Object> holder = info.Holder();
   ASSERT(info.Holder()->InternalFieldCount() ==
-         kHTMLDocumentInternalFieldCount);
-  info.Holder()->SetInternalField(kHTMLDocumentShadowIndex, value);
+         V8Custom::kHTMLDocumentInternalFieldCount);
+  info.Holder()->SetInternalField(V8Custom::kHTMLDocumentShadowIndex, value);
 }
 
 }  // namespace WebCore
