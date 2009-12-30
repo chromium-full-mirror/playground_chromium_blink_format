@@ -41,8 +41,12 @@
 
 namespace WebCore {
 
-NAMED_PROPERTY_GETTER(HTMLPlugInElement) {
-  INC_STATS("DOM.HTMLPlugInElement.NamedPropertyGetter");
+// FIXME: Consider moving getter/setter helpers to V8NPObject and renaming this
+// file to V8PluginElementFunctions
+// to match JSC bindings naming convention.
+
+static v8::Handle<v8::Value> npObjectNamedGetter(v8::Local<v8::String> name,
+                                                 const v8::AccessorInfo& info) {
   HTMLPlugInElement* imp =
       V8DOMWrapper::convertDOMWrapperToNode<HTMLPlugInElement>(info.Holder());
   ScriptInstance scriptInstance = imp->getInstance();
@@ -57,8 +61,9 @@ NAMED_PROPERTY_GETTER(HTMLPlugInElement) {
   return npObjectGetNamedProperty(instance, name);
 }
 
-NAMED_PROPERTY_SETTER(HTMLPlugInElement) {
-  INC_STATS("DOM.HTMLPlugInElement.NamedPropertySetter");
+static v8::Handle<v8::Value> npObjectNamedSetter(v8::Local<v8::String> name,
+                                                 v8::Local<v8::Value> value,
+                                                 const v8::AccessorInfo& info) {
   HTMLPlugInElement* imp =
       V8DOMWrapper::convertDOMWrapperToNode<HTMLPlugInElement>(info.Holder());
   ScriptInstance scriptInstance = imp->getInstance();
@@ -71,6 +76,36 @@ NAMED_PROPERTY_SETTER(HTMLPlugInElement) {
     return notHandledByInterceptor();
 
   return npObjectSetNamedProperty(instance, name, value);
+}
+
+NAMED_PROPERTY_GETTER(HTMLAppletElement) {
+  INC_STATS("DOM.HTMLAppletElement.NamedPropertyGetter");
+  return npObjectNamedGetter(name, info);
+}
+
+NAMED_PROPERTY_GETTER(HTMLEmbedElement) {
+  INC_STATS("DOM.HTMLEmbedElement.NamedPropertyGetter");
+  return npObjectNamedGetter(name, info);
+}
+
+NAMED_PROPERTY_GETTER(HTMLObjectElement) {
+  INC_STATS("DOM.HTMLObjectElement.NamedPropertyGetter");
+  return npObjectNamedGetter(name, info);
+}
+
+NAMED_PROPERTY_SETTER(HTMLAppletElement) {
+  INC_STATS("DOM.HTMLAppletElement.NamedPropertySetter");
+  return npObjectNamedSetter(name, value, info);
+}
+
+NAMED_PROPERTY_SETTER(HTMLEmbedElement) {
+  INC_STATS("DOM.HTMLEmbedElement.NamedPropertySetter");
+  return npObjectNamedSetter(name, value, info);
+}
+
+NAMED_PROPERTY_SETTER(HTMLObjectElement) {
+  INC_STATS("DOM.HTMLObjectElement.NamedPropertySetter");
+  return npObjectNamedSetter(name, value, info);
 }
 
 v8::Handle<v8::Value> V8HTMLPlugInElement::defaultCallback(
