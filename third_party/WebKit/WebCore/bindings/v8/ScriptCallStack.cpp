@@ -31,6 +31,8 @@
 #include "config.h"
 #include "ScriptCallStack.h"
 
+#include "ScriptController.h"
+
 #include <v8.h>
 
 #include "V8Binding.h"
@@ -62,8 +64,7 @@ ScriptCallStack::ScriptCallStack(const v8::Arguments& arguments,
                    sourceLineNumber,
                    arguments,
                    skipArgumentCount),
-      m_scriptState(
-          new ScriptState(V8Proxy::retrieveFrameForCurrentContext())) {}
+      m_scriptState(ScriptController::currentScriptState()) {}
 
 ScriptCallStack::~ScriptCallStack() {}
 
