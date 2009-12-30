@@ -56,7 +56,6 @@ class ImageDecoderQt : public ImageDecoder {
   ImageDecoderQt& operator=(const ImageDecoderQt&);
 
  private:
-  void initializeDecoder();
   void internalDecodeSize();
   void internalReadImage(size_t);
   void internalHandleCurrentImage(size_t);
