@@ -28,7 +28,6 @@
 #ifndef ResourceRequest_h
 #define ResourceRequest_h
 
-#include "CString.h"
 #include "ResourceRequestBase.h"
 
 namespace WebCore {
@@ -42,13 +41,6 @@ class ResourceRequest : public ResourceRequestBase {
         m_requestorID(0),
         m_requestorProcessID(0),
         m_appCacheHostID(0) {}
-
-  ResourceRequest(const KURL& url, const CString& securityInfo)
-      : ResourceRequestBase(url, UseProtocolCachePolicy),
-        m_requestorID(0),
-        m_requestorProcessID(0),
-        m_appCacheHostID(0),
-        m_securityInfo(securityInfo) {}
 
   ResourceRequest(const KURL& url)
       : ResourceRequestBase(url, UseProtocolCachePolicy),
@@ -89,15 +81,6 @@ class ResourceRequest : public ResourceRequestBase {
   int appCacheHostID() const { return m_appCacheHostID; }
   void setAppCacheHostID(int id) { m_appCacheHostID = id; }
 
-  // Opaque buffer that describes the security state (including SSL
-  // connection state) for the resource that should be reported when the
-  // resource has been loaded.  This is used to simulate secure
-  // connection for request (typically when showing error page, so the
-  // error page has the errors of the page that actually failed).  Empty
-  // string if not a secure connection.
-  CString securityInfo() const { return m_securityInfo; }
-  void setSecurityInfo(const CString& value) { m_securityInfo = value; }
-
  private:
   friend class ResourceRequestBase;
 
@@ -107,7 +90,6 @@ class ResourceRequest : public ResourceRequestBase {
   int m_requestorID;
   int m_requestorProcessID;
   int m_appCacheHostID;
-  CString m_securityInfo;
 };
 
 }  // namespace WebCore
