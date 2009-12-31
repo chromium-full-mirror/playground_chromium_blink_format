@@ -677,12 +677,11 @@ int RenderTableSection::layoutRows(int toAdd) {
       if (r < totalRows - 1 && cell == cellAt(r + 1, c).cell)
         continue;
       addOverflowFromChild(cell);
+      m_hasOverflowingCell |= cell->hasVisibleOverflow();
     }
   }
-  m_hasOverflowingCell = m_overflow;
 
   statePusher.pop();
-
   return height();
 }
 

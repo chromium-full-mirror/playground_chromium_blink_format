@@ -111,6 +111,8 @@ class RenderTableCell : public RenderBlock {
 
   virtual void setOverrideSize(int);
 
+  bool hasVisibleOverflow() const { return m_overflow; }
+
  protected:
   virtual void styleWillChange(StyleDifference, const RenderStyle* newStyle);
   virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);
