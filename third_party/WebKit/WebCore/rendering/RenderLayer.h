@@ -275,6 +275,7 @@ class RenderLayer : public ScrollbarClient {
   int verticalScrollbarWidth() const;
   int horizontalScrollbarHeight() const;
 
+  bool hasOverflowControls() const;
   void positionOverflowControls(int tx, int ty);
   bool isPointInResizeControl(const IntPoint& absolutePoint) const;
   bool hitTestOverflowControls(HitTestResult&, const IntPoint& localPoint);
