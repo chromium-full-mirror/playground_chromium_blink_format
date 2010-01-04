@@ -214,12 +214,6 @@ void ScriptController::evaluateInIsolatedWorld(
   m_proxy->evaluateInIsolatedWorld(worldID, sources, extensionGroup);
 }
 
-void ScriptController::evaluateInNewContext(
-    const Vector<ScriptSourceCode>& sources,
-    int extensionGroup) {
-  m_proxy->evaluateInNewContext(sources, extensionGroup);
-}
-
 // Evaluate a script file in the environment of this proxy.
 ScriptValue ScriptController::evaluate(const ScriptSourceCode& sourceCode) {
   String sourceURL = sourceCode.url();
