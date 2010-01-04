@@ -97,6 +97,7 @@ class ChromiumBridge {
                          const KURL& firstPartyForCookies,
                          Vector<Cookie>*);
   static void deleteCookie(const KURL& url, const String& cookieName);
+  static bool cookiesEnabled(const KURL& url, const KURL& firstPartyForCookies);
 
   // DNS ----------------------------------------------------------------
   static void prefetchDNS(const String& hostname);

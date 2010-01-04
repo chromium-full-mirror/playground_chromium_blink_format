@@ -45,9 +45,9 @@ String cookies(const Document* document, const KURL& url) {
   return ChromiumBridge::cookies(url, document->firstPartyForCookies());
 }
 
-bool cookiesEnabled(const Document*) {
-  // FIXME: For now just assume cookies are always on.
-  return true;
+bool cookiesEnabled(const Document* document) {
+  return ChromiumBridge::cookiesEnabled(document->cookieURL(),
+                                        document->firstPartyForCookies());
 }
 
 bool getRawCookies(const Document* document,
