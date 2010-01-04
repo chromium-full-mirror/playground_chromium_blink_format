@@ -43,9 +43,10 @@ class RenderSVGContainer : public RenderSVGModelObject {
   void setDrawsContents(bool);
   bool drawsContents() const;
 
+ protected:
   virtual void paint(PaintInfo&, int parentX, int parentY);
 
- protected:
+ private:
   virtual RenderObjectChildList* virtualChildren() { return children(); }
   virtual const RenderObjectChildList* virtualChildren() const {
     return children();
@@ -81,7 +82,6 @@ class RenderSVGContainer : public RenderSVGModelObject {
 
   bool selfWillPaint() const;
 
- private:
   RenderObjectChildList m_children;
   bool m_drawsContents : 1;
 };
