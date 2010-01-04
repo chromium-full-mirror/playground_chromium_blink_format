@@ -158,6 +158,8 @@ class RenderView : public RenderBlock {
     state->destroy(renderArena());
   }
 
+  bool shouldDisableLayoutStateForSubtree(RenderObject*) const;
+
   // Returns true if layoutState should be used for its cached offset and clip.
   bool layoutStateEnabled() const {
     return m_layoutStateDisableCount == 0 && m_layoutState;
