@@ -120,7 +120,7 @@ class Identifier {
   static PassRefPtr<UString::Rep> add(JSGlobalData*, const UChar*, int length);
 
   static PassRefPtr<UString::Rep> add(ExecState* exec, UString::Rep* r) {
-    if (r->identifierTable()) {
+    if (r->isIdentifier()) {
 #ifndef NDEBUG
       checkSameIdentifierTable(exec, r);
 #endif
@@ -130,7 +130,7 @@ class Identifier {
   }
   static PassRefPtr<UString::Rep> add(JSGlobalData* globalData,
                                       UString::Rep* r) {
-    if (r->identifierTable()) {
+    if (r->isIdentifier()) {
 #ifndef NDEBUG
       checkSameIdentifierTable(globalData, r);
 #endif

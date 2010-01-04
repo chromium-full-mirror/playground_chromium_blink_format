@@ -152,6 +152,7 @@ class UStringImpl : Noncopyable {
     ASSERT(hash == computeHash(data(), m_length));
     m_hash = hash;
   }  // fast path for Identifiers
+  bool isIdentifier() const { return m_identifierTable; }
   IdentifierTable* identifierTable() const { return m_identifierTable; }
   void setIdentifierTable(IdentifierTable* table) {
     ASSERT(!isStatic());
