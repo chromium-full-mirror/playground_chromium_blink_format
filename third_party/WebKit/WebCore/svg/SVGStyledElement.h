@@ -67,6 +67,8 @@ class SVGStyledElement : public SVGElement, public SVGStylable {
   PassRefPtr<RenderStyle> resolveStyle(RenderStyle* parentStyle);
 
   void invalidateResourcesInAncestorChain() const;
+  void invalidateResources();
+
   virtual void detach();
 
   void setInstanceUpdatesBlocked(bool);
