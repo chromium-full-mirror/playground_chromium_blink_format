@@ -130,7 +130,7 @@ ALWAYS_INLINE JIT::Call JIT::emitNakedCall(CodePtr function) {
 
 ALWAYS_INLINE void JIT::beginUninterruptedSequence(int insnSpace,
                                                    int constSpace) {
-#if PLATFORM(ARM_TRADITIONAL)
+#if CPU(ARM_TRADITIONAL)
 #ifndef NDEBUG
   // Ensure the label after the sequence can also fit
   insnSpace += sizeof(ARMWord);
@@ -161,7 +161,7 @@ ALWAYS_INLINE void JIT::endUninterruptedSequence(int insnSpace,
 
 #endif
 
-#if PLATFORM(ARM)
+#if CPU(ARM)
 
 ALWAYS_INLINE void JIT::preserveReturnAddressAfterCall(RegisterID reg) {
   move(linkRegister, reg);
@@ -175,7 +175,7 @@ ALWAYS_INLINE void JIT::restoreReturnAddressBeforeReturn(Address address) {
   loadPtr(address, linkRegister);
 }
 
-#else  // PLATFORM(X86) || PLATFORM(X86_64)
+#else  // CPU(X86) || CPU(X86_64)
 
 ALWAYS_INLINE void JIT::preserveReturnAddressAfterCall(RegisterID reg) {
   pop(reg);
@@ -204,10 +204,10 @@ ALWAYS_INLINE void JIT::restoreArgumentReference() {
        OBJECT_OFFSETOF(struct JITStackFrame, callFrame) / sizeof(void*));
 }
 ALWAYS_INLINE void JIT::restoreArgumentReferenceForTrampoline() {
-#if PLATFORM(X86)
+#if CPU(X86)
   // Within a trampoline the return address will be on the stack at this point.
   addPtr(Imm32(sizeof(void*)), stackPointerRegister, firstArgumentRegister);
-#elif PLATFORM(ARM)
+#elif CPU(ARM)
   move(stackPointerRegister, firstArgumentRegister);
 #endif
   // In the trampoline on x86-64, the first argument register is not
@@ -280,9 +280,9 @@ ALWAYS_INLINE void JIT::clearSamplingFlag(int32_t flag) {
 #if ENABLE(SAMPLING_COUNTERS)
 ALWAYS_INLINE void JIT::emitCount(AbstractSamplingCounter& counter,
                                   uint32_t count) {
-#if PLATFORM(X86_64)  // Or any other 64-bit plattform.
+#if CPU(X86_64)  // Or any other 64-bit plattform.
   addPtr(Imm32(count), AbsoluteAddress(&counter.m_counter));
-#elif PLATFORM(X86)  // Or any other little-endian 32-bit plattform.
+#elif CPU(X86)  // Or any other little-endian 32-bit plattform.
   intptr_t hiWord =
       reinterpret_cast<intptr_t>(&counter.m_counter) + sizeof(int32_t);
   add32(Imm32(count), AbsoluteAddress(&counter.m_counter));
@@ -294,7 +294,7 @@ ALWAYS_INLINE void JIT::emitCount(AbstractSamplingCounter& counter,
 #endif
 
 #if ENABLE(OPCODE_SAMPLING)
-#if PLATFORM(X86_64)
+#if CPU(X86_64)
 ALWAYS_INLINE void JIT::sampleInstruction(Instruction* instruction,
                                           bool inHostFunction) {
   move(ImmPtr(m_interpreter->sampler()->sampleSlot()), X86Registers::ecx);
@@ -313,7 +313,7 @@ ALWAYS_INLINE void JIT::sampleInstruction(Instruction* instruction,
 #endif
 
 #if ENABLE(CODEBLOCK_SAMPLING)
-#if PLATFORM(X86_64)
+#if CPU(X86_64)
 ALWAYS_INLINE void JIT::sampleCodeBlock(CodeBlock* codeBlock) {
   move(ImmPtr(m_interpreter->sampler()->codeBlockSlot()), X86Registers::ecx);
   storePtr(ImmPtr(codeBlock), X86Registers::ecx);

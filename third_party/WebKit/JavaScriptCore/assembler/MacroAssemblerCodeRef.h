@@ -39,7 +39,7 @@
 // is a valid
 // instruction address on the platform (for example, check any alignment
 // requirements).
-#if PLATFORM(ARM_THUMB2)
+#if CPU(ARM_THUMB2)
 // ARM/thumb instructions must be 16-bit aligned, but all code pointers to be
 // loaded
 // into the processor are decorated with the bottom bit set, indicating that
@@ -123,7 +123,7 @@ class MacroAssemblerCodePtr {
   MacroAssemblerCodePtr() : m_value(0) {}
 
   explicit MacroAssemblerCodePtr(void* value)
-#if PLATFORM(ARM_THUMB2)
+#if CPU(ARM_THUMB2)
       // Decorate the pointer as a thumb code pointer.
       : m_value(reinterpret_cast<char*>(value) + 1)
 #else
@@ -138,7 +138,7 @@ class MacroAssemblerCodePtr {
   }
 
   void* executableAddress() const { return m_value; }
-#if PLATFORM(ARM_THUMB2)
+#if CPU(ARM_THUMB2)
   // To use this pointer as a data address remove the decoration.
   void* dataLocation() const {
     ASSERT_VALID_CODE_POINTER(m_value);

@@ -185,7 +185,7 @@ class JIT : private MacroAssembler {
 // on x86/x86-64 it is ecx for performance reasons, since the
 // MacroAssembler will need to plant register swaps if it is not -
 // however the code will still function correctly.
-#if PLATFORM(X86_64)
+#if CPU(X86_64)
   static const RegisterID returnValueRegister = X86Registers::eax;
   static const RegisterID cachedResultRegister = X86Registers::eax;
   static const RegisterID firstArgumentRegister = X86Registers::edi;
@@ -203,7 +203,7 @@ class JIT : private MacroAssembler {
   static const FPRegisterID fpRegT0 = X86Registers::xmm0;
   static const FPRegisterID fpRegT1 = X86Registers::xmm1;
   static const FPRegisterID fpRegT2 = X86Registers::xmm2;
-#elif PLATFORM(X86)
+#elif CPU(X86)
   static const RegisterID returnValueRegister = X86Registers::eax;
   static const RegisterID cachedResultRegister = X86Registers::eax;
   // On x86 we always use fastcall conventions = but on
@@ -221,7 +221,7 @@ class JIT : private MacroAssembler {
   static const FPRegisterID fpRegT0 = X86Registers::xmm0;
   static const FPRegisterID fpRegT1 = X86Registers::xmm1;
   static const FPRegisterID fpRegT2 = X86Registers::xmm2;
-#elif PLATFORM(ARM_THUMB2)
+#elif CPU(ARM_THUMB2)
   static const RegisterID returnValueRegister = ARMRegisters::r0;
   static const RegisterID cachedResultRegister = ARMRegisters::r0;
   static const RegisterID firstArgumentRegister = ARMRegisters::r0;
@@ -237,7 +237,7 @@ class JIT : private MacroAssembler {
   static const FPRegisterID fpRegT0 = ARMRegisters::d0;
   static const FPRegisterID fpRegT1 = ARMRegisters::d1;
   static const FPRegisterID fpRegT2 = ARMRegisters::d2;
-#elif PLATFORM(ARM_TRADITIONAL)
+#elif CPU(ARM_TRADITIONAL)
   static const RegisterID returnValueRegister = ARMRegisters::r0;
   static const RegisterID cachedResultRegister = ARMRegisters::r0;
   static const RegisterID firstArgumentRegister = ARMRegisters::r0;
@@ -608,7 +608,7 @@ class JIT : private MacroAssembler {
                           bool op1IsInRegisters = true,
                           bool op2IsInRegisters = true);
 
-#if PLATFORM(X86)
+#if CPU(X86)
   // These architecture specific value are used to enable patching - see comment
   // on op_put_by_id.
   static const int patchOffsetPutByIdStructure = 7;
@@ -639,7 +639,7 @@ class JIT : private MacroAssembler {
   static const int patchOffsetMethodCheckProtoObj = 11;
   static const int patchOffsetMethodCheckProtoStruct = 18;
   static const int patchOffsetMethodCheckPutFunction = 29;
-#elif PLATFORM(ARM_TRADITIONAL)
+#elif CPU(ARM_TRADITIONAL)
   // These architecture specific value are used to enable patching - see comment
   // on op_put_by_id.
   static const int patchOffsetPutByIdStructure = 4;
@@ -793,7 +793,7 @@ class JIT : private MacroAssembler {
                               Structure* structure,
                               size_t cachedOffset);
 
-#if PLATFORM(X86_64)
+#if CPU(X86_64)
   // These architecture specific value are used to enable patching - see comment
   // on op_put_by_id.
   static const int patchOffsetPutByIdStructure = 10;
@@ -818,7 +818,7 @@ class JIT : private MacroAssembler {
   static const int patchOffsetMethodCheckProtoObj = 20;
   static const int patchOffsetMethodCheckProtoStruct = 30;
   static const int patchOffsetMethodCheckPutFunction = 50;
-#elif PLATFORM(X86)
+#elif CPU(X86)
   // These architecture specific value are used to enable patching - see comment
   // on op_put_by_id.
   static const int patchOffsetPutByIdStructure = 7;
@@ -847,7 +847,7 @@ class JIT : private MacroAssembler {
   static const int patchOffsetMethodCheckProtoObj = 11;
   static const int patchOffsetMethodCheckProtoStruct = 18;
   static const int patchOffsetMethodCheckPutFunction = 29;
-#elif PLATFORM(ARM_THUMB2)
+#elif CPU(ARM_THUMB2)
   // These architecture specific value are used to enable patching - see comment
   // on op_put_by_id.
   static const int patchOffsetPutByIdStructure = 10;
@@ -872,7 +872,7 @@ class JIT : private MacroAssembler {
   static const int patchOffsetMethodCheckProtoObj = 24;
   static const int patchOffsetMethodCheckProtoStruct = 34;
   static const int patchOffsetMethodCheckPutFunction = 58;
-#elif PLATFORM(ARM_TRADITIONAL)
+#elif CPU(ARM_TRADITIONAL)
   // These architecture specific value are used to enable patching - see comment
   // on op_put_by_id.
   static const int patchOffsetPutByIdStructure = 4;

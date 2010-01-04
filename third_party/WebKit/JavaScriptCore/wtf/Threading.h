@@ -267,7 +267,7 @@ inline int atomicDecrement(int volatile* addend) {
 }
 
 #elif COMPILER(GCC) && \
-    !PLATFORM(SPARC64)  // sizeof(_Atomic_word) != sizeof(int) on sparc64 gcc
+    !CPU(SPARC64)  // sizeof(_Atomic_word) != sizeof(int) on sparc64 gcc
 #define WTF_USE_LOCKFREE_THREADSAFESHARED 1
 
 inline int atomicIncrement(int volatile* addend) {

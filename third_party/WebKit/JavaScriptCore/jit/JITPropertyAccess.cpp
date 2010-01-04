@@ -893,7 +893,7 @@ void JIT::privateCompileGetByIdProto(StructureStubInfo* stubInfo,
 
   // Check the prototype object's Structure had not changed.
   Structure** prototypeStructureAddress = &(protoObject->m_structure);
-#if PLATFORM(X86_64)
+#if CPU(X86_64)
   move(ImmPtr(prototypeStructure), regT3);
   Jump failureCases2 =
       branchPtr(NotEqual, AbsoluteAddress(prototypeStructureAddress), regT3);
@@ -1002,7 +1002,7 @@ void JIT::privateCompileGetByIdProtoList(
 
   // Check the prototype object's Structure had not changed.
   Structure** prototypeStructureAddress = &(protoObject->m_structure);
-#if PLATFORM(X86_64)
+#if CPU(X86_64)
   move(ImmPtr(prototypeStructure), regT3);
   Jump failureCases2 =
       branchPtr(NotEqual, AbsoluteAddress(prototypeStructureAddress), regT3);
@@ -1072,7 +1072,7 @@ void JIT::privateCompileGetByIdChainList(
 
     // Check the prototype object's Structure had not changed.
     Structure** prototypeStructureAddress = &(protoObject->m_structure);
-#if PLATFORM(X86_64)
+#if CPU(X86_64)
     move(ImmPtr(currStructure), regT3);
     bucketsOfFail.append(
         branchPtr(NotEqual, AbsoluteAddress(prototypeStructureAddress), regT3));
@@ -1141,7 +1141,7 @@ void JIT::privateCompileGetByIdChain(StructureStubInfo* stubInfo,
 
     // Check the prototype object's Structure had not changed.
     Structure** prototypeStructureAddress = &(protoObject->m_structure);
-#if PLATFORM(X86_64)
+#if CPU(X86_64)
     move(ImmPtr(currStructure), regT3);
     bucketsOfFail.append(
         branchPtr(NotEqual, AbsoluteAddress(prototypeStructureAddress), regT3));
@@ -2102,7 +2102,7 @@ void JIT::privateCompileGetByIdProto(StructureStubInfo* stubInfo,
 
   // Check the prototype object's Structure had not changed.
   Structure** prototypeStructureAddress = &(protoObject->m_structure);
-#if PLATFORM(X86_64)
+#if CPU(X86_64)
   move(ImmPtr(prototypeStructure), regT3);
   Jump failureCases2 =
       branchPtr(NotEqual, AbsoluteAddress(prototypeStructureAddress), regT3);
@@ -2207,7 +2207,7 @@ void JIT::privateCompileGetByIdProtoList(
 
   // Check the prototype object's Structure had not changed.
   Structure** prototypeStructureAddress = &(protoObject->m_structure);
-#if PLATFORM(X86_64)
+#if CPU(X86_64)
   move(ImmPtr(prototypeStructure), regT3);
   Jump failureCases2 =
       branchPtr(NotEqual, AbsoluteAddress(prototypeStructureAddress), regT3);
@@ -2277,7 +2277,7 @@ void JIT::privateCompileGetByIdChainList(
 
     // Check the prototype object's Structure had not changed.
     Structure** prototypeStructureAddress = &(protoObject->m_structure);
-#if PLATFORM(X86_64)
+#if CPU(X86_64)
     move(ImmPtr(currStructure), regT3);
     bucketsOfFail.append(
         branchPtr(NotEqual, AbsoluteAddress(prototypeStructureAddress), regT3));
@@ -2344,7 +2344,7 @@ void JIT::privateCompileGetByIdChain(StructureStubInfo* stubInfo,
 
     // Check the prototype object's Structure had not changed.
     Structure** prototypeStructureAddress = &(protoObject->m_structure);
-#if PLATFORM(X86_64)
+#if CPU(X86_64)
     move(ImmPtr(currStructure), regT3);
     bucketsOfFail.append(
         branchPtr(NotEqual, AbsoluteAddress(prototypeStructureAddress), regT3));

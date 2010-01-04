@@ -76,7 +76,7 @@ namespace JSC {
 #define THUMB_FUNC_PARAM(name)
 #endif
 
-#if PLATFORM(LINUX) && PLATFORM(X86_64)
+#if PLATFORM(LINUX) && CPU(X86_64)
 #define SYMBOL_STRING_RELOCATION(name) #name "@plt"
 #else
 #define SYMBOL_STRING_RELOCATION(name) SYMBOL_STRING(name)
@@ -88,9 +88,9 @@ namespace JSC {
 #elif PLATFORM(AIX)
 // IBM's own file format
 #define HIDE_SYMBOL(name) ".lglobl " #name
-#elif PLATFORM(LINUX) || PLATFORM(FREEBSD) || PLATFORM(OPENBSD) || \
-    PLATFORM(SOLARIS) || (PLATFORM(HPUX) && PLATFORM(IA64)) ||     \
-    PLATFORM(SYMBIAN) || PLATFORM(NETBSD)
+#elif PLATFORM(LINUX) || PLATFORM(FREEBSD) || PLATFORM(OPENBSD) ||             \
+    PLATFORM(SOLARIS) || (PLATFORM(HPUX) && CPU(IA64)) || PLATFORM(SYMBIAN) || \
+    PLATFORM(NETBSD)
 // ELF platform
 #define HIDE_SYMBOL(name) ".hidden " #name
 #else
@@ -99,7 +99,7 @@ namespace JSC {
 
 #if USE(JSVALUE32_64)
 
-#if COMPILER(GCC) && PLATFORM(X86)
+#if COMPILER(GCC) && CPU(X86)
 
 // These ASSERTs remind you that, if you change the layout of JITStackFrame, you
 // need to change the assembly trampolines below to match.
@@ -162,7 +162,7 @@ SYMBOL_STRING(ctiOpThrowNotCaught) ":" "\n"
     "ret" "\n"
 );
 
-#elif COMPILER(GCC) && PLATFORM(X86_64)
+#elif COMPILER(GCC) && CPU(X86_64)
 
 #if USE(JIT_STUB_ARGUMENT_VA_LIST)
 #error "JIT_STUB_ARGUMENT_VA_LIST not supported on x86-64."
@@ -236,7 +236,7 @@ SYMBOL_STRING(ctiOpThrowNotCaught) ":" "\n"
     "ret" "\n"
 );
 
-#elif COMPILER(GCC) && PLATFORM(ARM_THUMB2)
+#elif COMPILER(GCC) && CPU(ARM_THUMB2)
 
 #if USE(JIT_STUB_ARGUMENT_VA_LIST)
 #error "JIT_STUB_ARGUMENT_VA_LIST not supported on ARMv7."
@@ -302,7 +302,7 @@ SYMBOL_STRING(ctiOpThrowNotCaught) ":" "\n"
     "bx lr" "\n"
 );
 
-#elif COMPILER(GCC) && PLATFORM(ARM_TRADITIONAL)
+#elif COMPILER(GCC) && CPU(ARM_TRADITIONAL)
 
 asm volatile (
 ".globl " SYMBOL_STRING(ctiTrampoline) "\n"
@@ -406,11 +406,11 @@ __declspec(naked) void ctiOpThrowNotCaught() {
 }
 }
 
-#endif  // COMPILER(GCC) && PLATFORM(X86)
+#endif  // COMPILER(GCC) && CPU(X86)
 
 #else  // USE(JSVALUE32_64)
 
-#if COMPILER(GCC) && PLATFORM(X86)
+#if COMPILER(GCC) && CPU(X86)
 
 // These ASSERTs remind you that, if you change the layout of JITStackFrame, you
 // need to change the assembly trampolines below to match.
@@ -471,7 +471,7 @@ SYMBOL_STRING(ctiOpThrowNotCaught) ":" "\n"
     "ret" "\n"
 );
 
-#elif COMPILER(GCC) && PLATFORM(X86_64)
+#elif COMPILER(GCC) && CPU(X86_64)
 
 #if USE(JIT_STUB_ARGUMENT_VA_LIST)
 #error "JIT_STUB_ARGUMENT_VA_LIST not supported on x86-64."
@@ -551,7 +551,7 @@ SYMBOL_STRING(ctiOpThrowNotCaught) ":" "\n"
     "ret" "\n"
 );
 
-#elif COMPILER(GCC) && PLATFORM(ARM_THUMB2)
+#elif COMPILER(GCC) && CPU(ARM_THUMB2)
 
 #if USE(JIT_STUB_ARGUMENT_VA_LIST)
 #error "JIT_STUB_ARGUMENT_VA_LIST not supported on ARMv7."
@@ -618,7 +618,7 @@ SYMBOL_STRING(ctiOpThrowNotCaught) ":" "\n"
     "bx lr" "\n"
 );
 
-#elif COMPILER(GCC) && PLATFORM(ARM_TRADITIONAL)
+#elif COMPILER(GCC) && CPU(ARM_TRADITIONAL)
 
 asm volatile (
 ".text\n"
@@ -723,7 +723,7 @@ __declspec(naked) void ctiOpThrowNotCaught() {
 }
 }
 
-#endif  // COMPILER(GCC) && PLATFORM(X86)
+#endif  // COMPILER(GCC) && CPU(X86)
 
 #endif  // USE(JSVALUE32_64)
 
@@ -738,7 +738,7 @@ JITThunks::JITThunks(JSGlobalData* globalData) {
       globalData, &m_executablePool, &m_ctiStringLengthTrampoline,
       &m_ctiVirtualCallLink, &m_ctiVirtualCall, &m_ctiNativeCallThunk);
 
-#if PLATFORM(ARM_THUMB2)
+#if CPU(ARM_THUMB2)
   // Unfortunate the arm compiler does not like the use of offsetof on
   // JITStackFrame (since it contains non POD types),
   // and the OBJECT_OFFSETOF macro does not appear constantish enough for it to
@@ -1037,7 +1037,7 @@ static NEVER_INLINE void throwStackOverflowError(
     }                                                 \
   } while (0)
 
-#if PLATFORM(ARM_THUMB2)
+#if CPU(ARM_THUMB2)
 
 #define DEFINE_STUB_FUNCTION(rtype, op)                                                                                                                                                                                                                                                                                                                                                                                                                               \
   extern "C" {                                                                                                                                                                                                                                                                                                                                                                                                                                                        \
@@ -1058,7 +1058,7 @@ static NEVER_INLINE void throwStackOverflowError(
         ); \
   rtype JITStubThunked_##op(STUB_ARGS_DECLARATION)
 
-#elif PLATFORM(ARM_TRADITIONAL) && COMPILER(GCC)
+#elif CPU(ARM_TRADITIONAL) && COMPILER(GCC)
 
 #if USE(JSVALUE32_64)
 #define THUNK_RETURN_ADDRESS_OFFSET 64

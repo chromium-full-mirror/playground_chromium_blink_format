@@ -30,7 +30,7 @@
 
 #include <wtf/Platform.h>
 
-#if ENABLE(ASSEMBLER) && PLATFORM(ARM_TRADITIONAL)
+#if ENABLE(ASSEMBLER) && CPU(ARM_TRADITIONAL)
 
 #include "ARMAssembler.h"
 #include "AbstractMacroAssembler.h"
@@ -208,7 +208,7 @@ class MacroAssemblerARM : public AbstractMacroAssembler<ARMAssembler> {
                                     address.offset);
   }
 
-#if defined(ARM_REQUIRE_NATURAL_ALIGNMENT) && ARM_REQUIRE_NATURAL_ALIGNMENT
+#if CPU(ARMV5_OR_LOWER)
   void load32WithUnalignedHalfWords(BaseIndex address, RegisterID dest);
 #else
   void load32WithUnalignedHalfWords(BaseIndex address, RegisterID dest) {
@@ -841,6 +841,6 @@ class MacroAssemblerARM : public AbstractMacroAssembler<ARMAssembler> {
 };
 }
 
-#endif  // ENABLE(ASSEMBLER) && PLATFORM(ARM_TRADITIONAL)
+#endif  // ENABLE(ASSEMBLER) && CPU(ARM_TRADITIONAL)
 
 #endif  // MacroAssemblerARM_h

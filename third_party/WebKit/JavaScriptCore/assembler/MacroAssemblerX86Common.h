@@ -490,7 +490,7 @@ class MacroAssemblerX86Common : public AbstractMacroAssembler<X86Assembler> {
       m_assembler.movl_i32r(imm.m_value, dest);
   }
 
-#if PLATFORM(X86_64)
+#if CPU(X86_64)
   void move(RegisterID src, RegisterID dest) {
     // Note: on 64-bit this is is a full register move; perhaps it would be
     // useful to have separate move32 & movePtr, with move32 zero extending?
@@ -841,7 +841,7 @@ class MacroAssemblerX86Common : public AbstractMacroAssembler<X86Assembler> {
   // 'supportsFloatingPoint()'.
   friend class MacroAssemblerX86;
 
-#if PLATFORM(X86)
+#if CPU(X86)
 #if PLATFORM(MAC)
 
   // All X86 Macs are guaranteed to support at least SSE2,
@@ -884,7 +884,7 @@ class MacroAssemblerX86Common : public AbstractMacroAssembler<X86Assembler> {
   static SSE2CheckState s_sse2CheckState;
 
 #endif                  // PLATFORM(MAC)
-#elif !defined(NDEBUG)  // PLATFORM(X86)
+#elif !defined(NDEBUG)  // CPU(X86)
 
   // On x86-64 we should never be checking for SSE2 in a non-debug build,
   // but non debug add this method to keep the asserts above happy.

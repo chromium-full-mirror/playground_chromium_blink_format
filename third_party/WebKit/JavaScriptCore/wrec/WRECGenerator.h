@@ -71,7 +71,7 @@ class Generator : private MacroAssembler {
 
   Generator(Parser& parser) : m_parser(parser) {}
 
-#if PLATFORM(X86)
+#if CPU(X86)
   static const RegisterID input = X86Registers::eax;
   static const RegisterID index = X86Registers::edx;
   static const RegisterID length = X86Registers::ecx;
@@ -84,7 +84,7 @@ class Generator : private MacroAssembler {
 
   static const RegisterID returnRegister = X86Registers::eax;
 #endif
-#if PLATFORM(X86_64)
+#if CPU(X86_64)
   static const RegisterID input = X86Registers::edi;
   static const RegisterID index = X86Registers::esi;
   static const RegisterID length = X86Registers::edx;

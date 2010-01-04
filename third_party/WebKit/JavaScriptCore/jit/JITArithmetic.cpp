@@ -1146,7 +1146,7 @@ void JIT::emitSlow_op_div(Instruction* currentInstruction,
 /* ------------------------------ BEGIN: OP_MOD ------------------------------
  */
 
-#if PLATFORM(X86) || PLATFORM(X86_64)
+#if CPU(X86) || CPU(X86_64)
 
 void JIT::emit_op_mod(Instruction* currentInstruction) {
   unsigned dst = currentInstruction[1].u.operand;
@@ -1219,7 +1219,7 @@ void JIT::emitSlow_op_mod(Instruction* currentInstruction,
   stubCall.call(dst);
 }
 
-#else  // PLATFORM(X86) || PLATFORM(X86_64)
+#else  // CPU(X86) || CPU(X86_64)
 
 void JIT::emit_op_mod(Instruction* currentInstruction) {
   unsigned dst = currentInstruction[1].u.operand;
@@ -1234,7 +1234,7 @@ void JIT::emit_op_mod(Instruction* currentInstruction) {
 
 void JIT::emitSlow_op_mod(Instruction*, Vector<SlowCaseEntry>::iterator&) {}
 
-#endif  // PLATFORM(X86) || PLATFORM(X86_64)
+#endif  // CPU(X86) || CPU(X86_64)
 
 /* ------------------------------ END: OP_MOD ------------------------------ */
 
@@ -2153,7 +2153,7 @@ void JIT::emitSlow_op_pre_dec(Instruction* currentInstruction,
 /* ------------------------------ BEGIN: OP_MOD ------------------------------
  */
 
-#if PLATFORM(X86) || PLATFORM(X86_64)
+#if CPU(X86) || CPU(X86_64)
 
 void JIT::emit_op_mod(Instruction* currentInstruction) {
   unsigned result = currentInstruction[1].u.operand;
@@ -2202,7 +2202,7 @@ void JIT::emitSlow_op_mod(Instruction* currentInstruction,
   stubCall.call(result);
 }
 
-#else  // PLATFORM(X86) || PLATFORM(X86_64)
+#else  // CPU(X86) || CPU(X86_64)
 
 void JIT::emit_op_mod(Instruction* currentInstruction) {
   unsigned result = currentInstruction[1].u.operand;
@@ -2219,7 +2219,7 @@ void JIT::emitSlow_op_mod(Instruction*, Vector<SlowCaseEntry>::iterator&) {
   ASSERT_NOT_REACHED();
 }
 
-#endif  // PLATFORM(X86) || PLATFORM(X86_64)
+#endif  // CPU(X86) || CPU(X86_64)
 
 /* ------------------------------ END: OP_MOD ------------------------------ */
 
