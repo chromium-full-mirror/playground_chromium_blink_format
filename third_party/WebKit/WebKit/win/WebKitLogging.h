@@ -35,7 +35,7 @@
 #define LOG_CHANNEL_PREFIX WebKitLog
 #endif
 
-extern WTFLogChannel WebKitLogNetwork;
+extern WTFLogChannel WebKitLogTextInput;
 extern WTFLogChannel WebKitLogTiming;
 extern WTFLogChannel WebKitLogLoading;
 extern WTFLogChannel WebKitLogFontCache;
