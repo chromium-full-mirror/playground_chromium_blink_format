@@ -335,7 +335,7 @@ SYMBOL_STRING(ctiOpThrowNotCaught) ":" "\n"
     "mov pc, lr" "\n"
 );
 
-#elif COMPILER(MSVC)
+#elif COMPILER(MSVC) && CPU(X86)
 
 #if USE(JIT_STUB_ARGUMENT_VA_LIST)
 #error "JIT_STUB_ARGUMENT_VA_LIST configuration not supported on MSVC."
@@ -405,7 +405,9 @@ __declspec(naked) void ctiOpThrowNotCaught() {
 }
 }
 
-#endif  // COMPILER(GCC) && CPU(X86)
+#else
+#error "JIT not supported on this platform."
+#endif
 
 #else  // USE(JSVALUE32_64)
 
@@ -654,7 +656,7 @@ SYMBOL_STRING(ctiOpThrowNotCaught) ":" "\n"
     "mov pc, lr" "\n"
 );
 
-#elif COMPILER(MSVC)
+#elif COMPILER(MSVC) && CPU(X86)
 
 #if USE(JIT_STUB_ARGUMENT_VA_LIST)
 #error "JIT_STUB_ARGUMENT_VA_LIST configuration not supported on MSVC."
@@ -722,7 +724,9 @@ __declspec(naked) void ctiOpThrowNotCaught() {
 }
 }
 
-#endif  // COMPILER(GCC) && CPU(X86)
+#else
+#error "JIT not supported on this platform."
+#endif
 
 #endif  // USE(JSVALUE32_64)
 
