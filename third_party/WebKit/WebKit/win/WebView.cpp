@@ -320,7 +320,12 @@ enum {
 bool WebView::s_allowSiteSpecificHacks = false;
 
 WebView::WebView()
-    : m_refCount(0),
+    : m_refCount(0)
+#if !ASSERT_DISABLED
+      ,
+      m_deletionHasBegun(false)
+#endif
+      ,
       m_hostWindow(0),
       m_viewWindow(0),
       m_mainFrame(0),
@@ -2418,13 +2423,20 @@ HRESULT STDMETHODCALLTYPE WebView::QueryInterface(REFIID riid,
 }
 
 ULONG STDMETHODCALLTYPE WebView::AddRef(void) {
+  ASSERT(!m_deletionHasBegun);
   return ++m_refCount;
 }
 
 ULONG STDMETHODCALLTYPE WebView::Release(void) {
+  ASSERT(!m_deletionHasBegun);
+
   ULONG newRef = --m_refCount;
-  if (!newRef)
+  if (!newRef) {
+#if !ASSERT_DISABLED
+    m_deletionHasBegun = true;
+#endif
     delete (this);
+  }
 
   return newRef;
 }

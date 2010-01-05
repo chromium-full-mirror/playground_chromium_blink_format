@@ -978,6 +978,9 @@ class WebView : public IWebView,
   virtual void windowReceivedMessage(HWND, UINT message, WPARAM, LPARAM);
 
   ULONG m_refCount;
+#if !ASSERT_DISABLED
+  bool m_deletionHasBegun;
+#endif
   HWND m_hostWindow;
   HWND m_viewWindow;
   WebFrame* m_mainFrame;
