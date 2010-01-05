@@ -383,14 +383,6 @@ WebView::WebView()
 WebView::~WebView() {
   deleteBackingStore();
 
-  // <rdar://4958382> m_viewWindow will be destroyed when m_hostWindow is
-  // destroyed, but if
-  // setHostWindow was never called we will leak our HWND. If we still have a
-  // valid HWND at
-  // this point, we should just destroy it ourselves.
-  if (!isBeingDestroyed() && ::IsWindow(m_viewWindow))
-    ::DestroyWindow(m_viewWindow);
-
   // the tooltip window needs to be explicitly destroyed since it isn't a
   // WS_CHILD
   if (::IsWindow(m_toolTipHwnd))
@@ -398,6 +390,7 @@ WebView::~WebView() {
 
   ASSERT(!m_page);
   ASSERT(!m_preferences);
+  ASSERT(!m_viewWindow);
 
   WebViewCount--;
   gClassCount--;
@@ -680,6 +673,21 @@ HRESULT STDMETHODCALLTYPE WebView::close() {
     m_mouseOutTracker->dwFlags = TME_CANCEL;
     ::TrackMouseEvent(m_mouseOutTracker.get());
     m_mouseOutTracker.set(0);
+  }
+
+  revokeDragDrop();
+
+  if (m_viewWindow) {
+    // We can't check IsWindow(m_viewWindow) here, because that will return true
+    // even while
+    // we're already handling WM_DESTROY. So we check !isBeingDestroyed()
+    // instead.
+    if (!isBeingDestroyed())
+      DestroyWindow(m_viewWindow);
+    // Either we just destroyed m_viewWindow, or it's in the process of being
+    // destroyed. Either
+    // way, we clear it out to make sure we don't try to use it later.
+    m_viewWindow = 0;
   }
 
   setHostWindow(0);
@@ -2049,7 +2057,6 @@ LRESULT CALLBACK WebView::WebViewWndProc(HWND hWnd,
     case WM_DESTROY:
       webView->setIsBeingDestroyed();
       webView->close();
-      webView->revokeDragDrop();
       break;
     case WM_GESTURENOTIFY:
       handled = webView->gestureNotify(wParam, lParam);
@@ -2431,6 +2438,17 @@ ULONG STDMETHODCALLTYPE WebView::AddRef(void) {
 
 ULONG STDMETHODCALLTYPE WebView::Release(void) {
   ASSERT(!m_deletionHasBegun);
+
+  if (m_refCount == 1) {
+    // Call close() now so that clients don't have to. (It's harmless to call
+    // close() multiple
+    // times.) We do this here instead of in our destructor because close() can
+    // cause AddRef()
+    // and Release() to be called, and if that happened in our destructor we
+    // would be destroyed
+    // more than once.
+    close();
+  }
 
   ULONG newRef = --m_refCount;
   if (!newRef) {
@@ -3203,8 +3221,7 @@ HRESULT STDMETHODCALLTYPE WebView::setHostWindow(
 
   m_hostWindow = window;
 
-  if (m_viewWindow)
-    windowAncestryDidChange();
+  windowAncestryDidChange();
 
   return S_OK;
 }
@@ -5009,7 +5026,9 @@ HRESULT WebView::registerDragDrop() {
 }
 
 HRESULT WebView::revokeDragDrop() {
-  ASSERT(::IsWindow(m_viewWindow));
+  if (!m_viewWindow)
+    return S_OK;
+
   return ::RevokeDragDrop(m_viewWindow);
 }
 
@@ -5442,7 +5461,16 @@ HRESULT STDMETHODCALLTYPE WebView::inspector(IWebInspector** inspector) {
 }
 
 HRESULT STDMETHODCALLTYPE WebView::windowAncestryDidChange() {
-  HWND newParent = findTopLevelParent(m_hostWindow);
+  HWND newParent;
+  if (m_viewWindow)
+    newParent = findTopLevelParent(m_hostWindow);
+  else {
+    // There's no point in tracking active state changes of our parent window if
+    // we don't have
+    // a window ourselves.
+    newParent = 0;
+  }
+
   if (newParent == m_topLevelParent)
     return S_OK;
 
