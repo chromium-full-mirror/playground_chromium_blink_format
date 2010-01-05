@@ -46,6 +46,7 @@ class Local;
 
 namespace WebKit {
 
+class WebAnimationController;
 class WebData;
 class WebDataSource;
 class WebDocument;
@@ -174,6 +175,8 @@ class WebFrame {
   virtual WebDocument document() const = 0;
 
   virtual void forms(WebVector<WebFormElement>&) const = 0;
+
+  virtual WebAnimationController* animationController() = 0;
 
   // Scripting ----------------------------------------------------------
 
