@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Apple Inc. All Rights Reserved.
+ * Copyright (C) 2008, 2009, 2010 Apple Inc. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -37,10 +37,13 @@
 using namespace std;
 
 AccessibilityController::AccessibilityController()
-    : m_focusEventHook(0), m_scrollingStartEventHook(0) {}
+    : m_focusEventHook(0),
+      m_scrollingStartEventHook(0),
+      m_valueChangeEventHook(0) {}
 
 AccessibilityController::~AccessibilityController() {
   setLogFocusEvents(false);
+  setLogValueChangeEvents(false);
 }
 
 AccessibilityUIElement AccessibilityController::focusedElement() {
@@ -115,6 +118,18 @@ static void CALLBACK logEventProc(HWINEVENTHOOK hWinEventHook,
       printf("Received focus event for object '%S'.\n", name.c_str());
       break;
 
+    case EVENT_OBJECT_VALUECHANGE: {
+      BSTR valueBSTR;
+      hr = parentObject->get_accValue(vChild, &valueBSTR);
+      ASSERT(SUCCEEDED(hr));
+      wstring value(valueBSTR, ::SysStringLen(valueBSTR));
+      SysFreeString(valueBSTR);
+
+      printf("Received value change event for object '%S', value '%S'.\n",
+             name.c_str(), value.c_str());
+      break;
+    }
+
     case EVENT_SYSTEM_SCROLLINGSTART:
       printf("Received scrolling start event for object '%S'.\n", name.c_str());
       break;
@@ -144,6 +159,28 @@ void AccessibilityController::setLogFocusEvents(bool logFocusEvents) {
       GetCurrentProcessId(), 0, WINEVENT_INCONTEXT);
 
   ASSERT(m_focusEventHook);
+}
+
+void AccessibilityController::setLogValueChangeEvents(
+    bool logValueChangeEvents) {
+  if (!!m_valueChangeEventHook == logValueChangeEvents)
+    return;
+
+  if (!logValueChangeEvents) {
+    UnhookWinEvent(m_valueChangeEventHook);
+    m_valueChangeEventHook = 0;
+    return;
+  }
+
+  // Ensure that accessibility is initialized for the WebView by querying for
+  // the root accessible object.
+  rootElement();
+
+  m_valueChangeEventHook = SetWinEventHook(
+      EVENT_OBJECT_VALUECHANGE, EVENT_OBJECT_VALUECHANGE, GetModuleHandle(0),
+      logEventProc, GetCurrentProcessId(), 0, WINEVENT_INCONTEXT);
+
+  ASSERT(m_valueChangeEventHook);
 }
 
 void AccessibilityController::setLogScrollingStartEvents(
