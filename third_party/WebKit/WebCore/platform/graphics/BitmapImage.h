@@ -142,7 +142,7 @@ class BitmapImage : public Image {
   virtual CGImageRef getCGImageRef();
 #endif
 
-#if PLATFORM(WIN) || (PLATFORM(QT) && PLATFORM(WIN_OS))
+#if PLATFORM(WIN) || (PLATFORM(QT) && OS(WINDOWS))
   static PassRefPtr<BitmapImage> create(HBITMAP);
 #endif
 #if PLATFORM(WIN)
@@ -183,7 +183,7 @@ class BitmapImage : public Image {
                     ColorSpace styleColorSpace,
                     CompositeOperator);
 
-#if PLATFORM(WX) || (PLATFORM(WINCE) && !PLATFORM(QT))
+#if PLATFORM(WX) || (OS(WINCE) && !PLATFORM(QT))
   virtual void drawPattern(GraphicsContext*,
                            const FloatRect& srcRect,
                            const TransformationMatrix& patternTransform,
@@ -259,7 +259,7 @@ class BitmapImage : public Image {
       checkForSolidColor();
 // WINCE PORT: checkForSolidColor() doesn't set m_checkedForSolidColor until
 // it gets enough information to make final decision.
-#if !PLATFORM(WINCE)
+#if !OS(WINCE)
       ASSERT(m_checkedForSolidColor);
 #endif
     }

@@ -36,7 +36,7 @@
 
 namespace WebCore {
 
-#if PLATFORM(WIN_OS)
+#if OS(WINDOWS)
 void replaceNewlinesWithWindowsStyleNewlines(String& str) {
   static const UChar Newline = '\n';
   static const char* const WindowsNewline("\r\n");

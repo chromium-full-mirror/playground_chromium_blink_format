@@ -76,7 +76,7 @@ class Gradient : public Generator {
 
   void getColor(float value, float* r, float* g, float* b, float* a) const;
 
-#if PLATFORM(WINCE) && !PLATFORM(QT)
+#if OS(WINCE) && !PLATFORM(QT)
   const FloatPoint& p0() const { return m_p0; }
   const FloatPoint& p1() const { return m_p1; }
   float r0() const { return m_r0; }

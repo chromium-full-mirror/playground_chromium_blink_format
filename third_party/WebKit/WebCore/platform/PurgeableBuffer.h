@@ -70,8 +70,7 @@ class PurgeableBuffer : public Noncopyable {
   mutable State m_state;
 };
 
-#if !PLATFORM(DARWIN) || defined(BUILDING_ON_TIGER) || PLATFORM(QT) || \
-    PLATFORM(GTK)
+#if !OS(DARWIN) || defined(BUILDING_ON_TIGER) || PLATFORM(QT) || PLATFORM(GTK)
 inline PurgeableBuffer* PurgeableBuffer::create(const char*, size_t) {
   return 0;
 }

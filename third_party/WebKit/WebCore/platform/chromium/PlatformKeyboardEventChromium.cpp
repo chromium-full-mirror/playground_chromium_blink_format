@@ -27,9 +27,9 @@
 #include "config.h"
 #include "PlatformKeyboardEvent.h"
 
-#if PLATFORM(WIN_OS)
+#if OS(WINDOWS)
 #include <windows.h>
-#elif PLATFORM(DARWIN)
+#elif OS(DARWIN)
 #import <Carbon/Carbon.h>
 #else
 #include "NotImplemented.h"
@@ -40,7 +40,7 @@ namespace WebCore {
 void PlatformKeyboardEvent::disambiguateKeyDownEvent(
     Type type,
     bool backwardCompatibilityMode) {
-#if PLATFORM(WIN_OS)
+#if OS(WINDOWS)
   // No KeyDown events on Windows to disambiguate.
   ASSERT_NOT_REACHED();
 #else
@@ -58,7 +58,7 @@ void PlatformKeyboardEvent::disambiguateKeyDownEvent(
   } else {
     m_keyIdentifier = String();
     m_windowsVirtualKeyCode = 0;
-#if PLATFORM(DARWIN)
+#if OS(DARWIN)
     if (m_text.length() == 1 &&
         (m_text[0U] >= 0xF700 && m_text[0U] <= 0xF7FF)) {
       // According to NSEvents.h, OpenStep reserves the range 0xF700-0xF8FF for
@@ -74,10 +74,10 @@ void PlatformKeyboardEvent::disambiguateKeyDownEvent(
 }
 
 bool PlatformKeyboardEvent::currentCapsLockState() {
-#if PLATFORM(WIN_OS)
+#if OS(WINDOWS)
   // FIXME: Does this even work inside the sandbox?
   return GetKeyState(VK_CAPITAL) & 1;
-#elif PLATFORM(DARWIN)
+#elif OS(DARWIN)
   return GetCurrentKeyModifiers() & alphaLock;
 #else
   notImplemented();

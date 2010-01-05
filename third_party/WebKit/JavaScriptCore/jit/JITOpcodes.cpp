@@ -195,7 +195,7 @@ void JIT::privateCompileCTIMachineTrampolines(
  * stack pointer by the right amount after the call.
  */
 
-#if COMPILER(MSVC) || PLATFORM(LINUX)
+#if COMPILER(MSVC) || OS(LINUX)
 #if COMPILER(MSVC)
 #pragma pack(push)
 #pragma pack(4)
@@ -277,7 +277,7 @@ void JIT::privateCompileCTIMachineTrampolines(
                           OBJECT_OFFSETOF(NativeCallFrameStructure, thisValue) +
                               OBJECT_OFFSETOF(JSValue, u.asBits.tag)));
 
-#if COMPILER(MSVC) || PLATFORM(LINUX)
+#if COMPILER(MSVC) || OS(LINUX)
   // ArgList is passed by reference so is stackPointerRegister + 4 *
   // sizeof(Register)
   addPtr(Imm32(OBJECT_OFFSETOF(NativeCallFrameStructure, result)),
@@ -1793,7 +1793,7 @@ void JIT::privateCompileCTIMachineTrampolines(
  * the
  * stack pointer by the right amount after the call.
  */
-#if COMPILER(MSVC) || PLATFORM(LINUX)
+#if COMPILER(MSVC) || OS(LINUX)
   struct NativeCallFrameStructure {
     //  CallFrame* callFrame; // passed in EDX
     JSObject* callee;
@@ -1859,7 +1859,7 @@ void JIT::privateCompileCTIMachineTrampolines(
            Address(stackPointerRegister,
                    OBJECT_OFFSETOF(NativeCallFrameStructure, thisValue)));
 
-#if COMPILER(MSVC) || PLATFORM(LINUX)
+#if COMPILER(MSVC) || OS(LINUX)
   // ArgList is passed by reference so is stackPointerRegister + 4 *
   // sizeof(Register)
   addPtr(Imm32(OBJECT_OFFSETOF(NativeCallFrameStructure, result)),

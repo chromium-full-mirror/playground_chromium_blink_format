@@ -50,7 +50,7 @@
 #include <inttypes.h>
 #endif
 
-#if PLATFORM(SYMBIAN)
+#if OS(SYMBIAN)
 #include <e32def.h>
 #include <e32debug.h>
 #endif
@@ -157,7 +157,7 @@ void WTFLogVerbose(const char* file,
  * ignored by the crash reporter so we must do better */
 
 #ifndef CRASH
-#if PLATFORM(SYMBIAN)
+#if OS(SYMBIAN)
 #define CRASH()                         \
   do {                                  \
     __DEBUGGER();                       \
@@ -174,7 +174,7 @@ void WTFLogVerbose(const char* file,
 
 /* ASSERT, ASSERT_WITH_MESSAGE, ASSERT_NOT_REACHED */
 
-#if PLATFORM(WINCE) && !PLATFORM(TORCHMOBILE)
+#if OS(WINCE) && !PLATFORM(TORCHMOBILE)
 /* FIXME: We include this here only to avoid a conflict with the ASSERT macro.
  */
 #include <windows.h>
@@ -183,7 +183,7 @@ void WTFLogVerbose(const char* file,
 #undef ERROR
 #endif
 
-#if PLATFORM(WIN_OS) || PLATFORM(SYMBIAN)
+#if OS(WINDOWS) || OS(SYMBIAN)
 /* FIXME: Change to use something other than ASSERT to avoid this conflict with
  * the underlying platform */
 #undef ASSERT

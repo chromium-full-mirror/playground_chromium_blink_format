@@ -33,7 +33,7 @@
 #include "Interpreter.h"
 #include "Opcode.h"
 
-#if !PLATFORM(WIN_OS)
+#if !OS(WINDOWS)
 #include <unistd.h>
 #endif
 
@@ -89,7 +89,7 @@ void SamplingFlags::stop() {}
 */
 uint32_t SamplingFlags::s_flags = 1 << 15;
 
-#if PLATFORM(WIN_OS)
+#if OS(WINDOWS)
 
 static void sleepForMicroseconds(unsigned us) {
   unsigned ms = us / 1000;

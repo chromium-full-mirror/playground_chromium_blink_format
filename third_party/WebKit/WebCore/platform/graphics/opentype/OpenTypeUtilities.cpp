@@ -431,7 +431,7 @@ static size_t renameFontInternal(SharedBuffer* fontData,
   return nameTableSize;
 }
 
-#if PLATFORM(WINCE)
+#if OS(WINCE)
 // AddFontMemResourceEx does not exist on WinCE, so we must handle the font data
 // manually
 // This function just renames the font and overwrites the old font data with the

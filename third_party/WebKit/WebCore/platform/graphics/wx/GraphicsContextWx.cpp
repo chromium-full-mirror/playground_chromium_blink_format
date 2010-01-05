@@ -535,7 +535,7 @@ void GraphicsContext::addInnerRoundedRectClip(const IntRect& rect,
   notImplemented();
 }
 
-#if PLATFORM(WIN_OS)
+#if OS(WINDOWS)
 HDC GraphicsContext::getWindowsContext(const IntRect& dstRect,
                                        bool supportAlphaBlend,
                                        bool mayCreateBitmap) {

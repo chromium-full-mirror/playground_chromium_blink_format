@@ -254,13 +254,26 @@
 
 #endif /* ARM */
 
-/* Operating systems - low-level dependencies */
+/* ==== OS() - underlying operating system; only to be used for mandated
+   low-level services like
+   virtual memory, not to choose a GUI toolkit ==== */
 
-/* PLATFORM(DARWIN) */
-/* Operating system level dependencies for Mac OS X / Darwin that should */
-/* be used regardless of operating environment */
+/* OS(ANDROID) - Android */
+#ifdef ANDROID
+#define WTF_OS_ANDROID 1
+#endif
+
+/* OS(AIX) - AIX */
+#ifdef _AIX
+#define WTF_OS_AIX 1
+#endif
+
+/* OS(DARWIN) - Any Darwin-based OS, including Mac OS X and iPhone OS */
 #ifdef __APPLE__
-#define WTF_PLATFORM_DARWIN 1
+#define WTF_OS_DARWIN 1
+
+// FIXME: BUILDING_ON_.., and TARGETING... macros should be folded into the OS()
+// system
 #include <AvailabilityMacros.h>
 #if !defined(MAC_OS_X_VERSION_10_5) || \
     MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_5
@@ -283,84 +296,85 @@
 #define TARGETING_SNOW_LEOPARD 1
 #endif
 #include <TargetConditionals.h>
+
 #endif
 
-/* PLATFORM(WIN_OS) */
-/* Operating system level dependencies for Windows that should be used */
-/* regardless of operating environment */
-#if defined(WIN32) || defined(_WIN32)
-#define WTF_PLATFORM_WIN_OS 1
+/* OS(IPHONE_OS) - iPhone OS */
+/* OS(MAC_OS_X) - Mac OS X (not including iPhone OS) */
+#if OS(DARWIN) &&                                           \
+    ((defined(TARGET_OS_EMBEDDED) && TARGET_OS_EMBEDDED) || \
+     (defined(TARGET_OS_IPHONE) && TARGET_OS_IPHONE) ||     \
+     (defined(TARGET_IPHONE_SIMULATOR) && TARGET_IPHONE_SIMULATOR))
+#define WTF_OS_IPHONE_OS 1
+#elif OS(DARWIN) && defined(TARGET_OS_MAC) && TARGET_OS_MAC
+#define WTF_OS_MAC_OS_X 1
 #endif
 
-/* PLATFORM(WINCE) */
-/* Operating system level dependencies for Windows CE that should be used */
-/* regardless of operating environment */
-/* Note that for this platform PLATFORM(WIN_OS) is also defined. */
-#if defined(_WIN32_WCE)
-#define WTF_PLATFORM_WINCE 1
-#endif
-
-/* PLATFORM(LINUX) */
-/* Operating system level dependencies for Linux-like systems that */
-/* should be used regardless of operating environment */
-#ifdef __linux__
-#define WTF_PLATFORM_LINUX 1
-#endif
-
-/* PLATFORM(FREEBSD) */
-/* Operating system level dependencies for FreeBSD-like systems that */
-/* should be used regardless of operating environment */
+/* OS(FREEBSD) - FreeBSD */
 #ifdef __FreeBSD__
-#define WTF_PLATFORM_FREEBSD 1
+#define WTF_OS_FREEBSD 1
 #endif
 
-/* PLATFORM(OPENBSD) */
-/* Operating system level dependencies for OpenBSD systems that */
-/* should be used regardless of operating environment */
-#ifdef __OpenBSD__
-#define WTF_PLATFORM_OPENBSD 1
+/* OS(HAIKU) - Haiku */
+#ifdef __HAIKU__
+#define WTF_OS_HAIKU 1
 #endif
 
-/* PLATFORM(SOLARIS) */
-/* Operating system level dependencies for Solaris that should be used */
-/* regardless of operating environment */
-#if defined(sun) || defined(__sun)
-#define WTF_PLATFORM_SOLARIS 1
+/* OS(LINUX) - Linux */
+#ifdef __linux__
+#define WTF_OS_LINUX 1
 #endif
 
-#if defined(__SYMBIAN32__)
-/* we are cross-compiling, it is not really windows */
-#undef WTF_PLATFORM_WIN_OS
-#undef WTF_PLATFORM_WIN
-#define WTF_PLATFORM_SYMBIAN 1
-#endif
-
-/* PLATFORM(NETBSD) */
-/* Operating system level dependencies for NetBSD that should be used */
-/* regardless of operating environment */
+/* OS(NETBSD) - NetBSD */
 #if defined(__NetBSD__)
 #define WTF_PLATFORM_NETBSD 1
 #endif
 
-/* PLATFORM(QNX) */
-/* Operating system level dependencies for QNX that should be used */
-/* regardless of operating environment */
-#if defined(__QNXNTO__)
-#define WTF_PLATFORM_QNX 1
+/* OS(OPENBSD) - OpenBSD */
+#ifdef __OpenBSD__
+#define WTF_OS_OPENBSD 1
 #endif
 
-/* PLATFORM(UNIX) */
-/* Operating system level dependencies for Unix-like systems that */
-/* should be used regardless of operating environment */
-#if PLATFORM(DARWIN) || PLATFORM(FREEBSD) || PLATFORM(SYMBIAN) || \
-    PLATFORM(NETBSD) || defined(unix) || defined(__unix) ||       \
-    defined(__unix__) || defined(_AIX) || defined(__HAIKU__) ||   \
-    defined(__QNXNTO__) || defined(ANDROID)
-#define WTF_PLATFORM_UNIX 1
+/* OS(QNX) - QNX */
+#if defined(__QNXNTO__)
+#define WTF_OS_QNX 1
+#endif
+
+/* OS(SOLARIS) - Solaris */
+#if defined(sun) || defined(__sun)
+#define WTF_OS_SOLARIS 1
+#endif
+
+/* OS(WINCE) - Windows CE; note that for this platform OS(WINDOWS) is also
+ * defined */
+#if defined(_WIN32_WCE)
+#define WTF_OS_WINCE 1
+#endif
+
+/* OS(WINDOWS) - Any version of Windows */
+#if defined(WIN32) || defined(_WIN32)
+#define WTF_OS_WINDOWS 1
+#endif
+
+/* OS(SYMBIAN) - Symbian */
+#if defined(__SYMBIAN32__)
+/* we are cross-compiling, it is not really windows */
+#undef WTF_OS_WINDOWS
+#undef WTF_PLATFORM_WIN
+#define WTF_OS_SYMBIAN 1
+#endif
+
+/* OS(UNIX) - Any Unix-like system */
+#if OS(AIX) || OS(ANDROID) || OS(DARWIN) || OS(FREEBSD) || OS(HAIKU) || \
+    OS(LINUX) || OS(NETBSD) || OS(OPENBSD) || OS(QNX) || OS(SOLARIS) || \
+    OS(SYMBIAN) || defined(unix) || defined(__unix) || defined(__unix__)
+#define WTF_OS_UNIX 1
 #endif
 
 /* Operating environments */
 
+// FIXME: these are all mixes of OS, operating environment and policy choices.
+// */
 /* PLATFORM(CHROMIUM) */
 /* PLATFORM(QT) */
 /* PLATFORM(WX) */
@@ -378,13 +392,15 @@
 #define WTF_PLATFORM_GTK 1
 #elif defined(BUILDING_HAIKU__)
 #define WTF_PLATFORM_HAIKU 1
-#elif PLATFORM(DARWIN)
+#elif OS(DARWIN)
 #define WTF_PLATFORM_MAC 1
-#elif PLATFORM(WIN_OS)
+#elif OS(WINDOWS)
 #define WTF_PLATFORM_WIN 1
 #endif
 
 /* PLATFORM(IPHONE) */
+// FIXME: this is sometimes used as an OS switch and sometimes for higher-level
+// things
 #if (defined(TARGET_OS_EMBEDDED) && TARGET_OS_EMBEDDED) || \
     (defined(TARGET_OS_IPHONE) && TARGET_OS_IPHONE)
 #define WTF_PLATFORM_IPHONE 1
@@ -403,6 +419,8 @@
 #endif
 
 /* PLATFORM(ANDROID) */
+// FIXME: this is sometimes used as an OS() switch, and other times to drive
+// policy choices
 #if defined(ANDROID)
 #define WTF_PLATFORM_ANDROID 1
 #endif
@@ -419,7 +437,7 @@
 
 /* PLATFORM(SKIA) for Win/Linux, CG/CI for Mac */
 #if PLATFORM(CHROMIUM)
-#if PLATFORM(DARWIN)
+#if OS(DARWIN)
 #define WTF_PLATFORM_CG 1
 #define WTF_PLATFORM_CI 1
 #define WTF_USE_ATSUI 1
@@ -433,12 +451,12 @@
 #define WTF_PLATFORM_CAIRO 1
 #endif
 
-/* PLATFORM(WINCE) && PLATFORM(QT)
+/* OS(WINCE) && PLATFORM(QT)
    We can not determine the endianess at compile time. For
    Qt for Windows CE the endianess is specified in the
    device specific makespec
 */
-#if PLATFORM(WINCE) && PLATFORM(QT)
+#if OS(WINCE) && PLATFORM(QT)
 #include <QtGlobal>
 #undef WTF_PLATFORM_BIG_ENDIAN
 #undef WTF_PLATFORM_MIDDLE_ENDIAN
@@ -449,18 +467,18 @@
 #include <ce_time.h>
 #endif
 
-#if (PLATFORM(IPHONE) || PLATFORM(MAC) || PLATFORM(WIN) ||              \
-     (PLATFORM(QT) && PLATFORM(DARWIN) && !ENABLE(SINGLE_THREADED))) && \
+#if (PLATFORM(IPHONE) || PLATFORM(MAC) || PLATFORM(WIN) ||        \
+     (PLATFORM(QT) && OS(DARWIN) && !ENABLE(SINGLE_THREADED))) && \
     !defined(ENABLE_JSC_MULTIPLE_THREADS)
 #define ENABLE_JSC_MULTIPLE_THREADS 1
 #endif
 
 /* On Windows, use QueryPerformanceCounter by default */
-#if PLATFORM(WIN_OS)
+#if OS(WINDOWS)
 #define WTF_USE_QUERY_PERFORMANCE_COUNTER 1
 #endif
 
-#if PLATFORM(WINCE) && !PLATFORM(QT)
+#if OS(WINCE) && !PLATFORM(QT)
 #undef ENABLE_JSC_MULTIPLE_THREADS
 #define ENABLE_JSC_MULTIPLE_THREADS 0
 #define USE_SYSTEM_MALLOC 0
@@ -486,11 +504,11 @@
 #define _countof(x) (sizeof(x) / sizeof((x)[0]))
 #endif
 
-#endif /* PLATFORM(WINCE) && !PLATFORM(QT) */
+#endif /* OS(WINCE) && !PLATFORM(QT) */
 
 #if PLATFORM(QT)
 #define WTF_USE_QT4_UNICODE 1
-#elif PLATFORM(WINCE)
+#elif OS(WINCE)
 #define WTF_USE_WINCE_UNICODE 1
 #elif PLATFORM(GTK)
 /* The GTK+ Unicode backend is configurable */
@@ -515,13 +533,13 @@
 #define HAVE_RUNLOOP_TIMER 1
 #endif /* PLATFORM(MAC) && !PLATFORM(IPHONE) */
 
-#if PLATFORM(CHROMIUM) && PLATFORM(DARWIN)
+#if PLATFORM(CHROMIUM) && OS(DARWIN)
 #define WTF_PLATFORM_CF 1
 #define WTF_USE_PTHREADS 1
 #define HAVE_PTHREAD_RWLOCK 1
 #endif
 
-#if PLATFORM(QT) && PLATFORM(DARWIN)
+#if PLATFORM(QT) && OS(DARWIN)
 #define WTF_PLATFORM_CF 1
 #endif
 
@@ -560,7 +578,7 @@
 
 #if PLATFORM(WX)
 #define ENABLE_ASSEMBLER 1
-#if PLATFORM(DARWIN)
+#if OS(DARWIN)
 #define WTF_PLATFORM_CF 1
 #endif
 #endif
@@ -588,19 +606,18 @@
 #endif
 #endif /* !defined(HAVE_ACCESSIBILITY) */
 
-#if PLATFORM(UNIX) && !PLATFORM(SYMBIAN)
+#if OS(UNIX) && !OS(SYMBIAN)
 #define HAVE_SIGNAL_H 1
 #endif
 
-#if !PLATFORM(WIN_OS) && !PLATFORM(SOLARIS) && !PLATFORM(QNX) && \
-    !PLATFORM(SYMBIAN) && !PLATFORM(HAIKU) && !COMPILER(RVCT) && \
-    !PLATFORM(ANDROID)
+#if !OS(WINDOWS) && !OS(SOLARIS) && !OS(QNX) && !OS(SYMBIAN) && !OS(HAIKU) && \
+    !OS(RVCT) && !OS(ANDROID)
 #define HAVE_TM_GMTOFF 1
 #define HAVE_TM_ZONE 1
 #define HAVE_TIMEGM 1
 #endif
 
-#if PLATFORM(DARWIN)
+#if OS(DARWIN)
 
 #define HAVE_ERRNO_H 1
 #define HAVE_LANGINFO_H 1
@@ -623,16 +640,16 @@
 #define HAVE_MADV_FREE 1
 #endif
 
-#elif PLATFORM(WIN_OS)
+#elif OS(WINDOWS)
 
-#if PLATFORM(WINCE)
+#if OS(WINCE)
 #define HAVE_ERRNO_H 0
 #else
 #define HAVE_SYS_TIMEB_H 1
 #endif
 #define HAVE_VIRTUALALLOC 1
 
-#elif PLATFORM(SYMBIAN)
+#elif OS(SYMBIAN)
 
 #define HAVE_ERRNO_H 1
 #define HAVE_MMAP 0
@@ -645,7 +662,7 @@
 #define HAVE_SYS_PARAM_H 1
 #endif
 
-#elif PLATFORM(QNX)
+#elif OS(QNX)
 
 #define HAVE_ERRNO_H 1
 #define HAVE_MMAP 1
@@ -654,7 +671,7 @@
 #define HAVE_SYS_PARAM_H 1
 #define HAVE_SYS_TIME_H 1
 
-#elif PLATFORM(ANDROID)
+#elif OS(ANDROID)
 
 #define HAVE_ERRNO_H 1
 #define HAVE_LANGINFO_H 0
@@ -672,7 +689,7 @@
 #define HAVE_ERRNO_H 1
 /* As long as Haiku doesn't have a complete support of locale this will be
  * disabled. */
-#if !PLATFORM(HAIKU)
+#if !OS(HAIKU)
 #define HAVE_LANGINFO_H 1
 #endif
 #define HAVE_MMAP 1
@@ -772,12 +789,11 @@
 
 #if !defined(WTF_USE_JSVALUE64) && !defined(WTF_USE_JSVALUE32) && \
     !defined(WTF_USE_JSVALUE32_64)
-#if (CPU(X86_64) && (PLATFORM(UNIX) || PLATFORM(WIN_OS))) || CPU(IA64) || \
-    CPU(ALPHA)
+#if (CPU(X86_64) && (OS(UNIX) || OS(WINDOWS))) || CPU(IA64) || CPU(ALPHA)
 #define WTF_USE_JSVALUE64 1
 #elif CPU(ARM) || CPU(PPC64)
 #define WTF_USE_JSVALUE32 1
-#elif PLATFORM(WIN_OS) && COMPILER(MINGW)
+#elif OS(WINDOWS) && COMPILER(MINGW)
 /* Using JSVALUE32_64 causes padding/alignement issues for JITStubArg
 on MinGW. See https://bugs.webkit.org/show_bug.cgi?id=29268 */
 #define WTF_USE_JSVALUE32 1
@@ -808,21 +824,21 @@ on MinGW. See https://bugs.webkit.org/show_bug.cgi?id=29268 */
 #endif
 
 #if PLATFORM(QT)
-#if CPU(X86_64) && PLATFORM(DARWIN)
+#if CPU(X86_64) && OS(DARWIN)
 #define ENABLE_JIT 1
-#elif CPU(X86) && PLATFORM(DARWIN)
-#define ENABLE_JIT 1
-#define WTF_USE_JIT_STUB_ARGUMENT_VA_LIST 1
-#elif CPU(X86) && PLATFORM(WIN_OS) && COMPILER(MINGW) && GCC_VERSION >= 40100
+#elif CPU(X86) && OS(DARWIN)
 #define ENABLE_JIT 1
 #define WTF_USE_JIT_STUB_ARGUMENT_VA_LIST 1
-#elif CPU(X86) && PLATFORM(WIN_OS) && COMPILER(MSVC)
+#elif CPU(X86) && OS(WINDOWS) && COMPILER(MINGW) && GCC_VERSION >= 40100
+#define ENABLE_JIT 1
+#define WTF_USE_JIT_STUB_ARGUMENT_VA_LIST 1
+#elif CPU(X86) && OS(WINDOWS) && COMPILER(MSVC)
 #define ENABLE_JIT 1
 #define WTF_USE_JIT_STUB_ARGUMENT_REGISTER 1
-#elif CPU(X86) && PLATFORM(LINUX) && GCC_VERSION >= 40100
+#elif CPU(X86) && OS(LINUX) && GCC_VERSION >= 40100
 #define ENABLE_JIT 1
 #define WTF_USE_JIT_STUB_ARGUMENT_VA_LIST 1
-#elif CPU(ARM_TRADITIONAL) && PLATFORM(LINUX)
+#elif CPU(ARM_TRADITIONAL) && OS(LINUX)
 #define ENABLE_JIT 1
 #endif
 #endif /* PLATFORM(QT) */
@@ -873,11 +889,10 @@ on MinGW. See https://bugs.webkit.org/show_bug.cgi?id=29268 */
 #endif
 
 #if PLATFORM(QT)
-#if (CPU(X86) && PLATFORM(WIN_OS) && COMPILER(MINGW) &&      \
-     GCC_VERSION >= 40100) ||                                \
-    (CPU(X86) && PLATFORM(WIN_OS) && COMPILER(MSVC)) ||      \
-    (CPU(X86) && PLATFORM(LINUX) && GCC_VERSION >= 40100) || \
-    (CPU(ARM_TRADITIONAL) && PLATFORM(LINUX))
+#if (CPU(X86) && OS(WINDOWS) && COMPILER(MINGW) && GCC_VERSION >= 40100) || \
+    (CPU(X86) && OS(WINDOWS) && COMPILER(MSVC)) ||                          \
+    (CPU(X86) && OS(LINUX) && GCC_VERSION >= 40100) ||                      \
+    (CPU(ARM_TRADITIONAL) && OS(LINUX))
 #define ENABLE_YARR 1
 #define ENABLE_YARR_JIT 1
 #endif
@@ -902,7 +917,7 @@ on MinGW. See https://bugs.webkit.org/show_bug.cgi?id=29268 */
 #define ENABLE_ASSEMBLER_WX_EXCLUSIVE 0
 #endif
 
-#if !defined(ENABLE_PAN_SCROLLING) && PLATFORM(WIN_OS)
+#if !defined(ENABLE_PAN_SCROLLING) && OS(WINDOWS)
 #define ENABLE_PAN_SCROLLING 1
 #endif
 
@@ -949,7 +964,7 @@ on MinGW. See https://bugs.webkit.org/show_bug.cgi?id=29268 */
 
 #if !ENABLE(NETSCAPE_PLUGIN_API) || \
     (ENABLE(NETSCAPE_PLUGIN_API) && \
-     ((PLATFORM(UNIX) && (PLATFORM(QT) || PLATFORM(WX))) || PLATFORM(GTK)))
+     ((OS(UNIX) && (PLATFORM(QT) || PLATFORM(WX))) || PLATFORM(GTK)))
 #define ENABLE_PLUGIN_PACKAGE_SIMPLE_HASH 1
 #endif
 

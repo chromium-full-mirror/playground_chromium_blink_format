@@ -257,7 +257,7 @@ bool PluginPackage::load() {
     m_loadCount++;
     return true;
   } else {
-#if PLATFORM(WINCE)
+#if OS(WINCE)
     m_module = ::LoadLibraryW(m_path.charactersWithNullTermination());
 #else
     WCHAR currentPath[MAX_PATH];
@@ -291,7 +291,7 @@ bool PluginPackage::load() {
   NP_InitializeFuncPtr NP_Initialize = 0;
   NPError npErr;
 
-#if PLATFORM(WINCE)
+#if OS(WINCE)
   NP_Initialize =
       (NP_InitializeFuncPtr)GetProcAddress(m_module, L"NP_Initialize");
   NP_GetEntryPoints =

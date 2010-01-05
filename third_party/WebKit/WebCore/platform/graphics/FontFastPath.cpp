@@ -161,7 +161,7 @@ GlyphData Font::glyphDataForCharacter(UChar32 c,
                          : characterFontData->missingGlyphData();
     // Cache it so we don't have to do system fallback again next time.
     if (!useSmallCapsFont) {
-#if PLATFORM(WINCE)
+#if OS(WINCE)
       // missingGlyphData returns a null character, which is not suitable for
       // GDI to display.
       // Also, sometimes we cannot map a font for the character on WINCE, but
@@ -184,7 +184,7 @@ GlyphData Font::glyphDataForCharacter(UChar32 c,
   // instead.
   GlyphData data = primaryFont()->missingGlyphData();
   if (!useSmallCapsFont) {
-#if PLATFORM(WINCE)
+#if OS(WINCE)
     // See comment about WINCE GDI handling near setGlyphDataForCharacter above.
     page->setGlyphDataForCharacter(c, c, data.fontData);
     return page->glyphDataForCharacter(c);

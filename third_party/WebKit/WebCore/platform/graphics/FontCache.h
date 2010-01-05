@@ -66,7 +66,7 @@ class FontCache : public Noncopyable {
   // Also implemented by the platform.
   void platformInit();
 
-#if PLATFORM(WINCE) && !PLATFORM(QT)
+#if OS(WINCE) && !PLATFORM(QT)
 #if defined(IMLANG_FONT_LINK) && (IMLANG_FONT_LINK == 2)
   IMLangFontLink2* getFontLinkInterface();
 #else

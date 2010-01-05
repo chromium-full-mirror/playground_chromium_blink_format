@@ -104,10 +104,10 @@
 #include "Threading.h"
 
 #include "MainThread.h"
-#if !USE(PTHREADS) && PLATFORM(WIN_OS)
+#if !USE(PTHREADS) && OS(WINDOWS)
 #include "ThreadSpecific.h"
 #endif
-#if !PLATFORM(WINCE)
+#if !OS(WINCE)
 #include <process.h>
 #endif
 #if HAVE(ERRNO_H)
@@ -216,7 +216,7 @@ static unsigned __stdcall wtfThreadEntryPoint(void* param) {
 
   void* result = invocation.function(invocation.data);
 
-#if !USE(PTHREADS) && PLATFORM(WIN_OS)
+#if !USE(PTHREADS) && OS(WINDOWS)
   // Do the TLS cleanup.
   ThreadSpecificThreadExit();
 #endif
@@ -231,7 +231,7 @@ ThreadIdentifier createThreadInternal(ThreadFunction entryPoint,
   ThreadIdentifier threadID = 0;
   ThreadFunctionInvocation* invocation =
       new ThreadFunctionInvocation(entryPoint, data);
-#if PLATFORM(WINCE)
+#if OS(WINCE)
   // This is safe on WINCE, since CRT is in the core and innately multithreaded.
   // On desktop Windows, need to use _beginthreadex (not available on WinCE) if
   // using any CRT functions
@@ -243,7 +243,7 @@ ThreadIdentifier createThreadInternal(ThreadFunction entryPoint,
       0, 0, wtfThreadEntryPoint, invocation, 0, &threadIdentifier));
 #endif
   if (!threadHandle) {
-#if PLATFORM(WINCE)
+#if OS(WINCE)
     LOG_ERROR("Failed to create thread at entry point %p with data %p: %ld",
               entryPoint, data, ::GetLastError());
 #elif defined(NO_ERRNO)

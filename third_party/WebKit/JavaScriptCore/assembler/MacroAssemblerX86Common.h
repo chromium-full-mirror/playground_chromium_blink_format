@@ -842,12 +842,12 @@ class MacroAssemblerX86Common : public AbstractMacroAssembler<X86Assembler> {
   friend class MacroAssemblerX86;
 
 #if CPU(X86)
-#if PLATFORM(MAC)
+#if OS(MAC_OS_X)
 
   // All X86 Macs are guaranteed to support at least SSE2,
   static bool isSSE2Present() { return true; }
 
-#else  // PLATFORM(MAC)
+#else  // OS(MAC_OS_X)
 
   enum SSE2CheckState{NotCheckedSSE2, HasSSE2, NoSSE2};
 
@@ -883,7 +883,7 @@ class MacroAssemblerX86Common : public AbstractMacroAssembler<X86Assembler> {
 
   static SSE2CheckState s_sse2CheckState;
 
-#endif                  // PLATFORM(MAC)
+#endif                  // OS(MAC_OS_X)
 #elif !defined(NDEBUG)  // CPU(X86)
 
   // On x86-64 we should never be checking for SSE2 in a non-debug build,

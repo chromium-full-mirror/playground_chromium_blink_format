@@ -135,7 +135,7 @@ CString TextEncoding::encode(const UChar* characters,
 
   return newTextCodec(*this)->encode(UTF16Normalized.get(), UTF16Length,
                                      handling);
-#elif PLATFORM(WINCE)
+#elif OS(WINCE)
   // normalization will be done by Windows CE API
   OwnPtr<TextCodec> textCodec = newTextCodec(*this);
   return textCodec.get() ? textCodec->encode(characters, length, handling)

@@ -1118,7 +1118,7 @@ void PopupListBox::layout() {
   // Calculate scroll bar width.
   int windowHeight = 0;
 
-#if PLATFORM(DARWIN)
+#if OS(DARWIN)
   // Set the popup's window to contain all available items on Mac only, which
   // uses native controls that manage their own scrolling. This allows hit
   // testing to work when selecting items in popups that have more menu entries
@@ -1130,7 +1130,7 @@ void PopupListBox::layout() {
 
   for (int i = 0; i < m_visibleRows; ++i) {
     int rowHeight = getRowHeight(i);
-#if !PLATFORM(DARWIN)
+#if !OS(DARWIN)
     // Only clip the window height for non-Mac platforms.
     if (windowHeight + rowHeight > kMaxHeight) {
       m_visibleRows = i;
@@ -1202,7 +1202,7 @@ PopupMenu::~PopupMenu() {
 void PopupMenu::show(const IntRect& r, FrameView* v, int index) {
   if (!p.popup)
     p.popup = PopupContainer::create(client(), dropDownSettings);
-#if PLATFORM(DARWIN)
+#if OS(DARWIN)
   p.popup->showExternal(r, v, index);
 #else
   p.popup->show(r, v, index);

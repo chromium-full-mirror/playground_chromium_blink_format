@@ -1954,7 +1954,7 @@ bool EventHandler::dispatchMouseEvent(const AtomicString& eventType,
   return swallowEvent;
 }
 
-#if !PLATFORM(GTK) && !(PLATFORM(CHROMIUM) && PLATFORM(LINUX))
+#if !PLATFORM(GTK) && !(PLATFORM(CHROMIUM) && OS(LINUX))
 bool EventHandler::shouldTurnVerticalTicksIntoHorizontal(
     const HitTestResult&) const {
   return false;

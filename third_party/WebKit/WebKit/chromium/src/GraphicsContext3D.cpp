@@ -56,7 +56,7 @@
 #include <stdio.h>
 #include <wtf/FastMalloc.h>
 
-#if PLATFORM(WIN_OS)
+#if OS(WINDOWS)
 #include <windows.h>
 #endif
 
@@ -76,11 +76,11 @@
 #include "NativeImageSkia.h"
 #endif
 
-#if PLATFORM(DARWIN)
+#if OS(DARWIN)
 #define USE_TEXTURE_RECTANGLE_FOR_FRAMEBUFFER
 #endif
 
-#if PLATFORM(LINUX)
+#if OS(LINUX)
 #include <dlfcn.h>
 #include "GL/glxew.h"
 #endif
@@ -185,7 +185,7 @@ class GraphicsContext3DInternal {
 #endif
 
   static bool s_initializedGLEW;
-#if PLATFORM(WIN_OS)
+#if OS(WINDOWS)
   HWND m_canvasWindow;
   HDC m_canvasDC;
   HGLRC m_contextObj;
@@ -193,7 +193,7 @@ class GraphicsContext3DInternal {
   CGLPBufferObj m_pbuffer;
   CGLContextObj m_contextObj;
   unsigned char* m_renderOutput;
-#elif PLATFORM(LINUX)
+#elif OS(LINUX)
   GLXContext m_contextObj;
   GLXPbuffer m_pbuffer;
 
@@ -287,7 +287,7 @@ class GraphicsContext3DInternal {
 
 bool GraphicsContext3DInternal::s_initializedGLEW = false;
 
-#if PLATFORM(LINUX)
+#if OS(LINUX)
 GraphicsContext3DInternal::GLConnection* GraphicsContext3DInternal::s_gl = 0;
 
 GraphicsContext3DInternal::GLConnection*
@@ -347,7 +347,7 @@ GraphicsContext3DInternal::GLConnection::~GLConnection() {
   dlclose(m_libGL);
 }
 
-#endif  // PLATFORM(LINUX)
+#endif  // OS(LINUX)
 
 GraphicsContext3DInternal::VertexAttribPointerState::VertexAttribPointerState()
     : enabled(false),
@@ -374,7 +374,7 @@ GraphicsContext3DInternal::GraphicsContext3DInternal()
       ,
       m_resizingBitmap(0)
 #endif
-#if PLATFORM(WIN_OS)
+#if OS(WINDOWS)
       ,
       m_canvasWindow(0),
       m_canvasDC(0),
@@ -384,7 +384,7 @@ GraphicsContext3DInternal::GraphicsContext3DInternal()
       m_pbuffer(0),
       m_contextObj(0),
       m_renderOutput(0)
-#elif PLATFORM(LINUX)
+#elif OS(LINUX)
       ,
       m_contextObj(0),
       m_pbuffer(0)
@@ -392,7 +392,7 @@ GraphicsContext3DInternal::GraphicsContext3DInternal()
 #error Must port to your platform
 #endif
 {
-#if PLATFORM(WIN_OS)
+#if OS(WINDOWS)
   WNDCLASS wc;
   if (!GetClassInfo(GetModuleHandle(0), L"CANVASGL", &wc)) {
     ZeroMemory(&wc, sizeof(WNDCLASS));
@@ -504,7 +504,7 @@ GraphicsContext3DInternal::GraphicsContext3DInternal()
   }
   m_pbuffer = pbuffer;
   m_contextObj = context;
-#elif PLATFORM(LINUX)
+#elif OS(LINUX)
   if (!s_gl) {
     s_gl = GLConnection::create();
     if (!s_gl)
@@ -583,7 +583,7 @@ GraphicsContext3DInternal::~GraphicsContext3DInternal() {
   if (m_resizingBitmap)
     delete m_resizingBitmap;
 #endif
-#if PLATFORM(WIN_OS)
+#if OS(WINDOWS)
   wglMakeCurrent(0, 0);
   wglDeleteContext(m_contextObj);
   ReleaseDC(m_canvasWindow, m_canvasDC);
@@ -594,7 +594,7 @@ GraphicsContext3DInternal::~GraphicsContext3DInternal() {
   CGLDestroyPBuffer(m_pbuffer);
   if (m_renderOutput)
     delete[] m_renderOutput;
-#elif PLATFORM(LINUX)
+#elif OS(LINUX)
   s_gl->makeCurrent(0, 0);
   s_gl->destroyContext(m_contextObj);
   s_gl->destroyPbuffer(m_pbuffer);
@@ -605,7 +605,7 @@ GraphicsContext3DInternal::~GraphicsContext3DInternal() {
 }
 
 bool GraphicsContext3DInternal::makeContextCurrent() {
-#if PLATFORM(WIN_OS)
+#if OS(WINDOWS)
   if (wglGetCurrentContext() != m_contextObj)
     if (wglMakeCurrent(m_canvasDC, m_contextObj))
       return true;
@@ -613,7 +613,7 @@ bool GraphicsContext3DInternal::makeContextCurrent() {
   if (CGLGetCurrentContext() != m_contextObj)
     if (CGLSetCurrentContext(m_contextObj) == kCGLNoError)
       return true;
-#elif PLATFORM(LINUX)
+#elif OS(LINUX)
   if (s_gl->getCurrentContext() != m_contextObj)
     if (s_gl->makeCurrent(m_pbuffer, m_contextObj))
       return true;

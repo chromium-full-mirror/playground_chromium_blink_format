@@ -306,7 +306,7 @@ void GraphicsContext::drawImage(Image* image,
             useLowQualityScale);
 }
 
-#if !PLATFORM(WINCE) || PLATFORM(QT)
+#if !OS(WINCE) || PLATFORM(QT)
 void GraphicsContext::drawText(const Font& font,
                                const TextRun& run,
                                const IntPoint& point,

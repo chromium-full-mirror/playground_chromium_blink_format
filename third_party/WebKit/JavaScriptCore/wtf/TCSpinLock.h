@@ -47,7 +47,7 @@
 #include <sys/types.h>
 #endif
 
-#if PLATFORM(WIN_OS)
+#if OS(WINDOWS)
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
@@ -101,7 +101,7 @@ struct TCMalloc_SpinLock {
         "isync\n\t"
         "eieio\n\t"
         "stw %1, %0"
-#if PLATFORM(DARWIN) || CPU(PPC)
+#if OS(DARWIN) || CPU(PPC)
         : "=o"(lockword_)
 #else
         : "=m"(lockword_)
@@ -174,7 +174,7 @@ static void TCMalloc_SlowLock(volatile unsigned int* lockword) {
 // from taking 30 seconds to 16 seconds.
 
 // Sleep for a few milliseconds
-#if PLATFORM(WIN_OS)
+#if OS(WINDOWS)
     Sleep(2);
 #else
     struct timespec tm;

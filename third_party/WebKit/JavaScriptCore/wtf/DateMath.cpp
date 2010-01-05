@@ -87,7 +87,7 @@
 #include <errno.h>
 #endif
 
-#if PLATFORM(WINCE)
+#if OS(WINCE)
 extern "C" size_t strftime(char* const s,
                            const size_t maxsize,
                            const char* const format,
@@ -496,7 +496,7 @@ static inline double ymdhmsToSeconds(long year,
 // We follow the recommendation of RFC 2822 to consider all
 // obsolete time zones not listed here equivalent to "-0000".
 static const struct KnownZone {
-#if !PLATFORM(WIN_OS)
+#if !OS(WINDOWS)
   const
 #endif
       char tzName[4];

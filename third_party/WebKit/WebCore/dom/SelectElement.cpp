@@ -53,10 +53,10 @@
 // arrow/space/return keystroke.
 // (PLATFORM(MAC) and PLATFORM(GTK) are always false in Chromium, hence the
 // extra tests.)
-#if PLATFORM(MAC) || (PLATFORM(CHROMIUM) && PLATFORM(DARWIN))
+#if PLATFORM(MAC) || (PLATFORM(CHROMIUM) && OS(DARWIN))
 #define ARROW_KEYS_POP_MENU 1
 #define SPACE_OR_RETURN_POP_MENU 0
-#elif PLATFORM(GTK) || (PLATFORM(CHROMIUM) && PLATFORM(LINUX))
+#elif PLATFORM(GTK) || (PLATFORM(CHROMIUM) && OS(LINUX))
 #define ARROW_KEYS_POP_MENU 0
 #define SPACE_OR_RETURN_POP_MENU 1
 #else
@@ -747,7 +747,7 @@ void SelectElement::listBoxDefaultEventHandler(SelectElementData& data,
       data.setActiveSelectionState(true);
 
       bool multiSelectKeyPressed = false;
-#if PLATFORM(MAC) || (PLATFORM(CHROMIUM) && PLATFORM(DARWIN))
+#if PLATFORM(MAC) || (PLATFORM(CHROMIUM) && OS(DARWIN))
       multiSelectKeyPressed = mouseEvent->metaKey();
 #else
       multiSelectKeyPressed = mouseEvent->ctrlKey();

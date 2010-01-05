@@ -47,7 +47,7 @@ inline double currentTimeMS() {
 }
 
 inline void getLocalTime(const time_t* localTime, struct tm* localTM) {
-#if COMPILER(MSVC7) || COMPILER(MINGW) || PLATFORM(WINCE)
+#if COMPILER(MSVC7) || COMPILER(MINGW) || OS(WINCE)
   *localTM = *localtime(localTime);
 #elif COMPILER(MSVC)
   localtime_s(localTM, localTime);

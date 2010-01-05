@@ -37,7 +37,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if !PLATFORM(WIN_OS)
+#if !OS(WINDOWS)
 #include <unistd.h>
 #endif
 
@@ -54,7 +54,7 @@
 #include <signal.h>
 #endif
 
-#if COMPILER(MSVC) && !PLATFORM(WINCE)
+#if COMPILER(MSVC) && !OS(WINCE)
 #include <crtdbg.h>
 #include <windows.h>
 #include <mmsystem.h>
@@ -403,7 +403,7 @@ JSValue JSC_HOST_CALL functionQuit(ExecState* exec,
 int jscmain(int argc, char** argv, JSGlobalData*);
 
 int main(int argc, char** argv) {
-#if defined(_DEBUG) && PLATFORM(WIN_OS)
+#if defined(_DEBUG) && OS(WINDOWS)
   _CrtSetReportFile(_CRT_WARN, _CRTDBG_FILE_STDERR);
   _CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_FILE);
   _CrtSetReportFile(_CRT_ERROR, _CRTDBG_FILE_STDERR);
@@ -412,7 +412,7 @@ int main(int argc, char** argv) {
   _CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE);
 #endif
 
-#if COMPILER(MSVC) && !PLATFORM(WINCE)
+#if COMPILER(MSVC) && !OS(WINCE)
   timeBeginPeriod(1);
 #endif
 
