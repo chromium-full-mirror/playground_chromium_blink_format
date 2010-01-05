@@ -28,24 +28,23 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef V8IsolatedWorld_h
-#define V8IsolatedWorld_h
+#ifndef V8IsolatedContext_h
+#define V8IsolatedContext_h
 
-#include <v8.h>
-
-#include "V8DOMMap.h"
+#include "IsolatedWorld.h"
+#include "ScriptSourceCode.h"  // for WebCore::ScriptSourceCode
 #include "V8Index.h"
 #include "V8Proxy.h"
 #include "V8Utilities.h"
-#include "ScriptSourceCode.h"  // for WebCore::ScriptSourceCode
+#include <v8.h>
 
 namespace WebCore {
 
 class V8Proxy;
 
-// V8IsolatedWorld
+// V8IsolatedContext
 //
-// V8IsolatedWorld represents a isolated execution environment for
+// V8IsolatedContext represents a isolated execution environment for
 // JavaScript.  Each isolated world executes in parallel with the main
 // JavaScript world.  An isolated world has access to the same DOM data
 // structures as the main world but none of the JavaScript pointers.
@@ -55,13 +54,12 @@ class V8Proxy;
 // isolated worlds have access to the DOM, they need their own DOM wrappers
 // to avoid having pointers to the main world's DOM wrappers (which are
 // JavaScript objects).
-//
-class V8IsolatedWorld {
+class V8IsolatedContext {
  public:
   // Creates an isolated world. To destroy it, call destroy().
   // This will delete the isolated world when the context it owns is GC'd.
-  V8IsolatedWorld(V8Proxy* proxy, int extensionGroup);
-  ~V8IsolatedWorld();
+  V8IsolatedContext(V8Proxy* proxy, int extensionGroup);
+  ~V8IsolatedContext();
 
   // Call this to destroy the isolated world. It will be deleted sometime
   // after this call, once all script references to the world's context
@@ -71,22 +69,22 @@ class V8IsolatedWorld {
   // Returns the isolated world associated with
   // v8::Context::GetEntered().  Because worlds are isolated, the entire
   // JavaScript call stack should be from the same isolated world.
-  // Returns NULL if the entered context is from the main world.
+  // Returns 0 if the entered context is from the main world.
   //
   // FIXME: Consider edge cases with DOM mutation events that might
   // violate this invariant.
   //
-  static V8IsolatedWorld* getEntered() {
+  static V8IsolatedContext* getEntered() {
     // This is a temporary performance optimization.   Essentially,
     // GetHiddenValue is too slow for this code path.  We need to get the
     // V8 team to add a real property to v8::Context for isolated worlds.
     // Until then, we optimize the common case of not having any isolated
     // worlds at all.
-    if (!isolatedWorldCount)
+    if (!IsolatedWorld::count())
       return 0;
     if (!v8::Context::InContext())
       return 0;
-    return reinterpret_cast<V8IsolatedWorld*>(
+    return reinterpret_cast<V8IsolatedContext*>(
         getGlobalObject(v8::Context::GetEntered())
             ->GetPointerFromInternalField(
                 V8Custom::kDOMWindowEnteredIsolatedWorldIndex));
@@ -97,7 +95,7 @@ class V8IsolatedWorld {
     return m_context;
   }
 
-  DOMDataStore* getDOMDataStore() const { return m_domDataStore.getStore(); }
+  IsolatedWorld* world() const { return m_world.get(); }
 
   ScriptState* scriptState();
 
@@ -110,24 +108,19 @@ class V8IsolatedWorld {
   // Called by the garbage collector when our JavaScript context is about
   // to be destroyed.
   static void contextWeakReferenceCallback(v8::Persistent<v8::Value> object,
-                                           void* isolated_world);
+                                           void* isolatedContext);
 
-  // The v8::Context for the isolated world.  This object is keep on the
-  // heap as long as |m_context| has not been garbage collected.
+  // The underlying v8::Context. This object is keep on the heap as
+  // long as |m_context| has not been garbage collected.
   RefPtr<SharedPersistent<v8::Context>> m_context;
 
-  // The backing store for the isolated world's DOM wrappers.  This class
-  // doesn't have visibility into the wrappers.  This handle simply helps
-  // manage their lifetime.
-  DOMDataStoreHandle m_domDataStore;
+  RefPtr<IsolatedWorld> m_world;
 
   // FIXME: get rid of redundant m_context field. The context can be retrieved
   // from the ScriptState.
   OwnPtr<ScriptState> m_scriptState;
-
-  static int isolatedWorldCount;
 };
 
 }  // namespace WebCore
 
-#endif  // V8IsolatedWorld_h
+#endif  // V8IsolatedContext_h

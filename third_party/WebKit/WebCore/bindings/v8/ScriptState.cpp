@@ -66,10 +66,4 @@ ScriptState* scriptStateFromPage(DOMWrapperWorld*, Page* page) {
   // tests.
   return page->mainFrame()->script()->mainWorldScriptState();
 }
-
-// FIXME: Stub method so we compile.  Currently called from FrameLoader.cpp.
-DOMWrapperWorld* mainThreadNormalWorld() {
-  DEFINE_STATIC_LOCAL(DOMWrapperWorld, oneWorld, ());
-  return &oneWorld;
-}
 }
