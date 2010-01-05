@@ -244,9 +244,6 @@ struct DefaultHash<std::pair<T, U>> {
   typedef PairHash<T, U> Hash;
 };
 
-// Golden ratio - arbitrary start value to avoid mapping all 0's to all 0's
-static const unsigned stringHashingStartValue = 0x9e3779b9U;
-
 }  // namespace WTF
 
 using WTF::DefaultHash;
