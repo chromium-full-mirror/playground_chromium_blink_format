@@ -744,6 +744,13 @@ static JSValueRef getIsExpandedCallback(JSContextRef context,
   return JSValueMakeBoolean(context, toAXElement(thisObject)->isExpanded());
 }
 
+static JSValueRef getIsCheckedCallback(JSContextRef context,
+                                       JSObjectRef thisObject,
+                                       JSStringRef,
+                                       JSValueRef*) {
+  return JSValueMakeBoolean(context, toAXElement(thisObject)->isChecked());
+}
+
 static JSValueRef hierarchicalLevelCallback(JSContextRef context,
                                             JSObjectRef thisObject,
                                             JSStringRef,
@@ -874,6 +881,8 @@ JSClassRef AccessibilityUIElement::getJSClass() {
       {"isSelected", getIsSelectedCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"isExpanded", getIsExpandedCallback, 0,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"isChecked", getIsCheckedCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"valueDescription", getValueDescriptionCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},

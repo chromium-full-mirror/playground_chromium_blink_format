@@ -227,7 +227,7 @@ JSStringRef AccessibilityUIElement::orientation() const {
   return 0;
 }
 
-double AccessibilityUIElement::intValue() {
+double AccessibilityUIElement::intValue() const {
   GValue value = {0, {{0}}};
 
   if (!ATK_IS_VALUE(m_element))
@@ -321,6 +321,10 @@ JSStringRef AccessibilityUIElement::ariaDropEffects() const {
 bool AccessibilityUIElement::isExpanded() const {
   // FIXME: implement
   return false;
+}
+
+bool AccessibilityUIElement::isChecked() const {
+  return intValue();
 }
 
 JSStringRef AccessibilityUIElement::attributesOfColumnHeaders() {
