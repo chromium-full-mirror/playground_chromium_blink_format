@@ -61,6 +61,7 @@ class WebElement : public WebNode {
   WEBKIT_API bool hasAttribute(const WebString&) const;
   WEBKIT_API WebString getAttribute(const WebString&) const;
   WEBKIT_API bool setAttribute(const WebString& name, const WebString& value);
+  WEBKIT_API WebString innerText() const;
 
 #if WEBKIT_IMPLEMENTATION
   WebElement(const WTF::PassRefPtr<WebCore::Element>&);

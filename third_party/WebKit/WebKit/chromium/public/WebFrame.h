@@ -98,6 +98,7 @@ class WebFrame {
 
   // The name of this frame.
   virtual WebString name() const = 0;
+  virtual void clearName() = 0;
 
   // The url of the document loaded in this frame.  This is equivalent to
   // dataSource()->request().url().
@@ -456,6 +457,14 @@ class WebFrame {
   // Returns HTML text for the contents of this frame.  This is generated
   // from the DOM.
   virtual WebString contentAsMarkup() const = 0;
+
+  // Returns a text representation of the render tree.  This method is used
+  // to support layout tests.
+  virtual WebString renderTreeAsText() const = 0;
+
+  // Returns the counter value for the specified element.  This method is
+  // used to support layout tests.
+  virtual WebString counterValueForElementById(const WebString& id) const = 0;
 
  protected:
   ~WebFrame() {}
