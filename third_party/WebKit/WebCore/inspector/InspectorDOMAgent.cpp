@@ -479,6 +479,12 @@ void InspectorDOMAgent::getEventListenersForNode(long callId, long nodeId) {
   m_frontend->didGetEventListenersForNode(callId, nodeId, listenersArray);
 }
 
+String InspectorDOMAgent::documentURLString(Document* document) const {
+  if (!document || document->url().isNull())
+    return "";
+  return document->url().string();
+}
+
 ScriptObject InspectorDOMAgent::buildObjectForNode(Node* node,
                                                    int depth,
                                                    NodeToIdMap* nodesMap) {
@@ -513,10 +519,6 @@ ScriptObject InspectorDOMAgent::buildObjectForNode(Node* node,
   value.set("localName", localName);
   value.set("nodeValue", nodeValue);
 
-  if (node->nodeType() == Node::ELEMENT_NODE) {
-    Element* element = static_cast<Element*>(node);
-    value.set("attributes", buildArrayForElementAttributes(element));
-  }
   if (node->nodeType() == Node::ELEMENT_NODE ||
       node->nodeType() == Node::DOCUMENT_NODE) {
     int nodeCount = innerChildNodeCount(node);
@@ -525,8 +527,21 @@ ScriptObject InspectorDOMAgent::buildObjectForNode(Node* node,
         buildArrayForContainerChildren(node, depth, nodesMap);
     if (children.length() > 0)
       value.set("children", children);
-  }
-  if (node->nodeType() == Node::DOCUMENT_TYPE_NODE) {
+
+    if (node->nodeType() == Node::ELEMENT_NODE) {
+      Element* element = static_cast<Element*>(node);
+      value.set("attributes", buildArrayForElementAttributes(element));
+      if (node->isFrameOwnerElement()) {
+        HTMLFrameOwnerElement* frameOwner =
+            static_cast<HTMLFrameOwnerElement*>(node);
+        value.set("documentURL",
+                  documentURLString(frameOwner->contentDocument()));
+      }
+    } else {
+      Document* document = static_cast<Document*>(node);
+      value.set("documentURL", documentURLString(document));
+    }
+  } else if (node->nodeType() == Node::DOCUMENT_TYPE_NODE) {
     DocumentType* docType = static_cast<DocumentType*>(node);
     value.set("publicId", docType->publicId());
     value.set("systemId", docType->systemId());
