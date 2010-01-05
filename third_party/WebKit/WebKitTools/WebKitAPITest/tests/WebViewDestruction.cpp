@@ -37,7 +37,7 @@ namespace WebKitAPITest {
 template <typename T>
 static HRESULT WebKitCreateInstance(REFCLSID clsid, T** object) {
   return WebKitCreateInstance(clsid, 0, __uuidof(T),
-                              reinterpret_cast<void**>(&object));
+                              reinterpret_cast<void**>(object));
 }
 
 static int webViewCount() {
