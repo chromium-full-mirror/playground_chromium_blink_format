@@ -43,6 +43,7 @@
 #include <wtf/Vector.h>
 
 namespace WebCore {
+
 class DOMWrapperWorld;
 class Event;
 class Frame;
