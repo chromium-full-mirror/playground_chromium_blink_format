@@ -213,8 +213,8 @@ struct GIFImageReader {
             unsigned haltAtFrame = -1);
 
  private:
-  void output_row();
-  int do_lzw(const unsigned char* q);
+  bool output_row();
+  bool do_lzw(const unsigned char* q);
 };
 
 #endif

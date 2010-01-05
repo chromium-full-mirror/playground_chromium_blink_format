@@ -317,7 +317,7 @@ bool GIFImageDecoder::initFrameBuffer(unsigned frameIndex) {
   return true;
 }
 
-void GIFImageDecoder::haveDecodedRow(unsigned frameIndex,
+bool GIFImageDecoder::haveDecodedRow(unsigned frameIndex,
                                      unsigned char* rowBuffer,
                                      unsigned char* rowEnd,
                                      unsigned rowNumber,
@@ -331,20 +331,20 @@ void GIFImageDecoder::haveDecodedRow(unsigned frameIndex,
 
   // Sanity-check the arguments.
   if ((rowBuffer == 0) || (y >= size().height()))
-    return;
+    return true;
 
   // Get the colormap.
   unsigned colorMapSize;
   unsigned char* colorMap;
   m_reader->getColorMap(colorMap, colorMapSize);
   if (!colorMap)
-    return;
+    return true;
 
   // Initialize the frame if necessary.
   RGBA32Buffer& buffer = m_frameBufferCache[frameIndex];
   if ((buffer.status() == RGBA32Buffer::FrameEmpty) &&
       !initFrameBuffer(frameIndex))
-    return;
+    return false;
 
   // Write one row's worth of data into the frame.  There is no guarantee that
   // (rowEnd - rowBuffer) == (size().width() - m_reader->frameXOffset()), so
@@ -378,6 +378,8 @@ void GIFImageDecoder::haveDecodedRow(unsigned frameIndex,
     buffer.copyRowNTimes(
         m_reader->frameXOffset(), x, y,
         std::min(y + static_cast<int>(repeatCount), size().height()));
+
+  return true;
 }
 
 void GIFImageDecoder::frameComplete(

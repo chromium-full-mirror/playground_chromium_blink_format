@@ -67,7 +67,7 @@ class GIFImageDecoder : public ImageDecoder {
   // Callbacks from the GIF reader.
   bool sizeNowAvailable(unsigned width, unsigned height);
   void decodingHalted(unsigned bytesLeft);
-  void haveDecodedRow(unsigned frameIndex,
+  bool haveDecodedRow(unsigned frameIndex,
                       unsigned char* rowBuffer,
                       unsigned char* rowEnd,
                       unsigned rowNumber,
