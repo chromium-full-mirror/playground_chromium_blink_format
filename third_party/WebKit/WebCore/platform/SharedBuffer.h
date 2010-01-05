@@ -93,7 +93,7 @@ class SharedBuffer : public RefCounted<SharedBuffer> {
   // for better performance.
   const Vector<char>& buffer() const;
 
-  bool isEmpty() const { return size(); }
+  bool isEmpty() const { return !size(); }
 
   void append(const char*, int);
   void clear();

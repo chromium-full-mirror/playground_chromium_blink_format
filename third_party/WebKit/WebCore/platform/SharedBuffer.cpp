@@ -121,7 +121,9 @@ void SharedBuffer::append(const char* data, int length) {
     segment = m_segments.last() + positionInSegment;
 
   unsigned segmentFreeSpace = segmentSize - positionInSegment;
-  unsigned bytesToCopy = length < segmentFreeSpace ? length : segmentFreeSpace;
+  unsigned bytesToCopy = static_cast<unsigned>(length) < segmentFreeSpace
+                             ? static_cast<unsigned>(length)
+                             : segmentFreeSpace;
 
   for (;;) {
     memcpy(segment, data, bytesToCopy);
