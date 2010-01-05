@@ -29,6 +29,14 @@
 
 #include "WebGLRenderingContext.h"
 
+#include "CanvasPixelArray.h"
+#include "HTMLCanvasElement.h"
+#include "HTMLImageElement.h"
+#include "ImageBuffer.h"
+#include "ImageData.h"
+#include "NotImplemented.h"
+#include "RenderBox.h"
+#include "RenderLayer.h"
 #include "WebGLActiveInfo.h"
 #include "WebGLBuffer.h"
 #include "WebGLFramebuffer.h"
@@ -43,6 +51,8 @@
 #include "NotImplemented.h"
 #include "RenderBox.h"
 #include "RenderLayer.h"
+
+#include <wtf/ByteArray.h>
 
 namespace WebCore {
 
@@ -1685,26 +1695,31 @@ void WebGLRenderingContext::texImage2D(unsigned target,
                                        WebGLArray* pixels,
                                        ExceptionCode& ec) {
   // FIXME: For now we ignore any errors returned
+  // FIXME: Need to make sure passed buffer has enough bytes to define the
+  // texture
   ec = 0;
   m_context->texImage2D(target, level, internalformat, width, height, border,
-                        format, type, pixels);
+                        format, type, pixels ? pixels->baseAddress() : 0);
   cleanupAfterGraphicsCall(false);
 }
 
 void WebGLRenderingContext::texImage2D(unsigned target,
                                        unsigned level,
-                                       unsigned internalformat,
-                                       unsigned width,
-                                       unsigned height,
-                                       unsigned border,
-                                       unsigned format,
-                                       unsigned type,
                                        ImageData* pixels,
+                                       bool flipY,
+                                       bool premultiplyAlpha,
                                        ExceptionCode& ec) {
   // FIXME: For now we ignore any errors returned
+  // FIXME: Need a form of this call that can take both a pixel buffer and flipY
+  // and premultiplyAlpha flags
+  UNUSED_PARAM(flipY);
+  UNUSED_PARAM(premultiplyAlpha);
   ec = 0;
-  m_context->texImage2D(target, level, internalformat, width, height, border,
-                        format, type, pixels);
+  m_context->texImage2D(target, level, GraphicsContext3D::RGBA, pixels->width(),
+                        pixels->height(), 0, GraphicsContext3D::RGBA,
+                        GraphicsContext3D::UNSIGNED_BYTE,
+                        pixels->data()->data()->data());
+  // RLP: m_context->texImage2D(target, level, pixels, flipY, premultiplyAlpha);
   cleanupAfterGraphicsCall(false);
 }
 
@@ -1762,9 +1777,14 @@ void WebGLRenderingContext::texImage2D(unsigned target,
                                        bool flipY,
                                        bool premultiplyAlpha,
                                        ExceptionCode& ec) {
-  // FIXME: For now we ignore any errors returned
+  // FIXME: Need implement this call
+  UNUSED_PARAM(target);
+  UNUSED_PARAM(level);
+  UNUSED_PARAM(video);
+  UNUSED_PARAM(flipY);
+  UNUSED_PARAM(premultiplyAlpha);
+
   ec = 0;
-  m_context->texImage2D(target, level, video, flipY, premultiplyAlpha);
   cleanupAfterGraphicsCall(false);
 }
 
@@ -1793,9 +1813,11 @@ void WebGLRenderingContext::texSubImage2D(unsigned target,
                                           WebGLArray* pixels,
                                           ExceptionCode& ec) {
   // FIXME: For now we ignore any errors returned
+  // FIXME: Need to make sure passed buffer has enough bytes to define the
+  // texture
   ec = 0;
   m_context->texSubImage2D(target, level, xoffset, yoffset, width, height,
-                           format, type, pixels);
+                           format, type, pixels ? pixels->baseAddress() : 0);
   cleanupAfterGraphicsCall(false);
 }
 
@@ -1803,16 +1825,20 @@ void WebGLRenderingContext::texSubImage2D(unsigned target,
                                           unsigned level,
                                           unsigned xoffset,
                                           unsigned yoffset,
-                                          unsigned width,
-                                          unsigned height,
-                                          unsigned format,
-                                          unsigned type,
                                           ImageData* pixels,
+                                          bool flipY,
+                                          bool premultiplyAlpha,
                                           ExceptionCode& ec) {
   // FIXME: For now we ignore any errors returned
+  UNUSED_PARAM(flipY);
+  UNUSED_PARAM(premultiplyAlpha);
   ec = 0;
-  m_context->texSubImage2D(target, level, xoffset, yoffset, width, height,
-                           format, type, pixels);
+  m_context->texSubImage2D(target, level, xoffset, yoffset, pixels->width(),
+                           pixels->height(), GraphicsContext3D::RGBA,
+                           GraphicsContext3D::UNSIGNED_BYTE,
+                           pixels->data()->data()->data());
+  // RLP: m_context->texSubImage2D(target, level, xoffset, yoffset, pixels,
+  // flipY, premultiplyAlpha);
   cleanupAfterGraphicsCall(false);
 }
 
@@ -1820,8 +1846,6 @@ void WebGLRenderingContext::texSubImage2D(unsigned target,
                                           unsigned level,
                                           unsigned xoffset,
                                           unsigned yoffset,
-                                          unsigned width,
-                                          unsigned height,
                                           HTMLImageElement* image,
                                           bool flipY,
                                           bool premultiplyAlpha,
@@ -1839,7 +1863,7 @@ void WebGLRenderingContext::texSubImage2D(unsigned target,
     return;
   }
 
-  m_context->texSubImage2D(target, level, xoffset, yoffset, width, height,
+  m_context->texSubImage2D(target, level, xoffset, yoffset,
                            cachedImage->image(), flipY, premultiplyAlpha);
   cleanupAfterGraphicsCall(false);
 }
@@ -1848,8 +1872,6 @@ void WebGLRenderingContext::texSubImage2D(unsigned target,
                                           unsigned level,
                                           unsigned xoffset,
                                           unsigned yoffset,
-                                          unsigned width,
-                                          unsigned height,
                                           HTMLCanvasElement* canvas,
                                           bool flipY,
                                           bool premultiplyAlpha,
@@ -1867,8 +1889,8 @@ void WebGLRenderingContext::texSubImage2D(unsigned target,
   }
 
   // FIXME: For now we ignore any errors returned
-  m_context->texSubImage2D(target, level, xoffset, yoffset, width, height,
-                           buffer->image(), flipY, premultiplyAlpha);
+  m_context->texSubImage2D(target, level, xoffset, yoffset, buffer->image(),
+                           flipY, premultiplyAlpha);
   cleanupAfterGraphicsCall(false);
 }
 
@@ -1876,16 +1898,19 @@ void WebGLRenderingContext::texSubImage2D(unsigned target,
                                           unsigned level,
                                           unsigned xoffset,
                                           unsigned yoffset,
-                                          unsigned width,
-                                          unsigned height,
                                           HTMLVideoElement* video,
                                           bool flipY,
                                           bool premultiplyAlpha,
                                           ExceptionCode& ec) {
-  // FIXME: For now we ignore any errors returned
+  // FIXME: Need to implement this call
+  UNUSED_PARAM(target);
+  UNUSED_PARAM(level);
+  UNUSED_PARAM(xoffset);
+  UNUSED_PARAM(yoffset);
+  UNUSED_PARAM(video);
+  UNUSED_PARAM(flipY);
+  UNUSED_PARAM(premultiplyAlpha);
   ec = 0;
-  m_context->texSubImage2D(target, level, xoffset, yoffset, width, height,
-                           video, flipY, premultiplyAlpha);
   cleanupAfterGraphicsCall(false);
 }
 

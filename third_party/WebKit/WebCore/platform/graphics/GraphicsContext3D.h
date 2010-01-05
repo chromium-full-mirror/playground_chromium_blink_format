@@ -65,9 +65,6 @@ class WebGLRenderingContext;
 class WebGLShader;
 class WebGLTexture;
 class Image;
-class HTMLVideoElement;
-class ImageData;
-class WebKitCSSMatrix;
 
 struct ActiveInfo {
   String name;
@@ -602,24 +599,10 @@ class GraphicsContext3D : public Noncopyable {
                  unsigned border,
                  unsigned format,
                  unsigned type,
-                 WebGLArray* pixels);
-  int texImage2D(unsigned target,
-                 unsigned level,
-                 unsigned internalformat,
-                 unsigned width,
-                 unsigned height,
-                 unsigned border,
-                 unsigned format,
-                 unsigned type,
-                 ImageData* pixels);
+                 void* pixels);
   int texImage2D(unsigned target,
                  unsigned level,
                  Image* image,
-                 bool flipY,
-                 bool premultiplyAlpha);
-  int texImage2D(unsigned target,
-                 unsigned level,
-                 HTMLVideoElement* video,
                  bool flipY,
                  bool premultiplyAlpha);
 
@@ -634,32 +617,12 @@ class GraphicsContext3D : public Noncopyable {
                     unsigned height,
                     unsigned format,
                     unsigned type,
-                    WebGLArray* pixels);
+                    void* pixels);
   int texSubImage2D(unsigned target,
                     unsigned level,
                     unsigned xoffset,
                     unsigned yoffset,
-                    unsigned width,
-                    unsigned height,
-                    unsigned format,
-                    unsigned type,
-                    ImageData* pixels);
-  int texSubImage2D(unsigned target,
-                    unsigned level,
-                    unsigned xoffset,
-                    unsigned yoffset,
-                    unsigned width,
-                    unsigned height,
                     Image* image,
-                    bool flipY,
-                    bool premultiplyAlpha);
-  int texSubImage2D(unsigned target,
-                    unsigned level,
-                    unsigned xoffset,
-                    unsigned yoffset,
-                    unsigned width,
-                    unsigned height,
-                    HTMLVideoElement* video,
                     bool flipY,
                     bool premultiplyAlpha);
 
