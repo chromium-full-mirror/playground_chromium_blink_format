@@ -155,7 +155,8 @@ inline void AXObjectCache::attachWrapper(AccessibilityObject*) {}
 inline void AXObjectCache::selectedChildrenChanged(RenderObject*) {}
 inline void AXObjectCache::postNotification(RenderObject*,
                                             AXNotification,
-                                            bool postToElement) {}
+                                            bool postToElement,
+                                            PostType) {}
 inline void AXObjectCache::postPlatformNotification(AccessibilityObject*,
                                                     AXNotification) {}
 inline void AXObjectCache::handleFocusedUIElementChanged(RenderObject*,
