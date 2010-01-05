@@ -230,6 +230,7 @@ class CSSParser {
   bool addVariableDeclarationBlock(const CSSParserString&);
   bool checkForVariables(CSSParserValueList*);
   void addUnresolvedProperty(int propId, bool important);
+  void invalidBlockHit();
 
   Vector<CSSSelector*>* reusableSelectorVector() {
     return &m_reusableSelectorVector;
@@ -253,6 +254,7 @@ class CSSParser {
   bool m_implicitShorthand;
 
   bool m_hasFontFaceOnlyValues;
+  bool m_hadSyntacticallyValidCSSRule;
 
   Vector<String> m_variableNames;
   Vector<RefPtr<CSSValue>> m_variableValues;

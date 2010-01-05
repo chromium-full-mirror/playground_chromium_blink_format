@@ -25,6 +25,7 @@
 #include "CachedCSSStyleSheet.h"
 #include "DocLoader.h"
 #include "Document.h"
+#include "SecurityOrigin.h"
 #include "Settings.h"
 #include <wtf/StdLibExtras.h>
 
@@ -60,6 +61,8 @@ void CSSImportRule::setCSSStyleSheet(const String& url,
     m_styleSheet->setParent(0);
   m_styleSheet = CSSStyleSheet::create(this, url, charset);
 
+  bool crossOriginCSS = false;
+  bool validMIMEType = false;
   CSSStyleSheet* parent = parentStyleSheet();
   bool strict = !parent || parent->useStrictParsing();
   bool enforceMIMEType = strict;
@@ -75,8 +78,16 @@ void CSSImportRule::setCSSStyleSheet(const String& url,
   }
 #endif
 
-  String sheetText = sheet->sheetText(enforceMIMEType);
+  String sheetText = sheet->sheetText(enforceMIMEType, &validMIMEType);
   m_styleSheet->parseString(sheetText, strict);
+
+  if (!parent || !parent->doc() ||
+      !parent->doc()->securityOrigin()->canRequest(KURL(ParsedURLString, url)))
+    crossOriginCSS = true;
+
+  if (crossOriginCSS && !validMIMEType &&
+      !m_styleSheet->hasSyntacticallyValidCSSHeader())
+    m_styleSheet = CSSStyleSheet::create(this, url, charset);
 
   if (strict && needsSiteSpecificQuirks) {
     // Work around <https://bugs.webkit.org/show_bug.cgi?id=28350>.
