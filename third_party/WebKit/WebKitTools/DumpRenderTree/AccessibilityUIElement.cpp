@@ -239,6 +239,21 @@ static JSValueRef stringForRangeCallback(JSContextRef context,
   return JSValueMakeString(context, stringDescription.get());
 }
 
+static JSValueRef indexOfChildCallback(JSContextRef context,
+                                       JSObjectRef function,
+                                       JSObjectRef thisObject,
+                                       size_t argumentCount,
+                                       const JSValueRef arguments[],
+                                       JSValueRef* exception) {
+  if (argumentCount != 1)
+    return 0;
+
+  JSObjectRef otherElement = JSValueToObject(context, arguments[0], exception);
+  AccessibilityUIElement* childElement = toAXElement(otherElement);
+  return JSValueMakeNumber(
+      context, (double)toAXElement(thisObject)->indexOfChild(childElement));
+}
+
 static JSValueRef childAtIndexCallback(JSContextRef context,
                                        JSObjectRef function,
                                        JSObjectRef thisObject,
@@ -390,18 +405,34 @@ static JSValueRef isActionSupportedCallback(JSContextRef context,
   return result;
 }
 
-static JSValueRef attributeValueCallback(JSContextRef context,
-                                         JSObjectRef function,
-                                         JSObjectRef thisObject,
-                                         size_t argumentCount,
-                                         const JSValueRef arguments[],
-                                         JSValueRef* exception) {
+static JSValueRef boolAttributeValueCallback(JSContextRef context,
+                                             JSObjectRef function,
+                                             JSObjectRef thisObject,
+                                             size_t argumentCount,
+                                             const JSValueRef arguments[],
+                                             JSValueRef* exception) {
   JSStringRef attribute = 0;
   if (argumentCount == 1)
     attribute = JSValueToStringCopy(context, arguments[0], exception);
-  JSRetainPtr<JSStringRef> attributeValue(
-      Adopt, toAXElement(thisObject)->attributeValue(attribute));
-  JSValueRef result = JSValueMakeString(context, attributeValue.get());
+  bool val = toAXElement(thisObject)->boolAttributeValue(attribute);
+  JSValueRef result = JSValueMakeBoolean(context, val);
+  if (attribute)
+    JSStringRelease(attribute);
+  return result;
+}
+
+static JSValueRef stringAttributeValueCallback(JSContextRef context,
+                                               JSObjectRef function,
+                                               JSObjectRef thisObject,
+                                               size_t argumentCount,
+                                               const JSValueRef arguments[],
+                                               JSValueRef* exception) {
+  JSStringRef attribute = 0;
+  if (argumentCount == 1)
+    attribute = JSValueToStringCopy(context, arguments[0], exception);
+  JSRetainPtr<JSStringRef> stringAttributeValue(
+      Adopt, toAXElement(thisObject)->stringAttributeValue(attribute));
+  JSValueRef result = JSValueMakeString(context, stringAttributeValue.get());
   if (attribute)
     JSStringRelease(attribute);
   return result;
@@ -765,6 +796,20 @@ static JSValueRef getURLCallback(JSContextRef context,
   return JSValueMakeString(context, url.get());
 }
 
+static JSValueRef addNotificationListenerCallback(JSContextRef context,
+                                                  JSObjectRef function,
+                                                  JSObjectRef thisObject,
+                                                  size_t argumentCount,
+                                                  const JSValueRef arguments[],
+                                                  JSValueRef* exception) {
+  if (argumentCount != 1)
+    return JSValueMakeBoolean(context, false);
+
+  JSObjectRef callback = JSValueToObject(context, arguments[0], exception);
+  bool succeeded = toAXElement(thisObject)->addNotificationListener(callback);
+  return JSValueMakeBoolean(context, succeeded);
+}
+
 // Destruction
 
 static void finalize(JSObjectRef thisObject) {
@@ -869,6 +914,8 @@ JSClassRef AccessibilityUIElement::getJSClass() {
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"childAtIndex", childAtIndexCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"indexOfChild", indexOfChildCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"elementAtPoint", elementAtPointCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"attributesOfColumnHeaders", attributesOfColumnHeadersCallback,
@@ -895,7 +942,9 @@ JSClassRef AccessibilityUIElement::getJSClass() {
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setSelectedTextRange", setSelectedTextRangeCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
-      {"attributeValue", attributeValueCallback,
+      {"stringAttributeValue", stringAttributeValueCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"boolAttributeValue", boolAttributeValueCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"isAttributeSupported", isAttributeSupportedCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
@@ -922,6 +971,8 @@ JSClassRef AccessibilityUIElement::getJSClass() {
       {"selectedRowAtIndex", selectedRowAtIndexCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"isEqual", isEqualCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"addNotificationListener", addNotificationListenerCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {0, 0, 0}};
 

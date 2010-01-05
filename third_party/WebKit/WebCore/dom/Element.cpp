@@ -580,6 +580,11 @@ void Element::updateAfterAttributeChanged(Attribute* attr) {
     // If the valuenow attribute changes, AX clients need to be notified.
     axObjectCache->postNotification(renderer(), AXObjectCache::AXValueChanged,
                                     true);
+  } else if (attrName == aria_labelAttr || attrName == aria_labeledbyAttr ||
+             attrName == altAttr || attrName == titleAttr) {
+    // If the content of an element changes due to an attribute change, notify
+    // accessibility.
+    axObjectCache->contentChanged(renderer());
   }
 }
 

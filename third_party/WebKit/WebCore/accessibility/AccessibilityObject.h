@@ -420,6 +420,7 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   virtual void decrement() {}
 
   virtual void childrenChanged() {}
+  virtual void contentChanged() {}
   virtual const AccessibilityChildrenVector& children() { return m_children; }
   virtual void addChildren() {}
   virtual bool canHaveChildren() const { return true; }
@@ -534,6 +535,16 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   // Used by an ARIA tree item to get only its content, and not its child tree
   // items and groups.
   void ariaTreeItemContent(AccessibilityChildrenVector&);
+
+  // ARIA live-region features.
+  bool supportsARIALiveRegion() const;
+  bool isInsideARIALiveRegion() const;
+  virtual const AtomicString& ariaLiveRegionStatus() const { return nullAtom; }
+  virtual const AtomicString& ariaLiveRegionRelevant() const {
+    return nullAtom;
+  }
+  virtual bool ariaLiveRegionAtomic() const { return false; }
+  virtual bool ariaLiveRegionBusy() const { return false; }
 
 #if HAVE(ACCESSIBILITY)
 #if PLATFORM(GTK)

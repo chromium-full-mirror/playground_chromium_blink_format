@@ -974,4 +974,23 @@ AccessibilityRole AccessibilityObject::ariaRoleToWebCoreRole(
   return roleMap->get(value);
 }
 
+bool AccessibilityObject::isInsideARIALiveRegion() const {
+  if (supportsARIALiveRegion())
+    return true;
+
+  for (AccessibilityObject* axParent = parentObject(); axParent;
+       axParent = axParent->parentObject()) {
+    if (axParent->supportsARIALiveRegion())
+      return true;
+  }
+
+  return false;
+}
+
+bool AccessibilityObject::supportsARIALiveRegion() const {
+  const AtomicString& liveRegion = ariaLiveRegionStatus();
+  return equalIgnoringCase(liveRegion, "polite") ||
+         equalIgnoringCase(liveRegion, "assertive");
+}
+
 }  // namespace WebCore

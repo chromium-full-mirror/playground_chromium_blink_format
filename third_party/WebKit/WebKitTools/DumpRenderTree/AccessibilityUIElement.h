@@ -76,6 +76,7 @@ class AccessibilityUIElement {
 
   AccessibilityUIElement elementAtPoint(int x, int y);
   AccessibilityUIElement getChildAtIndex(unsigned);
+  unsigned indexOfChild(AccessibilityUIElement*);
   int childrenCount();
   AccessibilityUIElement titleUIElement();
   AccessibilityUIElement parentElement();
@@ -91,7 +92,8 @@ class AccessibilityUIElement {
   void showMenu();
 
   // Attributes - platform-independent implementations
-  JSStringRef attributeValue(JSStringRef attribute);
+  JSStringRef stringAttributeValue(JSStringRef attribute);
+  bool boolAttributeValue(JSStringRef attribute);
   bool isAttributeSupported(JSStringRef attribute);
   bool isAttributeSettable(JSStringRef attribute);
   bool isActionSupported(JSStringRef action);
@@ -158,6 +160,10 @@ class AccessibilityUIElement {
 
   // Table-specific
   AccessibilityUIElement cellForColumnAndRow(unsigned column, unsigned row);
+
+  // Notifications
+  // Function callback should take one argument, the name of the notification.
+  bool addNotificationListener(JSObjectRef functionCallback);
 
  private:
   static JSClassRef getJSClass();
