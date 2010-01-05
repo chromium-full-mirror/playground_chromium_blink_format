@@ -34,6 +34,7 @@
 #include "HTMLFrameElement.h"
 #include "HTMLNames.h"
 #include "V8Binding.h"
+#include "V8BindingState.h"
 #include "V8CustomBinding.h"
 #include "V8Proxy.h"
 
@@ -48,7 +49,8 @@ void V8HTMLFrameElement::srcAccessorSetter(v8::Local<v8::String> name,
       V8DOMWrapper::convertDOMWrapperToNode<HTMLFrameElement>(info.Holder());
   String srcValue = toWebCoreStringWithNullCheck(value);
 
-  if (!allowSettingFrameSrcToJavascriptUrl(frame, srcValue))
+  if (!V8BindingSecurity::allowSettingFrameSrcToJavascriptUrl(
+          V8BindingState::Only(), frame, srcValue))
     return;
 
   frame->setAttribute(srcAttr, srcValue);
@@ -61,7 +63,8 @@ void V8HTMLFrameElement::locationAccessorSetter(v8::Local<v8::String> name,
       V8DOMWrapper::convertDOMWrapperToNode<HTMLFrameElement>(info.Holder());
   String locationValue = toWebCoreStringWithNullCheck(value);
 
-  if (!allowSettingFrameSrcToJavascriptUrl(frame, locationValue))
+  if (!V8BindingSecurity::allowSettingFrameSrcToJavascriptUrl(
+          V8BindingState::Only(), frame, locationValue))
     return;
 
   frame->setLocation(locationValue);

@@ -34,6 +34,7 @@
 #include "HTMLIFrameElement.h"
 #include "HTMLNames.h"
 #include "V8Binding.h"
+#include "V8BindingState.h"
 #include "V8CustomBinding.h"
 #include "V8Proxy.h"
 
@@ -48,7 +49,8 @@ void V8HTMLIFrameElement::srcAccessorSetter(v8::Local<v8::String> name,
       V8DOMWrapper::convertDOMWrapperToNode<HTMLIFrameElement>(info.Holder());
   String v = toWebCoreStringWithNullCheck(value);
 
-  if (!allowSettingFrameSrcToJavascriptUrl(iframe, v))
+  if (!V8BindingSecurity::allowSettingFrameSrcToJavascriptUrl(
+          V8BindingState::Only(), iframe, v))
     return;
 
   iframe->setAttribute(srcAttr, v);
