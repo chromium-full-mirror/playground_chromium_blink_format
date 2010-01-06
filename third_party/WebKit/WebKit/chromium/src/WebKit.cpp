@@ -89,6 +89,12 @@ bool layoutTestMode() {
   return s_layoutTestMode;
 }
 
+void enableLogChannel(const char* name) {
+  WTFLogChannel* channel = WebCore::getChannelFromName(name);
+  if (channel)
+    channel->state = WTFLogChannelOn;
+}
+
 void resetPluginCache(bool reloadPages) {
   WebCore::Page::refreshPlugins(reloadPages);
 }

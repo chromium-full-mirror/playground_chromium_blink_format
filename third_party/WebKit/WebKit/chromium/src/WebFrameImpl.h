@@ -177,8 +177,6 @@ class WebFrameImpl : public WebFrame, public RefCounted<WebFrameImpl> {
   static PassRefPtr<WebFrameImpl> create(WebFrameClient* client);
   ~WebFrameImpl();
 
-  static int liveObjectCount() { return m_liveObjectCount; }
-
   // Called by the WebViewImpl to initialize its main frame:
   void initializeAsMainFrame(WebViewImpl*);
 
@@ -299,9 +297,6 @@ class WebFrameImpl : public WebFrame, public RefCounted<WebFrameImpl> {
   void clearPasswordListeners();
 
   void loadJavaScriptURL(const WebCore::KURL&);
-
-  // Used to check for leaks of this object.
-  static int m_liveObjectCount;
 
   FrameLoaderClientImpl m_frameLoaderClient;
 
