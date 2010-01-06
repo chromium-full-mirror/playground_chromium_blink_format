@@ -95,6 +95,11 @@ PassRefPtr<V8DOMWindowShell> V8DOMWindowShell::create(Frame* frame) {
 
 V8DOMWindowShell::V8DOMWindowShell(Frame* frame) : m_frame(frame) {}
 
+V8DOMWindowShell::~V8DOMWindowShell() {
+  clearForClose();
+  destroyGlobal();
+}
+
 bool V8DOMWindowShell::isContextInitialized() {
   // m_context, m_global, and m_wrapperBoilerplates should
   // all be non-empty if if m_context is non-empty.
