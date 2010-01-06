@@ -85,7 +85,6 @@ class ResourceLoader : public RefCounted<ResourceLoader>,
                               int,
                               long long lengthReceived,
                               bool allAtOnce);
-  void didReceiveData(const SharedBuffer&);
   void willStopBufferingData(const char*, int);
   virtual void didFinishLoading();
   virtual void didFail(const ResourceError&);
