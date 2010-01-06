@@ -92,6 +92,8 @@ class V8DOMWindowShell : public RefCounted<V8DOMWindowShell> {
     return clone.IsEmpty() ? createWrapperFromCacheSlowCase(type) : clone;
   }
 
+  static void setLocation(DOMWindow*, const String& relativeURL);
+
  private:
   V8DOMWindowShell(Frame*);
 

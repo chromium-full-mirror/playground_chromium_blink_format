@@ -55,8 +55,8 @@ void V8Document::locationAccessorSetter(v8::Local<v8::String> name,
     return;
 
   DOMWindow* window = document->frame()->domWindow();
-  // WindowSetLocation does security checks. // XXXMB- verify!
-  V8Custom::WindowSetLocation(window, toWebCoreString(value));
+  // setLocation does security checks. // XXXMB- verify!
+  V8DOMWindowShell::setLocation(window, toWebCoreString(value));
 }
 
 }  // namespace WebCore

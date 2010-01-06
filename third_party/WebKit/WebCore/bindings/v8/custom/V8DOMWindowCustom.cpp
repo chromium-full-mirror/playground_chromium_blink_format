@@ -233,7 +233,7 @@ void V8DOMWindow::locationAccessorSetter(v8::Local<v8::String> name,
                                          const v8::AccessorInfo& info) {
   DOMWindow* imp = V8DOMWrapper::convertToNativeObject<DOMWindow>(
       V8ClassIndex::DOMWINDOW, info.Holder());
-  V8Custom::WindowSetLocation(imp, toWebCoreString(value));
+  V8DOMWindowShell::setLocation(imp, toWebCoreString(value));
 }
 
 void V8DOMWindow::openerAccessorSetter(v8::Local<v8::String> name,
@@ -870,21 +870,6 @@ NAMED_PROPERTY_GETTER(DOMWindow) {
   return notHandledByInterceptor();
 }
 
-void V8Custom::WindowSetLocation(DOMWindow* window, const String& relativeURL) {
-  Frame* frame = window->frame();
-  if (!frame)
-    return;
-
-  KURL url = completeURL(relativeURL);
-  if (url.isNull())
-    return;
-
-  if (!shouldAllowNavigation(frame))
-    return;
-
-  navigateIfAllowed(frame, url, false, false);
-}
-
 v8::Handle<v8::Value> V8DOMWindow::setTimeoutCallback(
     const v8::Arguments& args) {
   INC_STATS("DOM.DOMWindow.setTimeout()");
@@ -927,7 +912,10 @@ v8::Handle<v8::Value> V8DOMWindow::clearIntervalCallback(
   return v8::Undefined();
 }
 
-NAMED_ACCESS_CHECK(DOMWindow) {
+bool V8DOMWindow::namedSecurityCheck(v8::Local<v8::Object> host,
+                                     v8::Local<v8::Value> key,
+                                     v8::AccessType type,
+                                     v8::Local<v8::Value> data) {
   ASSERT(V8ClassIndex::FromInt(data->Int32Value()) == V8ClassIndex::DOMWINDOW);
   v8::Handle<v8::Object> window =
       V8DOMWrapper::lookupDOMWrapper(V8ClassIndex::DOMWINDOW, host);
@@ -956,7 +944,10 @@ NAMED_ACCESS_CHECK(DOMWindow) {
                                            false);
 }
 
-INDEXED_ACCESS_CHECK(DOMWindow) {
+bool V8DOMWindow::indexedSecurityCheck(v8::Local<v8::Object> host,
+                                       uint32_t index,
+                                       v8::AccessType type,
+                                       v8::Local<v8::Value> data) {
   ASSERT(V8ClassIndex::FromInt(data->Int32Value()) == V8ClassIndex::DOMWINDOW);
   v8::Handle<v8::Object> window =
       V8DOMWrapper::lookupDOMWrapper(V8ClassIndex::DOMWINDOW, host);

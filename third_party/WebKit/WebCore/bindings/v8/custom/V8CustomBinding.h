@@ -34,8 +34,6 @@
 #include "V8Index.h"
 #include <v8.h>
 
-struct NPObject;
-
 #define INDEXED_PROPERTY_GETTER(NAME)                              \
   v8::Handle<v8::Value> V8Custom::v8##NAME##IndexedPropertyGetter( \
       uint32_t index, const v8::AccessorInfo& info)
@@ -62,26 +60,7 @@ struct NPObject;
   v8::Handle<v8::Boolean> V8Custom::v8##NAME##NamedPropertyDeleter( \
       v8::Local<v8::String> name, const v8::AccessorInfo& info)
 
-#define NAMED_ACCESS_CHECK(NAME)                            \
-  bool V8Custom::v8##NAME##NamedSecurityCheck(              \
-      v8::Local<v8::Object> host, v8::Local<v8::Value> key, \
-      v8::AccessType type, v8::Local<v8::Value> data)
-
-#define INDEXED_ACCESS_CHECK(NAME)                                     \
-  bool V8Custom::v8##NAME##IndexedSecurityCheck(                       \
-      v8::Local<v8::Object> host, uint32_t index, v8::AccessType type, \
-      v8::Local<v8::Value> data)
-
 namespace WebCore {
-
-class DOMWindow;
-class Element;
-class Frame;
-class HTMLCollection;
-class HTMLFrameElementBase;
-class String;
-class V8Proxy;
-
 class V8Custom {
  public:
   // Constants.
@@ -276,22 +255,6 @@ class V8Custom {
 
 #define USE_CALLBACK(NAME) V8Custom::v8##NAME##Callback
 
-#define DECLARE_NAMED_ACCESS_CHECK(NAME)                    \
-  static bool v8##NAME##NamedSecurityCheck(                 \
-      v8::Local<v8::Object> host, v8::Local<v8::Value> key, \
-      v8::AccessType type, v8::Local<v8::Value> data)
-
-#define DECLARE_INDEXED_ACCESS_CHECK(NAME)                             \
-  static bool v8##NAME##IndexedSecurityCheck(                          \
-      v8::Local<v8::Object> host, uint32_t index, v8::AccessType type, \
-      v8::Local<v8::Value> data)
-
-  DECLARE_NAMED_ACCESS_CHECK(Location);
-  DECLARE_INDEXED_ACCESS_CHECK(History);
-
-  DECLARE_NAMED_ACCESS_CHECK(History);
-  DECLARE_INDEXED_ACCESS_CHECK(Location);
-
   DECLARE_NAMED_PROPERTY_GETTER(HTMLDocument);
   DECLARE_NAMED_PROPERTY_DELETER(HTMLDocument);
 
@@ -320,8 +283,6 @@ class V8Custom {
 
   DECLARE_NAMED_PROPERTY_GETTER(DOMWindow);
   DECLARE_INDEXED_PROPERTY_GETTER(DOMWindow);
-  DECLARE_NAMED_ACCESS_CHECK(DOMWindow);
-  DECLARE_INDEXED_ACCESS_CHECK(DOMWindow);
 
   DECLARE_NAMED_PROPERTY_GETTER(HTMLFrameSetElement);
   DECLARE_NAMED_PROPERTY_GETTER(HTMLFormElement);
@@ -403,9 +364,6 @@ class V8Custom {
   DECLARE_CALLBACK(WebSocketConstructor);
 #endif
 
-#undef DECLARE_INDEXED_ACCESS_CHECK
-#undef DECLARE_NAMED_ACCESS_CHECK
-
 #undef DECLARE_NAMED_PROPERTY_GETTER
 #undef DECLARE_NAMED_PROPERTY_SETTER
 #undef DECLARE_NAMED_PROPERTY_DELETER
@@ -415,20 +373,6 @@ class V8Custom {
 #undef DECLARE_INDEXED_PROPERTY_DELETER
 
 #undef DECLARE_CALLBACK
-
-  // Returns the NPObject corresponding to an HTMLElement object.
-  static NPObject* GetHTMLPlugInElementNPObject(v8::Handle<v8::Object>);
-
-  // Returns the owner frame pointer of a DOM wrapper object. It only works for
-  // these DOM objects requiring cross-domain access check.
-  static Frame* GetTargetFrame(v8::Local<v8::Object> host,
-                               v8::Local<v8::Value> data);
-
-// Special case for downcasting SVG path segments.
-#if ENABLE(SVG)
-  static V8ClassIndex::V8WrapperType DowncastSVGPathSeg(void* pathSeg);
-#endif
-  static void WindowSetLocation(DOMWindow*, const String&);
 };
 
 }  // namespace WebCore
