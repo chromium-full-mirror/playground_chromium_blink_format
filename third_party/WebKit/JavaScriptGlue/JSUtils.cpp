@@ -121,7 +121,7 @@ JSUserObject* KJSValueToJSObject(JSValue inValue, ExecState* exec) {
 // JSObjectKJSValue
 //--------------------------------------------------------------------------
 JSValue JSObjectKJSValue(JSUserObject* ptr) {
-  JSLock lock(LockForReal);
+  JSGlueAPIEntry entry;
 
   JSValue result = jsUndefined();
   if (ptr) {
@@ -182,7 +182,7 @@ CFTypeRef KJSValueToCFTypeInternal(JSValue inValue,
 
   CFTypeRef result = 0;
 
-  JSLock lock(LockForReal);
+  JSGlueAPIEntry entry;
 
   if (inValue.isBoolean()) {
     result = inValue.toBoolean(exec) ? kCFBooleanTrue : kCFBooleanFalse;
@@ -356,7 +356,7 @@ static pthread_key_t globalObjectKey;
 static pthread_once_t globalObjectKeyOnce = PTHREAD_ONCE_INIT;
 
 static void unprotectGlobalObject(void* data) {
-  JSLock lock(LockForReal);
+  JSGlueAPIEntry entry;
   gcUnprotect(static_cast<JSGlueGlobalObject*>(data));
 }
 
@@ -384,4 +384,23 @@ ExecState* getThreadGlobalExecState() {
   // evaluation throughout the thread
   exec->clearException();
   return exec;
+}
+
+JSGlueAPIEntry::JSGlueAPIEntry()
+    : m_lock(LockForReal), m_storedIdentifierTable(currentIdentifierTable()) {
+  setCurrentIdentifierTable(
+      getThreadGlobalObject()->globalExec()->globalData().identifierTable);
+}
+
+JSGlueAPIEntry::~JSGlueAPIEntry() {
+  setCurrentIdentifierTable(m_storedIdentifierTable);
+}
+
+JSGlueAPICallback::JSGlueAPICallback(ExecState* exec) : m_dropLocks(exec) {
+  resetCurrentIdentifierTable();
+}
+
+JSGlueAPICallback::~JSGlueAPICallback() {
+  setCurrentIdentifierTable(
+      getThreadGlobalObject()->globalExec()->globalData().identifierTable);
 }

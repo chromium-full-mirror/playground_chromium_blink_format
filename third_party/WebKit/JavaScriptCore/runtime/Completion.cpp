@@ -35,6 +35,7 @@ namespace JSC {
 
 Completion checkSyntax(ExecState* exec, const SourceCode& source) {
   JSLock lock(exec);
+  ASSERT(exec->globalData().identifierTable == currentIdentifierTable());
 
   RefPtr<ProgramExecutable> program = ProgramExecutable::create(exec, source);
   JSObject* error = program->checkSyntax(exec);
@@ -49,6 +50,7 @@ Completion evaluate(ExecState* exec,
                     const SourceCode& source,
                     JSValue thisValue) {
   JSLock lock(exec);
+  ASSERT(exec->globalData().identifierTable == currentIdentifierTable());
 
   RefPtr<ProgramExecutable> program = ProgramExecutable::create(exec, source);
   JSObject* error = program->compile(exec, scopeChain.node());

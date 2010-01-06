@@ -152,12 +152,8 @@ class UStringImpl : Noncopyable {
     ASSERT(hash == computeHash(data(), m_length));
     m_hash = hash;
   }  // fast path for Identifiers
-  bool isIdentifier() const { return m_identifierTable; }
-  IdentifierTable* identifierTable() const { return m_identifierTable; }
-  void setIdentifierTable(IdentifierTable* table) {
-    ASSERT(!isStatic());
-    m_identifierTable = table;
-  }
+  bool isIdentifier() const { return m_isIdentifier; }
+  void setIsIdentifier(bool isIdentifier) { m_isIdentifier = isIdentifier; }
 
   UStringImpl* ref() {
     m_refCount += s_refCountIncrement;
@@ -203,7 +199,7 @@ class UStringImpl : Noncopyable {
     ASSERT(bufferOwnerString()->bufferOwnership() != BufferSubstring);
     // Static strings cannot be put in identifier tables, because they are
     // globally shared.
-    ASSERT(!isStatic() || !identifierTable());
+    ASSERT(!isStatic() || !isIdentifier());
   }
 
  private:
@@ -223,7 +219,7 @@ class UStringImpl : Noncopyable {
         m_length(length),
         m_refCount(s_refCountIncrement),
         m_hash(0),
-        m_identifierTable(0),
+        m_isIdentifier(false),
         m_dataBuffer(0, ownership) {
     ASSERT((ownership == BufferInternal) || (ownership == BufferOwned));
     checkConsistency();
@@ -241,7 +237,7 @@ class UStringImpl : Noncopyable {
         m_length(length),
         m_refCount(s_staticRefCountInitialValue),
         m_hash(0),
-        m_identifierTable(0),
+        m_isIdentifier(false),
         m_dataBuffer(0, BufferOwned) {
     checkConsistency();
   }
@@ -252,7 +248,7 @@ class UStringImpl : Noncopyable {
         m_length(length),
         m_refCount(s_refCountIncrement),
         m_hash(0),
-        m_identifierTable(0),
+        m_isIdentifier(false),
         m_dataBuffer(base.releaseRef(), BufferSubstring) {
     // Do use static strings as a base for substrings; UntypedPtrAndBitfield
     // assumes
@@ -270,7 +266,7 @@ class UStringImpl : Noncopyable {
         m_length(length),
         m_refCount(s_refCountIncrement),
         m_hash(0),
-        m_identifierTable(0),
+        m_isIdentifier(false),
         m_dataBuffer(sharedBuffer.releaseRef(), BufferShared) {
     checkConsistency();
   }
@@ -312,8 +308,8 @@ class UStringImpl : Noncopyable {
   UChar* m_data;
   int m_length;
   unsigned m_refCount;
-  mutable unsigned m_hash;
-  IdentifierTable* m_identifierTable;
+  mutable unsigned m_hash : 31;
+  mutable unsigned m_isIdentifier : 1;
   UntypedPtrAndBitfield m_dataBuffer;
 
   JS_EXPORTDATA static UStringImpl* s_null;

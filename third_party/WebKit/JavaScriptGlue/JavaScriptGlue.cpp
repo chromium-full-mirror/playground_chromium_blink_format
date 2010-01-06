@@ -219,7 +219,7 @@ JSRunRef JSRunCreate(CFStringRef jsSource, JSFlags inFlags) {
 
   JSRunRef result = 0;
   if (jsSource) {
-    JSLock lock(LockForReal);
+    JSGlueAPIEntry entry;
     result = (JSRunRef) new JSRun(jsSource, inFlags);
   }
   return result;
@@ -258,7 +258,7 @@ JSObjectRef JSRunEvaluate(JSRunRef ref) {
   JSObjectRef result = 0;
   JSRun* ptr = (JSRun*)ref;
   if (ptr) {
-    JSLock lock(LockForReal);
+    JSGlueAPIEntry entry;
     Completion completion = ptr->Evaluate();
     if (completion.isValueCompletion()) {
       result = (JSObjectRef)KJSValueToJSObject(
@@ -287,7 +287,7 @@ bool JSRunCheckSyntax(JSRunRef ref) {
   bool result = false;
   JSRun* ptr = (JSRun*)ref;
   if (ptr) {
-    JSLock lock(LockForReal);
+    JSGlueAPIEntry entry;
     result = ptr->CheckSyntax();
   }
   return result;
@@ -299,7 +299,7 @@ bool JSRunCheckSyntax(JSRunRef ref) {
 void JSCollect() {
   initializeThreading();
 
-  JSLock lock(LockForReal);
+  JSGlueAPIEntry entry;
   Heap* heap = getThreadGlobalExecState()->heap();
   if (!heap->isBusy())
     heap->collectAllGarbage();
