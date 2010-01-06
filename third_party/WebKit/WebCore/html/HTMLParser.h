@@ -147,8 +147,7 @@ class HTMLParser : public Noncopyable {
 
   bool allowNestedRedundantTag(const AtomicString& tagName);
 
-  static bool isHeaderTag(const AtomicString& tagName);
-  void popNestedHeaderTag();
+  static bool isHeadingTag(const AtomicString& tagName);
 
   bool isInline(Node*) const;
 

@@ -680,7 +680,7 @@ bool HTMLParser::handleError(Node* n,
       reportError(MisplacedContentRetryError, &localName, &currentTagName);
       popBlock(objectTag);
       handled = true;
-    } else if (h->hasLocalName(pTag) || isHeaderTag(currentTagName)) {
+    } else if (h->hasLocalName(pTag) || isHeadingTag(currentTagName)) {
       if (!isInline(n)) {
         popBlock(currentTagName);
         handled = true;
@@ -944,6 +944,8 @@ PassRefPtr<Node> HTMLParser::getNode(Token* t) {
                      &HTMLParser::formCreateErrorCheck);
     gFunctionMap.set(fieldsetTag.localName().impl(),
                      &HTMLParser::pCloserCreateErrorCheck);
+    gFunctionMap.set(footerTag.localName().impl(),
+                     &HTMLParser::pCloserCreateErrorCheck);
     gFunctionMap.set(framesetTag.localName().impl(),
                      &HTMLParser::framesetCreateErrorCheck);
     gFunctionMap.set(h1Tag.localName().impl(),
@@ -960,6 +962,8 @@ PassRefPtr<Node> HTMLParser::getNode(Token* t) {
                      &HTMLParser::pCloserCreateErrorCheck);
     gFunctionMap.set(headTag.localName().impl(),
                      &HTMLParser::headCreateErrorCheck);
+    gFunctionMap.set(headerTag.localName().impl(),
+                     &HTMLParser::pCloserCreateErrorCheck);
     gFunctionMap.set(hrTag.localName().impl(),
                      &HTMLParser::pCloserCreateErrorCheck);
     gFunctionMap.set(iTag.localName().impl(),
@@ -1082,18 +1086,18 @@ void HTMLParser::processCloseTag(Token* t) {
   }
 }
 
-bool HTMLParser::isHeaderTag(const AtomicString& tagName) {
-  DEFINE_STATIC_LOCAL(HashSet<AtomicStringImpl*>, headerTags, ());
-  if (headerTags.isEmpty()) {
-    headerTags.add(h1Tag.localName().impl());
-    headerTags.add(h2Tag.localName().impl());
-    headerTags.add(h3Tag.localName().impl());
-    headerTags.add(h4Tag.localName().impl());
-    headerTags.add(h5Tag.localName().impl());
-    headerTags.add(h6Tag.localName().impl());
+bool HTMLParser::isHeadingTag(const AtomicString& tagName) {
+  DEFINE_STATIC_LOCAL(HashSet<AtomicStringImpl*>, headingTags, ());
+  if (headingTags.isEmpty()) {
+    headingTags.add(h1Tag.localName().impl());
+    headingTags.add(h2Tag.localName().impl());
+    headingTags.add(h3Tag.localName().impl());
+    headingTags.add(h4Tag.localName().impl());
+    headingTags.add(h5Tag.localName().impl());
+    headingTags.add(h6Tag.localName().impl());
   }
 
-  return headerTags.contains(tagName.impl());
+  return headingTags.contains(tagName.impl());
 }
 
 bool HTMLParser::isInline(Node* node) const {
