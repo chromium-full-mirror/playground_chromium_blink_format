@@ -60,24 +60,6 @@
 
 namespace WebCore {
 
-PassRefPtr<DOMWrapperWorld> ScriptController::createWorld() {
-  return IsolatedWorld::create();
-}
-
-V8DOMWindowShell* ScriptController::initScript(DOMWrapperWorld* world) {
-  ASSERT(!m_windowShells.contains(world));
-
-  RefPtr<V8DOMWindowShell> windowShell =
-      V8DOMWindowShell::create(m_frame, world);
-  m_windowShells.add(world, windowShell);
-  windowShell->initContextIfNeeded();
-  windowShell->updateDocument();
-
-  m_frame->loader()->dispatchDidClearWindowObjectInWorld(world);
-
-  return windowShell.get();
-}
-
 void ScriptController::initializeThreading() {
   static bool initializedThreading = false;
   if (!initializedThreading) {
@@ -117,7 +99,8 @@ ScriptController::ScriptController(Frame* frame)
       m_inExecuteScript(false),
       m_processingTimerCallback(false),
       m_paused(false),
-      m_proxy(new V8Proxy(frame))
+      m_proxy(new V8Proxy(frame)),
+      m_windowShell(V8DOMWindowShell::create(frame))
 #if ENABLE(NETSCAPE_PLUGIN_API)
       ,
       m_windowScriptNPObject(0)
@@ -128,12 +111,7 @@ ScriptController::ScriptController(Frame* frame)
 
 ScriptController::~ScriptController() {
   m_proxy->disconnectFrame();
-
-  if (!m_windowShells.isEmpty()) {
-    m_windowShells.clear();
-    m_mainWorldWindowShell = 0;
-    // JSC triggers a GC here, but we haven't historically.
-  }
+  m_windowShell.clear();
 }
 
 void ScriptController::clearScriptObjects() {
@@ -158,9 +136,7 @@ void ScriptController::clearScriptObjects() {
 }
 
 void ScriptController::updateSecurityOrigin() {
-  for (ShellMap::iterator iter = m_windowShells.begin();
-       iter != m_windowShells.end(); ++iter)
-    iter->second->updateSecurityOrigin();
+  m_windowShell->updateSecurityOrigin();
 }
 
 void ScriptController::updatePlatformScriptObjects() {
@@ -232,9 +208,7 @@ void ScriptController::evaluateInIsolatedWorld(
     const Vector<ScriptSourceCode>& sources) {
   // FIXME: This will need to get reorganized once we have a windowShell for the
   // isolated world.
-
-  // Force the mainWindowShell to exist.
-  windowShell(mainThreadNormalWorld());
+  m_windowShell->initContextIfNeeded();
   m_proxy->evaluateInIsolatedWorld(worldID, sources, 0);
 }
 
@@ -274,13 +248,6 @@ ScriptValue ScriptController::evaluate(const ScriptSourceCode& sourceCode) {
     return ScriptValue();
 
   return ScriptValue(object);
-}
-
-ScriptValue ScriptController::evaluateInWorld(const ScriptSourceCode&,
-                                              DOMWrapperWorld*) {
-  // FIXME: Move isolated world execution to here!
-  notImplemented();
-  return ScriptValue();
 }
 
 void ScriptController::setEventHandlerLineNumber(int lineNumber) {
@@ -324,6 +291,10 @@ void ScriptController::collectGarbage() {
 
 void ScriptController::lowMemoryNotification() {
   v8::V8::LowMemoryNotification();
+}
+
+bool ScriptController::haveInterpreter() const {
+  return m_windowShell->isContextInitialized();
 }
 
 bool ScriptController::isEnabled() const {
@@ -468,10 +439,9 @@ NPObject* ScriptController::createScriptObjectForPluginElement(
                                 window);
 }
 
-V8DOMWindowShell* ScriptController::mainWorldWindowShell() {
-  if (!m_mainWorldWindowShell)
-    m_mainWorldWindowShell = windowShell(mainThreadNormalWorld());
-  return m_mainWorldWindowShell.get();
+V8DOMWindowShell* ScriptController::mainWorldWindowShell() const {
+  m_windowShell->initContextIfNeeded();
+  return m_windowShell.get();
 }
 
 void ScriptController::clearWindowShell() {
@@ -481,20 +451,16 @@ void ScriptController::clearWindowShell() {
   // V8 binding expects ScriptController::clearWindowShell only be called
   // when a frame is loading a new page. V8DOMWindowShell::clearForNavigation
   // creates a new context for the new page.
-  for (ShellMap::iterator iter = m_windowShells.begin();
-       iter != m_windowShells.end(); ++iter)
-    iter->second->clearForNavigation();
+  m_windowShell->clearForNavigation();
 }
 
 void ScriptController::clearForClose() {
-  for (ShellMap::iterator iter = m_windowShells.begin();
-       iter != m_windowShells.end(); ++iter)
-    iter->second->clearForClose();
+  m_windowShell->clearForClose();
 }
 
 void ScriptController::destroyWindowShell() {
-  m_windowShells.clear();
-  m_mainWorldWindowShell = 0;
+  m_windowShell->clearForClose();
+  m_windowShell->destroyGlobal();
 }
 
 void ScriptController::attachDebugger(void*) {
@@ -502,13 +468,7 @@ void ScriptController::attachDebugger(void*) {
 }
 
 void ScriptController::updateDocument() {
-  // This seems redudant, but JSC does it.
-  if (!m_frame->document())
-    return;
-
-  for (ShellMap::iterator iter = m_windowShells.begin();
-       iter != m_windowShells.end(); ++iter)
-    iter->second->updateDocument();
+  m_windowShell->updateDocument();
 }
 
 }  // namespace WebCore
