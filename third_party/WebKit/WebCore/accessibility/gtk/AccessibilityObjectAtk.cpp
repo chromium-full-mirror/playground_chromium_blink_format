@@ -47,6 +47,10 @@ AccessibilityObject::accessibilityPlatformIncludesObject() const {
   if (parent->isPasswordField() || parent->isTextControl())
     return IgnoreObject;
 
+  // The object containing the text should implement AtkText itself.
+  if (roleValue() == StaticTextRole)
+    return IgnoreObject;
+
   return DefaultBehavior;
 }
 
