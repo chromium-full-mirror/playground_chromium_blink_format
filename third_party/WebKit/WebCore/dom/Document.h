@@ -1235,6 +1235,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   bool m_frameElementsShouldIgnoreScrolling;
 
   String m_title;
+  String m_rawTitle;
   bool m_titleSetExplicitly;
   RefPtr<Element> m_titleElement;
 
