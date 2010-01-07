@@ -67,6 +67,8 @@ class EventSender : public QObject {
   void touchStart();
   void touchMove();
   void touchEnd();
+  void zoomPageIn();
+  void zoomPageOut();
   void clearTouchPoints();
   void releaseTouchPoint(int index);
 
