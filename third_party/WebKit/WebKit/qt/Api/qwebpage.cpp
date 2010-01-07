@@ -1397,6 +1397,11 @@ QVariant QWebPage::inputMethodQuery(Qt::InputMethodQuery property) const {
 
   switch (property) {
     case Qt::ImMicroFocus: {
+      WebCore::FrameView* view = frame->view();
+      if (view && view->needsLayout()) {
+        // We can't access absoluteCaretBounds() while the view needs to layout.
+        return QVariant();
+      }
       return QVariant(frame->selection()->absoluteCaretBounds());
     }
     case Qt::ImFont: {
