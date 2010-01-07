@@ -47,6 +47,16 @@
 #include <QUrl>
 #include <QFileInfo>
 
+#if ENABLE(QT_BEARER)
+#include "NetworkStateNotifier.h"
+#endif
+
+void QWEBKIT_EXPORT qt_networkAccessAllowed(bool isAllowed) {
+#if ENABLE(QT_BEARER)
+  WebCore::networkStateNotifier().setNetworkAccessAllowed(isAllowed);
+#endif
+}
+
 class QWebSettingsPrivate {
  public:
   QWebSettingsPrivate(WebCore::Settings* wcSettings = 0)

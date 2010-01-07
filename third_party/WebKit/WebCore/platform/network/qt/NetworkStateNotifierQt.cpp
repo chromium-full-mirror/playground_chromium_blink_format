@@ -31,6 +31,7 @@ NetworkStateNotifierPrivate::NetworkStateNotifierPrivate(
     NetworkStateNotifier* notifier)
     : m_configurationManager(new QNetworkConfigurationManager()),
       m_online(m_configurationManager->isOnline()),
+      m_networkAccessAllowed(true),
       m_notifier(notifier) {
   Q_ASSERT(notifier);
   connect(m_configurationManager, SIGNAL(onlineStateChanged(bool)), this,
@@ -42,7 +43,18 @@ void NetworkStateNotifierPrivate::onlineStateChanged(bool isOnline) {
     return;
 
   m_online = isOnline;
-  m_notifier->updateState();
+  if (m_networkAccessAllowed)
+    m_notifier->updateState();
+}
+
+void NetworkStateNotifierPrivate::networkAccessPermissionChanged(
+    bool isAllowed) {
+  if (isAllowed == m_networkAccessAllowed)
+    return;
+
+  m_networkAccessAllowed = isAllowed;
+  if (m_online)
+    m_notifier->updateState();
 }
 
 NetworkStateNotifierPrivate::~NetworkStateNotifierPrivate() {
@@ -50,10 +62,10 @@ NetworkStateNotifierPrivate::~NetworkStateNotifierPrivate() {
 }
 
 void NetworkStateNotifier::updateState() {
-  if (m_isOnLine == p->m_online)
+  if (m_isOnLine == (p->m_online && p->m_networkAccessAllowed))
     return;
 
-  m_isOnLine = p->m_online;
+  m_isOnLine = p->m_online && p->m_networkAccessAllowed;
   if (m_networkStateChangedFunction)
     m_networkStateChangedFunction();
 }
@@ -61,7 +73,11 @@ void NetworkStateNotifier::updateState() {
 NetworkStateNotifier::NetworkStateNotifier()
     : m_isOnLine(true), m_networkStateChangedFunction(0) {
   p = new NetworkStateNotifierPrivate(this);
-  m_isOnLine = p->m_online;
+  m_isOnLine = p->m_online && p->m_networkAccessAllowed;
+}
+
+void NetworkStateNotifier::setNetworkAccessAllowed(bool isAllowed) {
+  p->networkAccessPermissionChanged(isAllowed);
 }
 
 }  // namespace WebCore
