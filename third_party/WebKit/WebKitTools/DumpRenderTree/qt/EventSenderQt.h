@@ -57,7 +57,8 @@ class EventSender : public QObject {
   void mouseMoveTo(int x, int y);
   void leapForward(int ms);
   void keyDown(const QString& string,
-               const QStringList& modifiers = QStringList());
+               const QStringList& modifiers = QStringList(),
+               unsigned int location = 0);
   void clearKillRing() {}
   void contextClick();
   void scheduleAsynchronousClick();
