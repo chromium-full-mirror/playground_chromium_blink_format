@@ -32,6 +32,21 @@ class SVGRootInlineBox;
 struct SVGChar;
 struct SVGTextDecorationInfo;
 
+enum SVGTextPaintSubphase {
+  SVGTextPaintSubphaseBackground,
+  SVGTextPaintSubphaseGlyphFill,
+  SVGTextPaintSubphaseGlyphStroke,
+  SVGTextPaintSubphaseForeground
+};
+
+struct SVGTextPaintInfo {
+  SVGTextPaintInfo()
+      : activePaintServer(0), subphase(SVGTextPaintSubphaseBackground) {}
+
+  SVGPaintServer* activePaintServer;
+  SVGTextPaintSubphase subphase;
+};
+
 class SVGInlineTextBox : public InlineTextBox {
  public:
   SVGInlineTextBox(RenderObject* obj);
@@ -60,7 +75,7 @@ class SVGInlineTextBox : public InlineTextBox {
                        const SVGChar&,
                        const UChar* chars,
                        int length,
-                       SVGPaintServer*);
+                       SVGTextPaintInfo&);
 
   // SVGs custom paint selection method
   void paintSelection(int boxStartOffset,
