@@ -123,6 +123,7 @@ class EventSource : public RefCounted<EventSource>,
   RefPtr<ThreadableLoader> m_loader;
   Timer<EventSource> m_reconnectTimer;
   Vector<UChar> m_receiveBuf;
+  bool m_discardTrailingNewline;
   bool m_failSilently;
   bool m_requestInFlight;
 
