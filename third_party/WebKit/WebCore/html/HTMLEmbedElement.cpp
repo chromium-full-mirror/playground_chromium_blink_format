@@ -32,8 +32,8 @@
 #include "HTMLNames.h"
 #include "HTMLObjectElement.h"
 #include "MappedAttribute.h"
+#include "RenderEmbeddedObject.h"
 #include "RenderImage.h"
-#include "RenderPartObject.h"
 #include "RenderWidget.h"
 #include "ScriptController.h"
 #include "Settings.h"
@@ -153,7 +153,7 @@ RenderObject* HTMLEmbedElement::createRenderer(RenderArena* arena,
                                                RenderStyle*) {
   if (isImageType())
     return new (arena) RenderImage(this);
-  return new (arena) RenderPartObject(this);
+  return new (arena) RenderEmbeddedObject(this);
 }
 
 void HTMLEmbedElement::attach() {
@@ -179,7 +179,7 @@ void HTMLEmbedElement::attach() {
 void HTMLEmbedElement::updateWidget() {
   document()->updateStyleIfNeeded();
   if (m_needWidgetUpdate && renderer() && !isImageType())
-    toRenderPartObject(renderer())->updateWidget(true);
+    toRenderEmbeddedObject(renderer())->updateWidget(true);
 }
 
 void HTMLEmbedElement::insertedIntoDocument() {
