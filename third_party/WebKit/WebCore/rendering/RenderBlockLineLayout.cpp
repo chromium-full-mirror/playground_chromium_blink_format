@@ -2030,6 +2030,17 @@ InlineIterator RenderBlock::findNextLineBreak(InlineBidiResolver& resolver,
       int wordSpacing = o->style()->wordSpacing();
       int lastSpaceWordSpacing = 0;
 
+      TextRenderingMode textRenderingMode =
+          f.fontDescription().textRenderingMode();
+      // Non-zero only when kerning is enabled, in which case we measure words
+      // with their trailing
+      // space, then subtract its width.
+      int wordTrailingSpaceWidth =
+          textRenderingMode == OptimizeLegibility ||
+                  textRenderingMode == GeometricPrecision
+              ? f.spaceWidth() + wordSpacing
+              : 0;
+
       int wrapW = tmpW + inlineWidth(o, !appliedStartWidth, true);
       int charWidth = 0;
       bool breakNBSP = autoWrap && o->style()->nbspMode() == SPACE;
@@ -2144,10 +2155,17 @@ InlineIterator RenderBlock::findNextLineBreak(InlineBidiResolver& resolver,
             }
           }
 
-          int additionalTmpW =
-              textWidth(t, lastSpace, pos - lastSpace, f, w + tmpW,
-                        isFixedPitch, collapseWhiteSpace) +
-              lastSpaceWordSpacing;
+          int additionalTmpW;
+          if (wordTrailingSpaceWidth && currentCharacterIsSpace)
+            additionalTmpW =
+                textWidth(t, lastSpace, pos + 1 - lastSpace, f, w + tmpW,
+                          isFixedPitch, collapseWhiteSpace) -
+                wordTrailingSpaceWidth + lastSpaceWordSpacing;
+          else
+            additionalTmpW =
+                textWidth(t, lastSpace, pos - lastSpace, f, w + tmpW,
+                          isFixedPitch, collapseWhiteSpace) +
+                lastSpaceWordSpacing;
           tmpW += additionalTmpW;
           if (!appliedStartWidth) {
             tmpW += inlineWidth(o, true, false);
