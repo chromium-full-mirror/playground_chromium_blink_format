@@ -235,7 +235,6 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
 
   void scheduleTimeupdateEvent(bool periodicEvent);
   void scheduleEvent(const AtomicString& eventName);
-  void enqueueEvent(RefPtr<Event> event);
 
   // loading
   void selectMediaResource();
