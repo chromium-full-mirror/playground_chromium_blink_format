@@ -31,6 +31,7 @@
 #include "config.h"
 
 #if ENABLE(DOM_STORAGE)
+#include "V8Storage.h"
 
 #include "Storage.h"
 #include "V8Binding.h"
@@ -40,7 +41,7 @@
 namespace WebCore {
 
 // Get an array containing the names of indexed properties in a collection.
-v8::Handle<v8::Array> V8Custom::v8StorageNamedPropertyEnumerator(
+v8::Handle<v8::Array> V8Storage::namedPropertyEnumerator(
     const v8::AccessorInfo& info) {
   Storage* storage = V8DOMWrapper::convertToNativeObject<Storage>(
       V8ClassIndex::STORAGE, info.Holder());
@@ -68,13 +69,17 @@ static v8::Handle<v8::Value> storageGetter(v8::Local<v8::String> v8Name,
   return notHandledByInterceptor();
 }
 
-INDEXED_PROPERTY_GETTER(Storage) {
+v8::Handle<v8::Value> V8Storage::indexedPropertyGetter(
+    uint32_t index,
+    const v8::AccessorInfo& info) {
   INC_STATS("DOM.Storage.IndexedPropertyGetter");
   v8::Local<v8::Integer> indexV8 = v8::Integer::New(index);
   return storageGetter(indexV8->ToString(), info);
 }
 
-NAMED_PROPERTY_GETTER(Storage) {
+v8::Handle<v8::Value> V8Storage::namedPropertyGetter(
+    v8::Local<v8::String> name,
+    const v8::AccessorInfo& info) {
   INC_STATS("DOM.Storage.NamedPropertyGetter");
   return storageGetter(name, info);
 }
@@ -105,13 +110,19 @@ static v8::Handle<v8::Value> storageSetter(v8::Local<v8::String> v8Name,
   return v8Value;
 }
 
-INDEXED_PROPERTY_SETTER(Storage) {
+v8::Handle<v8::Value> V8Storage::indexedPropertySetter(
+    uint32_t index,
+    v8::Local<v8::Value> value,
+    const v8::AccessorInfo& info) {
   INC_STATS("DOM.Storage.NamedPropertyGetter");
   v8::Local<v8::Integer> indexV8 = v8::Integer::New(index);
   return storageSetter(indexV8->ToString(), value, info);
 }
 
-NAMED_PROPERTY_SETTER(Storage) {
+v8::Handle<v8::Value> V8Storage::namedPropertySetter(
+    v8::Local<v8::String> name,
+    v8::Local<v8::Value> value,
+    const v8::AccessorInfo& info) {
   INC_STATS("DOM.Storage.NamedPropertySetter");
   return storageSetter(name, value, info);
 }
@@ -130,13 +141,17 @@ static v8::Handle<v8::Boolean> storageDeleter(v8::Local<v8::String> v8Name,
   return deletionNotHandledByInterceptor();
 }
 
-INDEXED_PROPERTY_DELETER(Storage) {
+v8::Handle<v8::Boolean> V8Storage::indexedPropertyDeleter(
+    uint32_t index,
+    const v8::AccessorInfo& info) {
   INC_STATS("DOM.Storage.IndexedPropertyDeleter");
   v8::Local<v8::Integer> indexV8 = v8::Integer::New(index);
   return storageDeleter(indexV8->ToString(), info);
 }
 
-NAMED_PROPERTY_DELETER(Storage) {
+v8::Handle<v8::Boolean> V8Storage::namedPropertyDeleter(
+    v8::Local<v8::String> name,
+    const v8::AccessorInfo& info) {
   INC_STATS("DOM.Storage.NamedPropertyDeleter");
   return storageDeleter(name, info);
 }

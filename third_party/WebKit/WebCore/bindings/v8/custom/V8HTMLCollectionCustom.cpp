@@ -71,7 +71,9 @@ static v8::Handle<v8::Value> getItem(HTMLCollection* collection,
   return V8DOMWrapper::convertNodeToV8Object(result.release());
 }
 
-NAMED_PROPERTY_GETTER(HTMLCollection) {
+v8::Handle<v8::Value> V8HTMLCollection::namedPropertyGetter(
+    v8::Local<v8::String> name,
+    const v8::AccessorInfo& info) {
   INC_STATS("DOM.HTMLCollection.NamedPropertyGetter");
   // Search the prototype chain first.
   v8::Handle<v8::Value> value =

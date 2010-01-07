@@ -806,7 +806,9 @@ v8::Handle<v8::Value> V8DOMWindow::openCallback(const v8::Arguments& args) {
                                          frame->domWindow());
 }
 
-INDEXED_PROPERTY_GETTER(DOMWindow) {
+v8::Handle<v8::Value> V8DOMWindow::indexedPropertyGetter(
+    uint32_t index,
+    const v8::AccessorInfo& info) {
   INC_STATS("DOM.DOMWindow.IndexedPropertyGetter");
 
   DOMWindow* window = V8DOMWrapper::convertToNativeObject<DOMWindow>(
@@ -826,7 +828,9 @@ INDEXED_PROPERTY_GETTER(DOMWindow) {
   return notHandledByInterceptor();
 }
 
-NAMED_PROPERTY_GETTER(DOMWindow) {
+v8::Handle<v8::Value> V8DOMWindow::namedPropertyGetter(
+    v8::Local<v8::String> name,
+    const v8::AccessorInfo& info) {
   INC_STATS("DOM.DOMWindow.NamedPropertyGetter");
 
   // TODO(antonm): investigate what convertToNativeObject does for the case of
