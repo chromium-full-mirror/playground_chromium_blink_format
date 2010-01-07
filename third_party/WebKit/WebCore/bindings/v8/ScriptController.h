@@ -63,8 +63,6 @@ class ScriptController {
   // or this accessor should be made JSProxy*
   V8Proxy* proxy() { return m_proxy.get(); }
 
-  V8DOMWindowShell* mainWorldWindowShell() const;
-
   ScriptValue executeScript(const ScriptSourceCode&);
   ScriptValue executeScript(const String& script,
                             bool forceUserGesture = false);
@@ -168,11 +166,6 @@ class ScriptController {
   void clearWindowShell();
   void updateDocument();
 
-  void clearForClose();
-
-  // This is very destructive (e.g., out of memory).
-  void destroyWindowShell();
-
   void updateSecurityOrigin();
   void clearScriptObjects();
   void updatePlatformScriptObjects();
@@ -202,13 +195,7 @@ class ScriptController {
   bool m_processingTimerCallback;
   bool m_paused;
 
-  // FIXME: V8Proxy should eventually be removed.
   OwnPtr<V8Proxy> m_proxy;
-
-  // For the moment, we have one of these.  Soon we will have one per
-  // DOMWrapperWorld.
-  RefPtr<V8DOMWindowShell> m_windowShell;
-
   typedef HashMap<Widget*, NPObject*> PluginObjectMap;
 
   // A mapping between Widgets and their corresponding script object.
