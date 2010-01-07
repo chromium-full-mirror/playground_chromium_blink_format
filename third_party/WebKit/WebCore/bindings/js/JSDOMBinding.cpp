@@ -454,9 +454,7 @@ void markActiveObjectsForContext(
     if (iter->first->hasPendingActivity()) {
       // Generally, an active object with pending activity must have a wrapper
       // to mark its listeners.
-      // However, some ActiveDOMObjects don't have JS wrappers (timers created
-      // by setTimeout is one example).
-      // FIXME: perhaps need to make sure even timers have a markable 'wrapper'.
+      // However, some ActiveDOMObjects don't have JS wrappers.
       markDOMObjectWrapper(markStack, globalData, iter->second);
     }
   }
