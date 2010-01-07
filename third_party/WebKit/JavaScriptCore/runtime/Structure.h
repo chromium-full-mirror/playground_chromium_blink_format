@@ -165,8 +165,10 @@ class Structure : public RefCounted<Structure> {
     return m_propertyTable ? !m_propertyTable->keyCount : m_offset == noOffset;
   }
 
-  JSCell* specificValue() { return m_specificValueInPrevious; }
   void despecifyDictionaryFunction(const Identifier& propertyName);
+  void disableSpecificFunctionTracking() {
+    m_specificFunctionThrashCount = maxSpecificFunctionThrashCount;
+  }
 
   void setEnumerationCache(
       JSPropertyNameIterator*
@@ -202,6 +204,7 @@ class Structure : public RefCounted<Structure> {
   void checkConsistency();
 
   bool despecifyFunction(const Identifier&);
+  void despecifyAllFunctions();
 
   PropertyMapHashTable* copyPropertyTable();
   void materializePropertyMap();
@@ -224,6 +227,8 @@ class Structure : public RefCounted<Structure> {
   static const signed char s_maxTransitionLength = 64;
 
   static const signed char noOffset = -1;
+
+  static const unsigned maxSpecificFunctionThrashCount = 3;
 
   TypeInfo m_typeInfo;
 
@@ -259,6 +264,8 @@ class Structure : public RefCounted<Structure> {
   unsigned m_attributesInPrevious : 7;
 #endif
   unsigned m_anonymousSlotsInPrevious : 6;
+  unsigned m_specificFunctionThrashCount : 2;
+  // 4 free bits
 };
 
 inline size_t Structure::get(const Identifier& propertyName) {

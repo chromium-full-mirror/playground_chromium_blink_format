@@ -143,7 +143,8 @@ Structure::Structure(JSValue prototype, const TypeInfo& typeInfo)
       m_dictionaryKind(NoneDictionaryKind),
       m_isPinnedPropertyTable(false),
       m_hasGetterSetterProperties(false),
-      m_attributesInPrevious(0) {
+      m_attributesInPrevious(0),
+      m_specificFunctionThrashCount(0) {
   ASSERT(m_prototype);
   ASSERT(m_prototype.isObject() || m_prototype.isNull());
 
@@ -379,6 +380,10 @@ PassRefPtr<Structure> Structure::addPropertyTransition(
   ASSERT(!Structure::addPropertyTransitionToExistingStructure(
       structure, propertyName, attributes, specificValue, offset));
 
+  if (structure->m_specificFunctionThrashCount ==
+      maxSpecificFunctionThrashCount)
+    specificValue = 0;
+
   if (structure->transitionCount() > s_maxTransitionLength) {
     RefPtr<Structure> transition = toCacheableDictionaryTransition(structure);
     ASSERT(structure != transition);
@@ -402,6 +407,8 @@ PassRefPtr<Structure> Structure::addPropertyTransition(
       structure->m_hasGetterSetterProperties;
   transition->m_hasNonEnumerableProperties =
       structure->m_hasNonEnumerableProperties;
+  transition->m_specificFunctionThrashCount =
+      structure->m_specificFunctionThrashCount;
 
   if (structure->m_propertyTable) {
     if (structure->m_isPinnedPropertyTable)
@@ -450,6 +457,8 @@ PassRefPtr<Structure> Structure::changePrototypeTransition(Structure* structure,
       structure->m_hasGetterSetterProperties;
   transition->m_hasNonEnumerableProperties =
       structure->m_hasNonEnumerableProperties;
+  transition->m_specificFunctionThrashCount =
+      structure->m_specificFunctionThrashCount;
 
   // Don't set m_offset, as one can not transition to this.
 
@@ -463,6 +472,8 @@ PassRefPtr<Structure> Structure::changePrototypeTransition(Structure* structure,
 PassRefPtr<Structure> Structure::despecifyFunctionTransition(
     Structure* structure,
     const Identifier& replaceFunction) {
+  ASSERT(structure->m_specificFunctionThrashCount <
+         maxSpecificFunctionThrashCount);
   RefPtr<Structure> transition =
       create(structure->storedPrototype(), structure->typeInfo());
 
@@ -471,6 +482,8 @@ PassRefPtr<Structure> Structure::despecifyFunctionTransition(
       structure->m_hasGetterSetterProperties;
   transition->m_hasNonEnumerableProperties =
       structure->m_hasNonEnumerableProperties;
+  transition->m_specificFunctionThrashCount =
+      structure->m_specificFunctionThrashCount + 1;
 
   // Don't set m_offset, as one can not transition to this.
 
@@ -478,8 +491,13 @@ PassRefPtr<Structure> Structure::despecifyFunctionTransition(
   transition->m_propertyTable = structure->copyPropertyTable();
   transition->m_isPinnedPropertyTable = true;
 
-  bool removed = transition->despecifyFunction(replaceFunction);
-  ASSERT_UNUSED(removed, removed);
+  if (transition->m_specificFunctionThrashCount ==
+      maxSpecificFunctionThrashCount)
+    transition->despecifyAllFunctions();
+  else {
+    bool removed = transition->despecifyFunction(replaceFunction);
+    ASSERT_UNUSED(removed, removed);
+  }
 
   return transition.release();
 }
@@ -508,6 +526,8 @@ PassRefPtr<Structure> Structure::addAnonymousSlotsTransition(
       structure->m_hasGetterSetterProperties;
   transition->m_hasNonEnumerableProperties =
       structure->m_hasNonEnumerableProperties;
+  transition->m_specificFunctionThrashCount =
+      structure->m_specificFunctionThrashCount;
 
   if (structure->m_propertyTable) {
     if (structure->m_isPinnedPropertyTable)
@@ -539,6 +559,8 @@ PassRefPtr<Structure> Structure::getterSetterTransition(Structure* structure) {
       transition->m_hasGetterSetterProperties;
   transition->m_hasNonEnumerableProperties =
       structure->m_hasNonEnumerableProperties;
+  transition->m_specificFunctionThrashCount =
+      structure->m_specificFunctionThrashCount;
 
   // Don't set m_offset, as one can not transition to this.
 
@@ -561,6 +583,8 @@ PassRefPtr<Structure> Structure::toDictionaryTransition(Structure* structure,
       structure->m_hasGetterSetterProperties;
   transition->m_hasNonEnumerableProperties =
       structure->m_hasNonEnumerableProperties;
+  transition->m_specificFunctionThrashCount =
+      structure->m_specificFunctionThrashCount;
 
   structure->materializePropertyMapIfNecessary();
   transition->m_propertyTable = structure->copyPropertyTable();
@@ -627,6 +651,10 @@ size_t Structure::addPropertyWithoutTransition(const Identifier& propertyName,
                                                unsigned attributes,
                                                JSCell* specificValue) {
   ASSERT(!m_enumerationCache);
+
+  if (m_specificFunctionThrashCount == maxSpecificFunctionThrashCount)
+    specificValue = 0;
+
   materializePropertyMapIfNecessary();
 
   m_isPinnedPropertyTable = true;
@@ -805,6 +833,17 @@ bool Structure::despecifyFunction(const Identifier& propertyName) {
       return true;
     }
   }
+}
+
+void Structure::despecifyAllFunctions() {
+  materializePropertyMapIfNecessary();
+  if (!m_propertyTable)
+    return;
+
+  unsigned entryCount =
+      m_propertyTable->keyCount + m_propertyTable->deletedSentinelCount;
+  for (unsigned i = 1; i <= entryCount; ++i)
+    m_propertyTable->entries()[i].specificValue = 0;
 }
 
 size_t Structure::put(const Identifier& propertyName,
