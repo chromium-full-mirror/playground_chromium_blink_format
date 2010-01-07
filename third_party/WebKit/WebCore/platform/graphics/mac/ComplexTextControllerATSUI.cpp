@@ -304,13 +304,13 @@ static bool fontHasMirroringInfo(ATSUFontID fontID) {
 }
 
 static void disableLigatures(const SimpleFontData* fontData,
-                             TextRenderingMode textMode) {
+                             TypesettingFeatures typesettingFeatures) {
   // Don't be too aggressive: if the font doesn't contain 'a', then assume that
   // any ligatures it contains are
   // in characters that always go through ATSUI, and therefore allow them. Geeza
   // Pro is an example.
   // See bugzilla 5166.
-  if (textMode == OptimizeLegibility || textMode == GeometricPrecision ||
+  if ((typesettingFeatures & Ligatures) ||
       fontData->platformData().allowsLigatures())
     return;
 
@@ -324,7 +324,7 @@ static void disableLigatures(const SimpleFontData* fontData,
 }
 
 static void initializeATSUStyle(const SimpleFontData* fontData,
-                                TextRenderingMode textMode) {
+                                TypesettingFeatures typesettingFeatures) {
   if (fontData->m_ATSUStyleInitialized)
     return;
 
@@ -352,8 +352,7 @@ static void initializeATSUStyle(const SimpleFontData* fontData,
   ATSUAttributeValuePtr styleValues[4] = {&fontSize, &fontID, &verticalFlip,
                                           &kerningInhibitFactor};
 
-  bool allowKerning =
-      textMode == OptimizeLegibility || textMode == GeometricPrecision;
+  bool allowKerning = typesettingFeatures & Kerning;
   status = ATSUSetAttributes(fontData->m_ATSUStyle, allowKerning ? 3 : 4,
                              styleTags, styleSizes, styleValues);
   if (status != noErr)
@@ -361,7 +360,7 @@ static void initializeATSUStyle(const SimpleFontData* fontData,
 
   fontData->m_ATSUMirrors = fontHasMirroringInfo(fontID);
 
-  disableLigatures(fontData, textMode);
+  disableLigatures(fontData, typesettingFeatures);
 
   fontData->m_ATSUStyleInitialized = true;
 }
@@ -381,7 +380,7 @@ void ComplexTextController::collectComplexTextRunsForCharactersATSUI(
   if (m_fallbackFonts && fontData != m_font.primaryFont())
     m_fallbackFonts->add(fontData);
 
-  initializeATSUStyle(fontData, m_font.fontDescription().textRenderingMode());
+  initializeATSUStyle(fontData, m_font.typesettingFeatures());
 
   OSStatus status;
   ATSUTextLayout atsuTextLayout;

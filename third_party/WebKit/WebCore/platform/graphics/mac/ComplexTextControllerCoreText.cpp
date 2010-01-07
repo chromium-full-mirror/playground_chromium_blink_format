@@ -144,10 +144,9 @@ void ComplexTextController::collectComplexTextRunsForCharactersCoreText(
       CFStringCreateWithCharactersNoCopy(NULL, cp, length, kCFAllocatorNull));
 
   RetainPtr<CFAttributedStringRef> attributedString(
-      AdoptCF, CFAttributedStringCreate(
-                   NULL, string.get(),
-                   fontData->getCFStringAttributes(
-                       m_font.fontDescription().textRenderingMode())));
+      AdoptCF, CFAttributedStringCreate(NULL, string.get(),
+                                        fontData->getCFStringAttributes(
+                                            m_font.typesettingFeatures())));
 
   RetainPtr<CTTypesetterRef> typesetter;
 
