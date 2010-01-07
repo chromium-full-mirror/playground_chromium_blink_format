@@ -40,6 +40,7 @@
 
 namespace WebCore {
 
+class KURL;
 class ResourceError;
 class ResourceRequest;
 class ResourceResponse;
@@ -94,6 +95,12 @@ struct CrossThreadCopierBase<false, std::auto_ptr<T>> {
   static Type copy(const std::auto_ptr<T>& autoPtr) {
     return std::auto_ptr<T>(*const_cast<std::auto_ptr<T>*>(&autoPtr));
   }
+};
+
+template <>
+struct CrossThreadCopierBase<false, KURL> {
+  typedef KURL Type;
+  static Type copy(const KURL&);
 };
 
 template <>

@@ -34,6 +34,7 @@
 #if ENABLE(WEB_SOCKETS)
 
 #include "SocketStreamHandleClient.h"
+#include "ThreadableWebSocketChannel.h"
 #include "WebSocketHandshake.h"
 #include <wtf/RefCounted.h>
 
@@ -46,7 +47,8 @@ class SocketStreamError;
 class WebSocketChannelClient;
 
 class WebSocketChannel : public RefCounted<WebSocketChannel>,
-                         public SocketStreamHandleClient {
+                         public SocketStreamHandleClient,
+                         public ThreadableWebSocketChannel {
  public:
   static PassRefPtr<WebSocketChannel> create(ScriptExecutionContext* context,
                                              WebSocketChannelClient* client,
@@ -56,11 +58,11 @@ class WebSocketChannel : public RefCounted<WebSocketChannel>,
   }
   virtual ~WebSocketChannel();
 
-  void connect();
-  bool send(const String& msg);
-  unsigned long bufferedAmount() const;
-  void close();
-  void disconnect();  // Will suppress didClose().
+  virtual void connect();
+  virtual bool send(const String& message);
+  virtual unsigned long bufferedAmount() const;
+  virtual void close();
+  virtual void disconnect();  // Will suppress didClose().
 
   virtual void didOpen(SocketStreamHandle*);
   virtual void didClose(SocketStreamHandle*);
@@ -72,11 +74,18 @@ class WebSocketChannel : public RefCounted<WebSocketChannel>,
   virtual void didCancelAuthenticationChallenge(SocketStreamHandle*,
                                                 const AuthenticationChallenge&);
 
+  using RefCounted<WebSocketChannel>::ref;
+  using RefCounted<WebSocketChannel>::deref;
+
+ protected:
+  virtual void refThreadableWebSocketChannel() { ref(); }
+  virtual void derefThreadableWebSocketChannel() { deref(); }
+
  private:
   WebSocketChannel(ScriptExecutionContext*,
                    WebSocketChannelClient*,
                    const KURL&,
-                   const String&);
+                   const String& protocol);
 
   bool appendToBuffer(const char* data, int len);
   void skipBuffer(int len);
