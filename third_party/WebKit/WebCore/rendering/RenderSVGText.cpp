@@ -58,6 +58,7 @@ void RenderSVGText::computeRectForRepaint(
     RenderBoxModelObject* repaintContainer,
     IntRect& repaintRect,
     bool fixed) {
+  inflateForShadow(style(), repaintRect);
   SVGRenderBase::computeRectForRepaint(this, repaintContainer, repaintRect,
                                        fixed);
 }
