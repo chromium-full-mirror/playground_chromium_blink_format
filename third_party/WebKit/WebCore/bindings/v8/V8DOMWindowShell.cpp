@@ -141,6 +141,7 @@ bool V8DOMWindowShell::isContextInitialized() {
 
 void V8DOMWindowShell::disposeContextHandles() {
   if (!m_context.IsEmpty()) {
+    m_frame->loader()->client()->didDestroyScriptContextForFrame();
     m_context.Dispose();
     m_context.Clear();
   }
