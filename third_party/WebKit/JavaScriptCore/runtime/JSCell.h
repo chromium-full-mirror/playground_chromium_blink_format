@@ -44,7 +44,7 @@ class JSCell : public NoncopyableCustomAllocated {
   friend class JSValue;
   friend class JSAPIValueWrapper;
   friend class JSZombie;
-  friend struct VPtrSet;
+  friend class JSGlobalData;
 
  private:
   explicit JSCell(Structure*);
@@ -117,6 +117,7 @@ class JSCell : public NoncopyableCustomAllocated {
   virtual JSString* toThisJSString(ExecState*);
   virtual JSValue getJSNumber();
   void* vptr() { return *reinterpret_cast<void**>(this); }
+  void setVPtr(void* vptr) { *reinterpret_cast<void**>(this) = vptr; }
 
  private:
   // Base implementation; for non-object classes implements getPropertySlot.

@@ -44,6 +44,12 @@ JSByteArray::JSByteArray(ExecState* exec,
             jsNumber(exec, m_storage->length()), ReadOnly | DontDelete);
 }
 
+#if !ASSERT_DISABLED
+JSByteArray::~JSByteArray() {
+  ASSERT(vptr() == JSGlobalData::jsByteArrayVPtr);
+}
+#endif
+
 PassRefPtr<Structure> JSByteArray::createStructure(JSValue prototype) {
   PassRefPtr<Structure> result =
       Structure::create(prototype, TypeInfo(ObjectType, StructureFlags));

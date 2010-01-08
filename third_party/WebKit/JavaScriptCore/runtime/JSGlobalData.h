@@ -62,7 +62,6 @@ class UString;
 
 struct HashTable;
 struct Instruction;
-struct VPtrSet;
 
 struct DSTOffsetCache {
   DSTOffsetCache() { reset(); }
@@ -126,10 +125,11 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
   RefPtr<Structure> numberStructure;
 #endif
 
-  void* jsArrayVPtr;
-  void* jsByteArrayVPtr;
-  void* jsStringVPtr;
-  void* jsFunctionVPtr;
+  static void storeVPtrs();
+  static JS_EXPORTDATA void* jsArrayVPtr;
+  static JS_EXPORTDATA void* jsByteArrayVPtr;
+  static JS_EXPORTDATA void* jsStringVPtr;
+  static JS_EXPORTDATA void* jsFunctionVPtr;
 
   IdentifierTable* identifierTable;
   CommonIdentifiers* propertyNames;
@@ -195,7 +195,7 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
   void dumpSampleData(ExecState* exec);
 
  private:
-  JSGlobalData(bool isShared, const VPtrSet&);
+  JSGlobalData(bool isShared);
   static JSGlobalData*& sharedInstanceInternal();
   void createNativeThunk();
 };

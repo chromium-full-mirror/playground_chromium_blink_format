@@ -86,6 +86,8 @@ JSFunction::JSFunction(ExecState* exec,
 }
 
 JSFunction::~JSFunction() {
+  ASSERT(vptr() == JSGlobalData::jsFunctionVPtr);
+
   // JIT code for other functions may have had calls linked directly to the code
   // for this function; these links
   // are based on a check for the this pointer value for this JSFunction - which
