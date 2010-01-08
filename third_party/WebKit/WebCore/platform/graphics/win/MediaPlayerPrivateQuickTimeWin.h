@@ -54,6 +54,9 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface,
  private:
   MediaPlayerPrivate(MediaPlayer*);
 
+  virtual bool supportsFullscreen() const;
+  virtual PlatformMedia platformMedia() const;
+
   IntSize naturalSize() const;
   bool hasVideo() const;
   bool hasAudio() const;
