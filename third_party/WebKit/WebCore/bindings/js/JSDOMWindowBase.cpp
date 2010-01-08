@@ -57,8 +57,6 @@ JSDOMWindowBase::JSDOMWindowBase(NonNullPassRefPtr<Structure> structure,
     : JSDOMGlobalObject(structure,
                         new JSDOMWindowBaseData(window, shell),
                         shell) {
-  this->structure()->disableSpecificFunctionTracking();
-
   GlobalPropertyInfo staticGlobals[] = {
       GlobalPropertyInfo(Identifier(globalExec(), "document"), jsNull(),
                          DontDelete | ReadOnly),
