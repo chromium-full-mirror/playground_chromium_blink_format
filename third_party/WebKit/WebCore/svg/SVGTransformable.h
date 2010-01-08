@@ -38,11 +38,14 @@ class SVGTransformable : virtual public SVGLocatable {
   SVGTransformable();
   virtual ~SVGTransformable();
 
+  enum TransformParsingMode { ClearList, DoNotClearList };
+
   static bool parseTransformAttribute(SVGTransformList*,
                                       const AtomicString& transform);
   static bool parseTransformAttribute(SVGTransformList*,
                                       const UChar*& ptr,
-                                      const UChar* end);
+                                      const UChar* end,
+                                      TransformParsingMode mode = ClearList);
   static bool parseTransformValue(unsigned type,
                                   const UChar*& ptr,
                                   const UChar* end,
