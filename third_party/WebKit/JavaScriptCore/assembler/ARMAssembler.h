@@ -177,6 +177,7 @@ class ARMAssembler {
   };
 
   static const ARMWord INVALID_IMM = 0xf0000000;
+  static const int DefaultPrefetching = 2;
 
   class JmpSrc {
     friend class ARMAssembler;
@@ -557,17 +558,31 @@ class ARMAssembler {
 
   // Patching helpers
 
-  static ARMWord* getLdrImmAddress(ARMWord* insn, uint32_t* constPool = 0);
-  static void linkBranch(void* code,
-                         JmpSrc from,
-                         void* to,
-                         int useConstantPool = 0);
+  static ARMWord* getLdrImmAddress(ARMWord* insn) {
+    // Must be an ldr ..., [pc +/- imm]
+    ASSERT((*insn & 0x0f7f0000) == 0x051f0000);
+
+    ARMWord addr =
+        reinterpret_cast<ARMWord>(insn) + DefaultPrefetching * sizeof(ARMWord);
+    if (*insn & DT_UP)
+      return reinterpret_cast<ARMWord*>(addr + (*insn & SDT_OFFSET_MASK));
+    return reinterpret_cast<ARMWord*>(addr - (*insn & SDT_OFFSET_MASK));
+  }
+
+  static ARMWord* getLdrImmAddressOnPool(ARMWord* insn, uint32_t* constPool) {
+    // Must be an ldr ..., [pc +/- imm]
+    ASSERT((*insn & 0x0f7f0000) == 0x051f0000);
+
+    if (*insn & 0x1)
+      return reinterpret_cast<ARMWord*>(constPool +
+                                        ((*insn & SDT_OFFSET_MASK) >> 1));
+    return getLdrImmAddress(insn);
+  }
 
   static void patchPointerInternal(intptr_t from, void* to) {
     ARMWord* insn = reinterpret_cast<ARMWord*>(from);
     ARMWord* addr = getLdrImmAddress(insn);
     *addr = reinterpret_cast<ARMWord>(to);
-    ExecutableAllocator::cacheFlush(addr, sizeof(ARMWord));
   }
 
   static ARMWord patchConstantPoolLoad(ARMWord load, ARMWord value) {
@@ -608,12 +623,12 @@ class ARMAssembler {
   void linkJump(JmpSrc from, JmpDst to) {
     ARMWord* insn = reinterpret_cast<ARMWord*>(m_buffer.data()) +
                     (from.m_offset / sizeof(ARMWord));
-    *getLdrImmAddress(insn, m_buffer.poolAddress()) =
-        static_cast<ARMWord>(to.m_offset);
+    ARMWord* addr = getLdrImmAddressOnPool(insn, m_buffer.poolAddress());
+    *addr = static_cast<ARMWord>(to.m_offset);
   }
 
   static void linkJump(void* code, JmpSrc from, void* to) {
-    linkBranch(code, from, to);
+    patchPointerInternal(reinterpret_cast<intptr_t>(code) + from.m_offset, to);
   }
 
   static void relinkJump(void* from, void* to) {
@@ -622,10 +637,13 @@ class ARMAssembler {
   }
 
   static void linkCall(void* code, JmpSrc from, void* to) {
-    linkBranch(code, from, to, true);
+    patchPointerInternal(reinterpret_cast<intptr_t>(code) + from.m_offset, to);
   }
 
-  static void relinkCall(void* from, void* to) { relinkJump(from, to); }
+  static void relinkCall(void* from, void* to) {
+    patchPointerInternal(reinterpret_cast<intptr_t>(from) - sizeof(ARMWord),
+                         to);
+  }
 
   // Address operations
 
