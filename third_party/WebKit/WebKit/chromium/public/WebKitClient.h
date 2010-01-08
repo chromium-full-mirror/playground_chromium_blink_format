@@ -235,17 +235,17 @@ class WebKitClient {
 
   // If refresh is true, then cached information should not be used to
   // satisfy this call.
-  virtual void getPluginList(bool refresh, WebPluginListBuilder*){};
+  virtual void getPluginList(bool refresh, WebPluginListBuilder*) {}
 
   // Profiling -----------------------------------------------------------
 
-  virtual void decrementStatsCounter(const char* name){};
-  virtual void incrementStatsCounter(const char* name){};
+  virtual void decrementStatsCounter(const char* name) {}
+  virtual void incrementStatsCounter(const char* name) {}
 
   // An event is identified by the pair (name, id).  The extra parameter
   // specifies additional data to log with the event.
-  virtual void traceEventBegin(const char* name, void* id, const char* extra){};
-  virtual void traceEventEnd(const char* name, void* id, const char* extra){};
+  virtual void traceEventBegin(const char* name, void* id, const char* extra) {}
+  virtual void traceEventEnd(const char* name, void* id, const char* extra) {}
 
   // Generic callback for reporting histogram data. Range is identified by the
   // min, max pair.
@@ -257,7 +257,7 @@ class WebKitClient {
                                int min,
                                int max,
                                int bucketCount,
-                               bool linear){};
+                               bool linear) {}
 
   // Resources -----------------------------------------------------------
 
