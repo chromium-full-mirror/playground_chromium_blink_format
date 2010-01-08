@@ -42,6 +42,7 @@ class FileChooser;
 class FloatRect;
 class Page;
 struct FrameLoadRequest;
+class QtAbstractWebPopup;
 
 class ChromeClientQt : public ChromeClient {
  public:
@@ -147,6 +148,8 @@ class ChromeClientQt : public ChromeClient {
   virtual void scrollRectIntoView(const IntRect&, const ScrollView*) const {}
 
   virtual void requestGeolocationPermissionForFrame(Frame*, Geolocation*);
+
+  QtAbstractWebPopup* createPopup();
 
   QWebPage* m_webPage;
   WebCore::KURL lastHoverURL;
