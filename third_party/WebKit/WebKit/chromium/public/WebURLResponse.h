@@ -122,8 +122,8 @@ class WebURLResponse {
 
   // Flag whether this request was loaded via the SPDY protocol or not.
   // SPDY is an experimental web protocol, see http://dev.chromium.org/spdy
-  WEBKIT_API bool wasFetchedViaSpdy() const;
-  WEBKIT_API void setWasFetchedViaSpdy(bool);
+  WEBKIT_API bool wasFetchedViaSPDY() const;
+  WEBKIT_API void setWasFetchedViaSPDY(bool);
 
  protected:
   void assign(WebURLResponsePrivate*);

@@ -38,7 +38,7 @@ class ResourceResponse : public ResourceResponseBase {
   ResourceResponse()
       : m_isContentFiltered(false),
         m_appCacheID(0),
-        m_wasFetchedViaSpdy(false) {}
+        m_wasFetchedViaSPDY(false) {}
 
   ResourceResponse(const KURL& url,
                    const String& mimeType,
@@ -52,7 +52,7 @@ class ResourceResponse : public ResourceResponseBase {
                              filename),
         m_isContentFiltered(false),
         m_appCacheID(0),
-        m_wasFetchedViaSpdy(false) {}
+        m_wasFetchedViaSPDY(false) {}
 
   const CString& getSecurityInfo() const { return m_securityInfo; }
   void setSecurityInfo(const CString& securityInfo) {
@@ -70,8 +70,8 @@ class ResourceResponse : public ResourceResponseBase {
   const KURL& appCacheManifestURL() const { return m_appCacheManifestURL; }
   void setAppCacheManifestURL(const KURL& url) { m_appCacheManifestURL = url; }
 
-  bool wasFetchedViaSpdy() const { return m_wasFetchedViaSpdy; }
-  void setWasFetchedViaSpdy(bool value) { m_wasFetchedViaSpdy = value; }
+  bool wasFetchedViaSPDY() const { return m_wasFetchedViaSPDY; }
+  void setWasFetchedViaSPDY(bool value) { m_wasFetchedViaSPDY = value; }
 
  private:
   friend class ResourceResponseBase;
@@ -95,7 +95,7 @@ class ResourceResponse : public ResourceResponseBase {
   // Note: only valid for main resource responses.
   KURL m_appCacheManifestURL;
 
-  bool m_wasFetchedViaSpdy;
+  bool m_wasFetchedViaSPDY;
 };
 
 }  // namespace WebCore
