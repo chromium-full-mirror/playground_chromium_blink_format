@@ -42,6 +42,8 @@ DOMData::DOMData()
       m_isMainThread(WTF::isMainThread()),
       m_owningThread(WTF::currentThread()) {}
 
+DOMData::~DOMData() {}
+
 DOMData* DOMData::getCurrent() {
   if (WTF::isMainThread())
     return MainThreadDOMData::getCurrent();
