@@ -124,7 +124,7 @@ void PluginPackage::unload() {
 
   unloadWithoutShutdown();
 }
-#endif  //! OS(SYMBIAN)
+#endif  // !OS(SYMBIAN)
 
 void PluginPackage::unloadWithoutShutdown() {
   if (!m_isLoaded)
