@@ -218,8 +218,7 @@ class SimpleFontData : public FontData {
 
 #if USE(ATSUI)
  public:
-  mutable ATSUStyle m_ATSUStyle;
-  mutable bool m_ATSUStyleInitialized;
+  mutable HashMap<unsigned, ATSUStyle> m_ATSUStyleMap;
   mutable bool m_ATSUMirrors;
   mutable bool m_checkedShapesArabic;
   mutable bool m_shapesArabic;
@@ -229,7 +228,7 @@ class SimpleFontData : public FontData {
 
 #if USE(CORE_TEXT)
   mutable RetainPtr<CTFontRef> m_CTFont;
-  mutable RetainPtr<CFDictionaryRef> m_CFStringAttributes;
+  mutable HashMap<unsigned, RetainPtr<CFDictionaryRef>> m_CFStringAttributes;
 #endif
 
 #if PLATFORM(WIN)

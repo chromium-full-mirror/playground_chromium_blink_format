@@ -304,6 +304,7 @@ static bool fontHasMirroringInfo(ATSUFontID fontID) {
 }
 
 static void disableLigatures(const SimpleFontData* fontData,
+                             ATSUStyle atsuStyle,
                              TypesettingFeatures typesettingFeatures) {
   // Don't be too aggressive: if the font doesn't contain 'a', then assume that
   // any ligatures it contains are
@@ -316,26 +317,31 @@ static void disableLigatures(const SimpleFontData* fontData,
 
   ATSUFontFeatureType featureTypes[] = {kLigaturesType};
   ATSUFontFeatureSelector featureSelectors[] = {kCommonLigaturesOffSelector};
-  OSStatus status = ATSUSetFontFeatures(fontData->m_ATSUStyle, 1, featureTypes,
-                                        featureSelectors);
+  OSStatus status =
+      ATSUSetFontFeatures(atsuStyle, 1, featureTypes, featureSelectors);
   if (status != noErr)
     LOG_ERROR("ATSUSetFontFeatures failed (%d) -- ligatures remain enabled",
               static_cast<int>(status));
 }
 
-static void initializeATSUStyle(const SimpleFontData* fontData,
-                                TypesettingFeatures typesettingFeatures) {
-  if (fontData->m_ATSUStyleInitialized)
-    return;
+static ATSUStyle initializeATSUStyle(const SimpleFontData* fontData,
+                                     TypesettingFeatures typesettingFeatures) {
+  unsigned key = typesettingFeatures + 1;
+  pair<HashMap<unsigned, ATSUStyle>::iterator, bool> addResult =
+      fontData->m_ATSUStyleMap.add(key, 0);
+  ATSUStyle& atsuStyle = addResult.first->second;
+  if (!addResult.second)
+    return atsuStyle;
 
   ATSUFontID fontID = fontData->platformData().m_atsuFontID;
   if (!fontID) {
     LOG_ERROR("unable to get ATSUFontID for %p",
               fontData->platformData().font());
-    return;
+    fontData->m_ATSUStyleMap.remove(addResult.first);
+    return 0;
   }
 
-  OSStatus status = ATSUCreateStyle(&fontData->m_ATSUStyle);
+  OSStatus status = ATSUCreateStyle(&atsuStyle);
   if (status != noErr)
     LOG_ERROR("ATSUCreateStyle failed (%d)", static_cast<int>(status));
 
@@ -353,16 +359,15 @@ static void initializeATSUStyle(const SimpleFontData* fontData,
                                           &kerningInhibitFactor};
 
   bool allowKerning = typesettingFeatures & Kerning;
-  status = ATSUSetAttributes(fontData->m_ATSUStyle, allowKerning ? 3 : 4,
-                             styleTags, styleSizes, styleValues);
+  status = ATSUSetAttributes(atsuStyle, allowKerning ? 3 : 4, styleTags,
+                             styleSizes, styleValues);
   if (status != noErr)
     LOG_ERROR("ATSUSetAttributes failed (%d)", static_cast<int>(status));
 
   fontData->m_ATSUMirrors = fontHasMirroringInfo(fontID);
 
-  disableLigatures(fontData, typesettingFeatures);
-
-  fontData->m_ATSUStyleInitialized = true;
+  disableLigatures(fontData, atsuStyle, typesettingFeatures);
+  return atsuStyle;
 }
 
 void ComplexTextController::collectComplexTextRunsForCharactersATSUI(
@@ -380,15 +385,15 @@ void ComplexTextController::collectComplexTextRunsForCharactersATSUI(
   if (m_fallbackFonts && fontData != m_font.primaryFont())
     m_fallbackFonts->add(fontData);
 
-  initializeATSUStyle(fontData, m_font.typesettingFeatures());
+  ATSUStyle atsuStyle =
+      initializeATSUStyle(fontData, m_font.typesettingFeatures());
 
   OSStatus status;
   ATSUTextLayout atsuTextLayout;
   UniCharCount runLength = length;
 
-  status =
-      ATSUCreateTextLayoutWithTextPtr(cp, 0, length, length, 1, &runLength,
-                                      &fontData->m_ATSUStyle, &atsuTextLayout);
+  status = ATSUCreateTextLayoutWithTextPtr(cp, 0, length, length, 1, &runLength,
+                                           &atsuStyle, &atsuTextLayout);
   if (status != noErr) {
     LOG_ERROR("ATSUCreateTextLayoutWithTextPtr failed with error %d",
               static_cast<int>(status));
