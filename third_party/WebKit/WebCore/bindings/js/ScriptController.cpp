@@ -294,13 +294,6 @@ bool ScriptController::anyPageIsProcessingUserGesture() const {
   return false;
 }
 
-bool ScriptController::isEnabled() {
-  Settings* settings = m_frame->settings();
-  return m_frame->loader()->client()->allowJavaScript(
-      settings && settings->isJavaScriptEnabled() &&
-      !m_frame->loader()->isSandboxed(SandboxScripts));
-}
-
 void ScriptController::attachDebugger(JSC::Debugger* debugger) {
   // FIXME: Should be able to debug isolated worlds.
   JSDOMWindowShell* shell = existingWindowShell(debuggerWorld());
@@ -329,7 +322,7 @@ void ScriptController::updateSecurityOrigin() {
 }
 
 Bindings::RootObject* ScriptController::bindingRootObject() {
-  if (!isEnabled())
+  if (!canExecuteScripts())
     return 0;
 
   if (!m_bindingRootObject) {
@@ -357,7 +350,7 @@ PassRefPtr<Bindings::RootObject> ScriptController::createRootObject(
 
 NPObject* ScriptController::windowScriptNPObject() {
   if (!m_windowScriptNPObject) {
-    if (isEnabled()) {
+    if (canExecuteScripts()) {
       // JavaScript is enabled, so there is a JavaScript window object.
       // Return an NPObject bound to the window object.
       JSC::JSLock lock(SilenceAssertionsOnly);
@@ -392,7 +385,7 @@ NPObject* ScriptController::createScriptObjectForPluginElement(
 JSObject* ScriptController::jsObjectForPluginElement(
     HTMLPlugInElement* plugin) {
   // Can't create JSObjects when JavaScript is disabled
-  if (!isEnabled())
+  if (!canExecuteScripts())
     return 0;
 
   // Create a JSObject bound to this element
@@ -458,7 +451,7 @@ ScriptValue ScriptController::executeScriptInWorld(DOMWrapperWorld* world,
   ScriptSourceCode sourceCode(
       script, forceUserGesture ? KURL() : m_frame->loader()->url());
 
-  if (!isEnabled() || isPaused())
+  if (!canExecuteScripts() || isPaused())
     return ScriptValue();
 
   bool wasInExecuteScript = m_inExecuteScript;

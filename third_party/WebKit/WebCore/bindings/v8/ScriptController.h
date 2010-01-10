@@ -121,7 +121,7 @@ class ScriptController {
   // Check if the javascript engine has been initialized.
   bool haveInterpreter() const;
 
-  bool isEnabled() const;
+  bool canExecuteScripts();
 
   // FIXME: void* is a compile hack.
   void attachDebugger(void*);

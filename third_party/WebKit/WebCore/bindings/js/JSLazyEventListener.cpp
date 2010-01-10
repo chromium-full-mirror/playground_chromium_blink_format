@@ -97,7 +97,7 @@ void JSLazyEventListener::parseCode(
     return;
 
   ScriptController* scriptController = frame->script();
-  if (!scriptController->isEnabled())
+  if (!scriptController->canExecuteScripts())
     return;
 
   JSDOMGlobalObject* globalObject =
@@ -120,7 +120,7 @@ void JSLazyEventListener::parseCode(
       return;
     // FIXME: Is this check needed for non-Document contexts?
     ScriptController* script = frame->script();
-    if (!script->isEnabled() || script->isPaused())
+    if (!script->canExecuteScripts() || script->isPaused())
       return;
   }
 

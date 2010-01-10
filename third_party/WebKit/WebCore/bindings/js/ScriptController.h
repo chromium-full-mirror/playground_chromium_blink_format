@@ -118,7 +118,7 @@ class ScriptController {
   bool processingUserGesture() const;
   bool anyPageIsProcessingUserGesture() const;
 
-  bool isEnabled();
+  bool canExecuteScripts();
 
   void attachDebugger(JSC::Debugger*);
 

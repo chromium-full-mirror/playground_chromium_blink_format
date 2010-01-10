@@ -543,7 +543,7 @@ V8Proxy* V8Proxy::retrieve() {
 V8Proxy* V8Proxy::retrieve(Frame* frame) {
   if (!frame)
     return 0;
-  return frame->script()->isEnabled() ? frame->script()->proxy() : 0;
+  return frame->script()->canExecuteScripts() ? frame->script()->proxy() : 0;
 }
 
 V8Proxy* V8Proxy::retrieve(ScriptExecutionContext* context) {

@@ -23,6 +23,7 @@
 #include "ScriptController.h"
 
 #include "Frame.h"
+#include "FrameLoaderClient.h"
 #include "Page.h"
 #include "ScriptSourceCode.h"
 #include "ScriptValue.h"
@@ -30,6 +31,15 @@
 #include "XSSAuditor.h"
 
 namespace WebCore {
+
+bool ScriptController::canExecuteScripts() {
+  if (m_frame->loader()->isSandboxed(SandboxScripts))
+    return false;
+
+  Settings* settings = m_frame->settings();
+  return m_frame->loader()->client()->allowJavaScript(
+      settings && settings->isJavaScriptEnabled());
+}
 
 ScriptValue ScriptController::executeScript(const String& script,
                                             bool forceUserGesture) {
@@ -39,7 +49,7 @@ ScriptValue ScriptController::executeScript(const String& script,
 
 ScriptValue ScriptController::executeScript(
     const ScriptSourceCode& sourceCode) {
-  if (!isEnabled() || isPaused())
+  if (!canExecuteScripts() || isPaused())
     return ScriptValue();
 
   bool wasInExecuteScript = m_inExecuteScript;

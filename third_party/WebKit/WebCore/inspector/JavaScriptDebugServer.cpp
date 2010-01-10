@@ -421,7 +421,7 @@ void JavaScriptDebugServer::setJavaScriptPaused(Page* page, bool paused) {
 void JavaScriptDebugServer::setJavaScriptPaused(Frame* frame, bool paused) {
   ASSERT_ARG(frame, frame);
 
-  if (!frame->script()->isEnabled())
+  if (!frame->script()->canExecuteScripts())
     return;
 
   frame->script()->setPaused(paused);
