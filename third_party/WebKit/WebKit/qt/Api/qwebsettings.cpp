@@ -403,6 +403,8 @@ QWebSettings* QWebSettings::globalSettings() {
         QWebSettings::LocalStorageEnabled instead.
     \value LocalContentCanAccessRemoteUrls Specifies whether locally loaded
    documents are allowed to access remote urls.
+    \value XSSAuditorEnabled Enables or disables WebKit's XSSAuditor to mitigate
+   reflective cross-site scripting attacks.
 */
 
 /*!
