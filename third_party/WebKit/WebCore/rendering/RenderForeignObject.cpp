@@ -83,7 +83,7 @@ void RenderForeignObject::computeRectForRepaint(
     IntRect& rect,
     bool fixed) {
   rect = localToParentTransform().mapRect(rect);
-  inflateForShadow(style(), rect);
+  style()->svgStyle()->inflateForShadow(rect);
   RenderBlock::computeRectForRepaint(repaintContainer, rect, fixed);
 }
 
