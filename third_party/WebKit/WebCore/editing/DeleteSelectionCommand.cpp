@@ -711,12 +711,13 @@ void DeleteSelectionCommand::mergeParagraphs() {
   if (!m_startsAtEmptyLine && isStartOfParagraph(mergeDestination) &&
       startOfParagraphToMove.absoluteCaretBounds().x() >
           mergeDestination.absoluteCaretBounds().x()) {
-    ASSERT(mergeDestination.deepEquivalent().downstream().node()->hasTagName(
-        brTag));
-    removeNodeAndPruneAncestors(
-        mergeDestination.deepEquivalent().downstream().node());
-    m_endingPosition = startOfParagraphToMove.deepEquivalent();
-    return;
+    if (mergeDestination.deepEquivalent().downstream().node()->hasTagName(
+            brTag)) {
+      removeNodeAndPruneAncestors(
+          mergeDestination.deepEquivalent().downstream().node());
+      m_endingPosition = startOfParagraphToMove.deepEquivalent();
+      return;
+    }
   }
 
   // Block images, tables and horizontal rules cannot be made inline with
