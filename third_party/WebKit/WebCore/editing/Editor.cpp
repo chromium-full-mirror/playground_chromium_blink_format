@@ -1136,6 +1136,8 @@ void Editor::paste() {
 #endif
 
 void Editor::pasteAsPlainText() {
+  if (tryDHTMLPaste())
+    return;
   if (!canPaste())
     return;
   pasteAsPlainTextWithPasteboard(Pasteboard::generalPasteboard());
