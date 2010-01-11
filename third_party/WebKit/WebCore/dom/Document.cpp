@@ -4398,9 +4398,8 @@ void Document::initSecurityContext() {
   // loading URL.
   const KURL& url = m_frame->loader()->url();
   m_cookieURL = url;
-  ScriptExecutionContext::setSecurityOrigin(SecurityOrigin::create(url));
-
-  updateSandboxFlags();
+  ScriptExecutionContext::setSecurityOrigin(
+      SecurityOrigin::create(url, m_frame->loader()->sandboxFlags()));
 
   if (SecurityOrigin::allowSubstituteDataAccessToLocal()) {
     // If this document was loaded with substituteData, then the document can
