@@ -115,6 +115,7 @@ class LayoutTestController : public QObject {
   void resetLoadFinished() { m_loadFinished = false; }
   void setWindowIsKey(bool isKey);
   void setMainFrameIsFirstResponder(bool isFirst);
+  void setXSSAuditorEnabled(bool enable);
 
   bool pauseAnimationAtTimeOnElementWithId(const QString& animationName,
                                            double time,

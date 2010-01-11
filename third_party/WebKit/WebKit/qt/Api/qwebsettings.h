@@ -67,7 +67,8 @@ class QWEBKIT_EXPORT QWebSettings {
     LocalStorageDatabaseEnabled = LocalStorageEnabled,
 #endif
     LocalContentCanAccessRemoteUrls,
-    DnsPrefetchEnabled
+    DnsPrefetchEnabled,
+    XSSAuditorEnabled
   };
   enum WebGraphic {
     MissingImageGraphic,
