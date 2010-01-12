@@ -3626,7 +3626,8 @@ void RenderLayer::repaintIncludingNonCompositingDescendants(
 
 bool RenderLayer::shouldBeNormalFlowOnly() const {
   return (renderer()->hasOverflowClip() || renderer()->hasReflection() ||
-          renderer()->hasMask() || renderer()->isVideo()) &&
+          renderer()->hasMask() || renderer()->isVideo() ||
+          renderer()->isEmbeddedObject()) &&
          !renderer()->isPositioned() && !renderer()->isRelPositioned() &&
          !renderer()->hasTransform() && !isTransparent();
 }
@@ -3634,7 +3635,7 @@ bool RenderLayer::shouldBeNormalFlowOnly() const {
 bool RenderLayer::isSelfPaintingLayer() const {
   return !isNormalFlowOnly() || renderer()->hasReflection() ||
          renderer()->hasMask() || renderer()->isTableRow() ||
-         renderer()->isVideo();
+         renderer()->isVideo() || renderer()->isEmbeddedObject();
 }
 
 void RenderLayer::styleChanged(StyleDifference diff, const RenderStyle*) {
