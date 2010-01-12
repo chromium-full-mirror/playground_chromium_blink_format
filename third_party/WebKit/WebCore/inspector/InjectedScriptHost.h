@@ -33,7 +33,9 @@
 #include "Console.h"
 #include "InspectorController.h"
 #include "PlatformString.h"
+#include "ScriptState.h"
 
+#include <wtf/HashMap.h>
 #include <wtf/RefCounted.h>
 
 namespace WebCore {
@@ -53,6 +55,10 @@ class InjectedScriptHost : public RefCounted<InjectedScriptHost> {
   }
 
   ~InjectedScriptHost();
+
+  void setInjectedScriptSource(const String& source) {
+    m_injectedScriptSource = source;
+  }
 
   InspectorController* inspectorController() { return m_inspectorController; }
   void disconnectController() { m_inspectorController = 0; }
@@ -82,12 +88,20 @@ class InjectedScriptHost : public RefCounted<InjectedScriptHost> {
                                          const String& result,
                                          bool isException);
 
+  ScriptObject injectedScriptFor(ScriptState*);
+  ScriptObject injectedScriptForId(long);
+  void discardInjectedScripts();
+
  private:
   InjectedScriptHost(InspectorController* inspectorController);
   InspectorDOMAgent* inspectorDOMAgent();
   InspectorFrontend* inspectorFrontend();
 
   InspectorController* m_inspectorController;
+  String m_injectedScriptSource;
+  long m_nextInjectedScriptId;
+  typedef HashMap<long, ScriptObject> IdToInjectedScriptMap;
+  IdToInjectedScriptMap m_idToInjectedScript;
 };
 
 }  // namespace WebCore
