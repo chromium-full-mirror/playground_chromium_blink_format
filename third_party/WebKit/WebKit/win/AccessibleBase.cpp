@@ -552,6 +552,7 @@ static long MSAARole(AccessibilityRole role) {
     case WebCore::GroupRole:
       return ROLE_SYSTEM_GROUPING;
     case WebCore::ListRole:
+    case WebCore::ListBoxRole:
       return ROLE_SYSTEM_LIST;
     case WebCore::TableRole:
       return ROLE_SYSTEM_TABLE;
@@ -562,6 +563,7 @@ static long MSAARole(AccessibilityRole role) {
     case WebCore::ImageRole:
       return ROLE_SYSTEM_GRAPHIC;
     case WebCore::ListItemRole:
+    case WebCore::ListBoxOptionRole:
       return ROLE_SYSTEM_LISTITEM;
     case WebCore::PopUpButtonRole:
       return ROLE_SYSTEM_COMBOBOX;
