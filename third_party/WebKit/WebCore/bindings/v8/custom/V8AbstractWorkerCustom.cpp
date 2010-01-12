@@ -57,8 +57,7 @@ v8::Handle<v8::Value> V8AbstractWorker::addEventListenerCallback(
     bool useCapture = args[2]->BooleanValue();
     worker->addEventListener(type, listener, useCapture);
 
-    createHiddenDependency(args.Holder(), args[1],
-                           V8Custom::kAbstractWorkerRequestCacheIndex);
+    createHiddenDependency(args.Holder(), args[1], cacheIndex);
   }
   return v8::Undefined();
 }
@@ -76,8 +75,7 @@ v8::Handle<v8::Value> V8AbstractWorker::removeEventListenerCallback(
     bool useCapture = args[2]->BooleanValue();
     worker->removeEventListener(type, listener.get(), useCapture);
 
-    removeHiddenDependency(args.Holder(), args[1],
-                           V8Custom::kAbstractWorkerRequestCacheIndex);
+    removeHiddenDependency(args.Holder(), args[1], cacheIndex);
   }
 
   return v8::Undefined();

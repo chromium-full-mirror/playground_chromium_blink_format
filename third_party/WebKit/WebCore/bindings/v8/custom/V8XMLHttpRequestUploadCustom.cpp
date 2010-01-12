@@ -60,8 +60,7 @@ v8::Handle<v8::Value> V8XMLHttpRequestUpload::addEventListenerCallback(
     bool useCapture = args[2]->BooleanValue();
     xmlHttpRequestUpload->addEventListener(type, listener, useCapture);
 
-    createHiddenDependency(args.Holder(), args[1],
-                           V8Custom::kXMLHttpRequestCacheIndex);
+    createHiddenDependency(args.Holder(), args[1], cacheIndex);
   }
   return v8::Undefined();
 }
@@ -83,8 +82,7 @@ v8::Handle<v8::Value> V8XMLHttpRequestUpload::removeEventListenerCallback(
     bool useCapture = args[2]->BooleanValue();
     xmlHttpRequestUpload->removeEventListener(type, listener.get(), useCapture);
 
-    removeHiddenDependency(args.Holder(), args[1],
-                           V8Custom::kXMLHttpRequestCacheIndex);
+    removeHiddenDependency(args.Holder(), args[1], cacheIndex);
   }
 
   return v8::Undefined();

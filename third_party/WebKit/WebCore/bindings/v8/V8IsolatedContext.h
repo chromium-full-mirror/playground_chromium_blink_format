@@ -33,6 +33,7 @@
 
 #include "IsolatedWorld.h"
 #include "ScriptSourceCode.h"  // for WebCore::ScriptSourceCode
+#include "V8DOMWindow.h"
 #include "V8Index.h"
 #include "V8Proxy.h"
 #include "V8Utilities.h"
@@ -87,7 +88,7 @@ class V8IsolatedContext {
     return reinterpret_cast<V8IsolatedContext*>(
         getGlobalObject(v8::Context::GetEntered())
             ->GetPointerFromInternalField(
-                V8Custom::kDOMWindowEnteredIsolatedWorldIndex));
+                V8DOMWindow::enteredIsolatedWorldIndex));
   }
 
   v8::Handle<v8::Context> context() { return m_context->get(); }

@@ -113,9 +113,8 @@ class V8DOMWrapper {
                             int type,
                             void* cptr) {
     ASSERT(object->InternalFieldCount() >= 2);
-    object->SetPointerInInternalField(V8Custom::kDOMWrapperObjectIndex, cptr);
-    object->SetInternalField(V8Custom::kDOMWrapperTypeIndex,
-                             v8::Integer::New(type));
+    object->SetPointerInInternalField(v8DOMWrapperObjectIndex, cptr);
+    object->SetInternalField(v8DOMWrapperTypeIndex, v8::Integer::New(type));
   }
 
   static v8::Handle<v8::Object> lookupDOMWrapper(
@@ -135,7 +134,7 @@ class V8DOMWrapper {
     ASSERT(maybeDOMWrapper(object));
 #endif
     return reinterpret_cast<C*>(
-        object->GetPointerFromInternalField(V8Custom::kDOMWrapperObjectIndex));
+        object->GetPointerFromInternalField(v8DOMWrapperObjectIndex));
   }
 
   template <class C>

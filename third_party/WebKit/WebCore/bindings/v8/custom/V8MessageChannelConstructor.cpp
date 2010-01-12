@@ -29,13 +29,13 @@
  */
 
 #include "config.h"
-#include "MessageChannel.h"
-
-#include "V8Binding.h"
-#include "V8Proxy.h"
+#include "V8MessageChannel.h"
 
 #include "Document.h"
 #include "Frame.h"
+#include "MessageChannel.h"
+#include "V8Binding.h"
+#include "V8Proxy.h"
 #include "V8Utilities.h"
 #include "WorkerContext.h"
 #include "WorkerContextExecutionProxy.h"
@@ -67,10 +67,10 @@ v8::Handle<v8::Value> V8Custom::v8MessageChannelConstructorCallback(
   // MessagePort wrappers to make sure that the MessagePort wrappers
   // stay alive as long as the MessageChannel wrapper is around.
   messageChannel->SetInternalField(
-      kMessageChannelPort1Index,
+      V8MessageChannel::port1Index,
       V8DOMWrapper::convertToV8Object(V8ClassIndex::MESSAGEPORT, obj->port1()));
   messageChannel->SetInternalField(
-      kMessageChannelPort2Index,
+      V8MessageChannel::port2Index,
       V8DOMWrapper::convertToV8Object(V8ClassIndex::MESSAGEPORT, obj->port2()));
 
   // Setup the standard wrapper object internal fields.

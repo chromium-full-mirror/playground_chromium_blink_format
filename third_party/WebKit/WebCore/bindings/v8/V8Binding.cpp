@@ -125,12 +125,11 @@ class WebCoreStringResource : public v8::String::ExternalStringResource {
 };
 
 void* v8DOMWrapperToNative(v8::Handle<v8::Object> object) {
-  return object->GetPointerFromInternalField(V8Custom::kDOMWrapperObjectIndex);
+  return object->GetPointerFromInternalField(v8DOMWrapperObjectIndex);
 }
 
 void* v8DOMWrapperToNative(const v8::AccessorInfo& info) {
-  return info.Holder()->GetPointerFromInternalField(
-      V8Custom::kDOMWrapperObjectIndex);
+  return info.Holder()->GetPointerFromInternalField(v8DOMWrapperObjectIndex);
 }
 
 String v8ValueToWebCoreString(v8::Handle<v8::Value> value) {

@@ -57,8 +57,7 @@ v8::Handle<v8::Value> V8SVGElementInstance::addEventListenerCallback(
     String type = toWebCoreString(args[0]);
     bool useCapture = args[2]->BooleanValue();
     instance->addEventListener(type, listener, useCapture);
-    createHiddenDependency(args.Holder(), args[1],
-                           V8Custom::kNodeEventListenerCacheIndex);
+    createHiddenDependency(args.Holder(), args[1], cacheIndex);
   }
 
   return v8::Undefined();
@@ -77,8 +76,7 @@ v8::Handle<v8::Value> V8SVGElementInstance::removeEventListenerCallback(
     String type = toWebCoreString(args[0]);
     bool useCapture = args[2]->BooleanValue();
     instance->removeEventListener(type, listener.get(), useCapture);
-    removeHiddenDependency(args.Holder(), args[1],
-                           V8Custom::kNodeEventListenerCacheIndex);
+    removeHiddenDependency(args.Holder(), args[1], cacheIndex);
   }
 
   return v8::Undefined();

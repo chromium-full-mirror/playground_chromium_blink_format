@@ -37,11 +37,8 @@
 #include "HTMLCollection.h"
 #include "HTMLIFrameElement.h"
 #include "HTMLNames.h"
-
 #include "V8Binding.h"
-#include "V8CustomBinding.h"
 #include "V8Proxy.h"
-
 #include <wtf/RefPtr.h>
 #include <wtf/StdLibExtras.h>
 
@@ -59,10 +56,10 @@ v8::Handle<v8::Boolean> V8HTMLDocument::namedPropertyDeleter(
     return deletionNotHandledByInterceptor();
 
   ASSERT(info.Holder()->InternalFieldCount() ==
-         V8Custom::kHTMLDocumentInternalFieldCount);
+         V8HTMLDocument::internalFieldCount);
   v8::Local<v8::Value> marker =
-      info.Holder()->GetInternalField(V8Custom::kHTMLDocumentMarkerIndex);
-  info.Holder()->SetInternalField(V8Custom::kHTMLDocumentShadowIndex, marker);
+      info.Holder()->GetInternalField(V8HTMLDocument::markerIndex);
+  info.Holder()->SetInternalField(V8HTMLDocument::shadowIndex, marker);
   return v8::True();
 }
 
@@ -78,11 +75,11 @@ v8::Handle<v8::Value> V8HTMLDocument::namedPropertyGetter(
   DEFINE_STATIC_LOCAL(const AtomicString, all, ("all"));
   if (key == all) {
     ASSERT(info.Holder()->InternalFieldCount() ==
-           V8Custom::kHTMLDocumentInternalFieldCount);
+           V8HTMLDocument::internalFieldCount);
     v8::Local<v8::Value> marker =
-        info.Holder()->GetInternalField(V8Custom::kHTMLDocumentMarkerIndex);
+        info.Holder()->GetInternalField(V8HTMLDocument::markerIndex);
     v8::Local<v8::Value> value =
-        info.Holder()->GetInternalField(V8Custom::kHTMLDocumentShadowIndex);
+        info.Holder()->GetInternalField(V8HTMLDocument::shadowIndex);
     if (marker != value)
       return value;
   }
@@ -208,8 +205,8 @@ void V8HTMLDocument::allAccessorSetter(v8::Local<v8::String> name,
   INC_STATS("DOM.HTMLDocument.all._set");
   v8::Handle<v8::Object> holder = info.Holder();
   ASSERT(info.Holder()->InternalFieldCount() ==
-         V8Custom::kHTMLDocumentInternalFieldCount);
-  info.Holder()->SetInternalField(V8Custom::kHTMLDocumentShadowIndex, value);
+         V8HTMLDocument::internalFieldCount);
+  info.Holder()->SetInternalField(V8HTMLDocument::shadowIndex, value);
 }
 
 }  // namespace WebCore

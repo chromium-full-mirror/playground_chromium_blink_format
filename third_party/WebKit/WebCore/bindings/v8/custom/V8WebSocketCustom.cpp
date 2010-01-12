@@ -58,8 +58,7 @@ v8::Handle<v8::Value> V8WebSocket::addEventListenerCallback(
     bool useCapture = args[2]->BooleanValue();
     webSocket->addEventListener(type, listener, useCapture);
 
-    createHiddenDependency(args.Holder(), args[1],
-                           V8Custom::kWebSocketCacheIndex);
+    createHiddenDependency(args.Holder(), args[1], cacheIndex);
   }
   return v8::Undefined();
 }
@@ -76,8 +75,7 @@ v8::Handle<v8::Value> V8WebSocket::removeEventListenerCallback(
     String type = toWebCoreString(args[0]);
     bool useCapture = args[2]->BooleanValue();
     webSocket->removeEventListener(type, listener.get(), useCapture);
-    removeHiddenDependency(args.Holder(), args[1],
-                           V8Custom::kWebSocketCacheIndex);
+    removeHiddenDependency(args.Holder(), args[1], cacheIndex);
   }
   return v8::Undefined();
 }

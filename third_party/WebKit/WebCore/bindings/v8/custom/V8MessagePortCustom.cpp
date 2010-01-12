@@ -55,8 +55,7 @@ v8::Handle<v8::Value> V8MessagePort::addEventListenerCallback(
     bool useCapture = args[2]->BooleanValue();
     messagePort->addEventListener(type, listener, useCapture);
 
-    createHiddenDependency(args.Holder(), args[1],
-                           V8Custom::kMessagePortRequestCacheIndex);
+    createHiddenDependency(args.Holder(), args[1], cacheIndex);
   }
   return v8::Undefined();
 }
@@ -73,8 +72,7 @@ v8::Handle<v8::Value> V8MessagePort::removeEventListenerCallback(
     bool useCapture = args[2]->BooleanValue();
     messagePort->removeEventListener(type, listener.get(), useCapture);
 
-    removeHiddenDependency(args.Holder(), args[1],
-                           V8Custom::kMessagePortRequestCacheIndex);
+    removeHiddenDependency(args.Holder(), args[1], cacheIndex);
   }
 
   return v8::Undefined();
