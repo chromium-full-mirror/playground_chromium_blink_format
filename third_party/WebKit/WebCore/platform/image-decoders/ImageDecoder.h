@@ -134,6 +134,11 @@ class RGBA32Buffer {
     setRGBA(getAddr(x, y), r, g, b, a);
   }
 
+#if ENABLE(IMAGE_DECODER_DOWN_SAMPLING)
+  const IntRect& scaledRect() const { return m_scaledRect; }
+  void setScaledRect(const IntRect& r) { m_scaledRect = r; }
+#endif
+
 #if PLATFORM(QT)
   void setDecodedImage(const QImage& image);
   QImage decodedImage() const { return m_image; }
@@ -195,7 +200,10 @@ class RGBA32Buffer {
       m_status;  // Whether or not this frame is completely finished decoding.
   unsigned m_duration;  // The animation delay.
   FrameDisposalMethod m_disposalMethod;
-  // What to do with this frame's data when initializing the next frame.
+// What to do with this frame's data when initializing the next frame.
+#if ENABLE(IMAGE_DECODER_DOWN_SAMPLING)
+  IntRect m_scaledRect;
+#endif
 };
 
 // The ImageDecoder class represents a base class for specific image format
@@ -311,6 +319,10 @@ class ImageDecoder : public Noncopyable {
 
 #if ENABLE(IMAGE_DECODER_DOWN_SAMPLING)
   void setMaxNumPixels(int m) { m_maxNumPixels = m; }
+  IntSize scaledSize() const {
+    return m_scaled ? IntSize(m_scaledColumns.size(), m_scaledRows.size())
+                    : m_size;
+  }
 #endif
 
  protected:
@@ -318,6 +330,8 @@ class ImageDecoder : public Noncopyable {
   void prepareScaleDataIfNecessary();
   int upperBoundScaledX(int origX, int searchStart = 0);
   int lowerBoundScaledX(int origX, int searchStart = 0);
+  int upperBoundScaledY(int origY, int searchStart = 0);
+  int lowerBoundScaledY(int origY, int searchStart = 0);
   int scaledY(int origY, int searchStart = 0);
 #endif
 
