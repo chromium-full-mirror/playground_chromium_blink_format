@@ -34,10 +34,7 @@
 #if PLATFORM(CG)
 typedef struct CGPath PlatformPath;
 #elif PLATFORM(QT)
-#include <qglobal.h>
-QT_BEGIN_NAMESPACE
-class QPainterPath;
-QT_END_NAMESPACE
+#include <qpainterpath.h>
 typedef QPainterPath PlatformPath;
 #elif PLATFORM(WX) && USE(WXGC)
 class wxGraphicsPath;
@@ -59,6 +56,13 @@ class PlatformPath;
 }
 #else
 typedef void PlatformPath;
+#endif
+
+#if PLATFORM(QT)
+/* QPainterPath is valued based */
+typedef PlatformPath PlatformPathPtr;
+#else
+typedef PlatformPath* PlatformPathPtr;
 #endif
 
 namespace WebCore {
@@ -137,7 +141,7 @@ class Path : public FastAllocBase {
 
   String debugString() const;
 
-  PlatformPath* platformPath() const { return m_path; }
+  PlatformPathPtr platformPath() const { return m_path; }
 
   static Path createRoundedRectangle(const FloatRect&,
                                      const FloatSize& roundingRadii);
@@ -155,7 +159,7 @@ class Path : public FastAllocBase {
   void transform(const TransformationMatrix&);
 
  private:
-  PlatformPath* m_path;
+  PlatformPathPtr m_path;
 };
 }
 
