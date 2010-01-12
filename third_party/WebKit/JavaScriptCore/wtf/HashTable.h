@@ -273,7 +273,7 @@ class HashTableConstIterator {
 #if CHECK_HASHTABLE_ITERATORS
   void checkValidity(const const_iterator& other) const {
     ASSERT(m_table);
-    ASSERT(other.m_table);
+    ASSERT_UNUSED(other, other.m_table);
     ASSERT(m_table == other.m_table);
   }
 #else

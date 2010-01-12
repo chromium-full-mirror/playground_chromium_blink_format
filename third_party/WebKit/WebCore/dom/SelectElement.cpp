@@ -1064,7 +1064,7 @@ SelectElementData::SelectElementData()
       m_lastCharTime(0) {}
 
 void SelectElementData::checkListItems(const Element* element) const {
-#ifndef NDEBUG
+#if !ASSERT_DISABLED
   const Vector<Element*>& items = m_listItems;
   SelectElement::recalcListItems(*const_cast<SelectElementData*>(this), element,
                                  false);

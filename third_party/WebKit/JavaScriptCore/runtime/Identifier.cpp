@@ -246,12 +246,14 @@ void Identifier::remove(UString::Rep* r) {
 #ifndef NDEBUG
 
 void Identifier::checkSameIdentifierTable(ExecState* exec, UString::Rep*) {
-  ASSERT(exec->globalData().identifierTable == currentIdentifierTable());
+  ASSERT_UNUSED(exec,
+                exec->globalData().identifierTable == currentIdentifierTable());
 }
 
 void Identifier::checkSameIdentifierTable(JSGlobalData* globalData,
                                           UString::Rep*) {
-  ASSERT(globalData->identifierTable == currentIdentifierTable());
+  ASSERT_UNUSED(globalData,
+                globalData->identifierTable == currentIdentifierTable());
 }
 
 #else
