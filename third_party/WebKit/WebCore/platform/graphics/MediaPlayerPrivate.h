@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009 Apple Inc. All rights reserved.
+ * Copyright (C) 2009, 2010 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -101,6 +101,10 @@ class MediaPlayerPrivateInterface : public Noncopyable {
   }
 
   virtual void setAutobuffer(bool){};
+
+  virtual bool hasAvailableVideoFrame() const {
+    return readyState() >= MediaPlayer::HaveCurrentData;
+  }
 
   virtual bool canLoadPoster() const { return false; }
   virtual void setPoster(const String&) {}

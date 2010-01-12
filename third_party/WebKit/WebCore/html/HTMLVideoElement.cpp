@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007, 2008, 2009 Apple Inc. All rights reserved.
+ * Copyright (C) 2007, 2008, 2009, 2010 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -45,7 +45,7 @@ namespace WebCore {
 using namespace HTMLNames;
 
 HTMLVideoElement::HTMLVideoElement(const QualifiedName& tagName, Document* doc)
-    : HTMLMediaElement(tagName, doc), m_shouldShowPosterImage(false) {
+    : HTMLMediaElement(tagName, doc), m_shouldDisplayPosterImage(false) {
   ASSERT(hasTagName(videoTag));
 }
 
@@ -56,8 +56,6 @@ bool HTMLVideoElement::rendererIsNeeded(RenderStyle* style) {
 #if !ENABLE(PLUGIN_PROXY_FOR_VIDEO)
 RenderObject* HTMLVideoElement::createRenderer(RenderArena* arena,
                                                RenderStyle*) {
-  if (m_shouldShowPosterImage)
-    return new (arena) RenderImage(this);
   return new (arena) RenderVideo(this);
 }
 #endif
@@ -66,11 +64,12 @@ void HTMLVideoElement::attach() {
   HTMLMediaElement::attach();
 
 #if !ENABLE(PLUGIN_PROXY_FOR_VIDEO)
-  if (m_shouldShowPosterImage) {
+  updatePosterImage();
+  if (m_shouldDisplayPosterImage) {
     if (!m_imageLoader)
       m_imageLoader.set(new HTMLImageLoader(this));
     m_imageLoader->updateFromElement();
-    if (renderer() && renderer()->isImage()) {
+    if (renderer()) {
       RenderImage* imageRenderer = toRenderImage(renderer());
       imageRenderer->setCachedImage(m_imageLoader->image());
     }
@@ -81,7 +80,7 @@ void HTMLVideoElement::attach() {
 void HTMLVideoElement::detach() {
   HTMLMediaElement::detach();
 
-  if (!m_shouldShowPosterImage)
+  if (!m_shouldDisplayPosterImage)
     if (m_imageLoader)
       m_imageLoader.clear();
 }
@@ -90,8 +89,9 @@ void HTMLVideoElement::parseMappedAttribute(MappedAttribute* attr) {
   const QualifiedName& attrName = attr->name();
 
   if (attrName == posterAttr) {
+    m_posterURL = document()->completeURL(attr->value());
     updatePosterImage();
-    if (m_shouldShowPosterImage) {
+    if (m_shouldDisplayPosterImage) {
 #if !ENABLE(PLUGIN_PROXY_FOR_VIDEO)
       if (!m_imageLoader)
         m_imageLoader.set(new HTMLImageLoader(this));
@@ -153,10 +153,6 @@ void HTMLVideoElement::setHeight(unsigned value) {
   setAttribute(heightAttr, String::number(value));
 }
 
-KURL HTMLVideoElement::poster() const {
-  return document()->completeURL(getAttribute(posterAttr));
-}
-
 void HTMLVideoElement::setPoster(const String& value) {
   setAttribute(posterAttr, value);
 }
@@ -171,17 +167,14 @@ const QualifiedName& HTMLVideoElement::imageSourceAttributeName() const {
 
 void HTMLVideoElement::updatePosterImage() {
 #if !ENABLE(PLUGIN_PROXY_FOR_VIDEO)
-  bool oldShouldShowPosterImage = m_shouldShowPosterImage;
+  bool oldShouldShowPosterImage = m_shouldDisplayPosterImage;
 #endif
 
-  m_shouldShowPosterImage =
-      !poster().isEmpty() && readyState() < HAVE_CURRENT_DATA;
+  m_shouldDisplayPosterImage = !poster().isEmpty() && !hasAvailableVideoFrame();
 
 #if !ENABLE(PLUGIN_PROXY_FOR_VIDEO)
-  if (attached() && oldShouldShowPosterImage != m_shouldShowPosterImage) {
-    detach();
-    attach();
-  }
+  if (renderer() && oldShouldShowPosterImage != m_shouldDisplayPosterImage)
+    renderer()->updateFromElement();
 #endif
 }
 
@@ -207,6 +200,13 @@ void HTMLVideoElement::paintCurrentFrameInContext(GraphicsContext* context,
 
   player->setVisible(true);  // Make player visible or it won't draw.
   player->paintCurrentFrameInContext(context, destRect);
+}
+
+bool HTMLVideoElement::hasAvailableVideoFrame() const {
+  if (!m_player)
+    return false;
+
+  return m_player->hasAvailableVideoFrame();
 }
 }
 #endif
