@@ -217,21 +217,13 @@ class PrintWebUIDelegate : public IWebUIDelegate {
   virtual HRESULT STDMETHODCALLTYPE ftpDirectoryTemplatePath(IWebView*, BSTR*) {
     return E_NOTIMPL;
   }
-  virtual HRESULT STDMETHODCALLTYPE webViewHeaderHeight(IWebView*, float*) {
-    return E_NOTIMPL;
-  }
-  virtual HRESULT STDMETHODCALLTYPE webViewFooterHeight(IWebView*, float*) {
-    return E_NOTIMPL;
-  }
+  virtual HRESULT STDMETHODCALLTYPE webViewHeaderHeight(IWebView*, float*);
+  virtual HRESULT STDMETHODCALLTYPE webViewFooterHeight(IWebView*, float*);
   virtual HRESULT STDMETHODCALLTYPE drawHeaderInRect(IWebView*,
                                                      RECT*,
-                                                     OLE_HANDLE) {
-    return E_NOTIMPL;
-  }
+                                                     OLE_HANDLE);
   virtual HRESULT STDMETHODCALLTYPE
-  drawFooterInRect(IWebView*, RECT*, OLE_HANDLE, UINT, UINT) {
-    return E_NOTIMPL;
-  }
+  drawFooterInRect(IWebView*, RECT*, OLE_HANDLE, UINT, UINT);
   virtual HRESULT STDMETHODCALLTYPE webViewPrintingMarginRect(IWebView*, RECT*);
   virtual HRESULT STDMETHODCALLTYPE canRunModal(IWebView*, BOOL*) {
     return E_NOTIMPL;
