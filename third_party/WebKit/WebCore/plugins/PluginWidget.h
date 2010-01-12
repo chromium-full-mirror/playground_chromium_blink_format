@@ -45,6 +45,12 @@ class PluginWidget : public Widget {
   virtual bool isPluginWidget() const { return true; }
 };
 
+#if USE(ACCELERATED_COMPOSITING) && !PLATFORM(MAC)
+inline PlatformLayer* PluginWidget::platformLayer() const {
+  return 0;
+}
+#endif
+
 }  // namespace WebCore
 
 #endif  // PluginWidget_h
