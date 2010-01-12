@@ -33,7 +33,6 @@
 #include "JPEGImageDecoder.h"
 #include "PNGImageDecoder.h"
 #include "SharedBuffer.h"
-#include "XBMImageDecoder.h"
 
 using namespace std;
 
@@ -57,15 +56,12 @@ static unsigned copyFromSharedBuffer(char* buffer,
 }
 
 ImageDecoder* ImageDecoder::create(const SharedBuffer& data) {
-  // XBMs require 8 bytes of info.
-  static const unsigned maxMarkerLength = 8;
-
-  char contents[maxMarkerLength];
-  unsigned length = copyFromSharedBuffer(contents, maxMarkerLength, data, 0);
-
   // We need at least 4 bytes to figure out what kind of image we're dealing
   // with.
-  if (length < 4)
+  static const unsigned maxMarkerLength = 4;
+  char contents[maxMarkerLength];
+  unsigned length = copyFromSharedBuffer(contents, maxMarkerLength, data, 0);
+  if (length < maxMarkerLength)
     return 0;
 
   const unsigned char* uContents =
@@ -93,10 +89,6 @@ ImageDecoder* ImageDecoder::create(const SharedBuffer& data) {
   if (!memcmp(contents, "\000\000\001\000", 4) ||
       !memcmp(contents, "\000\000\002\000", 4))
     return new ICOImageDecoder();
-
-  // XBMs require 8 bytes of info.
-  if (length >= 8 && strncmp(contents, "#define ", 8) == 0)
-    return new XBMImageDecoder();
 
   // Give up. We don't know what the heck this is.
   return 0;
