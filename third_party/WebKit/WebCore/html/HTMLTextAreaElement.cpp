@@ -89,7 +89,7 @@ bool HTMLTextAreaElement::saveFormControlState(String& result) const {
 }
 
 void HTMLTextAreaElement::restoreFormControlState(const String& state) {
-  setDefaultValue(state);
+  setValue(state);
 }
 
 void HTMLTextAreaElement::childrenChanged(bool changedByParser,
