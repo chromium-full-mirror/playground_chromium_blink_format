@@ -1837,7 +1837,7 @@ AccessibilityObject* objectAndOffsetUnignored(AccessibilityObject* coreObject,
                                               bool ignoreLinks) {
   Node* endNode =
       static_cast<AccessibilityRenderObject*>(coreObject)->renderer()->node();
-  int endOffset = coreObject->selection().end().offsetInContainerNode();
+  int endOffset = coreObject->selection().end().computeOffsetInContainerNode();
 
   AccessibilityObject* realObject = coreObject;
   if (realObject->accessibilityIsIgnored())
