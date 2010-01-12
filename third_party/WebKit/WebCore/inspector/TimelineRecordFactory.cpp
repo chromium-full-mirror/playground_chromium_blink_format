@@ -194,6 +194,17 @@ ScriptObject TimelineRecordFactory::createPaintRecord(
   return record;
 }
 
+ScriptObject TimelineRecordFactory::createParseHTMLRecord(
+    InspectorFrontend* frontend,
+    double startTime,
+    unsigned length) {
+  ScriptObject record = createGenericRecord(frontend, startTime);
+  ScriptObject data = frontend->newScriptObject();
+  data.set("length", length);
+  record.set("data", data);
+  return record;
+}
+
 }  // namespace WebCore
 
 #endif  // ENABLE(INSPECTOR)

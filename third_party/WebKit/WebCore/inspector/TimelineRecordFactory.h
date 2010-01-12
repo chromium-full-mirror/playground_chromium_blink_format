@@ -96,6 +96,10 @@ class TimelineRecordFactory {
                                         double startTime,
                                         const IntRect&);
 
+  static ScriptObject createParseHTMLRecord(InspectorFrontend*,
+                                            double startTime,
+                                            unsigned length);
+
  private:
   TimelineRecordFactory() {}
 };
