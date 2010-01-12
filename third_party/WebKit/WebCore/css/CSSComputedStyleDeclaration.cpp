@@ -148,7 +148,7 @@ static const int computedProperties[] = {
     CSSPropertyBaselineShift, CSSPropertyDominantBaseline, CSSPropertyKerning,
     CSSPropertyTextAnchor, CSSPropertyWritingMode,
     CSSPropertyGlyphOrientationHorizontal, CSSPropertyGlyphOrientationVertical,
-    CSSPropertyWebkitShadow
+    CSSPropertyWebkitSvgShadow
 #endif
 };
 

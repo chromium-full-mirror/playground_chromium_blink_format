@@ -181,7 +181,7 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getSVGPropertyCSSValue(
 
       return 0;
     }
-    case CSSPropertyWebkitShadow:
+    case CSSPropertyWebkitSvgShadow:
       return valueForShadow(svgStyle->shadow(), propertyID);
     case CSSPropertyMarker:
     case CSSPropertyEnableBackground:
