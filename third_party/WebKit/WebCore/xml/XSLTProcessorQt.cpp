@@ -36,6 +36,7 @@
 #include <wtf/Vector.h>
 
 #include <qabstractmessagehandler.h>
+#include <qabstracturiresolver.h>
 #include <qbuffer.h>
 #include <qsourcelocation.h>
 #include <qxmlquery.h>
@@ -86,6 +87,26 @@ void XSLTMessageHandler::handleMessage(QtMsgType type,
                       sourceLocation.line(), sourceLocation.uri().toString());
 }
 
+class XSLTUriResolver : public QAbstractUriResolver {
+ public:
+  XSLTUriResolver(Document* document);
+  virtual QUrl resolve(const QUrl& relative, const QUrl& baseURI) const;
+
+ private:
+  Document* m_document;
+};
+
+XSLTUriResolver::XSLTUriResolver(Document* document)
+    : QAbstractUriResolver(), m_document(document) {}
+
+QUrl XSLTUriResolver::resolve(const QUrl& relative, const QUrl& baseURI) const {
+  QUrl url = baseURI.resolved(relative);
+
+  if (!m_document->frame() || !m_document->securityOrigin()->canRequest(url))
+    return QUrl();
+  return url;
+}
+
 bool XSLTProcessor::transformToString(Node* sourceNode,
                                       String&,
                                       String& resultString,
@@ -109,6 +130,7 @@ bool XSLTProcessor::transformToString(Node* sourceNode,
   QXmlQuery query(QXmlQuery::XSLT20);
 
   XSLTMessageHandler messageHandler(ownerDocument.get());
+  XSLTUriResolver uriResolver(ownerDocument.get());
   query.setMessageHandler(&messageHandler);
 
   XSLTProcessor::ParameterMap::iterator end = m_parameters.end();
@@ -135,6 +157,9 @@ bool XSLTProcessor::transformToString(Node* sourceNode,
 
   query.setFocus(&inputBuffer);
   query.setQuery(&styleSheetBuffer, QUrl(stylesheet->href()));
+
+  query.setUriResolver(&uriResolver);
+
   success = query.evaluateTo(&outputBuffer);
   outputBuffer.reset();
   resultString = QString::fromUtf8(outputBuffer.readAll()).trimmed();
