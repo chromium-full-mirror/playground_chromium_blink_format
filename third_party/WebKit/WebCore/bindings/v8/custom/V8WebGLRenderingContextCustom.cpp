@@ -379,8 +379,7 @@ v8::Handle<v8::Value> V8WebGLRenderingContext::getProgramParameterCallback(
           args.Holder());
   WebGLProgram* program =
       V8WebGLProgram::HasInstance(args[0])
-          ? v8DOMWrapperTo<WebGLProgram>(V8ClassIndex::WEBGLPROGRAM,
-                                         v8::Handle<v8::Object>::Cast(args[0]))
+          ? V8WebGLProgram::toNative(v8::Handle<v8::Object>::Cast(args[0]))
           : 0;
   bool ok;
   unsigned pname = toInt32(args[1], ok);
@@ -417,8 +416,7 @@ v8::Handle<v8::Value> V8WebGLRenderingContext::getShaderParameterCallback(
           args.Holder());
   WebGLShader* shader =
       V8WebGLShader::HasInstance(args[0])
-          ? v8DOMWrapperTo<WebGLShader>(V8ClassIndex::WEBGLSHADER,
-                                        v8::Handle<v8::Object>::Cast(args[0]))
+          ? V8WebGLShader::toNative(v8::Handle<v8::Object>::Cast(args[0]))
           : 0;
   bool ok;
   unsigned pname = toInt32(args[1], ok);
@@ -455,8 +453,7 @@ v8::Handle<v8::Value> V8WebGLRenderingContext::getUniformCallback(
           args.Holder());
   WebGLProgram* program =
       V8WebGLProgram::HasInstance(args[0])
-          ? v8DOMWrapperTo<WebGLProgram>(V8ClassIndex::WEBGLPROGRAM,
-                                         v8::Handle<v8::Object>::Cast(args[0]))
+          ? V8WebGLProgram::toNative(v8::Handle<v8::Object>::Cast(args[0]))
           : 0;
 
   bool ok = false;
