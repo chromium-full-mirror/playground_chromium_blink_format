@@ -1020,18 +1020,21 @@ void RenderBox::mapLocalToContainer(RenderBoxModelObject* repaintContainer,
     }
   }
 
-  if (style()->position() == FixedPosition)
-    fixed = true;
-
   bool containerSkipped;
   RenderObject* o = container(repaintContainer, &containerSkipped);
   if (!o)
     return;
 
+  bool isFixedPos = style()->position() == FixedPosition;
   bool hasTransform = hasLayer() && layer()->transform();
-  if (hasTransform)
-    fixed = false;  // Elements with transforms act as a containing block for
-                    // fixed position descendants
+  if (hasTransform) {
+    // If this box has a transform, it acts as a fixed position container for
+    // fixed descendants,
+    // and may itself also be fixed position. So propagate 'fixed' up only if
+    // this box is fixed position.
+    fixed &= isFixedPos;
+  } else
+    fixed |= isFixedPos;
 
   IntSize containerOffset = offsetFromContainer(o);
 
@@ -1069,13 +1072,16 @@ void RenderBox::mapAbsoluteToLocalPoint(bool fixed,
   // We don't expect absoluteToLocal() to be called during layout (yet)
   ASSERT(!view() || !view()->layoutStateEnabled());
 
-  if (style()->position() == FixedPosition)
-    fixed = true;
-
+  bool isFixedPos = style()->position() == FixedPosition;
   bool hasTransform = hasLayer() && layer()->transform();
-  if (hasTransform)
-    fixed = false;  // Elements with transforms act as a containing block for
-                    // fixed position descendants
+  if (hasTransform) {
+    // If this box has a transform, it acts as a fixed position container for
+    // fixed descendants,
+    // and may itself also be fixed position. So propagate 'fixed' up only if
+    // this box is fixed position.
+    fixed &= isFixedPos;
+  } else
+    fixed |= isFixedPos;
 
   RenderObject* o = container();
   if (!o)

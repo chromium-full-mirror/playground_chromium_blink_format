@@ -1018,19 +1018,24 @@ void RenderLayer::convertToLayerCoords(const RenderLayer* ancestorLayer,
   if (ancestorLayer == this)
     return;
 
-  if (renderer()->style()->position() == FixedPosition) {
-    // Add in the offset of the view.  We can obtain this by calling
+  EPosition position = renderer()->style()->position();
+    if (position == FixedPosition && (!ancestorLayer || ancestorLayer == renderer()->view()->layer()) {
+    // If the fixed layer's container is the root, just add in the offset of the
+    // view. We can obtain this by calling
     // localToAbsolute() on the RenderView.
     FloatPoint absPos = renderer()->localToAbsolute(FloatPoint(), true);
     xPos += absPos.x();
     yPos += absPos.y();
     return;
-  }
-
-  RenderLayer* parentLayer;
-  if (renderer()->style()->position() == AbsolutePosition) {
+    }
+ 
+    RenderLayer* parentLayer;
+    // For a fixed layer, if we're asking for coords relative to some other ancestor, then it must be
+    // enclosed in a fixed position container (e.g. a transformed element), so it behaves like an absolutely
+    // positioned element.
+    if (position == AbsolutePosition || position == FixedPosition) {
     // Do what enclosingPositionedAncestor() does, but check for ancestorLayer
-    // along the way
+    // along the way.
     parentLayer = parent();
     bool foundAncestorFirst = false;
     while (parentLayer) {
@@ -1065,16 +1070,16 @@ void RenderLayer::convertToLayerCoords(const RenderLayer* ancestorLayer,
       yPos += (thisY - ancestorY);
       return;
     }
-  } else
-    parentLayer = parent();
+    } else
+        parentLayer = parent();
+    
+    if (!parentLayer)
+        return;
+    
+    parentLayer->convertToLayerCoords(ancestorLayer, xPos, yPos);
 
-  if (!parentLayer)
-    return;
-
-  parentLayer->convertToLayerCoords(ancestorLayer, xPos, yPos);
-
-  xPos += x();
-  yPos += y();
+    xPos += x();
+    yPos += y();
 }
 
 static inline int adjustedScrollDelta(int beginningDelta) {
