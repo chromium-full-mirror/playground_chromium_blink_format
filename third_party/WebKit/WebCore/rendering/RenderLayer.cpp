@@ -1019,7 +1019,8 @@ void RenderLayer::convertToLayerCoords(const RenderLayer* ancestorLayer,
     return;
 
   EPosition position = renderer()->style()->position();
-    if (position == FixedPosition && (!ancestorLayer || ancestorLayer == renderer()->view()->layer()) {
+  if (position == FixedPosition &&
+      (!ancestorLayer || ancestorLayer == renderer()->view()->layer())) {
     // If the fixed layer's container is the root, just add in the offset of the
     // view. We can obtain this by calling
     // localToAbsolute() on the RenderView.
@@ -1027,13 +1028,15 @@ void RenderLayer::convertToLayerCoords(const RenderLayer* ancestorLayer,
     xPos += absPos.x();
     yPos += absPos.y();
     return;
-    }
- 
-    RenderLayer* parentLayer;
-    // For a fixed layer, if we're asking for coords relative to some other ancestor, then it must be
-    // enclosed in a fixed position container (e.g. a transformed element), so it behaves like an absolutely
-    // positioned element.
-    if (position == AbsolutePosition || position == FixedPosition) {
+  }
+
+  RenderLayer* parentLayer;
+  // For a fixed layer, if we're asking for coords relative to some other
+  // ancestor, then it must be
+  // enclosed in a fixed position container (e.g. a transformed element), so it
+  // behaves like an absolutely
+  // positioned element.
+  if (position == AbsolutePosition || position == FixedPosition) {
     // Do what enclosingPositionedAncestor() does, but check for ancestorLayer
     // along the way.
     parentLayer = parent();
@@ -1070,16 +1073,16 @@ void RenderLayer::convertToLayerCoords(const RenderLayer* ancestorLayer,
       yPos += (thisY - ancestorY);
       return;
     }
-    } else
-        parentLayer = parent();
-    
-    if (!parentLayer)
-        return;
-    
-    parentLayer->convertToLayerCoords(ancestorLayer, xPos, yPos);
+  } else
+    parentLayer = parent();
 
-    xPos += x();
-    yPos += y();
+  if (!parentLayer)
+    return;
+
+  parentLayer->convertToLayerCoords(ancestorLayer, xPos, yPos);
+
+  xPos += x();
+  yPos += y();
 }
 
 static inline int adjustedScrollDelta(int beginningDelta) {
