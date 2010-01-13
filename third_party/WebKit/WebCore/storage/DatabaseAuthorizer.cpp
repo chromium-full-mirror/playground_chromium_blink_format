@@ -314,8 +314,7 @@ int DatabaseAuthorizer::allowDetach(const String&) {
 }
 
 int DatabaseAuthorizer::allowFunction(const String& functionName) {
-  if (m_securityEnabled &&
-      !m_whitelistedFunctions.contains(functionName.lower()))
+  if (m_securityEnabled && !m_whitelistedFunctions.contains(functionName))
     return SQLAuthDeny;
 
   return SQLAuthAllow;
