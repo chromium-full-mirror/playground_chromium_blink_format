@@ -41,6 +41,9 @@
 #include <SkMatrix.h>
 #elif PLATFORM(WX) && USE(WXGC)
 #include <wx/graphics.h>
+#if OS(WINDOWS)
+#include <windows.h>
+#endif
 #endif
 
 namespace WebCore {
@@ -363,7 +366,8 @@ class TransformationMatrix : public FastAllocBase {
   operator wxGraphicsMatrix() const;
 #endif
 
-#if PLATFORM(WIN) || (PLATFORM(QT) && OS(WINDOWS))
+#if PLATFORM(WIN) || (PLATFORM(QT) && OS(WINDOWS)) || \
+    (PLATFORM(WX) && OS(WINDOWS))
   operator XFORM() const;
 #endif
 
