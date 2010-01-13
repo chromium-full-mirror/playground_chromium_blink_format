@@ -57,6 +57,9 @@ class NetscapePluginHostProxy {
   bool isMenuBarVisible() const { return m_menuBarIsVisible; }
   void setMenuBarVisible(bool);
 
+  bool isFullScreenWindowShowing() const { return m_fullScreenWindowIsShowing; }
+  void setFullScreenWindowIsShowing(bool);
+
   void setModal(bool);
 
   void applicationDidBecomeActive();
@@ -75,7 +78,10 @@ class NetscapePluginHostProxy {
   void beginModal();
   void endModal();
 
-  static void deadNameNotificationCallback(CFMachPortRef port,
+  void didEnterFullScreen() const;
+  void didExitFullScreen() const;
+
+  static void deadNameNotificationCallback(CFMachPortRef,
                                            void* msg,
                                            CFIndex size,
                                            void* info);
@@ -99,6 +105,7 @@ class NetscapePluginHostProxy {
   RetainPtr<WebPlaceholderModalWindow*> m_placeholderWindow;
   unsigned m_isModal;
   bool m_menuBarIsVisible;
+  bool m_fullScreenWindowIsShowing;
   const ProcessSerialNumber m_pluginHostPSN;
 
   unsigned m_processingRequests;
