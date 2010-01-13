@@ -1133,7 +1133,8 @@ int comparePropertyMapEntryIndices(const void* a, const void* b) {
   return 0;
 }
 
-void Structure::getEnumerablePropertyNames(PropertyNameArray& propertyNames) {
+void Structure::getPropertyNames(PropertyNameArray& propertyNames,
+                                 EnumerationMode mode) {
   materializePropertyMapIfNecessary();
   if (!m_propertyTable)
     return;
@@ -1147,7 +1148,8 @@ void Structure::getEnumerablePropertyNames(PropertyNameArray& propertyNames) {
       ASSERT(m_hasNonEnumerableProperties ||
              !(m_propertyTable->entries()[k].attributes & DontEnum));
       if (m_propertyTable->entries()[k].key &&
-          !(m_propertyTable->entries()[k].attributes & DontEnum)) {
+          (!(m_propertyTable->entries()[k].attributes & DontEnum) ||
+           (mode == IncludeDontEnumProperties))) {
         PropertyMapEntry* value = &m_propertyTable->entries()[k];
         int j;
         for (j = i - 1; j >= 0 && a[j]->index > value->index; --j)
@@ -1177,7 +1179,8 @@ void Structure::getEnumerablePropertyNames(PropertyNameArray& propertyNames) {
       m_propertyTable->keyCount + m_propertyTable->deletedSentinelCount;
   for (unsigned i = 1; i <= entryCount; i++) {
     if (m_propertyTable->entries()[i].key &&
-        !(m_propertyTable->entries()[i].attributes & DontEnum))
+        (!(m_propertyTable->entries()[i].attributes & DontEnum) ||
+         (mode == IncludeDontEnumProperties)))
       *p++ = &m_propertyTable->entries()[i];
   }
 

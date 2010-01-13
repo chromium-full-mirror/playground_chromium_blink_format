@@ -179,11 +179,12 @@ bool JSHistory::deleteProperty(ExecState* exec,
 }
 
 void JSHistory::getOwnPropertyNames(ExecState* exec,
-                                    PropertyNameArray& propertyNames) {
+                                    PropertyNameArray& propertyNames,
+                                    EnumerationMode mode) {
   // Only allow the history object to enumerated by frames in the same origin.
   if (!allowsAccessFromFrame(exec, impl()->frame()))
     return;
-  Base::getOwnPropertyNames(exec, propertyNames);
+  Base::getOwnPropertyNames(exec, propertyNames, mode);
 }
 
 JSValue JSHistory::pushState(ExecState* exec, const ArgList& args) {

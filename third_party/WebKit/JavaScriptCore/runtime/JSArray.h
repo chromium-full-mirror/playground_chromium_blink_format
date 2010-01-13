@@ -116,7 +116,10 @@ class JSArray : public JSObject {
                    PutPropertySlot&);
   virtual bool deleteProperty(ExecState*, const Identifier& propertyName);
   virtual bool deleteProperty(ExecState*, unsigned propertyName);
-  virtual void getOwnPropertyNames(ExecState*, PropertyNameArray&);
+  virtual void getOwnPropertyNames(
+      ExecState*,
+      PropertyNameArray&,
+      EnumerationMode mode = ExcludeDontEnumProperties);
   virtual void markChildren(MarkStack&);
 
   void* lazyCreationData();

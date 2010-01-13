@@ -96,11 +96,14 @@ bool StringObject::deleteProperty(ExecState* exec,
 }
 
 void StringObject::getOwnPropertyNames(ExecState* exec,
-                                       PropertyNameArray& propertyNames) {
+                                       PropertyNameArray& propertyNames,
+                                       EnumerationMode mode) {
   int size = internalValue()->length();
   for (int i = 0; i < size; ++i)
     propertyNames.add(Identifier(exec, UString::from(i)));
-  return JSObject::getOwnPropertyNames(exec, propertyNames);
+  if (mode == IncludeDontEnumProperties)
+    propertyNames.add(exec->propertyNames().length);
+  return JSObject::getOwnPropertyNames(exec, propertyNames, mode);
 }
 
 }  // namespace JSC

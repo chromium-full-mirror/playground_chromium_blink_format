@@ -109,10 +109,11 @@ void JSByteArray::put(ExecState* exec, unsigned propertyName, JSValue value) {
 }
 
 void JSByteArray::getOwnPropertyNames(ExecState* exec,
-                                      PropertyNameArray& propertyNames) {
+                                      PropertyNameArray& propertyNames,
+                                      EnumerationMode mode) {
   unsigned length = m_storage->length();
   for (unsigned i = 0; i < length; ++i)
     propertyNames.add(Identifier::from(exec, i));
-  JSObject::getOwnPropertyNames(exec, propertyNames);
+  JSObject::getOwnPropertyNames(exec, propertyNames, mode);
 }
 }

@@ -49,7 +49,10 @@ class StringObject : public JSWrapperObject {
                    JSValue,
                    PutPropertySlot&);
   virtual bool deleteProperty(ExecState*, const Identifier& propertyName);
-  virtual void getOwnPropertyNames(ExecState*, PropertyNameArray&);
+  virtual void getOwnPropertyNames(
+      ExecState*,
+      PropertyNameArray&,
+      EnumerationMode mode = ExcludeDontEnumProperties);
 
   virtual const ClassInfo* classInfo() const { return &info; }
   static const JS_EXPORTDATA ClassInfo info;

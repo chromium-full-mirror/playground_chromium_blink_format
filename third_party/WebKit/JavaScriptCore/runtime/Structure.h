@@ -51,6 +51,8 @@ class MarkStack;
 class PropertyNameArray;
 class PropertyNameArrayData;
 
+enum EnumerationMode { ExcludeDontEnumProperties, IncludeDontEnumProperties };
+
 class Structure : public RefCounted<Structure> {
  public:
   friend class JIT;
@@ -176,7 +178,7 @@ class Structure : public RefCounted<Structure> {
   JSPropertyNameIterator* enumerationCache() {
     return m_enumerationCache.get();
   }
-  void getEnumerablePropertyNames(PropertyNameArray&);
+  void getPropertyNames(PropertyNameArray&, EnumerationMode mode);
 
  private:
   Structure(JSValue prototype, const TypeInfo&);

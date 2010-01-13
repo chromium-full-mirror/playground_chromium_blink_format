@@ -104,6 +104,10 @@ class Arguments : public JSObject {
   virtual bool getOwnPropertyDescriptor(ExecState*,
                                         const Identifier&,
                                         PropertyDescriptor&);
+  virtual void getOwnPropertyNames(
+      ExecState*,
+      PropertyNameArray&,
+      EnumerationMode mode = ExcludeDontEnumProperties);
   virtual void put(ExecState*,
                    const Identifier& propertyName,
                    JSValue,

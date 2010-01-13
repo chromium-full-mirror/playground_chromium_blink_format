@@ -492,19 +492,21 @@ bool JSDOMWindow::deleteProperty(ExecState* exec,
 }
 
 void JSDOMWindow::getPropertyNames(ExecState* exec,
-                                   PropertyNameArray& propertyNames) {
+                                   PropertyNameArray& propertyNames,
+                                   EnumerationMode mode) {
   // Only allow the window to enumerated by frames in the same origin.
   if (!allowsAccessFrom(exec))
     return;
-  Base::getPropertyNames(exec, propertyNames);
+  Base::getPropertyNames(exec, propertyNames, mode);
 }
 
 void JSDOMWindow::getOwnPropertyNames(ExecState* exec,
-                                      PropertyNameArray& propertyNames) {
+                                      PropertyNameArray& propertyNames,
+                                      EnumerationMode mode) {
   // Only allow the window to enumerated by frames in the same origin.
   if (!allowsAccessFrom(exec))
     return;
-  Base::getOwnPropertyNames(exec, propertyNames);
+  Base::getOwnPropertyNames(exec, propertyNames, mode);
 }
 
 void JSDOMWindow::defineGetter(ExecState* exec,

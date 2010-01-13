@@ -88,8 +88,14 @@ class JSDOMWindowShell : public DOMObject {
                                  unsigned attributes);
   virtual bool deleteProperty(JSC::ExecState*,
                               const JSC::Identifier& propertyName);
-  virtual void getPropertyNames(JSC::ExecState*, JSC::PropertyNameArray&);
-  virtual void getOwnPropertyNames(JSC::ExecState*, JSC::PropertyNameArray&);
+  virtual void getPropertyNames(
+      JSC::ExecState*,
+      JSC::PropertyNameArray&,
+      JSC::EnumerationMode mode = JSC::ExcludeDontEnumProperties);
+  virtual void getOwnPropertyNames(
+      JSC::ExecState*,
+      JSC::PropertyNameArray&,
+      JSC::EnumerationMode mode = JSC::ExcludeDontEnumProperties);
   virtual void defineGetter(JSC::ExecState*,
                             const JSC::Identifier& propertyName,
                             JSC::JSObject* getterFunction,

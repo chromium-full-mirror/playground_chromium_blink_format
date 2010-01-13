@@ -35,7 +35,10 @@ class RuntimeArray : public JSObject {
  public:
   RuntimeArray(ExecState*, Bindings::Array*);
 
-  virtual void getOwnPropertyNames(ExecState*, PropertyNameArray&);
+  virtual void getOwnPropertyNames(
+      ExecState*,
+      PropertyNameArray&,
+      EnumerationMode mode = ExcludeDontEnumProperties);
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   virtual bool getOwnPropertySlot(ExecState*, unsigned, PropertySlot&);
   virtual bool getOwnPropertyDescriptor(ExecState*,

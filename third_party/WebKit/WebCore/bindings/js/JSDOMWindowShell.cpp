@@ -123,13 +123,15 @@ bool JSDOMWindowShell::deleteProperty(ExecState* exec,
 }
 
 void JSDOMWindowShell::getPropertyNames(ExecState* exec,
-                                        PropertyNameArray& propertyNames) {
-  m_window->getPropertyNames(exec, propertyNames);
+                                        PropertyNameArray& propertyNames,
+                                        EnumerationMode mode) {
+  m_window->getPropertyNames(exec, propertyNames, mode);
 }
 
 void JSDOMWindowShell::getOwnPropertyNames(ExecState* exec,
-                                           PropertyNameArray& propertyNames) {
-  m_window->getOwnPropertyNames(exec, propertyNames);
+                                           PropertyNameArray& propertyNames,
+                                           EnumerationMode mode) {
+  m_window->getOwnPropertyNames(exec, propertyNames, mode);
 }
 
 void JSDOMWindowShell::defineGetter(ExecState* exec,

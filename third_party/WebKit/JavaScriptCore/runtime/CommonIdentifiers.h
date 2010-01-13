@@ -35,14 +35,15 @@
           macro(defineProperties) macro(enumerable) macro(eval) macro(         \
               exec) macro(fromCharCode) macro(global) macro(get)               \
               macro(getPrototypeOf) macro(getOwnPropertyDescriptor) macro(     \
-                  hasOwnProperty) macro(ignoreCase) macro(index) macro(input)  \
-                  macro(isArray) macro(isPrototypeOf) macro(keys) macro(       \
-                      length) macro(message) macro(multiline) macro(name)      \
-                      macro(now) macro(parse) macro(propertyIsEnumerable)      \
-                          macro(prototype) macro(set) macro(source)            \
-                              macro(test) macro(toExponential) macro(toFixed)  \
-                                  macro(toISOString) macro(toJSON)             \
-                                      macro(toLocaleString) macro(toPrecision) \
+                  getOwnPropertyNames) macro(hasOwnProperty) macro(ignoreCase) \
+                  macro(index) macro(input) macro(isArray) macro(              \
+                      isPrototypeOf) macro(keys) macro(length) macro(message)  \
+                      macro(multiline) macro(name) macro(now) macro(parse)     \
+                          macro(propertyIsEnumerable) macro(prototype)         \
+                              macro(set) macro(source) macro(test)             \
+                                  macro(toExponential) macro(toFixed)          \
+                                      macro(toISOString) macro(toJSON) macro(  \
+                                          toLocaleString) macro(toPrecision)   \
                                           macro(toString) macro(UTC)           \
                                               macro(value) macro(valueOf)      \
                                                   macro(writable)              \
