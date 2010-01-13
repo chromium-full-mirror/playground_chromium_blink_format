@@ -48,6 +48,7 @@ class WebFrame;
 class WebNode;
 class WebNotificationPresenter;
 class WebRange;
+class WebStorageNamespace;
 class WebURL;
 class WebView;
 class WebWidget;
@@ -70,6 +71,9 @@ class WebViewClient : virtual public WebWidgetClient {
   // responsible for rendering the contents of the popup menu.
   virtual WebWidget* createPopupMenu(bool activatable) { return 0; }
   virtual WebWidget* createPopupMenu(const WebPopupMenuInfo&) { return 0; }
+
+  // Create a session storage namespace associated with this WebView.
+  virtual WebStorageNamespace* createSessionStorageNamespace() { return 0; }
 
   // Misc ----------------------------------------------------------------
 

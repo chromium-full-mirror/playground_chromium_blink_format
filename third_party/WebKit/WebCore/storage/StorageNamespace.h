@@ -35,6 +35,7 @@
 
 namespace WebCore {
 
+class Page;
 class SecurityOrigin;
 class StorageArea;
 
@@ -44,7 +45,7 @@ class StorageNamespace : public RefCounted<StorageNamespace> {
  public:
   static PassRefPtr<StorageNamespace> localStorageNamespace(const String& path,
                                                             unsigned quota);
-  static PassRefPtr<StorageNamespace> sessionStorageNamespace();
+  static PassRefPtr<StorageNamespace> sessionStorageNamespace(Page*);
 
   virtual ~StorageNamespace() {}
   virtual PassRefPtr<StorageArea> storageArea(PassRefPtr<SecurityOrigin>) = 0;
