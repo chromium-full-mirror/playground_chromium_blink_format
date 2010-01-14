@@ -27,10 +27,12 @@
 #include "config.h"
 #include "HTMLCanvasElement.h"
 
+#include "CanvasContextAttributes.h"
 #include "CanvasGradient.h"
 #include "CanvasPattern.h"
 #include "CanvasRenderingContext2D.h"
 #if ENABLE(3D_CANVAS)
+#include "WebGLContextAttributes.h"
 #include "WebGLRenderingContext.h"
 #endif
 #include "CanvasStyle.h"
@@ -144,7 +146,9 @@ String HTMLCanvasElement::toDataURL(const String& mimeType, ExceptionCode& ec) {
   return buffer()->toDataURL(mimeType);
 }
 
-CanvasRenderingContext* HTMLCanvasElement::getContext(const String& type) {
+CanvasRenderingContext* HTMLCanvasElement::getContext(
+    const String& type,
+    CanvasContextAttributes* attrs) {
   // A Canvas can either be "2D" or "webgl" but never both. If you request a 2D
   // canvas and the existing
   // context is already 2D, just return that. If the existing context is WebGL,
@@ -175,7 +179,8 @@ CanvasRenderingContext* HTMLCanvasElement::getContext(const String& type) {
       if (m_context && !m_context->is3d())
         return 0;
       if (!m_context) {
-        m_context = WebGLRenderingContext::create(this);
+        m_context = WebGLRenderingContext::create(
+            this, static_cast<WebGLContextAttributes*>(attrs));
         if (m_context) {
           // Need to make sure a RenderLayer and compositing layer get created
           // for the Canvas

@@ -382,7 +382,23 @@ class GraphicsContext3D : public Noncopyable {
     INVALID_FRAMEBUFFER_OPERATION = 0x0506
   };
 
-  static PassOwnPtr<GraphicsContext3D> create();
+  // Context creation attributes.
+  struct Attributes {
+    Attributes()
+        : alpha(true),
+          depth(true),
+          stencil(true),
+          antialias(true),
+          premultipliedAlpha(true) {}
+
+    bool alpha;
+    bool depth;
+    bool stencil;
+    bool antialias;
+    bool premultipliedAlpha;
+  };
+
+  static PassOwnPtr<GraphicsContext3D> create(Attributes attrs);
   virtual ~GraphicsContext3D();
 
 #if PLATFORM(MAC)
@@ -499,6 +515,8 @@ class GraphicsContext3D : public Noncopyable {
   void getBufferParameteriv(unsigned long target,
                             unsigned long pname,
                             int* value);
+
+  Attributes getContextAttributes();
 
   unsigned long getError();
 
@@ -698,11 +716,12 @@ class GraphicsContext3D : public Noncopyable {
   void synthesizeGLError(unsigned long error);
 
  private:
-  GraphicsContext3D();
+  GraphicsContext3D(Attributes attrs);
 
   int m_currentWidth, m_currentHeight;
 
 #if PLATFORM(MAC)
+  Attributes m_attrs;
   Vector<Vector<float>> m_vertexArray;
 
   CGLContextObj m_contextObj;

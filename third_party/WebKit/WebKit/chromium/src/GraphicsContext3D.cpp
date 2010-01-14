@@ -99,7 +99,7 @@ namespace WebCore {
 
 class GraphicsContext3DInternal {
  public:
-  GraphicsContext3DInternal();
+  GraphicsContext3DInternal(GraphicsContext3D::Attributes attrs);
   ~GraphicsContext3DInternal();
 
   bool makeContextCurrent();
@@ -125,6 +125,7 @@ class GraphicsContext3DInternal {
   void disableVertexAttribArray(unsigned long index);
   void enableVertexAttribArray(unsigned long index);
   unsigned long getError();
+  GraphicsContext3D::Attributes getContextAttributes();
   void vertexAttribPointer(unsigned long indx,
                            int size,
                            int type,
@@ -136,6 +137,8 @@ class GraphicsContext3DInternal {
   void synthesizeGLError(unsigned long error);
 
  private:
+  GraphicsContext3D::Attributes m_attrs;
+
   unsigned int m_texture;
   unsigned int m_fbo;
   unsigned int m_depthBuffer;
@@ -359,8 +362,10 @@ GraphicsContext3DInternal::VertexAttribPointerState::VertexAttribPointerState()
       stride(0),
       offset(0) {}
 
-GraphicsContext3DInternal::GraphicsContext3DInternal()
-    : m_texture(0),
+GraphicsContext3DInternal::GraphicsContext3DInternal(
+    GraphicsContext3D::Attributes attrs)
+    : m_attrs(attrs),
+      m_texture(0),
       m_fbo(0),
       m_depthBuffer(0),
       m_boundFBO(0)
@@ -392,6 +397,16 @@ GraphicsContext3DInternal::GraphicsContext3DInternal()
 #error Must port to your platform
 #endif
 {
+  // FIXME: we need to take into account the user's requested
+  // context creation attributes, in particular stencil and
+  // antialias, and determine which could and could not be honored
+  // based on the capabilities of the OpenGL implementation.
+  m_attrs.alpha = true;
+  m_attrs.depth = true;
+  m_attrs.stencil = false;
+  m_attrs.antialias = false;
+  m_attrs.premultipliedAlpha = true;
+
 #if OS(WINDOWS)
   WNDCLASS wc;
   if (!GetClassInfo(GetModuleHandle(0), L"CANVASGL", &wc)) {
@@ -960,6 +975,11 @@ unsigned long GraphicsContext3DInternal::getError() {
   return glGetError();
 }
 
+GraphicsContext3D::Attributes
+GraphicsContext3DInternal::getContextAttributes() {
+  return m_attrs;
+}
+
 void GraphicsContext3DInternal::vertexAttribPointer(unsigned long indx,
                                                     int size,
                                                     int type,
@@ -1098,16 +1118,17 @@ void GraphicsContext3DInternal::synthesizeGLError(unsigned long error) {
     gl##glname(a1, a2, a3, a4, a5, a6, a7, a8);                          \
   }
 
-PassOwnPtr<GraphicsContext3D> GraphicsContext3D::create() {
-  PassOwnPtr<GraphicsContext3D> context = new GraphicsContext3D();
+PassOwnPtr<GraphicsContext3D> GraphicsContext3D::create(
+    GraphicsContext3D::Attributes attrs) {
+  PassOwnPtr<GraphicsContext3D> context = new GraphicsContext3D(attrs);
   // FIXME: add error checking
   return context;
 }
 
-GraphicsContext3D::GraphicsContext3D()
+GraphicsContext3D::GraphicsContext3D(GraphicsContext3D::Attributes attrs)
     : m_currentWidth(0),
       m_currentHeight(0),
-      m_internal(new GraphicsContext3DInternal()) {}
+      m_internal(new GraphicsContext3DInternal(attrs)) {}
 
 GraphicsContext3D::~GraphicsContext3D() {}
 
@@ -1551,6 +1572,10 @@ void GraphicsContext3D::getBufferParameteriv(unsigned long target,
                                              int* value) {
   makeContextCurrent();
   glGetBufferParameteriv(target, pname, value);
+}
+
+GraphicsContext3D::Attributes GraphicsContext3D::getContextAttributes() {
+  return m_internal->getContextAttributes();
 }
 
 unsigned long GraphicsContext3D::getError() {

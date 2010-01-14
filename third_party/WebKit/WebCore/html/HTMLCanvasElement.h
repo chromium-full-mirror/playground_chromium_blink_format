@@ -37,6 +37,7 @@
 
 namespace WebCore {
 
+class CanvasContextAttributes;
 class CanvasRenderingContext;
 class FloatPoint;
 class FloatRect;
@@ -69,7 +70,8 @@ class HTMLCanvasElement : public HTMLElement {
 
   String toDataURL(const String& mimeType, ExceptionCode&);
 
-  CanvasRenderingContext* getContext(const String&);
+  CanvasRenderingContext* getContext(const String&,
+                                     CanvasContextAttributes* attributes = 0);
 
   const IntSize& size() const { return m_size; }
   void setSize(const IntSize& size) {

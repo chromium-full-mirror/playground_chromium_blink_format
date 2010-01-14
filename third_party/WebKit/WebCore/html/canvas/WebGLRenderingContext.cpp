@@ -39,6 +39,7 @@
 #include "RenderLayer.h"
 #include "WebGLActiveInfo.h"
 #include "WebGLBuffer.h"
+#include "WebGLContextAttributes.h"
 #include "WebGLFramebuffer.h"
 #include "WebGLProgram.h"
 #include "WebGLRenderbuffer.h"
@@ -69,8 +70,10 @@ class WebGLStateRestorer {
 };
 
 PassOwnPtr<WebGLRenderingContext> WebGLRenderingContext::create(
-    HTMLCanvasElement* canvas) {
-  OwnPtr<GraphicsContext3D> context(GraphicsContext3D::create());
+    HTMLCanvasElement* canvas,
+    WebGLContextAttributes* attrs) {
+  OwnPtr<GraphicsContext3D> context(
+      GraphicsContext3D::create(attrs->attributes()));
   if (!context)
     return 0;
 
@@ -922,6 +925,13 @@ WebGLGetInfo WebGLRenderingContext::getBufferParameter(unsigned long target,
     return WebGLGetInfo(static_cast<long>(value));
   else
     return WebGLGetInfo(static_cast<unsigned long>(value));
+}
+
+PassRefPtr<WebGLContextAttributes>
+WebGLRenderingContext::getContextAttributes() {
+  // We always need to return a new WebGLContextAttributes object to
+  // prevent the user from mutating any cached version.
+  return WebGLContextAttributes::create(m_context->getContextAttributes());
 }
 
 unsigned long WebGLRenderingContext::getError() {
