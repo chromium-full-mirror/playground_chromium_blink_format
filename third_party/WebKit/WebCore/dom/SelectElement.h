@@ -86,7 +86,6 @@ class SelectElement {
   static void listBoxOnChange(SelectElementData&, Element*);
   static void menuListOnChange(SelectElementData&, Element*);
   static void scrollToSelection(SelectElementData&, Element*);
-  static void recalcStyle(SelectElementData&, Element*);
   static void setRecalcListItems(SelectElementData&, Element*);
   static void recalcListItems(SelectElementData&,
                               const Element*,
@@ -141,6 +140,7 @@ class SelectElement {
                                          Element*,
                                          Event*,
                                          HTMLFormElement*);
+  static void setOptionsChangedOnRenderer(SelectElementData&, Element*);
 };
 
 // HTML/WMLSelectElement hold this struct as member variable
