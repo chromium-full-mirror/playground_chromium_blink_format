@@ -49,18 +49,14 @@ v8::Handle<v8::Value> V8XMLHttpRequest::responseTextAccessorGetter(
     v8::Local<v8::String> name,
     const v8::AccessorInfo& info) {
   INC_STATS("DOM.XMLHttpRequest.responsetext._get");
-  XMLHttpRequest* xmlHttpRequest =
-      V8DOMWrapper::convertToNativeObject<XMLHttpRequest>(
-          V8ClassIndex::XMLHTTPREQUEST, info.Holder());
+  XMLHttpRequest* xmlHttpRequest = V8XMLHttpRequest::toNative(info.Holder());
   return xmlHttpRequest->responseText().v8StringOrNull();
 }
 
 v8::Handle<v8::Value> V8XMLHttpRequest::addEventListenerCallback(
     const v8::Arguments& args) {
   INC_STATS("DOM.XMLHttpRequest.addEventListener()");
-  XMLHttpRequest* xmlHttpRequest =
-      V8DOMWrapper::convertToNativeObject<XMLHttpRequest>(
-          V8ClassIndex::XMLHTTPREQUEST, args.Holder());
+  XMLHttpRequest* xmlHttpRequest = V8XMLHttpRequest::toNative(args.Holder());
 
   RefPtr<EventListener> listener = V8DOMWrapper::getEventListener(
       xmlHttpRequest, args[1], false, ListenerFindOrCreate);
@@ -77,9 +73,7 @@ v8::Handle<v8::Value> V8XMLHttpRequest::addEventListenerCallback(
 v8::Handle<v8::Value> V8XMLHttpRequest::removeEventListenerCallback(
     const v8::Arguments& args) {
   INC_STATS("DOM.XMLHttpRequest.removeEventListener()");
-  XMLHttpRequest* xmlHttpRequest =
-      V8DOMWrapper::convertToNativeObject<XMLHttpRequest>(
-          V8ClassIndex::XMLHTTPREQUEST, args.Holder());
+  XMLHttpRequest* xmlHttpRequest = V8XMLHttpRequest::toNative(args.Holder());
 
   RefPtr<EventListener> listener = V8DOMWrapper::getEventListener(
       xmlHttpRequest, args[1], false, ListenerFindOnly);
@@ -106,9 +100,7 @@ v8::Handle<v8::Value> V8XMLHttpRequest::openCallback(
   if (args.Length() < 2)
     return throwError("Not enough arguments", V8Proxy::SyntaxError);
 
-  XMLHttpRequest* xmlHttpRequest =
-      V8DOMWrapper::convertToNativeObject<XMLHttpRequest>(
-          V8ClassIndex::XMLHTTPREQUEST, args.Holder());
+  XMLHttpRequest* xmlHttpRequest = V8XMLHttpRequest::toNative(args.Holder());
 
   String method = toWebCoreString(args[0]);
   String urlstring = toWebCoreString(args[1]);
@@ -147,9 +139,7 @@ static bool IsDocumentType(v8::Handle<v8::Value> value) {
 v8::Handle<v8::Value> V8XMLHttpRequest::sendCallback(
     const v8::Arguments& args) {
   INC_STATS("DOM.XMLHttpRequest.send()");
-  XMLHttpRequest* xmlHttpRequest =
-      V8DOMWrapper::convertToNativeObject<XMLHttpRequest>(
-          V8ClassIndex::XMLHTTPREQUEST, args.Holder());
+  XMLHttpRequest* xmlHttpRequest = V8XMLHttpRequest::toNative(args.Holder());
 
   ExceptionCode ec = 0;
   if (args.Length() < 1)
@@ -158,13 +148,12 @@ v8::Handle<v8::Value> V8XMLHttpRequest::sendCallback(
     v8::Handle<v8::Value> arg = args[0];
     if (IsDocumentType(arg)) {
       v8::Handle<v8::Object> object = v8::Handle<v8::Object>::Cast(arg);
-      Document* document =
-          V8DOMWrapper::convertDOMWrapperToNode<Document>(object);
+      Document* document = V8Document::toNative(object);
       ASSERT(document);
       xmlHttpRequest->send(document, ec);
     } else if (V8File::HasInstance(arg)) {
       v8::Handle<v8::Object> object = v8::Handle<v8::Object>::Cast(arg);
-      File* file = V8DOMWrapper::convertDOMWrapperToNative<File>(object);
+      File* file = V8File::toNative(object);
       ASSERT(file);
       xmlHttpRequest->send(file, ec);
     } else
@@ -183,9 +172,7 @@ v8::Handle<v8::Value> V8XMLHttpRequest::setRequestHeaderCallback(
   if (args.Length() < 2)
     return throwError("Not enough arguments", V8Proxy::SyntaxError);
 
-  XMLHttpRequest* xmlHttpRequest =
-      V8DOMWrapper::convertToNativeObject<XMLHttpRequest>(
-          V8ClassIndex::XMLHTTPREQUEST, args.Holder());
+  XMLHttpRequest* xmlHttpRequest = V8XMLHttpRequest::toNative(args.Holder());
   ExceptionCode ec = 0;
   String header = toWebCoreString(args[0]);
   String value = toWebCoreString(args[1]);
@@ -201,9 +188,7 @@ v8::Handle<v8::Value> V8XMLHttpRequest::getResponseHeaderCallback(
   if (args.Length() < 1)
     return throwError("Not enough arguments", V8Proxy::SyntaxError);
 
-  XMLHttpRequest* xmlHttpRequest =
-      V8DOMWrapper::convertToNativeObject<XMLHttpRequest>(
-          V8ClassIndex::XMLHTTPREQUEST, args.Holder());
+  XMLHttpRequest* xmlHttpRequest = V8XMLHttpRequest::toNative(args.Holder());
   ExceptionCode ec = 0;
   String header = toWebCoreString(args[0]);
   String result = xmlHttpRequest->getResponseHeader(header, ec);
@@ -218,9 +203,7 @@ v8::Handle<v8::Value> V8XMLHttpRequest::overrideMimeTypeCallback(
   if (args.Length() < 1)
     return throwError("Not enough arguments", V8Proxy::SyntaxError);
 
-  XMLHttpRequest* xmlHttpRequest =
-      V8DOMWrapper::convertToNativeObject<XMLHttpRequest>(
-          V8ClassIndex::XMLHTTPREQUEST, args.Holder());
+  XMLHttpRequest* xmlHttpRequest = V8XMLHttpRequest::toNative(args.Holder());
   String value = toWebCoreString(args[0]);
   xmlHttpRequest->overrideMimeType(value);
   return v8::Undefined();

@@ -44,8 +44,7 @@ v8::Handle<v8::Value> V8HTMLInputElement::selectionStartAccessorGetter(
     const v8::AccessorInfo& info) {
   INC_STATS("DOM.HTMLInputElement.selectionStart._get");
   v8::Handle<v8::Object> holder = info.Holder();
-  HTMLInputElement* imp =
-      V8DOMWrapper::convertDOMWrapperToNode<HTMLInputElement>(holder);
+  HTMLInputElement* imp = V8HTMLInputElement::toNative(holder);
 
   if (!imp->canHaveSelection())
     return throwError(
@@ -62,8 +61,7 @@ void V8HTMLInputElement::selectionStartAccessorSetter(
     const v8::AccessorInfo& info) {
   INC_STATS("DOM.HTMLInputElement.selectionStart._set");
   v8::Handle<v8::Object> holder = info.Holder();
-  HTMLInputElement* imp =
-      V8DOMWrapper::convertDOMWrapperToNode<HTMLInputElement>(holder);
+  HTMLInputElement* imp = V8HTMLInputElement::toNative(holder);
 
   if (!imp->canHaveSelection()) {
     throwError(
@@ -79,8 +77,7 @@ v8::Handle<v8::Value> V8HTMLInputElement::selectionEndAccessorGetter(
     const v8::AccessorInfo& info) {
   INC_STATS("DOM.HTMLInputElement.selectionEnd._get");
   v8::Handle<v8::Object> holder = info.Holder();
-  HTMLInputElement* imp =
-      V8DOMWrapper::convertDOMWrapperToNode<HTMLInputElement>(holder);
+  HTMLInputElement* imp = V8HTMLInputElement::toNative(holder);
 
   if (!imp->canHaveSelection())
     return throwError(
@@ -97,8 +94,7 @@ void V8HTMLInputElement::selectionEndAccessorSetter(
     const v8::AccessorInfo& info) {
   INC_STATS("DOM.HTMLInputElement.selectionEnd._set");
   v8::Handle<v8::Object> holder = info.Holder();
-  HTMLInputElement* imp =
-      V8DOMWrapper::convertDOMWrapperToNode<HTMLInputElement>(holder);
+  HTMLInputElement* imp = V8HTMLInputElement::toNative(holder);
 
   if (!imp->canHaveSelection()) {
     throwError(
@@ -114,8 +110,7 @@ v8::Handle<v8::Value> V8HTMLInputElement::setSelectionRangeCallback(
     const v8::Arguments& args) {
   INC_STATS("DOM.HTMLInputElement.setSelectionRange");
   v8::Handle<v8::Object> holder = args.Holder();
-  HTMLInputElement* imp =
-      V8DOMWrapper::convertDOMWrapperToNode<HTMLInputElement>(holder);
+  HTMLInputElement* imp = V8HTMLInputElement::toNative(holder);
 
   if (!imp->canHaveSelection())
     return throwError(

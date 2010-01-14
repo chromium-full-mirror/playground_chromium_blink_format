@@ -54,14 +54,12 @@ namespace WebCore {
 v8::Handle<v8::Value> V8Document::evaluateCallback(const v8::Arguments& args) {
   INC_STATS("DOM.Document.evaluate()");
 
-  RefPtr<Document> document =
-      V8DOMWrapper::convertDOMWrapperToNode<Document>(args.Holder());
+  RefPtr<Document> document = V8Document::toNative(args.Holder());
   ExceptionCode ec = 0;
   String expression = toWebCoreString(args[0]);
   RefPtr<Node> contextNode;
   if (V8Node::HasInstance(args[1]))
-    contextNode = V8DOMWrapper::convertDOMWrapperToNode<Node>(
-        v8::Handle<v8::Object>::Cast(args[1]));
+    contextNode = V8Node::toNative(v8::Handle<v8::Object>::Cast(args[1]));
 
   RefPtr<XPathNSResolver> resolver = V8DOMWrapper::getXPathNSResolver(
       args[2], V8Proxy::retrieve(V8Proxy::retrieveFrameForCallingContext()));
@@ -71,8 +69,7 @@ v8::Handle<v8::Value> V8Document::evaluateCallback(const v8::Arguments& args) {
   int type = toInt32(args[3]);
   RefPtr<XPathResult> inResult;
   if (V8XPathResult::HasInstance(args[4]))
-    inResult = V8DOMWrapper::convertToNativeObject<XPathResult>(
-        V8ClassIndex::XPATHRESULT, v8::Handle<v8::Object>::Cast(args[4]));
+    inResult = V8XPathResult::toNative(v8::Handle<v8::Object>::Cast(args[4]));
 
   v8::TryCatch exceptionCatcher;
   RefPtr<XPathResult> result = document->evaluate(
@@ -91,7 +88,7 @@ v8::Handle<v8::Value> V8Document::getCSSCanvasContextCallback(
     const v8::Arguments& args) {
   INC_STATS("DOM.Document.getCSSCanvasContext");
   v8::Handle<v8::Object> holder = args.Holder();
-  Document* imp = V8DOMWrapper::convertDOMWrapperToNode<Document>(holder);
+  Document* imp = V8Document::toNative(holder);
   String contextId = toWebCoreString(args[0]);
   String name = toWebCoreString(args[1]);
   int width = toInt32(args[2]);
@@ -132,8 +129,7 @@ v8::Handle<v8::Value> V8Document::implementationAccessorGetter(
     return implementation;
 
   // Generate a wrapper.
-  Document* document =
-      V8DOMWrapper::convertDOMWrapperToNative<Document>(info.Holder());
+  Document* document = V8Document::toNative(info.Holder());
   v8::Handle<v8::Value> wrapper =
       V8DOMWrapper::convertDOMImplementationToV8Object(
           document->implementation());

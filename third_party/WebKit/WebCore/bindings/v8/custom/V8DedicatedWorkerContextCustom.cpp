@@ -46,8 +46,7 @@ v8::Handle<v8::Value> V8DedicatedWorkerContext::postMessageCallback(
     const v8::Arguments& args) {
   INC_STATS(L"DOM.DedicatedWorkerContext.postMessage");
   DedicatedWorkerContext* workerContext =
-      V8DOMWrapper::convertToNativeObject<DedicatedWorkerContext>(
-          V8ClassIndex::DEDICATEDWORKERCONTEXT, args.Holder());
+      V8DedicatedWorkerContext::toNative(args.Holder());
   RefPtr<SerializedScriptValue> message =
       SerializedScriptValue::create(v8ValueToWebCoreString(args[0]));
   MessagePortArray portArray;

@@ -47,9 +47,7 @@ namespace WebCore {
 v8::Handle<v8::Value> V8HTMLOptionsCollection::removeCallback(
     const v8::Arguments& args) {
   INC_STATS("DOM.HTMLOptionsCollection.remove()");
-  HTMLOptionsCollection* imp =
-      V8DOMWrapper::convertToNativeObject<HTMLOptionsCollection>(
-          V8ClassIndex::HTMLOPTIONSCOLLECTION, args.Holder());
+  HTMLOptionsCollection* imp = V8HTMLOptionsCollection::toNative(args.Holder());
   HTMLSelectElement* base = static_cast<HTMLSelectElement*>(imp->base());
   return removeElement(base, args);
 }
@@ -61,12 +59,9 @@ v8::Handle<v8::Value> V8HTMLOptionsCollection::addCallback(
     V8Proxy::setDOMException(TYPE_MISMATCH_ERR);
     return v8::Undefined();
   }
-  HTMLOptionsCollection* imp =
-      V8DOMWrapper::convertToNativeObject<HTMLOptionsCollection>(
-          V8ClassIndex::HTMLOPTIONSCOLLECTION, args.Holder());
-  HTMLOptionElement* option =
-      V8DOMWrapper::convertDOMWrapperToNode<HTMLOptionElement>(
-          v8::Handle<v8::Object>(v8::Handle<v8::Object>::Cast(args[0])));
+  HTMLOptionsCollection* imp = V8HTMLOptionsCollection::toNative(args.Holder());
+  HTMLOptionElement* option = V8HTMLOptionElement::toNative(
+      v8::Handle<v8::Object>(v8::Handle<v8::Object>::Cast(args[0])));
 
   ExceptionCode ec = 0;
   if (args.Length() < 2)
@@ -95,9 +90,7 @@ v8::Handle<v8::Value> V8HTMLOptionsCollection::lengthAccessorGetter(
     v8::Local<v8::String> name,
     const v8::AccessorInfo& info) {
   INC_STATS("DOM.HTMLOptionsCollection.length._get");
-  HTMLOptionsCollection* imp =
-      V8DOMWrapper::convertToNativeObject<HTMLOptionsCollection>(
-          V8ClassIndex::HTMLOPTIONSCOLLECTION, info.Holder());
+  HTMLOptionsCollection* imp = V8HTMLOptionsCollection::toNative(info.Holder());
   int v = imp->length();
   return v8::Integer::New(v);
 }
@@ -107,9 +100,7 @@ void V8HTMLOptionsCollection::lengthAccessorSetter(
     v8::Local<v8::Value> value,
     const v8::AccessorInfo& info) {
   INC_STATS("DOM.HTMLOptionsCollection.length._set");
-  HTMLOptionsCollection* imp =
-      V8DOMWrapper::convertToNativeObject<HTMLOptionsCollection>(
-          V8ClassIndex::HTMLOPTIONSCOLLECTION, info.Holder());
+  HTMLOptionsCollection* imp = V8HTMLOptionsCollection::toNative(info.Holder());
   double v = value->NumberValue();
   unsigned newLength = 0;
   ExceptionCode ec = 0;
@@ -132,8 +123,7 @@ v8::Handle<v8::Value> V8HTMLOptionsCollection::indexedPropertyGetter(
     const v8::AccessorInfo& info) {
   INC_STATS("DOM.HTMLOptionsCollection.IndexedPropertyGetter");
   HTMLOptionsCollection* collection =
-      V8DOMWrapper::convertToNativeObject<HTMLOptionsCollection>(
-          V8ClassIndex::HTMLOPTIONSCOLLECTION, info.Holder());
+      V8HTMLOptionsCollection::toNative(info.Holder());
 
   RefPtr<Node> result = collection->item(index);
   if (!result)
@@ -148,8 +138,7 @@ v8::Handle<v8::Value> V8HTMLOptionsCollection::indexedPropertySetter(
     const v8::AccessorInfo& info) {
   INC_STATS("DOM.HTMLOptionsCollection.IndexedPropertySetter");
   HTMLOptionsCollection* collection =
-      V8DOMWrapper::convertToNativeObject<HTMLOptionsCollection>(
-          V8ClassIndex::HTMLOPTIONSCOLLECTION, info.Holder());
+      V8HTMLOptionsCollection::toNative(info.Holder());
   HTMLSelectElement* base = static_cast<HTMLSelectElement*>(collection->base());
   return toOptionsCollectionSetter(index, value, base);
 }

@@ -41,7 +41,10 @@
 
 #include "V8Binding.h"
 #include "V8CustomBinding.h"
+#include "V8Database.h"
+#include "V8Node.h"
 #include "V8Proxy.h"
+#include "V8Storage.h"
 
 namespace WebCore {
 
@@ -127,9 +130,7 @@ v8::Handle<v8::Value> V8InjectedScriptHost::inspectedWindowCallback(
     const v8::Arguments& args) {
   INC_STATS("InjectedScriptHost.inspectedWindow()");
 
-  InjectedScriptHost* host =
-      V8DOMWrapper::convertToNativeObject<InjectedScriptHost>(
-          V8ClassIndex::INJECTEDSCRIPTHOST, args.Holder());
+  InjectedScriptHost* host = V8InjectedScriptHost::toNative(args.Holder());
   InspectorController* ic = host->inspectorController();
   if (!ic)
     return v8::Undefined();
@@ -149,9 +150,7 @@ v8::Handle<v8::Value> V8InjectedScriptHost::nodeForIdCallback(
   if (args.Length() < 1)
     return v8::Undefined();
 
-  InjectedScriptHost* host =
-      V8DOMWrapper::convertToNativeObject<InjectedScriptHost>(
-          V8ClassIndex::INJECTEDSCRIPTHOST, args.Holder());
+  InjectedScriptHost* host = V8InjectedScriptHost::toNative(args.Holder());
 
   Node* node = host->nodeForId(args[0]->ToInt32()->Value());
   if (!node)
@@ -170,9 +169,7 @@ v8::Handle<v8::Value> V8InjectedScriptHost::wrapObjectCallback(
   if (args.Length() < 2)
     return v8::Undefined();
 
-  InjectedScriptHost* host =
-      V8DOMWrapper::convertToNativeObject<InjectedScriptHost>(
-          V8ClassIndex::INJECTEDSCRIPTHOST, args.Holder());
+  InjectedScriptHost* host = V8InjectedScriptHost::toNative(args.Holder());
   return host
       ->wrapObject(ScriptValue(args[0]), toWebCoreStringWithNullCheck(args[1]))
       .v8Value();
@@ -184,9 +181,7 @@ v8::Handle<v8::Value> V8InjectedScriptHost::unwrapObjectCallback(
   if (args.Length() < 1)
     return v8::Undefined();
 
-  InjectedScriptHost* host =
-      V8DOMWrapper::convertToNativeObject<InjectedScriptHost>(
-          V8ClassIndex::INJECTEDSCRIPTHOST, args.Holder());
+  InjectedScriptHost* host = V8InjectedScriptHost::toNative(args.Holder());
   return host->unwrapObject(toWebCoreStringWithNullCheck(args[0])).v8Value();
 }
 
@@ -196,11 +191,8 @@ v8::Handle<v8::Value> V8InjectedScriptHost::pushNodePathToFrontendCallback(
   if (args.Length() < 3)
     return v8::Undefined();
 
-  InjectedScriptHost* host =
-      V8DOMWrapper::convertToNativeObject<InjectedScriptHost>(
-          V8ClassIndex::INJECTEDSCRIPTHOST, args.Holder());
-  Node* node = V8DOMWrapper::convertDOMWrapperToNode<Node>(
-      v8::Handle<v8::Object>::Cast(args[0]));
+  InjectedScriptHost* host = V8InjectedScriptHost::toNative(args.Holder());
+  Node* node = V8Node::toNative(v8::Handle<v8::Object>::Cast(args[0]));
   bool withChildren = args[1]->ToBoolean()->Value();
   bool selectInUI = args[2]->ToBoolean()->Value();
   if (node)
@@ -217,9 +209,7 @@ v8::Handle<v8::Value> V8InjectedScriptHost::databaseForIdCallback(
   if (args.Length() < 1)
     return v8::Undefined();
 
-  InjectedScriptHost* host =
-      V8DOMWrapper::convertToNativeObject<InjectedScriptHost>(
-          V8ClassIndex::INJECTEDSCRIPTHOST, args.Holder());
+  InjectedScriptHost* host = V8InjectedScriptHost::toNative(args.Holder());
   Database* database = host->databaseForId(args[0]->ToInt32()->Value());
   if (!database)
     return v8::Undefined();
@@ -233,11 +223,9 @@ v8::Handle<v8::Value> V8InjectedScriptHost::selectDatabaseCallback(
   if (args.Length() < 1)
     return v8::Undefined();
 
-  InjectedScriptHost* host =
-      V8DOMWrapper::convertToNativeObject<InjectedScriptHost>(
-          V8ClassIndex::INJECTEDSCRIPTHOST, args.Holder());
-  Database* database = V8DOMWrapper::convertToNativeObject<Database>(
-      V8ClassIndex::DATABASE, v8::Handle<v8::Object>::Cast(args[0]));
+  InjectedScriptHost* host = V8InjectedScriptHost::toNative(args.Holder());
+  Database* database =
+      V8Database::toNative(v8::Handle<v8::Object>::Cast(args[0]));
   if (database)
     host->selectDatabase(database);
 
@@ -252,11 +240,8 @@ v8::Handle<v8::Value> V8InjectedScriptHost::selectDOMStorageCallback(
   if (args.Length() < 1)
     return v8::Undefined();
 
-  InjectedScriptHost* host =
-      V8DOMWrapper::convertToNativeObject<InjectedScriptHost>(
-          V8ClassIndex::INJECTEDSCRIPTHOST, args.Holder());
-  Storage* storage = V8DOMWrapper::convertToNativeObject<Storage>(
-      V8ClassIndex::STORAGE, v8::Handle<v8::Object>::Cast(args[0]));
+  InjectedScriptHost* host = V8InjectedScriptHost::toNative(args.Holder());
+  Storage* storage = V8Storage::toNative(v8::Handle<v8::Object>::Cast(args[0]));
   if (storage)
     host->selectDOMStorage(storage);
 

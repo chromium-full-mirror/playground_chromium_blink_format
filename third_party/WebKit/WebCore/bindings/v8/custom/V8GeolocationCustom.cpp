@@ -197,8 +197,7 @@ v8::Handle<v8::Value> V8Geolocation::getCurrentPositionCallback(
     return v8::Undefined();
   ASSERT(positionOptions);
 
-  Geolocation* geolocation = V8DOMWrapper::convertToNativeObject<Geolocation>(
-      V8ClassIndex::GEOLOCATION, args.Holder());
+  Geolocation* geolocation = V8Geolocation::toNative(args.Holder());
   geolocation->getCurrentPosition(positionCallback.release(),
                                   positionErrorCallback.release(),
                                   positionOptions.release());
@@ -228,8 +227,7 @@ v8::Handle<v8::Value> V8Geolocation::watchPositionCallback(
     return v8::Undefined();
   ASSERT(positionOptions);
 
-  Geolocation* geolocation = V8DOMWrapper::convertToNativeObject<Geolocation>(
-      V8ClassIndex::GEOLOCATION, args.Holder());
+  Geolocation* geolocation = V8Geolocation::toNative(args.Holder());
   int watchId = geolocation->watchPosition(positionCallback.release(),
                                            positionErrorCallback.release(),
                                            positionOptions.release());

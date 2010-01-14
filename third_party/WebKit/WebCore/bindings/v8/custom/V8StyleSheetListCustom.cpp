@@ -48,8 +48,7 @@ v8::Handle<v8::Value> V8StyleSheetList::namedPropertyGetter(
     return notHandledByInterceptor();
 
   // Search style sheet.
-  StyleSheetList* imp = V8DOMWrapper::convertToNativeObject<StyleSheetList>(
-      V8ClassIndex::STYLESHEETLIST, info.Holder());
+  StyleSheetList* imp = V8StyleSheetList::toNative(info.Holder());
   HTMLStyleElement* item = imp->getNamedItem(toWebCoreString(name));
   if (!item)
     return notHandledByInterceptor();

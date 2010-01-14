@@ -44,14 +44,14 @@ namespace WebCore {
 void V8Event::valueAccessorSetter(v8::Local<v8::String> name,
                                   v8::Local<v8::Value> value,
                                   const v8::AccessorInfo& info) {
-  Event* event = V8DOMWrapper::convertDOMWrapperToNative<Event>(info.Holder());
+  Event* event = V8Event::toNative(info.Holder());
   event->setDefaultPrevented(!value->BooleanValue());
 }
 
 v8::Handle<v8::Value> V8Event::dataTransferAccessorGetter(
     v8::Local<v8::String> name,
     const v8::AccessorInfo& info) {
-  Event* event = V8DOMWrapper::convertDOMWrapperToNative<Event>(info.Holder());
+  Event* event = V8Event::toNative(info.Holder());
 
   if (event->isDragEvent())
     return V8DOMWrapper::convertToV8Object(
@@ -63,7 +63,7 @@ v8::Handle<v8::Value> V8Event::dataTransferAccessorGetter(
 v8::Handle<v8::Value> V8Event::clipboardDataAccessorGetter(
     v8::Local<v8::String> name,
     const v8::AccessorInfo& info) {
-  Event* event = V8DOMWrapper::convertDOMWrapperToNative<Event>(info.Holder());
+  Event* event = V8Event::toNative(info.Holder());
 
   if (event->isClipboardEvent())
     return V8DOMWrapper::convertToV8Object(

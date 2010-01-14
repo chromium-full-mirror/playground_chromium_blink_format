@@ -48,8 +48,7 @@ namespace WebCore {
 v8::Handle<v8::Value> V8WebSocket::addEventListenerCallback(
     const v8::Arguments& args) {
   INC_STATS("DOM.WebSocket.addEventListener()");
-  WebSocket* webSocket = V8DOMWrapper::convertToNativeObject<WebSocket>(
-      V8ClassIndex::WEBSOCKET, args.Holder());
+  WebSocket* webSocket = V8WebSocket::toNative(args.Holder());
 
   RefPtr<EventListener> listener = V8DOMWrapper::getEventListener(
       webSocket, args[1], false, ListenerFindOrCreate);
@@ -66,8 +65,7 @@ v8::Handle<v8::Value> V8WebSocket::addEventListenerCallback(
 v8::Handle<v8::Value> V8WebSocket::removeEventListenerCallback(
     const v8::Arguments& args) {
   INC_STATS("DOM.WebSocket.removeEventListener()");
-  WebSocket* webSocket = V8DOMWrapper::convertToNativeObject<WebSocket>(
-      V8ClassIndex::WEBSOCKET, args.Holder());
+  WebSocket* webSocket = V8WebSocket::toNative(args.Holder());
 
   RefPtr<EventListener> listener = V8DOMWrapper::getEventListener(
       webSocket, args[1], false, ListenerFindOnly);
@@ -135,8 +133,7 @@ v8::Handle<v8::Value> V8Custom::v8WebSocketConstructorCallback(
 
 v8::Handle<v8::Value> V8WebSocket::sendCallback(const v8::Arguments& args) {
   INC_STATS("DOM.WebSocket.send()");
-  WebSocket* webSocket = V8DOMWrapper::convertToNativeObject<WebSocket>(
-      V8ClassIndex::WEBSOCKET, args.Holder());
+  WebSocket* webSocket = V8WebSocket::toNative(args.Holder());
 
   ExceptionCode ec = 0;
   bool ret = false;

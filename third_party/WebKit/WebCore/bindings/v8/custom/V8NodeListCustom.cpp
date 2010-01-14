@@ -46,8 +46,7 @@ v8::Handle<v8::Value> V8NodeList::namedPropertyGetter(
     v8::Local<v8::String> name,
     const v8::AccessorInfo& info) {
   INC_STATS("DOM.NodeList.NamedPropertyGetter");
-  NodeList* list = V8DOMWrapper::convertToNativeObject<NodeList>(
-      V8ClassIndex::NODELIST, info.Holder());
+  NodeList* list = V8NodeList::toNative(info.Holder());
   String key = toWebCoreString(name);
 
   // Length property cannot be overridden.
@@ -69,8 +68,7 @@ v8::Handle<v8::Value> V8NodeList::callAsFunctionCallback(
   if (args.Length() < 1)
     return v8::Undefined();
 
-  NodeList* list = V8DOMWrapper::convertToNativeObject<NodeList>(
-      V8ClassIndex::NODELIST, args.Holder());
+  NodeList* list = V8NodeList::toNative(args.Holder());
 
   // The first argument must be a number.
   v8::Local<v8::Uint32> index = args[0]->ToArrayIndex();

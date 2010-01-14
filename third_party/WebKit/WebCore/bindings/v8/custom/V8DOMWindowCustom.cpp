@@ -103,8 +103,7 @@ v8::Handle<v8::Value> WindowSetTimeoutImpl(const v8::Arguments& args,
   if (argumentCount >= 2)
     timeout = args[1]->Int32Value();
 
-  DOMWindow* imp = V8DOMWrapper::convertToNativeObject<DOMWindow>(
-      V8ClassIndex::DOMWINDOW, args.Holder());
+  DOMWindow* imp = V8DOMWindow::toNative(args.Holder());
 
   if (!V8BindingSecurity::canAccessFrame(V8BindingState::Only(), imp->frame(),
                                          true))
@@ -182,9 +181,7 @@ v8::Handle<v8::Value> V8DOMWindow::eventAccessorGetter(
   if (holder.IsEmpty())
     return v8::Undefined();
 
-  Frame* frame = V8DOMWrapper::convertToNativeObject<DOMWindow>(
-                     V8ClassIndex::DOMWINDOW, holder)
-                     ->frame();
+  Frame* frame = V8DOMWindow::toNative(holder)->frame();
   if (!V8BindingSecurity::canAccessFrame(V8BindingState::Only(), frame, true))
     return v8::Undefined();
 
@@ -208,9 +205,7 @@ void V8DOMWindow::eventAccessorSetter(v8::Local<v8::String> name,
   if (holder.IsEmpty())
     return;
 
-  Frame* frame = V8DOMWrapper::convertToNativeObject<DOMWindow>(
-                     V8ClassIndex::DOMWINDOW, holder)
-                     ->frame();
+  Frame* frame = V8DOMWindow::toNative(holder)->frame();
   if (!V8BindingSecurity::canAccessFrame(V8BindingState::Only(), frame, true))
     return;
 
@@ -232,16 +227,14 @@ v8::Handle<v8::Value> V8DOMWindow::cryptoAccessorGetter(
 void V8DOMWindow::locationAccessorSetter(v8::Local<v8::String> name,
                                          v8::Local<v8::Value> value,
                                          const v8::AccessorInfo& info) {
-  DOMWindow* imp = V8DOMWrapper::convertToNativeObject<DOMWindow>(
-      V8ClassIndex::DOMWINDOW, info.Holder());
+  DOMWindow* imp = V8DOMWindow::toNative(info.Holder());
   V8DOMWindowShell::setLocation(imp, toWebCoreString(value));
 }
 
 void V8DOMWindow::openerAccessorSetter(v8::Local<v8::String> name,
                                        v8::Local<v8::Value> value,
                                        const v8::AccessorInfo& info) {
-  DOMWindow* imp = V8DOMWrapper::convertToNativeObject<DOMWindow>(
-      V8ClassIndex::DOMWINDOW, info.Holder());
+  DOMWindow* imp = V8DOMWindow::toNative(info.Holder());
 
   if (!V8BindingSecurity::canAccessFrame(V8BindingState::Only(), imp->frame(),
                                          true))
@@ -269,8 +262,7 @@ void V8DOMWindow::openerAccessorSetter(v8::Local<v8::String> name,
 v8::Handle<v8::Value> V8DOMWindow::AudioAccessorGetter(
     v8::Local<v8::String> name,
     const v8::AccessorInfo& info) {
-  DOMWindow* window = V8DOMWrapper::convertToNativeObject<DOMWindow>(
-      V8ClassIndex::DOMWINDOW, info.Holder());
+  DOMWindow* window = V8DOMWindow::toNative(info.Holder());
   return V8DOMWrapper::getConstructor(V8ClassIndex::AUDIO, window);
 }
 
@@ -339,16 +331,14 @@ bool V8DOMWindow::ApplicationCacheEnabled() {
 v8::Handle<v8::Value> V8DOMWindow::ImageAccessorGetter(
     v8::Local<v8::String> name,
     const v8::AccessorInfo& info) {
-  DOMWindow* window = V8DOMWrapper::convertToNativeObject<DOMWindow>(
-      V8ClassIndex::DOMWINDOW, info.Holder());
+  DOMWindow* window = V8DOMWindow::toNative(info.Holder());
   return V8DOMWrapper::getConstructor(V8ClassIndex::IMAGE, window);
 }
 
 v8::Handle<v8::Value> V8DOMWindow::OptionAccessorGetter(
     v8::Local<v8::String> name,
     const v8::AccessorInfo& info) {
-  DOMWindow* window = V8DOMWrapper::convertToNativeObject<DOMWindow>(
-      V8ClassIndex::DOMWINDOW, info.Holder());
+  DOMWindow* window = V8DOMWindow::toNative(info.Holder());
   return V8DOMWrapper::getConstructor(V8ClassIndex::OPTION, window);
 }
 
@@ -359,8 +349,7 @@ v8::Handle<v8::Value> V8DOMWindow::addEventListenerCallback(
   String eventType = toWebCoreString(args[0]);
   bool useCapture = args[2]->BooleanValue();
 
-  DOMWindow* imp = V8DOMWrapper::convertToNativeObject<DOMWindow>(
-      V8ClassIndex::DOMWINDOW, args.Holder());
+  DOMWindow* imp = V8DOMWindow::toNative(args.Holder());
 
   if (!V8BindingSecurity::canAccessFrame(V8BindingState::Only(), imp->frame(),
                                          true))
@@ -394,8 +383,7 @@ v8::Handle<v8::Value> V8DOMWindow::removeEventListenerCallback(
   String eventType = toWebCoreString(args[0]);
   bool useCapture = args[2]->BooleanValue();
 
-  DOMWindow* imp = V8DOMWrapper::convertToNativeObject<DOMWindow>(
-      V8ClassIndex::DOMWINDOW, args.Holder());
+  DOMWindow* imp = V8DOMWindow::toNative(args.Holder());
 
   if (!V8BindingSecurity::canAccessFrame(V8BindingState::Only(), imp->frame(),
                                          true))
@@ -424,8 +412,7 @@ v8::Handle<v8::Value> V8DOMWindow::removeEventListenerCallback(
 v8::Handle<v8::Value> V8DOMWindow::postMessageCallback(
     const v8::Arguments& args) {
   INC_STATS("DOM.DOMWindow.postMessage()");
-  DOMWindow* window = V8DOMWrapper::convertToNativeObject<DOMWindow>(
-      V8ClassIndex::DOMWINDOW, args.Holder());
+  DOMWindow* window = V8DOMWindow::toNative(args.Holder());
 
   DOMWindow* source = V8Proxy::retrieveFrameForCallingContext()->domWindow();
   ASSERT(source->frame());
@@ -463,8 +450,7 @@ v8::Handle<v8::Value> V8DOMWindow::atobCallback(const v8::Arguments& args) {
     return v8String("");
   String str = toWebCoreString(args[0]);
 
-  DOMWindow* imp = V8DOMWrapper::convertToNativeObject<DOMWindow>(
-      V8ClassIndex::DOMWINDOW, args.Holder());
+  DOMWindow* imp = V8DOMWindow::toNative(args.Holder());
 
   if (!V8BindingSecurity::canAccessFrame(V8BindingState::Only(), imp->frame(),
                                          true))
@@ -483,8 +469,7 @@ v8::Handle<v8::Value> V8DOMWindow::btoaCallback(const v8::Arguments& args) {
     return v8String("");
   String str = toWebCoreString(args[0]);
 
-  DOMWindow* imp = V8DOMWrapper::convertToNativeObject<DOMWindow>(
-      V8ClassIndex::DOMWINDOW, args.Holder());
+  DOMWindow* imp = V8DOMWindow::toNative(args.Holder());
 
   if (!V8BindingSecurity::canAccessFrame(V8BindingState::Only(), imp->frame(),
                                          true))
@@ -577,8 +562,7 @@ v8::Handle<v8::Value> V8DOMWindow::showModalDialogCallback(
   v8::Local<v8::Value> dialogArgs = args[1];
   String featureArgs = toWebCoreStringWithNullOrUndefinedCheck(args[2]);
 
-  DOMWindow* window = V8DOMWrapper::convertToNativeObject<DOMWindow>(
-      V8ClassIndex::DOMWINDOW, args.Holder());
+  DOMWindow* window = V8DOMWindow::toNative(args.Holder());
   Frame* frame = window->frame();
 
   if (!V8BindingSecurity::canAccessFrame(V8BindingState::Only(), frame, true))
@@ -679,8 +663,7 @@ v8::Handle<v8::Value> V8DOMWindow::openCallback(const v8::Arguments& args) {
                                ? "_blank"
                                : AtomicString(toWebCoreString(args[1]));
 
-  DOMWindow* parent = V8DOMWrapper::convertToNativeObject<DOMWindow>(
-      V8ClassIndex::DOMWINDOW, args.Holder());
+  DOMWindow* parent = V8DOMWindow::toNative(args.Holder());
   Frame* frame = parent->frame();
 
   if (!V8BindingSecurity::canAccessFrame(V8BindingState::Only(), frame, true))
@@ -810,8 +793,7 @@ v8::Handle<v8::Value> V8DOMWindow::indexedPropertyGetter(
     const v8::AccessorInfo& info) {
   INC_STATS("DOM.DOMWindow.IndexedPropertyGetter");
 
-  DOMWindow* window = V8DOMWrapper::convertToNativeObject<DOMWindow>(
-      V8ClassIndex::DOMWINDOW, info.Holder());
+  DOMWindow* window = V8DOMWindow::toNative(info.Holder());
   if (!window)
     return notHandledByInterceptor();
 
@@ -832,10 +814,7 @@ v8::Handle<v8::Value> V8DOMWindow::namedPropertyGetter(
     const v8::AccessorInfo& info) {
   INC_STATS("DOM.DOMWindow.NamedPropertyGetter");
 
-  // TODO(antonm): investigate what convertToNativeObject does for the case of
-  // DOMWINDOW.
-  DOMWindow* window = V8DOMWrapper::convertToNativeObject<DOMWindow>(
-      V8ClassIndex::DOMWINDOW, info.Holder());
+  DOMWindow* window = V8DOMWindow::toNative(info.Holder());
   if (!window)
     return notHandledByInterceptor();
 
@@ -891,8 +870,7 @@ void ClearTimeoutImpl(const v8::Arguments& args) {
   int handle = toInt32(args[0]);
 
   v8::Handle<v8::Object> holder = args.Holder();
-  DOMWindow* imp = V8DOMWrapper::convertToNativeObject<DOMWindow>(
-      V8ClassIndex::DOMWINDOW, holder);
+  DOMWindow* imp = V8DOMWindow::toNative(holder);
   if (!V8BindingSecurity::canAccessFrame(V8BindingState::Only(), imp->frame(),
                                          true))
     return;
@@ -927,8 +905,7 @@ bool V8DOMWindow::namedSecurityCheck(v8::Local<v8::Object> host,
   if (window.IsEmpty())
     return false;  // the frame is gone.
 
-  DOMWindow* targetWindow = V8DOMWrapper::convertToNativeObject<DOMWindow>(
-      V8ClassIndex::DOMWINDOW, window);
+  DOMWindow* targetWindow = V8DOMWindow::toNative(window);
 
   ASSERT(targetWindow);
 
@@ -959,8 +936,7 @@ bool V8DOMWindow::indexedSecurityCheck(v8::Local<v8::Object> host,
   if (window.IsEmpty())
     return false;
 
-  DOMWindow* targetWindow = V8DOMWrapper::convertToNativeObject<DOMWindow>(
-      V8ClassIndex::DOMWINDOW, window);
+  DOMWindow* targetWindow = V8DOMWindow::toNative(window);
 
   ASSERT(targetWindow);
 

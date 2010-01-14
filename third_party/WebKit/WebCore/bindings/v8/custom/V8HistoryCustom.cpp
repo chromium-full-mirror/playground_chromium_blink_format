@@ -57,8 +57,7 @@ v8::Handle<v8::Value> V8History::pushStateCallback(const v8::Arguments& args) {
   }
 
   ExceptionCode ec = 0;
-  History* history = V8DOMWrapper::convertToNativeObject<History>(
-      V8ClassIndex::HISTORY, args.Holder());
+  History* history = V8History::toNative(args.Holder());
   history->stateObjectAdded(historyState.release(), title, url,
                             History::StateObjectPush, ec);
   return throwError(ec);
@@ -81,8 +80,7 @@ v8::Handle<v8::Value> V8History::replaceStateCallback(
   }
 
   ExceptionCode ec = 0;
-  History* history = V8DOMWrapper::convertToNativeObject<History>(
-      V8ClassIndex::HISTORY, args.Holder());
+  History* history = V8History::toNative(args.Holder());
   history->stateObjectAdded(historyState.release(), title, url,
                             History::StateObjectReplace, ec);
   return throwError(ec);
@@ -94,8 +92,7 @@ bool V8History::indexedSecurityCheck(v8::Local<v8::Object> host,
                                      v8::Local<v8::Value> data) {
   ASSERT(V8ClassIndex::FromInt(data->Int32Value()) == V8ClassIndex::HISTORY);
   // Only allow same origin access.
-  History* history =
-      V8DOMWrapper::convertToNativeObject<History>(V8ClassIndex::HISTORY, host);
+  History* history = V8History::toNative(host);
   return V8BindingSecurity::canAccessFrame(V8BindingState::Only(),
                                            history->frame(), false);
 }
@@ -106,8 +103,7 @@ bool V8History::namedSecurityCheck(v8::Local<v8::Object> host,
                                    v8::Local<v8::Value> data) {
   ASSERT(V8ClassIndex::FromInt(data->Int32Value()) == V8ClassIndex::HISTORY);
   // Only allow same origin access.
-  History* history =
-      V8DOMWrapper::convertToNativeObject<History>(V8ClassIndex::HISTORY, host);
+  History* history = V8History::toNative(host);
   return V8BindingSecurity::canAccessFrame(V8BindingState::Only(),
                                            history->frame(), false);
 }

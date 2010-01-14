@@ -54,8 +54,7 @@ v8::Handle<v8::Value> V8Database::changeVersionCallback(
   if (!(args[0]->IsString() && args[1]->IsString()))
     return throwError("The old and new versions must be strings.");
 
-  Database* database = V8DOMWrapper::convertToNativeObject<Database>(
-      V8ClassIndex::DATABASE, args.Holder());
+  Database* database = V8Database::toNative(args.Holder());
 
   Frame* frame = V8Proxy::retrieveFrameForCurrentContext();
   if (!frame)
@@ -103,8 +102,7 @@ static v8::Handle<v8::Value> createTransaction(const v8::Arguments& args,
   if (!args[0]->IsObject())
     return throwError("Transaction callback must be of valid type.");
 
-  Database* database = V8DOMWrapper::convertToNativeObject<Database>(
-      V8ClassIndex::DATABASE, args.Holder());
+  Database* database = V8Database::toNative(args.Holder());
 
   Frame* frame = V8Proxy::retrieveFrameForCurrentContext();
   if (!frame)

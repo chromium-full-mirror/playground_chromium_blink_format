@@ -47,8 +47,7 @@ v8::Handle<v8::Value> V8PopStateEvent::initPopStateEventCallback(
   RefPtr<SerializedScriptValue> stateArg =
       SerializedScriptValue::create(v8ValueToWebCoreString(args[3]));
 
-  PopStateEvent* event = V8DOMWrapper::convertToNativeObject<PopStateEvent>(
-      V8ClassIndex::POPSTATEEVENT, args.Holder());
+  PopStateEvent* event = V8PopStateEvent::toNative(args.Holder());
   event->initPopStateEvent(typeArg, canBubbleArg, cancelableArg,
                            stateArg.release());
 
@@ -60,8 +59,7 @@ v8::Handle<v8::Value> V8PopStateEvent::stateAccessorGetter(
     const v8::AccessorInfo& info) {
   INC_STATS("DOM.PopStateEvent.state");
 
-  PopStateEvent* event = V8DOMWrapper::convertToNativeObject<PopStateEvent>(
-      V8ClassIndex::POPSTATEEVENT, info.Holder());
+  PopStateEvent* event = V8PopStateEvent::toNative(info.Holder());
   SerializedScriptValue* state = event->state();
   if (!state)
     return v8::Null();

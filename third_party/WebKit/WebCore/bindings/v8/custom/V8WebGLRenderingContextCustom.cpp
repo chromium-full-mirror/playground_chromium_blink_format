@@ -115,8 +115,7 @@ v8::Handle<v8::Value> V8WebGLRenderingContext::bufferDataCallback(
   }
 
   WebGLRenderingContext* context =
-      V8DOMWrapper::convertDOMWrapperToNative<WebGLRenderingContext>(
-          args.Holder());
+      V8WebGLRenderingContext::toNative(args.Holder());
   bool ok;
   int target = toInt32(args[0], ok);
   if (!ok) {
@@ -133,8 +132,7 @@ v8::Handle<v8::Value> V8WebGLRenderingContext::bufferDataCallback(
     ExceptionCode exceptionCode;
     context->bufferData(target, size, usage, exceptionCode);
   } else if (V8WebGLArray::HasInstance(args[1])) {
-    WebGLArray* array = V8DOMWrapper::convertToNativeObject<WebGLArray>(
-        V8ClassIndex::WEBGLARRAY, args[1]->ToObject());
+    WebGLArray* array = V8WebGLArray::toNative(args[1]->ToObject());
     ExceptionCode exceptionCode;
     context->bufferData(target, array, usage, exceptionCode);
   } else {
@@ -156,8 +154,7 @@ v8::Handle<v8::Value> V8WebGLRenderingContext::bufferSubDataCallback(
   }
 
   WebGLRenderingContext* context =
-      V8DOMWrapper::convertDOMWrapperToNative<WebGLRenderingContext>(
-          args.Holder());
+      V8WebGLRenderingContext::toNative(args.Holder());
   bool ok;
   int target = toInt32(args[0], ok);
   if (!ok) {
@@ -173,8 +170,7 @@ v8::Handle<v8::Value> V8WebGLRenderingContext::bufferSubDataCallback(
     V8Proxy::setDOMException(SYNTAX_ERR);
     return notHandledByInterceptor();
   }
-  WebGLArray* array = V8DOMWrapper::convertToNativeObject<WebGLArray>(
-      V8ClassIndex::WEBGLARRAY, args[2]->ToObject());
+  WebGLArray* array = V8WebGLArray::toNative(args[2]->ToObject());
   ExceptionCode exceptionCode;
   context->bufferSubData(target, offset, array, exceptionCode);
   return v8::Undefined();
@@ -239,8 +235,7 @@ static v8::Handle<v8::Value> getObjectParameter(const v8::Arguments& args,
 
   ExceptionCode ec = 0;
   WebGLRenderingContext* context =
-      V8DOMWrapper::convertDOMWrapperToNative<WebGLRenderingContext>(
-          args.Holder());
+      V8WebGLRenderingContext::toNative(args.Holder());
   bool ok;
   unsigned target = toInt32(args[0], ok);
   if (!ok) {
@@ -283,8 +278,7 @@ static WebGLUniformLocation* toWebGLUniformLocation(v8::Handle<v8::Value> value,
   ok = false;
   WebGLUniformLocation* location = 0;
   if (V8WebGLUniformLocation::HasInstance(value)) {
-    location = V8DOMWrapper::convertToNativeObject<WebGLUniformLocation>(
-        V8ClassIndex::WEBGLUNIFORMLOCATION, value->ToObject());
+    location = V8WebGLUniformLocation::toNative(value->ToObject());
     ok = true;
   }
   return location;
@@ -310,8 +304,7 @@ V8WebGLRenderingContext::getFramebufferAttachmentParameterCallback(
 
   ExceptionCode ec = 0;
   WebGLRenderingContext* context =
-      V8DOMWrapper::convertDOMWrapperToNative<WebGLRenderingContext>(
-          args.Holder());
+      V8WebGLRenderingContext::toNative(args.Holder());
   bool ok;
   unsigned target = toInt32(args[0], ok);
   if (!ok) {
@@ -348,8 +341,7 @@ v8::Handle<v8::Value> V8WebGLRenderingContext::getParameterCallback(
 
   ExceptionCode ec = 0;
   WebGLRenderingContext* context =
-      V8DOMWrapper::convertDOMWrapperToNative<WebGLRenderingContext>(
-          args.Holder());
+      V8WebGLRenderingContext::toNative(args.Holder());
   bool ok;
   unsigned pname = toInt32(args[0], ok);
   if (!ok) {
@@ -375,8 +367,7 @@ v8::Handle<v8::Value> V8WebGLRenderingContext::getProgramParameterCallback(
 
   ExceptionCode ec = 0;
   WebGLRenderingContext* context =
-      V8DOMWrapper::convertDOMWrapperToNative<WebGLRenderingContext>(
-          args.Holder());
+      V8WebGLRenderingContext::toNative(args.Holder());
   WebGLProgram* program =
       V8WebGLProgram::HasInstance(args[0])
           ? V8WebGLProgram::toNative(v8::Handle<v8::Object>::Cast(args[0]))
@@ -412,8 +403,7 @@ v8::Handle<v8::Value> V8WebGLRenderingContext::getShaderParameterCallback(
 
   ExceptionCode ec = 0;
   WebGLRenderingContext* context =
-      V8DOMWrapper::convertDOMWrapperToNative<WebGLRenderingContext>(
-          args.Holder());
+      V8WebGLRenderingContext::toNative(args.Holder());
   WebGLShader* shader =
       V8WebGLShader::HasInstance(args[0])
           ? V8WebGLShader::toNative(v8::Handle<v8::Object>::Cast(args[0]))
@@ -449,8 +439,7 @@ v8::Handle<v8::Value> V8WebGLRenderingContext::getUniformCallback(
 
   ExceptionCode ec = 0;
   WebGLRenderingContext* context =
-      V8DOMWrapper::convertDOMWrapperToNative<WebGLRenderingContext>(
-          args.Holder());
+      V8WebGLRenderingContext::toNative(args.Holder());
   WebGLProgram* program =
       V8WebGLProgram::HasInstance(args[0])
           ? V8WebGLProgram::toNative(v8::Handle<v8::Object>::Cast(args[0]))
@@ -508,8 +497,7 @@ v8::Handle<v8::Value> V8WebGLRenderingContext::texImage2DCallback(
   }
 
   WebGLRenderingContext* context =
-      V8DOMWrapper::convertDOMWrapperToNative<WebGLRenderingContext>(
-          args.Holder());
+      V8WebGLRenderingContext::toNative(args.Holder());
   bool ok;
   int target = toInt32(args[0], ok);
   if (!ok) {
@@ -534,24 +522,20 @@ v8::Handle<v8::Value> V8WebGLRenderingContext::texImage2DCallback(
     v8::Handle<v8::Value> arg = args[2];
     if (V8HTMLImageElement::HasInstance(arg)) {
       HTMLImageElement* element =
-          V8DOMWrapper::convertDOMWrapperToNode<HTMLImageElement>(
-              v8::Handle<v8::Object>::Cast(arg));
+          V8HTMLImageElement::toNative(v8::Handle<v8::Object>::Cast(arg));
       context->texImage2D(target, level, element, flipY, premultiplyAlpha, ec);
     } else if (V8HTMLCanvasElement::HasInstance(arg)) {
       HTMLCanvasElement* element =
-          V8DOMWrapper::convertDOMWrapperToNode<HTMLCanvasElement>(
-              v8::Handle<v8::Object>::Cast(arg));
+          V8HTMLCanvasElement::toNative(v8::Handle<v8::Object>::Cast(arg));
       context->texImage2D(target, level, element, flipY, premultiplyAlpha, ec);
     } else if (V8ImageData::HasInstance(arg)) {
-      ImageData* image_element =
-          V8DOMWrapper::convertDOMWrapperToNative<ImageData>(
-              v8::Handle<v8::Object>::Cast(arg));
-      context->texImage2D(target, level, image_element, flipY, premultiplyAlpha,
+      ImageData* imageElement =
+          V8ImageData::toNative(v8::Handle<v8::Object>::Cast(arg));
+      context->texImage2D(target, level, imageElement, flipY, premultiplyAlpha,
                           ec);
     } else if (V8HTMLVideoElement::HasInstance(arg)) {
       HTMLVideoElement* element =
-          V8DOMWrapper::convertDOMWrapperToNode<HTMLVideoElement>(
-              v8::Handle<v8::Object>::Cast(arg));
+          V8HTMLVideoElement::toNative(v8::Handle<v8::Object>::Cast(arg));
       context->texImage2D(target, level, element, flipY, premultiplyAlpha, ec);
     } else {
       // FIXME: consider different / better exception type.
@@ -596,8 +580,7 @@ v8::Handle<v8::Value> V8WebGLRenderingContext::texImage2DCallback(
       context->texImage2D(target, level, internalformat, width, height, border,
                           format, type, 0, ec);
     else if (V8WebGLArray::HasInstance(arg)) {
-      WebGLArray* array = V8DOMWrapper::convertToNativeObject<WebGLArray>(
-          V8ClassIndex::WEBGLARRAY, arg->ToObject());
+      WebGLArray* array = V8WebGLArray::toNative(arg->ToObject());
       context->texImage2D(target, level, internalformat, width, height, border,
                           format, type, array, ec);
       // Fall through
@@ -651,8 +634,7 @@ v8::Handle<v8::Value> V8WebGLRenderingContext::texSubImage2DCallback(
   }
 
   WebGLRenderingContext* context =
-      V8DOMWrapper::convertDOMWrapperToNative<WebGLRenderingContext>(
-          args.Holder());
+      V8WebGLRenderingContext::toNative(args.Holder());
   bool ok;
   int target = toInt32(args[0], ok);
   if (!ok) {
@@ -687,26 +669,22 @@ v8::Handle<v8::Value> V8WebGLRenderingContext::texSubImage2DCallback(
     v8::Handle<v8::Value> arg = args[4];
     if (V8HTMLImageElement::HasInstance(arg)) {
       HTMLImageElement* element =
-          V8DOMWrapper::convertDOMWrapperToNode<HTMLImageElement>(
-              v8::Handle<v8::Object>::Cast(arg));
+          V8HTMLImageElement::toNative(v8::Handle<v8::Object>::Cast(arg));
       context->texSubImage2D(target, level, xoff, yoff, element, flipY,
                              premultiplyAlpha, ec);
     } else if (V8HTMLCanvasElement::HasInstance(arg)) {
       HTMLCanvasElement* element =
-          V8DOMWrapper::convertDOMWrapperToNode<HTMLCanvasElement>(
-              v8::Handle<v8::Object>::Cast(arg));
+          V8HTMLCanvasElement::toNative(v8::Handle<v8::Object>::Cast(arg));
       context->texSubImage2D(target, level, xoff, yoff, element, flipY,
                              premultiplyAlpha, ec);
     } else if (V8ImageData::HasInstance(arg)) {
-      ImageData* image_element =
-          V8DOMWrapper::convertDOMWrapperToNative<ImageData>(
-              v8::Handle<v8::Object>::Cast(arg));
-      context->texSubImage2D(target, level, xoff, yoff, image_element, flipY,
+      ImageData* imageElement =
+          V8ImageData::toNative(v8::Handle<v8::Object>::Cast(arg));
+      context->texSubImage2D(target, level, xoff, yoff, imageElement, flipY,
                              premultiplyAlpha, ec);
     } else if (V8HTMLVideoElement::HasInstance(arg)) {
       HTMLVideoElement* element =
-          V8DOMWrapper::convertDOMWrapperToNode<HTMLVideoElement>(
-              v8::Handle<v8::Object>::Cast(arg));
+          V8HTMLVideoElement::toNative(v8::Handle<v8::Object>::Cast(arg));
       context->texSubImage2D(target, level, xoff, yoff, element, flipY,
                              premultiplyAlpha, ec);
     } else {
@@ -742,8 +720,7 @@ v8::Handle<v8::Value> V8WebGLRenderingContext::texSubImage2DCallback(
       context->texSubImage2D(target, level, xoff, yoff, width, height, format,
                              type, 0, ec);
     else if (V8WebGLArray::HasInstance(arg)) {
-      WebGLArray* array = V8DOMWrapper::convertToNativeObject<WebGLArray>(
-          V8ClassIndex::WEBGLARRAY, arg->ToObject());
+      WebGLArray* array = V8WebGLArray::toNative(arg->ToObject());
       context->texSubImage2D(target, level, xoff, yoff, width, height, format,
                              type, array, ec);
       // Fall through
@@ -823,17 +800,14 @@ static v8::Handle<v8::Value> vertexAttribAndUniformHelperf(
     location = toWebGLUniformLocation(args[0], ok);
 
   WebGLRenderingContext* context =
-      V8DOMWrapper::convertDOMWrapperToNative<WebGLRenderingContext>(
-          args.Holder());
+      V8WebGLRenderingContext::toNative(args.Holder());
 
   if (!ok) {
     V8Proxy::setDOMException(SYNTAX_ERR);
     return notHandledByInterceptor();
   }
   if (V8WebGLFloatArray::HasInstance(args[1])) {
-    WebGLFloatArray* array =
-        V8DOMWrapper::convertToNativeObject<WebGLFloatArray>(
-            V8ClassIndex::WEBGLFLOATARRAY, args[1]->ToObject());
+    WebGLFloatArray* array = V8WebGLFloatArray::toNative(args[1]->ToObject());
     ASSERT(array != NULL);
     ExceptionCode ec = 0;
     switch (functionToCall) {
@@ -936,8 +910,7 @@ static v8::Handle<v8::Value> uniformHelperi(const v8::Arguments& args,
   }
 
   WebGLRenderingContext* context =
-      V8DOMWrapper::convertDOMWrapperToNative<WebGLRenderingContext>(
-          args.Holder());
+      V8WebGLRenderingContext::toNative(args.Holder());
   bool ok = false;
   WebGLUniformLocation* location = toWebGLUniformLocation(args[0], ok);
 
@@ -946,8 +919,7 @@ static v8::Handle<v8::Value> uniformHelperi(const v8::Arguments& args,
     return notHandledByInterceptor();
   }
   if (V8WebGLIntArray::HasInstance(args[1])) {
-    WebGLIntArray* array = V8DOMWrapper::convertToNativeObject<WebGLIntArray>(
-        V8ClassIndex::WEBGLINTARRAY, args[1]->ToObject());
+    WebGLIntArray* array = V8WebGLIntArray::toNative(args[1]->ToObject());
     ASSERT(array != NULL);
     ExceptionCode ec = 0;
     switch (functionToCall) {
@@ -1076,8 +1048,7 @@ static v8::Handle<v8::Value> uniformMatrixHelper(const v8::Arguments& args,
   }
 
   WebGLRenderingContext* context =
-      V8DOMWrapper::convertDOMWrapperToNative<WebGLRenderingContext>(
-          args.Holder());
+      V8WebGLRenderingContext::toNative(args.Holder());
 
   bool ok = false;
   WebGLUniformLocation* location = toWebGLUniformLocation(args[0], ok);
@@ -1088,9 +1059,7 @@ static v8::Handle<v8::Value> uniformMatrixHelper(const v8::Arguments& args,
   }
   bool transpose = args[1]->BooleanValue();
   if (V8WebGLFloatArray::HasInstance(args[2])) {
-    WebGLFloatArray* array =
-        V8DOMWrapper::convertToNativeObject<WebGLFloatArray>(
-            V8ClassIndex::WEBGLFLOATARRAY, args[2]->ToObject());
+    WebGLFloatArray* array = V8WebGLFloatArray::toNative(args[2]->ToObject());
     ASSERT(array != NULL);
     ExceptionCode ec = 0;
     switch (matrixSize) {
