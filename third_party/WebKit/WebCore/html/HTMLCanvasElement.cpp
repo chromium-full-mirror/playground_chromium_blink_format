@@ -190,6 +190,8 @@ CanvasRenderingContext* HTMLCanvasElement::getContext(
       return m_context.get();
     }
   }
+#else
+  UNUSED_PARAM(attrs);
 #endif
   return 0;
 }
