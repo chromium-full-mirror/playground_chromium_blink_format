@@ -709,7 +709,7 @@ void FrameView::layout(bool allowSubtree) {
   m_layoutRoot = 0;
 
   m_frame->selection()->setNeedsLayout();
-  m_frame->selectionLayoutChanged();
+  m_frame->selection()->updateAppearance();
 
   m_layoutSchedulingEnabled = true;
 

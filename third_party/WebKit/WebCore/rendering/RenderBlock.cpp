@@ -1896,8 +1896,8 @@ void RenderBlock::paintCaret(PaintInfo& paintInfo,
     offsetForContents(tx, ty);
 
     if (type == CursorCaret)
-      document()->frame()->paintCaret(paintInfo.context, tx, ty,
-                                      paintInfo.rect);
+      document()->frame()->selection()->paintCaret(paintInfo.context, tx, ty,
+                                                   paintInfo.rect);
     else
       document()->frame()->paintDragCaret(paintInfo.context, tx, ty,
                                           paintInfo.rect);

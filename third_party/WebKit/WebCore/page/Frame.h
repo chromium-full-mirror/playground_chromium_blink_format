@@ -64,9 +64,6 @@ class CSSMutableStyleDeclaration;
 class HTMLTableCellElement;
 class RegularExpression;
 
-template <typename T>
-class Timer;
-
 class Frame : public RefCounted<Frame> {
  public:
   static PassRefPtr<Frame> create(Page* page,
@@ -265,16 +262,9 @@ class Frame : public RefCounted<Frame> {
 
   bool shouldChangeSelection(const VisibleSelection&) const;
   bool shouldDeleteSelection(const VisibleSelection&) const;
-  void clearCaretRectIfNeeded();
   void setFocusedNodeIfNeeded();
-  void selectionLayoutChanged();
   void notifyRendererOfSelectionChange(bool userTriggered);
 
-  void setCaretVisible(bool = true);
-  void paintCaret(GraphicsContext*,
-                  int tx,
-                  int ty,
-                  const IntRect& clipRect) const;
   void paintDragCaret(GraphicsContext*,
                       int tx,
                       int ty,
@@ -306,10 +296,6 @@ class Frame : public RefCounted<Frame> {
 
   void setUseSecureKeyboardEntry(bool);
 
- private:
-  void caretBlinkTimerFired(Timer<Frame>*);
-
- public:
   SelectionController* dragCaretController() const;
 
   String searchForLabelsAboveCell(RegularExpression*, HTMLTableCellElement*);
@@ -383,7 +369,6 @@ class Frame : public RefCounted<Frame> {
 
   mutable SelectionController m_selectionController;
   mutable VisibleSelection m_mark;
-  Timer<Frame> m_caretBlinkTimer;
   mutable Editor m_editor;
   mutable EventHandler m_eventHandler;
   mutable AnimationController m_animationController;
@@ -395,9 +380,6 @@ class Frame : public RefCounted<Frame> {
 #if ENABLE(ORIENTATION_EVENTS)
   int m_orientation;
 #endif
-
-  bool m_caretVisible;
-  bool m_caretPaint;
 
   bool m_highlightTextMatches;
   bool m_inViewSourceMode;

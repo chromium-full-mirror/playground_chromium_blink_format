@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2004 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010 Apple Inc. All rights
+ * reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -28,6 +29,7 @@
 
 #include "IntRect.h"
 #include "Range.h"
+#include "Timer.h"
 #include "VisibleSelection.h"
 #include <wtf/Noncopyable.h>
 
@@ -136,6 +138,8 @@ class SelectionController : public Noncopyable {
 
   void nodeWillBeRemoved(Node*);
 
+  void setCaretVisible(bool = true);
+  void clearCaretRectIfNeeded();
   bool recomputeCaretRect();  // returns true if caret rect moved
   void invalidateCaretRect();
   void paintCaret(GraphicsContext*, int tx, int ty, const IntRect& clipRect);
@@ -151,6 +155,9 @@ class SelectionController : public Noncopyable {
   bool isFocused() const { return m_focused; }
   bool isFocusedAndActive() const;
   void pageActivationChanged();
+
+  // Painting.
+  void updateAppearance();
 
 #ifndef NDEBUG
   void formatForDebugger(char* buffer, unsigned length) const;
@@ -176,46 +183,42 @@ class SelectionController : public Noncopyable {
 
   int xPosForVerticalArrowNavigation(EPositionType);
 
-#if PLATFORM(MAC) || PLATFORM(GTK)
   void notifyAccessibilityForSelectionChange();
-#else
-  void notifyAccessibilityForSelectionChange(){};
-#endif
 
   void focusedOrActiveStateChanged();
   bool caretRendersInsideNode(Node*) const;
 
   IntRect absoluteBoundsForLocalRect(const IntRect&) const;
 
+  void caretBlinkTimerFired(Timer<SelectionController>*);
+
   Frame* m_frame;
+
   int m_xPosForVerticalArrowNavigation;
 
   VisibleSelection m_selection;
+
+  Timer<SelectionController> m_caretBlinkTimer;
 
   IntRect m_caretRect;       // caret rect in coords local to the renderer
                              // responsible for painting the caret
   IntRect m_absCaretBounds;  // absolute bounding rect for the caret
   IntRect m_absoluteCaretRepaintBounds;
 
-  bool m_needsLayout : 1;  // true if the caret and expectedVisible rectangles
-                           // need to be calculated
-  bool m_absCaretBoundsDirty : 1;
-  bool m_lastChangeWasHorizontalExtension : 1;
-  bool m_isDragCaretController : 1;
-  bool m_isCaretBlinkingSuspended : 1;
-  bool m_focused : 1;
+  bool m_needsLayout;  // true if m_caretRect and m_absCaretBounds need to be
+                       // calculated
+  bool m_absCaretBoundsDirty;
+  bool m_lastChangeWasHorizontalExtension;
+  bool m_isDragCaretController;
+  bool m_isCaretBlinkingSuspended;
+  bool m_focused;
+  bool m_caretVisible;
+  bool m_caretPaint;
 };
 
-inline bool operator==(const SelectionController& a,
-                       const SelectionController& b) {
-  return a.start() == b.start() && a.end() == b.end() &&
-         a.affinity() == b.affinity();
-}
-
-inline bool operator!=(const SelectionController& a,
-                       const SelectionController& b) {
-  return !(a == b);
-}
+#if !(PLATFORM(MAC) || PLATFORM(GTK))
+inline void SelectionController::notifyAccessibilityForSelectionChange() {}
+#endif
 
 }  // namespace WebCore
 
