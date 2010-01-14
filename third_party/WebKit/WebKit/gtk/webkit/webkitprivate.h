@@ -158,6 +158,7 @@ struct _WebKitWebViewPrivate {
   WebKitWebResource* mainResource;
   char* mainResourceIdentifier;
   GHashTable* subResources;
+  char* tooltipText;
 };
 
 #define WEBKIT_WEB_FRAME_GET_PRIVATE(obj)                    \
@@ -263,6 +264,8 @@ WebKitWebResource* webkit_web_view_get_main_resource(WebKitWebView*);
 void webkit_web_view_clear_resources(WebKitWebView*);
 
 GList* webkit_web_view_get_subresources(WebKitWebView*);
+
+void webkit_web_view_set_tooltip_text(WebKitWebView*, const char*);
 
 WebKitDownload* webkit_download_new_with_handle(
     WebKitNetworkRequest* request,
