@@ -64,4 +64,6 @@ NPObject* npCreateV8ScriptObject(NPP,
                                  v8::Handle<v8::Object>,
                                  WebCore::DOMWindow*);
 
+NPObject* v8ObjectToNPObject(v8::Handle<v8::Object>);
+
 #endif  // NPV8Object_h

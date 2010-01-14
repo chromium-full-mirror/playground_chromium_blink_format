@@ -39,6 +39,7 @@
 #include "V8CustomBinding.h"
 #include "V8CustomXPathNSResolver.h"
 #include "V8DOMMap.h"
+#include "V8Event.h"
 #include "V8Index.h"
 #include "V8Utilities.h"
 #include "V8XPathNSResolver.h"
@@ -125,28 +126,6 @@ class V8DOMWrapper {
                : object->FindInstanceInPrototypeChain(getTemplate(type));
   }
 
-  // A helper function extract native object pointer from a DOM wrapper
-  // and cast to the specified type.
-  template <class C>
-  static C* convertDOMWrapperToNative(v8::Handle<v8::Object> object) {
-#ifndef NDEBUG
-    v8::HandleScope handleScope;
-    ASSERT(maybeDOMWrapper(object));
-#endif
-    return reinterpret_cast<C*>(
-        object->GetPointerFromInternalField(v8DOMWrapperObjectIndex));
-  }
-
-  template <class C>
-  static C* convertDOMWrapperToNode(v8::Handle<v8::Object> object) {
-#ifndef NDEBUG
-    v8::HandleScope handleScope;
-    ASSERT(maybeDOMWrapper(object));
-    ASSERT(domWrapperType(object) == V8ClassIndex::NODE);
-#endif
-    return convertDOMWrapperToNative<C>(object);
-  }
-
   template <typename T>
   static v8::Handle<v8::Value> convertToV8Object(
       V8ClassIndex::V8WrapperType type,
@@ -178,31 +157,6 @@ class V8DOMWrapper {
                                                         V8Proxy*,
                                                         DOMWrapperMap<Node>&);
 
-  template <class C>
-  static C* convertToNativeObject(V8ClassIndex::V8WrapperType type,
-                                  v8::Handle<v8::Object> object) {
-    // Native event listener is per frame, it cannot be handled by this generic
-    // function.
-    ASSERT(type != V8ClassIndex::EVENTLISTENER);
-    ASSERT(type != V8ClassIndex::EVENTTARGET);
-
-    ASSERT(maybeDOMWrapper(object));
-
-#ifndef NDEBUG
-    const bool typeIsValid =
-#define MAKE_CASE(TYPE, NAME) (type != V8ClassIndex::TYPE)&&
-        DOM_NODE_TYPES(MAKE_CASE)
-#if ENABLE(SVG)
-            SVG_NODE_TYPES(MAKE_CASE)
-#endif
-#undef MAKE_CASE
-                true;
-    ASSERT(typeIsValid);
-#endif
-
-    return convertDOMWrapperToNative<C>(object);
-  }
-
   static V8ClassIndex::V8WrapperType domWrapperType(v8::Handle<v8::Object>);
 
   static v8::Handle<v8::Value> convertEventToV8Object(PassRefPtr<Event> event) {
@@ -210,13 +164,6 @@ class V8DOMWrapper {
   }
 
   static v8::Handle<v8::Value> convertEventToV8Object(Event*);
-
-  static Event* convertToNativeEvent(v8::Handle<v8::Value> jsEvent) {
-    if (!isDOMEventWrapper(jsEvent))
-      return 0;
-    return convertDOMWrapperToNative<Event>(
-        v8::Handle<v8::Object>::Cast(jsEvent));
-  }
 
   static v8::Handle<v8::Value> convertEventTargetToV8Object(
       PassRefPtr<EventTarget> eventTarget) {
@@ -285,8 +232,8 @@ class V8DOMWrapper {
                                                     V8Proxy* proxy = 0) {
     RefPtr<XPathNSResolver> resolver;
     if (V8XPathNSResolver::HasInstance(value))
-      resolver = convertToNativeObject<XPathNSResolver>(
-          V8ClassIndex::XPATHNSRESOLVER, v8::Handle<v8::Object>::Cast(value));
+      resolver =
+          V8XPathNSResolver::toNative(v8::Handle<v8::Object>::Cast(value));
     else if (value->IsObject())
       resolver = V8CustomXPathNSResolver::create(proxy, value->ToObject());
     return resolver;
@@ -322,9 +269,6 @@ class V8DOMWrapper {
   // Check whether a V8 value is a wrapper of type |classType|.
   static bool isWrapperOfType(v8::Handle<v8::Value>,
                               V8ClassIndex::V8WrapperType);
-
-  static void* convertToSVGPODTypeImpl(V8ClassIndex::V8WrapperType,
-                                       v8::Handle<v8::Value>);
 
   // Check whether a V8 value is a DOM Event wrapper.
   static bool isDOMEventWrapper(v8::Handle<v8::Value>);
