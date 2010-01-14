@@ -240,14 +240,15 @@ void SelectElement::scrollToSelection(SelectElementData& data,
     toRenderListBox(renderer)->selectionChanged();
 }
 
-void SelectElement::setOptionsChangedOnRenderer(SelectElementData& data,
-                                                Element* element) {
-  if (RenderObject* renderer = element->renderer()) {
+void SelectElement::recalcStyle(SelectElementData& data, Element* element) {
+  RenderObject* renderer = element->renderer();
+  if (element->childNeedsStyleRecalc() && renderer) {
     if (data.usesMenuList())
       toRenderMenuList(renderer)->setOptionsChanged(true);
     else
       toRenderListBox(renderer)->setOptionsChanged(true);
-  }
+  } else if (data.shouldRecalcListItems())
+    recalcListItems(data, element);
 }
 
 void SelectElement::setRecalcListItems(SelectElementData& data,
@@ -256,7 +257,12 @@ void SelectElement::setRecalcListItems(SelectElementData& data,
   data.setActiveSelectionAnchorIndex(-1);  // Manual selection anchor is reset
                                            // when manipulating the select
                                            // programmatically.
-  setOptionsChangedOnRenderer(data, element);
+  if (RenderObject* renderer = element->renderer()) {
+    if (data.usesMenuList())
+      toRenderMenuList(renderer)->setOptionsChanged(true);
+    else
+      toRenderListBox(renderer)->setOptionsChanged(true);
+  }
   element->setNeedsStyleRecalc();
 }
 
@@ -265,8 +271,6 @@ void SelectElement::recalcListItems(SelectElementData& data,
                                     bool updateSelectedStates) {
   Vector<Element*>& listItems = data.rawListItems();
   listItems.clear();
-
-  data.setShouldRecalcListItems(false);
 
   OptionElement* foundSelected = 0;
   for (Node* currentNode = element->firstChild(); currentNode;) {
@@ -316,6 +320,8 @@ void SelectElement::recalcListItems(SelectElementData& data,
     // <select>'s subtree at this point.
     currentNode = currentNode->traverseNextSibling(element);
   }
+
+  data.setShouldRecalcListItems(false);
 }
 
 int SelectElement::selectedIndex(const SelectElementData& data,
@@ -479,7 +485,7 @@ void SelectElement::restoreFormControlState(SelectElementData& data,
       optionElement->setSelectedState(state[i] == 'X');
   }
 
-  setOptionsChangedOnRenderer(data, element);
+  element->setNeedsStyleRecalc();
 }
 
 void SelectElement::parseMultipleAttribute(SelectElementData& data,
@@ -555,7 +561,7 @@ void SelectElement::reset(SelectElementData& data, Element* element) {
   if (!selectedOption && firstOption && data.usesMenuList())
     firstOption->setSelectedState(true);
 
-  setOptionsChangedOnRenderer(data, element);
+  element->setNeedsStyleRecalc();
 }
 
 #if !ARROW_KEYS_POP_MENU
@@ -994,8 +1000,7 @@ void SelectElement::typeAheadFind(SelectElementData& data,
       setSelectedIndex(data, element, listToOptionIndex(data, element, index));
       if (!data.usesMenuList())
         listBoxOnChange(data, element);
-
-      setOptionsChangedOnRenderer(data, element);
+      element->setNeedsStyleRecalc();
       return;
     }
   }
