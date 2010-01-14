@@ -259,6 +259,8 @@ class FrameLoaderClient : public WebCore::FrameLoaderClient {
   WebCore::ResourceResponse m_response;
   WebKitWebPolicyDecision* m_policyDecision;
 
+  bool m_loadingErrorPage;
+
   // Plugin view to redirect data to
   WebCore::PluginView* m_pluginView;
   bool m_hasSentResponseToPlugin;
