@@ -34,6 +34,7 @@
 #include "WebDragOperation.h"
 #include "WebEditingAction.h"
 #include "WebFileChooserCompletion.h"
+#include "WebFileChooserParams.h"
 #include "WebString.h"
 #include "WebTextAffinity.h"
 #include "WebTextDirection.h"
@@ -171,13 +172,19 @@ class WebViewClient : virtual public WebWidgetClient {
 
   // Dialogs -------------------------------------------------------------
 
+  // Deprecated. Use another runFileChooser() below instead.
+  virtual bool runFileChooser(bool multiSelect,
+                              const WebString& title,
+                              const WebString& initialValue,
+                              WebFileChooserCompletion*) {
+    return false;
+  }
+
   // This method returns immediately after showing the dialog. When the
   // dialog is closed, it should call the WebFileChooserCompletion to
   // pass the results of the dialog. Returns false if
   // WebFileChooseCompletion will never be called.
-  virtual bool runFileChooser(bool multiSelect,
-                              const WebString& title,
-                              const WebString& initialValue,
+  virtual bool runFileChooser(const WebFileChooserParams&,
                               WebFileChooserCompletion*) {
     return false;
   }
