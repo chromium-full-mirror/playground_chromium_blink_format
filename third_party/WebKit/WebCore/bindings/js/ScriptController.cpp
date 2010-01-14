@@ -161,7 +161,7 @@ ScriptValue ScriptController::evaluate(const ScriptSourceCode& sourceCode) {
 // An DOMWrapperWorld other than the thread's normal world.
 class IsolatedWorld : public DOMWrapperWorld {
  public:
-  IsolatedWorld(JSGlobalData* globalData) : DOMWrapperWorld(globalData) {
+  IsolatedWorld(JSGlobalData* globalData) : DOMWrapperWorld(globalData, false) {
     JSGlobalData::ClientData* clientData = globalData->clientData;
     ASSERT(clientData);
     static_cast<WebCoreJSClientData*>(clientData)->rememberWorld(this);

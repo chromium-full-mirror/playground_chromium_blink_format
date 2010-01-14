@@ -82,6 +82,16 @@ using namespace HTMLNames;
 typedef Document::JSWrapperCache JSWrapperCache;
 typedef Document::JSWrapperCacheMap JSWrapperCacheMap;
 
+inline JSWrapperCache* Document::getWrapperCache(DOMWrapperWorld* world) {
+  if (world->isNormal()) {
+    if (JSWrapperCache* wrapperCache = m_normalWorldWrapperCache)
+      return wrapperCache;
+    ASSERT(!m_wrapperCacheMap.contains(world));
+  } else if (JSWrapperCache* wrapperCache = m_wrapperCacheMap.get(world))
+    return wrapperCache;
+  return createWrapperCache(world);
+}
+
 // For debugging, keep a set of wrappers currently registered, and check that
 // all are unregistered before they are destroyed. This has helped us fix at
 // least one bug.
@@ -146,8 +156,8 @@ DOMObject::~DOMObject() {
 
 #endif
 
-DOMWrapperWorld::DOMWrapperWorld(JSC::JSGlobalData* globalData)
-    : m_globalData(globalData) {}
+DOMWrapperWorld::DOMWrapperWorld(JSC::JSGlobalData* globalData, bool isNormal)
+    : m_globalData(globalData), m_isNormal(isNormal) {}
 
 DOMWrapperWorld::~DOMWrapperWorld() {
   JSGlobalData::ClientData* clientData = m_globalData->clientData;
@@ -279,6 +289,17 @@ JSNode* getCachedDOMNodeWrapper(JSC::ExecState* exec,
 
 void forgetDOMObject(DOMObject* wrapper, void* objectHandle) {
   JSC::JSGlobalData* globalData = Heap::heap(wrapper)->globalData();
+
+  // Check the normal world first!
+  JSGlobalData::ClientData* clientData = globalData->clientData;
+  ASSERT(clientData);
+  DOMObjectWrapperMap& wrappers =
+      static_cast<WebCoreJSClientData*>(clientData)->normalWorld()->m_wrappers;
+  if (wrappers.uncheckedRemove(objectHandle, wrapper)) {
+    removeWrapper(wrapper);
+    return;
+  }
+
   for (JSGlobalDataWorldIterator worldIter(globalData); worldIter;
        ++worldIter) {
     if (worldIter->m_wrappers.uncheckedRemove(objectHandle, wrapper))

@@ -147,7 +147,7 @@ typedef JSC::WeakGCMap<void*, DOMObject*> DOMObjectWrapperMap;
 
 class DOMWrapperWorld : public RefCounted<DOMWrapperWorld> {
  public:
-  DOMWrapperWorld(JSC::JSGlobalData*);
+  DOMWrapperWorld(JSC::JSGlobalData*, bool isNormal);
   ~DOMWrapperWorld();
 
   void rememberDocument(Document* document) {
@@ -160,9 +160,12 @@ class DOMWrapperWorld : public RefCounted<DOMWrapperWorld> {
   // FIXME: can we make this private?
   DOMObjectWrapperMap m_wrappers;
 
+  bool isNormal() const { return m_isNormal; }
+
  private:
   JSC::JSGlobalData* m_globalData;
   HashSet<Document*> documentsWithWrappers;
+  bool m_isNormal;
 };
 
 // Map from static HashTable instances to per-GlobalData ones.
@@ -197,7 +200,7 @@ class WebCoreJSClientData : public JSC::JSGlobalData::ClientData,
 
  public:
   WebCoreJSClientData(JSC::JSGlobalData* globalData)
-      : m_normalWorld(globalData) {
+      : m_normalWorld(globalData, true) {
     m_worldSet.add(&m_normalWorld);
   }
   // FIXME: add a destructor to assert m_worldSet only contains m_normalWorld?
