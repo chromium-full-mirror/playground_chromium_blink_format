@@ -431,7 +431,8 @@ class RenderBox : public RenderBoxModelObject {
                       int ty,
                       int width,
                       int height,
-                      CompositeOperator = CompositeSourceOver);
+                      CompositeOperator op,
+                      RenderObject* backgroundObject);
   void paintFillLayers(const PaintInfo&,
                        const Color&,
                        const FillLayer*,
@@ -439,7 +440,8 @@ class RenderBox : public RenderBoxModelObject {
                        int ty,
                        int width,
                        int height,
-                       CompositeOperator = CompositeSourceOver);
+                       CompositeOperator = CompositeSourceOver,
+                       RenderObject* backgroundObject = 0);
 
   void paintMaskImages(const PaintInfo&, int tx, int ty, int width, int height);
 

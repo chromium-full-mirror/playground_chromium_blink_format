@@ -135,7 +135,8 @@ class RenderBoxModelObject : public RenderObject {
                               int width,
                               int height,
                               InlineFlowBox* = 0,
-                              CompositeOperator = CompositeSourceOver);
+                              CompositeOperator = CompositeSourceOver,
+                              RenderObject* backgroundObject = 0);
 
   // The difference between this inline's baseline position and the line's
   // baseline position.
