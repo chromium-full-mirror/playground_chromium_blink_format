@@ -234,6 +234,13 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
   void setWaitToDump(bool waitToDump);
   void waitToDumpWatchdogTimerFired();
 
+  bool willSendRequestReturnsNull() const {
+    return m_willSendRequestReturnsNull;
+  }
+  void setWillSendRequestReturnsNull(bool returnsNull) {
+    m_willSendRequestReturnsNull = returnsNull;
+  }
+
   bool willSendRequestReturnsNullOnRedirect() const {
     return m_willSendRequestReturnsNullOnRedirect;
   }
@@ -338,6 +345,7 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
   bool m_testRepaintSweepHorizontally;
   bool m_waitToDump;  // True if waitUntilDone() has been called, but
                       // notifyDone() has not yet been called.
+  bool m_willSendRequestReturnsNull;
   bool m_willSendRequestReturnsNullOnRedirect;
   bool m_windowIsKey;
   bool m_alwaysAcceptCookies;

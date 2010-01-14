@@ -67,6 +67,7 @@ LayoutTestController::LayoutTestController(const std::string& testPathOrURL,
       m_testRepaint(false),
       m_testRepaintSweepHorizontally(false),
       m_waitToDump(false),
+      m_willSendRequestReturnsNull(false),
       m_willSendRequestReturnsNullOnRedirect(false),
       m_windowIsKey(true),
       m_alwaysAcceptCookies(false),
@@ -1327,6 +1328,25 @@ static JSValueRef setUserStyleSheetLocationCallback(
   return JSValueMakeUndefined(context);
 }
 
+static JSValueRef setWillSendRequestReturnsNullCallback(
+    JSContextRef context,
+    JSObjectRef function,
+    JSObjectRef thisObject,
+    size_t argumentCount,
+    const JSValueRef arguments[],
+    JSValueRef* exception) {
+  // Has cross-platform implementation
+  if (argumentCount < 1)
+    return JSValueMakeUndefined(context);
+
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->setWillSendRequestReturnsNull(
+      JSValueToBoolean(context, arguments[0]));
+
+  return JSValueMakeUndefined(context);
+}
+
 static JSValueRef setWillSendRequestReturnsNullOnRedirectCallback(
     JSContextRef context,
     JSObjectRef function,
@@ -1992,6 +2012,8 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
       {"setUserStyleSheetEnabled", setUserStyleSheetEnabledCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setUserStyleSheetLocation", setUserStyleSheetLocationCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"setWillSendRequestReturnsNull", setWillSendRequestReturnsNullCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setWillSendRequestReturnsNullOnRedirect",
        setWillSendRequestReturnsNullOnRedirectCallback,

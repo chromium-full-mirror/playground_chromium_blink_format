@@ -231,6 +231,11 @@ HRESULT STDMETHODCALLTYPE ResourceLoadDelegate::willSendRequest(
            descriptionSuitableForTestResult(redirectResponse).c_str());
   }
 
+  if (!done && gLayoutTestController->willSendRequestReturnsNull()) {
+    *newRequest = 0;
+    return S_OK;
+  }
+
   if (!done && gLayoutTestController->willSendRequestReturnsNullOnRedirect() &&
       redirectResponse) {
     printf("Returning null for this redirect\n");
