@@ -51,10 +51,6 @@ class RuntimeObjectImp : public JSObject {
   virtual CallType getCallData(CallData&);
   virtual ConstructType getConstructData(ConstructData&);
 
-  virtual void getPropertyNames(
-      ExecState*,
-      PropertyNameArray&,
-      EnumerationMode mode = ExcludeDontEnumProperties);
   virtual void getOwnPropertyNames(
       ExecState*,
       PropertyNameArray&,

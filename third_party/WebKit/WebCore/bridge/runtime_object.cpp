@@ -323,9 +323,9 @@ ConstructType RuntimeObjectImp::getConstructData(ConstructData& constructData) {
   return ConstructTypeHost;
 }
 
-void RuntimeObjectImp::getPropertyNames(ExecState* exec,
-                                        PropertyNameArray& propertyNames,
-                                        EnumerationMode) {
+void RuntimeObjectImp::getOwnPropertyNames(ExecState* exec,
+                                           PropertyNameArray& propertyNames,
+                                           EnumerationMode) {
   if (!m_instance) {
     throwInvalidAccessError(exec);
     return;
@@ -336,12 +336,6 @@ void RuntimeObjectImp::getPropertyNames(ExecState* exec,
   instance->begin();
   instance->getPropertyNames(exec, propertyNames);
   instance->end();
-}
-
-void RuntimeObjectImp::getOwnPropertyNames(ExecState* exec,
-                                           PropertyNameArray& propertyNames,
-                                           EnumerationMode mode) {
-  getOwnPropertyNames(exec, propertyNames, mode);
 }
 
 JSObject* RuntimeObjectImp::throwInvalidAccessError(ExecState* exec) {
