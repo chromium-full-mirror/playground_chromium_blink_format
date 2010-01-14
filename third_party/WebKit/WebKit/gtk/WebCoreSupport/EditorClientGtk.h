@@ -34,7 +34,6 @@
 
 #include <wtf/Deque.h>
 #include <wtf/Forward.h>
-#include <gtk/gtk.h>
 
 typedef struct _WebKitWebView WebKitWebView;
 
@@ -139,14 +138,6 @@ class EditorClient : public WebCore::EditorClient {
 
  private:
   WebKitWebView* m_webView;
-  RefPtr<WebCore::Range> m_range;
-
-  friend void clipboard_get_contents_cb(GtkClipboard* clipboard,
-                                        GtkSelectionData* selection_data,
-                                        guint info,
-                                        gpointer data);
-  friend void clipboard_clear_contents_cb(GtkClipboard* clipboard,
-                                          gpointer data);
 };
 }
 
