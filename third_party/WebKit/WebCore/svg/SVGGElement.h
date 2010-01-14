@@ -56,9 +56,6 @@ class SVGGElement : public SVGStyledTransformableElement,
                                  bool,
                                  ExternalResourcesRequired,
                                  externalResourcesRequired)
-
-  friend class SVGUseElement;
-  TransformationMatrix localMatrix() const;
 };
 
 }  // namespace WebCore

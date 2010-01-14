@@ -71,6 +71,8 @@ class SVGUseElement : public SVGStyledTransformableElement,
   SVGElementInstance* instanceForShadowTreeElement(Node* element) const;
 
  private:
+  virtual bool hasRelativeValues() const;
+
   ANIMATED_PROPERTY_DECLARATIONS(SVGUseElement,
                                  SVGNames::useTagString,
                                  SVGNames::xAttrString,

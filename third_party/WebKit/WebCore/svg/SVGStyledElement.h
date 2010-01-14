@@ -41,6 +41,7 @@ class SVGStyledElement : public SVGElement, public SVGStylable {
   SVGStyledElement(const QualifiedName&, Document*);
   virtual ~SVGStyledElement();
 
+  virtual bool hasRelativeValues() const { return false; }
   virtual bool isStyled() const { return true; }
   virtual bool supportsMarkers() const { return false; }
 
@@ -74,8 +75,6 @@ class SVGStyledElement : public SVGElement, public SVGStylable {
   void setInstanceUpdatesBlocked(bool);
 
  protected:
-  virtual bool hasRelativeValues() const { return true; }
-
   static int cssPropertyIdForSVGAttributeName(const QualifiedName&);
 
  private:
