@@ -397,6 +397,7 @@ void WorkerThreadableWebSocketChannel::Bridge::disconnect() {
     m_loaderProxy.postTaskToLoader(
         createCallbackTask(&mainThreadDestroy, peer));
   }
+  m_workerContext = 0;
 }
 
 void WorkerThreadableWebSocketChannel::Bridge::clearClientWrapper() {
@@ -413,6 +414,8 @@ void WorkerThreadableWebSocketChannel::Bridge::setMethodNotCompleted() {
 }
 
 void WorkerThreadableWebSocketChannel::Bridge::waitForMethodCompletion() {
+  if (!m_workerContext)
+    return;
   WorkerRunLoop& runLoop = m_workerContext->thread()->runLoop();
   MessageQueueWaitResult result = MessageQueueMessageReceived;
   ThreadableWebSocketChannelClientWrapper* clientWrapper =
