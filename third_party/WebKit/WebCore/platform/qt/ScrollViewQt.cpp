@@ -34,28 +34,14 @@
 
 namespace WebCore {
 
-void ScrollView::platformInit() {
-  m_widgetsPreventingBlitting = 0;
-}
+void ScrollView::platformInit() {}
 
 void ScrollView::platformDestroy() {}
 
-// Windowed plugins are using native windows and are thus preventing
-// us from doing any kind of scrolling optimization.
-
-void ScrollView::adjustWidgetsPreventingBlittingCount(int delta) {
-  m_widgetsPreventingBlitting += delta;
-  if (parent())
-    parent()->adjustWidgetsPreventingBlittingCount(delta);
-}
-
-void ScrollView::platformAddChild(Widget*) {
-  adjustWidgetsPreventingBlittingCount(1);
-}
+void ScrollView::platformAddChild(Widget*) {}
 
 void ScrollView::platformRemoveChild(Widget* child) {
   child->hide();
-  adjustWidgetsPreventingBlittingCount(-1);
 }
 }
 // vim: ts=4 sw=4 et

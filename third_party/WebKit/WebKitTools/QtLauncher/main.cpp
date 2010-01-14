@@ -654,6 +654,13 @@ QObject* WebPage::createPlugin(const QString& classId,
   Q_UNUSED(url);
   Q_UNUSED(paramNames);
   Q_UNUSED(paramValues);
+
+  if (classId == "alien_QLabel") {
+    QLabel* l = new QLabel;
+    l->winId();
+    return l;
+  }
+
 #ifndef QT_NO_UITOOLS
   QUiLoader loader;
   return loader.createWidget(classId, view());

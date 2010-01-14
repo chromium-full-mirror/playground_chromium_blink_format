@@ -130,6 +130,10 @@ void PluginView::updatePluginWidget() {
   // scroll, we need to move/resize immediately.
   if (!m_windowRect.intersects(frameView->frameRect()))
     setNPWindowIfNeeded();
+
+  // Make sure we get repainted afterwards. This is necessary for downward
+  // scrolling to move the plugin widget properly.
+  invalidate();
 }
 
 void PluginView::setFocus() {
@@ -675,7 +679,8 @@ NPError PluginView::getValue(NPNVariable variable, void* value) {
 
 void PluginView::invalidateRect(const IntRect& rect) {
   if (m_isWindowed) {
-    platformWidget()->update(rect);
+    if (platformWidget())
+      platformWidget()->update(rect);
     return;
   }
 
