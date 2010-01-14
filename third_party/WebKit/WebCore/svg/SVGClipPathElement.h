@@ -40,7 +40,6 @@ class SVGClipPathElement : public SVGStyledTransformableElement,
   virtual ~SVGClipPathElement();
 
   virtual bool isValid() const { return SVGTests::isValid(); }
-  virtual bool rendererIsNeeded(RenderStyle*) { return false; }
 
   virtual void parseMappedAttribute(MappedAttribute*);
   virtual void svgAttributeChanged(const QualifiedName&);
@@ -49,6 +48,7 @@ class SVGClipPathElement : public SVGStyledTransformableElement,
                                Node* afterChange = 0,
                                int childCountDelta = 0);
 
+  virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual SVGResource* canvasResource(const RenderObject*);
 
  private:
