@@ -631,6 +631,8 @@ inStringEscapeSequence:
     shiftLineTerminator();
     goto inString;
   }
+  if (m_current == -1)
+    goto returnError;
   record16(singleEscape(m_current));
   shift1();
   goto inString;
