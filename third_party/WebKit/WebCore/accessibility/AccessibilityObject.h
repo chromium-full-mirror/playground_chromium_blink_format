@@ -291,7 +291,7 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   virtual bool isHovered() const { return false; }
   virtual bool isIndeterminate() const { return false; }
   virtual bool isLoaded() const { return false; }
-  virtual bool isMultiSelect() const { return false; }
+  virtual bool isMultiSelectable() const { return false; }
   virtual bool isOffScreen() const { return false; }
   virtual bool isPressed() const { return false; }
   virtual bool isReadOnly() const { return false; }

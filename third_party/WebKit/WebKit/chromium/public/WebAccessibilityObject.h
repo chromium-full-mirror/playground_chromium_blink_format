@@ -91,7 +91,7 @@ class WebAccessibilityObject {
   bool isEnabled() const;
   bool isHovered() const;
   bool isIndeterminate() const;
-  bool isMultiSelect() const;
+  bool isMultiSelectable() const;
   bool isOffScreen() const;
   bool isPasswordField() const;
   bool isPressed() const;

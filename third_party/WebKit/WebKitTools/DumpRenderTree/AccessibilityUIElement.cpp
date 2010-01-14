@@ -737,6 +737,21 @@ static JSValueRef getIsSelectedCallback(JSContextRef context,
   return JSValueMakeBoolean(context, toAXElement(thisObject)->isSelected());
 }
 
+static JSValueRef getIsSelectableCallback(JSContextRef context,
+                                          JSObjectRef thisObject,
+                                          JSStringRef,
+                                          JSValueRef*) {
+  return JSValueMakeBoolean(context, toAXElement(thisObject)->isSelectable());
+}
+
+static JSValueRef getIsMultiSelectableCallback(JSContextRef context,
+                                               JSObjectRef thisObject,
+                                               JSStringRef,
+                                               JSValueRef*) {
+  return JSValueMakeBoolean(context,
+                            toAXElement(thisObject)->isMultiSelectable());
+}
+
 static JSValueRef getIsExpandedCallback(JSContextRef context,
                                         JSObjectRef thisObject,
                                         JSStringRef,
@@ -879,6 +894,10 @@ JSClassRef AccessibilityUIElement::getJSClass() {
       {"isRequired", getIsRequiredCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"isSelected", getIsSelectedCallback, 0,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"isSelectable", getIsSelectableCallback, 0,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"isMultiSelectable", getIsMultiSelectableCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"isExpanded", getIsExpandedCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},

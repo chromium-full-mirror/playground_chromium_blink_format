@@ -119,6 +119,8 @@ class AccessibilityUIElement {
   bool isEnabled();
   bool isRequired() const;
   bool isSelected() const;
+  bool isSelectable() const;
+  bool isMultiSelectable() const;
   bool isExpanded() const;
   bool isChecked() const;
   int hierarchicalLevel() const;

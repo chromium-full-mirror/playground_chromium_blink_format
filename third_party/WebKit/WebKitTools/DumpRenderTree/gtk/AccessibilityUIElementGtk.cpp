@@ -494,3 +494,13 @@ bool AccessibilityUIElement::addNotificationListener(
   // FIXME: implement
   return false;
 }
+
+bool AccessibilityUIElement::isSelectable() const {
+  // FIXME: implement
+  return false;
+}
+
+bool AccessibilityUIElement::isMultiSelectable() const {
+  // FIXME: implement
+  return false;
+}

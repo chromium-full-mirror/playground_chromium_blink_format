@@ -246,9 +246,6 @@ HRESULT STDMETHODCALLTYPE AccessibleBase::get_accState(VARIANT vChild,
   if (childObj->isOffScreen())
     pvState->lVal |= STATE_SYSTEM_OFFSCREEN;
 
-  if (childObj->isMultiSelect())
-    pvState->lVal |= STATE_SYSTEM_MULTISELECTABLE;
-
   if (childObj->isPasswordField())
     pvState->lVal |= STATE_SYSTEM_PROTECTED;
 
@@ -270,7 +267,14 @@ HRESULT STDMETHODCALLTYPE AccessibleBase::get_accState(VARIANT vChild,
   if (childObj->canSetFocusAttribute())
     pvState->lVal |= STATE_SYSTEM_FOCUSABLE;
 
-  // TODO: Add selected and selectable states.
+  if (childObj->isSelected())
+    pvState->lVal |= STATE_SYSTEM_SELECTED;
+
+  if (childObj->canSetSelectedAttribute())
+    pvState->lVal |= STATE_SYSTEM_SELECTABLE;
+
+  if (childObj->isMultiSelectable())
+    pvState->lVal |= STATE_SYSTEM_EXTSELECTABLE | STATE_SYSTEM_MULTISELECTABLE;
 
   return S_OK;
 }

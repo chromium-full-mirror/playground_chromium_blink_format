@@ -493,7 +493,7 @@ static void setAtkStateSetFromCoreObject(AccessibilityObject* coreObject,
   if (coreObject->isIndeterminate())
     atk_state_set_add_state(stateSet, ATK_STATE_INDETERMINATE);
 
-  if (coreObject->isMultiSelect())
+  if (coreObject->isMultiSelectable())
     atk_state_set_add_state(stateSet, ATK_STATE_MULTISELECTABLE);
 
   // TODO: ATK_STATE_OPAQUE
@@ -790,7 +790,7 @@ static gboolean webkit_accessible_selection_remove_selection(
 static gboolean webkit_accessible_selection_select_all_selection(
     AtkSelection* selection) {
   AccessibilityObject* coreSelection = core(selection);
-  if (!coreSelection || !coreSelection->isMultiSelect())
+  if (!coreSelection || !coreSelection->isMultiSelectable())
     return false;
 
   AccessibilityRenderObject::AccessibilityChildrenVector children =
