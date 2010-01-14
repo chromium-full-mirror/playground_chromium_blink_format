@@ -136,6 +136,9 @@ CachedFrame::CachedFrame(Frame* frame) : CachedFrameBase(frame) {
   for (unsigned i = 0; i < m_childFrames.size(); ++i)
     frame->tree()->removeChild(m_childFrames[i]->view()->frame());
 
+  if (!m_isMainFrame)
+    frame->page()->decrementFrameCount();
+
 #ifndef NDEBUG
   if (m_isMainFrame)
     LOG(PageCache,
@@ -153,6 +156,9 @@ CachedFrame::CachedFrame(Frame* frame) : CachedFrameBase(frame) {
 void CachedFrame::open() {
   ASSERT(m_view);
   m_view->frame()->loader()->open(*this);
+
+  if (!m_isMainFrame)
+    m_view->frame()->page()->incrementFrameCount();
 }
 
 void CachedFrame::clear() {

@@ -34,10 +34,8 @@ namespace WebCore {
 
 class CachedFrame;
 class CachedFramePlatformData;
-class DOMWindow;
 class Document;
 class DocumentLoader;
-class Frame;
 class FrameView;
 class Node;
 

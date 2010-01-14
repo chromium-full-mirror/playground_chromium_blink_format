@@ -30,13 +30,8 @@
 
 namespace WebCore {
 
-class CachedFramePlatformData;
-class DOMWindow;
 class Document;
 class DocumentLoader;
-class FrameView;
-class KURL;
-class Node;
 class Page;
 
 class CachedPage : public RefCounted<CachedPage> {
