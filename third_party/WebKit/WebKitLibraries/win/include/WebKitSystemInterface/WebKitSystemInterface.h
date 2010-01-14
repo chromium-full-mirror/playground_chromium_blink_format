@@ -77,6 +77,7 @@ CFPropertyListRef wkCreateFontsPlist();
 
 void wkSetPatternBaseCTM(CGContextRef, CGAffineTransform);
 void wkSetPatternPhaseInUserSpace(CGContextRef, CGPoint phasePoint);
+CGAffineTransform wkGetUserToBaseCTM(CGContextRef);
 
 void wkDrawFocusRing(CGContextRef, CGColorRef, float radius);
 
