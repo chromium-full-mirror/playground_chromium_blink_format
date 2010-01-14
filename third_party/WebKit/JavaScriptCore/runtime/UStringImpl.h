@@ -133,11 +133,14 @@ class UStringImpl : Noncopyable {
   UChar* data() const { return m_data; }
   int size() const { return m_length; }
   size_t cost() {
-    UStringImpl* base = bufferOwnerString();
+    // For substrings, return the cost of the base string.
+    if (bufferOwnership() == BufferSubstring)
+      return m_dataBuffer.asPtr<UStringImpl*>()->cost();
+
     if (m_dataBuffer & s_reportedCostBit)
       return 0;
     m_dataBuffer |= s_reportedCostBit;
-    return base->m_length;
+    return m_length;
   }
   unsigned hash() const {
     if (!m_hash)
@@ -161,7 +164,7 @@ class UStringImpl : Noncopyable {
   }
   ALWAYS_INLINE void deref() {
     if (!(m_refCount -= s_refCountIncrement))
-      destroy();
+      delete this;
   }
 
   static WTF::PossiblyNull<UChar*> allocChars(size_t length) {
@@ -271,8 +274,10 @@ class UStringImpl : Noncopyable {
     checkConsistency();
   }
 
-  void* operator new(size_t size) { return fastMalloc(size); }
+  using Noncopyable::operator new;
   void* operator new(size_t, void* inPlace) { return inPlace; }
+
+  ~UStringImpl();
 
   // This number must be at least 2 to avoid sharing empty, null as well as 1
   // character strings from SmallStrings.
@@ -287,7 +292,6 @@ class UStringImpl : Noncopyable {
   static const int s_refCountIncrement = 2;
   static const int s_staticRefCountInitialValue = 1;
 
-  void destroy();
   UStringImpl* bufferOwnerString() {
     return (bufferOwnership() == BufferSubstring)
                ? m_dataBuffer.asPtr<UStringImpl*>()
