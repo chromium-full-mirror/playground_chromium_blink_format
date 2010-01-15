@@ -111,6 +111,9 @@ class Gradient : public Generator {
   }
 
   virtual void fill(GraphicsContext*, const FloatRect&);
+  virtual void adjustParametersForTiledDrawing(IntSize& size,
+                                               FloatRect& srcRect);
+
   void setPlatformGradientSpaceTransform(
       const TransformationMatrix& gradientSpaceTransformation);
 
