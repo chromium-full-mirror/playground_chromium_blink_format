@@ -99,24 +99,27 @@ static String IEOpFromDragOp(DragOperation op) {
   return "none";
 }
 
-bool Clipboard::sourceOperation(DragOperation& op) const {
-  op = dragOpFromIEOp(m_effectAllowed);
+DragOperation Clipboard::sourceOperation() const {
+  DragOperation op = dragOpFromIEOp(m_effectAllowed);
   ASSERT(op != DragOperationPrivate);
-  return true;
+  return op;
 }
 
-bool Clipboard::destinationOperation(DragOperation& op) const {
-  op = dragOpFromIEOp(m_dropEffect);
-  ASSERT(op == DragOperationCopy || op == DragOperationNone ||
-         op == DragOperationLink || op == DragOperationMove);
-  return true;
+DragOperation Clipboard::destinationOperation() const {
+  DragOperation op = dragOpFromIEOp(m_dropEffect);
+  ASSERT_ARG(op, op == DragOperationCopy || op == DragOperationNone ||
+                     op == DragOperationLink || op == DragOperationGeneric);
+  return op;
 }
 
 void Clipboard::setSourceOperation(DragOperation op) {
+  ASSERT_ARG(op, op != DragOperationPrivate);
   m_effectAllowed = IEOpFromDragOp(op);
 }
 
 void Clipboard::setDestinationOperation(DragOperation op) {
+  ASSERT(op == DragOperationCopy || op == DragOperationNone ||
+         op == DragOperationLink || op == DragOperationMove);
   m_dropEffect = IEOpFromDragOp(op);
 }
 

@@ -2560,7 +2560,7 @@ bool EventHandler::handleDrag(const MouseEventWithHitTestResults& event) {
 
     if (m_mouseDownMayStartDrag) {
       // gather values from DHTML element, if it set any
-      dragState().m_dragClipboard->sourceOperation(srcOp);
+      srcOp = dragState().m_dragClipboard->sourceOperation();
 
       // Yuck, a draggedImage:moveTo: message can be fired as a result of
       // kicking off the
