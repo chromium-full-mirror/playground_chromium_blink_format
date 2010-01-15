@@ -451,7 +451,7 @@ static void convertCMYKToRGBA(RGBA32Buffer& dest,
   if (scaled) {
     int numColumns = scaledColumns.size();
     for (int x = 0; x < numColumns; ++x) {
-      JSAMPLE* jsample = src + scaledColumns[x] * 3;
+      JSAMPLE* jsample = src + scaledColumns[x] * 4;
       unsigned c = jsample[0];
       unsigned m = jsample[1];
       unsigned y = jsample[2];
