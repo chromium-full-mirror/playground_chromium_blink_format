@@ -341,10 +341,12 @@ bool GIFImageDecoder::haveDecodedRow(unsigned frameIndex,
   // row's X-coordinates.
   int xBegin = upperBoundScaledX(m_reader->frameXOffset());
   int yBegin = upperBoundScaledY(m_reader->frameYOffset() + rowNumber);
-  int xEnd = lowerBoundScaledX(
-                 std::min(xBegin + (rowEnd - rowBuffer), size().width()) - 1,
-                 xBegin + 1) +
-             1;
+  int xEnd =
+      lowerBoundScaledX(std::min(xBegin + static_cast<int>(rowEnd - rowBuffer),
+                                 size().width()) -
+                            1,
+                        xBegin + 1) +
+      1;
   int yEnd =
       lowerBoundScaledY(
           std::min(yBegin + static_cast<int>(repeatCount), size().height()) - 1,
