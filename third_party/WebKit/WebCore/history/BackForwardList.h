@@ -111,8 +111,6 @@ class BackForwardList : public RefCounted<BackForwardList> {
  private:
   BackForwardList(Page*);
 
-  void insertItemAfterCurrent(PassRefPtr<HistoryItem>, bool removeForwardList);
-
   Page* m_page;
 #if PLATFORM(CHROMIUM)
   BackForwardListClient* m_client;
