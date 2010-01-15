@@ -40,7 +40,7 @@ class Structure;
 
 struct StructureTransitionTableHash {
   typedef std::pair<RefPtr<UString::Rep>, unsigned> Key;
-  static unsigned hash(const Key& p) { return p.first->computedHash(); }
+  static unsigned hash(const Key& p) { return p.first->existingHash(); }
 
   static bool equal(const Key& a, const Key& b) { return a == b; }
 

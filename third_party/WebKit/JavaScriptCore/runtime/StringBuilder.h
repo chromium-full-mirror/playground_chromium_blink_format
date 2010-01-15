@@ -57,8 +57,7 @@ class StringBuilder {
 
   UString release() {
     buffer.shrinkToFit();
-    size_t length = buffer.size();
-    return UString::createNonCopying(buffer.releaseBuffer(), length);
+    return UString::adopt(buffer);
   }
 
  private:

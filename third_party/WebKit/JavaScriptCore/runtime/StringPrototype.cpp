@@ -320,9 +320,7 @@ substituteBackreferencesSlow(const UString& replacement,
                                   replacement.size() - offset);
 
   substitutedReplacement.shrinkToFit();
-  unsigned size = substitutedReplacement.size();
-  return UString::createNonCopying(substitutedReplacement.releaseBuffer(),
-                                   size);
+  return UString::adopt(substitutedReplacement);
 }
 
 static inline UString substituteBackreferences(const UString& replacement,
@@ -882,8 +880,7 @@ JSValue JSC_HOST_CALL stringProtoFuncToLowerCase(ExecState* exec,
     buffer[i] = toASCIILower(c);
   }
   if (!(ored & ~0x7f))
-    return jsString(exec,
-                    UString::createNonCopying(buffer.releaseBuffer(), sSize));
+    return jsString(exec, UString::adopt(buffer));
 
   bool error;
   int length = Unicode::toLower(buffer.data(), sSize, sData, sSize, &error);
@@ -893,11 +890,12 @@ JSValue JSC_HOST_CALL stringProtoFuncToLowerCase(ExecState* exec,
     if (error)
       return sVal;
   }
-  if (length == sSize &&
-      memcmp(buffer.data(), sData, length * sizeof(UChar)) == 0)
-    return sVal;
-  return jsString(exec,
-                  UString::createNonCopying(buffer.releaseBuffer(), length));
+  if (length == sSize) {
+    if (memcmp(buffer.data(), sData, length * sizeof(UChar)) == 0)
+      return sVal;
+  } else
+    buffer.resize(length);
+  return jsString(exec, UString::adopt(buffer));
 }
 
 JSValue JSC_HOST_CALL stringProtoFuncToUpperCase(ExecState* exec,
@@ -921,8 +919,7 @@ JSValue JSC_HOST_CALL stringProtoFuncToUpperCase(ExecState* exec,
     buffer[i] = toASCIIUpper(c);
   }
   if (!(ored & ~0x7f))
-    return jsString(exec,
-                    UString::createNonCopying(buffer.releaseBuffer(), sSize));
+    return jsString(exec, UString::adopt(buffer));
 
   bool error;
   int length = Unicode::toUpper(buffer.data(), sSize, sData, sSize, &error);
@@ -932,11 +929,12 @@ JSValue JSC_HOST_CALL stringProtoFuncToUpperCase(ExecState* exec,
     if (error)
       return sVal;
   }
-  if (length == sSize &&
-      memcmp(buffer.data(), sData, length * sizeof(UChar)) == 0)
-    return sVal;
-  return jsString(exec,
-                  UString::createNonCopying(buffer.releaseBuffer(), length));
+  if (length == sSize) {
+    if (memcmp(buffer.data(), sData, length * sizeof(UChar)) == 0)
+      return sVal;
+  } else
+    buffer.resize(length);
+  return jsString(exec, UString::adopt(buffer));
 }
 
 JSValue JSC_HOST_CALL stringProtoFuncLocaleCompare(ExecState* exec,
@@ -1046,7 +1044,9 @@ JSValue JSC_HOST_CALL stringProtoFuncFontsize(ExecState* exec,
     unsigned stringSize = s.size();
     unsigned bufferSize = 22 + stringSize;
     UChar* buffer;
-    if (!tryFastMalloc(bufferSize * sizeof(UChar)).getValue(buffer))
+    PassRefPtr<UStringImpl> impl =
+        UStringImpl::tryCreateUninitialized(bufferSize, buffer);
+    if (!impl)
       return jsUndefined();
     buffer[0] = '<';
     buffer[1] = 'f';
@@ -1071,8 +1071,7 @@ JSValue JSC_HOST_CALL stringProtoFuncFontsize(ExecState* exec,
     buffer[19 + stringSize] = 'n';
     buffer[20 + stringSize] = 't';
     buffer[21 + stringSize] = '>';
-    return jsNontrivialString(exec,
-                              UString::createNonCopying(buffer, bufferSize));
+    return jsNontrivialString(exec, impl);
   }
 
   return jsNontrivialString(exec, makeString("<font size=\"", a0.toString(exec),
@@ -1101,7 +1100,9 @@ JSValue JSC_HOST_CALL stringProtoFuncLink(ExecState* exec,
   unsigned stringSize = s.size();
   unsigned bufferSize = 15 + linkTextSize + stringSize;
   UChar* buffer;
-  if (!tryFastMalloc(bufferSize * sizeof(UChar)).getValue(buffer))
+  PassRefPtr<UStringImpl> impl =
+      UStringImpl::tryCreateUninitialized(bufferSize, buffer);
+  if (!impl)
     return jsUndefined();
   buffer[0] = '<';
   buffer[1] = 'a';
@@ -1120,8 +1121,7 @@ JSValue JSC_HOST_CALL stringProtoFuncLink(ExecState* exec,
   buffer[12 + linkTextSize + stringSize] = '/';
   buffer[13 + linkTextSize + stringSize] = 'a';
   buffer[14 + linkTextSize + stringSize] = '>';
-  return jsNontrivialString(exec,
-                            UString::createNonCopying(buffer, bufferSize));
+  return jsNontrivialString(exec, impl);
 }
 
 enum { TrimLeft = 1, TrimRight = 2 };

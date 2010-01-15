@@ -279,7 +279,7 @@ inline size_t Structure::get(const Identifier& propertyName) {
 
   UString::Rep* rep = propertyName._ustring.rep();
 
-  unsigned i = rep->computedHash();
+  unsigned i = rep->existingHash();
 
 #if DUMP_PROPERTYMAP_STATS
   ++numProbes;
@@ -297,7 +297,7 @@ inline size_t Structure::get(const Identifier& propertyName) {
   ++numCollisions;
 #endif
 
-  unsigned k = 1 | WTF::doubleHash(rep->computedHash());
+  unsigned k = 1 | WTF::doubleHash(rep->existingHash());
 
   while (1) {
     i += k;

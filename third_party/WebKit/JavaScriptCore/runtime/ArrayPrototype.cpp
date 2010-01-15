@@ -278,9 +278,7 @@ JSValue JSC_HOST_CALL arrayProtoFuncToString(ExecState* exec,
       buffer.append(rep->data(), rep->size());
   }
   ASSERT(buffer.size() == totalSize);
-  unsigned finalSize = buffer.size();
-  return jsString(exec,
-                  UString::createNonCopying(buffer.releaseBuffer(), finalSize));
+  return jsString(exec, UString::adopt(buffer));
 }
 
 JSValue JSC_HOST_CALL arrayProtoFuncToLocaleString(ExecState* exec,

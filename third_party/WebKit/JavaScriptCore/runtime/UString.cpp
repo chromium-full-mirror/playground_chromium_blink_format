@@ -163,7 +163,8 @@ static PassRefPtr<UString::Rep> createRep(const char* c) {
 
   size_t length = strlen(c);
   UChar* d;
-  PassRefPtr<UStringImpl> result = UStringImpl::createUninitialized(length, d);
+  PassRefPtr<UStringImpl> result =
+      UStringImpl::tryCreateUninitialized(length, d);
   if (!result)
     return &UString::Rep::null();
 
@@ -181,7 +182,8 @@ static inline PassRefPtr<UString::Rep> createRep(const char* c, int length) {
     return &UString::Rep::empty();
 
   UChar* d;
-  PassRefPtr<UStringImpl> result = UStringImpl::createUninitialized(length, d);
+  PassRefPtr<UStringImpl> result =
+      UStringImpl::tryCreateUninitialized(length, d);
   if (!result)
     return &UString::Rep::null();
 
@@ -199,14 +201,7 @@ UString::UString(const UChar* c, int length) {
   if (length == 0)
     m_rep = &Rep::empty();
   else
-    m_rep = Rep::createCopying(c, length);
-}
-
-UString UString::createNonCopying(UChar* c, int length) {
-  if (length == 0)
-    return UString(&Rep::empty());
-  else
-    return Rep::create(c, length);
+    m_rep = Rep::create(c, length);
 }
 
 UString UString::createFromUTF8(const char* string) {
@@ -221,19 +216,6 @@ UString UString::createFromUTF8(const char* string) {
     return null();
 
   return UString(buffer.data(), p - buffer.data());
-}
-
-UString UString::createUninitialized(unsigned length, UChar*& output) {
-  if (!length) {
-    output = &sharedEmptyChar;
-    return UString(&Rep::empty());
-  }
-
-  if (PassRefPtr<UStringImpl> result =
-          UStringImpl::createUninitialized(length, output))
-    return result;
-  output = 0;
-  return UString();
 }
 
 UString UString::from(int i) {
@@ -375,7 +357,8 @@ UString UString::spliceSubstringsWithSeparators(const Range* substringRanges,
     return "";
 
   UChar* buffer;
-  if (!UStringImpl::allocChars(totalLength).getValue(buffer))
+  PassRefPtr<Rep> rep = Rep::tryCreateUninitialized(totalLength, buffer);
+  if (!rep)
     return null();
 
   int maxCount = max(rangeCount, separatorCount);
@@ -394,7 +377,7 @@ UString UString::spliceSubstringsWithSeparators(const Range* substringRanges,
     }
   }
 
-  return UString::Rep::create(buffer, totalLength);
+  return rep;
 }
 
 UString UString::replaceRange(int rangeStart,
@@ -408,7 +391,8 @@ UString UString::replaceRange(int rangeStart,
     return "";
 
   UChar* buffer;
-  if (!UStringImpl::allocChars(totalLength).getValue(buffer))
+  PassRefPtr<Rep> rep = Rep::tryCreateUninitialized(totalLength, buffer);
+  if (!rep)
     return null();
 
   UStringImpl::copyChars(buffer, data(), rangeStart);
@@ -418,7 +402,7 @@ UString UString::replaceRange(int rangeStart,
   UStringImpl::copyChars(buffer + rangeStart + replacementLength,
                          data() + rangeEnd, size() - rangeEnd);
 
-  return UString::Rep::create(buffer, totalLength);
+  return rep;
 }
 
 bool UString::getCString(CStringBuffer& buffer) const {
@@ -476,15 +460,14 @@ UString& UString::operator=(const char* c) {
   }
 
   int l = static_cast<int>(strlen(c));
-  UChar* d;
-  if (!UStringImpl::allocChars(l).getValue(d)) {
+  UChar* d = 0;
+  m_rep = Rep::tryCreateUninitialized(l, d);
+  if (m_rep) {
+    for (int i = 0; i < l; i++)
+      d[i] = static_cast<unsigned char>(
+          c[i]);  // use unsigned char to zero-extend instead of sign-extend
+  } else
     makeNull();
-    return *this;
-  }
-  for (int i = 0; i < l; i++)
-    d[i] = static_cast<unsigned char>(
-        c[i]);  // use unsigned char to zero-extend instead of sign-extend
-  m_rep = Rep::create(d, l);
 
   return *this;
 }
