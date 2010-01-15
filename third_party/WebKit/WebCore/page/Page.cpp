@@ -332,7 +332,8 @@ void Page::goToItem(HistoryItem* item, FrameLoadType type) {
 }
 
 int Page::getHistoryLength() {
-  return m_backForwardList->backListCount() + 1;
+  return m_backForwardList->backListCount() + 1 +
+         m_backForwardList->forwardListCount();
 }
 
 void Page::setGlobalHistoryItem(HistoryItem* item) {
