@@ -59,6 +59,9 @@ class WebSecurityOrigin {
     return *this;
   }
 
+  WEBKIT_API static WebSecurityOrigin* createFromDatabaseIdentifier(
+      const WebString& databaseIdentifier);
+
   WEBKIT_API void reset();
   WEBKIT_API void assign(const WebSecurityOrigin&);
 
