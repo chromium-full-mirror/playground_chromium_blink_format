@@ -249,6 +249,8 @@ FloatRect RenderSVGText::repaintRectInLocalCoordinates() const {
   if (!rect.isEmpty())
     repaintRect.intersect(rect);
 
+  style()->svgStyle()->inflateForShadow(repaintRect);
+
   return repaintRect;
 }
 }
