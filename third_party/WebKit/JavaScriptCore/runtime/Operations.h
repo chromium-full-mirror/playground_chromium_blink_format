@@ -343,7 +343,9 @@ ALWAYS_INLINE JSValue jsAdd(CallFrame* callFrame, JSValue v1, JSValue v2) {
 
 inline size_t normalizePrototypeChain(CallFrame* callFrame,
                                       JSValue base,
-                                      JSValue slotBase) {
+                                      JSValue slotBase,
+                                      const Identifier& propertyName,
+                                      size_t& slotOffset) {
   JSCell* cell = asCell(base);
   size_t count = 0;
 
@@ -360,8 +362,11 @@ inline size_t normalizePrototypeChain(CallFrame* callFrame,
 
     // Since we're accessing a prototype in a loop, it's a good bet that it
     // should not be treated as a dictionary.
-    if (cell->structure()->isDictionary())
+    if (cell->structure()->isDictionary()) {
       asObject(cell)->flattenDictionaryObject();
+      if (slotBase == cell)
+        slotOffset = cell->structure()->get(propertyName);
+    }
 
     ++count;
   }
