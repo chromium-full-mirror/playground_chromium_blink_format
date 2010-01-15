@@ -144,8 +144,8 @@ void WebWorkerBase::invokeTaskMethod(void* param) {
 void WebWorkerBase::postMessageToWorkerObject(
     PassRefPtr<SerializedScriptValue> message,
     PassOwnPtr<MessagePortChannelArray> channels) {
-  dispatchTaskToMainThread(createCallbackTask(
-      &postMessageTask, this, message->toWireString(), channels));
+  dispatchTaskToMainThread(createCallbackTask(&postMessageTask, this,
+                                              message->toString(), channels));
 }
 
 void WebWorkerBase::postMessageTask(

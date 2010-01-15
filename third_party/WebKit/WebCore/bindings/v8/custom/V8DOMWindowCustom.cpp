@@ -419,7 +419,7 @@ v8::Handle<v8::Value> V8DOMWindow::postMessageCallback(
 
   v8::TryCatch tryCatch;
   RefPtr<SerializedScriptValue> message =
-      SerializedScriptValue::create(args[0]);
+      SerializedScriptValue::create(toWebCoreString(args[0]));
   MessagePortArray portArray;
   String targetOrigin;
 

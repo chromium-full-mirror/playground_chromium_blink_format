@@ -80,7 +80,7 @@ void WebWorkerImpl::postMessageToWorkerContextTask(
   OwnPtr<MessagePortArray> ports =
       MessagePort::entanglePorts(*context, channels.release());
   RefPtr<SerializedScriptValue> serializedMessage =
-      SerializedScriptValue::createFromWire(message);
+      SerializedScriptValue::create(message);
   workerContext->dispatchEvent(
       MessageEvent::create(ports.release(), serializedMessage.release()));
   thisPtr->confirmMessageFromWorkerObject(workerContext->hasPendingActivity());

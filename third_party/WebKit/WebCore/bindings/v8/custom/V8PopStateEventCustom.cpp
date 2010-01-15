@@ -45,7 +45,7 @@ v8::Handle<v8::Value> V8PopStateEvent::initPopStateEventCallback(
   bool canBubbleArg = args[1]->BooleanValue();
   bool cancelableArg = args[2]->BooleanValue();
   RefPtr<SerializedScriptValue> stateArg =
-      SerializedScriptValue::create(args[3]);
+      SerializedScriptValue::create(v8ValueToWebCoreString(args[3]));
 
   PopStateEvent* event = V8PopStateEvent::toNative(args.Holder());
   event->initPopStateEvent(typeArg, canBubbleArg, cancelableArg,
@@ -64,7 +64,7 @@ v8::Handle<v8::Value> V8PopStateEvent::stateAccessorGetter(
   if (!state)
     return v8::Null();
 
-  return state->deserialize();
+  return v8StringOrNull(state->toString());
 }
 
 }  // namespace WebCore
