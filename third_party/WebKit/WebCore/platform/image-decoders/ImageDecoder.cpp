@@ -23,9 +23,8 @@
 
 #include "ImageDecoder.h"
 
-#if ENABLE(IMAGE_DECODER_DOWN_SAMPLING)
 #include <algorithm>
-#endif
+#include <cmath>
 
 #include "BMPImageDecoder.h"
 #include "GIFImageDecoder.h"
@@ -171,8 +170,6 @@ int RGBA32Buffer::height() const {
 
 #endif
 
-#if ENABLE(IMAGE_DECODER_DOWN_SAMPLING)
-
 namespace {
 
 enum MatchType { Exact, UpperBound, LowerBound };
@@ -196,6 +193,9 @@ template <MatchType type>
 int getScaledValue(const Vector<int>& scaledValues,
                    int valueToMatch,
                    int searchStart) {
+  if (scaledValues.isEmpty())
+    return valueToMatch;
+
   const int* dataStart = scaledValues.data();
   const int* dataEnd = dataStart + scaledValues.size();
   const int* matched =
@@ -217,18 +217,19 @@ int getScaledValue(const Vector<int>& scaledValues,
 }
 
 void ImageDecoder::prepareScaleDataIfNecessary() {
-  int width = m_size.width();
-  int height = m_size.height();
+  int width = size().width();
+  int height = size().height();
   int numPixels = height * width;
-  if (m_maxNumPixels <= 0 || numPixels <= m_maxNumPixels) {
+  if (m_maxNumPixels > 0 && numPixels > m_maxNumPixels) {
+    m_scaled = true;
+    double scale = sqrt(m_maxNumPixels / (double)numPixels);
+    fillScaledValues(m_scaledColumns, scale, width);
+    fillScaledValues(m_scaledRows, scale, height);
+  } else if (m_scaled) {
     m_scaled = false;
-    return;
+    m_scaledColumns.clear();
+    m_scaledRows.clear();
   }
-
-  m_scaled = true;
-  double scale = sqrt(m_maxNumPixels / (double)numPixels);
-  fillScaledValues(m_scaledColumns, scale, width);
-  fillScaledValues(m_scaledRows, scale, height);
 }
 
 int ImageDecoder::upperBoundScaledX(int origX, int searchStart) {
@@ -250,6 +251,4 @@ int ImageDecoder::lowerBoundScaledY(int origY, int searchStart) {
 int ImageDecoder::scaledY(int origY, int searchStart) {
   return getScaledValue<Exact>(m_scaledRows, origY, searchStart);
 }
-
-#endif  // ENABLE(IMAGE_DECODER_DOWN_SAMPLING)
 }
