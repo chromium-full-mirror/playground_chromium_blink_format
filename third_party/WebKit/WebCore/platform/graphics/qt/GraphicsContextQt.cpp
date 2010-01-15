@@ -194,7 +194,7 @@ struct TransparencyLayer : FastAllocBase {
   TransparencyLayer& operator=(const TransparencyLayer&) { return *this; }
 };
 
-class GraphicsContextPlatformPrivate {
+class GraphicsContextPlatformPrivate : public Noncopyable {
  public:
   GraphicsContextPlatformPrivate(QPainter* painter);
   ~GraphicsContextPlatformPrivate();
