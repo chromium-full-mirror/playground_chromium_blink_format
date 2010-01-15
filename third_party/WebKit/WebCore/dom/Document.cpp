@@ -392,7 +392,8 @@ Document::Document(Frame* frame, bool isXHTML)
       ,
       m_containsWMLContent(false)
 #endif
-{
+      ,
+      m_weakReference(DocumentWeakReference::create(this)) {
   m_document = this;
 
   m_pageGroupUserSheetCacheValid = false;
@@ -543,6 +544,8 @@ Document::~Document() {
 
   if (m_styleSheets)
     m_styleSheets->documentDestroyed();
+
+  m_weakReference->clear();
 }
 
 #if USE(JSC)
@@ -4757,19 +4760,24 @@ class ScriptExecutionContextTaskTimer : public TimerBase {
 };
 
 struct PerformTaskContext : Noncopyable {
-  PerformTaskContext(ScriptExecutionContext* scriptExecutionContext,
+  PerformTaskContext(PassRefPtr<DocumentWeakReference> documentReference,
                      PassOwnPtr<ScriptExecutionContext::Task> task)
-      : scriptExecutionContext(scriptExecutionContext), task(task) {}
+      : documentReference(documentReference), task(task) {}
 
-  ScriptExecutionContext*
-      scriptExecutionContext;  // The context should exist until task execution.
+  RefPtr<DocumentWeakReference> documentReference;
   OwnPtr<ScriptExecutionContext::Task> task;
 };
 
 static void performTask(void* ctx) {
-  PerformTaskContext* ptctx = reinterpret_cast<PerformTaskContext*>(ctx);
-  ptctx->task->performTask(ptctx->scriptExecutionContext);
-  delete ptctx;
+  ASSERT(isMainThread());
+
+  PerformTaskContext* context = reinterpret_cast<PerformTaskContext*>(ctx);
+  ASSERT(context);
+
+  if (Document* document = context->documentReference->document())
+    context->task->performTask(document);
+
+  delete context;
 }
 
 void Document::postTask(PassOwnPtr<Task> task) {
@@ -4778,7 +4786,8 @@ void Document::postTask(PassOwnPtr<Task> task) {
         new ScriptExecutionContextTaskTimer(static_cast<Document*>(this), task);
     timer->startOneShot(0);
   } else {
-    callOnMainThread(performTask, new PerformTaskContext(this, task));
+    callOnMainThread(performTask,
+                     new PerformTaskContext(m_weakReference, task));
   }
 }
 
@@ -4842,5 +4851,20 @@ InspectorTimelineAgent* Document::inspectorTimelineAgent() const {
   return page() ? page()->inspectorTimelineAgent() : 0;
 }
 #endif
+
+inline DocumentWeakReference::DocumentWeakReference(Document* document)
+    : m_document(document) {
+  ASSERT(isMainThread());
+}
+
+inline Document* DocumentWeakReference::document() {
+  ASSERT(isMainThread());
+  return m_document;
+}
+
+inline void DocumentWeakReference::clear() {
+  ASSERT(isMainThread());
+  m_document = 0;
+}
 
 }  // namespace WebCore
