@@ -45,8 +45,8 @@ namespace WebCore {
 PassRefPtr<StorageNamespace> StorageNamespace::localStorageNamespace(
     const String& path,
     unsigned quota) {
-  return new StorageNamespaceProxy(
-      WebKit::webKitClient()->createLocalStorageNamespace(path, quota));
+  return adoptRef(new StorageNamespaceProxy(
+      WebKit::webKitClient()->createLocalStorageNamespace(path, quota)));
 }
 
 PassRefPtr<StorageNamespace> StorageNamespace::sessionStorageNamespace(
@@ -54,8 +54,8 @@ PassRefPtr<StorageNamespace> StorageNamespace::sessionStorageNamespace(
   WebKit::ChromeClientImpl* chromeClientImpl =
       static_cast<WebKit::ChromeClientImpl*>(page->chrome()->client());
   WebKit::WebViewClient* webViewClient = chromeClientImpl->webView()->client();
-  return new StorageNamespaceProxy(
-      webViewClient->createSessionStorageNamespace());
+  return adoptRef(new StorageNamespaceProxy(
+      webViewClient->createSessionStorageNamespace()));
 }
 
 StorageNamespaceProxy::StorageNamespaceProxy(
