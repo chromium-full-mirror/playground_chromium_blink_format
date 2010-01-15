@@ -95,10 +95,12 @@ class UStringImpl : Noncopyable {
 
   static PassRefPtr<UStringImpl> create(const UChar* buffer, int length) {
     UChar* newBuffer;
-    if (!UStringImpl::allocChars(length).getValue(newBuffer))
-      return &null();
-    copyChars(newBuffer, buffer, length);
-    return adoptRef(new UStringImpl(newBuffer, length, BufferOwned));
+    if (PassRefPtr<UStringImpl> impl =
+            tryCreateUninitialized(length, newBuffer)) {
+      copyChars(newBuffer, buffer, length);
+      return impl;
+    }
+    return &null();
   }
 
   static PassRefPtr<UStringImpl> create(PassRefPtr<UStringImpl> rep,
@@ -188,13 +190,6 @@ class UStringImpl : Noncopyable {
   ALWAYS_INLINE void deref() {
     if (!(m_refCount -= s_refCountIncrement))
       delete this;
-  }
-
-  static WTF::PossiblyNull<UChar*> allocChars(size_t length) {
-    ASSERT(length);
-    if (length > std::numeric_limits<size_t>::max() / sizeof(UChar))
-      return 0;
-    return tryFastMalloc(sizeof(UChar) * length);
   }
 
   static void copyChars(UChar* destination,
