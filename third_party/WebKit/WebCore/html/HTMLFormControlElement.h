@@ -136,7 +136,7 @@ class HTMLFormControlElement : public HTMLElement {
   virtual bool isValidFormControlElement();
 
   HTMLFormElement* m_form;
-  RefPtr<ValidityState> m_validityState;
+  OwnPtr<ValidityState> m_validityState;
   bool m_disabled : 1;
   bool m_readOnly : 1;
   bool m_required : 1;
