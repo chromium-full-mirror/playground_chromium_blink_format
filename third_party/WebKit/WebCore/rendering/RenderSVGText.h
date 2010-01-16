@@ -44,7 +44,7 @@ class RenderSVGText : public RenderSVGBlock {
 
   virtual bool isSVGText() const { return true; }
 
-  virtual TransformationMatrix localToParentTransform() const {
+  virtual const TransformationMatrix& localToParentTransform() const {
     return m_localTransform;
   }
 

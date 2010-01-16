@@ -87,8 +87,10 @@ void RenderForeignObject::computeRectForRepaint(
   RenderBlock::computeRectForRepaint(repaintContainer, rect, fixed);
 }
 
-TransformationMatrix RenderForeignObject::localToParentTransform() const {
-  return localTransform() * translationForAttributes();
+const TransformationMatrix& RenderForeignObject::localToParentTransform()
+    const {
+  m_localToParentTransform = localTransform() * translationForAttributes();
+  return m_localToParentTransform;
 }
 
 void RenderForeignObject::layout() {

@@ -2700,14 +2700,13 @@ FloatRect RenderObject::repaintRectInLocalCoordinates() const {
 }
 
 TransformationMatrix RenderObject::localTransform() const {
-  return TransformationMatrix();
+  static const TransformationMatrix identity;
+  return identity;
 }
 
-TransformationMatrix RenderObject::localToParentTransform() const {
-  // FIXME: This double virtual call indirection is temporary until I can land
-  // the
-  // rest of the of the localToParentTransform() support for SVG.
-  return localTransform();
+const TransformationMatrix& RenderObject::localToParentTransform() const {
+  static const TransformationMatrix identity;
+  return identity;
 }
 
 TransformationMatrix RenderObject::absoluteTransform() const {

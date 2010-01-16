@@ -43,7 +43,7 @@ class RenderSVGImage : public RenderImage, SVGRenderBase {
   virtual const char* renderName() const { return "RenderSVGImage"; }
   virtual bool isSVGImage() const { return true; }
 
-  virtual TransformationMatrix localToParentTransform() const {
+  virtual const TransformationMatrix& localToParentTransform() const {
     return m_localTransform;
   }
 

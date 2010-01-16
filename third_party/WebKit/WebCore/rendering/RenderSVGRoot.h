@@ -56,7 +56,7 @@ class RenderSVGRoot : public RenderBox, SVGRenderBase {
   virtual void layout();
   virtual void paint(PaintInfo&, int parentX, int parentY);
 
-  virtual TransformationMatrix localToParentTransform() const;
+  virtual const TransformationMatrix& localToParentTransform() const;
 
   bool fillContains(const FloatPoint&) const;
   bool strokeContains(const FloatPoint&) const;
@@ -101,6 +101,7 @@ class RenderSVGRoot : public RenderBox, SVGRenderBase {
 
   RenderObjectChildList m_children;
   FloatSize m_viewportSize;
+  mutable TransformationMatrix m_localToParentTransform;
 };
 
 inline RenderSVGRoot* toRenderSVGRoot(RenderObject* object) {

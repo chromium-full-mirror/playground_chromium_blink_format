@@ -38,7 +38,7 @@ class RenderForeignObject : public RenderSVGBlock {
 
   virtual void paint(PaintInfo&, int parentX, int parentY);
 
-  virtual TransformationMatrix localToParentTransform() const;
+  virtual const TransformationMatrix& localToParentTransform() const;
 
   virtual void computeRectForRepaint(RenderBoxModelObject* repaintContainer,
                                      IntRect&,
@@ -71,6 +71,7 @@ class RenderForeignObject : public RenderSVGBlock {
   }
 
   TransformationMatrix m_localTransform;
+  mutable TransformationMatrix m_localToParentTransform;
 };
 
 }  // namespace WebCore
