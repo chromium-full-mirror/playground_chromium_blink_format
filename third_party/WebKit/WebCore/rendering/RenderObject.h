@@ -296,6 +296,7 @@ class RenderObject : public CachedResourceClient {
   virtual bool isRenderInline() const { return false; }
   virtual bool isRenderPart() const { return false; }
   virtual bool isRenderView() const { return false; }
+  virtual bool isReplica() const { return false; }
   virtual bool isRuby() const { return false; }
   virtual bool isRubyBase() const { return false; }
   virtual bool isRubyRun() const { return false; }

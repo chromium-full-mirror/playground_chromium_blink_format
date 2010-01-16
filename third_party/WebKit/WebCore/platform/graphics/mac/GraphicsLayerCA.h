@@ -63,6 +63,7 @@ class GraphicsLayerCA : public GraphicsLayer {
   virtual void removeFromParent();
 
   virtual void setMaskLayer(GraphicsLayer*);
+  virtual void setReplicatedLayer(GraphicsLayer*);
 
   virtual void setPosition(const FloatPoint&);
   virtual void setAnchorPoint(const FloatPoint3D&);
@@ -119,8 +120,9 @@ class GraphicsLayerCA : public GraphicsLayer {
 
   virtual void setGeometryOrientation(CompositingCoordinatesOrientation);
 
+  virtual void didDisplay();
+
   void recursiveCommitChanges();
-  void commitLayerChanges();
 
   virtual void syncCompositingState();
 
@@ -136,6 +138,19 @@ class GraphicsLayerCA : public GraphicsLayer {
   CALayer* hostLayerForSublayers() const;
   CALayer* layerForSuperlayer() const;
   CALayer* animatedLayer(AnimatedPropertyID property) const;
+
+  typedef String CloneID;  // Identifier for a given clone, based on
+                           // original/replica branching down the tree.
+  static bool isReplicatedRootClone(const CloneID& cloneID) {
+    return cloneID[0U] & 1;
+  }
+
+  typedef HashMap<CloneID, RetainPtr<CALayer>> LayerMap;
+  LayerMap* primaryLayerClones() const {
+    return m_structuralLayer.get() ? m_structuralLayerClones.get()
+                                   : m_layerClones.get();
+  }
+  LayerMap* animatedLayerClones(AnimatedPropertyID property) const;
 
   bool createAnimationFromKeyframes(const KeyframeValueList&,
                                     const Animation*,
@@ -186,6 +201,9 @@ class GraphicsLayerCA : public GraphicsLayer {
            m_runningKeyframeAnimations.end();
   }
 
+  void commitLayerChangesBeforeSublayers();
+  void commitLayerChangesAfterSublayers();
+
   bool requiresTiledLayer(const FloatSize&) const;
   void swapFromOrToTiledLayer(bool useTiledLayer);
 
@@ -194,6 +212,70 @@ class GraphicsLayerCA : public GraphicsLayer {
 
   void setupContentsLayer(CALayer*);
   CALayer* contentsLayer() const { return m_contentsLayer.get(); }
+
+  virtual void setReplicatedByLayer(GraphicsLayer*);
+
+  // Used to track the path down the tree for replica layers.
+  struct ReplicaState {
+    static const size_t maxReplicaDepth = 16;
+    enum ReplicaBranchType { ChildBranch = 0, ReplicaBranch = 1 };
+    ReplicaState(ReplicaBranchType firstBranch) : m_replicaDepth(0) {
+      push(firstBranch);
+    }
+
+    // Called as we walk down the tree to build replicas.
+    void push(ReplicaBranchType branchType) {
+      m_replicaBranches.append(branchType);
+      if (branchType == ReplicaBranch)
+        ++m_replicaDepth;
+    }
+
+    void setBranchType(ReplicaBranchType branchType) {
+      ASSERT(!m_replicaBranches.isEmpty());
+
+      if (m_replicaBranches.last() != branchType) {
+        if (branchType == ReplicaBranch)
+          ++m_replicaDepth;
+        else
+          --m_replicaDepth;
+      }
+
+      m_replicaBranches.last() = branchType;
+    }
+
+    void pop() {
+      if (m_replicaBranches.last() == ReplicaBranch)
+        --m_replicaDepth;
+      m_replicaBranches.removeLast();
+    }
+
+    size_t depth() const { return m_replicaBranches.size(); }
+    size_t replicaDepth() const { return m_replicaDepth; }
+
+    CloneID cloneID() const;
+
+   private:
+    Vector<ReplicaBranchType> m_replicaBranches;
+    size_t m_replicaDepth;
+  };
+  CALayer* replicatedLayerRoot(ReplicaState&);
+
+  enum CloneLevel { RootCloneLevel, IntermediateCloneLevel };
+  CALayer* fetchCloneLayers(GraphicsLayer* replicaRoot,
+                            ReplicaState&,
+                            CloneLevel);
+  void ensureCloneLayers(CloneID index,
+                         CALayer*& primaryLayer,
+                         CALayer*& structuralLayer,
+                         CALayer*& contentsLayer,
+                         CloneLevel);
+  CALayer* cloneLayer(CALayer*, CloneLevel);
+
+  bool hasCloneLayers() const { return m_layerClones; }
+  void removeCloneLayers();
+  FloatPoint positionForCloneRootLayer() const;
+
+  void propagateLayerChangeToReplicas();
 
   // All these "update" methods will be called inside a
   // BEGIN_BLOCK_OBJC_EXCEPTIONS/END_BLOCK_OBJC_EXCEPTIONS block.
@@ -219,6 +301,7 @@ class GraphicsLayerCA : public GraphicsLayer {
   void updateContentsRect();
   void updateGeometryOrientation();
   void updateMaskLayer();
+  void updateReplicatedLayers();
 
   void updateLayerAnimations();
 
@@ -243,9 +326,16 @@ class GraphicsLayerCA : public GraphicsLayer {
                              int index,
                              double timeOffset);
 
-  void moveAnimationsForProperty(AnimatedPropertyID property,
-                                 CALayer* fromLayer,
-                                 CALayer* toLayer);
+  enum MoveOrCopy { Move, Copy };
+  void moveOrCopyAnimationsForProperty(MoveOrCopy,
+                                       AnimatedPropertyID property,
+                                       CALayer* fromLayer,
+                                       CALayer* toLayer);
+  static void moveOrCopyAllAnimationsForProperty(MoveOrCopy operation,
+                                                 AnimatedPropertyID property,
+                                                 const String& keyframesName,
+                                                 CALayer* fromLayer,
+                                                 CALayer* toLayer);
 
   enum LayerChange {
     NoChange = 0,
@@ -273,10 +363,12 @@ class GraphicsLayerCA : public GraphicsLayer {
 #endif
     ContentsRectChanged = 1 << 20,
     GeometryOrientationChanged = 1 << 21,
-    MaskLayerChanged = 1 << 22
+    MaskLayerChanged = 1 << 22,
+    ReplicatedLayerChanged = 1 << 23
   };
   typedef unsigned LayerChangeFlags;
   void noteLayerPropertyChanged(LayerChangeFlags flags);
+  void noteSublayersChanged();
 
   void repaintLayerDirtyRects();
 
@@ -287,6 +379,11 @@ class GraphicsLayerCA : public GraphicsLayer {
                                          // m_layer.
   RetainPtr<CALayer>
       m_contentsLayer;  // A layer used for inner content, like image and video
+
+  // References to clones of our layers, for replicated layers.
+  OwnPtr<LayerMap> m_layerClones;
+  OwnPtr<LayerMap> m_structuralLayerClones;
+  OwnPtr<LayerMap> m_contentsLayerClones;
 
   enum ContentsLayerPurpose {
     NoContentsLayer = 0,
