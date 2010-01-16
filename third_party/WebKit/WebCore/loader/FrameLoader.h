@@ -615,6 +615,8 @@ class FrameLoader : public Noncopyable {
   bool m_isComplete;
   bool m_isLoadingMainResource;
 
+  RefPtr<SerializedScriptValue> m_pendingStateObject;
+
   KURL m_URL;
   KURL m_workingURL;
 
