@@ -212,7 +212,11 @@ static GtkWidget* currentToplevelCallback(WebKitSoupAuthDialog* feature,
 
   GtkWidget* toplevel = gtk_widget_get_toplevel(
       GTK_WIDGET(frame->page()->chrome()->platformPageClient()));
+#if GTK_CHECK_VERSION(2, 18, 0)
+  if (gtk_widget_is_toplevel(toplevel))
+#else
   if (GTK_WIDGET_TOPLEVEL(toplevel))
+#endif
     return toplevel;
   else
     return NULL;
