@@ -40,6 +40,8 @@ class RenderCounter : public RenderText {
   void invalidate(const AtomicString& identifier);
 
   static void destroyCounterNodes(RenderObject*);
+  static void destroyCounterNode(RenderObject*, const AtomicString& identifier);
+  static void rendererSubtreeAttached(RenderObject*);
 
  private:
   virtual const char* renderName() const;
