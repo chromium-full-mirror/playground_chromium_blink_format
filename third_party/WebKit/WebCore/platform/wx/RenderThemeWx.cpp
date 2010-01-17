@@ -288,7 +288,11 @@ bool RenderThemeWx::paintButton(RenderObject* o,
 
   IntRect rect = r;
 
-#if USE(WXGC)
+// On Mac, wxGraphicsContext and wxDC share the same native implementation,
+// and so transformations are available.
+// On Win and Linux, however, this is not true and transforms are lost,
+// so we need to restore them here.
+#if USE(WXGC) && !defined(__WXMAC__)
   double xtrans = 0;
   double ytrans = 0;
 
@@ -315,7 +319,7 @@ bool RenderThemeWx::paintButton(RenderObject* o,
     if (isChecked(o))
       flags |= wxCONTROL_CHECKED;
 #if wxCHECK_VERSION(2, 9, 1)
-    wxRendererNative::Get().DrawRadioBitmap(window, *dc, r, flags);
+    wxRendererNative::Get().DrawRadioBitmap(window, *dc, rect, flags);
 #elif wxCHECK_VERSION(2, 9, 0)
     wxRendererNative::Get().DrawRadioButton(window, *dc, rect, flags);
 #else
