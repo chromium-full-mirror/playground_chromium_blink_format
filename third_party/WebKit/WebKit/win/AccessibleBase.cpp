@@ -100,7 +100,17 @@ ULONG STDMETHODCALLTYPE AccessibleBase::Release(void) {
 HRESULT STDMETHODCALLTYPE AccessibleBase::get_accParent(IDispatch** parent) {
   *parent = 0;
 
-  if (!m_object || !m_object->topDocumentFrameView())
+  if (!m_object)
+    return E_FAIL;
+
+  AccessibilityObject* parentObject = m_object->parentObjectUnignored();
+  if (parentObject) {
+    *parent = wrapper(parentObject);
+    (*parent)->AddRef();
+    return S_OK;
+  }
+
+  if (!m_object->topDocumentFrameView())
     return E_FAIL;
 
   return WebView::AccessibleObjectFromWindow(
