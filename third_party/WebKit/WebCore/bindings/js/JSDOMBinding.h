@@ -144,6 +144,7 @@ class DOMConstructorWithDocument : public DOMConstructorObject {
 };
 
 typedef JSC::WeakGCMap<void*, DOMObject*> DOMObjectWrapperMap;
+typedef JSC::WeakGCMap<StringImpl*, JSC::JSString*> JSStringCache;
 
 class DOMWrapperWorld : public RefCounted<DOMWrapperWorld> {
  public:
@@ -159,6 +160,7 @@ class DOMWrapperWorld : public RefCounted<DOMWrapperWorld> {
 
   // FIXME: can we make this private?
   DOMObjectWrapperMap m_wrappers;
+  JSStringCache m_stringCache;
 
   bool isNormal() const { return m_isNormal; }
 
@@ -412,6 +414,14 @@ void reportCurrentException(JSC::ExecState*);
 // Convert a DOM implementation exception code into a JavaScript exception in
 // the execution state.
 void setDOMException(JSC::ExecState*, ExceptionCode);
+
+JSC::JSValue jsString(JSC::ExecState*,
+                      const String&);  // empty if the string is null
+JSC::JSValue jsString(JSC::ExecState*,
+                      const KURL&);  // empty if the URL is null
+inline JSC::JSValue jsString(JSC::ExecState* exec, const AtomicString& s) {
+  return jsString(exec, s.string());
+}
 
 JSC::JSValue jsStringOrNull(JSC::ExecState*,
                             const String&);  // null if the string is null

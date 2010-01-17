@@ -74,6 +74,12 @@ JSString* jsNontrivialString(ExecState*, const char*);
 JSString* jsOwnedString(JSGlobalData*, const UString&);
 JSString* jsOwnedString(ExecState*, const UString&);
 
+typedef void (*JSStringFinalizerCallback)(JSString*, void* context);
+JSString* jsStringWithFinalizer(ExecState*,
+                                const UString&,
+                                JSStringFinalizerCallback callback,
+                                void* context);
+
 class JS_EXPORTCLASS JSString : public JSCell {
  public:
   friend class JIT;
@@ -86,10 +92,12 @@ class JS_EXPORTCLASS JSString : public JSCell {
     // Each Fiber in a rope is either UString::Rep or another Rope.
     class Fiber {
      public:
-      Fiber() {}
+      Fiber() : m_value(0) {}
       Fiber(UString::Rep* string)
           : m_value(reinterpret_cast<intptr_t>(string)) {}
       Fiber(Rope* rope) : m_value(reinterpret_cast<intptr_t>(rope) | 1) {}
+
+      Fiber(void* nonFiber) : m_value(reinterpret_cast<intptr_t>(nonFiber)) {}
 
       void deref() {
         if (isRope())
@@ -123,6 +131,8 @@ class JS_EXPORTCLASS JSString : public JSCell {
       UString::Rep* string() {
         return reinterpret_cast<UString::Rep*>(m_value);
       }
+
+      void* nonFiber() { return reinterpret_cast<void*>(m_value); }
 
      private:
       intptr_t m_value;
@@ -259,10 +269,30 @@ class JS_EXPORTCLASS JSString : public JSCell {
     ASSERT(index == s_maxInternalRopeLength);
   }
 
+  JSString(JSGlobalData* globalData,
+           const UString& value,
+           JSStringFinalizerCallback finalizer,
+           void* context)
+      : JSCell(globalData->stringStructure.get()),
+        m_stringLength(value.size()),
+        m_value(value),
+        m_ropeLength(0) {
+    // nasty hack because we can't union non-POD types
+    m_fibers[0] = reinterpret_cast<void*>(finalizer);
+    m_fibers[1] = context;
+    Heap::heap(this)->reportExtraMemoryCost(value.cost());
+  }
+
   ~JSString() {
     ASSERT(vptr() == JSGlobalData::jsStringVPtr);
     for (unsigned i = 0; i < m_ropeLength; ++i)
       m_fibers[i].deref();
+
+    if (!m_ropeLength && m_fibers[0].nonFiber()) {
+      JSStringFinalizerCallback finalizer =
+          reinterpret_cast<JSStringFinalizerCallback>(m_fibers[0].nonFiber());
+      finalizer(this, m_fibers[1].nonFiber());
+    }
   }
 
   const UString& value(ExecState* exec) const {
@@ -372,6 +402,10 @@ class JS_EXPORTCLASS JSString : public JSCell {
   friend JSValue jsString(ExecState* exec,
                           JSValue thisValue,
                           const ArgList& args);
+  friend JSString* jsStringWithFinalizer(ExecState*,
+                                         const UString&,
+                                         JSStringFinalizerCallback callback,
+                                         void* context);
 };
 
 JSString* asString(JSValue);
@@ -452,6 +486,16 @@ inline JSString* jsString(JSGlobalData* globalData, const UString& s) {
       return globalData->smallStrings.singleCharacterString(globalData, c);
   }
   return fixupVPtr(globalData, new (globalData) JSString(globalData, s));
+}
+
+inline JSString* jsStringWithFinalizer(ExecState* exec,
+                                       const UString& s,
+                                       JSStringFinalizerCallback callback,
+                                       void* context) {
+  ASSERT(s.size() && (s.size() > 1 || s.data()[0] > 0xFF));
+  JSGlobalData* globalData = &exec->globalData();
+  return fixupVPtr(globalData,
+                   new (globalData) JSString(globalData, s, callback, context));
 }
 
 inline JSString* jsSubstring(JSGlobalData* globalData,
