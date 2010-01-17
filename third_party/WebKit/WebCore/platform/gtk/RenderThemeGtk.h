@@ -25,9 +25,10 @@
  *
  */
 
-#ifndef RenderThemeGdk_h
-#define RenderThemeGdk_h
+#ifndef RenderThemeGtk_h
+#define RenderThemeGtk_h
 
+#include "GRefPtr.h"
 #include "RenderTheme.h"
 
 typedef struct _GtkWidget GtkWidget;
@@ -36,6 +37,7 @@ typedef struct _GtkContainer GtkContainer;
 typedef struct _GdkRectangle GdkRectangle;
 typedef struct _GdkDrawable GdkDrawable;
 typedef struct _GtkBorder GtkBorder;
+typedef struct _GtkThemeParts GtkThemeParts;
 
 namespace WebCore {
 
@@ -90,6 +92,8 @@ class RenderThemeGtk : public RenderTheme {
 #if ENABLE(VIDEO)
   virtual String extraMediaControlsStyleSheet();
 #endif
+
+  GtkThemeParts* partsForDrawable(GdkDrawable*) const;
 
  protected:
   virtual bool paintCheckbox(RenderObject* o,
@@ -195,7 +199,6 @@ class RenderThemeGtk : public RenderTheme {
    */
   GtkContainer* gtkContainer() const;
 
- private:
   mutable GtkWidget* m_gtkWindow;
   mutable GtkContainer* m_gtkContainer;
   mutable GtkWidget* m_gtkEntry;
@@ -217,7 +220,9 @@ class RenderThemeGtk : public RenderTheme {
   RefPtr<Image> m_pauseButton;
   RefPtr<Image> m_seekBackButton;
   RefPtr<Image> m_seekForwardButton;
+  Page* m_page;
+  GRefPtr<GHashTable> m_partsTable;
 };
 }
 
-#endif
+#endif  // RenderThemeGtk_h
