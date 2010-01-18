@@ -95,6 +95,7 @@ class SQLiteStatement : public Noncopyable {
  private:
   SQLiteDatabase& m_database;
   String m_query;
+  OwnArrayPtr<const UChar> m_queryWithNullTermination;
   sqlite3_stmt* m_statement;
 #ifndef NDEBUG
   bool m_isPrepared;
