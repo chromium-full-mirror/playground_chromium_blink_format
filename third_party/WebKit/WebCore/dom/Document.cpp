@@ -130,6 +130,7 @@
 #include "WebKitTransitionEvent.h"
 #include "WheelEvent.h"
 #include "XMLHttpRequest.h"
+#include "XMLNSNames.h"
 #include "XMLNames.h"
 #include "XMLTokenizer.h"
 #include "htmlediting.h"
@@ -820,17 +821,12 @@ PassRefPtr<Node> Document::adoptNode(PassRefPtr<Node> source,
 }
 
 bool Document::hasPrefixNamespaceMismatch(const QualifiedName& qName) {
-  DEFINE_STATIC_LOCAL(const AtomicString, xmlnsNamespaceURI,
-                      ("http://www.w3.org/2000/xmlns/"));
-  DEFINE_STATIC_LOCAL(const AtomicString, xmlns, ("xmlns"));
-  DEFINE_STATIC_LOCAL(const AtomicString, xml, ("xml"));
-
   // These checks are from DOM Core Level 2, createElementNS
   // http://www.w3.org/TR/DOM-Level-2-Core/core.html#ID-DocCrElNS
   if (!qName.prefix().isEmpty() &&
       qName.namespaceURI().isNull())  // createElementNS(null, "html:div")
     return true;
-  if (qName.prefix() == xml &&
+  if (qName.prefix() == xmlAtom &&
       qName.namespaceURI() !=
           XMLNames::
               xmlNamespaceURI)  // createElementNS("http://www.example.com",
@@ -841,8 +837,10 @@ bool Document::hasPrefixNamespaceMismatch(const QualifiedName& qName) {
   // http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-DocCrElNS
   // createElementNS("http://www.w3.org/2000/xmlns/", "foo:bar"),
   // createElementNS(null, "xmlns:bar")
-  if ((qName.prefix() == xmlns && qName.namespaceURI() != xmlnsNamespaceURI) ||
-      (qName.prefix() != xmlns && qName.namespaceURI() == xmlnsNamespaceURI))
+  if ((qName.prefix() == xmlnsAtom &&
+       qName.namespaceURI() != XMLNSNames::xmlnsNamespaceURI) ||
+      (qName.prefix() != xmlnsAtom &&
+       qName.namespaceURI() == XMLNSNames::xmlnsNamespaceURI))
     return true;
 
   return false;
@@ -4124,8 +4122,8 @@ PassRefPtr<Attr> Document::createAttributeNS(const String& namespaceURI,
 
   // Spec: DOM Level 2 Core:
   // http://www.w3.org/TR/DOM-Level-2-Core/core.html#ID-DocCrAttrNS
-  if (!shouldIgnoreNamespaceChecks && qName.localName() == "xmlns" &&
-      qName.namespaceURI() != "http://www.w3.org/2000/xmlns/") {
+  if (!shouldIgnoreNamespaceChecks && qName.localName() == xmlnsAtom &&
+      qName.namespaceURI() != XMLNSNames::xmlnsNamespaceURI) {
     ec = NAMESPACE_ERR;
     return 0;
   }
