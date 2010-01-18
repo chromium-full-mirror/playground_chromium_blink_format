@@ -61,6 +61,11 @@ class RuntimeEnabledFeatures {
   }
   static bool applicationCacheEnabled() { return isApplicationCacheEnabled; }
 
+  static void setGeolocationEnabled(bool isEnabled) {
+    isGeolocationEnabled = isEnabled;
+  }
+  static bool geolocationEnabled() { return isGeolocationEnabled; }
+
  private:
   // Never instantiate.
   RuntimeEnabledFeatures() {}
@@ -70,6 +75,7 @@ class RuntimeEnabledFeatures {
   static bool isSessionStorageEnabled;
   static bool isNotificationsEnabled;
   static bool isApplicationCacheEnabled;
+  static bool isGeolocationEnabled;
 };
 
 }  // namespace WebCore
