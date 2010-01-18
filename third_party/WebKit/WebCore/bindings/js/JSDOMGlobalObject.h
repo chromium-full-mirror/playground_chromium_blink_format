@@ -58,10 +58,6 @@ class JSDOMGlobalObject : public JSC::JSGlobalObject {
 
   virtual ScriptExecutionContext* scriptExecutionContext() const = 0;
 
-  // Creates a JS EventListener for an "onXXX" event attribute. These
-  // listeners cannot be removed through the removeEventListener API.
-  PassRefPtr<JSEventListener> createJSAttributeEventListener(JSC::JSValue);
-
   // Make binding code generation easier.
   JSDOMGlobalObject* globalObject() { return this; }
 
