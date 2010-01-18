@@ -1229,11 +1229,15 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
       // float will
       // include the padding incorrectly. -dwh
       if (checkForFloatsFromLastLine) {
+        int bottomVisualOverflow = lastRootBox()->bottomVisualOverflow();
+        int bottomLayoutOverflow = lastRootBox()->bottomLayoutOverflow();
         TrailingFloatsRootInlineBox* trailingFloatsLineBox =
             new (renderArena()) TrailingFloatsRootInlineBox(this);
         m_lineBoxes.appendLineBox(trailingFloatsLineBox);
         trailingFloatsLineBox->setConstructed();
         trailingFloatsLineBox->verticallyAlignBoxes(height());
+        trailingFloatsLineBox->setVerticalOverflowPositions(
+            height(), bottomLayoutOverflow, height(), bottomVisualOverflow, 0);
         trailingFloatsLineBox->setBlockHeight(height());
       }
       if (lastFloat) {
