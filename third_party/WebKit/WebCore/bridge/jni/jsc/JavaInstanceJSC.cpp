@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2003, 2008, 2010 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -57,12 +57,12 @@ using namespace JSC;
 
 JavaInstance::JavaInstance(jobject instance, PassRefPtr<RootObject> rootObject)
     : Instance(rootObject) {
-  _instance = new JObjectWrapper(instance);
-  _class = 0;
+  m_instance = new JObjectWrapper(instance);
+  m_class = 0;
 }
 
 JavaInstance::~JavaInstance() {
-  delete _class;
+  delete m_class;
 }
 
 #define NUM_LOCAL_REFS 64
@@ -72,20 +72,20 @@ void JavaInstance::virtualBegin() {
 }
 
 void JavaInstance::virtualEnd() {
-  getJNIEnv()->PopLocalFrame(NULL);
+  getJNIEnv()->PopLocalFrame(0);
 }
 
 Class* JavaInstance::getClass() const {
-  if (_class == 0)
-    _class = new JavaClass(_instance->_instance);
-  return _class;
+  if (!m_class)
+    m_class = new JavaClass(m_instance->m_instance);
+  return m_class;
 }
 
 JSValue JavaInstance::stringValue(ExecState* exec) const {
   JSLock lock(SilenceAssertionsOnly);
 
   jstring stringValue = (jstring)callJNIMethod<jobject>(
-      _instance->_instance, "toString", "()Ljava/lang/String;");
+      m_instance->m_instance, "toString", "()Ljava/lang/String;");
   JNIEnv* env = getJNIEnv();
   const jchar* c = getUCharactersFromJStringInEnv(env, stringValue);
   UString u((const UChar*)c, (int)env->GetStringLength(stringValue));
@@ -95,13 +95,13 @@ JSValue JavaInstance::stringValue(ExecState* exec) const {
 
 JSValue JavaInstance::numberValue(ExecState* exec) const {
   jdouble doubleValue =
-      callJNIMethod<jdouble>(_instance->_instance, "doubleValue", "()D");
+      callJNIMethod<jdouble>(m_instance->m_instance, "doubleValue", "()D");
   return jsNumber(exec, doubleValue);
 }
 
 JSValue JavaInstance::booleanValue() const {
   jboolean booleanValue =
-      callJNIMethod<jboolean>(_instance->_instance, "booleanValue", "()Z");
+      callJNIMethod<jboolean>(m_instance->m_instance, "booleanValue", "()Z");
   return jsBoolean(booleanValue);
 }
 
@@ -127,18 +127,18 @@ JSValue JavaInstance::invokeMethod(ExecState* exec,
       break;
     }
   }
-  if (method == 0) {
+  if (!method) {
     JS_LOG("unable to find an appropiate method\n");
     return jsUndefined();
   }
 
   const JavaMethod* jMethod = static_cast<const JavaMethod*>(method);
   JS_LOG("call %s %s on %p\n", UString(jMethod->name()).UTF8String().c_str(),
-         jMethod->signature(), _instance->_instance);
+         jMethod->signature(), m_instance->m_instance);
 
-  if (count > 0) {
+  if (count > 0)
     jArgs = (jvalue*)malloc(count * sizeof(jvalue));
-  } else
+  else
     jArgs = 0;
 
   for (i = 0; i < count; i++) {
@@ -159,7 +159,7 @@ JSValue JavaInstance::invokeMethod(ExecState* exec,
 
   bool handled = false;
   if (rootObject->nativeHandle()) {
-    jobject obj = _instance->_instance;
+    jobject obj = m_instance->m_instance;
     JSValue exceptionDescription;
     const char* callingURL = 0;  // FIXME, need to propagate calling URL to Java
     handled = dispatchJNICall(exec, rootObject->nativeHandle(), obj,
@@ -177,7 +177,7 @@ JSValue JavaInstance::invokeMethod(ExecState* exec,
   // that
   // contains the new Java plugin.  It is needed for builds prior to Tiger.
   if (!handled) {
-    jobject obj = _instance->_instance;
+    jobject obj = m_instance->m_instance;
     switch (jMethod->JNIReturnType()) {
       case void_type:
         callJNIMethodIDA<void>(obj, jMethod->methodID(obj), jArgs);
@@ -225,18 +225,16 @@ JSValue JavaInstance::invokeMethod(ExecState* exec,
     } break;
 
     case object_type: {
-      if (result.l != 0) {
+      if (result.l) {
         const char* arrayType = jMethod->returnType();
-        if (arrayType[0] == '[') {
+        if (arrayType[0] == '[')
           resultValue = JavaArray::convertJObjectToArray(exec, result.l,
                                                          arrayType, rootObject);
-        } else {
+        else
           resultValue = JavaInstance::create(result.l, rootObject)
                             ->createRuntimeObject(exec);
-        }
-      } else {
+      } else
         resultValue = jsUndefined();
-      }
     } break;
 
     case boolean_type: {
@@ -300,26 +298,25 @@ JSValue JavaInstance::valueOf(ExecState* exec) const {
   return stringValue(exec);
 }
 
-JObjectWrapper::JObjectWrapper(jobject instance) : _refCount(0) {
-  assert(instance != 0);
+JObjectWrapper::JObjectWrapper(jobject instance) : m_refCount(0) {
+  assert(instance);
 
   // Cache the JNIEnv used to get the global ref for this java instanace.
   // It'll be used to delete the reference.
-  _env = getJNIEnv();
+  m_env = getJNIEnv();
 
-  _instance = _env->NewGlobalRef(instance);
+  m_instance = m_env->NewGlobalRef(instance);
 
-  JS_LOG("new global ref %p for %p\n", _instance, instance);
+  JS_LOG("new global ref %p for %p\n", m_instance, instance);
 
-  if (_instance == NULL) {
+  if (!m_instance)
     fprintf(stderr, "%s:  could not get GlobalRef for %p\n",
             __PRETTY_FUNCTION__, instance);
-  }
 }
 
 JObjectWrapper::~JObjectWrapper() {
-  JS_LOG("deleting global ref %p\n", _instance);
-  _env->DeleteGlobalRef(_instance);
+  JS_LOG("deleting global ref %p\n", m_instance);
+  m_env->DeleteGlobalRef(m_instance);
 }
 
 #endif  // ENABLE(MAC_JAVA_BRIDGE)

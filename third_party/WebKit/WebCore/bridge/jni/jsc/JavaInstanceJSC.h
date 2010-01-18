@@ -47,24 +47,24 @@ class JObjectWrapper {
   friend class JavaMethod;
 
  public:
-  jobject instance() const { return _instance; }
-  void setInstance(jobject instance) { _instance = instance; }
+  jobject instance() const { return m_instance; }
+  void setInstance(jobject instance) { m_instance = instance; }
 
  protected:
   JObjectWrapper(jobject instance);
   ~JObjectWrapper();
 
-  void ref() { _refCount++; }
+  void ref() { m_refCount++; }
   void deref() {
-    if (--_refCount == 0)
+    if (!(--m_refCount))
       delete this;
   }
 
-  jobject _instance;
+  jobject m_instance;
 
  private:
-  JNIEnv* _env;
-  unsigned int _refCount;
+  JNIEnv* m_env;
+  unsigned int m_refCount;
 };
 
 class JavaInstance : public Instance {
@@ -85,7 +85,7 @@ class JavaInstance : public Instance {
                                const MethodList& method,
                                const ArgList& args);
 
-  jobject javaInstance() const { return _instance->_instance; }
+  jobject javaInstance() const { return m_instance->m_instance; }
 
   JSValue stringValue(ExecState*) const;
   JSValue numberValue(ExecState*) const;
@@ -96,8 +96,8 @@ class JavaInstance : public Instance {
   virtual void virtualBegin();
   virtual void virtualEnd();
 
-  RefPtr<JObjectWrapper> _instance;
-  mutable JavaClass* _class;
+  RefPtr<JObjectWrapper> m_instance;
+  mutable JavaClass* m_class;
 };
 
 }  // namespace Bindings
