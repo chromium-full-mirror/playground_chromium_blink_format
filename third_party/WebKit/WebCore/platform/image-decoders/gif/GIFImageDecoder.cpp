@@ -29,59 +29,12 @@
 
 namespace WebCore {
 
-class GIFImageDecoderPrivate {
- public:
-  GIFImageDecoderPrivate(GIFImageDecoder* decoder = 0)
-      : m_reader(decoder), m_readOffset(0) {}
-
-  ~GIFImageDecoderPrivate() { m_reader.close(); }
-
-  bool decode(SharedBuffer* data,
-              GIFImageDecoder::GIFQuery query = GIFImageDecoder::GIFFullQuery,
-              unsigned int haltFrame = -1) {
-    return m_reader.read((const unsigned char*)data->data() + m_readOffset,
-                         data->size() - m_readOffset, query, haltFrame);
-  }
-
-  unsigned frameCount() const { return m_reader.images_count; }
-  int repetitionCount() const { return m_reader.loop_count; }
-
-  void setReadOffset(unsigned o) { m_readOffset = o; }
-
-  bool isTransparent() const { return m_reader.frame_reader->is_transparent; }
-
-  void getColorMap(unsigned char*& map, unsigned& size) const {
-    if (m_reader.frame_reader->is_local_colormap_defined) {
-      map = m_reader.frame_reader->local_colormap;
-      size = (unsigned)m_reader.frame_reader->local_colormap_size;
-    } else {
-      map = m_reader.global_colormap;
-      size = m_reader.global_colormap_size;
-    }
-  }
-
-  unsigned frameXOffset() const { return m_reader.frame_reader->x_offset; }
-  unsigned frameYOffset() const { return m_reader.frame_reader->y_offset; }
-  unsigned frameWidth() const { return m_reader.frame_reader->width; }
-  unsigned frameHeight() const { return m_reader.frame_reader->height; }
-
-  int transparentPixel() const { return m_reader.frame_reader->tpixel; }
-
-  unsigned duration() const { return m_reader.frame_reader->delay_time; }
-
- private:
-  GIFImageReader m_reader;
-  unsigned m_readOffset;
-};
-
 GIFImageDecoder::GIFImageDecoder()
     : m_frameCountValid(true),
       m_repetitionCount(cAnimationLoopOnce),
-      m_reader(0) {}
+      m_readOffset(0) {}
 
-GIFImageDecoder::~GIFImageDecoder() {
-  delete m_reader;
-}
+GIFImageDecoder::~GIFImageDecoder() {}
 
 // Take the data and store it.
 void GIFImageDecoder::setData(SharedBuffer* data, bool allDataReceived) {
@@ -96,7 +49,7 @@ void GIFImageDecoder::setData(SharedBuffer* data, bool allDataReceived) {
 
   // Create the GIF reader.
   if (!m_reader && !m_failed)
-    m_reader = new GIFImageDecoderPrivate(this);
+    m_reader.set(new GIFImageReader(this));
 }
 
 // Whether or not the size information has been decoded yet.
@@ -122,13 +75,14 @@ size_t GIFImageDecoder::frameCount() {
     // state, but for now we just crawl all the data.  Note that this is no
     // worse than what
     // ImageIO does on Mac right now (it also crawls all the data again).
-    GIFImageDecoderPrivate reader;
+    GIFImageReader reader(0);
     // This function may fail, but we want to keep any partial data it may
     // have decoded, so don't mark it is invalid. If there is an overflow
     // or some serious error, m_failed will have gotten set for us.
-    reader.decode(m_data.get(), GIFFrameCountQuery);
+    reader.read((const unsigned char*)m_data->data(), m_data->size(),
+                GIFFrameCountQuery, -1);
     m_frameCountValid = true;
-    m_frameBufferCache.resize(reader.frameCount());
+    m_frameBufferCache.resize(reader.images_count);
   }
 
   return m_frameBufferCache.size();
@@ -150,7 +104,7 @@ int GIFImageDecoder::repetitionCount() const {
     // cAnimationLoopOnce (-1) when its current incarnation hasn't actually
     // seen a loop count yet; in this case we return our previously-cached
     // value.
-    const int repetitionCount = m_reader->repetitionCount();
+    const int repetitionCount = m_reader->loop_count;
     if (repetitionCount != cLoopCountNotSeen)
       m_repetitionCount = repetitionCount;
   }
@@ -226,12 +180,12 @@ void GIFImageDecoder::decode(GIFQuery query, unsigned haltAtFrame) {
   if (m_failed)
     return;
 
-  m_failed = !m_reader->decode(m_data.get(), query, haltAtFrame);
+  m_failed =
+      !m_reader->read((const unsigned char*)m_data->data() + m_readOffset,
+                      m_data->size() - m_readOffset, query, haltAtFrame);
 
-  if (m_failed) {
-    delete m_reader;
-    m_reader = 0;
-  }
+  if (m_failed)
+    m_reader.clear();
 }
 
 // Callbacks from the GIF reader.
@@ -243,19 +197,20 @@ bool GIFImageDecoder::sizeNowAvailable(unsigned width, unsigned height) {
 }
 
 void GIFImageDecoder::decodingHalted(unsigned bytesLeft) {
-  m_reader->setReadOffset(m_data->size() - bytesLeft);
+  m_readOffset = m_data->size() - bytesLeft;
 }
 
 bool GIFImageDecoder::initFrameBuffer(unsigned frameIndex) {
   // Initialize the frame rect in our buffer.
-  IntRect frameRect(m_reader->frameXOffset(), m_reader->frameYOffset(),
-                    m_reader->frameWidth(), m_reader->frameHeight());
+  const GIFFrameReader* frameReader = m_reader->frame_reader;
+  IntRect frameRect(frameReader->x_offset, frameReader->y_offset,
+                    frameReader->width, frameReader->height);
 
   // Make sure the frameRect doesn't extend past the bottom-right of the buffer.
   if (frameRect.right() > size().width())
-    frameRect.setWidth(size().width() - m_reader->frameXOffset());
+    frameRect.setWidth(size().width() - frameReader->x_offset);
   if (frameRect.bottom() > size().height())
-    frameRect.setHeight(size().height() - m_reader->frameYOffset());
+    frameRect.setHeight(size().height() - frameReader->y_offset);
 
   RGBA32Buffer* const buffer = &m_frameBufferCache[frameIndex];
   int left = upperBoundScaledX(frameRect.x());
@@ -332,15 +287,15 @@ bool GIFImageDecoder::haveDecodedRow(unsigned frameIndex,
                                      unsigned rowNumber,
                                      unsigned repeatCount,
                                      bool writeTransparentPixels) {
+  const GIFFrameReader* frameReader = m_reader->frame_reader;
   // The pixel data and coordinates supplied to us are relative to the frame's
   // origin within the entire image size, i.e.
-  // (m_reader->frameXOffset(), m_reader->frameYOffset()).  There is no
-  // guarantee that
-  // (rowEnd - rowBuffer) == (size().width() - m_reader->frameXOffset()), so
+  // (frameReader->x_offset, frameReader->y_offset).  There is no guarantee
+  // that (rowEnd - rowBuffer) == (size().width() - frameReader->x_offset), so
   // we must ensure we don't run off the end of either the source data or the
   // row's X-coordinates.
-  int xBegin = upperBoundScaledX(m_reader->frameXOffset());
-  int yBegin = upperBoundScaledY(m_reader->frameYOffset() + rowNumber);
+  int xBegin = upperBoundScaledX(frameReader->x_offset);
+  int yBegin = upperBoundScaledY(frameReader->y_offset + rowNumber);
   int xEnd =
       lowerBoundScaledX(std::min(xBegin + static_cast<int>(rowEnd - rowBuffer),
                                  size().width()) -
@@ -357,9 +312,15 @@ bool GIFImageDecoder::haveDecodedRow(unsigned frameIndex,
     return true;
 
   // Get the colormap.
+  const unsigned char* colorMap;
   unsigned colorMapSize;
-  unsigned char* colorMap;
-  m_reader->getColorMap(colorMap, colorMapSize);
+  if (frameReader->is_local_colormap_defined) {
+    colorMap = frameReader->local_colormap;
+    colorMapSize = (unsigned)frameReader->local_colormap_size;
+  } else {
+    colorMap = m_reader->global_colormap;
+    colorMapSize = m_reader->global_colormap_size;
+  }
   if (!colorMap)
     return true;
 
@@ -373,9 +334,9 @@ bool GIFImageDecoder::haveDecodedRow(unsigned frameIndex,
   for (int x = xBegin; x < xEnd; ++x) {
     const unsigned char sourceValue =
         *(rowBuffer + (m_scaled ? m_scaledColumns[x] : x) -
-          m_reader->frameXOffset());
-    if ((!m_reader->isTransparent() ||
-         (sourceValue != m_reader->transparentPixel())) &&
+          frameReader->x_offset);
+    if ((!frameReader->is_transparent ||
+         (sourceValue != frameReader->tpixel)) &&
         (sourceValue < colorMapSize)) {
       const size_t colorIndex = static_cast<size_t>(sourceValue) * 3;
       buffer.setRGBA(x, yBegin, colorMap[colorIndex], colorMap[colorIndex + 1],
@@ -453,9 +414,8 @@ void GIFImageDecoder::frameComplete(
 
 void GIFImageDecoder::gifComplete() {
   if (m_reader)
-    m_repetitionCount = m_reader->repetitionCount();
-  delete m_reader;
-  m_reader = 0;
+    m_repetitionCount = m_reader->loop_count;
+  m_reader.clear();
 }
 
 }  // namespace WebCore

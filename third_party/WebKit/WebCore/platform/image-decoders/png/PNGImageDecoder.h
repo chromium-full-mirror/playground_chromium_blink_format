@@ -27,6 +27,7 @@
 #define PNGImageDecoder_h
 
 #include "ImageDecoder.h"
+#include <wtf/OwnPtr.h>
 
 namespace WebCore {
 
@@ -50,8 +51,6 @@ class PNGImageDecoder : public ImageDecoder {
 
   void decode(bool sizeOnly = false);
 
-  PNGImageReader* reader() { return m_reader; }
-
   // Callbacks from libpng
   void decodingFailed();
   void headerAvailable();
@@ -61,7 +60,7 @@ class PNGImageDecoder : public ImageDecoder {
   void pngComplete();
 
  private:
-  PNGImageReader* m_reader;
+  OwnPtr<PNGImageReader> m_reader;
 };
 
 }  // namespace WebCore

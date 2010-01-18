@@ -46,13 +46,9 @@ ImageDecoder* ImageDecoder::create(const SharedBuffer& data) {
   return new ImageDecoderQt;
 }
 
-ImageDecoderQt::ImageDecoderQt()
-    : m_buffer(0), m_reader(0), m_repetitionCount(cAnimationNone) {}
+ImageDecoderQt::ImageDecoderQt() : m_repetitionCount(cAnimationNone) {}
 
-ImageDecoderQt::~ImageDecoderQt() {
-  delete m_reader;
-  delete m_buffer;
-}
+ImageDecoderQt::~ImageDecoderQt() {}
 
 void ImageDecoderQt::setData(SharedBuffer* data, bool allDataReceived) {
   if (m_failed)
@@ -72,10 +68,10 @@ void ImageDecoderQt::setData(SharedBuffer* data, bool allDataReceived) {
   // Attempt to load the data
   QByteArray imageData =
       QByteArray::fromRawData(m_data->data(), m_data->size());
-  m_buffer = new QBuffer;
+  m_buffer.set(new QBuffer);
   m_buffer->setData(imageData);
   m_buffer->open(QBuffer::ReadOnly);
-  m_reader = new QImageReader(m_buffer, m_format);
+  m_reader.set(new QImageReader(m_buffer.get(), m_format));
 
   // This will force the JPEG decoder to use JDCT_IFAST
   m_reader->setQuality(49);
@@ -169,10 +165,8 @@ void ImageDecoderQt::internalReadImage(size_t frameIndex) {
     if (m_frameBufferCache[i].status() != RGBA32Buffer::FrameComplete)
       return;
 
-  delete m_reader;
-  delete m_buffer;
-  m_buffer = 0;
-  m_reader = 0;
+  m_reader.clear();
+  m_buffer.clear();
 }
 
 void ImageDecoderQt::internalHandleCurrentImage(size_t frameIndex) {
@@ -217,10 +211,8 @@ void ImageDecoderQt::forceLoadEverything() {
 
 void ImageDecoderQt::failRead() {
   setFailed();
-  delete m_reader;
-  delete m_buffer;
-  m_reader = 0;
-  m_buffer = 0;
+  m_reader.clear();
+  m_buffer.clear();
 }
 }
 
