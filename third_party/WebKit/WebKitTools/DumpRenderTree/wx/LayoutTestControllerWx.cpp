@@ -178,6 +178,12 @@ void LayoutTestController::setDatabaseQuota(unsigned long long quota) {
   // FIXME: implement
 }
 
+void LayoutTestController::setDomainRelaxationForbiddenForURLScheme(
+    bool,
+    JSStringRef) {
+  // FIXME: implement
+}
+
 void LayoutTestController::setAppCacheMaximumSize(unsigned long long size) {
   // FIXME: implement
 }

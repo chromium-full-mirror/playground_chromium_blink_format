@@ -816,6 +816,9 @@ class WebView : public IWebView,
   virtual HRESULT STDMETHODCALLTYPE
   geolocationDidFailWithError(IWebError* error);
 
+  virtual HRESULT STDMETHODCALLTYPE
+  setDomainRelaxationForbiddenForURLScheme(BOOL forbidden, BSTR scheme);
+
   // WebView
   bool shouldUseEmbeddedView(const WebCore::String& mimeType) const;
 

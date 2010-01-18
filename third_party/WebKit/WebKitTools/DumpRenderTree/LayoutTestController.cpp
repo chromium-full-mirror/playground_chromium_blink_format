@@ -1007,6 +1007,28 @@ static JSValueRef setDatabaseQuotaCallback(JSContextRef context,
   return JSValueMakeUndefined(context);
 }
 
+static JSValueRef setDomainRelaxationForbiddenForURLSchemeCallback(
+    JSContextRef context,
+    JSObjectRef function,
+    JSObjectRef thisObject,
+    size_t argumentCount,
+    const JSValueRef arguments[],
+    JSValueRef* exception) {
+  // Has Mac and Windows implementation
+  if (argumentCount < 2)
+    return JSValueMakeUndefined(context);
+
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+
+  bool forbidden = JSValueToBoolean(context, arguments[0]);
+  JSRetainPtr<JSStringRef> scheme(
+      Adopt, JSValueToStringCopy(context, arguments[1], 0));
+  controller->setDomainRelaxationForbiddenForURLScheme(forbidden, scheme.get());
+
+  return JSValueMakeUndefined(context);
+}
+
 static JSValueRef setMockGeolocationPositionCallback(
     JSContextRef context,
     JSObjectRef function,
@@ -1968,6 +1990,9 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
       {"setCustomPolicyDelegate", setCustomPolicyDelegateCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setDatabaseQuota", setDatabaseQuotaCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"setDomainRelaxationForbiddenForURLScheme",
+       setDomainRelaxationForbiddenForURLSchemeCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setGeolocationPermission", setGeolocationPermissionCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},

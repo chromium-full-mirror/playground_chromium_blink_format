@@ -596,6 +596,9 @@ backforward list.
 */
 - (void)setCSSAnimationsSuspended:(BOOL)suspended;
 
++ (void)_setDomainRelaxationForbidden:(BOOL)forbidden
+                         forURLScheme:(NSString*)scheme;
+
 @end
 
 @interface WebView (WebViewPrintingPrivate)
