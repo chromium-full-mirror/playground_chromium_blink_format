@@ -108,45 +108,31 @@ struct CallLinkInfo {
   CodeLocationNearCall callReturnLocation;
   CodeLocationDataLabelPtr hotPathBegin;
   CodeLocationNearCall hotPathOther;
-  CodeBlock* ownerCodeBlock;
+  PtrAndFlags<CodeBlock, HasSeenShouldRepatch> ownerCodeBlock;
   CodeBlock* callee;
-  unsigned position : 31;
-  unsigned hasSeenShouldRepatch : 1;
+  unsigned position;
 
   void setUnlinked() { callee = 0; }
   bool isLinked() { return callee; }
 
-  bool seenOnce() { return hasSeenShouldRepatch; }
+  bool seenOnce() { return ownerCodeBlock.isFlagSet(hasSeenShouldRepatch); }
 
-  void setSeen() { hasSeenShouldRepatch = true; }
+  void setSeen() { ownerCodeBlock.setFlag(hasSeenShouldRepatch); }
 };
 
-#define MethodCallLinkInfo_seenFlag ((Structure*)1)
-
 struct MethodCallLinkInfo {
-  MethodCallLinkInfo() : cachedStructure(0), cachedPrototypeStructure(0) {}
+  MethodCallLinkInfo() : cachedStructure(0) {}
 
   bool seenOnce() {
-    ASSERT(!cachedStructure);
-    return cachedPrototypeStructure;
+    return cachedPrototypeStructure.isFlagSet(hasSeenShouldRepatch);
   }
 
-  void setSeen() {
-    ASSERT(!cachedStructure && !cachedPrototypeStructure);
-    // We use the values of cachedStructure & cachedPrototypeStructure to
-    // indicate the
-    // current state.
-    //     - In the initial state, both are null.
-    //     - Once this transition has been taken once, cachedStructure is
-    //       null and cachedPrototypeStructure is set to a nun-null value.
-    //     - Once the call is linked both structures are set to non-null values.
-    cachedPrototypeStructure = MethodCallLinkInfo_seenFlag;
-  }
+  void setSeen() { cachedPrototypeStructure.setFlag(hasSeenShouldRepatch); }
 
   CodeLocationCall callReturnLocation;
   CodeLocationDataLabelPtr structureLabel;
   Structure* cachedStructure;
-  Structure* cachedPrototypeStructure;
+  PtrAndFlags<Structure, HasSeenShouldRepatch> cachedPrototypeStructure;
 };
 
 struct FunctionRegisterInfo {
