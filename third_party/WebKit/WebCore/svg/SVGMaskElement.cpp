@@ -186,7 +186,8 @@ PassOwnPtr<ImageBuffer> SVGMaskElement::drawMaskerContent(
       continue;
 
     rendererList.append(node->renderer());
-    repaintRect.unite(node->renderer()->repaintRectInLocalCoordinates());
+    repaintRect.unite(node->renderer()->localToParentTransform().mapRect(
+        node->renderer()->repaintRectInLocalCoordinates()));
   }
 
   TransformationMatrix contextTransform;
