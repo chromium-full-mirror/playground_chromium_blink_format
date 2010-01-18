@@ -6071,9 +6071,9 @@ void WebView::updateRootLayerContents() {
     return;
   FrameView* frameView = coreFrame->view();
 
-  m_layerRenderer->setScrollFrame(frameView->layoutWidth(),
-                                  frameView->layoutHeight(),
-                                  frameView->scrollX(), frameView->scrollY());
+  m_layerRenderer->setScrollFrame(
+      IntRect(frameView->scrollX(), frameView->scrollY(),
+              frameView->layoutWidth(), frameView->layoutHeight()));
 }
 #endif
 
