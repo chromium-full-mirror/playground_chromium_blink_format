@@ -97,6 +97,9 @@ class WeakReferenceMap {
   class Visitor {
    public:
     virtual void visitDOMWrapper(KeyType*, v8::Persistent<ValueType>) = 0;
+
+   protected:
+    virtual ~Visitor() {}
   };
 
   virtual void visit(Visitor* visitor) {
