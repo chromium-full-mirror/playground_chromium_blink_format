@@ -30,6 +30,7 @@
 #include <wtf/OwnPtr.h>
 #include <wtf/RefPtr.h>
 #include "HTMLParserErrorCodes.h"
+#include "MappedAttributeEntry.h"
 
 namespace WebCore {
 
@@ -54,7 +55,8 @@ struct Token;
 class HTMLParser : public Noncopyable {
  public:
   HTMLParser(HTMLDocument*, bool reportErrors);
-  HTMLParser(DocumentFragment*);
+  HTMLParser(DocumentFragment*,
+             FragmentScriptingPermission = FragmentScriptingAllowed);
   virtual ~HTMLParser();
 
   /**
@@ -212,6 +214,7 @@ class HTMLParser : public Noncopyable {
   bool m_reportErrors;
   bool m_handlingResidualStyleAcrossBlocks;
   int m_inStrayTableContent;
+  FragmentScriptingPermission m_scriptingPermission;
 
   OwnPtr<HTMLParserQuirks> m_parserQuirks;
 };

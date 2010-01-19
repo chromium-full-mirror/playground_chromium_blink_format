@@ -28,6 +28,7 @@
 
 #include "ContainerNode.h"
 #include "HTMLNames.h"
+#include "MappedAttributeEntry.h"
 #include "QualifiedName.h"
 #include "ScrollTypes.h"
 
@@ -205,7 +206,8 @@ class Element : public ContainerNode {
   virtual void attributeChanged(Attribute*, bool preserveDecls = false);
 
   // not part of the DOM
-  void setAttributeMap(PassRefPtr<NamedNodeMap>);
+  void setAttributeMap(PassRefPtr<NamedNodeMap>,
+                       FragmentScriptingPermission = FragmentScriptingAllowed);
   NamedNodeMap* attributeMap() const { return namedAttrMap.get(); }
 
   virtual void copyNonAttributeProperties(const Element* /*source*/) {}

@@ -418,7 +418,8 @@ PassRefPtr<DocumentFragment> fragmentFromCF_HTML(Document* doc,
   String markup = cf_html.substring(fragmentStart, fragmentEnd - fragmentStart)
                       .stripWhiteSpace();
 
-  return createFragmentFromMarkup(doc, markup, srcURL);
+  return createFragmentFromMarkup(doc, markup, srcURL,
+                                  FragmentScriptingNotAllowed);
 }
 
 PassRefPtr<DocumentFragment> fragmentFromHTML(Document* doc,
@@ -446,7 +447,8 @@ PassRefPtr<DocumentFragment> fragmentFromHTML(Document* doc,
     html = String(data);
     GlobalUnlock(store.hGlobal);
     ReleaseStgMedium(&store);
-    return createFragmentFromMarkup(doc, html, srcURL);
+    return createFragmentFromMarkup(doc, html, srcURL,
+                                    FragmentScriptingNotAllowed);
   }
 
   return 0;

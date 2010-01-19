@@ -318,7 +318,8 @@ String HTMLElement::outerHTML() const {
 }
 
 PassRefPtr<DocumentFragment> HTMLElement::createContextualFragment(
-    const String& html) {
+    const String& html,
+    FragmentScriptingPermission scriptingPermission) {
   // the following is in accordance with the definition as used by IE
   if (endTagRequirement() == TagStatusForbidden)
     return 0;
@@ -331,7 +332,7 @@ PassRefPtr<DocumentFragment> HTMLElement::createContextualFragment(
   RefPtr<DocumentFragment> fragment = DocumentFragment::create(document());
 
   if (document()->isHTMLDocument())
-    parseHTMLDocumentFragment(html, fragment.get());
+    parseHTMLDocumentFragment(html, fragment.get(), scriptingPermission);
   else {
     if (!parseXMLDocumentFragment(html, fragment.get(), this))
       // FIXME: We should propagate a syntax error exception out here.

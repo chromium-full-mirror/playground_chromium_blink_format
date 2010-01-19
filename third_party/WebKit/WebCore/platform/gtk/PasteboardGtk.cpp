@@ -180,8 +180,8 @@ PassRefPtr<DocumentFragment> Pasteboard::documentFragment(
     gtk_selection_data_free(data);
 
     if (!html.isEmpty()) {
-      RefPtr<DocumentFragment> fragment =
-          createFragmentFromMarkup(frame->document(), html, "");
+      RefPtr<DocumentFragment> fragment = createFragmentFromMarkup(
+          frame->document(), html, "", FragmentScriptingNotAllowed);
       if (fragment)
         return fragment.release();
     }

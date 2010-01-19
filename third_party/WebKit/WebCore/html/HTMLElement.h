@@ -47,7 +47,9 @@ class HTMLElement : public StyledElement {
 
   String innerHTML() const;
   String outerHTML() const;
-  PassRefPtr<DocumentFragment> createContextualFragment(const String&);
+  PassRefPtr<DocumentFragment> createContextualFragment(
+      const String&,
+      FragmentScriptingPermission = FragmentScriptingAllowed);
   void setInnerHTML(const String&, ExceptionCode&);
   void setOuterHTML(const String&, ExceptionCode&);
   void setInnerText(const String&, ExceptionCode&);
