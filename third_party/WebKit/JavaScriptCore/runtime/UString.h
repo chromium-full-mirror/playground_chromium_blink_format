@@ -191,7 +191,7 @@ class UString {
   friend bool operator==(const UString&, const UString&);
 };
 
-inline bool operator==(const UString& s1, const UString& s2) {
+ALWAYS_INLINE bool operator==(const UString& s1, const UString& s2) {
   int size = s1.size();
   switch (size) {
     case 0:
