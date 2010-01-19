@@ -55,7 +55,6 @@ class SVGStyledElement : public SVGElement, public SVGStylable {
 
   virtual bool mapToEntry(const QualifiedName&, MappedAttributeEntry&) const;
   virtual void parseMappedAttribute(MappedAttribute*);
-
   virtual void svgAttributeChanged(const QualifiedName&);
 
   virtual void childrenChanged(bool changedByParser = false,
@@ -72,7 +71,10 @@ class SVGStyledElement : public SVGElement, public SVGStylable {
 
   virtual void detach();
 
-  void setInstanceUpdatesBlocked(bool);
+  bool instanceUpdatesBlocked() const { return m_instanceUpdatesBlocked; }
+  void setInstanceUpdatesBlocked(bool value) {
+    m_instanceUpdatesBlocked = value;
+  }
 
  protected:
   static int cssPropertyIdForSVGAttributeName(const QualifiedName&);
@@ -84,6 +86,7 @@ class SVGStyledElement : public SVGElement, public SVGStylable {
                                  String,
                                  ClassName,
                                  className)
+  bool m_instanceUpdatesBlocked;
 };
 
 }  // namespace WebCore

@@ -33,6 +33,7 @@ namespace WebCore {
 
 class SVGElementInstance;
 class SVGLength;
+class SVGShadowTreeRootElement;
 
 class SVGUseElement : public SVGStyledTransformableElement,
                       public SVGTests,
@@ -53,14 +54,9 @@ class SVGUseElement : public SVGStyledTransformableElement,
   virtual void buildPendingResource();
 
   virtual void parseMappedAttribute(MappedAttribute*);
-  virtual void childrenChanged(bool changedByParser = false,
-                               Node* beforeChange = 0,
-                               Node* afterChange = 0,
-                               int childCountDelta = 0);
-
   virtual void svgAttributeChanged(const QualifiedName&);
-  virtual void recalcStyle(StyleChange = NoChange);
 
+  virtual void recalcStyle(StyleChange = NoChange);
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual void attach();
   virtual void detach();
@@ -69,6 +65,12 @@ class SVGUseElement : public SVGStyledTransformableElement,
 
   static void removeDisallowedElementsFromSubtree(Node* element);
   SVGElementInstance* instanceForShadowTreeElement(Node* element) const;
+  void invalidateShadowTree();
+
+ private:
+  friend class RenderSVGShadowTreeRootContainer;
+  bool isPendingResource() const { return m_isPendingResource; }
+  void buildShadowAndInstanceTree(SVGShadowTreeRootElement*);
 
  private:
   virtual bool hasRelativeValues() const;
@@ -124,19 +126,16 @@ class SVGUseElement : public SVGStyledTransformableElement,
                                 bool& foundCycle);
 
   // Shadow tree handling
-  PassRefPtr<SVGSVGElement> buildShadowTreeForSymbolTag(
-      SVGElement* target,
-      SVGElementInstance* targetInstance);
-  void alterShadowTreeForSVGTag(SVGElement* target);
-
-  void buildShadowTree(SVGElement* target, SVGElementInstance* targetInstance);
+  void alterShadowTreeForSVGTag(SVGElement*);
+  void buildShadowTree(SVGShadowTreeRootElement*,
+                       SVGElement* target,
+                       SVGElementInstance* targetInstance);
 
 #if ENABLE(SVG) && ENABLE(SVG_USE)
-  void expandUseElementsInShadowTree(Node* element);
-  void expandSymbolElementsInShadowTree(Node* element);
+  void expandUseElementsInShadowTree(SVGShadowTreeRootElement*, Node* element);
+  void expandSymbolElementsInShadowTree(SVGShadowTreeRootElement*,
+                                        Node* element);
 #endif
-
-  void attachShadowTree();
 
   // "Tree connector"
   void associateInstancesWithShadowTreeElements(
@@ -149,8 +148,11 @@ class SVGUseElement : public SVGStyledTransformableElement,
   void transferUseAttributesToReplacedElement(SVGElement* from,
                                               SVGElement* to) const;
   void transferEventListenersToShadowTree(SVGElementInstance* target);
+  void updateContainerOffsets();
 
-  RefPtr<SVGElement> m_shadowTreeRootElement;
+  bool m_isPendingResource;
+  bool m_needsShadowTreeRecreation;
+  String m_resourceId;
   RefPtr<SVGElementInstance> m_targetElementInstance;
 };
 

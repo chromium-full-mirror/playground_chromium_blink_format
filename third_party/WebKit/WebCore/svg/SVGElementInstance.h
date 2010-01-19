@@ -49,9 +49,6 @@ class SVGElementInstance : public TreeShared<SVGElementInstance>,
 
   virtual ~SVGElementInstance();
 
-  bool needsUpdate() const { return m_needsUpdate; }
-  void setNeedsUpdate(bool);
-
   virtual ScriptExecutionContext* scriptExecutionContext() const;
 
   virtual bool addEventListener(const AtomicString& eventType,
@@ -143,7 +140,6 @@ class SVGElementInstance : public TreeShared<SVGElementInstance>,
 
   void appendChild(PassRefPtr<SVGElementInstance> child);
   void setShadowTreeElement(SVGElement*);
-  void forgetWrapper();
 
   template <class GenericNode, class GenericNodeContainer>
   friend void appendChildToContainer(GenericNode* child,
@@ -172,8 +168,6 @@ class SVGElementInstance : public TreeShared<SVGElementInstance>,
   virtual void derefEventTarget() { deref(); }
   virtual EventTargetData* eventTargetData();
   virtual EventTargetData* ensureEventTargetData();
-
-  bool m_needsUpdate : 1;
 
   SVGUseElement* m_useElement;
   RefPtr<SVGElement> m_element;
