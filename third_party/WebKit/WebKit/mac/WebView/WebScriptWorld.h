@@ -25,6 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+typedef struct OpaqueJSContext* JSGlobalContextRef;
+
 @class WebScriptWorldPrivate;
 
 @interface WebScriptWorld : NSObject {
@@ -34,4 +36,8 @@
 
 + (WebScriptWorld*)standardWorld;
 + (WebScriptWorld*)world;
+
++ (WebScriptWorld*)scriptWorldForGlobalContext:
+    (JSGlobalContextRef)globalContext;
+
 @end
