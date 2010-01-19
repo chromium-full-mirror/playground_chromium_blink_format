@@ -23,8 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef JAVASCRIPTCORE_BINDINGS_RUNTIME_H
-#define JAVASCRIPTCORE_BINDINGS_RUNTIME_H
+#ifndef Bridge_h
+#define Bridge_h
 
 #include <runtime/JSString.h>
 #include <wtf/HashMap.h>
