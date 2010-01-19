@@ -45,7 +45,11 @@
 
 #if PLATFORM(WIN) || (PLATFORM(QT) && OS(WINDOWS)) || \
     (PLATFORM(WX) && OS(WINDOWS))
+#if COMPILER(MINGW)
+typedef struct _XFORM XFORM;
+#else
 typedef struct tagXFORM XFORM;
+#endif
 #endif
 
 namespace WebCore {
