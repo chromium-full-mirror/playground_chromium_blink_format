@@ -64,7 +64,17 @@
 - (DOMElement*)currentForm;
 - (NSArray*)controlsInForm:(DOMElement*)form;
 - (NSString*)searchForLabels:(NSArray*)labels
-               beforeElement:(DOMElement*)element;
+               beforeElement:(DOMElement*)element
+              resultDistance:(NSUInteger*)outDistance
+         resultIsInCellAbove:(BOOL*)outIsInCellAbove;
 - (NSString*)matchLabels:(NSArray*)labels againstElement:(DOMElement*)element;
+
+// Deprecated SPI
+- (NSString*)
+searchForLabels:(NSArray*)labels
+  beforeElement:
+      (DOMElement*)
+          element;  // Use
+                    // -searchForLabels:beforeElement:resultDistance:resultIsInCellAbove:
 
 @end

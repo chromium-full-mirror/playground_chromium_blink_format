@@ -180,13 +180,13 @@ HRESULT STDMETHODCALLTYPE WebHTMLRepresentation::controlsInForm(
   return m_frame->controlsInForm(form, controls, cControls);
 }
 
-HRESULT STDMETHODCALLTYPE WebHTMLRepresentation::searchForLabels(
+HRESULT STDMETHODCALLTYPE WebHTMLRepresentation::deprecatedSearchForLabels(
     /* [size_is][in] */ BSTR* labels,
     /* [in] */ int cLabels,
     /* [in] */ IDOMElement* beforeElement,
     /* [retval][out] */ BSTR* result) {
   return m_frame->searchForLabelsBeforeElement(labels, cLabels, beforeElement,
-                                               result);
+                                               0, 0, result);
 }
 
 HRESULT STDMETHODCALLTYPE WebHTMLRepresentation::matchLabels(
@@ -196,6 +196,17 @@ HRESULT STDMETHODCALLTYPE WebHTMLRepresentation::matchLabels(
     /* [retval][out] */ BSTR* result) {
   return m_frame->matchLabelsAgainstElement(labels, cLabels, againstElement,
                                             result);
+}
+
+HRESULT WebHTMLRepresentation::searchForLabels(BSTR* labels,
+                                               unsigned cLabels,
+                                               IDOMElement* beforeElement,
+                                               unsigned* resultDistance,
+                                               BOOL* resultIsInCellAbove,
+                                               BSTR* result) {
+  return m_frame->searchForLabelsBeforeElement(labels, cLabels, beforeElement,
+                                               resultDistance,
+                                               resultIsInCellAbove, result);
 }
 
 // IWebDocumentRepresentation

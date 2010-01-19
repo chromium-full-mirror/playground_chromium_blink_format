@@ -298,8 +298,13 @@ class Frame : public RefCounted<Frame> {
 
   SelectionController* dragCaretController() const;
 
-  String searchForLabelsAboveCell(RegularExpression*, HTMLTableCellElement*);
-  String searchForLabelsBeforeElement(const Vector<String>& labels, Element*);
+  String searchForLabelsAboveCell(RegularExpression*,
+                                  HTMLTableCellElement*,
+                                  size_t* resultDistanceFromStartOfCell);
+  String searchForLabelsBeforeElement(const Vector<String>& labels,
+                                      Element*,
+                                      size_t* resultDistance,
+                                      bool* resultIsInCellAbove);
   String matchLabelsAgainstElement(const Vector<String>& labels, Element*);
 
   VisiblePosition visiblePositionForPoint(const IntPoint& framePoint);
@@ -311,8 +316,12 @@ class Frame : public RefCounted<Frame> {
 
  public:
   NSString* searchForNSLabelsAboveCell(RegularExpression*,
-                                       HTMLTableCellElement*);
-  NSString* searchForLabelsBeforeElement(NSArray* labels, Element*);
+                                       HTMLTableCellElement*,
+                                       size_t* resultDistanceFromStartOfCell);
+  NSString* searchForLabelsBeforeElement(NSArray* labels,
+                                         Element*,
+                                         size_t* resultDistance,
+                                         bool* resultIsInCellAbove);
   NSString* matchLabelsAgainstElement(NSArray* labels, Element*);
 
 #if ENABLE(DASHBOARD_SUPPORT)

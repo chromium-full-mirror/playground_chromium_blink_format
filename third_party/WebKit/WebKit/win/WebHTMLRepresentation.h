@@ -91,7 +91,9 @@ class WebHTMLRepresentation : public IWebHTMLRepresentation,
       /* [out][in] */ IDOMElement** controls,
       /* [out][in] */ int* cControls);
 
-  virtual HRESULT STDMETHODCALLTYPE searchForLabels(
+  /* Deprecated. Use the variant that includes resultDistance and
+   * resultIsInCellAbove instead. */
+  virtual HRESULT STDMETHODCALLTYPE deprecatedSearchForLabels(
       /* [size_is][in] */ BSTR* labels,
       /* [in] */ int cLabels,
       /* [in] */ IDOMElement* beforeElement,
@@ -102,6 +104,13 @@ class WebHTMLRepresentation : public IWebHTMLRepresentation,
       /* [in] */ int cLabels,
       /* [in] */ IDOMElement* againstElement,
       /* [retval][out] */ BSTR* result);
+
+  virtual HRESULT STDMETHODCALLTYPE searchForLabels(BSTR* labels,
+                                                    unsigned cLabels,
+                                                    IDOMElement* beforeElement,
+                                                    unsigned* resultDistance,
+                                                    BOOL* resultIsInCellAbove,
+                                                    BSTR* result);
 
   // IWebDocumentRepresentation
   virtual HRESULT STDMETHODCALLTYPE setDataSource(

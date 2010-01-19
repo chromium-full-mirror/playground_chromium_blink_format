@@ -394,8 +394,10 @@ class DECLSPEC_UUID("{A3676398-4485-4a9d-87DC-CB5A40E6351D}") WebFrame
                          int* cControls);
   HRESULT elementIsPassword(IDOMElement* element, bool* result);
   HRESULT searchForLabelsBeforeElement(const BSTR* labels,
-                                       int cLabels,
+                                       unsigned cLabels,
                                        IDOMElement* beforeElement,
+                                       unsigned* resultDistance,
+                                       BOOL* resultIsInCellAbove,
                                        BSTR* result);
   HRESULT matchLabelsAgainstElement(const BSTR* labels,
                                     int cLabels,
