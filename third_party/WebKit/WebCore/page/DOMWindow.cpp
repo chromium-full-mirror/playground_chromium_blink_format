@@ -1206,20 +1206,40 @@ void DOMWindow::resizeTo(float width, float height) const {
   page->chrome()->setWindowRect(fr);
 }
 
-int DOMWindow::setTimeout(ScheduledAction* action, int timeout) {
-  return DOMTimer::install(scriptExecutionContext(), action, timeout, true);
+int DOMWindow::setTimeout(ScheduledAction* action,
+                          int timeout,
+                          ExceptionCode& ec) {
+  ScriptExecutionContext* context = scriptExecutionContext();
+  if (!context) {
+    ec = INVALID_ACCESS_ERR;
+    return -1;
+  }
+  return DOMTimer::install(context, action, timeout, true);
 }
 
 void DOMWindow::clearTimeout(int timeoutId) {
-  DOMTimer::removeById(scriptExecutionContext(), timeoutId);
+  ScriptExecutionContext* context = scriptExecutionContext();
+  if (!context)
+    return;
+  DOMTimer::removeById(context, timeoutId);
 }
 
-int DOMWindow::setInterval(ScheduledAction* action, int timeout) {
-  return DOMTimer::install(scriptExecutionContext(), action, timeout, false);
+int DOMWindow::setInterval(ScheduledAction* action,
+                           int timeout,
+                           ExceptionCode& ec) {
+  ScriptExecutionContext* context = scriptExecutionContext();
+  if (!context) {
+    ec = INVALID_ACCESS_ERR;
+    return -1;
+  }
+  return DOMTimer::install(context, action, timeout, false);
 }
 
 void DOMWindow::clearInterval(int timeoutId) {
-  DOMTimer::removeById(scriptExecutionContext(), timeoutId);
+  ScriptExecutionContext* context = scriptExecutionContext();
+  if (!context)
+    return;
+  DOMTimer::removeById(context, timeoutId);
 }
 
 bool DOMWindow::addEventListener(const AtomicString& eventType,
