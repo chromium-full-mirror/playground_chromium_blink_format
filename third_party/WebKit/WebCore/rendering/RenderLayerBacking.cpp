@@ -423,9 +423,11 @@ void RenderLayerBacking::updateGraphicsLayerGeometry() {
     // The reflection layer has the bounds of m_owningLayer->reflectionLayer(),
     // but the reflected layer is the bounds of this layer, so we need to
     // position it appropriately.
-    FloatRect reflectedLayerBounds = compositedBounds();
+    FloatRect layerBounds = compositedBounds();
+    FloatRect reflectionLayerBounds = reflectionBacking->compositedBounds();
     reflectionBacking->graphicsLayer()->setReplicatedLayerPosition(
-        reflectedLayerBounds.location());
+        FloatPoint() +
+        (layerBounds.location() - reflectionLayerBounds.location()));
   }
 
   m_graphicsLayer->setContentsRect(contentsBox());
