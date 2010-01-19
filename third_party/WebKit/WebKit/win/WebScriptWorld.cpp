@@ -29,6 +29,7 @@
 #include "WebKitDLL.h"
 #include "WebScriptWorld.h"
 
+#include <JavaScriptCore/APICast.h>
 #include <WebCore/JSDOMBinding.h>
 #include <WebCore/ScriptController.h>
 
