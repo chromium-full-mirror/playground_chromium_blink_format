@@ -71,8 +71,7 @@ class InspectorFrontend : public Noncopyable {
   void updateConsoleMessageExpiredCount(unsigned count);
   void addConsoleMessage(const ScriptObject& messageObj,
                          const Vector<ScriptString>& frames,
-                         ScriptState*,
-                         const Vector<ScriptValue> arguments,
+                         const Vector<ScriptValue> wrappedArguments,
                          const String& message);
   void updateConsoleMessageRepeatCount(unsigned count);
   void clearConsoleMessages();
@@ -104,7 +103,7 @@ class InspectorFrontend : public Noncopyable {
   void setRecordingProfile(bool isProfiling);
   void didGetProfileHeaders(int callId, const ScriptArray& headers);
   void didGetProfile(int callId, const ScriptValue& profile);
-  void pausedScript(const String& callFrames);
+  void pausedScript(const ScriptValue& callFrames);
   void resumedScript();
 #endif
 

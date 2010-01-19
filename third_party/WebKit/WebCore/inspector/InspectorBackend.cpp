@@ -40,7 +40,6 @@
 #include "Frame.h"
 #include "FrameLoader.h"
 #include "HTMLFrameOwnerElement.h"
-#include "InjectedScriptHost.h"
 #include "InspectorClient.h"
 #include "InspectorController.h"
 #include "InspectorDOMAgent.h"
@@ -231,14 +230,7 @@ JavaScriptCallFrame* InspectorBackend::currentCallFrame() const {
 }
 #endif
 
-void InspectorBackend::setInjectedScriptSource(const String& source) {
-  if (m_inspectorController)
-    m_inspectorController->injectedScriptHost()->setInjectedScriptSource(
-        source);
-}
-
 void InspectorBackend::dispatchOnInjectedScript(long callId,
-                                                long injectedScriptId,
                                                 const String& methodName,
                                                 const String& arguments,
                                                 bool async) {
@@ -246,22 +238,8 @@ void InspectorBackend::dispatchOnInjectedScript(long callId,
   if (!frontend)
     return;
 
-  // FIXME: explicitly pass injectedScriptId along with node id to the frontend.
-  bool injectedScriptIdIsNodeId = injectedScriptId <= 0;
-
-  ScriptObject injectedScript;
-  if (injectedScriptIdIsNodeId)
-    injectedScript =
-        m_inspectorController->injectedScriptForNodeId(-injectedScriptId);
-  else
-    injectedScript =
-        m_inspectorController->injectedScriptHost()->injectedScriptForId(
-            injectedScriptId);
-
-  if (injectedScript.hasNoValue())
-    return;
-
-  ScriptFunctionCall function(injectedScript.scriptState(), injectedScript,
+  ScriptFunctionCall function(m_inspectorController->m_scriptState,
+                              m_inspectorController->m_injectedScriptObj,
                               "dispatch");
   function.appendArgument(methodName);
   function.appendArgument(arguments);
@@ -276,7 +254,7 @@ void InspectorBackend::dispatchOnInjectedScript(long callId,
     frontend->didDispatchOnInjectedScript(callId, "", true);
   else
     frontend->didDispatchOnInjectedScript(
-        callId, result.toString(injectedScript.scriptState()), false);
+        callId, result.toString(m_inspectorController->m_scriptState), false);
 }
 
 void InspectorBackend::getChildNodes(long callId, long nodeId) {
@@ -370,12 +348,9 @@ void InspectorBackend::deleteCookie(const String& cookieName,
   m_inspectorController->deleteCookie(cookieName, domain);
 }
 
-void InspectorBackend::releaseWrapperObjectGroup(long injectedScriptId,
-                                                 const String& objectGroup) {
-  if (!m_inspectorController)
-    return;
-  m_inspectorController->injectedScriptHost()->releaseWrapperObjectGroup(
-      injectedScriptId, objectGroup);
+void InspectorBackend::releaseWrapperObjectGroup(const String& objectGroup) {
+  if (m_inspectorController)
+    m_inspectorController->releaseWrapperObjectGroup(objectGroup);
 }
 
 void InspectorBackend::didEvaluateForTestInFrontend(long callId,
