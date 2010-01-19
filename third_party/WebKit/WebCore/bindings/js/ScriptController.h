@@ -25,6 +25,7 @@
 
 #include "JSDOMWindowShell.h"
 #include "ScriptInstance.h"
+#include "ScriptState.h"
 #include <runtime/Protect.h>
 #include <wtf/RefPtr.h>
 
@@ -171,6 +172,8 @@ class ScriptController {
 #endif
 
   XSSAuditor* xssAuditor() { return m_XSSAuditor.get(); }
+
+  ScriptState* mainWorldScriptState();
 
  private:
   JSDOMWindowShell* initScript(DOMWrapperWorld* world);
