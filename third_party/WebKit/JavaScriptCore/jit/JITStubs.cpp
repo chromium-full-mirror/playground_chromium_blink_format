@@ -674,8 +674,7 @@ __asm EncodedJSValue ctiTrampoline(void*,
 }
 
 __asm void ctiVMThrowTrampoline() {
-  ARM PRESERVE8 IMPORT cti_vm_throw mov r0, sp bl cti_vm_throw add sp, sp,
-      #36 ldmia sp !, {
+  ARM PRESERVE8 mov r0, sp bl cti_vm_throw add sp, sp, #36 ldmia sp !, {
     r4 - r8, lr
   }
   add sp, sp, #12 bx lr
@@ -1142,7 +1141,7 @@ RVCT(    IMPORT JITStubThunked_#op#)
 RVCT(    str lr, [sp, #32])
 RVCT(    bl JITStubThunked_#op#)
 RVCT(    ldr lr, [sp, #32])
-RVCT(    bx lr))
+RVCT(    bx lr)
 RVCT(})
 RVCT()
 */
