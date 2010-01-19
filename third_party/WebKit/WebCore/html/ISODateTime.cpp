@@ -31,9 +31,11 @@
 #include "config.h"
 #include "ISODateTime.h"
 
+#include "PlatformString.h"
 #include <limits.h>
 #include <wtf/ASCIICType.h>
 #include <wtf/DateMath.h>
+#include <wtf/MathExtras.h>
 
 namespace WebCore {
 
@@ -144,6 +146,13 @@ bool ISODateTime::parseYear(const UChar* src,
   return true;
 }
 
+static bool beforeGregorianStartDate(int year, int month, int monthDay) {
+  return year < gregorianStartYear ||
+         year == gregorianStartYear && month < gregorianStartMonth ||
+         year == gregorianStartYear && month == gregorianStartMonth &&
+             monthDay < gregorianStartDay;
+}
+
 bool ISODateTime::addDay(int dayDiff) {
   ASSERT(m_monthDay);
 
@@ -183,10 +192,7 @@ bool ISODateTime::addDay(int dayDiff) {
         }
         day = maxDayOfMonth(year, month);
       }
-      if (year < gregorianStartYear ||
-          (year == gregorianStartYear && month < gregorianStartMonth) ||
-          (year == gregorianStartYear && month == gregorianStartMonth &&
-           day < gregorianStartDay))
+      if (beforeGregorianStartDate(year, month, day))
         return false;
     }
     m_year = year;
@@ -300,7 +306,7 @@ bool ISODateTime::parseMonth(const UChar* src,
     return false;
   --month;
   // No support for months before Gregorian calendar.
-  if (m_year == gregorianStartYear && month < gregorianStartMonth)
+  if (beforeGregorianStartDate(m_year, month, gregorianStartDay))
     return false;
   m_month = month;
   end = index + 2;
@@ -467,6 +473,26 @@ bool ISODateTime::parseDateTime(const UChar* src,
   return true;
 }
 
+bool ISODateTime::setMillisecondsSinceEpochForDateInternal(double ms) {
+  m_year = msToYear(ms);
+  int yearDay = dayInYear(ms, m_year);
+  m_month = monthFromDayInYear(yearDay, isLeapYear(m_year));
+  m_monthDay = dayInMonthFromDayInYear(yearDay, isLeapYear(m_year));
+  return true;
+}
+
+bool ISODateTime::setMillisecondsSinceEpochForMonth(double ms) {
+  if (!isfinite(ms))
+    return false;
+  if (!setMillisecondsSinceEpochForDateInternal(ms))
+    return false;
+  // Ignore m_monthDay updated by setMillisecondsSinceEpochForDateInternal().
+  if (beforeGregorianStartDate(m_year, m_month, gregorianStartDay))
+    return false;
+  m_type = Month;
+  return true;
+}
+
 double ISODateTime::millisecondsSinceEpochForTime() const {
   ASSERT(m_type == Time || m_type == DateTime);
   return ((m_hour * minutesPerHour + m_minute) * secondsPerMinute + m_second) *
@@ -501,6 +527,19 @@ double ISODateTime::millisecondsSinceEpoch() const {
   }
   ASSERT_NOT_REACHED();
   return invalidMilliseconds();
+}
+
+String ISODateTime::toString() const {
+  switch (m_type) {
+    case Month:
+      return String::format("%04d-%02d", m_year, m_month + 1);
+
+    // FIXME: implementations for other types.
+    default:
+      break;
+  }
+  ASSERT_NOT_REACHED();
+  return String("(Invalid ISODateTime)");
 }
 
 }  // namespace WebCore
