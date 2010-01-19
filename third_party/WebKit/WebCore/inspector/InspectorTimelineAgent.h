@@ -86,8 +86,8 @@ class InspectorTimelineAgent : public Noncopyable {
   void willPaint(const IntRect&);
   void didPaint();
 
-  void willWriteHTML(unsigned length);
-  void didWriteHTML();
+  void willWriteHTML(unsigned int length, unsigned int startLine);
+  void didWriteHTML(unsigned int endLine);
 
   void didInstallTimer(int timerId, int timeout, bool singleShot);
   void didRemoveTimer(int timerId);
@@ -115,10 +115,12 @@ class InspectorTimelineAgent : public Noncopyable {
  private:
   struct TimelineRecordEntry {
     TimelineRecordEntry(ScriptObject record,
+                        ScriptObject data,
                         ScriptArray children,
                         TimelineRecordType type)
-        : record(record), children(children), type(type) {}
+        : record(record), data(data), children(children), type(type) {}
     ScriptObject record;
+    ScriptObject data;
     ScriptArray children;
     TimelineRecordType type;
   };
