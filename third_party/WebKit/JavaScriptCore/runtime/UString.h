@@ -72,7 +72,7 @@ bool operator==(const CString&, const CString&);
 
 typedef Vector<char, 32> CStringBuffer;
 
-class UString : public FastAllocBase {
+class UString {
   friend class JIT;
 
  public:
