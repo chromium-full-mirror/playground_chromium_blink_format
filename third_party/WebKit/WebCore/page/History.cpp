@@ -92,9 +92,8 @@ void History::stateObjectAdded(PassRefPtr<SerializedScriptValue> data,
                                const String& urlString,
                                StateObjectType stateObjectType,
                                ExceptionCode& ec) {
-  if (!m_frame)
+  if (!m_frame || !m_frame->page())
     return;
-  ASSERT(m_frame->page());
 
   KURL fullURL = urlForState(urlString);
   if (!fullURL.isValid()) {
