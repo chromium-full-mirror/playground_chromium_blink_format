@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2003 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 Apple Inc. All
+ * rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -29,10 +30,10 @@
 #if ENABLE(MAC_JAVA_BRIDGE)
 
 #include "JSDOMWindow.h"
+#include "jni_runtime.h"
+#include "jni_utility.h"
 #include <runtime/Identifier.h>
 #include <runtime/JSLock.h>
-#include "jni_utility.h"
-#include "jni_runtime.h"
 
 using namespace JSC::Bindings;
 
@@ -49,7 +50,7 @@ JavaClass::JavaClass(jobject anInstance) {
   jstring className = (jstring)callJNIMethod<jobject>(aClass, "getName",
                                                       "()Ljava/lang/String;");
   const char* classNameC = getCharactersFromJString(className);
-  _name = strdup(classNameC);
+  m_name = strdup(classNameC);
   releaseCharactersForJString(className, classNameC);
 
   int i;
@@ -65,7 +66,7 @@ JavaClass::JavaClass(jobject anInstance) {
         new JavaField(env, aJField);  // deleted in the JavaClass destructor
     {
       JSLock lock(SilenceAssertionsOnly);
-      _fields.set(((UString)aField->name()).rep(), aField);
+      m_fields.set(((UString)aField->name()).rep(), aField);
     }
     env->DeleteLocalRef(aJField);
   }
@@ -82,10 +83,10 @@ JavaClass::JavaClass(jobject anInstance) {
     {
       JSLock lock(SilenceAssertionsOnly);
 
-      methodList = _methods.get(((UString)aMethod->name()).rep());
+      methodList = m_methods.get(((UString)aMethod->name()).rep());
       if (!methodList) {
         methodList = new MethodList();
-        _methods.set(((UString)aMethod->name()).rep(), methodList);
+        m_methods.set(((UString)aMethod->name()).rep(), methodList);
       }
     }
     methodList->append(aMethod);
@@ -98,25 +99,25 @@ JavaClass::JavaClass(jobject anInstance) {
 }
 
 JavaClass::~JavaClass() {
-  free((void*)_name);
+  free(const_cast<char*>(m_name));
 
   JSLock lock(SilenceAssertionsOnly);
 
-  deleteAllValues(_fields);
-  _fields.clear();
+  deleteAllValues(m_fields);
+  m_fields.clear();
 
-  MethodListMap::const_iterator end = _methods.end();
-  for (MethodListMap::const_iterator it = _methods.begin(); it != end; ++it) {
+  MethodListMap::const_iterator end = m_methods.end();
+  for (MethodListMap::const_iterator it = m_methods.begin(); it != end; ++it) {
     const MethodList* methodList = it->second;
     deleteAllValues(*methodList);
     delete methodList;
   }
-  _methods.clear();
+  m_methods.clear();
 }
 
 MethodList JavaClass::methodsNamed(const Identifier& identifier,
                                    Instance*) const {
-  MethodList* methodList = _methods.get(identifier.ustring().rep());
+  MethodList* methodList = m_methods.get(identifier.ustring().rep());
 
   if (methodList)
     return *methodList;
@@ -124,24 +125,23 @@ MethodList JavaClass::methodsNamed(const Identifier& identifier,
 }
 
 Field* JavaClass::fieldNamed(const Identifier& identifier, Instance*) const {
-  return _fields.get(identifier.ustring().rep());
+  return m_fields.get(identifier.ustring().rep());
 }
 
 bool JavaClass::isNumberClass() const {
-  return ((strcmp(_name, "java.lang.Byte") == 0 ||
-           strcmp(_name, "java.lang.Short") == 0 ||
-           strcmp(_name, "java.lang.Integer") == 0 ||
-           strcmp(_name, "java.lang.Long") == 0 ||
-           strcmp(_name, "java.lang.Float") == 0 ||
-           strcmp(_name, "java.lang.Double") == 0));
+  return (
+      !strcmp(m_name, "java.lang.Byte") || !strcmp(m_name, "java.lang.Short") ||
+      !strcmp(m_name, "java.lang.Integer") ||
+      !strcmp(m_name, "java.lang.Long") || !strcmp(m_name, "java.lang.Float") ||
+      !strcmp(m_name, "java.lang.Double"));
 }
 
 bool JavaClass::isBooleanClass() const {
-  return strcmp(_name, "java.lang.Boolean") == 0;
+  return !strcmp(m_name, "java.lang.Boolean");
 }
 
 bool JavaClass::isStringClass() const {
-  return strcmp(_name, "java.lang.String") == 0;
+  return !strcmp(m_name, "java.lang.String");
 }
 
 #endif  // ENABLE(MAC_JAVA_BRIDGE)

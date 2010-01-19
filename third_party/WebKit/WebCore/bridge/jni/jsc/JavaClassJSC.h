@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2003 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2003, 2004, 2005, 2007, 2009, 2010 Apple Inc. All rights
+ * reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -28,7 +29,7 @@
 
 #if ENABLE(MAC_JAVA_BRIDGE)
 
-#include <jni_runtime.h>
+#include "jni_runtime.h"
 #include <wtf/HashMap.h>
 
 namespace JSC {
@@ -37,20 +38,20 @@ namespace Bindings {
 
 class JavaClass : public Class {
  public:
-  JavaClass(jobject anInstance);
+  JavaClass(jobject);
   ~JavaClass();
 
-  virtual MethodList methodsNamed(const Identifier&, Instance* instance) const;
-  virtual Field* fieldNamed(const Identifier&, Instance* instance) const;
+  virtual MethodList methodsNamed(const Identifier&, Instance*) const;
+  virtual Field* fieldNamed(const Identifier&, Instance*) const;
 
   bool isNumberClass() const;
   bool isBooleanClass() const;
   bool isStringClass() const;
 
  private:
-  const char* _name;
-  FieldMap _fields;
-  MethodListMap _methods;
+  const char* m_name;
+  FieldMap m_fields;
+  MethodListMap m_methods;
 };
 
 }  // namespace Bindings
