@@ -198,6 +198,8 @@ class GraphicsLayer {
   virtual void setReplicatedByLayer(GraphicsLayer*);
   // Whether this layer is being replicated by another layer.
   bool isReplicated() const { return m_replicaLayer; }
+  // The layer that replicates this layer (if any).
+  GraphicsLayer* replicaLayer() const { return m_replicaLayer; }
 
   const FloatPoint& replicatedLayerPosition() const {
     return m_replicatedLayerPosition;
@@ -383,8 +385,6 @@ class GraphicsLayer {
 
   virtual void setOpacityInternal(float) {}
 
-  // The layer that replicates this layer (if any).
-  GraphicsLayer* replicaLayer() const { return m_replicaLayer; }
   // The layer being replicated.
   GraphicsLayer* replicatedLayer() const { return m_replicatedLayer; }
   virtual void setReplicatedLayer(GraphicsLayer* layer) {
