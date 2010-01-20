@@ -530,6 +530,46 @@ static JSValueRef showMenuCallback(JSContextRef context,
   return JSValueMakeUndefined(context);
 }
 
+static JSValueRef takeFocusCallback(JSContextRef context,
+                                    JSObjectRef function,
+                                    JSObjectRef thisObject,
+                                    size_t argumentCount,
+                                    const JSValueRef arguments[],
+                                    JSValueRef* exception) {
+  toAXElement(thisObject)->takeFocus();
+  return JSValueMakeUndefined(context);
+}
+
+static JSValueRef takeSelectionCallback(JSContextRef context,
+                                        JSObjectRef function,
+                                        JSObjectRef thisObject,
+                                        size_t argumentCount,
+                                        const JSValueRef arguments[],
+                                        JSValueRef* exception) {
+  toAXElement(thisObject)->takeSelection();
+  return JSValueMakeUndefined(context);
+}
+
+static JSValueRef addSelectionCallback(JSContextRef context,
+                                       JSObjectRef function,
+                                       JSObjectRef thisObject,
+                                       size_t argumentCount,
+                                       const JSValueRef arguments[],
+                                       JSValueRef* exception) {
+  toAXElement(thisObject)->addSelection();
+  return JSValueMakeUndefined(context);
+}
+
+static JSValueRef removeSelectionCallback(JSContextRef context,
+                                          JSObjectRef function,
+                                          JSObjectRef thisObject,
+                                          size_t argumentCount,
+                                          const JSValueRef arguments[],
+                                          JSValueRef* exception) {
+  toAXElement(thisObject)->removeSelection();
+  return JSValueMakeUndefined(context);
+}
+
 // Static Value Getters
 
 static JSValueRef getARIADropEffectsCallback(JSContextRef context,
@@ -1037,6 +1077,14 @@ JSClassRef AccessibilityUIElement::getJSClass() {
       {"isEqual", isEqualCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"addNotificationListener", addNotificationListenerCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"takeFocus", takeFocusCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"takeSelection", takeSelectionCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"addSelection", addSelectionCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"removeSelection", removeSelectionCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {0, 0, 0}};
 
