@@ -67,7 +67,10 @@
 
 #include <limits.h>
 
+#ifndef Q_OS_WIN
 #include <unistd.h>
+#endif
+
 #include <qdebug.h>
 
 extern void qt_drt_run(bool b);
@@ -86,14 +89,14 @@ const unsigned int maxViewHeight = 600;
 
 NetworkAccessManager::NetworkAccessManager(QObject* parent)
     : QNetworkAccessManager(parent) {
-#ifndef QT_NO_SSL
+#ifndef QT_NO_OPENSSL
   connect(this, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError>&)),
           this,
           SLOT(sslErrorsEncountered(QNetworkReply*, const QList<QSslError>&)));
 #endif
 }
 
-#ifndef QT_NO_SSL
+#ifndef QT_NO_OPENSSL
 void NetworkAccessManager::sslErrorsEncountered(
     QNetworkReply* reply,
     const QList<QSslError>& errors) {
