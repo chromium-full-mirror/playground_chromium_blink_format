@@ -46,6 +46,10 @@ namespace WebCore {
 PassRefPtr<V8LazyEventListener> createAttributeEventListener(Node* node,
                                                              Attribute* attr) {
   ASSERT(node);
+  ASSERT(attr);
+  if (attr->isNull())
+    return 0;
+
   int lineNumber = 1;
   int columnNumber = 0;
   String sourceURL;
@@ -77,6 +81,11 @@ PassRefPtr<V8LazyEventListener> createAttributeEventListener(Node* node,
 PassRefPtr<V8LazyEventListener> createAttributeEventListener(Frame* frame,
                                                              Attribute* attr) {
   if (!frame)
+    return 0;
+
+  ASSERT(node);
+  ASSERT(attr);
+  if (attr->isNull())
     return 0;
 
   int lineNumber = 1;
