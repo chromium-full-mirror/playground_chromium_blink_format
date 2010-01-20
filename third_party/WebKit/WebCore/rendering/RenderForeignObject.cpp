@@ -130,6 +130,15 @@ bool RenderForeignObject::nodeAtPoint(const HitTestRequest&,
   return false;
 }
 
+void RenderForeignObject::mapLocalToContainer(
+    RenderBoxModelObject* repaintContainer,
+    bool fixed,
+    bool useTransforms,
+    TransformState& transformState) const {
+  SVGRenderBase::mapLocalToContainer(this, repaintContainer, fixed,
+                                     useTransforms, transformState);
+}
+
 }  // namespace WebCore
 
 #endif  // ENABLE(SVG) && ENABLE(SVG_FOREIGN_OBJECT)

@@ -63,6 +63,11 @@ class RenderForeignObject : public RenderSVGBlock {
                            HitTestAction);
   virtual bool isSVGForeignObject() const { return true; }
 
+  virtual void mapLocalToContainer(RenderBoxModelObject* repaintContainer,
+                                   bool fixed,
+                                   bool useTransforms,
+                                   TransformState& transformState) const;
+
  private:
   TransformationMatrix translationForAttributes() const;
 
