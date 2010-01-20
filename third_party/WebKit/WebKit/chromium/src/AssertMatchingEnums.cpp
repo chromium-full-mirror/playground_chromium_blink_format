@@ -124,6 +124,10 @@ COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleHeading, HeadingRole);
 COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleListBox, ListBoxRole);
 COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleListBoxOption,
                              ListBoxOptionRole);
+COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleMenuListOption,
+                             MenuListOptionRole);
+COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleMenuListPopup,
+                             MenuListPopupRole);
 COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleTableHeaderContainer,
                              TableHeaderContainerRole);
 COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleDefinitionListTerm,
