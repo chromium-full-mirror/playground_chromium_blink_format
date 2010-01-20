@@ -191,6 +191,10 @@ class RenderBlock : public RenderBox {
                    RenderObjectChildList* toChildList,
                    RenderObject* beforeChild,
                    RenderObject* child);
+  void moveAllChildrenTo(RenderObject* to, RenderObjectChildList* toChildList);
+  void moveAllChildrenTo(RenderObject* to,
+                         RenderObjectChildList* toChildList,
+                         RenderObject* beforeChild);
 
   int maxTopPosMargin() const {
     return m_maxMargin ? m_maxMargin->m_topPos : MaxMargin::topPosDefault(this);
@@ -730,6 +734,11 @@ class RenderBlock : public RenderBox {
                                   // total lines for the <div>.
 
   mutable int m_lineHeight;
+
+  // RenderRubyBase objects need to be able to split and merge, moving their
+  // children around
+  // (calling moveChildTo, moveAllChildrenTo, and makeChildrenNonInline).
+  friend class RenderRubyBase;
 };
 
 inline RenderBlock* toRenderBlock(RenderObject* object) {
