@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2003 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2003, 2004, 2005, 2008, 2009, 2010 Apple Inc. All rights
+ * reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -56,28 +57,21 @@ namespace Bindings {
 
 class JavaParameter;
 
-const char* getCharactersFromJString(jstring aJString);
-void releaseCharactersForJString(jstring aJString, const char* s);
+const char* getCharactersFromJString(jstring);
+void releaseCharactersForJString(jstring, const char*);
 
-const char* getCharactersFromJStringInEnv(JNIEnv* env, jstring aJString);
-void releaseCharactersForJStringInEnv(JNIEnv* env,
-                                      jstring aJString,
-                                      const char* s);
-const jchar* getUCharactersFromJStringInEnv(JNIEnv* env, jstring aJString);
-void releaseUCharactersForJStringInEnv(JNIEnv* env,
-                                       jstring aJString,
-                                       const jchar* s);
+const char* getCharactersFromJStringInEnv(JNIEnv*, jstring);
+void releaseCharactersForJStringInEnv(JNIEnv*, jstring, const char*);
+const jchar* getUCharactersFromJStringInEnv(JNIEnv*, jstring);
+void releaseUCharactersForJStringInEnv(JNIEnv*, jstring, const jchar*);
 
 JNIType JNITypeFromClassName(const char* name);
 JNIType JNITypeFromPrimitiveType(char type);
-const char* signatureFromPrimitiveType(JNIType type);
+const char* signatureFromPrimitiveType(JNIType);
 
-jvalue getJNIField(jobject obj,
-                   JNIType type,
-                   const char* name,
-                   const char* signature);
+jvalue getJNIField(jobject, JNIType, const char* name, const char* signature);
 
-jmethodID getMethodID(jobject obj, const char* name, const char* sig);
+jmethodID getMethodID(jobject, const char* name, const char* sig);
 JNIEnv* getJNIEnv();
 JavaVM* getJavaVM();
 void setJavaVM(JavaVM*);
@@ -201,27 +195,25 @@ static T callJNIMethodV(jobject obj,
   JavaVM* jvm = getJavaVM();
   JNIEnv* env = getJNIEnv();
 
-  if (obj != NULL && jvm != NULL && env != NULL) {
+  if (obj && jvm && env) {
     jclass cls = env->GetObjectClass(obj);
-    if (cls != NULL) {
+    if (cls) {
       jmethodID mid = env->GetMethodID(cls, name, sig);
-      if (mid != NULL) {
+      if (mid) {
         // Avoids references to cls without popping the local frame.
         env->DeleteLocalRef(cls);
         return JNICaller<T>::callV(obj, mid, args);
-      } else {
-        fprintf(stderr, "%s: Could not find method: %s for %p\n",
-                __PRETTY_FUNCTION__, name, obj);
-        env->ExceptionDescribe();
-        env->ExceptionClear();
-        fprintf(stderr, "\n");
       }
+      fprintf(stderr, "%s: Could not find method: %s for %p\n",
+              __PRETTY_FUNCTION__, name, obj);
+      env->ExceptionDescribe();
+      env->ExceptionClear();
+      fprintf(stderr, "\n");
 
       env->DeleteLocalRef(cls);
-    } else {
+    } else
       fprintf(stderr, "%s: Could not find class for %p\n", __PRETTY_FUNCTION__,
               obj);
-    }
   }
 
   return 0;
@@ -255,9 +247,9 @@ T callJNIStaticMethod(jclass cls,
 
   T result = 0;
 
-  if (cls != NULL && jvm != NULL && env != NULL) {
+  if (cls && jvm && env) {
     jmethodID mid = env->GetStaticMethodID(cls, methodName, methodSignature);
-    if (mid != NULL)
+    if (mid)
       result = JNICaller<T>::callStaticV(cls, mid, args);
     else {
       fprintf(stderr, "%s: Could not find method: %s for %p\n",
