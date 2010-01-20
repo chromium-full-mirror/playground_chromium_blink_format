@@ -134,7 +134,7 @@ JSValue CInstance::invokeMethod(ExecState* exec,
     _NPN_ReleaseVariantValue(&cArgs[i]);
 
   JSValue resultValue =
-      convertNPVariantToValue(exec, &resultVariant, _rootObject.get());
+      convertNPVariantToValue(exec, &resultVariant, m_rootObject.get());
   _NPN_ReleaseVariantValue(&resultVariant);
   return resultValue;
 }
@@ -169,7 +169,7 @@ JSValue CInstance::invokeDefaultMethod(ExecState* exec, const ArgList& args) {
     _NPN_ReleaseVariantValue(&cArgs[i]);
 
   JSValue resultValue =
-      convertNPVariantToValue(exec, &resultVariant, _rootObject.get());
+      convertNPVariantToValue(exec, &resultVariant, m_rootObject.get());
   _NPN_ReleaseVariantValue(&resultVariant);
   return resultValue;
 }
@@ -208,7 +208,7 @@ JSValue CInstance::invokeConstruct(ExecState* exec, const ArgList& args) {
     _NPN_ReleaseVariantValue(&cArgs[i]);
 
   JSValue resultValue =
-      convertNPVariantToValue(exec, &resultVariant, _rootObject.get());
+      convertNPVariantToValue(exec, &resultVariant, m_rootObject.get());
   _NPN_ReleaseVariantValue(&resultVariant);
   return resultValue;
 }

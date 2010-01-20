@@ -35,17 +35,18 @@
 #endif
 
 namespace JSC {
+
 namespace Bindings {
 
-Array::Array(PassRefPtr<RootObject> rootObject) : _rootObject(rootObject) {
-  ASSERT(_rootObject);
+Array::Array(PassRefPtr<RootObject> rootObject) : m_rootObject(rootObject) {
+  ASSERT(m_rootObject);
 }
 
 Array::~Array() {}
 
 Instance::Instance(PassRefPtr<RootObject> rootObject)
-    : _rootObject(rootObject), m_runtimeObject(0) {
-  ASSERT(_rootObject);
+    : m_rootObject(rootObject), m_runtimeObject(0) {
+  ASSERT(m_rootObject);
 }
 
 Instance::~Instance() {
@@ -71,13 +72,13 @@ void Instance::end() {
 }
 
 RuntimeObjectImp* Instance::createRuntimeObject(ExecState* exec) {
-  ASSERT(_rootObject);
-  ASSERT(_rootObject->isValid());
+  ASSERT(m_rootObject);
+  ASSERT(m_rootObject->isValid());
   if (m_runtimeObject)
     return m_runtimeObject;
   JSLock lock(SilenceAssertionsOnly);
   m_runtimeObject = newRuntimeObject(exec);
-  _rootObject->addRuntimeObject(m_runtimeObject);
+  m_rootObject->addRuntimeObject(m_runtimeObject);
   return m_runtimeObject;
 }
 
@@ -87,10 +88,10 @@ RuntimeObjectImp* Instance::newRuntimeObject(ExecState* exec) {
 }
 
 void Instance::willDestroyRuntimeObject() {
-  ASSERT(_rootObject);
-  ASSERT(_rootObject->isValid());
+  ASSERT(m_rootObject);
+  ASSERT(m_rootObject->isValid());
   ASSERT(m_runtimeObject);
-  _rootObject->removeRuntimeObject(m_runtimeObject);
+  m_rootObject->removeRuntimeObject(m_runtimeObject);
   m_runtimeObject = 0;
 }
 
@@ -100,7 +101,9 @@ void Instance::willInvalidateRuntimeObject() {
 }
 
 RootObject* Instance::rootObject() const {
-  return _rootObject && _rootObject->isValid() ? _rootObject.get() : 0;
+  return m_rootObject && m_rootObject->isValid() ? m_rootObject.get() : 0;
 }
-}
-}  // namespace JSC::Bindings
+
+}  // namespace Bindings
+
+}  // namespace JSC

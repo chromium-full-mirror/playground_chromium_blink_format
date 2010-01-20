@@ -1841,7 +1841,7 @@ QtArray<T>::~QtArray() {}
 
 template <typename T>
 RootObject* QtArray<T>::rootObject() const {
-  return _rootObject && _rootObject->isValid() ? _rootObject.get() : 0;
+  return m_rootObject && m_rootObject->isValid() ? m_rootObject.get() : 0;
 }
 
 template <typename T>

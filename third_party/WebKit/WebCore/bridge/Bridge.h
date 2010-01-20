@@ -149,7 +149,7 @@ class Instance : public RefCounted<Instance> {
   virtual void virtualEnd() {}
   virtual RuntimeObjectImp* newRuntimeObject(ExecState*);
 
-  RefPtr<RootObject> _rootObject;
+  RefPtr<RootObject> m_rootObject;
 
  private:
   RuntimeObjectImp* m_runtimeObject;
@@ -165,7 +165,7 @@ class Array : public Noncopyable {
   virtual unsigned int getLength() const = 0;
 
  protected:
-  RefPtr<RootObject> _rootObject;
+  RefPtr<RootObject> m_rootObject;
 };
 
 const char* signatureForParameters(const ArgList&);
