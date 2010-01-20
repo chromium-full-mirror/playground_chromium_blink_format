@@ -29,7 +29,6 @@
 
 #include "JSWebGLRenderingContext.h"
 
-#include "WebGLRenderingContext.h"
 #include "ExceptionCode.h"
 #include "HTMLCanvasElement.h"
 #include "HTMLImageElement.h"
@@ -51,11 +50,12 @@
 #include "JSWebKitCSSMatrix.h"
 #include "NotImplemented.h"
 #include "WebGLBuffer.h"
-#include "WebGLGetInfo.h"
 #include "WebGLFloatArray.h"
 #include "WebGLFramebuffer.h"
+#include "WebGLGetInfo.h"
 #include "WebGLIntArray.h"
 #include "WebGLProgram.h"
+#include "WebGLRenderingContext.h"
 #include <runtime/Error.h>
 #include <wtf/FastMalloc.h>
 #include <wtf/OwnFastMallocPtr.h>
