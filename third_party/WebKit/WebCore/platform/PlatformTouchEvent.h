@@ -33,7 +33,7 @@ QT_END_NAMESPACE
 
 namespace WebCore {
 
-enum TouchEventType { TouchStart, TouchMove, TouchEnd };
+enum TouchEventType { TouchStart, TouchMove, TouchEnd, TouchCancel };
 
 class PlatformTouchEvent {
  public:

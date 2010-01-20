@@ -306,6 +306,9 @@ void HTMLElement::parseMappedAttribute(MappedAttribute* attr) {
   } else if (attr->name() == ontouchendAttr) {
     setAttributeEventListener(eventNames().touchendEvent,
                               createAttributeEventListener(this, attr));
+  } else if (attr->name() == ontouchcancelAttr) {
+    setAttributeEventListener(eventNames().touchcancelEvent,
+                              createAttributeEventListener(this, attr));
   }
 }
 

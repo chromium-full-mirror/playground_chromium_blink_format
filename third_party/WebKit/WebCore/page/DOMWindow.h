@@ -369,6 +369,7 @@ class DOMWindow : public RefCounted<DOMWindow>, public EventTarget {
   DEFINE_ATTRIBUTE_EVENT_LISTENER(touchstart);
   DEFINE_ATTRIBUTE_EVENT_LISTENER(touchmove);
   DEFINE_ATTRIBUTE_EVENT_LISTENER(touchend);
+  DEFINE_ATTRIBUTE_EVENT_LISTENER(touchcancel);
 #endif
   void captureEvents();
   void releaseEvents();

@@ -254,7 +254,8 @@ bool ScriptController::processingUserGestureEvent() const {
         // touch events
         || type == eventNames().touchstartEvent ||
         type == eventNames().touchmoveEvent ||
-        type == eventNames().touchendEvent
+        type == eventNames().touchendEvent ||
+        type == eventNames().touchcancelEvent
 #endif
         // other accepted events
         || type == eventNames().selectEvent ||
