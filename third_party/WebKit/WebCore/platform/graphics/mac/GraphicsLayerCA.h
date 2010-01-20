@@ -120,7 +120,7 @@ class GraphicsLayerCA : public GraphicsLayer {
 
   virtual void setGeometryOrientation(CompositingCoordinatesOrientation);
 
-  virtual void didDisplay();
+  virtual void didDisplay(PlatformLayer*);
 
   void recursiveCommitChanges();
 
