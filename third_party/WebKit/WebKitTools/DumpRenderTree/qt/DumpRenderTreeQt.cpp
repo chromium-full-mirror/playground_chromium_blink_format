@@ -318,8 +318,8 @@ QObject* WebPage::createPlugin(const QString& classId,
 DumpRenderTree::DumpRenderTree()
     : m_dumpPixels(false),
       m_stdin(0),
-      m_notifier(0),
-      m_enableTextOutput(false) {
+      m_enableTextOutput(false),
+      m_singleFileMode(false) {
   qt_drt_overwritePluginDirectories();
   QWebSettings::enablePersistentStorage();
 
@@ -367,19 +367,6 @@ DumpRenderTree::DumpRenderTree()
 DumpRenderTree::~DumpRenderTree() {
   delete m_mainView;
   delete m_stdin;
-  delete m_notifier;
-}
-
-void DumpRenderTree::open() {
-  if (!m_stdin) {
-    m_stdin = new QFile;
-    m_stdin->open(stdin, QFile::ReadOnly);
-  }
-
-  if (!m_notifier) {
-    m_notifier = new QSocketNotifier(STDIN_FILENO, QSocketNotifier::Read);
-    connect(m_notifier, SIGNAL(activated(int)), this, SLOT(readStdin(int)));
-  }
 }
 
 static void clearHistory(QWebPage* page) {
@@ -462,19 +449,57 @@ void DumpRenderTree::open(const QUrl& aurl) {
   m_page->mainFrame()->load(url);
 }
 
-void DumpRenderTree::readStdin(int /* socket */) {
-  // Read incoming data from stdin...
-  QByteArray line = m_stdin->readLine();
-  if (line.endsWith('\n'))
-    line.truncate(line.size() - 1);
-  // fprintf(stderr, "\n    opening %s\n", line.constData());
-  if (line.isEmpty())
-    quit();
+void DumpRenderTree::readLine() {
+  if (!m_stdin) {
+    m_stdin = new QFile;
+    m_stdin->open(stdin, QFile::ReadOnly);
 
-  if (line.startsWith("http:") || line.startsWith("https:"))
+    if (!m_stdin->isReadable()) {
+      emit quit();
+      return;
+    }
+  }
+
+  QByteArray line = m_stdin->readLine().trimmed();
+
+  if (line.isEmpty()) {
+    emit quit();
+    return;
+  }
+
+  processLine(QString::fromLocal8Bit(line.constData(), line.length()));
+}
+
+void DumpRenderTree::processLine(const QString& input) {
+  QString line = input;
+
+  if (line.startsWith(QLatin1String("http:")) ||
+      line.startsWith(QLatin1String("https:")) ||
+      line.startsWith(QLatin1String("file:"))) {
     open(QUrl(line));
-  else {
+  } else {
     QFileInfo fi(line);
+
+    if (!fi.exists()) {
+      QDir currentDir = QDir::currentPath();
+
+      // Try to be smart about where the test is located
+      if (currentDir.dirName() == QLatin1String("LayoutTests"))
+        fi = QFileInfo(currentDir,
+                       line.replace(QRegExp(".*?LayoutTests/(.*)"), "\\1"));
+      else if (!line.contains(QLatin1String("LayoutTests")))
+        fi = QFileInfo(currentDir, line.prepend(QLatin1String("LayoutTests/")));
+
+      if (!fi.exists()) {
+        if (isSingleFileMode())
+          emit quit();
+        else
+          emit ready();
+
+        return;
+      }
+    }
+
     open(QUrl::fromLocalFile(fi.absoluteFilePath()));
   }
 
@@ -625,9 +650,7 @@ void DumpRenderTree::dump() {
 
   QWebFrame* mainFrame = m_page->mainFrame();
 
-  // fprintf(stderr, "    Dumping\n");
-  if (!m_notifier) {
-    // Dump markup in single file mode...
+  if (isSingleFileMode()) {
     QString markup = mainFrame->toHtml();
     fprintf(stdout, "Source:\n\n%s\n", markup.toUtf8().constData());
   }
@@ -708,8 +731,10 @@ void DumpRenderTree::dump() {
   fflush(stdout);
   fflush(stderr);
 
-  if (!m_notifier)
-    quit();  // Exit now in single file mode...
+  if (isSingleFileMode())
+    emit quit();
+  else
+    emit ready();
 }
 
 void DumpRenderTree::titleChanged(const QString& s) {
