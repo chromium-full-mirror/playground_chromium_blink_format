@@ -141,6 +141,14 @@ String AXLinkActionVerb() {
   return query(WebLocalizedString::AXLinkActionVerb);
 }
 
+String AXMenuListPopupActionVerb() {
+  return String();
+}
+
+String AXMenuListActionVerb() {
+  return String();
+}
+
 String multipleFileUploadText(unsigned numberOfFiles) {
   return query(WebLocalizedString::MultipleFileUploadText, numberOfFiles);
 }
