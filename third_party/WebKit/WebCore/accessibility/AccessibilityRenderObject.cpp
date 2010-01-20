@@ -588,6 +588,10 @@ Element* AccessibilityRenderObject::actionElement() const {
   if (m_renderer->isMenuList())
     return static_cast<Element*>(m_renderer->node());
 
+  AccessibilityRole role = roleValue();
+  if (role == ButtonRole || role == PopUpButtonRole)
+    return static_cast<Element*>(m_renderer->node());
+
   Element* elt = anchorElement();
   if (!elt)
     elt = mouseButtonListener();
@@ -2634,6 +2638,10 @@ AccessibilityRole AccessibilityRenderObject::determineAriaRoleAttribute()
     return UnknownRole;
 
   AccessibilityRole role = ariaRoleToWebCoreRole(ariaRole);
+
+  if (role == ButtonRole && elementAttributeValue(aria_haspopupAttr))
+    role = PopUpButtonRole;
+
   if (role)
     return role;
   // selects and listboxes both have options as child roles, but they map to
