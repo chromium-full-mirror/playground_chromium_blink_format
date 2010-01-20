@@ -2203,11 +2203,10 @@ void RenderBlock::paintSelection(PaintInfo& paintInfo, int tx, int ty) {
                                                lastLeft, lastRight, &paintInfo);
     if (!gapRectsBounds.isEmpty()) {
       if (RenderLayer* layer = enclosingLayer()) {
-        if (!hasLayer()) {
-          FloatRect localBounds(gapRectsBounds);
-          gapRectsBounds = localToContainerQuad(localBounds, layer->renderer())
-                               .enclosingBoundingBox();
-        }
+        IntSize offset = hasLayer()
+                             ? IntSize()
+                             : offsetFromAncestorContainer(layer->renderer());
+        gapRectsBounds.move(offset - IntSize(tx, ty));
         layer->addBlockSelectionGapsBounds(gapRectsBounds);
       }
     }
