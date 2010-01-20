@@ -651,9 +651,11 @@ NEVER_INLINE HandlerInfo* Interpreter::throwException(CallFrame*& callFrame,
 
   if (Debugger* debugger = callFrame->dynamicGlobalObject()->debugger()) {
     DebuggerCallFrame debuggerCallFrame(callFrame, exceptionValue);
+    bool hasHandler = codeBlock->handlerForBytecodeOffset(bytecodeOffset);
     debugger->exception(
         debuggerCallFrame, codeBlock->ownerExecutable()->sourceID(),
-        codeBlock->lineNumberForBytecodeOffset(callFrame, bytecodeOffset));
+        codeBlock->lineNumberForBytecodeOffset(callFrame, bytecodeOffset),
+        hasHandler);
   }
 
   // If we throw in the middle of a call instruction, we need to notify

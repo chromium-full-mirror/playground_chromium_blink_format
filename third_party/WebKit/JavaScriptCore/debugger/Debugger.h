@@ -48,7 +48,8 @@ class Debugger {
                             const UString& errorMessage) = 0;
   virtual void exception(const DebuggerCallFrame&,
                          intptr_t sourceID,
-                         int lineNumber) = 0;
+                         int lineNumber,
+                         bool hasHandler) = 0;
   virtual void atStatement(const DebuggerCallFrame&,
                            intptr_t sourceID,
                            int lineNumber) = 0;

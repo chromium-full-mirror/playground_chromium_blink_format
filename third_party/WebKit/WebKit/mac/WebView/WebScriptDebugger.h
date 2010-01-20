@@ -68,7 +68,8 @@ class WebScriptDebugger : public JSC::Debugger {
                            int lineNumber);
   virtual void exception(const JSC::DebuggerCallFrame&,
                          intptr_t sourceID,
-                         int lineNumber);
+                         int lineNumber,
+                         bool hasHandler);
   virtual void willExecuteProgram(const JSC::DebuggerCallFrame&,
                                   intptr_t sourceID,
                                   int lineno);

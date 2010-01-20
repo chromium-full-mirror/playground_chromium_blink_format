@@ -547,7 +547,10 @@ void JavaScriptDebugServer::returnEvent(
 void JavaScriptDebugServer::exception(
     const DebuggerCallFrame& debuggerCallFrame,
     intptr_t sourceID,
-    int lineNumber) {
+    int lineNumber,
+    bool hasHandler) {
+  UNUSED_PARAM(hasHandler);
+
   if (m_paused)
     return;
 
