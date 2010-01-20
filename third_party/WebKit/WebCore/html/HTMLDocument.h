@@ -87,7 +87,6 @@ class HTMLDocument : public Document, public CachedResourceClient {
   virtual PassRefPtr<Element> createElement(const AtomicString& tagName,
                                             ExceptionCode&);
 
-  virtual bool isHTMLDocument() const { return true; }
   virtual bool isFrameSet() const;
   virtual Tokenizer* createTokenizer();
   virtual void determineParseMode();
