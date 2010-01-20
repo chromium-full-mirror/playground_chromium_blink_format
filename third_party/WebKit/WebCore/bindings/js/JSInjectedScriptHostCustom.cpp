@@ -47,8 +47,6 @@
 #include "InspectorController.h"
 #include "InspectorResource.h"
 #include "JSDOMWindow.h"
-#include "JSInspectedObjectWrapper.h"
-#include "JSInspectorCallbackWrapper.h"
 #include "JSNode.h"
 #include "JSRange.h"
 #include "Node.h"
@@ -117,32 +115,9 @@ JSValue JSInjectedScriptHost::databaseForId(ExecState* exec,
   Database* database = impl()->databaseForId(args.at(0).toInt32(exec));
   if (!database)
     return jsUndefined();
-  // Could use currentWorld(exec) ... but which exec!  The following mixed use
-  // of exec & inspectedWindow->globalExec() scares me!
-  JSDOMWindow* inspectedWindow =
-      toJSDOMWindow(ic->inspectedPage()->mainFrame(), debuggerWorld());
-  return JSInspectedObjectWrapper::wrap(inspectedWindow->globalExec(),
-                                        toJS(exec, database));
+  return toJS(exec, database);
 }
 #endif
-
-JSValue JSInjectedScriptHost::inspectedWindow(ExecState*, const ArgList&) {
-  InspectorController* ic = impl()->inspectorController();
-  if (!ic)
-    return jsUndefined();
-  JSDOMWindow* inspectedWindow =
-      toJSDOMWindow(ic->inspectedPage()->mainFrame(), debuggerWorld());
-  return JSInspectedObjectWrapper::wrap(inspectedWindow->globalExec(),
-                                        inspectedWindow);
-}
-
-JSValue JSInjectedScriptHost::wrapCallback(ExecState* exec,
-                                           const ArgList& args) {
-  if (args.size() < 1)
-    return jsUndefined();
-
-  return JSInspectorCallbackWrapper::wrap(exec, args.at(0));
-}
 
 #if ENABLE(JAVASCRIPT_DEBUGGER)
 
@@ -152,11 +127,8 @@ JSValue JSInjectedScriptHost::currentCallFrame(ExecState* exec,
   if (!callFrame || !callFrame->isValid())
     return jsUndefined();
 
-  // FIXME: I am not sure if this is actually needed. Can we just use exec?
-  ExecState* globalExec = callFrame->scopeChain()->globalObject->globalExec();
-
   JSLock lock(SilenceAssertionsOnly);
-  return JSInspectedObjectWrapper::wrap(globalExec, toJS(exec, callFrame));
+  return toJS(exec, callFrame);
 }
 
 #endif
@@ -174,30 +146,7 @@ JSValue JSInjectedScriptHost::nodeForId(ExecState* exec, const ArgList& args) {
     return jsUndefined();
 
   JSLock lock(SilenceAssertionsOnly);
-  JSDOMWindow* inspectedWindow =
-      toJSDOMWindow(ic->inspectedPage()->mainFrame(), debuggerWorld());
-  return JSInspectedObjectWrapper::wrap(
-      inspectedWindow->globalExec(),
-      toJS(exec,
-           deprecatedGlobalObjectForPrototype(inspectedWindow->globalExec()),
-           node));
-}
-
-JSValue JSInjectedScriptHost::wrapObject(ExecState* exec, const ArgList& args) {
-  if (args.size() < 2)
-    return jsUndefined();
-
-  return impl()
-      ->wrapObject(ScriptValue(args.at(0)), args.at(1).toString(exec))
-      .jsValue();
-}
-
-JSValue JSInjectedScriptHost::unwrapObject(ExecState* exec,
-                                           const ArgList& args) {
-  if (args.size() < 1)
-    return jsUndefined();
-
-  return impl()->unwrapObject(args.at(0).toString(exec)).jsValue();
+  return toJS(exec, node);
 }
 
 JSValue JSInjectedScriptHost::pushNodePathToFrontend(ExecState* exec,
@@ -205,12 +154,7 @@ JSValue JSInjectedScriptHost::pushNodePathToFrontend(ExecState* exec,
   if (args.size() < 3)
     return jsUndefined();
 
-  JSQuarantinedObjectWrapper* wrapper =
-      JSQuarantinedObjectWrapper::asWrapper(args.at(0));
-  if (!wrapper)
-    return jsUndefined();
-
-  Node* node = toNode(wrapper->unwrappedObject());
+  Node* node = toNode(args.at(0));
   if (!node)
     return jsUndefined();
 
@@ -225,12 +169,7 @@ JSValue JSInjectedScriptHost::selectDatabase(ExecState*, const ArgList& args) {
   if (args.size() < 1)
     return jsUndefined();
 
-  JSQuarantinedObjectWrapper* wrapper =
-      JSQuarantinedObjectWrapper::asWrapper(args.at(0));
-  if (!wrapper)
-    return jsUndefined();
-
-  Database* database = toDatabase(wrapper->unwrappedObject());
+  Database* database = toDatabase(args.at(0));
   if (database)
     impl()->selectDatabase(database);
   return jsUndefined();
@@ -246,12 +185,7 @@ JSValue JSInjectedScriptHost::selectDOMStorage(ExecState*,
   if (!ic)
     return jsUndefined();
 
-  JSQuarantinedObjectWrapper* wrapper =
-      JSQuarantinedObjectWrapper::asWrapper(args.at(0));
-  if (!wrapper)
-    return jsUndefined();
-
-  Storage* storage = toStorage(wrapper->unwrappedObject());
+  Storage* storage = toStorage(args.at(0));
   if (storage)
     impl()->selectDOMStorage(storage);
   return jsUndefined();

@@ -102,7 +102,6 @@ class InspectorController
   typedef HashMap<int, RefPtr<InspectorDatabaseResource>> DatabaseResourcesMap;
   typedef HashMap<int, RefPtr<InspectorDOMStorageResource>>
       DOMStorageResourcesMap;
-  typedef HashMap<String, Vector<String>> ObjectGroupsMap;
 
   typedef enum {
     CurrentPanel,
@@ -293,6 +292,8 @@ class InspectorController
 
   void evaluateForTestInFrontend(long callId, const String& script);
 
+  ScriptObject injectedScriptForNodeId(long id);
+
  private:
   static const char* const FrontendSettingsSettingName;
   friend class InspectorBackend;
@@ -307,17 +308,6 @@ class InspectorController
   void closeWindow();
   InspectorDOMAgent* domAgent() { return m_domAgent.get(); }
   void releaseDOMAgent();
-
-  friend class InspectorFrontend;
-  // Following are used from InspectorFrontend only. We don't want to expose
-  // them to the
-  // rest of the InspectorController clients.
-  // TODO: extract these into a separate interface.
-  ScriptValue wrapObject(const ScriptValue& object, const String& objectGroup);
-  ScriptValue unwrapObject(const String& objectId);
-  void releaseWrapperObjectGroup(const String& objectGroup);
-
-  void resetInjectedScript();
 
   void deleteCookie(const String& cookieName, const String& domain);
 
@@ -366,7 +356,6 @@ class InspectorController
   OwnPtr<InspectorFrontend> m_frontend;
   RefPtr<InspectorDOMAgent> m_domAgent;
   OwnPtr<InspectorTimelineAgent> m_timelineAgent;
-  ScriptObject m_injectedScriptObj;
   Page* m_page;
   RefPtr<Node> m_nodeToFocus;
   RefPtr<InspectorResource> m_mainResource;
@@ -395,9 +384,6 @@ class InspectorController
   RefPtr<InspectorBackend> m_inspectorBackend;
   RefPtr<InspectorFrontendHost> m_inspectorFrontendHost;
   RefPtr<InjectedScriptHost> m_injectedScriptHost;
-  HashMap<String, ScriptValue> m_idToWrappedObject;
-  ObjectGroupsMap m_objectGroups;
-  long m_lastBoundObjectId;
 
   typedef HashMap<String, String> Settings;
   mutable Settings m_settings;
