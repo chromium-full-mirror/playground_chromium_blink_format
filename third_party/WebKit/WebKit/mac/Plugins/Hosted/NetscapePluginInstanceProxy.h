@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Apple Inc. All Rights Reserved.
+ * Copyright (C) 2008, 2009, 2010 Apple Inc. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -307,6 +307,8 @@ class NetscapePluginInstanceProxy
 
   template <typename T>
   std::auto_ptr<T> waitForReply(uint32_t requestID) {
+    willCallPluginFunction();
+
     m_waitingForReply = true;
 
     Reply* reply = processRequestsAndWaitForReply(requestID);
@@ -314,6 +316,9 @@ class NetscapePluginInstanceProxy
       ASSERT(reply->m_type == T::ReplyType);
 
     m_waitingForReply = false;
+
+    didCallPluginFunction();
+
     return std::auto_ptr<T>(static_cast<T*>(reply));
   }
 
