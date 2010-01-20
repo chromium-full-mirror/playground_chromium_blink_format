@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009 Google Inc. All rights reserved.
+ * Copyright (C) 2009, 2010 Google Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -173,8 +173,7 @@ void WorkerThreadableLoader::MainThreadBridge::mainThreadCancel(
 void WorkerThreadableLoader::MainThreadBridge::cancel() {
   m_loaderProxy.postTaskToLoader(
       createCallbackTask(&MainThreadBridge::mainThreadCancel, this));
-  ThreadableLoaderClientWrapper* clientWrapper =
-      static_cast<ThreadableLoaderClientWrapper*>(m_workerClientWrapper.get());
+  ThreadableLoaderClientWrapper* clientWrapper = m_workerClientWrapper.get();
   if (!clientWrapper->done()) {
     // If the client hasn't reached a termination state, then transition it by
     // sending a cancellation error.
@@ -188,8 +187,7 @@ void WorkerThreadableLoader::MainThreadBridge::cancel() {
 }
 
 void WorkerThreadableLoader::MainThreadBridge::clearClientWrapper() {
-  static_cast<ThreadableLoaderClientWrapper*>(m_workerClientWrapper.get())
-      ->clearClient();
+  m_workerClientWrapper->clearClient();
 }
 
 static void workerContextDidSendData(

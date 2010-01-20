@@ -150,8 +150,7 @@ class WorkerThreadableLoader : public RefCounted<WorkerThreadableLoader>,
 
     // ThreadableLoaderClientWrapper is to be used on the worker context thread.
     // The ref counting is done on either thread.
-    RefPtr<ThreadSafeShared<ThreadableLoaderClientWrapper>>
-        m_workerClientWrapper;
+    RefPtr<ThreadableLoaderClientWrapper> m_workerClientWrapper;
 
     // May be used on either thread.
     WorkerLoaderProxy& m_loaderProxy;
