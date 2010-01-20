@@ -37,6 +37,9 @@ AccessibilityObject::accessibilityPlatformIncludesObject() const {
   if (!parent)
     return DefaultBehavior;
 
+  if (isMenuListPopup() || isMenuListOption())
+    return IgnoreObject;
+
   // When a list item is made up entirely of children (e.g. paragraphs)
   // the list item gets ignored. We need it.
   if (isGroup() && parent->isList())

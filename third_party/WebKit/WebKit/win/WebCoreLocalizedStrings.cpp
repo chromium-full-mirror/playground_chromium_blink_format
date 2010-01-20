@@ -279,6 +279,18 @@ String WebCore::AXLinkActionVerb() {
                                   "when a link is clicked, as used by "
                                   "accessibility"));
 }
+String WebCore::AXMenuListActionVerb() {
+  return String(LPCTSTR_UI_STRING("open",
+                                  "Verb stating the action that will occur "
+                                  "when a select element is clicked, as used "
+                                  "by accessibility"));
+}
+String WebCore::AXMenuListPopupActionVerb() {
+  return String(LPCTSTR_UI_STRING("press",
+                                  "Verb stating the action that will occur "
+                                  "when a select element's popup list is "
+                                  "clicked, as used by accessibility"));
+}
 String WebCore::unknownFileSizeText() {
   return String(LPCTSTR_UI_STRING(
       "Unknown", "Unknown filesize FTP directory listing item"));

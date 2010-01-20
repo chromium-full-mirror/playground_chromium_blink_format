@@ -30,6 +30,9 @@ bool AccessibilityObject::accessibilityIgnoreAttachment() const {
 
 AccessibilityObjectPlatformInclusion
 AccessibilityObject::accessibilityPlatformIncludesObject() const {
+  if (isMenuListPopup() || isMenuListOption())
+    return IgnoreObject;
+
   return DefaultBehavior;
 }
 

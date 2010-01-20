@@ -171,6 +171,8 @@ enum AccessibilityRole {
   DirectoryRole,
   EditableTextRole,
   ListItemRole,
+  MenuListPopupRole,
+  MenuListOptionRole,
 
   // ARIA Grouping roles
   LandmarkApplicationRole,
@@ -275,6 +277,9 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   virtual bool isFieldset() const { return false; }
   virtual bool isGroup() const { return false; }
   virtual bool isARIATreeGridRow() const { return false; }
+  virtual bool isMenuList() const { return false; }
+  virtual bool isMenuListPopup() const { return false; }
+  virtual bool isMenuListOption() const { return false; }
   bool isTabList() const { return roleValue() == TabListRole; }
   bool isTabItem() const { return roleValue() == TabRole; }
   bool isRadioGroup() const { return roleValue() == RadioGroupRole; }
@@ -299,6 +304,8 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   virtual bool isRequired() const { return false; }
   virtual bool isLinked() const { return false; }
   virtual bool isExpanded() const { return false; }
+  virtual bool isVisible() const { return true; }
+  virtual bool isCollapsed() const { return false; }
   virtual void setIsExpanded(bool) {}
 
   virtual bool canSetFocusAttribute() const { return false; }

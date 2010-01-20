@@ -123,6 +123,10 @@ class AccessibilityUIElement {
   bool isMultiSelectable() const;
   bool isExpanded() const;
   bool isChecked() const;
+  bool isVisible() const;
+  bool isOffScreen() const;
+  bool isCollapsed() const;
+  bool hasPopup() const;
   int hierarchicalLevel() const;
   double clickPointX();
   double clickPointY();

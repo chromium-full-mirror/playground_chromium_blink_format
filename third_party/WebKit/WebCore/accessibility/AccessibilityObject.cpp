@@ -853,6 +853,9 @@ const String& AccessibilityObject::actionVerb() const {
   DEFINE_STATIC_LOCAL(const String, uncheckedCheckBoxAction,
                       (AXUncheckedCheckBoxActionVerb()));
   DEFINE_STATIC_LOCAL(const String, linkAction, (AXLinkActionVerb()));
+  DEFINE_STATIC_LOCAL(const String, menuListAction, (AXMenuListActionVerb()));
+  DEFINE_STATIC_LOCAL(const String, menuListPopupAction,
+                      (AXMenuListPopupActionVerb()));
   DEFINE_STATIC_LOCAL(const String, noAction, ());
 
   switch (roleValue()) {
@@ -868,6 +871,10 @@ const String& AccessibilityObject::actionVerb() const {
     case LinkRole:
     case WebCoreLinkRole:
       return linkAction;
+    case PopUpButtonRole:
+      return menuListAction;
+    case MenuListPopupRole:
+      return menuListPopupAction;
     default:
       return noAction;
   }
