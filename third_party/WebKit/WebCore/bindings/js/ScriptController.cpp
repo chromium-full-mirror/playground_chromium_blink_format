@@ -391,11 +391,6 @@ NPObject* ScriptController::createScriptObjectForPluginElement(
 
 #endif
 
-ScriptState* ScriptController::mainWorldScriptState() {
-  JSDOMWindowShell* shell = windowShell(mainThreadNormalWorld());
-  return shell->window()->globalExec();
-}
-
 JSObject* ScriptController::jsObjectForPluginElement(
     HTMLPlugInElement* plugin) {
   // Can't create JSObjects when JavaScript is disabled
