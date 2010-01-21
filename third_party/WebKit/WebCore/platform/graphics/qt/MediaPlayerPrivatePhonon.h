@@ -93,13 +93,10 @@ class MediaPlayerPrivate : public QObject, public MediaPlayerPrivateInterface {
   float duration() const;
   float currentTime() const;
   void seek(float);
-  void setEndTime(float);
 
   void setRate(float);
   void setVolume(float);
   void setMuted(bool);
-
-  int dataRate() const;
 
   MediaPlayer::NetworkState networkState() const;
   MediaPlayer::ReadyState readyState() const;
@@ -107,7 +104,6 @@ class MediaPlayerPrivate : public QObject, public MediaPlayerPrivateInterface {
   PassRefPtr<TimeRanges> buffered() const;
   float maxTimeSeekable() const;
   unsigned bytesLoaded() const;
-  bool totalBytesKnown() const;
   unsigned totalBytes() const;
 
   void setVisible(bool);
