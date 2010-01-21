@@ -121,6 +121,7 @@ void Scrollbar::setSteps(int lineStep, int pageStep, int pixelsPerStep) {
 bool Scrollbar::scroll(ScrollDirection direction,
                        ScrollGranularity granularity,
                        float multiplier) {
+#if HAVE(ACCESSIBILITY)
   if (AXObjectCache::accessibilityEnabled()) {
     if (parent() && parent()->isFrameView()) {
       Document* document =
@@ -133,6 +134,7 @@ bool Scrollbar::scroll(ScrollDirection direction,
                               true);
     }
   }
+#endif
 
   float step = 0;
   if ((direction == ScrollUp && m_orientation == VerticalScrollbar) ||
