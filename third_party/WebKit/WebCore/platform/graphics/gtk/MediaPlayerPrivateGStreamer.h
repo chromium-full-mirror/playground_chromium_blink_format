@@ -70,6 +70,7 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
 
   void load(const String& url);
   void cancelLoad();
+  bool loadNextLocation();
 
   void play();
   void pause();
@@ -100,6 +101,7 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
   void setVisible(bool);
   void setSize(const IntSize&);
 
+  void mediaLocationChanged(GstMessage*);
   void loadStateChanged();
   void sizeChanged();
   void timeChanged();
@@ -113,6 +115,8 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
   bool hasSingleSecurityOrigin() const;
 
   bool supportsFullscreen() const;
+
+  bool pipelineReset() const { return m_resetPipeline; }
 
  private:
   MediaPlayerPrivate(MediaPlayer*);
@@ -148,7 +152,9 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
   mutable bool m_isStreaming;
   IntSize m_size;
   GstBuffer* m_buffer;
-
+  GstStructure* m_mediaLocations;
+  gint m_mediaLocationCurrentIndex;
+  bool m_resetPipeline;
   bool m_paused;
   bool m_seeking;
   float m_playbackRate;
