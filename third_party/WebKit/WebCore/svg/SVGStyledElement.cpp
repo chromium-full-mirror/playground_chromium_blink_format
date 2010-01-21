@@ -266,8 +266,6 @@ void SVGStyledElement::childrenChanged(bool changedByParser,
                                        int childCountDelta) {
   SVGElement::childrenChanged(changedByParser, beforeChange, afterChange,
                               childCountDelta);
-  if (document()->parsing())
-    return;
 
   // Invalidate all SVGElementInstances associated with us
   SVGElementInstance::invalidateAllInstancesOfElement(this);

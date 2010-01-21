@@ -126,7 +126,6 @@ class SVGUseElement : public SVGStyledTransformableElement,
                                 bool& foundCycle);
 
   // Shadow tree handling
-  void alterShadowTreeForSVGTag(SVGElement*);
   void buildShadowTree(SVGShadowTreeRootElement*,
                        SVGElement* target,
                        SVGElementInstance* targetInstance);
@@ -148,15 +147,16 @@ class SVGUseElement : public SVGStyledTransformableElement,
   void transferUseAttributesToReplacedElement(SVGElement* from,
                                               SVGElement* to) const;
   void transferEventListenersToShadowTree(SVGElementInstance* target);
+
   void updateContainerOffsets();
+  void updateContainerSizes();
 
   bool m_isPendingResource;
   bool m_needsShadowTreeRecreation;
   String m_resourceId;
   RefPtr<SVGElementInstance> m_targetElementInstance;
 };
+}
 
-}  // namespace WebCore
-
-#endif  // ENABLE(SVG)
+#endif
 #endif
