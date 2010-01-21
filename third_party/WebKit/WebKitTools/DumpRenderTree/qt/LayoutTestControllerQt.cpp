@@ -52,6 +52,9 @@ extern bool qt_drt_pauseSVGAnimation(QWebFrame*,
                                      double time,
                                      const QString& elementId);
 extern int qt_drt_numberOfActiveAnimations(QWebFrame*);
+extern void qt_drt_setDomainRelaxationForbiddenForURLScheme(
+    bool forbidden,
+    const QString& scheme);
 
 extern void qt_drt_whiteListAccessFromOrigin(const QString& sourceOrigin,
                                              const QString& destinationProtocol,
@@ -400,4 +403,10 @@ void LayoutTestController::setUserStyleSheetEnabled(bool enabled) {
         m_userStyleSheetLocation);
   else
     m_drt->webPage()->settings()->setUserStyleSheetUrl(QUrl());
+}
+
+void LayoutTestController::setDomainRelaxationForbiddenForURLScheme(
+    bool forbidden,
+    const QString& scheme) {
+  qt_drt_setDomainRelaxationForbiddenForURLScheme(forbidden, scheme);
 }
