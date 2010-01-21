@@ -131,6 +131,11 @@ class AXObjectCache : public Noncopyable {
                         AXNotification,
                         bool postToElement,
                         PostType = PostAsynchronously);
+  void postNotification(AccessibilityObject*,
+                        Document*,
+                        AXNotification,
+                        bool postToElement,
+                        PostType = PostAsynchronously);
 
  protected:
   void postPlatformNotification(AccessibilityObject*, AXNotification);

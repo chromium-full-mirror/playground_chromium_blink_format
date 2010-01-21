@@ -41,6 +41,7 @@
 #include "AccessibilityMenuListPopup.h"
 #include "AccessibilityMenuListOption.h"
 #include "AccessibilityRenderObject.h"
+#include "AccessibilityScrollbar.h"
 #include "AccessibilitySlider.h"
 #include "AccessibilityTable.h"
 #include "AccessibilityTableCell.h"
@@ -226,6 +227,9 @@ AccessibilityObject* AXObjectCache::getOrCreate(AccessibilityRole role) {
     case MenuListOptionRole:
       obj = AccessibilityMenuListOption::create();
       break;
+    case ScrollBarRole:
+      obj = AccessibilityScrollbar::create();
+      break;
     default:
       obj = 0;
   }
@@ -372,31 +376,39 @@ void AXObjectCache::postNotification(RenderObject* renderer,
   // here
   // because a render update may be in progress and creating an AX object can
   // re-trigger a layout
-  RefPtr<AccessibilityObject> obj = get(renderer);
-  while (!obj && renderer) {
+  RefPtr<AccessibilityObject> object = get(renderer);
+  while (!object && renderer) {
     renderer = renderer->parent();
-    obj = get(renderer);
+    object = get(renderer);
   }
 
   if (!renderer)
     return;
 
-  if (obj && !postToElement)
-    obj = obj->observableObject();
+  postNotification(object.get(), renderer->document(), notification,
+                   postToElement, postType);
+}
 
-  Document* document = renderer->document();
-  if (!obj && document)
-    obj = get(document->renderer());
+void AXObjectCache::postNotification(AccessibilityObject* object,
+                                     Document* document,
+                                     AXNotification notification,
+                                     bool postToElement,
+                                     PostType postType) {
+  if (object && !postToElement)
+    object = object->observableObject();
 
-  if (!obj)
+  if (!object && document)
+    object = get(document->renderer());
+
+  if (!object)
     return;
 
   if (postType == PostAsynchronously) {
-    m_notificationsToPost.append(make_pair(obj, notification));
+    m_notificationsToPost.append(make_pair(object, notification));
     if (!m_notificationPostTimer.isActive())
       m_notificationPostTimer.startOneShot(0);
   } else
-    postPlatformNotification(obj.get(), notification);
+    postPlatformNotification(object, notification);
 }
 
 void AXObjectCache::selectedChildrenChanged(RenderObject* renderer) {
