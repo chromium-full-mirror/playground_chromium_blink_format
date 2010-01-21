@@ -40,7 +40,6 @@
 namespace WebCore {
 
 DOMApplicationCache::DOMApplicationCache(Frame* frame) : m_frame(frame) {
-  ASSERT(!m_frame || applicationCacheHost());
   ApplicationCacheHost* cacheHost = applicationCacheHost();
   if (cacheHost)
     cacheHost->setDOMApplicationCache(this);
