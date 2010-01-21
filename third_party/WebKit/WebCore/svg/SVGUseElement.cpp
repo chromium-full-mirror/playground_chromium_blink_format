@@ -935,6 +935,11 @@ void SVGUseElement::associateInstancesWithShadowTreeElements(
 
 SVGElementInstance* SVGUseElement::instanceForShadowTreeElement(
     Node* element) const {
+  if (!m_targetElementInstance) {
+    ASSERT(!inDocument());
+    return 0;
+  }
+
   return instanceForShadowTreeElement(element, m_targetElementInstance.get());
 }
 
