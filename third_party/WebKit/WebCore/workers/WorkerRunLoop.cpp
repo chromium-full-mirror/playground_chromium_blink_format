@@ -140,10 +140,9 @@ MessageQueueWaitResult WorkerRunLoop::runInMode(
       m_messageQueue.waitForMessageFilteredWithTimeout(result, predicate,
                                                        absoluteTime);
 
-  // If the context is closing, don't dispatch any further tasks (per section
-  // 4.1.1 of the Web Workers spec).
-  if (context->isClosing())
-    return result;
+  // If the context is closing, don't execute any further JavaScript tasks (per
+  // section 4.1.1 of the Web Workers spec).  However, there may be
+  // implementation cleanup tasks in the queue, so keep running through it.
 
   switch (result) {
     case MessageQueueTerminated:
@@ -154,7 +153,8 @@ MessageQueueWaitResult WorkerRunLoop::runInMode(
       break;
 
     case MessageQueueTimeout:
-      m_sharedTimer->fire();
+      if (!context->isClosing())
+        m_sharedTimer->fire();
       break;
   }
 
@@ -182,7 +182,9 @@ PassOwnPtr<WorkerRunLoop::Task> WorkerRunLoop::Task::create(
 }
 
 void WorkerRunLoop::Task::performTask(ScriptExecutionContext* context) {
-  m_task->performTask(context);
+  WorkerContext* workerContext = static_cast<WorkerContext*>(context);
+  if (!workerContext->isClosing() || m_task->isCleanupTask())
+    m_task->performTask(context);
 }
 
 WorkerRunLoop::Task::Task(PassOwnPtr<ScriptExecutionContext::Task> task,

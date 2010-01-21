@@ -36,10 +36,10 @@
 #include "Database.h"
 #include "DatabaseThread.h"
 #include "DatabaseTrackerClient.h"
-#include "Document.h"
 #include "Logging.h"
 #include "OriginQuotaManager.h"
 #include "Page.h"
+#include "ScriptExecutionContext.h"
 #include "SecurityOrigin.h"
 #include "SecurityOriginHash.h"
 #include "SQLiteFileSystem.h"
@@ -122,7 +122,7 @@ void DatabaseTracker::openTrackerDatabase(bool createIfDoesNotExist) {
   }
 }
 
-bool DatabaseTracker::canEstablishDatabase(Document* document,
+bool DatabaseTracker::canEstablishDatabase(ScriptExecutionContext* context,
                                            const String& name,
                                            const String& displayName,
                                            unsigned long estimatedSize) {
@@ -133,9 +133,9 @@ bool DatabaseTracker::canEstablishDatabase(Document* document,
   // can run on the database thread later.
   populateOrigins();
 
-  SecurityOrigin* origin = document->securityOrigin();
+  SecurityOrigin* origin = context->securityOrigin();
 
-  // Since we're imminently opening a database within this Document's origin,
+  // Since we're imminently opening a database within this context's origin,
   // make sure this origin is being tracked by the QuotaTracker
   // by fetching it's current usage now
   unsigned long long usage = usageForOrigin(origin);
@@ -156,13 +156,10 @@ bool DatabaseTracker::canEstablishDatabase(Document* document,
   // Give the chrome client a chance to increase the quota.
   // Temporarily make the details of the proposed database available, so the
   // client can get at them.
-  Page* page = document->page();
-  if (!page)
-    return false;
   pair<SecurityOrigin*, DatabaseDetails> details(
       origin, DatabaseDetails(name, displayName, estimatedSize, 0));
   m_proposedDatabase = &details;
-  page->chrome()->client()->exceededDatabaseQuota(document->frame(), name);
+  context->databaseExceededQuota(name);
   m_proposedDatabase = 0;
 
   // If the database will fit now, allow its creation.
@@ -197,7 +194,7 @@ bool DatabaseTracker::hasEntryForDatabase(SecurityOrigin* origin,
 unsigned long long DatabaseTracker::getMaxSizeForDatabase(
     const Database* database) {
   ASSERT(currentThread() ==
-         database->document()->databaseThread()->getThreadID());
+         database->scriptExecutionContext()->databaseThread()->getThreadID());
   // The maximum size for a database is the full quota for its origin, minus the
   // current usage within the origin,
   // plus the current usage of the given database

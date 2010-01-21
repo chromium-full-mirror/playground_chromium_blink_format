@@ -43,6 +43,7 @@ namespace WebCore {
 
 class Database;
 class DatabaseTask;
+class DatabaseTaskSynchronizer;
 class Document;
 class SQLTransactionClient;
 class SQLTransactionCoordinator;
@@ -55,7 +56,7 @@ class DatabaseThread : public ThreadSafeShared<DatabaseThread> {
   ~DatabaseThread();
 
   bool start();
-  void requestTermination();
+  void requestTermination(DatabaseTaskSynchronizer* cleanupSync);
   bool terminationRequested() const;
 
   void scheduleTask(PassOwnPtr<DatabaseTask>);
@@ -100,6 +101,7 @@ class DatabaseThread : public ThreadSafeShared<DatabaseThread> {
 
   OwnPtr<SQLTransactionClient> m_transactionClient;
   OwnPtr<SQLTransactionCoordinator> m_transactionCoordinator;
+  DatabaseTaskSynchronizer* m_cleanupSync;
 };
 
 }  // namespace WebCore

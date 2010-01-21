@@ -52,7 +52,7 @@ namespace WebCore {
 
 class DatabaseAuthorizer;
 class DatabaseThread;
-class Document;
+class ScriptExecutionContext;
 class SQLResultSet;
 class SQLTransactionCallback;
 class SQLTransactionClient;
@@ -68,10 +68,13 @@ class Database : public ThreadSafeShared<Database> {
   friend class SQLTransaction;
 
  public:
+  static void setIsAvailable(bool);
+  static bool isAvailable();
+
   ~Database();
 
   // Direct support for the DOM API
-  static PassRefPtr<Database> openDatabase(Document* document,
+  static PassRefPtr<Database> openDatabase(ScriptExecutionContext* context,
                                            const String& name,
                                            const String& expectedVersion,
                                            const String& displayName,
@@ -97,7 +100,9 @@ class Database : public ThreadSafeShared<Database> {
 
   Vector<String> tableNames();
 
-  Document* document() const { return m_document.get(); }
+  ScriptExecutionContext* scriptExecutionContext() const {
+    return m_scriptExecutionContext.get();
+  }
   SecurityOrigin* securityOrigin() const;
   String stringIdentifier() const;
   String displayName() const;
@@ -134,7 +139,7 @@ class Database : public ThreadSafeShared<Database> {
   SQLTransactionCoordinator* transactionCoordinator() const;
 
  private:
-  Database(Document* document,
+  Database(ScriptExecutionContext* context,
            const String& name,
            const String& expectedVersion,
            const String& displayName,
@@ -154,7 +159,7 @@ class Database : public ThreadSafeShared<Database> {
 
   static void deliverPendingCallback(void*);
 
-  RefPtr<Document> m_document;
+  RefPtr<ScriptExecutionContext> m_scriptExecutionContext;
   RefPtr<SecurityOrigin> m_mainThreadSecurityOrigin;
   RefPtr<SecurityOrigin> m_databaseThreadSecurityOrigin;
   String m_name;

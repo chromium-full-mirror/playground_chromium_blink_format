@@ -35,8 +35,8 @@
 #include "Database.h"
 #include "DatabaseObserver.h"
 #include "DatabaseThread.h"
-#include "Document.h"
 #include "QuotaTracker.h"
+#include "ScriptExecutionContext.h"
 #include "SecurityOrigin.h"
 #include "SQLiteFileSystem.h"
 #include <wtf/HashSet.h>
@@ -54,7 +54,7 @@ DatabaseTracker::DatabaseTracker() {
   SQLiteFileSystem::registerSQLiteVFS();
 }
 
-bool DatabaseTracker::canEstablishDatabase(Document*,
+bool DatabaseTracker::canEstablishDatabase(ScriptExecutionContext*,
                                            const String&,
                                            const String&,
                                            unsigned long) {
@@ -77,19 +77,32 @@ String DatabaseTracker::fullPathForDatabase(SecurityOrigin* origin,
 }
 
 void DatabaseTracker::addOpenDatabase(Database* database) {
-  ASSERT(isMainThread());
+  ASSERT(database->scriptExecutionContext()->isContextThread());
   DatabaseObserver::databaseOpened(database);
 }
-static void removeOpenDatabaseOnMainThread(void* context) {
-  Database* database = static_cast<Database*>(context);
-  DatabaseTracker::tracker().removeOpenDatabase(database);
-  database->deref();
-}
+
+class TrackerRemoveOpenDatabaseTask : public ScriptExecutionContext::Task {
+ public:
+  static PassOwnPtr<TrackerRemoveOpenDatabaseTask> create(
+      PassRefPtr<Database> database) {
+    return new TrackerRemoveOpenDatabaseTask(database);
+  }
+
+  virtual void performTask(ScriptExecutionContext* context) {
+    DatabaseTracker::tracker().removeOpenDatabase(m_database.get());
+  }
+
+ private:
+  TrackerRemoveOpenDatabaseTask(PassRefPtr<Database> database)
+      : m_database(database) {}
+
+  RefPtr<Database> m_database;
+};
 
 void DatabaseTracker::removeOpenDatabase(Database* database) {
-  if (!isMainThread()) {
-    database->ref();
-    callOnMainThread(removeOpenDatabaseOnMainThread, database);
+  if (!database->scriptExecutionContext()->isContextThread()) {
+    database->scriptExecutionContext()->postTask(
+        TrackerRemoveOpenDatabaseTask::create(database));
     return;
   }
 
@@ -99,7 +112,7 @@ void DatabaseTracker::removeOpenDatabase(Database* database) {
 unsigned long long DatabaseTracker::getMaxSizeForDatabase(
     const Database* database) {
   ASSERT(currentThread() ==
-         database->document()->databaseThread()->getThreadID());
+         database->scriptExecutionContext()->databaseThread()->getThreadID());
   unsigned long long spaceAvailable = 0;
   unsigned long long databaseSize = 0;
   QuotaTracker::instance().getDatabaseSizeAndSpaceAvailableToOrigin(

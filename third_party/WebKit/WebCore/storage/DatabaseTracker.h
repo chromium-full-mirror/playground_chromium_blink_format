@@ -45,7 +45,7 @@
 namespace WebCore {
 
 class Database;
-class Document;
+class ScriptExecutionContext;
 class SecurityOrigin;
 
 #if !PLATFORM(CHROMIUM)
@@ -59,8 +59,11 @@ struct SecurityOriginTraits;
 class DatabaseTracker : public Noncopyable {
  public:
   static DatabaseTracker& tracker();
+  // FIXME: Due to workers having multiple threads in a single process sharing
+  // a DatabaseTracker, this singleton will have to be synchronized or moved
+  // to TLS.
 
-  bool canEstablishDatabase(Document*,
+  bool canEstablishDatabase(ScriptExecutionContext*,
                             const String& name,
                             const String& displayName,
                             unsigned long estimatedSize);

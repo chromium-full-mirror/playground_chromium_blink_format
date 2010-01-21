@@ -39,6 +39,7 @@
 #include "CString.h"
 #include "CachedCSSStyleSheet.h"
 #include "Chrome.h"
+#include "ChromeClient.h"
 #include "Comment.h"
 #include "Console.h"
 #include "CookieJar.h"
@@ -139,11 +140,6 @@
 #include <wtf/MainThread.h>
 #include <wtf/PassRefPtr.h>
 #include <wtf/StdLibExtras.h>
-
-#if ENABLE(DATABASE)
-#include "Database.h"
-#include "DatabaseThread.h"
-#endif
 
 #if ENABLE(SHARED_WORKERS)
 #include "SharedWorkerRepository.h"
@@ -408,10 +404,6 @@ Document::Document(Frame* frame, bool isXHTML, bool isHTML)
       ,
       m_normalWorldWrapperCache(0)
 #endif
-#if ENABLE(DATABASE)
-      ,
-      m_hasOpenDatabases(false)
-#endif
       ,
       m_usingGeolocation(false)
 #if ENABLE(WML)
@@ -560,13 +552,6 @@ Document::~Document() {
       sizeof(m_nameCollectionInfo) / sizeof(m_nameCollectionInfo[0]);
   for (unsigned i = 0; i < count; i++)
     deleteAllValues(m_nameCollectionInfo[i]);
-
-#if ENABLE(DATABASE)
-  if (m_databaseThread) {
-    ASSERT(m_databaseThread->terminationRequested());
-    m_databaseThread = 0;
-  }
-#endif
 
   if (m_styleSheets)
     m_styleSheets->documentDestroyed();
@@ -4502,6 +4487,27 @@ void Document::setSecurityOrigin(SecurityOrigin* securityOrigin) {
   initDNSPrefetch();
 }
 
+#if ENABLE(DATABASE)
+
+bool Document::isDatabaseReadOnly() const {
+  if (!page() || page()->settings()->privateBrowsingEnabled())
+    return true;
+  return false;
+}
+
+void Document::databaseExceededQuota(const String& name) {
+  Page* currentPage = page();
+  if (currentPage)
+    currentPage->chrome()->client()->exceededDatabaseQuota(document()->frame(),
+                                                           name);
+}
+
+#endif
+
+bool Document::isContextThread() const {
+  return isMainThread();
+}
+
 void Document::updateURLForPushOrReplaceState(const KURL& url) {
   Frame* f = frame();
   if (!f)
@@ -4596,55 +4602,6 @@ void Document::executeScriptSoon(
 DOMSelection* Document::getSelection() const {
   return frame() ? frame()->domWindow()->getSelection() : 0;
 }
-
-#if ENABLE(DATABASE)
-
-void Document::addOpenDatabase(Database* database) {
-  if (!m_openDatabaseSet)
-    m_openDatabaseSet.set(new DatabaseSet);
-
-  ASSERT(!m_openDatabaseSet->contains(database));
-  m_openDatabaseSet->add(database);
-}
-
-void Document::removeOpenDatabase(Database* database) {
-  ASSERT(m_openDatabaseSet && m_openDatabaseSet->contains(database));
-  if (!m_openDatabaseSet)
-    return;
-
-  m_openDatabaseSet->remove(database);
-}
-
-DatabaseThread* Document::databaseThread() {
-  if (!m_databaseThread && !m_hasOpenDatabases) {
-    // Create the database thread on first request - but not if at least one
-    // database was already opened,
-    // because in that case we already had a database thread and terminated it
-    // and should not create another.
-    m_databaseThread = DatabaseThread::create();
-    if (!m_databaseThread->start())
-      m_databaseThread = 0;
-  }
-
-  return m_databaseThread.get();
-}
-
-void Document::stopDatabases() {
-  if (m_openDatabaseSet) {
-    DatabaseSet::iterator i = m_openDatabaseSet->begin();
-    DatabaseSet::iterator end = m_openDatabaseSet->end();
-    for (; i != end; ++i) {
-      (*i)->stop();
-      if (m_databaseThread)
-        m_databaseThread->unscheduleDatabaseTasks(*i);
-    }
-  }
-
-  if (m_databaseThread)
-    m_databaseThread->requestTermination();
-}
-
-#endif
 
 #if ENABLE(WML)
 void Document::resetWMLPageState() {

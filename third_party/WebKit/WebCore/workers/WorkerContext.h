@@ -30,11 +30,13 @@
 #if ENABLE(WORKERS)
 
 #include "AtomicStringHash.h"
+#include "Database.h"
 #include "EventListener.h"
 #include "EventNames.h"
 #include "EventTarget.h"
 #include "ScriptExecutionContext.h"
 #include "WorkerScriptController.h"
+#include <wtf/Assertions.h>
 #include <wtf/OwnPtr.h>
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
@@ -42,6 +44,7 @@
 
 namespace WebCore {
 
+class Database;
 class NotificationCenter;
 class ScheduledAction;
 class WorkerLocation;
@@ -67,9 +70,9 @@ class WorkerContext : public RefCounted<WorkerContext>,
   virtual String userAgent(const KURL&) const;
 
   WorkerScriptController* script() { return m_script.get(); }
-  void clearScript() { return m_script.clear(); }
+  void clearScript() { m_script.clear(); }
 
-  WorkerThread* thread() { return m_thread; }
+  WorkerThread* thread() const { return m_thread; }
 
   bool hasPendingActivity() const;
 
@@ -117,6 +120,20 @@ class WorkerContext : public RefCounted<WorkerContext>,
 #if ENABLE(NOTIFICATIONS)
   NotificationCenter* webkitNotifications() const;
 #endif
+
+#if ENABLE(DATABASE)
+  // HTML 5 client-side database
+  PassRefPtr<Database> openDatabase(const String& name,
+                                    const String& version,
+                                    const String& displayName,
+                                    unsigned long estimatedSize,
+                                    ExceptionCode&);
+  // Not implemented yet.
+  virtual bool isDatabaseReadOnly() const { return false; }
+  // Not implemented yet.
+  virtual void databaseExceededQuota(const String&) {}
+#endif
+  virtual bool isContextThread() const;
 
   // These methods are used for GC marking. See
   // JSWorkerContext::markChildren(MarkStack&) in
