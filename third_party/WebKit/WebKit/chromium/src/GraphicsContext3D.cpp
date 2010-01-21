@@ -2044,9 +2044,9 @@ int GraphicsContext3D::texSubImage2D(unsigned target,
                                      unsigned format,
                                      unsigned type,
                                      void* pixels) {
-  // FIXME: implement.
-  notImplemented();
-  return -1;
+  glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type,
+                  pixels);
+  return 0;
 }
 
 int GraphicsContext3D::texSubImage2D(unsigned target,
