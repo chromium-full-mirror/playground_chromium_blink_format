@@ -252,14 +252,6 @@ void RenderWidget::paint(PaintInfo& paintInfo, int tx, int ty) {
   }
 
   if (m_widget) {
-    // Move the widget if necessary.  We normally move and resize widgets during
-    // layout, but sometimes
-    // widgets can move without layout occurring (most notably when you scroll a
-    // document that
-    // contains fixed positioned elements).
-    m_widget->move(tx + borderLeft() + paddingLeft(),
-                   ty + borderTop() + paddingTop());
-
     // Tell the widget to paint now.  This is the only time the widget is
     // allowed
     // to paint itself.  That way it will composite properly with z-indexed
@@ -268,9 +260,26 @@ void RenderWidget::paint(PaintInfo& paintInfo, int tx, int ty) {
       paintInfo.context->drawImage(m_substituteImage.get(),
                                    style()->colorSpace(),
                                    m_widget->frameRect());
-    else
-      m_widget->paint(paintInfo.context, paintInfo.rect);
+    else {
+      IntPoint widgetLocation = m_widget->frameRect().location();
+      IntPoint paintLocation(tx + borderLeft() + paddingLeft(),
+                             ty + borderTop() + paddingTop());
+      IntRect paintRect = paintInfo.rect;
 
+      IntSize paintOffset = paintLocation - widgetLocation;
+      // When painting widgets into compositing layers, tx and ty are relative
+      // to the enclosing compositing layer,
+      // not the root. In this case, shift the CTM and adjust the paintRect to
+      // be root-relative to fix plug-in drawing.
+      if (!paintOffset.isZero()) {
+        paintInfo.context->translate(paintOffset);
+        paintRect.move(-paintOffset);
+      }
+      m_widget->paint(paintInfo.context, paintRect);
+
+      if (!paintOffset.isZero())
+        paintInfo.context->translate(-paintOffset);
+    }
     if (m_widget->isFrameView() && paintInfo.overlapTestRequests &&
         !static_cast<FrameView*>(m_widget.get())
              ->useSlowRepaintsIfNotOverlapped()) {
