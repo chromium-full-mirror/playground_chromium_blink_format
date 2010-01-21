@@ -141,6 +141,10 @@ class QWEBKIT_EXPORT QGraphicsWebView : public QGraphicsWidget {
 
  private:
   Q_PRIVATE_SLOT(d, void _q_doLoadFinished(bool success))
+  // we don't want to change the moc based on USE() macro, so this function is
+  // here
+  // but will be empty if ACCLERATED_COMPOSITING is disabled
+  Q_PRIVATE_SLOT(d, void syncLayers())
 
   QGraphicsWebViewPrivate* const d;
   friend class QGraphicsWebViewPrivate;

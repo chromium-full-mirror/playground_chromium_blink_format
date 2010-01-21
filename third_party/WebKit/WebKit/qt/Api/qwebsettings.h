@@ -68,7 +68,8 @@ class QWEBKIT_EXPORT QWebSettings {
 #endif
     LocalContentCanAccessRemoteUrls,
     DnsPrefetchEnabled,
-    XSSAuditorEnabled
+    XSSAuditorEnabled,
+    AcceleratedCompositingEnabled
   };
   enum WebGraphic {
     MissingImageGraphic,

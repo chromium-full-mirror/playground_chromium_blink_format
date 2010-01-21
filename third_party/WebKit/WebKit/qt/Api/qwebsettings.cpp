@@ -165,7 +165,13 @@ void QWebSettingsPrivate::apply() {
         QWebSettings::JavascriptEnabled,
         global->attributes.value(QWebSettings::JavascriptEnabled));
     settings->setJavaScriptEnabled(value);
+#if USE(ACCELERATED_COMPOSITING)
+    value = attributes.value(
+        QWebSettings::AcceleratedCompositingEnabled,
+        global->attributes.value(QWebSettings::AcceleratedCompositingEnabled));
 
+    settings->setAcceleratedCompositingEnabled(value);
+#endif
     value = attributes.value(
         QWebSettings::JavascriptCanOpenWindows,
         global->attributes.value(QWebSettings::JavascriptCanOpenWindows));
@@ -439,6 +445,7 @@ QWebSettings::QWebSettings() : d(new QWebSettingsPrivate) {
   d->attributes.insert(QWebSettings::OfflineWebApplicationCacheEnabled, false);
   d->attributes.insert(QWebSettings::LocalStorageEnabled, false);
   d->attributes.insert(QWebSettings::LocalContentCanAccessRemoteUrls, false);
+  d->attributes.insert(QWebSettings::AcceleratedCompositingEnabled, false);
   d->offlineStorageDefaultQuota = 5 * 1024 * 1024;
   d->defaultTextEncoding = QLatin1String("iso-8859-1");
 }
