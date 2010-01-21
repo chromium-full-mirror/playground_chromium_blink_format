@@ -149,7 +149,7 @@ class ChromeClientQt : public ChromeClient {
 
   virtual void requestGeolocationPermissionForFrame(Frame*, Geolocation*);
 
-  QtAbstractWebPopup* createPopup();
+  QtAbstractWebPopup* createSelectPopup();
 
   QWebPage* m_webPage;
   WebCore::KURL lastHoverURL;

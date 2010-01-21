@@ -24,7 +24,8 @@
 
 namespace WebCore {
 
-QtAbstractWebPopup::QtAbstractWebPopup() : m_client(0) {}
+QtAbstractWebPopup::QtAbstractWebPopup()
+    : m_client(0), m_view(0), m_currentIndex(-1) {}
 
 QtAbstractWebPopup::~QtAbstractWebPopup() {}
 
@@ -36,6 +37,14 @@ void QtAbstractWebPopup::popupDidHide(bool acceptSuggestions) {
 void QtAbstractWebPopup::valueChanged(int index) {
   Q_ASSERT(m_client);
   m_client->valueChanged(index);
+}
+
+QtAbstractWebPopup::ItemType QtAbstractWebPopup::itemType(int idx) const {
+  if (m_client->itemIsSeparator(idx))
+    return Separator;
+  if (m_client->itemIsLabel(idx))
+    return Group;
+  return Option;
 }
 
 }  // namespace WebCore

@@ -435,7 +435,7 @@ void ChromeClientQt::requestGeolocationPermissionForFrame(Frame*,
   notImplemented();
 }
 
-QtAbstractWebPopup* ChromeClientQt::createPopup() {
+QtAbstractWebPopup* ChromeClientQt::createSelectPopup() {
   return new QtFallbackWebPopup;
 }
 }
