@@ -28,7 +28,7 @@
 
 #include "NPV8Object.h"
 
-#include "ChromiumBridge.h"
+#include "PlatformBridge.h"
 #include "DOMWindow.h"
 #include "Frame.h"
 #include "OwnArrayPtr.h"
@@ -276,7 +276,7 @@ bool _NPN_Evaluate(NPP npp,
                    NPObject* npObject,
                    NPString* npScript,
                    NPVariant* result) {
-  bool popupsAllowed = WebCore::ChromiumBridge::popupsAllowed(npp);
+  bool popupsAllowed = WebCore::PlatformBridge::popupsAllowed(npp);
   return _NPN_EvaluateHelper(npp, popupsAllowed, npObject, npScript, result);
 }
 
