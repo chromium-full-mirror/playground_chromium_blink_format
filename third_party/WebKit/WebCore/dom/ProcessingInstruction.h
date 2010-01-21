@@ -73,11 +73,14 @@ class ProcessingInstruction : public ContainerNode,
   virtual void removedFromDocument();
 
   void checkStyleSheet();
-  virtual void setCSSStyleSheet(const String& url,
+  virtual void setCSSStyleSheet(const String& href,
+                                const KURL& baseURL,
                                 const String& charset,
                                 const CachedCSSStyleSheet*);
 #if ENABLE(XSLT)
-  virtual void setXSLStyleSheet(const String& url, const String& sheet);
+  virtual void setXSLStyleSheet(const String& href,
+                                const KURL& baseURL,
+                                const String& sheet);
 #endif
 
   bool isLoading() const;

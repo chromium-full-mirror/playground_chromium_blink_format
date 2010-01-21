@@ -2055,9 +2055,9 @@ void Document::updateBaseURL() {
     m_baseURL = KURL();
 
   if (m_elemSheet)
-    m_elemSheet->setHref(m_baseURL.string());
+    m_elemSheet->setBaseURL(m_baseURL);
   if (m_mappedElementSheet)
-    m_mappedElementSheet->setHref(m_baseURL.string());
+    m_mappedElementSheet->setBaseURL(m_baseURL);
 }
 
 String Document::userAgent(const KURL& url) const {
@@ -2078,7 +2078,7 @@ CSSStyleSheet* Document::pageUserSheet() {
 
   // Parse the sheet and cache it.
   m_pageUserSheet =
-      CSSStyleSheet::create(this, settings()->userStyleSheetLocation());
+      CSSStyleSheet::createInline(this, settings()->userStyleSheetLocation());
   m_pageUserSheet->setIsUserStyleSheet(true);
   m_pageUserSheet->parseString(userSheetText, !inCompatMode());
   return m_pageUserSheet.get();
@@ -2113,8 +2113,8 @@ const Vector<RefPtr<CSSStyleSheet>>* Document::pageGroupUserSheets() const {
       if (!UserContentURLPattern::matchesPatterns(url(), sheet->whitelist(),
                                                   sheet->blacklist()))
         continue;
-      RefPtr<CSSStyleSheet> parsedSheet =
-          CSSStyleSheet::create(const_cast<Document*>(this), sheet->url());
+      RefPtr<CSSStyleSheet> parsedSheet = CSSStyleSheet::createInline(
+          const_cast<Document*>(this), sheet->url());
       parsedSheet->setIsUserStyleSheet(true);
       parsedSheet->parseString(sheet->source(), !inCompatMode());
       if (!m_pageGroupUserSheets)
@@ -2134,13 +2134,13 @@ void Document::clearPageGroupUserSheets() {
 
 CSSStyleSheet* Document::elementSheet() {
   if (!m_elemSheet)
-    m_elemSheet = CSSStyleSheet::create(this, m_baseURL.string());
+    m_elemSheet = CSSStyleSheet::createInline(this, m_baseURL);
   return m_elemSheet.get();
 }
 
 CSSStyleSheet* Document::mappedElementSheet() {
   if (!m_mappedElementSheet)
-    m_mappedElementSheet = CSSStyleSheet::create(this, m_baseURL.string());
+    m_mappedElementSheet = CSSStyleSheet::createInline(this, m_baseURL);
   return m_mappedElementSheet.get();
 }
 

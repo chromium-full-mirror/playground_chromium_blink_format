@@ -140,7 +140,8 @@ void ProcessingInstruction::checkStyleSheet() {
       // to be able
       // to kick off import/include loads that can hang off some parent sheet.
       if (m_isXSL) {
-        m_sheet = XSLStyleSheet::createEmbedded(this, m_localHref);
+        KURL baseURL = KURL(ParsedURLString, m_localHref);
+        m_sheet = XSLStyleSheet::createEmbedded(this, m_localHref, baseURL);
         m_loading = false;
       }
 #endif
@@ -198,13 +199,15 @@ bool ProcessingInstruction::sheetLoaded() {
   return false;
 }
 
-void ProcessingInstruction::setCSSStyleSheet(const String& url,
+void ProcessingInstruction::setCSSStyleSheet(const String& href,
+                                             const KURL& baseURL,
                                              const String& charset,
                                              const CachedCSSStyleSheet* sheet) {
 #if ENABLE(XSLT)
   ASSERT(!m_isXSL);
 #endif
-  RefPtr<CSSStyleSheet> newSheet = CSSStyleSheet::create(this, url, charset);
+  RefPtr<CSSStyleSheet> newSheet =
+      CSSStyleSheet::create(this, href, baseURL, charset);
   m_sheet = newSheet;
   // We don't need the cross-origin security check here because we are
   // getting the sheet text in "strict" mode. This enforces a valid CSS MIME
@@ -216,10 +219,11 @@ void ProcessingInstruction::setCSSStyleSheet(const String& url,
 }
 
 #if ENABLE(XSLT)
-void ProcessingInstruction::setXSLStyleSheet(const String& url,
+void ProcessingInstruction::setXSLStyleSheet(const String& href,
+                                             const KURL& baseURL,
                                              const String& sheet) {
   ASSERT(m_isXSL);
-  m_sheet = XSLStyleSheet::create(this, url);
+  m_sheet = XSLStyleSheet::create(this, href, baseURL);
   parseStyleSheet(sheet);
 }
 #endif

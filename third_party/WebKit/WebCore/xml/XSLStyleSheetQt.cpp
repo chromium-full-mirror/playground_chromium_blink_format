@@ -35,8 +35,9 @@ namespace WebCore {
 
 XSLStyleSheet::XSLStyleSheet(Node* parentNode,
                              const String& href,
+                             const KURL& baseURL,
                              bool embedded)
-    : StyleSheet(parentNode, href),
+    : StyleSheet(parentNode, href, baseURL),
       m_ownerDocument(parentNode->document()),
       m_embedded(embedded) {}
 

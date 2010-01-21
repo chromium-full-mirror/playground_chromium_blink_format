@@ -37,24 +37,33 @@ typedef int ExceptionCode;
 class CSSStyleSheet : public StyleSheet {
  public:
   static PassRefPtr<CSSStyleSheet> create() {
-    return adoptRef(
-        new CSSStyleSheet(static_cast<CSSStyleSheet*>(0), String(), String()));
+    return adoptRef(new CSSStyleSheet(static_cast<CSSStyleSheet*>(0), String(),
+                                      KURL(), String()));
   }
   static PassRefPtr<CSSStyleSheet> create(Node* ownerNode) {
-    return adoptRef(new CSSStyleSheet(ownerNode, String(), String()));
-  }
-  static PassRefPtr<CSSStyleSheet> create(Node* ownerNode, const String& href) {
-    return adoptRef(new CSSStyleSheet(ownerNode, href, String()));
+    return adoptRef(new CSSStyleSheet(ownerNode, String(), KURL(), String()));
   }
   static PassRefPtr<CSSStyleSheet> create(Node* ownerNode,
                                           const String& href,
+                                          const KURL& baseURL) {
+    return adoptRef(new CSSStyleSheet(ownerNode, href, baseURL, String()));
+  }
+  static PassRefPtr<CSSStyleSheet> create(Node* ownerNode,
+                                          const String& href,
+                                          const KURL& baseURL,
                                           const String& charset) {
-    return adoptRef(new CSSStyleSheet(ownerNode, href, charset));
+    return adoptRef(new CSSStyleSheet(ownerNode, href, baseURL, charset));
   }
   static PassRefPtr<CSSStyleSheet> create(CSSRule* ownerRule,
                                           const String& href,
+                                          const KURL& baseURL,
                                           const String& charset) {
-    return adoptRef(new CSSStyleSheet(ownerRule, href, charset));
+    return adoptRef(new CSSStyleSheet(ownerRule, href, baseURL, charset));
+  }
+  static PassRefPtr<CSSStyleSheet> createInline(Node* ownerNode,
+                                                const KURL& baseURL) {
+    return adoptRef(
+        new CSSStyleSheet(ownerNode, baseURL.string(), baseURL, String()));
   }
 
   virtual ~CSSStyleSheet();
@@ -108,11 +117,18 @@ class CSSStyleSheet : public StyleSheet {
   }
 
  private:
-  CSSStyleSheet(Node* ownerNode, const String& href, const String& charset);
+  CSSStyleSheet(Node* ownerNode,
+                const String& href,
+                const KURL& baseURL,
+                const String& charset);
   CSSStyleSheet(CSSStyleSheet* parentSheet,
                 const String& href,
+                const KURL& baseURL,
                 const String& charset);
-  CSSStyleSheet(CSSRule* ownerRule, const String& href, const String& charset);
+  CSSStyleSheet(CSSRule* ownerRule,
+                const String& href,
+                const KURL& baseURL,
+                const String& charset);
 
   virtual bool isCSSStyleSheet() const { return true; }
   virtual String type() const { return "text/css"; }

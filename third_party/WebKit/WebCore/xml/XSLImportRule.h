@@ -57,7 +57,9 @@ class XSLImportRule : public StyleBase, private CachedResourceClient {
   virtual bool isImportRule() { return true; }
 
   // from CachedResourceClient
-  virtual void setXSLStyleSheet(const String& url, const String& sheet);
+  virtual void setXSLStyleSheet(const String& href,
+                                const KURL& baseURL,
+                                const String& sheet);
 
   String m_strHref;
   RefPtr<XSLStyleSheet> m_styleSheet;
