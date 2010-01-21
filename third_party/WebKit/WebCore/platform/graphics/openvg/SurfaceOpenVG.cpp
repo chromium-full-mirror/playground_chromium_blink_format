@@ -45,7 +45,8 @@ SurfaceOpenVG* SurfaceOpenVG::currentSurface() {
 #if PLATFORM(EGL)
 SurfaceOpenVG::SurfaceOpenVG(const IntSize& size,
                              const EGLDisplay& display,
-                             EGLConfig* confPtr)
+                             EGLConfig* confPtr,
+                             EGLint* errorCode)
     : m_eglDisplay(display),
       m_eglSurface(EGL_NO_SURFACE),
       m_eglContext(EGL_NO_CONTEXT) {
@@ -54,7 +55,7 @@ SurfaceOpenVG::SurfaceOpenVG(const IntSize& size,
   EGLDisplayOpenVG* displayManager = EGLDisplayOpenVG::forDisplay(m_eglDisplay);
   EGLConfig config =
       confPtr ? (*confPtr) : displayManager->defaultPbufferConfig();
-  m_eglSurface = displayManager->createPbufferSurface(size, config);
+  m_eglSurface = displayManager->createPbufferSurface(size, config, errorCode);
 
   if (m_eglSurface == EGL_NO_SURFACE)
     return;
@@ -75,9 +76,7 @@ SurfaceOpenVG::SurfaceOpenVG(EGLNativeWindowType window,
   EGLConfig config =
       confPtr ? (*confPtr) : displayManager->defaultWindowConfig();
   m_eglSurface = displayManager->surfaceForWindow(window, config);
-
-  if (m_eglSurface == EGL_NO_SURFACE)
-    return;
+  ASSERT(m_eglSurface != EGL_NO_SURFACE);
 
   m_eglContext = displayManager->contextForSurface(m_eglSurface);
   EGLDisplayOpenVG::registerPlatformSurface(this);
