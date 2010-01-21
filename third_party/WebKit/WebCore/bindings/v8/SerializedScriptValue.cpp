@@ -561,7 +561,7 @@ class Deserializer {
   bool doDeserialize() {
     SerializationTag tag;
     v8::Local<v8::Value> value;
-    int length;
+    int length = 0;
     if (!m_reader.read(&tag, &value, &length))
       return false;
     if (!value.IsEmpty()) {
