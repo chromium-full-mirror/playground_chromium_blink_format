@@ -33,7 +33,7 @@
 #ifndef TCMALLOC_INTERNAL_SPINLOCK_H__
 #define TCMALLOC_INTERNAL_SPINLOCK_H__
 
-#if (CPU(X86) || CPU(PPC)) && (COMPILER(GCC) || COMPILER(MSVC))
+#if (CPU(X86) || CPU(X86_64) || CPU(PPC)) && (COMPILER(GCC) || COMPILER(MSVC))
 
 #include <time.h> /* For nanosleep() */
 
@@ -61,7 +61,7 @@ struct TCMalloc_SpinLock {
   inline void Lock() {
     int r;
 #if COMPILER(GCC)
-#if CPU(X86)
+#if CPU(X86) || CPU(X86_64)
     __asm__ __volatile__("xchgl %0, %1"
                          : "=r"(r), "=m"(lockword_)
                          : "0"(1), "m"(lockword_)
@@ -91,7 +91,7 @@ struct TCMalloc_SpinLock {
 
   inline void Unlock() {
 #if COMPILER(GCC)
-#if CPU(X86)
+#if CPU(X86) || CPU(X86_64)
     __asm__ __volatile__("movl $0, %0"
                          : "=m"(lockword_)
                          : "m"(lockword_)
@@ -135,7 +135,7 @@ static void TCMalloc_SlowLock(volatile unsigned int* lockword) {
   while (true) {
     int r;
 #if COMPILER(GCC)
-#if CPU(X86)
+#if CPU(X86) || CPU(X86_64)
     __asm__ __volatile__("xchgl %0, %1"
                          : "=r"(r), "=m"(*lockword)
                          : "0"(1), "m"(*lockword)
