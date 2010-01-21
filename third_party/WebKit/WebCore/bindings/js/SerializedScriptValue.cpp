@@ -32,6 +32,7 @@
 #include "JSFile.h"
 #include "JSFileList.h"
 #include <JavaScriptCore/APICast.h>
+#include <JavaScriptCore/JSLock.h>
 #include <runtime/DateInstance.h>
 #include <runtime/ExceptionHelpers.h>
 #include <runtime/PropertyNameArray.h>
@@ -655,6 +656,7 @@ struct DeserializingTreeWalker : public BaseWalker {
 
 JSValue SerializedScriptValueData::deserialize(ExecState* exec,
                                                bool mustCopy) const {
+  JSLock lock(SilenceAssertionsOnly);
   DeserializingTreeWalker context(exec, mustCopy);
   return walk<DeserializingTreeWalker>(context, *this);
 }
