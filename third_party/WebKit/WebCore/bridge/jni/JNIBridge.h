@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2003 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2003, 2004, 2005, 2007, 2009, 2010 Apple Inc. All rights
+ * reserved.
+ * Copyright 2010, The Android Open Source Project
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -62,77 +64,74 @@ class JavaString {
 
 class JavaParameter {
  public:
-  JavaParameter() : _JNIType(invalid_type){};
-  JavaParameter(JNIEnv* env, jstring type);
+  JavaParameter() : m_JNIType(invalid_type) {}
+  JavaParameter(JNIEnv*, jstring type);
   virtual ~JavaParameter() {}
 
-  RuntimeType type() const { return _type.UTF8String(); }
-  JNIType getJNIType() const { return _JNIType; }
+  RuntimeType type() const { return m_type.UTF8String(); }
+  JNIType getJNIType() const { return m_JNIType; }
 
  private:
-  JavaString _type;
-  JNIType _JNIType;
+  JavaString m_type;
+  JNIType m_JNIType;
 };
 
 class JavaField : public Field {
  public:
-  JavaField(JNIEnv* env, jobject aField);
+  JavaField(JNIEnv*, jobject aField);
 
-  virtual JSValue valueFromInstance(ExecState* exec,
-                                    const Instance* instance) const;
-  virtual void setValueToInstance(ExecState* exec,
-                                  const Instance* instance,
-                                  JSValue aValue) const;
+  virtual JSValue valueFromInstance(ExecState*, const Instance*) const;
+  virtual void setValueToInstance(ExecState*, const Instance*, JSValue) const;
 
-  const JavaString& name() const { return _name; }
-  virtual RuntimeType type() const { return _type.UTF8String(); }
+  const JavaString& name() const { return m_name; }
+  virtual RuntimeType type() const { return m_type.UTF8String(); }
 
-  JNIType getJNIType() const { return _JNIType; }
+  JNIType getJNIType() const { return m_JNIType; }
 
  private:
-  void dispatchSetValueToInstance(ExecState* exec,
-                                  const JavaInstance* instance,
-                                  jvalue javaValue,
+  void dispatchSetValueToInstance(ExecState*,
+                                  const JavaInstance*,
+                                  jvalue,
                                   const char* name,
                                   const char* sig) const;
-  jvalue dispatchValueFromInstance(ExecState* exec,
-                                   const JavaInstance* instance,
+  jvalue dispatchValueFromInstance(ExecState*,
+                                   const JavaInstance*,
                                    const char* name,
                                    const char* sig,
                                    JNIType returnType) const;
 
-  JavaString _name;
-  JavaString _type;
-  JNIType _JNIType;
-  RefPtr<JObjectWrapper> _field;
+  JavaString m_name;
+  JavaString m_type;
+  JNIType m_JNIType;
+  RefPtr<JObjectWrapper> m_field;
 };
 
 class JavaMethod : public Method {
  public:
-  JavaMethod(JNIEnv* env, jobject aMethod);
+  JavaMethod(JNIEnv*, jobject aMethod);
   ~JavaMethod();
 
-  const JavaString& name() const { return _name; }
-  RuntimeType returnType() const { return _returnType.UTF8String(); };
-  JavaParameter* parameterAt(int i) const { return &_parameters[i]; };
-  int numParameters() const { return _numParameters; };
+  const JavaString& name() const { return m_name; }
+  RuntimeType returnType() const { return m_returnType.UTF8String(); }
+  JavaParameter* parameterAt(int i) const { return &m_parameters[i]; }
+  int numParameters() const { return m_numParameters; }
 
   const char* signature() const;
   JNIType JNIReturnType() const;
 
   jmethodID methodID(jobject obj) const;
 
-  bool isStatic() const { return _isStatic; }
+  bool isStatic() const { return m_isStatic; }
 
  private:
-  JavaParameter* _parameters;
-  int _numParameters;
-  JavaString _name;
-  mutable char* _signature;
-  JavaString _returnType;
-  JNIType _JNIReturnType;
-  mutable jmethodID _methodID;
-  bool _isStatic;
+  JavaParameter* m_parameters;
+  int m_numParameters;
+  JavaString m_name;
+  mutable char* m_signature;
+  JavaString m_returnType;
+  JNIType m_JNIReturnType;
+  mutable jmethodID m_methodID;
+  bool m_isStatic;
 };
 
 class JavaArray : public Array {
@@ -142,23 +141,21 @@ class JavaArray : public Array {
 
   RootObject* rootObject() const;
 
-  virtual void setValueAt(ExecState* exec,
-                          unsigned int index,
-                          JSValue aValue) const;
-  virtual JSValue valueAt(ExecState* exec, unsigned int index) const;
+  virtual void setValueAt(ExecState*, unsigned int index, JSValue) const;
+  virtual JSValue valueAt(ExecState*, unsigned int index) const;
   virtual unsigned int getLength() const;
 
-  jobject javaArray() const { return _array->m_instance; }
+  jobject javaArray() const { return m_array->m_instance; }
 
-  static JSValue convertJObjectToArray(ExecState* exec,
-                                       jobject anObject,
+  static JSValue convertJObjectToArray(ExecState*,
+                                       jobject,
                                        const char* type,
                                        PassRefPtr<RootObject>);
 
  private:
-  RefPtr<JObjectWrapper> _array;
-  unsigned int _length;
-  const char* _type;
+  RefPtr<JObjectWrapper> m_array;
+  unsigned int m_length;
+  const char* m_type;
 };
 
 }  // namespace Bindings

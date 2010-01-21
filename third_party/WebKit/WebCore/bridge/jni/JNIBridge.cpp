@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2003 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2003, 2004, 2005, 2007, 2009 Apple Inc. All rights reserved.
+ * Copyright 2010, The Android Open Source Project
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -53,25 +54,25 @@ using namespace JSC::Bindings;
 using namespace WebCore;
 
 JavaParameter::JavaParameter(JNIEnv* env, jstring type) {
-  _type = JavaString(env, type);
-  _JNIType = JNITypeFromClassName(_type.UTF8String());
+  m_type = JavaString(env, type);
+  m_JNIType = JNITypeFromClassName(m_type.UTF8String());
 }
 
 JavaField::JavaField(JNIEnv* env, jobject aField) {
   // Get field type
   jobject fieldType =
       callJNIMethod<jobject>(aField, "getType", "()Ljava/lang/Class;");
-  jstring fieldTypeName = (jstring)callJNIMethod<jobject>(
-      fieldType, "getName", "()Ljava/lang/String;");
-  _type = JavaString(env, fieldTypeName);
-  _JNIType = JNITypeFromClassName(_type.UTF8String());
+  jstring fieldTypeName = static_cast<jstring>(
+      callJNIMethod<jobject>(fieldType, "getName", "()Ljava/lang/String;"));
+  m_type = JavaString(env, fieldTypeName);
+  m_JNIType = JNITypeFromClassName(m_type.UTF8String());
 
   // Get field name
-  jstring fieldName = (jstring)callJNIMethod<jobject>(aField, "getName",
-                                                      "()Ljava/lang/String;");
-  _name = JavaString(env, fieldName);
+  jstring fieldName = static_cast<jstring>(
+      callJNIMethod<jobject>(aField, "getName", "()Ljava/lang/String;"));
+  m_name = JavaString(env, fieldName);
 
-  _field = new JObjectWrapper(aField);
+  m_field = new JObjectWrapper(aField);
 }
 
 JSValue JavaArray::convertJObjectToArray(ExecState* exec,
@@ -82,7 +83,7 @@ JSValue JavaArray::convertJObjectToArray(ExecState* exec,
     return jsUndefined();
 
   return new (exec)
-      RuntimeArray(exec, new JavaArray((jobject)anObject, type, rootObject));
+      RuntimeArray(exec, new JavaArray(anObject, type, rootObject));
 }
 
 jvalue JavaField::dispatchValueFromInstance(ExecState* exec,
@@ -91,15 +92,15 @@ jvalue JavaField::dispatchValueFromInstance(ExecState* exec,
                                             const char* sig,
                                             JNIType returnType) const {
   jobject jinstance = instance->javaInstance();
-  jobject fieldJInstance = _field->m_instance;
+  jobject fieldJInstance = m_field->m_instance;
   JNIEnv* env = getJNIEnv();
   jvalue result;
 
   bzero(&result, sizeof(jvalue));
   jclass cls = env->GetObjectClass(fieldJInstance);
-  if (cls != NULL) {
+  if (cls) {
     jmethodID mid = env->GetMethodID(cls, name, sig);
-    if (mid != NULL) {
+    if (mid) {
       RootObject* rootObject = instance->rootObject();
       if (rootObject && rootObject->nativeHandle()) {
         JSValue exceptionDescription;
@@ -121,7 +122,7 @@ JSValue JavaField::valueFromInstance(ExecState* exec, const Instance* i) const {
 
   JSValue jsresult = jsUndefined();
 
-  switch (_JNIType) {
+  switch (m_JNIType) {
     case array_type:
     case object_type: {
       jvalue result = dispatchValueFromInstance(
@@ -130,13 +131,12 @@ JSValue JavaField::valueFromInstance(ExecState* exec, const Instance* i) const {
       jobject anObject = result.l;
 
       const char* arrayType = type();
-      if (arrayType[0] == '[') {
+      if (arrayType[0] == '[')
         jsresult = JavaArray::convertJObjectToArray(exec, anObject, arrayType,
                                                     instance->rootObject());
-      } else if (anObject != 0) {
+      else if (anObject)
         jsresult = JavaInstance::create(anObject, instance->rootObject())
                        ->createRuntimeObject(exec);
-      }
     } break;
 
     case boolean_type:
@@ -155,7 +155,7 @@ JSValue JavaField::valueFromInstance(ExecState* exec, const Instance* i) const {
       jvalue result = dispatchValueFromInstance(
           exec, instance, "getInt", "(Ljava/lang/Object;)I", int_type);
       value = result.i;
-      jsresult = jsNumber(exec, (int)value);
+      jsresult = jsNumber(exec, static_cast<int>(value));
     } break;
 
     case long_type:
@@ -165,7 +165,7 @@ JSValue JavaField::valueFromInstance(ExecState* exec, const Instance* i) const {
       jvalue result = dispatchValueFromInstance(
           exec, instance, "getDouble", "(Ljava/lang/Object;)D", double_type);
       value = result.i;
-      jsresult = jsNumber(exec, (double)value);
+      jsresult = jsNumber(exec, static_cast<double>(value));
     } break;
     default:
       break;
@@ -183,13 +183,13 @@ void JavaField::dispatchSetValueToInstance(ExecState* exec,
                                            const char* name,
                                            const char* sig) const {
   jobject jinstance = instance->javaInstance();
-  jobject fieldJInstance = _field->m_instance;
+  jobject fieldJInstance = m_field->m_instance;
   JNIEnv* env = getJNIEnv();
 
   jclass cls = env->GetObjectClass(fieldJInstance);
-  if (cls != NULL) {
+  if (cls) {
     jmethodID mid = env->GetMethodID(cls, name, sig);
-    if (mid != NULL) {
+    if (mid) {
       RootObject* rootObject = instance->rootObject();
       if (rootObject && rootObject->nativeHandle()) {
         JSValue exceptionDescription;
@@ -211,12 +211,12 @@ void JavaField::setValueToInstance(ExecState* exec,
                                    const Instance* i,
                                    JSValue aValue) const {
   const JavaInstance* instance = static_cast<const JavaInstance*>(i);
-  jvalue javaValue = convertValueToJValue(exec, aValue, _JNIType, type());
+  jvalue javaValue = convertValueToJValue(exec, aValue, m_JNIType, type());
 
   JS_LOG("setting value %s to %s\n", UString(name()).UTF8String().c_str(),
          aValue.toString(exec).ascii());
 
-  switch (_JNIType) {
+  switch (m_JNIType) {
     case array_type:
     case object_type: {
       dispatchSetValueToInstance(exec, instance, javaValue, "set",
@@ -271,52 +271,51 @@ JavaMethod::JavaMethod(JNIEnv* env, jobject aMethod) {
   // Get return type
   jobject returnType =
       callJNIMethod<jobject>(aMethod, "getReturnType", "()Ljava/lang/Class;");
-  jstring returnTypeName = (jstring)callJNIMethod<jobject>(
-      returnType, "getName", "()Ljava/lang/String;");
-  _returnType = JavaString(env, returnTypeName);
-  _JNIReturnType = JNITypeFromClassName(_returnType.UTF8String());
+  jstring returnTypeName = static_cast<jstring>(
+      callJNIMethod<jobject>(returnType, "getName", "()Ljava/lang/String;"));
+  m_returnType = JavaString(env, returnTypeName);
+  m_JNIReturnType = JNITypeFromClassName(m_returnType.UTF8String());
   env->DeleteLocalRef(returnType);
   env->DeleteLocalRef(returnTypeName);
 
   // Get method name
-  jstring methodName = (jstring)callJNIMethod<jobject>(aMethod, "getName",
-                                                       "()Ljava/lang/String;");
-  _name = JavaString(env, methodName);
+  jstring methodName = static_cast<jstring>(
+      callJNIMethod<jobject>(aMethod, "getName", "()Ljava/lang/String;"));
+  m_name = JavaString(env, methodName);
   env->DeleteLocalRef(methodName);
 
   // Get parameters
-  jarray jparameters = (jarray)callJNIMethod<jobject>(
-      aMethod, "getParameterTypes", "()[Ljava/lang/Class;");
-  _numParameters = env->GetArrayLength(jparameters);
-  _parameters = new JavaParameter[_numParameters];
+  jarray jparameters = static_cast<jarray>(callJNIMethod<jobject>(
+      aMethod, "getParameterTypes", "()[Ljava/lang/Class;"));
+  m_numParameters = env->GetArrayLength(jparameters);
+  m_parameters = new JavaParameter[m_numParameters];
 
-  int i;
-  for (i = 0; i < _numParameters; i++) {
+  for (int i = 0; i < m_numParameters; i++) {
     jobject aParameter =
-        env->GetObjectArrayElement((jobjectArray)jparameters, i);
-    jstring parameterName = (jstring)callJNIMethod<jobject>(
-        aParameter, "getName", "()Ljava/lang/String;");
-    _parameters[i] = JavaParameter(env, parameterName);
+        env->GetObjectArrayElement(static_cast<jobjectArray>(jparameters), i);
+    jstring parameterName = static_cast<jstring>(
+        callJNIMethod<jobject>(aParameter, "getName", "()Ljava/lang/String;"));
+    m_parameters[i] = JavaParameter(env, parameterName);
     env->DeleteLocalRef(aParameter);
     env->DeleteLocalRef(parameterName);
   }
   env->DeleteLocalRef(jparameters);
 
   // Created lazily.
-  _signature = 0;
-  _methodID = 0;
+  m_signature = 0;
+  m_methodID = 0;
 
   jclass modifierClass = env->FindClass("java/lang/reflect/Modifier");
   int modifiers = callJNIMethod<jint>(aMethod, "getModifiers", "()I");
-  _isStatic = (bool)callJNIStaticMethod<jboolean>(modifierClass, "isStatic",
-                                                  "(I)Z", modifiers);
+  m_isStatic = static_cast<bool>(callJNIStaticMethod<jboolean>(
+      modifierClass, "isStatic", "(I)Z", modifiers));
   env->DeleteLocalRef(modifierClass);
 }
 
 JavaMethod::~JavaMethod() {
-  if (_signature)
-    free(_signature);
-  delete[] _parameters;
+  if (m_signature)
+    free(m_signature);
+  delete[] m_parameters;
 };
 
 // JNI method signatures use '/' between components of a class name, but
@@ -324,13 +323,13 @@ JavaMethod::~JavaMethod() {
 static void appendClassName(StringBuilder& builder, const char* className) {
   ASSERT(JSLock::lockCount() > 0);
 
-  char *result, *cp = strdup(className);
+  char* c = strdup(className);
 
-  result = cp;
-  while (*cp) {
-    if (*cp == '.')
-      *cp = '/';
-    cp++;
+  char* result = c;
+  while (*c) {
+    if (*c == '.')
+      *c = '/';
+    c++;
   }
 
   builder.append(result);
@@ -339,19 +338,19 @@ static void appendClassName(StringBuilder& builder, const char* className) {
 }
 
 const char* JavaMethod::signature() const {
-  if (!_signature) {
+  if (!m_signature) {
     JSLock lock(SilenceAssertionsOnly);
 
     StringBuilder signatureBuilder;
     signatureBuilder.append("(");
-    for (int i = 0; i < _numParameters; i++) {
+    for (int i = 0; i < m_numParameters; i++) {
       JavaParameter* aParameter = parameterAt(i);
-      JNIType _JNIType = aParameter->getJNIType();
-      if (_JNIType == array_type)
+      JNIType type = aParameter->getJNIType();
+      if (type == array_type)
         appendClassName(signatureBuilder, aParameter->type());
       else {
-        signatureBuilder.append(signatureFromPrimitiveType(_JNIType));
-        if (_JNIType == object_type) {
+        signatureBuilder.append(signatureFromPrimitiveType(type));
+        if (type == object_type) {
           appendClassName(signatureBuilder, aParameter->type());
           signatureBuilder.append(";");
         }
@@ -359,49 +358,48 @@ const char* JavaMethod::signature() const {
     }
     signatureBuilder.append(")");
 
-    const char* returnType = _returnType.UTF8String();
-    if (_JNIReturnType == array_type) {
+    const char* returnType = m_returnType.UTF8String();
+    if (m_JNIReturnType == array_type)
       appendClassName(signatureBuilder, returnType);
-    } else {
-      signatureBuilder.append(signatureFromPrimitiveType(_JNIReturnType));
-      if (_JNIReturnType == object_type) {
+    else {
+      signatureBuilder.append(signatureFromPrimitiveType(m_JNIReturnType));
+      if (m_JNIReturnType == object_type) {
         appendClassName(signatureBuilder, returnType);
         signatureBuilder.append(";");
       }
     }
 
     String signatureString = signatureBuilder.toString();
-    _signature = strdup(signatureString.utf8().data());
+    m_signature = strdup(signatureString.utf8().data());
   }
 
-  return _signature;
+  return m_signature;
 }
 
 JNIType JavaMethod::JNIReturnType() const {
-  return _JNIReturnType;
+  return m_JNIReturnType;
 }
 
 jmethodID JavaMethod::methodID(jobject obj) const {
-  if (_methodID == 0) {
-    _methodID = getMethodID(obj, _name.UTF8String(), signature());
-  }
-  return _methodID;
+  if (!m_methodID)
+    m_methodID = getMethodID(obj, m_name.UTF8String(), signature());
+  return m_methodID;
 }
 
 JavaArray::JavaArray(jobject array,
                      const char* type,
                      PassRefPtr<RootObject> rootObject)
     : Array(rootObject) {
-  _array = new JObjectWrapper(array);
+  m_array = new JObjectWrapper(array);
   // Java array are fixed length, so we can cache length.
   JNIEnv* env = getJNIEnv();
-  _length = env->GetArrayLength((jarray)_array->m_instance);
-  _type = strdup(type);
+  m_length = env->GetArrayLength(static_cast<jarray>(m_array->m_instance));
+  m_type = strdup(type);
   m_rootObject = rootObject;
 }
 
 JavaArray::~JavaArray() {
-  free((void*)_type);
+  free(const_cast<char*>(m_type));
 }
 
 RootObject* JavaArray::rootObject() const {
@@ -414,60 +412,67 @@ void JavaArray::setValueAt(ExecState* exec,
   JNIEnv* env = getJNIEnv();
   char* javaClassName = 0;
 
-  JNIType arrayType = JNITypeFromPrimitiveType(_type[1]);
-  if (_type[1] == 'L') {
+  JNIType arrayType = JNITypeFromPrimitiveType(m_type[1]);
+  if (m_type[1] == 'L') {
     // The type of the array will be something like:
     // "[Ljava.lang.string;".  This is guaranteed, so no need
     // for extra sanity checks.
-    javaClassName = strdup(&_type[2]);
+    javaClassName = strdup(&m_type[2]);
     javaClassName[strchr(javaClassName, ';') - javaClassName] = 0;
   }
   jvalue aJValue = convertValueToJValue(exec, aValue, arrayType, javaClassName);
 
   switch (arrayType) {
     case object_type: {
-      env->SetObjectArrayElement((jobjectArray)javaArray(), index, aJValue.l);
+      env->SetObjectArrayElement(static_cast<jobjectArray>(javaArray()), index,
+                                 aJValue.l);
       break;
     }
 
     case boolean_type: {
-      env->SetBooleanArrayRegion((jbooleanArray)javaArray(), index, 1,
-                                 &aJValue.z);
+      env->SetBooleanArrayRegion(static_cast<jbooleanArray>(javaArray()), index,
+                                 1, &aJValue.z);
       break;
     }
 
     case byte_type: {
-      env->SetByteArrayRegion((jbyteArray)javaArray(), index, 1, &aJValue.b);
+      env->SetByteArrayRegion(static_cast<jbyteArray>(javaArray()), index, 1,
+                              &aJValue.b);
       break;
     }
 
     case char_type: {
-      env->SetCharArrayRegion((jcharArray)javaArray(), index, 1, &aJValue.c);
+      env->SetCharArrayRegion(static_cast<jcharArray>(javaArray()), index, 1,
+                              &aJValue.c);
       break;
     }
 
     case short_type: {
-      env->SetShortArrayRegion((jshortArray)javaArray(), index, 1, &aJValue.s);
+      env->SetShortArrayRegion(static_cast<jshortArray>(javaArray()), index, 1,
+                               &aJValue.s);
       break;
     }
 
     case int_type: {
-      env->SetIntArrayRegion((jintArray)javaArray(), index, 1, &aJValue.i);
+      env->SetIntArrayRegion(static_cast<jintArray>(javaArray()), index, 1,
+                             &aJValue.i);
       break;
     }
 
     case long_type: {
-      env->SetLongArrayRegion((jlongArray)javaArray(), index, 1, &aJValue.j);
+      env->SetLongArrayRegion(static_cast<jlongArray>(javaArray()), index, 1,
+                              &aJValue.j);
     }
 
     case float_type: {
-      env->SetFloatArrayRegion((jfloatArray)javaArray(), index, 1, &aJValue.f);
+      env->SetFloatArrayRegion(static_cast<jfloatArray>(javaArray()), index, 1,
+                               &aJValue.f);
       break;
     }
 
     case double_type: {
-      env->SetDoubleArrayRegion((jdoubleArray)javaArray(), index, 1,
-                                &aJValue.d);
+      env->SetDoubleArrayRegion(static_cast<jdoubleArray>(javaArray()), index,
+                                1, &aJValue.d);
       break;
     }
     default:
@@ -475,49 +480,47 @@ void JavaArray::setValueAt(ExecState* exec,
   }
 
   if (javaClassName)
-    free((void*)javaClassName);
+    free(const_cast<char*>(javaClassName));
 }
 
 JSValue JavaArray::valueAt(ExecState* exec, unsigned index) const {
   JNIEnv* env = getJNIEnv();
-  JNIType arrayType = JNITypeFromPrimitiveType(_type[1]);
+  JNIType arrayType = JNITypeFromPrimitiveType(m_type[1]);
   switch (arrayType) {
     case object_type: {
-      jobjectArray objectArray = (jobjectArray)javaArray();
+      jobjectArray objectArray = static_cast<jobjectArray>(javaArray());
       jobject anObject;
       anObject = env->GetObjectArrayElement(objectArray, index);
 
       // No object?
-      if (!anObject) {
+      if (!anObject)
         return jsNull();
-      }
 
       // Nested array?
-      if (_type[1] == '[') {
-        return JavaArray::convertJObjectToArray(exec, anObject, _type + 1,
+      if (m_type[1] == '[')
+        return JavaArray::convertJObjectToArray(exec, anObject, m_type + 1,
                                                 rootObject());
-      }
       // or array of other object type?
       return JavaInstance::create(anObject, rootObject())
           ->createRuntimeObject(exec);
     }
 
     case boolean_type: {
-      jbooleanArray booleanArray = (jbooleanArray)javaArray();
+      jbooleanArray booleanArray = static_cast<jbooleanArray>(javaArray());
       jboolean aBoolean;
       env->GetBooleanArrayRegion(booleanArray, index, 1, &aBoolean);
       return jsBoolean(aBoolean);
     }
 
     case byte_type: {
-      jbyteArray byteArray = (jbyteArray)javaArray();
+      jbyteArray byteArray = static_cast<jbyteArray>(javaArray());
       jbyte aByte;
       env->GetByteArrayRegion(byteArray, index, 1, &aByte);
       return jsNumber(exec, aByte);
     }
 
     case char_type: {
-      jcharArray charArray = (jcharArray)javaArray();
+      jcharArray charArray = static_cast<jcharArray>(javaArray());
       jchar aChar;
       env->GetCharArrayRegion(charArray, index, 1, &aChar);
       return jsNumber(exec, aChar);
@@ -525,35 +528,35 @@ JSValue JavaArray::valueAt(ExecState* exec, unsigned index) const {
     }
 
     case short_type: {
-      jshortArray shortArray = (jshortArray)javaArray();
+      jshortArray shortArray = static_cast<jshortArray>(javaArray());
       jshort aShort;
       env->GetShortArrayRegion(shortArray, index, 1, &aShort);
       return jsNumber(exec, aShort);
     }
 
     case int_type: {
-      jintArray intArray = (jintArray)javaArray();
+      jintArray intArray = static_cast<jintArray>(javaArray());
       jint anInt;
       env->GetIntArrayRegion(intArray, index, 1, &anInt);
       return jsNumber(exec, anInt);
     }
 
     case long_type: {
-      jlongArray longArray = (jlongArray)javaArray();
+      jlongArray longArray = static_cast<jlongArray>(javaArray());
       jlong aLong;
       env->GetLongArrayRegion(longArray, index, 1, &aLong);
       return jsNumber(exec, aLong);
     }
 
     case float_type: {
-      jfloatArray floatArray = (jfloatArray)javaArray();
+      jfloatArray floatArray = static_cast<jfloatArray>(javaArray());
       jfloat aFloat;
       env->GetFloatArrayRegion(floatArray, index, 1, &aFloat);
       return jsNumber(exec, aFloat);
     }
 
     case double_type: {
-      jdoubleArray doubleArray = (jdoubleArray)javaArray();
+      jdoubleArray doubleArray = static_cast<jdoubleArray>(javaArray());
       jdouble aDouble;
       env->GetDoubleArrayRegion(doubleArray, index, 1, &aDouble);
       return jsNumber(exec, aDouble);
@@ -565,7 +568,7 @@ JSValue JavaArray::valueAt(ExecState* exec, unsigned index) const {
 }
 
 unsigned int JavaArray::getLength() const {
-  return _length;
+  return m_length;
 }
 
 #endif  // ENABLE(MAC_JAVA_BRIDGE)
