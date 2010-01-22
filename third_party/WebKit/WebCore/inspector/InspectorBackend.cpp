@@ -181,12 +181,13 @@ void InspectorBackend::stepOutOfFunctionInDebugger() {
   JavaScriptDebugServer::shared().stepOutOfFunction();
 }
 
-bool InspectorBackend::pauseOnExceptions() {
-  return JavaScriptDebugServer::shared().pauseOnExceptions();
+long InspectorBackend::pauseOnExceptionsState() {
+  return JavaScriptDebugServer::shared().pauseOnExceptionsState();
 }
 
-void InspectorBackend::setPauseOnExceptions(bool pause) {
-  JavaScriptDebugServer::shared().setPauseOnExceptions(pause);
+void InspectorBackend::setPauseOnExceptionsState(long pauseState) {
+  JavaScriptDebugServer::shared().setPauseOnExceptionsState(
+      static_cast<JavaScriptDebugServer::PauseOnExceptionsState>(pauseState));
 }
 
 bool InspectorBackend::profilerEnabled() {

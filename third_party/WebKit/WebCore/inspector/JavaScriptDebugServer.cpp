@@ -73,7 +73,7 @@ JavaScriptDebugServer& JavaScriptDebugServer::shared() {
 
 JavaScriptDebugServer::JavaScriptDebugServer()
     : m_callingListeners(false),
-      m_pauseOnExceptions(false),
+      m_pauseOnExceptionsState(DontPauseOnExceptions),
       m_pauseOnNextStatement(false),
       m_paused(false),
       m_doneProcessingDebuggerEvents(true),
@@ -244,8 +244,9 @@ void JavaScriptDebugServer::clearBreakpoints() {
   m_breakpoints.clear();
 }
 
-void JavaScriptDebugServer::setPauseOnExceptions(bool pause) {
-  m_pauseOnExceptions = pause;
+void JavaScriptDebugServer::setPauseOnExceptionsState(
+    PauseOnExceptionsState pause) {
+  m_pauseOnExceptionsState = pause;
 }
 
 void JavaScriptDebugServer::pauseProgram() {
@@ -549,8 +550,6 @@ void JavaScriptDebugServer::exception(
     intptr_t sourceID,
     int lineNumber,
     bool hasHandler) {
-  UNUSED_PARAM(hasHandler);
-
   if (m_paused)
     return;
 
@@ -558,7 +557,8 @@ void JavaScriptDebugServer::exception(
   if (!m_currentCallFrame)
     return;
 
-  if (m_pauseOnExceptions)
+  if (m_pauseOnExceptionsState == PauseOnAllExceptions ||
+      (m_pauseOnExceptionsState == PauseOnUncaughtExceptions && !hasHandler))
     m_pauseOnNextStatement = true;
 
   m_currentCallFrame->update(debuggerCallFrame, sourceID, lineNumber);

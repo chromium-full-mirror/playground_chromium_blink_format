@@ -72,8 +72,15 @@ class JavaScriptDebugServer : JSC::Debugger, public Noncopyable {
   bool hasBreakpoint(intptr_t sourceID, unsigned lineNumber) const;
   void clearBreakpoints();
 
-  bool pauseOnExceptions() const { return m_pauseOnExceptions; }
-  void setPauseOnExceptions(bool);
+  enum PauseOnExceptionsState {
+    DontPauseOnExceptions,
+    PauseOnAllExceptions,
+    PauseOnUncaughtExceptions
+  };
+  PauseOnExceptionsState pauseOnExceptionsState() const {
+    return m_pauseOnExceptionsState;
+  }
+  void setPauseOnExceptionsState(PauseOnExceptionsState);
 
   void pauseProgram();
   void continueProgram();
@@ -162,7 +169,7 @@ class JavaScriptDebugServer : JSC::Debugger, public Noncopyable {
   PageListenersMap m_pageListenersMap;
   ListenerSet m_listeners;
   bool m_callingListeners;
-  bool m_pauseOnExceptions;
+  PauseOnExceptionsState m_pauseOnExceptionsState;
   bool m_pauseOnNextStatement;
   bool m_paused;
   bool m_doneProcessingDebuggerEvents;
