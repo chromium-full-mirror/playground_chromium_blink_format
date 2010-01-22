@@ -131,7 +131,7 @@ ThreadIdentifier createThreadInternal(ThreadFunction entryPoint,
   return threadID;
 }
 
-void setThreadNameInternal(const char*) {}
+void initializeCurrentThreadInternal(const char*) {}
 
 int waitForThreadCompletion(ThreadIdentifier threadID, void** result) {
   ASSERT(threadID);

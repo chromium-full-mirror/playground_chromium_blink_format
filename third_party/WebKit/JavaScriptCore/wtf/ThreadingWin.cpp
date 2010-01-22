@@ -136,7 +136,7 @@ typedef struct tagTHREADNAME_INFO {
 } THREADNAME_INFO;
 #pragma pack(pop)
 
-void setThreadNameInternal(const char* szThreadName) {
+void initializeCurrentThreadInternal(const char* szThreadName) {
   THREADNAME_INFO info;
   info.dwType = 0x1000;
   info.szName = szThreadName;
@@ -175,7 +175,7 @@ void initializeThreading() {
     initializeRandomNumberGenerator();
     initializeMainThread();
     mainThreadIdentifier = currentThread();
-    setThreadNameInternal("Main Thread");
+    initializeCurrentThreadInternal("Main Thread");
   }
 }
 
