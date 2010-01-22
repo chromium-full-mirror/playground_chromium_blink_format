@@ -1370,6 +1370,9 @@ void HTMLInputElement::setValueAsDate(double value, ExceptionCode& ec) {
     case DATE:
       success = dateTime.setMillisecondsSinceEpochForDate(value);
       break;
+    case DATETIME:
+      success = dateTime.setMillisecondsSinceEpochForDateTime(value);
+      break;
     case MONTH:
       success = dateTime.setMillisecondsSinceEpochForMonth(value);
       break;
