@@ -34,6 +34,7 @@
 #include <runtime/ObjectPrototype.h>
 #include <runtime/Identifier.h>
 
+using namespace std;
 using namespace JSC;
 
 const JSClassDefinition kJSClassDefinitionEmpty = {0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -131,29 +132,22 @@ static void clearReferenceToPrototype(JSObjectRef prototype) {
 }
 
 PassRefPtr<OpaqueJSClass> OpaqueJSClass::create(
-    const JSClassDefinition* definition) {
-  const JSStaticFunction* staticFunctions = definition->staticFunctions;
-  if (staticFunctions || definition->parentClass) {
-    // copy functions into a prototype class
-    JSClassDefinition protoDefinition = kJSClassDefinitionEmpty;
-    protoDefinition.staticFunctions = staticFunctions;
-    protoDefinition.finalize = clearReferenceToPrototype;
+    const JSClassDefinition* clientDefinition) {
+  JSClassDefinition definition =
+      *clientDefinition;  // Avoid modifying client copy.
 
-    // We are supposed to use JSClassRetain/Release but since we know that we
-    // currently have
-    // the only reference to this class object we cheat and use a RefPtr
-    // instead.
-    RefPtr<OpaqueJSClass> protoClass =
-        adoptRef(new OpaqueJSClass(&protoDefinition, 0));
+  JSClassDefinition protoDefinition = kJSClassDefinitionEmpty;
+  protoDefinition.finalize = clearReferenceToPrototype;
+  swap(definition.staticFunctions,
+       protoDefinition
+           .staticFunctions);  // Move static functions to the prototype.
 
-    // remove functions from the original class
-    JSClassDefinition objectDefinition = *definition;
-    objectDefinition.staticFunctions = 0;
-
-    return adoptRef(new OpaqueJSClass(&objectDefinition, protoClass.get()));
-  }
-
-  return adoptRef(new OpaqueJSClass(definition, 0));
+  // We are supposed to use JSClassRetain/Release but since we know that we
+  // currently have
+  // the only reference to this class object we cheat and use a RefPtr instead.
+  RefPtr<OpaqueJSClass> protoClass =
+      adoptRef(new OpaqueJSClass(&protoDefinition, 0));
+  return adoptRef(new OpaqueJSClass(&definition, protoClass.get()));
 }
 
 OpaqueJSClassContextData::OpaqueJSClassContextData(OpaqueJSClass* jsClass)
