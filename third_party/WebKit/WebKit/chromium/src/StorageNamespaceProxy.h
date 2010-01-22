@@ -28,6 +28,7 @@
 
 #if ENABLE(DOM_STORAGE)
 
+#include "StorageArea.h"
 #include "StorageNamespace.h"
 
 namespace WebKit {
@@ -38,7 +39,7 @@ namespace WebCore {
 
 class StorageNamespaceProxy : public StorageNamespace {
  public:
-  StorageNamespaceProxy(WebKit::WebStorageNamespace* storageNamespace);
+  StorageNamespaceProxy(WebKit::WebStorageNamespace*, StorageType);
   virtual ~StorageNamespaceProxy();
   virtual PassRefPtr<StorageArea> storageArea(PassRefPtr<SecurityOrigin>);
   virtual PassRefPtr<StorageNamespace> copy();
@@ -47,6 +48,7 @@ class StorageNamespaceProxy : public StorageNamespace {
 
  private:
   OwnPtr<WebKit::WebStorageNamespace> m_storageNamespace;
+  StorageType m_storageType;
 };
 
 }  // namespace WebCore

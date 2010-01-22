@@ -46,7 +46,8 @@ PassRefPtr<StorageNamespace> StorageNamespace::localStorageNamespace(
     const String& path,
     unsigned quota) {
   return adoptRef(new StorageNamespaceProxy(
-      WebKit::webKitClient()->createLocalStorageNamespace(path, quota)));
+      WebKit::webKitClient()->createLocalStorageNamespace(path, quota),
+      LocalStorage));
 }
 
 PassRefPtr<StorageNamespace> StorageNamespace::sessionStorageNamespace(
@@ -55,23 +56,26 @@ PassRefPtr<StorageNamespace> StorageNamespace::sessionStorageNamespace(
       static_cast<WebKit::ChromeClientImpl*>(page->chrome()->client());
   WebKit::WebViewClient* webViewClient = chromeClientImpl->webView()->client();
   return adoptRef(new StorageNamespaceProxy(
-      webViewClient->createSessionStorageNamespace()));
+      webViewClient->createSessionStorageNamespace(), SessionStorage));
 }
 
 StorageNamespaceProxy::StorageNamespaceProxy(
-    WebKit::WebStorageNamespace* storageNamespace)
-    : m_storageNamespace(storageNamespace) {}
+    WebKit::WebStorageNamespace* storageNamespace,
+    StorageType storageType)
+    : m_storageNamespace(storageNamespace), m_storageType(storageType) {}
 
 StorageNamespaceProxy::~StorageNamespaceProxy() {}
 
 PassRefPtr<StorageNamespace> StorageNamespaceProxy::copy() {
-  return adoptRef(new StorageNamespaceProxy(m_storageNamespace->copy()));
+  return adoptRef(
+      new StorageNamespaceProxy(m_storageNamespace->copy(), m_storageType));
 }
 
 PassRefPtr<StorageArea> StorageNamespaceProxy::storageArea(
     PassRefPtr<SecurityOrigin> origin) {
   return adoptRef(new StorageAreaProxy(
-      m_storageNamespace->createStorageArea(origin->toString())));
+      m_storageNamespace->createStorageArea(origin->toString()),
+      m_storageType));
 }
 
 void StorageNamespaceProxy::close() {
