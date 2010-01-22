@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2008, 2010 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -32,7 +32,7 @@
 
 namespace WebCore {
 
-SharedBuffer::SharedBuffer(CFDataRef cfData) : m_cfData(cfData) {}
+SharedBuffer::SharedBuffer(CFDataRef cfData) : m_size(0), m_cfData(cfData) {}
 
 // Mac is a CF platform but has an even more efficient version of this method,
 // so only use this version for non-Mac
