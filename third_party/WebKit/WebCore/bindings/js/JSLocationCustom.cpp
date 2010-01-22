@@ -25,6 +25,7 @@
 #include "JSLocationCustom.h"
 
 #include "DOMWindow.h"
+#include "ExceptionCode.h"
 #include "Frame.h"
 #include "FrameLoader.h"
 #include "JSDOMBinding.h"
@@ -257,7 +258,10 @@ void JSLocation::setProtocol(ExecState* exec, JSValue value) {
   ASSERT(frame);
 
   KURL url = frame->loader()->url();
-  url.setProtocol(value.toString(exec));
+  if (!url.setProtocol(value.toString(exec))) {
+    setDOMException(exec, SYNTAX_ERR);
+    return;
+  }
 
   navigateIfAllowed(exec, frame, url,
                     !frame->script()->anyPageIsProcessingUserGesture(), false);
