@@ -29,9 +29,9 @@ QtAbstractWebPopup::QtAbstractWebPopup()
 
 QtAbstractWebPopup::~QtAbstractWebPopup() {}
 
-void QtAbstractWebPopup::popupDidHide(bool acceptSuggestions) {
+void QtAbstractWebPopup::popupDidHide() {
   Q_ASSERT(m_popupClient);
-  m_popupClient->popupDidHide(acceptSuggestions);
+  m_popupClient->popupDidHide();
 }
 
 void QtAbstractWebPopup::valueChanged(int index) {

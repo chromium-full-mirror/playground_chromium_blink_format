@@ -84,7 +84,7 @@ class RenderMenuList : public RenderFlexibleBox, private PopupMenuClient {
   virtual int clientPaddingRight() const;
   virtual int listSize() const;
   virtual int selectedIndex() const;
-  virtual void popupDidHide(bool acceptSuggestions);
+  virtual void popupDidHide();
   virtual bool itemIsSeparator(unsigned listIndex) const;
   virtual bool itemIsLabel(unsigned listIndex) const;
   virtual bool itemIsSelected(unsigned listIndex) const;
@@ -92,7 +92,6 @@ class RenderMenuList : public RenderFlexibleBox, private PopupMenuClient {
   virtual bool valueShouldChangeOnHotTrack() const { return true; }
   virtual bool shouldPopOver() const { return !POPUP_MENU_PULLS_DOWN; }
   virtual void valueChanged(unsigned listIndex, bool fireOnChange = true);
-  virtual void selectionChanged(unsigned, bool) {}
   virtual FontSelector* fontSelector() const;
   virtual HostWindow* hostWindow() const;
   virtual PassRefPtr<Scrollbar> createScrollbar(ScrollbarClient*,
