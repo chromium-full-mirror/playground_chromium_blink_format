@@ -689,9 +689,28 @@ void RenderBox::paintMaskImages(const PaintInfo& paintInfo,
   bool compositedMask = hasLayer() && layer()->hasCompositedMask();
   CompositeOperator compositeOp = CompositeSourceOver;
 
+  bool allMaskImagesLoaded = true;
+
   if (!compositedMask) {
     StyleImage* maskBoxImage = style()->maskBoxImage().image();
-    if (maskBoxImage && style()->maskLayers()->hasImage()) {
+    const FillLayer* maskLayers = style()->maskLayers();
+
+    // Don't render a masked element until all the mask images have loaded, to
+    // prevent a flash of unmasked content.
+    if (maskBoxImage)
+      allMaskImagesLoaded &= maskBoxImage->isLoaded();
+
+    if (maskLayers)
+      allMaskImagesLoaded &= maskLayers->imagesAreLoaded();
+
+    // Before all images have loaded, just use an empty transparency layer as
+    // the mask.
+    if (!allMaskImagesLoaded)
+      pushTransparencyLayer = true;
+
+    if (maskBoxImage && maskLayers->hasImage()) {
+      // We have a mask-box-image and mask-image, so need to composite them
+      // together before using the result as a mask.
       pushTransparencyLayer = true;
     } else {
       // We have to use an extra image buffer to hold the mask. Multiple mask
@@ -706,8 +725,8 @@ void RenderBox::paintMaskImages(const PaintInfo& paintInfo,
       // We have to check that the mask images to be rendered contain at least
       // one image that can be actually used in rendering
       // before pushing the transparency layer.
-      for (const FillLayer* fillLayer = style()->maskLayers()->next();
-           fillLayer; fillLayer = fillLayer->next()) {
+      for (const FillLayer* fillLayer = maskLayers->next(); fillLayer;
+           fillLayer = fillLayer->next()) {
         if (fillLayer->hasImage() &&
             fillLayer->image()->canRender(style()->effectiveZoom())) {
           pushTransparencyLayer = true;
@@ -725,10 +744,12 @@ void RenderBox::paintMaskImages(const PaintInfo& paintInfo,
     }
   }
 
-  paintFillLayers(paintInfo, Color(), style()->maskLayers(), tx, ty, w, h,
-                  compositeOp);
-  paintNinePieceImage(paintInfo.context, tx, ty, w, h, style(),
-                      style()->maskBoxImage(), compositeOp);
+  if (allMaskImagesLoaded) {
+    paintFillLayers(paintInfo, Color(), style()->maskLayers(), tx, ty, w, h,
+                    compositeOp);
+    paintNinePieceImage(paintInfo.context, tx, ty, w, h, style(),
+                        style()->maskBoxImage(), compositeOp);
+  }
 
   if (pushTransparencyLayer)
     paintInfo.context->endTransparencyLayer();

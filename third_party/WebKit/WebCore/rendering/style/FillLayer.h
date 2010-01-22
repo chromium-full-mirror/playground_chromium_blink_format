@@ -153,6 +153,7 @@ struct FillLayer : FastAllocBase {
   bool operator!=(const FillLayer& o) const { return !(*this == o); }
 
   bool containsImage(StyleImage*) const;
+  bool imagesAreLoaded() const;
 
   bool hasImage() const {
     if (m_image)
