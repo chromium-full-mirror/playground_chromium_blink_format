@@ -76,7 +76,11 @@
   ((sizeof(a) / sizeof(*(a))) / \
    static_cast<size_t>(!(sizeof(a) % sizeof(*(a)))))
 
+class NPObject;
+
 namespace WebCore {
+
+class Widget;
 
 // An interface to the embedding layer, which has the ability to answer
 // questions about the system and so on...
@@ -101,6 +105,8 @@ class PlatformBridge {
   static void setCookies(const KURL&, const String& value);
   static String cookies(const KURL&);
   static bool cookiesEnabled();
+  // Plugin
+  static NPObject* pluginScriptableObject(Widget*);
 };
 }
 #endif  // PlatformBridge_h
