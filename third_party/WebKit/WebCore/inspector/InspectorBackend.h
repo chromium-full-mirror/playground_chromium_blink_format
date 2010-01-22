@@ -111,6 +111,14 @@ class InspectorBackend : public RefCounted<InspectorBackend> {
                                 const String& methodName,
                                 const String& arguments,
                                 bool async);
+  // FIXME(32554): Temporarily we have two similar methods so that clients can
+  // compile against both signatures.
+  // The method above will be removed soon.
+  void dispatchOnInjectedScript(long,
+                                long,
+                                const String&,
+                                const String&,
+                                bool) {}
   void getChildNodes(long callId, long nodeId);
   void setAttribute(long callId,
                     long elementId,
