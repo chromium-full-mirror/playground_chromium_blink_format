@@ -63,6 +63,8 @@ static pthread_t mainThread;  // The thread that was the first to call
                               // thread.
 #endif
 
+void clearPthreadHandleForIdentifier(ThreadIdentifier);
+
 static Mutex& threadMapMutex() {
   DEFINE_STATIC_LOCAL(Mutex, mutex, ());
   return mutex;
