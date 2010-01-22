@@ -106,14 +106,14 @@ class ScrollView::ScrollViewPrivate : public wxEvtHandler {
         pos.y -= cScrollbarPixelsPerLineStep;
     } else if (scrollType == wxEVT_SCROLLWIN_PAGEUP) {
       if (horiz)
-        pos.x -= m_scrollView->visibleWidth() - cAmountToKeepWhenPaging;
+        pos.x -= m_scrollView->visibleWidth() * cFractionToStepWhenPaging;
       else
-        pos.y -= m_scrollView->visibleHeight() - cAmountToKeepWhenPaging;
+        pos.y -= m_scrollView->visibleHeight() * cFractionToStepWhenPaging;
     } else if (scrollType == wxEVT_SCROLLWIN_PAGEDOWN) {
       if (horiz)
-        pos.x += m_scrollView->visibleWidth() - cAmountToKeepWhenPaging;
+        pos.x += m_scrollView->visibleWidth() * cFractionToStepWhenPaging;
       else
-        pos.y += m_scrollView->visibleHeight() - cAmountToKeepWhenPaging;
+        pos.y += m_scrollView->visibleHeight() * cFractionToStepWhenPaging;
     } else
       return e.Skip();
 
