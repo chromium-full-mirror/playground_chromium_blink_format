@@ -51,7 +51,7 @@
 #include <qwebelement.h>
 #include <qwebframe.h>
 #include <qwebinspector.h>
-#include <qwebpage.h>
+#include "webpage.h"
 #include <qwebsettings.h>
 #include <qwebview.h>
 
@@ -91,58 +91,11 @@ class WebView : public QWebView {
   }
 
   virtual void mousePressEvent(QMouseEvent* event) {
-    mouseButtons = event->buttons();
-    keyboardModifiers = event->modifiers();
+    setProperty("mouseButtons", QVariant::fromValue(int(event->buttons())));
+    setProperty("keyboardModifiers",
+                QVariant::fromValue(int(event->modifiers())));
 
     QWebView::mousePressEvent(event);
-  }
-
- public slots:
-  void openUrlInDefaultBrowser(const QUrl& url = QUrl()) {
-    if (QAction* action = qobject_cast<QAction*>(sender()))
-      QDesktopServices::openUrl(action->data().toUrl());
-    else
-      QDesktopServices::openUrl(url);
-  }
-
- public:
-  Qt::MouseButtons mouseButtons;
-  Qt::KeyboardModifiers keyboardModifiers;
-};
-
-class WebPage : public QWebPage {
- public:
-  WebPage(QWidget* parent) : QWebPage(parent) {}
-
-  virtual QWebPage* createWindow(QWebPage::WebWindowType);
-  virtual QObject* createPlugin(const QString&,
-                                const QUrl&,
-                                const QStringList&,
-                                const QStringList&);
-  virtual bool supportsExtension(QWebPage::Extension extension) const {
-    if (extension == QWebPage::ErrorPageExtension)
-      return true;
-    return false;
-  }
-  virtual bool extension(Extension extension,
-                         const ExtensionOption* option,
-                         ExtensionReturn* output);
-
-  virtual bool acceptNavigationRequest(QWebFrame* frame,
-                                       const QNetworkRequest& request,
-                                       NavigationType type) {
-    WebView* webView = static_cast<WebView*>(view());
-    if (webView->keyboardModifiers & Qt::ShiftModifier) {
-      QWebPage* page = createWindow(QWebPage::WebBrowserWindow);
-      page->mainFrame()->load(request);
-      return false;
-    }
-    if (webView->keyboardModifiers & Qt::AltModifier) {
-      webView->openUrlInDefaultBrowser(request.url());
-      return false;
-    }
-
-    return QWebPage::acceptNavigationRequest(frame, request, type);
   }
 };
 
@@ -623,23 +576,6 @@ class MainWindow : public QMainWindow {
   bool touchMocking;
 #endif
 };
-
-bool WebPage::extension(Extension extension,
-                        const ExtensionOption* option,
-                        ExtensionReturn* output) {
-  const QWebPage::ErrorPageExtensionOption* info =
-      static_cast<const QWebPage::ErrorPageExtensionOption*>(option);
-  QWebPage::ErrorPageExtensionReturn* errorPage =
-      static_cast<QWebPage::ErrorPageExtensionReturn*>(output);
-
-  errorPage->content = QString(
-                           "<html><head><title>Failed loading "
-                           "page</title></head><body>%1</body></html>")
-                           .arg(info->errorString)
-                           .toUtf8();
-
-  return true;
-}
 
 QWebPage* WebPage::createWindow(QWebPage::WebWindowType) {
   MainWindow* mw = new MainWindow;
