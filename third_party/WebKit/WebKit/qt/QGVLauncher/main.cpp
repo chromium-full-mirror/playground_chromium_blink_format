@@ -262,7 +262,7 @@ class MainWindow : public QMainWindow {
 
     QState* s2 = new QState(machine);
     s2->assignProperty(scene->webView(), "yRotation", -90);
-    s1->addTransition(s1, SIGNAL(polished()), s2);
+    s1->addTransition(s1, SIGNAL(propertiesAssigned()), s2);
 
     QAbstractTransition* t2 = s2->addTransition(s0);
     t2->addAnimation(yRotationAnim);
