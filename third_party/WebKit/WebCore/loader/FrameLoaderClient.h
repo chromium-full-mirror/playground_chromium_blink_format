@@ -338,6 +338,9 @@ class FrameLoaderClient {
   virtual bool allowJavaScript(bool enabledPerSettings) {
     return enabledPerSettings;
   }
+  virtual bool allowPlugins(bool enabledPerSettings) {
+    return enabledPerSettings;
+  }
 };
 
 }  // namespace WebCore

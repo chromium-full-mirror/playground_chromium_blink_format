@@ -251,6 +251,7 @@ class FrameLoaderClientImpl : public WebCore::FrameLoaderClient {
   virtual void registerForIconNotification(bool listen = true);
   virtual void didChangeScrollOffset();
   virtual bool allowJavaScript(bool enabledPerSettings);
+  virtual bool allowPlugins(bool enabledPerSettings);
 
  private:
   void makeDocumentView();
