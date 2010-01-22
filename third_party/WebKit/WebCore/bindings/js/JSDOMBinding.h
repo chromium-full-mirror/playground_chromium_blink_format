@@ -25,6 +25,7 @@
 #define JSDOMBinding_h
 
 #include "JSDOMGlobalObject.h"
+#include "JSSVGContextCache.h"
 #include "Document.h"
 #include <runtime/Completion.h>
 #include <runtime/Lookup.h>
@@ -354,12 +355,11 @@ inline DOMObject* createDOMObjectWrapper(JSC::ExecState* exec,
                                          JSDOMGlobalObject* globalObject,
                                          DOMClass* object,
                                          SVGElement* context) {
-  ASSERT(object);
-  ASSERT(!getCachedDOMObjectWrapper(exec, object));
-  WrapperClass* wrapper =
-      new (exec) WrapperClass(getDOMStructure<WrapperClass>(exec, globalObject),
-                              globalObject, object, context);
-  cacheDOMObjectWrapper(exec, object, wrapper);
+  DOMObject* wrapper = createDOMObjectWrapper<WrapperClass, DOMClass>(
+      exec, globalObject, object);
+  ASSERT(wrapper);
+  if (context)
+    JSSVGContextCache::addWrapper(wrapper, context);
   return wrapper;
 }
 template <class WrapperClass, class DOMClass>
@@ -369,10 +369,12 @@ inline JSC::JSValue getDOMObjectWrapper(JSC::ExecState* exec,
                                         SVGElement* context) {
   if (!object)
     return JSC::jsNull();
-  if (DOMObject* wrapper = getCachedDOMObjectWrapper(exec, object))
+  if (DOMObject* wrapper = getCachedDOMObjectWrapper(exec, object)) {
+    ASSERT(JSSVGContextCache::svgContextForDOMObject(wrapper) == context);
     return wrapper;
-  return createDOMObjectWrapper<WrapperClass>(exec, globalObject, object,
-                                              context);
+  }
+  return createDOMObjectWrapper<WrapperClass, DOMClass>(exec, globalObject,
+                                                        object, context);
 }
 #endif
 

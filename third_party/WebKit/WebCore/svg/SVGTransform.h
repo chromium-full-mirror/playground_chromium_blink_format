@@ -54,7 +54,6 @@ class SVGTransform {
   float angle() const;
   FloatPoint rotationCenter() const;
 
-  //        void setMatrix(const TransformationMatrix&);
   void setMatrix(TransformationMatrix);
 
   void setTranslate(float tx, float ty);
@@ -68,12 +67,6 @@ class SVGTransform {
   FloatSize scale() const;
 
   bool isValid();
-
-  // Throughout SVG 1.1 'SVGTransform' is only used for the 'transform'
-  // attribute
-  const QualifiedName& associatedAttributeName() const {
-    return SVGNames::transformAttr;
-  }
 
  private:
   SVGTransformType m_type;
@@ -95,5 +88,3 @@ inline bool operator!=(const SVGTransform& a, const SVGTransform& b) {
 
 #endif  // ENABLE(SVG)
 #endif
-
-// vim:ts=4:noet

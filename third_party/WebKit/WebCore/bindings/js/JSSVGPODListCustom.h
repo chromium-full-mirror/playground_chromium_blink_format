@@ -22,6 +22,7 @@
 #ifndef JSSVGPODListCustom_h
 #define JSSVGPODListCustom_h
 
+#include "JSSVGContextCache.h"
 #include "JSSVGPODTypeWrapper.h"
 #include "SVGList.h"
 
@@ -38,61 +39,68 @@ struct JSSVGPODListTraits {
   typedef PODType (*ConversionCallback)(JSC::JSValue);
 };
 
-template <typename PODType>
+template <typename JSPODListType, typename PODType>
 static JSC::JSValue finishGetter(
     JSC::ExecState* exec,
     ExceptionCode& ec,
-    SVGElement* context,
-    typename JSSVGPODListTraits<PODType>::PODList* list,
+    JSPODListType* wrapper,
     PassRefPtr<typename JSSVGPODListTraits<PODType>::PODListItem> item) {
   if (ec) {
     setDOMException(exec, ec);
     return JSC::jsUndefined();
   }
 
-  return toJS(exec, deprecatedGlobalObjectForPrototype(exec),
+  typename JSSVGPODListTraits<PODType>::PODList* listImp = wrapper->impl();
+
+  SVGElement* context = JSSVGContextCache::svgContextForDOMObject(wrapper);
+  return toJS(exec, wrapper->globalObject(),
               JSSVGPODTypeWrapperCreatorForList<PODType>::create(
-                  item.get(), list->associatedAttributeName())
+                  item.get(), listImp->associatedAttributeName())
                   .get(),
               context);
 }
 
-template <typename PODType>
+template <typename JSPODListType, typename PODType>
 static JSC::JSValue finishSetter(
     JSC::ExecState* exec,
     ExceptionCode& ec,
-    SVGElement* context,
-    typename JSSVGPODListTraits<PODType>::PODList* list,
+    JSPODListType* wrapper,
     PassRefPtr<typename JSSVGPODListTraits<PODType>::PODListItem> item) {
   if (ec) {
     setDOMException(exec, ec);
     return JSC::jsUndefined();
   }
 
-  const QualifiedName& attributeName = list->associatedAttributeName();
-  context->svgAttributeChanged(attributeName);
+  typename JSSVGPODListTraits<PODType>::PODList* listImp = wrapper->impl();
 
-  return toJS(exec, deprecatedGlobalObjectForPrototype(exec),
+  const QualifiedName& attributeName = listImp->associatedAttributeName();
+  JSSVGContextCache::propagateSVGDOMChange(wrapper, attributeName);
+
+  SVGElement* context = JSSVGContextCache::svgContextForDOMObject(wrapper);
+  return toJS(exec, wrapper->globalObject(),
               JSSVGPODTypeWrapperCreatorForList<PODType>::create(item.get(),
                                                                  attributeName)
                   .get(),
               context);
 }
 
-template <typename PODType>
+template <typename JSPODListType, typename PODType>
 static JSC::JSValue finishSetterReadOnlyResult(
     JSC::ExecState* exec,
     ExceptionCode& ec,
-    SVGElement* context,
-    typename JSSVGPODListTraits<PODType>::PODList* list,
+    JSPODListType* wrapper,
     PassRefPtr<typename JSSVGPODListTraits<PODType>::PODListItem> item) {
   if (ec) {
     setDOMException(exec, ec);
     return JSC::jsUndefined();
   }
-  context->svgAttributeChanged(list->associatedAttributeName());
-  return toJS(exec, deprecatedGlobalObjectForPrototype(exec),
-              JSSVGStaticPODTypeWrapper<PODType>::create(*item).get(), context);
+
+  typename JSSVGPODListTraits<PODType>::PODList* listImp = wrapper->impl();
+  JSSVGContextCache::propagateSVGDOMChange(wrapper,
+                                           listImp->associatedAttributeName());
+  return toJS(exec, wrapper->globalObject(),
+              JSSVGStaticPODTypeWrapper<PODType>::create(*item).get(),
+              0 /* no context on purpose */);
 }
 
 template <typename JSPODListType, typename PODType>
@@ -108,7 +116,8 @@ static JSC::JSValue clear(
   if (ec)
     setDOMException(exec, ec);
   else
-    wrapper->context()->svgAttributeChanged(listImp->associatedAttributeName());
+    JSSVGContextCache::propagateSVGDOMChange(
+        wrapper, listImp->associatedAttributeName());
 
   return JSC::jsUndefined();
 }
@@ -121,8 +130,8 @@ static JSC::JSValue initialize(
     typename JSSVGPODListTraits<PODType>::ConversionCallback conversion) {
   ExceptionCode ec = 0;
   typename JSSVGPODListTraits<PODType>::PODList* listImp = wrapper->impl();
-  return finishSetter<PODType>(
-      exec, ec, wrapper->context(), listImp,
+  return finishSetter<JSPODListType, PODType>(
+      exec, ec, wrapper,
       listImp->initialize(JSSVGPODListTraits<PODType>::PODListItem::copy(
                               conversion(args.at(0))),
                           ec));
@@ -143,8 +152,8 @@ static JSC::JSValue getItem(
 
   ExceptionCode ec = 0;
   typename JSSVGPODListTraits<PODType>::PODList* listImp = wrapper->impl();
-  return finishGetter<PODType>(exec, ec, wrapper->context(), listImp,
-                               listImp->getItem(index, ec));
+  return finishGetter<JSPODListType, PODType>(exec, ec, wrapper,
+                                              listImp->getItem(index, ec));
 }
 
 template <typename JSPODListType, typename PODType>
@@ -162,8 +171,8 @@ static JSC::JSValue insertItemBefore(
 
   ExceptionCode ec = 0;
   typename JSSVGPODListTraits<PODType>::PODList* listImp = wrapper->impl();
-  return finishSetter<PODType>(
-      exec, ec, wrapper->context(), listImp,
+  return finishSetter<JSPODListType, PODType>(
+      exec, ec, wrapper,
       listImp->insertItemBefore(JSSVGPODListTraits<PODType>::PODListItem::copy(
                                     conversion(args.at(0))),
                                 index, ec));
@@ -184,8 +193,8 @@ static JSC::JSValue replaceItem(
 
   ExceptionCode ec = 0;
   typename JSSVGPODListTraits<PODType>::PODList* listImp = wrapper->impl();
-  return finishSetter<PODType>(
-      exec, ec, wrapper->context(), listImp,
+  return finishSetter<JSPODListType, PODType>(
+      exec, ec, wrapper,
       listImp->replaceItem(JSSVGPODListTraits<PODType>::PODListItem::copy(
                                conversion(args.at(0))),
                            index, ec));
@@ -206,8 +215,8 @@ static JSC::JSValue removeItem(
 
   ExceptionCode ec = 0;
   typename JSSVGPODListTraits<PODType>::PODList* listImp = wrapper->impl();
-  return finishSetterReadOnlyResult<PODType>(
-      exec, ec, wrapper->context(), listImp, listImp->removeItem(index, ec));
+  return finishSetterReadOnlyResult<JSPODListType, PODType>(
+      exec, ec, wrapper, listImp->removeItem(index, ec));
 }
 
 template <typename JSPODListType, typename PODType>
@@ -218,8 +227,8 @@ static JSC::JSValue appendItem(
     typename JSSVGPODListTraits<PODType>::ConversionCallback conversion) {
   ExceptionCode ec = 0;
   typename JSSVGPODListTraits<PODType>::PODList* listImp = wrapper->impl();
-  return finishSetter<PODType>(
-      exec, ec, wrapper->context(), listImp,
+  return finishSetter<JSPODListType, PODType>(
+      exec, ec, wrapper,
       listImp->appendItem(JSSVGPODListTraits<PODType>::PODListItem::copy(
                               conversion(args.at(0))),
                           ec));

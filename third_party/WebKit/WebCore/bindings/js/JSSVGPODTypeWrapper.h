@@ -28,10 +28,13 @@
 #define JSSVGPODTypeWrapper_h
 
 #if ENABLE(SVG)
+#include "JSSVGContextCache.h"
 #include "SVGElement.h"
 #include <wtf/StdLibExtras.h>
 
 namespace WebCore {
+
+class DOMObject;
 
 template <typename PODType>
 class JSSVGPODTypeWrapper : public RefCounted<JSSVGPODTypeWrapper<PODType>> {
@@ -39,7 +42,7 @@ class JSSVGPODTypeWrapper : public RefCounted<JSSVGPODTypeWrapper<PODType>> {
   virtual ~JSSVGPODTypeWrapper() {}
 
   virtual operator PODType() = 0;
-  virtual void commitChange(PODType, SVGElement*) = 0;
+  virtual void commitChange(PODType, DOMObject*) = 0;
 };
 
 // This file contains JS wrapper objects for SVG datatypes, that are passed
@@ -104,11 +107,10 @@ class JSSVGDynamicPODTypeWrapper : public JSSVGPODTypeWrapper<PODType> {
 
   virtual operator PODType() { return (m_creator.get()->*m_getter)(); }
 
-  virtual void commitChange(PODType type, SVGElement* context) {
+  virtual void commitChange(PODType type, DOMObject* wrapper) {
     (m_creator.get()->*m_setter)(type);
-
-    if (context)
-      context->svgAttributeChanged(m_creator->associatedAttributeName());
+    JSSVGContextCache::propagateSVGDOMChange(
+        wrapper, m_creator->associatedAttributeName());
   }
 
  private:
@@ -145,7 +147,7 @@ class JSSVGStaticPODTypeWrapper : public JSSVGPODTypeWrapper<PODType> {
 
   virtual operator PODType() { return m_podType; }
 
-  virtual void commitChange(PODType type, SVGElement*) { m_podType = type; }
+  virtual void commitChange(PODType type, DOMObject*) { m_podType = type; }
 
  protected:
   JSSVGStaticPODTypeWrapper(PODType type) : m_podType(type) {}
@@ -166,9 +168,9 @@ class JSSVGStaticPODTypeWrapperWithPODTypeParent
         new JSSVGStaticPODTypeWrapperWithPODTypeParent(type, parent));
   }
 
-  virtual void commitChange(PODType type, SVGElement* context) {
-    JSSVGStaticPODTypeWrapper<PODType>::commitChange(type, context);
-    m_parentType->commitChange(ParentTypeArg(type), context);
+  virtual void commitChange(PODType type, DOMObject* wrapper) {
+    JSSVGStaticPODTypeWrapper<PODType>::commitChange(type, wrapper);
+    m_parentType->commitChange(ParentTypeArg(type), wrapper);
   }
 
  private:
@@ -202,7 +204,7 @@ class JSSVGStaticPODTypeWrapperWithParent
 
   virtual operator PODType() { return (m_parent.get()->*m_getter)(); }
 
-  virtual void commitChange(PODType type, SVGElement*) {
+  virtual void commitChange(PODType type, DOMObject*) {
     (m_parent.get()->*m_setter)(type);
   }
 
@@ -245,14 +247,13 @@ class JSSVGPODTypeWrapperCreatorForList : public JSSVGPODTypeWrapper<PODType> {
 
   virtual operator PODType() { return (m_creator.get()->*m_getter)(); }
 
-  virtual void commitChange(PODType type, SVGElement* context) {
+  virtual void commitChange(PODType type, DOMObject* wrapper) {
     if (!m_setter)
       return;
 
     (m_creator.get()->*m_setter)(type);
-
-    if (context)
-      context->svgAttributeChanged(m_associatedAttributeName);
+    JSSVGContextCache::propagateSVGDOMChange(wrapper,
+                                             m_associatedAttributeName);
   }
 
  private:

@@ -95,10 +95,6 @@ class SVGPreserveAspectRatio {
 
   String valueAsString() const;
 
-  const QualifiedName& associatedAttributeName() const {
-    return SVGNames::preserveAspectRatioAttr;
-  }
-
  private:
   unsigned short m_align;
   unsigned short m_meetOrSlice;
