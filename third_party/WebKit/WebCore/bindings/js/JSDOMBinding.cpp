@@ -92,24 +92,19 @@ inline JSWrapperCache* Document::getWrapperCache(DOMWrapperWorld* world) {
   return createWrapperCache(world);
 }
 
-// For debugging, keep a set of wrappers currently registered, and check that
-// all are unregistered before they are destroyed. This has helped us fix at
-// least one bug.
+// For debugging, keep a set of wrappers currently cached, and check that
+// all are uncached before they are destroyed. This helps us catch bugs like:
+//     - wrappers being deleted without being removed from the cache
+//     - wrappers being cached twice
 
-static void addWrapper(DOMObject* wrapper);
-static void removeWrapper(DOMObject* wrapper);
-static void removeWrappers(const JSWrapperCache& wrappers);
-static void removeWrappers(const DOMObjectWrapperMap& wrappers);
+static void willCacheWrapper(DOMObject* wrapper);
+static void didUncacheWrapper(DOMObject* wrapper);
 
 #ifdef NDEBUG
 
-static inline void addWrapper(DOMObject*) {}
+static inline void willCacheWrapper(DOMObject*) {}
 
-static inline void removeWrapper(DOMObject*) {}
-
-static inline void removeWrappers(const JSWrapperCache&) {}
-
-static inline void removeWrappers(const DOMObjectWrapperMap&) {}
+static inline void didUncacheWrapper(DOMObject*) {}
 
 #else
 
@@ -124,30 +119,16 @@ static HashSet<DOMObject*>& wrapperSet() {
 #endif
 }
 
-static void addWrapper(DOMObject* wrapper) {
+static void willCacheWrapper(DOMObject* wrapper) {
   ASSERT(!wrapperSet().contains(wrapper));
   wrapperSet().add(wrapper);
 }
 
-static void removeWrapper(DOMObject* wrapper) {
+static void didUncacheWrapper(DOMObject* wrapper) {
   if (!wrapper)
     return;
   ASSERT(wrapperSet().contains(wrapper));
   wrapperSet().remove(wrapper);
-}
-
-static void removeWrappers(const JSWrapperCache& wrappers) {
-  JSWrapperCache::const_iterator wrappersEnd = wrappers.uncheckedEnd();
-  for (JSWrapperCache::const_iterator it = wrappers.uncheckedBegin();
-       it != wrappersEnd; ++it)
-    removeWrapper(it->second);
-}
-
-static inline void removeWrappers(const DOMObjectWrapperMap& wrappers) {
-  DOMObjectWrapperMap::const_iterator wrappersEnd = wrappers.uncheckedEnd();
-  for (DOMObjectWrapperMap::const_iterator it = wrappers.uncheckedBegin();
-       it != wrappersEnd; ++it)
-    removeWrapper(it->second);
 }
 
 DOMObject::~DOMObject() {
@@ -163,8 +144,6 @@ DOMWrapperWorld::~DOMWrapperWorld() {
   JSGlobalData::ClientData* clientData = m_globalData->clientData;
   ASSERT(clientData);
   static_cast<WebCoreJSClientData*>(clientData)->forgetWorld(this);
-
-  removeWrappers(m_wrappers);
 
   for (HashSet<Document*>::iterator iter = documentsWithWrappers.begin();
        iter != documentsWithWrappers.end(); ++iter)
@@ -257,7 +236,7 @@ DOMObject* getCachedDOMObjectWrapper(JSC::ExecState* exec, void* objectHandle) {
 void cacheDOMObjectWrapper(JSC::ExecState* exec,
                            void* objectHandle,
                            DOMObject* wrapper) {
-  addWrapper(wrapper);
+  willCacheWrapper(wrapper);
   DOMObjectWrapperMapFor(exec).set(objectHandle, wrapper);
 }
 
@@ -292,16 +271,19 @@ void forgetDOMObject(DOMObject* wrapper, void* objectHandle) {
   DOMObjectWrapperMap& wrappers =
       static_cast<WebCoreJSClientData*>(clientData)->normalWorld()->m_wrappers;
   if (wrappers.uncheckedRemove(objectHandle, wrapper)) {
-    removeWrapper(wrapper);
+    didUncacheWrapper(wrapper);
     return;
   }
 
+  // We can't guarantee that an wrapper is in the cache when it uncaches itself,
+  // since a new wrapper may have been allocated before the object's destrcutor
+  // ran.
   for (JSGlobalDataWorldIterator worldIter(globalData); worldIter;
        ++worldIter) {
     if (worldIter->m_wrappers.uncheckedRemove(objectHandle, wrapper))
       break;
   }
-  removeWrapper(wrapper);
+  didUncacheWrapper(wrapper);
 }
 
 void forgetDOMNode(JSNode* wrapper, Node* node, Document* document) {
@@ -310,13 +292,16 @@ void forgetDOMNode(JSNode* wrapper, Node* node, Document* document) {
     return;
   }
 
+  // We can't guarantee that an wrapper is in the cache when it uncaches itself,
+  // since a new wrapper may have been allocated before the object's destrcutor
+  // ran.
   JSWrapperCacheMap& wrapperCacheMap = document->wrapperCacheMap();
   for (JSWrapperCacheMap::iterator wrappersIter = wrapperCacheMap.begin();
        wrappersIter != wrapperCacheMap.end(); ++wrappersIter) {
     if (wrappersIter->second->uncheckedRemove(node, wrapper))
       break;
   }
-  removeWrapper(wrapper);
+  didUncacheWrapper(wrapper);
 }
 
 void cacheDOMNodeWrapper(JSC::ExecState* exec,
@@ -324,11 +309,11 @@ void cacheDOMNodeWrapper(JSC::ExecState* exec,
                          Node* node,
                          JSNode* wrapper) {
   if (!document) {
-    addWrapper(wrapper);
+    willCacheWrapper(wrapper);
     DOMObjectWrapperMapFor(exec).set(node, wrapper);
     return;
   }
-  addWrapper(wrapper);
+  willCacheWrapper(wrapper);
   document->getWrapperCache(currentWorld(exec))->set(node, wrapper);
 }
 
@@ -339,9 +324,7 @@ void forgetAllDOMNodesForDocument(Document* document) {
   for (JSWrapperCacheMap::const_iterator wrappersMapIter =
            wrapperCacheMap.begin();
        wrappersMapIter != wrappersMapEnd; ++wrappersMapIter) {
-    JSWrapperCache* wrappers = wrappersMapIter->second;
-    removeWrappers(*wrappers);
-    delete wrappers;
+    delete wrappersMapIter->second;
     wrappersMapIter->first->forgetDocument(document);
   }
 }
@@ -351,7 +334,6 @@ void forgetWorldOfDOMNodesForDocument(Document* document,
   JSWrapperCache* wrappers = document->wrapperCacheMap().take(world);
   ASSERT(wrappers);  // 'world' should only know about 'document' if 'document'
                      // knows about 'world'!
-  removeWrappers(*wrappers);
   delete wrappers;
 }
 
@@ -499,7 +481,7 @@ static inline void takeWrappers(Node* node,
     for (JSWrapperCacheMap::iterator iter = wrapperCacheMap.begin();
          iter != wrapperCacheMap.end(); ++iter) {
       if (JSNode* wrapper = iter->second->take(node)) {
-        removeWrapper(wrapper);
+        didUncacheWrapper(wrapper);
         wrapperSet.append(WrapperAndWorld(wrapper, iter->first));
       }
     }
@@ -509,7 +491,7 @@ static inline void takeWrappers(Node* node,
       DOMWrapperWorld* world = *worldIter;
       if (JSNode* wrapper =
               static_cast<JSNode*>(world->m_wrappers.take(node))) {
-        removeWrapper(wrapper);
+        didUncacheWrapper(wrapper);
         wrapperSet.append(WrapperAndWorld(wrapper, world));
       }
     }
@@ -526,11 +508,11 @@ void updateDOMNodeDocument(Node* node,
 
   for (unsigned i = 0; i < wrapperSet.size(); ++i) {
     JSNode* wrapper = wrapperSet[i].first;
+    willCacheWrapper(wrapper);
     if (newDocument)
       newDocument->getWrapperCache(wrapperSet[i].second)->set(node, wrapper);
     else
       wrapperSet[i].second->m_wrappers.set(node, wrapper);
-    addWrapper(wrapper);
   }
 }
 
