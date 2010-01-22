@@ -31,6 +31,10 @@ class QTouchEvent;
 QT_END_NAMESPACE
 #endif
 
+#if PLATFORM(ANDROID)
+#include "IntPoint.h"
+#endif
+
 namespace WebCore {
 
 enum TouchEventType { TouchStart, TouchMove, TouchEnd, TouchCancel };
@@ -45,6 +49,10 @@ class PlatformTouchEvent {
         m_metaKey(false) {}
 #if PLATFORM(QT)
   PlatformTouchEvent(QTouchEvent*);
+#elif PLATFORM(ANDROID)
+  PlatformTouchEvent(const IntPoint& absolutePagePos,
+                     TouchEventType,
+                     PlatformTouchPoint::State);
 #endif
 
   TouchEventType type() const { return m_type; }
