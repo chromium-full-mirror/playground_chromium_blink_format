@@ -108,14 +108,14 @@ class WebNode {
   template <typename T>
   T toElement() {
     T res;
-    res.m_private = m_private;
+    res.WebNode::assign(*this);
     return res;
   }
 
   template <typename T>
   const T toConstElement() const {
     T res;
-    res.m_private = m_private;
+    res.WebNode::assign(*this);
     return res;
   }
 
