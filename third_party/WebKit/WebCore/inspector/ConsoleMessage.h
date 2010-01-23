@@ -74,7 +74,8 @@ class ConsoleMessage : public Noncopyable {
   MessageLevel m_level;
   String m_message;
 #if ENABLE(INSPECTOR)
-  Vector<ScriptValue> m_wrappedArguments;
+  Vector<ScriptValue> m_arguments;
+  ScriptState* m_scriptState;
 #endif
   Vector<ScriptString> m_frames;
   unsigned m_line;
