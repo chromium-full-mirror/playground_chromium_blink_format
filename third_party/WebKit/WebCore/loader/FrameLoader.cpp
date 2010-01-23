@@ -3188,6 +3188,9 @@ CachePolicy FrameLoader::subresourceCachePolicy() const {
   if (m_loadType == FrameLoadTypeReload)
     return CachePolicyRevalidate;
 
+  if (request.cachePolicy() == ReturnCacheDataElseLoad)
+    return CachePolicyAllowStale;
+
   return CachePolicyVerify;
 }
 
@@ -3508,7 +3511,9 @@ void FrameLoader::addExtraFieldsToRequest(ResourceRequest& request,
     request.setCachePolicy(ReloadIgnoringCacheData);
     request.setHTTPHeaderField("Cache-Control", "no-cache");
     request.setHTTPHeaderField("Pragma", "no-cache");
-  }
+  } else if (isBackForwardLoadType(loadType) &&
+             !request.url().protocolIs("https"))
+    request.setCachePolicy(ReturnCacheDataElseLoad);
 
   if (mainResource)
     request.setHTTPAccept(defaultAcceptHeader);
