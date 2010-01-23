@@ -332,6 +332,10 @@ class RenderObject : public CachedResourceClient {
   bool cellWidthChanged() const { return m_cellWidthChanged; }
   void setCellWidthChanged(bool b = true) { m_cellWidthChanged = b; }
 
+#if ENABLE(MATHML)
+  virtual bool isRenderMathMLBlock() const { return false; }
+#endif  // ENABLE(MATHML)
+
 #if ENABLE(SVG)
   // FIXME: Until all SVG renders can be subclasses of RenderSVGModelObject we
   // have

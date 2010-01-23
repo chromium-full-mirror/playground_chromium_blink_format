@@ -30,7 +30,7 @@
 #include "MathMLInlineContainerElement.h"
 
 #include "MathMLNames.h"
-#include "RenderObject.h"
+#include "RenderMathMLBlock.h"
 
 namespace WebCore {
 
@@ -47,11 +47,13 @@ PassRefPtr<MathMLInlineContainerElement> MathMLInlineContainerElement::create(
   return new MathMLInlineContainerElement(tagName, document);
 }
 
-RenderObject* MathMLInlineContainerElement::createRenderer(RenderArena*,
+RenderObject* MathMLInlineContainerElement::createRenderer(RenderArena* arena,
                                                            RenderStyle* style) {
   // FIXME: This method will contain the specialized renderers based on element
   // name
-  return RenderObject::createObject(this, style);
+  RenderObject* object = new (arena) RenderMathMLBlock(this);
+  object->setStyle(style);
+  return object;
 }
 }
 
