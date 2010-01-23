@@ -153,6 +153,10 @@ class WebViewImpl : public WebView, public RefCounted<WebViewImpl> {
   virtual void setScrollbarColors(unsigned inactiveColor,
                                   unsigned activeColor,
                                   unsigned trackColor);
+  virtual void setSelectionColors(unsigned activeBackgroundColor,
+                                  unsigned activeForegroundColor,
+                                  unsigned inactiveBackgroundColor,
+                                  unsigned inactiveForegroundColor);
   virtual void performCustomContextMenuAction(unsigned action);
 
   // WebViewImpl
