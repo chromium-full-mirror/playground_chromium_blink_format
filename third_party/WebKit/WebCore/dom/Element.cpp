@@ -519,8 +519,11 @@ void Element::setAttribute(const AtomicString& name,
 
 #if ENABLE(INSPECTOR)
   if (Page* page = document()->page()) {
-    if (InspectorController* inspectorController = page->inspectorController())
-      inspectorController->didModifyDOMAttr(this);
+    if (InspectorController* inspectorController =
+            page->inspectorController()) {
+      if (!m_synchronizingStyleAttribute)
+        inspectorController->didModifyDOMAttr(this);
+    }
   }
 #endif
 }
@@ -547,8 +550,11 @@ void Element::setAttribute(const QualifiedName& name,
 
 #if ENABLE(INSPECTOR)
   if (Page* page = document()->page()) {
-    if (InspectorController* inspectorController = page->inspectorController())
-      inspectorController->didModifyDOMAttr(this);
+    if (InspectorController* inspectorController =
+            page->inspectorController()) {
+      if (!m_synchronizingStyleAttribute)
+        inspectorController->didModifyDOMAttr(this);
+    }
   }
 #endif
 }
