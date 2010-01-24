@@ -264,12 +264,15 @@ class GraphicsLayerCA : public GraphicsLayer {
   CALayer* fetchCloneLayers(GraphicsLayer* replicaRoot,
                             ReplicaState&,
                             CloneLevel);
+
+  CALayer* cloneLayer(CALayer*, CloneLevel);
+  CALayer* findOrMakeClone(CloneID, CALayer*, LayerMap*, CloneLevel);
+
   void ensureCloneLayers(CloneID index,
                          CALayer*& primaryLayer,
                          CALayer*& structuralLayer,
                          CALayer*& contentsLayer,
                          CloneLevel);
-  CALayer* cloneLayer(CALayer*, CloneLevel);
 
   bool hasCloneLayers() const { return m_layerClones; }
   void removeCloneLayers();
