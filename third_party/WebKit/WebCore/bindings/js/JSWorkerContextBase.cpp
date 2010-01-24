@@ -42,7 +42,8 @@ namespace WebCore {
 
 ASSERT_CLASS_FITS_IN_CELL(JSWorkerContextBase);
 
-const ClassInfo JSWorkerContextBase::s_info = {"WorkerContext", 0, 0, 0};
+const ClassInfo JSWorkerContextBase::s_info = {
+    "WorkerContext", &JSDOMGlobalObject::s_info, 0, 0};
 
 JSWorkerContextBase::JSWorkerContextBase(
     NonNullPassRefPtr<JSC::Structure> structure,

@@ -576,7 +576,11 @@ struct DeserializingTreeWalker : public BaseWalker {
   typedef SerializedObject::PropertyNameList PropertyList;
 
   DeserializingTreeWalker(ExecState* exec, bool mustCopy)
-      : BaseWalker(exec), m_mustCopy(mustCopy) {}
+      : BaseWalker(exec),
+        m_globalObject(exec->lexicalGlobalObject()),
+        m_isDOMGlobalObject(
+            m_globalObject->inherits(&JSDOMGlobalObject::s_info)),
+        m_mustCopy(mustCopy) {}
 
   OutputType null() { return jsNull(); }
 
@@ -643,10 +647,14 @@ struct DeserializingTreeWalker : public BaseWalker {
       case SerializedScriptValueData::DateType:
         return new (m_exec) DateInstance(m_exec, value.asDouble());
       case SerializedScriptValueData::FileType:
+        if (!m_isDOMGlobalObject)
+          return jsNull();
         return toJS(m_exec, static_cast<JSDOMGlobalObject*>(
                                 m_exec->lexicalGlobalObject()),
                     File::create(value.asString().crossThreadString()));
       case SerializedScriptValueData::FileListType: {
+        if (!m_isDOMGlobalObject)
+          return jsNull();
         RefPtr<FileList> result = FileList::create();
         SerializedFileList* serializedFileList = value.asFileList();
         unsigned length = serializedFileList->length();
@@ -694,6 +702,8 @@ struct DeserializingTreeWalker : public BaseWalker {
   }
 
  private:
+  JSGlobalObject* m_globalObject;
+  bool m_isDOMGlobalObject;
   bool m_mustCopy;
 };
 
