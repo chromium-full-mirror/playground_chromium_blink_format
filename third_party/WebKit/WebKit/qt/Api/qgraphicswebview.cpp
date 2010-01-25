@@ -110,6 +110,8 @@ class QGraphicsWebViewPrivate : public QWebPageClient {
 
   virtual QObject* pluginParent() const;
 
+  virtual QStyle* style() const;
+
 #if USE(ACCELERATED_COMPOSITING)
   virtual void setRootGraphicsLayer(QGraphicsItem* layer);
   virtual void markForSync(bool scheduleSync);
@@ -284,6 +286,10 @@ QWidget* QGraphicsWebViewPrivate::ownerWidget() const {
 
 QObject* QGraphicsWebViewPrivate::pluginParent() const {
   return q;
+}
+
+QStyle* QGraphicsWebViewPrivate::style() const {
+  return q->style();
 }
 
 /*!
