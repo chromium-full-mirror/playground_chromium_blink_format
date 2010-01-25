@@ -536,7 +536,7 @@ void ScrollView::scrollContents(const IntSize& scrollDelta) {
 
   if (canBlitOnScroll()) {  // The main frame can just blit the WebView window
     // FIXME: Find a way to blit subframes without blitting overlapping content
-    hostWindow()->scroll(-scrollDelta, scrollViewRect, clipRect);
+    scrollContentsFastPath(-scrollDelta, scrollViewRect, clipRect);
   } else {
     // We need to go ahead and repaint the entire backing store.  Do it now
     // before moving the
@@ -554,6 +554,12 @@ void ScrollView::scrollContents(const IntSize& scrollDelta) {
   // store's updateRect and so should
   // be very fast).
   hostWindow()->paint();
+}
+
+void ScrollView::scrollContentsFastPath(const IntSize& scrollDelta,
+                                        const IntRect& rectToScroll,
+                                        const IntRect& clipRect) {
+  hostWindow()->scroll(scrollDelta, rectToScroll, clipRect);
 }
 
 IntPoint ScrollView::windowToContents(const IntPoint& windowPoint) const {
