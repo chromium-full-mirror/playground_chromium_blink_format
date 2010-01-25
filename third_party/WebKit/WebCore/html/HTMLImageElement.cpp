@@ -53,10 +53,7 @@ HTMLImageElement::HTMLImageElement(const QualifiedName& tagName,
     form->registerImgElement(this);
 }
 
-HTMLImageElement::~HTMLImageElement() {
-  if (m_form)
-    m_form->removeImgElement(this);
-}
+HTMLImageElement::~HTMLImageElement() {}
 
 bool HTMLImageElement::mapToEntry(const QualifiedName& attrName,
                                   MappedAttributeEntry& result) const {
@@ -206,6 +203,42 @@ void HTMLImageElement::removedFromDocument() {
   }
 
   HTMLElement::removedFromDocument();
+}
+
+void HTMLImageElement::insertedIntoTree(bool deep) {
+  if (m_form) {
+// m_form was set by constructor. In debug builds, check that it's an ancestor
+// indeed.
+#ifndef NDEBUG
+    for (Node* ancestor = parentNode();
+         /* no end condition - there must be a form ancestor */;
+         ancestor = ancestor->parentNode()) {
+      ASSERT(ancestor);
+      if (ancestor->hasTagName(formTag)) {
+        ASSERT(m_form == static_cast<HTMLFormElement*>(ancestor));
+        break;
+      }
+    }
+#endif
+  } else {
+    for (Node* ancestor = parentNode(); ancestor;
+         ancestor = ancestor->parentNode()) {
+      if (ancestor->hasTagName(formTag)) {
+        m_form = static_cast<HTMLFormElement*>(ancestor);
+        m_form->registerImgElement(this);
+        break;
+      }
+    }
+  }
+
+  HTMLElement::insertedIntoTree(deep);
+}
+
+void HTMLImageElement::removedFromTree(bool deep) {
+  if (m_form)
+    m_form->removeImgElement(this);
+  m_form = 0;
+  HTMLElement::removedFromTree(deep);
 }
 
 int HTMLImageElement::width(bool ignorePendingStylesheets) const {
