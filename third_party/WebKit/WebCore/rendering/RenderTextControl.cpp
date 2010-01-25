@@ -209,7 +209,7 @@ void RenderTextControl::setInnerTextValue(const String& innerTextValue) {
     }
 
     // We set m_lastChangeWasUserEdit to false since this change was not
-    // explicty made by the user (say, via typing on the keyboard), see
+    // explicitly made by the user (say, via typing on the keyboard), see
     // <rdar://problem/5359921>.
     m_lastChangeWasUserEdit = false;
   }

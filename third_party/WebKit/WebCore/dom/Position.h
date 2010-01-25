@@ -150,7 +150,7 @@ class Position {
   bool atFirstEditingPositionForNode() const;
   bool atLastEditingPositionForNode() const;
 
-  // Retuns true if the visually equivalent positions around have different
+  // Returns true if the visually equivalent positions around have different
   // editability
   bool atEditingBoundary() const;
 

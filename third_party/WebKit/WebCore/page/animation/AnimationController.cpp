@@ -520,7 +520,7 @@ PassRefPtr<RenderStyle> AnimationController::updateAnimations(
   m_data->updateAnimationTimer();
 
   if (blendedStyle != newStyle) {
-    // If the animations/transitions change opacity or transform, we neeed to
+    // If the animations/transitions change opacity or transform, we need to
     // update
     // the style to impose the stacking rules. Note that this is also
     // done in CSSStyleSelector::adjustRenderStyle().

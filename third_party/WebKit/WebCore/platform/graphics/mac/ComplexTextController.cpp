@@ -122,7 +122,7 @@ int ComplexTextController::offsetForPosition(int h, bool includePartialGlyphs) {
                                      j > 0 ? complexTextRun.indexAt(j - 1)
                                            : complexTextRun.stringLength());
 
-        // FIXME: Instead of dividing the glyph's advance equially between the
+        // FIXME: Instead of dividing the glyph's advance equally between the
         // characters, this
         // could use the glyph's "ligature carets". However, there is no Core
         // Text API to get the

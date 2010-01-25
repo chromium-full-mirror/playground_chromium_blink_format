@@ -47,7 +47,7 @@ class NotificationPresenter {
   enum Permission {
     PermissionAllowed,     // User has allowed notifications
     PermissionNotAllowed,  // User has not yet allowed
-    PermissionDenied       // User has explictly denied permission
+    PermissionDenied       // User has explicitly denied permission
   };
 
   virtual ~NotificationPresenter() {}

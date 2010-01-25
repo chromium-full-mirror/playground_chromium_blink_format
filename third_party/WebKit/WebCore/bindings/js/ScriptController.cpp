@@ -105,7 +105,7 @@ ScriptValue ScriptController::evaluateInWorld(
   }
 
   // evaluate code. Returns the JS return value or 0
-  // if there was none, an error occured or the type couldn't be converted.
+  // if there was none, an error occurred or the type couldn't be converted.
 
   // inlineCode is true for <a href="javascript:doSomething()">
   // and false for <script>doSomething()</script>. Check if it has the

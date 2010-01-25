@@ -144,7 +144,7 @@ void StyleChange::reconcileTextDecorationProperties(
     textDecoration = textDecorationsInEffect;
   }
 
-  // If text-decration is set to "none", remove the property because we don't
+  // If text-decoration is set to "none", remove the property because we don't
   // want to add redundant "text-decoration: none".
   if (textDecoration && !textDecoration->isValueList())
     style->removeProperty(CSSPropertyTextDecoration);
@@ -276,8 +276,8 @@ void StyleChange::extractTextStyles(CSSMutableStyleDeclaration* style) {
         else
           m_applyFontSize = "7";
       }
-      // Huge quirk in Microsft Entourage is that they understand CSS font-size,
-      // but also write
+      // Huge quirk in Microsoft Entourage is that they understand CSS
+      // font-size, but also write
       // out legacy 1-7 values in font tags (I guess for mailers that are not
       // CSS-savvy at all,
       // like Eudora). Yes, they write out *both*. We need to write out both as
@@ -498,9 +498,9 @@ PassRefPtr<CSSMutableStyleDeclaration> editingStyleAtPosition(
 
 void prepareEditingStyleToApplyAt(CSSMutableStyleDeclaration* editingStyle,
                                   Position pos) {
-  // ReplaceSelectionCommand::handleStyleSpans() requiers that this function
+  // ReplaceSelectionCommand::handleStyleSpans() requires that this function
   // only removes the editing style.
-  // If this function was modified in the futureto delete all redundant
+  // If this function was modified in the future to delete all redundant
   // properties, then add a boolean value to indicate
   // which one of editingStyleAtPosition or computedStyle is called.
   RefPtr<CSSMutableStyleDeclaration> style = editingStyleAtPosition(pos);

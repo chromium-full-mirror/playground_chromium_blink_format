@@ -376,7 +376,7 @@ class GraphicsLayerCA : public GraphicsLayer {
   void repaintLayerDirtyRects();
 
   RetainPtr<WebLayer> m_layer;           // The main layer
-  RetainPtr<CALayer> m_structuralLayer;  // A layer used for structual reasons,
+  RetainPtr<CALayer> m_structuralLayer;  // A layer used for structural reasons,
                                          // like preserves-3d or
                                          // replica-flattening. Is the parent of
                                          // m_layer.

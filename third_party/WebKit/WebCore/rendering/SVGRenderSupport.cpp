@@ -77,8 +77,8 @@ void SVGRenderBase::mapLocalToContainer(const RenderObject* object,
                                         bool useTransforms,
                                         TransformState& transformState) {
   ASSERT(!fixed);  // We should have no fixed content in the SVG rendering tree.
-  ASSERT(useTransforms);  // mapping a point through SVG w/o respecting
-                          // trasnforms is useless.
+  ASSERT(useTransforms);  // Mapping a point through SVG w/o respecting
+                          // transforms is useless.
   transformState.applyTransform(object->localToParentTransform());
   object->parent()->mapLocalToContainer(repaintContainer, fixed, useTransforms,
                                         transformState);

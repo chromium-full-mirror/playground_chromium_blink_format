@@ -2180,7 +2180,7 @@ void RenderBox::calcAbsoluteHorizontalValues(
     int& marginRightValue,
     int& xPos) {
   // 'left' and 'right' cannot both be 'auto' because one would of been
-  // converted to the static postion already
+  // converted to the static position already
   ASSERT(!(left.isAuto() && right.isAuto()));
 
   int leftValue = 0;
@@ -2216,7 +2216,7 @@ void RenderBox::calcAbsoluteHorizontalValues(
     if (marginLeft.isAuto() && marginRight.isAuto()) {
       // Both margins auto, solve for equality
       if (availableSpace >= 0) {
-        marginLeftValue = availableSpace / 2;  // split the diference
+        marginLeftValue = availableSpace / 2;  // split the difference
         marginRightValue =
             availableSpace -
             marginLeftValue;  // account for odd valued differences
@@ -2526,7 +2526,7 @@ void RenderBox::calcAbsoluteVerticalValues(
     if (marginTop.isAuto() && marginBottom.isAuto()) {
       // Both margins auto, solve for equality
       // NOTE: This may result in negative values.
-      marginTopValue = availableSpace / 2;  // split the diference
+      marginTopValue = availableSpace / 2;  // split the difference
       marginBottomValue = availableSpace -
                           marginTopValue;  // account for odd valued differences
     } else if (marginTop.isAuto()) {
@@ -2609,7 +2609,7 @@ void RenderBox::calcAbsoluteVerticalValues(
 
 void RenderBox::calcAbsoluteHorizontalReplaced() {
   // The following is based off of the W3C Working Draft from April 11, 2006 of
-  // CSS 2.1: Section 10.3.8 "Absolutly positioned, replaced elements"
+  // CSS 2.1: Section 10.3.8 "Absolutely positioned, replaced elements"
   // <http://www.w3.org/TR/2005/WD-CSS21-20050613/visudet.html#abs-replaced-width>
   // (block-style-comments in this function correspond to text from the spec and
   // the numbers correspond to numbers in spec)
@@ -2706,7 +2706,7 @@ void RenderBox::calcAbsoluteHorizontalReplaced() {
 
     int difference = availableSpace - (leftValue + rightValue);
     if (difference > 0) {
-      m_marginLeft = difference / 2;  // split the diference
+      m_marginLeft = difference / 2;  // split the difference
       m_marginRight =
           difference - m_marginLeft;  // account for odd valued differences
     } else {
@@ -2796,7 +2796,7 @@ void RenderBox::calcAbsoluteHorizontalReplaced() {
 
 void RenderBox::calcAbsoluteVerticalReplaced() {
   // The following is based off of the W3C Working Draft from April 11, 2006 of
-  // CSS 2.1: Section 10.6.5 "Absolutly positioned, replaced elements"
+  // CSS 2.1: Section 10.6.5 "Absolutely positioned, replaced elements"
   // <http://www.w3.org/TR/2005/WD-CSS21-20050613/visudet.html#abs-replaced-height>
   // (block-style-comments in this function correspond to text from the spec and
   // the numbers correspond to numbers in spec)
@@ -2865,7 +2865,7 @@ void RenderBox::calcAbsoluteVerticalReplaced() {
   int bottomValue = 0;
 
   if (marginTop.isAuto() && marginBottom.isAuto()) {
-    // 'top' and 'bottom' cannot be 'auto' due to step 2 and 3 combinded.
+    // 'top' and 'bottom' cannot be 'auto' due to step 2 and 3 combined.
     ASSERT(!(top.isAuto() || bottom.isAuto()));
 
     topValue = top.calcValue(containerHeight);

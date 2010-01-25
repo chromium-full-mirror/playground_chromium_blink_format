@@ -53,7 +53,7 @@ class JSSVGPODTypeWrapper : public RefCounted<JSSVGPODTypeWrapper<PODType>> {
 // changes to any
 // of the writable attributes of SVGMatrix need to be reflected in the object
 // which exposed the
-// SVGMatrix object (ie. 'someElement.transform.matrix.a = 50.0', in that case
+// SVGMatrix object (i.e. 'someElement.transform.matrix.a = 50.0', in that case
 // 'SVGTransform').
 // The SVGTransform class stores its "TransformationMatrix m_matrix" object on
 // the stack. If it would
@@ -132,10 +132,10 @@ class JSSVGDynamicPODTypeWrapper : public JSSVGPODTypeWrapper<PODType> {
 };
 
 // Represents a JS wrapper object for SVG POD types (not for SVGAnimated*
-// clases). Any modification to the SVG POD
+// classes). Any modification to the SVG POD
 // types don't cause any updates unlike JSSVGDynamicPODTypeWrapper. This class
 // is used for return values (ie. getBBox())
-// and for properties where SVG specification explicitely states, that the
+// and for properties where SVG specification explicitly states, that the
 // contents of the POD type are immutable.
 
 template <typename PODType>

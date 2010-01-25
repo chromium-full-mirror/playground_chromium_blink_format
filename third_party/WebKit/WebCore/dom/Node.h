@@ -284,7 +284,7 @@ class Node : public EventTarget,
   virtual ContainerNode* addChild(PassRefPtr<Node>);
 
   // Called by the parser when this element's close tag is reached,
-  // signalling that all child tags have been parsed and added.
+  // signaling that all child tags have been parsed and added.
   // This is needed for <applet> and <object> elements, which can't lay
   // themselves out
   // until they know all of their nested <param>s. [Radar 3603191, 4040848].

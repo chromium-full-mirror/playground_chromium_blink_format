@@ -82,7 +82,7 @@ static inline bool containsColonSlashSlash(const UChar* characters,
 }
 
 static inline void cleanPath(Vector<UChar, 512>& path) {
-  // FIXME: Shold not do this in the query or anchor part.
+  // FIXME: Should not do this in the query or anchor part.
   int pos;
   while ((pos = findSlashDotDotSlash(path.data(), path.size())) != -1) {
     int prev = reverseFind(path.data(), path.size(), '/', pos - 1);
@@ -94,7 +94,7 @@ static inline void cleanPath(Vector<UChar, 512>& path) {
       path.remove(prev, pos - prev + 3);
   }
 
-  // FIXME: Shold not do this in the query part.
+  // FIXME: Should not do this in the query part.
   // Set refPos to -2 to mean "I haven't looked for the anchor yet".
   // We don't want to waste a function call on the search for the the anchor
   // in the vast majority of cases where there is no "//" in the path.
@@ -112,7 +112,7 @@ static inline void cleanPath(Vector<UChar, 512>& path) {
       pos += 2;
   }
 
-  // FIXME: Shold not do this in the query or anchor part.
+  // FIXME: Should not do this in the query or anchor part.
   while ((pos = findSlashDotSlash(path.data(), path.size())) != -1)
     path.remove(pos, 2);
 }

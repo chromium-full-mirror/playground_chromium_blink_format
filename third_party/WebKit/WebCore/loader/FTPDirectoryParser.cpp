@@ -1099,7 +1099,7 @@ FTPEntryType parseOneFTPLine(const char* line,
 
         } /* time/year */
 
-        // there is exacly 1 space between filename and previous token in all
+        // there is exactly 1 space between filename and previous token in all
         // outputs except old Hellsoft
         if (!isOldHellsoft)
           result.filename = tokens[tokmarker + 3] + toklen[tokmarker + 3] + 1;

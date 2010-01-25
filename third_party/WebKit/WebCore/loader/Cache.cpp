@@ -314,7 +314,7 @@ void Cache::pruneLiveResources() {
         return;
 
       // Destroy our decoded data. This will remove us from
-      // m_liveDecodedResources, and possibly move us to a differnt LRU
+      // m_liveDecodedResources, and possibly move us to a different LRU
       // list in m_allResources.
       current->destroyDecodedData();
 
@@ -369,7 +369,7 @@ void Cache::pruneDeadResources() {
       if (!current->hasClients() && !current->isPreloaded() &&
           current->isLoaded()) {
         // Destroy our decoded data. This will remove us from
-        // m_liveDecodedResources, and possibly move us to a differnt
+        // m_liveDecodedResources, and possibly move us to a different
         // LRU list in m_allResources.
         current->destroyDecodedData();
 

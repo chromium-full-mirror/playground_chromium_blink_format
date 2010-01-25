@@ -103,7 +103,7 @@ class CachedResourceHandle : public CachedResourceHandleBase {
   }
 };
 
-// Don't inline for winscw compiler to prevent the compiler agressively
+// Don't inline for winscw compiler to prevent the compiler aggressively
 // resolving
 // the base class of R* when CachedResourceHandler<T>(R*) is inlined.  The bug
 // is

@@ -100,7 +100,7 @@ class JSDOMWindowBase : public JSDOMGlobalObject {
 };
 
 // Returns a JSDOMWindow or jsNull()
-// JSDOMGlobalObject* is ignored, accesing a window in any context will
+// JSDOMGlobalObject* is ignored, accessing a window in any context will
 // use that DOMWindow's prototype chain.
 JSC::JSValue toJS(JSC::ExecState*, JSDOMGlobalObject*, DOMWindow*);
 JSC::JSValue toJS(JSC::ExecState*, DOMWindow*);

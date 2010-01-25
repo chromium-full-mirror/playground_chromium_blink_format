@@ -67,8 +67,8 @@ static bool isDeletableElement(const Node* node) {
       !node->isContentEditable())
     return false;
 
-  // In general we want to only draw the UI arround object of a certain area,
-  // but we still keep the min width/height to
+  // In general we want to only draw the UI around object of a certain area, but
+  // we still keep the min width/height to
   // make sure we don't end up with very thin or very short elements getting the
   // UI.
   const int minimumArea = 2500;

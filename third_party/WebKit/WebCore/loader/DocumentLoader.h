@@ -168,7 +168,7 @@ class DocumentLoader : public RefCounted<DocumentLoader> {
   KURL urlForHistory() const;
   bool urlForHistoryReflectsFailure() const;
 
-  // These accessors accomodate WebCore's somewhat fickle custom of creating
+  // These accessors accommodate WebCore's somewhat fickle custom of creating
   // history
   // items for redirects, but only sometimes. For "source" and "destination",
   // these accessors return the URL that would have been used if a history

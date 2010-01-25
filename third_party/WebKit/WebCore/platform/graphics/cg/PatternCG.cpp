@@ -61,7 +61,7 @@ CGPatternRef Pattern::createPlatformPattern(
   // Using fractions of FLT_MAX also
   // result in nothing being rendered.
   // INT_MAX is almost correct, but there seems to be some number wrapping
-  // occuring making the fill
+  // occurring making the fill
   // pattern is not filled correctly.
   // To make error of floating point less than 0.5, we use the half of the
   // number of mantissa of float (1 << 22).

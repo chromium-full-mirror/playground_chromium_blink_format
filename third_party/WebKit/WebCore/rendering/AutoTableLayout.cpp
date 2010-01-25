@@ -389,7 +389,7 @@ int AutoTableLayout::calcEffectiveWidth() {
         tMaxWidth =
             max(tMaxWidth, spanMax * 100 * percentScaleFactor / w.rawValue());
 
-        // all non percent columns in the span get percent vlaues to sum up
+        // all non percent columns in the span get percent values to sum up
         // correctly.
         int percentMissing = w.rawValue() - totalPercent;
         float totalWidth = 0;
@@ -709,9 +709,9 @@ void AutoTableLayout::layout() {
     }
   }
 
-  // if we have overallocated, reduce every cell according to the difference
+  // If we have overallocated, reduce every cell according to the difference
   // between desired width and minwidth
-  // this seems to produce to the pixel exaxt results with IE. Wonder is some of
+  // this seems to produce to the pixel exact results with IE. Wonder is some of
   // this also holds for width distributing.
   if (available < 0) {
     // Need to reduce cells with the following prioritization:

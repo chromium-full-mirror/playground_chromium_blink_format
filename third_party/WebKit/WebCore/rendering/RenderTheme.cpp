@@ -622,7 +622,7 @@ bool RenderTheme::supportsFocusRing(const RenderStyle* style) const {
 }
 
 bool RenderTheme::stateChanged(RenderObject* o, ControlState state) const {
-  // Default implementation assumes the controls dont respond to changes in
+  // Default implementation assumes the controls don't respond to changes in
   // :hover state
   if (state == HoverState && !supportsHover(o->style()))
     return false;

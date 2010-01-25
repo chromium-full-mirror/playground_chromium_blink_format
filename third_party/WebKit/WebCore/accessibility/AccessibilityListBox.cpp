@@ -74,7 +74,7 @@ void AccessibilityListBox::addChildren() {
   for (unsigned i = 0; i < length; i++) {
     // The cast to HTMLElement below is safe because the only other possible
     // listItem type
-    // would be a WMLElement, but WML builds don't use accessbility features at
+    // would be a WMLElement, but WML builds don't use accessibility features at
     // all.
     AccessibilityObject* listOption = listBoxOptionAccessibilityObject(
         static_cast<HTMLElement*>(listItems[i]));
@@ -176,7 +176,7 @@ AccessibilityObject* AccessibilityListBox::doAccessibilityHitTest(
                        ->itemBoundingBoxRect(parentRect.x(), parentRect.y(), i);
     // The cast to HTMLElement below is safe because the only other possible
     // listItem type
-    // would be a WMLElement, but WML builds don't use accessbility features at
+    // would be a WMLElement, but WML builds don't use accessibility features at
     // all.
     if (rect.contains(point))
       return listBoxOptionAccessibilityObject(
