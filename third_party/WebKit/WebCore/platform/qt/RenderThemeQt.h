@@ -35,6 +35,7 @@ namespace WebCore {
 
 class RenderStyle;
 class HTMLMediaElement;
+class ScrollbarThemeQt;
 
 class RenderThemeQt : public RenderTheme {
  private:
@@ -75,6 +76,8 @@ class RenderThemeQt : public RenderTheme {
 #if ENABLE(VIDEO)
   virtual String extraMediaControlsStyleSheet();
 #endif
+
+  QStyle* qStyle() const;
 
  protected:
   virtual bool paintCheckbox(RenderObject* o,
@@ -205,7 +208,6 @@ class RenderThemeQt : public RenderTheme {
 
   void setPaletteFromPageClientIfExists(QPalette&) const;
 
-  QStyle* qStyle() const;
   QStyle* fallbackStyle();
 
   Page* m_page;
@@ -220,8 +222,8 @@ class RenderThemeQt : public RenderTheme {
 
 class StylePainter {
  public:
-  explicit StylePainter(const RenderObject::PaintInfo& paintInfo);
-  explicit StylePainter(GraphicsContext* context);
+  explicit StylePainter(RenderThemeQt*, const RenderObject::PaintInfo&);
+  explicit StylePainter(ScrollbarThemeQt*, GraphicsContext*);
   ~StylePainter();
 
   bool isValid() const { return painter && style; }
@@ -242,7 +244,7 @@ class StylePainter {
   }
 
  private:
-  void init(GraphicsContext* context);
+  void init(GraphicsContext* context, QStyle*);
 
   QBrush oldBrush;
   bool oldAntialiasing;

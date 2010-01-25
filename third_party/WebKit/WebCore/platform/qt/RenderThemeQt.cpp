@@ -47,6 +47,7 @@
 #include "RenderBox.h"
 #include "RenderSlider.h"
 #include "RenderTheme.h"
+#include "ScrollbarThemeQt.h"
 #include "UserAgentStyleSheets.h"
 #include "qwebpage.h"
 
@@ -67,15 +68,16 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-StylePainter::StylePainter(const RenderObject::PaintInfo& paintInfo) {
-  init(paintInfo.context ? paintInfo.context : 0);
+StylePainter::StylePainter(RenderThemeQt* theme,
+                           const RenderObject::PaintInfo& paintInfo) {
+  init(paintInfo.context ? paintInfo.context : 0, theme->qStyle());
 }
 
-StylePainter::StylePainter(GraphicsContext* context) {
-  init(context);
+StylePainter::StylePainter(ScrollbarThemeQt* theme, GraphicsContext* context) {
+  init(context, theme->style());
 }
 
-void StylePainter::init(GraphicsContext* context) {
+void StylePainter::init(GraphicsContext* context, QStyle* themeStyle) {
   painter = static_cast<QPainter*>(context->platformContext());
   widget = 0;
   QPaintDevice* dev = 0;
@@ -83,7 +85,7 @@ void StylePainter::init(GraphicsContext* context) {
     dev = painter->device();
   if (dev && dev->devType() == QInternal::Widget)
     widget = static_cast<QWidget*>(dev);
-  style = (widget ? widget->style() : QApplication::style());
+  style = themeStyle;
 
   if (painter) {
     // the styles often assume being called with a pristine painter where no
@@ -450,7 +452,7 @@ void RenderThemeQt::setButtonPadding(RenderStyle* style) const {
 bool RenderThemeQt::paintButton(RenderObject* o,
                                 const RenderObject::PaintInfo& i,
                                 const IntRect& r) {
-  StylePainter p(i);
+  StylePainter p(this, i);
   if (!p.isValid())
     return true;
 
@@ -485,7 +487,7 @@ void RenderThemeQt::adjustTextFieldStyle(CSSStyleSelector*,
 bool RenderThemeQt::paintTextField(RenderObject* o,
                                    const RenderObject::PaintInfo& i,
                                    const IntRect& r) {
-  StylePainter p(i);
+  StylePainter p(this, i);
   if (!p.isValid())
     return true;
 
@@ -554,7 +556,7 @@ void RenderThemeQt::setPopupPadding(RenderStyle* style) const {
 bool RenderThemeQt::paintMenuList(RenderObject* o,
                                   const RenderObject::PaintInfo& i,
                                   const IntRect& r) {
-  StylePainter p(i);
+  StylePainter p(this, i);
   if (!p.isValid())
     return true;
 
@@ -596,7 +598,7 @@ void RenderThemeQt::adjustMenuListButtonStyle(CSSStyleSelector*,
 bool RenderThemeQt::paintMenuListButton(RenderObject* o,
                                         const RenderObject::PaintInfo& i,
                                         const IntRect& r) {
-  StylePainter p(i);
+  StylePainter p(this, i);
   if (!p.isValid())
     return true;
 
@@ -617,7 +619,7 @@ bool RenderThemeQt::paintMenuListButton(RenderObject* o,
 bool RenderThemeQt::paintSliderTrack(RenderObject* o,
                                      const RenderObject::PaintInfo& pi,
                                      const IntRect& r) {
-  StylePainter p(pi);
+  StylePainter p(this, pi);
   if (!p.isValid())
     return true;
 
@@ -908,7 +910,7 @@ bool RenderThemeQt::paintMediaMuteButton(
   if (!mediaElement)
     return false;
 
-  StylePainter p(paintInfo);
+  StylePainter p(this, paintInfo);
   if (!p.isValid())
     return true;
 
@@ -940,7 +942,7 @@ bool RenderThemeQt::paintMediaPlayButton(
   if (!mediaElement)
     return false;
 
-  StylePainter p(paintInfo);
+  StylePainter p(this, paintInfo);
   if (!p.isValid())
     return true;
 
@@ -984,7 +986,7 @@ bool RenderThemeQt::paintMediaSliderTrack(
   if (!mediaElement)
     return false;
 
-  StylePainter p(paintInfo);
+  StylePainter p(this, paintInfo);
   if (!p.isValid())
     return true;
 
@@ -1003,7 +1005,7 @@ bool RenderThemeQt::paintMediaSliderThumb(
   if (!mediaElement)
     return false;
 
-  StylePainter p(paintInfo);
+  StylePainter p(this, paintInfo);
   if (!p.isValid())
     return true;
 

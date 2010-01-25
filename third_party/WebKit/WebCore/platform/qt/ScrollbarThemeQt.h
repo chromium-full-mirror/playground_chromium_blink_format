@@ -28,6 +28,12 @@
 
 #include "ScrollbarTheme.h"
 
+#include <QtCore/qglobal.h>
+
+QT_BEGIN_NAMESPACE
+class QStyle;
+QT_END_NAMESPACE
+
 namespace WebCore {
 
 class ScrollbarThemeQt : public ScrollbarTheme {
@@ -51,6 +57,8 @@ class ScrollbarThemeQt : public ScrollbarTheme {
   virtual int trackLength(Scrollbar*);
 
   virtual int scrollbarThickness(ScrollbarControlSize = RegularScrollbar);
+
+  QStyle* style() const;
 };
 }
 #endif
