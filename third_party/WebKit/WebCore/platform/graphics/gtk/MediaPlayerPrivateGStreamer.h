@@ -50,6 +50,9 @@ gboolean mediaPlayerPrivateMessageCallback(GstBus* bus,
 void mediaPlayerPrivateVolumeChangedCallback(GObject* element,
                                              GParamSpec* pspec,
                                              gpointer data);
+void mediaPlayerPrivateSourceChangedCallback(GObject* element,
+                                             GParamSpec* pspec,
+                                             gpointer data);
 
 class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
   friend gboolean mediaPlayerPrivateMessageCallback(GstBus* bus,
@@ -59,6 +62,9 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
       WebKitVideoSink*,
       GstBuffer* buffer,
       MediaPlayerPrivate* playerPrivate);
+  friend void mediaPlayerPrivateSourceChangedCallback(GObject* element,
+                                                      GParamSpec* pspec,
+                                                      gpointer data);
 
  public:
   static void registerMediaEngine(MediaEngineRegistrar);
