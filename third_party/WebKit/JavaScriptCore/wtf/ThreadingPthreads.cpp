@@ -205,6 +205,8 @@ int waitForThreadCompletion(ThreadIdentifier threadID, void** result) {
   ASSERT(threadID);
 
   pthread_t pthreadHandle = pthreadHandleForIdentifier(threadID);
+  if (!pthreadHandle)
+    return 0;
 
   int joinResult = pthread_join(pthreadHandle, result);
   if (joinResult == EDEADLK)
@@ -218,6 +220,8 @@ void detachThread(ThreadIdentifier threadID) {
   ASSERT(threadID);
 
   pthread_t pthreadHandle = pthreadHandleForIdentifier(threadID);
+  if (!pthreadHandle)
+    return;
 
   pthread_detach(pthreadHandle);
 }
