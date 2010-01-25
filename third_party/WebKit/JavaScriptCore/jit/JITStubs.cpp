@@ -2592,14 +2592,13 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_post_inc) {
   return JSValue::encode(number);
 }
 
-#if USE(JSVALUE32_64)
-
 DEFINE_STUB_FUNCTION(int, op_eq) {
   STUB_INIT_STACK_FRAME(stackFrame);
 
   JSValue src1 = stackFrame.args[0].jsValue();
   JSValue src2 = stackFrame.args[1].jsValue();
 
+#if USE(JSVALUE32_64)
 start:
   if (src2.isUndefined()) {
     return src1.isNull() ||
@@ -2693,7 +2692,17 @@ start:
   src1 = asObject(cell1)->toPrimitive(stackFrame.callFrame);
   CHECK_FOR_EXCEPTION();
   goto start;
+
+#else   // USE(JSVALUE32_64)
+  CallFrame* callFrame = stackFrame.callFrame;
+
+  bool result = JSValue::equalSlowCaseInline(callFrame, src1, src2);
+  CHECK_FOR_EXCEPTION_AT_END();
+  return result;
+#endif  // USE(JSVALUE32_64)
 }
+
+#if USE(JSVALUE32_64)
 
 DEFINE_STUB_FUNCTION(int, op_eq_strings) {
   STUB_INIT_STACK_FRAME(stackFrame);
@@ -2707,22 +2716,7 @@ DEFINE_STUB_FUNCTION(int, op_eq_strings) {
          string2->value(stackFrame.callFrame);
 }
 
-#else  // USE(JSVALUE32_64)
-
-DEFINE_STUB_FUNCTION(int, op_eq) {
-  STUB_INIT_STACK_FRAME(stackFrame);
-
-  JSValue src1 = stackFrame.args[0].jsValue();
-  JSValue src2 = stackFrame.args[1].jsValue();
-
-  CallFrame* callFrame = stackFrame.callFrame;
-
-  bool result = JSValue::equalSlowCaseInline(callFrame, src1, src2);
-  CHECK_FOR_EXCEPTION_AT_END();
-  return result;
-}
-
-#endif  // USE(JSVALUE32_64)
+#endif
 
 DEFINE_STUB_FUNCTION(EncodedJSValue, op_lshift) {
   STUB_INIT_STACK_FRAME(stackFrame);
