@@ -765,13 +765,11 @@ bool RenderThemeQt::supportsFocus(ControlPart appearance) const {
   }
 }
 
-static inline void setPaletteFromPageClientIfExists(QPalette& palette,
-                                                    const RenderObject* o) {
+void RenderThemeQt::setPaletteFromPageClientIfExists(QPalette& palette) const {
   // If the webview has a custom palette, use it
-  Page* page = o->document()->page();
-  if (!page)
+  if (!m_page)
     return;
-  Chrome* chrome = page->chrome();
+  Chrome* chrome = m_page->chrome();
   if (!chrome)
     return;
   ChromeClient* chromeClient = chrome->client();
@@ -801,7 +799,7 @@ ControlPart RenderThemeQt::initializeCommonQStyleOptions(
   if (isHovered(o))
     option.state |= QStyle::State_MouseOver;
 
-  setPaletteFromPageClientIfExists(option.palette, o);
+  setPaletteFromPageClientIfExists(option.palette);
   RenderStyle* style = o->style();
   if (!style)
     return NoControlPart;

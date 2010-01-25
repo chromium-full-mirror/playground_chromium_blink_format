@@ -203,6 +203,8 @@ class RenderThemeQt : public RenderTheme {
   void setButtonPadding(RenderStyle*) const;
   void setPopupPadding(RenderStyle*) const;
 
+  void setPaletteFromPageClientIfExists(QPalette&) const;
+
   QStyle* qStyle() const;
   QStyle* fallbackStyle();
 
