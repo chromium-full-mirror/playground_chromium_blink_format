@@ -112,6 +112,20 @@ void InspectorBackend::disableResourceTracking(bool always) {
     m_inspectorController->disableResourceTracking(always);
 }
 
+void InspectorBackend::getResourceContent(long callId,
+                                          unsigned long identifier) {
+  InspectorFrontend* frontend = inspectorFrontend();
+  if (!frontend)
+    return;
+
+  RefPtr<InspectorResource> resource =
+      m_inspectorController->resources().get(identifier);
+  if (resource)
+    frontend->didGetResourceContent(callId, resource->sourceString());
+  else
+    frontend->didGetResourceContent(callId, "");
+}
+
 void InspectorBackend::startTimelineProfiler() {
   if (m_inspectorController)
     m_inspectorController->startTimelineProfiler();

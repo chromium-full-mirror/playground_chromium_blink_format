@@ -73,6 +73,7 @@ class InspectorFrontendHost : public RefCounted<InspectorFrontendHost> {
   const String& platform() const;
   const String& port() const;
 
+  // FIXME: Remove these once migrated to SourceFrame2.
   void addResourceSourceToFrame(long identifier, Node* frame);
   bool addSourceToFrame(const String& mimeType,
                         const String& source,
