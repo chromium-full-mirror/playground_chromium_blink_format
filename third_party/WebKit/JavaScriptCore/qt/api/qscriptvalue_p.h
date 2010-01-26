@@ -25,6 +25,7 @@
 #include "qscriptvalue.h"
 #include <JavaScriptCore/JavaScript.h>
 #include <QtCore/qshareddata.h>
+#include <QtCore/qvarlengtharray.h>
 
 class QScriptEngine;
 class QScriptValue;
@@ -611,7 +612,7 @@ QScriptValuePrivate* QScriptValuePrivate::call(const QScriptValuePrivate*,
     case JSObject: {
       // Convert all arguments and bind to the engine.
       int argc = args.size();
-      JSValueRef argv[argc];
+      QVarLengthArray<JSValueRef, 8> argv(argc);
       QScriptValueList::const_iterator i = args.constBegin();
       for (int j = 0; i != args.constEnd(); j++, i++) {
         QScriptValuePrivate* value = QScriptValuePrivate::get(*i);
@@ -626,8 +627,9 @@ QScriptValuePrivate* QScriptValuePrivate::call(const QScriptValuePrivate*,
 
       // Make the call
       JSValueRef exception = 0;
-      JSValueRef result = JSObjectCallAsFunction(
-          context(), object(), /* thisObject */ 0, argc, argv, &exception);
+      JSValueRef result =
+          JSObjectCallAsFunction(context(), object(), /* thisObject */ 0, argc,
+                                 argv.constData(), &exception);
       if (!result && exception)
         return new QScriptValuePrivate(engine(), exception);
       if (result && !exception)
