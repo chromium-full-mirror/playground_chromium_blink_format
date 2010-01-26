@@ -33,8 +33,16 @@
 #include "PageCache.h"
 #include "ResourceRequest.h"
 #include <stdio.h>
+#include <wtf/CurrentTime.h>
 
 namespace WebCore {
+
+static long long generateDocumentSequenceNumber() {
+  // Initialize to the current time to reduce the likelihood of generating
+  // identifiers that overlap with those from past/future browser sessions.
+  static long long next = static_cast<long long>(currentTime() * 1000000.0);
+  return ++next;
+}
 
 static void defaultNotifyHistoryItemChanged(HistoryItem*) {}
 
@@ -47,7 +55,7 @@ HistoryItem::HistoryItem()
       m_lastVisitWasFailure(false),
       m_isTargetItem(false),
       m_visitCount(0),
-      m_document(0) {}
+      m_documentSequenceNumber(generateDocumentSequenceNumber()) {}
 
 HistoryItem::HistoryItem(const String& urlString,
                          const String& title,
@@ -60,7 +68,7 @@ HistoryItem::HistoryItem(const String& urlString,
       m_lastVisitWasFailure(false),
       m_isTargetItem(false),
       m_visitCount(0),
-      m_document(0) {
+      m_documentSequenceNumber(generateDocumentSequenceNumber()) {
   iconDatabase()->retainIconForPageURL(m_urlString);
 }
 
@@ -77,7 +85,7 @@ HistoryItem::HistoryItem(const String& urlString,
       m_lastVisitWasFailure(false),
       m_isTargetItem(false),
       m_visitCount(0),
-      m_document(0) {
+      m_documentSequenceNumber(generateDocumentSequenceNumber()) {
   iconDatabase()->retainIconForPageURL(m_urlString);
 }
 
@@ -95,13 +103,12 @@ HistoryItem::HistoryItem(const KURL& url,
       m_lastVisitWasFailure(false),
       m_isTargetItem(false),
       m_visitCount(0),
-      m_document(0) {
+      m_documentSequenceNumber(generateDocumentSequenceNumber()) {
   iconDatabase()->retainIconForPageURL(m_urlString);
 }
 
 HistoryItem::~HistoryItem() {
   ASSERT(!m_cachedPage);
-  ASSERT(!m_document);
   iconDatabase()->releaseIconForPageURL(m_urlString);
 #if PLATFORM(ANDROID)
   if (m_bridge)
@@ -126,7 +133,7 @@ inline HistoryItem::HistoryItem(const HistoryItem& item)
       m_visitCount(item.m_visitCount),
       m_dailyVisitCounts(item.m_dailyVisitCounts),
       m_weeklyVisitCounts(item.m_weeklyVisitCounts),
-      m_document(0),
+      m_documentSequenceNumber(generateDocumentSequenceNumber()),
       m_formContentType(item.m_formContentType) {
   if (item.m_formData)
     m_formData = item.m_formData->copy();
@@ -364,25 +371,7 @@ void HistoryItem::setIsTargetItem(bool flag) {
 }
 
 void HistoryItem::setStateObject(PassRefPtr<SerializedScriptValue> object) {
-  ASSERT(m_document);
   m_stateObject = object;
-}
-
-void HistoryItem::setDocument(Document* document) {
-  if (m_document == document)
-    return;
-
-  if (m_document)
-    m_document->unregisterHistoryItem(this);
-  if (document)
-    document->registerHistoryItem(this);
-
-  m_document = document;
-}
-
-void HistoryItem::documentDetached(Document* document) {
-  ASSERT_UNUSED(document, m_document == document);
-  m_document = 0;
 }
 
 void HistoryItem::addChildItem(PassRefPtr<HistoryItem> child) {

@@ -4068,7 +4068,8 @@ Frame* FrameLoader::findFrameForNavigation(const AtomicString& name) {
 }
 
 void FrameLoader::navigateWithinDocument(HistoryItem* item) {
-  ASSERT(!item->document() || item->document() == m_frame->document());
+  ASSERT(item->documentSequenceNumber() ==
+         history()->currentItem()->documentSequenceNumber());
 
   // Save user view state to the current history item here since we don't do a
   // normal load.
@@ -4208,7 +4209,8 @@ void FrameLoader::loadItem(HistoryItem* item, FrameLoadType loadType) {
       (!item->formData() &&
        !(history()->currentItem() && history()->currentItem()->formData()) &&
        history()->urlsMatchItem(item)) ||
-      item->document() == m_frame->document();
+      item->documentSequenceNumber() ==
+          history()->currentItem()->documentSequenceNumber();
 
 #if ENABLE(WML)
   // All WML decks should go through the real load mechanism, not the

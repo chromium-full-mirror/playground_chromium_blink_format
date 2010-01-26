@@ -138,9 +138,11 @@ class HistoryItem : public RefCounted<HistoryItem> {
 
   void setStateObject(PassRefPtr<SerializedScriptValue> object);
   SerializedScriptValue* stateObject() const { return m_stateObject.get(); }
-  void setDocument(Document* document);
-  Document* document() const { return m_document; }
-  void documentDetached(Document*);
+
+  void setDocumentSequenceNumber(long long number) {
+    m_documentSequenceNumber = number;
+  }
+  long long documentSequenceNumber() const { return m_documentSequenceNumber; }
 
   void setFormInfoFromRequest(const ResourceRequest&);
   void setFormData(PassRefPtr<FormData>);
@@ -261,7 +263,7 @@ class HistoryItem : public RefCounted<HistoryItem> {
 
   // Support for HTML5 History
   RefPtr<SerializedScriptValue> m_stateObject;
-  Document* m_document;
+  long long m_documentSequenceNumber;
 
   // info used to repost form data
   RefPtr<FormData> m_formData;
