@@ -306,9 +306,8 @@ void RedirectScheduler::scheduleHistoryNavigation(int steps) {
   // is either a state object traversal or a fragment
   // traversal (or both) and should be performed synchronously.
   HistoryItem* currentEntry = m_frame->loader()->history()->currentItem();
-  if (currentEntry != specifiedEntry &&
-      currentEntry->documentSequenceNumber() ==
-          specifiedEntry->documentSequenceNumber()) {
+  if (currentEntry != specifiedEntry && specifiedEntry->document() &&
+      currentEntry->document() == specifiedEntry->document()) {
     m_frame->loader()->history()->goToItem(specifiedEntry,
                                            FrameLoadTypeIndexedBackForward);
     return;
