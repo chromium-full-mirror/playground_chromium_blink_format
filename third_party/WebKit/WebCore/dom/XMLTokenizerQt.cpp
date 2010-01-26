@@ -329,7 +329,8 @@ static inline String prefixFromQName(const QString& qName) {
 static inline void handleElementNamespaces(
     Element* newElement,
     const QXmlStreamNamespaceDeclarations& ns,
-    ExceptionCode& ec) {
+    ExceptionCode& ec,
+    FragmentScriptingPermission scriptingPermission) {
   for (int i = 0; i < ns.count(); ++i) {
     const QXmlStreamNamespaceDeclaration& decl = ns[i];
     String namespaceURI = decl.namespaceUri();
@@ -337,15 +338,17 @@ static inline void handleElementNamespaces(
                                 ? String("xmlns")
                                 : String("xmlns:") + decl.prefix();
     newElement->setAttributeNS("http://www.w3.org/2000/xmlns/", namespaceQName,
-                               namespaceURI, ec);
+                               namespaceURI, ec, scriptingPermission);
     if (ec)  // exception setting attributes
       return;
   }
 }
 
-static inline void handleElementAttributes(Element* newElement,
-                                           const QXmlStreamAttributes& attrs,
-                                           ExceptionCode& ec) {
+static inline void handleElementAttributes(
+    Element* newElement,
+    const QXmlStreamAttributes& attrs,
+    ExceptionCode& ec,
+    FragmentScriptingPermission scriptingPermission) {
   for (int i = 0; i < attrs.count(); ++i) {
     const QXmlStreamAttribute& attr = attrs[i];
     String attrLocalName = attr.name();
@@ -353,7 +356,8 @@ static inline void handleElementAttributes(Element* newElement,
     String attrURI =
         attr.namespaceUri().isEmpty() ? String() : String(attr.namespaceUri());
     String attrQName = attr.qualifiedName();
-    newElement->setAttributeNS(attrURI, attrQName, attrValue, ec);
+    newElement->setAttributeNS(attrURI, attrQName, attrValue, ec,
+                               scriptingPermission);
     if (ec)  // exception setting attributes
       return;
   }
@@ -506,13 +510,14 @@ void XMLTokenizer::parseStartElement() {
 
   ExceptionCode ec = 0;
   handleElementNamespaces(newElement.get(), m_stream.namespaceDeclarations(),
-                          ec);
+                          ec, m_scriptingPermission);
   if (ec) {
     stopParsing();
     return;
   }
 
-  handleElementAttributes(newElement.get(), m_stream.attributes(), ec);
+  handleElementAttributes(newElement.get(), m_stream.attributes(), ec,
+                          m_scriptingPermission);
   if (ec) {
     stopParsing();
     return;
@@ -540,6 +545,14 @@ void XMLTokenizer::parseEndElement() {
 
   Node* n = m_currentNode;
   n->finishParsingChildren();
+
+  if (m_scriptingPermission == FragmentScriptingNotAllowed &&
+      n->isElementNode() && toScriptElement(static_cast<Element*>(n))) {
+    popCurrentNode();
+    ExceptionCode ec;
+    n->remove(ec);
+    return;
+  }
 
   if (!n->isElementNode() || !m_view) {
     if (!m_currentNodeStack.isEmpty())
