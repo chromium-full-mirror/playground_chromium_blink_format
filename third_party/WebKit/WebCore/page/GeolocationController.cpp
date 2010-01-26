@@ -37,7 +37,9 @@ GeolocationController::GeolocationController(
     GeolocationControllerClient* client)
     : m_page(page), m_client(client) {}
 
-GeolocationController::~GeolocationController() {}
+GeolocationController::~GeolocationController() {
+  m_client->geolocationDestroyed();
+}
 
 void GeolocationController::addObserver(Geolocation* observer) {
   ASSERT(!m_observers.contains(observer));

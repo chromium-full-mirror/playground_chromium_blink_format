@@ -35,6 +35,10 @@ using namespace WebCore;
 WebGeolocationControllerClient::WebGeolocationControllerClient(WebView* webView)
     : m_webView(webView) {}
 
+void WebGeolocationControllerClient::geolocationDestroyed() {
+  delete this;
+}
+
 void WebGeolocationControllerClient::startUpdating() {
   COMPtr<IWebGeolocationProvider> provider;
   if (FAILED(m_webView->geolocationProvider(&provider)))
