@@ -887,12 +887,13 @@ V8ClassIndex::V8WrapperType V8DOMWrapper::htmlElementType(
                   macro(feFuncG, FEFUNCG) macro(feFuncR, FEFUNCR) macro(      \
                       feGaussianBlur, FEGAUSSIANBLUR) macro(feImage, FEIMAGE) \
                       macro(feMerge, FEMERGE) macro(feMergeNode, FEMERGENODE) \
-                          macro(feOffset, FEOFFSET)                           \
-                              macro(fePointLight, FEPOINTLIGHT) macro(        \
-                                  feSpecularLighting, FESPECULARLIGHTING)     \
-                                  macro(feSpotLight, FESPOTLIGHT)             \
-                                      macro(feTile, FETILE)                   \
-                                          macro(feTurbulence, FETURBULENCE)   \
+                          macro(feMorphology, FEMORPHOLOGY)                   \
+                              macro(feOffset, FEOFFSET)                       \
+                                  macro(fePointLight, FEPOINTLIGHT) macro(    \
+                                      feSpecularLighting, FESPECULARLIGHTING) \
+                                      macro(feSpotLight, FESPOTLIGHT)         \
+                                          macro(feTile, FETILE) macro(        \
+                                              feTurbulence, FETURBULENCE)     \
                                               macro(filter, FILTER)
 #else
 #define FOR_EACH_FILTERS_TAG(macro)
