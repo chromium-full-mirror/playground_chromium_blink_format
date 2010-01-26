@@ -46,6 +46,7 @@ class RenderReplaced : public RenderBox {
   void setIntrinsicSize(const IntSize&);
   virtual void intrinsicSizeChanged();
 
+  virtual void paint(PaintInfo&, int tx, int ty);
   bool shouldPaint(PaintInfo&, int& tx, int& ty);
   void adjustOverflowForBoxShadowAndReflect();
   IntRect localSelectionRect(bool checkWhetherSelected = true) const;
@@ -63,7 +64,6 @@ class RenderReplaced : public RenderBox {
 
   virtual int minimumReplacedHeight() const { return 0; }
 
-  virtual void paint(PaintInfo&, int tx, int ty);
   virtual void paintReplaced(PaintInfo&, int /*tx*/, int /*ty*/) {}
 
   virtual IntRect clippedOverflowRectForRepaint(

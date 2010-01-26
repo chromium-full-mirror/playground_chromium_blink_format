@@ -29,6 +29,7 @@ namespace WebCore {
 
 class IntSize;
 class HitTestResult;
+class HTMLImageElement;
 
 class HTMLMapElement : public HTMLElement {
  public:
@@ -45,6 +46,7 @@ class HTMLMapElement : public HTMLElement {
 
   bool mapMouseEvent(int x, int y, const IntSize&, HitTestResult&);
 
+  HTMLImageElement* imageElement() const;
   PassRefPtr<HTMLCollection> areas();
 
   String name() const;

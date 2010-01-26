@@ -30,6 +30,7 @@
 namespace WebCore {
 
 class HitTestResult;
+class HTMLImageElement;
 class Path;
 
 class HTMLAreaElement : public HTMLAnchorElement {
@@ -41,6 +42,10 @@ class HTMLAreaElement : public HTMLAnchorElement {
   bool mapMouseEvent(int x, int y, const IntSize&, HitTestResult&);
 
   IntRect getRect(RenderObject*) const;
+  Path getPath(RenderObject*) const;
+
+  // Convenience method to get the parent map's image.
+  HTMLImageElement* imageElement() const;
 
   KURL href() const;
 
@@ -55,6 +60,10 @@ class HTMLAreaElement : public HTMLAnchorElement {
   virtual void parseMappedAttribute(MappedAttribute*);
   virtual bool supportsFocus() const;
   virtual String target() const;
+  virtual bool isKeyboardFocusable(KeyboardEvent*) const;
+  virtual bool isFocusable() const;
+  virtual void updateFocusAppearance(bool /*restorePreviousSelection*/);
+  virtual void dispatchBlurEvent();
 
   enum Shape { Default, Poly, Rect, Circle, Unknown };
   Path getRegion(const IntSize&) const;

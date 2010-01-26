@@ -319,6 +319,7 @@ class GraphicsContext : public Noncopyable {
                      int width,
                      int offset,
                      const Color&);
+  void drawFocusRing(const Vector<Path>&, int width, int offset, const Color&);
 
   void setLineCap(LineCap);
   void setLineDash(const DashArray&, float dashOffset);
