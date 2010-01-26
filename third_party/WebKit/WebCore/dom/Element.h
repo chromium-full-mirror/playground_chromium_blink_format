@@ -124,7 +124,8 @@ class Element : public ContainerNode {
   void setAttributeNS(const AtomicString& namespaceURI,
                       const AtomicString& qualifiedName,
                       const AtomicString& value,
-                      ExceptionCode&);
+                      ExceptionCode&,
+                      FragmentScriptingPermission = FragmentScriptingAllowed);
 
   const QualifiedName& idAttributeName() const;
 

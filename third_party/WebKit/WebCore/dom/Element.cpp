@@ -610,6 +610,13 @@ static bool isEventHandlerAttribute(const QualifiedName& name) {
   return name.namespaceURI().isNull() && name.localName().startsWith("on");
 }
 
+static bool isAttributeToRemove(const QualifiedName& name,
+                                const AtomicString& value) {
+  return (name.localName().endsWith(hrefAttr.localName()) || name == srcAttr ||
+          name == actionAttr) &&
+         protocolIsJavaScript(deprecatedParseURL(value));
+}
+
 void Element::setAttributeMap(PassRefPtr<NamedNodeMap> list,
                               FragmentScriptingPermission scriptingPermission) {
   document()->incDOMTreeVersion();
@@ -644,10 +651,8 @@ void Element::setAttributeMap(PassRefPtr<NamedNodeMap> list,
           continue;
         }
 
-        if ((attributeName.localName().endsWith(hrefAttr.localName()) ||
-             attributeName == srcAttr || attributeName == actionAttr) &&
-            protocolIsJavaScript(
-                deprecatedParseURL(namedAttrMap->m_attributes[i]->value())))
+        if (isAttributeToRemove(attributeName,
+                                namedAttrMap->m_attributes[i]->value()))
           namedAttrMap->m_attributes[i]->setValue(nullAtom);
         i++;
       }
@@ -1201,12 +1206,18 @@ PassRefPtr<Attr> Element::removeAttributeNode(Attr* attr, ExceptionCode& ec) {
 void Element::setAttributeNS(const AtomicString& namespaceURI,
                              const AtomicString& qualifiedName,
                              const AtomicString& value,
-                             ExceptionCode& ec) {
+                             ExceptionCode& ec,
+                             FragmentScriptingPermission scriptingPermission) {
   String prefix, localName;
   if (!Document::parseQualifiedName(qualifiedName, prefix, localName, ec))
     return;
 
   QualifiedName qName(prefix, localName, namespaceURI);
+
+  if (scriptingPermission == FragmentScriptingNotAllowed &&
+      (isEventHandlerAttribute(qName) || isAttributeToRemove(qName, value)))
+    return;
+
   setAttribute(qName, value, ec);
 }
 

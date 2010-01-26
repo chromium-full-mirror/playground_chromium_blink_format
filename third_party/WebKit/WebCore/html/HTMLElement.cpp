@@ -337,7 +337,8 @@ PassRefPtr<DocumentFragment> HTMLElement::createContextualFragment(
   if (document()->isHTMLDocument())
     parseHTMLDocumentFragment(html, fragment.get(), scriptingPermission);
   else {
-    if (!parseXMLDocumentFragment(html, fragment.get(), this))
+    if (!parseXMLDocumentFragment(html, fragment.get(), this,
+                                  scriptingPermission))
       // FIXME: We should propagate a syntax error exception out here.
       return 0;
   }
