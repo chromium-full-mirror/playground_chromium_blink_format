@@ -140,7 +140,7 @@ class InspectorTimelineAgent : public Noncopyable {
 
 inline InspectorTimelineAgent* InspectorTimelineAgent::retrieve(
     ScriptExecutionContext* context) {
-  if (context->isDocument())
+  if (context && context->isDocument())
     return static_cast<Document*>(context)->inspectorTimelineAgent();
   return 0;
 }
