@@ -54,7 +54,7 @@ StorageEvent::StorageEvent(const AtomicString& type,
                            const String& newValue,
                            const String& uri,
                            Storage* storageArea)
-    : Event(type, false, true),
+    : Event(type, false, false),
       m_key(key),
       m_oldValue(oldValue),
       m_newValue(newValue),

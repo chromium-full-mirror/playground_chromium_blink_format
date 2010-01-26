@@ -682,6 +682,9 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   void dispatchWindowEvent(PassRefPtr<Event>, PassRefPtr<EventTarget> = 0);
   void dispatchWindowLoadEvent();
 
+  void enqueueStorageEvent(PassRefPtr<Event>);
+  void storageEventTimerFired(Timer<Document>*);
+
   PassRefPtr<Event> createEvent(const String& eventType, ExceptionCode&);
 
   // keep track of what types of event listeners are registered, so we don't
@@ -1352,6 +1355,9 @@ class Document : public ContainerNode, public ScriptExecutionContext {
 #endif
 
   bool m_usingGeolocation;
+
+  Timer<Document> m_storageEventTimer;
+  Vector<RefPtr<Event>> m_storageEventQueue;
 
 #if ENABLE(WML)
   bool m_containsWMLContent;

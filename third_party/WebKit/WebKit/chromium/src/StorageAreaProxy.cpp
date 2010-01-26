@@ -122,12 +122,13 @@ void StorageAreaProxy::storageEvent(const String& key,
     // Send events only to our page.
     for (Frame* frame = page->mainFrame(); frame;
          frame = frame->tree()->traverseNext()) {
-      if (frame->document()->securityOrigin()->equal(securityOrigin))
+      if (sourceFrame != frame &&
+          frame->document()->securityOrigin()->equal(securityOrigin))
         frames.append(frame);
     }
 
     for (unsigned i = 0; i < frames.size(); ++i)
-      frames[i]->document()->dispatchWindowEvent(
+      frames[i]->document()->enqueueStorageEvent(
           StorageEvent::create(eventNames().storageEvent, key, oldValue,
                                newValue, sourceFrame->document()->url(),
                                frames[i]->domWindow()->sessionStorage()));
@@ -138,13 +139,14 @@ void StorageAreaProxy::storageEvent(const String& key,
     for (HashSet<Page*>::const_iterator it = pages.begin(); it != end; ++it) {
       for (Frame* frame = (*it)->mainFrame(); frame;
            frame = frame->tree()->traverseNext()) {
-        if (frame->document()->securityOrigin()->equal(securityOrigin))
+        if (sourceFrame != frame &&
+            frame->document()->securityOrigin()->equal(securityOrigin))
           frames.append(frame);
       }
     }
 
     for (unsigned i = 0; i < frames.size(); ++i)
-      frames[i]->document()->dispatchWindowEvent(
+      frames[i]->document()->enqueueStorageEvent(
           StorageEvent::create(eventNames().storageEvent, key, oldValue,
                                newValue, sourceFrame->document()->url(),
                                frames[i]->domWindow()->localStorage()));
