@@ -101,11 +101,14 @@ XMLTokenizer::XMLTokenizer(Document* _doc, FrameView* _view)
       m_lastErrorColumn(0),
       m_pendingScript(0),
       m_scriptStartLine(0),
-      m_parsingFragment(false) {
+      m_parsingFragment(false),
+      m_scriptingPermission(FragmentScriptingAllowed) {
   m_stream.setEntityResolver(new EntityResolver);
 }
 
-XMLTokenizer::XMLTokenizer(DocumentFragment* fragment, Element* parentElement)
+XMLTokenizer::XMLTokenizer(DocumentFragment* fragment,
+                           Element* parentElement,
+                           FragmentScriptingPermission permission)
     : m_doc(fragment->document()),
       m_view(0),
       m_wroteText(false),
@@ -128,7 +131,8 @@ XMLTokenizer::XMLTokenizer(DocumentFragment* fragment, Element* parentElement)
       m_lastErrorColumn(0),
       m_pendingScript(0),
       m_scriptStartLine(0),
-      m_parsingFragment(true) {
+      m_parsingFragment(true),
+      m_scriptingPermission(permission) {
   fragment->ref();
   if (m_doc)
     m_doc->ref();
@@ -258,11 +262,12 @@ void XMLTokenizer::resumeParsing() {
 
 bool parseXMLDocumentFragment(const String& chunk,
                               DocumentFragment* fragment,
-                              Element* parent) {
+                              Element* parent,
+                              FragmentScriptingPermission scriptingPermission) {
   if (!chunk.length())
     return true;
 
-  XMLTokenizer tokenizer(fragment, parent);
+  XMLTokenizer tokenizer(fragment, parent, scriptingPermission);
 
   tokenizer.write(String("<qxmlstreamdummyelement>"), false);
   tokenizer.write(chunk, false);
