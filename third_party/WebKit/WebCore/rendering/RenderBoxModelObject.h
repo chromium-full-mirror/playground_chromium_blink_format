@@ -146,6 +146,8 @@ class RenderBoxModelObject : public RenderObject {
   // only way layers should ever be destroyed
   void destroyLayer();
 
+  void highQualityRepaintTimerFired(Timer<RenderBoxModelObject>*);
+
  protected:
   void calculateBackgroundImageGeometry(const FillLayer*,
                                         int tx,
