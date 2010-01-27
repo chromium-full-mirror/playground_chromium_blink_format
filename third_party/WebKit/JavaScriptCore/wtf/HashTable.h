@@ -30,9 +30,6 @@
 namespace WTF {
 
 #define DUMP_HASHTABLE_STATS 0
-// Enables internal WTF consistency checks that are invoked automatically.
-// Non-WTF callers can call checkTableConsistency() even if internal checks are
-// disabled.
 #define CHECK_HASHTABLE_CONSISTENCY 0
 
 #ifdef NDEBUG
@@ -510,19 +507,10 @@ class HashTable {
   template <typename T, typename HashTranslator>
   ValueType* lookup(const T&);
 
-#if !ASSERT_DISABLED
+#if CHECK_HASHTABLE_CONSISTENCY
   void checkTableConsistency() const;
 #else
   static void checkTableConsistency() {}
-#endif
-#if CHECK_HASHTABLE_CONSISTENCY
-  void internalCheckTableConsistency() const { checkTableConsistency(); }
-  void internalCheckTableConsistencyExceptSize() const {
-    checkTableConsistencyExceptSize();
-  }
-#else
-  static void internalCheckTableConsistencyExceptSize() {}
-  static void internalCheckTableConsistency() {}
 #endif
 
  private:
@@ -589,7 +577,7 @@ class HashTable {
     return const_iterator(this, pos, m_table + m_tableSize, HashItemKnownGood);
   }
 
-#if !ASSERT_DISABLED
+#if CHECK_HASHTABLE_CONSISTENCY
   void checkTableConsistencyExceptSize() const;
 #else
   static void checkTableConsistencyExceptSize() {}
@@ -888,7 +876,7 @@ HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::add(
   if (!m_table)
     expand();
 
-  internalCheckTableConsistency();
+  checkTableConsistency();
 
   ASSERT(m_table);
 
@@ -957,7 +945,7 @@ HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::add(
     return p;
   }
 
-  internalCheckTableConsistency();
+  checkTableConsistency();
 
   return std::make_pair(makeKnownGoodIterator(entry), true);
 }
@@ -985,7 +973,7 @@ HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::
   if (!m_table)
     expand();
 
-  internalCheckTableConsistency();
+  checkTableConsistency();
 
   FullLookupType lookupResult = fullLookupForWriting<T, HashTranslator>(key);
 
@@ -1014,7 +1002,7 @@ HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::
     return p;
   }
 
-  internalCheckTableConsistency();
+  checkTableConsistency();
 
   return std::make_pair(makeKnownGoodIterator(entry), true);
 }
@@ -1119,7 +1107,7 @@ template <typename Key,
 void HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::
     removeAndInvalidate(ValueType* pos) {
   invalidateIterators();
-  internalCheckTableConsistency();
+  checkTableConsistency();
   remove(pos);
 }
 
@@ -1142,7 +1130,7 @@ void HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::remove(
   if (shouldShrink())
     shrink();
 
-  internalCheckTableConsistency();
+  checkTableConsistency();
 }
 
 template <typename Key,
@@ -1251,7 +1239,7 @@ template <typename Key,
           typename KeyTraits>
 void HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::rehash(
     int newTableSize) {
-  internalCheckTableConsistencyExceptSize();
+  checkTableConsistencyExceptSize();
 
   int oldTableSize = m_tableSize;
   ValueType* oldTable = m_table;
@@ -1273,7 +1261,7 @@ void HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::rehash(
 
   deallocateTable(oldTable, oldTableSize);
 
-  internalCheckTableConsistency();
+  checkTableConsistency();
 }
 
 template <typename Key,
@@ -1364,7 +1352,7 @@ HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::operator=(
   return *this;
 }
 
-#if !ASSERT_DISABLED
+#if CHECK_HASHTABLE_CONSISTENCY
 
 template <typename Key,
           typename Value,
@@ -1375,7 +1363,7 @@ template <typename Key,
 void HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::
     checkTableConsistency() const {
   checkTableConsistencyExceptSize();
-  ASSERT(!m_table || !shouldExpand());
+  ASSERT(!shouldExpand());
   ASSERT(!shouldShrink());
 }
 
@@ -1405,8 +1393,6 @@ void HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::
     const_iterator it = find(Extractor::extract(*entry));
     ASSERT(entry == it.m_position);
     ++count;
-
-    KeyTraits::checkValueConsistency(it->first);
   }
 
   ASSERT(count == m_keyCount);
@@ -1416,7 +1402,7 @@ void HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::
   ASSERT(m_tableSize == m_tableSizeMask + 1);
 }
 
-#endif  // ASSERT_DISABLED
+#endif  // CHECK_HASHTABLE_CONSISTENCY
 
 #if CHECK_HASHTABLE_ITERATORS
 

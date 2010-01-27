@@ -34,12 +34,6 @@ template <class GenericNode, class GenericNodeContainer>
 void addChildNodesToDeletionQueue(GenericNode*& head,
                                   GenericNode*& tail,
                                   GenericNodeContainer* container);
-
-template <class GenericNode, bool dispatchRemovalNotification>
-struct NodeRemovalDispatcher;
-
-template <class GenericNode>
-struct ShouldDispatchRemovalNotification;
 };
 
 // Helper functions for TreeShared-derived classes, which have a 'Node' style
@@ -70,9 +64,6 @@ void removeAllChildrenInContainer(GenericNodeContainer* container) {
       Private::addChildNodesToDeletionQueue<GenericNode, GenericNodeContainer>(
           head, tail, static_cast<GenericNodeContainer*>(n));
 
-    Private::NodeRemovalDispatcher<GenericNode,
-                                   Private::ShouldDispatchRemovalNotification<
-                                       GenericNode>::value>::dispatch(n);
     delete n;
   }
 }

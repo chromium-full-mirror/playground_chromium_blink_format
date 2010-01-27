@@ -42,7 +42,6 @@ class TreeShared : public Noncopyable {
   }
   virtual ~TreeShared() {
     ASSERT(isMainThread());
-    ASSERT(!m_refCount);
     ASSERT(m_deletionHasBegun);
   }
 
@@ -55,7 +54,6 @@ class TreeShared : public Noncopyable {
 
   void deref() {
     ASSERT(isMainThread());
-    ASSERT(m_refCount >= 0);
     ASSERT(!m_deletionHasBegun);
     ASSERT(!m_inRemovedLastRefFunction);
     if (--m_refCount <= 0 && !m_parent) {
