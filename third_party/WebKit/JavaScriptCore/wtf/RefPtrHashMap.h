@@ -298,7 +298,7 @@ template <typename T, typename U, typename V, typename W, typename X>
 inline void HashMap<RefPtr<T>, U, V, W, X>::remove(iterator it) {
   if (it.m_impl == m_impl.end())
     return;
-  m_impl.checkTableConsistency();
+  m_impl.internalCheckTableConsistency();
   m_impl.removeWithoutEntryConsistencyCheck(it.m_impl);
 }
 

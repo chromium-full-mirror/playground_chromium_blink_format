@@ -128,6 +128,7 @@ void Loader::load(DocLoader* docLoader,
   RefPtr<Host> host;
   KURL url(ParsedURLString, resource->url());
   if (url.protocolInHTTPFamily()) {
+    m_hosts.checkConsistency();
     AtomicString hostName = url.host();
     host = m_hosts.get(hostName.impl());
     if (!host) {
@@ -170,6 +171,7 @@ void Loader::servePendingRequests(Priority minimumPriority) {
   m_nonHTTPProtocolHost->servePendingRequests(minimumPriority);
 
   Vector<Host*> hostsToServe;
+  m_hosts.checkConsistency();
   HostMap::iterator i = m_hosts.begin();
   HostMap::iterator end = m_hosts.end();
   for (; i != end; ++i)
@@ -203,6 +205,7 @@ void Loader::nonCacheRequestInFlight(const KURL& url) {
     return;
 
   AtomicString hostName = url.host();
+  m_hosts.checkConsistency();
   RefPtr<Host> host = m_hosts.get(hostName.impl());
   if (!host) {
     host = Host::create(hostName, maxRequestsInFlightPerHost);
@@ -217,6 +220,7 @@ void Loader::nonCacheRequestComplete(const KURL& url) {
     return;
 
   AtomicString hostName = url.host();
+  m_hosts.checkConsistency();
   RefPtr<Host> host = m_hosts.get(hostName.impl());
   ASSERT(host);
   if (!host)
@@ -232,6 +236,7 @@ void Loader::cancelRequests(DocLoader* docLoader) {
     m_nonHTTPProtocolHost->cancelRequests(docLoader);
 
   Vector<Host*> hostsToCancel;
+  m_hosts.checkConsistency();
   HostMap::iterator i = m_hosts.begin();
   HostMap::iterator end = m_hosts.end();
   for (; i != end; ++i)

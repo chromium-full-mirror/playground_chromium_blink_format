@@ -317,6 +317,8 @@ static bool shouldAddNamespaceElem(const Element* elem) {
 static bool shouldAddNamespaceAttr(
     const Attribute* attr,
     HashMap<AtomicStringImpl*, AtomicStringImpl*>& namespaces) {
+  namespaces.checkConsistency();
+
   // Don't add namespace attributes twice
   if (attr->name() == XMLNSNames::xmlnsAttr) {
     namespaces.set(emptyAtom.impl(), attr->value().impl());
@@ -338,6 +340,7 @@ static void appendNamespace(
     const AtomicString& prefix,
     const AtomicString& ns,
     HashMap<AtomicStringImpl*, AtomicStringImpl*>& namespaces) {
+  namespaces.checkConsistency();
   if (ns.isEmpty())
     return;
 
@@ -403,6 +406,9 @@ static void appendStartMarkup(
     bool convertBlocksToInlines = false,
     HashMap<AtomicStringImpl*, AtomicStringImpl*>* namespaces = 0,
     RangeFullySelectsNode rangeFullySelectsNode = DoesFullySelectNode) {
+  if (namespaces)
+    namespaces->checkConsistency();
+
   bool documentIsHTML = node->document()->isHTMLDocument();
   switch (node->nodeType()) {
     case Node::TEXT_NODE: {

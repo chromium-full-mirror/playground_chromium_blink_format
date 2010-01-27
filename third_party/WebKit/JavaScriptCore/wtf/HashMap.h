@@ -117,6 +117,8 @@ class HashMap : public FastAllocBase {
   template <typename T, typename HashTranslator>
   pair<iterator, bool> add(const T&, const MappedType&);
 
+  void checkConsistency() const;
+
  private:
   pair<iterator, bool> inlineAdd(const KeyType&, const MappedType&);
 
@@ -302,7 +304,7 @@ template <typename T, typename U, typename V, typename W, typename X>
 inline void HashMap<T, U, V, W, X>::remove(iterator it) {
   if (it.m_impl == m_impl.end())
     return;
-  m_impl.checkTableConsistency();
+  m_impl.internalCheckTableConsistency();
   m_impl.removeWithoutEntryConsistencyCheck(it.m_impl);
 }
 
@@ -326,6 +328,11 @@ HashMap<T, U, V, W, MappedTraits>::take(const KeyType& key) {
   typename HashMap<T, U, V, W, MappedTraits>::MappedType result = it->second;
   remove(it);
   return result;
+}
+
+template <typename T, typename U, typename V, typename W, typename X>
+inline void HashMap<T, U, V, W, X>::checkConsistency() const {
+  m_impl.checkTableConsistency();
 }
 
 template <typename T, typename U, typename V, typename W, typename X>

@@ -61,12 +61,16 @@ HTMLInputElement* CheckedRadioButtons::checkedButtonForGroup(
   if (!m_nameToCheckedRadioButtonMap)
     return 0;
 
+  m_nameToCheckedRadioButtonMap->checkConsistency();
+
   return m_nameToCheckedRadioButtonMap->get(name.impl());
 }
 
 void CheckedRadioButtons::removeButton(HTMLFormControlElement* element) {
   if (element->name().isEmpty() || !m_nameToCheckedRadioButtonMap)
     return;
+
+  m_nameToCheckedRadioButtonMap->checkConsistency();
 
   NameToInputMap::iterator it =
       m_nameToCheckedRadioButtonMap->find(element->name().impl());
