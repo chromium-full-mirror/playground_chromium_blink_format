@@ -62,6 +62,7 @@ extern void qt_drt_whiteListAccessFromOrigin(const QString& sourceOrigin,
                                              bool allowDestinationSubdomains);
 extern QString qt_drt_counterValueForElementById(QWebFrame* qFrame,
                                                  const QString& id);
+extern int qt_drt_workerThreadCount();
 
 LayoutTestController::LayoutTestController(WebCore::DumpRenderTree* drt)
     : QObject(), m_drt(drt) {
@@ -433,4 +434,8 @@ void LayoutTestController::setDomainRelaxationForbiddenForURLScheme(
     bool forbidden,
     const QString& scheme) {
   qt_drt_setDomainRelaxationForbiddenForURLScheme(forbidden, scheme);
+}
+
+int LayoutTestController::workerThreadCount() {
+  return qt_drt_workerThreadCount();
 }

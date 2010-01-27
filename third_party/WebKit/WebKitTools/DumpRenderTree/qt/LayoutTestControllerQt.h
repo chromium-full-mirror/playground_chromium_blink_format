@@ -52,6 +52,7 @@ class DumpRenderTree;
 class LayoutTestController : public QObject {
   Q_OBJECT
   Q_PROPERTY(int webHistoryItemCount READ webHistoryItemCount)
+  Q_PROPERTY(int workerThreadCount READ workerThreadCount)
  public:
   LayoutTestController(WebCore::DumpRenderTree* drt);
 
@@ -148,6 +149,7 @@ class LayoutTestController : public QObject {
   void setUserStyleSheetEnabled(bool enabled);
   void setDomainRelaxationForbiddenForURLScheme(bool forbidden,
                                                 const QString& scheme);
+  int workerThreadCount();
 
  private slots:
   void processWork();

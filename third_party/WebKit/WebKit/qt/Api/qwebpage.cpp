@@ -81,6 +81,7 @@
 #include "runtime/InitializeThreading.h"
 #include "PageGroup.h"
 #include "QWebPageClient.h"
+#include "WorkerThread.h"
 
 #include <QApplication>
 #include <QBasicTimer>
@@ -126,6 +127,14 @@ void QWEBKIT_EXPORT qt_drt_overwritePluginDirectories() {
 
   db->setPluginDirectories(paths);
   db->refresh();
+}
+
+int QWEBKIT_EXPORT qt_drt_workerThreadCount() {
+#if ENABLE(WORKERS)
+  return WebCore::WorkerThread::workerThreadCount();
+#else
+  return 0;
+#endif
 }
 
 bool QWebPagePrivate::drtRun = false;
