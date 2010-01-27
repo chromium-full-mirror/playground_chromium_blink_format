@@ -246,11 +246,7 @@ class ImageDecoder : public Noncopyable {
   virtual bool isSizeAvailable() { return !m_failed && m_sizeAvailable; }
 
   // Returns the size of the image.
-  virtual IntSize size() const {
-    // Requesting the size of an invalid bitmap is meaningless.
-    ASSERT(!m_failed);
-    return m_size;
-  }
+  virtual IntSize size() const { return m_size; }
 
   IntSize scaledSize() const {
     return m_scaled ? IntSize(m_scaledColumns.size(), m_scaledRows.size())
