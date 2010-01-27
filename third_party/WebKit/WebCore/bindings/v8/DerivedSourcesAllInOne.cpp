@@ -425,3 +425,7 @@
 #include "bindings/V8InspectorBackend.cpp"
 #include "bindings/V8InspectorFrontendHost.cpp"
 #endif
+
+#if ENABLE(EVENTSOURCE)
+#include "bindings/V8EventSource.cpp"
+#endif

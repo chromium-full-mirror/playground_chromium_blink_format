@@ -217,6 +217,13 @@ class V8DOMWrapper {
       bool isAttribute,
       ListenerLookupType lookup);
 
+#if ENABLE(EVENTSOURCE)
+  static PassRefPtr<EventListener> getEventListener(EventSource* eventTarget,
+                                                    v8::Local<v8::Value> value,
+                                                    bool isAttribute,
+                                                    ListenerLookupType lookup);
+#endif
+
   static PassRefPtr<EventListener> getEventListener(EventTarget* eventTarget,
                                                     v8::Local<v8::Value> value,
                                                     bool isAttribute,

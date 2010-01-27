@@ -37,6 +37,7 @@
 #include "DOMCoreException.h"
 #include "DedicatedWorkerContext.h"
 #include "Event.h"
+#include "EventSource.h"
 #include "Notification.h"
 #include "NotificationCenter.h"
 #include "EventException.h"
@@ -329,6 +330,12 @@ v8::Handle<v8::Value> WorkerContextExecutionProxy::convertEventTargetToV8Object(
   WebSocket* webSocket = target->toWebSocket();
   if (webSocket)
     return convertToV8Object(V8ClassIndex::WEBSOCKET, webSocket);
+#endif
+
+#if ENABLE(EVENTSOURCE)
+  EventSource* eventSource = target->toEventSource();
+  if (eventSource)
+    return convertToV8Object(V8ClassIndex::EVENTSOURCE, eventSource);
 #endif
 
   ASSERT_NOT_REACHED();
