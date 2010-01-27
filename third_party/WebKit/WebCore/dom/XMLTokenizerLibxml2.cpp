@@ -827,7 +827,7 @@ void XMLTokenizer::startElementNs(const xmlChar* xmlLocalName,
   if (m_view && !newElement->attached())
     newElement->attach();
 
-  if (isFirstElement && m_doc->frame())
+  if (!m_parsingFragment && isFirstElement && m_doc->frame())
     m_doc->frame()->loader()->dispatchDocumentElementAvailable();
 }
 
