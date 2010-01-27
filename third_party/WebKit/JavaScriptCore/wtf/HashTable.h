@@ -592,7 +592,7 @@ class HashTable {
 #if !ASSERT_DISABLED
   void checkTableConsistencyExceptSize() const;
 #else
-  static void checkTableConsistencyExceptSize() const {}
+  static void checkTableConsistencyExceptSize() {}
 #endif
 
 #if CHECK_HASHTABLE_ITERATORS
