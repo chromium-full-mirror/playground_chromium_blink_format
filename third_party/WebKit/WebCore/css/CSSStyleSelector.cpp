@@ -1072,6 +1072,9 @@ bool CSSStyleSelector::canShareStyleWithElement(Node* n) {
         if (s->isDefaultButtonForForm() != m_element->isDefaultButtonForForm())
           return false;
 
+        if (!m_element->document()->containsValidityStyleRules())
+          return false;
+
         bool willValidate = s->willValidate();
         if (willValidate != m_element->willValidate())
           return false;
@@ -2660,10 +2663,18 @@ bool CSSStyleSelector::SelectorChecker::checkOneSelector(
         return e && e->isOptionalFormControl();
       case CSSSelector::PseudoRequired:
         return e && e->isRequiredFormControl();
-      case CSSSelector::PseudoValid:
-        return e && e->willValidate() && e->isValidFormControlElement();
-      case CSSSelector::PseudoInvalid:
-        return e && e->willValidate() && !e->isValidFormControlElement();
+      case CSSSelector::PseudoValid: {
+        if (!e)
+          return false;
+        e->document()->setContainsValidityStyleRules();
+        return e->willValidate() && e->isValidFormControlElement();
+      }
+      case CSSSelector::PseudoInvalid: {
+        if (!e)
+          return false;
+        e->document()->setContainsValidityStyleRules();
+        return e->willValidate() && !e->isValidFormControlElement();
+      }
       case CSSSelector::PseudoChecked: {
         if (!e || !e->isFormControlElement())
           break;

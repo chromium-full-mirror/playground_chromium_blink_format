@@ -1073,6 +1073,11 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   void initializeWMLPageState();
 #endif
 
+  bool containsValidityStyleRules() const {
+    return m_containsValidityStyleRules;
+  }
+  void setContainsValidityStyleRules() { m_containsValidityStyleRules = true; }
+
  protected:
   Document(Frame*, bool isXHTML, bool isHTML);
 
@@ -1232,6 +1237,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   bool m_isDNSPrefetchEnabled;
   bool m_haveExplicitlyDisabledDNSPrefetch;
   bool m_frameElementsShouldIgnoreScrolling;
+  bool m_containsValidityStyleRules;
 
   String m_title;
   String m_rawTitle;
