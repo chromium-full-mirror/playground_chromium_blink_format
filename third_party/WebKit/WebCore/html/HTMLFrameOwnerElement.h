@@ -54,6 +54,8 @@ class HTMLFrameOwnerElement : public HTMLElement {
 
   void setSandboxFlags(SandboxFlags);
 
+  virtual void willRemove();
+
  private:
   friend class Frame;
 
@@ -61,8 +63,6 @@ class HTMLFrameOwnerElement : public HTMLElement {
   virtual bool isKeyboardFocusable(KeyboardEvent*) const {
     return m_contentFrame;
   }
-
-  virtual void willRemove();
 
   Frame* m_contentFrame;
   SandboxFlags m_sandboxFlags;

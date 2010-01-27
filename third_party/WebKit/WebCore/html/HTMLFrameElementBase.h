@@ -42,6 +42,8 @@ class HTMLFrameElementBase : public HTMLFrameOwnerElement {
   int width() const;
   int height() const;
 
+  void setRemainsAliveOnRemovalFromTree(bool);
+
  protected:
   HTMLFrameElementBase(const QualifiedName&, Document*);
 
@@ -62,6 +64,9 @@ class HTMLFrameElementBase : public HTMLFrameOwnerElement {
 
   virtual bool isURLAttribute(Attribute*) const;
 
+  virtual void willRemove();
+  void checkAttachedTimerFired(Timer<HTMLFrameElementBase>*);
+
   bool viewSourceMode() const { return m_viewSource; }
 
   void setNameAndOpenURL();
@@ -77,9 +82,13 @@ class HTMLFrameElementBase : public HTMLFrameOwnerElement {
   int m_marginWidth;
   int m_marginHeight;
 
+  Timer<HTMLFrameElementBase> m_checkAttachedTimer;
+
   bool m_viewSource;
 
   bool m_shouldOpenURLAfterAttach;
+
+  bool m_remainsAliveOnRemovalFromTree;
 };
 
 }  // namespace WebCore

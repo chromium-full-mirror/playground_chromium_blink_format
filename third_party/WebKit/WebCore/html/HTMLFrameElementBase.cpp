@@ -51,8 +51,11 @@ HTMLFrameElementBase::HTMLFrameElementBase(const QualifiedName& tagName,
       m_scrolling(ScrollbarAuto),
       m_marginWidth(-1),
       m_marginHeight(-1),
+      m_checkAttachedTimer(this,
+                           &HTMLFrameElementBase::checkAttachedTimerFired),
       m_viewSource(false),
-      m_shouldOpenURLAfterAttach(false) {}
+      m_shouldOpenURLAfterAttach(false),
+      m_remainsAliveOnRemovalFromTree(false) {}
 
 bool HTMLFrameElementBase::isURLAllowed() const {
   if (m_URL.isEmpty())
@@ -187,9 +190,12 @@ void HTMLFrameElementBase::removedFromDocument() {
 void HTMLFrameElementBase::attach() {
   if (m_shouldOpenURLAfterAttach) {
     m_shouldOpenURLAfterAttach = false;
-    queuePostAttachCallback(&HTMLFrameElementBase::setNameAndOpenURLCallback,
-                            this);
+    if (!m_remainsAliveOnRemovalFromTree)
+      queuePostAttachCallback(&HTMLFrameElementBase::setNameAndOpenURLCallback,
+                              this);
   }
+
+  setRemainsAliveOnRemovalFromTree(false);
 
   HTMLFrameOwnerElement::attach();
 
@@ -242,6 +248,35 @@ int HTMLFrameElementBase::height() const {
 
   document()->updateLayoutIgnorePendingStylesheets();
   return toRenderBox(renderer())->height();
+}
+
+void HTMLFrameElementBase::setRemainsAliveOnRemovalFromTree(bool value) {
+  m_remainsAliveOnRemovalFromTree = value;
+
+  // There is a possibility that JS will do document.adoptNode() on this element
+  // but will not insert it into the tree.
+  // Start the async timer that is normally stopped by attach(). If it's not
+  // stopped and fires, it'll unload the frame.
+  if (value)
+    m_checkAttachedTimer.startOneShot(0);
+  else
+    m_checkAttachedTimer.stop();
+}
+
+void HTMLFrameElementBase::checkAttachedTimerFired(
+    Timer<HTMLFrameElementBase>*) {
+  ASSERT(!attached());
+  ASSERT(m_remainsAliveOnRemovalFromTree);
+
+  m_remainsAliveOnRemovalFromTree = false;
+  willRemove();
+}
+
+void HTMLFrameElementBase::willRemove() {
+  if (m_remainsAliveOnRemovalFromTree)
+    return;
+
+  HTMLFrameOwnerElement::willRemove();
 }
 
 }  // namespace WebCore
