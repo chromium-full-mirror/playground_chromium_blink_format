@@ -40,6 +40,7 @@ inline CollectionCache* HTMLFormCollection::formCollectionInfo(
     HTMLFormElement* form) {
   if (!form->collectionInfo)
     form->collectionInfo = new CollectionCache;
+  form->collectionInfo->checkConsistency();
   return form->collectionInfo;
 }
 

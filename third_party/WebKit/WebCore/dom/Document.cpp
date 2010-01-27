@@ -494,6 +494,10 @@ void Document::removedLastRef() {
     m_titleElement = 0;
     m_documentElement = 0;
 
+    // removeAllChildren() doesn't always unregister IDs, do it upfront to avoid
+    // having stale references in the map.
+    m_elementsById.clear();
+
     removeAllChildren();
 
     deleteAllValues(m_markers);
@@ -923,6 +927,8 @@ Element* Document::getElementById(const AtomicString& elementId) const {
   if (elementId.isEmpty())
     return 0;
 
+  m_elementsById.checkConsistency();
+
   Element* element = m_elementsById.get(elementId.impl());
   if (element)
     return element;
@@ -1115,6 +1121,8 @@ void Document::addElementById(const AtomicString& elementId, Element* element) {
 
 void Document::removeElementById(const AtomicString& elementId,
                                  Element* element) {
+  m_elementsById.checkConsistency();
+
   if (m_elementsById.get(elementId.impl()) == element)
     m_elementsById.remove(elementId.impl());
   else
@@ -3402,6 +3410,8 @@ void Document::removeImageMap(HTMLMapElement* imageMap) {
   if (!name.impl())
     return;
 
+  m_imageMapsByName.checkConsistency();
+
   ImageMapsByName::iterator it = m_imageMapsByName.find(name.impl());
   if (it != m_imageMapsByName.end() && it->second == imageMap)
     m_imageMapsByName.remove(it);
@@ -3413,6 +3423,7 @@ HTMLMapElement* Document::getImageMap(const String& url) const {
   int hashPos = url.find('#');
   String name = (hashPos < 0 ? url : url.substring(hashPos + 1)).impl();
   AtomicString mapName = isHTMLDocument() ? name.lower() : name;
+  m_imageMapsByName.checkConsistency();
   return m_imageMapsByName.get(mapName.impl());
 }
 
@@ -4233,6 +4244,7 @@ CollectionCache* Document::nameCollectionInfo(CollectionType type,
   NamedCollectionMap::iterator iter = map.find(name.impl());
   if (iter == map.end())
     iter = map.add(name.impl(), new CollectionCache).first;
+  iter->second->checkConsistency();
   return iter->second;
 }
 

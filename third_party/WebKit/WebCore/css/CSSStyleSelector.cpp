@@ -378,12 +378,15 @@ class CSSRuleSet : public Noncopyable {
                     CSSSelector* sel);
 
   CSSRuleDataList* getIDRules(AtomicStringImpl* key) {
+    m_idRules.checkConsistency();
     return m_idRules.get(key);
   }
   CSSRuleDataList* getClassRules(AtomicStringImpl* key) {
+    m_classRules.checkConsistency();
     return m_classRules.get(key);
   }
   CSSRuleDataList* getTagRules(AtomicStringImpl* key) {
+    m_tagRules.checkConsistency();
     return m_tagRules.get(key);
   }
   CSSRuleDataList* getUniversalRules() { return m_universalRules; }
@@ -1410,6 +1413,8 @@ void CSSStyleSelector::keyframeStylesForAnimation(
   // Get the keyframesRule for this name
   if (!e || list.animationName().isEmpty())
     return;
+
+  m_keyframesRuleMap.checkConsistency();
 
   if (!m_keyframesRuleMap.contains(list.animationName().impl()))
     return;
