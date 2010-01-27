@@ -64,7 +64,7 @@ class V8SVGPODTypeWrapperCreatorForList : public V8SVGPODTypeWrapper<PODType> {
   typedef SVGPODListItem<PODType> PODListItemPtrType;
 
   typedef PODType (SVGPODListItem<PODType>::*GetterMethod)() const;
-  typedef void (SVGPODListItem<PODType>::*SetterMethod)(PODType);
+  typedef void (SVGPODListItem<PODType>::*SetterMethod)(const PODType&);
 
   static PassRefPtr<V8SVGPODTypeWrapperCreatorForList> create(
       PassRefPtr<PODListItemPtrType> creator,
@@ -195,7 +195,7 @@ template <typename PODType, typename PODTypeCreator>
 class V8SVGDynamicPODTypeWrapper : public V8SVGPODTypeWrapper<PODType> {
  public:
   typedef PODType (PODTypeCreator::*GetterMethod)() const;
-  typedef void (PODTypeCreator::*SetterMethod)(PODType);
+  typedef void (PODTypeCreator::*SetterMethod)(const PODType&);
   typedef void (*CacheRemovalCallback)(V8SVGPODTypeWrapper<PODType>*);
 
   static PassRefPtr<V8SVGDynamicPODTypeWrapper> create(
@@ -250,7 +250,7 @@ class V8SVGDynamicPODTypeWrapper : public V8SVGPODTypeWrapper<PODType> {
 template <typename PODType, typename PODTypeCreator>
 struct PODTypeWrapperCacheInfo {
   typedef PODType (PODTypeCreator::*GetterMethod)() const;
-  typedef void (PODTypeCreator::*SetterMethod)(PODType);
+  typedef void (PODTypeCreator::*SetterMethod)(const PODType&);
 
   // Empty value
   PODTypeWrapperCacheInfo() : creator(0), getter(0), setter(0), fieldHash(0) {}
@@ -334,7 +334,7 @@ template <typename PODType, typename PODTypeCreator>
 class V8SVGDynamicPODTypeWrapperCache {
  public:
   typedef PODType (PODTypeCreator::*GetterMethod)() const;
-  typedef void (PODTypeCreator::*SetterMethod)(PODType);
+  typedef void (PODTypeCreator::*SetterMethod)(const PODType&);
 
   typedef PODTypeWrapperCacheInfo<PODType, PODTypeCreator> CacheInfo;
   typedef PODTypeWrapperCacheInfoHash<PODType, PODTypeCreator> CacheInfoHash;
