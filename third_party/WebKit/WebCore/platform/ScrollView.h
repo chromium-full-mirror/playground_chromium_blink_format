@@ -315,11 +315,6 @@ class ScrollView : public Widget, public ScrollbarClient {
   virtual void updateScrollCorner();
   virtual void paintScrollCorner(GraphicsContext*, const IntRect& cornerRect);
 
-  // Scroll the content by blitting the pixels
-  virtual void scrollContentsFastPath(const IntSize& scrollDelta,
-                                      const IntRect& rectToScroll,
-                                      const IntRect& clipRect);
-
  private:
   RefPtr<Scrollbar> m_horizontalScrollbar;
   RefPtr<Scrollbar> m_verticalScrollbar;
