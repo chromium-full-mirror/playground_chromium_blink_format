@@ -307,4 +307,6 @@ void LayoutTestController::whiteListAccessFromOrigin(
     bool allowDestinationSubdomains) {}
 
 JSRetainPtr<JSStringRef> LayoutTestController::counterValueForElementById(
-    JSStringRef id) {}
+    JSStringRef id) {
+  return 0;
+}
