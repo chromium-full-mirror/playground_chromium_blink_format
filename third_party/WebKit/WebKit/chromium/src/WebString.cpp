@@ -77,6 +77,10 @@ WebString WebString::fromUTF8(const char* data) {
   return WebCore::String::fromUTF8(data);
 }
 
+bool WebString::equals(const WebString& s) const {
+  return equal(m_private, s.m_private);
+}
+
 WebString::WebString(const WebCore::String& s)
     : m_private(static_cast<WebStringPrivate*>(s.impl())) {
   if (m_private)

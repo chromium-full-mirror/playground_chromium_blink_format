@@ -46,6 +46,8 @@ class PassRefPtr;
 
 namespace WebKit {
 class WebDocument;
+class WebEventListener;
+class WebEventListenerPrivate;
 class WebFrame;
 class WebNodeList;
 
@@ -104,6 +106,12 @@ class WebNode {
   WEBKIT_API WebString createMarkup() const;
   WEBKIT_API bool isTextNode() const;
   WEBKIT_API bool isElementNode() const;
+  WEBKIT_API void addEventListener(const WebString& eventType,
+                                   WebEventListener* listener,
+                                   bool useCapture);
+  WEBKIT_API void removeEventListener(const WebString& eventType,
+                                      WebEventListener* listener,
+                                      bool useCapture);
 
   template <typename T>
   T toElement() {
