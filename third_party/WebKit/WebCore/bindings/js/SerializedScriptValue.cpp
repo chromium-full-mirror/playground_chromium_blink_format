@@ -562,6 +562,7 @@ struct SerializingTreeWalker : public BaseWalker {
 SerializedScriptValueData SerializedScriptValueData::serialize(
     ExecState* exec,
     JSValue inValue) {
+  JSLock lock(SilenceAssertionsOnly);
   SerializingTreeWalker context(exec);
   return walk<SerializingTreeWalker>(context, inValue);
 }
