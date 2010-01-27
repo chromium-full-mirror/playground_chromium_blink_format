@@ -73,7 +73,7 @@ static inline bool shouldBreakAfter(UChar ch, UChar nextCh) {
     // For ASCII characters, use a lookup table for enhanced speed and for
     // compatibility with Internet Explorer.
     case '?':
-      return nextCh <= internetExplorerLineBreaksAfterQuestionMarkTableSize &&
+      return nextCh < internetExplorerLineBreaksAfterQuestionMarkTableSize &&
              internetExplorerLineBreaksAfterQuestionMarkTable[nextCh];
     // Internet Explorer always allows breaking after a hyphen.
     case '-':
