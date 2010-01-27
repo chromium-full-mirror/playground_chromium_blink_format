@@ -29,7 +29,6 @@
 
 namespace WebCore {
 
-extern char SVGStyledElementIdentifier[];
 class SVGResource;
 
 void mapAttributeToCSSProperty(
@@ -56,6 +55,7 @@ class SVGStyledElement : public SVGElement, public SVGStylable {
   virtual bool mapToEntry(const QualifiedName&, MappedAttributeEntry&) const;
   virtual void parseMappedAttribute(MappedAttribute*);
   virtual void svgAttributeChanged(const QualifiedName&);
+  virtual void synchronizeProperty(const QualifiedName&);
 
   virtual void childrenChanged(bool changedByParser = false,
                                Node* beforeChange = 0,
@@ -80,12 +80,11 @@ class SVGStyledElement : public SVGElement, public SVGStylable {
   static int cssPropertyIdForSVGAttributeName(const QualifiedName&);
 
  private:
-  ANIMATED_PROPERTY_DECLARATIONS(SVGStyledElement,
-                                 SVGStyledElementIdentifier,
-                                 HTMLNames::classAttrString,
-                                 String,
-                                 ClassName,
-                                 className)
+  DECLARE_ANIMATED_PROPERTY(SVGStyledElement,
+                            HTMLNames::classAttr,
+                            String,
+                            ClassName,
+                            className)
   bool m_instanceUpdatesBlocked;
 };
 

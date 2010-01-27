@@ -31,8 +31,7 @@
 namespace WebCore {
 
 SVGFETileElement::SVGFETileElement(const QualifiedName& tagName, Document* doc)
-    : SVGFilterPrimitiveStandardAttributes(tagName, doc),
-      m_in1(this, SVGNames::inAttr) {}
+    : SVGFilterPrimitiveStandardAttributes(tagName, doc) {}
 
 SVGFETileElement::~SVGFETileElement() {}
 
@@ -42,6 +41,13 @@ void SVGFETileElement::parseMappedAttribute(MappedAttribute* attr) {
     setIn1BaseValue(value);
   else
     SVGFilterPrimitiveStandardAttributes::parseMappedAttribute(attr);
+}
+
+void SVGFETileElement::synchronizeProperty(const QualifiedName& attrName) {
+  SVGFilterPrimitiveStandardAttributes::synchronizeProperty(attrName);
+
+  if (attrName == anyQName() || attrName == SVGNames::inAttr)
+    synchronizeIn1();
 }
 
 bool SVGFETileElement::build(SVGResourceFilter* filterResource) {

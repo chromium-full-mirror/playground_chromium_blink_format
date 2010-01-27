@@ -40,15 +40,15 @@ class SVGDefsElement : public SVGStyledTransformableElement,
   virtual bool isValid() const;
 
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
+  virtual void synchronizeProperty(const QualifiedName&);
 
  private:
   // SVGExternalResourcesRequired
-  ANIMATED_PROPERTY_DECLARATIONS(SVGDefsElement,
-                                 SVGExternalResourcesRequiredIdentifier,
-                                 SVGNames::externalResourcesRequiredAttrString,
-                                 bool,
-                                 ExternalResourcesRequired,
-                                 externalResourcesRequired)
+  DECLARE_ANIMATED_PROPERTY(SVGDefsElement,
+                            SVGNames::externalResourcesRequiredAttr,
+                            bool,
+                            ExternalResourcesRequired,
+                            externalResourcesRequired)
 };
 
 }  // namespace WebCore

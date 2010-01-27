@@ -42,12 +42,7 @@ SVGFEImageElement::SVGFEImageElement(const QualifiedName& tagName,
     : SVGFilterPrimitiveStandardAttributes(tagName, doc),
       SVGURIReference(),
       SVGLangSpace(),
-      SVGExternalResourcesRequired(),
-      m_preserveAspectRatio(this, SVGNames::preserveAspectRatioAttr),
-      m_href(this, XLinkNames::hrefAttr),
-      m_externalResourcesRequired(this,
-                                  SVGNames::externalResourcesRequiredAttr,
-                                  false) {}
+      SVGExternalResourcesRequired() {}
 
 SVGFEImageElement::~SVGFEImageElement() {
   if (m_cachedImage)
@@ -87,6 +82,24 @@ void SVGFEImageElement::parseMappedAttribute(MappedAttribute* attr) {
 
     SVGFilterPrimitiveStandardAttributes::parseMappedAttribute(attr);
   }
+}
+
+void SVGFEImageElement::synchronizeProperty(const QualifiedName& attrName) {
+  SVGFilterPrimitiveStandardAttributes::synchronizeProperty(attrName);
+
+  if (attrName == anyQName()) {
+    synchronizePreserveAspectRatio();
+    synchronizeHref();
+    synchronizeExternalResourcesRequired();
+    return;
+  }
+
+  if (attrName == SVGNames::preserveAspectRatioAttr)
+    synchronizePreserveAspectRatio();
+  else if (SVGURIReference::isKnownAttribute(attrName))
+    synchronizeHref();
+  else if (SVGExternalResourcesRequired::isKnownAttribute(attrName))
+    synchronizeExternalResourcesRequired();
 }
 
 void SVGFEImageElement::notifyFinished(CachedResource*) {

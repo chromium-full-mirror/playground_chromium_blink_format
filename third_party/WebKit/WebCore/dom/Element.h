@@ -331,7 +331,7 @@ class Element : public ContainerNode {
   virtual void updateStyleAttribute() const {}
 
 #if ENABLE(SVG)
-  virtual void updateAnimatedSVGAttribute(const String&) const {}
+  virtual void updateAnimatedSVGAttribute(const QualifiedName&) const {}
 #endif
 
   void updateFocusAppearanceSoonAfterAttach();
@@ -385,7 +385,7 @@ inline NamedNodeMap* Element::attributes(bool readonly) const {
 
 #if ENABLE(SVG)
   if (!m_areSVGAttributesValid)
-    updateAnimatedSVGAttribute(String());
+    updateAnimatedSVGAttribute(anyQName());
 #endif
 
   if (!readonly && !namedAttrMap)

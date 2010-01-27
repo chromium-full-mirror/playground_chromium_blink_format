@@ -29,8 +29,6 @@
 
 namespace WebCore {
 
-extern char SVGTextContentElementIdentifier[];
-
 class SVGLength;
 
 class SVGTextContentElement : public SVGStyledElement,
@@ -63,30 +61,28 @@ class SVGTextContentElement : public SVGStyledElement,
   void selectSubString(unsigned charnum, unsigned nchars, ExceptionCode&) const;
 
   virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void synchronizeProperty(const QualifiedName&);
 
   bool isKnownAttribute(const QualifiedName&);
 
  private:
-  ANIMATED_PROPERTY_DECLARATIONS(SVGTextContentElement,
-                                 SVGTextContentElementIdentifier,
-                                 SVGNames::textLengthAttrString,
-                                 SVGLength,
-                                 TextLength,
-                                 textLength)
-  ANIMATED_PROPERTY_DECLARATIONS(SVGTextContentElement,
-                                 SVGTextContentElementIdentifier,
-                                 SVGNames::lengthAdjustAttrString,
-                                 int,
-                                 LengthAdjust,
-                                 lengthAdjust)
+  DECLARE_ANIMATED_PROPERTY(SVGTextContentElement,
+                            SVGNames::textLengthAttr,
+                            SVGLength,
+                            TextLength,
+                            textLength)
+  DECLARE_ANIMATED_PROPERTY(SVGTextContentElement,
+                            SVGNames::lengthAdjustAttr,
+                            int,
+                            LengthAdjust,
+                            lengthAdjust)
 
   // SVGExternalResourcesRequired
-  ANIMATED_PROPERTY_DECLARATIONS(SVGTextContentElement,
-                                 SVGExternalResourcesRequiredIdentifier,
-                                 SVGNames::externalResourcesRequiredAttrString,
-                                 bool,
-                                 ExternalResourcesRequired,
-                                 externalResourcesRequired)
+  DECLARE_ANIMATED_PROPERTY(SVGTextContentElement,
+                            SVGNames::externalResourcesRequiredAttr,
+                            bool,
+                            ExternalResourcesRequired,
+                            externalResourcesRequired)
 };
 
 }  // namespace WebCore

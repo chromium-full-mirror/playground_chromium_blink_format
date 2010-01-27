@@ -48,6 +48,7 @@ class SVGScriptElement : public SVGElement,
                                int childCountDelta = 0);
 
   virtual void svgAttributeChanged(const QualifiedName&);
+  virtual void synchronizeProperty(const QualifiedName&);
   virtual bool isURLAttribute(Attribute*) const;
   virtual void finishParsingChildren();
 
@@ -74,20 +75,18 @@ class SVGScriptElement : public SVGElement,
 
  private:
   // SVGURIReference
-  ANIMATED_PROPERTY_DECLARATIONS(SVGScriptElement,
-                                 SVGURIReferenceIdentifier,
-                                 XLinkNames::hrefAttrString,
-                                 String,
-                                 Href,
-                                 href)
+  DECLARE_ANIMATED_PROPERTY(SVGScriptElement,
+                            XLinkNames::hrefAttr,
+                            String,
+                            Href,
+                            href)
 
   // SVGExternalResourcesRequired
-  ANIMATED_PROPERTY_DECLARATIONS(SVGScriptElement,
-                                 SVGExternalResourcesRequiredIdentifier,
-                                 SVGNames::externalResourcesRequiredAttrString,
-                                 bool,
-                                 ExternalResourcesRequired,
-                                 externalResourcesRequired)
+  DECLARE_ANIMATED_PROPERTY(SVGScriptElement,
+                            SVGNames::externalResourcesRequiredAttr,
+                            bool,
+                            ExternalResourcesRequired,
+                            externalResourcesRequired)
 
  private:
   ScriptElementData m_data;

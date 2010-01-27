@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006 Rob Buis <buis@kde.org>
 
     This library is free software; you can redistribute it and/or
@@ -19,6 +19,7 @@
 */
 
 #include "config.h"
+
 #if ENABLE(SVG)
 #include "SVGTRefElement.h"
 
@@ -31,9 +32,7 @@
 namespace WebCore {
 
 SVGTRefElement::SVGTRefElement(const QualifiedName& tagName, Document* doc)
-    : SVGTextPositioningElement(tagName, doc),
-      SVGURIReference(),
-      m_href(this, XLinkNames::hrefAttr) {}
+    : SVGTextPositioningElement(tagName, doc), SVGURIReference() {}
 
 SVGTRefElement::~SVGTRefElement() {}
 
@@ -66,6 +65,13 @@ void SVGTRefElement::svgAttributeChanged(const QualifiedName& attrName) {
     renderer()->setNeedsLayout(true);
 }
 
+void SVGTRefElement::synchronizeProperty(const QualifiedName& attrName) {
+  SVGTextPositioningElement::synchronizeProperty(attrName);
+
+  if (attrName == anyQName() || SVGURIReference::isKnownAttribute(attrName))
+    synchronizeHref();
+}
+
 bool SVGTRefElement::childShouldCreateRenderer(Node* child) const {
   if (child->isTextNode() || child->hasTagName(SVGNames::tspanTag) ||
       child->hasTagName(SVGNames::trefTag))
@@ -78,5 +84,4 @@ RenderObject* SVGTRefElement::createRenderer(RenderArena* arena, RenderStyle*) {
 }
 }
 
-// vim:ts=4:noet
 #endif  // ENABLE(SVG)

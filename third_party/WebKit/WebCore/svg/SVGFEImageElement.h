@@ -43,6 +43,7 @@ class SVGFEImageElement : public SVGFilterPrimitiveStandardAttributes,
   virtual ~SVGFEImageElement();
 
   virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void synchronizeProperty(const QualifiedName&);
   virtual void notifyFinished(CachedResource*);
 
   virtual void addSubresourceAttributeURLs(ListHashSet<KURL>&) const;
@@ -51,28 +52,25 @@ class SVGFEImageElement : public SVGFilterPrimitiveStandardAttributes,
  private:
   void requestImageResource();
 
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFEImageElement,
-                                 SVGNames::feImageTagString,
-                                 SVGNames::preserveAspectRatioAttrString,
-                                 SVGPreserveAspectRatio,
-                                 PreserveAspectRatio,
-                                 preserveAspectRatio)
+  DECLARE_ANIMATED_PROPERTY(SVGFEImageElement,
+                            SVGNames::preserveAspectRatioAttr,
+                            SVGPreserveAspectRatio,
+                            PreserveAspectRatio,
+                            preserveAspectRatio)
 
   // SVGURIReference
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFEImageElement,
-                                 SVGURIReferenceIdentifier,
-                                 XLinkNames::hrefAttrString,
-                                 String,
-                                 Href,
-                                 href)
+  DECLARE_ANIMATED_PROPERTY(SVGFEImageElement,
+                            XLinkNames::hrefAttr,
+                            String,
+                            Href,
+                            href)
 
   // SVGExternalResourcesRequired
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFEImageElement,
-                                 SVGExternalResourcesRequiredIdentifier,
-                                 SVGNames::externalResourcesRequiredAttrString,
-                                 bool,
-                                 ExternalResourcesRequired,
-                                 externalResourcesRequired)
+  DECLARE_ANIMATED_PROPERTY(SVGFEImageElement,
+                            SVGNames::externalResourcesRequiredAttr,
+                            bool,
+                            ExternalResourcesRequired,
+                            externalResourcesRequired)
 
   CachedResourceHandle<CachedImage> m_cachedImage;
   OwnPtr<ImageBuffer> m_targetImage;

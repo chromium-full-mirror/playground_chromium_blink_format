@@ -33,15 +33,15 @@ class SVGFETileElement : public SVGFilterPrimitiveStandardAttributes {
   virtual ~SVGFETileElement();
 
   virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void synchronizeProperty(const QualifiedName&);
   virtual bool build(SVGResourceFilter*);
 
  private:
-  ANIMATED_PROPERTY_DECLARATIONS(SVGFETileElement,
-                                 SVGNames::feTileTagString,
-                                 SVGNames::inAttrString,
-                                 String,
-                                 In1,
-                                 in1)
+  DECLARE_ANIMATED_PROPERTY(SVGFETileElement,
+                            SVGNames::inAttr,
+                            String,
+                            In1,
+                            in1)
 };
 
 }  // namespace WebCore

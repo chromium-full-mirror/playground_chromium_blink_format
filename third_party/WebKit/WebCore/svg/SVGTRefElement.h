@@ -35,6 +35,7 @@ class SVGTRefElement : public SVGTextPositioningElement,
 
   virtual void parseMappedAttribute(MappedAttribute*);
   virtual void svgAttributeChanged(const QualifiedName&);
+  virtual void synchronizeProperty(const QualifiedName&);
 
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   bool childShouldCreateRenderer(Node*) const;
@@ -43,12 +44,11 @@ class SVGTRefElement : public SVGTextPositioningElement,
   void updateReferencedText();
 
   // SVGURIReference
-  ANIMATED_PROPERTY_DECLARATIONS(SVGTRefElement,
-                                 SVGURIReferenceIdentifier,
-                                 XLinkNames::hrefAttrString,
-                                 String,
-                                 Href,
-                                 href)
+  DECLARE_ANIMATED_PROPERTY(SVGTRefElement,
+                            XLinkNames::hrefAttr,
+                            String,
+                            Href,
+                            href)
 };
 
 }  // namespace WebCore

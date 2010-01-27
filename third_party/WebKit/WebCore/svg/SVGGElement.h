@@ -42,6 +42,7 @@ class SVGGElement : public SVGStyledTransformableElement,
 
   virtual void parseMappedAttribute(MappedAttribute*);
   virtual void svgAttributeChanged(const QualifiedName&);
+  virtual void synchronizeProperty(const QualifiedName&);
   virtual void childrenChanged(bool changedByParser = false,
                                Node* beforeChange = 0,
                                Node* afterChange = 0,
@@ -51,12 +52,11 @@ class SVGGElement : public SVGStyledTransformableElement,
 
  private:
   // SVGExternalResourcesRequired
-  ANIMATED_PROPERTY_DECLARATIONS(SVGGElement,
-                                 SVGExternalResourcesRequiredIdentifier,
-                                 SVGNames::externalResourcesRequiredAttrString,
-                                 bool,
-                                 ExternalResourcesRequired,
-                                 externalResourcesRequired)
+  DECLARE_ANIMATED_PROPERTY(SVGGElement,
+                            SVGNames::externalResourcesRequiredAttr,
+                            bool,
+                            ExternalResourcesRequired,
+                            externalResourcesRequired)
 };
 
 }  // namespace WebCore

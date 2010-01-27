@@ -35,10 +35,16 @@ namespace WebCore {
 
 SVGAltGlyphElement::SVGAltGlyphElement(const QualifiedName& tagName,
                                        Document* doc)
-    : SVGTextPositioningElement(tagName, doc),
-      m_href(this, XLinkNames::hrefAttr) {}
+    : SVGTextPositioningElement(tagName, doc) {}
 
 SVGAltGlyphElement::~SVGAltGlyphElement() {}
+
+void SVGAltGlyphElement::synchronizeProperty(const QualifiedName& attrName) {
+  SVGTextPositioningElement::synchronizeProperty(attrName);
+
+  if (attrName == anyQName() || SVGURIReference::isKnownAttribute(attrName))
+    synchronizeHref();
+}
 
 void SVGAltGlyphElement::setGlyphRef(const AtomicString&, ExceptionCode& ec) {
   ec = NO_MODIFICATION_ALLOWED_ERR;

@@ -37,10 +37,9 @@ SVGTextPathElement::SVGTextPathElement(const QualifiedName& tagName,
                                        Document* doc)
     : SVGTextContentElement(tagName, doc),
       SVGURIReference(),
-      m_startOffset(this, SVGNames::startOffsetAttr, LengthModeOther),
-      m_method(this, SVGNames::methodAttr, SVG_TEXTPATH_METHODTYPE_ALIGN),
-      m_spacing(this, SVGNames::spacingAttr, SVG_TEXTPATH_SPACINGTYPE_EXACT),
-      m_href(this, XLinkNames::hrefAttr) {}
+      m_startOffset(LengthModeOther),
+      m_method(SVG_TEXTPATH_METHODTYPE_ALIGN),
+      m_spacing(SVG_TEXTPATH_SPACINGTYPE_EXACT) {}
 
 SVGTextPathElement::~SVGTextPathElement() {}
 
@@ -64,6 +63,27 @@ void SVGTextPathElement::parseMappedAttribute(MappedAttribute* attr) {
       return;
     SVGTextContentElement::parseMappedAttribute(attr);
   }
+}
+
+void SVGTextPathElement::synchronizeProperty(const QualifiedName& attrName) {
+  SVGTextContentElement::synchronizeProperty(attrName);
+
+  if (attrName == anyQName()) {
+    synchronizeStartOffset();
+    synchronizeMethod();
+    synchronizeSpacing();
+    synchronizeHref();
+    return;
+  }
+
+  if (attrName == SVGNames::startOffsetAttr)
+    synchronizeStartOffset();
+  else if (attrName == SVGNames::methodAttr)
+    synchronizeMethod();
+  else if (attrName == SVGNames::spacingAttr)
+    synchronizeSpacing();
+  else if (SVGURIReference::isKnownAttribute(attrName))
+    synchronizeHref();
 }
 
 RenderObject* SVGTextPathElement::createRenderer(RenderArena* arena,
@@ -97,5 +117,3 @@ void SVGTextPathElement::insertedIntoDocument() {
 }
 
 #endif  // ENABLE(SVG)
-
-// vim:ts=4:noet

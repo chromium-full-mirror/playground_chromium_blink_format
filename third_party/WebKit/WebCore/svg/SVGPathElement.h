@@ -130,6 +130,7 @@ class SVGPathElement : public SVGStyledTransformableElement,
 
   virtual void parseMappedAttribute(MappedAttribute*);
   virtual void svgAttributeChanged(const QualifiedName&);
+  virtual void synchronizeProperty(const QualifiedName&);
 
   virtual Path toPathData() const;
 
@@ -138,20 +139,18 @@ class SVGPathElement : public SVGStyledTransformableElement,
  private:
   mutable RefPtr<SVGPathSegList> m_pathSegList;
 
-  ANIMATED_PROPERTY_DECLARATIONS(SVGPathElement,
-                                 SVGNames::pathTagString,
-                                 SVGNames::pathLengthAttrString,
-                                 float,
-                                 PathLength,
-                                 pathLength)
+  DECLARE_ANIMATED_PROPERTY(SVGPathElement,
+                            SVGNames::pathLengthAttr,
+                            float,
+                            PathLength,
+                            pathLength)
 
   // SVGExternalResourcesRequired
-  ANIMATED_PROPERTY_DECLARATIONS(SVGPathElement,
-                                 SVGExternalResourcesRequiredIdentifier,
-                                 SVGNames::externalResourcesRequiredAttrString,
-                                 bool,
-                                 ExternalResourcesRequired,
-                                 externalResourcesRequired)
+  DECLARE_ANIMATED_PROPERTY(SVGPathElement,
+                            SVGNames::externalResourcesRequiredAttr,
+                            bool,
+                            ExternalResourcesRequired,
+                            externalResourcesRequired)
 };
 
 }  // namespace WebCore

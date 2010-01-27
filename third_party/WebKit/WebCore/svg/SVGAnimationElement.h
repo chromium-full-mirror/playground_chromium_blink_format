@@ -49,6 +49,7 @@ class SVGAnimationElement : public SVGSMILElement,
 
   virtual void parseMappedAttribute(MappedAttribute*);
   virtual void attributeChanged(Attribute*, bool preserveDecls);
+  virtual void synchronizeProperty(const QualifiedName&);
 
   // SVGAnimationElement
   float getStartTime() const;
@@ -134,12 +135,11 @@ class SVGAnimationElement : public SVGSMILElement,
 
  protected:
   // SVGExternalResourcesRequired
-  ANIMATED_PROPERTY_DECLARATIONS(SVGAnimationElement,
-                                 SVGExternalResourcesRequiredIdentifier,
-                                 SVGNames::externalResourcesRequiredAttrString,
-                                 bool,
-                                 ExternalResourcesRequired,
-                                 externalResourcesRequired)
+  DECLARE_ANIMATED_PROPERTY(SVGAnimationElement,
+                            SVGNames::externalResourcesRequiredAttr,
+                            bool,
+                            ExternalResourcesRequired,
+                            externalResourcesRequired)
 
   bool m_animationValid;
 

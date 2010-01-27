@@ -178,10 +178,10 @@ void SVGAnimateTransformElement::applyResultsToTarget() {
     ASSERT(shadowTreeElement);
     if (shadowTreeElement->isStyledTransformable())
       static_cast<SVGStyledTransformableElement*>(shadowTreeElement)
-          ->setTransform(transformList.get());
+          ->setTransformBaseValue(transformList.get());
     else if (shadowTreeElement->hasTagName(SVGNames::textTag))
       static_cast<SVGTextElement*>(shadowTreeElement)
-          ->setTransform(transformList.get());
+          ->setTransformBaseValue(transformList.get());
     if (shadowTreeElement->renderer())
       shadowTreeElement->renderer()->setNeedsLayout(true);
   }

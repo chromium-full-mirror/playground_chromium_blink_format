@@ -23,11 +23,7 @@
 #define SVGAnimatedTemplate_h
 
 #if ENABLE(SVG)
-#include "AtomicString.h"
-#include "FloatRect.h"
-#include "SVGAngle.h"
-#include "SVGLength.h"
-#include "SVGPreserveAspectRatio.h"
+#include "SVGAnimatedPropertyTraits.h"
 #include <wtf/HashMap.h>
 
 namespace WebCore {
@@ -96,19 +92,26 @@ struct SVGAnimatedTypeWrapperKeyHashTraits
   }
 };
 
-template <typename BareType>
-class SVGAnimatedTemplate : public RefCounted<SVGAnimatedTemplate<BareType>> {
+template <typename AnimatedType>
+class SVGAnimatedTemplate
+    : public RefCounted<SVGAnimatedTemplate<AnimatedType>> {
  public:
+  typedef typename SVGAnimatedPropertyTraits<AnimatedType>::PassType PassType;
+  typedef
+      typename SVGAnimatedPropertyTraits<AnimatedType>::ReturnType ReturnType;
+
   virtual ~SVGAnimatedTemplate() { forgetWrapper(this); }
 
-  virtual BareType baseVal() const = 0;
-  virtual void setBaseVal(BareType) = 0;
+  virtual ReturnType baseVal() const = 0;
+  virtual void setBaseVal(PassType) = 0;
 
-  virtual BareType animVal() const = 0;
-  virtual void setAnimVal(BareType) = 0;
+  virtual ReturnType animVal() const = 0;
+  virtual void setAnimVal(PassType) = 0;
+
+  virtual const QualifiedName& associatedAttributeName() const = 0;
 
   typedef HashMap<SVGAnimatedTypeWrapperKey,
-                  SVGAnimatedTemplate<BareType>*,
+                  SVGAnimatedTemplate<AnimatedType>*,
                   SVGAnimatedTypeWrapperKeyHash,
                   SVGAnimatedTypeWrapperKeyHashTraits>
       ElementToWrapperMap;
@@ -120,7 +123,7 @@ class SVGAnimatedTemplate : public RefCounted<SVGAnimatedTemplate<BareType>> {
     return s_wrapperCache;
   }
 
-  static void forgetWrapper(SVGAnimatedTemplate<BareType>* wrapper) {
+  static void forgetWrapper(SVGAnimatedTemplate<AnimatedType>* wrapper) {
     ElementToWrapperMap* cache = wrapperCache();
     ElementToWrapperMapIterator itr = cache->begin();
     ElementToWrapperMapIterator end = cache->end();
@@ -131,146 +134,27 @@ class SVGAnimatedTemplate : public RefCounted<SVGAnimatedTemplate<BareType>> {
       }
     }
   }
-
-  const QualifiedName& associatedAttributeName() const {
-    return m_associatedAttributeName;
-  }
-
- protected:
-  SVGAnimatedTemplate(const QualifiedName& attributeName)
-      : m_associatedAttributeName(attributeName) {}
-
- private:
-  const QualifiedName& m_associatedAttributeName;
 };
 
-template <typename OwnerTypeArg,
-          typename AnimatedTypeArg,
-          const char* TagName,
-          const char* PropertyName>
+template <typename AnimatedType>
 class SVGAnimatedProperty;
 
-template <typename OwnerType,
-          typename AnimatedType,
-          const char* TagName,
-          const char* PropertyName,
-          typename Type,
-          typename OwnerElement>
-PassRefPtr<Type> lookupOrCreateWrapper(
-    const SVGAnimatedProperty<OwnerType, AnimatedType, TagName, PropertyName>&
-        creator,
-    const OwnerElement* element,
-    const QualifiedName& attrName,
-    const AtomicString& attrIdentifier) {
-  SVGAnimatedTypeWrapperKey key(element, attrIdentifier);
-  RefPtr<Type> wrapper = static_cast<Type*>(Type::wrapperCache()->get(key));
+template <typename AnimatedType, typename AnimatedTearOff>
+PassRefPtr<AnimatedTearOff> lookupOrCreateWrapper(
+    SVGElement* element,
+    SVGAnimatedProperty<AnimatedType>& creator,
+    const QualifiedName& attrName) {
+  SVGAnimatedTypeWrapperKey key(element, attrName.localName());
+  RefPtr<AnimatedTearOff> wrapper =
+      static_cast<AnimatedTearOff*>(AnimatedTearOff::wrapperCache()->get(key));
 
   if (!wrapper) {
-    wrapper = Type::create(creator, element, attrName);
-    element->propertyController().setPropertyNeedsSynchronization(attrName);
-    Type::wrapperCache()->set(key, wrapper.get());
+    wrapper = AnimatedTearOff::create(creator, element);
+    AnimatedTearOff::wrapperCache()->set(key, wrapper.get());
   }
 
   return wrapper.release();
 }
-
-// Default implementation for pointer types
-template <typename Type>
-struct SVGAnimatedTypeValue : Noncopyable {
-  typedef RefPtr<Type> StorableType;
-  typedef Type* DecoratedType;
-
-  static Type null() { return 0; }
-  static String toString(Type type) {
-    return type ? type->valueAsString() : String();
-  }
-};
-
-template <>
-struct SVGAnimatedTypeValue<bool> : Noncopyable {
-  typedef bool StorableType;
-  typedef bool DecoratedType;
-
-  static bool null() { return false; }
-  static String toString(bool type) { return type ? "true" : "false"; }
-};
-
-template <>
-struct SVGAnimatedTypeValue<int> : Noncopyable {
-  typedef int StorableType;
-  typedef int DecoratedType;
-
-  static int null() { return 0; }
-  static String toString(int type) { return String::number(type); }
-};
-
-template <>
-struct SVGAnimatedTypeValue<long> : Noncopyable {
-  typedef long StorableType;
-  typedef long DecoratedType;
-
-  static long null() { return 0l; }
-  static String toString(long type) { return String::number(type); }
-};
-
-template <>
-struct SVGAnimatedTypeValue<SVGAngle> : Noncopyable {
-  typedef SVGAngle StorableType;
-  typedef SVGAngle DecoratedType;
-
-  static SVGAngle null() { return SVGAngle(); }
-  static String toString(const SVGAngle& type) { return type.valueAsString(); }
-};
-
-template <>
-struct SVGAnimatedTypeValue<SVGLength> : Noncopyable {
-  typedef SVGLength StorableType;
-  typedef SVGLength DecoratedType;
-
-  static SVGLength null() { return SVGLength(); }
-  static String toString(const SVGLength& type) { return type.valueAsString(); }
-};
-
-template <>
-struct SVGAnimatedTypeValue<SVGPreserveAspectRatio> : Noncopyable {
-  typedef SVGPreserveAspectRatio StorableType;
-  typedef SVGPreserveAspectRatio DecoratedType;
-
-  static SVGPreserveAspectRatio null() { return SVGPreserveAspectRatio(); }
-  static String toString(const SVGPreserveAspectRatio& type) {
-    return type.valueAsString();
-  }
-};
-
-template <>
-struct SVGAnimatedTypeValue<float> : Noncopyable {
-  typedef float StorableType;
-  typedef float DecoratedType;
-
-  static float null() { return 0.0f; }
-  static String toString(float type) { return String::number(type); }
-};
-
-template <>
-struct SVGAnimatedTypeValue<FloatRect> : Noncopyable {
-  typedef FloatRect StorableType;
-  typedef FloatRect DecoratedType;
-
-  static FloatRect null() { return FloatRect(); }
-  static String toString(const FloatRect& type) {
-    return String::format("%f %f %f %f", type.x(), type.y(), type.width(),
-                          type.height());
-  }
-};
-
-template <>
-struct SVGAnimatedTypeValue<String> : Noncopyable {
-  typedef String StorableType;
-  typedef String DecoratedType;
-
-  static String null() { return String(); }
-  static String toString(const String& type) { return type; }
-};
 
 // Common type definitions, to ease IDL generation.
 typedef SVGAnimatedTemplate<SVGAngle> SVGAnimatedAngle;
@@ -288,5 +172,5 @@ typedef SVGAnimatedTemplate<String> SVGAnimatedString;
 typedef SVGAnimatedTemplate<SVGTransformList*> SVGAnimatedTransformList;
 }
 
-#endif  // ENABLE(SVG)
-#endif  // SVGAnimatedTemplate_h
+#endif
+#endif

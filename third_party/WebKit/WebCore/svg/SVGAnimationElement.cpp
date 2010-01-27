@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
+    Copyright (C) 2004, 2005 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005, 2006, 2007 Rob Buis <buis@kde.org>
     Copyright (C) 2007 Eric Seidel <eric@webkit.org>
     Copyright (C) 2008 Apple Inc. All rights reserved.
@@ -52,9 +52,6 @@ SVGAnimationElement::SVGAnimationElement(const QualifiedName& tagName,
     : SVGSMILElement(tagName, doc),
       SVGTests(),
       SVGExternalResourcesRequired(),
-      m_externalResourcesRequired(this,
-                                  SVGNames::externalResourcesRequiredAttr,
-                                  false),
       m_animationValid(false) {}
 
 SVGAnimationElement::~SVGAnimationElement() {}
@@ -140,6 +137,14 @@ void SVGAnimationElement::attributeChanged(Attribute* attr,
   // Assumptions may not hold after an attribute change.
   m_animationValid = false;
   SVGSMILElement::attributeChanged(attr, preserveDecls);
+}
+
+void SVGAnimationElement::synchronizeProperty(const QualifiedName& attrName) {
+  SVGSMILElement::synchronizeProperty(attrName);
+
+  if (attrName == anyQName() ||
+      SVGExternalResourcesRequired::isKnownAttribute(attrName))
+    synchronizeExternalResourcesRequired();
 }
 
 float SVGAnimationElement::getStartTime() const {

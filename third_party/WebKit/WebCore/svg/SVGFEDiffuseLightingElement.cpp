@@ -42,11 +42,8 @@ SVGFEDiffuseLightingElement::SVGFEDiffuseLightingElement(
     const QualifiedName& tagName,
     Document* doc)
     : SVGFilterPrimitiveStandardAttributes(tagName, doc),
-      m_in1(this, SVGNames::inAttr),
-      m_diffuseConstant(this, SVGNames::diffuseConstantAttr, 1.0f),
-      m_surfaceScale(this, SVGNames::surfaceScaleAttr, 1.0f),
-      m_kernelUnitLengthX(this, SVGNames::kernelUnitLengthAttr),
-      m_kernelUnitLengthY(this, SVGNames::kernelUnitLengthAttr) {}
+      m_diffuseConstant(1.0f),
+      m_surfaceScale(1.0f) {}
 
 SVGFEDiffuseLightingElement::~SVGFEDiffuseLightingElement() {}
 
@@ -66,6 +63,31 @@ void SVGFEDiffuseLightingElement::parseMappedAttribute(MappedAttribute* attr) {
     }
   } else
     SVGFilterPrimitiveStandardAttributes::parseMappedAttribute(attr);
+}
+
+void SVGFEDiffuseLightingElement::synchronizeProperty(
+    const QualifiedName& attrName) {
+  SVGFilterPrimitiveStandardAttributes::synchronizeProperty(attrName);
+
+  if (attrName == anyQName()) {
+    synchronizeIn1();
+    synchronizeSurfaceScale();
+    synchronizeDiffuseConstant();
+    synchronizeKernelUnitLengthX();
+    synchronizeKernelUnitLengthY();
+    return;
+  }
+
+  if (attrName == SVGNames::inAttr)
+    synchronizeIn1();
+  else if (attrName == SVGNames::surfaceScaleAttr)
+    synchronizeSurfaceScale();
+  else if (attrName == SVGNames::diffuseConstantAttr)
+    synchronizeDiffuseConstant();
+  else if (attrName == SVGNames::kernelUnitLengthAttr) {
+    synchronizeKernelUnitLengthX();
+    synchronizeKernelUnitLengthY();
+  }
 }
 
 bool SVGFEDiffuseLightingElement::build(SVGResourceFilter* filterResource) {

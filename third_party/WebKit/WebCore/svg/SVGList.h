@@ -169,7 +169,7 @@ class SVGPODListItem : public RefCounted<SVGPODListItem<Item>> {
 
   // Updating facilities, used by JSSVGPODTypeWrapperCreatorForList
   Item value() const { return m_item; }
-  void setValue(Item newItem) { m_item = newItem; }
+  void setValue(const Item& newItem) { m_item = newItem; }
 
  private:
   SVGPODListItem() : m_item() {}

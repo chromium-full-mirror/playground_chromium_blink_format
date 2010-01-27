@@ -39,12 +39,7 @@ SVGClipPathElement::SVGClipPathElement(const QualifiedName& tagName,
       SVGTests(),
       SVGLangSpace(),
       SVGExternalResourcesRequired(),
-      m_clipPathUnits(this,
-                      SVGNames::clipPathUnitsAttr,
-                      SVGUnitTypes::SVG_UNIT_TYPE_USERSPACEONUSE),
-      m_externalResourcesRequired(this,
-                                  SVGNames::externalResourcesRequiredAttr,
-                                  false) {}
+      m_clipPathUnits(SVGUnitTypes::SVG_UNIT_TYPE_USERSPACEONUSE) {}
 
 SVGClipPathElement::~SVGClipPathElement() {}
 
@@ -77,6 +72,21 @@ void SVGClipPathElement::svgAttributeChanged(const QualifiedName& attrName) {
       SVGExternalResourcesRequired::isKnownAttribute(attrName) ||
       SVGStyledTransformableElement::isKnownAttribute(attrName))
     m_clipper->invalidate();
+}
+
+void SVGClipPathElement::synchronizeProperty(const QualifiedName& attrName) {
+  SVGStyledTransformableElement::synchronizeProperty(attrName);
+
+  if (attrName == anyQName()) {
+    synchronizeClipPathUnits();
+    synchronizeExternalResourcesRequired();
+    return;
+  }
+
+  if (attrName == SVGNames::clipPathUnitsAttr)
+    synchronizeClipPathUnits();
+  else if (SVGExternalResourcesRequired::isKnownAttribute(attrName))
+    synchronizeExternalResourcesRequired();
 }
 
 void SVGClipPathElement::childrenChanged(bool changedByParser,
