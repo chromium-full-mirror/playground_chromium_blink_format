@@ -110,6 +110,14 @@ v8::Handle<v8::Value> V8HTMLDocument::namedPropertyGetter(
                                          items.release());
 }
 
+v8::Handle<v8::Value> V8HTMLDocument::indexedPropertyGetter(
+    uint32_t index,
+    const v8::AccessorInfo& info) {
+  INC_STATS("DOM.HTMLDocument.IndexedPropertyGetter");
+  v8::Local<v8::Integer> indexV8 = v8::Integer::NewFromUnsigned(index);
+  return namedPropertyGetter(indexV8->ToString(), info);
+}
+
 // HTMLDocument ----------------------------------------------------------------
 
 // Concatenates "args" to a string. If args is empty, returns empty string.
