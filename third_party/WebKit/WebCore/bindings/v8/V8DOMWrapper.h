@@ -155,7 +155,7 @@ class V8DOMWrapper {
 
   static v8::Handle<v8::Value> convertNewNodeToV8Object(Node*,
                                                         V8Proxy*,
-                                                        DOMWrapperMap<Node>&);
+                                                        DOMNodeMapping&);
 
   static V8ClassIndex::V8WrapperType domWrapperType(v8::Handle<v8::Object>);
 
