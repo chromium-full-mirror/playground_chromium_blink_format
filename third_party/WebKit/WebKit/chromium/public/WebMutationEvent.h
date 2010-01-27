@@ -49,10 +49,6 @@ class WebMutationEvent : public WebEvent {
   WEBKIT_API WebString newValue() const;
   WEBKIT_API WebString attrName() const;
   WEBKIT_API AttrChangeType attrChange() const;
-
-#if WEBKIT_IMPLEMENTATION
-  WebMutationEvent(const WTF::PassRefPtr<WebCore::Event>&);
-#endif
 };
 
 }  // namespace WebKit
