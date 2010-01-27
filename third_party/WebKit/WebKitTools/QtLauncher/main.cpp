@@ -95,10 +95,6 @@ class MainWindow : public QMainWindow {
 
     setupUI();
 
-    QFileInfo fi(url);
-    if (fi.exists() && fi.isRelative())
-      url = fi.absoluteFilePath();
-
     QUrl qurl = urlFromUserInput(url);
     if (qurl.scheme().isEmpty())
       qurl = QUrl("http://" + url + "/");
@@ -516,13 +512,9 @@ QWebPage* WebPage::createWindow(QWebPage::WebWindowType) {
 }
 
 QObject* WebPage::createPlugin(const QString& classId,
-                               const QUrl& url,
-                               const QStringList& paramNames,
-                               const QStringList& paramValues) {
-  Q_UNUSED(url);
-  Q_UNUSED(paramNames);
-  Q_UNUSED(paramValues);
-
+                               const QUrl&,
+                               const QStringList&,
+                               const QStringList&) {
   if (classId == "alien_QLabel") {
     QLabel* l = new QLabel;
     l->winId();
