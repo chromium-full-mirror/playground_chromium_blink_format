@@ -145,9 +145,9 @@ class QtRuntimeMethod : public InternalFunction {
   }
 
  protected:
-  static const unsigned StructureFlags = OverridesGetOwnPropertySlot |
-                                         InternalFunction::StructureFlags |
-                                         OverridesMarkChildren;
+  static const unsigned StructureFlags =
+      OverridesGetOwnPropertySlot | OverridesGetPropertyNames |
+      InternalFunction::StructureFlags | OverridesMarkChildren;
 
   QtRuntimeMethodData* d_func() const { return d_ptr; }
   QtRuntimeMethod(QtRuntimeMethodData* dd,
@@ -167,6 +167,13 @@ class QtRuntimeMetaMethod : public QtRuntimeMethod {
                       bool allowPrivate);
 
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
+  virtual bool getOwnPropertyDescriptor(ExecState*,
+                                        const Identifier&,
+                                        PropertyDescriptor&);
+  virtual void getOwnPropertyNames(
+      ExecState*,
+      PropertyNameArray&,
+      EnumerationMode mode = ExcludeDontEnumProperties);
 
   virtual void markChildren(MarkStack& markStack);
 
@@ -203,6 +210,13 @@ class QtRuntimeConnectionMethod : public QtRuntimeMethod {
                             const QByteArray& signature);
 
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
+  virtual bool getOwnPropertyDescriptor(ExecState*,
+                                        const Identifier&,
+                                        PropertyDescriptor&);
+  virtual void getOwnPropertyNames(
+      ExecState*,
+      PropertyNameArray&,
+      EnumerationMode mode = ExcludeDontEnumProperties);
 
  protected:
   QtRuntimeConnectionMethodData* d_func() const {
