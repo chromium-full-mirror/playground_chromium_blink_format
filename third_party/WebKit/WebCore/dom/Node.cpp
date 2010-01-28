@@ -426,7 +426,8 @@ Node::Node(Document* document, ConstructionType type)
 #if ENABLE(SVG)
       ,
       m_areSVGAttributesValid(true),
-      m_synchronizingSVGAttributes(false)
+      m_synchronizingSVGAttributes(false),
+      m_hasRareSVGData(false)
 #endif
 {
   if (m_document)

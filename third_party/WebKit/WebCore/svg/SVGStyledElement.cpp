@@ -35,6 +35,7 @@
 #include "RenderObject.h"
 #include "SVGElement.h"
 #include "SVGElementInstance.h"
+#include "SVGElementRareData.h"
 #include "SVGNames.h"
 #include "SVGRenderStyle.h"
 #include "SVGResourceClipper.h"
@@ -56,7 +57,7 @@ void mapAttributeToCSSProperty(
 }
 
 SVGStyledElement::SVGStyledElement(const QualifiedName& tagName, Document* doc)
-    : SVGElement(tagName, doc), m_instanceUpdatesBlocked(false) {}
+    : SVGElement(tagName, doc) {}
 
 SVGStyledElement::~SVGStyledElement() {
   SVGResource::removeClient(this);
@@ -314,6 +315,15 @@ PassRefPtr<CSSValue> SVGStyledElement::getPresentationAttribute(
 void SVGStyledElement::detach() {
   SVGResource::removeClient(this);
   SVGElement::detach();
+}
+
+bool SVGStyledElement::instanceUpdatesBlocked() const {
+  return hasRareSVGData() && rareSVGData()->instanceUpdatesBlocked();
+}
+
+void SVGStyledElement::setInstanceUpdatesBlocked(bool value) {
+  if (hasRareSVGData())
+    rareSVGData()->setInstanceUpdatesBlocked(value);
 }
 }
 

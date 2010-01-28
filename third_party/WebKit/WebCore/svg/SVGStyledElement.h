@@ -71,10 +71,8 @@ class SVGStyledElement : public SVGElement, public SVGStylable {
 
   virtual void detach();
 
-  bool instanceUpdatesBlocked() const { return m_instanceUpdatesBlocked; }
-  void setInstanceUpdatesBlocked(bool value) {
-    m_instanceUpdatesBlocked = value;
-  }
+  bool instanceUpdatesBlocked() const;
+  void setInstanceUpdatesBlocked(bool);
 
  protected:
   static int cssPropertyIdForSVGAttributeName(const QualifiedName&);
@@ -85,7 +83,6 @@ class SVGStyledElement : public SVGElement, public SVGStylable {
                             String,
                             ClassName,
                             className)
-  bool m_instanceUpdatesBlocked;
 };
 
 }  // namespace WebCore

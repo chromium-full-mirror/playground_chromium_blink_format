@@ -32,6 +32,7 @@ class CSSCursorImageValue;
 class Document;
 class SVGCursorElement;
 class SVGElementInstance;
+class SVGElementRareData;
 class SVGSVGElement;
 class TransformationMatrix;
 
@@ -75,14 +76,10 @@ class SVGElement : public StyledElement {
     m_areSVGAttributesValid = value;
   }
 
-  HashSet<SVGElementInstance*> instancesForElement() const;
+  const HashSet<SVGElementInstance*>& instancesForElement() const;
 
-  void setCursorElement(SVGCursorElement* cursorElement) {
-    m_cursorElement = cursorElement;
-  }
-  void setCursorImageValue(CSSCursorImageValue* cursorImageValue) {
-    m_cursorImageValue = cursorImageValue;
-  }
+  void setCursorElement(SVGCursorElement*);
+  void setCursorImageValue(CSSCursorImageValue*);
 
  protected:
   SVGElement(const QualifiedName&, Document*);
@@ -91,6 +88,9 @@ class SVGElement : public StyledElement {
   virtual void insertedIntoDocument();
   virtual void attributeChanged(Attribute*, bool preserveDecls = false);
   virtual void updateAnimatedSVGAttribute(const QualifiedName&) const;
+
+  SVGElementRareData* rareSVGData() const;
+  SVGElementRareData* ensureRareSVGData();
 
  private:
   friend class SVGElementInstance;
@@ -105,11 +105,6 @@ class SVGElement : public StyledElement {
   void removeInstanceMapping(SVGElementInstance*);
 
   virtual bool haveLoadedRequiredResources();
-
-  SVGCursorElement* m_cursorElement;
-  CSSCursorImageValue* m_cursorImageValue;
-
-  HashSet<SVGElementInstance*> m_elementInstances;
 };
 }
 

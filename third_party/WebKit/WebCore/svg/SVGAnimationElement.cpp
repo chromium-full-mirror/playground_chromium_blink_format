@@ -301,10 +301,10 @@ void SVGAnimationElement::setTargetAttributeAnimatedValue(const String& value) {
 
   // If the target element is used in an <use> instance tree, update that as
   // well.
-  HashSet<SVGElementInstance*> instances = target->instancesForElement();
-  HashSet<SVGElementInstance*>::iterator end = instances.end();
-  for (HashSet<SVGElementInstance*>::iterator it = instances.begin(); it != end;
-       ++it) {
+  const HashSet<SVGElementInstance*>& instances = target->instancesForElement();
+  const HashSet<SVGElementInstance*>::const_iterator end = instances.end();
+  for (HashSet<SVGElementInstance*>::const_iterator it = instances.begin();
+       it != end; ++it) {
     SVGElement* shadowTreeElement = (*it)->shadowTreeElement();
     ASSERT(shadowTreeElement);
     if (isCSS)

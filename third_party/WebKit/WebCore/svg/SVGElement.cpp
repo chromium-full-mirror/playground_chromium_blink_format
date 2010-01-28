@@ -40,6 +40,7 @@
 #include "RenderObject.h"
 #include "SVGCursorElement.h"
 #include "SVGElementInstance.h"
+#include "SVGElementRareData.h"
 #include "SVGNames.h"
 #include "SVGResource.h"
 #include "SVGSVGElement.h"
@@ -53,9 +54,7 @@ namespace WebCore {
 using namespace HTMLNames;
 
 SVGElement::SVGElement(const QualifiedName& tagName, Document* document)
-    : StyledElement(tagName, document, CreateElementZeroRefCount),
-      m_cursorElement(0),
-      m_cursorImageValue(0) {}
+    : StyledElement(tagName, document, CreateElementZeroRefCount) {}
 
 PassRefPtr<SVGElement> SVGElement::create(const QualifiedName& tagName,
                                           Document* document) {
@@ -63,10 +62,40 @@ PassRefPtr<SVGElement> SVGElement::create(const QualifiedName& tagName,
 }
 
 SVGElement::~SVGElement() {
-  if (m_cursorElement)
-    m_cursorElement->removeClient(this);
-  if (m_cursorImageValue)
-    m_cursorImageValue->removeReferencedElement(this);
+  if (!hasRareSVGData())
+    ASSERT(!SVGElementRareData::rareDataMap().contains(this));
+  else {
+    SVGElementRareData::SVGElementRareDataMap& rareDataMap =
+        SVGElementRareData::rareDataMap();
+    SVGElementRareData::SVGElementRareDataMap::iterator it =
+        rareDataMap.find(this);
+    ASSERT(it != rareDataMap.end());
+
+    SVGElementRareData* rareData = it->second;
+    if (SVGCursorElement* cursorElement = rareData->cursorElement())
+      cursorElement->removeClient(this);
+    if (CSSCursorImageValue* cursorImageValue = rareData->cursorImageValue())
+      cursorImageValue->removeReferencedElement(this);
+
+    delete rareData;
+    rareDataMap.remove(it);
+  }
+}
+
+SVGElementRareData* SVGElement::rareSVGData() const {
+  ASSERT(hasRareSVGData());
+  return SVGElementRareData::rareDataFromMap(this);
+}
+
+SVGElementRareData* SVGElement::ensureRareSVGData() {
+  if (hasRareSVGData())
+    return rareSVGData();
+
+  ASSERT(!SVGElementRareData::rareDataMap().contains(this));
+  SVGElementRareData* data = new SVGElementRareData;
+  SVGElementRareData::rareDataMap().set(this, data);
+  m_hasRareSVGData = true;
+  return data;
 }
 
 bool SVGElement::isSupported(StringImpl* feature, StringImpl* version) const {
@@ -120,18 +149,38 @@ SVGDocumentExtensions* SVGElement::accessDocumentSVGExtensions() const {
 
 void SVGElement::mapInstanceToElement(SVGElementInstance* instance) {
   ASSERT(instance);
-  ASSERT(!m_elementInstances.contains(instance));
-  m_elementInstances.add(instance);
+
+  HashSet<SVGElementInstance*>& instances =
+      ensureRareSVGData()->elementInstances();
+  ASSERT(!instances.contains(instance));
+
+  instances.add(instance);
 }
 
 void SVGElement::removeInstanceMapping(SVGElementInstance* instance) {
   ASSERT(instance);
-  ASSERT(m_elementInstances.contains(instance));
-  m_elementInstances.remove(instance);
+  ASSERT(hasRareSVGData());
+
+  HashSet<SVGElementInstance*>& instances = rareSVGData()->elementInstances();
+  ASSERT(instances.contains(instance));
+
+  instances.remove(instance);
 }
 
-HashSet<SVGElementInstance*> SVGElement::instancesForElement() const {
-  return m_elementInstances;
+const HashSet<SVGElementInstance*>& SVGElement::instancesForElement() const {
+  if (!hasRareSVGData()) {
+    DEFINE_STATIC_LOCAL(HashSet<SVGElementInstance*>, emptyInstances, ());
+    return emptyInstances;
+  }
+  return rareSVGData()->elementInstances();
+}
+
+void SVGElement::setCursorElement(SVGCursorElement* cursorElement) {
+  ensureRareSVGData()->setCursorElement(cursorElement);
+}
+
+void SVGElement::setCursorImageValue(CSSCursorImageValue* cursorImageValue) {
+  ensureRareSVGData()->setCursorImageValue(cursorImageValue);
 }
 
 void SVGElement::parseMappedAttribute(MappedAttribute* attr) {
