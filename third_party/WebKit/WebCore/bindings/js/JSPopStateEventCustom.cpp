@@ -47,12 +47,4 @@ JSValue JSPopStateEvent::initPopStateEvent(ExecState* exec,
   return jsUndefined();
 }
 
-JSC::JSValue JSPopStateEvent::state(JSC::ExecState* exec) const {
-  SerializedScriptValue* object = static_cast<PopStateEvent*>(impl())->state();
-  if (!object)
-    return JSC::jsNull();
-
-  return object->deserialize(exec);
-}
-
 }  // namespace WebCore

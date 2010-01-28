@@ -65,7 +65,9 @@ class SerializedScriptValueData {
 
   SerializedType type() const { return m_type; }
   static SerializedScriptValueData serialize(JSC::ExecState*, JSC::JSValue);
-  JSC::JSValue deserialize(JSC::ExecState*, bool mustCopy) const;
+  JSC::JSValue deserialize(JSC::ExecState*,
+                           JSC::JSGlobalObject*,
+                           bool mustCopy) const;
 
   ~SerializedScriptValueData() {
     if (m_sharedData)
@@ -183,10 +185,11 @@ class SerializedScriptValue : public RefCounted<SerializedScriptValue> {
     return m_value.asString();
   }
 
-  JSC::JSValue deserialize(JSC::ExecState* exec) {
+  JSC::JSValue deserialize(JSC::ExecState* exec,
+                           JSC::JSGlobalObject* globalObject) {
     if (!m_value)
       return JSC::jsNull();
-    return m_value.deserialize(exec, m_mustCopy);
+    return m_value.deserialize(exec, globalObject, m_mustCopy);
   }
 
   JSValueRef deserialize(JSContextRef, JSValueRef* exception);
