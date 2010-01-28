@@ -30,7 +30,7 @@
 
 namespace WebCore {
 
-PlatformTouchEvent::PlatformTouchEvent(const IntPoint& absolutePagePos,
+PlatformTouchEvent::PlatformTouchEvent(const IntPoint& windowPos,
                                        TouchEventType type,
                                        PlatformTouchPoint::State state)
     : m_type(type),
@@ -38,7 +38,7 @@ PlatformTouchEvent::PlatformTouchEvent(const IntPoint& absolutePagePos,
       m_altKey(false),
       m_shiftKey(false),
       m_metaKey(false) {
-  m_touchPoints.append(PlatformTouchPoint(absolutePagePos, state));
+  m_touchPoints.append(PlatformTouchPoint(windowPos, state));
 }
 }
 

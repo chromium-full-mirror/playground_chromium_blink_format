@@ -58,24 +58,14 @@ Touch::Touch(Frame* frame,
              int screenY,
              int pageX,
              int pageY)
-    : m_frame(frame),
-      m_target(target),
+    : m_target(target),
       m_identifier(identifier),
-      m_clientX(pageX - contentsX(m_frame.get())),
-      m_clientY(pageY - contentsY(m_frame.get())),
+      m_clientX(pageX - contentsX(frame)),
+      m_clientY(pageY - contentsY(frame)),
       m_screenX(screenX),
       m_screenY(screenY),
       m_pageX(pageX),
       m_pageY(pageY) {}
-
-void Touch::updateLocation(int screenX, int screenY, int pageX, int pageY) {
-  m_clientX = pageX - contentsX(m_frame.get());
-  m_clientY = pageY - contentsY(m_frame.get());
-  m_screenX = screenX;
-  m_screenY = screenY;
-  m_pageX = pageX;
-  m_pageY = pageY;
-}
 
 }  // namespace WebCore
 

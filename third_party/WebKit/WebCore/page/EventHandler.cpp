@@ -2784,9 +2784,9 @@ bool EventHandler::handleTouchEvent(const PlatformTouchEvent& event) {
 
   for (int i = 0; i < points.size(); ++i) {
     const PlatformTouchPoint& point = points[i];
-    IntPoint framePoint = documentPointForWindowPoint(m_frame, point.pos());
+    IntPoint pagePoint = documentPointForWindowPoint(m_frame, point.pos());
     HitTestResult result =
-        hitTestResultAtPoint(framePoint, /*allowShadowContent*/ false);
+        hitTestResultAtPoint(pagePoint, /*allowShadowContent*/ false);
     Node* target = result.innerNode();
 
     // Touch events should not go to text nodes
@@ -2799,17 +2799,23 @@ bool EventHandler::handleTouchEvent(const PlatformTouchEvent& event) {
     if (!doc->hasListenerType(Document::TOUCH_LISTENER))
       continue;
 
-    int adjustedPageX = lroundf(framePoint.x() / m_frame->pageZoomFactor());
-    int adjustedPageY = lroundf(framePoint.y() / m_frame->pageZoomFactor());
+    if (m_frame != doc->frame()) {
+      // pagePoint should always be relative to the target elements containing
+      // frame.
+      pagePoint = documentPointForWindowPoint(doc->frame(), point.pos());
+    }
+
+    int adjustedPageX = lroundf(pagePoint.x() / m_frame->pageZoomFactor());
+    int adjustedPageY = lroundf(pagePoint.y() / m_frame->pageZoomFactor());
 
     RefPtr<Touch> touch =
-        Touch::create(m_frame, target, point.id(), point.screenPos().x(),
+        Touch::create(doc->frame(), target, point.id(), point.screenPos().x(),
                       point.screenPos().y(), adjustedPageX, adjustedPageY);
 
     if (event.type() == TouchStart && !i) {
       m_touchEventTarget = target;
       m_firstTouchScreenPos = point.screenPos();
-      m_firstTouchPagePos = framePoint;
+      m_firstTouchPagePos = pagePoint;
     }
 
     if (point.state() == PlatformTouchPoint::TouchReleased)

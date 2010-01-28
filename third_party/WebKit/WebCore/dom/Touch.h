@@ -49,9 +49,6 @@ class Touch : public RefCounted<Touch> {
         new Touch(frame, target, identifier, screenX, screenY, pageX, pageY));
   }
 
-  void updateLocation(int screenX, int screenY, int pageX, int pageY);
-
-  Frame* frame() const { return m_frame.get(); }
   EventTarget* target() const { return m_target.get(); }
   unsigned identifier() const { return m_identifier; }
   int clientX() const { return m_clientX; }
@@ -70,7 +67,6 @@ class Touch : public RefCounted<Touch> {
         int pageX,
         int pageY);
 
-  RefPtr<Frame> m_frame;
   RefPtr<EventTarget> m_target;
   unsigned m_identifier;
   int m_clientX;

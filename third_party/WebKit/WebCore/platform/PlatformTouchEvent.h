@@ -50,7 +50,7 @@ class PlatformTouchEvent {
 #if PLATFORM(QT)
   PlatformTouchEvent(QTouchEvent*);
 #elif PLATFORM(ANDROID)
-  PlatformTouchEvent(const IntPoint& absolutePagePos,
+  PlatformTouchEvent(const IntPoint& windowPos,
                      TouchEventType,
                      PlatformTouchPoint::State);
 #endif
