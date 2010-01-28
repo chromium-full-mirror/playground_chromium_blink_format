@@ -29,6 +29,7 @@
 #include "AXObjectCache.h"
 #include "CSSPropertyNames.h"
 #include "ChromeClient.h"
+#include "DateComponents.h"
 #include "Document.h"
 #include "Editor.h"
 #include "Event.h"
@@ -45,7 +46,6 @@
 #include "HTMLImageLoader.h"
 #include "HTMLNames.h"
 #include "HTMLOptionElement.h"
-#include "ISODateTime.h"
 #include "ScriptEventListener.h"
 #include "KeyboardEvent.h"
 #include "LocalizedStrings.h"
@@ -1461,10 +1461,10 @@ double HTMLInputElement::parseToDouble(const String& src,
     case MONTH:
     case TIME:
     case WEEK: {
-      ISODateTime dateTime;
-      if (!formStringToISODateTime(inputType(), src, &dateTime))
+      DateComponents date;
+      if (!formStringToDateComponents(inputType(), src, &date))
         return defaultValue;
-      double msec = dateTime.millisecondsSinceEpoch();
+      double msec = date.millisecondsSinceEpoch();
       ASSERT(isfinite(msec));
       return msec;
     }
@@ -1506,7 +1506,7 @@ double HTMLInputElement::valueAsDate() const {
     case MONTH:
     case TIME:
     case WEEK:
-      return parseToDouble(value(), ISODateTime::invalidMilliseconds());
+      return parseToDouble(value(), DateComponents::invalidMilliseconds());
 
     case BUTTON:
     case CHECKBOX:
@@ -1528,30 +1528,30 @@ double HTMLInputElement::valueAsDate() const {
     case TELEPHONE:
     case TEXT:
     case URL:
-      return ISODateTime::invalidMilliseconds();
+      return DateComponents::invalidMilliseconds();
   }
   ASSERT_NOT_REACHED();
-  return ISODateTime::invalidMilliseconds();
+  return DateComponents::invalidMilliseconds();
 }
 
 void HTMLInputElement::setValueAsDate(double value, ExceptionCode& ec) {
-  ISODateTime dateTime;
+  DateComponents date;
   bool success;
   switch (inputType()) {
     case DATE:
-      success = dateTime.setMillisecondsSinceEpochForDate(value);
+      success = date.setMillisecondsSinceEpochForDate(value);
       break;
     case DATETIME:
-      success = dateTime.setMillisecondsSinceEpochForDateTime(value);
+      success = date.setMillisecondsSinceEpochForDateTime(value);
       break;
     case MONTH:
-      success = dateTime.setMillisecondsSinceEpochForMonth(value);
+      success = date.setMillisecondsSinceEpochForMonth(value);
       break;
     case TIME:
-      success = dateTime.setMillisecondsSinceMidnight(value);
+      success = date.setMillisecondsSinceMidnight(value);
       break;
     case WEEK:
-      success = dateTime.setMillisecondsSinceEpochForWeek(value);
+      success = date.setMillisecondsSinceEpochForWeek(value);
       break;
     case BUTTON:
     case CHECKBOX:
@@ -1586,7 +1586,7 @@ void HTMLInputElement::setValueAsDate(double value, ExceptionCode& ec) {
   // FIXME: We should specify SecondFormat.
   // e.g. If the step value is 60, use SecondFormat::None.
   //      If the step value is 1, use SecondFormat::Second.
-  setValue(dateTime.toString());
+  setValue(date.toString());
 }
 
 double HTMLInputElement::valueAsNumber() const {
@@ -1638,15 +1638,15 @@ void HTMLInputElement::setValueAsNumber(double newValue, ExceptionCode& ec) {
       setValueAsDate(newValue, ec);
       return;
     case DATETIMELOCAL: {
-      ISODateTime dateTime;
-      if (!dateTime.setMillisecondsSinceEpochForDateTimeLocal(newValue)) {
+      DateComponents date;
+      if (!date.setMillisecondsSinceEpochForDateTimeLocal(newValue)) {
         setValue(String());
         return;
       }
       // FIXME: We should specify SecondFormat.
       // e.g. If the step value is 60, use SecondFormat::None.
       //      If the step value is 1, use SecondFormat::Second.
-      setValue(dateTime.toString());
+      setValue(date.toString());
       return;
     }
     case NUMBER:
@@ -2412,12 +2412,12 @@ bool HTMLInputElement::formStringToDouble(const String& src, double* out) {
   return true;
 }
 
-bool HTMLInputElement::formStringToISODateTime(InputType type,
-                                               const String& formString,
-                                               ISODateTime* out) {
+bool HTMLInputElement::formStringToDateComponents(InputType type,
+                                                  const String& formString,
+                                                  DateComponents* out) {
   if (formString.isEmpty())
     return false;
-  ISODateTime ignoredResult;
+  DateComponents ignoredResult;
   if (!out)
     out = &ignoredResult;
   const UChar* characters = formString.characters();
