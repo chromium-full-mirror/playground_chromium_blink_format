@@ -46,11 +46,12 @@
           macro(WebKitStatistics) macro(WebMutableURLRequest) macro(           \
               WebNotificationCenter) macro(WebPreferences) macro(WebScrollBar) \
               macro(WebTextRenderer) macro(WebURLCredential)                   \
-                  macro(WebURLProtectionSpace) macro(WebURLRequest) macro(     \
-                      WebURLResponse) macro(WebView) macro(WebArchive)         \
-                      macro(WebCoreStatistics) macro(WebCookieManager)         \
-                          macro(WebWorkersPrivate) macro(WebScriptWorld)       \
-                              macro(WebGeolocationPosition)  // end of macro
+                  macro(WebURLProtectionSpace) macro(WebURLRequest)            \
+                      macro(WebURLResponse) macro(WebView) macro(WebArchive)   \
+                          macro(WebCoreStatistics) macro(WebCookieManager)     \
+                              macro(WebWorkersPrivate) macro(WebScriptWorld)   \
+                                  macro(WebGeolocationPosition) macro(         \
+                                      WebSerializedJSValue)  // end of macro
 
 // Everything below this point is deprecated. Please do not use.
 
