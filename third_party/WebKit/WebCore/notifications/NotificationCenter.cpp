@@ -50,7 +50,10 @@ int NotificationCenter::checkPermission() {
   if (!presenter())
     return NotificationPresenter::PermissionDenied;
   return m_notificationPresenter->checkPermission(
-      m_scriptExecutionContext->securityOrigin());
+      m_scriptExecutionContext->url(),
+      m_scriptExecutionContext->isDocument()
+          ? static_cast<Document*>(m_scriptExecutionContext)
+          : 0);
 }
 
 void NotificationCenter::requestPermission(PassRefPtr<VoidCallback> callback) {

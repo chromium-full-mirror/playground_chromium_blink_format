@@ -51,7 +51,9 @@ Notification::Notification(const String& url,
       m_isShowing(false),
       m_presenter(provider) {
   ASSERT(m_presenter);
-  if (m_presenter->checkPermission(context->securityOrigin()) !=
+  Document* document =
+      context->isDocument() ? static_cast<Document*>(context) : 0;
+  if (m_presenter->checkPermission(context->url(), document) !=
       NotificationPresenter::PermissionAllowed) {
     ec = SECURITY_ERR;
     return;
@@ -74,7 +76,9 @@ Notification::Notification(const NotificationContents& contents,
       m_isShowing(false),
       m_presenter(provider) {
   ASSERT(m_presenter);
-  if (m_presenter->checkPermission(context->securityOrigin()) !=
+  Document* document =
+      context->isDocument() ? static_cast<Document*>(context) : 0;
+  if (m_presenter->checkPermission(context->url(), document) !=
       NotificationPresenter::PermissionAllowed) {
     ec = SECURITY_ERR;
     return;
