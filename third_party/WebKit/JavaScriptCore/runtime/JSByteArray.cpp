@@ -51,8 +51,8 @@ JSByteArray::~JSByteArray() {
 #endif
 
 PassRefPtr<Structure> JSByteArray::createStructure(JSValue prototype) {
-  PassRefPtr<Structure> result =
-      Structure::create(prototype, TypeInfo(ObjectType, StructureFlags));
+  PassRefPtr<Structure> result = Structure::create(
+      prototype, TypeInfo(ObjectType, StructureFlags), AnonymousSlotCount);
   return result;
 }
 

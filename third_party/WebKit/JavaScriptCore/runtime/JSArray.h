@@ -101,7 +101,8 @@ class JSArray : public JSObject {
   void copyToRegisters(ExecState*, Register*, uint32_t);
 
   static PassRefPtr<Structure> createStructure(JSValue prototype) {
-    return Structure::create(prototype, TypeInfo(ObjectType, StructureFlags));
+    return Structure::create(prototype, TypeInfo(ObjectType, StructureFlags),
+                             AnonymousSlotCount);
   }
 
   inline void markChildrenDirect(MarkStack& markStack);

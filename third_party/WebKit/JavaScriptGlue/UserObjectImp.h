@@ -71,7 +71,8 @@ class UserObjectImp : public JSObject {
     return Structure::create(
         prototype, TypeInfo(ObjectType, OverridesGetOwnPropertySlot |
                                             OverridesMarkChildren |
-                                            OverridesGetPropertyNames));
+                                            OverridesGetPropertyNames),
+        AnonymousSlotCount);
   }
 
  private:

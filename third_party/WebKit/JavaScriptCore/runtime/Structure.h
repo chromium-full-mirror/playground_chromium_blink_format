@@ -58,8 +58,19 @@ class Structure : public RefCounted<Structure> {
   friend class JIT;
   friend class StructureTransitionTable;
   static PassRefPtr<Structure> create(JSValue prototype,
-                                      const TypeInfo& typeInfo) {
-    return adoptRef(new Structure(prototype, typeInfo));
+                                      const TypeInfo& typeInfo,
+                                      unsigned anonymousSlotCount) {
+    Structure* structure = (new Structure(prototype, typeInfo));
+    if (anonymousSlotCount) {
+      structure->materializePropertyMap();
+      structure->m_isPinnedPropertyTable = true;
+      structure->m_propertyTable->anonymousSlotCount = anonymousSlotCount;
+      // Currently we don't allow more anonymous slots than fit in the inline
+      // capacity
+      ASSERT(structure->propertyStorageSize() <=
+             structure->propertyStorageCapacity());
+    }
+    return adoptRef(structure);
   }
 
   static void startIgnoringLeaks();
@@ -87,8 +98,6 @@ class Structure : public RefCounted<Structure> {
                                                          JSValue prototype);
   static PassRefPtr<Structure> despecifyFunctionTransition(Structure*,
                                                            const Identifier&);
-  static PassRefPtr<Structure> addAnonymousSlotsTransition(Structure*,
-                                                           unsigned count);
   static PassRefPtr<Structure> getterSetterTransition(Structure*);
   static PassRefPtr<Structure> toCacheableDictionaryTransition(Structure*);
   static PassRefPtr<Structure> toUncacheableDictionaryTransition(Structure*);
@@ -162,6 +171,9 @@ class Structure : public RefCounted<Structure> {
   bool hasAnonymousSlots() const {
     return m_propertyTable && m_propertyTable->anonymousSlotCount;
   }
+  unsigned anonymousSlotCount() const {
+    return m_propertyTable ? m_propertyTable->anonymousSlotCount : 0;
+  }
 
   bool isEmpty() const {
     return m_propertyTable ? !m_propertyTable->keyCount : m_offset == noOffset;
@@ -181,6 +193,11 @@ class Structure : public RefCounted<Structure> {
   void getPropertyNames(PropertyNameArray&, EnumerationMode mode);
 
  private:
+  static PassRefPtr<Structure> create(JSValue prototype,
+                                      const TypeInfo& typeInfo) {
+    return adoptRef(new Structure(prototype, typeInfo));
+  }
+
   Structure(JSValue prototype, const TypeInfo&);
 
   typedef enum {
@@ -195,7 +212,6 @@ class Structure : public RefCounted<Structure> {
              unsigned attributes,
              JSCell* specificValue);
   size_t remove(const Identifier& propertyName);
-  void addAnonymousSlots(unsigned slotCount);
 
   void expandPropertyMapHashTable();
   void rehashPropertyMapHashTable();
@@ -265,9 +281,8 @@ class Structure : public RefCounted<Structure> {
 #else
   unsigned m_attributesInPrevious : 7;
 #endif
-  unsigned m_anonymousSlotsInPrevious : 6;
   unsigned m_specificFunctionThrashCount : 2;
-  // 4 free bits
+  // 10 free bits
 };
 
 inline size_t Structure::get(const Identifier& propertyName) {

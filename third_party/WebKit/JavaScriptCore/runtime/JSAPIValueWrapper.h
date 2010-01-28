@@ -41,7 +41,8 @@ class JSAPIValueWrapper : public JSCell {
   static PassRefPtr<Structure> createStructure(JSValue prototype) {
     return Structure::create(
         prototype, TypeInfo(CompoundType,
-                            OverridesMarkChildren | OverridesGetPropertyNames));
+                            OverridesMarkChildren | OverridesGetPropertyNames),
+        AnonymousSlotCount);
   }
 
  private:

@@ -69,7 +69,8 @@ class DebuggerActivation : public JSObject {
   virtual JSValue lookupSetter(ExecState*, const Identifier& propertyName);
 
   static PassRefPtr<Structure> createStructure(JSValue prototype) {
-    return Structure::create(prototype, TypeInfo(ObjectType, StructureFlags));
+    return Structure::create(prototype, TypeInfo(ObjectType, StructureFlags),
+                             AnonymousSlotCount);
   }
 
  protected:

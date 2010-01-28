@@ -57,7 +57,8 @@ class RegExpConstructor : public InternalFunction {
   RegExpConstructor(ExecState*, NonNullPassRefPtr<Structure>, RegExpPrototype*);
 
   static PassRefPtr<Structure> createStructure(JSValue prototype) {
-    return Structure::create(prototype, TypeInfo(ObjectType, StructureFlags));
+    return Structure::create(prototype, TypeInfo(ObjectType, StructureFlags),
+                             AnonymousSlotCount);
   }
 
   virtual void put(ExecState*,

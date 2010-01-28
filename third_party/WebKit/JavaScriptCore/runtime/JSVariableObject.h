@@ -63,7 +63,8 @@ class JSVariableObject : public JSObject {
   Register& registerAt(int index) const { return d->registers[index]; }
 
   static PassRefPtr<Structure> createStructure(JSValue prototype) {
-    return Structure::create(prototype, TypeInfo(ObjectType, StructureFlags));
+    return Structure::create(prototype, TypeInfo(ObjectType, StructureFlags),
+                             AnonymousSlotCount);
   }
 
  protected:

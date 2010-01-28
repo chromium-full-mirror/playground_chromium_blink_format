@@ -321,8 +321,9 @@ class JS_EXPORTCLASS JSString : public JSCell {
 
   static PassRefPtr<Structure> createStructure(JSValue proto) {
     return Structure::create(
-        proto, TypeInfo(StringType,
-                        OverridesGetOwnPropertySlot | NeedsThisConversion));
+        proto,
+        TypeInfo(StringType, OverridesGetOwnPropertySlot | NeedsThisConversion),
+        AnonymousSlotCount);
   }
 
  private:

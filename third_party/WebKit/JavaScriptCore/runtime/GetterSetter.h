@@ -49,7 +49,8 @@ class GetterSetter : public JSCell {
   void setSetter(JSObject* setter) { m_setter = setter; }
   static PassRefPtr<Structure> createStructure(JSValue prototype) {
     return Structure::create(prototype,
-                             TypeInfo(GetterSetterType, OverridesMarkChildren));
+                             TypeInfo(GetterSetterType, OverridesMarkChildren),
+                             AnonymousSlotCount);
   }
 
  private:

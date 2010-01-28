@@ -274,7 +274,8 @@ class JSObject : public JSCell {
   static const unsigned nonInlineBaseStorageCapacity = 16;
 
   static PassRefPtr<Structure> createStructure(JSValue prototype) {
-    return Structure::create(prototype, TypeInfo(ObjectType, StructureFlags));
+    return Structure::create(prototype, TypeInfo(ObjectType, StructureFlags),
+                             AnonymousSlotCount);
   }
 
   void flattenDictionaryObject() {
@@ -284,11 +285,12 @@ class JSObject : public JSCell {
  protected:
   static const unsigned StructureFlags = 0;
 
-  void addAnonymousSlots(unsigned count);
   void putAnonymousValue(unsigned index, JSValue value) {
+    ASSERT(index < m_structure->anonymousSlotCount());
     *locationForOffset(index) = value;
   }
   JSValue getAnonymousValue(unsigned index) {
+    ASSERT(index < m_structure->anonymousSlotCount());
     return *locationForOffset(index);
   }
 
@@ -638,18 +640,6 @@ inline void JSObject::putDirectInternal(JSGlobalData& globalData,
   PutPropertySlot slot;
   putDirectInternal(propertyName, value, attributes, false, slot,
                     getJSFunction(globalData, value));
-}
-
-inline void JSObject::addAnonymousSlots(unsigned count) {
-  size_t currentCapacity = m_structure->propertyStorageCapacity();
-  RefPtr<Structure> structure =
-      Structure::addAnonymousSlotsTransition(m_structure, count);
-
-  if (currentCapacity != structure->propertyStorageCapacity())
-    allocatePropertyStorage(currentCapacity,
-                            structure->propertyStorageCapacity());
-
-  setStructure(structure.release());
 }
 
 inline void JSObject::putDirect(const Identifier& propertyName,

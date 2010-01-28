@@ -52,7 +52,8 @@ class JSCallbackObject : public Base {
   bool inherits(JSClassRef) const;
 
   static PassRefPtr<Structure> createStructure(JSValue proto) {
-    return Structure::create(proto, TypeInfo(ObjectType, StructureFlags));
+    return Structure::create(proto, TypeInfo(ObjectType, StructureFlags),
+                             Base::AnonymousSlotCount);
   }
 
  protected:

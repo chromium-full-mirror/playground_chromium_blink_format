@@ -52,7 +52,8 @@ class JSCell : public NoncopyableCustomAllocated {
 
  public:
   static PassRefPtr<Structure> createDummyStructure() {
-    return Structure::create(jsNull(), TypeInfo(UnspecifiedType));
+    return Structure::create(jsNull(), TypeInfo(UnspecifiedType),
+                             AnonymousSlotCount);
   }
 
 // Querying the type.
@@ -118,6 +119,9 @@ class JSCell : public NoncopyableCustomAllocated {
   virtual JSValue getJSNumber();
   void* vptr() { return *reinterpret_cast<void**>(this); }
   void setVPtr(void* vptr) { *reinterpret_cast<void**>(this) = vptr; }
+
+ protected:
+  static const unsigned AnonymousSlotCount = 0;
 
  private:
   // Base implementation; for non-object classes implements getPropertySlot.
