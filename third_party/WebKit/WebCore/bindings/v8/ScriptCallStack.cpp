@@ -64,7 +64,7 @@ ScriptCallStack::ScriptCallStack(const v8::Arguments& arguments,
                    sourceLineNumber,
                    arguments,
                    skipArgumentCount),
-      m_scriptState(ScriptState::current()) {}
+      m_scriptState(ScriptController::currentScriptState()) {}
 
 ScriptCallStack::~ScriptCallStack() {}
 

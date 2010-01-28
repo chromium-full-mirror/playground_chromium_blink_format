@@ -51,6 +51,7 @@ class Event;
 class Frame;
 class HTMLPlugInElement;
 class ScriptSourceCode;
+class ScriptState;
 class String;
 class Widget;
 class XSSAuditor;
@@ -181,6 +182,12 @@ class ScriptController {
   void evaluateInWorld(const ScriptSourceCode&, DOMWrapperWorld*) {}
   static void getAllWorlds(Vector<DOMWrapperWorld*>& worlds);
 
+  // Script state for the main world context.
+  ScriptState* mainWorldScriptState();
+
+  // Returns ScriptState for current context.
+  static ScriptState* currentScriptState();
+
  private:
   Frame* m_frame;
   const String* m_sourceURL;
@@ -203,6 +210,9 @@ class ScriptController {
 #endif
   // The XSSAuditor associated with this ScriptController.
   OwnPtr<XSSAuditor> m_XSSAuditor;
+
+  // Script state for the main world context.
+  OwnPtr<ScriptState> m_mainWorldScriptState;
 };
 
 }  // namespace WebCore

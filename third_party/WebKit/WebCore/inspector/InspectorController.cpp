@@ -1917,7 +1917,8 @@ ScriptObject InspectorController::injectedScriptForNodeId(long id) {
     frame = m_inspectedPage->mainFrame();
 
   if (frame)
-    return m_injectedScriptHost->injectedScriptFor(mainWorldScriptState(frame));
+    return m_injectedScriptHost->injectedScriptFor(
+        frame->script()->mainWorldScriptState());
 
   return ScriptObject();
 }

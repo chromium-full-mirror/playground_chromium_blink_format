@@ -33,6 +33,10 @@
 
 #include "ScriptState.h"
 
+#include "Document.h"
+#include "Frame.h"
+#include "V8Binding.h"
+
 #include <v8.h>
 
 namespace WebCore {
@@ -40,14 +44,21 @@ namespace WebCore {
 ScriptScope::ScriptScope(ScriptState* scriptState, bool reportExceptions)
     : m_context(scriptState->context()),
       m_scope(m_context),
-      m_scriptState(scriptState) {
-  m_exceptionCatcher.SetVerbose(reportExceptions);
+      m_scriptState(scriptState),
+      m_reportExceptions(reportExceptions) {
   ASSERT(!m_context.IsEmpty());
 }
 
 bool ScriptScope::success() {
   if (!m_exceptionCatcher.HasCaught())
     return true;
+
+  v8::Local<v8::Message> message = m_exceptionCatcher.Message();
+  if (m_reportExceptions)
+    m_scriptState->frame()->document()->reportException(
+        toWebCoreString(message->Get()), message->GetLineNumber(),
+        toWebCoreString(message->GetScriptResourceName()));
+
   m_exceptionCatcher.Reset();
   return false;
 }
