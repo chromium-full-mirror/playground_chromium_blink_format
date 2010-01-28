@@ -136,13 +136,15 @@ ScriptExecutionContext* getScriptExecutionContext(ScriptState* scriptState) {
     return proxy->workerContext()->scriptExecutionContext();
 #endif
 
-  if (scriptState)
-    return scriptState->frame()->document()->scriptExecutionContext();
-  else {
-    Frame* frame = V8Proxy::retrieveFrameForCurrentContext();
-    if (frame)
-      return frame->document()->scriptExecutionContext();
-  }
+  Frame* frame;
+  if (scriptState) {
+    v8::HandleScope handleScope;
+    frame = V8Proxy::retrieveFrame(scriptState->context());
+  } else
+    frame = V8Proxy::retrieveFrameForCurrentContext();
+
+  if (frame)
+    return frame->document()->scriptExecutionContext();
 
   return 0;
 }
