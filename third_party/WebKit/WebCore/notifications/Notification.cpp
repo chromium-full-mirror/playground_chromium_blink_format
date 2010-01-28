@@ -51,11 +51,12 @@ Notification::Notification(const String& url,
       m_isShowing(false),
       m_presenter(provider) {
   ASSERT(m_presenter);
-  if (m_presenter->checkPermission(context->securityOrigin()) !=
-      NotificationPresenter::PermissionAllowed) {
-    ec = SECURITY_ERR;
-    return;
-  }
+  Document* document =
+      context->isDocument() ? static_cast<Document*>(context) : 0;
+  if (m_presenter->checkPermission(context->url(), document)) != NotificationPresenter::PermissionAllowed) {
+      ec = SECURITY_ERR;
+      return;
+    }
 
   m_notificationURL = context->completeURL(url);
   if (url.isEmpty() || !m_notificationURL.isValid()) {
@@ -74,11 +75,12 @@ Notification::Notification(const NotificationContents& contents,
       m_isShowing(false),
       m_presenter(provider) {
   ASSERT(m_presenter);
-  if (m_presenter->checkPermission(context->securityOrigin()) !=
-      NotificationPresenter::PermissionAllowed) {
-    ec = SECURITY_ERR;
-    return;
-  }
+  Document* document =
+      context->isDocument() ? static_cast<Document*>(context) : 0;
+  if (m_presenter->checkPermission(context->url(), document)) != NotificationPresenter::PermissionAllowed) {
+      ec = SECURITY_ERR;
+      return;
+    }
 
   KURL icon = context->completeURL(contents.icon());
   if (!icon.isEmpty() && !icon.isValid()) {
