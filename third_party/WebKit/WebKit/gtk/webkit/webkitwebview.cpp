@@ -181,7 +181,8 @@ enum {
   PROP_PROGRESS,
   PROP_ENCODING,
   PROP_CUSTOM_ENCODING,
-  PROP_ICON_URI
+  PROP_ICON_URI,
+  PROP_IM_CONTEXT
 };
 
 static guint webkit_web_view_signals[LAST_SIGNAL] = {
@@ -196,6 +197,8 @@ static void webkit_web_view_settings_notify(WebKitWebSettings* webSettings,
 static void webkit_web_view_set_window_features(
     WebKitWebView* webView,
     WebKitWebWindowFeatures* webWindowFeatures);
+
+static GtkIMContext* webkit_web_view_get_im_context(WebKitWebView*);
 
 static void destroy_menu_cb(GtkObject* object, gpointer data) {
   WebKitWebView* webView = WEBKIT_WEB_VIEW(data);
@@ -406,6 +409,9 @@ static void webkit_web_view_get_property(GObject* object,
       break;
     case PROP_ICON_URI:
       g_value_set_string(value, webkit_web_view_get_icon_uri(webView));
+      break;
+    case PROP_IM_CONTEXT:
+      g_value_set_object(value, webkit_web_view_get_im_context(webView));
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
@@ -1378,6 +1384,11 @@ static gboolean webkit_web_view_query_tooltip(GtkWidget* widget,
   return FALSE;
 }
 #endif
+
+static GtkIMContext* webkit_web_view_get_im_context(WebKitWebView* webView) {
+  g_return_val_if_fail(WEBKIT_IS_WEB_VIEW(webView), 0);
+  return GTK_IM_CONTEXT(webView->priv->imContext);
+}
 
 static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
   GtkBindingSet* binding_set;
@@ -2418,6 +2429,22 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
       g_param_spec_string("icon-uri", _("Icon URI"),
                           _("The URI for the favicon for the #WebKitWebView."),
                           NULL, WEBKIT_PARAM_READABLE));
+  /**
+  * WebKitWebView:im-context:
+  *
+  * The GtkIMMulticontext for the #WebKitWebView.
+  *
+  * This is the input method context used for all text entry widgets inside
+  * the #WebKitWebView. It can be used to generate context menu items for
+  * controlling the active input method.
+  *
+  * Since: 1.1.20
+  */
+  g_object_class_install_property(
+      objectClass, PROP_IM_CONTEXT,
+      g_param_spec_object("im-context", "IM Context",
+                          "The GtkIMMultiContext for the #WebKitWebView.",
+                          GTK_TYPE_IM_CONTEXT, WEBKIT_PARAM_READABLE));
 
   g_type_class_add_private(webViewClass, sizeof(WebKitWebViewPrivate));
 }
