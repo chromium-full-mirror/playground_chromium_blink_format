@@ -36,11 +36,6 @@
 
 interface IWebDesktopNotificationPresenter;
 
-namespace WebCore {
-class Document;
-class KURL;
-}
-
 class WebDesktopNotificationsDelegate : public WebCore::NotificationPresenter {
  public:
   WebDesktopNotificationsDelegate(WebView* view);
@@ -52,8 +47,7 @@ class WebDesktopNotificationsDelegate : public WebCore::NotificationPresenter {
   virtual void requestPermission(WebCore::SecurityOrigin* origin,
                                  PassRefPtr<WebCore::VoidCallback> callback);
   virtual WebCore::NotificationPresenter::Permission checkPermission(
-      const KURL& url,
-      Document* document);
+      WebCore::SecurityOrigin* origin);
 
  private:
   bool hasNotificationDelegate();
