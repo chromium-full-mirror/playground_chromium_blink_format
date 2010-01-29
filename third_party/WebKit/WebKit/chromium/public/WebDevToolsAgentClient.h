@@ -31,6 +31,7 @@
 #ifndef WebDevToolsAgentClient_h
 #define WebDevToolsAgentClient_h
 
+#include "WebCString.h"
 #include "WebCommon.h"
 
 namespace WebKit {
@@ -53,6 +54,9 @@ class WebDevToolsAgentClient {
 
   WEBKIT_API static void sendMessageToFrontendOnIOThread(
       const WebDevToolsMessageData&);
+
+  virtual WebCString injectedScriptSource() { return WebCString(); }
+  virtual WebCString injectedScriptDispatcherSource() { return WebCString(); }
 
  protected:
   ~WebDevToolsAgentClient() {}
