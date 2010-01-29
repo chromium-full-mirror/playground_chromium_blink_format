@@ -36,8 +36,7 @@ StyleInheritedData::StyleInheritedData()
       horizontal_border_spacing(RenderStyle::initialHorizontalBorderSpacing()),
       vertical_border_spacing(RenderStyle::initialVerticalBorderSpacing()),
       widows(RenderStyle::initialWidows()),
-      orphans(RenderStyle::initialOrphans()),
-      page_break_inside(RenderStyle::initialPageBreak()) {}
+      orphans(RenderStyle::initialOrphans()) {}
 
 StyleInheritedData::~StyleInheritedData() {}
 
@@ -53,8 +52,7 @@ StyleInheritedData::StyleInheritedData(const StyleInheritedData& o)
       horizontal_border_spacing(o.horizontal_border_spacing),
       vertical_border_spacing(o.vertical_border_spacing),
       widows(o.widows),
-      orphans(o.orphans),
-      page_break_inside(o.page_break_inside) {}
+      orphans(o.orphans) {}
 
 static bool cursorDataEquivalent(const CursorList* c1, const CursorList* c2) {
   if (c1 == c2)
@@ -73,8 +71,7 @@ bool StyleInheritedData::operator==(const StyleInheritedData& o) const {
          m_effectiveZoom == o.m_effectiveZoom &&
          horizontal_border_spacing == o.horizontal_border_spacing &&
          vertical_border_spacing == o.vertical_border_spacing &&
-         widows == o.widows && orphans == o.orphans &&
-         page_break_inside == o.page_break_inside;
+         widows == o.widows && orphans == o.orphans;
 }
 
 }  // namespace WebCore
