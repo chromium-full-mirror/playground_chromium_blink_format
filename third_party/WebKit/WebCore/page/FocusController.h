@@ -62,6 +62,7 @@ class FocusController : public Noncopyable {
   RefPtr<Frame> m_focusedFrame;
   bool m_isActive;
   bool m_isFocused;
+  bool m_isChangingFocusedFrame;
 };
 
 }  // namespace WebCore
