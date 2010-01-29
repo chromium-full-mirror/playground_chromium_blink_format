@@ -309,8 +309,8 @@ QVariant convertValueToQVariant(ExecState* exec,
         return QString();
       } else {
         UString ustring = value.toString(exec);
-        ret = QVariant(QString::fromUtf16((const ushort*)ustring.rep()->data(),
-                                          ustring.size()));
+        ret = QVariant(
+            QString((const QChar*)ustring.rep()->data(), ustring.size()));
         if (type == String)
           dist = 0;
         else
@@ -335,8 +335,8 @@ QVariant convertValueToQVariant(ExecState* exec,
                                                 &objdist, visitedObjects);
             if (objdist >= 0) {
               UString ustring = (*it).ustring();
-              QString id = QString::fromUtf16(
-                  (const ushort*)ustring.rep()->data(), ustring.size());
+              QString id =
+                  QString((const QChar*)ustring.rep()->data(), ustring.size());
               result.insert(id, v);
             }
           }
@@ -414,8 +414,8 @@ QVariant convertValueToQVariant(ExecState* exec,
         for (int i = 0; i < len; ++i) {
           JSValue val = rtarray->getConcreteArray()->valueAt(exec, i);
           UString ustring = val.toString(exec);
-          QString qstring = QString::fromUtf16(
-              (const ushort*)ustring.rep()->data(), ustring.size());
+          QString qstring =
+              QString((const QChar*)ustring.rep()->data(), ustring.size());
 
           result.append(qstring);
         }
@@ -429,8 +429,8 @@ QVariant convertValueToQVariant(ExecState* exec,
         for (int i = 0; i < len; ++i) {
           JSValue val = array->get(exec, i);
           UString ustring = val.toString(exec);
-          QString qstring = QString::fromUtf16(
-              (const ushort*)ustring.rep()->data(), ustring.size());
+          QString qstring =
+              QString((const QChar*)ustring.rep()->data(), ustring.size());
 
           result.append(qstring);
         }
@@ -439,8 +439,8 @@ QVariant convertValueToQVariant(ExecState* exec,
       } else {
         // Make a single length array
         UString ustring = value.toString(exec);
-        QString qstring = QString::fromUtf16(
-            (const ushort*)ustring.rep()->data(), ustring.size());
+        QString qstring =
+            QString((const QChar*)ustring.rep()->data(), ustring.size());
         QStringList result;
         result.append(qstring);
         ret = QVariant(result);
@@ -457,9 +457,9 @@ QVariant convertValueToQVariant(ExecState* exec,
         dist = 0;
       } else {
         UString ustring = value.toString(exec);
-        ret = QVariant(QString::fromUtf16((const ushort*)ustring.rep()->data(),
-                                          ustring.size())
-                           .toLatin1());
+        ret = QVariant(
+            QString((const QChar*)ustring.rep()->data(), ustring.size())
+                .toLatin1());
         if (type == String)
           dist = 5;
         else
@@ -503,8 +503,8 @@ QVariant convertValueToQVariant(ExecState* exec,
         }
       } else if (type == String) {
         UString ustring = value.toString(exec);
-        QString qstring = QString::fromUtf16(
-            (const ushort*)ustring.rep()->data(), ustring.size());
+        QString qstring =
+            QString((const QChar*)ustring.rep()->data(), ustring.size());
 
         if (hint == QMetaType::QDateTime) {
           QDateTime dt = QDateTime::fromString(qstring, Qt::ISODate);
@@ -553,8 +553,8 @@ QVariant convertValueToQVariant(ExecState* exec,
         */
         // Attempt to convert.. a bit risky
         UString ustring = value.toString(exec);
-        QString qstring = QString::fromUtf16(
-            (const ushort*)ustring.rep()->data(), ustring.size());
+        QString qstring =
+            QString((const QChar*)ustring.rep()->data(), ustring.size());
 
         // this is of the form '/xxxxxx/i'
         int firstSlash = qstring.indexOf(QLatin1Char('/'));
@@ -575,8 +575,8 @@ QVariant convertValueToQVariant(ExecState* exec,
         }
       } else if (type == String) {
         UString ustring = value.toString(exec);
-        QString qstring = QString::fromUtf16(
-            (const ushort*)ustring.rep()->data(), ustring.size());
+        QString qstring =
+            QString((const QChar*)ustring.rep()->data(), ustring.size());
 
         QRegExp re(qstring);
         if (re.isValid()) {
