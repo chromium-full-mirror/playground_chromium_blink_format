@@ -76,8 +76,9 @@ class JSNumberCell : public JSCell {
 
   static PassRefPtr<Structure> createStructure(JSValue proto) {
     return Structure::create(
-        proto, TypeInfo(NumberType,
-                        OverridesGetOwnPropertySlot | NeedsThisConversion));
+        proto,
+        TypeInfo(NumberType, OverridesGetOwnPropertySlot | NeedsThisConversion),
+        AnonymousSlotCount);
   }
 
  private:
