@@ -44,6 +44,7 @@ StorageMap::StorageMap(unsigned quota)
 PassRefPtr<StorageMap> StorageMap::copy() {
   RefPtr<StorageMap> newMap = create(m_quotaSize);
   newMap->m_map = m_map;
+  newMap->m_currentLength = m_currentLength;
   return newMap.release();
 }
 
