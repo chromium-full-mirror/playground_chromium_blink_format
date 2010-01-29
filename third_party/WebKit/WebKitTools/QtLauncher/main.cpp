@@ -248,7 +248,9 @@ class LauncherWindow : public MainWindow {
   }
 
   void showLinkHover(const QString& link, const QString& toolTip) {
+#ifndef Q_WS_MAEMO_5
     statusBar()->showMessage(link);
+#endif
 #ifndef QT_NO_TOOLTIP
     if (!toolTip.isEmpty())
       QToolTip::showText(QCursor::pos(), toolTip);
@@ -335,8 +337,10 @@ class LauncherWindow : public MainWindow {
       QWebElementCollection result = page()->mainFrame()->findAllElements(str);
       foreach (QWebElement e, result)
         e.setStyleProperty("background-color", "yellow");
+#ifndef Q_WS_MAEMO_5
       statusBar()->showMessage(
           QString("%1 element(s) selected").arg(result.count()), 5000);
+#endif
     }
   }
 
