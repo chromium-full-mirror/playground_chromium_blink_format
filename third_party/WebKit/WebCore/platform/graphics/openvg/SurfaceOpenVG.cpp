@@ -29,9 +29,10 @@
 #endif
 
 #include <wtf/Assertions.h>
-#include <wtf/UnusedParam.h>
 
 namespace WebCore {
+
+PainterOpenVG* SurfaceOpenVG::s_currentPainter = 0;
 
 SurfaceOpenVG* SurfaceOpenVG::currentSurface() {
 #if PLATFORM(EGL)
@@ -47,7 +48,8 @@ SurfaceOpenVG::SurfaceOpenVG(const IntSize& size,
                              const EGLDisplay& display,
                              EGLConfig* confPtr,
                              EGLint* errorCode)
-    : m_eglDisplay(display),
+    : m_activePainter(0),
+      m_eglDisplay(display),
       m_eglSurface(EGL_NO_SURFACE),
       m_eglContext(EGL_NO_CONTEXT) {
   ASSERT(m_eglDisplay != EGL_NO_DISPLAY);
@@ -67,7 +69,8 @@ SurfaceOpenVG::SurfaceOpenVG(const IntSize& size,
 SurfaceOpenVG::SurfaceOpenVG(EGLNativeWindowType window,
                              const EGLDisplay& display,
                              EGLConfig* confPtr)
-    : m_eglDisplay(display),
+    : m_activePainter(0),
+      m_eglDisplay(display),
       m_eglSurface(EGL_NO_SURFACE),
       m_eglContext(EGL_NO_CONTEXT) {
   ASSERT(m_eglDisplay != EGL_NO_DISPLAY);
@@ -88,7 +91,8 @@ SurfaceOpenVG::SurfaceOpenVG(EGLNativeWindowType window,
 // arguments and EGLDisplayOpenVG basically implements the constructor
 // by itself.
 SurfaceOpenVG::SurfaceOpenVG()
-    : m_eglDisplay(EGL_NO_DISPLAY),
+    : m_activePainter(0),
+      m_eglDisplay(EGL_NO_DISPLAY),
       m_eglSurface(EGL_NO_SURFACE),
       m_eglContext(EGL_NO_CONTEXT) {}
 #endif
@@ -96,6 +100,9 @@ SurfaceOpenVG::SurfaceOpenVG()
 SurfaceOpenVG::~SurfaceOpenVG() {
   if (!isValid())
     return;
+
+  if (m_activePainter && this == m_activePainter->baseSurface())
+    m_activePainter->end();
 
 #if PLATFORM(EGL)
   EGLDisplayOpenVG::forDisplay(m_eglDisplay)->destroySurface(m_eglSurface);
@@ -164,10 +171,15 @@ void SurfaceOpenVG::makeCurrent(MakeCurrentMode mode) {
   if (currentSurface != m_eglSurface) {
     eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext);
     ASSERT_EGL_NO_ERROR();
+    s_currentPainter = 0;
   }
-#else
-  UNUSED_PARAM(mode);
 #endif
+
+  if (m_activePainter && mode == ApplyPainterStateOnSurfaceSwitch &&
+      s_currentPainter != m_activePainter) {
+    m_activePainter->applyState();
+    s_currentPainter = m_activePainter;
+  }
 }
 
 void SurfaceOpenVG::makeCompatibleCurrent() {
@@ -179,11 +191,16 @@ void SurfaceOpenVG::makeCompatibleCurrent() {
   EGLSurface currentSurface = eglGetCurrentSurface(EGL_DRAW);
   ASSERT_EGL_NO_ERROR();
 
-  if (currentSurface != m_eglSurface &&
-      !EGLDisplayOpenVG::forDisplay(m_eglDisplay)
-           ->surfacesCompatible(currentSurface, m_eglSurface)) {
+  if (currentSurface == m_eglSurface) {
+    if (m_activePainter && s_currentPainter != m_activePainter) {
+      m_activePainter->applyState();
+      s_currentPainter = m_activePainter;
+    }
+  } else if (!EGLDisplayOpenVG::forDisplay(m_eglDisplay)
+                  ->surfacesCompatible(currentSurface, m_eglSurface)) {
     eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext);
     ASSERT_EGL_NO_ERROR();
+    s_currentPainter = 0;
   }
 // else: surfaces compatible, no need to switch contexts
 #endif
@@ -196,5 +213,25 @@ void SurfaceOpenVG::flush() {
   eglSwapBuffers(m_eglDisplay, m_eglSurface);
   ASSERT_EGL_NO_ERROR();
 #endif
+}
+
+void SurfaceOpenVG::setActivePainter(PainterOpenVG* painter) {
+  ASSERT(isValid());
+
+  // If painter is non-zero, we want to make sure there was no previous painter
+  // set.
+  ASSERT(!painter || !m_activePainter);
+
+  // Make sure a disabled painter isn't marked as global current painter
+  // anymore.
+  if (!painter && s_currentPainter == m_activePainter)
+    s_currentPainter = 0;
+
+  m_activePainter = painter;
+}
+
+PainterOpenVG* SurfaceOpenVG::activePainter() {
+  ASSERT(isValid());
+  return m_activePainter;
 }
 }

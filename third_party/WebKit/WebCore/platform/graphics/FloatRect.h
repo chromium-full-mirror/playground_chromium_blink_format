@@ -61,6 +61,10 @@ struct SkRect;
 
 namespace WebCore {
 
+#if PLATFORM(OPENVG)
+class VGRect;
+#endif
+
 class IntRect;
 
 class FloatRect {
@@ -162,6 +166,10 @@ class FloatRect {
 #if PLATFORM(SKIA)
   FloatRect(const SkRect&);
   operator SkRect() const;
+#endif
+
+#if PLATFORM(OPENVG)
+  operator VGRect() const;
 #endif
 
  private:

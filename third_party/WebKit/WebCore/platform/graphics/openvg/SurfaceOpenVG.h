@@ -32,6 +32,7 @@ namespace WebCore {
 #if PLATFORM(EGL)
 class EGLDisplayOpenVG;
 #endif
+class PainterOpenVG;
 class IntSize;
 
 /**
@@ -44,6 +45,11 @@ class IntSize;
  */
 class SurfaceOpenVG : public Noncopyable {
  public:
+  enum MakeCurrentMode {
+    ApplyPainterStateOnSurfaceSwitch,
+    DontApplyPainterState,
+  };
+
   static SurfaceOpenVG* currentSurface();
 
 #if PLATFORM(EGL)
@@ -95,7 +101,7 @@ class SurfaceOpenVG : public Noncopyable {
    * Make the associated GL/EGL context the current one, so that subsequent
    * OpenVG commands apply to it.
    */
-  void makeCurrent();
+  void makeCurrent(MakeCurrentMode mode = ApplyPainterStateOnSurfaceSwitch);
 
   /**
    * Make a surface/context combination current that is "compatible"
@@ -115,7 +121,13 @@ class SurfaceOpenVG : public Noncopyable {
    */
   void flush();
 
+  void setActivePainter(PainterOpenVG*);
+  PainterOpenVG* activePainter();
+
  private:
+  PainterOpenVG* m_activePainter;
+  static PainterOpenVG* s_currentPainter;  // global currently active painter
+
 #if PLATFORM(EGL)
   SurfaceOpenVG();  // for EGLDisplayOpenVG
 
