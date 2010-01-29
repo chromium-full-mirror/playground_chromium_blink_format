@@ -44,6 +44,7 @@ class LocationEdit : public QLineEdit {
 
  protected:
   virtual void paintEvent(QPaintEvent*);
+  virtual void focusInEvent(QFocusEvent*);
 
  private:
   int m_progress;
