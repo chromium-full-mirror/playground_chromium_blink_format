@@ -80,7 +80,7 @@ size_t GIFImageDecoder::frameCount() {
     // have decoded, so don't mark it is invalid. If there is an overflow
     // or some serious error, m_failed will have gotten set for us.
     reader.read((const unsigned char*)m_data->data(), m_data->size(),
-                GIFFrameCountQuery, -1);
+                GIFFrameCountQuery, static_cast<unsigned>(-1));
     m_frameCountValid = true;
     m_frameBufferCache.resize(reader.images_count);
   }
