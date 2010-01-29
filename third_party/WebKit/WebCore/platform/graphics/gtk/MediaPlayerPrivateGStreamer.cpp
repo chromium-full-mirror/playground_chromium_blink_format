@@ -28,6 +28,9 @@
 
 #include "CString.h"
 #include "DataSourceGStreamer.h"
+#include "Document.h"
+#include "Frame.h"
+#include "FrameView.h"
 #include "GraphicsContext.h"
 #include "IntRect.h"
 #include "KURL.h"
@@ -164,6 +167,17 @@ void mediaPlayerPrivateSourceChangedCallback(GObject* object,
     char* cookiesStrv[] = {cookies, NULL};
     g_object_set(element, "cookies", cookiesStrv, NULL);
     g_free(cookies);
+
+    Frame* frame =
+        mp->m_player->frameView() ? mp->m_player->frameView()->frame() : 0;
+    Document* document = frame ? frame->document() : 0;
+    if (document) {
+      GstStructure* extraHeaders =
+          gst_structure_new("extra-headers", "Referer", G_TYPE_STRING,
+                            document->documentURI().utf8().data(), 0);
+      g_object_set(element, "extra-headers", extraHeaders, NULL);
+      gst_structure_free(extraHeaders);
+    }
   }
 
   gst_object_unref(element);
