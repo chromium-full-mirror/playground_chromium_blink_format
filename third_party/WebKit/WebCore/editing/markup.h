@@ -51,6 +51,8 @@ PassRefPtr<DocumentFragment> createFragmentFromMarkup(
 PassRefPtr<DocumentFragment> createFragmentFromNodes(Document*,
                                                      const Vector<Node*>&);
 
+bool isPlainTextMarkup(Node* node);
+
 String createMarkup(const Range*,
                     Vector<Node*>* = 0,
                     EAnnotateForInterchange = DoNotAnnotateForInterchange,
