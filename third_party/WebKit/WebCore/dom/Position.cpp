@@ -1247,8 +1247,10 @@ void Position::formatForDebugger(char* buffer, unsigned length) const {
 }
 
 void Position::showTreeForThis() const {
-  if (node())
+  if (node()) {
     node()->showTreeForThis();
+    fprintf(stderr, "offset: %d\n", m_offset);
+  }
 }
 
 #endif

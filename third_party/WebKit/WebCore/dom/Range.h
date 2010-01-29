@@ -183,4 +183,9 @@ inline bool operator!=(const Range& a, const Range& b) {
 
 }  // namespace
 
+#ifndef NDEBUG
+// Outside the WebCore namespace for ease of invocation from gdb.
+void showTree(const WebCore::Range*);
+#endif
+
 #endif
