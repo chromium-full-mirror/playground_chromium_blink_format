@@ -32,6 +32,7 @@
 
 #include "mainwindow.h"
 
+#include "locationedit.h"
 #include "utils.h"
 
 MainWindow::MainWindow(const QString& url) : m_page(new WebPage(this)) {
@@ -51,7 +52,7 @@ void MainWindow::buildUI() {
   bar->addAction(page()->action(QWebPage::Reload));
   bar->addAction(page()->action(QWebPage::Stop));
 
-  urlEdit = new QLineEdit(this);
+  urlEdit = new LocationEdit(this);
   urlEdit->setSizePolicy(QSizePolicy::Expanding,
                          urlEdit->sizePolicy().verticalPolicy());
   connect(urlEdit, SIGNAL(returnPressed()), SLOT(changeLocation()));
@@ -60,18 +61,9 @@ void MainWindow::buildUI() {
   completer->setModel(&urlModel);
   bar->addWidget(urlEdit);
 
-  progress = new QProgressBar(this);
-  progress->setRange(0, 100);
-  progress->setMinimumSize(100, 20);
-  progress->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-  progress->hide();
-  statusBar()->addPermanentWidget(progress);
-
   connect(page()->mainFrame(), SIGNAL(titleChanged(const QString&)), this,
           SLOT(setWindowTitle(const QString&)));
-  connect(page(), SIGNAL(loadProgress(int)), progress, SLOT(show()));
-  connect(page(), SIGNAL(loadProgress(int)), progress, SLOT(setValue(int)));
-  connect(page(), SIGNAL(loadFinished(bool)), progress, SLOT(hide()));
+  connect(page(), SIGNAL(loadProgress(int)), urlEdit, SLOT(setProgress(int)));
   connect(page(), SIGNAL(windowCloseRequested()), this, SLOT(close()));
 
   // short-cuts
