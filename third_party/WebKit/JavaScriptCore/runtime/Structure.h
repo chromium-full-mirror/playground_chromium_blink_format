@@ -193,11 +193,6 @@ class Structure : public RefCounted<Structure> {
   void getPropertyNames(PropertyNameArray&, EnumerationMode mode);
 
  private:
-  static PassRefPtr<Structure> create(JSValue prototype,
-                                      const TypeInfo& typeInfo) {
-    return adoptRef(new Structure(prototype, typeInfo));
-  }
-
   Structure(JSValue prototype, const TypeInfo&);
 
   typedef enum {

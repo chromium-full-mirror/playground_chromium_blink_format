@@ -387,7 +387,8 @@ PassRefPtr<Structure> Structure::addPropertyTransition(
   }
 
   RefPtr<Structure> transition =
-      create(structure->m_prototype, structure->typeInfo());
+      create(structure->m_prototype, structure->typeInfo(),
+             structure->anonymousSlotCount());
 
   transition->m_cachedPrototypeChain = structure->m_cachedPrototypeChain;
   transition->m_previous = structure;
@@ -442,7 +443,8 @@ PassRefPtr<Structure> Structure::removePropertyTransition(
 
 PassRefPtr<Structure> Structure::changePrototypeTransition(Structure* structure,
                                                            JSValue prototype) {
-  RefPtr<Structure> transition = create(prototype, structure->typeInfo());
+  RefPtr<Structure> transition =
+      create(prototype, structure->typeInfo(), structure->anonymousSlotCount());
 
   transition->m_propertyStorageCapacity = structure->m_propertyStorageCapacity;
   transition->m_hasGetterSetterProperties =
@@ -467,7 +469,8 @@ PassRefPtr<Structure> Structure::despecifyFunctionTransition(
   ASSERT(structure->m_specificFunctionThrashCount <
          maxSpecificFunctionThrashCount);
   RefPtr<Structure> transition =
-      create(structure->storedPrototype(), structure->typeInfo());
+      create(structure->storedPrototype(), structure->typeInfo(),
+             structure->anonymousSlotCount());
 
   transition->m_propertyStorageCapacity = structure->m_propertyStorageCapacity;
   transition->m_hasGetterSetterProperties =
@@ -496,7 +499,8 @@ PassRefPtr<Structure> Structure::despecifyFunctionTransition(
 
 PassRefPtr<Structure> Structure::getterSetterTransition(Structure* structure) {
   RefPtr<Structure> transition =
-      create(structure->storedPrototype(), structure->typeInfo());
+      create(structure->storedPrototype(), structure->typeInfo(),
+             structure->anonymousSlotCount());
   transition->m_propertyStorageCapacity = structure->m_propertyStorageCapacity;
   transition->m_hasGetterSetterProperties =
       transition->m_hasGetterSetterProperties;
@@ -519,7 +523,8 @@ PassRefPtr<Structure> Structure::toDictionaryTransition(Structure* structure,
   ASSERT(!structure->isUncacheableDictionary());
 
   RefPtr<Structure> transition =
-      create(structure->m_prototype, structure->typeInfo());
+      create(structure->m_prototype, structure->typeInfo(),
+             structure->anonymousSlotCount());
   transition->m_dictionaryKind = kind;
   transition->m_propertyStorageCapacity = structure->m_propertyStorageCapacity;
   transition->m_hasGetterSetterProperties =
