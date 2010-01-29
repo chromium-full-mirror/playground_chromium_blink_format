@@ -289,7 +289,7 @@ class JSObject : public JSCell {
     ASSERT(index < m_structure->anonymousSlotCount());
     *locationForOffset(index) = value;
   }
-  JSValue getAnonymousValue(unsigned index) {
+  JSValue getAnonymousValue(unsigned index) const {
     ASSERT(index < m_structure->anonymousSlotCount());
     return *locationForOffset(index);
   }
