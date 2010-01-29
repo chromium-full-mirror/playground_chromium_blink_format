@@ -45,6 +45,10 @@ class FrameLoadDelegate : public IWebFrameLoadDelegate,
 
   void resetToConsistentState();
 
+  AccessibilityController* accessibilityController() const {
+    return m_accessibilityController.get();
+  }
+
   // IUnknown
   virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid,
                                                    void** ppvObject);

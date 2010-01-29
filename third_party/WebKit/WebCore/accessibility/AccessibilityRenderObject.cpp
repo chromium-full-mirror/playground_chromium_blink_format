@@ -2001,6 +2001,8 @@ RenderView* AccessibilityRenderObject::topRenderer() const {
 }
 
 Document* AccessibilityRenderObject::document() const {
+  if (!m_renderer)
+    return 0;
   return m_renderer->document();
 }
 
