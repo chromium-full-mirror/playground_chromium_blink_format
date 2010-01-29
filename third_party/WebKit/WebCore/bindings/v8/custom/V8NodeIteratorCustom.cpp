@@ -64,7 +64,7 @@ v8::Handle<v8::Value> V8NodeIterator::nextNodeCallback(
   NodeIterator* nodeIterator = V8NodeIterator::toNative(args.Holder());
 
   ExceptionCode ec = 0;
-  ScriptState state;
+  EmptyScriptState state;
   RefPtr<Node> result = nodeIterator->nextNode(&state, ec);
   return toV8(result.release(), ec, &state);
 }
@@ -75,7 +75,7 @@ v8::Handle<v8::Value> V8NodeIterator::previousNodeCallback(
   NodeIterator* nodeIterator = V8NodeIterator::toNative(args.Holder());
 
   ExceptionCode ec = 0;
-  ScriptState state;
+  EmptyScriptState state;
   RefPtr<Node> result = nodeIterator->previousNode(&state, ec);
   return toV8(result.release(), ec, &state);
 }
