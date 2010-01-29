@@ -341,6 +341,9 @@ class FrameLoaderClient {
   virtual bool allowPlugins(bool enabledPerSettings) {
     return enabledPerSettings;
   }
+  virtual bool allowImages(bool enabledPerSettings) {
+    return enabledPerSettings;
+  }
 };
 
 }  // namespace WebCore

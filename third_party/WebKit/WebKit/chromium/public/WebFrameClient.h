@@ -93,6 +93,11 @@ class WebFrameClient {
     return enabledPerSettings;
   }
 
+  // Controls whether images are allowed for this frame.
+  virtual bool allowImages(WebFrame*, bool enabledPerSettings) {
+    return enabledPerSettings;
+  }
+
   // Load commands -------------------------------------------------------
 
   // The client should handle the navigation externally.

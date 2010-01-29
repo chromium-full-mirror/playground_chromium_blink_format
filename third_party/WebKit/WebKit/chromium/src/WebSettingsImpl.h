@@ -60,6 +60,7 @@ class WebSettingsImpl : public WebSettings {
   virtual void setWebSecurityEnabled(bool);
   virtual void setJavaScriptCanOpenWindowsAutomatically(bool);
   virtual void setLoadsImagesAutomatically(bool);
+  virtual void setImagesEnabled(bool);
   virtual void setPluginsEnabled(bool);
   virtual void setDOMPasteAllowed(bool);
   virtual void setDeveloperExtrasEnabled(bool);

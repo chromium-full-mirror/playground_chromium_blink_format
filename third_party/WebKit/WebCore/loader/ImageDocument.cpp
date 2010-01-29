@@ -33,6 +33,7 @@
 #include "EventNames.h"
 #include "Frame.h"
 #include "FrameLoader.h"
+#include "FrameLoaderClient.h"
 #include "FrameView.h"
 #include "HTMLImageElement.h"
 #include "HTMLNames.h"
@@ -109,9 +110,15 @@ void ImageTokenizer::write(const SegmentedString&, bool) {
 }
 
 bool ImageTokenizer::writeRawData(const char*, int) {
+  Frame* frame = m_doc->frame();
+  Settings* settings = frame->settings();
+  if (!frame->loader()->client()->allowImages(!settings ||
+                                              settings->areImagesEnabled()))
+    return false;
+
   CachedImage* cachedImage = m_doc->cachedImage();
-  cachedImage->data(
-      m_doc->frame()->loader()->documentLoader()->mainResourceData(), false);
+  cachedImage->data(frame->loader()->documentLoader()->mainResourceData(),
+                    false);
 
   m_doc->imageChanged();
 

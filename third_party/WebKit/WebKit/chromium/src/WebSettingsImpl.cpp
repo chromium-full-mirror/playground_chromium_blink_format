@@ -115,6 +115,10 @@ void WebSettingsImpl::setLoadsImagesAutomatically(
   m_settings->setLoadsImagesAutomatically(loadsImagesAutomatically);
 }
 
+void WebSettingsImpl::setImagesEnabled(bool enabled) {
+  m_settings->setImagesEnabled(enabled);
+}
+
 void WebSettingsImpl::setPluginsEnabled(bool enabled) {
   m_settings->setPluginsEnabled(enabled);
 }
