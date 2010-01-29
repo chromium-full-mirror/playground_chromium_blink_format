@@ -358,11 +358,13 @@ void AXObjectCache::removeAXID(AccessibilityObject* object) {
   m_idsInUse.remove(objID);
 }
 
+#if HAVE(ACCESSIBILITY)
 void AXObjectCache::contentChanged(RenderObject* renderer) {
   AccessibilityObject* object = getOrCreate(renderer);
   if (object)
     object->contentChanged();
 }
+#endif
 
 void AXObjectCache::childrenChanged(RenderObject* renderer) {
   if (!renderer)

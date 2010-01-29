@@ -175,6 +175,7 @@ inline void AXObjectCache::postPlatformNotification(AccessibilityObject*,
 inline void AXObjectCache::handleFocusedUIElementChanged(RenderObject*,
                                                          RenderObject*) {}
 inline void AXObjectCache::handleScrolledToAnchor(const Node*) {}
+inline void AXObjectCache::contentChanged(RenderObject*) {}
 #endif
 }
 
