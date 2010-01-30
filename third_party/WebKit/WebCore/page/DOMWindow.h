@@ -52,6 +52,7 @@ class EventListener;
 class FloatRect;
 class Frame;
 class History;
+class IndexedDatabaseRequest;
 class InspectorTimelineAgent;
 class Location;
 class Media;
@@ -240,6 +241,10 @@ class DOMWindow : public RefCounted<DOMWindow>, public EventTarget {
 
 #if ENABLE(NOTIFICATIONS)
   NotificationCenter* webkitNotifications() const;
+#endif
+
+#if ENABLE(INDEXED_DATABASE)
+  IndexedDatabaseRequest* indexedDB() const;
 #endif
 
   void postMessage(PassRefPtr<SerializedScriptValue> message,
