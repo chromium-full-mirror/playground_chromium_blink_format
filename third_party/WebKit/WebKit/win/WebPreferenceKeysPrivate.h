@@ -167,3 +167,6 @@
 
 #define WebKitAcceleratedCompositingEnabledPreferenceKey \
   "WebKitAcceleratedCompositingEnabled"
+
+#define WebKitCustomDragCursorsEnabledPreferenceKey \
+  "WebKitCustomDragCursorsEnabled"

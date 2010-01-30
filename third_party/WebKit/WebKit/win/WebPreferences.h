@@ -389,6 +389,9 @@ class WebPreferences : public IWebPreferences, public IWebPreferencesPrivate {
   virtual HRESULT STDMETHODCALLTYPE setAcceleratedCompositingEnabled(BOOL);
   virtual HRESULT STDMETHODCALLTYPE acceleratedCompositingEnabled(BOOL*);
 
+  virtual HRESULT STDMETHODCALLTYPE setCustomDragCursorsEnabled(BOOL);
+  virtual HRESULT STDMETHODCALLTYPE customDragCursorsEnabled(BOOL*);
+
   // WebPreferences
 
   // This method accesses a different preference key than
