@@ -251,9 +251,13 @@ PassRefPtr<Geolocation::GeoNotifier> Geolocation::startRequest(
     notifier->setFatalError(PositionError::create(
         PositionError::PERMISSION_DENIED, permissionDeniedErrorMessage));
   else {
-    if (notifier->hasZeroTimeout() || startUpdating(notifier.get()))
-      notifier->startTimerIfNeeded();
-    else
+    if (notifier->hasZeroTimeout() || startUpdating(notifier.get())) {
+#if ENABLE(CLIENT_BASED_GEOLOCATION)
+      // Only start timer if we're not waiting for user permission.
+      if (!m_startRequestPermissionNotifier)
+#endif
+        notifier->startTimerIfNeeded();
+    } else
       notifier->setFatalError(
           PositionError::create(PositionError::POSITION_UNAVAILABLE,
                                 "Failed to start Geolocation service"));
@@ -307,6 +311,7 @@ void Geolocation::setIsAllowed(bool allowed) {
   if (m_startRequestPermissionNotifier) {
     if (isAllowed()) {
       // Permission request was made during the startUpdating process
+      m_startRequestPermissionNotifier->startTimerIfNeeded();
       m_startRequestPermissionNotifier = 0;
       if (!m_frame)
         return;
