@@ -36,8 +36,15 @@
 #include <wtf/Vector.h>
 
 #if PLATFORM(CG)
+
+#ifdef BUILDING_ON_TIGER
 typedef struct CGShading* CGShadingRef;
 typedef CGShadingRef PlatformGradient;
+#else
+typedef struct CGGradient* CGGradientRef;
+typedef CGGradientRef PlatformGradient;
+#endif
+
 #elif PLATFORM(QT)
 QT_BEGIN_NAMESPACE
 class QGradient;
@@ -117,6 +124,9 @@ class Gradient : public Generator {
   void setPlatformGradientSpaceTransform(
       const TransformationMatrix& gradientSpaceTransformation);
 
+#if PLATFORM(CG)
+  void paint(GraphicsContext*);
+#endif
  private:
   Gradient(const FloatPoint& p0, const FloatPoint& p1);
   Gradient(const FloatPoint& p0, float r0, const FloatPoint& p1, float r1);
@@ -125,6 +135,7 @@ class Gradient : public Generator {
   void platformDestroy();
 
   int findStop(float value) const;
+  void sortStopsIfNecessary();
 
   bool m_radial;
   FloatPoint m_p0;
