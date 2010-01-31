@@ -42,9 +42,6 @@
 
 namespace WebCore {
 
-ScriptState::ScriptState(Frame*, v8::Handle<v8::Context> context)
-    : m_context(v8::Persistent<v8::Context>::New(context)) {}
-
 ScriptState::ScriptState(v8::Handle<v8::Context> context)
     : m_context(v8::Persistent<v8::Context>::New(context)) {
   m_context.MakeWeak(this, &ScriptState::weakReferenceCallback);
