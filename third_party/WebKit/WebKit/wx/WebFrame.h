@@ -76,6 +76,9 @@ class WXDLLIMPEXP_WEBKIT wxWebViewDOMElementInfo {
   wxString m_link;
 };
 
+// based on enums in WebCore/dom/Document.h
+enum wxWebKitParseMode { Compat, AlmostStrict, Strict, NoDocument };
+
 class WXDLLIMPEXP_WEBKIT wxWebFrame {
   // ChromeClientWx needs to get the Page* stored by the wxWebView
   // for the createWindow function.
@@ -143,6 +146,8 @@ class WXDLLIMPEXP_WEBKIT wxWebFrame {
   wxWebViewDOMElementInfo HitTest(const wxPoint& post) const;
 
   bool ShouldClose() const;
+
+  wxWebKitParseMode GetParseMode() const;
 
  private:
   float m_textMagnifier;
