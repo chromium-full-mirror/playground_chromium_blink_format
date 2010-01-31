@@ -81,7 +81,7 @@ class GraphicsLayerCACF : public GraphicsLayer {
   virtual void setContentsRect(const IntRect&);
 
   virtual void setContentsToImage(Image*);
-  virtual void setContentsToMedia(PlatformLayer*);
+  virtual void setContentsToVideo(PlatformLayer*);
 
   virtual PlatformLayer* platformLayer() const;
 
@@ -119,7 +119,7 @@ class GraphicsLayerCACF : public GraphicsLayer {
   void updateLayerBackgroundColor();
 
   void updateContentsImage();
-  void updateContentsMedia();
+  void updateContentsVideo();
   void updateContentsRect();
   void updateGeometryOrientation();
 
@@ -133,7 +133,7 @@ class GraphicsLayerCACF : public GraphicsLayer {
   enum ContentsLayerPurpose {
     NoContentsLayer = 0,
     ContentsLayerForImage,
-    ContentsLayerForMedia
+    ContentsLayerForVideo
   };
 
   ContentsLayerPurpose m_contentsLayerPurpose;

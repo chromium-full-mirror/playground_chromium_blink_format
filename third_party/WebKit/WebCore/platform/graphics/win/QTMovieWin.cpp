@@ -99,7 +99,6 @@ class QTMovieWinPrivate : public Noncopyable {
   void deleteGWorld();
   void clearGWorld();
   void cacheMovieScale();
-  void updateMovieSize();
 
   void setSize(int, int);
 
@@ -259,17 +258,15 @@ void QTMovieWinPrivate::task() {
       // loaded while it
       //  is visible as the gworld is destroyed/created when visibility changes
       bool shouldRestorePlaybackState = false;
-      bool movieNewlyPlayable = loadState >= QTMovieLoadStateLoaded &&
-                                m_loadState < QTMovieLoadStateLoaded;
-      m_loadState = loadState;
-      if (movieNewlyPlayable) {
-        updateMovieSize();
+      if (loadState >= QTMovieLoadStateLoaded &&
+          m_loadState < QTMovieLoadStateLoaded) {
         if (m_visible)
           clearGWorld();
         cacheMovieScale();
         shouldRestorePlaybackState = true;
       }
 
+      m_loadState = loadState;
       if (!m_movieController && m_loadState >= QTMovieLoadStateLoaded)
         createMovieController();
       m_client->movieLoadStateChanged(m_movieWin);
@@ -419,18 +416,11 @@ void QTMovieWinPrivate::setSize(int width, int height) {
   ASSERT(m_scaleCached);
 #endif
 
-  updateMovieSize();
-}
-
-void QTMovieWinPrivate::updateMovieSize() {
-  if (!m_movie || m_loadState < QTMovieLoadStateLoaded)
-    return;
-
   Rect bounds;
   bounds.top = 0;
   bounds.left = 0;
-  bounds.right = m_width;
-  bounds.bottom = m_height;
+  bounds.right = width;
+  bounds.bottom = height;
   if (m_movieController)
     MCSetControllerBoundsRect(m_movieController, &bounds);
   SetMovieBox(m_movie, &bounds);
