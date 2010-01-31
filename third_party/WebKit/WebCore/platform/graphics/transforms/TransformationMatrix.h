@@ -381,6 +381,14 @@ class TransformationMatrix : public FastAllocBase {
   operator XFORM() const;
 #endif
 
+  bool isIdentityOrTranslation() const {
+    return m_matrix[0][0] == 1 && m_matrix[0][1] == 0 && m_matrix[0][2] == 0 &&
+           m_matrix[0][3] == 0 && m_matrix[1][0] == 0 && m_matrix[1][1] == 1 &&
+           m_matrix[1][2] == 0 && m_matrix[1][3] == 0 && m_matrix[2][0] == 0 &&
+           m_matrix[2][1] == 0 && m_matrix[2][2] == 1 && m_matrix[2][3] == 0 &&
+           m_matrix[3][3] == 1;
+  }
+
  private:
   // multiply passed 2D point by matrix (assume z=0)
   void multVecMatrix(double x, double y, double& dstX, double& dstY) const;
@@ -396,14 +404,6 @@ class TransformationMatrix : public FastAllocBase {
   void setMatrix(const Matrix4 m) {
     if (m && m != m_matrix)
       memcpy(m_matrix, m, sizeof(Matrix4));
-  }
-
-  bool isIdentityOrTranslation() const {
-    return m_matrix[0][0] == 1 && m_matrix[0][1] == 0 && m_matrix[0][2] == 0 &&
-           m_matrix[0][3] == 0 && m_matrix[1][0] == 0 && m_matrix[1][1] == 1 &&
-           m_matrix[1][2] == 0 && m_matrix[1][3] == 0 && m_matrix[2][0] == 0 &&
-           m_matrix[2][1] == 0 && m_matrix[2][2] == 1 && m_matrix[2][3] == 0 &&
-           m_matrix[3][3] == 1;
   }
 
   Matrix4 m_matrix;
