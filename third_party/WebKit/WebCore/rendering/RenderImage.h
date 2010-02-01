@@ -69,6 +69,8 @@ class RenderImage : public RenderReplaced {
   bool isWidthSpecified() const;
   bool isHeightSpecified() const;
 
+  virtual void intrinsicSizeChanged() { imageChanged(imagePtr()); }
+
  private:
   virtual const char* renderName() const { return "RenderImage"; }
 
@@ -110,8 +112,6 @@ class RenderImage : public RenderReplaced {
     return m_cachedImage ? m_cachedImage->imageSize(multiplier) : IntSize();
   }
   virtual WrappedImagePtr imagePtr() const { return m_cachedImage.get(); }
-
-  virtual void intrinsicSizeChanged() { imageChanged(imagePtr()); }
 
   int calcAspectRatioWidth() const;
   int calcAspectRatioHeight() const;
