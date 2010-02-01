@@ -121,13 +121,13 @@ class Structure : public RefCounted<Structure> {
   void growPropertyStorageCapacity();
   unsigned propertyStorageCapacity() const { return m_propertyStorageCapacity; }
   unsigned propertyStorageSize() const {
-    return m_propertyTable
-               ? m_propertyTable->keyCount +
-                     m_propertyTable->anonymousSlotCount +
-                     (m_propertyTable->deletedOffsets
-                          ? m_propertyTable->deletedOffsets->size()
-                          : 0)
-               : m_offset + 1;
+    return m_anonymousSlotCount +
+           (m_propertyTable
+                ? m_propertyTable->keyCount +
+                      (m_propertyTable->deletedOffsets
+                           ? m_propertyTable->deletedOffsets->size()
+                           : 0)
+                : m_offset + 1);
   }
   bool isUsingInlineStorage() const;
 
