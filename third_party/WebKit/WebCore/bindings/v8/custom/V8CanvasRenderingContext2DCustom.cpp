@@ -50,7 +50,7 @@
 
 namespace WebCore {
 
-static v8::Handle<v8::Value> toV8(CanvasStyle* style) {
+static v8::Handle<v8::Value> toV8Object(CanvasStyle* style) {
   if (style->canvasGradient())
     return V8DOMWrapper::convertToV8Object(V8ClassIndex::CANVASGRADIENT,
                                            style->canvasGradient());
@@ -82,7 +82,7 @@ v8::Handle<v8::Value> V8CanvasRenderingContext2D::strokeStyleAccessorGetter(
     const v8::AccessorInfo& info) {
   CanvasRenderingContext2D* impl =
       V8CanvasRenderingContext2D::toNative(info.Holder());
-  return toV8(impl->strokeStyle());
+  return toV8Object(impl->strokeStyle());
 }
 
 void V8CanvasRenderingContext2D::strokeStyleAccessorSetter(
@@ -99,7 +99,7 @@ v8::Handle<v8::Value> V8CanvasRenderingContext2D::fillStyleAccessorGetter(
     const v8::AccessorInfo& info) {
   CanvasRenderingContext2D* impl =
       V8CanvasRenderingContext2D::toNative(info.Holder());
-  return toV8(impl->fillStyle());
+  return toV8Object(impl->fillStyle());
 }
 
 void V8CanvasRenderingContext2D::fillStyleAccessorSetter(

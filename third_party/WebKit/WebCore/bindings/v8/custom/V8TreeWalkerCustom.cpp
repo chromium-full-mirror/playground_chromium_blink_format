@@ -44,8 +44,8 @@
 
 namespace WebCore {
 
-static inline v8::Handle<v8::Value> toV8(PassRefPtr<Node> object,
-                                         ScriptState* state) {
+static inline v8::Handle<v8::Value> toV8Object(PassRefPtr<Node> object,
+                                               ScriptState* state) {
   if (state->hadException())
     return throwError(state->exception());
 
@@ -62,7 +62,7 @@ v8::Handle<v8::Value> V8TreeWalker::parentNodeCallback(
 
   EmptyScriptState state;
   RefPtr<Node> result = treeWalker->parentNode(&state);
-  return toV8(result.release(), &state);
+  return toV8Object(result.release(), &state);
 }
 
 v8::Handle<v8::Value> V8TreeWalker::firstChildCallback(
@@ -72,7 +72,7 @@ v8::Handle<v8::Value> V8TreeWalker::firstChildCallback(
 
   EmptyScriptState state;
   RefPtr<Node> result = treeWalker->firstChild(&state);
-  return toV8(result.release(), &state);
+  return toV8Object(result.release(), &state);
 }
 
 v8::Handle<v8::Value> V8TreeWalker::lastChildCallback(
@@ -82,7 +82,7 @@ v8::Handle<v8::Value> V8TreeWalker::lastChildCallback(
 
   EmptyScriptState state;
   RefPtr<Node> result = treeWalker->lastChild(&state);
-  return toV8(result.release(), &state);
+  return toV8Object(result.release(), &state);
 }
 
 v8::Handle<v8::Value> V8TreeWalker::nextNodeCallback(
@@ -92,7 +92,7 @@ v8::Handle<v8::Value> V8TreeWalker::nextNodeCallback(
 
   EmptyScriptState state;
   RefPtr<Node> result = treeWalker->nextNode(&state);
-  return toV8(result.release(), &state);
+  return toV8Object(result.release(), &state);
 }
 
 v8::Handle<v8::Value> V8TreeWalker::previousNodeCallback(
@@ -102,7 +102,7 @@ v8::Handle<v8::Value> V8TreeWalker::previousNodeCallback(
 
   EmptyScriptState state;
   RefPtr<Node> result = treeWalker->previousNode(&state);
-  return toV8(result.release(), &state);
+  return toV8Object(result.release(), &state);
 }
 
 v8::Handle<v8::Value> V8TreeWalker::nextSiblingCallback(
@@ -112,7 +112,7 @@ v8::Handle<v8::Value> V8TreeWalker::nextSiblingCallback(
 
   EmptyScriptState state;
   RefPtr<Node> result = treeWalker->nextSibling(&state);
-  return toV8(result.release(), &state);
+  return toV8Object(result.release(), &state);
 }
 
 v8::Handle<v8::Value> V8TreeWalker::previousSiblingCallback(
@@ -122,7 +122,7 @@ v8::Handle<v8::Value> V8TreeWalker::previousSiblingCallback(
 
   EmptyScriptState state;
   RefPtr<Node> result = treeWalker->previousSibling(&state);
-  return toV8(result.release(), &state);
+  return toV8Object(result.release(), &state);
 }
 
 }  // namespace WebCore
