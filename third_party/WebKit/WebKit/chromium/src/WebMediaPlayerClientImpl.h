@@ -53,7 +53,8 @@ class WebMediaPlayerClientImpl : public WebMediaPlayerClient,
   // WebMediaPlayerClient methods:
   virtual void networkStateChanged();
   virtual void readyStateChanged();
-  virtual void volumeChanged();
+  virtual void volumeChanged(float);
+  virtual void muteChanged(bool);
   virtual void timeChanged();
   virtual void repaint();
   virtual void durationChanged();

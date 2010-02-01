@@ -212,6 +212,7 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   virtual void mediaPlayerReadyStateChanged(MediaPlayer*);
   virtual void mediaPlayerTimeChanged(MediaPlayer*);
   virtual void mediaPlayerVolumeChanged(MediaPlayer*);
+  virtual void mediaPlayerMuteChanged(MediaPlayer*);
   virtual void mediaPlayerDurationChanged(MediaPlayer*);
   virtual void mediaPlayerRateChanged(MediaPlayer*);
   virtual void mediaPlayerSawUnsupportedTracks(MediaPlayer*);
