@@ -111,7 +111,6 @@ const int cMisspellingLineThickness = 3;
 const int cMisspellingLinePatternWidth = 4;
 const int cMisspellingLinePatternGapWidth = 1;
 
-class AffineTransform;
 class Font;
 class Generator;
 class Gradient;
@@ -373,9 +372,7 @@ class GraphicsContext : public Noncopyable {
   void setURLForRect(const KURL&, const IntRect&);
 
   void concatCTM(const TransformationMatrix&);
-  void concatCTM(const AffineTransform&);
   TransformationMatrix getCTM() const;
-  AffineTransform getAffineCTM() const;
 
 #if OS(WINCE) && !PLATFORM(QT)
   void setBitmap(PassRefPtr<SharedBitmap>);
