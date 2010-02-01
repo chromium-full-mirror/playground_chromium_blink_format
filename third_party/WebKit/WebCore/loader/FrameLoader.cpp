@@ -4209,12 +4209,12 @@ void FrameLoader::loadItem(HistoryItem* item, FrameLoadType loadType) {
   // target item or the current history entry,
   //   and the URLs in the frame tree match the history item for fragment
   //   scrolling.
+  HistoryItem* currentItem = history()->currentItem();
   bool sameDocumentNavigation =
-      (!item->formData() &&
-       !(history()->currentItem() && history()->currentItem()->formData()) &&
+      (!item->formData() && !(currentItem && currentItem->formData()) &&
        history()->urlsMatchItem(item)) ||
-      item->documentSequenceNumber() ==
-          history()->currentItem()->documentSequenceNumber();
+      (currentItem &&
+       item->documentSequenceNumber() == currentItem->documentSequenceNumber());
 
 #if ENABLE(WML)
   // All WML decks should go through the real load mechanism, not the
