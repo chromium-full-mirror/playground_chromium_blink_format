@@ -1458,7 +1458,6 @@ double HTMLInputElement::parseToDouble(const String& src,
     case DATE:
     case DATETIME:
     case DATETIMELOCAL:
-    case MONTH:
     case TIME:
     case WEEK: {
       DateComponents date;
@@ -1467,6 +1466,14 @@ double HTMLInputElement::parseToDouble(const String& src,
       double msec = date.millisecondsSinceEpoch();
       ASSERT(isfinite(msec));
       return msec;
+    }
+    case MONTH: {
+      DateComponents date;
+      if (!formStringToDateComponents(inputType(), src, &date))
+        return defaultValue;
+      double months = date.monthsSinceEpoch();
+      ASSERT(isfinite(months));
+      return months;
     }
     case NUMBER:
     case RANGE: {
@@ -1503,10 +1510,17 @@ double HTMLInputElement::valueAsDate() const {
   switch (inputType()) {
     case DATE:
     case DATETIME:
-    case MONTH:
     case TIME:
     case WEEK:
       return parseToDouble(value(), DateComponents::invalidMilliseconds());
+    case MONTH: {
+      DateComponents date;
+      if (!formStringToDateComponents(inputType(), value(), &date))
+        return DateComponents::invalidMilliseconds();
+      double msec = date.millisecondsSinceEpoch();
+      ASSERT(isfinite(msec));
+      return msec;
+    }
 
     case BUTTON:
     case CHECKBOX:
@@ -1632,11 +1646,19 @@ void HTMLInputElement::setValueAsNumber(double newValue, ExceptionCode& ec) {
   switch (inputType()) {
     case DATE:
     case DATETIME:
-    case MONTH:
     case TIME:
     case WEEK:
       setValueAsDate(newValue, ec);
       return;
+    case MONTH: {
+      DateComponents date;
+      if (!date.setMonthsSinceEpoch(newValue)) {
+        setValue(String());
+        return;
+      }
+      setValue(date.toString());
+      return;
+    }
     case DATETIMELOCAL: {
       DateComponents date;
       if (!date.setMillisecondsSinceEpochForDateTimeLocal(newValue)) {
