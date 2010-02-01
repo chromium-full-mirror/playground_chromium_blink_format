@@ -60,17 +60,7 @@ class Structure : public RefCounted<Structure> {
   static PassRefPtr<Structure> create(JSValue prototype,
                                       const TypeInfo& typeInfo,
                                       unsigned anonymousSlotCount) {
-    Structure* structure = (new Structure(prototype, typeInfo));
-    if (anonymousSlotCount) {
-      structure->materializePropertyMap();
-      structure->m_isPinnedPropertyTable = true;
-      structure->m_propertyTable->anonymousSlotCount = anonymousSlotCount;
-      // Currently we don't allow more anonymous slots than fit in the inline
-      // capacity
-      ASSERT(structure->propertyStorageSize() <=
-             structure->propertyStorageCapacity());
-    }
-    return adoptRef(structure);
+    return adoptRef(new Structure(prototype, typeInfo, anonymousSlotCount));
   }
 
   static void startIgnoringLeaks();
@@ -168,12 +158,8 @@ class Structure : public RefCounted<Structure> {
     return m_hasNonEnumerableProperties;
   }
 
-  bool hasAnonymousSlots() const {
-    return m_propertyTable && m_propertyTable->anonymousSlotCount;
-  }
-  unsigned anonymousSlotCount() const {
-    return m_propertyTable ? m_propertyTable->anonymousSlotCount : 0;
-  }
+  bool hasAnonymousSlots() const { return !!m_anonymousSlotCount; }
+  unsigned anonymousSlotCount() const { return m_anonymousSlotCount; }
 
   bool isEmpty() const {
     return m_propertyTable ? !m_propertyTable->keyCount : m_offset == noOffset;
@@ -193,12 +179,7 @@ class Structure : public RefCounted<Structure> {
   void getPropertyNames(PropertyNameArray&, EnumerationMode mode);
 
  private:
-  static PassRefPtr<Structure> create(JSValue prototype,
-                                      const TypeInfo& typeInfo) {
-    return adoptRef(new Structure(prototype, typeInfo));
-  }
-
-  Structure(JSValue prototype, const TypeInfo&);
+  Structure(JSValue prototype, const TypeInfo&, unsigned anonymousSlotCount);
 
   typedef enum {
     NoneDictionaryKind = 0,
@@ -282,7 +263,8 @@ class Structure : public RefCounted<Structure> {
   unsigned m_attributesInPrevious : 7;
 #endif
   unsigned m_specificFunctionThrashCount : 2;
-  // 10 free bits
+  unsigned m_anonymousSlotCount : 5;
+  // 5 free bits
 };
 
 inline size_t Structure::get(const Identifier& propertyName) {
