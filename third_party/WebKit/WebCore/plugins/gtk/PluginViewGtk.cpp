@@ -213,7 +213,7 @@ void PluginView::paint(GraphicsContext* context, const IntRect& rect) {
   XGetGeometry(GDK_DISPLAY(), m_drawable, &dummyW, &dummyI, &dummyI, &dummyUI,
                &dummyUI, &dummyUI, &actualDepth);
 
-  const int drawableDepth =
+  const unsigned int drawableDepth =
       ((NPSetWindowCallbackStruct*)m_npWindow.ws_info)->depth;
   ASSERT(drawableDepth == actualDepth);
 
