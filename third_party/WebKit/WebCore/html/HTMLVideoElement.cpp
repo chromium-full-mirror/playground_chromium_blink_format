@@ -33,6 +33,7 @@
 #include "CSSHelper.h"
 #include "CSSPropertyNames.h"
 #include "Document.h"
+#include "ExceptionCode.h"
 #include "HTMLImageLoader.h"
 #include "HTMLNames.h"
 #include "MappedAttribute.h"
@@ -180,8 +181,6 @@ void HTMLVideoElement::updatePosterImage() {
 
 void HTMLVideoElement::paint(GraphicsContext* context,
                              const IntRect& destRect) {
-  // FIXME: We should also be able to paint the poster image.
-
   MediaPlayer* player = HTMLMediaElement::player();
   if (!player)
     return;
@@ -192,8 +191,6 @@ void HTMLVideoElement::paint(GraphicsContext* context,
 
 void HTMLVideoElement::paintCurrentFrameInContext(GraphicsContext* context,
                                                   const IntRect& destRect) {
-  // FIXME: We should also be able to paint the poster image.
-
   MediaPlayer* player = HTMLMediaElement::player();
   if (!player)
     return;
@@ -207,6 +204,34 @@ bool HTMLVideoElement::hasAvailableVideoFrame() const {
     return false;
 
   return m_player->hasAvailableVideoFrame();
+}
+
+void HTMLVideoElement::webkitEnterFullScreen(ExceptionCode& ec) {
+  if (m_isFullscreen)
+    return;
+
+  // Generate an exception if this isn't called in response to a user gesture,
+  // or if the
+  // element does not support fullscreen.
+  if (!processingUserGesture() || !supportsFullscreen()) {
+    ec = INVALID_STATE_ERR;
+    return;
+  }
+
+  enterFullscreen();
+}
+
+void HTMLVideoElement::webkitExitFullScreen() {
+  if (m_isFullscreen)
+    exitFullscreen();
+}
+
+bool HTMLVideoElement::webkitSupportsFullscreen() {
+  return supportsFullscreen();
+}
+
+bool HTMLVideoElement::webkitDisplayingFullscreen() {
+  return m_isFullscreen;
 }
 }
 #endif
