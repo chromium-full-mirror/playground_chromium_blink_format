@@ -687,6 +687,45 @@ static JSValueRef notifyDoneCallback(JSContextRef context,
   return JSValueMakeUndefined(context);
 }
 
+static JSValueRef pageNumberForElementByIdCallback(JSContextRef context,
+                                                   JSObjectRef function,
+                                                   JSObjectRef thisObject,
+                                                   size_t argumentCount,
+                                                   const JSValueRef arguments[],
+                                                   JSValueRef* exception) {
+  // FIXME: These values should sync with maxViewWidth/Height in
+  //        DumpRenderTree.mm. Factor these values out to somewhere.
+  float pageWidthInPixels = 800;
+  float pageHeightInPixels = 600;
+  switch (argumentCount) {
+    case 1:
+      break;
+    case 3:
+      pageWidthInPixels =
+          static_cast<float>(JSValueToNumber(context, arguments[1], exception));
+      if (*exception)
+        return JSValueMakeUndefined(context);
+      pageHeightInPixels =
+          static_cast<float>(JSValueToNumber(context, arguments[2], exception));
+      if (*exception)
+        return JSValueMakeUndefined(context);
+      break;
+    default:
+      return JSValueMakeUndefined(context);
+  }
+
+  JSRetainPtr<JSStringRef> elementId(
+      Adopt, JSValueToStringCopy(context, arguments[0], exception));
+  if (*exception)
+    return JSValueMakeUndefined(context);
+
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  int pageNumber = controller->pageNumberForElementById(
+      elementId.get(), pageWidthInPixels, pageHeightInPixels);
+  return JSValueMakeNumber(context, pageNumber);
+}
+
 static JSValueRef queueBackNavigationCallback(JSContextRef context,
                                               JSObjectRef function,
                                               JSObjectRef thisObject,
@@ -1953,6 +1992,8 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
       {"numberOfActiveAnimations", numberOfActiveAnimationsCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"overridePreference", overridePreferenceCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"pageNumberForElementById", pageNumberForElementByIdCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"pathToLocalResource", pathToLocalResourceCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},

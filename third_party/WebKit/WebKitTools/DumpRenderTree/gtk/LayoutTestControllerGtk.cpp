@@ -156,6 +156,11 @@ void LayoutTestController::keepWebHistory() {
   // FIXME: implement
 }
 
+int LayoutTestController::pageNumberForElementById(JSStringRef, float, float) {
+  // FIXME: implement
+  return -1;
+}
+
 size_t LayoutTestController::webHistoryItemCount() {
   // FIXME: implement
   return 0;

@@ -25,8 +25,10 @@
 
 namespace WebCore {
 
+class Element;
 class Frame;
 class FloatRect;
+class FloatSize;
 class GraphicsContext;
 class IntRect;
 
@@ -36,6 +38,7 @@ class PrintContext {
   ~PrintContext();
 
   int pageCount() const;
+  const IntRect& pageRect(int pageNumber) const;
 
   void computePageRects(const FloatRect& printRect,
                         float headerHeight,
@@ -51,7 +54,13 @@ class PrintContext {
 
   void end();
 
+  // Used by layout tests.
+  static int pageNumberForElement(Element*, const FloatSize& pageSizeInPixels);
+
  protected:
+  void computePageRectsWithPageSize(const FloatSize& pageSizeInPixels,
+                                    float userScaleFactor);
+
   Frame* m_frame;
   Vector<IntRect> m_pageRects;
 };
