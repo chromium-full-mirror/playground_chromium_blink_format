@@ -47,6 +47,10 @@ WebSecurityOrigin* WebSecurityOrigin::createFromDatabaseIdentifier(
       SecurityOrigin::createFromDatabaseIdentifier(databaseIdentifier));
 }
 
+WebSecurityOrigin WebSecurityOrigin::createFromString(const WebString& origin) {
+  return WebSecurityOrigin(SecurityOrigin::createFromString(origin));
+}
+
 void WebSecurityOrigin::reset() {
   assign(0);
 }
