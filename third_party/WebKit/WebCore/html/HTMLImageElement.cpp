@@ -53,7 +53,10 @@ HTMLImageElement::HTMLImageElement(const QualifiedName& tagName,
     form->registerImgElement(this);
 }
 
-HTMLImageElement::~HTMLImageElement() {}
+HTMLImageElement::~HTMLImageElement() {
+  if (m_form)
+    m_form->removeImgElement(this);
+}
 
 bool HTMLImageElement::mapToEntry(const QualifiedName& attrName,
                                   MappedAttributeEntry& result) const {
