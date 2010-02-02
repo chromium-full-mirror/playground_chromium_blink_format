@@ -154,7 +154,9 @@ class ScriptController {
   void setProcessingTimerCallback(bool processingTimerCallback) {
     m_processingTimerCallback = processingTimerCallback;
   }
-  bool processingUserGesture() const;
+  // FIXME: Currently we don't use the parameter world at all.
+  // See http://trac.webkit.org/changeset/54182
+  bool processingUserGesture(DOMWrapperWorld* world = 0) const;
   bool anyPageIsProcessingUserGesture() const;
 
   void setPaused(bool paused) { m_paused = paused; }
