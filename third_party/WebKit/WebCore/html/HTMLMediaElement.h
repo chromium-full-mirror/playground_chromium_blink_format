@@ -108,7 +108,7 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   void setAutobuffer(bool);
 
   PassRefPtr<TimeRanges> buffered() const;
-  void load(ExceptionCode&);
+  void load(bool isUserGesture, ExceptionCode&);
   String canPlayType(const String& mimeType) const;
 
   // ready state
@@ -141,8 +141,8 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   void setAutoplay(bool b);
   bool loop() const;
   void setLoop(bool b);
-  void play();
-  void pause();
+  void play(bool isUserGesture);
+  void pause(bool isUserGesture);
 
   // captions
   bool webkitHasClosedCaptions() const;
@@ -187,6 +187,8 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   bool closedCaptionsVisible() const;
   void setClosedCaptionsVisible(bool);
 
+  bool processingUserGesture() const;
+
  protected:
   float getTimeOffsetAttribute(const QualifiedName&, float valueOnError) const;
   void setTimeOffsetAttribute(const QualifiedName&, float value);
@@ -200,8 +202,6 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
 
   virtual void willMoveToNewOwnerDocument();
   virtual void didMoveToNewOwnerDocument();
-
-  bool processingUserGesture() const;
 
  private:  // MediaPlayerClient
   virtual void mediaPlayerNetworkStateChanged(MediaPlayer*);

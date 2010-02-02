@@ -130,6 +130,7 @@ class Event : public RefCounted<Event> {
 #if ENABLE(TOUCH_EVENTS)
   virtual bool isTouchEvent() const;
 #endif
+  bool fromUserGesture();
 
   bool propagationStopped() const { return m_propagationStopped; }
 

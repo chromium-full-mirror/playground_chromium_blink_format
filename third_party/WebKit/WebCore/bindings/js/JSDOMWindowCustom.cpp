@@ -796,6 +796,13 @@ static Frame* createWindow(ExecState* exec,
   return newFrame;
 }
 
+static bool domWindowAllowPopUp(Frame* activeFrame, ExecState* exec) {
+  ASSERT(activeFrame);
+  if (activeFrame->script()->processingUserGesture(currentWorld(exec)))
+    return true;
+  return DOMWindow::allowPopUp(activeFrame);
+}
+
 JSValue JSDOMWindow::open(ExecState* exec, const ArgList& args) {
   String urlString = valueToStringWithUndefinedOrNullCheck(exec, args.at(0));
   AtomicString frameName = args.at(1).isUndefinedOrNull()
@@ -820,7 +827,7 @@ JSValue JSDOMWindow::open(ExecState* exec, const ArgList& args) {
   // empty framenames.
   // Otherwise, illegitimate window.open() calls with no name will pass right
   // through the popup blocker.
-  if (!DOMWindow::allowPopUp(dynamicFrame) &&
+  if (!domWindowAllowPopUp(dynamicFrame, exec) &&
       (frameName.isEmpty() || !frame->tree()->find(frameName)))
     return jsUndefined();
 
@@ -903,7 +910,7 @@ JSValue JSDOMWindow::showModalDialog(ExecState* exec, const ArgList& args) {
     return jsUndefined();
 
   if (!DOMWindow::canShowModalDialogNow(frame) ||
-      !DOMWindow::allowPopUp(dynamicFrame))
+      !domWindowAllowPopUp(dynamicFrame, exec))
     return jsUndefined();
 
   HashMap<String, String> features;
