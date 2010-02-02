@@ -208,7 +208,7 @@ class RenderThemeQt : public RenderTheme {
 
   void setPaletteFromPageClientIfExists(QPalette&) const;
 
-  QStyle* fallbackStyle();
+  QStyle* fallbackStyle() const;
 
   Page* m_page;
 
