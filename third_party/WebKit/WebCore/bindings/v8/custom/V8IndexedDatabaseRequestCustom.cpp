@@ -29,6 +29,8 @@
  */
 
 #include "config.h"
+
+#if ENABLE(INDEXED_DATABASE)
 #include "V8IndexedDatabaseRequest.h"
 
 #include "V8Binding.h"
@@ -56,3 +58,5 @@ v8::Handle<v8::Value> V8IndexedDatabaseRequest::openCallback(
 }
 
 }  // namespace WebCore
+
+#endif
