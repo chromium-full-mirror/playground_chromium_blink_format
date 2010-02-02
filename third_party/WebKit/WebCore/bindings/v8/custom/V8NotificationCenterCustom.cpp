@@ -37,7 +37,6 @@
 #include "Notification.h"
 #include "NotificationCenter.h"
 #include "V8Binding.h"
-#include "V8CustomBinding.h"
 #include "V8CustomEventListener.h"
 #include "V8CustomVoidCallback.h"
 #include "V8Notification.h"
@@ -100,8 +99,7 @@ v8::Handle<v8::Value> V8NotificationCenter::createHTMLNotificationCallback(
     return WorkerContextExecutionProxy::convertToV8Object(
         V8ClassIndex::NOTIFICATION, notification.get());
 
-  return V8DOMWrapper::convertToV8Object(V8ClassIndex::NOTIFICATION,
-                                         notification.get());
+  return toV8(notification.get());
 }
 
 v8::Handle<v8::Value> V8NotificationCenter::createNotificationCallback(
@@ -122,8 +120,7 @@ v8::Handle<v8::Value> V8NotificationCenter::createNotificationCallback(
     return WorkerContextExecutionProxy::convertToV8Object(
         V8ClassIndex::NOTIFICATION, notification.get());
 
-  return V8DOMWrapper::convertToV8Object(V8ClassIndex::NOTIFICATION,
-                                         notification.get());
+  return toV8(notification.get());
 }
 
 v8::Handle<v8::Value> V8NotificationCenter::requestPermissionCallback(

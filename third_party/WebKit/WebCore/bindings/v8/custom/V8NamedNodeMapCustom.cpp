@@ -33,8 +33,8 @@
 
 #include "NamedNodeMap.h"
 #include "V8Binding.h"
-#include "V8CustomBinding.h"
 #include "V8Element.h"
+#include "V8Node.h"
 #include "V8Proxy.h"
 
 #include <wtf/RefPtr.h>
@@ -50,7 +50,7 @@ v8::Handle<v8::Value> V8NamedNodeMap::indexedPropertyGetter(
   if (!result)
     return notHandledByInterceptor();
 
-  return V8DOMWrapper::convertNodeToV8Object(result.release());
+  return toV8(result.release());
 }
 
 v8::Handle<v8::Value> V8NamedNodeMap::namedPropertyGetter(
@@ -73,7 +73,7 @@ v8::Handle<v8::Value> V8NamedNodeMap::namedPropertyGetter(
   if (!result)
     return notHandledByInterceptor();
 
-  return V8DOMWrapper::convertNodeToV8Object(result.release());
+  return toV8(result.release());
 }
 
 v8::Handle<v8::Value> toV8(NamedNodeMap* impl) {
