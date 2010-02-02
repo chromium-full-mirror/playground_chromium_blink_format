@@ -270,7 +270,6 @@ class RenderThemeChromiumMac : public RenderTheme {
   mutable HashMap<int, RGBA32> m_systemColorCache;
 
   RetainPtr<WebCoreRenderThemeNotificationObserver> m_notificationObserver;
-  bool paintMediaButtonInternal(GraphicsContext*, const IntRect&, Image*);
 };
 
 }  // namespace WebCore
