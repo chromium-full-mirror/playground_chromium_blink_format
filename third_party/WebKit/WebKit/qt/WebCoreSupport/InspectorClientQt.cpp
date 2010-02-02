@@ -58,9 +58,7 @@ class InspectorClientWebPage : public QWebPage {
   friend class InspectorClientQt;
 
  public:
-  InspectorClientWebPage(QObject* parent = 0) : QWebPage(parent) {
-    settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, false);
-  }
+  InspectorClientWebPage(QObject* parent = 0) : QWebPage(parent) {}
 
   QWebPage* createWindow(QWebPage::WebWindowType) {
     QWebView* view = new QWebView;
