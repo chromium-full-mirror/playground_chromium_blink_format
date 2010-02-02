@@ -46,11 +46,15 @@ class AbstractWeakReferenceMap {
  public:
   AbstractWeakReferenceMap(v8::WeakReferenceCallback callback)
       : m_weakReferenceCallback(callback) {}
+  virtual ~AbstractWeakReferenceMap() {}
 
   class Visitor {
    public:
     virtual void visitDOMWrapper(KeyType* key,
                                  v8::Persistent<ValueType> object) = 0;
+
+   protected:
+    virtual ~Visitor() {}
   };
 
   virtual v8::Persistent<ValueType> get(KeyType* obj) = 0;
