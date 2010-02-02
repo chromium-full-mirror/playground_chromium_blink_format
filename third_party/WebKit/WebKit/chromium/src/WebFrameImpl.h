@@ -148,6 +148,7 @@ class WebFrameImpl : public WebFrame, public RefCounted<WebFrameImpl> {
   virtual WebRange selectionRange() const;
   virtual WebString selectionAsText() const;
   virtual WebString selectionAsMarkup() const;
+  virtual bool selectWordAroundCaret();
   virtual int printBegin(const WebSize& pageSize);
   virtual float printPage(int pageToPrint, WebCanvas*);
   virtual float getPrintPageShrink(int page);
@@ -231,6 +232,9 @@ class WebFrameImpl : public WebFrame, public RefCounted<WebFrameImpl> {
 
   WebFrameClient* client() const { return m_client; }
   void dropClient() { m_client = 0; }
+
+  static void selectWordAroundPosition(WebCore::Frame*,
+                                       WebCore::VisiblePosition);
 
  private:
   class DeferredScopeStringMatches;

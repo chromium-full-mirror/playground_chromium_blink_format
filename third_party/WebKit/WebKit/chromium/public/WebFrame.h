@@ -353,6 +353,11 @@ class WebFrame {
   virtual WebString selectionAsText() const = 0;
   virtual WebString selectionAsMarkup() const = 0;
 
+  // Expands the selection to a word around the caret and returns
+  // true. Does nothing and returns false if there is no caret or
+  // there is ranged selection.
+  virtual bool selectWordAroundCaret() = 0;
+
   // Printing ------------------------------------------------------------
 
   // Reformats the WebFrame for printing.  pageSize is the page size in
