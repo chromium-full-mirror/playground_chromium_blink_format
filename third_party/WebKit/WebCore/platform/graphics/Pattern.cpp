@@ -32,9 +32,30 @@
 namespace WebCore {
 
 Pattern::Pattern(Image* image, bool repeatX, bool repeatY)
-    : m_tileImage(image), m_repeatX(repeatX), m_repeatY(repeatY) {
+    : m_tileImage(image),
+      m_repeatX(repeatX),
+      m_repeatY(repeatY)
+#if PLATFORM(SKIA)
+      ,
+      m_pattern(0)
+#endif
+{
   ASSERT(image);
 }
 
-Pattern::~Pattern() {}
+Pattern::~Pattern() {
+  platformDestroy();
+}
+
+void Pattern::setPatternSpaceTransform(
+    const TransformationMatrix& patternSpaceTransformation) {
+  m_patternSpaceTransformation = patternSpaceTransformation;
+  setPlatformPatternSpaceTransform();
+}
+
+#if !PLATFORM(SKIA)
+void Pattern::platformDestroy() {}
+
+void Pattern::setPlatformPatternSpaceTransform() {}
+#endif
 }

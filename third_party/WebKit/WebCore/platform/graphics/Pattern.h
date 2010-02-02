@@ -75,14 +75,20 @@ class Pattern : public RefCounted<Pattern> {
 
   Image* tileImage() const { return m_tileImage.get(); }
 
-  // Pattern space is an abstract space that maps to the default user space by
-  // the transformation 'userSpaceTransformation'
+  void platformDestroy();
+
+// Pattern space is an abstract space that maps to the default user space by the
+// transformation 'userSpaceTransformation'
+#if PLATFORM(SKIA)
+  PlatformPatternPtr platformPattern(
+      const TransformationMatrix& userSpaceTransformation);
+#else
   PlatformPatternPtr createPlatformPattern(
       const TransformationMatrix& userSpaceTransformation) const;
+#endif
   void setPatternSpaceTransform(
-      const TransformationMatrix& patternSpaceTransformation) {
-    m_patternSpaceTransformation = patternSpaceTransformation;
-  }
+      const TransformationMatrix& patternSpaceTransformation);
+  void setPlatformPatternSpaceTransform();
 
  private:
   Pattern(Image*, bool repeatX, bool repeatY);
@@ -91,6 +97,7 @@ class Pattern : public RefCounted<Pattern> {
   bool m_repeatX;
   bool m_repeatY;
   TransformationMatrix m_patternSpaceTransformation;
+  PlatformPatternPtr m_pattern;
 };
 
 }  // namespace
