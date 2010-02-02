@@ -105,6 +105,7 @@
 #include <QStyle>
 #include <QSysInfo>
 #include <QTextCharFormat>
+#include <QTextDocument>
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #if defined(Q_WS_X11)
@@ -1906,8 +1907,8 @@ void QWebPage::javaScriptAlert(QWebFrame* frame, const QString& msg) {
   Q_UNUSED(frame)
 #ifndef QT_NO_MESSAGEBOX
   QMessageBox::information(
-      view(), tr("JavaScript Alert - %1").arg(mainFrame()->url().host()), msg,
-      QMessageBox::Ok);
+      view(), tr("JavaScript Alert - %1").arg(mainFrame()->url().host()),
+      Qt::escape(msg), QMessageBox::Ok);
 #endif
 }
 
@@ -1928,8 +1929,8 @@ bool QWebPage::javaScriptConfirm(QWebFrame* frame, const QString& msg) {
   return QMessageBox::Yes ==
          QMessageBox::information(
              view(),
-             tr("JavaScript Confirm - %1").arg(mainFrame()->url().host()), msg,
-             QMessageBox::Yes, QMessageBox::No);
+             tr("JavaScript Confirm - %1").arg(mainFrame()->url().host()),
+             Qt::escape(msg), QMessageBox::Yes, QMessageBox::No);
 #endif
 }
 
@@ -1956,8 +1957,8 @@ bool QWebPage::javaScriptPrompt(QWebFrame* frame,
   bool ok = false;
 #ifndef QT_NO_INPUTDIALOG
   QString x = QInputDialog::getText(
-      view(), tr("JavaScript Prompt - %1").arg(mainFrame()->url().host()), msg,
-      QLineEdit::Normal, defaultValue, &ok);
+      view(), tr("JavaScript Prompt - %1").arg(mainFrame()->url().host()),
+      Qt::escape(msg), QLineEdit::Normal, defaultValue, &ok);
   if (ok && result)
     *result = x;
 #endif
