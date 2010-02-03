@@ -27,6 +27,7 @@
 #include "qwebpage_p.h"
 #include "QWebPageClient.h"
 #include <FrameView.h>
+#include <QtCore/qmetaobject.h>
 #include <QtCore/qsharedpointer.h>
 #include <QtCore/qtimer.h>
 #include <QtGui/qapplication.h>
@@ -79,7 +80,7 @@ class QGraphicsWebViewPrivate : public QWebPageClient {
 #if USE(ACCELERATED_COMPOSITING)
         ,
         rootGraphicsLayer(0),
-        shouldSync(true)
+        shouldSync(false)
 #endif
   {
 #if USE(ACCELERATED_COMPOSITING)
@@ -87,6 +88,8 @@ class QGraphicsWebViewPrivate : public QWebPageClient {
     // this QGraphicsWebView as the scrollbars are needed when there's no
     // compositing
     q->setFlag(QGraphicsItem::ItemUsesExtendedStyleOption);
+    syncMetaMethod =
+        q->metaObject()->method(q->metaObject()->indexOfMethod("syncLayers()"));
 #endif
   }
 
@@ -133,6 +136,10 @@ class QGraphicsWebViewPrivate : public QWebPageClient {
   // we need to sync the layers if we get a special call from the WebCore
   // compositor telling us to do so. We'll get that call from ChromeClientQt
   bool shouldSync;
+
+  // we have to flush quite often, so we use a meta-method instead of
+  // QTimer::singleShot for putting the event in the queue
+  QMetaMethod syncMetaMethod;
 
   // we need to put the root graphics layer behind the overlay (which contains
   // the scrollbar)
@@ -183,7 +190,7 @@ void QGraphicsWebViewPrivate::setRootGraphicsLayer(QGraphicsItem* layer) {
 void QGraphicsWebViewPrivate::markForSync(bool scheduleSync) {
   shouldSync = true;
   if (scheduleSync)
-    QTimer::singleShot(0, q, SLOT(syncLayers()));
+    syncMetaMethod.invoke(q, Qt::QueuedConnection);
 }
 
 void QGraphicsWebViewPrivate::updateCompositingScrollPosition() {
@@ -228,6 +235,7 @@ void QGraphicsWebViewPrivate::update(const QRect& dirtyRect) {
 #if USE(ACCELERATED_COMPOSITING)
   if (overlay)
     overlay->update(QRectF(dirtyRect));
+  syncLayers();
 #endif
 }
 
@@ -446,7 +454,6 @@ void QGraphicsWebView::paint(QPainter* painter,
   page()->mainFrame()->render(
       painter, d->overlay ? QWebFrame::ContentsLayer : QWebFrame::AllLayers,
       option->exposedRect.toAlignedRect());
-  d->syncLayers();
 #else
   page()->mainFrame()->render(painter, QWebFrame::AllLayers,
                               option->exposedRect.toRect());
