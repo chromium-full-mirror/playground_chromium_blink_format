@@ -37,10 +37,11 @@
 
 #include "V8Binding.h"
 #include "V8Collection.h"
-#include "V8CustomBinding.h"
 #include "V8HTMLOptionElement.h"
 #include "V8HTMLSelectElement.h"
 #include "V8NamedNodesCollection.h"
+#include "V8Node.h"
+#include "V8NodeList.h"
 #include "V8Proxy.h"
 
 namespace WebCore {
@@ -69,10 +70,10 @@ v8::Handle<v8::Value> V8HTMLSelectElement::namedPropertyGetter(
     return notHandledByInterceptor();
 
   if (items.size() == 1)
-    return V8DOMWrapper::convertNodeToV8Object(items.at(0).release());
+    return toV8(items.at(0).release());
 
   NodeList* list = new V8NamedNodesCollection(items);
-  return V8DOMWrapper::convertToV8Object(V8ClassIndex::NODELIST, list);
+  return toV8(list);
 }
 
 v8::Handle<v8::Value> V8HTMLSelectElement::indexedPropertyGetter(
@@ -84,7 +85,7 @@ v8::Handle<v8::Value> V8HTMLSelectElement::indexedPropertyGetter(
   if (!result)
     return notHandledByInterceptor();
 
-  return V8DOMWrapper::convertNodeToV8Object(result.release());
+  return toV8(result.release());
 }
 
 v8::Handle<v8::Value> V8HTMLSelectElement::indexedPropertySetter(

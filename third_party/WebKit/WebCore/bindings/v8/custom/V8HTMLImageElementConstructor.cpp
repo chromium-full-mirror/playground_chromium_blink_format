@@ -36,6 +36,7 @@
 #include "Frame.h"
 #include "HTMLNames.h"
 #include "V8Binding.h"
+#include "V8Document.h"
 #include "V8HTMLImageElement.h"
 #include "V8Proxy.h"
 
@@ -83,7 +84,7 @@ v8::Handle<v8::Value> V8Custom::v8HTMLImageElementConstructorCallback(
   // HTMLImageElement instance
   // may end up being the only node in the map and get garbage-ccollected
   // prematurely.
-  V8DOMWrapper::convertNodeToV8Object(document);
+  toV8(document);
 
   RefPtr<HTMLImageElement> image =
       new HTMLImageElement(HTMLNames::imgTag, document);

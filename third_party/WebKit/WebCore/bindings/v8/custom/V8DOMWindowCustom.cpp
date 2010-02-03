@@ -57,7 +57,9 @@
 #include "V8BindingState.h"
 #include "V8CustomBinding.h"
 #include "V8CustomEventListener.h"
+#include "V8HTMLCollection.h"
 #include "V8MessagePortCustom.h"
+#include "V8Node.h"
 #include "V8Proxy.h"
 #include "V8Utilities.h"
 #if ENABLE(WEB_SOCKETS)
@@ -727,8 +729,7 @@ v8::Handle<v8::Value> V8DOMWindow::openCallback(const v8::Arguments& args) {
       frame->redirectScheduler()->scheduleLocationChange(completedUrl, referrer,
                                                          false, userGesture);
     }
-    return V8DOMWrapper::convertToV8Object(V8ClassIndex::DOMWINDOW,
-                                           frame->domWindow());
+    return toV8(frame->domWindow());
   }
 
   // In the case of a named frame or a new window, we'll use the
@@ -791,8 +792,7 @@ v8::Handle<v8::Value> V8DOMWindow::openCallback(const v8::Arguments& args) {
   if (!frame)
     return v8::Undefined();
 
-  return V8DOMWrapper::convertToV8Object(V8ClassIndex::DOMWINDOW,
-                                         frame->domWindow());
+  return toV8(frame->domWindow());
 }
 
 v8::Handle<v8::Value> V8DOMWindow::indexedPropertyGetter(
@@ -810,8 +810,7 @@ v8::Handle<v8::Value> V8DOMWindow::indexedPropertyGetter(
 
   Frame* child = frame->tree()->child(index);
   if (child)
-    return V8DOMWrapper::convertToV8Object(V8ClassIndex::DOMWINDOW,
-                                           child->domWindow());
+    return toV8(child->domWindow());
 
   return notHandledByInterceptor();
 }
@@ -834,8 +833,7 @@ v8::Handle<v8::Value> V8DOMWindow::namedPropertyGetter(
   AtomicString propName = v8StringToAtomicWebCoreString(name);
   Frame* child = frame->tree()->child(propName);
   if (child)
-    return V8DOMWrapper::convertToV8Object(V8ClassIndex::DOMWINDOW,
-                                           child->domWindow());
+    return toV8(child->domWindow());
 
   // Search IDL functions defined in the prototype
   v8::Handle<v8::Value> result = info.Holder()->GetRealNamedProperty(name);
@@ -851,9 +849,8 @@ v8::Handle<v8::Value> V8DOMWindow::namedPropertyGetter(
       RefPtr<HTMLCollection> items = doc->windowNamedItems(propName);
       if (items->length() >= 1) {
         if (items->length() == 1)
-          return V8DOMWrapper::convertNodeToV8Object(items->firstItem());
-        return V8DOMWrapper::convertToV8Object(V8ClassIndex::HTMLCOLLECTION,
-                                               items.release());
+          return toV8(items->firstItem());
+        return toV8(items.release());
       }
     }
   }
