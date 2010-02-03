@@ -83,6 +83,8 @@ class WebSocket : public RefCounted<WebSocket>,
   virtual WebSocket* toWebSocket() { return this; }
 
   virtual ScriptExecutionContext* scriptExecutionContext() const;
+  virtual void contextDestroyed();
+  virtual void stop();
 
   using RefCounted<WebSocket>::ref;
   using RefCounted<WebSocket>::deref;
