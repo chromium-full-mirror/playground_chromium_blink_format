@@ -31,17 +31,18 @@
 
 #include "PlatformString.h"
 
-#if ENABLE(JAVASCRIPT_DEBUGGER)
-#include <profiler/Profile.h>
-#endif
+#include "ScriptProfile.h"
 
-#include <wtf/RefCounted.h>
 #include <wtf/PassRefPtr.h>
+#include <wtf/RefCounted.h>
 
 namespace WebCore {
 
-#if ENABLE(JAVASCRIPT_DEBUGGER)
-typedef Vector<RefPtr<JSC::Profile>> ProfilesArray;
+// FIXME: "USE(V8)" and "USE(JSC)" below are temporary measures until
+// JAVASCRIPT_DEBUGGER is
+// enabled when building Chromium.
+#if ENABLE(JAVASCRIPT_DEBUGGER) || USE(V8)
+typedef Vector<RefPtr<ScriptProfile>> ProfilesArray;
 #endif
 
 class Frame;
@@ -106,9 +107,9 @@ class Console : public RefCounted<Console> {
 #if ENABLE(WML)
   String lastWMLErrorMessage() const;
 #endif
-#if ENABLE(JAVASCRIPT_DEBUGGER)
-  void profile(const JSC::UString&, ScriptCallStack*);
-  void profileEnd(const JSC::UString&, ScriptCallStack*);
+#if ENABLE(JAVASCRIPT_DEBUGGER) || USE(V8)
+  void profile(const String&, ScriptCallStack*);
+  void profileEnd(const String&, ScriptCallStack*);
 #endif
   void time(const String&);
   void timeEnd(const String&, ScriptCallStack*);
@@ -132,7 +133,7 @@ class Console : public RefCounted<Console> {
   Console(Frame*);
 
   Frame* m_frame;
-#if ENABLE(JAVASCRIPT_DEBUGGER)
+#if ENABLE(JAVASCRIPT_DEBUGGER) || USE(V8)
   ProfilesArray m_profiles;
 #endif
 };

@@ -39,9 +39,9 @@
 #include "ConsoleMessage.h"
 #include "Cookie.h"
 #include "CookieJar.h"
+#include "DOMWindow.h"
 #include "Document.h"
 #include "DocumentLoader.h"
-#include "DOMWindow.h"
 #include "Element.h"
 #include "FloatConversion.h"
 #include "FloatQuad.h"
@@ -53,16 +53,16 @@
 #include "GraphicsContext.h"
 #include "HTMLFrameOwnerElement.h"
 #include "HitTestResult.h"
-#include "InspectorBackend.h"
 #include "InjectedScriptHost.h"
+#include "InspectorBackend.h"
 #include "InspectorClient.h"
-#include "InspectorFrontend.h"
-#include "InspectorFrontendHost.h"
-#include "InspectorDatabaseResource.h"
 #include "InspectorDOMAgent.h"
 #include "InspectorDOMStorageResource.h"
-#include "InspectorTimelineAgent.h"
+#include "InspectorDatabaseResource.h"
+#include "InspectorFrontend.h"
+#include "InspectorFrontendHost.h"
 #include "InspectorResource.h"
+#include "InspectorTimelineAgent.h"
 #include "JavaScriptProfile.h"
 #include "Page.h"
 #include "ProgressTracker.h"
@@ -73,6 +73,8 @@
 #include "ScriptCallStack.h"
 #include "ScriptFunctionCall.h"
 #include "ScriptObject.h"
+#include "ScriptProfile.h"
+#include "ScriptProfiler.h"
 #include "ScriptString.h"
 #include "SecurityOrigin.h"
 #include "Settings.h"
@@ -94,14 +96,11 @@
 #endif
 
 #if ENABLE(JAVASCRIPT_DEBUGGER)
+#include "JSJavaScriptCallFrame.h"
 #include "JavaScriptCallFrame.h"
 #include "JavaScriptDebugServer.h"
-#include "JSJavaScriptCallFrame.h"
 
-#include <profiler/Profile.h>
-#include <profiler/Profiler.h>
 #include <runtime/JSLock.h>
-#include <runtime/StringBuilder.h>
 #include <runtime/UString.h>
 
 using namespace JSC;
@@ -400,7 +399,7 @@ void InspectorController::startGroup(MessageSource source,
 void InspectorController::endGroup(MessageSource source,
                                    unsigned lineNumber,
                                    const String& sourceURL) {
-  if (m_groupLevel == 0)
+  if (!m_groupLevel)
     return;
 
   --m_groupLevel;
@@ -1348,7 +1347,7 @@ void InspectorController::setDOMStorageItem(long callId,
   if (storageResource) {
     ExceptionCode exception = 0;
     storageResource->domStorage()->setItem(key, value, exception);
-    success = (exception == 0);
+    success = !exception;
   }
   m_frontend->didSetDOMStorageItem(callId, success);
 }
@@ -1388,13 +1387,13 @@ void InspectorController::moveWindowBy(float x, float y) const {
 }
 
 #if ENABLE(JAVASCRIPT_DEBUGGER)
-void InspectorController::addProfile(PassRefPtr<Profile> prpProfile,
+void InspectorController::addProfile(PassRefPtr<ScriptProfile> prpProfile,
                                      unsigned lineNumber,
-                                     const UString& sourceURL) {
+                                     const String& sourceURL) {
   if (!enabled())
     return;
 
-  RefPtr<Profile> profile = prpProfile;
+  RefPtr<ScriptProfile> profile = prpProfile;
   m_profiles.add(profile->uid(), profile);
 
   if (m_frontend) {
@@ -1406,35 +1405,28 @@ void InspectorController::addProfile(PassRefPtr<Profile> prpProfile,
 }
 
 void InspectorController::addProfileFinishedMessageToConsole(
-    PassRefPtr<Profile> prpProfile,
+    PassRefPtr<ScriptProfile> prpProfile,
     unsigned lineNumber,
-    const UString& sourceURL) {
-  RefPtr<Profile> profile = prpProfile;
+    const String& sourceURL) {
+  RefPtr<ScriptProfile> profile = prpProfile;
 
-  JSC::StringBuilder message;
-  message.append("Profile \"webkit-profile://");
-  message.append((UString)encodeWithURLEscapeSequences(CPUProfileType));
-  message.append("/");
-  message.append((UString)encodeWithURLEscapeSequences(profile->title()));
-  message.append("#");
-  message.append(UString::from(profile->uid()));
-  message.append("\" finished.");
-  addMessageToConsole(JSMessageSource, LogMessageType, LogMessageLevel,
-                      message.release(), lineNumber, sourceURL);
+  String message = String::format(
+      "Profile \"webkit-profile://%s/%s#%d\" finished.", CPUProfileType,
+      encodeWithURLEscapeSequences(profile->title()).utf8().data(),
+      profile->uid());
+  addMessageToConsole(JSMessageSource, LogMessageType, LogMessageLevel, message,
+                      lineNumber, sourceURL);
 }
 
 void InspectorController::addStartProfilingMessageToConsole(
-    const UString& title,
+    const String& title,
     unsigned lineNumber,
-    const UString& sourceURL) {
-  JSC::StringBuilder message;
-  message.append("Profile \"webkit-profile://");
-  message.append(encodeWithURLEscapeSequences(CPUProfileType));
-  message.append("/");
-  message.append(encodeWithURLEscapeSequences(title));
-  message.append("#0\" started.");
-  addMessageToConsole(JSMessageSource, LogMessageType, LogMessageLevel,
-                      message.release(), lineNumber, sourceURL);
+    const String& sourceURL) {
+  String message = String::format(
+      "Profile \"webkit-profile://%s/%s#0\" started.", CPUProfileType,
+      encodeWithURLEscapeSequences(title).utf8().data());
+  addMessageToConsole(JSMessageSource, LogMessageType, LogMessageLevel, message,
+                      lineNumber, sourceURL);
 }
 
 void InspectorController::getProfileHeaders(long callId) {
@@ -1457,25 +1449,21 @@ void InspectorController::getProfile(long callId, unsigned uid) {
 }
 
 ScriptObject InspectorController::createProfileHeader(
-    const JSC::Profile& profile) {
+    const ScriptProfile& profile) {
   ScriptObject header = m_frontend->newScriptObject();
   header.set("title", profile.title());
   header.set("uid", profile.uid());
-  header.set("typeId", UString(CPUProfileType));
+  header.set("typeId", String(CPUProfileType));
   return header;
 }
 
-UString InspectorController::getCurrentUserInitiatedProfileName(
+String InspectorController::getCurrentUserInitiatedProfileName(
     bool incrementProfileNumber = false) {
   if (incrementProfileNumber)
     m_currentUserInitiatedProfileNumber = m_nextUserInitiatedProfileNumber++;
 
-  JSC::StringBuilder title;
-  title.append(UserInitiatedProfileName);
-  title.append(".");
-  title.append(UString::from(m_currentUserInitiatedProfileNumber));
-
-  return title.release();
+  return String::format("%s.%d", UserInitiatedProfileName,
+                        m_currentUserInitiatedProfileNumber);
 }
 
 void InspectorController::startUserInitiatedProfilingSoon() {
@@ -1494,14 +1482,14 @@ void InspectorController::startUserInitiatedProfiling(
 
   m_recordingUserInitiatedProfile = true;
 
-  UString title = getCurrentUserInitiatedProfileName(true);
+  String title = getCurrentUserInitiatedProfileName(true);
 
   ExecState* scriptState =
       toJSDOMWindow(m_inspectedPage->mainFrame(), debuggerWorld())
           ->globalExec();
-  Profiler::profiler()->startProfiling(scriptState, title);
+  ScriptProfiler::start(scriptState, title);
 
-  addStartProfilingMessageToConsole(title, 0, UString());
+  addStartProfilingMessageToConsole(title, 0, String());
 
   toggleRecordButton(true);
 }
@@ -1512,15 +1500,14 @@ void InspectorController::stopUserInitiatedProfiling() {
 
   m_recordingUserInitiatedProfile = false;
 
-  UString title = getCurrentUserInitiatedProfileName();
+  String title = getCurrentUserInitiatedProfileName();
 
   ExecState* scriptState =
       toJSDOMWindow(m_inspectedPage->mainFrame(), debuggerWorld())
           ->globalExec();
-  RefPtr<Profile> profile =
-      Profiler::profiler()->stopProfiling(scriptState, title);
+  RefPtr<ScriptProfile> profile = ScriptProfiler::stop(scriptState, title);
   if (profile)
-    addProfile(profile, 0, UString());
+    addProfile(profile, 0, String());
 
   toggleRecordButton(false);
 }
@@ -1582,9 +1569,9 @@ void InspectorController::enableDebugger() {
   if (m_debuggerEnabled)
     return;
 
-  if (!m_scriptState || !m_frontend) {
+  if (!m_scriptState || !m_frontend)
     m_attachDebuggerWhenShown = true;
-  } else {
+  else {
     m_frontend->attachDebuggerWhenShown();
     m_attachDebuggerWhenShown = false;
   }
@@ -1876,20 +1863,19 @@ InspectorController::SpecialPanels InspectorController::specialPanelForJSName(
     const String& panelName) {
   if (panelName == "elements")
     return ElementsPanel;
-  else if (panelName == "resources")
+  if (panelName == "resources")
     return ResourcesPanel;
-  else if (panelName == "scripts")
+  if (panelName == "scripts")
     return ScriptsPanel;
-  else if (panelName == "timeline")
+  if (panelName == "timeline")
     return TimelinePanel;
-  else if (panelName == "profiles")
+  if (panelName == "profiles")
     return ProfilesPanel;
-  else if (panelName == "storage" || panelName == "databases")
+  if (panelName == "storage" || panelName == "databases")
     return StoragePanel;
-  else if (panelName == "console")
+  if (panelName == "console")
     return ConsolePanel;
-  else
-    return ElementsPanel;
+  return ElementsPanel;
 }
 
 void InspectorController::deleteCookie(const String& cookieName,
