@@ -60,6 +60,7 @@ class NetscapePluginInstanceProxy;
             element:(PassRefPtr<WebCore::HTMLPlugInElement>)element;
 
 - (void)pluginHostDied;
+- (CALayer*)pluginLayer;
 - (void)webFrame:(WebFrame*)webFrame didFinishLoadWithReason:(NPReason)reason;
 
 @end
