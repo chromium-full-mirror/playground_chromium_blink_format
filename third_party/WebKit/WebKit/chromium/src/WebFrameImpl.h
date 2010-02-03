@@ -174,6 +174,9 @@ class WebFrameImpl : public WebFrame, public RefCounted<WebFrameImpl> {
   virtual WebString contentAsMarkup() const;
   virtual WebString renderTreeAsText() const;
   virtual WebString counterValueForElementById(const WebString& id) const;
+  virtual int pageNumberForElementById(const WebString& id,
+                                       float pageWidthInPixels,
+                                       float pageHeightInPixels) const;
 
   static PassRefPtr<WebFrameImpl> create(WebFrameClient* client);
   ~WebFrameImpl();
