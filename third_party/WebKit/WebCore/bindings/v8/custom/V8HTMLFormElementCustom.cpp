@@ -34,9 +34,8 @@
 #include "HTMLCollection.h"
 #include "HTMLFormElement.h"
 #include "V8Binding.h"
+#include "V8CustomBinding.h"
 #include "V8NamedNodesCollection.h"
-#include "V8Node.h"
-#include "V8NodeList.h"
 #include "V8Proxy.h"
 
 namespace WebCore {
@@ -50,7 +49,7 @@ v8::Handle<v8::Value> V8HTMLFormElement::indexedPropertyGetter(
   RefPtr<Node> formElement = form->elements()->item(index);
   if (!formElement)
     return notHandledByInterceptor();
-  return toV8(formElement.release());
+  return V8DOMWrapper::convertNodeToV8Object(formElement.release());
 }
 
 v8::Handle<v8::Value> V8HTMLFormElement::namedPropertyGetter(
@@ -77,10 +76,10 @@ v8::Handle<v8::Value> V8HTMLFormElement::namedPropertyGetter(
   ASSERT(!elements.isEmpty());
 
   if (elements.size() == 1)
-    return toV8(elements.at(0).release());
+    return V8DOMWrapper::convertNodeToV8Object(elements.at(0).release());
 
   NodeList* collection = new V8NamedNodesCollection(elements);
-  return toV8(collection);
+  return V8DOMWrapper::convertToV8Object(V8ClassIndex::NODELIST, collection);
 }
 
 v8::Handle<v8::Value> V8HTMLFormElement::submitCallback(

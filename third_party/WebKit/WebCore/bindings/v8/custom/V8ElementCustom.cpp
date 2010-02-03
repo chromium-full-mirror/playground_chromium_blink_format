@@ -89,7 +89,7 @@ v8::Handle<v8::Value> V8Element::setAttributeNodeCallback(
   if (ec)
     throwError(ec);
 
-  return toV8(result.release());
+  return V8DOMWrapper::convertNodeToV8Object(result.release());
 }
 
 v8::Handle<v8::Value> V8Element::setAttributeNSCallback(
@@ -130,7 +130,7 @@ v8::Handle<v8::Value> V8Element::setAttributeNodeNSCallback(
   if (ec)
     throwError(ec);
 
-  return toV8(result.release());
+  return V8DOMWrapper::convertNodeToV8Object(result.release());
 }
 
 v8::Handle<v8::Value> toV8(Element* impl, bool forceNewObject) {

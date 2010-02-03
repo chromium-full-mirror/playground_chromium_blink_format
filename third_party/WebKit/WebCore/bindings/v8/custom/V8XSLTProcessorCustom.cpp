@@ -36,8 +36,8 @@
 #include "Node.h"
 
 #include "V8Binding.h"
+#include "V8CustomBinding.h"
 #include "V8Document.h"
-#include "V8DocumentFragment.h"
 #include "V8Node.h"
 #include "V8Proxy.h"
 #include "XSLTProcessor.h"
@@ -77,7 +77,7 @@ v8::Handle<v8::Value> V8XSLTProcessor::transformToFragmentCallback(
   Node* source = V8Node::toNative(v8::Handle<v8::Object>::Cast(args[0]));
   Document* owner = V8Document::toNative(v8::Handle<v8::Object>::Cast(args[1]));
   RefPtr<DocumentFragment> result = imp->transformToFragment(source, owner);
-  return toV8(result.release());
+  return V8DOMWrapper::convertNodeToV8Object(result.release());
 }
 
 v8::Handle<v8::Value> V8XSLTProcessor::transformToDocumentCallback(
@@ -97,7 +97,7 @@ v8::Handle<v8::Value> V8XSLTProcessor::transformToDocumentCallback(
   if (!result)
     return v8::Undefined();
 
-  return toV8(result.release());
+  return V8DOMWrapper::convertNodeToV8Object(result.release());
 }
 
 v8::Handle<v8::Value> V8XSLTProcessor::setParameterCallback(

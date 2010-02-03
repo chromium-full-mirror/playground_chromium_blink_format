@@ -28,7 +28,6 @@
 
 #include "Frame.h"
 #include "V8CustomVoidCallback.h"  // For invokeCallback
-#include "V8Geoposition.h"
 
 namespace WebCore {
 
@@ -50,7 +49,8 @@ void V8CustomPositionCallback::handleEvent(Geoposition* position) {
 
   v8::Context::Scope scope(context);
 
-  v8::Handle<v8::Value> argv[] = {toV8(position)};
+  v8::Handle<v8::Value> argv[] = {
+      V8DOMWrapper::convertToV8Object(V8ClassIndex::GEOPOSITION, position)};
 
   // Protect the frame until the callback returns.
   RefPtr<Frame> protector(m_frame);
