@@ -55,7 +55,6 @@ class SocketStreamHandlePrivate : public QObject {
   int send(const char* data, int len);
   void close();
   void socketSentdata();
-  void socketBytesWritten(qint64);
   void socketClosed();
   void socketError(QAbstractSocket::SocketError);
   void socketClosedCallback();
@@ -66,7 +65,6 @@ class SocketStreamHandlePrivate : public QObject {
  public:
   QTcpSocket* m_socket;
   SocketStreamHandle* m_streamHandle;
-  QByteArray m_data;
 };
 }
 
