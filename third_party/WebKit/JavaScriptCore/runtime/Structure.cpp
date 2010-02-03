@@ -281,14 +281,14 @@ void Structure::materializePropertyMap() {
                                            // by combining with the copy above.
   }
 
-  m_propertyTable->anonymousSlotCount = m_anonymousSlotCount;
   for (ptrdiff_t i = structures.size() - 2; i >= 0; --i) {
     structure = structures[i];
     structure->m_nameInPrevious->ref();
-    PropertyMapEntry entry(
-        structure->m_nameInPrevious.get(), structure->m_offset,
-        structure->m_attributesInPrevious, structure->m_specificValueInPrevious,
-        ++m_propertyTable->lastIndexUsed);
+    PropertyMapEntry entry(structure->m_nameInPrevious.get(),
+                           m_anonymousSlotCount + structure->m_offset,
+                           structure->m_attributesInPrevious,
+                           structure->m_specificValueInPrevious,
+                           ++m_propertyTable->lastIndexUsed);
     insertIntoPropertyMapHashTable(entry);
   }
 }
@@ -358,7 +358,11 @@ PassRefPtr<Structure> Structure::addPropertyTransitionToExistingStructure(
   if (Structure* existingTransition = structure->table.get(
           make_pair(propertyName.ustring().rep(), attributes), specificValue)) {
     ASSERT(existingTransition->m_offset != noOffset);
-    offset = existingTransition->m_offset;
+    offset =
+        existingTransition->m_offset + existingTransition->m_anonymousSlotCount;
+    ASSERT(offset >= structure->m_anonymousSlotCount);
+    ASSERT(structure->m_anonymousSlotCount ==
+           existingTransition->m_anonymousSlotCount);
     return existingTransition;
   }
 
@@ -384,6 +388,8 @@ PassRefPtr<Structure> Structure::addPropertyTransition(
     RefPtr<Structure> transition = toCacheableDictionaryTransition(structure);
     ASSERT(structure != transition);
     offset = transition->put(propertyName, attributes, specificValue);
+    ASSERT(offset >= structure->m_anonymousSlotCount);
+    ASSERT(structure->m_anonymousSlotCount == transition->m_anonymousSlotCount);
     if (transition->propertyStorageSize() >
         transition->propertyStorageCapacity())
       transition->growPropertyStorageCapacity();
@@ -408,8 +414,6 @@ PassRefPtr<Structure> Structure::addPropertyTransition(
       structure->m_specificFunctionThrashCount;
 
   if (structure->m_propertyTable) {
-    ASSERT(structure->m_propertyTable->anonymousSlotCount ==
-           structure->m_anonymousSlotCount);
     if (structure->m_isPinnedPropertyTable)
       transition->m_propertyTable = structure->copyPropertyTable();
     else {
@@ -424,10 +428,12 @@ PassRefPtr<Structure> Structure::addPropertyTransition(
   }
 
   offset = transition->put(propertyName, attributes, specificValue);
+  ASSERT(offset >= structure->m_anonymousSlotCount);
+  ASSERT(structure->m_anonymousSlotCount == transition->m_anonymousSlotCount);
   if (transition->propertyStorageSize() > transition->propertyStorageCapacity())
     transition->growPropertyStorageCapacity();
 
-  transition->m_offset = offset;
+  transition->m_offset = offset - structure->m_anonymousSlotCount;
   ASSERT(structure->anonymousSlotCount() == transition->anonymousSlotCount());
   structure->table.add(make_pair(propertyName.ustring().rep(), attributes),
                        transition.get(), specificValue);
@@ -443,6 +449,8 @@ PassRefPtr<Structure> Structure::removePropertyTransition(
   RefPtr<Structure> transition = toUncacheableDictionaryTransition(structure);
 
   offset = transition->remove(propertyName);
+  ASSERT(offset >= structure->m_anonymousSlotCount);
+  ASSERT(structure->m_anonymousSlotCount == transition->m_anonymousSlotCount);
 
   return transition.release();
 }
@@ -582,8 +590,7 @@ PassRefPtr<Structure> Structure::flattenDictionaryStructure(JSObject* object) {
     // in the order that they are expected to be in, but we need to
     // reorder the storage, so we have to copy the current values out
     Vector<JSValue> values(propertyCount);
-    ASSERT(m_propertyTable->anonymousSlotCount == m_anonymousSlotCount);
-    unsigned anonymousSlotCount = m_propertyTable->anonymousSlotCount;
+    unsigned anonymousSlotCount = m_anonymousSlotCount;
     for (unsigned i = 0; i < propertyCount; i++) {
       PropertyMapEntry* entry = sortedPropertyEntries[i];
       values[i] = object->getDirectOffset(entry->offset);
@@ -619,6 +626,7 @@ size_t Structure::addPropertyWithoutTransition(const Identifier& propertyName,
   m_isPinnedPropertyTable = true;
 
   size_t offset = put(propertyName, attributes, specificValue);
+  ASSERT(offset >= m_anonymousSlotCount);
   if (propertyStorageSize() > propertyStorageCapacity())
     growPropertyStorageCapacity();
   return offset;
@@ -633,6 +641,7 @@ size_t Structure::removePropertyWithoutTransition(
 
   m_isPinnedPropertyTable = true;
   size_t offset = remove(propertyName);
+  ASSERT(offset >= m_anonymousSlotCount);
   return offset;
 }
 
@@ -672,7 +681,6 @@ PropertyMapHashTable* Structure::copyPropertyTable() {
   if (!m_propertyTable)
     return 0;
 
-  ASSERT(m_propertyTable->anonymousSlotCount == m_anonymousSlotCount);
   size_t tableSize =
       PropertyMapHashTable::allocationSize(m_propertyTable->size);
   PropertyMapHashTable* newTable =
@@ -691,7 +699,6 @@ PropertyMapHashTable* Structure::copyPropertyTable() {
     newTable->deletedOffsets =
         new Vector<unsigned>(*m_propertyTable->deletedOffsets);
 
-  newTable->anonymousSlotCount = m_propertyTable->anonymousSlotCount;
   return newTable;
 }
 
@@ -716,6 +723,8 @@ size_t Structure::get(const UString::Rep* rep,
   if (rep == m_propertyTable->entries()[entryIndex - 1].key) {
     attributes = m_propertyTable->entries()[entryIndex - 1].attributes;
     specificValue = m_propertyTable->entries()[entryIndex - 1].specificValue;
+    ASSERT(m_propertyTable->entries()[entryIndex - 1].offset >=
+           m_anonymousSlotCount);
     return m_propertyTable->entries()[entryIndex - 1].offset;
   }
 
@@ -739,6 +748,8 @@ size_t Structure::get(const UString::Rep* rep,
     if (rep == m_propertyTable->entries()[entryIndex - 1].key) {
       attributes = m_propertyTable->entries()[entryIndex - 1].attributes;
       specificValue = m_propertyTable->entries()[entryIndex - 1].specificValue;
+      ASSERT(m_propertyTable->entries()[entryIndex - 1].offset >=
+             m_anonymousSlotCount);
       return m_propertyTable->entries()[entryIndex - 1].offset;
     }
   }
@@ -821,7 +832,6 @@ size_t Structure::put(const Identifier& propertyName,
 
   if (!m_propertyTable)
     createPropertyMapHashTable();
-  ASSERT(m_propertyTable->anonymousSlotCount == m_anonymousSlotCount);
 
   // FIXME: Consider a fast case for tables with no deleted sentinels.
 
@@ -895,9 +905,10 @@ size_t Structure::put(const Identifier& propertyName,
     newOffset = m_propertyTable->deletedOffsets->last();
     m_propertyTable->deletedOffsets->removeLast();
   } else
-    newOffset = m_propertyTable->keyCount + m_propertyTable->anonymousSlotCount;
+    newOffset = m_propertyTable->keyCount + m_anonymousSlotCount;
   m_propertyTable->entries()[entryIndex - 1].offset = newOffset;
 
+  ASSERT(newOffset >= m_anonymousSlotCount);
   ++m_propertyTable->keyCount;
 
   if ((m_propertyTable->keyCount + m_propertyTable->deletedSentinelCount) * 2 >=
@@ -922,7 +933,6 @@ size_t Structure::remove(const Identifier& propertyName) {
   if (!m_propertyTable)
     return notFound;
 
-  ASSERT(m_propertyTable->anonymousSlotCount == m_anonymousSlotCount);
 #if DUMP_PROPERTYMAP_STATS
   ++numProbes;
   ++numRemoves;
@@ -962,6 +972,7 @@ size_t Structure::remove(const Identifier& propertyName) {
       deletedSentinelIndex;
 
   size_t offset = m_propertyTable->entries()[entryIndex - 1].offset;
+  ASSERT(offset >= m_anonymousSlotCount);
 
   key->deref();
   m_propertyTable->entries()[entryIndex - 1].key = 0;
@@ -986,8 +997,7 @@ size_t Structure::remove(const Identifier& propertyName) {
 
 void Structure::insertIntoPropertyMapHashTable(const PropertyMapEntry& entry) {
   ASSERT(m_propertyTable);
-
-  ASSERT(m_propertyTable->anonymousSlotCount == m_anonymousSlotCount);
+  ASSERT(entry.offset >= m_anonymousSlotCount);
   unsigned i = entry.key->existingHash();
   unsigned k = 0;
 
@@ -1037,7 +1047,6 @@ void Structure::createPropertyMapHashTable(unsigned newTableSize) {
       fastZeroedMalloc(PropertyMapHashTable::allocationSize(newTableSize)));
   m_propertyTable->size = newTableSize;
   m_propertyTable->sizeMask = newTableSize - 1;
-  m_propertyTable->anonymousSlotCount = m_anonymousSlotCount;
 
   checkConsistency();
 }
@@ -1065,7 +1074,6 @@ void Structure::rehashPropertyMapHashTable(unsigned newTableSize) {
       fastZeroedMalloc(PropertyMapHashTable::allocationSize(newTableSize)));
   m_propertyTable->size = newTableSize;
   m_propertyTable->sizeMask = newTableSize - 1;
-  m_propertyTable->anonymousSlotCount = oldTable->anonymousSlotCount;
 
   unsigned lastIndexUsed = 0;
   unsigned entryCount = oldTable->keyCount + oldTable->deletedSentinelCount;
@@ -1207,6 +1215,7 @@ void Structure::checkConsistency() {
     ASSERT(m_hasNonEnumerableProperties ||
            !(m_propertyTable->entries()[c].attributes & DontEnum));
     UString::Rep* rep = m_propertyTable->entries()[c].key;
+    ASSERT(m_propertyTable->entries()[c].offset >= m_anonymousSlotCount);
     if (!rep)
       continue;
     ++nonEmptyEntryCount;
