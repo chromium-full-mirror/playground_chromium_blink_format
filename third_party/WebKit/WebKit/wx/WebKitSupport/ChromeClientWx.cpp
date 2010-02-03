@@ -37,6 +37,7 @@
 #include "FrameLoadRequest.h"
 #include "NotImplemented.h"
 #include "PlatformString.h"
+#include "WindowFeatures.h"
 
 #include <stdio.h>
 
@@ -52,6 +53,21 @@
 #include "WebViewPrivate.h"
 
 namespace WebCore {
+
+wxWebKitWindowFeatures wkFeaturesforWindowFeatures(
+    const WindowFeatures& features) {
+  wxWebKitWindowFeatures wkFeatures;
+  wkFeatures.menuBarVisible = features.menuBarVisible;
+  wkFeatures.statusBarVisible = features.statusBarVisible;
+  wkFeatures.toolBarVisible = features.toolBarVisible;
+  wkFeatures.locationBarVisible = features.locationBarVisible;
+  wkFeatures.scrollbarsVisible = features.scrollbarsVisible;
+  wkFeatures.resizable = features.resizable;
+  wkFeatures.fullscreen = features.fullscreen;
+  wkFeatures.dialog = features.dialog;
+
+  return wkFeatures;
+}
 
 ChromeClientWx::ChromeClientWx(wxWebView* webView) {
   m_webView = webView;
@@ -103,20 +119,20 @@ void ChromeClientWx::focusedNodeChanged(Node*) {}
 
 Page* ChromeClientWx::createWindow(Frame*,
                                    const FrameLoadRequest& request,
-                                   const WindowFeatures&) {
-  // FIXME: Create a EVT_WEBKIT_NEW_WINDOW event, and only run this code
-  // when that event is not handled.
-
+                                   const WindowFeatures& features) {
   Page* myPage = 0;
-  wxWebBrowserShell* newFrame = new wxWebBrowserShell(wxTheApp->GetAppName());
+  wxWebViewNewWindowEvent wkEvent(m_webView);
+  wkEvent.SetURL(request.resourceRequest().url().string());
 
-  if (newFrame->webview) {
-    newFrame->webview->LoadURL(request.resourceRequest().url().string());
-    newFrame->Show(true);
+  wxWebKitWindowFeatures wkFeatures = wkFeaturesforWindowFeatures(features);
+  wkEvent.SetWindowFeatures(wkFeatures);
 
-    WebViewPrivate* impl = newFrame->webview->m_impl;
-    if (impl)
-      myPage = impl->page;
+  if (m_webView->GetEventHandler()->ProcessEvent(wkEvent)) {
+    if (wxWebView* webView = wkEvent.GetWebView()) {
+      WebViewPrivate* impl = webView->m_impl;
+      if (impl)
+        myPage = impl->page;
+    }
   }
 
   return myPage;
