@@ -63,7 +63,6 @@ class AbstractWeakReferenceMap {
   virtual void visit(Visitor* visitor) = 0;
   virtual bool removeIfPresent(KeyType* key,
                                v8::Persistent<v8::Data> value) = 0;
-  virtual void clear() = 0;
 
   v8::WeakReferenceCallback weakReferenceCallback() {
     return m_weakReferenceCallback;
@@ -124,8 +123,6 @@ class WeakReferenceMap : public AbstractWeakReferenceMap<KeyType, ValueType> {
     return true;
   }
 
-  void clear() { m_map.clear(); }
-
   bool contains(KeyType* obj) { return m_map.contains(obj); }
 
   virtual void visit(typename Parent::Visitor* visitor) {
@@ -175,10 +172,6 @@ void visitDOMObjectsInCurrentThread(DOMWrapperMap<void>::Visitor*);
 // pending activity.
 DOMWrapperMap<void>& getActiveDOMObjectMap();
 void visitActiveDOMObjectsInCurrentThread(DOMWrapperMap<void>::Visitor*);
-
-// This should be called to remove all DOM objects associated with the current
-// thread when it is tearing down.
-void removeAllDOMObjectsInCurrentThread();
 
 #if ENABLE(SVG)
 // A map for SVGElementInstances to its JS wrapper.
