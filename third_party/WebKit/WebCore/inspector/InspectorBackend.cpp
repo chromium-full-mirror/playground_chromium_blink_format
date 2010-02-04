@@ -54,7 +54,7 @@
 #include "Storage.h"
 #endif
 
-#if ENABLE(JAVASCRIPT_DEBUGGER)
+#if ENABLE(JAVASCRIPT_DEBUGGER) && USE(JSC)
 #include "JavaScriptCallFrame.h"
 #include "JavaScriptDebugServer.h"
 using namespace JSC;
@@ -136,7 +136,7 @@ void InspectorBackend::stopTimelineProfiler() {
     m_inspectorController->stopTimelineProfiler();
 }
 
-#if ENABLE(JAVASCRIPT_DEBUGGER)
+#if ENABLE(JAVASCRIPT_DEBUGGER) && USE(JSC)
 bool InspectorBackend::debuggerEnabled() const {
   if (m_inspectorController)
     return m_inspectorController->debuggerEnabled();

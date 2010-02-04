@@ -35,7 +35,7 @@
 #include "ScriptState.h"
 #include <wtf/PassOwnPtr.h>
 
-#if ENABLE(JAVASCRIPT_DEBUGGER)
+#if ENABLE(JAVASCRIPT_DEBUGGER) && USE(JSC)
 namespace JSC {
 class JSValue;
 class SourceCode;
@@ -91,7 +91,7 @@ class InspectorFrontend : public Noncopyable {
   void resourceTrackingWasEnabled();
   void resourceTrackingWasDisabled();
 
-#if ENABLE(JAVASCRIPT_DEBUGGER)
+#if ENABLE(JAVASCRIPT_DEBUGGER) && USE(JSC)
   void attachDebuggerWhenShown();
   void debuggerWasEnabled();
   void debuggerWasDisabled();

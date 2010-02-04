@@ -47,7 +47,7 @@
 #include <wtf/RefCounted.h>
 #include <wtf/Vector.h>
 
-#if ENABLE(JAVASCRIPT_DEBUGGER)
+#if ENABLE(JAVASCRIPT_DEBUGGER) && USE(JSC)
 #include "JavaScriptDebugListener.h"
 
 namespace JSC {
@@ -89,7 +89,7 @@ class InspectorDOMStorageResource;
 class InspectorResource;
 
 class InspectorController
-#if ENABLE(JAVASCRIPT_DEBUGGER)
+#if ENABLE(JAVASCRIPT_DEBUGGER) && USE(JSC)
     : JavaScriptDebugListener,
       public Noncopyable
 #else
@@ -252,7 +252,7 @@ class InspectorController
 
   void markTimeline(const String& message);
 
-#if ENABLE(JAVASCRIPT_DEBUGGER)
+#if ENABLE(JAVASCRIPT_DEBUGGER) && USE(JSC)
   void addProfile(PassRefPtr<ScriptProfile>,
                   unsigned lineNumber,
                   const String& sourceURL);
@@ -311,7 +311,7 @@ class InspectorController
 
   void deleteCookie(const String& cookieName, const String& domain);
 
-#if ENABLE(JAVASCRIPT_DEBUGGER)
+#if ENABLE(JAVASCRIPT_DEBUGGER) && USE(JSC)
   typedef HashMap<unsigned int, RefPtr<ScriptProfile>> ProfilesMap;
 
   void startUserInitiatedProfilingSoon();
@@ -389,7 +389,7 @@ class InspectorController
   mutable Settings m_settings;
 
   Vector<pair<long, String>> m_pendingEvaluateTestCommands;
-#if ENABLE(JAVASCRIPT_DEBUGGER)
+#if ENABLE(JAVASCRIPT_DEBUGGER) && USE(JSC)
   bool m_debuggerEnabled;
   bool m_attachDebuggerWhenShown;
   bool m_profilerEnabled;
