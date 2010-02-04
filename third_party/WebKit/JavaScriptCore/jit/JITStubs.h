@@ -81,6 +81,13 @@ union JITStubArg {
   ReturnAddressPtr returnAddress() { return ReturnAddressPtr(asPointer); }
 };
 
+struct TrampolineStructure {
+  MacroAssemblerCodePtr ctiStringLengthTrampoline;
+  MacroAssemblerCodePtr ctiVirtualCallLink;
+  MacroAssemblerCodePtr ctiVirtualCall;
+  MacroAssemblerCodePtr ctiNativeCallThunk;
+};
+
 #if CPU(X86_64)
 struct JITStackFrame {
   void* reserved;  // Unused
@@ -278,19 +285,22 @@ class JITThunks {
                               StructureStubInfo* stubInfo);
 
   MacroAssemblerCodePtr ctiStringLengthTrampoline() {
-    return m_ctiStringLengthTrampoline;
+    return m_trampolineStructure.ctiStringLengthTrampoline;
   }
-  MacroAssemblerCodePtr ctiVirtualCallLink() { return m_ctiVirtualCallLink; }
-  MacroAssemblerCodePtr ctiVirtualCall() { return m_ctiVirtualCall; }
-  MacroAssemblerCodePtr ctiNativeCallThunk() { return m_ctiNativeCallThunk; }
+  MacroAssemblerCodePtr ctiVirtualCallLink() {
+    return m_trampolineStructure.ctiVirtualCallLink;
+  }
+  MacroAssemblerCodePtr ctiVirtualCall() {
+    return m_trampolineStructure.ctiVirtualCall;
+  }
+  MacroAssemblerCodePtr ctiNativeCallThunk() {
+    return m_trampolineStructure.ctiNativeCallThunk;
+  }
 
  private:
   RefPtr<ExecutablePool> m_executablePool;
 
-  MacroAssemblerCodePtr m_ctiStringLengthTrampoline;
-  MacroAssemblerCodePtr m_ctiVirtualCallLink;
-  MacroAssemblerCodePtr m_ctiVirtualCall;
-  MacroAssemblerCodePtr m_ctiNativeCallThunk;
+  TrampolineStructure m_trampolineStructure;
 };
 
 extern "C" {

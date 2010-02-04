@@ -364,14 +364,10 @@ class JIT : private MacroAssembler {
   static void compileCTIMachineTrampolines(
       JSGlobalData* globalData,
       RefPtr<ExecutablePool>* executablePool,
-      CodePtr* ctiStringLengthTrampoline,
-      CodePtr* ctiVirtualCallLink,
-      CodePtr* ctiVirtualCall,
-      CodePtr* ctiNativeCallThunk) {
+      TrampolineStructure* trampolines) {
     JIT jit(globalData);
-    jit.privateCompileCTIMachineTrampolines(
-        executablePool, globalData, ctiStringLengthTrampoline,
-        ctiVirtualCallLink, ctiVirtualCall, ctiNativeCallThunk);
+    jit.privateCompileCTIMachineTrampolines(executablePool, globalData,
+                                            trampolines);
   }
 
   static void patchGetByIdSelf(CodeBlock* codeblock,
@@ -465,10 +461,7 @@ class JIT : private MacroAssembler {
   void privateCompileCTIMachineTrampolines(
       RefPtr<ExecutablePool>* executablePool,
       JSGlobalData* data,
-      CodePtr* ctiStringLengthTrampoline,
-      CodePtr* ctiVirtualCallLink,
-      CodePtr* ctiVirtualCall,
-      CodePtr* ctiNativeCallThunk);
+      TrampolineStructure* trampolines);
   void privateCompilePatchGetArrayLength(ReturnAddressPtr returnAddress);
 
   void addSlowCase(Jump);
