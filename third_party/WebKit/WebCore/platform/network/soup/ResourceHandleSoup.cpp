@@ -34,6 +34,7 @@
 #include "DocLoader.h"
 #include "FileSystem.h"
 #include "Frame.h"
+#include "GOwnPtrGtk.h"
 #include "HTTPParsers.h"
 #include "Logging.h"
 #include "MIMETypeRegistry.h"
@@ -213,6 +214,13 @@ static void restartedCallback(SoupMessage* msg, gpointer data) {
 
   if (d->client())
     d->client()->willSendRequest(handle, request, response);
+
+  // Update the first party in case the base URL changed with the redirect
+  String firstPartyString = request.firstPartyForCookies().string();
+  if (!firstPartyString.isEmpty()) {
+    GOwnPtr<SoupURI> firstParty(soup_uri_new(firstPartyString.utf8().data()));
+    soup_message_set_first_party(d->m_msg, firstParty.get());
+  }
 }
 
 static void gotHeadersCallback(SoupMessage* msg, gpointer data) {
@@ -500,6 +508,11 @@ static bool startHttp(ResourceHandle* handle) {
                    G_CALLBACK(contentSniffedCallback), handle);
   g_signal_connect(d->m_msg, "got-chunk", G_CALLBACK(gotChunkCallback), handle);
 
+  String firstPartyString = request.firstPartyForCookies().string();
+  if (!firstPartyString.isEmpty()) {
+    GOwnPtr<SoupURI> firstParty(soup_uri_new(firstPartyString.utf8().data()));
+    soup_message_set_first_party(d->m_msg, firstParty.get());
+  }
   g_object_set_data(G_OBJECT(d->m_msg), "resourceHandle",
                     reinterpret_cast<void*>(handle));
 
