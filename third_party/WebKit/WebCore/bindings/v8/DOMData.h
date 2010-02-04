@@ -120,6 +120,14 @@ void DOMData::handleWeakObject(DOMDataStore::DOMWrapperMapType mapType,
   }
 }
 
+template <typename T>
+void DOMData::removeObjectsFromWrapperMap(
+    AbstractWeakReferenceMap<T, v8::Object>& domMap) {
+  WrapperMapObjectRemover<T> remover;
+  domMap.visit(&remover);
+  domMap.clear();
+}
+
 }  // namespace WebCore
 
 #endif  // DOMData_h

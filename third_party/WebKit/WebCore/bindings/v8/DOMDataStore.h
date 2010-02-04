@@ -83,6 +83,26 @@ class ChunkedTable {
            ((m_chunks->m_entries < m_current) && (m_current <= m_last)));
   }
 
+  void clear() {
+    if (!m_chunks)
+      return;
+
+    clearEntries(m_chunks->m_entries, m_current);
+    Chunk* last = m_chunks;
+    while (true) {
+      Chunk* previous = last->m_previous;
+      if (!previous)
+        break;
+      delete last;
+      clearEntries(previous->m_entries, previous->m_entries + CHUNK_SIZE);
+      last = previous;
+    }
+
+    m_chunks = last;
+    m_current = m_chunks->m_entries;
+    m_last = m_current + CHUNK_SIZE;
+  }
+
   void visit(typename Traits::Visitor* visitor) {
     if (!m_chunks)
       return;
@@ -98,6 +118,11 @@ class ChunkedTable {
     Chunk* const m_previous;
     T m_entries[CHUNK_SIZE];
   };
+
+  static void clearEntries(T* first, T* last) {
+    for (T* entry = first; entry < last; entry++)
+      Traits::clear(entry);
+  }
 
   static void visitEntries(T* first,
                            T* last,
@@ -172,6 +197,8 @@ class DOMDataStore : public Noncopyable {
 
     virtual bool removeIfPresent(Node* key, v8::Persistent<v8::Data> value);
 
+    virtual void clear() { m_table.clear(); }
+
    private:
     static int const numberOfEntries = (1 << 10) - 1;
 
@@ -184,6 +211,14 @@ class DOMDataStore : public Noncopyable {
         Node* node = V8Node::toNative(*target);
         ASSERT(node);
         node->setWrapper(target);
+      }
+
+      static void clear(v8::Persistent<v8::Object>* entry) {
+        Node* node = V8Node::toNative(*entry);
+        ASSERT(node->wrapper() == entry);
+
+        node->clearWrapper();
+        entry->Dispose();
       }
 
       static void visit(v8::Persistent<v8::Object>* entry, Visitor* visitor) {

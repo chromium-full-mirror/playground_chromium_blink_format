@@ -53,7 +53,9 @@ WorkerScriptController::WorkerScriptController(WorkerContext* workerContext)
       m_proxy(new WorkerContextExecutionProxy(workerContext)),
       m_executionForbidden(false) {}
 
-WorkerScriptController::~WorkerScriptController() {}
+WorkerScriptController::~WorkerScriptController() {
+  removeAllDOMObjectsInCurrentThread();
+}
 
 ScriptValue WorkerScriptController::evaluate(
     const ScriptSourceCode& sourceCode) {
