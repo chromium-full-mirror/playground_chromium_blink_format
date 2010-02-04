@@ -40,16 +40,7 @@ class ScrollbarClient;
 class ScrollbarTheme;
 class PlatformMouseEvent;
 
-const int cScrollbarPixelsPerLineStep = 40;
-const float cFractionToStepWhenPaging = 0.875f;
-
 class Scrollbar : public Widget {
- protected:
-  Scrollbar(ScrollbarClient*,
-            ScrollbarOrientation,
-            ScrollbarControlSize,
-            ScrollbarTheme* = 0);
-
  public:
   virtual ~Scrollbar();
 
@@ -60,6 +51,10 @@ class Scrollbar : public Widget {
       ScrollbarClient* client,
       ScrollbarOrientation orientation,
       ScrollbarControlSize size);
+
+  static int pixelsPerLineStep() { return 40; }
+  static float minFractionToStepWhenPaging() { return 0.875f; }
+  static int maxOverlapBetweenPages();
 
   void setClient(ScrollbarClient* client) { m_client = client; }
   ScrollbarClient* client() const { return m_client; }
@@ -142,6 +137,11 @@ class Scrollbar : public Widget {
   virtual bool isScrollbar() const { return true; }
 
  protected:
+  Scrollbar(ScrollbarClient*,
+            ScrollbarOrientation,
+            ScrollbarControlSize,
+            ScrollbarTheme* = 0);
+
   virtual void updateThumbPosition();
   virtual void updateThumbProportion();
 

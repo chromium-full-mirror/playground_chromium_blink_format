@@ -108,6 +108,10 @@ class ScrollbarTheme : public Noncopyable {
     return 0;
   }  // The length of the track along the axis of the scrollbar.
 
+  virtual int maxOverlapBetweenPages() {
+    return std::numeric_limits<int>::max();
+  }
+
   virtual double initialAutoscrollTimerDelay() { return 0.25; }
   virtual double autoscrollTimerDelay() { return 0.05; }
 

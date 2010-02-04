@@ -301,7 +301,9 @@ static int verticalScrollDistance(Frame* frame) {
         renderer->isTextArea()))
     return 0;
   int height = toRenderBox(renderer)->clientHeight();
-  return max(height * cFractionToStepWhenPaging, 1.f);
+  return max(max<int>(height * Scrollbar::minFractionToStepWhenPaging(),
+                      height - Scrollbar::maxOverlapBetweenPages()),
+             1);
 }
 
 static RefPtr<Range> unionDOMRanges(Range* a, Range* b) {

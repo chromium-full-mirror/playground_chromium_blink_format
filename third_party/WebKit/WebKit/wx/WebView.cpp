@@ -770,22 +770,22 @@ void wxWebView::OnKeyEvents(wxKeyEvent& event) {
       case WXK_LEFT:
       case WXK_NUMPAD_LEFT:
         frame->view()->scrollBy(
-            WebCore::IntSize(-WebCore::cScrollbarPixelsPerLineStep, 0));
+            WebCore::IntSize(-WebCore::Scrollbar::pixelsPerLineStep(), 0));
         return;
       case WXK_UP:
       case WXK_NUMPAD_UP:
         frame->view()->scrollBy(
-            WebCore::IntSize(0, -WebCore::cScrollbarPixelsPerLineStep));
+            WebCore::IntSize(0, -WebCore::Scrollbar::pixelsPerLineStep()));
         return;
       case WXK_RIGHT:
       case WXK_NUMPAD_RIGHT:
         frame->view()->scrollBy(
-            WebCore::IntSize(WebCore::cScrollbarPixelsPerLineStep, 0));
+            WebCore::IntSize(WebCore::Scrollbar::pixelsPerLineStep(), 0));
         return;
       case WXK_DOWN:
       case WXK_NUMPAD_DOWN:
         frame->view()->scrollBy(
-            WebCore::IntSize(0, WebCore::cScrollbarPixelsPerLineStep));
+            WebCore::IntSize(0, WebCore::Scrollbar::pixelsPerLineStep()));
         return;
       case WXK_END:
       case WXK_NUMPAD_END:
@@ -800,15 +800,15 @@ void wxWebView::OnKeyEvents(wxKeyEvent& event) {
         return;
       case WXK_PAGEUP:
       case WXK_NUMPAD_PAGEUP:
-        frame->view()->scrollBy(
-            WebCore::IntSize(0, -frame->view()->visibleHeight() *
-                                    WebCore::cFractionToStepWhenPaging));
+        frame->view()->scrollBy(WebCore::IntSize(
+            0, -frame->view()->visibleHeight() *
+                   WebCore::ScrollBar::minFractionToStepWhenPaging()));
         return;
       case WXK_PAGEDOWN:
       case WXK_NUMPAD_PAGEDOWN:
-        frame->view()->scrollBy(
-            WebCore::IntSize(0, frame->view()->visibleHeight() *
-                                    WebCore::cFractionToStepWhenPaging));
+        frame->view()->scrollBy(WebCore::IntSize(
+            0, frame->view()->visibleHeight() *
+                   WebCore::ScrollBar::minFractionToStepWhenPaging()));
         return;
       // These we don't want turning into char events, stuff 'em
       case WXK_ESCAPE:
