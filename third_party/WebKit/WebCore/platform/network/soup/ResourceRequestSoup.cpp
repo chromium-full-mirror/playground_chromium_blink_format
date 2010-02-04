@@ -46,11 +46,13 @@ SoupMessage* ResourceRequest::toSoupMessage() const {
                                   it->second.utf8().data());
   }
 
+#ifdef HAVE_LIBSOUP_2_29_90
   String firstPartyString = firstPartyForCookies().string();
   if (!firstPartyString.isEmpty()) {
     GOwnPtr<SoupURI> firstParty(soup_uri_new(firstPartyString.utf8().data()));
     soup_message_set_first_party(soupMessage, firstParty.get());
   }
+#endif
 
   // Body data is only handled at ResourceHandleSoup::startHttp for
   // now; this is because this may not be a good place to go
@@ -79,12 +81,14 @@ void ResourceRequest::updateFromSoupMessage(SoupMessage* soupMessage) {
     m_httpBody = FormData::create(soupMessage->request_body->data,
                                   soupMessage->request_body->length);
 
+#ifdef HAVE_LIBSOUP_2_29_90
   SoupURI* firstParty = soup_message_get_first_party(soupMessage);
   if (firstParty) {
     GOwnPtr<gchar> firstPartyURI(soup_uri_to_string(firstParty, FALSE));
     m_firstPartyForCookies =
         KURL(KURL(), String::fromUTF8(firstPartyURI.get()));
   }
+#endif
 
   // FIXME: m_allowCookies should probably be handled here and on
   // doUpdatePlatformRequest somehow.
