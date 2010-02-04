@@ -62,6 +62,7 @@ class ClipboardWx : public Clipboard {
                                         Frame*);
   virtual void writeURL(const KURL&, const String&, Frame*);
   virtual void writeRange(Range*, Frame*);
+  virtual void writePlainText(const WebCore::String&);
 
   virtual bool hasData();
 
