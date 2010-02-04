@@ -31,6 +31,7 @@
 #include "Document.h"
 #include "Frame.h"
 #include "FrameView.h"
+#include "GOwnPtrGtk.h"
 #include "GraphicsContext.h"
 #include "IntRect.h"
 #include "KURL.h"
