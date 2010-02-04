@@ -34,6 +34,7 @@
 #include "DOMWindow.h"
 #include "Database.h"
 #include "Frame.h"
+#include "InjectedScript.h"
 #include "InjectedScriptHost.h"
 #include "InspectorController.h"
 #include "Node.h"
@@ -207,7 +208,7 @@ v8::Handle<v8::Value> V8InjectedScriptHost::selectDOMStorageCallback(
 }
 #endif
 
-ScriptObject InjectedScriptHost::injectedScriptFor(
+InjectedScript InjectedScriptHost::injectedScriptFor(
     ScriptState* inspectedScriptState) {
   v8::HandleScope handleScope;
   v8::Local<v8::Context> context = inspectedScriptState->context();
@@ -222,16 +223,18 @@ ScriptObject InjectedScriptHost::injectedScriptFor(
   v8::Local<v8::String> key = v8::String::New("Devtools_InjectedScript");
   v8::Local<v8::Value> val = global->GetHiddenValue(key);
   if (!val.IsEmpty() && val->IsObject())
-    return ScriptObject(inspectedScriptState, v8::Local<v8::Object>::Cast(val));
+    return InjectedScript(
+        ScriptObject(inspectedScriptState, v8::Local<v8::Object>::Cast(val)));
 
   ASSERT(!m_injectedScriptSource.isEmpty());
   ScriptObject injectedScriptObject =
       createInjectedScript(m_injectedScriptSource, this, inspectedScriptState,
                            m_nextInjectedScriptId);
-  m_idToInjectedScript.set(m_nextInjectedScriptId, injectedScriptObject);
+  InjectedScript result(injectedScriptObject);
+  m_idToInjectedScript.set(m_nextInjectedScriptId, result);
   ++m_nextInjectedScriptId;
   global->SetHiddenValue(key, injectedScriptObject.v8Object());
-  return injectedScriptObject;
+  return result;
 }
 
 }  // namespace WebCore

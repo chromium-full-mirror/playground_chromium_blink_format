@@ -54,6 +54,7 @@
 #include "HTMLFrameOwnerElement.h"
 #include "HitTestResult.h"
 #include "InjectedScriptHost.h"
+#include "InjectedScript.h"
 #include "InspectorBackend.h"
 #include "InspectorClient.h"
 #include "InspectorDOMAgent.h"
@@ -135,7 +136,7 @@ InspectorController::InspectorController(Page* page, InspectorClient* client)
       m_client(client),
       m_page(0),
       m_expiredConsoleMessageCount(0),
-      m_scriptState(0),
+      m_frontendScriptState(0),
       m_windowVisible(false),
       m_showAfterVisible(CurrentPanel),
       m_groupLevel(0),
@@ -165,7 +166,7 @@ InspectorController::InspectorController(Page* page, InspectorClient* client)
 InspectorController::~InspectorController() {
   // These should have been cleared in inspectedPageDestroyed().
   ASSERT(!m_client);
-  ASSERT(!m_scriptState);
+  ASSERT(!m_frontendScriptState);
   ASSERT(!m_inspectedPage);
   ASSERT(!m_page || (m_page && !m_page->parentInspectorController()));
 
@@ -185,10 +186,9 @@ InspectorController::~InspectorController() {
 void InspectorController::inspectedPageDestroyed() {
   close();
 
-  if (m_scriptState) {
-    ScriptGlobalObject::remove(m_scriptState, "InspectorBackend");
-    ScriptGlobalObject::remove(m_scriptState, "InspectorFrontendHost");
-    ScriptGlobalObject::remove(m_scriptState, "InjectedScriptHost");
+  if (m_frontendScriptState) {
+    ScriptGlobalObject::remove(m_frontendScriptState, "InspectorBackend");
+    ScriptGlobalObject::remove(m_frontendScriptState, "InspectorFrontendHost");
   }
   ASSERT(m_inspectedPage);
   m_inspectedPage = 0;
@@ -519,23 +519,23 @@ void InspectorController::windowScriptObjectAvailable() {
 
   // Grant the inspector the ability to script the inspected page.
   m_page->mainFrame()->document()->securityOrigin()->grantUniversalAccess();
-  m_scriptState = scriptStateFromPage(debuggerWorld(), m_page);
-  ScriptGlobalObject::set(m_scriptState, "InspectorBackend",
+  m_frontendScriptState = scriptStateFromPage(debuggerWorld(), m_page);
+  ScriptGlobalObject::set(m_frontendScriptState, "InspectorBackend",
                           m_inspectorBackend.get());
-  ScriptGlobalObject::set(m_scriptState, "InspectorFrontendHost",
+  ScriptGlobalObject::set(m_frontendScriptState, "InspectorFrontendHost",
                           m_inspectorFrontendHost.get());
 }
 
 void InspectorController::scriptObjectReady() {
-  ASSERT(m_scriptState);
-  if (!m_scriptState)
+  ASSERT(m_frontendScriptState);
+  if (!m_frontendScriptState)
     return;
 
   ScriptObject webInspectorObj;
-  if (!ScriptGlobalObject::get(m_scriptState, "WebInspector", webInspectorObj))
+  if (!ScriptGlobalObject::get(m_frontendScriptState, "WebInspector",
+                               webInspectorObj))
     return;
-  ScriptObject injectedScriptObj;
-  setFrontendProxyObject(m_scriptState, webInspectorObj, injectedScriptObj);
+  setFrontendProxyObject(m_frontendScriptState, webInspectorObj);
 
 #if ENABLE(JAVASCRIPT_DEBUGGER) && USE(JSC)
   String debuggerEnabled = setting(debuggerEnabledSettingName);
@@ -555,7 +555,7 @@ void InspectorController::scriptObjectReady() {
 void InspectorController::setFrontendProxyObject(ScriptState* scriptState,
                                                  ScriptObject webInspectorObj,
                                                  ScriptObject) {
-  m_scriptState = scriptState;
+  m_frontendScriptState = scriptState;
   m_frontend.set(new InspectorFrontend(this, scriptState, webInspectorObj));
   releaseDOMAgent();
   m_domAgent = InspectorDOMAgent::create(m_frontend.get());
@@ -613,7 +613,7 @@ void InspectorController::close() {
   releaseDOMAgent();
   m_frontend.set(0);
   m_timelineAgent = 0;
-  m_scriptState = 0;
+  m_frontendScriptState = 0;
   if (m_page) {
     if (!m_page->mainFrame() || !m_page->mainFrame()->loader() ||
         !m_page->mainFrame()->loader()->isLoading()) {
@@ -1445,7 +1445,8 @@ void InspectorController::getProfile(long callId, unsigned uid) {
     return;
   ProfilesMap::iterator it = m_profiles.find(uid);
   if (it != m_profiles.end())
-    m_frontend->didGetProfile(callId, toJS(m_scriptState, it->second.get()));
+    m_frontend->didGetProfile(callId,
+                              toJS(m_frontendScriptState, it->second.get()));
 }
 
 ScriptObject InspectorController::createProfileHeader(
@@ -1569,7 +1570,7 @@ void InspectorController::enableDebugger() {
   if (m_debuggerEnabled)
     return;
 
-  if (!m_scriptState || !m_frontend)
+  if (!m_frontendScriptState || !m_frontend)
     m_attachDebuggerWhenShown = true;
   else {
     m_frontend->attachDebuggerWhenShown();
@@ -1619,12 +1620,9 @@ void InspectorController::didPause() {
   ScriptState* scriptState =
       callFrame->scopeChain()->globalObject->globalExec();
   ASSERT(scriptState);
-  ScriptObject injectedScriptObj =
+  InjectedScript injectedScript =
       m_injectedScriptHost->injectedScriptFor(scriptState);
-  ScriptFunctionCall function(scriptState, injectedScriptObj, "getCallFrames");
-  ScriptValue callFramesValue = function.call();
-  String callFrames = callFramesValue.toString(scriptState);
-
+  String callFrames = injectedScript.callFrames();
   m_frontend->pausedScript(callFrames);
 }
 
@@ -1889,7 +1887,7 @@ void InspectorController::deleteCookie(const String& cookieName,
   }
 }
 
-ScriptObject InspectorController::injectedScriptForNodeId(long id) {
+InjectedScript InspectorController::injectedScriptForNodeId(long id) {
   Frame* frame = 0;
   if (id) {
     ASSERT(m_domAgent);
@@ -1905,7 +1903,7 @@ ScriptObject InspectorController::injectedScriptForNodeId(long id) {
   if (frame)
     return m_injectedScriptHost->injectedScriptFor(mainWorldScriptState(frame));
 
-  return ScriptObject();
+  return InjectedScript();
 }
 
 }  // namespace WebCore

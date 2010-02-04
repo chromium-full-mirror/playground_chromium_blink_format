@@ -41,6 +41,7 @@
 namespace WebCore {
 
 class Database;
+class InjectedScript;
 class InspectorDOMAgent;
 class InspectorFrontend;
 class JavaScriptCallFrame;
@@ -86,8 +87,8 @@ class InjectedScriptHost : public RefCounted<InjectedScriptHost> {
                                          const String& result,
                                          bool isException);
 
-  ScriptObject injectedScriptFor(ScriptState*);
-  ScriptObject injectedScriptForId(long);
+  InjectedScript injectedScriptFor(ScriptState*);
+  InjectedScript injectedScriptForId(long);
   void discardInjectedScripts();
   void releaseWrapperObjectGroup(long injectedScriptId,
                                  const String& objectGroup);
@@ -97,13 +98,10 @@ class InjectedScriptHost : public RefCounted<InjectedScriptHost> {
   InspectorDOMAgent* inspectorDOMAgent();
   InspectorFrontend* inspectorFrontend();
 
-  void releaseWrapperObjectGroup(const ScriptObject& injectedScript,
-                                 const String& objectGroup);
-
   InspectorController* m_inspectorController;
   String m_injectedScriptSource;
   long m_nextInjectedScriptId;
-  typedef HashMap<long, ScriptObject> IdToInjectedScriptMap;
+  typedef HashMap<long, InjectedScript> IdToInjectedScriptMap;
   IdToInjectedScriptMap m_idToInjectedScript;
 };
 
