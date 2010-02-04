@@ -72,6 +72,7 @@ class Clipboard : public RefCounted<Clipboard> {
 #endif
   virtual void writeURL(const KURL&, const String&, Frame*) = 0;
   virtual void writeRange(Range*, Frame*) = 0;
+  virtual void writePlainText(const String&) = 0;
 
   virtual bool hasData() = 0;
 

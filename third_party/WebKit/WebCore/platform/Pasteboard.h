@@ -89,6 +89,7 @@ class Pasteboard : public Noncopyable {
                        const KURL& url,
                        const String& titleStr,
                        Frame* frame);
+  static void writePlainText(NSPasteboard* pasteboard, const String& text);
 #endif
 
   static Pasteboard* generalPasteboard();

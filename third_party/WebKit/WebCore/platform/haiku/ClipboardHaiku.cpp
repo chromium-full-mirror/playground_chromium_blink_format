@@ -173,6 +173,10 @@ void ClipboardHaiku::writeRange(Range*, Frame*) {
   notImplemented();
 }
 
+void ClipboardHaiku::writePlainText(const String&) {
+  notImplemented();
+}
+
 bool ClipboardHaiku::hasData() {
   bool result = false;
 
