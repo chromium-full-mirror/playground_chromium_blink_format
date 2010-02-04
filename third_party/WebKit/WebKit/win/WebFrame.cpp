@@ -2044,10 +2044,17 @@ void WebFrame::spoolPage(PlatformGraphicsContext* pctx,
   CGContextRestoreGState(pctx);
 }
 #elif PLATFORM(CAIRO)
-static float scaleFactor(HDC printDC, const IntRect& pageRect) {
+static float scaleFactor(HDC printDC,
+                         const IntRect& marginRect,
+                         const IntRect& pageRect) {
   const IntRect& printRect = printerRect(printDC);
 
-  float scale = static_cast<float>(printRect.width()) /
+  IntRect adjustedRect =
+      IntRect(printRect.x() + marginRect.x(), printRect.y() + marginRect.y(),
+              printRect.width() - marginRect.x() - marginRect.right(),
+              printRect.height() - marginRect.y() - marginRect.bottom());
+
+  float scale = static_cast<float>(adjustedRect.width()) /
                 static_cast<float>(pageRect.width());
   if (!scale)
     scale = 1.0;
@@ -2065,8 +2072,9 @@ void WebFrame::drawHeader(PlatformGraphicsContext* pctx,
                           const IntRect& pageRect,
                           float headerHeight) {
   HDC hdc = hdcFromContext(pctx);
+  const IntRect& marginRect = printerMarginRect(hdc);
 
-  const float scale = scaleFactor(hdc, pageRect);
+  const float scale = scaleFactor(hdc, marginRect, pageRect);
   int x = static_cast<int>(scale * pageRect.x());
   int y = 0;
   RECT headerRect = {x, y, x + static_cast<int>(scale * pageRect.width()),
@@ -2084,8 +2092,9 @@ void WebFrame::drawFooter(PlatformGraphicsContext* pctx,
                           float headerHeight,
                           float footerHeight) {
   HDC hdc = hdcFromContext(pctx);
+  const IntRect& marginRect = printerMarginRect(hdc);
 
-  const float scale = scaleFactor(hdc, pageRect);
+  const float scale = scaleFactor(hdc, marginRect, pageRect);
   int x = static_cast<int>(scale * pageRect.x());
   int y = static_cast<int>(
       scale * max(static_cast<int>(headerHeight) + pageRect.height(),
@@ -2109,26 +2118,29 @@ void WebFrame::spoolPage(PlatformGraphicsContext* pctx,
   Frame* coreFrame = core(this);
 
   const IntRect& pageRect = m_pageRects[page];
-  IntRect marginRect = printerMarginRect(printDC);
+  const IntRect& marginRect = printerMarginRect(printDC);
 
   cairo_save(pctx);
-  float scale = scaleFactor(printDC, pageRect);
+  float scale = scaleFactor(printDC, marginRect, pageRect);
   cairo_scale(pctx, scale, scale);
 
-  cairo_translate(pctx, -pageRect.x() + marginRect.x(),
-                  -pageRect.y() + marginRect.y() + headerHeight);
+  IntRect cairoMarginRect(marginRect);
+  cairoMarginRect.scale(1 / scale);
+
+  cairo_translate(pctx, -pageRect.x() + cairoMarginRect.x(),
+                  -pageRect.y() + cairoMarginRect.y() + headerHeight);
   coreFrame->view()->paintContents(spoolCtx, pageRect);
 
-  cairo_translate(pctx, pageRect.x() - marginRect.x(),
-                  pageRect.y() - marginRect.y() - headerHeight);
+  cairo_translate(pctx, pageRect.x() - cairoMarginRect.x(),
+                  pageRect.y() - cairoMarginRect.y() - headerHeight);
 
   XFORM originalWorld;
   ::GetWorldTransform(printDC, &originalWorld);
 
   // Position world transform to account for margin
   XFORM newWorld = originalWorld;
-  newWorld.eDx = scale * marginRect.x();
-  newWorld.eDy = scale * marginRect.y();
+  newWorld.eDx = marginRect.x();
+  newWorld.eDy = marginRect.y();
 
   ::SetWorldTransform(printDC, &newWorld);
 
