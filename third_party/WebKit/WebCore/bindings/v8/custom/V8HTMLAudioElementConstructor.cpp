@@ -44,26 +44,7 @@
 
 namespace WebCore {
 
-v8::Persistent<v8::FunctionTemplate>
-V8HTMLAudioElementConstructor::GetTemplate() {
-  static v8::Persistent<v8::FunctionTemplate> cachedTemplate;
-  if (!cachedTemplate.IsEmpty())
-    return cachedTemplate;
-
-  v8::HandleScope scope;
-  v8::Local<v8::FunctionTemplate> result =
-      v8::FunctionTemplate::New(USE_CALLBACK(HTMLAudioElementConstructor));
-
-  v8::Local<v8::ObjectTemplate> instance = result->InstanceTemplate();
-  instance->SetInternalFieldCount(V8HTMLAudioElement::internalFieldCount);
-  result->SetClassName(v8::String::New("HTMLAudioElement"));
-  result->Inherit(V8DOMWrapper::getTemplate(V8ClassIndex::HTMLAUDIOELEMENT));
-
-  cachedTemplate = v8::Persistent<v8::FunctionTemplate>::New(result);
-  return cachedTemplate;
-}
-
-v8::Handle<v8::Value> V8Custom::v8HTMLAudioElementConstructorCallback(
+static v8::Handle<v8::Value> v8HTMLAudioElementConstructorCallback(
     const v8::Arguments& args) {
   INC_STATS("DOM.HTMLAudioElement.Contructor");
 
@@ -100,6 +81,25 @@ v8::Handle<v8::Value> V8Custom::v8HTMLAudioElementConstructorCallback(
   V8DOMWrapper::setJSWrapperForDOMNode(
       audio.get(), v8::Persistent<v8::Object>::New(args.Holder()));
   return args.Holder();
+}
+
+v8::Persistent<v8::FunctionTemplate>
+V8HTMLAudioElementConstructor::GetTemplate() {
+  static v8::Persistent<v8::FunctionTemplate> cachedTemplate;
+  if (!cachedTemplate.IsEmpty())
+    return cachedTemplate;
+
+  v8::HandleScope scope;
+  v8::Local<v8::FunctionTemplate> result =
+      v8::FunctionTemplate::New(v8HTMLAudioElementConstructorCallback);
+
+  v8::Local<v8::ObjectTemplate> instance = result->InstanceTemplate();
+  instance->SetInternalFieldCount(V8HTMLAudioElement::internalFieldCount);
+  result->SetClassName(v8::String::New("HTMLAudioElement"));
+  result->Inherit(V8DOMWrapper::getTemplate(V8ClassIndex::HTMLAUDIOELEMENT));
+
+  cachedTemplate = v8::Persistent<v8::FunctionTemplate>::New(result);
+  return cachedTemplate;
 }
 
 }  // namespace WebCore
