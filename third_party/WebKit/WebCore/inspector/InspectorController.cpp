@@ -1213,7 +1213,7 @@ void InspectorController::getCookies(long callId) {
     Document* document = it->second->frame()->document();
     Vector<Cookie> docCookiesList;
     rawCookiesImplemented =
-        getRawCookies(document, document->cookieURL(), docCookiesList);
+        getRawCookies(document, it->second->requestURL(), docCookiesList);
 
     if (!rawCookiesImplemented) {
       // FIXME: We need duplication checking for the String representation of
