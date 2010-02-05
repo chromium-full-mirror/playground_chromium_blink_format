@@ -951,7 +951,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   }
   bool hasNodeListCaches() const { return m_numNodeListCaches; }
 
-  void updateFocusAppearanceSoon();
+  void updateFocusAppearanceSoon(bool restorePreviousSelection);
   void cancelFocusAppearanceUpdate();
 
   // FF method for accessing the selection added for compatibility.
@@ -1240,6 +1240,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   bool m_haveExplicitlyDisabledDNSPrefetch;
   bool m_frameElementsShouldIgnoreScrolling;
   bool m_containsValidityStyleRules;
+  bool m_updateFocusAppearanceRestoresSelection;
 
   String m_title;
   String m_rawTitle;
