@@ -68,6 +68,9 @@ class WebViewGraphicsBased : public QGraphicsView {
   WebViewGraphicsBased(QWidget* parent);
   virtual void resizeEvent(QResizeEvent*);
   void setPage(QWebPage* page) { m_item->setPage(page); }
+  void setItemCacheMode(QGraphicsItem::CacheMode mode) {
+    m_item->setCacheMode(mode);
+  }
 
  private:
   GraphicsWebView* m_item;

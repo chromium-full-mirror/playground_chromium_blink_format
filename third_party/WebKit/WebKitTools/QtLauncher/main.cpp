@@ -70,7 +70,11 @@
 void QWEBKIT_EXPORT qt_drt_garbageCollector_collect();
 #endif
 
-static bool useGraphicsView = false;
+static bool gUseGraphicsView = false;
+static bool gUseCompositing = false;
+static bool gCacheWebView = false;
+static QGraphicsView::ViewportUpdateMode gViewportUpdateMode =
+    QGraphicsView::MinimalViewportUpdate;
 
 class LauncherWindow : public MainWindow {
   Q_OBJECT
@@ -139,13 +143,18 @@ LauncherWindow::LauncherWindow(QString url)
 
   resize(800, 600);
 
-  if (!useGraphicsView) {
+  if (!gUseGraphicsView) {
     WebViewTraditional* view = new WebViewTraditional(splitter);
     view->setPage(page());
     m_view = view;
   } else {
     WebViewGraphicsBased* view = new WebViewGraphicsBased(splitter);
     view->setPage(page());
+    view->setViewportUpdateMode(gViewportUpdateMode);
+    view->setItemCacheMode(gCacheWebView ? QGraphicsItem::DeviceCoordinateCache
+                                         : QGraphicsItem::NoCache);
+    page()->settings()->setAttribute(
+        QWebSettings::AcceleratedCompositingEnabled, gUseCompositing);
     m_view = view;
   }
 
@@ -577,7 +586,7 @@ LauncherApplication::LauncherApplication(int& argc, char** argv)
 }
 
 static void requiresGraphicsView(const QString& option) {
-  if (useGraphicsView)
+  if (gUseGraphicsView)
     return;
   appQuit(1,
           QString("%1 only works in combination with the -graphicsbased option")
@@ -608,17 +617,16 @@ void LauncherApplication::handleUserOptions() {
   }
 
   if (args.contains("-graphicsbased"))
-    useGraphicsView = true;
+    gUseGraphicsView = true;
 
   if (args.contains("-compositing")) {
     requiresGraphicsView("-compositing");
-    QWebSettings::globalSettings()->setAttribute(
-        QWebSettings::AcceleratedCompositingEnabled, true);
+    gUseCompositing = true;
   }
 
   if (args.contains("-cache-webview")) {
     requiresGraphicsView("-cache-webview");
-    // view->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
+    gCacheWebView = true;
   }
 
   QString arg1("-viewport-update-mode");
@@ -637,7 +645,7 @@ void LauncherApplication::handleUserOptions() {
                      .arg(arg1)
                      .arg(formatKeys(updateModes)));
 
-    // view->setViewportUpdateMode(static_cast<QGraphicsView::ViewportUpdateMode>(idx));
+    gViewportUpdateMode = static_cast<QGraphicsView::ViewportUpdateMode>(idx);
   }
 
   int robotIndex = args.indexOf("-r");
