@@ -46,6 +46,7 @@ class InspectorDOMAgent;
 class InspectorFrontend;
 class JavaScriptCallFrame;
 class Node;
+class SerializedScriptValue;
 class Storage;
 
 class InjectedScriptHost : public RefCounted<InjectedScriptHost> {
@@ -84,7 +85,7 @@ class InjectedScriptHost : public RefCounted<InjectedScriptHost> {
   void selectDOMStorage(Storage* storage);
 #endif
   void reportDidDispatchOnInjectedScript(long callId,
-                                         const String& result,
+                                         SerializedScriptValue* result,
                                          bool isException);
 
   InjectedScript injectedScriptFor(ScriptState*);

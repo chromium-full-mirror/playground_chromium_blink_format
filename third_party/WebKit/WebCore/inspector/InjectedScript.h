@@ -34,9 +34,11 @@
 #include "InjectedScriptHost.h"
 #include "ScriptObject.h"
 #include <wtf/Noncopyable.h>
+#include <wtf/PassRefPtr.h>
 
 namespace WebCore {
 
+class SerializedScriptValue;
 class String;
 
 class InjectedScript {
@@ -50,12 +52,12 @@ class InjectedScript {
                 const String& methodName,
                 const String& arguments,
                 bool async,
-                String* result,
+                RefPtr<SerializedScriptValue>* result,
                 bool* hadException);
 #if ENABLE(JAVASCRIPT_DEBUGGER)
-  String callFrames();
+  PassRefPtr<SerializedScriptValue> callFrames();
 #endif
-  String wrapAndStringifyForConsole(ScriptValue);
+  PassRefPtr<SerializedScriptValue> wrapForConsole(ScriptValue);
   void releaseWrapperObjectGroup(const String&);
 
  private:

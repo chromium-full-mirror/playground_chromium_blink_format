@@ -43,9 +43,7 @@ class ScriptString;
 
 class ScriptFunctionCall {
  public:
-  ScriptFunctionCall(ScriptState* scriptState,
-                     const ScriptObject& thisObject,
-                     const String& name);
+  ScriptFunctionCall(const ScriptObject& thisObject, const String& name);
   virtual ~ScriptFunctionCall(){};
 
   void appendArgument(const ScriptObject&);

@@ -45,12 +45,17 @@
 
 namespace WebCore {
 
-ScriptFunctionCall::ScriptFunctionCall(ScriptState* scriptState,
-                                       const ScriptObject& thisObject,
+ScriptFunctionCall::ScriptFunctionCall(const ScriptObject& thisObject,
                                        const String& name)
-    : m_scriptState(scriptState), m_thisObject(thisObject), m_name(name) {}
+    : m_scriptState(thisObject.scriptState()),
+      m_thisObject(thisObject),
+      m_name(name) {}
 
 void ScriptFunctionCall::appendArgument(const ScriptObject& argument) {
+  if (argument.scriptState() != m_scriptState) {
+    ASSERT_NOT_REACHED();
+    return;
+  }
   m_arguments.append(argument);
 }
 

@@ -50,14 +50,13 @@ class Frame;
 class InspectorController;
 class InspectorResource;
 class Node;
-class ScriptFunctionCall;
 class ScriptString;
+class SerializedScriptValue;
 class Storage;
 
 class InspectorFrontend : public Noncopyable {
  public:
   InspectorFrontend(InspectorController* inspectorController,
-                    ScriptState*,
                     ScriptObject webInspector);
   ~InspectorFrontend();
 
@@ -105,7 +104,7 @@ class InspectorFrontend : public Noncopyable {
   void setRecordingProfile(bool isProfiling);
   void didGetProfileHeaders(int callId, const ScriptArray& headers);
   void didGetProfile(int callId, const ScriptValue& profile);
-  void pausedScript(const String& callFrames);
+  void pausedScript(SerializedScriptValue* callFrames);
   void resumedScript();
 #endif
 
@@ -146,7 +145,7 @@ class InspectorFrontend : public Noncopyable {
                      const ScriptArray& cookies,
                      const String& cookiesString);
   void didDispatchOnInjectedScript(int callId,
-                                   const String& result,
+                                   SerializedScriptValue* result,
                                    bool isException);
 
   void addNodesToSearchResult(const String& nodeIds);
@@ -154,14 +153,13 @@ class InspectorFrontend : public Noncopyable {
   void contextMenuItemSelected(int itemId);
   void contextMenuCleared();
 
-  ScriptState* scriptState() const { return m_scriptState; }
+  ScriptState* scriptState() const { return m_webInspector.scriptState(); }
 
   void evaluateForTestInFrontend(int callId, const String& script);
 
  private:
   void callSimpleFunction(const String& functionName);
   InspectorController* m_inspectorController;
-  ScriptState* m_scriptState;
   ScriptObject m_webInspector;
 };
 

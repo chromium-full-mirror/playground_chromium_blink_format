@@ -29,6 +29,8 @@
 #include "config.h"
 #include "ScriptValue.h"
 
+#include "SerializedScriptValue.h"
+
 #include <JavaScriptCore/APICast.h>
 #include <JavaScriptCore/JSValueRef.h>
 
@@ -76,6 +78,17 @@ bool ScriptValue::isObject() const {
   if (!m_value)
     return false;
   return m_value.get().isObject();
+}
+
+PassRefPtr<SerializedScriptValue> ScriptValue::serialize(
+    ScriptState* scriptState) {
+  return SerializedScriptValue::create(scriptState, jsValue());
+}
+
+ScriptValue ScriptValue::deserialize(ScriptState* scriptState,
+                                     SerializedScriptValue* value) {
+  return ScriptValue(
+      value->deserialize(scriptState, scriptState->lexicalGlobalObject()));
 }
 
 }  // namespace WebCore

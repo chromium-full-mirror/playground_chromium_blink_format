@@ -42,12 +42,17 @@ using namespace JSC;
 
 namespace WebCore {
 
-ScriptFunctionCall::ScriptFunctionCall(ScriptState* exec,
-                                       const ScriptObject& thisObject,
+ScriptFunctionCall::ScriptFunctionCall(const ScriptObject& thisObject,
                                        const String& name)
-    : m_exec(exec), m_thisObject(thisObject), m_name(name) {}
+    : m_exec(thisObject.scriptState()),
+      m_thisObject(thisObject),
+      m_name(name) {}
 
 void ScriptFunctionCall::appendArgument(const ScriptObject& argument) {
+  if (argument.scriptState() != m_exec) {
+    ASSERT_NOT_REACHED();
+    return;
+  }
   m_arguments.append(argument.jsObject());
 }
 
