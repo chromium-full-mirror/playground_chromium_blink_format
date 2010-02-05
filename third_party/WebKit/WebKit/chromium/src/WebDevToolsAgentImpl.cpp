@@ -52,6 +52,7 @@
 #include "ScriptState.h"
 #include "ScriptValue.h"
 #include "V8Binding.h"
+#include "V8InspectorBackend.h"
 #include "V8Proxy.h"
 #include "V8Utilities.h"
 #include "WebDataSource.h"
@@ -87,6 +88,7 @@ using WebCore::ScriptValue;
 using WebCore::String;
 using WebCore::V8ClassIndex;
 using WebCore::V8DOMWrapper;
+using WebCore::V8InspectorBackend;
 using WebCore::V8Proxy;
 
 namespace WebKit {
@@ -333,7 +335,7 @@ void WebDevToolsAgentImpl::initDevToolsAgentHost() {
 v8::Local<v8::Object> WebDevToolsAgentImpl::createInspectorBackendV8Wrapper() {
   V8ClassIndex::V8WrapperType descriptorType = V8ClassIndex::INSPECTORBACKEND;
   v8::Handle<v8::Function> function =
-      V8DOMWrapper::getTemplate(descriptorType)->GetFunction();
+      V8InspectorBackend::GetTemplate()->GetFunction();
   if (function.IsEmpty()) {
     // Return if allocation failed.
     return v8::Local<v8::Object>();

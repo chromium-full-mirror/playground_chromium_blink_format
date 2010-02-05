@@ -90,7 +90,7 @@ static v8::Handle<v8::Value> v8HTMLOptionElementConstructorCallback(
   }
 
   V8DOMWrapper::setDOMWrapper(
-      args.Holder(), V8ClassIndex::ToInt(V8ClassIndex::NODE), option.get());
+      args.Holder(), V8ClassIndex::ToInt(V8ClassIndex::OPTION), option.get());
   option->ref();
   V8DOMWrapper::setJSWrapperForDOMNode(
       option.get(), v8::Persistent<v8::Object>::New(args.Holder()));
@@ -110,7 +110,7 @@ V8HTMLOptionElementConstructor::GetTemplate() {
   v8::Local<v8::ObjectTemplate> instance = result->InstanceTemplate();
   instance->SetInternalFieldCount(V8HTMLOptionElement::internalFieldCount);
   result->SetClassName(v8::String::New("HTMLOptionElement"));
-  result->Inherit(V8DOMWrapper::getTemplate(V8ClassIndex::HTMLOPTIONELEMENT));
+  result->Inherit(V8HTMLOptionElement::GetTemplate());
 
   cachedTemplate = v8::Persistent<v8::FunctionTemplate>::New(result);
   return cachedTemplate;

@@ -36,10 +36,8 @@
 namespace WebCore {
 
 class V8HTMLOptionElementConstructor {
- private:
+ public:
   static v8::Persistent<v8::FunctionTemplate> GetTemplate();
-
-  friend class V8ClassIndex;
 };
 }
 

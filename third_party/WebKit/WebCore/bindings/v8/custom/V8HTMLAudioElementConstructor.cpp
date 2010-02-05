@@ -76,7 +76,7 @@ static v8::Handle<v8::Value> v8HTMLAudioElementConstructorCallback(
   }
 
   V8DOMWrapper::setDOMWrapper(
-      args.Holder(), V8ClassIndex::ToInt(V8ClassIndex::NODE), audio.get());
+      args.Holder(), V8ClassIndex::ToInt(V8ClassIndex::AUDIO), audio.get());
   audio->ref();
   V8DOMWrapper::setJSWrapperForDOMNode(
       audio.get(), v8::Persistent<v8::Object>::New(args.Holder()));
@@ -96,7 +96,7 @@ V8HTMLAudioElementConstructor::GetTemplate() {
   v8::Local<v8::ObjectTemplate> instance = result->InstanceTemplate();
   instance->SetInternalFieldCount(V8HTMLAudioElement::internalFieldCount);
   result->SetClassName(v8::String::New("HTMLAudioElement"));
-  result->Inherit(V8DOMWrapper::getTemplate(V8ClassIndex::HTMLAUDIOELEMENT));
+  result->Inherit(V8HTMLAudioElement::GetTemplate());
 
   cachedTemplate = v8::Persistent<v8::FunctionTemplate>::New(result);
   return cachedTemplate;
