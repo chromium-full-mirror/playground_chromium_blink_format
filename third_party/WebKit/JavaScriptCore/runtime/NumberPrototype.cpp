@@ -25,6 +25,7 @@
 #include "Error.h"
 #include "JSFunction.h"
 #include "JSString.h"
+#include "JSStringBuilder.h"
 #include "Operations.h"
 #include "PrototypeFunction.h"
 #include "StringBuilder.h"
@@ -495,10 +496,8 @@ JSValue JSC_HOST_CALL numberProtoFuncToPrecision(ExecState* exec,
       if (m.size() > 1)
         m = makeString(m.substr(0, 1), ".", m.substr(1));
       if (e >= 0)
-        return jsNontrivialString(exec,
-                                  makeString(s, m, "e+", UString::from(e)));
-      return jsNontrivialString(exec,
-                                makeString(s, m, "e-", UString::from(-e)));
+        return jsMakeNontrivialString(exec, s, m, "e+", UString::from(e));
+      return jsMakeNontrivialString(exec, s, m, "e-", UString::from(-e));
     }
   } else {
     m = charSequence('0', precision);
@@ -513,8 +512,7 @@ JSValue JSC_HOST_CALL numberProtoFuncToPrecision(ExecState* exec,
                       makeString(s, m.substr(0, e + 1), ".", m.substr(e + 1)));
     return jsString(exec, makeString(s, m));
   }
-  return jsNontrivialString(
-      exec, makeString(s, "0.", charSequence('0', -(e + 1)), m));
+  return jsMakeNontrivialString(exec, s, "0.", charSequence('0', -(e + 1)), m);
 }
 
 }  // namespace JSC

@@ -26,6 +26,7 @@
 #include "DateConversion.h"
 #include "Error.h"
 #include "JSString.h"
+#include "JSStringBuilder.h"
 #include "ObjectPrototype.h"
 #include "DateInstance.h"
 
@@ -601,7 +602,7 @@ JSValue JSC_HOST_CALL dateProtoFuncToString(ExecState* exec,
   DateConversionBuffer time;
   formatDate(*gregorianDateTime, date);
   formatTime(*gregorianDateTime, time);
-  return jsNontrivialString(exec, makeString(date, " ", time));
+  return jsMakeNontrivialString(exec, date, " ", time);
 }
 
 JSValue JSC_HOST_CALL dateProtoFuncToUTCString(ExecState* exec,
@@ -621,7 +622,7 @@ JSValue JSC_HOST_CALL dateProtoFuncToUTCString(ExecState* exec,
   DateConversionBuffer time;
   formatDateUTCVariant(*gregorianDateTime, date);
   formatTimeUTC(*gregorianDateTime, time);
-  return jsNontrivialString(exec, makeString(date, " ", time));
+  return jsMakeNontrivialString(exec, date, " ", time);
 }
 
 JSValue JSC_HOST_CALL dateProtoFuncToISOString(ExecState* exec,
@@ -783,7 +784,7 @@ JSValue JSC_HOST_CALL dateProtoFuncToGMTString(ExecState* exec,
   DateConversionBuffer time;
   formatDateUTCVariant(*gregorianDateTime, date);
   formatTimeUTC(*gregorianDateTime, time);
-  return jsNontrivialString(exec, makeString(date, " ", time));
+  return jsMakeNontrivialString(exec, date, " ", time);
 }
 
 JSValue JSC_HOST_CALL dateProtoFuncGetMonth(ExecState* exec,

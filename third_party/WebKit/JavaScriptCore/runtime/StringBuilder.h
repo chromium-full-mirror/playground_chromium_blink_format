@@ -34,7 +34,7 @@ class StringBuilder {
  public:
   void append(const UChar u) { buffer.append(u); }
 
-  void append(const char* str) { buffer.append(str, strlen(str)); }
+  void append(const char* str) { append(str, strlen(str)); }
 
   void append(const char* str, size_t len) {
     buffer.reserveCapacity(buffer.size() + len);
@@ -60,7 +60,7 @@ class StringBuilder {
     return UString::adopt(buffer);
   }
 
- private:
+ protected:
   Vector<UChar, 64> buffer;
 };
 }

@@ -66,6 +66,7 @@ JSObject* createNotAnObjectError(ExecState*,
                                  JSNotAnObjectErrorStub*,
                                  unsigned bytecodeOffset,
                                  CodeBlock*);
+JSValue throwOutOfMemoryError(ExecState*);
 
 }  // namespace JSC
 

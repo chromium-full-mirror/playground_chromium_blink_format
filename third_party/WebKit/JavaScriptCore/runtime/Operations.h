@@ -23,6 +23,7 @@
 #ifndef Operations_h
 #define Operations_h
 
+#include "ExceptionHelpers.h"
 #include "Interpreter.h"
 #include "JSImmediate.h"
 #include "JSNumberCell.h"
@@ -30,7 +31,6 @@
 
 namespace JSC {
 
-NEVER_INLINE JSValue throwOutOfMemoryError(ExecState*);
 NEVER_INLINE JSValue jsAddSlowCase(CallFrame*, JSValue, JSValue);
 JSValue jsTypeStringForValue(CallFrame*, JSValue);
 bool jsIsObjectType(JSValue);
