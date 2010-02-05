@@ -1882,7 +1882,7 @@ void InspectorController::deleteCookie(const String& cookieName,
        ++it) {
     Document* document = it->second->frame()->document();
     if (document->url().host() == domain)
-      WebCore::deleteCookie(document, document->cookieURL(), cookieName);
+      WebCore::deleteCookie(document, it->second->requestURL(), cookieName);
   }
 }
 
