@@ -68,7 +68,7 @@ ContextMenuItem::~ContextMenuItem() {
 
 PlatformMenuItemDescription ContextMenuItem::releasePlatformDescription() {
   BMenuItem* item = m_platformDescription;
-  m_platformDescription = NULL;
+  m_platformDescription = 0;
   return item;
 }
 
