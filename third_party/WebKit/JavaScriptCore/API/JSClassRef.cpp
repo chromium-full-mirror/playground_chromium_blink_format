@@ -128,7 +128,7 @@ static void clearReferenceToPrototype(JSObjectRef prototype) {
   OpaqueJSClassContextData* jsClassData =
       static_cast<OpaqueJSClassContextData*>(JSObjectGetPrivate(prototype));
   ASSERT(jsClassData);
-  jsClassData->cachedPrototype = 0;
+  jsClassData->cachedPrototype.clear(toJS(prototype));
 }
 
 PassRefPtr<OpaqueJSClass> OpaqueJSClass::create(

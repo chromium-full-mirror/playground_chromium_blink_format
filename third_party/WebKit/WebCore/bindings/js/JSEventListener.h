@@ -102,6 +102,10 @@ inline JSC::JSObject* JSEventListener::jsFunction(
   return m_jsFunction;
 }
 
+inline void JSEventListener::invalidateJSFunction(JSC::JSObject* wrapper) {
+  m_wrapper.clear(wrapper);
+}
+
 // Creates a JS EventListener for an "onXXX" event attribute.
 inline PassRefPtr<JSEventListener> createJSAttributeEventListener(
     JSC::ExecState* exec,

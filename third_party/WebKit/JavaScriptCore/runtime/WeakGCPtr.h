@@ -45,7 +45,10 @@ class WeakGCPtr : Noncopyable {
     return m_ptr;
   }
 
-  void clear() { m_ptr = 0; }
+  void clear(JSCell* ptr) {
+    if (ptr == m_ptr)
+      m_ptr = 0;
+  }
 
   T& operator*() const { return *get(); }
   T* operator->() const { return get(); }
