@@ -70,6 +70,10 @@ WebString WebInputElement::formControlType() const {
   return constUnwrap<HTMLInputElement>()->formControlType();
 }
 
+bool WebInputElement::isActivatedSubmit() const {
+  return constUnwrap<HTMLInputElement>()->isActivatedSubmit();
+}
+
 void WebInputElement::setActivatedSubmit(bool activated) {
   unwrap<HTMLInputElement>()->setActivatedSubmit(activated);
 }

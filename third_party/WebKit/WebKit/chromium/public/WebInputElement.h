@@ -94,6 +94,7 @@ class WebInputElement : public WebElement {
   WEBKIT_API bool isEnabledFormControl() const;
   WEBKIT_API InputType inputType() const;
   WEBKIT_API WebString formControlType() const;
+  WEBKIT_API bool isActivatedSubmit() const;
   WEBKIT_API void setActivatedSubmit(bool);
   WEBKIT_API void setValue(const WebString& value);
   WEBKIT_API WebString value() const;
