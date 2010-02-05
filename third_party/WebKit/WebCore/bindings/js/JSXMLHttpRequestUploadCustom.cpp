@@ -48,7 +48,7 @@ void JSXMLHttpRequestUpload::markChildren(MarkStack& markStack) {
     markDOMObjectWrapper(markStack, *Heap::heap(this)->globalData(),
                          xmlHttpRequest);
 
-  m_impl->markEventListeners(markStack);
+  m_impl->markJSEventListeners(markStack);
 }
 
 JSValue JSXMLHttpRequestUpload::addEventListener(ExecState* exec,
@@ -57,10 +57,10 @@ JSValue JSXMLHttpRequestUpload::addEventListener(ExecState* exec,
   if (!listener.isObject())
     return jsUndefined();
 
-  impl()->addEventListener(
-      args.at(0).toString(exec),
-      JSEventListener::create(asObject(listener), false, currentWorld(exec)),
-      args.at(2).toBoolean(exec));
+  impl()->addEventListener(args.at(0).toString(exec),
+                           JSEventListener::create(asObject(listener), this,
+                                                   false, currentWorld(exec)),
+                           args.at(2).toBoolean(exec));
   return jsUndefined();
 }
 
@@ -70,11 +70,11 @@ JSValue JSXMLHttpRequestUpload::removeEventListener(ExecState* exec,
   if (!listener.isObject())
     return jsUndefined();
 
-  impl()->removeEventListener(
-      args.at(0).toString(exec),
-      JSEventListener::create(asObject(listener), false, currentWorld(exec))
-          .get(),
-      args.at(2).toBoolean(exec));
+  impl()->removeEventListener(args.at(0).toString(exec),
+                              JSEventListener::create(asObject(listener), this,
+                                                      false, currentWorld(exec))
+                                  .get(),
+                              args.at(2).toBoolean(exec));
   return jsUndefined();
 }
 

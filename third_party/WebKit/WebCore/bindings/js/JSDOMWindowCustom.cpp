@@ -96,7 +96,7 @@ namespace WebCore {
 void JSDOMWindow::markChildren(MarkStack& markStack) {
   Base::markChildren(markStack);
 
-  impl()->markEventListeners(markStack);
+  impl()->markJSEventListeners(markStack);
 
   JSGlobalData& globalData = *Heap::heap(this)->globalData();
 
@@ -1105,10 +1105,10 @@ JSValue JSDOMWindow::addEventListener(ExecState* exec, const ArgList& args) {
   if (!listener.isObject())
     return jsUndefined();
 
-  impl()->addEventListener(
-      args.at(0).toString(exec),
-      JSEventListener::create(asObject(listener), false, currentWorld(exec)),
-      args.at(2).toBoolean(exec));
+  impl()->addEventListener(args.at(0).toString(exec),
+                           JSEventListener::create(asObject(listener), this,
+                                                   false, currentWorld(exec)),
+                           args.at(2).toBoolean(exec));
   return jsUndefined();
 }
 
@@ -1121,11 +1121,11 @@ JSValue JSDOMWindow::removeEventListener(ExecState* exec, const ArgList& args) {
   if (!listener.isObject())
     return jsUndefined();
 
-  impl()->removeEventListener(
-      args.at(0).toString(exec),
-      JSEventListener::create(asObject(listener), false, currentWorld(exec))
-          .get(),
-      args.at(2).toBoolean(exec));
+  impl()->removeEventListener(args.at(0).toString(exec),
+                              JSEventListener::create(asObject(listener), this,
+                                                      false, currentWorld(exec))
+                                  .get(),
+                              args.at(2).toBoolean(exec));
   return jsUndefined();
 }
 

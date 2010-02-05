@@ -37,10 +37,11 @@ class JSLazyEventListener : public JSEventListener {
       Node* node,
       const String& sourceURL,
       int lineNumber,
+      JSC::JSObject* wrapper,
       DOMWrapperWorld* isolatedWorld) {
     return adoptRef(new JSLazyEventListener(functionName, eventParameterName,
                                             code, node, sourceURL, lineNumber,
-                                            isolatedWorld));
+                                            wrapper, isolatedWorld));
   }
   virtual ~JSLazyEventListener();
 
@@ -51,17 +52,15 @@ class JSLazyEventListener : public JSEventListener {
                       Node*,
                       const String& sourceURL,
                       int lineNumber,
+                      JSC::JSObject* wrapper,
                       DOMWrapperWorld* isolatedWorld);
 
-  virtual JSC::JSObject* jsFunction(ScriptExecutionContext*) const;
+  virtual JSC::JSObject* initializeJSFunction(ScriptExecutionContext*) const;
   virtual bool wasCreatedFromMarkup() const { return true; }
-
-  void parseCode(ScriptExecutionContext*) const;
 
   mutable String m_functionName;
   mutable String m_eventParameterName;
   mutable String m_code;
-  mutable bool m_parsed;
   mutable String m_sourceURL;
   int m_lineNumber;
   Node* m_originalNode;

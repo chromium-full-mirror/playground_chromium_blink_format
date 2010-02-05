@@ -34,22 +34,33 @@ using namespace JSC;
 namespace WebCore {
 
 JSEventListener::JSEventListener(JSObject* function,
+                                 JSObject* wrapper,
                                  bool isAttribute,
                                  DOMWrapperWorld* isolatedWorld)
     : EventListener(JSEventListenerType),
       m_jsFunction(function),
+      m_wrapper(wrapper),
       m_isAttribute(isAttribute),
       m_isolatedWorld(isolatedWorld) {}
 
 JSEventListener::~JSEventListener() {}
 
-JSObject* JSEventListener::jsFunction(ScriptExecutionContext*) const {
-  return m_jsFunction;
+JSObject* JSEventListener::initializeJSFunction(ScriptExecutionContext*) const {
+  ASSERT_NOT_REACHED();
+  return 0;
 }
 
 void JSEventListener::markJSFunction(MarkStack& markStack) {
   if (m_jsFunction)
     markStack.append(m_jsFunction);
+}
+
+void JSEventListener::invalidateJSFunction(JSC::JSObject* wrapper) {
+  // Since m_wrapper is a WeakGCPtr, it pretends to be null, and therefore !=
+  // to wrapper, when it's awaiting destruction. So, we check for == wrapper
+  // or == null.
+  if (!m_wrapper || m_wrapper == wrapper)
+    m_wrapper = 0;
 }
 
 void JSEventListener::handleEvent(

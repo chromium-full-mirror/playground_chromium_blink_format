@@ -143,8 +143,8 @@ class EventTarget {
   bool isFiringEventListeners();
 
 #if USE(JSC)
-  void markEventListeners(JSC::MarkStack&);
-  void invalidateEventListeners();
+  void markJSEventListeners(JSC::MarkStack&);
+  void invalidateJSEventListeners(JSC::JSObject*);
 #endif
 
  protected:
@@ -215,7 +215,7 @@ inline void allowEventDispatch() {}
 #endif
 
 #if USE(JSC)
-inline void EventTarget::markEventListeners(JSC::MarkStack& markStack) {
+inline void EventTarget::markJSEventListeners(JSC::MarkStack& markStack) {
   EventTargetData* d = eventTargetData();
   if (!d)
     return;
@@ -229,13 +229,18 @@ inline void EventTarget::markEventListeners(JSC::MarkStack& markStack) {
   }
 }
 
-inline void EventTarget::invalidateEventListeners() {
+inline void EventTarget::invalidateJSEventListeners(JSC::JSObject* wrapper) {
   EventTargetData* d = eventTargetData();
   if (!d)
     return;
 
-  deleteAllValues(d->eventListenerMap);
-  d->eventListenerMap.clear();
+  EventListenerMap::iterator end = d->eventListenerMap.end();
+  for (EventListenerMap::iterator it = d->eventListenerMap.begin(); it != end;
+       ++it) {
+    EventListenerVector& entry = *it->second;
+    for (size_t i = 0; i < entry.size(); ++i)
+      entry[i].listener->invalidateJSFunction(wrapper);
+  }
 }
 #endif
 

@@ -37,6 +37,7 @@
 #include "JSNode.h"
 #include "Frame.h"
 #include "XSSAuditor.h"
+#include <runtime/JSLock.h>
 
 using namespace JSC;
 
@@ -57,6 +58,7 @@ PassRefPtr<JSLazyEventListener> createAttributeEventListener(Node* node,
 
   int lineNumber = 1;
   String sourceURL;
+  JSObject* wrapper = 0;
 
   // FIXME: We should be able to provide accurate source information for
   // frameless documents, too (e.g. for importing nodes from
@@ -74,11 +76,17 @@ PassRefPtr<JSLazyEventListener> createAttributeEventListener(Node* node,
 
     lineNumber = scriptController->eventHandlerLineNumber();
     sourceURL = node->document()->url().string();
+
+    JSC::JSLock lock(SilenceAssertionsOnly);
+    JSDOMGlobalObject* globalObject =
+        toJSDOMGlobalObject(node->document(), mainThreadNormalWorld());
+    wrapper = asObject(toJS(globalObject->globalExec(), globalObject, node));
   }
 
-  return JSLazyEventListener::create(
-      attr->localName().string(), eventParameterName(node->isSVGElement()),
-      attr->value(), node, sourceURL, lineNumber, mainThreadNormalWorld());
+  return JSLazyEventListener::create(attr->localName().string(),
+                                     eventParameterName(node->isSVGElement()),
+                                     attr->value(), node, sourceURL, lineNumber,
+                                     wrapper, mainThreadNormalWorld());
 }
 
 PassRefPtr<JSLazyEventListener> createAttributeEventListener(Frame* frame,
@@ -105,19 +113,23 @@ PassRefPtr<JSLazyEventListener> createAttributeEventListener(Frame* frame,
 
   lineNumber = scriptController->eventHandlerLineNumber();
   sourceURL = frame->document()->url().string();
+  JSObject* wrapper = toJSDOMWindow(frame, mainThreadNormalWorld());
   return JSLazyEventListener::create(
       attr->localName().string(),
       eventParameterName(frame->document()->isSVGDocument()), attr->value(), 0,
-      sourceURL, lineNumber, mainThreadNormalWorld());
+      sourceURL, lineNumber, wrapper, mainThreadNormalWorld());
 }
 
 String getEventListenerHandlerBody(ScriptExecutionContext* context,
                                    ScriptState* scriptState,
                                    EventListener* eventListener) {
-  JSC::JSObject* functionObject = eventListener->jsFunction(context);
-  if (!functionObject)
+  const JSEventListener* jsListener = JSEventListener::cast(eventListener);
+  if (!jsListener)
     return "";
-  return functionObject->toString(scriptState);
+  JSC::JSObject* jsFunction = jsListener->jsFunction(context);
+  if (!jsFunction)
+    return "";
+  return jsFunction->toString(scriptState);
 }
 
 }  // namespace WebCore
