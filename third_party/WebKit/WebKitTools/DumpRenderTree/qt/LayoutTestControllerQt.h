@@ -115,6 +115,8 @@ class LayoutTestController : public QObject {
   void dumpSelectionRect() const {}
   void showWebInspector();
   void hideWebInspector();
+
+  void setFrameSetFlatteningEnabled(bool enable);
   void setAllowUniversalAccessFromFileURLs(bool enable);
   void setJavaScriptProfilingEnabled(bool enable);
   void setFixedContentsSize(int width, int height);

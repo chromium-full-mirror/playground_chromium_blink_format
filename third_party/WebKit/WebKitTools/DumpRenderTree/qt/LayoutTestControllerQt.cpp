@@ -38,6 +38,7 @@
 
 extern void qt_dump_editing_callbacks(bool b);
 extern void qt_dump_resource_load_callbacks(bool b);
+extern void qt_drt_setFrameSetFlatteningEnabled(QWebPage*, bool);
 extern void qt_drt_setJavaScriptProfilingEnabled(QWebFrame*, bool enabled);
 extern bool qt_drt_pauseAnimation(QWebFrame*,
                                   const QString& name,
@@ -286,6 +287,10 @@ void LayoutTestController::showWebInspector() {
 
 void LayoutTestController::hideWebInspector() {
   m_drt->webPage()->webInspector()->hide();
+}
+
+void LayoutTestController::setFrameSetFlatteningEnabled(bool enabled) {
+  qt_drt_setFrameSetFlatteningEnabled(m_drt->webPage(), enabled);
 }
 
 void LayoutTestController::setAllowUniversalAccessFromFileURLs(bool enabled) {

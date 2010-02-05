@@ -35,6 +35,7 @@ class RenderFrame : public RenderPart {
   RenderFrame(HTMLFrameElement*);
 
   FrameEdgeInfo edgeInfo() const;
+  void layoutWithFlattening(bool fixedWidth, bool fixedHeight);
 
  private:
   virtual const char* renderName() const { return "RenderFrame"; }

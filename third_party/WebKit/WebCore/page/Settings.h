@@ -237,6 +237,9 @@ class Settings : public Noncopyable {
   void setDeveloperExtrasEnabled(bool);
   bool developerExtrasEnabled() const { return m_developerExtrasEnabled; }
 
+  void setFrameSetFlatteningEnabled(bool);
+  bool frameSetFlatteningEnabled() const { return m_frameSetFlatteningEnabled; }
+
   void setAuthorAndUserStylesEnabled(bool);
   bool authorAndUserStylesEnabled() const {
     return m_authorAndUserStylesEnabled;
@@ -404,6 +407,7 @@ class Settings : public Noncopyable {
   bool m_authorAndUserStylesEnabled : 1;
   bool m_needsSiteSpecificQuirks : 1;
   unsigned m_fontRenderingMode : 1;
+  bool m_frameSetFlatteningEnabled : 1;
   bool m_webArchiveDebugModeEnabled : 1;
   bool m_localFileContentSniffingEnabled : 1;
   bool m_inApplicationChromeMode : 1;

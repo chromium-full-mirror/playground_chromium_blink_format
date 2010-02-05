@@ -72,6 +72,8 @@ class RenderFrameSet : public RenderBox {
   bool canResizeRow(const IntPoint&) const;
   bool canResizeColumn(const IntPoint&) const;
 
+  bool flattenFrameSet() const;
+
  private:
   static const int noSplit = -1;
 
@@ -114,6 +116,7 @@ class RenderFrameSet : public RenderBox {
   void computeEdgeInfo();
   void fillFromEdgeInfo(const FrameEdgeInfo& edgeInfo, int r, int c);
   void positionFrames();
+  void positionFramesWithFlattening();
 
   int splitPosition(const GridAxis&, int split) const;
   int hitTestSplit(const GridAxis&, int position) const;
