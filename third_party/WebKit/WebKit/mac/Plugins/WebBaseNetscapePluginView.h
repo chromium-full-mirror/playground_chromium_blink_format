@@ -118,6 +118,7 @@ class WebHaltablePlugin;
 
 - (void)addWindowObservers;
 - (void)removeWindowObservers;
+- (BOOL)shouldClipOutPlugin;
 
 - (BOOL)convertFromX:(double)sourceX
                 andY:(double)sourceY
