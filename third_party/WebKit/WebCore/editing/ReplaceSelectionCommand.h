@@ -69,6 +69,9 @@ class ReplaceSelectionCommand : public CompositeEditCommand {
   void insertNodeAtAndUpdateNodesInserted(PassRefPtr<Node>, const Position&);
   void insertNodeBeforeAndUpdateNodesInserted(PassRefPtr<Node> insertChild,
                                               Node* refChild);
+  Node* insertAsListItems(PassRefPtr<Node>,
+                          Node* insertionNode,
+                          const Position&);
 
   void updateNodesInserted(Node*);
   bool shouldRemoveEndBR(Node*, const VisiblePosition&);
