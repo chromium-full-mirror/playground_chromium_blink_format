@@ -344,4 +344,8 @@ void SQLiteDatabase::unlock() {
   m_lockingMutex.unlock();
 }
 
+bool SQLiteDatabase::isAutoCommitOn() const {
+  return sqlite3_get_autocommit(m_db);
+}
+
 }  // namespace WebCore

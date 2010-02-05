@@ -336,7 +336,8 @@ void SQLTransaction::runStatements() {
   // have no associated
   // SQLStatementCallback objects, then we can burn through the queue
   do {
-    if (m_shouldRetryCurrentStatement) {
+    if (m_shouldRetryCurrentStatement &&
+        !m_sqliteTransaction->wasRolledBackBySqlite()) {
       m_shouldRetryCurrentStatement = false;
       // FIXME - Another place that needs fixing up after
       // <rdar://problem/5628468> is addressed.
@@ -425,8 +426,9 @@ bool SQLTransaction::runCurrentStatement() {
 void SQLTransaction::handleCurrentStatementError() {
   // Transaction Steps 6.error - Call the statement's error callback, but if
   // there was no error callback,
-  // jump to the transaction error callback
-  if (m_currentStatement->hasStatementErrorCallback()) {
+  // or the transaction was rolled back, jump to the transaction error callback
+  if (m_currentStatement->hasStatementErrorCallback() &&
+      !m_sqliteTransaction->wasRolledBackBySqlite()) {
     m_nextStep = &SQLTransaction::deliverStatementCallback;
     LOG(StorageAPI, "Scheduling deliverStatementCallback for transaction %p\n",
         this);

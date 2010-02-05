@@ -43,6 +43,7 @@ class SQLiteTransaction : public Noncopyable {
   void stop();
 
   bool inProgress() const { return m_inProgress; }
+  bool wasRolledBackBySqlite() const;
 
  private:
   SQLiteDatabase& m_db;
