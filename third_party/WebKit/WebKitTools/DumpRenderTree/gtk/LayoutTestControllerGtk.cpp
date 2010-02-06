@@ -69,6 +69,10 @@ void webkit_white_list_access_from_origin(const gchar* sourceOrigin,
                                           bool allowDestinationSubdomains);
 gchar* webkit_web_frame_counter_value_for_element_by_id(WebKitWebFrame* frame,
                                                         const gchar* id);
+int webkit_web_frame_page_number_for_element_by_id(WebKitWebFrame* frame,
+                                                   const gchar* id,
+                                                   float pageWidth,
+                                                   float pageHeight);
 void webkit_web_inspector_execute_script(WebKitWebInspector* inspector,
                                          long callId,
                                          const gchar* script);
@@ -156,9 +160,14 @@ void LayoutTestController::keepWebHistory() {
   // FIXME: implement
 }
 
-int LayoutTestController::pageNumberForElementById(JSStringRef, float, float) {
-  // FIXME: implement
-  return -1;
+int LayoutTestController::pageNumberForElementById(JSStringRef id,
+                                                   float pageWidth,
+                                                   float pageHeight) {
+  gchar* idGChar = JSStringCopyUTF8CString(id);
+  int pageNumber = webkit_web_frame_page_number_for_element_by_id(
+      mainFrame, idGChar, pageWidth, pageHeight);
+  g_free(idGChar);
+  return pageNumber;
 }
 
 size_t LayoutTestController::webHistoryItemCount() {
