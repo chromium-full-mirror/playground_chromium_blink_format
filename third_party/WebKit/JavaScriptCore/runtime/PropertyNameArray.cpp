@@ -29,7 +29,7 @@ namespace JSC {
 static const size_t setThreshold = 20;
 
 void PropertyNameArray::add(UString::Rep* identifier) {
-  ASSERT(identifier == &UString::Rep::null() ||
+  ASSERT(identifier == UString::null().rep() ||
          identifier == &UString::Rep::empty() || identifier->isIdentifier());
 
   size_t size = m_data->propertyNameVector().size();

@@ -39,7 +39,7 @@ Profile::Profile(const UString& title, unsigned uid)
     : m_title(title), m_uid(uid) {
   // FIXME: When multi-threading is supported this will be a vector and calls
   // into the profiler will need to know which thread it is executing on.
-  m_head = ProfileNode::create(CallIdentifier("Thread_1", 0, 0), 0, 0);
+  m_head = ProfileNode::create(CallIdentifier("Thread_1", UString(), 0), 0, 0);
 }
 
 Profile::~Profile() {}

@@ -93,15 +93,9 @@ class UStringImpl : Noncopyable {
     return &empty();
   }
 
-  static PassRefPtr<UStringImpl> create(const UChar* buffer, int length) {
-    UChar* newBuffer;
-    if (PassRefPtr<UStringImpl> impl =
-            tryCreateUninitialized(length, newBuffer)) {
-      copyChars(newBuffer, buffer, length);
-      return impl;
-    }
-    return &null();
-  }
+  static PassRefPtr<UStringImpl> create(const char* c);
+  static PassRefPtr<UStringImpl> create(const char* c, int length);
+  static PassRefPtr<UStringImpl> create(const UChar* buffer, int length);
 
   static PassRefPtr<UStringImpl> create(PassRefPtr<UStringImpl> rep,
                                         int offset,
@@ -212,7 +206,6 @@ class UStringImpl : Noncopyable {
   }
   static unsigned computeHash(const char* s) { return WTF::stringHash(s); }
 
-  static UStringImpl& null() { return *s_null; }
   static UStringImpl& empty() { return *s_empty; }
 
   ALWAYS_INLINE void checkConsistency() const {
@@ -334,7 +327,6 @@ class UStringImpl : Noncopyable {
   mutable unsigned m_isIdentifier : 1;
   UntypedPtrAndBitfield m_dataBuffer;
 
-  JS_EXPORTDATA static UStringImpl* s_null;
   JS_EXPORTDATA static UStringImpl* s_empty;
 
   friend class JIT;

@@ -142,60 +142,23 @@ bool operator==(const CString& c1, const CString& c2) {
 // reduce the possibility of it becoming zero due to ref/deref not being
 // thread-safe.
 static UChar sharedEmptyChar;
-UStringImpl* UStringImpl::s_null;
 UStringImpl* UStringImpl::s_empty;
-UString* UString::nullUString;
+
+UString::Rep* UString::s_nullRep;
+UString* UString::s_nullUString;
 
 void initializeUString() {
-  UStringImpl::s_null =
-      new UStringImpl(0, 0, UStringImpl::ConstructStaticString);
   UStringImpl::s_empty =
       new UStringImpl(&sharedEmptyChar, 0, UStringImpl::ConstructStaticString);
-  UString::nullUString = new UString;
+
+  UString::s_nullRep =
+      new UStringImpl(0, 0, UStringImpl::ConstructStaticString);
+  UString::s_nullUString = new UString;
 }
 
-static PassRefPtr<UString::Rep> createRep(const char* c) {
-  if (!c)
-    return &UString::Rep::null();
+UString::UString(const char* c) : m_rep(Rep::create(c)) {}
 
-  if (!c[0])
-    return &UString::Rep::empty();
-
-  size_t length = strlen(c);
-  UChar* d;
-  PassRefPtr<UStringImpl> result =
-      UStringImpl::tryCreateUninitialized(length, d);
-  if (!result)
-    return &UString::Rep::null();
-
-  for (size_t i = 0; i < length; i++)
-    d[i] = static_cast<unsigned char>(
-        c[i]);  // use unsigned char to zero-extend instead of sign-extend
-  return result;
-}
-
-static inline PassRefPtr<UString::Rep> createRep(const char* c, int length) {
-  if (!c)
-    return &UString::Rep::null();
-
-  if (!length)
-    return &UString::Rep::empty();
-
-  UChar* d;
-  PassRefPtr<UStringImpl> result =
-      UStringImpl::tryCreateUninitialized(length, d);
-  if (!result)
-    return &UString::Rep::null();
-
-  for (int i = 0; i < length; i++)
-    d[i] = static_cast<unsigned char>(
-        c[i]);  // use unsigned char to zero-extend instead of sign-extend
-  return result;
-}
-
-UString::UString(const char* c) : m_rep(createRep(c)) {}
-
-UString::UString(const char* c, int length) : m_rep(createRep(c, length)) {}
+UString::UString(const char* c, int length) : m_rep(Rep::create(c, length)) {}
 
 UString::UString(const UChar* c, int length) {
   if (length == 0)
@@ -450,7 +413,7 @@ char* UString::ascii() const {
 
 UString& UString::operator=(const char* c) {
   if (!c) {
-    m_rep = &Rep::null();
+    m_rep = s_nullRep;
     return *this;
   }
 
@@ -467,7 +430,8 @@ UString& UString::operator=(const char* c) {
       d[i] = static_cast<unsigned char>(
           c[i]);  // use unsigned char to zero-extend instead of sign-extend
   } else
-    makeNull();
+    m_rep = s_nullRep;
+  ;
 
   return *this;
 }
@@ -863,18 +827,6 @@ CString UString::UTF8String(bool strict) const {
     return CString();
 
   return CString(buffer.data(), p - buffer.data());
-}
-
-// For use in error handling code paths -- having this not be inlined helps
-// avoid PIC branches to fetch the global on Mac OS X.
-NEVER_INLINE void UString::makeNull() {
-  m_rep = &Rep::null();
-}
-
-// For use in error handling code paths -- having this not be inlined helps
-// avoid PIC branches to fetch the global on Mac OS X.
-NEVER_INLINE UString::Rep* UString::nullRep() {
-  return &Rep::null();
 }
 
 }  // namespace JSC

@@ -146,7 +146,7 @@ class UString {
 
   const UChar* data() const { return m_rep->data(); }
 
-  bool isNull() const { return m_rep == &Rep::null(); }
+  bool isNull() const { return m_rep == s_nullRep; }
   bool isEmpty() const { return !m_rep->size(); }
 
   bool is8Bit() const;
@@ -172,20 +172,19 @@ class UString {
 
   UString substr(int pos = 0, int len = -1) const;
 
-  static const UString& null() { return *nullUString; }
+  static const UString& null() { return *s_nullUString; }
 
   Rep* rep() const { return m_rep.get(); }
-  static Rep* nullRep();
 
   UString(PassRefPtr<Rep> r) : m_rep(r) { ASSERT(m_rep); }
 
   size_t cost() const { return m_rep->cost(); }
 
  private:
-  void makeNull();
-
   RefPtr<Rep> m_rep;
-  static UString* nullUString;
+
+  JS_EXPORTDATA static Rep* s_nullRep;
+  static UString* s_nullUString;
 
   friend void initializeUString();
   friend bool operator==(const UString&, const UString&);
@@ -234,7 +233,7 @@ inline bool operator!=(const char* s1, const UString& s2) {
 
 int compare(const UString&, const UString&);
 
-inline UString::UString() : m_rep(&Rep::null()) {}
+inline UString::UString() : m_rep(s_nullRep) {}
 
 // Rule from ECMA 15.2 about what an array index is.
 // Must exactly match string form of an unsigned integer, and be less than 2^32
