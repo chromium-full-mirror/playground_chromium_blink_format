@@ -87,6 +87,15 @@ inline StringImpl::StringImpl(const UChar* characters, unsigned length)
     : m_data(characters), m_length(length), m_hash(0) {
   ASSERT(characters);
   ASSERT(length);
+  ASSERT(!bufferIsInternal());
+}
+
+inline StringImpl::StringImpl(unsigned length)
+    : m_data(reinterpret_cast<const UChar*>(this + 1)),
+      m_length(length),
+      m_hash(0) {
+  ASSERT(length);
+  ASSERT(bufferIsInternal());
 }
 
 StringImpl::~StringImpl() {
@@ -891,7 +900,7 @@ PassRefPtr<StringImpl> StringImpl::createUninitialized(unsigned length,
   size_t size = sizeof(StringImpl) + length * sizeof(UChar);
   StringImpl* string = static_cast<StringImpl*>(fastMalloc(size));
   data = reinterpret_cast<UChar*>(string + 1);
-  string = new (string) StringImpl(data, length);
+  string = new (string) StringImpl(length);
   return adoptRef(string);
 }
 
