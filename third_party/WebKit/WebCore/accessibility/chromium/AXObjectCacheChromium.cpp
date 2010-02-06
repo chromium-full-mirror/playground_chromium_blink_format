@@ -26,20 +26,10 @@
 
 #include "config.h"
 #include "AXObjectCache.h"
+
 #include "AccessibilityObject.h"
-#include "Chrome.h"
-#include "ChromeClientChromium.h"
-#include "FrameView.h"
 
 namespace WebCore {
-
-static ChromeClientChromium* toChromeClientChromium(FrameView* view) {
-  Page* page = view->frame() ? view->frame()->page() : 0;
-  if (!page)
-    return 0;
-
-  return static_cast<ChromeClientChromium*>(page->chrome()->client());
-}
 
 void AXObjectCache::detachWrapper(AccessibilityObject* obj) {
   // In Chromium, AccessibilityObjects are wrapped lazily.
@@ -51,17 +41,8 @@ void AXObjectCache::attachWrapper(AccessibilityObject*) {
   // In Chromium, AccessibilityObjects are wrapped lazily.
 }
 
-void AXObjectCache::postPlatformNotification(AccessibilityObject* obj,
-                                             AXNotification notification) {
-  if (!obj || !obj->documentFrameView() ||
-      notification != AXCheckedStateChanged)
-    return;
-
-  ChromeClientChromium* client =
-      toChromeClientChromium(obj->documentFrameView());
-  if (client)
-    client->didChangeAccessibilityObjectState(obj);
-}
+void AXObjectCache::postPlatformNotification(AccessibilityObject*,
+                                             AXNotification) {}
 
 void AXObjectCache::handleFocusedUIElementChanged(RenderObject*,
                                                   RenderObject*) {}
