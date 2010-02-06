@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2006, 2007 Apple, Inc.  All rights reserved.
- * Copyright (C) 2009 Google, Inc.  All rights reserved.
+ * Copyright (C) 2010 Google, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -598,7 +598,7 @@ void EditorClientImpl::textFieldDidEndEditing(Element* element) {
   m_autofillTimer.stop();
 
   // Hide any showing popup.
-  m_webView->hideAutoCompletePopup();
+  m_webView->hideSuggestionsPopup();
 
   if (!m_webView->client())
     return;  // The page is getting closed, don't fill the password.
@@ -689,7 +689,7 @@ void EditorClientImpl::doAutofill(Timer<EditorClientImpl>* timer) {
         inputElement->selectionEnd() == static_cast<int>(value.length());
 
   if ((!args->autofillOnEmptyValue && value.isEmpty()) || !isCaretAtEnd) {
-    m_webView->hideAutoCompletePopup();
+    m_webView->hideSuggestionsPopup();
     return;
   }
 
