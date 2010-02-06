@@ -126,9 +126,11 @@ NPError NPP_New(NPMIMEType pluginType,
   NPBool supportsCocoa = false;
 
 #ifndef NP_NO_CARBON
+  // A browser that doesn't know about NPNVsupportsCarbonBool is one that only
+  // supports Carbon event model.
   if (browser->getvalue(instance, NPNVsupportsCarbonBool, &supportsCarbon) !=
       NPERR_NO_ERROR)
-    supportsCarbon = false;
+    supportsCarbon = true;
 #endif
 
   if (browser->getvalue(instance, NPNVsupportsCocoaBool, &supportsCocoa) !=
