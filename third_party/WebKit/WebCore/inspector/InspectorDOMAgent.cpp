@@ -197,7 +197,8 @@ bool InspectorDOMAgent::pushDocumentToFrontend() {
 void InspectorDOMAgent::pushChildNodesToFrontend(long nodeId) {
   Node* node = nodeForId(nodeId);
   if (!node || (node->nodeType() != Node::ELEMENT_NODE &&
-                node->nodeType() != Node::DOCUMENT_NODE))
+                node->nodeType() != Node::DOCUMENT_NODE &&
+                node->nodeType() != Node::DOCUMENT_FRAGMENT_NODE))
     return;
   if (m_childrenRequested.contains(nodeId))
     return;
@@ -465,7 +466,8 @@ ScriptObject InspectorDOMAgent::buildObjectForNode(Node* node,
   value.set("nodeValue", nodeValue);
 
   if (node->nodeType() == Node::ELEMENT_NODE ||
-      node->nodeType() == Node::DOCUMENT_NODE) {
+      node->nodeType() == Node::DOCUMENT_NODE ||
+      node->nodeType() == Node::DOCUMENT_FRAGMENT_NODE) {
     int nodeCount = innerChildNodeCount(node);
     value.set("childNodeCount", nodeCount);
     ScriptArray children =
@@ -482,7 +484,7 @@ ScriptObject InspectorDOMAgent::buildObjectForNode(Node* node,
         value.set("documentURL",
                   documentURLString(frameOwner->contentDocument()));
       }
-    } else {
+    } else if (node->nodeType() == Node::DOCUMENT_NODE) {
       Document* document = static_cast<Document*>(node);
       value.set("documentURL", documentURLString(document));
     }
