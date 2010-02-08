@@ -31,11 +31,11 @@
 #include "Interpreter.h"
 #include "JSGlobalObject.h"
 #include "JSString.h"
+#include "JSStringBuilder.h"
 #include "Lexer.h"
 #include "LiteralParser.h"
 #include "Nodes.h"
 #include "Parser.h"
-#include "StringBuilder.h"
 #include "StringExtras.h"
 #include "dtoa.h"
 #include <stdio.h>
@@ -60,7 +60,7 @@ static JSValue encode(ExecState* exec,
     return throwError(exec, URIError,
                       "String contained an illegal UTF-16 sequence.");
 
-  StringBuilder builder;
+  JSStringBuilder builder;
   const char* p = cstr.c_str();
   for (size_t k = 0; k < cstr.size(); k++, p++) {
     char c = *p;
@@ -72,14 +72,14 @@ static JSValue encode(ExecState* exec,
       builder.append((const char*)tmp);
     }
   }
-  return jsString(exec, builder.release());
+  return builder.releaseJSString(exec);
 }
 
 static JSValue decode(ExecState* exec,
                       const ArgList& args,
                       const char* doNotUnescape,
                       bool strict) {
-  StringBuilder builder;
+  JSStringBuilder builder;
   UString str = args.at(0).toString(exec);
   int k = 0;
   int len = str.size();
@@ -143,7 +143,7 @@ static JSValue decode(ExecState* exec,
     k++;
     builder.append(c);
   }
-  return jsString(exec, builder.release());
+  return builder.releaseJSString(exec);
 }
 
 bool isStrWhiteSpace(UChar c) {
@@ -415,8 +415,7 @@ JSValue JSC_HOST_CALL globalFuncEscape(ExecState* exec,
       "0123456789"
       "*+-./@_";
 
-  StringBuilder builder;
-  UString s;
+  JSStringBuilder builder;
   UString str = args.at(0).toString(exec);
   const UChar* c = str.data();
   for (int k = 0; k < str.size(); k++, c++) {
@@ -424,18 +423,17 @@ JSValue JSC_HOST_CALL globalFuncEscape(ExecState* exec,
     if (u > 255) {
       char tmp[7];
       sprintf(tmp, "%%u%04X", u);
-      s = UString(tmp);
+      builder.append((const char*)tmp);
     } else if (u != 0 && strchr(do_not_escape, static_cast<char>(u)))
-      s = UString(c, 1);
+      builder.append(c, 1);
     else {
       char tmp[4];
       sprintf(tmp, "%%%02X", u);
-      s = UString(tmp);
+      builder.append((const char*)tmp);
     }
-    builder.append(s);
   }
 
-  return jsString(exec, builder.release());
+  return builder.releaseJSString(exec);
 }
 
 JSValue JSC_HOST_CALL globalFuncUnescape(ExecState* exec,
