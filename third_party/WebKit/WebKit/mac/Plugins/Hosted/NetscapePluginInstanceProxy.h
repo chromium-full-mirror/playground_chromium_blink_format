@@ -241,6 +241,9 @@ class NetscapePluginInstanceProxy
   void didDraw();
   void privateBrowsingModeDidChange(bool isPrivateBrowsingEnabled);
 
+  static void setGlobalException(const WebCore::String&);
+  static void moveGlobalExceptionToExecState(JSC::ExecState*);
+
   // Reply structs
   struct Reply {
     enum Type {
