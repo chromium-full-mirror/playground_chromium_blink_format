@@ -30,12 +30,12 @@
 
 #if PLATFORM(CAIRO)
 
+#include "AffineTransform.h"
 #include "Color.h"
 #include "FloatRect.h"
 #include "GraphicsContext.h"
 #include "ImageBuffer.h"
 #include "ImageObserver.h"
-#include "TransformationMatrix.h"
 #include <cairo.h>
 #include <math.h>
 #include <wtf/OwnPtr.h>
@@ -179,7 +179,7 @@ void BitmapImage::draw(GraphicsContext* context,
 
 void Image::drawPattern(GraphicsContext* context,
                         const FloatRect& tileRect,
-                        const TransformationMatrix& patternTransform,
+                        const AffineTransform& patternTransform,
                         const FloatPoint& phase,
                         ColorSpace,
                         CompositeOperator op,

@@ -416,7 +416,7 @@ class RenderBox : public RenderBoxModelObject {
   virtual bool avoidsFloats() const;
 
 #if ENABLE(SVG)
-  virtual TransformationMatrix localTransform() const;
+  virtual AffineTransform localTransform() const;
 #endif
 
  protected:

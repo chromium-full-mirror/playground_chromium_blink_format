@@ -29,7 +29,7 @@
 
 #if ENABLE(SVG)
 
-#include "TransformationMatrix.h"
+#include "AffineTransform.h"
 #include "Color.h"
 #include "Gradient.h"
 #include "GraphicsContext.h"
@@ -59,8 +59,8 @@ class SVGPaintServerGradient : public SVGPaintServer {
   bool boundingBoxMode() const;
   void setBoundingBoxMode(bool mode = true);
 
-  TransformationMatrix gradientTransform() const;
-  void setGradientTransform(const TransformationMatrix&);
+  AffineTransform gradientTransform() const;
+  void setGradientTransform(const AffineTransform&);
 
   void setGradientStops(const Vector<SVGGradientStop>& stops) {
     m_stops = stops;
@@ -85,7 +85,7 @@ class SVGPaintServerGradient : public SVGPaintServer {
   Vector<SVGGradientStop> m_stops;
   RefPtr<Gradient> m_gradient;
   bool m_boundingBoxMode;
-  TransformationMatrix m_gradientTransform;
+  AffineTransform m_gradientTransform;
   const SVGGradientElement* m_ownerElement;
 
 #if PLATFORM(CG)

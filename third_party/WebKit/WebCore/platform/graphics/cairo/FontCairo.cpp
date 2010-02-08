@@ -29,13 +29,13 @@
 #include "config.h"
 #include "Font.h"
 
+#include "AffineTransform.h"
 #include "GlyphBuffer.h"
 #include "Gradient.h"
 #include "GraphicsContext.h"
 #include "ImageBuffer.h"
 #include "Pattern.h"
 #include "SimpleFontData.h"
-#include "TransformationMatrix.h"
 
 #define SYNTHETIC_OBLIQUE_ANGLE 14
 
@@ -147,7 +147,7 @@ void Font::drawGlyphs(GraphicsContext* context,
         cairo_pop_group_to_source(cr);
       }
     } else if (context->fillPattern()) {
-      TransformationMatrix affine;
+      AffineTransform affine;
       cairo_set_source(cr,
                        context->fillPattern()->createPlatformPattern(affine));
       if (context->getAlpha() < 1.0f) {
@@ -178,7 +178,7 @@ void Font::drawGlyphs(GraphicsContext* context,
         cairo_pop_group_to_source(cr);
       }
     } else if (context->strokePattern()) {
-      TransformationMatrix affine;
+      AffineTransform affine;
       cairo_set_source(cr,
                        context->strokePattern()->createPlatformPattern(affine));
       if (context->getAlpha() < 1.0f) {

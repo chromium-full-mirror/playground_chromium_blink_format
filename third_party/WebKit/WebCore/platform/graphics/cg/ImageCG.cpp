@@ -28,7 +28,7 @@
 
 #if PLATFORM(CG)
 
-#include "TransformationMatrix.h"
+#include "AffineTransform.h"
 #include "FloatConversion.h"
 #include "FloatRect.h"
 #include "GraphicsContext.h"
@@ -267,7 +267,7 @@ static void drawPatternCallback(void* info, CGContextRef context) {
 
 void Image::drawPattern(GraphicsContext* ctxt,
                         const FloatRect& tileRect,
-                        const TransformationMatrix& patternTransform,
+                        const AffineTransform& patternTransform,
                         const FloatPoint& phase,
                         ColorSpace styleColorSpace,
                         CompositeOperator op,

@@ -30,7 +30,7 @@
 
 namespace WebCore {
 
-class TransformationMatrix;
+class AffineTransform;
 
 class SVGAnimateTransformElement : public SVGAnimationElement {
  public:

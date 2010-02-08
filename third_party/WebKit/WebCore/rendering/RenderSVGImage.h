@@ -24,11 +24,11 @@
 #define RenderSVGImage_h
 
 #if ENABLE(SVG)
+#include "AffineTransform.h"
 #include "FloatRect.h"
 #include "RenderImage.h"
 #include "SVGPreserveAspectRatio.h"
 #include "SVGRenderSupport.h"
-#include "TransformationMatrix.h"
 
 namespace WebCore {
 
@@ -43,7 +43,7 @@ class RenderSVGImage : public RenderImage, SVGRenderBase {
   virtual const char* renderName() const { return "RenderSVGImage"; }
   virtual bool isSVGImage() const { return true; }
 
-  virtual const TransformationMatrix& localToParentTransform() const {
+  virtual const AffineTransform& localToParentTransform() const {
     return m_localTransform;
   }
 
@@ -85,11 +85,9 @@ class RenderSVGImage : public RenderImage, SVGRenderBase {
                            int ty,
                            HitTestAction);
 
-  virtual TransformationMatrix localTransform() const {
-    return m_localTransform;
-  }
+  virtual AffineTransform localTransform() const { return m_localTransform; }
 
-  TransformationMatrix m_localTransform;
+  AffineTransform m_localTransform;
   FloatRect m_localBounds;
   mutable FloatRect m_cachedLocalRepaintRect;
 };

@@ -48,19 +48,19 @@ class JSSVGPODTypeWrapper : public RefCounted<JSSVGPODTypeWrapper<PODType>> {
 // This file contains JS wrapper objects for SVG datatypes, that are passed
 // around by value
 // in WebCore/svg (aka. 'POD types'). For instance SVGMatrix is mapped to
-// TransformationMatrix, and
+// AffineTransform, and
 // passed around as const reference. SVG DOM demands these objects to be "live",
 // changes to any
 // of the writable attributes of SVGMatrix need to be reflected in the object
 // which exposed the
 // SVGMatrix object (i.e. 'someElement.transform.matrix.a = 50.0', in that case
 // 'SVGTransform').
-// The SVGTransform class stores its "TransformationMatrix m_matrix" object on
-// the stack. If it would
+// The SVGTransform class stores its "AffineTransform m_matrix" object on the
+// stack. If it would
 // be stored as pointer we could just build an auto-generated JSSVG* wrapper
 // object around it
 // and all changes to that object would automatically affect the
-// TransformationMatrix* object stored
+// AffineTransform* object stored
 // in the SVGTransform object. For the sake of efficiency and memory we don't
 // pass around any
 // primitive values as pointers, so a custom JS wrapper object is needed for all

@@ -74,7 +74,7 @@ class FloatSize;
 class GraphicsContext;
 class SharedBuffer;
 class String;
-class TransformationMatrix;
+class AffineTransform;
 
 // This class gets notified when an image creates or destroys decoded frames and
 // when it advances animation frames.
@@ -200,7 +200,7 @@ class Image : public RefCounted<Image> {
 
   virtual void drawPattern(GraphicsContext*,
                            const FloatRect& srcRect,
-                           const TransformationMatrix& patternTransform,
+                           const AffineTransform& patternTransform,
                            const FloatPoint& phase,
                            ColorSpace styleColorSpace,
                            CompositeOperator,

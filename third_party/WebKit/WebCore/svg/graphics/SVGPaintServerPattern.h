@@ -28,7 +28,7 @@
 
 #if ENABLE(SVG)
 
-#include "TransformationMatrix.h"
+#include "AffineTransform.h"
 #include "FloatRect.h"
 #include "Pattern.h"
 #include "SVGPaintServer.h"
@@ -62,8 +62,8 @@ class SVGPaintServerPattern : public SVGPaintServer {
   ImageBuffer* tile() const;
   void setTile(PassOwnPtr<ImageBuffer>);
 
-  TransformationMatrix patternTransform() const;
-  void setPatternTransform(const TransformationMatrix&);
+  AffineTransform patternTransform() const;
+  void setPatternTransform(const AffineTransform&);
 
   virtual TextStream& externalRepresentation(TextStream&) const;
 
@@ -81,7 +81,7 @@ class SVGPaintServerPattern : public SVGPaintServer {
 
   OwnPtr<ImageBuffer> m_tile;
   const SVGPatternElement* m_ownerElement;
-  TransformationMatrix m_patternTransform;
+  AffineTransform m_patternTransform;
   FloatRect m_patternBoundaries;
 
   mutable RefPtr<Pattern> m_pattern;

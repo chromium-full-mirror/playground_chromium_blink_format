@@ -37,7 +37,7 @@ RenderSVGViewportContainer::RenderSVGViewportContainer(SVGStyledElement* node)
     : RenderSVGContainer(node) {}
 
 FloatRect RenderSVGViewportContainer::markerBoundaries(
-    const TransformationMatrix& markerTransformation) const {
+    const AffineTransform& markerTransformation) const {
   FloatRect coordinates = repaintRectInLocalCoordinates();
 
   // Map repaint rect into parent coordinate space, in which the marker
@@ -47,15 +47,15 @@ FloatRect RenderSVGViewportContainer::markerBoundaries(
   return markerTransformation.mapRect(coordinates);
 }
 
-TransformationMatrix RenderSVGViewportContainer::markerContentTransformation(
-    const TransformationMatrix& contentTransformation,
+AffineTransform RenderSVGViewportContainer::markerContentTransformation(
+    const AffineTransform& contentTransformation,
     const FloatPoint& origin,
     float strokeWidth) const {
   // The 'origin' coordinate maps to SVGs refX/refY, given in coordinates
   // relative to the viewport established by the marker
   FloatPoint mappedOrigin = viewportTransform().mapPoint(origin);
 
-  TransformationMatrix transformation = contentTransformation;
+  AffineTransform transformation = contentTransformation;
   if (strokeWidth != -1)
     transformation.scaleNonUniform(strokeWidth, strokeWidth);
 
@@ -93,7 +93,7 @@ void RenderSVGViewportContainer::calcViewport() {
   }
 }
 
-TransformationMatrix RenderSVGViewportContainer::viewportTransform() const {
+AffineTransform RenderSVGViewportContainer::viewportTransform() const {
   if (node()->hasTagName(SVGNames::svgTag)) {
     SVGSVGElement* svg = static_cast<SVGSVGElement*>(node());
     return svg->viewBoxToViewTransform(m_viewport.width(), m_viewport.height());
@@ -103,12 +103,12 @@ TransformationMatrix RenderSVGViewportContainer::viewportTransform() const {
                                           m_viewport.height());
   }
 
-  return TransformationMatrix();
+  return AffineTransform();
 }
 
-const TransformationMatrix& RenderSVGViewportContainer::localToParentTransform()
+const AffineTransform& RenderSVGViewportContainer::localToParentTransform()
     const {
-  TransformationMatrix viewportTranslation;
+  AffineTransform viewportTranslation;
   viewportTranslation.translate(m_viewport.x(), m_viewport.y());
   m_localToParentTransform = viewportTransform() * viewportTranslation;
   return m_localToParentTransform;

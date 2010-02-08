@@ -48,7 +48,7 @@ Pattern::~Pattern() {
 }
 
 void Pattern::setPatternSpaceTransform(
-    const TransformationMatrix& patternSpaceTransformation) {
+    const AffineTransform& patternSpaceTransformation) {
   m_patternSpaceTransformation = patternSpaceTransformation;
   setPlatformPatternSpaceTransform();
 }

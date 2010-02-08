@@ -55,7 +55,7 @@ SVGMarkerElement::SVGMarkerElement(const QualifiedName& tagName, Document* doc)
 
 SVGMarkerElement::~SVGMarkerElement() {}
 
-TransformationMatrix SVGMarkerElement::viewBoxToViewTransform(
+AffineTransform SVGMarkerElement::viewBoxToViewTransform(
     float viewWidth,
     float viewHeight) const {
   return SVGFitToViewBox::viewBoxToViewTransform(

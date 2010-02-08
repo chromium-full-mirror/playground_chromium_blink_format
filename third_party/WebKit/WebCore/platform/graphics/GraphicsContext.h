@@ -122,7 +122,6 @@ class KURL;
 class Path;
 class Pattern;
 class TextRun;
-class TransformationMatrix;
 
 // These bits can be ORed together for a total of 8 possible text drawing modes.
 const int cTextInvisible = 0;
@@ -372,10 +371,8 @@ class GraphicsContext : public Noncopyable {
 
   void setURLForRect(const KURL&, const IntRect&);
 
-  void concatCTM(const TransformationMatrix&);
   void concatCTM(const AffineTransform&);
-  TransformationMatrix getCTM() const;
-  AffineTransform getAffineCTM() const;
+  AffineTransform getCTM() const;
 
 #if OS(WINCE) && !PLATFORM(QT)
   void setBitmap(PassRefPtr<SharedBitmap>);
@@ -397,7 +394,7 @@ class GraphicsContext : public Noncopyable {
                   CompositeOperator compositeOp);
   void drawBitmapPattern(SharedBitmap*,
                          const FloatRect& tileRectIn,
-                         const TransformationMatrix& patternTransform,
+                         const AffineTransform& patternTransform,
                          const FloatPoint& phase,
                          CompositeOperator op,
                          const FloatRect& destRect,

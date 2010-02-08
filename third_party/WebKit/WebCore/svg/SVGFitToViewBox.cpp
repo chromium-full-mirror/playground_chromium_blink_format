@@ -23,6 +23,7 @@
 #if ENABLE(SVG)
 #include "SVGFitToViewBox.h"
 
+#include "AffineTransform.h"
 #include "Attr.h"
 #include "Document.h"
 #include "FloatRect.h"
@@ -31,7 +32,6 @@
 #include "SVGParserUtilities.h"
 #include "SVGPreserveAspectRatio.h"
 #include "StringImpl.h"
-#include "TransformationMatrix.h"
 
 namespace WebCore {
 
@@ -81,13 +81,13 @@ bool SVGFitToViewBox::parseViewBox(Document* doc,
   return true;
 }
 
-TransformationMatrix SVGFitToViewBox::viewBoxToViewTransform(
+AffineTransform SVGFitToViewBox::viewBoxToViewTransform(
     const FloatRect& viewBoxRect,
     const SVGPreserveAspectRatio& preserveAspectRatio,
     float viewWidth,
     float viewHeight) {
   if (!viewBoxRect.width() || !viewBoxRect.height())
-    return TransformationMatrix();
+    return AffineTransform();
 
   return preserveAspectRatio.getCTM(viewBoxRect.x(), viewBoxRect.y(),
                                     viewBoxRect.width(), viewBoxRect.height(),

@@ -45,7 +45,7 @@ class BufferedImage : public Image {
                     CompositeOperator);
   virtual void drawPattern(GraphicsContext*,
                            const FloatRect& srcRect,
-                           const TransformationMatrix& patternTransform,
+                           const AffineTransform& patternTransform,
                            const FloatPoint& phase,
                            CompositeOperator,
                            const FloatRect& destRect);
@@ -64,7 +64,7 @@ void BufferedImage::draw(GraphicsContext* ctxt,
 
 void BufferedImage::drawPattern(GraphicsContext* ctxt,
                                 const FloatRect& tileRectIn,
-                                const TransformationMatrix& patternTransform,
+                                const AffineTransform& patternTransform,
                                 const FloatPoint& phase,
                                 CompositeOperator op,
                                 const FloatRect& destRect) {

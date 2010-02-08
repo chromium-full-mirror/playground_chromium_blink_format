@@ -2716,13 +2716,13 @@ FloatRect RenderObject::repaintRectInLocalCoordinates() const {
   return FloatRect();
 }
 
-TransformationMatrix RenderObject::localTransform() const {
-  static const TransformationMatrix identity;
+AffineTransform RenderObject::localTransform() const {
+  static const AffineTransform identity;
   return identity;
 }
 
-const TransformationMatrix& RenderObject::localToParentTransform() const {
-  static const TransformationMatrix identity;
+const AffineTransform& RenderObject::localToParentTransform() const {
+  static const AffineTransform identity;
   return identity;
 }
 

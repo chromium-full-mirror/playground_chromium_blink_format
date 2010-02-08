@@ -131,10 +131,6 @@ void Path::transform(const AffineTransform& transform) {
   notImplemented();
 }
 
-void Path::transform(const TransformationMatrix& transform) {
-  notImplemented();
-}
-
 FloatRect Path::strokeBoundingRect(StrokeStyleApplier* applier) {
   notImplemented();
   return FloatRect();

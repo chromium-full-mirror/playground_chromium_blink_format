@@ -38,7 +38,7 @@ class SVGTransformList : public SVGPODList<SVGTransform> {
   }
   virtual ~SVGTransformList();
 
-  SVGTransform createSVGTransformFromMatrix(const TransformationMatrix&) const;
+  SVGTransform createSVGTransformFromMatrix(const AffineTransform&) const;
   SVGTransform consolidate();
 
   // Internal use only

@@ -27,7 +27,7 @@
 
 namespace WebCore {
 
-class TransformationMatrix;
+class AffineTransform;
 
 class SVGFitToViewBox {
  public:
@@ -42,11 +42,10 @@ class SVGFitToViewBox {
                     float& w,
                     float& h,
                     bool validate = true);
-  static TransformationMatrix viewBoxToViewTransform(
-      const FloatRect& viewBoxRect,
-      const SVGPreserveAspectRatio&,
-      float viewWidth,
-      float viewHeight);
+  static AffineTransform viewBoxToViewTransform(const FloatRect& viewBoxRect,
+                                                const SVGPreserveAspectRatio&,
+                                                float viewWidth,
+                                                float viewHeight);
 
   bool parseMappedAttribute(Document*, MappedAttribute*);
   bool isKnownAttribute(const QualifiedName&);

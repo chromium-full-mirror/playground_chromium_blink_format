@@ -64,11 +64,11 @@ class BoundingRectStrokeStyleApplier : public StrokeStyleApplier {
 RenderPath::RenderPath(SVGStyledTransformableElement* node)
     : RenderSVGModelObject(node) {}
 
-const TransformationMatrix& RenderPath::localToParentTransform() const {
+const AffineTransform& RenderPath::localToParentTransform() const {
   return m_localTransform;
 }
 
-TransformationMatrix RenderPath::localTransform() const {
+AffineTransform RenderPath::localTransform() const {
   return m_localTransform;
 }
 

@@ -191,18 +191,7 @@ void GraphicsContextPlatformPrivate::concatCTM(
   if (!m_hdc)
     return;
 
-  XFORM xform =
-      TransformationMatrix(transform.a(), transform.b(), transform.c(),
-                           transform.d(), transform.e(), transform.f());
-  ModifyWorldTransform(m_hdc, &xform, MWT_LEFTMULTIPLY);
-}
-
-void GraphicsContextPlatformPrivate::concatCTM(
-    const TransformationMatrix& transform) {
-  if (!m_hdc)
-    return;
-
-  XFORM xform = transform;
+  XFORM xform = transform.toTransformationMatrix();
   ModifyWorldTransform(m_hdc, &xform, MWT_LEFTMULTIPLY);
 }
 

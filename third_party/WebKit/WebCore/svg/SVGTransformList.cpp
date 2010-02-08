@@ -21,10 +21,11 @@
 #include "config.h"
 
 #if ENABLE(SVG)
-#include "TransformationMatrix.h"
-#include "SVGTransform.h"
-#include "SVGSVGElement.h"
 #include "SVGTransformList.h"
+
+#include "AffineTransform.h"
+#include "SVGSVGElement.h"
+#include "SVGTransform.h"
 
 using namespace WebCore;
 
@@ -34,7 +35,7 @@ SVGTransformList::SVGTransformList(const QualifiedName& attributeName)
 SVGTransformList::~SVGTransformList() {}
 
 SVGTransform SVGTransformList::createSVGTransformFromMatrix(
-    const TransformationMatrix& matrix) const {
+    const AffineTransform& matrix) const {
   return SVGSVGElement::createSVGTransformFromMatrix(matrix);
 }
 
@@ -48,7 +49,7 @@ SVGTransform SVGTransformList::concatenate() const {
   if (!length)
     return SVGTransform();
 
-  TransformationMatrix matrix;
+  AffineTransform matrix;
   ExceptionCode ec = 0;
   for (unsigned int i = 0; i < length; i++)
     matrix = getItem(i, ec).matrix() * matrix;
@@ -61,7 +62,7 @@ String SVGTransformList::valueAsString() const {
   // to a matrix(...).
   SVGTransform transform = concatenate();
   if (transform.type() == SVGTransform::SVG_TRANSFORM_MATRIX) {
-    TransformationMatrix matrix = transform.matrix();
+    AffineTransform matrix = transform.matrix();
     return String::format("matrix(%f %f %f %f %f %f)", matrix.a(), matrix.b(),
                           matrix.c(), matrix.d(), matrix.e(), matrix.f());
   }

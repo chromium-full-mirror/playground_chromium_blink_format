@@ -51,7 +51,6 @@
 #include "Path.h"
 #include "Pattern.h"
 #include "Pen.h"
-#include "TransformationMatrix.h"
 
 #include <QBrush>
 #include <QDebug>
@@ -265,17 +264,10 @@ PlatformGraphicsContext* GraphicsContext::platformContext() const {
   return m_data->p();
 }
 
-AffineTransform GraphicsContext::getAffineCTM() const {
+AffineTransform GraphicsContext::getCTM() const {
   QTransform matrix(platformContext()->combinedTransform());
   return AffineTransform(matrix.m11(), matrix.m12(), matrix.m21(), matrix.m22(),
                          matrix.dx(), matrix.dy());
-}
-
-TransformationMatrix GraphicsContext::getCTM() const {
-  QTransform matrix(platformContext()->combinedTransform());
-  return TransformationMatrix(
-      matrix.m11(), matrix.m12(), 0, matrix.m13(), matrix.m21(), matrix.m22(),
-      0, matrix.m23(), 0, 0, 1, 0, matrix.m31(), matrix.m32(), 0, matrix.m33());
 }
 
 void GraphicsContext::savePlatformState() {
@@ -650,7 +642,7 @@ void GraphicsContext::fillPath() {
       fillColor().alpha()) {
     drawFilledShadowPath(this, p, path);
     if (m_common->state.fillPattern) {
-      TransformationMatrix affine;
+      AffineTransform affine;
       p->fillPath(
           path,
           QBrush(m_common->state.fillPattern->createPlatformPattern(affine)));
@@ -690,7 +682,7 @@ void GraphicsContext::strokePath() {
       p->setWorldTransform(t);
     }
     if (m_common->state.strokePattern) {
-      TransformationMatrix affine;
+      AffineTransform affine;
       pen.setBrush(
           QBrush(m_common->state.strokePattern->createPlatformPattern(affine)));
       p->setPen(pen);
@@ -733,7 +725,7 @@ void GraphicsContext::fillRect(const FloatRect& rect) {
       fillColor().alpha()) {
     drawBorderlessRectShadow(this, p, rect);
     if (m_common->state.fillPattern) {
-      TransformationMatrix affine;
+      AffineTransform affine;
       p->fillRect(
           rect,
           QBrush(m_common->state.fillPattern->createPlatformPattern(affine)));
@@ -1209,22 +1201,6 @@ void GraphicsContext::concatCTM(const AffineTransform& transform) {
     QTransform matrix = transform.inverse();
     m_data->currentPath = m_data->currentPath * matrix;
     m_common->state.pathTransform.multiply(transform.toTransformationMatrix());
-  }
-}
-
-void GraphicsContext::concatCTM(const TransformationMatrix& transform) {
-  if (paintingDisabled())
-    return;
-
-  m_data->p()->setWorldTransform(transform, true);
-
-  // Transformations to the context shouldn't transform the currentPath.
-  // We have to undo every change made to the context from the currentPath
-  // to avoid wrong drawings.
-  if (!m_data->currentPath.isEmpty() && transform.isInvertible()) {
-    QTransform matrix = transform.inverse();
-    m_data->currentPath = m_data->currentPath * matrix;
-    m_common->state.pathTransform.multiply(transform);
   }
 }
 

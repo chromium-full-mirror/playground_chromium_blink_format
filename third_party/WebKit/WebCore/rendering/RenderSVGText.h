@@ -26,7 +26,7 @@
 
 #if ENABLE(SVG)
 
-#include "TransformationMatrix.h"
+#include "AffineTransform.h"
 #include "RenderSVGBlock.h"
 
 namespace WebCore {
@@ -44,7 +44,7 @@ class RenderSVGText : public RenderSVGBlock {
 
   virtual bool isSVGText() const { return true; }
 
-  virtual const TransformationMatrix& localToParentTransform() const {
+  virtual const AffineTransform& localToParentTransform() const {
     return m_localTransform;
   }
 
@@ -84,13 +84,11 @@ class RenderSVGText : public RenderSVGBlock {
 
   // FIXME: This can be removed when localTransform() is removed from
   // RenderObject
-  virtual TransformationMatrix localTransform() const {
-    return m_localTransform;
-  }
+  virtual AffineTransform localTransform() const { return m_localTransform; }
 
   virtual RootInlineBox* createRootInlineBox();
 
-  TransformationMatrix m_localTransform;
+  AffineTransform m_localTransform;
 };
 }
 

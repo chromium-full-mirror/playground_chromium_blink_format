@@ -53,7 +53,7 @@ void GeneratedImage::draw(GraphicsContext* context,
 
 void GeneratedImage::drawPattern(GraphicsContext* context,
                                  const FloatRect& srcRect,
-                                 const TransformationMatrix& patternTransform,
+                                 const AffineTransform& patternTransform,
                                  const FloatPoint& phase,
                                  ColorSpace styleColorSpace,
                                  CompositeOperator compositeOp,

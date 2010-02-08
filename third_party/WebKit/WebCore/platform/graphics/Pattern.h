@@ -28,10 +28,11 @@
 #ifndef Pattern_h
 #define Pattern_h
 
+#include "AffineTransform.h"
+
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 #include <wtf/RefPtr.h>
-#include "TransformationMatrix.h"
 
 #if PLATFORM(CG)
 typedef struct CGPattern* CGPatternRef;
@@ -61,7 +62,8 @@ typedef void* PlatformPatternPtr;
 #endif
 
 namespace WebCore {
-class TransformationMatrix;
+
+class AffineTransform;
 class Image;
 
 class Pattern : public RefCounted<Pattern> {
@@ -81,13 +83,13 @@ class Pattern : public RefCounted<Pattern> {
 // transformation 'userSpaceTransformation'
 #if PLATFORM(SKIA)
   PlatformPatternPtr platformPattern(
-      const TransformationMatrix& userSpaceTransformation);
+      const AffineTransform& userSpaceTransformation);
 #else
   PlatformPatternPtr createPlatformPattern(
-      const TransformationMatrix& userSpaceTransformation) const;
+      const AffineTransform& userSpaceTransformation) const;
 #endif
   void setPatternSpaceTransform(
-      const TransformationMatrix& patternSpaceTransformation);
+      const AffineTransform& patternSpaceTransformation);
   void setPlatformPatternSpaceTransform();
 
  private:
@@ -96,7 +98,7 @@ class Pattern : public RefCounted<Pattern> {
   RefPtr<Image> m_tileImage;
   bool m_repeatX;
   bool m_repeatY;
-  TransformationMatrix m_patternSpaceTransformation;
+  AffineTransform m_patternSpaceTransformation;
   PlatformPatternPtr m_pattern;
 };
 

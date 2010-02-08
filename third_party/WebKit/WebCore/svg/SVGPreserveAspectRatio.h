@@ -29,7 +29,7 @@
 namespace WebCore {
 
 class String;
-class TransformationMatrix;
+class AffineTransform;
 
 class SVGPreserveAspectRatio {
  public:
@@ -64,14 +64,14 @@ class SVGPreserveAspectRatio {
 
   void transformRect(FloatRect& destRect, FloatRect& srcRect);
 
-  TransformationMatrix getCTM(double logicX,
-                              double logicY,
-                              double logicWidth,
-                              double logicHeight,
-                              double physX,
-                              double physY,
-                              double physWidth,
-                              double physHeight) const;
+  AffineTransform getCTM(double logicX,
+                         double logicY,
+                         double logicWidth,
+                         double logicHeight,
+                         double physX,
+                         double physY,
+                         double physWidth,
+                         double physHeight) const;
 
   template <class Consumer>
   static bool parsePreserveAspectRatio(Consumer* consumer,

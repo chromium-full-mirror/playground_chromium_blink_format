@@ -28,7 +28,7 @@
 #if ENABLE(SVG)
 #include "SVGResourceMarker.h"
 
-#include "TransformationMatrix.h"
+#include "AffineTransform.h"
 #include "GraphicsContext.h"
 #include "RenderSVGViewportContainer.h"
 #include "TextStream.h"
@@ -45,13 +45,13 @@ SVGResourceMarker::SVGResourceMarker()
 
 SVGResourceMarker::~SVGResourceMarker() {}
 
-TransformationMatrix SVGResourceMarker::markerTransformation(
+AffineTransform SVGResourceMarker::markerTransformation(
     const FloatPoint& origin,
     float angle,
     float strokeWidth) const {
   ASSERT(m_renderer);
 
-  TransformationMatrix transform;
+  AffineTransform transform;
   transform.translate(origin.x(), origin.y());
   transform.rotate(m_angle == -1 ? angle : m_angle);
   transform = m_renderer->markerContentTransformation(
@@ -60,7 +60,7 @@ TransformationMatrix SVGResourceMarker::markerTransformation(
 }
 
 void SVGResourceMarker::draw(RenderObject::PaintInfo& paintInfo,
-                             const TransformationMatrix& transform) {
+                             const AffineTransform& transform) {
   if (!m_renderer)
     return;
 

@@ -176,7 +176,7 @@ TextStream& operator<<(TextStream& ts, const FloatSize& s) {
   return ts;
 }
 
-TextStream& operator<<(TextStream& ts, const TransformationMatrix& transform) {
+TextStream& operator<<(TextStream& ts, const AffineTransform& transform) {
   if (transform.isIdentity())
     ts << "identity";
   else

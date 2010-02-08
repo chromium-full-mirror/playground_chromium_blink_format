@@ -108,7 +108,7 @@ void BitmapImage::draw(GraphicsContext* ctxt,
 
 void Image::drawPattern(GraphicsContext* context,
                         const FloatRect& tileRect,
-                        const TransformationMatrix& patternTransform,
+                        const AffineTransform& patternTransform,
                         const FloatPoint& srcPoint,
                         ColorSpace,
                         CompositeOperator op,

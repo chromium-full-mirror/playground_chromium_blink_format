@@ -191,13 +191,13 @@ void Gradient::setSpreadMethod(GradientSpreadMethod spreadMethod) {
 }
 
 void Gradient::setGradientSpaceTransform(
-    const TransformationMatrix& gradientSpaceTransformation) {
+    const AffineTransform& gradientSpaceTransformation) {
   m_gradientSpaceTransformation = gradientSpaceTransformation;
   setPlatformGradientSpaceTransform(gradientSpaceTransformation);
 }
 
 #if !PLATFORM(SKIA)
-void Gradient::setPlatformGradientSpaceTransform(const TransformationMatrix&) {}
+void Gradient::setPlatformGradientSpaceTransform(const AffineTransform&) {}
 #endif
 
 }  // namespace

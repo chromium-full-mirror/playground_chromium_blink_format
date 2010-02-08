@@ -114,9 +114,7 @@ FloatRect SVGInlineTextBox::calculateGlyphBoundaries(
   FloatRect glyphRect(x1, y1, x2 - x1, y2 - y1);
 
   // Take per-character transformations into account
-  TransformationMatrix ctm = svgChar.characterTransform();
-  if (!ctm.isIdentity())
-    glyphRect = ctm.mapRect(glyphRect);
+  glyphRect = svgChar.characterTransform().mapRect(glyphRect);
 
   return glyphRect;
 }
@@ -132,7 +130,7 @@ struct SVGInlineTextBoxClosestCharacterToPositionWalker {
 
   void chunkPortionCallback(SVGInlineTextBox* textBox,
                             int startOffset,
-                            const TransformationMatrix& chunkCtm,
+                            const AffineTransform& chunkCtm,
                             const Vector<SVGChar>::iterator& start,
                             const Vector<SVGChar>::iterator& end) {
     RenderStyle* style = textBox->textRenderer()->style();
@@ -199,7 +197,7 @@ struct SVGInlineTextBoxSelectionRectWalker {
 
   void chunkPortionCallback(SVGInlineTextBox* textBox,
                             int startOffset,
-                            const TransformationMatrix& chunkCtm,
+                            const AffineTransform& chunkCtm,
                             const Vector<SVGChar>::iterator& start,
                             const Vector<SVGChar>::iterator& end) {
     RenderStyle* style = textBox->textRenderer()->style();
@@ -379,7 +377,7 @@ void SVGInlineTextBox::paintCharacters(RenderObject::PaintInfo& paintInfo,
   RenderStyle* styleToUse = text->style(isFirstLineStyle());
   const Font& font = styleToUse->font();
 
-  TransformationMatrix ctm = svgChar.characterTransform();
+  AffineTransform ctm = svgChar.characterTransform();
   if (!ctm.isIdentity())
     paintInfo.context->concatCTM(ctm);
 
@@ -593,7 +591,7 @@ void SVGInlineTextBox::paintDecoration(ETextDecoration decoration,
   context->save();
   context->beginPath();
 
-  TransformationMatrix ctm = svgChar.characterTransform();
+  AffineTransform ctm = svgChar.characterTransform();
   if (!ctm.isIdentity())
     context->concatCTM(ctm);
 

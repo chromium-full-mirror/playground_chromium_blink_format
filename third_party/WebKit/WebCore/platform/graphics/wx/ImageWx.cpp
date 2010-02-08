@@ -26,13 +26,13 @@
 #include "config.h"
 #include "Image.h"
 
+#include "AffineTransform.h"
 #include "BitmapImage.h"
 #include "FloatConversion.h"
 #include "FloatRect.h"
 #include "GraphicsContext.h"
 #include "ImageObserver.h"
 #include "NotImplemented.h"
-#include "TransformationMatrix.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -184,7 +184,7 @@ void BitmapImage::draw(GraphicsContext* ctxt,
 
 void BitmapImage::drawPattern(GraphicsContext* ctxt,
                               const FloatRect& srcRect,
-                              const TransformationMatrix& patternTransform,
+                              const AffineTransform& patternTransform,
                               const FloatPoint& phase,
                               ColorSpace,
                               CompositeOperator,
@@ -275,7 +275,7 @@ void BitmapImage::invalidatePlatformData() {}
 
 void Image::drawPattern(GraphicsContext*,
                         const FloatRect& srcRect,
-                        const TransformationMatrix& patternTransform,
+                        const AffineTransform& patternTransform,
                         const FloatPoint& phase,
                         ColorSpace,
                         CompositeOperator,

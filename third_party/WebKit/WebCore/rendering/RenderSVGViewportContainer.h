@@ -38,15 +38,14 @@ class RenderSVGViewportContainer : public RenderSVGContainer {
 
   // Calculates marker boundaries, mapped to the target element's coordinate
   // space
-  FloatRect markerBoundaries(
-      const TransformationMatrix& markerTransformation) const;
+  FloatRect markerBoundaries(const AffineTransform& markerTransformation) const;
 
   // Generates a transformation matrix usable to render marker content. Handles
   // scaling the marker content
   // acording to SVGs markerUnits="strokeWidth" concept, when a strokeWidth
   // value != -1 is passed in.
-  TransformationMatrix markerContentTransformation(
-      const TransformationMatrix& contentTransformation,
+  AffineTransform markerContentTransformation(
+      const AffineTransform& contentTransformation,
       const FloatPoint& origin,
       float strokeWidth = -1) const;
 
@@ -56,8 +55,8 @@ class RenderSVGViewportContainer : public RenderSVGContainer {
     return "RenderSVGViewportContainer";
   }
 
-  TransformationMatrix viewportTransform() const;
-  virtual const TransformationMatrix& localToParentTransform() const;
+  AffineTransform viewportTransform() const;
+  virtual const AffineTransform& localToParentTransform() const;
 
   virtual void calcViewport();
 
@@ -65,7 +64,7 @@ class RenderSVGViewportContainer : public RenderSVGContainer {
   virtual bool pointIsInsideViewportClip(const FloatPoint& pointInParent);
 
   FloatRect m_viewport;
-  mutable TransformationMatrix m_localToParentTransform;
+  mutable AffineTransform m_localToParentTransform;
 };
 
 inline RenderSVGViewportContainer* toRenderSVGViewportContainer(

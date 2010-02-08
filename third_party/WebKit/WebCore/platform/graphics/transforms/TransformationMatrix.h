@@ -26,6 +26,7 @@
 #ifndef TransformationMatrix_h
 #define TransformationMatrix_h
 
+#include "AffineTransform.h"
 #include "FloatPoint.h"
 #include "IntPoint.h"
 #include <string.h>  //for memcpy
@@ -56,6 +57,7 @@ typedef struct tagXFORM XFORM;
 
 namespace WebCore {
 
+class AffineTransform;
 class IntRect;
 class FloatPoint3D;
 class FloatRect;
@@ -325,6 +327,8 @@ class TransformationMatrix : public FastAllocBase {
 
   // Throw away the non-affine parts of the matrix (lossy!)
   void makeAffine();
+
+  AffineTransform toAffineTransform() const;
 
   bool operator==(const TransformationMatrix& m2) const {
     return (m_matrix[0][0] == m2.m_matrix[0][0] &&

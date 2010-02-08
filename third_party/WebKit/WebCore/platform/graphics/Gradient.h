@@ -28,10 +28,10 @@
 #ifndef Gradient_h
 #define Gradient_h
 
+#include "AffineTransform.h"
 #include "FloatPoint.h"
 #include "Generator.h"
 #include "GraphicsTypes.h"
-#include "TransformationMatrix.h"
 #include <wtf/PassRefPtr.h>
 #include <wtf/Vector.h>
 
@@ -111,9 +111,9 @@ class Gradient : public Generator {
   void setSpreadMethod(GradientSpreadMethod);
   GradientSpreadMethod spreadMethod() { return m_spreadMethod; }
   void setGradientSpaceTransform(
-      const TransformationMatrix& gradientSpaceTransformation);
+      const AffineTransform& gradientSpaceTransformation);
   // Qt and CG transform the gradient at draw time
-  TransformationMatrix gradientSpaceTransform() {
+  AffineTransform gradientSpaceTransform() {
     return m_gradientSpaceTransformation;
   }
 
@@ -122,7 +122,7 @@ class Gradient : public Generator {
                                                FloatRect& srcRect);
 
   void setPlatformGradientSpaceTransform(
-      const TransformationMatrix& gradientSpaceTransformation);
+      const AffineTransform& gradientSpaceTransformation);
 
 #if PLATFORM(CG)
   void paint(GraphicsContext*);
@@ -146,7 +146,7 @@ class Gradient : public Generator {
   mutable bool m_stopsSorted;
   mutable int m_lastStop;
   GradientSpreadMethod m_spreadMethod;
-  TransformationMatrix m_gradientSpaceTransformation;
+  AffineTransform m_gradientSpaceTransformation;
 
   PlatformGradient m_gradient;
 };
