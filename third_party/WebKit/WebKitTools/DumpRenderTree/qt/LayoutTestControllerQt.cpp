@@ -427,6 +427,11 @@ void LayoutTestController::overridePreference(const QString& name,
     settings->setFontSize(QWebSettings::DefaultFontSize, value.toInt());
   else if (name == "WebKitUsesPageCachePreferenceKey")
     QWebSettings::setMaximumPagesInCache(value.toInt());
+  else
+    printf(
+        "ERROR: LayoutTestController::overridePreference() does not support "
+        "the '%s' preference\n",
+        name.toLatin1().data());
 }
 
 void LayoutTestController::setUserStyleSheetLocation(const QString& url) {
