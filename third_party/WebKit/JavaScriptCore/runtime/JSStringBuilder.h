@@ -46,8 +46,8 @@ template <typename StringType1, typename StringType2>
 inline JSValue jsMakeNontrivialString(ExecState* exec,
                                       StringType1 string1,
                                       StringType2 string2) {
-  UString result = makeString(string1, string2);
-  if (result.isNull())
+  PassRefPtr<UStringImpl> result = tryMakeString(string1, string2);
+  if (!result)
     return throwOutOfMemoryError(exec);
   return jsNontrivialString(exec, result);
 }
@@ -57,8 +57,8 @@ inline JSValue jsMakeNontrivialString(ExecState* exec,
                                       StringType1 string1,
                                       StringType2 string2,
                                       StringType3 string3) {
-  UString result = makeString(string1, string2, string3);
-  if (result.isNull())
+  PassRefPtr<UStringImpl> result = tryMakeString(string1, string2, string3);
+  if (!result)
     return throwOutOfMemoryError(exec);
   return jsNontrivialString(exec, result);
 }
@@ -72,8 +72,9 @@ inline JSValue jsMakeNontrivialString(ExecState* exec,
                                       StringType2 string2,
                                       StringType3 string3,
                                       StringType4 string4) {
-  UString result = makeString(string1, string2, string3, string4);
-  if (result.isNull())
+  PassRefPtr<UStringImpl> result =
+      tryMakeString(string1, string2, string3, string4);
+  if (!result)
     return throwOutOfMemoryError(exec);
   return jsNontrivialString(exec, result);
 }
@@ -89,8 +90,9 @@ inline JSValue jsMakeNontrivialString(ExecState* exec,
                                       StringType3 string3,
                                       StringType4 string4,
                                       StringType5 string5) {
-  UString result = makeString(string1, string2, string3, string4, string5);
-  if (result.isNull())
+  PassRefPtr<UStringImpl> result =
+      tryMakeString(string1, string2, string3, string4, string5);
+  if (!result)
     return throwOutOfMemoryError(exec);
   return jsNontrivialString(exec, result);
 }
@@ -108,9 +110,9 @@ inline JSValue jsMakeNontrivialString(ExecState* exec,
                                       StringType4 string4,
                                       StringType5 string5,
                                       StringType6 string6) {
-  UString result =
-      makeString(string1, string2, string3, string4, string5, string6);
-  if (result.isNull())
+  PassRefPtr<UStringImpl> result =
+      tryMakeString(string1, string2, string3, string4, string5, string6);
+  if (!result)
     return throwOutOfMemoryError(exec);
   return jsNontrivialString(exec, result);
 }
