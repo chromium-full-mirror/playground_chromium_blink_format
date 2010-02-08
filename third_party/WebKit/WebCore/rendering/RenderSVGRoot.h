@@ -67,9 +67,8 @@ class RenderSVGRoot : public RenderBox, SVGRenderBase {
   }
   virtual FloatRect repaintRectInLocalCoordinates() const;
 
-  // FIXME: Both of these overrides should be removed.
+  // FIXME: This override should be removed.
   virtual TransformationMatrix localTransform() const;
-  virtual TransformationMatrix absoluteTransform() const;
 
   virtual bool nodeAtPoint(const HitTestRequest&,
                            HitTestResult&,
@@ -89,7 +88,6 @@ class RenderSVGRoot : public RenderBox, SVGRenderBase {
                                    TransformState&) const;
 
   void calcViewport();
-  const FloatSize& viewportSize() const;
 
   bool selfWillPaint() const;
 

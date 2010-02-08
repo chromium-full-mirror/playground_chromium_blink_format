@@ -59,10 +59,6 @@ class RenderSVGViewportContainer : public RenderSVGContainer {
   TransformationMatrix viewportTransform() const;
   virtual const TransformationMatrix& localToParentTransform() const;
 
-  // FIXME: This override should be removed once callers of
-  // RenderBox::absoluteTransform() can be removed.
-  virtual TransformationMatrix absoluteTransform() const;
-
   virtual void calcViewport();
 
   virtual void applyViewportClip(PaintInfo&);

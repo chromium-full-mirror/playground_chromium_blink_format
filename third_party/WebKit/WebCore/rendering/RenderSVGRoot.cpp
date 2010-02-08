@@ -137,7 +137,7 @@ void RenderSVGRoot::paint(PaintInfo& paintInfo, int parentX, int parentY) {
 
   // An empty viewport disables rendering.  FIXME: Should we still render
   // filters?
-  if (viewportSize().isEmpty())
+  if (m_viewportSize.isEmpty())
     return;
 
   // Don't paint if we don't have kids, except if we have filters we should
@@ -150,8 +150,10 @@ void RenderSVGRoot::paint(PaintInfo& paintInfo, int parentX, int parentY) {
   RenderObject::PaintInfo childPaintInfo(paintInfo);
   childPaintInfo.context->save();
 
-  // SVG does not support independent x/y clipping
-  if (style()->overflowX() != OVISIBLE)
+  // In SVG special rules need to be applied that differ from the CSS overflow
+  // handling,
+  // see comments in svg.css for spec references, explaining this behaviour
+  if (SVGRenderBase::isOverflowHidden(this))
     childPaintInfo.context->clip(overflowClipRect(
         borderBoxOriginInContainer.x(), borderBoxOriginInContainer.y()));
 
@@ -182,10 +184,6 @@ void RenderSVGRoot::paint(PaintInfo& paintInfo, int parentX, int parentY) {
       style()->outlineWidth() && style()->visibility() == VISIBLE)
     paintOutline(paintInfo.context, borderBoxOriginInContainer.x(),
                  borderBoxOriginInContainer.y(), width(), height(), style());
-}
-
-const FloatSize& RenderSVGRoot::viewportSize() const {
-  return m_viewportSize;
 }
 
 void RenderSVGRoot::calcViewport() {
@@ -256,14 +254,6 @@ const TransformationMatrix& RenderSVGRoot::localToParentTransform() const {
   return m_localToParentTransform;
 }
 
-// FIXME: This method should be removed as soon as callers to
-// RenderBox::absoluteTransform() can be removed.
-TransformationMatrix RenderSVGRoot::absoluteTransform() const {
-  // This would apply localTransform() twice if localTransform() were not the
-  // identity.
-  return localToParentTransform() * RenderBox::absoluteTransform();
-}
-
 FloatRect RenderSVGRoot::objectBoundingBox() const {
   return computeContainerBoundingBox(this, false);
 }
@@ -287,6 +277,14 @@ void RenderSVGRoot::computeRectForRepaint(
   // and then call RenderBox's method to handle all the normal CSS Box model
   // bits
   repaintRect = localToBorderBoxTransform().mapRect(repaintRect);
+
+  // In SVG special rules need to be applied that differ from the CSS overflow
+  // handling,
+  // see comments in svg.css for spec references, explaining this behaviour
+  if (SVGRenderBase::isOverflowHidden(this))
+    repaintRect.intersect(
+        enclosingIntRect(FloatRect(FloatPoint(), m_viewportSize)));
+
   style()->svgStyle()->inflateForShadow(repaintRect);
   RenderBox::computeRectForRepaint(repaintContainer, repaintRect, fixed);
 }
@@ -320,10 +318,7 @@ bool RenderSVGRoot::nodeAtPoint(const HitTestRequest& request,
   IntPoint pointInBorderBox = pointInParent - parentOriginToBorderBox();
 
   // Note: For now, we're ignoring hits to border and padding for <svg>
-
-  if (style()->overflowX() == OHIDDEN) {
-    // SVG doesn't support independent x/y overflow
-    ASSERT(style()->overflowY() == OHIDDEN);
+  if (SVGRenderBase::isOverflowHidden(this)) {
     IntPoint pointInContentBox = pointInBorderBox - borderOriginToContentBox();
     if (!contentBoxRect().contains(pointInContentBox))
       return false;

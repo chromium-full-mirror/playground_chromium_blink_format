@@ -58,6 +58,9 @@ class SVGRenderBase {
   // Layout all children of the passed render object
   static void layoutChildren(RenderObject*, bool selfNeedsLayout);
 
+  // Helper function determining wheter overflow is hidden
+  static bool isOverflowHidden(const RenderObject*);
+
   virtual FloatRect strokeBoundingBox() const { return FloatRect(); }
   virtual FloatRect markerBoundingBox() const { return FloatRect(); }
 
