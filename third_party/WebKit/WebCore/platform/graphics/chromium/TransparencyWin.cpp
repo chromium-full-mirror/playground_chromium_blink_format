@@ -31,11 +31,11 @@
 #include "config.h"
 #include <windows.h>
 
+#include "AffineTransform.h"
 #include "GraphicsContext.h"
 #include "ImageBuffer.h"
 #include "PlatformContextSkia.h"
 #include "SimpleFontData.h"
-#include "TransformationMatrix.h"
 #include "TransparencyWin.h"
 
 #include "SkColorPriv.h"
@@ -59,7 +59,7 @@ inline const SkBitmap& bitmapForContext(const GraphicsContext& context) {
 
 void compositeToCopy(const GraphicsContext& sourceLayers,
                      GraphicsContext& destContext,
-                     const TransformationMatrix& matrix) {
+                     const AffineTransform& matrix) {
   // Make a list of all devices. The iterator goes top-down, and we want
   // bottom-up. Note that each layer can also have an offset in canvas
   // coordinates, which is the (x, y) position.
@@ -233,7 +233,7 @@ void TransparencyWin::setupLayerForOpaqueCompositeLayer() {
   if (!m_validLayer)
     return;
 
-  TransformationMatrix mapping;
+  AffineTransform mapping;
   mapping.translate(-m_transformedSourceRect.x(), -m_transformedSourceRect.y());
   if (m_transformMode == Untransform) {
     // Compute the inverse mapping from the canvas space to the
@@ -290,7 +290,7 @@ void TransparencyWin::setupTransformForKeepTransform(const IntRect& region) {
     // Account for the fact that the layer may be offset from the
     // original. This only happens when we create a layer that has the
     // same coordinate space as the parent.
-    TransformationMatrix xform;
+    AffineTransform xform;
     xform.translate(-m_transformedSourceRect.x(), -m_transformedSourceRect.y());
 
     // We're making a layer, so apply the old transform to the new one

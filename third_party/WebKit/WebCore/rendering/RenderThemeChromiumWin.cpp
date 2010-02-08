@@ -84,7 +84,7 @@ class ThemePainter : public TransparencyWin {
       return transformMode == KeepTransform ? NoLayer : OpaqueCompositeLayer;
   }
 
-  static TransformMode getTransformMode(const TransformationMatrix& matrix) {
+  static TransformMode getTransformMode(const AffineTransform& matrix) {
     if (matrix.b() != 0 || matrix.c() != 0)  // Skew.
       return Untransform;
     else if (matrix.a() != 1.0 || matrix.d() != 1.0)  // Scale.
