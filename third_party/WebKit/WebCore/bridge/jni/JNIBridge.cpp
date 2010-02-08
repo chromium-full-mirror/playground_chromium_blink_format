@@ -110,7 +110,7 @@ JavaMethod::JavaMethod(JNIEnv* env, jobject aMethod) {
 
 JavaMethod::~JavaMethod() {
   if (m_signature)
-    free(m_signature);
+    fastFree(m_signature);
   delete[] m_parameters;
 };
 
@@ -121,7 +121,7 @@ static void appendClassName(StringBuilder& builder, const char* className) {
   ASSERT(JSLock::lockCount() > 0);
 #endif
 
-  char* c = strdup(className);
+  char* c = fastStrDup(className);
 
   char* result = c;
   while (*c) {
@@ -132,7 +132,7 @@ static void appendClassName(StringBuilder& builder, const char* className) {
 
   builder.append(result);
 
-  free(result);
+  fastFree(result);
 }
 
 const char* JavaMethod::signature() const {
@@ -170,7 +170,7 @@ const char* JavaMethod::signature() const {
     }
 
     String signatureString = signatureBuilder.toString();
-    m_signature = strdup(signatureString.utf8().data());
+    m_signature = fastStrDup(signatureString.utf8().data());
   }
 
   return m_signature;

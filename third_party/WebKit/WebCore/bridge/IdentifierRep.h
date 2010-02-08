@@ -49,7 +49,7 @@ class IdentifierRep : public FastAllocBase {
   IdentifierRep(int number) : m_isString(false) { m_value.m_number = number; }
 
   IdentifierRep(const char* name) : m_isString(true) {
-    m_value.m_string = strdup(name);
+    m_value.m_string = fastStrDup(name);
   }
 
   ~IdentifierRep() {
