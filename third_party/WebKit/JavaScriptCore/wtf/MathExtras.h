@@ -260,7 +260,7 @@ inline float grad2rad(float g) {
   return g * piFloat / 200.0f;
 }
 
-#if !COMPILER(MSVC)
+#if !COMPILER(MSVC) && !COMPILER(RVCT)
 using std::isfinite;
 using std::isinf;
 using std::isnan;
