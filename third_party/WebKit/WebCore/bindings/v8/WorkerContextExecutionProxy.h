@@ -93,25 +93,6 @@ class WorkerContextExecutionProxy {
   // worker context.
   static WorkerContextExecutionProxy* retrieve();
 
-  // We have to keep all these conversion functions here before
-  // WorkerContextExecutionProxy is refactor-ed.
-  template <typename T>
-  static v8::Handle<v8::Value> convertToV8Object(
-      V8ClassIndex::V8WrapperType type,
-      PassRefPtr<T> impl) {
-    return convertToV8Object(type, impl.get());
-  }
-  static v8::Handle<v8::Value> convertToV8Object(V8ClassIndex::V8WrapperType,
-                                                 void* impl);
-  static v8::Handle<v8::Value> convertEventToV8Object(Event*);
-  static v8::Handle<v8::Value> convertEventTargetToV8Object(EventTarget*);
-  static v8::Handle<v8::Value> convertWorkerContextToV8Object(WorkerContext*);
-
-  static v8::Local<v8::Object> toV8(V8ClassIndex::V8WrapperType type,
-                                    void* impl) {
-    return toV8(type, type, impl);
-  }
-
  private:
   void initV8IfNeeded();
   void initContextIfNeeded();
@@ -119,10 +100,6 @@ class WorkerContextExecutionProxy {
 
   // Run an already compiled script.
   v8::Local<v8::Value> runScript(v8::Handle<v8::Script>);
-
-  static v8::Local<v8::Object> toV8(V8ClassIndex::V8WrapperType descriptorType,
-                                    V8ClassIndex::V8WrapperType cptrType,
-                                    void* impl);
 
   static bool forgetV8EventObject(Event*);
 
