@@ -28,6 +28,8 @@
 #ifndef utils_h
 #define utils_h
 
+#include <wtf/AlwaysInline.h>
+
 #include <QtCore>
 
 // options handling
@@ -37,8 +39,7 @@ QList<QString> enumToKeys(const QMetaObject o,
                           const QString& name,
                           const QString& strip);
 
-void appQuit(int status, const QString& msg = QString())
-    __attribute__((noreturn));
+NO_RETURN void appQuit(int status, const QString& msg = QString());
 
 QUrl urlFromUserInput(const QString& input);
 
