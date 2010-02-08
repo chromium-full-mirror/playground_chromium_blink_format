@@ -622,8 +622,7 @@ void FrameLoaderClient::setMainFrameDocumentReady(bool) {
 }
 
 bool FrameLoaderClient::hasWebView() const {
-  notImplemented();
-  return true;
+  return getViewFromFrame(m_frame);
 }
 
 void FrameLoaderClient::dispatchDidFinishLoad() {
