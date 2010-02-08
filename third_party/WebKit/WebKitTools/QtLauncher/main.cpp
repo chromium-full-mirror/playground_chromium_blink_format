@@ -73,6 +73,7 @@ void QWEBKIT_EXPORT qt_drt_garbageCollector_collect();
 static bool gUseGraphicsView = false;
 static bool gUseCompositing = false;
 static bool gCacheWebView = false;
+static bool gShowFrameRate = false;
 static QGraphicsView::ViewportUpdateMode gViewportUpdateMode =
     QGraphicsView::MinimalViewportUpdate;
 
@@ -153,6 +154,8 @@ LauncherWindow::LauncherWindow(QString url)
     view->setViewportUpdateMode(gViewportUpdateMode);
     view->setItemCacheMode(gCacheWebView ? QGraphicsItem::DeviceCoordinateCache
                                          : QGraphicsItem::NoCache);
+    if (gShowFrameRate)
+      view->enableFrameRateMeasurement();
     page()->settings()->setAttribute(
         QWebSettings::AcceleratedCompositingEnabled, gUseCompositing);
     m_view = view;
@@ -611,6 +614,7 @@ void LauncherApplication::handleUserOptions() {
                     .toLatin1()
                     .data()
              << "[-cache-webview]"
+             << "[-show-fps]"
              << "[-r list]"
              << "URLs";
     appQuit(0);
@@ -622,6 +626,11 @@ void LauncherApplication::handleUserOptions() {
   if (args.contains("-compositing")) {
     requiresGraphicsView("-compositing");
     gUseCompositing = true;
+  }
+
+  if (args.contains("-show-fps")) {
+    requiresGraphicsView("-show-fps");
+    gShowFrameRate = true;
   }
 
   if (args.contains("-cache-webview")) {
