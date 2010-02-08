@@ -57,7 +57,6 @@ class CommonIdentifiers : public Noncopyable {
   friend class JSGlobalData;
 
  public:
-  const Identifier nullIdentifier;
   const Identifier emptyIdentifier;
   const Identifier underscoreProto;
   const Identifier thisIdentifier;
