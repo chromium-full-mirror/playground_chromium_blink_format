@@ -32,13 +32,13 @@
 #if ENABLE(DATABASE)
 
 #include "PlatformString.h"
+#include "StringHash.h"
+#include <wtf/HashMap.h>
+#include <wtf/HashSet.h>
 
 #if !PLATFORM(CHROMIUM)
 #include "DatabaseDetails.h"
 #include "SQLiteDatabase.h"
-#include "StringHash.h"
-#include <wtf/HashMap.h>
-#include <wtf/HashSet.h>
 #include <wtf/OwnPtr.h>
 #endif  // !PLATFORM(CHROMIUM)
 
@@ -48,11 +48,12 @@ class Database;
 class ScriptExecutionContext;
 class SecurityOrigin;
 
+struct SecurityOriginHash;
+
 #if !PLATFORM(CHROMIUM)
 class DatabaseTrackerClient;
 class OriginQuotaManager;
 
-struct SecurityOriginHash;
 struct SecurityOriginTraits;
 #endif  // !PLATFORM(CHROMIUM)
 
@@ -77,11 +78,22 @@ class DatabaseTracker : public Noncopyable {
 
   void addOpenDatabase(Database*);
   void removeOpenDatabase(Database*);
+  void getOpenDatabases(SecurityOrigin* origin,
+                        const String& name,
+                        HashSet<RefPtr<Database>>* databases);
 
   unsigned long long getMaxSizeForDatabase(const Database*);
 
  private:
   DatabaseTracker();
+
+  typedef HashSet<Database*> DatabaseSet;
+  typedef HashMap<String, DatabaseSet*> DatabaseNameMap;
+  typedef HashMap<RefPtr<SecurityOrigin>, DatabaseNameMap*, SecurityOriginHash>
+      DatabaseOriginMap;
+
+  Mutex m_openDatabaseMapGuard;
+  mutable OwnPtr<DatabaseOriginMap> m_openDatabaseMap;
 
 #if !PLATFORM(CHROMIUM)
  public:
@@ -132,14 +144,6 @@ class DatabaseTracker : public Noncopyable {
       QuotaMap;
   Mutex m_quotaMapGuard;
   mutable OwnPtr<QuotaMap> m_quotaMap;
-
-  typedef HashSet<Database*> DatabaseSet;
-  typedef HashMap<String, DatabaseSet*> DatabaseNameMap;
-  typedef HashMap<RefPtr<SecurityOrigin>, DatabaseNameMap*, SecurityOriginHash>
-      DatabaseOriginMap;
-
-  Mutex m_openDatabaseMapGuard;
-  mutable OwnPtr<DatabaseOriginMap> m_openDatabaseMap;
 
   OwnPtr<OriginQuotaManager> m_quotaManager;
 
