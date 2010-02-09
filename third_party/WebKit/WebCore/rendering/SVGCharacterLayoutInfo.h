@@ -299,7 +299,9 @@ struct SVGTextChunkWalkerBase {
 
   virtual bool setupBackground(InlineBox*) = 0;
   virtual bool setupFill(InlineBox*) = 0;
+  virtual bool setupFillSelection(InlineBox*) = 0;
   virtual bool setupStroke(InlineBox*) = 0;
+  virtual bool setupStrokeSelection(InlineBox*) = 0;
   virtual bool setupForeground(InlineBox*) = 0;
 };
 
@@ -331,7 +333,9 @@ struct SVGTextChunkWalker : public SVGTextChunkWalkerBase {
                      SVGTextChunkEndCallback end = 0,
                      SVGTextChunkSetupBackgroundCallback background = 0,
                      SVGTextChunkSetupFillCallback fill = 0,
+                     SVGTextChunkSetupFillCallback fillSelection = 0,
                      SVGTextChunkSetupStrokeCallback stroke = 0,
+                     SVGTextChunkSetupStrokeCallback strokeSelection = 0,
                      SVGTextChunkSetupForegroundCallback foreground = 0)
       : m_object(object),
         m_walkerCallback(walker),
@@ -339,7 +343,9 @@ struct SVGTextChunkWalker : public SVGTextChunkWalkerBase {
         m_endCallback(end),
         m_setupBackgroundCallback(background),
         m_setupFillCallback(fill),
+        m_setupFillSelectionCallback(fillSelection),
         m_setupStrokeCallback(stroke),
+        m_setupStrokeSelectionCallback(strokeSelection),
         m_setupForegroundCallback(foreground) {
     ASSERT(object);
     ASSERT(walker);
@@ -384,9 +390,25 @@ struct SVGTextChunkWalker : public SVGTextChunkWalkerBase {
     return false;
   }
 
+  virtual bool setupFillSelection(InlineBox* box) {
+    if (m_setupFillSelectionCallback)
+      return (*m_object.*m_setupFillSelectionCallback)(box);
+
+    ASSERT_NOT_REACHED();
+    return false;
+  }
+
   virtual bool setupStroke(InlineBox* box) {
     if (m_setupStrokeCallback)
       return (*m_object.*m_setupStrokeCallback)(box);
+
+    ASSERT_NOT_REACHED();
+    return false;
+  }
+
+  virtual bool setupStrokeSelection(InlineBox* box) {
+    if (m_setupStrokeSelectionCallback)
+      return (*m_object.*m_setupStrokeSelectionCallback)(box);
 
     ASSERT_NOT_REACHED();
     return false;
@@ -407,7 +429,9 @@ struct SVGTextChunkWalker : public SVGTextChunkWalkerBase {
   SVGTextChunkEndCallback m_endCallback;
   SVGTextChunkSetupBackgroundCallback m_setupBackgroundCallback;
   SVGTextChunkSetupFillCallback m_setupFillCallback;
+  SVGTextChunkSetupFillCallback m_setupFillSelectionCallback;
   SVGTextChunkSetupStrokeCallback m_setupStrokeCallback;
+  SVGTextChunkSetupStrokeCallback m_setupStrokeSelectionCallback;
   SVGTextChunkSetupForegroundCallback m_setupForegroundCallback;
 };
 

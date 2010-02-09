@@ -49,6 +49,7 @@ class SVGPaintServerSolid : public SVGPaintServer {
 
   virtual bool setup(GraphicsContext*&,
                      const RenderObject*,
+                     const RenderStyle*,
                      SVGPaintTargetType,
                      bool isPaintingText) const;
 

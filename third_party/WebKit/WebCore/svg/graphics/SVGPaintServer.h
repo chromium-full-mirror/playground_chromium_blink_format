@@ -82,8 +82,14 @@ class SVGPaintServer : public SVGResource {
 
   virtual bool setup(GraphicsContext*&,
                      const RenderObject*,
+                     const RenderStyle*,
                      SVGPaintTargetType,
                      bool isPaintingText = false) const = 0;
+
+  bool setup(GraphicsContext*&,
+             const RenderObject*,
+             SVGPaintTargetType,
+             bool isPaintingText = false) const;
 
   static SVGPaintServer* strokePaintServer(const RenderStyle*,
                                            const RenderObject*);
@@ -102,7 +108,7 @@ SVGPaintServer* getPaintServerById(Document*,
                                    const RenderObject*);
 
 void applyStrokeStyleToContext(GraphicsContext*,
-                               RenderStyle*,
+                               const RenderStyle*,
                                const RenderObject*);
 DashArray dashArrayFromRenderingStyle(const RenderStyle* style,
                                       RenderStyle* rootStyle);

@@ -71,6 +71,7 @@ class SVGPaintServerGradient : public SVGPaintServer {
 
   virtual bool setup(GraphicsContext*&,
                      const RenderObject*,
+                     const RenderStyle*,
                      SVGPaintTargetType,
                      bool isPaintingText) const;
   virtual void teardown(GraphicsContext*&,

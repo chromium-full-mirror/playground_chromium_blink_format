@@ -154,7 +154,7 @@ SVGPaintServer* SVGPaintServer::strokePaintServer(const RenderStyle* style,
 }
 
 void applyStrokeStyleToContext(GraphicsContext* context,
-                               RenderStyle* style,
+                               const RenderStyle* style,
                                const RenderObject* object) {
   context->setStrokeThickness(SVGRenderStyle::cssPrimitiveToLength(
       object, style->svgStyle()->strokeWidth(), 1.0f));
@@ -168,6 +168,14 @@ void applyStrokeStyleToContext(GraphicsContext* context,
   float dashOffset = SVGRenderStyle::cssPrimitiveToLength(
       object, style->svgStyle()->strokeDashOffset(), 0.0f);
   context->setLineDash(dashes, dashOffset);
+}
+
+bool SVGPaintServer::setup(GraphicsContext*& context,
+                           const RenderObject* object,
+                           SVGPaintTargetType type,
+                           bool isPaintingText) const {
+  return setup(context, object, object ? object->style() : 0, type,
+               isPaintingText);
 }
 
 void SVGPaintServer::draw(GraphicsContext*& context,

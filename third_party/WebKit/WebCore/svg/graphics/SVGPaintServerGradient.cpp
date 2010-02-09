@@ -195,13 +195,14 @@ static inline AffineTransform clipToTextMask(
 
 bool SVGPaintServerGradient::setup(GraphicsContext*& context,
                                    const RenderObject* object,
+                                   const RenderStyle* style,
                                    SVGPaintTargetType type,
                                    bool isPaintingText) const {
   m_ownerElement->buildGradient();
 
-  const SVGRenderStyle* style = object->style()->svgStyle();
-  bool isFilled = (type & ApplyToFillTargetType) && style->hasFill();
-  bool isStroked = (type & ApplyToStrokeTargetType) && style->hasStroke();
+  const SVGRenderStyle* svgStyle = style->svgStyle();
+  bool isFilled = (type & ApplyToFillTargetType) && svgStyle->hasFill();
+  bool isStroked = (type & ApplyToStrokeTargetType) && svgStyle->hasStroke();
 
   ASSERT((isFilled && !isStroked) || (!isFilled && isStroked));
 
@@ -219,14 +220,14 @@ bool SVGPaintServerGradient::setup(GraphicsContext*& context,
   }
 
   if (isFilled) {
-    context->setAlpha(style->fillOpacity());
+    context->setAlpha(svgStyle->fillOpacity());
     context->setFillGradient(m_gradient);
-    context->setFillRule(style->fillRule());
+    context->setFillRule(svgStyle->fillRule());
   }
   if (isStroked) {
-    context->setAlpha(style->strokeOpacity());
+    context->setAlpha(svgStyle->strokeOpacity());
     context->setStrokeGradient(m_gradient);
-    applyStrokeStyleToContext(context, object->style(), object);
+    applyStrokeStyleToContext(context, style, object);
   }
 
   AffineTransform matrix;
@@ -244,7 +245,7 @@ bool SVGPaintServerGradient::setup(GraphicsContext*& context,
     // lines or rectangles without width or height.
     if (bbox.width() == 0 || bbox.height() == 0) {
       Color color(0, 0, 0);
-      context->setStrokeColor(color, object->style()->colorSpace());
+      context->setStrokeColor(color, style->colorSpace());
       return true;
     }
     matrix.translate(bbox.x(), bbox.y());

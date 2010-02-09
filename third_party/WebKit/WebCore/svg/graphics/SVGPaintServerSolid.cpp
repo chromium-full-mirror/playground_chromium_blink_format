@@ -55,9 +55,9 @@ TextStream& SVGPaintServerSolid::externalRepresentation(TextStream& ts) const {
 
 bool SVGPaintServerSolid::setup(GraphicsContext*& context,
                                 const RenderObject* object,
+                                const RenderStyle* style,
                                 SVGPaintTargetType type,
                                 bool isPaintingText) const {
-  RenderStyle* style = object ? object->style() : 0;
   const SVGRenderStyle* svgStyle = style ? style->svgStyle() : 0;
   ColorSpace colorSpace = style ? style->colorSpace() : DeviceColorSpace;
 

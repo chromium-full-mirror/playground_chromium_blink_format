@@ -35,7 +35,9 @@ struct SVGTextDecorationInfo;
 enum SVGTextPaintSubphase {
   SVGTextPaintSubphaseBackground,
   SVGTextPaintSubphaseGlyphFill,
+  SVGTextPaintSubphaseGlyphFillSelection,
   SVGTextPaintSubphaseGlyphStroke,
+  SVGTextPaintSubphaseGlyphStrokeSelection,
   SVGTextPaintSubphaseForeground
 };
 
@@ -115,6 +117,10 @@ class SVGInlineTextBox : public InlineTextBox {
  private:
   friend class RenderSVGInlineText;
   bool svgCharacterHitsPosition(int x, int y, int& offset) const;
+  bool chunkSelectionStartEnd(const UChar* chunk,
+                              int chunkLength,
+                              int& selectionStart,
+                              int& selectionEnd);
 
   int m_height;
 };
