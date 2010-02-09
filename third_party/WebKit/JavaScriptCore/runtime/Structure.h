@@ -127,7 +127,7 @@ class Structure : public RefCounted<Structure> {
                       (m_propertyTable->deletedOffsets
                            ? m_propertyTable->deletedOffsets->size()
                            : 0)
-                : m_offset + 1);
+                : static_cast<unsigned>(m_offset + 1));
   }
   bool isUsingInlineStorage() const;
 
