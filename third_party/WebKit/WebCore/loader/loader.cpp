@@ -318,6 +318,7 @@ void Loader::Host::servePendingRequests(RequestQueue& requestsPending,
         m_requestsLoading.size() + m_nonCachedRequestsInFlight >=
             m_maxRequestsInFlight) {
       serveLowerPriority = false;
+      cache()->loader()->scheduleServePendingRequests();
       return;
     }
     requestsPending.removeFirst();
