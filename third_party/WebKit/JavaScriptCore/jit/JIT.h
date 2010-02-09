@@ -1022,6 +1022,9 @@ class JIT : private MacroAssembler {
   void emit_op_to_jsnumber(Instruction*);
   void emit_op_to_primitive(Instruction*);
   void emit_op_unexpected_load(Instruction*);
+#if ENABLE(JIT_OPTIMIZE_MOD)
+  void softModulo();
+#endif
 
   void emitSlow_op_add(Instruction*, Vector<SlowCaseEntry>::iterator&);
   void emitSlow_op_bitand(Instruction*, Vector<SlowCaseEntry>::iterator&);

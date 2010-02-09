@@ -86,6 +86,7 @@ struct TrampolineStructure {
   MacroAssemblerCodePtr ctiVirtualCallLink;
   MacroAssemblerCodePtr ctiVirtualCall;
   MacroAssemblerCodePtr ctiNativeCallThunk;
+  MacroAssemblerCodePtr ctiSoftModulo;
 };
 
 #if CPU(X86_64)
@@ -295,6 +296,9 @@ class JITThunks {
   }
   MacroAssemblerCodePtr ctiNativeCallThunk() {
     return m_trampolineStructure.ctiNativeCallThunk;
+  }
+  MacroAssemblerCodePtr ctiSoftModulo() {
+    return m_trampolineStructure.ctiSoftModulo;
   }
 
  private:
