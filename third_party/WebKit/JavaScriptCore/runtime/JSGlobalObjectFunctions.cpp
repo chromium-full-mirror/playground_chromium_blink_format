@@ -72,7 +72,7 @@ static JSValue encode(ExecState* exec,
       builder.append(tmp);
     }
   }
-  return builder.releaseJSString(exec);
+  return builder.build(exec);
 }
 
 static JSValue decode(ExecState* exec,
@@ -143,7 +143,7 @@ static JSValue decode(ExecState* exec,
     k++;
     builder.append(c);
   }
-  return builder.releaseJSString(exec);
+  return builder.build(exec);
 }
 
 bool isStrWhiteSpace(UChar c) {
@@ -433,7 +433,7 @@ JSValue JSC_HOST_CALL globalFuncEscape(ExecState* exec,
     }
   }
 
-  return builder.releaseJSString(exec);
+  return builder.build(exec);
 }
 
 JSValue JSC_HOST_CALL globalFuncUnescape(ExecState* exec,
@@ -464,7 +464,7 @@ JSValue JSC_HOST_CALL globalFuncUnescape(ExecState* exec,
     builder.append(*c);
   }
 
-  return jsString(exec, builder.release());
+  return jsString(exec, builder.build());
 }
 
 #ifndef NDEBUG

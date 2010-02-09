@@ -208,7 +208,7 @@ inline LiteralParser::TokenType LiteralParser::Lexer::lexString(
   if (m_ptr >= m_end || *m_ptr != '"')
     return TokError;
 
-  token.stringToken = builder.release();
+  token.stringToken = builder.build();
   token.type = TokString;
   token.end = ++m_ptr;
   return TokString;

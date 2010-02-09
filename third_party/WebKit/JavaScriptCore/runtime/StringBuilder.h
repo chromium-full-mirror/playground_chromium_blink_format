@@ -55,9 +55,9 @@ class StringBuilder {
 
   UChar operator[](size_t i) const { return buffer.at(i); }
 
-  UString release() {
+  UString build() {
     buffer.shrinkToFit();
-    if (!buffer.data())
+    if (buffer.size() && !buffer.data())
       CRASH();
     return UString::adopt(buffer);
   }

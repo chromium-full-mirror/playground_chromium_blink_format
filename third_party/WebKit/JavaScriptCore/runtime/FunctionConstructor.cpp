@@ -104,7 +104,7 @@ JSObject* constructFunction(ExecState* exec,
     builder.append(") { ");
     builder.append(args.at(args.size() - 1).toString(exec));
     builder.append("\n})");
-    program = builder.release();
+    program = builder.build();
   }
 
   int errLine;

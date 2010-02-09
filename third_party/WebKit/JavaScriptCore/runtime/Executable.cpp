@@ -308,6 +308,6 @@ UString FunctionExecutable::paramString() const {
       builder.append(", ");
     builder.append(parameters[pos].ustring());
   }
-  return builder.release();
+  return builder.build();
 }
 };
