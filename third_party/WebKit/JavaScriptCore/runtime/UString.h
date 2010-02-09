@@ -79,8 +79,6 @@ class UString {
   typedef UStringImpl Rep;
 
  public:
-  // UString constructors passed char*s assume ISO Latin-1 encoding; for UTF8
-  // use 'createFromUTF8', below.
   UString();
   UString(const char*);  // Constructor for null-terminated string.
   UString(const char*, int length);
@@ -98,8 +96,6 @@ class UString {
   static PassRefPtr<UStringImpl> adopt(Vector<UChar, inlineCapacity>& vector) {
     return Rep::adopt(vector);
   }
-
-  static UString createFromUTF8(const char*);
 
   static UString from(int);
   static UString from(long long);

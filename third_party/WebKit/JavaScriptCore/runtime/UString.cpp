@@ -167,20 +167,6 @@ UString::UString(const UChar* c, int length) {
     m_rep = Rep::create(c, length);
 }
 
-UString UString::createFromUTF8(const char* string) {
-  if (!string)
-    return null();
-
-  size_t length = strlen(string);
-  Vector<UChar, 1024> buffer(length);
-  UChar* p = buffer.data();
-  if (conversionOK !=
-      convertUTF8ToUTF16(&string, string + length, &p, p + length))
-    return null();
-
-  return UString(buffer.data(), p - buffer.data());
-}
-
 UString UString::from(int i) {
   UChar buf[1 + sizeof(i) * 3];
   UChar* end = buf + sizeof(buf) / sizeof(UChar);

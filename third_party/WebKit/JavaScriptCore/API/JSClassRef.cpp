@@ -33,12 +33,28 @@
 #include <runtime/JSGlobalObject.h>
 #include <runtime/ObjectPrototype.h>
 #include <runtime/Identifier.h>
+#include <wtf/unicode/UTF8.h>
 
 using namespace std;
 using namespace JSC;
+using namespace WTF::Unicode;
 
 const JSClassDefinition kJSClassDefinitionEmpty = {0, 0, 0, 0, 0, 0, 0, 0, 0,
                                                    0, 0, 0, 0, 0, 0, 0, 0};
+
+UString tryCreateStringFromUTF8(const char* string) {
+  if (!string)
+    return UString::null();
+
+  size_t length = strlen(string);
+  Vector<UChar, 1024> buffer(length);
+  UChar* p = buffer.data();
+  if (conversionOK !=
+      convertUTF8ToUTF16(&string, string + length, &p, p + length))
+    return UString::null();
+
+  return UString(buffer.data(), p - buffer.data());
+}
 
 OpaqueJSClass::OpaqueJSClass(const JSClassDefinition* definition,
                              OpaqueJSClass* protoClass)
@@ -55,7 +71,7 @@ OpaqueJSClass::OpaqueJSClass(const JSClassDefinition* definition,
       callAsConstructor(definition->callAsConstructor),
       hasInstance(definition->hasInstance),
       convertToType(definition->convertToType),
-      m_className(UString::createFromUTF8(definition->className).rep()->ref()),
+      m_className(tryCreateStringFromUTF8(definition->className)),
       m_staticValues(0),
       m_staticFunctions(0) {
   initializeThreading();
@@ -63,12 +79,14 @@ OpaqueJSClass::OpaqueJSClass(const JSClassDefinition* definition,
   if (const JSStaticValue* staticValue = definition->staticValues) {
     m_staticValues = new OpaqueJSClassStaticValuesTable();
     while (staticValue->name) {
-      // Use a local variable here to sidestep an RVCT compiler bug.
-      StaticValueEntry* entry = new StaticValueEntry(staticValue->getProperty,
-                                                     staticValue->setProperty,
-                                                     staticValue->attributes);
-      m_staticValues->add(
-          UString::createFromUTF8(staticValue->name).rep()->ref(), entry);
+      UString valueName = tryCreateStringFromUTF8(staticValue->name);
+      if (!valueName.isNull()) {
+        // Use a local variable here to sidestep an RVCT compiler bug.
+        StaticValueEntry* entry = new StaticValueEntry(staticValue->getProperty,
+                                                       staticValue->setProperty,
+                                                       staticValue->attributes);
+        m_staticValues->add(valueName.rep()->ref(), entry);
+      }
       ++staticValue;
     }
   }
@@ -76,11 +94,13 @@ OpaqueJSClass::OpaqueJSClass(const JSClassDefinition* definition,
   if (const JSStaticFunction* staticFunction = definition->staticFunctions) {
     m_staticFunctions = new OpaqueJSClassStaticFunctionsTable();
     while (staticFunction->name) {
-      // Use a local variable here to sidestep an RVCT compiler bug.
-      StaticFunctionEntry* entry = new StaticFunctionEntry(
-          staticFunction->callAsFunction, staticFunction->attributes);
-      m_staticFunctions->add(
-          UString::createFromUTF8(staticFunction->name).rep()->ref(), entry);
+      UString functionName = tryCreateStringFromUTF8(staticFunction->name);
+      if (!functionName.isNull()) {
+        // Use a local variable here to sidestep an RVCT compiler bug.
+        StaticFunctionEntry* entry = new StaticFunctionEntry(
+            staticFunction->callAsFunction, staticFunction->attributes);
+        m_staticFunctions->add(functionName.rep()->ref(), entry);
+      }
       ++staticFunction;
     }
   }
@@ -167,7 +187,6 @@ OpaqueJSClassContextData::OpaqueJSClassContextData(OpaqueJSClass* jsClass)
       staticValues->add(
           UString::Rep::create(it->first->data(), it->first->size()), entry);
     }
-
   } else
     staticValues = 0;
 
