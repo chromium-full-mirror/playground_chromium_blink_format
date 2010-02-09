@@ -2022,6 +2022,9 @@ bool QWebPage::shouldInterruptJavaScript() {
     the request to QWebView's createWindow() function; otherwise it returns a
    null pointer.
 
+    If \a type is WebModalDialog, the application must call
+   setWindowModality(Qt::ApplicationModal) on the new window.
+
     \sa acceptNavigationRequest()
 */
 QWebPage* QWebPage::createWindow(WebWindowType type) {

@@ -34,6 +34,7 @@
 #include "KURL.h"
 #include "PlatformString.h"
 
+class QEventLoop;
 class QWebPage;
 
 namespace WebCore {
@@ -173,6 +174,7 @@ class ChromeClientQt : public ChromeClient {
   bool toolBarsVisible;
   bool statusBarVisible;
   bool menuBarVisible;
+  QEventLoop* m_eventLoop;
 };
 }
 
