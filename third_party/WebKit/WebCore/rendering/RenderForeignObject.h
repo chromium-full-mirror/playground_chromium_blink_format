@@ -24,6 +24,7 @@
 #if ENABLE(SVG) && ENABLE(SVG_FOREIGN_OBJECT)
 
 #include "AffineTransform.h"
+#include "FloatPoint.h"
 #include "RenderSVGBlock.h"
 
 namespace WebCore {
@@ -69,7 +70,7 @@ class RenderForeignObject : public RenderSVGBlock {
                                    TransformState& transformState) const;
 
  private:
-  AffineTransform translationForAttributes() const;
+  FloatPoint translationForAttributes() const;
 
   virtual AffineTransform localTransform() const { return m_localTransform; }
 

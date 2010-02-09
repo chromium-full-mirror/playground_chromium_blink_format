@@ -36,11 +36,10 @@ namespace WebCore {
 RenderForeignObject::RenderForeignObject(SVGForeignObjectElement* node)
     : RenderSVGBlock(node) {}
 
-AffineTransform RenderForeignObject::translationForAttributes() const {
+FloatPoint RenderForeignObject::translationForAttributes() const {
   SVGForeignObjectElement* foreign =
       static_cast<SVGForeignObjectElement*>(node());
-  return AffineTransform().translate(foreign->x().value(foreign),
-                                     foreign->y().value(foreign));
+  return FloatPoint(foreign->x().value(foreign), foreign->y().value(foreign));
 }
 
 void RenderForeignObject::paint(PaintInfo& paintInfo, int, int) {
@@ -88,7 +87,9 @@ void RenderForeignObject::computeRectForRepaint(
 }
 
 const AffineTransform& RenderForeignObject::localToParentTransform() const {
-  m_localToParentTransform = localTransform() * translationForAttributes();
+  FloatPoint attributeTranslation(translationForAttributes());
+  m_localToParentTransform = localTransform().translateRight(
+      attributeTranslation.x(), attributeTranslation.y());
   return m_localToParentTransform;
 }
 
