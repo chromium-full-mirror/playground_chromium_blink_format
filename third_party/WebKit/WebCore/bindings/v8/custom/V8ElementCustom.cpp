@@ -58,12 +58,9 @@ v8::Handle<v8::Value> V8Element::setAttributeCallback(
   String name = toWebCoreString(args[0]);
   String value = toWebCoreString(args[1]);
 
-  if (!V8BindingSecurity::allowSettingSrcToJavascriptURL(V8BindingState::Only(),
-                                                         element, name, value))
-    return v8::Undefined();
-
   ExceptionCode ec = 0;
-  element->setAttribute(name, value, ec);
+  V8BindingElement::setAttribute(V8BindingState::Only(), element, name, value,
+                                 ec);
   if (ec)
     return throwError(ec);
 
@@ -79,12 +76,9 @@ v8::Handle<v8::Value> V8Element::setAttributeNodeCallback(
   Attr* newAttr = V8Attr::toNative(v8::Handle<v8::Object>::Cast(args[0]));
   Element* element = V8Element::toNative(args.Holder());
 
-  if (!V8BindingSecurity::allowSettingSrcToJavascriptURL(
-          V8BindingState::Only(), element, newAttr->name(), newAttr->value()))
-    return v8::Undefined();
-
   ExceptionCode ec = 0;
-  RefPtr<Attr> result = element->setAttributeNode(newAttr, ec);
+  RefPtr<Attr> result = V8BindingElement::setAttributeNode(
+      V8BindingState::Only(), element, newAttr, ec);
   if (ec)
     throwError(ec);
 
@@ -99,12 +93,9 @@ v8::Handle<v8::Value> V8Element::setAttributeNSCallback(
   String qualifiedName = toWebCoreString(args[1]);
   String value = toWebCoreString(args[2]);
 
-  if (!V8BindingSecurity::allowSettingSrcToJavascriptURL(
-          V8BindingState::Only(), element, qualifiedName, value))
-    return v8::Undefined();
-
   ExceptionCode ec = 0;
-  element->setAttributeNS(namespaceURI, qualifiedName, value, ec);
+  V8BindingElement::setAttributeNS(V8BindingState::Only(), element,
+                                   namespaceURI, qualifiedName, value, ec);
   if (ec)
     throwError(ec);
 
@@ -120,12 +111,9 @@ v8::Handle<v8::Value> V8Element::setAttributeNodeNSCallback(
   Attr* newAttr = V8Attr::toNative(v8::Handle<v8::Object>::Cast(args[0]));
   Element* element = V8Element::toNative(args.Holder());
 
-  if (!V8BindingSecurity::allowSettingSrcToJavascriptURL(
-          V8BindingState::Only(), element, newAttr->name(), newAttr->value()))
-    return v8::Undefined();
-
   ExceptionCode ec = 0;
-  RefPtr<Attr> result = element->setAttributeNodeNS(newAttr, ec);
+  RefPtr<Attr> result = V8BindingElement::setAttributeNodeNS(
+      V8BindingState::Only(), element, newAttr, ec);
   if (ec)
     throwError(ec);
 
