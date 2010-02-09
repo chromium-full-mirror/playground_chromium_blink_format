@@ -57,6 +57,7 @@ class PrintContext {
 
   // Used by layout tests.
   static int pageNumberForElement(Element*, const FloatSize& pageSizeInPixels);
+  static int numberOfPages(Frame*, const FloatSize& pageSizeInPixels);
 
  protected:
   void computePageRectsWithPageSize(const FloatSize& pageSizeInPixels,

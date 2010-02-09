@@ -87,4 +87,5 @@
 - (int)pageNumberForElement:(DOMElement*)
                     element:(float)
           pageWidthInPixels:(float)pageHeightInPixels;
+- (int)numberOfPages:(float)pageWidthInPixels:(float)pageHeightInPixels;
 @end

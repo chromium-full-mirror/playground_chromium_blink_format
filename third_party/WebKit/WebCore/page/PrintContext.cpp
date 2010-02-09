@@ -188,6 +188,19 @@ int PrintContext::pageNumberForElement(Element* element,
         top < page.bottom())
       return pageNumber;
   }
+  printContext.end();
   return -1;
+}
+
+int PrintContext::numberOfPages(Frame* frame,
+                                const FloatSize& pageSizeInPixels) {
+  frame->document()->updateLayout();
+
+  FloatRect pageRect(FloatPoint(0, 0), pageSizeInPixels);
+  PrintContext printContext(frame);
+  printContext.begin(pageRect.width());
+  printContext.computePageRectsWithPageSize(pageSizeInPixels, 1);
+  printContext.end();
+  return printContext.pageCount();
 }
 }
