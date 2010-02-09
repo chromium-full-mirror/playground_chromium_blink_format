@@ -356,6 +356,13 @@ JSValue jsSpliceSubstringsWithSeparators(ExecState* exec,
                                          const StringRange* substringRanges,
                                          int rangeCount,
                                          const UString* separators,
+                                         int separatorCount);
+JSValue jsSpliceSubstringsWithSeparators(ExecState* exec,
+                                         JSString* sourceVal,
+                                         const UString& source,
+                                         const StringRange* substringRanges,
+                                         int rangeCount,
+                                         const UString* separators,
                                          int separatorCount) {
   if (rangeCount == 1 && separatorCount == 0) {
     int sourceSize = source.size();
@@ -402,6 +409,11 @@ JSValue jsSpliceSubstringsWithSeparators(ExecState* exec,
   return jsString(exec, impl);
 }
 
+JSValue jsReplaceRange(ExecState* exec,
+                       const UString& source,
+                       int rangeStart,
+                       int rangeLength,
+                       const UString& replacement);
 JSValue jsReplaceRange(ExecState* exec,
                        const UString& source,
                        int rangeStart,
