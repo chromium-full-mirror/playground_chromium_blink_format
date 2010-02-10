@@ -325,7 +325,7 @@ bool QScriptValuePrivate::isBool() {
 bool QScriptValuePrivate::isNumber() {
   switch (m_state) {
     case CNumber:
-      return m_number;
+      return true;
     case JSValue:
       if (isObject())
         return false;
