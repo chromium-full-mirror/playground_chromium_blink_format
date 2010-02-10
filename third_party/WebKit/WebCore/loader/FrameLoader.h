@@ -574,6 +574,8 @@ class FrameLoader : public Noncopyable {
   bool shouldTreatURLAsSameAsCurrent(const KURL&) const;
 
   void updateSandboxFlags();
+  // FIXME: isDocumentSandboxed should eventually replace isSandboxed.
+  bool isDocumentSandboxed(SandboxFlags) const;
 
   Frame* m_frame;
   FrameLoaderClient* m_client;
