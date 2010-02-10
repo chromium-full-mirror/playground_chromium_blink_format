@@ -49,15 +49,16 @@ const SimpleFontData* FontCache::getFontDataForCharacters(const Font&,
   return 0;
 }
 
-FontPlatformData* FontCache::getSimilarFontPlatformData(const Font& font) {
+SimpleFontData* FontCache::getSimilarFontPlatformData(const Font& font) {
   return 0;
 }
 
-FontPlatformData* FontCache::getLastResortFallbackFont(
+SimpleFontData* FontCache::getLastResortFallbackFont(
     const FontDescription& fontDescription) {
   const AtomicString fallbackFamily =
       QFont(fontDescription.family().family()).lastResortFamily();
-  return new FontPlatformData(fontDescription, fallbackFamily);
+  return getCachedFontData(
+      new FontPlatformData(fontDescription, fallbackFamily));
 }
 
 void FontCache::getTraitsInFamily(const AtomicString&, Vector<unsigned>&) {}

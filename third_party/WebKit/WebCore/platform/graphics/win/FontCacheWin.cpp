@@ -330,11 +330,11 @@ const SimpleFontData* FontCache::getFontDataForCharacters(
   return fontData;
 }
 
-FontPlatformData* FontCache::getSimilarFontPlatformData(const Font& font) {
+SimpleFontData* FontCache::getSimilarFontPlatformData(const Font& font) {
   return 0;
 }
 
-FontPlatformData* FontCache::getLastResortFallbackFont(
+SimpleFontData* FontCache::getLastResortFallbackFont(
     const FontDescription& fontDescription) {
   // FIXME: Would be even better to somehow get the user's default font here.
   // For now we'll pick
@@ -352,7 +352,7 @@ FontPlatformData* FontCache::getLastResortFallbackFont(
     defaultGUIFontFamily =
         String(logFont.lfFaceName, wcsnlen(logFont.lfFaceName, LF_FACESIZE));
   }
-  return getCachedFontPlatformData(fontDescription, defaultGUIFontFamily);
+  return getCachedFontData(fontDescription, defaultGUIFontFamily);
 }
 
 static LONG toGDIFontWeight(FontWeight fontWeight) {

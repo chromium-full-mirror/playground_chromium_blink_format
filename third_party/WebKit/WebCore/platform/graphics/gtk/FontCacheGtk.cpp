@@ -63,17 +63,17 @@ const SimpleFontData* FontCache::getFontDataForCharacters(
   return 0;
 }
 
-FontPlatformData* FontCache::getSimilarFontPlatformData(const Font& font) {
+SimpleFontData* FontCache::getSimilarFontPlatformData(const Font& font) {
   return 0;
 }
 
-FontPlatformData* FontCache::getLastResortFallbackFont(
+SimpleFontData* FontCache::getLastResortFallbackFont(
     const FontDescription& fontDescription) {
   // FIXME: Would be even better to somehow get the user's default font here.
   // For now we'll pick the default that the user would get without changing any
   // prefs.
   static AtomicString timesStr("Times New Roman");
-  return getCachedFontPlatformData(fontDescription, timesStr);
+  return getCachedFontData(fontDescription, timesStr);
 }
 
 void FontCache::getTraitsInFamily(const AtomicString& familyName,

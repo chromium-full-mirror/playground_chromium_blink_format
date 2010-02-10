@@ -415,11 +415,11 @@ const SimpleFontData* FontCache::getFontDataForCharacters(
   return 0;
 }
 
-FontPlatformData* FontCache::getSimilarFontPlatformData(const Font& font) {
+SimpleFontData* FontCache::getSimilarFontPlatformData(const Font& font) {
   return 0;
 }
 
-FontPlatformData* FontCache::getLastResortFallbackFont(
+SimpleFontData* FontCache::getLastResortFallbackFont(
     const FontDescription& description) {
   FontDescription::GenericFamilyType generic = description.genericFamily();
 
@@ -436,7 +436,7 @@ FontPlatformData* FontCache::getLastResortFallbackFont(
   else if (generic == FontDescription::MonospaceFamily)
     fontStr = courierStr;
 
-  return getCachedFontPlatformData(description, fontStr);
+  return getCachedFontData(description, fontStr);
 }
 
 static LONG toGDIFontWeight(FontWeight fontWeight) {

@@ -421,8 +421,7 @@ static FontData* fontDataForGenericFamily(
     genericFamily = settings->standardFontFamily();
 
   if (!genericFamily.isEmpty())
-    return fontCache()->getCachedFontData(
-        fontCache()->getCachedFontPlatformData(fontDescription, genericFamily));
+    return fontCache()->getCachedFontData(fontDescription, genericFamily);
 
   return 0;
 }

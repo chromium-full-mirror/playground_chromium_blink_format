@@ -80,12 +80,10 @@ class FontCache : public Noncopyable {
 
   void getTraitsInFamily(const AtomicString&, Vector<unsigned>&);
 
-  FontPlatformData* getCachedFontPlatformData(
-      const FontDescription&,
-      const AtomicString& family,
-      bool checkingAlternateName = false);
-  SimpleFontData* getCachedFontData(const FontPlatformData*);
-  FontPlatformData* getLastResortFallbackFont(const FontDescription&);
+  SimpleFontData* getCachedFontData(const FontDescription& fontDescription,
+                                    const AtomicString& family,
+                                    bool checkingAlternateName = false);
+  SimpleFontData* getLastResortFallbackFont(const FontDescription&);
 
   void addClient(FontSelector*);
   void removeClient(FontSelector*);
@@ -101,12 +99,21 @@ class FontCache : public Noncopyable {
   FontCache();
   ~FontCache();
 
+  // FIXME: This method should eventually be removed.
+  FontPlatformData* getCachedFontPlatformData(
+      const FontDescription&,
+      const AtomicString& family,
+      bool checkingAlternateName = false);
+
   // These methods are implemented by each platform.
-  FontPlatformData* getSimilarFontPlatformData(const Font&);
+  SimpleFontData* getSimilarFontPlatformData(const Font&);
   FontPlatformData* createFontPlatformData(const FontDescription&,
                                            const AtomicString& family);
 
-  friend class SimpleFontData;
+  SimpleFontData* getCachedFontData(const FontPlatformData*);
+
+  friend class SimpleFontData;  // For getCachedFontData(const
+                                // FontPlatformData*)
   friend class FontFallbackList;
 };
 
