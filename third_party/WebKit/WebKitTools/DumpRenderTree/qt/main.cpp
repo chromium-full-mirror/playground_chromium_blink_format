@@ -162,7 +162,6 @@ int main(int argc, char* argv[]) {
       QDesktopServices::storageLocation(QDesktopServices::DataLocation) +
       QDir::separator() + "qtwebkitdrt";
   QWebSettings::setOfflineStoragePath(dbDir);
-  QWebSettings::setOfflineWebApplicationCachePath(dbDir);
   QWebDatabase::removeAllDatabases();
 
   if (args.contains(QLatin1String("-"))) {
