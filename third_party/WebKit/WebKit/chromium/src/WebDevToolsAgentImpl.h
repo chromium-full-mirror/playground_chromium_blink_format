@@ -78,7 +78,6 @@ class WebDevToolsAgentImpl : public WebDevToolsAgentPrivate,
                                         const WebCore::String& functionName,
                                         const WebCore::String& jsonArgs,
                                         bool async);
-  virtual void executeVoidJavaScript();
 
   // WebDevToolsAgentPrivate implementation.
   virtual void didClearWindowObject(WebFrameImpl* frame);
