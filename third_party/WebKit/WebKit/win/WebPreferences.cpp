@@ -239,6 +239,9 @@ void WebPreferences::initializeDefaultSettings() {
       kCFBooleanFalse);
   CFDictionaryAddValue(defaults, CFSTR(WebKitXSSAuditorEnabledPreferenceKey),
                        kCFBooleanTrue);
+  CFDictionaryAddValue(defaults,
+                       CFSTR(WebKitFrameSetFlatteningEnabledPreferenceKey),
+                       kCFBooleanFalse);
   CFDictionaryAddValue(
       defaults, CFSTR(WebKitJavaScriptCanOpenWindowsAutomaticallyPreferenceKey),
       kCFBooleanTrue);
@@ -858,6 +861,19 @@ HRESULT STDMETHODCALLTYPE WebPreferences::isXSSAuditorEnabled(
 HRESULT STDMETHODCALLTYPE WebPreferences::setXSSAuditorEnabled(
     /* [in] */ BOOL enabled) {
   setBoolValue(CFSTR(WebKitXSSAuditorEnabledPreferenceKey), enabled);
+  return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE WebPreferences::isFrameSetFlatteningEnabled(
+    /* [retval][out] */ BOOL* enabled) {
+  *enabled =
+      boolValueForKey(CFSTR(WebKitFrameSetFlatteningEnabledPreferenceKey));
+  return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE WebPreferences::setFrameSetFlatteningEnabled(
+    /* [in] */ BOOL enabled) {
+  setBoolValue(CFSTR(WebKitFrameSetFlatteningEnabledPreferenceKey), enabled);
   return S_OK;
 }
 

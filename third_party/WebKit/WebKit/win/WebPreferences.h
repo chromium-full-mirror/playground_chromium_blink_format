@@ -382,6 +382,12 @@ class WebPreferences : public IWebPreferences, public IWebPreferencesPrivate {
   virtual HRESULT STDMETHODCALLTYPE pluginAllowedRunTime(
       /* [retval][out] */ UINT* allowedRunTime);
 
+  virtual HRESULT STDMETHODCALLTYPE isFrameSetFlatteningEnabled(
+      /* [retval][out] */ BOOL* enabled);
+
+  virtual HRESULT STDMETHODCALLTYPE setFrameSetFlatteningEnabled(
+      /* [in] */ BOOL enabled);
+
   virtual HRESULT STDMETHODCALLTYPE setPreferenceForTest(
       /* [in] */ BSTR key,
       /* [in] */ BSTR value);
