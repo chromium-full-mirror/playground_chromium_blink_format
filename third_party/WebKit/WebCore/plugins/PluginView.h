@@ -210,7 +210,7 @@ class PluginView : public Widget,
 
   virtual bool isPluginView() const { return true; }
 
-  Frame* parentFrame() const { return m_parentFrame; }
+  Frame* parentFrame() const { return m_parentFrame.get(); }
 
   void focusPluginElement();
 
@@ -243,6 +243,9 @@ class PluginView : public Widget,
   static bool isCallingPlugin();
 
   bool start();
+
+  static void keepAlive(NPP);
+  void keepAlive();
 
  private:
   PluginView(Frame* parentFrame,
@@ -287,7 +290,7 @@ class PluginView : public Widget,
   static BOOL WINAPI hookedEndPaint(HWND, const PAINTSTRUCT*);
 #endif
 
-  Frame* m_parentFrame;
+  RefPtr<Frame> m_parentFrame;
   RefPtr<PluginPackage> m_plugin;
   Element* m_element;
   bool m_isStarted;
@@ -305,6 +308,9 @@ class PluginView : public Widget,
 
   void popPopupsStateTimerFired(Timer<PluginView>*);
   Timer<PluginView> m_popPopupsStateTimer;
+
+  void lifeSupportTimerFired(Timer<PluginView>*);
+  Timer<PluginView> m_lifeSupportTimer;
 
 #ifndef NP_NO_CARBON
   bool dispatchNPEvent(NPEvent&);
