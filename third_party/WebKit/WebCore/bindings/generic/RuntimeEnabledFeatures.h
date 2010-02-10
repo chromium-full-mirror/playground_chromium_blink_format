@@ -33,7 +33,10 @@
 
 namespace WebCore {
 
-// A class that stores static enablers for all experimental features
+// A class that stores static enablers for all experimental features. Note that
+// the method names must line up with the JavaScript method they enable for code
+// generation to work properly.
+
 class RuntimeEnabledFeatures {
  public:
   static void setLocalStorageEnabled(bool isEnabled) {
@@ -46,10 +49,12 @@ class RuntimeEnabledFeatures {
   }
   static bool sessionStorageEnabled() { return isSessionStorageEnabled; }
 
-  static void setNotificationsEnabled(bool isEnabled) {
-    isNotificationsEnabled = isEnabled;
+  static void setWebkitNotificationsEnabled(bool isEnabled) {
+    isWebkitNotificationsEnabled = isEnabled;
   }
-  static bool notificationsEnabled() { return isNotificationsEnabled; }
+  static bool webkitNotificationsEnabled() {
+    return isWebkitNotificationsEnabled;
+  }
 
   static void setApplicationCacheEnabled(bool isEnabled) {
     isApplicationCacheEnabled = isEnabled;
@@ -61,10 +66,30 @@ class RuntimeEnabledFeatures {
   }
   static bool geolocationEnabled() { return isGeolocationEnabled; }
 
-  static void setIndexedDatabaseEnabled(bool isEnabled) {
-    isIndexedDatabaseEnabled = isEnabled;
+  static void setIndexedDBEnabled(bool isEnabled) {
+    isIndexedDBEnabled = isEnabled;
   }
-  static bool indexedDatabaseEnabled() { return isIndexedDatabaseEnabled; }
+  static bool indexedDBEnabled() { return isIndexedDBEnabled; }
+
+#if ENABLE(VIDEO)
+  static bool audioEnabled();
+  static bool htmlMediaElementEnabled();
+  static bool htmlAudioElementEnabled();
+  static bool htmlVideoElementEnabled();
+  static bool mediaErrorEnabled();
+#endif
+
+#if ENABLE(SHARED_WORKERS)
+  static bool sharedWorkerEnabled();
+#endif
+
+#if ENABLE(WEB_SOCKETS)
+  static bool webSocketEnabled();
+#endif
+
+#if ENABLE(DATABASE)
+  static bool openDatabaseEnabled();
+#endif
 
  private:
   // Never instantiate.
@@ -72,10 +97,10 @@ class RuntimeEnabledFeatures {
 
   static bool isLocalStorageEnabled;
   static bool isSessionStorageEnabled;
-  static bool isNotificationsEnabled;
+  static bool isWebkitNotificationsEnabled;
   static bool isApplicationCacheEnabled;
   static bool isGeolocationEnabled;
-  static bool isIndexedDatabaseEnabled;
+  static bool isIndexedDBEnabled;
 };
 
 }  // namespace WebCore

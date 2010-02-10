@@ -45,7 +45,6 @@
 #include "MediaPlayer.h"
 #include "Page.h"
 #include "PlatformScreen.h"
-#include "RuntimeEnabledFeatures.h"
 #include "ScheduledAction.h"
 #include "ScriptSourceCode.h"
 #include "SerializedScriptValue.h"
@@ -268,72 +267,6 @@ v8::Handle<v8::Value> V8DOMWindow::AudioAccessorGetter(
   return V8DOMWrapper::getConstructor(V8ClassIndex::AUDIO, window);
 }
 
-bool V8DOMWindow::AudioEnabled() {
-  return MediaPlayer::isAvailable();
-}
-
-bool V8DOMWindow::HTMLMediaElementEnabled() {
-  return MediaPlayer::isAvailable();
-}
-
-bool V8DOMWindow::HTMLAudioElementEnabled() {
-  return MediaPlayer::isAvailable();
-}
-
-bool V8DOMWindow::HTMLVideoElementEnabled() {
-  return MediaPlayer::isAvailable();
-}
-
-bool V8DOMWindow::MediaErrorEnabled() {
-  return MediaPlayer::isAvailable();
-}
-
-#endif
-
-#if ENABLE(SHARED_WORKERS)
-bool V8DOMWindow::SharedWorkerEnabled() {
-  return SharedWorkerRepository::isAvailable();
-}
-#endif
-
-#if ENABLE(WEB_SOCKETS)
-bool V8DOMWindow::WebSocketEnabled() {
-  return WebSocket::isAvailable();
-}
-#endif
-
-#if ENABLE(DATABASE)
-bool V8DOMWindow::OpenDatabaseEnabled() {
-  return Database::isAvailable();
-}
-#endif
-
-#if ENABLE(INDEXED_DATABASE)
-bool V8DOMWindow::IndexedDBEnabled() {
-  return RuntimeEnabledFeatures::indexedDatabaseEnabled();
-}
-#endif
-
-#if ENABLE(DOM_STORAGE)
-bool V8DOMWindow::LocalStorageEnabled() {
-  return RuntimeEnabledFeatures::localStorageEnabled();
-}
-
-bool V8DOMWindow::SessionStorageEnabled() {
-  return RuntimeEnabledFeatures::sessionStorageEnabled();
-}
-#endif
-
-#if ENABLE(NOTIFICATIONS)
-bool V8DOMWindow::WebkitNotificationsEnabled() {
-  return RuntimeEnabledFeatures::notificationsEnabled();
-}
-#endif
-
-#if ENABLE(OFFLINE_WEB_APPLICATIONS)
-bool V8DOMWindow::ApplicationCacheEnabled() {
-  return RuntimeEnabledFeatures::applicationCacheEnabled();
-}
 #endif
 
 v8::Handle<v8::Value> V8DOMWindow::ImageAccessorGetter(

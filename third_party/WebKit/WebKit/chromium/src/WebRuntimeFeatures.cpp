@@ -112,13 +112,13 @@ bool WebRuntimeFeatures::isSocketsEnabled() {
 
 void WebRuntimeFeatures::enableNotifications(bool enable) {
 #if ENABLE(NOTIFICATIONS)
-  RuntimeEnabledFeatures::setNotificationsEnabled(enable);
+  RuntimeEnabledFeatures::setWebkitNotificationsEnabled(enable);
 #endif
 }
 
 bool WebRuntimeFeatures::isNotificationsEnabled() {
 #if ENABLE(NOTIFICATIONS)
-  return RuntimeEnabledFeatures::notificationsEnabled();
+  return RuntimeEnabledFeatures::webkitNotificationsEnabled();
 #else
   return false;
 #endif
@@ -154,13 +154,13 @@ bool WebRuntimeFeatures::isGeolocationEnabled() {
 
 void WebRuntimeFeatures::enableIndexedDatabase(bool enable) {
 #if ENABLE(INDEXED_DATABASE)
-  RuntimeEnabledFeatures::setIndexedDatabaseEnabled(enable);
+  RuntimeEnabledFeatures::setIndexedDBEnabled(enable);
 #endif
 }
 
 bool WebRuntimeFeatures::isIndexedDatabaseEnabled() {
 #if ENABLE(INDEXED_DATABASE)
-  return RuntimeEnabledFeatures::indexedDatabaseEnabled();
+  return RuntimeEnabledFeatures::indexedDBEnabled();
 #else
   return false;
 #endif

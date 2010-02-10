@@ -37,12 +37,6 @@
 
 namespace WebCore {
 
-#if ENABLE(GEOLOCATION)
-bool V8Navigator::GeolocationEnabled() {
-  return RuntimeEnabledFeatures::geolocationEnabled();
-}
-#endif
-
 v8::Handle<v8::Value> toV8(Navigator* impl) {
   if (!impl)
     return v8::Null();
