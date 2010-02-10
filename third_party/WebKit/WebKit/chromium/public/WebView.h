@@ -216,12 +216,26 @@ class WebView : public WebWidget {
   // Returns the accessibility object for this view.
   virtual WebAccessibilityObject accessibilityObject() = 0;
 
-  // Autofill ------------------------------------------------------------
+  // AutoFill / Autocomplete ---------------------------------------------
 
-  // Notifies the WebView that autofill suggestions are available for a node.
+  // DEPRECATED: WebView::applyAutocompleteSuggestions is the new way to
+  // access this.
   virtual void applyAutofillSuggestions(const WebNode&,
                                         const WebVector<WebString>& suggestions,
                                         int defaultSuggestionIndex) = 0;
+
+  // Notifies the WebView that AutoFill suggestions are available for a node.
+  virtual void applyAutoFillSuggestions(const WebNode&,
+                                        const WebVector<WebString>& names,
+                                        const WebVector<WebString>& labels,
+                                        int defaultSuggestionIndex) = 0;
+
+  // Notifies the WebView that Autocomplete suggestions are available for a
+  // node.
+  virtual void applyAutocompleteSuggestions(
+      const WebNode&,
+      const WebVector<WebString>& suggestions,
+      int defaultSuggestionIndex) = 0;
 
   // DEPRECATED: WebView::hideSuggestionsPopup is the new way to access this.
   virtual void hideAutofillPopup() = 0;
