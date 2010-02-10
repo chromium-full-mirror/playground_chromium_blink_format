@@ -340,9 +340,8 @@ SimpleFontData* FontCache::getLastResortFallbackFont(
   // For now we'll pick
   // the default that the user would get without changing any prefs.
   static AtomicString timesStr("Times New Roman");
-  if (FontPlatformData* platformFont =
-          getCachedFontPlatformData(fontDescription, timesStr))
-    return platformFont;
+  if (SimpleFontData* simpleFont = getCachedFontData(fontDescription, timesStr))
+    return simpleFont;
 
   DEFINE_STATIC_LOCAL(String, defaultGUIFontFamily, ());
   if (defaultGUIFontFamily.isEmpty()) {
