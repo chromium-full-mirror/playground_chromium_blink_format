@@ -216,6 +216,8 @@ class GraphicsContextPlatformPrivate : public Noncopyable {
 
   QBrush solidColor;
 
+  InterpolationQuality imageInterpolationQuality;
+
   // Only used by SVG for now.
   QPainterPath currentPath;
 
@@ -228,6 +230,8 @@ GraphicsContextPlatformPrivate::GraphicsContextPlatformPrivate(QPainter* p) {
   redirect = 0;
 
   solidColor = QBrush(Qt::black);
+
+  imageInterpolationQuality = InterpolationDefault;
 
   if (painter) {
     // use the default the QPainter was constructed with
@@ -1232,10 +1236,29 @@ void GraphicsContext::releaseWindowsContext(HDC hdc,
 }
 #endif
 
-void GraphicsContext::setImageInterpolationQuality(InterpolationQuality) {}
+void GraphicsContext::setImageInterpolationQuality(
+    InterpolationQuality quality) {
+  m_data->imageInterpolationQuality = quality;
+
+  switch (quality) {
+    case InterpolationDefault:
+    case InterpolationNone:
+    case InterpolationLow:
+      // use nearest-neigbor
+      m_data->p()->setRenderHint(QPainter::SmoothPixmapTransform, false);
+      break;
+
+    case InterpolationMedium:
+    case InterpolationHigh:
+    default:
+      // use the filter
+      m_data->p()->setRenderHint(QPainter::SmoothPixmapTransform, true);
+      break;
+  };
+}
 
 InterpolationQuality GraphicsContext::imageInterpolationQuality() const {
-  return InterpolationDefault;
+  return m_data->imageInterpolationQuality;
 }
 }
 
