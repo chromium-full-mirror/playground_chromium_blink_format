@@ -55,14 +55,12 @@ SmallStringsStorage::SmallStringsStorage() {
   }
 }
 
-SmallStrings::SmallStrings() : m_emptyString(0), m_storage(0) {
+SmallStrings::SmallStrings() {
   COMPILE_ASSERT(numCharactersToStore ==
                      sizeof(m_singleCharacterStrings) /
                          sizeof(m_singleCharacterStrings[0]),
                  IsNumCharactersConstInSyncWithClassUsage);
-
-  for (unsigned i = 0; i < numCharactersToStore; ++i)
-    m_singleCharacterStrings[i] = 0;
+  clear();
 }
 
 SmallStrings::~SmallStrings() {}
@@ -74,6 +72,12 @@ void SmallStrings::markChildren(MarkStack& markStack) {
     if (m_singleCharacterStrings[i])
       markStack.append(m_singleCharacterStrings[i]);
   }
+}
+
+void SmallStrings::clear() {
+  m_emptyString = 0;
+  for (unsigned i = 0; i < numCharactersToStore; ++i)
+    m_singleCharacterStrings[i] = 0;
 }
 
 unsigned SmallStrings::count() const {
