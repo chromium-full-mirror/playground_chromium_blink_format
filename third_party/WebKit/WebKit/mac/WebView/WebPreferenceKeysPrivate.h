@@ -119,6 +119,8 @@
 #define WebKitWebGLEnabledPreferenceKey @"WebKitWebGLEnabled"
 #define WebKitUsesProxiedOpenPanelPreferenceKey @"WebKitUsesProxiedOpenPanel"
 #define WebKitPluginAllowedRunTimePreferenceKey @"WebKitPluginAllowedRunTime"
+#define WebKitFrameSetFlatteningEnabledPreferenceKey \
+  @"WebKitFrameSetFlatteningEnabled"
 
 // These are private both because callers should be using the cover methods and
 // because the
