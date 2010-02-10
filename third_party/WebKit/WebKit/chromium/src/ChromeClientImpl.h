@@ -34,6 +34,7 @@
 #include "ChromeClientChromium.h"
 
 namespace WebCore {
+class AccessibilityObject;
 class HTMLParserQuirks;
 class PopupContainer;
 class SecurityOrigin;
@@ -141,6 +142,7 @@ class ChromeClientImpl : public WebCore::ChromeClientChromium {
                            const WebCore::IntRect& bounds,
                            bool activatable,
                            bool handleExternally);
+  virtual void didChangeAccessibilityObjectState(WebCore::AccessibilityObject*);
 
   // ChromeClientImpl:
   void setCursor(const WebCursorInfo& cursor);

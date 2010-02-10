@@ -35,6 +35,7 @@
 #include <wtf/Forward.h>
 
 namespace WebCore {
+class AccessibilityObject;
 class IntRect;
 class PopupContainer;
 
@@ -50,6 +51,9 @@ class ChromeClientChromium : public ChromeClient {
                            const IntRect& bounds,
                            bool focusOnShow,
                            bool handleExternal) = 0;
+
+  // Notifies embedder that the state of an accessibility object has changed.
+  virtual void didChangeAccessibilityObjectState(AccessibilityObject*) = 0;
 };
 
 }  // namespace WebCore
