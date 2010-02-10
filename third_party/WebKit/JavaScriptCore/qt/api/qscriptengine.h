@@ -40,6 +40,9 @@ class QScriptEngine : public QObject {
                         int lineNumber = 1);
   void collectGarbage();
 
+  QScriptValue nullValue();
+  QScriptValue undefinedValue();
+
  private:
   friend class QScriptEnginePrivate;
 
