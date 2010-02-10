@@ -95,6 +95,9 @@ class InspectorBackend : public RefCounted<InspectorBackend> {
   void stepIntoStatementInDebugger();
   void stepOutOfFunctionInDebugger();
 
+  JavaScriptCallFrame* currentCallFrame() const;
+#endif
+#if ENABLE(JAVASCRIPT_DEBUGGER)
   bool profilerEnabled();
   void enableProfiler(bool always);
   void disableProfiler(bool always);
@@ -104,8 +107,6 @@ class InspectorBackend : public RefCounted<InspectorBackend> {
 
   void getProfileHeaders(long callId);
   void getProfile(long callId, unsigned uid);
-
-  JavaScriptCallFrame* currentCallFrame() const;
 #endif
 
   void setInjectedScriptSource(const String& source);

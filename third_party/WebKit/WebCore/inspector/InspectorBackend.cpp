@@ -206,6 +206,12 @@ void InspectorBackend::setPauseOnExceptionsState(long pauseState) {
       static_cast<JavaScriptDebugServer::PauseOnExceptionsState>(pauseState));
 }
 
+JavaScriptCallFrame* InspectorBackend::currentCallFrame() const {
+  return JavaScriptDebugServer::shared().currentCallFrame();
+}
+#endif
+
+#if ENABLE(JAVASCRIPT_DEBUGGER)
 bool InspectorBackend::profilerEnabled() {
   if (m_inspectorController)
     return m_inspectorController->profilerEnabled();
@@ -240,10 +246,6 @@ void InspectorBackend::getProfileHeaders(long callId) {
 void InspectorBackend::getProfile(long callId, unsigned uid) {
   if (m_inspectorController)
     m_inspectorController->getProfile(callId, uid);
-}
-
-JavaScriptCallFrame* InspectorBackend::currentCallFrame() const {
-  return JavaScriptDebugServer::shared().currentCallFrame();
 }
 #endif
 

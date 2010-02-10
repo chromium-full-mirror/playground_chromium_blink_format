@@ -253,7 +253,7 @@ class InspectorController
 
   void markTimeline(const String& message);
 
-#if ENABLE(JAVASCRIPT_DEBUGGER) && USE(JSC)
+#if ENABLE(JAVASCRIPT_DEBUGGER)
   void addProfile(PassRefPtr<ScriptProfile>,
                   unsigned lineNumber,
                   const String& sourceURL);
@@ -275,7 +275,9 @@ class InspectorController
   void enableProfiler(bool always = false, bool skipRecompile = false);
   void disableProfiler(bool always = false);
   bool profilerEnabled() const { return enabled() && m_profilerEnabled; }
+#endif
 
+#if ENABLE(JAVASCRIPT_DEBUGGER) && USE(JSC)
   void enableDebugger();
   void disableDebugger(bool always = false);
   bool debuggerEnabled() const { return m_debuggerEnabled; }
@@ -312,7 +314,7 @@ class InspectorController
 
   void deleteCookie(const String& cookieName, const String& domain);
 
-#if ENABLE(JAVASCRIPT_DEBUGGER) && USE(JSC)
+#if ENABLE(JAVASCRIPT_DEBUGGER)
   typedef HashMap<unsigned int, RefPtr<ScriptProfile>> ProfilesMap;
 
   void startUserInitiatedProfilingSoon();
@@ -393,6 +395,8 @@ class InspectorController
 #if ENABLE(JAVASCRIPT_DEBUGGER) && USE(JSC)
   bool m_debuggerEnabled;
   bool m_attachDebuggerWhenShown;
+#endif
+#if ENABLE(JAVASCRIPT_DEBUGGER)
   bool m_profilerEnabled;
   bool m_recordingUserInitiatedProfile;
   int m_currentUserInitiatedProfileNumber;
