@@ -24,6 +24,7 @@
 #include "FastAllocBase.h"
 #include "Noncopyable.h"
 #include "NotFound.h"
+#include "ValueCheck.h"
 #include "VectorTraits.h"
 #include <limits>
 #include <utility>
@@ -557,6 +558,8 @@ class Vector : public FastAllocBase {
     m_buffer.swap(other.m_buffer);
   }
 
+  void checkConsistency();
+
  private:
   void expandCapacity(size_t newMinCapacity);
   const T* expandCapacity(size_t newMinCapacity, const T*);
@@ -949,6 +952,15 @@ inline T* Vector<T, inlineCapacity>::releaseBuffer() {
 }
 
 template <typename T, size_t inlineCapacity>
+inline void Vector<T, inlineCapacity>::checkConsistency() {
+#if !ASSERT_DISABLED
+  for (size_t i = 0; i < size(); ++i) {
+    ValueCheck<T>::checkConsistency(at(i));
+  }
+#endif
+}
+
+template <typename T, size_t inlineCapacity>
 void deleteAllValues(const Vector<T, inlineCapacity>& collection) {
   typedef typename Vector<T, inlineCapacity>::const_iterator iterator;
   iterator end = collection.end();
@@ -975,6 +987,14 @@ inline bool operator!=(const Vector<T, inlineCapacity>& a,
                        const Vector<T, inlineCapacity>& b) {
   return !(a == b);
 }
+
+#if !ASSERT_DISABLED
+template <typename T>
+struct ValueCheck<Vector<T>> {
+  typedef Vector<T> TraitType;
+  static void checkConsistency(const Vector<T>& v) { v.checkConsistency(); }
+};
+#endif
 
 }  // namespace WTF
 
