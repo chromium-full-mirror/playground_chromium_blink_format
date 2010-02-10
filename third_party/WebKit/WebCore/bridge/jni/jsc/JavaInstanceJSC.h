@@ -50,15 +50,15 @@ class JObjectWrapper {
   jobject instance() const { return m_instance; }
   void setInstance(jobject instance) { m_instance = instance; }
 
- protected:
-  JObjectWrapper(jobject instance);
-  ~JObjectWrapper();
-
   void ref() { m_refCount++; }
   void deref() {
     if (!(--m_refCount))
       delete this;
   }
+
+ protected:
+  JObjectWrapper(jobject instance);
+  ~JObjectWrapper();
 
   jobject m_instance;
 
