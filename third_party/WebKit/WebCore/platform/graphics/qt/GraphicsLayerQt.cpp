@@ -1175,7 +1175,8 @@ bool GraphicsLayerQt::addAnimation(const KeyframeValueList& values,
   else
     newAnim->start();
 
-  QObject::connect(newAnim, SIGNAL(finished()), newAnim, SLOT(deleteLater()));
+  // we don't need to manage the animation object's lifecycle:
+  // WebCore would call removeAnimations when it's time to delete.
 
   return true;
 }
@@ -1187,7 +1188,7 @@ void GraphicsLayerQt::removeAnimationsForProperty(AnimatedPropertyID id) {
     if (*it) {
       AnimationQtBase* anim = static_cast<AnimationQtBase*>(it->data());
       if (anim && anim->m_webkitPropertyID == id) {
-        delete anim;
+        anim->deleteLater();
         it = m_impl->m_animations.erase(it);
         --it;
       }
