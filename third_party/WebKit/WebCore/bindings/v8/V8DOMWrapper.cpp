@@ -246,7 +246,7 @@ void V8DOMWrapper::setHiddenWindowReference(Frame* frame,
 
   v8::Handle<v8::Object> global = context->Global();
   // Look for real DOM wrapper.
-  global = V8DOMWrapper::lookupDOMWrapper(V8ClassIndex::DOMWINDOW, global);
+  global = V8DOMWrapper::lookupDOMWrapper(V8DOMWindow::GetTemplate(), global);
   ASSERT(!global.IsEmpty());
   ASSERT(global->GetInternalField(internalIndex)->IsUndefined());
   global->SetInternalField(internalIndex, jsObject);

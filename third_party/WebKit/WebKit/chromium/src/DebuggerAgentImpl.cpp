@@ -95,7 +95,7 @@ void DebuggerAgentImpl::createUtilityContext(
   v8::Handle<v8::Context> windowContext = V8Proxy::context(frame);
   v8::Handle<v8::Object> windowGlobal = windowContext->Global();
   v8::Handle<v8::Object> windowWrapper =
-      V8DOMWrapper::lookupDOMWrapper(V8ClassIndex::DOMWINDOW, windowGlobal);
+      V8DOMWrapper::lookupDOMWrapper(V8DOMWindow::GetTemplate(), windowGlobal);
 
   ASSERT(V8DOMWindow::toNative(windowWrapper) == frame->domWindow());
 

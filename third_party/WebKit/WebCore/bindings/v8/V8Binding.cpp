@@ -427,7 +427,7 @@ v8::Persistent<v8::FunctionTemplate> createRawTemplate() {
 v8::Local<v8::Signature> configureTemplate(
     v8::Persistent<v8::FunctionTemplate> desc,
     const char* interfaceName,
-    V8ClassIndex::V8WrapperType parentClassIndex,
+    v8::Persistent<v8::FunctionTemplate> parentClass,
     int fieldCount,
     const BatchedAttribute* attributes,
     size_t attributeCount,
@@ -436,8 +436,8 @@ v8::Local<v8::Signature> configureTemplate(
   desc->SetClassName(v8::String::New(interfaceName));
   v8::Local<v8::ObjectTemplate> instance = desc->InstanceTemplate();
   instance->SetInternalFieldCount(fieldCount);
-  if (parentClassIndex)
-    desc->Inherit(V8ClassIndex::getTemplate(parentClassIndex));
+  if (!parentClass.IsEmpty())
+    desc->Inherit(parentClass);
   if (attributeCount)
     batchConfigureAttributes(instance, desc->PrototypeTemplate(), attributes,
                              attributeCount);

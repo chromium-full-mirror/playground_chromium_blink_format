@@ -37,7 +37,6 @@
 #include "MathExtras.h"
 #include "PlatformString.h"
 #include "V8DOMWrapper.h"
-#include "V8Index.h"
 
 #include <v8.h>
 
@@ -158,7 +157,7 @@ struct BatchedCallback;
 v8::Local<v8::Signature> configureTemplate(
     v8::Persistent<v8::FunctionTemplate>,
     const char* interfaceName,
-    V8ClassIndex::V8WrapperType parentClassIndex,
+    v8::Persistent<v8::FunctionTemplate> parentClass,
     int fieldCount,
     const BatchedAttribute*,
     size_t attributeCount,

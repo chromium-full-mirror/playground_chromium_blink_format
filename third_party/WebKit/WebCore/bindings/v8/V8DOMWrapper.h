@@ -119,10 +119,11 @@ class V8DOMWrapper {
   }
 
   static v8::Handle<v8::Object> lookupDOMWrapper(
-      V8ClassIndex::V8WrapperType type,
+      v8::Handle<v8::FunctionTemplate> functionTemplate,
       v8::Handle<v8::Object> object) {
-    return object.IsEmpty() ? object : object->FindInstanceInPrototypeChain(
-                                           V8ClassIndex::getTemplate(type));
+    return object.IsEmpty()
+               ? object
+               : object->FindInstanceInPrototypeChain(functionTemplate);
   }
 
   static V8ClassIndex::V8WrapperType domWrapperType(v8::Handle<v8::Object>);

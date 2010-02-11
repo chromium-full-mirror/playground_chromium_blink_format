@@ -224,7 +224,7 @@ v8::Handle<v8::Value> V8Location::reloadAccessorGetter(
           V8Location::reloadCallback, v8::Handle<v8::Value>(),
           v8::Signature::New(V8Location::GetRawTemplate())));
   v8::Handle<v8::Object> holder =
-      V8DOMWrapper::lookupDOMWrapper(V8ClassIndex::LOCATION, info.This());
+      V8DOMWrapper::lookupDOMWrapper(V8Location::GetTemplate(), info.This());
   if (holder.IsEmpty()) {
     // can only reach here by 'object.__proto__.func', and it should passed
     // domain security check already
@@ -251,7 +251,7 @@ v8::Handle<v8::Value> V8Location::replaceAccessorGetter(
           V8Location::replaceCallback, v8::Handle<v8::Value>(),
           v8::Signature::New(V8Location::GetRawTemplate())));
   v8::Handle<v8::Object> holder =
-      V8DOMWrapper::lookupDOMWrapper(V8ClassIndex::LOCATION, info.This());
+      V8DOMWrapper::lookupDOMWrapper(V8Location::GetTemplate(), info.This());
   if (holder.IsEmpty()) {
     // can only reach here by 'object.__proto__.func', and it should passed
     // domain security check already
@@ -278,7 +278,7 @@ v8::Handle<v8::Value> V8Location::assignAccessorGetter(
           V8Location::assignCallback, v8::Handle<v8::Value>(),
           v8::Signature::New(V8Location::GetRawTemplate())));
   v8::Handle<v8::Object> holder =
-      V8DOMWrapper::lookupDOMWrapper(V8ClassIndex::LOCATION, info.This());
+      V8DOMWrapper::lookupDOMWrapper(V8Location::GetTemplate(), info.This());
   if (holder.IsEmpty()) {
     // can only reach here by 'object.__proto__.func', and it should passed
     // domain security check already
