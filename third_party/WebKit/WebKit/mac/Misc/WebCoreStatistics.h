@@ -42,6 +42,7 @@
 + (size_t)javaScriptProtectedObjectsCount;
 + (size_t)javaScriptProtectedGlobalObjectsCount;
 + (NSCountedSet*)javaScriptProtectedObjectTypeCounts;
++ (NSCountedSet*)javaScriptObjectTypeCounts;
 
 + (void)garbageCollectJavaScriptObjects;
 + (void)garbageCollectJavaScriptObjectsOnAlternateThreadForDebugging:

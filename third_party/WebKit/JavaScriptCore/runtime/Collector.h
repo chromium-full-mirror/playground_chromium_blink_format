@@ -103,6 +103,7 @@ class Heap : public Noncopyable {
   size_t protectedObjectCount();
   size_t protectedGlobalObjectCount();
   HashCountedSet<const char*>* protectedObjectTypeCounts();
+  HashCountedSet<const char*>* objectTypeCounts();
 
   void registerThread();  // Only needs to be called by clients that can use the
                           // same heap from multiple threads.
