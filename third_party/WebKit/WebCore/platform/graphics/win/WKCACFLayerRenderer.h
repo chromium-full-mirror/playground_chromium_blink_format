@@ -100,6 +100,10 @@ class WKCACFLayerRenderer : public Noncopyable {
   HWND m_hostWindow;
   Timer<WKCACFLayerRenderer> m_renderTimer;
   IntRect m_scrollFrame;
+
+#ifndef NDEBUG
+  bool m_printTree;
+#endif
 };
 }
 

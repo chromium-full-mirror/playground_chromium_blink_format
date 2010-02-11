@@ -135,7 +135,12 @@ WKCACFLayerRenderer::WKCACFLayerRenderer()
       m_hostWindow(0),
       m_renderTimer(this, &WKCACFLayerRenderer::renderTimerFired),
       m_scrollFrame(0, 0, 1, 1)  // Default to 1 to avoid 0 size frames
-{}
+{
+#ifndef NDEBUG
+  char* printTreeFlag = getenv("CA_PRINT_TREE");
+  m_printTree = printTreeFlag && atoi(printTreeFlag);
+#endif
+}
 
 WKCACFLayerRenderer::~WKCACFLayerRenderer() {
   destroyRenderer();
@@ -226,7 +231,9 @@ void WKCACFLayerRenderer::createRenderer() {
 
   // Create the root hierarchy
   m_rootLayer = WKCACFLayer::create(WKCACFLayer::Layer);
+  m_rootLayer->setName("WKCACFLayerRenderer rootLayer");
   m_scrollLayer = WKCACFLayer::create(WKCACFLayer::Layer);
+  m_scrollLayer->setName("WKCACFLayerRenderer scrollLayer");
 
   m_rootLayer->addSublayer(m_scrollLayer);
   m_scrollLayer->setMasksToBounds(true);
@@ -392,6 +399,11 @@ void WKCACFLayerRenderer::render(const Vector<CGRect>& dirtyRects) {
   } while (err == D3DERR_DEVICELOST);
 
   CARenderUpdateFinish(u);
+
+#ifndef NDEBUG
+  if (m_printTree)
+    m_rootLayer->printTree();
+#endif
 }
 
 void WKCACFLayerRenderer::renderSoon() {
