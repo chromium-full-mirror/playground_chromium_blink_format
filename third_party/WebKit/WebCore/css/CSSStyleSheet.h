@@ -44,26 +44,29 @@ class CSSStyleSheet : public StyleSheet {
     return adoptRef(new CSSStyleSheet(ownerNode, String(), KURL(), String()));
   }
   static PassRefPtr<CSSStyleSheet> create(Node* ownerNode,
-                                          const String& href,
-                                          const KURL& baseURL) {
-    return adoptRef(new CSSStyleSheet(ownerNode, href, baseURL, String()));
+                                          const String& originalURL,
+                                          const KURL& finalURL) {
+    return adoptRef(
+        new CSSStyleSheet(ownerNode, originalURL, finalURL, String()));
   }
   static PassRefPtr<CSSStyleSheet> create(Node* ownerNode,
-                                          const String& href,
-                                          const KURL& baseURL,
+                                          const String& originalURL,
+                                          const KURL& finalURL,
                                           const String& charset) {
-    return adoptRef(new CSSStyleSheet(ownerNode, href, baseURL, charset));
+    return adoptRef(
+        new CSSStyleSheet(ownerNode, originalURL, finalURL, charset));
   }
   static PassRefPtr<CSSStyleSheet> create(CSSRule* ownerRule,
-                                          const String& href,
-                                          const KURL& baseURL,
+                                          const String& originalURL,
+                                          const KURL& finalURL,
                                           const String& charset) {
-    return adoptRef(new CSSStyleSheet(ownerRule, href, baseURL, charset));
+    return adoptRef(
+        new CSSStyleSheet(ownerRule, originalURL, finalURL, charset));
   }
   static PassRefPtr<CSSStyleSheet> createInline(Node* ownerNode,
-                                                const KURL& baseURL) {
+                                                const KURL& finalURL) {
     return adoptRef(
-        new CSSStyleSheet(ownerNode, baseURL.string(), baseURL, String()));
+        new CSSStyleSheet(ownerNode, finalURL.string(), finalURL, String()));
   }
 
   virtual ~CSSStyleSheet();
@@ -118,16 +121,16 @@ class CSSStyleSheet : public StyleSheet {
 
  private:
   CSSStyleSheet(Node* ownerNode,
-                const String& href,
-                const KURL& baseURL,
+                const String& originalURL,
+                const KURL& finalURL,
                 const String& charset);
   CSSStyleSheet(CSSStyleSheet* parentSheet,
-                const String& href,
-                const KURL& baseURL,
+                const String& originalURL,
+                const KURL& finalURL,
                 const String& charset);
   CSSStyleSheet(CSSRule* ownerRule,
-                const String& href,
-                const KURL& baseURL,
+                const String& originalURL,
+                const KURL& finalURL,
                 const String& charset);
 
   virtual bool isCSSStyleSheet() const { return true; }

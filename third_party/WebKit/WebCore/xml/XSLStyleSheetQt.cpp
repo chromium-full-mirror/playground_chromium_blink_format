@@ -34,10 +34,10 @@
 namespace WebCore {
 
 XSLStyleSheet::XSLStyleSheet(Node* parentNode,
-                             const String& href,
-                             const KURL& baseURL,
+                             const String& originalURL,
+                             const KURL& finalURL,
                              bool embedded)
-    : StyleSheet(parentNode, href, baseURL),
+    : StyleSheet(parentNode, originalURL, finalURL),
       m_ownerDocument(parentNode->document()),
       m_embedded(embedded) {}
 

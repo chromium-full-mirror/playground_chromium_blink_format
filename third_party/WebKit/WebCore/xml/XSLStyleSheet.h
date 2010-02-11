@@ -44,20 +44,21 @@ class XSLStyleSheet : public StyleSheet {
  public:
 #if !USE(QXMLQUERY)
   static PassRefPtr<XSLStyleSheet> create(XSLImportRule* parentImport,
-                                          const String& href,
-                                          const KURL& baseURL) {
-    return adoptRef(new XSLStyleSheet(parentImport, href, baseURL));
+                                          const String& originalURL,
+                                          const KURL& finalURL) {
+    return adoptRef(new XSLStyleSheet(parentImport, originalURL, finalURL));
   }
 #endif
   static PassRefPtr<XSLStyleSheet> create(Node* parentNode,
-                                          const String& href,
-                                          const KURL& baseURL) {
-    return adoptRef(new XSLStyleSheet(parentNode, href, baseURL, false));
+                                          const String& originalURL,
+                                          const KURL& finalURL) {
+    return adoptRef(
+        new XSLStyleSheet(parentNode, originalURL, finalURL, false));
   }
-  static PassRefPtr<XSLStyleSheet> createEmbedded(Node* parentNode,
-                                                  const String& href,
-                                                  const KURL& baseURL) {
-    return adoptRef(new XSLStyleSheet(parentNode, href, baseURL, true));
+  static PassRefPtr<XSLStyleSheet> createInline(Node* parentNode,
+                                                const KURL& finalURL) {
+    return adoptRef(
+        new XSLStyleSheet(parentNode, finalURL.string(), finalURL, true));
   }
 
   virtual ~XSLStyleSheet();
@@ -95,13 +96,13 @@ class XSLStyleSheet : public StyleSheet {
 
  private:
   XSLStyleSheet(Node* parentNode,
-                const String& href,
-                const KURL& baseURL,
+                const String& originalURL,
+                const KURL& finalURL,
                 bool embedded);
 #if !USE(QXMLQUERY)
   XSLStyleSheet(XSLImportRule* parentImport,
-                const String& href,
-                const KURL& baseURL);
+                const String& originalURL,
+                const KURL& finalURL);
 #endif
 
   Document* m_ownerDocument;

@@ -68,9 +68,9 @@ SOFT_LINK(libxslt,
 namespace WebCore {
 
 XSLStyleSheet::XSLStyleSheet(XSLImportRule* parentRule,
-                             const String& href,
-                             const KURL& baseURL)
-    : StyleSheet(parentRule, href, baseURL),
+                             const String& originalURL,
+                             const KURL& finalURL)
+    : StyleSheet(parentRule, originalURL, finalURL),
       m_ownerDocument(0),
       m_embedded(false),
       m_processed(false)  // Child sheets get marked as processed when the
@@ -81,10 +81,10 @@ XSLStyleSheet::XSLStyleSheet(XSLImportRule* parentRule,
       m_parentStyleSheet(0) {}
 
 XSLStyleSheet::XSLStyleSheet(Node* parentNode,
-                             const String& href,
-                             const KURL& baseURL,
+                             const String& originalURL,
+                             const KURL& finalURL,
                              bool embedded)
-    : StyleSheet(parentNode, href, baseURL),
+    : StyleSheet(parentNode, originalURL, finalURL),
       m_ownerDocument(parentNode->document()),
       m_embedded(embedded),
       m_processed(true)  // The root sheet starts off processed.
@@ -178,11 +178,11 @@ bool XSLStyleSheet::parseString(const String& string, bool) {
     xmlDictReference(ctxt->dict);
   }
 
-  m_stylesheetDoc = xmlCtxtReadMemory(
-      ctxt, buffer, size, putativeBaseURL().string().utf8().data(),
-      BOMHighByte == 0xFF ? "UTF-16LE" : "UTF-16BE",
-      XML_PARSE_NOENT | XML_PARSE_DTDATTR | XML_PARSE_NOWARNING |
-          XML_PARSE_NOCDATA);
+  m_stylesheetDoc =
+      xmlCtxtReadMemory(ctxt, buffer, size, finalURL().string().utf8().data(),
+                        BOMHighByte == 0xFF ? "UTF-16LE" : "UTF-16BE",
+                        XML_PARSE_NOENT | XML_PARSE_DTDATTR |
+                            XML_PARSE_NOWARNING | XML_PARSE_NOCDATA);
   xmlFreeParserCtxt(ctxt);
 
   loadChildSheets();
@@ -206,7 +206,7 @@ void XSLStyleSheet::loadChildSheets() {
     // that we can walk the
     // import/include list.
     xmlAttrPtr idNode = xmlGetID(
-        document(), (const xmlChar*)(putativeBaseURL().string().utf8().data()));
+        document(), (const xmlChar*)(finalURL().string().utf8().data()));
     if (!idNode)
       return;
     stylesheetRoot = idNode->parent;
