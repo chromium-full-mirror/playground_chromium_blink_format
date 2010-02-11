@@ -315,3 +315,8 @@ int LayoutTestController::pageNumberForElementById(JSStringRef, float, float) {
   // FIXME: implement
   return -1;
 }
+
+int LayoutTestController::numberOfPages(float, float) {
+  // FIXME: implement
+  return -1;
+}

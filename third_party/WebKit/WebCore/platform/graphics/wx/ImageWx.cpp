@@ -182,22 +182,19 @@ void BitmapImage::draw(GraphicsContext* ctxt,
     observer->didDraw(this);
 }
 
-void BitmapImage::drawPattern(GraphicsContext* ctxt,
-                              const FloatRect& srcRect,
-                              const AffineTransform& patternTransform,
-                              const FloatPoint& phase,
-                              ColorSpace,
-                              CompositeOperator,
-                              const FloatRect& dstRect) {
-  if (!m_source.initialized())
-    return;
-
+void Image::drawPattern(GraphicsContext* ctxt,
+                        const FloatRect& srcRect,
+                        const AffineTransform& patternTransform,
+                        const FloatPoint& phase,
+                        ColorSpace,
+                        CompositeOperator,
+                        const FloatRect& dstRect) {
 #if USE(WXGC)
   wxGCDC* context = (wxGCDC*)ctxt->platformContext();
-  wxGraphicsBitmap* bitmap = frameAtIndex(m_currentFrame);
+  wxGraphicsBitmap* bitmap = nativeImageForCurrentFrame();
 #else
   wxWindowDC* context = ctxt->platformContext();
-  wxBitmap* bitmap = frameAtIndex(m_currentFrame);
+  wxBitmap* bitmap = nativeImageForCurrentFrame();
 #endif
 
   if (!bitmap)  // If it's too early we won't have an image yet.
@@ -272,14 +269,4 @@ void BitmapImage::checkForSolidColor() {
 }
 
 void BitmapImage::invalidatePlatformData() {}
-
-void Image::drawPattern(GraphicsContext*,
-                        const FloatRect& srcRect,
-                        const AffineTransform& patternTransform,
-                        const FloatPoint& phase,
-                        ColorSpace,
-                        CompositeOperator,
-                        const FloatRect& destRect) {
-  notImplemented();
-}
 }

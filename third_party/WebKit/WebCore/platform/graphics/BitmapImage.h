@@ -183,7 +183,7 @@ class BitmapImage : public Image {
                     ColorSpace styleColorSpace,
                     CompositeOperator);
 
-#if PLATFORM(WX) || (OS(WINCE) && !PLATFORM(QT))
+#if (OS(WINCE) && !PLATFORM(QT))
   virtual void drawPattern(GraphicsContext*,
                            const FloatRect& srcRect,
                            const TransformationMatrix& patternTransform,
