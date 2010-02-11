@@ -24,6 +24,8 @@
  */
 
 #include "config.h"
+// this needs to be included before fontprops.h for UChar* to be defined.
+#include <wtf/unicode/Unicode.h>
 
 #include <wx/defs.h>
 #include <wx/gdicmn.h>
@@ -88,6 +90,12 @@ wxFontProperties::wxFontProperties(wxFont* font)
 
   pango_font_metrics_unref(metrics);
 #endif
+}
+
+bool wxFontContainsCharacters(const wxFont& font,
+                              const UChar* characters,
+                              int length) {
+  return true;
 }
 
 void GetTextExtent(const wxFont& font,

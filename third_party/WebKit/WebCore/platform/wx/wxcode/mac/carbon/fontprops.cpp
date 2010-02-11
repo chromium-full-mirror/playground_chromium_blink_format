@@ -24,6 +24,9 @@
  */
 
 #include "config.h"
+// this needs to be included before fontprops.h for UChar* to be defined.
+#include <wtf/unicode/Unicode.h>
+
 #include "fontprops.h"
 
 #include <ApplicationServices/ApplicationServices.h>
@@ -90,6 +93,24 @@ wxFontProperties::wxFontProperties(wxFont* font)
 
   if (cgFont)
     CGFontRelease(cgFont);
+}
+
+bool wxFontContainsCharacters(const wxFont& font,
+                              const UChar* characters,
+                              int length) {
+#if wxOSX_USE_COCOA
+  NSString* string = [[NSString alloc]
+      initWithCharactersNoCopy:const_cast<unichar*>(characters)
+                        length:length
+                  freeWhenDone:NO];
+  NSCharacterSet* set = [[font.GetNSFont() coveredCharacterSet] invertedSet];
+  bool result =
+      set && [string rangeOfCharacterFromSet:set].location == NSNotFound;
+  [string release];
+  return result;
+#else
+  return true;
+#endif
 }
 
 void GetTextExtent(const wxFont& font,
