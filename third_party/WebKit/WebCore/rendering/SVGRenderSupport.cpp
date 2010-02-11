@@ -65,6 +65,8 @@ void SVGRenderBase::computeRectForRepaint(
     RenderBoxModelObject* repaintContainer,
     IntRect& repaintRect,
     bool fixed) {
+  object->style()->svgStyle()->inflateForShadow(repaintRect);
+
   // Translate to coords in our parent renderer, and then call
   // computeRectForRepaint on our parent
   repaintRect = object->localToParentTransform().mapRect(repaintRect);
