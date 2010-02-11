@@ -108,7 +108,8 @@ static bool privateBrowsingEnabled(Frame* frame) {
   ASSERT(!frame);
   return false;
 #else
-  return frame->page()->settings()->privateBrowsingEnabled();
+  return frame->page()->settings()->privateBrowsingEnabled() &&
+         !frame->page()->settings()->localStorageOverridesPrivateBrowsing();
 #endif
 }
 
