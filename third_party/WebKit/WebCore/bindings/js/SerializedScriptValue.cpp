@@ -29,14 +29,17 @@
 
 #include "File.h"
 #include "FileList.h"
+#include "ImageData.h"
 #include "JSDOMGlobalObject.h"
 #include "JSFile.h"
 #include "JSFileList.h"
+#include "JSImageData.h"
 #include <JavaScriptCore/APICast.h>
 #include <runtime/DateInstance.h>
 #include <runtime/ExceptionHelpers.h>
 #include <runtime/JSLock.h>
 #include <runtime/PropertyNameArray.h>
+#include <wtf/ByteArray.h>
 #include <wtf/HashTraits.h>
 #include <wtf/Vector.h>
 
@@ -153,6 +156,28 @@ class SerializedFileList : public SharedSerializedData {
   Vector<String> m_files;
 };
 
+class SerializedImageData : public SharedSerializedData {
+ public:
+  static PassRefPtr<SerializedImageData> create(const ImageData* imageData) {
+    return adoptRef(new SerializedImageData(imageData));
+  }
+
+  unsigned width() const { return m_width; }
+  unsigned height() const { return m_height; }
+  WTF::ByteArray* data() const { return m_storage.get(); }
+
+ private:
+  SerializedImageData(const ImageData* imageData)
+      : m_width(imageData->width()), m_height(imageData->height()) {
+    WTF::ByteArray* array = imageData->data()->data();
+    m_storage = WTF::ByteArray::create(array->length());
+    memcpy(m_storage->data(), array->data(), array->length());
+  }
+  unsigned m_width;
+  unsigned m_height;
+  RefPtr<WTF::ByteArray> m_storage;
+};
+
 SerializedScriptValueData::SerializedScriptValueData(
     RefPtr<SerializedObject> data)
     : m_type(ObjectType), m_sharedData(data) {}
@@ -164,6 +189,10 @@ SerializedScriptValueData::SerializedScriptValueData(
 SerializedScriptValueData::SerializedScriptValueData(const FileList* fileList)
     : m_type(FileListType),
       m_sharedData(SerializedFileList::create(fileList)) {}
+
+SerializedScriptValueData::SerializedScriptValueData(const ImageData* imageData)
+    : m_type(ImageDataType),
+      m_sharedData(SerializedImageData::create(imageData)) {}
 
 SerializedScriptValueData::SerializedScriptValueData(const File* file)
     : m_type(FileType), m_string(file->path().crossThreadString()) {}
@@ -178,6 +207,10 @@ SerializedObject* SharedSerializedData::asObject() {
 
 SerializedFileList* SharedSerializedData::asFileList() {
   return static_cast<SerializedFileList*>(this);
+}
+
+SerializedImageData* SharedSerializedData::asImageData() {
+  return static_cast<SerializedImageData*>(this);
 }
 
 static const unsigned maximumFilterRecursion = 40000;
@@ -496,6 +529,8 @@ struct SerializingTreeWalker : public BaseWalker {
         return SerializedScriptValueData(toFile(obj));
       if (obj->inherits(&JSFileList::s_info))
         return SerializedScriptValueData(toFileList(obj));
+      if (obj->inherits(&JSImageData::s_info))
+        return SerializedScriptValueData(toImageData(obj));
 
       CallData unusedData;
       if (value.getCallData(unusedData) == CallTypeNone)
@@ -666,6 +701,18 @@ struct DeserializingTreeWalker : public BaseWalker {
         return toJS(m_exec, static_cast<JSDOMGlobalObject*>(m_globalObject),
                     result.get());
       }
+      case SerializedScriptValueData::ImageDataType: {
+        if (!m_isDOMGlobalObject)
+          return jsNull();
+        SerializedImageData* serializedImageData = value.asImageData();
+        RefPtr<ImageData> result = ImageData::create(
+            serializedImageData->width(), serializedImageData->height());
+        memcpy(result->data()->data()->data(),
+               serializedImageData->data()->data(),
+               serializedImageData->data()->length());
+        return toJS(m_exec, static_cast<JSDOMGlobalObject*>(m_globalObject),
+                    result.get());
+      }
       case SerializedScriptValueData::EmptyType:
         ASSERT_NOT_REACHED();
         return jsNull();
@@ -795,6 +842,7 @@ struct TeardownTreeWalker {
       case SerializedScriptValueData::EmptyType:
       case SerializedScriptValueData::FileType:
       case SerializedScriptValueData::FileListType:
+      case SerializedScriptValueData::ImageDataType:
         return true;
     }
     ASSERT_NOT_REACHED();
