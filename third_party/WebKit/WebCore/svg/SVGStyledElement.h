@@ -77,6 +77,8 @@ class SVGStyledElement : public SVGElement, public SVGStylable {
  protected:
   static int cssPropertyIdForSVGAttributeName(const QualifiedName&);
 
+  virtual void invalidateCanvasResources();
+
  private:
   DECLARE_ANIMATED_PROPERTY(SVGStyledElement,
                             HTMLNames::classAttr,

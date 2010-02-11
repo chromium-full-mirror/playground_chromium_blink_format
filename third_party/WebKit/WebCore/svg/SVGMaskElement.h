@@ -100,6 +100,8 @@ class SVGMaskElement : public SVGStyledLocatableElement,
                             ExternalResourcesRequired,
                             externalResourcesRequired)
 
+  virtual void invalidateCanvasResources();
+
   HashMap<const RenderObject*, RefPtr<SVGResourceMasker>> m_masker;
 };
 
