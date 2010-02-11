@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2007 Ryan Leavengood <leavengood@gmail.com>
+ * Copyright (C) 2010 Stephan Aßmus <superstippi@gmx.de>
  *
  * All rights reserved.
  *
@@ -33,10 +34,10 @@
 namespace WebCore {
 
 FloatRect::FloatRect(const BRect& rect)
-    : m_location(rect.LeftTop()), m_size(rect.Width(), rect.Height()) {}
+    : m_location(rect.LeftTop()), m_size(rect.Width() + 1, rect.Height() + 1) {}
 
 FloatRect::operator BRect() const {
-  return BRect(BPoint(x(), y()), BSize(width(), height()));
+  return BRect(BPoint(x(), y()), BSize(width() - 1, height() - 1));
 }
 
 }  // namespace WebCore
