@@ -1300,7 +1300,6 @@ class Document : public ContainerNode, public ScriptExecutionContext {
 #endif
 
   RenderObject* m_savedRenderer;
-  int m_secureForms;
 
   RefPtr<TextResourceDecoder> m_decoder;
 
