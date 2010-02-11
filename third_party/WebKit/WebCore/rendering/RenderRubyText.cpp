@@ -29,6 +29,8 @@
  */
 
 #include "config.h"
+
+#if ENABLE(RUBY)
 #include "RenderRubyText.h"
 
 namespace WebCore {
@@ -42,3 +44,5 @@ bool RenderRubyText::isChildAllowed(RenderObject* child, RenderStyle*) const {
 }
 
 }  // namespace WebCore
+
+#endif

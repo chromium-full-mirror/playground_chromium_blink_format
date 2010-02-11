@@ -29,6 +29,8 @@
  */
 
 #include "config.h"
+
+#if ENABLE(RUBY)
 #include "RenderRuby.h"
 
 #include "RenderRubyRun.h"
@@ -175,3 +177,5 @@ void RenderRubyAsBlock::removeChild(RenderObject* child) {
 }
 
 }  // namespace WebCore
+
+#endif

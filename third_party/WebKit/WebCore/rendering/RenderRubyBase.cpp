@@ -29,6 +29,8 @@
  */
 
 #include "config.h"
+
+#if ENABLE(RUBY)
 #include "RenderRubyBase.h"
 
 namespace WebCore {
@@ -192,3 +194,5 @@ void RenderRubyBase::mergeBlockChildren(RenderRubyBase* toBase,
 }
 
 }  // namespace WebCore
+
+#endif

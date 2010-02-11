@@ -31,6 +31,8 @@
 #ifndef RenderRubyBase_h
 #define RenderRubyBase_h
 
+#if ENABLE(RUBY)
+
 #include "RenderBlock.h"
 
 namespace WebCore {
@@ -64,5 +66,7 @@ class RenderRubyBase : public RenderBlock {
 };
 
 }  // namespace WebCore
+
+#endif
 
 #endif  // RenderRubyBase_h
