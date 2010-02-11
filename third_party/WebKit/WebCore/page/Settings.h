@@ -150,11 +150,6 @@ class Settings : public Noncopyable {
   void setPrivateBrowsingEnabled(bool);
   bool privateBrowsingEnabled() const { return m_privateBrowsingEnabled; }
 
-  void setLocalStorageOverridesPrivateBrowsing(bool);
-  bool localStorageOverridesPrivateBrowsing() const {
-    return m_localStorageOverridesPrivateBrowsing;
-  }
-
   void setCaretBrowsingEnabled(bool);
   bool caretBrowsingEnabled() const { return m_caretBrowsingEnabled; }
 
@@ -384,7 +379,6 @@ class Settings : public Noncopyable {
   bool m_isJavaEnabled : 1;
   bool m_loadsImagesAutomatically : 1;
   bool m_privateBrowsingEnabled : 1;
-  bool m_localStorageOverridesPrivateBrowsing : 1;
   bool m_caretBrowsingEnabled : 1;
   bool m_areImagesEnabled : 1;
   bool m_arePluginsEnabled : 1;
