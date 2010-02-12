@@ -104,7 +104,7 @@ class WorkerThreadableWebSocketChannel
 
     virtual void didConnect();
     virtual void didReceiveMessage(const String& message);
-    virtual void didClose(unsigned long unhandledBufferedAmount);
+    virtual void didClose();
 
    private:
     Peer(RefPtr<ThreadableWebSocketChannelClientWrapper>,

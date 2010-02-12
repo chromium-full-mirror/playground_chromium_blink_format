@@ -92,7 +92,7 @@ class WebSocket : public RefCounted<WebSocket>,
   // WebSocketChannelClient
   virtual void didConnect();
   virtual void didReceiveMessage(const String& message);
-  virtual void didClose(unsigned long unhandledBufferedAmount);
+  virtual void didClose();
 
  private:
   WebSocket(ScriptExecutionContext*);
@@ -112,7 +112,6 @@ class WebSocket : public RefCounted<WebSocket>,
   KURL m_url;
   String m_protocol;
   EventTargetData m_eventTargetData;
-  unsigned long m_bufferedAmountAfterClose;
 };
 
 }  // namespace WebCore

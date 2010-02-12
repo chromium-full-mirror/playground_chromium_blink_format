@@ -78,9 +78,9 @@ class ThreadableWebSocketChannelClientWrapper
       m_client->didReceiveMessage(msg);
   }
 
-  void didClose(unsigned long unhandledBufferedAmount) {
+  void didClose() {
     if (m_client)
-      m_client->didClose(unhandledBufferedAmount);
+      m_client->didClose();
   }
 
  protected:

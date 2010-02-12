@@ -91,9 +91,7 @@ bool WebSocket::isAvailable() {
 #endif
 
 WebSocket::WebSocket(ScriptExecutionContext* context)
-    : ActiveDOMObject(context, this),
-      m_state(CONNECTING),
-      m_bufferedAmountAfterClose(0) {}
+    : ActiveDOMObject(context, this), m_state(CONNECTING) {}
 
 WebSocket::~WebSocket() {
   if (m_channel)
@@ -174,12 +172,9 @@ bool WebSocket::send(const String& message, ExceptionCode& ec) {
   }
   // No exception is raised if the connection was once established but has
   // subsequently been closed.
-  if (m_state == CLOSED) {
-    m_bufferedAmountAfterClose += message.utf8().length() + 2;  // 2 for framing
+  if (m_state == CLOSED)
     return false;
-  }
   // FIXME: check message is valid utf8.
-  ASSERT(m_channel);
   return m_channel->send(message);
 }
 
@@ -188,7 +183,6 @@ void WebSocket::close() {
   if (m_state == CLOSED)
     return;
   m_state = CLOSED;
-  m_bufferedAmountAfterClose = m_channel->bufferedAmount();
   m_channel->close();
 }
 
@@ -203,7 +197,7 @@ WebSocket::State WebSocket::readyState() const {
 unsigned long WebSocket::bufferedAmount() const {
   if (m_state == OPEN)
     return m_channel->bufferedAmount();
-  return m_bufferedAmountAfterClose;
+  return 0;
 }
 
 ScriptExecutionContext* WebSocket::scriptExecutionContext() const {
@@ -231,7 +225,7 @@ void WebSocket::stop() {
 void WebSocket::didConnect() {
   LOG(Network, "WebSocket %p didConnect", this);
   if (m_state != CONNECTING || !scriptExecutionContext()) {
-    didClose(0);
+    didClose();
     return;
   }
   m_state = OPEN;
@@ -248,10 +242,9 @@ void WebSocket::didReceiveMessage(const String& msg) {
   dispatchEvent(evt);
 }
 
-void WebSocket::didClose(unsigned long unhandledBufferedAmount) {
+void WebSocket::didClose() {
   LOG(Network, "WebSocket %p didClose", this);
   m_state = CLOSED;
-  m_bufferedAmountAfterClose += unhandledBufferedAmount;
   dispatchEvent(Event::create(eventNames().closeEvent, false, false));
   m_channel = 0;
   if (hasPendingActivity())
