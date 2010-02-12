@@ -41,7 +41,7 @@ WebViewGraphicsBased::WebViewGraphicsBased(QWidget* parent)
       m_numPaintsTotal(0),
       m_numPaintsSinceLastMeasure(0),
       m_measureFps(false) {
-  setScene(new QGraphicsScene);
+  setScene(new QGraphicsScene(this));
   scene()->addItem(m_item);
 
   setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
