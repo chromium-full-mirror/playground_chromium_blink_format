@@ -153,7 +153,6 @@ class DOMWrapperWorld : public RefCounted<DOMWrapperWorld> {
   }
   ~DOMWrapperWorld();
 
-  void detachFromGlobalData() { m_globalData = 0; }
   void rememberDocument(Document* document) {
     documentsWithWrappers.add(document);
   }
@@ -215,7 +214,9 @@ class WebCoreJSClientData : public JSC::JSGlobalData::ClientData,
   virtual ~WebCoreJSClientData() {
     ASSERT(m_worldSet.contains(m_normalWorld.get()));
     ASSERT(m_worldSet.size() == 1);
-    m_normalWorld->detachFromGlobalData();
+    ASSERT(m_normalWorld->hasOneRef());
+    m_normalWorld.clear();
+    ASSERT(m_worldSet.isEmpty());
   }
 
   DOMWrapperWorld* normalWorld() { return m_normalWorld.get(); }
