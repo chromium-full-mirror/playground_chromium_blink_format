@@ -36,6 +36,7 @@
 #include "StructureTransitionTable.h"
 #include "JSTypeInfo.h"
 #include "UString.h"
+#include "WeakGCPtr.h"
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 
@@ -173,9 +174,11 @@ class Structure : public RefCounted<Structure> {
   void setEnumerationCache(
       JSPropertyNameIterator*
           enumerationCache);  // Defined in JSPropertyNameIterator.h.
-  JSPropertyNameIterator* enumerationCache() {
-    return m_enumerationCache.get();
-  }
+  void clearEnumerationCache(
+      JSPropertyNameIterator*
+          enumerationCache);  // Defined in JSPropertyNameIterator.h.
+  JSPropertyNameIterator*
+  enumerationCache();  // Defined in JSPropertyNameIterator.h.
   void getPropertyNames(PropertyNameArray&, EnumerationMode mode);
 
  private:
@@ -240,7 +243,7 @@ class Structure : public RefCounted<Structure> {
 
   StructureTransitionTable table;
 
-  ProtectedPtr<JSPropertyNameIterator> m_enumerationCache;
+  WeakGCPtr<JSPropertyNameIterator> m_enumerationCache;
 
   PropertyMapHashTable* m_propertyTable;
 
