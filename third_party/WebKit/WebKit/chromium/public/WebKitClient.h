@@ -49,6 +49,7 @@ namespace WebKit {
 class WebApplicationCacheHost;
 class WebApplicationCacheHostClient;
 class WebClipboard;
+class WebCookieJar;
 class WebMessagePortChannel;
 class WebMimeRegistry;
 class WebPluginListBuilder;
@@ -75,6 +76,9 @@ class WebKitClient {
 
   // May return null on some platforms.
   virtual WebThemeEngine* themeEngine() { return 0; }
+
+  // May return null.
+  virtual WebCookieJar* cookieJar() { return 0; }
 
   // Application Cache --------------------------------------------
 
@@ -202,20 +206,20 @@ class WebKitClient {
 
   // Network -------------------------------------------------------------
 
-  virtual void setCookies(const WebURL& url,
+  // These cookie methods are DEPRECATED in favor of cookieJar accessor.
+  virtual void setCookies(const WebURL&,
                           const WebURL& firstPartyForCookies,
                           const WebString& cookies) {}
-  virtual WebString cookies(const WebURL& url,
-                            const WebURL& firstPartyForCookies) {
+  virtual WebString cookies(const WebURL&, const WebURL& firstPartyForCookies) {
     return WebString();
   }
-  virtual bool rawCookies(const WebURL& url,
+  virtual bool rawCookies(const WebURL&,
                           const WebURL& firstPartyForCookies,
                           WebVector<WebCookie>*) {
     return false;
   }
-  virtual void deleteCookie(const WebURL& url, const WebString& cookieName) {}
-  virtual bool cookiesEnabled(const WebURL& url,
+  virtual void deleteCookie(const WebURL&, const WebString& cookieName) {}
+  virtual bool cookiesEnabled(const WebURL&,
                               const WebURL& firstPartyForCookies) {
     return true;
   }

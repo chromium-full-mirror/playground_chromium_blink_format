@@ -38,6 +38,7 @@
 
 namespace WebKit {
 
+class WebCookieJar;
 class WebDataSource;
 class WebFormElement;
 class WebFrame;
@@ -82,6 +83,11 @@ class WebFrameClient {
   virtual WebMediaPlayer* createMediaPlayer(WebFrame*, WebMediaPlayerClient*) {
     return 0;
   }
+
+  // Services ------------------------------------------------------------
+
+  // A frame specific cookie jar.  May return null.
+  virtual WebCookieJar* cookieJar() { return 0; }
 
   // General notifications -----------------------------------------------
 
