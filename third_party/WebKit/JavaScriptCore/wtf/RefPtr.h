@@ -41,13 +41,10 @@ template <typename T>
 class RefPtr : public FastAllocBase {
  public:
   RefPtr() : m_ptr(0) {}
-  RefPtr(T* ptr) : m_ptr(ptr) {
-    if (ptr)
-      ptr->ref();
-  }
+  RefPtr(T* ptr) : m_ptr(ptr) { refIfNotNull(ptr); }
   RefPtr(const RefPtr& o) : m_ptr(o.m_ptr) {
-    if (T* ptr = m_ptr)
-      ptr->ref();
+    T* ptr = m_ptr;
+    refIfNotNull(ptr);
   }
   // see comment in PassRefPtr.h for why this takes const reference
   template <typename U>
@@ -69,8 +66,8 @@ class RefPtr : public FastAllocBase {
 
   template <typename U>
   RefPtr(const RefPtr<U>& o) : m_ptr(o.get()) {
-    if (T* ptr = m_ptr)
-      ptr->ref();
+    T* ptr = m_ptr;
+    refIfNotNull(ptr);
   }
 
   T* get() const { return m_ptr; }
@@ -126,12 +123,10 @@ inline RefPtr<T>::RefPtr(const NonNullPassRefPtr<U>& o)
 template <typename T>
 inline RefPtr<T>& RefPtr<T>::operator=(const RefPtr<T>& o) {
   T* optr = o.get();
-  if (optr)
-    optr->ref();
+  refIfNotNull(optr);
   T* ptr = m_ptr;
   m_ptr = optr;
-  if (ptr)
-    ptr->deref();
+  derefIfNotNull(ptr);
   return *this;
 }
 
@@ -139,23 +134,19 @@ template <typename T>
 template <typename U>
 inline RefPtr<T>& RefPtr<T>::operator=(const RefPtr<U>& o) {
   T* optr = o.get();
-  if (optr)
-    optr->ref();
+  refIfNotNull(optr);
   T* ptr = m_ptr;
   m_ptr = optr;
-  if (ptr)
-    ptr->deref();
+  derefIfNotNull(ptr);
   return *this;
 }
 
 template <typename T>
 inline RefPtr<T>& RefPtr<T>::operator=(T* optr) {
-  if (optr)
-    optr->ref();
+  refIfNotNull(optr);
   T* ptr = m_ptr;
   m_ptr = optr;
-  if (ptr)
-    ptr->deref();
+  derefIfNotNull(ptr);
   return *this;
 }
 
@@ -163,8 +154,7 @@ template <typename T>
 inline RefPtr<T>& RefPtr<T>::operator=(const PassRefPtr<T>& o) {
   T* ptr = m_ptr;
   m_ptr = o.releaseRef();
-  if (ptr)
-    ptr->deref();
+  derefIfNotNull(ptr);
   return *this;
 }
 
@@ -172,8 +162,7 @@ template <typename T>
 inline RefPtr<T>& RefPtr<T>::operator=(const NonNullPassRefPtr<T>& o) {
   T* ptr = m_ptr;
   m_ptr = o.releaseRef();
-  if (ptr)
-    ptr->deref();
+  derefIfNotNull(ptr);
   return *this;
 }
 
@@ -182,8 +171,7 @@ template <typename U>
 inline RefPtr<T>& RefPtr<T>::operator=(const PassRefPtr<U>& o) {
   T* ptr = m_ptr;
   m_ptr = o.releaseRef();
-  if (ptr)
-    ptr->deref();
+  derefIfNotNull(ptr);
   return *this;
 }
 
@@ -192,8 +180,7 @@ template <typename U>
 inline RefPtr<T>& RefPtr<T>::operator=(const NonNullPassRefPtr<U>& o) {
   T* ptr = m_ptr;
   m_ptr = o.releaseRef();
-  if (ptr)
-    ptr->deref();
+  derefIfNotNull(ptr);
   return *this;
 }
 

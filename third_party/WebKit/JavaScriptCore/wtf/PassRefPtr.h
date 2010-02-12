@@ -32,11 +32,21 @@ class PassRefPtr;
 template <typename T>
 PassRefPtr<T> adoptRef(T*);
 
-// Remove inline for winscw compiler to prevent the compiler agressively
+// Remove inline for WINSCW compiler to prevent the compiler agressively
 // resolving
-// T::deref(), which will fail compiling when PassRefPtr<T> is used as class
-// member
-// or function arguments before T is defined.
+// T::ref() and T::deref(), which will fail compiling when PassRefPtr<T> is used
+// as
+// a class member or function arguments before T is defined.
+template <typename T>
+#if !COMPILER(WINSCW)
+inline
+#endif
+    void
+    refIfNotNull(T* ptr) {
+  if (UNLIKELY(ptr != 0))
+    ptr->ref();
+}
+
 template <typename T>
 #if !COMPILER(WINSCW)
 inline
@@ -51,10 +61,7 @@ template <typename T>
 class PassRefPtr {
  public:
   PassRefPtr() : m_ptr(0) {}
-  PassRefPtr(T* ptr) : m_ptr(ptr) {
-    if (ptr)
-      ptr->ref();
-  }
+  PassRefPtr(T* ptr) : m_ptr(ptr) { refIfNotNull(ptr); }
   // It somewhat breaks the type system to allow transfer of ownership out of
   // a const PassRefPtr. However, it makes it much easier to work with
   // PassRefPtr
@@ -64,19 +71,19 @@ class PassRefPtr {
   template <typename U>
   PassRefPtr(const PassRefPtr<U>& o) : m_ptr(o.releaseRef()) {}
 
-  ALWAYS_INLINE ~PassRefPtr() { derefIfNotNull<T>(m_ptr); }
+  ALWAYS_INLINE ~PassRefPtr() { derefIfNotNull(m_ptr); }
 
   template <class U>
   PassRefPtr(const RefPtr<U>& o) : m_ptr(o.get()) {
-    if (T* ptr = m_ptr)
-      ptr->ref();
+    T* ptr = m_ptr;
+    refIfNotNull(ptr);
   }
 
   T* get() const { return m_ptr; }
 
   void clear() {
-    if (T* ptr = m_ptr)
-      ptr->deref();
+    T* ptr = m_ptr;
+    derefIfNotNull(ptr);
     m_ptr = 0;
   }
   T* releaseRef() const {
@@ -174,23 +181,19 @@ template <typename T>
 template <typename U>
 inline PassRefPtr<T>& PassRefPtr<T>::operator=(const RefPtr<U>& o) {
   T* optr = o.get();
-  if (optr)
-    optr->ref();
+  refIfNotNull(optr);
   T* ptr = m_ptr;
   m_ptr = optr;
-  if (ptr)
-    ptr->deref();
+  derefIfNotNull(ptr);
   return *this;
 }
 
 template <typename T>
 inline PassRefPtr<T>& PassRefPtr<T>::operator=(T* optr) {
-  if (optr)
-    optr->ref();
+  refIfNotNull(optr);
   T* ptr = m_ptr;
   m_ptr = optr;
-  if (ptr)
-    ptr->deref();
+  derefIfNotNull(ptr);
   return *this;
 }
 
@@ -198,8 +201,7 @@ template <typename T>
 inline PassRefPtr<T>& PassRefPtr<T>::operator=(const PassRefPtr<T>& ref) {
   T* ptr = m_ptr;
   m_ptr = ref.releaseRef();
-  if (ptr)
-    ptr->deref();
+  derefIfNotNull(ptr);
   return *this;
 }
 
@@ -208,8 +210,7 @@ template <typename U>
 inline PassRefPtr<T>& PassRefPtr<T>::operator=(const PassRefPtr<U>& ref) {
   T* ptr = m_ptr;
   m_ptr = ref.releaseRef();
-  if (ptr)
-    ptr->deref();
+  derefIfNotNull(ptr);
   return *this;
 }
 
