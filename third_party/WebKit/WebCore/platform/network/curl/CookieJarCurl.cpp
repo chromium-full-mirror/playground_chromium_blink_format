@@ -38,6 +38,12 @@ String cookies(const Document* /*document*/, const KURL& url) {
   return cookieJar.get(url.string());
 }
 
+String cookieRequestHeaderFieldValue(const Document* /*document*/,
+                                     const KURL& url) {
+  // FIXME: include HttpOnly cookie.
+  return cookieJar.get(url.string());
+}
+
 bool cookiesEnabled(const Document* /*document*/) {
   return true;
 }
