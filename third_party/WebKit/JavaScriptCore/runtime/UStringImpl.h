@@ -40,49 +40,6 @@ class IdentifierTable;
 
 typedef CrossThreadRefCounted<OwnFastMallocPtr<UChar>> SharedUChar;
 
-class UntypedPtrAndBitfield {
- public:
-  UntypedPtrAndBitfield() {}
-
-  UntypedPtrAndBitfield(void* ptrValue, uintptr_t bitValue)
-      : m_value(reinterpret_cast<uintptr_t>(ptrValue) | bitValue)
-#ifndef NDEBUG
-        ,
-        m_leaksPtr(ptrValue)
-#endif
-  {
-    ASSERT(ptrValue == asPtr<void*>());
-    ASSERT((*this & ~s_alignmentMask) == bitValue);
-  }
-
-  template <typename T>
-  T asPtr() const {
-    return reinterpret_cast<T>(m_value & s_alignmentMask);
-  }
-
-  UntypedPtrAndBitfield& operator&=(uintptr_t bits) {
-    m_value &= bits | s_alignmentMask;
-    return *this;
-  }
-
-  UntypedPtrAndBitfield& operator|=(uintptr_t bits) {
-    m_value |= bits & ~s_alignmentMask;
-    return *this;
-  }
-
-  uintptr_t operator&(uintptr_t mask) const {
-    return m_value & mask & ~s_alignmentMask;
-  }
-
- private:
-  static const uintptr_t s_alignmentMask = ~static_cast<uintptr_t>(0x7);
-  uintptr_t m_value;
-#ifndef NDEBUG
-  void* m_leaksPtr;  // Only used to allow tools like leaks on OSX to detect
-                     // that the memory is referenced.
-#endif
-};
-
 class UStringImpl : Noncopyable {
  public:
   template <size_t inlineCapacity>
@@ -156,11 +113,11 @@ class UStringImpl : Noncopyable {
   size_t cost() {
     // For substrings, return the cost of the base string.
     if (bufferOwnership() == BufferSubstring)
-      return m_dataBuffer.asPtr<UStringImpl*>()->cost();
+      return m_bufferSubstring->cost();
 
-    if (m_dataBuffer & s_reportedCostBit)
+    if (m_refCountAndFlags & s_refCountFlagHasReportedCost)
       return 0;
-    m_dataBuffer |= s_reportedCostBit;
+    m_refCountAndFlags |= s_refCountFlagHasReportedCost;
     return m_length;
   }
   unsigned hash() const {
@@ -176,15 +133,23 @@ class UStringImpl : Noncopyable {
     ASSERT(hash == computeHash(data(), m_length));
     m_hash = hash;
   }  // fast path for Identifiers
-  bool isIdentifier() const { return m_isIdentifier; }
-  void setIsIdentifier(bool isIdentifier) { m_isIdentifier = isIdentifier; }
+  bool isIdentifier() const {
+    return m_refCountAndFlags & s_refCountFlagIsIdentifier;
+  }
+  void setIsIdentifier(bool isIdentifier) {
+    if (isIdentifier)
+      m_refCountAndFlags |= s_refCountFlagIsIdentifier;
+    else
+      m_refCountAndFlags &= ~s_refCountFlagIsIdentifier;
+  }
 
   UStringImpl* ref() {
-    m_refCount += s_refCountIncrement;
+    m_refCountAndFlags += s_refCountIncrement;
     return this;
   }
   ALWAYS_INLINE void deref() {
-    if (!(m_refCount -= s_refCountIncrement))
+    m_refCountAndFlags -= s_refCountIncrement;
+    if (!(m_refCountAndFlags & s_refCountMask))
       delete this;
   }
 
@@ -232,11 +197,10 @@ class UStringImpl : Noncopyable {
   // Used to construct normal strings with an internal or external buffer.
   UStringImpl(UChar* data, int length, BufferOwnership ownership)
       : m_data(data),
+        m_buffer(0),
         m_length(length),
-        m_refCount(s_refCountIncrement),
-        m_hash(0),
-        m_isIdentifier(false),
-        m_dataBuffer(0, ownership) {
+        m_refCountAndFlags(s_refCountIncrement | ownership),
+        m_hash(0) {
     ASSERT((ownership == BufferInternal) || (ownership == BufferOwned));
     checkConsistency();
   }
@@ -250,40 +214,37 @@ class UStringImpl : Noncopyable {
   enum StaticStringConstructType { ConstructStaticString };
   UStringImpl(UChar* data, int length, StaticStringConstructType)
       : m_data(data),
+        m_buffer(0),
         m_length(length),
-        m_refCount(s_staticRefCountInitialValue),
-        m_hash(0),
-        m_isIdentifier(false),
-        m_dataBuffer(0, BufferOwned) {
+        m_refCountAndFlags(s_refCountFlagStatic | BufferOwned),
+        m_hash(0) {
     checkConsistency();
   }
 
   // Used to create new strings that are a substring of an existing string.
   UStringImpl(UChar* data, int length, PassRefPtr<UStringImpl> base)
       : m_data(data),
+        m_bufferSubstring(base.releaseRef()),
         m_length(length),
-        m_refCount(s_refCountIncrement),
-        m_hash(0),
-        m_isIdentifier(false),
-        m_dataBuffer(base.releaseRef(), BufferSubstring) {
+        m_refCountAndFlags(s_refCountIncrement | BufferSubstring),
+        m_hash(0) {
     // Do use static strings as a base for substrings; UntypedPtrAndBitfield
     // assumes
     // that all pointers will be at least 8-byte aligned, we cannot guarantee
     // that of
     // UStringImpls that are not heap allocated.
-    ASSERT(m_dataBuffer.asPtr<UStringImpl*>()->size());
-    ASSERT(!m_dataBuffer.asPtr<UStringImpl*>()->isStatic());
+    ASSERT(m_bufferSubstring->size());
+    ASSERT(!m_bufferSubstring->isStatic());
     checkConsistency();
   }
 
   // Used to construct new strings sharing an existing shared buffer.
   UStringImpl(UChar* data, int length, PassRefPtr<SharedUChar> sharedBuffer)
       : m_data(data),
+        m_bufferShared(sharedBuffer.releaseRef()),
         m_length(length),
-        m_refCount(s_refCountIncrement),
-        m_hash(0),
-        m_isIdentifier(false),
-        m_dataBuffer(sharedBuffer.releaseRef(), BufferShared) {
+        m_refCountAndFlags(s_refCountIncrement | BufferShared),
+        m_hash(0) {
     checkConsistency();
   }
 
@@ -296,38 +257,39 @@ class UStringImpl : Noncopyable {
   // character strings from SmallStrings.
   static const int s_minLengthToShare = 10;
   static const unsigned s_copyCharsInlineCutOff = 20;
-  static const uintptr_t s_bufferOwnershipMask = 3;
-  static const uintptr_t s_reportedCostBit = 4;
   // We initialize and increment/decrement the refCount for all normal
   // (non-static) strings by the value 2.
   // We initialize static strings with an odd number (specifically, 1), such
   // that the refCount cannot reach zero.
-  static const int s_refCountIncrement = 2;
-  static const int s_staticRefCountInitialValue = 1;
+  static const unsigned s_refCountMask = 0xFFFFFFF0;
+  static const int s_refCountIncrement = 0x20;
+  static const int s_refCountFlagStatic = 0x10;
+  static const unsigned s_refCountFlagHasReportedCost = 0x8;
+  static const unsigned s_refCountFlagIsIdentifier = 0x4;
+  static const unsigned s_refCountMaskBufferOwnership = 0x3;
 
   UStringImpl* bufferOwnerString() {
-    return (bufferOwnership() == BufferSubstring)
-               ? m_dataBuffer.asPtr<UStringImpl*>()
-               : this;
+    return (bufferOwnership() == BufferSubstring) ? m_bufferSubstring : this;
   }
   const UStringImpl* bufferOwnerString() const {
-    return (bufferOwnership() == BufferSubstring)
-               ? m_dataBuffer.asPtr<UStringImpl*>()
-               : this;
+    return (bufferOwnership() == BufferSubstring) ? m_bufferSubstring : this;
   }
   SharedUChar* baseSharedBuffer();
   unsigned bufferOwnership() const {
-    return m_dataBuffer & s_bufferOwnershipMask;
+    return m_refCountAndFlags & s_refCountMaskBufferOwnership;
   }
-  bool isStatic() const { return m_refCount & 1; }
+  bool isStatic() const { return m_refCountAndFlags & s_refCountFlagStatic; }
 
   // unshared data
   UChar* m_data;
+  union {
+    void* m_buffer;
+    UStringImpl* m_bufferSubstring;
+    SharedUChar* m_bufferShared;
+  };
   int m_length;
-  unsigned m_refCount;
-  mutable unsigned m_hash : 31;
-  mutable unsigned m_isIdentifier : 1;
-  UntypedPtrAndBitfield m_dataBuffer;
+  unsigned m_refCountAndFlags;
+  mutable unsigned m_hash;
 
   JS_EXPORTDATA static UStringImpl* s_empty;
 
