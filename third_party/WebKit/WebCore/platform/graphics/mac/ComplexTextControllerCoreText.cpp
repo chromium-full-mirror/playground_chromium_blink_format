@@ -53,7 +53,8 @@ ComplexTextController::ComplexTextRun::ComplexTextRun(
       m_fontData(fontData),
       m_characters(characters),
       m_stringLocation(stringLocation),
-      m_stringLength(stringLength) {
+      m_stringLength(stringLength),
+      m_isMonotonic(true) {
   m_glyphCount = CTRunGetGlyphCount(m_coreTextRun.get());
   m_coreTextIndices = CTRunGetStringIndicesPtr(m_coreTextRun.get());
   if (!m_coreTextIndices) {
