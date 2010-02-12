@@ -37,6 +37,7 @@
 #include <qwebsettings.h>
 
 extern void qt_dump_editing_callbacks(bool b);
+extern void qt_dump_frame_loader(bool b);
 extern void qt_dump_resource_load_callbacks(bool b);
 extern void qt_drt_setFrameSetFlatteningEnabled(QWebPage*, bool);
 extern void qt_drt_setJavaScriptProfilingEnabled(QWebFrame*, bool enabled);
@@ -92,6 +93,7 @@ void LayoutTestController::reset() {
   m_webHistory = 0;
   m_globalFlag = false;
   qt_dump_editing_callbacks(false);
+  qt_dump_frame_loader(false);
   qt_dump_resource_load_callbacks(false);
   emit hidePage();
 }
@@ -212,6 +214,10 @@ QString LayoutTestController::pathToLocalResource(const QString& url) {
 void LayoutTestController::dumpEditingCallbacks() {
   qDebug() << ">>>dumpEditingCallbacks";
   qt_dump_editing_callbacks(true);
+}
+
+void LayoutTestController::dumpFrameLoadCallbacks() {
+  qt_dump_frame_loader(true);
 }
 
 void LayoutTestController::dumpResourceLoadCallbacks() {
