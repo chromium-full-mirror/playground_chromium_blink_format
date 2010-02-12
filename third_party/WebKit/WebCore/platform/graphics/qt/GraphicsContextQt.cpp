@@ -951,7 +951,7 @@ void GraphicsContext::clipOut(const Path& path) {
   QPainterPath newClip;
   newClip.setFillRule(Qt::OddEvenFill);
   if (p->hasClipping()) {
-    newClip.addRect(p->clipPath().boundingRect());
+    newClip.addRect(p->clipRegion().boundingRect());
     newClip.addPath(clippedOut);
     p->setClipPath(newClip, Qt::IntersectClip);
   } else {
@@ -1017,7 +1017,7 @@ void GraphicsContext::clipOut(const IntRect& rect) {
   QPainterPath newClip;
   newClip.setFillRule(Qt::OddEvenFill);
   if (p->hasClipping()) {
-    newClip.addRect(p->clipPath().boundingRect());
+    newClip.addRect(p->clipRegion().boundingRect());
     newClip.addRect(QRect(rect));
     p->setClipPath(newClip, Qt::IntersectClip);
   } else {
@@ -1038,7 +1038,7 @@ void GraphicsContext::clipOutEllipseInRect(const IntRect& rect) {
   QPainterPath newClip;
   newClip.setFillRule(Qt::OddEvenFill);
   if (p->hasClipping()) {
-    newClip.addRect(p->clipPath().boundingRect());
+    newClip.addRect(p->clipRegion().boundingRect());
     newClip.addEllipse(QRect(rect));
     p->setClipPath(newClip, Qt::IntersectClip);
   } else {
