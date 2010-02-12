@@ -48,7 +48,7 @@ class WebStorageAreaImpl : public WebStorageArea {
   virtual void setItem(const WebString& key,
                        const WebString& value,
                        const WebURL& url,
-                       bool& quotaException,
+                       Result& result,
                        WebString& oldValue);
   virtual void removeItem(const WebString& key,
                           const WebURL& url,

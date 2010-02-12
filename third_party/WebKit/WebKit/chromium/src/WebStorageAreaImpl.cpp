@@ -63,7 +63,7 @@ WebString WebStorageAreaImpl::getItem(const WebString& key) {
 void WebStorageAreaImpl::setItem(const WebString& key,
                                  const WebString& value,
                                  const WebURL& url,
-                                 bool& quotaException,
+                                 Result& result,
                                  WebString& oldValue) {
   int exceptionCode = 0;
 
@@ -72,9 +72,9 @@ void WebStorageAreaImpl::setItem(const WebString& key,
 
   if (exceptionCode) {
     ASSERT(exceptionCode == WebCore::QUOTA_EXCEEDED_ERR);
-    quotaException = true;
+    result = ResultBlockedByQuota;
   } else
-    quotaException = false;
+    result = ResultOK;
 }
 
 void WebStorageAreaImpl::removeItem(const WebString& key,
