@@ -266,7 +266,7 @@ bool HTMLInputElement::tooLong() const {
       bool userEdited = !m_data.value().isNull();
       if (!userEdited)
         return false;
-      return value().length() > static_cast<unsigned>(max);
+      return value().numGraphemeClusters() > static_cast<unsigned>(max);
     }
     case BUTTON:
     case CHECKBOX:
