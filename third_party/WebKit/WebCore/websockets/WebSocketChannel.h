@@ -96,7 +96,6 @@ class WebSocketChannel : public RefCounted<WebSocketChannel>,
   RefPtr<SocketStreamHandle> m_handle;
   char* m_buffer;
   int m_bufferSize;
-  unsigned long m_unhandledBufferSize;
 };
 
 }  // namespace WebCore

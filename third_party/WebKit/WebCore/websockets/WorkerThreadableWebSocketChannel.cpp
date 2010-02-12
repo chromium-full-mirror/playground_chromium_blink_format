@@ -210,16 +210,19 @@ void WorkerThreadableWebSocketChannel::Peer::didReceiveMessage(
 
 static void workerContextDidClose(
     ScriptExecutionContext* context,
-    RefPtr<ThreadableWebSocketChannelClientWrapper> workerClientWrapper) {
+    RefPtr<ThreadableWebSocketChannelClientWrapper> workerClientWrapper,
+    unsigned long unhandledBufferedAmount) {
   ASSERT_UNUSED(context, context->isWorkerContext());
-  workerClientWrapper->didClose();
+  workerClientWrapper->didClose(unhandledBufferedAmount);
 }
 
-void WorkerThreadableWebSocketChannel::Peer::didClose() {
+void WorkerThreadableWebSocketChannel::Peer::didClose(
+    unsigned long unhandledBufferedAmount) {
   ASSERT(isMainThread());
   m_mainWebSocketChannel = 0;
   m_loaderProxy.postTaskForModeToWorkerContext(
-      createCallbackTask(&workerContextDidClose, m_workerClientWrapper),
+      createCallbackTask(&workerContextDidClose, m_workerClientWrapper,
+                         unhandledBufferedAmount),
       m_taskMode);
 }
 
