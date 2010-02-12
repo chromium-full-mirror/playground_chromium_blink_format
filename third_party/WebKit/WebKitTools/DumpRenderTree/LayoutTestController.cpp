@@ -1327,6 +1327,25 @@ static JSValueRef setXSSAuditorEnabledCallback(JSContextRef context,
   return JSValueMakeUndefined(context);
 }
 
+static JSValueRef setFrameSetFlatteningEnabledCallback(
+    JSContextRef context,
+    JSObjectRef function,
+    JSObjectRef thisObject,
+    size_t argumentCount,
+    const JSValueRef arguments[],
+    JSValueRef* exception) {
+  // Has mac & windows implementation
+  if (argumentCount < 1)
+    return JSValueMakeUndefined(context);
+
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->setFrameSetFlatteningEnabled(
+      JSValueToBoolean(context, arguments[0]));
+
+  return JSValueMakeUndefined(context);
+}
+
 static JSValueRef setAllowUniversalAccessFromFileURLsCallback(
     JSContextRef context,
     JSObjectRef function,
@@ -2116,6 +2135,8 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
       {"setPrivateBrowsingEnabled", setPrivateBrowsingEnabledCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setXSSAuditorEnabled", setXSSAuditorEnabledCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"setFrameSetFlatteningEnabled", setFrameSetFlatteningEnabledCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setSelectTrailingWhitespaceEnabled",
        setSelectTrailingWhitespaceEnabledCallback,

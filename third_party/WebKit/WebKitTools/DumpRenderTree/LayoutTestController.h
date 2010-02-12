@@ -98,6 +98,7 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
   void setUserStyleSheetEnabled(bool flag);
   void setUserStyleSheetLocation(JSStringRef path);
   void setXSSAuditorEnabled(bool flag);
+  void setFrameSetFlatteningEnabled(bool enable);
 
   void waitForPolicyDelegate();
   size_t webHistoryItemCount();

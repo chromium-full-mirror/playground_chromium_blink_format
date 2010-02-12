@@ -139,6 +139,10 @@ void LayoutTestController::setXSSAuditorEnabled(bool enabled) {
   // FIXME: implement
 }
 
+void LayoutTestController::setFrameSetFlatteningEnabled(bool enabled) {
+  // FIXME: implement
+}
+
 void LayoutTestController::setAllowUniversalAccessFromFileURLs(bool enabled) {
   // FIXME: implement
 }
