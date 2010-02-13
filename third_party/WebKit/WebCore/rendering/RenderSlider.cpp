@@ -101,7 +101,7 @@ double SliderRange::valueFromElement(HTMLInputElement* element,
                                      bool* wasClamped) {
   double oldValue;
   bool parseSuccess =
-      HTMLInputElement::formStringToDouble(element->value(), &oldValue);
+      HTMLInputElement::parseToDoubleForNumberType(element->value(), &oldValue);
   if (!parseSuccess)
     oldValue = (minimum + maximum) / 2;
   double newValue = clampValue(oldValue);
@@ -388,7 +388,7 @@ void RenderSlider::updateFromElement() {
   double value = range.valueFromElement(element, &clamped);
   if (clamped)
     element->setValueFromRenderer(
-        HTMLInputElement::formStringFromDouble(value));
+        HTMLInputElement::serializeForNumberType(value));
 
   // Layout will take care of the thumb's size and position.
   if (!m_thumb) {
@@ -447,7 +447,8 @@ void RenderSlider::setValueForPosition(int position) {
       style()->appearance() == MediaVolumeSliderPart)
     fraction = 1 - fraction;
   double value = range.clampValue(range.valueFromProportion(fraction));
-  element->setValueFromRenderer(HTMLInputElement::formStringFromDouble(value));
+  element->setValueFromRenderer(
+      HTMLInputElement::serializeForNumberType(value));
 
   // Also update the position if appropriate.
   if (position != currentPosition()) {
