@@ -80,6 +80,10 @@ class RenderTextControl : public RenderBlock {
   int textBlockWidth() const;
   int textBlockHeight() const;
 
+  float scaleEmToUnits(int x) const;
+
+  static bool hasValidAvgCharWidth(AtomicString family);
+  virtual float getAvgCharWidth(AtomicString family);
   virtual int preferredContentWidth(float charWidth) const = 0;
   virtual void adjustControlHeightBasedOnLineHeight(int lineHeight) = 0;
   virtual void cacheSelection(int start, int end) = 0;
