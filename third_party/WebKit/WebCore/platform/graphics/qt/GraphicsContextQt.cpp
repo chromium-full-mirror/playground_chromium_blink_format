@@ -214,6 +214,7 @@ class GraphicsContextPlatformPrivate : public Noncopyable {
   QStack<TransparencyLayer*> layers;
   QPainter* redirect;
 
+  // reuse this brush for solid color (to prevent expensive QBrush construction)
   QBrush solidColor;
 
   InterpolationQuality imageInterpolationQuality;
@@ -1107,7 +1108,8 @@ void GraphicsContext::setPlatformStrokeColor(const Color& color,
     return;
   QPainter* p = m_data->p();
   QPen newPen(p->pen());
-  newPen.setColor(color);
+  m_data->solidColor.setColor(color);
+  newPen.setBrush(m_data->solidColor);
   p->setPen(newPen);
 }
 
