@@ -387,6 +387,7 @@ class NetscapePluginInstanceProxy
   class LocalObjectMap {
    public:
     LocalObjectMap();
+    ~LocalObjectMap();
     uint32_t idForObject(JSC::JSObject*);
     void retain(JSC::JSObject*);
     void release(JSC::JSObject*);
