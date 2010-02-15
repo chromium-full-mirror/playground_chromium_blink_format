@@ -159,6 +159,7 @@ class WebPage : public QWebPage {
   WebPage(QObject* parent, DumpRenderTree*);
   virtual ~WebPage();
   QWebInspector* webInspector();
+  void closeWebInspector();
 
   QWebPage* createWindow(QWebPage::WebWindowType);
 
