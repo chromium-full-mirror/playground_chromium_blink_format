@@ -71,6 +71,8 @@ class WebView : public QGraphicsWebView {
   WebView(QGraphicsItem* parent = 0) : QGraphicsWebView(parent) {
     if (QApplication::instance()->arguments().contains("--cacheWebView"))
       setCacheMode(QGraphicsItem::DeviceCoordinateCache);
+    if (QApplication::instance()->arguments().contains("--resizesToContents"))
+      setResizesToContents(true);
   }
   void setYRotation(qreal angle) {
 #if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
@@ -118,8 +120,13 @@ class MainView : public QGraphicsView {
             QApplication::instance()->arguments().contains("--show-fps")),
         m_numTotalPaints(0),
         m_numPaintsSinceLastMeasure(0) {
-    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    // Use the graphics view scrollbars when the webview is set to size to the
+    // content.
+    if (!QApplication::instance()->arguments().contains(
+            "--resizesToContents")) {
+      setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+      setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    }
 
     setFrameShape(QFrame::NoFrame);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -132,15 +139,17 @@ class MainView : public QGraphicsView {
     }
   }
 
-  void setMainWidget(QGraphicsWidget* widget) {
-    QRectF rect(QRect(QPoint(0, 0), size()));
-    widget->setGeometry(rect);
+  void setMainWidget(WebView* widget) {
     m_mainWidget = widget;
+    if (m_mainWidget->resizesToContents())
+      return;
+    QRectF rect(QRect(QPoint(0, 0), size()));
+    m_mainWidget->setGeometry(rect);
   }
 
   void resizeEvent(QResizeEvent* event) {
     QGraphicsView::resizeEvent(event);
-    if (!m_mainWidget)
+    if (!m_mainWidget || m_mainWidget->resizesToContents())
       return;
     QRectF rect(QPoint(0, 0), event->size());
     m_mainWidget->setGeometry(rect);
@@ -207,7 +216,7 @@ class MainView : public QGraphicsView {
   void flipRequest();
 
  private:
-  QGraphicsWidget* m_mainWidget;
+  WebView* m_mainWidget;
   bool m_measureFps;
   int m_numTotalPaints;
   int m_numPaintsSinceLastMeasure;
@@ -454,7 +463,8 @@ int main(int argc, char** argv) {
   QApplication app(argc, argv);
   if (app.arguments().contains("--help")) {
     qDebug() << "Usage: QGVLauncher [--url url] [--compositing] [--updateMode "
-                "Full|Minimal|Smart|No|BoundingRect] [--cacheWebView]\n";
+                "Full|Minimal|Smart|No|BoundingRect] [--cacheWebView] "
+                "[--resizesToContents]\n";
     return 0;
   }
   QString url = QString("file://%1/%2")
