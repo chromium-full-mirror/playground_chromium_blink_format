@@ -195,4 +195,4 @@ void RenderRubyBase::mergeBlockChildren(RenderRubyBase* toBase,
 
 }  // namespace WebCore
 
-#endif
+#endif  // ENABLE(RUBY)

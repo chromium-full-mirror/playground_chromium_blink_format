@@ -45,4 +45,4 @@ bool RenderRubyText::isChildAllowed(RenderObject* child, RenderStyle*) const {
 
 }  // namespace WebCore
 
-#endif
+#endif  // ENABLE(RUBY)

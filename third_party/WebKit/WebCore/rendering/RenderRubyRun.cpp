@@ -212,4 +212,4 @@ RenderRubyRun* RenderRubyRun::staticCreateRubyRun(
 
 }  // namespace WebCore
 
-#endif
+#endif  // ENABLE(RUBY)
