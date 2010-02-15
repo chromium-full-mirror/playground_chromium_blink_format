@@ -26,10 +26,12 @@
 #include "config.h"
 #include "ProgressTracker.h"
 
+#include "CString.h"
 #include "DocumentLoader.h"
 #include "Frame.h"
 #include "FrameLoader.h"
 #include "FrameLoaderClient.h"
+#include "Logging.h"
 #include "ResourceResponse.h"
 #include <wtf/CurrentTime.h>
 
@@ -90,9 +92,12 @@ void ProgressTracker::reset() {
 }
 
 void ProgressTracker::progressStarted(Frame* frame) {
-  // LOG (Progress, "frame %p(%@), _private->numProgressTrackedFrames %d,
-  // _private->originatingProgressFrame %p", frame, [frame name],
-  // _private->numProgressTrackedFrames, _private->originatingProgressFrame);
+  LOG(Progress,
+      "Progress started (%p) - frame %p(\"%s\"), value %f, tracked frames %d, "
+      "originating frame %p",
+      this, frame, frame->tree()->name().string().utf8().data(),
+      m_progressValue, m_numProgressTrackedFrames,
+      m_originatingProgressFrame.get());
 
   frame->loader()->client()->willChangeEstimatedProgress();
 
@@ -111,9 +116,12 @@ void ProgressTracker::progressStarted(Frame* frame) {
 }
 
 void ProgressTracker::progressCompleted(Frame* frame) {
-  // LOG (Progress, "frame %p(%@), _private->numProgressTrackedFrames %d,
-  // _private->originatingProgressFrame %p", frame, [frame name],
-  // _private->numProgressTrackedFrames, _private->originatingProgressFrame);
+  LOG(Progress,
+      "Progress completed (%p) - frame %p(\"%s\"), value %f, tracked frames "
+      "%d, originating frame %p",
+      this, frame, frame->tree()->name().string().utf8().data(),
+      m_progressValue, m_numProgressTrackedFrames,
+      m_originatingProgressFrame.get());
 
   if (m_numProgressTrackedFrames <= 0)
     return;
@@ -129,7 +137,7 @@ void ProgressTracker::progressCompleted(Frame* frame) {
 }
 
 void ProgressTracker::finalProgressComplete() {
-  // LOG (Progress, "");
+  LOG(Progress, "Final progress complete (%p)", this);
 
   RefPtr<Frame> frame = m_originatingProgressFrame.release();
 
@@ -149,9 +157,11 @@ void ProgressTracker::finalProgressComplete() {
 
 void ProgressTracker::incrementProgress(unsigned long identifier,
                                         const ResourceResponse& response) {
-  // LOG (Progress, "_private->numProgressTrackedFrames %d,
-  // _private->originatingProgressFrame %p", _private->numProgressTrackedFrames,
-  // _private->originatingProgressFrame);
+  LOG(Progress,
+      "Progress incremented (%p) - value %f, tracked frames %d, originating "
+      "frame %p",
+      this, m_progressValue, m_numProgressTrackedFrames,
+      m_originatingProgressFrame.get());
 
   if (m_numProgressTrackedFrames <= 0)
     return;
@@ -222,9 +232,8 @@ void ProgressTracker::incrementProgress(unsigned long identifier,
   double now = currentTime();
   double notifiedProgressTimeDelta = now - m_lastNotifiedProgressTime;
 
-  // LOG (Progress, "_private->progressValue %g,
-  // _private->numProgressTrackedFrames %d", _private->progressValue,
-  // _private->numProgressTrackedFrames);
+  LOG(Progress, "Progress incremented (%p) - value %f, tracked frames %d", this,
+      m_progressValue, m_numProgressTrackedFrames);
   double notificationProgressDelta =
       m_progressValue - m_lastNotifiedProgressValue;
   if ((notificationProgressDelta >= m_progressNotificationInterval ||
