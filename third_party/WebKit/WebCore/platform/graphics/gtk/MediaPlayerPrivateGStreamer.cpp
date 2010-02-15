@@ -54,8 +54,6 @@
 #include <webkit/webkitwebview.h>
 #include <wtf/gtk/GOwnPtr.h>
 
-#define LOG_VERBOSE(channel, fmt, args...) g_printerr(fmt "\n", ##args)
-
 using namespace std;
 
 namespace WebCore {
