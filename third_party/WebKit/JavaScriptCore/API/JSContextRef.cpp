@@ -121,11 +121,14 @@ JSGlobalContextRef JSGlobalContextRetain(JSGlobalContextRef ctx) {
 
 void JSGlobalContextRelease(JSGlobalContextRef ctx) {
   ExecState* exec = toJS(ctx);
-  APIEntryShim entryShim(exec, false);
+  JSLock lock(exec);
+
+  JSGlobalData& globalData = exec->globalData();
+  IdentifierTable* savedIdentifierTable =
+      setCurrentIdentifierTable(globalData.identifierTable);
 
   gcUnprotect(exec->dynamicGlobalObject());
 
-  JSGlobalData& globalData = exec->globalData();
   if (globalData.refCount() == 2) {  // One reference is held by JSGlobalObject,
                                      // another added by
                                      // JSGlobalContextRetain().
@@ -135,6 +138,8 @@ void JSGlobalContextRelease(JSGlobalContextRef ctx) {
     globalData.heap.collectAllGarbage();
 
   globalData.deref();
+
+  setCurrentIdentifierTable(savedIdentifierTable);
 }
 
 JSObjectRef JSContextGetGlobalObject(JSContextRef ctx) {
