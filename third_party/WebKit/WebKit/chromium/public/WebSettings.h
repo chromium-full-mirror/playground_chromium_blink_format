@@ -85,6 +85,7 @@ class WebSettings {
   virtual void setOfflineWebApplicationCacheEnabled(bool) = 0;
   virtual void setExperimentalWebGLEnabled(bool) = 0;
   virtual void setGeolocationEnabled(bool) = 0;
+  virtual void setShowDebugBorders(bool) = 0;
 
  protected:
   ~WebSettings() {}

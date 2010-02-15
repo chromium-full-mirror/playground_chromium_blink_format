@@ -217,6 +217,10 @@ void WebSettingsImpl::setExperimentalWebGLEnabled(bool enabled) {
   m_settings->setWebGLEnabled(enabled);
 }
 
+void WebSettingsImpl::setShowDebugBorders(bool show) {
+  m_settings->setShowDebugBorders(show);
+}
+
 void WebSettingsImpl::setGeolocationEnabled(bool enabled) {
   m_settings->setGeolocationEnabled(enabled);
 }

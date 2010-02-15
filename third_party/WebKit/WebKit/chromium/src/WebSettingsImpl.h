@@ -84,6 +84,7 @@ class WebSettingsImpl : public WebSettings {
   virtual void setOfflineWebApplicationCacheEnabled(bool);
   virtual void setExperimentalWebGLEnabled(bool);
   virtual void setGeolocationEnabled(bool);
+  virtual void setShowDebugBorders(bool);
 
  private:
   WebCore::Settings* m_settings;
