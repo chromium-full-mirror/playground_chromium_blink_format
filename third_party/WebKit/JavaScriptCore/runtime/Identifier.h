@@ -95,7 +95,7 @@ class Identifier {
   static void remove(UString::Rep*);
 
   static bool equal(const UString::Rep*, const char*);
-  static bool equal(const UString::Rep*, const UChar*, int length);
+  static bool equal(const UString::Rep*, const UChar*, unsigned length);
   static bool equal(const UString::Rep* a, const UString::Rep* b) {
     return JSC::equal(a, b);
   }
