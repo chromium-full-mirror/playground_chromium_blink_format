@@ -675,8 +675,11 @@ class RenderObject : public CachedResourceClient {
                                  RenderBoxModelObject* repaintContainer,
                                  bool fixed = false) const;
 
-  // Return the offset from the container() renderer (excluding transforms)
-  virtual IntSize offsetFromContainer(RenderObject*) const;
+  // Return the offset from the container() renderer (excluding transforms). In
+  // multi-column layout,
+  // different offsets apply at different points, so return the offset that
+  // applies to the given point.
+  virtual IntSize offsetFromContainer(RenderObject*, const IntPoint&) const;
   // Return the offset from an object up the container() chain. Asserts that
   // none of the intermediate objects have transforms.
   IntSize offsetFromAncestorContainer(RenderObject*) const;
@@ -780,6 +783,11 @@ class RenderObject : public CachedResourceClient {
   virtual void computeRectForRepaint(RenderBoxModelObject* repaintContainer,
                                      IntRect&,
                                      bool fixed = false);
+
+  // If multiple-column layout results in applying an offset to the given point,
+  // add the same
+  // offset to the given size.
+  virtual void adjustForColumns(IntSize&, const IntPoint&) const {}
 
   virtual unsigned int length() const { return 1; }
 

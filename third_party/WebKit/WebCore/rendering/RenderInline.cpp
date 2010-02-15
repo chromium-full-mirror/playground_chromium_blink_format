@@ -775,21 +775,15 @@ void RenderInline::computeRectForRepaint(RenderBoxModelObject* repaintContainer,
   o->computeRectForRepaint(repaintContainer, rect, fixed);
 }
 
-IntSize RenderInline::offsetFromContainer(RenderObject* container) const {
+IntSize RenderInline::offsetFromContainer(RenderObject* container,
+                                          const IntPoint& point) const {
   ASSERT(container == this->container());
 
   IntSize offset;
   if (isRelPositioned())
     offset += relativePositionOffset();
 
-  if (!isInline() || isReplaced()) {
-    RenderBlock* cb;
-    if (container->isBlockFlow() &&
-        (cb = toRenderBlock(container))->hasColumns()) {
-      IntRect rect(0, 0, 1, 1);
-      cb->adjustRectForColumns(rect);
-    }
-  }
+  container->adjustForColumns(offset, point);
 
   if (container->hasOverflowClip())
     offset -= toRenderBox(container)->layer()->scrolledContentOffset();
@@ -820,7 +814,8 @@ void RenderInline::mapLocalToContainer(RenderBoxModelObject* repaintContainer,
   if (!o)
     return;
 
-  IntSize containerOffset = offsetFromContainer(o);
+  IntSize containerOffset =
+      offsetFromContainer(o, roundedIntPoint(transformState.mappedPoint()));
 
   bool preserve3D =
       useTransforms && (o->style()->preserves3D() || style()->preserves3D());
@@ -863,7 +858,7 @@ void RenderInline::mapAbsoluteToLocalPoint(
 
   o->mapAbsoluteToLocalPoint(fixed, useTransforms, transformState);
 
-  IntSize containerOffset = offsetFromContainer(o);
+  IntSize containerOffset = offsetFromContainer(o, IntPoint());
 
   bool preserve3D =
       useTransforms && (o->style()->preserves3D() || style()->preserves3D());

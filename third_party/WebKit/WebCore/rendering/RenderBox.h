@@ -252,7 +252,7 @@ class RenderBox : public RenderBoxModelObject {
   int overrideHeight() const;
   virtual void setOverrideSize(int);
 
-  virtual IntSize offsetFromContainer(RenderObject*) const;
+  virtual IntSize offsetFromContainer(RenderObject*, const IntPoint&) const;
 
   int calcBorderBoxWidth(int width) const;
   int calcBorderBoxHeight(int height) const;

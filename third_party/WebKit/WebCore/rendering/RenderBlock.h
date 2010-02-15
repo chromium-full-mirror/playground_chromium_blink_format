@@ -172,6 +172,7 @@ class RenderBlock : public RenderBox {
   void clearTruncation();
 
   void adjustRectForColumns(IntRect&) const;
+  virtual void adjustForColumns(IntSize&, const IntPoint&) const;
 
   void addContinuationWithOutline(RenderInline*);
 

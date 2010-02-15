@@ -1912,6 +1912,12 @@ void RenderObject::mapLocalToContainer(RenderBoxModelObject* repaintContainer,
   if (!o)
     return;
 
+  IntSize columnOffset;
+  o->adjustForColumns(columnOffset,
+                      roundedIntPoint(transformState.mappedPoint()));
+  if (!columnOffset.isZero())
+    transformState.move(columnOffset);
+
   if (o->hasOverflowClip())
     transformState.move(-toRenderBox(o)->layer()->scrolledContentOffset());
 
@@ -1982,17 +1988,21 @@ FloatQuad RenderObject::localToContainerQuad(
     RenderBoxModelObject* repaintContainer,
     bool fixed) const {
   TransformState transformState(TransformState::ApplyTransformDirection,
-                                FloatPoint(), &localQuad);
+                                localQuad.boundingBox().location(), &localQuad);
   mapLocalToContainer(repaintContainer, fixed, true, transformState);
   transformState.flatten();
 
   return transformState.lastPlanarQuad();
 }
 
-IntSize RenderObject::offsetFromContainer(RenderObject* o) const {
+IntSize RenderObject::offsetFromContainer(RenderObject* o,
+                                          const IntPoint& point) const {
   ASSERT(o == container());
 
   IntSize offset;
+
+  o->adjustForColumns(offset, point);
+
   if (o->hasOverflowClip())
     offset -= toRenderBox(o)->layer()->scrolledContentOffset();
 
@@ -2002,6 +2012,7 @@ IntSize RenderObject::offsetFromContainer(RenderObject* o) const {
 IntSize RenderObject::offsetFromAncestorContainer(
     RenderObject* container) const {
   IntSize offset;
+  IntPoint referencePoint;
   const RenderObject* currContainer = this;
   do {
     RenderObject* nextContainer = currContainer->container();
@@ -2010,7 +2021,10 @@ IntSize RenderObject::offsetFromAncestorContainer(
     if (!nextContainer)
       break;
     ASSERT(!currContainer->hasTransform());
-    offset += currContainer->offsetFromContainer(nextContainer);
+    IntSize currentOffset =
+        currContainer->offsetFromContainer(nextContainer, referencePoint);
+    offset += currentOffset;
+    referencePoint.move(currentOffset);
     currContainer = nextContainer;
   } while (currContainer != container);
 
