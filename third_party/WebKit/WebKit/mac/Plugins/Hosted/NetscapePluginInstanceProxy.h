@@ -120,7 +120,10 @@ class NetscapePluginInstanceProxy
   // NPRuntime
   bool getWindowNPObject(uint32_t& objectID);
   bool getPluginElementNPObject(uint32_t& objectID);
-  void releaseObject(uint32_t objectID);
+  bool forgetBrowserObjectID(uint32_t objectID);  // Will fail if the ID is
+                                                  // being sent to plug-in right
+                                                  // now (i.e., retain/release
+                                                  // calls aren't balanced).
 
   bool evaluate(uint32_t objectID,
                 const WebCore::String& script,
@@ -210,12 +213,16 @@ class NetscapePluginInstanceProxy
       PassRefPtr<JSC::Bindings::RootObject>);
   RetainPtr<NSData*> marshalValues(JSC::ExecState*, const JSC::ArgList& args);
   void marshalValue(JSC::ExecState*,
-                    JSC::JSValue value,
+                    JSC::JSValue,
                     data_t& resultData,
                     mach_msg_type_number_t& resultLength);
   JSC::JSValue demarshalValue(JSC::ExecState*,
                               const char* valueData,
                               mach_msg_type_number_t valueLength);
+
+  // No-op if the value does not contain a local object.
+  void retainLocalObject(JSC::JSValue);
+  void releaseLocalObject(JSC::JSValue);
 
   void addInstance(ProxyInstance*);
   void removeInstance(ProxyInstance*);
@@ -363,7 +370,6 @@ class NetscapePluginInstanceProxy
   HashMap<uint32_t, Reply*> m_replies;
 
   // NPRuntime
-  uint32_t idForObject(JSC::JSObject*);
 
   void addValueToArray(NSMutableArray*,
                        JSC::ExecState* exec,
@@ -378,9 +384,32 @@ class NetscapePluginInstanceProxy
                        mach_msg_type_number_t valuesLength,
                        JSC::MarkedArgumentBuffer& result);
 
-  uint32_t m_objectIDCounter;
-  typedef HashMap<uint32_t, JSC::ProtectedPtr<JSC::JSObject>> ObjectMap;
-  ObjectMap m_objects;
+  class LocalObjectMap {
+   public:
+    LocalObjectMap();
+    uint32_t idForObject(JSC::JSObject*);
+    void retain(JSC::JSObject*);
+    void release(JSC::JSObject*);
+    void clear();
+    bool forget(uint32_t);
+    bool contains(uint32_t objectID) const {
+      return m_idToJSObjectMap.contains(objectID);
+    }
+    JSC::JSObject* get(uint32_t objectID) const {
+      return m_idToJSObjectMap.get(objectID);
+    }
+
+   private:
+    HashMap<uint32_t, JSC::ProtectedPtr<JSC::JSObject>> m_idToJSObjectMap;
+    // The pair consists of object ID and a reference count. One reference
+    // belongs to remote plug-in,
+    // and the proxy will add transient references for arguments that are being
+    // sent out.
+    HashMap<JSC::JSObject*, pair<uint32_t, uint32_t>> m_jsObjectToIDMap;
+    uint32_t m_objectIDCounter;
+  };
+
+  LocalObjectMap m_localObjects;
 
   typedef HashSet<ProxyInstance*> ProxyInstanceSet;
   ProxyInstanceSet m_instances;

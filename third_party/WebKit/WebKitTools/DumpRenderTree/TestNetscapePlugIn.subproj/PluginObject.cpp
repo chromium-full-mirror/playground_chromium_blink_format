@@ -187,24 +187,44 @@ enum {
   ID_TEST_RELOAD_PLUGINS_AND_PAGES,
   ID_TEST_GET_BROWSER_PROPERTY,
   ID_TEST_SET_BROWSER_PROPERTY,
+  ID_REMEMBER,
+  ID_GET_REMEMBERED_OBJECT,
+  ID_GET_AND_FORGET_REMEMBERED_OBJECT,
+  ID_REF_COUNT,
   NUM_METHOD_IDENTIFIERS
 };
 
 static NPIdentifier pluginMethodIdentifiers[NUM_METHOD_IDENTIFIERS];
 static const NPUTF8* pluginMethodIdentifierNames[NUM_METHOD_IDENTIFIERS] = {
-    "testCallback",           "getURL",
-    "removeDefaultMethod",    "testDOMAccess",
-    "getURLNotify",           "testInvokeDefault",
-    "destroyStream",          "testEnumerate",
-    "testGetIntIdentifier",   "testGetProperty",
-    "testHasProperty",        "testHasMethod",
-    "testEvaluate",           "testGetPropertyReturnValue",
-    "testIdentifierToString", "testIdentifierToInt",
-    "testPostURLFile",        "testConstruct",
-    "testThrowException",     "testFail",
-    "destroyNullStream",      "reloadPluginsNoPages",
-    "reloadPluginsAndPages",  "testGetBrowserProperty",
-    "testSetBrowserProperty"};
+    "testCallback",
+    "getURL",
+    "removeDefaultMethod",
+    "testDOMAccess",
+    "getURLNotify",
+    "testInvokeDefault",
+    "destroyStream",
+    "testEnumerate",
+    "testGetIntIdentifier",
+    "testGetProperty",
+    "testHasProperty",
+    "testHasMethod",
+    "testEvaluate",
+    "testGetPropertyReturnValue",
+    "testIdentifierToString",
+    "testIdentifierToInt",
+    "testPostURLFile",
+    "testConstruct",
+    "testThrowException",
+    "testFail",
+    "destroyNullStream",
+    "reloadPluginsNoPages",
+    "reloadPluginsAndPages",
+    "testGetBrowserProperty",
+    "testSetBrowserProperty",
+    "remember",
+    "getRememberedObject",
+    "getAndForgetRememberedObject",
+    "refCount"};
 
 static NPUTF8* createCStringFromNPVariant(const NPVariant* variant) {
   size_t length = NPVARIANT_TO_STRING(*variant).UTF8Length;
@@ -821,6 +841,8 @@ bool testWindowOpen(NPP npp) {
   return false;
 }
 
+static NPObject* rememberedObject;
+
 static bool pluginInvoke(NPObject* header,
                          NPIdentifier name,
                          const NPVariant* args,
@@ -887,6 +909,28 @@ static bool pluginInvoke(NPObject* header,
   } else if (name == pluginMethodIdentifiers[ID_TEST_SET_BROWSER_PROPERTY]) {
     browser->setproperty(plugin->npp, NPVARIANT_TO_OBJECT(args[0]),
                          stringVariantToIdentifier(args[1]), &args[2]);
+    return true;
+  } else if (name == pluginMethodIdentifiers[ID_REMEMBER]) {
+    if (rememberedObject)
+      browser->releaseobject(rememberedObject);
+    rememberedObject = NPVARIANT_TO_OBJECT(args[0]);
+    browser->retainobject(rememberedObject);
+    VOID_TO_NPVARIANT(*result);
+    return true;
+  } else if (name == pluginMethodIdentifiers[ID_GET_REMEMBERED_OBJECT]) {
+    assert(rememberedObject);
+    browser->retainobject(rememberedObject);
+    OBJECT_TO_NPVARIANT(rememberedObject, *result);
+    return true;
+  } else if (name ==
+             pluginMethodIdentifiers[ID_GET_AND_FORGET_REMEMBERED_OBJECT]) {
+    assert(rememberedObject);
+    OBJECT_TO_NPVARIANT(rememberedObject, *result);
+    rememberedObject = 0;
+    return true;
+  } else if (name == pluginMethodIdentifiers[ID_REF_COUNT]) {
+    uint32_t refCount = NPVARIANT_TO_OBJECT(args[0])->referenceCount;
+    INT32_TO_NPVARIANT(refCount, *result);
     return true;
   }
 
