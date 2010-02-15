@@ -70,6 +70,8 @@ class MyQObject : public QObject {
   Q_PROPERTY(QKeySequence shortcut READ shortcut WRITE setShortcut)
   Q_PROPERTY(CustomType propWithCustomType READ propWithCustomType WRITE
                  setPropWithCustomType)
+  Q_PROPERTY(QWebElement webElementProperty READ webElementProperty WRITE
+                 setWebElementProperty)
   Q_ENUMS(Policy Strategy)
   Q_FLAGS(Ability)
 
@@ -144,6 +146,12 @@ class MyQObject : public QObject {
 
   QKeySequence shortcut() const { return m_shortcut; }
   void setShortcut(const QKeySequence& seq) { m_shortcut = seq; }
+
+  QWebElement webElementProperty() const { return m_webElement; }
+
+  void setWebElementProperty(const QWebElement& element) {
+    m_webElement = element;
+  }
 
   CustomType propWithCustomType() const { return m_customType; }
   void setPropWithCustomType(const CustomType& c) { m_customType = c; }
@@ -375,6 +383,10 @@ class MyQObject : public QObject {
     m_qtFunctionInvoked = 35;
     m_actuals << arg;
   }
+  void myOverloadedSlot(const QWebElement& arg) {
+    m_qtFunctionInvoked = 36;
+    m_actuals << QVariant::fromValue<QWebElement>(arg);
+  }
 
   void qscript_call(int arg) {
     m_qtFunctionInvoked = 40;
@@ -407,6 +419,7 @@ class MyQObject : public QObject {
   int m_writeOnlyValue;
   int m_readOnlyValue;
   QKeySequence m_shortcut;
+  QWebElement m_webElement;
   CustomType m_customType;
   int m_qtFunctionInvoked;
   QVariantList m_actuals;
@@ -614,6 +627,7 @@ void tst_QWebFrame::cleanup() {
 }
 
 void tst_QWebFrame::getSetStaticProperty() {
+  m_page->mainFrame()->setHtml("<html><head><body></body></html>");
   QCOMPARE(evalJS("typeof myObject.noSuchProperty"), sUndefined);
 
   // initial value (set in MyQObject constructor)
@@ -766,6 +780,9 @@ void tst_QWebFrame::getSetStaticProperty() {
   QCOMPARE(evalJS("myObject.stringListProperty[1]"), QLatin1String("two"));
   QCOMPARE(evalJS("typeof myObject.stringListProperty[2]"), sString);
   QCOMPARE(evalJS("myObject.stringListProperty[2]"), QLatin1String("true"));
+  evalJS("myObject.webElementProperty=document.body;");
+  QCOMPARE(evalJS("myObject.webElementProperty.tagName"),
+           QLatin1String("BODY"));
 
   // try to delete
   QCOMPARE(evalJS("delete myObject.intProperty"), sFalse);
@@ -1949,6 +1966,12 @@ void tst_QWebFrame::overloadedSlots() {
   f.call(QString(), QStringList() << m_engine->newVariant(QVariant("ciao")));
   QCOMPARE(m_myObject->qtFunctionInvoked(), 35);
   */
+
+  // should pick myOverloadedSlot(QRegExp)
+  m_myObject->resetQtFunctionInvoked();
+  evalJS("myObject.myOverloadedSlot(document.body)");
+  QCOMPARE(m_myObject->qtFunctionInvoked(), 36);
+
   // should pick myOverloadedSlot(QObject*)
   m_myObject->resetQtFunctionInvoked();
   evalJS("myObject.myOverloadedSlot(myObject)");
