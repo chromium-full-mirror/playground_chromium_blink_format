@@ -134,6 +134,8 @@
 #include "JSXMLHttpRequestUploadCustom.cpp"
 #include "JSXSLTProcessorConstructor.cpp"
 #include "JSXSLTProcessorCustom.cpp"
+#include "JavaScriptProfile.cpp"
+#include "JavaScriptProfileNode.cpp"
 #include "ScheduledAction.cpp"
 #include "ScriptArray.cpp"
 #include "ScriptCachedFrameData.cpp"
