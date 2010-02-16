@@ -158,6 +158,7 @@ QString QWEBKIT_EXPORT qt_webpage_groupName(QWebPage* page) {
   return page->handle()->page->groupName();
 }
 
+#if ENABLE(INSPECTOR)
 void QWEBKIT_EXPORT qt_drt_webinspector_executeScript(QWebPage* page,
                                                       long callId,
                                                       const QString& script) {
@@ -189,6 +190,7 @@ void QWEBKIT_EXPORT qt_drt_setTimelineProfilingEnabled(QWebPage* page,
   else
     controller->stopTimelineProfiler();
 }
+#endif
 
 class QWebPageWidgetClient : public QWebPageClient {
  public:
