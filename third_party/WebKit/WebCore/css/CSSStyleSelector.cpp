@@ -1206,10 +1206,11 @@ PassRefPtr<RenderStyle> CSSStyleSelector::styleForDocument(Document* document) {
     int size =
         CSSStyleSelector::fontSizeForKeyword(document, CSSValueMedium, false);
     fontDescription.setSpecifiedSize(size);
+    bool useSVGZoomRules = document->isSVGDocument();
     fontDescription.setComputedSize(
         CSSStyleSelector::getComputedSizeFromSpecifiedSize(
-            document, fontDescription.isAbsoluteSize(), size,
-            documentStyle->effectiveZoom()));
+            document, documentStyle.get(), fontDescription.isAbsoluteSize(),
+            size, useSVGZoomRules));
   }
 
   documentStyle->setFontDescription(fontDescription);
@@ -3283,6 +3284,24 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
 
   float zoomFactor = m_style->effectiveZoom();
 
+  // SVG handles zooming in a different way compared to CSS. The whole document
+  // is scaled instead
+  // of each individual length value in the render style / tree.
+  // CSSPrimitiveValue::computeLength*()
+  // multiplies each resolved length with the zoom multiplier - so for SVG we
+  // need to disable that.
+  // Though all CSS values that can be applied to outermost <svg> elements
+  // (width/height/border/padding...)
+  // need to respect the scaling. RenderBox (the parent class of RenderSVGRoot)
+  // grabs values like
+  // width/height/border/padding/... from the RenderStyle -> for SVG these
+  // values would never scale,
+  // if we'd pass a 1.0 zoom factor everyhwere. So we only pass a zoom factor of
+  // 1.0 for specific
+  // properties that are NOT allowed to scale within a zoomed SVG document
+  // (letter/word-spacing/font-size).
+  bool useSVGZoomRules = m_element && m_element->isSVGElement();
+
   Length l;
   bool apply = false;
 
@@ -3971,8 +3990,8 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
       } else {
         if (!primitiveValue)
           return;
-        width = primitiveValue->computeLengthInt(style(), m_rootElementStyle,
-                                                 zoomFactor);
+        width = primitiveValue->computeLengthInt(
+            style(), m_rootElementStyle, useSVGZoomRules ? 1.0f : zoomFactor);
       }
       switch (id) {
         case CSSPropertyLetterSpacing:
@@ -4421,7 +4440,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
       if (primitiveValue->getIdent() == CSSValueNormal)
         lineHeight = Length(-100.0, Percent);
       else if (CSSPrimitiveValue::isUnitTypeLength(type)) {
-        double multiplier = m_style->effectiveZoom();
+        double multiplier = zoomFactor;
         if (m_style->textSizeAdjust() && m_checker.m_document->frame() &&
             m_checker.m_document->frame()->shouldApplyTextZoom())
           multiplier *= m_checker.m_document->frame()->textZoomFactor();
@@ -4965,8 +4984,9 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
 
           // Handle the zoom factor.
           fontDescription.setComputedSize(getComputedSizeFromSpecifiedSize(
-              m_checker.m_document, fontDescription.isAbsoluteSize(),
-              fontDescription.specifiedSize(), m_style->effectiveZoom()));
+              m_checker.m_document, m_style.get(),
+              fontDescription.isAbsoluteSize(), fontDescription.specifiedSize(),
+              useSVGZoomRules));
           if (m_style->setFontDescription(fontDescription))
             m_fontDirty = true;
         }
@@ -6426,15 +6446,25 @@ void CSSStyleSelector::checkForGenericFamilyChange(RenderStyle* style,
 void CSSStyleSelector::setFontSize(FontDescription& fontDescription,
                                    float size) {
   fontDescription.setSpecifiedSize(size);
+
+  bool useSVGZoomRules = m_element && m_element->isSVGElement();
   fontDescription.setComputedSize(getComputedSizeFromSpecifiedSize(
-      m_checker.m_document, fontDescription.isAbsoluteSize(), size,
-      m_style->effectiveZoom()));
+      m_checker.m_document, m_style.get(), fontDescription.isAbsoluteSize(),
+      size, useSVGZoomRules));
 }
 
 float CSSStyleSelector::getComputedSizeFromSpecifiedSize(Document* document,
+                                                         RenderStyle* style,
                                                          bool isAbsoluteSize,
                                                          float specifiedSize,
-                                                         float zoomFactor) {
+                                                         bool useSVGZoomRules) {
+  float zoomFactor = 1.0f;
+  if (!useSVGZoomRules) {
+    zoomFactor = style->effectiveZoom();
+    if (document->frame() && document->frame()->shouldApplyTextZoom())
+      zoomFactor *= document->frame()->textZoomFactor();
+  }
+
   // We support two types of minimum font size.  The first is a hard override
   // that applies to
   // all fonts.  This is "minSize."  The second type of minimum font size is a
@@ -6458,10 +6488,6 @@ float CSSStyleSelector::getComputedSizeFromSpecifiedSize(Document* document,
 
   int minSize = settings->minimumFontSize();
   int minLogicalSize = settings->minimumLogicalFontSize();
-
-  if (document->frame() && document->frame()->shouldApplyTextZoom())
-    zoomFactor *= document->frame()->textZoomFactor();
-
   float zoomedSize = specifiedSize * zoomFactor;
 
   // Apply the hard minimum first.  We only apply the hard minimum if after

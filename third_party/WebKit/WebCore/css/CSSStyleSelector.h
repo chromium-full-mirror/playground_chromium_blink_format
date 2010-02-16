@@ -155,9 +155,10 @@ class CSSStyleSelector : public Noncopyable {
 
  private:
   static float getComputedSizeFromSpecifiedSize(Document*,
+                                                RenderStyle*,
                                                 bool isAbsoluteSize,
                                                 float specifiedSize,
-                                                float zoomFactor = 1.0f);
+                                                bool useSVGZoomRules);
 
  public:
   Color getColorFromPrimitiveValue(CSSPrimitiveValue*);
