@@ -41,6 +41,7 @@ class PNGImageDecoder;
 class ICOImageDecoder : public ImageDecoder {
  public:
   ICOImageDecoder();
+  virtual ~ICOImageDecoder();
 
   // ImageDecoder
   virtual String filenameExtension() const { return "ico"; }
@@ -89,7 +90,7 @@ class ICOImageDecoder : public ImageDecoder {
   // decoding, it merely ensures the decoder is created and ready to
   // decode.  The caller will then call a function on the PNGImageDecoder
   // that actually triggers decoding.
-  void decodeWithCheckForDataEnded(size_t index, bool onlySize);
+  void decode(size_t index, bool onlySize);
 
   // Decodes the directory and directory entries at the beginning of the
   // data, and initializes members.  Returns true if all decoding
@@ -115,9 +116,6 @@ class ICOImageDecoder : public ImageDecoder {
   // Determines whether the desired entry is a BMP or PNG.  Returns true
   // if the type could be determined.
   ImageType imageTypeAtIndex(size_t);
-
-  // True if we've seen all the data.
-  bool m_allDataReceived;
 
   // An index into |m_data| representing how much we've already decoded.
   // Note that this only tracks data _this_ class decodes; once the

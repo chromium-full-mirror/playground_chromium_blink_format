@@ -219,10 +219,7 @@ class BMPImageReader {
 
   inline unsigned getAlpha(uint32_t pixel) const {
     // For images without alpha, return alpha of 0xff.
-    if (m_bitMasks[3] == 0)
-      return 0xff;
-
-    return getComponent(pixel, 3);
+    return m_bitMasks[3] ? getComponent(pixel, 3) : 0xff;
   }
 
   // Sets the current pixel to the color given by |colorIndex|.  This also

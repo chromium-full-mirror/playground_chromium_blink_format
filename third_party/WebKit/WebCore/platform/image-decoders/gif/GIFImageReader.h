@@ -197,9 +197,7 @@ struct GIFImageReader {
     count = 0;
   }
 
-  ~GIFImageReader() { close(); }
-
-  void close() {
+  ~GIFImageReader() {
     delete[] global_colormap;
     global_colormap = 0;
     delete frame_reader;

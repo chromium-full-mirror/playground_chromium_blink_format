@@ -37,19 +37,13 @@ class PNGImageReader;
 class PNGImageDecoder : public ImageDecoder {
  public:
   PNGImageDecoder();
-  ~PNGImageDecoder();
+  virtual ~PNGImageDecoder();
 
+  // ImageDecoder
   virtual String filenameExtension() const { return "png"; }
-
-  // Take the data and store it.
   virtual void setData(SharedBuffer* data, bool allDataReceived);
-
-  // Whether or not the size information has been decoded yet.
   virtual bool isSizeAvailable();
-
   virtual RGBA32Buffer* frameBufferAtIndex(size_t index);
-
-  void decode(bool sizeOnly = false);
 
   // Callbacks from libpng
   void decodingFailed();
@@ -60,6 +54,10 @@ class PNGImageDecoder : public ImageDecoder {
   void pngComplete();
 
  private:
+  // Decodes the image.  If |onlySize| is true, stops decoding after
+  // calculating the image size.
+  void decode(bool onlySize);
+
   OwnPtr<PNGImageReader> m_reader;
 };
 

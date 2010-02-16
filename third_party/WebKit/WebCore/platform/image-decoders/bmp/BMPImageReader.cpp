@@ -153,7 +153,7 @@ bool BMPImageReader::readInfoHeaderSize() {
     ;
   // OS/2 2.x: any multiple of 4 between 16 and 64, inclusive, or 42 or 46
   else if ((m_infoHeader.biSize >= 16) && (m_infoHeader.biSize <= 64) &&
-           (((m_infoHeader.biSize & 3) == 0) || (m_infoHeader.biSize == 42) ||
+           (!(m_infoHeader.biSize & 3) || (m_infoHeader.biSize == 42) ||
             (m_infoHeader.biSize == 46)))
     m_isOS22x = true;
   else
@@ -185,7 +185,7 @@ bool BMPImageReader::processInfoHeader() {
   if (m_infoHeader.biBitCount < 16) {
     const uint32_t maxColors = static_cast<uint32_t>(1)
                                << m_infoHeader.biBitCount;
-    if ((m_infoHeader.biClrUsed == 0) || (m_infoHeader.biClrUsed > maxColors))
+    if (!m_infoHeader.biClrUsed || (m_infoHeader.biClrUsed > maxColors))
       m_infoHeader.biClrUsed = maxColors;
   }
 
@@ -200,7 +200,7 @@ bool BMPImageReader::processInfoHeader() {
   // Tell caller what still needs to be processed.
   if (m_infoHeader.biBitCount >= 16)
     m_needToProcessBitmasks = true;
-  else if (m_infoHeader.biBitCount > 0)
+  else if (m_infoHeader.biBitCount)
     m_needToProcessColorTable = true;
 
   return true;
@@ -279,7 +279,7 @@ bool BMPImageReader::readInfoHeader() {
 bool BMPImageReader::isInfoHeaderValid() const {
   // Non-positive widths/heights are invalid.  (We've already flipped the
   // sign of the height for top-down bitmaps.)
-  if ((m_infoHeader.biWidth <= 0) || (m_infoHeader.biHeight == 0))
+  if ((m_infoHeader.biWidth <= 0) || !m_infoHeader.biHeight)
     return false;
 
   // Only Windows V3+ has top-down bitmaps.
@@ -291,10 +291,9 @@ bool BMPImageReader::isInfoHeaderValid() const {
       (m_infoHeader.biBitCount != 8) && (m_infoHeader.biBitCount != 24)) {
     // Windows V3+ additionally supports bit depths of 0 (for embedded
     // JPEG/PNG images), 16, and 32.
-    if (m_isOS21x || m_isOS22x)
-      return false;
-    if ((m_infoHeader.biBitCount != 0) && (m_infoHeader.biBitCount != 16) &&
-        (m_infoHeader.biBitCount != 32))
+    if (m_isOS21x || m_isOS22x ||
+        (m_infoHeader.biBitCount && (m_infoHeader.biBitCount != 16) &&
+         (m_infoHeader.biBitCount != 32)))
       return false;
   }
 
@@ -303,7 +302,7 @@ bool BMPImageReader::isInfoHeaderValid() const {
   // some compression types.
   switch (m_infoHeader.biCompression) {
     case RGB:
-      if (m_infoHeader.biBitCount == 0)
+      if (!m_infoHeader.biBitCount)
         return false;
       break;
 
@@ -312,46 +311,39 @@ bool BMPImageReader::isInfoHeaderValid() const {
       // Compression = RLE4" (which means "4 bit, but with a 2-color table"),
       // so also allow the paletted RLE compression types to have too low a
       // bit count; we'll correct this later.
-      if (m_infoHeader.biBitCount == 0 || m_infoHeader.biBitCount > 8)
+      if (!m_infoHeader.biBitCount || (m_infoHeader.biBitCount > 8))
         return false;
       break;
 
     case RLE4:
       // See comments in RLE8.
-      if (m_infoHeader.biBitCount == 0 || m_infoHeader.biBitCount > 4)
+      if (!m_infoHeader.biBitCount || (m_infoHeader.biBitCount > 4))
         return false;
       break;
 
     case BITFIELDS:
       // Only valid for Windows V3+.
-      if (m_isOS21x || m_isOS22x)
-        return false;
-      if ((m_infoHeader.biBitCount != 16) && (m_infoHeader.biBitCount != 32))
+      if (m_isOS21x || m_isOS22x ||
+          ((m_infoHeader.biBitCount != 16) && (m_infoHeader.biBitCount != 32)))
         return false;
       break;
 
     case JPEG:
     case PNG:
       // Only valid for Windows V3+.
-      if (m_isOS21x || m_isOS22x)
-        return false;
-      if (m_infoHeader.biBitCount != 0)
+      if (m_isOS21x || m_isOS22x || m_infoHeader.biBitCount)
         return false;
       break;
 
     case HUFFMAN1D:
       // Only valid for OS/2 2.x.
-      if (!m_isOS22x)
-        return false;
-      if (m_infoHeader.biBitCount != 1)
+      if (!m_isOS22x || (m_infoHeader.biBitCount != 1))
         return false;
       break;
 
     case RLE24:
       // Only valid for OS/2 2.x.
-      if (!m_isOS22x)
-        return false;
-      if (m_infoHeader.biBitCount != 24)
+      if (!m_isOS22x || (m_infoHeader.biBitCount != 24))
         return false;
       break;
 
@@ -401,10 +393,9 @@ bool BMPImageReader::processBitmasks() {
     // 16 bits:    MSB <-                     xRRRRRGG GGGBBBBB -> LSB
     // 24/32 bits: MSB <- [AAAAAAAA] RRRRRRRR GGGGGGGG BBBBBBBB -> LSB
     const int numBits = (m_infoHeader.biBitCount == 16) ? 5 : 8;
-    for (int i = 0; i <= 2; ++i) {
+    for (int i = 0; i <= 2; ++i)
       m_bitMasks[i] = ((static_cast<uint32_t>(1) << (numBits * (3 - i))) - 1) ^
                       ((static_cast<uint32_t>(1) << (numBits * (2 - i))) - 1);
-    }
 
     // For Windows V4+ 32-bit RGB, don't overwrite the alpha mask from the
     // header (see note in readInfoHeader()).
@@ -560,7 +551,7 @@ bool BMPImageReader::processRLEData() {
     // the image.
     const uint8_t count = m_data->data()[m_decodedOffset];
     const uint8_t code = m_data->data()[m_decodedOffset + 1];
-    if (((count != 0) || (code != 1)) && pastEndOfImage(0))
+    if ((count || (code != 1)) && pastEndOfImage(0))
       return setFailed();
 
     // Decode.
@@ -593,7 +584,7 @@ bool BMPImageReader::processRLEData() {
           // past the end of the image.
           const uint8_t dx = m_data->data()[m_decodedOffset + 2];
           const uint8_t dy = m_data->data()[m_decodedOffset + 3];
-          if ((dx != 0) || (dy != 0))
+          if (dx || dy)
             m_buffer->setHasAlpha(true);
           if (((m_coord.x() + dx) > m_parent->size().width()) ||
               pastEndOfImage(dy))
@@ -734,7 +725,7 @@ bool BMPImageReader::processNonRLEData(bool inRLE, int numPixels) {
         // images where all alpha values are 255; opaque images are
         // faster to draw.
         int alpha = getAlpha(pixel);
-        if (!m_seenNonZeroAlphaPixel && (alpha == 0)) {
+        if (!m_seenNonZeroAlphaPixel && !alpha) {
           m_seenZeroAlphaPixel = true;
           alpha = 255;
         } else {

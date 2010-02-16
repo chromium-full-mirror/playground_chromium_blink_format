@@ -52,26 +52,41 @@ const double cInverseGamma = 0.45455;
 const unsigned long cMaxPNGSize = 1000000UL;
 
 // Called if the decoding of the image fails.
-static void PNGAPI decodingFailed(png_structp png_ptr,
-                                  png_const_charp error_msg);
+static void PNGAPI decodingFailed(png_structp png, png_const_charp) {
+  longjmp(png->jmpbuf, 1);
+}
 
 // Callbacks given to the read struct.  The first is for warnings (we want to
-// treat a particular warning
-// as an error, which is why we have to register this callback.
-static void PNGAPI decodingWarning(png_structp png_ptr,
-                                   png_const_charp warning_msg);
+// treat a particular warning as an error, which is why we have to register this
+// callback).
+static void PNGAPI decodingWarning(png_structp png,
+                                   png_const_charp warningMsg) {
+  // Mozilla did this, so we will too.
+  // Convert a tRNS warning to be an error (see
+  // http://bugzilla.mozilla.org/show_bug.cgi?id=251381 )
+  if (!strncmp(warningMsg, "Missing PLTE before tRNS", 24))
+    png_error(png, warningMsg);
+}
 
 // Called when we have obtained the header information (including the size).
-static void PNGAPI headerAvailable(png_structp png_ptr, png_infop info_ptr);
+static void PNGAPI headerAvailable(png_structp png, png_infop) {
+  static_cast<PNGImageDecoder*>(png_get_progressive_ptr(png))
+      ->headerAvailable();
+}
 
 // Called when a row is ready.
-static void PNGAPI rowAvailable(png_structp png_ptr,
-                                png_bytep new_row,
-                                png_uint_32 row_num,
-                                int pass);
+static void PNGAPI rowAvailable(png_structp png,
+                                png_bytep rowBuffer,
+                                png_uint_32 rowIndex,
+                                int interlacePass) {
+  static_cast<PNGImageDecoder*>(png_get_progressive_ptr(png))
+      ->rowAvailable(rowBuffer, rowIndex, interlacePass);
+}
 
 // Called when we have completely finished decoding the image.
-static void PNGAPI pngComplete(png_structp png_ptr, png_infop info_ptr);
+static void PNGAPI pngComplete(png_structp png, png_infop) {
+  static_cast<PNGImageDecoder*>(png_get_progressive_ptr(png))->pngComplete();
+}
 
 class PNGImageReader {
  public:
@@ -79,7 +94,7 @@ class PNGImageReader {
       : m_readOffset(0),
         m_decodingSizeOnly(false),
         m_interlaceBuffer(0),
-        m_hasAlpha(0),
+        m_hasAlpha(false),
         m_hasFinishedDecoding(false),
         m_currentBufferSize(0) {
     m_png = png_create_read_struct(PNG_LIBPNG_VER_STRING, 0, decodingFailed,
@@ -93,7 +108,8 @@ class PNGImageReader {
 
   void close() {
     if (m_png && m_info)
-      png_destroy_read_struct(&m_png, &m_info, 0);  // Will zero the pointers.
+      // This will zero the pointers.
+      png_destroy_read_struct(&m_png, &m_info, 0);
     delete[] m_interlaceBuffer;
     m_interlaceBuffer = 0;
     m_readOffset = 0;
@@ -107,7 +123,7 @@ class PNGImageReader {
   void decode(const SharedBuffer& data, bool sizeOnly) {
     m_decodingSizeOnly = sizeOnly;
 
-    // We need to do the setjmp here. Otherwise bad things will happen
+    // We need to do the setjmp here. Otherwise bad things will happen.
     if (setjmp(m_png->jmpbuf)) {
       close();
       return;
@@ -157,20 +173,15 @@ PNGImageDecoder::PNGImageDecoder() {}
 
 PNGImageDecoder::~PNGImageDecoder() {}
 
-// Take the data and store it.
 void PNGImageDecoder::setData(SharedBuffer* data, bool allDataReceived) {
   if (m_failed)
     return;
 
-  // Cache our new data.
   ImageDecoder::setData(data, allDataReceived);
 
-  // Create the PNG reader.
   if (!m_reader && !m_failed)
     m_reader.set(new PNGImageReader(this));
 }
-
-// Whether or not the size information has been decoded yet.
 bool PNGImageDecoder::isSizeAvailable() {
   if (!ImageDecoder::isSizeAvailable() && !failed() && m_reader)
     decode(true);
@@ -188,39 +199,8 @@ RGBA32Buffer* PNGImageDecoder::frameBufferAtIndex(size_t index) {
   RGBA32Buffer& frame = m_frameBufferCache[0];
   if (frame.status() != RGBA32Buffer::FrameComplete && m_reader)
     // Decode this frame.
-    decode();
+    decode(false);
   return &frame;
-}
-
-// Feed data to the PNG reader.
-void PNGImageDecoder::decode(bool sizeOnly) {
-  if (m_failed)
-    return;
-
-  m_reader->decode(*m_data, sizeOnly);
-
-  if (m_failed ||
-      (!m_frameBufferCache.isEmpty() &&
-       m_frameBufferCache[0].status() == RGBA32Buffer::FrameComplete))
-    m_reader.clear();
-}
-
-void decodingFailed(png_structp png, png_const_charp errorMsg) {
-  static_cast<PNGImageDecoder*>(png_get_progressive_ptr(png))->decodingFailed();
-  longjmp(png->jmpbuf, 1);
-}
-
-void decodingWarning(png_structp png, png_const_charp warningMsg) {
-  // Mozilla did this, so we will too.
-  // Convert a tRNS warning to be an error (documented in bugzilla.mozilla.org
-  // bug #251381)
-  if (!strncmp(warningMsg, "Missing PLTE before tRNS", 24))
-    png_error(png, warningMsg);
-}
-
-void headerAvailable(png_structp png, png_infop info) {
-  static_cast<PNGImageDecoder*>(png_get_progressive_ptr(png))
-      ->headerAvailable();
 }
 
 void PNGImageDecoder::decodingFailed() {
@@ -290,7 +270,7 @@ void PNGImageDecoder::headerAvailable() {
   if (interlaceType == PNG_INTERLACE_ADAM7)
     png_set_interlace_handling(png);
 
-  // Update our info now
+  // Update our info now.
   png_read_update_info(png, info);
   channels = png_get_channels(png, info);
   ASSERT(channels == 3 || channels == 4);
@@ -302,14 +282,6 @@ void PNGImageDecoder::headerAvailable() {
     m_reader->setReadOffset(m_reader->currentBufferSize() - png->buffer_size);
     png->buffer_size = 0;
   }
-}
-
-void rowAvailable(png_structp png,
-                  png_bytep rowBuffer,
-                  png_uint_32 rowIndex,
-                  int interlacePass) {
-  static_cast<PNGImageDecoder*>(png_get_progressive_ptr(png))
-      ->rowAvailable(rowBuffer, rowIndex, interlacePass);
 }
 
 void PNGImageDecoder::rowAvailable(unsigned char* rowBuffer,
@@ -338,11 +310,11 @@ void PNGImageDecoder::rowAvailable(unsigned char* rowBuffer,
                                       size().width() * size().height());
   }
 
-  if (rowBuffer == 0)
+  if (!rowBuffer)
     return;
 
-  /* libpng comments (pasted in here to explain what follows)
-   *
+  // libpng comments (pasted in here to explain what follows)
+  /*
    * this function is called for every row in the image.  If the
    * image is interlacing, and you turned on the interlace handler,
    * this function will be called for every row in every pass.
@@ -386,7 +358,7 @@ void PNGImageDecoder::rowAvailable(unsigned char* rowBuffer,
   if (destY < 0)
     return;
   bool sawAlpha = buffer.hasAlpha();
-  for (int x = 0; x < width; x++) {
+  for (int x = 0; x < width; ++x) {
     png_bytep pixel = row + (m_scaled ? m_scaledColumns[x] : x) * colorChannels;
     unsigned alpha = hasAlpha ? pixel[3] : 255;
     buffer.setRGBA(x, destY, pixel[0], pixel[1], pixel[2], alpha);
@@ -397,20 +369,23 @@ void PNGImageDecoder::rowAvailable(unsigned char* rowBuffer,
   }
 }
 
-void pngComplete(png_structp png, png_infop info) {
-  static_cast<PNGImageDecoder*>(png_get_progressive_ptr(png))->pngComplete();
-}
-
 void PNGImageDecoder::pngComplete() {
   m_reader->setComplete();
 
-  if (m_frameBufferCache.isEmpty())
+  if (!m_frameBufferCache.isEmpty())
+    m_frameBufferCache.first().setStatus(RGBA32Buffer::FrameComplete);
+}
+
+void PNGImageDecoder::decode(bool onlySize) {
+  if (m_failed)
     return;
 
-  // Hand back an appropriately sized buffer, even if the image ended up being
-  // empty.
-  RGBA32Buffer& buffer = m_frameBufferCache[0];
-  buffer.setStatus(RGBA32Buffer::FrameComplete);
+  m_reader->decode(*m_data, onlySize);
+
+  if (m_failed ||
+      (!m_frameBufferCache.isEmpty() &&
+       m_frameBufferCache[0].status() == RGBA32Buffer::FrameComplete))
+    m_reader.clear();
 }
 
 }  // namespace WebCore

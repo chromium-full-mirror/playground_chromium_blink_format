@@ -60,18 +60,17 @@ extern "C" {
 namespace WebCore {
 
 struct decoder_error_mgr {
-  struct jpeg_error_mgr pub; /* "public" fields for IJG library*/
-  jmp_buf setjmp_buffer;     /* For handling catastropic errors */
+  struct jpeg_error_mgr pub;  // "public" fields for IJG library
+  jmp_buf setjmp_buffer;      // For handling catastropic errors
 };
 
 enum jstate {
-  JPEG_HEADER, /* Reading JFIF headers */
+  JPEG_HEADER,  // Reading JFIF headers
   JPEG_START_DECOMPRESS,
-  JPEG_DECOMPRESS_PROGRESSIVE, /* Output progressive pixels */
-  JPEG_DECOMPRESS_SEQUENTIAL,  /* Output sequential pixels */
+  JPEG_DECOMPRESS_PROGRESSIVE,  // Output progressive pixels
+  JPEG_DECOMPRESS_SEQUENTIAL,   // Output sequential pixels
   JPEG_DONE,
-  JPEG_SINK_NON_JPEG_TRAILER, /* Some image files have a */
-                              /* non-JPEG trailer */
+  JPEG_SINK_NON_JPEG_TRAILER,  // Some image files have a non-JPEG trailer
   JPEG_ERROR
 };
 
@@ -81,11 +80,9 @@ void skip_input_data(j_decompress_ptr jd, long num_bytes);
 void term_source(j_decompress_ptr jd);
 void error_exit(j_common_ptr cinfo);
 
-/*
- *  Implementation of a JPEG src object that understands our state machine
- */
+// Implementation of a JPEG src object that understands our state machine
 struct decoder_source_mgr {
-  /* public fields; must be first in this struct! */
+  // public fields; must be first in this struct!
   struct jpeg_source_mgr pub;
 
   JPEGImageReader* decoder;
@@ -101,11 +98,11 @@ class JPEGImageReader {
         m_samples(0) {
     memset(&m_info, 0, sizeof(jpeg_decompress_struct));
 
-    /* We set up the normal JPEG error routines, then override error_exit. */
+    // We set up the normal JPEG error routines, then override error_exit.
     m_info.err = jpeg_std_error(&m_err.pub);
     m_err.pub.error_exit = error_exit;
 
-    /* Allocate and initialize JPEG decompression object */
+    // Allocate and initialize JPEG decompression object.
     jpeg_create_decompress(&m_info);
 
     decoder_source_mgr* src = 0;
@@ -119,7 +116,7 @@ class JPEGImageReader {
 
     m_info.src = (jpeg_source_mgr*)src;
 
-    /* Set up callback functions. */
+    // Set up callback functions.
     src->pub.init_source = init_source;
     src->pub.fill_input_buffer = fill_input_buffer;
     src->pub.skip_input_data = skip_input_data;
@@ -145,14 +142,11 @@ class JPEGImageReader {
     src->pub.bytes_in_buffer -= (size_t)bytesToSkip;
     src->pub.next_input_byte += bytesToSkip;
 
-    if (num_bytes > bytesToSkip)
-      m_bytesToSkip = (size_t)(num_bytes - bytesToSkip);
-    else
-      m_bytesToSkip = 0;
+    m_bytesToSkip = std::max(num_bytes - bytesToSkip, static_cast<long>(0));
   }
 
-  bool decode(const Vector<char>& data, bool sizeOnly) {
-    m_decodingSizeOnly = sizeOnly;
+  bool decode(const Vector<char>& data, bool onlySize) {
+    m_decodingSizeOnly = onlySize;
 
     unsigned newByteCount = data.size() - m_bufferLength;
     unsigned readOffset = m_bufferLength - m_info.src->bytes_in_buffer;
@@ -174,12 +168,12 @@ class JPEGImageReader {
     }
 
     switch (m_state) {
-      case JPEG_HEADER: {
-        /* Read file parameters with jpeg_read_header() */
+      case JPEG_HEADER:
+        // Read file parameters with jpeg_read_header().
         if (jpeg_read_header(&m_info, true) == JPEG_SUSPENDED)
-          return true; /* I/O suspension */
+          return true;  // I/O suspension.
 
-        /* let libjpeg take care of gray->RGB and YCbCr->RGB conversions */
+        // Let libjpeg take care of gray->RGB and YCbCr->RGB conversions.
         switch (m_info.jpeg_color_space) {
           case JCS_GRAYSCALE:
           case JCS_RGB:
@@ -188,8 +182,8 @@ class JPEGImageReader {
             break;
           case JCS_CMYK:
           case JCS_YCCK:
-            // jpeglib cannot convert these to rgb, but it can
-            // convert ycck to cmyk
+            // jpeglib cannot convert these to rgb, but it can convert ycck
+            // to cmyk.
             m_info.out_color_space = JCS_CMYK;
             break;
           default:
@@ -197,26 +191,19 @@ class JPEGImageReader {
             return false;
         }
 
-        /*
-         * Don't allocate a giant and superfluous memory buffer
-         * when the image is a sequential JPEG.
-         */
+        // Don't allocate a giant and superfluous memory buffer when the
+        // image is a sequential JPEG.
         m_info.buffered_image = jpeg_has_multiple_scans(&m_info);
 
-        /* Used to set up image size so arrays can be allocated */
+        // Used to set up image size so arrays can be allocated.
         jpeg_calc_output_dimensions(&m_info);
 
-        /*
-         * Make a one-row-high sample array that will go away
-         * when done with image. Always make it big enough to
-         * hold an RGB row.  Since this uses the IJG memory
-         * manager, it must be allocated before the call to
-         * jpeg_start_compress().
-         */
-        int row_stride = m_info.output_width * 4;  // RGBA buffer
-
-        m_samples = (*m_info.mem->alloc_sarray)((j_common_ptr)&m_info,
-                                                JPOOL_IMAGE, row_stride, 1);
+        // Make a one-row-high sample array that will go away when done with
+        // image. Always make it big enough to hold an RGB row.  Since this
+        // uses the IJG memory manager, it must be allocated before the call
+        // to jpeg_start_compress().
+        m_samples = (*m_info.mem->alloc_sarray)(
+            (j_common_ptr)&m_info, JPOOL_IMAGE, m_info.output_width * 4, 1);
 
         m_state = JPEG_START_DECOMPRESS;
 
@@ -227,46 +214,45 @@ class JPEGImageReader {
         }
 
         if (m_decodingSizeOnly) {
-          // We can stop here.
-          // Reduce our buffer length and available data.
+          // We can stop here.  Reduce our buffer length and available
+          // data.
           m_bufferLength -= m_info.src->bytes_in_buffer;
           m_info.src->bytes_in_buffer = 0;
           return true;
         }
-      }
+      // FALL THROUGH
 
-      case JPEG_START_DECOMPRESS: {
-        /* Set parameters for decompression */
-        /* FIXME -- Should reset dct_method and dither mode
-         * for final pass of progressive JPEG
-         */
+      case JPEG_START_DECOMPRESS:
+        // Set parameters for decompression.
+        // FIXME -- Should reset dct_method and dither mode for final pass
+        // of progressive JPEG.
         m_info.dct_method = JDCT_ISLOW;
         m_info.dither_mode = JDITHER_FS;
         m_info.do_fancy_upsampling = true;
         m_info.enable_2pass_quant = false;
         m_info.do_block_smoothing = true;
 
-        /* Start decompressor */
+        // Start decompressor.
         if (!jpeg_start_decompress(&m_info))
-          return true; /* I/O suspension */
+          return true;  // I/O suspension.
 
-        /* If this is a progressive JPEG ... */
+        // If this is a progressive JPEG ...
         m_state = (m_info.buffered_image) ? JPEG_DECOMPRESS_PROGRESSIVE
                                           : JPEG_DECOMPRESS_SEQUENTIAL;
-      }
+      // FALL THROUGH
 
-      case JPEG_DECOMPRESS_SEQUENTIAL: {
+      case JPEG_DECOMPRESS_SEQUENTIAL:
         if (m_state == JPEG_DECOMPRESS_SEQUENTIAL) {
           if (!m_decoder->outputScanlines())
-            return true; /* I/O suspension */
+            return true;  // I/O suspension.
 
-          /* If we've completed image output ... */
+          // If we've completed image output...
           ASSERT(m_info.output_scanline == m_info.output_height);
           m_state = JPEG_DONE;
         }
-      }
+      // FALL THROUGH
 
-      case JPEG_DECOMPRESS_PROGRESSIVE: {
+      case JPEG_DECOMPRESS_PROGRESSIVE:
         if (m_state == JPEG_DECOMPRESS_PROGRESSIVE) {
           int status;
           do {
@@ -274,34 +260,35 @@ class JPEGImageReader {
           } while ((status != JPEG_SUSPENDED) && (status != JPEG_REACHED_EOI));
 
           for (;;) {
-            if (m_info.output_scanline == 0) {
+            if (!m_info.output_scanline) {
               int scan = m_info.input_scan_number;
 
-              /* if we haven't displayed anything yet (output_scan_number==0)
-              and we have enough data for a complete scan, force output
-              of the last full scan */
-              if ((m_info.output_scan_number == 0) && (scan > 1) &&
+              // If we haven't displayed anything yet
+              // (output_scan_number == 0) and we have enough data for
+              // a complete scan, force output of the last full scan.
+              if (!m_info.output_scan_number && (scan > 1) &&
                   (status != JPEG_REACHED_EOI))
-                scan--;
+                --scan;
 
               if (!jpeg_start_output(&m_info, scan))
-                return true; /* I/O suspension */
+                return true;  // I/O suspension.
             }
 
             if (m_info.output_scanline == 0xffffff)
               m_info.output_scanline = 0;
 
             if (!m_decoder->outputScanlines()) {
-              if (m_info.output_scanline == 0)
-                /* didn't manage to read any lines - flag so we don't call
-                jpeg_start_output() multiple times for the same scan */
+              if (!m_info.output_scanline)
+                // Didn't manage to read any lines - flag so we
+                // don't call jpeg_start_output() multiple times for
+                // the same scan.
                 m_info.output_scanline = 0xffffff;
-              return true; /* I/O suspension */
+              return true;  // I/O suspension.
             }
 
             if (m_info.output_scanline == m_info.output_height) {
               if (!jpeg_finish_output(&m_info))
-                return true; /* I/O suspension */
+                return true;  // I/O suspension.
 
               if (jpeg_input_complete(&m_info) &&
                   (m_info.input_scan_number == m_info.output_scan_number))
@@ -313,18 +300,15 @@ class JPEGImageReader {
 
           m_state = JPEG_DONE;
         }
-      }
+      // FALL THROUGH
 
-      case JPEG_DONE: {
-        /* Finish decompression */
+      case JPEG_DONE:
+        // Finish decompression.
         if (!jpeg_finish_decompress(&m_info))
-          return true; /* I/O suspension */
+          return true;  // I/O suspension.
 
         m_state = JPEG_SINK_NON_JPEG_TRAILER;
-
-        /* we're done */
         break;
-      }
 
       case JPEG_SINK_NON_JPEG_TRAILER:
         break;
@@ -354,9 +338,9 @@ class JPEGImageReader {
   JSAMPARRAY m_samples;
 };
 
-/* Override the standard error method in the IJG JPEG decoder code. */
+// Override the standard error method in the IJG JPEG decoder code.
 void error_exit(j_common_ptr cinfo) {
-  /* Return control to the setjmp point. */
+  // Return control to the setjmp point.
   decoder_error_mgr* err = (decoder_error_mgr*)cinfo->err;
   longjmp(err->setjmp_buffer, -1);
 }
@@ -370,9 +354,8 @@ void skip_input_data(j_decompress_ptr jd, long num_bytes) {
 
 boolean fill_input_buffer(j_decompress_ptr jd) {
   // Our decode step always sets things up properly, so if this method is ever
-  // called, then we have hit the end of the buffer.  A return value of FALSE
-  // indicates
-  // that we have no data to supply yet.
+  // called, then we have hit the end of the buffer.  A return value of false
+  // indicates that we have no data to supply yet.
   return false;
 }
 
@@ -385,20 +368,16 @@ JPEGImageDecoder::JPEGImageDecoder() {}
 
 JPEGImageDecoder::~JPEGImageDecoder() {}
 
-// Take the data and store it.
 void JPEGImageDecoder::setData(SharedBuffer* data, bool allDataReceived) {
   if (m_failed)
     return;
 
-  // Cache our new data.
   ImageDecoder::setData(data, allDataReceived);
 
-  // Create the JPEG reader.
   if (!m_reader && !m_failed)
     m_reader.set(new JPEGImageReader(this));
 }
 
-// Whether or not the size information has been decoded yet.
 bool JPEGImageDecoder::isSizeAvailable() {
   if (!ImageDecoder::isSizeAvailable() && !failed() && m_reader)
     decode(true);
@@ -409,6 +388,7 @@ bool JPEGImageDecoder::isSizeAvailable() {
 bool JPEGImageDecoder::setSize(unsigned width, unsigned height) {
   if (!ImageDecoder::setSize(width, height))
     return false;
+
   prepareScaleDataIfNecessary();
   return true;
 }
@@ -422,22 +402,8 @@ RGBA32Buffer* JPEGImageDecoder::frameBufferAtIndex(size_t index) {
 
   RGBA32Buffer& frame = m_frameBufferCache[0];
   if (frame.status() != RGBA32Buffer::FrameComplete && m_reader)
-    // Decode this frame.
-    decode();
+    decode(false);
   return &frame;
-}
-
-// Feed data to the JPEG reader.
-void JPEGImageDecoder::decode(bool sizeOnly) {
-  if (m_failed)
-    return;
-
-  m_failed = !m_reader->decode(m_data->buffer(), sizeOnly);
-
-  if (m_failed ||
-      (!m_frameBufferCache.isEmpty() &&
-       m_frameBufferCache[0].status() == RGBA32Buffer::FrameComplete))
-    m_reader.clear();
 }
 
 bool JPEGImageDecoder::outputScanlines() {
@@ -509,7 +475,18 @@ void JPEGImageDecoder::jpegComplete() {
 
   // Hand back an appropriately sized buffer, even if the image ended up being
   // empty.
-  RGBA32Buffer& buffer = m_frameBufferCache[0];
-  buffer.setStatus(RGBA32Buffer::FrameComplete);
+  m_frameBufferCache[0].setStatus(RGBA32Buffer::FrameComplete);
+}
+
+void JPEGImageDecoder::decode(bool onlySize) {
+  if (m_failed)
+    return;
+
+  m_failed = !m_reader->decode(m_data->buffer(), onlySize);
+
+  if (m_failed ||
+      (!m_frameBufferCache.isEmpty() &&
+       m_frameBufferCache[0].status() == RGBA32Buffer::FrameComplete))
+    m_reader.clear();
 }
 }

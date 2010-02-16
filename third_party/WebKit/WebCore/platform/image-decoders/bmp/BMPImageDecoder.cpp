@@ -40,22 +40,20 @@ namespace WebCore {
 // don't pack).
 static const size_t sizeOfFileHeader = 14;
 
-BMPImageDecoder::BMPImageDecoder()
-    : ImageDecoder(), m_allDataReceived(false), m_decodedOffset(0) {}
+BMPImageDecoder::BMPImageDecoder() : m_decodedOffset(0) {}
 
 void BMPImageDecoder::setData(SharedBuffer* data, bool allDataReceived) {
   if (failed())
     return;
 
   ImageDecoder::setData(data, allDataReceived);
-  m_allDataReceived = allDataReceived;
   if (m_reader)
     m_reader->setData(data);
 }
 
 bool BMPImageDecoder::isSizeAvailable() {
   if (!ImageDecoder::isSizeAvailable() && !failed())
-    decodeWithCheckForDataEnded(true);
+    decode(true);
 
   return ImageDecoder::isSizeAvailable();
 }
@@ -69,21 +67,21 @@ RGBA32Buffer* BMPImageDecoder::frameBufferAtIndex(size_t index) {
 
   RGBA32Buffer* buffer = &m_frameBufferCache.first();
   if (buffer->status() != RGBA32Buffer::FrameComplete && !failed())
-    decodeWithCheckForDataEnded(false);
+    decode(false);
   return buffer;
 }
 
-void BMPImageDecoder::decodeWithCheckForDataEnded(bool onlySize) {
+void BMPImageDecoder::decode(bool onlySize) {
   if (failed())
     return;
 
   // If we couldn't decode the image but we've received all the data, decoding
   // has failed.
-  if (!decode(onlySize) && m_allDataReceived)
+  if (!decodeHelper(onlySize) && isAllDataReceived())
     setFailed();
 }
 
-bool BMPImageDecoder::decode(bool onlySize) {
+bool BMPImageDecoder::decodeHelper(bool onlySize) {
   size_t imgDataOffset = 0;
   if ((m_decodedOffset < sizeOfFileHeader) &&
       !processFileHeader(&imgDataOffset))

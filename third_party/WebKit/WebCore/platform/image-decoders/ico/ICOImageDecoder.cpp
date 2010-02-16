@@ -44,15 +44,15 @@ namespace WebCore {
 static const size_t sizeOfDirectory = 6;
 static const size_t sizeOfDirEntry = 16;
 
-ICOImageDecoder::ICOImageDecoder()
-    : ImageDecoder(), m_allDataReceived(false), m_decodedOffset(0) {}
+ICOImageDecoder::ICOImageDecoder() : m_decodedOffset(0) {}
+
+ICOImageDecoder::~ICOImageDecoder() {}
 
 void ICOImageDecoder::setData(SharedBuffer* data, bool allDataReceived) {
   if (failed())
     return;
 
   ImageDecoder::setData(data, allDataReceived);
-  m_allDataReceived = allDataReceived;
 
   for (BMPReaders::iterator i(m_bmpReaders.begin()); i != m_bmpReaders.end();
        ++i) {
@@ -65,7 +65,7 @@ void ICOImageDecoder::setData(SharedBuffer* data, bool allDataReceived) {
 
 bool ICOImageDecoder::isSizeAvailable() {
   if (!ImageDecoder::isSizeAvailable())
-    decodeWithCheckForDataEnded(0, true);
+    decode(0, true);
 
   return ImageDecoder::isSizeAvailable();
 }
@@ -91,7 +91,7 @@ bool ICOImageDecoder::setSize(unsigned width, unsigned height) {
 }
 
 size_t ICOImageDecoder::frameCount() {
-  decodeWithCheckForDataEnded(0, true);
+  decode(0, true);
   if (m_frameBufferCache.isEmpty())
     m_frameBufferCache.resize(m_dirEntries.size());
   // CAUTION: We must not resize m_frameBufferCache again after this, as
@@ -106,7 +106,7 @@ RGBA32Buffer* ICOImageDecoder::frameBufferAtIndex(size_t index) {
     return 0;
 
   // Determine the image type, and if this is a BMP, decode.
-  decodeWithCheckForDataEnded(index, false);
+  decode(index, false);
 
   // PNGs decode into their own framebuffers, so only use our internal cache
   // for non-PNGs (BMP or unknown).
@@ -130,14 +130,11 @@ RGBA32Buffer* ICOImageDecoder::frameBufferAtIndex(size_t index) {
 // static
 bool ICOImageDecoder::compareEntries(const IconDirectoryEntry& a,
                                      const IconDirectoryEntry& b) {
-  // Larger icons are better.
+  // Larger icons are better.  After that, higher bit-depth icons are better.
   const int aEntryArea = a.m_size.width() * a.m_size.height();
   const int bEntryArea = b.m_size.width() * b.m_size.height();
-  if (aEntryArea != bEntryArea)
-    return (aEntryArea > bEntryArea);
-
-  // Higher bit-depth icons are better.
-  return (a.m_bitCount > b.m_bitCount);
+  return (aEntryArea == bEntryArea) ? (a.m_bitCount > b.m_bitCount)
+                                    : (aEntryArea > bEntryArea);
 }
 
 void ICOImageDecoder::setDataForPNGDecoderAtIndex(size_t index) {
@@ -151,17 +148,17 @@ void ICOImageDecoder::setDataForPNGDecoderAtIndex(size_t index) {
   RefPtr<SharedBuffer> pngData(
       SharedBuffer::create(&m_data->data()[dirEntry.m_imageOffset],
                            m_data->size() - dirEntry.m_imageOffset));
-  m_pngDecoders[index]->setData(pngData.get(), m_allDataReceived);
+  m_pngDecoders[index]->setData(pngData.get(), isAllDataReceived());
 }
 
-void ICOImageDecoder::decodeWithCheckForDataEnded(size_t index, bool onlySize) {
+void ICOImageDecoder::decode(size_t index, bool onlySize) {
   if (failed())
     return;
 
   // If we couldn't decode the image but we've received all the data, decoding
   // has failed.
   if ((!decodeDirectory() || (!onlySize && !decodeAtIndex(index))) &&
-      m_allDataReceived)
+      isAllDataReceived())
     setFailed();
 }
 
