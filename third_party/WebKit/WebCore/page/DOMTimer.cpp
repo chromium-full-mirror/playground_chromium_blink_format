@@ -44,7 +44,7 @@ double DOMTimer::s_minTimerInterval = 0.010;  // 10 milliseconds
 static int timerNestingLevel = 0;
 
 DOMTimer::DOMTimer(ScriptExecutionContext* context,
-                   ScheduledAction* action,
+                   PassOwnPtr<ScheduledAction> action,
                    int timeout,
                    bool singleShot)
     : ActiveDOMObject(context, this),
@@ -88,7 +88,7 @@ DOMTimer::~DOMTimer() {
 }
 
 int DOMTimer::install(ScriptExecutionContext* context,
-                      ScheduledAction* action,
+                      PassOwnPtr<ScheduledAction> action,
                       int timeout,
                       bool singleShot) {
   // DOMTimer constructor links the new timer into a list of ActiveDOMObjects

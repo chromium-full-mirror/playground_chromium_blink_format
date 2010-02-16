@@ -28,13 +28,14 @@
 #define DOMTimer_h
 
 #include "ActiveDOMObject.h"
+#include "ScheduledAction.h"
 #include "Timer.h"
 #include <wtf/OwnPtr.h>
+#include <wtf/PassOwnPtr.h>
 
 namespace WebCore {
 
 class InspectorTimelineAgent;
-class ScheduledAction;
 
 class DOMTimer : public TimerBase, public ActiveDOMObject {
  public:
@@ -42,7 +43,7 @@ class DOMTimer : public TimerBase, public ActiveDOMObject {
   // Creates a new timer owned by specified ScriptExecutionContext, starts it
   // and returns its Id.
   static int install(ScriptExecutionContext*,
-                     ScheduledAction*,
+                     PassOwnPtr<ScheduledAction>,
                      int timeout,
                      bool singleShot);
   static void removeById(ScriptExecutionContext*, int timeoutId);
@@ -63,7 +64,7 @@ class DOMTimer : public TimerBase, public ActiveDOMObject {
 
  private:
   DOMTimer(ScriptExecutionContext*,
-           ScheduledAction*,
+           PassOwnPtr<ScheduledAction>,
            int timeout,
            bool singleShot);
   virtual void fired();

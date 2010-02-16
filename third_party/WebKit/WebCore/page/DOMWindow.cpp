@@ -1220,7 +1220,7 @@ void DOMWindow::resizeTo(float width, float height) const {
   page->chrome()->setWindowRect(fr);
 }
 
-int DOMWindow::setTimeout(ScheduledAction* action,
+int DOMWindow::setTimeout(PassOwnPtr<ScheduledAction> action,
                           int timeout,
                           ExceptionCode& ec) {
   ScriptExecutionContext* context = scriptExecutionContext();
@@ -1238,7 +1238,7 @@ void DOMWindow::clearTimeout(int timeoutId) {
   DOMTimer::removeById(context, timeoutId);
 }
 
-int DOMWindow::setInterval(ScheduledAction* action,
+int DOMWindow::setInterval(PassOwnPtr<ScheduledAction> action,
                            int timeout,
                            ExceptionCode& ec) {
   ScriptExecutionContext* context = scriptExecutionContext();

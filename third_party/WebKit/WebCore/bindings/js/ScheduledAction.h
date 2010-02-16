@@ -26,6 +26,7 @@
 #include <JSDOMBinding.h>
 #include <runtime/JSCell.h>
 #include <runtime/Protect.h>
+#include <wtf/PassOwnPtr.h>
 #include <wtf/Vector.h>
 
 namespace JSC {
@@ -44,9 +45,9 @@ class WorkerContext;
  */
 class ScheduledAction : public Noncopyable {
  public:
-  static ScheduledAction* create(JSC::ExecState*,
-                                 const JSC::ArgList&,
-                                 DOMWrapperWorld* isolatedWorld);
+  static PassOwnPtr<ScheduledAction> create(JSC::ExecState*,
+                                            const JSC::ArgList&,
+                                            DOMWrapperWorld* isolatedWorld);
 
   void execute(ScriptExecutionContext*);
 
