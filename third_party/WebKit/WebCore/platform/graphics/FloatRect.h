@@ -103,7 +103,8 @@ class FloatRect {
   float bottom() const { return y() + height(); }
 
   FloatPoint center() const {
-    return IntPoint(x() + width() / 2, y() + height() / 2);
+    return IntPoint(static_cast<int>(x() + width() / 2),
+                    static_cast<int>(y() + height() / 2));
   }
 
   void move(const FloatSize& delta) { m_location += delta; }
