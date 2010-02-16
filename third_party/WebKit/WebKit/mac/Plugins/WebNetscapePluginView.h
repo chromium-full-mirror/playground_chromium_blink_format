@@ -147,6 +147,9 @@ typedef union PluginPort {
 - (void)didCallPlugInFunction;
 
 - (void)handleMouseMoved:(NSEvent*)event;
+- (void)handleMouseEntered:(NSEvent*)event;
+- (void)handleMouseExited:(NSEvent*)event;
+
 - (uint32)checkIfAllowedToLoadURL:(const char*)urlCString
                             frame:(const char*)frameNameCString
                      callbackFunc:(void (*)(NPP npp,
