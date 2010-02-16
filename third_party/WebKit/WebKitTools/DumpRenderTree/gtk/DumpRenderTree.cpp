@@ -327,18 +327,19 @@ static void invalidateAnyPreviousWaitToDumpWatchdog() {
 
 static void resetDefaultsToConsistentValues() {
   WebKitWebSettings* settings = webkit_web_view_get_settings(webView);
-  g_object_set(
-      G_OBJECT(settings), "enable-private-browsing", FALSE,
-      "enable-developer-extras", FALSE, "enable-spell-checking", TRUE,
-      "enable-html5-database", TRUE, "enable-html5-local-storage", TRUE,
-      "enable-xss-auditor", FALSE, "javascript-can-open-windows-automatically",
-      TRUE, "enable-offline-web-application-cache", TRUE,
-      "enable-universal-access-from-file-uris", TRUE, "enable-scripts", TRUE,
-      "enable-dom-paste", TRUE, "default-font-family", "Times",
-      "monospace-font-family", "Courier", "serif-font-family", "Times",
-      "sans-serif-font-family", "Helvetica", "default-font-size", 16,
-      "default-monospace-font-size", 13, "minimum-font-size", 1,
-      "enable-caret-browsing", FALSE, "enable-page-cache", FALSE, NULL);
+  g_object_set(G_OBJECT(settings), "enable-private-browsing", FALSE,
+               "enable-developer-extras", FALSE, "enable-spell-checking", TRUE,
+               "enable-html5-database", TRUE, "enable-html5-local-storage",
+               TRUE, "enable-xss-auditor", FALSE,
+               "javascript-can-open-windows-automatically", TRUE,
+               "enable-offline-web-application-cache", TRUE,
+               "enable-universal-access-from-file-uris", TRUE, "enable-scripts",
+               TRUE, "enable-dom-paste", TRUE, "default-font-family", "Times",
+               "monospace-font-family", "Courier", "serif-font-family", "Times",
+               "sans-serif-font-family", "Helvetica", "default-font-size", 16,
+               "default-monospace-font-size", 13, "minimum-font-size", 1,
+               "enable-caret-browsing", FALSE, "enable-page-cache", FALSE,
+               "auto-resize-window", TRUE, NULL);
 
   webkit_web_frame_clear_main_frame_name(mainFrame);
 

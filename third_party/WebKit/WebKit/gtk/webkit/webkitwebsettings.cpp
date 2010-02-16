@@ -103,6 +103,7 @@ struct _WebKitWebSettingsPrivate {
   gboolean enable_default_context_menu;
   gboolean enable_site_specific_quirks;
   gboolean enable_page_cache;
+  gboolean auto_resize_window;
 };
 
 #define WEBKIT_WEB_SETTINGS_GET_PRIVATE(obj)                    \
@@ -149,7 +150,8 @@ enum {
   PROP_TAB_KEY_CYCLES_THROUGH_ELEMENTS,
   PROP_ENABLE_DEFAULT_CONTEXT_MENU,
   PROP_ENABLE_SITE_SPECIFIC_QUIRKS,
-  PROP_ENABLE_PAGE_CACHE
+  PROP_ENABLE_PAGE_CACHE,
+  PROP_AUTO_RESIZE_WINDOW
 };
 
 // Create a default user agent string
@@ -694,6 +696,26 @@ static void webkit_web_settings_class_init(WebKitWebSettingsClass* klass) {
                            _("Whether the page cache should be used"), FALSE,
                            flags));
 
+  /**
+  * WebKitWebSettings:auto-resize-window:
+  *
+  * Web pages can request to modify the size and position of the
+  * window containing the #WebKitWebView through various DOM methods
+  * (resizeTo, moveTo, resizeBy, moveBy). By default WebKit will not
+  * honor this requests, but you can set this property to %TRUE if
+  * you'd like it to do so. If you wish to handle this manually, you
+  * can connect to the notify signal for the
+  * #WebKitWebWindowFeatures of your #WebKitWebView.
+  *
+  * Since: 1.1.22
+  */
+  g_object_class_install_property(
+      gobject_class, PROP_AUTO_RESIZE_WINDOW,
+      g_param_spec_boolean(
+          "auto-resize-window", _("Auto Resize Window"),
+          _("Automatically resize the toplevel window when a page requests it"),
+          FALSE, flags));
+
   g_type_class_add_private(klass, sizeof(WebKitWebSettingsPrivate));
 }
 
@@ -906,6 +928,9 @@ static void webkit_web_settings_set_property(GObject* object,
     case PROP_ENABLE_PAGE_CACHE:
       priv->enable_page_cache = g_value_get_boolean(value);
       break;
+    case PROP_AUTO_RESIZE_WINDOW:
+      priv->auto_resize_window = g_value_get_boolean(value);
+      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
       break;
@@ -1035,6 +1060,9 @@ static void webkit_web_settings_get_property(GObject* object,
     case PROP_ENABLE_PAGE_CACHE:
       g_value_set_boolean(value, priv->enable_page_cache);
       break;
+    case PROP_AUTO_RESIZE_WINDOW:
+      g_value_set_boolean(value, priv->auto_resize_window);
+      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
       break;
@@ -1099,7 +1127,8 @@ WebKitWebSettings* webkit_web_settings_copy(WebKitWebSettings* web_settings) {
       priv->tab_key_cycles_through_elements, "enable-default-context-menu",
       priv->enable_default_context_menu, "enable-site-specific-quirks",
       priv->enable_site_specific_quirks, "enable-page-cache",
-      priv->enable_page_cache, NULL));
+      priv->enable_page_cache, "auto-resize-window", priv->auto_resize_window,
+      NULL));
 
   return copy;
 }
