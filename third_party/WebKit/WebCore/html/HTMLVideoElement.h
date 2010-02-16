@@ -70,7 +70,6 @@ class HTMLVideoElement : public HTMLMediaElement {
   bool webkitSupportsFullscreen();
   bool webkitDisplayingFullscreen();
 
-  void updatePosterImage();
   bool shouldDisplayPosterImage() const { return m_shouldDisplayPosterImage; }
 
   void paint(GraphicsContext*, const IntRect&);
@@ -79,6 +78,7 @@ class HTMLVideoElement : public HTMLMediaElement {
 
  private:
   virtual bool hasAvailableVideoFrame() const;
+  virtual void updatePosterImage();
 
   OwnPtr<HTMLImageLoader> m_imageLoader;
   KURL m_posterURL;

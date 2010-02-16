@@ -199,6 +199,7 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   virtual void documentWillBecomeInactive();
   virtual void documentDidBecomeActive();
   virtual void mediaVolumeDidChange();
+  virtual void updatePosterImage() {}
 
   void setReadyState(MediaPlayer::ReadyState);
   void setNetworkState(MediaPlayer::NetworkState);

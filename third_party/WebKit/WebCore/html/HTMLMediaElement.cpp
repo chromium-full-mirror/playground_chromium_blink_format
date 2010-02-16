@@ -675,8 +675,8 @@ void HTMLMediaElement::noneSupported() {
   // 9 -Abort these steps. Until the load() method is invoked, the element won't
   // attempt to load another resource.
 
-  if (isVideo())
-    static_cast<HTMLVideoElement*>(this)->updatePosterImage();
+  updatePosterImage();
+
   if (renderer())
     renderer()->updateFromElement();
 }
@@ -759,9 +759,7 @@ void HTMLMediaElement::setNetworkState(MediaPlayer::NetworkState state) {
              m_loadState == LoadingFromSrcAttr)
       noneSupported();
 
-    if (isVideo())
-      static_cast<HTMLVideoElement*>(this)->updatePosterImage();
-
+    updatePosterImage();
     return;
   }
 
@@ -905,8 +903,8 @@ void HTMLMediaElement::setReadyState(MediaPlayer::ReadyState state) {
     shouldUpdatePosterImage = true;
   }
 
-  if (shouldUpdatePosterImage && isVideo())
-    static_cast<HTMLVideoElement*>(this)->updatePosterImage();
+  if (shouldUpdatePosterImage)
+    updatePosterImage();
 
   updatePlayState();
 }
@@ -1490,6 +1488,8 @@ void HTMLMediaElement::mediaPlayerRepaint(MediaPlayer*) {
   beginProcessingMediaPlayerCallback();
   if (renderer())
     renderer()->repaint();
+
+  updatePosterImage();
   endProcessingMediaPlayerCallback();
 }
 
