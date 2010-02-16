@@ -1512,10 +1512,9 @@ bool HTMLMediaElement::mediaPlayerRenderingCanBeAccelerated(MediaPlayer*) {
   return false;
 }
 
-GraphicsLayer* HTMLMediaElement::mediaPlayerGraphicsLayer(MediaPlayer*) {
-  if (renderer() && renderer()->isVideo())
-    return toRenderVideo(renderer())->videoGraphicsLayer();
-  return 0;
+void HTMLMediaElement::mediaPlayerRenderingModeChanged(MediaPlayer*) {
+  // Kick off a fake recalcStyle that will update the compositing tree.
+  setNeedsStyleRecalc(SyntheticStyleChange);
 }
 #endif
 
@@ -1848,6 +1847,12 @@ void HTMLMediaElement::exitFullscreen() {
 PlatformMedia HTMLMediaElement::platformMedia() const {
   return m_player ? m_player->platformMedia() : NoPlatformMedia;
 }
+
+#if USE(ACCELERATED_COMPOSITING)
+PlatformLayer* HTMLMediaElement::platformLayer() const {
+  return m_player ? m_player->platformLayer() : 0;
+}
+#endif
 
 bool HTMLMediaElement::hasClosedCaptions() const {
   return m_player && m_player->hasClosedCaptions();

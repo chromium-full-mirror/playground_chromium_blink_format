@@ -39,6 +39,10 @@
 #include <wtf/Noncopyable.h>
 #include <wtf/PassOwnPtr.h>
 
+#if USE(ACCELERATED_COMPOSITING)
+#include "GraphicsLayer.h"
+#endif
+
 #ifdef __OBJC__
 @class QTMovie;
 #else
@@ -64,10 +68,6 @@ class MediaPlayer;
 class MediaPlayerPrivateInterface;
 class String;
 class TimeRanges;
-
-#if USE(ACCELERATED_COMPOSITING)
-class GraphicsLayer;
-#endif
 
 class MediaPlayerClient {
  public:
@@ -113,9 +113,10 @@ class MediaPlayerClient {
     return false;
   }
 
-  // return the GraphicsLayer that will host the presentation for this
-  // MediaPlayer.
-  virtual GraphicsLayer* mediaPlayerGraphicsLayer(MediaPlayer*) { return 0; }
+  // called when the media player's rendering mode changed, which indicates a
+  // change in the
+  // availability of the platformLayer().
+  virtual void mediaPlayerRenderingModeChanged(MediaPlayer*) {}
 #endif
 };
 
@@ -135,6 +136,9 @@ class MediaPlayer : public Noncopyable {
   bool supportsFullscreen() const;
   bool supportsSave() const;
   PlatformMedia platformMedia() const;
+#if USE(ACCELERATED_COMPOSITING)
+  PlatformLayer* platformLayer() const;
+#endif
 
   IntSize naturalSize();
   bool hasVideo() const;

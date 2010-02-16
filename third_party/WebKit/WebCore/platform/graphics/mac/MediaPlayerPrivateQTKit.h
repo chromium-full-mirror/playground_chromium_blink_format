@@ -79,6 +79,9 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
   static bool isAvailable();
 
   PlatformMedia platformMedia() const;
+#if USE(ACCELERATED_COMPOSITING)
+  PlatformLayer* platformLayer() const;
+#endif
 
   IntSize naturalSize() const;
   bool hasVideo() const;
