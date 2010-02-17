@@ -81,6 +81,7 @@ class WebSettings {
   virtual void setShouldPaintCustomScrollbars(bool) = 0;
   virtual void setDatabasesEnabled(bool) = 0;
   virtual void setAllowUniversalAccessFromFileURLs(bool) = 0;
+  virtual void setAllowFileAccessFromFileURLs(bool) = 0;
   virtual void setTextDirectionSubmenuInclusionBehaviorNeverIncluded() = 0;
   virtual void setOfflineWebApplicationCacheEnabled(bool) = 0;
   virtual void setExperimentalWebGLEnabled(bool) = 0;

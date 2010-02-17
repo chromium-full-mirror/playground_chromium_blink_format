@@ -201,6 +201,10 @@ void WebSettingsImpl::setAllowUniversalAccessFromFileURLs(bool allow) {
   m_settings->setAllowUniversalAccessFromFileURLs(allow);
 }
 
+void WebSettingsImpl::setAllowFileAccessFromFileURLs(bool allow) {
+  m_settings->setAllowFileAccessFromFileURLs(allow);
+}
+
 void WebSettingsImpl::setTextDirectionSubmenuInclusionBehaviorNeverIncluded() {
   // FIXME: If you ever need more behaviors than this, then we should probably
   //        define an enum in WebSettings.h and have a switch statement that

@@ -250,6 +250,11 @@ void QWebSettingsPrivate::apply() {
     settings->setAllowUniversalAccessFromFileURLs(value);
 
     value = attributes.value(
+        QWebSettings::LocalContentCanAccessFileUrls,
+        global->attributes.value(QWebSettings::LocalContentCanAccessFileUrls));
+    settings->setAllowFileAccessFromFileURLs(value);
+
+    value = attributes.value(
         QWebSettings::XSSAuditorEnabled,
         global->attributes.value(QWebSettings::XSSAuditorEnabled));
     settings->setXSSAuditorEnabled(value);
@@ -414,6 +419,8 @@ QWebSettings* QWebSettings::globalSettings() {
         QWebSettings::LocalStorageEnabled instead.
     \value LocalContentCanAccessRemoteUrls Specifies whether locally loaded
    documents are allowed to access remote urls.
+    \value LocalContentCanAccessFileUrls Specifies whether locally loaded
+   documents are allowed to access other local  urls.
     \value XSSAuditorEnabled Specifies whether load requests should be monitored
    for cross-site scripting attempts.
 */
@@ -445,6 +452,7 @@ QWebSettings::QWebSettings() : d(new QWebSettingsPrivate) {
   d->attributes.insert(QWebSettings::OfflineWebApplicationCacheEnabled, false);
   d->attributes.insert(QWebSettings::LocalStorageEnabled, false);
   d->attributes.insert(QWebSettings::LocalContentCanAccessRemoteUrls, false);
+  d->attributes.insert(QWebSettings::LocalContentCanAccessFileUrls, true);
   d->attributes.insert(QWebSettings::AcceleratedCompositingEnabled, false);
   d->offlineStorageDefaultQuota = 5 * 1024 * 1024;
   d->defaultTextEncoding = QLatin1String("iso-8859-1");

@@ -237,6 +237,9 @@ void WebPreferences::initializeDefaultSettings() {
   CFDictionaryAddValue(
       defaults, CFSTR(WebKitAllowUniversalAccessFromFileURLsPreferenceKey),
       kCFBooleanFalse);
+  CFDictionaryAddValue(defaults,
+                       CFSTR(WebKitAllowFileAccessFromFileURLsPreferenceKey),
+                       kCFBooleanTrue);
   CFDictionaryAddValue(defaults, CFSTR(WebKitXSSAuditorEnabledPreferenceKey),
                        kCFBooleanTrue);
   CFDictionaryAddValue(defaults,
@@ -848,6 +851,20 @@ HRESULT STDMETHODCALLTYPE WebPreferences::allowUniversalAccessFromFileURLs(
 HRESULT STDMETHODCALLTYPE WebPreferences::setAllowUniversalAccessFromFileURLs(
     /* [in] */ BOOL allowAccess) {
   setBoolValue(CFSTR(WebKitAllowUniversalAccessFromFileURLsPreferenceKey),
+               allowAccess);
+  return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE WebPreferences::allowFileAccessFromFileURLs(
+    /* [retval][out] */ BOOL* allowAccess) {
+  *allowAccess =
+      boolValueForKey(CFSTR(WebKitAllowFileAccessFromFileURLsPreferenceKey));
+  return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE WebPreferences::setAllowFileAccessFromFileURLs(
+    /* [in] */ BOOL allowAccess) {
+  setBoolValue(CFSTR(WebKitAllowFileAccessFromFileURLsPreferenceKey),
                allowAccess);
   return S_OK;
 }

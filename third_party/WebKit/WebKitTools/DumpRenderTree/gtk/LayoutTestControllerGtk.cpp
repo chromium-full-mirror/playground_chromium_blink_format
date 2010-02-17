@@ -355,6 +355,15 @@ void LayoutTestController::setAllowUniversalAccessFromFileURLs(bool flag) {
                flag, NULL);
 }
 
+void LayoutTestController::setAllowFileAccessFromFileURLs(bool flag) {
+  WebKitWebView* view = webkit_web_frame_get_web_view(mainFrame);
+  ASSERT(view);
+
+  WebKitWebSettings* settings = webkit_web_view_get_settings(view);
+  g_object_set(G_OBJECT(settings), "enable-file-access-from-file-uris", flag,
+               NULL);
+}
+
 void LayoutTestController::setAuthorAndUserStylesEnabled(bool flag) {
   // FIXME: implement
 }

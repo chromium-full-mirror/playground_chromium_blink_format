@@ -321,6 +321,11 @@ void LayoutTestController::setAllowUniversalAccessFromFileURLs(bool enabled) {
       QWebSettings::LocalContentCanAccessRemoteUrls, enabled);
 }
 
+void LayoutTestController::setAllowFileAccessFromFileURLs(bool enabled) {
+  m_drt->webPage()->settings()->setAttribute(
+      QWebSettings::LocalContentCanAccessFileUrls, enabled);
+}
+
 void LayoutTestController::setJavaScriptProfilingEnabled(bool enable) {
   m_topLoadingFrame->page()->settings()->setAttribute(
       QWebSettings::DeveloperExtrasEnabled, true);

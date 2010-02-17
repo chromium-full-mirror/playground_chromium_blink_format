@@ -120,6 +120,7 @@ class LayoutTestController : public QObject {
 
   void setFrameSetFlatteningEnabled(bool enable);
   void setAllowUniversalAccessFromFileURLs(bool enable);
+  void setAllowFileAccessFromFileURLs(bool enable);
   void setJavaScriptProfilingEnabled(bool enable);
   void setTimelineProfilingEnabled(bool enable);
   void setFixedContentsSize(int width, int height);

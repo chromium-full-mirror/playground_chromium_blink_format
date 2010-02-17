@@ -2483,8 +2483,8 @@ static void webkit_web_view_update_settings(WebKitWebView* webView) {
       enablePrivateBrowsing, enableCaretBrowsing, enableHTML5Database,
       enableHTML5LocalStorage, enableXSSAuditor, javascriptCanOpenWindows,
       enableOfflineWebAppCache, enableUniversalAccessFromFileURI,
-      enableDOMPaste, tabKeyCyclesThroughElements, enableSiteSpecificQuirks,
-      usePageCache;
+      enableFileAccessFromFileURI, enableDOMPaste, tabKeyCyclesThroughElements,
+      enableSiteSpecificQuirks, usePageCache;
 
   WebKitEditingBehavior editingBehavior;
 
@@ -2507,7 +2507,8 @@ static void webkit_web_view_update_settings(WebKitWebView* webView) {
       "enable-offline-web-application-cache", &enableOfflineWebAppCache,
       "editing-behavior", &editingBehavior,
       "enable-universal-access-from-file-uris",
-      &enableUniversalAccessFromFileURI, "enable-dom-paste", &enableDOMPaste,
+      &enableUniversalAccessFromFileURI, "enable-file-access-from-file-uris",
+      &enableFileAccessFromFileURI, "enable-dom-paste", &enableDOMPaste,
       "tab-key-cycles-through-elements", &tabKeyCyclesThroughElements,
       "enable-site-specific-quirks", &enableSiteSpecificQuirks,
       "enable-page-cache", &usePageCache, NULL);
@@ -2537,6 +2538,7 @@ static void webkit_web_view_update_settings(WebKitWebView* webView) {
   settings->setEditingBehavior(core(editingBehavior));
   settings->setAllowUniversalAccessFromFileURLs(
       enableUniversalAccessFromFileURI);
+  settings->setAllowFileAccessFromFileURLs(enableFileAccessFromFileURI);
   settings->setDOMPasteAllowed(enableDOMPaste);
   settings->setNeedsSiteSpecificQuirks(enableSiteSpecificQuirks);
   settings->setUsesPageCache(usePageCache);
@@ -2637,6 +2639,8 @@ static void webkit_web_view_settings_notify(WebKitWebSettings* webSettings,
         core(static_cast<WebKitEditingBehavior>(g_value_get_enum(&value))));
   else if (name == g_intern_string("enable-universal-access-from-file-uris"))
     settings->setAllowUniversalAccessFromFileURLs(g_value_get_boolean(&value));
+  else if (name == g_intern_string("enable-file-access-from-file-uris"))
+    settings->setAllowFileAccessFromFileURLs(g_value_get_boolean(&value));
   else if (name == g_intern_string("enable-dom-paste"))
     settings->setDOMPasteAllowed(g_value_get_boolean(&value));
   else if (name == g_intern_string("tab-key-cycles-through-elements")) {

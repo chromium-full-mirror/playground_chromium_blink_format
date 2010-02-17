@@ -124,6 +124,11 @@ class Settings : public Noncopyable {
     return m_allowUniversalAccessFromFileURLs;
   }
 
+  void setAllowFileAccessFromFileURLs(bool);
+  bool allowFileAccessFromFileURLs() const {
+    return m_allowFileAccessFromFileURLs;
+  }
+
   void setJavaScriptCanOpenWindowsAutomatically(bool);
   bool javaScriptCanOpenWindowsAutomatically() const {
     return m_javaScriptCanOpenWindowsAutomatically;
@@ -387,6 +392,7 @@ class Settings : public Noncopyable {
   bool m_isJavaScriptEnabled : 1;
   bool m_isWebSecurityEnabled : 1;
   bool m_allowUniversalAccessFromFileURLs : 1;
+  bool m_allowFileAccessFromFileURLs : 1;
   bool m_javaScriptCanOpenWindowsAutomatically : 1;
   bool m_shouldPrintBackgrounds : 1;
   bool m_textAreasAreResizable : 1;
