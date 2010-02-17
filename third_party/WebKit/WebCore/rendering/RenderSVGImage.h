@@ -71,8 +71,6 @@ class RenderSVGImage : public RenderImage, protected SVGRenderBase {
   virtual void layout();
   virtual void paint(PaintInfo&, int parentX, int parentY);
 
-  virtual void destroy();
-
   virtual bool requiresLayer() const { return false; }
 
   virtual bool nodeAtFloatPoint(const HitTestRequest&,

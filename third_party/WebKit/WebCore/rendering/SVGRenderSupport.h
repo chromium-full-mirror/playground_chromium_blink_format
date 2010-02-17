@@ -26,8 +26,6 @@
 
 #if ENABLE(SVG)
 #include "RenderObject.h"
-#include "SVGElement.h"
-#include "SVGStyledElement.h"
 
 namespace WebCore {
 
@@ -91,8 +89,6 @@ class SVGRenderBase {
   // and repaintRectInLocalCoordinates in RenderSVGRoot and RenderSVGContainer
   static FloatRect computeContainerBoundingBox(const RenderObject* container,
                                                bool includeAllPaintedContent);
-
-  static void deregisterFromResources(RenderObject*);
 };
 
 // FIXME: This should move to RenderObject or PaintInfo

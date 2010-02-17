@@ -38,10 +38,9 @@ class SVGUnitTypes : public RefCounted<SVGUnitTypes> {
   SVGUnitTypes() {}
 };
 
-static inline SVGUnitTypes::SVGUnitType toUnitType(int type) {
-  return static_cast<SVGUnitTypes::SVGUnitType>(type);
-}
-}
+}  // namespace WebCore
 
-#endif
-#endif
+#endif  // ENABLE(SVG)
+#endif  // SVGUnitTypes_h
+
+// vim:ts=4:noet
