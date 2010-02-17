@@ -339,7 +339,7 @@ static void resetDefaultsToConsistentValues() {
                "sans-serif-font-family", "Helvetica", "default-font-size", 16,
                "default-monospace-font-size", 13, "minimum-font-size", 1,
                "enable-caret-browsing", FALSE, "enable-page-cache", FALSE,
-               "auto-resize-window", TRUE, "enable-java", FALSE, NULL);
+               "auto-resize-window", TRUE, "enable-java-applet", FALSE, NULL);
 
   webkit_web_frame_clear_main_frame_name(mainFrame);
 
