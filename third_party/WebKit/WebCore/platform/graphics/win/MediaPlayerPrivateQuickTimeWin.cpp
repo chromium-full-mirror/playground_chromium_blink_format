@@ -841,7 +841,7 @@ void MediaPlayerPrivate::acceleratedRenderingStateChanged() {
 
 void MediaPlayerPrivate::notifySyncRequired(const GraphicsLayer*) {
   GraphicsLayerCACF* videoGraphicsLayer =
-      static_cast<GraphicsLayerCACF*>(platformLayer());
+      static_cast<GraphicsLayerCACF*>(m_qtVideoLayer);
   if (videoGraphicsLayer)
     videoGraphicsLayer->notifySyncRequired();
 }
