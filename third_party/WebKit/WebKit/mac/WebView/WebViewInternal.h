@@ -69,6 +69,8 @@ class Node;
 
 @interface WebView (WebViewInternal)
 
++ (BOOL)shouldIncludeInWebKitStatistics;
+
 - (WebCore::Frame*)_mainCoreFrame;
 - (WebFrame*)_selectedOrMainFrame;
 

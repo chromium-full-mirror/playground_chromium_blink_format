@@ -28,6 +28,11 @@
 
 #import <Foundation/Foundation.h>
 
+// These values are only incremented and decremented if the WebView is
+// subclassed and
+// +[WebView shouldIncludeInWebKitStatistics] returns YES. By default WebView
+// returns NO.
+
 @interface WebKitStatistics : NSObject
 
 + (int)webViewCount;
