@@ -560,13 +560,14 @@ void FrameLoaderClient::redirectDataToPlugin(Widget* pluginWidget) {
 }
 
 PassRefPtr<Widget> FrameLoaderClient::createJavaAppletWidget(
-    const IntSize&,
-    HTMLAppletElement*,
+    const IntSize& pluginSize,
+    HTMLAppletElement* element,
     const KURL& baseURL,
     const Vector<String>& paramNames,
     const Vector<String>& paramValues) {
-  notImplemented();
-  return 0;
+  return FrameLoaderClient::createPlugin(pluginSize, element, baseURL,
+                                         paramNames, paramValues,
+                                         "application/x-java-applet", false);
 }
 
 ObjectContentType FrameLoaderClient::objectContentType(const KURL& url,
