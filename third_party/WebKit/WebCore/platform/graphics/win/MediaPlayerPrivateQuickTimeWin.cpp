@@ -106,7 +106,7 @@ PlatformMedia MediaPlayerPrivate::platformMedia() const {
 
 #if USE(ACCELERATED_COMPOSITING)
 PlatformLayer* MediaPlayerPrivate::platformLayer() const {
-  m_qtVideoLayer->platformLayer()
+  m_qtVideoLayer->platformLayer();
 }
 #endif
 
