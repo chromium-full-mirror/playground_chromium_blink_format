@@ -116,6 +116,11 @@ bool RenderSVGText::nodeAtFloatPoint(const HitTestRequest& request,
   return false;
 }
 
+void RenderSVGText::destroy() {
+  deregisterFromResources(this);
+  RenderSVGBlock::destroy();
+}
+
 bool RenderSVGText::nodeAtPoint(const HitTestRequest&,
                                 HitTestResult&,
                                 int,

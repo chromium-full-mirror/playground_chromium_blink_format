@@ -199,6 +199,11 @@ void RenderSVGRoot::paint(PaintInfo& paintInfo, int parentX, int parentY) {
                  borderBoxOriginInContainer.y(), width(), height(), style());
 }
 
+void RenderSVGRoot::destroy() {
+  deregisterFromResources(this);
+  RenderBox::destroy();
+}
+
 void RenderSVGRoot::calcViewport() {
   SVGSVGElement* svg = static_cast<SVGSVGElement*>(node());
 
