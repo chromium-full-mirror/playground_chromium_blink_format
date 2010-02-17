@@ -64,7 +64,7 @@ class JavaStringImpl {
     return m_utf8String.c_str();
   }
   const jchar* uchars() const { return (const jchar*)m_rep->data(); }
-  int length() const { return m_rep->size(); }
+  int length() const { return m_rep->length(); }
   UString uString() const { return UString(m_rep); }
 
  private:

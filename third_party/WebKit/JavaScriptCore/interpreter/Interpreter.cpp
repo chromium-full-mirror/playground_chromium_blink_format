@@ -3260,7 +3260,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
         vPC += defaultOffset;
       else {
         UString::Rep* value = asString(scrutinee)->value(callFrame).rep();
-        if (value->size() != 1)
+        if (value->length() != 1)
           vPC += defaultOffset;
         else
           vPC += callFrame->codeBlock()

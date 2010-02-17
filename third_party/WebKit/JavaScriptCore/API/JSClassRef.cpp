@@ -85,7 +85,9 @@ OpaqueJSClass::OpaqueJSClass(const JSClassDefinition* definition,
         StaticValueEntry* entry = new StaticValueEntry(staticValue->getProperty,
                                                        staticValue->setProperty,
                                                        staticValue->attributes);
-        m_staticValues->add(valueName.rep()->ref(), entry);
+        UStringImpl* impl = valueName.rep();
+        impl->ref();
+        m_staticValues->add(impl, entry);
       }
       ++staticValue;
     }
@@ -99,7 +101,9 @@ OpaqueJSClass::OpaqueJSClass(const JSClassDefinition* definition,
         // Use a local variable here to sidestep an RVCT compiler bug.
         StaticFunctionEntry* entry = new StaticFunctionEntry(
             staticFunction->callAsFunction, staticFunction->attributes);
-        m_staticFunctions->add(functionName.rep()->ref(), entry);
+        UStringImpl* impl = functionName.rep();
+        impl->ref();
+        m_staticFunctions->add(impl, entry);
       }
       ++staticFunction;
     }
@@ -185,7 +189,7 @@ OpaqueJSClassContextData::OpaqueJSClassContextData(OpaqueJSClass* jsClass)
           new StaticValueEntry(it->second->getProperty, it->second->setProperty,
                                it->second->attributes);
       staticValues->add(
-          UString::Rep::create(it->first->data(), it->first->size()), entry);
+          UString::Rep::create(it->first->data(), it->first->length()), entry);
     }
   } else
     staticValues = 0;
@@ -202,7 +206,7 @@ OpaqueJSClassContextData::OpaqueJSClassContextData(OpaqueJSClass* jsClass)
       StaticFunctionEntry* entry = new StaticFunctionEntry(
           it->second->callAsFunction, it->second->attributes);
       staticFunctions->add(
-          UString::Rep::create(it->first->data(), it->first->size()), entry);
+          UString::Rep::create(it->first->data(), it->first->length()), entry);
     }
 
   } else
