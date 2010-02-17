@@ -41,7 +41,7 @@ using namespace WebCore;
 namespace WebKit {
 
 WebInputElement::WebInputElement(const WTF::PassRefPtr<HTMLInputElement>& elem)
-    : WebElement(elem.releaseRef()) {}
+    : WebElement(elem) {}
 
 WebInputElement& WebInputElement::operator=(
     const WTF::PassRefPtr<HTMLInputElement>& elem) {

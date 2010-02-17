@@ -46,7 +46,7 @@ namespace WebKit {
 class WebFormPrivate : public HTMLFormElement {};
 
 WebFormElement::WebFormElement(const WTF::PassRefPtr<HTMLFormElement>& e)
-    : WebElement(e.releaseRef()) {}
+    : WebElement(e) {}
 
 WebFormElement& WebFormElement::operator=(
     const WTF::PassRefPtr<HTMLFormElement>& e) {
