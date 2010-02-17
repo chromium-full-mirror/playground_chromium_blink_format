@@ -1276,7 +1276,11 @@ void RenderLayer::scrollToOffset(int x,
 
 #if USE(ACCELERATED_COMPOSITING)
   if (compositor()->inCompositingMode()) {
-    if (RenderLayer* compositingAncestor = ancestorCompositingLayer()) {
+    // Our stacking context is guaranteed to contain all of our descendants that
+    // may need
+    // repositioning, so update compositing layers from there.
+    if (RenderLayer* compositingAncestor =
+            stackingContext()->enclosingCompositingLayer()) {
       bool isUpdateRoot = true;
       compositingAncestor->backing()->updateAfterLayout(
           RenderLayerBacking::AllDescendants, isUpdateRoot);
