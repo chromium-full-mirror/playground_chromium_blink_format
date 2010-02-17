@@ -87,10 +87,13 @@ class Geolocation : public RefCounted<Geolocation>
     m_shouldClearCache = shouldClearCache;
   }
   bool shouldClearCache() const { return m_shouldClearCache; }
+  Frame* frame() const { return m_frame; }
 
 #if ENABLE(CLIENT_BASED_GEOLOCATION)
   void setPosition(GeolocationPosition*);
   void setError(GeolocationError*);
+#else
+  GeolocationService* getGeolocationService() const { return m_service.get(); }
 #endif
 
  private:

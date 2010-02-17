@@ -63,6 +63,9 @@ class GeolocationService : public Noncopyable {
 
  protected:
   GeolocationService(GeolocationServiceClient*);
+  GeolocationServiceClient* geolocationServiceClient() const {
+    return m_geolocationServiceClient;
+  }
 
  private:
   GeolocationServiceClient* m_geolocationServiceClient;

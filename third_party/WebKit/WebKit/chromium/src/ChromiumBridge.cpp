@@ -74,6 +74,7 @@
 #include "BitmapImage.h"
 #include "Cookie.h"
 #include "FrameView.h"
+#include "GeolocationServiceBridgeChromium.h"
 #include "GraphicsContext.h"
 #include "KURL.h"
 #include "NotImplemented.h"
@@ -338,6 +339,13 @@ String ChromiumBridge::getFontFamilyForCharacters(const UChar* characters,
   return WebString();
 }
 #endif
+
+// Geolocation ----------------------------------------------------------------
+
+GeolocationServiceBridge* ChromiumBridge::createGeolocationServiceBridge(
+    GeolocationServiceChromium* geolocationServiceChromium) {
+  return createGeolocationServiceBridgeImpl(geolocationServiceChromium);
+}
 
 // HTML5 DB -------------------------------------------------------------------
 
