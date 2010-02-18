@@ -240,9 +240,6 @@ class V8DOMWrapper {
       V8Proxy* proxy,
       V8ClassIndex::V8WrapperType type,
       void* impl);
-  static v8::Local<v8::Object> instantiateV8ObjectInWorkerContext(
-      V8ClassIndex::V8WrapperType type,
-      void* impl);
 
   static v8::Handle<v8::Object> getWrapper(Node*);
 };
