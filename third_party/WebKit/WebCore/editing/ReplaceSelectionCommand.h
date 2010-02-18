@@ -86,6 +86,8 @@ class ReplaceSelectionCommand : public CompositeEditCommand {
 
   void negateStyleRulesThatAffectAppearance();
   void handleStyleSpans();
+  void copyStyleToChildren(Node* parentNode,
+                           const CSSMutableStyleDeclaration* parentStyle);
   void handlePasteAsQuotationNode();
 
   virtual void removeNodePreservingChildren(Node*);
