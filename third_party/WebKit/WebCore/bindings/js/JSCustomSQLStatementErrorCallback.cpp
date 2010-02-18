@@ -80,7 +80,7 @@ bool JSCustomSQLStatementErrorCallback::handleEvent(SQLTransaction* transaction,
     // true on an exception
     return true;
   }
-  return result.toBoolean(exec);
+  return !result.isFalse();
 }
 }
 

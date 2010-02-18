@@ -70,7 +70,8 @@ bool V8CustomSQLStatementErrorCallback::handleEvent(SQLTransaction* transaction,
   // statement, if any, or onto the next overall step otherwise. Otherwise,
   // the error callback did not return false, or there was no error callback.
   // Jump to the last step in the overall steps.
-  return invokeCallback(m_callback, 2, argv, callbackReturnValue) ||
+  return invokeCallbackTreatOnlyExplicitFalseAsFalse(m_callback, 2, argv,
+                                                     callbackReturnValue) ||
          callbackReturnValue;
 }
 
