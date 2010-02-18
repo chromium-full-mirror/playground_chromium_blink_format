@@ -115,6 +115,8 @@ class JS_EXPORTCLASS JSString : public JSCell {
       return m_rope.release();
     }
 
+    unsigned length() { return m_rope->length(); }
+
    private:
     unsigned m_index;
     RefPtr<Rope> m_rope;
