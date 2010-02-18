@@ -343,15 +343,18 @@ bool V8DOMWrapper::maybeDOMWrapper(v8::Handle<v8::Value> value) {
 }
 #endif
 
+bool V8DOMWrapper::isValidDOMObject(v8::Handle<v8::Value> value) {
+  if (value.IsEmpty() || !value->IsObject())
+    return false;
+  return v8::Handle<v8::Object>::Cast(value)->InternalFieldCount();
+}
+
 bool V8DOMWrapper::isWrapperOfType(v8::Handle<v8::Value> value,
                                    V8ClassIndex::V8WrapperType classType) {
-  if (value.IsEmpty() || !value->IsObject())
+  if (!isValidDOMObject(value))
     return false;
 
   v8::Handle<v8::Object> object = v8::Handle<v8::Object>::Cast(value);
-  if (!object->InternalFieldCount())
-    return false;
-
   ASSERT(object->InternalFieldCount() >= v8DefaultWrapperInternalFieldCount);
 
   v8::Handle<v8::Value> wrapper =

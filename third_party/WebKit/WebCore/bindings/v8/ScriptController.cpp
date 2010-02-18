@@ -163,7 +163,7 @@ bool ScriptController::processingUserGesture(DOMWrapperWorld*) const {
 
   v8::Handle<v8::Object> global = v8Context->Global();
   v8::Handle<v8::Value> jsEvent = global->Get(v8::String::NewSymbol("event"));
-  Event* event = (!jsEvent.IsEmpty() && jsEvent->IsObject())
+  Event* event = V8DOMWrapper::isValidDOMObject(jsEvent)
                      ? V8Event::toNative(v8::Handle<v8::Object>::Cast(jsEvent))
                      : 0;
 

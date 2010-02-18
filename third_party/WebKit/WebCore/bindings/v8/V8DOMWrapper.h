@@ -219,6 +219,8 @@ class V8DOMWrapper {
   static void setJSWrapperForActiveDOMObject(void*, v8::Persistent<v8::Object>);
   static void setJSWrapperForDOMNode(Node*, v8::Persistent<v8::Object>);
 
+  static bool isValidDOMObject(v8::Handle<v8::Value>);
+
   // Check whether a V8 value is a wrapper of type |classType|.
   static bool isWrapperOfType(v8::Handle<v8::Value>,
                               V8ClassIndex::V8WrapperType);
