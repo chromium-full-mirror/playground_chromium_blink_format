@@ -553,6 +553,8 @@ PassRefPtr<Frame> FrameLoaderClient::createFrame(
   return childFrame.release();
 }
 
+void FrameLoaderClient::didTransferChildFrameToNewDocument() {}
+
 void FrameLoaderClient::redirectDataToPlugin(Widget* pluginWidget) {
   ASSERT(!m_pluginView);
   m_pluginView = static_cast<PluginView*>(pluginWidget);

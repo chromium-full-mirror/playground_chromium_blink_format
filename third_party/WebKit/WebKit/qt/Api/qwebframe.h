@@ -226,6 +226,8 @@ class QWEBKIT_EXPORT QWebFrame : public QObject {
   void loadStarted();
   void loadFinished(bool ok);
 
+  void pageChanged();
+
  private:
   friend class QWebPage;
   friend class QWebPagePrivate;

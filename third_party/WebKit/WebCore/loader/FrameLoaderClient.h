@@ -272,6 +272,7 @@ class FrameLoaderClient {
                                         bool allowsScrolling,
                                         int marginWidth,
                                         int marginHeight) = 0;
+  virtual void didTransferChildFrameToNewDocument() = 0;
   virtual PassRefPtr<Widget> createPlugin(const IntSize&,
                                           HTMLPlugInElement*,
                                           const KURL&,

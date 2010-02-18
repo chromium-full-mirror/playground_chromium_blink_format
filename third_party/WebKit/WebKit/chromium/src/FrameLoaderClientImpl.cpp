@@ -209,7 +209,7 @@ void FrameLoaderClientImpl::detachedFromParent3() {
 
   // Stop communicating with the WebFrameClient at this point since we are no
   // longer associated with the Page.
-  m_webFrame->dropClient();
+  m_webFrame->setClient(0);
 }
 
 // This function is responsible for associating the |identifier| with a given
@@ -1265,6 +1265,18 @@ PassRefPtr<Frame> FrameLoaderClientImpl::createFrame(
     int marginHeight) {
   FrameLoadRequest frameRequest(ResourceRequest(url, referrer), name);
   return m_webFrame->createChildFrame(frameRequest, ownerElement);
+}
+
+void FrameLoaderClientImpl::didTransferChildFrameToNewDocument() {
+  ASSERT(m_webFrame->frame()->ownerElement());
+
+  WebFrameImpl* newParent = static_cast<WebFrameImpl*>(m_webFrame->parent());
+  if (!newParent || !newParent->client())
+    return;
+
+  // Replace the client since the old client may be destroyed when the
+  // previous page is closed.
+  m_webFrame->setClient(newParent->client());
 }
 
 PassRefPtr<Widget> FrameLoaderClientImpl::createPlugin(

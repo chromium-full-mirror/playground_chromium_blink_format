@@ -234,7 +234,7 @@ class WebFrameImpl : public WebFrame, public RefCounted<WebFrameImpl> {
       WebCore::HTMLInputElement*);
 
   WebFrameClient* client() const { return m_client; }
-  void dropClient() { m_client = 0; }
+  void setClient(WebFrameClient* client) { m_client = client; }
 
   static void selectWordAroundPosition(WebCore::Frame*,
                                        WebCore::VisiblePosition);

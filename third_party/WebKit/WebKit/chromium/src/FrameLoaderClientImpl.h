@@ -228,6 +228,7 @@ class FrameLoaderClientImpl : public WebCore::FrameLoaderClient {
       bool allowsScrolling,
       int marginWidth,
       int marginHeight);
+  virtual void didTransferChildFrameToNewDocument();
   virtual PassRefPtr<WebCore::Widget> createPlugin(
       const WebCore::IntSize&,
       WebCore::HTMLPlugInElement*,

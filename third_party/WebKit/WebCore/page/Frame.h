@@ -78,6 +78,8 @@ class Frame : public RefCounted<Frame> {
 
   Page* page() const;
   void detachFromPage();
+  void transferChildFrameToNewDocument();
+
   HTMLFrameOwnerElement* ownerElement() const;
 
   void pageDestroyed();

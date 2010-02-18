@@ -388,6 +388,7 @@ class EmptyFrameLoaderClient : public FrameLoaderClient, public Noncopyable {
                                         int) {
     return 0;
   }
+  virtual void didTransferChildFrameToNewDocument() {}
   virtual PassRefPtr<Widget> createPlugin(const IntSize&,
                                           HTMLPlugInElement*,
                                           const KURL&,
