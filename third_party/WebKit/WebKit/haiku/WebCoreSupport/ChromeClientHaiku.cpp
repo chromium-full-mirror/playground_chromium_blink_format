@@ -312,6 +312,11 @@ void ChromeClientHaiku::runOpenPanel(Frame*, PassRefPtr<FileChooser>) {
   notImplemented();
 }
 
+void ChromeClientHaiku::iconForFiles(const Vector<String>&,
+                                     PassRefPtr<FileChooser>) {
+  notImplemented();
+}
+
 bool ChromeClientHaiku::setCursor(PlatformCursorHandle) {
   notImplemented();
   return false;

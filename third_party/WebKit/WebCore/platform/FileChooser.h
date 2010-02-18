@@ -41,8 +41,10 @@ class Icon;
 class FileChooserClient {
  public:
   virtual void valueChanged() = 0;
+  virtual void repaint() = 0;
   virtual bool allowsMultipleFiles() = 0;
   virtual String acceptTypes() = 0;
+  virtual void iconForFiles(const Vector<String>&) = 0;
   virtual ~FileChooserClient();
 };
 
@@ -64,6 +66,9 @@ class FileChooser : public RefCounted<FileChooser> {
 
   void chooseFile(const String& path);
   void chooseFiles(const Vector<String>& paths);
+  // Called when FileChooserClient finishes to load an icon requested by
+  // iconForFiles().
+  void iconLoaded(PassRefPtr<Icon>);
 
   bool allowsMultipleFiles() const {
     return m_client ? m_client->allowsMultipleFiles() : false;
@@ -76,6 +81,7 @@ class FileChooser : public RefCounted<FileChooser> {
 
  private:
   FileChooser(FileChooserClient*, const Vector<String>& initialFilenames);
+  void loadIcon();
 
   FileChooserClient* m_client;
   Vector<String> m_filenames;

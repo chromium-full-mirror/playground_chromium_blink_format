@@ -758,6 +758,12 @@ void WebChromeClient::runOpenPanel(Frame*,
   // buffer is too small.  For now, this will fail silently.
 }
 
+void WebChromeClient::iconForFiles(const Vector<WebCore::String>&,
+                                   PassRefPtr<WebCore::FileChooser>) {
+  // FIXME: Move the code of Icon::createIconForFiles() here.
+  notImplemented();
+}
+
 bool WebChromeClient::setCursor(PlatformCursorHandle cursor) {
   if (!cursor)
     return false;

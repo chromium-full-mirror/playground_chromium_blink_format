@@ -123,6 +123,8 @@ class ChromeClient : public WebCore::ChromeClient {
   virtual void reachedMaxAppCacheSize(int64_t spaceNeeded);
 #endif
   virtual void runOpenPanel(WebCore::Frame*, PassRefPtr<WebCore::FileChooser>);
+  virtual void iconForFiles(const Vector<WebCore::String>&,
+                            PassRefPtr<WebCore::FileChooser>);
 
   virtual void formStateDidChange(const WebCore::Node*) {}
 

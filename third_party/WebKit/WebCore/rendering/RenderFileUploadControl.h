@@ -26,6 +26,7 @@
 
 namespace WebCore {
 
+class Chrome;
 class HTMLInputElement;
 
 // Each RenderFileUploadControl contains a RenderButton (for opening the file
@@ -43,15 +44,10 @@ class RenderFileUploadControl : public RenderBlock, private FileChooserClient {
 
   void click();
 
-  void valueChanged();
-
   void receiveDroppedFiles(const Vector<String>&);
 
   String buttonValue();
   String fileTextValue() const;
-
-  bool allowsMultipleFiles();
-  String acceptTypes();
 
  private:
   virtual const char* renderName() const { return "RenderFileUploadControl"; }
@@ -62,6 +58,14 @@ class RenderFileUploadControl : public RenderBlock, private FileChooserClient {
 
   virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);
 
+  // FileChooserClient methods.
+  void valueChanged();
+  void repaint() { RenderBlock::repaint(); }
+  bool allowsMultipleFiles();
+  String acceptTypes();
+  void iconForFiles(const Vector<String>&);
+
+  Chrome* chrome() const;
   int maxFilenameWidth() const;
   PassRefPtr<RenderStyle> createButtonStyle(
       const RenderStyle* parentStyle) const;

@@ -437,6 +437,12 @@ void ChromeClientQt::runOpenPanel(Frame* frame,
   }
 }
 
+void ChromeClientQt::iconForFiles(const Vector<String>&,
+                                  PassRefPtr<FileChooser>) {
+  // FIXME: Move the code of Icon::createIconForFiles() here.
+  notImplemented();
+}
+
 bool ChromeClientQt::setCursor(PlatformCursorHandle) {
   notImplemented();
   return false;
