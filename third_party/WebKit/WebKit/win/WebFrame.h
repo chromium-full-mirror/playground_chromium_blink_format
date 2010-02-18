@@ -166,6 +166,17 @@ class DECLSPEC_UUID("{A3676398-4485-4a9d-87DC-CB5A40E6351D}") WebFrame
       /* [in] */ BSTR id,
       /* [retval][out] */ BSTR* result);
 
+  virtual HRESULT STDMETHODCALLTYPE pageNumberForElementById(
+      /* [in] */ BSTR id,
+      /* [in] */ float pageWidthInPixels,
+      /* [in] */ float pageHeightInPixels,
+      /* [retval][out] */ int* result);
+
+  virtual HRESULT STDMETHODCALLTYPE numberOfPages(
+      /* [in] */ float pageWidthInPixels,
+      /* [in] */ float pageHeightInPixels,
+      /* [retval][out] */ int* result);
+
   virtual HRESULT STDMETHODCALLTYPE scrollOffset(
       /* [retval][out] */ SIZE* offset);
 
