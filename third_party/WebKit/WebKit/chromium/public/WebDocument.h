@@ -70,6 +70,7 @@ class WebDocument : public WebNode {
   WEBKIT_API WebElement documentElement() const;
   WEBKIT_API WebElement body() const;
   WEBKIT_API WebElement head();
+  WEBKIT_API WebString title() const;
   WEBKIT_API WebNodeCollection all();
   WEBKIT_API WebURL completeURL(const WebString&) const;
   WEBKIT_API WebElement getElementById(const WebString& id) const;
