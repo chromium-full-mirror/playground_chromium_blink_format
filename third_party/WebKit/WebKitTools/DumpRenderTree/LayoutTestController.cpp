@@ -693,10 +693,8 @@ static bool parsePageParameters(JSContextRef context,
                                 JSValueRef* exception,
                                 float& pageWidthInPixels,
                                 float& pageHeightInPixels) {
-  // FIXME: These values should sync with maxViewWidth/Height in
-  //        DumpRenderTree.mm. Factor these values out to somewhere.
-  pageWidthInPixels = 800;
-  pageHeightInPixels = 600;
+  pageWidthInPixels = LayoutTestController::maxViewWidth;
+  pageHeightInPixels = LayoutTestController::maxViewHeight;
   switch (argumentCount) {
     case 2:
       pageWidthInPixels =
@@ -2256,3 +2254,6 @@ void LayoutTestController::setPOSIXLocale(JSStringRef locale) {
   JSStringGetUTF8CString(locale, localeBuf, sizeof(localeBuf));
   setlocale(LC_ALL, localeBuf);
 }
+
+const unsigned LayoutTestController::maxViewWidth = 800;
+const unsigned LayoutTestController::maxViewHeight = 600;

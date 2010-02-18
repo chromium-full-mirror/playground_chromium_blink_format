@@ -99,8 +99,6 @@ GSList* webViewList = 0;
 // current b/f item at the end of the previous test
 static WebKitWebHistoryItem* prevTestBFItem = NULL;
 
-const unsigned maxViewHeight = 600;
-const unsigned maxViewWidth = 800;
 const unsigned historyItemIndent = 8;
 
 static gchar* autocorrectURL(const gchar* url) {
@@ -486,8 +484,8 @@ static void runTest(const string& testPathOrURL) {
                            "svg/W3C-SVG-1.1") != string::npos);
   GtkAllocation size;
   size.x = size.y = 0;
-  size.width = isSVGW3CTest ? 480 : maxViewWidth;
-  size.height = isSVGW3CTest ? 360 : maxViewHeight;
+  size.width = isSVGW3CTest ? 480 : LayoutTestController::maxViewWidth;
+  size.height = isSVGW3CTest ? 360 : LayoutTestController::maxViewHeight;
   gtk_window_resize(GTK_WINDOW(window), size.width, size.height);
   gtk_widget_size_allocate(container, &size);
 
