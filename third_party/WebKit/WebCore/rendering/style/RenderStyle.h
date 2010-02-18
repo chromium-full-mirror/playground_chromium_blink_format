@@ -377,6 +377,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
 
   bool isStyleAvailable() const;
 
+  bool hasAnyPublicPseudoStyles() const;
   bool hasPseudoStyle(PseudoId pseudo) const;
   void setHasPseudoStyle(PseudoId pseudo);
 

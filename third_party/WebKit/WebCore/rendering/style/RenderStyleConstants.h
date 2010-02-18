@@ -73,6 +73,7 @@ enum StyleDifferenceContextSensitiveProperty {
 
 // Static pseudo styles. Dynamic ones are produced on the fly.
 enum PseudoId {
+  // The order must be NOP ID, public IDs, and then internal IDs.
   NOPSEUDO,
   FIRST_LINE,
   FIRST_LETTER,
@@ -114,7 +115,10 @@ enum PseudoId {
   INNER_SPIN_BUTTON,
   OUTER_SPIN_BUTTON,
 
-  FIRST_INTERNAL_PSEUDOID = FILE_UPLOAD_BUTTON
+  FIRST_PUBLIC_PSEUDOID = FIRST_LINE,
+  FIRST_INTERNAL_PSEUDOID = FILE_UPLOAD_BUTTON,
+  PUBLIC_PSEUDOID_MASK =
+      ((1 << FIRST_INTERNAL_PSEUDOID) - 1) & ~((1 << FIRST_PUBLIC_PSEUDOID) - 1)
 };
 
 // These have been defined in the order of their precedence for
