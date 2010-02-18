@@ -2218,6 +2218,7 @@ void RenderBlock::paintSelection(PaintInfo& paintInfo, int tx, int ty) {
           FloatRect localBounds(gapRectsBounds);
           gapRectsBounds = localToContainerQuad(localBounds, layer->renderer())
                                .enclosingBoundingBox();
+          gapRectsBounds.move(layer->scrolledContentOffset());
         }
         layer->addBlockSelectionGapsBounds(gapRectsBounds);
       }
