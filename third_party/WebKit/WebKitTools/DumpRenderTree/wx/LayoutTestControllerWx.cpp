@@ -328,3 +328,7 @@ int LayoutTestController::numberOfPages(float, float) {
   // FIXME: implement
   return -1;
 }
+
+void LayoutTestController::apiTestNewWindowDataLoadBaseURL(
+    JSStringRef utf8Data,
+    JSStringRef baseURL) {}

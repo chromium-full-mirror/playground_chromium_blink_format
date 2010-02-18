@@ -333,6 +333,12 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
 
   void setPOSIXLocale(JSStringRef locale);
 
+  // The following API test functions should probably be moved to
+  // platform-specific
+  // unit tests outside of DRT once they exist.
+  void apiTestNewWindowDataLoadBaseURL(JSStringRef utf8Data,
+                                       JSStringRef baseURL);
+
   static const unsigned maxViewWidth;
   static const unsigned maxViewHeight;
 
