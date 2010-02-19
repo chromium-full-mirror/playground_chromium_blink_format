@@ -140,6 +140,8 @@ extern int pluginDatabaseClientCount;
   // WebView.  This means no WebFrameViews and no WebHTMLViews.
   BOOL usesDocumentViews;
 
+  BOOL includesFlattenedCompositingLayersWhenDrawingToBitmap;
+
 #if USE(ACCELERATED_COMPOSITING)
   // When this flag is set, next time a WebHTMLView draws, it needs to
   // temporarily disable screen updates
