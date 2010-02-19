@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
- * Copyright (C) 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010 Apple Inc. All rights
+ * reserved.
+ * Copyright (C) 2010 Google Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -56,6 +58,18 @@ HTMLImageElement::HTMLImageElement(const QualifiedName& tagName,
 HTMLImageElement::~HTMLImageElement() {
   if (m_form)
     m_form->removeImgElement(this);
+}
+
+PassRefPtr<HTMLImageElement> HTMLImageElement::createForJSConstructor(
+    Document* document,
+    const int* optionalWidth,
+    const int* optionalHeight) {
+  RefPtr<HTMLImageElement> image = new HTMLImageElement(imgTag, document);
+  if (optionalWidth)
+    image->setWidth(*optionalWidth);
+  if (optionalHeight > 0)
+    image->setHeight(*optionalHeight);
+  return image.release();
 }
 
 bool HTMLImageElement::mapToEntry(const QualifiedName& attrName,

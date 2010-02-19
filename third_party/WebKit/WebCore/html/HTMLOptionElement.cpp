@@ -2,8 +2,9 @@
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
  *           (C) 2001 Dirk Mueller (mueller@kde.org)
- * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
  *           (C) 2006 Alexey Proskuryakov (ap@nypop.com)
+ * Copyright (C) 2004, 2005, 2006, 2010 Apple Inc. All rights reserved.
+ * Copyright (C) 2010 Google Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -42,10 +43,35 @@ namespace WebCore {
 using namespace HTMLNames;
 
 HTMLOptionElement::HTMLOptionElement(const QualifiedName& tagName,
-                                     Document* doc,
-                                     HTMLFormElement* f)
-    : HTMLFormControlElement(tagName, doc, f), m_style(0) {
+                                     Document* document,
+                                     HTMLFormElement* form)
+    : HTMLFormControlElement(tagName, document, form), m_style(0) {
   ASSERT(hasTagName(optionTag));
+}
+
+PassRefPtr<HTMLOptionElement> HTMLOptionElement::createForJSConstructor(
+    Document* document,
+    const String& data,
+    const String& value,
+    bool defaultSelected,
+    bool selected,
+    ExceptionCode& ec) {
+  RefPtr<HTMLOptionElement> element =
+      new HTMLOptionElement(optionTag, document);
+
+  RefPtr<Text> text = Text::create(document, data.isNull() ? "" : data);
+
+  ec = 0;
+  element->appendChild(text.release(), ec);
+  if (ec)
+    return 0;
+
+  if (!value.isNull())
+    element->setValue(value);
+  element->setDefaultSelected(defaultSelected);
+  element->setSelected(selected);
+
+  return element.release();
 }
 
 bool HTMLOptionElement::checkDTD(const Node* newChild) {
