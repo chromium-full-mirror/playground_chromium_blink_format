@@ -279,6 +279,8 @@ void EventSender::contextClick() {
   QMouseEvent event2(QEvent::MouseButtonRelease, m_mousePos, Qt::RightButton,
                      Qt::RightButton, Qt::NoModifier);
   QApplication::sendEvent(m_page, &event2);
+  QContextMenuEvent event3(QContextMenuEvent::Mouse, m_mousePos);
+  QApplication::sendEvent(m_page->view(), &event3);
 }
 
 void EventSender::scheduleAsynchronousClick() {
