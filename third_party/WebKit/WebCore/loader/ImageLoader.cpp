@@ -229,8 +229,7 @@ void ImageLoader::updateRenderer() {
     // dynamic
     // change is happening between two images.
     CachedImage* cachedImage = imageRenderer->cachedImage();
-    if (m_image != cachedImage &&
-        (m_imageComplete || !imageRenderer->cachedImage()))
+    if (m_image != cachedImage && (m_imageComplete || !cachedImage))
       imageRenderer->setCachedImage(m_image.get());
   }
 }
