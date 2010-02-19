@@ -553,9 +553,13 @@ void JSObject::putDirectFunctionWithoutTransition(ExecState* exec,
 
 NEVER_INLINE void JSObject::fillGetterPropertySlot(PropertySlot& slot,
                                                    JSValue* location) {
-  if (JSObject* getterFunction = asGetterSetter(*location)->getter())
-    slot.setGetterSlot(getterFunction);
-  else
+  if (JSObject* getterFunction = asGetterSetter(*location)->getter()) {
+    if (!structure()->isDictionary())
+      slot.setCacheableGetterSlot(this, getterFunction,
+                                  offsetForLocation(location));
+    else
+      slot.setGetterSlot(getterFunction);
+  } else
     slot.setUndefined();
 }
 
