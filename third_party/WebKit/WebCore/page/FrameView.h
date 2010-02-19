@@ -110,6 +110,11 @@ class FrameView : public ScrollView {
   // Returns true if the sync was completed.
   bool syncCompositingStateRecursive();
 
+  // Returns true when a paint with the PaintBehaviorFlattenCompositingLayers
+  // flag set gives
+  // a faithful representation of the content.
+  bool isSoftwareRenderable() const;
+
   void didMoveOnscreen();
   void willMoveOffscreen();
 
@@ -175,7 +180,7 @@ class FrameView : public ScrollView {
 
   virtual void paintContents(GraphicsContext*, const IntRect& damageRect);
   void setPaintBehavior(PaintBehavior);
-  PaintBehavior paintBehavior() const { return m_paintBehavior; }
+  PaintBehavior paintBehavior() const;
   bool isPainting() const;
   void setNodeToDraw(Node*);
 

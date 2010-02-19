@@ -534,6 +534,10 @@ backforward list.
 - (void)_setPostsAcceleratedCompositingNotifications:(BOOL)flag;
 - (BOOL)_isUsingAcceleratedCompositing;
 
+// Returns YES if NSView -displayRectIgnoringOpacity:inContext: will produce a
+// faithful representation of the content.
+- (BOOL)_isSoftwareRenderable;
+
 // SPI for PluginHalter
 + (BOOL)_isNodeHaltedPlugin:(DOMNode*)node;
 + (BOOL)_hasPluginForNodeBeenHalted:(DOMNode*)node;
