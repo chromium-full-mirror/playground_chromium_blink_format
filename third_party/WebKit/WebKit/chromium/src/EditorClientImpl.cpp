@@ -725,7 +725,7 @@ void EditorClientImpl::cancelPendingAutofill() {
   m_autofillTimer.stop();
 }
 
-void EditorClientImpl::onAutofillSuggestionAccepted(
+void EditorClientImpl::onAutocompleteSuggestionAccepted(
     HTMLInputElement* textField) {
   WebFrameImpl* webframe =
       WebFrameImpl::fromFrame(textField->document()->frame());

@@ -60,7 +60,7 @@ void SuggestionsPopupMenuClient::valueChanged(unsigned listIndex,
   EditorClientImpl* editor =
       static_cast<EditorClientImpl*>(webView->page()->editorClient());
   ASSERT(editor);
-  editor->onAutofillSuggestionAccepted(
+  editor->onAutocompleteSuggestionAccepted(
       static_cast<HTMLInputElement*>(m_textField.get()));
 }
 
