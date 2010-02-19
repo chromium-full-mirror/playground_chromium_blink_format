@@ -191,6 +191,7 @@ enum {
   ID_GET_REMEMBERED_OBJECT,
   ID_GET_AND_FORGET_REMEMBERED_OBJECT,
   ID_REF_COUNT,
+  ID_SET_STATUS,
   NUM_METHOD_IDENTIFIERS
 };
 
@@ -224,7 +225,8 @@ static const NPUTF8* pluginMethodIdentifierNames[NUM_METHOD_IDENTIFIERS] = {
     "remember",
     "getRememberedObject",
     "getAndForgetRememberedObject",
-    "refCount"};
+    "refCount",
+    "setStatus"};
 
 static NPUTF8* createCStringFromNPVariant(const NPVariant* variant) {
   size_t length = NPVARIANT_TO_STRING(*variant).UTF8Length;
@@ -841,6 +843,22 @@ bool testWindowOpen(NPP npp) {
   return false;
 }
 
+static bool testSetStatus(PluginObject* obj,
+                          const NPVariant* args,
+                          uint32_t argCount,
+                          NPVariant* result) {
+  char* message = 0;
+  if (argCount && NPVARIANT_IS_STRING(args[0])) {
+    NPString statusString = NPVARIANT_TO_STRING(args[0]);
+    message = toCString(statusString);
+  }
+
+  browser->status(obj->npp, message);
+
+  free(message);
+  return true;
+}
+
 static NPObject* rememberedObject;
 
 static bool pluginInvoke(NPObject* header,
@@ -932,7 +950,8 @@ static bool pluginInvoke(NPObject* header,
     uint32_t refCount = NPVARIANT_TO_OBJECT(args[0])->referenceCount;
     INT32_TO_NPVARIANT(refCount, *result);
     return true;
-  }
+  } else if (name == pluginMethodIdentifiers[ID_SET_STATUS])
+    return testSetStatus(plugin, args, argCount, result);
 
   return false;
 }
