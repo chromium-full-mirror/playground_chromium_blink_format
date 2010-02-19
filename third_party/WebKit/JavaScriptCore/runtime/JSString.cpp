@@ -55,13 +55,6 @@ void JSString::resolveRope(ExecState* exec) const {
           UStringImpl::tryCreateUninitialized(m_length, buffer))
     m_value = newImpl;
   else {
-    for (unsigned i = 0; i < m_fiberCount; ++i) {
-      m_other.m_fibers[i]->deref();
-      m_other.m_fibers[i] = 0;
-    }
-    m_fiberCount = 0;
-    ASSERT(!isRope());
-    ASSERT(m_value == UString());
     throwOutOfMemoryError(exec);
     return;
   }
@@ -190,8 +183,7 @@ bool JSString::getStringPropertyDescriptor(ExecState* exec,
   bool isStrictUInt32;
   unsigned i = propertyName.toStrictUInt32(&isStrictUInt32);
   if (isStrictUInt32 && i < m_length) {
-    descriptor.setDescriptor(jsSingleCharacterSubstring(exec, value(exec), i),
-                             DontDelete | ReadOnly);
+    descriptor.setDescriptor(getIndex(exec, i), DontDelete | ReadOnly);
     return true;
   }
 
