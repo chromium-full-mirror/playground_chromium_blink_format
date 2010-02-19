@@ -41,8 +41,7 @@ JavaClass::JavaClass(jobject anInstance) {
       callJNIMethod<jobject>(anInstance, "getClass", "()Ljava/lang/Class;");
 
   if (!aClass) {
-    fprintf(stderr, "%s:  unable to call getClass on instance %p\n",
-            __PRETTY_FUNCTION__, anInstance);
+    LOG_ERROR("Unable to call getClass on instance %p", anInstance);
     m_name = fastStrDup("<Unknown>");
     return;
   }

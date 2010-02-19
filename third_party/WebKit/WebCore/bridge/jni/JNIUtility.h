@@ -204,16 +204,14 @@ static T callJNIMethodV(jobject obj,
         env->DeleteLocalRef(cls);
         return JNICaller<T>::callV(obj, mid, args);
       }
-      fprintf(stderr, "%s: Could not find method: %s for %p\n",
-              __PRETTY_FUNCTION__, name, obj);
+      LOG_ERROR("Could not find method: %s for %p", name, obj);
       env->ExceptionDescribe();
       env->ExceptionClear();
       fprintf(stderr, "\n");
 
       env->DeleteLocalRef(cls);
     } else
-      fprintf(stderr, "%s: Could not find class for %p\n", __PRETTY_FUNCTION__,
-              obj);
+      LOG_ERROR("Could not find class for %p", obj);
   }
 
   return 0;
@@ -252,8 +250,7 @@ T callJNIStaticMethod(jclass cls,
     if (mid)
       result = JNICaller<T>::callStaticV(cls, mid, args);
     else {
-      fprintf(stderr, "%s: Could not find method: %s for %p\n",
-              __PRETTY_FUNCTION__, methodName, cls);
+      LOG_ERROR("Could not find method: %s for %p", methodName, cls);
       env->ExceptionDescribe();
       env->ExceptionClear();
       fprintf(stderr, "\n");
