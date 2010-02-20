@@ -292,6 +292,13 @@ class WebViewClient : virtual public WebWidgetClient {
   virtual void removeAutofillSuggestions(const WebString& name,
                                          const WebString& value) {}
 
+  // Informs the browser that the user has selected an AutoFill suggestion
+  // for a WebNode.  |name| and |label| form a key into the set of AutoFill
+  // profiles.
+  virtual void didAcceptAutoFillSuggestion(const WebNode&,
+                                           const WebString& name,
+                                           const WebString& label) {}
+
   // Geolocation ---------------------------------------------------------
 
   // Access the embedder API for geolocation services.
