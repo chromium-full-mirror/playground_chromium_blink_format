@@ -263,7 +263,6 @@ JavaArray::JavaArray(jobject array,
   JNIEnv* env = getJNIEnv();
   m_length = env->GetArrayLength(static_cast<jarray>(m_array->m_instance));
   m_type = strdup(type);
-  m_rootObject = rootObject;
 }
 
 JavaArray::~JavaArray() {
