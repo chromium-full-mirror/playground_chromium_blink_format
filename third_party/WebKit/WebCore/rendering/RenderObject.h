@@ -749,10 +749,13 @@ class RenderObject : public CachedResourceClient {
   // the object's coordinate space.
   void repaintRectangle(const IntRect&, bool immediate = false);
 
-  // Repaint only if our old bounds and new bounds are different.
+  // Repaint only if our old bounds and new bounds are different. The caller may
+  // pass in newBounds and newOutlineBox if they are known.
   bool repaintAfterLayoutIfNeeded(RenderBoxModelObject* repaintContainer,
                                   const IntRect& oldBounds,
-                                  const IntRect& oldOutlineBox);
+                                  const IntRect& oldOutlineBox,
+                                  const IntRect* newBoundsPtr = 0,
+                                  const IntRect* newOutlineBoxPtr = 0);
 
   // Repaint only if the object moved.
   virtual void repaintDuringLayoutIfMoved(const IntRect& rect);

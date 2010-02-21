@@ -1254,12 +1254,18 @@ void RenderObject::repaintRectangle(const IntRect& r, bool immediate) {
 bool RenderObject::repaintAfterLayoutIfNeeded(
     RenderBoxModelObject* repaintContainer,
     const IntRect& oldBounds,
-    const IntRect& oldOutlineBox) {
+    const IntRect& oldOutlineBox,
+    const IntRect* newBoundsPtr,
+    const IntRect* newOutlineBoxRectPtr) {
   RenderView* v = view();
   if (v->printing())
     return false;  // Don't repaint if we're printing.
 
-  IntRect newBounds = clippedOverflowRectForRepaint(repaintContainer);
+  ASSERT(!newBoundsPtr ||
+         *newBoundsPtr == clippedOverflowRectForRepaint(repaintContainer));
+  IntRect newBounds = newBoundsPtr
+                          ? *newBoundsPtr
+                          : clippedOverflowRectForRepaint(repaintContainer);
   IntRect newOutlineBox;
 
   bool fullRepaint = selfNeedsLayout();
@@ -1268,7 +1274,11 @@ bool RenderObject::repaintAfterLayoutIfNeeded(
   if (!fullRepaint && style()->borderFit() == BorderFitLines)
     fullRepaint = true;
   if (!fullRepaint) {
-    newOutlineBox = outlineBoundsForRepaint(repaintContainer);
+    ASSERT(!newOutlineBoxRectPtr ||
+           *newOutlineBoxRectPtr == outlineBoundsForRepaint(repaintContainer));
+    newOutlineBox = newOutlineBoxRectPtr
+                        ? *newOutlineBoxRectPtr
+                        : outlineBoundsForRepaint(repaintContainer);
     if (newOutlineBox.location() != oldOutlineBox.location() ||
         (mustRepaintBackgroundOrBorder() &&
          (newBounds != oldBounds || newOutlineBox != oldOutlineBox)))

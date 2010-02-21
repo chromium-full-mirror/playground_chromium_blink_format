@@ -290,7 +290,8 @@ void RenderLayer::updateLayerPositions(UpdateLayerPositionsFlags flags) {
             renderer()->repaintUsingContainer(repaintContainer, newRect);
         } else
           renderer()->repaintAfterLayoutIfNeeded(repaintContainer,
-                                                 m_repaintRect, m_outlineBox);
+                                                 m_repaintRect, m_outlineBox,
+                                                 &newRect, &newOutlineBox);
       }
     }
     m_repaintRect = newRect;
