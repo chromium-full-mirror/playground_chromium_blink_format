@@ -31,16 +31,14 @@
 #include "config.h"
 #include "HTTPHeaderMap.h"
 
-#include <memory>
 #include <utility>
 
 using namespace std;
 
 namespace WebCore {
 
-auto_ptr<CrossThreadHTTPHeaderMapData> HTTPHeaderMap::copyData() const {
-  auto_ptr<CrossThreadHTTPHeaderMapData> data(
-      new CrossThreadHTTPHeaderMapData());
+PassOwnPtr<CrossThreadHTTPHeaderMapData> HTTPHeaderMap::copyData() const {
+  OwnPtr<CrossThreadHTTPHeaderMapData> data(new CrossThreadHTTPHeaderMapData());
   data->reserveInitialCapacity(size());
 
   HTTPHeaderMap::const_iterator end_it = end();
@@ -48,10 +46,10 @@ auto_ptr<CrossThreadHTTPHeaderMapData> HTTPHeaderMap::copyData() const {
     data->append(make_pair(it->first.string().crossThreadString(),
                            it->second.crossThreadString()));
   }
-  return data;
+  return data.release();
 }
 
-void HTTPHeaderMap::adopt(auto_ptr<CrossThreadHTTPHeaderMapData> data) {
+void HTTPHeaderMap::adopt(PassOwnPtr<CrossThreadHTTPHeaderMapData> data) {
   clear();
   size_t dataSize = data->size();
   for (size_t index = 0; index < dataSize; ++index) {

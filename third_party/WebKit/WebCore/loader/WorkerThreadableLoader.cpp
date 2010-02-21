@@ -42,7 +42,6 @@
 #include "WorkerContext.h"
 #include "WorkerLoaderProxy.h"
 #include "WorkerThread.h"
-#include <memory>
 #include <wtf/OwnPtr.h>
 #include <wtf/Threading.h>
 #include <wtf/Vector.h>
@@ -117,7 +116,7 @@ WorkerThreadableLoader::MainThreadBridge::~MainThreadBridge() {}
 void WorkerThreadableLoader::MainThreadBridge::mainThreadCreateLoader(
     ScriptExecutionContext* context,
     MainThreadBridge* thisPtr,
-    auto_ptr<CrossThreadResourceRequestData> requestData,
+    PassOwnPtr<CrossThreadResourceRequestData> requestData,
     ThreadableLoaderOptions options) {
   ASSERT(isMainThread());
   ASSERT(context->isDocument());
@@ -211,7 +210,7 @@ void WorkerThreadableLoader::MainThreadBridge::didSendData(
 static void workerContextDidReceiveResponse(
     ScriptExecutionContext* context,
     RefPtr<ThreadableLoaderClientWrapper> workerClientWrapper,
-    auto_ptr<CrossThreadResourceResponseData> responseData) {
+    PassOwnPtr<CrossThreadResourceResponseData> responseData) {
   ASSERT_UNUSED(context, context->isWorkerContext());
   OwnPtr<ResourceResponse> response(ResourceResponse::adopt(responseData));
   workerClientWrapper->didReceiveResponse(*response);
@@ -228,7 +227,7 @@ void WorkerThreadableLoader::MainThreadBridge::didReceiveResponse(
 static void workerContextDidReceiveData(
     ScriptExecutionContext* context,
     RefPtr<ThreadableLoaderClientWrapper> workerClientWrapper,
-    auto_ptr<Vector<char>> vectorData) {
+    PassOwnPtr<Vector<char>> vectorData) {
   ASSERT_UNUSED(context, context->isWorkerContext());
   workerClientWrapper->didReceiveData(vectorData->data(), vectorData->size());
 }
@@ -236,13 +235,13 @@ static void workerContextDidReceiveData(
 void WorkerThreadableLoader::MainThreadBridge::didReceiveData(
     const char* data,
     int lengthReceived) {
-  auto_ptr<Vector<char>> vector(
-      new Vector<char>(lengthReceived));  // needs to be an auto_ptr for usage
+  OwnPtr<Vector<char>> vector(
+      new Vector<char>(lengthReceived));  // needs to be an OwnPtr for usage
                                           // with createCallbackTask.
   memcpy(vector->data(), data, lengthReceived);
   m_loaderProxy.postTaskForModeToWorkerContext(
       createCallbackTask(&workerContextDidReceiveData, m_workerClientWrapper,
-                         vector),
+                         vector.release()),
       m_taskMode);
 }
 
@@ -294,7 +293,7 @@ void WorkerThreadableLoader::MainThreadBridge::didFailRedirectCheck() {
 static void workerContextDidReceiveAuthenticationCancellation(
     ScriptExecutionContext* context,
     RefPtr<ThreadableLoaderClientWrapper> workerClientWrapper,
-    auto_ptr<CrossThreadResourceResponseData> responseData) {
+    PassOwnPtr<CrossThreadResourceResponseData> responseData) {
   ASSERT_UNUSED(context, context->isWorkerContext());
   OwnPtr<ResourceResponse> response(ResourceResponse::adopt(responseData));
   workerClientWrapper->didReceiveAuthenticationCancellation(*response);

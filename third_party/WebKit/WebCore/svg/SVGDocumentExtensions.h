@@ -24,8 +24,8 @@
 #define SVGDocumentExtensions_h
 
 #if ENABLE(SVG)
-#include <memory>
 
+#include <wtf/PassOwnPtr.h>
 #include <wtf/HashSet.h>
 #include <wtf/HashMap.h>
 
@@ -75,7 +75,7 @@ class SVGDocumentExtensions : public Noncopyable {
   // For instance, dynamically build gradients / patterns / clippers...
   void addPendingResource(const AtomicString& id, SVGStyledElement*);
   bool isPendingResource(const AtomicString& id) const;
-  std::auto_ptr<HashSet<SVGStyledElement*>> removePendingResource(
+  PassOwnPtr<HashSet<SVGStyledElement*>> removePendingResource(
       const AtomicString& id);
 };
 }

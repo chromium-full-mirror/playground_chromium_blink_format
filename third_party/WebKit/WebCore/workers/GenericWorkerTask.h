@@ -54,11 +54,6 @@ struct GenericWorkerTaskTraits<T*> {
 };
 
 template <typename T>
-struct GenericWorkerTaskTraits<std::auto_ptr<T>> {
-  typedef std::auto_ptr<T> ParamType;
-};
-
-template <typename T>
 struct GenericWorkerTaskTraits<PassRefPtr<T>> {
   typedef PassRefPtr<T> ParamType;
 };

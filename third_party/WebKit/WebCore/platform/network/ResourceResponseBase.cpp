@@ -86,9 +86,9 @@ ResourceResponseBase::ResourceResponseBase(const KURL& url,
       m_expires(0.0),
       m_lastModified(0.0) {}
 
-auto_ptr<ResourceResponse> ResourceResponseBase::adopt(
-    auto_ptr<CrossThreadResourceResponseData> data) {
-  auto_ptr<ResourceResponse> response(new ResourceResponse());
+PassOwnPtr<ResourceResponse> ResourceResponseBase::adopt(
+    PassOwnPtr<CrossThreadResourceResponseData> data) {
+  OwnPtr<ResourceResponse> response(new ResourceResponse());
   response->setURL(data->m_url);
   response->setMimeType(data->m_mimeType);
   response->setExpectedContentLength(data->m_expectedContentLength);
@@ -99,17 +99,15 @@ auto_ptr<ResourceResponse> ResourceResponseBase::adopt(
   response->setHTTPStatusText(data->m_httpStatusText);
 
   response->lazyInit();
-  response->m_httpHeaderFields.adopt(
-      std::auto_ptr<CrossThreadHTTPHeaderMapData>(
-          data->m_httpHeaders.release()));
+  response->m_httpHeaderFields.adopt(data->m_httpHeaders.release());
   response->setLastModifiedDate(data->m_lastModifiedDate);
 
-  return response;
+  return response.release();
 }
 
-auto_ptr<CrossThreadResourceResponseData> ResourceResponseBase::copyData()
+PassOwnPtr<CrossThreadResourceResponseData> ResourceResponseBase::copyData()
     const {
-  auto_ptr<CrossThreadResourceResponseData> data(
+  OwnPtr<CrossThreadResourceResponseData> data(
       new CrossThreadResourceResponseData());
   data->m_url = url().copy();
   data->m_mimeType = mimeType().crossThreadString();
@@ -118,9 +116,9 @@ auto_ptr<CrossThreadResourceResponseData> ResourceResponseBase::copyData()
   data->m_suggestedFilename = suggestedFilename().crossThreadString();
   data->m_httpStatusCode = httpStatusCode();
   data->m_httpStatusText = httpStatusText().crossThreadString();
-  data->m_httpHeaders.adopt(httpHeaderFields().copyData());
+  data->m_httpHeaders = httpHeaderFields().copyData();
   data->m_lastModifiedDate = lastModifiedDate();
-  return data;
+  return data.release();
 }
 
 bool ResourceResponseBase::isHTTP() const {

@@ -46,8 +46,8 @@ namespace WebCore {
 IconLoader::IconLoader(Frame* frame)
     : m_frame(frame), m_loadIsInProgress(false) {}
 
-auto_ptr<IconLoader> IconLoader::create(Frame* frame) {
-  return auto_ptr<IconLoader>(new IconLoader(frame));
+PassOwnPtr<IconLoader> IconLoader::create(Frame* frame) {
+  return new IconLoader(frame);
 }
 
 IconLoader::~IconLoader() {}

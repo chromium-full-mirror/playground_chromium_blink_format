@@ -289,7 +289,7 @@ void SVGElement::insertedIntoDocument() {
   String resourceId =
       SVGURIReference::getTarget(getAttribute(idAttributeName()));
   if (extensions->isPendingResource(resourceId)) {
-    std::auto_ptr<HashSet<SVGStyledElement*>> clients(
+    OwnPtr<HashSet<SVGStyledElement*>> clients(
         extensions->removePendingResource(resourceId));
     if (clients->isEmpty())
       return;

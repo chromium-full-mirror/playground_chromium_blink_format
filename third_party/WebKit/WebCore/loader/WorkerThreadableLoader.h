@@ -38,7 +38,7 @@
 #include "ThreadableLoaderClient.h"
 #include "ThreadableLoaderClientWrapper.h"
 
-#include <memory>
+#include <wtf/PassOwnPtr.h>
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 #include <wtf/RefPtr.h>
@@ -133,7 +133,7 @@ class WorkerThreadableLoader : public RefCounted<WorkerThreadableLoader>,
     static void mainThreadCreateLoader(
         ScriptExecutionContext*,
         MainThreadBridge*,
-        std::auto_ptr<CrossThreadResourceRequestData>,
+        PassOwnPtr<CrossThreadResourceRequestData>,
         ThreadableLoaderOptions);
     static void mainThreadCancel(ScriptExecutionContext*, MainThreadBridge*);
     virtual void didSendData(unsigned long long bytesSent,
