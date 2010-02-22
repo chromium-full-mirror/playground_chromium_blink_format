@@ -64,6 +64,7 @@ class Widget;
 
 struct Cookie;
 struct PluginInfo;
+struct FontRenderStyle;
 
 // An interface to the embedding layer, which has the ability to answer
 // questions about the system and so on...
@@ -122,6 +123,9 @@ class ChromiumBridge {
   static bool ensureFontLoaded(HFONT font);
 #endif
 #if OS(LINUX)
+  static void getRenderStyleForStrike(const char* family,
+                                      int sizeAndStyle,
+                                      FontRenderStyle* result);
   static String getFontFamilyForCharacters(const UChar*, size_t numCharacters);
 #endif
 

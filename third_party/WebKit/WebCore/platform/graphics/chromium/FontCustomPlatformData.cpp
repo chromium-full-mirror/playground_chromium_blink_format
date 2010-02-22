@@ -103,7 +103,7 @@ FontPlatformData FontCustomPlatformData::fontPlatformData(
   return FontPlatformData(hfont, size);
 #elif OS(LINUX)
   ASSERT(m_fontReference);
-  return FontPlatformData(m_fontReference, size,
+  return FontPlatformData(m_fontReference, "", size,
                           bold && !m_fontReference->isBold(),
                           italic && !m_fontReference->isItalic());
 #else

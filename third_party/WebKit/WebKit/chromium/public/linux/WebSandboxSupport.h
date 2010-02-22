@@ -36,6 +36,8 @@
 
 namespace WebKit {
 
+struct WebFontRenderStyle;
+
 // Put methods here that are required due to sandbox restrictions.
 class WebSandboxSupport {
  public:
@@ -50,6 +52,9 @@ class WebSandboxSupport {
   // request cannot be satisfied.
   virtual WebString getFontFamilyForCharacters(const WebUChar* characters,
                                                size_t numCharacters) = 0;
+  virtual void getRenderStyleForStrike(const char* family,
+                                       int sizeAndStyle,
+                                       WebFontRenderStyle* style) = 0;
 };
 
 }  // namespace WebKit

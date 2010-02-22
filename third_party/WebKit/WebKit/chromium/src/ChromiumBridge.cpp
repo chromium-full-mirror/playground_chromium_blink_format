@@ -65,6 +65,7 @@
 #if OS(LINUX)
 #include "WebSandboxSupport.h"
 #include "WebFontInfo.h"
+#include "WebFontRenderStyle.h"
 #endif
 
 #if WEBKIT_USING_SKIA
@@ -337,6 +338,20 @@ String ChromiumBridge::getFontFamilyForCharacters(const UChar* characters,
     return WebString::fromUTF8(family.data());
 
   return WebString();
+}
+
+void ChromiumBridge::getRenderStyleForStrike(const char* font,
+                                             int sizeAndStyle,
+                                             FontRenderStyle* result) {
+  WebFontRenderStyle style;
+
+  if (webKitClient()->sandboxSupport())
+    webKitClient()->sandboxSupport()->getRenderStyleForStrike(
+        font, sizeAndStyle, &style);
+  else
+    WebFontInfo::renderStyleForStrike(font, sizeAndStyle, &style);
+
+  style.toFontRenderStyle(result);
 }
 #endif
 

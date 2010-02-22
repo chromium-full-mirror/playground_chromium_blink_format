@@ -31,6 +31,8 @@
 #ifndef FontPlatformDataLinux_h
 #define FontPlatformDataLinux_h
 
+#include "CString.h"
+#include "FontRenderStyle.h"
 #include "StringImpl.h"
 #include <wtf/RefPtr.h>
 #include <SkPaint.h>
@@ -43,7 +45,6 @@ struct HB_FaceRec_;
 namespace WebCore {
 
 class FontDescription;
-class String;
 
 // -----------------------------------------------------------------------------
 // FontPlatformData is the handle which WebKit has on a specific face. A face
@@ -73,7 +74,11 @@ class FontPlatformData {
         m_fakeItalic(fakeItalic) {}
 
   FontPlatformData(const FontPlatformData&);
-  FontPlatformData(SkTypeface*, float textSize, bool fakeBold, bool fakeItalic);
+  FontPlatformData(SkTypeface*,
+                   const char* name,
+                   float textSize,
+                   bool fakeBold,
+                   bool fakeItalic);
   FontPlatformData(const FontPlatformData& src, float textSize);
   ~FontPlatformData();
 
@@ -135,11 +140,15 @@ class FontPlatformData {
     HB_FaceRec_* m_harfbuzzFace;
   };
 
+  void querySystemForRenderStyle();
+
   // FIXME: Could SkAutoUnref be used here?
   SkTypeface* m_typeface;
+  CString m_family;
   float m_textSize;
   bool m_fakeBold;
   bool m_fakeItalic;
+  FontRenderStyle m_style;
   mutable RefPtr<RefCountedHarfbuzzFace> m_harfbuzzFace;
 
   SkTypeface* hashTableDeletedFontValue() const {

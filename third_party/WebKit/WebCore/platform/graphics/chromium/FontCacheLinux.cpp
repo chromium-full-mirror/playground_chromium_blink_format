@@ -140,7 +140,7 @@ FontPlatformData* FontCache::createFontPlatformData(
     return 0;
 
   FontPlatformData* result =
-      new FontPlatformData(tf, fontDescription.computedSize(),
+      new FontPlatformData(tf, name, fontDescription.computedSize(),
                            (style & SkTypeface::kBold) && !tf->isBold(),
                            (style & SkTypeface::kItalic) && !tf->isItalic());
   tf->unref();
