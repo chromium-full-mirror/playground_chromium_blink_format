@@ -23,6 +23,12 @@
 
 #include "JSDOMBinding.h"
 
+namespace JSC {
+namespace Bindings {
+class Instance;
+}
+}
+
 namespace WebCore {
 
 class HTMLElement;
@@ -31,10 +37,8 @@ class Node;
 
 // Runtime object support code for JSHTMLAppletElement, JSHTMLEmbedElement and
 // JSHTMLObjectElement.
+JSC::Bindings::Instance* pluginInstance(Node*);
 
-JSC::JSValue runtimeObjectGetter(JSC::ExecState*,
-                                 const JSC::Identifier&,
-                                 const JSC::PropertySlot&);
 JSC::JSValue runtimeObjectPropertyGetter(JSC::ExecState*,
                                          const JSC::Identifier&,
                                          const JSC::PropertySlot&);
