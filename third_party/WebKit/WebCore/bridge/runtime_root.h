@@ -41,7 +41,7 @@ namespace JSC {
 
 class Interpreter;
 class JSGlobalObject;
-class RuntimeObjectImp;
+class RuntimeObject;
 
 namespace Bindings {
 
@@ -71,8 +71,8 @@ class RootObject : public RefCounted<RootObject> {
   const void* nativeHandle() const;
   JSGlobalObject* globalObject() const;
 
-  void addRuntimeObject(RuntimeObjectImp*);
-  void removeRuntimeObject(RuntimeObjectImp*);
+  void addRuntimeObject(RuntimeObject*);
+  void removeRuntimeObject(RuntimeObject*);
 
   struct InvalidationCallback {
     virtual void operator()(RootObject*) = 0;
@@ -91,7 +91,7 @@ class RootObject : public RefCounted<RootObject> {
   ProtectedPtr<JSGlobalObject> m_globalObject;
 
   ProtectCountSet m_protectCountSet;
-  HashSet<RuntimeObjectImp*> m_runtimeObjects;
+  HashSet<RuntimeObject*> m_runtimeObjects;
 
   HashSet<InvalidationCallback*> m_invalidationCallbacks;
 };

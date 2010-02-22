@@ -99,8 +99,8 @@ void RootObject::invalidate() {
     return;
 
   {
-    HashSet<RuntimeObjectImp*>::iterator end = m_runtimeObjects.end();
-    for (HashSet<RuntimeObjectImp*>::iterator it = m_runtimeObjects.begin();
+    HashSet<RuntimeObject*>::iterator end = m_runtimeObjects.end();
+    for (HashSet<RuntimeObject*>::iterator it = m_runtimeObjects.begin();
          it != end; ++it)
       (*it)->invalidate();
 
@@ -166,14 +166,14 @@ JSGlobalObject* RootObject::globalObject() const {
   return m_globalObject;
 }
 
-void RootObject::addRuntimeObject(RuntimeObjectImp* object) {
+void RootObject::addRuntimeObject(RuntimeObject* object) {
   ASSERT(m_isValid);
   ASSERT(!m_runtimeObjects.contains(object));
 
   m_runtimeObjects.add(object);
 }
 
-void RootObject::removeRuntimeObject(RuntimeObjectImp* object) {
+void RootObject::removeRuntimeObject(RuntimeObject* object) {
   ASSERT(m_isValid);
   ASSERT(m_runtimeObjects.contains(object));
 
