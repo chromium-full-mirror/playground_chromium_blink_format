@@ -426,6 +426,23 @@ static unsigned constrainedAttachedWindowHeight(unsigned preferredHeight,
                      totalWindowHeight * maximumAttachedHeightRatio)));
 }
 
+bool InspectorController::canAttachWindow() const {
+  if (!enabled())
+    return false;
+
+  String attachedHeight = setting(inspectorAttachedHeightName);
+  bool success = true;
+  int height = attachedHeight.toInt(&success);
+  unsigned preferredHeight = success ? height : defaultAttachedHeight;
+
+  unsigned inspectedPageHeight =
+      m_inspectedPage->mainFrame()->view()->visibleHeight();
+
+  // Don't allow the attach if the window is too small to respect what should be
+  // the minimum inspector height.
+  return preferredHeight <= inspectedPageHeight * maximumAttachedHeightRatio;
+}
+
 void InspectorController::attachWindow() {
   if (!enabled())
     return;
@@ -433,12 +450,17 @@ void InspectorController::attachWindow() {
   unsigned inspectedPageHeight =
       m_inspectedPage->mainFrame()->view()->visibleHeight();
 
-  m_client->attachWindow();
-
   String attachedHeight = setting(inspectorAttachedHeightName);
   bool success = true;
   int height = attachedHeight.toInt(&success);
   unsigned preferredHeight = success ? height : defaultAttachedHeight;
+
+  // Don't allow the attach if the window is too small to respect what should be
+  // the minimum inspector height.
+  if (preferredHeight > inspectedPageHeight * maximumAttachedHeightRatio)
+    return;
+
+  m_client->attachWindow();
 
   // We need to constrain the window height here in case the user has resized
   // the inspected page's window so that

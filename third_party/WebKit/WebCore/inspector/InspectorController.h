@@ -159,6 +159,7 @@ class InspectorController
     return m_consoleMessages;
   }
 
+  bool canAttachWindow() const;
   void attachWindow();
   void detachWindow();
 
