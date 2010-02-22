@@ -190,10 +190,24 @@ class RenderThemeQt : public RenderTheme {
   virtual bool paintMediaSliderThumb(RenderObject*,
                                      const RenderObject::PaintInfo&,
                                      const IntRect&);
+  virtual bool paintMediaCurrentTime(RenderObject*,
+                                     const RenderObject::PaintInfo&,
+                                     const IntRect&);
+  virtual bool paintMediaVolumeSliderTrack(RenderObject*,
+                                           const RenderObject::PaintInfo&,
+                                           const IntRect&);
+  virtual bool paintMediaVolumeSliderThumb(RenderObject*,
+                                           const RenderObject::PaintInfo&,
+                                           const IntRect&);
+  virtual String formatMediaControlsCurrentTime(float currentTime,
+                                                float duration) const;
+  virtual String formatMediaControlsRemainingTime(float currentTime,
+                                                  float duration) const;
 
  private:
   HTMLMediaElement* getMediaElementFromRenderObject(RenderObject* o) const;
   void paintMediaBackground(QPainter* painter, const IntRect& r) const;
+  double mediaControlsBaselineOpacity() const;
   QColor getMediaControlForegroundColor(RenderObject* o = 0) const;
 #endif
   void computeSizeBasedOnStyle(RenderStyle* renderStyle) const;
