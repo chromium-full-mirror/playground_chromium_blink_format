@@ -34,7 +34,8 @@ namespace WebCore {
 
 class ResourceResponse : public ResourceResponseBase {
  public:
-  ResourceResponse() : ResourceResponseBase() {}
+  ResourceResponse()
+      : ResourceResponseBase(), m_soupFlags(static_cast<SoupMessageFlags>(0)) {}
 
   ResourceResponse(const KURL& url,
                    const String& mimeType,
@@ -47,15 +48,23 @@ class ResourceResponse : public ResourceResponseBase {
                              textEncodingName,
                              filename) {}
 
-  ResourceResponse(SoupMessage* soupMessage) : ResourceResponseBase() {
+  ResourceResponse(SoupMessage* soupMessage)
+      : ResourceResponseBase(), m_soupFlags(static_cast<SoupMessageFlags>(0)) {
     updateFromSoupMessage(soupMessage);
   }
 
   SoupMessage* toSoupMessage() const;
   void updateFromSoupMessage(SoupMessage* soupMessage);
 
+  SoupMessageFlags soupMessageFlags() const { return m_soupFlags; }
+  void setSoupMessageFlags(SoupMessageFlags soupFlags) {
+    m_soupFlags = soupFlags;
+  }
+
  private:
   friend class ResourceResponseBase;
+
+  SoupMessageFlags m_soupFlags;
 
   void doUpdateResourceResponse() {}
 };
