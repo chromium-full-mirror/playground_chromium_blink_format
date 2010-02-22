@@ -44,6 +44,7 @@
 #include "PluginView.h"
 #include "ScriptBreakpoint.h"
 #include "ScriptController.h"
+#include "ScriptDebugListener.h"
 #include "ScrollView.h"
 #include "Widget.h"
 #include <debugger/DebuggerCallFrame.h>
@@ -75,7 +76,7 @@ ScriptDebugServer::~ScriptDebugServer() {
   deleteAllValues(m_pageListenersMap);
 }
 
-void ScriptDebugServer::addListener(Listener* listener, Page* page) {
+void ScriptDebugServer::addListener(ScriptDebugListener* listener, Page* page) {
   ASSERT_ARG(listener, listener);
   ASSERT_ARG(page, page);
 
@@ -90,7 +91,8 @@ void ScriptDebugServer::addListener(Listener* listener, Page* page) {
   didAddListener(page);
 }
 
-void ScriptDebugServer::removeListener(Listener* listener, Page* page) {
+void ScriptDebugServer::removeListener(ScriptDebugListener* listener,
+                                       Page* page) {
   ASSERT_ARG(listener, listener);
   ASSERT_ARG(page, page);
 
@@ -233,7 +235,7 @@ void ScriptDebugServer::dispatchDidParseSource(const ListenerSet& listeners,
   String data = JSC::UString(source.data(), source.length());
   int firstLine = source.firstLine();
 
-  Vector<Listener*> copy;
+  Vector<ScriptDebugListener*> copy;
   copyToVector(listeners, copy);
   for (size_t i = 0; i < copy.size(); ++i)
     copy[i]->didParseSource(sourceID, url, data, firstLine);
@@ -248,7 +250,7 @@ void ScriptDebugServer::dispatchFailedToParseSource(
   String data = JSC::UString(source.data(), source.length());
   int firstLine = source.firstLine();
 
-  Vector<Listener*> copy;
+  Vector<ScriptDebugListener*> copy;
   copyToVector(listeners, copy);
   for (size_t i = 0; i < copy.size(); ++i)
     copy[i]->failedToParseSource(url, data, firstLine, errorLine, errorMessage);
@@ -314,7 +316,7 @@ void ScriptDebugServer::sourceParsed(ExecState* exec,
 void ScriptDebugServer::dispatchFunctionToListeners(
     const ListenerSet& listeners,
     JavaScriptExecutionCallback callback) {
-  Vector<Listener*> copy;
+  Vector<ScriptDebugListener*> copy;
   copyToVector(listeners, copy);
   for (size_t i = 0; i < copy.size(); ++i)
     (copy[i]->*callback)();
@@ -422,7 +424,7 @@ void ScriptDebugServer::pauseIfNeeded(Page* page) {
   m_pauseOnNextStatement = false;
   m_paused = true;
 
-  dispatchFunctionToListeners(&Listener::didPause, page);
+  dispatchFunctionToListeners(&ScriptDebugListener::didPause, page);
 
   setJavaScriptPaused(page->group(), true);
 
@@ -437,7 +439,7 @@ void ScriptDebugServer::pauseIfNeeded(Page* page) {
 
   m_paused = false;
 
-  dispatchFunctionToListeners(&Listener::didContinue, page);
+  dispatchFunctionToListeners(&ScriptDebugListener::didContinue, page);
 }
 
 void ScriptDebugServer::callEvent(const DebuggerCallFrame& debuggerCallFrame,
