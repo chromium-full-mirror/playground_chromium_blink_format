@@ -249,7 +249,7 @@ void cacheDOMObjectWrapper(JSC::ExecState*,
 void forgetDOMNode(JSNode* wrapper, Node* node, Document* document);
 void forgetDOMObject(DOMObject* wrapper, void* objectHandle);
 
-JSNode* getCachedDOMNodeWrapper(JSC::ExecState*, Document*, Node*);
+JSNode* getCachedDOMNodeWrapper(JSC::ExecState*, Node*);
 void cacheDOMNodeWrapper(JSC::ExecState*, Document*, Node*, JSNode* wrapper);
 void forgetAllDOMNodesForDocument(Document*);
 void forgetWorldOfDOMNodesForDocument(Document*, DOMWrapperWorld*);
@@ -536,6 +536,10 @@ inline JSC::JSValue jsString(JSC::ExecState* exec, const String& s) {
     return wrapper;
 
   return jsStringSlowCase(exec, stringCache, stringImpl);
+}
+
+inline DOMObjectWrapperMap& domObjectWrapperMapFor(JSC::ExecState* exec) {
+  return currentWorld(exec)->m_wrappers;
 }
 
 }  // namespace WebCore
