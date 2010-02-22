@@ -466,7 +466,6 @@ class RenderBlock : public RenderBox {
   // a first-line style to our inline
   // children.
   virtual RenderBlock* firstLineBlock() const;
-  bool inRootBlockContext() const;
 
   virtual IntRect rectWithOutlineForRepaint(
       RenderBoxModelObject* repaintContainer,
