@@ -182,6 +182,10 @@ inline bool operator!=(const IntPoint& a, const IntPoint& b) {
   return a.x() != b.x() || a.y() != b.y();
 }
 
+inline IntPoint toPoint(const IntSize& size) {
+  return IntPoint(size.width(), size.height());
+}
+
 #if PLATFORM(QT)
 inline QDataStream& operator<<(QDataStream& stream, const IntPoint& point) {
   stream << point.x() << point.y();

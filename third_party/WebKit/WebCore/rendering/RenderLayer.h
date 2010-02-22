@@ -226,6 +226,8 @@ class RenderLayer : public ScrollbarClient {
 
   int width() const { return m_width; }
   int height() const { return m_height; }
+  IntSize size() const { return IntSize(m_width, m_height); }
+
   void setWidth(int w) { m_width = w; }
   void setHeight(int h) { m_height = h; }
 
@@ -236,8 +238,7 @@ class RenderLayer : public ScrollbarClient {
 
   // Scrolling methods for layers that can scroll their overflow.
   void scrollByRecursively(int xDelta, int yDelta);
-  void addScrolledContentOffset(int& x, int& y) const;
-  void subtractScrolledContentOffset(int& x, int& y) const;
+
   IntSize scrolledContentOffset() const {
     return IntSize(scrollXOffset() + m_scrollLeftOverflow, scrollYOffset());
   }

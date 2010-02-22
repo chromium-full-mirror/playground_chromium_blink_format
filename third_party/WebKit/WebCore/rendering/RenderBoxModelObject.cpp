@@ -513,7 +513,9 @@ void RenderBoxModelObject::paintFillLayerExtended(
 
     // Now adjust our tx, ty, w, h to reflect a scrolled content box with
     // borders at the ends.
-    layer()->subtractScrolledContentOffset(tx, ty);
+    IntSize offset = layer()->scrolledContentOffset();
+    tx -= offset.width();
+    ty -= offset.height();
     w = bLeft + layer()->scrollWidth() + bRight;
     h = borderTop() + layer()->scrollHeight() + borderBottom();
   }

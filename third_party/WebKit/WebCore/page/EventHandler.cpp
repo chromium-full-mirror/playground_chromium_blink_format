@@ -2556,7 +2556,7 @@ bool EventHandler::handleDrag(const MouseEventWithHitTestResults& event) {
         FloatPoint absPos = renderer->localToAbsolute();
         IntSize delta = m_mouseDownPos - roundedIntPoint(absPos);
         dragState().m_dragClipboard->setDragImageElement(
-            dragState().m_dragSrc.get(), IntPoint() + delta);
+            dragState().m_dragSrc.get(), toPoint(delta));
       } else {
         // The renderer has disappeared, this can happen if the onStartDrag
         // handler has hidden
