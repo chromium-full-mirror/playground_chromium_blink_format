@@ -57,8 +57,7 @@ class StringBuilder {
 
   UString build() {
     buffer.shrinkToFit();
-    if (buffer.size() && !buffer.data())
-      CRASH();
+    ASSERT(buffer.data() || !buffer.size());
     return UString::adopt(buffer);
   }
 
