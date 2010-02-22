@@ -38,7 +38,8 @@ namespace JSC {
 
 class IdentifierTable;
 
-typedef CrossThreadRefCounted<OwnFastMallocPtr<UChar>> SharedUChar;
+typedef OwnFastMallocPtr<const UChar> SharableUChar;
+typedef CrossThreadRefCounted<SharableUChar> SharedUChar;
 
 class UStringOrRopeImpl : public Noncopyable {
  public:
@@ -131,7 +132,7 @@ class UStringImpl : public UStringOrRopeImpl {
   }
 
   static PassRefPtr<UStringImpl> create(PassRefPtr<SharedUChar> sharedBuffer,
-                                        UChar* buffer,
+                                        const UChar* buffer,
                                         unsigned length) {
     return adoptRef(new UStringImpl(buffer, length, sharedBuffer));
   }
@@ -171,7 +172,7 @@ class UStringImpl : public UStringOrRopeImpl {
   }
 
   SharedUChar* sharedBuffer();
-  UChar* data() const { return m_data; }
+  const UChar* data() const { return m_data; }
   size_t cost() {
     // For substrings, return the cost of the base string.
     if (bufferOwnership() == BufferSubstring)
@@ -259,7 +260,7 @@ class UStringImpl : public UStringOrRopeImpl {
   }
 
   // Used to construct normal strings with an external buffer.
-  UStringImpl(UChar* data, unsigned length)
+  UStringImpl(const UChar* data, unsigned length)
       : UStringOrRopeImpl(length, BufferOwned),
         m_data(data),
         m_buffer(0),
@@ -273,7 +274,7 @@ class UStringImpl : public UStringOrRopeImpl {
   // important because
   // static strings will be shared across threads & ref-counted in a
   // non-threadsafe manner.
-  UStringImpl(UChar* data, unsigned length, StaticStringConstructType)
+  UStringImpl(const UChar* data, unsigned length, StaticStringConstructType)
       : UStringOrRopeImpl(length, ConstructStaticString),
         m_data(data),
         m_buffer(0),
@@ -282,7 +283,7 @@ class UStringImpl : public UStringOrRopeImpl {
   }
 
   // Used to create new strings that are a substring of an existing string.
-  UStringImpl(UChar* data, unsigned length, PassRefPtr<UStringImpl> base)
+  UStringImpl(const UChar* data, unsigned length, PassRefPtr<UStringImpl> base)
       : UStringOrRopeImpl(length, BufferSubstring),
         m_data(data),
         m_bufferSubstring(base.releaseRef()),
@@ -298,7 +299,7 @@ class UStringImpl : public UStringOrRopeImpl {
   }
 
   // Used to construct new strings sharing an existing shared buffer.
-  UStringImpl(UChar* data,
+  UStringImpl(const UChar* data,
               unsigned length,
               PassRefPtr<SharedUChar> sharedBuffer)
       : UStringOrRopeImpl(length, BufferShared),
@@ -328,7 +329,7 @@ class UStringImpl : public UStringOrRopeImpl {
   bool isStatic() const { return m_refCountAndFlags & s_refCountFlagStatic; }
 
   // unshared data
-  UChar* m_data;
+  const UChar* m_data;
   union {
     void* m_buffer;
     UStringImpl* m_bufferSubstring;

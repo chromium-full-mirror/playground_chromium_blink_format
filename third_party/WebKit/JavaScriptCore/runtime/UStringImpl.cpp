@@ -80,7 +80,7 @@ SharedUChar* UStringImpl::baseSharedBuffer() {
     m_refCountAndFlags =
         (m_refCountAndFlags & ~s_refCountMaskBufferOwnership) | BufferShared;
     m_bufferShared =
-        SharedUChar::create(new OwnFastMallocPtr<UChar>(m_data)).releaseRef();
+        SharedUChar::create(new SharableUChar(m_data)).releaseRef();
   }
 
   return m_bufferShared;
@@ -107,7 +107,7 @@ UStringImpl::~UStringImpl() {
 
   if (bufferOwnership() != BufferInternal) {
     if (bufferOwnership() == BufferOwned)
-      fastFree(m_data);
+      fastFree(const_cast<UChar*>(m_data));
     else if (bufferOwnership() == BufferSubstring)
       m_bufferSubstring->deref();
     else {

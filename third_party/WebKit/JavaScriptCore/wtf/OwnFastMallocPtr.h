@@ -32,7 +32,10 @@ class OwnFastMallocPtr : public Noncopyable {
  public:
   explicit OwnFastMallocPtr(T* ptr) : m_ptr(ptr) {}
 
-  ~OwnFastMallocPtr() { fastFree(m_ptr); }
+  ~OwnFastMallocPtr() {
+    fastFree(const_cast<void*>(
+        static_cast<const void*>(const_cast<const T*>(m_ptr))));
+  }
 
   T* get() const { return m_ptr; }
   T* release() {
