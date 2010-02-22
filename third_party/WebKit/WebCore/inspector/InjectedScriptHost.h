@@ -74,9 +74,6 @@ class InjectedScriptHost : public RefCounted<InjectedScriptHost> {
   void addNodesToSearchResult(const String& nodeIds);
   long pushNodeByPathToFrontend(const String& path);
 
-#if ENABLE(JAVASCRIPT_DEBUGGER) && USE(JSC)
-  JavaScriptCallFrame* currentCallFrame() const;
-#endif
 #if ENABLE(DATABASE)
   Database* databaseForId(long databaseId);
   void selectDatabase(Database* database);

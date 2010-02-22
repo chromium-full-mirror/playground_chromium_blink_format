@@ -67,8 +67,8 @@
 
 #if ENABLE(JAVASCRIPT_DEBUGGER)
 #include "JavaScriptCallFrame.h"
-#include "JavaScriptDebugServer.h"
 #include "JSJavaScriptCallFrame.h"
+#include "ScriptDebugServer.h"
 #endif
 
 using namespace JSC;
@@ -123,10 +123,10 @@ JSValue JSInjectedScriptHost::databaseForId(ExecState* exec,
 #endif
 
 #if ENABLE(JAVASCRIPT_DEBUGGER)
-
 JSValue JSInjectedScriptHost::currentCallFrame(ExecState* exec,
                                                const ArgList&) {
-  JavaScriptCallFrame* callFrame = impl()->currentCallFrame();
+  JavaScriptCallFrame* callFrame =
+      ScriptDebugServer::shared().currentCallFrame();
   if (!callFrame || !callFrame->isValid())
     return jsUndefined();
 
@@ -138,7 +138,6 @@ JSValue JSInjectedScriptHost::isActivation(ExecState*, const ArgList& args) {
   JSObject* object = args.at(0).getObject();
   return jsBoolean(object && object->isActivationObject());
 }
-
 #endif
 
 JSValue JSInjectedScriptHost::nodeForId(ExecState* exec, const ArgList& args) {

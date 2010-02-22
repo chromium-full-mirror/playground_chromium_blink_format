@@ -71,8 +71,8 @@
 #include "StorageNamespace.h"
 #endif
 
-#if ENABLE(JAVASCRIPT_DEBUGGER) && USE(JSC)
-#include "JavaScriptDebugServer.h"
+#if ENABLE(JAVASCRIPT_DEBUGGER)
+#include "ScriptDebugServer.h"
 #endif
 
 #if ENABLE(WML)
@@ -193,8 +193,8 @@ Page::Page(ChromeClient* chromeClient,
     m_pluginHalter->setPluginAllowedRunTime(m_settings->pluginAllowedRunTime());
   }
 
-#if ENABLE(JAVASCRIPT_DEBUGGER) && USE(JSC)
-  JavaScriptDebugServer::shared().pageCreated(this);
+#if ENABLE(JAVASCRIPT_DEBUGGER)
+  ScriptDebugServer::shared().pageCreated(this);
 #endif
 
 #ifndef NDEBUG

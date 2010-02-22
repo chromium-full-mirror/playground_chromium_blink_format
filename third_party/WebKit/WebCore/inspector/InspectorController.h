@@ -47,12 +47,8 @@
 #include <wtf/RefCounted.h>
 #include <wtf/Vector.h>
 
-#if ENABLE(JAVASCRIPT_DEBUGGER) && USE(JSC)
-#include "JavaScriptDebugListener.h"
-
-namespace JSC {
-class UString;
-}
+#if ENABLE(JAVASCRIPT_DEBUGGER)
+#include "ScriptDebugServer.h"
 #endif
 
 namespace WebCore {
@@ -90,8 +86,8 @@ class InspectorDOMStorageResource;
 class InspectorResource;
 
 class InspectorController
-#if ENABLE(JAVASCRIPT_DEBUGGER) && USE(JSC)
-    : JavaScriptDebugListener,
+#if ENABLE(JAVASCRIPT_DEBUGGER)
+    : ScriptDebugServer::Listener,
       public Noncopyable
 #else
     : public Noncopyable
@@ -277,18 +273,22 @@ class InspectorController
   bool profilerEnabled() const { return enabled() && m_profilerEnabled; }
 #endif
 
-#if ENABLE(JAVASCRIPT_DEBUGGER) && USE(JSC)
+#if ENABLE(JAVASCRIPT_DEBUGGER)
   void enableDebugger();
   void disableDebugger(bool always = false);
   bool debuggerEnabled() const { return m_debuggerEnabled; }
 
   void resumeDebugger();
 
-  virtual void didParseSource(JSC::ExecState*, const JSC::SourceCode&);
-  virtual void failedToParseSource(JSC::ExecState*,
-                                   const JSC::SourceCode&,
+  virtual void didParseSource(const String& sourceID,
+                              const String& url,
+                              const String& data,
+                              int firstLine);
+  virtual void failedToParseSource(const String& url,
+                                   const String& data,
+                                   int firstLine,
                                    int errorLine,
-                                   const JSC::UString& errorMessage);
+                                   const String& errorMessage);
   virtual void didPause();
   virtual void didContinue();
 #endif
@@ -315,6 +315,12 @@ class InspectorController
   void deleteCookie(const String& cookieName, const String& domain);
 
 #if ENABLE(JAVASCRIPT_DEBUGGER)
+  void setBreakpoint(const String& sourceID,
+                     unsigned lineNumber,
+                     bool enabled,
+                     const String& condition);
+  void removeBreakpoint(const String& sourceID, unsigned lineNumber);
+
   typedef HashMap<unsigned int, RefPtr<ScriptProfile>> ProfilesMap;
 
   void startUserInitiatedProfilingSoon();
@@ -392,11 +398,12 @@ class InspectorController
   mutable Settings m_settings;
 
   Vector<pair<long, String>> m_pendingEvaluateTestCommands;
-#if ENABLE(JAVASCRIPT_DEBUGGER) && USE(JSC)
+#if ENABLE(JAVASCRIPT_DEBUGGER)
   bool m_debuggerEnabled;
   bool m_attachDebuggerWhenShown;
-#endif
-#if ENABLE(JAVASCRIPT_DEBUGGER)
+  HashMap<String, String> m_sourceIDToURL;
+  HashMap<String, SourceBreakpoints> m_stickyBreakpoints;
+
   bool m_profilerEnabled;
   bool m_recordingUserInitiatedProfile;
   int m_currentUserInitiatedProfileNumber;
