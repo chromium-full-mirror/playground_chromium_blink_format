@@ -2442,9 +2442,8 @@ void RenderLayer::paintLayer(
     int x = 0;
     int y = 0;
     convertToLayerCoords(rootLayer, x, y);
-    TransformationMatrix transform;
-    transform.translate(x, y);
-    transform = layerTransform * transform;
+    TransformationMatrix transform(layerTransform);
+    transform.translateRight(x, y);
 
     // Apply the transform.
     p->save();
