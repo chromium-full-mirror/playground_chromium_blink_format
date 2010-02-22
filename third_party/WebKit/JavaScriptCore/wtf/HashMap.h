@@ -163,9 +163,10 @@ struct HashMapTranslatorAdapter {
   }
   static void translate(ValueType& location,
                         const T& key,
-                        const MappedType&,
+                        const MappedType& mapped,
                         unsigned hashCode) {
     Translator::translate(location.first, key, hashCode);
+    location.second = mapped;
   }
 };
 
