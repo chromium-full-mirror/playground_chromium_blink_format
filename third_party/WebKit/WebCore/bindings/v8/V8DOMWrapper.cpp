@@ -279,6 +279,7 @@ PassRefPtr<NodeFilter> V8DOMWrapper::wrapNativeNodeFilter(
 
 static bool globalObjectPrototypeIsDOMWindow(
     v8::Handle<v8::Object> objectPrototype) {
+#if ENABLE(SHARED_WORKERS)
   // We can identify what type of context the global object is wrapping by
   // looking at the
   // internal field count of its prototype. This assumes WorkerContexts and
@@ -291,6 +292,7 @@ static bool globalObjectPrototypeIsDOMWindow(
           V8DOMWindow::internalFieldCount !=
               V8SharedWorkerContext::internalFieldCount,
       DOMWindowAndWorkerContextHaveUnequalFieldCounts);
+#endif
   return objectPrototype->InternalFieldCount() ==
          V8DOMWindow::internalFieldCount;
 }
