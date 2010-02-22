@@ -68,6 +68,7 @@ class ScriptDebugServer : JSC::Debugger, public Noncopyable {
                      ScriptBreakpoint breakpoint);
   void removeBreakpoint(const String& sourceID, unsigned lineNumber);
   void clearBreakpoints();
+  void setBreakpointsActivated(bool activated);
 
   enum PauseOnExceptionsState {
     DontPauseOnExceptions,
@@ -167,6 +168,7 @@ class ScriptDebugServer : JSC::Debugger, public Noncopyable {
   bool m_pauseOnNextStatement;
   bool m_paused;
   bool m_doneProcessingDebuggerEvents;
+  bool m_breakpointsActivated;
   JavaScriptCallFrame* m_pauseOnCallFrame;
   RefPtr<JavaScriptCallFrame> m_currentCallFrame;
   BreakpointsMap m_breakpoints;

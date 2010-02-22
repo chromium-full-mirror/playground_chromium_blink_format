@@ -56,6 +56,7 @@ class ScriptDebugServer : public Noncopyable {
                      ScriptBreakpoint breakpoint) {}
   void removeBreakpoint(const String& sourceID, unsigned lineNumber) {}
   void clearBreakpoints() {}
+  void setBreakpointsActivated(bool activated) {}
 
   enum PauseOnExceptionsState {
     DontPauseOnExceptions,
