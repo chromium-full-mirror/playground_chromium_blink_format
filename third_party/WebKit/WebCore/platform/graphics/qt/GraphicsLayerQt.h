@@ -74,6 +74,7 @@ class GraphicsLayerQt : public GraphicsLayer {
   virtual void suspendAnimations(double time);
   virtual void resumeAnimations();
   virtual void setContentsToImage(Image*);
+  virtual void setContentsToMedia(PlatformLayer*);
   virtual void setContentsBackgroundColor(const Color&);
   virtual void setGeometryOrientation(
       CompositingCoordinatesOrientation orientation);

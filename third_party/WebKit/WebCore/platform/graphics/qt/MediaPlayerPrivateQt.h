@@ -82,6 +82,18 @@ class MediaPlayerPrivate : public QObject, public MediaPlayerPrivateInterface {
 
   bool supportsFullscreen() const { return false; }
 
+#if USE(ACCELERATED_COMPOSITING)
+  // whether accelerated rendering is supported by the media engine for the
+  // current media.
+  virtual bool supportsAcceleratedRendering() const { return true; }
+  // called when the rendering system flips the into or out of accelerated
+  // rendering mode.
+  virtual void acceleratedRenderingStateChanged();
+  // returns an object that can be directly composited via GraphicsLayerQt
+  // (essentially a QGraphicsItem*)
+  virtual PlatformLayer* platformLayer() const;
+#endif
+
  private slots:
   void mediaStatusChanged(QMediaPlayer::MediaStatus);
   void handleError(QMediaPlayer::Error);
@@ -113,6 +125,7 @@ class MediaPlayerPrivate : public QObject, public MediaPlayerPrivateInterface {
   IntSize m_currentSize;
   bool m_isVisible;
   bool m_isSeeking;
+  bool m_composited;
   qint64 m_queuedSeek;
 };
 }
