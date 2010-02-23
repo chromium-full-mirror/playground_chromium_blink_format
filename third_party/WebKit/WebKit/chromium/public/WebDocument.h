@@ -47,6 +47,7 @@ namespace WebKit {
 class WebElement;
 class WebFrame;
 class WebNodeCollection;
+class WebNodeList;
 class WebString;
 class WebURL;
 
@@ -74,6 +75,7 @@ class WebDocument : public WebNode {
   WEBKIT_API WebNodeCollection all();
   WEBKIT_API WebURL completeURL(const WebString&) const;
   WEBKIT_API WebElement getElementById(const WebString& id) const;
+  WEBKIT_API WebNodeList getElementsByTagName(const WebString&);
   WEBKIT_API WebString applicationID() const;
 
 #if WEBKIT_IMPLEMENTATION
