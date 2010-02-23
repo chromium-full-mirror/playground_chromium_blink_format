@@ -179,6 +179,7 @@ class WebChromeClient : public WebCore::ChromeClient {
 
   virtual void requestGeolocationPermissionForFrame(WebCore::Frame*,
                                                     WebCore::Geolocation*);
+  virtual void cancelGeolocationPermissionRequestForFrame(WebCore::Frame*) {}
 
 #if ENABLE(VIDEO)
   virtual bool supportsFullscreenForNode(const WebCore::Node*);

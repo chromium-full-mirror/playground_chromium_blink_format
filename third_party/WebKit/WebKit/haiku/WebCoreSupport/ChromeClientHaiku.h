@@ -150,9 +150,9 @@ class ChromeClientHaiku : public ChromeClient {
 
   // This is an asynchronous call. The ChromeClient can display UI asking the
   // user for permission
-  // to use Geolococation. The ChromeClient must call
-  // Geolocation::setShouldClearCache() appropriately.
+  // to use Geolococation.
   void requestGeolocationPermissionForFrame(Frame*, Geolocation*);
+  void cancelGeolocationPermissionRequestForFrame(Frame*) {}
 
   void runOpenPanel(Frame*, PassRefPtr<FileChooser>);
   void iconForFiles(const Vector<String>&, PassRefPtr<FileChooser>);
