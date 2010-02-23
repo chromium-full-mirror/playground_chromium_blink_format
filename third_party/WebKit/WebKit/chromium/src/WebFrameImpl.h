@@ -177,6 +177,7 @@ class WebFrameImpl : public WebFrame, public RefCounted<WebFrameImpl> {
   virtual int pageNumberForElementById(const WebString& id,
                                        float pageWidthInPixels,
                                        float pageHeightInPixels) const;
+  virtual WebRect selectionBoundsRect() const;
 
   static PassRefPtr<WebFrameImpl> create(WebFrameClient* client);
   ~WebFrameImpl();
