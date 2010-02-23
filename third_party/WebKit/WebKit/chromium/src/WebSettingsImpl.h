@@ -84,7 +84,6 @@ class WebSettingsImpl : public WebSettings {
   virtual void setTextDirectionSubmenuInclusionBehaviorNeverIncluded();
   virtual void setOfflineWebApplicationCacheEnabled(bool);
   virtual void setExperimentalWebGLEnabled(bool);
-  virtual void setGeolocationEnabled(bool);
   virtual void setShowDebugBorders(bool);
 
  private:
