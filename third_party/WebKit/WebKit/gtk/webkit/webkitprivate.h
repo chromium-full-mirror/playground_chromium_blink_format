@@ -313,6 +313,10 @@ WEBKIT_API int webkit_web_frame_page_number_for_element_by_id(
     float pageWidth,
     float pageHeight);
 
+WEBKIT_API int webkit_web_frame_number_of_pages(WebKitWebFrame* frame,
+                                                float pageWidth,
+                                                float pageHeight);
+
 WEBKIT_API guint
 webkit_web_frame_get_pending_unload_event_count(WebKitWebFrame* frame);
 

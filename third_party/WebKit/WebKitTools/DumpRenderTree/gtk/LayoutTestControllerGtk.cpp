@@ -73,6 +73,9 @@ int webkit_web_frame_page_number_for_element_by_id(WebKitWebFrame* frame,
                                                    const gchar* id,
                                                    float pageWidth,
                                                    float pageHeight);
+int webkit_web_frame_number_of_pages(WebKitWebFrame* frame,
+                                     float pageWidth,
+                                     float pageHeight);
 void webkit_web_inspector_execute_script(WebKitWebInspector* inspector,
                                          long callId,
                                          const gchar* script);
@@ -170,9 +173,8 @@ int LayoutTestController::pageNumberForElementById(JSStringRef id,
   return pageNumber;
 }
 
-int LayoutTestController::numberOfPages(float, float) {
-  // FIXME: implement
-  return -1;
+int LayoutTestController::numberOfPages(float pageWidth, float pageHeight) {
+  return webkit_web_frame_number_of_pages(mainFrame, pageWidth, pageHeight);
 }
 
 size_t LayoutTestController::webHistoryItemCount() {
