@@ -89,6 +89,12 @@ void InspectorFrontendHost::windowUnloading() {
     m_inspectorController->close();
 }
 
+bool InspectorFrontendHost::canAttachWindow() const {
+  if (m_inspectorController)
+    return m_inspectorController->canAttachWindow();
+  return false;
+}
+
 void InspectorFrontendHost::setAttachedWindowHeight(unsigned height) {
   if (m_inspectorController)
     m_inspectorController->setAttachedWindowHeight(height);
