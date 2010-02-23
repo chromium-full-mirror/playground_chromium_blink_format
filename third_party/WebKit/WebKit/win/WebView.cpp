@@ -3275,12 +3275,25 @@ HRESULT STDMETHODCALLTYPE WebView::preferencesIdentifier(
   return E_NOTIMPL;
 }
 
+static void systemParameterChanged(WPARAM parameter) {
+#if PLATFORM(CG)
+  if (parameter == SPI_SETFONTSMOOTHING ||
+      parameter == SPI_SETFONTSMOOTHINGTYPE ||
+      parameter == SPI_SETFONTSMOOTHINGCONTRAST ||
+      parameter == SPI_SETFONTSMOOTHINGORIENTATION)
+    wkSystemFontSmoothingChanged();
+#endif
+}
+
 void WebView::windowReceivedMessage(HWND, UINT message, WPARAM wParam, LPARAM) {
   switch (message) {
     case WM_NCACTIVATE:
       updateActiveStateSoon();
       if (!wParam)
         deleteBackingStoreSoon();
+      break;
+    case WM_SETTINGCHANGE:
+      systemParameterChanged(wParam);
       break;
   }
 }

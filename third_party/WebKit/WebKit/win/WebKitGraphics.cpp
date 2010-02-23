@@ -192,11 +192,3 @@ void WebKitSetShouldUseFontSmoothing(bool smooth) {
 bool WebKitShouldUseFontSmoothing() {
   return WebCoreShouldUseFontSmoothing();
 }
-
-void WebKitSystemParameterChanged(UINT parameter) {
-  if (parameter == SPI_SETFONTSMOOTHING ||
-      parameter == SPI_SETFONTSMOOTHINGTYPE ||
-      parameter == SPI_SETFONTSMOOTHINGCONTRAST ||
-      parameter == SPI_SETFONTSMOOTHINGORIENTATION)
-    wkSystemFontSmoothingChanged();
-}
