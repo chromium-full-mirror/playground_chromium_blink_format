@@ -43,7 +43,6 @@ class OwnPtr : public Noncopyable {
   typedef ValueType* PtrType;
 
   explicit OwnPtr(PtrType ptr = 0) : m_ptr(ptr) {}
-  OwnPtr(std::auto_ptr<ValueType> autoPtr) : m_ptr(autoPtr.release()) {}
   // See comment in PassOwnPtr.h for why this takes a const reference.
   template <typename U>
   OwnPtr(const PassOwnPtr<U>& o);
@@ -68,12 +67,6 @@ class OwnPtr : public Noncopyable {
     ASSERT(!ptr || m_ptr != ptr);
     deleteOwnedPtr(m_ptr);
     m_ptr = ptr;
-  }
-
-  void adopt(std::auto_ptr<ValueType> autoPtr) {
-    ASSERT(!autoPtr.get() || m_ptr != autoPtr.get());
-    deleteOwnedPtr(m_ptr);
-    m_ptr = autoPtr.release();
   }
 
   void clear() {

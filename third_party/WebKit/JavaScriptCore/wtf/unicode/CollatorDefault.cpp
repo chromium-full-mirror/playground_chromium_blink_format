@@ -39,8 +39,8 @@ Collator::~Collator() {}
 
 void Collator::setOrderLowerFirst(bool) {}
 
-std::auto_ptr<Collator> Collator::userDefault() {
-  return std::auto_ptr<Collator>(new Collator(0));
+PassOwnPtr<Collator> Collator::userDefault() {
+  return new Collator(0);
 }
 
 // A default implementation for platforms that lack Unicode-aware collation.
