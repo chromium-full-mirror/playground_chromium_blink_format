@@ -43,7 +43,6 @@
 #include <QDebug>
 
 #include <cstdio>
-#include "mainwindow.h"
 #include <qevent.h>
 #include <qwebelement.h>
 #include <qwebframe.h>
@@ -54,6 +53,7 @@
 #include <qx11info_x11.h>
 #endif
 
+#include "mainwindow.h"
 #include "urlloader.h"
 #include "utils.h"
 #include "webinspector.h"
