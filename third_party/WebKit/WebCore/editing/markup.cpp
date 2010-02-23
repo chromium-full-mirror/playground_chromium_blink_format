@@ -1189,12 +1189,9 @@ PassRefPtr<DocumentFragment> createFragmentFromMarkup(
     const String& markup,
     const String& baseURL,
     FragmentScriptingPermission scriptingPermission) {
-  ASSERT(document->documentElement()->isHTMLElement());
-  // FIXME: What if the document element is not an HTML element?
-  HTMLElement* element = static_cast<HTMLElement*>(document->documentElement());
-
   RefPtr<DocumentFragment> fragment =
-      element->createContextualFragment(markup, scriptingPermission);
+      document->documentElement()->createContextualFragment(
+          markup, scriptingPermission);
 
   if (fragment && !baseURL.isEmpty() && baseURL != blankURL() &&
       baseURL != document->baseURL())
