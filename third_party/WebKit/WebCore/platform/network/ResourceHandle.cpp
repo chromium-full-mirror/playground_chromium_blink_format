@@ -111,6 +111,10 @@ const ResourceRequest& ResourceHandle::request() const {
   return d->m_request;
 }
 
+const String& ResourceHandle::lastHTTPMethod() const {
+  return d->m_lastHTTPMethod;
+}
+
 void ResourceHandle::clearAuthentication() {
 #if PLATFORM(MAC)
   d->m_currentMacChallenge = nil;
