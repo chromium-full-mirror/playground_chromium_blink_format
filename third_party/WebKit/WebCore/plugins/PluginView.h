@@ -244,7 +244,9 @@ class PluginView : public Widget,
 
   bool start();
 
+#if ENABLE(NETSCAPE_PLUGIN_API)
   static void keepAlive(NPP);
+#endif
   void keepAlive();
 
  private:
