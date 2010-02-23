@@ -89,7 +89,7 @@
 #if USE(PTHREADS)
 #include <pthread.h>
 #elif PLATFORM(GTK)
-#include <wtf/gtk/GOwnPtr.h>
+#include "GOwnPtr.h"
 typedef struct _GMutex GMutex;
 typedef struct _GCond GCond;
 #endif
