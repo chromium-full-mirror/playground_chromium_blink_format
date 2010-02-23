@@ -841,6 +841,9 @@ on MinGW. See https://bugs.webkit.org/show_bug.cgi?id=29268 */
 #define WTF_USE_JIT_STUB_ARGUMENT_VA_LIST 1
 #elif CPU(ARM_THUMB2) && PLATFORM(IPHONE)
 #define ENABLE_JIT 1
+/* The JIT is tested & working on Android */
+#elif CPU(ARM_THUMB2) && PLATFORM(ANDROID) && ENABLE(ANDROID_JSC_JIT)
+#define ENABLE_JIT 1
 /* The JIT is tested & working on x86 Windows */
 #elif CPU(X86) && PLATFORM(WIN)
 #define ENABLE_JIT 1
@@ -917,9 +920,10 @@ on MinGW. See https://bugs.webkit.org/show_bug.cgi?id=29268 */
 #if !defined(ENABLE_YARR_JIT)
 
 /* YARR supports x86 & x86-64, and has been tested on Mac and Windows. */
-#if (CPU(X86) && PLATFORM(MAC)) || (CPU(X86_64) && PLATFORM(MAC)) ||        \
-    (CPU(ARM_THUMB2) && PLATFORM(IPHONE)) || (CPU(X86) && PLATFORM(WIN)) || \
-    (CPU(X86) && PLATFORM(WX))
+#if (CPU(X86) && PLATFORM(MAC)) || (CPU(X86_64) && PLATFORM(MAC)) ||     \
+    (CPU(ARM_THUMB2) && PLATFORM(IPHONE)) ||                             \
+    (CPU(ARM_THUMB2) && PLATFORM(ANDROID) && ENABLE(ANDROID_JSC_JIT)) || \
+    (CPU(X86) && PLATFORM(WIN)) || (CPU(X86) && PLATFORM(WX))
 #define ENABLE_YARR 1
 #define ENABLE_YARR_JIT 1
 #endif
