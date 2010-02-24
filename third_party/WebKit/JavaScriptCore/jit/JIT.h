@@ -283,11 +283,13 @@ class JIT : private MacroAssembler {
                                   StructureStubInfo* stubInfo,
                                   Structure* structure,
                                   Structure* prototypeStructure,
+                                  bool isGetter,
                                   size_t cachedOffset,
                                   ReturnAddressPtr returnAddress) {
     JIT jit(globalData, codeBlock);
     jit.privateCompileGetByIdProto(stubInfo, structure, prototypeStructure,
-                                   cachedOffset, returnAddress, callFrame);
+                                   isGetter, cachedOffset, returnAddress,
+                                   callFrame);
   }
 
   static void compileGetByIdSelfList(
@@ -297,10 +299,12 @@ class JIT : private MacroAssembler {
       PolymorphicAccessStructureList* polymorphicStructures,
       int currentIndex,
       Structure* structure,
+      bool isGetter,
       size_t cachedOffset) {
     JIT jit(globalData, codeBlock);
     jit.privateCompileGetByIdSelfList(stubInfo, polymorphicStructures,
-                                      currentIndex, structure, cachedOffset);
+                                      currentIndex, structure, isGetter,
+                                      cachedOffset);
   }
   static void compileGetByIdProtoList(
       JSGlobalData* globalData,
@@ -311,11 +315,12 @@ class JIT : private MacroAssembler {
       int currentIndex,
       Structure* structure,
       Structure* prototypeStructure,
+      bool isGetter,
       size_t cachedOffset) {
     JIT jit(globalData, codeBlock);
     jit.privateCompileGetByIdProtoList(
         stubInfo, prototypeStructureList, currentIndex, structure,
-        prototypeStructure, cachedOffset, callFrame);
+        prototypeStructure, isGetter, cachedOffset, callFrame);
   }
   static void compileGetByIdChainList(
       JSGlobalData* globalData,
@@ -327,11 +332,12 @@ class JIT : private MacroAssembler {
       Structure* structure,
       StructureChain* chain,
       size_t count,
+      bool isGetter,
       size_t cachedOffset) {
     JIT jit(globalData, codeBlock);
     jit.privateCompileGetByIdChainList(stubInfo, prototypeStructureList,
                                        currentIndex, structure, chain, count,
-                                       cachedOffset, callFrame);
+                                       isGetter, cachedOffset, callFrame);
   }
 
   static void compileGetByIdChain(JSGlobalData* globalData,
@@ -341,10 +347,11 @@ class JIT : private MacroAssembler {
                                   Structure* structure,
                                   StructureChain* chain,
                                   size_t count,
+                                  bool isGetter,
                                   size_t cachedOffset,
                                   ReturnAddressPtr returnAddress) {
     JIT jit(globalData, codeBlock);
-    jit.privateCompileGetByIdChain(stubInfo, structure, chain, count,
+    jit.privateCompileGetByIdChain(stubInfo, structure, chain, count, isGetter,
                                    cachedOffset, returnAddress, callFrame);
   }
 
@@ -421,6 +428,7 @@ class JIT : private MacroAssembler {
   void privateCompileGetByIdProto(StructureStubInfo*,
                                   Structure*,
                                   Structure* prototypeStructure,
+                                  bool isGetter,
                                   size_t cachedOffset,
                                   ReturnAddressPtr returnAddress,
                                   CallFrame* callFrame);
@@ -428,12 +436,14 @@ class JIT : private MacroAssembler {
                                      PolymorphicAccessStructureList*,
                                      int,
                                      Structure*,
+                                     bool isGetter,
                                      size_t cachedOffset);
   void privateCompileGetByIdProtoList(StructureStubInfo*,
                                       PolymorphicAccessStructureList*,
                                       int,
                                       Structure*,
                                       Structure* prototypeStructure,
+                                      bool isGetter,
                                       size_t cachedOffset,
                                       CallFrame* callFrame);
   void privateCompileGetByIdChainList(StructureStubInfo*,
@@ -442,12 +452,14 @@ class JIT : private MacroAssembler {
                                       Structure*,
                                       StructureChain* chain,
                                       size_t count,
+                                      bool isGetter,
                                       size_t cachedOffset,
                                       CallFrame* callFrame);
   void privateCompileGetByIdChain(StructureStubInfo*,
                                   Structure*,
                                   StructureChain*,
                                   size_t count,
+                                  bool isGetter,
                                   size_t cachedOffset,
                                   ReturnAddressPtr returnAddress,
                                   CallFrame* callFrame);
