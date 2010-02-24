@@ -2698,7 +2698,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
                 CallData callData;
                 CallType callType = getter->getCallData(callData);
                 JSValue result = call(callFrame, getter, callType, callData,
-                                      asObject(baseCell), ArgList());
+                                      baseValue, ArgList());
                 CHECK_FOR_EXCEPTION();
                 callFrame->r(dst) = result;
               } else
