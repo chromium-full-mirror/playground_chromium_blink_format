@@ -187,6 +187,9 @@ ScriptValue WorkerContextExecutionProxy::evaluate(
       V8Proxy::compileScript(scriptString, fileName, baseLine);
   v8::Local<v8::Value> result = runScript(compiledScript);
 
+  if (!exceptionCatcher.CanContinue())
+    return ScriptValue();
+
   if (exceptionCatcher.HasCaught()) {
     v8::Local<v8::Message> message = exceptionCatcher.Message();
     state->hadException = true;
