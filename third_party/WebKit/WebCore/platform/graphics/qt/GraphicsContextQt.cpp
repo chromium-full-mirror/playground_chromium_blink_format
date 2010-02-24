@@ -619,7 +619,8 @@ void GraphicsContext::fillRect(const FloatRect& rect) {
 
   if (m_common->state.fillPattern || m_common->state.fillGradient ||
       fillColor().alpha()) {
-    drawBorderlessRectShadow(this, p, rect);
+    if (m_common->state.shadowColor.isValid())
+      drawBorderlessRectShadow(this, p, rect);
     if (m_common->state.fillPattern) {
       AffineTransform affine;
       p->fillRect(
@@ -645,7 +646,8 @@ void GraphicsContext::fillRect(const FloatRect& rect,
 
   m_data->solidColor.setColor(c);
   QPainter* p = m_data->p();
-  drawBorderlessRectShadow(this, p, rect);
+  if (m_common->state.shadowColor.isValid())
+    drawBorderlessRectShadow(this, p, rect);
   p->fillRect(rect, m_data->solidColor);
 }
 
