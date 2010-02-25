@@ -37,12 +37,17 @@
 class NSView;
 #endif
 
+#if ENABLE(TOUCH_EVENTS)
+#include <wtf/HashMap.h>
+#endif
+
 namespace WebCore {
 
 class AtomicString;
 class Clipboard;
 class Cursor;
 class Event;
+class EventTarget;
 class FloatPoint;
 class Frame;
 class HitTestRequest;
@@ -450,6 +455,8 @@ class EventHandler : public Noncopyable {
   int m_activationEventNumber;
 #endif
 #if ENABLE(TOUCH_EVENTS)
+  typedef HashMap<int, RefPtr<EventTarget>> TouchTargetMap;
+  TouchTargetMap m_originatingTouchPointTargets;
   RefPtr<Node> m_touchEventTarget;
 #endif
 };
