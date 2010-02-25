@@ -629,8 +629,13 @@ Path SVGUseElement::toClipPath() const {
       // Spec: Indirect references are an error (14.3.5)
       document()->accessSVGExtensions()->reportError(
           "Not allowed to use indirect reference in <clip-path>");
-    else
-      return static_cast<SVGStyledTransformableElement*>(n)->toClipPath();
+    else {
+      Path clipPath =
+          static_cast<SVGStyledTransformableElement*>(n)->toClipPath();
+      clipPath.translate(FloatSize(x().value(this), y().value(this)));
+      clipPath.transform(animatedLocalTransform());
+      return clipPath;
+    }
   }
 
   return Path();
