@@ -49,6 +49,9 @@ ThreadIdentifier currentThread() {
 bool isMainThread() {
   return true;
 }
+void* threadContext(ThreadIdentifier) {
+  return 0;
+}
 
 Mutex::Mutex() {}
 Mutex::~Mutex() {}
