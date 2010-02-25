@@ -225,7 +225,7 @@ class WebFrameImpl : public WebFrame, public RefCounted<WebFrameImpl> {
   // Sets whether the WebFrameImpl allows its document to be scrolled.
   // If the parameter is true, allow the document to be scrolled.
   // Otherwise, disallow scrolling.
-  void setAllowsScrolling(bool);
+  void setCanHaveScrollbars(bool);
 
   // Returns the password autocomplete listener associated with the passed
   // user name input element, or 0 if none available.

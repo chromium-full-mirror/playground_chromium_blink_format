@@ -1676,8 +1676,8 @@ void WebFrameImpl::didFail(const ResourceError& error, bool wasProvisional) {
     client()->didFailLoad(this, webError);
 }
 
-void WebFrameImpl::setAllowsScrolling(bool flag) {
-  m_frame->view()->setCanHaveScrollbars(flag);
+void WebFrameImpl::setCanHaveScrollbars(bool canHaveScrollbars) {
+  m_frame->view()->setCanHaveScrollbars(canHaveScrollbars);
 }
 
 void WebFrameImpl::registerPasswordListener(
