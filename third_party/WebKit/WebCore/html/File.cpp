@@ -27,9 +27,17 @@
 #include "File.h"
 
 #include "FileSystem.h"
+#include "MIMETypeRegistry.h"
 
 namespace WebCore {
 
-File::File(const String& path) : Blob(path), m_name(pathGetFileName(path)) {}
+File::File(const String& path) : Blob(path), m_name(pathGetFileName(path)) {
+  // We don't use MIMETypeRegistry::getMIMETypeForPath() because it returns
+  // "application/octet-stream" upon failure.
+  int index = m_name.reverseFind('.');
+  if (index != -1)
+    m_type =
+        MIMETypeRegistry::getMIMETypeForExtension(m_name.substring(index + 1));
+}
 
 }  // namespace WebCore
