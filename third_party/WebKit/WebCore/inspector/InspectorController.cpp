@@ -76,6 +76,7 @@
 #include "ScriptObject.h"
 #include "ScriptProfile.h"
 #include "ScriptProfiler.h"
+#include "ScriptSourceCode.h"
 #include "ScriptString.h"
 #include "SecurityOrigin.h"
 #include "Settings.h"
@@ -825,6 +826,12 @@ void InspectorController::didCommitLoad(DocumentLoader* loader) {
        frame = frame->tree()->traverseNext(loader->frame()))
     if (ResourcesMap* resourceMap = m_frameResources.get(frame))
       pruneResources(resourceMap, loader);
+
+  for (Vector<String>::iterator it = m_scriptsToEvaluateOnLoad.begin();
+       it != m_scriptsToEvaluateOnLoad.end(); ++it) {
+    ScriptSourceCode scriptSourceCode(*it);
+    loader->frame()->script()->evaluate(scriptSourceCode);
+  }
 }
 
 void InspectorController::frameDetachedFromParent(Frame* frame) {
@@ -1993,6 +2000,14 @@ InjectedScript InspectorController::injectedScriptForNodeId(long id) {
     return m_injectedScriptHost->injectedScriptFor(mainWorldScriptState(frame));
 
   return InjectedScript();
+}
+
+void InspectorController::addScriptToEvaluateOnLoad(const String& source) {
+  m_scriptsToEvaluateOnLoad.append(source);
+}
+
+void InspectorController::removeAllScriptsToEvaluateOnLoad() {
+  m_scriptsToEvaluateOnLoad.clear();
 }
 
 }  // namespace WebCore

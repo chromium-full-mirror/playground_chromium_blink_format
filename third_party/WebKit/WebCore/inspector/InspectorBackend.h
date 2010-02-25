@@ -111,6 +111,8 @@ class InspectorBackend : public RefCounted<InspectorBackend> {
                                 const String& methodName,
                                 const String& arguments,
                                 bool async);
+  void addScriptToEvaluateOnLoad(const String& source);
+  void removeAllScriptsToEvaluateOnLoad();
   void getChildNodes(long callId, long nodeId);
   void setAttribute(long callId,
                     long elementId,

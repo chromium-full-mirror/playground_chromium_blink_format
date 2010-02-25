@@ -298,6 +298,8 @@ class InspectorController
   void evaluateForTestInFrontend(long callId, const String& script);
 
   InjectedScript injectedScriptForNodeId(long id);
+  void addScriptToEvaluateOnLoad(const String& source);
+  void removeAllScriptsToEvaluateOnLoad();
 
  private:
   static const char* const FrontendSettingsSettingName;
@@ -400,6 +402,7 @@ class InspectorController
   mutable Settings m_settings;
 
   Vector<pair<long, String>> m_pendingEvaluateTestCommands;
+  Vector<String> m_scriptsToEvaluateOnLoad;
 #if ENABLE(JAVASCRIPT_DEBUGGER)
   bool m_debuggerEnabled;
   bool m_attachDebuggerWhenShown;
