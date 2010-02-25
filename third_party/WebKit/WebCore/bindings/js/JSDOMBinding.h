@@ -25,6 +25,7 @@
 #define JSDOMBinding_h
 
 #include "JSDOMGlobalObject.h"
+#include "JSDOMWrapper.h"
 #include "JSSVGContextCache.h"
 #include "Document.h"
 #include <runtime/Completion.h>
@@ -53,22 +54,6 @@ typedef int ExceptionCode;
 #if ENABLE(SVG)
 class SVGElement;
 #endif
-
-// Base class for all objects in this binding except Window.
-class DOMObject : public JSC::JSObject {
- protected:
-  explicit DOMObject(NonNullPassRefPtr<JSC::Structure> structure)
-      : JSObject(structure) {}
-
-  virtual bool defineOwnProperty(JSC::ExecState*,
-                                 const JSC::Identifier&,
-                                 JSC::PropertyDescriptor&,
-                                 bool);
-
-#ifndef NDEBUG
-  virtual ~DOMObject();
-#endif
-};
 
 // FIXME: This class should collapse into DOMObject once all DOMObjects are
 // updated to store a globalObject pointer.
@@ -536,6 +521,22 @@ inline JSC::JSValue jsString(JSC::ExecState* exec, const String& s) {
     return wrapper;
 
   return jsStringSlowCase(exec, stringCache, stringImpl);
+}
+
+inline DOMObjectWrapperMap& domObjectWrapperMapFor(JSC::ExecState* exec) {
+  return currentWorld(exec)->m_wrappers;
+}
+
+inline Document::JSWrapperCache* Document::getWrapperCache(
+    DOMWrapperWorld* world) {
+  if (world->isNormal()) {
+    if (Document::JSWrapperCache* wrapperCache = m_normalWorldWrapperCache)
+      return wrapperCache;
+    ASSERT(!m_wrapperCacheMap.contains(world));
+  } else if (Document::JSWrapperCache* wrapperCache =
+                 m_wrapperCacheMap.get(world))
+    return wrapperCache;
+  return createWrapperCache(world);
 }
 
 }  // namespace WebCore
