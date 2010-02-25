@@ -24,6 +24,9 @@
  *
  */
 
+#ifndef CrossOriginPreflightResultCacheItem_h
+#define CrossOriginPreflightResultCacheItem_h
+
 #include "KURLHash.h"
 #include "StringHash.h"
 #include <wtf/HashMap.h>
@@ -85,3 +88,5 @@ class CrossOriginPreflightResultCache : public Noncopyable {
 };
 
 }  // namespace WebCore
+
+#endif
