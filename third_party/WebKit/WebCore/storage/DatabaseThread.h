@@ -74,6 +74,7 @@ class DatabaseThread : public ThreadSafeShared<DatabaseThread> {
   void recordDatabaseOpen(Database*);
   void recordDatabaseClosed(Database*);
   ThreadIdentifier getThreadID() { return m_threadID; }
+  Database* getDatabaseOfCurrentTask() { return m_databaseOfCurrentTask; }
 
   SQLTransactionClient* transactionClient() {
     return m_transactionClient.get();
@@ -93,6 +94,8 @@ class DatabaseThread : public ThreadSafeShared<DatabaseThread> {
   RefPtr<DatabaseThread> m_selfRef;
 
   MessageQueue<DatabaseTask> m_queue;
+
+  Database* m_databaseOfCurrentTask;
 
   // This set keeps track of the open databases that have been used on this
   // thread.
