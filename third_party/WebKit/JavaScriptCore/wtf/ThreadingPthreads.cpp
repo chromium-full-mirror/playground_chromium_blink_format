@@ -53,12 +53,7 @@
 
 namespace WTF {
 
-typedef struct {
-  pthread_t handle;
-  void* context;
-} ThreadInfo;
-
-typedef HashMap<ThreadIdentifier, ThreadInfo> ThreadMap;
+typedef HashMap<ThreadIdentifier, pthread_t> ThreadMap;
 
 static Mutex* atomicallyInitializedStaticMutex;
 
@@ -107,7 +102,7 @@ static ThreadIdentifier identifierByPthreadHandle(
 
   ThreadMap::iterator i = threadMap().begin();
   for (; i != threadMap().end(); ++i) {
-    if (pthread_equal(i->second.handle, pthreadHandle))
+    if (pthread_equal(i->second, pthreadHandle))
       return i->first;
   }
 
@@ -115,18 +110,14 @@ static ThreadIdentifier identifierByPthreadHandle(
 }
 
 static ThreadIdentifier establishIdentifierForPthreadHandle(
-    const pthread_t& pthreadHandle,
-    void* context) {
+    const pthread_t& pthreadHandle) {
   ASSERT(!identifierByPthreadHandle(pthreadHandle));
 
   MutexLocker locker(threadMapMutex());
 
   static ThreadIdentifier identifierCount = 1;
 
-  ThreadInfo info;
-  info.handle = pthreadHandle;
-  info.context = context;
-  threadMap().add(identifierCount, info);
+  threadMap().add(identifierCount, pthreadHandle);
 
   return identifierCount++;
 }
@@ -134,13 +125,7 @@ static ThreadIdentifier establishIdentifierForPthreadHandle(
 static pthread_t pthreadHandleForIdentifier(ThreadIdentifier id) {
   MutexLocker locker(threadMapMutex());
 
-  return threadMap().get(id).handle;
-}
-
-static void* contextForIdentifier(ThreadIdentifier id) {
-  MutexLocker locker(threadMapMutex());
-
-  return threadMap().get(id).context;
+  return threadMap().get(id);
 }
 
 void clearPthreadHandleForIdentifier(ThreadIdentifier id) {
@@ -187,7 +172,7 @@ ThreadIdentifier createThreadInternal(ThreadFunction entryPoint,
     delete threadData;
     return 0;
   }
-  return establishIdentifierForPthreadHandle(threadHandle, data);
+  return establishIdentifierForPthreadHandle(threadHandle);
 }
 #else
 ThreadIdentifier createThreadInternal(ThreadFunction entryPoint,
@@ -200,7 +185,7 @@ ThreadIdentifier createThreadInternal(ThreadFunction entryPoint,
     return 0;
   }
 
-  return establishIdentifierForPthreadHandle(threadHandle, data);
+  return establishIdentifierForPthreadHandle(threadHandle);
 }
 #endif
 
@@ -247,7 +232,7 @@ ThreadIdentifier currentThread() {
     return id;
 
   // Not a WTF-created thread, ThreadIdentifier is not established yet.
-  id = establishIdentifierForPthreadHandle(pthread_self(), 0);
+  id = establishIdentifierForPthreadHandle(pthread_self());
   ThreadIdentifierData::initialize(id);
   return id;
 }
@@ -258,10 +243,6 @@ bool isMainThread() {
 #else
   return pthread_equal(pthread_self(), mainThread);
 #endif
-}
-
-void* threadContext(ThreadIdentifier id) {
-  return contextForIdentifier(id);
 }
 
 Mutex::Mutex() {
