@@ -30,6 +30,7 @@
 
 #include "c_utility.h"
 
+#include "CRuntimeObject.h"
 #include "JSDOMWindow.h"
 #include "NP_jsobject.h"
 #include "c_instance.h"
@@ -91,10 +92,9 @@ void convertValueToNPVariant(ExecState* exec,
     NULL_TO_NPVARIANT(*result);
   } else if (value.isObject()) {
     JSObject* object = asObject(value);
-    if (object->classInfo() == &RuntimeObject::s_info) {
-      RuntimeObject* runtimeObject = static_cast<RuntimeObject*>(object);
-      CInstance* instance =
-          static_cast<CInstance*>(runtimeObject->getInternalInstance());
+    if (object->classInfo() == &CRuntimeObject::s_info) {
+      CRuntimeObject* runtimeObject = static_cast<CRuntimeObject*>(object);
+      CInstance* instance = runtimeObject->getInternalCInstance();
       if (instance) {
         NPObject* obj = instance->getObject();
         _NPN_RetainObject(obj);

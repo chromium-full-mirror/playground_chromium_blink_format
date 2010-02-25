@@ -29,15 +29,16 @@
 
 #include "c_instance.h"
 
+#include "CRuntimeObject.h"
+#include "IdentifierRep.h"
 #include "c_class.h"
 #include "c_runtime.h"
 #include "c_utility.h"
-#include "IdentifierRep.h"
 #include "npruntime_impl.h"
 #include "runtime_root.h"
+#include <interpreter/CallFrame.h>
 #include <runtime/ArgList.h>
 #include <runtime/Error.h>
-#include <interpreter/CallFrame.h>
 #include <runtime/JSLock.h>
 #include <runtime/JSNumberCell.h>
 #include <runtime/PropertyNameArray.h>
@@ -82,6 +83,10 @@ CInstance::CInstance(NPObject* o, PassRefPtr<RootObject> rootObject)
 
 CInstance::~CInstance() {
   _NPN_ReleaseObject(_object);
+}
+
+RuntimeObject* CInstance::newRuntimeObject(ExecState* exec) {
+  return new (exec) CRuntimeObject(exec, this);
 }
 
 Class* CInstance::getClass() const {

@@ -39,7 +39,10 @@ class JSObject;
 
 namespace Bindings {
 
+class RootObject;
+
 jvalue convertValueToJValue(ExecState*,
+                            RootObject*,
                             JSValue,
                             JNIType,
                             const char* javaClassName);

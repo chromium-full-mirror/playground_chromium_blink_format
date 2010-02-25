@@ -65,6 +65,8 @@ class ProxyInstance : public JSC::Bindings::Instance {
                 NetscapePluginInstanceProxy*,
                 uint32_t objectID);
 
+  virtual JSC::Bindings::RuntimeObject* newRuntimeObject(JSC::ExecState*);
+
   virtual JSC::Bindings::Class* getClass() const;
 
   virtual JSC::JSValue invokeMethod(JSC::ExecState*,

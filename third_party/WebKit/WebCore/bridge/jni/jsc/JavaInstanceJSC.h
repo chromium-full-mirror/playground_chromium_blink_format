@@ -93,6 +93,9 @@ class JavaInstance : public Instance {
 
  protected:
   JavaInstance(jobject instance, PassRefPtr<RootObject>);
+
+  virtual RuntimeObject* newRuntimeObject(ExecState*);
+
   virtual void virtualBegin();
   virtual void virtualEnd();
 

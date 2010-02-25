@@ -34,8 +34,7 @@
 using namespace WebCore;
 
 namespace JSC {
-
-using namespace Bindings;
+namespace Bindings {
 
 const ClassInfo RuntimeObject::s_info = {"RuntimeObject", 0, 0, 0};
 
@@ -275,6 +274,7 @@ static JSValue JSC_HOST_CALL callRuntimeObject(ExecState* exec,
                                                JSObject* function,
                                                JSValue,
                                                const ArgList& args) {
+  ASSERT(function->inherits(&RuntimeObject::s_info));
   RefPtr<Instance> instance(
       static_cast<RuntimeObject*>(function)->getInternalInstance());
   instance->begin();
@@ -298,6 +298,7 @@ CallType RuntimeObject::getCallData(CallData& callData) {
 static JSObject* callRuntimeConstructor(ExecState* exec,
                                         JSObject* constructor,
                                         const ArgList& args) {
+  ASSERT(constructor->inherits(&RuntimeObject::s_info));
   RefPtr<Instance> instance(
       static_cast<RuntimeObject*>(constructor)->getInternalInstance());
   instance->begin();
@@ -339,5 +340,6 @@ void RuntimeObject::getOwnPropertyNames(ExecState* exec,
 JSObject* RuntimeObject::throwInvalidAccessError(ExecState* exec) {
   return throwError(exec, ReferenceError,
                     "Trying to access object from destroyed plug-in.");
+}
 }
 }
