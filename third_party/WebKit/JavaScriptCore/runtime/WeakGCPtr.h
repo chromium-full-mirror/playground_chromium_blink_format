@@ -66,6 +66,10 @@ class WeakGCPtr : Noncopyable {
 
   WeakGCPtr& operator=(T*);
 
+#if !ASSERT_DISABLED
+  bool hasDeadObject() const { return !!m_ptr; }
+#endif
+
  private:
   void assign(T* ptr) {
     if (ptr)

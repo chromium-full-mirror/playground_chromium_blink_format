@@ -292,9 +292,7 @@ Structure::~Structure() {
         make_pair(m_nameInPrevious.get(), m_attributesInPrevious),
         m_specificValueInPrevious);
   }
-
-  if (m_enumerationCache)
-    m_enumerationCache->setCachedStructure(0);
+  ASSERT(!m_enumerationCache.hasDeadObject());
 
   if (m_propertyTable) {
     unsigned entryCount =

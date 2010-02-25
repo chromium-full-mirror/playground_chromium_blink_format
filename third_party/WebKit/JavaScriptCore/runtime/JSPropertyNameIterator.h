@@ -68,9 +68,11 @@ class JSPropertyNameIterator : public JSCell {
   size_t size() { return m_jsStringsSize; }
 
   void setCachedStructure(Structure* structure) {
+    ASSERT(!m_cachedStructure);
+    ASSERT(structure);
     m_cachedStructure = structure;
   }
-  Structure* cachedStructure() { return m_cachedStructure; }
+  Structure* cachedStructure() { return m_cachedStructure.get(); }
 
   void setCachedPrototypeChain(
       NonNullPassRefPtr<StructureChain> cachedPrototypeChain) {
@@ -85,7 +87,7 @@ class JSPropertyNameIterator : public JSCell {
                          PropertyNameArrayData* propertyNameArrayData,
                          size_t numCacheableSlot);
 
-  Structure* m_cachedStructure;
+  RefPtr<Structure> m_cachedStructure;
   RefPtr<StructureChain> m_cachedPrototypeChain;
   uint32_t m_numCacheableSlots;
   uint32_t m_jsStringsSize;
