@@ -44,6 +44,13 @@ typedef void* PlatformGraphicsContext3D;
 const PlatformGraphicsContext3D NullPlatformGraphicsContext3D = 0;
 typedef GLuint Platform3DObject;
 const Platform3DObject NullPlatform3DObject = 0;
+#elif PLATFORM(QT)
+#include <QtOpenGL/QtOpenGL>
+
+typedef void* PlatformGraphicsContext3D;
+const PlatformGraphicsContext3D NullPlatformGraphicsContext3D = 0;
+typedef int Platform3DObject;
+const Platform3DObject NullPlatform3DObject = 0;
 #else
 typedef void* PlatformGraphicsContext3D;
 const PlatformGraphicsContext3D NullPlatformGraphicsContext3D = 0;
@@ -73,7 +80,7 @@ struct ActiveInfo {
 };
 
 // FIXME: ideally this would be used on all platforms.
-#if PLATFORM(CHROMIUM)
+#if PLATFORM(CHROMIUM) || PLATFORM(QT)
 class GraphicsContext3DInternal;
 #endif
 
@@ -408,6 +415,9 @@ class GraphicsContext3D : public Noncopyable {
   Platform3DObject platformTexture() const { return m_texture; }
 #elif PLATFORM(CHROMIUM)
   PlatformGraphicsContext3D platformGraphicsContext3D() const;
+  Platform3DObject platformTexture() const;
+#elif PLATFORM(QT)
+  PlatformGraphicsContext3D platformGraphicsContext3D();
   Platform3DObject platformTexture() const;
 #else
   PlatformGraphicsContext3D platformGraphicsContext3D() const {
@@ -798,7 +808,7 @@ class GraphicsContext3D : public Noncopyable {
 #endif
 
 // FIXME: ideally this would be used on all platforms.
-#if PLATFORM(CHROMIUM)
+#if PLATFORM(CHROMIUM) || PLATFORM(QT)
   friend class GraphicsContext3DInternal;
   OwnPtr<GraphicsContext3DInternal> m_internal;
 #endif

@@ -70,7 +70,8 @@ class QWEBKIT_EXPORT QWebSettings {
     LocalContentCanAccessFileUrls,
     DnsPrefetchEnabled,
     XSSAuditorEnabled,
-    AcceleratedCompositingEnabled
+    AcceleratedCompositingEnabled,
+    WebGLEnabled
   };
   enum WebGraphic {
     MissingImageGraphic,
