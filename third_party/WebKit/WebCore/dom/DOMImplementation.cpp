@@ -32,6 +32,7 @@
 #include "Element.h"
 #include "ExceptionCode.h"
 #include "Frame.h"
+#include "FrameLoaderClient.h"
 #include "FTPDirectoryDocument.h"
 #include "HTMLDocument.h"
 #include "HTMLNames.h"
@@ -345,7 +346,9 @@ PassRefPtr<Document> DOMImplementation::createDocument(const String& type,
 #endif
 
   PluginData* pluginData = 0;
-  if (frame && frame->page() && frame->page()->settings()->arePluginsEnabled())
+  if (frame && frame->page() &&
+      frame->loader()->client()->allowPlugins(
+          frame->page()->settings()->arePluginsEnabled()))
     pluginData = frame->page()->pluginData();
 
   // PDF is one image type for which a plugin can override built-in support.

@@ -21,6 +21,7 @@
 #include "MimeType.h"
 
 #include "Frame.h"
+#include "FrameLoaderClient.h"
 #include "Page.h"
 #include "Plugin.h"
 #include "PluginData.h"
@@ -47,7 +48,9 @@ const String& MimeType::description() const {
 
 PassRefPtr<Plugin> MimeType::enabledPlugin() const {
   const Page* p = m_pluginData->page();
-  if (!p || !p->settings()->arePluginsEnabled())
+  if (!p ||
+      !p->mainFrame()->loader()->client()->allowPlugins(
+          p->settings()->arePluginsEnabled()))
     return 0;
 
   const PluginInfo* info = m_pluginData->mimes()[m_index]->plugin;
