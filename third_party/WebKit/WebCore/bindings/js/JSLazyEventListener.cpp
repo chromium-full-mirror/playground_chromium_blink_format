@@ -88,7 +88,7 @@ JSObject* JSLazyEventListener::initializeJSFunction(
     return 0;
 
   ScriptController* scriptController = frame->script();
-  if (!scriptController->canExecuteScripts())
+  if (!scriptController->canExecuteScripts(AboutToExecuteScript))
     return 0;
 
   JSDOMGlobalObject* globalObject =
@@ -103,7 +103,7 @@ JSObject* JSLazyEventListener::initializeJSFunction(
       return 0;
     // FIXME: Is this check needed for non-Document contexts?
     ScriptController* script = frame->script();
-    if (!script->canExecuteScripts() || script->isPaused())
+    if (!script->canExecuteScripts(AboutToExecuteScript) || script->isPaused())
       return 0;
   }
 

@@ -1601,7 +1601,8 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
           m_scriptTagCharsetAttrValue = String();
           if (m_currentToken.attrs && !m_fragment) {
             if (m_doc->frame() &&
-                m_doc->frame()->script()->canExecuteScripts()) {
+                m_doc->frame()->script()->canExecuteScripts(
+                    NotAboutToExecuteScript)) {
               if ((a = m_currentToken.attrs->getAttributeItem(srcAttr)))
                 m_scriptTagSrcAttrValue =
                     m_doc->completeURL(deprecatedParseURL(a->value())).string();
@@ -2033,7 +2034,8 @@ void HTMLTokenizer::finish() {
 PassRefPtr<Node> HTMLTokenizer::processToken() {
   ScriptController* scriptController =
       (!m_fragment && m_doc->frame()) ? m_doc->frame()->script() : 0;
-  if (scriptController && scriptController->canExecuteScripts())
+  if (scriptController &&
+      scriptController->canExecuteScripts(NotAboutToExecuteScript))
     // FIXME: Why isn't this m_currentScriptTagStartLineNumber?  I suspect this
     // is wrong.
     scriptController->setEventHandlerLineNumber(

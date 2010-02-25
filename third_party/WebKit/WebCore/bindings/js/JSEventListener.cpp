@@ -86,7 +86,7 @@ void JSEventListener::handleEvent(
       return;
     // FIXME: Is this check needed for other contexts?
     ScriptController* script = frame->script();
-    if (!script->canExecuteScripts() || script->isPaused())
+    if (!script->canExecuteScripts(AboutToExecuteScript) || script->isPaused())
       return;
   }
 

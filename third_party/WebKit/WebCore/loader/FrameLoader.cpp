@@ -1590,7 +1590,7 @@ void FrameLoader::provisionalLoadStarted() {
 
 bool FrameLoader::isProcessingUserGesture() {
   Frame* frame = m_frame->tree()->top();
-  if (!frame->script()->canExecuteScripts())
+  if (!frame->script()->canExecuteScripts(NotAboutToExecuteScript))
     return true;  // If JavaScript is disabled, a user gesture must have
                   // initiated the navigation.
   return frame->script()->processingUserGesture(
@@ -2969,7 +2969,7 @@ void FrameLoader::open(CachedPage& cachedPage) {
   closeURL();
 
   // Delete old status bar messages (if it _was_ activated on last URL).
-  if (m_frame->script()->canExecuteScripts()) {
+  if (m_frame->script()->canExecuteScripts(NotAboutToExecuteScript)) {
     m_frame->setJSStatusBarText(String());
     m_frame->setJSDefaultStatusBarText(String());
   }
@@ -4302,7 +4302,7 @@ void FrameLoader::dispatchDocumentElementAvailable() {
 }
 
 void FrameLoader::dispatchDidClearWindowObjectsInAllWorlds() {
-  if (!m_frame->script()->canExecuteScripts())
+  if (!m_frame->script()->canExecuteScripts(NotAboutToExecuteScript))
     return;
 
   Vector<DOMWrapperWorld*> worlds;
@@ -4312,7 +4312,7 @@ void FrameLoader::dispatchDidClearWindowObjectsInAllWorlds() {
 }
 
 void FrameLoader::dispatchDidClearWindowObjectInWorld(DOMWrapperWorld* world) {
-  if (!m_frame->script()->canExecuteScripts() ||
+  if (!m_frame->script()->canExecuteScripts(NotAboutToExecuteScript) ||
       !m_frame->script()->existingWindowShell(world))
     return;
 

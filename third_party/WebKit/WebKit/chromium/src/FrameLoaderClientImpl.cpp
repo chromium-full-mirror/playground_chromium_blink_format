@@ -163,6 +163,11 @@ bool FrameLoaderClientImpl::allowImages(bool enabledPerSettings) {
   return enabledPerSettings;
 }
 
+void FrameLoaderClientImpl::didNotAllowScript() {
+  if (m_webFrame->client())
+    m_webFrame->client()->didNotAllowScript(m_webFrame);
+}
+
 bool FrameLoaderClientImpl::hasWebView() const {
   return m_webFrame->viewImpl();
 }

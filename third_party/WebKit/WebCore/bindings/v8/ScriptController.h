@@ -55,6 +55,11 @@ class String;
 class Widget;
 class XSSAuditor;
 
+enum ReasonForCallingCanExecuteScripts {
+  AboutToExecuteScript,
+  NotAboutToExecuteScript
+};
+
 class ScriptController {
  public:
   ScriptController(Frame*);
@@ -122,7 +127,7 @@ class ScriptController {
   // Check if the javascript engine has been initialized.
   bool haveInterpreter() const;
 
-  bool canExecuteScripts();
+  bool canExecuteScripts(ReasonForCallingCanExecuteScripts);
 
   // FIXME: void* is a compile hack.
   void attachDebugger(void*);

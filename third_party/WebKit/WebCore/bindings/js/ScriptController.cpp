@@ -324,7 +324,7 @@ void ScriptController::updateSecurityOrigin() {
 }
 
 Bindings::RootObject* ScriptController::bindingRootObject() {
-  if (!canExecuteScripts())
+  if (!canExecuteScripts(NotAboutToExecuteScript))
     return 0;
 
   if (!m_bindingRootObject) {
@@ -352,7 +352,7 @@ PassRefPtr<Bindings::RootObject> ScriptController::createRootObject(
 
 NPObject* ScriptController::windowScriptNPObject() {
   if (!m_windowScriptNPObject) {
-    if (canExecuteScripts()) {
+    if (canExecuteScripts(NotAboutToExecuteScript)) {
       // JavaScript is enabled, so there is a JavaScript window object.
       // Return an NPObject bound to the window object.
       JSC::JSLock lock(SilenceAssertionsOnly);
@@ -387,7 +387,7 @@ NPObject* ScriptController::createScriptObjectForPluginElement(
 JSObject* ScriptController::jsObjectForPluginElement(
     HTMLPlugInElement* plugin) {
   // Can't create JSObjects when JavaScript is disabled
-  if (!canExecuteScripts())
+  if (!canExecuteScripts(NotAboutToExecuteScript))
     return 0;
 
   // Create a JSObject bound to this element
@@ -453,7 +453,7 @@ ScriptValue ScriptController::executeScriptInWorld(DOMWrapperWorld* world,
   ScriptSourceCode sourceCode(
       script, forceUserGesture ? KURL() : m_frame->loader()->url());
 
-  if (!canExecuteScripts() || isPaused())
+  if (!canExecuteScripts(AboutToExecuteScript) || isPaused())
     return ScriptValue();
 
   bool wasInExecuteScript = m_inExecuteScript;
