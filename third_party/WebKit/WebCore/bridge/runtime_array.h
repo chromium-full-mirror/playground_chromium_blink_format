@@ -27,13 +27,14 @@
 #define RUNTIME_ARRAY_H_
 
 #include "Bridge.h"
-#include <runtime/JSGlobalObject.h>
+#include <runtime/ArrayPrototype.h>
 
 namespace JSC {
 
-class RuntimeArray : public JSObject {
+class RuntimeArray : public JSArray {
  public:
   RuntimeArray(ExecState*, Bindings::Array*);
+  virtual ~RuntimeArray();
 
   virtual void getOwnPropertyNames(
       ExecState*,
@@ -57,18 +58,15 @@ class RuntimeArray : public JSObject {
 
   unsigned getLength() const { return getConcreteArray()->getLength(); }
 
-  Bindings::Array* getConcreteArray() const { return _array.get(); }
+  Bindings::Array* getConcreteArray() const {
+    return static_cast<Bindings::Array*>(subclassData());
+  }
 
   static const ClassInfo s_info;
 
   static ArrayPrototype* createPrototype(ExecState*,
                                          JSGlobalObject* globalObject) {
     return globalObject->arrayPrototype();
-  }
-
-  static PassRefPtr<Structure> createStructure(JSValue prototype) {
-    return Structure::create(prototype, TypeInfo(ObjectType, StructureFlags),
-                             AnonymousSlotCount);
   }
 
  private:
@@ -81,8 +79,6 @@ class RuntimeArray : public JSObject {
   static JSValue indexGetter(ExecState*,
                              const Identifier&,
                              const PropertySlot&);
-
-  OwnPtr<Bindings::Array> _array;
 };
 
 }  // namespace JSC

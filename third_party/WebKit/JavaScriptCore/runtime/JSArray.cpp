@@ -171,7 +171,7 @@ JSArray::JSArray(NonNullPassRefPtr<Structure> structure, unsigned initialLength)
   m_vectorLength = initialCapacity;
   m_storage->m_numValuesInVector = 0;
   m_storage->m_sparseValueMap = 0;
-  m_storage->lazyCreationData = 0;
+  m_storage->subclassData = 0;
   m_storage->reportedMapCapacity = 0;
 
   JSValue* vector = m_storage->m_vector;
@@ -193,7 +193,7 @@ JSArray::JSArray(NonNullPassRefPtr<Structure> structure, const ArgList& list)
   m_vectorLength = initialCapacity;
   m_storage->m_numValuesInVector = initialCapacity;
   m_storage->m_sparseValueMap = 0;
-  m_storage->lazyCreationData = 0;
+  m_storage->subclassData = 0;
   m_storage->reportedMapCapacity = 0;
 
   size_t i = 0;
@@ -1096,12 +1096,12 @@ unsigned JSArray::compactForSorting() {
   return numDefined;
 }
 
-void* JSArray::lazyCreationData() {
-  return m_storage->lazyCreationData;
+void* JSArray::subclassData() const {
+  return m_storage->subclassData;
 }
 
-void JSArray::setLazyCreationData(void* d) {
-  m_storage->lazyCreationData = d;
+void JSArray::setSubclassData(void* d) {
+  m_storage->subclassData = d;
 }
 
 #if CHECK_ARRAY_CONSISTENCY

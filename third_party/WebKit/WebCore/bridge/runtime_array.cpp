@@ -41,8 +41,13 @@ RuntimeArray::RuntimeArray(ExecState* exec, Bindings::Array* array)
     // FIXME: deprecatedGetDOMStructure uses the prototype off of the wrong
     // global object
     // We need to pass in the right global object for "array".
-    : JSObject(deprecatedGetDOMStructure<RuntimeArray>(exec)),
-      _array(array) {}
+    : JSArray(deprecatedGetDOMStructure<RuntimeArray>(exec)) {
+  setSubclassData(array);
+}
+
+RuntimeArray::~RuntimeArray() {
+  delete getConcreteArray();
+}
 
 JSValue RuntimeArray::lengthGetter(ExecState* exec,
                                    const Identifier&,
