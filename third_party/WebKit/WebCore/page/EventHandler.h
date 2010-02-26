@@ -457,7 +457,6 @@ class EventHandler : public Noncopyable {
 #if ENABLE(TOUCH_EVENTS)
   typedef HashMap<int, RefPtr<EventTarget>> TouchTargetMap;
   TouchTargetMap m_originatingTouchPointTargets;
-  RefPtr<Node> m_touchEventTarget;
 #endif
 };
 
