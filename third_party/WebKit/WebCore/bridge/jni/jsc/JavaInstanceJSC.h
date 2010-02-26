@@ -81,8 +81,9 @@ class JavaInstance : public Instance {
   virtual JSValue valueOf(ExecState*) const;
   virtual JSValue defaultValue(ExecState*, PreferredPrimitiveType) const;
 
+  virtual JSValue getMethod(ExecState* exec, const Identifier& propertyName);
   virtual JSValue invokeMethod(ExecState* exec,
-                               const MethodList& method,
+                               RuntimeMethod* method,
                                const ArgList& args);
 
   jobject javaInstance() const { return m_instance->m_instance; }

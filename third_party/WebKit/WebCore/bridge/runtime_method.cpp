@@ -41,7 +41,8 @@ using namespace Bindings;
 
 ASSERT_CLASS_FITS_IN_CELL(RuntimeMethod);
 
-const ClassInfo RuntimeMethod::s_info = {"RuntimeMethod", 0, 0, 0};
+const ClassInfo RuntimeMethod::s_info = {"RuntimeMethod",
+                                         &InternalFunction::info, 0, 0};
 
 RuntimeMethod::RuntimeMethod(ExecState* exec,
                              const Identifier& ident,
@@ -127,7 +128,7 @@ static JSValue JSC_HOST_CALL callRuntimeMethod(ExecState* exec,
   ASSERT(instance);
 
   instance->begin();
-  JSValue result = instance->invokeMethod(exec, *method->methods(), args);
+  JSValue result = instance->invokeMethod(exec, method, args);
   instance->end();
   return result;
 }

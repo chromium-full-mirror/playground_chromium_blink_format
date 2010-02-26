@@ -115,13 +115,11 @@ JSValue RuntimeObject::methodGetter(ExecState* exec,
 
   instance->begin();
 
-  Class* aClass = instance->getClass();
-  MethodList methodList = aClass->methodsNamed(propertyName, instance.get());
-  JSValue result = new (exec) RuntimeMethod(exec, propertyName, methodList);
+  JSValue method = instance->getMethod(exec, propertyName);
 
   instance->end();
 
-  return result;
+  return method;
 }
 
 bool RuntimeObject::getOwnPropertySlot(ExecState* exec,

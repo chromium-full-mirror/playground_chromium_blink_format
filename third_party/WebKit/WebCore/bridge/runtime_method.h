@@ -50,6 +50,8 @@ class RuntimeMethod : public InternalFunction {
                              AnonymousSlotCount);
   }
 
+  virtual const ClassInfo* classInfo() const { return &s_info; }
+
  private:
   static const unsigned StructureFlags =
       OverridesGetOwnPropertySlot | ImplementsHasInstance |

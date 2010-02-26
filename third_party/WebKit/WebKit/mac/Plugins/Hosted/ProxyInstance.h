@@ -69,8 +69,10 @@ class ProxyInstance : public JSC::Bindings::Instance {
 
   virtual JSC::Bindings::Class* getClass() const;
 
+  virtual JSC::JSValue getMethod(JSC::ExecState* exec,
+                                 const JSC::Identifier& propertyName);
   virtual JSC::JSValue invokeMethod(JSC::ExecState*,
-                                    const JSC::Bindings::MethodList&,
+                                    JSC::RuntimeMethod*,
                                     const JSC::ArgList& args);
 
   virtual bool supportsInvokeDefaultMethod() const;

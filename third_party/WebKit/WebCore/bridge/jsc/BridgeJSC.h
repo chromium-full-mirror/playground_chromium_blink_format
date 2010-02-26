@@ -40,6 +40,7 @@ class ArgList;
 class Identifier;
 class JSGlobalObject;
 class PropertyNameArray;
+class RuntimeMethod;
 
 namespace Bindings {
 
@@ -98,8 +99,10 @@ class Instance : public RefCounted<Instance> {
     return false;
   }
 
+  virtual JSValue getMethod(ExecState* exec,
+                            const Identifier& propertyName) = 0;
   virtual JSValue invokeMethod(ExecState*,
-                               const MethodList&,
+                               RuntimeMethod* method,
                                const ArgList& args) = 0;
 
   virtual bool supportsInvokeDefaultMethod() const { return false; }
