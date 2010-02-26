@@ -44,7 +44,6 @@ class TextStream;
 
 enum SVGResourceType {
   // Painting mode
-  ClipperResourceType = 0,
   ImageResourceType,
   FilterResourceType,
   MarkerResourceType,
@@ -56,8 +55,6 @@ enum SVGResourceType {
 
 // The SVGResource file represent various graphics resources:
 // - Filter resource
-// - Clipper resource
-// - Masker resource
 // - Marker resource
 // - Pattern resource
 // - Linear/Radial gradient resource
@@ -77,7 +74,6 @@ class SVGResource : public RefCounted<SVGResource> {
     return resourceType() == PaintServerResourceType;
   }
   bool isFilter() const { return resourceType() == FilterResourceType; }
-  bool isClipper() const { return resourceType() == ClipperResourceType; }
   bool isMarker() const { return resourceType() == MarkerResourceType; }
 
   virtual TextStream& externalRepresentation(TextStream&) const;
@@ -97,8 +93,7 @@ SVGResource* getResourceById(Document*,
                              const RenderObject*);
 
 TextStream& operator<<(TextStream&, const SVGResource&);
-
-}  // namespace WebCore
+}
 
 #endif
-#endif  // SVGResource_h
+#endif

@@ -34,13 +34,13 @@
 #include "PlatformString.h"
 #include "RenderObject.h"
 #include "RenderSVGResource.h"
+#include "RenderSVGResourceClipper.h"
 #include "RenderSVGResourceMasker.h"
 #include "SVGElement.h"
 #include "SVGElementInstance.h"
 #include "SVGElementRareData.h"
 #include "SVGNames.h"
 #include "SVGRenderStyle.h"
-#include "SVGResourceClipper.h"
 #include "SVGResourceFilter.h"
 #include "SVGSVGElement.h"
 #include <wtf/Assertions.h>
@@ -241,10 +241,10 @@ void SVGStyledElement::invalidateResources() {
               document, svgStyle->maskElement()))
     masker->invalidateClient(object);
 
-  SVGResourceClipper* clipper =
-      getClipperById(document, svgStyle->clipPath(), object);
-  if (clipper)
-    clipper->invalidate();
+  if (RenderSVGResourceClipper* clipper =
+          getRenderSVGResourceById<RenderSVGResourceClipper>(
+              document, svgStyle->clipPath()))
+    clipper->invalidateClient(object);
 }
 
 void SVGStyledElement::invalidateResourcesInAncestorChain() const {

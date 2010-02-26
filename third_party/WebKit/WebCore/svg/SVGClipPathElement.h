@@ -25,12 +25,10 @@
 #include "RenderObject.h"
 #include "SVGExternalResourcesRequired.h"
 #include "SVGLangSpace.h"
-#include "SVGResourceClipper.h"
 #include "SVGStyledTransformableElement.h"
 #include "SVGTests.h"
 
 namespace WebCore {
-
 class SVGClipPathElement : public SVGStyledTransformableElement,
                            public SVGTests,
                            public SVGLangSpace,
@@ -50,7 +48,6 @@ class SVGClipPathElement : public SVGStyledTransformableElement,
                                int childCountDelta = 0);
 
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
-  virtual SVGResource* canvasResource(const RenderObject*);
 
  private:
   DECLARE_ANIMATED_PROPERTY(SVGClipPathElement,
@@ -65,11 +62,8 @@ class SVGClipPathElement : public SVGStyledTransformableElement,
                             bool,
                             ExternalResourcesRequired,
                             externalResourcesRequired)
-
-  RefPtr<SVGResourceClipper> m_clipper;
 };
+}
 
-}  // namespace WebCore
-
-#endif  // ENABLE(SVG)
+#endif
 #endif
