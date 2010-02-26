@@ -72,6 +72,7 @@ class WebGLRenderingContext;
 class WebGLShader;
 class WebGLTexture;
 class Image;
+class ImageData;
 
 struct ActiveInfo {
   String name;
@@ -446,6 +447,14 @@ class GraphicsContext3D : public Noncopyable {
                         Vector<uint8_t>& imageData,
                         unsigned int* format,
                         unsigned int* internalFormat);
+
+  // Extracts the contents of the given ImageData into the passed
+  // Vector, obeying the flipY and premultiplyAlpha flags.
+  // Returns true upon success.
+  bool extractImageData(ImageData*,
+                        bool flipY,
+                        bool premultiplyAlpha,
+                        Vector<uint8_t>& data);
 
   // Processes the given image data in preparation for uploading
   // via texImage2D or texSubImage2D. The input data must be in
