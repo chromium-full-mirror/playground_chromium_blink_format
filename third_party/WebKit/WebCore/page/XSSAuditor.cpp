@@ -403,7 +403,7 @@ bool XSSAuditor::findInRequest(Frame* frame, const FindTask& task) const {
   if (!task.context.isEmpty())
     canonicalizedString = task.context + canonicalizedString;
 
-  String decodedPageURL = m_cache.canonicalizeURL(
+  String decodedPageURL = m_pageURLCache.canonicalizeURL(
       pageURL, frame->document()->decoder()->encoding(), task.decodeEntities,
       task.decodeURLEscapeSequencesTwice);
 
@@ -416,7 +416,7 @@ bool XSSAuditor::findInRequest(Frame* frame, const FindTask& task) const {
     return true;  // We've found the string in the GET data.
 
   if (hasFormData) {
-    String decodedFormData = m_cache.canonicalizeURL(
+    String decodedFormData = m_formDataCache.canonicalizeURL(
         formDataObj->flattenToString(),
         frame->document()->decoder()->encoding(), task.decodeEntities,
         task.decodeURLEscapeSequencesTwice);
