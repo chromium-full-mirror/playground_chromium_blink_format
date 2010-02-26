@@ -94,6 +94,7 @@ WebGLRenderingContext::WebGLRenderingContext(
                          &numVertexAttribs);
   m_maxVertexAttribs = numVertexAttribs;
   m_context->reshape(canvas()->width(), canvas()->height());
+  m_context->viewport(0, 0, canvas()->width(), canvas()->height());
 }
 
 WebGLRenderingContext::~WebGLRenderingContext() {
