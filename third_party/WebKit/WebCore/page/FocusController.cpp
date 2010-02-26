@@ -66,8 +66,11 @@ static inline void dispatchEventsOnWindowAndFocusedNode(Document* document,
 
   // Do not fire events while modal dialogs are up.  See
   // https://bugs.webkit.org/show_bug.cgi?id=33962
-  if (document->page()->defersLoading())
-    return;
+  if (Page* page = document->page()) {
+    if (page->defersLoading())
+      return;
+  }
+
   if (!focused && document->focusedNode())
     document->focusedNode()->dispatchBlurEvent();
   document->dispatchWindowEvent(
