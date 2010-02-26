@@ -74,6 +74,7 @@ class AffineTransform : public FastAllocBase {
   IntRect mapRect(const IntRect&) const;
 
   FloatRect mapRect(const FloatRect&) const;
+  FloatQuad mapQuad(const FloatQuad&) const;
 
   bool isIdentity() const;
 
