@@ -615,8 +615,19 @@ static JSValueRef keyDownCallback(JSContextRef context,
   event.key.state = state;
   event.key.window = GTK_WIDGET(view)->window;
 
+  // When synthesizing an event, an invalid hardware_keycode value
+  // can cause it to be badly processed by Gtk+.
+  GdkKeymapKey* keys;
+  gint n_keys;
+  if (gdk_keymap_get_entries_for_keyval(gdk_keymap_get_default(), gdkKeySym,
+                                        &keys, &n_keys)) {
+    event.key.hardware_keycode = keys[0].keycode;
+    g_free(keys);
+  }
+
   gboolean return_val;
   event.key.type = GDK_KEY_PRESS;
+
   g_signal_emit_by_name(view, "key-press-event", &event.key, &return_val);
 
   event.key.type = GDK_KEY_RELEASE;
