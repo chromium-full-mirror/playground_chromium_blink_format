@@ -136,6 +136,9 @@ class QWEBKIT_EXPORT QWebSettings {
   void setLocalStoragePath(const QString& path);
   QString localStoragePath() const;
 
+  void setInspectorUrl(const QUrl& location);
+  QUrl inspectorUrl() const;
+
   static void clearMemoryCaches();
 
   static void enablePersistentStorage(const QString& path = QString());

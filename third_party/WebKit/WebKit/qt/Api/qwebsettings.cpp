@@ -70,6 +70,7 @@ class QWebSettingsPrivate {
   QString localStoragePath;
   QString offlineWebApplicationCachePath;
   qint64 offlineStorageDefaultQuota;
+  QUrl inspectorLocation;
 
   void apply();
   WebCore::Settings* settings;
@@ -971,6 +972,30 @@ qint64 QWebSettings::offlineWebApplicationCacheQuota() {
 void QWebSettings::setLocalStoragePath(const QString& path) {
   d->localStoragePath = path;
   d->apply();
+}
+
+/*!
+    \since 4.7
+
+    Specifies the location of a frontend to load with each web page when using
+   Web Inspector.
+
+    \sa inspectorUrl()
+*/
+void QWebSettings::setInspectorUrl(const QUrl& location) {
+  d->inspectorLocation = location;
+  d->apply();
+}
+
+/*!
+    \since 4.7
+
+    Returns the location of the Web Inspector frontend.
+
+    \sa setInspectorUrl()
+*/
+QUrl QWebSettings::inspectorUrl() const {
+  return d->inspectorLocation;
 }
 
 /*!
