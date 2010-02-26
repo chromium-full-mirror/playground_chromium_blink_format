@@ -568,6 +568,10 @@ static char* getFrameNameSuitableForTestResult(WebKitWebView* view,
   } else if (!frameName || (frameName[0] == '\0')) {
     g_free(frameName);
     frameName = g_strdup("frame (anonymous)");
+  } else {
+    char* tmp = g_strdup_printf("frame \"%s\"", frameName);
+    g_free(frameName);
+    frameName = tmp;
   }
 
   return frameName;
@@ -576,17 +580,6 @@ static char* getFrameNameSuitableForTestResult(WebKitWebView* view,
 static void webViewLoadFinished(WebKitWebView* view,
                                 WebKitWebFrame* frame,
                                 void*) {
-  if (!done && !gLayoutTestController->dumpFrameLoadCallbacks()) {
-    guint pendingFrameUnloadEvents =
-        webkit_web_frame_get_pending_unload_event_count(frame);
-    if (pendingFrameUnloadEvents) {
-      char* frameName = getFrameNameSuitableForTestResult(view, frame);
-      printf("%s - has %u onunload handler(s)\n", frameName,
-             pendingFrameUnloadEvents);
-      g_free(frameName);
-    }
-  }
-
   if (frame != topLoadingFrame)
     return;
 
@@ -600,6 +593,25 @@ static void webViewLoadFinished(WebKitWebView* view,
     g_timeout_add(0, processWork, 0);
   else
     dump();
+}
+
+static void webViewDocumentLoadFinished(WebKitWebView* view,
+                                        WebKitWebFrame* frame,
+                                        void*) {
+  if (!done && gLayoutTestController->dumpFrameLoadCallbacks()) {
+    char* frameName = getFrameNameSuitableForTestResult(view, frame);
+    printf("%s - didFinishDocumentLoadForFrame", frameName);
+    g_free(frameName);
+  } else if (!done) {
+    guint pendingFrameUnloadEvents =
+        webkit_web_frame_get_pending_unload_event_count(frame);
+    if (pendingFrameUnloadEvents) {
+      char* frameName = getFrameNameSuitableForTestResult(view, frame);
+      printf("%s - has %u onunload handler(s)\n", frameName,
+             pendingFrameUnloadEvents);
+      g_free(frameName);
+    }
+  }
 }
 
 static void webViewWindowObjectCleared(WebKitWebView* view,
@@ -806,7 +818,8 @@ static WebKitWebView* createWebView() {
       "signal::status-bar-text-changed", webViewStatusBarTextChanged, 0,
       "signal::create-web-view", webViewCreate, 0, "signal::close-web-view",
       webViewClose, 0, "signal::database-quota-exceeded", databaseQuotaExceeded,
-      0, NULL);
+      0, "signal::document-load-finished", webViewDocumentLoadFinished, 0,
+      NULL);
 
   WebKitWebInspector* inspector = webkit_web_view_get_inspector(view);
   g_object_connect(G_OBJECT(inspector), "signal::inspect-web-view",
