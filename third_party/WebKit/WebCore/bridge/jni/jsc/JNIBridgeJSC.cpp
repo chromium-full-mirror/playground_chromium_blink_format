@@ -117,6 +117,9 @@ JSValue JavaField::valueFromInstance(ExecState* exec, const Instance* i) const {
           object_type);
       jobject anObject = result.l;
 
+      if (!anObject)
+        return jsNull();
+
       const char* arrayType = type();
       if (arrayType[0] == '[')
         jsresult = JavaArray::convertJObjectToArray(exec, anObject, arrayType,
