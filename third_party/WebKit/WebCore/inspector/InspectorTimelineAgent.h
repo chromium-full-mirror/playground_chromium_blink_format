@@ -63,6 +63,7 @@ enum TimelineRecordType {
   ResourceSendRequestTimelineRecordType = 12,
   ResourceReceiveResponseTimelineRecordType = 13,
   ResourceFinishTimelineRecordType = 14,
+  FunctionCallTimelineRecordType = 15,
 };
 
 class InspectorTimelineAgent : public Noncopyable {
@@ -74,6 +75,9 @@ class InspectorTimelineAgent : public Noncopyable {
   void resetFrontendProxyObject(InspectorFrontend*);
 
   // Methods called from WebCore.
+  void willCallFunction(const String& scriptName, int scriptLine);
+  void didCallFunction();
+
   void willDispatchEvent(const Event&);
   void didDispatchEvent();
 
@@ -110,6 +114,7 @@ class InspectorTimelineAgent : public Noncopyable {
   void didReceiveResourceResponse(unsigned long, const ResourceResponse&);
   void didFinishLoadingResource(unsigned long, bool didFail);
 
+  static int instanceCount() { return s_instanceCount; }
   static InspectorTimelineAgent* retrieve(ScriptExecutionContext*);
 
  private:
@@ -136,6 +141,7 @@ class InspectorTimelineAgent : public Noncopyable {
   InspectorFrontend* m_frontend;
 
   Vector<TimelineRecordEntry> m_recordStack;
+  static int s_instanceCount;
 };
 
 inline InspectorTimelineAgent* InspectorTimelineAgent::retrieve(

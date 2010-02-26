@@ -39,6 +39,7 @@
 #include "ResourceRequest.h"
 #include "ResourceResponse.h"
 #include "ScriptArray.h"
+#include "ScriptCallStack.h"
 #include "ScriptObject.h"
 
 namespace WebCore {
@@ -48,7 +49,25 @@ ScriptObject TimelineRecordFactory::createGenericRecord(
     double startTime) {
   ScriptObject record = frontend->newScriptObject();
   record.set("startTime", startTime);
+
+  String sourceName;
+  int sourceLineNumber;
+  if (ScriptCallStack::callLocation(&sourceName, &sourceLineNumber) &&
+      sourceName != "undefined") {
+    record.set("callerScriptName", sourceName);
+    record.set("callerScriptLine", sourceLineNumber);
+  }
   return record;
+}
+
+ScriptObject TimelineRecordFactory::createFunctionCallData(
+    InspectorFrontend* frontend,
+    const String& scriptName,
+    int scriptLine) {
+  ScriptObject data = frontend->newScriptObject();
+  data.set("scriptName", scriptName);
+  data.set("scriptLine", scriptLine);
+  return data;
 }
 
 ScriptObject TimelineRecordFactory::createEventDispatchData(
