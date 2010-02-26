@@ -52,10 +52,6 @@ class InsertTextCommand : public CompositeEditCommand {
 
   bool performTrivialReplace(const String&, bool selectInsertedText);
 
-  void insertTextIntoNodeAndRebalanceWhitespace(const String& text,
-                                                Text* node,
-                                                unsigned offset);
-
   unsigned m_charactersAdded;
 };
 
