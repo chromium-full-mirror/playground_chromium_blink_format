@@ -2429,7 +2429,8 @@ bool EventHandler::shouldDragAutoNode(Node* node, const IntPoint& point) const {
     return false;
   Page* page = m_frame->page();
   return page &&
-         page->dragController()->mayStartDragAtEventLocation(m_frame, point);
+         page->dragController()->mayStartDragAtEventLocation(m_frame, point,
+                                                             node);
 }
 
 void EventHandler::dragSourceEndedAt(const PlatformMouseEvent& event,
