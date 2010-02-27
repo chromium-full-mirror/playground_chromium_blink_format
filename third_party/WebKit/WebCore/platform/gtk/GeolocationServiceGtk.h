@@ -46,7 +46,6 @@ class GeolocationServiceGtk : public GeolocationService {
  private:
   GeolocationServiceGtk(GeolocationServiceClient*);
 
-  void updateLocationInformation();
   void setError(PositionError::ErrorCode, const char* message);
   void updatePosition();
 
@@ -58,6 +57,15 @@ class GeolocationServiceGtk : public GeolocationService {
                                double,
                                GeoclueAccuracy*,
                                GeolocationServiceGtk*);
+  static void getPositionCallback(GeocluePosition*,
+                                  GeocluePositionFields,
+                                  int,
+                                  double,
+                                  double,
+                                  double,
+                                  GeoclueAccuracy*,
+                                  GError*,
+                                  GeolocationServiceGtk*);
 
  private:
   RefPtr<Geoposition> m_lastPosition;
