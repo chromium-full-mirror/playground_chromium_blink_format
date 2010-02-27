@@ -151,6 +151,8 @@ WebDevToolsFrontendImpl::WebDevToolsFrontendImpl(
                                 WebDevToolsFrontendImpl::jsWindowUnloading);
   devToolsHost.addProtoFunction("showContextMenu",
                                 WebDevToolsFrontendImpl::jsShowContextMenu);
+  devToolsHost.addProtoFunction("canAttachWindow",
+                                WebDevToolsFrontendImpl::jsCanAttachWindow);
   devToolsHost.build();
 }
 
@@ -386,6 +388,11 @@ v8::Handle<v8::Value> WebDevToolsFrontendImpl::jsShowContextMenu(
   menuController->showContextMenu(event, frontend->m_menuProvider);
 
   return v8::Undefined();
+}
+
+v8::Handle<v8::Value> WebDevToolsFrontendImpl::jsCanAttachWindow(
+    const v8::Arguments& args) {
+  return v8Boolean(true);
 }
 
 }  // namespace WebKit

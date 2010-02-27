@@ -1062,7 +1062,9 @@ void InspectorController::didFinishLoading(unsigned long identifier) {
 
   resource->endTiming();
 
-  if (resource != m_mainResource && windowVisible())
+  // No need to mute this event for main resource since it happens after did
+  // commit load.
+  if (windowVisible())
     resource->updateScriptObject(m_frontend.get());
 }
 
@@ -1078,7 +1080,9 @@ void InspectorController::didFailLoading(unsigned long identifier,
   resource->markFailed();
   resource->endTiming();
 
-  if (resource != m_mainResource && windowVisible())
+  // No need to mute this event for main resource since it happens after did
+  // commit load.
+  if (windowVisible())
     resource->updateScriptObject(m_frontend.get());
 }
 

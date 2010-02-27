@@ -47,6 +47,7 @@
 #include "InspectorDOMAgent.h"
 #include "InspectorFrontend.h"
 #include "InspectorResource.h"
+#include "Page.h"
 #include "Pasteboard.h"
 #include "ScriptArray.h"
 #include "ScriptBreakpoint.h"
@@ -124,6 +125,11 @@ void InspectorBackend::getResourceContent(long callId,
     frontend->didGetResourceContent(callId, resource->sourceString());
   else
     frontend->didGetResourceContent(callId, "");
+}
+
+void InspectorBackend::reloadPage() {
+  if (m_inspectorController)
+    m_inspectorController->m_inspectedPage->mainFrame()->loader()->reload();
 }
 
 void InspectorBackend::startTimelineProfiler() {
