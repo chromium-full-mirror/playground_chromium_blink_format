@@ -58,4 +58,7 @@
 - (void)updateScrollers;
 - (void)setSuppressLayout:(BOOL)flag;
 
+// Calculate the appropriate frame for the contentView based on
+// allowsScrollersToOverlapContent.
+- (NSRect)contentViewFrame;
 @end
