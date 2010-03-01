@@ -20,6 +20,7 @@
 #include "config.h"
 #include "PainterOpenVG.h"
 
+#include "AffineTransform.h"
 #include "Color.h"
 #include "DashArray.h"
 #include "FloatPoint.h"
@@ -29,7 +30,6 @@
 #include "IntSize.h"
 #include "NotImplemented.h"
 #include "SurfaceOpenVG.h"
-#include "TransformationMatrix.h"
 #include "VGUtils.h"
 
 #if PLATFORM(EGL)
@@ -43,13 +43,8 @@
 
 namespace WebCore {
 
-static bool isNonRotatedAffineTransformation(
-    const TransformationMatrix& matrix) {
-  return matrix.m12() <= FLT_EPSILON && matrix.m13() <= FLT_EPSILON &&
-         matrix.m14() <= FLT_EPSILON && matrix.m21() <= FLT_EPSILON &&
-         matrix.m23() <= FLT_EPSILON && matrix.m24() <= FLT_EPSILON &&
-         matrix.m31() <= FLT_EPSILON && matrix.m32() <= FLT_EPSILON &&
-         matrix.m34() <= FLT_EPSILON && matrix.m44() >= 1 - FLT_EPSILON;
+static bool isNonRotatedAffineTransformation(const AffineTransform& t) {
+  return t.b() <= FLT_EPSILON && t.c() <= FLT_EPSILON;
 }
 
 static VGCapStyle toVGCapStyle(LineCap lineCap) {
@@ -98,7 +93,7 @@ static void setVGSolidColor(VGPaintMode paintMode, const Color& color) {
 }
 
 struct PlatformPainterState {
-  TransformationMatrix surfaceTransformationMatrix;
+  AffineTransform surfaceTransformation;
   CompositeOperator compositeOperation;
   float opacity;
 
@@ -131,7 +126,7 @@ struct PlatformPainterState {
         antialiasingEnabled(true) {}
 
   PlatformPainterState(const PlatformPainterState& state) {
-    surfaceTransformationMatrix = state.surfaceTransformationMatrix;
+    surfaceTransformation = state.surfaceTransformation;
 
     scissoringEnabled = state.scissoringEnabled;
     scissorRect = state.scissorRect;
@@ -174,7 +169,7 @@ struct PlatformPainterState {
     applyBlending(painter);
     applyStrokeStyle();
 
-    applyTransformationMatrix(painter);
+    applyTransformation(painter);
     applyScissorRect();
   }
 
@@ -257,14 +252,14 @@ struct PlatformPainterState {
     ASSERT_VG_NO_ERROR();
   }
 
-  void applyTransformationMatrix(PainterOpenVG* painter) {
+  void applyTransformation(PainterOpenVG* painter) {
     // There are *five* separate transforms that can be applied to OpenVG as of
     // 1.1
     // but it is not clear that we need to set them separately.  Instead we set
     // them
     // all right here and let this be a call to essentially set the world
     // transformation!
-    VGMatrix vgMatrix(surfaceTransformationMatrix);
+    VGMatrix vgMatrix(surfaceTransformation);
     const VGfloat* vgFloatArray = vgMatrix.toVGfloat();
 
     vgSeti(VG_MATRIX_MODE, VG_MATRIX_PATH_USER_TO_SURFACE);
@@ -393,32 +388,29 @@ void PainterOpenVG::blitToSurface() {
   m_surface->flush();
 }
 
-TransformationMatrix PainterOpenVG::transformationMatrix() const {
+AffineTransform PainterOpenVG::transformation() const {
   ASSERT(m_state);
-  return m_state->surfaceTransformationMatrix;
+  return m_state->surfaceTransformation;
 }
 
-void PainterOpenVG::concatTransformationMatrix(
-    const TransformationMatrix& matrix) {
+void PainterOpenVG::concatTransformation(
+    const AffineTransform& transformation) {
   ASSERT(m_state);
   m_surface->makeCurrent();
 
-  // We do the multiplication ourself using WebCore's TransformationMatrix
-  // rather than
-  // offloading this to VG via vgMultMatrix to keep things simple and so we can
-  // maintain
-  // state ourselves.
-  m_state->surfaceTransformationMatrix.multLeft(matrix);
-  m_state->applyTransformationMatrix(this);
+  // We do the multiplication ourself using WebCore's AffineTransform rather
+  // than offloading this to VG via vgMultMatrix() to keep things simple and
+  // so we can maintain state ourselves.
+  m_state->surfaceTransformation.multLeft(transformation);
+  m_state->applyTransformation(this);
 }
 
-void PainterOpenVG::setTransformationMatrix(
-    const TransformationMatrix& matrix) {
+void PainterOpenVG::setTransformation(const AffineTransform& transformation) {
   ASSERT(m_state);
   m_surface->makeCurrent();
 
-  m_state->surfaceTransformationMatrix = matrix;
-  m_state->applyTransformationMatrix(this);
+  m_state->surfaceTransformation = transformation;
+  m_state->applyTransformation(this);
 }
 
 CompositeOperator PainterOpenVG::compositeOperation() const {
@@ -557,27 +549,27 @@ void PainterOpenVG::scale(const FloatSize& scaleFactors) {
   ASSERT(m_state);
   m_surface->makeCurrent();
 
-  TransformationMatrix matrix = m_state->surfaceTransformationMatrix;
-  matrix.scaleNonUniform(scaleFactors.width(), scaleFactors.height());
-  setTransformationMatrix(matrix);
+  AffineTransform transformation = m_state->surfaceTransformation;
+  transformation.scaleNonUniform(scaleFactors.width(), scaleFactors.height());
+  setTransformation(transformation);
 }
 
 void PainterOpenVG::rotate(float radians) {
   ASSERT(m_state);
   m_surface->makeCurrent();
 
-  TransformationMatrix matrix = m_state->surfaceTransformationMatrix;
-  matrix.rotate(rad2deg(radians));
-  setTransformationMatrix(matrix);
+  AffineTransform transformation = m_state->surfaceTransformation;
+  transformation.rotate(rad2deg(radians));
+  setTransformation(transformation);
 }
 
 void PainterOpenVG::translate(float dx, float dy) {
   ASSERT(m_state);
   m_surface->makeCurrent();
 
-  TransformationMatrix matrix = m_state->surfaceTransformationMatrix;
-  matrix.translate(dx, dy);
-  setTransformationMatrix(matrix);
+  AffineTransform transformation = m_state->surfaceTransformation;
+  transformation.translate(dx, dy);
+  setTransformation(transformation);
 }
 
 void PainterOpenVG::intersectScissorRect(const FloatRect& rect) {
@@ -603,7 +595,7 @@ void PainterOpenVG::intersectClipRect(const FloatRect& rect) {
   ASSERT(m_state);
   m_surface->makeCurrent();
 
-  if (m_state->surfaceTransformationMatrix.isIdentity()) {
+  if (m_state->surfaceTransformation.isIdentity()) {
     // No transformation required, skip all the complex stuff.
     intersectScissorRect(rect);
     return;
@@ -615,7 +607,7 @@ void PainterOpenVG::intersectClipRect(const FloatRect& rect) {
   // subject to transformations, so we need to do the transformation to
   // surface coordinates by ourselves.
   FloatQuad effectiveScissorQuad =
-      m_state->surfaceTransformationMatrix.mapQuad(FloatQuad(rect));
+      m_state->surfaceTransformation.mapQuad(FloatQuad(rect));
 
   if (effectiveScissorQuad.isRectilinear())
     intersectScissorRect(effectiveScissorQuad.boundingBox());
