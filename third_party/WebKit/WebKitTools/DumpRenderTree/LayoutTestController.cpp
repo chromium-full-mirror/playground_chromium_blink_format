@@ -1901,6 +1901,19 @@ static JSValueRef apiTestNewWindowDataLoadBaseURLCallback(
   return JSValueMakeUndefined(context);
 }
 
+static JSValueRef apiTestGoToCurrentBackForwardItemCallback(
+    JSContextRef context,
+    JSObjectRef,
+    JSObjectRef thisObject,
+    size_t argumentCount,
+    const JSValueRef arguments[],
+    JSValueRef* exception) {
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->apiTestGoToCurrentBackForwardItem();
+  return JSValueMakeUndefined(context);
+}
+
 // Static Values
 
 static JSValueRef getGlobalFlagCallback(JSContextRef context,
@@ -2014,6 +2027,9 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"apiTestNewWindowDataLoadBaseURL",
        apiTestNewWindowDataLoadBaseURLCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"apiTestGoToCurrentBackForwardItem",
+       apiTestGoToCurrentBackForwardItemCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"clearAllDatabases", clearAllDatabasesCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},

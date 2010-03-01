@@ -338,6 +338,7 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
   // unit tests outside of DRT once they exist.
   void apiTestNewWindowDataLoadBaseURL(JSStringRef utf8Data,
                                        JSStringRef baseURL);
+  void apiTestGoToCurrentBackForwardItem();
 
   static const unsigned maxViewWidth;
   static const unsigned maxViewHeight;

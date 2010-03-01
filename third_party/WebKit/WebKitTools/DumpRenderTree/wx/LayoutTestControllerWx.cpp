@@ -332,3 +332,5 @@ int LayoutTestController::numberOfPages(float, float) {
 void LayoutTestController::apiTestNewWindowDataLoadBaseURL(
     JSStringRef utf8Data,
     JSStringRef baseURL) {}
+
+void LayoutTestController::apiTestGoToCurrentBackForwardItem() {}
