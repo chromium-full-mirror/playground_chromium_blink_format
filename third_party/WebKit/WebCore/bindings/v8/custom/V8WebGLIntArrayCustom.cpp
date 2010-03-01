@@ -47,7 +47,7 @@ v8::Handle<v8::Value> V8WebGLIntArray::constructorCallback(
     const v8::Arguments& args) {
   INC_STATS("DOM.WebGLIntArray.Contructor");
 
-  return constructWebGLArray<WebGLIntArray>(
+  return constructWebGLArray<WebGLIntArray, int>(
       args, V8ClassIndex::ToInt(V8ClassIndex::WEBGLINTARRAY));
 }
 

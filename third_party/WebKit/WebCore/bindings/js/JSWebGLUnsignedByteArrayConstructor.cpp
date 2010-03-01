@@ -30,6 +30,7 @@
 #include "JSWebGLUnsignedByteArrayConstructor.h"
 
 #include "Document.h"
+#include "ExceptionCode.h"
 #include "WebGLUnsignedByteArray.h"
 #include "JSWebGLArrayBuffer.h"
 #include "JSWebGLArrayBufferConstructor.h"
@@ -62,6 +63,10 @@ static JSObject* constructCanvasUnsignedByteArray(ExecState* exec,
       static_cast<JSWebGLUnsignedByteArrayConstructor*>(constructor);
   RefPtr<WebGLUnsignedByteArray> array = static_cast<WebGLUnsignedByteArray*>(
       construct<WebGLUnsignedByteArray, unsigned char>(exec, args).get());
+  if (!array.get()) {
+    setDOMException(exec, INDEX_SIZE_ERR);
+    return 0;
+  }
   return asObject(toJS(exec, jsConstructor->globalObject(), array.get()));
 }
 

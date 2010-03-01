@@ -47,7 +47,7 @@ v8::Handle<v8::Value> V8WebGLUnsignedIntArray::constructorCallback(
     const v8::Arguments& args) {
   INC_STATS("DOM.WebGLUnsignedIntArray.Contructor");
 
-  return constructWebGLArray<WebGLUnsignedIntArray>(
+  return constructWebGLArray<WebGLUnsignedIntArray, unsigned int>(
       args, V8ClassIndex::ToInt(V8ClassIndex::WEBGLUNSIGNEDINTARRAY));
 }
 

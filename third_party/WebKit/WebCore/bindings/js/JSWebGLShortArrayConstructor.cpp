@@ -63,6 +63,10 @@ static JSObject* constructCanvasShortArray(ExecState* exec,
       static_cast<JSWebGLShortArrayConstructor*>(constructor);
   RefPtr<WebGLShortArray> array = static_cast<WebGLShortArray*>(
       construct<WebGLShortArray, short>(exec, args).get());
+  if (!array.get()) {
+    setDOMException(exec, INDEX_SIZE_ERR);
+    return 0;
+  }
   return asObject(toJS(exec, jsConstructor->globalObject(), array.get()));
 }
 

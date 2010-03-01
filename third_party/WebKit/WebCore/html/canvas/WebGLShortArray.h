@@ -41,7 +41,7 @@ class WebGLShortArray : public WebGLArray {
   static PassRefPtr<WebGLShortArray> create(unsigned length);
   static PassRefPtr<WebGLShortArray> create(short* array, unsigned length);
   static PassRefPtr<WebGLShortArray> create(PassRefPtr<WebGLArrayBuffer> buffer,
-                                            int byteOffset,
+                                            unsigned byteOffset,
                                             unsigned length);
 
   short* data() { return static_cast<short*>(baseAddress()); }
@@ -82,7 +82,7 @@ class WebGLShortArray : public WebGLArray {
 
  private:
   WebGLShortArray(PassRefPtr<WebGLArrayBuffer> buffer,
-                  int byteOffset,
+                  unsigned byteOffset,
                   unsigned length);
   unsigned m_size;
 };

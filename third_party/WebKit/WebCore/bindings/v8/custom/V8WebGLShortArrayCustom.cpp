@@ -47,7 +47,7 @@ v8::Handle<v8::Value> V8WebGLShortArray::constructorCallback(
     const v8::Arguments& args) {
   INC_STATS("DOM.WebGLShortArray.Contructor");
 
-  return constructWebGLArray<WebGLShortArray>(
+  return constructWebGLArray<WebGLShortArray, short>(
       args, V8ClassIndex::ToInt(V8ClassIndex::WEBGLSHORTARRAY));
 }
 

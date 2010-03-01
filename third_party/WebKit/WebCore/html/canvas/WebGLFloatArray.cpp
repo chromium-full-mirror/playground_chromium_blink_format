@@ -34,7 +34,7 @@ namespace WebCore {
 
 PassRefPtr<WebGLFloatArray> WebGLFloatArray::create(unsigned length) {
   RefPtr<WebGLArrayBuffer> buffer =
-      WebGLArrayBuffer::create(length * sizeof(float));
+      WebGLArrayBuffer::create(length, sizeof(float));
   return create(buffer, 0, length);
 }
 
@@ -48,23 +48,17 @@ PassRefPtr<WebGLFloatArray> WebGLFloatArray::create(float* array,
 
 PassRefPtr<WebGLFloatArray> WebGLFloatArray::create(
     PassRefPtr<WebGLArrayBuffer> buffer,
-    int byteOffset,
+    unsigned byteOffset,
     unsigned length) {
-  // Make sure the offset results in valid alignment.
-  if ((byteOffset % sizeof(float)) != 0)
-    return NULL;
+  RefPtr<WebGLArrayBuffer> buf(buffer);
+  if (!verifySubRange<float>(buf, byteOffset, length))
+    return 0;
 
-  if (buffer) {
-    // Check to make sure we are talking about a valid region of
-    // the given WebGLArrayBuffer's storage.
-    if ((byteOffset + (length * sizeof(float))) > buffer->byteLength())
-      return NULL;
-  }
-  return adoptRef(new WebGLFloatArray(buffer, byteOffset, length));
+  return adoptRef(new WebGLFloatArray(buf, byteOffset, length));
 }
 
 WebGLFloatArray::WebGLFloatArray(PassRefPtr<WebGLArrayBuffer> buffer,
-                                 int byteOffset,
+                                 unsigned byteOffset,
                                  unsigned length)
     : WebGLArray(buffer, byteOffset), m_size(length) {}
 
@@ -78,14 +72,9 @@ unsigned WebGLFloatArray::byteLength() const {
 
 PassRefPtr<WebGLArray> WebGLFloatArray::slice(unsigned offset,
                                               unsigned length) {
-  // Check to make sure the specified region is within the bounds of
-  // the WebGLArrayBuffer.
-  unsigned startByte = m_byteOffset + offset * sizeof(float);
-  unsigned limitByte = startByte + length * sizeof(float);
-  unsigned bufferLength = buffer()->byteLength();
-  if (startByte >= bufferLength || limitByte > bufferLength)
-    return 0;
-  return create(buffer(), startByte, length);
+  unsigned fullOffset = m_byteOffset + offset * sizeof(float);
+  clampOffsetAndNumElements<float>(buffer(), &fullOffset, &length);
+  return create(buffer(), fullOffset, length);
 }
 
 void WebGLFloatArray::set(WebGLFloatArray* array,

@@ -41,7 +41,7 @@ class WebGLFloatArray : public WebGLArray {
   static PassRefPtr<WebGLFloatArray> create(unsigned length);
   static PassRefPtr<WebGLFloatArray> create(float* array, unsigned length);
   static PassRefPtr<WebGLFloatArray> create(PassRefPtr<WebGLArrayBuffer> buffer,
-                                            int byteOffset,
+                                            unsigned byteOffset,
                                             unsigned length);
 
   float* data() { return static_cast<float*>(baseAddress()); }
@@ -83,7 +83,7 @@ class WebGLFloatArray : public WebGLArray {
 
  private:
   WebGLFloatArray(PassRefPtr<WebGLArrayBuffer> buffer,
-                  int byteOffset,
+                  unsigned byteOffset,
                   unsigned length);
   unsigned m_size;
 };
