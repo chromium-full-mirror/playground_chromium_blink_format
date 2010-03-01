@@ -163,6 +163,11 @@ void WebPluginContainerImpl::frameRectsChanged() {
   reportGeometry();
 }
 
+void WebPluginContainerImpl::widgetPositionsUpdated() {
+  Widget::widgetPositionsUpdated();
+  reportGeometry();
+}
+
 void WebPluginContainerImpl::setParentVisible(bool parentVisible) {
   // We override this function to make sure that geometry updates are sent
   // over to the plugin. For e.g. when a plugin is instantiated it does not

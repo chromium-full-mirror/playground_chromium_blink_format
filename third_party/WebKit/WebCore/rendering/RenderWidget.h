@@ -39,6 +39,7 @@ class RenderWidget : public RenderReplaced, private OverlapTestRequestClient {
   static RenderWidget* find(const Widget*);
 
   void updateWidgetPosition();
+  void widgetPositionsUpdated();
 
   void showSubstituteImage(PassRefPtr<Image>);
 

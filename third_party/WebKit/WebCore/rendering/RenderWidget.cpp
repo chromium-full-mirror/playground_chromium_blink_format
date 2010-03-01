@@ -335,6 +335,12 @@ void RenderWidget::updateWidgetPosition() {
   }
 }
 
+void RenderWidget::widgetPositionsUpdated() {
+  if (!m_widget)
+    return;
+  m_widget->widgetPositionsUpdated();
+}
+
 void RenderWidget::setSelectionState(SelectionState state) {
   if (selectionState() != state) {
     RenderReplaced::setSelectionState(state);
