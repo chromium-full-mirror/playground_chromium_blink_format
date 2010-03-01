@@ -421,7 +421,7 @@ void ChromeClient::contentsSizeChanged(Frame* frame,
   // otherwise we get into an infinite loop!
   GtkWidget* widget = GTK_WIDGET(m_webView);
   if (GTK_WIDGET_REALIZED(widget) &&
-      (widget->requisition.height != size.height()) &&
+          (widget->requisition.height != size.height()) ||
       (widget->requisition.width != size.width()))
     gtk_widget_queue_resize_no_redraw(widget);
 }
