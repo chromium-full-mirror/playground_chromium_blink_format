@@ -29,6 +29,7 @@
 #include "IntRect.h"
 #include "IntSize.h"
 #include "NotImplemented.h"
+#include "PlatformPathOpenVG.h"
 #include "SurfaceOpenVG.h"
 #include "VGUtils.h"
 
@@ -323,16 +324,17 @@ struct PlatformPainterState {
   }
 };
 
-PainterOpenVG::PainterOpenVG() : m_state(0), m_surface(0) {}
+PainterOpenVG::PainterOpenVG() : m_state(0), m_surface(0), m_currentPath(0) {}
 
 PainterOpenVG::PainterOpenVG(SurfaceOpenVG* surface)
-    : m_state(0), m_surface(0) {
+    : m_state(0), m_surface(0), m_currentPath(0) {
   ASSERT(surface);
   begin(surface);
 }
 
 PainterOpenVG::~PainterOpenVG() {
   end();
+  delete m_currentPath;
 }
 
 void PainterOpenVG::begin(SurfaceOpenVG* surface) {
@@ -411,6 +413,29 @@ void PainterOpenVG::setTransformation(const AffineTransform& transformation) {
 
   m_state->surfaceTransformation = transformation;
   m_state->applyTransformation(this);
+}
+
+void PainterOpenVG::transformPath(VGPath dst,
+                                  VGPath src,
+                                  const AffineTransform& transformation) {
+  vgSeti(VG_MATRIX_MODE, VG_MATRIX_PATH_USER_TO_SURFACE);
+
+  // Save the transform state
+  VGfloat currentMatrix[9];
+  vgGetMatrix(currentMatrix);
+  ASSERT_VG_NO_ERROR();
+
+  // Load the new transform
+  vgLoadMatrix(VGMatrix(transformation).toVGfloat());
+  ASSERT_VG_NO_ERROR();
+
+  // Apply the new transform
+  vgTransformPath(dst, src);
+  ASSERT_VG_NO_ERROR();
+
+  // Restore the transform state
+  vgLoadMatrix(currentMatrix);
+  ASSERT_VG_NO_ERROR();
 }
 
 CompositeOperator PainterOpenVG::compositeOperation() const {
@@ -570,6 +595,45 @@ void PainterOpenVG::translate(float dx, float dy) {
   AffineTransform transformation = m_state->surfaceTransformation;
   transformation.translate(dx, dy);
   setTransformation(transformation);
+}
+
+void PainterOpenVG::beginPath() {
+  delete m_currentPath;
+  m_currentPath = new Path();
+}
+
+void PainterOpenVG::addPath(const Path& path) {
+  m_currentPath->platformPath()->makeCompatibleContextCurrent();
+
+  vgAppendPath(m_currentPath->platformPath()->vgPath(),
+               path.platformPath()->vgPath());
+  ASSERT_VG_NO_ERROR();
+}
+
+Path* PainterOpenVG::currentPath() const {
+  return m_currentPath;
+}
+
+void PainterOpenVG::drawPath(VGbitfield specifiedPaintModes,
+                             WindRule fillRule) {
+  ASSERT(m_state);
+
+  VGbitfield paintModes = 0;
+  if (!m_state->strokeDisabled())
+    paintModes |= VG_STROKE_PATH;
+  if (!m_state->fillDisabled())
+    paintModes |= VG_FILL_PATH;
+
+  paintModes &= specifiedPaintModes;
+
+  if (!paintModes)
+    return;
+
+  m_surface->makeCurrent();
+
+  vgSeti(VG_FILL_RULE, toVGFillRule(fillRule));
+  vgDrawPath(m_currentPath->platformPath()->vgPath(), paintModes);
+  ASSERT_VG_NO_ERROR();
 }
 
 void PainterOpenVG::intersectScissorRect(const FloatRect& rect) {

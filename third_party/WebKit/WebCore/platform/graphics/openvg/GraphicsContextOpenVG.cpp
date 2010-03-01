@@ -22,6 +22,7 @@
 
 #include "AffineTransform.h"
 #include "GraphicsContextPrivate.h"
+#include "KURL.h"
 #include "NotImplemented.h"
 #include "PainterOpenVG.h"
 #include "SurfaceOpenVG.h"
@@ -133,14 +134,21 @@ void GraphicsContext::fillPath() {
   if (paintingDisabled())
     return;
 
-  notImplemented();
+  m_data->drawPath(VG_FILL_PATH, m_common->state.fillRule);
 }
 
 void GraphicsContext::strokePath() {
   if (paintingDisabled())
     return;
 
-  notImplemented();
+  m_data->drawPath(VG_STROKE_PATH, m_common->state.fillRule);
+}
+
+void GraphicsContext::drawPath() {
+  if (paintingDisabled())
+    return;
+
+  m_data->drawPath(VG_FILL_PATH | VG_STROKE_PATH, m_common->state.fillRule);
 }
 
 void GraphicsContext::fillRect(const FloatRect& rect) {
@@ -187,14 +195,14 @@ void GraphicsContext::beginPath() {
   if (paintingDisabled())
     return;
 
-  notImplemented();
+  m_data->beginPath();
 }
 
 void GraphicsContext::addPath(const Path& path) {
   if (paintingDisabled())
     return;
 
-  notImplemented();
+  m_data->addPath(path);
 }
 
 void GraphicsContext::clip(const FloatRect& rect) {

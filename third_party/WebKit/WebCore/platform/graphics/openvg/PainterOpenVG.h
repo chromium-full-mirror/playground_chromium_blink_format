@@ -36,6 +36,7 @@ class FloatPoint;
 class FloatRect;
 class IntRect;
 class IntSize;
+class Path;
 class SurfaceOpenVG;
 
 struct PlatformPainterState;
@@ -61,6 +62,8 @@ class PainterOpenVG : public Noncopyable {
   AffineTransform transformation() const;
   void setTransformation(const AffineTransform&);
   void concatTransformation(const AffineTransform&);
+
+  static void transformPath(VGPath dst, VGPath src, const AffineTransform&);
 
   CompositeOperator compositeOperation() const;
   void setCompositeOperation(CompositeOperator);
@@ -109,6 +112,12 @@ class PainterOpenVG : public Noncopyable {
   void rotate(float radians);
   void translate(float dx, float dy);
 
+  void beginPath();
+  void addPath(const Path&);
+  Path* currentPath() const;
+  void drawPath(VGbitfield paintModes = (VG_STROKE_PATH | VG_FILL_PATH),
+                WindRule fillRule = RULE_NONZERO);
+
   void intersectClipRect(const FloatRect&);
 
   void save(PainterOpenVG::SaveMode saveMode = CreateNewState);
@@ -127,6 +136,7 @@ class PainterOpenVG : public Noncopyable {
   Vector<PlatformPainterState*> m_stateStack;
   PlatformPainterState* m_state;
   SurfaceOpenVG* m_surface;
+  Path* m_currentPath;
 };
 }
 
