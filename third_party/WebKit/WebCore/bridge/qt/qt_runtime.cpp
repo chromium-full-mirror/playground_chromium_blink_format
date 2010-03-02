@@ -1529,17 +1529,17 @@ void QtRuntimeMetaMethod::getOwnPropertyNames(ExecState* exec,
 }
 
 JSValue QtRuntimeMetaMethod::lengthGetter(ExecState* exec,
-                                          const Identifier&,
-                                          const PropertySlot&) {
+                                          JSValue,
+                                          const Identifier&) {
   // QtScript always returns 0
   return jsNumber(exec, 0);
 }
 
 JSValue QtRuntimeMetaMethod::connectGetter(ExecState* exec,
-                                           const Identifier& ident,
-                                           const PropertySlot& slot) {
+                                           JSValue slotBase,
+                                           const Identifier& ident) {
   QtRuntimeMetaMethod* thisObj =
-      static_cast<QtRuntimeMetaMethod*>(asObject(slot.slotBase()));
+      static_cast<QtRuntimeMetaMethod*>(asObject(slotBase));
   QW_DS(QtRuntimeMetaMethod, thisObj);
 
   if (!d->m_connect)
@@ -1549,10 +1549,10 @@ JSValue QtRuntimeMetaMethod::connectGetter(ExecState* exec,
 }
 
 JSValue QtRuntimeMetaMethod::disconnectGetter(ExecState* exec,
-                                              const Identifier& ident,
-                                              const PropertySlot& slot) {
+                                              JSValue slotBase,
+                                              const Identifier& ident) {
   QtRuntimeMetaMethod* thisObj =
-      static_cast<QtRuntimeMetaMethod*>(asObject(slot.slotBase()));
+      static_cast<QtRuntimeMetaMethod*>(asObject(slotBase));
   QW_DS(QtRuntimeMetaMethod, thisObj);
 
   if (!d->m_disconnect)
@@ -1779,8 +1779,8 @@ void QtRuntimeConnectionMethod::getOwnPropertyNames(
 }
 
 JSValue QtRuntimeConnectionMethod::lengthGetter(ExecState* exec,
-                                                const Identifier&,
-                                                const PropertySlot&) {
+                                                JSValue,
+                                                const Identifier&) {
   // we have one formal argument, and one optional
   return jsNumber(exec, 1);
 }
