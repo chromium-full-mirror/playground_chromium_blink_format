@@ -253,7 +253,13 @@ bool ScriptElementData::shouldExecuteAsJavaScript() const {
   // we should just
   // return 'true' here.
   String forAttribute = m_scriptElement->forAttributeValue();
-  return forAttribute.isEmpty();
+  String eventAttribute = m_scriptElement->eventAttributeValue();
+  if (forAttribute.isEmpty() || eventAttribute.isEmpty())
+    return true;
+
+  return equalIgnoringCase(forAttribute, "window") &&
+         (equalIgnoringCase(eventAttribute, "onload") ||
+          equalIgnoringCase(eventAttribute, "onload()"));
 }
 
 String ScriptElementData::scriptCharset() const {

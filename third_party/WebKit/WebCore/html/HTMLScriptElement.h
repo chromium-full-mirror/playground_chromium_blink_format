@@ -86,6 +86,7 @@ class HTMLScriptElement : public HTMLElement, public ScriptElement {
   virtual String typeAttributeValue() const;
   virtual String languageAttributeValue() const;
   virtual String forAttributeValue() const;
+  virtual String eventAttributeValue() const;
 
   virtual void dispatchLoadEvent();
   virtual void dispatchErrorEvent();

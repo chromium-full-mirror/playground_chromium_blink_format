@@ -183,6 +183,10 @@ String SVGScriptElement::forAttributeValue() const {
   return String();
 }
 
+String SVGScriptElement::eventAttributeValue() const {
+  return String();
+}
+
 void SVGScriptElement::dispatchLoadEvent() {
   bool externalResourcesRequired = externalResourcesRequiredBaseValue();
 
