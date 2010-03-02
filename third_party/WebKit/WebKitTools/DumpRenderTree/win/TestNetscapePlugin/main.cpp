@@ -111,6 +111,7 @@ NPError NPP_New(NPMIMEType pluginType,
   if (browser->version >= 14) {
     PluginObject* obj =
         (PluginObject*)browser->createobject(instance, getPluginClass());
+    instance->pdata = obj;
 
     for (int16 i = 0; i < argc; i++) {
       if (_stricmp(argn[i], "onstreamload") == 0 && !obj->onStreamLoad)
@@ -132,7 +133,8 @@ NPError NPP_New(NPMIMEType pluginType,
         obj->testWindowOpen = TRUE;
     }
 
-    instance->pdata = obj;
+    browser->getvalue(instance, NPNVprivateModeBool,
+                      (void*)&obj->cachedPrivateBrowsingMode);
   }
 
   return NPERR_NO_ERROR;
@@ -258,5 +260,13 @@ NPError NPP_GetValue(NPP instance, NPPVariable variable, void* value) {
 }
 
 NPError NPP_SetValue(NPP instance, NPNVariable variable, void* value) {
-  return NPERR_GENERIC_ERROR;
+  PluginObject* obj = static_cast<PluginObject*>(instance->pdata);
+
+  switch (variable) {
+    case NPNVprivateModeBool:
+      obj->cachedPrivateBrowsingMode = *(NPBool*)value;
+      return NPERR_NO_ERROR;
+    default:
+      return NPERR_GENERIC_ERROR;
+  }
 }

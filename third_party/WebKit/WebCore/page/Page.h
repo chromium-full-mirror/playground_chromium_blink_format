@@ -243,6 +243,8 @@ class Page : public Noncopyable {
   void userStyleSheetLocationChanged();
   const String& userStyleSheet() const;
 
+  void privateBrowsingStateChanged();
+
   void didStartPlugin(HaltablePlugin*);
   void didStopPlugin(HaltablePlugin*);
   void pluginAllowedRunTimeChanged();
