@@ -59,9 +59,9 @@ bool JSNodeList::canGetItemsForName(ExecState*,
 }
 
 JSValue JSNodeList::nameGetter(ExecState* exec,
-                               const Identifier& propertyName,
-                               const PropertySlot& slot) {
-  JSNodeList* thisObj = static_cast<JSNodeList*>(asObject(slot.slotBase()));
+                               JSValue slotBase,
+                               const Identifier& propertyName) {
+  JSNodeList* thisObj = static_cast<JSNodeList*>(asObject(slotBase));
   return toJS(exec, thisObj->impl()->itemWithName(propertyName));
 }
 

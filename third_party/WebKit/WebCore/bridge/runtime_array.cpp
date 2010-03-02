@@ -50,9 +50,9 @@ RuntimeArray::~RuntimeArray() {
 }
 
 JSValue RuntimeArray::lengthGetter(ExecState* exec,
-                                   const Identifier&,
-                                   const PropertySlot& slot) {
-  RuntimeArray* thisObj = static_cast<RuntimeArray*>(asObject(slot.slotBase()));
+                                   JSValue slotBase,
+                                   const Identifier&) {
+  RuntimeArray* thisObj = static_cast<RuntimeArray*>(asObject(slotBase));
   return jsNumber(exec, thisObj->getLength());
 }
 

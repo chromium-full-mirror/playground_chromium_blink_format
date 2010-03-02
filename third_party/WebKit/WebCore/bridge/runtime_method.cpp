@@ -58,10 +58,9 @@ RuntimeMethod::RuntimeMethod(ExecState* exec,
       _methodList(new MethodList(m)) {}
 
 JSValue RuntimeMethod::lengthGetter(ExecState* exec,
-                                    const Identifier&,
-                                    const PropertySlot& slot) {
-  RuntimeMethod* thisObj =
-      static_cast<RuntimeMethod*>(asObject(slot.slotBase()));
+                                    JSValue slotBase,
+                                    const Identifier&) {
+  RuntimeMethod* thisObj = static_cast<RuntimeMethod*>(asObject(slotBase));
 
   // Ick!  There may be more than one method with this name.  Arbitrarily
   // just pick the first method.  The fundamental problem here is that

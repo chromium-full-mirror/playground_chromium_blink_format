@@ -84,15 +84,9 @@ class RuntimeObject : public JSObject {
  private:
   virtual const ClassInfo* classInfo() const { return &s_info; }
 
-  static JSValue fallbackObjectGetter(ExecState*,
-                                      const Identifier&,
-                                      const PropertySlot&);
-  static JSValue fieldGetter(ExecState*,
-                             const Identifier&,
-                             const PropertySlot&);
-  static JSValue methodGetter(ExecState*,
-                              const Identifier&,
-                              const PropertySlot&);
+  static JSValue fallbackObjectGetter(ExecState*, JSValue, const Identifier&);
+  static JSValue fieldGetter(ExecState*, JSValue, const Identifier&);
+  static JSValue methodGetter(ExecState*, JSValue, const Identifier&);
 
   RefPtr<Instance> m_instance;
 };

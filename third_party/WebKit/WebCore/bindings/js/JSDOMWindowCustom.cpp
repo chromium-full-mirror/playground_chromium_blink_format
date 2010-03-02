@@ -125,17 +125,17 @@ void JSDOMWindow::markChildren(MarkStack& markStack) {
 
 template <NativeFunction nativeFunction, int length>
 JSValue nonCachingStaticFunctionGetter(ExecState* exec,
-                                       const Identifier& propertyName,
-                                       const PropertySlot&) {
+                                       JSValue,
+                                       const Identifier& propertyName) {
   return new (exec) NativeFunctionWrapper(
       exec, exec->lexicalGlobalObject()->prototypeFunctionStructure(), length,
       propertyName, nativeFunction);
 }
 
 static JSValue childFrameGetter(ExecState* exec,
-                                const Identifier& propertyName,
-                                const PropertySlot& slot) {
-  return toJS(exec, static_cast<JSDOMWindow*>(asObject(slot.slotBase()))
+                                JSValue slotBase,
+                                const Identifier& propertyName) {
+  return toJS(exec, static_cast<JSDOMWindow*>(asObject(slotBase))
                         ->impl()
                         ->frame()
                         ->tree()
@@ -153,10 +153,9 @@ static JSValue indexGetter(ExecState* exec, JSValue slotBase, unsigned index) {
 }
 
 static JSValue namedItemGetter(ExecState* exec,
-                               const Identifier& propertyName,
-                               const PropertySlot& slot) {
-  JSDOMWindowBase* thisObj =
-      static_cast<JSDOMWindow*>(asObject(slot.slotBase()));
+                               JSValue slotBase,
+                               const Identifier& propertyName) {
+  JSDOMWindowBase* thisObj = static_cast<JSDOMWindow*>(asObject(slotBase));
   Document* document = thisObj->impl()->frame()->document();
 
   ASSERT(thisObj->allowsAccessFrom(exec));

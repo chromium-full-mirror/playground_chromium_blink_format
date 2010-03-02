@@ -121,10 +121,10 @@ bool JSHTMLAllCollection::canGetItemsForName(ExecState*,
 }
 
 JSValue JSHTMLAllCollection::nameGetter(ExecState* exec,
-                                        const Identifier& propertyName,
-                                        const PropertySlot& slot) {
+                                        JSValue slotBase,
+                                        const Identifier& propertyName) {
   JSHTMLAllCollection* thisObj =
-      static_cast<JSHTMLAllCollection*>(asObject(slot.slotBase()));
+      static_cast<JSHTMLAllCollection*>(asObject(slotBase));
   return getNamedItems(exec, thisObj, propertyName);
 }
 

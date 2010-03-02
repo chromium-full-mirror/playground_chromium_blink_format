@@ -53,10 +53,10 @@ bool JSStyleSheetList::canGetItemsForName(ExecState*,
 }
 
 JSValue JSStyleSheetList::nameGetter(ExecState* exec,
-                                     const Identifier& propertyName,
-                                     const PropertySlot& slot) {
+                                     JSValue slotBase,
+                                     const Identifier& propertyName) {
   JSStyleSheetList* thisObj =
-      static_cast<JSStyleSheetList*>(asObject(slot.slotBase()));
+      static_cast<JSStyleSheetList*>(asObject(slotBase));
   HTMLStyleElement* element = thisObj->impl()->getNamedItem(propertyName);
   ASSERT(element);
   return toJS(exec, element->sheet());

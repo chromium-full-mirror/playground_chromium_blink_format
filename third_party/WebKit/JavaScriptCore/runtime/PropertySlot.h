@@ -35,6 +35,7 @@ class JSObject;
 #define JSC_VALUE_SLOT_MARKER 0
 #define JSC_REGISTER_SLOT_MARKER reinterpret_cast<GetValueFunc>(1)
 #define INDEX_GETTER_MARKER reinterpret_cast<GetValueFunc>(2)
+#define GETTER_FUNCTION_MARKER reinterpret_cast<GetValueFunc>(3)
 
 class PropertySlot {
  public:
@@ -50,8 +51,8 @@ class PropertySlot {
   }
 
   typedef JSValue (*GetValueFunc)(ExecState*,
-                                  const Identifier&,
-                                  const PropertySlot&);
+                                  JSValue slotBase,
+                                  const Identifier&);
   typedef JSValue (*GetIndexValueFunc)(ExecState*, JSValue slotBase, unsigned);
 
   JSValue getValue(ExecState* exec, const Identifier& propertyName) const {
@@ -61,7 +62,9 @@ class PropertySlot {
       return (*m_data.registerSlot).jsValue();
     if (m_getValue == INDEX_GETTER_MARKER)
       return m_getIndexValue(exec, slotBase(), index());
-    return m_getValue(exec, propertyName, *this);
+    if (m_getValue == GETTER_FUNCTION_MARKER)
+      return functionGetter(exec);
+    return m_getValue(exec, slotBase(), propertyName);
   }
 
   JSValue getValue(ExecState* exec, unsigned propertyName) const {
@@ -71,7 +74,9 @@ class PropertySlot {
       return (*m_data.registerSlot).jsValue();
     if (m_getValue == INDEX_GETTER_MARKER)
       return m_getIndexValue(exec, m_slotBase, m_data.index);
-    return m_getValue(exec, Identifier::from(exec, propertyName), *this);
+    if (m_getValue == GETTER_FUNCTION_MARKER)
+      return functionGetter(exec);
+    return m_getValue(exec, slotBase(), Identifier::from(exec, propertyName));
   }
 
   bool isGetter() const { return m_isGetter; }
@@ -146,7 +151,7 @@ class PropertySlot {
   void setGetterSlot(JSObject* getterFunc) {
     ASSERT(getterFunc);
     m_thisValue = m_slotBase;
-    m_getValue = functionGetter;
+    m_getValue = GETTER_FUNCTION_MARKER;
     m_data.getterFunc = getterFunc;
     m_isGetter = true;
   }
@@ -155,7 +160,7 @@ class PropertySlot {
                               JSObject* getterFunc,
                               unsigned offset) {
     ASSERT(getterFunc);
-    m_getValue = functionGetter;
+    m_getValue = GETTER_FUNCTION_MARKER;
     m_thisValue = m_slotBase;
     m_slotBase = slotBase;
     m_data.getterFunc = getterFunc;
@@ -201,9 +206,7 @@ class PropertySlot {
   JSValue thisValue() const { return m_thisValue; }
 
  private:
-  static JSValue functionGetter(ExecState*,
-                                const Identifier&,
-                                const PropertySlot&);
+  JSValue functionGetter(ExecState*) const;
 
   GetValueFunc m_getValue;
   GetIndexValueFunc m_getIndexValue;

@@ -133,25 +133,25 @@ JSValue JSFunction::call(ExecState* exec,
 }
 
 JSValue JSFunction::argumentsGetter(ExecState* exec,
-                                    const Identifier&,
-                                    const PropertySlot& slot) {
-  JSFunction* thisObj = asFunction(slot.slotBase());
+                                    JSValue slotBase,
+                                    const Identifier&) {
+  JSFunction* thisObj = asFunction(slotBase);
   ASSERT(!thisObj->isHostFunction());
   return exec->interpreter()->retrieveArguments(exec, thisObj);
 }
 
 JSValue JSFunction::callerGetter(ExecState* exec,
-                                 const Identifier&,
-                                 const PropertySlot& slot) {
-  JSFunction* thisObj = asFunction(slot.slotBase());
+                                 JSValue slotBase,
+                                 const Identifier&) {
+  JSFunction* thisObj = asFunction(slotBase);
   ASSERT(!thisObj->isHostFunction());
   return exec->interpreter()->retrieveCaller(exec, thisObj);
 }
 
 JSValue JSFunction::lengthGetter(ExecState* exec,
-                                 const Identifier&,
-                                 const PropertySlot& slot) {
-  JSFunction* thisObj = asFunction(slot.slotBase());
+                                 JSValue slotBase,
+                                 const Identifier&) {
+  JSFunction* thisObj = asFunction(slotBase);
   ASSERT(!thisObj->isHostFunction());
   return jsNumber(exec, thisObj->jsExecutable()->parameterCount());
 }

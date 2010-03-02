@@ -564,9 +564,9 @@ bool JSCallbackObject<Base>::inherits(JSClassRef c) const {
 template <class Base>
 JSValue JSCallbackObject<Base>::staticValueGetter(
     ExecState* exec,
-    const Identifier& propertyName,
-    const PropertySlot& slot) {
-  JSCallbackObject* thisObj = asCallbackObject(slot.slotBase());
+    JSValue slotBase,
+    const Identifier& propertyName) {
+  JSCallbackObject* thisObj = asCallbackObject(slotBase);
 
   JSObjectRef thisRef = toRef(thisObj);
   RefPtr<OpaqueJSString> propertyNameRef;
@@ -603,9 +603,9 @@ JSValue JSCallbackObject<Base>::staticValueGetter(
 template <class Base>
 JSValue JSCallbackObject<Base>::staticFunctionGetter(
     ExecState* exec,
-    const Identifier& propertyName,
-    const PropertySlot& slot) {
-  JSCallbackObject* thisObj = asCallbackObject(slot.slotBase());
+    JSValue slotBase,
+    const Identifier& propertyName) {
+  JSCallbackObject* thisObj = asCallbackObject(slotBase);
 
   // Check for cached or override property.
   PropertySlot slot2(thisObj);
@@ -636,9 +636,9 @@ JSValue JSCallbackObject<Base>::staticFunctionGetter(
 
 template <class Base>
 JSValue JSCallbackObject<Base>::callbackGetter(ExecState* exec,
-                                               const Identifier& propertyName,
-                                               const PropertySlot& slot) {
-  JSCallbackObject* thisObj = asCallbackObject(slot.slotBase());
+                                               JSValue slotBase,
+                                               const Identifier& propertyName) {
+  JSCallbackObject* thisObj = asCallbackObject(slotBase);
 
   JSObjectRef thisRef = toRef(thisObj);
   RefPtr<OpaqueJSString> propertyNameRef;

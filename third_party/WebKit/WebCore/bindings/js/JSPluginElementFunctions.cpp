@@ -59,10 +59,9 @@ static RuntimeObject* getRuntimeObject(ExecState* exec, Node* node) {
 }
 
 JSValue runtimeObjectPropertyGetter(ExecState* exec,
-                                    const Identifier& propertyName,
-                                    const PropertySlot& slot) {
-  JSHTMLElement* thisObj =
-      static_cast<JSHTMLElement*>(asObject(slot.slotBase()));
+                                    JSValue slotBase,
+                                    const Identifier& propertyName) {
+  JSHTMLElement* thisObj = static_cast<JSHTMLElement*>(asObject(slotBase));
   HTMLElement* element = static_cast<HTMLElement*>(thisObj->impl());
   RuntimeObject* runtimeObject = getRuntimeObject(exec, element);
   if (!runtimeObject)

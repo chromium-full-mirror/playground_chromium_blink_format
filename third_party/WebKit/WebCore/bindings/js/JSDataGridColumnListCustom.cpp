@@ -45,10 +45,10 @@ bool JSDataGridColumnList::canGetItemsForName(ExecState*,
 }
 
 JSValue JSDataGridColumnList::nameGetter(ExecState* exec,
-                                         const Identifier& propertyName,
-                                         const PropertySlot& slot) {
+                                         JSValue slotBase,
+                                         const Identifier& propertyName) {
   JSDataGridColumnList* thisObj =
-      static_cast<JSDataGridColumnList*>(asObject(slot.slotBase()));
+      static_cast<JSDataGridColumnList*>(asObject(slotBase));
   return toJS(exec, thisObj->globalObject(),
               thisObj->impl()->itemWithName(propertyName));
 }

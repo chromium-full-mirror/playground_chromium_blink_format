@@ -42,8 +42,8 @@ namespace WebCore {
 
 static JSValue nonCachingStaticReplaceFunctionGetter(
     ExecState* exec,
-    const Identifier& propertyName,
-    const PropertySlot&) {
+    JSValue,
+    const Identifier& propertyName) {
   return new (exec) NativeFunctionWrapper(
       exec, exec->lexicalGlobalObject()->prototypeFunctionStructure(), 1,
       propertyName, jsLocationPrototypeFunctionReplace);
@@ -51,8 +51,8 @@ static JSValue nonCachingStaticReplaceFunctionGetter(
 
 static JSValue nonCachingStaticReloadFunctionGetter(
     ExecState* exec,
-    const Identifier& propertyName,
-    const PropertySlot&) {
+    JSValue,
+    const Identifier& propertyName) {
   return new (exec) NativeFunctionWrapper(
       exec, exec->lexicalGlobalObject()->prototypeFunctionStructure(), 0,
       propertyName, jsLocationPrototypeFunctionReload);
@@ -60,8 +60,8 @@ static JSValue nonCachingStaticReloadFunctionGetter(
 
 static JSValue nonCachingStaticAssignFunctionGetter(
     ExecState* exec,
-    const Identifier& propertyName,
-    const PropertySlot&) {
+    JSValue,
+    const Identifier& propertyName) {
   return new (exec) NativeFunctionWrapper(
       exec, exec->lexicalGlobalObject()->prototypeFunctionStructure(), 1,
       propertyName, jsLocationPrototypeFunctionAssign);

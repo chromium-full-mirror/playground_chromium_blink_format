@@ -100,15 +100,9 @@ class JSCallbackObject : public Base {
                                     const ArgList&);
   static JSObject* construct(ExecState*, JSObject* constructor, const ArgList&);
 
-  static JSValue staticValueGetter(ExecState*,
-                                   const Identifier&,
-                                   const PropertySlot&);
-  static JSValue staticFunctionGetter(ExecState*,
-                                      const Identifier&,
-                                      const PropertySlot&);
-  static JSValue callbackGetter(ExecState*,
-                                const Identifier&,
-                                const PropertySlot&);
+  static JSValue staticValueGetter(ExecState*, JSValue, const Identifier&);
+  static JSValue staticFunctionGetter(ExecState*, JSValue, const Identifier&);
+  static JSValue callbackGetter(ExecState*, JSValue, const Identifier&);
 
   struct JSCallbackObjectData {
     JSCallbackObjectData(void* privateData, JSClassRef jsClass)

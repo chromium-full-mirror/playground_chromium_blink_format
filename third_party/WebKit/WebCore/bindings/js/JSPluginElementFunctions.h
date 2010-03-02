@@ -40,8 +40,8 @@ class Node;
 JSC::Bindings::Instance* pluginInstance(Node*);
 
 JSC::JSValue runtimeObjectPropertyGetter(JSC::ExecState*,
-                                         const JSC::Identifier&,
-                                         const JSC::PropertySlot&);
+                                         JSC::JSValue,
+                                         const JSC::Identifier&);
 bool runtimeObjectCustomGetOwnPropertySlot(JSC::ExecState*,
                                            const JSC::Identifier&,
                                            JSC::PropertySlot&,

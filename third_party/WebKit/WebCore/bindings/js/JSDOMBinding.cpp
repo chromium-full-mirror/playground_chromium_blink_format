@@ -793,8 +793,8 @@ KURL completeURL(ExecState* exec, const String& relativeURL) {
 }
 
 JSValue objectToStringFunctionGetter(ExecState* exec,
-                                     const Identifier& propertyName,
-                                     const PropertySlot&) {
+                                     JSValue,
+                                     const Identifier& propertyName) {
   return new (exec) NativeFunctionWrapper(
       exec, exec->lexicalGlobalObject()->prototypeFunctionStructure(), 0,
       propertyName, objectProtoFuncToString);

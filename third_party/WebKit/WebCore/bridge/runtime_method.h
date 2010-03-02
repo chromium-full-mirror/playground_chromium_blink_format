@@ -56,9 +56,7 @@ class RuntimeMethod : public InternalFunction {
   static const unsigned StructureFlags =
       OverridesGetOwnPropertySlot | ImplementsHasInstance |
       OverridesMarkChildren | InternalFunction::StructureFlags;
-  static JSValue lengthGetter(ExecState*,
-                              const Identifier&,
-                              const PropertySlot&);
+  static JSValue lengthGetter(ExecState*, JSValue, const Identifier&);
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   virtual bool getOwnPropertyDescriptor(ExecState*,
                                         const Identifier&,

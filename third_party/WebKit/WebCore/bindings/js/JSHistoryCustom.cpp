@@ -40,8 +40,8 @@ namespace WebCore {
 
 static JSValue nonCachingStaticBackFunctionGetter(
     ExecState* exec,
-    const Identifier& propertyName,
-    const PropertySlot&) {
+    JSValue,
+    const Identifier& propertyName) {
   return new (exec) NativeFunctionWrapper(
       exec, exec->lexicalGlobalObject()->prototypeFunctionStructure(), 0,
       propertyName, jsHistoryPrototypeFunctionBack);
@@ -49,16 +49,17 @@ static JSValue nonCachingStaticBackFunctionGetter(
 
 static JSValue nonCachingStaticForwardFunctionGetter(
     ExecState* exec,
-    const Identifier& propertyName,
-    const PropertySlot&) {
+    JSValue,
+    const Identifier& propertyName) {
   return new (exec) NativeFunctionWrapper(
       exec, exec->lexicalGlobalObject()->prototypeFunctionStructure(), 0,
       propertyName, jsHistoryPrototypeFunctionForward);
 }
 
-static JSValue nonCachingStaticGoFunctionGetter(ExecState* exec,
-                                                const Identifier& propertyName,
-                                                const PropertySlot&) {
+static JSValue nonCachingStaticGoFunctionGetter(
+    ExecState* exec,
+    JSValue,
+    const Identifier& propertyName) {
   return new (exec) NativeFunctionWrapper(
       exec, exec->lexicalGlobalObject()->prototypeFunctionStructure(), 1,
       propertyName, jsHistoryPrototypeFunctionGo);
