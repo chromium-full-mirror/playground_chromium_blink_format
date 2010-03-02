@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2006, 2007, 2008 Apple Inc. All rights reserved.
  * Copyright (C) 2009 Holger Hans Peter Freyther
+ * Copyright (C) 2010 Collabora Ltd.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -435,9 +436,9 @@ static bool testCallback(PluginObject* obj,
   free(callbackString);
 
   NPVariant browserResult;
-  browser->invoke(obj->npp, windowScriptObject, callbackIdentifier, 0, 0,
-                  &browserResult);
-  browser->releasevariantvalue(&browserResult);
+  if (browser->invoke(obj->npp, windowScriptObject, callbackIdentifier, 0, 0,
+                      &browserResult))
+    browser->releasevariantvalue(&browserResult);
 
   browser->releaseobject(windowScriptObject);
 
@@ -572,9 +573,9 @@ static bool testEnumerate(PluginObject* obj,
       NPVariant args[1];
       STRINGZ_TO_NPVARIANT(string, args[0]);
       NPVariant browserResult;
-      browser->invoke(obj->npp, outArray, pushIdentifier, args, 1,
-                      &browserResult);
-      browser->releasevariantvalue(&browserResult);
+      if (browser->invoke(obj->npp, outArray, pushIdentifier, args, 1,
+                          &browserResult))
+        browser->releasevariantvalue(&browserResult);
       browser->memfree(string);
     }
 
@@ -805,8 +806,8 @@ bool testDocumentOpen(NPP npp) {
   STRINGZ_TO_NPVARIANT("_blank", openArgs[1]);
 
   NPVariant result;
-  browser->invoke(npp, documentObject, openId, openArgs, 2, &result);
-  browser->releaseobject(documentObject);
+  if (browser->invoke(npp, documentObject, openId, openArgs, 2, &result))
+    browser->releaseobject(documentObject);
 
   if (result.type == NPVariantType_Object) {
     pluginLogWithWindowObjectVariableArgs(windowObject, npp,
@@ -832,8 +833,9 @@ bool testWindowOpen(NPP npp) {
   STRINGZ_TO_NPVARIANT("_blank", openArgs[1]);
 
   NPVariant result;
-  browser->invoke(npp, windowObject, openId, openArgs, 2, &result);
-  if (result.type == NPVariantType_Object) {
+  bool didSucceed =
+      browser->invoke(npp, windowObject, openId, openArgs, 2, &result);
+  if (didSucceed && (result.type == NPVariantType_Object)) {
     pluginLogWithWindowObjectVariableArgs(windowObject, npp,
                                           "WINDOW OPEN SUCCESS");
     notifyTestCompletion(npp, result.value.objectValue);
@@ -1044,9 +1046,9 @@ void handleCallback(PluginObject* object,
     NULL_TO_NPVARIANT(args[1]);
 
   NPVariant browserResult;
-  browser->invoke(object->npp, windowScriptObject, callbackIdentifier, args, 2,
-                  &browserResult);
-  browser->releasevariantvalue(&browserResult);
+  if (browser->invoke(object->npp, windowScriptObject, callbackIdentifier, args,
+                      2, &browserResult))
+    browser->releasevariantvalue(&browserResult);
 
   free(strHdr);
 }
