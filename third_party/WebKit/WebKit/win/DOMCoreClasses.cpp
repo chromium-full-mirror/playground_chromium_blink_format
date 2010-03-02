@@ -186,9 +186,14 @@ HRESULT STDMETHODCALLTYPE DOMNode::previousSibling(
 }
 
 HRESULT STDMETHODCALLTYPE DOMNode::nextSibling(
-    /* [retval][out] */ IDOMNode** /*result*/) {
-  ASSERT_NOT_REACHED();
-  return E_NOTIMPL;
+    /* [retval][out] */ IDOMNode** result) {
+  if (!result)
+    return E_POINTER;
+  *result = 0;
+  if (!m_node)
+    return E_FAIL;
+  *result = DOMNode::createInstance(m_node->nextSibling());
+  return *result ? S_OK : E_FAIL;
 }
 
 HRESULT STDMETHODCALLTYPE DOMNode::attributes(
@@ -209,11 +214,31 @@ HRESULT STDMETHODCALLTYPE DOMNode::ownerDocument(
 }
 
 HRESULT STDMETHODCALLTYPE DOMNode::insertBefore(
-    /* [in] */ IDOMNode* /*newChild*/,
-    /* [in] */ IDOMNode* /*refChild*/,
-    /* [retval][out] */ IDOMNode** /*result*/) {
-  ASSERT_NOT_REACHED();
-  return E_NOTIMPL;
+    /* [in] */ IDOMNode* newChild,
+    /* [in] */ IDOMNode* refChild,
+    /* [retval][out] */ IDOMNode** result) {
+  if (!result)
+    return E_POINTER;
+
+  *result = 0;
+
+  if (!m_node)
+    return E_FAIL;
+
+  COMPtr<DOMNode> newChildNode(Query, newChild);
+  if (!newChildNode)
+    return E_FAIL;
+
+  COMPtr<DOMNode> refChildNode(Query, refChild);
+
+  ExceptionCode ec;
+  if (!m_node->insertBefore(newChildNode->node(),
+                            refChildNode ? refChildNode->node() : 0, ec))
+    return E_FAIL;
+
+  *result = newChild;
+  (*result)->AddRef();
+  return S_OK;
 }
 
 HRESULT STDMETHODCALLTYPE DOMNode::replaceChild(
@@ -225,10 +250,27 @@ HRESULT STDMETHODCALLTYPE DOMNode::replaceChild(
 }
 
 HRESULT STDMETHODCALLTYPE DOMNode::removeChild(
-    /* [in] */ IDOMNode* /*oldChild*/,
-    /* [retval][out] */ IDOMNode** /*result*/) {
-  ASSERT_NOT_REACHED();
-  return E_NOTIMPL;
+    /* [in] */ IDOMNode* oldChild,
+    /* [retval][out] */ IDOMNode** result) {
+  if (!result)
+    return E_POINTER;
+
+  *result = 0;
+
+  if (!m_node)
+    return E_FAIL;
+
+  COMPtr<DOMNode> oldChildNode(Query, oldChild);
+  if (!oldChildNode)
+    return E_FAIL;
+
+  ExceptionCode ec;
+  if (!m_node->removeChild(oldChildNode->node(), ec))
+    return E_FAIL;
+
+  *result = oldChild;
+  (*result)->AddRef();
+  return S_OK;
 }
 
 HRESULT STDMETHODCALLTYPE DOMNode::appendChild(
