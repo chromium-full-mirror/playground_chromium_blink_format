@@ -57,10 +57,10 @@ JSValue RuntimeArray::lengthGetter(ExecState* exec,
 }
 
 JSValue RuntimeArray::indexGetter(ExecState* exec,
-                                  const Identifier&,
-                                  const PropertySlot& slot) {
-  RuntimeArray* thisObj = static_cast<RuntimeArray*>(asObject(slot.slotBase()));
-  return thisObj->getConcreteArray()->valueAt(exec, slot.index());
+                                  JSValue slotBase,
+                                  unsigned index) {
+  RuntimeArray* thisObj = static_cast<RuntimeArray*>(asObject(slotBase));
+  return thisObj->getConcreteArray()->valueAt(exec, index);
 }
 
 void RuntimeArray::getOwnPropertyNames(ExecState* exec,

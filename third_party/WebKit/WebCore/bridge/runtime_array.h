@@ -76,9 +76,7 @@ class RuntimeArray : public JSArray {
   static JSValue lengthGetter(ExecState*,
                               const Identifier&,
                               const PropertySlot&);
-  static JSValue indexGetter(ExecState*,
-                             const Identifier&,
-                             const PropertySlot&);
+  static JSValue indexGetter(ExecState*, JSValue, unsigned);
 };
 
 }  // namespace JSC

@@ -34,6 +34,7 @@ class JSObject;
 
 #define JSC_VALUE_SLOT_MARKER 0
 #define JSC_REGISTER_SLOT_MARKER reinterpret_cast<GetValueFunc>(1)
+#define INDEX_GETTER_MARKER reinterpret_cast<GetValueFunc>(2)
 
 class PropertySlot {
  public:
@@ -51,12 +52,15 @@ class PropertySlot {
   typedef JSValue (*GetValueFunc)(ExecState*,
                                   const Identifier&,
                                   const PropertySlot&);
+  typedef JSValue (*GetIndexValueFunc)(ExecState*, JSValue slotBase, unsigned);
 
   JSValue getValue(ExecState* exec, const Identifier& propertyName) const {
     if (m_getValue == JSC_VALUE_SLOT_MARKER)
       return *m_data.valueSlot;
     if (m_getValue == JSC_REGISTER_SLOT_MARKER)
       return (*m_data.registerSlot).jsValue();
+    if (m_getValue == INDEX_GETTER_MARKER)
+      return m_getIndexValue(exec, slotBase(), index());
     return m_getValue(exec, propertyName, *this);
   }
 
@@ -65,6 +69,8 @@ class PropertySlot {
       return *m_data.valueSlot;
     if (m_getValue == JSC_REGISTER_SLOT_MARKER)
       return (*m_data.registerSlot).jsValue();
+    if (m_getValue == INDEX_GETTER_MARKER)
+      return m_getIndexValue(exec, m_slotBase, m_data.index);
     return m_getValue(exec, Identifier::from(exec, propertyName), *this);
   }
 
@@ -122,13 +128,17 @@ class PropertySlot {
     ASSERT(slotBase);
     ASSERT(getValue);
     m_getValue = getValue;
+    m_getIndexValue = 0;
     m_slotBase = slotBase;
   }
 
-  void setCustomIndex(JSValue slotBase, unsigned index, GetValueFunc getValue) {
+  void setCustomIndex(JSValue slotBase,
+                      unsigned index,
+                      GetIndexValueFunc getIndexValue) {
     ASSERT(slotBase);
-    ASSERT(getValue);
-    m_getValue = getValue;
+    ASSERT(getIndexValue);
+    m_getValue = INDEX_GETTER_MARKER;
+    m_getIndexValue = getIndexValue;
     m_slotBase = slotBase;
     m_data.index = index;
   }
@@ -196,6 +206,7 @@ class PropertySlot {
                                 const PropertySlot&);
 
   GetValueFunc m_getValue;
+  GetIndexValueFunc m_getIndexValue;
 
   JSValue m_slotBase;
   union {

@@ -143,14 +143,12 @@ static JSValue childFrameGetter(ExecState* exec,
                         ->domWindow());
 }
 
-static JSValue indexGetter(ExecState* exec,
-                           const Identifier&,
-                           const PropertySlot& slot) {
-  return toJS(exec, static_cast<JSDOMWindow*>(asObject(slot.slotBase()))
+static JSValue indexGetter(ExecState* exec, JSValue slotBase, unsigned index) {
+  return toJS(exec, static_cast<JSDOMWindow*>(asObject(slotBase))
                         ->impl()
                         ->frame()
                         ->tree()
-                        ->child(slot.index())
+                        ->child(index)
                         ->domWindow());
 }
 
