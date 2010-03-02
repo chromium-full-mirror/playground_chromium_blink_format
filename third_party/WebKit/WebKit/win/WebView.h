@@ -818,6 +818,7 @@ class WebView : public IWebView,
 
   virtual HRESULT STDMETHODCALLTYPE
   setDomainRelaxationForbiddenForURLScheme(BOOL forbidden, BSTR scheme);
+  virtual HRESULT STDMETHODCALLTYPE registerURLSchemeAsSecure(BSTR);
 
   // WebView
   bool shouldUseEmbeddedView(const WebCore::String& mimeType) const;

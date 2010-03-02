@@ -609,6 +609,7 @@ backforward list.
 
 + (void)_setDomainRelaxationForbidden:(BOOL)forbidden
                          forURLScheme:(NSString*)scheme;
++ (void)_registerURLSchemeAsSecure:(NSString*)scheme;
 
 @end
 

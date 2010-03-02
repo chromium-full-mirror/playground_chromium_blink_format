@@ -6342,6 +6342,11 @@ HRESULT WebView::setDomainRelaxationForbiddenForURLScheme(BOOL forbidden,
   return S_OK;
 }
 
+HRESULT WebView::registerURLSchemeAsSecure(BSTR scheme) {
+  SecurityOrigin::registerURLSchemeAsSecure(toString(scheme));
+  return S_OK;
+}
+
 class EnumTextMatches : public IEnumTextMatches {
   long m_ref;
   UINT m_index;
