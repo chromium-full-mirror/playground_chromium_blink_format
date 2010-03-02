@@ -97,6 +97,31 @@ class PlatformKeyboardEvent : public FastAllocBase {
     ShiftKey = 1 << 3,
   };
 
+  PlatformKeyboardEvent()
+      : m_type(KeyDown),
+        m_autoRepeat(false),
+        m_windowsVirtualKeyCode(0),
+        m_nativeVirtualKeyCode(0),
+        m_isKeypad(false),
+        m_shiftKey(false),
+        m_ctrlKey(false),
+        m_altKey(false),
+        m_metaKey(false)
+#if PLATFORM(WIN) || PLATFORM(CHROMIUM)
+        ,
+        m_isSystemKey(false)
+#endif
+#if PLATFORM(GTK)
+        ,
+        m_gdkEventKey(0)
+#endif
+#if PLATFORM(QT)
+        ,
+        m_qtEvent(0)
+#endif
+  {
+  }
+
   Type type() const { return m_type; }
   void disambiguateKeyDownEvent(
       Type,
@@ -144,7 +169,6 @@ class PlatformKeyboardEvent : public FastAllocBase {
   static bool currentCapsLockState();
 
 #if PLATFORM(MAC)
-  PlatformKeyboardEvent();
   PlatformKeyboardEvent(NSEvent*);
   NSEvent* macEvent() const { return m_macEvent.get(); }
 #endif
