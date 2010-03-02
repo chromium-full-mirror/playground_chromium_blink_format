@@ -22,6 +22,7 @@
 
 #include "qscriptconverter_p.h"
 #include "qscriptengine.h"
+#include "qscriptstring_p.h"
 #include "qscriptvalue.h"
 #include <JavaScriptCore/JavaScript.h>
 #include <QtCore/qshareddata.h>
@@ -54,6 +55,8 @@ class QScriptEnginePrivate : public QSharedData {
   inline JSValueRef makeJSValue(const QString& string) const;
   inline JSValueRef makeJSValue(bool number) const;
   inline JSValueRef makeJSValue(QScriptValue::SpecialValue value) const;
+
+  inline QScriptStringPrivate* toStringHandle(const QString& str) const;
 
   inline JSGlobalContextRef context() const;
 
@@ -91,6 +94,11 @@ JSValueRef QScriptEnginePrivate::makeJSValue(
   if (value == QScriptValue::NullValue)
     return JSValueMakeNull(m_context);
   return JSValueMakeUndefined(m_context);
+}
+
+QScriptStringPrivate* QScriptEnginePrivate::toStringHandle(
+    const QString& str) const {
+  return new QScriptStringPrivate(str);
 }
 
 JSGlobalContextRef QScriptEnginePrivate::context() const {
