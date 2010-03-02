@@ -149,6 +149,8 @@ class AccessibilityUIElement {
   int indexInTable();
   JSStringRef rowIndexRange();
   JSStringRef columnIndexRange();
+  int rowCount();
+  int columnCount();
 
   // Tree/Outline specific attributes
   AccessibilityUIElement selectedRowAtIndex(unsigned);

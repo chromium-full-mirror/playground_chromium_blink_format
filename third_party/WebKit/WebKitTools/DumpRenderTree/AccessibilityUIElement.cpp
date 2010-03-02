@@ -676,6 +676,20 @@ static JSValueRef getChildrenCountCallback(JSContextRef context,
   return JSValueMakeNumber(context, toAXElement(thisObject)->childrenCount());
 }
 
+static JSValueRef rowCountCallback(JSContextRef context,
+                                   JSObjectRef thisObject,
+                                   JSStringRef propertyName,
+                                   JSValueRef* exception) {
+  return JSValueMakeNumber(context, toAXElement(thisObject)->rowCount());
+}
+
+static JSValueRef columnCountCallback(JSContextRef context,
+                                      JSObjectRef thisObject,
+                                      JSStringRef propertyName,
+                                      JSValueRef* exception) {
+  return JSValueMakeNumber(context, toAXElement(thisObject)->columnCount());
+}
+
 static JSValueRef getXCallback(JSContextRef context,
                                JSObjectRef thisObject,
                                JSStringRef propertyName,
@@ -952,6 +966,10 @@ JSClassRef AccessibilityUIElement::getJSClass() {
       {"maxValue", getMaxValueCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"childrenCount", getChildrenCountCallback, 0,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"rowCount", rowCountCallback, 0,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"columnCount", columnCountCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"insertionPointLineNumber", getInsertionPointLineNumberCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},

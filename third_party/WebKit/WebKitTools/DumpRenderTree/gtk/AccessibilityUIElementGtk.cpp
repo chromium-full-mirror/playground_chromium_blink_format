@@ -72,6 +72,16 @@ void AccessibilityUIElement::getChildrenWithRange(
   }
 }
 
+int AccessibilityUIElement::rowCount() {
+  // FIXME: implement
+  return 0;
+}
+
+int AccessibilityUIElement::columnCount() {
+  // FIXME: implement
+  return 0;
+}
+
 int AccessibilityUIElement::childrenCount() {
   if (!m_element)
     return 0;
