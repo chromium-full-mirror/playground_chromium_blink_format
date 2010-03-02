@@ -3643,7 +3643,8 @@ static void webkit_web_view_apply_zoom_level(WebKitWebView* webView,
     return;
 
   WebKitWebViewPrivate* priv = webView->priv;
-  frame->setZoomFactor(zoomLevel, !priv->zoomFullContent);
+  frame->setZoomFactor(zoomLevel,
+                       priv->zoomFullContent ? ZoomPage : ZoomTextOnly);
 }
 
 /**

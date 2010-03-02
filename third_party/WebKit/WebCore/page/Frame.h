@@ -39,6 +39,7 @@
 #include "ScrollBehavior.h"
 #include "SelectionController.h"
 #include "UserScriptTypes.h"
+#include "ZoomMode.h"
 
 #if PLATFORM(WIN)
 #include "FrameWin.h"
@@ -183,9 +184,9 @@ class Frame : public RefCounted<Frame> {
   // === to be moved into FrameView
 
  public:
-  void setZoomFactor(float scale, bool isTextOnly);
+  void setZoomFactor(float scale, ZoomMode);
   float zoomFactor() const;
-  bool isZoomFactorTextOnly() const;
+  ZoomMode zoomMode() const;
   bool shouldApplyTextZoom() const;
   bool shouldApplyPageZoom() const;
   float pageZoomFactor() const {

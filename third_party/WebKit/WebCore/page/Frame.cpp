@@ -681,24 +681,20 @@ float Frame::zoomFactor() const {
   return m_zoomFactor;
 }
 
-bool Frame::isZoomFactorTextOnly() const {
-  return m_page->settings()->zoomsTextOnly();
+ZoomMode Frame::zoomMode() const {
+  return m_page->settings()->zoomMode();
 }
 
 bool Frame::shouldApplyTextZoom() const {
-  if (m_zoomFactor == 1.0f || !isZoomFactorTextOnly())
-    return false;
-  return true;
+  return m_zoomFactor != 1.0f && zoomMode() == ZoomTextOnly;
 }
 
 bool Frame::shouldApplyPageZoom() const {
-  if (m_zoomFactor == 1.0f || isZoomFactorTextOnly())
-    return false;
-  return true;
+  return m_zoomFactor != 1.0f && zoomMode() == ZoomPage;
 }
 
-void Frame::setZoomFactor(float percent, bool isTextOnly) {
-  if (m_zoomFactor == percent && isZoomFactorTextOnly() == isTextOnly)
+void Frame::setZoomFactor(float percent, ZoomMode mode) {
+  if (m_zoomFactor == percent && zoomMode() == mode)
     return;
 
 #if ENABLE(SVG)
@@ -713,7 +709,7 @@ void Frame::setZoomFactor(float percent, bool isTextOnly) {
   }
 #endif
 
-  if (!isTextOnly) {
+  if (mode == ZoomPage) {
     // Update the scroll position when doing a full page zoom, so the content
     // stays in relatively the same position.
     IntPoint scrollPosition = view()->scrollPosition();
@@ -723,13 +719,13 @@ void Frame::setZoomFactor(float percent, bool isTextOnly) {
   }
 
   m_zoomFactor = percent;
-  m_page->settings()->setZoomsTextOnly(isTextOnly);
+  m_page->settings()->setZoomMode(mode);
 
   m_doc->recalcStyle(Node::Force);
 
   for (Frame* child = tree()->firstChild(); child;
        child = child->tree()->nextSibling())
-    child->setZoomFactor(m_zoomFactor, isTextOnly);
+    child->setZoomFactor(m_zoomFactor, mode);
 
   if (m_doc->renderer() && m_doc->renderer()->needsLayout() &&
       view()->didFirstLayout())

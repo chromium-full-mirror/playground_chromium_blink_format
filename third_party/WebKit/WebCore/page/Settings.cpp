@@ -66,6 +66,7 @@ Settings::Settings(Page* page)
       m_localStorageQuota(5 * 1024 * 1024)  // Suggested by the HTML5 spec.
       ,
       m_pluginAllowedRunTime(numeric_limits<unsigned>::max()),
+      m_zoomMode(ZoomPage),
       m_isJavaEnabled(false),
       m_loadsImagesAutomatically(false),
       m_privateBrowsingEnabled(false),
@@ -106,7 +107,6 @@ Settings::Settings(Page* page)
       m_inApplicationChromeMode(false),
       m_offlineWebApplicationCacheEnabled(false),
       m_shouldPaintCustomScrollbars(false),
-      m_zoomsTextOnly(false),
       m_enforceCSSMIMETypeInStrictMode(true),
       m_usesEncodingDetector(false),
       m_allowScriptsToCloseWindows(false),
@@ -437,11 +437,11 @@ void Settings::setShouldPaintCustomScrollbars(
   m_shouldPaintCustomScrollbars = shouldPaintCustomScrollbars;
 }
 
-void Settings::setZoomsTextOnly(bool zoomsTextOnly) {
-  if (zoomsTextOnly == m_zoomsTextOnly)
+void Settings::setZoomMode(ZoomMode mode) {
+  if (mode == m_zoomMode)
     return;
 
-  m_zoomsTextOnly = zoomsTextOnly;
+  m_zoomMode = mode;
   setNeedsReapplyStylesInAllFrames(m_page);
 }
 
