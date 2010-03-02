@@ -31,6 +31,7 @@
 
 #include "MathMLNames.h"
 #include "RenderMathMLBlock.h"
+#include "RenderMathMLSubSup.h"
 #include "RenderMathMLUnderOver.h"
 
 namespace WebCore {
@@ -51,7 +52,13 @@ PassRefPtr<MathMLInlineContainerElement> MathMLInlineContainerElement::create(
 RenderObject* MathMLInlineContainerElement::createRenderer(RenderArena* arena,
                                                            RenderStyle* style) {
   RenderObject* object = 0;
-  if (hasLocalName(MathMLNames::moverTag))
+  if (hasLocalName(MathMLNames::msubTag))
+    object = new (arena) RenderMathMLSubSup(this);
+  else if (hasLocalName(MathMLNames::msupTag))
+    object = new (arena) RenderMathMLSubSup(this);
+  else if (hasLocalName(MathMLNames::msubsupTag))
+    object = new (arena) RenderMathMLSubSup(this);
+  else if (hasLocalName(MathMLNames::moverTag))
     object = new (arena) RenderMathMLUnderOver(this);
   else if (hasLocalName(MathMLNames::munderTag))
     object = new (arena) RenderMathMLUnderOver(this);
