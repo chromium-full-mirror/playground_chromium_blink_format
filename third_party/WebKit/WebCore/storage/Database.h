@@ -30,6 +30,7 @@
 #define Database_h
 
 #if ENABLE(DATABASE)
+#include "DatabaseCallback.h"
 #include "PlatformString.h"
 #include "SecurityOrigin.h"
 #include "SQLiteDatabase.h"
@@ -51,6 +52,7 @@
 namespace WebCore {
 
 class DatabaseAuthorizer;
+class DatabaseCallback;
 class DatabaseThread;
 class ScriptExecutionContext;
 class SQLResultSet;
@@ -74,12 +76,14 @@ class Database : public ThreadSafeShared<Database> {
   ~Database();
 
   // Direct support for the DOM API
-  static PassRefPtr<Database> openDatabase(ScriptExecutionContext* context,
-                                           const String& name,
-                                           const String& expectedVersion,
-                                           const String& displayName,
-                                           unsigned long estimatedSize,
-                                           ExceptionCode&);
+  static PassRefPtr<Database> openDatabase(
+      ScriptExecutionContext* context,
+      const String& name,
+      const String& expectedVersion,
+      const String& displayName,
+      unsigned long estimatedSize,
+      PassRefPtr<DatabaseCallback> creationCallback,
+      ExceptionCode&);
   String version() const;
   void changeVersion(const String& oldVersion,
                      const String& newVersion,
@@ -123,6 +127,8 @@ class Database : public ThreadSafeShared<Database> {
   void stop();
   bool stopped() const { return m_stopped; }
 
+  bool isNew() const { return m_new; }
+
   unsigned long long databaseSize() const;
   unsigned long long maximumSize() const;
 
@@ -134,6 +140,7 @@ class Database : public ThreadSafeShared<Database> {
   bool performOpenAndVerify(ExceptionCode&);
 
   Vector<String> performGetTableNames();
+  void performCreationCallback();
 
   SQLTransactionClient* transactionClient() const;
   SQLTransactionCoordinator* transactionCoordinator() const;
@@ -143,7 +150,8 @@ class Database : public ThreadSafeShared<Database> {
            const String& name,
            const String& expectedVersion,
            const String& displayName,
-           unsigned long estimatedSize);
+           unsigned long estimatedSize,
+           PassRefPtr<DatabaseCallback> creationCallback);
 
   bool openAndVerifyVersion(ExceptionCode&);
 
@@ -175,8 +183,12 @@ class Database : public ThreadSafeShared<Database> {
 
   bool m_opened;
 
+  bool m_new;
+
   SQLiteDatabase m_sqliteDatabase;
   RefPtr<DatabaseAuthorizer> m_databaseAuthorizer;
+
+  RefPtr<DatabaseCallback> m_creationCallback;
 
 #ifndef NDEBUG
   String databaseDebugName() const {
