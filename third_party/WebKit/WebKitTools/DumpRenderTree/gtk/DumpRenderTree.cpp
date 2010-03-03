@@ -774,6 +774,20 @@ static void databaseQuotaExceeded(WebKitWebView* view,
   webkit_security_origin_set_web_database_quota(origin, 5 * 1024 * 1024);
 }
 
+static bool geolocationPolicyDecisionRequested(
+    WebKitWebView*,
+    WebKitWebFrame*,
+    WebKitGeolocationPolicyDecision* decision) {
+  if (!gLayoutTestController->isGeolocationPermissionSet())
+    return FALSE;
+  if (gLayoutTestController->geolocationPermission())
+    webkit_geolocation_policy_allow(decision);
+  else
+    webkit_geolocation_policy_deny(decision);
+
+  return TRUE;
+}
+
 static WebKitWebView* webViewCreate(WebKitWebView*, WebKitWebFrame*);
 
 static gboolean webInspectorShowWindow(WebKitWebInspector*, gpointer data) {
@@ -819,7 +833,8 @@ static WebKitWebView* createWebView() {
       "signal::create-web-view", webViewCreate, 0, "signal::close-web-view",
       webViewClose, 0, "signal::database-quota-exceeded", databaseQuotaExceeded,
       0, "signal::document-load-finished", webViewDocumentLoadFinished, 0,
-      NULL);
+      "signal::geolocation-policy-decision-requested",
+      geolocationPolicyDecisionRequested, 0, NULL);
 
   WebKitWebInspector* inspector = webkit_web_view_get_inspector(view);
   g_object_connect(G_OBJECT(inspector), "signal::inspect-web-view",
