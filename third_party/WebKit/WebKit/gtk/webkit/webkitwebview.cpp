@@ -50,6 +50,7 @@
 #include "ContextMenu.h"
 #include "CString.h"
 #include "Cursor.h"
+#include "Database.h"
 #include "Document.h"
 #include "DocumentLoader.h"
 #include "DragClientGtk.h"
@@ -2645,6 +2646,9 @@ static void webkit_web_view_update_settings(WebKitWebView* webView) {
   settings->setPrivateBrowsingEnabled(enablePrivateBrowsing);
   settings->setCaretBrowsingEnabled(enableCaretBrowsing);
   settings->setDatabasesEnabled(enableHTML5Database);
+#if ENABLE(DATABASE)
+  Database::setIsAvailable(enableHTML5Database);
+#endif
   settings->setLocalStorageEnabled(enableHTML5LocalStorage);
   settings->setXSSAuditorEnabled(enableXSSAuditor);
   settings->setJavaScriptCanOpenWindowsAutomatically(javascriptCanOpenWindows);
@@ -2738,38 +2742,44 @@ static void webkit_web_view_settings_notify(WebKitWebSettings* webSettings,
     settings->setPrivateBrowsingEnabled(g_value_get_boolean(&value));
   else if (name == g_intern_string("enable-caret-browsing"))
     settings->setCaretBrowsingEnabled(g_value_get_boolean(&value));
+#if ENABLE(DATABASE)
   else if (name == g_intern_string("enable-html5-database"))
     settings->setDatabasesEnabled(g_value_get_boolean(&value));
+  Database::setIsAvailable(g_value_get_boolean(&value));
+#endif
   else if (name == g_intern_string("enable-html5-local-storage"))
-    settings->setLocalStorageEnabled(g_value_get_boolean(&value));
+      settings->setLocalStorageEnabled(g_value_get_boolean(&value));
   else if (name == g_intern_string("enable-xss-auditor"))
-    settings->setXSSAuditorEnabled(g_value_get_boolean(&value));
+      settings->setXSSAuditorEnabled(g_value_get_boolean(&value));
   else if (name == g_intern_string("javascript-can-open-windows-automatically"))
-    settings->setJavaScriptCanOpenWindowsAutomatically(
-        g_value_get_boolean(&value));
+      settings->setJavaScriptCanOpenWindowsAutomatically(
+          g_value_get_boolean(&value));
   else if (name == g_intern_string("enable-offline-web-application-cache"))
-    settings->setOfflineWebApplicationCacheEnabled(g_value_get_boolean(&value));
+      settings->setOfflineWebApplicationCacheEnabled(
+          g_value_get_boolean(&value));
   else if (name == g_intern_string("editing-behavior"))
-    settings->setEditingBehavior(
-        core(static_cast<WebKitEditingBehavior>(g_value_get_enum(&value))));
+      settings->setEditingBehavior(
+          core(static_cast<WebKitEditingBehavior>(g_value_get_enum(&value))));
   else if (name == g_intern_string("enable-universal-access-from-file-uris"))
-    settings->setAllowUniversalAccessFromFileURLs(g_value_get_boolean(&value));
+      settings->setAllowUniversalAccessFromFileURLs(
+          g_value_get_boolean(&value));
   else if (name == g_intern_string("enable-file-access-from-file-uris"))
-    settings->setAllowFileAccessFromFileURLs(g_value_get_boolean(&value));
+      settings->setAllowFileAccessFromFileURLs(g_value_get_boolean(&value));
   else if (name == g_intern_string("enable-dom-paste"))
-    settings->setDOMPasteAllowed(g_value_get_boolean(&value));
+      settings->setDOMPasteAllowed(g_value_get_boolean(&value));
   else if (name == g_intern_string("tab-key-cycles-through-elements")) {
     Page* page = core(webView);
     if (page)
       page->setTabKeyCyclesThroughElements(g_value_get_boolean(&value));
-  } else if (name == g_intern_string("enable-site-specific-quirks"))
-    settings->setNeedsSiteSpecificQuirks(g_value_get_boolean(&value));
+  }
+  else if (name == g_intern_string("enable-site-specific-quirks"))
+      settings->setNeedsSiteSpecificQuirks(g_value_get_boolean(&value));
   else if (name == g_intern_string("enable-page-cache"))
-    settings->setUsesPageCache(g_value_get_boolean(&value));
+      settings->setUsesPageCache(g_value_get_boolean(&value));
   else if (name == g_intern_string("enable-java-applet"))
-    settings->setJavaEnabled(g_value_get_boolean(&value));
+      settings->setJavaEnabled(g_value_get_boolean(&value));
   else if (!g_object_class_find_property(G_OBJECT_GET_CLASS(webSettings), name))
-    g_warning("Unexpected setting '%s'", name);
+      g_warning("Unexpected setting '%s'", name);
   g_value_unset(&value);
 }
 

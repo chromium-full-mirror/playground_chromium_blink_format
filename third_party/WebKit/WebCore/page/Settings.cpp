@@ -27,6 +27,7 @@
 #include "Settings.h"
 
 #include "BackForwardList.h"
+#include "Database.h"
 #include "Frame.h"
 #include "FrameTree.h"
 #include "FrameView.h"
@@ -253,6 +254,7 @@ void Settings::setPluginsEnabled(bool arePluginsEnabled) {
 
 void Settings::setDatabasesEnabled(bool databasesEnabled) {
   m_databasesEnabled = databasesEnabled;
+  Database::setIsAvailable(databasesEnabled);
 }
 
 void Settings::setLocalStorageEnabled(bool localStorageEnabled) {
