@@ -117,10 +117,10 @@ struct JITStackFrame {
   }
 };
 #elif CPU(X86)
-#if COMPILER(MSVC)
+#if COMPILER(MSVC) || (OS(WINDOWS) && COMPILER(GCC))
 #pragma pack(push)
 #pragma pack(4)
-#endif  // COMPILER(MSVC)
+#endif  // COMPILER(MSVC) || (OS(WINDOWS) && COMPILER(GCC))
 struct JITStackFrame {
   void* reserved;  // Unused
   JITStubArg args[6];
@@ -147,9 +147,9 @@ struct JITStackFrame {
     return reinterpret_cast<ReturnAddressPtr*>(this) - 1;
   }
 };
-#if COMPILER(MSVC)
+#if COMPILER(MSVC) || (OS(WINDOWS) && COMPILER(GCC))
 #pragma pack(pop)
-#endif  // COMPILER(MSVC)
+#endif  // COMPILER(MSVC) || (OS(WINDOWS) && COMPILER(GCC))
 #elif CPU(ARM_THUMB2)
 struct JITStackFrame {
   void* reserved;  // Unused
