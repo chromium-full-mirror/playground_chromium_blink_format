@@ -106,8 +106,9 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
     NETWORK_NO_SOURCE
   };
   NetworkState networkState() const;
-  bool autobuffer() const;
-  void setAutobuffer(bool);
+
+  String preload() const;
+  void setPreload(const String&);
 
   PassRefPtr<TimeRanges> buffered() const;
   void load(bool isUserGesture, ExceptionCode&);
@@ -338,11 +339,13 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
 
   BehaviorRestrictions m_restrictions;
 
+  MediaPlayer::Preload m_preload;
+
   bool m_playing;
 
-  // counter incremented while processing a callback from the media player, so
+  // Counter incremented while processing a callback from the media player, so
   // we can avoid
-  //  calling the media engine recursively
+  // calling the media engine recursively.
   int m_processingMediaPlayerCallback;
 
   bool m_processingLoad : 1;
