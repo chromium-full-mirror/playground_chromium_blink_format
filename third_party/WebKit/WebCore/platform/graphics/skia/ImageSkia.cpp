@@ -466,8 +466,7 @@ PassRefPtr<BitmapImageSingleFrameSkia> BitmapImageSingleFrameSkia::create(
     const SkBitmap& bitmap) {
   RefPtr<BitmapImageSingleFrameSkia> image(
       adoptRef(new BitmapImageSingleFrameSkia()));
-  if (!bitmap.copyTo(&image->m_nativeImage, bitmap.config()))
-    return 0;
+  bitmap.copyTo(&image->m_nativeImage, bitmap.config());
   return image.release();
 }
 
