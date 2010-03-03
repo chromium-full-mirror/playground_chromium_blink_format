@@ -73,7 +73,6 @@ class InspectorBackend : public RefCounted<InspectorBackend> {
   void stopTimelineProfiler();
 
 #if ENABLE(JAVASCRIPT_DEBUGGER)
-  bool debuggerEnabled() const;
   void enableDebugger(bool always);
   void disableDebugger(bool always);
 
@@ -95,7 +94,6 @@ class InspectorBackend : public RefCounted<InspectorBackend> {
   void stepIntoStatementInDebugger();
   void stepOutOfFunctionInDebugger();
 
-  bool profilerEnabled();
   void enableProfiler(bool always);
   void disableProfiler(bool always);
 
