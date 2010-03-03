@@ -94,7 +94,8 @@ bool GeolocationServiceGtk::startUpdating(PositionOptions* options) {
     accuracyLevel = options->enableHighAccuracy()
                         ? GEOCLUE_ACCURACY_LEVEL_DETAILED
                         : GEOCLUE_ACCURACY_LEVEL_LOCALITY;
-    timeout = options->timeout();
+    if (options->hasTimeout())
+      timeout = options->timeout();
   }
 
   gboolean result = geoclue_master_client_set_requirements(
