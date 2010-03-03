@@ -333,6 +333,7 @@ class FrameLoader : public Noncopyable {
   void setResponseMIMEType(const String&);
   const String& responseMIMEType() const;
 
+  bool allowPlugins(ReasonForCallingAllowPlugins);
   bool containsPlugins() const;
 
   void loadDone();

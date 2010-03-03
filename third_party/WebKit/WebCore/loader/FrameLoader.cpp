@@ -1378,7 +1378,7 @@ bool FrameLoader::requestObject(RenderPart* renderer,
   if (shouldUsePlugin(completedURL, mimeType, renderer->hasFallbackContent(),
                       useFallback)) {
     Settings* settings = m_frame->settings();
-    if (!m_client->allowPlugins(settings && settings->arePluginsEnabled()) ||
+    if (!allowPlugins(AboutToInstantiatePlugin) ||
         (!settings->isJavaEnabled() &&
          MIMETypeRegistry::isJavaAppletMIMEType(mimeType)))
       return false;
@@ -1994,6 +1994,15 @@ void FrameLoader::completed() {
 void FrameLoader::started() {
   for (Frame* frame = m_frame; frame; frame = frame->tree()->parent())
     frame->loader()->m_isComplete = false;
+}
+
+bool FrameLoader::allowPlugins(ReasonForCallingAllowPlugins reason) {
+  Settings* settings = m_frame->settings();
+  bool allowed =
+      m_client->allowPlugins(settings && settings->arePluginsEnabled());
+  if (!allowed && reason == AboutToInstantiatePlugin)
+    m_frame->loader()->client()->didNotAllowPlugins();
+  return allowed;
 }
 
 bool FrameLoader::containsPlugins() const {

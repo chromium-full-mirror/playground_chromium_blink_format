@@ -112,6 +112,11 @@ enum SandboxFlag {
 
 enum SecurityCheckPolicy { SkipSecurityCheck, DoSecurityCheck };
 
+enum ReasonForCallingAllowPlugins {
+  AboutToInstantiatePlugin,
+  NotAboutToInstantiatePlugin
+};
+
 typedef int SandboxFlags;
 }
 
