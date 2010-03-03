@@ -6163,6 +6163,7 @@ void WebView::setAcceleratedCompositing(bool accelerated) {
       // Create the root layer
       ASSERT(m_viewWindow);
       m_layerRenderer->setHostWindow(m_viewWindow);
+      m_layerRenderer->createRenderer();
       updateRootLayerContents();
     }
   } else {
