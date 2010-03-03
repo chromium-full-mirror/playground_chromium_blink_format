@@ -388,12 +388,6 @@ void ScriptDebugServer::setJavaScriptPaused(Frame* frame, bool paused) {
   setJavaScriptPaused(frame->view(), paused);
 }
 
-#if PLATFORM(MAC)
-
-void ScriptDebugServer::setJavaScriptPaused(FrameView*, bool) {}
-
-#else
-
 void ScriptDebugServer::setJavaScriptPaused(FrameView* view, bool paused) {
   if (!view)
     return;
@@ -410,8 +404,6 @@ void ScriptDebugServer::setJavaScriptPaused(FrameView* view, bool paused) {
     static_cast<PluginView*>(widget)->setJavaScriptPaused(paused);
   }
 }
-
-#endif
 
 void ScriptDebugServer::pauseIfNeeded(Page* page) {
   if (m_paused)
