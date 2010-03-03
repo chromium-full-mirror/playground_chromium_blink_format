@@ -73,8 +73,11 @@ class WebViewGraphicsBased : public QGraphicsView {
   void setItemCacheMode(QGraphicsItem::CacheMode mode) {
     m_item->setCacheMode(mode);
   }
+  QGraphicsItem::CacheMode itemCacheMode() { return m_item->cacheMode(); }
 
-  void enableFrameRateMeasurement();
+  void setFrameRateMeasurementEnabled(bool enabled);
+  bool frameRateMeasurementEnabled() { return m_measureFps; }
+
   virtual void paintEvent(QPaintEvent* event);
 
   void setYRotation(qreal angle) {
@@ -103,6 +106,7 @@ class WebViewGraphicsBased : public QGraphicsView {
   int m_numPaintsSinceLastMeasure;
   QTime m_startTime;
   QTime m_lastConsultTime;
+  QTimer* m_updateTimer;
   bool m_measureFps;
   qreal m_yRotation;
 };

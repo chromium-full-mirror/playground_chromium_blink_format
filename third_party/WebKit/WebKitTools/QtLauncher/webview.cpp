@@ -72,6 +72,10 @@ WebViewGraphicsBased::WebViewGraphicsBased(QWidget* parent)
   machine->setInitialState(s0);
   machine->start();
 #endif
+
+  m_updateTimer = new QTimer(this);
+  m_updateTimer->setInterval(1000);
+  connect(m_updateTimer, SIGNAL(timeout()), this, SLOT(updateFrameRate()));
 }
 
 void WebViewGraphicsBased::resizeEvent(QResizeEvent* event) {
@@ -80,13 +84,12 @@ void WebViewGraphicsBased::resizeEvent(QResizeEvent* event) {
   m_item->setGeometry(rect);
 }
 
-void WebViewGraphicsBased::enableFrameRateMeasurement() {
-  m_measureFps = true;
-  m_lastConsultTime = m_startTime = QTime::currentTime();
-  QTimer* updateTimer = new QTimer(this);
-  updateTimer->setInterval(1000);
-  connect(updateTimer, SIGNAL(timeout()), this, SLOT(updateFrameRate()));
-  updateTimer->start();
+void WebViewGraphicsBased::setFrameRateMeasurementEnabled(bool enabled) {
+  if (m_measureFps = enabled) {
+    m_lastConsultTime = m_startTime = QTime::currentTime();
+    m_updateTimer->start();
+  } else
+    m_updateTimer->stop();
 }
 
 void WebViewGraphicsBased::updateFrameRate() {
