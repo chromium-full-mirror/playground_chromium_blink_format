@@ -61,11 +61,11 @@ long long distanceInDirection(Node* start,
                               FocusCandidate& candidate) {
   RenderObject* startRender = start->renderer();
   if (!startRender)
-    return cMaxDistance;
+    return maxDistance();
 
   RenderObject* destRender = dest->renderer();
   if (!destRender)
-    return cMaxDistance;
+    return maxDistance();
 
   IntRect curRect = renderRectRelativeToRootDocument(startRender);
   IntRect targetRect = renderRectRelativeToRootDocument(destRender);
@@ -76,10 +76,10 @@ long long distanceInDirection(Node* start,
 
   if ((curRect.isEmpty() || targetRect.isEmpty()) ||
       (targetRect.x() < 0 || targetRect.y() < 0))
-    return cMaxDistance;
+    return maxDistance();
 
   if (!isRectInDirection(direction, curRect, targetRect))
-    return cMaxDistance;
+    return maxDistance();
 
   // The distance between two nodes is not to be considered alone when
   // evaluating/looking
@@ -94,11 +94,11 @@ long long distanceInDirection(Node* start,
   if (sameDocument) {
     if (candidate.alignment > alignment ||
         (candidate.parentAlignment && alignment > candidate.parentAlignment))
-      return cMaxDistance;
+      return maxDistance();
   } else if (candidate.alignment > alignment &&
              (candidate.parentAlignment &&
               alignment > candidate.parentAlignment))
-    return cMaxDistance;
+    return maxDistance();
 
   // FIXME_tonikitoo: simplify the logic here !
   if (alignment != None ||
@@ -110,7 +110,7 @@ long long distanceInDirection(Node* start,
     // |spatialDistance| (see below).
     if (candidate.alignment < alignment &&
         candidate.parentAlignment < alignment)
-      candidate.distance = cMaxDistance;
+      candidate.distance = maxDistance();
 
     candidate.alignment = alignment;
   }
