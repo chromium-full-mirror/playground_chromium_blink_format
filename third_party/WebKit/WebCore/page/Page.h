@@ -32,11 +32,6 @@
 #include "SchedulePair.h"
 #endif
 
-#if PLATFORM(WIN) || (PLATFORM(WX) && OS(WINDOWS)) || \
-    (PLATFORM(QT) && defined(Q_WS_WIN))
-typedef struct HINSTANCE__* HINSTANCE;
-#endif
-
 namespace JSC {
 class Debugger;
 }
@@ -253,15 +248,6 @@ class Page : public Noncopyable {
   void setDebugger(JSC::Debugger*);
   JSC::Debugger* debugger() const { return m_debugger; }
 
-#if PLATFORM(WIN) || (PLATFORM(WX) && OS(WINDOWS)) || \
-    (PLATFORM(QT) && defined(Q_WS_WIN))
-  // The global DLL or application instance used for all windows.
-  static void setInstanceHandle(HINSTANCE instanceHandle) {
-    s_instanceHandle = instanceHandle;
-  }
-  static HINSTANCE instanceHandle() { return s_instanceHandle; }
-#endif
-
   static void removeAllVisitedLinks();
 
   static void allVisitedStateChanged(PageGroup*);
@@ -381,11 +367,6 @@ class Page : public Noncopyable {
 
 #if ENABLE(DOM_STORAGE)
   RefPtr<StorageNamespace> m_sessionStorage;
-#endif
-
-#if PLATFORM(WIN) || (PLATFORM(WX) && defined(__WXMSW__)) || \
-    (PLATFORM(QT) && defined(Q_WS_WIN))
-  static HINSTANCE s_instanceHandle;
 #endif
 
 #if ENABLE(WML)

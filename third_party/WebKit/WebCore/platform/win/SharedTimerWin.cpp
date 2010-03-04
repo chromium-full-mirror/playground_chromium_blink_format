@@ -28,6 +28,7 @@
 
 #include "Page.h"
 #include "Settings.h"
+#include "WebCoreInstanceHandle.h"
 #include "Widget.h"
 #include <wtf/Assertions.h>
 #include <wtf/CurrentTime.h>
@@ -133,13 +134,13 @@ static void initializeOffScreenTimerWindow() {
   memset(&wcex, 0, sizeof(WNDCLASSEX));
   wcex.cbSize = sizeof(WNDCLASSEX);
   wcex.lpfnWndProc = TimerWindowWndProc;
-  wcex.hInstance = Page::instanceHandle();
+  wcex.hInstance = WebCore::instanceHandle();
   wcex.lpszClassName = kTimerWindowClassName;
   RegisterClassEx(&wcex);
 
   timerWindowHandle =
       CreateWindow(kTimerWindowClassName, 0, 0, CW_USEDEFAULT, 0, CW_USEDEFAULT,
-                   0, HWND_MESSAGE, 0, Page::instanceHandle(), 0);
+                   0, HWND_MESSAGE, 0, WebCore::instanceHandle(), 0);
   timerFiredMessage = RegisterWindowMessage(L"com.apple.WebKit.TimerFired");
 }
 
