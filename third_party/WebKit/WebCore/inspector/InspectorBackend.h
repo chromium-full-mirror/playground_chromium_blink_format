@@ -60,8 +60,8 @@ class InspectorBackend : public RefCounted<InspectorBackend> {
 
   void storeLastActivePanel(const String& panelName);
 
-  void toggleNodeSearch();
-  bool searchingForNode();
+  void enableSearchingForNode();
+  void disableSearchingForNode();
 
   void enableResourceTracking(bool always);
   void disableResourceTracking(bool always);
@@ -86,7 +86,6 @@ class InspectorBackend : public RefCounted<InspectorBackend> {
   void pauseInDebugger();
   void resumeDebugger();
 
-  long pauseOnExceptionsState();
   void setPauseOnExceptionsState(long pauseState);
 
   void stepOverStatementInDebugger();
