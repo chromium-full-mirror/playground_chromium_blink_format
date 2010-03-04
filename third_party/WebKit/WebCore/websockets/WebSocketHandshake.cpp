@@ -121,10 +121,6 @@ bool WebSocketHandshake::secure() const {
   return m_secure;
 }
 
-void WebSocketHandshake::setSecure(bool secure) {
-  m_secure = secure;
-}
-
 String WebSocketHandshake::clientOrigin() const {
   return m_context->securityOrigin()->toString();
 }
@@ -146,6 +142,7 @@ String WebSocketHandshake::clientLocation() const {
 }
 
 CString WebSocketHandshake::clientHandshakeMessage() const {
+  // Keep the following consistent with clientHandshakeRequest().
   StringBuilder builder;
 
   builder.append("GET ");
@@ -155,12 +152,10 @@ CString WebSocketHandshake::clientHandshakeMessage() const {
   builder.append("Connection: Upgrade\r\n");
   builder.append("Host: ");
   builder.append(m_url.host().lower());
-  if (m_url.port()) {
-    if ((!m_secure && m_url.port() != 80) ||
-        (m_secure && m_url.port() != 443)) {
-      builder.append(":");
-      builder.append(String::number(m_url.port()));
-    }
+  if (m_url.port() && ((!m_secure && m_url.port() != 80) ||
+                       (m_secure && m_url.port() != 443))) {
+    builder.append(":");
+    builder.append(String::number(m_url.port()));
   }
   builder.append("\r\n");
   builder.append("Origin: ");
@@ -171,10 +166,8 @@ CString WebSocketHandshake::clientHandshakeMessage() const {
     builder.append(m_clientProtocol);
     builder.append("\r\n");
   }
+
   KURL url = httpURLForAuthenticationAndCookies();
-  // FIXME: set authentication information or cookies for url.
-  // Set "Authorization: <credentials>" if authentication information exists for
-  // url.
   if (m_context->isDocument()) {
     Document* document = static_cast<Document*>(m_context);
     String cookie = cookieRequestHeaderFieldValue(document, url);
@@ -185,8 +178,25 @@ CString WebSocketHandshake::clientHandshakeMessage() const {
     }
     // Set "Cookie2: <cookie>" if cookies 2 exists for url?
   }
+
   builder.append("\r\n");
   return builder.toString().utf8();
+}
+
+WebSocketHandshakeRequest WebSocketHandshake::clientHandshakeRequest() const {
+  // Keep the following consistent with clientHandshakeMessage().
+  WebSocketHandshakeRequest request(m_url, clientOrigin(), m_clientProtocol);
+
+  KURL url = httpURLForAuthenticationAndCookies();
+  if (m_context->isDocument()) {
+    Document* document = static_cast<Document*>(m_context);
+    String cookie = cookieRequestHeaderFieldValue(document, url);
+    if (!cookie.isEmpty())
+      request.addExtraHeaderField("Cookie", cookie);
+    // Set "Cookie2: <cookie>" if cookies 2 exists for url?
+  }
+
+  return request;
 }
 
 void WebSocketHandshake::reset() {
