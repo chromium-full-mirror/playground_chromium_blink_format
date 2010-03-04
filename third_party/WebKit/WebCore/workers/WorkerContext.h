@@ -31,7 +31,6 @@
 
 #include "AtomicStringHash.h"
 #include "Database.h"
-#include "DatabaseCallback.h"
 #include "EventListener.h"
 #include "EventNames.h"
 #include "EventTarget.h"
@@ -124,13 +123,11 @@ class WorkerContext : public RefCounted<WorkerContext>,
 
 #if ENABLE(DATABASE)
   // HTML 5 client-side database
-  PassRefPtr<Database> openDatabase(
-      const String& name,
-      const String& version,
-      const String& displayName,
-      unsigned long estimatedSize,
-      PassRefPtr<DatabaseCallback> creationCallback,
-      ExceptionCode&);
+  PassRefPtr<Database> openDatabase(const String& name,
+                                    const String& version,
+                                    const String& displayName,
+                                    unsigned long estimatedSize,
+                                    ExceptionCode&);
   // Not implemented yet.
   virtual bool isDatabaseReadOnly() const { return false; }
   // Not implemented yet.

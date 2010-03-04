@@ -127,32 +127,12 @@ static const String& databaseVersionKey() {
 
 static int guidForOriginAndName(const String& origin, const String& name);
 
-class DatabaseCreationCallbackTask : public ScriptExecutionContext::Task {
- public:
-  static PassOwnPtr<DatabaseCreationCallbackTask> create(
-      PassRefPtr<Database> database) {
-    return new DatabaseCreationCallbackTask(database);
-  }
-
-  virtual void performTask(ScriptExecutionContext*) {
-    m_database->performCreationCallback();
-  }
-
- private:
-  DatabaseCreationCallbackTask(PassRefPtr<Database> database)
-      : m_database(database) {}
-
-  RefPtr<Database> m_database;
-};
-
-PassRefPtr<Database> Database::openDatabase(
-    ScriptExecutionContext* context,
-    const String& name,
-    const String& expectedVersion,
-    const String& displayName,
-    unsigned long estimatedSize,
-    PassRefPtr<DatabaseCallback> creationCallback,
-    ExceptionCode& e) {
+PassRefPtr<Database> Database::openDatabase(ScriptExecutionContext* context,
+                                            const String& name,
+                                            const String& expectedVersion,
+                                            const String& displayName,
+                                            unsigned long estimatedSize,
+                                            ExceptionCode& e) {
   if (!DatabaseTracker::tracker().canEstablishDatabase(
           context, name, displayName, estimatedSize)) {
     // FIXME: There should be an exception raised here in addition to returning
@@ -163,9 +143,8 @@ PassRefPtr<Database> Database::openDatabase(
     return 0;
   }
 
-  RefPtr<Database> database =
-      adoptRef(new Database(context, name, expectedVersion, displayName,
-                            estimatedSize, creationCallback));
+  RefPtr<Database> database = adoptRef(
+      new Database(context, name, expectedVersion, displayName, estimatedSize));
 
   if (!database->openAndVerifyVersion(e)) {
     LOG(StorageAPI,
@@ -191,21 +170,6 @@ PassRefPtr<Database> Database::openDatabase(
   }
 #endif
 
-  // If it's a new database and a creation callback was provided, reset the
-  // expected
-  // version to "" and schedule the creation callback. Because of some subtle
-  // String
-  // implementation issues, we have to reset m_expectedVersion here instead of
-  // doing
-  // it inside performOpenAndVerify() which is run on the DB thread.
-  if (database->isNew() && database->m_creationCallback.get()) {
-    database->m_expectedVersion = "";
-    LOG(StorageAPI, "Scheduling DatabaseCreationCallbackTask for database %p\n",
-        database.get());
-    database->m_scriptExecutionContext->postTask(
-        DatabaseCreationCallbackTask::create(database));
-  }
-
   return database;
 }
 
@@ -213,8 +177,7 @@ Database::Database(ScriptExecutionContext* context,
                    const String& name,
                    const String& expectedVersion,
                    const String& displayName,
-                   unsigned long estimatedSize,
-                   PassRefPtr<DatabaseCallback> creationCallback)
+                   unsigned long estimatedSize)
     : m_transactionInProgress(false),
       m_isTransactionQueueEnabled(true),
       m_scriptExecutionContext(context),
@@ -225,9 +188,7 @@ Database::Database(ScriptExecutionContext* context,
       m_estimatedSize(estimatedSize),
       m_deleted(false),
       m_stopped(false),
-      m_opened(false),
-      m_new(false),
-      m_creationCallback(creationCallback) {
+      m_opened(false) {
   ASSERT(m_scriptExecutionContext.get());
   m_mainThreadSecurityOrigin = m_scriptExecutionContext->securityOrigin();
   m_databaseThreadSecurityOrigin = m_mainThreadSecurityOrigin->threadsafeCopy();
@@ -587,8 +548,6 @@ bool Database::performOpenAndVerify(ExceptionCode& e) {
       LOG(StorageAPI, "No cached version for guid %i", m_guid);
 
       if (!m_sqliteDatabase.tableExists(databaseInfoTableName())) {
-        m_new = true;
-
         if (!m_sqliteDatabase.executeCommand(
                 "CREATE TABLE " + databaseInfoTableName() +
                 " (key TEXT NOT NULL ON CONFLICT FAIL UNIQUE ON CONFLICT "
@@ -614,7 +573,7 @@ bool Database::performOpenAndVerify(ExceptionCode& e) {
       if (currentVersion.length()) {
         LOG(StorageAPI, "Retrieved current version %s from database %s",
             currentVersion.ascii().data(), databaseDebugName().ascii().data());
-      } else if (!m_new || !m_creationCallback) {
+      } else {
         LOG(StorageAPI,
             "Setting version %s in database %s that was just created",
             m_expectedVersion.ascii().data(),
@@ -645,8 +604,7 @@ bool Database::performOpenAndVerify(ExceptionCode& e) {
   // database version we have matches that version. Otherwise, set an exception.
   // If the expected version is the empty string, then we always return with
   // whatever version of the database we have.
-  if ((!m_new || !m_creationCallback) && m_expectedVersion.length() &&
-      m_expectedVersion != currentVersion) {
+  if (m_expectedVersion.length() && m_expectedVersion != currentVersion) {
     LOG(StorageAPI,
         "page expects version %s from database %s, which actually has version "
         "name %s - openDatabase() call will fail",
@@ -783,10 +741,6 @@ Vector<String> Database::performGetTableNames() {
   }
 
   return tableNames;
-}
-
-void Database::performCreationCallback() {
-  m_creationCallback->handleEvent(m_scriptExecutionContext.get(), this);
 }
 
 SQLTransactionClient* Database::transactionClient() const {
