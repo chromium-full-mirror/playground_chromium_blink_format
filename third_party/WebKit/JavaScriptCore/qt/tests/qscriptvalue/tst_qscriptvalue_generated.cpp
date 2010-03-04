@@ -131,6 +131,35 @@ void tst_QScriptValue::initScriptValues() {
   DEFINE_TEST_VALUE(engine->evaluate("new Object()"));
   DEFINE_TEST_VALUE(engine->evaluate("new Array()"));
   DEFINE_TEST_VALUE(engine->evaluate("new Error()"));
+  DEFINE_TEST_VALUE(engine->evaluate("a = new Object(); a.foo = 22; a.foo"));
+  DEFINE_TEST_VALUE(engine->evaluate("Undefined"));
+  DEFINE_TEST_VALUE(engine->evaluate("Null"));
+  DEFINE_TEST_VALUE(engine->evaluate("True"));
+  DEFINE_TEST_VALUE(engine->evaluate("False"));
+  DEFINE_TEST_VALUE(engine->evaluate("undefined"));
+  DEFINE_TEST_VALUE(engine->evaluate("null"));
+  DEFINE_TEST_VALUE(engine->evaluate("true"));
+  DEFINE_TEST_VALUE(engine->evaluate("false"));
+  DEFINE_TEST_VALUE(engine->evaluate("122"));
+  DEFINE_TEST_VALUE(engine->evaluate("124"));
+  DEFINE_TEST_VALUE(engine->evaluate("0"));
+  DEFINE_TEST_VALUE(engine->evaluate("0.0"));
+  DEFINE_TEST_VALUE(engine->evaluate("123.0"));
+  DEFINE_TEST_VALUE(engine->evaluate("6.37e-8"));
+  DEFINE_TEST_VALUE(engine->evaluate("-6.37e-8"));
+  DEFINE_TEST_VALUE(engine->evaluate("0x43211234"));
+  DEFINE_TEST_VALUE(engine->evaluate("0x10000"));
+  DEFINE_TEST_VALUE(engine->evaluate("0x10001"));
+  DEFINE_TEST_VALUE(engine->evaluate("NaN"));
+  DEFINE_TEST_VALUE(engine->evaluate("Infinity"));
+  DEFINE_TEST_VALUE(engine->evaluate("-Infinity"));
+  DEFINE_TEST_VALUE(engine->evaluate("'ciao'"));
+  DEFINE_TEST_VALUE(engine->evaluate("''"));
+  DEFINE_TEST_VALUE(engine->evaluate("'0'"));
+  DEFINE_TEST_VALUE(engine->evaluate("'123'"));
+  DEFINE_TEST_VALUE(engine->evaluate("'12.4'"));
+  DEFINE_TEST_VALUE(engine->nullValue());
+  DEFINE_TEST_VALUE(engine->undefinedValue());
 }
 
 void tst_QScriptValue::isValid_initData() {
@@ -242,13 +271,43 @@ void tst_QScriptValue::isValid_makeData(const char* expr) {
             << "engine->evaluate(\"/foo/\")"
             << "engine->evaluate(\"new Object()\")"
             << "engine->evaluate(\"new Array()\")"
-            << "engine->evaluate(\"new Error()\")";
+            << "engine->evaluate(\"new Error()\")"
+            << "engine->evaluate(\"a = new Object(); a.foo = 22; a.foo\")"
+            << "engine->evaluate(\"Undefined\")"
+            << "engine->evaluate(\"Null\")"
+            << "engine->evaluate(\"True\")"
+            << "engine->evaluate(\"False\")"
+            << "engine->evaluate(\"undefined\")"
+            << "engine->evaluate(\"null\")"
+            << "engine->evaluate(\"true\")"
+            << "engine->evaluate(\"false\")"
+            << "engine->evaluate(\"122\")"
+            << "engine->evaluate(\"124\")"
+            << "engine->evaluate(\"0\")"
+            << "engine->evaluate(\"0.0\")"
+            << "engine->evaluate(\"123.0\")"
+            << "engine->evaluate(\"6.37e-8\")"
+            << "engine->evaluate(\"-6.37e-8\")"
+            << "engine->evaluate(\"0x43211234\")"
+            << "engine->evaluate(\"0x10000\")"
+            << "engine->evaluate(\"0x10001\")"
+            << "engine->evaluate(\"NaN\")"
+            << "engine->evaluate(\"Infinity\")"
+            << "engine->evaluate(\"-Infinity\")"
+            << "engine->evaluate(\"'ciao'\")"
+            << "engine->evaluate(\"''\")"
+            << "engine->evaluate(\"'0'\")"
+            << "engine->evaluate(\"'123'\")"
+            << "engine->evaluate(\"'12.4'\")"
+            << "engine->nullValue()"
+            << "engine->undefinedValue()";
   }
   newRow(expr) << isValid.contains(expr);
 }
 
 void tst_QScriptValue::isValid_test(const char*, const QScriptValue& value) {
   QFETCH(bool, expected);
+  QCOMPARE(value.isValid(), expected);
   QCOMPARE(value.isValid(), expected);
 }
 
@@ -267,13 +326,16 @@ void tst_QScriptValue::isBool_makeData(const char* expr) {
            << "QScriptValue(0, true)"
            << "QScriptValue(0, false)"
            << "QScriptValue(engine, true)"
-           << "QScriptValue(engine, false)";
+           << "QScriptValue(engine, false)"
+           << "engine->evaluate(\"true\")"
+           << "engine->evaluate(\"false\")";
   }
   newRow(expr) << isBool.contains(expr);
 }
 
 void tst_QScriptValue::isBool_test(const char*, const QScriptValue& value) {
   QFETCH(bool, expected);
+  QCOMPARE(value.isBool(), expected);
   QCOMPARE(value.isBool(), expected);
 }
 
@@ -292,13 +354,16 @@ void tst_QScriptValue::isBoolean_makeData(const char* expr) {
               << "QScriptValue(0, true)"
               << "QScriptValue(0, false)"
               << "QScriptValue(engine, true)"
-              << "QScriptValue(engine, false)";
+              << "QScriptValue(engine, false)"
+              << "engine->evaluate(\"true\")"
+              << "engine->evaluate(\"false\")";
   }
   newRow(expr) << isBoolean.contains(expr);
 }
 
 void tst_QScriptValue::isBoolean_test(const char*, const QScriptValue& value) {
   QFETCH(bool, expected);
+  QCOMPARE(value.isBoolean(), expected);
   QCOMPARE(value.isBoolean(), expected);
 }
 
@@ -353,13 +418,28 @@ void tst_QScriptValue::isNumber_makeData(const char* expr) {
              << "QScriptValue(engine, qSNaN())"
              << "QScriptValue(engine, qQNaN())"
              << "QScriptValue(engine, qInf())"
-             << "QScriptValue(engine, -qInf())";
+             << "QScriptValue(engine, -qInf())"
+             << "engine->evaluate(\"a = new Object(); a.foo = 22; a.foo\")"
+             << "engine->evaluate(\"122\")"
+             << "engine->evaluate(\"124\")"
+             << "engine->evaluate(\"0\")"
+             << "engine->evaluate(\"0.0\")"
+             << "engine->evaluate(\"123.0\")"
+             << "engine->evaluate(\"6.37e-8\")"
+             << "engine->evaluate(\"-6.37e-8\")"
+             << "engine->evaluate(\"0x43211234\")"
+             << "engine->evaluate(\"0x10000\")"
+             << "engine->evaluate(\"0x10001\")"
+             << "engine->evaluate(\"NaN\")"
+             << "engine->evaluate(\"Infinity\")"
+             << "engine->evaluate(\"-Infinity\")";
   }
   newRow(expr) << isNumber.contains(expr);
 }
 
 void tst_QScriptValue::isNumber_test(const char*, const QScriptValue& value) {
   QFETCH(bool, expected);
+  QCOMPARE(value.isNumber(), expected);
   QCOMPARE(value.isNumber(), expected);
 }
 
@@ -390,6 +470,7 @@ void tst_QScriptValue::isFunction_makeData(const char* expr) {
 void tst_QScriptValue::isFunction_test(const char*, const QScriptValue& value) {
   QFETCH(bool, expected);
   QCOMPARE(value.isFunction(), expected);
+  QCOMPARE(value.isFunction(), expected);
 }
 
 DEFINE_TEST_FUNCTION(isFunction)
@@ -404,13 +485,16 @@ void tst_QScriptValue::isNull_makeData(const char* expr) {
   if (isNull.isEmpty()) {
     isNull << "QScriptValue(QScriptValue::NullValue)"
            << "QScriptValue(0, QScriptValue::NullValue)"
-           << "QScriptValue(engine, QScriptValue::NullValue)";
+           << "QScriptValue(engine, QScriptValue::NullValue)"
+           << "engine->evaluate(\"null\")"
+           << "engine->nullValue()";
   }
   newRow(expr) << isNull.contains(expr);
 }
 
 void tst_QScriptValue::isNull_test(const char*, const QScriptValue& value) {
   QFETCH(bool, expected);
+  QCOMPARE(value.isNull(), expected);
   QCOMPARE(value.isNull(), expected);
 }
 
@@ -453,13 +537,19 @@ void tst_QScriptValue::isString_makeData(const char* expr) {
              << "QScriptValue(engine, QString())"
              << "QScriptValue(engine, QString(\"0\"))"
              << "QScriptValue(engine, QString(\"123\"))"
-             << "QScriptValue(engine, QString(\"1.23\"))";
+             << "QScriptValue(engine, QString(\"1.23\"))"
+             << "engine->evaluate(\"'ciao'\")"
+             << "engine->evaluate(\"''\")"
+             << "engine->evaluate(\"'0'\")"
+             << "engine->evaluate(\"'123'\")"
+             << "engine->evaluate(\"'12.4'\")";
   }
   newRow(expr) << isString.contains(expr);
 }
 
 void tst_QScriptValue::isString_test(const char*, const QScriptValue& value) {
   QFETCH(bool, expected);
+  QCOMPARE(value.isString(), expected);
   QCOMPARE(value.isString(), expected);
 }
 
@@ -476,7 +566,9 @@ void tst_QScriptValue::isUndefined_makeData(const char* expr) {
     isUndefined << "QScriptValue(QScriptValue::UndefinedValue)"
                 << "QScriptValue(0, QScriptValue::UndefinedValue)"
                 << "QScriptValue(engine, QScriptValue::UndefinedValue)"
-                << "engine->evaluate(\"{}\")";
+                << "engine->evaluate(\"{}\")"
+                << "engine->evaluate(\"undefined\")"
+                << "engine->undefinedValue()";
   }
   newRow(expr) << isUndefined.contains(expr);
 }
@@ -484,6 +576,7 @@ void tst_QScriptValue::isUndefined_makeData(const char* expr) {
 void tst_QScriptValue::isUndefined_test(const char*,
                                         const QScriptValue& value) {
   QFETCH(bool, expected);
+  QCOMPARE(value.isUndefined(), expected);
   QCOMPARE(value.isUndefined(), expected);
 }
 
@@ -513,13 +606,18 @@ void tst_QScriptValue::isObject_makeData(const char* expr) {
              << "engine->evaluate(\"/foo/\")"
              << "engine->evaluate(\"new Object()\")"
              << "engine->evaluate(\"new Array()\")"
-             << "engine->evaluate(\"new Error()\")";
+             << "engine->evaluate(\"new Error()\")"
+             << "engine->evaluate(\"Undefined\")"
+             << "engine->evaluate(\"Null\")"
+             << "engine->evaluate(\"True\")"
+             << "engine->evaluate(\"False\")";
   }
   newRow(expr) << isObject.contains(expr);
 }
 
 void tst_QScriptValue::isObject_test(const char*, const QScriptValue& value) {
   QFETCH(bool, expected);
+  QCOMPARE(value.isObject(), expected);
   QCOMPARE(value.isObject(), expected);
 }
 
@@ -651,12 +749,47 @@ void tst_QScriptValue::toString_makeData(const char* expr) {
     toString.insert("engine->evaluate(\"new Array()\")", "");
     toString.insert("engine->evaluate(\"new Error()\")",
                     "Error: Unknown error");
+    toString.insert("engine->evaluate(\"a = new Object(); a.foo = 22; a.foo\")",
+                    "22");
+    toString.insert("engine->evaluate(\"Undefined\")",
+                    "ReferenceError: Can't find variable: Undefined");
+    toString.insert("engine->evaluate(\"Null\")",
+                    "ReferenceError: Can't find variable: Null");
+    toString.insert("engine->evaluate(\"True\")",
+                    "ReferenceError: Can't find variable: True");
+    toString.insert("engine->evaluate(\"False\")",
+                    "ReferenceError: Can't find variable: False");
+    toString.insert("engine->evaluate(\"undefined\")", "undefined");
+    toString.insert("engine->evaluate(\"null\")", "null");
+    toString.insert("engine->evaluate(\"true\")", "true");
+    toString.insert("engine->evaluate(\"false\")", "false");
+    toString.insert("engine->evaluate(\"122\")", "122");
+    toString.insert("engine->evaluate(\"124\")", "124");
+    toString.insert("engine->evaluate(\"0\")", "0");
+    toString.insert("engine->evaluate(\"0.0\")", "0");
+    toString.insert("engine->evaluate(\"123.0\")", "123");
+    toString.insert("engine->evaluate(\"6.37e-8\")", "6.37e-8");
+    toString.insert("engine->evaluate(\"-6.37e-8\")", "-6.37e-8");
+    toString.insert("engine->evaluate(\"0x43211234\")", "1126240820");
+    toString.insert("engine->evaluate(\"0x10000\")", "65536");
+    toString.insert("engine->evaluate(\"0x10001\")", "65537");
+    toString.insert("engine->evaluate(\"NaN\")", "NaN");
+    toString.insert("engine->evaluate(\"Infinity\")", "Infinity");
+    toString.insert("engine->evaluate(\"-Infinity\")", "-Infinity");
+    toString.insert("engine->evaluate(\"'ciao'\")", "ciao");
+    toString.insert("engine->evaluate(\"''\")", "");
+    toString.insert("engine->evaluate(\"'0'\")", "0");
+    toString.insert("engine->evaluate(\"'123'\")", "123");
+    toString.insert("engine->evaluate(\"'12.4'\")", "12.4");
+    toString.insert("engine->nullValue()", "null");
+    toString.insert("engine->undefinedValue()", "undefined");
   }
   newRow(expr) << toString.value(expr);
 }
 
 void tst_QScriptValue::toString_test(const char*, const QScriptValue& value) {
   QFETCH(QString, expected);
+  QCOMPARE(value.toString(), expected);
   QCOMPARE(value.toString(), expected);
 }
 
@@ -779,6 +912,36 @@ void tst_QScriptValue::toNumber_makeData(const char* expr) {
     toNumber.insert("engine->evaluate(\"new Object()\")", qQNaN());
     toNumber.insert("engine->evaluate(\"new Array()\")", 0);
     toNumber.insert("engine->evaluate(\"new Error()\")", qQNaN());
+    toNumber.insert("engine->evaluate(\"a = new Object(); a.foo = 22; a.foo\")",
+                    22);
+    toNumber.insert("engine->evaluate(\"Undefined\")", qQNaN());
+    toNumber.insert("engine->evaluate(\"Null\")", qQNaN());
+    toNumber.insert("engine->evaluate(\"True\")", qQNaN());
+    toNumber.insert("engine->evaluate(\"False\")", qQNaN());
+    toNumber.insert("engine->evaluate(\"undefined\")", qQNaN());
+    toNumber.insert("engine->evaluate(\"null\")", 0);
+    toNumber.insert("engine->evaluate(\"true\")", 1);
+    toNumber.insert("engine->evaluate(\"false\")", 0);
+    toNumber.insert("engine->evaluate(\"122\")", 122);
+    toNumber.insert("engine->evaluate(\"124\")", 124);
+    toNumber.insert("engine->evaluate(\"0\")", 0);
+    toNumber.insert("engine->evaluate(\"0.0\")", 0);
+    toNumber.insert("engine->evaluate(\"123.0\")", 123);
+    toNumber.insert("engine->evaluate(\"6.37e-8\")", 6.369999999999999e-08);
+    toNumber.insert("engine->evaluate(\"-6.37e-8\")", -6.369999999999999e-08);
+    toNumber.insert("engine->evaluate(\"0x43211234\")", 1126240820);
+    toNumber.insert("engine->evaluate(\"0x10000\")", 65536);
+    toNumber.insert("engine->evaluate(\"0x10001\")", 65537);
+    toNumber.insert("engine->evaluate(\"NaN\")", qQNaN());
+    toNumber.insert("engine->evaluate(\"Infinity\")", qInf());
+    toNumber.insert("engine->evaluate(\"-Infinity\")", qInf());
+    toNumber.insert("engine->evaluate(\"'ciao'\")", qQNaN());
+    toNumber.insert("engine->evaluate(\"''\")", 0);
+    toNumber.insert("engine->evaluate(\"'0'\")", 0);
+    toNumber.insert("engine->evaluate(\"'123'\")", 123);
+    toNumber.insert("engine->evaluate(\"'12.4'\")", 12.4);
+    toNumber.insert("engine->nullValue()", 0);
+    toNumber.insert("engine->undefinedValue()", qQNaN());
   }
   newRow(expr) << toNumber.value(expr);
 }
@@ -791,8 +954,10 @@ void tst_QScriptValue::toNumber_test(const char*, const QScriptValue& value) {
   }
   if (qIsInf(expected)) {
     QVERIFY(qIsInf(value.toNumber()));
+    QVERIFY(qIsInf(value.toNumber()));
     return;
   }
+  QCOMPARE(value.toNumber(), expected);
   QCOMPARE(value.toNumber(), expected);
 }
 
@@ -911,12 +1076,43 @@ void tst_QScriptValue::toBool_makeData(const char* expr) {
     toBool.insert("engine->evaluate(\"new Object()\")", true);
     toBool.insert("engine->evaluate(\"new Array()\")", true);
     toBool.insert("engine->evaluate(\"new Error()\")", true);
+    toBool.insert("engine->evaluate(\"a = new Object(); a.foo = 22; a.foo\")",
+                  true);
+    toBool.insert("engine->evaluate(\"Undefined\")", true);
+    toBool.insert("engine->evaluate(\"Null\")", true);
+    toBool.insert("engine->evaluate(\"True\")", true);
+    toBool.insert("engine->evaluate(\"False\")", true);
+    toBool.insert("engine->evaluate(\"undefined\")", false);
+    toBool.insert("engine->evaluate(\"null\")", false);
+    toBool.insert("engine->evaluate(\"true\")", true);
+    toBool.insert("engine->evaluate(\"false\")", false);
+    toBool.insert("engine->evaluate(\"122\")", true);
+    toBool.insert("engine->evaluate(\"124\")", true);
+    toBool.insert("engine->evaluate(\"0\")", false);
+    toBool.insert("engine->evaluate(\"0.0\")", false);
+    toBool.insert("engine->evaluate(\"123.0\")", true);
+    toBool.insert("engine->evaluate(\"6.37e-8\")", true);
+    toBool.insert("engine->evaluate(\"-6.37e-8\")", true);
+    toBool.insert("engine->evaluate(\"0x43211234\")", true);
+    toBool.insert("engine->evaluate(\"0x10000\")", true);
+    toBool.insert("engine->evaluate(\"0x10001\")", true);
+    toBool.insert("engine->evaluate(\"NaN\")", false);
+    toBool.insert("engine->evaluate(\"Infinity\")", true);
+    toBool.insert("engine->evaluate(\"-Infinity\")", true);
+    toBool.insert("engine->evaluate(\"'ciao'\")", true);
+    toBool.insert("engine->evaluate(\"''\")", false);
+    toBool.insert("engine->evaluate(\"'0'\")", true);
+    toBool.insert("engine->evaluate(\"'123'\")", true);
+    toBool.insert("engine->evaluate(\"'12.4'\")", true);
+    toBool.insert("engine->nullValue()", false);
+    toBool.insert("engine->undefinedValue()", false);
   }
   newRow(expr) << toBool.value(expr);
 }
 
 void tst_QScriptValue::toBool_test(const char*, const QScriptValue& value) {
   QFETCH(bool, expected);
+  QCOMPARE(value.toBool(), expected);
   QCOMPARE(value.toBool(), expected);
 }
 
@@ -1037,12 +1233,43 @@ void tst_QScriptValue::toBoolean_makeData(const char* expr) {
     toBoolean.insert("engine->evaluate(\"new Object()\")", true);
     toBoolean.insert("engine->evaluate(\"new Array()\")", true);
     toBoolean.insert("engine->evaluate(\"new Error()\")", true);
+    toBoolean.insert(
+        "engine->evaluate(\"a = new Object(); a.foo = 22; a.foo\")", true);
+    toBoolean.insert("engine->evaluate(\"Undefined\")", true);
+    toBoolean.insert("engine->evaluate(\"Null\")", true);
+    toBoolean.insert("engine->evaluate(\"True\")", true);
+    toBoolean.insert("engine->evaluate(\"False\")", true);
+    toBoolean.insert("engine->evaluate(\"undefined\")", false);
+    toBoolean.insert("engine->evaluate(\"null\")", false);
+    toBoolean.insert("engine->evaluate(\"true\")", true);
+    toBoolean.insert("engine->evaluate(\"false\")", false);
+    toBoolean.insert("engine->evaluate(\"122\")", true);
+    toBoolean.insert("engine->evaluate(\"124\")", true);
+    toBoolean.insert("engine->evaluate(\"0\")", false);
+    toBoolean.insert("engine->evaluate(\"0.0\")", false);
+    toBoolean.insert("engine->evaluate(\"123.0\")", true);
+    toBoolean.insert("engine->evaluate(\"6.37e-8\")", true);
+    toBoolean.insert("engine->evaluate(\"-6.37e-8\")", true);
+    toBoolean.insert("engine->evaluate(\"0x43211234\")", true);
+    toBoolean.insert("engine->evaluate(\"0x10000\")", true);
+    toBoolean.insert("engine->evaluate(\"0x10001\")", true);
+    toBoolean.insert("engine->evaluate(\"NaN\")", false);
+    toBoolean.insert("engine->evaluate(\"Infinity\")", true);
+    toBoolean.insert("engine->evaluate(\"-Infinity\")", true);
+    toBoolean.insert("engine->evaluate(\"'ciao'\")", true);
+    toBoolean.insert("engine->evaluate(\"''\")", false);
+    toBoolean.insert("engine->evaluate(\"'0'\")", true);
+    toBoolean.insert("engine->evaluate(\"'123'\")", true);
+    toBoolean.insert("engine->evaluate(\"'12.4'\")", true);
+    toBoolean.insert("engine->nullValue()", false);
+    toBoolean.insert("engine->undefinedValue()", false);
   }
   newRow(expr) << toBoolean.value(expr);
 }
 
 void tst_QScriptValue::toBoolean_test(const char*, const QScriptValue& value) {
   QFETCH(bool, expected);
+  QCOMPARE(value.toBoolean(), expected);
   QCOMPARE(value.toBoolean(), expected);
 }
 
@@ -1161,6 +1388,36 @@ void tst_QScriptValue::toInteger_makeData(const char* expr) {
     toInteger.insert("engine->evaluate(\"new Object()\")", 0);
     toInteger.insert("engine->evaluate(\"new Array()\")", 0);
     toInteger.insert("engine->evaluate(\"new Error()\")", 0);
+    toInteger.insert(
+        "engine->evaluate(\"a = new Object(); a.foo = 22; a.foo\")", 22);
+    toInteger.insert("engine->evaluate(\"Undefined\")", 0);
+    toInteger.insert("engine->evaluate(\"Null\")", 0);
+    toInteger.insert("engine->evaluate(\"True\")", 0);
+    toInteger.insert("engine->evaluate(\"False\")", 0);
+    toInteger.insert("engine->evaluate(\"undefined\")", 0);
+    toInteger.insert("engine->evaluate(\"null\")", 0);
+    toInteger.insert("engine->evaluate(\"true\")", 1);
+    toInteger.insert("engine->evaluate(\"false\")", 0);
+    toInteger.insert("engine->evaluate(\"122\")", 122);
+    toInteger.insert("engine->evaluate(\"124\")", 124);
+    toInteger.insert("engine->evaluate(\"0\")", 0);
+    toInteger.insert("engine->evaluate(\"0.0\")", 0);
+    toInteger.insert("engine->evaluate(\"123.0\")", 123);
+    toInteger.insert("engine->evaluate(\"6.37e-8\")", 0);
+    toInteger.insert("engine->evaluate(\"-6.37e-8\")", 0);
+    toInteger.insert("engine->evaluate(\"0x43211234\")", 1126240820);
+    toInteger.insert("engine->evaluate(\"0x10000\")", 65536);
+    toInteger.insert("engine->evaluate(\"0x10001\")", 65537);
+    toInteger.insert("engine->evaluate(\"NaN\")", 0);
+    toInteger.insert("engine->evaluate(\"Infinity\")", qInf());
+    toInteger.insert("engine->evaluate(\"-Infinity\")", qInf());
+    toInteger.insert("engine->evaluate(\"'ciao'\")", 0);
+    toInteger.insert("engine->evaluate(\"''\")", 0);
+    toInteger.insert("engine->evaluate(\"'0'\")", 0);
+    toInteger.insert("engine->evaluate(\"'123'\")", 123);
+    toInteger.insert("engine->evaluate(\"'12.4'\")", 12);
+    toInteger.insert("engine->nullValue()", 0);
+    toInteger.insert("engine->undefinedValue()", 0);
   }
   newRow(expr) << toInteger.value(expr);
 }
@@ -1169,8 +1426,10 @@ void tst_QScriptValue::toInteger_test(const char*, const QScriptValue& value) {
   QFETCH(qsreal, expected);
   if (qIsInf(expected)) {
     QVERIFY(qIsInf(value.toInteger()));
+    QVERIFY(qIsInf(value.toInteger()));
     return;
   }
+  QCOMPARE(value.toInteger(), expected);
   QCOMPARE(value.toInteger(), expected);
 }
 
@@ -1288,12 +1547,43 @@ void tst_QScriptValue::toInt32_makeData(const char* expr) {
     toInt32.insert("engine->evaluate(\"new Object()\")", 0);
     toInt32.insert("engine->evaluate(\"new Array()\")", 0);
     toInt32.insert("engine->evaluate(\"new Error()\")", 0);
+    toInt32.insert("engine->evaluate(\"a = new Object(); a.foo = 22; a.foo\")",
+                   22);
+    toInt32.insert("engine->evaluate(\"Undefined\")", 0);
+    toInt32.insert("engine->evaluate(\"Null\")", 0);
+    toInt32.insert("engine->evaluate(\"True\")", 0);
+    toInt32.insert("engine->evaluate(\"False\")", 0);
+    toInt32.insert("engine->evaluate(\"undefined\")", 0);
+    toInt32.insert("engine->evaluate(\"null\")", 0);
+    toInt32.insert("engine->evaluate(\"true\")", 1);
+    toInt32.insert("engine->evaluate(\"false\")", 0);
+    toInt32.insert("engine->evaluate(\"122\")", 122);
+    toInt32.insert("engine->evaluate(\"124\")", 124);
+    toInt32.insert("engine->evaluate(\"0\")", 0);
+    toInt32.insert("engine->evaluate(\"0.0\")", 0);
+    toInt32.insert("engine->evaluate(\"123.0\")", 123);
+    toInt32.insert("engine->evaluate(\"6.37e-8\")", 0);
+    toInt32.insert("engine->evaluate(\"-6.37e-8\")", 0);
+    toInt32.insert("engine->evaluate(\"0x43211234\")", 1126240820);
+    toInt32.insert("engine->evaluate(\"0x10000\")", 65536);
+    toInt32.insert("engine->evaluate(\"0x10001\")", 65537);
+    toInt32.insert("engine->evaluate(\"NaN\")", 0);
+    toInt32.insert("engine->evaluate(\"Infinity\")", 0);
+    toInt32.insert("engine->evaluate(\"-Infinity\")", 0);
+    toInt32.insert("engine->evaluate(\"'ciao'\")", 0);
+    toInt32.insert("engine->evaluate(\"''\")", 0);
+    toInt32.insert("engine->evaluate(\"'0'\")", 0);
+    toInt32.insert("engine->evaluate(\"'123'\")", 123);
+    toInt32.insert("engine->evaluate(\"'12.4'\")", 12);
+    toInt32.insert("engine->nullValue()", 0);
+    toInt32.insert("engine->undefinedValue()", 0);
   }
   newRow(expr) << toInt32.value(expr);
 }
 
 void tst_QScriptValue::toInt32_test(const char*, const QScriptValue& value) {
   QFETCH(qint32, expected);
+  QCOMPARE(value.toInt32(), expected);
   QCOMPARE(value.toInt32(), expected);
 }
 
@@ -1411,12 +1701,43 @@ void tst_QScriptValue::toUInt32_makeData(const char* expr) {
     toUInt32.insert("engine->evaluate(\"new Object()\")", 0);
     toUInt32.insert("engine->evaluate(\"new Array()\")", 0);
     toUInt32.insert("engine->evaluate(\"new Error()\")", 0);
+    toUInt32.insert("engine->evaluate(\"a = new Object(); a.foo = 22; a.foo\")",
+                    22);
+    toUInt32.insert("engine->evaluate(\"Undefined\")", 0);
+    toUInt32.insert("engine->evaluate(\"Null\")", 0);
+    toUInt32.insert("engine->evaluate(\"True\")", 0);
+    toUInt32.insert("engine->evaluate(\"False\")", 0);
+    toUInt32.insert("engine->evaluate(\"undefined\")", 0);
+    toUInt32.insert("engine->evaluate(\"null\")", 0);
+    toUInt32.insert("engine->evaluate(\"true\")", 1);
+    toUInt32.insert("engine->evaluate(\"false\")", 0);
+    toUInt32.insert("engine->evaluate(\"122\")", 122);
+    toUInt32.insert("engine->evaluate(\"124\")", 124);
+    toUInt32.insert("engine->evaluate(\"0\")", 0);
+    toUInt32.insert("engine->evaluate(\"0.0\")", 0);
+    toUInt32.insert("engine->evaluate(\"123.0\")", 123);
+    toUInt32.insert("engine->evaluate(\"6.37e-8\")", 0);
+    toUInt32.insert("engine->evaluate(\"-6.37e-8\")", 0);
+    toUInt32.insert("engine->evaluate(\"0x43211234\")", 1126240820);
+    toUInt32.insert("engine->evaluate(\"0x10000\")", 65536);
+    toUInt32.insert("engine->evaluate(\"0x10001\")", 65537);
+    toUInt32.insert("engine->evaluate(\"NaN\")", 0);
+    toUInt32.insert("engine->evaluate(\"Infinity\")", 0);
+    toUInt32.insert("engine->evaluate(\"-Infinity\")", 0);
+    toUInt32.insert("engine->evaluate(\"'ciao'\")", 0);
+    toUInt32.insert("engine->evaluate(\"''\")", 0);
+    toUInt32.insert("engine->evaluate(\"'0'\")", 0);
+    toUInt32.insert("engine->evaluate(\"'123'\")", 123);
+    toUInt32.insert("engine->evaluate(\"'12.4'\")", 12);
+    toUInt32.insert("engine->nullValue()", 0);
+    toUInt32.insert("engine->undefinedValue()", 0);
   }
   newRow(expr) << toUInt32.value(expr);
 }
 
 void tst_QScriptValue::toUInt32_test(const char*, const QScriptValue& value) {
   QFETCH(quint32, expected);
+  QCOMPARE(value.toUInt32(), expected);
   QCOMPARE(value.toUInt32(), expected);
 }
 
@@ -1534,12 +1855,43 @@ void tst_QScriptValue::toUInt16_makeData(const char* expr) {
     toUInt16.insert("engine->evaluate(\"new Object()\")", 0);
     toUInt16.insert("engine->evaluate(\"new Array()\")", 0);
     toUInt16.insert("engine->evaluate(\"new Error()\")", 0);
+    toUInt16.insert("engine->evaluate(\"a = new Object(); a.foo = 22; a.foo\")",
+                    22);
+    toUInt16.insert("engine->evaluate(\"Undefined\")", 0);
+    toUInt16.insert("engine->evaluate(\"Null\")", 0);
+    toUInt16.insert("engine->evaluate(\"True\")", 0);
+    toUInt16.insert("engine->evaluate(\"False\")", 0);
+    toUInt16.insert("engine->evaluate(\"undefined\")", 0);
+    toUInt16.insert("engine->evaluate(\"null\")", 0);
+    toUInt16.insert("engine->evaluate(\"true\")", 1);
+    toUInt16.insert("engine->evaluate(\"false\")", 0);
+    toUInt16.insert("engine->evaluate(\"122\")", 122);
+    toUInt16.insert("engine->evaluate(\"124\")", 124);
+    toUInt16.insert("engine->evaluate(\"0\")", 0);
+    toUInt16.insert("engine->evaluate(\"0.0\")", 0);
+    toUInt16.insert("engine->evaluate(\"123.0\")", 123);
+    toUInt16.insert("engine->evaluate(\"6.37e-8\")", 0);
+    toUInt16.insert("engine->evaluate(\"-6.37e-8\")", 0);
+    toUInt16.insert("engine->evaluate(\"0x43211234\")", 4660);
+    toUInt16.insert("engine->evaluate(\"0x10000\")", 0);
+    toUInt16.insert("engine->evaluate(\"0x10001\")", 1);
+    toUInt16.insert("engine->evaluate(\"NaN\")", 0);
+    toUInt16.insert("engine->evaluate(\"Infinity\")", 0);
+    toUInt16.insert("engine->evaluate(\"-Infinity\")", 0);
+    toUInt16.insert("engine->evaluate(\"'ciao'\")", 0);
+    toUInt16.insert("engine->evaluate(\"''\")", 0);
+    toUInt16.insert("engine->evaluate(\"'0'\")", 0);
+    toUInt16.insert("engine->evaluate(\"'123'\")", 123);
+    toUInt16.insert("engine->evaluate(\"'12.4'\")", 12);
+    toUInt16.insert("engine->nullValue()", 0);
+    toUInt16.insert("engine->undefinedValue()", 0);
   }
   newRow(expr) << toUInt16.value(expr);
 }
 
 void tst_QScriptValue::toUInt16_test(const char*, const QScriptValue& value) {
   QFETCH(quint16, expected);
+  QCOMPARE(value.toUInt16(), expected);
   QCOMPARE(value.toUInt16(), expected);
 }
 
