@@ -39,8 +39,6 @@
 
 namespace WebCore {
 
-using namespace std;
-
 static long long spatialDistance(FocusDirection,
                                  const IntRect&,
                                  const IntRect&);
@@ -402,7 +400,10 @@ static long long spatialDistance(FocusDirection direction,
     }
   }
 
-  long long distance = pow((x1 - x2), 2) + pow((y1 - y2), 2);
+  long long dx = x1 - x2;
+  long long dy = y1 - y2;
+
+  long long distance = (dx * dx) + (dy * dy);
   return abs(distance);
 }
 
