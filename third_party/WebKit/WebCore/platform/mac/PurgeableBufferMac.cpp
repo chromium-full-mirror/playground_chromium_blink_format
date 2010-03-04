@@ -31,6 +31,7 @@
 
 #include <mach/mach.h>
 #include <wtf/Assertions.h>
+#include <wtf/VMTags.h>
 
 namespace WebCore {
 
@@ -53,7 +54,8 @@ PurgeableBuffer* PurgeableBuffer::create(const char* data, size_t size) {
 
   vm_address_t buffer = 0;
   kern_return_t ret = vm_allocate(mach_task_self(), &buffer, size,
-                                  VM_FLAGS_PURGABLE | VM_FLAGS_ANYWHERE);
+                                  VM_FLAGS_PURGABLE | VM_FLAGS_ANYWHERE |
+                                      VM_TAG_FOR_WEBCORE_PURGEABLE_MEMORY);
 
   ASSERT(ret == KERN_SUCCESS);
   if (ret != KERN_SUCCESS)
