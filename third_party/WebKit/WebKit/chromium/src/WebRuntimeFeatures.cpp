@@ -180,4 +180,12 @@ bool WebRuntimeFeatures::isWebGLEnabled() {
 #endif
 }
 
+void WebRuntimeFeatures::enablePushState(bool enable) {
+  RuntimeEnabledFeatures::setPushStateEnabled(enable);
+}
+
+bool WebRuntimeFeatures::isPushStateEnabled(bool enable) {
+  return RuntimeEnabledFeatures::pushStateEnabled();
+}
+
 }  // namespace WebKit

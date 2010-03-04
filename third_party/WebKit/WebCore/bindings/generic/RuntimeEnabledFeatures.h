@@ -104,6 +104,12 @@ class RuntimeEnabledFeatures {
   static bool webGLFloatArrayEnabled() { return isWebGLEnabled; }
 #endif
 
+  static void setPushStateEnabled(bool isEnabled) {
+    isPushStateEnabled = isEnabled;
+  }
+  static bool pushStateEnabled() { return isPushStateEnabled; }
+  static bool replaceStateEnabled() { return isPushStateEnabled; }
+
  private:
   // Never instantiate.
   RuntimeEnabledFeatures() {}
@@ -115,6 +121,7 @@ class RuntimeEnabledFeatures {
   static bool isGeolocationEnabled;
   static bool isIndexedDBEnabled;
   static bool isWebGLEnabled;
+  static bool isPushStateEnabled;
 };
 
 }  // namespace WebCore
