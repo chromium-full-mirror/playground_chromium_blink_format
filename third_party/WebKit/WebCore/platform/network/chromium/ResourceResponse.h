@@ -38,7 +38,8 @@ class ResourceResponse : public ResourceResponseBase {
   ResourceResponse()
       : m_isContentFiltered(false),
         m_appCacheID(0),
-        m_wasFetchedViaSPDY(false) {}
+        m_wasFetchedViaSPDY(false),
+        m_isMultipartPayload(false) {}
 
   ResourceResponse(const KURL& url,
                    const String& mimeType,
