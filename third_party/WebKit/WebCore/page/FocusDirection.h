@@ -29,7 +29,15 @@
 #define FocusDirection_h
 
 namespace WebCore {
-enum FocusDirection { FocusDirectionForward = 0, FocusDirectionBackward };
+enum FocusDirection {
+  FocusDirectionNone = 0,
+  FocusDirectionForward,
+  FocusDirectionBackward,
+  FocusDirectionUp,
+  FocusDirectionDown,
+  FocusDirectionLeft,
+  FocusDirectionRight
+};
 }
 
 #endif  // FocusDirection_h

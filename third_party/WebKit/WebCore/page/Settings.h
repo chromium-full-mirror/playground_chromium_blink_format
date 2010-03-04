@@ -135,6 +135,11 @@ class Settings : public Noncopyable {
     return m_javaScriptCanOpenWindowsAutomatically;
   }
 
+  void setSpatialNavigationEnabled(bool);
+  bool isSpatialNavigationEnabled() const {
+    return m_isSpatialNavigationEnabled;
+  }
+
   void setJavaEnabled(bool);
   bool isJavaEnabled() const { return m_isJavaEnabled; }
 
@@ -380,6 +385,7 @@ class Settings : public Noncopyable {
   unsigned m_localStorageQuota;
   unsigned m_pluginAllowedRunTime;
   ZoomMode m_zoomMode;
+  bool m_isSpatialNavigationEnabled : 1;
   bool m_isJavaEnabled : 1;
   bool m_loadsImagesAutomatically : 1;
   bool m_privateBrowsingEnabled : 1;

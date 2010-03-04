@@ -68,6 +68,7 @@ Settings::Settings(Page* page)
       ,
       m_pluginAllowedRunTime(numeric_limits<unsigned>::max()),
       m_zoomMode(ZoomPage),
+      m_isSpatialNavigationEnabled(false),
       m_isJavaEnabled(false),
       m_loadsImagesAutomatically(false),
       m_privateBrowsingEnabled(false),
@@ -238,6 +239,10 @@ void Settings::setAllowUniversalAccessFromFileURLs(
 void Settings::setAllowFileAccessFromFileURLs(
     bool allowFileAccessFromFileURLs) {
   m_allowFileAccessFromFileURLs = allowFileAccessFromFileURLs;
+}
+
+void Settings::setSpatialNavigationEnabled(bool isSpatialNavigationEnabled) {
+  m_isSpatialNavigationEnabled = isSpatialNavigationEnabled;
 }
 
 void Settings::setJavaEnabled(bool isJavaEnabled) {
