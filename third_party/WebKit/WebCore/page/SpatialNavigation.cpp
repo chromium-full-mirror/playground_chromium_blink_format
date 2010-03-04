@@ -404,7 +404,11 @@ static long long spatialDistance(FocusDirection direction,
   long long dy = y1 - y2;
 
   long long distance = (dx * dx) + (dy * dy);
-  return abs(distance);
+
+  if (distance < 0)
+    distance *= -1;
+
+  return distance;
 }
 
 static bool isRectInDirection(FocusDirection direction,
