@@ -118,7 +118,6 @@ class WebDevToolsAgentImpl : public WebDevToolsAgentPrivate,
       const v8::Arguments& args);
 
   void disposeUtilityContext();
-  void unhideResourcesPanelIfNecessary();
 
   void compileUtilityScripts();
   void initDevToolsAgentHost();
