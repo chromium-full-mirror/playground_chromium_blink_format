@@ -599,7 +599,7 @@ inline void JSObject::putDirectInternal(const Identifier& propertyName,
     // There are three possibilities here:
     //  (1) There is an existing specific value set, and we're overwriting with
     //  *the same value*.
-    //       * Do nothing – no need to despecify, but that means we can't cache
+    //       * Do nothing - no need to despecify, but that means we can't cache
     //       (a cached
     //         put could write a different value). Leave the slot in an
     //         uncachable state.
