@@ -98,7 +98,9 @@ void WebSocketChannel::close() {
 
 void WebSocketChannel::disconnect() {
   LOG(Network, "WebSocketChannel %p disconnect", this);
+  m_handshake.clearScriptExecutionContext();
   m_client = 0;
+  m_context = 0;
   if (m_handle)
     m_handle->close();
 }
@@ -106,6 +108,8 @@ void WebSocketChannel::disconnect() {
 void WebSocketChannel::didOpen(SocketStreamHandle* handle) {
   LOG(Network, "WebSocketChannel %p didOpen", this);
   ASSERT(handle == m_handle);
+  if (!m_context)
+    return;
   const CString& handshakeMessage = m_handshake.clientHandshakeMessage();
   if (!handle->send(handshakeMessage.data(), handshakeMessage.length())) {
     m_context->addMessage(ConsoleDestination, JSMessageSource, LogMessageType,
@@ -122,6 +126,7 @@ void WebSocketChannel::didClose(SocketStreamHandle* handle) {
     unsigned long unhandledBufferedAmount = m_handle->bufferedAmount();
     WebSocketChannelClient* client = m_client;
     m_client = 0;
+    m_context = 0;
     m_handle = 0;
     if (client)
       client->didClose(unhandledBufferedAmount);
@@ -137,11 +142,14 @@ void WebSocketChannel::didReceiveData(SocketStreamHandle* handle,
                                            // potentially removing the last
                                            // reference.
   ASSERT(handle == m_handle);
-  if (!appendToBuffer(data, len)) {
-    handle->close();
+  if (!m_context) {
     return;
   }
   if (!m_client) {
+    handle->close();
+    return;
+  }
+  if (!appendToBuffer(data, len)) {
     handle->close();
     return;
   }
