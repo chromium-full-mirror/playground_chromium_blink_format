@@ -138,10 +138,14 @@ void KeyframeAnimation::animate(CompositeAnimation*,
 
   // If we are waiting for the start timer, we don't want to change the style
   // yet.
-  // Special case - if the delay time is 0, then we do want to set the first
+  // Special case 1 - if the delay time is 0, then we do want to set the first
   // frame of the
   // animation right away. This avoids a flash when the animation starts.
-  if (waitingToStart() && m_animation->delay() > 0)
+  // Special case 2 - if there is a backwards fill mode, then we want to
+  // continue
+  // through to the style blend so that we get the fromStyle.
+  if (waitingToStart() && m_animation->delay() > 0 &&
+      !m_animation->fillsBackwards())
     return;
 
   // FIXME: we need to be more efficient about determining which keyframes we
@@ -279,7 +283,10 @@ void KeyframeAnimation::onAnimationIteration(double elapsedTime) {
 
 void KeyframeAnimation::onAnimationEnd(double elapsedTime) {
   sendAnimationEvent(eventNames().webkitAnimationEndEvent, elapsedTime);
-  endAnimation();
+  // End the animation if we don't fill forwards. Forward filling
+  // animations are ended properly in the class destructor.
+  if (!m_animation->fillsForwards())
+    endAnimation();
 }
 
 bool KeyframeAnimation::sendAnimationEvent(const AtomicString& eventType,

@@ -82,24 +82,26 @@ class AnimationBase : public RefCounted<AnimationBase> {
                                        // state
     AnimationStatePausedRun,  // animation paused when in LOOPING or ENDING
                               // state
-    AnimationStateDone        // end timer fired, animation finished and removed
+    AnimationStateDone,       // end timer fired, animation finished and removed
+    AnimationStateFillingForwards  // animation has ended and is retaining its
+                                   // final value
   };
 
   enum AnimStateInput {
-    AnimationStateInputMakeNew,            // reset back to new from any state
-    AnimationStateInputStartAnimation,     // animation requests a start
-    AnimationStateInputRestartAnimation,   // force a restart from any state
-    AnimationStateInputStartTimerFired,    // start timer fired
-    AnimationStateInputStyleAvailable,     // style is setup, ready to start
-                                           // animating
-    AnimationStateInputStartTimeSet,       // m_startTime was set
-    AnimationStateInputLoopTimerFired,     // loop timer fired
-    AnimationStateInputEndTimerFired,      // end timer fired
-    AnimationStateInputPauseOverride,      // pause an animation due to override
-    AnimationStateInputResumeOverride,     // resume an overridden animation
-    AnimationStateInputPlayStateRunnning,  // play state paused -> running
-    AnimationStateInputPlayStatePaused,    // play state running -> paused
-    AnimationStateInputEndAnimation        // force an end from any state
+    AnimationStateInputMakeNew,           // reset back to new from any state
+    AnimationStateInputStartAnimation,    // animation requests a start
+    AnimationStateInputRestartAnimation,  // force a restart from any state
+    AnimationStateInputStartTimerFired,   // start timer fired
+    AnimationStateInputStyleAvailable,    // style is setup, ready to start
+                                          // animating
+    AnimationStateInputStartTimeSet,      // m_startTime was set
+    AnimationStateInputLoopTimerFired,    // loop timer fired
+    AnimationStateInputEndTimerFired,     // end timer fired
+    AnimationStateInputPauseOverride,     // pause an animation due to override
+    AnimationStateInputResumeOverride,    // resume an overridden animation
+    AnimationStateInputPlayStateRunning,  // play state paused -> running
+    AnimationStateInputPlayStatePaused,   // play state running -> paused
+    AnimationStateInputEndAnimation       // force an end from any state
   };
 
   // Called when animation is in AnimationStateNew to start animation

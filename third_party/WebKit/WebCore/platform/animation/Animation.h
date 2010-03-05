@@ -44,6 +44,7 @@ class Animation : public RefCounted<Animation> {
   bool isDelaySet() const { return m_delaySet; }
   bool isDirectionSet() const { return m_directionSet; }
   bool isDurationSet() const { return m_durationSet; }
+  bool isFillModeSet() const { return m_fillModeSet; }
   bool isIterationCountSet() const { return m_iterationCountSet; }
   bool isNameSet() const { return m_nameSet; }
   bool isPlayStateSet() const { return m_playStateSet; }
@@ -57,7 +58,7 @@ class Animation : public RefCounted<Animation> {
   bool isValidAnimation() const { return !m_isNone && !m_name.isEmpty(); }
 
   bool isEmpty() const {
-    return (!m_directionSet && !m_durationSet && !m_nameSet &&
+    return (!m_directionSet && !m_durationSet && !m_fillModeSet && !m_nameSet &&
             !m_playStateSet && !m_iterationCountSet && !m_delaySet &&
             !m_timingFunctionSet && !m_propertySet);
   }
@@ -69,6 +70,7 @@ class Animation : public RefCounted<Animation> {
   void clearDelay() { m_delaySet = false; }
   void clearDirection() { m_directionSet = false; }
   void clearDuration() { m_durationSet = false; }
+  void clearFillMode() { m_fillModeSet = false; }
   void clearIterationCount() { m_iterationCountSet = false; }
   void clearName() { m_nameSet = false; }
   void clearPlayState() { m_playStateSet = AnimPlayStatePlaying; }
@@ -82,6 +84,14 @@ class Animation : public RefCounted<Animation> {
     AnimationDirectionAlternate
   };
   AnimationDirection direction() const { return m_direction; }
+
+  enum AnimationFillMode {
+    AnimationFillModeNone,
+    AnimationFillModeForwards,
+    AnimationFillModeBackwards,
+    AnimationFillModeBoth
+  };
+  AnimationFillMode fillMode() const { return m_fillMode; }
 
   double duration() const { return m_duration; }
 
@@ -104,6 +114,10 @@ class Animation : public RefCounted<Animation> {
     ASSERT(d >= 0);
     m_duration = d;
     m_durationSet = true;
+  }
+  void setFillMode(AnimationFillMode f) {
+    m_fillMode = f;
+    m_fillModeSet = true;
   }
   void setIterationCount(int c) {
     m_iterationCount = c;
@@ -137,6 +151,15 @@ class Animation : public RefCounted<Animation> {
   bool operator==(const Animation& o) const { return animationsMatch(&o); }
   bool operator!=(const Animation& o) const { return !(*this == o); }
 
+  bool fillsBackwards() const {
+    return m_fillModeSet && (m_fillMode == AnimationFillModeBackwards ||
+                             m_fillMode == AnimationFillModeBoth);
+  }
+  bool fillsForwards() const {
+    return m_fillModeSet && (m_fillMode == AnimationFillModeForwards ||
+                             m_fillMode == AnimationFillModeBoth);
+  }
+
  private:
   Animation();
   Animation(const Animation& o);
@@ -148,12 +171,14 @@ class Animation : public RefCounted<Animation> {
   double m_duration;
   TimingFunction m_timingFunction;
   AnimationDirection m_direction : 1;
+  AnimationFillMode m_fillMode : 2;
 
   unsigned m_playState : 2;
 
   bool m_delaySet : 1;
   bool m_directionSet : 1;
   bool m_durationSet : 1;
+  bool m_fillModeSet : 1;
   bool m_iterationCountSet : 1;
   bool m_nameSet : 1;
   bool m_playStateSet : 1;
@@ -168,6 +193,9 @@ class Animation : public RefCounted<Animation> {
     return AnimationDirectionNormal;
   }
   static double initialAnimationDuration() { return 0; }
+  static AnimationFillMode initialAnimationFillMode() {
+    return AnimationFillModeNone;
+  }
   static int initialAnimationIterationCount() { return 1; }
   static String initialAnimationName() { return String("none"); }
   static unsigned initialAnimationPlayState() { return AnimPlayStatePlaying; }
