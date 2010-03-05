@@ -59,8 +59,6 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
  public:
   static void registerMediaEngine(MediaEngineRegistrar);
 
-  ~MediaPlayerPrivate();
-
   void repaint();
   void loadStateChanged();
   void rateChanged();
@@ -70,6 +68,7 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
 
  private:
   MediaPlayerPrivate(MediaPlayer*);
+  ~MediaPlayerPrivate();
 
   // engine support
   static MediaPlayerPrivateInterface* create(MediaPlayer* player);
@@ -90,9 +89,12 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
 
   void load(const String& url);
   void cancelLoad();
+  void loadInternal(const String& url);
+  void resumeLoad();
 
   void play();
   void pause();
+  void prepareToPlay();
 
   bool paused() const;
   bool seeking() const;
@@ -107,6 +109,8 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
 
   bool hasClosedCaptions() const;
   void setClosedCaptionsVisible(bool);
+
+  void setPreload(MediaPlayer::Preload);
 
   MediaPlayer::NetworkState networkState() const { return m_networkState; }
   MediaPlayer::ReadyState readyState() const { return m_readyState; }
@@ -183,6 +187,7 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
   RetainPtr<QTMovieView> m_qtMovieView;
   RetainPtr<QTVideoRendererWebKitOnly> m_qtVideoRenderer;
   RetainPtr<WebCoreMovieObserver> m_objcObserver;
+  String m_movieURL;
   float m_seekTo;
   Timer<MediaPlayerPrivate> m_seekTimer;
   MediaPlayer::NetworkState m_networkState;
@@ -195,11 +200,13 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
   float m_cachedDuration;
   float m_timeToRestore;
   RetainPtr<QTMovieLayer> m_qtVideoLayer;
+  MediaPlayer::Preload m_preload;
   bool m_startedPlaying;
   bool m_isStreaming;
   bool m_visible;
   bool m_hasUnsupportedTracks;
   bool m_videoFrameHasDrawn;
+  bool m_delayingLoad;
 #if DRAW_FRAME_RATE
   int m_frameCountWhilePlaying;
   double m_timeStartedPlaying;
