@@ -379,6 +379,10 @@ void LayoutTestController::setFrameSetFlatteningEnabled(bool enabled) {
   prefsPrivate->setFrameSetFlatteningEnabled(enabled);
 }
 
+void LayoutTestController::setSpatialNavigationEnabled(bool enabled) {
+  // FIXME: Implement for SpatialNavigation layout tests.
+}
+
 void LayoutTestController::setAllowUniversalAccessFromFileURLs(bool enabled) {
   COMPtr<IWebView> webView;
   if (FAILED(frame->webView(&webView)))

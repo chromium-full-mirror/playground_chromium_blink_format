@@ -1325,6 +1325,24 @@ static JSValueRef setXSSAuditorEnabledCallback(JSContextRef context,
   return JSValueMakeUndefined(context);
 }
 
+static JSValueRef setSpatialNavigationEnabledCallback(
+    JSContextRef context,
+    JSObjectRef function,
+    JSObjectRef thisObject,
+    size_t argumentCount,
+    const JSValueRef arguments[],
+    JSValueRef* exception) {
+  if (argumentCount < 1)
+    return JSValueMakeUndefined(context);
+
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->setSpatialNavigationEnabled(
+      JSValueToBoolean(context, arguments[0]));
+
+  return JSValueMakeUndefined(context);
+}
+
 static JSValueRef setFrameSetFlatteningEnabledCallback(
     JSContextRef context,
     JSObjectRef function,
@@ -2197,6 +2215,8 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
       {"setPrivateBrowsingEnabled", setPrivateBrowsingEnabledCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setXSSAuditorEnabled", setXSSAuditorEnabledCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"setSpatialNavigationEnabled", setSpatialNavigationEnabledCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setFrameSetFlatteningEnabled", setFrameSetFlatteningEnabledCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
