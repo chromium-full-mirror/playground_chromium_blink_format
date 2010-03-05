@@ -65,7 +65,7 @@ class PlatformTouchEvent {
   bool shiftKey() const { return m_shiftKey; }
   bool metaKey() const { return m_metaKey; }
 
- private:
+ protected:
   TouchEventType m_type;
   Vector<PlatformTouchPoint> m_touchPoints;
   bool m_ctrlKey;
