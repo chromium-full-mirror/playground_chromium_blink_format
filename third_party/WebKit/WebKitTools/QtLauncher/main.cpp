@@ -118,6 +118,7 @@ class LauncherWindow : public MainWindow {
   void toggleAcceleratedCompositing(bool toggle);
   void toggleWebGL(bool toggle);
   void initializeView(bool useGraphicsView = false);
+  void toggleSpatialNavigation(bool b);
 
  public slots:
   void newWindow();
@@ -524,6 +525,10 @@ void LauncherWindow::initializeView(bool useGraphicsView) {
 #endif
 }
 
+void LauncherWindow::toggleSpatialNavigation(bool b) {
+  page()->settings()->setAttribute(QWebSettings::SpatialNavigationEnabled, b);
+}
+
 void LauncherWindow::newWindow() {
   LauncherWindow* mw = new LauncherWindow(this, false);
   mw->show();
@@ -628,6 +633,12 @@ void LauncherWindow::createChrome() {
   toggleAcceleratedCompositing->setEnabled(isGraphicsBased());
   toggleAcceleratedCompositing->connect(
       toggleGraphicsView, SIGNAL(toggled(bool)), SLOT(setEnabled(bool)));
+
+  QAction* spatialNavigationAction = toolsMenu->addAction(
+      "Toggle Spatial Navigation", this, SLOT(toggleSpatialNavigation(bool)));
+  spatialNavigationAction->setCheckable(true);
+  spatialNavigationAction->setShortcut(
+      QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_S));
 
   graphicsViewMenu->addSeparator();
 
