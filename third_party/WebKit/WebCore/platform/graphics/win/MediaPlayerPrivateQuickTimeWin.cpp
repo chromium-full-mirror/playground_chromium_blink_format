@@ -106,7 +106,7 @@ PlatformMedia MediaPlayerPrivate::platformMedia() const {
 
 #if USE(ACCELERATED_COMPOSITING)
 PlatformLayer* MediaPlayerPrivate::platformLayer() const {
-  return m_qtVideoLayer->platformLayer();
+  return m_qtVideoLayer ? m_qtVideoLayer->platformLayer() : 0;
 }
 #endif
 
@@ -837,13 +837,6 @@ bool MediaPlayerPrivate::supportsAcceleratedRendering() const {
 void MediaPlayerPrivate::acceleratedRenderingStateChanged() {
   // Set up or change the rendering path if necessary.
   setUpVideoRendering();
-}
-
-void MediaPlayerPrivate::notifySyncRequired(const GraphicsLayer*) {
-  GraphicsLayerCACF* videoGraphicsLayer =
-      static_cast<GraphicsLayerCACF*>(m_qtVideoLayer.get());
-  if (videoGraphicsLayer)
-    videoGraphicsLayer->notifySyncRequired();
 }
 
 #endif

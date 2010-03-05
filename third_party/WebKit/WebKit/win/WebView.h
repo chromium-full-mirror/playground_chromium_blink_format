@@ -932,7 +932,7 @@ class WebView : public IWebView,
     if (m_layerRenderer)
       m_layerRenderer->setNeedsDisplay();
   }
-  void setRootChildLayer(WebCore::PlatformLayer* layer);
+  void setRootChildLayer(WebCore::WKCACFLayer* layer);
 #endif
 
   void enterFullscreenForNode(WebCore::Node*);

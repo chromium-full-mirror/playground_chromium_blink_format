@@ -71,7 +71,7 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface,
                              GraphicsLayerPaintingPhase,
                              const IntRect& inClip);
   virtual void notifyAnimationStarted(const GraphicsLayer*, double time) {}
-  virtual void notifySyncRequired(const GraphicsLayer*);
+  virtual void notifySyncRequired(const GraphicsLayer*) {}
   virtual bool showDebugBorders() const { return false; }
   virtual bool showRepaintCounter() const { return false; }
 #endif

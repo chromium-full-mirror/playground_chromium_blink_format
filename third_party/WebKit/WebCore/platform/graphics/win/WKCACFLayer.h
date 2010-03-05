@@ -39,7 +39,6 @@
 #include <wtf/Vector.h>
 
 #include "GraphicsContext.h"
-#include "GraphicsLayerCACF.h"
 #include "PlatformString.h"
 #include "TransformationMatrix.h"
 
@@ -67,13 +66,17 @@ class WKCACFLayer : public RefCounted<WKCACFLayer> {
     ResizeAspectFill
   };
 
-  static PassRefPtr<WKCACFLayer> create(LayerType,
-                                        GraphicsLayerCACF* owner = 0);
+  static PassRefPtr<WKCACFLayer> create(LayerType);
   static WKCACFLayer* layer(CACFLayerRef layer) {
     return static_cast<WKCACFLayer*>(CACFLayerGetUserData(layer));
   }
 
-  ~WKCACFLayer();
+  virtual ~WKCACFLayer();
+
+  virtual void setNeedsRender() {}
+  virtual void drawInContext(PlatformGraphicsContext*) {}
+  virtual void setNeedsDisplay(const CGRect* dirtyRect);
+  void setNeedsDisplay();
 
   // Makes this layer the root when the passed context is rendered
   void becomeRootLayerForContext(CACFContextRef);
@@ -123,8 +126,6 @@ class WKCACFLayer : public RefCounted<WKCACFLayer> {
         AdoptCF, CGColorCreateGenericRGB(color.red(), color.green(),
                                          color.blue(), color.alpha()));
   }
-
-  void display(PlatformGraphicsContext*);
 
   bool isTransformLayer() const;
 
@@ -250,9 +251,6 @@ class WKCACFLayer : public RefCounted<WKCACFLayer> {
   }
   String name() const { return CACFLayerGetName(layer()); }
 
-  void setNeedsDisplay(const CGRect& dirtyRect);
-  void setNeedsDisplay();
-
   void setNeedsDisplayOnBoundsChange(bool needsDisplay) {
     m_needsDisplayOnBoundsChange = needsDisplay;
   }
@@ -326,10 +324,12 @@ class WKCACFLayer : public RefCounted<WKCACFLayer> {
   void printTree() const;
 #endif
 
- private:
-  WKCACFLayer(LayerType, GraphicsLayerCACF* owner);
+ protected:
+  WKCACFLayer(LayerType);
 
   void setNeedsCommit();
+
+ private:
   CACFLayerRef layer() const { return m_layer.get(); }
   size_t numSublayers() const {
     CFArrayRef sublayers = CACFLayerGetSublayers(layer());
@@ -352,7 +352,6 @@ class WKCACFLayer : public RefCounted<WKCACFLayer> {
 
   RetainPtr<CACFLayerRef> m_layer;
   bool m_needsDisplayOnBoundsChange;
-  GraphicsLayerCACF* m_owner;
 };
 }
 
