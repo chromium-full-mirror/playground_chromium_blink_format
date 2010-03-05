@@ -916,7 +916,7 @@ NEVER_INLINE void JITThunks::tryCacheGetByID(CallFrame* callFrame,
   if (slot.slotBase() == baseValue) {
     // set this up, so derefStructures can do it's job.
     stubInfo->initGetByIdSelf(structure);
-    if (slot.isGetter())
+    if (slot.cachedPropertyType() != PropertySlot::Value)
       ctiPatchCallByReturnAddress(codeBlock, returnAddress,
                                   FunctionPtr(cti_op_get_by_id_self_fail));
     else
@@ -950,7 +950,7 @@ NEVER_INLINE void JITThunks::tryCacheGetByID(CallFrame* callFrame,
     ASSERT(!slotBaseObject->structure()->isDictionary());
     JIT::compileGetByIdProto(callFrame->scopeChain()->globalData, callFrame,
                              codeBlock, stubInfo, structure,
-                             slotBaseObject->structure(), slot.isGetter(),
+                             slotBaseObject->structure(), propertyName, slot,
                              offset, returnAddress);
     return;
   }
@@ -967,7 +967,7 @@ NEVER_INLINE void JITThunks::tryCacheGetByID(CallFrame* callFrame,
   stubInfo->initGetByIdChain(structure, prototypeChain);
   JIT::compileGetByIdChain(callFrame->scopeChain()->globalData, callFrame,
                            codeBlock, stubInfo, structure, prototypeChain,
-                           count, slot.isGetter(), offset, returnAddress);
+                           count, propertyName, slot, offset, returnAddress);
 }
 
 #endif  // ENABLE(JIT_OPTIMIZE_PROPERTY_ACCESS)
@@ -1479,7 +1479,7 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_get_by_id_self_fail) {
 
     JIT::compileGetByIdSelfList(callFrame->scopeChain()->globalData, codeBlock,
                                 stubInfo, polymorphicStructureList, listIndex,
-                                asCell(baseValue)->structure(), slot.isGetter(),
+                                asCell(baseValue)->structure(), ident, slot,
                                 slot.cachedOffset());
 
     if (listIndex == (POLYMORPHIC_LIST_CACHE_SIZE - 1))
@@ -1544,6 +1544,23 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_get_by_id_getter_stub) {
   return JSValue::encode(result);
 }
 
+DEFINE_STUB_FUNCTION(EncodedJSValue, op_get_by_id_custom_stub) {
+  STUB_INIT_STACK_FRAME(stackFrame);
+  CallFrame* callFrame = stackFrame.callFrame;
+  JSObject* slotBase = stackFrame.args[0].jsObject();
+  PropertySlot::GetValueFunc getter =
+      reinterpret_cast<PropertySlot::GetValueFunc>(
+          stackFrame.args[1].asPointer);
+  const Identifier& ident = stackFrame.args[2].identifier();
+  JSValue result = getter(callFrame, slotBase, ident);
+  if (callFrame->hadException())
+    returnToThrowTrampoline(&callFrame->globalData(),
+                            stackFrame.args[3].returnAddress(),
+                            STUB_RETURN_ADDRESS);
+
+  return JSValue::encode(result);
+}
+
 DEFINE_STUB_FUNCTION(EncodedJSValue, op_get_by_id_proto_list) {
   STUB_INIT_STACK_FRAME(stackFrame);
 
@@ -1592,7 +1609,7 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_get_by_id_proto_list) {
     JIT::compileGetByIdProtoList(
         callFrame->scopeChain()->globalData, callFrame, codeBlock, stubInfo,
         prototypeStructureList, listIndex, structure,
-        slotBaseObject->structure(), slot.isGetter(), offset);
+        slotBaseObject->structure(), propertyName, slot, offset);
 
     if (listIndex == (POLYMORPHIC_LIST_CACHE_SIZE - 1))
       ctiPatchCallByReturnAddress(
@@ -1609,7 +1626,7 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_get_by_id_proto_list) {
     JIT::compileGetByIdChainList(callFrame->scopeChain()->globalData, callFrame,
                                  codeBlock, stubInfo, prototypeStructureList,
                                  listIndex, structure, protoChain, count,
-                                 slot.isGetter(), offset);
+                                 propertyName, slot, offset);
 
     if (listIndex == (POLYMORPHIC_LIST_CACHE_SIZE - 1))
       ctiPatchCallByReturnAddress(

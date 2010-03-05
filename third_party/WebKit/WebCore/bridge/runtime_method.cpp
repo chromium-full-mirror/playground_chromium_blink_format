@@ -75,7 +75,7 @@ bool RuntimeMethod::getOwnPropertySlot(ExecState* exec,
                                        const Identifier& propertyName,
                                        PropertySlot& slot) {
   if (propertyName == exec->propertyNames().length) {
-    slot.setCustom(this, lengthGetter);
+    slot.setCacheableCustom(this, lengthGetter);
     return true;
   }
 

@@ -203,7 +203,7 @@ inline bool getStaticPropertySlot(ExecState* exec,
   if (entry->attributes() & Function)
     setUpStaticFunctionSlot(exec, entry, thisObj, propertyName, slot);
   else
-    slot.setCustom(thisObj, entry->propertyGetter());
+    slot.setCacheableCustom(thisObj, entry->propertyGetter());
 
   return true;
 }
@@ -302,7 +302,7 @@ inline bool getStaticValueSlot(ExecState* exec,
 
   ASSERT(!(entry->attributes() & Function));
 
-  slot.setCustom(thisObj, entry->propertyGetter());
+  slot.setCacheableCustom(thisObj, entry->propertyGetter());
   return true;
 }
 

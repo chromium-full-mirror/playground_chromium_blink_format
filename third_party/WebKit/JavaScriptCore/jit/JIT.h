@@ -283,12 +283,13 @@ class JIT : private MacroAssembler {
                                   StructureStubInfo* stubInfo,
                                   Structure* structure,
                                   Structure* prototypeStructure,
-                                  bool isGetter,
+                                  const Identifier& ident,
+                                  const PropertySlot& slot,
                                   size_t cachedOffset,
                                   ReturnAddressPtr returnAddress) {
     JIT jit(globalData, codeBlock);
     jit.privateCompileGetByIdProto(stubInfo, structure, prototypeStructure,
-                                   isGetter, cachedOffset, returnAddress,
+                                   ident, slot, cachedOffset, returnAddress,
                                    callFrame);
   }
 
@@ -299,11 +300,12 @@ class JIT : private MacroAssembler {
       PolymorphicAccessStructureList* polymorphicStructures,
       int currentIndex,
       Structure* structure,
-      bool isGetter,
+      const Identifier& ident,
+      const PropertySlot& slot,
       size_t cachedOffset) {
     JIT jit(globalData, codeBlock);
     jit.privateCompileGetByIdSelfList(stubInfo, polymorphicStructures,
-                                      currentIndex, structure, isGetter,
+                                      currentIndex, structure, ident, slot,
                                       cachedOffset);
   }
   static void compileGetByIdProtoList(
@@ -315,12 +317,13 @@ class JIT : private MacroAssembler {
       int currentIndex,
       Structure* structure,
       Structure* prototypeStructure,
-      bool isGetter,
+      const Identifier& ident,
+      const PropertySlot& slot,
       size_t cachedOffset) {
     JIT jit(globalData, codeBlock);
     jit.privateCompileGetByIdProtoList(
         stubInfo, prototypeStructureList, currentIndex, structure,
-        prototypeStructure, isGetter, cachedOffset, callFrame);
+        prototypeStructure, ident, slot, cachedOffset, callFrame);
   }
   static void compileGetByIdChainList(
       JSGlobalData* globalData,
@@ -332,12 +335,13 @@ class JIT : private MacroAssembler {
       Structure* structure,
       StructureChain* chain,
       size_t count,
-      bool isGetter,
+      const Identifier& ident,
+      const PropertySlot& slot,
       size_t cachedOffset) {
     JIT jit(globalData, codeBlock);
     jit.privateCompileGetByIdChainList(stubInfo, prototypeStructureList,
                                        currentIndex, structure, chain, count,
-                                       isGetter, cachedOffset, callFrame);
+                                       ident, slot, cachedOffset, callFrame);
   }
 
   static void compileGetByIdChain(JSGlobalData* globalData,
@@ -347,12 +351,14 @@ class JIT : private MacroAssembler {
                                   Structure* structure,
                                   StructureChain* chain,
                                   size_t count,
-                                  bool isGetter,
+                                  const Identifier& ident,
+                                  const PropertySlot& slot,
                                   size_t cachedOffset,
                                   ReturnAddressPtr returnAddress) {
     JIT jit(globalData, codeBlock);
-    jit.privateCompileGetByIdChain(stubInfo, structure, chain, count, isGetter,
-                                   cachedOffset, returnAddress, callFrame);
+    jit.privateCompileGetByIdChain(stubInfo, structure, chain, count, ident,
+                                   slot, cachedOffset, returnAddress,
+                                   callFrame);
   }
 
   static void compilePutByIdTransition(JSGlobalData* globalData,
@@ -428,7 +434,8 @@ class JIT : private MacroAssembler {
   void privateCompileGetByIdProto(StructureStubInfo*,
                                   Structure*,
                                   Structure* prototypeStructure,
-                                  bool isGetter,
+                                  const Identifier&,
+                                  const PropertySlot&,
                                   size_t cachedOffset,
                                   ReturnAddressPtr returnAddress,
                                   CallFrame* callFrame);
@@ -436,14 +443,16 @@ class JIT : private MacroAssembler {
                                      PolymorphicAccessStructureList*,
                                      int,
                                      Structure*,
-                                     bool isGetter,
+                                     const Identifier&,
+                                     const PropertySlot&,
                                      size_t cachedOffset);
   void privateCompileGetByIdProtoList(StructureStubInfo*,
                                       PolymorphicAccessStructureList*,
                                       int,
                                       Structure*,
                                       Structure* prototypeStructure,
-                                      bool isGetter,
+                                      const Identifier&,
+                                      const PropertySlot&,
                                       size_t cachedOffset,
                                       CallFrame* callFrame);
   void privateCompileGetByIdChainList(StructureStubInfo*,
@@ -452,14 +461,16 @@ class JIT : private MacroAssembler {
                                       Structure*,
                                       StructureChain* chain,
                                       size_t count,
-                                      bool isGetter,
+                                      const Identifier&,
+                                      const PropertySlot&,
                                       size_t cachedOffset,
                                       CallFrame* callFrame);
   void privateCompileGetByIdChain(StructureStubInfo*,
                                   Structure*,
                                   StructureChain*,
                                   size_t count,
-                                  bool isGetter,
+                                  const Identifier&,
+                                  const PropertySlot&,
                                   size_t cachedOffset,
                                   ReturnAddressPtr returnAddress,
                                   CallFrame* callFrame);

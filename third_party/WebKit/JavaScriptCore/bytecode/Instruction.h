@@ -31,6 +31,7 @@
 
 #include "MacroAssembler.h"
 #include "Opcode.h"
+#include "PropertySlot.h"
 #include "Structure.h"
 #include <wtf/VectorTraits.h>
 
@@ -157,6 +158,9 @@ struct Instruction {
   Instruction(PolymorphicAccessStructureList* polymorphicStructures) {
     u.polymorphicStructures = polymorphicStructures;
   }
+  Instruction(PropertySlot::GetValueFunc getterFunc) {
+    u.getterFunc = getterFunc;
+  }
 
   union {
     Opcode opcode;
@@ -165,6 +169,7 @@ struct Instruction {
     StructureChain* structureChain;
     JSCell* jsCell;
     PolymorphicAccessStructureList* polymorphicStructures;
+    PropertySlot::GetValueFunc getterFunc;
   } u;
 };
 

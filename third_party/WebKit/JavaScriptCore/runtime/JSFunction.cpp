@@ -177,17 +177,17 @@ bool JSFunction::getOwnPropertySlot(ExecState* exec,
   }
 
   if (propertyName == exec->propertyNames().arguments) {
-    slot.setCustom(this, argumentsGetter);
+    slot.setCacheableCustom(this, argumentsGetter);
     return true;
   }
 
   if (propertyName == exec->propertyNames().length) {
-    slot.setCustom(this, lengthGetter);
+    slot.setCacheableCustom(this, lengthGetter);
     return true;
   }
 
   if (propertyName == exec->propertyNames().caller) {
-    slot.setCustom(this, callerGetter);
+    slot.setCacheableCustom(this, callerGetter);
     return true;
   }
 
