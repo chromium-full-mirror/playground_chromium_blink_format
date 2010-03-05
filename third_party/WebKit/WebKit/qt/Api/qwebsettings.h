@@ -71,7 +71,8 @@ class QWEBKIT_EXPORT QWebSettings {
     DnsPrefetchEnabled,
     XSSAuditorEnabled,
     AcceleratedCompositingEnabled,
-    WebGLEnabled
+    WebGLEnabled,
+    SpatialNavigationEnabled
   };
   enum WebGraphic {
     MissingImageGraphic,
