@@ -287,6 +287,12 @@ void XMLHttpRequest::setWithCredentials(bool value, ExceptionCode& ec) {
 
 void XMLHttpRequest::open(const String& method,
                           const KURL& url,
+                          ExceptionCode& ec) {
+  open(method, url, true, ec);
+}
+
+void XMLHttpRequest::open(const String& method,
+                          const KURL& url,
                           bool async,
                           ExceptionCode& ec) {
   internalAbort();

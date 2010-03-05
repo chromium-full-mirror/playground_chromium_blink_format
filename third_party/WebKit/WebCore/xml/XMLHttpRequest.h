@@ -72,6 +72,7 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
   State readyState() const;
   bool withCredentials() const { return m_includeCredentials; }
   void setWithCredentials(bool, ExceptionCode&);
+  void open(const String& method, const KURL&, ExceptionCode&);
   void open(const String& method, const KURL&, bool async, ExceptionCode&);
   void open(const String& method,
             const KURL&,
