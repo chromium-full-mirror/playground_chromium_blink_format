@@ -45,7 +45,6 @@ class Node;
 class ScriptString;
 class SerializedScriptValue;
 class Storage;
-class InspectorWorkerResource;
 
 class InspectorFrontend : public Noncopyable {
  public:
@@ -150,11 +149,6 @@ class InspectorFrontend : public Noncopyable {
   void timelineProfilerWasStarted();
   void timelineProfilerWasStopped();
   void addRecordToTimeline(const ScriptObject&);
-
-#if ENABLE(WORKERS)
-  void didCreateWorker(const InspectorWorkerResource&);
-  void willDestroyWorker(const InspectorWorkerResource&);
-#endif  // ENABLE(WORKER)
 
   void didGetCookies(int callId,
                      const ScriptArray& cookies,

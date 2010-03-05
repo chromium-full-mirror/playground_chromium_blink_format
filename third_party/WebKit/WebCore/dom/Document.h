@@ -496,8 +496,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   Page* page() const;                       // can be NULL
   Settings* settings() const;               // can be NULL
 #if ENABLE(INSPECTOR)
-  InspectorTimelineAgent* inspectorTimelineAgent() const;    // can be NULL
-  virtual InspectorController* inspectorController() const;  // can be NULL
+  InspectorTimelineAgent* inspectorTimelineAgent() const;  // can be NULL
 #endif
 
   PassRefPtr<Range> createRange();
