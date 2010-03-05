@@ -535,7 +535,7 @@ void RenderLayerCompositor::computeCompositingRequirements(
   ++childState.m_depth;
 #endif
 
-  const bool willBeComposited = needsToBeComposited(layer);
+  bool willBeComposited = needsToBeComposited(layer);
   if (willBeComposited) {
     // Tell the parent it has compositing descendants.
     compositingState.m_subtreeIsCompositing = true;
@@ -611,6 +611,7 @@ void RenderLayerCompositor::computeCompositingRequirements(
     layer->setMustOverlapCompositedLayers(true);
     if (overlapMap)
       addToOverlapMap(*overlapMap, layer, absBounds, haveComputedBounds);
+    willBeComposited = true;
   }
 
   if (layer->reflectionLayer())
@@ -621,14 +622,21 @@ void RenderLayerCompositor::computeCompositingRequirements(
   if (childState.m_subtreeIsCompositing)
     compositingState.m_subtreeIsCompositing = true;
 
+  // Set the flag to say that this SC has compositing children.
+  layer->setHasCompositingDescendant(childState.m_subtreeIsCompositing);
+
+  // setHasCompositingDescendant() may have changed the answer to
+  // needsToBeComposited() when clipping,
+  // so test that again.
+  if (!willBeComposited && clipsCompositingDescendants(layer)) {
+    if (overlapMap)
+      addToOverlapMap(*overlapMap, layer, absBounds, haveComputedBounds);
+    willBeComposited = true;
+  }
+
   // If the layer is going into compositing mode, repaint its old location.
   if (!layer->isComposited() && needsToBeComposited(layer))
     repaintOnCompositingChange(layer);
-
-  // Set the flag to say that this SC has compositing children.
-  // this can affect the answer to needsToBeComposited() when clipping,
-  // but that's ok here.
-  layer->setHasCompositingDescendant(childState.m_subtreeIsCompositing);
 
   // Update backing now, so that we can use isComposited() reliably during tree
   // traversal in rebuildCompositingLayerTree().
