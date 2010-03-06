@@ -147,6 +147,8 @@ class DOMWindow : public RefCounted<DOMWindow>, public EventTarget {
   void alert(const String& message);
   bool confirm(const String& message);
   String prompt(const String& message, const String& defaultValue);
+  String btoa(const String& stringToEncode, ExceptionCode&);
+  String atob(const String& encodedString, ExceptionCode&);
 
   bool find(const String&,
             bool caseSensitive,
