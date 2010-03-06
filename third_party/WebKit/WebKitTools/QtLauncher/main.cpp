@@ -423,7 +423,7 @@ void LauncherWindow::toggleZoomTextOnly(bool b) {
 void LauncherWindow::print() {
 #if !defined(QT_NO_PRINTER)
   QPrintPreviewDialog dlg(this);
-  connect(&dlg, SIGNAL(paintRequested(QPrinter*)), m_view,
+  connect(&dlg, SIGNAL(paintRequested(QPrinter*)), page()->mainFrame(),
           SLOT(print(QPrinter*)));
   dlg.exec();
 #endif
