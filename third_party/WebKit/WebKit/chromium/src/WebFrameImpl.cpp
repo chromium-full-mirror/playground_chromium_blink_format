@@ -663,9 +663,6 @@ bool WebFrameImpl::insertStyleText(const WebString& css, const WebString& id) {
 
 void WebFrameImpl::reload(bool ignoreCache) {
   m_frame->loader()->history()->saveDocumentAndScrollState();
-
-  stopLoading();  // Make sure existing activity stops.
-
   m_frame->loader()->reload(ignoreCache);
 }
 
@@ -678,15 +675,12 @@ void WebFrameImpl::loadRequest(const WebURLRequest& request) {
     return;
   }
 
-  stopLoading();  // Make sure existing activity stops.
   m_frame->loader()->load(resourceRequest, false);
 }
 
 void WebFrameImpl::loadHistoryItem(const WebHistoryItem& item) {
   RefPtr<HistoryItem> historyItem = PassRefPtr<HistoryItem>(item);
   ASSERT(historyItem.get());
-
-  stopLoading();  // Make sure existing activity stops.
 
   // If there is no currentItem, which happens when we are navigating in
   // session history after a crash, we need to manufacture one otherwise WebKit
@@ -722,8 +716,6 @@ void WebFrameImpl::loadData(const WebData& data,
   if (replace && !unreachableURL.isEmpty())
     request = m_frame->loader()->originalRequest();
   request.setURL(baseURL);
-
-  stopLoading();  // Make sure existing activity stops.
 
   m_frame->loader()->load(request, substData, false);
   if (replace) {
