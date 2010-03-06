@@ -85,13 +85,7 @@ class Animation : public RefCounted<Animation> {
   };
   AnimationDirection direction() const { return m_direction; }
 
-  enum AnimationFillMode {
-    AnimationFillModeNone,
-    AnimationFillModeForwards,
-    AnimationFillModeBackwards,
-    AnimationFillModeBoth
-  };
-  AnimationFillMode fillMode() const { return m_fillMode; }
+  unsigned fillMode() const { return m_fillMode; }
 
   double duration() const { return m_duration; }
 
@@ -115,7 +109,7 @@ class Animation : public RefCounted<Animation> {
     m_duration = d;
     m_durationSet = true;
   }
-  void setFillMode(AnimationFillMode f) {
+  void setFillMode(unsigned f) {
     m_fillMode = f;
     m_fillModeSet = true;
   }
@@ -171,7 +165,7 @@ class Animation : public RefCounted<Animation> {
   double m_duration;
   TimingFunction m_timingFunction;
   AnimationDirection m_direction : 1;
-  AnimationFillMode m_fillMode : 2;
+  unsigned m_fillMode : 2;
 
   unsigned m_playState : 2;
 
@@ -193,9 +187,7 @@ class Animation : public RefCounted<Animation> {
     return AnimationDirectionNormal;
   }
   static double initialAnimationDuration() { return 0; }
-  static AnimationFillMode initialAnimationFillMode() {
-    return AnimationFillModeNone;
-  }
+  static unsigned initialAnimationFillMode() { return AnimationFillModeNone; }
   static int initialAnimationIterationCount() { return 1; }
   static String initialAnimationName() { return String("none"); }
   static unsigned initialAnimationPlayState() { return AnimPlayStatePlaying; }

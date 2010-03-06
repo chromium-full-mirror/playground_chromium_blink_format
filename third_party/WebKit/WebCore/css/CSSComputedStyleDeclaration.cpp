@@ -1232,18 +1232,18 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       if (t) {
         for (size_t i = 0; i < t->size(); ++i) {
           switch (t->animation(i)->fillMode()) {
-            case Animation::AnimationFillModeNone:
+            case AnimationFillModeNone:
               list->append(CSSPrimitiveValue::createIdentifier(CSSValueNone));
               break;
-            case Animation::AnimationFillModeForwards:
+            case AnimationFillModeForwards:
               list->append(
                   CSSPrimitiveValue::createIdentifier(CSSValueForwards));
               break;
-            case Animation::AnimationFillModeBackwards:
+            case AnimationFillModeBackwards:
               list->append(
                   CSSPrimitiveValue::createIdentifier(CSSValueBackwards));
               break;
-            case Animation::AnimationFillModeBoth:
+            case AnimationFillModeBoth:
               list->append(CSSPrimitiveValue::createIdentifier(CSSValueBoth));
               break;
           }
