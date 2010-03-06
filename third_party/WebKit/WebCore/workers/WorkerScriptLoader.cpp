@@ -61,6 +61,7 @@ void WorkerScriptLoader::loadSynchronously(
   ThreadableLoaderOptions options;
   options.allowCredentials = true;
   options.crossOriginRequestPolicy = crossOriginRequestPolicy;
+  options.sendLoadCallbacks = true;
 
   WorkerThreadableLoader::loadResourceSynchronously(
       static_cast<WorkerContext*>(scriptExecutionContext), *request, *this,
@@ -83,6 +84,7 @@ void WorkerScriptLoader::loadAsynchronously(
   ThreadableLoaderOptions options;
   options.allowCredentials = true;
   options.crossOriginRequestPolicy = crossOriginRequestPolicy;
+  options.sendLoadCallbacks = true;
 
   m_threadableLoader =
       ThreadableLoader::create(scriptExecutionContext, this, *request, options);
