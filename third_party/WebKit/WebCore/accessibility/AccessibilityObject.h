@@ -339,8 +339,8 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   virtual void ariaFlowToElements(AccessibilityChildrenVector&) const {}
 
   // ARIA drag and drop
-  virtual bool supportsARIADropping() { return false; }
-  virtual bool supportsARIADragging() { return false; }
+  virtual bool supportsARIADropping() const { return false; }
+  virtual bool supportsARIADragging() const { return false; }
   virtual bool isARIAGrabbed() { return false; }
   virtual void setARIAGrabbed(bool) {}
   virtual void determineARIADropEffects(Vector<String>&) {}
@@ -555,6 +555,8 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   }
   virtual bool ariaLiveRegionAtomic() const { return false; }
   virtual bool ariaLiveRegionBusy() const { return false; }
+
+  bool supportsARIAAttributes() const;
 
 #if HAVE(ACCESSIBILITY)
 #if PLATFORM(GTK)
