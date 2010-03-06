@@ -32,6 +32,7 @@
 #include "HTMLNames.h"
 #include "RenderBlock.h"
 #include "RenderLayer.h"
+#include "RenderObject.h"
 #include "TextBoundaries.h"
 #include "TextBreakIterator.h"
 #include "TextIterator.h"
@@ -279,6 +280,11 @@ static VisiblePosition nextBoundary(const VisiblePosition& c,
 
   // generate VisiblePosition, use UPSTREAM affinity if possible
   return VisiblePosition(pos, VP_UPSTREAM_IF_POSSIBLE);
+}
+
+static bool canHaveCursor(RenderObject* o) {
+  return (o->isText() && toRenderText(o)->linesBoundingBox().height()) ||
+         (o->isBox() && toRenderBox(o)->borderBoundingBox().height());
 }
 
 // ---------
@@ -641,17 +647,20 @@ VisiblePosition previousLinePosition(const VisiblePosition& visiblePosition,
         break;
       Position pos(n, caretMinOffset(n));
       if (pos.isCandidate()) {
-        ASSERT(n->renderer());
-        Position maxPos(n, caretMaxOffset(n));
-        maxPos.getInlineBoxAndOffset(DOWNSTREAM, box, ignoredCaretOffset);
-        if (box) {
-          // previous root line box found
-          root = box->root();
-          containingBlock = n->renderer()->containingBlock();
-          break;
-        }
+        RenderObject* o = n->renderer();
+        ASSERT(o);
+        if (canHaveCursor(o)) {
+          Position maxPos(n, caretMaxOffset(n));
+          maxPos.getInlineBoxAndOffset(DOWNSTREAM, box, ignoredCaretOffset);
+          if (box) {
+            // previous root line box found
+            root = box->root();
+            containingBlock = n->renderer()->containingBlock();
+            break;
+          }
 
-        return VisiblePosition(pos, DOWNSTREAM);
+          return VisiblePosition(pos, DOWNSTREAM);
+        }
       }
       n = previousLeafWithSameEditability(n);
     }
