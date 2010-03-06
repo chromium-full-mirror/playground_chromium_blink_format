@@ -2203,7 +2203,7 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass) {
    *
    * Since: 1.1.23
    */
-  webkit_web_view_signals[GEOLOCATION_POLICY_DECISION_REQUESTED] = g_signal_new(
+  webkit_web_view_signals[GEOLOCATION_POLICY_DECISION_CANCELLED] = g_signal_new(
       "geolocation-policy-decision-cancelled", G_TYPE_FROM_CLASS(webViewClass),
       (GSignalFlags)(G_SIGNAL_RUN_LAST), 0, NULL, NULL,
       g_cclosure_marshal_VOID__OBJECT, G_TYPE_NONE, 1, WEBKIT_TYPE_WEB_FRAME);
