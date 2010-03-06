@@ -98,8 +98,6 @@ class RenderBlock : public RenderBox {
   }
   bool containsFloat(RenderObject*);
 
-  IntRect floatRect() const;
-
   int lineWidth(int y, bool firstLine) const;
 
   virtual int lowestPosition(bool includeOverflowInterior = true,
