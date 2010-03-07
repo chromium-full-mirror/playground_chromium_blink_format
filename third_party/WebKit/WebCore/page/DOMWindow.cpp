@@ -36,7 +36,6 @@
 #include "Chrome.h"
 #include "Console.h"
 #include "Database.h"
-#include "DatabaseCallback.h"
 #include "DOMApplicationCache.h"
 #include "DOMSelection.h"
 #include "DOMTimer.h"
@@ -1137,13 +1136,11 @@ double DOMWindow::devicePixelRatio() const {
 }
 
 #if ENABLE(DATABASE)
-PassRefPtr<Database> DOMWindow::openDatabase(
-    const String& name,
-    const String& version,
-    const String& displayName,
-    unsigned long estimatedSize,
-    PassRefPtr<DatabaseCallback> creationCallback,
-    ExceptionCode& ec) {
+PassRefPtr<Database> DOMWindow::openDatabase(const String& name,
+                                             const String& version,
+                                             const String& displayName,
+                                             unsigned long estimatedSize,
+                                             ExceptionCode& ec) {
   if (!m_frame)
     return 0;
 
@@ -1155,7 +1152,7 @@ PassRefPtr<Database> DOMWindow::openDatabase(
     return 0;
 
   return Database::openDatabase(document, name, version, displayName,
-                                estimatedSize, creationCallback, ec);
+                                estimatedSize, ec);
 }
 #endif
 

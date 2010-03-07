@@ -268,13 +268,11 @@ NotificationCenter* WorkerContext::webkitNotifications() const {
 #endif
 
 #if ENABLE(DATABASE)
-PassRefPtr<Database> WorkerContext::openDatabase(
-    const String& name,
-    const String& version,
-    const String& displayName,
-    unsigned long estimatedSize,
-    PassRefPtr<DatabaseCallback> creationCallback,
-    ExceptionCode& ec) {
+PassRefPtr<Database> WorkerContext::openDatabase(const String& name,
+                                                 const String& version,
+                                                 const String& displayName,
+                                                 unsigned long estimatedSize,
+                                                 ExceptionCode& ec) {
   if (!securityOrigin()->canAccessDatabase()) {
     ec = SECURITY_ERR;
     return 0;
@@ -285,7 +283,7 @@ PassRefPtr<Database> WorkerContext::openDatabase(
     return 0;
 
   return Database::openDatabase(this, name, version, displayName, estimatedSize,
-                                creationCallback, ec);
+                                ec);
 }
 #endif
 
