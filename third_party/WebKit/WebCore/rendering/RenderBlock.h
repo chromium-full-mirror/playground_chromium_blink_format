@@ -555,6 +555,7 @@ class RenderBlock : public RenderBox {
 
   void calcColumnWidth();
   int layoutColumns(int endOfContent = -1, int requestedColumnHeight = -1);
+  int visibleTopOfHighestFloatExtendingBelow(int bottom, int maxHeight) const;
 
   bool expandsToEncloseOverhangingFloats() const;
 
