@@ -26,8 +26,6 @@
 #ifndef JITInlineMethods_h
 #define JITInlineMethods_h
 
-#include <wtf/Platform.h>
-
 #if ENABLE(JIT)
 
 namespace JSC {

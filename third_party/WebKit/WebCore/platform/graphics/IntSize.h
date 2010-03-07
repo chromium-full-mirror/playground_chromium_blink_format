@@ -27,8 +27,6 @@
 #ifndef IntSize_h
 #define IntSize_h
 
-#include <wtf/Platform.h>
-
 #if PLATFORM(CG)
 typedef struct CGSize CGSize;
 #endif
