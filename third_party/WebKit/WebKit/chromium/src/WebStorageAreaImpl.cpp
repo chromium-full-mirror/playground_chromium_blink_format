@@ -64,7 +64,8 @@ void WebStorageAreaImpl::setItem(const WebString& key,
                                  const WebString& value,
                                  const WebURL& url,
                                  Result& result,
-                                 WebString& oldValue) {
+                                 WebString& oldValue,
+                                 WebFrame*) {
   int exceptionCode = 0;
 
   ScopedStorageEventURL scope(url);

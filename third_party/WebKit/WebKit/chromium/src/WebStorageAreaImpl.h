@@ -49,7 +49,8 @@ class WebStorageAreaImpl : public WebStorageArea {
                        const WebString& value,
                        const WebURL& url,
                        Result& result,
-                       WebString& oldValue);
+                       WebString& oldValue,
+                       WebFrame*);
   virtual void removeItem(const WebString& key,
                           const WebURL& url,
                           WebString& oldValue);
