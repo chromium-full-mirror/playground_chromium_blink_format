@@ -50,7 +50,11 @@ class AccessibilityTableHeaderContainer : public AccessibilityObject {
   void setParentTable(AccessibilityTable* table) { m_parentTable = table; }
   virtual AccessibilityObject* parentObject() const { return m_parentTable; }
 
+#if PLATFORM(GTK)
+  virtual bool accessibilityIsIgnored() const { return true; }
+#else
   virtual bool accessibilityIsIgnored() const { return false; }
+#endif
 
   virtual const AccessibilityChildrenVector& children();
   virtual void addChildren();

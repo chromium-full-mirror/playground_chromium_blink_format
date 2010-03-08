@@ -2744,6 +2744,9 @@ AccessibilityRole AccessibilityRenderObject::determineAccessibilityRole() {
   if (node && (node->hasTagName(tdTag) || node->hasTagName(thTag)))
     return CellRole;
 
+  if (node && node->hasTagName(trTag))
+    return RowRole;
+
   if (node && node->hasTagName(tableTag))
     return TableRole;
 #endif
