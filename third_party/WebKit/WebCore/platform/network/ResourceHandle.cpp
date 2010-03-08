@@ -39,28 +39,24 @@ static bool shouldForceContentSniffing;
 ResourceHandle::ResourceHandle(const ResourceRequest& request,
                                ResourceHandleClient* client,
                                bool defersLoading,
-                               bool shouldContentSniff,
-                               bool mightDownloadFromHandle)
+                               bool shouldContentSniff)
     : d(new ResourceHandleInternal(this,
                                    request,
                                    client,
                                    defersLoading,
-                                   shouldContentSniff,
-                                   mightDownloadFromHandle)) {}
+                                   shouldContentSniff)) {}
 
 PassRefPtr<ResourceHandle> ResourceHandle::create(
     const ResourceRequest& request,
     ResourceHandleClient* client,
     Frame* frame,
     bool defersLoading,
-    bool shouldContentSniff,
-    bool mightDownloadFromHandle) {
+    bool shouldContentSniff) {
   if (shouldContentSniff)
     shouldContentSniff = shouldContentSniffURL(request.url());
 
   RefPtr<ResourceHandle> newHandle(adoptRef(
-      new ResourceHandle(request, client, defersLoading, shouldContentSniff,
-                         mightDownloadFromHandle)));
+      new ResourceHandle(request, client, defersLoading, shouldContentSniff)));
 
   if (!request.url().isValid()) {
     newHandle->scheduleFailure(InvalidURLFailure);

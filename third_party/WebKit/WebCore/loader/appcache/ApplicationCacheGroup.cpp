@@ -489,7 +489,7 @@ PassRefPtr<ResourceHandle> ApplicationCacheGroup::createResourceHandle(
     }
   }
 
-  return ResourceHandle::create(request, this, m_frame, false, true, false);
+  return ResourceHandle::create(request, this, m_frame, false, true);
 }
 
 void ApplicationCacheGroup::didReceiveResponse(
