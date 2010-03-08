@@ -130,6 +130,7 @@ class X86Assembler {
     PRE_SSE_66 = 0x66,
     OP_PUSH_Iz = 0x68,
     OP_IMUL_GvEvIz = 0x69,
+    OP_GROUP1_EbIb = 0x80,
     OP_GROUP1_EvIz = 0x81,
     OP_GROUP1_EvIb = 0x83,
     OP_TEST_EvGv = 0x85,
@@ -689,6 +690,11 @@ class X86Assembler {
     }
   }
 
+  void cmpb_im(int imm, int offset, RegisterID base) {
+    m_formatter.oneByteOp(OP_GROUP1_EbIb, GROUP1_OP_CMP, base, offset);
+    m_formatter.immediate8(imm);
+  }
+
   void cmpl_im(int imm,
                int offset,
                RegisterID base,
@@ -813,6 +819,11 @@ class X86Assembler {
   void testl_i32m(int imm, int offset, RegisterID base) {
     m_formatter.oneByteOp(OP_GROUP3_EvIz, GROUP3_OP_TEST, base, offset);
     m_formatter.immediate32(imm);
+  }
+
+  void testb_im(int imm, int offset, RegisterID base) {
+    m_formatter.oneByteOp(OP_GROUP3_EbIb, GROUP3_OP_TEST, base, offset);
+    m_formatter.immediate8(imm);
   }
 
   void testl_i32m(int imm,

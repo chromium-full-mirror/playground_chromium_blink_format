@@ -551,6 +551,11 @@ class MacroAssemblerX86Common : public AbstractMacroAssembler<X86Assembler> {
   // an optional second operand of a mask under which to perform the test.
 
  public:
+  Jump branch8(Condition cond, Address left, Imm32 right) {
+    m_assembler.cmpb_im(right.m_value, left.offset, left.base);
+    return Jump(m_assembler.jCC(x86Condition(cond)));
+  }
+
   Jump branch32(Condition cond, RegisterID left, RegisterID right) {
     m_assembler.cmpl_rr(right, left);
     return Jump(m_assembler.jCC(x86Condition(cond)));
@@ -640,6 +645,15 @@ class MacroAssemblerX86Common : public AbstractMacroAssembler<X86Assembler> {
     else
       m_assembler.testl_i32m(mask.m_value, address.offset, address.base,
                              address.index, address.scale);
+    return Jump(m_assembler.jCC(x86Condition(cond)));
+  }
+
+  Jump branchTest8(Condition cond, Address address, Imm32 mask = Imm32(-1)) {
+    ASSERT((cond == Zero) || (cond == NonZero));
+    if (mask.m_value == -1)
+      m_assembler.cmpb_im(0, address.offset, address.base);
+    else
+      m_assembler.testb_im(mask.m_value, address.offset, address.base);
     return Jump(m_assembler.jCC(x86Condition(cond)));
   }
 
@@ -812,10 +826,11 @@ class MacroAssemblerX86Common : public AbstractMacroAssembler<X86Assembler> {
 
   void setTest8(Condition cond, Address address, Imm32 mask, RegisterID dest) {
     if (mask.m_value == -1)
-      m_assembler.cmpl_im(0, address.offset, address.base);
+      m_assembler.cmpb_im(0, address.offset, address.base);
     else
-      m_assembler.testl_i32m(mask.m_value, address.offset, address.base);
+      m_assembler.testb_im(mask.m_value, address.offset, address.base);
     m_assembler.setCC_r(x86Condition(cond), dest);
+    m_assembler.movzbl_rr(dest, dest);
   }
 
   void setTest32(Condition cond, Address address, Imm32 mask, RegisterID dest) {
