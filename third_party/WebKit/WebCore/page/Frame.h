@@ -275,8 +275,6 @@ class Frame : public RefCounted<Frame> {
 
   bool isContentEditable() const;  // if true, everything in frame is editable
 
-  void updateSecureKeyboardEntryIfActive();
-
   CSSMutableStyleDeclaration* typingStyle() const;
   void setTypingStyle(CSSMutableStyleDeclaration*);
   void clearTypingStyle();
@@ -296,8 +294,6 @@ class Frame : public RefCounted<Frame> {
       const ScrollAlignment& = ScrollAlignment::alignCenterIfNeeded,
       bool revealExtent = false);
   void setSelectionFromNone();
-
-  void setUseSecureKeyboardEntry(bool);
 
   SelectionController* dragCaretController() const;
 

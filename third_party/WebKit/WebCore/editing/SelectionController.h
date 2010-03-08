@@ -160,6 +160,8 @@ class SelectionController : public Noncopyable {
   // Painting.
   void updateAppearance();
 
+  void updateSecureKeyboardEntryIfActive();
+
 #ifndef NDEBUG
   void formatForDebugger(char* buffer, unsigned length) const;
   void showTreeForThis() const;
@@ -197,6 +199,8 @@ class SelectionController : public Noncopyable {
   IntRect absoluteBoundsForLocalRect(const IntRect&) const;
 
   void caretBlinkTimerFired(Timer<SelectionController>*);
+
+  void setUseSecureKeyboardEntry(bool);
 
   Frame* m_frame;
 
