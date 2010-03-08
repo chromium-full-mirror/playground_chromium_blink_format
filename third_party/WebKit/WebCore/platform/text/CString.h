@@ -26,8 +26,6 @@
 #ifndef CString_h
 #define CString_h
 
-#include "SharedBuffer.h"
-
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 #include <wtf/Vector.h>
