@@ -149,9 +149,6 @@ class Settings : public Noncopyable {
   void setPluginsEnabled(bool);
   bool arePluginsEnabled() const { return m_arePluginsEnabled; }
 
-  void setDatabasesEnabled(bool);
-  bool databasesEnabled() const { return m_databasesEnabled; }
-
   void setLocalStorageEnabled(bool);
   bool localStorageEnabled() const { return m_localStorageEnabled; }
 
@@ -392,7 +389,6 @@ class Settings : public Noncopyable {
   bool m_caretBrowsingEnabled : 1;
   bool m_areImagesEnabled : 1;
   bool m_arePluginsEnabled : 1;
-  bool m_databasesEnabled : 1;
   bool m_localStorageEnabled : 1;
   bool m_isJavaScriptEnabled : 1;
   bool m_isWebSecurityEnabled : 1;
