@@ -228,15 +228,24 @@ void WebPopupMenuImpl::setTextDirection(WebTextDirection direction) {}
 //-----------------------------------------------------------------------------
 // WebCore::HostWindow
 
-void WebPopupMenuImpl::repaint(const IntRect& paintRect,
-                               bool contentChanged,
-                               bool immediate,
-                               bool repaintContentOnly) {
-  // Ignore spurious calls.
-  if (!contentChanged || paintRect.isEmpty())
-    return;
+void WebPopupMenuImpl::invalidateContents(const IntRect&, bool) {
+  notImplemented();
+}
+
+void WebPopupMenuImpl::invalidateWindow(const IntRect&, bool) {
+  notImplemented();
+}
+
+void WebPopupMenuImpl::invalidateContentsAndWindow(const IntRect& paintRect,
+                                                   bool /*immediate*/) {
   if (m_client)
     m_client->didInvalidateRect(paintRect);
+}
+
+void WebPopupMenuImpl::invalidateContentsForSlowScroll(
+    const IntRect& updateRect,
+    bool immediate) {
+  invalidateContentsAndWindow(updateRect, immediate);
 }
 
 void WebPopupMenuImpl::scroll(const IntSize& scrollDelta,

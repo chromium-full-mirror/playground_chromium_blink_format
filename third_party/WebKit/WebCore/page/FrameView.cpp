@@ -288,7 +288,7 @@ bool FrameView::didFirstLayout() const {
 void FrameView::invalidateRect(const IntRect& rect) {
   if (!parent()) {
     if (hostWindow())
-      hostWindow()->repaint(rect, true);
+      hostWindow()->invalidateContentsAndWindow(rect, false /*immediate*/);
     return;
   }
 

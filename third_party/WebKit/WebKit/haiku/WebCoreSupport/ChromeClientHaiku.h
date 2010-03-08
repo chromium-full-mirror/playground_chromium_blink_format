@@ -116,13 +116,14 @@ class ChromeClientHaiku : public ChromeClient {
   bool tabsToLinks() const;
   IntRect windowResizerRect() const;
 
-  void repaint(const IntRect&,
-               bool contentChanged,
-               bool immediate = false,
-               bool repaintContentOnly = false);
+  void invalidateContents(const IntRect&, bool);
+  void invalidateWindow(const IntRect&, bool);
+  void invalidateContentsAndWindow(const IntRect&, bool);
+  void invalidateContentsForSlowScroll(const IntRect&, bool);
   void scroll(const IntSize& scrollDelta,
               const IntRect& rectToScroll,
               const IntRect& clipRect);
+
   IntPoint screenToWindow(const IntPoint&) const;
   IntRect windowToScreen(const IntRect&) const;
   PlatformPageClient platformPageClient() const;

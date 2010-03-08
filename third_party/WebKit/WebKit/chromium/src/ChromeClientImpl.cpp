@@ -428,15 +428,24 @@ IntRect ChromeClientImpl::windowResizerRect() const {
   return result;
 }
 
-void ChromeClientImpl::repaint(const IntRect& paintRect,
-                               bool contentChanged,
-                               bool immediate,
-                               bool repaintContentOnly) {
-  // Ignore spurious calls.
-  if (!contentChanged || paintRect.isEmpty())
-    return;
+void ChromeClientImpl::invalidateContents(const IntRect&, bool) {
+  notImplemented();
+}
+
+void ChromeClientImpl::invalidateWindow(const IntRect&, bool) {
+  notImplemented();
+}
+
+void ChromeClientImpl::invalidateContentsAndWindow(const IntRect& updateRect,
+                                                   bool /*immediate*/) {
   if (m_webView->client())
-    m_webView->client()->didInvalidateRect(paintRect);
+    m_webView->client()->didInvalidateRect(updateRect);
+}
+
+void ChromeClientImpl::invalidateContentsForSlowScroll(
+    const IntRect& updateRect,
+    bool immediate) {
+  invalidateContentsAndWindow(updateRect, immediate);
 }
 
 void ChromeClientImpl::scroll(const IntSize& scrollDelta,
