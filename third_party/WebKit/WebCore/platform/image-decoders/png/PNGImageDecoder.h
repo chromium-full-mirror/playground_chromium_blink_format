@@ -46,7 +46,6 @@ class PNGImageDecoder : public ImageDecoder {
   virtual RGBA32Buffer* frameBufferAtIndex(size_t index);
 
   // Callbacks from libpng
-  void decodingFailed();
   void headerAvailable();
   void rowAvailable(unsigned char* rowBuffer,
                     unsigned rowIndex,
