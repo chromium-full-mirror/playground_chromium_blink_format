@@ -189,7 +189,8 @@ bool ScriptController::processingUserGesture(DOMWrapperWorld*) const {
 
     if (eventOk)
       return true;
-  } else if (activeProxy->inlineCode() && !activeProxy->timerCallback()) {
+  } else if (m_sourceURL && m_sourceURL->isNull() &&
+             !activeProxy->timerCallback()) {
     // This is the <a href="javascript:window.open('...')> case -> we let it
     // through.
     return true;
@@ -221,6 +222,8 @@ void ScriptController::evaluateInIsolatedWorld(
 // Evaluate a script file in the environment of this proxy.
 ScriptValue ScriptController::evaluate(const ScriptSourceCode& sourceCode) {
   String sourceURL = sourceCode.url();
+  const String* savedSourceURL = m_sourceURL;
+  m_sourceURL = &sourceURL;
 
   if (!m_XSSAuditor->canEvaluate(sourceCode.source())) {
     // This script is not safe to be evaluated.
@@ -240,8 +243,10 @@ ScriptValue ScriptController::evaluate(const ScriptSourceCode& sourceCode) {
   v8::Local<v8::Value> object = m_proxy->evaluate(sourceCode, 0);
 
   // Evaluating the JavaScript could cause the frame to be deallocated
-  // so we starot the keep alive timer here.
+  // so we start the keep alive timer here.
   m_frame->keepAlive();
+
+  m_sourceURL = savedSourceURL;
 
   if (object.IsEmpty() || object->IsUndefined())
     return ScriptValue();
