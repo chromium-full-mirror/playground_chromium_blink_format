@@ -241,11 +241,6 @@ class UStringImpl : public UStringOrRopeImpl {
     ASSERT(!isStatic() || !isIdentifier());
   }
 
-  PassRefPtr<UStringImpl> singleCharacterSubstring(unsigned index) {
-    ASSERT(index < length());
-    return create(this, index, 1);
-  }
-
  private:
   // For SmallStringStorage, which allocates an array and uses an in-place new.
   UStringImpl() {}
@@ -392,9 +387,6 @@ class URopeImpl : public UStringOrRopeImpl {
   Fiber m_fibers[1];
 
   friend class UStringOrRopeImpl;
-  friend PassRefPtr<UStringImpl> singleCharacterSubstring(
-      UStringOrRopeImpl* ropeoid,
-      unsigned index);
 };
 
 inline void UStringOrRopeImpl::deref() {
@@ -405,9 +397,6 @@ inline void UStringOrRopeImpl::deref() {
 }
 
 bool equal(const UStringImpl*, const UStringImpl*);
-
-PassRefPtr<UStringImpl> singleCharacterSubstring(UStringOrRopeImpl* ropeoid,
-                                                 unsigned index);
 }
 
 #endif
