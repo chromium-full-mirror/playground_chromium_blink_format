@@ -98,8 +98,8 @@ void HTMLVideoElement::parseMappedAttribute(MappedAttribute* attr) {
         m_imageLoader.set(new HTMLImageLoader(this));
       m_imageLoader->updateFromElementIgnoringPreviousError();
 #else
-      if (m_player)
-        m_player->setPoster(poster());
+      if (player())
+        player()->setPoster(poster());
 #endif
     }
   } else if (attrName == widthAttr)
@@ -115,7 +115,7 @@ bool HTMLVideoElement::supportsFullscreen() const {
   if (!page)
     return false;
 
-  if (!m_player || !m_player->supportsFullscreen() || !m_player->hasVideo())
+  if (!player() || !player()->supportsFullscreen() || !player()->hasVideo())
     return false;
 
   // Check with the platform client.
@@ -123,15 +123,15 @@ bool HTMLVideoElement::supportsFullscreen() const {
 }
 
 unsigned HTMLVideoElement::videoWidth() const {
-  if (!m_player)
+  if (!player())
     return 0;
-  return m_player->naturalSize().width();
+  return player()->naturalSize().width();
 }
 
 unsigned HTMLVideoElement::videoHeight() const {
-  if (!m_player)
+  if (!player())
     return 0;
-  return m_player->naturalSize().height();
+  return player()->naturalSize().height();
 }
 
 unsigned HTMLVideoElement::width() const {
@@ -179,16 +179,6 @@ void HTMLVideoElement::updatePosterImage() {
 #endif
 }
 
-void HTMLVideoElement::paint(GraphicsContext* context,
-                             const IntRect& destRect) {
-  MediaPlayer* player = HTMLMediaElement::player();
-  if (!player)
-    return;
-
-  player->setVisible(true);  // Make player visible or it won't draw.
-  player->paint(context, destRect);
-}
-
 void HTMLVideoElement::paintCurrentFrameInContext(GraphicsContext* context,
                                                   const IntRect& destRect) {
   MediaPlayer* player = HTMLMediaElement::player();
@@ -200,15 +190,15 @@ void HTMLVideoElement::paintCurrentFrameInContext(GraphicsContext* context,
 }
 
 bool HTMLVideoElement::hasAvailableVideoFrame() const {
-  if (!m_player)
+  if (!player())
     return false;
 
-  return m_player->hasAvailableVideoFrame();
+  return player()->hasAvailableVideoFrame();
 }
 
 void HTMLVideoElement::webkitEnterFullScreen(bool isUserGesture,
                                              ExceptionCode& ec) {
-  if (m_isFullscreen)
+  if (isFullscreen())
     return;
 
   // Generate an exception if this isn't called in response to a user gesture,
@@ -223,7 +213,7 @@ void HTMLVideoElement::webkitEnterFullScreen(bool isUserGesture,
 }
 
 void HTMLVideoElement::webkitExitFullScreen() {
-  if (m_isFullscreen)
+  if (isFullscreen())
     exitFullscreen();
 }
 
@@ -232,7 +222,7 @@ bool HTMLVideoElement::webkitSupportsFullscreen() {
 }
 
 bool HTMLVideoElement::webkitDisplayingFullscreen() {
-  return m_isFullscreen;
+  return isFullscreen();
 }
 }
 #endif

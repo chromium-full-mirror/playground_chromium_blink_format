@@ -1792,12 +1792,11 @@ void HTMLMediaElement::mediaVolumeDidChange() {
   updateVolume();
 }
 
-const IntRect HTMLMediaElement::screenRect() {
-  IntRect elementRect;
-  if (renderer())
-    elementRect = renderer()->view()->frameView()->contentsToScreen(
-        renderer()->absoluteBoundingBoxRect());
-  return elementRect;
+IntRect HTMLMediaElement::screenRect() {
+  if (!renderer())
+    return IntRect();
+  return renderer()->view()->frameView()->contentsToScreen(
+      renderer()->absoluteBoundingBoxRect());
 }
 
 void HTMLMediaElement::defaultEventHandler(Event* event) {
