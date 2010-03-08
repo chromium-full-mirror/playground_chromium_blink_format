@@ -30,6 +30,7 @@
 
 #include "CachedResourceClient.h"
 #include "CachedResourceClientWalker.h"
+#include "SharedBuffer.h"
 #include "TextResourceDecoder.h"
 #include <wtf/Vector.h>
 
