@@ -667,7 +667,7 @@ void ResourceHandle::loadResourceSynchronously(
     Vector<char>& data,
     Frame* frame) {
   WebCoreSynchronousLoader syncLoader(error, response, data);
-  ResourceHandle handle(request, &syncLoader, true, false, true);
+  ResourceHandle handle(request, &syncLoader, true, false);
 
   handle.start(frame);
   syncLoader.run();
