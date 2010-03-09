@@ -53,7 +53,7 @@ FunctionPrototype::FunctionPrototype(ExecState* exec,
                                      NonNullPassRefPtr<Structure> structure)
     : InternalFunction(&exec->globalData(),
                        structure,
-                       exec->propertyNames().emptyIdentifier) {
+                       exec->propertyNames().nullIdentifier) {
   putDirectWithoutTransition(exec->propertyNames().length, jsNumber(exec, 0),
                              DontDelete | ReadOnly | DontEnum);
 }

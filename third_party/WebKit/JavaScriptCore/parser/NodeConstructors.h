@@ -930,7 +930,7 @@ inline ForNode::ForNode(JSGlobalData* globalData,
 
 inline ContinueNode::ContinueNode(JSGlobalData* globalData)
     : StatementNode(globalData),
-      m_ident(globalData->propertyNames->emptyIdentifier) {}
+      m_ident(globalData->propertyNames->nullIdentifier) {}
 
 inline ContinueNode::ContinueNode(JSGlobalData* globalData,
                                   const Identifier& ident)
@@ -938,7 +938,7 @@ inline ContinueNode::ContinueNode(JSGlobalData* globalData,
 
 inline BreakNode::BreakNode(JSGlobalData* globalData)
     : StatementNode(globalData),
-      m_ident(globalData->propertyNames->emptyIdentifier) {}
+      m_ident(globalData->propertyNames->nullIdentifier) {}
 
 inline BreakNode::BreakNode(JSGlobalData* globalData, const Identifier& ident)
     : StatementNode(globalData), m_ident(ident) {}
@@ -1046,7 +1046,7 @@ inline ForInNode::ForInNode(JSGlobalData* globalData,
                             ExpressionNode* expr,
                             StatementNode* statement)
     : StatementNode(globalData),
-      m_ident(globalData->propertyNames->emptyIdentifier),
+      m_ident(globalData->propertyNames->nullIdentifier),
       m_init(0),
       m_lexpr(l),
       m_expr(expr),
