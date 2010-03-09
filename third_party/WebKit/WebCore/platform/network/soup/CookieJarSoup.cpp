@@ -25,7 +25,7 @@
 #include "Cookie.h"
 #include "CString.h"
 #include "Document.h"
-#include "GOwnPtrGtk.h"
+#include "GOwnPtrSoup.h"
 #include "KURL.h"
 
 namespace WebCore {
