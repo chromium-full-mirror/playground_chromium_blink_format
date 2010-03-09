@@ -1062,6 +1062,7 @@ void CompositeEditCommand::moveParagraphs(
   ASSERT(destination.deepEquivalent().node()->inDocument());
 
   cleanupAfterDeletion();
+  ASSERT(destination.deepEquivalent().node()->inDocument());
 
   // Add a br if pruning an empty block level element caused a collapse. For
   // example:
@@ -1091,6 +1092,7 @@ void CompositeEditCommand::moveParagraphs(
       TextIterator::rangeLength(startToDestinationRange.get(), true);
 
   setEndingSelection(destination);
+  ASSERT(endingSelection().isCaretOrRange());
   applyCommandToComposite(ReplaceSelectionCommand::create(
       document(), fragment, true, false, !preserveStyle, false, true));
 
