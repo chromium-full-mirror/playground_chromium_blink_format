@@ -181,11 +181,6 @@ class RenderThemeChromiumSkia : public RenderTheme {
   virtual int popupInternalPaddingTop(RenderStyle*) const;
   virtual int popupInternalPaddingBottom(RenderStyle*) const;
 
-  virtual int buttonInternalPaddingLeft() const;
-  virtual int buttonInternalPaddingRight() const;
-  virtual int buttonInternalPaddingTop() const;
-  virtual int buttonInternalPaddingBottom() const;
-
 #if ENABLE(VIDEO)
   // Media controls
   virtual bool shouldRenderMediaControlPart(ControlPart, Element*);
