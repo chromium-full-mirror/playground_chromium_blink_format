@@ -106,6 +106,25 @@ static JSValueRef logScrollingStartEventsCallback(JSContextRef ctx,
   return JSValueMakeUndefined(ctx);
 }
 
+static JSValueRef getElementAtPointCallback(JSContextRef context,
+                                            JSObjectRef function,
+                                            JSObjectRef thisObject,
+                                            size_t argumentCount,
+                                            const JSValueRef arguments[],
+                                            JSValueRef* exception) {
+  int x = 0;
+  int y = 0;
+  if (argumentCount == 2) {
+    x = JSValueToNumber(context, arguments[0], exception);
+    y = JSValueToNumber(context, arguments[1], exception);
+  }
+
+  AccessibilityController* controller =
+      static_cast<AccessibilityController*>(JSObjectGetPrivate(thisObject));
+  return AccessibilityUIElement::makeJSAccessibilityUIElement(
+      context, controller->elementAtPoint(x, y));
+}
+
 JSClassRef AccessibilityController::getJSClass() {
   static JSStaticFunction staticFunctions[] = {
       {"logFocusEvents", logFocusEventsCallback,
@@ -113,6 +132,8 @@ JSClassRef AccessibilityController::getJSClass() {
       {"logValueChangeEvents", logValueChangeEventsCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"logScrollingStartEvents", logScrollingStartEventsCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"elementAtPoint", getElementAtPointCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {0, 0, 0}};
 

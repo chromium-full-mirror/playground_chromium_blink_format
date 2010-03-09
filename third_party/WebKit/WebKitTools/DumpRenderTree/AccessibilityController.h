@@ -47,6 +47,7 @@ class AccessibilityController {
   // Controller Methods - platform-independent implementations
   AccessibilityUIElement rootElement();
   AccessibilityUIElement focusedElement();
+  AccessibilityUIElement elementAtPoint(int x, int y);
 
   void setLogFocusEvents(bool);
   void setLogValueChangeEvents(bool);

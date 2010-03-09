@@ -43,6 +43,11 @@ AccessibilityController::AccessibilityController() {}
 
 AccessibilityController::~AccessibilityController() {}
 
+AccessibilityUIElement AccessibilityController::elementAtPoint(int x, int y) {
+  // FIXME: implement
+  return 0;
+}
+
 AccessibilityUIElement AccessibilityController::focusedElement() {
   AtkObject* accessible =
       webkit_web_frame_get_focused_accessible_element(mainFrame);
