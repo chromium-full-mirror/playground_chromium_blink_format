@@ -156,8 +156,7 @@ void ResourceHandleInternal::didFail(WebURLLoader*, const WebURLError& error) {
 ResourceHandle::ResourceHandle(const ResourceRequest& request,
                                ResourceHandleClient* client,
                                bool defersLoading,
-                               bool shouldContentSniff,
-                               bool mightDownloadFromHandle)
+                               bool shouldContentSniff)
     : d(new ResourceHandleInternal(request, client)) {
   d->m_owner = this;
 
@@ -169,11 +168,9 @@ PassRefPtr<ResourceHandle> ResourceHandle::create(
     ResourceHandleClient* client,
     Frame* deprecated,
     bool defersLoading,
-    bool shouldContentSniff,
-    bool mightDownloadFromHandle) {
-  RefPtr<ResourceHandle> newHandle =
-      adoptRef(new ResourceHandle(request, client, defersLoading,
-                                  shouldContentSniff, mightDownloadFromHandle));
+    bool shouldContentSniff) {
+  RefPtr<ResourceHandle> newHandle = adoptRef(
+      new ResourceHandle(request, client, defersLoading, shouldContentSniff));
 
   if (newHandle->start(deprecated))
     return newHandle.release();
