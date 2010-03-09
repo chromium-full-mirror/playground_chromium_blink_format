@@ -179,6 +179,20 @@ void DeleteSelectionCommand::initializeStartEnd(Position& start,
   }
 }
 
+void DeleteSelectionCommand::setStartingSelectionOnSmartDelete(Position& start,
+                                                               Position& end) {
+  VisiblePosition newBase;
+  VisiblePosition newExtent;
+  if (startingSelection().isBaseFirst()) {
+    newBase = start;
+    newExtent = end;
+  } else {
+    newBase = end;
+    newExtent = start;
+  }
+  setStartingSelection(VisibleSelection(newBase, newExtent));
+}
+
 void DeleteSelectionCommand::initializePositionData() {
   Position start, end;
   initializeStartEnd(start, end);
@@ -271,6 +285,8 @@ void DeleteSelectionCommand::initializePositionData() {
       m_downstreamStart = pos.downstream();
       m_leadingWhitespace =
           m_upstreamStart.leadingWhitespacePosition(visiblePos.affinity());
+
+      setStartingSelectionOnSmartDelete(m_upstreamStart, m_upstreamEnd);
     }
 
     // trailing whitespace is only considered for smart delete if there is no
@@ -289,6 +305,8 @@ void DeleteSelectionCommand::initializePositionData() {
       m_downstreamEnd = pos.downstream();
       m_trailingWhitespace =
           m_downstreamEnd.trailingWhitespacePosition(VP_DEFAULT_AFFINITY);
+
+      setStartingSelectionOnSmartDelete(m_downstreamStart, m_downstreamEnd);
     }
   }
 
