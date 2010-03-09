@@ -418,7 +418,7 @@ static bool webKitWebSrcStart(WebKitWebSrc* src) {
   request.setHTTPHeaderField("transferMode.dlna", "Streaming");
 
   priv->resourceHandle =
-      ResourceHandle::create(request, priv->client, 0, false, false, false);
+      ResourceHandle::create(request, priv->client, 0, false, false);
   if (!priv->resourceHandle) {
     GST_ERROR_OBJECT(src, "Failed to create ResourceHandle");
     return false;
