@@ -199,6 +199,12 @@ TryMallocReturnValue tryFastZeroedMalloc(size_t n) {
 #include "brew/SystemMallocBrew.h"
 #endif
 
+#if OS(DARWIN)
+#include <malloc/malloc.h>
+#elif COMPILER(MSVC)
+#include <malloc.h>
+#endif
+
 namespace WTF {
 
 TryMallocReturnValue tryFastMalloc(size_t n) {
@@ -361,6 +367,16 @@ void releaseFastMallocFreeMemory() {}
 FastMallocStatistics fastMallocStatistics() {
   FastMallocStatistics statistics = {0, 0, 0, 0};
   return statistics;
+}
+
+void fastCheckConsistency(const void* p) {
+#if (defined(USE_SYSTEM_MALLOC) && USE_SYSTEM_MALLOC) || !defined(NDEBUG)
+#if OS(DARWIN)
+  ASSERT(malloc_size(p));
+#elif COMPILER(MSVC)
+  ASSERT(_msize(const_cast<P*>(p)));
+#endif
+#endif
 }
 
 }  // namespace WTF
@@ -4589,6 +4605,8 @@ FastMallocStatistics fastMallocStatistics() {
   }
   return statistics;
 }
+
+void fastCheckConsistency(const void*) {}
 
 }  // namespace WTF
 #endif

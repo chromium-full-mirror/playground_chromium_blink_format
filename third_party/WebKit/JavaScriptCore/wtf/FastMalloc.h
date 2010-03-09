@@ -34,6 +34,7 @@ void* fastZeroedMalloc(size_t);
 void* fastCalloc(size_t numElements, size_t elementSize);
 void* fastRealloc(void*, size_t);
 char* fastStrDup(const char*);
+void fastCheckConsistency(const void*);
 
 struct TryMallocReturnValue {
   TryMallocReturnValue(void* data) : m_data(data) {}
