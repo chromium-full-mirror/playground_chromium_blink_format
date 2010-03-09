@@ -497,6 +497,8 @@ void InspectorController::mouseDidMoveOverElement(const HitTestResult& result,
     return;
 
   Node* node = result.innerNode();
+  while (node && node->nodeType() == Node::TEXT_NODE)
+    node = node->parentNode();
   if (node)
     highlight(node);
 }
