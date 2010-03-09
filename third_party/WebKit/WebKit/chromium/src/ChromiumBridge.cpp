@@ -92,6 +92,9 @@ using namespace WebKit;
 namespace WebCore {
 
 static ChromeClientImpl* toChromeClientImpl(Widget* widget) {
+  if (!widget)
+    return 0;
+
   FrameView* view;
   if (widget->isFrameView())
     view = static_cast<FrameView*>(widget);
