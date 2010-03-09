@@ -29,6 +29,7 @@
 #if ENABLE(VIDEO)
 
 #include "HTMLElement.h"
+#include "MediaCanStartListener.h"
 #include "MediaPlayer.h"
 
 namespace WebCore {
@@ -45,7 +46,9 @@ class TimeRanges;
 // it
 // no longer depends on typecasting a MediaPlayerClient to an HTMLMediaElement.
 
-class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
+class HTMLMediaElement : public HTMLElement,
+                         public MediaPlayerClient,
+                         private MediaCanStartListener {
  public:
   MediaPlayer* player() const { return m_player.get(); }
 
@@ -287,6 +290,8 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   // Pauses playback without changing any states or generating events
   void setPausedInternal(bool);
 
+  virtual void mediaCanStart();
+
   // Restrictions to change default behaviors. This is effectively a compile
   // time choice at the moment
   // because there are no accessor functions.
@@ -345,6 +350,8 @@ class HTMLMediaElement : public HTMLElement, public MediaPlayerClient {
   // we can avoid
   // calling the media engine recursively.
   int m_processingMediaPlayerCallback;
+
+  bool m_isWaitingUntilMediaCanStart;
 
   bool m_processingLoad : 1;
   bool m_delayingTheLoadEvent : 1;
