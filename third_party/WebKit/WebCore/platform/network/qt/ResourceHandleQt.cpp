@@ -196,7 +196,7 @@ void ResourceHandle::loadResourceSynchronously(
     Vector<char>& data,
     Frame* frame) {
   WebCoreSynchronousLoader syncLoader;
-  ResourceHandle handle(request, &syncLoader, true, false, true);
+  ResourceHandle handle(request, &syncLoader, true, false);
 
   ResourceHandleInternal* d = handle.getInternal();
   if (!(d->m_user.isEmpty() || d->m_pass.isEmpty())) {
