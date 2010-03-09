@@ -122,7 +122,9 @@ void InspectorBackend::getResourceContent(long callId,
 
 void InspectorBackend::reloadPage() {
   if (m_inspectorController)
-    m_inspectorController->m_inspectedPage->mainFrame()->loader()->reload();
+    m_inspectorController->m_inspectedPage->mainFrame()
+        ->redirectScheduler()
+        ->scheduleRefresh(true);
 }
 
 void InspectorBackend::startTimelineProfiler() {
