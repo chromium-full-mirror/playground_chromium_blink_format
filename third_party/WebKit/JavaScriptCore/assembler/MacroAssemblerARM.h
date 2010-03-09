@@ -196,6 +196,10 @@ class MacroAssemblerARM : public AbstractMacroAssembler<ARMAssembler> {
                        m_assembler.getImm(imm.m_value, ARMRegisters::S0));
   }
 
+  void load8(ImplicitAddress address, RegisterID dest) {
+    m_assembler.dataTransfer32(true, dest, address.base, address.offset, true);
+  }
+
   void load32(ImplicitAddress address, RegisterID dest) {
     m_assembler.dataTransfer32(true, dest, address.base, address.offset);
   }
@@ -320,6 +324,11 @@ class MacroAssemblerARM : public AbstractMacroAssembler<ARMAssembler> {
       move(src, dest);
   }
 
+  Jump branch8(Condition cond, Address left, Imm32 right) {
+    load8(left, ARMRegisters::S1);
+    return branch32(cond, ARMRegisters::S1, right);
+  }
+
   Jump branch32(Condition cond,
                 RegisterID left,
                 RegisterID right,
@@ -381,6 +390,11 @@ class MacroAssemblerARM : public AbstractMacroAssembler<ARMAssembler> {
     move(right, ARMRegisters::S1);
     m_assembler.cmp_r(ARMRegisters::S0, ARMRegisters::S1);
     return m_assembler.jmp(ARMCondition(cond));
+  }
+
+  Jump branchTest8(Condition cond, Address address, Imm32 mask = Imm32(-1)) {
+    load8(address, ARMRegisters::S1);
+    return branchTest32(cond, ARMRegisters::S1, mask);
   }
 
   Jump branchTest32(Condition cond, RegisterID reg, RegisterID mask) {

@@ -147,6 +147,7 @@ class ARMAssembler {
     SET_CC = (1 << 20),
     OP2_OFSREG = (1 << 25),
     DT_UP = (1 << 23),
+    DT_BYTE = (1 << 22),
     DT_WB = (1 << 21),
     // This flag is inlcuded in LDR and STR
     DT_PRE = (1 << 24),
@@ -694,7 +695,8 @@ class ARMAssembler {
   void dataTransfer32(bool isLoad,
                       RegisterID srcDst,
                       RegisterID base,
-                      int32_t offset);
+                      int32_t offset,
+                      bool bytes = false);
   void baseIndexTransfer32(bool isLoad,
                            RegisterID srcDst,
                            RegisterID base,
