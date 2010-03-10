@@ -55,7 +55,10 @@
 #include "V8BindingState.h"
 #include "V8CustomEventListener.h"
 #include "V8GCForContextDispose.h"
+#include "V8HTMLAudioElementConstructor.h"
 #include "V8HTMLCollection.h"
+#include "V8HTMLImageElementConstructor.h"
+#include "V8HTMLOptionElementConstructor.h"
 #include "V8MessagePortCustom.h"
 #include "V8Node.h"
 #include "V8Proxy.h"
@@ -242,7 +245,8 @@ v8::Handle<v8::Value> V8DOMWindow::AudioAccessorGetter(
     v8::Local<v8::String> name,
     const v8::AccessorInfo& info) {
   DOMWindow* window = V8DOMWindow::toNative(info.Holder());
-  return V8DOMWrapper::getConstructor(V8ClassIndex::AUDIO, window);
+  return V8DOMWrapper::getConstructor(&V8HTMLAudioElementConstructor::info,
+                                      window);
 }
 
 #endif
@@ -251,14 +255,16 @@ v8::Handle<v8::Value> V8DOMWindow::ImageAccessorGetter(
     v8::Local<v8::String> name,
     const v8::AccessorInfo& info) {
   DOMWindow* window = V8DOMWindow::toNative(info.Holder());
-  return V8DOMWrapper::getConstructor(V8ClassIndex::IMAGE, window);
+  return V8DOMWrapper::getConstructor(&V8HTMLImageElementConstructor::info,
+                                      window);
 }
 
 v8::Handle<v8::Value> V8DOMWindow::OptionAccessorGetter(
     v8::Local<v8::String> name,
     const v8::AccessorInfo& info) {
   DOMWindow* window = V8DOMWindow::toNative(info.Holder());
-  return V8DOMWrapper::getConstructor(V8ClassIndex::OPTION, window);
+  return V8DOMWrapper::getConstructor(&V8HTMLOptionElementConstructor::info,
+                                      window);
 }
 
 v8::Handle<v8::Value> V8DOMWindow::addEventListenerCallback(

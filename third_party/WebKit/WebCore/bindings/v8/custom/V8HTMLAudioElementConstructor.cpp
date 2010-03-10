@@ -44,6 +44,10 @@
 
 namespace WebCore {
 
+WrapperTypeInfo V8HTMLAudioElementConstructor::info = {
+    V8ClassIndex::ToInt(V8ClassIndex::AUDIO),
+    V8HTMLAudioElementConstructor::GetTemplate, 0, false};
+
 static v8::Handle<v8::Value> v8HTMLAudioElementConstructorCallback(
     const v8::Arguments& args) {
   INC_STATS("DOM.HTMLAudioElement.Contructor");
@@ -74,7 +78,7 @@ static v8::Handle<v8::Value> v8HTMLAudioElementConstructorCallback(
       HTMLAudioElement::createForJSConstructor(document, src);
 
   V8DOMWrapper::setDOMWrapper(
-      args.Holder(), V8ClassIndex::ToInt(V8ClassIndex::AUDIO), audio.get());
+      args.Holder(), &V8HTMLAudioElementConstructor::info, audio.get());
   audio->ref();
   V8DOMWrapper::setJSWrapperForDOMNode(
       audio.get(), v8::Persistent<v8::Object>::New(args.Holder()));

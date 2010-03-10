@@ -67,7 +67,7 @@ static v8::Handle<v8::Value> getNamedPropertyOfCollection(
     v8::Local<v8::Object> object) {
   // FIXME: assert object is a collection type
   ASSERT(V8DOMWrapper::maybeDOMWrapper(object));
-  ASSERT(V8DOMWrapper::domWrapperType(object) != V8ClassIndex::NODE);
+  ASSERT(V8DOMWrapper::domWrapperType(object)->index != V8ClassIndex::NODE);
   Collection* collection = toNativeCollection<Collection>(object);
   AtomicString propertyName = toAtomicWebCoreStringWithNullCheck(name);
   return getV8Object<ItemType>(collection->namedItem(propertyName));
@@ -99,7 +99,7 @@ static v8::Handle<v8::Value> getIndexedPropertyOfCollection(
     v8::Local<v8::Object> object) {
   // FIXME: Assert that object must be a collection type.
   ASSERT(V8DOMWrapper::maybeDOMWrapper(object));
-  ASSERT(V8DOMWrapper::domWrapperType(object) != V8ClassIndex::NODE);
+  ASSERT(V8DOMWrapper::domWrapperType(object)->index != V8ClassIndex::NODE);
   Collection* collection = toNativeCollection<Collection>(object);
   return getV8Object<ItemType>(collection->item(index));
 }

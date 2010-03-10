@@ -59,8 +59,7 @@ v8::Handle<v8::Value> V8WebKitPoint::constructorCallback(
   }
   PassRefPtr<WebKitPoint> point = WebKitPoint::create(x, y);
   point->ref();
-  V8DOMWrapper::setDOMWrapper(args.Holder(), V8ClassIndex::WEBKITPOINT,
-                              point.get());
+  V8DOMWrapper::setDOMWrapper(args.Holder(), &info, point.get());
   return args.Holder();
 }
 

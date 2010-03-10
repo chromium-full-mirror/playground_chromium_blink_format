@@ -73,8 +73,7 @@ v8::Handle<v8::Value> V8MessageChannel::constructorCallback(
                                    toV8(obj->port2()));
 
   // Setup the standard wrapper object internal fields.
-  V8DOMWrapper::setDOMWrapper(messageChannel, V8ClassIndex::MESSAGECHANNEL,
-                              obj.get());
+  V8DOMWrapper::setDOMWrapper(messageChannel, &info, obj.get());
   return toV8(obj.release(), messageChannel);
 }
 

@@ -44,6 +44,10 @@
 
 namespace WebCore {
 
+WrapperTypeInfo V8HTMLOptionElementConstructor::info = {
+    V8ClassIndex::ToInt(V8ClassIndex::OPTION),
+    V8HTMLOptionElementConstructor::GetTemplate, 0, false};
+
 static v8::Handle<v8::Value> v8HTMLOptionElementConstructorCallback(
     const v8::Arguments& args) {
   INC_STATS("DOM.HTMLOptionElement.Contructor");
@@ -82,7 +86,7 @@ static v8::Handle<v8::Value> v8HTMLOptionElementConstructorCallback(
     throwError(ec);
 
   V8DOMWrapper::setDOMWrapper(
-      args.Holder(), V8ClassIndex::ToInt(V8ClassIndex::OPTION), option.get());
+      args.Holder(), &V8HTMLOptionElementConstructor::info, option.get());
   option->ref();
   V8DOMWrapper::setJSWrapperForDOMNode(
       option.get(), v8::Persistent<v8::Object>::New(args.Holder()));

@@ -68,11 +68,11 @@ class V8DOMWrapper {
 
   // Sets contents of a DOM wrapper.
   static void setDOMWrapper(v8::Handle<v8::Object> object,
-                            int type,
+                            WrapperTypeInfo* type,
                             void* cptr) {
     ASSERT(object->InternalFieldCount() >= 2);
     object->SetPointerInInternalField(v8DOMWrapperObjectIndex, cptr);
-    object->SetInternalField(v8DOMWrapperTypeIndex, v8::Integer::New(type));
+    object->SetPointerInInternalField(v8DOMWrapperTypeIndex, type);
   }
 
   static v8::Handle<v8::Object> lookupDOMWrapper(
@@ -83,7 +83,7 @@ class V8DOMWrapper {
                : object->FindInstanceInPrototypeChain(functionTemplate);
   }
 
-  static V8ClassIndex::V8WrapperType domWrapperType(v8::Handle<v8::Object>);
+  static WrapperTypeInfo* domWrapperType(v8::Handle<v8::Object>);
 
   static v8::Handle<v8::Value> convertEventTargetToV8Object(
       PassRefPtr<EventTarget> eventTarget) {
@@ -114,14 +114,13 @@ class V8DOMWrapper {
   static PassRefPtr<NodeFilter> wrapNativeNodeFilter(v8::Handle<v8::Value>);
 
   static v8::Local<v8::Function> getConstructorForContext(
-      V8ClassIndex::V8WrapperType,
+      WrapperTypeInfo*,
       v8::Handle<v8::Context>);
   static v8::Local<v8::Function> getConstructor(
-      V8ClassIndex::V8WrapperType,
+      WrapperTypeInfo*,
       v8::Handle<v8::Value> objectPrototype);
-  static v8::Local<v8::Function> getConstructor(V8ClassIndex::V8WrapperType,
-                                                DOMWindow*);
-  static v8::Local<v8::Function> getConstructor(V8ClassIndex::V8WrapperType,
+  static v8::Local<v8::Function> getConstructor(WrapperTypeInfo*, DOMWindow*);
+  static v8::Local<v8::Function> getConstructor(WrapperTypeInfo*,
                                                 WorkerContext*);
 
   // Set JS wrapper of a DOM object, the caller in charge of increase ref.
@@ -146,10 +145,9 @@ class V8DOMWrapper {
                                        const int internalIndex,
                                        v8::Handle<v8::Object>);
 
-  static v8::Local<v8::Object> instantiateV8Object(
-      V8Proxy* proxy,
-      V8ClassIndex::V8WrapperType type,
-      void* impl);
+  static v8::Local<v8::Object> instantiateV8Object(V8Proxy* proxy,
+                                                   WrapperTypeInfo*,
+                                                   void* impl);
 
   static v8::Handle<v8::Object> getWrapper(Node*);
 };

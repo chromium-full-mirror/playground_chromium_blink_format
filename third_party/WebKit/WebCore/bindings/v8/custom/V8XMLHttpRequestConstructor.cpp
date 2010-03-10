@@ -56,9 +56,7 @@ v8::Handle<v8::Value> V8XMLHttpRequest::constructorCallback(
         "XMLHttpRequest constructor's associated context is not available",
         V8Proxy::ReferenceError);
   RefPtr<XMLHttpRequest> xmlHttpRequest = XMLHttpRequest::create(context);
-  V8DOMWrapper::setDOMWrapper(args.Holder(),
-                              V8ClassIndex::ToInt(V8ClassIndex::XMLHTTPREQUEST),
-                              xmlHttpRequest.get());
+  V8DOMWrapper::setDOMWrapper(args.Holder(), &info, xmlHttpRequest.get());
 
   // Add object to the wrapper map.
   xmlHttpRequest->ref();

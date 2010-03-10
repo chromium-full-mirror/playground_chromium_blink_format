@@ -60,7 +60,6 @@ static void WeakReferenceCallback(v8::Persistent<v8::Value> object,
 
 static v8::Local<v8::Object> createInjectedScriptHostV8Wrapper(
     InjectedScriptHost* host) {
-  V8ClassIndex::V8WrapperType descriptorType = V8ClassIndex::INJECTEDSCRIPTHOST;
   v8::Local<v8::Function> function =
       V8InjectedScriptHost::GetTemplate()->GetFunction();
   if (function.IsEmpty()) {
@@ -72,8 +71,7 @@ static v8::Local<v8::Object> createInjectedScriptHostV8Wrapper(
     // Avoid setting the wrapper if allocation failed.
     return v8::Local<v8::Object>();
   }
-  V8DOMWrapper::setDOMWrapper(instance, V8ClassIndex::ToInt(descriptorType),
-                              host);
+  V8DOMWrapper::setDOMWrapper(instance, &V8InjectedScriptHost::info, host);
   // Create a weak reference to the v8 wrapper of InspectorBackend to deref
   // InspectorBackend when the wrapper is garbage collected.
   host->ref();

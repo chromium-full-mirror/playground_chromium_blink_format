@@ -374,7 +374,7 @@ bool V8DOMWindowShell::installDOMWindow(v8::Handle<v8::Context> context,
   // Create a new JS window object and use it as the prototype for the  shadow
   // global object.
   v8::Handle<v8::Function> windowConstructor = V8DOMWrapper::getConstructor(
-      V8ClassIndex::DOMWINDOW, getHiddenObjectPrototype(context));
+      &V8DOMWindow::info, getHiddenObjectPrototype(context));
   v8::Local<v8::Object> jsWindow =
       SafeAllocation::newInstance(windowConstructor);
   // Bail out if allocation failed.
@@ -382,11 +382,10 @@ bool V8DOMWindowShell::installDOMWindow(v8::Handle<v8::Context> context,
     return false;
 
   // Wrap the window.
-  V8DOMWrapper::setDOMWrapper(
-      jsWindow, V8ClassIndex::ToInt(V8ClassIndex::DOMWINDOW), window);
+  V8DOMWrapper::setDOMWrapper(jsWindow, &V8DOMWindow::info, window);
   V8DOMWrapper::setDOMWrapper(
       v8::Handle<v8::Object>::Cast(jsWindow->GetPrototype()),
-      V8ClassIndex::ToInt(V8ClassIndex::DOMWINDOW), window);
+      &V8DOMWindow::info, window);
 
   window->ref();
   V8DOMWrapper::setJSWrapperForDOMObject(
@@ -396,7 +395,7 @@ bool V8DOMWindowShell::installDOMWindow(v8::Handle<v8::Context> context,
   v8::Handle<v8::Object> v8Global = context->Global();
   V8DOMWrapper::setDOMWrapper(
       v8::Handle<v8::Object>::Cast(v8Global->GetPrototype()),
-      V8ClassIndex::ToInt(V8ClassIndex::DOMWINDOW), window);
+      &V8DOMWindow::info, window);
   v8Global->Set(implicitProtoString, jsWindow);
   return true;
 }
@@ -546,9 +545,9 @@ void V8DOMWindowShell::installHiddenObjectPrototype(
 }
 
 v8::Local<v8::Object> V8DOMWindowShell::createWrapperFromCacheSlowCase(
-    V8ClassIndex::V8WrapperType type) {
+    WrapperTypeInfo* type) {
   // Not in cache.
-  int classIndex = V8ClassIndex::ToInt(type);
+  int classIndex = type->index;
   initContextIfNeeded();
   v8::Context::Scope scope(m_context);
   v8::Local<v8::Function> function =

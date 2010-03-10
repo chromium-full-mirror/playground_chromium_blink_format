@@ -86,9 +86,7 @@ v8::Handle<v8::Value> V8WebSocket::constructorCallback(
     return throwError(ec);
 
   // Setup the standard wrapper object internal fields.
-  V8DOMWrapper::setDOMWrapper(args.Holder(),
-                              V8ClassIndex::ToInt(V8ClassIndex::WEBSOCKET),
-                              webSocket.get());
+  V8DOMWrapper::setDOMWrapper(args.Holder(), &info, webSocket.get());
 
   // Add object to the wrapper map.
   webSocket->ref();

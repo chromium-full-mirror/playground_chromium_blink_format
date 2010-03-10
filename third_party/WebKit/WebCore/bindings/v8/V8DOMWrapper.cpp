@@ -132,17 +132,7 @@ void V8DOMWrapper::setJSWrapperForDOMObject(
     void* object,
     v8::Persistent<v8::Object> wrapper) {
   ASSERT(V8DOMWrapper::maybeDOMWrapper(wrapper));
-#ifndef NDEBUG
-  V8ClassIndex::V8WrapperType type = V8DOMWrapper::domWrapperType(wrapper);
-  switch (type) {
-#define MAKE_CASE(TYPE, NAME) case V8ClassIndex::TYPE:
-    ACTIVE_DOM_OBJECT_TYPES(MAKE_CASE)
-    ASSERT_NOT_REACHED();
-#undef MAKE_CASE
-    default:
-      break;
-  }
-#endif
+  ASSERT(!domWrapperType(wrapper)->toActiveDOMObjectFunction);
   getDOMObjectMap().set(object, wrapper);
 }
 
@@ -151,18 +141,7 @@ void V8DOMWrapper::setJSWrapperForActiveDOMObject(
     void* object,
     v8::Persistent<v8::Object> wrapper) {
   ASSERT(V8DOMWrapper::maybeDOMWrapper(wrapper));
-#ifndef NDEBUG
-  V8ClassIndex::V8WrapperType type = V8DOMWrapper::domWrapperType(wrapper);
-  switch (type) {
-#define MAKE_CASE(TYPE, NAME) \
-  case V8ClassIndex::TYPE:    \
-    break;
-    ACTIVE_DOM_OBJECT_TYPES(MAKE_CASE)
-    default:
-      ASSERT_NOT_REACHED();
-#undef MAKE_CASE
-  }
-#endif
+  ASSERT(domWrapperType(wrapper)->toActiveDOMObjectFunction);
   getActiveDOMObjectMap().set(object, wrapper);
 }
 
@@ -174,7 +153,7 @@ void V8DOMWrapper::setJSWrapperForDOMNode(Node* node,
 }
 
 v8::Local<v8::Function> V8DOMWrapper::getConstructor(
-    V8ClassIndex::V8WrapperType type,
+    WrapperTypeInfo* type,
     v8::Handle<v8::Value> objectPrototype) {
   // A DOM constructor is a function instance created from a DOM constructor
   // template. There is one instance per context. A DOM constructor is
@@ -185,8 +164,7 @@ v8::Local<v8::Function> V8DOMWrapper::getConstructor(
   // The reason for 2) is that, in Safari, a DOM constructor is a normal JS
   // object, but not a function. Hotmail relies on the fact that, in Safari,
   // HTMLElement.__proto__ == Object.prototype.
-  v8::Handle<v8::FunctionTemplate> functionTemplate =
-      V8ClassIndex::getTemplate(type);
+  v8::Handle<v8::FunctionTemplate> functionTemplate = type->getTemplate();
   // Getting the function might fail if we're running out of
   // stack or memory.
   v8::TryCatch tryCatch;
@@ -200,7 +178,7 @@ v8::Local<v8::Function> V8DOMWrapper::getConstructor(
 }
 
 v8::Local<v8::Function> V8DOMWrapper::getConstructorForContext(
-    V8ClassIndex::V8WrapperType type,
+    WrapperTypeInfo* type,
     v8::Handle<v8::Context> context) {
   // Enter the scope for this context to get the correct constructor.
   v8::Context::Scope scope(context);
@@ -209,9 +187,8 @@ v8::Local<v8::Function> V8DOMWrapper::getConstructorForContext(
                         V8DOMWindowShell::getHiddenObjectPrototype(context));
 }
 
-v8::Local<v8::Function> V8DOMWrapper::getConstructor(
-    V8ClassIndex::V8WrapperType type,
-    DOMWindow* window) {
+v8::Local<v8::Function> V8DOMWrapper::getConstructor(WrapperTypeInfo* type,
+                                                     DOMWindow* window) {
   Frame* frame = window->frame();
   if (!frame)
     return v8::Local<v8::Function>();
@@ -223,9 +200,8 @@ v8::Local<v8::Function> V8DOMWrapper::getConstructor(
   return getConstructorForContext(type, context);
 }
 
-v8::Local<v8::Function> V8DOMWrapper::getConstructor(
-    V8ClassIndex::V8WrapperType type,
-    WorkerContext*) {
+v8::Local<v8::Function> V8DOMWrapper::getConstructor(WrapperTypeInfo* type,
+                                                     WorkerContext*) {
   WorkerContextExecutionProxy* proxy = WorkerContextExecutionProxy::retrieve();
   if (!proxy)
     return v8::Local<v8::Function>();
@@ -257,11 +233,10 @@ void V8DOMWrapper::setHiddenWindowReference(Frame* frame,
   global->SetInternalField(internalIndex, jsObject);
 }
 
-V8ClassIndex::V8WrapperType V8DOMWrapper::domWrapperType(
-    v8::Handle<v8::Object> object) {
+WrapperTypeInfo* V8DOMWrapper::domWrapperType(v8::Handle<v8::Object> object) {
   ASSERT(V8DOMWrapper::maybeDOMWrapper(object));
-  v8::Handle<v8::Value> type = object->GetInternalField(v8DOMWrapperTypeIndex);
-  return V8ClassIndex::FromInt(type->Int32Value());
+  return static_cast<WrapperTypeInfo*>(
+      object->GetPointerFromInternalField(v8DOMWrapperTypeIndex));
 }
 
 PassRefPtr<NodeFilter> V8DOMWrapper::wrapNativeNodeFilter(
@@ -301,10 +276,9 @@ static bool globalObjectPrototypeIsDOMWindow(
          V8DOMWindow::internalFieldCount;
 }
 
-v8::Local<v8::Object> V8DOMWrapper::instantiateV8Object(
-    V8Proxy* proxy,
-    V8ClassIndex::V8WrapperType type,
-    void* impl) {
+v8::Local<v8::Object> V8DOMWrapper::instantiateV8Object(V8Proxy* proxy,
+                                                        WrapperTypeInfo* type,
+                                                        void* impl) {
   WorkerContext* workerContext = 0;
   if (V8IsolatedContext::getEntered()) {
     // This effectively disables the wrapper cache for isolated worlds.
@@ -335,12 +309,12 @@ v8::Local<v8::Object> V8DOMWrapper::instantiateV8Object(
     if (workerContext)
       function = getConstructor(type, workerContext);
     else
-      function = V8ClassIndex::getTemplate(type)->GetFunction();
+      function = type->getTemplate()->GetFunction();
     instance = SafeAllocation::newInstance(function);
   }
   if (!instance.IsEmpty()) {
     // Avoid setting the DOM wrapper for failed allocations.
-    setDOMWrapper(instance, V8ClassIndex::ToInt(type), impl);
+    setDOMWrapper(instance, type, impl);
   }
   return instance;
 }
@@ -356,10 +330,10 @@ bool V8DOMWrapper::maybeDOMWrapper(v8::Handle<v8::Value> value) {
 
   ASSERT(object->InternalFieldCount() >= v8DefaultWrapperInternalFieldCount);
 
-  v8::Handle<v8::Value> type = object->GetInternalField(v8DOMWrapperTypeIndex);
-  ASSERT(type->IsInt32());
-  ASSERT(V8ClassIndex::INVALID_CLASS_INDEX < type->Int32Value() &&
-         type->Int32Value() < V8ClassIndex::CLASSINDEX_END);
+  WrapperTypeInfo* typeInfo = static_cast<WrapperTypeInfo*>(
+      object->GetPointerFromInternalField(v8DOMWrapperTypeIndex));
+  ASSERT(V8ClassIndex::INVALID_CLASS_INDEX < typeInfo->index &&
+         typeInfo->index < V8ClassIndex::CLASSINDEX_END);
 
   v8::Handle<v8::Value> wrapper =
       object->GetInternalField(v8DOMWrapperObjectIndex);
@@ -387,12 +361,12 @@ bool V8DOMWrapper::isWrapperOfType(v8::Handle<v8::Value> value,
       object->GetInternalField(v8DOMWrapperObjectIndex);
   ASSERT(wrapper->IsNumber() || wrapper->IsExternal());
 
-  v8::Handle<v8::Value> type = object->GetInternalField(v8DOMWrapperTypeIndex);
-  ASSERT(type->IsInt32());
-  ASSERT(V8ClassIndex::INVALID_CLASS_INDEX < type->Int32Value() &&
-         type->Int32Value() < V8ClassIndex::CLASSINDEX_END);
+  WrapperTypeInfo* typeInfo = static_cast<WrapperTypeInfo*>(
+      object->GetPointerFromInternalField(v8DOMWrapperTypeIndex));
+  ASSERT(V8ClassIndex::INVALID_CLASS_INDEX < typeInfo->index &&
+         typeInfo->index < V8ClassIndex::CLASSINDEX_END);
 
-  return V8ClassIndex::FromInt(type->Int32Value()) == classType;
+  return V8ClassIndex::FromInt(typeInfo->index) == classType;
 }
 
 v8::Handle<v8::Object> V8DOMWrapper::getWrapper(Node* node) {
