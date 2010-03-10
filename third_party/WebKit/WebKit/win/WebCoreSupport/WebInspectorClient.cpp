@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006, 2007 Apple Inc.  All rights reserved.
+ * Copyright (C) 2006, 2007, 2008, 2009, 2010 Apple Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -51,9 +51,6 @@
 #include <wtf/RetainPtr.h>
 
 using namespace WebCore;
-
-static const char* const inspectorStartsAttachedName =
-    "inspectorStartsAttached";
 
 static LPCTSTR kWebInspectorWindowClassName = TEXT("WebInspectorWindowClass");
 static ATOM registerWindowClass();
@@ -236,7 +233,7 @@ void WebInspectorClient::attachWindow() {
     return;
 
   m_inspectedWebView->page()->inspectorController()->setSetting(
-      inspectorStartsAttachedName, "true");
+      InspectorController::inspectorStartsAttachedSettingName(), "true");
 
   closeWindowWithoutNotifications();
   showWindowWithoutNotifications();
@@ -247,7 +244,7 @@ void WebInspectorClient::detachWindow() {
     return;
 
   m_inspectedWebView->page()->inspectorController()->setSetting(
-      inspectorStartsAttachedName, "false");
+      InspectorController::inspectorStartsAttachedSettingName(), "false");
 
   closeWindowWithoutNotifications();
   showWindowWithoutNotifications();
@@ -354,7 +351,7 @@ void WebInspectorClient::showWindowWithoutNotifications() {
   // for inspector LayoutTests.
   String shouldAttach =
       m_inspectedWebView->page()->inspectorController()->setting(
-          inspectorStartsAttachedName);
+          InspectorController::inspectorStartsAttachedSettingName());
   m_shouldAttachWhenShown = shouldAttach != "false";
 
   if (m_shouldAttachWhenShown &&

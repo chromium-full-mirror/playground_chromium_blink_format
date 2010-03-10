@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Apple Inc. All rights reserved.
+ * Copyright (C) 2007, 2008, 2009, 2010 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -300,8 +300,11 @@ class InspectorController
   void addScriptToEvaluateOnLoad(const String& source);
   void removeAllScriptsToEvaluateOnLoad();
 
+  static const String& inspectorStartsAttachedSettingName();
+
  private:
-  static const char* const FrontendSettingsSettingName;
+  static const String& frontendSettingsSettingName();
+
   friend class InspectorBackend;
   friend class InspectorFrontendHost;
   friend class InjectedScriptHost;
