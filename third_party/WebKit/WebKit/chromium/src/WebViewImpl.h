@@ -422,6 +422,8 @@ class WebViewImpl : public WebView, public RefCounted<WebViewImpl> {
   NotificationPresenterImpl m_notificationPresenter;
 #endif
 
+  bool m_haveMouseCapture;
+
   static const WebInputEvent* m_currentInputEvent;
 };
 
