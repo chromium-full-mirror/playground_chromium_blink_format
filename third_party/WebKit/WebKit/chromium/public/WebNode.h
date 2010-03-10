@@ -114,6 +114,7 @@ class WebNode {
   WEBKIT_API void removeEventListener(const WebString& eventType,
                                       WebEventListener* listener,
                                       bool useCapture);
+  WEBKIT_API void simulateClick();
 
   template <typename T>
   T toElement() {

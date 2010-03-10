@@ -140,4 +140,8 @@ WebString WebDocument::applicationID() const {
   return WebString();
 }
 
+WebNode WebDocument::focusedNode() const {
+  return WebNode(constUnwrap<Document>()->focusedNode());
+}
+
 }  // namespace WebKit
