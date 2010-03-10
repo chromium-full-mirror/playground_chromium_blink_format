@@ -1106,8 +1106,9 @@ HRESULT WebFrame::elementDoesAutoComplete(IDOMElement* element, BOOL* result) {
   if (!inputElement)
     *result = false;
   else
-    *result = (inputElement->inputType() == HTMLInputElement::TEXT &&
-               inputElement->autoComplete());
+    *result = inputElement->isTextField() &&
+              inputElement->inputType() != HTMLInputElement::PASSWORD &&
+              inputElement->autoComplete();
 
   return S_OK;
 }
