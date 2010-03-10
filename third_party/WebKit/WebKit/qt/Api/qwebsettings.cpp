@@ -444,7 +444,7 @@ QWebSettings* QWebSettings::globalSettings() {
     \value LocalContentCanAccessRemoteUrls Specifies whether locally loaded
    documents are allowed to access remote urls.
     \value LocalContentCanAccessFileUrls Specifies whether locally loaded
-   documents are allowed to access other local  urls.
+   documents are allowed to access other local urls.
     \value XSSAuditorEnabled Specifies whether load requests should be monitored
    for cross-site scripting attempts.
 */
