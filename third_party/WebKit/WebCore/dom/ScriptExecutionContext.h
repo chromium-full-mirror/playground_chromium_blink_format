@@ -49,6 +49,9 @@ class MessagePort;
 class SecurityOrigin;
 class ScriptString;
 class String;
+#if ENABLE(INSPECTOR)
+class InspectorController;
+#endif
 
 enum MessageDestination {
 #if ENABLE(INSPECTOR)
@@ -84,6 +87,9 @@ class ScriptExecutionContext {
   virtual String userAgent(const KURL&) const = 0;
 
   SecurityOrigin* securityOrigin() const { return m_securityOrigin.get(); }
+#if ENABLE(INSPECTOR)
+  virtual InspectorController* inspectorController() const { return 0; }
+#endif
 
   virtual void reportException(const String& errorMessage,
                                int lineNumber,
