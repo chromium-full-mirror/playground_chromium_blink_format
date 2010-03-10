@@ -48,6 +48,7 @@ class KeyboardEvent;
 class MouseEvent;
 class ResourceError;
 class ResourceResponse;
+class WheelEvent;
 }
 
 namespace WebKit {
@@ -109,6 +110,7 @@ class WebPluginContainerImpl : public WebCore::Widget,
   ~WebPluginContainerImpl();
 
   void handleMouseEvent(WebCore::MouseEvent*);
+  void handleWheelEvent(WebCore::WheelEvent*);
   void handleKeyboardEvent(WebCore::KeyboardEvent*);
 
   void calculateGeometry(const WebCore::IntRect& frameRect,
