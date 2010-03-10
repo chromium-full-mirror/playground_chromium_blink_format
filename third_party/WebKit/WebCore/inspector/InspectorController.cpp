@@ -2047,6 +2047,8 @@ InspectorController::SpecialPanels InspectorController::specialPanelForJSName(
     return ProfilesPanel;
   if (panelName == "storage" || panelName == "databases")
     return StoragePanel;
+  if (panelName == "audits")
+    return AuditsPanel;
   if (panelName == "console")
     return ConsolePanel;
   return ElementsPanel;

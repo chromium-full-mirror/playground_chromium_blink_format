@@ -171,6 +171,9 @@ void InspectorFrontend::setAttachedWindow(bool attached) {
 void InspectorFrontend::showPanel(int panel) {
   const char* showFunctionName;
   switch (panel) {
+    case InspectorController::AuditsPanel:
+      showFunctionName = "showAuditsPanel";
+      break;
     case InspectorController::ConsolePanel:
       showFunctionName = "showConsolePanel";
       break;
@@ -180,14 +183,14 @@ void InspectorFrontend::showPanel(int panel) {
     case InspectorController::ResourcesPanel:
       showFunctionName = "showResourcesPanel";
       break;
-    case InspectorController::ScriptsPanel:
-      showFunctionName = "showScriptsPanel";
-      break;
     case InspectorController::TimelinePanel:
       showFunctionName = "showTimelinePanel";
       break;
     case InspectorController::ProfilesPanel:
       showFunctionName = "showProfilesPanel";
+      break;
+    case InspectorController::ScriptsPanel:
+      showFunctionName = "showScriptsPanel";
       break;
     case InspectorController::StoragePanel:
       showFunctionName = "showStoragePanel";

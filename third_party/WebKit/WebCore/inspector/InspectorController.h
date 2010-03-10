@@ -103,6 +103,7 @@ class InspectorController
       DOMStorageResourcesMap;
 
   typedef enum {
+    AuditsPanel,
     CurrentPanel,
     ConsolePanel,
     ElementsPanel,
