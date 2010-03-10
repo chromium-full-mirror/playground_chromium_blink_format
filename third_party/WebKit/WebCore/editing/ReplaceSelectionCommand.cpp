@@ -113,6 +113,25 @@ static bool isInterchangeConvertedSpaceSpan(const Node* node) {
              convertedSpaceSpanClassString;
 }
 
+static Position positionAvoidingPrecedingNodes(Position pos) {
+  // If we're already on a break, it's probably a placeholder and we shouldn't
+  // change our position.
+  if (pos.node()->hasTagName(brTag))
+    return pos;
+
+  // We also stop when changing block flow elements because even though the
+  // visual position is the
+  // same.  E.g.,
+  //   <div>foo^</div>^
+  // The two positions above are the same visual position, but we want to stay
+  // in the same block.
+  Node* stopNode = pos.node()->enclosingBlockFlowElement();
+  while (stopNode != pos.node() &&
+         VisiblePosition(pos) == VisiblePosition(pos.next()))
+    pos = pos.next();
+  return pos;
+}
+
 ReplacementFragment::ReplacementFragment(Document* document,
                                          DocumentFragment* fragment,
                                          bool matchStyle,
@@ -1031,6 +1050,13 @@ void ReplaceSelectionCommand::doApply() {
 
   bool handledStyleSpans =
       handleStyleSpansBeforeInsertion(fragment, insertionPos);
+
+  // We don't want the destination to end up inside nodes that weren't selected.
+  // To avoid that, we move the
+  // position forward without changing the visible position so we're still at
+  // the same visible location, but
+  // outside of preceding tags.
+  insertionPos = positionAvoidingPrecedingNodes(insertionPos);
 
   // FIXME: When pasting rich content we're often prevented from heading down
   // the fast path by style spans.  Try
