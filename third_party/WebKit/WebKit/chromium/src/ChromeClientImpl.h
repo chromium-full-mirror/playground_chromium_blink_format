@@ -139,6 +139,11 @@ class ChromeClientImpl : public WebCore::ChromeClientChromium {
   virtual PassOwnPtr<WebCore::HTMLParserQuirks> createHTMLParserQuirks() {
     return 0;
   }
+#if ENABLE(TOUCH_EVENTS)
+  // FIXME: All touch events are forwarded regardless of whether or not they are
+  // needed.
+  virtual void needTouchEvents(bool needTouchEvents) {}
+#endif
 
   // ChromeClientChromium methods:
   virtual void popupOpened(WebCore::PopupContainer* popupContainer,

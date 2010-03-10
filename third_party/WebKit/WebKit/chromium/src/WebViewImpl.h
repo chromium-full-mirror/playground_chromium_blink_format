@@ -76,6 +76,7 @@ class WebKeyboardEvent;
 class WebMouseEvent;
 class WebMouseWheelEvent;
 class WebSettingsImpl;
+class WebTouchEvent;
 
 class WebViewImpl : public WebView, public RefCounted<WebViewImpl> {
  public:
@@ -216,6 +217,7 @@ class WebViewImpl : public WebView, public RefCounted<WebViewImpl> {
   void mouseWheel(const WebMouseWheelEvent&);
   bool keyEvent(const WebKeyboardEvent&);
   bool charEvent(const WebKeyboardEvent&);
+  bool touchEvent(const WebTouchEvent&);
 
   // Handles context menu events orignated via the the keyboard. These
   // include the VK_APPS virtual key and the Shift+F10 combine.  Code is
