@@ -43,7 +43,7 @@ struct ValueCheck<P*> {
   static void checkConsistency(const P* p) {
     if (!p)
       return;
-    fastCheckConsistency(p);
+    ASSERT(fastMallocSize(p));
     ValueCheck<P>::checkConsistency(*p);
   }
 };
