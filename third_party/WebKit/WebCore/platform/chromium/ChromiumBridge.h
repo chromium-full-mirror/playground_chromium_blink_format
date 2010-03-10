@@ -57,6 +57,7 @@ class GeolocationServiceBridge;
 class GeolocationServiceChromium;
 class GraphicsContext;
 class Image;
+class IndexedDatabase;
 class IntRect;
 class KURL;
 class String;
@@ -151,6 +152,9 @@ class ChromiumBridge {
   // Returns the size of the DB file
   static long long databaseGetFileSize(const String& vfsFileName);
 #endif
+
+  // IndexedDB ----------------------------------------------------------
+  static PassRefPtr<IndexedDatabase> indexedDatabase();
 
   // JavaScript ---------------------------------------------------------
   static void notifyJSOutOfMemory(Frame*);
