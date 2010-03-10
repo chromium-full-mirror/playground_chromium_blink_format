@@ -179,8 +179,9 @@ void DeleteSelectionCommand::initializeStartEnd(Position& start,
   }
 }
 
-void DeleteSelectionCommand::setStartingSelectionOnSmartDelete(Position& start,
-                                                               Position& end) {
+void DeleteSelectionCommand::setStartingSelectionOnSmartDelete(
+    const Position& start,
+    const Position& end) {
   VisiblePosition newBase;
   VisiblePosition newExtent;
   if (startingSelection().isBaseFirst()) {
