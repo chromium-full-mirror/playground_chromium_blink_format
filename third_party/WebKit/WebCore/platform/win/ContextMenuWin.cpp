@@ -85,7 +85,9 @@ static ContextMenuItem* contextMenuItemByIdOrPosition(HMENU menu,
 
   info->cbSize = sizeof(MENUITEMINFO);
 
-  info->fMask = MIIM_FTYPE | MIIM_ID | MIIM_STRING;
+  // Setting MIIM_DATA which is useful for WebKit clients who store data in this
+  // member for their custom menu items.
+  info->fMask = MIIM_FTYPE | MIIM_ID | MIIM_STRING | MIIM_DATA;
 
   if (!::GetMenuItemInfo(menu, id, byPosition, info)) {
     free(info);
