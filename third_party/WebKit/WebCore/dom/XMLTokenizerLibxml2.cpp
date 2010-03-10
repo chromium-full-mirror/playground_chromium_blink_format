@@ -1079,16 +1079,8 @@ void XMLTokenizer::internalSubset(const xmlChar* name,
     }
 #endif
 
-#if ENABLE(XHTMLMP)
-    m_doc->addChild(
-        DocumentType::create(m_doc, dtdName, extId, toString(systemID)));
-#elif ENABLE(WML)
-    m_doc->addChild(
-        DocumentType::create(m_doc, toString(name), extId, toString(systemID)));
-#else
     m_doc->addChild(DocumentType::create(
         m_doc, toString(name), toString(externalID), toString(systemID)));
-#endif
   }
 }
 
@@ -1281,7 +1273,7 @@ static void externalSubsetHandler(void* closure,
       (extId == "-//W3C//DTD XHTML Basic 1.0//EN") ||
       (extId == "-//W3C//DTD XHTML 1.1 plus MathML 2.0//EN") ||
       (extId == "-//W3C//DTD XHTML 1.1 plus MathML 2.0 plus SVG 1.1//EN")
-#if !ENABLE(XHTMLMP)
+#if ENABLE(XHTMLMP)
       || (extId == "-//WAPFORUM//DTD XHTML Mobile 1.0//EN")
 #endif
           )
