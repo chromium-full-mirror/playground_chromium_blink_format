@@ -52,7 +52,8 @@ class PlatformTouchEvent {
 #elif PLATFORM(ANDROID)
   PlatformTouchEvent(const IntPoint& windowPos,
                      TouchEventType,
-                     PlatformTouchPoint::State);
+                     PlatformTouchPoint::State,
+                     int metaState);
 #endif
 
   TouchEventType type() const { return m_type; }
