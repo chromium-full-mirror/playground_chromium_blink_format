@@ -110,6 +110,10 @@ bool AccessibilityListBoxOption::accessibilityIsIgnored() const {
   return parentObject()->accessibilityIsIgnored();
 }
 
+String AccessibilityListBoxOption::language() const {
+  return AccessibilityObject::language(m_optionElement);
+}
+
 bool AccessibilityListBoxOption::canSetSelectedAttribute() const {
   if (!m_optionElement)
     return false;
