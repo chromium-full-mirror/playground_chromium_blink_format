@@ -51,6 +51,9 @@ PassRefPtr<AccessibilityTableCell> AccessibilityTableCell::create(
 }
 
 bool AccessibilityTableCell::accessibilityIsIgnored() const {
+  if (accessibilityIsIgnoredBase())
+    return true;
+
   if (!isTableCell())
     return AccessibilityRenderObject::accessibilityIsIgnored();
 
