@@ -32,22 +32,16 @@
 #define WebHistoryItem_h
 
 #include "WebCommon.h"
+#include "WebPrivatePtr.h"
 
-#if WEBKIT_IMPLEMENTATION
 namespace WebCore {
 class HistoryItem;
 }
-namespace WTF {
-template <typename T>
-class PassRefPtr;
-}
-#endif
 
 namespace WebKit {
-
-class WebHistoryItemPrivate;
 class WebHTTPBody;
 class WebString;
+class WebSerializedScriptValue;
 struct WebPoint;
 template <typename T>
 class WebVector;
@@ -61,8 +55,8 @@ class WebHistoryItem {
  public:
   ~WebHistoryItem() { reset(); }
 
-  WebHistoryItem() : m_private(0) {}
-  WebHistoryItem(const WebHistoryItem& h) : m_private(0) { assign(h); }
+  WebHistoryItem() {}
+  WebHistoryItem(const WebHistoryItem& h) { assign(h); }
   WebHistoryItem& operator=(const WebHistoryItem& h) {
     assign(h);
     return *this;
@@ -72,7 +66,7 @@ class WebHistoryItem {
   WEBKIT_API void reset();
   WEBKIT_API void assign(const WebHistoryItem&);
 
-  bool isNull() const { return !m_private; }
+  bool isNull() const { return m_private.isNull(); }
 
   WEBKIT_API WebString urlString() const;
   WEBKIT_API void setURLString(const WebString&);
@@ -113,6 +107,9 @@ class WebHistoryItem {
   WEBKIT_API long long documentSequenceNumber() const;
   WEBKIT_API void setDocumentSequenceNumber(long long);
 
+  WEBKIT_API WebSerializedScriptValue stateObject() const;
+  WEBKIT_API void setStateObject(const WebSerializedScriptValue&);
+
   WEBKIT_API WebString httpContentType() const;
   WEBKIT_API void setHTTPContentType(const WebString&);
 
@@ -130,9 +127,8 @@ class WebHistoryItem {
 #endif
 
  private:
-  void assign(WebHistoryItemPrivate*);
   void ensureMutable();
-  WebHistoryItemPrivate* m_private;
+  WebPrivatePtr<WebCore::HistoryItem> m_private;
 };
 
 }  // namespace WebKit
