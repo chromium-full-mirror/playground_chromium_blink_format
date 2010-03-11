@@ -172,7 +172,7 @@ class UStringImpl : public UStringOrRopeImpl {
   }
 
   SharedUChar* sharedBuffer();
-  const UChar* data() const { return m_data; }
+  const UChar* characters() const { return m_data; }
   size_t cost() {
     // For substrings, return the cost of the base string.
     if (bufferOwnership() == BufferSubstring)
@@ -186,7 +186,7 @@ class UStringImpl : public UStringOrRopeImpl {
   }
   unsigned hash() const {
     if (!m_hash)
-      m_hash = computeHash(data(), m_length);
+      m_hash = computeHash(m_data, m_length);
     return m_hash;
   }
   unsigned existingHash() const {
@@ -194,7 +194,7 @@ class UStringImpl : public UStringOrRopeImpl {
     return m_hash;
   }  // fast path for Identifiers
   void setHash(unsigned hash) {
-    ASSERT(hash == computeHash(data(), m_length));
+    ASSERT(hash == computeHash(m_data, m_length));
     m_hash = hash;
   }  // fast path for Identifiers
   bool isIdentifier() const {

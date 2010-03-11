@@ -118,7 +118,7 @@ class UString {
    */
   CString UTF8String(bool strict = false) const;
 
-  const UChar* data() const { return m_rep->data(); }
+  const UChar* data() const { return m_rep->characters(); }
 
   bool isNull() const { return m_rep == s_nullRep; }
   bool isEmpty() const { return !m_rep->length(); }

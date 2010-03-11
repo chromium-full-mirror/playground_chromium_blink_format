@@ -3633,7 +3633,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
         else
           vPC += callFrame->codeBlock()
                      ->characterSwitchJumpTable(tableIndex)
-                     .offsetForValue(value->data()[0], defaultOffset);
+                     .offsetForValue(value->characters()[0], defaultOffset);
       }
       NEXT_INSTRUCTION();
     }
