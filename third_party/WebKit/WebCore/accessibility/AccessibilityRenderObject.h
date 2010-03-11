@@ -116,7 +116,7 @@ class AccessibilityRenderObject : public AccessibilityObject {
   virtual bool hasIntValue() const;
 
   // Provides common logic used by all elements when determining isIgnored.
-  bool accessibilityIsIgnoredBase() const;
+  AccessibilityObjectInclusion accessibilityIsIgnoredBase() const;
   virtual bool accessibilityIsIgnored() const;
 
   virtual int headingLevel() const;

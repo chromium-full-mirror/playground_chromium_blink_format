@@ -34,7 +34,7 @@ bool AccessibilityObject::accessibilityIgnoreAttachment() const {
   return false;
 }
 
-AccessibilityObjectPlatformInclusion
+AccessibilityObjectInclusion
 AccessibilityObject::accessibilityPlatformIncludesObject() const {
   if (isMenuListPopup() || isMenuListOption())
     return IncludeObject;

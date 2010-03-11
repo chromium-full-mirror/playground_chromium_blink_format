@@ -31,7 +31,7 @@ bool AccessibilityObject::accessibilityIgnoreAttachment() const {
   return false;
 }
 
-AccessibilityObjectPlatformInclusion
+AccessibilityObjectInclusion
 AccessibilityObject::accessibilityPlatformIncludesObject() const {
   AccessibilityObject* parent = parentObject();
   if (!parent)
