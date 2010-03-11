@@ -37,6 +37,14 @@ struct TimingFunction : FastAllocBase {
         m_x2(0.25),
         m_y2(1.0) {}
 
+  // This explicit copy constructor works around an inlining bug in GCC.
+  TimingFunction(const TimingFunction& that)
+      : m_type(that.m_type),
+        m_x1(that.m_x1),
+        m_y1(that.m_y1),
+        m_x2(that.m_x2),
+        m_y2(that.m_y2) {}
+
   TimingFunction(ETimingFunctionType timingFunction,
                  double x1 = 0.0,
                  double y1 = 0.0,
