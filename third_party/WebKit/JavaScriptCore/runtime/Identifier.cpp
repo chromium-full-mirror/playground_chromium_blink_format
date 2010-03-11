@@ -124,8 +124,8 @@ PassRefPtr<UString::Rep> Identifier::add(JSGlobalData* globalData,
     return rep;
   }
   if (!c[0]) {
-    UString::Rep::empty().hash();
-    return &UString::Rep::empty();
+    UString::Rep::empty()->hash();
+    return UString::Rep::empty();
   }
   if (!c[1])
     return add(globalData, globalData->smallStrings.singleCharacterStringRep(
@@ -193,8 +193,8 @@ PassRefPtr<UString::Rep> Identifier::add(JSGlobalData* globalData,
                  globalData->smallStrings.singleCharacterStringRep(c));
   }
   if (!length) {
-    UString::Rep::empty().hash();
-    return &UString::Rep::empty();
+    UString::Rep::empty()->hash();
+    return UString::Rep::empty();
   }
   UCharBuffer buf = {s, length};
   pair<HashSet<UString::Rep*>::iterator, bool> addResult =
@@ -226,8 +226,8 @@ PassRefPtr<UString::Rep> Identifier::addSlowCase(JSGlobalData* globalData,
     }
   }
   if (!r->length()) {
-    UString::Rep::empty().hash();
-    return &UString::Rep::empty();
+    UString::Rep::empty()->hash();
+    return UString::Rep::empty();
   }
   return *globalData->identifierTable->add(r).first;
 }

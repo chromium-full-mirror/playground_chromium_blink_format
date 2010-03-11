@@ -137,19 +137,15 @@ bool operator==(const CString& c1, const CString& c2) {
          (len == 0 || memcmp(c1.c_str(), c2.c_str(), len) == 0);
 }
 
-// These static strings are immutable, except for rc, whose initial value is
-// chosen to
-// reduce the possibility of it becoming zero due to ref/deref not being
-// thread-safe.
-static UChar sharedEmptyChar;
-UStringImpl* UStringImpl::s_empty;
-
+// The null string is immutable, except for refCount.
 UString::Rep* UString::s_nullRep;
 UString* UString::s_nullUString;
 
 void initializeUString() {
-  UStringImpl::s_empty =
-      new UStringImpl(&sharedEmptyChar, 0, UStringImpl::ConstructStaticString);
+  // UStringImpl::empty() does not construct its static string in a threadsafe
+  // fashion,
+  // so ensure it has been initialized from here.
+  UStringImpl::empty();
 
   UString::s_nullRep =
       new UStringImpl(0, 0, UStringImpl::ConstructStaticString);
@@ -161,12 +157,8 @@ UString::UString(const char* c) : m_rep(Rep::create(c)) {}
 UString::UString(const char* c, unsigned length)
     : m_rep(Rep::create(c, length)) {}
 
-UString::UString(const UChar* c, unsigned length) {
-  if (length == 0)
-    m_rep = &Rep::empty();
-  else
-    m_rep = Rep::create(c, length);
-}
+UString::UString(const UChar* c, unsigned length)
+    : m_rep(Rep::create(c, length)) {}
 
 UString UString::from(int i) {
   UChar buf[1 + sizeof(i) * 3];

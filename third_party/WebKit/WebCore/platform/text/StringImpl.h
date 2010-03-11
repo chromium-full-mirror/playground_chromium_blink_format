@@ -144,11 +144,12 @@ class StringImpl : public Noncopyable {
   }
   ALWAYS_INLINE void deref() {
     m_refCountAndFlags -= s_refCountIncrement;
-    if (!(m_refCountAndFlags & s_refCountMask))
+    if (!(m_refCountAndFlags & (s_refCountMask | s_refCountFlagStatic)))
       delete this;
   }
   ALWAYS_INLINE bool hasOneRef() const {
-    return (m_refCountAndFlags & s_refCountMask) == s_refCountIncrement;
+    return (m_refCountAndFlags & (s_refCountMask | s_refCountFlagStatic)) ==
+           s_refCountIncrement;
   }
 
   // Returns a StringImpl suitable for use on another thread.
@@ -247,8 +248,9 @@ class StringImpl : public Noncopyable {
                                         s_refCountMaskBufferOwnership);
   }
 
-  static const unsigned s_refCountMask = 0xFFFFFFF0;
-  static const unsigned s_refCountIncrement = 0x10;
+  static const unsigned s_refCountMask = 0xFFFFFFE0;
+  static const unsigned s_refCountIncrement = 0x20;
+  static const unsigned s_refCountFlagStatic = 0x10;
   static const unsigned s_refCountFlagHasTerminatingNullCharacter = 0x8;
   static const unsigned s_refCountFlagInTable = 0x4;
   static const unsigned s_refCountMaskBufferOwnership = 0x3;

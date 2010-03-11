@@ -115,12 +115,12 @@ class UStringImpl : public UStringOrRopeImpl {
       ASSERT(vector.data());
       return adoptRef(new UStringImpl(vector.releaseBuffer(), length));
     }
-    return &empty();
+    return empty();
   }
 
-  static PassRefPtr<UStringImpl> create(const char* c);
-  static PassRefPtr<UStringImpl> create(const char* c, unsigned length);
   static PassRefPtr<UStringImpl> create(const UChar* buffer, unsigned length);
+  static PassRefPtr<UStringImpl> create(const char* c, unsigned length);
+  static PassRefPtr<UStringImpl> create(const char* c);
 
   static PassRefPtr<UStringImpl> create(PassRefPtr<UStringImpl> rep,
                                         unsigned offset,
@@ -141,7 +141,7 @@ class UStringImpl : public UStringOrRopeImpl {
                                                      UChar*& output) {
     if (!length) {
       output = 0;
-      return &empty();
+      return empty();
     }
 
     if (length > ((std::numeric_limits<size_t>::max() - sizeof(UStringImpl)) /
@@ -157,7 +157,7 @@ class UStringImpl : public UStringOrRopeImpl {
                                                         UChar*& output) {
     if (!length) {
       output = 0;
-      return &empty();
+      return empty();
     }
 
     if (length > ((std::numeric_limits<size_t>::max() - sizeof(UStringImpl)) /
@@ -231,7 +231,7 @@ class UStringImpl : public UStringOrRopeImpl {
   }
   static unsigned computeHash(const char* s) { return WTF::stringHash(s); }
 
-  static UStringImpl& empty() { return *s_empty; }
+  static UStringImpl* empty();
 
   ALWAYS_INLINE void checkConsistency() const {
     // There is no recursion of substrings.
@@ -331,8 +331,6 @@ class UStringImpl : public UStringOrRopeImpl {
     SharedUChar* m_bufferShared;
   };
   mutable unsigned m_hash;
-
-  JS_EXPORTDATA static UStringImpl* s_empty;
 
   friend class JIT;
   friend class SmallStringsStorage;
