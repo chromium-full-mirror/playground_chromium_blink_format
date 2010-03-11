@@ -989,7 +989,7 @@ bool KURL::isHierarchical() const {
     return false;
   return url_util::IsStandard(
       &m_url.utf8String().data()[m_url.m_parsed.scheme.begin],
-      m_url.utf8String().length(), m_url.m_parsed.scheme);
+      m_url.m_parsed.scheme);
 }
 
 #ifndef NDEBUG
