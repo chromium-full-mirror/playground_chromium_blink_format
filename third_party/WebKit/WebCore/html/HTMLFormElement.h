@@ -140,7 +140,7 @@ class HTMLFormElement : public HTMLElement {
 
   bool isMailtoForm() const;
   TextEncoding dataEncoding() const;
-  PassRefPtr<FormData> createFormData(const CString& boundary);
+  PassRefPtr<FormData> createFormData();
   unsigned formElementIndex(HTMLFormControlElement*);
 
   friend class HTMLFormCollection;

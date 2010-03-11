@@ -36,6 +36,7 @@ namespace WebCore {
 
 class Blob;
 class Document;
+class DOMFormData;
 class ResourceRequest;
 class TextResourceDecoder;
 class ThreadableLoader;
@@ -89,6 +90,7 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
   void send(Document*, ExceptionCode&);
   void send(const String&, ExceptionCode&);
   void send(Blob*, ExceptionCode&);
+  void send(DOMFormData*, ExceptionCode&);
   void abort();
   void setRequestHeader(const AtomicString& name,
                         const String& value,

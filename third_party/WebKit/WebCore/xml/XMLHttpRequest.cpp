@@ -27,6 +27,7 @@
 #include "Cache.h"
 #include "CString.h"
 #include "CrossOriginAccessControl.h"
+#include "DOMFormData.h"
 #include "DOMImplementation.h"
 #include "Document.h"
 #include "Event.h"
@@ -465,6 +466,24 @@ void XMLHttpRequest::send(Blob* body, ExceptionCode& ec) {
 #else
     m_requestEntityBody->appendFile(body->path(), false);
 #endif
+  }
+
+  createRequest(ec);
+}
+
+void XMLHttpRequest::send(DOMFormData* body, ExceptionCode& ec) {
+  if (!initSend(ec))
+    return;
+
+  if (m_method != "GET" && m_method != "HEAD" && m_url.protocolInHTTPFamily()) {
+    m_requestEntityBody = FormData::createMultiPart(*body, document());
+
+    String contentType = getRequestHeader("Content-Type");
+    if (contentType.isEmpty()) {
+      contentType = "multipart/form-data; boundary=";
+      contentType += m_requestEntityBody->boundary().data();
+      setRequestHeaderInternal("Content-Type", contentType);
+    }
   }
 
   createRequest(ec);

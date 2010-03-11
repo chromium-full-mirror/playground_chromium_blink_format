@@ -27,6 +27,8 @@
 namespace WebCore {
 
 class ChromeClient;
+class DOMFormData;
+class Document;
 
 class FormDataElement {
  public:
@@ -93,6 +95,8 @@ class FormData : public RefCounted<FormData> {
   static PassRefPtr<FormData> create(const void*, size_t);
   static PassRefPtr<FormData> create(const CString&);
   static PassRefPtr<FormData> create(const Vector<char>&);
+  static PassRefPtr<FormData> create(const DOMFormData&);
+  static PassRefPtr<FormData> createMultiPart(const DOMFormData&, Document*);
   PassRefPtr<FormData> copy() const;
   PassRefPtr<FormData> deepCopy() const;
   ~FormData();
@@ -112,6 +116,7 @@ class FormData : public RefCounted<FormData> {
 
   bool isEmpty() const { return m_elements.isEmpty(); }
   const Vector<FormDataElement>& elements() const { return m_elements; }
+  const Vector<char>& boundary() const { return m_boundary; }
 
   void generateFiles(ChromeClient*);
   void removeGeneratedFilesIfNeeded();
@@ -128,10 +133,15 @@ class FormData : public RefCounted<FormData> {
   FormData();
   FormData(const FormData&);
 
+  void appendDOMFormData(const DOMFormData& domFormData,
+                         bool isMultiPartForm,
+                         Document* document);
+
   Vector<FormDataElement> m_elements;
   int64_t m_identifier;
   bool m_hasGeneratedFiles;
   bool m_alwaysStream;
+  Vector<char> m_boundary;
 };
 
 inline bool operator==(const FormData& a, const FormData& b) {
