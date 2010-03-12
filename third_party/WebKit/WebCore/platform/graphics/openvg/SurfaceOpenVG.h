@@ -47,6 +47,7 @@ class SurfaceOpenVG : public Noncopyable {
   enum MakeCurrentMode {
     ApplyPainterStateOnSurfaceSwitch,
     DontApplyPainterState,
+    DontSaveOrApplyPainterState
   };
 
   static SurfaceOpenVG* currentSurface();

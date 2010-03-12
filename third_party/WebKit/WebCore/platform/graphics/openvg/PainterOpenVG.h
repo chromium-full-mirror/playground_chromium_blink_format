@@ -47,8 +47,13 @@ class PainterOpenVG : public Noncopyable {
 
   enum SaveMode {
     CreateNewState,
+    KeepCurrentState,
     CreateNewStateWithPaintStateOnly  // internal usage only, do not use outside
                                       // PainterOpenVG
+  };
+  enum ClipOperation {
+    IntersectClip = VG_INTERSECT_MASK,
+    SubtractClip = VG_SUBTRACT_MASK
   };
 
   PainterOpenVG();
@@ -118,6 +123,9 @@ class PainterOpenVG : public Noncopyable {
                 WindRule fillRule = RULE_NONZERO);
 
   void intersectClipRect(const FloatRect&);
+  void clipPath(const Path&,
+                PainterOpenVG::ClipOperation,
+                WindRule clipRule = RULE_NONZERO);
 
   void save(PainterOpenVG::SaveMode saveMode = CreateNewState);
   void restore();
