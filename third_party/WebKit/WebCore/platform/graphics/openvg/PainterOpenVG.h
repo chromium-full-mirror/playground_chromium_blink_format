@@ -90,6 +90,9 @@ class PainterOpenVG : public Noncopyable {
   Color fillColor() const;
   void setFillColor(const Color&);
 
+  int textDrawingMode() const;
+  void setTextDrawingMode(int mode);
+
   bool antialiasingEnabled() const;
   void setAntialiasingEnabled(bool);
 
@@ -111,6 +114,13 @@ class PainterOpenVG : public Noncopyable {
   void drawPolygon(size_t numPoints,
                    const FloatPoint* points,
                    VGbitfield paintModes = (VG_STROKE_PATH | VG_FILL_PATH));
+#ifdef OPENVG_VERSION_1_1
+  void drawText(VGFont,
+                Vector<VGuint>& characters,
+                VGfloat* adjustmentsX,
+                VGfloat* adjustmentsY,
+                const FloatPoint&);
+#endif
 
   void scale(const FloatSize& scaleFactors);
   void rotate(float radians);
