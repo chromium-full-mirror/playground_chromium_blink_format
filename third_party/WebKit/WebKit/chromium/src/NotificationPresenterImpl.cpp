@@ -33,11 +33,10 @@
 
 #if ENABLE(NOTIFICATIONS)
 
-#include "Document.h"
+#include "KURL.h"
 #include "Notification.h"
 #include "SecurityOrigin.h"
 
-#include "WebDocument.h"
 #include "WebNotification.h"
 #include "WebNotificationPermissionCallback.h"
 #include "WebNotificationPresenter.h"
@@ -87,20 +86,24 @@ void NotificationPresenterImpl::notificationObjectDestroyed(
 }
 
 NotificationPresenter::Permission NotificationPresenterImpl::checkPermission(
-    const KURL& url,
-    Document* document) {
-  WebDocument webDocument;
-  if (document)
-    webDocument = document;
+    SecurityOrigin* origin) {
+  int result = m_presenter->checkPermission(WebSecurityOrigin(origin));
 
-  int result = m_presenter->checkPermission(url, document ? &webDocument : 0);
+  // FIXME: Remove this once clients are updated to use the above signature.
+  if (result == NotificationPresenter::PermissionNotAllowed)
+    result = m_presenter->checkPermission(KURL(KURL(), origin->toString()), 0);
+
   return static_cast<NotificationPresenter::Permission>(result);
 }
 
 void NotificationPresenterImpl::requestPermission(
     SecurityOrigin* origin,
     PassRefPtr<VoidCallback> callback) {
+  // FIXME: Remove the first call once clients are updated to use the second
+  // signature.
   m_presenter->requestPermission(origin->toString(),
+                                 new VoidCallbackClient(callback));
+  m_presenter->requestPermission(WebSecurityOrigin(origin),
                                  new VoidCallbackClient(callback));
 }
 
