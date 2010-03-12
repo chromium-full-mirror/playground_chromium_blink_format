@@ -126,6 +126,7 @@ class WebNode {
 #endif
 
  protected:
+#if WEBKIT_IMPLEMENTATION
   template <typename T>
   T* unwrap() {
     return static_cast<T*>(m_private.get());
@@ -135,6 +136,7 @@ class WebNode {
   const T* constUnwrap() const {
     return static_cast<const T*>(m_private.get());
   }
+#endif
 
   WebPrivatePtr<WebCore::Node> m_private;
 };
