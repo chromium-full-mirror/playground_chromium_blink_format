@@ -41,7 +41,7 @@ static QTextBoundaryFinder* iterator = 0;
 static unsigned char buffer[1024];
 
 TextBreakIterator* wordBreakIterator(const UChar* string, int length) {
-  if (!string)
+  if (!string || !length)
     return 0;
   if (!iterator)
     iterator = new QTextBoundaryFinder;
@@ -53,7 +53,7 @@ TextBreakIterator* wordBreakIterator(const UChar* string, int length) {
 }
 
 TextBreakIterator* characterBreakIterator(const UChar* string, int length) {
-  if (!string)
+  if (!string || !length)
     return 0;
   if (!iterator)
     iterator = new QTextBoundaryFinder;
@@ -70,7 +70,7 @@ TextBreakIterator* cursorMovementIterator(const UChar* string, int length) {
 
 TextBreakIterator* lineBreakIterator(const UChar* string, int length) {
   static QTextBoundaryFinder* iterator = 0;
-  if (!string)
+  if (!string || !length)
     return 0;
   if (!iterator)
     iterator = new QTextBoundaryFinder;
@@ -82,7 +82,7 @@ TextBreakIterator* lineBreakIterator(const UChar* string, int length) {
 }
 
 TextBreakIterator* sentenceBreakIterator(const UChar* string, int length) {
-  if (!string)
+  if (!string || !length)
     return 0;
   if (!iterator)
     iterator = new QTextBoundaryFinder;
