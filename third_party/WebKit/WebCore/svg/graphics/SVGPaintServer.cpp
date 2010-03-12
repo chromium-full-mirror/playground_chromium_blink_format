@@ -122,8 +122,10 @@ SVGPaintServer* SVGPaintServer::strokePaintServer(const RenderStyle* style,
 
   SVGPaintServer* strokePaintServer = 0;
   SVGPaint::SVGPaintType paintType = stroke->paintType();
-  if (paintType == SVGPaint::SVG_PAINTTYPE_URI ||
-      paintType == SVGPaint::SVG_PAINTTYPE_URI_RGBCOLOR) {
+  if ((paintType == SVGPaint::SVG_PAINTTYPE_URI ||
+       paintType == SVGPaint::SVG_PAINTTYPE_URI_RGBCOLOR) &&
+      item->objectBoundingBox().width() != 0 &&
+      item->objectBoundingBox().height() != 0) {
     AtomicString id(SVGURIReference::getTarget(stroke->uri()));
     strokePaintServer = getPaintServerById(item->document(), id, item);
 
@@ -148,6 +150,12 @@ SVGPaintServer* SVGPaintServer::strokePaintServer(const RenderStyle* style,
     // this could turn into an ASSERT
     if (!strokePaintServerSolid->color().isValid())
       strokePaintServer = 0;
+  }
+  if (!strokePaintServer) {
+    // default value (black), see bug 11017
+    strokePaintServer = sharedSolidPaintServer();
+    static_cast<SVGPaintServerSolid*>(strokePaintServer)
+        ->setColor(Color::black);
   }
 
   return strokePaintServer;
