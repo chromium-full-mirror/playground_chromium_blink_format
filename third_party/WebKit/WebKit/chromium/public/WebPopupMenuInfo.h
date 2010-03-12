@@ -42,6 +42,7 @@ struct WebPopupMenuInfo {
   // typedef.
   typedef WebMenuItemInfo Item;
   int itemHeight;
+  int itemFontSize;
   int selectedIndex;
   WebVector<WebMenuItemInfo> items;
 };
