@@ -38,6 +38,11 @@
 #include "WebImage.h"
 #include "WebSize.h"
 
+#if WEBKIT_USING_SKIA
+#include <wtf/OwnPtr.h>
+#include <wtf/PassRefPtr.h>
+#endif
+
 using namespace WebCore;
 
 namespace WebKit {
@@ -59,8 +64,7 @@ void WebImageDecoder::init(Type type) {
 
 void WebImageDecoder::setData(const WebData& data, bool allDataReceived) {
   ASSERT(m_private);
-  RefPtr<SharedBuffer> buffer(SharedBuffer::create(data.data(), data.size()));
-  m_private->setData(buffer.get(), allDataReceived);
+  m_private->setData(PassRefPtr<SharedBuffer>(data).get(), allDataReceived);
 }
 
 bool WebImageDecoder::isFailed() const {
@@ -97,8 +101,10 @@ WebImage WebImageDecoder::getFrameAtIndex(int index = 0) const {
   if (!frameBuffer)
     return WebImage();
 #if WEBKIT_USING_SKIA
-  return WebImage(*(frameBuffer->asNewNativeImage()));
+  OwnPtr<NativeImageSkia> image(frameBuffer->asNewNativeImage());
+  return WebImage(*image);
 #elif WEBKIT_USING_CG
+  // FIXME: Implement CG side of this.
   return WebImage(frameBuffer->asNewNativeImage());
 #endif
 }
