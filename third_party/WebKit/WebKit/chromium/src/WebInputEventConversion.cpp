@@ -81,7 +81,6 @@ PlatformMouseEventBuilder::PlatformMouseEventBuilder(Widget* widget,
     default:
       ASSERT_NOT_REACHED();
   }
-  return TouchStart;
 }
 
 // PlatformWheelEventBuilder --------------------------------------------------
@@ -155,7 +154,6 @@ void PlatformKeyboardEventBuilder::setKeyType(Type type) {
     m_keyIdentifier = String();
     m_windowsVirtualKeyCode = 0;
   }
-  return PlatformTouchPoint::TouchReleased;
 }
 
 // Please refer to bug http://b/issue?id=961192, which talks about Webkit
@@ -185,7 +183,7 @@ static inline TouchEventType toPlatformTouchEventType(
     default:
       ASSERT_NOT_REACHED();
   }
-  return WebInputEvent::Undefined;
+  return TouchStart;
 }
 
 static inline PlatformTouchPoint::State toPlatformTouchPointState(
@@ -204,7 +202,7 @@ static inline PlatformTouchPoint::State toPlatformTouchPointState(
     case WebTouchPoint::StateUndefined:
       ASSERT_NOT_REACHED();
   }
-  return WebTouchPoint::StateUndefined;
+  return PlatformTouchPoint::TouchReleased;
 }
 
 PlatformTouchPointBuilder::PlatformTouchPointBuilder(
