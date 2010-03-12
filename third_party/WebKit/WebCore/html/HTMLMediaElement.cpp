@@ -1088,7 +1088,7 @@ float HTMLMediaElement::startTime() const {
 }
 
 float HTMLMediaElement::duration() const {
-  if (m_readyState >= HAVE_METADATA)
+  if (m_player && m_readyState >= HAVE_METADATA)
     return m_player->duration();
 
   return numeric_limits<float>::quiet_NaN();
@@ -1765,6 +1765,9 @@ void HTMLMediaElement::userCancelledLoad() {
 
   // 7 - Abort the overall resource selection algorithm.
   m_currentSourceNode = 0;
+
+  // Reset m_readyState since m_player is gone.
+  m_readyState = HAVE_NOTHING;
 }
 
 void HTMLMediaElement::documentWillBecomeInactive() {
