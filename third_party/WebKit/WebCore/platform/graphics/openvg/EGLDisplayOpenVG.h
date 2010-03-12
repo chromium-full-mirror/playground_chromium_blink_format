@@ -53,6 +53,10 @@ class EGLDisplayOpenVG {
   EGLSurface createPbufferSurface(const IntSize&,
                                   const EGLConfig&,
                                   EGLint* errorCode = 0);
+  EGLSurface createPbufferFromClientBuffer(EGLClientBuffer,
+                                           EGLenum bufferType,
+                                           const EGLConfig&,
+                                           EGLint* errorCode = 0);
 
   EGLSurface surfaceForWindow(EGLNativeWindowType, const EGLConfig&);
 
