@@ -878,8 +878,6 @@ static bool testSetStatus(PluginObject* obj,
   return true;
 }
 
-static NPObject* rememberedObject;
-
 static bool pluginInvoke(NPObject* header,
                          NPIdentifier name,
                          const NPVariant* args,
@@ -948,22 +946,22 @@ static bool pluginInvoke(NPObject* header,
                          stringVariantToIdentifier(args[1]), &args[2]);
     return true;
   } else if (name == pluginMethodIdentifiers[ID_REMEMBER]) {
-    if (rememberedObject)
-      browser->releaseobject(rememberedObject);
-    rememberedObject = NPVARIANT_TO_OBJECT(args[0]);
-    browser->retainobject(rememberedObject);
+    if (plugin->rememberedObject)
+      browser->releaseobject(plugin->rememberedObject);
+    plugin->rememberedObject = NPVARIANT_TO_OBJECT(args[0]);
+    browser->retainobject(plugin->rememberedObject);
     VOID_TO_NPVARIANT(*result);
     return true;
   } else if (name == pluginMethodIdentifiers[ID_GET_REMEMBERED_OBJECT]) {
-    assert(rememberedObject);
-    browser->retainobject(rememberedObject);
-    OBJECT_TO_NPVARIANT(rememberedObject, *result);
+    assert(plugin->rememberedObject);
+    browser->retainobject(plugin->rememberedObject);
+    OBJECT_TO_NPVARIANT(plugin->rememberedObject, *result);
     return true;
   } else if (name ==
              pluginMethodIdentifiers[ID_GET_AND_FORGET_REMEMBERED_OBJECT]) {
-    assert(rememberedObject);
-    OBJECT_TO_NPVARIANT(rememberedObject, *result);
-    rememberedObject = 0;
+    assert(plugin->rememberedObject);
+    OBJECT_TO_NPVARIANT(plugin->rememberedObject, *result);
+    plugin->rememberedObject = 0;
     return true;
   } else if (name == pluginMethodIdentifiers[ID_REF_COUNT]) {
     uint32_t refCount = NPVARIANT_TO_OBJECT(args[0])->referenceCount;
@@ -986,6 +984,7 @@ static bool pluginInvokeDefault(NPObject* obj,
 static void pluginInvalidate(NPObject* header) {
   PluginObject* plugin = reinterpret_cast<PluginObject*>(header);
   plugin->testObject = 0;
+  plugin->rememberedObject = 0;
 }
 
 static NPObject* pluginAllocate(NPP npp, NPClass* theClass) {
@@ -998,6 +997,7 @@ static NPObject* pluginAllocate(NPP npp, NPClass* theClass) {
 
   newInstance->npp = npp;
   newInstance->testObject = browser->createobject(npp, getTestClass());
+  newInstance->rememberedObject = 0;
   newInstance->eventLogging = FALSE;
   newInstance->onStreamLoad = 0;
   newInstance->onStreamDestroy = 0;
@@ -1023,6 +1023,8 @@ static void pluginDeallocate(NPObject* header) {
   PluginObject* plugin = reinterpret_cast<PluginObject*>(header);
   if (plugin->testObject)
     browser->releaseobject(plugin->testObject);
+  if (plugin->rememberedObject)
+    browser->releaseobject(plugin->rememberedObject);
 
   free(plugin->firstUrl);
   free(plugin->firstHeaders);
