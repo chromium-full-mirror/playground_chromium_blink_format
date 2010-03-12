@@ -177,12 +177,6 @@ class StringImpl : public Noncopyable {
   bool inTable() const { return m_refCountAndFlags & s_refCountFlagInTable; }
   void setInTable() { m_refCountAndFlags |= s_refCountFlagInTable; }
 
-  // SYNC SYNC SYNC
-  // SYNC SYNC SYNC
-  // SYNC SYNC SYNC
-  // SYNC SYNC SYNC
-  // SYNC SYNC SYNC
-
   unsigned hash() const {
     if (!m_hash)
       m_hash = computeHash(m_data, m_length);

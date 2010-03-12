@@ -270,12 +270,6 @@ class UStringImpl : public UStringOrRopeImpl {
       m_refCountAndFlags &= ~s_refCountFlagIsIdentifier;
   }
 
-  // SYNC SYNC SYNC
-  // SYNC SYNC SYNC
-  // SYNC SYNC SYNC
-  // SYNC SYNC SYNC
-  // SYNC SYNC SYNC
-
   unsigned hash() const {
     if (!m_hash)
       m_hash = computeHash(m_data, m_length);
