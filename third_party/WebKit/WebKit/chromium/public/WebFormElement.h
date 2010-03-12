@@ -31,17 +31,12 @@
 #ifndef WebFormElement_h
 #define WebFormElement_h
 
-#include "WebElement.h"
 #include "WebInputElement.h"
 #include "WebVector.h"
 
 #if WEBKIT_IMPLEMENTATION
 namespace WebCore {
 class HTMLFormElement;
-}
-namespace WTF {
-template <typename T>
-class PassRefPtr;
 }
 #endif
 
@@ -61,12 +56,6 @@ class WebFormElement : public WebElement {
   }
   WEBKIT_API void assign(const WebFormElement& e) { WebElement::assign(e); }
 
-#if WEBKIT_IMPLEMENTATION
-  WebFormElement(const WTF::PassRefPtr<WebCore::HTMLFormElement>&);
-  WebFormElement& operator=(const WTF::PassRefPtr<WebCore::HTMLFormElement>&);
-  operator WTF::PassRefPtr<WebCore::HTMLFormElement>() const;
-#endif
-
   WEBKIT_API bool autoComplete() const;
   WEBKIT_API WebString action() const;
   WEBKIT_API WebString name() const;
@@ -75,6 +64,12 @@ class WebFormElement : public WebElement {
   // FIXME: Deprecate and replace with WebVector<WebElement>.
   WEBKIT_API void getNamedElements(const WebString&, WebVector<WebNode>&);
   WEBKIT_API void getInputElements(WebVector<WebInputElement>&) const;
+
+#if WEBKIT_IMPLEMENTATION
+  WebFormElement(const WTF::PassRefPtr<WebCore::HTMLFormElement>&);
+  WebFormElement& operator=(const WTF::PassRefPtr<WebCore::HTMLFormElement>&);
+  operator WTF::PassRefPtr<WebCore::HTMLFormElement>() const;
+#endif
 };
 
 }  // namespace WebKit

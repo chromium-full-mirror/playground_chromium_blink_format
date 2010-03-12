@@ -37,10 +37,6 @@
 namespace WebCore {
 class HTMLInputElement;
 }
-namespace WTF {
-template <typename T>
-class PassRefPtr;
-}
 #endif
 
 namespace WebKit {
@@ -56,12 +52,6 @@ class WebInputElement : public WebElement {
     return *this;
   }
   WEBKIT_API void assign(const WebInputElement& n) { WebElement::assign(n); }
-
-#if WEBKIT_IMPLEMENTATION
-  WebInputElement(const WTF::PassRefPtr<WebCore::HTMLInputElement>&);
-  WebInputElement& operator=(const WTF::PassRefPtr<WebCore::HTMLInputElement>&);
-  operator WTF::PassRefPtr<WebCore::HTMLInputElement>() const;
-#endif
 
   enum InputType {
     Text = 0,
@@ -106,6 +96,12 @@ class WebInputElement : public WebElement {
   // storing autofill data.  This is either the field name or its id, an empty
   // string if it has no name and no id.
   WEBKIT_API WebString nameForAutofill() const;
+
+#if WEBKIT_IMPLEMENTATION
+  WebInputElement(const WTF::PassRefPtr<WebCore::HTMLInputElement>&);
+  WebInputElement& operator=(const WTF::PassRefPtr<WebCore::HTMLInputElement>&);
+  operator WTF::PassRefPtr<WebCore::HTMLInputElement>() const;
+#endif
 };
 
 }  // namespace WebKit

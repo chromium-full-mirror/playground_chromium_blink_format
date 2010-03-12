@@ -38,26 +38,13 @@ using namespace WebCore;
 
 namespace WebKit {
 
-WebElement::WebElement(const WTF::PassRefPtr<WebCore::Element>& elem)
-    : WebNode(elem) {}
-
-WebElement& WebElement::operator=(
-    const WTF::PassRefPtr<WebCore::Element>& elem) {
-  WebNode::assign(elem.releaseRef());
-  return *this;
-}
-
-WebElement::operator WTF::PassRefPtr<Element>() const {
-  return PassRefPtr<Element>(static_cast<Element*>(m_private));
-}
-
 WebString WebElement::tagName() const {
   return constUnwrap<Element>()->tagName();
 }
 
 bool WebElement::hasTagName(const WebString& tagName) const {
   return equalIgnoringCase(constUnwrap<Element>()->tagName(),
-                           tagName.operator WebCore::String());
+                           tagName.operator String());
 }
 
 bool WebElement::hasAttribute(const WebString& attrName) const {
@@ -77,6 +64,17 @@ bool WebElement::setAttribute(const WebString& attrName,
 
 WebString WebElement::innerText() const {
   return constUnwrap<Element>()->innerText();
+}
+
+WebElement::WebElement(const PassRefPtr<Element>& elem) : WebNode(elem) {}
+
+WebElement& WebElement::operator=(const PassRefPtr<Element>& elem) {
+  m_private = elem;
+  return *this;
+}
+
+WebElement::operator PassRefPtr<Element>() const {
+  return static_cast<Element*>(m_private.get());
 }
 
 }  // namespace WebKit
