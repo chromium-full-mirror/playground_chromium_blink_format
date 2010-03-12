@@ -166,6 +166,10 @@ class PlatformKeyboardEvent : public FastAllocBase {
   }
 
   static bool currentCapsLockState();
+  static void getCurrentModifierState(bool& shiftKey,
+                                      bool& ctrlKey,
+                                      bool& altKey,
+                                      bool& metaKey);
 
 #if PLATFORM(MAC)
   PlatformKeyboardEvent(NSEvent*);

@@ -232,4 +232,15 @@ bool PlatformKeyboardEvent::currentCapsLockState() {
   notImplemented();
   return false;
 }
+
+void PlatformKeyboardEvent::getCurrentModifierState(bool& shiftKey,
+                                                    bool& ctrlKey,
+                                                    bool& altKey,
+                                                    bool& metaKey) {
+  notImplemented();
+  shiftKey = false;
+  ctrlKey = false;
+  altKey = false;
+  metaKey = false;
+}
 }
