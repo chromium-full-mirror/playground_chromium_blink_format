@@ -56,14 +56,6 @@ class DOMData : public Noncopyable {
                                v8::Persistent<v8::Object>,
                                T* domObject);
 
-  void forgetDelayedObject(void* object) { m_delayedObjectMap.take(object); }
-
-  // This is to ensure that we will deref DOM objects from the owning thread,
-  // not the GC thread. The helper function will be scheduled by the GC
-  // thread to get called from the owning thread.
-  static void derefDelayedObjectsInCurrentThread(void*);
-  void derefDelayedObjects();
-
   template <typename T>
   static void removeObjectsFromWrapperMap(
       AbstractWeakReferenceMap<T, v8::Object>& domMap);
@@ -71,9 +63,6 @@ class DOMData : public Noncopyable {
   ThreadIdentifier owningThread() const { return m_owningThread; }
 
  private:
-  typedef WTF::HashMap<void*, WrapperTypeInfo*> DelayedObjectMap;
-
-  void ensureDeref(WrapperTypeInfo* type, void* domObject);
   static void derefObject(WrapperTypeInfo* type, void* domObject);
 
   template <typename T>
@@ -88,15 +77,6 @@ class DOMData : public Noncopyable {
     }
   };
 
-  // Stores all the DOM objects that are delayed to be processed when the
-  // owning thread gains control.
-  DelayedObjectMap m_delayedObjectMap;
-
-  // The flag to indicate if the task to do the delayed process has
-  // already been posted.
-  bool m_delayedProcessingScheduled;
-
-  bool m_isMainThread;
   ThreadIdentifier m_owningThread;
 };
 
@@ -109,9 +89,8 @@ void DOMData::handleWeakObject(DOMDataStore::DOMWrapperMapType mapType,
     DOMDataStore* store = list[i];
     ASSERT(store->domData()->owningThread() == WTF::currentThread());
 
-    DOMDataStore::InternalDOMWrapperMap<T>* domMap =
-        static_cast<DOMDataStore::InternalDOMWrapperMap<T>*>(
-            store->getDOMWrapperMap(mapType));
+    DOMWrapperMap<T>* domMap =
+        static_cast<DOMWrapperMap<T>*>(store->getDOMWrapperMap(mapType));
     if (domMap->removeIfPresent(domObject, v8Object))
       store->domData()->derefObject(V8DOMWrapper::domWrapperType(v8Object),
                                     domObject);
