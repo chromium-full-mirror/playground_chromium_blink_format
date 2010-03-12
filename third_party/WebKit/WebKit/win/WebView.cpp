@@ -779,6 +779,8 @@ void WebView::deleteBackingStore() {
   }
   m_backingStoreBitmap.clear();
   m_backingStoreDirtyRegion.clear();
+  if (m_layerRenderer)
+    m_layerRenderer->setBackingStoreDirty(false);
 
   m_backingStoreSize.cx = m_backingStoreSize.cy = 0;
 }
@@ -828,6 +830,9 @@ void WebView::addToDirtyRegion(HRGN newRegion) {
     m_backingStoreDirtyRegion.set(combinedRegion);
   } else
     m_backingStoreDirtyRegion.set(newRegion);
+
+  if (m_layerRenderer)
+    m_layerRenderer->setBackingStoreDirty(true);
 
   if (m_uiDelegatePrivate)
     m_uiDelegatePrivate->webViewDidInvalidate(this);
@@ -965,6 +970,8 @@ void WebView::updateBackingStore(FrameView* frameView,
       m_uiDelegatePrivate->webViewPainted(this);
 
     m_backingStoreDirtyRegion.clear();
+    if (m_layerRenderer)
+      m_layerRenderer->setBackingStoreDirty(false);
   }
 
   if (!dc) {
@@ -6167,7 +6174,6 @@ void WebView::setAcceleratedCompositing(bool accelerated) {
       ASSERT(m_viewWindow);
       m_layerRenderer->setHostWindow(m_viewWindow);
       m_layerRenderer->createRenderer();
-      updateRootLayerContents();
     }
   } else {
     m_layerRenderer = 0;
@@ -6206,8 +6212,8 @@ void WebView::updateRootLayerContents() {
   FrameView* frameView = coreFrame->view();
 
   m_layerRenderer->setScrollFrame(
-      IntRect(frameView->scrollX(), frameView->scrollY(),
-              frameView->layoutWidth(), frameView->layoutHeight()));
+      IntPoint(frameView->scrollX(), frameView->scrollY()),
+      IntSize(frameView->layoutWidth(), frameView->layoutHeight()));
 }
 #endif
 
