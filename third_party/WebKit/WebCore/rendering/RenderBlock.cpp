@@ -202,7 +202,7 @@ void RenderBlock::destroy() {
       // children will be destroyed by the time we return from this function.
       if (isAnonymousBlock()) {
         for (InlineFlowBox* box = firstLineBox(); box;
-             box = box->nextFlowBox()) {
+             box = box->nextLineBox()) {
           while (InlineBox* childBox = box->firstChild())
             childBox->remove();
         }
@@ -3178,7 +3178,7 @@ int RenderBlock::rightmostPosition(bool includeOverflowInterior,
     right = max(right,
                 borderLeft() + paddingLeft() + paddingRight() + relativeOffset);
     if (childrenInline()) {
-      for (InlineRunBox* currBox = firstLineBox(); currBox;
+      for (InlineFlowBox* currBox = firstLineBox(); currBox;
            currBox = currBox->nextLineBox()) {
         int childRightEdge = currBox->x() + currBox->width();
 
@@ -3288,7 +3288,7 @@ int RenderBlock::leftmostPosition(bool includeOverflowInterior,
   }
 
   if (!includeSelf && firstLineBox()) {
-    for (InlineRunBox* currBox = firstLineBox(); currBox;
+    for (InlineFlowBox* currBox = firstLineBox(); currBox;
          currBox = currBox->nextLineBox())
       left = min(left, (int)currBox->x() + relativeOffset);
   }

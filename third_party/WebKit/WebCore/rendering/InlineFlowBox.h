@@ -21,7 +21,7 @@
 #ifndef InlineFlowBox_h
 #define InlineFlowBox_h
 
-#include "InlineRunBox.h"
+#include "InlineBox.h"
 #include "RenderOverflow.h"
 
 namespace WebCore {
@@ -30,12 +30,14 @@ class HitTestRequest;
 class HitTestResult;
 class RenderLineBoxList;
 
-class InlineFlowBox : public InlineRunBox {
+class InlineFlowBox : public InlineBox {
  public:
   InlineFlowBox(RenderObject* obj)
-      : InlineRunBox(obj),
+      : InlineBox(obj),
         m_firstChild(0),
         m_lastChild(0),
+        m_prevLineBox(0),
+        m_nextLineBox(0),
         m_includeLeftEdge(false),
         m_includeRightEdge(false)
 #ifndef NDEBUG
@@ -59,12 +61,10 @@ class InlineFlowBox : public InlineRunBox {
   virtual ~InlineFlowBox();
 #endif
 
-  InlineFlowBox* prevFlowBox() const {
-    return static_cast<InlineFlowBox*>(m_prevLine);
-  }
-  InlineFlowBox* nextFlowBox() const {
-    return static_cast<InlineFlowBox*>(m_nextLine);
-  }
+  InlineFlowBox* prevLineBox() const { return m_prevLineBox; }
+  InlineFlowBox* nextLineBox() const { return m_nextLineBox; }
+  void setNextLineBox(InlineFlowBox* n) { m_nextLineBox = n; }
+  void setPreviousLineBox(InlineFlowBox* p) { m_prevLineBox = p; }
 
   InlineBox* firstChild() const {
     checkConsistency();
@@ -289,11 +289,14 @@ class InlineFlowBox : public InlineRunBox {
  protected:
   OwnPtr<RenderOverflow> m_overflow;
 
- private:
   virtual bool isInlineFlowBox() const { return true; }
 
   InlineBox* m_firstChild;
   InlineBox* m_lastChild;
+
+  InlineFlowBox*
+      m_prevLineBox;  // The previous box that also uses our RenderObject
+  InlineFlowBox* m_nextLineBox;  // The next box that also uses our RenderObject
 
   bool m_includeLeftEdge : 1;
   bool m_includeRightEdge : 1;

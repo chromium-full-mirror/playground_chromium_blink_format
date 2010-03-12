@@ -141,12 +141,8 @@ void RenderSVGText::absoluteRects(Vector<IntRect>& rects, int, int) {
   // it hard
   // to spot errors, if there are any using WebInspector. Individually feed them
   // into 'rects'.
-  for (InlineRunBox* runBox = firstLineBox(); runBox;
-       runBox = runBox->nextLineBox()) {
-    ASSERT(runBox->isInlineFlowBox());
-
-    InlineFlowBox* flowBox = static_cast<InlineFlowBox*>(runBox);
-    for (InlineBox* box = flowBox->firstChild(); box; box = box->nextOnLine()) {
+  for (InlineFlowBox* flow = firstLineBox(); flow; flow = flow->nextLineBox()) {
+    for (InlineBox* box = flow->firstChild(); box; box = box->nextOnLine()) {
       FloatRect boxRect(box->x(), box->y(), box->width(), box->height());
       // FIXME: crawling up the parent chain to map each rect is very
       // inefficient
@@ -166,12 +162,8 @@ void RenderSVGText::absoluteQuads(Vector<FloatQuad>& quads) {
   // it hard
   // to spot errors, if there are any using WebInspector. Individually feed them
   // into 'rects'.
-  for (InlineRunBox* runBox = firstLineBox(); runBox;
-       runBox = runBox->nextLineBox()) {
-    ASSERT(runBox->isInlineFlowBox());
-
-    InlineFlowBox* flowBox = static_cast<InlineFlowBox*>(runBox);
-    for (InlineBox* box = flowBox->firstChild(); box; box = box->nextOnLine()) {
+  for (InlineFlowBox* flow = firstLineBox(); flow; flow = flow->nextLineBox()) {
+    for (InlineBox* box = flow->firstChild(); box; box = box->nextOnLine()) {
       FloatRect boxRect(box->x(), box->y(), box->width(), box->height());
       // FIXME: crawling up the parent chain to map each quad is very
       // inefficient
@@ -192,12 +184,8 @@ void RenderSVGText::paint(PaintInfo& paintInfo, int, int) {
 FloatRect RenderSVGText::objectBoundingBox() const {
   FloatRect boundingBox;
 
-  for (InlineRunBox* runBox = firstLineBox(); runBox;
-       runBox = runBox->nextLineBox()) {
-    ASSERT(runBox->isInlineFlowBox());
-
-    InlineFlowBox* flowBox = static_cast<InlineFlowBox*>(runBox);
-    for (InlineBox* box = flowBox->firstChild(); box; box = box->nextOnLine())
+  for (InlineFlowBox* flow = firstLineBox(); flow; flow = flow->nextLineBox()) {
+    for (InlineBox* box = flow->firstChild(); box; box = box->nextOnLine())
       boundingBox.unite(
           FloatRect(box->x(), box->y(), box->width(), box->height()));
   }

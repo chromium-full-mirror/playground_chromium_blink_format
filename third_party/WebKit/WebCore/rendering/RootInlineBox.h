@@ -48,10 +48,10 @@ class RootInlineBox : public InlineFlowBox {
   void detachEllipsisBox(RenderArena*);
 
   RootInlineBox* nextRootBox() const {
-    return static_cast<RootInlineBox*>(m_nextLine);
+    return static_cast<RootInlineBox*>(m_nextLineBox);
   }
   RootInlineBox* prevRootBox() const {
-    return static_cast<RootInlineBox*>(m_prevLine);
+    return static_cast<RootInlineBox*>(m_prevLineBox);
   }
 
   virtual void adjustPosition(int dx, int dy);

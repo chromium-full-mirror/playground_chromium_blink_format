@@ -155,7 +155,7 @@ void InlineFlowBox::attachLineBoxToRenderObject() {
 }
 
 void InlineFlowBox::adjustPosition(int dx, int dy) {
-  InlineRunBox::adjustPosition(dx, dy);
+  InlineBox::adjustPosition(dx, dy);
   for (InlineBox* child = firstChild(); child; child = child->nextOnLine())
     child->adjustPosition(dx, dy);
   if (m_overflow)
@@ -813,11 +813,11 @@ void InlineFlowBox::paintFillLayer(const RenderObject::PaintInfo& paintInfo,
     // obviously not right,
     // but it isn't even clear how this should work at all.
     int xOffsetOnLine = 0;
-    for (InlineRunBox* curr = prevLineBox(); curr; curr = curr->prevLineBox())
+    for (InlineFlowBox* curr = prevLineBox(); curr; curr = curr->prevLineBox())
       xOffsetOnLine += curr->width();
     int startX = tx - xOffsetOnLine;
     int totalWidth = xOffsetOnLine;
-    for (InlineRunBox* curr = this; curr; curr = curr->nextLineBox())
+    for (InlineFlowBox* curr = this; curr; curr = curr->nextLineBox())
       totalWidth += curr->width();
     paintInfo.context->save();
     paintInfo.context->clip(IntRect(tx, ty, width(), height()));
@@ -922,12 +922,12 @@ void InlineFlowBox::paintBoxDecorations(RenderObject::PaintInfo& paintInfo,
         // obviously not right,
         // but it isn't even clear how this should work at all.
         int xOffsetOnLine = 0;
-        for (InlineRunBox* curr = prevLineBox(); curr;
+        for (InlineFlowBox* curr = prevLineBox(); curr;
              curr = curr->prevLineBox())
           xOffsetOnLine += curr->width();
         int startX = tx - xOffsetOnLine;
         int totalWidth = xOffsetOnLine;
-        for (InlineRunBox* curr = this; curr; curr = curr->nextLineBox())
+        for (InlineFlowBox* curr = this; curr; curr = curr->nextLineBox())
           totalWidth += curr->width();
         context->save();
         context->clip(IntRect(tx, ty, w, h));
@@ -1007,11 +1007,11 @@ void InlineFlowBox::paintMask(RenderObject::PaintInfo& paintInfo,
     // We have a mask image that spans multiple lines.
     // We need to adjust _tx and _ty by the width of all previous lines.
     int xOffsetOnLine = 0;
-    for (InlineRunBox* curr = prevLineBox(); curr; curr = curr->prevLineBox())
+    for (InlineFlowBox* curr = prevLineBox(); curr; curr = curr->prevLineBox())
       xOffsetOnLine += curr->width();
     int startX = tx - xOffsetOnLine;
     int totalWidth = xOffsetOnLine;
-    for (InlineRunBox* curr = this; curr; curr = curr->nextLineBox())
+    for (InlineFlowBox* curr = this; curr; curr = curr->nextLineBox())
       totalWidth += curr->width();
     paintInfo.context->save();
     paintInfo.context->clip(IntRect(tx, ty, w, h));
