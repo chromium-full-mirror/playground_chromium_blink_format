@@ -74,7 +74,8 @@ class UStringOrRopeImpl : public Noncopyable {
 
   enum StaticStringConstructType { ConstructStaticString };
   UStringOrRopeImpl(unsigned length, StaticStringConstructType)
-      : m_refCountAndFlags(s_refCountFlagStatic | BufferOwned),
+      : m_refCountAndFlags(s_refCountFlagStatic | s_refCountFlagIsIdentifier |
+                           BufferOwned),
         m_length(length) {
     ASSERT(!isRope());
   }
@@ -133,7 +134,6 @@ class UStringImpl : public UStringOrRopeImpl {
         m_buffer(0),
         m_hash(0) {
     hash();
-    checkConsistency();
   }
 
   // Create a normal string with internal storage (BufferInternal)
@@ -144,7 +144,6 @@ class UStringImpl : public UStringOrRopeImpl {
         m_hash(0) {
     ASSERT(m_data);
     ASSERT(m_length);
-    checkConsistency();
   }
 
   // Create a UStringImpl adopting ownership of the provided buffer
@@ -156,7 +155,6 @@ class UStringImpl : public UStringOrRopeImpl {
         m_hash(0) {
     ASSERT(m_data);
     ASSERT(m_length);
-    checkConsistency();
   }
 
   // Used to create new strings that are a substring of an existing UStringImpl
@@ -170,7 +168,7 @@ class UStringImpl : public UStringOrRopeImpl {
         m_hash(0) {
     ASSERT(m_data);
     ASSERT(m_length);
-    checkConsistency();
+    ASSERT(m_substringBuffer->bufferOwnership() != BufferSubstring);
   }
 
   // Used to construct new strings sharing an existing SharedUChar
@@ -184,11 +182,11 @@ class UStringImpl : public UStringOrRopeImpl {
         m_hash(0) {
     ASSERT(m_data);
     ASSERT(m_length);
-    checkConsistency();
   }
 
   // For use only by Identifier's XXXTranslator helpers.
   void setHash(unsigned hash) {
+    ASSERT(!isStatic());
     ASSERT(!m_hash);
     ASSERT(hash == computeHash(m_data, m_length));
     m_hash = hash;
@@ -206,10 +204,12 @@ class UStringImpl : public UStringOrRopeImpl {
   static PassRefPtr<UStringImpl> create(PassRefPtr<UStringImpl> rep,
                                         unsigned offset,
                                         unsigned length) {
+    ASSERT(rep);
+    ASSERT(length <= rep->length());
+
     if (!length)
       return empty();
-    ASSERT(rep);
-    rep->checkConsistency();
+
     UStringImpl* ownerRep = (rep->bufferOwnership() == BufferSubstring)
                                 ? rep->m_substringBuffer
                                 : rep.get();
@@ -264,6 +264,7 @@ class UStringImpl : public UStringOrRopeImpl {
     return m_refCountAndFlags & s_refCountFlagIsIdentifier;
   }
   void setIsIdentifier(bool isIdentifier) {
+    ASSERT(!isStatic());
     if (isIdentifier)
       m_refCountAndFlags |= s_refCountFlagIsIdentifier;
     else
@@ -307,15 +308,6 @@ class UStringImpl : public UStringOrRopeImpl {
       memcpy(destination, source, numCharacters * sizeof(UChar));
   }
 
-  ALWAYS_INLINE void checkConsistency() const {
-    // There is no recursion of substrings.
-    ASSERT((bufferOwnership() != BufferSubstring) ||
-           (m_substringBuffer->bufferOwnership() != BufferSubstring));
-    // Static strings cannot be put in identifier tables, because they are
-    // globally shared.
-    ASSERT(!isStatic() || !isIdentifier());
-  }
-
  private:
   // This number must be at least 2 to avoid sharing empty, null as well as 1
   // character strings from SmallStrings.
@@ -327,7 +319,6 @@ class UStringImpl : public UStringOrRopeImpl {
   }
   bool isStatic() const { return m_refCountAndFlags & s_refCountFlagStatic; }
 
-  // unshared data
   const UChar* m_data;
   union {
     void* m_buffer;

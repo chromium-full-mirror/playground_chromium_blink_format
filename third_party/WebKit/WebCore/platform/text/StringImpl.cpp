@@ -48,6 +48,8 @@ namespace WebCore {
 static const unsigned minLengthToShare = 20;
 
 StringImpl::~StringImpl() {
+  ASSERT(!isStatic());
+
   if (inTable())
     AtomicString::remove(this);
 
@@ -131,6 +133,8 @@ PassRefPtr<StringImpl> StringImpl::create(const char* string) {
 SharedUChar* StringImpl::sharedBuffer() {
   if (m_length < minLengthToShare)
     return 0;
+  // All static strings are smaller that the minimim length to share.
+  ASSERT(!isStatic());
 
   BufferOwnership ownership = bufferOwnership();
 
