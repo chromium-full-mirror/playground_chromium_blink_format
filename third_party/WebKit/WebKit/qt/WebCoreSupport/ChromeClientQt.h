@@ -113,7 +113,6 @@ class ChromeClientQt : public ChromeClient {
   virtual bool tabsToLinks() const;
   virtual IntRect windowResizerRect() const;
 
-  virtual void invalidateContents(const IntRect&, bool);
   virtual void invalidateWindow(const IntRect&, bool);
   virtual void invalidateContentsAndWindow(const IntRect&, bool);
   virtual void invalidateContentsForSlowScroll(const IntRect&, bool);

@@ -116,7 +116,6 @@ class ChromeClientHaiku : public ChromeClient {
   bool tabsToLinks() const;
   IntRect windowResizerRect() const;
 
-  void invalidateContents(const IntRect&, bool);
   void invalidateWindow(const IntRect&, bool);
   void invalidateContentsAndWindow(const IntRect&, bool);
   void invalidateContentsForSlowScroll(const IntRect&, bool);

@@ -133,7 +133,6 @@ class EmptyChromeClient : public ChromeClient {
 
   virtual IntRect windowResizerRect() const { return IntRect(); }
 
-  virtual void invalidateContents(const IntRect&, bool) {}
   virtual void invalidateWindow(const IntRect&, bool) {}
   virtual void invalidateContentsAndWindow(const IntRect&, bool) {}
   virtual void invalidateContentsForSlowScroll(const IntRect&, bool){};

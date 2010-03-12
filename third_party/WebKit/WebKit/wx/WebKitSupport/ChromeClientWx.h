@@ -109,7 +109,6 @@ class ChromeClientWx : public ChromeClient {
                                   const IntRect& clipRect);
   virtual void updateBackingStore();
 
-  virtual void invalidateContents(const IntRect&, bool);
   virtual void invalidateWindow(const IntRect&, bool);
   virtual void invalidateContentsAndWindow(const IntRect&, bool);
   virtual void invalidateContentsForSlowScroll(const IntRect&, bool);
