@@ -1795,10 +1795,6 @@ void RenderObject::styleWillChange(StyleDifference diff,
     s_affectsParentBlock = false;
 
   if (view()->frameView()) {
-    // FIXME: A better solution would be to only invalidate the fixed regions
-    // when scrolling.  It's overkill to
-    // prevent the entire view from blitting on a scroll.
-
     bool shouldBlitOnFixedBackgroundImage = false;
 #if ENABLE(FAST_MOBILE_SCROLLING)
     // On low-powered/mobile devices, preventing blitting on a scroll can cause
@@ -1811,14 +1807,10 @@ void RenderObject::styleWillChange(StyleDifference diff,
     shouldBlitOnFixedBackgroundImage = true;
 #endif
 
-    bool newStyleSlowScroll =
-        newStyle && (newStyle->position() == FixedPosition ||
-                     (!shouldBlitOnFixedBackgroundImage &&
-                      newStyle->hasFixedBackgroundImage()));
-    bool oldStyleSlowScroll =
-        m_style && (m_style->position() == FixedPosition ||
-                    (!shouldBlitOnFixedBackgroundImage &&
-                     m_style->hasFixedBackgroundImage()));
+    bool newStyleSlowScroll = newStyle && !shouldBlitOnFixedBackgroundImage &&
+                              newStyle->hasFixedBackgroundImage();
+    bool oldStyleSlowScroll = m_style && !shouldBlitOnFixedBackgroundImage &&
+                              m_style->hasFixedBackgroundImage();
     if (oldStyleSlowScroll != newStyleSlowScroll) {
       if (oldStyleSlowScroll)
         view()->frameView()->removeSlowRepaintObject();

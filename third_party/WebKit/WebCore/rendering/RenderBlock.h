@@ -78,6 +78,9 @@ class RenderBlock : public RenderBox {
   void insertPositionedObject(RenderBox*);
   void removePositionedObject(RenderBox*);
   void removePositionedObjects(RenderBlock*);
+  ListHashSet<RenderBox*>* positionedObjects() const {
+    return m_positionedObjects;
+  }
 
   void addPercentHeightDescendant(RenderBox*);
   static void removePercentHeightDescendant(RenderBox*);
