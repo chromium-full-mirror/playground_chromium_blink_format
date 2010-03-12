@@ -31,9 +31,10 @@
 
 #include <JavaScriptCore/JSObjectRef.h>
 #include <JavaScriptCore/JSRetainPtr.h>
-#include <wtf/RefCounted.h>
+#include <set>
 #include <string>
 #include <vector>
+#include <wtf/RefCounted.h>
 
 class LayoutTestController : public RefCounted<LayoutTestController> {
  public:
@@ -251,6 +252,13 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
   void setWaitToDump(bool waitToDump);
   void waitToDumpWatchdogTimerFired();
 
+  const std::set<std::string>& willSendRequestClearHeaders() const {
+    return m_willSendRequestClearHeaders;
+  }
+  void setWillSendRequestClearHeader(std::string header) {
+    m_willSendRequestClearHeaders.insert(header);
+  }
+
   bool willSendRequestReturnsNull() const {
     return m_willSendRequestReturnsNull;
   }
@@ -386,6 +394,8 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
   std::string m_authenticationPassword;
   std::string m_testPathOrURL;
   std::string m_expectedPixelHash;  // empty string if no hash
+
+  std::set<std::string> m_willSendRequestClearHeaders;
 
   // origins which have been granted desktop notification access
   std::vector<JSStringRef> m_desktopNotificationAllowedOrigins;
