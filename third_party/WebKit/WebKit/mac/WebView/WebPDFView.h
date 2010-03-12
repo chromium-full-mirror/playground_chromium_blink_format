@@ -38,6 +38,7 @@
                                WebMultipleTextMatches,
                                WebDocumentSelection,
                                WebDocumentElement,
+                               WebDocumentPDF,
                                _WebDocumentViewState,
                                _WebDocumentZooming> {
   NSView* previewView;
@@ -57,5 +58,6 @@
 + (NSBundle*)PDFKitBundle;
 
 - (void)setPDFDocument:(PDFDocument*)doc;
+- (PDFDocument*)PDFDocument;
 
 @end
