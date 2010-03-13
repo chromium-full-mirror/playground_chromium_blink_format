@@ -45,6 +45,7 @@ class DOMWrapperWorld : public RefCounted<DOMWrapperWorld> {
   static PassRefPtr<DOMWrapperWorld> create() {
     return adoptRef(new DOMWrapperWorld());
   }
+  virtual ~DOMWrapperWorld() {}
 
  protected:
   DOMWrapperWorld();
