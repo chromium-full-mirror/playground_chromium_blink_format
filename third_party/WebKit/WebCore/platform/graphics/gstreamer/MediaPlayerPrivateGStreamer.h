@@ -76,11 +76,9 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
   bool hasAudio() const;
 
   void load(const String& url);
-  void commitLoad();
   void cancelLoad();
   bool loadNextLocation();
 
-  void prepareToPlay();
   void play();
   void pause();
 
@@ -183,8 +181,6 @@ class MediaPlayerPrivate : public MediaPlayerPrivateInterface {
   guint m_fillTimeoutId;
   float m_maxTimeLoaded;
   int m_bufferingPercentage;
-  MediaPlayer::Preload m_preload;
-  bool m_delayingLoad;
 };
 }
 
