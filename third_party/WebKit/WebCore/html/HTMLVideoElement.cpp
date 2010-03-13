@@ -196,7 +196,7 @@ bool HTMLVideoElement::hasAvailableVideoFrame() const {
   return player()->hasAvailableVideoFrame();
 }
 
-void HTMLVideoElement::webkitEnterFullScreen(bool isUserGesture,
+void HTMLVideoElement::webkitEnterFullscreen(bool isUserGesture,
                                              ExceptionCode& ec) {
   if (isFullscreen())
     return;
@@ -212,7 +212,7 @@ void HTMLVideoElement::webkitEnterFullScreen(bool isUserGesture,
   enterFullscreen();
 }
 
-void HTMLVideoElement::webkitExitFullScreen() {
+void HTMLVideoElement::webkitExitFullscreen() {
   if (isFullscreen())
     exitFullscreen();
 }

@@ -139,7 +139,7 @@ class FullscreenVideoController : QTMovieWinFullscreenClient,
   void beginScrubbing();
   void endScrubbing();
 
-  WebCore::IntPoint fullScreenToHUDCoordinates(
+  WebCore::IntPoint fullscreenToHUDCoordinates(
       const WebCore::IntPoint& point) const {
     return WebCore::IntPoint(point.x() - m_hudPosition.x(),
                              point.y() - m_hudPosition.y());
