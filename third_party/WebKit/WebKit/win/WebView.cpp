@@ -779,8 +779,10 @@ void WebView::deleteBackingStore() {
   }
   m_backingStoreBitmap.clear();
   m_backingStoreDirtyRegion.clear();
+#if USE(ACCELERATED_COMPOSITING)
   if (m_layerRenderer)
     m_layerRenderer->setBackingStoreDirty(false);
+#endif
 
   m_backingStoreSize.cx = m_backingStoreSize.cy = 0;
 }
@@ -831,8 +833,10 @@ void WebView::addToDirtyRegion(HRGN newRegion) {
   } else
     m_backingStoreDirtyRegion.set(newRegion);
 
+#if USE(ACCELERATED_COMPOSITING)
   if (m_layerRenderer)
     m_layerRenderer->setBackingStoreDirty(true);
+#endif
 
   if (m_uiDelegatePrivate)
     m_uiDelegatePrivate->webViewDidInvalidate(this);
@@ -970,8 +974,10 @@ void WebView::updateBackingStore(FrameView* frameView,
       m_uiDelegatePrivate->webViewPainted(this);
 
     m_backingStoreDirtyRegion.clear();
+#if USE(ACCELERATED_COMPOSITING)
     if (m_layerRenderer)
       m_layerRenderer->setBackingStoreDirty(false);
+#endif
   }
 
   if (!dc) {
