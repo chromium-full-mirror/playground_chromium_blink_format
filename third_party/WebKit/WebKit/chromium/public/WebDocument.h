@@ -68,6 +68,7 @@ class WebDocument : public WebNode {
   WEBKIT_API WebFrame* frame() const;
   WEBKIT_API bool isHTMLDocument() const;
   WEBKIT_API WebURL baseURL() const;
+  WEBKIT_API WebURL firstPartyForCookies() const;
   WEBKIT_API WebElement documentElement() const;
   WEBKIT_API WebElement body() const;
   WEBKIT_API WebElement head();
