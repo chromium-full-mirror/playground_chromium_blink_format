@@ -31,12 +31,6 @@
 
 #include "WebKitDLL.h"
 
-#include <CoreFoundation/CFString.h>
-#if PLATFORM(CG)
-#include <WebKitSystemInterface/WebKitSystemInterface.h>
-#endif
-#include <wtf/RetainPtr.h>
-
 WebTextRenderer* WebTextRenderer::createInstance() {
   WebTextRenderer* instance = new WebTextRenderer;
   instance->AddRef();
@@ -84,12 +78,5 @@ HRESULT STDMETHODCALLTYPE WebTextRenderer::registerPrivateFont(
   if (!AddFontResourceEx(fontFilePath, FR_PRIVATE, 0))
     return E_FAIL;
 
-  RetainPtr<CFStringRef> string(
-      AdoptCF, CFStringCreateWithCharacters(
-                   0, reinterpret_cast<const UniChar*>(fontFilePath),
-                   static_cast<CFIndex>(wcslen(fontFilePath))));
-#if PLATFORM(CG)
-  wkAddFontsAtPath(string.get());
-#endif
   return S_OK;
 }

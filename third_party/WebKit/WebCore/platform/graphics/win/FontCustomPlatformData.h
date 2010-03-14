@@ -33,10 +33,8 @@ class FontPlatformData;
 class SharedBuffer;
 
 struct FontCustomPlatformData : Noncopyable {
-  FontCustomPlatformData(CGFontRef cgFont,
-                         HANDLE fontReference,
-                         const String& name)
-      : m_cgFont(cgFont), m_fontReference(fontReference), m_name(name) {}
+  FontCustomPlatformData(HANDLE fontReference, const String& name)
+      : m_fontReference(fontReference), m_name(name) {}
 
   ~FontCustomPlatformData();
 
@@ -45,7 +43,6 @@ struct FontCustomPlatformData : Noncopyable {
                                     bool italic,
                                     FontRenderingMode = NormalRenderingMode);
 
-  CGFontRef m_cgFont;
   HANDLE m_fontReference;
   String m_name;
 };

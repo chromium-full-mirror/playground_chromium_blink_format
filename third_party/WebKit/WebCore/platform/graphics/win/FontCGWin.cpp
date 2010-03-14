@@ -361,14 +361,9 @@ void Font::drawGlyphs(GraphicsContext* graphicsContext,
       ASSERT_NOT_REACHED();
   }
 
-  if (font->platformData().useGDI()) {
-    static bool canCreateCGFontWithLOGFONT = wkCanCreateCGFontWithLOGFONT();
-    if (!shouldUseFontSmoothing ||
-        !canCreateCGFontWithLOGFONT &&
-            (graphicsContext->textDrawingMode() & cTextStroke)) {
-      drawGDIGlyphs(graphicsContext, font, glyphBuffer, from, numGlyphs, point);
-      return;
-    }
+  if (font->platformData().useGDI() && !shouldUseFontSmoothing) {
+    drawGDIGlyphs(graphicsContext, font, glyphBuffer, from, numGlyphs, point);
+    return;
   }
 
   uint32_t oldFontSmoothingStyle =

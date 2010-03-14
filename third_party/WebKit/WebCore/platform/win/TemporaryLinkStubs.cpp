@@ -38,8 +38,4 @@ String signedPublicKeyAndChallengeString(unsigned, const String&, const KURL&) {
 void getSupportedKeySizes(Vector<String>&) {
   notImplemented();
 }
-#if PLATFORM(CAIRO)
-void populateFontDatabase() { /* Not needed for GDI fonts */
-}
-#endif
 }  // namespace WebCore

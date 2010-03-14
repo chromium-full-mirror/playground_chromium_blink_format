@@ -572,24 +572,18 @@ FontPlatformData* FontCache::createFontPlatformData(
   bool useGDI = fontDescription.renderingMode() == AlternateRenderingMode &&
                 !isLucidaGrande;
 
-// The logical size constant is 32. We do this for subpixel precision when
-// rendering using Uniscribe.
-// This masks rounding errors related to the HFONT metrics being  different from
-// the CGFont metrics.
-// FIXME: We will eventually want subpixel precision for GDI mode, but the
-// scaled rendering doesn't
-// look as nice. That may be solvable though.
-#if PLATFORM(CG)
-  bool canCreateCGFontWithLOGFONT = wkCanCreateCGFontWithLOGFONT();
-#else
-  bool canCreateCGFontWithLOGFONT = true;
-#endif
+  // The logical size constant is 32. We do this for subpixel precision when
+  // rendering using Uniscribe.
+  // This masks rounding errors related to the HFONT metrics being  different
+  // from the CGFont metrics.
+  // FIXME: We will eventually want subpixel precision for GDI mode, but the
+  // scaled rendering doesn't
+  // look as nice. That may be solvable though.
   LONG weight =
       adjustedGDIFontWeight(toGDIFontWeight(fontDescription.weight()), family);
-  HFONT hfont =
-      createGDIFont(family, weight, fontDescription.italic(),
-                    fontDescription.computedPixelSize() * (useGDI ? 1 : 32),
-                    useGDI && canCreateCGFontWithLOGFONT);
+  HFONT hfont = createGDIFont(
+      family, weight, fontDescription.italic(),
+      fontDescription.computedPixelSize() * (useGDI ? 1 : 32), useGDI);
 
   if (!hfont)
     return 0;
