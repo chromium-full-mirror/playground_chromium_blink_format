@@ -38,7 +38,8 @@ class HTMLFormControlElement : public HTMLElement {
  public:
   HTMLFormControlElement(const QualifiedName& tagName,
                          Document*,
-                         HTMLFormElement*);
+                         HTMLFormElement*,
+                         ConstructionType = CreateElementZeroRefCount);
   virtual ~HTMLFormControlElement();
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }

@@ -79,6 +79,7 @@ enum ControlPart {
   MenulistTextPart,
   MenulistTextFieldPart,
   OuterSpinButtonPart,
+  ProgressBarPart,
   SliderHorizontalPart,
   SliderVerticalPart,
   SliderThumbHorizontalPart,
