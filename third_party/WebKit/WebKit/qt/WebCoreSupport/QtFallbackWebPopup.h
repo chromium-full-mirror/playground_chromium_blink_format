@@ -48,6 +48,9 @@ class QtFallbackWebPopup : public QObject, public QtAbstractWebPopup {
   QGraphicsProxyWidget* m_proxy;
 
   void populate();
+#if ENABLE(SYMBIAN_DIALOG_PROVIDERS)
+  void showS60BrowserDialog();
+#endif
 };
 
 class QtFallbackWebPopupCombo : public QComboBox {
