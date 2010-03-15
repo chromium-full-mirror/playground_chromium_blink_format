@@ -92,6 +92,7 @@ gboolean mediaPlayerPrivateMessageCallback(GstBus* bus,
   MediaPlayerPrivate* mp = reinterpret_cast<MediaPlayerPrivate*>(data);
   bool issueError = true;
   bool attemptNextLocation = false;
+  GstElement* pipeline = mp->pipeline();
 
   if (message->structure) {
     const gchar* messageTypeName = gst_structure_get_name(message->structure);
@@ -136,7 +137,10 @@ gboolean mediaPlayerPrivateMessageCallback(GstBus* bus,
       mp->didEnd();
       break;
     case GST_MESSAGE_STATE_CHANGED:
-      mp->updateStates();
+      // Ignore state changes from internal elements. They are
+      // forwarded to playbin2 anyway.
+      if (GST_MESSAGE_SRC(message) == reinterpret_cast<GstObject*>(pipeline))
+        mp->updateStates();
       break;
     case GST_MESSAGE_BUFFERING:
       mp->processBufferingStats(message);
