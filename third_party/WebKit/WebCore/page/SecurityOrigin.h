@@ -119,7 +119,7 @@ class SecurityOrigin : public ThreadSafeShared<SecurityOrigin> {
   bool isSandboxed(SandboxFlags mask) const { return m_sandboxFlags & mask; }
 
   bool canAccessDatabase() const { return !isUnique(); }
-  bool canAccessStorage() const { return !isUnique(); }
+  bool canAccessLocalStorage() const { return !isUnique(); }
   bool canAccessCookies() const { return !isUnique(); }
 
   bool isSecureTransitionTo(const KURL&) const;

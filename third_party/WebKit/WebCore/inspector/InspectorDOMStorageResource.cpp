@@ -105,8 +105,9 @@ void InspectorDOMStorageResource::handleEvent(ScriptExecutionContext*,
   ASSERT(eventNames().storageEvent == event->type());
   StorageEvent* storageEvent = static_cast<StorageEvent*>(event);
   Storage* storage = storageEvent->storageArea();
+  ExceptionCode ec = 0;
   bool isLocalStorage =
-      storage->frame()->domWindow()->localStorage() == storage;
+      (storage->frame()->domWindow()->localStorage(ec) == storage && !ec);
   if (isSameHostAndType(storage->frame(), isLocalStorage))
     m_frontend->updateDOMStorage(m_id);
 }
