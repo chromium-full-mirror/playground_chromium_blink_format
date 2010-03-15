@@ -145,6 +145,10 @@ inline double trunc(double num) {
 
 #if COMPILER(MSVC)
 
+inline long long abs(long long num) {
+  return _abs64(num);
+}
+
 inline bool isinf(double num) {
   return !_finite(num) && !_isnan(num);
 }
