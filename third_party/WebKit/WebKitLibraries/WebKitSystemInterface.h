@@ -218,6 +218,8 @@ BOOL WKCGContextIsBitmapContext(CGContextRef context);
 void WKGetWheelEventDeltas(NSEvent*,
                            float* deltaX,
                            float* deltaY,
+                           float* wheelTicksX,
+                           float* wheelTicksY,
                            BOOL* continuous);
 
 BOOL WKAppVersionCheckLessThan(NSString*, int, double);

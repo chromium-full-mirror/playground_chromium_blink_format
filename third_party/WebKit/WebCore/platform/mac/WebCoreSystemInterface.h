@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, 2007, 2008 Apple Inc. All rights reserved.
+ * Copyright 2006, 2007, 2008, 2010 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -139,6 +139,8 @@ extern BOOL (*wkGetNSURLResponseMustRevalidate)(NSURLResponse* response);
 extern void (*wkGetWheelEventDeltas)(NSEvent*,
                                      float* deltaX,
                                      float* deltaY,
+                                     float* wheelTicksX,
+                                     float* wheelTicksY,
                                      BOOL* continuous);
 extern BOOL (*wkHitTestMediaUIPart)(int part,
                                     int themeStyle,
