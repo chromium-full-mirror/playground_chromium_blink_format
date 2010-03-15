@@ -276,6 +276,13 @@ void QWebSettingsPrivate::apply() {
         global->attributes.value(QWebSettings::XSSAuditorEnabled));
     settings->setXSSAuditorEnabled(value);
 
+#if ENABLE(TILED_BACKING_STORE)
+    value = attributes.value(
+        QWebSettings::TiledBackingStoreEnabled,
+        global->attributes.value(QWebSettings::TiledBackingStoreEnabled));
+    settings->setTiledBackingStoreEnabled(value);
+#endif
+
     settings->setUsesPageCache(WebCore::pageCache()->capacity());
   } else {
     QList<QWebSettingsPrivate*> settings = *::allSettings();

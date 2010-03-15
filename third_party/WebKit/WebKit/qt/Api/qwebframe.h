@@ -229,6 +229,7 @@ class QWEBKIT_EXPORT QWebFrame : public QObject {
   void pageChanged();
 
  private:
+  friend class QGraphicsWebView;
   friend class QWebPage;
   friend class QWebPagePrivate;
   friend class QWebFramePrivate;
