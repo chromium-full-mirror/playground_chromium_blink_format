@@ -357,7 +357,7 @@ void QWebFramePrivate::renderContentsLayerAbsoluteCoords(
   if (!frame->tiledBackingStore())
     view->layoutIfNeededRecursive();
 #else
-  view->layoutIfNeededRecursive()
+  view->layoutIfNeededRecursive();
 #endif
 
   for (int i = 0; i < vector.size(); ++i) {
