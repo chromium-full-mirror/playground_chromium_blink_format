@@ -136,13 +136,13 @@ class JPEGImageReader {
     jpeg_destroy_decompress(&m_info);
   }
 
-  void skipBytes(long num_bytes) {
+  void skipBytes(long numBytes) {
     decoder_source_mgr* src = (decoder_source_mgr*)m_info.src;
-    long bytesToSkip = std::min(num_bytes, (long)src->pub.bytes_in_buffer);
+    long bytesToSkip = std::min(numBytes, (long)src->pub.bytes_in_buffer);
     src->pub.bytes_in_buffer -= (size_t)bytesToSkip;
     src->pub.next_input_byte += bytesToSkip;
 
-    m_bytesToSkip = std::max(num_bytes - bytesToSkip, static_cast<long>(0));
+    m_bytesToSkip = std::max(numBytes - bytesToSkip, static_cast<long>(0));
   }
 
   bool decode(const Vector<char>& data, bool onlySize) {
@@ -366,16 +366,6 @@ JPEGImageDecoder::JPEGImageDecoder() {}
 
 JPEGImageDecoder::~JPEGImageDecoder() {}
 
-void JPEGImageDecoder::setData(SharedBuffer* data, bool allDataReceived) {
-  if (failed())
-    return;
-
-  ImageDecoder::setData(data, allDataReceived);
-
-  if (!m_reader && !failed())
-    m_reader.set(new JPEGImageReader(this));
-}
-
 bool JPEGImageDecoder::isSizeAvailable() {
   if (!ImageDecoder::isSizeAvailable())
     decode(true);
@@ -474,8 +464,11 @@ void JPEGImageDecoder::jpegComplete() {
 }
 
 void JPEGImageDecoder::decode(bool onlySize) {
-  if (failed() || !m_reader)
+  if (failed())
     return;
+
+  if (!m_reader)
+    m_reader.set(new JPEGImageReader(this));
 
   if (!m_reader->decode(m_data->buffer(), onlySize))
     setFailed();

@@ -212,8 +212,8 @@ class ImageDecoder : public Noncopyable {
   ImageDecoder()
       : m_scaled(false),
         m_sizeAvailable(false),
-        m_isAllDataReceived(false),
         m_maxNumPixels(-1),
+        m_isAllDataReceived(false),
         m_failed(false) {}
 
   virtual ~ImageDecoder() {}
@@ -318,10 +318,10 @@ class ImageDecoder : public Noncopyable {
   int scaledY(int origY, int searchStart = 0);
 
   RefPtr<SharedBuffer> m_data;  // The encoded data.
+  Vector<RGBA32Buffer> m_frameBufferCache;
+  bool m_scaled;
   Vector<int> m_scaledColumns;
   Vector<int> m_scaledRows;
-  bool m_scaled;
-  Vector<RGBA32Buffer> m_frameBufferCache;
 
  private:
   // Some code paths compute the size of the image as "width * height * 4"
@@ -336,8 +336,8 @@ class ImageDecoder : public Noncopyable {
 
   IntSize m_size;
   bool m_sizeAvailable;
-  bool m_isAllDataReceived;
   int m_maxNumPixels;
+  bool m_isAllDataReceived;
   bool m_failed;
 };
 
