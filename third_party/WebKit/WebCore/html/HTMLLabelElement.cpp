@@ -130,6 +130,8 @@ void HTMLLabelElement::focus(bool) {
 void HTMLLabelElement::accessKeyAction(bool sendToAnyElement) {
   if (HTMLElement* element = correspondingControl())
     element->accessKeyAction(sendToAnyElement);
+  else
+    HTMLElement::accessKeyAction(sendToAnyElement);
 }
 
 String HTMLLabelElement::accessKey() const {
