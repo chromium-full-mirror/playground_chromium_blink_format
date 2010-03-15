@@ -74,8 +74,8 @@ long long distanceInDirection(Node* start,
   // deflate both.
   deflateIfOverlapped(curRect, targetRect);
 
-  if ((curRect.isEmpty() || targetRect.isEmpty()) ||
-      (targetRect.x() < 0 || targetRect.y() < 0))
+  if (curRect.isEmpty() || targetRect.isEmpty() || targetRect.x() < 0 ||
+      targetRect.y() < 0)
     return maxDistance();
 
   if (!isRectInDirection(direction, curRect, targetRect))
@@ -103,7 +103,7 @@ long long distanceInDirection(Node* start,
   // FIXME_tonikitoo: simplify the logic here !
   if (alignment != None ||
       (candidate.node && candidate.parentAlignment >= alignment &&
-       (dest->document() == candidate.node->document()) && alignment > None)) {
+       (candidate.node->document() == dest->document()) && alignment > None)) {
     // If we are now in an higher precedent case, lets reset the current
     // |candidate|'s
     // |distance| so we force it to be bigger than the result we will get from
@@ -501,12 +501,10 @@ static void deflateIfOverlapped(IntRect& a, IntRect& b) {
   static const int fudgeFactor = -2;
 
   // Avoid negative width or height values.
-  if (fudgeFactor > 0 ||
-      ((a.width() + 2 * fudgeFactor > 0) && (a.height() + 2 * fudgeFactor > 0)))
+  if ((a.width() + 2 * fudgeFactor > 0) && (a.height() + 2 * fudgeFactor > 0))
     a.inflate(fudgeFactor);
 
-  if (fudgeFactor > 0 ||
-      ((b.width() + 2 * fudgeFactor > 0) && (b.height() + 2 * fudgeFactor > 0)))
+  if ((b.width() + 2 * fudgeFactor > 0) && (b.height() + 2 * fudgeFactor > 0))
     b.inflate(fudgeFactor);
 }
 
