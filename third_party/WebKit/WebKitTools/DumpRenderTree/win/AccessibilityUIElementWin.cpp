@@ -422,6 +422,10 @@ void AccessibilityUIElement::showMenu() {
   m_element->accDoDefaultAction(self());
 }
 
+void AccessibilityUIElement::press() {
+  // FIXME: implement
+}
+
 AccessibilityUIElement AccessibilityUIElement::disclosedRowAtIndex(
     unsigned index) {
   return 0;

@@ -443,6 +443,10 @@ void AccessibilityUIElement::decrement() {
   // FIXME: implement
 }
 
+void AccessibilityUIElement::press() {
+  // FIXME: implement
+}
+
 void AccessibilityUIElement::showMenu() {
   // FIXME: implement
 }

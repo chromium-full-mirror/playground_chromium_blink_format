@@ -95,6 +95,7 @@ class AccessibilityUIElement {
   void increment();
   void decrement();
   void showMenu();
+  void press();
 
   // Attributes - platform-independent implementations
   JSStringRef stringAttributeValue(JSStringRef attribute);
