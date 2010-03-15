@@ -131,10 +131,8 @@ bool GeolocationServiceBridgeImpl::startUpdating(
     m_bridgeId =
         getWebViewClient()->getGeolocationService()->attachBridge(this);
   getWebViewClient()->getGeolocationService()->startUpdating(
-      m_bridgeId, positionOptions->enableHighAccuracy());
-  //// FIXME: this will trigger a permission request regardless.
-  //// Is it correct? confirm with andreip.
-  // positionChanged();
+      m_bridgeId, m_GeolocationServiceChromium->frame()->document()->url(),
+      positionOptions->enableHighAccuracy());
   return true;
 }
 
