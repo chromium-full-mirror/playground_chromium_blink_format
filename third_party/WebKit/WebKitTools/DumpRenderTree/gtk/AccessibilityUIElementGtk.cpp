@@ -444,7 +444,7 @@ void AccessibilityUIElement::decrement() {
 }
 
 void AccessibilityUIElement::press() {
-  // FIXME: implement
+  atk_action_do_action(ATK_ACTION(ATK_OBJECT(m_element)), 0);
 }
 
 void AccessibilityUIElement::showMenu() {
