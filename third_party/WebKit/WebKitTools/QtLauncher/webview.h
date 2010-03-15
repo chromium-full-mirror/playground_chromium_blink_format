@@ -80,6 +80,8 @@ class WebViewGraphicsBased : public QGraphicsView {
 
   virtual void paintEvent(QPaintEvent* event);
 
+  void setResizesToContents(bool b);
+
   void setYRotation(qreal angle) {
 #if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
     QRectF r = m_item->boundingRect();
@@ -109,6 +111,7 @@ class WebViewGraphicsBased : public QGraphicsView {
   QTimer* m_updateTimer;
   bool m_measureFps;
   qreal m_yRotation;
+  bool m_resizesToContents;
 };
 
 #endif
