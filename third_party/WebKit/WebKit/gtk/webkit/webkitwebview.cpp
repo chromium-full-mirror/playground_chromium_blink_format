@@ -730,7 +730,11 @@ static void webkit_web_view_size_allocate(GtkWidget* widget,
 }
 
 static void webkit_web_view_grab_focus(GtkWidget* widget) {
+#if GTK_CHECK_VERSION(2, 18, 0)
+  if (gtk_widget_is_sensitive(widget)) {
+#else
   if (GTK_WIDGET_IS_SENSITIVE(widget)) {
+#endif
     WebKitWebView* webView = WEBKIT_WEB_VIEW(widget);
     FocusController* focusController = core(webView)->focusController();
 
