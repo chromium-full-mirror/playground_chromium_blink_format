@@ -46,9 +46,6 @@ JSString* jsString(
 
 JSString* jsSingleCharacterString(JSGlobalData*, UChar);
 JSString* jsSingleCharacterString(ExecState*, UChar);
-JSString* jsSingleCharacterSubstring(JSGlobalData*,
-                                     const UString&,
-                                     unsigned offset);
 JSString* jsSingleCharacterSubstring(ExecState*,
                                      const UString&,
                                      unsigned offset);
@@ -255,6 +252,7 @@ class JS_EXPORTCLASS JSString : public JSCell {
 
   bool canGetIndex(unsigned i) { return i < m_length; }
   JSString* getIndex(ExecState*, unsigned);
+  JSString* getIndexSlowCase(ExecState*, unsigned);
 
   static PassRefPtr<Structure> createStructure(JSValue proto) {
     return Structure::create(
@@ -401,9 +399,10 @@ inline JSString* jsSingleCharacterString(JSGlobalData* globalData, UChar c) {
                    new (globalData) JSString(globalData, UString(&c, 1)));
 }
 
-inline JSString* jsSingleCharacterSubstring(JSGlobalData* globalData,
+inline JSString* jsSingleCharacterSubstring(ExecState* exec,
                                             const UString& s,
                                             unsigned offset) {
+  JSGlobalData* globalData = &exec->globalData();
   ASSERT(offset < static_cast<unsigned>(s.size()));
   UChar c = s.data()[offset];
   if (c <= 0xFF)
@@ -429,7 +428,10 @@ inline JSString* jsNontrivialString(JSGlobalData* globalData,
 
 inline JSString* JSString::getIndex(ExecState* exec, unsigned i) {
   ASSERT(canGetIndex(i));
-  return jsSingleCharacterSubstring(&exec->globalData(), value(exec), i);
+  if (isRope())
+    return getIndexSlowCase(exec, i);
+  ASSERT(i < m_value.size());
+  return jsSingleCharacterSubstring(exec, value(exec), i);
 }
 
 inline JSString* jsString(JSGlobalData* globalData, const UString& s) {
@@ -497,11 +499,6 @@ inline JSString* jsString(ExecState* exec, const UString& s) {
 inline JSString* jsSingleCharacterString(ExecState* exec, UChar c) {
   return jsSingleCharacterString(&exec->globalData(), c);
 }
-inline JSString* jsSingleCharacterSubstring(ExecState* exec,
-                                            const UString& s,
-                                            unsigned offset) {
-  return jsSingleCharacterSubstring(&exec->globalData(), s, offset);
-}
 inline JSString* jsSubstring(ExecState* exec,
                              const UString& s,
                              unsigned offset,
@@ -530,7 +527,7 @@ ALWAYS_INLINE bool JSString::getStringPropertySlot(
   bool isStrictUInt32;
   unsigned i = propertyName.toStrictUInt32(&isStrictUInt32);
   if (isStrictUInt32 && i < m_length) {
-    slot.setValue(jsSingleCharacterSubstring(exec, value(exec), i));
+    slot.setValue(getIndex(exec, i));
     return true;
   }
 
@@ -541,7 +538,7 @@ ALWAYS_INLINE bool JSString::getStringPropertySlot(ExecState* exec,
                                                    unsigned propertyName,
                                                    PropertySlot& slot) {
   if (propertyName < m_length) {
-    slot.setValue(jsSingleCharacterSubstring(exec, value(exec), propertyName));
+    slot.setValue(getIndex(exec, propertyName));
     return true;
   }
 
