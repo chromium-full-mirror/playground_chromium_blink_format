@@ -45,8 +45,6 @@
 #endif
 #include <Settings.h>
 
-#if USE(ACCELERATED_COMPOSITING)
-
 // the overlay is here for one reason only: to have the scroll-bars and other
 // extra UI elements appear on top of any QGraphicsItems created by CSS
 // compositing layers
@@ -73,8 +71,6 @@ class QGraphicsWebViewOverlay : public QGraphicsItem {
   friend class QGraphicsWebView;
   QGraphicsWebView* q;
 };
-
-#endif
 
 class QGraphicsWebViewPrivate : public QWebPageClient {
  public:
@@ -127,7 +123,9 @@ class QGraphicsWebViewPrivate : public QWebPageClient {
 #endif
 
   void updateResizesToContentsForPage();
-  QRectF visibleRect() const;
+  QRectF graphicsItemVisibleRect() const;
+
+  void createOrDeleteOverlay();
 
   void syncLayers();
   void _q_doLoadFinished(bool success);
@@ -138,13 +136,16 @@ class QGraphicsWebViewPrivate : public QWebPageClient {
 
   bool resizesToContents;
 
-#if USE(ACCELERATED_COMPOSITING)
-  QGraphicsItem* rootGraphicsLayer;
-
   // the overlay gets instantiated when the root layer is attached, and get
   // deleted when it's detached
   QSharedPointer<QGraphicsWebViewOverlay> overlay;
 
+  // we need to put the root graphics layer behind the overlay (which contains
+  // the scrollbar)
+  enum { RootGraphicsLayerZValue, OverlayZValue };
+
+#if USE(ACCELERATED_COMPOSITING)
+  QGraphicsItem* rootGraphicsLayer;
   // we need to sync the layers if we get a special call from the WebCore
   // compositor telling us to do so. We'll get that call from ChromeClientQt
   bool shouldSync;
@@ -152,10 +153,6 @@ class QGraphicsWebViewPrivate : public QWebPageClient {
   // we have to flush quite often, so we use a meta-method instead of
   // QTimer::singleShot for putting the event in the queue
   QMetaMethod syncMetaMethod;
-
-  // we need to put the root graphics layer behind the overlay (which contains
-  // the scrollbar)
-  enum {RootGraphicsLayerZValue, OverlayZValue};
 #endif
 };
 
@@ -168,6 +165,28 @@ QGraphicsWebViewPrivate::~QGraphicsWebViewPrivate() {
     q->scene()->removeItem(rootGraphicsLayer);
   }
 #endif
+}
+
+void QGraphicsWebViewPrivate::createOrDeleteOverlay() {
+  bool useOverlay = false;
+  if (!resizesToContents) {
+#if USE(ACCELERATED_COMPOSITING)
+    useOverlay = useOverlay || rootGraphicsLayer;
+#endif
+#if ENABLE(TILED_BACKING_STORE)
+    useOverlay =
+        useOverlay ||
+        QWebFramePrivate::core(q->page()->mainFrame())->tiledBackingStore();
+#endif
+  }
+  if (useOverlay == !!overlay)
+    return;
+  if (useOverlay) {
+    overlay =
+        QSharedPointer<QGraphicsWebViewOverlay>(new QGraphicsWebViewOverlay(q));
+    overlay->setZValue(OverlayZValue);
+  } else
+    overlay.clear();
 }
 
 #if USE(ACCELERATED_COMPOSITING)
@@ -186,17 +205,9 @@ void QGraphicsWebViewPrivate::setRootGraphicsLayer(QGraphicsItem* layer) {
     layer->setFlag(QGraphicsItem::ItemClipsChildrenToShape, true);
     layer->setParentItem(q);
     layer->setZValue(RootGraphicsLayerZValue);
-    if (!overlay) {
-      overlay = QSharedPointer<QGraphicsWebViewOverlay>(
-          new QGraphicsWebViewOverlay(q));
-      overlay->setZValue(OverlayZValue);
-    }
     updateCompositingScrollPosition();
-  } else {
-    // we don't have compositing layers, we can render the scrollbars and
-    // content in one go
-    overlay.clear();
   }
+  createOrDeleteOverlay();
 }
 
 void QGraphicsWebViewPrivate::markForSync(bool scheduleSync) {
@@ -211,7 +222,6 @@ void QGraphicsWebViewPrivate::updateCompositingScrollPosition() {
     rootGraphicsLayer->setPos(-scrollPosition);
   }
 }
-
 #endif
 
 void QGraphicsWebViewPrivate::syncLayers() {
@@ -237,6 +247,7 @@ void QGraphicsWebViewPrivate::scroll(int dx,
                                      int dy,
                                      const QRect& rectToScroll) {
   q->scroll(qreal(dx), qreal(dy), QRectF(rectToScroll));
+
 #if USE(ACCELERATED_COMPOSITING)
   updateCompositingScrollPosition();
 #endif
@@ -244,9 +255,11 @@ void QGraphicsWebViewPrivate::scroll(int dx,
 
 void QGraphicsWebViewPrivate::update(const QRect& dirtyRect) {
   q->update(QRectF(dirtyRect));
-#if USE(ACCELERATED_COMPOSITING)
+
+  createOrDeleteOverlay();
   if (overlay)
     overlay->update(QRectF(dirtyRect));
+#if USE(ACCELERATED_COMPOSITING)
   syncLayers();
 #endif
 }
@@ -340,7 +353,7 @@ void QGraphicsWebViewPrivate::_q_contentsSizeChanged(const QSize& size) {
   q->setGeometry(QRectF(q->geometry().topLeft(), size));
 }
 
-QRectF QGraphicsWebViewPrivate::visibleRect() const {
+QRectF QGraphicsWebViewPrivate::graphicsItemVisibleRect() const {
   if (!q->scene())
     return QRectF();
   QList<QGraphicsView*> views = q->scene()->views();
@@ -509,15 +522,21 @@ void QGraphicsWebView::paint(QPainter* painter,
                              const QStyleOptionGraphicsItem* option,
                              QWidget*) {
 #if ENABLE(TILED_BACKING_STORE)
-  // FIXME: Scrollbars could be drawn with the overlay layer when using tiling.
   if (WebCore::TiledBackingStore* backingStore =
           QWebFramePrivate::core(page()->mainFrame())->tiledBackingStore()) {
-    // FIXME: We should set the backing store viewpart earlier than in paint.
-    backingStore->viewportChanged(WebCore::IntRect(d->visibleRect()));
+    // FIXME: We should set the backing store viewport earlier than in paint
+    if (d->resizesToContents)
+      backingStore->viewportChanged(
+          WebCore::IntRect(d->graphicsItemVisibleRect()));
+    else {
+      QRectF visibleRect(d->page->mainFrame()->scrollPosition(),
+                         d->page->mainFrame()->geometry().size());
+      backingStore->viewportChanged(WebCore::IntRect(visibleRect));
+    }
     // QWebFrame::render is a public API, bypass it for tiled rendering so
     // behavior does not need to change.
     WebCore::GraphicsContext context(painter);
-    page()->mainFrame()->d->renderContentsLayerAbsoluteCoords(
+    page()->mainFrame()->d->renderFromTiledBackingStore(
         &context, option->exposedRect.toAlignedRect());
     return;
   }
@@ -661,10 +680,8 @@ void QGraphicsWebView::setPage(QWebPage* page) {
   d->page = page;
   if (!d->page)
     return;
-#if USE(ACCELERATED_COMPOSITING)
   if (d->overlay)
     d->overlay->prepareGeometryChange();
-#endif
   d->page->d->client = d;  // set the page client
 
   QSize size = geometry().size().toSize();
@@ -759,10 +776,8 @@ qreal QGraphicsWebView::zoomFactor() const {
 /*! \reimp
 */
 void QGraphicsWebView::updateGeometry() {
-#if USE(ACCELERATED_COMPOSITING)
   if (d->overlay)
     d->overlay->prepareGeometryChange();
-#endif
 
   QGraphicsWidget::updateGeometry();
 
@@ -778,10 +793,8 @@ void QGraphicsWebView::updateGeometry() {
 void QGraphicsWebView::setGeometry(const QRectF& rect) {
   QGraphicsWidget::setGeometry(rect);
 
-#if USE(ACCELERATED_COMPOSITING)
   if (d->overlay)
     d->overlay->prepareGeometryChange();
-#endif
 
   if (!d->page)
     return;

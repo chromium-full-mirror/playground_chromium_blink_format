@@ -1876,7 +1876,7 @@ void Frame::tiledBackingStorePaintEnd(const Vector<IntRect>& paintedArea) {
   // Request repaint from the system
   for (int n = 0; n < size; ++n)
     m_page->chrome()->invalidateContentsAndWindow(
-        m_view->convertToContainingWindow(paintedArea[n]), true);
+        m_view->contentsToWindow(paintedArea[n]), false);
 }
 
 IntRect Frame::tiledBackingStoreContentsRect() {
