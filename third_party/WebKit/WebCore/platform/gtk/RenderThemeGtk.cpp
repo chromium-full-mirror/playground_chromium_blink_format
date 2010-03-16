@@ -716,7 +716,7 @@ bool RenderThemeGtk::paintMediaPlayButton(
 
   return paintMediaButton(
       paintInfo.context, r,
-      mediaElement->paused() ? m_playButton.get() : m_pauseButton.get(),
+      mediaElement->canPlay() ? m_playButton.get() : m_pauseButton.get(),
       m_panelColor, m_mediaIconSize);
 }
 
