@@ -312,7 +312,7 @@ static bool pluginGetProperty(NPObject* obj,
         buf, 256,
         "x: %d, y: %d, width: %u, height: %u, clipRect: (%u, %u, %u, %u)",
         (int)plugin->lastWindow.x, (int)plugin->lastWindow.y,
-        plugin->lastWindow.width, plugin->lastWindow.height,
+        (unsigned)plugin->lastWindow.width, (unsigned)plugin->lastWindow.height,
         plugin->lastWindow.clipRect.left, plugin->lastWindow.clipRect.top,
         plugin->lastWindow.clipRect.right - plugin->lastWindow.clipRect.left,
         plugin->lastWindow.clipRect.bottom - plugin->lastWindow.clipRect.top);
