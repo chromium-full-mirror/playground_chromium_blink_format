@@ -77,6 +77,7 @@ class Notification : public RefCounted<Notification>,
 
   bool isHTML() { return m_isHTML; }
   KURL url() { return m_notificationURL; }
+  KURL iconURL() { return m_iconURL; }
   NotificationContents& contents() { return m_contents; }
 
   DEFINE_ATTRIBUTE_EVENT_LISTENER(display);
@@ -110,6 +111,7 @@ class Notification : public RefCounted<Notification>,
 
   bool m_isHTML;
   KURL m_notificationURL;
+  KURL m_iconURL;
   NotificationContents m_contents;
 
   bool m_isShowing;
