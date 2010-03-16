@@ -52,5 +52,6 @@ class QWEBKIT_EXPORT QWebInspector : public QWidget {
   friend class QWebPage;
   friend class QWebPagePrivate;
   friend class WebCore::InspectorClientQt;
+  friend class WebCore::InspectorFrontendClientQt;
 };
 #endif

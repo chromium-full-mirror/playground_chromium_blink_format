@@ -119,18 +119,10 @@ HRESULT STDMETHODCALLTYPE WebInspector::close() {
 }
 
 HRESULT STDMETHODCALLTYPE WebInspector::attach() {
-  if (m_webView)
-    if (Page* page = m_webView->page())
-      page->inspectorController()->attachWindow();
-
   return S_OK;
 }
 
 HRESULT STDMETHODCALLTYPE WebInspector::detach() {
-  if (m_webView)
-    if (Page* page = m_webView->page())
-      page->inspectorController()->detachWindow();
-
   return S_OK;
 }
 

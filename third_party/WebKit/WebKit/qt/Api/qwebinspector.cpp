@@ -149,13 +149,18 @@ void QWebInspector::showEvent(QShowEvent* event) {
 }
 
 /*! \reimp */
-void QWebInspector::hideEvent(QHideEvent* event) {}
+void QWebInspector::hideEvent(QHideEvent* event) {
+#if ENABLE(INSPECTOR)
+  if (d->page)
+    d->page->d->inspectorController()->close();
+#endif
+}
 
 /*! \reimp */
 void QWebInspector::closeEvent(QCloseEvent* event) {
 #if ENABLE(INSPECTOR)
   if (d->page)
-    d->page->d->inspectorController()->setWindowVisible(false);
+    d->page->d->inspectorController()->close();
 #endif
 }
 

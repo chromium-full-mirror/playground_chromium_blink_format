@@ -54,6 +54,7 @@ class ChromeClientQt;
 class EditorClientQt;
 class FrameLoaderClientQt;
 class InspectorClientQt;
+class InspectorFrontendClientQt;
 class ResourceHandle;
 class HitTestResult;
 class QNetworkReplyHandler;
@@ -374,6 +375,7 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
   friend class WebCore::EditorClientQt;
   friend class WebCore::FrameLoaderClientQt;
   friend class WebCore::InspectorClientQt;
+  friend class WebCore::InspectorFrontendClientQt;
   friend class WebCore::ResourceHandle;
   friend class WebCore::QNetworkReplyHandler;
 };

@@ -161,7 +161,7 @@ void WebDevToolsAgentImpl::attach() {
     return;
   m_debuggerAgentImpl.set(new DebuggerAgentImpl(
       m_webViewImpl, m_debuggerAgentDelegateStub.get(), this));
-  resetInspectorFrontendProxy();
+  createInspectorFrontendProxy();
 
   // Allow controller to send messages to the frontend.
   InspectorController* ic = inspectorController();
@@ -177,7 +177,7 @@ void WebDevToolsAgentImpl::attach() {
     }
   }
 
-  ic->setWindowVisible(true, false);
+  setInspectorFrontendProxyToInspectorController();
   m_attached = true;
 }
 
@@ -204,7 +204,6 @@ void WebDevToolsAgentImpl::didCommitProvisionalLoad(WebFrameImpl* webframe,
   const WebURLRequest& request = ds->request();
   WebURL url = ds->hasUnreachableURL() ? ds->unreachableURL() : request.url();
   if (!webframe->parent()) {
-    resetInspectorFrontendProxy();
     m_toolsAgentDelegateStub->frameNavigate(WebCore::KURL(url).string());
     SetApuAgentEnabledInUtilityContext(m_utilityContext, m_apuAgentEnabled);
   }
@@ -342,7 +341,7 @@ v8::Local<v8::Object> WebDevToolsAgentImpl::createInspectorBackendV8Wrapper() {
   return instance;
 }
 
-void WebDevToolsAgentImpl::resetInspectorFrontendProxy() {
+void WebDevToolsAgentImpl::createInspectorFrontendProxy() {
   disposeUtilityContext();
   m_utilityContext = v8::Context::New();
   compileUtilityScripts();
@@ -352,9 +351,15 @@ void WebDevToolsAgentImpl::resetInspectorFrontendProxy() {
   v8::Context::Scope contextScope(m_utilityContext);
   ScriptState* state =
       ScriptState::forContext(v8::Local<v8::Context>::New(m_utilityContext));
+}
+
+void WebDevToolsAgentImpl::setInspectorFrontendProxyToInspectorController() {
+  v8::HandleScope scope;
+  ScriptState* state =
+      ScriptState::forContext(v8::Local<v8::Context>::New(m_utilityContext));
   InspectorController* ic = inspectorController();
-  ic->setFrontendProxyObject(state,
-                             ScriptObject(state, m_utilityContext->Global()));
+  ic->setFrontend(
+      new InspectorFrontend(ScriptObject(state, m_utilityContext->Global())));
 }
 
 void WebDevToolsAgentImpl::setApuAgentEnabled(bool enabled) {

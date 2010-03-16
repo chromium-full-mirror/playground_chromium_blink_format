@@ -66,7 +66,7 @@ class InjectedScriptHost;
 class InspectorBackend;
 class InspectorClient;
 class InspectorFrontend;
-class InspectorFrontendHost;
+class InspectorFrontendClient;
 class InspectorTimelineAgent;
 class JavaScriptCallFrame;
 class KURL;
@@ -118,15 +118,11 @@ class InspectorController
   ~InspectorController();
 
   InspectorBackend* inspectorBackend() { return m_inspectorBackend.get(); }
-  InspectorFrontendHost* inspectorFrontendHost() {
-    return m_inspectorFrontendHost.get();
-  }
   InjectedScriptHost* injectedScriptHost() {
     return m_injectedScriptHost.get();
   }
 
   void inspectedPageDestroyed();
-  void pageDestroyed() { m_page = 0; }
 
   bool enabled() const;
 
@@ -142,9 +138,7 @@ class InspectorController
   void show();
   void showPanel(SpecialPanels);
   void close();
-
-  bool windowVisible();
-  void setWindowVisible(bool visible = true, bool attached = false);
+  void disconnectFrontend();
 
   void addMessageToConsole(MessageSource,
                            MessageType,
@@ -161,21 +155,17 @@ class InspectorController
     return m_consoleMessages;
   }
 
-  bool canAttachWindow() const;
-  void attachWindow();
-  void detachWindow();
-
   bool searchingForNodeInPage() const { return m_searchingForNode; }
   void mouseDidMoveOverElement(const HitTestResult&, unsigned modifierFlags);
   void handleMousePressOnNode(Node*);
 
-  void inspectedWindowScriptObjectCleared(Frame*);
-  void windowScriptObjectAvailable();
+  void setInspectorFrontendClient(PassOwnPtr<InspectorFrontendClient> client);
+  bool hasInspectorFrontendClient() const { return m_inspectorFrontendClient; }
 
-  void setFrontendProxyObject(ScriptState* state,
-                              ScriptObject webInspectorObj,
-                              ScriptObject injectedScriptObj = ScriptObject());
-  ScriptState* frontendScriptState() const { return m_frontendScriptState; }
+  void inspectedWindowScriptObjectCleared(Frame*);
+
+  bool windowVisible();
+  void setFrontend(PassOwnPtr<InspectorFrontend>);
 
   void populateScriptObjects();
   void resetScriptObjects();
@@ -311,19 +301,13 @@ class InspectorController
   static const String& frontendSettingsSettingName();
 
   friend class InspectorBackend;
-  friend class InspectorFrontendHost;
   friend class InjectedScriptHost;
 
   // Following are used from InspectorBackend and internally.
-
   void setSearchingForNode(bool enabled);
 
-  void scriptObjectReady();
-  void moveWindowBy(float x, float y) const;
-  void setAttachedWindow(bool);
-  void setAttachedWindowHeight(unsigned height);
+  // Following are used from InspectorBackend and internally.
   void storeLastActivePanel(const String& panelName);
-  void closeWindow();
   InspectorDOMAgent* domAgent() { return m_domAgent.get(); }
   void releaseDOMAgent();
 
@@ -367,8 +351,6 @@ class InspectorController
   void pruneResources(ResourcesMap*, DocumentLoader* loaderToKeep = 0);
   void removeAllResources(ResourcesMap* map) { pruneResources(map); }
 
-  void showWindow();
-
   bool isMainResourceLoader(DocumentLoader* loader, const KURL& requestUrl);
 
   SpecialPanels specialPanelForJSName(const String& panelName);
@@ -377,10 +359,11 @@ class InspectorController
 
   Page* m_inspectedPage;
   InspectorClient* m_client;
+  OwnPtr<InspectorFrontendClient> m_inspectorFrontendClient;
+  bool m_openingFrontend;
   OwnPtr<InspectorFrontend> m_frontend;
   RefPtr<InspectorDOMAgent> m_domAgent;
   OwnPtr<InspectorTimelineAgent> m_timelineAgent;
-  Page* m_page;
   RefPtr<Node> m_nodeToFocus;
   RefPtr<InspectorResource> m_mainResource;
   ResourcesMap m_resources;
@@ -396,8 +379,6 @@ class InspectorController
 #if ENABLE(DOM_STORAGE)
   DOMStorageResourcesMap m_domStorageResources;
 #endif
-  ScriptState* m_frontendScriptState;
-  bool m_windowVisible;
   SpecialPanels m_showAfterVisible;
   RefPtr<Node> m_highlightedNode;
   unsigned m_groupLevel;
@@ -406,7 +387,6 @@ class InspectorController
   bool m_resourceTrackingEnabled;
   bool m_resourceTrackingSettingsLoaded;
   RefPtr<InspectorBackend> m_inspectorBackend;
-  RefPtr<InspectorFrontendHost> m_inspectorFrontendHost;
   RefPtr<InjectedScriptHost> m_injectedScriptHost;
 
   typedef HashMap<String, String> Settings;

@@ -49,9 +49,11 @@ class InspectorWorkerResource;
 
 class InspectorFrontend : public Noncopyable {
  public:
-  InspectorFrontend(InspectorController* inspectorController,
-                    ScriptObject webInspector);
+  InspectorFrontend(ScriptObject webInspector);
   ~InspectorFrontend();
+
+  void close();
+  void inspectedPageDestroyed();
 
   ScriptArray newScriptArray();
   ScriptObject newScriptObject();
@@ -63,8 +65,7 @@ class InspectorFrontend : public Noncopyable {
   void updateConsoleMessageExpiredCount(unsigned count);
   void addConsoleMessage(const ScriptObject& messageObj,
                          const Vector<ScriptString>& frames,
-                         ScriptState*,
-                         const Vector<ScriptValue> arguments,
+                         const Vector<RefPtr<SerializedScriptValue>>& arguments,
                          const String& message);
   void updateConsoleMessageRepeatCount(unsigned count);
   void clearConsoleMessages();
@@ -79,6 +80,9 @@ class InspectorFrontend : public Noncopyable {
   void showPanel(int panel);
   void populateInterface();
   void reset();
+
+  void bringToFront();
+  void inspectedURLChanged(const String&);
 
   void resourceTrackingWasEnabled();
   void resourceTrackingWasDisabled();

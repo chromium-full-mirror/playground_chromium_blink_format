@@ -38,6 +38,7 @@
 #include <wtf/Vector.h>
 
 namespace WebCore {
+class InjectedScriptHost;
 class InspectorFrontend;
 class ScriptCallStack;
 class ScriptString;
@@ -59,10 +60,10 @@ class ConsoleMessage : public Noncopyable {
                  bool storeTrace = false);
 
 #if ENABLE(INSPECTOR)
-  void addToConsole(InspectorFrontend* frontend);
+  void addToFrontend(InspectorFrontend*, InjectedScriptHost*);
   void updateRepeatCountInConsole(InspectorFrontend* frontend);
 #endif
-  void incrementCount() { ++m_repeatCount; };
+  void incrementCount() { ++m_repeatCount; }
   bool isEqual(ScriptState*, ConsoleMessage* msg) const;
 
   MessageSource source() const { return m_source; }
