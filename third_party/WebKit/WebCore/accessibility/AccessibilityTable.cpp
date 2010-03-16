@@ -90,6 +90,11 @@ bool AccessibilityTable::isTableExposableThroughAccessibility() {
   if (!tableNode || !tableNode->hasTagName(tableTag))
     return false;
 
+// Gtk+ ATs expect all tables to be exposed as tables.
+#if PLATFORM(GTK)
+  return true;
+#endif
+
   // if there is a caption element, summary, THEAD, or TFOOT section, it's most
   // certainly a data table
   HTMLTableElement* tableElement = static_cast<HTMLTableElement*>(tableNode);
