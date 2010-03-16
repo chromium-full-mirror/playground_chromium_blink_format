@@ -553,7 +553,7 @@ static void webKitWebSrcNeedDataCb(GstAppSrc* appsrc,
     return;
 
   priv->needDataID = g_timeout_add_full(
-      G_PRIORITY_HIGH, 0, (GSourceFunc)webKitWebSrcNeedDataMainCb,
+      G_PRIORITY_DEFAULT, 0, (GSourceFunc)webKitWebSrcNeedDataMainCb,
       gst_object_ref(src), (GDestroyNotify)gst_object_unref);
 }
 
@@ -577,7 +577,7 @@ static void webKitWebSrcEnoughDataCb(GstAppSrc* appsrc, gpointer userData) {
     return;
 
   priv->enoughDataID = g_timeout_add_full(
-      G_PRIORITY_HIGH, 0, (GSourceFunc)webKitWebSrcEnoughDataMainCb,
+      G_PRIORITY_DEFAULT, 0, (GSourceFunc)webKitWebSrcEnoughDataMainCb,
       gst_object_ref(src), (GDestroyNotify)gst_object_unref);
 }
 
@@ -608,7 +608,7 @@ static gboolean webKitWebSrcSeekDataCb(GstAppSrc* appsrc,
   if (priv->seekID)
     g_source_remove(priv->seekID);
   priv->seekID = g_timeout_add_full(
-      G_PRIORITY_HIGH, 0, (GSourceFunc)webKitWebSrcSeekMainCb,
+      G_PRIORITY_DEFAULT, 0, (GSourceFunc)webKitWebSrcSeekMainCb,
       gst_object_ref(src), (GDestroyNotify)gst_object_unref);
 
   return TRUE;

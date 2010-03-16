@@ -212,9 +212,11 @@ static GstFlowReturn webkit_video_sink_render(GstBaseSink* bsink,
     buffer = priv->buffer = newBuffer;
   }
 
-  // Use HIGH_IDLE+20 priority, like Gtk+ for redrawing operations.
+  // This should likely use a lower priority, but glib currently starves
+  // lower priority sources.
+  // See: https://bugzilla.gnome.org/show_bug.cgi?id=610830.
   priv->timeout_id = g_timeout_add_full(
-      G_PRIORITY_HIGH_IDLE + 20, 0, webkit_video_sink_timeout_func,
+      G_PRIORITY_DEFAULT, 0, webkit_video_sink_timeout_func,
       gst_object_ref(sink), (GDestroyNotify)gst_object_unref);
 
   g_cond_wait(priv->data_cond, priv->buffer_mutex);
