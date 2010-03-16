@@ -115,6 +115,9 @@ class Settings : public Noncopyable {
   bool loadsImagesAutomatically() const { return m_loadsImagesAutomatically; }
 
   void setJavaScriptEnabled(bool);
+  // Instead of calling isJavaScriptEnabled directly, please consider calling
+  // ScriptController::canExecuteScripts, which takes things like the
+  // HTML sandbox attribute into account.
   bool isJavaScriptEnabled() const { return m_isJavaScriptEnabled; }
 
   void setWebSecurityEnabled(bool);

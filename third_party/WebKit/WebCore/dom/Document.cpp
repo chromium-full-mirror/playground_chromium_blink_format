@@ -471,7 +471,7 @@ Document::Document(Frame* frame, bool isXHTML, bool isHTML)
   m_docID = docID++;
 #if ENABLE(XHTMLMP)
   m_shouldProcessNoScriptElement =
-      settings() && !settings()->isJavaScriptEnabled();
+      m_frame->script()->canExecuteScripts(NotAboutToExecuteScript);
 #endif
 }
 
