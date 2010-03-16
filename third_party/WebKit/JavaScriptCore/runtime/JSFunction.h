@@ -71,7 +71,7 @@ class JSFunction : public InternalFunction {
   }
 
   NativeFunction nativeFunction() {
-    return *bitwise_cast<NativeFunction*>(m_data);
+    return *WTF::bitwise_cast<NativeFunction*>(m_data);
   }
 
   virtual ConstructType getConstructData(ConstructData&);
@@ -113,7 +113,7 @@ class JSFunction : public InternalFunction {
   RefPtr<ExecutableBase> m_executable;
   ScopeChain& scopeChain() {
     ASSERT(!isHostFunctionNonInline());
-    return *bitwise_cast<ScopeChain*>(m_data);
+    return *WTF::bitwise_cast<ScopeChain*>(m_data);
   }
   void clearScopeChain() {
     ASSERT(!isHostFunctionNonInline());
@@ -125,10 +125,10 @@ class JSFunction : public InternalFunction {
   }
   void setScopeChain(const ScopeChain& sc) {
     ASSERT(!isHostFunctionNonInline());
-    *bitwise_cast<ScopeChain*>(m_data) = sc;
+    *WTF::bitwise_cast<ScopeChain*>(m_data) = sc;
   }
   void setNativeFunction(NativeFunction func) {
-    *bitwise_cast<NativeFunction*>(m_data) = func;
+    *WTF::bitwise_cast<NativeFunction*>(m_data) = func;
   }
   unsigned char m_data[sizeof(void*)];
 };

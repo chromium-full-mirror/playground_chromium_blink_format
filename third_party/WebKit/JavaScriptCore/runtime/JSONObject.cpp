@@ -338,7 +338,7 @@ void Stringifier::appendQuotedString(StringBuilder& builder,
                        hexDigits[(ch >> 8) & 0xF],
                        hexDigits[(ch >> 4) & 0xF],
                        hexDigits[ch & 0xF]};
-        builder.append(hex, arrayLength(hex));
+        builder.append(hex, sizeof(hex) / sizeof(UChar));
         break;
     }
   }
@@ -370,7 +370,7 @@ inline JSValue Stringifier::toJSON(
     return value;
 
   JSValue list[] = {propertyName.value(m_exec)};
-  ArgList args(list, arrayLength(list));
+  ArgList args(list, sizeof(list) / sizeof(JSValue));
   return call(m_exec, object, callType, callData, value, args);
 }
 
@@ -387,7 +387,7 @@ Stringifier::StringifyResult Stringifier::appendStringifiedValue(
   // Call the replacer function.
   if (m_replacerCallType != CallTypeNone) {
     JSValue list[] = {propertyName.value(m_exec), value};
-    ArgList args(list, arrayLength(list));
+    ArgList args(list, sizeof(list) / sizeof(JSValue));
     value = call(m_exec, m_replacer, m_replacerCallType, m_replacerCallData,
                  holder, args);
     if (m_exec->hadException())
