@@ -122,6 +122,7 @@ class FrameLoaderClientImpl : public WebCore::FrameLoaderClient {
   virtual void dispatchWillPerformClientRedirect(const WebCore::KURL&,
                                                  double interval,
                                                  double fireDate);
+  virtual void dispatchDidNavigateWithinPage();
   virtual void dispatchDidChangeLocationWithinPage();
   virtual void dispatchDidPushStateWithinPage();
   virtual void dispatchDidReplaceStateWithinPage();
@@ -265,9 +266,6 @@ class FrameLoaderClientImpl : public WebCore::FrameLoaderClient {
   static bool actionSpecifiesNavigationPolicy(
       const WebCore::NavigationAction& action,
       WebNavigationPolicy* policy);
-
-  // Called when a dummy back-forward navigation is intercepted.
-  void handleBackForwardNavigation(const WebCore::KURL&);
 
   PassOwnPtr<WebPluginLoadObserver> pluginLoadObserver();
 

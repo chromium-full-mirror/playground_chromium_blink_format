@@ -143,6 +143,7 @@ class FrameLoaderClient {
   virtual void dispatchWillPerformClientRedirect(const KURL&,
                                                  double interval,
                                                  double fireDate) = 0;
+  virtual void dispatchDidNavigateWithinPage() {}
   virtual void dispatchDidChangeLocationWithinPage() = 0;
   virtual void dispatchDidPushStateWithinPage() = 0;
   virtual void dispatchDidReplaceStateWithinPage() = 0;

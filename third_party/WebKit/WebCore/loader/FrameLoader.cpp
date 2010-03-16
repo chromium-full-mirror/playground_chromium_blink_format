@@ -1958,6 +1958,8 @@ void FrameLoader::loadInSameDocument(const KURL& url,
     checkLoadComplete();
   }
 
+  m_client->dispatchDidNavigateWithinPage();
+
   if (stateObject) {
     m_frame->document()->statePopped(stateObject);
     m_client->dispatchDidPopStateWithinPage();
