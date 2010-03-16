@@ -27,6 +27,7 @@
 
 namespace WebCore {
 
+class Element;
 class Frame;
 class IntRect;
 class Node;
@@ -100,6 +101,7 @@ struct FocusCandidate {
 
 long long distanceInDirection(Node*, Node*, FocusDirection, FocusCandidate&);
 bool scrollInDirection(Frame*, FocusDirection);
+void scrollIntoView(Element*);
 bool hasOffscreenRect(Node*);
 bool isInRootDocument(Node*);
 
