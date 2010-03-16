@@ -432,8 +432,7 @@ void JSGlobalObject::reset(JSValue prototype) {
                              JSONObject::createStructure(d()->objectPrototype)),
                          DontEnum | DontDelete)};
 
-  addStaticGlobals(staticGlobals,
-                   sizeof(staticGlobals) / sizeof(GlobalPropertyInfo));
+  addStaticGlobals(staticGlobals, arrayLength(staticGlobals));
 
   // Set global functions.
 

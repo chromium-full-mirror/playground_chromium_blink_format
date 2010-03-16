@@ -162,7 +162,7 @@ UString::UString(const UChar* c, unsigned length)
 
 UString UString::from(int i) {
   UChar buf[1 + sizeof(i) * 3];
-  UChar* end = buf + sizeof(buf) / sizeof(UChar);
+  UChar* end = buf + arrayLength(buf);
   UChar* p = end;
 
   if (i == 0)
@@ -190,7 +190,7 @@ UString UString::from(int i) {
 
 UString UString::from(long long i) {
   UChar buf[1 + sizeof(i) * 3];
-  UChar* end = buf + sizeof(buf) / sizeof(UChar);
+  UChar* end = buf + arrayLength(buf);
   UChar* p = end;
 
   if (i == 0)
@@ -224,7 +224,7 @@ UString UString::from(long long i) {
 
 UString UString::from(unsigned int u) {
   UChar buf[sizeof(u) * 3];
-  UChar* end = buf + sizeof(buf) / sizeof(UChar);
+  UChar* end = buf + arrayLength(buf);
   UChar* p = end;
 
   if (u == 0)
@@ -241,7 +241,7 @@ UString UString::from(unsigned int u) {
 
 UString UString::from(long l) {
   UChar buf[1 + sizeof(l) * 3];
-  UChar* end = buf + sizeof(buf) / sizeof(UChar);
+  UChar* end = buf + arrayLength(buf);
   UChar* p = end;
 
   if (l == 0)
