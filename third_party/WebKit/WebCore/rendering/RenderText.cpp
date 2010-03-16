@@ -48,11 +48,6 @@ using namespace Unicode;
 
 namespace WebCore {
 
-// FIXME: Move to StringImpl.h eventually.
-static inline bool charactersAreAllASCII(StringImpl* text) {
-  return charactersAreAllASCII(text->characters(), text->length());
-}
-
 RenderText::RenderText(Node* node, PassRefPtr<StringImpl> str)
     : RenderObject(node),
       m_minWidth(-1),
@@ -65,7 +60,7 @@ RenderText::RenderText(Node* node, PassRefPtr<StringImpl> str)
       m_hasTab(false),
       m_linesDirty(false),
       m_containsReversedText(false),
-      m_isAllASCII(charactersAreAllASCII(m_text.get())),
+      m_isAllASCII(m_text.containsOnlyASCII()),
       m_knownNotToUseFallbackFonts(false) {
   ASSERT(m_text);
 
@@ -474,8 +469,10 @@ ALWAYS_INLINE int RenderText::widthFromCache(
     bool isSpace;
     bool previousCharWasSpace = true;  // FIXME: Preserves historical behavior,
                                        // but seems wrong for start > 0.
+    ASSERT(m_text);
+    StringImpl& text = *m_text.impl();
     for (int i = start; i < start + len; i++) {
-      char c = (*m_text)[i];
+      char c = text[i];
       if (c <= ' ') {
         if (c == ' ' || c == '\n') {
           w += monospaceCharacterWidth;
@@ -525,7 +522,7 @@ void RenderText::trimmedPrefWidths(int leadWidth,
 
   int len = textLength();
 
-  if (!len || (stripFrontSpaces && m_text->containsOnlyWhitespace())) {
+  if (!len || (stripFrontSpaces && text()->containsOnlyWhitespace())) {
     beginMinW = 0;
     endMinW = 0;
     beginMaxW = 0;
@@ -545,9 +542,10 @@ void RenderText::trimmedPrefWidths(int leadWidth,
   hasBreakableChar = m_hasBreakableChar;
   hasBreak = m_hasBreak;
 
-  if ((*m_text)[0] == ' ' ||
-      ((*m_text)[0] == '\n' && !style()->preserveNewline()) ||
-      (*m_text)[0] == '\t') {
+  ASSERT(m_text);
+  StringImpl& text = *m_text.impl();
+  if (text[0] == ' ' || (text[0] == '\n' && !style()->preserveNewline()) ||
+      text[0] == '\t') {
     const Font& f = style()->font();  // FIXME: This ignores first-line.
     if (stripFrontSpaces) {
       const UChar space = ' ';
@@ -570,7 +568,7 @@ void RenderText::trimmedPrefWidths(int leadWidth,
     endMaxW = maxW;
     for (int i = 0; i < len; i++) {
       int linelen = 0;
-      while (i + linelen < len && (*m_text)[i + linelen] != '\n')
+      while (i + linelen < len && text[i + linelen] != '\n')
         linelen++;
 
       if (linelen) {
@@ -830,10 +828,12 @@ bool RenderText::isAllCollapsibleWhitespace() {
 }
 
 bool RenderText::containsOnlyWhitespace(unsigned from, unsigned len) const {
+  ASSERT(m_text);
+  StringImpl& text = *m_text.impl();
   unsigned currPos;
-  for (currPos = from; currPos < from + len && ((*m_text)[currPos] == '\n' ||
-                                                (*m_text)[currPos] == ' ' ||
-                                                (*m_text)[currPos] == '\t');
+  for (currPos = from;
+       currPos < from + len &&
+       (text[currPos] == '\n' || text[currPos] == ' ' || text[currPos] == '\t');
        currPos++) {
   }
   return currPos >= (from + len);
@@ -1010,7 +1010,7 @@ void RenderText::setTextInternal(PassRefPtr<StringImpl> text) {
       // characters, including
       // leading, trailing and multiple contiguous space characters.
 
-      m_text = m_text->replace('\n', ' ');
+      m_text.replace('\n', ' ');
 
       // If xml:space="preserve" is set, white-space is set to "pre", which
       // preserves leading, trailing & contiguous space character for us.
@@ -1024,14 +1024,14 @@ void RenderText::setTextInternal(PassRefPtr<StringImpl> text) {
       // Then, it will strip off all leading and trailing space characters.
       // Then, all contiguous space characters will be consolidated.
 
-      m_text = m_text->replace('\n', StringImpl::empty());
+      m_text.replace('\n', StringImpl::empty());
 
       // If xml:space="default" is set, white-space is set to "nowrap", which
       // handles
       // leading, trailing & contiguous space character removal for us.
     }
 
-    m_text = m_text->replace('\t', ' ');
+    m_text.replace('\t', ' ');
   }
 #endif
 
@@ -1039,15 +1039,14 @@ void RenderText::setTextInternal(PassRefPtr<StringImpl> text) {
     switch (style()->textTransform()) {
       case TTNONE:
         break;
-      case CAPITALIZE: {
-        m_text = m_text->capitalize(previousCharacter());
+      case CAPITALIZE:
+        m_text.makeCapitalized(previousCharacter());
         break;
-      }
       case UPPERCASE:
-        m_text = m_text->upper();
+        m_text.makeUpper();
         break;
       case LOWERCASE:
-        m_text = m_text->lower();
+        m_text.makeLower();
         break;
     }
 
@@ -1057,26 +1056,26 @@ void RenderText::setTextInternal(PassRefPtr<StringImpl> text) {
       case TSNONE:
         break;
       case TSCIRCLE:
-        m_text = m_text->secure(whiteBullet);
+        m_text.makeSecure(whiteBullet);
         break;
       case TSDISC:
-        m_text = m_text->secure(bullet);
+        m_text.makeSecure(bullet);
         break;
       case TSSQUARE:
-        m_text = m_text->secure(blackSquare);
+        m_text.makeSecure(blackSquare);
     }
   }
 
   ASSERT(m_text);
-  ASSERT(!isBR() || (textLength() == 1 && (*m_text)[0] == '\n'));
+  ASSERT(!isBR() || (textLength() == 1 && m_text[0] == '\n'));
 
-  m_isAllASCII = charactersAreAllASCII(m_text.get());
+  m_isAllASCII = m_text.containsOnlyASCII();
 }
 
 void RenderText::setText(PassRefPtr<StringImpl> text, bool force) {
   ASSERT(text);
 
-  if (!force && equal(m_text.get(), text.get()))
+  if (!force && equal(m_text.impl(), text.get()))
     return;
 
   setTextInternal(text);
@@ -1311,7 +1310,7 @@ unsigned RenderText::caretMaxRenderedOffset() const {
 }
 
 int RenderText::previousOffset(int current) const {
-  StringImpl* si = m_text.get();
+  StringImpl* si = m_text.impl();
   TextBreakIterator* iterator =
       cursorMovementIterator(si->characters(), si->length());
   if (!iterator)
@@ -1358,14 +1357,16 @@ inline bool isHangulLVT(UChar32 character) {
 
 int RenderText::previousOffsetForBackwardDeletion(int current) const {
 #if PLATFORM(MAC)
+  ASSERT(m_text);
+  StringImpl& text = *m_text.impl();
   UChar32 character;
   while (current > 0) {
-    if (U16_IS_TRAIL((*m_text)[--current]))
+    if (U16_IS_TRAIL(text[--current]))
       --current;
     if (current < 0)
       break;
 
-    UChar32 character = m_text->characterStartingAt(current);
+    UChar32 character = text.characterStartingAt(current);
 
     // We don't combine characters in Armenian ... Limbu range for backward
     // deletion.
@@ -1380,7 +1381,7 @@ int RenderText::previousOffsetForBackwardDeletion(int current) const {
     return current;
 
   // Hangul
-  character = m_text->characterStartingAt(current);
+  character = text.characterStartingAt(current);
   if (((character >= HANGUL_CHOSEONG_START) &&
        (character <= HANGUL_JONGSEONG_END)) ||
       ((character >= HANGUL_SYLLABLE_START) &&
@@ -1400,7 +1401,7 @@ int RenderText::previousOffsetForBackwardDeletion(int current) const {
     initialState = state;
 
     while (current > 0 &&
-           ((character = m_text->characterStartingAt(current - 1)) >=
+           ((character = text.characterStartingAt(current - 1)) >=
             HANGUL_CHOSEONG_START) &&
            (character <= HANGUL_SYLLABLE_END) &&
            ((character <= HANGUL_JONGSEONG_END) ||
@@ -1446,7 +1447,7 @@ int RenderText::previousOffsetForBackwardDeletion(int current) const {
 }
 
 int RenderText::nextOffset(int current) const {
-  StringImpl* si = m_text.get();
+  StringImpl* si = m_text.impl();
   TextBreakIterator* iterator =
       cursorMovementIterator(si->characters(), si->length());
   if (!iterator)

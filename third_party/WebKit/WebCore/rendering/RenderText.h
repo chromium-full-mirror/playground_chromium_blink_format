@@ -51,7 +51,7 @@ class RenderText : public RenderObject {
 
   virtual void destroy();
 
-  StringImpl* text() const { return m_text.get(); }
+  StringImpl* text() const { return m_text.impl(); }
 
   InlineTextBox* createInlineTextBox();
   void dirtyLineBoxes(bool fullLayout);
@@ -70,9 +70,9 @@ class RenderText : public RenderObject {
 
   virtual VisiblePosition positionForPoint(const IntPoint&);
 
-  const UChar* characters() const { return m_text->characters(); }
+  const UChar* characters() const { return m_text.characters(); }
   unsigned textLength() const {
-    return m_text->length();
+    return m_text.length();
   }  // non virtual implementation of length()
   void positionLineBox(InlineBox*);
 
@@ -202,7 +202,7 @@ class RenderText : public RenderObject {
 
   int m_minWidth;  // here to minimize padding in 64-bit.
 
-  RefPtr<StringImpl> m_text;
+  String m_text;
 
   InlineTextBox* m_firstTextBox;
   InlineTextBox* m_lastTextBox;
