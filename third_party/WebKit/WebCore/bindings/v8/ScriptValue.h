@@ -107,6 +107,8 @@ class ScriptValue {
   PassRefPtr<SerializedScriptValue> serialize(ScriptState*);
   static ScriptValue deserialize(ScriptState*, SerializedScriptValue*);
 
+  static ScriptValue undefined() { return ScriptValue(v8::Undefined()); }
+
   void clear() {
     if (m_value.IsEmpty())
       return;
