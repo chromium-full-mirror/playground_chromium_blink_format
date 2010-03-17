@@ -123,6 +123,7 @@ class InspectorBackend : public RefCounted<InspectorBackend> {
   void removeNode(long callId, long nodeId);
 
   void getStyles(long callId, long nodeId, bool authOnly);
+  void getAllStyles(long callId);
   void getInlineStyle(long callId, long nodeId);
   void getComputedStyle(long callId, long nodeId);
   void applyStyleText(long callId,

@@ -101,6 +101,7 @@ class InspectorDOMAgent : public EventListener {
 
   // Methods called from the frontend for CSS styles inspection.
   void getStyles(long callId, long nodeId, bool authorOnly);
+  void getAllStyles(long callId);
   void getInlineStyle(long callId, long nodeId);
   void getComputedStyle(long callId, long nodeId);
   void applyStyleText(long callId,
@@ -180,6 +181,7 @@ class InspectorDOMAgent : public EventListener {
   void populateObjectWithStyleProperties(CSSStyleDeclaration*,
                                          ScriptObject& result);
   ScriptObject buildObjectForRule(CSSStyleRule*);
+  ScriptObject buildObjectForStyleSheet(CSSStyleSheet*);
   Vector<String> uniqueStyleProperties(CSSStyleDeclaration*);
   Vector<String> longhandProperties(CSSStyleDeclaration*,
                                     const String& shorthandProperty);
