@@ -169,6 +169,14 @@ ScriptObject TimelineRecordFactory::createResourceFinishData(
   return data;
 }
 
+ScriptObject TimelineRecordFactory::createReceiveResourceData(
+    InspectorFrontend* frontend,
+    unsigned long identifier) {
+  ScriptObject data = frontend->newScriptObject();
+  data.set("identifier", identifier);
+  return data;
+}
+
 ScriptObject TimelineRecordFactory::createPaintData(InspectorFrontend* frontend,
                                                     const IntRect& rect) {
   ScriptObject data = frontend->newScriptObject();

@@ -81,6 +81,9 @@ class TimelineRecordFactory {
       unsigned long identifier,
       const ResourceResponse&);
 
+  static ScriptObject createReceiveResourceData(InspectorFrontend*,
+                                                unsigned long identifier);
+
   static ScriptObject createResourceFinishData(InspectorFrontend*,
                                                unsigned long identifier,
                                                bool didFail);
