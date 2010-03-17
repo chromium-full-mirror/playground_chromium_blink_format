@@ -351,6 +351,9 @@ void WebPreferences::initializeDefaultSettings() {
                        CFSTR(WebKitAcceleratedCompositingEnabledPreferenceKey),
                        kCFBooleanTrue);
 
+  CFDictionaryAddValue(defaults, CFSTR(WebKitShowDebugBordersPreferenceKey),
+                       kCFBooleanFalse);
+
   defaultSettings = defaults;
 }
 
@@ -1419,6 +1422,26 @@ HRESULT WebPreferences::acceleratedCompositingEnabled(BOOL* enabled) {
 #else
   *enabled = FALSE;
 #endif
+  return S_OK;
+}
+
+HRESULT WebPreferences::showDebugBorders(BOOL* enabled) {
+  *enabled = boolValueForKey(CFSTR(WebKitShowDebugBordersPreferenceKey));
+  return S_OK;
+}
+
+HRESULT WebPreferences::setShowDebugBorders(BOOL enabled) {
+  setBoolValue(CFSTR(WebKitShowDebugBordersPreferenceKey), enabled);
+  return S_OK;
+}
+
+HRESULT WebPreferences::showRepaintCounter(BOOL* enabled) {
+  *enabled = boolValueForKey(CFSTR(WebKitShowRepaintCounterPreferenceKey));
+  return S_OK;
+}
+
+HRESULT WebPreferences::setShowRepaintCounter(BOOL enabled) {
+  setBoolValue(CFSTR(WebKitShowRepaintCounterPreferenceKey), enabled);
   return S_OK;
 }
 

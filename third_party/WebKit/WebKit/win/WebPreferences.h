@@ -404,6 +404,12 @@ class WebPreferences : public IWebPreferences, public IWebPreferencesPrivate {
   virtual HRESULT STDMETHODCALLTYPE setCustomDragCursorsEnabled(BOOL);
   virtual HRESULT STDMETHODCALLTYPE customDragCursorsEnabled(BOOL*);
 
+  virtual HRESULT STDMETHODCALLTYPE setShowDebugBorders(BOOL);
+  virtual HRESULT STDMETHODCALLTYPE showDebugBorders(BOOL*);
+
+  virtual HRESULT STDMETHODCALLTYPE setShowRepaintCounter(BOOL);
+  virtual HRESULT STDMETHODCALLTYPE showRepaintCounter(BOOL*);
+
   // WebPreferences
 
   // This method accesses a different preference key than
