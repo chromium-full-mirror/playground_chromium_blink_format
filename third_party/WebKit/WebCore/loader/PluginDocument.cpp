@@ -161,4 +161,12 @@ Tokenizer* PluginDocument::createTokenizer() {
 Widget* PluginDocument::pluginWidget() {
   return PluginTokenizer::pluginWidgetFromDocument(this);
 }
+
+Node* PluginDocument::pluginNode() {
+  RefPtr<Element> body_element = body();
+  if (body_element)
+    return body_element->firstChild();
+
+  return 0;
+}
 }

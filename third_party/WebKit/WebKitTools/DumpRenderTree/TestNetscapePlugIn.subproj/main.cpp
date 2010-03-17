@@ -118,6 +118,9 @@ NPError NPP_New(NPMIMEType pluginType,
       obj->testDocumentOpenInDestroyStream = TRUE;
     else if (strcasecmp(argn[i], "testwindowopen") == 0)
       obj->testWindowOpen = TRUE;
+    else if (strcasecmp(argn[i], "src") == 0 &&
+             strstr(argv[i], "plugin-document-has-focus.pl"))
+      obj->testKeyboardFocusForPlugins = TRUE;
   }
 
 #ifndef NP_NO_CARBON
@@ -188,12 +191,17 @@ NPError NPP_SetWindow(NPP instance, NPWindow* window) {
     if (obj->logSetWindow) {
       pluginLog(instance, "NPP_SetWindow: %d %d", (int)window->width,
                 (int)window->height);
-      obj->logSetWindow = false;
+      obj->logSetWindow = FALSE;
     }
 
     if (obj->testWindowOpen) {
       testWindowOpen(instance);
       obj->testWindowOpen = FALSE;
+    }
+
+    if (obj->testKeyboardFocusForPlugins) {
+      obj->eventLogging = true;
+      executeScript(obj, "eventSender.keyDown('A');");
     }
   }
 
@@ -287,6 +295,11 @@ static int16_t handleEventCarbon(NPP instance,
       break;
     case keyUp:
       pluginLog(instance, "keyUp '%c'", (char)(event->message & 0xFF));
+      if (obj->testKeyboardFocusForPlugins) {
+        obj->eventLogging = false;
+        obj->testKeyboardFocusForPlugins = FALSE;
+        executeScript(obj, "layoutTestController.notifyDone();");
+      }
       break;
     case autoKey:
       pluginLog(instance, "autoKey '%c'", (char)(event->message & 0xFF));
@@ -359,11 +372,17 @@ static int16_t handleEventCocoa(NPP instance,
       return 1;
 
     case NPCocoaEventKeyUp:
-      if (event->data.key.characters)
+      if (event->data.key.characters) {
         pluginLog(
             instance, "keyUp '%c'",
             CFStringGetCharacterAtIndex(
                 reinterpret_cast<CFStringRef>(event->data.key.characters), 0));
+        if (obj->testKeyboardFocusForPlugins) {
+          obj->eventLogging = false;
+          obj->testKeyboardFocusForPlugins = FALSE;
+          executeScript(obj, "layoutTestController.notifyDone();");
+        }
+      }
       return 1;
 
     case NPCocoaEventFlagsChanged:
