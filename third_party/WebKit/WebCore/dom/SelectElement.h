@@ -131,6 +131,12 @@ class SelectElement {
                                         int index);
   static unsigned optionCount(const SelectElementData&, const Element*);
 
+  static void updateSelectedState(SelectElementData& data,
+                                  Element* element,
+                                  int listIndex,
+                                  bool multi,
+                                  bool shift);
+
  private:
   static void menuListDefaultEventHandler(SelectElementData&,
                                           Element*,
