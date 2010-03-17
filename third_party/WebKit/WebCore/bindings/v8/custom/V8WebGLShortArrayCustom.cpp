@@ -50,13 +50,6 @@ v8::Handle<v8::Value> V8WebGLShortArray::constructorCallback(
   return constructWebGLArray<WebGLShortArray, short>(args, &info);
 }
 
-v8::Handle<v8::Value> V8WebGLShortArray::getCallback(
-    const v8::Arguments& args) {
-  INC_STATS("DOM.WebGLShortArray.get()");
-  return getWebGLArrayElement<WebGLShortArray, short>(
-      args, V8ClassIndex::WEBGLSHORTARRAY);
-}
-
 v8::Handle<v8::Value> V8WebGLShortArray::setCallback(
     const v8::Arguments& args) {
   INC_STATS("DOM.WebGLShortArray.set()");

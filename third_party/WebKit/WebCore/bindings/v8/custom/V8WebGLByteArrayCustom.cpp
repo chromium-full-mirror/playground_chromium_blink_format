@@ -50,12 +50,6 @@ v8::Handle<v8::Value> V8WebGLByteArray::constructorCallback(
   return constructWebGLArray<WebGLByteArray, signed char>(args, &info);
 }
 
-v8::Handle<v8::Value> V8WebGLByteArray::getCallback(const v8::Arguments& args) {
-  INC_STATS("DOM.WebGLByteArray.get()");
-  return getWebGLArrayElement<WebGLByteArray, signed char>(
-      args, V8ClassIndex::WEBGLBYTEARRAY);
-}
-
 v8::Handle<v8::Value> V8WebGLByteArray::setCallback(const v8::Arguments& args) {
   INC_STATS("DOM.WebGLByteArray.set()");
   return setWebGLArray<WebGLByteArray, V8WebGLByteArray>(
