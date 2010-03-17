@@ -27,6 +27,7 @@
 #include "ResourceHandle.h"
 #include "ResourceHandleInternal.h"
 
+#include "DNS.h"
 #include "Logging.h"
 #include "ResourceHandleClient.h"
 #include "Timer.h"
@@ -135,5 +136,11 @@ bool ResourceHandle::shouldContentSniffURL(const KURL& url) {
 void ResourceHandle::forceContentSniffing() {
   shouldForceContentSniffing = true;
 }
+
+#if !USE(SOUP)
+void ResourceHandle::prepareForURL(const KURL& url) {
+  return prefetchDNS(url.host());
+}
+#endif
 
 }  // namespace WebCore

@@ -30,7 +30,6 @@
 #if ENABLE(WML)
 #include "WMLAElement.h"
 
-#include "DNS.h"
 #include "Event.h"
 #include "EventHandler.h"
 #include "EventNames.h"
@@ -41,6 +40,7 @@
 #include "MappedAttribute.h"
 #include "MouseEvent.h"
 #include "RenderBox.h"
+#include "ResourceHandle.h"
 #include "WMLNames.h"
 
 namespace WebCore {
@@ -60,7 +60,7 @@ void WMLAElement::parseMappedAttribute(MappedAttribute* attr) {
       String value = attr->value();
       if (protocolIs(value, "http") || protocolIs(value, "https") ||
           value.startsWith("//"))
-        prefetchDNS(document()->completeURL(value).host());
+        ResourceHandle::prepareForURL(document()->completeURL(value));
     }
   } else if (attr->name() == HTMLNames::nameAttr ||
              attr->name() == HTMLNames::titleAttr ||

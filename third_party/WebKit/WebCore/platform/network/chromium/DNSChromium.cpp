@@ -27,11 +27,16 @@
 #include "DNS.h"
 
 #include "ChromiumBridge.h"
+#include "ResourceHandle.h"
 
 namespace WebCore {
 
 void prefetchDNS(const String& hostname) {
   ChromiumBridge::prefetchDNS(hostname);
+}
+
+void ResourceHandle::prepareForURL(const KURL& url) {
+  return prefetchDNS(url.host());
 }
 
 }  // namespace WebCore

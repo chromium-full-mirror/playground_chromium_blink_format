@@ -120,6 +120,7 @@ class ResourceHandle : public RefCounted<ResourceHandle>
                                         ResourceResponse&,
                                         Vector<char>& data,
                                         Frame* frame);
+  static void prepareForURL(const KURL&);
   static bool willLoadFromCache(ResourceRequest&, Frame*);
 #if PLATFORM(MAC)
   static bool didSendBodyDataDelegateExists();
