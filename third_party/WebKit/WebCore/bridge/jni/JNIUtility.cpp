@@ -280,7 +280,7 @@ jvalue getJNIField(jobject obj,
   JNIEnv* env = getJNIEnv();
   jvalue result;
 
-  bzero(&result, sizeof(jvalue));
+  memset(&result, 0, sizeof(jvalue));
   if (obj && jvm && env) {
     jclass cls = env->GetObjectClass(obj);
     if (cls) {
