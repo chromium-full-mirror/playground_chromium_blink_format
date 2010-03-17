@@ -39,7 +39,6 @@ namespace WebCore {
 class ConsoleMessage;
 class Database;
 class Frame;
-class InspectorController;
 class InspectorResource;
 class Node;
 class ScriptString;
@@ -196,7 +195,6 @@ class InspectorFrontend : public Noncopyable {
 
  private:
   void callSimpleFunction(const String& functionName);
-  InspectorController* m_inspectorController;
   ScriptObject m_webInspector;
 };
 
