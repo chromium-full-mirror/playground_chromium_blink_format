@@ -339,6 +339,7 @@ WebCore::Scrollbar* QWebFramePrivate::verticalScrollBar() const {
   return frame->view()->verticalScrollbar();
 }
 
+#if ENABLE(TILED_BACKING_STORE)
 void QWebFramePrivate::renderFromTiledBackingStore(GraphicsContext* context,
                                                    const QRegion& clip) {
   ASSERT(frame->tiledBackingStore());
@@ -371,6 +372,7 @@ void QWebFramePrivate::renderFromTiledBackingStore(GraphicsContext* context,
     painter->restore();
   }
 }
+#endif
 
 void QWebFramePrivate::renderRelativeCoords(GraphicsContext* context,
                                             QWebFrame::RenderLayer layer,

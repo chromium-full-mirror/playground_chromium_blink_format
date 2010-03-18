@@ -88,8 +88,10 @@ class QWebFramePrivate {
   void renderRelativeCoords(WebCore::GraphicsContext*,
                             QWebFrame::RenderLayer,
                             const QRegion& clip);
+#if ENABLE(TILED_BACKING_STORE)
   void renderFromTiledBackingStore(WebCore::GraphicsContext*,
                                    const QRegion& clip);
+#endif
 
   bool scrollOverflow(int dx, int dy);
 
