@@ -94,6 +94,8 @@ class WebViewGraphicsBased : public QGraphicsView {
   }
   qreal yRotation() const { return m_yRotation; }
 
+  GraphicsWebView* graphicsWebView() const { return m_item; }
+
  public slots:
   void updateFrameRate();
   void animatedFlip();

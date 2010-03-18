@@ -107,6 +107,7 @@ class LauncherWindow : public MainWindow {
   void zoomOut();
   void resetZoom();
   void toggleZoomTextOnly(bool on);
+  void zoomAnimationFinished();
 
   void print();
   void screenshot();
@@ -139,6 +140,7 @@ class LauncherWindow : public MainWindow {
 
  private:
   void createChrome();
+  void applyZoom();
 
  private:
   QVector<int> m_zoomLevels;
@@ -150,6 +152,8 @@ class LauncherWindow : public MainWindow {
   QAction* m_formatMenuAction;
   QAction* m_flipAnimated;
   QAction* m_flipYAnimated;
+
+  QPropertyAnimation* m_zoomAnimation;
 
 #if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
   QList<QTouchEvent::TouchPoint> m_touchPoints;
@@ -168,7 +172,8 @@ LauncherWindow::LauncherWindow(LauncherWindow* other, bool shareScene)
       m_inspector(0),
       m_formatMenuAction(0),
       m_flipAnimated(0),
-      m_flipYAnimated(0) {
+      m_flipYAnimated(0),
+      m_zoomAnimation(0) {
   if (other) {
     init(other->isGraphicsBased());
     applyPrefs(other);
@@ -427,13 +432,46 @@ void LauncherWindow::showLinkHover(const QString& link,
 #endif
 }
 
+void LauncherWindow::zoomAnimationFinished() {
+  if (!isGraphicsBased())
+    return;
+  QGraphicsWebView* view =
+      static_cast<WebViewGraphicsBased*>(m_view)->graphicsWebView();
+  view->setTiledBackingStoreFrozen(false);
+}
+
+void LauncherWindow::applyZoom() {
+  if (isGraphicsBased() &&
+      page()->settings()->testAttribute(
+          QWebSettings::TiledBackingStoreEnabled)) {
+    QGraphicsWebView* view =
+        static_cast<WebViewGraphicsBased*>(m_view)->graphicsWebView();
+    view->setTiledBackingStoreFrozen(true);
+    if (!m_zoomAnimation) {
+      m_zoomAnimation = new QPropertyAnimation(view, "scale");
+      m_zoomAnimation->setStartValue(view->scale());
+      connect(m_zoomAnimation, SIGNAL(finished()), this,
+              SLOT(zoomAnimationFinished()));
+    } else {
+      m_zoomAnimation->stop();
+      m_zoomAnimation->setStartValue(m_zoomAnimation->currentValue());
+    }
+
+    m_zoomAnimation->setDuration(300);
+    m_zoomAnimation->setEndValue(qreal(m_currentZoom) / 100.);
+    m_zoomAnimation->start();
+    return;
+  }
+  page()->mainFrame()->setZoomFactor(qreal(m_currentZoom) / 100.0);
+}
+
 void LauncherWindow::zoomIn() {
   int i = m_zoomLevels.indexOf(m_currentZoom);
   Q_ASSERT(i >= 0);
   if (i < m_zoomLevels.count() - 1)
     m_currentZoom = m_zoomLevels[i + 1];
 
-  page()->mainFrame()->setZoomFactor(qreal(m_currentZoom) / 100.0);
+  applyZoom();
 }
 
 void LauncherWindow::zoomOut() {
@@ -442,7 +480,7 @@ void LauncherWindow::zoomOut() {
   if (i > 0)
     m_currentZoom = m_zoomLevels[i - 1];
 
-  page()->mainFrame()->setZoomFactor(qreal(m_currentZoom) / 100.0);
+  applyZoom();
 }
 
 void LauncherWindow::resetZoom() {
