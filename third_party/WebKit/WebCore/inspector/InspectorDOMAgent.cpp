@@ -707,6 +707,19 @@ void InspectorDOMAgent::getStyles(long callId, long nodeId, bool authorOnly) {
   result.set("computedStyle", buildObjectForStyle(computedStyle.get(), false));
   result.set("matchedCSSRules", getMatchedCSSRules(element, authorOnly));
   result.set("styleAttributes", getAttributeStyles(element));
+  ScriptObject currentStyle = result;
+  Element* parentElement = element->parentElement();
+  while (parentElement) {
+    ScriptObject parentStyle = m_frontend->newScriptObject();
+    currentStyle.set("parent", parentStyle);
+    if (parentElement->style() && parentElement->style()->length())
+      parentStyle.set("inlineStyle",
+                      buildObjectForStyle(parentElement->style(), true));
+    parentStyle.set("matchedCSSRules",
+                    getMatchedCSSRules(parentElement, authorOnly));
+    parentElement = parentElement->parentElement();
+    currentStyle = parentStyle;
+  }
   m_frontend->didGetStyles(callId, result);
 }
 
@@ -1092,7 +1105,6 @@ void InspectorDOMAgent::populateObjectWithStyleProperties(
     property.set("value", style->getPropertyValue(name));
     properties.set(i, property);
   }
-  result.set("uniqueStyleProperties", toArray(uniqueStyleProperties(style)));
 }
 
 ScriptObject InspectorDOMAgent::buildObjectForStyleSheet(
