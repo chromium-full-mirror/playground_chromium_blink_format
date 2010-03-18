@@ -579,9 +579,9 @@ static PassRefPtr<CSSValue> fillRepeatToCSSValue(EFillRepeat xRepeat,
   // shorthand.
   if (xRepeat == yRepeat)
     return CSSPrimitiveValue::create(xRepeat);
-  if (xRepeat == CSSValueRepeat && yRepeat == CSSValueNoRepeat)
+  if (xRepeat == RepeatFill && yRepeat == NoRepeatFill)
     return CSSPrimitiveValue::createIdentifier(CSSValueRepeatX);
-  if (xRepeat == CSSValueNoRepeat && yRepeat == CSSValueRepeat)
+  if (xRepeat == NoRepeatFill && yRepeat == RepeatFill)
     return CSSPrimitiveValue::createIdentifier(CSSValueRepeatY);
 
   RefPtr<CSSValueList> list = CSSValueList::createSpaceSeparated();
