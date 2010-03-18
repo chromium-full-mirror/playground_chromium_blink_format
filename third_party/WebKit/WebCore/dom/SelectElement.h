@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
  * Copyright (C) 2009 Torch Mobile Inc. All rights reserved.
  * (http//www.torchmobile.com/)
  *
@@ -62,6 +63,11 @@ class SelectElement {
   virtual void setSelectedIndexByUser(int index,
                                       bool deselect = true,
                                       bool fireOnChangeNow = false) = 0;
+
+  virtual void listBoxSelectItem(int listIndex,
+                                 bool allowMultiplySelections,
+                                 bool shift,
+                                 bool fireOnChangeNow = true) = 0;
 
  protected:
   virtual ~SelectElement() {}

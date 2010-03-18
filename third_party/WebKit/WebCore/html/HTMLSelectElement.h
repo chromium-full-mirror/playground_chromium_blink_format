@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
  *           (C) 2000 Dirk Mueller (mueller@kde.org)
@@ -90,6 +91,11 @@ class HTMLSelectElement : public HTMLFormControlElementWithState,
   }
 
   void scrollToSelection();
+
+  void listBoxSelectItem(int listIndex,
+                         bool allowMultiplySelections,
+                         bool shift,
+                         bool fireOnChangeNow = true);
 
  private:
   virtual int tagPriority() const { return 6; }
