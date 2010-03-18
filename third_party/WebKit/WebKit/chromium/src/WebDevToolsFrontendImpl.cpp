@@ -54,6 +54,7 @@
 #include "V8Binding.h"
 #include "V8DOMWrapper.h"
 #include "V8InspectorFrontendHost.h"
+#include "V8MouseEvent.h"
 #include "V8Node.h"
 #include "V8Proxy.h"
 #include "V8Utilities.h"
@@ -358,18 +359,17 @@ v8::Handle<v8::Value> WebDevToolsFrontendImpl::jsShowContextMenu(
     return v8::Undefined();
 
   v8::Local<v8::Object> eventWrapper = v8::Local<v8::Object>::Cast(args[0]);
-  if (V8DOMWrapper::domWrapperType(eventWrapper)->index !=
-      V8ClassIndex::MOUSEEVENT)
-    return v8::Undefined();
+    if (!V8MouseEvent::info.equals(V8DOMWrapper::domWrapperType(eventWrapper))
+        return v8::Undefined();
 
-  Event* event = V8Event::toNative(eventWrapper);
-  if (!args[1]->IsArray())
-    return v8::Undefined();
+    Event* event = V8Event::toNative(eventWrapper);
+    if (!args[1]->IsArray())
+        return v8::Undefined();
 
-  v8::Local<v8::Array> array = v8::Local<v8::Array>::Cast(args[1]);
-  Vector<ContextMenuItem*> items;
+    v8::Local<v8::Array> array = v8::Local<v8::Array>::Cast(args[1]);
+    Vector<ContextMenuItem*> items;
 
-  for (size_t i = 0; i < array->Length(); ++i) {
+    for (size_t i = 0; i < array->Length(); ++i) {
     v8::Local<v8::Object> item =
         v8::Local<v8::Object>::Cast(array->Get(v8::Integer::New(i)));
     v8::Local<v8::Value> label = item->Get(v8::String::New("label"));
@@ -383,18 +383,16 @@ v8::Handle<v8::Value> WebDevToolsFrontendImpl::jsShowContextMenu(
       items.append(new ContextMenuItem(ActionType, typedId,
                                        toWebCoreStringWithNullCheck(label)));
     }
-  }
+    }
 
-  WebDevToolsFrontendImpl* frontend = static_cast<WebDevToolsFrontendImpl*>(
-      v8::External::Cast(*args.Data())->Value());
+    WebDevToolsFrontendImpl* frontend = static_cast<WebDevToolsFrontendImpl*>(v8::External::Cast(*args.Data())->Value());
 
-  frontend->m_menuProvider = MenuProvider::create(frontend, items);
+    frontend->m_menuProvider = MenuProvider::create(frontend, items);
 
-  ContextMenuController* menuController =
-      frontend->m_webViewImpl->page()->contextMenuController();
-  menuController->showContextMenu(event, frontend->m_menuProvider);
+    ContextMenuController* menuController = frontend->m_webViewImpl->page()->contextMenuController();
+    menuController->showContextMenu(event, frontend->m_menuProvider);
 
-  return v8::Undefined();
+    return v8::Undefined();
 }
 
 v8::Handle<v8::Value> WebDevToolsFrontendImpl::jsCanAttachWindow(

@@ -40,8 +40,9 @@
 #include "MessagePort.h"
 #include "SVGElement.h"
 #include "V8DOMMap.h"
-#include "V8Index.h"
+#include "V8MessagePort.h"
 #include "V8Proxy.h"
+#include "WrapperTypeInfo.h"
 
 #include <algorithm>
 #include <utility>
@@ -190,7 +191,7 @@ class GCPrologueVisitor : public DOMWrapperMap<void>::Visitor {
     // forking MessagePort.* this is postponed to GC time. Having this postponed
     // has the drawback that the wrappers are "entangled/unentangled" for each
     // GC even though their entaglement most likely is still the same.
-    if (typeInfo->index == V8ClassIndex::MESSAGEPORT) {
+    if (V8MessagePort::info.equals(typeInfo)) {
       // Mark each port as in-use if it's entangled. For simplicity's sake, we
       // assume all ports are remotely entangled,
       // since the Chromium port implementation can't tell the difference.
@@ -354,7 +355,7 @@ class GCEpilogueVisitor : public DOMWrapperMap<void>::Visitor {
  public:
   void visitDOMWrapper(void* object, v8::Persistent<v8::Object> wrapper) {
     WrapperTypeInfo* typeInfo = V8DOMWrapper::domWrapperType(wrapper);
-    if (typeInfo->index == V8ClassIndex::MESSAGEPORT) {
+    if (V8MessagePort::info.equals(typeInfo)) {
       MessagePort* port1 = static_cast<MessagePort*>(object);
       // We marked this port as reachable in GCPrologueVisitor.  Undo this now
       // since the

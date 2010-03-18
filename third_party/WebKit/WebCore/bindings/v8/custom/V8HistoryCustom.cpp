@@ -89,8 +89,7 @@ v8::Handle<v8::Value> V8History::replaceStateCallback(
 bool V8History::indexedSecurityCheck(v8::Local<v8::Object> host,
                                      uint32_t index,
                                      v8::AccessType type,
-                                     v8::Local<v8::Value> data) {
-  ASSERT(V8ClassIndex::FromInt(data->Int32Value()) == V8ClassIndex::HISTORY);
+                                     v8::Local<v8::Value>) {
   // Only allow same origin access.
   History* history = V8History::toNative(host);
   return V8BindingSecurity::canAccessFrame(V8BindingState::Only(),
@@ -100,8 +99,7 @@ bool V8History::indexedSecurityCheck(v8::Local<v8::Object> host,
 bool V8History::namedSecurityCheck(v8::Local<v8::Object> host,
                                    v8::Local<v8::Value> key,
                                    v8::AccessType type,
-                                   v8::Local<v8::Value> data) {
-  ASSERT(V8ClassIndex::FromInt(data->Int32Value()) == V8ClassIndex::HISTORY);
+                                   v8::Local<v8::Value>) {
   // Only allow same origin access.
   History* history = V8History::toNative(host);
   return V8BindingSecurity::canAccessFrame(V8BindingState::Only(),

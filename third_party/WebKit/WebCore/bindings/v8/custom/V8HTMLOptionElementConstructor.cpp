@@ -45,7 +45,6 @@
 namespace WebCore {
 
 WrapperTypeInfo V8HTMLOptionElementConstructor::info = {
-    V8ClassIndex::ToInt(V8ClassIndex::OPTION),
     V8HTMLOptionElementConstructor::GetTemplate, 0, false};
 
 static v8::Handle<v8::Value> v8HTMLOptionElementConstructorCallback(

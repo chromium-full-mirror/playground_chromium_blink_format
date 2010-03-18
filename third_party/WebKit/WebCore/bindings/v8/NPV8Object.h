@@ -30,7 +30,7 @@
 #ifndef NPV8Object_h
 #define NPV8Object_h
 
-#include "V8Index.h"
+#include "V8DOMWrapper.h"
 
 #if PLATFORM(CHROMIUM)
 // FIXME: Chromium uses a different npruntime.h, which is in
@@ -49,6 +49,8 @@ class DOMWindow;
 
 static const int npObjectInternalFieldCount =
     v8DefaultWrapperInternalFieldCount + 0;
+
+static WrapperTypeInfo npObjectTypeInfo = {0, 0, false};
 }
 
 extern NPClass* npScriptObjectClass;

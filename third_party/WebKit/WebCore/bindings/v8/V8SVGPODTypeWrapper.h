@@ -392,16 +392,16 @@ class V8SVGDynamicPODTypeWrapperCache {
 class V8SVGPODTypeUtil {
  public:
   template <class P>
-  static P toSVGPODType(V8ClassIndex::V8WrapperType type,
+  static P toSVGPODType(WrapperTypeInfo* info,
                         v8::Handle<v8::Value> object,
                         bool& ok);
 };
 
 template <class P>
-P V8SVGPODTypeUtil::toSVGPODType(V8ClassIndex::V8WrapperType type,
+P V8SVGPODTypeUtil::toSVGPODType(WrapperTypeInfo* info,
                                  v8::Handle<v8::Value> object,
                                  bool& ok) {
-  if (!V8DOMWrapper::isWrapperOfType(object, type)) {
+  if (!V8DOMWrapper::isWrapperOfType(object, info)) {
     ok = false;
     return P();
   }

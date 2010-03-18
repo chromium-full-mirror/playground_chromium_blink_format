@@ -67,7 +67,7 @@ static v8::Handle<v8::Value> getNamedPropertyOfCollection(
     v8::Local<v8::Object> object) {
   // FIXME: assert object is a collection type
   ASSERT(V8DOMWrapper::maybeDOMWrapper(object));
-  ASSERT(V8DOMWrapper::domWrapperType(object)->index != V8ClassIndex::NODE);
+  ASSERT(V8DOMWrapper::domWrapperType(object) != &V8Node::info);
   Collection* collection = toNativeCollection<Collection>(object);
   AtomicString propertyName = toAtomicWebCoreStringWithNullCheck(name);
   return getV8Object<ItemType>(collection->namedItem(propertyName));
@@ -99,7 +99,7 @@ static v8::Handle<v8::Value> getIndexedPropertyOfCollection(
     v8::Local<v8::Object> object) {
   // FIXME: Assert that object must be a collection type.
   ASSERT(V8DOMWrapper::maybeDOMWrapper(object));
-  ASSERT(V8DOMWrapper::domWrapperType(object)->index != V8ClassIndex::NODE);
+  ASSERT(V8DOMWrapper::domWrapperType(object) != &V8Node::info);
   Collection* collection = toNativeCollection<Collection>(object);
   return getV8Object<ItemType>(collection->item(index));
 }
@@ -175,21 +175,17 @@ static v8::Handle<v8::Value> collectionStringIndexedPropertyGetter(
 
 // Add indexed getter to the function template for a collection.
 template <class Collection, class ItemType>
-static void setCollectionIndexedGetter(v8::Handle<v8::FunctionTemplate> desc,
-                                       V8ClassIndex::V8WrapperType type) {
+static void setCollectionIndexedGetter(v8::Handle<v8::FunctionTemplate> desc) {
   desc->InstanceTemplate()->SetIndexedPropertyHandler(
       collectionIndexedPropertyGetter<Collection, ItemType>, 0, 0, 0,
-      collectionIndexedPropertyEnumerator<Collection>,
-      v8::Integer::New(V8ClassIndex::ToInt(type)));
+      collectionIndexedPropertyEnumerator<Collection>);
 }
 
 // Add named getter to the function template for a collection.
 template <class Collection, class ItemType>
-static void setCollectionNamedGetter(v8::Handle<v8::FunctionTemplate> desc,
-                                     V8ClassIndex::V8WrapperType type) {
+static void setCollectionNamedGetter(v8::Handle<v8::FunctionTemplate> desc) {
   desc->InstanceTemplate()->SetNamedPropertyHandler(
-      collectionNamedPropertyGetter<Collection, ItemType>, 0, 0, 0, 0,
-      v8::Integer::New(V8ClassIndex::ToInt(type)));
+      collectionNamedPropertyGetter<Collection, ItemType>, 0, 0, 0, 0);
 }
 
 // Add indexed getter returning a string or null to a function template for a

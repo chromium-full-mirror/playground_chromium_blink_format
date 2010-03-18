@@ -70,9 +70,7 @@ v8::Handle<v8::Value> V8EventSource::constructorCallback(
   if (ec)
     return throwError(ec);
 
-  V8DOMWrapper::setDOMWrapper(args.Holder(),
-                              V8ClassIndex::ToInt(V8ClassIndex::EVENTSOURCE),
-                              eventSource.get());
+  V8DOMWrapper::setDOMWrapper(args.Holder(), &info, eventSource.get());
 
   // Add object to the wrapper map.
   eventSource->ref();

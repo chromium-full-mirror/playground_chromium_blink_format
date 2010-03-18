@@ -780,8 +780,7 @@ v8::Handle<v8::Value> V8DOMWindow::openDatabaseCallback(
 bool V8DOMWindow::namedSecurityCheck(v8::Local<v8::Object> host,
                                      v8::Local<v8::Value> key,
                                      v8::AccessType type,
-                                     v8::Local<v8::Value> data) {
-  ASSERT(V8ClassIndex::FromInt(data->Int32Value()) == V8ClassIndex::DOMWINDOW);
+                                     v8::Local<v8::Value>) {
   v8::Handle<v8::Object> window =
       V8DOMWrapper::lookupDOMWrapper(V8DOMWindow::GetTemplate(), host);
   if (window.IsEmpty())
@@ -811,8 +810,7 @@ bool V8DOMWindow::namedSecurityCheck(v8::Local<v8::Object> host,
 bool V8DOMWindow::indexedSecurityCheck(v8::Local<v8::Object> host,
                                        uint32_t index,
                                        v8::AccessType type,
-                                       v8::Local<v8::Value> data) {
-  ASSERT(V8ClassIndex::FromInt(data->Int32Value()) == V8ClassIndex::DOMWINDOW);
+                                       v8::Local<v8::Value>) {
   v8::Handle<v8::Object> window =
       V8DOMWrapper::lookupDOMWrapper(V8DOMWindow::GetTemplate(), host);
   if (window.IsEmpty())

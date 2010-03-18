@@ -383,8 +383,7 @@ v8::Handle<v8::Value> V8Location::toStringCallback(const v8::Arguments& args) {
 bool V8Location::indexedSecurityCheck(v8::Local<v8::Object> host,
                                       uint32_t index,
                                       v8::AccessType type,
-                                      v8::Local<v8::Value> data) {
-  ASSERT(V8ClassIndex::FromInt(data->Int32Value()) == V8ClassIndex::LOCATION);
+                                      v8::Local<v8::Value>) {
   // Only allow same origin access
   Location* imp = V8Location::toNative(host);
   return V8BindingSecurity::canAccessFrame(V8BindingState::Only(), imp->frame(),
@@ -394,8 +393,7 @@ bool V8Location::indexedSecurityCheck(v8::Local<v8::Object> host,
 bool V8Location::namedSecurityCheck(v8::Local<v8::Object> host,
                                     v8::Local<v8::Value> key,
                                     v8::AccessType type,
-                                    v8::Local<v8::Value> data) {
-  ASSERT(V8ClassIndex::FromInt(data->Int32Value()) == V8ClassIndex::LOCATION);
+                                    v8::Local<v8::Value>) {
   // Only allow same origin access
   Location* imp = V8Location::toNative(host);
   return V8BindingSecurity::canAccessFrame(V8BindingState::Only(), imp->frame(),
