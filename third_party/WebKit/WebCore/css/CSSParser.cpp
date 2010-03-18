@@ -3759,8 +3759,13 @@ static inline bool parseInt(const UChar*& string,
                             int& value) {
   const UChar* current = string;
   int localValue = 0;
+  bool negative = false;
   while (current != end && isCSSWhitespace(*current))
     current++;
+  if (current != end && *current == '-') {
+    negative = true;
+    current++;
+  }
   if (current == end || !isASCIIDigit(*current))
     return false;
   while (current != end && isASCIIDigit(*current))
@@ -3769,7 +3774,8 @@ static inline bool parseInt(const UChar*& string,
     current++;
   if (current == end || *current++ != terminator)
     return false;
-  value = localValue;
+  // Clamp negative values at zero.
+  value = negative ? 0 : localValue;
   string = current;
   return true;
 }
@@ -3778,13 +3784,7 @@ bool CSSParser::parseColor(const String& name, RGBA32& rgb, bool strict) {
   if (!strict && Color::parseHexColor(name, rgb))
     return true;
 
-  // try a little harder
-  Color tc;
-  tc.setNamedColor(name);
-  if (tc.isValid()) {
-    rgb = tc.rgb();
-    return true;
-  }
+  // Try rgb() syntax.
   if (name.startsWith("rgb(")) {
     const UChar* current = name.characters() + 4;
     const UChar* end = name.characters() + name.length();
@@ -3800,6 +3800,13 @@ bool CSSParser::parseColor(const String& name, RGBA32& rgb, bool strict) {
     if (current != end)
       return false;
     rgb = makeRGB(red, green, blue);
+    return true;
+  }
+  // Try named colors.
+  Color tc;
+  tc.setNamedColor(name);
+  if (tc.isValid()) {
+    rgb = tc.rgb();
     return true;
   }
   return false;
