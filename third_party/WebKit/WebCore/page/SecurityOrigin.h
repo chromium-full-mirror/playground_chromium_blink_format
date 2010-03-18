@@ -210,6 +210,7 @@ class SecurityOrigin : public ThreadSafeShared<SecurityOrigin> {
   SandboxFlags m_sandboxFlags;
   String m_protocol;
   String m_host;
+  mutable String m_encodedHost;
   String m_domain;
   unsigned short m_port;
   bool m_isUnique;
