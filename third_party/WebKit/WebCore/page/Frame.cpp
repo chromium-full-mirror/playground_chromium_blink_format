@@ -135,7 +135,6 @@ Frame::Frame(Page* page,
       m_redirectScheduler(this),
       m_ownerElement(ownerElement),
       m_script(this),
-      m_selectionGranularity(CharacterGranularity),
       m_selectionController(this),
       m_editor(this),
       m_eventHandler(this),
@@ -364,11 +363,7 @@ Editor* Frame::editor() const {
 }
 
 TextGranularity Frame::selectionGranularity() const {
-  return m_selectionGranularity;
-}
-
-void Frame::setSelectionGranularity(TextGranularity granularity) {
-  m_selectionGranularity = granularity;
+  return m_selectionController.granularity();
 }
 
 SelectionController* Frame::dragCaretController() const {

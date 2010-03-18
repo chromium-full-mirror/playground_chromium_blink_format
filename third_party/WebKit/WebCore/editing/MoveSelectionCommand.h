@@ -37,21 +37,25 @@ class MoveSelectionCommand : public CompositeEditCommand {
   static PassRefPtr<MoveSelectionCommand> create(
       PassRefPtr<DocumentFragment> fragment,
       const Position& position,
-      bool smartMove = false) {
-    return adoptRef(new MoveSelectionCommand(fragment, position, smartMove));
+      bool smartInsert = false,
+      bool smartDelete = false) {
+    return adoptRef(
+        new MoveSelectionCommand(fragment, position, smartInsert, smartDelete));
   }
 
  private:
   MoveSelectionCommand(PassRefPtr<DocumentFragment>,
                        const Position&,
-                       bool smartMove);
+                       bool smartInsert,
+                       bool smartDelete);
 
   virtual void doApply();
   virtual EditAction editingAction() const;
 
   RefPtr<DocumentFragment> m_fragment;
   Position m_position;
-  bool m_smartMove;
+  bool m_smartInsert;
+  bool m_smartDelete;
 };
 
 }  // namespace WebCore

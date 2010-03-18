@@ -67,6 +67,7 @@ SelectionController::SelectionController(Frame* frame,
                                          bool isDragCaretController)
     : m_frame(frame),
       m_xPosForVerticalArrowNavigation(NoXPosForVerticalArrowNavigation),
+      m_granularity(CharacterGranularity),
       m_caretBlinkTimer(this, &SelectionController::caretBlinkTimerFired),
       m_needsLayout(true),
       m_absCaretBoundsDirty(true),
@@ -119,7 +120,10 @@ void SelectionController::moveTo(const Position& base,
 void SelectionController::setSelection(const VisibleSelection& s,
                                        bool closeTyping,
                                        bool clearTypingStyle,
-                                       bool userTriggered) {
+                                       bool userTriggered,
+                                       TextGranularity granularity) {
+  m_granularity = granularity;
+
   m_lastChangeWasHorizontalExtension = false;
 
   if (m_isDragCaretController) {
@@ -647,9 +651,6 @@ bool SelectionController::modify(EAlteration alter,
       return false;
   }
 
-  if (m_frame)
-    m_frame->setSelectionGranularity(granularity);
-
   willBeModified(alter, dir);
 
   VisiblePosition pos;
@@ -703,18 +704,8 @@ bool SelectionController::modify(EAlteration alter,
   if (granularity == LineGranularity || granularity == ParagraphGranularity)
     m_xPosForVerticalArrowNavigation = x;
 
-  if (userTriggered) {
-    // User modified selection change also sets the granularity back to
-    // character.
-    // NOTE: The one exception is that we need to keep word granularity to
-    // preserve smart delete behavior when extending by word (e.g.
-    // double-click),
-    // then shift-option-right arrow, then delete needs to smart delete, per
-    // TextEdit.
-    if (!(alter == EXTEND && granularity == WordGranularity &&
-          m_frame->selectionGranularity() == WordGranularity))
-      m_frame->setSelectionGranularity(CharacterGranularity);
-  }
+  if (userTriggered)
+    m_granularity = CharacterGranularity;
 
   setNeedsLayout();
 
@@ -812,19 +803,10 @@ bool SelectionController::modify(EAlteration alter,
   }
 
   if (userTriggered)
-    m_frame->setSelectionGranularity(CharacterGranularity);
+    m_granularity = CharacterGranularity;
 
   m_lastChangeWasHorizontalExtension = alter == EXTEND;
 
-  return true;
-}
-
-bool SelectionController::expandUsingGranularity(TextGranularity granularity) {
-  if (isNone())
-    return false;
-
-  m_selection.expandUsingGranularity(granularity);
-  m_needsLayout = true;
   return true;
 }
 
@@ -870,6 +852,7 @@ int SelectionController::xPosForVerticalArrowNavigation(EPositionType type) {
 }
 
 void SelectionController::clear() {
+  m_granularity = CharacterGranularity;
   setSelection(VisibleSelection());
 }
 

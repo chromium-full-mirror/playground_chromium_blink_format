@@ -255,13 +255,14 @@ void EventHandler::selectClosestWordFromMouseEvent(
   if (innerNode && innerNode->renderer() && m_mouseDownMayStartSelect) {
     VisiblePosition pos(
         innerNode->renderer()->positionForPoint(result.localPoint()));
+    TextGranularity granularity = CharacterGranularity;
     if (pos.isNotNull()) {
       newSelection = VisibleSelection(pos);
       newSelection.expandUsingGranularity(WordGranularity);
     }
 
     if (newSelection.isRange()) {
-      m_frame->setSelectionGranularity(WordGranularity);
+      granularity = WordGranularity;
       m_beganSelectingText = true;
       if (result.event().clickCount() == 2 &&
           m_frame->editor()->isSelectTrailingWhitespaceEnabled())
@@ -269,7 +270,7 @@ void EventHandler::selectClosestWordFromMouseEvent(
     }
 
     if (m_frame->shouldChangeSelection(newSelection))
-      m_frame->selection()->setSelection(newSelection);
+      m_frame->selection()->setSelection(newSelection, granularity);
   }
 }
 
@@ -289,13 +290,14 @@ void EventHandler::selectClosestWordOrLinkFromMouseEvent(
         pos.deepEquivalent().node()->isDescendantOf(URLElement))
       newSelection = VisibleSelection::selectionFromContentsOfNode(URLElement);
 
+    TextGranularity granularity = CharacterGranularity;
     if (newSelection.isRange()) {
-      m_frame->setSelectionGranularity(WordGranularity);
+      granularity = WordGranularity;
       m_beganSelectingText = true;
     }
 
     if (m_frame->shouldChangeSelection(newSelection))
-      m_frame->selection()->setSelection(newSelection);
+      m_frame->selection()->setSelection(newSelection, granularity);
   }
 }
 
@@ -333,13 +335,15 @@ bool EventHandler::handleMousePressEventTripleClick(
     newSelection = VisibleSelection(pos);
     newSelection.expandUsingGranularity(ParagraphGranularity);
   }
+
+  TextGranularity granularity = CharacterGranularity;
   if (newSelection.isRange()) {
-    m_frame->setSelectionGranularity(ParagraphGranularity);
+    granularity = ParagraphGranularity;
     m_beganSelectingText = true;
   }
 
   if (m_frame->shouldChangeSelection(newSelection))
-    m_frame->selection()->setSelection(newSelection);
+    m_frame->selection()->setSelection(newSelection, granularity);
 
   return true;
 }
@@ -371,6 +375,8 @@ bool EventHandler::handleMousePressEventSingleClick(
   Position pos = visiblePos.deepEquivalent();
 
   VisibleSelection newSelection = m_frame->selection()->selection();
+  TextGranularity granularity = CharacterGranularity;
+
   if (extendSelection && newSelection.isCaretOrRange()) {
     m_frame->selection()->setLastChangeWasHorizontalExtension(false);
 
@@ -384,16 +390,17 @@ bool EventHandler::handleMousePressEventSingleClick(
     else
       newSelection = VisibleSelection(start, pos);
 
-    if (m_frame->selectionGranularity() != CharacterGranularity)
+    if (m_frame->selectionGranularity() != CharacterGranularity) {
+      granularity = m_frame->selectionGranularity();
       newSelection.expandUsingGranularity(m_frame->selectionGranularity());
+    }
+
     m_beganSelectingText = true;
-  } else {
+  } else
     newSelection = VisibleSelection(visiblePos);
-    m_frame->setSelectionGranularity(CharacterGranularity);
-  }
 
   if (m_frame->shouldChangeSelection(newSelection))
-    m_frame->selection()->setSelection(newSelection);
+    m_frame->selection()->setSelection(newSelection, granularity);
 
   return true;
 }
@@ -620,7 +627,8 @@ void EventHandler::updateSelectionForMouseDrag(Node* targetNode,
 
   if (m_frame->shouldChangeSelection(newSelection)) {
     m_frame->selection()->setLastChangeWasHorizontalExtension(false);
-    m_frame->selection()->setSelection(newSelection);
+    m_frame->selection()->setSelection(newSelection,
+                                       m_frame->selectionGranularity());
   }
 }
 #endif  // ENABLE(DRAG_SUPPORT)

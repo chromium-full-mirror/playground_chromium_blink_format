@@ -278,7 +278,6 @@ class Frame : public RefCounted<Frame>
 
  public:
   TextGranularity selectionGranularity() const;
-  void setSelectionGranularity(TextGranularity);
 
   bool shouldChangeSelection(const VisibleSelection&) const;
   bool shouldDeleteSelection(const VisibleSelection&) const;
@@ -398,8 +397,6 @@ class Frame : public RefCounted<Frame>
   String m_kjsDefaultStatusBarText;
 
   float m_zoomFactor;
-
-  TextGranularity m_selectionGranularity;
 
   mutable SelectionController m_selectionController;
   mutable VisibleSelection m_mark;

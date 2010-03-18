@@ -72,7 +72,12 @@ class SelectionController : public Noncopyable {
   void setSelection(const VisibleSelection&,
                     bool closeTyping = true,
                     bool clearTypingStyle = true,
-                    bool userTriggered = false);
+                    bool userTriggered = false,
+                    TextGranularity = CharacterGranularity);
+  void setSelection(const VisibleSelection& selection,
+                    TextGranularity granularity) {
+    setSelection(selection, true, true, false, granularity);
+  }
   bool setSelectedRange(Range*, EAffinity, bool closeTyping);
   void selectAll();
   void clear();
@@ -94,7 +99,7 @@ class SelectionController : public Noncopyable {
               TextGranularity,
               bool userTriggered = false);
   bool modify(EAlteration, int verticalDistance, bool userTriggered = false);
-  bool expandUsingGranularity(TextGranularity);
+  TextGranularity granularity() const { return m_granularity; }
 
   void setBase(const VisiblePosition&, bool userTriggered = false);
   void setBase(const Position&, EAffinity, bool userTriggered = false);
@@ -207,6 +212,7 @@ class SelectionController : public Noncopyable {
   int m_xPosForVerticalArrowNavigation;
 
   VisibleSelection m_selection;
+  TextGranularity m_granularity;
 
   Timer<SelectionController> m_caretBlinkTimer;
 

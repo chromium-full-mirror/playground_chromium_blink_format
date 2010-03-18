@@ -34,11 +34,13 @@ namespace WebCore {
 MoveSelectionCommand::MoveSelectionCommand(
     PassRefPtr<DocumentFragment> fragment,
     const Position& position,
-    bool smartMove)
+    bool smartInsert,
+    bool smartDelete)
     : CompositeEditCommand(position.node()->document()),
       m_fragment(fragment),
       m_position(position),
-      m_smartMove(smartMove) {
+      m_smartInsert(smartInsert),
+      m_smartDelete(smartDelete) {
   ASSERT(m_fragment);
 }
 
@@ -66,7 +68,7 @@ void MoveSelectionCommand::doApply() {
     pos = Position(positionNode, positionOffset);
   }
 
-  deleteSelection(m_smartMove);
+  deleteSelection(m_smartDelete);
 
   // If the node for the destination has been removed as a result of the
   // deletion,
@@ -83,7 +85,7 @@ void MoveSelectionCommand::doApply() {
     return;
   }
   applyCommandToComposite(ReplaceSelectionCommand::create(
-      positionNode->document(), m_fragment, true, m_smartMove));
+      positionNode->document(), m_fragment, true, m_smartInsert));
 }
 
 EditAction MoveSelectionCommand::editingAction() const {
