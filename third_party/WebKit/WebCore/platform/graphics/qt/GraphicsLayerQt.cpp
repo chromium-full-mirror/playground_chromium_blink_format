@@ -29,6 +29,7 @@
 #include "UnitBezier.h"
 #include <QtCore/qabstractanimation.h>
 #include <QtCore/qdebug.h>
+#include <QtCore/qmetaobject.h>
 #include <QtCore/qset.h>
 #include <QtCore/qtimer.h>
 #include <QtGui/qbitmap.h>
@@ -103,27 +104,33 @@ class GraphicsLayerQtImpl : public QGraphicsObject {
   // flush
   enum ChangeMask {
     NoChanges = 0,
+
+    ParentChange = (1L << 0),
     ChildrenChange = (1L << 1),
     MaskLayerChange = (1L << 2),
     PositionChange = (1L << 3),
+
     AnchorPointChange = (1L << 4),
     SizeChange = (1L << 5),
     TransformChange = (1L << 6),
     ContentChange = (1L << 7),
+
     GeometryOrientationChange = (1L << 8),
     ContentsOrientationChange = (1L << 9),
     OpacityChange = (1L << 10),
     ContentsRectChange = (1L << 11),
+
     Preserves3DChange = (1L << 12),
     MasksToBoundsChange = (1L << 13),
     DrawsContentChange = (1L << 14),
     ContentsOpaqueChange = (1L << 15),
+
     BackfaceVisibilityChange = (1L << 16),
     ChildrenTransformChange = (1L << 17),
     DisplayChange = (1L << 18),
     BackgroundColorChange = (1L << 19),
-    ParentChange = (1L << 20),
-    DistributesOpacityChange = (1L << 21)
+
+    DistributesOpacityChange = (1L << 20)
   };
 
   // the compositor lets us special-case images and colors, so we try to do so
@@ -174,6 +181,10 @@ class GraphicsLayerQtImpl : public QGraphicsObject {
   // we need to notify the client (aka the layer compositor) when the animation
   // actually starts
   void notifyAnimationStarted();
+
+  // we notify WebCore of a layer changed asynchronously; otherwise we end up
+  // calling flushChanges too often.
+  void notifySyncRequired();
 
  signals:
   // optimization: we don't want to use QTimer::singleShot
@@ -422,13 +433,16 @@ void GraphicsLayerQtImpl::paint(QPainter* painter,
   }
 }
 
-void GraphicsLayerQtImpl::notifyChange(ChangeMask changeMask) {
-  Q_ASSERT(this);
-
-  m_changeMask |= changeMask;
-
+void GraphicsLayerQtImpl::notifySyncRequired() {
   if (m_layer->client())
     m_layer->client()->notifySyncRequired(m_layer);
+}
+
+void GraphicsLayerQtImpl::notifyChange(ChangeMask changeMask) {
+  m_changeMask |= changeMask;
+  static QMetaMethod syncMethod = staticMetaObject.method(
+      staticMetaObject.indexOfMethod("notifySyncRequired()"));
+  syncMethod.invoke(this, Qt::QueuedConnection);
 }
 
 void GraphicsLayerQtImpl::flushChanges(bool recursive,
@@ -569,7 +583,8 @@ void GraphicsLayerQtImpl::flushChanges(bool recursive,
     }
   }
 
-  if ((m_changeMask & OpacityChange) && m_state.opacity != m_layer->opacity())
+  if ((m_changeMask & OpacityChange) && m_state.opacity != m_layer->opacity() &&
+      !m_opacityAnimationRunning)
     setOpacity(m_layer->opacity());
 
   if (m_changeMask & ContentsRectChange) {
@@ -750,102 +765,125 @@ void GraphicsLayerQt::removeFromParent() {
 }
 
 // reimp from GraphicsLayer.h
-void GraphicsLayerQt::setMaskLayer(GraphicsLayer* layer) {
-  GraphicsLayer::setMaskLayer(layer);
+void GraphicsLayerQt::setMaskLayer(GraphicsLayer* value) {
+  if (value == maskLayer())
+    return;
+  GraphicsLayer::setMaskLayer(value);
   m_impl->notifyChange(GraphicsLayerQtImpl::MaskLayerChange);
 }
 
 // reimp from GraphicsLayer.h
-void GraphicsLayerQt::setPosition(const FloatPoint& p) {
-  if (position() != p)
-    m_impl->notifyChange(GraphicsLayerQtImpl::PositionChange);
-  GraphicsLayer::setPosition(p);
+void GraphicsLayerQt::setPosition(const FloatPoint& value) {
+  if (value == position())
+    return;
+  GraphicsLayer::setPosition(value);
+  m_impl->notifyChange(GraphicsLayerQtImpl::PositionChange);
 }
 
 // reimp from GraphicsLayer.h
-void GraphicsLayerQt::setAnchorPoint(const FloatPoint3D& p) {
-  if (anchorPoint() != p)
-    m_impl->notifyChange(GraphicsLayerQtImpl::AnchorPointChange);
-  GraphicsLayer::setAnchorPoint(p);
+void GraphicsLayerQt::setAnchorPoint(const FloatPoint3D& value) {
+  if (value == anchorPoint())
+    return;
+  GraphicsLayer::setAnchorPoint(value);
+  m_impl->notifyChange(GraphicsLayerQtImpl::AnchorPointChange);
 }
 
 // reimp from GraphicsLayer.h
-void GraphicsLayerQt::setSize(const FloatSize& size) {
-  if (this->size() != size)
-    m_impl->notifyChange(GraphicsLayerQtImpl::SizeChange);
-  GraphicsLayer::setSize(size);
+void GraphicsLayerQt::setSize(const FloatSize& value) {
+  if (value == size())
+    return;
+  GraphicsLayer::setSize(value);
+  m_impl->notifyChange(GraphicsLayerQtImpl::SizeChange);
 }
 
 // reimp from GraphicsLayer.h
-void GraphicsLayerQt::setTransform(const TransformationMatrix& t) {
-  if (!m_impl->m_transformAnimationRunning && transform() != t)
-    m_impl->notifyChange(GraphicsLayerQtImpl::TransformChange);
-  GraphicsLayer::setTransform(t);
+void GraphicsLayerQt::setTransform(const TransformationMatrix& value) {
+  if (value == transform())
+    return;
+  GraphicsLayer::setTransform(value);
+  m_impl->notifyChange(GraphicsLayerQtImpl::TransformChange);
 }
 
 // reimp from GraphicsLayer.h
-void GraphicsLayerQt::setChildrenTransform(const TransformationMatrix& t) {
-  GraphicsLayer::setChildrenTransform(t);
+void GraphicsLayerQt::setChildrenTransform(const TransformationMatrix& value) {
+  if (value == childrenTransform())
+    return;
+  GraphicsLayer::setChildrenTransform(value);
   m_impl->notifyChange(GraphicsLayerQtImpl::ChildrenTransformChange);
 }
 
 // reimp from GraphicsLayer.h
-void GraphicsLayerQt::setPreserves3D(bool b) {
-  if (b != preserves3D())
-    ;
+void GraphicsLayerQt::setPreserves3D(bool value) {
+  if (value == preserves3D())
+    return;
+  GraphicsLayer::setPreserves3D(value);
   m_impl->notifyChange(GraphicsLayerQtImpl::Preserves3DChange);
-  GraphicsLayer::setPreserves3D(b);
 }
 
 // reimp from GraphicsLayer.h
-void GraphicsLayerQt::setMasksToBounds(bool b) {
-  GraphicsLayer::setMasksToBounds(b);
+void GraphicsLayerQt::setMasksToBounds(bool value) {
+  if (value == masksToBounds())
+    return;
+  GraphicsLayer::setMasksToBounds(value);
   m_impl->notifyChange(GraphicsLayerQtImpl::MasksToBoundsChange);
 }
 
 // reimp from GraphicsLayer.h
-void GraphicsLayerQt::setDrawsContent(bool b) {
+void GraphicsLayerQt::setDrawsContent(bool value) {
+  if (value == drawsContent())
+    return;
   m_impl->notifyChange(GraphicsLayerQtImpl::DrawsContentChange);
-  GraphicsLayer::setDrawsContent(b);
+  GraphicsLayer::setDrawsContent(value);
 }
 
 // reimp from GraphicsLayer.h
-void GraphicsLayerQt::setBackgroundColor(const Color& c) {
+void GraphicsLayerQt::setBackgroundColor(const Color& value) {
+  if (value == m_impl->m_pendingContent.backgroundColor)
+    return;
+  m_impl->m_pendingContent.backgroundColor = value;
+  GraphicsLayer::setBackgroundColor(value);
   m_impl->notifyChange(GraphicsLayerQtImpl::BackgroundColorChange);
-  m_impl->m_pendingContent.backgroundColor = c;
-  GraphicsLayer::setBackgroundColor(c);
 }
 
 // reimp from GraphicsLayer.h
 void GraphicsLayerQt::clearBackgroundColor() {
+  if (!m_impl->m_pendingContent.backgroundColor.isValid())
+    return;
   m_impl->m_pendingContent.backgroundColor = QColor();
-  m_impl->notifyChange(GraphicsLayerQtImpl::BackgroundColorChange);
   GraphicsLayer::clearBackgroundColor();
+  m_impl->notifyChange(GraphicsLayerQtImpl::BackgroundColorChange);
 }
 
 // reimp from GraphicsLayer.h
-void GraphicsLayerQt::setContentsOpaque(bool b) {
+void GraphicsLayerQt::setContentsOpaque(bool value) {
+  if (value == contentsOpaque())
+    return;
   m_impl->notifyChange(GraphicsLayerQtImpl::ContentsOpaqueChange);
-  GraphicsLayer::setContentsOpaque(b);
+  GraphicsLayer::setContentsOpaque(value);
 }
 
 // reimp from GraphicsLayer.h
-void GraphicsLayerQt::setBackfaceVisibility(bool b) {
+void GraphicsLayerQt::setBackfaceVisibility(bool value) {
+  if (value == backfaceVisibility())
+    return;
+  GraphicsLayer::setBackfaceVisibility(value);
   m_impl->notifyChange(GraphicsLayerQtImpl::BackfaceVisibilityChange);
-  GraphicsLayer::setBackfaceVisibility(b);
 }
 
 // reimp from GraphicsLayer.h
-void GraphicsLayerQt::setOpacity(float o) {
-  if (!m_impl->m_opacityAnimationRunning && opacity() != o)
-    m_impl->notifyChange(GraphicsLayerQtImpl::OpacityChange);
-  GraphicsLayer::setOpacity(o);
+void GraphicsLayerQt::setOpacity(float value) {
+  if (value == opacity())
+    return;
+  GraphicsLayer::setOpacity(value);
+  m_impl->notifyChange(GraphicsLayerQtImpl::OpacityChange);
 }
 
 // reimp from GraphicsLayer.h
-void GraphicsLayerQt::setContentsRect(const IntRect& r) {
+void GraphicsLayerQt::setContentsRect(const IntRect& value) {
+  if (value == contentsRect())
+    return;
+  GraphicsLayer::setContentsRect(value);
   m_impl->notifyChange(GraphicsLayerQtImpl::ContentsRectChange);
-  GraphicsLayer::setContentsRect(r);
 }
 
 // reimp from GraphicsLayer.h
