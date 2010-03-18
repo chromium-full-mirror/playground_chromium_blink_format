@@ -57,6 +57,8 @@ class JSONObject : public JSObject {
   static const ClassInfo info;
 };
 
+UString JSONStringify(ExecState* exec, JSValue value, unsigned indent);
+
 }  // namespace JSC
 
 #endif  // JSONObject_h
