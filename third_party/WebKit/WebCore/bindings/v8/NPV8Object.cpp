@@ -60,6 +60,14 @@ using WebCore::V8GCController;
 using WebCore::V8Proxy;
 using WebCore::WrapperTypeInfo;
 
+namespace WebCore {
+
+WrapperTypeInfo* npObjectTypeInfo() {
+  static WrapperTypeInfo typeInfo = {0, 0, false};
+  return &typeInfo;
+}
+}
+
 // FIXME: Comments on why use malloc and free.
 static NPObject* allocV8NPObject(NPP, NPClass*) {
   return static_cast<NPObject*>(malloc(sizeof(V8NPObject)));
@@ -125,7 +133,7 @@ NPObject* npCreateV8ScriptObject(NPP npp,
   if (object->InternalFieldCount() == npObjectInternalFieldCount) {
     WrapperTypeInfo* typeInfo = static_cast<WrapperTypeInfo*>(
         object->GetPointerFromInternalField(WebCore::v8DOMWrapperTypeIndex));
-    if (typeInfo == &WebCore::npObjectTypeInfo) {
+    if (typeInfo == WebCore::npObjectTypeInfo()) {
       NPObject* returnValue = v8ObjectToNPObject(object);
       _NPN_RetainObject(returnValue);
       return returnValue;

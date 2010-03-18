@@ -50,7 +50,7 @@ class DOMWindow;
 static const int npObjectInternalFieldCount =
     v8DefaultWrapperInternalFieldCount + 0;
 
-static WrapperTypeInfo npObjectTypeInfo = {0, 0, false};
+WrapperTypeInfo* npObjectTypeInfo();
 }
 
 extern NPClass* npScriptObjectClass;
