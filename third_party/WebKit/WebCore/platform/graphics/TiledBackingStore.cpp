@@ -38,6 +38,7 @@ TiledBackingStore::TiledBackingStore(TiledBackingStoreClient* client)
           new TileTimer(this, &TiledBackingStore::tileCreationTimerFired)),
       m_tileSize(defaultTileWidth, defaultTileHeight),
       m_contentsScale(1.f),
+      m_pendingScale(0),
       m_contentsFrozen(false) {}
 
 TiledBackingStore::~TiledBackingStore() {
@@ -145,11 +146,21 @@ void TiledBackingStore::viewportChanged(const IntRect& contentsViewport) {
 }
 
 void TiledBackingStore::setContentsScale(float scale) {
-  if (m_contentsScale == scale)
+  if (m_pendingScale == m_contentsScale) {
+    m_pendingScale = 0;
     return;
-  m_contentsScale = scale;
+  }
+  m_pendingScale = scale;
+  if (m_contentsFrozen)
+    return;
+  commitScaleChange();
+}
 
-  invalidate(m_client->tiledBackingStoreContentsRect());
+void TiledBackingStore::commitScaleChange() {
+  m_contentsScale = m_pendingScale;
+  m_pendingScale = 0;
+  m_tiles.clear();
+  createTiles();
 }
 
 double TiledBackingStore::tileDistance(const IntRect& viewport,
@@ -346,11 +357,14 @@ void TiledBackingStore::setContentsFrozen(bool freeze) {
   // Restart the timers. There might be pending invalidations that
   // were not painted or created because tiles are not created or
   // painted when in frozen state.
-  if (!m_contentsFrozen) {
+  if (m_contentsFrozen)
+    return;
+  if (m_pendingScale)
+    commitScaleChange();
+  else {
     startTileCreationTimer();
     startTileBufferUpdateTimer();
   }
-  // stopping is handled when the timers fire
 }
 }
 
