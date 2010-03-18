@@ -2659,9 +2659,8 @@ bool CSSStyleSelector::SelectorChecker::checkOneSelector(
         }
         break;
       case CSSSelector::PseudoEnabled:
-        if (e && e->isFormControlElement()) {
+        if (e && e->isFormControlElement())
           return e->isEnabledFormControl();
-        }
         break;
       case CSSSelector::PseudoFullPageMedia:
         return e && e->document() && e->document()->isMediaDocument();
@@ -2669,9 +2668,8 @@ bool CSSStyleSelector::SelectorChecker::checkOneSelector(
       case CSSSelector::PseudoDefault:
         return e && e->isDefaultButtonForForm();
       case CSSSelector::PseudoDisabled:
-        if (e && e->isFormControlElement()) {
+        if (e && e->isFormControlElement())
           return !e->isEnabledFormControl();
-        }
         break;
       case CSSSelector::PseudoReadOnly: {
         if (!e || !e->isFormControlElement())
