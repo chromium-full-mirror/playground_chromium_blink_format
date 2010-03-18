@@ -5,7 +5,7 @@
  *
  * Copyright (C) 2006, 2007, 2008 Apple Inc.
  * Copyright (C) 2007 Alp Toker
- * Copyright (C) 2008 Brent Fulgham
+ * Copyright (C) 2008, 2010 Brent Fulgham
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -35,7 +35,7 @@
 
 #include <cairo-win32.h>
 
-using std::min;
+using namespace std;
 
 namespace WebCore {
 
@@ -129,5 +129,13 @@ FontPlatformData& FontPlatformData::operator=(const FontPlatformData& other) {
   m_scaledFont = other.m_scaledFont;
 
   return *this;
+}
+
+bool FontPlatformData::operator==(const FontPlatformData& other) const {
+  return m_font == other.m_font && m_fontFace == other.m_fontFace &&
+         m_scaledFont == other.m_scaledFont && m_size == other.m_size &&
+         m_syntheticBold == other.m_syntheticBold &&
+         m_syntheticOblique == other.m_syntheticOblique &&
+         m_useGDI == other.m_useGDI;
 }
 }
