@@ -196,6 +196,7 @@ enum {
   ID_REF_COUNT,
   ID_SET_STATUS,
   ID_RESIZE_TO,
+  ID_NORMALIZE,
   NUM_METHOD_IDENTIFIERS
 };
 
@@ -232,7 +233,7 @@ static const NPUTF8* pluginMethodIdentifierNames[NUM_METHOD_IDENTIFIERS] = {
     "refCount",
     "setStatus",
     "resizeTo",
-};
+    "normalize"};
 
 static NPUTF8* createCStringFromNPVariant(const NPVariant* variant) {
   size_t length = NPVARIANT_TO_STRING(*variant).UTF8Length;
@@ -923,6 +924,26 @@ static bool testResizeTo(PluginObject* obj,
   return true;
 }
 
+static bool normalizeOverride(PluginObject* obj,
+                              const NPVariant* args,
+                              uint32_t argCount,
+                              NPVariant* result) {
+  VOID_TO_NPVARIANT(*result);
+
+  NPObject* windowObject;
+  if (NPERR_NO_ERROR !=
+      browser->getvalue(obj->npp, NPNVWindowNPObject, &windowObject))
+    return false;
+
+  NPVariant callResult;
+  if (browser->invoke(obj->npp, windowObject,
+                      browser->getstringidentifier("pluginCallback"), args,
+                      argCount, &callResult))
+    browser->releasevariantvalue(&callResult);
+
+  return true;
+}
+
 static bool pluginInvoke(NPObject* header,
                          NPIdentifier name,
                          const NPVariant* args,
@@ -1016,6 +1037,8 @@ static bool pluginInvoke(NPObject* header,
     return testSetStatus(plugin, args, argCount, result);
   else if (name == pluginMethodIdentifiers[ID_RESIZE_TO])
     return testResizeTo(plugin, args, argCount, result);
+  else if (name == pluginMethodIdentifiers[ID_NORMALIZE])
+    return normalizeOverride(plugin, args, argCount, result);
 
   return false;
 }
