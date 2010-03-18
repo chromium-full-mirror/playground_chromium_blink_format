@@ -243,13 +243,13 @@ GraphicsLayerCACF::~GraphicsLayerCACF() {
     m_transformLayer->removeFromSuperlayer();
 }
 
-void GraphicsLayerCACF::setName(const String& inName) {
-  String name =
+void GraphicsLayerCACF::setName(const String& name) {
+  String longName =
       String::format("CALayer(%p) GraphicsLayer(%p) ", m_layer.get(), this) +
-      inName;
-  GraphicsLayer::setName(name);
+      name;
+  GraphicsLayer::setName(longName);
 
-  m_layer->setName(inName);
+  m_layer->setName(longName);
 }
 
 NativeLayer GraphicsLayerCACF::nativeLayer() const {
