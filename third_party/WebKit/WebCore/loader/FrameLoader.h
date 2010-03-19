@@ -253,7 +253,9 @@ class FrameLoader : public Noncopyable {
                    ReferrerPolicy);
   bool requestFrame(HTMLFrameOwnerElement*,
                     const String& url,
-                    const AtomicString& frameName);
+                    const AtomicString& frameName,
+                    bool lockHistory = true,
+                    bool lockBackForwardList = true);
 
   void submitForm(const char* action,
                   const String& url,
