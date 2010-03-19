@@ -1,5 +1,5 @@
 /*
- * This file is part of the internal font implementation.  It should not be
+ * This file is part of the internal font implementation. It should not be
  * included by anyone other than
  * FontMac.cpp, FontWin.cpp and Font.cpp.
  *
