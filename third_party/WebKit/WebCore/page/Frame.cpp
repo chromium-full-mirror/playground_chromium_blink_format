@@ -735,7 +735,8 @@ void Frame::setPrinting(bool printing,
                         float maxPageWidth,
                         bool adjustViewSize) {
   m_doc->setPrinting(printing);
-  view()->setMediaType(printing ? "print" : "screen");
+  view()->adjustMediaTypeForPrinting(printing);
+
   m_doc->updateStyleSelector();
   view()->forceLayoutWithPageWidthRange(minPageWidth, maxPageWidth,
                                         adjustViewSize);

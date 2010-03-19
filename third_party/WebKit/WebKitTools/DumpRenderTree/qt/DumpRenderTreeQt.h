@@ -119,6 +119,7 @@ class DumpRenderTree : public QObject {
  private Q_SLOTS:
   void showPage();
   void hidePage();
+  void dryRunPrint(QWebFrame*);
 
  private:
   QString dumpFramesAsText(QWebFrame* frame);

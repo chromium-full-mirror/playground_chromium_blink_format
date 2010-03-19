@@ -39,12 +39,11 @@
 #include "testplugin.h"
 #include "WorkQueue.h"
 
+#include <QApplication>
 #include <QBuffer>
 #include <QCryptographicHash>
 #include <QDir>
 #include <QFile>
-#include <QApplication>
-#include <QUrl>
 #include <QFileInfo>
 #include <QFocusEvent>
 #include <QFontDatabase>
@@ -52,7 +51,9 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <QPrinter>
 #include <QUndoStack>
+#include <QUrl>
 
 #include <qwebsettings.h>
 #include <qwebsecurityorigin.h>
@@ -361,6 +362,8 @@ DumpRenderTree::DumpRenderTree()
           SLOT(resetLoadFinished()));
   connect(m_page, SIGNAL(windowCloseRequested()), this,
           SLOT(windowCloseRequested()));
+  connect(m_page, SIGNAL(printRequested(QWebFrame*)), this,
+          SLOT(dryRunPrint(QWebFrame*)));
 
   connect(m_page->mainFrame(), SIGNAL(titleChanged(const QString&)),
           SLOT(titleChanged(const QString&)));
@@ -391,6 +394,12 @@ static void clearHistory(QWebPage* page) {
   history->clear();
   history->setMaximumItemCount(0);
   history->setMaximumItemCount(itemCount);
+}
+
+void DumpRenderTree::dryRunPrint(QWebFrame* frame) {
+  QPrinter printer;
+  printer.setPaperSize(QPrinter::A4);
+  frame->print(&printer);
 }
 
 void DumpRenderTree::resetToConsistentStateBeforeTesting() {

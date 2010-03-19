@@ -121,6 +121,7 @@ class LayoutTestController : public QObject {
   void closeWebInspector();
   void evaluateInWebInspector(long callId, const QString& script);
 
+  void setMediaType(const QString& type);
   void setFrameSetFlatteningEnabled(bool enable);
   void setAllowUniversalAccessFromFileURLs(bool enable);
   void setAllowFileAccessFromFileURLs(bool enable);

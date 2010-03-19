@@ -147,6 +147,7 @@ class FrameView : public ScrollView {
 
   String mediaType() const;
   void setMediaType(const String&);
+  void adjustMediaTypeForPrinting(bool printing);
 
   void setUseSlowRepaints();
   void setIsOverlapped(bool);
@@ -325,6 +326,7 @@ class FrameView : public ScrollView {
   float m_lastZoomFactor;
 
   String m_mediaType;
+  String m_mediaTypeWhenNotPrinting;
 
   unsigned m_enqueueEvents;
   Vector<ScheduledEvent*> m_scheduledEvents;
