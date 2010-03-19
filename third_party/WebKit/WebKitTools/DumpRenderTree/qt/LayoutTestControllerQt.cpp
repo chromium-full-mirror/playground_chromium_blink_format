@@ -333,6 +333,10 @@ void LayoutTestController::setAllowFileAccessFromFileURLs(bool enabled) {
       QWebSettings::LocalContentCanAccessFileUrls, enabled);
 }
 
+void LayoutTestController::setAppCacheMaximumSize(unsigned long long quota) {
+  m_drt->webPage()->settings()->setOfflineWebApplicationCacheQuota(quota);
+}
+
 void LayoutTestController::setJavaScriptProfilingEnabled(bool enable) {
   m_topLoadingFrame->page()->settings()->setAttribute(
       QWebSettings::DeveloperExtrasEnabled, true);
