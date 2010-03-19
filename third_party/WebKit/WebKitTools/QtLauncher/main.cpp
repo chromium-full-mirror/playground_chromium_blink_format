@@ -955,7 +955,7 @@ void LauncherApplication::applyDefaultSettings() {
 }
 
 LauncherApplication::LauncherApplication(int& argc, char** argv)
-    : QApplication(argc, argv), m_isRobotized(false) {
+    : QApplication(argc, argv, QApplication::GuiServer), m_isRobotized(false) {
   // To allow QWebInspector's configuration persistence
   setOrganizationName("Nokia");
   setApplicationName("QtLauncher");
