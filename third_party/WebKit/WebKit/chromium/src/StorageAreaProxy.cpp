@@ -130,7 +130,7 @@ void StorageAreaProxy::storageEvent(const String& key,
     }
 
     for (unsigned i = 0; i < frames.size(); ++i)
-      frames[i]->document()->enqueueStorageEvent(
+      frames[i]->document()->enqueueEvent(
           StorageEvent::create(eventNames().storageEvent, key, oldValue,
                                newValue, sourceFrame->document()->url(),
                                frames[i]->domWindow()->sessionStorage()));
@@ -151,7 +151,7 @@ void StorageAreaProxy::storageEvent(const String& key,
       ExceptionCode ec = 0;
       Storage* storage = frames[i]->domWindow()->localStorage(ec);
       if (!ec)
-        frames[i]->document()->enqueueStorageEvent(StorageEvent::create(
+        frames[i]->document()->enqueueEvent(StorageEvent::create(
             eventNames().storageEvent, key, oldValue, newValue,
             sourceFrame->document()->url(), storage));
     }
