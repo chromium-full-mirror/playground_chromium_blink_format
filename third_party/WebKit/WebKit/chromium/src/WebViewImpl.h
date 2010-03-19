@@ -43,7 +43,9 @@
 #include "ContextMenuClientImpl.h"
 #include "DragClientImpl.h"
 #include "EditorClientImpl.h"
+#include "GraphicsLayer.h"
 #include "InspectorClientImpl.h"
+#include "LayerRendererSkia.h"
 #include "NotificationPresenterImpl.h"
 
 #include <wtf/OwnPtr.h>
@@ -274,6 +276,11 @@ class WebViewImpl : public WebView, public RefCounted<WebViewImpl> {
     return m_currentInputEvent;
   }
 
+#if USE(ACCELERATED_COMPOSITING)
+  void setRootLayerNeedsDisplay();
+  void setRootGraphicsLayer(WebCore::PlatformLayer*);
+#endif
+
  private:
   friend class WebView;  // So WebView::Create can call our constructor
   friend class WTF::RefCounted<WebViewImpl>;
@@ -298,6 +305,12 @@ class WebViewImpl : public WebView, public RefCounted<WebViewImpl> {
   // Converts |pos| from window coordinates to contents coordinates and gets
   // the HitTestResult for it.
   WebCore::HitTestResult hitTestResultForWindowPos(const WebCore::IntPoint&);
+
+#if USE(ACCELERATED_COMPOSITING)
+  void setAcceleratedCompositing(bool);
+  bool isAcceleratedCompositing() const { return m_isAcceleratedCompositing; }
+  void updateRootLayerContents(const WebRect&);
+#endif
 
   WebViewClient* m_client;
 
@@ -426,6 +439,10 @@ class WebViewImpl : public WebView, public RefCounted<WebViewImpl> {
 
   bool m_haveMouseCapture;
 
+#if USE(ACCELERATED_COMPOSITING)
+  OwnPtr<WebCore::LayerRendererSkia> m_layerRenderer;
+  bool m_isAcceleratedCompositing;
+#endif
   static const WebInputEvent* m_currentInputEvent;
 };
 
