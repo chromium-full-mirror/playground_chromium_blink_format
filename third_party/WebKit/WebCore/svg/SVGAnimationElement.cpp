@@ -476,6 +476,19 @@ void SVGAnimationElement::startedActiveInterval() {
   if (!hasValidTarget())
     return;
 
+  // These validations are appropriate for all animation modes.
+  if (hasAttribute(SVGNames::keyPointsAttr) &&
+      m_keyPoints.size() != m_keyTimes.size())
+    return;
+
+  CalcMode calcMode = this->calcMode();
+  if (calcMode == CalcModeSpline) {
+    unsigned num = m_keySplines.size() + 1;
+    if ((hasAttribute(SVGNames::keyPointsAttr) && m_keyPoints.size() != num) ||
+        m_values.size() != num)
+      return;
+  }
+
   AnimationMode animationMode = this->animationMode();
   if (animationMode == NoAnimation)
     return;
@@ -491,7 +504,6 @@ void SVGAnimationElement::startedActiveInterval() {
   else if (animationMode == ByAnimation)
     m_animationValid = calculateFromAndByValues(String(), byValue());
   else if (animationMode == ValuesAnimation) {
-    CalcMode calcMode = this->calcMode();
     m_animationValid =
         m_values.size() > 1 &&
         (calcMode == CalcModePaced || !hasAttribute(SVGNames::keyTimesAttr) ||
@@ -509,7 +521,7 @@ void SVGAnimationElement::startedActiveInterval() {
       calculateKeyTimesForCalcModePaced();
   } else if (animationMode == PathAnimation)
     m_animationValid =
-        calcMode() == CalcModePaced || !hasAttribute(SVGNames::keyPointsAttr) ||
+        calcMode == CalcModePaced || !hasAttribute(SVGNames::keyPointsAttr) ||
         (m_keyTimes.size() > 1 && m_keyTimes.size() == m_keyPoints.size());
 }
 
