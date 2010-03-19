@@ -2953,6 +2953,9 @@ static void webkit_web_view_set_window_features(
     WebKitWebWindowFeatures* webWindowFeatures) {
   WebKitWebViewPrivate* priv = webView->priv;
 
+  if (!webWindowFeatures)
+    return;
+
   if (webkit_web_window_features_equal(priv->webWindowFeatures,
                                        webWindowFeatures))
     return;

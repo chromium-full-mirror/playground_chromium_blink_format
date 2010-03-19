@@ -409,6 +409,11 @@ WebKitWebWindowFeatures* webkit_web_window_features_new_from_core_features(
  */
 gboolean webkit_web_window_features_equal(WebKitWebWindowFeatures* features1,
                                           WebKitWebWindowFeatures* features2) {
+  if (features1 == features2)
+    return TRUE;
+  if (!features1 || !features2)
+    return FALSE;
+
   WebKitWebWindowFeaturesPrivate* priv1 = features1->priv;
   WebKitWebWindowFeaturesPrivate* priv2 = features2->priv;
 
