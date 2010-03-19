@@ -66,7 +66,7 @@ class HTMLFrameOwnerElement;
 class IconLoader;
 class IntSize;
 class NavigationAction;
-class RenderPart;
+class RenderEmbeddedObject;
 class ResourceError;
 class ResourceLoader;
 class ResourceResponse;
@@ -346,7 +346,7 @@ class FrameLoader : public Noncopyable {
 
   bool isComplete() const;
 
-  bool requestObject(RenderPart* frame,
+  bool requestObject(RenderEmbeddedObject*,
                      const String& url,
                      const AtomicString& frameName,
                      const String& serviceType,
@@ -425,7 +425,7 @@ class FrameLoader : public Noncopyable {
                        const String& mimeType,
                        bool hasFallback,
                        bool& useFallback);
-  bool loadPlugin(RenderPart*,
+  bool loadPlugin(RenderEmbeddedObject*,
                   const KURL&,
                   const String& mimeType,
                   const Vector<String>& paramNames,
