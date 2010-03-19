@@ -48,7 +48,6 @@ class RenderReplaced : public RenderBox {
 
   virtual void paint(PaintInfo&, int tx, int ty);
   bool shouldPaint(PaintInfo&, int& tx, int& ty);
-  void adjustOverflowForBoxShadowAndReflect();
   IntRect localSelectionRect(bool checkWhetherSelected = true) const;
 
  private:
