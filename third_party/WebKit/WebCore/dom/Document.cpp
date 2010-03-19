@@ -408,7 +408,7 @@ Document::Document(Frame* frame, bool isXHTML, bool isHTML)
 #endif
       ,
       m_usingGeolocation(false),
-      m_storageEventTimer(this, &Document::storageEventTimerFired)
+      m_pendingEventTimer(this, &Document::pendingEventTimerFired)
 #if ENABLE(WML)
       ,
       m_containsWMLContent(false)
@@ -1859,10 +1859,9 @@ void Document::implicitClose() {
   ImageLoader::dispatchPendingBeforeLoadEvents();
   ImageLoader::dispatchPendingLoadEvents();
   dispatchWindowLoadEvent();
-  dispatchWindowEvent(
-      PageTransitionEvent::create(eventNames().pageshowEvent, false), this);
+  enqueuePageshowEvent(PageshowEventNotPersisted);
   if (m_pendingStateObject)
-    dispatchWindowEvent(PopStateEvent::create(m_pendingStateObject.release()));
+    enqueuePopstateEvent(m_pendingStateObject.release());
 
   if (f)
     f->loader()->handledOnloadEvents();
@@ -3050,20 +3049,20 @@ void Document::dispatchWindowLoadEvent() {
   domWindow->dispatchLoadEvent();
 }
 
-void Document::enqueueStorageEvent(PassRefPtr<Event> storageEvent) {
-  m_storageEventQueue.append(storageEvent);
-  if (!m_storageEventTimer.isActive())
-    m_storageEventTimer.startOneShot(0);
+void Document::enqueueEvent(PassRefPtr<Event> event) {
+  m_pendingEventQueue.append(event);
+  if (!m_pendingEventTimer.isActive())
+    m_pendingEventTimer.startOneShot(0);
 }
 
-void Document::storageEventTimerFired(Timer<Document>*) {
-  ASSERT(!m_storageEventTimer.isActive());
-  Vector<RefPtr<Event>> storageEventQueue;
-  storageEventQueue.swap(m_storageEventQueue);
+void Document::pendingEventTimerFired(Timer<Document>*) {
+  ASSERT(!m_pendingEventTimer.isActive());
+  Vector<RefPtr<Event>> eventQueue;
+  eventQueue.swap(m_pendingEventQueue);
 
   typedef Vector<RefPtr<Event>>::const_iterator Iterator;
-  Iterator end = storageEventQueue.end();
-  for (Iterator it = storageEventQueue.begin(); it != end; ++it)
+  Iterator end = eventQueue.end();
+  for (Iterator it = eventQueue.begin(); it != end; ++it)
     dispatchWindowEvent(*it);
 }
 
@@ -4552,7 +4551,7 @@ void Document::statePopped(SerializedScriptValue* stateObject) {
     return;
 
   if (f->loader()->isComplete())
-    dispatchWindowEvent(PopStateEvent::create(stateObject));
+    enqueuePopstateEvent(stateObject);
   else
     m_pendingStateObject = stateObject;
 }
@@ -4807,6 +4806,31 @@ void Document::displayBufferModifiedByEncoding(UChar* buffer,
                                                unsigned len) const {
   if (m_decoder)
     m_decoder->encoding().displayBuffer(buffer, len);
+}
+
+void Document::enqueuePageshowEvent(PageshowEventPersistence persisted) {
+  // FIXME: https://bugs.webkit.org/show_bug.cgi?id=36334 Pageshow event needs
+  // to fire asynchronously.
+  dispatchWindowEvent(
+      PageTransitionEvent::create(eventNames().pageshowEvent, persisted), this);
+}
+
+void Document::enqueueHashchangeEvent(const String& /*oldURL*/,
+                                      const String& /*newURL*/) {
+  // FIXME: https://bugs.webkit.org/show_bug.cgi?id=36201 Hashchange event needs
+  // to fire asynchronously.
+  // FIXME: https://bugs.webkit.org/show_bug.cgi?id=36335 Hashchange event is
+  // now its own interface and takes two
+  //   URL arguments which we need to pass in here.
+  dispatchWindowEvent(
+      Event::create(eventNames().hashchangeEvent, false, false));
+}
+
+void Document::enqueuePopstateEvent(
+    PassRefPtr<SerializedScriptValue> stateObject) {
+  // FIXME: https://bugs.webkit.org/show_bug.cgi?id=36202 Popstate event needs
+  // to fire asynchronously
+  dispatchWindowEvent(PopStateEvent::create(stateObject));
 }
 
 #if ENABLE(XHTMLMP)
