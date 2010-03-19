@@ -54,6 +54,10 @@ PDFDocumentImage::~PDFDocumentImage() {
   CGPDFDocumentRelease(m_document);
 }
 
+String PDFDocumentImage::filenameExtension() const {
+  return "pdf";
+}
+
 IntSize PDFDocumentImage::size() const {
   const float sina = sinf(-m_rotation);
   const float cosa = cosf(-m_rotation);
