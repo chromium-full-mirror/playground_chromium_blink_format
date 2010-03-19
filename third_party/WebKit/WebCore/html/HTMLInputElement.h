@@ -138,6 +138,8 @@ class HTMLInputElement : public HTMLTextFormControlElement,
   bool checked() const { return m_checked; }
   void setChecked(bool, bool sendChangeEvent = false);
 
+  // 'indeterminate' is a state independent of the checked state that causes the
+  // control to draw in a way that hides the actual state.
   bool allowsIndeterminate() const {
     return inputType() == CHECKBOX || inputType() == RADIO;
   }
