@@ -23,6 +23,7 @@
 
 #include "HTMLInputElement.h"
 #include "HTMLNames.h"
+#include "PlatformString.h"
 #include <wtf/MathExtras.h>
 
 using namespace std;
@@ -31,7 +32,7 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-StepRange::StepRange(HTMLInputElement* element) {
+StepRange::StepRange(const HTMLInputElement* element) {
   if (element->hasAttribute(precisionAttr)) {
     step = 1.0;
     hasStep = !equalIgnoringCase(element->getAttribute(precisionAttr), "float");
@@ -53,6 +54,15 @@ double StepRange::clampValue(double value) {
   ASSERT(clampedValue >= minimum);
   ASSERT(clampedValue <= maximum);
   return clampedValue;
+}
+
+double StepRange::clampValue(const String& stringValue) {
+  double value;
+  bool parseSuccess =
+      HTMLInputElement::parseToDoubleForNumberType(stringValue, &value);
+  if (!parseSuccess)
+    value = (minimum + maximum) / 2;
+  return clampValue(value);
 }
 
 double StepRange::valueFromElement(HTMLInputElement* element,

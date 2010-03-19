@@ -2,7 +2,8 @@
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
  *           (C) 2001 Dirk Mueller (mueller@kde.org)
- * Copyright (C) 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010 Apple Inc. All rights
+ * reserved.
  *           (C) 2006 Alexey Proskuryakov (ap@nypop.com)
  * Copyright (C) 2007 Samuel Weinig (sam@webkit.org)
  *
@@ -60,6 +61,7 @@
 #include "RenderText.h"
 #include "RenderTextControlSingleLine.h"
 #include "RenderTheme.h"
+#include "StepRange.h"
 #include "StringHash.h"
 #include "TextEvent.h"
 #include <wtf/HashMap.h>
@@ -307,12 +309,13 @@ bool HTMLInputElement::rangeUnderflow() const {
     case DATETIMELOCAL:
     case MONTH:
     case NUMBER:
-    case RANGE:
     case TIME:
     case WEEK: {
       double doubleValue = parseToDouble(value(), nan);
       return isfinite(doubleValue) && doubleValue < minimum();
     }
+    case RANGE:  // Guaranteed by sanitization.
+      ASSERT(parseToDouble(value(), nan) >= minimum());
     case BUTTON:
     case CHECKBOX:
     case COLOR:
@@ -342,12 +345,13 @@ bool HTMLInputElement::rangeOverflow() const {
     case DATETIMELOCAL:
     case MONTH:
     case NUMBER:
-    case RANGE:
     case TIME:
     case WEEK: {
       double doubleValue = parseToDouble(value(), nan);
       return isfinite(doubleValue) && doubleValue > maximum();
     }
+    case RANGE:  // Guaranteed by sanitization.
+      ASSERT(parseToDouble(value(), nan) <= maximum());
     case BUTTON:
     case CHECKBOX:
     case COLOR:
@@ -496,7 +500,8 @@ bool HTMLInputElement::stepMismatch() const {
   switch (inputType()) {
     case RANGE:
       // stepMismatch doesn't occur for RANGE. RenderSlider guarantees the
-      // value matches to step.
+      // value matches to step on user input, and sanitation takes care
+      // of the general case.
       return false;
     case NUMBER: {
       double doubleValue;
@@ -1456,10 +1461,16 @@ String HTMLInputElement::value() const {
   if (value.isNull()) {
     value = sanitizeValue(getAttribute(valueAttr));
 
-    // If no attribute exists, then just use "on" or "" based off the checked()
-    // state of the control.
-    if (value.isNull() && (inputType() == CHECKBOX || inputType() == RADIO))
-      return checked() ? "on" : "";
+    // If no attribute exists, extra handling may be necessary.
+    // For Checkbox Types just use "on" or "" based off the checked() state of
+    // the control.
+    // For a Range Input use the calculated default value.
+    if (value.isNull()) {
+      if (inputType() == CHECKBOX || inputType() == RADIO)
+        return checked() ? "on" : "";
+      else if (inputType() == RANGE)
+        return serializeForNumberType(StepRange(this).defaultValue());
+    }
   }
 
   return value;
@@ -2468,6 +2479,13 @@ FileList* HTMLInputElement::files() {
 String HTMLInputElement::sanitizeValue(const String& proposedValue) const {
   if (isTextField())
     return InputElement::sanitizeValue(this, proposedValue);
+
+  // If the proposedValue is null than this is a reset scenario and we
+  // want the range input's value attribute to take priority over the
+  // calculated default (middle) value.
+  if (inputType() == RANGE && !proposedValue.isNull())
+    return serializeForNumberType(StepRange(this).clampValue(proposedValue));
+
   return proposedValue;
 }
 
