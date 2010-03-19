@@ -157,7 +157,7 @@ void LayoutTestController::maybeDump(bool success) {
 void LayoutTestController::waitUntilDone() {
   // qDebug() << ">>>>waitForDone";
   m_waitForDone = true;
-  m_timeoutTimer.start(15000, this);
+  m_timeoutTimer.start(30000, this);
 }
 
 QString LayoutTestController::counterValueForElementById(const QString& id) {
