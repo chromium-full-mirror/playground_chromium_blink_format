@@ -383,8 +383,7 @@ static void updateFocusCandidateIfCloser(
     // not another already good focusable candidate in the same document as
     // |focusedNode|.
     if (!((isInRootDocument(candidate) && !isInRootDocument(focusedNode)) &&
-          closestFocusCandidate.node &&
-          focusedNode->document() == closestFocusCandidate.node->document())) {
+          focusedNode->document() == closestFocusCandidate.document())) {
       closestFocusCandidate.node = candidate;
       closestFocusCandidate.distance = distance;
     }
