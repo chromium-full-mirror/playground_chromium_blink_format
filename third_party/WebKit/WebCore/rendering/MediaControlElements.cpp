@@ -635,6 +635,9 @@ void MediaControlTimelineElement::defaultEventHandler(Event* event) {
   if (event->isMouseEvent() && static_cast<MouseEvent*>(event)->button())
     return;
 
+  if (!attached())
+    return;
+
   if (event->type() == eventNames().mousedownEvent)
     m_mediaElement->beginScrubbing();
 
@@ -681,6 +684,9 @@ MediaControlVolumeSliderElement::MediaControlVolumeSliderElement(
 void MediaControlVolumeSliderElement::defaultEventHandler(Event* event) {
   // Left button is 0. Rejects mouse events not from left button.
   if (event->isMouseEvent() && static_cast<MouseEvent*>(event)->button())
+    return;
+
+  if (!attached())
     return;
 
   MediaControlInputElement::defaultEventHandler(event);
