@@ -5234,7 +5234,9 @@ void RenderBlock::updateFirstLetter() {
   // Drill into inlines looking for our first text child.
   RenderObject* currChild = firstLetterBlock->firstChild();
   while (currChild && currChild->needsLayout() &&
-         (!currChild->isReplaced() || currChild->isFloatingOrPositioned()) &&
+         ((!currChild->isReplaced() && !currChild->isRenderButton() &&
+           !currChild->isMenuList()) ||
+          currChild->isFloatingOrPositioned()) &&
          !currChild->isText()) {
     if (currChild->isFloatingOrPositioned()) {
       if (currChild->style()->styleType() == FIRST_LETTER)
