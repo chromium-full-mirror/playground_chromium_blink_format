@@ -118,16 +118,6 @@ class WXDLLIMPEXP_WEBKIT wxWebSettings : public wxObject {
   bool IsJavaScriptEnabled() const;
 
   /**
-      Sets whether or not web pages can create databases.
-  */
-  void SetDatabasesEnabled(bool enabled);
-
-  /**
-      Returns whether or not the WebView runs JavaScript code.
-  */
-  bool AreDatabasesEnabled() const;
-
-  /**
       Sets the path where local data will be stored.
   */
   void SetLocalStoragePath(const wxString& path);

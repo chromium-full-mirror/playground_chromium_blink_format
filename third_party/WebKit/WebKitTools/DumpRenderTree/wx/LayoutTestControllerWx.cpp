@@ -334,3 +334,5 @@ void LayoutTestController::apiTestNewWindowDataLoadBaseURL(
     JSStringRef baseURL) {}
 
 void LayoutTestController::apiTestGoToCurrentBackForwardItem() {}
+
+void LayoutTestController::setSpatialNavigationEnabled(bool) {}
