@@ -88,7 +88,11 @@ void FEMorphology::apply(Filter* filter) {
 
   setIsAlphaImage(m_in->isAlphaImage());
 
-  if (!m_radiusX || !m_radiusY)
+  int radiusX =
+      static_cast<int>(m_radiusX * filter->filterResolution().width());
+  int radiusY =
+      static_cast<int>(m_radiusY * filter->filterResolution().height());
+  if (radiusX <= 0 || radiusY <= 0)
     return;
 
   IntRect imageRect(IntPoint(), resultImage()->size());
@@ -100,14 +104,11 @@ void FEMorphology::apply(Filter* filter) {
   RefPtr<ImageData> imageData =
       ImageData::create(imageRect.width(), imageRect.height());
 
-  int radiusX =
-      static_cast<int>(m_radiusX * filter->filterResolution().width());
-  int radiusY =
-      static_cast<int>(m_radiusY * filter->filterResolution().height());
   int effectWidth = effectDrawingRect.width() * 4;
 
-  // Limit the radius size to effect width
+  // Limit the radius size to effect dimensions
   radiusX = min(effectDrawingRect.width() - 1, radiusX);
+  radiusY = min(effectDrawingRect.height() - 1, radiusY);
 
   Vector<unsigned char> extrema;
   for (int y = 0; y < effectDrawingRect.height(); ++y) {
