@@ -33,6 +33,12 @@ namespace WebCore {
 
 class String;
 
+enum XSSProtectionDisposition {
+  XSSProtectionDisabled,
+  XSSProtectionEnabled,
+  XSSProtectionBlockEnabled
+};
+
 bool parseHTTPRefresh(const String& refresh,
                       bool fromHttpEquivMeta,
                       double& delay,
@@ -41,6 +47,7 @@ double parseDate(const String&);
 String filenameFromHTTPContentDisposition(const String&);
 String extractMIMETypeFromMediaType(const String&);
 String extractCharsetFromMediaType(const String&);
+XSSProtectionDisposition parseXSSProtectionHeader(const String&);
 }
 
 #endif

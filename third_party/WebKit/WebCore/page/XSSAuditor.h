@@ -27,6 +27,7 @@
 #ifndef XSSAuditor_h
 #define XSSAuditor_h
 
+#include "HTTPParsers.h"
 #include "PlatformString.h"
 #include "TextEncoding.h"
 
@@ -152,7 +153,7 @@ class XSSAuditor : public Noncopyable {
   bool findInRequest(const FindTask&) const;
   bool findInRequest(Frame*, const FindTask&) const;
 
-  bool shouldFullPageBlockForXSSProtectionHeader() const;
+  XSSProtectionDisposition xssProtection() const;
 
   // The frame to audit.
   Frame* m_frame;
