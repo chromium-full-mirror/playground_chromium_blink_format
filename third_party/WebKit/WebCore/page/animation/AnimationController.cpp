@@ -138,6 +138,9 @@ void AnimationControllerPrivate::updateAnimationTimer(
 
 void AnimationControllerPrivate::updateStyleIfNeededDispatcherFired(
     Timer<AnimationControllerPrivate>*) {
+  // Protect the frame from getting destroyed in the event handler
+  RefPtr<Frame> protector = m_frame;
+
   // fire all the events
   Vector<EventToDispatch>::const_iterator eventsToDispatchEnd =
       m_eventsToDispatch.end();
