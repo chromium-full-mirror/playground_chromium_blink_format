@@ -47,6 +47,10 @@ class QScriptEnginePrivate : public QSharedData {
   QScriptValuePrivate* evaluate(const QString& program,
                                 const QString& fileName,
                                 int lineNumber);
+  QScriptValuePrivate* evaluate(const QScriptProgramPrivate* program);
+  inline JSValueRef evaluate(JSStringRef program,
+                             JSStringRef fileName,
+                             int lineNumber);
   inline void collectGarbage();
 
   inline JSValueRef makeJSValue(double number) const;
@@ -64,6 +68,18 @@ class QScriptEnginePrivate : public QSharedData {
   QScriptEngine* q_ptr;
   JSGlobalContextRef m_context;
 };
+
+JSValueRef QScriptEnginePrivate::evaluate(JSStringRef program,
+                                          JSStringRef fileName,
+                                          int lineNumber) {
+  JSValueRef exception;
+  JSValueRef result =
+      JSEvaluateScript(m_context, program, /* Global Object */ 0, fileName,
+                       lineNumber, &exception);
+  if (!result)
+    return exception;  // returns an exception
+  return result;
+}
 
 void QScriptEnginePrivate::collectGarbage() {
   JSGarbageCollect(m_context);

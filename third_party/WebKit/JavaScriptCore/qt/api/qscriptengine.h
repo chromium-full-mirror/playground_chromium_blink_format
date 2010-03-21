@@ -20,6 +20,7 @@
 #ifndef qscriptengine_h
 #define qscriptengine_h
 
+#include "qscriptprogram.h"
 #include "qscriptstring.h"
 #include <QtCore/qobject.h>
 #include <QtCore/qshareddata.h>
@@ -39,6 +40,7 @@ class QScriptEngine : public QObject {
   QScriptValue evaluate(const QString& program,
                         const QString& fileName = QString(),
                         int lineNumber = 1);
+  QScriptValue evaluate(const QScriptProgram& program);
   void collectGarbage();
 
   QScriptString toStringHandle(const QString& str);
