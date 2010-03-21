@@ -636,19 +636,33 @@ static JSValueRef keyDownCallback(JSContextRef context,
   return JSValueMakeUndefined(context);
 }
 
+static void zoomIn(gboolean fullContentsZoom) {
+  WebKitWebView* view = webkit_web_frame_get_web_view(mainFrame);
+  if (!view)
+    return;
+
+  webkit_web_view_set_full_content_zoom(view, fullContentsZoom);
+  gfloat currentZoom = webkit_web_view_get_zoom_level(view);
+  webkit_web_view_set_zoom_level(view, currentZoom * zoomMultiplierRatio);
+}
+
+static void zoomOut(gboolean fullContentsZoom) {
+  WebKitWebView* view = webkit_web_frame_get_web_view(mainFrame);
+  if (!view)
+    return;
+
+  webkit_web_view_set_full_content_zoom(view, fullContentsZoom);
+  gfloat currentZoom = webkit_web_view_get_zoom_level(view);
+  webkit_web_view_set_zoom_level(view, currentZoom / zoomMultiplierRatio);
+}
+
 static JSValueRef textZoomInCallback(JSContextRef context,
                                      JSObjectRef function,
                                      JSObjectRef thisObject,
                                      size_t argumentCount,
                                      const JSValueRef arguments[],
                                      JSValueRef* exception) {
-  WebKitWebView* view = webkit_web_frame_get_web_view(mainFrame);
-  if (!view)
-    return JSValueMakeUndefined(context);
-
-  gfloat currentZoom = webkit_web_view_get_zoom_level(view);
-  webkit_web_view_set_zoom_level(view, currentZoom * zoomMultiplierRatio);
-
+  zoomIn(FALSE);
   return JSValueMakeUndefined(context);
 }
 
@@ -658,13 +672,7 @@ static JSValueRef textZoomOutCallback(JSContextRef context,
                                       size_t argumentCount,
                                       const JSValueRef arguments[],
                                       JSValueRef* exception) {
-  WebKitWebView* view = webkit_web_frame_get_web_view(mainFrame);
-  if (!view)
-    return JSValueMakeUndefined(context);
-
-  gfloat currentZoom = webkit_web_view_get_zoom_level(view);
-  webkit_web_view_set_zoom_level(view, currentZoom / zoomMultiplierRatio);
-
+  zoomOut(FALSE);
   return JSValueMakeUndefined(context);
 }
 
@@ -674,11 +682,7 @@ static JSValueRef zoomPageInCallback(JSContextRef context,
                                      size_t argumentCount,
                                      const JSValueRef arguments[],
                                      JSValueRef* exception) {
-  WebKitWebView* view = webkit_web_frame_get_web_view(mainFrame);
-  if (!view)
-    return JSValueMakeUndefined(context);
-
-  webkit_web_view_zoom_in(view);
+  zoomIn(TRUE);
   return JSValueMakeUndefined(context);
 }
 
@@ -688,11 +692,7 @@ static JSValueRef zoomPageOutCallback(JSContextRef context,
                                       size_t argumentCount,
                                       const JSValueRef arguments[],
                                       JSValueRef* exception) {
-  WebKitWebView* view = webkit_web_frame_get_web_view(mainFrame);
-  if (!view)
-    return JSValueMakeUndefined(context);
-
-  webkit_web_view_zoom_out(view);
+  zoomOut(TRUE);
   return JSValueMakeUndefined(context);
 }
 
