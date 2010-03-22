@@ -51,6 +51,8 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <QPaintDevice>
+#include <QPaintEngine>
 #include <QPrinter>
 #include <QUndoStack>
 #include <QUrl>
@@ -116,6 +118,26 @@ void NetworkAccessManager::sslErrorsEncountered(
   }
 }
 #endif
+
+class NullPrinter : public QPrinter {
+ public:
+  class NullPaintEngine : public QPaintEngine {
+   public:
+    virtual bool begin(QPaintDevice*) { return true; }
+    virtual bool end() { return true; }
+    virtual QPaintEngine::Type type() const { return QPaintEngine::User; }
+    virtual void drawPixmap(const QRectF& r,
+                            const QPixmap& pm,
+                            const QRectF& sr) {}
+    virtual void updateState(const QPaintEngineState& state) {}
+  };
+
+  virtual QPaintEngine* paintEngine() const {
+    return const_cast<NullPaintEngine*>(&m_engine);
+  }
+
+  NullPaintEngine m_engine;
+};
 
 WebPage::WebPage(QObject* parent, DumpRenderTree* drt)
     : QWebPage(parent), m_webInspector(0), m_drt(drt) {
@@ -397,8 +419,7 @@ static void clearHistory(QWebPage* page) {
 }
 
 void DumpRenderTree::dryRunPrint(QWebFrame* frame) {
-  QPrinter printer;
-  printer.setPaperSize(QPrinter::A4);
+  NullPrinter printer;
   frame->print(&printer);
 }
 
