@@ -23,12 +23,14 @@
 #include "qscriptconverter_p.h"
 #include "qscriptengine.h"
 #include "qscriptstring_p.h"
+#include "qscriptsyntaxcheckresult_p.h"
 #include "qscriptvalue.h"
 #include <JavaScriptCore/JavaScript.h>
 #include <QtCore/qshareddata.h>
 #include <QtCore/qstring.h>
 
 class QScriptEngine;
+class QScriptSyntaxCheckResultPrivate;
 
 class QScriptEnginePrivate : public QSharedData {
  public:
@@ -44,6 +46,7 @@ class QScriptEnginePrivate : public QSharedData {
   QScriptEnginePrivate(const QScriptEngine*);
   ~QScriptEnginePrivate();
 
+  QScriptSyntaxCheckResultPrivate* checkSyntax(const QString& program);
   QScriptValuePrivate* evaluate(const QString& program,
                                 const QString& fileName,
                                 int lineNumber);
