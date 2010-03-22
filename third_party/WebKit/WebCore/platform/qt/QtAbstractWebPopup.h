@@ -56,6 +56,9 @@ class QtAbstractWebPopup {
   void popupDidHide();
   void valueChanged(int index);
 
+  void selectItem(int index, bool allowMultiplySelections, bool shift);
+  bool multiple();
+
   QFont font() { return m_popupClient->menuStyle().font().font(); }
 
  private:
