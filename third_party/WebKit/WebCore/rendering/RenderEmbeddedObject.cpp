@@ -65,7 +65,7 @@ static const float missingPluginRoundedRectRadius = 5;
 static const float missingPluginTextOpacity = 0.55f;
 
 RenderEmbeddedObject::RenderEmbeddedObject(Element* element)
-    : RenderPartObject(element), m_setShowsMissingPluginIndicator(false) {
+    : RenderPartObject(element), m_showsMissingPluginIndicator(false) {
   view()->frameView()->setIsVisuallyNonEmpty();
 }
 
@@ -154,6 +154,9 @@ static void mapDataParamToSrc(Vector<String>* paramNames,
 }
 
 void RenderEmbeddedObject::updateWidget(bool onlyCreateNonNetscapePlugins) {
+  if (m_showsMissingPluginIndicator)
+    return;
+
   String url;
   String serviceType;
   Vector<String> paramNames;
@@ -373,7 +376,7 @@ void RenderEmbeddedObject::updateWidget(bool onlyCreateNonNetscapePlugins) {
 }
 
 void RenderEmbeddedObject::paint(PaintInfo& paintInfo, int tx, int ty) {
-  if (m_setShowsMissingPluginIndicator) {
+  if (m_showsMissingPluginIndicator) {
     RenderReplaced::paint(paintInfo, tx, ty);
     return;
   }
@@ -382,7 +385,7 @@ void RenderEmbeddedObject::paint(PaintInfo& paintInfo, int tx, int ty) {
 }
 
 void RenderEmbeddedObject::paintReplaced(PaintInfo& paintInfo, int tx, int ty) {
-  if (!m_setShowsMissingPluginIndicator)
+  if (!m_showsMissingPluginIndicator)
     return;
 
   if (paintInfo.phase == PaintPhaseSelection)
