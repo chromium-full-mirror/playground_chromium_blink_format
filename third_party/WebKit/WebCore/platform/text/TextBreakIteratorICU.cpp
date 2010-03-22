@@ -24,7 +24,6 @@
 
 #include "PlatformString.h"
 #include "TextBreakIteratorInternalICU.h"
-
 #include <unicode/ubrk.h>
 #include <wtf/Assertions.h>
 
@@ -40,7 +39,7 @@ static TextBreakIterator* setUpIterator(bool& createdIterator,
 
   if (!createdIterator) {
     UErrorCode openStatus = U_ZERO_ERROR;
-    iterator = static_cast<TextBreakIterator*>(
+    iterator = reinterpret_cast<TextBreakIterator*>(
         ubrk_open(type, currentTextBreakLocaleID(), 0, 0, &openStatus));
     createdIterator = true;
     ASSERT_WITH_MESSAGE(U_SUCCESS(openStatus),
@@ -51,7 +50,8 @@ static TextBreakIterator* setUpIterator(bool& createdIterator,
     return 0;
 
   UErrorCode setTextStatus = U_ZERO_ERROR;
-  ubrk_setText(iterator, string, length, &setTextStatus);
+  ubrk_setText(reinterpret_cast<UBreakIterator*>(iterator), string, length,
+               &setTextStatus);
   if (U_FAILURE(setTextStatus))
     return 0;
 
@@ -88,36 +88,36 @@ TextBreakIterator* sentenceBreakIterator(const UChar* string, int length) {
                        length);
 }
 
-int textBreakFirst(TextBreakIterator* bi) {
-  return ubrk_first(bi);
+int textBreakFirst(TextBreakIterator* iterator) {
+  return ubrk_first(reinterpret_cast<UBreakIterator*>(iterator));
 }
 
-int textBreakLast(TextBreakIterator* bi) {
-  return ubrk_last(bi);
+int textBreakLast(TextBreakIterator* iterator) {
+  return ubrk_last(reinterpret_cast<UBreakIterator*>(iterator));
 }
 
-int textBreakNext(TextBreakIterator* bi) {
-  return ubrk_next(bi);
+int textBreakNext(TextBreakIterator* iterator) {
+  return ubrk_next(reinterpret_cast<UBreakIterator*>(iterator));
 }
 
-int textBreakPrevious(TextBreakIterator* bi) {
-  return ubrk_previous(bi);
+int textBreakPrevious(TextBreakIterator* iterator) {
+  return ubrk_previous(reinterpret_cast<UBreakIterator*>(iterator));
 }
 
-int textBreakPreceding(TextBreakIterator* bi, int pos) {
-  return ubrk_preceding(bi, pos);
+int textBreakPreceding(TextBreakIterator* iterator, int pos) {
+  return ubrk_preceding(reinterpret_cast<UBreakIterator*>(iterator), pos);
 }
 
-int textBreakFollowing(TextBreakIterator* bi, int pos) {
-  return ubrk_following(bi, pos);
+int textBreakFollowing(TextBreakIterator* iterator, int pos) {
+  return ubrk_following(reinterpret_cast<UBreakIterator*>(iterator), pos);
 }
 
-int textBreakCurrent(TextBreakIterator* bi) {
-  return ubrk_current(bi);
+int textBreakCurrent(TextBreakIterator* iterator) {
+  return ubrk_current(reinterpret_cast<UBreakIterator*>(iterator));
 }
 
-bool isTextBreak(TextBreakIterator* bi, int pos) {
-  return ubrk_isBoundary(bi, pos);
+bool isTextBreak(TextBreakIterator* iterator, int position) {
+  return ubrk_isBoundary(reinterpret_cast<UBreakIterator*>(iterator), position);
 }
 
 #ifndef BUILDING_ON_TIGER
@@ -133,7 +133,7 @@ static TextBreakIterator* setUpIteratorWithRules(bool& createdIterator,
     UParseError parseStatus;
     UErrorCode openStatus = U_ZERO_ERROR;
     String rules(breakRules);
-    iterator = static_cast<TextBreakIterator*>(ubrk_openRules(
+    iterator = reinterpret_cast<TextBreakIterator*>(ubrk_openRules(
         rules.characters(), rules.length(), 0, 0, &parseStatus, &openStatus));
     createdIterator = true;
     ASSERT_WITH_MESSAGE(U_SUCCESS(openStatus),
@@ -144,7 +144,8 @@ static TextBreakIterator* setUpIteratorWithRules(bool& createdIterator,
     return 0;
 
   UErrorCode setTextStatus = U_ZERO_ERROR;
-  ubrk_setText(iterator, string, length, &setTextStatus);
+  ubrk_setText(reinterpret_cast<UBreakIterator*>(iterator), string, length,
+               &setTextStatus);
   if (U_FAILURE(setTextStatus))
     return 0;
 
