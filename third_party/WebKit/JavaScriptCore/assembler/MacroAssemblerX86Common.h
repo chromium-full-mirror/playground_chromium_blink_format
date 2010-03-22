@@ -758,6 +758,12 @@ class MacroAssemblerX86Common : public AbstractMacroAssembler<X86Assembler> {
     return Jump(m_assembler.jCC(x86Condition(cond)));
   }
 
+  Jump branchNeg32(Condition cond, RegisterID srcDest) {
+    ASSERT((cond == Overflow) || (cond == Zero) || (cond == NonZero));
+    neg32(srcDest);
+    return Jump(m_assembler.jCC(x86Condition(cond)));
+  }
+
   Jump branchOr32(Condition cond, RegisterID src, RegisterID dest) {
     ASSERT((cond == Signed) || (cond == Zero) || (cond == NonZero));
     or32(src, dest);
