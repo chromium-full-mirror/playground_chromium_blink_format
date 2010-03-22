@@ -41,8 +41,7 @@ WebViewGraphicsBased::WebViewGraphicsBased(QWidget* parent)
       m_numPaintsTotal(0),
       m_numPaintsSinceLastMeasure(0),
       m_measureFps(false),
-      m_resizesToContents(false),
-      m_fpsTextItem(0) {
+      m_resizesToContents(false) {
   setScene(new QGraphicsScene(this));
   scene()->addItem(m_item);
 
@@ -78,10 +77,6 @@ WebViewGraphicsBased::WebViewGraphicsBased(QWidget* parent)
   m_updateTimer = new QTimer(this);
   m_updateTimer->setInterval(1000);
   connect(m_updateTimer, SIGNAL(timeout()), this, SLOT(updateFrameRate()));
-
-  m_fpsTextItem = new GraphicsTextItem("[FPS] average: 0, current: 0", m_item);
-  m_fpsTextItem->setDefaultTextColor(QColor(Qt::red));
-  m_fpsTextItem->setVisible(false);
 }
 
 void WebViewGraphicsBased::setResizesToContents(bool b) {
@@ -102,10 +97,6 @@ void WebViewGraphicsBased::resizeEvent(QResizeEvent* event) {
     return;
   QRectF rect(QPoint(0, 0), event->size());
   m_item->setGeometry(rect);
-
-  m_fpsTextItem->setPos(
-      m_item->size().width() - m_fpsTextItem->boundingRect().width() - 20,
-      m_item->size().height() - m_fpsTextItem->boundingRect().height() - 20);
 }
 
 void WebViewGraphicsBased::setFrameRateMeasurementEnabled(bool enabled) {
@@ -113,11 +104,8 @@ void WebViewGraphicsBased::setFrameRateMeasurementEnabled(bool enabled) {
   if (m_measureFps) {
     m_lastConsultTime = m_startTime = QTime::currentTime();
     m_updateTimer->start();
-    m_fpsTextItem->setVisible(true);
-  } else {
+  } else
     m_updateTimer->stop();
-    m_fpsTextItem->setVisible(false);
-  }
 }
 
 void WebViewGraphicsBased::updateFrameRate() {
@@ -129,10 +117,7 @@ void WebViewGraphicsBased::updateFrameRate() {
   int average = total ? m_numPaintsTotal * 1000 / total : 0;
   int current = interval ? m_numPaintsSinceLastMeasure * 1000 / interval : 0;
 
-  QString fpsText;
-  QTextStream text(&fpsText);
-  text << "[FPS] average: " << average << ", current: " << current;
-  m_fpsTextItem->setPlainText(fpsText);
+  qDebug("[FPS] average: %d, current: %d", average, current);
 
   m_lastConsultTime = now;
   m_numPaintsSinceLastMeasure = 0;
