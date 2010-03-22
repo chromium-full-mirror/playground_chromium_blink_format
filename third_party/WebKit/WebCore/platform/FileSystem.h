@@ -155,6 +155,10 @@ String filenameForDisplay(const String&);
 String pathGetDisplayFileName(const String&);
 #endif
 
+#if PLATFORM(EFL)
+char* filenameFromString(const String&);
+#endif
+
 }  // namespace WebCore
 
 #endif  // FileSystem_h
