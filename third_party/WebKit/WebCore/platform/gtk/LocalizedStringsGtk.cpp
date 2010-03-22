@@ -285,6 +285,10 @@ String AXMenuListActionVerb() {
   return String();
 }
 
+String missingPluginText() {
+  return String::fromUTF8(_("Missing Plug-in"));
+}
+
 String multipleFileUploadText(unsigned numberOfFiles) {
   // FIXME: If this file gets localized, this should really be localized as one
   // string with a wildcard for the number.
