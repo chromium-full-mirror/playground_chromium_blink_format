@@ -304,7 +304,8 @@ String WebCore::allFilesText() {
       "All Files", "(Windows) Form submit file upload all files pop-up"));
 }
 String WebCore::missingPluginText() {
-  return String(LPCTSTR_UI_STRING("Missing Plug-in", "Missing Plug-in label"));
+  return String(LPCTSTR_UI_STRING(
+      "Missing Plug-in", "Label text to be used when a plugin is missing"));
 }
 String WebCore::imageTitle(const String& filename, const IntSize& size) {
   static RetainPtr<CFStringRef> format(
