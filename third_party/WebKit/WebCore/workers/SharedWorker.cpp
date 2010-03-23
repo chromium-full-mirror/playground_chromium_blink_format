@@ -61,7 +61,7 @@ SharedWorker::SharedWorker(const String& url,
 #if ENABLE(INSPECTOR)
   if (InspectorController* inspector =
           scriptExecutionContext()->inspectorController())
-    inspector->didCreateWorker(id(), scriptUrl.string(), true);
+    inspector->didCreateWorker(asID(), scriptUrl.string(), true);
 #endif
 }
 

@@ -68,7 +68,7 @@ Worker::Worker(const String& url,
 #if ENABLE(INSPECTOR)
   if (InspectorController* inspector =
           scriptExecutionContext()->inspectorController())
-    inspector->didCreateWorker(id(), scriptURL.string(), false);
+    inspector->didCreateWorker(asID(), scriptURL.string(), false);
 #endif
 }
 

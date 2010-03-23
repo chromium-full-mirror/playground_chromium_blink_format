@@ -44,10 +44,8 @@
 
 namespace WebCore {
 
-long AbstractWorker::s_lastId;
-
 AbstractWorker::AbstractWorker(ScriptExecutionContext* context)
-    : ActiveDOMObject(context, this), m_id(++s_lastId) {}
+    : ActiveDOMObject(context, this) {}
 
 AbstractWorker::~AbstractWorker() {
   onDestroyWorker();
@@ -59,7 +57,7 @@ void AbstractWorker::onDestroyWorker() {
           scriptExecutionContext()
               ? scriptExecutionContext()->inspectorController()
               : 0)
-    inspector->willDestroyWorker(id());
+    inspector->didDestroyWorker(asID());
 #endif
 }
 

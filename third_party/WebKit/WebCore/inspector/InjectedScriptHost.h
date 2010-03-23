@@ -84,7 +84,7 @@ class InjectedScriptHost : public RefCounted<InjectedScriptHost> {
 #if ENABLE(WORKERS)
   long nextWorkerId();
   void didCreateWorker(long id, const String& url, bool isSharedWorker);
-  void willDestroyWorker(long id);
+  void didDestroyWorker(long id);
 #endif
   void reportDidDispatchOnInjectedScript(long callId,
                                          SerializedScriptValue* result,
