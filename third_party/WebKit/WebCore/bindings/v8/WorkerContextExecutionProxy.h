@@ -85,7 +85,7 @@ class WorkerContextExecutionProxy {
 
  private:
   void initV8IfNeeded();
-  void initContextIfNeeded();
+  bool initContextIfNeeded();
   void dispose();
 
   // Run an already compiled script.
