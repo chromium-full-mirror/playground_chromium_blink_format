@@ -268,7 +268,8 @@ void Path::addArc(const FloatPoint& p,
     span += ea - sa;
   }
 
-  m_path.moveTo(QPointF(xc + radius * cos(sar), yc - radius * sin(sar)));
+  // connect to the previous point by a straight line
+  m_path.lineTo(QPointF(xc + radius * cos(sar), yc - radius * sin(sar)));
 
   m_path.arcTo(xs, ys, width, height, sa, span);
 }
