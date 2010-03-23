@@ -46,9 +46,7 @@
 #include "qwebframe_p.h"
 #include "qwebpage_p.h"
 
-#if QT_VERSION >= 0x040500
 #include <QAbstractNetworkCache>
-#endif
 #include <QCoreApplication>
 #include <QUrl>
 #include <QNetworkAccessManager>
@@ -159,7 +157,6 @@ bool ResourceHandle::willLoadFromCache(ResourceRequest& request, Frame* frame) {
   if (!frame)
     return false;
 
-#if QT_VERSION >= 0x040500
   QNetworkAccessManager* manager =
       QWebFramePrivate::kit(frame)->page()->networkAccessManager();
   QAbstractNetworkCache* cache = manager->cache();
@@ -174,9 +171,6 @@ bool ResourceHandle::willLoadFromCache(ResourceRequest& request, Frame* frame) {
   }
 
   return false;
-#else
-  return false;
-#endif
 }
 
 bool ResourceHandle::supportsBufferedData() {

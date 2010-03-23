@@ -238,11 +238,6 @@ void ScrollbarThemeQt::paintScrollCorner(ScrollView* scrollView,
     return;
   }
 
-#if QT_VERSION < 0x040500
-  context->fillRect(
-      rect, QApplication::palette().color(QPalette::Normal, QPalette::Window),
-      DeviceColorSpace);
-#else
   StylePainter p(this, context);
   if (!p.isValid())
     return;
@@ -250,7 +245,6 @@ void ScrollbarThemeQt::paintScrollCorner(ScrollView* scrollView,
   QStyleOption option;
   option.rect = rect;
   p.drawPrimitive(QStyle::PE_PanelScrollAreaCorner, option);
-#endif
 }
 
 QStyle* ScrollbarThemeQt::style() const {
