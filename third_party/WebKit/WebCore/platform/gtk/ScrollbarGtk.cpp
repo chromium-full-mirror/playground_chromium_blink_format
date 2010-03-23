@@ -202,7 +202,7 @@ void ScrollbarGtk::setEnabled(bool shouldEnable) {
 /*
  * Strategy to painting a Widget:
  *  1.) do not paint if there is no GtkWidget set
- *  2.) We assume that GTK_NO_WINDOW is set and that frameRectsChanged
+ *  2.) We assume that the widget has no window and that frameRectsChanged
  * positioned
  *      the widget correctly. ATM we do not honor the GraphicsContext
  * translation.
@@ -215,7 +215,7 @@ void ScrollbarGtk::paint(GraphicsContext* context, const IntRect& rect) {
     return;
 
   GtkWidget* widget = platformWidget();
-  ASSERT(GTK_WIDGET_NO_WINDOW(widget));
+  ASSERT(!gtk_widget_get_has_window(widget));
 
   GdkEvent* event = gdk_event_new(GDK_EXPOSE);
   event->expose = *context->gdkExposeEvent();
