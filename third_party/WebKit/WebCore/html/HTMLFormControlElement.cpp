@@ -496,12 +496,6 @@ VisibleSelection HTMLTextFormControlElement::selection() const {
 void HTMLTextFormControlElement::parseMappedAttribute(MappedAttribute* attr) {
   if (attr->name() == placeholderAttr)
     updatePlaceholderVisibility(true);
-  else if (attr->name() == onfocusAttr)
-    setAttributeEventListener(eventNames().focusEvent,
-                              createAttributeEventListener(this, attr));
-  else if (attr->name() == onblurAttr)
-    setAttributeEventListener(eventNames().blurEvent,
-                              createAttributeEventListener(this, attr));
   else if (attr->name() == onselectAttr)
     setAttributeEventListener(eventNames().selectEvent,
                               createAttributeEventListener(this, attr));

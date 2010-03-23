@@ -207,10 +207,10 @@ void SVGElement::parseMappedAttribute(MappedAttribute* attr) {
     setAttributeEventListener(eventNames().mouseupEvent,
                               createAttributeEventListener(this, attr));
   else if (attr->name() == SVGNames::onfocusinAttr)
-    setAttributeEventListener(eventNames().DOMFocusInEvent,
+    setAttributeEventListener(eventNames().focusinEvent,
                               createAttributeEventListener(this, attr));
   else if (attr->name() == SVGNames::onfocusoutAttr)
-    setAttributeEventListener(eventNames().DOMFocusOutEvent,
+    setAttributeEventListener(eventNames().focusoutEvent,
                               createAttributeEventListener(this, attr));
   else if (attr->name() == SVGNames::onactivateAttr)
     setAttributeEventListener(eventNames().DOMActivateEvent,
