@@ -273,8 +273,6 @@ class HTMLInputElement : public HTMLTextFormControlElement,
 
   virtual void addSubresourceAttributeURLs(ListHashSet<KURL>&) const;
 
-  virtual bool willValidate() const;
-
   // Converts the specified string to a floating number.
   // If the conversion fails, the return value is false. Take care that leading
   // or trailing unnecessary characters make failures.  This returns false for
@@ -316,6 +314,7 @@ class HTMLInputElement : public HTMLTextFormControlElement,
     return !isRequiredFormControl();
   }
   virtual bool isRequiredFormControl() const;
+  virtual bool recalcWillValidate() const;
 
   PassRefPtr<HTMLFormElement> createTemporaryFormForIsIndex();
   // Helper for getAllowedValueStep();

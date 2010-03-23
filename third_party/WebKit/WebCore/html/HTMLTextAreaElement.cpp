@@ -303,6 +303,7 @@ void HTMLTextAreaElement::setNonDirtyValue(const String& value) {
     return;
 
   m_value = normalizedValue;
+  setNeedsValidityCheck();
   m_isDirty = false;
   setFormControlValueMatchesRenderer(true);
   updatePlaceholderVisibility(false);
@@ -317,7 +318,6 @@ void HTMLTextAreaElement::setNonDirtyValue(const String& value) {
     setSelectionRange(endOfString, endOfString);
   }
 
-  setNeedsValidityCheck();
   notifyFormStateChanged(this);
 }
 
