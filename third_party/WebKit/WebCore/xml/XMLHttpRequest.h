@@ -30,6 +30,7 @@
 #include "ResourceResponse.h"
 #include "ScriptString.h"
 #include "ThreadableLoaderClient.h"
+#include "XMLHttpRequestProgressEventThrottle.h"
 #include <wtf/OwnPtr.h>
 
 namespace WebCore {
@@ -64,6 +65,8 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
 
   virtual void contextDestroyed();
   virtual bool canSuspend() const;
+  virtual void suspend();
+  virtual void resume();
   virtual void stop();
 
   virtual ScriptExecutionContext* scriptExecutionContext() const;
@@ -212,6 +215,8 @@ class XMLHttpRequest : public RefCounted<XMLHttpRequest>,
   ExceptionCode m_exceptionCode;
 
   EventTargetData m_eventTargetData;
+
+  XMLHttpRequestProgressEventThrottle m_progressEventThrottle;
 };
 
 }  // namespace WebCore
