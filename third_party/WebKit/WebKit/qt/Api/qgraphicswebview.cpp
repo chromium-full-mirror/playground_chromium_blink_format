@@ -1069,7 +1069,7 @@ bool QGraphicsWebView::findText(const QString& subString,
     If not explicitly set, the preferredContentsSize is automatically set to a
    reasonable value.
 
-    \sa QWebPage::setPreferredContentsSize
+    \sa QWebPage::setPreferredContentsSize()
 */
 void QGraphicsWebView::setResizesToContents(bool enabled) {
   if (d->resizesToContents == enabled)
