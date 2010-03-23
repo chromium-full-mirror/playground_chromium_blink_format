@@ -237,6 +237,8 @@ class CSSParser {
     return &m_reusableSelectorVector;
   }
 
+  void updateLastSelectorLine() { m_lastSelectorLine = m_line; }
+
   bool m_strict;
   bool m_important;
   int m_id;
@@ -266,6 +268,7 @@ class CSSParser {
   int lex(void* yylval);
   int token() { return yyTok; }
   UChar* text(int* length);
+  void countLines();
   int lex();
 
  private:
@@ -292,6 +295,8 @@ class CSSParser {
   int yyleng;
   int yyTok;
   int yy_start;
+  int m_line;
+  int m_lastSelectorLine;
 
   bool m_allowImportRules;
   bool m_allowVariablesRules;
