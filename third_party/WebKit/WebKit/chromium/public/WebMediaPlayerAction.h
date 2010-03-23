@@ -34,7 +34,7 @@
 namespace WebKit {
 
 struct WebMediaPlayerAction {
-  enum Type { Unknown, Play, Mute, Loop };
+  enum Type { Unknown, Play, Mute, Loop, Controls };
 
   Type type;
   bool enable;

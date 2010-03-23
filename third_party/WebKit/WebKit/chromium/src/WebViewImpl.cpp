@@ -1408,6 +1408,9 @@ void WebViewImpl::performMediaPlayerAction(const WebMediaPlayerAction& action,
     case WebMediaPlayerAction::Loop:
       mediaElement->setLoop(action.enable);
       break;
+    case WebMediaPlayerAction::Controls:
+      mediaElement->setControls(action.enable);
+      break;
     default:
       ASSERT_NOT_REACHED();
   }
