@@ -327,18 +327,23 @@ QPalette QGraphicsWebViewPrivate::palette() const {
 
 int QGraphicsWebViewPrivate::screenNumber() const {
 #if defined(Q_WS_X11)
-  const QList<QGraphicsView*> views = q->scene()->views();
+  if (QGraphicsScene* scene = q->scene()) {
+    const QList<QGraphicsView*> views = scene->views();
 
-  if (!views.isEmpty())
-    return views.at(0)->x11Info().screen();
+    if (!views.isEmpty())
+      return views.at(0)->x11Info().screen();
+  }
 #endif
 
   return 0;
 }
 
 QWidget* QGraphicsWebViewPrivate::ownerWidget() const {
-  const QList<QGraphicsView*> views = q->scene()->views();
-  return views.value(0);
+  if (QGraphicsScene* scene = q->scene()) {
+    const QList<QGraphicsView*> views = scene->views();
+    return views.value(0);
+  }
+  return 0;
 }
 
 QObject* QGraphicsWebViewPrivate::pluginParent() const {
