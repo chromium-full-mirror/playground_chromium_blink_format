@@ -1336,6 +1336,9 @@ void XMLTokenizer::doEnd() {
   }
 #endif
 
+  if (m_parserStopped)
+    return;
+
   if (m_context) {
     // Tell libxml we're done.
     {
