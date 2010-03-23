@@ -623,9 +623,17 @@ void GraphicsContext::fillRect(const FloatRect& rect) {
       drawBorderlessRectShadow(this, p, rect);
     if (m_common->state.fillPattern) {
       AffineTransform affine;
-      p->fillRect(
-          rect,
-          QBrush(m_common->state.fillPattern->createPlatformPattern(affine)));
+      FloatRect rectM(rect);
+      QBrush brush(m_common->state.fillPattern->createPlatformPattern(affine));
+      QPixmap* image = m_common->state.fillPattern->tileImage()
+                           ->nativeImageForCurrentFrame();
+
+      if (!m_common->state.fillPattern->repeatX() && image)
+        rectM.setWidth(image->width());
+      if (!m_common->state.fillPattern->repeatY() && image)
+        rectM.setHeight(image->height());
+      p->fillRect(rectM, brush);
+
     } else if (m_common->state.fillGradient) {
       QBrush brush(*m_common->state.fillGradient->platformGradient());
       brush.setTransform(
