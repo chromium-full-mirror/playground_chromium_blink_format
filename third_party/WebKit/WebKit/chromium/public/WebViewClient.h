@@ -73,10 +73,8 @@ class WebViewClient : virtual public WebWidgetClient {
 
   // Create a new WebPopupMenu.  In the second form, the client is
   // responsible for rendering the contents of the popup menu.
-  virtual WebWidget* createPopupMenu() { return 0; }
-  virtual WebWidget* createPopupMenu(const WebPopupMenuInfo&) { return 0; }
-  // Deprecated method.
   virtual WebWidget* createPopupMenu(bool activatable) { return 0; }
+  virtual WebWidget* createPopupMenu(const WebPopupMenuInfo&) { return 0; }
 
   // Create a session storage namespace object associated with this WebView.
   virtual WebStorageNamespace* createSessionStorageNamespace() { return 0; }

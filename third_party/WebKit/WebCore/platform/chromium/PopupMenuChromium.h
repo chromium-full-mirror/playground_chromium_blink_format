@@ -39,7 +39,6 @@
 
 namespace WebCore {
 
-class ChromeClientChromium;
 class FrameView;
 class PopupListBox;
 
@@ -68,6 +67,9 @@ struct PopupItem {
 // key events to it (through handleKeyEvent).
 
 struct PopupContainerSettings {
+  // Whether the popup should get the focus when displayed.
+  bool focusOnShow;
+
   // Whether the PopupMenuClient should be told to change its text when a
   // new item is selected by using the arrow keys.
   bool setTextOnIndexChange;
@@ -108,13 +110,7 @@ struct PopupContainerSettings {
 
 class PopupContainer : public FramelessScrollView {
  public:
-  enum PopupType {
-    Select,      // HTML select popup.
-    Suggestion,  // Autocomplete/autofill popup.
-  };
-
   static PassRefPtr<PopupContainer> create(PopupMenuClient*,
-                                           PopupType,
                                            const PopupContainerSettings&);
 
   // Whether a key event should be sent to this popup.
@@ -168,27 +164,18 @@ class PopupContainer : public FramelessScrollView {
   // The size of the font being used.
   int menuItemFontSize() const;
 
-  PopupType popupType() const { return m_popupType; }
-
  private:
   friend class WTF::RefCounted<PopupContainer>;
 
-  PopupContainer(PopupMenuClient*,
-                 PopupType popupType,
-                 const PopupContainerSettings&);
+  PopupContainer(PopupMenuClient*, const PopupContainerSettings&);
   ~PopupContainer();
 
   // Paint the border.
   void paintBorder(GraphicsContext*, const IntRect&);
 
-  // Returns the ChromeClient of the page this popup is associated with.
-  ChromeClientChromium* chromeClientChromium();
-
   RefPtr<PopupListBox> m_listBox;
-  RefPtr<FrameView> m_frameView;
 
   PopupContainerSettings m_settings;
-  PopupType m_popupType;
 };
 
 }  // namespace WebCore
