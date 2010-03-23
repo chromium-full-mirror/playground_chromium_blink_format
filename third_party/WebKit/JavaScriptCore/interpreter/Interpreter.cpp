@@ -1753,7 +1753,8 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
       */
       int dst = vPC[1].u.operand;
       JSValue src = callFrame->r(vPC[2].u.operand).jsValue();
-      if (src.isInt32() && src.asInt32())
+      if (src.isInt32() &&
+          (src.asInt32() & 0x7fffffff))  // non-zero and no overflow
         callFrame->r(dst) = jsNumber(callFrame, -src.asInt32());
       else {
         JSValue result = jsNumber(callFrame, -src.toNumber(callFrame));
