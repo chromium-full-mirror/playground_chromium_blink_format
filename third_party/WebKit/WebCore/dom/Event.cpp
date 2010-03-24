@@ -70,6 +70,10 @@ void Event::initEvent(const AtomicString& eventTypeArg,
   m_cancelable = cancelableArg;
 }
 
+bool Event::isCustomEvent() const {
+  return false;
+}
+
 bool Event::isUIEvent() const {
   return false;
 }

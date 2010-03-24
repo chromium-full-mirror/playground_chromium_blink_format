@@ -43,6 +43,7 @@
 #include "Comment.h"
 #include "Console.h"
 #include "CookieJar.h"
+#include "CustomEvent.h"
 #include "DOMImplementation.h"
 #include "DOMWindow.h"
 #include "DocLoader.h"
@@ -3079,6 +3080,8 @@ PassRefPtr<Event> Document::createEvent(const String& eventType,
   if (eventType == "Event" || eventType == "Events" ||
       eventType == "HTMLEvents")
     event = Event::create();
+  else if (eventType == "CustomEvent")
+    event = CustomEvent::create();
   else if (eventType == "KeyboardEvent" || eventType == "KeyboardEvents")
     event = KeyboardEvent::create();
   else if (eventType == "MessageEvent")

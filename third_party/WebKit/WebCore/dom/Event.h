@@ -104,6 +104,7 @@ class Event : public RefCounted<Event> {
     return isClipboardEvent() ? clipboard() : 0;
   }
 
+  virtual bool isCustomEvent() const;
   virtual bool isUIEvent() const;
   virtual bool isMouseEvent() const;
   virtual bool isMutationEvent() const;
