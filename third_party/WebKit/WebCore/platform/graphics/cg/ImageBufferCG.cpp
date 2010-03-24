@@ -38,6 +38,7 @@
 #include <wtf/Assertions.h>
 #include <wtf/OwnArrayPtr.h>
 #include <wtf/RetainPtr.h>
+#include <wtf/Threading.h>
 #include <math.h>
 
 using namespace std;
@@ -269,6 +270,8 @@ static RetainPtr<CFStringRef> utiFromMIMEType(const String& mimeType) {
       AdoptCF, UTTypeCreatePreferredIdentifierForTag(
                    kUTTagClassMIMEType, mimeTypeCFString.get(), 0));
 #else
+  ASSERT(isMainThread());  // It is unclear if CFSTR is threadsafe.
+
   // FIXME: Add Windows support for all the supported UTIs when a way to convert
   // from MIMEType to UTI reliably is found.
   // For now, only support PNG, JPEG, and GIF. See <rdar://problem/6095286>.

@@ -47,6 +47,7 @@ Image::Image(ImageObserver* observer) : m_imageObserver(observer) {}
 Image::~Image() {}
 
 Image* Image::nullImage() {
+  ASSERT(isMainThread());
   DEFINE_STATIC_LOCAL(RefPtr<Image>, nullImage, (BitmapImage::create()));
   ;
   return nullImage.get();
