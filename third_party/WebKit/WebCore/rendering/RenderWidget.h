@@ -40,6 +40,7 @@ class RenderWidget : public RenderReplaced, private OverlapTestRequestClient {
 
   void updateWidgetPosition();
   void widgetPositionsUpdated();
+  IntRect windowClipRect() const { return m_windowClipRect; }
 
   void showSubstituteImage(PassRefPtr<Image>);
 
@@ -83,6 +84,7 @@ class RenderWidget : public RenderReplaced, private OverlapTestRequestClient {
   RefPtr<Widget> m_widget;
   RefPtr<Image> m_substituteImage;
   FrameView* m_frameView;
+  IntRect m_windowClipRect;
   int m_refCount;
 };
 
