@@ -34,6 +34,7 @@
 #include "PlatformString.h"
 #include "CString.h"
 #include "HitTestResult.h"
+#include "Icon.h"
 #include "KURL.h"
 #include "webkitgeolocationpolicydecision.h"
 #include "webkitwebview.h"
@@ -549,10 +550,10 @@ void ChromeClient::runOpenPanel(Frame*,
   gtk_widget_destroy(dialog);
 }
 
-void ChromeClient::iconForFiles(const Vector<WebCore::String>&,
-                                PassRefPtr<WebCore::FileChooser>) {
-  // FIXME: Move the code in Icon::createIconForFiles() here.
-  notImplemented();
+void ChromeClient::chooseIconForFiles(
+    const Vector<WebCore::String>& filenames,
+    PassRefPtr<WebCore::FileChooser> chooser) {
+  chooser->iconLoaded(Icon::createIconForFiles(filenames));
 }
 
 bool ChromeClient::setCursor(PlatformCursorHandle) {
