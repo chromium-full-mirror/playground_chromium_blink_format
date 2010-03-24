@@ -68,7 +68,7 @@ class QWEBKIT_EXPORT QWebSettings {
 #endif
     LocalContentCanAccessRemoteUrls,
     DnsPrefetchEnabled,
-    XSSAuditorEnabled,
+    XSSAuditingEnabled,
     AcceleratedCompositingEnabled,
     WebGLEnabled,
     SpatialNavigationEnabled,

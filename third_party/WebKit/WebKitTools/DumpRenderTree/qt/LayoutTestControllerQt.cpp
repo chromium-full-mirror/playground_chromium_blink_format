@@ -381,14 +381,14 @@ void LayoutTestController::setMainFrameIsFirstResponder(bool isFirst) {
 }
 
 void LayoutTestController::setXSSAuditorEnabled(bool enable) {
-  // Set XSSAuditorEnabled globally so that windows created by the test inherit
+  // Set XSSAuditingEnabled globally so that windows created by the test inherit
   // it too.
   // resetSettings() will call this to reset the page and global setting to
   // false again.
   // Needed by http/tests/security/xssAuditor/link-opens-new-window.html
   QWebSettings* globalSettings = QWebSettings::globalSettings();
-  globalSettings->setAttribute(QWebSettings::XSSAuditorEnabled, enable);
-  m_drt->webPage()->settings()->setAttribute(QWebSettings::XSSAuditorEnabled,
+  globalSettings->setAttribute(QWebSettings::XSSAuditingEnabled, enable);
+  m_drt->webPage()->settings()->setAttribute(QWebSettings::XSSAuditingEnabled,
                                              enable);
 }
 
