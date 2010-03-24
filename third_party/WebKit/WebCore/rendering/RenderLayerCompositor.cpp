@@ -469,6 +469,10 @@ void RenderLayerCompositor::addToOverlapMap(OverlapMap& overlapMap,
         layer->renderer()
             ->localToAbsoluteQuad(FloatRect(layer->localBoundingBox()))
             .enclosingBoundingBox();
+    // Empty rects never intersect, but we need them to for the purposes of
+    // overlap testing.
+    if (layerBounds.isEmpty())
+      layerBounds.setSize(IntSize(1, 1));
     boundsComputed = true;
   }
 
@@ -525,6 +529,10 @@ void RenderLayerCompositor::computeCompositingRequirements(
     absBounds = layer->renderer()
                     ->localToAbsoluteQuad(FloatRect(layer->localBoundingBox()))
                     .enclosingBoundingBox();
+    // Empty rects never intersect, but we need them to for the purposes of
+    // overlap testing.
+    if (absBounds.isEmpty())
+      absBounds.setSize(IntSize(1, 1));
     haveComputedBounds = true;
     mustOverlapCompositedLayers =
         overlapsCompositedLayers(*overlapMap, absBounds);
