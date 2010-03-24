@@ -105,6 +105,7 @@ class WebNode {
                                       bool useCapture);
   WEBKIT_API void simulateClick();
 
+  // Deprecated. Use to() instead.
   template <typename T>
   T toElement() {
     T res;
@@ -112,8 +113,23 @@ class WebNode {
     return res;
   }
 
+  // Deprecated. Use toConst() instead.
   template <typename T>
   const T toConstElement() const {
+    T res;
+    res.WebNode::assign(*this);
+    return res;
+  }
+
+  template <typename T>
+  T to() {
+    T res;
+    res.WebNode::assign(*this);
+    return res;
+  }
+
+  template <typename T>
+  const T toConst() const {
     T res;
     res.WebNode::assign(*this);
     return res;
