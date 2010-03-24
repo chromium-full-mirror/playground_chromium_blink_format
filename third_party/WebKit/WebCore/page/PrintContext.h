@@ -46,6 +46,8 @@ class PrintContext {
                         float footerHeight,
                         float userScaleFactor,
                         float& outPageHeight);
+  void computePageRectsWithPageSize(const FloatSize& pageSizeInPixels,
+                                    bool allowHorizontalMultiPages);
 
   // TODO: eliminate width param
   void begin(float width);
@@ -60,11 +62,12 @@ class PrintContext {
   static int numberOfPages(Frame*, const FloatSize& pageSizeInPixels);
 
  protected:
-  void computePageRectsWithPageSize(const FloatSize& pageSizeInPixels,
-                                    float userScaleFactor);
-
   Frame* m_frame;
   Vector<IntRect> m_pageRects;
+
+ private:
+  void computePageRectsWithPageSizeInternal(const FloatSize& pageSizeInPixels,
+                                            bool allowHorizontalMultiPages);
 };
 }
 
