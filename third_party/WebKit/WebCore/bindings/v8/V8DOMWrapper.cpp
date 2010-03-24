@@ -137,7 +137,7 @@ v8::Local<v8::Function> V8DOMWrapper::getConstructor(
     return v8::Local<v8::Function>();
   // Hotmail fix, see comments above.
   if (!objectPrototype.IsEmpty())
-    value->Set(v8::String::New("__proto__"), objectPrototype);
+    value->SetPrototype(objectPrototype);
   return value;
 }
 
