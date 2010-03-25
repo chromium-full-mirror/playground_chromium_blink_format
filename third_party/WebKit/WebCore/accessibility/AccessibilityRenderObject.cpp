@@ -1525,6 +1525,9 @@ bool AccessibilityRenderObject::accessibilityIsIgnored() const {
   if (ariaRole != UnknownRole)
     return false;
 
+  if (!helpText().isEmpty())
+    return false;
+
   // don't ignore labels, because they serve as TitleUIElements
   Node* node = m_renderer->node();
   if (node && node->hasTagName(labelTag))
