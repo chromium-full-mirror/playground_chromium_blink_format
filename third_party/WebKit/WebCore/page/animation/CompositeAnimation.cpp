@@ -58,6 +58,7 @@ void CompositeAnimation::clearRenderer() {
     }
   }
   if (!m_keyframeAnimations.isEmpty()) {
+    m_keyframeAnimations.checkConsistency();
     AnimationNameMap::const_iterator animationsEnd = m_keyframeAnimations.end();
     for (AnimationNameMap::const_iterator it = m_keyframeAnimations.begin();
          it != animationsEnd; ++it) {
@@ -220,6 +221,8 @@ void CompositeAnimation::updateKeyframeAnimations(RenderObject* renderer,
   if (m_keyframeAnimations.isEmpty() && !targetStyle->hasAnimations())
     return;
 
+  m_keyframeAnimations.checkConsistency();
+
   AnimationNameMap::const_iterator kfend = m_keyframeAnimations.end();
 
   if (currentStyle && currentStyle->hasAnimations() &&
@@ -350,6 +353,8 @@ PassRefPtr<RenderStyle> CompositeAnimation::getAnimatedStyle() const {
       implicitAnimation->getAnimatedStyle(resultStyle);
   }
 
+  m_keyframeAnimations.checkConsistency();
+
   for (Vector<AtomicStringImpl*>::const_iterator it =
            m_keyframeAnimationOrderMap.begin();
        it != m_keyframeAnimationOrderMap.end(); ++it) {
@@ -374,6 +379,7 @@ void CompositeAnimation::setAnimating(bool animating) {
     }
   }
   if (!m_keyframeAnimations.isEmpty()) {
+    m_keyframeAnimations.checkConsistency();
     AnimationNameMap::const_iterator animationsEnd = m_keyframeAnimations.end();
     for (AnimationNameMap::const_iterator it = m_keyframeAnimations.begin();
          it != animationsEnd; ++it) {
@@ -404,6 +410,7 @@ double CompositeAnimation::timeToNextService() const {
     }
   }
   if (!m_keyframeAnimations.isEmpty()) {
+    m_keyframeAnimations.checkConsistency();
     AnimationNameMap::const_iterator animationsEnd = m_keyframeAnimations.end();
     for (AnimationNameMap::const_iterator it = m_keyframeAnimations.begin();
          it != animationsEnd; ++it) {
@@ -427,6 +434,7 @@ PassRefPtr<KeyframeAnimation> CompositeAnimation::getAnimationForProperty(
   // multiples.
   // So we need to iterate through all animations
   if (!m_keyframeAnimations.isEmpty()) {
+    m_keyframeAnimations.checkConsistency();
     AnimationNameMap::const_iterator animationsEnd = m_keyframeAnimations.end();
     for (AnimationNameMap::const_iterator it = m_keyframeAnimations.begin();
          it != animationsEnd; ++it) {
@@ -446,6 +454,7 @@ void CompositeAnimation::suspendAnimations() {
   m_isSuspended = true;
 
   if (!m_keyframeAnimations.isEmpty()) {
+    m_keyframeAnimations.checkConsistency();
     AnimationNameMap::const_iterator animationsEnd = m_keyframeAnimations.end();
     for (AnimationNameMap::const_iterator it = m_keyframeAnimations.begin();
          it != animationsEnd; ++it) {
@@ -472,6 +481,7 @@ void CompositeAnimation::resumeAnimations() {
   m_isSuspended = false;
 
   if (!m_keyframeAnimations.isEmpty()) {
+    m_keyframeAnimations.checkConsistency();
     AnimationNameMap::const_iterator animationsEnd = m_keyframeAnimations.end();
     for (AnimationNameMap::const_iterator it = m_keyframeAnimations.begin();
          it != animationsEnd; ++it) {
@@ -520,6 +530,7 @@ void CompositeAnimation::resumeOverriddenImplicitAnimations(int property) {
 bool CompositeAnimation::isAnimatingProperty(int property,
                                              bool isRunningNow) const {
   if (!m_keyframeAnimations.isEmpty()) {
+    m_keyframeAnimations.checkConsistency();
     AnimationNameMap::const_iterator animationsEnd = m_keyframeAnimations.end();
     for (AnimationNameMap::const_iterator it = m_keyframeAnimations.begin();
          it != animationsEnd; ++it) {
@@ -546,6 +557,8 @@ bool CompositeAnimation::pauseAnimationAtTime(const AtomicString& name,
                                               double t) {
   if (!name)
     return false;
+
+  m_keyframeAnimations.checkConsistency();
 
   RefPtr<KeyframeAnimation> keyframeAnim =
       m_keyframeAnimations.get(name.impl());
@@ -582,6 +595,7 @@ unsigned CompositeAnimation::numberOfActiveAnimations() const {
   unsigned count = 0;
 
   if (!m_keyframeAnimations.isEmpty()) {
+    m_keyframeAnimations.checkConsistency();
     AnimationNameMap::const_iterator animationsEnd = m_keyframeAnimations.end();
     for (AnimationNameMap::const_iterator it = m_keyframeAnimations.begin();
          it != animationsEnd; ++it) {
