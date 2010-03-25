@@ -73,7 +73,8 @@ class QWEBKIT_EXPORT QWebSettings {
     WebGLEnabled,
     SpatialNavigationEnabled,
     LocalContentCanAccessFileUrls,
-    TiledBackingStoreEnabled
+    TiledBackingStoreEnabled,
+    FrameFlatteningEnabled
   };
   enum WebGraphic {
     MissingImageGraphic,
