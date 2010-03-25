@@ -121,9 +121,7 @@ class SelectionController : public Noncopyable {
   IntRect absoluteCaretBounds();
   void setNeedsLayout(bool flag = true);
 
-  void setLastChangeWasHorizontalExtension(bool b) {
-    m_lastChangeWasHorizontalExtension = b;
-  }
+  void setIsDirectional(bool);
   void willBeModified(EAlteration, EDirection);
 
   bool isNone() const { return m_selection.isNone(); }
@@ -224,7 +222,7 @@ class SelectionController : public Noncopyable {
   bool m_needsLayout;  // true if m_caretRect and m_absCaretBounds need to be
                        // calculated
   bool m_absCaretBoundsDirty;
-  bool m_lastChangeWasHorizontalExtension;
+  bool m_isDirectional;
   bool m_isDragCaretController;
   bool m_isCaretBlinkingSuspended;
   bool m_focused;
