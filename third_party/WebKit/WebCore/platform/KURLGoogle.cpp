@@ -57,6 +57,8 @@ using std::binary_search;
 
 namespace WebCore {
 
+static const unsigned invalidPortNumber = 0xFFFF;
+
 // Wraps WebCore's text encoding in a character set converter for the
 // canonicalizer.
 class KURLCharsetConverter : public url_canon::CharsetConverter {
@@ -469,7 +471,7 @@ String KURL::host() const {
 // return 0 from this port() function, so we mirror that behavior here.
 unsigned short KURL::port() const {
   if (!m_url.m_isValid || m_url.m_parsed.port.len <= 0)
-    return 0;
+    return invalidPortNumber;
   int port =
       url_parse::ParsePort(m_url.utf8String().data(), m_url.m_parsed.port);
   if (port == url_parse::PORT_UNSPECIFIED)
@@ -749,65 +751,71 @@ bool portAllowed(const KURL& url) {
   // See http://www.mozilla.org/projects/netlib/PortBanning.html for more
   // information.
   static const unsigned short blockedPortList[] = {
-      1,     // tcpmux
-      7,     // echo
-      9,     // discard
-      11,    // systat
-      13,    // daytime
-      15,    // netstat
-      17,    // qotd
-      19,    // chargen
-      20,    // FTP-data
-      21,    // FTP-control
-      22,    // SSH
-      23,    // telnet
-      25,    // SMTP
-      37,    // time
-      42,    // name
-      43,    // nicname
-      53,    // domain
-      77,    // priv-rjs
-      79,    // finger
-      87,    // ttylink
-      95,    // supdup
-      101,   // hostriame
-      102,   // iso-tsap
-      103,   // gppitnp
-      104,   // acr-nema
-      109,   // POP2
-      110,   // POP3
-      111,   // sunrpc
-      113,   // auth
-      115,   // SFTP
-      117,   // uucp-path
-      119,   // nntp
-      123,   // NTP
-      135,   // loc-srv / epmap
-      139,   // netbios
-      143,   // IMAP2
-      179,   // BGP
-      389,   // LDAP
-      465,   // SMTP+SSL
-      512,   // print / exec
-      513,   // login
-      514,   // shell
-      515,   // printer
-      526,   // tempo
-      530,   // courier
-      531,   // Chat
-      532,   // netnews
-      540,   // UUCP
-      556,   // remotefs
-      563,   // NNTP+SSL
-      587,   // ESMTP
-      601,   // syslog-conn
-      636,   // LDAP+SSL
-      993,   // IMAP+SSL
-      995,   // POP3+SSL
-      2049,  // NFS
-      3659,  // apple-sasl / PasswordServer [Apple addition]
-      4045,  // lockd
-      6000,  // X11
+      1,                  // tcpmux
+      7,                  // echo
+      9,                  // discard
+      11,                 // systat
+      13,                 // daytime
+      15,                 // netstat
+      17,                 // qotd
+      19,                 // chargen
+      20,                 // FTP-data
+      21,                 // FTP-control
+      22,                 // SSH
+      23,                 // telnet
+      25,                 // SMTP
+      37,                 // time
+      42,                 // name
+      43,                 // nicname
+      53,                 // domain
+      77,                 // priv-rjs
+      79,                 // finger
+      87,                 // ttylink
+      95,                 // supdup
+      101,                // hostriame
+      102,                // iso-tsap
+      103,                // gppitnp
+      104,                // acr-nema
+      109,                // POP2
+      110,                // POP3
+      111,                // sunrpc
+      113,                // auth
+      115,                // SFTP
+      117,                // uucp-path
+      119,                // nntp
+      123,                // NTP
+      135,                // loc-srv / epmap
+      139,                // netbios
+      143,                // IMAP2
+      179,                // BGP
+      389,                // LDAP
+      465,                // SMTP+SSL
+      512,                // print / exec
+      513,                // login
+      514,                // shell
+      515,                // printer
+      526,                // tempo
+      530,                // courier
+      531,                // Chat
+      532,                // netnews
+      540,                // UUCP
+      556,                // remotefs
+      563,                // NNTP+SSL
+      587,                // ESMTP
+      601,                // syslog-conn
+      636,                // LDAP+SSL
+      993,                // IMAP+SSL
+      995,                // POP3+SSL
+      2049,               // NFS
+      3659,               // apple-sasl / PasswordServer [Apple addition]
+      4045,               // lockd
+      6000,               // X11
+      6665,               // Alternate IRC [Apple addition]
+      6666,               // Alternate IRC [Apple addition]
+      6667,               // Standard IRC [Apple addition]
+      6668,               // Alternate IRC [Apple addition]
+      6669,               // Alternate IRC [Apple addition]
+      invalidPortNumber,  // Used to block all invalid port numbers
   };
   const unsigned short* const blockedPortListEnd =
       blockedPortList + sizeof(blockedPortList) / sizeof(blockedPortList[0]);
