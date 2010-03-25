@@ -217,7 +217,9 @@ class GraphicsLayerQtImpl : public QGraphicsObject {
   int m_changeMask;
 
   QSizeF m_size;
+#ifndef QT_NO_ANIMATION
   QList<QWeakPointer<QAbstractAnimation>> m_animations;
+#endif
   QTimer m_suspendTimer;
 
   struct State {
@@ -252,7 +254,9 @@ class GraphicsLayerQtImpl : public QGraphicsObject {
           distributeOpacity(false) {}
   } m_state;
 
+#ifndef QT_NO_ANIMATION
   friend class AnimationQtBase;
+#endif
 };
 
 GraphicsLayerQtImpl::GraphicsLayerQtImpl(GraphicsLayerQt* newLayer)
@@ -289,12 +293,14 @@ GraphicsLayerQtImpl::~GraphicsLayerQtImpl() {
     }
   }
 
+#ifndef QT_NO_ANIMATION
   // we do, however, own the animations...
   for (QList<QWeakPointer<QAbstractAnimation>>::iterator it =
            m_animations.begin();
        it != m_animations.end(); ++it)
     if (QAbstractAnimation* anim = it->data())
       delete anim;
+#endif
 }
 
 void GraphicsLayerQtImpl::adjustCachingRecursively(bool animationIsRunning) {
@@ -1028,6 +1034,7 @@ static void webkitAnimationToQtAnimationValue(
           : 0;
 }
 
+#ifndef QT_NO_ANIMATION
 // we put a bit of the functionality in a base class to allow casting and to
 // save some code size
 class AnimationQtBase : public QAbstractAnimation {
@@ -1403,6 +1410,8 @@ void GraphicsLayerQt::resumeAnimations() {
     }
   }
 }
+
+#endif  // QT_NO_ANIMATION
 }
 
 #include <GraphicsLayerQt.moc>
