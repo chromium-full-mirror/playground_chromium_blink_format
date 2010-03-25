@@ -279,8 +279,7 @@ void CompositeAnimation::updateKeyframeAnimations(RenderObject* renderer,
         } else if ((anim->duration() || anim->delay()) &&
                    anim->iterationCount()) {
           keyframeAnim = KeyframeAnimation::create(
-              const_cast<Animation*>(anim), renderer, i, this,
-              currentStyle ? currentStyle : targetStyle);
+              const_cast<Animation*>(anim), renderer, i, this, targetStyle);
           m_keyframeAnimations.set(keyframeAnim->name().impl(), keyframeAnim);
         }
 
