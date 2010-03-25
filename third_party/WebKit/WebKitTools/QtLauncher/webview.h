@@ -76,7 +76,7 @@ class WebViewGraphicsBased : public QGraphicsView {
   QGraphicsItem::CacheMode itemCacheMode() { return m_item->cacheMode(); }
 
   void setFrameRateMeasurementEnabled(bool enabled);
-  bool frameRateMeasurementEnabled() { return m_measureFps; }
+  bool frameRateMeasurementEnabled() const { return m_measureFps; }
 
   virtual void paintEvent(QPaintEvent* event);
 
@@ -103,6 +103,7 @@ class WebViewGraphicsBased : public QGraphicsView {
 
  signals:
   void yFlipRequest();
+  void currentFPSUpdated(int fps);
 
  private:
   GraphicsWebView* m_item;

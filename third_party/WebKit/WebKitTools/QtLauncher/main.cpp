@@ -141,6 +141,7 @@ class LauncherWindow : public MainWindow {
  public slots:
   void newWindow();
   void cloneWindow();
+  void updateFPS(int fps);
 
  signals:
   void enteredFullScreenMode(bool on);
@@ -615,6 +616,8 @@ void LauncherWindow::initializeView(bool useGraphicsView) {
       connect(m_flipYAnimated, SIGNAL(triggered()), view,
               SLOT(animatedYFlip()));
 
+    connect(view, SIGNAL(currentFPSUpdated(int)), this, SLOT(updateFPS(int)));
+
     // The implementation of QAbstractScrollArea::eventFilter makes us need
     // to install the event filter on the viewport of a QGraphicsView.
     view->viewport()->installEventFilter(this);
@@ -650,6 +653,14 @@ void LauncherWindow::showFPS(bool enable) {
   gShowFrameRate = enable;
   WebViewGraphicsBased* view = static_cast<WebViewGraphicsBased*>(m_view);
   view->setFrameRateMeasurementEnabled(enable);
+
+  if (!enable) {
+#ifdef Q_WS_MAEMO_5&& defined(Q_WS_S60)
+    setWindowTitle("");
+#else
+    statusBar()->clearMessage();
+#endif
+  }
 }
 
 void LauncherWindow::changeViewportUpdateMode(int mode) {
@@ -676,6 +687,16 @@ void LauncherWindow::newWindow() {
 void LauncherWindow::cloneWindow() {
   LauncherWindow* mw = new LauncherWindow(this, true);
   mw->show();
+}
+
+void LauncherWindow::updateFPS(int fps) {
+  QString fpsStatusText = QString("Current FPS: %1").arg(fps);
+
+#ifdef Q_WS_MAEMO_5&& defined(Q_WS_S60)
+  setWindowTitle(fpsStatusText);
+#else
+  statusBar()->showMessage(fpsStatusText);
+#endif
 }
 
 void LauncherWindow::createChrome() {
