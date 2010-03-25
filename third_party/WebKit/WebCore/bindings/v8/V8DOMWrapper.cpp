@@ -274,9 +274,11 @@ v8::Local<v8::Object> V8DOMWrapper::instantiateV8Object(V8Proxy* proxy,
     instance = proxy->windowShell()->createWrapperFromCache(type);
   else {
     v8::Local<v8::Function> function;
+#if ENABLE(WORKERS)
     if (workerContext)
       function = getConstructor(type, workerContext);
     else
+#endif
       function = type->getTemplate()->GetFunction();
     instance = SafeAllocation::newInstance(function);
   }
