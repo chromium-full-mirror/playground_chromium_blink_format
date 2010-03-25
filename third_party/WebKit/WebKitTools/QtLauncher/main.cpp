@@ -81,7 +81,7 @@ static QUrl gInspectorUrl;
 static bool gResizesToContents = false;
 static bool gUseTiledBackingStore = false;
 
-#ifdef Q_WS_MAEMO_5 || defined(Q_WS_S60)
+#if defined(Q_WS_MAEMO_5) || defined(Q_WS_S60)
 static bool gUseFrameFlattening = true;
 #else
 static bool gUseFrameFlattening = false;
@@ -655,7 +655,7 @@ void LauncherWindow::showFPS(bool enable) {
   view->setFrameRateMeasurementEnabled(enable);
 
   if (!enable) {
-#ifdef Q_WS_MAEMO_5&& defined(Q_WS_S60)
+#if defined(Q_WS_MAEMO_5) && defined(Q_WS_S60)
     setWindowTitle("");
 #else
     statusBar()->clearMessage();
@@ -692,7 +692,7 @@ void LauncherWindow::cloneWindow() {
 void LauncherWindow::updateFPS(int fps) {
   QString fpsStatusText = QString("Current FPS: %1").arg(fps);
 
-#ifdef Q_WS_MAEMO_5&& defined(Q_WS_S60)
+#if defined(Q_WS_MAEMO_5) && defined(Q_WS_S60)
   setWindowTitle(fpsStatusText);
 #else
   statusBar()->showMessage(fpsStatusText);
