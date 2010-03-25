@@ -44,6 +44,7 @@
 #include "RenderTheme.h"
 #include "RenderView.h"
 #include "RenderWidgetProtector.h"
+#include "Settings.h"
 #include "Text.h"
 
 #if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
@@ -402,6 +403,12 @@ void RenderEmbeddedObject::paintReplaced(PaintInfo& paintInfo, int tx, int ty) {
   RenderTheme::defaultTheme()->systemFont(CSSValueWebkitSmallControl,
                                           fontDescription);
   fontDescription.setWeight(FontWeightBold);
+  Settings* settings = document()->settings();
+  ASSERT(settings);
+  if (!settings)
+    return;
+  fontDescription.setRenderingMode(settings->fontRenderingMode());
+  fontDescription.setComputedSize(fontDescription.specifiedSize());
   Font font(fontDescription, 0, 0);
   font.update(0);
 

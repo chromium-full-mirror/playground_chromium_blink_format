@@ -966,7 +966,7 @@ PassRefPtr<Widget> WebFrameLoaderClient::createPlugin(
 
   dispatchDidFailToStartPlugin(pluginView.get());
 
-  return pluginView;
+  return 0;
 }
 
 void WebFrameLoaderClient::redirectDataToPlugin(Widget* pluginWidget) {
