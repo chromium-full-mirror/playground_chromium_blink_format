@@ -52,7 +52,6 @@ bool DatabaseObserver::canEstablishDatabase(
     const String& name,
     const String& displayName,
     unsigned long estimatedSize) {
-  ASSERT(isMainThread());
   ASSERT(scriptExecutionContext->isDocument() ||
          scriptExecutionContext->isWorkerContext());
   if (scriptExecutionContext->isDocument()) {
