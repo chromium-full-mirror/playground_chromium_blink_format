@@ -220,6 +220,8 @@ class LayerSkia : public RefCounted<LayerSkia> {
 
   void setBackingStoreRect(const SkIRect&);
 
+  void drawDebugBorder();
+
  private:
   LayerSkia(LayerType, GraphicsLayerSkia* owner);
 
