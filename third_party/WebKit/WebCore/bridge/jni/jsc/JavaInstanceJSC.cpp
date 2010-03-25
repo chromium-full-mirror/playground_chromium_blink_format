@@ -161,7 +161,7 @@ JSValue JavaInstance::invokeMethod(ExecState* exec,
 
   const JavaMethod* jMethod = static_cast<const JavaMethod*>(method);
   LOG(LiveConnect, "JavaInstance::invokeMethod call %s %s on %p",
-      UString(jMethod->name()).UTF8String().c_str(), jMethod->signature(),
+      UString(jMethod->name()).UTF8String().data(), jMethod->signature(),
       m_instance->m_instance);
 
   Vector<jvalue> jArgs(count);

@@ -122,7 +122,7 @@ void Profile::debugPrintDataSampleStyle() const {
   for (NameCountPairVector::iterator it = sortedFunctions.begin();
        it != sortedFunctions.end(); ++it)
     printf("        %-12d%s\n", (*it).second,
-           UString((*it).first).UTF8String().c_str());
+           UString((*it).first).UTF8String().data());
 
   printf("\nSort by top of stack, same collapsed (when >= 5):\n");
 }

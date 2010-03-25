@@ -67,7 +67,7 @@ struct CallIdentifier : public FastAllocBase {
 
 #ifndef NDEBUG
   operator const char*() const { return c_str(); }
-  const char* c_str() const { return m_name.UTF8String().c_str(); }
+  const char* c_str() const { return m_name.UTF8String().data(); }
 #endif
 };
 

@@ -57,13 +57,13 @@ static JSValue encode(ExecState* exec,
                       const char* doNotEscape) {
   UString str = args.at(0).toString(exec);
   CString cstr = str.UTF8String(true);
-  if (!cstr.c_str())
+  if (!cstr.data())
     return throwError(exec, URIError,
                       "String contained an illegal UTF-16 sequence.");
 
   JSStringBuilder builder;
-  const char* p = cstr.c_str();
-  for (size_t k = 0; k < cstr.size(); k++, p++) {
+  const char* p = cstr.data();
+  for (size_t k = 0; k < cstr.length(); k++, p++) {
     char c = *p;
     if (c && strchr(doNotEscape, c))
       builder.append(c);
@@ -473,8 +473,7 @@ JSValue JSC_HOST_CALL globalFuncJSCPrint(ExecState* exec,
                                          JSObject*,
                                          JSValue,
                                          const ArgList& args) {
-  CStringBuffer string;
-  args.at(0).toString(exec).getCString(string);
+  CString string = args.at(0).toString(exec).UTF8String();
   puts(string.data());
   return jsUndefined();
 }

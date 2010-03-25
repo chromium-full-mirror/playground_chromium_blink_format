@@ -239,7 +239,7 @@ JSValue JSC_HOST_CALL functionPrint(ExecState* exec,
     if (i)
       putchar(' ');
 
-    printf("%s", args.at(i).toString(exec).UTF8String().c_str());
+    printf("%s", args.at(i).toString(exec).UTF8String().data());
   }
 
   putchar('\n');
@@ -251,7 +251,7 @@ JSValue JSC_HOST_CALL functionDebug(ExecState* exec,
                                     JSObject*,
                                     JSValue,
                                     const ArgList& args) {
-  fprintf(stderr, "--> %s\n", args.at(0).toString(exec).UTF8String().c_str());
+  fprintf(stderr, "--> %s\n", args.at(0).toString(exec).UTF8String().data());
   return jsUndefined();
 }
 
@@ -547,7 +547,7 @@ static void runInteractive(GlobalObject* globalObject) {
       printf("%s\n", completion.value()
                          .toString(globalObject->globalExec())
                          .UTF8String()
-                         .c_str());
+                         .data());
 
     globalObject->globalExec()->clearException();
   }
@@ -642,9 +642,9 @@ int jscmain(int argc, char** argv, JSGlobalData* globalData) {
 
 static bool fillBufferWithContentsOfFile(const UString& fileName,
                                          Vector<char>& buffer) {
-  FILE* f = fopen(fileName.UTF8String().c_str(), "r");
+  FILE* f = fopen(fileName.UTF8String().data(), "r");
   if (!f) {
-    fprintf(stderr, "Could not open file: %s\n", fileName.UTF8String().c_str());
+    fprintf(stderr, "Could not open file: %s\n", fileName.UTF8String().data());
     return false;
   }
 

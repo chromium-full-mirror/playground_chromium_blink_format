@@ -59,8 +59,8 @@ class CString {
   CString& operator=(const CString&);
   CString& operator+=(const CString& c) { return append(c); }
 
-  size_t size() const { return m_length; }
-  const char* c_str() const { return m_data; }
+  size_t length() const { return m_length; }
+  const char* data() const { return m_data; }
 
  private:
   size_t m_length;
@@ -101,8 +101,6 @@ class UString {
   static UString from(unsigned);
   static UString from(long);
   static UString from(double);
-
-  bool getCString(CStringBuffer&) const;
 
   // NOTE: This method should only be used for *debugging* purposes as it
   // is neither Unicode safe nor free from side effects nor thread-safe.
