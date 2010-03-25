@@ -63,11 +63,6 @@ bool invokeCallback(v8::Persistent<v8::Object> callback,
                     int argc,
                     v8::Handle<v8::Value> argv[],
                     bool& callbackReturnValue);
-bool invokeCallbackTreatOnlyExplicitFalseAsFalse(
-    v8::Persistent<v8::Object> callback,
-    int argc,
-    v8::Handle<v8::Value> argv[],
-    bool& callbackReturnValue);
 
 }  // namespace WebCore
 
