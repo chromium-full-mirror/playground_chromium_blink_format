@@ -139,11 +139,12 @@ bool unloadModule(PlatformModule module) {
   return ::FreeLibrary(module);
 
 #else
+#ifndef QT_NO_LIBRARY
   if (module->unload()) {
     delete module;
     return true;
   }
-
+#endif
   return false;
 #endif
 }
