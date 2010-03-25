@@ -332,6 +332,7 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
   }
   bool geolocationPermission() const { return m_geolocationPermission; }
 
+  void setDeveloperExtrasEnabled(bool);
   void showWebInspector();
   void closeWebInspector();
   void setTimelineProfilingEnabled(bool enabled);
