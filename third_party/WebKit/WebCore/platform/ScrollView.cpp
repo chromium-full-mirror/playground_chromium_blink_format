@@ -992,7 +992,7 @@ void ScrollView::removePanScrollIcon() {
       true /*immediate*/);
 }
 
-#if !PLATFORM(WX) && !PLATFORM(GTK) && !PLATFORM(QT)
+#if !PLATFORM(WX) && !PLATFORM(GTK) && !PLATFORM(QT) && !PLATFORM(EFL)
 
 void ScrollView::platformInit() {}
 

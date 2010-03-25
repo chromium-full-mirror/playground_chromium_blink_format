@@ -42,7 +42,7 @@ using namespace std;
 
 namespace WebCore {
 
-#if !PLATFORM(GTK)
+#if !PLATFORM(GTK) && !PLATFORM(EFL)
 PassRefPtr<Scrollbar> Scrollbar::createNativeScrollbar(
     ScrollbarClient* client,
     ScrollbarOrientation orientation,
