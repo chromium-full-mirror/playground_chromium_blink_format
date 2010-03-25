@@ -86,6 +86,13 @@ static String resourceName(const KURL& url) {
   return name;
 }
 
+static String trimConsoleMessage(const char* p, size_t len) {
+  String s = String(p, std::min<size_t>(len, 128));
+  if (len > 128)
+    s += "...";
+  return s;
+}
+
 WebSocketHandshake::WebSocketHandshake(const KURL& url,
                                        const String& protocol,
                                        ScriptExecutionContext* context)
@@ -225,18 +232,20 @@ int WebSocketHandshake::readServerHandshake(const char* header, size_t len) {
   else {
     const String& code = extractResponseCode(header, len);
     if (code.isNull()) {
-      m_context->addMessage(ConsoleDestination, JSMessageSource, LogMessageType,
-                            ErrorMessageLevel,
-                            "Short server handshake: " + String(header, len), 0,
-                            clientOrigin());
+      m_context->addMessage(
+          ConsoleDestination, JSMessageSource, LogMessageType,
+          ErrorMessageLevel,
+          "Short server handshake: " + trimConsoleMessage(header, len), 0,
+          clientOrigin());
       return -1;
     }
     if (code.isEmpty()) {
       m_mode = Failed;
-      m_context->addMessage(ConsoleDestination, JSMessageSource, LogMessageType,
-                            ErrorMessageLevel,
-                            "No response code found: " + String(header, len), 0,
-                            clientOrigin());
+      m_context->addMessage(
+          ConsoleDestination, JSMessageSource, LogMessageType,
+          ErrorMessageLevel,
+          "No response code found: " + trimConsoleMessage(header, len), 0,
+          clientOrigin());
       return len;
     }
     LOG(Network, "response code: %s", code.utf8().data());
@@ -267,10 +276,11 @@ int WebSocketHandshake::readServerHandshake(const char* header, size_t len) {
     }
     if (memcmp(p, webSocketUpgradeHeader, sizeof(webSocketUpgradeHeader) - 1)) {
       m_mode = Failed;
-      m_context->addMessage(ConsoleDestination, JSMessageSource, LogMessageType,
-                            ErrorMessageLevel,
-                            "Bad Upgrade header: " + String(p, end - p), 0,
-                            clientOrigin());
+      m_context->addMessage(
+          ConsoleDestination, JSMessageSource, LogMessageType,
+          ErrorMessageLevel,
+          "Bad Upgrade header: " + trimConsoleMessage(p, end - p), 0,
+          clientOrigin());
       return p - header + sizeof(webSocketUpgradeHeader) - 1;
     }
     p += sizeof(webSocketUpgradeHeader) - 1;
@@ -283,10 +293,11 @@ int WebSocketHandshake::readServerHandshake(const char* header, size_t len) {
     if (memcmp(p, webSocketConnectionHeader,
                sizeof(webSocketConnectionHeader) - 1)) {
       m_mode = Failed;
-      m_context->addMessage(ConsoleDestination, JSMessageSource, LogMessageType,
-                            ErrorMessageLevel,
-                            "Bad Connection header: " + String(p, end - p), 0,
-                            clientOrigin());
+      m_context->addMessage(
+          ConsoleDestination, JSMessageSource, LogMessageType,
+          ErrorMessageLevel,
+          "Bad Connection header: " + trimConsoleMessage(p, end - p), 0,
+          clientOrigin());
       return p - header + sizeof(webSocketConnectionHeader) - 1;
     }
     p += sizeof(webSocketConnectionHeader) - 1;
@@ -392,21 +403,21 @@ const char* WebSocketHandshake::readHTTPHeaders(const char* start,
             m_context->addMessage(
                 ConsoleDestination, JSMessageSource, LogMessageType,
                 ErrorMessageLevel,
-                "CR doesn't follow LF at " + String(p, end - p), 0,
+                "CR doesn't follow LF at " + trimConsoleMessage(p, end - p), 0,
                 clientOrigin());
             return 0;
           }
           m_context->addMessage(
               ConsoleDestination, JSMessageSource, LogMessageType,
               ErrorMessageLevel,
-              "Unexpected CR in name at " + String(p, end - p), 0,
+              "Unexpected CR in name at " + trimConsoleMessage(p, end - p), 0,
               clientOrigin());
           return 0;
         case '\n':
           m_context->addMessage(
               ConsoleDestination, JSMessageSource, LogMessageType,
               ErrorMessageLevel,
-              "Unexpected LF in name at " + String(p, end - p), 0,
+              "Unexpected LF in name at " + trimConsoleMessage(p, end - p), 0,
               clientOrigin());
           return 0;
         case ':':
@@ -435,7 +446,7 @@ const char* WebSocketHandshake::readHTTPHeaders(const char* start,
           m_context->addMessage(
               ConsoleDestination, JSMessageSource, LogMessageType,
               ErrorMessageLevel,
-              "Unexpected LF in value at " + String(p, end - p), 0,
+              "Unexpected LF in value at " + trimConsoleMessage(p, end - p), 0,
               clientOrigin());
           return 0;
         default:
@@ -447,11 +458,11 @@ const char* WebSocketHandshake::readHTTPHeaders(const char* start,
       }
     }
     if (p >= end || *p != '\n') {
-      m_context->addMessage(
-          ConsoleDestination, JSMessageSource, LogMessageType,
-          ErrorMessageLevel,
-          "CR doesn't follow LF after value at " + String(p, end - p), 0,
-          clientOrigin());
+      m_context->addMessage(ConsoleDestination, JSMessageSource, LogMessageType,
+                            ErrorMessageLevel,
+                            "CR doesn't follow LF after value at " +
+                                trimConsoleMessage(p, end - p),
+                            0, clientOrigin());
       return 0;
     }
     AtomicString nameStr(String::fromUTF8(name.data(), name.size()));
