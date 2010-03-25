@@ -630,9 +630,10 @@ unsigned short KURL::port() const {
     return 0;
 
   const UChar* stringData = m_string.characters();
+  bool ok = false;
   unsigned number = charactersToUIntStrict(stringData + m_hostEnd + 1,
-                                           m_portEnd - m_hostEnd - 1);
-  if (!number || number > maximumValidPortNumber)
+                                           m_portEnd - m_hostEnd - 1, &ok);
+  if (!ok || number > maximumValidPortNumber)
     return invalidPortNumber;
   return number;
 }
