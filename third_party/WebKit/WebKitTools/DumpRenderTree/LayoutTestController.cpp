@@ -412,6 +412,19 @@ static JSValueRef addDisallowedURLCallback(JSContextRef context,
   return JSValueMakeUndefined(context);
 }
 
+static JSValueRef callShouldCloseOnWebViewCallback(JSContextRef context,
+                                                   JSObjectRef function,
+                                                   JSObjectRef thisObject,
+                                                   size_t argumentCount,
+                                                   const JSValueRef arguments[],
+                                                   JSValueRef* exception) {
+  // Has mac & windows implementation
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+
+  return JSValueMakeBoolean(context, controller->callShouldCloseOnWebView());
+}
+
 static JSValueRef clearAllDatabasesCallback(JSContextRef context,
                                             JSObjectRef function,
                                             JSObjectRef thisObject,
@@ -2074,6 +2087,8 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"apiTestGoToCurrentBackForwardItem",
        apiTestGoToCurrentBackForwardItemCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"callShouldCloseOnWebView", callShouldCloseOnWebViewCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"clearAllDatabases", clearAllDatabasesCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
