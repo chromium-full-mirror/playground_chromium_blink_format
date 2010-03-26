@@ -107,6 +107,7 @@ enum SandboxFlag {
   SandboxOrigin = 1 << 2,
   SandboxForms = 1 << 3,
   SandboxScripts = 1 << 4,
+  SandboxTopNavigation = 1 << 5,
   SandboxAll = -1  // Mask with all bits set to 1.
 };
 
