@@ -39,6 +39,7 @@
 #include "CSSRuleList.h"
 #include "CSSStyleDeclaration.h"
 #include "CSSStyleRule.h"
+#include "CSSStyleSelector.h"
 #include "CSSStyleSheet.h"
 #include "ContainerNode.h"
 #include "Cookie.h"
@@ -59,6 +60,8 @@
 #include "Node.h"
 #include "NodeList.h"
 #include "PlatformString.h"
+#include "RenderStyle.h"
+#include "RenderStyleConstants.h"
 #include "ScriptEventListener.h"
 #include "ScriptObject.h"
 #include "StyleSheetList.h"
@@ -710,8 +713,16 @@ void InspectorDOMAgent::getStyles(long callId, long nodeId, bool authorOnly) {
   if (element->style())
     result.set("inlineStyle", buildObjectForStyle(element->style(), true));
   result.set("computedStyle", buildObjectForStyle(computedStyle.get(), false));
-  result.set("matchedCSSRules", getMatchedCSSRules(element, authorOnly));
-  result.set("styleAttributes", getAttributeStyles(element));
+
+  CSSStyleSelector* selector = element->ownerDocument()->styleSelector();
+  RefPtr<CSSRuleList> matchedRules =
+      selector->styleRulesForElement(element, authorOnly);
+  result.set("matchedCSSRules", buildArrayForCSSRules(matchedRules.get()));
+
+  result.set("styleAttributes", buildObjectForAttributeStyles(element));
+  result.set("pseudoElements",
+             buildArrayForPseudoElements(element, authorOnly));
+
   ScriptObject currentStyle = result;
   Element* parentElement = element->parentElement();
   while (parentElement) {
@@ -720,8 +731,14 @@ void InspectorDOMAgent::getStyles(long callId, long nodeId, bool authorOnly) {
     if (parentElement->style() && parentElement->style()->length())
       parentStyle.set("inlineStyle",
                       buildObjectForStyle(parentElement->style(), true));
+
+    CSSStyleSelector* parentSelector =
+        parentElement->ownerDocument()->styleSelector();
+    RefPtr<CSSRuleList> parentMatchedRules =
+        parentSelector->styleRulesForElement(parentElement, authorOnly);
     parentStyle.set("matchedCSSRules",
-                    getMatchedCSSRules(parentElement, authorOnly));
+                    buildArrayForCSSRules(parentMatchedRules.get()));
+
     parentElement = parentElement->parentElement();
     currentStyle = parentStyle;
   }
@@ -775,26 +792,8 @@ void InspectorDOMAgent::getComputedStyle(long callId, long nodeId) {
       callId, buildObjectForStyle(computedStyle.get(), false));
 }
 
-ScriptArray InspectorDOMAgent::getMatchedCSSRules(Element* element,
-                                                  bool authorOnly) {
-  DOMWindow* defaultView = element->ownerDocument()->defaultView();
-  if (!defaultView)
-    return m_frontend->newScriptArray();
-
-  RefPtr<CSSRuleList> matchedRules =
-      defaultView->getMatchedCSSRules(element, "", authorOnly);
-  ScriptArray matchedCSSRules = m_frontend->newScriptArray();
-  unsigned counter = 0;
-  for (unsigned i = 0; matchedRules.get() && i < matchedRules->length(); ++i) {
-    CSSRule* rule = matchedRules->item(i);
-    if (rule->type() == CSSRule::STYLE_RULE)
-      matchedCSSRules.set(counter++,
-                          buildObjectForRule(static_cast<CSSStyleRule*>(rule)));
-  }
-  return matchedCSSRules;
-}
-
-ScriptObject InspectorDOMAgent::getAttributeStyles(Element* element) {
+ScriptObject InspectorDOMAgent::buildObjectForAttributeStyles(
+    Element* element) {
   ScriptObject styleAttributes = m_frontend->newScriptObject();
   NamedNodeMap* attributes = element->attributes();
   for (unsigned i = 0; attributes && i < attributes->length(); ++i) {
@@ -806,6 +805,39 @@ ScriptObject InspectorDOMAgent::getAttributeStyles(Element* element) {
     }
   }
   return styleAttributes;
+}
+
+ScriptArray InspectorDOMAgent::buildArrayForCSSRules(
+    CSSRuleList* matchedRules) {
+  ScriptArray matchedCSSRules = m_frontend->newScriptArray();
+  unsigned counter = 0;
+  for (unsigned i = 0; matchedRules && i < matchedRules->length(); ++i) {
+    CSSRule* rule = matchedRules->item(i);
+    if (rule->type() == CSSRule::STYLE_RULE)
+      matchedCSSRules.set(counter++,
+                          buildObjectForRule(static_cast<CSSStyleRule*>(rule)));
+  }
+  return matchedCSSRules;
+}
+
+ScriptArray InspectorDOMAgent::buildArrayForPseudoElements(Element* element,
+                                                           bool authorOnly) {
+  ScriptArray result = m_frontend->newScriptArray();
+  CSSStyleSelector* selector = element->ownerDocument()->styleSelector();
+  RefPtr<RenderStyle> renderStyle = element->styleForRenderer();
+  unsigned counter = 0;
+
+  for (PseudoId pseudoId = FIRST_PUBLIC_PSEUDOID;
+       pseudoId < AFTER_LAST_INTERNAL_PSEUDOID;
+       pseudoId = static_cast<PseudoId>(pseudoId + 1)) {
+    RefPtr<CSSRuleList> matchedRules =
+        selector->pseudoStyleRulesForElement(element, pseudoId, authorOnly);
+    ScriptArray matchedArray = buildArrayForCSSRules(matchedRules.get());
+    static_cast<ScriptObject>(matchedArray)
+        .set("pseudoId", static_cast<int>(pseudoId));
+    result.set(counter++, matchedArray);
+  }
+  return result;
 }
 
 void InspectorDOMAgent::applyStyleText(long callId,

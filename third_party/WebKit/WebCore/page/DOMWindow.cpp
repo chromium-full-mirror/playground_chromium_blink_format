@@ -1091,16 +1091,12 @@ PassRefPtr<CSSStyleDeclaration> DOMWindow::getComputedStyle(
 }
 
 PassRefPtr<CSSRuleList> DOMWindow::getMatchedCSSRules(Element* elt,
-                                                      const String& pseudoElt,
+                                                      const String&,
                                                       bool authorOnly) const {
   if (!m_frame)
     return 0;
 
   Document* doc = m_frame->document();
-
-  if (!pseudoElt.isEmpty())
-    return doc->styleSelector()->pseudoStyleRulesForElement(elt, pseudoElt,
-                                                            authorOnly);
   return doc->styleSelector()->styleRulesForElement(elt, authorOnly);
 }
 

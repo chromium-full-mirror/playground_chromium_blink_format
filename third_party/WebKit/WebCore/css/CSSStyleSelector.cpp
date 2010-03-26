@@ -1881,13 +1881,20 @@ void CSSStyleSelector::cacheBorderAndBackground() {
 PassRefPtr<CSSRuleList> CSSStyleSelector::styleRulesForElement(
     Element* e,
     bool authorOnly) {
+  return pseudoStyleRulesForElement(e, NOPSEUDO, authorOnly);
+}
+
+PassRefPtr<CSSRuleList> CSSStyleSelector::pseudoStyleRulesForElement(
+    Element* e,
+    PseudoId pseudoId,
+    bool authorOnly) {
   if (!e || !e->document()->haveStylesheetsLoaded())
     return 0;
 
   m_checker.m_collectRulesOnly = true;
 
   initElementAndPseudoState(e);
-  initForStyleResolve(e);
+  initForStyleResolve(e, 0, pseudoId);
 
   if (!authorOnly) {
     int firstUARule = -1, lastUARule = -1;
@@ -1910,12 +1917,6 @@ PassRefPtr<CSSRuleList> CSSStyleSelector::styleRulesForElement(
   m_checker.m_collectRulesOnly = false;
 
   return m_ruleList.release();
-}
-
-PassRefPtr<CSSRuleList>
-CSSStyleSelector::pseudoStyleRulesForElement(Element*, const String&, bool) {
-  // FIXME: Implement this.
-  return 0;
 }
 
 bool CSSStyleSelector::checkSelector(CSSSelector* sel) {
@@ -2039,7 +2040,7 @@ CSSStyleSelector::SelectorChecker::checkSelector(
       // We make an exception for scrollbar pseudo elements and allow a set of
       // pseudo classes (but nothing else)
       // to follow the pseudo elements.
-      if (elementStyle && dynamicPseudo != NOPSEUDO &&
+      if ((elementStyle || m_collectRulesOnly) && dynamicPseudo != NOPSEUDO &&
           dynamicPseudo != SELECTION &&
           !((RenderScrollbar::scrollbarForStyleResolve() ||
              dynamicPseudo == SCROLLBAR_CORNER || dynamicPseudo == RESIZER) &&
@@ -2758,7 +2759,7 @@ bool CSSStyleSelector::SelectorChecker::checkOneSelector(
     return false;
   }
   if (sel->m_match == CSSSelector::PseudoElement) {
-    if (!elementStyle)
+    if (!elementStyle && !m_collectRulesOnly)
       return false;
 
     switch (sel->pseudoType()) {

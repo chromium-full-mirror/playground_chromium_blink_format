@@ -128,7 +128,7 @@ class CSSStyleSelector : public Noncopyable {
   // element (or a pseudo-element).
   PassRefPtr<CSSRuleList> styleRulesForElement(Element*, bool authorOnly);
   PassRefPtr<CSSRuleList> pseudoStyleRulesForElement(Element*,
-                                                     const String& pseudoStyle,
+                                                     PseudoId,
                                                      bool authorOnly);
 
   // Given a CSS keyword in the range (xx-small to -webkit-xxx-large), this
