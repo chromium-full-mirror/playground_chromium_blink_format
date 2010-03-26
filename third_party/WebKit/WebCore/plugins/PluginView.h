@@ -166,9 +166,8 @@ class PluginView : public Widget,
   static const char* userAgentStatic();
 #endif
   void status(const char* message);
-
-#if ENABLE(NETSCAPE_PLUGIN_API)
   NPError getValue(NPNVariable variable, void* value);
+#if ENABLE(NETSCAPE_PLUGIN_API)
   static NPError getValueStatic(NPNVariable variable, void* value);
 #endif
   NPError setValue(NPPVariable variable, void* value);

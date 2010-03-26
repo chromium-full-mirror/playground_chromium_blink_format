@@ -51,11 +51,11 @@ NPError PluginView::handlePostReadFile(Vector<char>&, uint32, const char*) {
   return 0;
 }
 
-#if ENABLE(NETSCAPE_PLUGIN_API)
 bool PluginView::platformGetValue(NPNVariable, void*, NPError*) {
   return false;
 }
 
+#if ENABLE(NETSCAPE_PLUGIN_API)
 bool PluginView::platformGetValueStatic(NPNVariable, void*, NPError*) {
   return false;
 }
@@ -87,10 +87,8 @@ void PluginView::restart() {}
 void PluginView::keepAlive(NPP) {}
 #endif
 
-#if PLATFORM(MAC)
 void PluginView::privateBrowsingStateChanged(bool) {}
 
 void PluginView::setJavaScriptPaused(bool) {}
-#endif
 
 }  // namespace WebCore
