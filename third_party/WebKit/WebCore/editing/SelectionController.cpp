@@ -660,11 +660,26 @@ bool SelectionController::modify(EAlteration alter,
                                  EDirection dir,
                                  TextGranularity granularity,
                                  bool userTriggered) {
+  Settings* settings = m_frame ? m_frame->settings() : 0;
+  return modify(alter, dir, granularity, userTriggered, settings);
+}
+
+static bool isBoundary(TextGranularity granularity) {
+  return granularity == LineBoundary || granularity == ParagraphBoundary ||
+         granularity == DocumentBoundary;
+}
+
+bool SelectionController::modify(EAlteration alter,
+                                 EDirection direction,
+                                 TextGranularity granularity,
+                                 bool userTriggered,
+                                 Settings* settings) {
   if (userTriggered) {
     SelectionController trialSelectionController;
     trialSelectionController.setSelection(m_selection);
     trialSelectionController.setIsDirectional(m_isDirectional);
-    trialSelectionController.modify(alter, dir, granularity, false);
+    trialSelectionController.modify(alter, direction, granularity, false,
+                                    settings);
 
     bool change =
         m_frame->shouldChangeSelection(trialSelectionController.selection());
@@ -672,37 +687,37 @@ bool SelectionController::modify(EAlteration alter,
       return false;
   }
 
-  willBeModified(alter, dir);
+  willBeModified(alter, direction);
 
-  VisiblePosition pos;
-  switch (dir) {
+  VisiblePosition position;
+  switch (direction) {
     case RIGHT:
       if (alter == MOVE)
-        pos = modifyMovingRight(granularity);
+        position = modifyMovingRight(granularity);
       else
-        pos = modifyExtendingRight(granularity);
+        position = modifyExtendingRight(granularity);
       break;
     case FORWARD:
       if (alter == EXTEND)
-        pos = modifyExtendingForward(granularity);
+        position = modifyExtendingForward(granularity);
       else
-        pos = modifyMovingForward(granularity);
+        position = modifyMovingForward(granularity);
       break;
     case LEFT:
       if (alter == MOVE)
-        pos = modifyMovingLeft(granularity);
+        position = modifyMovingLeft(granularity);
       else
-        pos = modifyExtendingLeft(granularity);
+        position = modifyExtendingLeft(granularity);
       break;
     case BACKWARD:
       if (alter == EXTEND)
-        pos = modifyExtendingBackward(granularity);
+        position = modifyExtendingBackward(granularity);
       else
-        pos = modifyMovingBackward(granularity);
+        position = modifyMovingBackward(granularity);
       break;
   }
 
-  if (pos.isNull())
+  if (position.isNull())
     return false;
 
   // Some of the above operations set an xPosForVerticalArrowNavigation.
@@ -715,11 +730,22 @@ bool SelectionController::modify(EAlteration alter,
 
   switch (alter) {
     case MOVE:
-      moveTo(pos, userTriggered);
+      moveTo(position, userTriggered);
       break;
     case EXTEND:
-      setExtent(pos, userTriggered);
-      break;
+      if (!settings || settings->editingBehavior() != EditingMacBehavior ||
+          m_selection.isCaret() || !isBoundary(granularity))
+        setExtent(position, userTriggered);
+      else {
+        // Standard Mac behavior when extending to a boundary is grow the
+        // selection rather
+        // than leaving the base in place and moving the extent. Matches
+        // NSTextView.
+        if (direction == FORWARD || direction == RIGHT)
+          setEnd(position, userTriggered);
+        else
+          setStart(position, userTriggered);
+      }
   }
 
   if (granularity == LineGranularity || granularity == ParagraphGranularity)
@@ -874,6 +900,22 @@ int SelectionController::xPosForVerticalArrowNavigation(EPositionType type) {
 void SelectionController::clear() {
   m_granularity = CharacterGranularity;
   setSelection(VisibleSelection());
+}
+
+void SelectionController::setStart(const VisiblePosition& pos,
+                                   bool userTriggered) {
+  if (m_selection.isBaseFirst())
+    setBase(pos, userTriggered);
+  else
+    setExtent(pos, userTriggered);
+}
+
+void SelectionController::setEnd(const VisiblePosition& pos,
+                                 bool userTriggered) {
+  if (m_selection.isBaseFirst())
+    setExtent(pos, userTriggered);
+  else
+    setBase(pos, userTriggered);
 }
 
 void SelectionController::setBase(const VisiblePosition& pos,
