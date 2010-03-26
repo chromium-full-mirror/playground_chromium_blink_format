@@ -335,7 +335,7 @@ static inline void handleElementNamespaces(
     String namespaceURI = decl.namespaceUri();
     String namespaceQName = decl.prefix().isEmpty()
                                 ? String("xmlns")
-                                : String("xmlns:") + decl.prefix();
+                                : String("xmlns:") + String(decl.prefix());
     newElement->setAttributeNS("http://www.w3.org/2000/xmlns/", namespaceQName,
                                namespaceURI, ec, scriptingPermission);
     if (ec)  // exception setting attributes
