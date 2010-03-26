@@ -56,11 +56,15 @@ class WebPage : public QWebPage {
                                        const QNetworkRequest& request,
                                        NavigationType type);
 
+  QString userAgentForUrl(const QUrl& url) const;
+
  public slots:
   void openUrlInDefaultBrowser(const QUrl& url = QUrl());
+  void setUserAgent(const QString& ua) { m_userAgent = ua; }
 
  private:
   void applyProxy();
+  QString m_userAgent;
 };
 
 #endif
