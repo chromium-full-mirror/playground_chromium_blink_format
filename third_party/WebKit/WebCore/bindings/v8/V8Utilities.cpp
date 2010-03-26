@@ -130,9 +130,12 @@ void navigateIfAllowed(Frame* frame,
 
 ScriptExecutionContext* getScriptExecutionContext() {
 #if ENABLE(WORKERS)
-  WorkerContextExecutionProxy* proxy = WorkerContextExecutionProxy::retrieve();
-  if (proxy)
-    return proxy->workerContext()->scriptExecutionContext();
+  WorkerScriptController* controller =
+      WorkerScriptController::controllerForContext();
+  if (controller) {
+    WorkerContextExecutionProxy* proxy = controller->proxy();
+    return proxy ? proxy->workerContext()->scriptExecutionContext() : 0;
+  }
 #endif
 
   Frame* frame = V8Proxy::retrieveFrameForCurrentContext();
