@@ -64,7 +64,8 @@ struct FontPlatformData {
         ,
         m_cgFont(0)
 #endif
-  {
+        ,
+        m_isColorBitmapFont(false) {
   }
 
   FontPlatformData(NSFont* nsFont,
@@ -81,7 +82,8 @@ struct FontPlatformData {
         m_atsuFontID(fontID),
         m_size(size),
         m_font(0),
-        m_cgFont(cgFont) {}
+        m_cgFont(cgFont),
+        m_isColorBitmapFont(false) {}
 
   FontPlatformData(const FontPlatformData&);
 
@@ -125,6 +127,7 @@ struct FontPlatformData {
 
   bool roundsGlyphAdvances() const;
   bool allowsLigatures() const;
+  bool isColorBitmapFont() const { return m_isColorBitmapFont; }
 
 #ifndef BUILDING_ON_TIGER
   CGFontRef cgFont() const { return m_cgFont.get(); }
@@ -148,6 +151,8 @@ struct FontPlatformData {
   CGFontRef m_cgFont;  // It is not necessary to refcount this, since either an
                        // NSFont owns it or some CachedFont has it referenced.
 #endif
+
+  bool m_isColorBitmapFont;
 };
 }
 
