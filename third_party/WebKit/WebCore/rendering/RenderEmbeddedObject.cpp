@@ -155,7 +155,8 @@ static void mapDataParamToSrc(Vector<String>* paramNames,
 }
 
 void RenderEmbeddedObject::updateWidget(bool onlyCreateNonNetscapePlugins) {
-  if (m_showsMissingPluginIndicator)
+  if (m_showsMissingPluginIndicator ||
+      !node())  // Check the node in case destroy() has been called.
     return;
 
   String url;

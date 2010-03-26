@@ -32,6 +32,7 @@
 #include "RenderLayer.h"
 #include "RenderSelectionInfo.h"
 #include "RenderWidget.h"
+#include "RenderWidgetProtector.h"
 #include "TransformState.h"
 
 #if USE(ACCELERATED_COMPOSITING)
@@ -49,6 +50,10 @@ RenderView::RenderView(Node* node, FrameView* view)
       m_selectionEndPos(-1),
       m_printImages(true),
       m_maximalOutlineSize(0),
+      m_bestTruncatedAt(0),
+      m_truncatorWidth(0),
+      m_minimumColumnHeight(0),
+      m_forcedPageBreak(false),
       m_layoutState(0),
       m_layoutStateDisableCount(0) {
   // Clear our anonymous bit, set because RenderObject assumes
@@ -579,11 +584,32 @@ bool RenderView::printing() const {
 }
 
 void RenderView::updateWidgetPositions() {
-  RenderWidgetSet::iterator end = m_widgets.end();
-  for (RenderWidgetSet::iterator it = m_widgets.begin(); it != end; ++it)
-    (*it)->updateWidgetPosition();
-  for (RenderWidgetSet::iterator it = m_widgets.begin(); it != end; ++it)
-    (*it)->widgetPositionsUpdated();
+  // updateWidgetPosition() can possibly cause layout to be re-entered (via
+  // plug-ins running
+  // scripts in response to NPP_SetWindow, for example), so we need to keep the
+  // Widgets
+  // alive during enumeration.
+
+  size_t size = m_widgets.size();
+
+  Vector<RenderWidget*> renderWidgets;
+  renderWidgets.reserveCapacity(size);
+
+  RenderWidgetSet::const_iterator end = m_widgets.end();
+  for (RenderWidgetSet::const_iterator it = m_widgets.begin(); it != end;
+       ++it) {
+    renderWidgets.uncheckedAppend(*it);
+    (*it)->ref();
+  }
+
+  for (size_t i = 0; i < size; ++i)
+    renderWidgets[i]->updateWidgetPosition();
+
+  for (size_t i = 0; i < size; ++i)
+    renderWidgets[i]->widgetPositionsUpdated();
+
+  for (size_t i = 0; i < size; ++i)
+    renderWidgets[i]->deref(renderArena());
 }
 
 void RenderView::addWidget(RenderWidget* o) {
