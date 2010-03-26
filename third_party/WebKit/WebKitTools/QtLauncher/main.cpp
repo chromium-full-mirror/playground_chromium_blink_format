@@ -32,6 +32,11 @@
 
 #include <QtGui>
 #include <QtNetwork/QNetworkRequest>
+
+#if defined(QT_CONFIGURED_WITH_OPENGL)
+#include <QtOpenGL/QGLWidget>
+#endif
+
 #if !defined(QT_NO_PRINTER)
 #include <QPrintPreviewDialog>
 #endif
@@ -87,6 +92,10 @@ static bool gUseFrameFlattening = true;
 static bool gUseFrameFlattening = false;
 #endif
 
+#if defined(QT_CONFIGURED_WITH_OPENGL)
+static bool gUseQGLWidgetViewport = false;
+#endif
+
 class LauncherWindow : public MainWindow {
   Q_OBJECT
 
@@ -137,6 +146,10 @@ class LauncherWindow : public MainWindow {
   void showFPS(bool enable);
   void changeViewportUpdateMode(int mode);
   void toggleFrameFlattening(bool toggle);
+
+#if defined(QT_CONFIGURED_WITH_OPENGL)
+  void toggleQGLWidgetViewport(bool enable);
+#endif
 
  public slots:
   void newWindow();
@@ -679,6 +692,18 @@ void LauncherWindow::toggleFrameFlattening(bool toggle) {
                                    toggle);
 }
 
+#if defined(QT_CONFIGURED_WITH_OPENGL)
+void LauncherWindow::toggleQGLWidgetViewport(bool enable) {
+  if (!isGraphicsBased())
+    return;
+
+  gUseQGLWidgetViewport = enable;
+  WebViewGraphicsBased* view = static_cast<WebViewGraphicsBased*>(m_view);
+
+  view->setViewport(enable ? new QGLWidget() : 0);
+}
+#endif
+
 void LauncherWindow::newWindow() {
   LauncherWindow* mw = new LauncherWindow(this, false);
   mw->show();
@@ -834,6 +859,17 @@ void LauncherWindow::createChrome() {
   toggleFrameFlattening->setCheckable(true);
   toggleFrameFlattening->setChecked(
       settings->testAttribute(QWebSettings::FrameFlatteningEnabled));
+
+#if defined(QT_CONFIGURED_WITH_OPENGL)
+  QAction* toggleQGLWidgetViewport =
+      graphicsViewMenu->addAction("Toggle use of QGLWidget Viewport", this,
+                                  SLOT(toggleQGLWidgetViewport(bool)));
+  toggleQGLWidgetViewport->setCheckable(true);
+  toggleQGLWidgetViewport->setChecked(gUseQGLWidgetViewport);
+  toggleQGLWidgetViewport->setEnabled(isGraphicsBased());
+  toggleQGLWidgetViewport->connect(toggleGraphicsView, SIGNAL(toggled(bool)),
+                                   SLOT(setEnabled(bool)));
+#endif
 
   graphicsViewMenu->addSeparator();
 
