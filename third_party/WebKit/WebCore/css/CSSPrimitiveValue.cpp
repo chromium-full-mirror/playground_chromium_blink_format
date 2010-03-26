@@ -326,6 +326,7 @@ void CSSPrimitiveValue::cleanup() {
   }
 
   m_type = 0;
+  m_cachedCSSText = String();
 }
 
 int CSSPrimitiveValue::computeLengthInt(RenderStyle* style,
@@ -714,8 +715,9 @@ int CSSPrimitiveValue::getIdent() {
 }
 
 String CSSPrimitiveValue::cssText() const {
-  // FIXME: return the original value instead of a generated one (e.g. color
-  // name if it was specified) - check what spec says about this
+  if (!m_cachedCSSText.isNull())
+    return m_cachedCSSText;
+
   String text;
   switch (m_type) {
     case CSS_UNKNOWN:
@@ -917,6 +919,7 @@ String CSSPrimitiveValue::cssText() const {
       text = quoteStringIfNeeded(m_value.string);
       break;
   }
+  m_cachedCSSText = text;
   return text;
 }
 
