@@ -78,7 +78,7 @@ class InspectorResource : public RefCounted<InspectorResource> {
   void updateRequest(const ResourceRequest&);
   void updateResponse(const ResourceResponse&);
 
-  void setXMLHttpResponseText(const ScriptString& data);
+  void setOverrideContent(const ScriptString& data, Type);
 
   String sourceString() const;
   PassRefPtr<SharedBuffer> resourceData(String* textEncodingName) const;
@@ -170,7 +170,8 @@ class InspectorResource : public RefCounted<InspectorResource> {
   double m_endTime;
   double m_loadEventTime;
   double m_domContentEventTime;
-  ScriptString m_xmlHttpResponseText;
+  ScriptString m_overrideContent;
+  Type m_overrideContentType;
   Changes m_changes;
   bool m_isMainResource;
   String m_requestMethod;

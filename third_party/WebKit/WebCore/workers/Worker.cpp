@@ -128,12 +128,18 @@ bool Worker::hasPendingActivity() const {
 void Worker::notifyFinished() {
   if (m_scriptLoader->failed())
     dispatchEvent(Event::create(eventNames().errorEvent, false, true));
-  else
+  else {
     m_contextProxy->startWorkerContext(
         m_scriptLoader->url(),
         scriptExecutionContext()->userAgent(m_scriptLoader->url()),
         m_scriptLoader->script());
-
+#if ENABLE(INSPECTOR)
+    if (InspectorController* inspector =
+            scriptExecutionContext()->inspectorController())
+      inspector->scriptImported(m_scriptLoader->identifier(),
+                                m_scriptLoader->script());
+#endif
+  }
   m_scriptLoader = 0;
 
   unsetPendingActivity(this);
