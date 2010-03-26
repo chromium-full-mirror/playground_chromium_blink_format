@@ -144,6 +144,7 @@ class QGraphicsWebViewPrivate : public QWebPageClient {
   void _q_scaleChanged();
 
   void _q_updateMicroFocus();
+  void _q_pageDestroyed();
 
   QGraphicsWebView* q;
   QWebPage* page;
@@ -270,6 +271,11 @@ void QGraphicsWebViewPrivate::_q_updateMicroFocus() {
       ic->update();
   }
 #endif
+}
+
+void QGraphicsWebViewPrivate::_q_pageDestroyed() {
+  page = 0;
+  q->setPage(0);
 }
 
 void QGraphicsWebViewPrivate::scroll(int dx,
@@ -790,6 +796,7 @@ void QGraphicsWebView::setPage(QWebPage* page) {
   connect(d->page, SIGNAL(linkClicked(QUrl)), this, SIGNAL(linkClicked(QUrl)));
   connect(d->page, SIGNAL(microFocusChanged()), this,
           SLOT(_q_updateMicroFocus()));
+  connect(d->page, SIGNAL(destroyed()), this, SLOT(_q_pageDestroyed()));
 }
 
 /*!
