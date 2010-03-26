@@ -52,10 +52,6 @@ WebInputElement::InputType WebInputElement::inputType() const {
   return static_cast<InputType>(constUnwrap<HTMLInputElement>()->inputType());
 }
 
-WebString WebInputElement::formControlType() const {
-  return constUnwrap<HTMLInputElement>()->formControlType();
-}
-
 bool WebInputElement::isActivatedSubmit() const {
   return constUnwrap<HTMLInputElement>()->isActivatedSubmit();
 }
@@ -101,7 +97,7 @@ WebString WebInputElement::nameForAutofill() const {
 }
 
 WebInputElement::WebInputElement(const PassRefPtr<HTMLInputElement>& elem)
-    : WebElement(elem) {}
+    : WebFormControlElement(elem) {}
 
 WebInputElement& WebInputElement::operator=(
     const PassRefPtr<HTMLInputElement>& elem) {

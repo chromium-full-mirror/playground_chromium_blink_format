@@ -38,6 +38,10 @@ using namespace WebCore;
 
 namespace WebKit {
 
+bool WebElement::isFormControlElement() const {
+  return constUnwrap<Element>()->isFormControlElement();
+}
+
 WebString WebElement::tagName() const {
   return constUnwrap<Element>()->tagName();
 }
