@@ -1462,49 +1462,16 @@ WebDragOperation WebViewImpl::dragTargetDragEnter(
   m_dragIdentity = identity;
   m_operationsAllowed = operationsAllowed;
 
-  DragData dragData(m_currentDragData.get(), clientPoint, screenPoint,
-                    static_cast<DragOperation>(operationsAllowed));
-
-  m_dropEffect = DropEffectDefault;
-  m_dragTargetDispatch = true;
-  DragOperation effect = m_page->dragController()->dragEntered(&dragData);
-  // Mask the operation against the drag source's allowed operations.
-  if ((effect & dragData.draggingSourceOperationMask()) != effect)
-    effect = DragOperationNone;
-  m_dragTargetDispatch = false;
-
-  if (m_dropEffect != DropEffectDefault) {
-    m_dragOperation = (m_dropEffect != DropEffectNone) ? WebDragOperationCopy
-                                                       : WebDragOperationNone;
-  } else
-    m_dragOperation = static_cast<WebDragOperation>(effect);
-  return m_dragOperation;
+  return dragTargetDragEnterOrOver(clientPoint, screenPoint, DragEnter);
 }
 
 WebDragOperation WebViewImpl::dragTargetDragOver(
     const WebPoint& clientPoint,
     const WebPoint& screenPoint,
     WebDragOperationsMask operationsAllowed) {
-  ASSERT(m_currentDragData.get());
-
   m_operationsAllowed = operationsAllowed;
-  DragData dragData(m_currentDragData.get(), clientPoint, screenPoint,
-                    static_cast<DragOperation>(operationsAllowed));
 
-  m_dropEffect = DropEffectDefault;
-  m_dragTargetDispatch = true;
-  DragOperation effect = m_page->dragController()->dragUpdated(&dragData);
-  // Mask the operation against the drag source's allowed operations.
-  if ((effect & dragData.draggingSourceOperationMask()) != effect)
-    effect = DragOperationNone;
-  m_dragTargetDispatch = false;
-
-  if (m_dropEffect != DropEffectDefault) {
-    m_dragOperation = (m_dropEffect != DropEffectNone) ? WebDragOperationCopy
-                                                       : WebDragOperationNone;
-  } else
-    m_dragOperation = static_cast<WebDragOperation>(effect);
-  return m_dragOperation;
+  return dragTargetDragEnterOrOver(clientPoint, screenPoint, DragOver);
 }
 
 void WebViewImpl::dragTargetDragLeave() {
@@ -1557,6 +1524,34 @@ int WebViewImpl::dragIdentity() {
   if (m_dragTargetDispatch)
     return m_dragIdentity;
   return 0;
+}
+
+WebDragOperation WebViewImpl::dragTargetDragEnterOrOver(
+    const WebPoint& clientPoint,
+    const WebPoint& screenPoint,
+    DragAction dragAction) {
+  ASSERT(m_currentDragData.get());
+
+  DragData dragData(m_currentDragData.get(), clientPoint, screenPoint,
+                    static_cast<DragOperation>(m_operationsAllowed));
+
+  m_dropEffect = DropEffectDefault;
+  m_dragTargetDispatch = true;
+  DragOperation effect = dragAction == DragEnter
+                             ? m_page->dragController()->dragEntered(&dragData)
+                             : m_page->dragController()->dragUpdated(&dragData);
+  // Mask the operation against the drag source's allowed operations.
+  if (!(effect & dragData.draggingSourceOperationMask()))
+    effect = DragOperationNone;
+  m_dragTargetDispatch = false;
+
+  if (m_dropEffect != DropEffectDefault) {
+    m_dragOperation = (m_dropEffect != DropEffectNone) ? WebDragOperationCopy
+                                                       : WebDragOperationNone;
+  } else
+    m_dragOperation = static_cast<WebDragOperation>(effect);
+
+  return m_dragOperation;
 }
 
 unsigned long WebViewImpl::createUniqueIdentifierForRequest() {
