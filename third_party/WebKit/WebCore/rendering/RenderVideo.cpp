@@ -47,9 +47,6 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-static const int cDefaultWidth = 300;
-static const int cDefaultHeight = 150;
-
 RenderVideo::RenderVideo(HTMLVideoElement* video) : RenderMedia(video) {
   if (video->player())
     setIntrinsicSize(video->player()->naturalSize());
@@ -71,9 +68,9 @@ RenderVideo::RenderVideo(HTMLVideoElement* video) : RenderMedia(video) {
       // will
       // have the correct height (it needs to be > 0 for controls to render
       // properly).
-      setIntrinsicSize(IntSize(cDefaultWidth, 1));
+      setIntrinsicSize(IntSize(defaultSize().width(), 1));
     } else
-      setIntrinsicSize(IntSize(cDefaultWidth, cDefaultHeight));
+      setIntrinsicSize(defaultSize());
   }
 }
 
@@ -82,6 +79,14 @@ RenderVideo::~RenderVideo() {
     p->setVisible(false);
     p->setFrameView(0);
   }
+}
+
+IntSize RenderVideo::defaultSize() {
+  // These values are specified in the spec.
+  static const int cDefaultWidth = 300;
+  static const int cDefaultHeight = 150;
+
+  return IntSize(cDefaultWidth, cDefaultHeight);
 }
 
 void RenderVideo::intrinsicSizeChanged() {

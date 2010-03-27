@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2006 Eric Seidel (eric@webkit.org)
- * Copyright (C) 2008, 2009 Apple Inc. All rights reserved.
+ * Copyright (C) 2008, 2009, 2010 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -405,6 +405,16 @@ class EmptyFrameLoaderClient : public FrameLoaderClient, public Noncopyable {
                                                     const Vector<String>&) {
     return 0;
   }
+#if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
+  virtual PassRefPtr<Widget> createMediaPlayerProxyPlugin(const IntSize&,
+                                                          HTMLMediaElement*,
+                                                          const KURL&,
+                                                          const Vector<String>&,
+                                                          const Vector<String>&,
+                                                          const String&) {
+    return 0;
+  }
+#endif
 
   virtual ObjectContentType objectContentType(const KURL&, const String&) {
     return ObjectContentType();

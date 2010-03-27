@@ -43,6 +43,8 @@ class RenderVideo : public RenderMedia {
   void videoSizeChanged();
   IntRect videoBox() const;
 
+  static IntSize defaultSize();
+
 #if USE(ACCELERATED_COMPOSITING)
   bool supportsAcceleratedRendering() const;
   void acceleratedRenderingStateChanged();

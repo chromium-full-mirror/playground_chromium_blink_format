@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006, 2007, 2008, 2009 Apple Inc. All rights reserved.
+ * Copyright (C) 2006, 2007, 2008, 2009, 2010 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -55,6 +55,9 @@ class FrameLoader;
 class HistoryItem;
 class HTMLAppletElement;
 class HTMLFrameOwnerElement;
+#if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
+class HTMLMediaElement;
+#endif
 class HTMLPlugInElement;
 class IntSize;
 class KURL;
@@ -290,6 +293,14 @@ class FrameLoaderClient {
       const Vector<String>& paramValues) = 0;
 
   virtual void dispatchDidFailToStartPlugin(const PluginView*) const {}
+#if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
+  virtual PassRefPtr<Widget> createMediaPlayerProxyPlugin(const IntSize&,
+                                                          HTMLMediaElement*,
+                                                          const KURL&,
+                                                          const Vector<String>&,
+                                                          const Vector<String>&,
+                                                          const String&) = 0;
+#endif
 
   virtual ObjectContentType objectContentType(const KURL& url,
                                               const String& mimeType) = 0;
