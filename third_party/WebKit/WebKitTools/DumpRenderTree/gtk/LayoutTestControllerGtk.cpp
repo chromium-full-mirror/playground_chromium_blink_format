@@ -86,7 +86,7 @@ static gchar* copyWebSettingKey(gchar* preferenceKey) {
 
   if (!keyTable) {
     // If you add a pref here, make sure you reset the value in
-    // DumpRenderTree::resetWebViewToConsistentStateBeforeTesting.
+    // DumpRenderTree::resetDefaultsToConsistentValues.
     keyTable = g_hash_table_new(g_str_hash, g_str_equal);
     g_hash_table_insert(keyTable, g_strdup("WebKitJavaScriptEnabled"),
                         g_strdup("enable-scripts"));
@@ -96,6 +96,8 @@ static gchar* copyWebSettingKey(gchar* preferenceKey) {
                         g_strdup("enable-caret-browsing"));
     g_hash_table_insert(keyTable, g_strdup("WebKitUsesPageCachePreferenceKey"),
                         g_strdup("enable-page-cache"));
+    g_hash_table_insert(keyTable, g_strdup("WebKitPluginsEnabled"),
+                        g_strdup("enable-plugins"));
   }
 
   return g_strdup(

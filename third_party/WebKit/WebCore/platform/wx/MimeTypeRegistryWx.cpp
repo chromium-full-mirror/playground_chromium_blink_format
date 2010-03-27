@@ -66,4 +66,8 @@ String MIMETypeRegistry::getMIMETypeForExtension(const String& ext) {
   // unknown, let's just assume plain text
   return "text/plain";
 }
+
+bool MIMETypeRegistry::isApplicationPluginMIMEType(const String&) {
+  return false;
+}
 }

@@ -1387,7 +1387,13 @@ bool FrameLoader::requestObject(RenderEmbeddedObject* renderer,
   if (shouldUsePlugin(completedURL, mimeType, renderer->hasFallbackContent(),
                       useFallback)) {
     Settings* settings = m_frame->settings();
-    if (!allowPlugins(AboutToInstantiatePlugin) ||
+    if (!allowPlugins(AboutToInstantiatePlugin)
+            // Application plugins are plugins implemented by the user agent,
+            // for example Qt plugins,
+            // as opposed to third-party code such as flash. The user agent
+            // decides whether or not they are
+            // permitted, rather than WebKit.
+            && !MIMETypeRegistry::isApplicationPluginMIMEType(mimeType) ||
         (!settings->isJavaEnabled() &&
          MIMETypeRegistry::isJavaAppletMIMEType(mimeType)))
       return false;

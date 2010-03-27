@@ -123,6 +123,10 @@ String MIMETypeRegistry::getMediaMIMETypeForExtension(const String&) {
   return String();
 }
 
+bool MIMETypeRegistry::isApplicationPluginMIMEType(const String&) {
+  return false;
+}
+
 static HashSet<String>& dummyHashSet() {
   ASSERT_NOT_REACHED();
   static HashSet<String> dummy;

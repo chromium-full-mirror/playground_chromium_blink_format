@@ -477,6 +477,8 @@ void LayoutTestController::overridePreference(const QString& name,
     QWebSettings::setMaximumPagesInCache(value.toInt());
   else if (name == "WebKitEnableCaretBrowsing")
     setCaretBrowsingEnabled(value.toBool());
+  else if (name == "WebKitPluginsEnabled")
+    settings->setAttribute(QWebSettings::PluginsEnabled, value.toBool());
   else
     printf(
         "ERROR: LayoutTestController::overridePreference() does not support "
