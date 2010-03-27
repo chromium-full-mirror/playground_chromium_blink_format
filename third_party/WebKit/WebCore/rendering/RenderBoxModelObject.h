@@ -156,7 +156,8 @@ class RenderBoxModelObject : public RenderObject {
                                         int h,
                                         IntRect& destRect,
                                         IntPoint& phase,
-                                        IntSize& tileSize);
+                                        IntSize& tileSize,
+                                        RenderObject* backgroundObject = 0);
 
  private:
   virtual bool isBoxModelObject() const { return true; }

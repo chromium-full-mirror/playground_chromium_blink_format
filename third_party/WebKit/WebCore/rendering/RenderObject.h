@@ -766,6 +766,16 @@ class RenderObject : public CachedResourceClient {
   // Called to repaint a block's floats.
   virtual void repaintOverhangingFloats(bool paintAllDescendants = false);
 
+  // Called to adjust the background image offset when painting the background.
+  virtual bool adjustBackgroundImagePosition(
+      const RenderObject* /*backgroundObject*/,
+      const IntRect& /*clipRect*/,
+      const IntSize& /*imageSize*/,
+      int& /*xPosition*/,
+      int& /*yPosition*/) {
+    return false;
+  }
+
   bool checkForRepaintDuringLayout() const;
 
   // Returns the rect that should be repainted whenever this object changes.
