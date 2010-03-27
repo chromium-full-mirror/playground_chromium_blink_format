@@ -90,6 +90,8 @@ static NPError webkit_test_plugin_new_instance(NPMIMEType /*mimetype*/,
         obj->testDocumentOpenInDestroyStream = TRUE;
       else if (strcasecmp(argn[i], "testwindowopen") == 0)
         obj->testWindowOpen = TRUE;
+      else if (strcasecmp(argn[i], "onSetWindow") == 0 && !obj->onSetWindow)
+        obj->onSetWindow = strdup(argv[i]);
     }
 
     browser->getvalue(instance, NPNVprivateModeBool,
@@ -120,6 +122,9 @@ static NPError webkit_test_plugin_destroy_instance(NPP instance,
     if (obj->logDestroy)
       pluginLog(instance, "NPP_Destroy");
 
+    if (obj->onSetWindow)
+      free(obj->onSetWindow);
+
     browser->releaseobject(&obj->header);
   }
 
@@ -137,6 +142,8 @@ static NPError webkit_test_plugin_set_window(NPP instance, NPWindow* window) {
                 (int)window->height);
       obj->logSetWindow = false;
     }
+    if (obj->onSetWindow)
+      executeScript(obj, obj->onSetWindow);
 
     if (obj->testWindowOpen) {
       testWindowOpen(instance);
