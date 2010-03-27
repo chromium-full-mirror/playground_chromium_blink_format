@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2005, 2010 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -28,21 +28,12 @@
 
 #import <Foundation/Foundation.h>
 
-#define WEB_UREAD (00400)  /* Read by owner */
-#define WEB_UWRITE (00200) /* Write by owner */
-#define WEB_UEXEC (00100)  /* Execute/Search by owner */
-
 @interface NSFileManager (WebNSFileManagerExtras)
-
-- (void)_webkit_backgroundRemoveFileAtPath:(NSString*)path;
-- (void)_webkit_backgroundRemoveLeftoverFiles:(NSString*)path;
-- (BOOL)_webkit_removeFileOnlyAtPath:(NSString*)path;
 - (void)_webkit_setMetadataURL:(NSString*)URLString
                       referrer:(NSString*)referrer
                         atPath:(NSString*)path;
 - (NSString*)_webkit_startupVolumeName;
 - (NSString*)_webkit_pathWithUniqueFilenameForPath:(NSString*)path;
-
 @end
 
 #ifdef BUILDING_ON_TIGER
