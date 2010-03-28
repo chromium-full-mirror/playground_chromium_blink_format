@@ -628,7 +628,7 @@ static void webViewDocumentLoadFinished(WebKitWebView* view,
                                         void*) {
   if (!done && gLayoutTestController->dumpFrameLoadCallbacks()) {
     char* frameName = getFrameNameSuitableForTestResult(view, frame);
-    printf("%s - didFinishDocumentLoadForFrame", frameName);
+    printf("%s - didFinishDocumentLoadForFrame\n", frameName);
     g_free(frameName);
   } else if (!done) {
     guint pendingFrameUnloadEvents =
