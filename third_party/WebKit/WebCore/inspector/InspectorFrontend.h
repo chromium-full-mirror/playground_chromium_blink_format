@@ -149,6 +149,7 @@ class InspectorFrontend : public Noncopyable {
                                    long nodeId,
                                    const ScriptArray& listenersArray);
   void didRemoveNode(long callId, long nodeId);
+  void didChangeTagName(long callId, long nodeId);
 
   void didGetStyles(long callId, const ScriptValue& styles);
   void didGetAllStyles(long callId, const ScriptArray& styles);

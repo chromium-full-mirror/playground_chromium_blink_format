@@ -121,6 +121,10 @@ class InspectorBackend : public RefCounted<InspectorBackend> {
   void getEventListenersForNode(long callId, long nodeId);
   void copyNode(long nodeId);
   void removeNode(long callId, long nodeId);
+  void changeTagName(long callId,
+                     long nodeId,
+                     const AtomicString& tagName,
+                     bool expanded);
 
   void getStyles(long callId, long nodeId, bool authOnly);
   void getAllStyles(long callId);
