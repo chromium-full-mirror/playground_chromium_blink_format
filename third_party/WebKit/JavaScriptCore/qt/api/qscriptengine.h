@@ -49,6 +49,7 @@ class QScriptEngine : public QObject {
 
   QScriptValue nullValue();
   QScriptValue undefinedValue();
+  QScriptValue globalObject() const;
 
  private:
   friend class QScriptEnginePrivate;
