@@ -411,10 +411,8 @@ bool GraphicsContext3DInternal::initialize(
   webAttributes.stencil = attrs.stencil;
   webAttributes.antialias = attrs.antialias;
   webAttributes.premultipliedAlpha = attrs.premultipliedAlpha;
-  // FIXME: once the Chromium portion of the WebKitClient changes has landed,
-  // change this to call WebKit::webKitClient()->createGraphicsContext3D().
   WebKit::WebGraphicsContext3D* webContext =
-      WebKit::WebGraphicsContext3D::createDefault();
+      WebKit::webKitClient()->createGraphicsContext3D();
   if (!webContext)
     return false;
   if (!webContext->initialize(webAttributes)) {
