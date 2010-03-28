@@ -35,6 +35,7 @@
 #include "RenderSVGContainer.h"
 #include "RenderSVGResource.h"
 #include "RenderSVGResourceClipper.h"
+#include "RenderSVGResourceMarker.h"
 #include "RenderSVGResourceMasker.h"
 #include "RenderView.h"
 #include "SVGResourceFilter.h"
@@ -341,7 +342,7 @@ FloatRect SVGRenderBase::maskerBoundingBoxForRenderer(
   return FloatRect();
 }
 
-void SVGRenderBase::deregisterFromResources(RenderObject* object) {
+void deregisterFromResources(RenderObject* object) {
   // We only have the renderer for masker and clipper at the moment.
   if (RenderSVGResourceMasker* masker =
           getRenderSVGResourceById<RenderSVGResourceMasker>(
@@ -351,6 +352,18 @@ void SVGRenderBase::deregisterFromResources(RenderObject* object) {
           getRenderSVGResourceById<RenderSVGResourceClipper>(
               object->document(), object->style()->svgStyle()->clipPath()))
     clipper->invalidateClient(object);
+  if (RenderSVGResourceMarker* startMarker =
+          getRenderSVGResourceById<RenderSVGResourceMarker>(
+              object->document(), object->style()->svgStyle()->startMarker()))
+    startMarker->invalidateClient(object);
+  if (RenderSVGResourceMarker* midMarker =
+          getRenderSVGResourceById<RenderSVGResourceMarker>(
+              object->document(), object->style()->svgStyle()->midMarker()))
+    midMarker->invalidateClient(object);
+  if (RenderSVGResourceMarker* endMarker =
+          getRenderSVGResourceById<RenderSVGResourceMarker>(
+              object->document(), object->style()->svgStyle()->endMarker()))
+    endMarker->invalidateClient(object);
 }
 
 void applyTransformToPaintInfo(

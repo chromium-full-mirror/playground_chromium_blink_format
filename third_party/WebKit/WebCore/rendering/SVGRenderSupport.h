@@ -91,8 +91,6 @@ class SVGRenderBase {
   // and repaintRectInLocalCoordinates in RenderSVGRoot and RenderSVGContainer
   static FloatRect computeContainerBoundingBox(const RenderObject* container,
                                                bool includeAllPaintedContent);
-
-  static void deregisterFromResources(RenderObject*);
 };
 
 // FIXME: This should move to RenderObject or PaintInfo
@@ -105,6 +103,7 @@ void applyTransformToPaintInfo(RenderObject::PaintInfo&,
 // ImageBuffer.
 void renderSubtreeToImage(ImageBuffer*, RenderObject*);
 
+void deregisterFromResources(RenderObject*);
 void clampImageBufferSizeToViewport(FrameView*, IntSize& imageBufferSize);
 
 const RenderObject* findTextRootObject(const RenderObject* start);

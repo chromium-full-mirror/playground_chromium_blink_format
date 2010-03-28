@@ -28,7 +28,6 @@
 #include "SVGExternalResourcesRequired.h"
 #include "SVGFitToViewBox.h"
 #include "SVGLangSpace.h"
-#include "SVGResourceMarker.h"
 #include "SVGStyledElement.h"
 
 namespace WebCore {
@@ -73,7 +72,6 @@ class SVGMarkerElement : public SVGStyledElement,
                                int childCountDelta = 0);
 
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
-  virtual SVGResource* canvasResource(const RenderObject*);
 
  private:
   DECLARE_ANIMATED_PROPERTY(SVGMarkerElement,
@@ -132,11 +130,8 @@ class SVGMarkerElement : public SVGStyledElement,
                             SVGPreserveAspectRatio,
                             PreserveAspectRatio,
                             preserveAspectRatio)
-
-  RefPtr<SVGResourceMarker> m_marker;
 };
+}
 
-}  // namespace WebCore
-
-#endif  // ENABLE(SVG)
+#endif
 #endif

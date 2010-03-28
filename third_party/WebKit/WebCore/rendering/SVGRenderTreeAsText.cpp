@@ -40,6 +40,7 @@
 #include "RenderSVGContainer.h"
 #include "RenderSVGInlineText.h"
 #include "RenderSVGResourceClipper.h"
+#include "RenderSVGResourceMarker.h"
 #include "RenderSVGResourceMasker.h"
 #include "RenderSVGRoot.h"
 #include "RenderSVGText.h"
@@ -213,6 +214,24 @@ static TextStream& operator<<(TextStream& ts,
       break;
     case SVGUnitTypes::SVG_UNIT_TYPE_OBJECTBOUNDINGBOX:
       ts << "objectBoundingBox";
+      break;
+  }
+
+  return ts;
+}
+
+static TextStream& operator<<(
+    TextStream& ts,
+    const SVGMarkerElement::SVGMarkerUnitsType& markerUnit) {
+  switch (markerUnit) {
+    case SVGMarkerElement::SVG_MARKERUNITS_UNKNOWN:
+      ts << "unknown";
+      break;
+    case SVGMarkerElement::SVG_MARKERUNITS_USERSPACEONUSE:
+      ts << "userSpaceOnUse";
+      break;
+    case SVGMarkerElement::SVG_MARKERUNITS_STROKEWIDTH:
+      ts << "strokeWidth";
       break;
   }
 
@@ -521,6 +540,18 @@ void writeSVGResource(TextStream& ts, const RenderObject& object, int indent) {
         static_cast<RenderSVGResourceClipper*>(resource);
     ASSERT(clipper);
     writeNameValuePair(ts, "clipPathUnits", clipper->clipPathUnits());
+  } else if (resource->resourceType() == MarkerResourceType) {
+    RenderSVGResourceMarker* marker =
+        static_cast<RenderSVGResourceMarker*>(resource);
+    ASSERT(marker);
+    writeNameValuePair(ts, "markerUnits", marker->markerUnits());
+    ts << " [ref at " << marker->referencePoint() << "]";
+    ts << " [angle=";
+    if (marker->angle() == -1)
+      ts << "auto"
+         << "]";
+    else
+      ts << marker->angle() << "]";
   }
 
   // FIXME: Handle other RenderSVGResource* classes here, after converting them

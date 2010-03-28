@@ -27,7 +27,11 @@
 
 namespace WebCore {
 
-enum RenderSVGResourceType { MaskerResourceType, ClipperResourceType };
+enum RenderSVGResourceType {
+  MaskerResourceType,
+  MarkerResourceType,
+  ClipperResourceType
+};
 
 class RenderSVGResource : public RenderSVGHiddenContainer {
  public:
