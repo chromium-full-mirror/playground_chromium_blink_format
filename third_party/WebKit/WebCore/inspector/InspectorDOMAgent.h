@@ -143,6 +143,9 @@ class InspectorDOMAgent : public EventListener {
   void pushChildNodesToFrontend(long nodeId);
 
  private:
+  typedef std::pair<String, String> PropertyValueAndPriority;
+  typedef HashMap<String, PropertyValueAndPriority> DisabledStyleDeclaration;
+
   void startListening(Document* document);
   void stopListening(Document* document);
 
@@ -188,6 +191,7 @@ class InspectorDOMAgent : public EventListener {
   ScriptObject buildObjectForStyle(CSSStyleDeclaration*, bool bind);
   void populateObjectWithStyleProperties(CSSStyleDeclaration*,
                                          ScriptObject& result);
+  ScriptArray buildArrayForDisabledStyleProperties(DisabledStyleDeclaration&);
   ScriptObject buildObjectForRule(CSSStyleRule*);
   ScriptObject buildObjectForStyleSheet(CSSStyleSheet*);
   Vector<String> longhandProperties(CSSStyleDeclaration*,
@@ -217,7 +221,8 @@ class InspectorDOMAgent : public EventListener {
   typedef HashMap<long, RefPtr<CSSStyleRule>> IdToRuleMap;
   RuleToIdMap m_ruleToId;
   IdToRuleMap m_idToRule;
-  IdToStyleMap m_idToDisabledStyle;
+  typedef HashMap<long, DisabledStyleDeclaration> IdToDisabledStyleMap;
+  IdToDisabledStyleMap m_idToDisabledStyle;
   RefPtr<CSSStyleSheet> m_inspectorStyleSheet;
 
   long m_lastStyleId;
