@@ -1001,7 +1001,7 @@ static inline double solveCubicBezierFunction(qreal p1x,
 // easing curve
 static inline qreal applyTimingFunction(const TimingFunction& timingFunction,
                                         qreal progress,
-                                        int duration) {
+                                        double duration) {
   if (timingFunction.type() == LinearTimingFunction)
     return progress;
   if (timingFunction.type() == CubicBezierTimingFunction) {
@@ -1099,6 +1099,8 @@ class AnimationQt : public AnimationQtBase {
       KeyframeValueQt<T> keyframeValue;
       if (animationValue->timingFunction())
         keyframeValue.timingFunction = *animationValue->timingFunction();
+      else
+        keyframeValue.timingFunction = anim->timingFunction();
       webkitAnimationToQtAnimationValue(animationValue, keyframeValue.value);
       m_keyframeValues[animationValue->keyTime()] = keyframeValue;
     }
@@ -1150,7 +1152,7 @@ class AnimationQt : public AnimationQtBase {
                    ? progress
                    : applyTimingFunction(timingFunc, (progress - it.key()) /
                                                          (it2.key() - it.key()),
-                                         duration() / 1000);
+                                         duration());
     applyFrame(fromValue, toValue, progress);
   }
 
