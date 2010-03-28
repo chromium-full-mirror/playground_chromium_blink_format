@@ -224,7 +224,6 @@ void SVGStyledElement::invalidateResources() {
   if (!object)
     return;
 
-  const SVGRenderStyle* svgStyle = object->style()->svgStyle();
   Document* document = this->document();
 
   if (document->parsing())
@@ -232,7 +231,7 @@ void SVGStyledElement::invalidateResources() {
 
 #if ENABLE(FILTERS)
   SVGResourceFilter* filter =
-      getFilterById(document, svgStyle->filter(), object);
+      getFilterById(document, object->style()->svgStyle()->filter(), object);
   if (filter)
     filter->invalidate();
 #endif
