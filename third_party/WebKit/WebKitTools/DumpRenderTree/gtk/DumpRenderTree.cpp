@@ -881,16 +881,6 @@ static WebKitWebView* webInspectorInspectWebView(WebKitWebInspector*,
   return WEBKIT_WEB_VIEW(webView);
 }
 
-static void webViewLoadStatusNotified(WebKitWebView* view, gpointer user_data) {
-  WebKitLoadStatus loadStatus = webkit_web_view_get_load_status(view);
-
-  if (loadStatus == WEBKIT_LOAD_PROVISIONAL) {
-    char* frameName = getFrameNameSuitableForTestResult(view, mainFrame);
-    printf("%s - didStartProvisionalLoadForFrame\n", frameName);
-    g_free(frameName);
-  }
-}
-
 static WebKitWebView* createWebView() {
   WebKitWebView* view = WEBKIT_WEB_VIEW(webkit_web_view_new());
 
@@ -915,9 +905,6 @@ static WebKitWebView* createWebView() {
       "signal::geolocation-policy-decision-requested",
       geolocationPolicyDecisionRequested, 0, "signal::onload-event",
       webViewOnloadEvent, 0, NULL);
-
-  g_signal_connect(view, "notify::load-status",
-                   G_CALLBACK(webViewLoadStatusNotified), NULL);
 
   WebKitWebInspector* inspector = webkit_web_view_get_inspector(view);
   g_object_connect(G_OBJECT(inspector), "signal::inspect-web-view",
