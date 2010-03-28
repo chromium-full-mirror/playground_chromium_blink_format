@@ -71,7 +71,7 @@ PassRefPtr<CSSPrimitiveValue> CSSPrimitiveValue::createColor(
   // These are the empty and deleted values of the hash table.
   if (rgbValue == Color::transparent) {
     static CSSPrimitiveValue* colorTransparent =
-        new CSSPrimitiveValue(CSSValueTransparent);
+        new CSSPrimitiveValue(Color::transparent);
     return colorTransparent;
   }
   if (rgbValue == Color::white) {
