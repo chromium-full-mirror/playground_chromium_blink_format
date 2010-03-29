@@ -277,6 +277,8 @@ void Loader::Host::nonCacheRequestInFlight() {
 void Loader::Host::nonCacheRequestComplete() {
   --m_nonCachedRequestsInFlight;
   ASSERT(m_nonCachedRequestsInFlight >= 0);
+
+  cache()->loader()->scheduleServePendingRequests();
 }
 
 bool Loader::Host::hasRequests() const {
@@ -319,7 +321,6 @@ void Loader::Host::servePendingRequests(RequestQueue& requestsPending,
         m_requestsLoading.size() + m_nonCachedRequestsInFlight >=
             m_maxRequestsInFlight) {
       serveLowerPriority = false;
-      cache()->loader()->scheduleServePendingRequests();
       return;
     }
     requestsPending.removeFirst();
