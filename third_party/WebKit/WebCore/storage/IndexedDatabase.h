@@ -29,12 +29,17 @@
 #define IndexedDatabase_h
 
 #include "ExceptionCode.h"
+#include "IDBCallbacks.h"
 #include "PlatformString.h"
 #include <wtf/Threading.h>
 
 #if ENABLE(INDEXED_DATABASE)
 
 namespace WebCore {
+
+class IDBDatabase;
+
+typedef IDBCallbacks<IDBDatabase> IDBDatabaseCallbacks;
 
 // This class is shared by IndexedDatabaseRequest (async) and
 // IndexedDatabaseSync (sync).
@@ -51,7 +56,8 @@ class IndexedDatabase : public ThreadSafeShared<IndexedDatabase> {
   virtual void open(const String& name,
                     const String& description,
                     bool modifyDatabase,
-                    ExceptionCode&) = 0;
+                    ExceptionCode&,
+                    PassRefPtr<IDBDatabaseCallbacks>) = 0;
 };
 
 }  // namespace WebCore

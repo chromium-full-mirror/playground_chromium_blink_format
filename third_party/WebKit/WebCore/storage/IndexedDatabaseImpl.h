@@ -42,7 +42,8 @@ class IndexedDatabaseImpl : public IndexedDatabase {
   virtual void open(const String& name,
                     const String& description,
                     bool modifyDatabase,
-                    ExceptionCode&);
+                    ExceptionCode&,
+                    PassRefPtr<IDBCallbacks<IDBDatabase>>);
 
  private:
   IndexedDatabaseImpl();

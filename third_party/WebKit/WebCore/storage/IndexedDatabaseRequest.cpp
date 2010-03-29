@@ -42,7 +42,9 @@ IndexedDatabaseRequest::~IndexedDatabaseRequest() {}
 void IndexedDatabaseRequest::open(const String& name,
                                   const String& description,
                                   bool modifyDatabase,
-                                  ExceptionCode& exception) {}
+                                  ExceptionCode& exception) {
+  // FIXME: This should initiate a request.
+}
 
 }  // namespace WebCore
 

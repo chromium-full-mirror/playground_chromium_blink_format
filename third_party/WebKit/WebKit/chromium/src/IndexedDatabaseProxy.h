@@ -25,6 +25,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 #ifndef IndexedDatabaseProxy_h
 #define IndexedDatabaseProxy_h
 
@@ -46,12 +47,13 @@ class IndexedDatabaseProxy : public IndexedDatabase {
   virtual void open(const String& name,
                     const String& description,
                     bool modifyDatabase,
-                    ExceptionCode&);
+                    ExceptionCode&,
+                    PassRefPtr<IDBDatabaseCallbacks>);
 
  private:
   IndexedDatabaseProxy();
 
-  // We don't own this pointer.
+  // We don't own this pointer (unlike all the other proxy classes which do).
   WebKit::WebIndexedDatabase* m_webIndexedDatabase;
 };
 
