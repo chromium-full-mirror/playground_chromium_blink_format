@@ -2863,10 +2863,10 @@ bool AccessibilityRenderObject::canSetTextRangeAttributes() const {
 
 void AccessibilityRenderObject::contentChanged() {
   // If this element supports ARIA live regions, then notify the AT of changes.
-  for (RenderObject* renderParent = m_renderer->parent(); renderParent;
+  AXObjectCache* cache = m_renderer->document()->axObjectCache();
+  for (RenderObject* renderParent = m_renderer; renderParent;
        renderParent = renderParent->parent()) {
-    AccessibilityObject* parent =
-        m_renderer->document()->axObjectCache()->get(renderParent);
+    AccessibilityObject* parent = cache->get(renderParent);
     if (!parent)
       continue;
 
