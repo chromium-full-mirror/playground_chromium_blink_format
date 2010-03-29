@@ -184,7 +184,6 @@ class Geolocation : public RefCounted<Geolocation>
   RefPtr<GeoNotifier> m_startRequestPermissionNotifier;
 #endif
   RefPtr<Geoposition> m_lastPosition;
-  RefPtr<Geoposition> m_currentPosition;
 
   enum { Unknown, InProgress, Yes, No } m_allowGeolocation;
   bool m_shouldClearCache;

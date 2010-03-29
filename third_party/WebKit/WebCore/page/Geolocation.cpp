@@ -524,9 +524,7 @@ void Geolocation::requestPermission() {
 }
 
 void Geolocation::positionChanged(PassRefPtr<Geoposition> newPosition) {
-  m_currentPosition = newPosition;
-
-  m_positionCache->setCachedPosition(m_currentPosition.get());
+  m_positionCache->setCachedPosition(newPosition.get());
 
   // Stop all currently running timers.
   stopTimers();
@@ -544,7 +542,7 @@ void Geolocation::positionChanged(PassRefPtr<Geoposition> newPosition) {
 }
 
 void Geolocation::makeSuccessCallbacks() {
-  ASSERT(m_currentPosition);
+  ASSERT(lastPosition());
   ASSERT(isAllowed());
 
   Vector<RefPtr<GeoNotifier>> oneShotsCopy;
@@ -558,8 +556,8 @@ void Geolocation::makeSuccessCallbacks() {
   // further callbacks to these notifiers.
   m_oneShots.clear();
 
-  sendPosition(oneShotsCopy, m_currentPosition.get());
-  sendPosition(watchersCopy, m_currentPosition.get());
+  sendPosition(oneShotsCopy, lastPosition());
+  sendPosition(watchersCopy, lastPosition());
 
   if (!hasListeners())
     stopUpdating();
