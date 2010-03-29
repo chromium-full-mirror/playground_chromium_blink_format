@@ -31,7 +31,11 @@
 #ifndef KeyboardCodesWin_h
 #define KeyboardCodesWin_h
 
+#if OS(WINDOWS)
 #include <windows.h>
+#endif
+
+#include "WindowsKeyboardCodes.h"
 
 namespace WebCore {
 
