@@ -50,6 +50,7 @@
 #include "HTMLAppletElement.h"
 #include "HTMLFormElement.h"
 #include "HTMLPlugInElement.h"
+#include "HTTPParsers.h"
 #include "NotImplemented.h"
 #include "QNetworkReplyHandler.h"
 #include "ResourceHandleInternal.h"
@@ -752,7 +753,7 @@ void FrameLoaderClientQt::download(WebCore::ResourceHandle* handle,
   if (reply) {
     QWebPage* page = m_webFrame->page();
     if (page->forwardUnsupportedContent())
-      emit m_webFrame->page()->unsupportedContent(reply);
+      emit page->unsupportedContent(reply);
     else
       reply->abort();
   }
@@ -924,7 +925,10 @@ void FrameLoaderClientQt::dispatchDecidePolicyForMIMEType(
     const WebCore::String& MIMEType,
     const WebCore::ResourceRequest&) {
   // we need to call directly here
-  if (canShowMIMEType(MIMEType))
+  if (WebCore::shouldTreatAsAttachment(
+          m_frame->loader()->activeDocumentLoader()->response()))
+    callPolicyFunction(function, PolicyDownload);
+  else if (canShowMIMEType(MIMEType))
     callPolicyFunction(function, PolicyUse);
   else
     callPolicyFunction(function, PolicyDownload);
