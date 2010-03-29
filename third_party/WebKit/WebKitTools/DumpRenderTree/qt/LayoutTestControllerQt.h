@@ -139,6 +139,7 @@ class LayoutTestController : public QObject {
   void setMainFrameIsFirstResponder(bool isFirst);
   void setXSSAuditorEnabled(bool enable);
   void setCaretBrowsingEnabled(bool enable);
+  void setViewModeMediaFeature(const QString& mode);
 
   bool pauseAnimationAtTimeOnElementWithId(const QString& animationName,
                                            double time,

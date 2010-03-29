@@ -167,6 +167,13 @@ class ChromeClientQt : public ChromeClient {
   virtual void requestGeolocationPermissionForFrame(Frame*, Geolocation*);
   virtual void cancelGeolocationPermissionRequestForFrame(Frame*) {}
 
+#if ENABLE(WIDGETS_10_SUPPORT)
+  virtual bool isDocked();
+  virtual bool isFloating();
+  virtual bool isApplication();
+  virtual bool isFullscreen();
+#endif
+
   QtAbstractWebPopup* createSelectPopup();
 
   QWebPage* m_webPage;
