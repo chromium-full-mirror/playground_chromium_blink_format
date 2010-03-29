@@ -50,6 +50,9 @@ gboolean mediaPlayerPrivateMessageCallback(GstBus* bus,
 void mediaPlayerPrivateVolumeChangedCallback(GObject* element,
                                              GParamSpec* pspec,
                                              gpointer data);
+void mediaPlayerPrivateMuteChangedCallback(GObject* element,
+                                           GParamSpec* pspec,
+                                           gpointer data);
 void mediaPlayerPrivateSourceChangedCallback(GObject* element,
                                              GParamSpec* pspec,
                                              gpointer data);
@@ -68,7 +71,6 @@ class MediaPlayerPrivateGStreamer : public MediaPlayerPrivateInterface {
 
  public:
   static void registerMediaEngine(MediaEngineRegistrar);
-  ~MediaPlayerPrivateGStreamer();
 
   IntSize naturalSize() const;
   bool hasVideo() const;
@@ -135,6 +137,8 @@ class MediaPlayerPrivateGStreamer : public MediaPlayerPrivateInterface {
 
  private:
   MediaPlayerPrivateGStreamer(MediaPlayer*);
+  ~MediaPlayerPrivateGStreamer();
+
   static MediaPlayerPrivateInterface* create(MediaPlayer* player);
 
   static void getSupportedTypes(HashSet<String>&);
