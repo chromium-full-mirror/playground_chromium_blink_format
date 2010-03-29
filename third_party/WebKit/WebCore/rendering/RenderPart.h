@@ -44,6 +44,8 @@ class RenderPart : public RenderWidget {
   virtual void setWidget(PassRefPtr<Widget>);
   virtual void viewCleared();
 
+  void layoutWithFlattening(bool fixedWidth, bool fixedHeight);
+
  protected:
   bool m_hasFallbackContent;
 

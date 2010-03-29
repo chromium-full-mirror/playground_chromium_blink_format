@@ -72,8 +72,6 @@ class RenderFrameSet : public RenderBox {
   bool canResizeRow(const IntPoint&) const;
   bool canResizeColumn(const IntPoint&) const;
 
-  bool flattenFrameSet() const;
-
  private:
   static const int noSplit = -1;
 
@@ -109,6 +107,8 @@ class RenderFrameSet : public RenderBox {
   virtual bool isChildAllowed(RenderObject*, RenderStyle*) const;
 
   inline HTMLFrameSetElement* frameSet() const;
+
+  bool flattenFrameSet() const;
 
   void setIsResizing(bool);
 

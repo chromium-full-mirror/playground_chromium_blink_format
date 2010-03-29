@@ -102,7 +102,7 @@ Settings::Settings(Page* page)
       m_authorAndUserStylesEnabled(true),
       m_needsSiteSpecificQuirks(false),
       m_fontRenderingMode(0),
-      m_frameSetFlatteningEnabled(false),
+      m_frameFlatteningEnabled(false),
       m_webArchiveDebugModeEnabled(false),
       m_localFileContentSniffingEnabled(false),
       m_inApplicationChromeMode(false),
@@ -414,8 +414,8 @@ void Settings::setNeedsSiteSpecificQuirks(bool needsQuirks) {
   m_needsSiteSpecificQuirks = needsQuirks;
 }
 
-void Settings::setFrameSetFlatteningEnabled(bool frameSetFlatteningEnabled) {
-  m_frameSetFlatteningEnabled = frameSetFlatteningEnabled;
+void Settings::setFrameFlatteningEnabled(bool frameFlatteningEnabled) {
+  m_frameFlatteningEnabled = frameFlatteningEnabled;
 }
 
 void Settings::setWebArchiveDebugModeEnabled(bool enabled) {

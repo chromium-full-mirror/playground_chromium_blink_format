@@ -139,7 +139,7 @@ void LayoutTestController::setXSSAuditorEnabled(bool enabled) {
   // FIXME: implement
 }
 
-void LayoutTestController::setFrameSetFlatteningEnabled(bool enabled) {
+void LayoutTestController::setFrameFlatteningEnabled(bool enabled) {
   // FIXME: implement
 }
 

@@ -167,8 +167,7 @@
 
 #define WebKitPluginAllowedRunTimePreferenceKey "WebKitPluginAllowedRunTime"
 
-#define WebKitFrameSetFlatteningEnabledPreferenceKey \
-  "WebKitFrameSetFlatteningEnabled"
+#define WebKitFrameFlatteningEnabledPreferenceKey "WebKitFrameFlatteningEnabled"
 
 #define WebKitAcceleratedCompositingEnabledPreferenceKey \
   "WebKitAcceleratedCompositingEnabled"

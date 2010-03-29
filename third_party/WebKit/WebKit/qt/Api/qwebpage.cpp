@@ -143,10 +143,9 @@ void QWEBKIT_EXPORT qt_drt_run(bool b) {
   QWebPagePrivate::drtRun = b;
 }
 
-void QWEBKIT_EXPORT qt_drt_setFrameSetFlatteningEnabled(QWebPage* page,
-                                                        bool enabled) {
-  QWebPagePrivate::core(page)->settings()->setFrameSetFlatteningEnabled(
-      enabled);
+void QWEBKIT_EXPORT qt_drt_setFrameFlatteningEnabled(QWebPage* page,
+                                                     bool enabled) {
+  QWebPagePrivate::core(page)->settings()->setFrameFlatteningEnabled(enabled);
 }
 
 void QWEBKIT_EXPORT qt_webpage_setGroupName(QWebPage* page,

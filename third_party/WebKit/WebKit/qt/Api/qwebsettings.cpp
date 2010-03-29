@@ -220,7 +220,7 @@ void QWebSettingsPrivate::apply() {
     value = attributes.value(
         QWebSettings::FrameFlatteningEnabled,
         global->attributes.value(QWebSettings::FrameFlatteningEnabled));
-    settings->setFrameSetFlatteningEnabled(value);
+    settings->setFrameFlatteningEnabled(value);
 
     QUrl location = !userStyleSheetLocation.isEmpty()
                         ? userStyleSheetLocation

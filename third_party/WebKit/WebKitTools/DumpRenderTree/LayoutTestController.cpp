@@ -1356,7 +1356,7 @@ static JSValueRef setSpatialNavigationEnabledCallback(
   return JSValueMakeUndefined(context);
 }
 
-static JSValueRef setFrameSetFlatteningEnabledCallback(
+static JSValueRef setFrameFlatteningEnabledCallback(
     JSContextRef context,
     JSObjectRef function,
     JSObjectRef thisObject,
@@ -1369,7 +1369,7 @@ static JSValueRef setFrameSetFlatteningEnabledCallback(
 
   LayoutTestController* controller =
       static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
-  controller->setFrameSetFlatteningEnabled(
+  controller->setFrameFlatteningEnabled(
       JSValueToBoolean(context, arguments[0]));
 
   return JSValueMakeUndefined(context);
@@ -2259,7 +2259,7 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setSpatialNavigationEnabled", setSpatialNavigationEnabledCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
-      {"setFrameSetFlatteningEnabled", setFrameSetFlatteningEnabledCallback,
+      {"setFrameFlatteningEnabled", setFrameFlatteningEnabledCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setSelectTrailingWhitespaceEnabled",
        setSelectTrailingWhitespaceEnabledCallback,
