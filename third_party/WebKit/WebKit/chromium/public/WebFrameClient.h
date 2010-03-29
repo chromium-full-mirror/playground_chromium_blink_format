@@ -291,10 +291,10 @@ class WebFrameClient {
   }
 
   // Controls whether access to Web Databases is allowed for this frame.
-  virtual bool allowDatabase(const WebSecurityOrigin&,
-                             const WebString&,
-                             const WebString&,
-                             unsigned long) {
+  virtual bool allowDatabase(WebFrame*,
+                             const WebString& name,
+                             const WebString& displayName,
+                             unsigned long estimatedSize) {
     return true;
   }
 
