@@ -3280,6 +3280,9 @@ QWebPluginFactory* QWebPage::pluginFactory() const {
    AppleWebKit/%WebKitVersion% (KHTML, like Gecko) %AppVersion
    Safari/%WebKitVersion%"
 
+    On mobile platforms such as Symbian S60 and Maemo, "Mobile Safari" is used
+   instead of "Safari".
+
     In this string the following values are replaced at run-time:
     \list
     \o %Platform% and %Subplatform% are expanded to the windowing system and the
@@ -3517,8 +3520,11 @@ QString QWebPage::userAgentForUrl(const QUrl& url) const {
     ua.append(QLatin1String(qVersion()));
   }
 
+#if defined(Q_WS_S60) || defined(Q_WS_MAEMO_5)
+  ua.append(QString(QLatin1String(" Mobile Safari/%1")).arg(qWebKitVersion()));
+#else
   ua.append(QString(QLatin1String(" Safari/%1")).arg(qWebKitVersion()));
-
+#endif
   return ua;
 }
 
