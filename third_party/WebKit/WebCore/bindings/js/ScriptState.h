@@ -33,6 +33,8 @@
 #define ScriptState_h
 
 #include "JSDOMBinding.h"
+#include <runtime/Protect.h>
+#include <wtf/Noncopyable.h>
 
 namespace WebCore {
 class DOMWrapperWorld;
@@ -45,6 +47,21 @@ class Page;
 // separate abstraction.
 // For now, the separation is purely by convention.
 typedef JSC::ExecState ScriptState;
+
+class ScriptStateProtectedPtr : public Noncopyable {
+ public:
+  ScriptStateProtectedPtr() {}
+  ScriptStateProtectedPtr(ScriptState* scriptState)
+      : m_globalObject(scriptState->lexicalGlobalObject()) {}
+  ScriptState* get() {
+    if (m_globalObject)
+      return m_globalObject->globalExec();
+    return 0;
+  }
+
+ private:
+  JSC::ProtectedPtr<JSC::JSGlobalObject> m_globalObject;
+};
 
 ScriptState* mainWorldScriptState(Frame*);
 

@@ -106,7 +106,7 @@ void ConsoleMessage::addToFrontend(InspectorFrontend* frontend,
   Vector<RefPtr<SerializedScriptValue>> arguments;
   if (!m_arguments.isEmpty()) {
     InjectedScript injectedScript =
-        injectedScriptHost->injectedScriptFor(m_scriptState);
+        injectedScriptHost->injectedScriptFor(m_scriptState.get());
     for (unsigned i = 0; i < m_arguments.size(); ++i) {
       RefPtr<SerializedScriptValue> serializedValue =
           injectedScript.wrapForConsole(m_arguments[i]);

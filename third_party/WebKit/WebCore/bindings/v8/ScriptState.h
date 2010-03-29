@@ -76,6 +76,29 @@ class EmptyScriptState : public ScriptState {
   ~EmptyScriptState() {}
 };
 
+class ScriptStateProtectedPtr : public Noncopyable {
+ public:
+  ScriptStateProtectedPtr() : m_scriptState(0) {}
+  ScriptStateProtectedPtr(ScriptState* scriptState)
+      : m_scriptState(scriptState) {
+    v8::HandleScope handleScope;
+    // Keep the context from being GC'ed. ScriptState is guaranteed to be live
+    // while the context is live.
+    m_context = v8::Persistent<v8::Context>::New(scriptState->context());
+  }
+  ~ScriptStateProtectedPtr() {
+    if (!m_context.IsEmpty()) {
+      m_context.Dispose();
+      m_context.Clear();
+    }
+  }
+  ScriptState* get() { return m_scriptState; }
+
+ private:
+  ScriptState* m_scriptState;
+  v8::Persistent<v8::Context> m_context;
+};
+
 ScriptState* mainWorldScriptState(Frame*);
 
 ScriptState* scriptStateFromNode(DOMWrapperWorld*, Node*);
