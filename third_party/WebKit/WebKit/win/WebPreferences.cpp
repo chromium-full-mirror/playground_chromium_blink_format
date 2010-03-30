@@ -349,7 +349,7 @@ void WebPreferences::initializeDefaultSettings() {
 
   CFDictionaryAddValue(defaults,
                        CFSTR(WebKitAcceleratedCompositingEnabledPreferenceKey),
-                       kCFBooleanTrue);
+                       kCFBooleanFalse);
 
   CFDictionaryAddValue(defaults, CFSTR(WebKitShowDebugBordersPreferenceKey),
                        kCFBooleanFalse);
