@@ -75,7 +75,10 @@ class NetscapePluginInstanceProxy
 
     return m_pluginID;
   }
-  uint32_t renderContextID() const { return m_renderContextID; }
+  uint32_t renderContextID() const {
+    ASSERT(fastMallocSize(this));
+    return m_renderContextID;
+  }
   void setRenderContextID(uint32_t renderContextID) {
     m_renderContextID = renderContextID;
   }
@@ -85,8 +88,14 @@ class NetscapePluginInstanceProxy
     m_useSoftwareRenderer = useSoftwareRenderer;
   }
 
-  WebHostedNetscapePluginView* pluginView() const { return m_pluginView; }
-  NetscapePluginHostProxy* hostProxy() const { return m_pluginHostProxy; }
+  WebHostedNetscapePluginView* pluginView() const {
+    ASSERT(fastMallocSize(this));
+    return m_pluginView;
+  }
+  NetscapePluginHostProxy* hostProxy() const {
+    ASSERT(fastMallocSize(this));
+    return m_pluginHostProxy;
+  }
 
   bool cancelStreamLoad(uint32_t streamID, NPReason);
   void disconnectStream(HostedNetscapePluginStream*);
