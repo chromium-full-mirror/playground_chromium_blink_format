@@ -4493,7 +4493,7 @@ void Document::initSecurityContext() {
                securityOrigin()->isLocal()) {
       // Some clients want file:// URLs to have even tighter restrictions by
       // default, and not be able to access other local files.
-      securityOrigin()->makeUnique();
+      securityOrigin()->enforceFilePathSeparation();
     }
   }
 
