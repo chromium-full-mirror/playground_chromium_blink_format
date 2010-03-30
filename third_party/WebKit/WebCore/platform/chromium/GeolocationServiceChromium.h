@@ -64,18 +64,7 @@ class GeolocationServiceChromium : public GeolocationService {
     return m_geolocationServiceBridge.get();
   }
   void setIsAllowed(bool allowed);
-  void setLastPosition(double latitude,
-                       double longitude,
-                       bool providesAltitude,
-                       double altitude,
-                       double accuracy,
-                       bool providesAltitudeAccuracy,
-                       double altitudeAccuracy,
-                       bool providesHeading,
-                       double heading,
-                       bool providesSpeed,
-                       double speed,
-                       long long timestamp);
+  void setLastPosition(PassRefPtr<Geoposition>);
   void setLastError(int errorCode, const String& message);
   Frame* frame();
 

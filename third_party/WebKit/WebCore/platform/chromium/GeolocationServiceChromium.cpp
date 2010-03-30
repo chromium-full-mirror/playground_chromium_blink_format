@@ -48,23 +48,9 @@ void GeolocationServiceChromium::setIsAllowed(bool allowed) {
   m_geolocation->setIsAllowed(allowed);
 }
 
-void GeolocationServiceChromium::setLastPosition(double latitude,
-                                                 double longitude,
-                                                 bool providesAltitude,
-                                                 double altitude,
-                                                 double accuracy,
-                                                 bool providesAltitudeAccuracy,
-                                                 double altitudeAccuracy,
-                                                 bool providesHeading,
-                                                 double heading,
-                                                 bool providesSpeed,
-                                                 double speed,
-                                                 long long timestamp) {
-  m_lastPosition = Geoposition::create(
-      Coordinates::create(latitude, longitude, providesAltitude, altitude,
-                          accuracy, providesAltitudeAccuracy, altitudeAccuracy,
-                          providesHeading, heading, providesSpeed, speed),
-      timestamp);
+void GeolocationServiceChromium::setLastPosition(
+    PassRefPtr<Geoposition> geoposition) {
+  m_lastPosition = geoposition;
   positionChanged();
 }
 

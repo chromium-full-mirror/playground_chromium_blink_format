@@ -45,7 +45,7 @@
 #include "FrameView.h"
 #include "Geolocation.h"
 #include "GeolocationService.h"
-#include "GeolocationServiceBridgeChromium.h"
+#include "WebGeolocationService.h"
 #include "GeolocationServiceChromium.h"
 #include "GraphicsLayer.h"
 #include "HitTestResult.h"
@@ -652,7 +652,7 @@ void ChromeClientImpl::requestGeolocationPermissionForFrame(
   GeolocationServiceChromium* geolocationService =
       reinterpret_cast<GeolocationServiceChromium*>(
           geolocation->getGeolocationService());
-  m_webView->client()->getGeolocationService()->requestPermissionForFrame(
+  m_webView->client()->geolocationService()->requestPermissionForFrame(
       geolocationService->geolocationServiceBridge()->getBridgeId(),
       frame->document()->url());
 }

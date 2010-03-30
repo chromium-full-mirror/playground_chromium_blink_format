@@ -29,8 +29,7 @@
  */
 
 #include "config.h"
-
-#include "GeolocationServiceBridgeChromium.h"
+#include "WebGeolocationServiceBridgeImpl.h"
 
 #include "Chrome.h"
 #include "ChromeClientImpl.h"
@@ -43,6 +42,8 @@
 #include "PositionOptions.h"
 #include "WebFrame.h"
 #include "WebFrameImpl.h"
+#include "WebGeolocationService.h"
+#include "WebGeolocationServiceBridge.h"
 #include "WebViewClient.h"
 #include "WebViewImpl.h"
 
@@ -61,11 +62,11 @@ using WebCore::String;
 
 namespace WebKit {
 
-class GeolocationServiceBridgeImpl : public GeolocationServiceBridge,
-                                     public WebGeolocationServiceBridge {
+class WebGeolocationServiceBridgeImpl : public GeolocationServiceBridge,
+                                        public WebGeolocationServiceBridge {
  public:
-  explicit GeolocationServiceBridgeImpl(GeolocationServiceChromium*);
-  virtual ~GeolocationServiceBridgeImpl();
+  explicit WebGeolocationServiceBridgeImpl(GeolocationServiceChromium*);
+  virtual ~WebGeolocationServiceBridgeImpl();
 
   // GeolocationServiceBridge
   virtual bool startUpdating(PositionOptions*);
@@ -100,69 +101,68 @@ class GeolocationServiceBridgeImpl : public GeolocationServiceBridge,
 
 GeolocationServiceBridge* createGeolocationServiceBridgeImpl(
     GeolocationServiceChromium* geolocationServiceChromium) {
-  return new GeolocationServiceBridgeImpl(geolocationServiceChromium);
+  return new WebGeolocationServiceBridgeImpl(geolocationServiceChromium);
 }
 
-GeolocationServiceBridgeImpl::GeolocationServiceBridgeImpl(
+WebGeolocationServiceBridgeImpl::WebGeolocationServiceBridgeImpl(
     GeolocationServiceChromium* geolocationServiceChromium)
     : m_GeolocationServiceChromium(geolocationServiceChromium) {
   // We need to attach ourselves here: Geolocation calls
   // requestPermissionForFrame()
   // directly, and we need to be attached so that the embedder can call
   // our setIsAllowed().
-  m_bridgeId = getWebViewClient()->getGeolocationService()->attachBridge(this);
+  m_bridgeId = getWebViewClient()->geolocationService()->attachBridge(this);
   ASSERT(m_bridgeId);
 }
 
-GeolocationServiceBridgeImpl::~GeolocationServiceBridgeImpl() {
+WebGeolocationServiceBridgeImpl::~WebGeolocationServiceBridgeImpl() {
   WebKit::WebViewClient* webViewClient = getWebViewClient();
   // Geolocation has an OwnPtr to us, and it's destroyed after the frame has
   // been potentially disconnected. In this case, it calls stopUpdating()
-  // has been called and we have already dettached ourselves.
-  if (!webViewClient) {
+  // has been called and we have already detached ourselves.
+  if (!webViewClient)
     ASSERT(!m_bridgeId);
-  } else if (m_bridgeId)
-    webViewClient->getGeolocationService()->dettachBridge(m_bridgeId);
+  else if (m_bridgeId)
+    webViewClient->geolocationService()->detachBridge(m_bridgeId);
 }
 
-bool GeolocationServiceBridgeImpl::startUpdating(
+bool WebGeolocationServiceBridgeImpl::startUpdating(
     PositionOptions* positionOptions) {
   if (!m_bridgeId)
-    m_bridgeId =
-        getWebViewClient()->getGeolocationService()->attachBridge(this);
-  getWebViewClient()->getGeolocationService()->startUpdating(
+    m_bridgeId = getWebViewClient()->geolocationService()->attachBridge(this);
+  getWebViewClient()->geolocationService()->startUpdating(
       m_bridgeId, m_GeolocationServiceChromium->frame()->document()->url(),
       positionOptions->enableHighAccuracy());
   return true;
 }
 
-void GeolocationServiceBridgeImpl::stopUpdating() {
+void WebGeolocationServiceBridgeImpl::stopUpdating() {
   if (m_bridgeId) {
-    WebGeolocationServiceInterface* geolocationService =
-        getWebViewClient()->getGeolocationService();
+    WebGeolocationService* geolocationService =
+        getWebViewClient()->geolocationService();
     geolocationService->stopUpdating(m_bridgeId);
-    geolocationService->dettachBridge(m_bridgeId);
+    geolocationService->detachBridge(m_bridgeId);
     m_bridgeId = 0;
   }
 }
 
-void GeolocationServiceBridgeImpl::suspend() {
-  getWebViewClient()->getGeolocationService()->suspend(m_bridgeId);
+void WebGeolocationServiceBridgeImpl::suspend() {
+  getWebViewClient()->geolocationService()->suspend(m_bridgeId);
 }
 
-void GeolocationServiceBridgeImpl::resume() {
-  getWebViewClient()->getGeolocationService()->resume(m_bridgeId);
+void WebGeolocationServiceBridgeImpl::resume() {
+  getWebViewClient()->geolocationService()->resume(m_bridgeId);
 }
 
-int GeolocationServiceBridgeImpl::getBridgeId() const {
+int WebGeolocationServiceBridgeImpl::getBridgeId() const {
   return m_bridgeId;
 }
 
-void GeolocationServiceBridgeImpl::setIsAllowed(bool allowed) {
+void WebGeolocationServiceBridgeImpl::setIsAllowed(bool allowed) {
   m_GeolocationServiceChromium->setIsAllowed(allowed);
 }
 
-void GeolocationServiceBridgeImpl::setLastPosition(
+void WebGeolocationServiceBridgeImpl::setLastPosition(
     double latitude,
     double longitude,
     bool providesAltitude,
@@ -175,18 +175,20 @@ void GeolocationServiceBridgeImpl::setLastPosition(
     bool providesSpeed,
     double speed,
     long long timestamp) {
-  m_GeolocationServiceChromium->setLastPosition(
-      latitude, longitude, providesAltitude, altitude, accuracy,
-      providesAltitudeAccuracy, altitudeAccuracy, providesHeading, heading,
-      providesSpeed, speed, timestamp);
+  RefPtr<Geoposition> geoposition = Geoposition::create(
+      Coordinates::create(latitude, longitude, providesAltitude, altitude,
+                          accuracy, providesAltitudeAccuracy, altitudeAccuracy,
+                          providesHeading, heading, providesSpeed, speed),
+      timestamp);
+  m_GeolocationServiceChromium->setLastPosition(geoposition);
 }
 
-void GeolocationServiceBridgeImpl::setLastError(int errorCode,
-                                                const WebString& message) {
+void WebGeolocationServiceBridgeImpl::setLastError(int errorCode,
+                                                   const WebString& message) {
   m_GeolocationServiceChromium->setLastError(errorCode, message);
 }
 
-WebViewClient* GeolocationServiceBridgeImpl::getWebViewClient() {
+WebViewClient* WebGeolocationServiceBridgeImpl::getWebViewClient() {
   Frame* frame = m_GeolocationServiceChromium->frame();
   if (!frame || !frame->page())
     return 0;
