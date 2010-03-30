@@ -28,6 +28,7 @@
 #include "SVGColor.h"
 #include "SVGParserUtilities.h"
 #include "SVGPathSegList.h"
+#include "SVGPointList.h"
 #include <math.h>
 
 using namespace std;
@@ -79,6 +80,8 @@ SVGAnimateElement::PropertyType SVGAnimateElement::determinePropertyType(
     return ColorProperty;
   if (attribute == "d")
     return PathProperty;
+  if (attribute == "points")
+    return PointsProperty;
   if (attribute == "color" || attribute == "fill" || attribute == "stroke")
     return ColorProperty;
   return NumberProperty;
@@ -152,6 +155,26 @@ void SVGAnimateElement::calculateAnimatedValue(float percentage,
                 : m_fromPath;
     }
     return;
+  } else if (m_propertyType == PointsProperty) {
+    if (percentage == 0)
+      results->m_animatedPoints = m_fromPoints;
+    else if (percentage == 1.f)
+      results->m_animatedPoints = m_toPoints;
+    else {
+      if (m_fromPoints && m_toPoints)
+        results->m_animatedPoints = SVGPointList::createAnimated(
+            m_fromPoints.get(), m_toPoints.get(), percentage);
+      else
+        results->m_animatedPoints.clear();
+      // Fall back to discrete animation if the points are not compatible
+      if (!results->m_animatedPoints)
+        results->m_animatedPoints =
+            ((animationMode == FromToAnimation && percentage > 0.5f) ||
+             animationMode == ToAnimation || percentage == 1.0f)
+                ? m_toPoints
+                : m_fromPoints;
+    }
+    return;
   }
   ASSERT(animationMode == FromToAnimation || animationMode == ToAnimation ||
          animationMode == ValuesAnimation);
@@ -190,6 +213,15 @@ bool SVGAnimateElement::calculateFromAndToValues(const String& fromString,
     }
     m_fromPath.clear();
     m_toPath.clear();
+  } else if (m_propertyType == PointsProperty) {
+    m_fromPoints = SVGPointList::create(SVGNames::pointsAttr);
+    if (pointsListFromSVGData(m_fromPoints.get(), fromString)) {
+      m_toPoints = SVGPointList::create(SVGNames::pointsAttr);
+      if (pointsListFromSVGData(m_toPoints.get(), toString))
+        return true;
+    }
+    m_fromPoints.clear();
+    m_toPoints.clear();
   }
   m_fromString = fromString;
   m_toString = toString;
@@ -242,6 +274,9 @@ void SVGAnimateElement::resetToBaseValue(const String& baseString) {
   } else if (m_propertyType == PathProperty) {
     m_animatedPath.clear();
     return;
+  } else if (m_propertyType == PointsProperty) {
+    m_animatedPoints.clear();
+    return;
   }
   m_propertyType = StringProperty;
 }
@@ -270,6 +305,11 @@ void SVGAnimateElement::applyResultsToTarget() {
         valueToApply.append(segment->toString() + " ");
       }
     }
+  } else if (m_propertyType == PointsProperty) {
+    if (!m_animatedPoints || !m_animatedPoints->numberOfItems())
+      valueToApply = m_animatedString;
+    else
+      valueToApply = m_animatedPoints->valueAsString();
   } else
     valueToApply = m_animatedString;
 

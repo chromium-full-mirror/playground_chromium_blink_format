@@ -50,6 +50,8 @@ class SVGPathSegList : public SVGList<RefPtr<SVGPathSeg>> {
   SVGPathSegList(const QualifiedName&);
 };
 
+float adjustAnimatedValue(float from, float to, float progress);
+
 }  // namespace WebCore
 
 #endif  // ENABLE(SVG)

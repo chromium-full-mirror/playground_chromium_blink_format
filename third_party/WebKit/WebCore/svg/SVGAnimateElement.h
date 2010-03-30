@@ -29,6 +29,7 @@
 
 namespace WebCore {
 class SVGPathSegList;
+class SVGPointList;
 
 class SVGAnimateElement : public SVGAnimationElement {
  public:
@@ -53,7 +54,8 @@ class SVGAnimateElement : public SVGAnimationElement {
     NumberProperty,
     ColorProperty,
     StringProperty,
-    PathProperty
+    PathProperty,
+    PointsProperty
   };
   PropertyType determinePropertyType(const String& attribute) const;
   PropertyType m_propertyType;
@@ -71,6 +73,9 @@ class SVGAnimateElement : public SVGAnimationElement {
   RefPtr<SVGPathSegList> m_fromPath;
   RefPtr<SVGPathSegList> m_toPath;
   RefPtr<SVGPathSegList> m_animatedPath;
+  RefPtr<SVGPointList> m_fromPoints;
+  RefPtr<SVGPointList> m_toPoints;
+  RefPtr<SVGPointList> m_animatedPoints;
 };
 
 }  // namespace WebCore

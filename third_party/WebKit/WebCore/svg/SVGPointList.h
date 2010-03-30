@@ -39,6 +39,10 @@ class SVGPointList : public SVGPODList<FloatPoint> {
 
   String valueAsString() const;
 
+  static PassRefPtr<SVGPointList> createAnimated(const SVGPointList* fromList,
+                                                 const SVGPointList* toList,
+                                                 float progress);
+
  private:
   SVGPointList(const QualifiedName&);
 };
