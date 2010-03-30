@@ -1280,7 +1280,8 @@ PassRefPtr<CanvasPattern> CanvasRenderingContext2D::createPattern(
     return CanvasPattern::create(Image::nullImage(), repeatX, repeatY, true);
 
   bool originClean = !canvas()->document()->securityOrigin()->taintsCanvas(
-      KURL(KURL(), cachedImage->url()));
+                         KURL(KURL(), cachedImage->url())) &&
+                     cachedImage->image()->hasSingleSecurityOrigin();
   return CanvasPattern::create(cachedImage->image(), repeatX, repeatY,
                                originClean);
 }
