@@ -397,6 +397,22 @@ class MacroAssemblerMIPS : public AbstractMacroAssembler<MIPSAssembler> {
   // operand objects to loads and store will be implicitly constructed if a
   // register is passed.
 
+  /* Need to use zero-extened load byte for load8.  */
+  void load8(ImplicitAddress address, RegisterID dest) {
+    if (address.offset >= -32768 && address.offset <= 32767 && !m_fixedWidth)
+      m_assembler.lbu(dest, address.base, address.offset);
+    else {
+      /*
+          lui     addrTemp, (offset + 0x8000) >> 16
+          addu    addrTemp, addrTemp, base
+          lbu     dest, (offset & 0xffff)(addrTemp)
+        */
+      m_assembler.lui(addrTempRegister, (address.offset + 0x8000) >> 16);
+      m_assembler.addu(addrTempRegister, addrTempRegister, address.base);
+      m_assembler.lbu(dest, addrTempRegister, address.offset);
+    }
+  }
+
   void load32(ImplicitAddress address, RegisterID dest) {
     if (address.offset >= -32768 && address.offset <= 32767 && !m_fixedWidth)
       m_assembler.lw(dest, address.base, address.offset);
@@ -769,6 +785,14 @@ class MacroAssemblerMIPS : public AbstractMacroAssembler<MIPSAssembler> {
   // jz and jnz test whether the first operand is equal to zero, and take
   // an optional second operand of a mask under which to perform the test.
 
+  Jump branch8(Condition cond, Address left, Imm32 right) {
+    // Make sure the immediate value is unsigned 8 bits.
+    ASSERT(!(right.m_value & 0xFFFFFF00));
+    load8(left, dataTempRegister);
+    move(right, immTempRegister);
+    return branch32(cond, dataTempRegister, immTempRegister);
+  }
+
   Jump branch32(Condition cond, RegisterID left, RegisterID right) {
     if (cond == Equal || cond == Zero)
       return branchEqual(left, right);
@@ -934,6 +958,11 @@ class MacroAssemblerMIPS : public AbstractMacroAssembler<MIPSAssembler> {
 
   Jump branchTest32(Condition cond, BaseIndex address, Imm32 mask = Imm32(-1)) {
     load32(address, dataTempRegister);
+    return branchTest32(cond, dataTempRegister, mask);
+  }
+
+  Jump branchTest8(Condition cond, Address address, Imm32 mask = Imm32(-1)) {
+    load8(address, dataTempRegister);
     return branchTest32(cond, dataTempRegister, mask);
   }
 
@@ -1215,6 +1244,24 @@ class MacroAssemblerMIPS : public AbstractMacroAssembler<MIPSAssembler> {
   void set32(Condition cond, RegisterID left, Imm32 right, RegisterID dest) {
     move(right, immTempRegister);
     set32(cond, left, immTempRegister, dest);
+  }
+
+  void setTest8(Condition cond, Address address, Imm32 mask, RegisterID dest) {
+    ASSERT((cond == Zero) || (cond == NonZero));
+    load8(address, dataTempRegister);
+    if (mask.m_value == -1 && !m_fixedWidth) {
+      if (cond == Zero)
+        m_assembler.sltiu(dest, dataTempRegister, 1);
+      else
+        m_assembler.sltu(dest, MIPSRegisters::zero, dataTempRegister);
+    } else {
+      move(mask, immTempRegister);
+      m_assembler.andInsn(cmpTempRegister, dataTempRegister, immTempRegister);
+      if (cond == Zero)
+        m_assembler.sltiu(dest, cmpTempRegister, 1);
+      else
+        m_assembler.sltu(dest, MIPSRegisters::zero, cmpTempRegister);
+    }
   }
 
   void setTest32(Condition cond, Address address, Imm32 mask, RegisterID dest) {
