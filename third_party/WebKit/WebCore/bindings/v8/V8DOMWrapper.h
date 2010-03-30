@@ -120,8 +120,10 @@ class V8DOMWrapper {
       WrapperTypeInfo*,
       v8::Handle<v8::Value> objectPrototype);
   static v8::Local<v8::Function> getConstructor(WrapperTypeInfo*, DOMWindow*);
+#if ENABLE(WORKERS)
   static v8::Local<v8::Function> getConstructor(WrapperTypeInfo*,
                                                 WorkerContext*);
+#endif
 
   // Set JS wrapper of a DOM object, the caller in charge of increase ref.
   static void setJSWrapperForDOMObject(void*, v8::Persistent<v8::Object>);
