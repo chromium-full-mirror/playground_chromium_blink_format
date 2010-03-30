@@ -86,12 +86,12 @@ void NotificationPresenterImpl::notificationObjectDestroyed(
 }
 
 NotificationPresenter::Permission NotificationPresenterImpl::checkPermission(
-    SecurityOrigin* origin) {
-  int result = m_presenter->checkPermission(WebSecurityOrigin(origin));
+    const KURL& sourceURL) {
+  int result = m_presenter->checkPermission(sourceURL);
 
   // FIXME: Remove this once clients are updated to use the above signature.
   if (result == NotificationPresenter::PermissionNotAllowed)
-    result = m_presenter->checkPermission(KURL(KURL(), origin->toString()), 0);
+    result = m_presenter->checkPermission(sourceURL, 0);
 
   return static_cast<NotificationPresenter::Permission>(result);
 }

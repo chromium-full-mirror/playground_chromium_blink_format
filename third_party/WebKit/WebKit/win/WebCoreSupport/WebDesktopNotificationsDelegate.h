@@ -55,7 +55,7 @@ class WebDesktopNotificationsDelegate : public WebCore::NotificationPresenter {
       const KURL& url,
       Document* document);
   virtual WebCore::NotificationPresenter::Permission checkPermission(
-      const WebCore::SecurityOrigin* origin);
+      const KURL& url);
 
  private:
   bool hasNotificationDelegate();
