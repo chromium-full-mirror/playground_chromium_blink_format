@@ -36,26 +36,13 @@
 
 namespace WebCore {
 
-IndexedDatabaseImpl* IndexedDatabaseImpl::indexedDatabaseImpl = 0;
-
-PassRefPtr<IndexedDatabaseImpl> IndexedDatabaseImpl::get() {
-  if (!indexedDatabaseImpl)
-    indexedDatabaseImpl = new IndexedDatabaseImpl();
-  ASSERT(indexedDatabaseImpl);
-  return indexedDatabaseImpl;
+PassRefPtr<IndexedDatabaseImpl> IndexedDatabaseImpl::create() {
+  return new IndexedDatabaseImpl();
 }
 
-IndexedDatabaseImpl::IndexedDatabaseImpl() {
-  // FIXME: Make this thread safe before implementing a sync interface.
-  ASSERT(!indexedDatabaseImpl);
-  indexedDatabaseImpl = this;
-}
+IndexedDatabaseImpl::IndexedDatabaseImpl() {}
 
-IndexedDatabaseImpl::~IndexedDatabaseImpl() {
-  // FIXME: Make this thread safe before implementing a sync interface.
-  ASSERT(indexedDatabaseImpl == this);
-  indexedDatabaseImpl = 0;
-}
+IndexedDatabaseImpl::~IndexedDatabaseImpl() {}
 
 void IndexedDatabaseImpl::open(const String& name,
                                const String& description,

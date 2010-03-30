@@ -449,6 +449,9 @@ class DOMWindow : public RefCounted<DOMWindow>, public EventTarget {
 #if ENABLE(NOTIFICATIONS)
   mutable RefPtr<NotificationCenter> m_notifications;
 #endif
+#if ENABLE(INDEXED_DATABASE)
+  mutable RefPtr<IndexedDatabaseRequest> m_indexedDatabaseRequest;
+#endif
 
   EventTargetData m_eventTargetData;
 };

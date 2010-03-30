@@ -36,6 +36,7 @@
 namespace WebCore {
 
 class KURL;
+class IndexedDatabase;
 class Page;
 class StorageNamespace;
 
@@ -68,6 +69,9 @@ class PageGroup : public Noncopyable {
 #if ENABLE(DOM_STORAGE)
   StorageNamespace* localStorage();
   bool hasLocalStorage() { return m_localStorage; }
+#endif
+#if ENABLE(DOM_STORAGE)
+  IndexedDatabase* indexedDatabase();
 #endif
 
   void addUserScriptToWorld(DOMWrapperWorld*,
@@ -108,6 +112,9 @@ class PageGroup : public Noncopyable {
   unsigned m_identifier;
 #if ENABLE(DOM_STORAGE)
   RefPtr<StorageNamespace> m_localStorage;
+#endif
+#if ENABLE(INDEXED_DATABASE)
+  RefPtr<IndexedDatabase> m_indexedDatabase;
 #endif
 
   OwnPtr<UserScriptMap> m_userScripts;
