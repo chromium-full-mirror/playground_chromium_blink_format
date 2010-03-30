@@ -126,9 +126,18 @@ void FontPlatformData::setupPaint(SkPaint* paint) const {
   paint->setAntiAlias(m_style.useAntiAlias == FontRenderStyle::NoPreference
                           ? isSkiaAntiAlias
                           : m_style.useAntiAlias);
-  paint->setHinting(m_style.useHinting == FontRenderStyle::NoPreference
-                        ? skiaHinting
-                        : (SkPaint::Hinting)m_style.hintStyle);
+  switch (m_style.useHinting) {
+    case FontRenderStyle::NoPreference:
+      paint->setHinting(skiaHinting);
+      break;
+    case 0:
+      paint->setHinting(SkPaint::kNo_Hinting);
+      break;
+    default:
+      paint->setHinting(static_cast<SkPaint::Hinting>(m_style.hintStyle));
+      break;
+  }
+
   paint->setTextSize(SkFloatToScalar(ts));
   paint->setTypeface(m_typeface);
   paint->setFakeBoldText(m_fakeBold);
