@@ -578,7 +578,8 @@ void ChromeClient::requestGeolocationPermissionForFrame(
 }
 
 void ChromeClient::cancelGeolocationPermissionRequestForFrame(
-    WebCore::Frame* frame) {
+    WebCore::Frame* frame,
+    WebCore::Geolocation*) {
   WebKitWebFrame* webFrame = kit(frame);
   WebKitWebView* webView = getViewFromFrame(webFrame);
   g_signal_emit_by_name(webView, "geolocation-policy-decision-cancelled",

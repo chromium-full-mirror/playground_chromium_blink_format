@@ -138,7 +138,9 @@ class ChromeClient : public WebCore::ChromeClient {
                                   const WebCore::ScrollView*) const {}
   virtual void requestGeolocationPermissionForFrame(WebCore::Frame*,
                                                     WebCore::Geolocation*);
-  virtual void cancelGeolocationPermissionRequestForFrame(WebCore::Frame*);
+  virtual void cancelGeolocationPermissionRequestForFrame(
+      WebCore::Frame*,
+      WebCore::Geolocation*);
 
  private:
   WebKitWebView* m_webView;

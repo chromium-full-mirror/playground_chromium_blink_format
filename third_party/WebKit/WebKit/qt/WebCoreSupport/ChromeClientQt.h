@@ -165,7 +165,8 @@ class ChromeClientQt : public ChromeClient {
   virtual void scrollRectIntoView(const IntRect&, const ScrollView*) const {}
 
   virtual void requestGeolocationPermissionForFrame(Frame*, Geolocation*);
-  virtual void cancelGeolocationPermissionRequestForFrame(Frame*) {}
+  virtual void cancelGeolocationPermissionRequestForFrame(Frame*,
+                                                          Geolocation*) {}
 
 #if ENABLE(WIDGETS_10_SUPPORT)
   virtual bool isDocked();

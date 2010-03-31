@@ -152,7 +152,7 @@ class ChromeClientHaiku : public ChromeClient {
   // user for permission
   // to use Geolococation.
   void requestGeolocationPermissionForFrame(Frame*, Geolocation*);
-  void cancelGeolocationPermissionRequestForFrame(Frame*) {}
+  void cancelGeolocationPermissionRequestForFrame(Frame*, Geolocation*) {}
 
   void runOpenPanel(Frame*, PassRefPtr<FileChooser>);
   void chooseIconForFiles(const Vector<String>&, PassRefPtr<FileChooser>);
