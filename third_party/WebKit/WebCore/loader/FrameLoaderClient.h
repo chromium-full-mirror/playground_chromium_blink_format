@@ -319,6 +319,11 @@ class FrameLoaderClient {
   virtual void didCreateScriptContextForFrame() = 0;
   virtual void didDestroyScriptContextForFrame() = 0;
   virtual void didCreateIsolatedScriptContext() = 0;
+
+  virtual void logCrossFramePropertyAccess(Frame* target,
+                                           bool crossOrigin,
+                                           const String& name,
+                                           unsigned long long eventId) {}
 #endif
 
   virtual void registerForIconNotification(bool listen = true) = 0;
