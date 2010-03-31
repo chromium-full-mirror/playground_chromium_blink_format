@@ -63,6 +63,7 @@ class InjectedScript {
  private:
   friend InjectedScript InjectedScriptHost::injectedScriptFor(ScriptState*);
   explicit InjectedScript(ScriptObject);
+  bool canAccessInspectedWindow();
   ScriptObject m_injectedScriptObject;
 };
 
