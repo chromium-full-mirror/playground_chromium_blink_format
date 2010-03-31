@@ -336,3 +336,7 @@ void LayoutTestController::apiTestNewWindowDataLoadBaseURL(
 void LayoutTestController::apiTestGoToCurrentBackForwardItem() {}
 
 void LayoutTestController::setSpatialNavigationEnabled(bool) {}
+
+bool LayoutTestController::callShouldCloseOnWebView() {
+  return false;
+}
