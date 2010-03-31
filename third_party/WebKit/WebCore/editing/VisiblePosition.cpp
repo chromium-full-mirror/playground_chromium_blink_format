@@ -27,7 +27,6 @@
 #include "config.h"
 #include "VisiblePosition.h"
 
-#include "CString.h"
 #include "Document.h"
 #include "FloatQuad.h"
 #include "HTMLElement.h"
@@ -39,6 +38,7 @@
 #include "htmlediting.h"
 #include "visible_units.h"
 #include <stdio.h>
+#include <wtf/text/CString.h>
 
 namespace WebCore {
 

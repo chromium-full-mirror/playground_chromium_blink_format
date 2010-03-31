@@ -24,7 +24,6 @@
 #include "config.h"
 #include "ScrollbarEfl.h"
 
-#include "CString.h"
 #include "ChromeClient.h"
 #include "Frame.h"
 #include "FrameView.h"
@@ -38,6 +37,7 @@
 #include <Ecore.h>
 #include <Edje.h>
 #include <string>
+#include <wtf/text/CString.h>
 
 using namespace std;
 using namespace WebCore;

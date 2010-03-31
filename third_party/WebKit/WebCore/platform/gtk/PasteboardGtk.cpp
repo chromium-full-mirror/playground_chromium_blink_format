@@ -21,7 +21,6 @@
 #include "config.h"
 #include "Pasteboard.h"
 
-#include "CString.h"
 #include "DocumentFragment.h"
 #include "Frame.h"
 #include "NotImplemented.h"
@@ -31,6 +30,7 @@
 #include "RenderImage.h"
 #include "KURL.h"
 #include "markup.h"
+#include <wtf/text/CString.h>
 
 #include <gtk/gtk.h>
 

@@ -20,8 +20,8 @@
 #include "config.h"
 #include "ContextMenu.h"
 #include "ContextMenuItem.h"
-#include "CString.h"
 #include "NotImplemented.h"
+#include <wtf/text/CString.h>
 
 #include <gtk/gtk.h>
 

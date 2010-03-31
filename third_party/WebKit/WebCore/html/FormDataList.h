@@ -21,9 +21,9 @@
 #ifndef FormDataList_h
 #define FormDataList_h
 
-#include "CString.h"
 #include "File.h"
 #include "TextEncoding.h"
+#include <wtf/text/CString.h>
 
 namespace WebCore {
 
@@ -35,7 +35,7 @@ class FormDataList {
     appendString(key);
     appendString(value);
   }
-  void appendData(const String& key, const CString& value) {
+  void appendData(const String& key, const WTF::CString& value) {
     appendString(key);
     appendString(value);
   }
@@ -51,14 +51,14 @@ class FormDataList {
   class Item {
    public:
     Item() {}
-    Item(const CString& data) : m_data(data) {}
+    Item(const WTF::CString& data) : m_data(data) {}
     Item(PassRefPtr<File> file) : m_file(file) {}
 
-    const CString& data() const { return m_data; }
+    const WTF::CString& data() const { return m_data; }
     File* file() const { return m_file.get(); }
 
    private:
-    CString m_data;
+    WTF::CString m_data;
     RefPtr<File> m_file;
   };
 
@@ -66,7 +66,7 @@ class FormDataList {
   const TextEncoding& encoding() const { return m_encoding; }
 
  private:
-  void appendString(const CString&);
+  void appendString(const WTF::CString&);
   void appendString(const String&);
 
   TextEncoding m_encoding;

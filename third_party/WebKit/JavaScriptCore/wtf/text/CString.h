@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2006, 2008, 2009 Apple Inc. All rights reserved.
+ * Copyright (C) 2003, 2006, 2008, 2009, 2010 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -26,11 +26,11 @@
 #ifndef CString_h
 #define CString_h
 
-#include <wtf/PassRefPtr.h>
-#include <wtf/RefCounted.h>
-#include <wtf/Vector.h>
+#include "PassRefPtr.h"
+#include "RefCounted.h"
+#include "Vector.h"
 
-namespace WebCore {
+namespace WTF {
 
 class CStringBuffer : public RefCounted<CStringBuffer> {
  public:
@@ -78,6 +78,8 @@ inline bool operator!=(const CString& a, const CString& b) {
   return !(a == b);
 }
 
-}  // namespace WebCore
+}  // namespace WTF
+
+using WTF::CString;
 
 #endif  // CString_h

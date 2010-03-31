@@ -25,7 +25,6 @@
 #include "config.h"
 #include "EditorClientGtk.h"
 
-#include "CString.h"
 #include "DataObjectGtk.h"
 #include "EditCommand.h"
 #include "Editor.h"
@@ -42,6 +41,7 @@
 #include "WindowsKeyboardCodes.h"
 #include "markup.h"
 #include "webkitprivate.h"
+#include <wtf/text/CString.h>
 
 // Arbitrary depth limit for the undo stack, to keep it from using
 // unbounded memory.  This is the maximum number of distinct undoable

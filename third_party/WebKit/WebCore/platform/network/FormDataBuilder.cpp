@@ -26,7 +26,6 @@
 #include "config.h"
 #include "FormDataBuilder.h"
 
-#include "CString.h"
 #include "Document.h"
 #include "Frame.h"
 #include "FrameLoader.h"
@@ -34,6 +33,7 @@
 
 #include <limits>
 #include <wtf/Assertions.h>
+#include <wtf/text/CString.h>
 #include <wtf/RandomNumber.h>
 
 namespace WebCore {

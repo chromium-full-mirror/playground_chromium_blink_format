@@ -27,7 +27,6 @@
 #include "StringImpl.h"
 
 #include "AtomicString.h"
-#include "CString.h"
 #include "CharacterNames.h"
 #include "FloatConversion.h"
 #include "StringBuffer.h"

@@ -24,7 +24,6 @@
 #include "config.h"
 #include "JSDOMWindowBase.h"
 
-#include "CString.h"
 #include "Chrome.h"
 #include "Console.h"
 #include "DOMWindow.h"
@@ -38,6 +37,7 @@
 #include "SecurityOrigin.h"
 #include "Settings.h"
 #include "WebCoreJSClientData.h"
+#include <wtf/text/CString.h>
 
 using namespace JSC;
 

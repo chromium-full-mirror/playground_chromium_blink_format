@@ -28,7 +28,7 @@
 
 #include "Logging.h"
 #include "npruntime_internal.h"
-#include "CString.h"
+#include <wtf/text/CString.h>
 
 #define LOG_NPERROR(err)     \
   if (err != NPERR_NO_ERROR) \

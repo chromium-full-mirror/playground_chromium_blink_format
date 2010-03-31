@@ -26,7 +26,6 @@
 #include "Range.h"
 #include "RangeException.h"
 
-#include "CString.h"
 #include "ClientRect.h"
 #include "ClientRectList.h"
 #include "DocumentFragment.h"
@@ -41,6 +40,7 @@
 #include "markup.h"
 #include "visible_units.h"
 #include <stdio.h>
+#include <wtf/text/CString.h>
 #include <wtf/RefCountedLeakCounter.h>
 
 namespace WebCore {

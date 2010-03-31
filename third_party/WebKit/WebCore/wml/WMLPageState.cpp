@@ -26,12 +26,12 @@
 #include "WMLPageState.h"
 
 #include "BackForwardList.h"
-#include "CString.h"
 #include "Document.h"
 #include "Frame.h"
 #include "HistoryItem.h"
 #include "KURL.h"
 #include "Page.h"
+#include <wtf/text/CString.h>
 
 namespace WebCore {
 

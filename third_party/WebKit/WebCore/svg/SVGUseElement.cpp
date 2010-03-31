@@ -26,7 +26,6 @@
 #include "SVGUseElement.h"
 
 #include "CSSStyleSelector.h"
-#include "CString.h"
 #include "Document.h"
 #include "Event.h"
 #include "EventListener.h"

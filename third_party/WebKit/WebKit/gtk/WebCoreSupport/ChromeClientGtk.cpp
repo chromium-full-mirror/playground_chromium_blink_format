@@ -32,7 +32,6 @@
 #include "GtkVersioning.h"
 #include "IntRect.h"
 #include "PlatformString.h"
-#include "CString.h"
 #include "HitTestResult.h"
 #include "Icon.h"
 #include "KURL.h"
@@ -45,6 +44,7 @@
 #if ENABLE(DATABASE)
 #include "DatabaseTracker.h"
 #endif
+#include <wtf/text/CString.h>
 
 #include <glib.h>
 #include <glib/gi18n-lib.h>

@@ -22,7 +22,6 @@
 #include "config.h"
 #include "ScriptController.h"
 
-#include "CString.h"
 #include "Event.h"
 #include "EventNames.h"
 #include "Frame.h"

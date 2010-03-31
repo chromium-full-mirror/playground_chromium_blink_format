@@ -26,10 +26,10 @@
 #include "config.h"
 #include "PopupMenu.h"
 
-#include "CString.h"
 #include "FrameView.h"
 #include "HostWindow.h"
 #include "PlatformString.h"
+#include <wtf/text/CString.h>
 #include <gtk/gtk.h>
 
 namespace WebCore {

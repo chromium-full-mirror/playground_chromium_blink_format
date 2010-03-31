@@ -34,7 +34,7 @@
 #include "WebCommon.h"
 
 #if WEBKIT_IMPLEMENTATION
-namespace WebCore {
+namespace WTF {
 class CString;
 }
 #else
@@ -82,9 +82,9 @@ class WebCString {
   WEBKIT_API static WebCString fromUTF16(const WebUChar* data);
 
 #if WEBKIT_IMPLEMENTATION
-  WebCString(const WebCore::CString&);
-  WebCString& operator=(const WebCore::CString&);
-  operator WebCore::CString() const;
+  WebCString(const WTF::CString&);
+  WebCString& operator=(const WTF::CString&);
+  operator WTF::CString() const;
 #else
   WebCString(const std::string& s) : m_private(0) {
     assign(s.data(), s.length());

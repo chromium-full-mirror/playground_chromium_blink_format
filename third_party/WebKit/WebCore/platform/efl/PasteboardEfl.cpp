@@ -24,7 +24,6 @@
 #include "config.h"
 #include "Pasteboard.h"
 
-#include "CString.h"
 #include "DocumentFragment.h"
 #include "Frame.h"
 #include "Image.h"
@@ -33,6 +32,7 @@
 #include "PlatformString.h"
 #include "RenderImage.h"
 #include "markup.h"
+#include <wtf/text/CString.h>
 
 namespace WebCore {
 

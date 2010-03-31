@@ -20,7 +20,6 @@
 #include "config.h"
 #include "WebKitWebSourceGStreamer.h"
 
-#include "CString.h"
 #include "Document.h"
 #include "GOwnPtr.h"
 #include "GRefPtr.h"
@@ -30,6 +29,7 @@
 #include "ResourceHandleInternal.h"
 #include "ResourceRequest.h"
 #include "ResourceResponse.h"
+#include <wtf/text/CString.h>
 #include <gst/app/gstappsrc.h>
 #include <gst/pbutils/missing-plugins.h>
 

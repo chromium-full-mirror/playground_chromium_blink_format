@@ -24,7 +24,6 @@
 #if ENABLE(WML)
 #include "WMLGoElement.h"
 
-#include "CString.h"
 #include "FormData.h"
 #include "Frame.h"
 #include "FrameLoader.h"
@@ -39,6 +38,7 @@
 #include "WMLPostfieldElement.h"
 #include "WMLTimerElement.h"
 #include "WMLVariables.h"
+#include <wtf/text/CString.h>
 
 namespace WebCore {
 

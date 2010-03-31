@@ -25,7 +25,6 @@
 #include "config.h"
 #include "ScheduledAction.h"
 
-#include "CString.h"
 #include "DOMWindow.h"
 #include "Document.h"
 #include "Frame.h"

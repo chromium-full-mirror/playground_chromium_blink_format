@@ -26,8 +26,8 @@
 #ifndef JavaStringV8_h
 #define JavaStringV8_h
 
-#include "CString.h"
 #include "JNIUtility.h"
+#include <wtf/text/CString.h>
 
 namespace JSC {
 
@@ -40,7 +40,7 @@ class JavaStringImpl {
   void init(JNIEnv* e, jstring s) {
     int size = e->GetStringLength(s);
     const char* cs = getCharactersFromJStringInEnv(e, s);
-    m_utf8String = WebCore::CString(cs, size);
+    m_utf8String = WTF::CString(cs, size);
     releaseCharactersForJStringInEnv(e, s, cs);
   }
 
@@ -49,7 +49,7 @@ class JavaStringImpl {
   int length() const { return m_utf8String.length(); }
 
  private:
-  WebCore::CString m_utf8String;
+  WTF::CString m_utf8String;
 };
 
 }  // namespace Bindings

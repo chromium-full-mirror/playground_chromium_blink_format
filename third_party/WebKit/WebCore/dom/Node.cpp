@@ -36,7 +36,6 @@
 #include "CSSStyleRule.h"
 #include "CSSStyleSelector.h"
 #include "CSSStyleSheet.h"
-#include "CString.h"
 #include "ChildNodeList.h"
 #include "ClassNodeList.h"
 #include "ContextMenuController.h"
@@ -82,6 +81,7 @@
 #include "WheelEvent.h"
 #include "XMLNames.h"
 #include "htmlediting.h"
+#include <wtf/text/CString.h>
 #include <wtf/HashSet.h>
 #include <wtf/PassOwnPtr.h>
 #include <wtf/RefCountedLeakCounter.h>

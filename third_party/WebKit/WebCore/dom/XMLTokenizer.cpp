@@ -28,7 +28,6 @@
 #include "XMLTokenizer.h"
 
 #include "CDATASection.h"
-#include "CString.h"
 #include "CachedScript.h"
 #include "Comment.h"
 #include "DocLoader.h"
@@ -52,6 +51,7 @@
 #include "ScriptSourceCode.h"
 #include "ScriptValue.h"
 #include "TextResourceDecoder.h"
+#include <wtf/text/CString.h>
 #include <wtf/StringExtras.h>
 #include <wtf/Threading.h>
 #include <wtf/Vector.h>

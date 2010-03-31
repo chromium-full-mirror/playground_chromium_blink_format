@@ -28,7 +28,6 @@
 #include "XMLTokenizer.h"
 
 #include "CDATASection.h"
-#include "CString.h"
 #include "CachedScript.h"
 #include "Comment.h"
 #include "DocLoader.h"
@@ -56,6 +55,7 @@
 #include "XMLTokenizerScope.h"
 #include <libxml/parser.h>
 #include <libxml/parserInternals.h>
+#include <wtf/text/CString.h>
 #include <wtf/StringExtras.h>
 #include <wtf/Threading.h>
 #include <wtf/UnusedParam.h>
