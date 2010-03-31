@@ -53,8 +53,9 @@ bool RenderPartObject::flattenFrame() const {
     return false;
 
   HTMLIFrameElement* element = static_cast<HTMLIFrameElement*>(node());
-  if (element->scrollingMode() == ScrollbarAlwaysOff ||
-      style()->width().isFixed() || style()->height().isFixed())
+
+  if (element->scrollingMode() == ScrollbarAlwaysOff &&
+      style()->width().isFixed() && style()->height().isFixed())
     return false;
 
   Document* document = element ? element->document() : 0;
