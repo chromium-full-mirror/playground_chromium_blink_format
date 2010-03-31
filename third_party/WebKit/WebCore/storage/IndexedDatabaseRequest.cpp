@@ -25,6 +25,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 #include "config.h"
 #include "IndexedDatabaseRequest.h"
 
@@ -44,8 +45,10 @@ IndexedDatabaseRequest::~IndexedDatabaseRequest() {}
 void IndexedDatabaseRequest::open(const String& name,
                                   const String& description,
                                   bool modifyDatabase,
-                                  ExceptionCode& exception) {
-  // FIXME: This should initiate a request.
+                                  ExceptionCode& exception,
+                                  PassRefPtr<IDBDatabaseCallbacks> callbacks) {
+  m_indexedDatabase->open(name, description, modifyDatabase, exception,
+                          callbacks);
 }
 
 }  // namespace WebCore
