@@ -60,9 +60,6 @@ void RenderPart::layoutWithFlattening(bool fixedWidth, bool fixedHeight) {
           : 0;
   HTMLFrameElement* element = static_cast<HTMLFrameElement*>(node());
 
-  // suppress scrollbars as we might have fixed width or height
-  childFrameView->setScrollbarsSuppressed(true, true);
-
   // Do not expand frames which has zero width or height
   if (!width() || !height() || !childRoot) {
     updateWidgetPosition();

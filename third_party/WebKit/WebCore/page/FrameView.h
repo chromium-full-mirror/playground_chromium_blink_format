@@ -79,6 +79,8 @@ class FrameView : public ScrollView {
 
   virtual PassRefPtr<Scrollbar> createScrollbar(ScrollbarOrientation);
 
+  virtual bool avoidScrollbarCreation();
+
   virtual void setContentsSize(const IntSize&);
 
   void layout(bool allowSubtree = true);

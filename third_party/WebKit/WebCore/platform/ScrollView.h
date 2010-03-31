@@ -117,6 +117,8 @@ class ScrollView : public Widget, public ScrollbarClient {
            verticalScrollbarMode() != ScrollbarAlwaysOff;
   }
 
+  virtual bool avoidScrollbarCreation() { return false; }
+
   // By default you only receive paint events for the area that is visible. In
   // the case of using a
   // tiled backing store, this method can be set, so that the view paints the
