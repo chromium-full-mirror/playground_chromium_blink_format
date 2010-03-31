@@ -2866,6 +2866,7 @@ DEFINE_STUB_FUNCTION(int, op_eq_strings) {
   return string1->value(stackFrame.callFrame) ==
          string2->value(stackFrame.callFrame);
 #else
+  UNUSED_PARAM(args);
   ASSERT_NOT_REACHED();
   return 0;
 #endif
