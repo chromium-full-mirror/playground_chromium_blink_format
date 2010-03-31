@@ -37,9 +37,10 @@ FileChooserClient::~FileChooserClient() {}
 
 inline FileChooser::FileChooser(FileChooserClient* client,
                                 const Vector<String>& initialFilenames)
-    : m_client(client) {
+    : m_client(client), m_isInitializing(true) {
   m_filenames = initialFilenames;
   loadIcon();
+  m_isInitializing = false;
 }
 
 PassRefPtr<FileChooser> FileChooser::create(
@@ -72,12 +73,12 @@ void FileChooser::chooseFiles(const Vector<String>& filenames) {
 
 void FileChooser::loadIcon() {
   if (m_filenames.size() && m_client)
-    m_client->chooseIconForFiles(m_filenames);
+    m_client->chooseIconForFiles(this, m_filenames);
 }
 
 void FileChooser::iconLoaded(PassRefPtr<Icon> icon) {
   m_icon = icon;
-  if (m_icon && m_client)
+  if (!m_isInitializing && m_icon && m_client)
     m_client->repaint();
 }
 }

@@ -63,7 +63,7 @@ class RenderFileUploadControl : public RenderBlock, private FileChooserClient {
   void repaint() { RenderBlock::repaint(); }
   bool allowsMultipleFiles();
   String acceptTypes();
-  void chooseIconForFiles(const Vector<String>&);
+  void chooseIconForFiles(FileChooser*, const Vector<String>&);
 
   Chrome* chrome() const;
   int maxFilenameWidth() const;
