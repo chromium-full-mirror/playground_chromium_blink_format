@@ -138,6 +138,9 @@ class WebDevToolsFrontendImpl : public WebKit::WebDevToolsFrontend,
   static v8::Handle<v8::Value> jsInspectedURLChanged(const v8::Arguments& args);
   static v8::Handle<v8::Value> jsShowContextMenu(const v8::Arguments& args);
   static v8::Handle<v8::Value> jsCanAttachWindow(const v8::Arguments& args);
+  static v8::Handle<v8::Value> jsSetAttachedWindowHeight(
+      const v8::Arguments& args);
+  static v8::Handle<v8::Value> jsMoveWindowBy(const v8::Arguments& args);
 
   WebKit::WebViewImpl* m_webViewImpl;
   WebKit::WebDevToolsFrontendClient* m_client;

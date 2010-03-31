@@ -156,6 +156,11 @@ WebDevToolsFrontendImpl::WebDevToolsFrontendImpl(
                                 WebDevToolsFrontendImpl::jsShowContextMenu);
   devToolsHost.addProtoFunction("canAttachWindow",
                                 WebDevToolsFrontendImpl::jsCanAttachWindow);
+  devToolsHost.addProtoFunction(
+      "setAttachedWindowHeight",
+      WebDevToolsFrontendImpl::jsSetAttachedWindowHeight);
+  devToolsHost.addProtoFunction("moveWindowBy",
+                                WebDevToolsFrontendImpl::jsMoveWindowBy);
   devToolsHost.build();
 }
 
@@ -400,6 +405,15 @@ v8::Handle<v8::Value> WebDevToolsFrontendImpl::jsShowContextMenu(
 v8::Handle<v8::Value> WebDevToolsFrontendImpl::jsCanAttachWindow(
     const v8::Arguments& args) {
   return v8Boolean(true);
+}
+v8::Handle<v8::Value> WebDevToolsFrontendImpl::jsSetAttachedWindowHeight(
+    const v8::Arguments& args) {
+  return v8::Undefined();
+}
+
+v8::Handle<v8::Value> WebDevToolsFrontendImpl::jsMoveWindowBy(
+    const v8::Arguments& args) {
+  return v8::Undefined();
 }
 
 }  // namespace WebKit
