@@ -49,7 +49,7 @@ PassRefPtr<HTMLProgressElement> HTMLProgressElement::create(
 }
 
 RenderObject* HTMLProgressElement::createRenderer(RenderArena* arena,
-                                                  RenderStyle* style) {
+                                                  RenderStyle*) {
   return new (arena) RenderProgress(this);
 }
 
