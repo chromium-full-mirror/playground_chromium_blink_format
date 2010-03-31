@@ -428,6 +428,11 @@ class GraphicsContext3D : public Noncopyable {
 #endif
   void makeContextCurrent();
 
+#if PLATFORM(MAC)
+  // With multisampling on, blit from multisampleFBO to regular FBO.
+  void prepareTexture();
+#endif
+
   // Helper to return the size in bytes of OpenGL data types
   // like GL_FLOAT, GL_INT, etc.
   int sizeInBytes(int type);
@@ -802,6 +807,14 @@ class GraphicsContext3D : public Noncopyable {
                     AlphaOp* neededAlphaOp,
                     unsigned int* format);
 
+#if PLATFORM(MAC)
+  // Take into account the user's requested context creation attributes,
+  // in particular stencil and antialias, and determine which could or
+  // could not be honored based on the capabilities of the OpenGL
+  // implementation.
+  void validateAttributes();
+#endif
+
   int m_currentWidth, m_currentHeight;
 
 #if PLATFORM(MAC)
@@ -811,7 +824,16 @@ class GraphicsContext3D : public Noncopyable {
   CGLContextObj m_contextObj;
   GLuint m_texture;
   GLuint m_fbo;
-  GLuint m_depthBuffer;
+  GLuint m_depthStencilBuffer;
+
+  // For tracking which FBO is bound
+  GLuint m_boundFBO;
+
+  // For multisampling
+  GLuint m_multisampleFBO;
+  GLuint m_multisampleDepthStencilBuffer;
+  GLuint m_multisampleColorBuffer;
+
   // Errors raised by synthesizeGLError().
   ListHashSet<unsigned long> m_syntheticErrors;
 #endif
