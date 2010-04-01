@@ -1006,14 +1006,7 @@ Position Position::trailingWhitespacePosition(
 void Position::getInlineBoxAndOffset(EAffinity affinity,
                                      InlineBox*& inlineBox,
                                      int& caretOffset) const {
-  TextDirection primaryDirection = LTR;
-  for (RenderObject* r = node()->renderer(); r; r = r->parent()) {
-    if (r->isBlockFlow()) {
-      primaryDirection = r->style()->direction();
-      break;
-    }
-  }
-  getInlineBoxAndOffset(affinity, primaryDirection, inlineBox, caretOffset);
+  getInlineBoxAndOffset(affinity, primaryDirection(), inlineBox, caretOffset);
 }
 
 static bool isNonTextLeafChild(RenderObject* object) {
@@ -1219,6 +1212,18 @@ void Position::getInlineBoxAndOffset(EAffinity affinity,
       caretOffset = inlineBox->caretRightmostOffset();
     }
   }
+}
+
+TextDirection Position::primaryDirection() const {
+  TextDirection primaryDirection = LTR;
+  for (const RenderObject* r = node()->renderer(); r; r = r->parent()) {
+    if (r->isBlockFlow()) {
+      primaryDirection = r->style()->direction();
+      break;
+    }
+  }
+
+  return primaryDirection;
 }
 
 void Position::debugPosition(const char* msg) const {

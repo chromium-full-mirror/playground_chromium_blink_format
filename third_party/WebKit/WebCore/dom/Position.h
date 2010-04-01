@@ -185,6 +185,8 @@ class Position {
                              InlineBox*&,
                              int& caretOffset) const;
 
+  TextDirection primaryDirection() const;
+
   static bool hasRenderedNonAnonymousDescendantsWithHeight(RenderObject*);
   static bool nodeIsUserSelectNone(Node*);
 
