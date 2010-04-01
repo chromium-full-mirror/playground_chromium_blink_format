@@ -1409,8 +1409,9 @@ bool Frame::findString(const String& target,
   // Compare ranges instead of selection objects to ignore the way that the
   // current selection was made.
   if (startInSelection &&
-      *VisibleSelection(resultRange.get()).toNormalizedRange() ==
-          *selection.toNormalizedRange()) {
+      areRangesEqual(
+          VisibleSelection(resultRange.get()).toNormalizedRange().get(),
+          selection.toNormalizedRange().get())) {
     searchRange = rangeOfContents(document());
     if (forward)
       setStart(searchRange.get(), selection.visibleEnd());

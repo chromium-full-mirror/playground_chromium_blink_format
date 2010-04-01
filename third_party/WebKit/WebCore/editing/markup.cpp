@@ -1059,9 +1059,10 @@ String createMarkup(const Range* range,
   Node* body = enclosingNodeWithTag(Position(commonAncestor, 0), bodyTag);
   // FIXME: Do this for all fully selected blocks, not just the body.
   Node* fullySelectedRoot =
-      body &&
-              *VisibleSelection::selectionFromContentsOfNode(body)
-                      .toNormalizedRange() == *updatedRange
+      body && areRangesEqual(VisibleSelection::selectionFromContentsOfNode(body)
+                                 .toNormalizedRange()
+                                 .get(),
+                             updatedRange.get())
           ? body
           : 0;
   RefPtr<CSSMutableStyleDeclaration> fullySelectedRootStyle =

@@ -176,10 +176,7 @@ class Range : public RefCounted<Range> {
 
 PassRefPtr<Range> rangeOfContents(Node*);
 
-bool operator==(const Range&, const Range&);
-inline bool operator!=(const Range& a, const Range& b) {
-  return !(a == b);
-}
+bool areRangesEqual(const Range*, const Range*);
 
 }  // namespace
 
