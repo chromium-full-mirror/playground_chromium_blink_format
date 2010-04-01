@@ -3935,7 +3935,8 @@ void showLayerTree(const WebCore::RenderLayer* layer) {
     WebCore::String output = externalRepresentation(
         frame, WebCore::RenderAsTextShowAllLayers |
                    WebCore::RenderAsTextShowLayerNesting |
-                   WebCore::RenderAsTextShowCompositedLayers);
+                   WebCore::RenderAsTextShowCompositedLayers |
+                   WebCore::RenderAsTextShowAddresses);
     fprintf(stderr, "%s\n", output.utf8().data());
   }
 }
