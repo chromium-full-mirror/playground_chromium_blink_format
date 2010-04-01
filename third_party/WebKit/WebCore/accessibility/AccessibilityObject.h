@@ -317,6 +317,9 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
 
   virtual bool hasIntValue() const { return false; }
 
+  // A programmatic way to set a name on an AccessibleObject.
+  virtual void setAccessibleName(String&) {}
+
   bool accessibilityShouldUseUniqueId() const { return true; }
   virtual bool accessibilityIsIgnored() const { return true; }
 
