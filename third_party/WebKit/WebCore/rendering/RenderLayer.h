@@ -330,7 +330,8 @@ class RenderLayer : public ScrollbarClient {
   typedef unsigned UpdateLayerPositionsFlags;
   void updateLayerPositions(
       UpdateLayerPositionsFlags = DoFullRepaint | IsCompositingUpdateRoot |
-                                  UpdateCompositingLayers);
+                                  UpdateCompositingLayers,
+      IntPoint* cachedOffset = 0);
 
   void updateTransform();
 

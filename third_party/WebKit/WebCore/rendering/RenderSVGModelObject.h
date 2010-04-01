@@ -60,7 +60,8 @@ class RenderSVGModelObject : public RenderObject, protected SVGRenderBase {
                                      IntRect&,
                                      bool fixed = false);
   virtual IntRect outlineBoundsForRepaint(
-      RenderBoxModelObject* repaintContainer) const;
+      RenderBoxModelObject* repaintContainer,
+      IntPoint*) const;
 
   virtual void absoluteRects(Vector<IntRect>& rects, int tx, int ty);
   virtual void absoluteQuads(Vector<FloatQuad>&);

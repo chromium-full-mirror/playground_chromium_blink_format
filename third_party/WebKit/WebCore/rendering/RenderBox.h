@@ -80,7 +80,8 @@ class RenderBox : public RenderBoxModelObject {
 
   // Bounds of the outline box in absolute coords. Respects transforms
   virtual IntRect outlineBoundsForRepaint(
-      RenderBoxModelObject* /*repaintContainer*/) const;
+      RenderBoxModelObject* /*repaintContainer*/,
+      IntPoint* cachedOffsetToRepaintContainer) const;
   virtual void addFocusRingRects(Vector<IntRect>&, int tx, int ty);
 
   // Use this with caution! No type checking is done!

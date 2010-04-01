@@ -989,7 +989,8 @@ class RenderObject : public CachedResourceClient {
   void arenaDelete(RenderArena*, void* objectBase);
 
   virtual IntRect outlineBoundsForRepaint(
-      RenderBoxModelObject* /*repaintContainer*/) const {
+      RenderBoxModelObject* /*repaintContainer*/,
+      IntPoint* /*cachedOffsetToRepaintContainer*/ = 0) const {
     return IntRect();
   }
 

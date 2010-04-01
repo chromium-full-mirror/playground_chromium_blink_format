@@ -72,7 +72,8 @@ void RenderSVGModelObject::mapLocalToContainer(
 // on borderBoundingBox() which SVG RenderBox subclases (like SVGRenderBlock) do
 // not implement.
 IntRect RenderSVGModelObject::outlineBoundsForRepaint(
-    RenderBoxModelObject* repaintContainer) const {
+    RenderBoxModelObject* repaintContainer,
+    IntPoint*) const {
   IntRect box = enclosingIntRect(repaintRectInLocalCoordinates());
   adjustRectForOutlineAndShadow(box);
 
