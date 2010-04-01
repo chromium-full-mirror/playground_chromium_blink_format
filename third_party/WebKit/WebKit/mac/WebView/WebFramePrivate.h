@@ -161,4 +161,7 @@ typedef enum {
 
 // Sets the name presented to accessibility clients for the web area object.
 - (void)setAccessibleName:(NSString*)name;
+
+- (NSString*)_layerTreeAsText;
+
 @end

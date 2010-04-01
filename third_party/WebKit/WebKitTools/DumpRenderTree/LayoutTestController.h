@@ -351,6 +351,8 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
                                        JSStringRef baseURL);
   void apiTestGoToCurrentBackForwardItem();
 
+  JSRetainPtr<JSStringRef> layerTreeAsText() const;
+
   static const unsigned maxViewWidth;
   static const unsigned maxViewHeight;
 

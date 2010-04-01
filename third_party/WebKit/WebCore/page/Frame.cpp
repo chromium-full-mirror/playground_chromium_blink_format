@@ -50,6 +50,7 @@
 #include "FrameLoaderClient.h"
 #include "FrameView.h"
 #include "GraphicsContext.h"
+#include "GraphicsLayer.h"
 #include "HTMLDocument.h"
 #include "HTMLFormControlElement.h"
 #include "HTMLFormElement.h"
@@ -64,6 +65,7 @@
 #include "Page.h"
 #include "PageGroup.h"
 #include "RegularExpression.h"
+#include "RenderLayerCompositor.h"
 #include "RenderPart.h"
 #include "RenderTableCell.h"
 #include "RenderTextControl.h"
@@ -1886,6 +1888,20 @@ IntRect Frame::tiledBackingStoreContentsRect() {
   if (!m_view)
     return IntRect();
   return IntRect(IntPoint(), m_view->contentsSize());
+}
+#endif
+
+#if USE(ACCELERATED_COMPOSITING)
+String Frame::layerTreeAsText() const {
+  if (!contentRenderer())
+    return String();
+
+  GraphicsLayer* rootLayer =
+      contentRenderer()->compositor()->rootPlatformLayer();
+  if (!rootLayer)
+    return String();
+
+  return rootLayer->layerTreeAsText();
 }
 #endif
 

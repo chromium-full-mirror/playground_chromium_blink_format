@@ -686,6 +686,18 @@ static JSValueRef keepWebHistoryCallback(JSContextRef context,
   return JSValueMakeUndefined(context);
 }
 
+static JSValueRef layerTreeAsTextCallback(JSContextRef context,
+                                          JSObjectRef function,
+                                          JSObjectRef thisObject,
+                                          size_t argumentCount,
+                                          const JSValueRef arguments[],
+                                          JSValueRef* exception) {
+  // Has mac & windows implementation
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  return JSValueMakeString(context, controller->layerTreeAsText().get());
+}
+
 static JSValueRef notifyDoneCallback(JSContextRef context,
                                      JSObjectRef function,
                                      JSObjectRef thisObject,
@@ -2155,6 +2167,8 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
       {"isCommandEnabled", isCommandEnabledCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"keepWebHistory", keepWebHistoryCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"layerTreeAsText", layerTreeAsTextCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"numberOfPages", numberOfPagesCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},

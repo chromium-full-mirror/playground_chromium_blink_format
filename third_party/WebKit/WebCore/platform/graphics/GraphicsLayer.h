@@ -74,6 +74,13 @@ typedef void* PlatformLayer;
 typedef void* NativeLayer;
 #endif
 
+enum LayerTreeAsTextBehaviorFlags {
+  LayerTreeAsTextBehaviorNormal = 0,
+  LayerTreeAsTextDebug =
+      1 << 0,  // Dump extra debugging info like layer addresses.
+};
+typedef unsigned LayerTreeAsTextBehavior;
+
 namespace WebCore {
 
 class FloatPoint3D;
@@ -324,7 +331,9 @@ class GraphicsLayer {
 
   virtual PlatformLayer* platformLayer() const { return 0; }
 
-  void dumpLayer(TextStream&, int indent = 0) const;
+  void dumpLayer(TextStream&,
+                 int indent = 0,
+                 LayerTreeAsTextBehavior = LayerTreeAsTextBehaviorNormal) const;
 
   int repaintCount() const { return m_repaintCount; }
   int incrementRepaintCount() { return ++m_repaintCount; }
@@ -382,6 +391,13 @@ class GraphicsLayer {
   // batched state.
   virtual void syncCompositingState() {}
 
+  // Return a string with a human readable form of the layer tree, If debug is
+  // true
+  // pointers for the layers and timing data will be included in the returned
+  // string.
+  String layerTreeAsText(
+      LayerTreeAsTextBehavior = LayerTreeAsTextBehaviorNormal) const;
+
  protected:
   typedef Vector<TransformOperation::OperationType> TransformOperationList;
   // Given a list of TransformAnimationValues, return an array of transform
@@ -403,7 +419,7 @@ class GraphicsLayer {
 
   GraphicsLayer(GraphicsLayerClient*);
 
-  void dumpProperties(TextStream&, int indent) const;
+  void dumpProperties(TextStream&, int indent, LayerTreeAsTextBehavior) const;
 
   GraphicsLayerClient* m_client;
   String m_name;
@@ -455,6 +471,11 @@ class GraphicsLayer {
 };
 
 }  // namespace WebCore
+
+#ifndef NDEBUG
+// Outside the WebCore namespace for ease of invocation from gdb.
+void showGraphicsLayerTree(const WebCore::GraphicsLayer* layer);
+#endif
 
 #endif  // USE(ACCELERATED_COMPOSITING)
 
