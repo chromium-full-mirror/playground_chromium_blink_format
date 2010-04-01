@@ -241,14 +241,9 @@ void HTMLTextAreaElement::handleBeforeTextInsertedEvent(
   unsigned unsignedMaxLength = static_cast<unsigned>(signedMaxLength);
 
   unsigned currentLength =
-      toRenderTextControl(renderer())->text().numGraphemeClusters();
-  unsigned selectionLength = plainText(document()
-                                           ->frame()
-                                           ->selection()
-                                           ->selection()
-                                           .toNormalizedRange()
-                                           .get())
-                                 .numGraphemeClusters();
+      numGraphemeClusters(toRenderTextControl(renderer())->text());
+  unsigned selectionLength = numGraphemeClusters(plainText(
+      document()->frame()->selection()->selection().toNormalizedRange().get()));
   ASSERT(currentLength >= selectionLength);
   unsigned baseLength = currentLength - selectionLength;
   unsigned appendableLength =
@@ -259,7 +254,7 @@ void HTMLTextAreaElement::handleBeforeTextInsertedEvent(
 String HTMLTextAreaElement::sanitizeUserInputValue(const String& proposedValue,
                                                    unsigned maxLength) {
   return proposedValue.left(
-      proposedValue.numCharactersInGraphemeClusters(maxLength));
+      numCharactersInGraphemeClusters(proposedValue, maxLength));
 }
 
 void HTMLTextAreaElement::rendererWillBeDestroyed() {
@@ -388,7 +383,7 @@ bool HTMLTextAreaElement::tooLong() const {
   int max = maxLength();
   if (max < 0)
     return false;
-  return value().numGraphemeClusters() > static_cast<unsigned>(max);
+  return numGraphemeClusters(value()) > static_cast<unsigned>(max);
 }
 
 void HTMLTextAreaElement::accessKeyAction(bool) {
