@@ -3883,6 +3883,7 @@ void webkit_web_view_set_full_content_zoom(WebKitWebView* webView,
  * Since: 1.1.1
  */
 SoupSession* webkit_get_default_session() {
+  webkit_init();
   return ResourceHandle::defaultSession();
 }
 
@@ -4297,6 +4298,8 @@ G_CONST_RETURN gchar* webkit_web_view_get_icon_uri(WebKitWebView* webView) {
  * Since: 1.1.18
  */
 void webkit_set_cache_model(WebKitCacheModel model) {
+  webkit_init();
+
   if (cacheModel == model)
     return;
 
@@ -4345,5 +4348,6 @@ void webkit_set_cache_model(WebKitCacheModel model) {
  * Since: 1.1.18
  */
 WebKitCacheModel webkit_get_cache_model() {
+  webkit_init();
   return cacheModel;
 }
