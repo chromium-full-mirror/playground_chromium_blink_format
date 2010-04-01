@@ -89,6 +89,10 @@ v8::Handle<v8::Value> V8MessageEvent::initMessageEventCallback(
   event->initMessageEvent(typeArg, canBubbleArg, cancelableArg,
                           dataArg.release(), originArg, lastEventIdArg,
                           sourceArg, portArray.release());
+  v8::PropertyAttribute dataAttr =
+      static_cast<v8::PropertyAttribute>(v8::DontDelete | v8::ReadOnly);
+  SerializedScriptValue::deserializeAndSetProperty(args.Holder(), "data",
+                                                   dataAttr, event->data());
   return v8::Undefined();
 }
 
