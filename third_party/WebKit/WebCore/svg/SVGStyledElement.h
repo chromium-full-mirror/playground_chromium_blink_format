@@ -25,6 +25,7 @@
 #if ENABLE(SVG)
 #include "HTMLNames.h"
 #include "SVGElement.h"
+#include "SVGLocatable.h"
 #include "SVGStylable.h"
 
 namespace WebCore {
@@ -73,6 +74,9 @@ class SVGStyledElement : public SVGElement, public SVGStylable {
 
   bool instanceUpdatesBlocked() const;
   void setInstanceUpdatesBlocked(bool);
+
+  virtual AffineTransform localCoordinateSpaceTransform(
+      SVGLocatable::CTMScope) const;
 
  protected:
   static int cssPropertyIdForSVGAttributeName(const QualifiedName&);

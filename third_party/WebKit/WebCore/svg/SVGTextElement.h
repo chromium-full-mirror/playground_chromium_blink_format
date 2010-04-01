@@ -43,6 +43,10 @@ class SVGTextElement : public SVGTextPositioningElement,
   virtual AffineTransform getScreenCTM() const;
   virtual AffineTransform animatedLocalTransform() const;
   virtual AffineTransform* supplementalTransform();
+  virtual AffineTransform localCoordinateSpaceTransform(
+      SVGLocatable::CTMScope mode) const {
+    return SVGTransformable::localCoordinateSpaceTransform(mode);
+  }
 
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual bool childShouldCreateRenderer(Node*) const;

@@ -43,6 +43,10 @@ class SVGStyledTransformableElement : public SVGStyledLocatableElement,
   virtual SVGElement* nearestViewportElement() const;
   virtual SVGElement* farthestViewportElement() const;
 
+  virtual AffineTransform localCoordinateSpaceTransform(
+      SVGLocatable::CTMScope mode) const {
+    return SVGTransformable::localCoordinateSpaceTransform(mode);
+  }
   virtual AffineTransform animatedLocalTransform() const;
   virtual AffineTransform* supplementalTransform();
 

@@ -43,11 +43,11 @@ SVGStyledTransformableElement::SVGStyledTransformableElement(
 SVGStyledTransformableElement::~SVGStyledTransformableElement() {}
 
 AffineTransform SVGStyledTransformableElement::getCTM() const {
-  return SVGTransformable::getCTM(this);
+  return SVGLocatable::computeCTM(this, SVGLocatable::NearestViewportScope);
 }
 
 AffineTransform SVGStyledTransformableElement::getScreenCTM() const {
-  return SVGTransformable::getScreenCTM(this);
+  return SVGLocatable::computeCTM(this, SVGLocatable::ScreenScope);
 }
 
 AffineTransform SVGStyledTransformableElement::animatedLocalTransform() const {

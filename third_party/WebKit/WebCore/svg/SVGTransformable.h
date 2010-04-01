@@ -51,9 +51,10 @@ class SVGTransformable : virtual public SVGLocatable {
                                   const UChar* end,
                                   SVGTransform&);
 
-  AffineTransform getCTM(const SVGElement*) const;
-  AffineTransform getScreenCTM(const SVGElement*) const;
-
+  virtual AffineTransform localCoordinateSpaceTransform(
+      SVGLocatable::CTMScope) const {
+    return animatedLocalTransform();
+  }
   virtual AffineTransform animatedLocalTransform() const = 0;
 
   bool isKnownAttribute(const QualifiedName&);
