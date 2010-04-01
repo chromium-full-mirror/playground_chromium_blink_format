@@ -850,8 +850,12 @@ String AccessibilityRenderObject::stringValue() const {
     // label
     SelectElement* selectNode =
         toSelectElement(static_cast<Element*>(m_renderer->node()));
-    Element* selectedOption =
-        selectNode->listItems()[selectNode->selectedIndex()];
+    int selectedIndex = selectNode->selectedIndex();
+    const Vector<Element*> listItems = selectNode->listItems();
+
+    Element* selectedOption = 0;
+    if (selectedIndex >= 0 && selectedIndex < (int)listItems.size())
+      selectedOption = listItems[selectedIndex];
     String overridenDescription =
         AccessibilityObject::getAttribute(selectedOption, aria_labelAttr);
     if (!overridenDescription.isNull())
