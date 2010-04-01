@@ -48,7 +48,8 @@ class IndexedDatabaseProxy : public IndexedDatabase {
                     const String& description,
                     bool modifyDatabase,
                     ExceptionCode&,
-                    PassRefPtr<IDBDatabaseCallbacks>);
+                    PassRefPtr<IDBDatabaseCallbacks>,
+                    Frame*);
 
  private:
   IndexedDatabaseProxy();

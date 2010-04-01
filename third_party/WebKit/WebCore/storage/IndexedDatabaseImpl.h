@@ -43,7 +43,8 @@ class IndexedDatabaseImpl : public IndexedDatabase {
                     const String& description,
                     bool modifyDatabase,
                     ExceptionCode&,
-                    PassRefPtr<IDBCallbacks<IDBDatabase>>);
+                    PassRefPtr<IDBCallbacks<IDBDatabase>>,
+                    Frame*);
 
  private:
   IndexedDatabaseImpl();

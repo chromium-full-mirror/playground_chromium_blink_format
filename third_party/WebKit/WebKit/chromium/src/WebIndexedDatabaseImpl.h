@@ -41,7 +41,8 @@ class WebIndexedDatabaseImpl : public WebIndexedDatabase {
                     const WebString& description,
                     bool modifyDatabase,
                     int& exceptionCode,
-                    WebIDBCallbacks<WebIDBDatabase>* callbacks);
+                    WebIDBCallbacks<WebIDBDatabase>*,
+                    WebFrame*);
 };
 
 }  // namespace WebKit

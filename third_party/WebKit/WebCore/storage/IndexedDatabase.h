@@ -37,6 +37,7 @@
 
 namespace WebCore {
 
+class Frame;
 class IDBDatabase;
 
 typedef IDBCallbacks<IDBDatabase> IDBDatabaseCallbacks;
@@ -57,7 +58,8 @@ class IndexedDatabase : public ThreadSafeShared<IndexedDatabase> {
                     const String& description,
                     bool modifyDatabase,
                     ExceptionCode&,
-                    PassRefPtr<IDBDatabaseCallbacks>) = 0;
+                    PassRefPtr<IDBDatabaseCallbacks>,
+                    Frame*) = 0;
 };
 
 }  // namespace WebCore

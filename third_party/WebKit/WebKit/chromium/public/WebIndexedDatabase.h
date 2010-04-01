@@ -34,6 +34,7 @@
 
 namespace WebKit {
 
+class WebFrame;
 class WebIDBDatabase;
 class WebString;
 
@@ -51,7 +52,8 @@ class WebIndexedDatabase {
                     const WebString& description,
                     bool modifyDatabase,
                     int& exceptionCode,
-                    WebIDBCallbacks<WebIDBDatabase>* callbacks) = 0;
+                    WebIDBCallbacks<WebIDBDatabase>*,
+                    WebFrame*) = 0;
 };
 
 }  // namespace WebKit

@@ -48,7 +48,8 @@ void IndexedDatabaseImpl::open(const String& name,
                                const String& description,
                                bool modifyDatabase,
                                ExceptionCode&,
-                               PassRefPtr<IDBDatabaseCallbacks>) {
+                               PassRefPtr<IDBDatabaseCallbacks>,
+                               Frame* frame) {
   // FIXME: Write.
   ASSERT_NOT_REACHED();
 }
