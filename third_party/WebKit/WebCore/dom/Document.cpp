@@ -1241,7 +1241,7 @@ void Document::setTitle(const String& title, Element* titleElement) {
   updateTitle();
 
   if (m_titleSetExplicitly && m_titleElement &&
-      m_titleElement->hasTagName(titleTag))
+      m_titleElement->hasTagName(titleTag) && !titleElement)
     static_cast<HTMLTitleElement*>(m_titleElement.get())->setText(m_title);
 }
 
