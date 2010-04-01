@@ -346,7 +346,7 @@ void RenderLayerCompositor::repaintOnCompositingChange(RenderLayer* layer) {
 IntRect RenderLayerCompositor::calculateCompositedBounds(
     const RenderLayer* layer,
     const RenderLayer* ancestorLayer) {
-  if (!layer->isSelfPaintingLayer())
+  if (!canBeComposited(layer))
     return IntRect();
 
   IntRect boundingBoxRect, unionBounds;
@@ -622,7 +622,8 @@ void RenderLayerCompositor::computeCompositingRequirements(
   // be composited. Also, if we have opacity < 1, then we need to be a layer so
   // that
   // the child layers are opaque, then rendered with opacity on this layer.
-  if (!willBeComposited && childState.m_subtreeIsCompositing &&
+  if (!willBeComposited && canBeComposited(layer) &&
+      childState.m_subtreeIsCompositing &&
       requiresCompositingWhenDescendantsAreCompositing(layer->renderer())) {
     layer->setMustOverlapCompositedLayers(true);
     if (overlapMap)
@@ -644,7 +645,8 @@ void RenderLayerCompositor::computeCompositingRequirements(
   // setHasCompositingDescendant() may have changed the answer to
   // needsToBeComposited() when clipping,
   // so test that again.
-  if (!willBeComposited && clipsCompositingDescendants(layer)) {
+  if (!willBeComposited && canBeComposited(layer) &&
+      clipsCompositingDescendants(layer)) {
     if (overlapMap)
       addToOverlapMap(*overlapMap, layer, absBounds, haveComputedBounds);
     willBeComposited = true;
@@ -1026,7 +1028,7 @@ bool RenderLayerCompositor::has3DContent() const {
 
 bool RenderLayerCompositor::needsToBeComposited(
     const RenderLayer* layer) const {
-  if (!m_hasAcceleratedCompositing || !layer->isSelfPaintingLayer())
+  if (!canBeComposited(layer))
     return false;
 
   return requiresCompositingLayer(layer) ||
@@ -1057,6 +1059,10 @@ bool RenderLayerCompositor::requiresCompositingLayer(
          renderer->style()->backfaceVisibility() == BackfaceVisibilityHidden ||
          clipsCompositingDescendants(layer) ||
          requiresCompositingForAnimation(renderer);
+}
+
+bool RenderLayerCompositor::canBeComposited(const RenderLayer* layer) const {
+  return m_hasAcceleratedCompositing && layer->isSelfPaintingLayer();
 }
 
 // Return true if the given layer has some ancestor in the RenderLayer hierarchy
