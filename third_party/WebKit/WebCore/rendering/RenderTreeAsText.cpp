@@ -184,7 +184,7 @@ static void writeRenderObject(TextStream& ts,
   ts << o.renderName();
 
   if (behavior & RenderAsTextShowAddresses)
-    ts << " " << static_cast<const void*>(&o);
+    ts << " " << &o;
 
   if (o.style() && o.style()->zIndex())
     ts << " zI: " << o.style()->zIndex();
@@ -502,7 +502,7 @@ static void write(TextStream& ts,
   ts << "layer ";
 
   if (behavior & RenderAsTextShowAddresses)
-    ts << static_cast<const void*>(&l) << " ";
+    ts << &l << " ";
 
   ts << layerBounds;
 
