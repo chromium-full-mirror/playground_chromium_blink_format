@@ -46,7 +46,8 @@ class SerializedScriptValue : public RefCounted<SerializedScriptValue> {
                                         const char* propertyName,
                                         v8::PropertyAttribute attribute,
                                         SerializedScriptValue* value) {
-    ASSERT(value);
+    if (!value)
+      return;
     v8::Handle<v8::Value> deserialized = value->deserialize();
     object->ForceSet(v8::String::NewSymbol(propertyName), deserialized,
                      attribute);
