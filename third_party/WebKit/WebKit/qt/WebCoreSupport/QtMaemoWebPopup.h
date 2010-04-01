@@ -24,6 +24,9 @@
 
 #include <QDialog>
 
+class QListWidgetItem;
+class QListWidget;
+
 namespace WebCore {
 
 class Maemo5Popup : public QDialog {
@@ -34,8 +37,14 @@ class Maemo5Popup : public QDialog {
  signals:
   void itemClicked(int idx);
 
+ protected slots:
+  void onItemSelected(QListWidgetItem* item);
+
  protected:
+  void populateList();
+
   QtAbstractWebPopup& m_data;
+  QListWidget* m_list;
 };
 
 class QtMaemoWebPopup : public QObject, public QtAbstractWebPopup {
@@ -57,6 +66,18 @@ class QtMaemoWebPopup : public QObject, public QtAbstractWebPopup {
   Maemo5Popup* createPopup();
   Maemo5Popup* createSingleSelectionPopup();
   Maemo5Popup* createMultipleSelectionPopup();
+};
+
+class Maemo5SingleSelectionPopup : public Maemo5Popup {
+  Q_OBJECT
+ public:
+  Maemo5SingleSelectionPopup(QtAbstractWebPopup& data);
+};
+
+class Maemo5MultipleSelectionPopup : public Maemo5Popup {
+  Q_OBJECT
+ public:
+  Maemo5MultipleSelectionPopup(QtAbstractWebPopup& data);
 };
 }
 
