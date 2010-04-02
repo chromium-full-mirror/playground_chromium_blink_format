@@ -59,7 +59,7 @@ class CanvasRenderingContext2D : public CanvasRenderingContext {
  public:
   CanvasRenderingContext2D(HTMLCanvasElement*,
                            bool usesCSSCompatibilityParseMode,
-                           bool usesDashbardCompatibilityMode);
+                           bool usesDashboardCompatibilityMode);
 
   virtual ~CanvasRenderingContext2D();
 
@@ -378,7 +378,7 @@ class CanvasRenderingContext2D : public CanvasRenderingContext {
   Vector<State, 1> m_stateStack;
   bool m_usesCSSCompatibilityParseMode;
 #if ENABLE(DASHBOARD_SUPPORT)
-  bool m_usesDashbardCompatibilityMode;
+  bool m_usesDashboardCompatibilityMode;
 #endif
 };
 
