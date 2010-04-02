@@ -105,7 +105,10 @@ FontPlatformData* FontCache::createFontPlatformData(
   const char* name = 0;
   CString s;
 
-  if (family.length() == 0) {
+  // If we're creating a fallback font (e.g. "-webkit-monospace"), convert the
+  // name into
+  // the fallback name (like "monospace") that fontconfig understands.
+  if (!family.length() || family.startsWith("-webkit-")) {
     static const struct {
       FontDescription::GenericFamilyType mType;
       const char* mName;
