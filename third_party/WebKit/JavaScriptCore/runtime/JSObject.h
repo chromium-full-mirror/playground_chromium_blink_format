@@ -36,6 +36,7 @@
 #include "ScopeChain.h"
 #include "Structure.h"
 #include "JSGlobalData.h"
+#include "JSString.h"
 #include <wtf/StdLibExtras.h>
 
 namespace JSC {
@@ -852,6 +853,18 @@ ALWAYS_INLINE void JSObject::markChildrenDirect(MarkStack& markStack) {
   PropertyStorage storage = propertyStorage();
   size_t storageSize = m_structure->propertyStorageSize();
   markStack.appendValues(reinterpret_cast<JSValue*>(storage), storageSize);
+}
+
+// --- JSValue inlines ----------------------------
+
+ALWAYS_INLINE UString JSValue::toThisString(ExecState* exec) const {
+  return isString() ? static_cast<JSString*>(asCell())->value(exec)
+                    : toThisObject(exec)->toString(exec);
+}
+
+inline JSString* JSValue::toThisJSString(ExecState* exec) const {
+  return isString() ? static_cast<JSString*>(asCell())
+                    : jsString(exec, toThisObject(exec)->toString(exec));
 }
 
 }  // namespace JSC
