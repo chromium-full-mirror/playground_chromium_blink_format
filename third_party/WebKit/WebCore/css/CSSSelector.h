@@ -226,7 +226,6 @@ class CSSSelector : public Noncopyable {
 
   bool isLastInSelectorList() const { return m_isLastInSelectorList; }
   void setLastInSelectorList() { m_isLastInSelectorList = true; }
-  bool isSimple() const;
 
   mutable AtomicString m_value;
   QualifiedName m_tag;
