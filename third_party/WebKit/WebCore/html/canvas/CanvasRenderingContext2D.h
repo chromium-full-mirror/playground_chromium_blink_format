@@ -57,7 +57,9 @@ typedef int ExceptionCode;
 
 class CanvasRenderingContext2D : public CanvasRenderingContext {
  public:
-  CanvasRenderingContext2D(HTMLCanvasElement*);
+  CanvasRenderingContext2D(HTMLCanvasElement*,
+                           bool usesCSSCompatibilityParseMode,
+                           bool usesDashbardCompatibilityMode);
 
   virtual ~CanvasRenderingContext2D();
 
@@ -374,6 +376,10 @@ class CanvasRenderingContext2D : public CanvasRenderingContext {
   void checkOrigin(const String&);
 
   Vector<State, 1> m_stateStack;
+  bool m_usesCSSCompatibilityParseMode;
+#if ENABLE(DASHBOARD_SUPPORT)
+  bool m_usesDashbardCompatibilityMode;
+#endif
 };
 
 }  // namespace WebCore

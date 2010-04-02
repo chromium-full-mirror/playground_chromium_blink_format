@@ -30,6 +30,7 @@
 #include "ExceptionCode.h"
 #include "FloatRect.h"
 #include "GraphicsContext.h"
+#include "HTMLCanvasElement.h"
 #include "ImageBuffer.h"
 #include "MIMETypeRegistry.h"
 
@@ -151,6 +152,26 @@ AffineTransform CanvasSurface::baseTransform() const {
                               size.height() / unscaledSize.height());
   transform.multiply(m_imageBuffer->baseTransform());
   return transform;
+}
+
+// FIXME: Everything below here relies on CanvasSurface really being
+// a HTMLCanvasElement.
+const SecurityOrigin& CanvasSurface::securityOrigin() const {
+  return *(static_cast<const HTMLCanvasElement*>(this)
+               ->document()
+               ->securityOrigin());
+}
+
+RenderBox* CanvasSurface::renderBox() const {
+  return static_cast<const HTMLCanvasElement*>(this)->renderBox();
+}
+
+RenderStyle* CanvasSurface::computedStyle() {
+  return static_cast<HTMLCanvasElement*>(this)->computedStyle();
+}
+
+CSSStyleSelector* CanvasSurface::styleSelector() {
+  return static_cast<HTMLCanvasElement*>(this)->document()->styleSelector();
 }
 
 }  // namespace WebCore

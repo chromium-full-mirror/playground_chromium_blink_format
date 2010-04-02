@@ -40,7 +40,6 @@
 #include "CSSMutableStyleDeclaration.h"
 #include "CSSPropertyNames.h"
 #include "CSSStyleSelector.h"
-#include "Document.h"
 #include "ExceptionCode.h"
 #include "FloatConversion.h"
 #include "GraphicsContext.h"
@@ -87,8 +86,23 @@ class CanvasStrokeStyleApplier : public StrokeStyleApplier {
   CanvasRenderingContext2D* m_canvasContext;
 };
 
-CanvasRenderingContext2D::CanvasRenderingContext2D(HTMLCanvasElement* canvas)
-    : CanvasRenderingContext(canvas), m_stateStack(1) {
+CanvasRenderingContext2D::CanvasRenderingContext2D(
+    HTMLCanvasElement* canvas,
+    bool usesCSSCompatibilityParseMode,
+    bool usesDashbardCompatibilityMode)
+    : CanvasRenderingContext(canvas),
+      m_stateStack(1),
+      m_usesCSSCompatibilityParseMode(usesCSSCompatibilityParseMode)
+#if ENABLE(DASHBOARD_SUPPORT)
+      ,
+      m_usesDashbardCompatibilityMode(usesDashbardCompatibilityMode)
+#endif
+{
+#if !ENABLE(DASHBOARD_SUPPORT)
+  ASSERT_UNUSED(usesDashboardCompatibilityMode,
+                !usesDashboardCompatibilityMode);
+#endif
+
   // Make sure that even if the drawingContext() has a different default
   // thickness, it is in sync with the canvas thickness.
   setLineWidth(lineWidth());
@@ -628,9 +642,8 @@ void CanvasRenderingContext2D::rect(float x,
 #if ENABLE(DASHBOARD_SUPPORT)
 void CanvasRenderingContext2D::
     clearPathForDashboardBackwardCompatibilityMode() {
-  if (Settings* settings = canvas()->document()->settings())
-    if (settings->usesDashboardBackwardCompatibilityMode())
-      m_path.clear();
+  if (m_usesDashbardCompatibilityMode)
+    m_path.clear();
 }
 #endif
 
@@ -962,7 +975,7 @@ static inline FloatRect normalizeRect(const FloatRect& rect) {
 }
 
 void CanvasRenderingContext2D::checkOrigin(const KURL& url) {
-  if (canvas()->document()->securityOrigin()->taintsCanvas(url))
+  if (canvas()->securityOrigin().taintsCanvas(url))
     canvas()->setOriginTainted();
 }
 
@@ -1216,9 +1229,8 @@ void CanvasRenderingContext2D::setCompositeOperation(const String& operation) {
 void CanvasRenderingContext2D::prepareGradientForDashboard(
     CanvasGradient* gradient) const {
 #if ENABLE(DASHBOARD_SUPPORT)
-  if (Settings* settings = canvas()->document()->settings())
-    if (settings->usesDashboardBackwardCompatibilityMode())
-      gradient->setDashboardCompatibilityMode();
+  if (m_usesDashbardCompatibilityMode)
+    gradient->setDashboardCompatibilityMode();
 #else
   UNUSED_PARAM(gradient);
 #endif
@@ -1279,7 +1291,7 @@ PassRefPtr<CanvasPattern> CanvasRenderingContext2D::createPattern(
   if (!cachedImage || !image->cachedImage()->image())
     return CanvasPattern::create(Image::nullImage(), repeatX, repeatY, true);
 
-  bool originClean = !canvas()->document()->securityOrigin()->taintsCanvas(
+  bool originClean = !canvas()->securityOrigin().taintsCanvas(
                          KURL(KURL(), cachedImage->url())) &&
                      cachedImage->image()->hasSingleSecurityOrigin();
   return CanvasPattern::create(cachedImage->image(), repeatX, repeatY,
@@ -1453,10 +1465,7 @@ String CanvasRenderingContext2D::font() const {
 void CanvasRenderingContext2D::setFont(const String& newFont) {
   RefPtr<CSSMutableStyleDeclaration> tempDecl =
       CSSMutableStyleDeclaration::create();
-  CSSParser parser(!canvas()->document()->inCompatMode());  // Use the parse
-                                                            // mode of the
-                                                            // canvas' document
-                                                            // when parsing CSS.
+  CSSParser parser(!m_usesCSSCompatibilityParseMode);
 
   String declarationText("font: ");
   declarationText += newFont;
@@ -1471,11 +1480,11 @@ void CanvasRenderingContext2D::setFont(const String& newFont) {
   // larger/smaller, these will work
   // relative to the canvas.
   RefPtr<RenderStyle> newStyle = RenderStyle::create();
-  if (canvas()->computedStyle())
-    newStyle->setFontDescription(canvas()->computedStyle()->fontDescription());
+  if (RenderStyle* computedStyle = canvas()->computedStyle())
+    newStyle->setFontDescription(computedStyle->fontDescription());
 
   // Now map the font property into the style.
-  CSSStyleSelector* styleSelector = canvas()->document()->styleSelector();
+  CSSStyleSelector* styleSelector = canvas()->styleSelector();
   styleSelector->applyPropertyToStyle(
       CSSPropertyFont, tempDecl->getPropertyCSSValue(CSSPropertyFont).get(),
       newStyle.get());
@@ -1556,12 +1565,10 @@ void CanvasRenderingContext2D::drawTextInternal(const String& text,
   // FIXME: Handle maxWidth.
   // FIXME: Need to turn off font smoothing.
 
-  bool rtl = canvas()->computedStyle()
-                 ? canvas()->computedStyle()->direction() == RTL
-                 : false;
-  bool override = canvas()->computedStyle()
-                      ? canvas()->computedStyle()->unicodeBidi() == Override
-                      : false;
+  RenderStyle* computedStyle = canvas()->computedStyle();
+  bool rtl = computedStyle ? computedStyle->direction() == RTL : false;
+  bool override =
+      computedStyle ? computedStyle->unicodeBidi() == Override : false;
 
   unsigned length = text.length();
   const UChar* string = text.characters();
