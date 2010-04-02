@@ -68,6 +68,7 @@ WTFLogChannel LogMedia = {0x01000000, "WebCoreLogLevel", WTFLogChannelOff};
 WTFLogChannel LogPlugins = {0x02000000, "WebCoreLogLevel", WTFLogChannelOff};
 WTFLogChannel LogArchives = {0x04000000, "WebCoreLogLevel", WTFLogChannelOff};
 WTFLogChannel LogProgress = {0x08000000, "WebCoreLogLevel", WTFLogChannelOff};
+WTFLogChannel LogFileAPI = {0x10000000, "WebCoreLogLevel", WTFLogChannelOff};
 
 WTFLogChannel* getChannelFromName(const String& channelName) {
   if (!(channelName.length() >= 2))
@@ -135,6 +136,9 @@ WTFLogChannel* getChannelFromName(const String& channelName) {
 
   if (equalIgnoringCase(channelName, String("Threading")))
     return &LogThreading;
+
+  if (equalIgnoringCase(channelName, String("FileAPI")))
+    return &LogFileAPI;
 
   return 0;
 }
