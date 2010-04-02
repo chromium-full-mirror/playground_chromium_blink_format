@@ -53,6 +53,7 @@ class DOMApplicationCache : public RefCounted<DOMApplicationCache>,
   }
   ~DOMApplicationCache() { ASSERT(!m_frame); }
 
+  Frame* frame() const { return m_frame; }
   void disconnectFrame();
 
   unsigned short status() const;

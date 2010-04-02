@@ -106,17 +106,4 @@ bool V8History::namedSecurityCheck(v8::Local<v8::Object> host,
                                            history->frame(), false);
 }
 
-v8::Handle<v8::Value> toV8(History* impl) {
-  if (!impl)
-    return v8::Null();
-  v8::Handle<v8::Object> wrapper = getDOMObjectMap().get(impl);
-  if (wrapper.IsEmpty()) {
-    wrapper = V8History::wrap(impl);
-    if (!wrapper.IsEmpty())
-      V8DOMWrapper::setHiddenWindowReference(
-          impl->frame(), V8DOMWindow::historyIndex, wrapper);
-  }
-  return wrapper;
-}
-
 }  // namespace WebCore
