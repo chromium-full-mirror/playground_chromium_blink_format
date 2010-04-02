@@ -88,21 +88,12 @@ void NotificationPresenterImpl::notificationObjectDestroyed(
 NotificationPresenter::Permission NotificationPresenterImpl::checkPermission(
     const KURL& sourceURL) {
   int result = m_presenter->checkPermission(sourceURL);
-
-  // FIXME: Remove this once clients are updated to use the above signature.
-  if (result == NotificationPresenter::PermissionNotAllowed)
-    result = m_presenter->checkPermission(sourceURL, 0);
-
   return static_cast<NotificationPresenter::Permission>(result);
 }
 
 void NotificationPresenterImpl::requestPermission(
     SecurityOrigin* origin,
     PassRefPtr<VoidCallback> callback) {
-  // FIXME: Remove the first call once clients are updated to use the second
-  // signature.
-  m_presenter->requestPermission(origin->toString(),
-                                 new VoidCallbackClient(callback));
   m_presenter->requestPermission(WebSecurityOrigin(origin),
                                  new VoidCallbackClient(callback));
 }
