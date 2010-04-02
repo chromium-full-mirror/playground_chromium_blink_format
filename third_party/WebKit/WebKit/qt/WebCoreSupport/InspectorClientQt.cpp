@@ -104,6 +104,11 @@ void InspectorClientQt::hideHighlight() {
 }
 
 void InspectorClientQt::populateSetting(const String& key, String* setting) {
+#ifdef QT_NO_SETTINGS
+  Q_UNUSED(key)
+  Q_UNUSED(setting)
+  qWarning("QWebInspector: QSettings is not supported by Qt.");
+#else
   QSettings qsettings;
   if (qsettings.status() == QSettings::AccessError) {
     // QCoreApplication::setOrganizationName and
@@ -120,9 +125,15 @@ void InspectorClientQt::populateSetting(const String& key, String* setting) {
   QVariant storedValue = qsettings.value(settingKey);
   storedValue.convert(QVariant::nameToType(storedValueType.toAscii().data()));
   *setting = variantToSetting(storedValue);
+#endif  // QT_NO_SETTINGS
 }
 
 void InspectorClientQt::storeSetting(const String& key, const String& setting) {
+#ifdef QT_NO_SETTINGS
+  Q_UNUSED(key)
+  Q_UNUSED(setting)
+  qWarning("QWebInspector: QSettings is not supported by Qt.");
+#else
   QSettings qsettings;
   if (qsettings.status() == QSettings::AccessError) {
     qWarning(
@@ -136,6 +147,7 @@ void InspectorClientQt::storeSetting(const String& key, const String& setting) {
   qsettings.setValue(settingKey, valueToStore);
   qsettings.setValue(settingKey + settingStorageTypeSuffix,
                      QVariant::typeToName(valueToStore.type()));
+#endif  // QT_NO_SETTINGS
 }
 
 static String variantToSetting(const QVariant& qvariant) {
