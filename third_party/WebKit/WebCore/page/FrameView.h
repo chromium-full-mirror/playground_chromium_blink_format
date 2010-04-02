@@ -245,6 +245,8 @@ class FrameView : public ScrollView {
   bool useSlowRepaints() const;
   bool useSlowRepaintsIfNotOverlapped() const;
 
+  bool hasFixedObjects() const { return m_fixedObjectCount > 0; }
+
   void applyOverflowToViewport(RenderObject*,
                                ScrollbarMode& hMode,
                                ScrollbarMode& vMode);
