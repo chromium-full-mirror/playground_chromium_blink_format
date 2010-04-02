@@ -60,8 +60,6 @@ class InspectorFrontendClient {
   virtual void changeAttachedWindowHeight(unsigned) = 0;
 
   virtual void inspectedURLChanged(const String&) = 0;
-
-  virtual void showContextMenu(Event*, const Vector<ContextMenuItem*>&) = 0;
 };
 
 }  // namespace WebCore

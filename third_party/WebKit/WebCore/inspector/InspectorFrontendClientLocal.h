@@ -37,7 +37,6 @@
 
 namespace WebCore {
 
-class FrontendMenuProvider;
 class InspectorController;
 class InspectorFrontendHost;
 class Page;
@@ -56,8 +55,6 @@ class InspectorFrontendClientLocal : public InspectorFrontendClient,
   virtual bool canAttachWindow();
   virtual void changeAttachedWindowHeight(unsigned);
 
-  virtual void showContextMenu(Event*, const Vector<ContextMenuItem*>&);
-
  protected:
   virtual void setAttachedWindowHeight(unsigned) = 0;
 
@@ -74,7 +71,6 @@ class InspectorFrontendClientLocal : public InspectorFrontendClient,
   ScriptState* m_frontendScriptState;
   // TODO(yurys): this ref shouldn't be needed.
   RefPtr<InspectorFrontendHost> m_frontendHost;
-  FrontendMenuProvider* m_menuProvider;
 };
 
 }  // namespace WebCore
