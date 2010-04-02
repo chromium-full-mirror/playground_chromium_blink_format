@@ -161,6 +161,8 @@ class HTMLFormControlElementWithState : public HTMLFormControlElement {
                                   HTMLFormElement*);
   virtual ~HTMLFormControlElementWithState();
 
+  virtual bool autoComplete() const;
+  virtual bool shouldSaveAndRestoreFormControlState() const;
   virtual void finishParsingChildren();
 
  protected:

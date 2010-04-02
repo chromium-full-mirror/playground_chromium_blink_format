@@ -290,6 +290,7 @@ class Element : public ContainerNode {
   virtual const AtomicString& formControlName() const { return nullAtom; }
   virtual const AtomicString& formControlType() const { return nullAtom; }
 
+  virtual bool shouldSaveAndRestoreFormControlState() const { return true; }
   virtual bool saveFormControlState(String&) const { return false; }
   virtual void restoreFormControlState(const String&) {}
 
