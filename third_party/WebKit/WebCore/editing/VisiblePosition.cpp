@@ -486,6 +486,7 @@ Position VisiblePosition::canonicalPosition(const Position& position) {
   if (!node)
     return Position();
 
+  ASSERT(node->document());
   node->document()->updateLayoutIgnorePendingStylesheets();
 
   Position candidate = position.upstream();

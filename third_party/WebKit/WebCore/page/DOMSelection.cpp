@@ -185,6 +185,10 @@ void DOMSelection::collapse(Node* node, int offset, ExceptionCode& ec) {
     ec = INDEX_SIZE_ERR;
     return;
   }
+
+  if (!isValidForPosition(node))
+    return;
+
   m_frame->selection()->moveTo(VisiblePosition(node, offset, DOWNSTREAM));
 }
 
@@ -222,6 +226,10 @@ void DOMSelection::setBaseAndExtent(Node* baseNode,
     ec = INDEX_SIZE_ERR;
     return;
   }
+
+  if (!isValidForPosition(baseNode) || !isValidForPosition(extentNode))
+    return;
+
   VisiblePosition visibleBase =
       VisiblePosition(baseNode, baseOffset, DOWNSTREAM);
   VisiblePosition visibleExtent =
@@ -237,6 +245,10 @@ void DOMSelection::setPosition(Node* node, int offset, ExceptionCode& ec) {
     ec = INDEX_SIZE_ERR;
     return;
   }
+
+  if (!isValidForPosition(node))
+    return;
+
   m_frame->selection()->moveTo(VisiblePosition(node, offset, DOWNSTREAM));
 }
 
@@ -299,6 +311,7 @@ void DOMSelection::extend(Node* node, int offset, ExceptionCode& ec) {
     ec = TYPE_MISMATCH_ERR;
     return;
   }
+
   if (offset < 0 ||
       offset > (node->offsetInCharacters() ? caretMaxOffset(node)
                                            : (int)node->childNodeCount())) {
@@ -306,8 +319,10 @@ void DOMSelection::extend(Node* node, int offset, ExceptionCode& ec) {
     return;
   }
 
-  SelectionController* selection = m_frame->selection();
-  selection->setExtent(VisiblePosition(node, offset, DOWNSTREAM));
+  if (!isValidForPosition(node))
+    return;
+
+  m_frame->selection()->setExtent(VisiblePosition(node, offset, DOWNSTREAM));
 }
 
 PassRefPtr<Range> DOMSelection::getRangeAt(int index, ExceptionCode& ec) {
@@ -412,7 +427,7 @@ bool DOMSelection::containsNode(const Node* n, bool allowPartial) const {
 
   SelectionController* selection = m_frame->selection();
 
-  if (!n || selection->isNone())
+  if (!n || m_frame->document() != n->document() || selection->isNone())
     return false;
 
   Node* parentNode = n->parentNode();
@@ -461,6 +476,13 @@ String DOMSelection::toString() {
     return String();
 
   return plainText(m_frame->selection()->selection().toNormalizedRange().get());
+}
+
+bool DOMSelection::isValidForPosition(Node* node) const {
+  ASSERT(m_frame);
+  if (!node)
+    return true;
+  return node->document() == m_frame->document();
 }
 
 }  // namespace WebCore
