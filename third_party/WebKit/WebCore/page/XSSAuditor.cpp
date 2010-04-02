@@ -77,6 +77,20 @@ static bool isIllegalURICharacter(UChar c) {
 }
 
 String XSSAuditor::CachingURLCanonicalizer::canonicalizeURL(
+    FormData* formData,
+    const TextEncoding& encoding,
+    bool decodeEntities,
+    bool decodeURLEscapeSequencesTwice) {
+  if (decodeEntities == m_decodeEntities &&
+      decodeURLEscapeSequencesTwice == m_decodeURLEscapeSequencesTwice &&
+      encoding == m_encoding && formData == m_formData)
+    return m_cachedCanonicalizedURL;
+  m_formData = formData;
+  return canonicalizeURL(formData->flattenToString(), encoding, decodeEntities,
+                         decodeURLEscapeSequencesTwice);
+}
+
+String XSSAuditor::CachingURLCanonicalizer::canonicalizeURL(
     const String& url,
     const TextEncoding& encoding,
     bool decodeEntities,
@@ -92,10 +106,17 @@ String XSSAuditor::CachingURLCanonicalizer::canonicalizeURL(
   m_encoding = encoding;
   m_decodeEntities = decodeEntities;
   m_decodeURLEscapeSequencesTwice = decodeURLEscapeSequencesTwice;
+  ++m_generation;
   return m_cachedCanonicalizedURL;
 }
 
-XSSAuditor::XSSAuditor(Frame* frame) : m_frame(frame) {}
+void XSSAuditor::CachingURLCanonicalizer::clear() {
+  m_formData.clear();
+  m_inputURL = String();
+}
+
+XSSAuditor::XSSAuditor(Frame* frame)
+    : m_frame(frame), m_generationOfSuffixTree(-1) {}
 
 XSSAuditor::~XSSAuditor() {}
 
@@ -376,6 +397,13 @@ bool XSSAuditor::findInRequest(Frame* frame, const FindTask& task) const {
   const bool hasFormData = formDataObj && !formDataObj->isEmpty();
   String pageURL = frame->document()->url().string();
 
+  if (!hasFormData) {
+    // We clear out our form data caches, in case we're holding onto a bunch of
+    // memory.
+    m_formDataCache.clear();
+    m_formDataSuffixTree.clear();
+  }
+
   String canonicalizedString;
   if (!hasFormData && task.string.length() > 2 * pageURL.length()) {
     // Q: Why do we bother to do this check at all?
@@ -417,9 +445,19 @@ bool XSSAuditor::findInRequest(Frame* frame, const FindTask& task) const {
 
   if (hasFormData) {
     String decodedFormData = m_formDataCache.canonicalizeURL(
-        formDataObj->flattenToString(),
-        frame->document()->decoder()->encoding(), task.decodeEntities,
-        task.decodeURLEscapeSequencesTwice);
+        formDataObj, frame->document()->decoder()->encoding(),
+        task.decodeEntities, task.decodeURLEscapeSequencesTwice);
+
+    if (m_generationOfSuffixTree != m_formDataCache.generation()) {
+      m_formDataSuffixTree = new SuffixTree<ASCIICodebook>(decodedFormData, 5);
+      m_generationOfSuffixTree = m_formDataCache.generation();
+    }
+
+    // Try a fast-reject via the suffixTree.
+    if (m_formDataSuffixTree &&
+        !m_formDataSuffixTree->mightContain(canonicalizedString))
+      return false;
+
     if (decodedFormData.find(canonicalizedString, 0, false) != -1)
       return true;  // We found the string in the POST data.
   }
