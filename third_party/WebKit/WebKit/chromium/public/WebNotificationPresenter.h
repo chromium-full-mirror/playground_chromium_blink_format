@@ -52,19 +52,21 @@ class WebNotificationPresenter {
   };
 
   // Shows a notification.
-  virtual bool show(const WebNotification&) = 0;
+  virtual bool show(const WebNotification&) { return false; }
 
   // Cancels a notification previously shown, and removes it if being shown.
-  virtual void cancel(const WebNotification&) = 0;
+  virtual void cancel(const WebNotification&) {}
 
   // Indiciates that the notification object subscribed to events for a
   // previously shown notification is
   // being destroyed.  Does _not_ remove the notification if being shown, but
   // detaches it from receiving events.
-  virtual void objectDestroyed(const WebNotification&) = 0;
+  virtual void objectDestroyed(const WebNotification&) {}
 
   // Checks the permission level for the given origin.
-  virtual Permission checkPermission(const WebURL&) = 0;
+  virtual Permission checkPermission(const WebURL&) {
+    return PermissionNotAllowed;
+  }
 
   // Requests permission for a given origin.  This operation is asynchronous and
   // the callback provided
@@ -72,7 +74,7 @@ class WebNotificationPresenter {
   // must remain
   // valid until called.
   virtual void requestPermission(const WebSecurityOrigin&,
-                                 WebNotificationPermissionCallback*) = 0;
+                                 WebNotificationPermissionCallback*) {}
 };
 
 }  // namespace WebKit
