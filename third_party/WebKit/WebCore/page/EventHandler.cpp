@@ -66,6 +66,7 @@
 #include "SelectionController.h"
 #include "Settings.h"
 #include "TextEvent.h"
+#include "UserGestureIndicator.h"
 #include "WheelEvent.h"
 #include "htmlediting.h"  // for comparePositions()
 #include <wtf/CurrentTime.h>
@@ -1230,6 +1231,8 @@ static IntPoint documentPointForWindowPoint(Frame* frame,
 bool EventHandler::handleMousePressEvent(const PlatformMouseEvent& mouseEvent) {
   RefPtr<FrameView> protector(m_frame->view());
 
+  UserGestureIndicator gestureIndicator;
+
   cancelFakeMouseMoveEvent();
   m_mousePressed = true;
   m_capturesDragging = true;
@@ -1378,6 +1381,8 @@ bool EventHandler::handleMousePressEvent(const PlatformMouseEvent& mouseEvent) {
 bool EventHandler::handleMouseDoubleClickEvent(
     const PlatformMouseEvent& mouseEvent) {
   RefPtr<FrameView> protector(m_frame->view());
+
+  UserGestureIndicator gestureIndicator;
 
   // We get this instead of a second mouse-up
   m_mousePressed = false;
@@ -1571,6 +1576,8 @@ void EventHandler::invalidateClick() {
 bool EventHandler::handleMouseReleaseEvent(
     const PlatformMouseEvent& mouseEvent) {
   RefPtr<FrameView> protector(m_frame->view());
+
+  UserGestureIndicator gestureIndicator;
 
 #if ENABLE(PAN_SCROLLING)
   if (mouseEvent.button() == MiddleButton)
@@ -2315,6 +2322,8 @@ bool EventHandler::keyEvent(const PlatformKeyboardEvent& initialKeyEvent) {
   if (!node)
     return false;
 
+  UserGestureIndicator gestureIndicator;
+
   if (FrameView* view = m_frame->view())
     view->resetDeferredRepaintDelay();
 
@@ -2941,6 +2950,8 @@ bool EventHandler::handleTouchEvent(const PlatformTouchEvent& event) {
 
   const Vector<PlatformTouchPoint>& points = event.touchPoints();
   AtomicString* eventName = 0;
+
+  UserGestureIndicator gestureIndicator;
 
   for (unsigned i = 0; i < points.size(); ++i) {
     const PlatformTouchPoint& point = points[i];
