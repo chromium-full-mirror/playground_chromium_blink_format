@@ -98,6 +98,11 @@ class WMLSelectElement : public WMLFormControlElement, public SelectElement {
   virtual void listBoxSelectItem(int listIndex,
                                  bool allowMultiplySelections,
                                  bool shift,
+                                 bool fireOnChangeNow = true);
+
+  virtual void listBoxSelectItem(int listIndex,
+                                 bool allowMultiplySelections,
+                                 bool shift,
                                  bool fireOnChangeNow = true) {
     return;
   }
