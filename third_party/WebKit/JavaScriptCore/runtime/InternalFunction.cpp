@@ -41,7 +41,7 @@ InternalFunction::InternalFunction(JSGlobalData* globalData,
                                    const Identifier& name)
     : JSObject(structure) {
   putDirect(globalData->propertyNames->name,
-            jsString(globalData, name.ustring()),
+            jsString(globalData, name.isNull() ? "" : name.ustring()),
             DontDelete | ReadOnly | DontEnum);
 }
 

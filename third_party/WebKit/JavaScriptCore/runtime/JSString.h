@@ -124,6 +124,7 @@ class JS_EXPORTCLASS JSString : public JSCell {
         m_length(value.size()),
         m_value(value),
         m_fiberCount(0) {
+    ASSERT(!m_value.isNull());
     Heap::heap(this)->reportExtraMemoryCost(value.cost());
   }
 
@@ -132,14 +133,18 @@ class JS_EXPORTCLASS JSString : public JSCell {
       : JSCell(globalData->stringStructure.get()),
         m_length(value.size()),
         m_value(value),
-        m_fiberCount(0) {}
+        m_fiberCount(0) {
+    ASSERT(!m_value.isNull());
+  }
   JSString(JSGlobalData* globalData,
            PassRefPtr<UString::Rep> value,
            HasOtherOwnerType)
       : JSCell(globalData->stringStructure.get()),
         m_length(value->length()),
         m_value(value),
-        m_fiberCount(0) {}
+        m_fiberCount(0) {
+    ASSERT(!m_value.isNull());
+  }
   JSString(JSGlobalData* globalData, PassRefPtr<Rope> rope)
       : JSCell(globalData->stringStructure.get()),
         m_length(rope->length()),
@@ -214,6 +219,7 @@ class JS_EXPORTCLASS JSString : public JSCell {
         m_length(value.size()),
         m_value(value),
         m_fiberCount(0) {
+    ASSERT(!m_value.isNull());
     // nasty hack because we can't union non-POD types
     m_other.m_finalizerCallback = finalizer;
     m_other.m_finalizerContext = context;

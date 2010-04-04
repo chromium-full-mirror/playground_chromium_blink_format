@@ -49,7 +49,7 @@ class UString {
   typedef UStringImpl Rep;
 
  public:
-  UString();
+  UString() {}
   UString(const char*);  // Constructor for null-terminated string.
   UString(const char*, unsigned length);
   UString(const UChar*, unsigned length);
@@ -59,8 +59,6 @@ class UString {
 
   // Special constructor for cases where we overwrite an object in place.
   UString(PlacementNewAdoptType) : m_rep(PlacementNewAdopt) {}
-
-  ~UString() {}
 
   template <size_t inlineCapacity>
   static PassRefPtr<UStringImpl> adopt(Vector<UChar, inlineCapacity>& vector) {
@@ -87,14 +85,22 @@ class UString {
    */
   CString UTF8String(bool strict = false) const;
 
-  const UChar* data() const { return m_rep->characters(); }
+  const UChar* data() const {
+    if (!m_rep)
+      return 0;
+    return m_rep->characters();
+  }
 
-  bool isNull() const { return m_rep == s_nullRep; }
-  bool isEmpty() const { return !m_rep->length(); }
+  unsigned size() const {
+    if (!m_rep)
+      return 0;
+    return m_rep->length();
+  }
+
+  bool isNull() const { return !m_rep; }
+  bool isEmpty() const { return !m_rep || !m_rep->length(); }
 
   bool is8Bit() const;
-
-  unsigned size() const { return m_rep->length(); }
 
   UChar operator[](unsigned pos) const;
 
@@ -120,14 +126,17 @@ class UString {
 
   Rep* rep() const { return m_rep.get(); }
 
-  UString(PassRefPtr<Rep> r) : m_rep(r) { ASSERT(m_rep); }
+  UString(PassRefPtr<Rep> r) : m_rep(r) {}
 
-  size_t cost() const { return m_rep->cost(); }
+  size_t cost() const {
+    if (!m_rep)
+      return 0;
+    return m_rep->cost();
+  }
 
  private:
   RefPtr<Rep> m_rep;
 
-  JS_EXPORTDATA static Rep* s_nullRep;
   static UString* s_nullUString;
 
   friend void initializeUString();
@@ -176,8 +185,6 @@ inline bool operator!=(const char* s1, const UString& s2) {
 }
 
 int compare(const UString&, const UString&);
-
-inline UString::UString() : m_rep(s_nullRep) {}
 
 // Rule from ECMA 15.2 about what an array index is.
 // Must exactly match string form of an unsigned integer, and be less than 2^32
