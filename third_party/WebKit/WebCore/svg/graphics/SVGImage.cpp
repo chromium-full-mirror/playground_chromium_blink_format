@@ -67,7 +67,7 @@ class SVGImageChromeClient : public EmptyChromeClient, public Noncopyable {
  private:
   virtual void chromeDestroyed() { m_image = 0; }
 
-  virtual void repaint(const IntRect& r, bool, bool, bool) {
+  virtual void invalidateContentsAndWindow(const IntRect& r, bool) {
     if (m_image && m_image->imageObserver())
       m_image->imageObserver()->changedInRect(m_image, r);
   }
