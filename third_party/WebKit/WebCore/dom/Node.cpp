@@ -2627,7 +2627,7 @@ bool Node::dispatchGenericEvent(PassRefPtr<Event> prpEvent) {
 #if ENABLE(INSPECTOR)
   Page* inspectedPage =
       InspectorTimelineAgent::instanceCount() ? document()->page() : 0;
-  if (inspectedPage)
+  if (inspectedPage) {
     if (InspectorTimelineAgent* timelineAgent =
             eventHasListeners(event->type(), targetForWindowEvents, this,
                               ancestors)
@@ -2636,6 +2636,7 @@ bool Node::dispatchGenericEvent(PassRefPtr<Event> prpEvent) {
       timelineAgent->willDispatchEvent(*event);
     else
       inspectedPage = 0;
+  }
 #endif
 
   // Give the target node a chance to do some work before DOM event handlers get
