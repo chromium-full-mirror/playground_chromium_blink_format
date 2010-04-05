@@ -296,6 +296,7 @@ class AccessibilityRenderObject : public AccessibilityObject {
                                                     const IntPoint&) const;
   AccessibilityObject* accessibilityParentForImageMap(
       HTMLMapElement* map) const;
+  bool renderObjectIsObservable(RenderObject*) const;
 
   void ariaSelectedRows(AccessibilityChildrenVector&);
 

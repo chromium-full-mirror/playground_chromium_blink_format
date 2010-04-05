@@ -644,7 +644,8 @@ void Element::updateAfterAttributeChanged(Attribute* attr) {
     // If the content of an element changes due to an attribute change, notify
     // accessibility.
     document()->axObjectCache()->contentChanged(renderer());
-  }
+  } else if (attrName == aria_selectedAttr)
+    document()->axObjectCache()->selectedChildrenChanged(renderer());
 }
 
 void Element::recalcStyleIfNeededAfterAttributeChanged(Attribute* attr) {

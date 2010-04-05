@@ -138,6 +138,8 @@ class AXObjectCache : public Noncopyable {
                         bool postToElement,
                         PostType = PostAsynchronously);
 
+  bool nodeHasRole(Node*, const AtomicString& role);
+
  protected:
   void postPlatformNotification(AccessibilityObject*, AXNotification);
 
@@ -157,7 +159,6 @@ class AXObjectCache : public Noncopyable {
   static AccessibilityObject* focusedImageMapUIElement(HTMLAreaElement*);
 
   AXID getAXID(AccessibilityObject*);
-  bool nodeIsAriaType(Node*, String role);
 };
 
 #if !HAVE(ACCESSIBILITY)
