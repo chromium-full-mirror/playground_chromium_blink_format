@@ -76,9 +76,8 @@ String Location::host() const {
   // "The hostname property is the concatenation of the host and port
   // properties, separated by a colon."
   const KURL& url = this->url();
-  return url.port()
-             ? url.host() + ":" + String::number((static_cast<int>(url.port())))
-             : url.host();
+  return url.port() ? url.host() + ":" + String::number(url.port())
+                    : url.host();
 }
 
 String Location::hostname() const {
@@ -93,7 +92,7 @@ String Location::port() const {
     return String();
 
   const KURL& url = this->url();
-  return url.port() ? String::number(static_cast<int>(url.port())) : "";
+  return url.port() ? String::number(url.port()) : "";
 }
 
 String Location::pathname() const {
