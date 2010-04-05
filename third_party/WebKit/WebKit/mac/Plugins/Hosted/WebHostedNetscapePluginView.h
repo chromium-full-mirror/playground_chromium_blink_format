@@ -46,7 +46,6 @@ class NetscapePluginInstanceProxy;
 
   NSSize _previousSize;
   RefPtr<WebKit::NetscapePluginInstanceProxy> _proxy;
-  BOOL _pluginHostDied;
 }
 
 - (id)initWithFrame:(NSRect)r

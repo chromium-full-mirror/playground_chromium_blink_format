@@ -35,12 +35,8 @@ class RenderEmbeddedObject : public RenderPartObject {
   virtual ~RenderEmbeddedObject();
 
   void updateWidget(bool onlyCreateNonNetscapePlugins);
-  void setShowsMissingPluginIndicator(bool showsMissingPluginIndicator) {
-    m_showsMissingPluginIndicator = showsMissingPluginIndicator;
-  }
-  bool showsMissingPluginIndicator() const {
-    return m_showsMissingPluginIndicator;
-  }
+  void setShowsMissingPluginIndicator();
+  void setShowsCrashedPluginIndicator();
 #if USE(ACCELERATED_COMPOSITING)
   virtual bool allowsAcceleratedCompositing() const;
 #endif
@@ -57,7 +53,7 @@ class RenderEmbeddedObject : public RenderPartObject {
 #endif
 
   virtual void layout();
-  bool m_showsMissingPluginIndicator;
+  String m_replacementText;
 };
 
 inline RenderEmbeddedObject* toRenderEmbeddedObject(RenderObject* object) {

@@ -59,14 +59,14 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-static const float missingPluginRoundedRectHeight = 18;
-static const float missingPluginRoundedRectLeftRightTextMargin = 6;
-static const float missingPluginRoundedRectOpacity = 0.20f;
-static const float missingPluginRoundedRectRadius = 5;
-static const float missingPluginTextOpacity = 0.55f;
+static const float replacementTextRoundedRectHeight = 18;
+static const float replacementTextRoundedRectLeftRightTextMargin = 6;
+static const float replacementTextRoundedRectOpacity = 0.20f;
+static const float replacementTextRoundedRectRadius = 5;
+static const float replacementTextTextOpacity = 0.55f;
 
 RenderEmbeddedObject::RenderEmbeddedObject(Element* element)
-    : RenderPartObject(element), m_showsMissingPluginIndicator(false) {
+    : RenderPartObject(element) {
   view()->frameView()->setIsVisuallyNonEmpty();
 }
 
@@ -155,7 +155,7 @@ static void mapDataParamToSrc(Vector<String>* paramNames,
 }
 
 void RenderEmbeddedObject::updateWidget(bool onlyCreateNonNetscapePlugins) {
-  if (m_showsMissingPluginIndicator ||
+  if (!m_replacementText.isNull() ||
       !node())  // Check the node in case destroy() has been called.
     return;
 
@@ -361,8 +361,16 @@ void RenderEmbeddedObject::updateWidget(bool onlyCreateNonNetscapePlugins) {
 #endif
 }
 
+void RenderEmbeddedObject::setShowsMissingPluginIndicator() {
+  m_replacementText = missingPluginText();
+}
+
+void RenderEmbeddedObject::setShowsCrashedPluginIndicator() {
+  m_replacementText = crashedPluginText();
+}
+
 void RenderEmbeddedObject::paint(PaintInfo& paintInfo, int tx, int ty) {
-  if (m_showsMissingPluginIndicator) {
+  if (!m_replacementText.isNull()) {
     RenderReplaced::paint(paintInfo, tx, ty);
     return;
   }
@@ -371,7 +379,7 @@ void RenderEmbeddedObject::paint(PaintInfo& paintInfo, int tx, int ty) {
 }
 
 void RenderEmbeddedObject::paintReplaced(PaintInfo& paintInfo, int tx, int ty) {
-  if (!m_showsMissingPluginIndicator)
+  if (!m_replacementText)
     return;
 
   if (paintInfo.phase == PaintPhaseSelection)
@@ -397,39 +405,39 @@ void RenderEmbeddedObject::paintReplaced(PaintInfo& paintInfo, int tx, int ty) {
   Font font(fontDescription, 0, 0);
   font.update(0);
 
-  String label = missingPluginText();
-  TextRun run(label.characters(), label.length());
+  TextRun run(m_replacementText.characters(), m_replacementText.length());
   run.disableRoundingHacks();
   float textWidth = font.floatWidth(run);
 
-  FloatRect missingPluginRect;
-  missingPluginRect.setSize(
-      FloatSize(textWidth + missingPluginRoundedRectLeftRightTextMargin * 2,
-                missingPluginRoundedRectHeight));
-  missingPluginRect.setLocation(FloatPoint(
-      (pluginRect.size().width() / 2 - missingPluginRect.size().width() / 2) +
+  FloatRect replacementTextRect;
+  replacementTextRect.setSize(
+      FloatSize(textWidth + replacementTextRoundedRectLeftRightTextMargin * 2,
+                replacementTextRoundedRectHeight));
+  replacementTextRect.setLocation(FloatPoint(
+      (pluginRect.size().width() / 2 - replacementTextRect.size().width() / 2) +
           pluginRect.location().x(),
-      (pluginRect.size().height() / 2 - missingPluginRect.size().height() / 2) +
+      (pluginRect.size().height() / 2 -
+       replacementTextRect.size().height() / 2) +
           pluginRect.location().y()));
 
   Path path = Path::createRoundedRectangle(
-      missingPluginRect, FloatSize(missingPluginRoundedRectRadius,
-                                   missingPluginRoundedRectRadius));
+      replacementTextRect, FloatSize(replacementTextRoundedRectRadius,
+                                     replacementTextRoundedRectRadius));
   context->save();
   context->clip(pluginRect);
   context->beginPath();
   context->addPath(path);
-  context->setAlpha(missingPluginRoundedRectOpacity);
+  context->setAlpha(replacementTextRoundedRectOpacity);
   context->setFillColor(Color::white, style()->colorSpace());
   context->fillPath();
 
   FloatPoint labelPoint(
-      roundf(missingPluginRect.location().x() +
-             (missingPluginRect.size().width() - textWidth) / 2),
-      roundf(missingPluginRect.location().y() +
-             (missingPluginRect.size().height() - font.height()) / 2 +
+      roundf(replacementTextRect.location().x() +
+             (replacementTextRect.size().width() - textWidth) / 2),
+      roundf(replacementTextRect.location().y() +
+             (replacementTextRect.size().height() - font.height()) / 2 +
              font.ascent()));
-  context->setAlpha(missingPluginTextOpacity);
+  context->setAlpha(replacementTextTextOpacity);
   context->setFillColor(Color::black, style()->colorSpace());
   context->drawBidiText(font, run, labelPoint);
   context->restore();

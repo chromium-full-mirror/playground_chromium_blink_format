@@ -154,6 +154,11 @@ String missingPluginText() {
   return String("Missing Plug-in");
 }
 
+String crashedPluginText() {
+  notImplemented();
+  return String("Plug-in Failure");
+}
+
 String multipleFileUploadText(unsigned numberOfFiles) {
   return query(WebLocalizedString::MultipleFileUploadText, numberOfFiles);
 }

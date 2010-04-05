@@ -1516,7 +1516,7 @@ bool FrameLoader::loadPlugin(RenderEmbeddedObject* renderer,
       renderer->node()->setNeedsStyleRecalc(SyntheticStyleChange);
 #endif
     } else
-      renderer->setShowsMissingPluginIndicator(true);
+      renderer->setShowsMissingPluginIndicator();
   }
 
   return widget != 0;

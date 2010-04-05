@@ -356,6 +356,11 @@ String missingPluginText() {
       "Label text to be used when a plug-in is missing");
 }
 
+String crashedPluginText() {
+  notImplemented();
+  return String();
+}
+
 String multipleFileUploadText(unsigned) {
   return String();
 }
