@@ -110,7 +110,9 @@ struct FocusCandidate {
   RectsAlignment parentAlignment;
 };
 
-long long distanceInDirection(Node*, Node*, FocusDirection, FocusCandidate&);
+void distanceDataForNode(FocusDirection direction,
+                         Node* start,
+                         FocusCandidate& candidate);
 bool scrollInDirection(Frame*, FocusDirection);
 void scrollIntoView(Element*);
 bool hasOffscreenRect(Node*);
