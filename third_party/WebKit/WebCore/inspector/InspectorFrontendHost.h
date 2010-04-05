@@ -71,8 +71,6 @@ class InspectorFrontendHost : public RefCounted<InspectorFrontendHost> {
 
   String localizedStringsURL();
   String hiddenPanels();
-  const String& platform() const;
-  const String& port() const;
 
   void copyText(const String& text);
 
