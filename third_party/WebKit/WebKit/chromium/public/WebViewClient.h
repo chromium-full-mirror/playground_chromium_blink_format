@@ -48,7 +48,6 @@ class WebDragData;
 class WebFileChooserCompletion;
 class WebFrame;
 class WebGeolocationService;
-class WebImage;
 class WebNode;
 class WebNotificationPresenter;
 class WebRange;
@@ -239,10 +238,9 @@ class WebViewClient : virtual public WebWidgetClient {
   virtual void showContextMenu(WebFrame*, const WebContextMenuData&) {}
 
   // Called when a drag-n-drop operation should begin.
-  virtual void startDragging(const WebDragData&,
-                             WebDragOperationsMask,
-                             const WebImage&,
-                             const WebPoint&) {}
+  virtual void startDragging(const WebPoint& from,
+                             const WebDragData&,
+                             WebDragOperationsMask) {}
 
   // Called to determine if drag-n-drop operations may initiate a page
   // navigation.

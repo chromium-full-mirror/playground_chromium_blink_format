@@ -31,28 +31,22 @@
 #include "config.h"
 #include "DragImage.h"
 
-#include "Image.h"
-#include "NativeImageSkia.h"
 #include "NotImplemented.h"
-#include "RefPtr.h"
-#include "SkBitmap.h"
 
 namespace WebCore {
 
 IntSize dragImageSize(DragImageRef image) {
-  if (!image)
-    return IntSize();
-
-  return IntSize(image->width(), image->height());
+  notImplemented();
+  return IntSize();
 }
 
 void deleteDragImage(DragImageRef image) {
-  delete image;
+  notImplemented();
 }
 
 DragImageRef scaleDragImage(DragImageRef image, FloatSize scale) {
   notImplemented();
-  return image;
+  return 0;
 }
 
 DragImageRef dissolveDragImageToFraction(DragImageRef image, float) {
@@ -60,8 +54,9 @@ DragImageRef dissolveDragImageToFraction(DragImageRef image, float) {
   return image;
 }
 
-DragImageRef createDragImageFromImage(Image* image) {
-  return new SkBitmap(*image->nativeImageForCurrentFrame());
+DragImageRef createDragImageFromImage(Image* img) {
+  notImplemented();
+  return 0;
 }
 
 DragImageRef createDragImageIconForCachedImage(CachedImage*) {
