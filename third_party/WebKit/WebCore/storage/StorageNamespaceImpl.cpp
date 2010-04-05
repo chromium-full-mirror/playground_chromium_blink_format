@@ -121,7 +121,9 @@ PassRefPtr<StorageArea> StorageNamespaceImpl::storageArea(
 
 void StorageNamespaceImpl::close() {
   ASSERT(isMainThread());
-  ASSERT(!m_isShutdown);
+
+  if (m_isShutdown)
+    return;
 
   // If we're session storage, we shouldn't need to do any work here.
   if (m_storageType == SessionStorage) {
