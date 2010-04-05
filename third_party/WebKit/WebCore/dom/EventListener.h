@@ -48,6 +48,13 @@ class EventListener : public RefCounted<EventListener> {
   virtual ~EventListener() {}
   virtual bool operator==(const EventListener&) = 0;
   virtual void handleEvent(ScriptExecutionContext*, Event*) = 0;
+  // Return true to indicate that the error is handled.
+  virtual bool reportError(ScriptExecutionContext*,
+                           const String& /*message*/,
+                           const String& /*url*/,
+                           int /*lineNumber*/) {
+    return false;
+  }
   virtual bool wasCreatedFromMarkup() const { return false; }
 
 #if USE(JSC)

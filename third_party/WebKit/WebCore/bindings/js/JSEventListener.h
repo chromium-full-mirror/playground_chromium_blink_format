@@ -64,6 +64,10 @@ class JSEventListener : public EventListener {
   virtual void markJSFunction(JSC::MarkStack&);
   virtual void invalidateJSFunction(JSC::JSObject*);
   virtual void handleEvent(ScriptExecutionContext*, Event*);
+  virtual bool reportError(ScriptExecutionContext*,
+                           const String& message,
+                           const String& url,
+                           int lineNumber);
   virtual bool virtualisAttribute() const;
 
  protected:

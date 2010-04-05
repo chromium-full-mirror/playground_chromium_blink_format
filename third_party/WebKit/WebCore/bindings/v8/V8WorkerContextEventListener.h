@@ -53,13 +53,16 @@ class V8WorkerContextEventListener : public V8EventListener {
   }
 
   virtual void handleEvent(ScriptExecutionContext*, Event*);
+  virtual bool reportError(ScriptExecutionContext*,
+                           const String& message,
+                           const String& url,
+                           int lineNumber);
 
- protected:
+ private:
   V8WorkerContextEventListener(v8::Local<v8::Object> listener,
                                bool isInline,
                                const WorldContextHandle& worldContext);
 
- private:
   virtual v8::Local<v8::Value> callListenerFunction(
       ScriptExecutionContext*,
       v8::Handle<v8::Value> jsEvent,

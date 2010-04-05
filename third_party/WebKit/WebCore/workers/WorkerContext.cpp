@@ -32,10 +32,9 @@
 #include "WorkerContext.h"
 
 #include "ActiveDOMObject.h"
+#include "Database.h"
 #include "DOMTimer.h"
 #include "DOMWindow.h"
-#include "Database.h"
-#include "ErrorEvent.h"
 #include "Event.h"
 #include "EventException.h"
 #include "MessagePort.h"
@@ -66,8 +65,7 @@ WorkerContext::WorkerContext(const KURL& url,
       m_userAgent(userAgent),
       m_script(new WorkerScriptController(this)),
       m_thread(thread),
-      m_closing(false),
-      m_reportingException(false) {
+      m_closing(false) {
   setSecurityOrigin(SecurityOrigin::create(url));
 }
 
@@ -228,16 +226,10 @@ void WorkerContext::reportException(const String& errorMessage,
                                     int lineNumber,
                                     const String& sourceURL) {
   bool errorHandled = false;
-  if (!m_reportingException) {
-    if (onerror()) {
-      m_reportingException = true;
-      RefPtr<ErrorEvent> errorEvent(
-          ErrorEvent::create(errorMessage, sourceURL, lineNumber));
-      onerror()->handleEvent(this, errorEvent.get());
-      errorHandled = errorEvent->defaultPrevented();
-      m_reportingException = false;
-    }
-  }
+  if (onerror())
+    errorHandled =
+        onerror()->reportError(this, errorMessage, sourceURL, lineNumber);
+
   if (!errorHandled)
     thread()->workerReportingProxy().postExceptionToWorkerObject(
         errorMessage, lineNumber, sourceURL);
