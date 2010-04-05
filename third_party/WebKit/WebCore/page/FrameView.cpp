@@ -408,6 +408,7 @@ void FrameView::adjustViewSize() {
   RenderView* root = m_frame->contentRenderer();
   if (!root)
     return;
+
   setContentsSize(
       IntSize(root->rightLayoutOverflow(), root->bottomLayoutOverflow()));
 }
@@ -1283,12 +1284,15 @@ void FrameView::scheduleRelayout() {
   if (!m_frame->document()->shouldScheduleLayout())
     return;
 
-  // When frameset flattening is enabled, the contents of the frame affects
-  // layout of the parent frames.
+  // When frame flattening is enabled, the contents of the frame affects layout
+  // of the parent frames.
   // Also invalidate parent frame starting from the owner element of this frame.
   if (m_frame->settings()->frameFlatteningEnabled() &&
-      m_frame->ownerRenderer() && m_frame->ownerElement()->hasTagName(frameTag))
-    m_frame->ownerRenderer()->setNeedsLayout(true, true);
+      m_frame->ownerRenderer()) {
+    if (m_frame->ownerElement()->hasTagName(iframeTag) ||
+        m_frame->ownerElement()->hasTagName(frameTag))
+      m_frame->ownerRenderer()->setNeedsLayout(true, true);
+  }
 
   int delay = m_frame->document()->minimumLayoutDelay();
   if (m_layoutTimer.isActive() && m_delayedLayout && !delay)
