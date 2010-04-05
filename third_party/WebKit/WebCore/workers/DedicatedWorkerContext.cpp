@@ -79,10 +79,8 @@ void DedicatedWorkerContext::postMessage(
 }
 
 void DedicatedWorkerContext::importScripts(const Vector<String>& urls,
-                                           const String& callerURL,
-                                           int callerLine,
                                            ExceptionCode& ec) {
-  Base::importScripts(urls, callerURL, callerLine, ec);
+  Base::importScripts(urls, ec);
   thread()->workerObjectProxy().reportPendingActivity(hasPendingActivity());
 }
 

@@ -94,10 +94,7 @@ class WorkerContext : public RefCounted<WorkerContext>,
   DEFINE_ATTRIBUTE_EVENT_LISTENER(error);
 
   // WorkerUtils
-  virtual void importScripts(const Vector<String>& urls,
-                             const String& callerURL,
-                             int callerLine,
-                             ExceptionCode&);
+  virtual void importScripts(const Vector<String>& urls, ExceptionCode&);
   WorkerNavigator* navigator() const;
 
   // Timers
