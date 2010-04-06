@@ -62,6 +62,10 @@ class wxKeyEvent;
 class BMessage;
 #endif
 
+#if PLATFORM(EFL)
+#include <Evas.h>
+#endif
+
 #if PLATFORM(BREWMP)
 typedef unsigned short uint16;
 typedef unsigned long int uint32;
@@ -204,6 +208,11 @@ class PlatformKeyboardEvent : public FastAllocBase {
 
 #if PLATFORM(WIN) || PLATFORM(CHROMIUM)
   bool isSystemKey() const { return m_isSystemKey; }
+#endif
+
+#if PLATFORM(EFL)
+  PlatformKeyboardEvent(const Evas_Event_Key_Down*);
+  PlatformKeyboardEvent(const Evas_Event_Key_Up*);
 #endif
 
  protected:
