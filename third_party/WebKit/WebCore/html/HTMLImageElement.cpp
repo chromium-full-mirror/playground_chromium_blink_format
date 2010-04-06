@@ -412,4 +412,9 @@ void HTMLImageElement::addSubresourceAttributeURLs(
   // FIXME: What about when the usemap attribute begins with "#"?
   addSubresourceURL(urls, document()->completeURL(getAttribute(usemapAttr)));
 }
+
+void HTMLImageElement::willMoveToNewOwnerDocument() {
+  m_imageLoader.elementWillMoveToNewOwnerDocument();
+  HTMLElement::willMoveToNewOwnerDocument();
+}
 }

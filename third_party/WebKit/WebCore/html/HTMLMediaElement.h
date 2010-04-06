@@ -198,6 +198,9 @@ class HTMLMediaElement : public HTMLElement,
   virtual void parseMappedAttribute(MappedAttribute*);
   virtual void attach();
 
+  virtual void willMoveToNewOwnerDocument();
+  virtual void didMoveToNewOwnerDocument();
+
  private:
   virtual bool checkDTD(const Node* newChild);
   virtual void attributeChanged(Attribute*, bool preserveDecls);
@@ -219,9 +222,6 @@ class HTMLMediaElement : public HTMLElement,
 
   void setReadyState(MediaPlayer::ReadyState);
   void setNetworkState(MediaPlayer::NetworkState);
-
-  virtual void willMoveToNewOwnerDocument();
-  virtual void didMoveToNewOwnerDocument();
 
   virtual Document* mediaPlayerOwningDocument();
   virtual void mediaPlayerNetworkStateChanged(MediaPlayer*);

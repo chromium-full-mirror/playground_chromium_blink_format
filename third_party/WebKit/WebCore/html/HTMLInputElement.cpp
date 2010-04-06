@@ -2568,6 +2568,9 @@ void HTMLInputElement::documentDidBecomeActive() {
 }
 
 void HTMLInputElement::willMoveToNewOwnerDocument() {
+  if (m_imageLoader)
+    m_imageLoader->elementWillMoveToNewOwnerDocument();
+
   // Always unregister for cache callbacks when leaving a document, even if we
   // would otherwise like to be registered
   if (needsActivationCallback())

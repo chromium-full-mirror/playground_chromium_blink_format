@@ -85,6 +85,7 @@ class HTMLVideoElement : public HTMLMediaElement {
 
   virtual bool hasAvailableVideoFrame() const;
   virtual void updatePosterImage();
+  virtual void willMoveToNewOwnerDocument();
 
   OwnPtr<HTMLImageLoader> m_imageLoader;
   KURL m_posterURL;

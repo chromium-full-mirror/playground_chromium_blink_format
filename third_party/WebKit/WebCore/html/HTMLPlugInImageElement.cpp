@@ -33,8 +33,6 @@ HTMLPlugInImageElement::HTMLPlugInImageElement(const QualifiedName& tagName,
                                                Document* document)
     : HTMLPlugInElement(tagName, document) {}
 
-HTMLPlugInImageElement::~HTMLPlugInImageElement() {}
-
 bool HTMLPlugInImageElement::isImageType() {
   if (m_serviceType.isEmpty() && protocolIs(m_url, "data"))
     m_serviceType = mimeTypeFromDataURL(m_url);
@@ -46,6 +44,12 @@ bool HTMLPlugInImageElement::isImageType() {
   }
 
   return Image::supportsType(m_serviceType);
+}
+
+void HTMLPlugInImageElement::willMoveToNewOwnerDocument() {
+  if (m_imageLoader)
+    m_imageLoader->elementWillMoveToNewOwnerDocument();
+  HTMLPlugInElement::willMoveToNewOwnerDocument();
 }
 
 }  // namespace WebCore

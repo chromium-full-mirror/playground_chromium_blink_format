@@ -62,6 +62,8 @@ class SVGImageElement : public SVGStyledTransformableElement,
   virtual bool hasRelativeValues() const;
 
  private:
+  virtual void willMoveToNewOwnerDocument();
+
   DECLARE_ANIMATED_PROPERTY(SVGImageElement, SVGNames::xAttr, SVGLength, X, x)
   DECLARE_ANIMATED_PROPERTY(SVGImageElement, SVGNames::yAttr, SVGLength, Y, y)
   DECLARE_ANIMATED_PROPERTY(SVGImageElement,

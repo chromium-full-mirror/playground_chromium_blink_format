@@ -175,6 +175,11 @@ void SVGImageElement::addSubresourceAttributeURLs(
 
   addSubresourceURL(urls, document()->completeURL(href()));
 }
+
+void SVGImageElement::willMoveToNewOwnerDocument() {
+  m_imageLoader.elementWillMoveToNewOwnerDocument();
+  SVGStyledTransformableElement::willMoveToNewOwnerDocument();
+}
 }
 
 #endif  // ENABLE(SVG)

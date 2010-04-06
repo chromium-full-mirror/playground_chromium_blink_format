@@ -48,6 +48,8 @@ class ImageLoader : public CachedResourceClient {
   // behavior).
   void updateFromElementIgnoringPreviousError();
 
+  void elementWillMoveToNewOwnerDocument();
+
   Element* element() const { return m_element; }
   bool imageComplete() const { return m_imageComplete; }
 
