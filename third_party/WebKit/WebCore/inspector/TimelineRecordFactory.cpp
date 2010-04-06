@@ -60,6 +60,14 @@ ScriptObject TimelineRecordFactory::createGenericRecord(
   return record;
 }
 
+ScriptObject TimelineRecordFactory::createGCEventData(
+    InspectorFrontend* frontend,
+    const size_t usedHeapSizeDelta) {
+  ScriptObject data = frontend->newScriptObject();
+  data.set("usedHeapSizeDelta", usedHeapSizeDelta);
+  return data;
+}
+
 ScriptObject TimelineRecordFactory::createFunctionCallData(
     InspectorFrontend* frontend,
     const String& scriptName,

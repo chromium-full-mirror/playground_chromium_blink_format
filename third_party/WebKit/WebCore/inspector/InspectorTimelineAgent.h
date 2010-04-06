@@ -35,6 +35,8 @@
 
 #include "Document.h"
 #include "ScriptExecutionContext.h"
+#include "ScriptGCEvent.h"
+#include "ScriptGCEventListener.h"
 #include "ScriptObject.h"
 #include "ScriptArray.h"
 #include <wtf/Vector.h>
@@ -65,9 +67,10 @@ enum TimelineRecordType {
   ResourceFinishTimelineRecordType = 14,
   FunctionCallTimelineRecordType = 15,
   ReceiveResourceDataTimelineRecordType = 16,
+  GCEventTimelineRecordType = 17,
 };
 
-class InspectorTimelineAgent : public Noncopyable {
+class InspectorTimelineAgent : ScriptGCEventListener, public Noncopyable {
  public:
   InspectorTimelineAgent(InspectorFrontend* frontend);
   ~InspectorTimelineAgent();
@@ -118,6 +121,8 @@ class InspectorTimelineAgent : public Noncopyable {
   void willReceiveResourceData(unsigned long identifier);
   void didReceiveResourceData();
 
+  virtual void didGC(double, double, size_t);
+
   static int instanceCount() { return s_instanceCount; }
   static InspectorTimelineAgent* retrieve(ScriptExecutionContext*);
 
@@ -135,17 +140,29 @@ class InspectorTimelineAgent : public Noncopyable {
   };
 
   void pushCurrentRecord(ScriptObject, TimelineRecordType);
-
-  static double currentTimeInMilliseconds();
+  void setHeapSizeStatistic(ScriptObject record);
 
   void didCompleteCurrentRecord(TimelineRecordType);
 
   void addRecordToTimeline(ScriptObject, TimelineRecordType);
 
+  void pushGCEventRecords();
+
   InspectorFrontend* m_frontend;
 
   Vector<TimelineRecordEntry> m_recordStack;
   static int s_instanceCount;
+  struct GCEvent {
+    GCEvent(double startTime, double endTime, size_t collectedBytes)
+        : startTime(startTime),
+          endTime(endTime),
+          collectedBytes(collectedBytes) {}
+    double startTime;
+    double endTime;
+    size_t collectedBytes;
+  };
+  typedef Vector<GCEvent> GCEvents;
+  GCEvents m_gcEvents;
 };
 
 inline InspectorTimelineAgent* InspectorTimelineAgent::retrieve(

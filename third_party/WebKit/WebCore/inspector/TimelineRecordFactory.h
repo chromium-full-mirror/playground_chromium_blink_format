@@ -46,6 +46,9 @@ class TimelineRecordFactory {
  public:
   static ScriptObject createGenericRecord(InspectorFrontend*, double startTime);
 
+  static ScriptObject createGCEventData(InspectorFrontend* frontend,
+                                        const size_t usedHeapSizeDelta);
+
   static ScriptObject createFunctionCallData(InspectorFrontend*,
                                              const String& scriptName,
                                              int scriptLine);
