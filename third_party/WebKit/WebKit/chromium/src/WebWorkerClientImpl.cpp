@@ -231,10 +231,9 @@ void WebWorkerClientImpl::postExceptionToWorkerObject(
     return;
   }
 
-  bool handled = false;
-  handled = m_worker->dispatchEvent(
+  bool unhandled = m_worker->dispatchEvent(
       ErrorEvent::create(errorMessage, sourceURL, lineNumber));
-  if (!handled)
+  if (unhandled)
     m_scriptExecutionContext->reportException(errorMessage, lineNumber,
                                               sourceURL);
 }
