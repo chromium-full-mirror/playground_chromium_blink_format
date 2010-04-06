@@ -104,6 +104,7 @@ class WebNode {
                                       WebEventListener* listener,
                                       bool useCapture);
   WEBKIT_API void simulateClick();
+  WEBKIT_API WebNodeList getElementsByTagName(const WebString&) const;
 
   // Deprecated. Use to() instead.
   template <typename T>
