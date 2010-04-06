@@ -59,13 +59,12 @@ class InspectorFrontendHost : public RefCounted<InspectorFrontendHost> {
   void disconnectClient();
 
   void loaded();
-  void attach();
-  void detach();
+  void requestAttachWindow();
+  void requestDetachWindow();
   void closeWindow();
   void bringToFront();
   void inspectedURLChanged(const String&);
 
-  bool canAttachWindow() const;
   void setAttachedWindowHeight(unsigned height);
   void moveWindowBy(float x, float y) const;
 

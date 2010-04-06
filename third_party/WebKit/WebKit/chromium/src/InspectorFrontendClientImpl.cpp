@@ -91,16 +91,12 @@ void InspectorFrontendClientImpl::closeWindow() {
   m_client->closeWindow();
 }
 
-bool InspectorFrontendClientImpl::canAttachWindow() {
-  return true;
+void InspectorFrontendClientImpl::requestAttachWindow() {
+  m_client->requestDockWindow();
 }
 
-void InspectorFrontendClientImpl::attachWindow() {
-  m_client->dockWindow();
-}
-
-void InspectorFrontendClientImpl::detachWindow() {
-  m_client->undockWindow();
+void InspectorFrontendClientImpl::requestDetachWindow() {
+  m_client->requestUndockWindow();
 }
 
 void InspectorFrontendClientImpl::changeAttachedWindowHeight(unsigned) {
