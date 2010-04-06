@@ -38,12 +38,12 @@
 
 namespace WebCore {
 
-class LayerSkia;
+class LayerChromium;
 
-class GraphicsLayerSkia : public GraphicsLayer {
+class GraphicsLayerChromium : public GraphicsLayer {
  public:
-  GraphicsLayerSkia(GraphicsLayerClient*);
-  virtual ~GraphicsLayerSkia();
+  GraphicsLayerChromium(GraphicsLayerClient*);
+  virtual ~GraphicsLayerChromium();
 
   virtual void setName(const String&);
 
@@ -102,11 +102,11 @@ class GraphicsLayerSkia : public GraphicsLayer {
  private:
   void updateOpacityOnLayer();
 
-  LayerSkia* primaryLayer() const {
+  LayerChromium* primaryLayer() const {
     return m_transformLayer.get() ? m_transformLayer.get() : m_layer.get();
   }
-  LayerSkia* hostLayerForSublayers() const;
-  LayerSkia* layerForSuperlayer() const;
+  LayerChromium* hostLayerForSublayers() const;
+  LayerChromium* layerForSuperlayer() const;
 
   void updateSublayerList();
   void updateLayerPosition();
@@ -126,12 +126,12 @@ class GraphicsLayerSkia : public GraphicsLayer {
   void updateContentsRect();
   void updateGeometryOrientation();
 
-  void setupContentsLayer(LayerSkia*);
-  LayerSkia* contentsLayer() const { return m_contentsLayer.get(); }
+  void setupContentsLayer(LayerChromium*);
+  LayerChromium* contentsLayer() const { return m_contentsLayer.get(); }
 
-  RefPtr<LayerSkia> m_layer;
-  RefPtr<LayerSkia> m_transformLayer;
-  RefPtr<LayerSkia> m_contentsLayer;
+  RefPtr<LayerChromium> m_layer;
+  RefPtr<LayerChromium> m_transformLayer;
+  RefPtr<LayerChromium> m_contentsLayer;
 
   enum ContentsLayerPurpose {
     NoContentsLayer = 0,

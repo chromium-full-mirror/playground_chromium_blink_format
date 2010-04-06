@@ -464,7 +464,7 @@ class WebViewImpl : public WebView, public RefCounted<WebViewImpl> {
   bool m_haveMouseCapture;
 
 #if USE(ACCELERATED_COMPOSITING)
-  OwnPtr<WebCore::LayerRendererSkia> m_layerRenderer;
+  OwnPtr<WebCore::LayerRendererChromium> m_layerRenderer;
   bool m_isAcceleratedCompositing;
 #endif
   static const WebInputEvent* m_currentInputEvent;
