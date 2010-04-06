@@ -29,6 +29,9 @@
  */
 
 #include "config.h"
+
+#if ENABLE(WORKERS)
+
 #include "JSWorkerContextErrorHandler.h"
 
 #include "ErrorEvent.h"
@@ -113,3 +116,5 @@ void JSWorkerContextErrorHandler::handleEvent(
 }
 
 }  // namespace WebCore
+
+#endif  // ENABLE(WORKERS)
