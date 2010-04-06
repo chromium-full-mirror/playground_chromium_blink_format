@@ -53,7 +53,9 @@
 #include <QNetworkRequest>
 #include <QPaintDevice>
 #include <QPaintEngine>
+#ifndef QT_NO_PRINTER
 #include <QPrinter>
+#endif
 #include <QUndoStack>
 #include <QUrl>
 
@@ -119,6 +121,7 @@ void NetworkAccessManager::sslErrorsEncountered(
 }
 #endif
 
+#ifndef QT_NO_PRINTER
 class NullPrinter : public QPrinter {
  public:
   class NullPaintEngine : public QPaintEngine {
@@ -138,6 +141,7 @@ class NullPrinter : public QPrinter {
 
   NullPaintEngine m_engine;
 };
+#endif
 
 WebPage::WebPage(QObject* parent, DumpRenderTree* drt)
     : QWebPage(parent), m_webInspector(0), m_drt(drt) {
@@ -422,8 +426,10 @@ static void clearHistory(QWebPage* page) {
 }
 
 void DumpRenderTree::dryRunPrint(QWebFrame* frame) {
+#ifndef QT_NO_PRINTER
   NullPrinter printer;
   frame->print(&printer);
+#endif
 }
 
 void DumpRenderTree::resetToConsistentStateBeforeTesting() {
