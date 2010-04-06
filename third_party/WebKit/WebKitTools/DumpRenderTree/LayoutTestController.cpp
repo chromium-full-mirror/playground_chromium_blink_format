@@ -1983,6 +1983,23 @@ static JSValueRef apiTestGoToCurrentBackForwardItemCallback(
   return JSValueMakeUndefined(context);
 }
 
+static JSValueRef setWebViewEditableCallback(JSContextRef context,
+                                             JSObjectRef function,
+                                             JSObjectRef thisObject,
+                                             size_t argumentCount,
+                                             const JSValueRef arguments[],
+                                             JSValueRef* exception) {
+  // Has Mac implementation
+  if (argumentCount < 1)
+    return JSValueMakeUndefined(context);
+
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->setWebViewEditable(JSValueToBoolean(context, arguments[0]));
+
+  return JSValueMakeUndefined(context);
+}
+
 // Static Values
 
 static JSValueRef getGlobalFlagCallback(JSContextRef context,
@@ -2226,11 +2243,11 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setAuthorAndUserStylesEnabled", setAuthorAndUserStylesEnabledCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"setCacheModel", setCacheModelCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setCallCloseOnWebViews", setCallCloseOnWebViewsCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setCanOpenWindows", setCanOpenWindowsCallback,
-       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
-      {"setCacheModel", setCacheModelCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setCloseRemainingWindowsWhenComplete",
        setCloseRemainingWindowsWhenCompleteCallback,
@@ -2242,12 +2259,12 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
       {"setDomainRelaxationForbiddenForURLScheme",
        setDomainRelaxationForbiddenForURLSchemeCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"setFrameFlatteningEnabled", setFrameFlatteningEnabledCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setGeolocationPermission", setGeolocationPermissionCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setHandlesAuthenticationChallenges",
        setHandlesAuthenticationChallengesCallback,
-       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
-      {"setPOSIXLocale", setPOSIXLocaleCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setIconDatabaseEnabled", setIconDatabaseEnabledCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
@@ -2255,12 +2272,14 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setMainFrameIsFirstResponder", setMainFrameIsFirstResponderCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
-      {"setMockGeolocationPosition", setMockGeolocationPositionCallback,
-       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setMockGeolocationError", setMockGeolocationErrorCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"setMockGeolocationPosition", setMockGeolocationPositionCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setNewWindowsCopyBackForwardList",
        setNewWindowsCopyBackForwardListCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"setPOSIXLocale", setPOSIXLocaleCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setPersistentUserStyleSheetLocation",
        setPersistentUserStyleSheetLocationCallback,
@@ -2269,16 +2288,12 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setPrivateBrowsingEnabled", setPrivateBrowsingEnabledCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
-      {"setXSSAuditorEnabled", setXSSAuditorEnabledCallback,
-       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
-      {"setSpatialNavigationEnabled", setSpatialNavigationEnabledCallback,
-       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
-      {"setFrameFlatteningEnabled", setFrameFlatteningEnabledCallback,
-       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setSelectTrailingWhitespaceEnabled",
        setSelectTrailingWhitespaceEnabledCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setSmartInsertDeleteEnabled", setSmartInsertDeleteEnabledCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"setSpatialNavigationEnabled", setSpatialNavigationEnabledCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setStopProvisionalFrameLoads", setStopProvisionalFrameLoadsCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
@@ -2293,6 +2308,8 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setUserStyleSheetLocation", setUserStyleSheetLocationCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"setWebViewEditable", setWebViewEditableCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setWillSendRequestClearHeader", setWillSendRequestClearHeaderCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setWillSendRequestReturnsNull", setWillSendRequestReturnsNullCallback,
@@ -2301,6 +2318,8 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
        setWillSendRequestReturnsNullOnRedirectCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setWindowIsKey", setWindowIsKeyCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"setXSSAuditorEnabled", setXSSAuditorEnabledCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"showWebInspector", showWebInspectorCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},

@@ -1224,3 +1224,5 @@ void LayoutTestController::apiTestGoToCurrentBackForwardItem() {
   BOOL success;
   webView->goToBackForwardItem(item.get(), &success);
 }
+
+void LayoutTestController::setWebViewEditable(bool) {}

@@ -344,6 +344,8 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
 
   void setPOSIXLocale(JSStringRef locale);
 
+  void setWebViewEditable(bool);
+
   // The following API test functions should probably be moved to
   // platform-specific
   // unit tests outside of DRT once they exist.

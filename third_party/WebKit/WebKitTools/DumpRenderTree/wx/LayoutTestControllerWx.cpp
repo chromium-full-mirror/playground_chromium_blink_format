@@ -337,6 +337,8 @@ void LayoutTestController::apiTestGoToCurrentBackForwardItem() {}
 
 void LayoutTestController::setSpatialNavigationEnabled(bool) {}
 
+void LayoutTestController::setWebViewEditable(bool) {}
+
 bool LayoutTestController::callShouldCloseOnWebView() {
   return false;
 }
