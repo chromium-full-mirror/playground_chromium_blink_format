@@ -357,6 +357,10 @@ class ShorthandScope : public FastAllocBase {
   CSSParser* m_parser;
 };
 
+String quoteCSSString(const String&);
+String quoteCSSStringIfNeeded(const String&);
+String quoteCSSURLIfNeeded(const String&);
+
 }  // namespace WebCore
 
 #endif  // CSSParser_h
