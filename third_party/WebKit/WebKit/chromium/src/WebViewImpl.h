@@ -74,6 +74,7 @@ class SuggestionsPopupMenuClient;
 class WebAccessibilityObject;
 class WebDevToolsAgentPrivate;
 class WebFrameImpl;
+class WebImage;
 class WebKeyboardEvent;
 class WebMouseEvent;
 class WebMouseWheelEvent;
@@ -254,9 +255,10 @@ class WebViewImpl : public WebView, public RefCounted<WebViewImpl> {
                                              WebNavigationPolicy*);
 
   // Start a system drag and drop operation.
-  void startDragging(const WebPoint& eventPos,
-                     const WebDragData& dragData,
-                     WebDragOperationsMask dragSourceOperationMask);
+  void startDragging(const WebDragData& dragData,
+                     WebDragOperationsMask mask,
+                     const WebImage& dragImage,
+                     const WebPoint& dragImageOffset);
 
   void suggestionsPopupDidHide() { m_suggestionsPopupShowing = false; }
 

@@ -31,22 +31,37 @@
 #include "config.h"
 #include "DragImage.h"
 
+#include "Image.h"
+#include "NativeImageSkia.h"
 #include "NotImplemented.h"
+#include "RefPtr.h"
+#include "SkBitmap.h"
+
+#include "skia/ext/image_operations.h"
 
 namespace WebCore {
 
 IntSize dragImageSize(DragImageRef image) {
-  notImplemented();
-  return IntSize();
+  if (!image)
+    return IntSize();
+
+  return IntSize(image->width(), image->height());
 }
 
 void deleteDragImage(DragImageRef image) {
-  notImplemented();
+  delete image;
 }
 
 DragImageRef scaleDragImage(DragImageRef image, FloatSize scale) {
-  notImplemented();
-  return 0;
+  if (!image)
+    return 0;
+
+  int imageWidth = scale.width() * image->width();
+  int imageHeight = scale.height() * image->height();
+  DragImageRef scaledImage = new SkBitmap(skia::ImageOperations::Resize(
+      *image, skia::ImageOperations::RESIZE_LANCZOS3, imageWidth, imageHeight));
+  delete image;
+  return scaledImage;
 }
 
 DragImageRef dissolveDragImageToFraction(DragImageRef image, float) {
@@ -54,9 +69,8 @@ DragImageRef dissolveDragImageToFraction(DragImageRef image, float) {
   return image;
 }
 
-DragImageRef createDragImageFromImage(Image* img) {
-  notImplemented();
-  return 0;
+DragImageRef createDragImageFromImage(Image* image) {
+  return new SkBitmap(*image->nativeImageForCurrentFrame());
 }
 
 DragImageRef createDragImageIconForCachedImage(CachedImage*) {
