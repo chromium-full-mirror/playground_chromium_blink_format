@@ -52,6 +52,10 @@ WebInputElement::InputType WebInputElement::inputType() const {
   return static_cast<InputType>(constUnwrap<HTMLInputElement>()->inputType());
 }
 
+int WebInputElement::maxLength() const {
+  return constUnwrap<HTMLInputElement>()->maxLength();
+}
+
 bool WebInputElement::isActivatedSubmit() const {
   return constUnwrap<HTMLInputElement>()->isActivatedSubmit();
 }
