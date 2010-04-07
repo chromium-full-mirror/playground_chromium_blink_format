@@ -65,17 +65,17 @@ void FileThread::postTask(PassOwnPtr<Task> task) {
 
 class SameFilePredicate {
  public:
-  SameFilePredicate(const PlatformFileHandle handle) : m_handle(handle) {}
+  SameFilePredicate(const FileStream* stream) : m_stream(stream) {}
   bool operator()(FileThread::Task* task) const {
-    return task->fileHandle() == m_handle;
+    return task->stream() == m_stream;
   }
 
  private:
-  PlatformFileHandle m_handle;
+  const FileStream* m_stream;
 };
 
-void FileThread::removeTask(PlatformFileHandle handle) {
-  SameFilePredicate predicate(handle);
+void FileThread::unscheduleTasks(const FileStream* stream) {
+  SameFilePredicate predicate(stream);
   m_queue.removeIf(predicate);
 }
 
