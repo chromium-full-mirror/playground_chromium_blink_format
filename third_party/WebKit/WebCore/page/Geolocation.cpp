@@ -203,7 +203,6 @@ Geolocation::Geolocation(Frame* frame)
 #endif
       ,
       m_allowGeolocation(Unknown),
-      m_shouldClearCache(false),
       m_positionCache(new GeolocationPositionCache) {
   if (!m_frame)
     return;

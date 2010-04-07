@@ -186,7 +186,6 @@ class Geolocation : public RefCounted<Geolocation>
   RefPtr<Geoposition> m_lastPosition;
 
   enum { Unknown, InProgress, Yes, No } m_allowGeolocation;
-  bool m_shouldClearCache;
 
 #if ENABLE(GEOLOCATION)
   OwnPtr<GeolocationPositionCache> m_positionCache;
