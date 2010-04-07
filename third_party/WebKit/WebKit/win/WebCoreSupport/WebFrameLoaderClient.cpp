@@ -274,10 +274,6 @@ void WebFrameLoaderClient::dispatchDidFailLoading(DocumentLoader* loader,
       webView, identifier, webError.get(), getWebDataSource(loader));
 }
 
-void WebFrameLoaderClient::dispatchDidLoadResourceByXMLHttpRequest(
-    unsigned long,
-    const ScriptString&) {}
-
 bool WebFrameLoaderClient::shouldCacheResponse(
     DocumentLoader* loader,
     unsigned long identifier,

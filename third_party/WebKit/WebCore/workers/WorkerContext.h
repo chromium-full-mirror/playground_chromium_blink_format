@@ -77,12 +77,6 @@ class WorkerContext : public RefCounted<WorkerContext>,
 
   bool hasPendingActivity() const;
 
-  virtual void resourceRetrievedByXMLHttpRequest(
-      unsigned long identifier,
-      const ScriptString& sourceString);
-  virtual void scriptImported(unsigned long identifier,
-                              const String& sourceString);
-
   virtual void postTask(PassOwnPtr<Task>);  // Executes the task on context's
                                             // thread asynchronously.
 
@@ -107,8 +101,7 @@ class WorkerContext : public RefCounted<WorkerContext>,
   virtual void reportException(const String& errorMessage,
                                int lineNumber,
                                const String& sourceURL);
-  virtual void addMessage(MessageDestination,
-                          MessageSource,
+  virtual void addMessage(MessageSource,
                           MessageType,
                           MessageLevel,
                           const String& message,

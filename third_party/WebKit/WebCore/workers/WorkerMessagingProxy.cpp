@@ -38,6 +38,7 @@
 #include "ErrorEvent.h"
 #include "ExceptionCode.h"
 #include "GenericWorkerTask.h"
+#include "InspectorController.h"
 #include "MessageEvent.h"
 #include "ScriptExecutionContext.h"
 #include "Worker.h"
@@ -305,7 +306,6 @@ void WorkerMessagingProxy::postExceptionToWorkerObject(
 
 static void postConsoleMessageTask(ScriptExecutionContext* context,
                                    WorkerMessagingProxy* messagingProxy,
-                                   MessageDestination destination,
                                    MessageSource source,
                                    MessageType type,
                                    MessageLevel level,
@@ -314,12 +314,10 @@ static void postConsoleMessageTask(ScriptExecutionContext* context,
                                    const String& sourceURL) {
   if (messagingProxy->askedToTerminate())
     return;
-  context->addMessage(destination, source, type, level, message, lineNumber,
-                      sourceURL);
+  context->addMessage(source, type, level, message, lineNumber, sourceURL);
 }
 
 void WorkerMessagingProxy::postConsoleMessageToWorkerObject(
-    MessageDestination destination,
     MessageSource source,
     MessageType type,
     MessageLevel level,
@@ -327,8 +325,8 @@ void WorkerMessagingProxy::postConsoleMessageToWorkerObject(
     int lineNumber,
     const String& sourceURL) {
   m_scriptExecutionContext->postTask(
-      createCallbackTask(&postConsoleMessageTask, this, destination, source,
-                         type, level, message, lineNumber, sourceURL));
+      createCallbackTask(&postConsoleMessageTask, this, source, type, level,
+                         message, lineNumber, sourceURL));
 }
 
 void WorkerMessagingProxy::workerThreadCreated(

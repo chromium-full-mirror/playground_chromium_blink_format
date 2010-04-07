@@ -213,8 +213,6 @@ class FrameLoaderClientWx : public FrameLoaderClient {
                                                       const ResourceRequest&,
                                                       const ResourceResponse&,
                                                       int);
-  virtual void dispatchDidLoadResourceByXMLHttpRequest(unsigned long,
-                                                       const ScriptString&);
 
   virtual void dispatchDidFailProvisionalLoad(const ResourceError&);
   virtual void dispatchDidFailLoad(const ResourceError&);

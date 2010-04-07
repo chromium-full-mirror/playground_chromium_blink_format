@@ -184,23 +184,19 @@ void WebWorkerBase::postExceptionTask(ScriptExecutionContext* context,
                                                        sourceURL);
 }
 
-void WebWorkerBase::postConsoleMessageToWorkerObject(
-    MessageDestination destination,
-    MessageSource source,
-    MessageType type,
-    MessageLevel level,
-    const String& message,
-    int lineNumber,
-    const String& sourceURL) {
-  dispatchTaskToMainThread(createCallbackTask(
-      &postConsoleMessageTask, this, static_cast<int>(destination),
-      static_cast<int>(source), static_cast<int>(type), static_cast<int>(level),
-      message, lineNumber, sourceURL));
+void WebWorkerBase::postConsoleMessageToWorkerObject(MessageSource source,
+                                                     MessageType type,
+                                                     MessageLevel level,
+                                                     const String& message,
+                                                     int lineNumber,
+                                                     const String& sourceURL) {
+  dispatchTaskToMainThread(createCallbackTask(&postConsoleMessageTask, this,
+                                              source, type, level, message,
+                                              lineNumber, sourceURL));
 }
 
 void WebWorkerBase::postConsoleMessageTask(ScriptExecutionContext* context,
                                            WebWorkerBase* thisPtr,
-                                           int destination,
                                            int source,
                                            int type,
                                            int level,
@@ -210,7 +206,7 @@ void WebWorkerBase::postConsoleMessageTask(ScriptExecutionContext* context,
   if (!thisPtr->commonClient())
     return;
   thisPtr->commonClient()->postConsoleMessageToWorkerObject(
-      destination, source, type, level, message, lineNumber, sourceURL);
+      source, type, level, message, lineNumber, sourceURL);
 }
 
 void WebWorkerBase::confirmMessageFromWorkerObject(bool hasPendingActivity) {

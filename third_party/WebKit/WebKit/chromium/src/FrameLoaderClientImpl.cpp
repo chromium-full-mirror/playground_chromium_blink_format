@@ -375,10 +375,6 @@ bool FrameLoaderClientImpl::dispatchDidLoadResourceFromMemoryCache(
   return false;  // Do not suppress remaining notifications
 }
 
-void FrameLoaderClientImpl::dispatchDidLoadResourceByXMLHttpRequest(
-    unsigned long identifier,
-    const ScriptString& source) {}
-
 void FrameLoaderClientImpl::dispatchDidHandleOnloadEvents() {
   if (m_webFrame->client())
     m_webFrame->client()->didHandleOnloadEvents(m_webFrame);

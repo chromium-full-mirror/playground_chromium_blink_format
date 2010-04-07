@@ -247,8 +247,6 @@ class EmptyFrameLoaderClient : public FrameLoaderClient, public Noncopyable {
                                                       int) {
     return false;
   }
-  virtual void dispatchDidLoadResourceByXMLHttpRequest(unsigned long,
-                                                       const ScriptString&) {}
 
   virtual void dispatchDidHandleOnloadEvents() {}
   virtual void dispatchDidReceiveServerRedirectForProvisionalLoad() {}

@@ -111,13 +111,6 @@ void ResourceLoadNotifier::didFailToLoad(ResourceLoader* loader,
 #endif
 }
 
-void ResourceLoadNotifier::didLoadResourceByXMLHttpRequest(
-    unsigned long identifier,
-    const ScriptString& sourceString) {
-  m_frame->loader()->client()->dispatchDidLoadResourceByXMLHttpRequest(
-      identifier, sourceString);
-}
-
 void ResourceLoadNotifier::assignIdentifierToInitialRequest(
     unsigned long identifier,
     DocumentLoader* loader,

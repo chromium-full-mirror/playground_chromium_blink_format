@@ -91,8 +91,7 @@ class SharedWorkerProxy : public ThreadSafeShared<SharedWorkerProxy>,
   virtual void postExceptionToWorkerObject(const String& errorMessage,
                                            int lineNumber,
                                            const String& sourceURL);
-  virtual void postConsoleMessageToWorkerObject(MessageDestination,
-                                                MessageSource,
+  virtual void postConsoleMessageToWorkerObject(MessageSource,
                                                 MessageType,
                                                 MessageLevel,
                                                 const String& message,
@@ -206,19 +205,16 @@ void SharedWorkerProxy::postExceptionToWorkerObject(const String& errorMessage,
 }
 
 static void postConsoleMessageTask(ScriptExecutionContext* document,
-                                   MessageDestination destination,
                                    MessageSource source,
                                    MessageType type,
                                    MessageLevel level,
                                    const String& message,
                                    unsigned lineNumber,
                                    const String& sourceURL) {
-  document->addMessage(destination, source, type, level, message, lineNumber,
-                       sourceURL);
+  document->addMessage(source, type, level, message, lineNumber, sourceURL);
 }
 
 void SharedWorkerProxy::postConsoleMessageToWorkerObject(
-    MessageDestination destination,
     MessageSource source,
     MessageType type,
     MessageLevel level,
@@ -228,9 +224,9 @@ void SharedWorkerProxy::postConsoleMessageToWorkerObject(
   MutexLocker lock(m_workerDocumentsLock);
   for (HashSet<Document*>::iterator iter = m_workerDocuments.begin();
        iter != m_workerDocuments.end(); ++iter)
-    (*iter)->postTask(createCallbackTask(&postConsoleMessageTask, destination,
-                                         source, type, level, message,
-                                         lineNumber, sourceURL));
+    (*iter)->postTask(createCallbackTask(&postConsoleMessageTask, source, type,
+                                         level, message, lineNumber,
+                                         sourceURL));
 }
 
 void SharedWorkerProxy::workerContextClosed() {

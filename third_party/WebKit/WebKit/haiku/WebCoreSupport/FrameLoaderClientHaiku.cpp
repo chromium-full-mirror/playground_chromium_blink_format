@@ -586,12 +586,6 @@ bool FrameLoaderClientHaiku::dispatchDidLoadResourceFromMemoryCache(
   return false;
 }
 
-void FrameLoaderClientHaiku::dispatchDidLoadResourceByXMLHttpRequest(
-    unsigned long,
-    const ScriptString&) {
-  notImplemented();
-}
-
 void FrameLoaderClientHaiku::dispatchDidFailProvisionalLoad(
     const ResourceError&) {
   notImplemented();

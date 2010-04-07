@@ -169,9 +169,6 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
       const WebCore::ResourceRequest&,
       const WebCore::ResourceResponse&,
       int length);
-  virtual void dispatchDidLoadResourceByXMLHttpRequest(
-      unsigned long identifier,
-      const WebCore::ScriptString&);
 
   virtual void willChangeEstimatedProgress();
   virtual void didChangeEstimatedProgress();

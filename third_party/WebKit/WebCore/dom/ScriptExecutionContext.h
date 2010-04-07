@@ -56,13 +56,6 @@ class String;
 class InspectorController;
 #endif
 
-enum MessageDestination {
-#if ENABLE(INSPECTOR)
-  InspectorControllerDestination,
-#endif
-  ConsoleDestination,
-};
-
 class ScriptExecutionContext {
  public:
   ScriptExecutionContext();
@@ -97,17 +90,12 @@ class ScriptExecutionContext {
   virtual void reportException(const String& errorMessage,
                                int lineNumber,
                                const String& sourceURL) = 0;
-  virtual void addMessage(MessageDestination,
-                          MessageSource,
+  virtual void addMessage(MessageSource,
                           MessageType,
                           MessageLevel,
                           const String& message,
                           unsigned lineNumber,
                           const String& sourceURL) = 0;
-  virtual void resourceRetrievedByXMLHttpRequest(
-      unsigned long identifier,
-      const ScriptString& sourceString) = 0;
-  virtual void scriptImported(unsigned long, const String&) = 0;
 
   // Active objects are not garbage collected even if inaccessible, e.g. because
   // their activity may result in callbacks being invoked.

@@ -48,8 +48,7 @@ class WorkerReportingProxy {
                                            int lineNumber,
                                            const String& sourceURL) = 0;
 
-  virtual void postConsoleMessageToWorkerObject(MessageDestination,
-                                                MessageSource,
+  virtual void postConsoleMessageToWorkerObject(MessageSource,
                                                 MessageType,
                                                 MessageLevel,
                                                 const String& message,

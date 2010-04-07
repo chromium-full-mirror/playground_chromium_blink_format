@@ -114,7 +114,7 @@ void WebSocket::connect(const KURL& url,
 
   if (!m_url.isValid()) {
     scriptExecutionContext()->addMessage(
-        ConsoleDestination, JSMessageSource, LogMessageType, ErrorMessageLevel,
+        JSMessageSource, LogMessageType, ErrorMessageLevel,
         "Invalid url for WebSocket " + url.string(), 0,
         scriptExecutionContext()->securityOrigin()->toString());
     m_state = CLOSED;
@@ -124,7 +124,7 @@ void WebSocket::connect(const KURL& url,
 
   if (!m_url.protocolIs("ws") && !m_url.protocolIs("wss")) {
     scriptExecutionContext()->addMessage(
-        ConsoleDestination, JSMessageSource, LogMessageType, ErrorMessageLevel,
+        JSMessageSource, LogMessageType, ErrorMessageLevel,
         "Wrong url scheme for WebSocket " + url.string(), 0,
         scriptExecutionContext()->securityOrigin()->toString());
     m_state = CLOSED;
@@ -133,7 +133,7 @@ void WebSocket::connect(const KURL& url,
   }
   if (m_url.hasFragmentIdentifier()) {
     scriptExecutionContext()->addMessage(
-        ConsoleDestination, JSMessageSource, LogMessageType, ErrorMessageLevel,
+        JSMessageSource, LogMessageType, ErrorMessageLevel,
         "URL has fragment component " + url.string(), 0,
         scriptExecutionContext()->securityOrigin()->toString());
     m_state = CLOSED;
@@ -142,7 +142,7 @@ void WebSocket::connect(const KURL& url,
   }
   if (!isValidProtocolString(m_protocol)) {
     scriptExecutionContext()->addMessage(
-        ConsoleDestination, JSMessageSource, LogMessageType, ErrorMessageLevel,
+        JSMessageSource, LogMessageType, ErrorMessageLevel,
         "Wrong protocol for WebSocket '" + encodeProtocolString(m_protocol) +
             "'",
         0, scriptExecutionContext()->securityOrigin()->toString());
@@ -152,7 +152,7 @@ void WebSocket::connect(const KURL& url,
   }
   if (!portAllowed(url)) {
     scriptExecutionContext()->addMessage(
-        ConsoleDestination, JSMessageSource, LogMessageType, ErrorMessageLevel,
+        JSMessageSource, LogMessageType, ErrorMessageLevel,
         String::format("WebSocket port %d blocked", url.port()), 0,
         scriptExecutionContext()->securityOrigin()->toString());
     m_state = CLOSED;

@@ -34,6 +34,7 @@
 #include "EventListener.h"
 #include "EventNames.h"
 #include "HTTPParsers.h"
+#include "InspectorController.h"
 #include "InspectorTimelineAgent.h"
 #include "ResourceError.h"
 #include "ResourceRequest.h"
@@ -706,8 +707,8 @@ static void reportUnsafeUsage(ScriptExecutionContext* context,
   // line it came from.
   // We should pass additional parameters so we can tell the console where the
   // mistake occurred.
-  context->addMessage(ConsoleDestination, JSMessageSource, LogMessageType,
-                      ErrorMessageLevel, message, 1, String());
+  context->addMessage(JSMessageSource, LogMessageType, ErrorMessageLevel,
+                      message, 1, String());
 }
 
 void XMLHttpRequest::setRequestHeader(const AtomicString& name,
@@ -905,8 +906,11 @@ void XMLHttpRequest::didFinishLoading(unsigned long identifier) {
   if (m_decoder)
     m_responseText += m_decoder->flush();
 
-  scriptExecutionContext()->resourceRetrievedByXMLHttpRequest(identifier,
-                                                              m_responseText);
+#if ENABLE(INSPECTOR)
+  if (InspectorController* inspector =
+          scriptExecutionContext()->inspectorController())
+    inspector->resourceRetrievedByXMLHttpRequest(identifier, m_responseText);
+#endif
 
   bool hadLoader = m_loader;
   m_loader = 0;

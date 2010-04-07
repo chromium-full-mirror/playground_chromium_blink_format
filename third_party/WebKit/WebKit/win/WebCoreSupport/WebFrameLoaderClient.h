@@ -79,9 +79,6 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
   virtual void dispatchDidFailLoading(WebCore::DocumentLoader*,
                                       unsigned long identifier,
                                       const WebCore::ResourceError&);
-  virtual void dispatchDidLoadResourceByXMLHttpRequest(
-      unsigned long identifier,
-      const WebCore::ScriptString&);
   virtual bool shouldCacheResponse(WebCore::DocumentLoader*,
                                    unsigned long identifier,
                                    const WebCore::ResourceResponse&,
