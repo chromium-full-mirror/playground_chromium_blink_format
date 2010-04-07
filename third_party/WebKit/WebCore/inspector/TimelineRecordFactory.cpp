@@ -52,10 +52,13 @@ ScriptObject TimelineRecordFactory::createGenericRecord(
 
   String sourceName;
   int sourceLineNumber;
-  if (ScriptCallStack::callLocation(&sourceName, &sourceLineNumber) &&
+  String functionName;
+  if (ScriptCallStack::callLocation(&sourceName, &sourceLineNumber,
+                                    &functionName) &&
       sourceName != "undefined") {
     record.set("callerScriptName", sourceName);
     record.set("callerScriptLine", sourceLineNumber);
+    record.set("callerFunctionName", functionName);
   }
   return record;
 }
