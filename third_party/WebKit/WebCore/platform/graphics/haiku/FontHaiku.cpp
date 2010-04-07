@@ -98,7 +98,8 @@ void Font::drawComplexText(GraphicsContext* ctx,
 
 float Font::floatWidthForComplexText(
     const TextRun& run,
-    HashSet<const SimpleFontData*>* fallbackFonts) const {
+    HashSet<const SimpleFontData*>* fallbackFonts,
+    GlyphOverflow* glyphOverflow) const {
   notImplemented();
   return 0;
 }

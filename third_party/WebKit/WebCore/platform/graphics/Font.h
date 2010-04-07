@@ -56,6 +56,15 @@ struct GlyphData;
 
 const unsigned defaultUnitsPerEm = 1000;
 
+struct GlyphOverflow {
+  GlyphOverflow() : left(0), right(0), top(0), bottom(0) {}
+
+  int left;
+  int right;
+  int top;
+  int bottom;
+};
+
 class Font {
  public:
   Font();
@@ -85,11 +94,13 @@ class Font {
                 int to = -1) const;
 
   int width(const TextRun& run,
-            HashSet<const SimpleFontData*>* fallbackFonts = 0) const {
-    return lroundf(floatWidth(run, fallbackFonts));
+            HashSet<const SimpleFontData*>* fallbackFonts = 0,
+            GlyphOverflow* glyphOverflow = 0) const {
+    return lroundf(floatWidth(run, fallbackFonts, glyphOverflow));
   }
   float floatWidth(const TextRun&,
-                   HashSet<const SimpleFontData*>* fallbackFonts = 0) const;
+                   HashSet<const SimpleFontData*>* fallbackFonts = 0,
+                   GlyphOverflow* glyphOverflow = 0) const;
   float floatWidth(const TextRun& run,
                    int extraCharsAvailable,
                    int& charsConsumed,
@@ -223,7 +234,8 @@ class Font {
                        int to) const;
   float floatWidthForComplexText(
       const TextRun&,
-      HashSet<const SimpleFontData*>* fallbackFonts = 0) const;
+      HashSet<const SimpleFontData*>* fallbackFonts = 0,
+      GlyphOverflow* = 0) const;
   int offsetForPositionForComplexText(const TextRun&,
                                       int position,
                                       bool includePartialGlyphs) const;

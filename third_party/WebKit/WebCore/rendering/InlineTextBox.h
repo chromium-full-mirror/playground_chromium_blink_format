@@ -66,7 +66,15 @@ class InlineTextBox : public InlineBox {
   void offsetRun(int d) { m_start += d; }
 
   void setFallbackFonts(const HashSet<const SimpleFontData*>&);
-  void takeFallbackFonts(Vector<const SimpleFontData*>&);
+  Vector<const SimpleFontData*>* fallbackFonts() const;
+
+  void setGlyphOverflow(const GlyphOverflow&);
+  GlyphOverflow* glyphOverflow() const;
+
+  static void clearGlyphOverflowAndFallbackFontMap() {
+    if (s_glyphOverflowAndFallbackFontsMap)
+      s_glyphOverflowAndFallbackFontsMap->clear();
+  }
 
   unsigned short truncation() { return m_truncation; }
 
@@ -147,6 +155,11 @@ class InlineTextBox : public InlineBox {
                                 // applied.  We use special constants to
   // denote no truncation (the whole run paints) and full truncation (nothing
   // paints at all).
+
+  typedef HashMap<const InlineTextBox*,
+                  pair<Vector<const SimpleFontData*>, GlyphOverflow>>
+      GlyphOverflowAndFallbackFontsMap;
+  static GlyphOverflowAndFallbackFontsMap* s_glyphOverflowAndFallbackFontsMap;
 
  protected:
   void paintCompositionBackground(GraphicsContext*,

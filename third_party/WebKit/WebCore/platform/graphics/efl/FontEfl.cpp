@@ -48,7 +48,8 @@ bool Font::canReturnFallbackFontsForComplexText() {
 }
 
 float Font::floatWidthForComplexText(const TextRun&,
-                                     HashSet<const SimpleFontData*>*) const {
+                                     HashSet<const SimpleFontData*>*,
+                                     GlyphOverflow*) const {
   notImplemented();
   return 0.0f;
 }

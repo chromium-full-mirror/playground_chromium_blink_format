@@ -246,7 +246,8 @@ void Font::drawComplexText(GraphicsContext* context,
 
 float Font::floatWidthForComplexText(
     const TextRun& run,
-    HashSet<const SimpleFontData*>* fallbackFonts) const {
+    HashSet<const SimpleFontData*>* fallbackFonts,
+    GlyphOverflow* glyphOverflow) const {
   TextRunComponents components;
   int w = generateComponents(&components, *this, run);
   return w;

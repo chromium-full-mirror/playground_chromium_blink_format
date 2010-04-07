@@ -204,7 +204,8 @@ void Font::drawText(GraphicsContext* context,
 }
 
 float Font::floatWidth(const TextRun& run,
-                       HashSet<const SimpleFontData*>* fallbackFonts) const {
+                       HashSet<const SimpleFontData*>* fallbackFonts,
+                       GlyphOverflow* glyphOverflow) const {
 #if ENABLE(SVG_FONTS)
   if (primaryFont()->isSVGFont())
     return floatWidthUsingSVGFont(run);
@@ -220,7 +221,7 @@ float Font::floatWidth(const TextRun& run,
   }
 #endif
 
-  return floatWidthForComplexText(run, fallbackFonts);
+  return floatWidthForComplexText(run, fallbackFonts, glyphOverflow);
 }
 
 float Font::floatWidth(const TextRun& run,

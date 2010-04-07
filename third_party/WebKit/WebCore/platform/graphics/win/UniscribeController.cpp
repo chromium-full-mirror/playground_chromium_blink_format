@@ -32,6 +32,8 @@
 #include "SimpleFontData.h"
 #include <wtf/MathExtras.h>
 
+using namespace std;
+
 namespace WebCore {
 
 // FIXME: Rearchitect this to be more like WidthIterator in Font.cpp.  Have an
@@ -48,6 +50,10 @@ UniscribeController::UniscribeController(
     : m_font(*font),
       m_run(run),
       m_fallbackFonts(fallbackFonts),
+      m_minGlyphBoundingBoxX(numeric_limits<float>::max()),
+      m_maxGlyphBoundingBoxX(numeric_limits<float>::min()),
+      m_minGlyphBoundingBoxY(numeric_limits<float>::max()),
+      m_maxGlyphBoundingBoxY(numeric_limits<float>::min()),
       m_end(run.length()),
       m_currentCharacter(0),
       m_runWidthSoFar(0),
@@ -426,6 +432,18 @@ bool UniscribeController::shapeAndPlaceItem(const UChar* cp,
       FloatSize size(offsetX, -offsetY);
       glyphBuffer->add(glyph, fontData, advance, &size);
     }
+
+    GlyphMetrics glyphMetrics = fontData->metricsForGlyph(glyph);
+    glyphMetrics.boundingBox.move(m_glyphOrigin.x(), m_glyphOrigin.y());
+    m_minGlyphBoundingBoxX =
+        min(m_minGlyphBoundingBoxX, glyphMetrics.boundingBox.x());
+    m_maxGlyphBoundingBoxX =
+        max(m_maxGlyphBoundingBoxX, glyphMetrics.boundingBox.right());
+    m_minGlyphBoundingBoxY =
+        min(m_minGlyphBoundingBoxY, glyphMetrics.boundingBox.y());
+    m_maxGlyphBoundingBoxY =
+        max(m_maxGlyphBoundingBoxY, glyphMetrics.boundingBox.bottom());
+    m_glyphOrigin.move(advance + offsetX, -offsetY);
 
     // Mutate the glyph array to contain our altered advances.
     if (m_computingOffsetPosition)

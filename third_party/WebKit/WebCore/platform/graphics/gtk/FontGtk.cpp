@@ -306,7 +306,8 @@ static PangoLayout* getDefaultPangoLayout(const TextRun& run) {
 
 float Font::floatWidthForComplexText(
     const TextRun& run,
-    HashSet<const SimpleFontData*>* /* fallbackFonts */) const {
+    HashSet<const SimpleFontData*>* /* fallbackFonts */,
+    GlyphOverflow*) const {
   if (run.length() == 0)
     return 0.0f;
 

@@ -137,7 +137,8 @@ void Font::drawComplexText(GraphicsContext* context,
 
 float Font::floatWidthForComplexText(
     const TextRun& run,
-    HashSet<const SimpleFontData*>* fallbackFonts) const {
+    HashSet<const SimpleFontData*>* fallbackFonts,
+    GlyphOverflow*) const {
 #if OS(WINDOWS)
   UniscribeController controller(this, run, fallbackFonts);
   controller.advance(run.length());

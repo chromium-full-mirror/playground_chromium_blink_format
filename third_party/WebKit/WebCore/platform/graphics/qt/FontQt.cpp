@@ -179,7 +179,8 @@ void Font::drawComplexText(GraphicsContext* ctx,
 }
 
 float Font::floatWidthForComplexText(const TextRun& run,
-                                     HashSet<const SimpleFontData*>*) const {
+                                     HashSet<const SimpleFontData*>*,
+                                     GlyphOverflow*) const {
   if (!run.length())
     return 0;
 

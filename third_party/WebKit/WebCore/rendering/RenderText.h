@@ -76,18 +76,18 @@ class RenderText : public RenderObject {
   }  // non virtual implementation of length()
   void positionLineBox(InlineBox*);
 
-  virtual unsigned width(
-      unsigned from,
-      unsigned len,
-      const Font&,
-      int xPos,
-      HashSet<const SimpleFontData*>* fallbackFonts = 0) const;
-  virtual unsigned width(
-      unsigned from,
-      unsigned len,
-      int xPos,
-      bool firstLine = false,
-      HashSet<const SimpleFontData*>* fallbackFonts = 0) const;
+  virtual unsigned width(unsigned from,
+                         unsigned len,
+                         const Font&,
+                         int xPos,
+                         HashSet<const SimpleFontData*>* fallbackFonts = 0,
+                         GlyphOverflow* = 0) const;
+  virtual unsigned width(unsigned from,
+                         unsigned len,
+                         int xPos,
+                         bool firstLine = false,
+                         HashSet<const SimpleFontData*>* fallbackFonts = 0,
+                         GlyphOverflow* = 0) const;
 
   virtual int lineHeight(bool firstLine, bool isRootLineBox = false) const;
 
@@ -171,7 +171,8 @@ class RenderText : public RenderObject {
 
  private:
   void calcPrefWidths(int leadWidth,
-                      HashSet<const SimpleFontData*>& fallbackFonts);
+                      HashSet<const SimpleFontData*>& fallbackFonts,
+                      GlyphOverflow&);
 
   // Make length() private so that callers that have a RenderText*
   // will use the more efficient textLength() instead, while
@@ -197,7 +198,8 @@ class RenderText : public RenderObject {
                      int start,
                      int len,
                      int xPos,
-                     HashSet<const SimpleFontData*>* fallbackFonts) const;
+                     HashSet<const SimpleFontData*>* fallbackFonts,
+                     GlyphOverflow*) const;
   bool isAllASCII() const { return m_isAllASCII; }
 
   int m_minWidth;  // here to minimize padding in 64-bit.
@@ -229,7 +231,7 @@ class RenderText : public RenderObject {
   // or removed).
   bool m_containsReversedText : 1;
   bool m_isAllASCII : 1;
-  mutable bool m_knownNotToUseFallbackFonts : 1;
+  mutable bool m_knownToHaveNoOverflowAndNoFallbackFonts : 1;
 };
 
 inline RenderText* toRenderText(RenderObject* object) {

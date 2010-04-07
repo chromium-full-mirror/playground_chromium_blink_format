@@ -103,7 +103,7 @@ RenderText::RenderText(Node* node, PassRefPtr<StringImpl> str)
       m_linesDirty(false),
       m_containsReversedText(false),
       m_isAllASCII(m_text.containsOnlyASCII()),
-      m_knownNotToUseFallbackFonts(false) {
+      m_knownToHaveNoOverflowAndNoFallbackFonts(false) {
   ASSERT(m_text);
 
   setIsText();
@@ -148,7 +148,7 @@ void RenderText::styleDidChange(StyleDifference diff,
   // need to relayout.
   if (diff == StyleDifferenceLayout) {
     setNeedsLayoutAndPrefWidthsRecalc();
-    m_knownNotToUseFallbackFonts = false;
+    m_knownToHaveNoOverflowAndNoFallbackFonts = false;
   }
 
   ETextTransform oldTransform = oldStyle ? oldStyle->textTransform() : TTNONE;
@@ -503,7 +503,8 @@ ALWAYS_INLINE int RenderText::widthFromCache(
     int start,
     int len,
     int xPos,
-    HashSet<const SimpleFontData*>* fallbackFonts) const {
+    HashSet<const SimpleFontData*>* fallbackFonts,
+    GlyphOverflow* glyphOverflow) const {
   if (f.isFixedPitch() && !f.isSmallCaps() && m_isAllASCII) {
     int monospaceCharacterWidth = f.spaceWidth();
     int tabWidth = allowTabs() ? monospaceCharacterWidth * 8 : 0;
@@ -537,7 +538,7 @@ ALWAYS_INLINE int RenderText::widthFromCache(
   }
 
   return f.width(TextRun(text()->characters() + start, len, allowTabs(), xPos),
-                 fallbackFonts);
+                 fallbackFonts, glyphOverflow);
 }
 
 void RenderText::trimmedPrefWidths(int leadWidth,
@@ -614,7 +615,7 @@ void RenderText::trimmedPrefWidths(int leadWidth,
         linelen++;
 
       if (linelen) {
-        endMaxW = widthFromCache(f, i, linelen, leadWidth + endMaxW, 0);
+        endMaxW = widthFromCache(f, i, linelen, leadWidth + endMaxW, 0, 0);
         if (firstLine) {
           firstLine = false;
           leadWidth = 0;
@@ -655,14 +656,18 @@ int RenderText::maxPrefWidth() const {
 
 void RenderText::calcPrefWidths(int leadWidth) {
   HashSet<const SimpleFontData*> fallbackFonts;
-  calcPrefWidths(leadWidth, fallbackFonts);
-  if (fallbackFonts.isEmpty())
-    m_knownNotToUseFallbackFonts = true;
+  GlyphOverflow glyphOverflow;
+  calcPrefWidths(leadWidth, fallbackFonts, glyphOverflow);
+  if (fallbackFonts.isEmpty() && !glyphOverflow.left && !glyphOverflow.right &&
+      !glyphOverflow.top && !glyphOverflow.bottom)
+    m_knownToHaveNoOverflowAndNoFallbackFonts = true;
 }
 
 void RenderText::calcPrefWidths(int leadWidth,
-                                HashSet<const SimpleFontData*>& fallbackFonts) {
-  ASSERT(m_hasTab || prefWidthsDirty() || !m_knownNotToUseFallbackFonts);
+                                HashSet<const SimpleFontData*>& fallbackFonts,
+                                GlyphOverflow& glyphOverflow) {
+  ASSERT(m_hasTab || prefWidthsDirty() ||
+         !m_knownToHaveNoOverflowAndNoFallbackFonts);
 
   m_minWidth = 0;
   m_beginMinWidth = 0;
@@ -691,6 +696,8 @@ void RenderText::calcPrefWidths(int leadWidth,
   bool firstLine = true;
   int nextBreakable = -1;
   int lastWordBoundary = 0;
+
+  int firstGlyphLeftOverflow = -1;
 
   bool breakNBSP = style()->autoWrap() && style()->nbspMode() == SPACE;
   bool breakAll = (style()->wordBreak() == BreakAllWordBreak ||
@@ -738,7 +745,10 @@ void RenderText::calcPrefWidths(int leadWidth,
       continue;
     } else if (c == softHyphen) {
       currMaxWidth += widthFromCache(f, lastWordBoundary, i - lastWordBoundary,
-                                     leadWidth + currMaxWidth, &fallbackFonts);
+                                     leadWidth + currMaxWidth, &fallbackFonts,
+                                     &glyphOverflow);
+      if (firstGlyphLeftOverflow < 0)
+        firstGlyphLeftOverflow = glyphOverflow.left;
       lastWordBoundary = i + 1;
       continue;
     }
@@ -764,15 +774,17 @@ void RenderText::calcPrefWidths(int leadWidth,
     int wordLen = j - i;
     if (wordLen) {
       int w = widthFromCache(f, i, wordLen, leadWidth + currMaxWidth,
-                             &fallbackFonts);
+                             &fallbackFonts, &glyphOverflow);
+      if (firstGlyphLeftOverflow < 0)
+        firstGlyphLeftOverflow = glyphOverflow.left;
       currMinWidth += w;
       if (betweenWords) {
         if (lastWordBoundary == i)
           currMaxWidth += w;
         else
-          currMaxWidth +=
-              widthFromCache(f, lastWordBoundary, j - lastWordBoundary,
-                             leadWidth + currMaxWidth, &fallbackFonts);
+          currMaxWidth += widthFromCache(
+              f, lastWordBoundary, j - lastWordBoundary,
+              leadWidth + currMaxWidth, &fallbackFonts, &glyphOverflow);
         lastWordBoundary = j;
       }
 
@@ -834,12 +846,16 @@ void RenderText::calcPrefWidths(int leadWidth,
       } else {
         currMaxWidth +=
             f.width(TextRun(txt + i, 1, allowTabs(), leadWidth + currMaxWidth));
+        glyphOverflow.right = 0;
         needsWordSpacing = isSpace && !previousCharacterIsSpace && i == len - 1;
       }
       ASSERT(lastWordBoundary == i);
       lastWordBoundary++;
     }
   }
+
+  if (firstGlyphLeftOverflow > 0)
+    glyphOverflow.left = firstGlyphLeftOverflow;
 
   if ((needsWordSpacing && len > 1) || (ignoringSpaces && !firstWord))
     currMaxWidth += wordSpacing;
@@ -1122,7 +1138,7 @@ void RenderText::setText(PassRefPtr<StringImpl> text, bool force) {
 
   setTextInternal(text);
   setNeedsLayoutAndPrefWidthsRecalc();
-  m_knownNotToUseFallbackFonts = false;
+  m_knownToHaveNoOverflowAndNoFallbackFonts = false;
 
   AXObjectCache* axObjectCache = document()->axObjectCache();
   if (axObjectCache->accessibilityEnabled())
@@ -1184,27 +1200,28 @@ void RenderText::positionLineBox(InlineBox* box) {
   m_containsReversedText |= s->direction() == RTL;
 }
 
-unsigned RenderText::width(
-    unsigned from,
-    unsigned len,
-    int xPos,
-    bool firstLine,
-    HashSet<const SimpleFontData*>* fallbackFonts) const {
+unsigned RenderText::width(unsigned from,
+                           unsigned len,
+                           int xPos,
+                           bool firstLine,
+                           HashSet<const SimpleFontData*>* fallbackFonts,
+                           GlyphOverflow* glyphOverflow) const {
   if (from >= textLength())
     return 0;
 
   if (from + len > textLength())
     len = textLength() - from;
 
-  return width(from, len, style(firstLine)->font(), xPos, fallbackFonts);
+  return width(from, len, style(firstLine)->font(), xPos, fallbackFonts,
+               glyphOverflow);
 }
 
-unsigned RenderText::width(
-    unsigned from,
-    unsigned len,
-    const Font& f,
-    int xPos,
-    HashSet<const SimpleFontData*>* fallbackFonts) const {
+unsigned RenderText::width(unsigned from,
+                           unsigned len,
+                           const Font& f,
+                           int xPos,
+                           HashSet<const SimpleFontData*>* fallbackFonts,
+                           GlyphOverflow* glyphOverflow) const {
   ASSERT(from + len <= textLength());
   if (!characters())
     return 0;
@@ -1213,19 +1230,23 @@ unsigned RenderText::width(
   if (&f == &style()->font()) {
     if (!style()->preserveNewline() && !from && len == textLength()) {
       if (fallbackFonts) {
-        if (prefWidthsDirty() || !m_knownNotToUseFallbackFonts) {
-          const_cast<RenderText*>(this)->calcPrefWidths(0, *fallbackFonts);
-          if (fallbackFonts->isEmpty())
-            m_knownNotToUseFallbackFonts = true;
+        ASSERT(glyphOverflow);
+        if (prefWidthsDirty() || !m_knownToHaveNoOverflowAndNoFallbackFonts) {
+          const_cast<RenderText*>(this)->calcPrefWidths(0, *fallbackFonts,
+                                                        *glyphOverflow);
+          if (fallbackFonts->isEmpty() && !glyphOverflow->left &&
+              !glyphOverflow->right && !glyphOverflow->top &&
+              !glyphOverflow->bottom)
+            m_knownToHaveNoOverflowAndNoFallbackFonts = true;
         }
         w = m_maxWidth;
       } else
         w = maxPrefWidth();
     } else
-      w = widthFromCache(f, from, len, xPos, fallbackFonts);
+      w = widthFromCache(f, from, len, xPos, fallbackFonts, glyphOverflow);
   } else
     w = f.width(TextRun(text()->characters() + from, len, allowTabs(), xPos),
-                fallbackFonts);
+                fallbackFonts, glyphOverflow);
 
   return w;
 }

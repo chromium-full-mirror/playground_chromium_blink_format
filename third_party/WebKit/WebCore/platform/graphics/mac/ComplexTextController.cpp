@@ -73,6 +73,10 @@ ComplexTextController::ComplexTextController(
       m_characterInCurrentGlyph(0),
       m_finalRoundingWidth(0),
       m_fallbackFonts(fallbackFonts),
+      m_minGlyphBoundingBoxX(numeric_limits<float>::max()),
+      m_maxGlyphBoundingBoxX(numeric_limits<float>::min()),
+      m_minGlyphBoundingBoxY(numeric_limits<float>::max()),
+      m_maxGlyphBoundingBoxY(numeric_limits<float>::min()),
       m_lastRoundingGlyph(0) {
   m_padding = m_run.padding();
   if (!m_padding)
@@ -526,6 +530,7 @@ void ComplexTextController::adjustGlyphsAndAdvances() {
     bool hasExtraSpacing =
         (m_font.letterSpacing() || m_font.wordSpacing() || m_padding) &&
         !m_run.spacingDisabled();
+    CGPoint glyphOrigin = CGPointZero;
     CFIndex lastCharacterIndex = m_run.ltr() ? numeric_limits<CFIndex>::min()
                                              : numeric_limits<CFIndex>::max();
     bool isMonotonic = true;
@@ -650,6 +655,20 @@ void ComplexTextController::adjustGlyphsAndAdvances() {
       advance.height *= -1;
       m_adjustedAdvances.append(advance);
       m_adjustedGlyphs.append(glyph);
+
+      GlyphMetrics glyphMetrics = fontData->metricsForGlyph(glyph);
+      glyphMetrics.boundingBox.move(glyphOrigin.x, glyphOrigin.y);
+      m_minGlyphBoundingBoxX =
+          min(m_minGlyphBoundingBoxX, glyphMetrics.boundingBox.x());
+      m_maxGlyphBoundingBoxX =
+          max(m_maxGlyphBoundingBoxX, glyphMetrics.boundingBox.right());
+      m_minGlyphBoundingBoxY =
+          min(m_minGlyphBoundingBoxY, glyphMetrics.boundingBox.y());
+      m_maxGlyphBoundingBoxY =
+          max(m_maxGlyphBoundingBoxY, glyphMetrics.boundingBox.bottom());
+      glyphOrigin.x += advance.width;
+      glyphOrigin.y += advance.height;
+
       lastCharacterIndex = characterIndex;
     }
     if (!isMonotonic)

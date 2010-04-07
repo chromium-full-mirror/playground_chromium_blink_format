@@ -34,6 +34,8 @@
 #include "UniscribeController.h"
 #include <wtf/MathExtras.h>
 
+using namespace std;
+
 namespace WebCore {
 
 bool Font::canReturnFallbackFontsForComplexText() {
@@ -98,9 +100,22 @@ void Font::drawComplexText(GraphicsContext* context,
 
 float Font::floatWidthForComplexText(
     const TextRun& run,
-    HashSet<const SimpleFontData*>* fallbackFonts) const {
+    HashSet<const SimpleFontData*>* fallbackFonts,
+    GlyphOverflow* glyphOverflow) const {
   UniscribeController controller(this, run, fallbackFonts);
   controller.advance(run.length());
+  if (glyphOverflow) {
+    glyphOverflow->top =
+        max<int>(glyphOverflow->top,
+                 ceilf(-controller.minGlyphBoundingBoxY()) - ascent());
+    glyphOverflow->bottom =
+        max<int>(glyphOverflow->bottom,
+                 ceilf(controller.maxGlyphBoundingBoxY()) - descent());
+    glyphOverflow->left =
+        max<int>(0, ceilf(-controller.minGlyphBoundingBoxX()));
+    glyphOverflow->right = max<int>(0, ceilf(controller.maxGlyphBoundingBoxX() -
+                                             controller.runWidthSoFar()));
+  }
   return controller.runWidthSoFar();
 }
 

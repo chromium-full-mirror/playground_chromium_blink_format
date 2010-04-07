@@ -90,7 +90,8 @@ void SimpleFontData::determinePitch() {
       m_platformData.font() && m_platformData.font()->IsFixed();
 }
 
-float SimpleFontData::platformWidthForGlyph(Glyph glyph) const {
+GlyphMetrics SimpleFontData::platformMetricsForGlyph(Glyph glyph,
+                                                     GlyphMetricsMode) const {
   if (!m_platformData.font())
     return 0;
 
@@ -99,7 +100,9 @@ float SimpleFontData::platformWidthForGlyph(Glyph glyph) const {
 
   charUnicodeToUTF8HACK(glyph, charArray);
   m_platformData.font()->GetEscapements(charArray, 1, escapements);
-  return escapements[0] * m_platformData.font()->Size();
+  GlyphMetrics metrics;
+  metrics.horizontalAdvance = escapements[0] * m_platformData.font()->Size();
+  return metrics;
 }
 
 }  // namespace WebCore

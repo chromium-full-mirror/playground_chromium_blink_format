@@ -68,6 +68,11 @@ class ComplexTextController {
   // Extra width to the left of the leftmost glyph.
   float finalRoundingWidth() const { return m_finalRoundingWidth; }
 
+  float minGlyphBoundingBoxX() const { return m_minGlyphBoundingBoxX; }
+  float maxGlyphBoundingBoxX() const { return m_maxGlyphBoundingBoxX; }
+  float minGlyphBoundingBoxY() const { return m_minGlyphBoundingBoxY; }
+  float maxGlyphBoundingBoxY() const { return m_maxGlyphBoundingBoxY; }
+
  private:
   class ComplexTextRun : public RefCounted<ComplexTextRun> {
    public:
@@ -224,6 +229,11 @@ class ComplexTextController {
   float m_padPerSpace;
 
   HashSet<const SimpleFontData*>* m_fallbackFonts;
+
+  float m_minGlyphBoundingBoxX;
+  float m_maxGlyphBoundingBoxX;
+  float m_minGlyphBoundingBoxY;
+  float m_maxGlyphBoundingBoxY;
 
   unsigned m_lastRoundingGlyph;
 };

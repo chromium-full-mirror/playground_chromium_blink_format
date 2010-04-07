@@ -499,7 +499,8 @@ void Font::drawComplexText(GraphicsContext* gc,
 
 float Font::floatWidthForComplexText(
     const TextRun& run,
-    HashSet<const SimpleFontData*>* /* fallbackFonts */) const {
+    HashSet<const SimpleFontData*>* /* fallbackFonts */,
+    GlyphOverflow* /* glyphOverflow */) const {
   TextRunWalker walker(run, 0, this);
   return walker.widthOfFullRun();
 }
