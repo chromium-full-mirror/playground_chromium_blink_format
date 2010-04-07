@@ -442,7 +442,7 @@ authenticationSchemeFromAuthenticationMethod(CFStringRef method) {
     return ProtectionSpaceAuthenticationSchemeNegotiate;
 #endif
   ASSERT_NOT_REACHED();
-  return ProtectionSpaceAuthenticationSchemeDefault;
+  return ProtectionSpaceAuthenticationSchemeUnknown;
 }
 
 void SocketStreamHandle::addCONNECTCredentials(CFHTTPMessageRef proxyResponse) {
