@@ -41,7 +41,6 @@ OriginAccessEntry::OriginAccessEntry(const String& protocol,
     : m_protocol(protocol.lower()),
       m_host(host.lower()),
       m_subdomainSettings(subdomainSetting) {
-  ASSERT(m_protocol == "http" || m_protocol == "https");
   ASSERT(subdomainSetting == AllowSubdomains ||
          subdomainSetting == DisallowSubdomains);
 
