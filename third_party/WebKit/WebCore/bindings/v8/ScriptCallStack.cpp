@@ -32,11 +32,11 @@
 #include "ScriptCallStack.h"
 
 #include "ScriptController.h"
-#include "ScriptDebugServer.h"
 
 #include <v8.h>
 
 #include "V8Binding.h"
+#include "V8Proxy.h"
 
 namespace WebCore {
 
@@ -44,18 +44,15 @@ ScriptCallStack* ScriptCallStack::create(const v8::Arguments& arguments,
                                          unsigned skipArgumentCount) {
   String sourceName;
   int sourceLineNumber;
-  String funcName;
-  if (!callLocation(&sourceName, &sourceLineNumber, &funcName))
+  if (!callLocation(&sourceName, &sourceLineNumber))
     return 0;
   return new ScriptCallStack(arguments, skipArgumentCount, sourceName,
-                             sourceLineNumber, funcName);
+                             sourceLineNumber);
 }
 
-bool ScriptCallStack::callLocation(String* sourceName,
-                                   int* sourceLineNumber,
-                                   String* functionName) {
-  if (!ScriptDebugServer::topStackFrame(*sourceName, *sourceLineNumber,
-                                        *functionName))
+bool ScriptCallStack::callLocation(String* sourceName, int* sourceLineNumber) {
+  if (!V8Proxy::sourceName(*sourceName) ||
+      !V8Proxy::sourceLineNumber(*sourceLineNumber))
     return false;
   *sourceLineNumber += 1;
   return true;
@@ -64,9 +61,8 @@ bool ScriptCallStack::callLocation(String* sourceName,
 ScriptCallStack::ScriptCallStack(const v8::Arguments& arguments,
                                  unsigned skipArgumentCount,
                                  String sourceName,
-                                 int sourceLineNumber,
-                                 String functionName)
-    : m_lastCaller(functionName,
+                                 int sourceLineNumber)
+    : m_lastCaller(String(),
                    sourceName,
                    sourceLineNumber,
                    arguments,
