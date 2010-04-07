@@ -45,7 +45,7 @@ WebIDBDatabaseError::~WebIDBDatabaseError() {
 }
 
 void WebIDBDatabaseError::assign(const WebIDBDatabaseError& value) {
-  m_private = value;
+  m_private = value.m_private;
 }
 
 void WebIDBDatabaseError::assign(unsigned short code,
