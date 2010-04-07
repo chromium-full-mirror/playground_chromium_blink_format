@@ -75,7 +75,7 @@ v8::Handle<v8::Value> V8IndexedDatabaseRequest::openCallback(
   Frame* frame = V8Proxy::retrieveFrameForCurrentContext();
   RefPtr<V8CustomIDBCallbacks<IDBDatabase, IDBDatabaseRequest>> callbacks =
       V8CustomIDBCallbacks<IDBDatabase, IDBDatabaseRequest>::create(
-          onSuccess, onError, frame);
+          onSuccess, onError, frame->document());
 
   ExceptionCode ec = 0;
   imp->open(name, description, modifyDatabase, ec, callbacks);
