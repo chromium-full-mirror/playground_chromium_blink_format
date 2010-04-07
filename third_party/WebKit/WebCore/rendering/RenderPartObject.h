@@ -43,7 +43,7 @@ class RenderPartObject : public RenderPart {
 
   virtual void viewCleared();
 
-  bool flattenFrame() const;
+  bool flattenFrame();
 };
 
 inline RenderPartObject* toRenderPartObject(RenderObject* object) {
