@@ -150,9 +150,8 @@ String convertNPStringToUTF16(const NPString* string) {
                                             string->UTF8Length);
 }
 
-Identifier identifierFromNPIdentifier(const NPUTF8* name) {
-  return Identifier(WebCore::JSDOMWindow::commonJSGlobalData(),
-                    convertUTF8ToUTF16WithLatin1Fallback(name, -1));
+Identifier identifierFromNPIdentifier(ExecState* exec, const NPUTF8* name) {
+  return Identifier(exec, convertUTF8ToUTF16WithLatin1Fallback(name, -1));
 }
 }
 }
