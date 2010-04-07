@@ -81,6 +81,8 @@ class IntPoint {
   explicit IntPoint(const IntSize& size)
       : m_x(size.width()), m_y(size.height()) {}
 
+  static IntPoint zero() { return IntPoint(); }
+
   int x() const { return m_x; }
   int y() const { return m_y; }
 
@@ -103,7 +105,7 @@ class IntPoint {
                     m_y < other.m_y ? m_y : other.m_y);
   }
 
-  void clampNegativeToZero() { *this = expandedTo(IntPoint()); }
+  void clampNegativeToZero() { *this = expandedTo(zero()); }
 
 #if PLATFORM(CG)
   explicit IntPoint(

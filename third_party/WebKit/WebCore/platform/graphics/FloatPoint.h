@@ -70,6 +70,8 @@ class FloatPoint {
   FloatPoint(float x, float y) : m_x(x), m_y(y) {}
   FloatPoint(const IntPoint&);
 
+  static FloatPoint zero() { return FloatPoint(); }
+
   static FloatPoint narrowPrecision(double x, double y);
 
   float x() const { return m_x; }
