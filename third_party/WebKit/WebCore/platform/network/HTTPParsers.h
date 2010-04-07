@@ -41,7 +41,14 @@ enum XSSProtectionDisposition {
   XSSProtectionBlockEnabled
 };
 
-bool shouldTreatAsAttachment(const ResourceResponseBase& response);
+typedef enum {
+  ContentDispositionNone,
+  ContentDispositionInline,
+  ContentDispositionAttachment,
+  ContentDispositionOther
+} ContentDispositionType;
+
+ContentDispositionType contentDispositionType(const String&);
 bool parseHTTPRefresh(const String& refresh,
                       bool fromHttpEquivMeta,
                       double& delay,

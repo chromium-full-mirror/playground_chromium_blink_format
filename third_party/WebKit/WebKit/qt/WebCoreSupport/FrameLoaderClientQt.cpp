@@ -927,8 +927,10 @@ void FrameLoaderClientQt::dispatchDecidePolicyForMIMEType(
     const WebCore::String& MIMEType,
     const WebCore::ResourceRequest&) {
   // we need to call directly here
-  if (WebCore::shouldTreatAsAttachment(
-          m_frame->loader()->activeDocumentLoader()->response()))
+  const ResourceResponse& response =
+      m_frame->loader()->activeDocumentLoader()->response();
+  if (WebCore::contentDispositionType(response.httpHeaderField(
+          "Content-Disposition")) == WebCore::ContentDispositionAttachment)
     callPolicyFunction(function, PolicyDownload);
   else if (canShowMIMEType(MIMEType))
     callPolicyFunction(function, PolicyUse);
