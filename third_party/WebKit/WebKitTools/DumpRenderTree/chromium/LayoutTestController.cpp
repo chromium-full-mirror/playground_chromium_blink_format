@@ -590,7 +590,7 @@ void LayoutTestController::setUserStyleSheetLocation(
     CppVariant* result) {
   if (arguments.size() > 0 && arguments[0].isString()) {
     m_userStyleSheetLocation =
-        WebURL(GURL(TestShell::rewriteLocalUrl(arguments[0].toString())));
+        webkit_support::RewriteLayoutTestsURL(arguments[0].toString());
     m_shell->webView()->settings()->setUserStyleSheetLocation(
         m_userStyleSheetLocation);
   }
@@ -712,8 +712,7 @@ void LayoutTestController::pathToLocalResource(const CppArgumentList& arguments,
   // them to just file:///.
   while (StartsWithASCII(url, "file:////", false))
     url = url.substr(0, 8) + url.substr(9);
-  GURL location(TestShell::rewriteLocalUrl(url));
-  result->set(location.spec());
+  result->set(webkit_support::RewriteLayoutTestsURL(url).spec());
 }
 
 void LayoutTestController::addFileToPasteboardOnDrag(const CppArgumentList&,
