@@ -1078,6 +1078,7 @@ bool SelectionController::recomputeCaretRect() {
   // obtain the repaint bounds.
   m_absoluteCaretRepaintBounds = caretRepaintRect();
 
+#if ENABLE(TEXT_CARET)
   if (RenderView* view = toRenderView(m_frame->document()->renderer())) {
     // FIXME: make caret repainting container-aware.
     view->repaintRectangleInViewAndCompositedLayers(
@@ -1086,7 +1087,7 @@ bool SelectionController::recomputeCaretRect() {
       view->repaintRectangleInViewAndCompositedLayers(
           m_absoluteCaretRepaintBounds, false);
   }
-
+#endif
   return true;
 }
 
@@ -1158,6 +1159,11 @@ void SelectionController::paintCaret(GraphicsContext* context,
   }
 
   context->fillRect(caret, caretColor, colorSpace);
+#else
+  UNUSED_PARAM(context);
+  UNUSED_PARAM(tx);
+  UNUSED_PARAM(ty);
+  UNUSED_PARAM(clipRect);
 #endif
 }
 
