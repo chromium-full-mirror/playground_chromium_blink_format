@@ -48,7 +48,9 @@ class ScriptCallStack : public Noncopyable {
                                  unsigned skipArgumentCount = 0);
   ~ScriptCallStack();
 
-  static bool callLocation(String* sourceName, int* sourceLineNumber);
+  static bool callLocation(String* sourceName,
+                           int* sourceLineNumber,
+                           String* functionName);
 
   const ScriptCallFrame& at(unsigned) const;
   // FIXME: implement retrieving and storing call stack trace
@@ -61,7 +63,8 @@ class ScriptCallStack : public Noncopyable {
   ScriptCallStack(const v8::Arguments& arguments,
                   unsigned skipArgumentCount,
                   String sourceName,
-                  int sourceLineNumber);
+                  int sourceLineNumber,
+                  String funcName);
 
   ScriptCallFrame m_lastCaller;
   ScriptState* m_scriptState;
