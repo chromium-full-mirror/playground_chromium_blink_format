@@ -42,8 +42,11 @@
 namespace WebCore {
 
 v8::Handle<v8::Value> V8History::pushStateCallback(const v8::Arguments& args) {
+  bool didThrow = false;
   RefPtr<SerializedScriptValue> historyState =
-      SerializedScriptValue::create(args[0]);
+      SerializedScriptValue::create(args[0], didThrow);
+  if (didThrow)
+    return v8::Undefined();
 
   v8::TryCatch tryCatch;
   String title = toWebCoreStringWithNullOrUndefinedCheck(args[1]);
@@ -65,8 +68,11 @@ v8::Handle<v8::Value> V8History::pushStateCallback(const v8::Arguments& args) {
 
 v8::Handle<v8::Value> V8History::replaceStateCallback(
     const v8::Arguments& args) {
+  bool didThrow = false;
   RefPtr<SerializedScriptValue> historyState =
-      SerializedScriptValue::create(args[0]);
+      SerializedScriptValue::create(args[0], didThrow);
+  if (didThrow)
+    return v8::Undefined();
 
   v8::TryCatch tryCatch;
   String title = toWebCoreStringWithNullOrUndefinedCheck(args[1]);
