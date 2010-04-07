@@ -31,7 +31,15 @@ class ExecState;
 class ScopeChain;
 class SourceCode;
 
-enum ComplType { Normal, Break, Continue, ReturnValue, Throw, Interrupted };
+enum ComplType {
+  Normal,
+  Break,
+  Continue,
+  ReturnValue,
+  Throw,
+  Interrupted,
+  Terminated
+};
 
 /*
  * Completion objects are used to convey the return status and value

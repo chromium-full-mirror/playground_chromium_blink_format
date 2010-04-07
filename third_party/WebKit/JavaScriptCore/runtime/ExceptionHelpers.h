@@ -42,6 +42,7 @@ class Node;
 struct Instruction;
 
 JSValue createInterruptedExecutionException(JSGlobalData*);
+JSValue createTerminatedExecutionException(JSGlobalData*);
 JSValue createStackOverflowError(ExecState*);
 JSValue createTypeError(ExecState*, const char* message);
 JSValue createUndefinedVariableError(ExecState*,

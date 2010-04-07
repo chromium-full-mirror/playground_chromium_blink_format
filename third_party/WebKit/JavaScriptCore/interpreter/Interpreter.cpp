@@ -639,7 +639,8 @@ NEVER_INLINE HandlerInfo* Interpreter::throwException(CallFrame*& callFrame,
             ReadOnly | DontDelete);
       }
 
-      if (exception->isWatchdogException()) {
+      ComplType exceptionType = exception->exceptionType();
+      if (exceptionType == Interrupted || exceptionType == Terminated) {
         while (unwindCallFrame(callFrame, exceptionValue, bytecodeOffset,
                                codeBlock)) {
           // Don't need handler checks or anything, we just want to unroll all
@@ -1387,7 +1388,8 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
 
 #define CHECK_FOR_TIMEOUT()                                       \
   if (!--tickCount) {                                             \
-    if (globalData->timeoutChecker.didTimeOut(callFrame)) {       \
+    if (globalData->terminator.shouldTerminate() ||               \
+        globalData->timeoutChecker.didTimeOut(callFrame)) {       \
       exceptionValue = jsNull();                                  \
       goto vm_throw;                                              \
     }                                                             \

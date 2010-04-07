@@ -37,6 +37,7 @@
 #include "MarkStack.h"
 #include "NumericStrings.h"
 #include "SmallStrings.h"
+#include "Terminator.h"
 #include "TimeoutChecker.h"
 #include "WeakRandom.h"
 #include <wtf/Forward.h>
@@ -112,6 +113,7 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
 
   RefPtr<Structure> activationStructure;
   RefPtr<Structure> interruptedExecutionErrorStructure;
+  RefPtr<Structure> terminatedExecutionErrorStructure;
   RefPtr<Structure> staticScopeStructure;
   RefPtr<Structure> stringStructure;
   RefPtr<Structure> notAnObjectErrorStubStructure;
@@ -153,6 +155,7 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
   JITThunks jitStubs;
 #endif
   TimeoutChecker timeoutChecker;
+  Terminator terminator;
   Heap heap;
 
   JSValue exception;

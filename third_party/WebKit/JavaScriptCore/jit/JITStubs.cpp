@@ -1332,7 +1332,10 @@ DEFINE_STUB_FUNCTION(int, timeout_check) {
   JSGlobalData* globalData = stackFrame.globalData;
   TimeoutChecker& timeoutChecker = globalData->timeoutChecker;
 
-  if (timeoutChecker.didTimeOut(stackFrame.callFrame)) {
+  if (globalData->terminator.shouldTerminate()) {
+    globalData->exception = createTerminatedExecutionException(globalData);
+    VM_THROW_EXCEPTION_AT_END();
+  } else if (timeoutChecker.didTimeOut(stackFrame.callFrame)) {
     globalData->exception = createInterruptedExecutionException(globalData);
     VM_THROW_EXCEPTION_AT_END();
   }

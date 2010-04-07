@@ -66,9 +66,10 @@ Completion evaluate(ExecState* exec,
       program.get(), exec, scopeChain.node(), thisObj, &exception);
 
   if (exception) {
-    if (exception.isObject() && asObject(exception)->isWatchdogException())
-      return Completion(Interrupted, exception);
-    return Completion(Throw, exception);
+    ComplType exceptionType = Throw;
+    if (exception.isObject())
+      exceptionType = asObject(exception)->exceptionType();
+    return Completion(exceptionType, exception);
   }
   return Completion(Normal, result);
 }

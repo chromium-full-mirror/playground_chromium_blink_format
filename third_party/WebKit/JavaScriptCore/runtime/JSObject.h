@@ -27,6 +27,7 @@
 #include "ArgList.h"
 #include "ClassInfo.h"
 #include "CommonIdentifiers.h"
+#include "Completion.h"
 #include "CallFrame.h"
 #include "JSCell.h"
 #include "JSNumberCell.h"
@@ -261,8 +262,9 @@ class JSObject : public JSCell {
   virtual bool isGlobalObject() const { return false; }
   virtual bool isVariableObject() const { return false; }
   virtual bool isActivationObject() const { return false; }
-  virtual bool isWatchdogException() const { return false; }
   virtual bool isNotAnObjectErrorStub() const { return false; }
+
+  virtual ComplType exceptionType() const { return Throw; }
 
   void allocatePropertyStorage(size_t oldSize, size_t newSize);
   void allocatePropertyStorageInline(size_t oldSize, size_t newSize);
