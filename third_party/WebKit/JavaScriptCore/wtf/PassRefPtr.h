@@ -39,7 +39,7 @@ PassRefPtr<T> adoptRef(T*);
 // a class member or function arguments before T is defined.
 template <typename T>
 #if !COMPILER(WINSCW)
-inline
+ALWAYS_INLINE
 #endif
     void
     refIfNotNull(T* ptr) {
@@ -49,7 +49,7 @@ inline
 
 template <typename T>
 #if !COMPILER(WINSCW)
-inline
+ALWAYS_INLINE
 #endif
     void
     derefIfNotNull(T* ptr) {
