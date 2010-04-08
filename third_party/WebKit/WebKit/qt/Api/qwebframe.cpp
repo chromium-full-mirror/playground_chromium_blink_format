@@ -294,10 +294,12 @@ static bool webframe_scrollOverflow(WebCore::Frame* frame,
                                     int dx,
                                     int dy,
                                     const QPoint& pos) {
-  if (!frame || !frame->document() || !frame->eventHandler())
+  if (!frame || !frame->document() || !frame->view() || !frame->eventHandler())
     return false;
 
-  Node* node = frame->document()->elementFromPoint(pos.x(), pos.y());
+  QPoint contentsPos = frame->view()->windowToContents(pos);
+  Node* node =
+      frame->document()->elementFromPoint(contentsPos.x(), contentsPos.y());
   if (!node)
     return false;
 
@@ -342,37 +344,37 @@ void QWEBKIT_EXPORT qtwebkit_webframe_scrollRecursively(QWebFrame* qFrame,
                                                         int dx,
                                                         int dy,
                                                         const QPoint& pos) {
-  Frame* frame = QWebFramePrivate::core(qFrame);
-
-  if (!frame || !frame->view())
+  if (!qFrame)
     return;
 
-  if (!webframe_scrollOverflow(frame, dx, dy, pos)) {
-    do {
-      bool scrolledHorizontal = false;
-      bool scrolledVertical = false;
+  if (webframe_scrollOverflow(QWebFramePrivate::core(qFrame), dx, dy, pos))
+    return;
 
-      IntSize scrollOffset = frame->view()->scrollOffset();
-      IntPoint maxScrollOffset = frame->view()->maximumScrollPosition();
+  bool scrollHorizontal = false;
+  bool scrollVertical = false;
 
-      if (dx > 0)  // scroll right
-        scrolledHorizontal = scrollOffset.width() < maxScrollOffset.x();
-      else if (dx < 0)  // scroll left
-        scrolledHorizontal = scrollOffset.width() > 0;
+  do {
+    if (dx > 0)  // scroll right
+      scrollHorizontal = qFrame->scrollBarValue(Qt::Horizontal) <
+                         qFrame->scrollBarMaximum(Qt::Horizontal);
+    else if (dx < 0)  // scroll left
+      scrollHorizontal = qFrame->scrollBarValue(Qt::Horizontal) >
+                         qFrame->scrollBarMinimum(Qt::Horizontal);
 
-      if (dy > 0)  // scroll down
-        scrolledVertical = scrollOffset.height() < maxScrollOffset.y();
-      else if (dy < 0)  // scroll up
-        scrolledVertical = scrollOffset.height() > 0;
+    if (dy > 0)  // scroll down
+      scrollVertical = qFrame->scrollBarValue(Qt::Vertical) <
+                       qFrame->scrollBarMaximum(Qt::Vertical);
+    else if (dy < 0)  // scroll up
+      scrollVertical = qFrame->scrollBarValue(Qt::Vertical) >
+                       qFrame->scrollBarMinimum(Qt::Vertical);
 
-      if (scrolledHorizontal || scrolledVertical) {
-        frame->view()->scrollBy(IntSize(dx, dy));
-        return;
-      }
+    if (scrollHorizontal || scrollVertical) {
+      qFrame->scroll(dx, dy);
+      return;
+    }
 
-      frame = frame->tree()->parent();
-    } while (frame && frame->view());
-  }
+    qFrame = qFrame->parentFrame();
+  } while (qFrame);
 }
 
 QWebFrameData::QWebFrameData(WebCore::Page* parentPage,
