@@ -63,14 +63,6 @@ class V8CustomIDBCallbacks : public IDBCallbacks<ResultType> {
     m_onError.Dispose();
   }
 
-  virtual void onSuccess(PassRefPtr<ResultType> result) {
-    onEvent(m_onSuccess, ResultWrapperType::create(result));
-  }
-
-  virtual void onError(PassRefPtr<IDBDatabaseError> error) {
-    onEvent(m_onError, error);
-  }
-
   // FIXME: Handle suspend/resume correctly.
 
  private:
@@ -112,6 +104,14 @@ class V8CustomIDBCallbacks : public IDBCallbacks<ResultType> {
     // FIXME: Do we care if this thing returns true (i.e. it raised an
     // exception)?
     invokeCallback(callback, 1, argv, callbackReturnValue);
+  }
+
+  virtual void onSuccessAsync(PassRefPtr<ResultType> result) {
+    onEvent(m_onSuccess, ResultWrapperType::create(result));
+  }
+
+  virtual void onErrorAsync(PassRefPtr<IDBDatabaseError> error) {
+    onEvent(m_onError, error);
   }
 
   // FIXME: Use OwnHandles.
