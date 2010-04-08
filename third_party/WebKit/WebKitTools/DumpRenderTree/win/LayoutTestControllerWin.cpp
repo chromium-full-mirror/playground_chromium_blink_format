@@ -983,6 +983,11 @@ void LayoutTestController::whiteListAccessFromOrigin(
       bstrT(destinationHost).GetBSTR(), allowDestinationSubdomains);
 }
 
+void LayoutTestController::setScrollbarPolicy(JSStringRef orientation,
+                                              JSStringRef policy) {
+  // FIXME: implement
+}
+
 void LayoutTestController::addUserScript(JSStringRef source, bool runAtStart) {
   COMPtr<IWebViewPrivate> webView;
   if (FAILED(WebKitCreateInstance(__uuidof(WebView), 0, __uuidof(webView),

@@ -261,6 +261,11 @@ void LayoutTestController::waitForPolicyDelegate() {
   setWaitToDump(true);
 }
 
+void LayoutTestController::setScrollbarPolicy(JSStringRef orientation,
+                                              JSStringRef policy) {
+  // FIXME: implement
+}
+
 void LayoutTestController::whiteListAccessFromOrigin(JSStringRef sourceOrigin,
                                                      JSStringRef protocol,
                                                      JSStringRef host,

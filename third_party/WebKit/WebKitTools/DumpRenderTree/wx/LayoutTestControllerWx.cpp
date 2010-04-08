@@ -314,6 +314,11 @@ void LayoutTestController::whiteListAccessFromOrigin(
     JSStringRef destinationHost,
     bool allowDestinationSubdomains) {}
 
+void LayoutTestController::setScrollbarPolicy(JSStringRef orientation,
+                                              JSStringRef policy) {
+  // FIXME: implement
+}
+
 JSRetainPtr<JSStringRef> LayoutTestController::counterValueForElementById(
     JSStringRef id) {
   return 0;

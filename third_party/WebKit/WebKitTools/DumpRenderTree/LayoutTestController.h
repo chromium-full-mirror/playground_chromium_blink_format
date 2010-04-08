@@ -103,6 +103,7 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
   void setXSSAuditorEnabled(bool flag);
   void setFrameFlatteningEnabled(bool enable);
   void setSpatialNavigationEnabled(bool enable);
+  void setScrollbarPolicy(JSStringRef orientation, JSStringRef policy);
 
   void waitForPolicyDelegate();
   size_t webHistoryItemCount();
