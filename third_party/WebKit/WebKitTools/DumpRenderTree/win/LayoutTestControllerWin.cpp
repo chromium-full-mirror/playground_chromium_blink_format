@@ -166,6 +166,13 @@ void LayoutTestController::keepWebHistory() {
   history->setOptionalSharedHistory(sharedHistory.get());
 }
 
+JSValueRef LayoutTestController::computedStyleIncludingVisitedInfo(
+    JSContextRef context,
+    JSValueRef value) {
+  // FIXME: Implement this.
+  return 0;
+}
+
 JSRetainPtr<JSStringRef> LayoutTestController::layerTreeAsText() const {
   COMPtr<IWebFramePrivate> framePrivate(Query, frame);
   if (!framePrivate)

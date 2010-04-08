@@ -488,9 +488,9 @@ void RenderImage::paintFocusRings(PaintInfo& paintInfo,
 
     Vector<Path> focusRingPaths;
     focusRingPaths.append(areaElement->getPath(this));
-    paintInfo.context->drawFocusRing(focusRingPaths, style->outlineWidth(),
-                                     style->outlineOffset(),
-                                     style->outlineColor());
+    paintInfo.context->drawFocusRing(
+        focusRingPaths, style->outlineWidth(), style->outlineOffset(),
+        style->visitedDependentColor(CSSPropertyOutlineColor));
     break;
   }
 }

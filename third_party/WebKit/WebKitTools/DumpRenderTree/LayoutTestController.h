@@ -60,6 +60,7 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
   JSRetainPtr<JSStringRef> counterValueForElementById(JSStringRef id);
   bool isCommandEnabled(JSStringRef name);
   void keepWebHistory();
+  JSValueRef computedStyleIncludingVisitedInfo(JSContextRef, JSValueRef);
   void notifyDone();
   int numberOfPages(float pageWidthInPixels, float pageHeightInPixels);
   void overridePreference(JSStringRef key, JSStringRef value);

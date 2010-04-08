@@ -165,6 +165,13 @@ void LayoutTestController::keepWebHistory() {
   // FIXME: implement
 }
 
+JSValueRef LayoutTestController::computedStyleIncludingVisitedInfo(
+    JSContextRef context,
+    JSValueRef value) {
+  // FIXME: Implement this.
+  return 0;
+}
+
 JSRetainPtr<JSStringRef> LayoutTestController::layerTreeAsText() const {
   // FIXME: implement
   JSRetainPtr<JSStringRef> string(Adopt, JSStringCreateWithUTF8CString(""));

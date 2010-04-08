@@ -1068,10 +1068,14 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
                           style->borderImage()))
     return;
 
-  const Color& topColor = style->borderTopColor();
-  const Color& bottomColor = style->borderBottomColor();
-  const Color& leftColor = style->borderLeftColor();
-  const Color& rightColor = style->borderRightColor();
+  const Color& topColor =
+      style->visitedDependentColor(CSSPropertyBorderTopColor);
+  const Color& bottomColor =
+      style->visitedDependentColor(CSSPropertyBorderBottomColor);
+  const Color& leftColor =
+      style->visitedDependentColor(CSSPropertyBorderLeftColor);
+  const Color& rightColor =
+      style->visitedDependentColor(CSSPropertyBorderRightColor);
 
   bool topTransparent = style->borderTopIsTransparent();
   bool bottomTransparent = style->borderBottomIsTransparent();
@@ -1151,7 +1155,7 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
     }
 
     drawLineForBoxSide(graphicsContext, x, ty, x2, ty + style->borderTopWidth(),
-                       BSTop, topColor, style->color(), topStyle,
+                       BSTop, topColor, topStyle,
                        ignore_left ? 0 : style->borderLeftWidth(),
                        ignore_right ? 0 : style->borderRightWidth());
 
@@ -1186,7 +1190,7 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
         // Draw upper left arc
         drawArcForBoxSide(graphicsContext, leftX, leftY, thickness, topLeft,
                           firstAngleStart, firstAngleSpan, BSTop, topColor,
-                          style->color(), topStyle, true);
+                          topStyle, true);
         if (applyLeftInnerClip)
           graphicsContext->restore();
       }
@@ -1216,7 +1220,7 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
         // Draw upper right arc
         drawArcForBoxSide(graphicsContext, rightX, leftY, thickness, topRight,
                           secondAngleStart, secondAngleSpan, BSTop, topColor,
-                          style->color(), topStyle, false);
+                          topStyle, false);
         if (applyRightInnerClip)
           graphicsContext->restore();
       }
@@ -1245,8 +1249,8 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
     }
 
     drawLineForBoxSide(graphicsContext, x, ty + h - style->borderBottomWidth(),
-                       x2, ty + h, BSBottom, bottomColor, style->color(),
-                       bottomStyle, ignore_left ? 0 : style->borderLeftWidth(),
+                       x2, ty + h, BSBottom, bottomColor, bottomStyle,
+                       ignore_left ? 0 : style->borderLeftWidth(),
                        ignore_right ? 0 : style->borderRightWidth());
 
     if (renderRadii) {
@@ -1278,7 +1282,7 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
         // Draw lower left arc
         drawArcForBoxSide(graphicsContext, leftX, leftY, thickness, bottomLeft,
                           firstAngleStart, firstAngleSpan, BSBottom,
-                          bottomColor, style->color(), bottomStyle, true);
+                          bottomColor, bottomStyle, true);
         if (applyLeftInnerClip)
           graphicsContext->restore();
       }
@@ -1304,8 +1308,7 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
         // Draw lower right arc
         drawArcForBoxSide(graphicsContext, rightX, rightY, thickness,
                           bottomRight, secondAngleStart, secondAngleSpan,
-                          BSBottom, bottomColor, style->color(), bottomStyle,
-                          false);
+                          BSBottom, bottomColor, bottomStyle, false);
         if (applyRightInnerClip)
           graphicsContext->restore();
       }
@@ -1334,7 +1337,7 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
     }
 
     drawLineForBoxSide(graphicsContext, tx, y, tx + style->borderLeftWidth(),
-                       y2, BSLeft, leftColor, style->color(), leftStyle,
+                       y2, BSLeft, leftColor, leftStyle,
                        ignore_top ? 0 : style->borderTopWidth(),
                        ignore_bottom ? 0 : style->borderBottomWidth());
 
@@ -1362,7 +1365,7 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
         // Draw top left arc
         drawArcForBoxSide(graphicsContext, topX, topY, thickness, topLeft,
                           firstAngleStart, firstAngleSpan, BSLeft, leftColor,
-                          style->color(), leftStyle, true);
+                          leftStyle, true);
         if (applyTopInnerClip)
           graphicsContext->restore();
       }
@@ -1387,7 +1390,7 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
         // Draw bottom left arc
         drawArcForBoxSide(graphicsContext, topX, bottomY, thickness, bottomLeft,
                           secondAngleStart, secondAngleSpan, BSLeft, leftColor,
-                          style->color(), leftStyle, false);
+                          leftStyle, false);
         if (applyBottomInnerClip)
           graphicsContext->restore();
       }
@@ -1417,8 +1420,8 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
     }
 
     drawLineForBoxSide(graphicsContext, tx + w - style->borderRightWidth(), y,
-                       tx + w, y2, BSRight, rightColor, style->color(),
-                       rightStyle, ignore_top ? 0 : style->borderTopWidth(),
+                       tx + w, y2, BSRight, rightColor, rightStyle,
+                       ignore_top ? 0 : style->borderTopWidth(),
                        ignore_bottom ? 0 : style->borderBottomWidth());
 
     if (renderRadii &&
@@ -1445,7 +1448,7 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
         // Draw top right arc
         drawArcForBoxSide(graphicsContext, topX, topY, thickness, topRight,
                           firstAngleStart, firstAngleSpan, BSRight, rightColor,
-                          style->color(), rightStyle, true);
+                          rightStyle, true);
         if (applyTopInnerClip)
           graphicsContext->restore();
       }
@@ -1471,8 +1474,7 @@ void RenderBoxModelObject::paintBorder(GraphicsContext* graphicsContext,
         // Draw bottom right arc
         drawArcForBoxSide(graphicsContext, bottomX, bottomY, thickness,
                           bottomRight, secondAngleStart, secondAngleSpan,
-                          BSRight, rightColor, style->color(), rightStyle,
-                          false);
+                          BSRight, rightColor, rightStyle, false);
         if (applyBottomInnerClip)
           graphicsContext->restore();
       }

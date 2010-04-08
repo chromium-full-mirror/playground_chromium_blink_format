@@ -182,6 +182,13 @@ void LayoutTestController::keepWebHistory() {
   m_webHistory = m_drt->webPage()->history();
 }
 
+JSValueRef LayoutTestController::computedStyleIncludingVisitedInfo(
+    JSContextRef context,
+    JSValueRef value) {
+  // FIXME: Implement this.
+  return 0;
+}
+
 void LayoutTestController::notifyDone() {
   qDebug() << ">>>>notifyDone";
 

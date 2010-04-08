@@ -119,7 +119,6 @@ class RenderStyle : public RefCounted<RenderStyle> {
  protected:
   // The following bitfield is 32-bits long, which optimizes padding with the
   // int refCount in the base class. Beware when adding more bits.
-  unsigned m_pseudoState : 3;  // PseudoState
   bool m_affectedByAttributeSelectors : 1;
   bool m_unique : 1;
 
@@ -138,7 +137,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
   bool m_childrenAffectedByBackwardPositionalRules : 1;
   bool m_firstChildState : 1;
   bool m_lastChildState : 1;
-  unsigned m_childIndex : 18;  // Plenty of bits to cache an index.
+  unsigned m_childIndex : 21;  // Plenty of bits to cache an index.
 
   // non-inherited attributes
   DataRef<StyleBoxData> box;
@@ -182,7 +181,8 @@ class RenderStyle : public RefCounted<RenderStyle> {
              (_htmlHacks == other._htmlHacks) &&
              (_force_backgrounds_to_white ==
               other._force_backgrounds_to_white) &&
-             (_pointerEvents == other._pointerEvents);
+             (_pointerEvents == other._pointerEvents) &&
+             (_insideLink == other._insideLink);
     }
 
     bool operator!=(const InheritedFlags& other) const {
@@ -210,7 +210,9 @@ class RenderStyle : public RefCounted<RenderStyle> {
     bool _htmlHacks : 1;
     bool _force_backgrounds_to_white : 1;
     unsigned _pointerEvents : 4;  // EPointerEvents
-                                  // 41 bits
+    EInsideLink
+        _insideLink : 2;  // Whether or not we are contained inside a link.
+                          // 43 bits
   } inherited_flags;
 
   // don't inherit
@@ -231,7 +233,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
              _affectedByActive == other._affectedByActive &&
              _affectedByDrag == other._affectedByDrag &&
              _pseudoBits == other._pseudoBits &&
-             _unicodeBidi == other._unicodeBidi;
+             _unicodeBidi == other._unicodeBidi && _isLink == other._isLink;
     }
 
     bool operator!=(const NonInheritedFlags& other) const {
@@ -252,13 +254,14 @@ class RenderStyle : public RefCounted<RenderStyle> {
     unsigned _page_break_after : 2;   // EPageBreak
     unsigned _page_break_inside : 2;  // EPageBreak
 
-    unsigned _styleType : 5;  // PseudoId
+    unsigned _styleType : 6;  // PseudoId
     bool _affectedByHover : 1;
     bool _affectedByActive : 1;
     bool _affectedByDrag : 1;
     unsigned _pseudoBits : 7;
     unsigned _unicodeBidi : 2;  // EUnicodeBidi
-                                // 50 bits
+    bool _isLink : 1;
+    // 50 bits
   } noninherited_flags;
 
   // !END SYNC!
@@ -282,6 +285,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
     inherited_flags._box_direction = initialBoxDirection();
     inherited_flags._force_backgrounds_to_white = false;
     inherited_flags._pointerEvents = initialPointerEvents();
+    inherited_flags._insideLink = NotInsideLink;
 
     noninherited_flags._effectiveDisplay = noninherited_flags._originalDisplay =
         initialDisplay();
@@ -301,6 +305,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
     noninherited_flags._affectedByDrag = false;
     noninherited_flags._pseudoBits = 0;
     noninherited_flags._unicodeBidi = initialUnicodeBidi();
+    noninherited_flags._isLink = false;
   }
 
  protected:
@@ -741,6 +746,11 @@ class RenderStyle : public RefCounted<RenderStyle> {
   }
 
   CursorList* cursors() const { return inherited->cursorData.get(); }
+
+  EInsideLink insideLink() const {
+    return static_cast<EInsideLink>(inherited_flags._insideLink);
+  }
+  bool isLink() const { return noninherited_flags._isLink; }
 
   short widows() const { return inherited->widows; }
   short orphans() const { return inherited->orphans; }
@@ -1330,6 +1340,11 @@ class RenderStyle : public RefCounted<RenderStyle> {
   void setCursorList(PassRefPtr<CursorList>);
   void clearCursorList();
 
+  void setInsideLink(EInsideLink insideLink) {
+    inherited_flags._insideLink = insideLink;
+  }
+  void setIsLink(bool b) { noninherited_flags._isLink = b; }
+
   bool forceBackgroundsToWhite() const {
     return inherited_flags._force_backgrounds_to_white;
   }
@@ -1631,12 +1646,6 @@ class RenderStyle : public RefCounted<RenderStyle> {
            originalDisplay() == INLINE_BOX || originalDisplay() == INLINE_TABLE;
   }
 
-  // To obtain at any time the pseudo state for a given link.
-  PseudoState pseudoState() const {
-    return static_cast<PseudoState>(m_pseudoState);
-  }
-  void setPseudoState(PseudoState s) { m_pseudoState = s; }
-
   // To tell if this style matched attribute selectors. This makes it impossible
   // to share.
   bool affectedByAttributeSelectors() const {
@@ -1698,6 +1707,8 @@ class RenderStyle : public RefCounted<RenderStyle> {
   void setLastChildState() { m_lastChildState = true; }
   unsigned childIndex() const { return m_childIndex; }
   void setChildIndex(unsigned index) { m_childIndex = index; }
+
+  Color visitedDependentColor(int colorProperty) const;
 
   // Initial values for all the properties
   static bool initialBorderCollapse() { return false; }

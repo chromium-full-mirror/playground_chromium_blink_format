@@ -96,10 +96,30 @@ SVGPaintServer* SVGPaintServer::fillPaintServer(const RenderStyle* style,
     fillPaintServer = sharedSolidPaintServer();
     SVGPaintServerSolid* fillPaintServerSolid =
         static_cast<SVGPaintServerSolid*>(fillPaintServer);
+
+    Color fillColor;
     if (paintType == SVGPaint::SVG_PAINTTYPE_CURRENTCOLOR)
-      fillPaintServerSolid->setColor(style->color());
+      fillColor = style->color();
     else
-      fillPaintServerSolid->setColor(fill->color());
+      fillColor = fill->color();
+
+    if (style->insideLink() == InsideVisitedLink) {
+      RenderStyle* visitedStyle = style->getCachedPseudoStyle(VISITED_LINK);
+      SVGPaint* visitedFill = visitedStyle->svgStyle()->fillPaint();
+      Color visitedFillColor;
+      if (visitedFill->paintType() != SVGPaint::SVG_PAINTTYPE_URI) {
+        if (visitedFill->paintType() == SVGPaint::SVG_PAINTTYPE_CURRENTCOLOR)
+          visitedFillColor = visitedStyle->color();
+        else
+          visitedFillColor = visitedFill->color();
+        if (visitedFillColor.isValid())
+          fillColor = Color(visitedFillColor.red(), visitedFillColor.green(),
+                            visitedFillColor.blue(), fillColor.alpha());
+      }
+    }
+
+    fillPaintServerSolid->setColor(fillColor);
+
     // FIXME: Ideally invalid colors would never get set on the RenderStyle and
     // this could turn into an ASSERT
     if (!fillPaintServerSolid->color().isValid())
@@ -142,10 +162,31 @@ SVGPaintServer* SVGPaintServer::strokePaintServer(const RenderStyle* style,
     strokePaintServer = sharedSolidPaintServer();
     SVGPaintServerSolid* strokePaintServerSolid =
         static_cast<SVGPaintServerSolid*>(strokePaintServer);
+
+    Color strokeColor;
     if (paintType == SVGPaint::SVG_PAINTTYPE_CURRENTCOLOR)
-      strokePaintServerSolid->setColor(style->color());
+      strokeColor = style->color();
     else
-      strokePaintServerSolid->setColor(stroke->color());
+      strokeColor = stroke->color();
+
+    if (style->insideLink() == InsideVisitedLink) {
+      RenderStyle* visitedStyle = style->getCachedPseudoStyle(VISITED_LINK);
+      SVGPaint* visitedStroke = visitedStyle->svgStyle()->strokePaint();
+      Color visitedStrokeColor;
+      if (visitedStroke->paintType() != SVGPaint::SVG_PAINTTYPE_URI) {
+        if (visitedStroke->paintType() == SVGPaint::SVG_PAINTTYPE_CURRENTCOLOR)
+          visitedStrokeColor = visitedStyle->color();
+        else
+          visitedStrokeColor = visitedStroke->color();
+        if (visitedStrokeColor.isValid())
+          strokeColor =
+              Color(visitedStrokeColor.red(), visitedStrokeColor.green(),
+                    visitedStrokeColor.blue(), strokeColor.alpha());
+      }
+    }
+
+    strokePaintServerSolid->setColor(strokeColor);
+
     // FIXME: Ideally invalid colors would never get set on the RenderStyle and
     // this could turn into an ASSERT
     if (!strokePaintServerSolid->color().isValid())

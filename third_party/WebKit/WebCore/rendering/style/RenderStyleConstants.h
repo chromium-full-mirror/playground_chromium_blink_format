@@ -114,6 +114,7 @@ enum PseudoId {
   INPUT_LIST_BUTTON,
   INNER_SPIN_BUTTON,
   OUTER_SPIN_BUTTON,
+  VISITED_LINK,
 
   AFTER_LAST_INTERNAL_PSEUDOID,
   FIRST_PUBLIC_PSEUDOID = FIRST_LINE,
@@ -146,14 +147,6 @@ enum EBorderPrecedence {
   BROWGROUP,
   BROW,
   BCELL
-};
-
-enum PseudoState {
-  PseudoUnknown,
-  PseudoNone,
-  PseudoAnyLink,
-  PseudoLink,
-  PseudoVisited
 };
 
 enum EPosition {
@@ -458,6 +451,8 @@ enum EDisplay {
 #endif
   NONE
 };
+
+enum EInsideLink { NotInsideLink, InsideUnvisitedLink, InsideVisitedLink };
 
 enum EPointerEvents {
   PE_NONE,

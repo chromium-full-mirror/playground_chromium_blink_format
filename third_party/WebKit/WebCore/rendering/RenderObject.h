@@ -460,7 +460,6 @@ class RenderObject : public CachedResourceClient {
                           int y2,
                           BoxSide,
                           Color,
-                          const Color& textcolor,
                           EBorderStyle,
                           int adjbw1,
                           int adjbw2);
@@ -473,7 +472,6 @@ class RenderObject : public CachedResourceClient {
                          int angleSpan,
                          BoxSide,
                          Color,
-                         const Color& textcolor,
                          EBorderStyle,
                          bool firstCorner);
 
@@ -964,12 +962,7 @@ class RenderObject : public CachedResourceClient {
   // Overrides should call the superclass at the start
   virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);
 
-  void paintOutline(GraphicsContext*,
-                    int tx,
-                    int ty,
-                    int w,
-                    int h,
-                    const RenderStyle*);
+  void paintOutline(GraphicsContext*, int tx, int ty, int w, int h);
   void addPDFURLRect(GraphicsContext*, const IntRect&);
 
   virtual IntRect viewRect() const;

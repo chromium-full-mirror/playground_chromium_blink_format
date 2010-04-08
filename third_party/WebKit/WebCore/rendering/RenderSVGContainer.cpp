@@ -124,7 +124,7 @@ void RenderSVGContainer::paint(PaintInfo& paintInfo, int, int) {
       style()->outlineWidth() && style()->visibility() == VISIBLE)
     paintOutline(paintInfo.context, paintRectInParent.x(),
                  paintRectInParent.y(), paintRectInParent.width(),
-                 paintRectInParent.height(), style());
+                 paintRectInParent.height());
 }
 
 // addFocusRingRects is called from paintOutline and needs to be in the same

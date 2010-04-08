@@ -438,8 +438,9 @@ static PassRefPtr<CSSValue> getTimingFunctionValue(
   return list.release();
 }
 
-CSSComputedStyleDeclaration::CSSComputedStyleDeclaration(PassRefPtr<Node> n)
-    : m_node(n) {}
+CSSComputedStyleDeclaration::CSSComputedStyleDeclaration(PassRefPtr<Node> n,
+                                                         bool allowVisitedStyle)
+    : m_node(n), m_allowVisitedStyle(allowVisitedStyle) {}
 
 CSSComputedStyleDeclaration::~CSSComputedStyleDeclaration() {}
 
@@ -628,7 +629,10 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       break;
 
     case CSSPropertyBackgroundColor:
-      return CSSPrimitiveValue::createColor(style->backgroundColor().rgb());
+      return CSSPrimitiveValue::createColor(
+          m_allowVisitedStyle
+              ? style->visitedDependentColor(CSSPropertyBackgroundColor).rgb()
+              : style->backgroundColor().rgb());
     case CSSPropertyBackgroundImage:
       if (style->backgroundImage())
         return style->backgroundImage()->cssValue();
@@ -695,13 +699,34 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       return CSSPrimitiveValue::create(style->verticalBorderSpacing(),
                                        CSSPrimitiveValue::CSS_PX);
     case CSSPropertyBorderTopColor:
-      return currentColorOrValidColor(style.get(), style->borderTopColor());
+      return m_allowVisitedStyle
+                 ? CSSPrimitiveValue::createColor(
+                       style->visitedDependentColor(CSSPropertyBorderTopColor)
+                           .rgb())
+                 : currentColorOrValidColor(style.get(),
+                                            style->borderTopColor());
     case CSSPropertyBorderRightColor:
-      return currentColorOrValidColor(style.get(), style->borderRightColor());
+      return m_allowVisitedStyle
+                 ? CSSPrimitiveValue::createColor(
+                       style->visitedDependentColor(CSSPropertyBorderRightColor)
+                           .rgb())
+                 : currentColorOrValidColor(style.get(),
+                                            style->borderRightColor());
     case CSSPropertyBorderBottomColor:
-      return currentColorOrValidColor(style.get(), style->borderBottomColor());
+      return m_allowVisitedStyle
+                 ? CSSPrimitiveValue::createColor(
+                       style
+                           ->visitedDependentColor(CSSPropertyBorderBottomColor)
+                           .rgb())
+                 : currentColorOrValidColor(style.get(),
+                                            style->borderBottomColor());
     case CSSPropertyBorderLeftColor:
-      return currentColorOrValidColor(style.get(), style->borderLeftColor());
+      return m_allowVisitedStyle
+                 ? CSSPrimitiveValue::createColor(
+                       style->visitedDependentColor(CSSPropertyBorderLeftColor)
+                           .rgb())
+                 : currentColorOrValidColor(style.get(),
+                                            style->borderLeftColor());
     case CSSPropertyBorderTopStyle:
       return CSSPrimitiveValue::create(style->borderTopStyle());
     case CSSPropertyBorderRightStyle:
@@ -758,7 +783,10 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
     case CSSPropertyClear:
       return CSSPrimitiveValue::create(style->clear());
     case CSSPropertyColor:
-      return CSSPrimitiveValue::createColor(style->color().rgb());
+      return CSSPrimitiveValue::createColor(
+          m_allowVisitedStyle
+              ? style->visitedDependentColor(CSSPropertyColor).rgb()
+              : style->color().rgb());
     case CSSPropertyWebkitColumnCount:
       if (style->hasAutoColumnCount())
         return CSSPrimitiveValue::createIdentifier(CSSValueAuto);
@@ -770,7 +798,12 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       return CSSPrimitiveValue::create(style->columnGap(),
                                        CSSPrimitiveValue::CSS_NUMBER);
     case CSSPropertyWebkitColumnRuleColor:
-      return currentColorOrValidColor(style.get(), style->columnRuleColor());
+      return m_allowVisitedStyle
+                 ? CSSPrimitiveValue::createColor(
+                       style->visitedDependentColor(CSSPropertyOutlineColor)
+                           .rgb())
+                 : currentColorOrValidColor(style.get(),
+                                            style->columnRuleColor());
     case CSSPropertyWebkitColumnRuleStyle:
       return CSSPrimitiveValue::create(style->columnRuleStyle());
     case CSSPropertyWebkitColumnRuleWidth:
@@ -1009,7 +1042,11 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
       return CSSPrimitiveValue::create(style->orphans(),
                                        CSSPrimitiveValue::CSS_NUMBER);
     case CSSPropertyOutlineColor:
-      return currentColorOrValidColor(style.get(), style->outlineColor());
+      return m_allowVisitedStyle
+                 ? CSSPrimitiveValue::createColor(
+                       style->visitedDependentColor(CSSPropertyOutlineColor)
+                           .rgb())
+                 : currentColorOrValidColor(style.get(), style->outlineColor());
     case CSSPropertyOutlineStyle:
       if (style->outlineStyleIsAuto())
         return CSSPrimitiveValue::createIdentifier(CSSValueAuto);

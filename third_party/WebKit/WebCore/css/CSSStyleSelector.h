@@ -88,21 +88,23 @@ class CSSStyleSelector : public Noncopyable {
                    bool matchAuthorAndUserStyles);
   ~CSSStyleSelector();
 
-  void initElementAndPseudoState(Element*);
+  void initElement(Element*);
   void initForStyleResolve(Element*,
                            RenderStyle* parentStyle = 0,
                            PseudoId = NOPSEUDO);
   PassRefPtr<RenderStyle> styleForElement(Element*,
                                           RenderStyle* parentStyle = 0,
                                           bool allowSharing = true,
-                                          bool resolveForRootDefault = false);
+                                          bool resolveForRootDefault = false,
+                                          bool matchVisitedLinks = false);
   void keyframeStylesForAnimation(Element*,
                                   const RenderStyle*,
                                   KeyframeList& list);
 
   PassRefPtr<RenderStyle> pseudoStyleForElement(PseudoId,
                                                 Element*,
-                                                RenderStyle* parentStyle = 0);
+                                                RenderStyle* parentStyle = 0,
+                                                bool matchVisitedLinks = false);
 
   static PassRefPtr<RenderStyle> styleForDocument(Document*);
 
@@ -246,21 +248,20 @@ class CSSStyleSelector : public Noncopyable {
                                 Element*,
                                 HashSet<AtomicStringImpl*>* selectorAttrs,
                                 PseudoId& dynamicPseudo,
-                                bool isAncestor,
                                 bool isSubSelector,
+                                bool encounteredLink,
                                 RenderStyle* = 0,
                                 RenderStyle* elementParentStyle = 0) const;
     bool checkOneSelector(CSSSelector*,
                           Element*,
                           HashSet<AtomicStringImpl*>* selectorAttrs,
                           PseudoId& dynamicPseudo,
-                          bool isAncestor,
                           bool isSubSelector,
                           RenderStyle*,
                           RenderStyle* elementParentStyle) const;
-    PseudoState checkPseudoState(Element*, bool checkVisited = true) const;
     bool checkScrollbarPseudoClass(CSSSelector*, PseudoId& dynamicPseudo) const;
 
+    EInsideLink determineLinkState(Element* element) const;
     void allVisitedStateChanged();
     void visitedStateChanged(LinkHash visitedHash);
 
@@ -269,6 +270,7 @@ class CSSStyleSelector : public Noncopyable {
     bool m_collectRulesOnly;
     PseudoId m_pseudoStyle;
     bool m_documentIsHTML;
+    mutable bool m_matchVisitedPseudoClass;
     mutable HashSet<LinkHash, LinkHashHash> m_linksCheckedForVisitedState;
   };
 
