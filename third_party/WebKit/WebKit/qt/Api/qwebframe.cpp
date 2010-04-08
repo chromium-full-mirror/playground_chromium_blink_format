@@ -1074,13 +1074,15 @@ void QWebFrame::setScrollBarPolicy(Qt::Orientation orientation,
   if (orientation == Qt::Horizontal) {
     d->horizontalScrollBarPolicy = policy;
     if (d->frame->view()) {
-      d->frame->view()->setHorizontalScrollbarMode((ScrollbarMode)policy);
+      d->frame->view()->setHorizontalScrollbarMode(
+          (ScrollbarMode)policy, policy != Qt::ScrollBarAsNeeded /* lock */);
       d->frame->view()->updateCanHaveScrollbars();
     }
   } else {
     d->verticalScrollBarPolicy = policy;
     if (d->frame->view()) {
-      d->frame->view()->setVerticalScrollbarMode((ScrollbarMode)policy);
+      d->frame->view()->setVerticalScrollbarMode(
+          (ScrollbarMode)policy, policy != Qt::ScrollBarAsNeeded /* lock */);
       d->frame->view()->updateCanHaveScrollbars();
     }
   }

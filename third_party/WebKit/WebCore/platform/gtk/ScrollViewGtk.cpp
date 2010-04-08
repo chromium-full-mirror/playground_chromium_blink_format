@@ -178,7 +178,9 @@ IntRect ScrollView::visibleContentRect(bool includeScrollbars) const {
 }
 
 void ScrollView::setScrollbarModes(ScrollbarMode horizontalMode,
-                                   ScrollbarMode verticalMode) {
+                                   ScrollbarMode verticalMode,
+                                   bool,
+                                   bool) {
   if (horizontalMode == m_horizontalScrollbarMode &&
       verticalMode == m_verticalScrollbarMode)
     return;

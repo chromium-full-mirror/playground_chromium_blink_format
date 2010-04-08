@@ -1820,7 +1820,9 @@ void Frame::createView(const IntSize& viewportSize,
                        const IntSize& fixedLayoutSize,
                        bool useFixedLayout,
                        ScrollbarMode horizontalScrollbarMode,
-                       ScrollbarMode verticalScrollbarMode) {
+                       bool horizontalLock,
+                       ScrollbarMode verticalScrollbarMode,
+                       bool verticalLock) {
   ASSERT(this);
   ASSERT(m_page);
 
@@ -1839,7 +1841,8 @@ void Frame::createView(const IntSize& viewportSize,
   } else
     frameView = FrameView::create(this);
 
-  frameView->setScrollbarModes(horizontalScrollbarMode, verticalScrollbarMode);
+  frameView->setScrollbarModes(horizontalScrollbarMode, verticalScrollbarMode,
+                               horizontalLock, verticalLock);
 
   setView(frameView);
 

@@ -129,7 +129,9 @@ class Frame : public RefCounted<Frame>
                   const IntSize&,
                   bool,
                   ScrollbarMode = ScrollbarAuto,
-                  ScrollbarMode = ScrollbarAuto);
+                  bool horizontalLock = false,
+                  ScrollbarMode = ScrollbarAuto,
+                  bool verticalLock = false);
 
   void injectUserScripts(UserScriptInjectionTime);
 
