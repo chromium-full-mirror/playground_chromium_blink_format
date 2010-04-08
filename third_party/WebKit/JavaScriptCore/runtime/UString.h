@@ -743,6 +743,11 @@ struct DefaultHash<RefPtr<JSC::UString::Rep>> {
   typedef StrHash<RefPtr<JSC::UString::Rep>> Hash;
 };
 
+template <>
+struct VectorTraits<JSC::UString> : SimpleClassVectorTraits {
+  static const bool canInitializeWithMemset = true;
+};
+
 }  // namespace WTF
 
 #endif
