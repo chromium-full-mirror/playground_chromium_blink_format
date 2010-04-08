@@ -189,7 +189,7 @@
 #endif
 
 /* CPU(ARM) - ARM, any version*/
-#if defined(arm) || defined(__arm__)
+#if defined(arm) || defined(__arm__) || defined(ARM) || defined(_ARM_)
 #define WTF_CPU_ARM 1
 
 #if defined(__ARMEB__)
