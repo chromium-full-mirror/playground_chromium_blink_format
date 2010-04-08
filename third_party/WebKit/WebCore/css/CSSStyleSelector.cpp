@@ -1429,7 +1429,8 @@ PassRefPtr<RenderStyle> CSSStyleSelector::styleForElement(
     m_style->setUnique();
 
   // Compute our style allowing :visited to match.
-  if (!matchVisitedRules && m_style->insideLink()) {
+  if (!matchVisitedRules && m_style->insideLink() &&
+      e->document()->usesLinkRules()) {
     // Fetch our parent style.
     RenderStyle* parentStyle = m_parentStyle;
     if (!m_style->isLink()) {
