@@ -105,7 +105,7 @@ class V8DOMWrapper {
       resolver =
           V8XPathNSResolver::toNative(v8::Handle<v8::Object>::Cast(value));
     else if (value->IsObject())
-      resolver = V8CustomXPathNSResolver::create(proxy, value->ToObject());
+      resolver = V8CustomXPathNSResolver::create(value->ToObject());
     return resolver;
   }
 #endif

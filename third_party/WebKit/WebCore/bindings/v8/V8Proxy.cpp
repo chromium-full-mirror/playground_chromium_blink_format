@@ -512,6 +512,20 @@ v8::Local<v8::Value> V8Proxy::callFunction(v8::Handle<v8::Function> function,
   return result;
 }
 
+v8::Local<v8::Value> V8Proxy::callFunctionWithoutFrame(
+    v8::Handle<v8::Function> function,
+    v8::Handle<v8::Object> receiver,
+    int argc,
+    v8::Handle<v8::Value> args[]) {
+  V8GCController::checkMemoryUsage();
+  v8::Local<v8::Value> result = function->Call(receiver, argc, args);
+
+  if (v8::V8::IsDead())
+    handleFatalErrorInV8();
+
+  return result;
+}
+
 v8::Local<v8::Value> V8Proxy::newInstance(v8::Handle<v8::Function> constructor,
                                           int argc,
                                           v8::Handle<v8::Value> args[]) {

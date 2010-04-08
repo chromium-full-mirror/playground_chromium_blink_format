@@ -69,11 +69,8 @@ short V8NodeFilterCondition::acceptNode(ScriptState* state, Node* node) const {
   OwnArrayPtr<v8::Handle<v8::Value>> args(new v8::Handle<v8::Value>[1]);
   args[0] = toV8(node);
 
-  V8Proxy* proxy = V8Proxy::retrieve();
-  ASSERT(proxy);
-
   v8::Handle<v8::Value> result =
-      proxy->callFunction(callback, object, 1, args.get());
+      V8Proxy::callFunctionWithoutFrame(callback, object, 1, args.get());
 
   if (exceptionCatcher.HasCaught()) {
     state->setException(exceptionCatcher.Exception());
