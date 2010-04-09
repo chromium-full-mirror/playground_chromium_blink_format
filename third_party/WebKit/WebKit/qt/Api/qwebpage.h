@@ -221,7 +221,9 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
 
   QString selectedText() const;
 
+#ifndef QT_NO_ACTION
   QAction* action(WebAction action) const;
+#endif
   virtual void triggerAction(WebAction action, bool checked = false);
 
   QSize viewportSize() const;
@@ -361,7 +363,9 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
 
  private:
   Q_PRIVATE_SLOT(d, void _q_onLoadProgressChanged(int))
+#ifndef QT_NO_ACTION
   Q_PRIVATE_SLOT(d, void _q_webActionTriggered(bool checked))
+#endif
   Q_PRIVATE_SLOT(d, void _q_cleanupLeakMessages())
 
   QWebPagePrivate* d;

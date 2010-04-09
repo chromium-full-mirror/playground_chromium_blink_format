@@ -81,7 +81,9 @@ class QWEBKIT_EXPORT QWebView : public QWidget {
 
   QString selectedText() const;
 
+#ifndef QT_NO_ACTION
   QAction* pageAction(QWebPage::WebAction action) const;
+#endif
   void triggerPageAction(QWebPage::WebAction action, bool checked = false);
 
   bool isModified() const;

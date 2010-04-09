@@ -1060,7 +1060,12 @@ QWebSettings* QGraphicsWebView::settings() const {
    action.
 */
 QAction* QGraphicsWebView::pageAction(QWebPage::WebAction action) const {
+#ifdef QT_NO_ACTION
+  Q_UNUSED(action)
+  return 0;
+#else
   return page()->action(action);
+#endif
 }
 
 /*!
