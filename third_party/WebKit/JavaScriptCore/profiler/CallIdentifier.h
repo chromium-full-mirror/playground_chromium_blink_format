@@ -39,7 +39,9 @@ struct CallIdentifier : public FastAllocBase {
   CallIdentifier() : m_lineNumber(0) {}
 
   CallIdentifier(const UString& name, const UString& url, int lineNumber)
-      : m_name(name), m_url(url), m_lineNumber(lineNumber) {}
+      : m_name(name),
+        m_url(!url.isNull() ? url : ""),
+        m_lineNumber(lineNumber) {}
 
   inline bool operator==(const CallIdentifier& ci) const {
     return ci.m_lineNumber == m_lineNumber && ci.m_name == m_name &&
