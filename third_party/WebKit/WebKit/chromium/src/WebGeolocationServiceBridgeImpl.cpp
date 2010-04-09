@@ -137,13 +137,14 @@ bool WebGeolocationServiceBridgeImpl::startUpdating(
 }
 
 void WebGeolocationServiceBridgeImpl::stopUpdating() {
-  if (m_bridgeId) {
+  WebViewClient* webViewClient = getWebViewClient();
+  if (m_bridgeId && webViewClient) {
     WebGeolocationService* geolocationService =
-        getWebViewClient()->geolocationService();
+        webViewClient->geolocationService();
     geolocationService->stopUpdating(m_bridgeId);
     geolocationService->detachBridge(m_bridgeId);
-    m_bridgeId = 0;
   }
+  m_bridgeId = 0;
 }
 
 void WebGeolocationServiceBridgeImpl::suspend() {
