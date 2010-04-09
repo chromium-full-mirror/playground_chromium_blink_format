@@ -104,10 +104,10 @@ static JSValue JSC_HOST_CALL functionReadline(ExecState*,
                                               JSObject*,
                                               JSValue,
                                               const ArgList&);
-static NO_RETURN JSValue JSC_HOST_CALL functionQuit(ExecState*,
-                                                    JSObject*,
-                                                    JSValue,
-                                                    const ArgList&);
+static NO_RETURN_WITH_VALUE JSValue JSC_HOST_CALL functionQuit(ExecState*,
+                                                               JSObject*,
+                                                               JSValue,
+                                                               const ArgList&);
 
 #if ENABLE(SAMPLING_FLAGS)
 static JSValue JSC_HOST_CALL functionSetSamplingFlags(ExecState*,
