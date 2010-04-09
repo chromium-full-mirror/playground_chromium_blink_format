@@ -626,37 +626,37 @@ class RenderStyle : public RefCounted<RenderStyle> {
 
   const Color& backgroundColor() const { return background->m_color; }
   StyleImage* backgroundImage() const {
-    return background->m_background.m_image.get();
+    return background->m_background.image();
   }
   EFillRepeat backgroundRepeatX() const {
-    return static_cast<EFillRepeat>(background->m_background.m_repeatX);
+    return static_cast<EFillRepeat>(background->m_background.repeatX());
   }
   EFillRepeat backgroundRepeatY() const {
-    return static_cast<EFillRepeat>(background->m_background.m_repeatY);
+    return static_cast<EFillRepeat>(background->m_background.repeatY());
   }
   CompositeOperator backgroundComposite() const {
-    return static_cast<CompositeOperator>(background->m_background.m_composite);
+    return static_cast<CompositeOperator>(background->m_background.composite());
   }
   EFillAttachment backgroundAttachment() const {
-    return static_cast<EFillAttachment>(background->m_background.m_attachment);
+    return static_cast<EFillAttachment>(background->m_background.attachment());
   }
   EFillBox backgroundClip() const {
-    return static_cast<EFillBox>(background->m_background.m_clip);
+    return static_cast<EFillBox>(background->m_background.clip());
   }
   EFillBox backgroundOrigin() const {
-    return static_cast<EFillBox>(background->m_background.m_origin);
+    return static_cast<EFillBox>(background->m_background.origin());
   }
   Length backgroundXPosition() const {
-    return background->m_background.m_xPosition;
+    return background->m_background.xPosition();
   }
   Length backgroundYPosition() const {
-    return background->m_background.m_yPosition;
+    return background->m_background.yPosition();
   }
   EFillSizeType backgroundSizeType() const {
-    return static_cast<EFillSizeType>(background->m_background.m_sizeType);
+    return background->m_background.sizeType();
   }
   LengthSize backgroundSizeLength() const {
-    return background->m_background.m_sizeLength;
+    return background->m_background.sizeLength();
   }
   FillLayer* accessBackgroundLayers() {
     return &(background.access()->m_background);
@@ -665,37 +665,38 @@ class RenderStyle : public RefCounted<RenderStyle> {
     return &(background->m_background);
   }
 
-  StyleImage* maskImage() const {
-    return rareNonInheritedData->m_mask.m_image.get();
-  }
+  StyleImage* maskImage() const { return rareNonInheritedData->m_mask.image(); }
   EFillRepeat maskRepeatX() const {
-    return static_cast<EFillRepeat>(rareNonInheritedData->m_mask.m_repeatX);
+    return static_cast<EFillRepeat>(rareNonInheritedData->m_mask.repeatX());
   }
   EFillRepeat maskRepeatY() const {
-    return static_cast<EFillRepeat>(rareNonInheritedData->m_mask.m_repeatY);
+    return static_cast<EFillRepeat>(rareNonInheritedData->m_mask.repeatY());
   }
   CompositeOperator maskComposite() const {
     return static_cast<CompositeOperator>(
-        rareNonInheritedData->m_mask.m_composite);
+        rareNonInheritedData->m_mask.composite());
   }
   EFillAttachment maskAttachment() const {
     return static_cast<EFillAttachment>(
-        rareNonInheritedData->m_mask.m_attachment);
+        rareNonInheritedData->m_mask.attachment());
   }
   EFillBox maskClip() const {
-    return static_cast<EFillBox>(rareNonInheritedData->m_mask.m_clip);
+    return static_cast<EFillBox>(rareNonInheritedData->m_mask.clip());
   }
   EFillBox maskOrigin() const {
-    return static_cast<EFillBox>(rareNonInheritedData->m_mask.m_origin);
+    return static_cast<EFillBox>(rareNonInheritedData->m_mask.origin());
   }
   Length maskXPosition() const {
-    return rareNonInheritedData->m_mask.m_xPosition;
+    return rareNonInheritedData->m_mask.xPosition();
   }
   Length maskYPosition() const {
-    return rareNonInheritedData->m_mask.m_yPosition;
+    return rareNonInheritedData->m_mask.yPosition();
   }
-  LengthSize maskSize() const {
-    return rareNonInheritedData->m_mask.m_sizeLength;
+  EFillSizeType maskSizeType() const {
+    return rareNonInheritedData->m_mask.sizeType();
+  }
+  LengthSize maskSizeLength() const {
+    return rareNonInheritedData->m_mask.sizeLength();
   }
   FillLayer* accessMaskLayers() {
     return &(rareNonInheritedData.access()->m_mask);

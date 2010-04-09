@@ -48,7 +48,7 @@ struct FillSize {
   LengthSize size;
 };
 
-struct FillLayer : FastAllocBase {
+class FillLayer : public FastAllocBase {
  public:
   FillLayer(EFillLayerType);
   ~FillLayer();
@@ -67,6 +67,9 @@ struct FillLayer : FastAllocBase {
     return static_cast<CompositeOperator>(m_composite);
   }
   LengthSize sizeLength() const { return m_sizeLength; }
+  EFillSizeType sizeType() const {
+    return static_cast<EFillSizeType>(m_sizeType);
+  }
   FillSize size() const {
     return FillSize(static_cast<EFillSizeType>(m_sizeType), m_sizeLength);
   }
@@ -200,9 +203,10 @@ struct FillLayer : FastAllocBase {
   static StyleImage* initialFillImage(EFillLayerType) { return 0; }
 
  private:
+  friend class RenderStyle;
+
   FillLayer() {}
 
- public:
   RefPtr<StyleImage> m_image;
 
   Length m_xPosition;
