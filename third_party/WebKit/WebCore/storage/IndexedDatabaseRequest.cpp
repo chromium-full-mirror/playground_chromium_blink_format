@@ -46,10 +46,10 @@ IndexedDatabaseRequest::~IndexedDatabaseRequest() {}
 void IndexedDatabaseRequest::open(const String& name,
                                   const String& description,
                                   bool modifyDatabase,
-                                  ExceptionCode& exception,
-                                  PassRefPtr<IDBDatabaseCallbacks> callbacks) {
-  m_indexedDatabase->open(name, description, modifyDatabase, exception,
-                          callbacks, m_frame);
+                                  PassRefPtr<IDBDatabaseCallbacks> callbacks,
+                                  ExceptionCode& exception) {
+  m_indexedDatabase->open(name, description, modifyDatabase, callbacks, m_frame,
+                          exception);
 }
 
 }  // namespace WebCore

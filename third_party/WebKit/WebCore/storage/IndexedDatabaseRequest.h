@@ -54,8 +54,8 @@ class IndexedDatabaseRequest : public RefCounted<IndexedDatabaseRequest> {
   void open(const String& name,
             const String& description,
             bool modifyDatabase,
-            ExceptionCode&,
-            PassRefPtr<IDBDatabaseCallbacks>);
+            PassRefPtr<IDBDatabaseCallbacks>,
+            ExceptionCode&);
 
   void disconnectFrame() { m_frame = 0; }
 

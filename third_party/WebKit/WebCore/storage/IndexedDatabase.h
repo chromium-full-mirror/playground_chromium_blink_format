@@ -57,9 +57,9 @@ class IndexedDatabase : public ThreadSafeShared<IndexedDatabase> {
   virtual void open(const String& name,
                     const String& description,
                     bool modifyDatabase,
-                    ExceptionCode&,
                     PassRefPtr<IDBDatabaseCallbacks>,
-                    Frame*) = 0;
+                    Frame*,
+                    ExceptionCode&) = 0;
 };
 
 }  // namespace WebCore
