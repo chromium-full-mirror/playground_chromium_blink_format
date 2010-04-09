@@ -27,6 +27,8 @@
 
 #include "WKAPICast.h"
 
+using namespace WebCore;
+
 namespace WebKit {
 
 WebUIClient::WebUIClient() {
@@ -63,12 +65,12 @@ void WebUIClient::close(WebPageProxy* page) {
 }
 
 void WebUIClient::runJavaScriptAlert(WebPageProxy* page,
-                                     CFStringRef alertText,
+                                     StringImpl* alertText,
                                      WebFrameProxy* frame) {
   if (!m_pageUIClient.runJavaScriptAlert)
     return;
 
-  m_pageUIClient.runJavaScriptAlert(toRef(page), alertText, toRef(frame),
+  m_pageUIClient.runJavaScriptAlert(toRef(page), toRef(alertText), toRef(frame),
                                     m_pageUIClient.clientInfo);
 }
 

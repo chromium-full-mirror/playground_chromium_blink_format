@@ -28,6 +28,10 @@
 
 #include "WKPage.h"
 
+namespace WebCore {
+class StringImpl;
+}
+
 namespace WebKit {
 
 class WebPageProxy;
@@ -45,7 +49,9 @@ class WebLoaderClient {
   void didCommitLoadForFrame(WebPageProxy*, WebFrameProxy*);
   void didFinishLoadForFrame(WebPageProxy*, WebFrameProxy*);
   void didFailLoadWithErrorForFrame(WebPageProxy*, WebFrameProxy*);
-  void didReceiveTitleForFrame(WebPageProxy*, CFStringRef, WebFrameProxy*);
+  void didReceiveTitleForFrame(WebPageProxy*,
+                               WebCore::StringImpl*,
+                               WebFrameProxy*);
   void didFirstLayoutForFrame(WebPageProxy*, WebFrameProxy*);
   void didFirstVisuallyNonEmptyLayoutForFrame(WebPageProxy*, WebFrameProxy*);
   void didStartProgress(WebPageProxy*);

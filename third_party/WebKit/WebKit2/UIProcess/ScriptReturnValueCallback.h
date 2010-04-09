@@ -26,14 +26,19 @@
 #ifndef ScriptReturnValueCallback_h
 #define ScriptReturnValueCallback_h
 
+#include "WKBase.h"
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
+
+namespace WebCore {
+class StringImpl;
+}
 
 namespace WebKit {
 
 class ScriptReturnValueCallback : public RefCounted<ScriptReturnValueCallback> {
  public:
-  typedef void (*ScriptReturnValueCallbackFunction)(void*, CFStringRef);
+  typedef void (*ScriptReturnValueCallbackFunction)(void*, WKStringRef);
   typedef void (*ScriptReturnValueCallbackDisposeFunction)(void*);
 
   static PassRefPtr<ScriptReturnValueCallback> create(
@@ -47,7 +52,7 @@ class ScriptReturnValueCallback : public RefCounted<ScriptReturnValueCallback> {
 
   uint64_t callbackID() const { return m_callbackID; }
 
-  void performCallbackWithReturnValue(CFStringRef);
+  void performCallbackWithReturnValue(WebCore::StringImpl*);
 
  private:
   ScriptReturnValueCallback(void*,

@@ -53,7 +53,7 @@ namespace WebKit {
 void WebFrameLoaderClient::frameLoaderDestroyed() {
   m_frame->invalidate();
 
-  // Balences explicit ref() in WebFrame::createMainFrame and
+  // Balances explicit ref() in WebFrame::createMainFrame and
   // WebFrame::createSubframe.
   m_frame->deref();
 }

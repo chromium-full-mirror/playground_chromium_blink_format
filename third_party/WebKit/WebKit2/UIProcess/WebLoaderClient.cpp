@@ -85,11 +85,11 @@ void WebLoaderClient::didFailLoadWithErrorForFrame(WebPageProxy* page,
 }
 
 void WebLoaderClient::didReceiveTitleForFrame(WebPageProxy* page,
-                                              CFStringRef title,
+                                              WebCore::StringImpl* title,
                                               WebFrameProxy* frame) {
   if (m_pageLoaderClient.didReceiveTitleForFrame)
-    m_pageLoaderClient.didReceiveTitleForFrame(toRef(page), title, toRef(frame),
-                                               m_pageLoaderClient.clientInfo);
+    m_pageLoaderClient.didReceiveTitleForFrame(
+        toRef(page), toRef(title), toRef(frame), m_pageLoaderClient.clientInfo);
 }
 
 void WebLoaderClient::didFirstLayoutForFrame(WebPageProxy* page,
