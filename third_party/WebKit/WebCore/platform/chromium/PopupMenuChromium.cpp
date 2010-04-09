@@ -420,6 +420,9 @@ void PopupContainer::showExternal(const IntRect& rect,
 
 void PopupContainer::hidePopup() {
   listBox()->hidePopup();
+}
+
+void PopupContainer::notifyPopupHidden() {
   chromeClientChromium()->popupClosed(this);
 }
 
@@ -1107,6 +1110,7 @@ void PopupListBox::hidePopup() {
     PopupContainer* container = static_cast<PopupContainer*>(parent());
     if (container->client())
       container->client()->popupClosed(container);
+    container->notifyPopupHidden();
   }
 
   if (m_popupClient)
