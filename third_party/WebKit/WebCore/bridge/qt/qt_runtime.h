@@ -38,12 +38,20 @@ class QtInstance;
 
 class QtField : public Field {
  public:
-  typedef enum { MetaProperty, DynamicProperty, ChildObject } QtFieldType;
+  typedef enum {
+    MetaProperty,
+#ifndef QT_NO_PROPERTIES
+    DynamicProperty,
+#endif
+    ChildObject
+  } QtFieldType;
 
   QtField(const QMetaProperty& p) : m_type(MetaProperty), m_property(p) {}
 
+#ifndef QT_NO_PROPERTIES
   QtField(const QByteArray& b)
       : m_type(DynamicProperty), m_dynamicProperty(b) {}
+#endif
 
   QtField(QObject* child) : m_type(ChildObject), m_childObject(child) {}
 
