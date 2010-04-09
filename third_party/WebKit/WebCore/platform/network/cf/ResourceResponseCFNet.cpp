@@ -92,13 +92,7 @@ void ResourceResponse::platformLazyInit() {
 
     RetainPtr<CFStringRef> statusLine(
         AdoptCF, CFHTTPMessageCopyResponseStatusLine(httpResponse));
-    String statusText(statusLine.get());
-    int spacePos = statusText.find(' ');
-    // Remove the status code from the status text.
-    spacePos = statusText.find(' ', spacePos + 1);
-    statusText = statusText.substring(spacePos + 1);
-
-    m_httpStatusText = statusText;
+    m_httpStatusText = extractReasonPhraseFromHTTPStatusLine(statusLine.get());
 
     RetainPtr<CFDictionaryRef> headers(
         AdoptCF, CFHTTPMessageCopyAllHeaderFields(httpResponse));

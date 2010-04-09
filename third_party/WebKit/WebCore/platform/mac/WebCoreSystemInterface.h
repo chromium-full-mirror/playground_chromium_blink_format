@@ -103,6 +103,7 @@ extern CFReadStreamRef (*wkCreateCustomCFReadStream)(
     void (*formSchedule)(CFReadStreamRef, CFRunLoopRef, CFStringRef, void*),
     void (*formUnschedule)(CFReadStreamRef, CFRunLoopRef, CFStringRef, void*),
     void* context);
+extern NSString* (*wkCopyNSURLResponseStatusLine)(NSURLResponse*);
 extern id (*wkCreateNSURLConnectionDelegateProxy)(void);
 extern void (*wkDrawBezeledTextFieldCell)(NSRect, BOOL enabled);
 extern void (*wkDrawTextFieldCellFocusRing)(NSTextFieldCell*, NSRect);
