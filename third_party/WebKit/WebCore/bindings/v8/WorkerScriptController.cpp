@@ -86,11 +86,12 @@ ScriptValue WorkerScriptController::evaluate(const ScriptSourceCode& sourceCode,
   return result;
 }
 
-void WorkerScriptController::forbidExecution() {
-  // This function is called from another thread.
+void WorkerScriptController::forbidExecution(ForbidExecutionOption option) {
+  // This function may be called from another thread.
   MutexLocker lock(m_sharedDataMutex);
   m_executionForbidden = true;
-  v8::V8::TerminateExecution();
+  if (option == TerminateRunningScript)
+    v8::V8::TerminateExecution();
 }
 
 void WorkerScriptController::setException(ScriptValue exception) {
