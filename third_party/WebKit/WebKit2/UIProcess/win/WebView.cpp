@@ -26,17 +26,15 @@
 #include "WebView.h"
 
 #include "DrawingAreaProxy.h"
-
 #include "RunLoop.h"
 #include "WebEventFactory.h"
 #include "WebPageNamespace.h"
 #include "WebPageProxy.h"
+#include <Commctrl.h>
 #include <WebCore/IntRect.h>
 #include <WebCore/PlatformString.h>
 #include <WebCore/WebCoreInstanceHandle.h>
 #include <WebCore/WindowMessageBroadcaster.h>
-
-#include <Commctrl.h>
 
 using namespace WebCore;
 

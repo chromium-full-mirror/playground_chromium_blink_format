@@ -23,11 +23,11 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <windows.h>
 #include "WebLocalizableStrings.h"
 #include <WebCore/IntSize.h>
 #include <WebCore/LocalizedStrings.h>
 #include <WebCore/PlatformString.h>
+#include <windows.h>
 #include <wtf/MathExtras.h>
 #include <wtf/RetainPtr.h>
 

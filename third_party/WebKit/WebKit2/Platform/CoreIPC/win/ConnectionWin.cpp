@@ -150,9 +150,9 @@ bool Connection::open() {
 
   if (m_isServer) {
     // Wait for a connection.
-    if (::ConnectNamedPipe(m_connectionPipe, &m_readState)) {
+    if (::ConnectNamedPipe(m_connectionPipe, &m_readState))
       m_isConnected = true;
-    } else {
+    else {
       // Even though the call to ConnectNamedPipe failed, we might still have a
       // valid connection.
       DWORD error = ::GetLastError();
