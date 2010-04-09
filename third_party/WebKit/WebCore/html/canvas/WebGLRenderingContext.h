@@ -548,6 +548,8 @@ class WebGLRenderingContext : public CanvasRenderingContext {
                                  long& numElementsRequired);
   bool validateRenderingState(long numElements);
 
+  bool validateWebGLObject(CanvasObject* object);
+
   OwnPtr<GraphicsContext3D> m_context;
   bool m_needsUpdate;
   bool m_markedCanvasDirty;

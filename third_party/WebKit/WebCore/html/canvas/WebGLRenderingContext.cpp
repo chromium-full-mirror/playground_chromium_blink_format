@@ -181,10 +181,8 @@ void WebGLRenderingContext::bindAttribLocation(WebGLProgram* program,
                                                const String& name,
                                                ExceptionCode& ec) {
   UNUSED_PARAM(ec);
-  if (!program || program->context() != this) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
+  if (!validateWebGLObject(program))
     return;
-  }
   m_context->bindAttribLocation(program, index, name);
   cleanupAfterGraphicsCall(false);
 }
@@ -419,10 +417,8 @@ void WebGLRenderingContext::colorMask(bool red,
 void WebGLRenderingContext::compileShader(WebGLShader* shader,
                                           ExceptionCode& ec) {
   UNUSED_PARAM(ec);
-  if (!shader || shader->context() != this) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
+  if (!validateWebGLObject(shader))
     return;
-  }
   m_context->compileShader(shader);
   cleanupAfterGraphicsCall(false);
 }
@@ -565,11 +561,8 @@ void WebGLRenderingContext::detachShader(WebGLProgram* program,
                                          WebGLShader* shader,
                                          ExceptionCode& ec) {
   UNUSED_PARAM(ec);
-  if (!program || program->context() != this || !shader ||
-      shader->context() != this) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
+  if (!validateWebGLObject(program) || !validateWebGLObject(shader))
     return;
-  }
   m_context->detachShader(program, shader);
   cleanupAfterGraphicsCall(false);
 }
@@ -732,6 +725,18 @@ bool WebGLRenderingContext::validateRenderingState(long numElementsRequired) {
     smallestNumElements = 0;
 
   return numElementsRequired <= smallestNumElements;
+}
+
+bool WebGLRenderingContext::validateWebGLObject(CanvasObject* object) {
+  if (!object) {
+    m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
+    return false;
+  }
+  if (object->context() != this) {
+    m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
+    return false;
+  }
+  return true;
 }
 
 void WebGLRenderingContext::drawArrays(unsigned long mode,
@@ -911,10 +916,8 @@ PassRefPtr<WebGLActiveInfo> WebGLRenderingContext::getActiveAttrib(
     ExceptionCode& ec) {
   UNUSED_PARAM(ec);
   ActiveInfo info;
-  if (!program || program->context() != this) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
+  if (!validateWebGLObject(program))
     return 0;
-  }
   if (!m_context->getActiveAttrib(program, index, info)) {
     return 0;
   }
@@ -927,10 +930,8 @@ PassRefPtr<WebGLActiveInfo> WebGLRenderingContext::getActiveUniform(
     ExceptionCode& ec) {
   UNUSED_PARAM(ec);
   ActiveInfo info;
-  if (!program || program->context() != this) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
+  if (!validateWebGLObject(program))
     return 0;
-  }
   if (!m_context->getActiveUniform(program, index, info)) {
     return 0;
   }
@@ -1216,10 +1217,8 @@ WebGLGetInfo WebGLRenderingContext::getProgramParameter(WebGLProgram* program,
                                                         unsigned long pname,
                                                         ExceptionCode& ec) {
   UNUSED_PARAM(ec);
-  if (!program || program->context() != this) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
+  if (!validateWebGLObject(program))
     return WebGLGetInfo();
-  }
 
   WebGLStateRestorer(this, false);
   int value = 0;
@@ -1246,10 +1245,8 @@ WebGLGetInfo WebGLRenderingContext::getProgramParameter(WebGLProgram* program,
 String WebGLRenderingContext::getProgramInfoLog(WebGLProgram* program,
                                                 ExceptionCode& ec) {
   UNUSED_PARAM(ec);
-  if (!program || program->context() != this) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
+  if (!validateWebGLObject(program))
     return "";
-  }
   WebGLStateRestorer(this, false);
   return m_context->getProgramInfoLog(program);
 }
@@ -1293,10 +1290,8 @@ WebGLGetInfo WebGLRenderingContext::getShaderParameter(WebGLShader* shader,
                                                        unsigned long pname,
                                                        ExceptionCode& ec) {
   UNUSED_PARAM(ec);
-  if (!shader || shader->context() != this) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
+  if (!validateWebGLObject(shader))
     return WebGLGetInfo();
-  }
   WebGLStateRestorer(this, false);
   int value = 0;
   switch (pname) {
@@ -1320,10 +1315,8 @@ WebGLGetInfo WebGLRenderingContext::getShaderParameter(WebGLShader* shader,
 String WebGLRenderingContext::getShaderInfoLog(WebGLShader* shader,
                                                ExceptionCode& ec) {
   UNUSED_PARAM(ec);
-  if (!shader || shader->context() != this) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
+  if (!validateWebGLObject(shader))
     return "";
-  }
   WebGLStateRestorer(this, false);
   return m_context->getShaderInfoLog(shader);
 }
@@ -1331,10 +1324,8 @@ String WebGLRenderingContext::getShaderInfoLog(WebGLShader* shader,
 String WebGLRenderingContext::getShaderSource(WebGLShader* shader,
                                               ExceptionCode& ec) {
   UNUSED_PARAM(ec);
-  if (!shader || shader->context() != this) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
+  if (!validateWebGLObject(shader))
     return "";
-  }
   WebGLStateRestorer(this, false);
   return m_context->getShaderSource(shader);
 }
@@ -1373,8 +1364,9 @@ WebGLGetInfo WebGLRenderingContext::getUniform(
     const WebGLUniformLocation* uniformLocation,
     ExceptionCode& ec) {
   UNUSED_PARAM(ec);
-  if (!program || uniformLocation->program() != program ||
-      program->context() != this) {
+  if (!validateWebGLObject(program))
+    return WebGLGetInfo();
+  if (uniformLocation->program() != program) {
     m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
     return WebGLGetInfo();
   }
@@ -1509,10 +1501,8 @@ PassRefPtr<WebGLUniformLocation> WebGLRenderingContext::getUniformLocation(
     const String& name,
     ExceptionCode& ec) {
   UNUSED_PARAM(ec);
-  if (!program || program->context() != this) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
+  if (!validateWebGLObject(program))
     return 0;
-  }
   WebGLStateRestorer(this, false);
   long uniformLocation = m_context->getUniformLocation(program, name);
   if (uniformLocation == -1)
@@ -1630,11 +1620,8 @@ void WebGLRenderingContext::lineWidth(double width) {
 void WebGLRenderingContext::linkProgram(WebGLProgram* program,
                                         ExceptionCode& ec) {
   UNUSED_PARAM(ec);
-  if (!program || program->context() != this) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
+  if (!validateWebGLObject(program))
     return;
-  }
-
   m_context->linkProgram(program);
   cleanupAfterGraphicsCall(false);
 }
@@ -1704,10 +1691,8 @@ void WebGLRenderingContext::shaderSource(WebGLShader* shader,
                                          const String& string,
                                          ExceptionCode& ec) {
   UNUSED_PARAM(ec);
-  if (!shader || shader->context() != this) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
+  if (!validateWebGLObject(shader))
     return;
-  }
   m_context->shaderSource(shader, string);
   cleanupAfterGraphicsCall(false);
 }
