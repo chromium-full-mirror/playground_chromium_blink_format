@@ -352,7 +352,12 @@ DumpRenderTree::DumpRenderTree()
       m_enableTextOutput(false),
       m_singleFileMode(false) {
   qt_drt_overwritePluginDirectories();
-  QWebSettings::enablePersistentStorage();
+
+  char* dumpRenderTreeTemp = getenv("DUMPRENDERTREE_TEMP");
+  if (dumpRenderTreeTemp)
+    QWebSettings::enablePersistentStorage(QString(dumpRenderTreeTemp));
+  else
+    QWebSettings::enablePersistentStorage();
 
   // create our primary testing page/view.
   m_mainView = new QWebView(0);
