@@ -30,11 +30,16 @@
 
 namespace WebCore {
 
+enum ProcessingUserGestureState {
+  DefinitelyProcessingUserGesture,
+  PossiblyProcessingUserGesture
+};
+
 class UserGestureIndicator : public Noncopyable {
  public:
   static bool processingUserGesture() { return s_processingUserGesture; }
 
-  UserGestureIndicator();
+  explicit UserGestureIndicator(ProcessingUserGestureState);
   ~UserGestureIndicator();
 
  private:

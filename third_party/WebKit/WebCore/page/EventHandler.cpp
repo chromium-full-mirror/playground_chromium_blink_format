@@ -1231,7 +1231,7 @@ static IntPoint documentPointForWindowPoint(Frame* frame,
 bool EventHandler::handleMousePressEvent(const PlatformMouseEvent& mouseEvent) {
   RefPtr<FrameView> protector(m_frame->view());
 
-  UserGestureIndicator gestureIndicator;
+  UserGestureIndicator gestureIndicator(DefinitelyProcessingUserGesture);
 
   cancelFakeMouseMoveEvent();
   m_mousePressed = true;
@@ -1382,7 +1382,7 @@ bool EventHandler::handleMouseDoubleClickEvent(
     const PlatformMouseEvent& mouseEvent) {
   RefPtr<FrameView> protector(m_frame->view());
 
-  UserGestureIndicator gestureIndicator;
+  UserGestureIndicator gestureIndicator(DefinitelyProcessingUserGesture);
 
   // We get this instead of a second mouse-up
   m_mousePressed = false;
@@ -1577,7 +1577,7 @@ bool EventHandler::handleMouseReleaseEvent(
     const PlatformMouseEvent& mouseEvent) {
   RefPtr<FrameView> protector(m_frame->view());
 
-  UserGestureIndicator gestureIndicator;
+  UserGestureIndicator gestureIndicator(DefinitelyProcessingUserGesture);
 
 #if ENABLE(PAN_SCROLLING)
   if (mouseEvent.button() == MiddleButton)
@@ -2322,7 +2322,7 @@ bool EventHandler::keyEvent(const PlatformKeyboardEvent& initialKeyEvent) {
   if (!node)
     return false;
 
-  UserGestureIndicator gestureIndicator;
+  UserGestureIndicator gestureIndicator(DefinitelyProcessingUserGesture);
 
   if (FrameView* view = m_frame->view())
     view->resetDeferredRepaintDelay();
@@ -2951,7 +2951,7 @@ bool EventHandler::handleTouchEvent(const PlatformTouchEvent& event) {
   const Vector<PlatformTouchPoint>& points = event.touchPoints();
   AtomicString* eventName = 0;
 
-  UserGestureIndicator gestureIndicator;
+  UserGestureIndicator gestureIndicator(DefinitelyProcessingUserGesture);
 
   for (unsigned i = 0; i < points.size(); ++i) {
     const PlatformTouchPoint& point = points[i];

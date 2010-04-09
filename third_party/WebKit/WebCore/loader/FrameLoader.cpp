@@ -527,6 +527,9 @@ void FrameLoader::submitForm(const char* action,
   if (!shouldAllowNavigation(targetFrame))
     return;
   if (!targetFrame) {
+    if (!DOMWindow::allowPopUp(m_frame) && !isProcessingUserGesture())
+      return;
+
     targetFrame = m_frame;
     frameRequest.setFrameName(targetOrBaseTarget);
   }
