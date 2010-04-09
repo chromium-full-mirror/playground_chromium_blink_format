@@ -157,7 +157,7 @@ class InspectorController
 
   bool searchingForNodeInPage() const { return m_searchingForNode; }
   void mouseDidMoveOverElement(const HitTestResult&, unsigned modifierFlags);
-  void handleMousePressOnNode(Node*);
+  void handleMousePress();
 
   void setInspectorFrontendClient(PassOwnPtr<InspectorFrontendClient> client);
   bool hasInspectorFrontendClient() const { return m_inspectorFrontendClient; }
