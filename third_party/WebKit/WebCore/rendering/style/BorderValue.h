@@ -31,20 +31,16 @@
 namespace WebCore {
 
 class BorderValue {
+  friend class RenderStyle;
+
  public:
-  BorderValue() : width(3), m_style(BNONE) {}
-
-  Color color;
-  unsigned width : 12;
-  unsigned m_style : 4;  // EBorderStyle
-
-  EBorderStyle style() const { return static_cast<EBorderStyle>(m_style); }
+  BorderValue() : m_width(3), m_style(BNONE) {}
 
   bool nonZero(bool checkStyle = true) const {
-    return width != 0 && (!checkStyle || m_style != BNONE);
+    return width() && (!checkStyle || m_style != BNONE);
   }
 
-  bool isTransparent() const { return color.isValid() && color.alpha() == 0; }
+  bool isTransparent() const { return m_color.isValid() && !m_color.alpha(); }
 
   bool isVisible(bool checkStyle = true) const {
     return nonZero(checkStyle) && !isTransparent() &&
@@ -52,10 +48,19 @@ class BorderValue {
   }
 
   bool operator==(const BorderValue& o) const {
-    return width == o.width && m_style == o.m_style && color == o.color;
+    return m_width == o.m_width && m_style == o.m_style && m_color == o.m_color;
   }
 
   bool operator!=(const BorderValue& o) const { return !(*this == o); }
+
+  const Color& color() const { return m_color; }
+  unsigned short width() const { return m_width; }
+  EBorderStyle style() const { return static_cast<EBorderStyle>(m_style); }
+
+ protected:
+  Color m_color;
+  unsigned m_width : 12;
+  unsigned m_style : 4;  // EBorderStyle
 };
 
 }  // namespace WebCore

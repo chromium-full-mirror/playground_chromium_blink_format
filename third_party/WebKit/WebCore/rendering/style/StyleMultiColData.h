@@ -50,7 +50,7 @@ class StyleMultiColData : public RefCounted<StyleMultiColData> {
   unsigned short ruleWidth() const {
     if (m_rule.style() == BNONE || m_rule.style() == BHIDDEN)
       return 0;
-    return m_rule.width;
+    return m_rule.width();
   }
 
   float m_width;

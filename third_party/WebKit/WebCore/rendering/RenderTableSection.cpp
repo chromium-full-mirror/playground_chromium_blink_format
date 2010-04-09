@@ -754,13 +754,13 @@ int RenderTableSection::calcOuterBorderTop() const {
   if (sb.style() == BHIDDEN)
     return -1;
   if (sb.style() > BHIDDEN)
-    borderWidth = sb.width;
+    borderWidth = sb.width();
 
   const BorderValue& rb = firstChild()->style()->borderTop();
   if (rb.style() == BHIDDEN)
     return -1;
-  if (rb.style() > BHIDDEN && rb.width > borderWidth)
-    borderWidth = rb.width;
+  if (rb.style() > BHIDDEN && rb.width() > borderWidth)
+    borderWidth = rb.width();
 
   bool allHidden = true;
   for (int c = 0; c < totalCols; c++) {
@@ -776,17 +776,17 @@ int RenderTableSection::calcOuterBorderTop() const {
         continue;
       else
         allHidden = false;
-      if (gb.style() > BHIDDEN && gb.width > borderWidth)
-        borderWidth = gb.width;
-      if (cb.style() > BHIDDEN && cb.width > borderWidth)
-        borderWidth = cb.width;
+      if (gb.style() > BHIDDEN && gb.width() > borderWidth)
+        borderWidth = gb.width();
+      if (cb.style() > BHIDDEN && cb.width() > borderWidth)
+        borderWidth = cb.width();
     } else {
       if (cb.style() == BHIDDEN)
         continue;
       else
         allHidden = false;
-      if (cb.style() > BHIDDEN && cb.width > borderWidth)
-        borderWidth = cb.width;
+      if (cb.style() > BHIDDEN && cb.width() > borderWidth)
+        borderWidth = cb.width();
     }
   }
   if (allHidden)
@@ -806,13 +806,13 @@ int RenderTableSection::calcOuterBorderBottom() const {
   if (sb.style() == BHIDDEN)
     return -1;
   if (sb.style() > BHIDDEN)
-    borderWidth = sb.width;
+    borderWidth = sb.width();
 
   const BorderValue& rb = lastChild()->style()->borderBottom();
   if (rb.style() == BHIDDEN)
     return -1;
-  if (rb.style() > BHIDDEN && rb.width > borderWidth)
-    borderWidth = rb.width;
+  if (rb.style() > BHIDDEN && rb.width() > borderWidth)
+    borderWidth = rb.width();
 
   bool allHidden = true;
   for (int c = 0; c < totalCols; c++) {
@@ -828,17 +828,17 @@ int RenderTableSection::calcOuterBorderBottom() const {
         continue;
       else
         allHidden = false;
-      if (gb.style() > BHIDDEN && gb.width > borderWidth)
-        borderWidth = gb.width;
-      if (cb.style() > BHIDDEN && cb.width > borderWidth)
-        borderWidth = cb.width;
+      if (gb.style() > BHIDDEN && gb.width() > borderWidth)
+        borderWidth = gb.width();
+      if (cb.style() > BHIDDEN && cb.width() > borderWidth)
+        borderWidth = cb.width();
     } else {
       if (cb.style() == BHIDDEN)
         continue;
       else
         allHidden = false;
-      if (cb.style() > BHIDDEN && cb.width > borderWidth)
-        borderWidth = cb.width;
+      if (cb.style() > BHIDDEN && cb.width() > borderWidth)
+        borderWidth = cb.width();
     }
   }
   if (allHidden)
@@ -858,7 +858,7 @@ int RenderTableSection::calcOuterBorderLeft(bool rtl) const {
   if (sb.style() == BHIDDEN)
     return -1;
   if (sb.style() > BHIDDEN)
-    borderWidth = sb.width;
+    borderWidth = sb.width();
 
   int leftmostColumn = rtl ? totalCols - 1 : 0;
   RenderTableCol* colGroup = table()->colElement(leftmostColumn);
@@ -866,8 +866,8 @@ int RenderTableSection::calcOuterBorderLeft(bool rtl) const {
     const BorderValue& gb = colGroup->style()->borderLeft();
     if (gb.style() == BHIDDEN)
       return -1;
-    if (gb.style() > BHIDDEN && gb.width > borderWidth)
-      borderWidth = gb.width;
+    if (gb.style() > BHIDDEN && gb.width() > borderWidth)
+      borderWidth = gb.width();
   }
 
   bool allHidden = true;
@@ -882,10 +882,10 @@ int RenderTableSection::calcOuterBorderLeft(bool rtl) const {
       continue;
     else
       allHidden = false;
-    if (cb.style() > BHIDDEN && cb.width > borderWidth)
-      borderWidth = cb.width;
-    if (rb.style() > BHIDDEN && rb.width > borderWidth)
-      borderWidth = rb.width;
+    if (cb.style() > BHIDDEN && cb.width() > borderWidth)
+      borderWidth = cb.width();
+    if (rb.style() > BHIDDEN && rb.width() > borderWidth)
+      borderWidth = rb.width();
   }
   if (allHidden)
     return -1;
@@ -904,7 +904,7 @@ int RenderTableSection::calcOuterBorderRight(bool rtl) const {
   if (sb.style() == BHIDDEN)
     return -1;
   if (sb.style() > BHIDDEN)
-    borderWidth = sb.width;
+    borderWidth = sb.width();
 
   int rightmostColumn = rtl ? 0 : totalCols - 1;
   RenderTableCol* colGroup = table()->colElement(rightmostColumn);
@@ -912,8 +912,8 @@ int RenderTableSection::calcOuterBorderRight(bool rtl) const {
     const BorderValue& gb = colGroup->style()->borderRight();
     if (gb.style() == BHIDDEN)
       return -1;
-    if (gb.style() > BHIDDEN && gb.width > borderWidth)
-      borderWidth = gb.width;
+    if (gb.style() > BHIDDEN && gb.width() > borderWidth)
+      borderWidth = gb.width();
   }
 
   bool allHidden = true;
@@ -928,10 +928,10 @@ int RenderTableSection::calcOuterBorderRight(bool rtl) const {
       continue;
     else
       allHidden = false;
-    if (cb.style() > BHIDDEN && cb.width > borderWidth)
-      borderWidth = cb.width;
-    if (rb.style() > BHIDDEN && rb.width > borderWidth)
-      borderWidth = rb.width;
+    if (cb.style() > BHIDDEN && cb.width() > borderWidth)
+      borderWidth = cb.width();
+    if (rb.style() > BHIDDEN && rb.width() > borderWidth)
+      borderWidth = rb.width();
   }
   if (allHidden)
     return -1;
