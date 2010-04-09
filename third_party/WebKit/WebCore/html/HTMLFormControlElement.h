@@ -116,7 +116,8 @@ class HTMLFormControlElement : public HTMLElement {
 
   virtual bool willValidate() const;
   String validationMessage();
-  bool checkValidity();
+  bool checkValidity(
+      Vector<RefPtr<HTMLFormControlElement>>* unhandledInvalidControls = 0);
   // This must be called when a validation constraint or control value is
   // changed.
   void setNeedsValidityCheck();
