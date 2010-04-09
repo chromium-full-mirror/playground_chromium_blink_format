@@ -31,17 +31,23 @@
 
 namespace WebCore {
 
-struct CursorData {
-  CursorData() : cursorImage(0) {}
+class CursorData {
+ public:
+  CursorData(CachedImage* image, const IntPoint& hotSpot)
+      : m_image(image), m_hotSpot(hotSpot) {}
 
   bool operator==(const CursorData& o) const {
-    return hotSpot == o.hotSpot && cursorImage == o.cursorImage;
+    return m_hotSpot == o.m_hotSpot && m_image == o.m_image;
   }
 
   bool operator!=(const CursorData& o) const { return !(*this == o); }
 
-  IntPoint hotSpot;  // for CSS3 support
-  CachedResourceHandle<CachedImage> cursorImage;
+  const CachedImage* image() const { return m_image.get(); }
+  const IntPoint& hotSpot() const { return m_hotSpot; }
+
+ private:
+  CachedResourceHandle<CachedImage> m_image;
+  IntPoint m_hotSpot;  // for CSS3 support
 };
 
 }  // namespace WebCore

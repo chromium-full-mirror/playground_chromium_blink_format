@@ -592,12 +592,9 @@ void RenderStyle::setClip(Length top,
 }
 
 void RenderStyle::addCursor(CachedImage* image, const IntPoint& hotSpot) {
-  CursorData data;
-  data.cursorImage = image;
-  data.hotSpot = hotSpot;
   if (!inherited.access()->cursorData)
     inherited.access()->cursorData = CursorList::create();
-  inherited.access()->cursorData->append(data);
+  inherited.access()->cursorData->append(CursorData(image, hotSpot));
 }
 
 void RenderStyle::setCursorList(PassRefPtr<CursorList> other) {
