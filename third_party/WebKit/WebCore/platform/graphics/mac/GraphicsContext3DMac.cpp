@@ -522,8 +522,17 @@ void GraphicsContext3D::copyTexImage2D(unsigned long target,
                                        unsigned long height,
                                        long border) {
   ensureContext(m_contextObj);
+  if (m_attrs.antialias && m_boundFBO == m_multisampleFBO) {
+    ::glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, m_multisampleFBO);
+    ::glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, m_fbo);
+    ::glBlitFramebufferEXT(x, y, x + width, y + height, x, y, x + width,
+                           y + height, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+    ::glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, m_fbo);
+  }
   ::glCopyTexImage2D(target, level, internalformat, x, y, width, height,
                      border);
+  if (m_attrs.antialias && m_boundFBO == m_multisampleFBO)
+    ::glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, m_multisampleFBO);
 }
 
 void GraphicsContext3D::copyTexSubImage2D(unsigned long target,
@@ -535,7 +544,16 @@ void GraphicsContext3D::copyTexSubImage2D(unsigned long target,
                                           unsigned long width,
                                           unsigned long height) {
   ensureContext(m_contextObj);
+  if (m_attrs.antialias && m_boundFBO == m_multisampleFBO) {
+    ::glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, m_multisampleFBO);
+    ::glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, m_fbo);
+    ::glBlitFramebufferEXT(x, y, x + width, y + height, x, y, x + width,
+                           y + height, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+    ::glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, m_fbo);
+  }
   ::glCopyTexSubImage2D(target, level, xoffset, yoffset, x, y, width, height);
+  if (m_attrs.antialias && m_boundFBO == m_multisampleFBO)
+    ::glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, m_multisampleFBO);
 }
 
 void GraphicsContext3D::cullFace(unsigned long mode) {
