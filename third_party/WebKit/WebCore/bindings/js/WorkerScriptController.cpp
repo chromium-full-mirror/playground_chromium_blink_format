@@ -51,7 +51,7 @@ WorkerScriptController::WorkerScriptController(WorkerContext* workerContext)
     : m_globalData(JSGlobalData::create()),
       m_workerContext(workerContext),
       m_executionForbidden(false) {
-  m_globalData->clientData = new WebCoreJSClientData(m_globalData.get());
+  initNormalWorldClientData(m_globalData.get());
 }
 
 WorkerScriptController::~WorkerScriptController() {

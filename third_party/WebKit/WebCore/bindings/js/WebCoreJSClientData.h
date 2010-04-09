@@ -35,13 +35,9 @@ namespace WebCore {
 class WebCoreJSClientData : public JSC::JSGlobalData::ClientData,
                             public Noncopyable {
   friend class JSGlobalDataWorldIterator;
+  friend void initNormalWorldClientData(JSC::JSGlobalData*);
 
  public:
-  WebCoreJSClientData(JSC::JSGlobalData* globalData)
-      : m_normalWorld(DOMWrapperWorld::create(globalData, true)) {
-    m_worldSet.add(m_normalWorld.get());
-  }
-
   virtual ~WebCoreJSClientData() {
     ASSERT(m_worldSet.contains(m_normalWorld.get()));
     ASSERT(m_worldSet.size() == 1);
@@ -71,6 +67,14 @@ class WebCoreJSClientData : public JSC::JSGlobalData::ClientData,
   HashSet<DOMWrapperWorld*> m_worldSet;
   RefPtr<DOMWrapperWorld> m_normalWorld;
 };
+
+inline void initNormalWorldClientData(JSC::JSGlobalData* globalData) {
+  WebCoreJSClientData* webCoreJSClientData = new WebCoreJSClientData;
+  globalData->clientData =
+      webCoreJSClientData;  // ~JSGlobalData deletes this pointer.
+  webCoreJSClientData->m_normalWorld =
+      DOMWrapperWorld::create(globalData, true);
+}
 
 }  // namespace WebCore
 

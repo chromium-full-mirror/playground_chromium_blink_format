@@ -39,7 +39,7 @@ typedef JSC::WeakGCMap<StringImpl*, JSC::JSString*> JSStringCache;
 class DOMWrapperWorld : public RefCounted<DOMWrapperWorld> {
  public:
   static PassRefPtr<DOMWrapperWorld> create(JSC::JSGlobalData* globalData,
-                                            bool isNormal) {
+                                            bool isNormal = false) {
     return adoptRef(new DOMWrapperWorld(globalData, isNormal));
   }
   ~DOMWrapperWorld();
