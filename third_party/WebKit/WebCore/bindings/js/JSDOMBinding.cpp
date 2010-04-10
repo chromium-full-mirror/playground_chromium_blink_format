@@ -217,18 +217,6 @@ void cacheDOMNodeWrapper(JSC::ExecState* exec,
     node->setWrapper(wrapper);
 }
 
-void forgetAllDOMNodesForDocument(Document* document) {
-  ASSERT(document);
-  JSWrapperCacheMap& wrapperCacheMap = document->wrapperCacheMap();
-  JSWrapperCacheMap::const_iterator wrappersMapEnd = wrapperCacheMap.end();
-  for (JSWrapperCacheMap::const_iterator wrappersMapIter =
-           wrapperCacheMap.begin();
-       wrappersMapIter != wrappersMapEnd; ++wrappersMapIter) {
-    delete wrappersMapIter->second;
-    wrappersMapIter->first->forgetDocument(document);
-  }
-}
-
 static inline bool isObservableThroughDOM(JSNode* jsNode,
                                           DOMWrapperWorld* world) {
   // Certain conditions implicitly make a JS DOM node wrapper observable

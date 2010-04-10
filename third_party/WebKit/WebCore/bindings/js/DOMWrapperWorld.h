@@ -44,11 +44,11 @@ class DOMWrapperWorld : public RefCounted<DOMWrapperWorld> {
   }
   ~DOMWrapperWorld();
 
-  void rememberDocument(Document* document) {
-    documentsWithWrappers.add(document);
+  void didCreateWrapperCache(Document* document) {
+    m_documentsWithWrapperCaches.add(document);
   }
-  void forgetDocument(Document* document) {
-    documentsWithWrappers.remove(document);
+  void didDestroyWrapperCache(Document* document) {
+    m_documentsWithWrapperCaches.remove(document);
   }
 
   // FIXME: can we make this private?
@@ -62,7 +62,7 @@ class DOMWrapperWorld : public RefCounted<DOMWrapperWorld> {
 
  private:
   JSC::JSGlobalData* m_globalData;
-  HashSet<Document*> documentsWithWrappers;
+  HashSet<Document*> m_documentsWithWrapperCaches;
   bool m_isNormal;
 };
 
