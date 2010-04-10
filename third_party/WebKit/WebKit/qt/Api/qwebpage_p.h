@@ -44,6 +44,7 @@ class ContextMenu;
 class EditorClientQt;
 class Element;
 class InspectorController;
+class NotificationPresenterClientQt;
 class Node;
 class Page;
 class Frame;
@@ -190,6 +191,8 @@ class QWebPagePrivate {
   bool inspectorIsInternalOnly;  // True if created through the Inspect context
                                  // menu action
   Qt::DropAction m_lastDropAction;
+
+  WebCore::NotificationPresenterClientQt* notificationPresenterClient;
 
   QString viewMode;
 
