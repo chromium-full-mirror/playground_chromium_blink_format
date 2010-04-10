@@ -142,6 +142,7 @@ void InspectorTimelineAgent::didWriteHTML(unsigned int endLine) {
 void InspectorTimelineAgent::didInstallTimer(int timerId,
                                              int timeout,
                                              bool singleShot) {
+  pushGCEventRecords();
   ScriptObject record = TimelineRecordFactory::createGenericRecord(
       m_frontend, WTF::currentTimeMS());
   record.set("data", TimelineRecordFactory::createTimerInstallData(
@@ -150,6 +151,7 @@ void InspectorTimelineAgent::didInstallTimer(int timerId,
 }
 
 void InspectorTimelineAgent::didRemoveTimer(int timerId) {
+  pushGCEventRecords();
   ScriptObject record = TimelineRecordFactory::createGenericRecord(
       m_frontend, WTF::currentTimeMS());
   record.set("data", TimelineRecordFactory::createGenericTimerData(m_frontend,
@@ -247,6 +249,7 @@ void InspectorTimelineAgent::didFinishLoadingResource(unsigned long identifier,
 }
 
 void InspectorTimelineAgent::didMarkTimeline(const String& message) {
+  pushGCEventRecords();
   ScriptObject record = TimelineRecordFactory::createGenericRecord(
       m_frontend, WTF::currentTimeMS());
   record.set("data", TimelineRecordFactory::createMarkTimelineData(m_frontend,
@@ -255,12 +258,14 @@ void InspectorTimelineAgent::didMarkTimeline(const String& message) {
 }
 
 void InspectorTimelineAgent::didMarkDOMContentEvent() {
+  pushGCEventRecords();
   ScriptObject record = TimelineRecordFactory::createGenericRecord(
       m_frontend, WTF::currentTimeMS());
   addRecordToTimeline(record, MarkDOMContentEventType);
 }
 
 void InspectorTimelineAgent::didMarkLoadEvent() {
+  pushGCEventRecords();
   ScriptObject record = TimelineRecordFactory::createGenericRecord(
       m_frontend, WTF::currentTimeMS());
   addRecordToTimeline(record, MarkLoadEventType);
@@ -279,8 +284,6 @@ void InspectorTimelineAgent::resetFrontendProxyObject(
 
 void InspectorTimelineAgent::addRecordToTimeline(ScriptObject record,
                                                  TimelineRecordType type) {
-  if (type != GCEventTimelineRecordType)
-    pushGCEventRecords();
   record.set("type", type);
   setHeapSizeStatistic(record);
   if (m_recordStack.isEmpty())
@@ -304,6 +307,7 @@ void InspectorTimelineAgent::didCompleteCurrentRecord(TimelineRecordType type) {
   // the middle of
   // an event.  Don't treat as an error.
   if (!m_recordStack.isEmpty()) {
+    pushGCEventRecords();
     TimelineRecordEntry entry = m_recordStack.last();
     m_recordStack.removeLast();
     ASSERT(entry.type == type);
