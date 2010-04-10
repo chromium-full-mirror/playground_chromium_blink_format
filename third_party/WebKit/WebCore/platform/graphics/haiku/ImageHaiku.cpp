@@ -39,6 +39,7 @@
 #include "ImageObserver.h"
 #include "NotImplemented.h"
 #include "PlatformString.h"
+#include "SharedBuffer.h"
 #include "TransformationMatrix.h"
 #include <Application.h>
 #include <Bitmap.h>
@@ -120,7 +121,7 @@ void BitmapImage::draw(GraphicsContext* ctxt,
 void Image::drawPattern(GraphicsContext* context,
                         const FloatRect& tileRect,
                         const AffineTransform& patternTransform,
-                        const FloatPoint& srcPoint,
+                        const FloatPoint& phase,
                         ColorSpace,
                         CompositeOperator op,
                         const FloatRect& dstRect) {
