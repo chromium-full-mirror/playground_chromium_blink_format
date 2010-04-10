@@ -44,6 +44,7 @@ class StorageEvent : public Event {
                                          const String& newValue,
                                          const String& uri,
                                          Storage* storageArea);
+  virtual ~StorageEvent();
 
   const String& key() const { return m_key; }
   const String& oldValue() const { return m_oldValue; }

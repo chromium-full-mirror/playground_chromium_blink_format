@@ -38,6 +38,8 @@ PassRefPtr<StorageEvent> StorageEvent::create() {
 
 StorageEvent::StorageEvent() {}
 
+StorageEvent::~StorageEvent() {}
+
 PassRefPtr<StorageEvent> StorageEvent::create(const AtomicString& type,
                                               const String& key,
                                               const String& oldValue,
