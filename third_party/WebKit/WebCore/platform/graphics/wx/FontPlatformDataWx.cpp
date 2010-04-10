@@ -93,6 +93,7 @@ FontPlatformData::FontPlatformData(const FontDescription& desc,
       fontWeightToWxFontWeight(desc.weight()), false, family.string()));
 #endif
   m_fontState = VALID;
+  m_size = desc.computedPixelSize();
 }
 
 unsigned FontPlatformData::computeHash() const {

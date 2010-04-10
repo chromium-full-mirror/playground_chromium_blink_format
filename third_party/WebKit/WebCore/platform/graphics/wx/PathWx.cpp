@@ -30,6 +30,7 @@
 #include "FloatPoint.h"
 #include "FloatRect.h"
 #include "NotImplemented.h"
+#include "PlatformString.h"
 #include "StrokeStyleApplier.h"
 
 #include <stdio.h>
@@ -105,8 +106,18 @@ FloatRect Path::strokeBoundingRect(StrokeStyleApplier* applier) {
   return FloatRect();
 }
 
-Path& Path::operator=(const Path&) {
+bool Path::strokeContains(StrokeStyleApplier*, const FloatPoint&) const {
   notImplemented();
+  return false;
+}
+
+String Path::debugString() const {
+  notImplemented();
+  return String();
+}
+
+Path& Path::operator=(const Path& path) {
+  *m_path = *path.platformPath();
   return *this;
 }
 
@@ -211,8 +222,8 @@ void Path::apply(void* info, PathApplierFunction function) const {
 bool Path::isEmpty() const {
 #if USE(WXGC)
   if (m_path) {
-    wxDouble width, height;
-    m_path->GetBox(NULL, NULL, &width, &height);
+    wxDouble x, y, width, height;
+    m_path->GetBox(&x, &y, &width, &height);
     return (width == 0 && height == 0);
   }
 #endif
