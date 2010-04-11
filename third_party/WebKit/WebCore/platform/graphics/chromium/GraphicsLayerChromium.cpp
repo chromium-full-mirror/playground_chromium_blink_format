@@ -47,12 +47,12 @@
 
 #if USE(ACCELERATED_COMPOSITING)
 
-#include "GraphicsLayerSkia.h"
+#include "GraphicsLayerChromium.h"
 
 #include "FloatConversion.h"
 #include "FloatRect.h"
 #include "Image.h"
-#include "LayerSkia.h"
+#include "LayerChromium.h"
 #include "PlatformString.h"
 #include "SystemTime.h"
 #include <wtf/CurrentTime.h>

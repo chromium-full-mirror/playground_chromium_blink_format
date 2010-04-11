@@ -28,14 +28,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LayerSkia_h
-#define LayerSkia_h
+#ifndef LayerChromium_h
+#define LayerChromium_h
 
 #if USE(ACCELERATED_COMPOSITING)
 
 #include "FloatPoint.h"
 #include "GraphicsContext.h"
-#include "GraphicsLayerSkia.h"
+#include "GraphicsLayerChromium.h"
 #include "PlatformString.h"
 #include "StringHash.h"
 #include "TransformationMatrix.h"
