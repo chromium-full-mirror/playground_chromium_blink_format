@@ -316,8 +316,8 @@ class FrameLoader : public Noncopyable {
   SandboxFlags sandboxFlags() const { return m_sandboxFlags; }
   // The following sandbox flags will be forced, regardless of changes to
   // the sandbox attribute of any parent frames.
-  void setForceSandboxFlags(SandboxFlags flags) {
-    m_forceSandboxFlags = flags;
+  void setForcedSandboxFlags(SandboxFlags flags) {
+    m_forcedSandboxFlags = flags;
     m_sandboxFlags |= flags;
   }
 
@@ -674,7 +674,7 @@ class FrameLoader : public Noncopyable {
   bool m_suppressOpenerInNewFrame;
 
   SandboxFlags m_sandboxFlags;
-  SandboxFlags m_forceSandboxFlags;
+  SandboxFlags m_forcedSandboxFlags;
 
 #ifndef NDEBUG
   bool m_didDispatchDidCommitLoad;
