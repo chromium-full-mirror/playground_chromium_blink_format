@@ -80,7 +80,7 @@ JSValue JSInspectorFrontendHost::showContextMenu(ExecState* execState,
                                                  const ArgList& args) {
   if (args.size() < 2)
     return jsUndefined();
-
+#if ENABLE(CONTEXT_MENUS)
   Event* event = toEvent(args.at(0));
 
   JSArray* array = asArray(args.at(1));
@@ -102,6 +102,9 @@ JSValue JSInspectorFrontendHost::showContextMenu(ExecState* execState,
   }
 
   impl()->showContextMenu(event, items);
+#else
+  UNUSED_PARAM(execState);
+#endif
   return jsUndefined();
 }
 
