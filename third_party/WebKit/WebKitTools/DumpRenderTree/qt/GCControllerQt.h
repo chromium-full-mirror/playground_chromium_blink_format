@@ -32,6 +32,7 @@
 #include <QObject>
 
 class QWebPage;
+class DumpRenderTreeSupportQt;
 
 class GCController : public QObject {
   Q_OBJECT
