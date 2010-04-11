@@ -25,6 +25,7 @@
 
 #include "Connection.h"
 
+#include "CoreIPCMessageKinds.h"
 #include "RunLoop.h"
 #include "WorkItem.h"
 #include <wtf/CurrentTime.h>
@@ -32,19 +33,6 @@
 using namespace std;
 
 namespace CoreIPC {
-
-namespace CoreIPCMessage {
-
-enum Kind {
-  InitializeConnection,
-  SyncMessageReply,
-};
-}
-
-template <>
-struct MessageKindTraits<CoreIPCMessage::Kind> {
-  static const MessageClass messageClass = MessageClassCoreIPC;
-};
 
 PassRefPtr<Connection> Connection::createServerConnection(
     Identifier identifier,
