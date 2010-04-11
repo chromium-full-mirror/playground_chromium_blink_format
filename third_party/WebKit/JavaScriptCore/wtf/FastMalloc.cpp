@@ -4589,6 +4589,15 @@ malloc_introspection_t jscore_fastmalloc_introspection = {
   0  // zone_locked will not be called on the zone unless it advertises itself
      // as version five or higher.
 #endif
+#if !defined(BUILDING_ON_TIGER) && !defined(BUILDING_ON_LEOPARD) && \
+    !defined(BUILDING_ON_SNOW_LEOPARD) && !OS(IPHONE_OS)
+  ,
+  0,
+  0,
+  0,
+  0  // These members will not be used unless the zone advertises itself as
+     // version seven or higher.
+#endif
 
 };
 }
