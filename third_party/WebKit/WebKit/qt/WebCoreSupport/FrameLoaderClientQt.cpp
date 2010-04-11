@@ -75,11 +75,14 @@
 #include <QGraphicsWidget>
 #include <QNetworkRequest>
 #include <QNetworkReply>
+#include <QStringList>
 #include "qwebhistory_p.h"
 
 static bool dumpFrameLoaderCallbacks = false;
 static bool dumpResourceLoadCallbacks = false;
 static bool sendRequestReturnsNullOnRedirect = false;
+static bool sendRequestReturnsNull = false;
+static QStringList sendRequestClearHeaders;
 
 static QMap<unsigned long, QString> dumpAssignedUrls;
 
@@ -93,6 +96,15 @@ void QWEBKIT_EXPORT qt_dump_resource_load_callbacks(bool b) {
 
 void QWEBKIT_EXPORT qt_set_will_send_request_returns_null_on_redirect(bool b) {
   sendRequestReturnsNullOnRedirect = b;
+}
+
+void QWEBKIT_EXPORT qt_set_will_send_request_returns_null(bool b) {
+  sendRequestReturnsNull = b;
+}
+
+void QWEBKIT_EXPORT
+qt_set_will_send_request_clear_headers(const QStringList& headers) {
+  sendRequestClearHeaders = headers;
 }
 
 // Compare with WebKitTools/DumpRenderTree/mac/FrameLoadDelegate.mm
@@ -800,10 +812,17 @@ void FrameLoaderClientQt::dispatchWillSendRequest(
                : qPrintable(
                      drtDescriptionSuitableForTestResult(redirectResponse)));
 
+  if (sendRequestReturnsNull)
+    newRequest.setURL(QUrl());
+
   if (sendRequestReturnsNullOnRedirect && !redirectResponse.isNull()) {
     printf("Returning null for this redirect\n");
     newRequest.setURL(QUrl());
   }
+
+  for (int i = 0; i < sendRequestClearHeaders.size(); ++i)
+    newRequest.setHTTPHeaderField(
+        sendRequestClearHeaders.at(i).toLocal8Bit().constData(), QString());
 
   // seems like the Mac code doesn't do anything here by default neither
   // qDebug() << "FrameLoaderClientQt::dispatchWillSendRequest" <<
