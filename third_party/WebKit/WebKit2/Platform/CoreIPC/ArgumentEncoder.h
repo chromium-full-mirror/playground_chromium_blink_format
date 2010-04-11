@@ -27,8 +27,8 @@
 #define ArgumentEncoder_h
 
 #include "Attachment.h"
-#include <list>
 #include <wtf/TypeTraits.h>
+#include <wtf/Vector.h>
 
 namespace CoreIPC {
 
@@ -67,7 +67,7 @@ class ArgumentEncoder {
   size_t bufferSize() const { return m_bufferSize; }
 
   void addAttachment(const Attachment&);
-  std::list<Attachment> releaseAttachments();
+  Vector<Attachment> releaseAttachments();
 
   void debug();
 
@@ -80,7 +80,7 @@ class ArgumentEncoder {
   size_t m_bufferSize;
   size_t m_bufferCapacity;
 
-  std::list<Attachment> m_attachments;
+  Vector<Attachment> m_attachments;
 };
 
 template <>

@@ -25,8 +25,6 @@
 
 #include "ArgumentDecoder.h"
 
-using namespace std;
-
 namespace CoreIPC {
 
 ArgumentDecoder::ArgumentDecoder(const uint8_t* buffer, size_t bufferSize) {
@@ -35,20 +33,20 @@ ArgumentDecoder::ArgumentDecoder(const uint8_t* buffer, size_t bufferSize) {
 
 ArgumentDecoder::ArgumentDecoder(const uint8_t* buffer,
                                  size_t bufferSize,
-                                 std::queue<Attachment>& attachments) {
+                                 Deque<Attachment>& attachments) {
   initialize(buffer, bufferSize);
 
-  std::swap(m_attachments, attachments);
+  m_attachments.swap(attachments);
 }
 
 ArgumentDecoder::~ArgumentDecoder() {
   ASSERT(m_buffer);
-  free(m_buffer);
+  fastFree(m_buffer);
   // FIXME: We need to dispose of the mach ports in cases of failure.
 }
 
 void ArgumentDecoder::initialize(const uint8_t* buffer, size_t bufferSize) {
-  m_buffer = static_cast<uint8_t*>(malloc(bufferSize));
+  m_buffer = static_cast<uint8_t*>(fastMalloc(bufferSize));
   m_bufferPos = m_buffer;
   m_bufferEnd = m_buffer + bufferSize;
   memcpy(m_buffer, buffer, bufferSize);
@@ -74,7 +72,7 @@ bool ArgumentDecoder::alignBufferPosition(unsigned alignment, size_t size) {
   return true;
 }
 
-bool ArgumentDecoder::decodeBytes(std::vector<uint8_t>& buffer) {
+bool ArgumentDecoder::decodeBytes(Vector<uint8_t>& buffer) {
   uint64_t size;
   if (!decodeUInt64(size))
     return false;
@@ -172,11 +170,11 @@ bool ArgumentDecoder::decodeDouble(double& result) {
 }
 
 bool ArgumentDecoder::removeAttachment(Attachment& attachment) {
-  if (m_attachments.empty())
+  if (m_attachments.isEmpty())
     return false;
 
-  attachment = m_attachments.front();
-  m_attachments.pop();
+  attachment = m_attachments.first();
+  m_attachments.removeFirst();
   return true;
 }
 

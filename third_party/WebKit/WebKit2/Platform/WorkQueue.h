@@ -28,8 +28,6 @@
 
 #if PLATFORM(MAC)
 #include <dispatch/dispatch.h>
-#elif PLATFORM(WIN)
-#include <queue>
 #endif
 
 #include "WorkItem.h"
@@ -91,7 +89,7 @@ class WorkQueue {
   HANDLE m_performWorkEvent;
 
   Mutex m_workItemQueueLock;
-  std::queue<WorkItem*> m_workItemQueue;
+  Vector<WorkItem*> m_workItemQueue;
 
   Mutex m_handlesLock;
   HashMap<HANDLE, WorkItem*> m_handles;

@@ -125,14 +125,12 @@ static inline size_t machMessageSize(size_t bodySize,
 
 void Connection::sendOutgoingMessage(unsigned messageID,
                                      auto_ptr<ArgumentEncoder> arguments) {
-  std::list<Attachment> attachments = arguments->releaseAttachments();
+  Vector<Attachment> attachments = arguments->releaseAttachments();
 
   size_t numberOfPortDescriptors = 0;
   size_t numberOfOOLMemoryDescriptors = 0;
-  for (std::list<Attachment>::const_iterator it = attachments.begin(),
-                                             end = attachments.end();
-       it != end; ++it) {
-    Attachment::Type type = ((Attachment)*it).type();
+  for (size_t i = 0; i < attachments.size(); ++i) {
+    Attachment::Type type = attachments[i].type();
     if (type == Attachment::MachPortType)
       numberOfPortDescriptors++;
     else if (type == Attachment::MachOOLMemoryType)
@@ -170,10 +168,8 @@ void Connection::sendOutgoingMessage(unsigned messageID,
         numberOfPortDescriptors + numberOfOOLMemoryDescriptors;
 
     uint8_t* descriptorData = reinterpret_cast<uint8_t*>(body + 1);
-    for (std::list<Attachment>::const_iterator it = attachments.begin(),
-                                               end = attachments.end();
-         it != end; ++it) {
-      Attachment attachment = *it;
+    for (size_t i = 0; i < attachments.size(); ++i) {
+      Attachment attachment = attachments[i];
 
       mach_msg_descriptor_t* descriptor =
           reinterpret_cast<mach_msg_descriptor_t*>(descriptorData);
@@ -239,7 +235,7 @@ static auto_ptr<ArgumentDecoder> createArgumentDecoder(
   ASSERT(numDescriptors);
 
   // Build attachment list
-  std::queue<Attachment> attachments;
+  Deque<Attachment> attachments;
   uint8_t* descriptorData = reinterpret_cast<uint8_t*>(body + 1);
   for (mach_msg_size_t i = 0; i < numDescriptors; ++i) {
     mach_msg_descriptor_t* descriptor =
@@ -247,12 +243,12 @@ static auto_ptr<ArgumentDecoder> createArgumentDecoder(
 
     switch (descriptor->type.type) {
       case MACH_MSG_PORT_DESCRIPTOR:
-        attachments.push(
+        attachments.append(
             Attachment(descriptor->port.name, descriptor->port.disposition));
         descriptorData += sizeof(mach_msg_port_descriptor_t);
         break;
       case MACH_MSG_OOL_DESCRIPTOR:
-        attachments.push(Attachment(
+        attachments.append(Attachment(
             descriptor->out_of_line.address, descriptor->out_of_line.size,
             descriptor->out_of_line.copy, descriptor->out_of_line.deallocate));
         descriptorData += sizeof(mach_msg_ool_descriptor_t);

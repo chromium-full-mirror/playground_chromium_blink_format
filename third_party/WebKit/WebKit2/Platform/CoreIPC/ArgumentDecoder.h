@@ -27,10 +27,9 @@
 #define ArgumentDecoder_h
 
 #include "Attachment.h"
-#include <memory>
-#include <queue>
-#include <vector>
+#include <wtf/Deque.h>
 #include <wtf/TypeTraits.h>
+#include <wtf/Vector.h>
 
 namespace CoreIPC {
 
@@ -48,14 +47,12 @@ bool decode(ArgumentDecoder& decoder, T& t) {
 class ArgumentDecoder {
  public:
   ArgumentDecoder(const uint8_t* buffer, size_t bufferSize);
-  ArgumentDecoder(const uint8_t* buffer,
-                  size_t bufferSize,
-                  std::queue<Attachment>&);
+  ArgumentDecoder(const uint8_t* buffer, size_t bufferSize, Deque<Attachment>&);
   ~ArgumentDecoder();
 
   uint64_t destinationID() const { return m_destinationID; }
 
-  bool decodeBytes(std::vector<uint8_t>&);
+  bool decodeBytes(Vector<uint8_t>&);
   bool decodeBytes(uint8_t*, size_t);
 
   bool decodeBool(bool&);
@@ -98,7 +95,7 @@ class ArgumentDecoder {
   uint8_t* m_bufferPos;
   uint8_t* m_bufferEnd;
 
-  std::queue<Attachment> m_attachments;
+  Deque<Attachment> m_attachments;
 };
 
 template <>

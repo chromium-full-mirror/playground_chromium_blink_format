@@ -31,7 +31,6 @@
 #include "Arguments.h"
 #include "MessageID.h"
 #include "WorkQueue.h"
-#include <deque>
 #include <memory>
 #include <wtf/HashMap.h>
 #include <wtf/PassRefPtr.h>
@@ -150,7 +149,7 @@ class Connection : public ThreadSafeShared<Connection> {
   };
 
   Mutex m_incomingMessagesLock;
-  std::deque<IncomingMessage> m_incomingMessages;
+  Vector<IncomingMessage> m_incomingMessages;
 
   // Outgoing messages.
   class OutgoingMessage {
@@ -170,7 +169,7 @@ class Connection : public ThreadSafeShared<Connection> {
   };
 
   Mutex m_outgoingMessagesLock;
-  std::deque<OutgoingMessage> m_outgoingMessages;
+  Vector<OutgoingMessage> m_outgoingMessages;
 
   ThreadCondition m_waitForMessageCondition;
   Mutex m_waitForMessageMutex;

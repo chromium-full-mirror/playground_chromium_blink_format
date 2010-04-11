@@ -25,11 +25,8 @@
 
 #include "WorkQueue.h"
 
-#include <assert.h>
 #include <process.h>
 #include <wtf/Threading.h>
-
-using namespace std;
 
 void WorkQueue::registerHandle(HANDLE handle, std::auto_ptr<WorkItem> item) {
   // Add the item.
@@ -104,26 +101,24 @@ void WorkQueue::platformInvalidate() {
 
 void WorkQueue::scheduleWork(std::auto_ptr<WorkItem> item) {
   MutexLocker locker(m_workItemQueueLock);
-  m_workItemQueue.push(item.release());
+  m_workItemQueue.append(item.release());
 
   // Set the work event.
   ::SetEvent(m_performWorkEvent);
 }
 
 void WorkQueue::performWork() {
-  std::queue<WorkItem*> workItemQueue;
+  Vector<WorkItem*> workItemQueue;
   {
     MutexLocker locker(m_workItemQueueLock);
-    swap(m_workItemQueue, workItemQueue);
+    m_workItemQueue.swap(workItemQueue);
   }
 
-  while (!workItemQueue.empty()) {
-    std::auto_ptr<WorkItem> item(workItemQueue.front());
+  for (size_t i = 0; i < workItemQueue.size(); ++i) {
+    std::auto_ptr<WorkItem> item(workItemQueue[i]);
 
     MutexLocker locker(m_isValidMutex);
     if (m_isValid)
       item->execute();
-
-    workItemQueue.pop();
   }
 }
