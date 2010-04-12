@@ -161,12 +161,12 @@ static inline ShadowData* blendFunc(const AnimationBase* anim,
                                     const ShadowData* to,
                                     double progress) {
   ASSERT(from && to);
-  return new ShadowData(blendFunc(anim, from->x, to->x, progress),
-                        blendFunc(anim, from->y, to->y, progress),
-                        blendFunc(anim, from->blur, to->blur, progress),
-                        blendFunc(anim, from->spread, to->spread, progress),
-                        blendFunc(anim, from->style, to->style, progress),
-                        blendFunc(anim, from->color, to->color, progress));
+  return new ShadowData(blendFunc(anim, from->x(), to->x(), progress),
+                        blendFunc(anim, from->y(), to->y(), progress),
+                        blendFunc(anim, from->blur(), to->blur(), progress),
+                        blendFunc(anim, from->spread(), to->spread(), progress),
+                        blendFunc(anim, from->style(), to->style(), progress),
+                        blendFunc(anim, from->color(), to->color(), progress));
 }
 
 static inline TransformOperations blendFunc(const AnimationBase* anim,
@@ -352,16 +352,16 @@ class PropertyWrapperAcceleratedTransform
 };
 #endif  // USE(ACCELERATED_COMPOSITING)
 
-class PropertyWrapperShadow : public PropertyWrapperGetter<ShadowData*> {
+class PropertyWrapperShadow : public PropertyWrapperBase {
  public:
   PropertyWrapperShadow(int prop,
-                        ShadowData* (RenderStyle::*getter)() const,
+                        const ShadowData* (RenderStyle::*getter)() const,
                         void (RenderStyle::*setter)(ShadowData*, bool))
-      : PropertyWrapperGetter<ShadowData*>(prop, getter), m_setter(setter) {}
+      : PropertyWrapperBase(prop), m_getter(getter), m_setter(setter) {}
 
   virtual bool equals(const RenderStyle* a, const RenderStyle* b) const {
-    ShadowData* shadowA = (a->*m_getter)();
-    ShadowData* shadowB = (b->*m_getter)();
+    const ShadowData* shadowA = (a->*m_getter)();
+    const ShadowData* shadowB = (b->*m_getter)();
 
     while (true) {
       if (!shadowA && !shadowB)  // end of both lists
@@ -373,8 +373,8 @@ class PropertyWrapperShadow : public PropertyWrapperGetter<ShadowData*> {
       if (*shadowA != *shadowB)
         return false;
 
-      shadowA = shadowA->next;
-      shadowB = shadowB->next;
+      shadowA = shadowA->next();
+      shadowB = shadowB->next();
     }
 
     return true;
@@ -385,29 +385,30 @@ class PropertyWrapperShadow : public PropertyWrapperGetter<ShadowData*> {
                      const RenderStyle* a,
                      const RenderStyle* b,
                      double progress) const {
-    ShadowData* shadowA = (a->*m_getter)();
-    ShadowData* shadowB = (b->*m_getter)();
+    const ShadowData* shadowA = (a->*m_getter)();
+    const ShadowData* shadowB = (b->*m_getter)();
     ShadowData defaultShadowData(0, 0, 0, 0, Normal, Color::transparent);
 
     ShadowData* newShadowData = 0;
 
     while (shadowA || shadowB) {
-      ShadowData* srcShadow = shadowA ? shadowA : &defaultShadowData;
-      ShadowData* dstShadow = shadowB ? shadowB : &defaultShadowData;
+      const ShadowData* srcShadow = shadowA ? shadowA : &defaultShadowData;
+      const ShadowData* dstShadow = shadowB ? shadowB : &defaultShadowData;
 
       if (!newShadowData)
         newShadowData = blendFunc(anim, srcShadow, dstShadow, progress);
       else
-        newShadowData->next = blendFunc(anim, srcShadow, dstShadow, progress);
+        newShadowData->setNext(blendFunc(anim, srcShadow, dstShadow, progress));
 
-      shadowA = shadowA ? shadowA->next : 0;
-      shadowB = shadowB ? shadowB->next : 0;
+      shadowA = shadowA ? shadowA->next() : 0;
+      shadowB = shadowB ? shadowB->next() : 0;
     }
 
     (dst->*m_setter)(newShadowData, false);
   }
 
  private:
+  const ShadowData* (RenderStyle::*m_getter)() const;
   void (RenderStyle::*m_setter)(ShadowData*, bool);
 };
 

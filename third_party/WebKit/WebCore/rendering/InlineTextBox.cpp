@@ -307,7 +307,7 @@ static void paintTextWithShadows(GraphicsContext* context,
                                  int y,
                                  int w,
                                  int h,
-                                 ShadowData* shadow,
+                                 const ShadowData* shadow,
                                  bool stroked) {
   Color fillColor = context->fillColor();
   ColorSpace fillColorSpace = context->fillColorSpace();
@@ -319,11 +319,11 @@ static void paintTextWithShadows(GraphicsContext* context,
     IntSize extraOffset;
 
     if (shadow) {
-      IntSize shadowOffset(shadow->x, shadow->y);
-      int shadowBlur = shadow->blur;
-      const Color& shadowColor = shadow->color;
+      IntSize shadowOffset(shadow->x(), shadow->y());
+      int shadowBlur = shadow->blur();
+      const Color& shadowColor = shadow->color();
 
-      if (shadow->next || stroked || !opaque) {
+      if (shadow->next() || stroked || !opaque) {
         IntRect shadowRect(x, y, w, h);
         shadowRect.inflate(shadowBlur);
         shadowRect.move(shadowOffset);
@@ -353,12 +353,12 @@ static void paintTextWithShadows(GraphicsContext* context,
     if (!shadow)
       break;
 
-    if (shadow->next || stroked || !opaque)
+    if (shadow->next() || stroked || !opaque)
       context->restore();
     else
       context->clearShadow();
 
-    shadow = shadow->next;
+    shadow = shadow->next();
   } while (shadow || stroked || !opaque);
 }
 
@@ -468,7 +468,7 @@ void InlineTextBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
   Color textFillColor;
   Color textStrokeColor;
   float textStrokeWidth = styleToUse->textStrokeWidth();
-  ShadowData* textShadow =
+  const ShadowData* textShadow =
       paintInfo.forceBlackText ? 0 : styleToUse->textShadow();
 
   if (paintInfo.forceBlackText) {
@@ -496,7 +496,7 @@ void InlineTextBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
   Color selectionFillColor = textFillColor;
   Color selectionStrokeColor = textStrokeColor;
   float selectionStrokeWidth = textStrokeWidth;
-  ShadowData* selectionShadow = textShadow;
+  const ShadowData* selectionShadow = textShadow;
   if (haveSelection) {
     // Check foreground color first.
     Color foreground = paintInfo.forceBlackText
@@ -510,7 +510,7 @@ void InlineTextBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
 
     if (RenderStyle* pseudoStyle =
             renderer()->getCachedPseudoStyle(SELECTION)) {
-      ShadowData* shadow =
+      const ShadowData* shadow =
           paintInfo.forceBlackText ? 0 : pseudoStyle->textShadow();
       if (shadow != selectionShadow) {
         if (!paintSelectedTextOnly)
@@ -758,7 +758,7 @@ void InlineTextBox::paintDecoration(GraphicsContext* context,
                                     int tx,
                                     int ty,
                                     int deco,
-                                    ShadowData* shadow) {
+                                    const ShadowData* shadow) {
   tx += m_x;
   ty += m_y;
 
@@ -792,15 +792,15 @@ void InlineTextBox::paintDecoration(GraphicsContext* context,
 
   bool setClip = false;
   int extraOffset = 0;
-  if (!linesAreOpaque && shadow && shadow->next) {
+  if (!linesAreOpaque && shadow && shadow->next()) {
     context->save();
     IntRect clipRect(tx, ty, width, baseline + 2);
-    for (ShadowData* s = shadow; s; s = s->next) {
+    for (const ShadowData* s = shadow; s; s = s->next()) {
       IntRect shadowRect(tx, ty, width, baseline + 2);
-      shadowRect.inflate(s->blur);
-      shadowRect.move(s->x, s->y);
+      shadowRect.inflate(s->blur());
+      shadowRect.move(s->x(), s->y());
       clipRect.unite(shadowRect);
-      extraOffset = max(extraOffset, max(0, s->y) + s->blur);
+      extraOffset = max(extraOffset, max(0, s->y()) + s->blur());
     }
     context->save();
     context->clip(clipRect);
@@ -814,15 +814,15 @@ void InlineTextBox::paintDecoration(GraphicsContext* context,
 
   do {
     if (shadow) {
-      if (!shadow->next) {
+      if (!shadow->next()) {
         // The last set of lines paints normally inside the clip.
         ty -= extraOffset;
         extraOffset = 0;
       }
-      context->setShadow(IntSize(shadow->x, shadow->y - extraOffset),
-                         shadow->blur, shadow->color, colorSpace);
+      context->setShadow(IntSize(shadow->x(), shadow->y() - extraOffset),
+                         shadow->blur(), shadow->color(), colorSpace);
       setShadow = true;
-      shadow = shadow->next;
+      shadow = shadow->next();
     }
 
     if (deco & UNDERLINE) {

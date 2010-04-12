@@ -119,10 +119,11 @@ bool SVGRenderBase::prepareToRenderSVGContent(
     paintInfo.context->beginTransparencyLayer(opacity);
   }
 
-  if (ShadowData* shadow = svgStyle->shadow()) {
+  if (const ShadowData* shadow = svgStyle->shadow()) {
     paintInfo.context->clip(repaintRect);
-    paintInfo.context->setShadow(IntSize(shadow->x, shadow->y), shadow->blur,
-                                 shadow->color, style->colorSpace());
+    paintInfo.context->setShadow(IntSize(shadow->x(), shadow->y()),
+                                 shadow->blur(), shadow->color(),
+                                 style->colorSpace());
     paintInfo.context->beginTransparencyLayer(1.0f);
   }
 

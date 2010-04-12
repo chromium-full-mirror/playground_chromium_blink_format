@@ -782,7 +782,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
     return background->m_outline.offset();
   }
 
-  ShadowData* textShadow() const { return rareInheritedData->textShadow; }
+  const ShadowData* textShadow() const { return rareInheritedData->textShadow; }
   const Color& textStrokeColor() const {
     return rareInheritedData->textStrokeColor;
   }
@@ -820,7 +820,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
     return static_cast<EBoxAlignment>(rareNonInheritedData->flexibleBox->pack);
   }
 
-  ShadowData* boxShadow() const {
+  const ShadowData* boxShadow() const {
     return rareNonInheritedData->m_boxShadow.get();
   }
   void getBoxShadowExtent(int& top, int& right, int& bottom, int& left) const;

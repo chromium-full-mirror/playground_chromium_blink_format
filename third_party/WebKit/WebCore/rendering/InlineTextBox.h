@@ -188,7 +188,7 @@ class InlineTextBox : public InlineBox {
                        int tx,
                        int ty,
                        int decoration,
-                       ShadowData*);
+                       const ShadowData*);
   void paintSelection(GraphicsContext*,
                       int tx,
                       int ty,
