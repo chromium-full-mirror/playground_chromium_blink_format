@@ -486,7 +486,7 @@ void FrameLoaderClientWx::committedLoad(WebCore::DocumentLoader* loader,
     return;
   if (!m_pluginView) {
     FrameLoader* fl = loader->frameLoader();
-    fl->writer()->setEncoding(m_response.textEncodingName(), false);
+    fl->setEncoding(m_response.textEncodingName(), false);
     fl->addData(data, length);
   }
 

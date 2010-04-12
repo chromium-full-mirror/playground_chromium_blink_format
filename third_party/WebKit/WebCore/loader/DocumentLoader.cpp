@@ -266,7 +266,7 @@ void DocumentLoader::finishedLoading() {
   commitIfReady();
   if (FrameLoader* loader = frameLoader()) {
     loader->finishedLoadingDocument(this);
-    loader->writer()->end();
+    loader->end();
   }
 }
 
@@ -305,7 +305,7 @@ void DocumentLoader::setupForReplaceByMIMEType(const String& newMIMEType) {
   }
 
   frameLoader()->finishedLoadingDocument(this);
-  m_frame->loader()->writer()->end();
+  m_frame->loader()->end();
 
   frameLoader()->setReplacing();
   m_gotFirstByte = false;

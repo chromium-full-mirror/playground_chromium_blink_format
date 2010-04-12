@@ -272,7 +272,7 @@ String ScriptElementData::scriptCharset() const {
   // encoding.
   if (charset.isEmpty()) {
     if (Frame* frame = m_element->document()->frame())
-      charset = frame->loader()->writer()->encoding();
+      charset = frame->loader()->encoding();
   }
 
   return charset;
