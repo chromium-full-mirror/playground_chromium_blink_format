@@ -178,35 +178,35 @@ static PassRefPtr<CSSValue> valueForNinePieceImage(
 
   // Create the slices.
   RefPtr<CSSPrimitiveValue> top;
-  if (image.m_slices.top().isPercent())
-    top = CSSPrimitiveValue::create(image.m_slices.top().value(),
+  if (image.slices().top().isPercent())
+    top = CSSPrimitiveValue::create(image.slices().top().value(),
                                     CSSPrimitiveValue::CSS_PERCENTAGE);
   else
-    top = CSSPrimitiveValue::create(image.m_slices.top().value(),
+    top = CSSPrimitiveValue::create(image.slices().top().value(),
                                     CSSPrimitiveValue::CSS_NUMBER);
 
   RefPtr<CSSPrimitiveValue> right;
-  if (image.m_slices.right().isPercent())
-    right = CSSPrimitiveValue::create(image.m_slices.right().value(),
+  if (image.slices().right().isPercent())
+    right = CSSPrimitiveValue::create(image.slices().right().value(),
                                       CSSPrimitiveValue::CSS_PERCENTAGE);
   else
-    right = CSSPrimitiveValue::create(image.m_slices.right().value(),
+    right = CSSPrimitiveValue::create(image.slices().right().value(),
                                       CSSPrimitiveValue::CSS_NUMBER);
 
   RefPtr<CSSPrimitiveValue> bottom;
-  if (image.m_slices.bottom().isPercent())
-    bottom = CSSPrimitiveValue::create(image.m_slices.bottom().value(),
+  if (image.slices().bottom().isPercent())
+    bottom = CSSPrimitiveValue::create(image.slices().bottom().value(),
                                        CSSPrimitiveValue::CSS_PERCENTAGE);
   else
-    bottom = CSSPrimitiveValue::create(image.m_slices.bottom().value(),
+    bottom = CSSPrimitiveValue::create(image.slices().bottom().value(),
                                        CSSPrimitiveValue::CSS_NUMBER);
 
   RefPtr<CSSPrimitiveValue> left;
-  if (image.m_slices.left().isPercent())
-    left = CSSPrimitiveValue::create(image.m_slices.left().value(),
+  if (image.slices().left().isPercent())
+    left = CSSPrimitiveValue::create(image.slices().left().value(),
                                      CSSPrimitiveValue::CSS_PERCENTAGE);
   else
-    left = CSSPrimitiveValue::create(image.m_slices.left().value(),
+    left = CSSPrimitiveValue::create(image.slices().left().value(),
                                      CSSPrimitiveValue::CSS_NUMBER);
 
   RefPtr<Rect> rect = Rect::create();
@@ -216,8 +216,8 @@ static PassRefPtr<CSSValue> valueForNinePieceImage(
   rect->setLeft(left);
 
   return CSSBorderImageValue::create(imageValue, rect,
-                                     valueForRepeatRule(image.m_horizontalRule),
-                                     valueForRepeatRule(image.m_verticalRule));
+                                     valueForRepeatRule(image.horizontalRule()),
+                                     valueForRepeatRule(image.verticalRule()));
 }
 
 static PassRefPtr<CSSValue> valueForReflection(
