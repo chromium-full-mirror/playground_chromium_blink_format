@@ -944,7 +944,7 @@ void InspectorDOMAgent::applyStyleText(long callId,
     // The input was parsable or the user deleted everything, so remove the
     // original property from the real style declaration. If this represents
     // a shorthand remove all the longhand properties.
-    if (style->getPropertyShorthand(propertyName).isEmpty()) {
+    if (!style->getPropertyShorthand(propertyName).isEmpty()) {
       Vector<String> longhandProps = longhandProperties(style, propertyName);
       for (unsigned i = 0; !ec && i < longhandProps.size(); ++i)
         style->removeProperty(longhandProps[i], ec);
