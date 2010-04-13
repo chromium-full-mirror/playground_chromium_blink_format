@@ -34,6 +34,8 @@ class RenderProgress : public RenderBlock {
   double position() { return m_position; }
   double animationProgress();
 
+  HTMLProgressElement* progressElement() const;
+
  private:
   virtual const char* renderName() const { return "RenderProgress"; }
   virtual bool isProgress() const { return true; }

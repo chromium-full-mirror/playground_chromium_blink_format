@@ -60,7 +60,7 @@ void RenderProgress::layout() {
 }
 
 void RenderProgress::updateFromElement() {
-  HTMLProgressElement* element = static_cast<HTMLProgressElement*>(node());
+  HTMLProgressElement* element = progressElement();
   if (m_position == element->position())
     return;
   m_position = element->position();
@@ -105,6 +105,10 @@ void RenderProgress::updateAnimationState() {
     m_animationTimer.startOneShot(m_animationRepeatInterval);
   } else
     m_animationTimer.stop();
+}
+
+HTMLProgressElement* RenderProgress::progressElement() const {
+  return static_cast<HTMLProgressElement*>(node());
 }
 
 }  // namespace WebCore
