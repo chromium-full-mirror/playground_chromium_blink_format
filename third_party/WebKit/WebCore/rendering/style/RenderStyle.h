@@ -142,7 +142,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
   // non-inherited attributes
   DataRef<StyleBoxData> box;
   DataRef<StyleVisualData> visual;
-  DataRef<StyleBackgroundData> background;
+  DataRef<StyleBackgroundData> m_background;
   DataRef<StyleSurroundData> surround;
   DataRef<StyleRareNonInheritedData> rareNonInheritedData;
 
@@ -367,13 +367,13 @@ class RenderStyle : public RefCounted<RenderStyle> {
   bool hasBackground() const {
     if (backgroundColor().isValid() && backgroundColor().alpha() > 0)
       return true;
-    return background->m_background.hasImage();
+    return m_background->background().hasImage();
   }
   bool hasBackgroundImage() const {
-    return background->m_background.hasImage();
+    return m_background->background().hasImage();
   }
   bool hasFixedBackgroundImage() const {
-    return background->m_background.hasFixedImage();
+    return m_background->background().hasFixedImage();
   }
   bool hasAppearance() const { return appearance() != NoControlPart; }
 
@@ -495,16 +495,16 @@ class RenderStyle : public RefCounted<RenderStyle> {
     return max(0, outlineWidth() + outlineOffset());
   }
   unsigned short outlineWidth() const {
-    if (background->m_outline.style() == BNONE)
+    if (m_background->outline().style() == BNONE)
       return 0;
-    return background->m_outline.width();
+    return m_background->outline().width();
   }
   bool hasOutline() const {
     return outlineWidth() > 0 && outlineStyle() > BHIDDEN;
   }
-  EBorderStyle outlineStyle() const { return background->m_outline.style(); }
-  bool outlineStyleIsAuto() const { return background->m_outline.isAuto(); }
-  const Color& outlineColor() const { return background->m_outline.color(); }
+  EBorderStyle outlineStyle() const { return m_background->outline().style(); }
+  bool outlineStyleIsAuto() const { return m_background->outline().isAuto(); }
+  const Color& outlineColor() const { return m_background->outline().color(); }
 
   EOverflow overflowX() const {
     return static_cast<EOverflow>(noninherited_flags._overflowX);
@@ -624,45 +624,47 @@ class RenderStyle : public RefCounted<RenderStyle> {
     return wordBreak() == BreakWordBreak || wordWrap() == BreakWordWrap;
   }
 
-  const Color& backgroundColor() const { return background->m_color; }
+  const Color& backgroundColor() const { return m_background->color(); }
   StyleImage* backgroundImage() const {
-    return background->m_background.image();
+    return m_background->background().image();
   }
   EFillRepeat backgroundRepeatX() const {
-    return static_cast<EFillRepeat>(background->m_background.repeatX());
+    return static_cast<EFillRepeat>(m_background->background().repeatX());
   }
   EFillRepeat backgroundRepeatY() const {
-    return static_cast<EFillRepeat>(background->m_background.repeatY());
+    return static_cast<EFillRepeat>(m_background->background().repeatY());
   }
   CompositeOperator backgroundComposite() const {
-    return static_cast<CompositeOperator>(background->m_background.composite());
+    return static_cast<CompositeOperator>(
+        m_background->background().composite());
   }
   EFillAttachment backgroundAttachment() const {
-    return static_cast<EFillAttachment>(background->m_background.attachment());
+    return static_cast<EFillAttachment>(
+        m_background->background().attachment());
   }
   EFillBox backgroundClip() const {
-    return static_cast<EFillBox>(background->m_background.clip());
+    return static_cast<EFillBox>(m_background->background().clip());
   }
   EFillBox backgroundOrigin() const {
-    return static_cast<EFillBox>(background->m_background.origin());
+    return static_cast<EFillBox>(m_background->background().origin());
   }
   Length backgroundXPosition() const {
-    return background->m_background.xPosition();
+    return m_background->background().xPosition();
   }
   Length backgroundYPosition() const {
-    return background->m_background.yPosition();
+    return m_background->background().yPosition();
   }
   EFillSizeType backgroundSizeType() const {
-    return background->m_background.sizeType();
+    return m_background->background().sizeType();
   }
   LengthSize backgroundSizeLength() const {
-    return background->m_background.sizeLength();
+    return m_background->background().sizeLength();
   }
   FillLayer* accessBackgroundLayers() {
-    return &(background.access()->m_background);
+    return &(m_background.access()->m_background);
   }
   const FillLayer* backgroundLayers() const {
-    return &(background->m_background);
+    return &(m_background->background());
   }
 
   StyleImage* maskImage() const { return rareNonInheritedData->m_mask.image(); }
@@ -777,9 +779,9 @@ class RenderStyle : public RefCounted<RenderStyle> {
 #endif
 
   int outlineOffset() const {
-    if (background->m_outline.style() == BNONE)
+    if (m_background->outline().style() == BNONE)
       return 0;
-    return background->m_outline.offset();
+    return m_background->outline().offset();
   }
 
   const ShadowData* textShadow() const { return rareInheritedData->textShadow; }
@@ -1110,21 +1112,21 @@ class RenderStyle : public RefCounted<RenderStyle> {
     SET_VAR(surround, border.m_bottomRight, initialBorderRadius())
   }
 
-  void resetOutline() { SET_VAR(background, m_outline, OutlineValue()) }
+  void resetOutline() { SET_VAR(m_background, m_outline, OutlineValue()) }
 
-  void setBackgroundColor(const Color& v) { SET_VAR(background, m_color, v) }
+  void setBackgroundColor(const Color& v) { SET_VAR(m_background, m_color, v) }
 
   void setBackgroundXPosition(Length l) {
-    SET_VAR(background, m_background.m_xPosition, l)
+    SET_VAR(m_background, m_background.m_xPosition, l)
   }
   void setBackgroundYPosition(Length l) {
-    SET_VAR(background, m_background.m_yPosition, l)
+    SET_VAR(m_background, m_background.m_yPosition, l)
   }
   void setBackgroundSize(EFillSizeType b) {
-    SET_VAR(background, m_background.m_sizeType, b)
+    SET_VAR(m_background, m_background.m_sizeType, b)
   }
   void setBackgroundSizeLength(LengthSize l) {
-    SET_VAR(background, m_background.m_sizeLength, l)
+    SET_VAR(m_background, m_background.m_sizeLength, l)
   }
 
   void setBorderImage(const NinePieceImage& b) {
@@ -1194,16 +1196,16 @@ class RenderStyle : public RefCounted<RenderStyle> {
     SET_VAR(surround, border.m_bottom.m_color, v)
   }
   void setOutlineWidth(unsigned short v) {
-    SET_VAR(background, m_outline.m_width, v)
+    SET_VAR(m_background, m_outline.m_width, v)
   }
 
   void setOutlineStyle(EBorderStyle v, bool isAuto = false) {
-    SET_VAR(background, m_outline.m_style, v)
-    SET_VAR(background, m_outline.m_isAuto, isAuto)
+    SET_VAR(m_background, m_outline.m_style, v)
+    SET_VAR(m_background, m_outline.m_isAuto, isAuto)
   }
 
   void setOutlineColor(const Color& v) {
-    SET_VAR(background, m_outline.m_color, v)
+    SET_VAR(m_background, m_outline.m_color, v)
   }
 
   void setOverflowX(EOverflow v) { noninherited_flags._overflowX = v; }
@@ -1265,10 +1267,10 @@ class RenderStyle : public RefCounted<RenderStyle> {
   void setLetterSpacing(int v) { inherited.access()->font.setLetterSpacing(v); }
 
   void clearBackgroundLayers() {
-    background.access()->m_background = FillLayer(BackgroundFillLayer);
+    m_background.access()->m_background = FillLayer(BackgroundFillLayer);
   }
   void inheritBackgroundLayers(const FillLayer& parent) {
-    background.access()->m_background = parent;
+    m_background.access()->m_background = parent;
   }
 
   void adjustBackgroundLayers() {
@@ -1398,7 +1400,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
   void addBindingURI(StringImpl* uri);
 #endif
 
-  void setOutlineOffset(int v) { SET_VAR(background, m_outline.m_offset, v) }
+  void setOutlineOffset(int v) { SET_VAR(m_background, m_outline.m_offset, v) }
   void setTextShadow(ShadowData* val, bool add = false);
   void setTextStrokeColor(const Color& c) {
     SET_VAR(rareInheritedData, textStrokeColor, c)
