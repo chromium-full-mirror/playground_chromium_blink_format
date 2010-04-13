@@ -63,6 +63,7 @@ class SVGUseElement : public SVGStyledTransformableElement,
   virtual void detach();
 
   virtual Path toClipPath() const;
+  RenderObject* rendererClipChild() const;
 
   static void removeDisallowedElementsFromSubtree(Node* element);
   SVGElementInstance* instanceForShadowTreeElement(Node* element) const;
