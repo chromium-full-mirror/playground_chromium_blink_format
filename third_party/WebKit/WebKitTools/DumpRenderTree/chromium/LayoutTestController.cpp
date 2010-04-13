@@ -132,8 +132,8 @@ LayoutTestController::LayoutTestController(TestShell* shell)
              &LayoutTestController::setWillSendRequestReturnsNullOnRedirect);
   bindMethod("setWillSendRequestReturnsNull",
              &LayoutTestController::setWillSendRequestReturnsNull);
-  bindMethod("whiteListAccessFromOrigin",
-             &LayoutTestController::whiteListAccessFromOrigin);
+  bindMethod("addOriginAccessWhitelistEntry",
+             &LayoutTestController::addOriginAccessWhitelistEntry);
   bindMethod("clearAllDatabases", &LayoutTestController::clearAllDatabases);
   bindMethod("setDatabaseQuota", &LayoutTestController::setDatabaseQuota);
   bindMethod("setPOSIXLocale", &LayoutTestController::setPOSIXLocale);
@@ -1108,7 +1108,7 @@ void LayoutTestController::fallbackMethod(const CppArgumentList&,
   result->setNull();
 }
 
-void LayoutTestController::whiteListAccessFromOrigin(
+void LayoutTestController::addOriginAccessWhitelistEntry(
     const CppArgumentList& arguments,
     CppVariant* result) {
   result->setNull();

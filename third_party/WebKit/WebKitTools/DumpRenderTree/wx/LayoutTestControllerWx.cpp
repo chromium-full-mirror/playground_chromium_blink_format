@@ -308,7 +308,7 @@ void LayoutTestController::evaluateScriptInIsolatedWorld(
 
 void LayoutTestController::disableImageLoading() {}
 
-void LayoutTestController::whiteListAccessFromOrigin(
+void LayoutTestController::addOriginAccessWhitelistEntry(
     JSStringRef sourceOrigin,
     JSStringRef destinationProtocol,
     JSStringRef destinationHost,

@@ -58,13 +58,13 @@ void WebSecurityPolicy::whiteListAccessFromOrigin(
     const WebString& destinationProtocol,
     const WebString& destinationHost,
     bool allowDestinationSubdomains) {
-  SecurityOrigin::whiteListAccessFromOrigin(
+  SecurityOrigin::addOriginAccessWhitelistEntry(
       *SecurityOrigin::create(sourceOrigin), destinationProtocol,
       destinationHost, allowDestinationSubdomains);
 }
 
 void WebSecurityPolicy::resetOriginAccessWhiteLists() {
-  SecurityOrigin::resetOriginAccessWhiteLists();
+  SecurityOrigin::resetOriginAccessWhitelists();
 }
 
 bool WebSecurityPolicy::shouldHideReferrer(const WebURL& url,

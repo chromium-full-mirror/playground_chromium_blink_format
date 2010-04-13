@@ -456,7 +456,7 @@ void LayoutTestController::clearAllDatabases() {
   QWebDatabase::removeAllDatabases();
 }
 
-void LayoutTestController::whiteListAccessFromOrigin(
+void LayoutTestController::addOriginAccessWhitelistEntry(
     const QString& sourceOrigin,
     const QString& destinationProtocol,
     const QString& destinationHost,

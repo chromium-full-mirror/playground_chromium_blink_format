@@ -321,10 +321,10 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
                                           JSStringRef elementId);
   unsigned numberOfActiveAnimations() const;
 
-  void whiteListAccessFromOrigin(JSStringRef sourceOrigin,
-                                 JSStringRef destinationProtocol,
-                                 JSStringRef destinationHost,
-                                 bool allowDestinationSubdomains);
+  void addOriginAccessWhitelistEntry(JSStringRef sourceOrigin,
+                                     JSStringRef destinationProtocol,
+                                     JSStringRef destinationHost,
+                                     bool allowDestinationSubdomains);
 
   void addUserScript(JSStringRef source, bool runAtStart);
   void addUserStyleSheet(JSStringRef source);

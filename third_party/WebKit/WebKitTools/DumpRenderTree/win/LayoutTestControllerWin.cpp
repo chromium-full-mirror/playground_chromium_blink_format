@@ -975,7 +975,7 @@ static _bstr_t bstrT(JSStringRef jsString) {
   return _bstr_t(JSStringCopyBSTR(jsString), false);
 }
 
-void LayoutTestController::whiteListAccessFromOrigin(
+void LayoutTestController::addOriginAccessWhitelistEntry(
     JSStringRef sourceOrigin,
     JSStringRef destinationProtocol,
     JSStringRef destinationHost,
@@ -985,7 +985,7 @@ void LayoutTestController::whiteListAccessFromOrigin(
                                   reinterpret_cast<void**>(&webView))))
     return;
 
-  webView->whiteListAccessFromOrigin(
+  webView->addOriginAccessWhitelistEntry(
       bstrT(sourceOrigin).GetBSTR(), bstrT(destinationProtocol).GetBSTR(),
       bstrT(destinationHost).GetBSTR(), allowDestinationSubdomains);
 }

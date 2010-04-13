@@ -1895,7 +1895,7 @@ static JSValueRef waitForPolicyDelegateCallback(JSContextRef context,
   return JSValueMakeUndefined(context);
 }
 
-static JSValueRef whiteListAccessFromOriginCallback(
+static JSValueRef addOriginAccessWhitelistEntryCallback(
     JSContextRef context,
     JSObjectRef,
     JSObjectRef thisObject,
@@ -1918,7 +1918,7 @@ static JSValueRef whiteListAccessFromOriginCallback(
 
   LayoutTestController* controller =
       static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
-  controller->whiteListAccessFromOrigin(
+  controller->addOriginAccessWhitelistEntry(
       sourceOrigin.get(), destinationProtocol.get(), destinationHost.get(),
       allowDestinationSubdomains);
   return JSValueMakeUndefined(context);
@@ -2375,7 +2375,7 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"windowCount", windowCountCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
-      {"whiteListAccessFromOrigin", whiteListAccessFromOriginCallback,
+      {"addOriginAccessWhitelistEntry", addOriginAccessWhitelistEntryCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setScrollbarPolicy", setScrollbarPolicyCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},

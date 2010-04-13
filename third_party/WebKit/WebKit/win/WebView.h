@@ -789,11 +789,11 @@ class WebView : public IWebView,
   virtual HRESULT STDMETHODCALLTYPE invalidateBackingStore(const RECT*);
 
   virtual HRESULT STDMETHODCALLTYPE
-  whiteListAccessFromOrigin(BSTR sourceOrigin,
-                            BSTR destinationProtocol,
-                            BSTR destinationHost,
-                            BOOL allowDestinationSubdomains);
-  virtual HRESULT STDMETHODCALLTYPE resetOriginAccessWhiteLists();
+  addOriginAccessWhitelistEntry(BSTR sourceOrigin,
+                                BSTR destinationProtocol,
+                                BSTR destinationHost,
+                                BOOL allowDestinationSubdomains);
+  virtual HRESULT STDMETHODCALLTYPE resetOriginAccessWhitelists();
 
   virtual HRESULT STDMETHODCALLTYPE
   setHistoryDelegate(IWebHistoryDelegate* historyDelegate);
