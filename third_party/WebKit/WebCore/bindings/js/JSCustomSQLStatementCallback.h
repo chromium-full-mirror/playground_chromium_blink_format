@@ -49,7 +49,8 @@ class JSCustomSQLStatementCallback : public SQLStatementCallback {
 
   virtual ~JSCustomSQLStatementCallback();
 
-  virtual void handleEvent(SQLTransaction*,
+  virtual void handleEvent(ScriptExecutionContext*,
+                           SQLTransaction*,
                            SQLResultSet*,
                            bool& raisedException);
 
@@ -57,6 +58,7 @@ class JSCustomSQLStatementCallback : public SQLStatementCallback {
   JSCustomSQLStatementCallback(JSC::JSObject* callback, JSDOMGlobalObject*);
 
   JSCallbackData* m_data;
+  RefPtr<DOMWrapperWorld> m_isolatedWorld;
 };
 }
 

@@ -34,9 +34,9 @@
 #if ENABLE(DATABASE)
 
 #include "SQLStatementCallback.h"
+#include "WorldContextHandle.h"
 #include <v8.h>
-#include <wtf/PassRefPtr.h>
-#include <wtf/RefPtr.h>
+#include <wtf/Forward.h>
 
 namespace WebCore {
 
@@ -52,7 +52,8 @@ class V8CustomSQLStatementCallback : public SQLStatementCallback {
   }
   virtual ~V8CustomSQLStatementCallback();
 
-  virtual void handleEvent(SQLTransaction*,
+  virtual void handleEvent(ScriptExecutionContext*,
+                           SQLTransaction*,
                            SQLResultSet*,
                            bool& raisedException);
 
@@ -61,6 +62,7 @@ class V8CustomSQLStatementCallback : public SQLStatementCallback {
 
   v8::Persistent<v8::Object> m_callback;
   RefPtr<Frame> m_frame;
+  WorldContextHandle m_worldContext;
 };
 
 }  // namespace WebCore

@@ -33,10 +33,8 @@
 
 #include "Frame.h"
 #include "JSCallbackData.h"
-#include "JSDOMGlobalObject.h"
 #include "JSSQLTransaction.h"
-#include "Page.h"
-#include "ScriptController.h"
+#include "ScriptExecutionContext.h"
 #include <runtime/JSLock.h>
 #include <wtf/MainThread.h>
 #include <wtf/RefCountedLeakCounter.h>
@@ -52,7 +50,8 @@ static WTF::RefCountedLeakCounter counter("JSCustomSQLTransactionCallback");
 JSCustomSQLTransactionCallback::JSCustomSQLTransactionCallback(
     JSObject* callback,
     JSDOMGlobalObject* globalObject)
-    : m_data(new JSCallbackData(callback, globalObject)) {
+    : m_data(new JSCallbackData(callback, globalObject)),
+      m_isolatedWorld(globalObject->world()) {
 #ifndef NDEBUG
   counter.increment();
 #endif
@@ -66,14 +65,22 @@ JSCustomSQLTransactionCallback::~JSCustomSQLTransactionCallback() {
 #endif
 }
 
-void JSCustomSQLTransactionCallback::handleEvent(SQLTransaction* transaction,
-                                                 bool& raisedException) {
+void JSCustomSQLTransactionCallback::handleEvent(
+    ScriptExecutionContext* context,
+    SQLTransaction* transaction,
+    bool& raisedException) {
   ASSERT(m_data);
+  ASSERT(context);
 
   RefPtr<JSCustomSQLTransactionCallback> protect(this);
 
   JSC::JSLock lock(SilenceAssertionsOnly);
-  ExecState* exec = m_data->globalObject()->globalExec();
+  JSDOMGlobalObject* globalObject =
+      toJSDOMGlobalObject(context, m_isolatedWorld.get());
+  if (!globalObject)
+    return;
+
+  ExecState* exec = globalObject->globalExec();
   MarkedArgumentBuffer args;
   args.append(
       toJS(exec, deprecatedGlobalObjectForPrototype(exec), transaction));

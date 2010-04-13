@@ -35,6 +35,7 @@
 #include "V8CustomSQLStatementCallback.h"
 
 #include "Frame.h"
+#include "ScriptExecutionContext.h"
 #include "V8CustomVoidCallback.h"
 #include "V8SQLResultSet.h"
 #include "V8SQLTransaction.h"
@@ -44,22 +45,25 @@ namespace WebCore {
 V8CustomSQLStatementCallback::V8CustomSQLStatementCallback(
     v8::Local<v8::Object> callback,
     Frame* frame)
-    : m_callback(v8::Persistent<v8::Object>::New(callback)), m_frame(frame) {}
+    : m_callback(v8::Persistent<v8::Object>::New(callback)),
+      m_frame(frame),
+      m_worldContext(UseCurrentWorld) {}
 
 V8CustomSQLStatementCallback::~V8CustomSQLStatementCallback() {
   m_callback.Dispose();
 }
 
-void V8CustomSQLStatementCallback::handleEvent(SQLTransaction* transaction,
+void V8CustomSQLStatementCallback::handleEvent(ScriptExecutionContext* context,
+                                               SQLTransaction* transaction,
                                                SQLResultSet* resultSet,
                                                bool& raisedException) {
   v8::HandleScope handleScope;
 
-  v8::Handle<v8::Context> context = V8Proxy::context(m_frame.get());
-  if (context.IsEmpty())
+  v8::Handle<v8::Context> v8Context = toV8Context(context, m_worldContext);
+  if (v8Context.IsEmpty())
     return;
 
-  v8::Context::Scope scope(context);
+  v8::Context::Scope scope(v8Context);
 
   v8::Handle<v8::Value> argv[] = {toV8(transaction), toV8(resultSet)};
 

@@ -31,12 +31,9 @@
 
 #if ENABLE(DATABASE)
 
+#include "JSDOMGlobalObject.h"
 #include "SQLTransactionCallback.h"
-#include <wtf/PassRefPtr.h>
-
-namespace JSC {
-class JSObject;
-}
+#include <wtf/Forward.h>
 
 namespace WebCore {
 
@@ -54,12 +51,15 @@ class JSCustomSQLTransactionCallback : public SQLTransactionCallback {
 
   virtual ~JSCustomSQLTransactionCallback();
 
-  virtual void handleEvent(SQLTransaction*, bool& raisedException);
+  virtual void handleEvent(ScriptExecutionContext*,
+                           SQLTransaction*,
+                           bool& raisedException);
 
  private:
   JSCustomSQLTransactionCallback(JSC::JSObject* callback, JSDOMGlobalObject*);
 
   JSCallbackData* m_data;
+  RefPtr<DOMWrapperWorld> m_isolatedWorld;
 };
 }
 

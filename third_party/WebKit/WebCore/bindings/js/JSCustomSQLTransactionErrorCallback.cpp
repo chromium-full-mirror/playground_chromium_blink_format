@@ -34,7 +34,7 @@
 #include "Frame.h"
 #include "JSCallbackData.h"
 #include "JSSQLError.h"
-#include "ScriptController.h"
+#include "ScriptExecutionContext.h"
 #include <runtime/JSLock.h>
 #include <wtf/MainThread.h>
 
@@ -45,7 +45,8 @@ using namespace JSC;
 JSCustomSQLTransactionErrorCallback::JSCustomSQLTransactionErrorCallback(
     JSObject* callback,
     JSDOMGlobalObject* globalObject)
-    : m_data(new JSCallbackData(callback, globalObject)) {}
+    : m_data(new JSCallbackData(callback, globalObject)),
+      m_isolatedWorld(globalObject->world()) {}
 
 JSCustomSQLTransactionErrorCallback::~JSCustomSQLTransactionErrorCallback() {
   callOnMainThread(JSCallbackData::deleteData, m_data);
@@ -54,13 +55,21 @@ JSCustomSQLTransactionErrorCallback::~JSCustomSQLTransactionErrorCallback() {
 #endif
 }
 
-void JSCustomSQLTransactionErrorCallback::handleEvent(SQLError* error) {
+void JSCustomSQLTransactionErrorCallback::handleEvent(
+    ScriptExecutionContext* context,
+    SQLError* error) {
   ASSERT(m_data);
+  ASSERT(context);
 
   RefPtr<JSCustomSQLTransactionErrorCallback> protect(this);
 
   JSC::JSLock lock(SilenceAssertionsOnly);
-  ExecState* exec = m_data->globalObject()->globalExec();
+  JSDOMGlobalObject* globalObject =
+      toJSDOMGlobalObject(context, m_isolatedWorld.get());
+  if (!globalObject)
+    return;
+
+  ExecState* exec = globalObject->globalExec();
   MarkedArgumentBuffer args;
   args.append(toJS(exec, deprecatedGlobalObjectForPrototype(exec), error));
   m_data->invokeCallback(args);

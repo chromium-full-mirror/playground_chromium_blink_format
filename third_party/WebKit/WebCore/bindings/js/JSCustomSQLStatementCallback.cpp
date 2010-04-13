@@ -32,9 +32,9 @@
 #if ENABLE(DATABASE)
 
 #include "Frame.h"
-#include "ScriptController.h"
 #include "JSSQLResultSet.h"
 #include "JSSQLTransaction.h"
+#include "ScriptExecutionContext.h"
 #include <runtime/JSLock.h>
 #include <wtf/MainThread.h>
 
@@ -45,7 +45,8 @@ using namespace JSC;
 JSCustomSQLStatementCallback::JSCustomSQLStatementCallback(
     JSObject* callback,
     JSDOMGlobalObject* globalObject)
-    : m_data(new JSCallbackData(callback, globalObject)) {}
+    : m_data(new JSCallbackData(callback, globalObject)),
+      m_isolatedWorld(globalObject->world()) {}
 
 JSCustomSQLStatementCallback::~JSCustomSQLStatementCallback() {
   callOnMainThread(JSCallbackData::deleteData, m_data);
@@ -54,15 +55,22 @@ JSCustomSQLStatementCallback::~JSCustomSQLStatementCallback() {
 #endif
 }
 
-void JSCustomSQLStatementCallback::handleEvent(SQLTransaction* transaction,
+void JSCustomSQLStatementCallback::handleEvent(ScriptExecutionContext* context,
+                                               SQLTransaction* transaction,
                                                SQLResultSet* resultSet,
                                                bool& raisedException) {
   ASSERT(m_data);
+  ASSERT(context);
 
   RefPtr<JSCustomSQLStatementCallback> protect(this);
 
   JSC::JSLock lock(SilenceAssertionsOnly);
-  ExecState* exec = m_data->globalObject()->globalExec();
+  JSDOMGlobalObject* globalObject =
+      toJSDOMGlobalObject(context, m_isolatedWorld.get());
+  if (!globalObject)
+    return;
+
+  ExecState* exec = globalObject->globalExec();
   MarkedArgumentBuffer args;
   args.append(
       toJS(exec, deprecatedGlobalObjectForPrototype(exec), transaction));
