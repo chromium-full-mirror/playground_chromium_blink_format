@@ -31,6 +31,7 @@
 
 namespace WebCore {
 
+class ScriptController;
 class StringImpl;
 
 typedef JSC::WeakGCMap<void*, DOMObject*> DOMObjectWrapperMap;
@@ -51,6 +52,13 @@ class DOMWrapperWorld : public RefCounted<DOMWrapperWorld> {
     m_documentsWithWrapperCaches.remove(document);
   }
 
+  void didCreateWindowShell(ScriptController* scriptController) {
+    m_scriptControllersWithWindowShells.add(scriptController);
+  }
+  void didDestroyWindowShell(ScriptController* scriptController) {
+    m_scriptControllersWithWindowShells.remove(scriptController);
+  }
+
   // FIXME: can we make this private?
   DOMObjectWrapperMap m_wrappers;
   JSStringCache m_stringCache;
@@ -63,6 +71,7 @@ class DOMWrapperWorld : public RefCounted<DOMWrapperWorld> {
  private:
   JSC::JSGlobalData* m_globalData;
   HashSet<Document*> m_documentsWithWrapperCaches;
+  HashSet<ScriptController*> m_scriptControllersWithWindowShells;
   bool m_isNormal;
 };
 

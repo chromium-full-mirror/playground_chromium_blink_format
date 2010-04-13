@@ -80,6 +80,9 @@ class ScriptController {
 
   static PassRefPtr<DOMWrapperWorld> createWorld();
 
+  JSDOMWindowShell* createWindowShell(DOMWrapperWorld*);
+  void destroyWindowShell(DOMWrapperWorld*);
+
   JSDOMWindowShell* windowShell(DOMWrapperWorld* world) {
     ShellMap::iterator iter = m_windowShells.find(world);
     return (iter != m_windowShells.end()) ? iter->second.get()
