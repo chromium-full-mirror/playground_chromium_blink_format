@@ -140,7 +140,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
   unsigned m_childIndex : 21;  // Plenty of bits to cache an index.
 
   // non-inherited attributes
-  DataRef<StyleBoxData> box;
+  DataRef<StyleBoxData> m_box;
   DataRef<StyleVisualData> visual;
   DataRef<StyleBackgroundData> m_background;
   DataRef<StyleSurroundData> surround;
@@ -417,12 +417,12 @@ class RenderStyle : public RefCounted<RenderStyle> {
     return static_cast<EFloat>(noninherited_flags._floating);
   }
 
-  Length width() const { return box->width; }
-  Length height() const { return box->height; }
-  Length minWidth() const { return box->min_width; }
-  Length maxWidth() const { return box->max_width; }
-  Length minHeight() const { return box->min_height; }
-  Length maxHeight() const { return box->max_height; }
+  Length width() const { return m_box->width(); }
+  Length height() const { return m_box->height(); }
+  Length minWidth() const { return m_box->minWidth(); }
+  Length maxWidth() const { return m_box->maxWidth(); }
+  Length minHeight() const { return m_box->minHeight(); }
+  Length maxHeight() const { return m_box->maxHeight(); }
 
   const BorderData& border() const { return surround->border; }
   const BorderValue& borderLeft() const { return surround->border.left(); }
@@ -519,7 +519,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
   EVerticalAlign verticalAlign() const {
     return static_cast<EVerticalAlign>(noninherited_flags._vertical_align);
   }
-  Length verticalAlignLength() const { return box->vertical_align; }
+  Length verticalAlignLength() const { return m_box->verticalAlign(); }
 
   Length clipLeft() const { return visual->clip.left(); }
   Length clipRight() const { return visual->clip.right(); }
@@ -832,9 +832,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
   StyleReflection* boxReflect() const {
     return rareNonInheritedData->m_boxReflect.get();
   }
-  EBoxSizing boxSizing() const {
-    return static_cast<EBoxSizing>(box->boxSizing);
-  }
+  EBoxSizing boxSizing() const { return m_box->boxSizing(); }
   Length marqueeIncrement() const {
     return rareNonInheritedData->marquee->increment;
   }
@@ -1042,13 +1040,13 @@ class RenderStyle : public RefCounted<RenderStyle> {
   void setTop(Length v) { SET_VAR(surround, offset.m_top, v) }
   void setBottom(Length v) { SET_VAR(surround, offset.m_bottom, v) }
 
-  void setWidth(Length v) { SET_VAR(box, width, v) }
-  void setHeight(Length v) { SET_VAR(box, height, v) }
+  void setWidth(Length v) { SET_VAR(m_box, m_width, v) }
+  void setHeight(Length v) { SET_VAR(m_box, m_height, v) }
 
-  void setMinWidth(Length v) { SET_VAR(box, min_width, v) }
-  void setMaxWidth(Length v) { SET_VAR(box, max_width, v) }
-  void setMinHeight(Length v) { SET_VAR(box, min_height, v) }
-  void setMaxHeight(Length v) { SET_VAR(box, max_height, v) }
+  void setMinWidth(Length v) { SET_VAR(m_box, m_minWidth, v) }
+  void setMaxWidth(Length v) { SET_VAR(m_box, m_maxWidth, v) }
+  void setMinHeight(Length v) { SET_VAR(m_box, m_minHeight, v) }
+  void setMaxHeight(Length v) { SET_VAR(m_box, m_maxHeight, v) }
 
 #if ENABLE(DASHBOARD_SUPPORT)
   Vector<StyleDashboardRegion> dashboardRegions() const {
@@ -1214,7 +1212,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
   void setVerticalAlign(EVerticalAlign v) {
     noninherited_flags._vertical_align = v;
   }
-  void setVerticalAlignLength(Length l) { SET_VAR(box, vertical_align, l) }
+  void setVerticalAlignLength(Length l) { SET_VAR(m_box, m_verticalAlign, l) }
 
   void setHasClip(bool b = true) { SET_VAR(visual, hasClip, b) }
   void setClipLeft(Length v) { SET_VAR(visual, clip.m_left, v) }
@@ -1366,15 +1364,15 @@ class RenderStyle : public RefCounted<RenderStyle> {
   bool htmlHacks() const { return inherited_flags._htmlHacks; }
   void setHtmlHacks(bool b = true) { inherited_flags._htmlHacks = b; }
 
-  bool hasAutoZIndex() const { return box->z_auto; }
+  bool hasAutoZIndex() const { return m_box->hasAutoZIndex(); }
   void setHasAutoZIndex() {
-    SET_VAR(box, z_auto, true);
-    SET_VAR(box, z_index, 0)
+    SET_VAR(m_box, m_hasAutoZIndex, true);
+    SET_VAR(m_box, m_zIndex, 0)
   }
-  int zIndex() const { return box->z_index; }
+  int zIndex() const { return m_box->zIndex(); }
   void setZIndex(int v) {
-    SET_VAR(box, z_auto, false);
-    SET_VAR(box, z_index, v)
+    SET_VAR(m_box, m_hasAutoZIndex, false);
+    SET_VAR(m_box, m_zIndex, v)
   }
 
   void setWidows(short w) { SET_VAR(inherited, widows, w); }
@@ -1445,7 +1443,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
     if (rareNonInheritedData->m_boxReflect != reflect)
       rareNonInheritedData.access()->m_boxReflect = reflect;
   }
-  void setBoxSizing(EBoxSizing s) { SET_VAR(box, boxSizing, s); }
+  void setBoxSizing(EBoxSizing s) { SET_VAR(m_box, m_boxSizing, s); }
   void setMarqueeIncrement(const Length& f) {
     SET_VAR(rareNonInheritedData.access()->marquee, increment, f);
   }

@@ -68,7 +68,7 @@ RenderStyle::RenderStyle()
       m_firstChildState(false),
       m_lastChildState(false),
       m_childIndex(0),
-      box(defaultStyle()->box),
+      m_box(defaultStyle()->m_box),
       visual(defaultStyle()->visual),
       m_background(defaultStyle()->m_background),
       surround(defaultStyle()->surround),
@@ -98,7 +98,7 @@ RenderStyle::RenderStyle(bool)
       m_childIndex(0) {
   setBitDefaults();
 
-  box.init();
+  m_box.init();
   visual.init();
   m_background.init();
   surround.init();
@@ -129,7 +129,7 @@ RenderStyle::RenderStyle(const RenderStyle& o)
       m_firstChildState(false),
       m_lastChildState(false),
       m_childIndex(0),
-      box(o.box),
+      m_box(o.m_box),
       visual(o.visual),
       m_background(o.m_background),
       surround(o.surround),
@@ -160,7 +160,7 @@ RenderStyle::~RenderStyle() {}
 bool RenderStyle::operator==(const RenderStyle& o) const {
   // compare everything except the pseudoStyle pointer
   return inherited_flags == o.inherited_flags &&
-         noninherited_flags == o.noninherited_flags && box == o.box &&
+         noninherited_flags == o.noninherited_flags && m_box == o.m_box &&
          visual == o.visual && m_background == o.m_background &&
          surround == o.surround &&
          rareNonInheritedData == o.rareNonInheritedData &&
@@ -278,20 +278,20 @@ StyleDifference RenderStyle::diff(
     return StyleDifferenceLayout;
 #endif
 
-  if (box->width != other->box->width ||
-      box->min_width != other->box->min_width ||
-      box->max_width != other->box->max_width ||
-      box->height != other->box->height ||
-      box->min_height != other->box->min_height ||
-      box->max_height != other->box->max_height)
+  if (m_box->width() != other->m_box->width() ||
+      m_box->minWidth() != other->m_box->minWidth() ||
+      m_box->maxWidth() != other->m_box->maxWidth() ||
+      m_box->height() != other->m_box->height() ||
+      m_box->minHeight() != other->m_box->minHeight() ||
+      m_box->maxHeight() != other->m_box->maxHeight())
     return StyleDifferenceLayout;
 
-  if (box->vertical_align != other->box->vertical_align ||
+  if (m_box->verticalAlign() != other->m_box->verticalAlign() ||
       noninherited_flags._vertical_align !=
           other->noninherited_flags._vertical_align)
     return StyleDifferenceLayout;
 
-  if (box->boxSizing != other->box->boxSizing)
+  if (m_box->boxSizing() != other->m_box->boxSizing())
     return StyleDifferenceLayout;
 
   if (surround->margin != other->surround->margin)
@@ -512,8 +512,8 @@ StyleDifference RenderStyle::diff(
       //    return RepaintLayer;
       // else
       return StyleDifferenceLayout;
-    } else if (box->z_index != other->box->z_index ||
-               box->z_auto != other->box->z_auto ||
+    } else if (m_box->zIndex() != other->m_box->zIndex() ||
+               m_box->hasAutoZIndex() != other->m_box->hasAutoZIndex() ||
                visual->clip != other->visual->clip ||
                visual->hasClip != other->visual->hasClip)
       return StyleDifferenceRepaintLayer;

@@ -26,6 +26,7 @@
 #define StyleBoxData_h
 
 #include "Length.h"
+#include "RenderStyleConstants.h"
 #include <wtf/RefCounted.h>
 #include <wtf/PassRefPtr.h>
 
@@ -43,24 +44,42 @@ class StyleBoxData : public RefCounted<StyleBoxData> {
   bool operator==(const StyleBoxData& o) const;
   bool operator!=(const StyleBoxData& o) const { return !(*this == o); }
 
-  Length width;
-  Length height;
+  Length width() const { return m_width; }
+  Length height() const { return m_height; }
 
-  Length min_width;
-  Length max_width;
+  Length minWidth() const { return m_minWidth; }
+  Length minHeight() const { return m_minHeight; }
 
-  Length min_height;
-  Length max_height;
+  Length maxWidth() const { return m_maxWidth; }
+  Length maxHeight() const { return m_maxHeight; }
 
-  Length vertical_align;
+  Length verticalAlign() const { return m_verticalAlign; }
 
-  int z_index;
-  bool z_auto : 1;
-  unsigned boxSizing : 1;  // EBoxSizing
+  int zIndex() const { return m_zIndex; }
+  bool hasAutoZIndex() const { return m_hasAutoZIndex; }
+
+  EBoxSizing boxSizing() const { return static_cast<EBoxSizing>(m_boxSizing); }
 
  private:
+  friend class RenderStyle;
+
   StyleBoxData();
   StyleBoxData(const StyleBoxData&);
+
+  Length m_width;
+  Length m_height;
+
+  Length m_minWidth;
+  Length m_maxWidth;
+
+  Length m_minHeight;
+  Length m_maxHeight;
+
+  Length m_verticalAlign;
+
+  int m_zIndex;
+  bool m_hasAutoZIndex : 1;
+  unsigned m_boxSizing : 1;  // EBoxSizing
 };
 
 }  // namespace WebCore
