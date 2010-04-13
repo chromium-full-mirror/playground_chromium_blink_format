@@ -242,13 +242,27 @@ String extractMIMETypeFromMediaType(const String& mediaType) {
 }
 
 String extractCharsetFromMediaType(const String& mediaType) {
-  int pos = 0;
+  unsigned int pos, len;
+  findCharsetInMediaType(mediaType, pos, len);
+  return mediaType.substring(pos, len);
+}
+
+void findCharsetInMediaType(const String& mediaType,
+                            unsigned int& charsetPos,
+                            unsigned int& charsetLen,
+                            unsigned int start) {
+  charsetPos = start;
+  charsetLen = 0;
+
+  int pos = start;
   int length = (int)mediaType.length();
 
   while (pos < length) {
     pos = mediaType.find("charset", pos, false);
-    if (pos <= 0)
-      return String();
+    if (pos <= 0) {
+      charsetLen = 0;
+      return;
+    }
 
     // is what we found a beginning of a word?
     if (mediaType[pos - 1] > ' ' && mediaType[pos - 1] != ';') {
@@ -278,10 +292,10 @@ String extractCharsetFromMediaType(const String& mediaType) {
            mediaType[endpos] != ';')
       ++endpos;
 
-    return mediaType.substring(pos, endpos - pos);
+    charsetPos = pos;
+    charsetLen = endpos - pos;
+    return;
   }
-
-  return String();
 }
 
 XSSProtectionDisposition parseXSSProtectionHeader(const String& header) {
