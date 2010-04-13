@@ -288,6 +288,14 @@ void LayoutTestController::addOriginAccessWhitelistEntry(
   g_free(hostGChar);
 }
 
+void LayoutTestController::removeOriginAccessWhitelistEntry(
+    JSStringRef sourceOrigin,
+    JSStringRef protocol,
+    JSStringRef host,
+    bool includeSubdomains) {
+  // FIXME: implement
+}
+
 void LayoutTestController::setMainFrameIsFirstResponder(bool flag) {
   // FIXME: implement
 }

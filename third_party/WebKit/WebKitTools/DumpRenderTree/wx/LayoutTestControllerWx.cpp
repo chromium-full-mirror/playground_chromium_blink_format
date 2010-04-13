@@ -312,7 +312,17 @@ void LayoutTestController::addOriginAccessWhitelistEntry(
     JSStringRef sourceOrigin,
     JSStringRef destinationProtocol,
     JSStringRef destinationHost,
-    bool allowDestinationSubdomains) {}
+    bool allowDestinationSubdomains) {
+  // FIXME: implement
+}
+
+void LayoutTestController::removeOriginAccessWhitelistEntry(
+    JSStringRef sourceOrigin,
+    JSStringRef destinationProtocol,
+    JSStringRef destinationHost,
+    bool allowDestinationSubdomains) {
+  // FIXME: implement
+}
 
 void LayoutTestController::setScrollbarPolicy(JSStringRef orientation,
                                               JSStringRef policy) {

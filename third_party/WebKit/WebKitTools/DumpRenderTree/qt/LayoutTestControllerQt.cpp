@@ -466,6 +466,14 @@ void LayoutTestController::addOriginAccessWhitelistEntry(
       allowDestinationSubdomains);
 }
 
+void LayoutTestController::removeOriginAccessWhitelistEntry(
+    const QString& sourceOrigin,
+    const QString& destinationProtocol,
+    const QString& destinationHost,
+    bool allowDestinationSubdomains) {
+  // FIXME: Implement.
+}
+
 void LayoutTestController::waitForPolicyDelegate() {
   m_waitForPolicy = true;
   waitUntilDone();

@@ -1924,6 +1924,35 @@ static JSValueRef addOriginAccessWhitelistEntryCallback(
   return JSValueMakeUndefined(context);
 }
 
+static JSValueRef removeOriginAccessWhitelistEntryCallback(
+    JSContextRef context,
+    JSObjectRef,
+    JSObjectRef thisObject,
+    size_t argumentCount,
+    const JSValueRef arguments[],
+    JSValueRef* exception) {
+  if (argumentCount != 4)
+    return JSValueMakeUndefined(context);
+
+  JSRetainPtr<JSStringRef> sourceOrigin(
+      Adopt, JSValueToStringCopy(context, arguments[0], exception));
+  ASSERT(!*exception);
+  JSRetainPtr<JSStringRef> destinationProtocol(
+      Adopt, JSValueToStringCopy(context, arguments[1], exception));
+  ASSERT(!*exception);
+  JSRetainPtr<JSStringRef> destinationHost(
+      Adopt, JSValueToStringCopy(context, arguments[2], exception));
+  ASSERT(!*exception);
+  bool allowDestinationSubdomains = JSValueToBoolean(context, arguments[3]);
+
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->removeOriginAccessWhitelistEntry(
+      sourceOrigin.get(), destinationProtocol.get(), destinationHost.get(),
+      allowDestinationSubdomains);
+  return JSValueMakeUndefined(context);
+}
+
 static JSValueRef setScrollbarPolicyCallback(JSContextRef context,
                                              JSObjectRef,
                                              JSObjectRef thisObject,
@@ -2265,6 +2294,9 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
       {"queueReload", queueReloadCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"removeAllVisitedLinks", removeAllVisitedLinksCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"removeOriginAccessWhitelistEntry",
+       removeOriginAccessWhitelistEntryCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"repaintSweepHorizontally", repaintSweepHorizontallyCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},

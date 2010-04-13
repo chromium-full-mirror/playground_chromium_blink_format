@@ -201,6 +201,11 @@ class SecurityOrigin : public ThreadSafeShared<SecurityOrigin> {
                                             const String& destinationProtocol,
                                             const String& destinationDomains,
                                             bool allowDestinationSubdomains);
+  static void removeOriginAccessWhitelistEntry(
+      const SecurityOrigin& sourceOrigin,
+      const String& destinationProtocol,
+      const String& destinationDomains,
+      bool allowDestinationSubdomains);
   static void resetOriginAccessWhitelists();
 
  private:

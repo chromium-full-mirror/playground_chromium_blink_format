@@ -564,6 +564,12 @@ _addOriginAccessWhitelistEntryWithSourceOrigin:(NSString*)sourceOrigin
                            destinationProtocol:(NSString*)destinationProtocol
                                destinationHost:(NSString*)destinationHost
                     allowDestinationSubdomains:(BOOL)allowDestinationSubdomains;
++ (void)
+_removeOriginAccessWhitelistEntryWithSourceOrigin:(NSString*)sourceOrigin
+                              destinationProtocol:(NSString*)destinationProtocol
+                                  destinationHost:(NSString*)destinationHost
+                       allowDestinationSubdomains:
+                           (BOOL)allowDestinationSubdomains;
 
 // Removes all white list entries created with
 // _addOriginAccessWhitelistEntryWithSourceOrigin.
