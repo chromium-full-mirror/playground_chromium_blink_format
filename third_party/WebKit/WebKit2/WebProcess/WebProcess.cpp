@@ -47,7 +47,7 @@ WebProcess& WebProcess::shared() {
   return process;
 }
 
-WebProcess::WebProcess() {}
+WebProcess::WebProcess() : m_inDidClose(false) {}
 
 void WebProcess::initialize(CoreIPC::Connection::Identifier serverIdentifier,
                             RunLoop* runLoop) {
@@ -79,7 +79,7 @@ void WebProcess::removeWebPage(uint64_t pageID) {
   m_pageMap.remove(pageID);
 
   // If we don't have any pages left, shut down.
-  if (m_pageMap.isEmpty())
+  if (m_pageMap.isEmpty() && !m_inDidClose)
     shutdown();
 }
 
@@ -150,6 +150,15 @@ void WebProcess::didClose(CoreIPC::Connection*) {
   ASSERT(isSeparateProcess());
 
 #ifndef NDEBUG
+  m_inDidClose = true;
+
+  // Close all the live pages.
+  Vector<RefPtr<WebPage>> pages;
+  copyValuesToVector(m_pageMap, pages);
+  for (size_t i = 0; i < pages.size(); ++i)
+    pages[i]->close();
+  pages.clear();
+
   gcController().garbageCollectNow();
   cache()->setDisabled(true);
 #endif

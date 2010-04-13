@@ -66,6 +66,8 @@ class WebPage : public RefCounted<WebPage> {
                                     DrawingArea::Type);
   ~WebPage();
 
+  void close();
+
   WebCore::Page* corePage() const { return m_page; }
   uint64_t pageID() const { return m_pageID; }
 
@@ -104,7 +106,6 @@ class WebPage : public RefCounted<WebPage> {
   static const char* interpretKeyEvent(const WebCore::KeyboardEvent*);
 
   // Actions
-  void close();
   void tryClose();
   void loadURL(const WebCore::KURL&);
   void stopLoading();

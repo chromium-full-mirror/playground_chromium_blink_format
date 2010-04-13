@@ -74,6 +74,8 @@ class WebProcess : CoreIPC::Connection::Client {
   RefPtr<CoreIPC::Connection> m_connection;
   HashMap<uint64_t, RefPtr<WebPage>> m_pageMap;
 
+  bool m_inDidClose;
+
   RunLoop* m_runLoop;
 };
 
