@@ -1093,6 +1093,9 @@ JSValue JSDOMWindow::openDatabase(ExecState* exec, const ArgList& args) {
       toJS(exec, globalObject(), WTF::getPtr(impl()->openDatabase(
                                      name, version, displayName, estimatedSize,
                                      creationCallback.release(), ec)));
+  if (!ec && result.isNull())
+    ec = SECURITY_ERR;
+
   setDOMException(exec, ec);
   return result;
 }
