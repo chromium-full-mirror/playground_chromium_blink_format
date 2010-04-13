@@ -55,8 +55,12 @@ void RenderSVGResourceMasker::invalidateClients() {
   HashMap<RenderObject*, MaskerData*>::const_iterator end = m_masker.end();
   for (HashMap<RenderObject*, MaskerData*>::const_iterator it =
            m_masker.begin();
-       it != end; ++it)
-    it->first->setNeedsLayout(true);
+       it != end; ++it) {
+    RenderObject* renderer = it->first;
+    renderer->setNeedsBoundariesUpdate();
+    renderer->setNeedsLayout(true);
+  }
+
   deleteAllValues(m_masker);
   m_masker.clear();
 }

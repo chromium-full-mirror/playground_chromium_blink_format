@@ -173,6 +173,9 @@ void SVGAnimateMotionElement::calculateAnimatedValue(float percentage,
   if (!transform)
     return;
 
+  if (target->renderer())
+    target->renderer()->setNeedsTransformUpdate();
+
   if (!isAdditive())
     transform->makeIdentity();
 
@@ -219,8 +222,10 @@ void SVGAnimateMotionElement::applyResultsToTarget() {
     AffineTransform* transform = shadowTreeElement->supplementalTransform();
     AffineTransform* t = targetElement->supplementalTransform();
     transform->setMatrix(t->a(), t->b(), t->c(), t->d(), t->e(), t->f());
-    if (shadowTreeElement->renderer())
-      shadowTreeElement->renderer()->setNeedsLayout(true);
+    if (RenderObject* renderer = shadowTreeElement->renderer()) {
+      renderer->setNeedsTransformUpdate();
+      renderer->setNeedsLayout(true);
+    }
   }
 }
 

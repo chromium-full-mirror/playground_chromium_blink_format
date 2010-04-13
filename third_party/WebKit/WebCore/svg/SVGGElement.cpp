@@ -49,14 +49,20 @@ void SVGGElement::parseMappedAttribute(MappedAttribute* attr) {
 void SVGGElement::svgAttributeChanged(const QualifiedName& attrName) {
   SVGStyledTransformableElement::svgAttributeChanged(attrName);
 
-  if (!renderer())
+  RenderObject* renderer = this->renderer();
+  if (!renderer)
     return;
+
+  if (SVGStyledTransformableElement::isKnownAttribute(attrName)) {
+    renderer->setNeedsTransformUpdate();
+    renderer->setNeedsLayout(true);
+    return;
+  }
 
   if (SVGTests::isKnownAttribute(attrName) ||
       SVGLangSpace::isKnownAttribute(attrName) ||
-      SVGExternalResourcesRequired::isKnownAttribute(attrName) ||
-      SVGStyledTransformableElement::isKnownAttribute(attrName))
-    renderer()->setNeedsLayout(true);
+      SVGExternalResourcesRequired::isKnownAttribute(attrName))
+    renderer->setNeedsLayout(true);
 }
 
 void SVGGElement::synchronizeProperty(const QualifiedName& attrName) {

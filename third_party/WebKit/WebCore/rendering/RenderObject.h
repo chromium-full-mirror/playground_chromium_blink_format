@@ -360,6 +360,15 @@ class RenderObject : public CachedResourceClient {
   virtual const SVGRenderBase* toSVGRenderBase() const;
   virtual RenderSVGResource* toRenderSVGResource();
 
+  // FIXME: Those belong into a SVG specific base-class for all renderers (see
+  // above)
+  // Unfortunately we don't have such a class yet, because it's not possible for
+  // all renderers
+  // to inherit from RenderSVGObject -> RenderObject (some need RenderBlock
+  // inheritance for instance)
+  virtual void setNeedsTransformUpdate() {}
+  virtual void setNeedsBoundariesUpdate() {}
+
   // Per SVG 1.1 objectBoundingBox ignores clipping, masking, filter effects,
   // opacity and stroke-width.
   // This is used for all computation of objectBoundingBox relative units and by
@@ -375,8 +384,6 @@ class RenderObject : public CachedResourceClient {
   // respecting clipping, masking, filters, opacity, stroke-width and markers
   virtual FloatRect repaintRectInLocalCoordinates() const;
 
-  // FIXME: This accessor is deprecated and mostly around for
-  // SVGRenderTreeAsText.
   // This only returns the transform="" value from the element
   // most callsites want localToParentTransform() instead.
   virtual AffineTransform localTransform() const;

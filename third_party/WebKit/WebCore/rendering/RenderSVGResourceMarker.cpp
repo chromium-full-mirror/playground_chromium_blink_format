@@ -55,10 +55,14 @@ void RenderSVGResourceMarker::addClient(const RenderObject* object) {
 }
 
 void RenderSVGResourceMarker::invalidateClients() {
-  HashSet<const RenderObject*>::const_iterator end = m_marker.end();
+  const HashSet<const RenderObject*>::const_iterator end = m_marker.end();
   for (HashSet<const RenderObject*>::const_iterator it = m_marker.begin();
-       it != end; ++it)
-    const_cast<RenderObject*>(*it)->setNeedsLayout(true);
+       it != end; ++it) {
+    RenderObject* renderer = const_cast<RenderObject*>(*it);
+    renderer->setNeedsBoundariesUpdate();
+    renderer->setNeedsLayout(true);
+  }
+
   m_marker.clear();
 }
 

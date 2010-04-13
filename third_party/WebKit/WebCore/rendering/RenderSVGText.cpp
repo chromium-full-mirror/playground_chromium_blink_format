@@ -47,7 +47,8 @@
 
 namespace WebCore {
 
-RenderSVGText::RenderSVGText(SVGTextElement* node) : RenderSVGBlock(node) {}
+RenderSVGText::RenderSVGText(SVGTextElement* node)
+    : RenderSVGBlock(node), m_needsTransformUpdate(true) {}
 
 IntRect RenderSVGText::clippedOverflowRectForRepaint(
     RenderBoxModelObject* repaintContainer) {
@@ -80,7 +81,10 @@ void RenderSVGText::layout() {
   int yOffset = (int)(text->y()->getFirst().value(text));
   setLocation(xOffset, yOffset);
 
-  m_localTransform = text->animatedLocalTransform();
+  if (m_needsTransformUpdate) {
+    m_localTransform = text->animatedLocalTransform();
+    m_needsTransformUpdate = false;
+  }
 
   RenderBlock::layout();
 

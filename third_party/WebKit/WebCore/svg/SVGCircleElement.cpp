@@ -66,15 +66,27 @@ void SVGCircleElement::parseMappedAttribute(MappedAttribute* attr) {
 void SVGCircleElement::svgAttributeChanged(const QualifiedName& attrName) {
   SVGStyledTransformableElement::svgAttributeChanged(attrName);
 
-  if (!renderer())
+  RenderPath* renderer = static_cast<RenderPath*>(this->renderer());
+  if (!renderer)
     return;
 
+  if (SVGStyledTransformableElement::isKnownAttribute(attrName)) {
+    renderer->setNeedsTransformUpdate();
+    renderer->setNeedsLayout(true);
+    return;
+  }
+
   if (attrName == SVGNames::cxAttr || attrName == SVGNames::cyAttr ||
-      attrName == SVGNames::rAttr || SVGTests::isKnownAttribute(attrName) ||
+      attrName == SVGNames::rAttr) {
+    renderer->setNeedsPathUpdate();
+    renderer->setNeedsLayout(true);
+    return;
+  }
+
+  if (SVGTests::isKnownAttribute(attrName) ||
       SVGLangSpace::isKnownAttribute(attrName) ||
-      SVGExternalResourcesRequired::isKnownAttribute(attrName) ||
-      SVGStyledTransformableElement::isKnownAttribute(attrName))
-    renderer()->setNeedsLayout(true);
+      SVGExternalResourcesRequired::isKnownAttribute(attrName))
+    renderer->setNeedsLayout(true);
 }
 
 void SVGCircleElement::synchronizeProperty(const QualifiedName& attrName) {

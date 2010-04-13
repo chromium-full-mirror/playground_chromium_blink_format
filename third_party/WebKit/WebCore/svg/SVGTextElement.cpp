@@ -105,11 +105,14 @@ bool SVGTextElement::childShouldCreateRenderer(Node* child) const {
 void SVGTextElement::svgAttributeChanged(const QualifiedName& attrName) {
   SVGTextPositioningElement::svgAttributeChanged(attrName);
 
-  if (!renderer())
+  RenderObject* renderer = this->renderer();
+  if (!renderer)
     return;
 
-  if (SVGTransformable::isKnownAttribute(attrName))
-    renderer()->setNeedsLayout(true);
+  if (SVGTransformable::isKnownAttribute(attrName)) {
+    renderer->setNeedsTransformUpdate();
+    renderer->setNeedsLayout(true);
+  }
 }
 
 void SVGTextElement::synchronizeProperty(const QualifiedName& attrName) {
