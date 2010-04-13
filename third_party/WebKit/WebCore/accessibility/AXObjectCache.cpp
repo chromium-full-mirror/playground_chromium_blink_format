@@ -60,6 +60,7 @@
 #include "InputElement.h"
 #include "Page.h"
 #include "RenderObject.h"
+#include "RenderProgress.h"
 #include "RenderView.h"
 
 #include <wtf/PassRefPtr.h>
@@ -225,7 +226,8 @@ AccessibilityObject* AXObjectCache::getOrCreate(RenderObject* renderer) {
 #if ENABLE(PROGRESS_TAG)
     // progress bar
     else if (renderer->isProgress())
-      newObj = AccessibilityProgressIndicator::create(renderer);
+      newObj =
+          AccessibilityProgressIndicator::create(toRenderProgress(renderer));
 #endif
 
     // input type=range
