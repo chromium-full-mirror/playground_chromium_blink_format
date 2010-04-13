@@ -163,6 +163,10 @@ class LayoutTestController : public QObject {
                                      const QString& destinationProtocol,
                                      const QString& destinationHost,
                                      bool allowDestinationSubdomains);
+  void removeOriginAccessWhitelistEntry(const QString& sourceOrigin,
+                                        const QString& destinationProtocol,
+                                        const QString& destinationHost,
+                                        bool allowDestinationSubdomains);
 
   void dispatchPendingLoadRequests();
   void disableImageLoading();
