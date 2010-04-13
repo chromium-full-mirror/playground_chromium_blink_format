@@ -198,6 +198,8 @@
 #include "JSRect.cpp"
 #include "JSRGBColor.cpp"
 #include "JSScreen.cpp"
+#include "JSScriptProfile.cpp"
+#include "JSScriptProfileNode.cpp"
 #include "JSSharedWorker.cpp"
 #include "JSSharedWorkerContext.cpp"
 #include "JSSQLError.cpp"
