@@ -32,6 +32,8 @@
 
 namespace WebKit {
 
+class UpdateChunk;
+
 class DrawingAreaUpdateChunk : public DrawingArea {
  public:
   DrawingAreaUpdateChunk(WebPage*);
@@ -53,6 +55,8 @@ class DrawingAreaUpdateChunk : public DrawingArea {
                                  CoreIPC::ArgumentDecoder&);
 
  private:
+  void paintIntoUpdateChunk(UpdateChunk*);
+
   void scheduleDisplay();
   void setSize(const WebCore::IntSize& viewSize);
 
