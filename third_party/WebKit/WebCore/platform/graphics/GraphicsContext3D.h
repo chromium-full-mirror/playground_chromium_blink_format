@@ -642,12 +642,13 @@ class GraphicsContext3D : public Noncopyable {
   void pixelStorei(unsigned long pname, long param);
   void polygonOffset(double factor, double units);
 
-  PassRefPtr<WebGLArray> readPixels(long x,
-                                    long y,
-                                    unsigned long width,
-                                    unsigned long height,
-                                    unsigned long format,
-                                    unsigned long type);
+  void readPixels(long x,
+                  long y,
+                  unsigned long width,
+                  unsigned long height,
+                  unsigned long format,
+                  unsigned long type,
+                  void* data);
 
   void releaseShaderCompiler();
   void renderbufferStorage(unsigned long target,
