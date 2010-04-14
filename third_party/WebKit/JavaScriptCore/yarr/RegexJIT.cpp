@@ -1141,17 +1141,17 @@ class RegexGenerator : private MacroAssembler {
         break;
 
       case PatternTerm::TypeBackReference:
-        m_generationFailed = true;
+        ASSERT_NOT_REACHED();
         break;
 
       case PatternTerm::TypeForwardReference:
         break;
 
       case PatternTerm::TypeParenthesesSubpattern:
-        if ((term.quantityCount == 1) && !term.parentheses.isCopy)
-          generateParenthesesSingle(state);
-        else
-          m_generationFailed = true;
+        ASSERT((term.quantityCount == 1) &&
+               !term.parentheses
+                    .isCopy);  // must fallback to pcre before this point
+        generateParenthesesSingle(state);
         break;
 
       case PatternTerm::TypeParentheticalAssertion:
@@ -1464,8 +1464,7 @@ class RegexGenerator : private MacroAssembler {
   }
 
  public:
-  RegexGenerator(RegexPattern& pattern)
-      : m_pattern(pattern), m_generationFailed(false) {}
+  RegexGenerator(RegexPattern& pattern) : m_pattern(pattern) {}
 
   void generate() {
     generateEnter();
@@ -1495,12 +1494,9 @@ class RegexGenerator : private MacroAssembler {
     jitObject.set(patchBuffer.finalizeCode());
   }
 
-  bool generationFailed() { return m_generationFailed; }
-
  private:
   RegexPattern& m_pattern;
   Vector<AlternativeBacktrackRecord> m_backtrackRecords;
-  bool m_generationFailed;
 };
 
 void jitCompileRegex(JSGlobalData* globalData,
@@ -1517,10 +1513,7 @@ void jitCompileRegex(JSGlobalData* globalData,
 
   numSubpatterns = pattern.m_numSubpatterns;
 
-  RegexGenerator generator(pattern);
-  generator.compile(globalData, jitObject);
-
-  if (generator.generationFailed()) {
+  if (pattern.m_shouldFallBack) {
     JSRegExpIgnoreCaseOption ignoreCaseOption =
         ignoreCase ? JSRegExpIgnoreCase : JSRegExpDoNotIgnoreCase;
     JSRegExpMultilineOption multilineOption =
@@ -1529,6 +1522,9 @@ void jitCompileRegex(JSGlobalData* globalData,
         jsRegExpCompile(reinterpret_cast<const UChar*>(patternString.data()),
                         patternString.size(), ignoreCaseOption, multilineOption,
                         &numSubpatterns, &error));
+  } else {
+    RegexGenerator generator(pattern);
+    generator.compile(globalData, jitObject);
   }
 }
 }
