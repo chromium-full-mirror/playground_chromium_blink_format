@@ -324,8 +324,7 @@ PopupContainer::PopupContainer(PopupMenuClient* client,
                                const PopupContainerSettings& settings)
     : m_listBox(PopupListBox::create(client, settings)),
       m_settings(settings),
-      m_popupType(popupType),
-      m_popupOpen(false) {
+      m_popupType(popupType) {
   setScrollbarModes(ScrollbarAlwaysOff, ScrollbarAlwaysOff);
 }
 
@@ -376,7 +375,6 @@ void PopupContainer::showPopup(FrameView* view) {
       }
     }
     chromeClient->popupOpened(this, widgetRect, false);
-    m_popupOpen = true;
   }
 
   if (!m_listBox->parent())
@@ -425,9 +423,6 @@ void PopupContainer::hidePopup() {
 }
 
 void PopupContainer::notifyPopupHidden() {
-  if (!m_popupOpen)
-    return;
-  m_popupOpen = false;
   chromeClientChromium()->popupClosed(this);
 }
 

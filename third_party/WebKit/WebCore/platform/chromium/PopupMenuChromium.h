@@ -144,7 +144,7 @@ class PopupContainer : public FramelessScrollView {
   // popups on other platforms.
   void show(const IntRect&, FrameView*, int index);
 
-  // Hides the popup.
+  // Hide the popup.
   void hidePopup();
 
   // The popup was hidden.
@@ -172,9 +172,6 @@ class PopupContainer : public FramelessScrollView {
   int menuItemFontSize() const;
 
   PopupType popupType() const { return m_popupType; }
-
-  // Whether the popup is currently open.
-  bool m_popupOpen;
 
  private:
   friend class WTF::RefCounted<PopupContainer>;
