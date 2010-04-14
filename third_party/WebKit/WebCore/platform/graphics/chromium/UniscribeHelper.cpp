@@ -389,7 +389,6 @@ void UniscribeHelper::draw(GraphicsContext* graphicsContext,
                             &shaping.m_glyphs[fromGlyph], glyphCount,
                             &shaping.m_advance[fromGlyph], justify,
                             &shaping.m_offsets[fromGlyph]);
-          ASSERT(S_OK == hr);
           textOutOk = (hr == S_OK);
         } else {
           SkPoint origin;
