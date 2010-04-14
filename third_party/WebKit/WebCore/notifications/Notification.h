@@ -57,7 +57,7 @@ class Notification : public RefCounted<Notification>,
                      public ActiveDOMObject,
                      public EventTarget {
  public:
-  static Notification* create(const String& url,
+  static Notification* create(const KURL& url,
                               ScriptExecutionContext* context,
                               ExceptionCode& ec,
                               NotificationPresenter* provider) {
@@ -77,7 +77,7 @@ class Notification : public RefCounted<Notification>,
 
   bool isHTML() { return m_isHTML; }
   KURL url() { return m_notificationURL; }
-  KURL iconURL() { return m_iconURL; }
+  KURL iconURL() { return m_contents.icon(); }
   NotificationContents& contents() { return m_contents; }
 
   DEFINE_ATTRIBUTE_EVENT_LISTENER(display);
@@ -94,14 +94,14 @@ class Notification : public RefCounted<Notification>,
   virtual Notification* toNotification() { return this; }
 
  private:
-  Notification(const String& url,
-               ScriptExecutionContext* context,
-               ExceptionCode& ec,
-               NotificationPresenter* provider);
-  Notification(const NotificationContents& fields,
-               ScriptExecutionContext* context,
-               ExceptionCode& ec,
-               NotificationPresenter* provider);
+  Notification(const KURL&,
+               ScriptExecutionContext*,
+               ExceptionCode&,
+               NotificationPresenter*);
+  Notification(const NotificationContents&,
+               ScriptExecutionContext*,
+               ExceptionCode&,
+               NotificationPresenter*);
 
   // EventTarget interface
   virtual void refEventTarget() { ref(); }
@@ -111,7 +111,6 @@ class Notification : public RefCounted<Notification>,
 
   bool m_isHTML;
   KURL m_notificationURL;
-  KURL m_iconURL;
   NotificationContents m_contents;
 
   bool m_isShowing;

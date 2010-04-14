@@ -60,7 +60,9 @@ bool NotificationPresenterClientQt::show(Notification* notification) {
              QString(notification->url().string()).toUtf8().constData());
     else {
       printf("DESKTOP NOTIFICATION: icon %s, title %s, text %s\n",
-             QString(notification->contents().icon()).toUtf8().constData(),
+             QString(notification->contents().icon().string())
+                 .toUtf8()
+                 .constData(),
              QString(notification->contents().title()).toUtf8().constData(),
              QString(notification->contents().body()).toUtf8().constData());
     }
