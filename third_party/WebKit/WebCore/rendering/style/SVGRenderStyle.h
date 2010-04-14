@@ -2,6 +2,7 @@
     Copyright (C) 2004, 2005, 2007 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005 Rob Buis <buis@kde.org>
     Copyright (C) 2005, 2006 Apple Computer, Inc.
+    Copyright (C) Research In Motion Limited 2010. All rights reserved.
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -26,9 +27,9 @@
 #include "CSSValueList.h"
 #include "DataRef.h"
 #include "GraphicsTypes.h"
+#include "Path.h"
 #include "SVGPaint.h"
 #include "SVGRenderStyleDefs.h"
-#include "ShadowData.h"
 
 namespace WebCore {
 
@@ -186,43 +187,6 @@ class SVGRenderStyle : public RefCounted<SVGRenderStyle> {
                                                stopColor,
                                                Color(0, 0, 0))
 
-  SVG_RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(String,
-                                               clip,
-                                               clipPath,
-                                               ClipPath,
-                                               clipPath,
-                                               String())
-  SVG_RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(String,
-                                               mask,
-                                               maskElement,
-                                               MaskElement,
-                                               maskElement,
-                                               String())
-  SVG_RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(String,
-                                               markers,
-                                               startMarker,
-                                               StartMarker,
-                                               startMarker,
-                                               String())
-  SVG_RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(String,
-                                               markers,
-                                               midMarker,
-                                               MidMarker,
-                                               midMarker,
-                                               String())
-  SVG_RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(String,
-                                               markers,
-                                               endMarker,
-                                               EndMarker,
-                                               endMarker,
-                                               String())
-
-  SVG_RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(String,
-                                               misc,
-                                               filter,
-                                               Filter,
-                                               filter,
-                                               String())
   SVG_RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(float,
                                                misc,
                                                floodOpacity,
@@ -254,6 +218,46 @@ class SVGRenderStyle : public RefCounted<SVGRenderStyle> {
                                                       Shadow,
                                                       shadow,
                                                       0)
+
+  // Non-inherited resources
+  SVG_RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(String,
+                                               resources,
+                                               clipper,
+                                               ClipperResource,
+                                               clipperResource,
+                                               String())
+  SVG_RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(String,
+                                               resources,
+                                               filter,
+                                               FilterResource,
+                                               filterResource,
+                                               String())
+  SVG_RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(String,
+                                               resources,
+                                               masker,
+                                               MaskerResource,
+                                               maskerResource,
+                                               String())
+
+  // Inherited resources
+  SVG_RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(String,
+                                               inheritedResources,
+                                               markerStart,
+                                               MarkerStartResource,
+                                               markerStartResource,
+                                               String())
+  SVG_RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(String,
+                                               inheritedResources,
+                                               markerMid,
+                                               MarkerMidResource,
+                                               markerMidResource,
+                                               String())
+  SVG_RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(String,
+                                               inheritedResources,
+                                               markerEnd,
+                                               MarkerEndResource,
+                                               markerEndResource,
+                                               String())
 
   // convenience
   bool hasStroke() const {
@@ -330,15 +334,14 @@ class SVGRenderStyle : public RefCounted<SVGRenderStyle> {
   // inherited attributes
   DataRef<StyleFillData> fill;
   DataRef<StyleStrokeData> stroke;
-  DataRef<StyleMarkerData> markers;
   DataRef<StyleTextData> text;
+  DataRef<StyleInheritedResourceData> inheritedResources;
 
   // non-inherited attributes
   DataRef<StyleStopData> stops;
-  DataRef<StyleClipData> clip;
-  DataRef<StyleMaskData> mask;
   DataRef<StyleMiscData> misc;
   DataRef<StyleShadowSVGData> shadowSVG;
+  DataRef<StyleResourceData> resources;
 
  private:
   enum CreateDefaultType { CreateDefault };
@@ -376,5 +379,3 @@ class SVGRenderStyle : public RefCounted<SVGRenderStyle> {
 
 #endif  // ENABLE(SVG)
 #endif  // SVGRenderStyle_h
-
-// vim:ts=4:noet

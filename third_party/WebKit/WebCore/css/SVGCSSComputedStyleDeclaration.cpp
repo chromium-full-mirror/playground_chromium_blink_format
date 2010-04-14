@@ -109,18 +109,18 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getSVGPropertyCSSValue(
     case CSSPropertyWritingMode:
       return CSSPrimitiveValue::create(svgStyle->writingMode());
     case CSSPropertyClipPath:
-      if (!svgStyle->clipPath().isEmpty())
-        return CSSPrimitiveValue::create(svgStyle->clipPath(),
+      if (!svgStyle->clipperResource().isEmpty())
+        return CSSPrimitiveValue::create(svgStyle->clipperResource(),
                                          CSSPrimitiveValue::CSS_URI);
       return CSSPrimitiveValue::createIdentifier(CSSValueNone);
     case CSSPropertyMask:
-      if (!svgStyle->maskElement().isEmpty())
-        return CSSPrimitiveValue::create(svgStyle->maskElement(),
+      if (!svgStyle->maskerResource().isEmpty())
+        return CSSPrimitiveValue::create(svgStyle->maskerResource(),
                                          CSSPrimitiveValue::CSS_URI);
       return CSSPrimitiveValue::createIdentifier(CSSValueNone);
     case CSSPropertyFilter:
-      if (!svgStyle->filter().isEmpty())
-        return CSSPrimitiveValue::create(svgStyle->filter(),
+      if (!svgStyle->filterResource().isEmpty())
+        return CSSPrimitiveValue::create(svgStyle->filterResource(),
                                          CSSPrimitiveValue::CSS_URI);
       return CSSPrimitiveValue::createIdentifier(CSSValueNone);
     case CSSPropertyFloodColor:
@@ -134,18 +134,18 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getSVGPropertyCSSValue(
     case CSSPropertyKerning:
       return svgStyle->kerning();
     case CSSPropertyMarkerEnd:
-      if (!svgStyle->endMarker().isEmpty())
-        return CSSPrimitiveValue::create(svgStyle->endMarker(),
+      if (!svgStyle->markerEndResource().isEmpty())
+        return CSSPrimitiveValue::create(svgStyle->markerEndResource(),
                                          CSSPrimitiveValue::CSS_URI);
       return CSSPrimitiveValue::createIdentifier(CSSValueNone);
     case CSSPropertyMarkerMid:
-      if (!svgStyle->midMarker().isEmpty())
-        return CSSPrimitiveValue::create(svgStyle->midMarker(),
+      if (!svgStyle->markerMidResource().isEmpty())
+        return CSSPrimitiveValue::create(svgStyle->markerMidResource(),
                                          CSSPrimitiveValue::CSS_URI);
       return CSSPrimitiveValue::createIdentifier(CSSValueNone);
     case CSSPropertyMarkerStart:
-      if (!svgStyle->startMarker().isEmpty())
-        return CSSPrimitiveValue::create(svgStyle->startMarker(),
+      if (!svgStyle->markerStartResource().isEmpty())
+        return CSSPrimitiveValue::create(svgStyle->markerStartResource(),
                                          CSSPrimitiveValue::CSS_URI);
       return CSSPrimitiveValue::createIdentifier(CSSValueNone);
     case CSSPropertyStroke:
