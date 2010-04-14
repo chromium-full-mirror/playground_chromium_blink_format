@@ -45,6 +45,9 @@ class DOMWrapperWorld : public RefCounted<DOMWrapperWorld> {
   }
   ~DOMWrapperWorld();
 
+  void registerWorld();
+  void unregisterWorld();
+
   void didCreateWrapperCache(Document* document) {
     m_documentsWithWrapperCaches.add(document);
   }
@@ -73,6 +76,7 @@ class DOMWrapperWorld : public RefCounted<DOMWrapperWorld> {
   HashSet<Document*> m_documentsWithWrapperCaches;
   HashSet<ScriptController*> m_scriptControllersWithWindowShells;
   bool m_isNormal;
+  bool m_isRegistered;
 };
 
 DOMWrapperWorld* normalWorld(JSC::JSGlobalData&);
