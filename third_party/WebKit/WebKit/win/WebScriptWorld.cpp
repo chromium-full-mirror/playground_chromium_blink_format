@@ -131,3 +131,8 @@ HRESULT WebScriptWorld::scriptWorldForGlobalContext(
     return E_POINTER;
   return findOrCreateWorld(currentWorld(toJS(context))).copyRefTo(outWorld);
 }
+
+HRESULT WebScriptWorld::unregisterWorld() {
+  m_world->unregisterWorld();
+  return S_OK;
+}

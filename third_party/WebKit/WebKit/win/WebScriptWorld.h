@@ -57,6 +57,7 @@ class WebScriptWorld : public Noncopyable, public IWebScriptWorld {
   virtual HRESULT STDMETHODCALLTYPE standardWorld(IWebScriptWorld**);
   virtual HRESULT STDMETHODCALLTYPE
   scriptWorldForGlobalContext(JSGlobalContextRef, IWebScriptWorld**);
+  virtual HRESULT STDMETHODCALLTYPE unregisterWorld();
 
   ULONG m_refCount;
   RefPtr<WebCore::DOMWrapperWorld> m_world;
