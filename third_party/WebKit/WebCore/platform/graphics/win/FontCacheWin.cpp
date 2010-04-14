@@ -337,17 +337,22 @@ SimpleFontData* FontCache::getSimilarFontPlatformData(const Font& font) {
 static SimpleFontData* fontDataFromDescriptionAndLogFont(
     FontCache* fontCache,
     const FontDescription& fontDescription,
-    const LOGFONT& font) {
-  String fontFamily =
+    const LOGFONT& font,
+    AtomicString& outFontFamilyName) {
+  AtomicString familyName =
       String(font.lfFaceName, wcsnlen(font.lfFaceName, LF_FACESIZE));
-  return fontCache->getCachedFontData(fontDescription, fontFamily);
+  SimpleFontData* fontData =
+      fontCache->getCachedFontData(fontDescription, familyName);
+  if (fontData)
+    outFontFamilyName = familyName;
+  return fontData;
 }
 
 SimpleFontData* FontCache::getLastResortFallbackFont(
     const FontDescription& fontDescription) {
-  DEFINE_STATIC_LOCAL(SimpleFontData*, simpleFont, ());
-  if (simpleFont)
-    return simpleFont;
+  DEFINE_STATIC_LOCAL(AtomicString, fallbackFontName, ());
+  if (!fallbackFontName.isEmpty())
+    return getCachedFontData(fontDescription, fallbackFontName);
 
   // FIXME: Would be even better to somehow get the user's default font here.
   // For now we'll pick
@@ -362,9 +367,12 @@ SimpleFontData* FontCache::getLastResortFallbackFont(
       AtomicString("Times New Roman"), AtomicString("Microsoft Sans Serif"),
       AtomicString("Tahoma"), AtomicString("Lucida Sans Unicode"),
       AtomicString("Arial")};
+  SimpleFontData* simpleFont;
   for (int i = 0; i < ARRAYSIZE(fallbackFonts); ++i) {
-    if (simpleFont = getCachedFontData(fontDescription, fallbackFonts[i]))
+    if (simpleFont = getCachedFontData(fontDescription, fallbackFonts[i])) {
+      fallbackFontName = fallbackFonts[i];
       return simpleFont;
+    }
   }
 
   // Fall back to the DEFAULT_GUI_FONT if no known Unicode fonts are available.
@@ -372,8 +380,8 @@ SimpleFontData* FontCache::getLastResortFallbackFont(
           static_cast<HFONT>(GetStockObject(DEFAULT_GUI_FONT))) {
     LOGFONT defaultGUILogFont;
     GetObject(defaultGUIFont, sizeof(defaultGUILogFont), &defaultGUILogFont);
-    if (simpleFont = fontDataFromDescriptionAndLogFont(this, fontDescription,
-                                                       defaultGUILogFont))
+    if (simpleFont = fontDataFromDescriptionAndLogFont(
+            this, fontDescription, defaultGUILogFont, fallbackFontName))
       return simpleFont;
   }
 
@@ -383,19 +391,24 @@ SimpleFontData* FontCache::getLastResortFallbackFont(
   if (SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(nonClientMetrics),
                            &nonClientMetrics, 0)) {
     if (simpleFont = fontDataFromDescriptionAndLogFont(
-            this, fontDescription, nonClientMetrics.lfMessageFont))
+            this, fontDescription, nonClientMetrics.lfMessageFont,
+            fallbackFontName))
       return simpleFont;
     if (simpleFont = fontDataFromDescriptionAndLogFont(
-            this, fontDescription, nonClientMetrics.lfMenuFont))
+            this, fontDescription, nonClientMetrics.lfMenuFont,
+            fallbackFontName))
       return simpleFont;
     if (simpleFont = fontDataFromDescriptionAndLogFont(
-            this, fontDescription, nonClientMetrics.lfStatusFont))
+            this, fontDescription, nonClientMetrics.lfStatusFont,
+            fallbackFontName))
       return simpleFont;
     if (simpleFont = fontDataFromDescriptionAndLogFont(
-            this, fontDescription, nonClientMetrics.lfCaptionFont))
+            this, fontDescription, nonClientMetrics.lfCaptionFont,
+            fallbackFontName))
       return simpleFont;
     if (simpleFont = fontDataFromDescriptionAndLogFont(
-            this, fontDescription, nonClientMetrics.lfSmCaptionFont))
+            this, fontDescription, nonClientMetrics.lfSmCaptionFont,
+            fallbackFontName))
       return simpleFont;
   }
 
