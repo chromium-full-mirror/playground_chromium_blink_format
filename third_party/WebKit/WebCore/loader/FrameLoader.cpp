@@ -2997,8 +2997,9 @@ void FrameLoader::clientRedirected(const KURL& url,
   // a normal load.
   // Loads triggered by JavaScript form submissions never count as quick
   // redirects.
-  m_quickRedirectComing = lockBackForwardList && m_documentLoader &&
-                          !m_isExecutingJavaScriptFormAction;
+  m_quickRedirectComing =
+      (lockBackForwardList || history()->currentItemShouldBeReplaced()) &&
+      m_documentLoader && !m_isExecutingJavaScriptFormAction;
 }
 
 bool FrameLoader::shouldReload(const KURL& currentURL,
