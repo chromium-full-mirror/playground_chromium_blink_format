@@ -699,8 +699,10 @@ void QScriptValuePrivate::setValue(JSValueRef value) {
 bool QScriptValuePrivate::inherits(const char* name) {
   Q_ASSERT(isJSBased());
   JSObjectRef globalObject = JSContextGetGlobalObject(context());
-  JSValueRef error = JSObjectGetProperty(context(), globalObject,
-                                         QScriptConverter::toString(name), 0);
+  JSStringRef errorAttrName = QScriptConverter::toString(name);
+  JSValueRef error = JSObjectGetProperty(context(), globalObject, errorAttrName,
+                                         /* exception */ 0);
+  JSStringRelease(errorAttrName);
   return JSValueIsInstanceOfConstructor(
       context(), value(), JSValueToObject(context(), error, /* exception */ 0),
       /* exception */ 0);
