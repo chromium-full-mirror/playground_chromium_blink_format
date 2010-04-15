@@ -77,6 +77,11 @@ class QScriptEnginePrivate : public QSharedData {
   JSGlobalContextRef m_context;
 };
 
+/*!
+  Evaluates given JavaScript program and returns result of the evaluation.
+  \attention this function doesn't take ownership of the parameters.
+  \internal
+*/
 JSValueRef QScriptEnginePrivate::evaluate(JSStringRef program,
                                           JSStringRef fileName,
                                           int lineNumber) {
