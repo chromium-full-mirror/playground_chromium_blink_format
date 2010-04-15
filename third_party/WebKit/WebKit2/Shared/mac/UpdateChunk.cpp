@@ -50,7 +50,7 @@ UpdateChunk::~UpdateChunk() {
                   m_size);
 }
 
-void UpdateChunk::drawIntoContext(CGContextRef context) {
+RetainPtr<CGImageRef> UpdateChunk::createImage() {
   RetainPtr<CGDataProviderRef> provider(
       AdoptCF, CGDataProviderCreateWithData(0, m_data, size(), 0));
   RetainPtr<CGColorSpaceRef> colorSpace(AdoptCF, CGColorSpaceCreateDeviceRGB());
@@ -60,9 +60,7 @@ void UpdateChunk::drawIntoContext(CGContextRef context) {
                     colorSpace.get(), kCGImageAlphaPremultipliedLast,
                     provider.get(), 0, false, kCGRenderingIntentDefault));
 
-  CGContextDrawImage(context, CGRectMake(m_rect.x(), m_rect.y(), m_rect.width(),
-                                         m_rect.height()),
-                     image.get());
+  return image;
 }
 
 void UpdateChunk::encode(CoreIPC::ArgumentEncoder& encoder) const {
