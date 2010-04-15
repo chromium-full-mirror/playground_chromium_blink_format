@@ -670,6 +670,14 @@ static JSValueRef getLanguageCallback(JSContextRef context,
   return JSValueMakeString(context, language.get());
 }
 
+static JSValueRef getHelpTextCallback(JSContextRef context,
+                                      JSObjectRef thisObject,
+                                      JSStringRef propertyName,
+                                      JSValueRef* exception) {
+  JSRetainPtr<JSStringRef> language(Adopt, toAXElement(thisObject)->helpText());
+  return JSValueMakeString(context, language.get());
+}
+
 static JSValueRef getOrientationCallback(JSContextRef context,
                                          JSObjectRef thisObject,
                                          JSStringRef propertyName,
@@ -954,6 +962,8 @@ JSClassRef AccessibilityUIElement::getJSClass() {
       {"description", getDescriptionCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"language", getLanguageCallback, 0,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"helpText", getHelpTextCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"stringValue", getStringValueCallback, 0,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},

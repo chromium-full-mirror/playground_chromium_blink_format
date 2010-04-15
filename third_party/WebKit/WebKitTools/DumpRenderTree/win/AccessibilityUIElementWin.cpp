@@ -212,6 +212,10 @@ JSStringRef AccessibilityUIElement::language() {
   return JSStringCreateWithCharacters(0, 0);
 }
 
+JSStringRef AccessibilityUIElement::helpText() const {
+  return 0;
+}
+
 double AccessibilityUIElement::x() {
   long x, y, width, height;
   if (FAILED(m_element->accLocation(&x, &y, &width, &height, self())))
