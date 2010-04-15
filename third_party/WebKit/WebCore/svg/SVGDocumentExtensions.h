@@ -35,6 +35,7 @@
 namespace WebCore {
 
 class Document;
+class RenderSVGResource;
 class String;
 class SVGStyledElement;
 class SVGSMILElement;
@@ -47,6 +48,10 @@ class SVGDocumentExtensions : public Noncopyable {
 
   void addTimeContainer(SVGSVGElement*);
   void removeTimeContainer(SVGSVGElement*);
+
+  void addResource(const String& id, RenderSVGResource*);
+  void removeResource(const String& id);
+  RenderSVGResource* resourceById(const String& id) const;
 
   void startAnimations();
   void pauseAnimations();
@@ -62,6 +67,7 @@ class SVGDocumentExtensions : public Noncopyable {
   Document* m_doc;                           // weak reference
   HashSet<SVGSVGElement*> m_timeContainers;  // For SVG 1.2 support this will
                                              // need to be made more general.
+  HashMap<String, RenderSVGResource*> m_resources;
   HashMap<String, HashSet<SVGStyledElement*>*> m_pendingResources;
 
   SVGDocumentExtensions(const SVGDocumentExtensions&);
