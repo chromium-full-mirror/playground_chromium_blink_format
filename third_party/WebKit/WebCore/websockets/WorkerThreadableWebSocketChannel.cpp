@@ -58,11 +58,11 @@ WorkerThreadableWebSocketChannel::WorkerThreadableWebSocketChannel(
     : m_workerContext(context),
       m_workerClientWrapper(
           ThreadableWebSocketChannelClientWrapper::create(client)),
-      m_bridge(new Bridge(m_workerClientWrapper,
-                          m_workerContext,
-                          taskMode,
-                          url,
-                          protocol)) {}
+      m_bridge(Bridge::create(m_workerClientWrapper,
+                              m_workerContext,
+                              taskMode,
+                              url,
+                              protocol)) {}
 
 WorkerThreadableWebSocketChannel::~WorkerThreadableWebSocketChannel() {
   if (m_bridge)
