@@ -33,6 +33,7 @@
 
 #include "Image.h"
 #include "NotImplemented.h"
+#include <wtf/RetainPtr.h>
 
 #include <CoreGraphics/CGBitmapContext.h>
 #include <CoreGraphics/CGImage.h>
@@ -54,9 +55,13 @@ DragImageRef scaleDragImage(DragImageRef image, FloatSize scale) {
     return 0;
   size_t width = roundf(CGImageGetWidth(image) * scale.width());
   size_t height = roundf(CGImageGetHeight(image) * scale.height());
+
+  RetainPtr<CGColorSpaceRef> deviceRGB(
+      WTF::AdoptCF, CGColorSpaceCreateWithName(kCGColorSpaceGenericRGB));
   CGContextRef context = CGBitmapContextCreate(
-      0, width, height, 8, width * 4, CGImageGetColorSpace(image),
+      0, width, height, 8, width * 4, deviceRGB.get(),
       kCGImageAlphaPremultipliedFirst | kCGBitmapByteOrder32Host);
+
   if (!context)
     return 0;
   CGContextDrawImage(context, CGRectMake(0, 0, width, height), image);
@@ -72,9 +77,13 @@ DragImageRef dissolveDragImageToFraction(DragImageRef image, float delta) {
     return 0;
   size_t width = CGImageGetWidth(image);
   size_t height = CGImageGetHeight(image);
+
+  RetainPtr<CGColorSpaceRef> deviceRGB(
+      WTF::AdoptCF, CGColorSpaceCreateWithName(kCGColorSpaceGenericRGB));
   CGContextRef context = CGBitmapContextCreate(
-      0, width, height, 8, width * 4, CGImageGetColorSpace(image),
+      0, width, height, 8, width * 4, deviceRGB.get(),
       kCGImageAlphaPremultipliedFirst | kCGBitmapByteOrder32Host);
+
   if (!context)
     return 0;
   // From CGContext.h:
