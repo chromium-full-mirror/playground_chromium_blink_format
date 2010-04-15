@@ -44,7 +44,7 @@ class WebURL;
 
 class TestWebWorker : public WebKit::WebWorker,
                       public WebKit::WebWorkerClient,
-                      public RefCounted<TestWebWorker> {
+                      public WTF::RefCounted<TestWebWorker> {
  public:
   TestWebWorker() {
     ref();
@@ -97,7 +97,7 @@ class TestWebWorker : public WebKit::WebWorker,
 
  private:
   ~TestWebWorker() {}
-  friend class RefCounted<TestWebWorker>;
+  friend class WTF::RefCounted<TestWebWorker>;
 };
 
 #endif  // TestWebWorker_h
