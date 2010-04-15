@@ -40,9 +40,6 @@ PlatformTouchPoint::PlatformTouchPoint(const QTouchEvent::TouchPoint& point) {
     case Qt::TouchPointPressed:
       m_state = TouchPressed;
       break;
-    case Qt::TouchPointStationary:
-      m_state = TouchStationary;
-      break;
   }
   m_screenPos = point.screenPos().toPoint();
   m_pos = point.pos().toPoint();

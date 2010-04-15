@@ -35,13 +35,7 @@ class PlatformTouchEvent;
 
 class PlatformTouchPoint {
  public:
-  enum State {
-    TouchReleased,
-    TouchPressed,
-    TouchMoved,
-    TouchStationary,
-    TouchCancelled
-  };
+  enum State { TouchReleased, TouchPressed, TouchMoved, TouchCancelled };
 
 #if PLATFORM(QT)
   PlatformTouchPoint(const QTouchEvent::TouchPoint&);
