@@ -1199,6 +1199,8 @@ class QtPluginWidget : public Widget {
     platformWidget()->setMask(clipRegion);
 
     handleVisibility();
+
+    platformWidget()->update();
   }
 
   virtual void show() {
