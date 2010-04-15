@@ -30,6 +30,7 @@
 #include "ScriptReturnValueCallback.h"
 #include "WebEvent.h"
 #include "WebFrameProxy.h"
+#include "WebHistoryClient.h"
 #include "WebLoaderClient.h"
 #include "WebPolicyClient.h"
 #include "WebUIClient.h"
@@ -61,6 +62,7 @@ class WebMouseEvent;
 class WebPageNamespace;
 class WebProcessProxy;
 class WebWheelEvent;
+class WebNavigationDataStore;
 
 class WebPageProxy : public RefCounted<WebPageProxy> {
  public:
@@ -78,6 +80,7 @@ class WebPageProxy : public RefCounted<WebPageProxy> {
   void initializeLoaderClient(WKPageLoaderClient*);
   void initializePolicyClient(WKPagePolicyClient*);
   void initializeUIClient(WKPageUIClient*);
+  void initializeHistoryClient(WKPageHistoryClient*);
 
   void revive();
 
@@ -174,8 +177,19 @@ class WebPageProxy : public RefCounted<WebPageProxy> {
   WebPageProxy* createNewPage();
   void showPage();
   void closePage();
-
   void runJavaScriptAlert(WebFrameProxy*, const WebCore::String&);
+
+  void didNavigateWithNavigationData(WebFrameProxy*,
+                                     const WebNavigationDataStore&);
+  void didPerformClientRedirect(WebFrameProxy*,
+                                const WebCore::String& sourceURLString,
+                                const WebCore::String& destinationURLString);
+  void didPerformServerRedirect(WebFrameProxy*,
+                                const WebCore::String& sourceURLString,
+                                const WebCore::String& destinationURLString);
+  void didUpdateHistoryTitle(WebFrameProxy*,
+                             const WebCore::String& title,
+                             const WebCore::String& url);
 
   void takeFocus(bool direction);
   void setToolTip(const WebCore::String&);
@@ -187,6 +201,7 @@ class WebPageProxy : public RefCounted<WebPageProxy> {
   WebLoaderClient m_loaderClient;
   WebPolicyClient m_policyClient;
   WebUIClient m_uiClient;
+  WebHistoryClient m_historyClient;
 
   OwnPtr<DrawingAreaProxy> m_drawingArea;
 
