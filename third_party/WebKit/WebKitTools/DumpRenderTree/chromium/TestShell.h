@@ -107,6 +107,11 @@ class TestShell {
   // the test results.
   void testTimedOut();
 
+#if defined(OS_WIN)
+  // Access to the finished event.  Used by the static WatchDog thread.
+  HANDLE finishedEvent() { return m_finishedEvent; }
+#endif
+
   // Get the timeout for running a test in milliseconds.
   static int layoutTestTimeout();
   static int layoutTestTimeoutForWatchDog() {
@@ -146,4 +151,9 @@ class TestShell {
   // The main window should be put into windowList[0].
   typedef Vector<WebViewHost*> WindowList;
   WindowList m_windowList;
+
+#if defined(OS_WIN)
+  // Used by the watchdog to know when it's finished.
+  HANDLE m_finishedEvent;
+#endif
 };
