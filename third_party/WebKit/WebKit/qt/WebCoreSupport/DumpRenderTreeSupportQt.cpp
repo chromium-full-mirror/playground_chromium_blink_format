@@ -354,11 +354,3 @@ void DumpRenderTreeSupportQt::setMediaType(QWebFrame* frame,
   coreFrame->document()->updateStyleSelector();
   view->forceLayout();
 }
-
-void DumpRenderTreeSupportQt::setViewMode(QWebPage* page, const QString& mode) {
-  QWebPagePrivate::priv(page)->viewMode = mode;
-  WebCore::Frame* frame = QWebFramePrivate::core(page->mainFrame());
-  WebCore::FrameView* view = frame->view();
-  frame->document()->updateStyleSelector();
-  view->forceLayout();
-}
