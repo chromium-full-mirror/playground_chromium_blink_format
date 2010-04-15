@@ -762,19 +762,20 @@ static JSClassRef getClass(JSContextRef context) {
   return eventSenderClass;
 }
 
-JSObjectRef makeEventSender(JSContextRef context) {
-  down = false;
-  dragMode = true;
-  replayingSavedEvents = false;
-  timeOffset = 0;
-  lastMousePosition.x = 0;
-  lastMousePosition.y = 0;
+JSObjectRef makeEventSender(JSContextRef context, bool isTopFrame) {
+  if (isTopFrame) {
+    down = false;
+    dragMode = true;
+    replayingSavedEvents = false;
+    timeOffset = 0;
+    lastMousePosition.x = 0;
+    lastMousePosition.y = 0;
 
-  endOfQueue = 0;
-  startOfQueue = 0;
+    endOfQueue = 0;
+    startOfQueue = 0;
 
-  didDragEnter = false;
-  draggingInfo = 0;
-
+    didDragEnter = false;
+    draggingInfo = 0;
+  }
   return JSObjectMake(context, getClass(context), 0);
 }
