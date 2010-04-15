@@ -532,20 +532,24 @@ QtAbstractWebPopup* ChromeClientQt::createSelectPopup() {
 }
 
 #if ENABLE(WIDGETS_10_SUPPORT)
-bool ChromeClientQt::isDocked() {
-  return m_webPage->d->viewMode == "mini";
+bool ChromeClientQt::isWindowed() {
+  return m_webPage->d->viewMode == "windowed";
 }
 
 bool ChromeClientQt::isFloating() {
   return m_webPage->d->viewMode == "floating";
 }
 
-bool ChromeClientQt::isApplication() {
-  return m_webPage->d->viewMode == "application";
-}
-
 bool ChromeClientQt::isFullscreen() {
   return m_webPage->d->viewMode == "fullscreen";
+}
+
+bool ChromeClientQt::isMaximized() {
+  return m_webPage->d->viewMode == "maximized";
+}
+
+bool ChromeClientQt::isMinimized() {
+  return m_webPage->d->viewMode == "minimized";
 }
 #endif
 }
