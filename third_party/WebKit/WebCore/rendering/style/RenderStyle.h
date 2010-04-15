@@ -113,6 +113,8 @@ class Pair;
 class StringImpl;
 class StyleImage;
 
+typedef Vector<RefPtr<RenderStyle>, 4> PseudoStyleCache;
+
 class RenderStyle : public RefCounted<RenderStyle> {
   friend class CSSStyleSelector;
 
@@ -151,7 +153,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
   DataRef<StyleInheritedData> inherited;
 
   // list of associated pseudo styles
-  RefPtr<RenderStyle> m_cachedPseudoStyle;
+  OwnPtr<PseudoStyleCache> m_cachedPseudoStyles;
 
 #if ENABLE(SVG)
   DataRef<SVGRenderStyle> m_svgStyle;
@@ -333,8 +335,9 @@ class RenderStyle : public RefCounted<RenderStyle> {
   RenderStyle* getCachedPseudoStyle(PseudoId) const;
   RenderStyle* addCachedPseudoStyle(PassRefPtr<RenderStyle>);
 
-  typedef Vector<RenderStyle*, 10> PseudoStyleCache;
-  void getPseudoStyleCache(PseudoStyleCache&) const;
+  const PseudoStyleCache* cachedPseudoStyles() const {
+    return m_cachedPseudoStyles.get();
+  }
 
   bool affectedByHoverRules() const {
     return noninherited_flags._affectedByHover;
