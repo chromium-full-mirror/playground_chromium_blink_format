@@ -451,6 +451,9 @@ bool hasOffscreenRect(Node* node) {
     return true;
 
   IntRect rect(render->absoluteClippedOverflowRect());
+  if (rect.isEmpty())
+    return true;
+
   return !containerViewportRect.intersects(rect);
 }
 
