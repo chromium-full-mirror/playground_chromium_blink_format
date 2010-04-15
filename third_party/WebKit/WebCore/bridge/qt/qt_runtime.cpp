@@ -900,6 +900,8 @@ JSValue convertQVariantToValue(ExecState* exec,
 
   if (type == QMetaType::QObjectStar || type == QMetaType::QWidgetStar) {
     QObject* obj = variant.value<QObject*>();
+    if (!obj)
+      return jsNull();
     return QtInstance::getQtInstance(obj, root, QScriptEngine::QtOwnership)
         ->createRuntimeObject(exec);
   }

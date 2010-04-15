@@ -72,6 +72,8 @@ class MyQObject : public QObject {
                  setPropWithCustomType)
   Q_PROPERTY(QWebElement webElementProperty READ webElementProperty WRITE
                  setWebElementProperty)
+  Q_PROPERTY(QObject* objectStarProperty READ objectStarProperty WRITE
+                 setObjectStarProperty)
   Q_ENUMS(Policy Strategy)
   Q_FLAGS(Ability)
 
@@ -103,6 +105,7 @@ class MyQObject : public QObject {
         m_hiddenValue(456.0),
         m_writeOnlyValue(789),
         m_readOnlyValue(987),
+        m_objectStar(0),
         m_qtFunctionInvoked(-1) {}
 
   ~MyQObject() {}
@@ -155,6 +158,10 @@ class MyQObject : public QObject {
 
   CustomType propWithCustomType() const { return m_customType; }
   void setPropWithCustomType(const CustomType& c) { m_customType = c; }
+
+  QObject* objectStarProperty() const { return m_objectStar; }
+
+  void setObjectStarProperty(QObject* object) { m_objectStar = object; }
 
   int qtFunctionInvoked() const { return m_qtFunctionInvoked; }
 
@@ -421,6 +428,7 @@ class MyQObject : public QObject {
   QKeySequence m_shortcut;
   QWebElement m_webElement;
   CustomType m_customType;
+  QObject* m_objectStar;
   int m_qtFunctionInvoked;
   QVariantList m_actuals;
 };
@@ -825,6 +833,21 @@ void tst_QWebFrame::getSetStaticProperty() {
                   "myObject.readOnlyProperty == 987"),
            sTrue);
   QCOMPARE(m_myObject->readOnlyProperty(), 987);
+
+  // QObject* property
+  m_myObject->setObjectStarProperty(0);
+  QCOMPARE(m_myObject->objectStarProperty(), (QObject*)0);
+  QCOMPARE(evalJS("myObject.objectStarProperty == null"), sTrue);
+  QCOMPARE(evalJS("typeof myObject.objectStarProperty"), sObject);
+  QCOMPARE(evalJS("Boolean(myObject.objectStarProperty)"), sFalse);
+  QCOMPARE(evalJS("String(myObject.objectStarProperty) == 'null'"), sTrue);
+  QCOMPARE(evalJS("myObject.objectStarProperty.objectStarProperty"),
+           sUndefined);
+  m_myObject->setObjectStarProperty(this);
+  QCOMPARE(evalJS("myObject.objectStarProperty != null"), sTrue);
+  QCOMPARE(evalJS("typeof myObject.objectStarProperty"), sObject);
+  QCOMPARE(evalJS("Boolean(myObject.objectStarProperty)"), sTrue);
+  QCOMPARE(evalJS("String(myObject.objectStarProperty) != 'null'"), sTrue);
 }
 
 void tst_QWebFrame::getSetDynamicProperty() {
