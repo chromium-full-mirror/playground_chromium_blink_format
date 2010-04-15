@@ -220,7 +220,7 @@ void WebFrameLoaderClient::dispatchDidStartProvisionalLoad() {
 
   DocumentLoader* provisionalLoader =
       m_frame->coreFrame()->loader()->provisionalDocumentLoader();
-  const KURL& url = provisionalLoader->url();
+  const String& url = provisionalLoader->url().string();
 
   WebProcess::shared().connection()->send(
       WebPageProxyMessage::DidStartProvisionalLoadForFrame, webPage->pageID(),
@@ -333,7 +333,7 @@ void WebFrameLoaderClient::dispatchDecidePolicyForMIMEType(
     return;
 
   uint64_t listenerID = m_frame->setUpPolicyListener(function);
-  KURL url = request.url();  // FIXME: Pass entire request.
+  const String& url = request.url().string();  // FIXME: Pass entire request.
 
   WebProcess::shared().connection()->send(
       WebPageProxyMessage::DecidePolicyForMIMEType, webPage->pageID(),
@@ -354,7 +354,7 @@ void WebFrameLoaderClient::dispatchDecidePolicyForNewWindowAction(
 
   // FIXME: Pass more than just the navigation action type.
   // FIXME: Pass the frame name.
-  KURL url = request.url();  // FIXME: Pass entire request.
+  const String& url = request.url().string();  // FIXME: Pass entire request.
 
   WebProcess::shared().connection()->send(
       WebPageProxyMessage::DecidePolicyForNewWindowAction, webPage->pageID(),
@@ -374,7 +374,7 @@ void WebFrameLoaderClient::dispatchDecidePolicyForNavigationAction(
   uint64_t listenerID = m_frame->setUpPolicyListener(function);
 
   // FIXME: Pass more than just the navigation action type.
-  KURL url = request.url();  // FIXME: Pass entire request.
+  const String& url = request.url().string();  // FIXME: Pass entire request.
 
   WebProcess::shared().connection()->send(
       WebPageProxyMessage::DecidePolicyForNavigationAction, webPage->pageID(),

@@ -34,7 +34,6 @@
 #include "WebPolicyClient.h"
 #include "WebUIClient.h"
 #include <WebCore/FrameLoaderTypes.h>
-#include <WebCore/KURL.h>
 #include <WebCore/PlatformString.h>
 #include <wtf/HashMap.h>
 #include <wtf/OwnPtr.h>
@@ -51,7 +50,6 @@ class MessageID;
 
 namespace WebCore {
 class IntSize;
-class KURL;
 }
 
 namespace WebKit {
@@ -90,7 +88,7 @@ class WebPageProxy : public RefCounted<WebPageProxy> {
   bool tryClose();
   bool isClosed() const { return m_closed; }
 
-  void loadURL(const WebCore::KURL&);
+  void loadURL(const WebCore::String&);
   void stopLoading();
   void reload();
 
@@ -137,7 +135,7 @@ class WebPageProxy : public RefCounted<WebPageProxy> {
   bool isValid();
 
   // REMOVE: For demo purposes only.
-  const WebCore::KURL& urlAtProcessExit() const { return m_urlAtProcessExit; }
+  const WebCore::String& urlAtProcessExit() const { return m_urlAtProcessExit; }
 
   void preferencesDidChange();
 
@@ -147,7 +145,7 @@ class WebPageProxy : public RefCounted<WebPageProxy> {
   void didCreateMainFrame(uint64_t frameID);
   void didCreateSubFrame(uint64_t frameID);
 
-  void didStartProvisionalLoadForFrame(WebFrameProxy*, const WebCore::KURL&);
+  void didStartProvisionalLoadForFrame(WebFrameProxy*, const WebCore::String&);
   void didReceiveServerRedirectForProvisionalLoadForFrame(WebFrameProxy*);
   void didFailProvisionalLoadForFrame(WebFrameProxy*);
   void didCommitLoadForFrame(WebFrameProxy*);
@@ -162,15 +160,15 @@ class WebPageProxy : public RefCounted<WebPageProxy> {
 
   void decidePolicyForNavigationAction(WebFrameProxy*,
                                        uint32_t navigationType,
-                                       const WebCore::KURL& url,
+                                       const WebCore::String& url,
                                        uint64_t listenerID);
   void decidePolicyForNewWindowAction(WebFrameProxy*,
                                       uint32_t navigationType,
-                                      const WebCore::KURL& url,
+                                      const WebCore::String& url,
                                       uint64_t listenerID);
   void decidePolicyForMIMEType(WebFrameProxy*,
                                const WebCore::String& MIMEType,
-                               const WebCore::KURL& url,
+                               const WebCore::String& url,
                                uint64_t listenerID);
 
   WebPageProxy* createNewPage();
@@ -206,7 +204,7 @@ class WebPageProxy : public RefCounted<WebPageProxy> {
   WebCore::String m_toolTip;
 
   // REMOVE: For demo purposes only.
-  WebCore::KURL m_urlAtProcessExit;
+  WebCore::String m_urlAtProcessExit;
 
   bool m_valid;
   bool m_closed;

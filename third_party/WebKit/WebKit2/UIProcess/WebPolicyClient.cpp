@@ -25,7 +25,6 @@
 
 #include "WebPolicyClient.h"
 
-#include "KURLWrapper.h"
 #include "WKAPICast.h"
 #include <WebCore/PlatformString.h>
 
@@ -47,15 +46,14 @@ void WebPolicyClient::initialize(WKPagePolicyClient* client) {
 bool WebPolicyClient::decidePolicyForNavigationAction(
     WebPageProxy* page,
     uint32_t navigationAction,
-    const KURL& url,
+    const String& url,
     WebFrameProxy* frame,
     WebFramePolicyListenerProxy* listener) {
   if (!m_pagePolicyClient.decidePolicyForNavigationAction)
     return false;
 
-  RefPtr<KURLWrapper> urlWrapper = KURLWrapper::create(url);
   m_pagePolicyClient.decidePolicyForNavigationAction(
-      toRef(page), navigationAction, toRef(urlWrapper.get()), toRef(frame),
+      toRef(page), navigationAction, toURLRef(url.impl()), toRef(frame),
       toRef(listener), m_pagePolicyClient.clientInfo);
   return true;
 }
@@ -63,15 +61,14 @@ bool WebPolicyClient::decidePolicyForNavigationAction(
 bool WebPolicyClient::decidePolicyForNewWindowAction(
     WebPageProxy* page,
     uint32_t navigationAction,
-    const KURL& url,
+    const String& url,
     WebFrameProxy* frame,
     WebFramePolicyListenerProxy* listener) {
   if (!m_pagePolicyClient.decidePolicyForNewWindowAction)
     return false;
 
-  RefPtr<KURLWrapper> urlWrapper = KURLWrapper::create(url);
   m_pagePolicyClient.decidePolicyForNewWindowAction(
-      toRef(page), navigationAction, toRef(urlWrapper.get()), toRef(frame),
+      toRef(page), navigationAction, toURLRef(url.impl()), toRef(frame),
       toRef(listener), m_pagePolicyClient.clientInfo);
   return true;
 }
@@ -79,16 +76,15 @@ bool WebPolicyClient::decidePolicyForNewWindowAction(
 bool WebPolicyClient::decidePolicyForMIMEType(
     WebPageProxy* page,
     const String& MIMEType,
-    const KURL& url,
+    const String& url,
     WebFrameProxy* frame,
     WebFramePolicyListenerProxy* listener) {
   if (!m_pagePolicyClient.decidePolicyForMIMEType)
     return false;
 
-  RefPtr<KURLWrapper> urlWrapper = KURLWrapper::create(url);
   m_pagePolicyClient.decidePolicyForMIMEType(
-      toRef(page), toRef(MIMEType.impl()), toRef(urlWrapper.get()),
-      toRef(frame), toRef(listener), m_pagePolicyClient.clientInfo);
+      toRef(page), toRef(MIMEType.impl()), toURLRef(url.impl()), toRef(frame),
+      toRef(listener), m_pagePolicyClient.clientInfo);
   return true;
 }
 

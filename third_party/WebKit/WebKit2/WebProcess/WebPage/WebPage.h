@@ -43,7 +43,6 @@ class MessageID;
 
 namespace WebCore {
 class GraphicsContext;
-class KURL;
 class KeyboardEvent;
 class Page;
 class PlatformKeyboardEvent;
@@ -107,7 +106,7 @@ class WebPage : public RefCounted<WebPage> {
 
   // Actions
   void tryClose();
-  void loadURL(const WebCore::KURL&);
+  void loadURL(const WebCore::String&);
   void stopLoading();
   void reload();
   void goForward();
