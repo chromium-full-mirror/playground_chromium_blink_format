@@ -52,7 +52,6 @@ struct SecurityOriginHash;
 
 #if !PLATFORM(CHROMIUM)
 class DatabaseTrackerClient;
-class OriginQuotaManager;
 
 struct SecurityOriginTraits;
 #endif  // !PLATFORM(CHROMIUM)
@@ -64,8 +63,8 @@ class DatabaseTracker : public Noncopyable {
   // the page's context thread simultaneously.  To keep this safe, it's
   // currently using 4 locks.  In order to avoid deadlock when taking multiple
   // locks, you must take them in the correct order:
-  // originQuotaManager() before m_databaseGuard or m_openDatabaseMapGuard
-  // m_databaseGuard before m_openDatabaseMapGuard
+  // m_databaseGuard before quotaManager if both locks are needed.
+  // no other lock is taken in the code locked on m_openDatabaseMapGuard.
   // notificationMutex() is currently independent of the other locks.
 
   bool canEstablishDatabase(ScriptExecutionContext*,
@@ -87,6 +86,7 @@ class DatabaseTracker : public Noncopyable {
                         HashSet<RefPtr<Database>>* databases);
 
   unsigned long long getMaxSizeForDatabase(const Database*);
+  void databaseChanged(Database*);
 
  private:
   DatabaseTracker();
@@ -123,12 +123,9 @@ class DatabaseTracker : public Noncopyable {
   // From a secondary thread, must be thread safe with its data
   void scheduleNotifyDatabaseChanged(SecurityOrigin*, const String& name);
 
-  OriginQuotaManager& originQuotaManager();
-
   bool hasEntryForOrigin(SecurityOrigin*);
 
  private:
-  OriginQuotaManager& originQuotaManagerNoLock();
   bool hasEntryForOriginNoLock(SecurityOrigin* origin);
   String fullPathForDatabaseNoLock(SecurityOrigin*,
                                    const String& name,
@@ -161,8 +158,6 @@ class DatabaseTracker : public Noncopyable {
                   SecurityOriginHash>
       QuotaMap;
   mutable OwnPtr<QuotaMap> m_quotaMap;
-
-  OwnPtr<OriginQuotaManager> m_quotaManager;
 
   String m_databaseDirectoryPath;
 

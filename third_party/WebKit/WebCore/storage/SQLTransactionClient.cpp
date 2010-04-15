@@ -39,7 +39,6 @@
 #include "DatabaseThread.h"
 #include "DatabaseTracker.h"
 #include "Document.h"
-#include "OriginQuotaManager.h"
 #include "Page.h"
 #include "SQLTransaction.h"
 
@@ -62,9 +61,7 @@ void SQLTransactionClient::didExecuteStatement(SQLTransaction* transaction) {
              ->scriptExecutionContext()
              ->databaseThread()
              ->getThreadID());
-  OriginQuotaManager& manager(DatabaseTracker::tracker().originQuotaManager());
-  Locker<OriginQuotaManager> locker(manager);
-  manager.markDatabase(transaction->database());
+  DatabaseTracker::tracker().databaseChanged(transaction->database());
 }
 
 bool SQLTransactionClient::didExceedQuota(SQLTransaction* transaction) {
