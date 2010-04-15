@@ -35,6 +35,7 @@
 #include "HTMLFrameElementBase.h"
 #include "HTMLNames.h"
 #include "JSAttr.h"
+#include "JSDOMBinding.h"
 #include "JSHTMLElementWrapperFactory.h"
 #include "JSNodeList.h"
 #include "NodeList.h"
@@ -61,21 +62,6 @@ void JSElement::markChildren(MarkStack& markStack) {
     markDOMObjectWrapper(
         markStack, globalData,
         static_cast<StyledElement*>(element)->inlineStyleDecl());
-}
-
-static inline bool allowSettingSrcToJavascriptURL(ExecState* exec,
-                                                  Element* element,
-                                                  const String& name,
-                                                  const String& value) {
-  if ((element->hasTagName(iframeTag) || element->hasTagName(frameTag)) &&
-      equalIgnoringCase(name, "src") &&
-      protocolIsJavaScript(deprecatedParseURL(value))) {
-    Document* contentDocument =
-        static_cast<HTMLFrameElementBase*>(element)->contentDocument();
-    if (contentDocument && !checkNodeSecurity(exec, contentDocument))
-      return false;
-  }
-  return true;
 }
 
 JSValue JSElement::setAttribute(ExecState* exec, const ArgList& args) {
