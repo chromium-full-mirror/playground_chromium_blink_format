@@ -49,7 +49,7 @@ void JSStyleSheetList::markChildren(MarkStack& markStack) {
 bool JSStyleSheetList::canGetItemsForName(ExecState*,
                                           StyleSheetList* styleSheetList,
                                           const Identifier& propertyName) {
-  return styleSheetList->getNamedItem(propertyName);
+  return styleSheetList->getNamedItem(identifierToString(propertyName));
 }
 
 JSValue JSStyleSheetList::nameGetter(ExecState* exec,
@@ -57,7 +57,8 @@ JSValue JSStyleSheetList::nameGetter(ExecState* exec,
                                      const Identifier& propertyName) {
   JSStyleSheetList* thisObj =
       static_cast<JSStyleSheetList*>(asObject(slotBase));
-  HTMLStyleElement* element = thisObj->impl()->getNamedItem(propertyName);
+  HTMLStyleElement* element =
+      thisObj->impl()->getNamedItem(identifierToString(propertyName));
   ASSERT(element);
   return toJS(exec, element->sheet());
 }

@@ -174,7 +174,7 @@ JSValue JSCSSStyleDeclaration::nameGetter(ExecState* exec,
   // IE 'filter' attribute.
   if (propertyName == "filter")
     return StringObjectThatMasqueradesAsUndefined::create(
-        exec, thisObj->impl()->getPropertyValue(prop));
+        exec, stringToUString(thisObj->impl()->getPropertyValue(prop)));
 
   return jsString(exec, thisObj->impl()->getPropertyValue(prop));
 }

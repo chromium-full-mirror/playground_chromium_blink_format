@@ -82,7 +82,8 @@ static JSObject* constructSharedWorker(ExecState* exec,
   DOMWindow* window = asJSDOMWindow(exec->lexicalGlobalObject())->impl();
   ExceptionCode ec = 0;
   RefPtr<SharedWorker> worker =
-      SharedWorker::create(scriptURL, name, window->document(), ec);
+      SharedWorker::create(ustringToString(scriptURL), ustringToString(name),
+                           window->document(), ec);
   setDOMException(exec, ec);
 
   return asObject(toJS(exec, jsConstructor->globalObject(), worker.release()));

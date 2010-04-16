@@ -29,6 +29,7 @@
 #ifndef StringSourceProvider_h
 #define StringSourceProvider_h
 
+#include "JSDOMBinding.h"
 #include "ScriptSourceProvider.h"
 #include <parser/SourceCode.h>
 
@@ -50,7 +51,7 @@ class StringSourceProvider : public ScriptSourceProvider {
 
  private:
   StringSourceProvider(const String& source, const String& url)
-      : ScriptSourceProvider(url), m_source(source) {}
+      : ScriptSourceProvider(stringToUString(url)), m_source(source) {}
 
   String m_source;
 };

@@ -130,7 +130,7 @@ void JSEventListener::handleEvent(
       reportCurrentException(exec);
     else {
       if (!retval.isUndefinedOrNull() && event->storesResultAsString())
-        event->storeResult(retval.toString(exec));
+        event->storeResult(ustringToString(retval.toString(exec)));
       if (m_isAttribute) {
         bool retvalbool;
         if (retval.getBoolean(retvalbool) && !retvalbool)

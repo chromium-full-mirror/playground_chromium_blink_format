@@ -182,9 +182,6 @@ class KURL {
   unsigned pathEnd() const;
   unsigned pathAfterLastSlash() const;
   operator const String&() const { return string(); }
-#if USE(JSC)
-  operator JSC::UString() const { return string(); }
-#endif
 
 #if PLATFORM(CF)
   KURL(CFURLRef);

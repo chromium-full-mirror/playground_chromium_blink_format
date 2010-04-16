@@ -89,7 +89,7 @@ static JSValue JSC_HOST_CALL callHTMLCollection(ExecState* exec,
   UString string = args.at(0).toString(exec);
   unsigned index = args.at(1).toString(exec).toUInt32(&ok, false);
   if (ok) {
-    String pstr = string;
+    String pstr = ustringToString(string);
     Node* node = collection->namedItem(pstr);
     while (node) {
       if (!index)

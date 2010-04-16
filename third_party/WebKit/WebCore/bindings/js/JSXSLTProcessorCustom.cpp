@@ -89,9 +89,9 @@ JSValue JSXSLTProcessor::transformToDocument(ExecState* exec,
 JSValue JSXSLTProcessor::setParameter(ExecState* exec, const ArgList& args) {
   if (args.at(1).isUndefinedOrNull() || args.at(2).isUndefinedOrNull())
     return jsUndefined();  // Throw exception?
-  String namespaceURI = args.at(0).toString(exec);
-  String localName = args.at(1).toString(exec);
-  String value = args.at(2).toString(exec);
+  String namespaceURI = ustringToString(args.at(0).toString(exec));
+  String localName = ustringToString(args.at(1).toString(exec));
+  String value = ustringToString(args.at(2).toString(exec));
   impl()->setParameter(namespaceURI, localName, value);
   return jsUndefined();
 }
@@ -99,8 +99,8 @@ JSValue JSXSLTProcessor::setParameter(ExecState* exec, const ArgList& args) {
 JSValue JSXSLTProcessor::getParameter(ExecState* exec, const ArgList& args) {
   if (args.at(1).isUndefinedOrNull())
     return jsUndefined();
-  String namespaceURI = args.at(0).toString(exec);
-  String localName = args.at(1).toString(exec);
+  String namespaceURI = ustringToString(args.at(0).toString(exec));
+  String localName = ustringToString(args.at(1).toString(exec));
   String value = impl()->getParameter(namespaceURI, localName);
   return jsStringOrUndefined(exec, value);
 }
@@ -108,8 +108,8 @@ JSValue JSXSLTProcessor::getParameter(ExecState* exec, const ArgList& args) {
 JSValue JSXSLTProcessor::removeParameter(ExecState* exec, const ArgList& args) {
   if (args.at(1).isUndefinedOrNull())
     return jsUndefined();
-  String namespaceURI = args.at(0).toString(exec);
-  String localName = args.at(1).toString(exec);
+  String namespaceURI = ustringToString(args.at(0).toString(exec));
+  String localName = ustringToString(args.at(1).toString(exec));
   impl()->removeParameter(namespaceURI, localName);
   return jsUndefined();
 }

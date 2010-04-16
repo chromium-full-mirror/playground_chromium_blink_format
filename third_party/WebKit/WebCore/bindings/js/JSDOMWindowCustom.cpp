@@ -164,7 +164,8 @@ static JSValue namedItemGetter(ExecState* exec,
   ASSERT(document);
   ASSERT(document->isHTMLDocument());
 
-  RefPtr<HTMLCollection> collection = document->windowNamedItems(propertyName);
+  RefPtr<HTMLCollection> collection =
+      document->windowNamedItems(identifierToString(propertyName));
   if (collection->length() == 1)
     return toJS(exec, collection->firstItem());
   return toJS(exec, collection.get());
@@ -581,7 +582,7 @@ void JSDOMWindow::setLocation(ExecState* exec, JSValue value) {
   Frame* frame = impl()->frame();
   ASSERT(frame);
 
-  KURL url = completeURL(exec, value.toString(exec));
+  KURL url = completeURL(exec, ustringToString(value.toString(exec)));
   if (url.isNull())
     return;
 
@@ -1089,10 +1090,11 @@ JSValue JSDOMWindow::openDatabase(ExecState* exec, const ArgList& args) {
     creationCallback =
         JSDatabaseCallback::create(asObject(args.at(4)), globalObject());
 
-  JSValue result =
-      toJS(exec, globalObject(), WTF::getPtr(impl()->openDatabase(
-                                     name, version, displayName, estimatedSize,
-                                     creationCallback.release(), ec)));
+  JSValue result = toJS(exec, globalObject(),
+                        WTF::getPtr(impl()->openDatabase(
+                            ustringToString(name), ustringToString(version),
+                            ustringToString(displayName), estimatedSize,
+                            creationCallback.release(), ec)));
   if (!ec && result.isNull())
     ec = SECURITY_ERR;
 

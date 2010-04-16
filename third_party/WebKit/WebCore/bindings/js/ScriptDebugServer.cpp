@@ -165,8 +165,8 @@ bool ScriptDebugServer::hasBreakpoint(intptr_t sourceID,
     return true;
 
   JSValue exception;
-  JSValue result =
-      m_currentCallFrame->evaluate(breakIt->second.condition, exception);
+  JSValue result = m_currentCallFrame->evaluate(
+      stringToUString(breakIt->second.condition), exception);
   if (exception) {
     // An erroneous condition counts as "false".
     return false;
@@ -238,9 +238,10 @@ ScriptState* ScriptDebugServer::currentCallFrameState() {
 
 void ScriptDebugServer::dispatchDidParseSource(const ListenerSet& listeners,
                                                const JSC::SourceCode& source) {
-  String sourceID = JSC::UString(JSC::UString::from(source.provider()->asID()));
-  String url = source.provider()->url();
-  String data = JSC::UString(source.data(), source.length());
+  String sourceID =
+      ustringToString(JSC::UString::from(source.provider()->asID()));
+  String url = ustringToString(source.provider()->url());
+  String data = ustringToString(JSC::UString(source.data(), source.length()));
   int firstLine = source.firstLine();
 
   Vector<ScriptDebugListener*> copy;
@@ -254,8 +255,8 @@ void ScriptDebugServer::dispatchFailedToParseSource(
     const SourceCode& source,
     int errorLine,
     const String& errorMessage) {
-  String url = source.provider()->url();
-  String data = JSC::UString(source.data(), source.length());
+  String url = ustringToString(source.provider()->url());
+  String data = ustringToString(JSC::UString(source.data(), source.length()));
   int firstLine = source.firstLine();
 
   Vector<ScriptDebugListener*> copy;
@@ -304,7 +305,8 @@ void ScriptDebugServer::sourceParsed(ExecState* exec,
 
   if (hasGlobalListeners()) {
     if (isError)
-      dispatchFailedToParseSource(m_listeners, source, errorLine, errorMessage);
+      dispatchFailedToParseSource(m_listeners, source, errorLine,
+                                  ustringToString(errorMessage));
     else
       dispatchDidParseSource(m_listeners, source);
   }
@@ -313,7 +315,7 @@ void ScriptDebugServer::sourceParsed(ExecState* exec,
     ASSERT(!pageListeners->isEmpty());
     if (isError)
       dispatchFailedToParseSource(*pageListeners, source, errorLine,
-                                  errorMessage);
+                                  ustringToString(errorMessage));
     else
       dispatchDidParseSource(*pageListeners, source);
   }

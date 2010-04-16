@@ -1395,10 +1395,14 @@ void InspectorController::addProfileFinishedMessageToConsole(
     const String& sourceURL) {
   RefPtr<ScriptProfile> profile = prpProfile;
 
+#if USE(JSC)
+  String title = ustringToString(profile->title());
+#else
+  String title = profile->title();
+#endif
   String message = String::format(
       "Profile \"webkit-profile://%s/%s#%d\" finished.", CPUProfileType,
-      encodeWithURLEscapeSequences(profile->title()).utf8().data(),
-      profile->uid());
+      encodeWithURLEscapeSequences(title).utf8().data(), profile->uid());
   addMessageToConsole(JSMessageSource, LogMessageType, LogMessageLevel, message,
                       lineNumber, sourceURL);
 }
@@ -1440,8 +1444,14 @@ void InspectorController::getProfile(long callId, unsigned uid) {
 
 ScriptObject InspectorController::createProfileHeader(
     const ScriptProfile& profile) {
+#if USE(JSC)
+  String title = ustringToString(profile.title());
+#else
+  String title = profile.title();
+#endif
+
   ScriptObject header = m_frontend->newScriptObject();
-  header.set("title", profile.title());
+  header.set("title", title);
   header.set("uid", profile.uid());
   header.set("typeId", String(CPUProfileType));
   return header;

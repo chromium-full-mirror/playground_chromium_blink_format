@@ -335,10 +335,13 @@ JSC::JSValue jsStringOrFalse(JSC::ExecState*,
 // unlikely to save memory.
 JSC::JSValue jsOwnedStringOrNull(JSC::ExecState*, const JSC::UString&);
 
-JSC::UString valueToStringWithNullCheck(
-    JSC::ExecState*,
-    JSC::JSValue);  // null if the value is null
-JSC::UString valueToStringWithUndefinedOrNullCheck(
+String identifierToString(const JSC::Identifier&);
+String ustringToString(const JSC::UString&);
+JSC::UString stringToUString(const String&);
+
+String valueToStringWithNullCheck(JSC::ExecState*,
+                                  JSC::JSValue);  // null if the value is null
+String valueToStringWithUndefinedOrNullCheck(
     JSC::ExecState*,
     JSC::JSValue);  // null if the value is null or undefined
 

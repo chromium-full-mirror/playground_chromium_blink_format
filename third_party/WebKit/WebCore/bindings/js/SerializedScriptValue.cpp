@@ -55,7 +55,7 @@ class SerializedObject : public SharedSerializedData {
   void set(const Identifier& propertyName,
            const SerializedScriptValueData& value) {
     ASSERT(m_names.size() == m_values.size());
-    m_names.append(String(propertyName.ustring()).crossThreadString().impl());
+    m_names.append(identifierToString(propertyName).crossThreadString().impl());
     m_values.append(value);
   }
 
@@ -510,7 +510,8 @@ struct SerializingTreeWalker : public BaseWalker {
       return SerializedScriptValueData(value);
 
     if (value.isString())
-      return SerializedScriptValueData(asString(value)->value(m_exec));
+      return SerializedScriptValueData(
+          ustringToString(asString(value)->value(m_exec)));
 
     if (value.isNumber())
       return SerializedScriptValueData(SerializedScriptValueData::NumberType,
@@ -734,7 +735,8 @@ struct DeserializingTreeWalker : public BaseWalker {
   void putProperty(JSObject* object,
                    const RefPtr<StringImpl> propertyName,
                    JSValue value) {
-    object->putDirect(Identifier(m_exec, String(propertyName)), value);
+    object->putDirect(Identifier(m_exec, stringToUString(String(propertyName))),
+                      value);
   }
 
   bool startArray(RefPtr<SerializedArray>, JSArray* outArray) {

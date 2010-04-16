@@ -57,7 +57,7 @@ PassOwnPtr<ScheduledAction> ScheduledAction::create(
     UString string = v.toString(exec);
     if (exec->hadException())
       return 0;
-    return new ScheduledAction(string, isolatedWorld);
+    return new ScheduledAction(ustringToString(string), isolatedWorld);
   }
   ArgList argsTail;
   args.getSlice(2, argsTail);

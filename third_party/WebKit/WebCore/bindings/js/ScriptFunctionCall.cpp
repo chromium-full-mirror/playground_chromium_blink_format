@@ -57,7 +57,7 @@ void ScriptFunctionCall::appendArgument(const ScriptObject& argument) {
 }
 
 void ScriptFunctionCall::appendArgument(const ScriptString& argument) {
-  m_arguments.append(jsString(m_exec, argument));
+  m_arguments.append(jsString(m_exec, argument.ustring()));
 }
 
 void ScriptFunctionCall::appendArgument(const ScriptValue& argument) {
@@ -118,7 +118,8 @@ ScriptValue ScriptFunctionCall::call(bool& hadException,
 
   JSLock lock(SilenceAssertionsOnly);
 
-  JSValue function = thisObject->get(m_exec, Identifier(m_exec, m_name));
+  JSValue function =
+      thisObject->get(m_exec, Identifier(m_exec, stringToUString(m_name)));
   if (m_exec->hadException()) {
     if (reportExceptions)
       reportException(m_exec, m_exec->exception());
@@ -156,8 +157,8 @@ ScriptObject ScriptFunctionCall::construct(bool& hadException,
 
   JSLock lock(SilenceAssertionsOnly);
 
-  JSObject* constructor =
-      asObject(thisObject->get(m_exec, Identifier(m_exec, m_name)));
+  JSObject* constructor = asObject(
+      thisObject->get(m_exec, Identifier(m_exec, stringToUString(m_name))));
   if (m_exec->hadException()) {
     if (reportExceptions)
       reportException(m_exec, m_exec->exception());
