@@ -159,6 +159,10 @@ void WebSettingsImpl::setUserStyleSheetLocation(const WebURL& location) {
   m_settings->setUserStyleSheetLocation(location);
 }
 
+void WebSettingsImpl::setAuthorAndUserStylesEnabled(bool enabled) {
+  m_settings->setAuthorAndUserStylesEnabled(enabled);
+}
+
 void WebSettingsImpl::setUsesPageCache(bool usesPageCache) {
   m_settings->setUsesPageCache(usesPageCache);
 }

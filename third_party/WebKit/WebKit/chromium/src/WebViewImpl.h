@@ -175,6 +175,7 @@ class WebViewImpl : public WebView, public RefCounted<WebViewImpl> {
                                   unsigned inactiveForegroundColor);
   virtual void performCustomContextMenuAction(unsigned action);
   virtual void addUserScript(const WebString& sourceCode, bool runAtStart);
+  virtual void addUserStyleSheet(const WebString& sourceCode);
   virtual void removeAllUserContent();
 
   // WebViewImpl

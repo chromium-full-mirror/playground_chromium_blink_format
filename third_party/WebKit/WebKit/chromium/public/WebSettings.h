@@ -72,6 +72,7 @@ class WebSettings {
   virtual void setJavaEnabled(bool) = 0;
   virtual void setAllowScriptsToCloseWindows(bool) = 0;
   virtual void setUserStyleSheetLocation(const WebURL&) = 0;
+  virtual void setAuthorAndUserStylesEnabled(bool) = 0;
   virtual void setUsesPageCache(bool) = 0;
   virtual void setDownloadableBinaryFontsEnabled(bool) = 0;
   virtual void setXSSAuditorEnabled(bool) = 0;
