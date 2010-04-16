@@ -51,6 +51,12 @@ void FileStream::start() {
   m_client->didStart();
 }
 
+void FileStream::stop() {
+  ASSERT(!isMainThread());
+  close();
+  m_client->didStop();
+}
+
 void FileStream::openForRead(Blob*) {
   ASSERT(!isMainThread());
   // FIXME: to be implemented.
