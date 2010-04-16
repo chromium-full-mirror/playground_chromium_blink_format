@@ -325,14 +325,7 @@ v8::Persistent<v8::Context> V8DOMWindowShell::createNewContext(
     // See http://code.google.com/p/chromium/issues/detail?id=10924
     if (extensions[i].scheme.length() > 0 &&
         (extensions[i].scheme !=
-             m_frame->loader()->activeDocumentLoader()->url().protocol() ||
-         extensions[i].scheme !=
-             m_frame->page()
-                 ->mainFrame()
-                 ->loader()
-                 ->activeDocumentLoader()
-                 ->url()
-                 .protocol()))
+         m_frame->loader()->activeDocumentLoader()->url().protocol()))
       continue;
 
     extensionNames[index++] = extensions[i].extension->name();
