@@ -35,7 +35,6 @@
 #define SOFT_LINK_LIBRARY_HELPER(lib, suffix)               \
   static HMODULE lib##Library() {                           \
     static HMODULE library = LoadLibraryW(L## #lib suffix); \
-    ASSERT(library);                                        \
     return library;                                         \
   }
 
