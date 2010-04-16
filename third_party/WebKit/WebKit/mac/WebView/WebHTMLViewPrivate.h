@@ -60,6 +60,9 @@
                   entireLine:(BOOL)line;
 @end
 
+extern const float _WebHTMLViewPrintingMinimumShrinkFactor;
+extern const float _WebHTMLViewPrintingMaximumShrinkFactor;
+
 @interface WebHTMLView (WebPrivate)
 
 + (NSArray*)supportedMIMETypes;
