@@ -1145,18 +1145,23 @@ DELEGATE_TO_IMPL_1(synthesizeGLError, unsigned long)
     return m_internal->name(a1, a2, a3, a4, a5, a6, a7, a8, a9);              \
   }
 
-GraphicsContext3D::GraphicsContext3D(GraphicsContext3D::Attributes attrs) {}
+GraphicsContext3D::GraphicsContext3D(GraphicsContext3D::Attributes attrs,
+                                     HostWindow* hostWindow) {
+  UNUSED_PARAM(hostWindow);
+}
 
 GraphicsContext3D::~GraphicsContext3D() {}
 
 PassOwnPtr<GraphicsContext3D> GraphicsContext3D::create(
-    GraphicsContext3D::Attributes attrs) {
+    GraphicsContext3D::Attributes attrs,
+    HostWindow* hostWindow) {
   GraphicsContext3DInternal* internal = new GraphicsContext3DInternal();
   if (!internal->initialize(attrs)) {
     delete internal;
     return 0;
   }
-  PassOwnPtr<GraphicsContext3D> result = new GraphicsContext3D(attrs);
+  PassOwnPtr<GraphicsContext3D> result =
+      new GraphicsContext3D(attrs, hostWindow);
   result->m_internal.set(internal);
   return result;
 }

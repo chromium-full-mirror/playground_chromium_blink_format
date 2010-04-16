@@ -81,12 +81,14 @@ static void setPixelFormat(Vector<CGLPixelFormatAttribute>& attribs,
 }
 
 PassOwnPtr<GraphicsContext3D> GraphicsContext3D::create(
-    GraphicsContext3D::Attributes attrs) {
-  OwnPtr<GraphicsContext3D> context(new GraphicsContext3D(attrs));
+    GraphicsContext3D::Attributes attrs,
+    HostWindow* hostWindow) {
+  OwnPtr<GraphicsContext3D> context(new GraphicsContext3D(attrs, hostWindow));
   return context->m_contextObj ? context.release() : 0;
 }
 
-GraphicsContext3D::GraphicsContext3D(GraphicsContext3D::Attributes attrs)
+GraphicsContext3D::GraphicsContext3D(GraphicsContext3D::Attributes attrs,
+                                     HostWindow* hostWindow)
     : m_currentWidth(0),
       m_currentHeight(0),
       m_attrs(attrs),
@@ -98,6 +100,8 @@ GraphicsContext3D::GraphicsContext3D(GraphicsContext3D::Attributes attrs)
       m_multisampleFBO(0),
       m_multisampleDepthStencilBuffer(0),
       m_multisampleColorBuffer(0) {
+  UNUSED_PARAM(hostWindow);
+
   Vector<CGLPixelFormatAttribute> attribs;
   CGLPixelFormatObj pixelFormatObj = 0;
   GLint numPixelFormats = 0;

@@ -74,6 +74,7 @@ class WebGLShader;
 class WebGLTexture;
 class Image;
 class ImageData;
+class HostWindow;
 
 struct ActiveInfo {
   String name;
@@ -409,7 +410,8 @@ class GraphicsContext3D : public Noncopyable {
     bool premultipliedAlpha;
   };
 
-  static PassOwnPtr<GraphicsContext3D> create(Attributes attrs);
+  static PassOwnPtr<GraphicsContext3D> create(Attributes attrs,
+                                              HostWindow* hostWindow);
   virtual ~GraphicsContext3D();
 
 #if PLATFORM(MAC)
@@ -781,7 +783,7 @@ class GraphicsContext3D : public Noncopyable {
   void synthesizeGLError(unsigned long error);
 
  private:
-  GraphicsContext3D(Attributes attrs);
+  GraphicsContext3D(Attributes attrs, HostWindow* hostWindow);
 
   // Helpers for texture uploading.
   void premultiplyAlpha(unsigned char* rgbaData, int numPixels);
