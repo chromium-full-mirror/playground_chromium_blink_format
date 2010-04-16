@@ -21,7 +21,7 @@
 #ifndef FormDataList_h
 #define FormDataList_h
 
-#include "File.h"
+#include "Blob.h"
 #include "TextEncoding.h"
 #include <wtf/text/CString.h>
 
@@ -43,23 +43,23 @@ class FormDataList {
     appendString(key);
     appendString(String::number(value));
   }
-  void appendFile(const String& key, PassRefPtr<File> file) {
+  void appendBlob(const String& key, PassRefPtr<Blob> blob) {
     appendString(key);
-    m_list.append(file);
+    m_list.append(blob);
   }
 
   class Item {
    public:
     Item() {}
     Item(const WTF::CString& data) : m_data(data) {}
-    Item(PassRefPtr<File> file) : m_file(file) {}
+    Item(PassRefPtr<Blob> blob) : m_blob(blob) {}
 
     const WTF::CString& data() const { return m_data; }
-    File* file() const { return m_file.get(); }
+    Blob* blob() const { return m_blob.get(); }
 
    private:
     WTF::CString m_data;
-    RefPtr<File> m_file;
+    RefPtr<Blob> m_blob;
   };
 
   const Vector<Item>& list() const { return m_list; }
