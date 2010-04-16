@@ -41,10 +41,6 @@ typedef const struct __CFString* CFStringRef;
 @class NSString;
 #endif
 
-namespace JSC {
-class UString;
-}
-
 namespace WebCore {
 
 class StringBuffer;
@@ -145,10 +141,9 @@ class StringImpl : public Noncopyable {
   static PassRefPtr<StringImpl> create(const UChar*, unsigned length);
   static PassRefPtr<StringImpl> create(const char*, unsigned length);
   static PassRefPtr<StringImpl> create(const char*);
-#if USE(JSC)
-  static PassRefPtr<StringImpl> create(const JSC::UString&);
-  JSC::UString ustring();
-#endif
+  static PassRefPtr<StringImpl> create(const UChar*,
+                                       unsigned length,
+                                       PassRefPtr<SharedUChar> sharedBuffer);
 
   static PassRefPtr<StringImpl> createUninitialized(unsigned length,
                                                     UChar*& data);
