@@ -45,10 +45,8 @@ static void* webThreadBody(void*) {
   // Initialization
   JSC::initializeThreading();
 
-  RunLoop runLoop;
-  WebProcess::shared().initialize(serverName, &runLoop);
-
-  runLoop.run();
+  WebProcess::shared().initialize(serverName, RunLoop::current());
+  RunLoop::run();
 
   return 0;
 }
@@ -58,7 +56,7 @@ ProcessInfo launchWebProcess(CoreIPC::Connection::Client* client,
   ProcessInfo info = {0, 0};
 
   info.connection = CoreIPC::Connection::createServerConnection(
-      serverName, client, RunLoop::mainRunLoop());
+      serverName, client, RunLoop::main());
   info.connection->open();
 
   switch (model) {

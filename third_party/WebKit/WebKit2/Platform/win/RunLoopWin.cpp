@@ -67,9 +67,6 @@ LRESULT RunLoop::wndProc(HWND hWnd,
 }
 
 void RunLoop::run() {
-  ASSERT(::GetCurrentThreadId() ==
-         ::GetWindowThreadProcessId(m_runLoopMessageWindow, 0));
-
   MSG message;
   while (BOOL result = ::GetMessage(&message, 0, 0, 0)) {
     if (result == -1)
