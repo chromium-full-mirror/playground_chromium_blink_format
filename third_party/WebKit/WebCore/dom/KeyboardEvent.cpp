@@ -157,7 +157,7 @@ int KeyboardEvent::charCode() const {
   // We match Firefox, unless in backward compatibility mode, where we always
   // return the character code.
   bool backwardCompatibilityMode = false;
-  if (view())
+  if (view() && view()->frame())
     backwardCompatibilityMode = view()
                                     ->frame()
                                     ->eventHandler()
