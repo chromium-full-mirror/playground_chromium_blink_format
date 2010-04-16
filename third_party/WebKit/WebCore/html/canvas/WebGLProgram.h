@@ -30,6 +30,7 @@
 
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
+#include <wtf/Vector.h>
 
 namespace WebCore {
 
@@ -39,10 +40,19 @@ class WebGLProgram : public CanvasObject {
 
   static PassRefPtr<WebGLProgram> create(WebGLRenderingContext*);
 
+  // cacheActiveAttribLocation() is only called once after linkProgram()
+  // succeeds.
+  bool cacheActiveAttribLocations();
+  int numActiveAttribLocations();
+  int getActiveAttribLocation(int index);
+
  protected:
   WebGLProgram(WebGLRenderingContext*);
 
   virtual void _deleteObject(Platform3DObject);
+
+ private:
+  Vector<int> m_activeAttribLocations;
 };
 
 }  // namespace WebCore
