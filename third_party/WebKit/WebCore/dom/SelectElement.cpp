@@ -292,14 +292,11 @@ void SelectElement::recalcListItems(SelectElementData& data,
     if (OptionElement* optionElement = toOptionElement(current)) {
       listItems.append(current);
 
-      if (updateSelectedStates) {
-        if (!foundSelected &&
-            (data.usesMenuList() ||
-             (!data.multiple() && optionElement->selected()))) {
+      if (updateSelectedStates && !data.multiple()) {
+        if (!foundSelected && (data.size() <= 1 || optionElement->selected())) {
           foundSelected = optionElement;
           foundSelected->setSelectedState(true);
-        } else if (foundSelected && !data.multiple() &&
-                   optionElement->selected()) {
+        } else if (foundSelected && optionElement->selected()) {
           foundSelected->setSelectedState(false);
           foundSelected = optionElement;
         }
@@ -541,7 +538,7 @@ void SelectElement::reset(SelectElementData& data, Element* element) {
       firstOption = optionElement;
   }
 
-  if (!selectedOption && firstOption && data.usesMenuList())
+  if (!selectedOption && firstOption && !data.multiple() && data.size() <= 1)
     firstOption->setSelectedState(true);
 
   setOptionsChangedOnRenderer(data, element);
