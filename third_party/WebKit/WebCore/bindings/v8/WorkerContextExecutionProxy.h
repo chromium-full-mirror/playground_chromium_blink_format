@@ -75,9 +75,6 @@ class WorkerContextExecutionProxy {
     return v8::Local<v8::Context>::New(m_context);
   }
 
-  // Returns WorkerContext object.
-  WorkerContext* workerContext() { return m_workerContext; }
-
  private:
   void initV8IfNeeded();
   bool initContextIfNeeded();
