@@ -44,7 +44,8 @@ static JSValue getNamedItems(ExecState* exec,
                              JSHTMLAllCollection* collection,
                              const Identifier& propertyName) {
   Vector<RefPtr<Node>> namedItems;
-  collection->impl()->namedItems(propertyName, namedItems);
+  collection->impl()->namedItems(identifierToAtomicString(propertyName),
+                                 namedItems);
 
   if (namedItems.isEmpty())
     return jsUndefined();
@@ -116,7 +117,7 @@ bool JSHTMLAllCollection::canGetItemsForName(ExecState*,
                                              HTMLAllCollection* collection,
                                              const Identifier& propertyName) {
   Vector<RefPtr<Node>> namedItems;
-  collection->namedItems(propertyName, namedItems);
+  collection->namedItems(identifierToAtomicString(propertyName), namedItems);
   return !namedItems.isEmpty();
 }
 

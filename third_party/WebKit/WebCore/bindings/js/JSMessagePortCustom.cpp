@@ -59,7 +59,7 @@ JSValue JSMessagePort::addEventListener(ExecState* exec, const ArgList& args) {
   if (!listener.isObject())
     return jsUndefined();
 
-  impl()->addEventListener(args.at(0).toString(exec),
+  impl()->addEventListener(ustringToAtomicString(args.at(0).toString(exec)),
                            JSEventListener::create(asObject(listener), this,
                                                    false, currentWorld(exec))
                                .get(),
@@ -73,7 +73,7 @@ JSValue JSMessagePort::removeEventListener(ExecState* exec,
   if (!listener.isObject())
     return jsUndefined();
 
-  impl()->removeEventListener(args.at(0).toString(exec),
+  impl()->removeEventListener(ustringToAtomicString(args.at(0).toString(exec)),
                               JSEventListener::create(asObject(listener), this,
                                                       false, currentWorld(exec))
                                   .get(),

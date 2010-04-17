@@ -339,6 +339,10 @@ String identifierToString(const JSC::Identifier&);
 String ustringToString(const JSC::UString&);
 JSC::UString stringToUString(const String&);
 
+AtomicString identifierToAtomicString(const JSC::Identifier&);
+AtomicString ustringToAtomicString(const JSC::UString&);
+AtomicStringImpl* findAtomicString(const JSC::Identifier&);
+
 String valueToStringWithNullCheck(JSC::ExecState*,
                                   JSC::JSValue);  // null if the value is null
 String valueToStringWithUndefinedOrNullCheck(

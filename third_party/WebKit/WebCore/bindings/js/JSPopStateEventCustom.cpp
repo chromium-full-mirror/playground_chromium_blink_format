@@ -42,8 +42,8 @@ JSValue JSPopStateEvent::initPopStateEvent(ExecState* exec,
       SerializedScriptValue::create(exec, args.at(3));
 
   PopStateEvent* event = static_cast<PopStateEvent*>(impl());
-  event->initPopStateEvent(typeArg, canBubbleArg, cancelableArg,
-                           stateObjectArg.release());
+  event->initPopStateEvent(ustringToAtomicString(typeArg), canBubbleArg,
+                           cancelableArg, stateObjectArg.release());
   return jsUndefined();
 }
 

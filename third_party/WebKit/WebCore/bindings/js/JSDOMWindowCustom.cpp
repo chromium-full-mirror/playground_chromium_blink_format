@@ -141,7 +141,7 @@ static JSValue childFrameGetter(ExecState* exec,
                         ->impl()
                         ->frame()
                         ->tree()
-                        ->child(AtomicString(propertyName))
+                        ->child(identifierToAtomicString(propertyName))
                         ->domWindow());
 }
 
@@ -291,7 +291,7 @@ bool JSDOMWindow::getOwnPropertySlot(ExecState* exec,
   // naming frames things that conflict with window properties that
   // are in Moz but not IE. Since we have some of these, we have to do
   // it the Moz way.
-  if (impl()->frame()->tree()->child(propertyName)) {
+  if (impl()->frame()->tree()->child(identifierToAtomicString(propertyName))) {
     slot.setCustom(this, childFrameGetter);
     return true;
   }
@@ -330,7 +330,7 @@ bool JSDOMWindow::getOwnPropertySlot(ExecState* exec,
   // Allow shortcuts like 'Image1' instead of document.images.Image1
   Document* document = impl()->frame()->document();
   if (document->isHTMLDocument()) {
-    AtomicStringImpl* atomicPropertyName = AtomicString::find(propertyName);
+    AtomicStringImpl* atomicPropertyName = findAtomicString(propertyName);
     if (atomicPropertyName &&
         (static_cast<HTMLDocument*>(document)->hasNamedItem(
              atomicPropertyName) ||
@@ -395,7 +395,7 @@ bool JSDOMWindow::getOwnPropertyDescriptor(ExecState* exec,
   // naming frames things that conflict with window properties that
   // are in Moz but not IE. Since we have some of these, we have to do
   // it the Moz way.
-  if (impl()->frame()->tree()->child(propertyName)) {
+  if (impl()->frame()->tree()->child(identifierToAtomicString(propertyName))) {
     PropertySlot slot;
     slot.setCustom(this, childFrameGetter);
     descriptor.setDescriptor(slot.getValue(exec, propertyName),
@@ -416,7 +416,7 @@ bool JSDOMWindow::getOwnPropertyDescriptor(ExecState* exec,
   // Allow shortcuts like 'Image1' instead of document.images.Image1
   Document* document = impl()->frame()->document();
   if (document->isHTMLDocument()) {
-    AtomicStringImpl* atomicPropertyName = AtomicString::find(propertyName);
+    AtomicStringImpl* atomicPropertyName = findAtomicString(propertyName);
     if (atomicPropertyName &&
         (static_cast<HTMLDocument*>(document)->hasNamedItem(
              atomicPropertyName) ||
@@ -801,9 +801,10 @@ static bool domWindowAllowPopUp(Frame* activeFrame, ExecState* exec) {
 
 JSValue JSDOMWindow::open(ExecState* exec, const ArgList& args) {
   String urlString = valueToStringWithUndefinedOrNullCheck(exec, args.at(0));
-  AtomicString frameName = args.at(1).isUndefinedOrNull()
-                               ? "_blank"
-                               : AtomicString(args.at(1).toString(exec));
+  AtomicString frameName =
+      args.at(1).isUndefinedOrNull()
+          ? "_blank"
+          : ustringToAtomicString(args.at(1).toString(exec));
   WindowFeatures windowFeatures(
       valueToStringWithUndefinedOrNullCheck(exec, args.at(2)));
 
@@ -1052,7 +1053,7 @@ JSValue JSDOMWindow::addEventListener(ExecState* exec, const ArgList& args) {
   if (!listener.isObject())
     return jsUndefined();
 
-  impl()->addEventListener(args.at(0).toString(exec),
+  impl()->addEventListener(ustringToAtomicString(args.at(0).toString(exec)),
                            JSEventListener::create(asObject(listener), this,
                                                    false, currentWorld(exec)),
                            args.at(2).toBoolean(exec));
@@ -1068,7 +1069,7 @@ JSValue JSDOMWindow::removeEventListener(ExecState* exec, const ArgList& args) {
   if (!listener.isObject())
     return jsUndefined();
 
-  impl()->removeEventListener(args.at(0).toString(exec),
+  impl()->removeEventListener(ustringToAtomicString(args.at(0).toString(exec)),
                               JSEventListener::create(asObject(listener), this,
                                                       false, currentWorld(exec))
                                   .get(),

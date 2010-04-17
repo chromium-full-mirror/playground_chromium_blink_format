@@ -41,7 +41,7 @@ bool JSHTMLFormElement::canGetItemsForName(ExecState*,
                                            HTMLFormElement* form,
                                            const Identifier& propertyName) {
   Vector<RefPtr<Node>> namedItems;
-  form->getNamedElements(propertyName, namedItems);
+  form->getNamedElements(identifierToAtomicString(propertyName), namedItems);
   return namedItems.size();
 }
 
@@ -52,7 +52,7 @@ JSValue JSHTMLFormElement::nameGetter(ExecState* exec,
   HTMLFormElement* form = static_cast<HTMLFormElement*>(jsForm->impl());
 
   Vector<RefPtr<Node>> namedItems;
-  form->getNamedElements(propertyName, namedItems);
+  form->getNamedElements(identifierToAtomicString(propertyName), namedItems);
 
   if (namedItems.isEmpty())
     return jsUndefined();

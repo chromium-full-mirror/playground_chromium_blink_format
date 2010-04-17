@@ -546,6 +546,30 @@ String identifierToString(const Identifier& i) {
   return ustringToString(i.ustring());
 }
 
+AtomicString ustringToAtomicString(const UString& u) {
+  UStringImpl* impl = u.rep();
+  if (!impl)
+    return AtomicString();
+  return AtomicString(impl->characters(), impl->length(), impl->hash());
+}
+
+AtomicString identifierToAtomicString(const Identifier& identifier) {
+  if (identifier.isNull())
+    return AtomicString();
+  UStringImpl* impl = identifier.ustring().rep();
+  ASSERT(impl->existingHash());
+  return AtomicString(impl->characters(), impl->length(), impl->existingHash());
+}
+
+AtomicStringImpl* findAtomicString(const Identifier& identifier) {
+  if (identifier.isNull())
+    return 0;
+  UStringImpl* impl = identifier.ustring().rep();
+  ASSERT(impl->existingHash());
+  return AtomicString::find(impl->characters(), impl->length(),
+                            impl->existingHash());
+}
+
 String valueToStringWithNullCheck(ExecState* exec, JSValue value) {
   if (value.isNull())
     return String();

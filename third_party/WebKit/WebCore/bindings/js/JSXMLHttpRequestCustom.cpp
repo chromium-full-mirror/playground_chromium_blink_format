@@ -96,7 +96,7 @@ JSValue JSXMLHttpRequest::setRequestHeader(ExecState* exec,
     return throwError(exec, SyntaxError, "Not enough arguments");
 
   ExceptionCode ec = 0;
-  impl()->setRequestHeader(args.at(0).toString(exec),
+  impl()->setRequestHeader(ustringToAtomicString(args.at(0).toString(exec)),
                            ustringToString(args.at(1).toString(exec)), ec);
   setDOMException(exec, ec);
   return jsUndefined();
@@ -140,7 +140,8 @@ JSValue JSXMLHttpRequest::getResponseHeader(ExecState* exec,
 
   ExceptionCode ec = 0;
   JSValue header = jsStringOrNull(
-      exec, impl()->getResponseHeader(args.at(0).toString(exec), ec));
+      exec, impl()->getResponseHeader(
+                ustringToAtomicString(args.at(0).toString(exec)), ec));
   setDOMException(exec, ec);
   return header;
 }
@@ -160,7 +161,7 @@ JSValue JSXMLHttpRequest::addEventListener(ExecState* exec,
   if (!listener.isObject())
     return jsUndefined();
 
-  impl()->addEventListener(args.at(0).toString(exec),
+  impl()->addEventListener(ustringToAtomicString(args.at(0).toString(exec)),
                            JSEventListener::create(asObject(listener), this,
                                                    false, currentWorld(exec)),
                            args.at(2).toBoolean(exec));
@@ -173,7 +174,7 @@ JSValue JSXMLHttpRequest::removeEventListener(ExecState* exec,
   if (!listener.isObject())
     return jsUndefined();
 
-  impl()->removeEventListener(args.at(0).toString(exec),
+  impl()->removeEventListener(ustringToAtomicString(args.at(0).toString(exec)),
                               JSEventListener::create(asObject(listener), this,
                                                       false, currentWorld(exec))
                                   .get(),
