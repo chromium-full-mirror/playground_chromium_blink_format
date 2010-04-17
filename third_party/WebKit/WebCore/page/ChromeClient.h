@@ -56,6 +56,7 @@ class String;
 class Widget;
 
 struct FrameLoadRequest;
+struct ViewportArguments;
 struct WindowFeatures;
 
 #if USE(ACCELERATED_COMPOSITING)
@@ -163,6 +164,9 @@ class ChromeClient {
                                        unsigned modifierFlags) = 0;
 
   virtual void setToolTip(const String&, TextDirection) = 0;
+
+  virtual void didReceiveViewportArguments(Frame*,
+                                           const ViewportArguments&) const {}
 
   virtual void print(Frame*) = 0;
 

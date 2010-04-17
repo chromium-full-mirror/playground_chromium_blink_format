@@ -782,6 +782,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
    * attribute)
    */
   void processHttpEquiv(const String& equiv, const String& content);
+  void processViewport(const String& features);
 
   // Returns the owning element in the parent document.
   // Returns 0 if this is the top level document.
@@ -1115,6 +1116,12 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   void clearXMLVersion() { m_xmlVersion = String(); }
 
  private:
+  typedef void (*ArgumentsCallback)(const String& keyString,
+                                    const String& valueString,
+                                    Document*,
+                                    void* data);
+  void processArguments(const String& features, void* data, ArgumentsCallback);
+
   virtual bool isDocument() const { return true; }
   virtual void removedLastRef();
   virtual void determineParseMode() {}
