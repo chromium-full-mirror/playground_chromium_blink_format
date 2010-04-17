@@ -103,7 +103,7 @@ void WebDatabase::closeDatabaseImmediately(const WebString& originIdentifier,
                                            const WebString& databaseName) {
   HashSet<RefPtr<Database>> databaseHandles;
   PassRefPtr<SecurityOrigin> originPrp(
-      *WebSecurityOrigin::createFromDatabaseIdentifier(originIdentifier));
+      WebSecurityOrigin::createFromDatabaseIdentifier(originIdentifier));
   RefPtr<SecurityOrigin> origin = originPrp;
   DatabaseTracker::tracker().getOpenDatabases(origin.get(), databaseName,
                                               &databaseHandles);
