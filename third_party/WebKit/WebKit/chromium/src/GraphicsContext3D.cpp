@@ -57,7 +57,6 @@
 
 #include <stdio.h>
 #include <wtf/FastMalloc.h>
-#include <wtf/UnusedParam.h>
 #include <wtf/text/CString.h>
 
 #if PLATFORM(CG)
@@ -1147,10 +1146,8 @@ DELEGATE_TO_IMPL_1(synthesizeGLError, unsigned long)
     return m_internal->name(a1, a2, a3, a4, a5, a6, a7, a8, a9);              \
   }
 
-GraphicsContext3D::GraphicsContext3D(GraphicsContext3D::Attributes attrs,
-                                     HostWindow* hostWindow) {
-  UNUSED_PARAM(hostWindow);
-}
+GraphicsContext3D::GraphicsContext3D(GraphicsContext3D::Attributes,
+                                     HostWindow*) {}
 
 GraphicsContext3D::~GraphicsContext3D() {}
 
