@@ -49,6 +49,7 @@ class WebApplicationCacheHost;
 class WebApplicationCacheHostClient;
 class WebClipboard;
 class WebCookieJar;
+class WebGLES2Context;
 class WebGraphicsContext3D;
 class WebIndexedDatabase;
 class WebMessagePortChannel;
@@ -296,6 +297,12 @@ class WebKitClient {
   // May return null if WebGL is not supported.
   // Returns newly allocated WebGraphicsContext3D instance.
   virtual WebGraphicsContext3D* createGraphicsContext3D() { return 0; }
+
+  // GLES2  --------------------------------------------------------------
+
+  // Returns newly allocated WebGLES2Context instance.
+  // May return null if it fails to create the context.
+  virtual WebGLES2Context* createGLES2Context() { return 0; }
 
  protected:
   ~WebKitClient() {}
