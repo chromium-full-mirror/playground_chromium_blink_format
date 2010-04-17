@@ -28,10 +28,10 @@
 
 #if ENABLE(JAVASCRIPT_DEBUGGER) && USE(JSC)
 
+#include <debugger/DebuggerCallFrame.h>
 #include <interpreter/CallFrame.h>
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
-#include <debugger/DebuggerCallFrame.h>
 
 namespace WebCore {
 
