@@ -1024,7 +1024,8 @@ class AnimationQtBase : public QAbstractAnimation {
                       Animation::AnimationDirectionAlternate),
         m_webkitPropertyID(values.property()),
         m_webkitAnimation(anim),
-        m_keyframesName(name) {}
+        m_keyframesName(name),
+        m_fillsForwards(false) {}
 
   virtual void updateState(QAbstractAnimation::State newState,
                            QAbstractAnimation::State oldState) {
@@ -1048,6 +1049,7 @@ class AnimationQtBase : public QAbstractAnimation {
   // by WebCore)
   const Animation* m_webkitAnimation;
   QString m_keyframesName;
+  bool m_fillsForwards;
 };
 
 // we'd rather have a templatized QAbstractAnimation than QPropertyAnimation /
@@ -1141,10 +1143,10 @@ class TransformAnimationQt : public AnimationQt<TransformOperations> {
       : AnimationQt<TransformOperations>(layer, values, boxSize, anim, name) {}
 
   ~TransformAnimationQt() {
-    // this came up during the compositing/animation LayoutTests
-    // when the animation dies, the transform has to go back to default
-    if (m_layer)
-      m_layer.data()->updateTransform();
+    if (m_fillsForwards)
+      setCurrentTime(1);
+    else
+      m_layer.data()->setBaseTransform(m_layer.data()->m_layer->transform());
   }
 
   // the idea is that we let WebCore manage the transform-operations
@@ -1193,6 +1195,8 @@ class TransformAnimationQt : public AnimationQt<TransformOperations> {
       }
     }
     m_layer.data()->setBaseTransform(transformMatrix);
+    if (m_fillsForwards)
+      m_layer.data()->m_layer->setTransform(m_layer.data()->m_baseTransform);
   }
 
   virtual void updateState(QAbstractAnimation::State newState,
@@ -1225,6 +1229,12 @@ class OpacityAnimationQt : public AnimationQt<qreal> {
                      const QString& name)
       : AnimationQt<qreal>(layer, values, boxSize, anim, name) {}
 
+  ~OpacityAnimationQt() {
+    if (m_fillsForwards)
+      setCurrentTime(1);
+    else
+      m_layer.data()->setOpacity(m_layer.data()->m_layer->opacity());
+  }
   virtual void applyFrame(const qreal& fromValue,
                           const qreal& toValue,
                           qreal progress) {
@@ -1237,6 +1247,8 @@ class OpacityAnimationQt : public AnimationQt<qreal> {
       m_layer.data()->scene()->update();
 
     m_layer.data()->setOpacity(opacity);
+    if (m_fillsForwards)
+      m_layer.data()->m_layer->setOpacity(opacity);
   }
 
   virtual void updateState(QAbstractAnimation::State newState,
@@ -1257,7 +1269,7 @@ bool GraphicsLayerQt::addAnimation(const KeyframeValueList& values,
   if (!anim->duration() || !anim->iterationCount())
     return false;
 
-  QAbstractAnimation* newAnim = 0;
+  AnimationQtBase* newAnim = 0;
 
   // fixed: we might already have the Qt animation object associated with this
   // WebCore::Animation object
@@ -1287,6 +1299,7 @@ bool GraphicsLayerQt::addAnimation(const KeyframeValueList& values,
 
     // we make sure WebCore::Animation and QAnimation are on the same terms
     newAnim->setLoopCount(anim->iterationCount());
+    newAnim->m_fillsForwards = anim->fillsForwards();
     m_impl->m_animations.append(QWeakPointer<QAbstractAnimation>(newAnim));
     QObject::connect(&m_impl->m_suspendTimer, SIGNAL(timeout()), newAnim,
                      SLOT(resume()));
@@ -1294,6 +1307,11 @@ bool GraphicsLayerQt::addAnimation(const KeyframeValueList& values,
 
   // flush now or flicker...
   m_impl->flushChanges(false);
+
+  // when fill-mode is backwards/both, we set the value to 0 before the delay
+  // takes place
+  if (anim->fillsBackwards())
+    newAnim->setCurrentTime(0);
 
   if (anim->delay())
     QTimer::singleShot(anim->delay() * 1000, newAnim, SLOT(start()));
