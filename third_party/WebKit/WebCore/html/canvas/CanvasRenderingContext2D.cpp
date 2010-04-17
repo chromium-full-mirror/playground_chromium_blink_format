@@ -1005,6 +1005,19 @@ void CanvasRenderingContext2D::drawImage(HTMLImageElement* image,
 }
 
 void CanvasRenderingContext2D::drawImage(HTMLImageElement* image,
+                                         float sx,
+                                         float sy,
+                                         float sw,
+                                         float sh,
+                                         float dx,
+                                         float dy,
+                                         float dw,
+                                         float dh,
+                                         ExceptionCode& ec) {
+  drawImage(image, FloatRect(sx, sy, sw, sh), FloatRect(dx, dy, dw, dh), ec);
+}
+
+void CanvasRenderingContext2D::drawImage(HTMLImageElement* image,
                                          const FloatRect& srcRect,
                                          const FloatRect& dstRect,
                                          ExceptionCode& ec) {
@@ -1063,6 +1076,19 @@ void CanvasRenderingContext2D::drawImage(HTMLCanvasElement* canvas,
   ASSERT(canvas);
   drawImage(canvas, FloatRect(0, 0, canvas->width(), canvas->height()),
             FloatRect(x, y, width, height), ec);
+}
+
+void CanvasRenderingContext2D::drawImage(HTMLCanvasElement* canvas,
+                                         float sx,
+                                         float sy,
+                                         float sw,
+                                         float sh,
+                                         float dx,
+                                         float dy,
+                                         float dw,
+                                         float dh,
+                                         ExceptionCode& ec) {
+  drawImage(canvas, FloatRect(sx, sy, sw, sh), FloatRect(dx, dy, dw, dh), ec);
 }
 
 void CanvasRenderingContext2D::drawImage(HTMLCanvasElement* sourceCanvas,
@@ -1129,6 +1155,19 @@ void CanvasRenderingContext2D::drawImage(HTMLVideoElement* video,
   IntSize s = size(video);
   drawImage(video, FloatRect(0, 0, s.width(), s.height()),
             FloatRect(x, y, width, height), ec);
+}
+
+void CanvasRenderingContext2D::drawImage(HTMLVideoElement* video,
+                                         float sx,
+                                         float sy,
+                                         float sw,
+                                         float sh,
+                                         float dx,
+                                         float dy,
+                                         float dw,
+                                         float dh,
+                                         ExceptionCode& ec) {
+  drawImage(video, FloatRect(sx, sy, sw, sh), FloatRect(dx, dy, dw, dh), ec);
 }
 
 void CanvasRenderingContext2D::drawImage(HTMLVideoElement* video,

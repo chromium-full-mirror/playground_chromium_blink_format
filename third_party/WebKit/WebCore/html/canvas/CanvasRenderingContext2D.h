@@ -211,6 +211,16 @@ class CanvasRenderingContext2D : public CanvasRenderingContext {
                  float height,
                  ExceptionCode&);
   void drawImage(HTMLImageElement*,
+                 float sx,
+                 float sy,
+                 float sw,
+                 float sh,
+                 float dx,
+                 float dy,
+                 float dw,
+                 float dh,
+                 ExceptionCode&);
+  void drawImage(HTMLImageElement*,
                  const FloatRect& srcRect,
                  const FloatRect& dstRect,
                  ExceptionCode&);
@@ -220,6 +230,16 @@ class CanvasRenderingContext2D : public CanvasRenderingContext {
                  float y,
                  float width,
                  float height,
+                 ExceptionCode&);
+  void drawImage(HTMLCanvasElement*,
+                 float sx,
+                 float sy,
+                 float sw,
+                 float sh,
+                 float dx,
+                 float dy,
+                 float dw,
+                 float dh,
                  ExceptionCode&);
   void drawImage(HTMLCanvasElement*,
                  const FloatRect& srcRect,
@@ -232,6 +252,16 @@ class CanvasRenderingContext2D : public CanvasRenderingContext {
                  float y,
                  float width,
                  float height,
+                 ExceptionCode&);
+  void drawImage(HTMLVideoElement*,
+                 float sx,
+                 float sy,
+                 float sw,
+                 float sh,
+                 float dx,
+                 float dy,
+                 float dw,
+                 float dh,
                  ExceptionCode&);
   void drawImage(HTMLVideoElement*,
                  const FloatRect& srcRect,
