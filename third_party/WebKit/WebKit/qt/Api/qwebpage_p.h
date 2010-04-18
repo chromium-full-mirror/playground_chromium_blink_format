@@ -168,6 +168,8 @@ class QWebPagePrivate {
   QNetworkAccessManager* networkManager;
 
   bool forwardUnsupportedContent;
+  bool smartInsertDeleteEnabled;
+  bool selectTrailingWhitespaceEnabled;
   QWebPage::LinkDelegationPolicy linkPolicy;
 
   QSize viewportSize;

@@ -354,3 +354,34 @@ void DumpRenderTreeSupportQt::setMediaType(QWebFrame* frame,
   coreFrame->document()->updateStyleSelector();
   view->forceLayout();
 }
+
+void DumpRenderTreeSupportQt::setSmartInsertDeleteEnabled(QWebPage* page,
+                                                          bool enabled) {
+  page->d->smartInsertDeleteEnabled = enabled;
+}
+
+void DumpRenderTreeSupportQt::setSelectTrailingWhitespaceEnabled(QWebPage* page,
+                                                                 bool enabled) {
+  page->d->selectTrailingWhitespaceEnabled = enabled;
+}
+
+void DumpRenderTreeSupportQt::executeCoreCommandByName(QWebPage* page,
+                                                       const QString& name,
+                                                       const QString& value) {
+  page->handle()
+      ->page->focusController()
+      ->focusedOrMainFrame()
+      ->editor()
+      ->command(name)
+      .execute(value);
+}
+
+bool DumpRenderTreeSupportQt::isCommandEnabled(QWebPage* page,
+                                               const QString& name) {
+  return page->handle()
+      ->page->focusController()
+      ->focusedOrMainFrame()
+      ->editor()
+      ->command(name)
+      .isEnabled();
+}

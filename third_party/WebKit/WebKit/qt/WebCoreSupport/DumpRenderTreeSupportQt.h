@@ -37,6 +37,8 @@ class QWEBKIT_EXPORT DumpRenderTreeSupportQt {
                                        const QString& name,
                                        const QString& value);
   static bool isCommandEnabled(QWebPage* page, const QString& name);
+  static void setSmartInsertDeleteEnabled(QWebPage* page, bool enabled);
+  static void setSelectTrailingWhitespaceEnabled(QWebPage* page, bool enabled);
 
   static bool pauseAnimation(QWebFrame*,
                              const QString& name,

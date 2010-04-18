@@ -48,6 +48,7 @@ class EditorClientQt : public EditorClient {
   virtual bool shouldDeleteRange(Range*);
   virtual bool shouldShowDeleteInterface(HTMLElement*);
   virtual bool smartInsertDeleteEnabled();
+  virtual void toggleSmartInsertDelete();
   virtual bool isSelectTrailingWhitespaceEnabled();
   virtual bool isContinuousSpellCheckingEnabled();
   virtual void toggleContinuousSpellChecking();
