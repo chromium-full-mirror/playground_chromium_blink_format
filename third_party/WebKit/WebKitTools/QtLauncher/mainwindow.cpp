@@ -69,6 +69,8 @@ void MainWindow::buildUI() {
 
   connect(page()->mainFrame(), SIGNAL(titleChanged(const QString&)), this,
           SLOT(setWindowTitle(const QString&)));
+  connect(page()->mainFrame(), SIGNAL(urlChanged(QUrl)), this,
+          SLOT(setAddressUrl(QUrl)));
   connect(page(), SIGNAL(loadProgress(int)), urlEdit, SLOT(setProgress(int)));
   connect(page(), SIGNAL(windowCloseRequested()), this, SLOT(close()));
 
@@ -96,6 +98,10 @@ void MainWindow::buildUI() {
 
 WebPage* MainWindow::page() {
   return m_page;
+}
+
+void MainWindow::setAddressUrl(const QUrl& url) {
+  urlEdit->setText(url.toString(QUrl::RemoveUserInfo));
 }
 
 void MainWindow::setAddressUrl(const QString& url) {
