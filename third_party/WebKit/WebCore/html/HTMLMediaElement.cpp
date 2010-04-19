@@ -166,8 +166,8 @@ void HTMLMediaElement::attributeChanged(Attribute* attr, bool preserveDecls) {
 
   const QualifiedName& attrName = attr->name();
   if (attrName == srcAttr) {
-    // don't have a src or any <source> children, trigger load
-    if (inDocument() && m_loadState == WaitingForSource)
+    // Trigger a reload, as long as the 'src' attribute is present.
+    if (!getAttribute(srcAttr).isEmpty())
       scheduleLoad();
   }
 #if !ENABLE(PLUGIN_PROXY_FOR_VIDEO)
@@ -477,34 +477,14 @@ void HTMLMediaElement::prepareForLoad() {
   m_sentStalledEvent = false;
   m_haveFiredLoadedData = false;
 
-  // 2 - Abort any already-running instance of the resource selection algorithm
+  // 1 - Abort any already-running instance of the resource selection algorithm
   // for this element.
   m_currentSourceNode = 0;
 
-  // 3 - If there are any tasks from the media element's media element event
+  // 2 - If there are any tasks from the media element's media element event
   // task source in
   // one of the task queues, then remove those tasks.
   cancelPendingEventsAndCallbacks();
-}
-
-void HTMLMediaElement::loadInternal() {
-  // If we can't start a load right away, start it later.
-  Page* page = document()->page();
-  if (page && !page->canStartMedia()) {
-    if (m_isWaitingUntilMediaCanStart)
-      return;
-    page->addMediaCanStartListener(this);
-    m_isWaitingUntilMediaCanStart = true;
-    return;
-  }
-
-  // If the load() method for this element is already being invoked, then abort
-  // these steps.
-  if (m_processingLoad)
-    return;
-  m_processingLoad = true;
-
-  // Steps 1 and 2 were done in prepareForLoad()
 
   // 3 - If the media element's networkState is set to NETWORK_LOADING or
   // NETWORK_IDLE, queue
@@ -512,17 +492,19 @@ void HTMLMediaElement::loadInternal() {
   if (m_networkState == NETWORK_LOADING || m_networkState == NETWORK_IDLE)
     scheduleEvent(eventNames().abortEvent);
 
-  // 4
+#if !ENABLE(PLUGIN_PROXY_FOR_VIDEO)
+  m_player = MediaPlayer::create(this);
+#else
+  createMediaPlayerProxy();
+#endif
+
+  // 4 - If the media element's networkState is not set to NETWORK_EMPTY, then
+  // run these substeps
   if (m_networkState != NETWORK_EMPTY) {
     m_networkState = NETWORK_EMPTY;
     m_readyState = HAVE_NOTHING;
     m_paused = true;
     m_seeking = false;
-    if (m_player) {
-      m_player->pause();
-      m_playing = false;
-      m_player->seek(0);
-    }
     scheduleEvent(eventNames().emptiedEvent);
   }
 
@@ -537,6 +519,20 @@ void HTMLMediaElement::loadInternal() {
   m_playedTimeRanges = TimeRanges::create();
   m_lastSeekTime = 0;
   m_closedCaptionsVisible = false;
+}
+
+void HTMLMediaElement::loadInternal() {
+  // If we can't start a load right away, start it later.
+  Page* page = document()->page();
+  if (page && !page->canStartMedia()) {
+    if (m_isWaitingUntilMediaCanStart)
+      return;
+    page->addMediaCanStartListener(this);
+    m_isWaitingUntilMediaCanStart = true;
+    return;
+  }
+
+  // Steps 1 - 6 were done in prepareForLoad
 
   // 7 - Invoke the media element's resource selection algorithm.
   selectMediaResource();
@@ -629,12 +625,6 @@ void HTMLMediaElement::loadResource(const KURL& initialURL,
 
   if (m_sendProgressEvents)
     startProgressEventTimer();
-
-#if !ENABLE(PLUGIN_PROXY_FOR_VIDEO)
-  m_player = MediaPlayer::create(this);
-#else
-  createMediaPlayerProxy();
-#endif
 
   if (!autoplay())
     m_player->setPreload(m_preload);
