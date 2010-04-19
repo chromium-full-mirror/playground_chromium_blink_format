@@ -109,8 +109,8 @@ class UStringOrRopeImpl : public Noncopyable {
 };
 
 class UStringImpl : public UStringOrRopeImpl {
-  friend class CStringTranslator;
-  friend class UCharBufferTranslator;
+  friend struct CStringTranslator;
+  friend struct UCharBufferTranslator;
   friend class JIT;
   friend class SmallStringsStorage;
   friend class UStringOrRopeImpl;
