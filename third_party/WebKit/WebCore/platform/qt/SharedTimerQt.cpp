@@ -39,6 +39,8 @@
 namespace WebCore {
 
 class SharedTimerQt : public QObject {
+  Q_OBJECT
+
   friend void setSharedTimerFiredFunction(void (*f)());
 
  public:
@@ -50,25 +52,34 @@ class SharedTimerQt : public QObject {
  protected:
   void timerEvent(QTimerEvent* ev);
 
+ private slots:
+  void destroy();
+
  private:
-  SharedTimerQt(QObject* parent);
+  SharedTimerQt();
   ~SharedTimerQt();
   QBasicTimer m_timer;
   void (*m_timerFunction)();
 };
 
-SharedTimerQt::SharedTimerQt(QObject* parent)
-    : QObject(parent), m_timerFunction(0) {}
+SharedTimerQt::SharedTimerQt() : QObject(), m_timerFunction(0) {}
 
 SharedTimerQt::~SharedTimerQt() {
   if (m_timer.isActive())
     (m_timerFunction)();
 }
 
+void SharedTimerQt::destroy() {
+  delete this;
+}
+
 SharedTimerQt* SharedTimerQt::inst() {
   static QPointer<SharedTimerQt> timer;
-  if (!timer)
-    timer = new SharedTimerQt(QCoreApplication::instance());
+  if (!timer) {
+    timer = new SharedTimerQt();
+    timer->connect(QCoreApplication::instance(), SIGNAL(aboutToQuit()),
+                   SLOT(destroy()));
+  }
 
   return timer;
 }
@@ -118,6 +129,8 @@ void stopSharedTimer() {
 
   SharedTimerQt::inst()->stop();
 }
+
+#include "SharedTimerQt.moc"
 }
 
 // vim: ts=4 sw=4 et
