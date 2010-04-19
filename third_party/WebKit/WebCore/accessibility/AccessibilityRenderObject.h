@@ -232,6 +232,7 @@ class AccessibilityRenderObject : public AccessibilityObject {
       const VisiblePositionRange&) const;
   virtual bool supportsARIAFlowTo() const;
   virtual void ariaFlowToElements(AccessibilityChildrenVector&) const;
+  virtual bool ariaHasPopup() const;
 
   virtual bool supportsARIADropping() const;
   virtual bool supportsARIADragging() const;
