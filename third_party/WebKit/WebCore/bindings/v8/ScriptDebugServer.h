@@ -33,6 +33,7 @@
 
 #if ENABLE(JAVASCRIPT_DEBUGGER)
 
+#include "OwnHandle.h"
 #include "PlatformString.h"
 #include "ScriptBreakpoint.h"
 #include "ScriptState.h"
@@ -44,6 +45,7 @@
 
 namespace WebCore {
 
+class JavaScriptCallFrame;
 class Page;
 class ScriptDebugListener;
 
@@ -112,6 +114,7 @@ class ScriptDebugServer : public Noncopyable {
   }
 
   v8::Handle<v8::Value> currentCallFrameV8();
+  PassRefPtr<JavaScriptCallFrame> currentCallFrame();
 
  private:
   ScriptDebugServer();
@@ -147,10 +150,10 @@ class ScriptDebugServer : public Noncopyable {
   ContextDataMap m_contextDataMap;
   String m_debuggerScriptSource;
   PauseOnExceptionsState m_pauseOnExceptionsState;
-  v8::Persistent<v8::Object> m_debuggerScript;
+  OwnHandle<v8::Object> m_debuggerScript;
   ScriptState* m_currentCallFrameState;
-  v8::Persistent<v8::Value> m_currentCallFrame;
-  v8::Persistent<v8::Object> m_executionState;
+  OwnHandle<v8::Value> m_currentCallFrame;
+  OwnHandle<v8::Object> m_executionState;
 
   static MessageLoopDispatchHandler s_messageLoopDispatchHandler;
 };
