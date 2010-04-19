@@ -44,8 +44,10 @@ PassRefPtr<StorageNamespace> StorageNamespace::localStorageNamespace(
 }
 
 // The page argument is only used by the Chromium port.
-PassRefPtr<StorageNamespace> StorageNamespace::sessionStorageNamespace(Page*) {
-  return StorageNamespaceImpl::sessionStorageNamespace();
+PassRefPtr<StorageNamespace> StorageNamespace::sessionStorageNamespace(
+    Page*,
+    unsigned quota) {
+  return StorageNamespaceImpl::sessionStorageNamespace(quota);
 }
 
 }  // namespace WebCore

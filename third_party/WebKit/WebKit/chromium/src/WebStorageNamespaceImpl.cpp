@@ -49,7 +49,7 @@ WebStorageNamespace* WebStorageNamespace::createLocalStorageNamespace(
 
 WebStorageNamespace* WebStorageNamespace::createSessionStorageNamespace() {
   return new WebStorageNamespaceImpl(
-      WebCore::StorageNamespaceImpl::sessionStorageNamespace());
+      WebCore::StorageNamespaceImpl::sessionStorageNamespace(noQuota));
 }
 
 WebStorageNamespaceImpl::WebStorageNamespaceImpl(

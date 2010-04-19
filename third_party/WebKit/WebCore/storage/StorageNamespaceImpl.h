@@ -44,7 +44,7 @@ class StorageNamespaceImpl : public StorageNamespace {
  public:
   static PassRefPtr<StorageNamespace> localStorageNamespace(const String& path,
                                                             unsigned quota);
-  static PassRefPtr<StorageNamespace> sessionStorageNamespace();
+  static PassRefPtr<StorageNamespace> sessionStorageNamespace(unsigned quota);
 
   virtual ~StorageNamespaceImpl();
   virtual PassRefPtr<StorageArea> storageArea(PassRefPtr<SecurityOrigin>);

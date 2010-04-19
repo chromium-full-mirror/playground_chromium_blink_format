@@ -51,7 +51,8 @@ PassRefPtr<StorageNamespace> StorageNamespace::localStorageNamespace(
 }
 
 PassRefPtr<StorageNamespace> StorageNamespace::sessionStorageNamespace(
-    Page* page) {
+    Page* page,
+    unsigned quota) {
   WebKit::ChromeClientImpl* chromeClientImpl =
       static_cast<WebKit::ChromeClientImpl*>(page->chrome()->client());
   WebKit::WebViewClient* webViewClient = chromeClientImpl->webView()->client();
