@@ -1452,9 +1452,16 @@ void Element::setMinimumSizeForResizing(const IntSize& size) {
   ensureRareData()->m_minimumSizeForResizing = size;
 }
 
-RenderStyle* Element::computedStyle() {
+RenderStyle* Element::computedStyle(PseudoId pseudoElementSpecifier) {
+  // FIXME: Find and use the renderer from the pseudo element instead of the
+  // actual element so that the 'length'
+  // properties, which are only known by the renderer because it did the layout,
+  // will be correct and so that the
+  // values returned for the ":selection" pseudo-element will be correct.
   if (RenderStyle* usedStyle = renderStyle())
-    return usedStyle;
+    return pseudoElementSpecifier
+               ? usedStyle->getCachedPseudoStyle(pseudoElementSpecifier)
+               : usedStyle;
 
   if (!attached())
     // FIXME: Try to do better than this. Ensure that styleForElement() works
@@ -1467,7 +1474,10 @@ RenderStyle* Element::computedStyle() {
   if (!data->m_computedStyle)
     data->m_computedStyle =
         document()->styleForElementIgnoringPendingStylesheets(this);
-  return data->m_computedStyle.get();
+  return pseudoElementSpecifier
+             ? data->m_computedStyle->getCachedPseudoStyle(
+                   pseudoElementSpecifier)
+             : data->m_computedStyle.get();
 }
 
 void Element::cancelFocusAppearanceUpdate() {

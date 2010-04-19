@@ -29,6 +29,7 @@
 
 #include "EventTarget.h"
 #include "KURLHash.h"
+#include "RenderStyleConstants.h"
 #include "ScriptWrappable.h"
 #include "TreeShared.h"
 #include <wtf/ListHashSet.h>
@@ -506,7 +507,9 @@ class Node : public EventTarget,
   RenderStyle* renderStyle() const;
   virtual void setRenderStyle(PassRefPtr<RenderStyle>);
 
-  virtual RenderStyle* computedStyle();
+  RenderStyle* computedStyle(PseudoId pseudoElementSpecifier = NOPSEUDO) {
+    return virtualComputedStyle(pseudoElementSpecifier);
+  }
 
   // -----------------------------------------------------------------------------
   // Notification of document structure changes
@@ -710,6 +713,7 @@ class Node : public EventTarget,
   virtual const AtomicString& virtualPrefix() const;
   virtual const AtomicString& virtualLocalName() const;
   virtual const AtomicString& virtualNamespaceURI() const;
+  virtual RenderStyle* virtualComputedStyle(PseudoId = NOPSEUDO);
 
   Element* ancestorElement() const;
 

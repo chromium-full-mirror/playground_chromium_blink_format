@@ -23,6 +23,7 @@
 
 #include "CSSStyleDeclaration.h"
 #include "Node.h"
+#include "RenderStyleConstants.h"
 
 namespace WebCore {
 
@@ -35,7 +36,8 @@ class CSSComputedStyleDeclaration : public CSSStyleDeclaration {
  public:
   friend PassRefPtr<CSSComputedStyleDeclaration> computedStyle(
       PassRefPtr<Node>,
-      bool allowVisitedStyle = false);
+      bool allowVisitedStyle,
+      const String& pseudoElementName);
   virtual ~CSSComputedStyleDeclaration();
 
   virtual String cssText() const;
@@ -63,7 +65,9 @@ class CSSComputedStyleDeclaration : public CSSStyleDeclaration {
   virtual bool cssPropertyMatches(const CSSProperty*) const;
 
  private:
-  CSSComputedStyleDeclaration(PassRefPtr<Node>, bool allowVisitedStyle);
+  CSSComputedStyleDeclaration(PassRefPtr<Node>,
+                              bool allowVisitedStyle,
+                              const String&);
 
   virtual void setCssText(const String&, ExceptionCode&);
 
@@ -76,13 +80,16 @@ class CSSComputedStyleDeclaration : public CSSStyleDeclaration {
   PassRefPtr<CSSValue> valueForShadow(const ShadowData*, int) const;
 
   RefPtr<Node> m_node;
+  PseudoId m_pseudoElementSpecifier;
   bool m_allowVisitedStyle;
 };
 
 inline PassRefPtr<CSSComputedStyleDeclaration> computedStyle(
     PassRefPtr<Node> node,
-    bool allowVisitedStyle) {
-  return adoptRef(new CSSComputedStyleDeclaration(node, allowVisitedStyle));
+    bool allowVisitedStyle = false,
+    const String& pseudoElementName = String()) {
+  return adoptRef(new CSSComputedStyleDeclaration(node, allowVisitedStyle,
+                                                  pseudoElementName));
 }
 
 }  // namespace WebCore

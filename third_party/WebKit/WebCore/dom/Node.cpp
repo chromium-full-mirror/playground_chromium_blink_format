@@ -1399,8 +1399,8 @@ void Node::setRenderStyle(PassRefPtr<RenderStyle> s) {
     m_renderer->setAnimatableStyle(s);
 }
 
-RenderStyle* Node::computedStyle() {
-  return parent() ? parent()->computedStyle() : 0;
+RenderStyle* Node::virtualComputedStyle(PseudoId pseudoElementSpecifier) {
+  return parent() ? parent()->computedStyle(pseudoElementSpecifier) : 0;
 }
 
 int Node::maxCharacterOffset() const {
