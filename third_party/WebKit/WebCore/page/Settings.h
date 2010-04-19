@@ -155,6 +155,7 @@ class Settings : public Noncopyable {
   void setLocalStorageEnabled(bool);
   bool localStorageEnabled() const { return m_localStorageEnabled; }
 
+#if ENABLE(DOM_STORAGE)
   void setLocalStorageQuota(unsigned);
   unsigned localStorageQuota() const { return m_localStorageQuota; }
 
@@ -164,6 +165,7 @@ class Settings : public Noncopyable {
   // Default is noQuota.
   void setSessionStorageQuota(unsigned);
   unsigned sessionStorageQuota() const { return m_sessionStorageQuota; }
+#endif
 
   void setPrivateBrowsingEnabled(bool);
   bool privateBrowsingEnabled() const { return m_privateBrowsingEnabled; }
@@ -392,8 +394,10 @@ class Settings : public Noncopyable {
   int m_defaultFontSize;
   int m_defaultFixedFontSize;
   size_t m_maximumDecodedImageSize;
+#if ENABLE(DOM_STORAGE)
   unsigned m_localStorageQuota;
   unsigned m_sessionStorageQuota;
+#endif
   unsigned m_pluginAllowedRunTime;
   ZoomMode m_zoomMode;
   bool m_isSpatialNavigationEnabled : 1;
