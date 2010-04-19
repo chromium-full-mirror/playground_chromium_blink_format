@@ -41,6 +41,7 @@
 #include "RootInlineBox.h"
 #include "loader.h"
 #include <wtf/CurrentTime.h>
+#include <wtf/Vector.h>
 
 namespace WebCore {
 
@@ -49,10 +50,21 @@ static void dispatchChildInsertionEvents(Node*);
 static void dispatchChildRemovalEvents(Node*);
 
 typedef Vector<std::pair<NodeCallback, RefPtr<Node>>> NodeCallbackQueue;
+typedef Vector<RefPtr<Node>, 1> NodeVector;
 static NodeCallbackQueue* s_postAttachCallbackQueue;
 
 static size_t s_attachDepth;
 static bool s_shouldReEnableMemoryCacheCallsAfterAttach;
+
+static void collectTargetNodes(Node* node, NodeVector& nodes) {
+  if (node->nodeType() != Node::DOCUMENT_FRAGMENT_NODE) {
+    nodes.append(node);
+    return;
+  }
+
+  for (Node* child = node->firstChild(); child; child = child->nextSibling())
+    nodes.append(child);
+}
 
 void ContainerNode::removeAllChildren() {
   removeAllChildrenInContainer<Node, ContainerNode>(this);
@@ -87,11 +99,9 @@ bool ContainerNode::insertBefore(PassRefPtr<Node> newChild,
     return false;
   }
 
-  bool isFragment = newChild->nodeType() == DOCUMENT_FRAGMENT_NODE;
-
-  // If newChild is a DocumentFragment with no children; there's nothing to do.
-  // Just return true
-  if (isFragment && !newChild->firstChild())
+  NodeVector targets;
+  collectTargetNodes(newChild.get(), targets);
+  if (targets.isEmpty())
     return true;
 
   // Now actually add the child(ren)
@@ -101,17 +111,16 @@ bool ContainerNode::insertBefore(PassRefPtr<Node> newChild,
 
   RefPtr<Node> next = refChild;
   RefPtr<Node> refChildPreviousSibling = refChild->previousSibling();
-
-  RefPtr<Node> child = isFragment ? newChild->firstChild() : newChild;
-  while (child) {
-    RefPtr<Node> nextChild = isFragment ? child->nextSibling() : 0;
+  for (NodeVector::const_iterator it = targets.begin(); it != targets.end();
+       ++it) {
+    Node* child = it->get();
 
     // If child is already present in the tree, first remove it from the old
     // location.
     if (Node* oldParent = child->parentNode())
-      oldParent->removeChild(child.get(), ec);
+      oldParent->removeChild(child, ec);
     if (ec)
-      return 0;
+      return false;
 
     // FIXME: After sending the mutation events, "this" could be destroyed.
     // We can prevent that by doing a "ref", but first we have to make sure
@@ -134,14 +143,14 @@ bool ContainerNode::insertBefore(PassRefPtr<Node> newChild,
     forbidEventDispatch();
     Node* prev = next->previousSibling();
     ASSERT(m_lastChild != prev);
-    next->setPreviousSibling(child.get());
+    next->setPreviousSibling(child);
     if (prev) {
       ASSERT(m_firstChild != next);
       ASSERT(prev->nextSibling() == next);
-      prev->setNextSibling(child.get());
+      prev->setNextSibling(child);
     } else {
       ASSERT(m_firstChild == next);
-      m_firstChild = child.get();
+      m_firstChild = child;
     }
     child->setParent(this);
     child->setPreviousSibling(prev);
@@ -150,7 +159,7 @@ bool ContainerNode::insertBefore(PassRefPtr<Node> newChild,
 
     // Send notification about the children change.
     childrenChanged(false, refChildPreviousSibling.get(), next.get(), 1);
-    notifyChildInserted(child.get());
+    notifyChildInserted(child);
 
     // Add child to the rendering tree.
     if (attached() && !child->attached() && child->parent() == this) {
@@ -162,9 +171,7 @@ bool ContainerNode::insertBefore(PassRefPtr<Node> newChild,
 
     // Now that the child is attached to the render tree, dispatch
     // the relevant mutation events.
-    dispatchChildInsertionEvents(child.get());
-
-    child = nextChild.release();
+    dispatchChildInsertionEvents(child);
   }
 
   dispatchSubtreeModifiedEvent();
@@ -471,31 +478,26 @@ bool ContainerNode::appendChild(PassRefPtr<Node> newChild,
   // Make sure adding the new child is ok
   checkAddChild(newChild.get(), ec);
   if (ec)
-    return 0;
+    return false;
 
   if (newChild == m_lastChild)  // nothing to do
     return newChild;
 
-  bool isFragment = newChild->nodeType() == DOCUMENT_FRAGMENT_NODE;
-
-  // If newChild is a DocumentFragment with no children.... there's nothing to
-  // do.
-  // Just return the document fragment
-  if (isFragment && !newChild->firstChild())
+  NodeVector targets;
+  collectTargetNodes(newChild.get(), targets);
+  if (targets.isEmpty())
     return true;
 
   // Now actually add the child(ren)
   RefPtr<Node> prev = lastChild();
-  RefPtr<Node> child = isFragment ? newChild->firstChild() : newChild;
-  while (child) {
-    // For a fragment we have more children to do.
-    RefPtr<Node> nextChild = isFragment ? child->nextSibling() : 0;
-
+  for (NodeVector::const_iterator it = targets.begin(); it != targets.end();
+       ++it) {
+    Node* child = it->get();
     // If child is already present in the tree, first remove it
     if (Node* oldParent = child->parentNode()) {
-      oldParent->removeChild(child.get(), ec);
+      oldParent->removeChild(child, ec);
       if (ec)
-        return 0;
+        return false;
 
       // If the child has a parent again, just stop what we're doing, because
       // that means someone is doing something with DOM mutation -- can't
@@ -510,15 +512,15 @@ bool ContainerNode::appendChild(PassRefPtr<Node> newChild,
     child->setParent(this);
     if (m_lastChild) {
       child->setPreviousSibling(m_lastChild);
-      m_lastChild->setNextSibling(child.get());
+      m_lastChild->setNextSibling(child);
     } else
-      m_firstChild = child.get();
-    m_lastChild = child.get();
+      m_firstChild = child;
+    m_lastChild = child;
     allowEventDispatch();
 
     // Send notification about the children change.
     childrenChanged(false, prev.get(), 0, 1);
-    notifyChildInserted(child.get());
+    notifyChildInserted(child);
 
     // Add child to the rendering tree
     if (attached() && !child->attached() && child->parent() == this) {
@@ -530,9 +532,7 @@ bool ContainerNode::appendChild(PassRefPtr<Node> newChild,
 
     // Now that the child is attached to the render tree, dispatch
     // the relevant mutation events.
-    dispatchChildInsertionEvents(child.get());
-
-    child = nextChild.release();
+    dispatchChildInsertionEvents(child);
   }
 
   dispatchSubtreeModifiedEvent();
