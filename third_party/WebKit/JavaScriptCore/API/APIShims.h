@@ -28,7 +28,6 @@
 
 #include "CallFrame.h"
 #include "JSLock.h"
-#include <wtf/WTFThreadData.h>
 
 namespace JSC {
 
@@ -36,8 +35,8 @@ class APIEntryShimWithoutLock {
  protected:
   APIEntryShimWithoutLock(JSGlobalData* globalData, bool registerThread)
       : m_globalData(globalData),
-        m_entryIdentifierTable(wtfThreadData().setCurrentIdentifierTable(
-            globalData->identifierTable)) {
+        m_entryIdentifierTable(
+            setCurrentIdentifierTable(globalData->identifierTable)) {
     if (registerThread)
       globalData->heap.registerThread();
     m_globalData->timeoutChecker.start();
@@ -45,7 +44,7 @@ class APIEntryShimWithoutLock {
 
   ~APIEntryShimWithoutLock() {
     m_globalData->timeoutChecker.stop();
-    wtfThreadData().setCurrentIdentifierTable(m_entryIdentifierTable);
+    setCurrentIdentifierTable(m_entryIdentifierTable);
   }
 
  private:
@@ -74,11 +73,11 @@ class APICallbackShim {
  public:
   APICallbackShim(ExecState* exec)
       : m_dropAllLocks(exec), m_globalData(&exec->globalData()) {
-    wtfThreadData().resetCurrentIdentifierTable();
+    resetCurrentIdentifierTable();
   }
 
   ~APICallbackShim() {
-    wtfThreadData().setCurrentIdentifierTable(m_globalData->identifierTable);
+    setCurrentIdentifierTable(m_globalData->identifierTable);
   }
 
  private:

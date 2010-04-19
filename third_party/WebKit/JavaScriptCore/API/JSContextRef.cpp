@@ -125,7 +125,7 @@ void JSGlobalContextRelease(JSGlobalContextRef ctx) {
   JSGlobalData& globalData = exec->globalData();
   JSGlobalObject* dgo = exec->dynamicGlobalObject();
   IdentifierTable* savedIdentifierTable =
-      wtfThreadData().setCurrentIdentifierTable(globalData.identifierTable);
+      setCurrentIdentifierTable(globalData.identifierTable);
 
   // One reference is held by JSGlobalObject, another added by
   // JSGlobalContextRetain().
@@ -152,7 +152,7 @@ void JSGlobalContextRelease(JSGlobalContextRef ctx) {
 
   globalData.deref();
 
-  wtfThreadData().setCurrentIdentifierTable(savedIdentifierTable);
+  setCurrentIdentifierTable(savedIdentifierTable);
 }
 
 JSObjectRef JSContextGetGlobalObject(JSContextRef ctx) {
