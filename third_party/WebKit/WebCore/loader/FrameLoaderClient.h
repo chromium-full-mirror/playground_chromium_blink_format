@@ -153,6 +153,7 @@ class FrameLoaderClient {
   virtual void dispatchDidReceiveIcon() = 0;
   virtual void dispatchDidStartProvisionalLoad() = 0;
   virtual void dispatchDidReceiveTitle(const String& title) = 0;
+  virtual void dispatchDidChangeIcons() = 0;
   virtual void dispatchDidCommitLoad() = 0;
   virtual void dispatchDidFailProvisionalLoad(const ResourceError&) = 0;
   virtual void dispatchDidFailLoad(const ResourceError&) = 0;
