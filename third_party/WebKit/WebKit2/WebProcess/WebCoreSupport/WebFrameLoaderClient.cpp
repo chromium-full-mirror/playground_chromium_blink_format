@@ -238,6 +238,10 @@ void WebFrameLoaderClient::dispatchDidReceiveTitle(const String& title) {
       CoreIPC::In(m_frame->frameID(), title));
 }
 
+void WebFrameLoaderClient::dispatchDidChangeIcons() {
+  notImplemented();
+}
+
 void WebFrameLoaderClient::dispatchDidCommitLoad() {
   WebPage* webPage = m_frame->page();
   if (!webPage)
