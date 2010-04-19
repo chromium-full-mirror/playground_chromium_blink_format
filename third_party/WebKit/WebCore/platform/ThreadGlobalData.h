@@ -51,7 +51,6 @@ class ThreadGlobalData : public Noncopyable {
   ~ThreadGlobalData();
 
   EventNames& eventNames() { return *m_eventNames; }
-  HashSet<StringImpl*>& atomicStringTable() { return *m_atomicStringTable; }
   ThreadTimers& threadTimers() { return *m_threadTimers; }
 
 #if USE(ICU_UNICODE)
@@ -63,7 +62,6 @@ class ThreadGlobalData : public Noncopyable {
 #endif
 
  private:
-  HashSet<StringImpl*>* m_atomicStringTable;
   EventNames* m_eventNames;
   ThreadTimers* m_threadTimers;
 
