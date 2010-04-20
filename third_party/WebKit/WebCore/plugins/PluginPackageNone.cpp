@@ -38,4 +38,10 @@ bool PluginPackage::fetchInfo() {
 bool PluginPackage::load() {
   return false;
 }
+
+#if ENABLE(NETSCAPE_PLUGIN_API)
+uint16 PluginPackage::NPVersion() const {
+  return 0;
+}
+#endif
 }
