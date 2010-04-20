@@ -1096,8 +1096,6 @@ JSValue JSDOMWindow::openDatabase(ExecState* exec, const ArgList& args) {
                             ustringToString(name), ustringToString(version),
                             ustringToString(displayName), estimatedSize,
                             creationCallback.release(), ec)));
-  if (!ec && result.isNull())
-    ec = SECURITY_ERR;
 
   setDOMException(exec, ec);
   return result;
