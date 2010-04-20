@@ -39,13 +39,8 @@ class RenderPart : public RenderWidget {
   RenderPart(Element*);
   virtual ~RenderPart();
 
-  bool hasFallbackContent() const { return m_hasFallbackContent; }
-
   virtual void setWidget(PassRefPtr<Widget>);
   virtual void viewCleared();
-
- protected:
-  bool m_hasFallbackContent;
 
  private:
   virtual bool isRenderPart() const { return true; }
