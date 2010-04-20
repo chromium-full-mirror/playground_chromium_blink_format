@@ -255,7 +255,8 @@ TextIterator::TextIterator()
       m_textLength(0),
       m_lastCharacter(0),
       m_emitCharactersBetweenAllVisiblePositions(false),
-      m_enterTextControls(false) {}
+      m_enterTextControls(false),
+      m_emitsTextWithoutTranscoding(false) {}
 
 TextIterator::TextIterator(const Range* r,
                            bool emitCharactersBetweenAllVisiblePositions,
@@ -269,7 +270,29 @@ TextIterator::TextIterator(const Range* r,
       m_textLength(0),
       m_emitCharactersBetweenAllVisiblePositions(
           emitCharactersBetweenAllVisiblePositions),
-      m_enterTextControls(enterTextControls) {
+      m_enterTextControls(enterTextControls),
+      m_emitsTextWithoutTranscoding(false) {
+  init(r);
+}
+
+TextIterator::TextIterator(const Range* r, TextIteratorBehavior behavior)
+    : m_startContainer(0),
+      m_startOffset(0),
+      m_endContainer(0),
+      m_endOffset(0),
+      m_positionNode(0),
+      m_textCharacters(0),
+      m_textLength(0),
+      m_emitCharactersBetweenAllVisiblePositions(
+          behavior &
+          TextIteratorBehaviorEmitCharactersBetweenAllVisiblePositions),
+      m_enterTextControls(behavior & TextIteratorBehaviorEnterTextControls),
+      m_emitsTextWithoutTranscoding(
+          behavior & TextIteratorBehaviorEmitsTextsWithoutTranscoding) {
+  init(r);
+}
+
+void TextIterator::init(const Range* r) {
   if (!r)
     return;
 
@@ -922,7 +945,9 @@ void TextIterator::emitText(Node* textNode,
                             int textStartOffset,
                             int textEndOffset) {
   RenderText* renderer = toRenderText(m_node->renderer());
-  String str = renderer->text();
+  String str = m_emitsTextWithoutTranscoding
+                   ? renderer->textWithoutTranscoding()
+                   : renderer->text();
   ASSERT(str.characters());
 
   m_positionNode = textNode;
@@ -2175,7 +2200,11 @@ UChar* plainTextToMallocAllocatedBuffer(const Range* r,
   Vector<TextSegment>* textSegments = 0;
   Vector<UChar> textBuffer;
   textBuffer.reserveInitialCapacity(cMaxSegmentSize);
-  for (TextIterator it(r); !it.atEnd(); it.advance()) {
+  for (TextIterator it(r,
+                       isDisplayString
+                           ? TextIteratorBehaviorDefault
+                           : TextIteratorBehaviorEmitsTextsWithoutTranscoding);
+       !it.atEnd(); it.advance()) {
     if (textBuffer.size() &&
         textBuffer.size() + it.length() > cMaxSegmentSize) {
       UChar* newSegmentBuffer =

@@ -39,6 +39,7 @@
 #include "StringBuffer.h"
 #include "Text.h"
 #include "TextBreakIterator.h"
+#include "TextResourceDecoder.h"
 #include "VisiblePosition.h"
 #include "break_lines.h"
 #include <wtf/AlwaysInline.h>
@@ -93,7 +94,7 @@ static void makeCapitalized(String* string, UChar previous) {
 RenderText::RenderText(Node* node, PassRefPtr<StringImpl> str)
     : RenderObject(node),
       m_minWidth(-1),
-      m_text(document()->displayStringModifiedByEncoding(str)),
+      m_text(str),
       m_firstTextBox(0),
       m_lastTextBox(0),
       m_maxWidth(-1),
@@ -103,7 +104,8 @@ RenderText::RenderText(Node* node, PassRefPtr<StringImpl> str)
       m_linesDirty(false),
       m_containsReversedText(false),
       m_isAllASCII(m_text.containsOnlyASCII()),
-      m_knownToHaveNoOverflowAndNoFallbackFonts(false) {
+      m_knownToHaveNoOverflowAndNoFallbackFonts(false),
+      m_needsTranscoding(false) {
   ASSERT(m_text);
 
   setIsText();
@@ -138,6 +140,12 @@ bool RenderText::isWordBreak() const {
   return false;
 }
 
+void RenderText::updateNeedsTranscoding() {
+  m_needsTranscoding =
+      document()->decoder() &&
+      document()->decoder()->encoding().backslashAsCurrencySymbol() != '\\';
+}
+
 void RenderText::styleDidChange(StyleDifference diff,
                                 const RenderStyle* oldStyle) {
   // There is no need to ever schedule repaints from a style change of a text
@@ -151,10 +159,15 @@ void RenderText::styleDidChange(StyleDifference diff,
     m_knownToHaveNoOverflowAndNoFallbackFonts = false;
   }
 
+  bool needsResetText = false;
+  if (!oldStyle) {
+    updateNeedsTranscoding();
+    needsResetText = m_needsTranscoding;
+  }
+
   ETextTransform oldTransform = oldStyle ? oldStyle->textTransform() : TTNONE;
   ETextSecurity oldSecurity = oldStyle ? oldStyle->textSecurity() : TSNONE;
-
-  if (oldTransform != style()->textTransform() ||
+  if (needsResetText || oldTransform != style()->textTransform() ||
       oldSecurity != style()->textSecurity()) {
     if (RefPtr<StringImpl> textToTransform = originalText())
       setText(textToTransform.release(), true);
@@ -1028,7 +1041,7 @@ void RenderText::setTextWithOffset(PassRefPtr<StringImpl> text,
   setText(text, force);
 }
 
-static inline bool isInlineFlowOrEmptyText(RenderObject* o) {
+static inline bool isInlineFlowOrEmptyText(const RenderObject* o) {
   if (o->isRenderInline())
     return true;
   if (!o->isText())
@@ -1039,9 +1052,9 @@ static inline bool isInlineFlowOrEmptyText(RenderObject* o) {
   return !text->length();
 }
 
-UChar RenderText::previousCharacter() {
+UChar RenderText::previousCharacter() const {
   // find previous text renderer if one exists
-  RenderObject* previousText = this;
+  const RenderObject* previousText = this;
   while ((previousText = previousText->previousInPreOrder()))
     if (!isInlineFlowOrEmptyText(previousText))
       break;
@@ -1052,9 +1065,29 @@ UChar RenderText::previousCharacter() {
   return prev;
 }
 
+void RenderText::transformText(String& text) const {
+  ASSERT(style());
+  switch (style()->textTransform()) {
+    case TTNONE:
+      break;
+    case CAPITALIZE:
+      makeCapitalized(&text, previousCharacter());
+      break;
+    case UPPERCASE:
+      text.makeUpper();
+      break;
+    case LOWERCASE:
+      text.makeLower();
+      break;
+  }
+}
+
 void RenderText::setTextInternal(PassRefPtr<StringImpl> text) {
   ASSERT(text);
-  m_text = document()->displayStringModifiedByEncoding(text);
+  if (m_needsTranscoding)
+    m_text = document()->displayStringModifiedByEncoding(text);
+  else
+    m_text = text;
   ASSERT(m_text);
 
 #if ENABLE(SVG)
@@ -1094,19 +1127,7 @@ void RenderText::setTextInternal(PassRefPtr<StringImpl> text) {
 #endif
 
   if (style()) {
-    switch (style()->textTransform()) {
-      case TTNONE:
-        break;
-      case CAPITALIZE:
-        makeCapitalized(&m_text, previousCharacter());
-        break;
-      case UPPERCASE:
-        m_text.makeUpper();
-        break;
-      case LOWERCASE:
-        m_text.makeLower();
-        break;
-    }
+    transformText(m_text);
 
     // We use the same characters here as for list markers.
     // See the listMarkerText function in RenderListMarker.cpp.
@@ -1143,6 +1164,20 @@ void RenderText::setText(PassRefPtr<StringImpl> text, bool force) {
   AXObjectCache* axObjectCache = document()->axObjectCache();
   if (axObjectCache->accessibilityEnabled())
     axObjectCache->contentChanged(this);
+}
+
+String RenderText::textWithoutTranscoding() const {
+  // If m_text isn't transcoded or is secure, we can just return the modified
+  // text.
+  if (!m_needsTranscoding || style()->textSecurity() != TSNONE)
+    return text();
+
+  // Otherwise, we should use original text. If text-transform is
+  // specified, we should transform the text on the fly.
+  String text = originalText();
+  if (style())
+    transformText(text);
+  return text;
 }
 
 int RenderText::lineHeight(bool firstLine, bool) const {

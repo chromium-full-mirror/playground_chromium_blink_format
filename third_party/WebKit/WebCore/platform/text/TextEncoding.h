@@ -77,8 +77,9 @@ class TextEncoding {
                 bool& sawError) const;
   WTF::CString encode(const UChar*, size_t length, UnencodableHandling) const;
 
- private:
   UChar backslashAsCurrencySymbol() const;
+
+ private:
   bool isNonByteBasedEncoding() const;
   bool isUTF7Encoding() const;
 
