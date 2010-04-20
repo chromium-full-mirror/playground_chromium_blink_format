@@ -83,6 +83,10 @@ void PluginView::halt() {}
 
 void PluginView::restart() {}
 
+#if ENABLE(NETSCAPE_PLUGIN_API)
+void PluginView::keepAlive(NPP) {}
+#endif
+
 void PluginView::privateBrowsingStateChanged(bool) {}
 
 void PluginView::setJavaScriptPaused(bool) {}
