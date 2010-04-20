@@ -25,7 +25,6 @@
 
 #include "MappedAttribute.h"
 #include "SVGParserUtilities.h"
-#include "SVGResourceFilter.h"
 
 namespace WebCore {
 
@@ -94,13 +93,10 @@ void SVGFETurbulenceElement::synchronizeProperty(
     synchronizeNumOctaves();
 }
 
-bool SVGFETurbulenceElement::build(SVGResourceFilter* filterResource) {
-  RefPtr<FilterEffect> effect = FETurbulence::create(
-      static_cast<TurbulanceType>(type()), baseFrequencyX(), baseFrequencyY(),
-      numOctaves(), seed(), stitchTiles() == SVG_STITCHTYPE_STITCH);
-  filterResource->addFilterEffect(this, effect.release());
-
-  return true;
+PassRefPtr<FilterEffect> SVGFETurbulenceElement::build(SVGFilterBuilder*) {
+  return FETurbulence::create(static_cast<TurbulanceType>(type()),
+                              baseFrequencyX(), baseFrequencyY(), numOctaves(),
+                              seed(), stitchTiles() == SVG_STITCHTYPE_STITCH);
 }
 }
 

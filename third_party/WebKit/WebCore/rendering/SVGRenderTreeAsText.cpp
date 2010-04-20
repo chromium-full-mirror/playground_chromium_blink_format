@@ -2,6 +2,7 @@
  * Copyright (C) 2004, 2005, 2007, 2009 Apple Inc. All rights reserved.
  *           (C) 2005 Rob Buis <buis@kde.org>
  *           (C) 2006 Alexander Kellett <lypanov@kde.org>
+ * Copyright (C) Research In Motion Limited 2010. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -40,6 +41,7 @@
 #include "RenderSVGContainer.h"
 #include "RenderSVGInlineText.h"
 #include "RenderSVGResourceClipper.h"
+#include "RenderSVGResourceFilter.h"
 #include "RenderSVGResourceMarker.h"
 #include "RenderSVGResourceMasker.h"
 #include "RenderSVGRoot.h"
@@ -348,7 +350,6 @@ static void writeStyle(TextStream& ts, const RenderObject& object) {
   writeIfNotEmpty(ts, "start marker", svgStyle->markerStartResource());
   writeIfNotEmpty(ts, "middle marker", svgStyle->markerMidResource());
   writeIfNotEmpty(ts, "end marker", svgStyle->markerEndResource());
-  writeIfNotEmpty(ts, "filter", svgStyle->filterResource());
 }
 
 static TextStream& writePositionAndStyle(TextStream& ts,
@@ -535,6 +536,40 @@ void writeSVGResource(TextStream& ts, const RenderObject& object, int indent) {
     ASSERT(masker);
     writeNameValuePair(ts, "maskUnits", masker->maskUnits());
     writeNameValuePair(ts, "maskContentUnits", masker->maskContentUnits());
+#if ENABLE(FILTERS)
+  } else if (resource->resourceType() == FilterResourceType) {
+    RenderSVGResourceFilter* filter =
+        static_cast<RenderSVGResourceFilter*>(resource);
+    ASSERT(filter);
+    writeNameValuePair(ts, "filterUnits", filter->filterUnits());
+    writeNameValuePair(ts, "primitiveUnits", filter->primitiveUnits());
+    if (OwnPtr<SVGFilterBuilder> builder = filter->buildPrimitives()) {
+      ts << "\n";
+      const HashMap<AtomicString, RefPtr<FilterEffect>>& effects =
+          builder->namedEffects();
+      HashMap<AtomicString, RefPtr<FilterEffect>>::const_iterator end =
+          effects.end();
+      for (HashMap<AtomicString, RefPtr<FilterEffect>>::const_iterator it =
+               effects.begin();
+           it != end; ++it) {
+        writeIndent(ts, indent);
+        ts << "  [primitve=\"" << it->first << "\" ";
+        it->second->externalRepresentation(ts);
+        ts << "]\n";
+      }
+      writeIndent(ts, indent);
+      // FIXME: Some effects don't give a representation back. So we miss some
+      // more informations
+      // after '[last primitive' .
+      // We also just dump named effects and the last effect at the moment, more
+      // effects
+      // without a name might be in the pipe.
+      ts << "  [last primitive ";
+      if (FilterEffect* lastEffect = builder->lastEffect())
+        lastEffect->externalRepresentation(ts);
+      ts << "]";
+    }
+#endif
   } else if (resource->resourceType() == ClipperResourceType) {
     RenderSVGResourceClipper* clipper =
         static_cast<RenderSVGResourceClipper*>(resource);
@@ -554,8 +589,6 @@ void writeSVGResource(TextStream& ts, const RenderObject& object, int indent) {
       ts << marker->angle() << "]";
   }
 
-  // FIXME: Handle other RenderSVGResource* classes here, after converting them
-  // from SVGResource*.
   ts << "\n";
   writeChildren(ts, object, indent);
 }
@@ -637,8 +670,21 @@ void writeResources(TextStream& ts, const RenderObject& object, int indent) {
          << "\n";
     }
   }
-  // FIXME: Handle other RenderSVGResource* classes here, after converting them
-  // from SVGResource*.
+#if ENABLE(FILTERS)
+  if (!svgStyle->filterResource().isEmpty()) {
+    if (RenderSVGResourceFilter* filter =
+            getRenderSVGResourceById<RenderSVGResourceFilter>(
+                object.document(), svgStyle->filterResource())) {
+      writeIndent(ts, indent);
+      ts << " ";
+      writeNameAndQuotedValue(ts, "filter", svgStyle->filterResource());
+      ts << " ";
+      writeStandardPrefix(ts, *filter, 0);
+      ts << " " << filter->resourceBoundingBox(object.objectBoundingBox())
+         << "\n";
+    }
+  }
+#endif
 }
 
 void writeRenderResources(TextStream& ts, Node* parent) {
@@ -664,9 +710,7 @@ void writeRenderResources(TextStream& ts, Node* parent) {
       ts << "KRenderingPaintServer {id=\"" << elementId << "\" " << *paintServer
          << "}"
          << "\n";
-    } else
-      ts << "KCanvasResource {id=\"" << elementId << "\" " << *resource << "}"
-         << "\n";
+    }
   } while ((node = node->traverseNextNode(parent)));
 }
 

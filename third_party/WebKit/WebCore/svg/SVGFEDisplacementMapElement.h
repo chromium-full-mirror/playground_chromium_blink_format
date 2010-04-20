@@ -36,7 +36,7 @@ class SVGFEDisplacementMapElement
 
   virtual void parseMappedAttribute(MappedAttribute*);
   virtual void synchronizeProperty(const QualifiedName&);
-  virtual bool build(SVGResourceFilter*);
+  virtual PassRefPtr<FilterEffect> build(SVGFilterBuilder*);
 
  private:
   DECLARE_ANIMATED_PROPERTY(SVGFEDisplacementMapElement,

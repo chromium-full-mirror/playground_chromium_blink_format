@@ -81,7 +81,7 @@ void RenderSVGResourceClipper::invalidateClient(RenderObject* object) {
 }
 
 bool RenderSVGResourceClipper::applyResource(RenderObject* object,
-                                             GraphicsContext* context) {
+                                             GraphicsContext*& context) {
   applyClippingToContext(object, object->objectBoundingBox(),
                          object->repaintRectInLocalCoordinates(), context);
   return true;

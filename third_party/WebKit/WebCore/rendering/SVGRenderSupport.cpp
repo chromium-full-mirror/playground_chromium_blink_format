@@ -35,10 +35,10 @@
 #include "RenderSVGContainer.h"
 #include "RenderSVGResource.h"
 #include "RenderSVGResourceClipper.h"
+#include "RenderSVGResourceFilter.h"
 #include "RenderSVGResourceMarker.h"
 #include "RenderSVGResourceMasker.h"
 #include "RenderView.h"
-#include "SVGResourceFilter.h"
 #include "SVGStyledElement.h"
 #include "SVGURIReference.h"
 #include "TransformState.h"
@@ -94,8 +94,8 @@ bool SVGRenderBase::prepareToRenderSVGContent(
     RenderObject* object,
     RenderObject::PaintInfo& paintInfo,
     const FloatRect& repaintRect,
-    SVGResourceFilter*& filter,
-    SVGResourceFilter* rootFilter) {
+    RenderSVGResourceFilter*& filter,
+    RenderSVGResourceFilter* rootFilter) {
 #if !ENABLE(FILTERS)
   UNUSED_PARAM(filter);
   UNUSED_PARAM(rootFilter);
@@ -137,7 +137,8 @@ bool SVGRenderBase::prepareToRenderSVGContent(
   Document* document = object->document();
 
 #if ENABLE(FILTERS)
-  SVGResourceFilter* newFilter = getFilterById(document, filterId, object);
+  RenderSVGResourceFilter* newFilter =
+      getRenderSVGResourceById<RenderSVGResourceFilter>(document, filterId);
   if (newFilter == rootFilter) {
     // Catch <text filter="url(#foo)">Test<tspan
     // filter="url(#foo)">123</tspan></text>.
@@ -167,8 +168,7 @@ bool SVGRenderBase::prepareToRenderSVGContent(
 
 #if ENABLE(FILTERS)
   if (filter) {
-    filter->addClient(styledElement);
-    if (!filter->prepareFilter(paintInfo.context, object))
+    if (!filter->applyResource(object, paintInfo.context))
       return false;
   } else if (!filterId.isEmpty())
     svgElement->document()->accessSVGExtensions()->addPendingResource(
@@ -180,7 +180,7 @@ bool SVGRenderBase::prepareToRenderSVGContent(
 
 void SVGRenderBase::finishRenderSVGContent(RenderObject* object,
                                            RenderObject::PaintInfo& paintInfo,
-                                           SVGResourceFilter*& filter,
+                                           RenderSVGResourceFilter*& filter,
                                            GraphicsContext* savedContext) {
 #if !ENABLE(FILTERS)
   UNUSED_PARAM(filter);
@@ -194,7 +194,7 @@ void SVGRenderBase::finishRenderSVGContent(RenderObject* object,
 
 #if ENABLE(FILTERS)
   if (filter) {
-    filter->applyFilter(paintInfo.context, object);
+    filter->postApplyResource(object, paintInfo.context);
     paintInfo.context = savedContext;
   }
 #endif
@@ -320,11 +320,11 @@ bool SVGRenderBase::isOverflowHidden(const RenderObject* object) {
 FloatRect SVGRenderBase::filterBoundingBoxForRenderer(
     const RenderObject* object) const {
 #if ENABLE(FILTERS)
-  SVGResourceFilter* filter =
-      getFilterById(object->document(),
-                    object->style()->svgStyle()->filterResource(), object);
-  if (filter)
-    return filter->filterBoundingBox(object->objectBoundingBox());
+  if (RenderSVGResourceFilter* filter =
+          getRenderSVGResourceById<RenderSVGResourceFilter>(
+              object->document(),
+              object->style()->svgStyle()->filterResource()))
+    return filter->resourceBoundingBox(object->objectBoundingBox());
 #else
   UNUSED_PARAM(object);
 #endif
@@ -365,6 +365,13 @@ void deregisterFromResources(RenderObject* object) {
               object->document(),
               object->style()->svgStyle()->clipperResource()))
     clipper->invalidateClient(object);
+#if ENABLE(FILTERS)
+  if (RenderSVGResourceFilter* filter =
+          getRenderSVGResourceById<RenderSVGResourceFilter>(
+              object->document(),
+              object->style()->svgStyle()->filterResource()))
+    filter->invalidateClient(object);
+#endif
   if (RenderSVGResourceMarker* startMarker =
           getRenderSVGResourceById<RenderSVGResourceMarker>(
               object->document(),
