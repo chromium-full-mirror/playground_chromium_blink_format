@@ -297,7 +297,6 @@ class RenderObject : public CachedResourceClient {
 #endif
   virtual bool isRenderBlock() const { return false; }
   virtual bool isRenderButton() const { return false; }
-  virtual bool isRenderFrameBase() const { return false; }
   virtual bool isRenderImage() const { return false; }
   virtual bool isRenderInline() const { return false; }
   virtual bool isRenderPart() const { return false; }
