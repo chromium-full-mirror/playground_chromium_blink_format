@@ -203,7 +203,7 @@ class CanvasRenderingContext2D : public CanvasRenderingContext {
 
   void clearShadow();
 
-  void drawImage(HTMLImageElement*, float x, float y);
+  void drawImage(HTMLImageElement*, float x, float y, ExceptionCode&);
   void drawImage(HTMLImageElement*,
                  float x,
                  float y,
@@ -224,7 +224,7 @@ class CanvasRenderingContext2D : public CanvasRenderingContext {
                  const FloatRect& srcRect,
                  const FloatRect& dstRect,
                  ExceptionCode&);
-  void drawImage(HTMLCanvasElement*, float x, float y);
+  void drawImage(HTMLCanvasElement*, float x, float y, ExceptionCode&);
   void drawImage(HTMLCanvasElement*,
                  float x,
                  float y,
@@ -246,7 +246,7 @@ class CanvasRenderingContext2D : public CanvasRenderingContext {
                  const FloatRect& dstRect,
                  ExceptionCode&);
 #if ENABLE(VIDEO)
-  void drawImage(HTMLVideoElement*, float x, float y);
+  void drawImage(HTMLVideoElement*, float x, float y, ExceptionCode&);
   void drawImage(HTMLVideoElement*,
                  float x,
                  float y,

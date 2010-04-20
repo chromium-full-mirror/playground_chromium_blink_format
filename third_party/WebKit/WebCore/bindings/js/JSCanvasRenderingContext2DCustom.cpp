@@ -217,7 +217,7 @@ JSValue JSCanvasRenderingContext2D::drawImage(ExecState* exec,
     switch (args.size()) {
       case 3:
         context->drawImage(imgElt, args.at(1).toFloat(exec),
-                           args.at(2).toFloat(exec));
+                           args.at(2).toFloat(exec), ec);
         break;
       case 5:
         context->drawImage(imgElt, args.at(1).toFloat(exec),
@@ -244,7 +244,7 @@ JSValue JSCanvasRenderingContext2D::drawImage(ExecState* exec,
     switch (args.size()) {
       case 3:
         context->drawImage(canvas, args.at(1).toFloat(exec),
-                           args.at(2).toFloat(exec));
+                           args.at(2).toFloat(exec), ec);
         break;
       case 5:
         context->drawImage(canvas, args.at(1).toFloat(exec),
@@ -272,7 +272,7 @@ JSValue JSCanvasRenderingContext2D::drawImage(ExecState* exec,
     switch (args.size()) {
       case 3:
         context->drawImage(video, args.at(1).toFloat(exec),
-                           args.at(2).toFloat(exec));
+                           args.at(2).toFloat(exec), ec);
         break;
       case 5:
         context->drawImage(video, args.at(1).toFloat(exec),

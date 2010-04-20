@@ -985,10 +985,13 @@ void CanvasRenderingContext2D::checkOrigin(const String& url) {
 
 void CanvasRenderingContext2D::drawImage(HTMLImageElement* image,
                                          float x,
-                                         float y) {
-  ASSERT(image);
+                                         float y,
+                                         ExceptionCode& ec) {
+  if (!image) {
+    ec = TYPE_MISMATCH_ERR;
+    return;
+  }
   IntSize s = size(image);
-  ExceptionCode ec;
   drawImage(image, x, y, s.width(), s.height(), ec);
 }
 
@@ -998,7 +1001,10 @@ void CanvasRenderingContext2D::drawImage(HTMLImageElement* image,
                                          float width,
                                          float height,
                                          ExceptionCode& ec) {
-  ASSERT(image);
+  if (!image) {
+    ec = TYPE_MISMATCH_ERR;
+    return;
+  }
   IntSize s = size(image);
   drawImage(image, FloatRect(0, 0, s.width(), s.height()),
             FloatRect(x, y, width, height), ec);
@@ -1014,6 +1020,10 @@ void CanvasRenderingContext2D::drawImage(HTMLImageElement* image,
                                          float dw,
                                          float dh,
                                          ExceptionCode& ec) {
+  if (!image) {
+    ec = TYPE_MISMATCH_ERR;
+    return;
+  }
   drawImage(image, FloatRect(sx, sy, sw, sh), FloatRect(dx, dy, dw, dh), ec);
 }
 
@@ -1021,7 +1031,10 @@ void CanvasRenderingContext2D::drawImage(HTMLImageElement* image,
                                          const FloatRect& srcRect,
                                          const FloatRect& dstRect,
                                          ExceptionCode& ec) {
-  ASSERT(image);
+  if (!image) {
+    ec = TYPE_MISMATCH_ERR;
+    return;
+  }
 
   ec = 0;
 
@@ -1061,9 +1074,12 @@ void CanvasRenderingContext2D::drawImage(HTMLImageElement* image,
 
 void CanvasRenderingContext2D::drawImage(HTMLCanvasElement* canvas,
                                          float x,
-                                         float y) {
-  ASSERT(canvas);
-  ExceptionCode ec;
+                                         float y,
+                                         ExceptionCode& ec) {
+  if (!canvas) {
+    ec = TYPE_MISMATCH_ERR;
+    return;
+  }
   drawImage(canvas, x, y, canvas->width(), canvas->height(), ec);
 }
 
@@ -1073,7 +1089,10 @@ void CanvasRenderingContext2D::drawImage(HTMLCanvasElement* canvas,
                                          float width,
                                          float height,
                                          ExceptionCode& ec) {
-  ASSERT(canvas);
+  if (!canvas) {
+    ec = TYPE_MISMATCH_ERR;
+    return;
+  }
   drawImage(canvas, FloatRect(0, 0, canvas->width(), canvas->height()),
             FloatRect(x, y, width, height), ec);
 }
@@ -1095,7 +1114,10 @@ void CanvasRenderingContext2D::drawImage(HTMLCanvasElement* sourceCanvas,
                                          const FloatRect& srcRect,
                                          const FloatRect& dstRect,
                                          ExceptionCode& ec) {
-  ASSERT(sourceCanvas);
+  if (!sourceCanvas) {
+    ec = TYPE_MISMATCH_ERR;
+    return;
+  }
 
   ec = 0;
 
@@ -1138,10 +1160,13 @@ void CanvasRenderingContext2D::drawImage(HTMLCanvasElement* sourceCanvas,
 #if ENABLE(VIDEO)
 void CanvasRenderingContext2D::drawImage(HTMLVideoElement* video,
                                          float x,
-                                         float y) {
-  ASSERT(video);
+                                         float y,
+                                         ExceptionCode& ec) {
+  if (!video) {
+    ec = TYPE_MISMATCH_ERR;
+    return;
+  }
   IntSize s = size(video);
-  ExceptionCode ec;
   drawImage(video, x, y, s.width(), s.height(), ec);
 }
 
@@ -1151,7 +1176,10 @@ void CanvasRenderingContext2D::drawImage(HTMLVideoElement* video,
                                          float width,
                                          float height,
                                          ExceptionCode& ec) {
-  ASSERT(video);
+  if (!video) {
+    ec = TYPE_MISMATCH_ERR;
+    return;
+  }
   IntSize s = size(video);
   drawImage(video, FloatRect(0, 0, s.width(), s.height()),
             FloatRect(x, y, width, height), ec);
@@ -1174,7 +1202,10 @@ void CanvasRenderingContext2D::drawImage(HTMLVideoElement* video,
                                          const FloatRect& srcRect,
                                          const FloatRect& dstRect,
                                          ExceptionCode& ec) {
-  ASSERT(video);
+  if (!video) {
+    ec = TYPE_MISMATCH_ERR;
+    return;
+  }
 
   ec = 0;
   FloatRect videoRect = FloatRect(FloatPoint(), size(video));
@@ -1315,6 +1346,10 @@ PassRefPtr<CanvasPattern> CanvasRenderingContext2D::createPattern(
     HTMLImageElement* image,
     const String& repetitionType,
     ExceptionCode& ec) {
+  if (!image) {
+    ec = TYPE_MISMATCH_ERR;
+    return 0;
+  }
   bool repeatX, repeatY;
   ec = 0;
   CanvasPattern::parseRepetitionType(repetitionType, repeatX, repeatY, ec);
@@ -1341,6 +1376,10 @@ PassRefPtr<CanvasPattern> CanvasRenderingContext2D::createPattern(
     HTMLCanvasElement* canvas,
     const String& repetitionType,
     ExceptionCode& ec) {
+  if (!canvas) {
+    ec = TYPE_MISMATCH_ERR;
+    return 0;
+  }
   if (!canvas->width() || !canvas->height()) {
     ec = INVALID_STATE_ERR;
     return 0;
