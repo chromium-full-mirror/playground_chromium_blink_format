@@ -216,7 +216,6 @@ class FrameLoader : public Noncopyable {
   bool subframeIsLoading() const;
   void willChangeTitle(DocumentLoader*);
   void didChangeTitle(DocumentLoader*);
-  void didChangeIcons(DocumentLoader*);
 
   FrameLoadType loadType() const;
   CachePolicy subresourceCachePolicy() const;
@@ -368,7 +367,6 @@ class FrameLoader : public Noncopyable {
   void cancelAndClear();
 
   void setTitle(const String&);
-  void setIconURL(const String&);
 
   void commitProvisionalLoad(PassRefPtr<CachedPage>);
   bool isLoadingFromCachedPage() const { return m_loadingFromCachedPage; }

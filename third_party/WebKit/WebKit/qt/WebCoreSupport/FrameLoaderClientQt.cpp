@@ -350,18 +350,6 @@ void FrameLoaderClientQt::dispatchDidReceiveTitle(const String& title) {
   emit titleChanged(title);
 }
 
-void FrameLoaderClientQt::dispatchDidChangeIcons() {
-  if (dumpFrameLoaderCallbacks)
-    printf("%s - didChangeIcons\n",
-           qPrintable(drtDescriptionSuitableForTestResult(m_frame)));
-
-  if (!m_webFrame)
-    return;
-
-  // FIXME: To be notified of changing icon URLS add notification
-  // emit iconsChanged();
-}
-
 void FrameLoaderClientQt::dispatchDidCommitLoad() {
   if (dumpFrameLoaderCallbacks)
     printf("%s - didCommitLoadForFrame\n",

@@ -198,11 +198,6 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
     m_dumpTitleChanges = dumpTitleChanges;
   }
 
-  bool dumpIconChanges() const { return m_dumpIconChanges; }
-  void setDumpIconChanges(bool dumpIconChanges) {
-    m_dumpIconChanges = dumpIconChanges;
-  }
-
   bool dumpVisitedLinksCallback() const { return m_dumpVisitedLinksCallback; }
   void setDumpVisitedLinksCallback(bool dumpVisitedLinksCallback) {
     m_dumpVisitedLinksCallback = dumpVisitedLinksCallback;
@@ -386,7 +381,6 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
   bool m_dumpSourceAsWebArchive;
   bool m_dumpStatusCallbacks;
   bool m_dumpTitleChanges;
-  bool m_dumpIconChanges;
   bool m_dumpVisitedLinksCallback;
   bool m_dumpWillCacheResponse;
   bool m_callCloseOnWebViews;
