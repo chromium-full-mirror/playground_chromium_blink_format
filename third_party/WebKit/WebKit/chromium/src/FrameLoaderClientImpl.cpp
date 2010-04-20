@@ -1033,7 +1033,7 @@ void FrameLoaderClientImpl::finishedLoading(DocumentLoader* dl) {
     // to
     // match the behavior on the Mac.
     if (m_hasRepresentation)
-      dl->frameLoader()->setEncoding("", false);
+      dl->frameLoader()->writer()->setEncoding("", false);
   }
 }
 

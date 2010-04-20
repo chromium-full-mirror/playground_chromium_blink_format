@@ -446,7 +446,7 @@ void FrameLoaderClientHaiku::committedLoad(WebCore::DocumentLoader* loader,
     return;
 
   FrameLoader* frameLoader = loader->frameLoader();
-  frameLoader->setEncoding(m_response.textEncodingName(), false);
+  frameLoader->writer()->setEncoding(m_response.textEncodingName(), false);
   frameLoader->addData(data, length);
 }
 

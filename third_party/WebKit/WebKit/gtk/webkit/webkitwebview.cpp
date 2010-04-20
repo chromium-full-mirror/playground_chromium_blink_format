@@ -3929,7 +3929,7 @@ gdouble webkit_web_view_get_progress(WebKitWebView* webView) {
 const gchar* webkit_web_view_get_encoding(WebKitWebView* webView) {
   g_return_val_if_fail(WEBKIT_IS_WEB_VIEW(webView), NULL);
 
-  String encoding = core(webView)->mainFrame()->loader()->encoding();
+  String encoding = core(webView)->mainFrame()->loader()->writer()->encoding();
 
   if (!encoding.isEmpty()) {
     WebKitWebViewPrivate* priv = webView->priv;

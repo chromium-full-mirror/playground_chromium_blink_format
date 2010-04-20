@@ -558,7 +558,7 @@ void WebFrameLoaderClient::receivedData(const char* data,
   bool userChosen = !encoding.isNull();
   if (encoding.isNull())
     encoding = textEncoding;
-  coreFrame->loader()->setEncoding(encoding, userChosen);
+  coreFrame->loader()->writer()->setEncoding(encoding, userChosen);
 
   coreFrame->loader()->addData(data, length);
 }
