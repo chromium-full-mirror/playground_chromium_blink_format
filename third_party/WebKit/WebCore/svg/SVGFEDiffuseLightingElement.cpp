@@ -31,7 +31,6 @@
 #include "SVGNames.h"
 #include "SVGParserUtilities.h"
 #include "SVGRenderStyle.h"
-#include "SVGResourceFilter.h"
 
 namespace WebCore {
 
@@ -90,21 +89,19 @@ void SVGFEDiffuseLightingElement::synchronizeProperty(
   }
 }
 
-bool SVGFEDiffuseLightingElement::build(SVGResourceFilter* filterResource) {
-  FilterEffect* input1 = filterResource->builder()->getEffectById(in1());
+PassRefPtr<FilterEffect> SVGFEDiffuseLightingElement::build(
+    SVGFilterBuilder* filterBuilder) {
+  FilterEffect* input1 = filterBuilder->getEffectById(in1());
 
   if (!input1)
-    return false;
+    return 0;
 
   RefPtr<RenderStyle> filterStyle = styleForRenderer();
   Color color = filterStyle->svgStyle()->lightingColor();
 
-  RefPtr<FilterEffect> effect = FEDiffuseLighting::create(
-      input1, color, surfaceScale(), diffuseConstant(), kernelUnitLengthX(),
-      kernelUnitLengthY(), findLights());
-  filterResource->addFilterEffect(this, effect.release());
-
-  return true;
+  return FEDiffuseLighting::create(input1, color, surfaceScale(),
+                                   diffuseConstant(), kernelUnitLengthX(),
+                                   kernelUnitLengthY(), findLights());
 }
 
 PassRefPtr<LightSource> SVGFEDiffuseLightingElement::findLights() const {

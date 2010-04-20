@@ -26,7 +26,6 @@
 #include "Attr.h"
 #include "MappedAttribute.h"
 #include "SVGRenderStyle.h"
-#include "SVGResourceFilter.h"
 
 namespace WebCore {
 
@@ -50,16 +49,14 @@ void SVGFETileElement::synchronizeProperty(const QualifiedName& attrName) {
     synchronizeIn1();
 }
 
-bool SVGFETileElement::build(SVGResourceFilter* filterResource) {
-  FilterEffect* input1 = filterResource->builder()->getEffectById(in1());
+PassRefPtr<FilterEffect> SVGFETileElement::build(
+    SVGFilterBuilder* filterBuilder) {
+  FilterEffect* input1 = filterBuilder->getEffectById(in1());
 
   if (!input1)
-    return false;
+    return 0;
 
-  RefPtr<FilterEffect> effect = FETile::create(input1);
-  filterResource->addFilterEffect(this, effect.release());
-
-  return true;
+  return FETile::create(input1);
 }
 }
 

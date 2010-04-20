@@ -26,7 +26,6 @@
 #include "MappedAttribute.h"
 #include "RenderStyle.h"
 #include "SVGRenderStyle.h"
-#include "SVGResourceFilter.h"
 
 namespace WebCore {
 
@@ -36,16 +35,13 @@ SVGFEFloodElement::SVGFEFloodElement(const QualifiedName& tagName,
 
 SVGFEFloodElement::~SVGFEFloodElement() {}
 
-bool SVGFEFloodElement::build(SVGResourceFilter* filterResource) {
+PassRefPtr<FilterEffect> SVGFEFloodElement::build(SVGFilterBuilder*) {
   RefPtr<RenderStyle> filterStyle = styleForRenderer();
 
   Color color = filterStyle->svgStyle()->floodColor();
   float opacity = filterStyle->svgStyle()->floodOpacity();
 
-  RefPtr<FilterEffect> effect = FEFlood::create(color, opacity);
-  filterResource->addFilterEffect(this, effect.release());
-
-  return true;
+  return FEFlood::create(color, opacity);
 }
 }
 
