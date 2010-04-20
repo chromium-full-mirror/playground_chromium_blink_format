@@ -30,6 +30,7 @@
 #include "JSNumberCell.h"
 #include "PropertyDescriptor.h"
 #include "PropertySlot.h"
+#include "RopeImpl.h"
 
 namespace JSC {
 
@@ -82,16 +83,14 @@ class JS_EXPORTCLASS JSString : public JSCell {
   friend class JIT;
   friend class JSGlobalData;
 
-  typedef URopeImpl Rope;
-
   class RopeBuilder {
    public:
     RopeBuilder(unsigned fiberCount)
-        : m_index(0), m_rope(Rope::tryCreateUninitialized(fiberCount)) {}
+        : m_index(0), m_rope(RopeImpl::tryCreateUninitialized(fiberCount)) {}
 
     bool isOutOfMemory() { return !m_rope; }
 
-    void append(Rope::Fiber& fiber) {
+    void append(RopeImpl::Fiber& fiber) {
       ASSERT(m_rope);
       m_rope->initializeFiber(m_index, fiber);
     }
@@ -107,7 +106,7 @@ class JS_EXPORTCLASS JSString : public JSCell {
         append(jsString->string());
     }
 
-    PassRefPtr<Rope> release() {
+    PassRefPtr<RopeImpl> release() {
       ASSERT(m_index == m_rope->fiberCount());
       return m_rope.release();
     }
@@ -116,7 +115,7 @@ class JS_EXPORTCLASS JSString : public JSCell {
 
    private:
     unsigned m_index;
-    RefPtr<Rope> m_rope;
+    RefPtr<RopeImpl> m_rope;
   };
 
   ALWAYS_INLINE JSString(JSGlobalData* globalData, const UString& value)
@@ -145,7 +144,7 @@ class JS_EXPORTCLASS JSString : public JSCell {
         m_fiberCount(0) {
     ASSERT(!m_value.isNull());
   }
-  JSString(JSGlobalData* globalData, PassRefPtr<Rope> rope)
+  JSString(JSGlobalData* globalData, PassRefPtr<RopeImpl> rope)
       : JSCell(globalData->stringStructure.get()),
         m_length(rope->length()),
         m_fiberCount(1) {
@@ -229,7 +228,7 @@ class JS_EXPORTCLASS JSString : public JSCell {
   ~JSString() {
     ASSERT(vptr() == JSGlobalData::jsStringVPtr);
     for (unsigned i = 0; i < m_fiberCount; ++i)
-      m_other.m_fibers[i]->deref();
+      RopeImpl::deref(m_other.m_fibers[i]);
 
     if (!m_fiberCount && m_other.m_finalizerCallback)
       m_other.m_finalizerCallback(this, m_other.m_finalizerContext);
@@ -282,7 +281,7 @@ class JS_EXPORTCLASS JSString : public JSCell {
   void appendStringInConstruct(unsigned& index, JSString* jsString) {
     if (jsString->isRope()) {
       for (unsigned i = 0; i < jsString->m_fiberCount; ++i) {
-        Rope::Fiber fiber = jsString->m_other.m_fibers[i];
+        RopeImpl::Fiber fiber = jsString->m_other.m_fibers[i];
         fiber->ref();
         m_other.m_fibers[index++] = fiber;
       }
@@ -330,7 +329,7 @@ class JS_EXPORTCLASS JSString : public JSCell {
 
   static const unsigned s_maxInternalRopeLength = 3;
 
-  // A string is represented either by a UString or a Rope.
+  // A string is represented either by a UString or a RopeImpl.
   unsigned m_length;
   mutable UString m_value;
   mutable unsigned m_fiberCount;
@@ -338,7 +337,7 @@ class JS_EXPORTCLASS JSString : public JSCell {
   struct JSStringFinalizerStruct {
     JSStringFinalizerStruct() : m_finalizerCallback(0) {}
     union {
-      mutable Rope::Fiber m_fibers[s_maxInternalRopeLength];
+      mutable RopeImpl::Fiber m_fibers[s_maxInternalRopeLength];
       struct {
         JSStringFinalizerCallback m_finalizerCallback;
         void* m_finalizerContext;
