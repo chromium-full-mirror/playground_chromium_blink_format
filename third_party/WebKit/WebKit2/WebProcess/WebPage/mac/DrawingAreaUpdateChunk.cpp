@@ -41,6 +41,7 @@ namespace WebKit {
 
 DrawingAreaUpdateChunk::DrawingAreaUpdateChunk(WebPage* webPage)
     : DrawingArea(DrawingAreaUpdateChunkType, webPage),
+      m_isWaitingForUpdate(false),
       m_displayTimer(WebProcess::shared().runLoop(),
                      this,
                      &DrawingAreaUpdateChunk::display) {}
@@ -96,6 +97,8 @@ void DrawingAreaUpdateChunk::paintIntoUpdateChunk(UpdateChunk* updateChunk) {
 }
 
 void DrawingAreaUpdateChunk::display() {
+  ASSERT(!m_isWaitingForUpdate);
+
   if (m_dirtyRect.isEmpty())
     return;
 
@@ -113,10 +116,14 @@ void DrawingAreaUpdateChunk::display() {
                                           m_webPage->pageID(),
                                           CoreIPC::In(updateChunk));
 
+  m_isWaitingForUpdate = true;
   m_displayTimer.stop();
 }
 
 void DrawingAreaUpdateChunk::scheduleDisplay() {
+  if (m_isWaitingForUpdate)
+    return;
+
   if (m_displayTimer.isActive())
     return;
 
@@ -124,6 +131,9 @@ void DrawingAreaUpdateChunk::scheduleDisplay() {
 }
 
 void DrawingAreaUpdateChunk::setSize(const IntSize& viewSize) {
+  // We don't want to wait for an update until we display.
+  m_isWaitingForUpdate = false;
+
   m_webPage->setSize(viewSize);
 
   // Layout if necessary.
@@ -140,6 +150,15 @@ void DrawingAreaUpdateChunk::setSize(const IntSize& viewSize) {
                                           CoreIPC::In(viewSize, updateChunk));
 }
 
+void DrawingAreaUpdateChunk::didUpdate() {
+  ASSERT(m_isWaitingForUpdate);
+
+  m_isWaitingForUpdate = false;
+
+  // Display if needed.
+  display();
+}
+
 void DrawingAreaUpdateChunk::didReceiveMessage(
     CoreIPC::Connection*,
     CoreIPC::MessageID messageID,
@@ -153,6 +172,11 @@ void DrawingAreaUpdateChunk::didReceiveMessage(
       setSize(size);
       break;
     }
+
+    case DrawingAreaMessage::DidUpdate:
+      didUpdate();
+      break;
+
     default:
       ASSERT_NOT_REACHED();
       break;
