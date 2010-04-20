@@ -186,7 +186,7 @@ class WebChromeClient : public WebCore::ChromeClient {
 
   virtual void runOpenPanel(WebCore::Frame*, PassRefPtr<WebCore::FileChooser>);
   virtual void chooseIconForFiles(const Vector<WebCore::String>&,
-                                  PassRefPtr<WebCore::FileChooser>);
+                                  WebCore::FileChooser*);
 
   virtual bool setCursor(WebCore::PlatformCursorHandle);
 
