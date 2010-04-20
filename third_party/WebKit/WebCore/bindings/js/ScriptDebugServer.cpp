@@ -134,6 +134,8 @@ void ScriptDebugServer::setBreakpoint(const String& sourceID,
                                       unsigned lineNumber,
                                       ScriptBreakpoint breakpoint) {
   intptr_t sourceIDValue = sourceID.toIntPtr();
+  if (!sourceIDValue)
+    return;
   BreakpointsMap::iterator it = m_breakpoints.find(sourceIDValue);
   if (it == m_breakpoints.end())
     it = m_breakpoints.set(sourceIDValue, SourceBreakpoints()).first;
@@ -143,6 +145,8 @@ void ScriptDebugServer::setBreakpoint(const String& sourceID,
 void ScriptDebugServer::removeBreakpoint(const String& sourceID,
                                          unsigned lineNumber) {
   intptr_t sourceIDValue = sourceID.toIntPtr();
+  if (!sourceIDValue)
+    return;
   BreakpointsMap::iterator it = m_breakpoints.find(sourceIDValue);
   if (it != m_breakpoints.end())
     it->second.remove(lineNumber);
