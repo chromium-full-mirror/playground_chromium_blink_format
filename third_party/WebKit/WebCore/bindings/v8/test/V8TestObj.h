@@ -18,14 +18,14 @@
     Boston, MA 02111-1307, USA.
 */
 
-#ifndef V8TestObj_H
-#define V8TestObj_H
+#ifndef V8TestObj_h
+#define V8TestObj_h
 
+#include "StringHash.h"
+#include "TestObj.h"
+#include "WrapperTypeInfo.h"
 #include <v8.h>
 #include <wtf/HashMap.h>
-#include "StringHash.h"
-#include "WrapperTypeInfo.h"
-#include "TestObj.h"
 
 namespace WebCore {
 
@@ -54,4 +54,4 @@ v8::Handle<v8::Value> toV8(TestObj*);
 v8::Handle<v8::Value> toV8(PassRefPtr<TestObj>);
 }
 
-#endif  // V8TestObj_H
+#endif  // V8TestObj_h
