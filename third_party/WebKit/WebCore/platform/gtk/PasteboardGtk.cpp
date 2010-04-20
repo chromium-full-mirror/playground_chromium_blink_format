@@ -61,8 +61,9 @@ static void clipboard_get_contents_cb(GtkClipboard* clipboard,
   PasteboardSelectionData* clipboardData =
       reinterpret_cast<PasteboardSelectionData*>(data);
   ASSERT(clipboardData);
-  if ((gint)info ==
-      Pasteboard::generalPasteboard()->m_helper->getWebViewTargetInfoHtml())
+  if (info ==
+      Pasteboard::generalPasteboard()->helper()->getIdForTargetType(
+          PasteboardHelper::TargetTypeMarkup))
     gtk_selection_data_set(
         selection_data, selection_data->target, 8,
         reinterpret_cast<const guchar*>(clipboardData->markup()),
@@ -90,6 +91,10 @@ Pasteboard::Pasteboard() {
 
 Pasteboard::~Pasteboard() {
   delete m_helper;
+}
+
+PasteboardHelper* Pasteboard::helper() {
+  return m_helper;
 }
 
 void Pasteboard::setHelper(PasteboardHelper* helper) {
@@ -126,7 +131,7 @@ void Pasteboard::writeURL(const KURL& url, const String&, Frame* frame) {
     return;
 
   GtkClipboard* clipboard = m_helper->getClipboard(frame);
-  GtkClipboard* primary = m_helper->getPrimary(frame);
+  GtkClipboard* primary = m_helper->getPrimarySelectionClipboard(frame);
   CString utf8 = url.string().utf8();
   gtk_clipboard_set_text(clipboard, utf8.data(), utf8.length());
   gtk_clipboard_set_text(primary, utf8.data(), utf8.length());
@@ -167,7 +172,7 @@ PassRefPtr<DocumentFragment> Pasteboard::documentFragment(
     bool allowPlainText,
     bool& chosePlainText) {
   GdkAtom textHtml = gdk_atom_intern_static_string("text/html");
-  GtkClipboard* clipboard = m_helper->getCurrentTarget(frame);
+  GtkClipboard* clipboard = m_helper->getCurrentClipboard(frame);
   chosePlainText = false;
 
   if (GtkSelectionData* data =
@@ -206,7 +211,7 @@ PassRefPtr<DocumentFragment> Pasteboard::documentFragment(
 }
 
 String Pasteboard::plainText(Frame* frame) {
-  GtkClipboard* clipboard = m_helper->getCurrentTarget(frame);
+  GtkClipboard* clipboard = m_helper->getCurrentClipboard(frame);
 
   gchar* utf8 = gtk_clipboard_wait_for_text(clipboard);
 

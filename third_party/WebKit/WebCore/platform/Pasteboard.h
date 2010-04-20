@@ -118,7 +118,7 @@ class Pasteboard : public Noncopyable {
 
 #if PLATFORM(GTK)
   void setHelper(PasteboardHelper*);
-  PasteboardHelper* m_helper;
+  PasteboardHelper* helper();
 #endif
 
  private:
@@ -140,6 +140,10 @@ class Pasteboard : public Noncopyable {
 
 #if PLATFORM(CHROMIUM)
   PasteboardPrivate p;
+#endif
+
+#if PLATFORM(GTK)
+  PasteboardHelper* m_helper;
 #endif
 };
 
