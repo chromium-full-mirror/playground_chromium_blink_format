@@ -31,7 +31,7 @@ class SVGFEFloodElement : public SVGFilterPrimitiveStandardAttributes {
   SVGFEFloodElement(const QualifiedName&, Document*);
   virtual ~SVGFEFloodElement();
 
-  virtual PassRefPtr<FilterEffect> build(SVGFilterBuilder*);
+  virtual bool build(SVGResourceFilter*);
 };
 
 }  // namespace WebCore

@@ -2,7 +2,6 @@
     Copyright (C) 2004, 2005, 2006, 2007 Nikolas Zimmermann <zimmermann@kde.org>
     Copyright (C) 2004, 2005, 2006 Rob Buis <buis@kde.org>
     Copyright (C) 2006 Samuel Weinig <sam.weinig@gmail.com>
-    Copyright (C) Research In Motion Limited 2010. All rights reserved.
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -25,6 +24,7 @@
 
 #if ENABLE(SVG) && ENABLE(FILTERS)
 #include "RenderObject.h"
+#include "SVGResourceFilter.h"
 #include "SVGExternalResourcesRequired.h"
 #include "SVGLangSpace.h"
 #include "SVGStyledElement.h"
@@ -35,6 +35,8 @@ namespace WebCore {
 extern char SVGFilterResXIdentifier[];
 extern char SVGFilterResYIdentifier[];
 
+class SVGResourceFilter;
+
 class SVGFilterElement : public SVGStyledElement,
                          public SVGURIReference,
                          public SVGLangSpace,
@@ -43,13 +45,13 @@ class SVGFilterElement : public SVGStyledElement,
   SVGFilterElement(const QualifiedName&, Document*);
   virtual ~SVGFilterElement();
 
+  virtual SVGResource* canvasResource(const RenderObject*);
+
   void setFilterRes(unsigned long filterResX, unsigned long filterResY) const;
-  FloatRect filterBoundingBox(const FloatRect&) const;
 
   virtual void parseMappedAttribute(MappedAttribute*);
   virtual void synchronizeProperty(const QualifiedName&);
-
-  virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
+  virtual bool rendererIsNeeded(RenderStyle*) { return false; }
 
  private:
   DECLARE_ANIMATED_PROPERTY(SVGFilterElement,
@@ -100,8 +102,16 @@ class SVGFilterElement : public SVGStyledElement,
                             bool,
                             ExternalResourcesRequired,
                             externalResourcesRequired)
-};
-}
 
-#endif
+  mutable RefPtr<SVGResourceFilter> m_filter;
+
+ private:
+  friend class SVGResourceFilter;
+  FloatRect filterBoundingBox(const FloatRect&) const;
+  void buildFilter(const FloatRect& targetRect) const;
+};
+
+}  // namespace WebCore
+
+#endif  // ENABLE(SVG)
 #endif

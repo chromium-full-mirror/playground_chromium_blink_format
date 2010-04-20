@@ -34,7 +34,6 @@
 #include "RenderObject.h"
 #include "RenderSVGResource.h"
 #include "RenderSVGResourceClipper.h"
-#include "RenderSVGResourceFilter.h"
 #include "RenderSVGResourceMasker.h"
 #include "SVGElement.h"
 #include "SVGElementInstance.h"
@@ -42,7 +41,7 @@
 #include "SVGNames.h"
 #include "SVGRenderStyle.h"
 #include "SVGRenderSupport.h"
-#include "SVGResource.h"
+#include "SVGResourceFilter.h"
 #include "SVGSVGElement.h"
 #include <wtf/Assertions.h>
 
@@ -237,6 +236,13 @@ void SVGStyledElement::invalidateResources() {
 
   if (document->parsing())
     return;
+
+#if ENABLE(FILTERS)
+  SVGResourceFilter* filter = getFilterById(
+      document, object->style()->svgStyle()->filterResource(), object);
+  if (filter)
+    filter->invalidate();
+#endif
 
   deregisterFromResources(object);
 }

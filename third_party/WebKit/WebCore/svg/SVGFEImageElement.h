@@ -22,7 +22,6 @@
 #define SVGFEImageElement_h
 
 #if ENABLE(SVG) && ENABLE(FILTERS)
-#include "CachedResourceClient.h"
 #include "CachedResourceHandle.h"
 #include "ImageBuffer.h"
 #include "SVGExternalResourcesRequired.h"
@@ -48,7 +47,7 @@ class SVGFEImageElement : public SVGFilterPrimitiveStandardAttributes,
   virtual void notifyFinished(CachedResource*);
 
   virtual void addSubresourceAttributeURLs(ListHashSet<KURL>&) const;
-  virtual PassRefPtr<FilterEffect> build(SVGFilterBuilder*);
+  virtual bool build(SVGResourceFilter*);
 
  private:
   void requestImageResource();

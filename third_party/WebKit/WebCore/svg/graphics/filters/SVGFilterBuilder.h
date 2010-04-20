@@ -41,10 +41,6 @@ class SVGFilterBuilder : public RefCounted<SVGFilterBuilder> {
   FilterEffect* getEffectById(const AtomicString& id) const;
   FilterEffect* lastEffect() const { return m_lastEffect.get(); }
 
-  const HashMap<AtomicString, RefPtr<FilterEffect>>& namedEffects() {
-    return m_namedEffects;
-  }
-
   void clearEffects();
 
  private:

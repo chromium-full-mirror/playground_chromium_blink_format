@@ -32,7 +32,7 @@ class SVGFEMergeElement : public SVGFilterPrimitiveStandardAttributes {
   SVGFEMergeElement(const QualifiedName&, Document*);
   virtual ~SVGFEMergeElement();
 
-  virtual PassRefPtr<FilterEffect> build(SVGFilterBuilder*);
+  virtual bool build(SVGResourceFilter*);
 };
 
 }  // namespace WebCore

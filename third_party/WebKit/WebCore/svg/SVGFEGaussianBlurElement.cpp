@@ -26,6 +26,7 @@
 #include "MappedAttribute.h"
 #include "SVGNames.h"
 #include "SVGParserUtilities.h"
+#include "SVGResourceFilter.h"
 
 namespace WebCore {
 
@@ -74,14 +75,17 @@ void SVGFEGaussianBlurElement::synchronizeProperty(
     synchronizeIn1();
 }
 
-PassRefPtr<FilterEffect> SVGFEGaussianBlurElement::build(
-    SVGFilterBuilder* filterBuilder) {
-  FilterEffect* input1 = filterBuilder->getEffectById(in1());
+bool SVGFEGaussianBlurElement::build(SVGResourceFilter* filterResource) {
+  FilterEffect* input1 = filterResource->builder()->getEffectById(in1());
 
   if (!input1)
-    return 0;
+    return false;
 
-  return FEGaussianBlur::create(input1, stdDeviationX(), stdDeviationY());
+  RefPtr<FilterEffect> effect =
+      FEGaussianBlur::create(input1, stdDeviationX(), stdDeviationY());
+  filterResource->addFilterEffect(this, effect.release());
+
+  return true;
 }
 }
 

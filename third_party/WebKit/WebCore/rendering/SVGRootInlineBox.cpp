@@ -32,7 +32,6 @@
 #include "Frame.h"
 #include "GraphicsContext.h"
 #include "RenderBlock.h"
-#include "RenderSVGResourceFilter.h"
 #include "RenderSVGRoot.h"
 #include "SVGInlineFlowBox.h"
 #include "SVGInlineTextBox.h"
@@ -40,6 +39,7 @@
 #include "SVGPaintServer.h"
 #include "SVGRenderStyleDefs.h"
 #include "SVGRenderSupport.h"
+#include "SVGResourceFilter.h"
 #include "SVGTextPositioningElement.h"
 #include "SVGURIReference.h"
 #include "Text.h"
@@ -355,7 +355,7 @@ static float calculateKerning(RenderObject* item) {
 // Helper class for paint()
 struct SVGRootInlineBoxPaintWalker {
   SVGRootInlineBoxPaintWalker(SVGRootInlineBox* rootBox,
-                              RenderSVGResourceFilter* rootFilter,
+                              SVGResourceFilter* rootFilter,
                               RenderObject::PaintInfo paintInfo,
                               int tx,
                               int ty)
@@ -707,8 +707,8 @@ struct SVGRootInlineBoxPaintWalker {
   RenderObject::PaintInfo m_savedInfo;
 
   FloatRect m_boundingBox;
-  RenderSVGResourceFilter* m_filter;
-  RenderSVGResourceFilter* m_rootFilter;
+  SVGResourceFilter* m_filter;
+  SVGResourceFilter* m_rootFilter;
 
   SVGPaintServer* m_fillPaintServer;
   SVGPaintServer* m_strokePaintServer;
@@ -732,7 +732,7 @@ void SVGRootInlineBox::paint(RenderObject::PaintInfo& paintInfo,
   RenderObject::PaintInfo savedInfo(paintInfo);
   paintInfo.context->save();
 
-  RenderSVGResourceFilter* filter = 0;
+  SVGResourceFilter* filter = 0;
   FloatRect boundingBox(tx + x(), ty + y(), width(), height());
 
   // Initialize text rendering

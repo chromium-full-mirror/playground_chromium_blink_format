@@ -22,15 +22,14 @@
 #define SVGFilterPrimitiveStandardAttributes_h
 
 #if ENABLE(SVG) && ENABLE(FILTERS)
-#include "FilterEffect.h"
 #include "SVGFilterBuilder.h"
 #include "SVGNames.h"
+#include "SVGResourceFilter.h"
 #include "SVGStyledElement.h"
 
-#include <wtf/PassRefPtr.h>
-#include <wtf/RefPtr.h>
-
 namespace WebCore {
+
+class SVGResourceFilter;
 
 class SVGFilterPrimitiveStandardAttributes : public SVGStyledElement {
  public:
@@ -41,11 +40,13 @@ class SVGFilterPrimitiveStandardAttributes : public SVGStyledElement {
 
   virtual void parseMappedAttribute(MappedAttribute*);
   virtual void synchronizeProperty(const QualifiedName&);
-  virtual PassRefPtr<FilterEffect> build(SVGFilterBuilder*) = 0;
+  virtual bool build(SVGResourceFilter*) = 0;
 
   virtual bool rendererIsNeeded(RenderStyle*) { return false; }
 
-  void setStandardAttributes(bool, FilterEffect*) const;
+ protected:
+  friend class SVGResourceFilter;
+  void setStandardAttributes(SVGResourceFilter*, FilterEffect*) const;
 
  private:
   DECLARE_ANIMATED_PROPERTY(SVGFilterPrimitiveStandardAttributes,

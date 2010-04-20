@@ -54,7 +54,7 @@ class RenderSVGResourceMasker : public RenderSVGResource {
   virtual void invalidateClients();
   virtual void invalidateClient(RenderObject*);
 
-  virtual bool applyResource(RenderObject*, GraphicsContext*&);
+  virtual bool applyResource(RenderObject*, GraphicsContext*);
   virtual FloatRect resourceBoundingBox(const FloatRect&) const;
 
   SVGUnitTypes::SVGUnitType maskUnits() const {

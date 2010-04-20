@@ -24,6 +24,7 @@
 #include "SVGFEMergeElement.h"
 
 #include "SVGFEMergeNodeElement.h"
+#include "SVGResourceFilter.h"
 
 namespace WebCore {
 
@@ -33,23 +34,25 @@ SVGFEMergeElement::SVGFEMergeElement(const QualifiedName& tagName,
 
 SVGFEMergeElement::~SVGFEMergeElement() {}
 
-PassRefPtr<FilterEffect> SVGFEMergeElement::build(
-    SVGFilterBuilder* filterBuilder) {
+bool SVGFEMergeElement::build(SVGResourceFilter* filterResource) {
   Vector<RefPtr<FilterEffect>> mergeInputs;
   for (Node* n = firstChild(); n != 0; n = n->nextSibling()) {
     if (n->hasTagName(SVGNames::feMergeNodeTag)) {
-      FilterEffect* mergeEffect = filterBuilder->getEffectById(
+      FilterEffect* mergeEffect = filterResource->builder()->getEffectById(
           static_cast<SVGFEMergeNodeElement*>(n)->in1());
       if (!mergeEffect)
-        return 0;
+        return false;
       mergeInputs.append(mergeEffect);
     }
   }
 
   if (mergeInputs.isEmpty())
-    return 0;
+    return false;
 
-  return FEMerge::create(mergeInputs);
+  RefPtr<FilterEffect> effect = FEMerge::create(mergeInputs);
+  filterResource->addFilterEffect(this, effect.release());
+
+  return true;
 }
 }
 

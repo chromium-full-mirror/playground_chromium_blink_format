@@ -38,7 +38,7 @@ class SVGFEMorphologyElement : public SVGFilterPrimitiveStandardAttributes {
 
   virtual void parseMappedAttribute(MappedAttribute*);
   virtual void synchronizeProperty(const QualifiedName&);
-  virtual PassRefPtr<FilterEffect> build(SVGFilterBuilder*);
+  virtual bool build(SVGResourceFilter*);
 
  private:
   DECLARE_ANIMATED_PROPERTY(SVGFEMorphologyElement,

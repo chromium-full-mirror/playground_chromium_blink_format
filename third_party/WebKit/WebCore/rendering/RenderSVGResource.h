@@ -30,7 +30,6 @@ namespace WebCore {
 enum RenderSVGResourceType {
   MaskerResourceType,
   MarkerResourceType,
-  FilterResourceType,
   ClipperResourceType
 };
 
@@ -95,8 +94,7 @@ class RenderSVGResource : public RenderSVGHiddenContainer {
   virtual void invalidateClients() = 0;
   virtual void invalidateClient(RenderObject*) = 0;
 
-  virtual bool applyResource(RenderObject*, GraphicsContext*&) = 0;
-  virtual void postApplyResource(RenderObject*, GraphicsContext*&) {}
+  virtual bool applyResource(RenderObject*, GraphicsContext*) = 0;
   virtual FloatRect resourceBoundingBox(const FloatRect&) const = 0;
 
   virtual RenderSVGResourceType resourceType() const = 0;
