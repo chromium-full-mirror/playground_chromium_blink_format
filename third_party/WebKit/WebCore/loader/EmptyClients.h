@@ -163,8 +163,7 @@ class EmptyChromeClient : public ChromeClient {
 #endif
 
   virtual void runOpenPanel(Frame*, PassRefPtr<FileChooser>) {}
-  virtual void chooseIconForFiles(const Vector<String>&,
-                                  PassRefPtr<FileChooser>) {}
+  virtual void chooseIconForFiles(const Vector<String>&, FileChooser*) {}
 
   virtual void formStateDidChange(const Node*) {}
 

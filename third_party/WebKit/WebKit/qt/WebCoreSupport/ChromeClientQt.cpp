@@ -491,7 +491,7 @@ void ChromeClientQt::runOpenPanel(Frame* frame,
 }
 
 void ChromeClientQt::chooseIconForFiles(const Vector<String>& filenames,
-                                        PassRefPtr<FileChooser> chooser) {
+                                        FileChooser* chooser) {
   chooser->iconLoaded(Icon::createIconForFiles(filenames));
 }
 

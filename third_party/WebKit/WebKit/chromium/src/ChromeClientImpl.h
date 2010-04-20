@@ -35,6 +35,7 @@
 
 namespace WebCore {
 class AccessibilityObject;
+class FileChooser;
 class HTMLParserQuirks;
 class PopupContainer;
 class SecurityOrigin;
@@ -134,7 +135,7 @@ class ChromeClientImpl : public WebCore::ChromeClientChromium {
       WebCore::Geolocation*);
   virtual void runOpenPanel(WebCore::Frame*, PassRefPtr<WebCore::FileChooser>);
   virtual void chooseIconForFiles(const Vector<WebCore::String>&,
-                                  PassRefPtr<WebCore::FileChooser>);
+                                  WebCore::FileChooser*);
   virtual bool setCursor(WebCore::PlatformCursorHandle) { return false; }
   virtual void formStateDidChange(const WebCore::Node*);
   virtual PassOwnPtr<WebCore::HTMLParserQuirks> createHTMLParserQuirks() {

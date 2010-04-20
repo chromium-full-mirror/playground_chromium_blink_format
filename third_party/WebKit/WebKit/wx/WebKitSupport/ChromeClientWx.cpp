@@ -399,7 +399,7 @@ void ChromeClientWx::runOpenPanel(Frame*, PassRefPtr<FileChooser>) {
 }
 
 void ChromeClientWx::chooseIconForFiles(const Vector<String>& filenames,
-                                        PassRefPtr<FileChooser> chooser) {
+                                        FileChooser* chooser) {
   chooser->iconLoaded(Icon::createIconForFiles(filenames));
 }
 

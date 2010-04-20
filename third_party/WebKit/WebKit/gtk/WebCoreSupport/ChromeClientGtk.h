@@ -124,7 +124,7 @@ class ChromeClient : public WebCore::ChromeClient {
 #endif
   virtual void runOpenPanel(WebCore::Frame*, PassRefPtr<WebCore::FileChooser>);
   virtual void chooseIconForFiles(const Vector<WebCore::String>&,
-                                  PassRefPtr<WebCore::FileChooser>);
+                                  WebCore::FileChooser*);
 
   virtual void formStateDidChange(const WebCore::Node*) {}
 

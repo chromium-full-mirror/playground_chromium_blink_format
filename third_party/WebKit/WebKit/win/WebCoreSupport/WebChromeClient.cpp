@@ -777,7 +777,7 @@ void WebChromeClient::runOpenPanel(Frame*,
 
 void WebChromeClient::chooseIconForFiles(
     const Vector<WebCore::String>& filenames,
-    PassRefPtr<WebCore::FileChooser> chooser) {
+    WebCore::FileChooser* chooser) {
   chooser->iconLoaded(Icon::createIconForFiles(filenames));
 }
 
