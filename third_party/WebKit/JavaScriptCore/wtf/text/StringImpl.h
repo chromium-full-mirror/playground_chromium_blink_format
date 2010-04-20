@@ -31,6 +31,7 @@
 #include <wtf/RefCounted.h>
 #include <wtf/StringHashFunctions.h>
 #include <wtf/Vector.h>
+#include <wtf/text/StringImplBase.h>
 #include <wtf/unicode/Unicode.h>
 
 #if PLATFORM(CF)
@@ -60,32 +61,24 @@ typedef OwnFastMallocPtr<const UChar> SharableUChar;
 typedef CrossThreadRefCounted<SharableUChar> SharedUChar;
 typedef bool (*CharacterMatchFunctionPtr)(UChar);
 
-class StringImpl : public Noncopyable {
+class StringImpl : public StringImplBase {
   friend struct CStringTranslator;
   friend struct HashAndCharactersTranslator;
   friend struct UCharBufferTranslator;
 
  private:
-  enum BufferOwnership {
-    BufferInternal,
-    BufferOwned,
-    BufferShared,
-  };
-
   // Used to construct static strings, which have an special refCount that can
   // never hit zero.
   // This means that the static string will never be destroyed, which is
   // important because
   // static strings will be shared across threads & ref-counted in a
   // non-threadsafe manner.
-  enum StaticStringConstructType { ConstructStaticString };
   StringImpl(const UChar* characters,
              unsigned length,
              StaticStringConstructType)
-      : m_data(characters),
+      : StringImplBase(length, ConstructStaticString),
+        m_data(characters),
         m_sharedBuffer(0),
-        m_length(length),
-        m_refCountAndFlags(s_refCountFlagStatic | BufferInternal),
         m_hash(0) {
     // Ensure that the hash is computed so that AtomicStringHash can call
     // existingHash()
@@ -97,10 +90,9 @@ class StringImpl : public Noncopyable {
 
   // Create a normal string with internal storage (BufferInternal)
   StringImpl(unsigned length)
-      : m_data(reinterpret_cast<const UChar*>(this + 1)),
+      : StringImplBase(length, BufferInternal),
+        m_data(reinterpret_cast<const UChar*>(this + 1)),
         m_sharedBuffer(0),
-        m_length(length),
-        m_refCountAndFlags(s_refCountIncrement | BufferInternal),
         m_hash(0) {
     ASSERT(m_data);
     ASSERT(m_length);
@@ -108,10 +100,9 @@ class StringImpl : public Noncopyable {
 
   // Create a StringImpl adopting ownership of the provided buffer (BufferOwned)
   StringImpl(const UChar* characters, unsigned length)
-      : m_data(characters),
+      : StringImplBase(length, BufferOwned),
+        m_data(characters),
         m_sharedBuffer(0),
-        m_length(length),
-        m_refCountAndFlags(s_refCountIncrement | BufferOwned),
         m_hash(0) {
     ASSERT(m_data);
     ASSERT(m_length);
@@ -122,10 +113,9 @@ class StringImpl : public Noncopyable {
   StringImpl(const UChar* characters,
              unsigned length,
              PassRefPtr<SharedUChar> sharedBuffer)
-      : m_data(characters),
+      : StringImplBase(length, BufferShared),
+        m_data(characters),
         m_sharedBuffer(sharedBuffer.releaseRef()),
-        m_length(length),
-        m_refCountAndFlags(s_refCountIncrement | BufferShared),
         m_hash(0) {
     ASSERT(m_data);
     ASSERT(m_length);
@@ -168,7 +158,6 @@ class StringImpl : public Noncopyable {
 
   SharedUChar* sharedBuffer();
   const UChar* characters() const { return m_data; }
-  unsigned length() { return m_length; }
 
   bool hasTerminatingNullCharacter() const {
     return m_refCountAndFlags & s_refCountFlagHasTerminatingNullCharacter;
@@ -193,10 +182,6 @@ class StringImpl : public Noncopyable {
     return WTF::stringHash(data);
   }
 
-  StringImpl* ref() {
-    m_refCountAndFlags += s_refCountIncrement;
-    return this;
-  }
   ALWAYS_INLINE void deref() {
     m_refCountAndFlags -= s_refCountIncrement;
     if (!(m_refCountAndFlags & (s_refCountMask | s_refCountFlagStatic)))
@@ -283,12 +268,6 @@ class StringImpl : public Noncopyable {
 #endif
 
  private:
-  using Noncopyable::operator new;
-  void* operator new(size_t, void* inPlace) {
-    ASSERT(inPlace);
-    return inPlace;
-  }
-
   static PassRefPtr<StringImpl> createStrippingNullCharactersSlowCase(
       const UChar*,
       unsigned length);
@@ -299,17 +278,8 @@ class StringImpl : public Noncopyable {
   }
   bool isStatic() const { return m_refCountAndFlags & s_refCountFlagStatic; }
 
-  static const unsigned s_refCountMask = 0xFFFFFFE0;
-  static const unsigned s_refCountIncrement = 0x20;
-  static const unsigned s_refCountFlagStatic = 0x10;
-  static const unsigned s_refCountFlagHasTerminatingNullCharacter = 0x8;
-  static const unsigned s_refCountFlagInTable = 0x4;
-  static const unsigned s_refCountMaskBufferOwnership = 0x3;
-
   const UChar* m_data;
   SharedUChar* m_sharedBuffer;
-  unsigned m_length;
-  unsigned m_refCountAndFlags;
   mutable unsigned m_hash;
 };
 
