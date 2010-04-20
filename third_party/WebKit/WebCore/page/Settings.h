@@ -149,6 +149,9 @@ class Settings : public Noncopyable {
   void setImagesEnabled(bool);
   bool areImagesEnabled() const { return m_areImagesEnabled; }
 
+  void setMediaEnabled(bool);
+  bool isMediaEnabled() const { return m_isMediaEnabled; }
+
   void setPluginsEnabled(bool);
   bool arePluginsEnabled() const { return m_arePluginsEnabled; }
 
@@ -406,6 +409,7 @@ class Settings : public Noncopyable {
   bool m_privateBrowsingEnabled : 1;
   bool m_caretBrowsingEnabled : 1;
   bool m_areImagesEnabled : 1;
+  bool m_isMediaEnabled : 1;
   bool m_arePluginsEnabled : 1;
   bool m_localStorageEnabled : 1;
   bool m_isJavaScriptEnabled : 1;
