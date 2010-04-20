@@ -30,7 +30,7 @@
 
 namespace WebCore {
 
-RenderFrame::RenderFrame(HTMLFrameElement* frame) : RenderPart(frame) {
+RenderFrame::RenderFrame(HTMLFrameElement* frame) : RenderFrameBase(frame) {
   setInline(false);
 }
 
