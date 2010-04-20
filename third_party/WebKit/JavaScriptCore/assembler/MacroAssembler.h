@@ -249,6 +249,13 @@ class MacroAssembler : public MacroAssemblerBase {
   Jump branchSubPtr(Condition cond, Imm32 imm, RegisterID dest) {
     return branchSub32(cond, imm, dest);
   }
+  using MacroAssemblerBase::branchTest8;
+  Jump branchTest8(Condition cond,
+                   ExtendedAddress address,
+                   Imm32 mask = Imm32(-1)) {
+    return MacroAssemblerBase::branchTest8(
+        cond, Address(address.base, address.offset), mask);
+  }
 #endif
 };
 

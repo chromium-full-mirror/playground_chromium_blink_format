@@ -349,7 +349,7 @@ void SamplingTool::dump(ExecState* exec) {
     if (blockPercent >= 1) {
       // Instruction* code = codeBlock->instructions().begin();
       printf("#%d: %s:%d: %d / %lld (%.3f%%)\n", i + 1,
-             record->m_executable->sourceURL().UTF8String().c_str(),
+             record->m_executable->sourceURL().ascii(),
              codeBlock->lineNumberForBytecodeOffset(exec, 0),
              record->m_sampleCount, m_sampleCount, blockPercent);
       if (i < 10) {

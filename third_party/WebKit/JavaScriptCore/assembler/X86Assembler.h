@@ -695,6 +695,16 @@ class X86Assembler {
     m_formatter.immediate8(imm);
   }
 
+  void cmpb_im(int imm,
+               int offset,
+               RegisterID base,
+               RegisterID index,
+               int scale) {
+    m_formatter.oneByteOp(OP_GROUP1_EbIb, GROUP1_OP_CMP, base, index, scale,
+                          offset);
+    m_formatter.immediate8(imm);
+  }
+
   void cmpl_im(int imm,
                int offset,
                RegisterID base,
@@ -823,6 +833,16 @@ class X86Assembler {
 
   void testb_im(int imm, int offset, RegisterID base) {
     m_formatter.oneByteOp(OP_GROUP3_EbIb, GROUP3_OP_TEST, base, offset);
+    m_formatter.immediate8(imm);
+  }
+
+  void testb_im(int imm,
+                int offset,
+                RegisterID base,
+                RegisterID index,
+                int scale) {
+    m_formatter.oneByteOp(OP_GROUP3_EbIb, GROUP3_OP_TEST, base, index, scale,
+                          offset);
     m_formatter.immediate8(imm);
   }
 

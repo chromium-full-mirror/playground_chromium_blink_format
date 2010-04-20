@@ -77,6 +77,14 @@ class AbstractMacroAssembler {
     int32_t offset;
   };
 
+  struct ExtendedAddress {
+    explicit ExtendedAddress(RegisterID base, intptr_t offset = 0)
+        : base(base), offset(offset) {}
+
+    RegisterID base;
+    intptr_t offset;
+  };
+
   // ImplicitAddress:
   //
   // This class is used for explicit 'load' and 'store' operations
