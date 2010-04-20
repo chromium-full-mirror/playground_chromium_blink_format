@@ -223,6 +223,7 @@ class RenderLayerCompositor {
   bool requiresCompositingForVideo(RenderObject*) const;
   bool requiresCompositingForCanvas(RenderObject*) const;
   bool requiresCompositingForPlugin(RenderObject*) const;
+  bool requiresCompositingForIFrame(RenderObject*) const;
   bool requiresCompositingWhenDescendantsAreCompositing(RenderObject*) const;
 
  private:
