@@ -201,7 +201,7 @@ class DOMWindow : public RefCounted<DOMWindow>, public EventTarget {
   // DOM Level 2 AbstractView Interface
   Document* document() const;
   // CSSOM View Module
-  PassRefPtr<Media> media() const;
+  PassRefPtr<Media> styleMedia() const;
 
   // DOM Level 2 Style Interface
   PassRefPtr<CSSStyleDeclaration> getComputedStyle(
