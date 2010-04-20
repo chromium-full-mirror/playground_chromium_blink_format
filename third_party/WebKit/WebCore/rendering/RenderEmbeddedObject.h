@@ -24,14 +24,14 @@
 #ifndef RenderEmbeddedObject_h
 #define RenderEmbeddedObject_h
 
-#include "RenderPartObject.h"
+#include "RenderPart.h"
 
 namespace WebCore {
 
 // Renderer for embeds and objects, often, but not always, rendered via
 // plug-ins.
 // For example, <embed src="foo.html"> does not invoke a plug-in.
-class RenderEmbeddedObject : public RenderPartObject {
+class RenderEmbeddedObject : public RenderPart {
  public:
   RenderEmbeddedObject(Element*);
   virtual ~RenderEmbeddedObject();
@@ -58,6 +58,7 @@ class RenderEmbeddedObject : public RenderPartObject {
 #endif
 
   virtual void layout();
+  virtual void viewCleared();
 
   String m_replacementText;
   bool m_hasFallbackContent;
