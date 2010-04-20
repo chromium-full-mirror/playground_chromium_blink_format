@@ -47,7 +47,7 @@
 #include "InspectorTimelineAgent.h"
 #include "OverflowEvent.h"
 #include "RenderEmbeddedObject.h"
-#include "RenderPart.h"
+#include "RenderFrameBase.h"
 #include "RenderScrollbar.h"
 #include "RenderScrollbarPart.h"
 #include "RenderTheme.h"
@@ -171,7 +171,7 @@ FrameView::~FrameView() {
 
   if (m_frame) {
     ASSERT(m_frame->view() != this || !m_frame->contentRenderer());
-    RenderPart* renderer = m_frame->ownerRenderer();
+    RenderFrameBase* renderer = m_frame->ownerRenderer();
     if (renderer && renderer->widget() == this)
       renderer->setWidget(0);
   }
@@ -279,7 +279,7 @@ void FrameView::clear() {
   reset();
 
   if (m_frame) {
-    if (RenderPart* renderer = m_frame->ownerRenderer())
+    if (RenderFrameBase* renderer = m_frame->ownerRenderer())
       renderer->viewCleared();
   }
 
@@ -300,7 +300,7 @@ void FrameView::invalidateRect(const IntRect& rect) {
   if (!m_frame)
     return;
 
-  RenderPart* renderer = m_frame->ownerRenderer();
+  RenderFrameBase* renderer = m_frame->ownerRenderer();
   if (!renderer)
     return;
 
@@ -373,7 +373,7 @@ PassRefPtr<Scrollbar> FrameView::createScrollbar(
 
   // If we have an owning iframe/frame element, then it can set the custom
   // scrollbar also.
-  RenderPart* frameRenderer = m_frame->ownerRenderer();
+  RenderFrameBase* frameRenderer = m_frame->ownerRenderer();
   if (frameRenderer && frameRenderer->style()->hasPseudoStyle(SCROLLBAR))
     return RenderScrollbar::createCustomScrollbar(this, orientation,
                                                   frameRenderer);
