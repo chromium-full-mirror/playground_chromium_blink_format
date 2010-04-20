@@ -1099,7 +1099,7 @@ Document* DOMWindow::document() const {
   return m_frame->document();
 }
 
-PassRefPtr<Media> DOMWindow::styleMedia() const {
+PassRefPtr<Media> DOMWindow::media() const {
   if (!m_media)
     m_media = Media::create(m_frame);
   return m_media.get();
