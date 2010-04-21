@@ -368,3 +368,7 @@ JSValueRef LayoutTestController::computedStyleIncludingVisitedInfo(JSContextRef,
                                                                    JSValueRef) {
   return 0;
 }
+
+void LayoutTestController::authenticateSession(JSStringRef,
+                                               JSStringRef,
+                                               JSStringRef) {}

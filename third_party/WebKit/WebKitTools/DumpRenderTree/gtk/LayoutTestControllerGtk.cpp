@@ -686,3 +686,7 @@ JSRetainPtr<JSStringRef> LayoutTestController::markerTextForListItem(
   g_free(markerTextGChar);
   return markerText;
 }
+
+void LayoutTestController::authenticateSession(JSStringRef,
+                                               JSStringRef,
+                                               JSStringRef) {}

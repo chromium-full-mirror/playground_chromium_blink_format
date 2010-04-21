@@ -1260,3 +1260,7 @@ void LayoutTestController::apiTestGoToCurrentBackForwardItem() {
 }
 
 void LayoutTestController::setWebViewEditable(bool) {}
+
+void LayoutTestController::authenticateSession(JSStringRef,
+                                               JSStringRef,
+                                               JSStringRef) {}

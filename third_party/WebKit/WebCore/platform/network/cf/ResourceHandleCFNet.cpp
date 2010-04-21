@@ -441,6 +441,32 @@ static CFURLRequestRef makeFinalRequest(const ResourceRequest& request,
   return newRequest;
 }
 
+static CFDictionaryRef createConnectionProperties(
+    bool shouldUseCredentialStorage) {
+  static const CFStringRef webKitPrivateSessionCF =
+      CFSTR("WebKitPrivateSession");
+  static const CFStringRef _kCFURLConnectionSessionID =
+      CFSTR("_kCFURLConnectionSessionID");
+  static const CFStringRef kCFURLConnectionSocketStreamProperties =
+      CFSTR("kCFURLConnectionSocketStreamProperties");
+
+  CFDictionaryRef sessionID =
+      shouldUseCredentialStorage
+          ? CFDictionaryCreate(0, 0, 0, 0, 0, 0)
+          : CFDictionaryCreate(0, (const void**)&_kCFURLConnectionSessionID,
+                               (const void**)&webKitPrivateSessionCF, 1,
+                               &kCFTypeDictionaryKeyCallBacks,
+                               &kCFTypeDictionaryValueCallBacks);
+
+  CFDictionaryRef propertiesDictionary = CFDictionaryCreate(
+      0, (const void**)&kCFURLConnectionSocketStreamProperties,
+      (const void**)&sessionID, 1, &kCFTypeDictionaryKeyCallBacks,
+      &kCFTypeDictionaryValueCallBacks);
+
+  CFRelease(sessionID);
+  return propertiesDictionary;
+}
+
 bool ResourceHandle::start(Frame* frame) {
   // If we are no longer attached to a Page, this must be an attempted load from
   // an
@@ -458,12 +484,13 @@ bool ResourceHandle::start(Frame* frame) {
     d->m_request.setURL(urlWithCredentials);
   }
 
+  bool shouldUseCredentialStorage =
+      !client() || client()->shouldUseCredentialStorage(this);
+
   // <rdar://problem/7174050> - For URLs that match the paths of those
   // previously challenged for HTTP Basic authentication,
   // try and reuse the credential preemptively, as allowed by RFC 2617.
-  if (!client() ||
-      client()->shouldUseCredentialStorage(this) &&
-          d->m_request.url().protocolInHTTPFamily()) {
+  if (shouldUseCredentialStorage && d->m_request.url().protocolInHTTPFamily()) {
     if (d->m_user.isEmpty() && d->m_pass.isEmpty()) {
       // <rdar://problem/7174050> - For URLs that match the paths of those
       // previously challenged for HTTP Basic authentication,
@@ -508,8 +535,12 @@ bool ResourceHandle::start(Frame* frame) {
                                      shouldUseCredentialStorageCallback,
                                      0};
 
-  d->m_connection.adoptCF(CFURLConnectionCreate(
-      0, request.get(), reinterpret_cast<CFURLConnectionClient*>(&client)));
+  RetainPtr<CFDictionaryRef> connectionProperties(
+      AdoptCF, createConnectionProperties(shouldUseCredentialStorage));
+
+  d->m_connection.adoptCF(CFURLConnectionCreateWithProperties(
+      0, request.get(), reinterpret_cast<CFURLConnectionClient*>(&client),
+      connectionProperties.get()));
 
   CFURLConnectionScheduleWithCurrentMessageQueue(d->m_connection.get());
   CFURLConnectionScheduleDownloadWithRunLoop(
@@ -951,10 +982,15 @@ RetainPtr<CFDataRef> WebCoreSynchronousLoader::load(
                                      0,
                                      shouldUseCredentialStorage,
                                      0};
+
+  RetainPtr<CFDictionaryRef> connectionProperties(
+      AdoptCF, createConnectionProperties(loader.m_allowStoredCredentials));
+
   RetainPtr<CFURLConnectionRef> connection(
-      AdoptCF,
-      CFURLConnectionCreate(kCFAllocatorDefault, cfRequest.get(),
-                            reinterpret_cast<CFURLConnectionClient*>(&client)));
+      AdoptCF, CFURLConnectionCreateWithProperties(
+                   kCFAllocatorDefault, cfRequest.get(),
+                   reinterpret_cast<CFURLConnectionClient*>(&client),
+                   connectionProperties.get()));
 
   CFURLConnectionScheduleWithRunLoop(connection.get(), CFRunLoopGetCurrent(),
                                      WebCoreSynchronousLoaderRunLoopMode);
