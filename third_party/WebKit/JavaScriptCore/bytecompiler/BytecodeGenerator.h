@@ -295,6 +295,7 @@ class BytecodeGenerator : public FastAllocBase {
   RegisterID* emitLoad(RegisterID* dst, bool);
   RegisterID* emitLoad(RegisterID* dst, double);
   RegisterID* emitLoad(RegisterID* dst, const Identifier&);
+  RegisterID* emitLoad(RegisterID* dst, RegExp* regExp);
   RegisterID* emitLoad(RegisterID* dst, JSValue);
 
   RegisterID* emitUnaryOp(OpcodeID, RegisterID* dst, RegisterID* src);
@@ -315,7 +316,6 @@ class BytecodeGenerator : public FastAllocBase {
 
   RegisterID* emitNewFunction(RegisterID* dst, FunctionBodyNode* body);
   RegisterID* emitNewFunctionExpression(RegisterID* dst, FuncExprNode* func);
-  RegisterID* emitNewRegExp(RegisterID* dst, RegExp* regExp);
 
   RegisterID* emitMove(RegisterID* dst, RegisterID* src);
 
@@ -576,7 +576,6 @@ class BytecodeGenerator : public FastAllocBase {
 
   unsigned addConstant(const Identifier&);
   RegisterID* addConstantValue(JSValue);
-  unsigned addRegExp(RegExp*);
 
   PassRefPtr<FunctionExecutable> makeFunction(ExecState* exec,
                                               FunctionBodyNode* body) {

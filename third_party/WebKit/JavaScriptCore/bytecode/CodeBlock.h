@@ -536,17 +536,6 @@ class CodeBlock : public FastAllocBase {
     return m_functionExprs[index].get();
   }
 
-  unsigned addRegExp(RegExp* r) {
-    createRareDataIfNecessary();
-    unsigned size = m_rareData->m_regexps.size();
-    m_rareData->m_regexps.append(r);
-    return size;
-  }
-  RegExp* regexp(int index) const {
-    ASSERT(m_rareData);
-    return m_rareData->m_regexps[index].get();
-  }
-
   // Jump Tables
 
   size_t numberOfImmediateSwitchJumpTables() const {
@@ -689,9 +678,6 @@ class CodeBlock : public FastAllocBase {
 
   struct RareData : FastAllocBase {
     Vector<HandlerInfo> m_exceptionHandlers;
-
-    // Rare Constants
-    Vector<RefPtr<RegExp>> m_regexps;
 
     // Jump Tables
     Vector<SimpleJumpTable> m_immediateSwitchJumpTables;

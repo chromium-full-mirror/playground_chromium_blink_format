@@ -169,7 +169,7 @@ RegisterID* RegExpNode::emitBytecode(BytecodeGenerator& generator,
                           regExp->errorMessage());
   if (dst == generator.ignoredResult())
     return 0;
-  return generator.emitNewRegExp(generator.finalDestination(dst), regExp.get());
+  return generator.emitLoad(generator.finalDestination(dst), regExp.get());
 }
 
 // ------------------------------ ThisNode -------------------------------------
