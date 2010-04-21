@@ -62,7 +62,6 @@ void DOMObjectCache::forget(void* objectHandle) {
 
 static gpointer createWrapper(Node* node) {
   ASSERT(node);
-  ASSERT(!ScriptInterpreter::getDOMObject(node));
 
   gpointer wrappedNode = 0;
 
