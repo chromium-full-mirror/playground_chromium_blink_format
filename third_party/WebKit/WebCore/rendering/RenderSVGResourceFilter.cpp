@@ -151,7 +151,7 @@ bool RenderSVGResourceFilter::applyResource(RenderObject* object,
         object);  // Oops, have to rebuild, go through normal code path
   }
 
-  FilterData* filterData = new FilterData;
+  OwnPtr<FilterData> filterData(new FilterData);
   filterData->builder = buildPrimitives();
   if (!filterData->builder)
     return false;
@@ -233,7 +233,7 @@ bool RenderSVGResourceFilter::applyResource(RenderObject* object,
   m_savedContext = context;
 
   context = sourceGraphicContext;
-  m_filter.set(object, filterData);
+  m_filter.set(object, filterData.release());
 
   return true;
 }
