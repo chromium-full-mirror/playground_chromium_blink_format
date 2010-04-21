@@ -212,9 +212,8 @@ class RenderStyle : public RefCounted<RenderStyle> {
     bool _htmlHacks : 1;
     bool _force_backgrounds_to_white : 1;
     unsigned _pointerEvents : 4;  // EPointerEvents
-    EInsideLink
-        _insideLink : 2;  // Whether or not we are contained inside a link.
-                          // 43 bits
+    unsigned _insideLink : 2;     // EInsideLink
+                                  // 43 bits
   } inherited_flags;
 
   // don't inherit
