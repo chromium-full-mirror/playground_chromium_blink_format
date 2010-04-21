@@ -714,8 +714,8 @@ JSValue Interpreter::execute(ProgramExecutable* program,
                              JSValue* exception) {
   ASSERT(!scopeChain->globalData->exception);
 
-  if (m_reentryDepth >= MaxSecondaryThreadReentryDepth) {
-    if (!isMainThread() || m_reentryDepth >= MaxMainThreadReentryDepth) {
+  if (m_reentryDepth >= MaxSmallThreadReentryDepth) {
+    if (m_reentryDepth >= callFrame->globalData().maxReentryDepth) {
       *exception = createStackOverflowError(callFrame);
       return jsNull();
     }
@@ -787,8 +787,8 @@ JSValue Interpreter::execute(FunctionExecutable* functionExecutable,
                              JSValue* exception) {
   ASSERT(!scopeChain->globalData->exception);
 
-  if (m_reentryDepth >= MaxSecondaryThreadReentryDepth) {
-    if (!isMainThread() || m_reentryDepth >= MaxMainThreadReentryDepth) {
+  if (m_reentryDepth >= MaxSmallThreadReentryDepth) {
+    if (m_reentryDepth >= callFrame->globalData().maxReentryDepth) {
       *exception = createStackOverflowError(callFrame);
       return jsNull();
     }
@@ -860,8 +860,8 @@ CallFrameClosure Interpreter::prepareForRepeatCall(
     JSValue* exception) {
   ASSERT(!scopeChain->globalData->exception);
 
-  if (m_reentryDepth >= MaxSecondaryThreadReentryDepth) {
-    if (!isMainThread() || m_reentryDepth >= MaxMainThreadReentryDepth) {
+  if (m_reentryDepth >= MaxSmallThreadReentryDepth) {
+    if (m_reentryDepth >= callFrame->globalData().maxReentryDepth) {
       *exception = createStackOverflowError(callFrame);
       return CallFrameClosure();
     }
@@ -958,8 +958,8 @@ JSValue Interpreter::execute(EvalExecutable* eval,
                              JSValue* exception) {
   ASSERT(!scopeChain->globalData->exception);
 
-  if (m_reentryDepth >= MaxSecondaryThreadReentryDepth) {
-    if (!isMainThread() || m_reentryDepth >= MaxMainThreadReentryDepth) {
+  if (m_reentryDepth >= MaxSmallThreadReentryDepth) {
+    if (m_reentryDepth >= callFrame->globalData().maxReentryDepth) {
       *exception = createStackOverflowError(callFrame);
       return jsNull();
     }

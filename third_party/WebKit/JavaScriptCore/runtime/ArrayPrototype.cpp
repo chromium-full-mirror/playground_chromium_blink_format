@@ -227,9 +227,8 @@ JSValue JSC_HOST_CALL arrayProtoFuncToString(ExecState* exec,
 
   HashSet<JSObject*>& arrayVisitedElements =
       exec->globalData().arrayVisitedElements;
-  if (arrayVisitedElements.size() >= MaxSecondaryThreadReentryDepth) {
-    if (!isMainThread() ||
-        arrayVisitedElements.size() >= MaxMainThreadReentryDepth)
+  if (arrayVisitedElements.size() >= MaxSmallThreadReentryDepth) {
+    if (arrayVisitedElements.size() >= exec->globalData().maxReentryDepth)
       return throwError(exec, RangeError, "Maximum call stack size exceeded.");
   }
 
@@ -291,9 +290,8 @@ JSValue JSC_HOST_CALL arrayProtoFuncToLocaleString(ExecState* exec,
 
   HashSet<JSObject*>& arrayVisitedElements =
       exec->globalData().arrayVisitedElements;
-  if (arrayVisitedElements.size() >= MaxSecondaryThreadReentryDepth) {
-    if (!isMainThread() ||
-        arrayVisitedElements.size() >= MaxMainThreadReentryDepth)
+  if (arrayVisitedElements.size() >= MaxSmallThreadReentryDepth) {
+    if (arrayVisitedElements.size() >= exec->globalData().maxReentryDepth)
       return throwError(exec, RangeError, "Maximum call stack size exceeded.");
   }
 
@@ -338,9 +336,8 @@ JSValue JSC_HOST_CALL arrayProtoFuncJoin(ExecState* exec,
 
   HashSet<JSObject*>& arrayVisitedElements =
       exec->globalData().arrayVisitedElements;
-  if (arrayVisitedElements.size() >= MaxSecondaryThreadReentryDepth) {
-    if (!isMainThread() ||
-        arrayVisitedElements.size() >= MaxMainThreadReentryDepth)
+  if (arrayVisitedElements.size() >= MaxSmallThreadReentryDepth) {
+    if (arrayVisitedElements.size() >= exec->globalData().maxReentryDepth)
       return throwError(exec, RangeError, "Maximum call stack size exceeded.");
   }
 

@@ -64,7 +64,7 @@ enum DebugHookID {
   WillExecuteStatement
 };
 
-enum { MaxMainThreadReentryDepth = 256, MaxSecondaryThreadReentryDepth = 32 };
+enum { MaxLargeThreadReentryDepth = 256, MaxSmallThreadReentryDepth = 32 };
 
 class Interpreter : public FastAllocBase {
   friend class JIT;
