@@ -30,6 +30,7 @@
 #include <wtf/FastMalloc.h>
 #include <wtf/HashSet.h>
 #include <wtf/WTFThreadData.h>
+#include <wtf/text/StringHash.h>
 
 using WTF::ThreadSpecific;
 
@@ -98,7 +99,7 @@ bool Identifier::equal(const UString::Rep* r, const UChar* s, unsigned length) {
   return true;
 }
 
-struct CStringTranslator {
+struct IdentifierCStringTranslator {
   static unsigned hash(const char* c) { return UString::Rep::computeHash(c); }
 
   static bool equal(UString::Rep* r, const char* s) {
@@ -136,7 +137,7 @@ PassRefPtr<UString::Rep> Identifier::add(JSGlobalData* globalData,
     return iter->second;
 
   pair<HashSet<UString::Rep*>::iterator, bool> addResult =
-      identifierTable.add<const char*, CStringTranslator>(c);
+      identifierTable.add<const char*, IdentifierCStringTranslator>(c);
 
   // If the string is newly-translated, then we need to adopt it.
   // The boolean in the pair tells us if that is so.
@@ -157,7 +158,7 @@ struct UCharBuffer {
   unsigned int length;
 };
 
-struct UCharBufferTranslator {
+struct IdentifierUCharBufferTranslator {
   static unsigned hash(const UCharBuffer& buf) {
     return UString::Rep::computeHash(buf.s, buf.length);
   }
@@ -192,7 +193,8 @@ PassRefPtr<UString::Rep> Identifier::add(JSGlobalData* globalData,
     return UString::Rep::empty();
   UCharBuffer buf = {s, length};
   pair<HashSet<UString::Rep*>::iterator, bool> addResult =
-      globalData->identifierTable->add<UCharBuffer, UCharBufferTranslator>(buf);
+      globalData->identifierTable
+          ->add<UCharBuffer, IdentifierUCharBufferTranslator>(buf);
 
   // If the string is newly-translated, then we need to adopt it.
   // The boolean in the pair tells us if that is so.

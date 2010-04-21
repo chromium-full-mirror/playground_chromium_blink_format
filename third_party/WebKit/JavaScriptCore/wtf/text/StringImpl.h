@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
- * Copyright (C) 2005, 2006, 2007, 2008, 2009 Apple Inc. All rights reserved.
+ * Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Apple Inc. All rights
+ * reserved.
  * Copyright (C) 2009 Google Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
@@ -26,9 +27,7 @@
 #include <limits.h>
 #include <wtf/ASCIICType.h>
 #include <wtf/CrossThreadRefCounted.h>
-#include <wtf/Noncopyable.h>
 #include <wtf/OwnFastMallocPtr.h>
-#include <wtf/RefCounted.h>
 #include <wtf/StringHashFunctions.h>
 #include <wtf/Vector.h>
 #include <wtf/text/StringImplBase.h>
@@ -41,6 +40,17 @@ typedef const struct __CFString* CFStringRef;
 #ifdef __OBJC__
 @class NSString;
 #endif
+
+// FIXME: This is a temporary layering violation while we move string code to
+// WTF.
+// Landing the file moves in one patch, will follow on with patches to change
+// the namespaces.
+namespace JSC {
+
+struct IdentifierCStringTranslator;
+struct IdentifierUCharBufferTranslator;
+class SmallStringsStorage;
+}
 
 // FIXME: This is a temporary layering violation while we move string code to
 // WTF.
@@ -62,11 +72,17 @@ typedef CrossThreadRefCounted<SharableUChar> SharedUChar;
 typedef bool (*CharacterMatchFunctionPtr)(UChar);
 
 class StringImpl : public StringImplBase {
+  friend struct JSC::IdentifierCStringTranslator;
+  friend struct JSC::IdentifierUCharBufferTranslator;
+  friend class JSC::SmallStringsStorage;
   friend struct CStringTranslator;
   friend struct HashAndCharactersTranslator;
   friend struct UCharBufferTranslator;
 
  private:
+  // For SmallStringStorage, which allocates an array and uses an in-place new.
+  StringImpl() {}
+
   // Used to construct static strings, which have an special refCount that can
   // never hit zero.
   // This means that the static string will never be destroyed, which is
@@ -78,7 +94,7 @@ class StringImpl : public StringImplBase {
              StaticStringConstructType)
       : StringImplBase(length, ConstructStaticString),
         m_data(characters),
-        m_sharedBuffer(0),
+        m_buffer(0),
         m_hash(0) {
     // Ensure that the hash is computed so that AtomicStringHash can call
     // existingHash()
@@ -92,7 +108,7 @@ class StringImpl : public StringImplBase {
   StringImpl(unsigned length)
       : StringImplBase(length, BufferInternal),
         m_data(reinterpret_cast<const UChar*>(this + 1)),
-        m_sharedBuffer(0),
+        m_buffer(0),
         m_hash(0) {
     ASSERT(m_data);
     ASSERT(m_length);
@@ -102,10 +118,24 @@ class StringImpl : public StringImplBase {
   StringImpl(const UChar* characters, unsigned length)
       : StringImplBase(length, BufferOwned),
         m_data(characters),
-        m_sharedBuffer(0),
+        m_buffer(0),
         m_hash(0) {
     ASSERT(m_data);
     ASSERT(m_length);
+  }
+
+  // Used to create new strings that are a substring of an existing StringImpl
+  // (BufferSubstring)
+  StringImpl(const UChar* characters,
+             unsigned length,
+             PassRefPtr<StringImpl> base)
+      : StringImplBase(length, BufferSubstring),
+        m_data(characters),
+        m_substringBuffer(base.releaseRef()),
+        m_hash(0) {
+    ASSERT(m_data);
+    ASSERT(m_length);
+    ASSERT(m_substringBuffer->bufferOwnership() != BufferSubstring);
   }
 
   // Used to construct new strings sharing an existing SharedUChar
@@ -138,9 +168,41 @@ class StringImpl : public StringImplBase {
   static PassRefPtr<StringImpl> create(const UChar*,
                                        unsigned length,
                                        PassRefPtr<SharedUChar> sharedBuffer);
+  static PassRefPtr<StringImpl> create(PassRefPtr<StringImpl> rep,
+                                       unsigned offset,
+                                       unsigned length) {
+    ASSERT(rep);
+    ASSERT(length <= rep->length());
+
+    if (!length)
+      return empty();
+
+    StringImpl* ownerRep = (rep->bufferOwnership() == BufferSubstring)
+                               ? rep->m_substringBuffer
+                               : rep.get();
+    return adoptRef(new StringImpl(rep->m_data + offset, length, ownerRep));
+  }
 
   static PassRefPtr<StringImpl> createUninitialized(unsigned length,
                                                     UChar*& data);
+  static PassRefPtr<StringImpl> tryCreateUninitialized(unsigned length,
+                                                       UChar*& output) {
+    if (!length) {
+      output = 0;
+      return empty();
+    }
+
+    if (length > ((std::numeric_limits<size_t>::max() - sizeof(StringImpl)) /
+                  sizeof(UChar)))
+      return 0;
+    StringImpl* resultImpl;
+    if (!tryFastMalloc(sizeof(UChar) * length + sizeof(StringImpl))
+             .getValue(resultImpl))
+      return 0;
+    output = reinterpret_cast<UChar*>(resultImpl + 1);
+    return adoptRef(new (resultImpl) StringImpl(length));
+  }
+
   static PassRefPtr<StringImpl> createWithTerminatingNullCharacter(
       const StringImpl&);
   static PassRefPtr<StringImpl> createStrippingNullCharacters(const UChar*,
@@ -158,6 +220,29 @@ class StringImpl : public StringImplBase {
 
   SharedUChar* sharedBuffer();
   const UChar* characters() const { return m_data; }
+
+  size_t cost() {
+    // For substrings, return the cost of the base string.
+    if (bufferOwnership() == BufferSubstring)
+      return m_substringBuffer->cost();
+
+    if (m_refCountAndFlags & s_refCountFlagShouldReportedCost) {
+      m_refCountAndFlags &= ~s_refCountFlagShouldReportedCost;
+      return m_length;
+    }
+    return 0;
+  }
+
+  bool isIdentifier() const {
+    return m_refCountAndFlags & s_refCountFlagIsIdentifier;
+  }
+  void setIsIdentifier(bool isIdentifier) {
+    ASSERT(!isStatic());
+    if (isIdentifier)
+      m_refCountAndFlags |= s_refCountFlagIsIdentifier;
+    else
+      m_refCountAndFlags &= ~s_refCountFlagIsIdentifier;
+  }
 
   bool hasTerminatingNullCharacter() const {
     return m_refCountAndFlags & s_refCountFlagHasTerminatingNullCharacter;
@@ -178,6 +263,9 @@ class StringImpl : public StringImplBase {
   static unsigned computeHash(const UChar* data, unsigned length) {
     return WTF::stringHash(data, length);
   }
+  static unsigned computeHash(const char* data, unsigned length) {
+    return WTF::stringHash(data, length);
+  }
   static unsigned computeHash(const char* data) {
     return WTF::stringHash(data);
   }
@@ -193,6 +281,16 @@ class StringImpl : public StringImplBase {
   }
 
   static StringImpl* empty();
+
+  static void copyChars(UChar* destination,
+                        const UChar* source,
+                        unsigned numCharacters) {
+    if (numCharacters <= s_copyCharsInlineCutOff) {
+      for (unsigned i = 0; i < numCharacters; ++i)
+        destination[i] = source[i];
+    } else
+      memcpy(destination, source, numCharacters * sizeof(UChar));
+  }
 
   // Returns a StringImpl suitable for use on another thread.
   PassRefPtr<StringImpl> crossThreadString();
@@ -268,6 +366,10 @@ class StringImpl : public StringImplBase {
 #endif
 
  private:
+  // This number must be at least 2 to avoid sharing empty, null as well as 1
+  // character strings from SmallStrings.
+  static const unsigned s_copyCharsInlineCutOff = 20;
+
   static PassRefPtr<StringImpl> createStrippingNullCharactersSlowCase(
       const UChar*,
       unsigned length);
@@ -279,12 +381,16 @@ class StringImpl : public StringImplBase {
   bool isStatic() const { return m_refCountAndFlags & s_refCountFlagStatic; }
 
   const UChar* m_data;
-  SharedUChar* m_sharedBuffer;
+  union {
+    void* m_buffer;
+    StringImpl* m_substringBuffer;
+    SharedUChar* m_sharedBuffer;
+  };
   mutable unsigned m_hash;
 };
 
-bool equal(StringImpl*, StringImpl*);
-bool equal(StringImpl*, const char*);
+bool equal(const StringImpl*, const StringImpl*);
+bool equal(const StringImpl*, const char*);
 inline bool equal(const char* a, StringImpl* b) {
   return equal(b, a);
 }
@@ -333,6 +439,8 @@ inline PassRefPtr<StringImpl> StringImpl::createStrippingNullCharacters(
   return StringImpl::createStrippingNullCharactersSlowCase(characters, length);
 }
 }
+
+using WebCore::equal;
 
 namespace WTF {
 

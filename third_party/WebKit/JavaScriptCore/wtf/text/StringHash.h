@@ -46,7 +46,7 @@ namespace WebCore {
 
 struct StringHash {
   static unsigned hash(StringImpl* key) { return key->hash(); }
-  static bool equal(StringImpl* a, StringImpl* b) {
+  static bool equal(const StringImpl* a, const StringImpl* b) {
     if (a == b)
       return true;
     if (!a || !b)
@@ -193,7 +193,7 @@ class CaseFoldingHash {
     return hash;
   }
 
-  static bool equal(StringImpl* a, StringImpl* b) {
+  static bool equal(const StringImpl* a, const StringImpl* b) {
     if (a == b)
       return true;
     if (!a || !b)
