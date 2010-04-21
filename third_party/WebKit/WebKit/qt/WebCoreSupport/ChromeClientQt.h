@@ -153,6 +153,7 @@ class ChromeClientQt : public ChromeClient {
   virtual void attachRootGraphicsLayer(Frame*, GraphicsLayer*);
   virtual void setNeedsOneShotDrawingSynchronization();
   virtual void scheduleCompositingLayerSync();
+  virtual bool allowsAcceleratedCompositing() const;
 #endif
 
 #if ENABLE(TOUCH_EVENTS)
