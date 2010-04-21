@@ -190,6 +190,7 @@ class LayoutTestController : public QObject {
                                float height = 0);
   int numberOfPages(float width = maxViewWidth, float height = maxViewHeight);
   bool callShouldCloseOnWebView();
+  QVariantMap computedStyleIncludingVisitedInfo(const QVariant& obj) const;
 
   /*
       Policy values: 'on', 'auto' or 'off'.
