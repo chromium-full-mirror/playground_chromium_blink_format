@@ -200,6 +200,12 @@ class LayoutTestController : public QObject {
 
   QString markerTextForListItem(const QWebElement& listItem);
 
+  // Simulate a request an embedding application could make, populating
+  // per-session credential storage.
+  void authenticateSession(const QString& url,
+                           const QString& username,
+                           const QString& password);
+
  private slots:
   void processWork();
 
