@@ -35,7 +35,6 @@
 #include "config.h"
 #include "FrameLoaderClientEfl.h"
 
-#include "CString.h"
 #include "DocumentLoader.h"
 #include "EWebKit.h"
 #include "FormState.h"
@@ -51,6 +50,7 @@
 #include "RenderPart.h"
 #include "ResourceRequest.h"
 #include "ewk_private.h"
+#include <wtf/text/CString.h>
 
 #if PLATFORM(UNIX)
 #include <sys/utsname.h>
@@ -375,6 +375,8 @@ PassRefPtr<Frame> FrameLoaderClientEfl::createFrame(
                                referrer);
 }
 
+void FrameLoaderClientEfl::didTransferChildFrameToNewDocument() {}
+
 void FrameLoaderClientEfl::redirectDataToPlugin(Widget* pluginWidget) {
   ASSERT(!m_pluginView);
   m_pluginView = static_cast<PluginView*>(pluginWidget);
@@ -410,8 +412,10 @@ ObjectContentType FrameLoaderClientEfl::objectContentType(
   if (MIMETypeRegistry::isSupportedImageMIMEType(type))
     return ObjectContentImage;
 
-  if (PluginDatabase::installedPlugins()->isMIMETypeRegistered(mimeType))
-    return ObjectContentNetscapePlugin;
+#if 0  // PluginDatabase is disabled until we have Plugin system done.
+    if (PluginDatabase::installedPlugins()->isMIMETypeRegistered(mimeType))
+        return ObjectContentNetscapePlugin;
+#endif
 
   if (MIMETypeRegistry::isSupportedNonImageMIMEType(type))
     return ObjectContentFrame;
@@ -552,6 +556,10 @@ void FrameLoaderClientEfl::dispatchDidReceiveTitle(const String& title) {
   ewk_view_title_set(m_view, cs.data());
 }
 
+void FrameLoaderClientEfl::dispatchDidChangeIcons() {
+  notImplemented();
+}
+
 void FrameLoaderClientEfl::dispatchDidCommitLoad() {
   ewk_frame_uri_changed(m_frame);
   if (ewk_view_frame_main_get(m_view) != m_frame)
@@ -609,8 +617,10 @@ bool FrameLoaderClientEfl::canShowMIMEType(const String& MIMEType) const {
   if (MIMETypeRegistry::isSupportedNonImageMIMEType(MIMEType))
     return true;
 
-  if (PluginDatabase::installedPlugins()->isMIMETypeRegistered(MIMEType))
-    return true;
+#if 0  // PluginDatabase is disabled until we have Plugin system done.
+    if (PluginDatabase::installedPlugins()->isMIMETypeRegistered(MIMEType))
+        return true;
+#endif
 
   return false;
 }

@@ -127,6 +127,7 @@ class FrameLoaderClientEfl : public FrameLoaderClient {
   virtual void dispatchDidReceiveIcon();
   virtual void dispatchDidStartProvisionalLoad();
   virtual void dispatchDidReceiveTitle(const String&);
+  virtual void dispatchDidChangeIcons();
   virtual void dispatchDidCommitLoad();
   virtual void dispatchDidFailProvisionalLoad(const ResourceError&);
   virtual void dispatchDidFailLoad(const ResourceError&);
@@ -174,6 +175,8 @@ class FrameLoaderClientEfl : public FrameLoaderClient {
                                         bool allowsScrolling,
                                         int marginWidth,
                                         int marginHeight);
+  virtual void didTransferChildFrameToNewDocument();
+
   virtual PassRefPtr<Widget> createPlugin(const IntSize&,
                                           HTMLPlugInElement*,
                                           const KURL&,

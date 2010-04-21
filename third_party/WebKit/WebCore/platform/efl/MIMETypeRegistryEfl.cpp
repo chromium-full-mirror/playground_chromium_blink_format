@@ -80,4 +80,8 @@ String MIMETypeRegistry::getMIMETypeForExtension(const String& ext) {
 
   return "application/octet-stream";
 }
+
+bool MIMETypeRegistry::isApplicationPluginMIMEType(const String&) {
+  return false;
+}
 }

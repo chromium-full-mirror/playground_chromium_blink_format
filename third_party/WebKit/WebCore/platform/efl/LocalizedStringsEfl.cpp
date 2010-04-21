@@ -334,4 +334,12 @@ String AXMenuListPopupActionVerb() {
 String AXMenuListActionVerb() {
   return String();
 }
+
+String missingPluginText() {
+  return String::fromUTF8("Missing Plug-in");
+}
+
+String crashedPluginText() {
+  return String::fromUTF8("Plug-in Crashed");
+}
 }
