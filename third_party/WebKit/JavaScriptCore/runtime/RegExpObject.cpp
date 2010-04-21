@@ -26,6 +26,7 @@
 #include "JSArray.h"
 #include "JSGlobalObject.h"
 #include "JSString.h"
+#include "Lookup.h"
 #include "RegExpConstructor.h"
 #include "RegExpPrototype.h"
 
