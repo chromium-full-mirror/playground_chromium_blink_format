@@ -448,6 +448,7 @@ class RenderLayer : public ScrollbarClient {
   // containerForRepaint.
   IntRect repaintRect() const { return m_repaintRect; }
   void computeRepaintRects();
+  void updateRepaintRectsAfterScroll(bool fixed = false);
   void setNeedsFullRepaint(bool f = true) { m_needsFullRepaint = f; }
 
   int staticX() const { return m_staticX; }
