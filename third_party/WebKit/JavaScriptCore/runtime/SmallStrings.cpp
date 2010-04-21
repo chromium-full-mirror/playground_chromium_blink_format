@@ -42,10 +42,10 @@ class SmallStringsStorage : public Noncopyable {
  public:
   SmallStringsStorage();
 
-  UString::Rep* rep(unsigned char character) { return &m_reps[character]; }
+  UString::Rep* rep(unsigned char character) { return m_reps[character].get(); }
 
  private:
-  UString::Rep m_reps[numCharactersToStore];
+  RefPtr<UString::Rep> m_reps[numCharactersToStore];
 };
 
 SmallStringsStorage::SmallStringsStorage() {
@@ -54,8 +54,7 @@ SmallStringsStorage::SmallStringsStorage() {
       UStringImpl::createUninitialized(numCharactersToStore, characterBuffer);
   for (unsigned i = 0; i < numCharactersToStore; ++i) {
     characterBuffer[i] = i;
-    new (&m_reps[i]) UString::Rep(&characterBuffer[i], 1,
-                                  PassRefPtr<UStringImpl>(baseString));
+    m_reps[i] = UStringImpl::create(baseString, i, 1);
   }
 }
 
