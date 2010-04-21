@@ -276,10 +276,15 @@ void V8DOMWindowShell::initContextIfNeeded() {
 #endif
   }
 
-  installHiddenObjectPrototype(v8Context);
-
-  if (!installDOMWindow(v8Context, m_frame->domWindow()))
+  if (!installHiddenObjectPrototype(v8Context)) {
     disposeContextHandles();
+    return;
+  }
+
+  if (!installDOMWindow(v8Context, m_frame->domWindow())) {
+    disposeContextHandles();
+    return;
+  }
 
   updateDocument();
 
@@ -501,7 +506,7 @@ v8::Handle<v8::Value> V8DOMWindowShell::getHiddenObjectPrototype(
       V8HiddenPropertyName::objectPrototype());
 }
 
-void V8DOMWindowShell::installHiddenObjectPrototype(
+bool V8DOMWindowShell::installHiddenObjectPrototype(
     v8::Handle<v8::Context> context) {
   v8::Handle<v8::String> objectString = v8::String::New("Object");
   v8::Handle<v8::String> prototypeString = v8::String::New("prototype");
@@ -510,14 +515,22 @@ void V8DOMWindowShell::installHiddenObjectPrototype(
   // Bail out if allocation failed.
   if (objectString.IsEmpty() || prototypeString.IsEmpty() ||
       hiddenObjectPrototypeString.IsEmpty())
-    return;
+    return false;
 
   v8::Handle<v8::Object> object =
       v8::Handle<v8::Object>::Cast(context->Global()->Get(objectString));
+  // Bail out if fetching failed.
+  if (object.IsEmpty())
+    return false;
   v8::Handle<v8::Value> objectPrototype = object->Get(prototypeString);
+  // Bail out if fetching failed.
+  if (objectPrototype.IsEmpty())
+    return false;
 
   context->Global()->SetHiddenValue(hiddenObjectPrototypeString,
                                     objectPrototype);
+
+  return true;
 }
 
 v8::Local<v8::Object> V8DOMWindowShell::createWrapperFromCacheSlowCase(
