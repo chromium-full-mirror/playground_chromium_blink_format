@@ -335,6 +335,11 @@ WEBKIT_API bool webkit_web_frame_pause_svg_animation(WebKitWebFrame* frame,
                                                      double time,
                                                      const gchar* elementId);
 
+WEBKIT_API gchar* webkit_web_frame_marker_text_for_list_item(
+    WebKitWebFrame* frame,
+    JSContextRef context,
+    JSValueRef nodeObject);
+
 WEBKIT_API unsigned int webkit_web_frame_number_of_active_animations(
     WebKitWebFrame* frame);
 

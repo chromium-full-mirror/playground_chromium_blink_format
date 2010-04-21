@@ -40,6 +40,7 @@
 #include <QVariant>
 
 #include <qwebdatabase.h>
+#include <qwebelement.h>
 #include <qwebframe.h>
 #include <qwebhistory.h>
 #include <qwebpage.h>
@@ -196,6 +197,8 @@ class LayoutTestController : public QObject {
       Orientation values: 'vertical' or 'horizontal'.
   */
   void setScrollbarPolicy(const QString& orientation, const QString& policy);
+
+  QString markerTextForListItem(const QWebElement& listItem);
 
  private slots:
   void processWork();

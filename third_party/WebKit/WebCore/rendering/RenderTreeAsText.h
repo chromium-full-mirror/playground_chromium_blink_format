@@ -58,6 +58,8 @@ String quoteAndEscapeNonPrintables(const String&);
 
 String counterValueForElement(Element*);
 
+String markerTextForListItem(Element*);
+
 }  // namespace WebCore
 
 #endif  // RenderTreeAsText_h

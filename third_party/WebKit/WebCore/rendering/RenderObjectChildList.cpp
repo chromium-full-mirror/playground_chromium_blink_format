@@ -39,14 +39,6 @@
 
 namespace WebCore {
 
-static void updateListMarkerNumbers(RenderObject* child) {
-  for (RenderObject* sibling = child; sibling;
-       sibling = sibling->nextSibling()) {
-    if (sibling->isListItem())
-      toRenderListItem(sibling)->updateValue();
-  }
-}
-
 void RenderObjectChildList::destroyLeftoverChildren() {
   while (firstChild()) {
     if (firstChild()->isListMarker() ||
@@ -104,9 +96,8 @@ RenderObject* RenderObjectChildList::removeChildNode(RenderObject* owner,
       oldChild->removeLayers(layer);
     }
 
-    // renumber ordered lists
     if (oldChild->isListItem())
-      updateListMarkerNumbers(oldChild->nextSibling());
+      toRenderListItem(oldChild)->updateListMarkerNumbers();
 
     if (oldChild->isPositioned() && owner->childrenInline())
       owner->dirtyLinesFromChangedChild(oldChild);
@@ -181,6 +172,9 @@ void RenderObjectChildList::appendChildNode(RenderObject* owner,
         layer->setHasVisibleContent(true);
     }
 
+    if (newChild->isListItem())
+      toRenderListItem(newChild)->updateListMarkerNumbers();
+
     if (!newChild->isFloatingOrPositioned() && owner->childrenInline())
       owner->dirtyLinesFromChangedChild(newChild);
   }
@@ -246,6 +240,9 @@ void RenderObjectChildList::insertChildNode(RenderObject* owner,
       if (layer)
         layer->setHasVisibleContent(true);
     }
+
+    if (child->isListItem())
+      toRenderListItem(child)->updateListMarkerNumbers();
 
     if (!child->isFloating() && owner->childrenInline())
       owner->dirtyLinesFromChangedChild(child);

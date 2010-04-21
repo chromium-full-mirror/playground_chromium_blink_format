@@ -188,6 +188,13 @@ JSRetainPtr<JSStringRef> LayoutTestController::layerTreeAsText() const {
   return textValueJS;
 }
 
+JSRetainPtr<JSStringRef> LayoutTestController::markerTextForListItem(
+    JSContextRef context,
+    JSValueRef nodeObject) const {
+  // FIXME: Implement me.
+  return JSRetainPtr<JSStringRef>();
+}
+
 void LayoutTestController::waitForPolicyDelegate() {
   // FIXME: Implement this.
 }

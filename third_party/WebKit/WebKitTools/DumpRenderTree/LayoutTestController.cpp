@@ -2068,6 +2068,20 @@ static JSValueRef setWebViewEditableCallback(JSContextRef context,
   return JSValueMakeUndefined(context);
 }
 
+static JSValueRef markerTextForListItemCallback(JSContextRef context,
+                                                JSObjectRef,
+                                                JSObjectRef thisObject,
+                                                size_t argumentCount,
+                                                const JSValueRef arguments[],
+                                                JSValueRef* exception) {
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  if (argumentCount < 1)
+    return JSValueMakeUndefined(context);
+  return JSValueMakeString(
+      context, controller->markerTextForListItem(context, arguments[0]).get());
+}
+
 // Static Values
 
 static JSValueRef getGlobalFlagCallback(JSContextRef context,
@@ -2259,6 +2273,8 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
       {"layerTreeAsText", layerTreeAsTextCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"numberOfPages", numberOfPagesCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"markerTextForListItem", markerTextForListItemCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"notifyDone", notifyDoneCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
