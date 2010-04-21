@@ -67,9 +67,11 @@ class DrawingAreaUpdateChunk : public DrawingArea {
  private:
   void paintIntoUpdateChunk(UpdateChunk*);
   void setSize(const WebCore::IntSize&);
+  void didUpdate();
   void scheduleDisplay();
 
   WebCore::IntRect m_dirtyRect;
+  bool m_isWaitingForUpdate;
   RunLoop::Timer<DrawingArea> m_displayTimer;
 };
 
