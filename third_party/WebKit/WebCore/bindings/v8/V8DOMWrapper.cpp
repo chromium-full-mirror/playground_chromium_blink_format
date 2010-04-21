@@ -46,6 +46,7 @@
 #include "V8DOMMap.h"
 #include "V8DOMWindow.h"
 #include "V8EventListenerList.h"
+#include "V8EventSource.h"
 #include "V8HTMLCollection.h"
 #include "V8HTMLDocument.h"
 #include "V8IsolatedContext.h"

@@ -59,8 +59,7 @@ v8::Handle<v8::Value> V8EventSource::constructorCallback(
         "EventSource constructor's associated context is not available",
         V8Proxy::ReferenceError);
   if (args.Length() != 1)
-    return throwError("EventSource constructor wrong number of parameters",
-                      V8Proxy::TypeError);
+    return throwError("Not enough arguments", V8Proxy::SyntaxError);
 
   ExceptionCode ec = 0;
   String url = toWebCoreString(args[0]);
