@@ -68,11 +68,12 @@ bool NotificationPresenterClientQt::show(Notification* notification) {
     }
   }
 
+#ifndef QT_NO_SYSTEMTRAYICON
   m_tray.show();
   m_tray.showMessage(notification->contents().title(),
                      notification->contents().body(),
                      QSystemTrayIcon::Information);
-
+#endif
   return true;
 }
 

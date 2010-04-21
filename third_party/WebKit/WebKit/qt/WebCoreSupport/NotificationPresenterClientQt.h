@@ -52,7 +52,9 @@ class NotificationPresenterClientQt : public NotificationPresenter {
   virtual NotificationPresenter::Permission checkPermission(const KURL&);
 
  private:
+#ifndef QT_NO_SYSTEMTRAYICON
   QSystemTrayIcon m_tray;
+#endif
 };
 }
 
