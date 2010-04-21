@@ -292,10 +292,20 @@ void InsertListCommand::doApply() {
       // itself.  bug 19066
       if (insertionPos == start.deepEquivalent())
         start = startOfParagraph(originalStart);
+      previousList =
+          outermostEnclosingList(previousPosition.deepEquivalent().node(),
+                                 enclosingList(listElement.get()));
+      nextList = outermostEnclosingList(nextPosition.deepEquivalent().node(),
+                                        enclosingList(listElement.get()));
     }
     moveParagraph(start, end, VisiblePosition(Position(placeholder.get(), 0)),
                   true);
-    if (nextList && previousList)
+    if (m_listElement) {
+      if (canMergeLists(previousList, m_listElement.get()))
+        mergeIdenticalElements(previousList, m_listElement.get());
+      if (canMergeLists(m_listElement.get(), nextList))
+        mergeIdenticalElements(m_listElement.get(), nextList);
+    } else if (canMergeLists(nextList, previousList))
       mergeIdenticalElements(previousList, nextList);
   }
 }
