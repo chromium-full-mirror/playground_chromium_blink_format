@@ -143,6 +143,7 @@ class LauncherWindow : public MainWindow {
   void showFPS(bool enable);
   void changeViewportUpdateMode(int mode);
   void toggleFrameFlattening(bool toggle);
+  void toggleInterruptingJavaScriptEnabled(bool enable);
 
 #if defined(QT_CONFIGURED_WITH_OPENGL)
   void toggleQGLWidgetViewport(bool enable);
@@ -151,8 +152,8 @@ class LauncherWindow : public MainWindow {
   void showUserAgentDialog();
 
  public slots:
-  void newWindow();
-  void cloneWindow();
+  LauncherWindow* newWindow();
+  LauncherWindow* cloneWindow();
   void updateFPS(int fps);
 
  signals:
@@ -692,6 +693,10 @@ void LauncherWindow::toggleFrameFlattening(bool toggle) {
                                    toggle);
 }
 
+void LauncherWindow::toggleInterruptingJavaScriptEnabled(bool enable) {
+  page()->setInterruptingJavaScriptEnabled(enable);
+}
+
 #if defined(QT_CONFIGURED_WITH_OPENGL)
 void LauncherWindow::toggleQGLWidgetViewport(bool enable) {
   if (!isGraphicsBased())
@@ -748,14 +753,16 @@ void LauncherWindow::showUserAgentDialog() {
   delete dialog;
 }
 
-void LauncherWindow::newWindow() {
+LauncherWindow* LauncherWindow::newWindow() {
   LauncherWindow* mw = new LauncherWindow(this, false);
   mw->show();
+  return mw;
 }
 
-void LauncherWindow::cloneWindow() {
+LauncherWindow* LauncherWindow::cloneWindow() {
   LauncherWindow* mw = new LauncherWindow(this, true);
   mw->show();
+  return mw;
 }
 
 void LauncherWindow::updateFPS(int fps) {
@@ -903,6 +910,12 @@ void LauncherWindow::createChrome() {
   toggleFrameFlattening->setCheckable(true);
   toggleFrameFlattening->setChecked(
       settings->testAttribute(QWebSettings::FrameFlatteningEnabled));
+
+  QAction* toggleInterruptingJavaScripteEnabled =
+      toolsMenu->addAction("Enable interrupting js scripts", this,
+                           SLOT(toggleInterruptingJavaScriptEnabled(bool)));
+  toggleInterruptingJavaScripteEnabled->setCheckable(true);
+  toggleInterruptingJavaScripteEnabled->setChecked(false);
 
 #if defined(QT_CONFIGURED_WITH_OPENGL)
   QAction* toggleQGLWidgetViewport =
@@ -1228,12 +1241,13 @@ int main(int argc, char** argv) {
 
   LauncherWindow* window = 0;
   foreach (QString url, urls) {
+    LauncherWindow* newWindow;
     if (!window)
-      window = new LauncherWindow();
+      newWindow = window = new LauncherWindow();
     else
-      window->newWindow();
+      newWindow = window->newWindow();
 
-    window->load(url);
+    newWindow->load(url);
   }
 
   window->show();

@@ -37,7 +37,8 @@
 #include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QNetworkProxy>
 
-WebPage::WebPage(QObject* parent) : QWebPage(parent) {
+WebPage::WebPage(QObject* parent)
+    : QWebPage(parent), m_userAgent(), m_interruptingJavaScriptEnabled(false) {
   applyProxy();
 }
 
@@ -110,4 +111,10 @@ QString WebPage::userAgentForUrl(const QUrl& url) const {
   if (!m_userAgent.isEmpty())
     return m_userAgent;
   return QWebPage::userAgentForUrl(url);
+}
+
+bool WebPage::shouldInterruptJavaScript() {
+  if (!m_interruptingJavaScriptEnabled)
+    return false;
+  return QWebPage::shouldInterruptJavaScript();
 }
