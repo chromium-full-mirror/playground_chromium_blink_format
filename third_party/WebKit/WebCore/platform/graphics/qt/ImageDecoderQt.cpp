@@ -190,6 +190,8 @@ bool ImageDecoderQt::internalHandleCurrentImage(size_t frameIndex) {
   // Now get the QImage from Qt and place it in the RGBA32Buffer
   QImage img;
   if (!m_reader->read(&img)) {
+    frameCount();
+    repetitionCount();
     clearPointers();
     return false;
   }
