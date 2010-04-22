@@ -37,9 +37,6 @@ AccessibilityObject::accessibilityPlatformIncludesObject() const {
   if (!parent)
     return DefaultBehavior;
 
-  if (isMenuListPopup() || isMenuListOption())
-    return IgnoreObject;
-
   if (roleValue() == SplitterRole)
     return IncludeObject;
 
