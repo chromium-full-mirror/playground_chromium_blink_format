@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009 Maxime Simon <simon.maxime@gmail.com>
+ * Copyright (C) 2010 Stephan Aßmus <superstippi@gmx.de>
  *
  * All rights reserved.
  *
@@ -28,6 +28,9 @@
 #ifndef ImageBufferData_h
 #define ImageBufferData_h
 
+#include <Bitmap.h>
+#include <View.h>
+
 namespace WebCore {
 
 class IntSize;
@@ -35,6 +38,10 @@ class IntSize;
 class ImageBufferData {
  public:
   ImageBufferData(const IntSize&);
+  ~ImageBufferData();
+
+  BBitmap m_bitmap;
+  BView m_view;
 };
 
 }  // namespace WebCore
