@@ -62,7 +62,7 @@ class DrawingAreaProxyUpdateChunk : public DrawingAreaProxy {
   void drawUpdateChunkIntoBackingStore(UpdateChunk*);
   void ensureBackingStore();
 
-  void didSetSize(const WebCore::IntSize& viewSize, UpdateChunk* updateChunk);
+  void didSetSize(UpdateChunk* updateChunk);
   void update(UpdateChunk*);
 
   bool m_isInitialized;
