@@ -87,7 +87,7 @@ void PluginView::restart() {}
 void PluginView::keepAlive(NPP) {}
 #endif
 
-#if PLATFORM(MAC) || PLATFORM(CHROMIUM)
+#if PLATFORM(MAC) || PLATFORM(CHROMIUM) || PLATFORM(EFL)
 void PluginView::privateBrowsingStateChanged(bool) {}
 
 void PluginView::setJavaScriptPaused(bool) {}
