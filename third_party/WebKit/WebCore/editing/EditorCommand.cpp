@@ -1487,6 +1487,20 @@ static bool supportedFromMenuOrKeyBinding(Frame*, EditorCommandSource source) {
   return source == CommandFromMenuOrKeyBinding;
 }
 
+static bool supportedCopyCut(Frame* frame, EditorCommandSource source) {
+  switch (source) {
+    case CommandFromMenuOrKeyBinding:
+      return true;
+    case CommandFromDOM:
+    case CommandFromDOMWithUserInterface: {
+      Settings* settings = frame ? frame->settings() : 0;
+      return settings && settings->javaScriptCanAccessClipboard();
+    }
+  }
+  ASSERT_NOT_REACHED();
+  return false;
+}
+
 static bool supportedPaste(Frame* frame, EditorCommandSource source) {
   switch (source) {
     case CommandFromMenuOrKeyBinding:
@@ -1494,7 +1508,8 @@ static bool supportedPaste(Frame* frame, EditorCommandSource source) {
     case CommandFromDOM:
     case CommandFromDOMWithUserInterface: {
       Settings* settings = frame ? frame->settings() : 0;
-      return settings && settings->isDOMPasteAllowed();
+      return settings && (settings->javaScriptCanAccessClipboard() ||
+                          settings->isDOMPasteAllowed());
     }
   }
   ASSERT_NOT_REACHED();
@@ -1747,13 +1762,13 @@ static const CommandMap& createCommandMap() {
        {executeToggleBold, supported, enabledInRichlyEditableText, stateBold,
         valueNull, notTextInsertion, doNotAllowExecutionWhenDisabled}},
       {"Copy",
-       {executeCopy, supported, enabledCopy, stateNone, valueNull,
+       {executeCopy, supportedCopyCut, enabledCopy, stateNone, valueNull,
         notTextInsertion, allowExecutionWhenDisabled}},
       {"CreateLink",
        {executeCreateLink, supported, enabledInRichlyEditableText, stateNone,
         valueNull, notTextInsertion, doNotAllowExecutionWhenDisabled}},
       {"Cut",
-       {executeCut, supported, enabledCut, stateNone, valueNull,
+       {executeCut, supportedCopyCut, enabledCut, stateNone, valueNull,
         notTextInsertion, allowExecutionWhenDisabled}},
       {"Delete",
        {executeDelete, supported, enabledDelete, stateNone, valueNull,

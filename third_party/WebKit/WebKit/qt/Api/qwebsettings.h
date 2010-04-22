@@ -55,7 +55,7 @@ class QWEBKIT_EXPORT QWebSettings {
     PluginsEnabled,
     PrivateBrowsingEnabled,
     JavascriptCanOpenWindows,
-    JavascriptCanAccessClipboard,
+    DOMPasteAllowed,
     DeveloperExtrasEnabled,
     LinksIncludedInFocusChain,
     ZoomTextOnly,
@@ -68,6 +68,7 @@ class QWEBKIT_EXPORT QWebSettings {
 #endif
     LocalContentCanAccessRemoteUrls,
     DnsPrefetchEnabled,
+    JavaScriptCanAccessClipboard,
     XSSAuditingEnabled,
     AcceleratedCompositingEnabled,
     WebGLEnabled,

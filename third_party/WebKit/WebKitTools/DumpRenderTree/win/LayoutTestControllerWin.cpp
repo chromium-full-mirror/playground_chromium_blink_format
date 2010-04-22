@@ -470,6 +470,10 @@ void LayoutTestController::setPopupBlockingEnabled(bool enabled) {
   preferences->setJavaScriptCanOpenWindowsAutomatically(!enabled);
 }
 
+void LayoutTestController::setJavaScriptCanAccessClipboard(bool enabled) {
+  preferences->setJavaScriptCanAccessClipboard(enabled);
+}
+
 void LayoutTestController::setTabKeyCyclesThroughElements(bool shouldCycle) {
   COMPtr<IWebView> webView;
   if (FAILED(frame->webView(&webView)))
