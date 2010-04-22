@@ -49,7 +49,7 @@
 
 using namespace WebCore;
 
-static inline Evas_Object* kit(WebCore::Frame* frame) {
+static inline Evas_Object* kit(Frame* frame) {
   if (!frame)
     return 0;
 
@@ -186,7 +186,7 @@ bool ChromeClientEfl::canRunBeforeUnloadConfirmPanel() {
 }
 
 bool ChromeClientEfl::runBeforeUnloadConfirmPanel(const String& message,
-                                                  WebCore::Frame* frame) {
+                                                  Frame* frame) {
   return runJavaScriptConfirm(frame, message);
 }
 
@@ -249,37 +249,9 @@ IntRect ChromeClientEfl::windowResizerRect() const {
   return IntRect();
 }
 
-void ChromeClientEfl::repaint(const IntRect& windowRect,
-                              bool contentChanged,
-                              bool immediate,
-                              bool repaintContentOnly) {
-  Evas_Coord x, y, w, h;
-
-  if (!contentChanged)
-    return;
-
-  x = windowRect.x();
-  y = windowRect.y();
-  w = windowRect.width();
-  h = windowRect.height();
-  ewk_view_repaint(m_view, x, y, w, h);
-}
-
 void ChromeClientEfl::contentsSizeChanged(Frame* frame,
                                           const IntSize& size) const {
   ewk_frame_contents_size_changed(kit(frame), size.width(), size.height());
-}
-
-bool ChromeClientEfl::scroll(const IntSize& delta,
-                             const IntRect& scrollViewRect,
-                             const IntRect& clipRect,
-                             bool canBlit,
-                             bool isMainFrame) {
-  ewk_view_scroll(m_view, delta.width(), delta.height(), scrollViewRect.x(),
-                  scrollViewRect.y(), scrollViewRect.width(),
-                  scrollViewRect.height(), clipRect.x(), clipRect.y(),
-                  clipRect.width(), clipRect.height(), isMainFrame);
-  return canBlit;
 }
 
 IntRect ChromeClientEfl::windowToScreen(const IntRect& rect) const {
@@ -348,7 +320,7 @@ void ChromeClientEfl::exceededDatabaseQuota(Frame* frame,
                                    databaseName.utf8().data());
 }
 
-void ChromeClientEfl::runOpenPanel(Frame*,
+void ChromeClientEfl::runOpenPanel(Frame* frame,
                                    PassRefPtr<FileChooser> prpFileChooser) {
   notImplemented();
 }
@@ -365,6 +337,64 @@ bool ChromeClientEfl::setCursor(PlatformCursorHandle) {
 void ChromeClientEfl::requestGeolocationPermissionForFrame(Frame*,
                                                            Geolocation*) {
   // See the comment in WebCore/page/ChromeClient.h
+  notImplemented();
+}
+
+void ChromeClientEfl::cancelGeolocationPermissionRequestForFrame(Frame*,
+                                                                 Geolocation*) {
+  notImplemented();
+}
+
+void ChromeClientEfl::cancelGeolocationPermissionForFrame(Frame*,
+                                                          Geolocation*) {
+  notImplemented();
+}
+
+void ChromeClientEfl::invalidateContents(const IntRect& updateRect,
+                                         bool immediate) {
+  notImplemented();
+}
+
+void ChromeClientEfl::invalidateWindow(const IntRect& updateRect,
+                                       bool immediate) {
+  notImplemented();
+}
+
+void ChromeClientEfl::invalidateContentsAndWindow(const IntRect& updateRect,
+                                                  bool immediate) {
+  Evas_Coord x, y, w, h;
+
+  x = updateRect.x();
+  y = updateRect.y();
+  w = updateRect.width();
+  h = updateRect.height();
+  ewk_view_repaint(m_view, x, y, w, h);
+}
+
+void ChromeClientEfl::invalidateContentsForSlowScroll(const IntRect& updateRect,
+                                                      bool immediate) {
+  invalidateContentsAndWindow(updateRect, immediate);
+}
+
+void ChromeClientEfl::scroll(const IntSize& scrollDelta,
+                             const IntRect& rectToScroll,
+                             const IntRect& clipRect) {
+  ewk_view_scroll(m_view, scrollDelta.width(), scrollDelta.height(),
+                  rectToScroll.x(), rectToScroll.y(), rectToScroll.width(),
+                  rectToScroll.height(), clipRect.x(), clipRect.y(),
+                  clipRect.width(), clipRect.height(), EINA_TRUE);
+}
+
+void ChromeClientEfl::cancelGeolocationPermissionRequestForFrame(Frame*) {
+  notImplemented();
+}
+
+void ChromeClientEfl::iconForFiles(const Vector<String, 0u>&,
+                                   PassRefPtr<FileChooser>) {
+  notImplemented();
+}
+
+void ChromeClientEfl::chooseIconForFiles(const Vector<String>&, FileChooser*) {
   notImplemented();
 }
 }

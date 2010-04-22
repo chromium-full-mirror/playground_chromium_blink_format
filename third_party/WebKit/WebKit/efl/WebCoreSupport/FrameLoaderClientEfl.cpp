@@ -185,7 +185,7 @@ void FrameLoaderClientEfl::committedLoad(DocumentLoader* loader,
 
     FrameLoader* fl = loader->frameLoader();
     if (m_firstData) {
-      fl->setEncoding(m_response.textEncodingName(), false);
+      fl->writer()->setEncoding(m_response.textEncodingName(), false);
       m_firstData = false;
     }
     fl->addData(data, length);
@@ -640,7 +640,7 @@ void FrameLoaderClientEfl::finishedLoading(DocumentLoader* loader) {
   if (!m_pluginView) {
     if (m_firstData) {
       FrameLoader* fl = loader->frameLoader();
-      fl->setEncoding(m_response.textEncodingName(), false);
+      fl->writer()->setEncoding(m_response.textEncodingName(), false);
       m_firstData = false;
     }
   } else {
@@ -683,7 +683,7 @@ void FrameLoaderClientEfl::dispatchDidFailLoading(DocumentLoader* loader,
                                                   const ResourceError&) {
   if (m_firstData) {
     FrameLoader* fl = loader->frameLoader();
-    fl->setEncoding(m_response.textEncodingName(), false);
+    fl->writer()->setEncoding(m_response.textEncodingName(), false);
     m_firstData = false;
   }
 }
@@ -802,7 +802,8 @@ void FrameLoaderClientEfl::setMainDocumentError(DocumentLoader* loader,
                                                 const ResourceError& error) {
   if (!m_pluginView) {
     if (m_firstData) {
-      loader->frameLoader()->setEncoding(m_response.textEncodingName(), false);
+      loader->frameLoader()->writer()->setEncoding(
+          m_response.textEncodingName(), false);
       m_firstData = false;
     }
   } else {
