@@ -40,6 +40,8 @@
 #include "WebProcessMessageKinds.h"
 #include "WebProcessProxy.h"
 
+#include "WKContextPrivate.h"
+
 #ifndef NDEBUG
 #include <wtf/RefCountedLeakCounter.h>
 #endif
@@ -294,6 +296,10 @@ void WebPageProxy::preferencesDidChange() {
   process()->connection()->send(
       WebPageMessage::PreferencesDidChange, m_pageID,
       CoreIPC::In(pageNamespace()->context()->preferences()->store()));
+}
+
+void WebPageProxy::getStatistics(WKContextStatistics* statistics) {
+  statistics->numberOfWKFrames += m_frameMap.size();
 }
 
 WebFrameProxy* WebPageProxy::webFrame(uint64_t frameID) const {

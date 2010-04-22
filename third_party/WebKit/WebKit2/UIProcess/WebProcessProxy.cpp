@@ -100,6 +100,10 @@ WebProcessProxy::pages_const_iterator WebProcessProxy::pages_end() {
   return m_pageMap.end().values();
 }
 
+size_t WebProcessProxy::numberOfPages() {
+  return m_pageMap.size();
+}
+
 void WebProcessProxy::didReceiveMessage(CoreIPC::Connection* connection,
                                         CoreIPC::MessageID messageID,
                                         CoreIPC::ArgumentDecoder* arguments) {

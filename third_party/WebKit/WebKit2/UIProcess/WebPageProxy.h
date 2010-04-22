@@ -53,6 +53,8 @@ namespace WebCore {
 class IntSize;
 }
 
+struct WKContextStatistics;
+
 namespace WebKit {
 
 class DrawingAreaProxy;
@@ -141,6 +143,8 @@ class WebPageProxy : public RefCounted<WebPageProxy> {
   const WebCore::String& urlAtProcessExit() const { return m_urlAtProcessExit; }
 
   void preferencesDidChange();
+
+  void getStatistics(WKContextStatistics*);
 
  private:
   WebPageProxy(WebPageNamespace*, uint64_t pageID);
