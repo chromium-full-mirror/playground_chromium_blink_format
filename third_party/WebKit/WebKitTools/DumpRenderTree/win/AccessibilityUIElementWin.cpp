@@ -488,6 +488,10 @@ bool AccessibilityUIElement::addNotificationListener(
   return true;
 }
 
+void AccessibilityUIElement::removeNotificationListener() {
+  // FIXME: implement
+}
+
 bool AccessibilityUIElement::isSelectable() const {
   DWORD state = accessibilityState(m_element);
   return (state & STATE_SYSTEM_SELECTABLE) == STATE_SYSTEM_SELECTABLE;

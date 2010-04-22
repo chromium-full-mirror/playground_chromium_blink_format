@@ -521,6 +521,10 @@ bool AccessibilityUIElement::addNotificationListener(
   return false;
 }
 
+void AccessibilityUIElement::removeNotificationListener() {
+  // FIXME: implement
+}
+
 bool AccessibilityUIElement::isSelectable() const {
   // FIXME: implement
   return false;

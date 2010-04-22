@@ -932,6 +932,17 @@ static JSValueRef addNotificationListenerCallback(JSContextRef context,
   return JSValueMakeBoolean(context, succeeded);
 }
 
+static JSValueRef removeNotificationListenerCallback(
+    JSContextRef context,
+    JSObjectRef function,
+    JSObjectRef thisObject,
+    size_t argumentCount,
+    const JSValueRef arguments[],
+    JSValueRef* exception) {
+  toAXElement(thisObject)->removeNotificationListener();
+  return JSValueMakeUndefined(context);
+}
+
 // Destruction
 
 static void finalize(JSObjectRef thisObject) {
@@ -1117,6 +1128,8 @@ JSClassRef AccessibilityUIElement::getJSClass() {
       {"isEqual", isEqualCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"addNotificationListener", addNotificationListenerCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"removeNotificationListener", removeNotificationListenerCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"takeFocus", takeFocusCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
