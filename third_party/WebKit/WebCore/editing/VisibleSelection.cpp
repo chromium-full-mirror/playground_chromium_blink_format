@@ -220,7 +220,8 @@ void VisibleSelection::appendTrailingWhitespace() {
   if (!searchRange)
     return;
 
-  CharacterIterator charIt(searchRange.get(), true);
+  CharacterIterator charIt(
+      searchRange.get(), TextIteratorEmitsCharactersBetweenAllVisiblePositions);
 
   for (; charIt.length(); charIt.advance(1)) {
     UChar c = charIt.characters()[0];

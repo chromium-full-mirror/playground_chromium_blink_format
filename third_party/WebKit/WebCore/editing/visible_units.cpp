@@ -227,7 +227,8 @@ static VisiblePosition nextBoundary(const VisiblePosition& c,
 
   searchRange->selectNodeContents(boundary, ec);
   searchRange->setStart(start.node(), start.deprecatedEditingOffset(), ec);
-  TextIterator it(searchRange.get(), true);
+  TextIterator it(searchRange.get(),
+                  TextIteratorEmitsCharactersBetweenAllVisiblePositions);
   unsigned next = 0;
   bool inTextSecurityMode =
       start.node() && start.node()->renderer() &&
@@ -265,7 +266,9 @@ static VisiblePosition nextBoundary(const VisiblePosition& c,
   } else if (next != prefixLength) {
     // Use the character iterator to translate the next value into a DOM
     // position.
-    CharacterIterator charIt(searchRange.get(), true);
+    CharacterIterator charIt(
+        searchRange.get(),
+        TextIteratorEmitsCharactersBetweenAllVisiblePositions);
     charIt.advance(next - prefixLength - 1);
     pos = charIt.range()->endPosition();
 

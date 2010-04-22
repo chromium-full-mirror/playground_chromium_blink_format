@@ -77,19 +77,17 @@ class BitStack {
 // chunks so as to optimize for performance of the iteration.
 
 enum TextIteratorBehavior {
-  TextIteratorBehaviorDefault = 0,
-  TextIteratorBehaviorEmitCharactersBetweenAllVisiblePositions = 1 << 0,
-  TextIteratorBehaviorEnterTextControls = 1 << 1,
-  TextIteratorBehaviorEmitsTextsWithoutTranscoding = 1 << 2,
+  TextIteratorDefaultBehavior = 0,
+  TextIteratorEmitsCharactersBetweenAllVisiblePositions = 1 << 0,
+  TextIteratorEntersTextControls = 1 << 1,
+  TextIteratorEmitsTextsWithoutTranscoding = 1 << 2,
 };
 
 class TextIterator {
  public:
   TextIterator();
   explicit TextIterator(const Range*,
-                        bool emitCharactersBetweenAllVisiblePositions = false,
-                        bool enterTextControls = false);
-  TextIterator(const Range*, TextIteratorBehavior);
+                        TextIteratorBehavior = TextIteratorDefaultBehavior);
 
   bool atEnd() const { return !m_positionNode; }
   void advance();
@@ -111,7 +109,6 @@ class TextIterator {
                                     int characterCount);
 
  private:
-  void init(const Range*);
   void exitNode();
   bool shouldRepresentNodeOffsetZero();
   bool shouldEmitSpaceBeforeAndAfterNode(Node*);
@@ -154,7 +151,7 @@ class TextIterator {
   // Used when there is still some pending text from the current node; when
   // these
   // are false and 0, we go back to normal iterating.
-  bool m_needAnotherNewline;
+  bool m_needsAnotherNewline;
   InlineTextBox* m_textBox;
 
   // Used to do the whitespace collapsing logic.
@@ -172,7 +169,7 @@ class TextIterator {
 
   // Used when deciding whether to emit a "positioning" (e.g. newline) before
   // any other content
-  bool m_haveEmitted;
+  bool m_hasEmitted;
 
   // Used by selection preservation code.  There should be one character emitted
   // between every VisiblePosition
@@ -180,8 +177,8 @@ class TextIterator {
   // FIXME <rdar://problem/6028818>: This functionality should eventually be
   // phased out when we rewrite
   // moveParagraphs to not clone/destroy moved content.
-  bool m_emitCharactersBetweenAllVisiblePositions;
-  bool m_enterTextControls;
+  bool m_emitsCharactersBetweenAllVisiblePositions;
+  bool m_entersTextControls;
 
   // Used when we want texts for copying, pasting, and transposing.
   bool m_emitsTextWithoutTranscoding;
@@ -254,8 +251,7 @@ class CharacterIterator {
   CharacterIterator();
   explicit CharacterIterator(
       const Range*,
-      bool emitCharactersBetweenAllVisiblePositions = false,
-      bool enterTextControls = false);
+      TextIteratorBehavior = TextIteratorDefaultBehavior);
 
   void advance(int numCharacters);
 
