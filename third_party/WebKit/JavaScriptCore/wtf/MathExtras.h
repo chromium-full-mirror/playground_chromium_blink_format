@@ -264,7 +264,7 @@ inline float grad2rad(float g) {
   return g * piFloat / 200.0f;
 }
 
-#if !COMPILER(MSVC) && !COMPILER(RVCT) && !COMPILER(WINSCW)
+#if !COMPILER(MSVC) && !COMPILER(RVCT) && !OS(ANDROID) && !COMPILER(WINSCW)
 using std::isfinite;
 using std::isinf;
 using std::isnan;
