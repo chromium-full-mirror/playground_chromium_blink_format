@@ -26,9 +26,9 @@
 #define Font_h
 
 #include "CharacterNames.h"
-#include "TextRun.h"
 #include "FontDescription.h"
 #include "SimpleFontData.h"
+#include "TextRun.h"
 #include "TypesettingFeatures.h"
 #include <wtf/HashMap.h>
 #include <wtf/HashSet.h>
@@ -266,8 +266,9 @@ class Font {
     return c == ' ' || c == '\t' || c == '\n' || c == 0x00A0;
   }
   static bool treatAsZeroWidthSpace(UChar c) {
-    return c < 0x20 || (c >= 0x7F && c < 0xA0) || c == 0x200e || c == 0x200f ||
-           (c >= 0x202a && c <= 0x202e) || c == 0xFFFC;
+    return c < 0x20 || (c >= 0x7F && c < 0xA0) ||
+           (c >= 0x200c && c <= 0x200f) || (c >= 0x202a && c <= 0x202e) ||
+           c == 0xFFFC;
   }
 
   static inline UChar normalizeSpaces(UChar character) {
