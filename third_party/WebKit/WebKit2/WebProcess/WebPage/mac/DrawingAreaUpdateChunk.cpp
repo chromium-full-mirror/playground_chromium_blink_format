@@ -145,7 +145,7 @@ void DrawingAreaUpdateChunk::setSize(const IntSize& viewSize) {
 
   m_displayTimer.stop();
 
-  WebProcess::shared().connection()->send(DrawingAreaProxyMessage::DidSetFrame,
+  WebProcess::shared().connection()->send(DrawingAreaProxyMessage::DidSetSize,
                                           m_webPage->pageID(),
                                           CoreIPC::In(viewSize, updateChunk));
 }
@@ -164,7 +164,7 @@ void DrawingAreaUpdateChunk::didReceiveMessage(
     CoreIPC::MessageID messageID,
     CoreIPC::ArgumentDecoder& arguments) {
   switch (messageID.get<DrawingAreaMessage::Kind>()) {
-    case DrawingAreaMessage::SetFrame: {
+    case DrawingAreaMessage::SetSize: {
       IntSize size;
       if (!arguments.decode(CoreIPC::Out(size)))
         return;

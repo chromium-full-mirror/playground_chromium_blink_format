@@ -32,7 +32,7 @@
 
 namespace DrawingAreaProxyMessage {
 
-enum Kind { Update, DidSetFrame };
+enum Kind { Update, DidSetSize };
 }
 
 namespace CoreIPC {
