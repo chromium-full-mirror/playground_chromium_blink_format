@@ -23,47 +23,27 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SVGPaintServerPattern_h
-#define SVGPaintServerPattern_h
+#ifndef RenderSVGResourceSolidColor_h
+#define RenderSVGResourceSolidColor_h
 
 #if ENABLE(SVG)
 
-#include "AffineTransform.h"
-#include "FloatRect.h"
-#include "Pattern.h"
+#include "Color.h"
 #include "SVGPaintServer.h"
-
-#include <memory>
-
-#include <wtf/OwnPtr.h>
-#include <wtf/PassOwnPtr.h>
 
 namespace WebCore {
 
-class GraphicsContext;
-class ImageBuffer;
-class SVGPatternElement;
-
-class SVGPaintServerPattern : public SVGPaintServer {
+class SVGPaintServerSolid : public SVGPaintServer {
  public:
-  static PassRefPtr<SVGPaintServerPattern> create(
-      const SVGPatternElement* owner) {
-    return adoptRef(new SVGPaintServerPattern(owner));
+  static PassRefPtr<SVGPaintServerSolid> create() {
+    return adoptRef(new SVGPaintServerSolid);
   }
+  virtual ~SVGPaintServerSolid();
 
-  virtual ~SVGPaintServerPattern();
+  virtual SVGPaintServerType type() const { return SolidPaintServer; }
 
-  virtual SVGPaintServerType type() const { return PatternPaintServer; }
-
-  // Pattern boundaries
-  void setPatternBoundaries(const FloatRect&);
-  FloatRect patternBoundaries() const;
-
-  ImageBuffer* tile() const;
-  void setTile(PassOwnPtr<ImageBuffer>);
-
-  AffineTransform patternTransform() const;
-  void setPatternTransform(const AffineTransform&);
+  Color color() const;
+  void setColor(const Color&);
 
   virtual TextStream& externalRepresentation(TextStream&) const;
 
@@ -72,24 +52,15 @@ class SVGPaintServerPattern : public SVGPaintServer {
                      const RenderStyle*,
                      SVGPaintTargetType,
                      bool isPaintingText) const;
-  virtual void teardown(GraphicsContext*&,
-                        const RenderObject*,
-                        SVGPaintTargetType,
-                        bool isPaintingText) const;
 
  private:
-  SVGPaintServerPattern(const SVGPatternElement*);
+  SVGPaintServerSolid();
 
-  OwnPtr<ImageBuffer> m_tile;
-  const SVGPatternElement* m_ownerElement;
-  AffineTransform m_patternTransform;
-  FloatRect m_patternBoundaries;
-
-  mutable RefPtr<Pattern> m_pattern;
+  Color m_color;
 };
 
 }  // namespace WebCore
 
 #endif
 
-#endif  // SVGPaintServerPattern_h
+#endif  // RenderSVGResourceSolidColor_h

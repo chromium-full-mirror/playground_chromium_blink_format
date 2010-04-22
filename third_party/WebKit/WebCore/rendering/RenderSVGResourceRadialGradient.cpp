@@ -23,44 +23,55 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SVGPaintServerSolid_h
-#define SVGPaintServerSolid_h
+#include "config.h"
 
 #if ENABLE(SVG)
+#include "RenderSVGResourceRadialGradient.h"
 
-#include "Color.h"
-#include "SVGPaintServer.h"
+#include "SVGRenderTreeAsText.h"
 
 namespace WebCore {
 
-class SVGPaintServerSolid : public SVGPaintServer {
- public:
-  static PassRefPtr<SVGPaintServerSolid> create() {
-    return adoptRef(new SVGPaintServerSolid);
-  }
-  virtual ~SVGPaintServerSolid();
+SVGPaintServerRadialGradient::SVGPaintServerRadialGradient(
+    const SVGGradientElement* owner)
+    : SVGPaintServerGradient(owner), m_radius(0.0f) {}
 
-  virtual SVGPaintServerType type() const { return SolidPaintServer; }
+SVGPaintServerRadialGradient::~SVGPaintServerRadialGradient() {}
 
-  Color color() const;
-  void setColor(const Color&);
+FloatPoint SVGPaintServerRadialGradient::gradientCenter() const {
+  return m_center;
+}
 
-  virtual TextStream& externalRepresentation(TextStream&) const;
+void SVGPaintServerRadialGradient::setGradientCenter(const FloatPoint& center) {
+  m_center = center;
+}
 
-  virtual bool setup(GraphicsContext*&,
-                     const RenderObject*,
-                     const RenderStyle*,
-                     SVGPaintTargetType,
-                     bool isPaintingText) const;
+FloatPoint SVGPaintServerRadialGradient::gradientFocal() const {
+  return m_focal;
+}
 
- private:
-  SVGPaintServerSolid();
+void SVGPaintServerRadialGradient::setGradientFocal(const FloatPoint& focal) {
+  m_focal = focal;
+}
 
-  Color m_color;
-};
+float SVGPaintServerRadialGradient::gradientRadius() const {
+  return m_radius;
+}
+
+void SVGPaintServerRadialGradient::setGradientRadius(float radius) {
+  m_radius = radius;
+}
+
+TextStream& SVGPaintServerRadialGradient::externalRepresentation(
+    TextStream& ts) const {
+  ts << "[type=RADIAL-GRADIENT] ";
+  SVGPaintServerGradient::externalRepresentation(ts);
+  ts << " [center=" << gradientCenter() << "]"
+     << " [focal=" << gradientFocal() << "]"
+     << " [radius=" << gradientRadius() << "]";
+  return ts;
+}
 
 }  // namespace WebCore
 
 #endif
-
-#endif  // SVGPaintServerSolid_h

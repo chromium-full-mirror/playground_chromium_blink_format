@@ -23,47 +23,43 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SVGPaintServerRadialGradient_h
-#define SVGPaintServerRadialGradient_h
+#ifndef RenderSVGResourceLinearGradient_h
+#define RenderSVGResourceLinearGradient_h
 
 #if ENABLE(SVG)
 
 #include "FloatPoint.h"
-#include "SVGPaintServerGradient.h"
+#include "RenderSVGResourceGradient.h"
 
 namespace WebCore {
 
-class SVGPaintServerRadialGradient : public SVGPaintServerGradient {
+class SVGPaintServerLinearGradient : public SVGPaintServerGradient {
  public:
-  static PassRefPtr<SVGPaintServerRadialGradient> create(
+  static PassRefPtr<SVGPaintServerLinearGradient> create(
       const SVGGradientElement* owner) {
-    return adoptRef(new SVGPaintServerRadialGradient(owner));
+    return adoptRef(new SVGPaintServerLinearGradient(owner));
   }
-  virtual ~SVGPaintServerRadialGradient();
+  virtual ~SVGPaintServerLinearGradient();
 
-  virtual SVGPaintServerType type() const { return RadialGradientPaintServer; }
+  virtual SVGPaintServerType type() const { return LinearGradientPaintServer; }
 
-  FloatPoint gradientCenter() const;
-  void setGradientCenter(const FloatPoint&);
+  FloatPoint gradientStart() const;
+  void setGradientStart(const FloatPoint&);
 
-  FloatPoint gradientFocal() const;
-  void setGradientFocal(const FloatPoint&);
-
-  float gradientRadius() const;
-  void setGradientRadius(float);
+  FloatPoint gradientEnd() const;
+  void setGradientEnd(const FloatPoint&);
 
   virtual TextStream& externalRepresentation(TextStream&) const;
 
  private:
-  SVGPaintServerRadialGradient(const SVGGradientElement* owner);
+  SVGPaintServerLinearGradient(const SVGGradientElement* owner);
 
-  float m_radius;
-  FloatPoint m_center;
-  FloatPoint m_focal;
+  FloatPoint m_start;
+  FloatPoint m_end;
 };
 
 }  // namespace WebCore
 
 #endif
 
-#endif  // SVGPaintServerRadialGradient_h
+#endif  // RenderSVGResourceLinearGradient_h

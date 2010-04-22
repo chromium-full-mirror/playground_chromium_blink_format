@@ -26,7 +26,8 @@
 #include "config.h"
 
 #if ENABLE(SVG)
-#include "SVGPaintServerLinearGradient.h"
+#include "RenderSVGResourceLinearGradient.h"
+
 #include "SVGRenderTreeAsText.h"
 
 namespace WebCore {

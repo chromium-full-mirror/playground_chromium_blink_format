@@ -24,8 +24,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SVGPaintServerGradient_h
-#define SVGPaintServerGradient_h
+#ifndef RenderSVGResourceGradient_h
+#define RenderSVGResourceGradient_h
 
 #if ENABLE(SVG)
 
@@ -104,4 +104,4 @@ inline SVGGradientStop makeGradientStop(float offset, const Color& color) {
 
 #endif
 
-#endif  // SVGPaintServerGradient_h
+#endif  // RenderSVGResourceGradient_h
