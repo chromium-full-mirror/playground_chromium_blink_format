@@ -33,6 +33,7 @@
 #ifndef webview_h
 #define webview_h
 
+#include "fpstimer.h"
 #include "webpage.h"
 #include <qwebview.h>
 #include <qgraphicswebview.h>
@@ -115,6 +116,7 @@ class WebViewGraphicsBased : public QGraphicsView {
   bool m_measureFps;
   qreal m_yRotation;
   bool m_resizesToContents;
+  FpsTimer m_fpsTimer;
 };
 
 #endif
