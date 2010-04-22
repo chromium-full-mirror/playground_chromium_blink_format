@@ -56,6 +56,7 @@ class Interpreter;
 class JSGlobalObject;
 class JSObject;
 class Lexer;
+class LiteralTable;
 class Parser;
 class Stringifier;
 class Structure;
@@ -136,6 +137,7 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
   static JS_EXPORTDATA void* jsFunctionVPtr;
 
   IdentifierTable* identifierTable;
+  LiteralTable* literalTable;
   CommonIdentifiers* propertyNames;
   const MarkedArgumentBuffer* emptyList;  // Lists are supposed to be allocated
                                           // on the stack to have their elements

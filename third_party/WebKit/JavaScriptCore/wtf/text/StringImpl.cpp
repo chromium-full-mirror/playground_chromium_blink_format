@@ -31,6 +31,7 @@
 #include "StringHash.h"
 #include <wtf/StdLibExtras.h>
 #include <wtf/WTFThreadData.h>
+#include <wtf/text/AtomicStringTable.h>
 
 using namespace WTF;
 using namespace Unicode;
@@ -42,7 +43,7 @@ static const unsigned minLengthToShare = 20;
 StringImpl::~StringImpl() {
   ASSERT(!isStatic());
 
-  if (inTable())
+  if (isAtomic())
     AtomicString::remove(this);
 #if USE(JSC)
   if (isIdentifier())

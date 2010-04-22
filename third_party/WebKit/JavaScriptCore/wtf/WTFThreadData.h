@@ -27,10 +27,7 @@
 #ifndef WTFThreadData_h
 #define WTFThreadData_h
 
-#include <wtf/HashMap.h>
-#include <wtf/HashSet.h>
 #include <wtf/Noncopyable.h>
-#include <wtf/text/StringHash.h>
 
 // This was ENABLE(WORKERS) in WebCore, but this is not defined when compiling
 // JSC.
@@ -51,40 +48,15 @@
 
 // FIXME: This is a temporary layering violation while we move more string code
 // to WTF.
-namespace WebCore {
-class AtomicStringTable;
-class StringImpl;
+namespace JSC {
+class IdentifierTable;
 }
-using WebCore::StringImpl;
 
-typedef void (*AtomicStringTableDestructor)(WebCore::AtomicStringTable*);
-
-#if USE(JSC)
 // FIXME: This is a temporary layering violation while we move more string code
 // to WTF.
-namespace JSC {
-
-typedef HashMap<const char*, RefPtr<StringImpl>, PtrHash<const char*>>
-    LiteralIdentifierTable;
-
-class IdentifierTable : public FastAllocBase {
- public:
-  ~IdentifierTable();
-
-  std::pair<HashSet<StringImpl*>::iterator, bool> add(StringImpl* value);
-  template <typename U, typename V>
-  std::pair<HashSet<StringImpl*>::iterator, bool> add(U value);
-
-  void remove(StringImpl* r) { m_table.remove(r); }
-
-  LiteralIdentifierTable& literalTable() { return m_literalTable; }
-
- private:
-  HashSet<StringImpl*> m_table;
-  LiteralIdentifierTable m_literalTable;
-};
+namespace WebCore {
+class AtomicStringTable;
 }
-#endif
 
 namespace WTF {
 
@@ -93,8 +65,8 @@ class WTFThreadData : public Noncopyable {
   WTFThreadData();
   ~WTFThreadData();
 
-  WebCore::AtomicStringTable* atomicStringTable() {
-    return m_atomicStringTable;
+  WebCore::AtomicStringTable& atomicStringTable() {
+    return *m_atomicStringTable;
   }
 
 #if USE(JSC)
@@ -121,7 +93,6 @@ class WTFThreadData : public Noncopyable {
 
  private:
   WebCore::AtomicStringTable* m_atomicStringTable;
-  AtomicStringTableDestructor m_atomicStringTableDestructor;
 
 #if USE(JSC)
   JSC::IdentifierTable* m_defaultIdentifierTable;
@@ -134,7 +105,6 @@ class WTFThreadData : public Noncopyable {
   static JS_EXPORTDATA WTFThreadData* staticData;
 #endif
   friend WTFThreadData& wtfThreadData();
-  friend class WebCore::AtomicStringTable;
 };
 
 inline WTFThreadData& wtfThreadData() {

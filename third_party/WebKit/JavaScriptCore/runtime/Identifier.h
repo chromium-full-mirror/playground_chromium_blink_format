@@ -155,6 +155,8 @@ inline bool operator!=(const Identifier& a, const char* b) {
 
 IdentifierTable* createIdentifierTable();
 void deleteIdentifierTable(IdentifierTable*);
+LiteralTable* createLiteralTable();
+void deleteLiteralTable(LiteralTable*);
 
 }  // namespace JSC
 
