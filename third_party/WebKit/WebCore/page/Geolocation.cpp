@@ -385,6 +385,20 @@ void Geolocation::clearWatch(int watchId) {
     stopUpdating();
 }
 
+void Geolocation::suspend() {
+#if !ENABLE(CLIENT_BASED_GEOLOCATION)
+  if (hasListeners())
+    m_service->suspend();
+#endif
+}
+
+void Geolocation::resume() {
+#if !ENABLE(CLIENT_BASED_GEOLOCATION)
+  if (hasListeners())
+    m_service->resume();
+#endif
+}
+
 void Geolocation::setIsAllowed(bool allowed) {
   // This may be due to either a new position from the service, or a cached
   // position.
