@@ -600,6 +600,16 @@ void DocumentLoader::setTitle(const String& title) {
   }
 }
 
+void DocumentLoader::setIconURL(const String& iconURL) {
+  if (iconURL.isEmpty())
+    return;
+
+  if (m_pageIconURL != iconURL) {
+    m_pageIconURL = iconURL;
+    frameLoader()->didChangeIcons(this);
+  }
+}
+
 KURL DocumentLoader::urlForHistory() const {
   // Return the URL to be used for history and B/F list.
   // Returns nil for WebDataProtocol URLs that aren't alternates

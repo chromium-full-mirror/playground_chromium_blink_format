@@ -57,6 +57,7 @@ LayoutTestController::LayoutTestController(const std::string& testPathOrURL,
       m_dumpSourceAsWebArchive(false),
       m_dumpStatusCallbacks(false),
       m_dumpTitleChanges(false),
+      m_dumpIconChanges(false),
       m_dumpVisitedLinksCallback(false),
       m_dumpWillCacheResponse(false),
       m_callCloseOnWebViews(true),
@@ -261,6 +262,18 @@ static JSValueRef dumpTitleChangesCallback(JSContextRef context,
   LayoutTestController* controller =
       static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
   controller->setDumpTitleChanges(true);
+  return JSValueMakeUndefined(context);
+}
+
+static JSValueRef dumpIconChangesCallback(JSContextRef context,
+                                          JSObjectRef function,
+                                          JSObjectRef thisObject,
+                                          size_t argumentCount,
+                                          const JSValueRef arguments[],
+                                          JSValueRef* exception) {
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->setDumpIconChanges(true);
   return JSValueMakeUndefined(context);
 }
 
@@ -2273,6 +2286,8 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
       {"dumpStatusCallbacks", dumpStatusCallbacksCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"dumpTitleChanges", dumpTitleChangesCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"dumpIconChanges", dumpIconChangesCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"dumpWillCacheResponse", dumpWillCacheResponseCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
