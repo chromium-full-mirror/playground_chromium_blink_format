@@ -75,7 +75,8 @@ class tst_QWebPage : public QObject {
   void modified();
   void contextMenuCrash();
   void database();
-  void createPlugin();
+  void createPluginWithPluginsEnabled();
+  void createPluginWithPluginsDisabled();
   void destroyPlugin_data();
   void destroyPlugin();
   void createViewlessPlugin_data();
@@ -532,32 +533,23 @@ class PluginPage : public QWebPage {
   }
 };
 
-void tst_QWebPage::createPlugin() {
-  QSignalSpy loadSpy(m_view, SIGNAL(loadFinished(bool)));
+static void createPlugin(QWebView* view) {
+  QSignalSpy loadSpy(view, SIGNAL(loadFinished(bool)));
 
-  PluginPage* newPage = new PluginPage(m_view);
-  m_view->setPage(newPage);
+  PluginPage* newPage = new PluginPage(view);
+  view->setPage(newPage);
 
-  // plugins not enabled by default, so the plugin shouldn't be loaded
-  m_view->setHtml(
-      QString("<html><body><object type='application/x-qt-plugin' "
+  // type has to be application/x-qt-plugin
+  view->setHtml(
+      QString("<html><body><object type='application/x-foobarbaz' "
               "classid='pushbutton' id='mybutton'/></body></html>"));
   QTRY_COMPARE(loadSpy.count(), 1);
   QCOMPARE(newPage->calls.count(), 0);
 
-  m_view->settings()->setAttribute(QWebSettings::PluginsEnabled, true);
-
-  // type has to be application/x-qt-plugin
-  m_view->setHtml(
-      QString("<html><body><object type='application/x-foobarbaz' "
-              "classid='pushbutton' id='mybutton'/></body></html>"));
-  QTRY_COMPARE(loadSpy.count(), 2);
-  QCOMPARE(newPage->calls.count(), 0);
-
-  m_view->setHtml(
+  view->setHtml(
       QString("<html><body><object type='application/x-qt-plugin' "
               "classid='pushbutton' id='mybutton'/></body></html>"));
-  QTRY_COMPARE(loadSpy.count(), 3);
+  QTRY_COMPARE(loadSpy.count(), 2);
   QCOMPARE(newPage->calls.count(), 1);
   {
     PluginPage::CallInfo ci = newPage->calls.takeFirst();
@@ -602,14 +594,14 @@ void tst_QWebPage::createPlugin() {
                .toString(),
            QString::fromLatin1("function clicked() {\n    [native code]\n}"));
 
-  m_view->setHtml(QString("<html><body><table>"
-                          "<tr><object type='application/x-qt-plugin' "
-                          "classid='lineedit' id='myedit'/></tr>"
-                          "<tr><object type='application/x-qt-plugin' "
-                          "classid='pushbutton' id='mybutton'/></tr>"
-                          "</table></body></html>"),
-                  QUrl("http://foo.bar.baz"));
-  QTRY_COMPARE(loadSpy.count(), 4);
+  view->setHtml(QString("<html><body><table>"
+                        "<tr><object type='application/x-qt-plugin' "
+                        "classid='lineedit' id='myedit'/></tr>"
+                        "<tr><object type='application/x-qt-plugin' "
+                        "classid='pushbutton' id='mybutton'/></tr>"
+                        "</table></body></html>"),
+                QUrl("http://foo.bar.baz"));
+  QTRY_COMPARE(loadSpy.count(), 3);
   QCOMPARE(newPage->calls.count(), 2);
   {
     PluginPage::CallInfo ci = newPage->calls.takeFirst();
@@ -643,14 +635,19 @@ void tst_QWebPage::createPlugin() {
     QVERIFY(ci.returnValue != 0);
     QVERIFY(ci.returnValue->inherits("QPushButton"));
   }
+}
 
+void tst_QWebPage::createPluginWithPluginsEnabled() {
+  m_view->settings()->setAttribute(QWebSettings::PluginsEnabled, true);
+  createPlugin(m_view);
+}
+
+void tst_QWebPage::createPluginWithPluginsDisabled() {
+  // Qt Plugins should be loaded by QtWebKit even when PluginsEnabled is
+  // false. The client decides whether a Qt plugin is enabled or not when
+  // it decides whether or not to instantiate it.
   m_view->settings()->setAttribute(QWebSettings::PluginsEnabled, false);
-
-  m_view->setHtml(
-      QString("<html><body><object type='application/x-qt-plugin' "
-              "classid='pushbutton' id='mybutton'/></body></html>"));
-  QTRY_COMPARE(loadSpy.count(), 5);
-  QCOMPARE(newPage->calls.count(), 0);
+  createPlugin(m_view);
 }
 
 // Standard base class for template PluginTracerPage. In tests it is used as

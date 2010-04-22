@@ -341,7 +341,11 @@ QWebSettings* QWebSettings::globalSettings() {
     \l{QWebSettings::PluginsEnabled}{PluginsEnabled} attribute. For many
    applications,
     this attribute is enabled for all pages by setting it on the
-    \l{globalSettings()}{global settings object}.
+    \l{globalSettings()}{global settings object}. QtWebKit will always ignore
+   this setting
+    \when processing Qt plugins. The decision to allow a Qt plugin is made by
+   the client
+    \in its reimplementation of QWebPage::createPlugin.
 
     \section1 Web Application Support
 
@@ -420,7 +424,9 @@ QWebSettings* QWebSettings::globalSettings() {
         programs.
     \value JavaEnabled Enables or disables Java applets.
         Currently Java applets are not supported.
-    \value PluginsEnabled Enables or disables plugins in Web pages.
+    \value PluginsEnabled Enables or disables plugins in Web pages. Qt plugins
+        with a mimetype such as "application/x-qt-plugin" are not affected by
+   this setting.
     \value PrivateBrowsingEnabled Private browsing prevents WebKit from
         recording visited pages in the history and storing web page icons.
     \value JavascriptCanOpenWindows Specifies whether JavaScript programs
