@@ -25,7 +25,7 @@
 #ifndef FontPlatformData_h
 #define FontPlatformData_h
 
-#include "RefCountedHFONT.h"
+#include "RefCountedGDIHandle.h"
 #include "StringImpl.h"
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
@@ -64,7 +64,7 @@ class FontPlatformData {
     return m_font.isHashTableDeletedValue();
   }
 
-  HFONT hfont() const { return m_font->hfont(); }
+  HFONT hfont() const { return m_font->handle(); }
   CGFontRef cgFont() const { return m_cgFont.get(); }
 
   float size() const { return m_size; }
@@ -89,7 +89,7 @@ class FontPlatformData {
  private:
   void platformDataInit(HFONT, float size, HDC, WCHAR* faceName);
 
-  RefPtr<RefCountedHFONT> m_font;
+  RefPtr<RefCountedGDIHandle<HFONT>> m_font;
   RetainPtr<CGFontRef> m_cgFont;
 
   float m_size;

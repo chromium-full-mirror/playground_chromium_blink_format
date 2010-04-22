@@ -17,39 +17,43 @@
  * Boston, MA 02110-1301, USA.
  *
  */
-#ifndef RefCountedHFONT_h
-#define RefCountedHFONT_h
 
-#include "StringImpl.h"
+#ifndef RefCountedGDIHandle_h
+#define RefCountedGDIHandle_h
+
+#include <windows.h>
+#include <wtf/HashFunctions.h>
+#include <wtf/OwnPtr.h>
 #include <wtf/RefCounted.h>
 
 namespace WebCore {
 
-class RefCountedHFONT : public RefCounted<RefCountedHFONT> {
+template <typename T>
+class RefCountedGDIHandle : public RefCounted<RefCountedGDIHandle<T>> {
  public:
-  static PassRefPtr<RefCountedHFONT> create(HFONT hfont) {
-    return adoptRef(new RefCountedHFONT(hfont));
-  }
-  static PassRefPtr<RefCountedHFONT> createDeleted() {
-    return adoptRef(new RefCountedHFONT(reinterpret_cast<HFONT>(-1)));
+  static PassRefPtr<RefCountedGDIHandle> create(T handle) {
+    return adoptRef(new RefCountedGDIHandle<T>(handle));
   }
 
-  ~RefCountedHFONT() {
-    if (m_hfont != reinterpret_cast<HFONT>(-1))
-      DeleteObject(m_hfont);
+  static PassRefPtr<RefCountedGDIHandle<T>> createDeleted() {
+    return adoptRef(new RefCountedGDIHandle<T>(reinterpret_cast<T>(-1)));
   }
 
-  HFONT hfont() const { return m_hfont; }
-  unsigned hash() const {
-    return StringImpl::computeHash(reinterpret_cast<const UChar*>(&m_hfont),
-                                   sizeof(HFONT) / sizeof(UChar));
+  ~RefCountedGDIHandle() {
+    if (m_handle != reinterpret_cast<T>(-1))
+      WTF::deleteOwnedPtr(m_handle);
   }
+
+  T handle() const { return m_handle; }
+
+  unsigned hash() const { return WTF::PtrHash<T>::hash(m_handle); }
 
  private:
-  RefCountedHFONT(HFONT hfont) : m_hfont(hfont) {}
+  RefCountedGDIHandle(T handle) : m_handle(handle) {}
 
-  HFONT m_hfont;
+  T m_handle;
 };
-}
 
-#endif
+}  // namespace WebCore
+
+#endif  // RefCountedGDIHandle_h
