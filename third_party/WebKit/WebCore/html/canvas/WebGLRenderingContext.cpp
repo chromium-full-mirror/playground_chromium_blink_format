@@ -852,7 +852,7 @@ void WebGLRenderingContext::framebufferRenderbuffer(
     m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
     return;
   }
-  if (buffer->object()) {
+  if (buffer && buffer->object()) {
     bool isConflicted = false;
     bool isDepthOrStencil = true;
     switch (attachment) {
