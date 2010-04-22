@@ -522,7 +522,7 @@ static WTF::PassRefPtr<WebCore::Frame> _ewk_view_core_frame_new(
   return WebCore::Frame::create(priv->page, owner, flc);
 }
 
-static Evas_Smart_Class _parent_sc = EVAS_SMART_CLASS_INIT_0;
+static Evas_Smart_Class _parent_sc = EVAS_SMART_CLASS_INIT_NULL;
 
 static Ewk_View_Private_Data* _ewk_view_priv_new(Ewk_View_Smart_Data* sd) {
   Ewk_View_Private_Data* priv =
@@ -1425,10 +1425,10 @@ Eina_Bool ewk_view_editable_set(Evas_Object* o, Eina_Bool editable) {
 char* ewk_view_selection_get(const Evas_Object* o) {
   EWK_VIEW_SD_GET_OR_RETURN(o, sd, 0);
   EWK_VIEW_PRIV_GET_OR_RETURN(sd, priv, 0);
-  WebCore::CString s = priv->page->focusController()
-                           ->focusedOrMainFrame()
-                           ->selectedText()
-                           .utf8();
+  WTF::CString s = priv->page->focusController()
+                       ->focusedOrMainFrame()
+                       ->selectedText()
+                       .utf8();
   if (s.isNull())
     return 0;
   return strdup(s.data());
