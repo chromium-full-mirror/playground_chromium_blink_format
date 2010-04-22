@@ -47,7 +47,6 @@
 #include "HTMLImageLoader.h"
 #include "HTMLNames.h"
 #include "HTMLOptionElement.h"
-#include "ScriptEventListener.h"
 #include "KeyboardEvent.h"
 #include "LocalizedStrings.h"
 #include "MappedAttribute.h"
@@ -61,6 +60,7 @@
 #include "RenderText.h"
 #include "RenderTextControlSingleLine.h"
 #include "RenderTheme.h"
+#include "ScriptEventListener.h"
 #include "StepRange.h"
 #include "StringHash.h"
 #include "TextEvent.h"
@@ -237,19 +237,15 @@ bool HTMLInputElement::patternMismatch() const {
     case URL:
       const AtomicString& pattern = getAttribute(patternAttr);
       String value = this->value();
-
       // Empty values can't be mismatched
       if (pattern.isEmpty() || value.isEmpty())
         return false;
-
       RegularExpression patternRegExp(pattern, TextCaseSensitive);
       int matchLength = 0;
       int valueLength = value.length();
       int matchOffset = patternRegExp.match(value, 0, &matchLength);
-
-      return matchOffset != 0 || matchLength != valueLength;
+      return matchOffset || matchLength != valueLength;
   }
-
   ASSERT_NOT_REACHED();
   return false;
 }
@@ -1101,11 +1097,9 @@ void HTMLInputElement::parseMappedAttribute(MappedAttribute* attr) {
   } else if (attr->name() == heightAttr) {
     if (respectHeightAndWidthAttrs())
       addCSSLength(attr, CSSPropertyHeight, attr->value());
-  }
-  // Search field and slider attributes all just cause updateFromElement to be
-  // called through style
-  // recalcing.
-  else if (attr->name() == onsearchAttr) {
+  } else if (attr->name() == onsearchAttr) {
+    // Search field and slider attributes all just cause updateFromElement to be
+    // called through style recalcing.
     setAttributeEventListener(eventNames().searchEvent,
                               createAttributeEventListener(this, attr));
   } else if (attr->name() == resultsAttr) {
@@ -1304,8 +1298,8 @@ bool HTMLInputElement::appendFormData(FormDataList& encoding, bool multipart) {
 
     case SUBMIT:
       if (m_activeSubmit) {
-        String enc_str = valueWithDefault();
-        encoding.appendData(name(), enc_str);
+        String encstr = valueWithDefault();
+        encoding.appendData(name(), encstr);
         return true;
       }
       break;
@@ -1322,9 +1316,8 @@ bool HTMLInputElement::appendFormData(FormDataList& encoding, bool multipart) {
         // file inputs, and Firefox doesn't add "name=" query
         // parameter.
 
-        for (unsigned i = 0; i < numFiles; ++i) {
+        for (unsigned i = 0; i < numFiles; ++i)
           encoding.appendData(name(), m_fileList->item(i)->fileName());
-        }
         return true;
       }
 
@@ -1415,12 +1408,12 @@ void HTMLInputElement::setChecked(bool nowChecked, bool sendChangeEvent) {
     dispatchFormControlChangeEvent();
 }
 
-void HTMLInputElement::setIndeterminate(bool _indeterminate) {
+void HTMLInputElement::setIndeterminate(bool newValue) {
   // Only checkboxes and radio buttons honor indeterminate.
-  if (!allowsIndeterminate() || indeterminate() == _indeterminate)
+  if (!allowsIndeterminate() || indeterminate() == newValue)
     return;
 
-  m_indeterminate = _indeterminate;
+  m_indeterminate = newValue;
 
   setNeedsStyleRecalc();
 
@@ -1467,7 +1460,7 @@ String HTMLInputElement::value() const {
     if (value.isNull()) {
       if (inputType() == CHECKBOX || inputType() == RADIO)
         return checked() ? "on" : "";
-      else if (inputType() == RANGE)
+      if (inputType() == RANGE)
         return serializeForNumberType(StepRange(this).defaultValue());
     }
   }
@@ -2446,8 +2439,8 @@ void HTMLInputElement::setMultiple(bool multiple) {
   setAttribute(multipleAttr, multiple ? "" : 0);
 }
 
-void HTMLInputElement::setSize(unsigned _size) {
-  setAttribute(sizeAttr, String::number(_size));
+void HTMLInputElement::setSize(unsigned size) {
+  setAttribute(sizeAttr, String::number(size));
 }
 
 KURL HTMLInputElement::src() const {
