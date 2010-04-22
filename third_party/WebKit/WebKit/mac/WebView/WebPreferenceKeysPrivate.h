@@ -113,8 +113,6 @@
 #define WebKitOfflineWebApplicationCacheEnabledPreferenceKey \
   @"WebKitOfflineWebApplicationCacheEnabled"
 #define WebKitZoomsTextOnlyPreferenceKey @"WebKitZoomsTextOnly"
-#define WebKitJavaScriptCanAccessClipboardPreferenceKey \
-  @"WebKitJavaScriptCanAccessClipboard"
 #define WebKitXSSAuditorEnabledPreferenceKey @"WebKitXSSAuditorEnabled"
 #define WebKitAcceleratedCompositingEnabledPreferenceKey \
   @"WebKitAcceleratedCompositingEnabled"

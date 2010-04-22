@@ -87,7 +87,6 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
                                                 JSStringRef scheme);
   void setIconDatabaseEnabled(bool iconDatabaseEnabled);
   void setJavaScriptProfilingEnabled(bool profilingEnabled);
-  void setJavaScriptCanAccessClipboard(bool flag);
   void setMainFrameIsFirstResponder(bool flag);
   void setMockGeolocationError(int code, JSStringRef message);
   void setMockGeolocationPosition(double latitude,

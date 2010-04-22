@@ -370,12 +370,6 @@ class WebPreferences : public IWebPreferences, public IWebPreferencesPrivate {
   virtual HRESULT STDMETHODCALLTYPE setAllowFileAccessFromFileURLs(
       /* [in] */ BOOL allowAccess);
 
-  virtual HRESULT STDMETHODCALLTYPE javaScriptCanAccessClipboard(
-      /* [retval][out] */ BOOL* enabled);
-
-  virtual HRESULT STDMETHODCALLTYPE setJavaScriptCanAccessClipboard(
-      /* [in] */ BOOL enabled);
-
   virtual HRESULT STDMETHODCALLTYPE isXSSAuditorEnabled(
       /* [retval][out] */ BOOL* enabled);
 

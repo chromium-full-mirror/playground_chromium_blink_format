@@ -150,7 +150,8 @@ WebPage::WebPage(QObject* parent, DumpRenderTree* drt)
   globalSettings->setFontSize(QWebSettings::DefaultFixedFontSize, 13);
 
   globalSettings->setAttribute(QWebSettings::JavascriptCanOpenWindows, true);
-  globalSettings->setAttribute(QWebSettings::DOMPasteAllowed, true);
+  globalSettings->setAttribute(QWebSettings::JavascriptCanAccessClipboard,
+                               true);
   globalSettings->setAttribute(QWebSettings::LinksIncludedInFocusChain, false);
   globalSettings->setAttribute(QWebSettings::PluginsEnabled, true);
   globalSettings->setAttribute(QWebSettings::LocalContentCanAccessRemoteUrls,
@@ -158,8 +159,6 @@ WebPage::WebPage(QObject* parent, DumpRenderTree* drt)
   globalSettings->setAttribute(QWebSettings::JavascriptEnabled, true);
   globalSettings->setAttribute(QWebSettings::PrivateBrowsingEnabled, false);
   globalSettings->setAttribute(QWebSettings::SpatialNavigationEnabled, false);
-  globalSettings->setAttribute(QWebSettings::JavaScriptCanAccessClipboard,
-                               true);
 
   connect(this, SIGNAL(geometryChangeRequested(const QRect&)), this,
           SLOT(setViewGeometry(const QRect&)));
@@ -192,7 +191,6 @@ void WebPage::resetSettings() {
   settings()->resetAttribute(QWebSettings::OfflineWebApplicationCacheEnabled);
   settings()->resetAttribute(QWebSettings::LocalContentCanAccessRemoteUrls);
   settings()->resetAttribute(QWebSettings::PluginsEnabled);
-  settings()->resetAttribute(QWebSettings::JavaScriptCanAccessClipboard);
 
   m_drt->layoutTestController()->setCaretBrowsingEnabled(false);
   m_drt->layoutTestController()->setFrameFlatteningEnabled(false);

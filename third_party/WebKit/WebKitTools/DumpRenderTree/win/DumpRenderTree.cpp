@@ -797,7 +797,6 @@ static void resetDefaultsToConsistentValues(IWebPreferences* preferences) {
   preferences->setUsesPageCache(FALSE);
   preferences->setPrivateBrowsingEnabled(FALSE);
   preferences->setJavaScriptCanOpenWindowsAutomatically(TRUE);
-  preferences->setJavaScriptCanAccessClipboard(TRUE);
   preferences->setJavaScriptEnabled(TRUE);
   preferences->setTabsToLinks(FALSE);
   preferences->setShouldPrintBackgrounds(TRUE);
