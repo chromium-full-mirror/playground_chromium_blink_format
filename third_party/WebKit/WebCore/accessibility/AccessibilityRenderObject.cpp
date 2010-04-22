@@ -2815,6 +2815,11 @@ AccessibilityRole AccessibilityRenderObject::determineAccessibilityRole() {
     return TableRole;
 #endif
 
+#if PLATFORM(GTK)
+  if (m_renderer->isHR())
+    return SplitterRole;
+#endif
+
   if (m_renderer->isBlockFlow() || (node && node->hasTagName(labelTag)))
     return GroupRole;
 
