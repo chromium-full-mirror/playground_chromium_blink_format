@@ -27,6 +27,7 @@
 #include <JavaScriptCore/JSBase.h>
 
 #include <webkit/webkitdefines.h>
+#include <webkit/webkitdom.h>
 #include <webkit/webkitwebbackforwardlist.h>
 #include <webkit/webkitwebframe.h>
 #include <webkit/webkitwebhistoryitem.h>
@@ -334,6 +335,9 @@ WEBKIT_API G_CONST_RETURN gchar* webkit_web_view_get_icon_uri(
 WEBKIT_API void webkit_set_cache_model(WebKitCacheModel cache_model);
 
 WEBKIT_API WebKitCacheModel webkit_get_cache_model(void);
+
+WEBKIT_API WebKitDOMDocument* webkit_web_view_get_dom_document(
+    WebKitWebView* webView);
 
 G_END_DECLS
 

@@ -28,8 +28,10 @@
 #include "Event.h"
 #include "EventException.h"
 #include "HTMLNames.h"
+#include "WebKitDOMElementPrivate.h"
 #include "WebKitDOMNode.h"
 #include "WebKitDOMNodePrivate.h"
+#include "WebKitHTMLElementWrapperFactory.h"
 
 namespace WebKit {
 
@@ -62,11 +64,21 @@ void DOMObjectCache::forget(void* objectHandle) {
 
 static gpointer createWrapper(Node* node) {
   ASSERT(node);
+  ASSERT(node->nodeType());
 
   gpointer wrappedNode = 0;
 
-  if (node->nodeType())
-    wrappedNode = wrapNode(node);
+  switch (node->nodeType()) {
+    case Node::ELEMENT_NODE:
+      if (node->isHTMLElement())
+        wrappedNode = createHTMLElementWrapper(static_cast<HTMLElement*>(node));
+      else
+        wrappedNode = wrapNode(node);
+      break;
+    default:
+      wrappedNode = wrapNode(node);
+      break;
+  }
 
   return DOMObjectCache::put(node, wrappedNode);
 }
@@ -80,6 +92,25 @@ gpointer kit(Node* node) {
     return kitNode;
 
   return createWrapper(node);
+}
+
+gpointer kit(Element* element) {
+  if (!element)
+    return 0;
+
+  gpointer kitElement = DOMObjectCache::get(element);
+  if (kitElement)
+    return kitElement;
+
+  gpointer wrappedElement;
+
+  if (element->isHTMLElement())
+    wrappedElement =
+        createHTMLElementWrapper(static_cast<HTMLElement*>(element));
+  else
+    wrappedElement = wrapElement(element);
+
+  return DOMObjectCache::put(element, wrappedElement);
 }
 
 }  // namespace WebKit
