@@ -983,8 +983,8 @@ void Heap::markStackObjectsConservatively(MarkStack& markStack) {
 
 void Heap::protect(JSValue k) {
   ASSERT(k);
-  ASSERT(JSLock::currentThreadIsHoldingLock() ||
-         !m_globalData->isSharedInstance);
+  //    ASSERT(JSLock::currentThreadIsHoldingLock() ||
+  //    !m_globalData->isSharedInstance());
 
   if (!k.isCell())
     return;
@@ -994,8 +994,8 @@ void Heap::protect(JSValue k) {
 
 bool Heap::unprotect(JSValue k) {
   ASSERT(k);
-  ASSERT(JSLock::currentThreadIsHoldingLock() ||
-         !m_globalData->isSharedInstance);
+  //    ASSERT(JSLock::currentThreadIsHoldingLock() ||
+  //    !m_globalData->isSharedInstance());
 
   if (!k.isCell())
     return false;
@@ -1072,7 +1072,7 @@ void Heap::sweep() {
 
 void Heap::markRoots() {
 #ifndef NDEBUG
-  if (m_globalData->isSharedInstance) {
+  if (m_globalData->isSharedInstance()) {
     ASSERT(JSLock::lockCount() > 0);
     ASSERT(JSLock::currentThreadIsHoldingLock());
   }

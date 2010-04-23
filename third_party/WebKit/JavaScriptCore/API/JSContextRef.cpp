@@ -47,7 +47,7 @@ using namespace JSC;
 JSContextGroupRef JSContextGroupCreate() {
   initializeThreading();
   return toRef(
-      JSGlobalData::createNonDefault(ThreadStackTypeSmall).releaseRef());
+      JSGlobalData::createContextGroup(ThreadStackTypeSmall).releaseRef());
 }
 
 JSContextGroupRef JSContextGroupRetain(JSContextGroupRef group) {
@@ -87,7 +87,7 @@ JSGlobalContextRef JSGlobalContextCreateInGroup(JSContextGroupRef group,
   JSLock lock(LockForReal);
   RefPtr<JSGlobalData> globalData =
       group ? PassRefPtr<JSGlobalData>(toJS(group))
-            : JSGlobalData::createNonDefault(ThreadStackTypeSmall);
+            : JSGlobalData::createContextGroup(ThreadStackTypeSmall);
 
   APIEntryShim entryShim(globalData.get(), false);
 

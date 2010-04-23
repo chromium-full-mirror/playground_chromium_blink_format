@@ -63,8 +63,8 @@ class APIEntryShim : public APIEntryShimWithoutLock {
   // JSPropertyNameAccumulator only has a globalData.
   APIEntryShim(JSGlobalData* globalData, bool registerThread = true)
       : APIEntryShimWithoutLock(globalData, registerThread),
-        m_lock(globalData->isSharedInstance ? LockForReal
-                                            : SilenceAssertionsOnly) {}
+        m_lock(globalData->isSharedInstance() ? LockForReal
+                                              : SilenceAssertionsOnly) {}
 
  private:
   JSLock m_lock;
