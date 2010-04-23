@@ -41,6 +41,7 @@
 #include <QtGui/qpainter.h>
 #include <QtGui/qpalette.h>
 #include <QtGui/qpixmap.h>
+#include <QtGui/qpixmapcache.h>
 #include <QtGui/qstyleoption.h>
 
 namespace WebCore {
@@ -158,6 +159,15 @@ class GraphicsLayerQtImpl : public QGraphicsObject {
   // let the compositor-API tell us which properties were changed
   void notifyChange(ChangeMask);
 
+  // actual rendering of the web-content into a QPixmap
+  // We prefer to use our own caching because it gives us a higher level of
+  // granularity than QGraphicsItem cache modes -
+  // sometimes we need to cache the contents even `though the item needs to be
+  // updated, e.g. when the background-color is changed.
+  // TODO: investigate if QGraphicsItem caching can be improved to support that
+  // out of the box.
+  QPixmap recache(const QRegion&);
+
   // called when the compositor is ready for us to show the changes on screen
   // this is called indirectly from
   // ChromeClientQt::setNeedsOneShotDrawingSynchronization
@@ -212,6 +222,7 @@ class GraphicsLayerQtImpl : public QGraphicsObject {
   int m_changeMask;
 
   QSizeF m_size;
+  QPixmapCache::Key m_backingStoreKey;
 #ifndef QT_NO_ANIMATION
   QList<QWeakPointer<QAbstractAnimation>> m_animations;
 #endif
@@ -267,9 +278,6 @@ GraphicsLayerQtImpl::GraphicsLayerQtImpl(GraphicsLayerQt* newLayer)
   // they are ignored and passed to the item below.
   setEnabled(true);
 
-  // we'll set the cache when we know what's going on
-  setCacheMode(ItemCoordinateCache);
-
   connect(this, SIGNAL(notifyAnimationStartedAsync()), this,
           SLOT(notifyAnimationStarted()), Qt::QueuedConnection);
 }
@@ -296,6 +304,40 @@ GraphicsLayerQtImpl::~GraphicsLayerQtImpl() {
     if (QAbstractAnimation* anim = it->data())
       delete anim;
 #endif
+}
+
+QPixmap GraphicsLayerQtImpl::recache(const QRegion& regionToUpdate) {
+  if (!m_layer->drawsContent())
+    return QPixmap();
+
+  QRegion region = regionToUpdate;
+  QPixmap pixmap;
+
+  // We might be drawing into an existing cache.
+  if (!QPixmapCache::find(m_backingStoreKey, &pixmap))
+    region = QRegion(boundingRect().toAlignedRect());
+
+  if (m_size != pixmap.size()) {
+    pixmap = QPixmap(m_size.toSize());
+    if (!m_layer->contentsOpaque())
+      pixmap.fill(Qt::transparent);
+    m_pendingContent.regionToUpdate =
+        QRegion(QRect(QPoint(0, 0), m_size.toSize()));
+  }
+
+  QPainter painter(&pixmap);
+  GraphicsContext gc(&painter);
+
+  // Clear the area in cache that we're drawing into
+  painter.setCompositionMode(QPainter::CompositionMode_Clear);
+  painter.fillRect(region.boundingRect(), Qt::transparent);
+
+  // Render the actual contents into the cache
+  painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
+  m_layer->paintGraphicsLayerContents(gc, region.boundingRect());
+
+  m_backingStoreKey = QPixmapCache::insert(pixmap);
+  return pixmap;
 }
 
 void GraphicsLayerQtImpl::updateTransform() {
@@ -393,10 +435,13 @@ void GraphicsLayerQtImpl::paint(QPainter* painter,
   switch (m_currentContent.contentType) {
     case HTMLContentType:
       if (m_state.drawsContent) {
-        // this is the expensive bit. we try to minimize calls to this area by
-        // proper caching
-        GraphicsContext gc(painter);
-        m_layer->paintGraphicsLayerContents(gc, option->rect);
+        QPixmap backingStore;
+        // We might need to recache, in case we try to paint and the cache
+        // was purged (e.g. if it was full).
+        if (!QPixmapCache::find(m_backingStoreKey, &backingStore) ||
+            backingStore.size() != m_size.toSize())
+          backingStore = recache(QRegion(boundingRect().toAlignedRect()));
+        painter->drawPixmap(0, 0, backingStore);
       }
       break;
     case PixmapContentType:
@@ -521,19 +566,13 @@ void GraphicsLayerQtImpl::flushChanges(bool recursive,
         update();
         setFlag(ItemHasNoContents, false);
 
-        // no point in caching a directly composited pixmap into another pixmap
-        setCacheMode(NoCache);
-
         break;
       case MediaContentType:
         setFlag(ItemHasNoContents, true);
-        setCacheMode(NoCache);
         m_pendingContent.mediaLayer.data()->setParentItem(this);
         break;
 
       case ColorContentType:
-        // no point in caching a solid-color rectangle
-        setCacheMode(NoCache);
         if (m_pendingContent.contentType != m_currentContent.contentType ||
             m_pendingContent.contentsBackgroundColor !=
                 m_currentContent.contentsBackgroundColor)
@@ -549,12 +588,8 @@ void GraphicsLayerQtImpl::flushChanges(bool recursive,
       case HTMLContentType:
         if (m_pendingContent.contentType != m_currentContent.contentType)
           update();
-        if (!m_state.drawsContent && m_layer->drawsContent()) {
+        if (!m_state.drawsContent && m_layer->drawsContent())
           update();
-          if (m_layer->drawsContent() && !m_maskEffect)
-            setCacheMode(ItemCoordinateCache);
-        } else if (!m_layer->drawsContent())
-          setCacheMode(NoCache);
 
         setFlag(ItemHasNoContents, !m_layer->drawsContent());
         break;
@@ -585,8 +620,13 @@ void GraphicsLayerQtImpl::flushChanges(bool recursive,
 
   if (m_maskEffect)
     m_maskEffect.data()->update();
-  else if (m_changeMask & DisplayChange)
+  else if (m_changeMask & DisplayChange) {
+    // Recache now: all the content is ready and we don't want to wait until the
+    // paint event.
+    recache(m_pendingContent.regionToUpdate);
     update(m_pendingContent.regionToUpdate.boundingRect());
+    m_pendingContent.regionToUpdate = QRegion();
+  }
 
   if ((m_changeMask & BackgroundColorChange) &&
       (m_pendingContent.backgroundColor != m_currentContent.backgroundColor))
@@ -616,7 +656,6 @@ void GraphicsLayerQtImpl::flushChanges(bool recursive,
   m_currentContent.contentType = m_pendingContent.contentType;
   m_currentContent.mediaLayer = m_pendingContent.mediaLayer;
   m_currentContent.backgroundColor = m_pendingContent.backgroundColor;
-  m_currentContent.regionToUpdate |= m_pendingContent.regionToUpdate;
   m_currentContent.contentsBackgroundColor =
       m_pendingContent.contentsBackgroundColor;
   m_pendingContent.regionToUpdate = QRegion();
