@@ -75,6 +75,8 @@ class WebGraphicsContext3DDefaultImpl : public WebGraphicsContext3D {
 
   virtual int sizeInBytes(int type);
 
+  virtual bool isGLES2Compliant();
+
   virtual void reshape(int width, int height);
 
   virtual bool readBackFramebuffer(unsigned char* pixels, size_t bufferSize);

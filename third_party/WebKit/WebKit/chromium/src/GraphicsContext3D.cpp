@@ -111,6 +111,8 @@ class GraphicsContext3DInternal {
   void beginPaint(WebGLRenderingContext* context);
   void endPaint();
 
+  bool isGLES2Compliant();
+
   //----------------------------------------------------------------------
   // Entry points for WebGL.
   //
@@ -655,6 +657,8 @@ void GraphicsContext3DInternal::reshape(int width, int height) {
 
 DELEGATE_TO_IMPL_R(makeContextCurrent, bool)
 DELEGATE_TO_IMPL_1R(sizeInBytes, int, int)
+
+DELEGATE_TO_IMPL_R(isGLES2Compliant, bool)
 
 DELEGATE_TO_IMPL_1(activeTexture, unsigned long)
 DELEGATE_TO_IMPL_2_X12(attachShader, WebGLProgram*, WebGLShader*)
@@ -1492,6 +1496,7 @@ DELEGATE_TO_INTERNAL_1(deleteShader, unsigned)
 DELEGATE_TO_INTERNAL_1(deleteTexture, unsigned)
 
 DELEGATE_TO_INTERNAL_1(synthesizeGLError, unsigned long)
+DELEGATE_TO_INTERNAL_R(isGLES2Compliant, bool)
 
 }  // namespace WebCore
 

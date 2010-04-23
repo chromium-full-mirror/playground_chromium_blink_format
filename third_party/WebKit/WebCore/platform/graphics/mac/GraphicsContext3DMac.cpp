@@ -238,6 +238,10 @@ void GraphicsContext3D::beginPaint(WebGLRenderingContext* context) {
 
 void GraphicsContext3D::endPaint() {}
 
+bool GraphicsContext3D::isGLES2Compliant() {
+  return false;
+}
+
 void GraphicsContext3D::reshape(int width, int height) {
   if (width == m_currentWidth && height == m_currentHeight || !m_contextObj)
     return;
