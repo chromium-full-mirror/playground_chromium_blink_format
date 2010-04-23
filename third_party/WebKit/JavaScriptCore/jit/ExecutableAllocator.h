@@ -241,7 +241,9 @@ class ExecutableAllocator {
   static void cacheFlush(void* code, size_t size) {
     User::IMB_Range(code, static_cast<char*>(code) + size);
   }
-#elif CPU(ARM_TRADITIONAL) && OS(LINUX)
+#elif CPU(ARM_TRADITIONAL) && OS(LINUX) && COMPILER(RVCT)
+  static __asm void cacheFlush(void* code, size_t size);
+#elif CPU(ARM_TRADITIONAL) && OS(LINUX) && COMPILER(GCC)
   static void cacheFlush(void* code, size_t size) {
     asm volatile(
         "push    {r7}\n"
