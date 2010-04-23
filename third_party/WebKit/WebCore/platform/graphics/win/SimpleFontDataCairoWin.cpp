@@ -97,6 +97,13 @@ void SimpleFontData::platformCharWidthInit() {
   // charwidths are set in platformInit.
 }
 
+FloatRect SimpleFontData::platformBoundsForGlyph(Glyph glyph) const {
+  if (m_platformData.useGDI())
+    return boundsForGDIGlyph(glyph);
+  // FIXME: Implement this
+  return FloatRect();
+}
+
 float SimpleFontData::platformWidthForGlyph(Glyph glyph) const {
   if (m_platformData.useGDI())
     return widthForGDIGlyph(glyph);

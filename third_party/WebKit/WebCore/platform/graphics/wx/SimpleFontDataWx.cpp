@@ -108,19 +108,20 @@ void SimpleFontData::determinePitch() {
     m_treatAsFixedPitch = false;
 }
 
-GlyphMetrics SimpleFontData::platformMetricsForGlyph(Glyph glyph,
-                                                     GlyphMetricsMode) const {
-  GlyphMetrics metrics;
+FloatRect SimpleFontData::platformBoundsForGlyph(Glyph) const {
+  return FloatRect();
+}
+
+float SimpleFontData::platformWidthForGlyph(Glyph glyph) const {
 #if __WXMSW__
   // under Windows / wxMSW we currently always use GDI fonts.
-  metrics.horizontalAdvance = widthForGDIGlyph(glyph);
+  return widthForGDIGlyph(glyph);
 #else
   // TODO: fix this! Make GetTextExtents a method of wxFont in 2.9
   int width = 10;
   GetTextExtent(*m_platformData.font(), (wxChar)glyph, &width, NULL);
-  metrics.horizontalAdvance = width;
+  return width;
 #endif
-  return metrics;
 }
 
 #if OS(WINDOWS)

@@ -29,7 +29,6 @@
 #ifndef GlyphMetricsMap_h
 #define GlyphMetricsMap_h
 
-#include "FloatRect.h"
 #include <wtf/HashMap.h>
 #include <wtf/OwnPtr.h>
 #include <wtf/unicode/Unicode.h>
@@ -40,11 +39,7 @@ typedef unsigned short Glyph;
 
 const float cGlyphSizeUnknown = -1;
 
-struct GlyphMetrics {
-  float horizontalAdvance;
-  FloatRect boundingBox;
-};
-
+template <class T>
 class GlyphMetricsMap : public Noncopyable {
  public:
   GlyphMetricsMap() : m_filledPrimaryPage(false) {}
@@ -53,17 +48,11 @@ class GlyphMetricsMap : public Noncopyable {
       deleteAllValues(*m_pages);
   }
 
-  GlyphMetrics metricsForGlyph(Glyph glyph) {
+  T metricsForGlyph(Glyph glyph) {
     return locatePage(glyph / GlyphMetricsPage::size)->metricsForGlyph(glyph);
   }
 
-  float widthForGlyph(Glyph glyph) {
-    return locatePage(glyph / GlyphMetricsPage::size)
-        ->metricsForGlyph(glyph)
-        .horizontalAdvance;
-  }
-
-  void setMetricsForGlyph(Glyph glyph, const GlyphMetrics& metrics) {
+  void setMetricsForGlyph(Glyph glyph, const T& metrics) {
     locatePage(glyph / GlyphMetricsPage::size)
         ->setMetricsForGlyph(glyph, metrics);
   }
@@ -71,15 +60,13 @@ class GlyphMetricsMap : public Noncopyable {
  private:
   struct GlyphMetricsPage {
     static const size_t size = 256;  // Usually covers Latin-1 in a single page.
-    GlyphMetrics m_metrics[size];
+    T m_metrics[size];
 
-    GlyphMetrics metricsForGlyph(Glyph glyph) const {
-      return m_metrics[glyph % size];
-    }
-    void setMetricsForGlyph(Glyph glyph, const GlyphMetrics& metrics) {
+    T metricsForGlyph(Glyph glyph) const { return m_metrics[glyph % size]; }
+    void setMetricsForGlyph(Glyph glyph, const T& metrics) {
       setMetricsForIndex(glyph % size, metrics);
     }
-    void setMetricsForIndex(unsigned index, const GlyphMetrics& metrics) {
+    void setMetricsForIndex(unsigned index, const T& metrics) {
       m_metrics[index] = metrics;
     }
   };
@@ -92,11 +79,48 @@ class GlyphMetricsMap : public Noncopyable {
 
   GlyphMetricsPage* locatePageSlowCase(unsigned pageNumber);
 
+  static T unknownMetrics();
+
   bool m_filledPrimaryPage;
   GlyphMetricsPage m_primaryPage;  // We optimize for the page that contains
                                    // glyph indices 0-255.
   OwnPtr<HashMap<int, GlyphMetricsPage*>> m_pages;
 };
+
+template <>
+inline float GlyphMetricsMap<float>::unknownMetrics() {
+  return cGlyphSizeUnknown;
+}
+
+template <>
+inline FloatRect GlyphMetricsMap<FloatRect>::unknownMetrics() {
+  return FloatRect(0, 0, cGlyphSizeUnknown, cGlyphSizeUnknown);
+}
+
+template <class T>
+typename GlyphMetricsMap<T>::GlyphMetricsPage*
+GlyphMetricsMap<T>::locatePageSlowCase(unsigned pageNumber) {
+  GlyphMetricsPage* page;
+  if (!pageNumber) {
+    ASSERT(!m_filledPrimaryPage);
+    page = &m_primaryPage;
+    m_filledPrimaryPage = true;
+  } else {
+    if (m_pages) {
+      if ((page = m_pages->get(pageNumber)))
+        return page;
+    } else
+      m_pages.set(new HashMap<int, GlyphMetricsPage*>);
+    page = new GlyphMetricsPage;
+    m_pages->set(pageNumber, page);
+  }
+
+  // Fill in the whole page with the unknown glyph information.
+  for (unsigned i = 0; i < GlyphMetricsPage::size; i++)
+    page->setMetricsForIndex(i, unknownMetrics());
+
+  return page;
+}
 
 }  // namespace WebCore
 

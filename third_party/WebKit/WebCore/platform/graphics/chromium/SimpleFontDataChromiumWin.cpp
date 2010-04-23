@@ -150,8 +150,11 @@ void SimpleFontData::determinePitch() {
   ReleaseDC(0, dc);
 }
 
-GlyphMetrics SimpleFontData::platformMetricsForGlyph(Glyph glyph,
-                                                     GlyphMetricsMode) const {
+FloatRect SimpleFontData::platformBoundsForGlyph(Glyph) const {
+  return FloatRect();
+}
+
+float SimpleFontData::platformWidthForGlyph(Glyph glyph) const {
   HDC dc = GetDC(0);
   HGDIOBJ oldFont = SelectObject(dc, m_platformData.hfont());
 
@@ -169,9 +172,7 @@ GlyphMetrics SimpleFontData::platformMetricsForGlyph(Glyph glyph,
   SelectObject(dc, oldFont);
   ReleaseDC(0, dc);
 
-  GlyphMetrics metrics;
-  metrics.horizontalAdvance = static_cast<float>(width);
-  return metrics;
+  return static_cast<float>(width);
 }
 
 }  // namespace WebCore
