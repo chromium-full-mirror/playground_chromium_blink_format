@@ -41,6 +41,8 @@ class SVGStyledElement : public SVGElement, public SVGStylable {
   SVGStyledElement(const QualifiedName&, Document*);
   virtual ~SVGStyledElement();
 
+  virtual String title() const;
+
   virtual bool hasRelativeValues() const { return false; }
   virtual bool isStyled() const { return true; }
   virtual bool supportsMarkers() const { return false; }
