@@ -62,6 +62,10 @@ void scheduleDispatchFunctionsOnMainThread() {
                             Qt::QueuedConnection);
 }
 
+bool isMainThread() {
+  return QThread::currentThread() == QCoreApplication::instance()->thread();
+}
+
 }  // namespace WTF
 
 #include "MainThreadQt.moc"

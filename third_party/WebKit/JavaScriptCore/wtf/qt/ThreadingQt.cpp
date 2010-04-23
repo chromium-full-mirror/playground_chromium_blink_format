@@ -76,8 +76,6 @@ class ThreadMonitor : public QObject {
 
 static Mutex* atomicallyInitializedStaticMutex;
 
-static ThreadIdentifier mainThreadIdentifier;
-
 static Mutex& threadMapMutex() {
   static Mutex mutex;
   return mutex;
@@ -131,10 +129,6 @@ void initializeThreading() {
     atomicallyInitializedStaticMutex = new Mutex;
     threadMapMutex();
     initializeRandomNumberGenerator();
-    QThread* mainThread = QCoreApplication::instance()->thread();
-    mainThreadIdentifier = identifierByQthreadHandle(mainThread);
-    if (!mainThreadIdentifier)
-      mainThreadIdentifier = establishIdentifierForThread(mainThread);
     initializeMainThread();
   }
 }
@@ -194,10 +188,6 @@ ThreadIdentifier currentThread() {
   if (ThreadIdentifier id = identifierByQthreadHandle(currentThread))
     return id;
   return establishIdentifierForThread(currentThread);
-}
-
-bool isMainThread() {
-  return QThread::currentThread() == QCoreApplication::instance()->thread();
 }
 
 Mutex::Mutex() : m_mutex(new QMutex()) {}
