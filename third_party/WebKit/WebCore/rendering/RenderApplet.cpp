@@ -60,12 +60,10 @@ void RenderApplet::createWidgetIfNecessary() {
   // not have an accurate m_width/m_height.
   int contentWidth = style()->width().isFixed()
                          ? style()->width().value()
-                         : width() - borderLeft() - borderRight() -
-                               paddingLeft() - paddingRight();
+                         : width() - borderAndPaddingWidth();
   int contentHeight = style()->height().isFixed()
                           ? style()->height().value()
-                          : height() - borderTop() - borderBottom() -
-                                paddingTop() - paddingBottom();
+                          : height() - borderAndPaddingHeight();
   for (Node* child = element->firstChild(); child;
        child = child->nextSibling()) {
     if (child->hasTagName(paramTag)) {

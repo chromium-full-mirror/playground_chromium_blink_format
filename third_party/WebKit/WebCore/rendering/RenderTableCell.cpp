@@ -116,9 +116,7 @@ Length RenderTableCell::styleOrColWidth() const {
     // See Bugzilla bug 8126 for details.
     if (colWidthSum.isFixed() && colWidthSum.value() > 0)
       colWidthSum =
-          Length(max(0, colWidthSum.value() - borderLeft() - borderRight() -
-                            paddingLeft() - paddingRight()),
-                 Fixed);
+          Length(max(0, colWidthSum.value() - borderAndPaddingWidth()), Fixed);
     return colWidthSum;
   }
 

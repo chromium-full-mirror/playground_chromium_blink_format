@@ -1668,10 +1668,7 @@ void RenderLayer::resize(const PlatformMouseEvent& evt,
           ec);
     }
     int baseWidth = renderer->width() -
-                    (isBoxSizingBorder ? 0 : renderer->borderLeft() +
-                                                 renderer->paddingLeft() +
-                                                 renderer->borderRight() +
-                                                 renderer->paddingRight());
+                    (isBoxSizingBorder ? 0 : renderer->borderAndPaddingWidth());
     baseWidth = baseWidth / zoomFactor;
     style->setProperty(CSSPropertyWidth,
                        String::number(baseWidth + difference.width()) + "px",
@@ -1690,11 +1687,9 @@ void RenderLayer::resize(const PlatformMouseEvent& evt,
           String::number(renderer->marginBottom() / zoomFactor) + "px", false,
           ec);
     }
-    int baseHeight = renderer->height() -
-                     (isBoxSizingBorder ? 0 : renderer->borderTop() +
-                                                  renderer->paddingTop() +
-                                                  renderer->borderBottom() +
-                                                  renderer->paddingBottom());
+    int baseHeight =
+        renderer->height() -
+        (isBoxSizingBorder ? 0 : renderer->borderAndPaddingHeight());
     baseHeight = baseHeight / zoomFactor;
     style->setProperty(CSSPropertyHeight,
                        String::number(baseHeight + difference.height()) + "px",

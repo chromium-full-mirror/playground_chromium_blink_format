@@ -273,7 +273,7 @@ void RenderMenuList::calcPrefWidths() {
         min(m_minPrefWidth, calcContentBoxWidth(style()->maxWidth().value()));
   }
 
-  int toAdd = paddingLeft() + paddingRight() + borderLeft() + borderRight();
+  int toAdd = borderAndPaddingWidth();
   m_minPrefWidth += toAdd;
   m_maxPrefWidth += toAdd;
 

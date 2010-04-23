@@ -506,16 +506,14 @@ int RenderBox::overrideHeight() const {
 }
 
 int RenderBox::calcBorderBoxWidth(int width) const {
-  int bordersPlusPadding =
-      borderLeft() + borderRight() + paddingLeft() + paddingRight();
+  int bordersPlusPadding = borderAndPaddingWidth();
   if (style()->boxSizing() == CONTENT_BOX)
     return width + bordersPlusPadding;
   return max(width, bordersPlusPadding);
 }
 
 int RenderBox::calcBorderBoxHeight(int height) const {
-  int bordersPlusPadding =
-      borderTop() + borderBottom() + paddingTop() + paddingBottom();
+  int bordersPlusPadding = borderAndPaddingHeight();
   if (style()->boxSizing() == CONTENT_BOX)
     return height + bordersPlusPadding;
   return max(height, bordersPlusPadding);
@@ -523,13 +521,13 @@ int RenderBox::calcBorderBoxHeight(int height) const {
 
 int RenderBox::calcContentBoxWidth(int width) const {
   if (style()->boxSizing() == BORDER_BOX)
-    width -= (borderLeft() + borderRight() + paddingLeft() + paddingRight());
+    width -= borderAndPaddingWidth();
   return max(0, width);
 }
 
 int RenderBox::calcContentBoxHeight(int height) const {
   if (style()->boxSizing() == BORDER_BOX)
-    height -= (borderTop() + borderBottom() + paddingTop() + paddingBottom());
+    height -= borderAndPaddingHeight();
   return max(0, height);
 }
 
@@ -1436,17 +1434,14 @@ void RenderBox::calcWidth() {
     m_marginLeft = marginLeft.calcMinValue(containerWidth);
     m_marginRight = marginRight.calcMinValue(containerWidth);
     if (treatAsReplaced)
-      setWidth(max(w.value() + borderLeft() + borderRight() + paddingLeft() +
-                       paddingRight(),
-                   minPrefWidth()));
+      setWidth(max(w.value() + borderAndPaddingWidth(), minPrefWidth()));
 
     return;
   }
 
   // Width calculations
   if (treatAsReplaced)
-    setWidth(w.value() + borderLeft() + borderRight() + paddingLeft() +
-             paddingRight());
+    setWidth(w.value() + borderAndPaddingWidth());
   else {
     // Calculate Width
     setWidth(calcWidthUsing(Width, containerWidth));
@@ -1620,9 +1615,7 @@ void RenderBox::calcHeight() {
     if (hasOverrideSize() && parent()->isFlexibleBox() &&
         parent()->style()->boxOrient() == VERTICAL &&
         parent()->isFlexingChildren())
-      h = Length(overrideSize() - borderTop() - borderBottom() - paddingTop() -
-                     paddingBottom(),
-                 Fixed);
+      h = Length(overrideSize() - borderAndPaddingHeight(), Fixed);
     else if (treatAsReplaced)
       h = Length(calcReplacedHeight(), Fixed);
     else {
@@ -1635,8 +1628,7 @@ void RenderBox::calcHeight() {
         parent()->style()->boxOrient() == HORIZONTAL &&
         parent()->isStretchingChildren()) {
       h = Length(parentBox()->contentHeight() - marginTop() - marginBottom() -
-                     borderTop() - paddingTop() - borderBottom() -
-                     paddingBottom(),
+                     borderAndPaddingHeight(),
                  Fixed);
       checkMinMaxHeight = false;
     }
@@ -1661,8 +1653,7 @@ void RenderBox::calcHeight() {
       // been given as an override.  Just use that.  The value has already been
       // adjusted
       // for box-sizing.
-      heightResult = h.value() + borderTop() + borderBottom() + paddingTop() +
-                     paddingBottom();
+      heightResult = h.value() + borderAndPaddingHeight();
     }
 
     setHeight(heightResult);
@@ -1694,10 +1685,9 @@ void RenderBox::calcHeight() {
     if (isRoot())
       setHeight(max(height(), visHeight - margins));
     else {
-      int marginsBordersPadding =
-          margins + parentBox()->marginTop() + parentBox()->marginBottom() +
-          parentBox()->borderTop() + parentBox()->borderBottom() +
-          parentBox()->paddingTop() + parentBox()->paddingBottom();
+      int marginsBordersPadding = margins + parentBox()->marginTop() +
+                                  parentBox()->marginBottom() +
+                                  parentBox()->borderAndPaddingHeight();
       setHeight(max(height(), visHeight - marginsBordersPadding));
     }
   }
@@ -1814,7 +1804,7 @@ int RenderBox::calcPercentageHeight(const Length& height) {
       // It is necessary to use the border-box to match WinIE's broken
       // box model.  This is essential for sizing inside
       // table cells using percentage heights.
-      result -= (borderTop() + paddingTop() + borderBottom() + paddingBottom());
+      result -= borderAndPaddingHeight();
       result = max(0, result);
     }
   }
@@ -1894,9 +1884,7 @@ int RenderBox::calcReplacedHeightUsing(Length height) const {
         // Don't let table cells squeeze percent-height replaced elements
         // <http://bugs.webkit.org/show_bug.cgi?id=15359>
         availableHeight = max(availableHeight, intrinsicSize().height());
-        return height.calcValue(
-            availableHeight -
-            (borderTop() + borderBottom() + paddingTop() + paddingBottom()));
+        return height.calcValue(availableHeight - borderAndPaddingHeight());
       }
 
       return calcContentBoxHeight(height.calcValue(availableHeight));
@@ -1923,8 +1911,7 @@ int RenderBox::availableHeightUsing(const Length& h) const {
   // new
   // height, and then when we lay out again we'll use the calculation below.
   if (isTableCell() && (h.isAuto() || h.isPercent()))
-    return overrideSize() -
-           (borderLeft() + borderRight() + paddingLeft() + paddingRight());
+    return overrideSize() - borderAndPaddingWidth();
 
   if (h.isPercent())
     return calcContentBoxHeight(
@@ -2051,8 +2038,7 @@ void RenderBox::calcAbsoluteHorizontal() {
                                          ? parent()->style()->direction()
                                          : containerBlock->style()->direction();
 
-  const int bordersPlusPadding =
-      borderLeft() + borderRight() + paddingLeft() + paddingRight();
+  const int bordersPlusPadding = borderAndPaddingWidth();
   const Length marginLeft = style()->marginLeft();
   const Length marginRight = style()->marginRight();
   Length left = style()->left();
@@ -2391,8 +2377,7 @@ void RenderBox::calcAbsoluteVertical() {
   const int containerHeight =
       containingBlockHeightForPositioned(containerBlock);
 
-  const int bordersPlusPadding =
-      borderTop() + borderBottom() + paddingTop() + paddingBottom();
+  const int bordersPlusPadding = borderAndPaddingHeight();
   const Length marginTop = style()->marginTop();
   const Length marginBottom = style()->marginBottom();
   Length top = style()->top();
@@ -2655,8 +2640,7 @@ void RenderBox::calcAbsoluteHorizontalReplaced() {
   // are dealt with in calcReplacedWidth().  This means that the steps to
   // produce
   // correct max/min in the non-replaced version, are not necessary.
-  setWidth(calcReplacedWidth() + borderLeft() + borderRight() + paddingLeft() +
-           paddingRight());
+  setWidth(calcReplacedWidth() + borderAndPaddingWidth());
   const int availableSpace = containerWidth - width();
 
   /*-----------------------------------------------------------------------*\
@@ -2837,8 +2821,7 @@ void RenderBox::calcAbsoluteVerticalReplaced() {
   // are dealt with in calcReplacedHeight().  This means that the steps to
   // produce
   // correct max/min in the non-replaced version, are not necessary.
-  setHeight(calcReplacedHeight() + borderTop() + borderBottom() + paddingTop() +
-            paddingBottom());
+  setHeight(calcReplacedHeight() + borderAndPaddingHeight());
   const int availableSpace = containerHeight - height();
 
   /*-----------------------------------------------------------------------*\
@@ -3032,10 +3015,8 @@ VisiblePosition RenderBox::positionForPoint(const IntPoint& point) {
   int yPos = point.y();
 
   if (isTable() && node()) {
-    int right = contentWidth() + borderRight() + paddingRight() + borderLeft() +
-                paddingLeft();
-    int bottom = contentHeight() + borderTop() + paddingTop() + borderBottom() +
-                 paddingBottom();
+    int right = contentWidth() + borderAndPaddingWidth();
+    int bottom = contentHeight() + borderAndPaddingHeight();
 
     if (xPos < 0 || xPos > right || yPos < 0 || yPos > bottom) {
       if (xPos <= right / 2)
