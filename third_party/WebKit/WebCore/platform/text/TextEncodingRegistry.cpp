@@ -311,8 +311,9 @@ bool noExtendedTextEncodingNameUsed() {
 
 #ifndef NDEBUG
 void dumpTextEncodingNameMap() {
+  unsigned size = textEncodingNameMap->size();
   fprintf(stderr, "Dumping %u entries in WebCore::textEncodingNameMap...\n",
-          textEncodingNameMap->size());
+          size);
 
   MutexLocker lock(encodingRegistryMutex());
 
