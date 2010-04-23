@@ -32,8 +32,6 @@
 #include "WebCoreTypeArgumentMarshalling.h"
 #include "WebPage.h"
 #include "WebProcess.h"
-#include <WebCore/GraphicsContext.h>
-#include <wtf/RetainPtr.h>
 
 using namespace WebCore;
 
@@ -76,26 +74,6 @@ void DrawingAreaUpdateChunk::setNeedsDisplay(const IntRect& rect) {
   scheduleDisplay();
 }
 
-void DrawingAreaUpdateChunk::paintIntoUpdateChunk(UpdateChunk* updateChunk) {
-  RetainPtr<CGColorSpaceRef> colorSpace(AdoptCF, CGColorSpaceCreateDeviceRGB());
-  RetainPtr<CGContextRef> bitmapContext(
-      AdoptCF,
-      CGBitmapContextCreate(updateChunk->data(), updateChunk->rect().width(),
-                            updateChunk->rect().height(), 8,
-                            updateChunk->rect().width() * 4, colorSpace.get(),
-                            kCGImageAlphaPremultipliedLast));
-
-  // WebCore expects a flipped coordinate system.
-  CGContextTranslateCTM(bitmapContext.get(), 0.0, updateChunk->rect().height());
-  CGContextScaleCTM(bitmapContext.get(), 1.0, -1.0);
-
-  // Now paint into the backing store.
-  GraphicsContext graphicsContext(bitmapContext.get());
-  graphicsContext.translate(-updateChunk->rect().x(), -updateChunk->rect().y());
-
-  m_webPage->drawRect(graphicsContext, updateChunk->rect());
-}
-
 void DrawingAreaUpdateChunk::display() {
   ASSERT(!m_isWaitingForUpdate);
 
@@ -131,6 +109,8 @@ void DrawingAreaUpdateChunk::scheduleDisplay() {
 }
 
 void DrawingAreaUpdateChunk::setSize(const IntSize& viewSize) {
+  ASSERT_ARG(viewSize, !viewSize.isEmpty());
+
   // We don't want to wait for an update until we display.
   m_isWaitingForUpdate = false;
 

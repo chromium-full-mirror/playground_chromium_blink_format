@@ -28,21 +28,11 @@
 
 #include "DrawingArea.h"
 #include "RunLoop.h"
-
-namespace WebCore {
-class IntSize;
-}
-
-namespace CoreIPC {
-class ArgumentDecoder;
-class Connection;
-class MessageID;
-}
+#include <WebCore/IntPoint.h>
 
 namespace WebKit {
 
 class UpdateChunk;
-class WebPage;
 
 class DrawingAreaUpdateChunk : public DrawingArea {
  public:
@@ -65,14 +55,17 @@ class DrawingAreaUpdateChunk : public DrawingArea {
                                  CoreIPC::ArgumentDecoder&);
 
  private:
-  void paintIntoUpdateChunk(UpdateChunk*);
-  void setSize(const WebCore::IntSize&);
-  void didUpdate();
   void scheduleDisplay();
+  void setSize(const WebCore::IntSize& viewSize);
+
+  void didUpdate();
+
+  // Platform overrides
+  void paintIntoUpdateChunk(UpdateChunk*);
 
   WebCore::IntRect m_dirtyRect;
   bool m_isWaitingForUpdate;
-  RunLoop::Timer<DrawingArea> m_displayTimer;
+  RunLoop::Timer<DrawingAreaUpdateChunk> m_displayTimer;
 };
 
 }  // namespace WebKit

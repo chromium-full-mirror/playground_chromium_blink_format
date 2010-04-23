@@ -23,50 +23,41 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef DrawingAreaUpdateChunk_h
-#define DrawingAreaUpdateChunk_h
+#include "DrawingAreaUpdateChunk.h"
 
-#include "DrawingArea.h"
-#include "RunLoop.h"
-#include <WebCore/IntPoint.h>
+#include "UpdateChunk.h"
+#include "WebPage.h"
+#include <WebCore/BitmapInfo.h>
+#include <WebCore/GraphicsContext.h>
+
+using namespace WebCore;
 
 namespace WebKit {
 
-class UpdateChunk;
+void DrawingAreaUpdateChunk::paintIntoUpdateChunk(UpdateChunk* updateChunk) {
+  OwnPtr<HDC> hdc(::CreateCompatibleDC(0));
 
-class DrawingAreaUpdateChunk : public DrawingArea {
- public:
-  DrawingAreaUpdateChunk(WebPage*);
-  virtual ~DrawingAreaUpdateChunk();
+  void* bits;
+  BitmapInfo bmp = BitmapInfo::createBottomUp(updateChunk->frame().size());
+  OwnPtr<HBITMAP> hbmp(::CreateDIBSection(0, &bmp, DIB_RGB_COLORS, &bits,
+                                          updateChunk->memory(), 0));
 
-  virtual void invalidateWindow(const WebCore::IntRect& rect, bool immediate);
-  virtual void invalidateContentsAndWindow(const WebCore::IntRect& rect,
-                                           bool immediate);
-  virtual void invalidateContentsForSlowScroll(const WebCore::IntRect& rect,
-                                               bool immediate);
-  virtual void scroll(const WebCore::IntSize& scrollDelta,
-                      const WebCore::IntRect& rectToScroll,
-                      const WebCore::IntRect& clipRect);
-  virtual void setNeedsDisplay(const WebCore::IntRect&);
-  virtual void display();
+  HBITMAP hbmpOld = static_cast<HBITMAP>(::SelectObject(hdc.get(), hbmp.get()));
 
-  virtual void didReceiveMessage(CoreIPC::Connection*,
-                                 CoreIPC::MessageID,
-                                 CoreIPC::ArgumentDecoder&);
+  GraphicsContext gc(hdc.get());
+  gc.save();
 
- private:
-  void paintIntoUpdateChunk(UpdateChunk*);
+  // FIXME: Is this white fill needed?
+  RECT rect = updateChunk->frame();
+  ::FillRect(hdc.get(), &rect, (HBRUSH)::GetStockObject(WHITE_BRUSH));
+  gc.translate(-updateChunk->frame().x(), -updateChunk->frame().y());
 
-  void scheduleDisplay();
-  void setSize(const WebCore::IntSize& viewSize);
+  m_webPage->drawRect(gc, updateChunk->frame());
 
-  void didUpdate();
+  gc.restore();
 
-  WebCore::IntRect m_dirtyRect;
-  bool m_isWaitingForUpdate;
-  RunLoop::Timer<DrawingAreaUpdateChunk> m_displayTimer;
-};
+  // Re-select the old HBITMAP
+  ::SelectObject(hdc.get(), hbmpOld);
+}
 
 }  // namespace WebKit
-
-#endif  // DrawingAreaUpdateChunk_h
