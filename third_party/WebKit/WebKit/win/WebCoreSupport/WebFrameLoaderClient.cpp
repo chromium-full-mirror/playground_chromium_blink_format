@@ -944,9 +944,7 @@ PassRefPtr<Widget> WebFrameLoaderClient::createPlugin(
       HashMap<String, COMVariant> arguments;
 
       arguments.set(WebEmbeddedViewAttributesKey, viewArgumentsBag);
-      arguments.set(WebEmbeddedViewSourceURLKey, url.string());
-      arguments.set(WebEmbeddedViewBaseURLKey,
-                    element->document()->baseURI().string());
+      arguments.set(WebEmbeddedViewBaseURLKey, url.string());
       arguments.set(WebEmbeddedViewContainingElementKey, containingElement);
       arguments.set(WebEmbeddedViewMIMETypeKey, mimeType);
 
