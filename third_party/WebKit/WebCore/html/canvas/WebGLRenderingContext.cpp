@@ -1870,6 +1870,21 @@ void WebGLRenderingContext::texImage2D(unsigned target,
 void WebGLRenderingContext::texImage2D(unsigned target,
                                        unsigned level,
                                        ImageData* pixels,
+                                       ExceptionCode& ec) {
+  texImage2D(target, level, pixels, 0, 0, ec);
+}
+
+void WebGLRenderingContext::texImage2D(unsigned target,
+                                       unsigned level,
+                                       ImageData* pixels,
+                                       bool flipY,
+                                       ExceptionCode& ec) {
+  texImage2D(target, level, pixels, flipY, 0, ec);
+}
+
+void WebGLRenderingContext::texImage2D(unsigned target,
+                                       unsigned level,
+                                       ImageData* pixels,
                                        bool flipY,
                                        bool premultiplyAlpha,
                                        ExceptionCode& ec) {
@@ -1881,6 +1896,21 @@ void WebGLRenderingContext::texImage2D(unsigned target,
                         pixels->height(), 0, GraphicsContext3D::RGBA,
                         GraphicsContext3D::UNSIGNED_BYTE, data.data());
   cleanupAfterGraphicsCall(false);
+}
+
+void WebGLRenderingContext::texImage2D(unsigned target,
+                                       unsigned level,
+                                       HTMLImageElement* image,
+                                       ExceptionCode& ec) {
+  texImage2D(target, level, image, 0, 0, ec);
+}
+
+void WebGLRenderingContext::texImage2D(unsigned target,
+                                       unsigned level,
+                                       HTMLImageElement* image,
+                                       bool flipY,
+                                       ExceptionCode& ec) {
+  texImage2D(target, level, image, flipY, 0, ec);
 }
 
 void WebGLRenderingContext::texImage2D(unsigned target,
@@ -1910,6 +1940,21 @@ void WebGLRenderingContext::texImage2D(unsigned target,
 void WebGLRenderingContext::texImage2D(unsigned target,
                                        unsigned level,
                                        HTMLCanvasElement* canvas,
+                                       ExceptionCode& ec) {
+  texImage2D(target, level, canvas, 0, 0, ec);
+}
+
+void WebGLRenderingContext::texImage2D(unsigned target,
+                                       unsigned level,
+                                       HTMLCanvasElement* canvas,
+                                       bool flipY,
+                                       ExceptionCode& ec) {
+  texImage2D(target, level, canvas, flipY, 0, ec);
+}
+
+void WebGLRenderingContext::texImage2D(unsigned target,
+                                       unsigned level,
+                                       HTMLCanvasElement* canvas,
                                        bool flipY,
                                        bool premultiplyAlpha,
                                        ExceptionCode& ec) {
@@ -1929,6 +1974,21 @@ void WebGLRenderingContext::texImage2D(unsigned target,
   m_context->texImage2D(target, level, buffer->image(), flipY,
                         premultiplyAlpha);
   cleanupAfterGraphicsCall(false);
+}
+
+void WebGLRenderingContext::texImage2D(unsigned target,
+                                       unsigned level,
+                                       HTMLVideoElement* video,
+                                       ExceptionCode& ec) {
+  texImage2D(target, level, video, 0, 0, ec);
+}
+
+void WebGLRenderingContext::texImage2D(unsigned target,
+                                       unsigned level,
+                                       HTMLVideoElement* video,
+                                       bool flipY,
+                                       ExceptionCode& ec) {
+  texImage2D(target, level, video, flipY, 0, ec);
 }
 
 void WebGLRenderingContext::texImage2D(unsigned target,
@@ -1986,6 +2046,25 @@ void WebGLRenderingContext::texSubImage2D(unsigned target,
                                           unsigned xoffset,
                                           unsigned yoffset,
                                           ImageData* pixels,
+                                          ExceptionCode& ec) {
+  texSubImage2D(target, level, xoffset, yoffset, pixels, 0, 0, ec);
+}
+
+void WebGLRenderingContext::texSubImage2D(unsigned target,
+                                          unsigned level,
+                                          unsigned xoffset,
+                                          unsigned yoffset,
+                                          ImageData* pixels,
+                                          bool flipY,
+                                          ExceptionCode& ec) {
+  texSubImage2D(target, level, xoffset, yoffset, pixels, flipY, 0, ec);
+}
+
+void WebGLRenderingContext::texSubImage2D(unsigned target,
+                                          unsigned level,
+                                          unsigned xoffset,
+                                          unsigned yoffset,
+                                          ImageData* pixels,
                                           bool flipY,
                                           bool premultiplyAlpha,
                                           ExceptionCode& ec) {
@@ -1997,6 +2076,25 @@ void WebGLRenderingContext::texSubImage2D(unsigned target,
                            pixels->height(), GraphicsContext3D::RGBA,
                            GraphicsContext3D::UNSIGNED_BYTE, data.data());
   cleanupAfterGraphicsCall(false);
+}
+
+void WebGLRenderingContext::texSubImage2D(unsigned target,
+                                          unsigned level,
+                                          unsigned xoffset,
+                                          unsigned yoffset,
+                                          HTMLImageElement* image,
+                                          ExceptionCode& ec) {
+  texSubImage2D(target, level, xoffset, yoffset, image, 0, 0, ec);
+}
+
+void WebGLRenderingContext::texSubImage2D(unsigned target,
+                                          unsigned level,
+                                          unsigned xoffset,
+                                          unsigned yoffset,
+                                          HTMLImageElement* image,
+                                          bool flipY,
+                                          ExceptionCode& ec) {
+  texSubImage2D(target, level, xoffset, yoffset, image, flipY, 0, ec);
 }
 
 void WebGLRenderingContext::texSubImage2D(unsigned target,
@@ -2030,6 +2128,25 @@ void WebGLRenderingContext::texSubImage2D(unsigned target,
                                           unsigned xoffset,
                                           unsigned yoffset,
                                           HTMLCanvasElement* canvas,
+                                          ExceptionCode& ec) {
+  texSubImage2D(target, level, xoffset, yoffset, canvas, 0, 0, ec);
+}
+
+void WebGLRenderingContext::texSubImage2D(unsigned target,
+                                          unsigned level,
+                                          unsigned xoffset,
+                                          unsigned yoffset,
+                                          HTMLCanvasElement* canvas,
+                                          bool flipY,
+                                          ExceptionCode& ec) {
+  texSubImage2D(target, level, xoffset, yoffset, canvas, flipY, 0, ec);
+}
+
+void WebGLRenderingContext::texSubImage2D(unsigned target,
+                                          unsigned level,
+                                          unsigned xoffset,
+                                          unsigned yoffset,
+                                          HTMLCanvasElement* canvas,
                                           bool flipY,
                                           bool premultiplyAlpha,
                                           ExceptionCode& ec) {
@@ -2049,6 +2166,25 @@ void WebGLRenderingContext::texSubImage2D(unsigned target,
   m_context->texSubImage2D(target, level, xoffset, yoffset, buffer->image(),
                            flipY, premultiplyAlpha);
   cleanupAfterGraphicsCall(false);
+}
+
+void WebGLRenderingContext::texSubImage2D(unsigned target,
+                                          unsigned level,
+                                          unsigned xoffset,
+                                          unsigned yoffset,
+                                          HTMLVideoElement* video,
+                                          ExceptionCode& ec) {
+  texSubImage2D(target, level, xoffset, yoffset, video, 0, 0, ec);
+}
+
+void WebGLRenderingContext::texSubImage2D(unsigned target,
+                                          unsigned level,
+                                          unsigned xoffset,
+                                          unsigned yoffset,
+                                          HTMLVideoElement* video,
+                                          bool flipY,
+                                          ExceptionCode& ec) {
+  texSubImage2D(target, level, xoffset, yoffset, video, flipY, 0, ec);
 }
 
 void WebGLRenderingContext::texSubImage2D(unsigned target,
