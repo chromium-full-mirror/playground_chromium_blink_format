@@ -56,7 +56,7 @@ class History;
 class IndexedDatabaseRequest;
 class InspectorTimelineAgent;
 class Location;
-class Media;
+class StyleMedia;
 class Navigator;
 class Node;
 class NotificationCenter;
@@ -201,7 +201,7 @@ class DOMWindow : public RefCounted<DOMWindow>, public EventTarget {
   // DOM Level 2 AbstractView Interface
   Document* document() const;
   // CSSOM View Module
-  PassRefPtr<Media> styleMedia() const;
+  PassRefPtr<StyleMedia> styleMedia() const;
 
   // DOM Level 2 Style Interface
   PassRefPtr<CSSStyleDeclaration> getComputedStyle(
@@ -399,7 +399,7 @@ class DOMWindow : public RefCounted<DOMWindow>, public EventTarget {
   Console* optionalConsole() const { return m_console.get(); }
   Navigator* optionalNavigator() const { return m_navigator.get(); }
   Location* optionalLocation() const { return m_location.get(); }
-  Media* optionalMedia() const { return m_media.get(); }
+  StyleMedia* optionalMedia() const { return m_media.get(); }
 #if ENABLE(DOM_STORAGE)
   Storage* optionalSessionStorage() const { return m_sessionStorage.get(); }
   Storage* optionalLocalStorage() const { return m_localStorage.get(); }
@@ -438,7 +438,7 @@ class DOMWindow : public RefCounted<DOMWindow>, public EventTarget {
   mutable RefPtr<Console> m_console;
   mutable RefPtr<Navigator> m_navigator;
   mutable RefPtr<Location> m_location;
-  mutable RefPtr<Media> m_media;
+  mutable RefPtr<StyleMedia> m_media;
 #if ENABLE(DOM_STORAGE)
   mutable RefPtr<Storage> m_sessionStorage;
   mutable RefPtr<Storage> m_localStorage;

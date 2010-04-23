@@ -23,31 +23,52 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef Media_h
-#define Media_h
+#include "config.h"
+#include "StyleMedia.h"
 
-#include "DOMWindow.h"
+#include "CSSStyleSelector.h"
+#include "Frame.h"
+#include "FrameView.h"
+#include "MediaList.h"
+#include "MediaQueryEvaluator.h"
 
 namespace WebCore {
 
-class Media : public RefCounted<Media> {
- public:
-  static PassRefPtr<Media> create(Frame* frame) {
-    return adoptRef(new Media(frame));
-  }
+StyleMedia::StyleMedia(Frame* frame) : m_frame(frame) {}
 
-  void disconnectFrame() { m_frame = 0; }
+String StyleMedia::type() const {
+  FrameView* view = m_frame ? m_frame->view() : 0;
+  if (view)
+    return view->mediaType();
 
-  String type() const;
+  return String();
+}
 
-  bool matchMedium(const String&) const;
+bool StyleMedia::matchMedium(const String& query) const {
+  if (!m_frame)
+    return false;
 
- private:
-  Media(Frame*);
+  Document* document = m_frame->document();
+  ASSERT(document);
+  Element* documentElement = document->documentElement();
+  ASSERT(documentElement);
 
-  Frame* m_frame;
-};
+  CSSStyleSelector* styleSelector = document->styleSelector();
+  if (!styleSelector)
+    return false;
 
-}  // namespace
+  RefPtr<RenderStyle> rootStyle = styleSelector->styleForElement(
+      documentElement, 0 /*defaultParent*/, false /*allowSharing*/,
+      true /*resolveForRootDefault*/);
+  RefPtr<MediaList> media = MediaList::create();
 
-#endif  // Media_h
+  ExceptionCode ec = 0;
+  media->setMediaText(query, ec);
+  if (ec)
+    return false;
+
+  MediaQueryEvaluator screenEval(type(), m_frame, rootStyle.get());
+  return screenEval.eval(media.get());
+}
+
+}  // namespace WebCore

@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2009 Apple Inc. All rights reserved.
+ * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies)
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -24,7 +25,7 @@
  */
 
 module view {
-    interface Media {
+    interface StyleMedia {
         readonly attribute DOMString type;
         boolean matchMedium(in DOMString mediaquery);
     };
