@@ -604,6 +604,7 @@ void RenderLayerCompositor::computeCompositingRequirements(
           childState.m_compositingAncestor = layer;
           if (overlapMap)
             addToOverlapMap(*overlapMap, layer, absBounds, haveComputedBounds);
+          willBeComposited = true;
         }
       }
     }
@@ -629,6 +630,8 @@ void RenderLayerCompositor::computeCompositingRequirements(
       }
     }
   }
+
+  ASSERT(willBeComposited == needsToBeComposited(layer));
 
   // If we have a software transform, and we have layers under us, we need to
   // also
