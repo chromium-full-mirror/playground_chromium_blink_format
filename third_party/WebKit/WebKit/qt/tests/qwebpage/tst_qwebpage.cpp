@@ -1484,11 +1484,17 @@ void tst_QWebPage::inputMethods() {
   QString selectionValue = variant.value<QString>();
   QCOMPARE(selectionValue, QString("eb"));
 
+  // Cancel current composition first
+  inputAttributes << QInputMethodEvent::Attribute(QInputMethodEvent::Selection,
+                                                  0, 0, QVariant());
+  QInputMethodEvent eventSelection2("", inputAttributes);
+  page->event(&eventSelection2);
+
   // Set selection with negative length
   inputAttributes << QInputMethodEvent::Attribute(QInputMethodEvent::Selection,
                                                   6, -5, QVariant());
-  QInputMethodEvent eventSelection2("", inputAttributes);
-  page->event(&eventSelection2);
+  QInputMethodEvent eventSelection3("", inputAttributes);
+  page->event(&eventSelection3);
 
   // ImAnchorPosition
   variant = page->inputMethodQuery(Qt::ImAnchorPosition);

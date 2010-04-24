@@ -24,6 +24,7 @@
 #define DumpRenderTreeSupportQt_h
 
 #include "qwebkitglobal.h"
+#include <QVariant>
 
 #include "qwebelement.h"
 
@@ -41,6 +42,10 @@ class QWEBKIT_EXPORT DumpRenderTreeSupportQt {
   static bool isCommandEnabled(QWebPage* page, const QString& name);
   static void setSmartInsertDeleteEnabled(QWebPage* page, bool enabled);
   static void setSelectTrailingWhitespaceEnabled(QWebPage* page, bool enabled);
+  static QVariantList selectedRange(QWebPage* page);
+  static QVariantList firstRectForCharacterRange(QWebPage* page,
+                                                 int location,
+                                                 int length);
 
   static bool pauseAnimation(QWebFrame*,
                              const QString& name,
