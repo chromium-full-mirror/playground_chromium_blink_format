@@ -1197,8 +1197,13 @@ bool RenderLayerCompositor::requiresCompositingForPlugin(
 
 bool RenderLayerCompositor::requiresCompositingForIFrame(
     RenderObject* renderer) const {
+#if !PLATFORM(MAC)
   return renderer->isRenderIFrame() &&
          toRenderIFrame(renderer)->requiresAcceleratedCompositing();
+#else
+  UNUSED_PARAM(renderer);
+  return false;
+#endif
 }
 
 bool RenderLayerCompositor::requiresCompositingForAnimation(
