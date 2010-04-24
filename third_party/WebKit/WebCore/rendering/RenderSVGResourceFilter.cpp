@@ -43,6 +43,7 @@
 #include "SVGStyledElement.h"
 #include "SVGUnitTypes.h"
 #include <wtf/Vector.h>
+#include <wtf/UnusedParam.h>
 
 static const float kMaxFilterSize = 5000.0f;
 
@@ -144,7 +145,11 @@ bool RenderSVGResourceFilter::applyResource(RenderObject* object,
                                             unsigned short resourceMode) {
   ASSERT(object);
   ASSERT(context);
+#ifndef NDEBUG
   ASSERT(resourceMode == ApplyToDefaultMode);
+#else
+  UNUSED_PARAM(resourceMode);
+#endif
 
   // Returning false here, to avoid drawings onto the context. We just want to
   // draw the stored filter output, not the unfiltered object as well.
@@ -249,7 +254,11 @@ void RenderSVGResourceFilter::postApplyResource(RenderObject* object,
                                                 unsigned short resourceMode) {
   ASSERT(object);
   ASSERT(context);
+#ifndef NDEBUG
   ASSERT(resourceMode == ApplyToDefaultMode);
+#else
+  UNUSED_PARAM(resourceMode);
+#endif
 
   if (!m_filter.contains(object))
     return;

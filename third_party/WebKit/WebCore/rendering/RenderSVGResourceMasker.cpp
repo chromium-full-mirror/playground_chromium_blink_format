@@ -37,6 +37,7 @@
 #include "SVGStyledElement.h"
 #include "SVGUnitTypes.h"
 #include <wtf/Vector.h>
+#include <wtf/UnusedParam.h>
 
 namespace WebCore {
 
@@ -87,7 +88,11 @@ bool RenderSVGResourceMasker::applyResource(RenderObject* object,
                                             unsigned short resourceMode) {
   ASSERT(object);
   ASSERT(context);
+#ifndef NDEBUG
   ASSERT(resourceMode == ApplyToDefaultMode);
+#else
+  UNUSED_PARAM(resourceMode);
+#endif
 
   if (!m_masker.contains(object))
     m_masker.set(object, new MaskerData);
