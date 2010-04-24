@@ -23,28 +23,22 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "DrawingAreaProxy.h"
+#include "DrawingAreaProxyUpdateChunk.h"
 
-#include "Connection.h"
-#include "DrawingAreaMessageKinds.h"
-#include "DrawingAreaProxyMessageKinds.h"
-#include "MessageID.h"
 #include "UpdateChunk.h"
 #include "WebProcessProxy.h"
 #include "WebView.h"
 #include <WebCore/BitmapInfo.h>
-#include <WebCore/IntRect.h>
 
 using namespace WebCore;
 
 namespace WebKit {
 
-DrawingAreaProxy::DrawingAreaProxy(WebView* webView)
-    : m_isWaitingForDidSetFrameNotification(false), m_webView(webView) {}
+WebPageProxy* DrawingAreaProxyUpdateChunk::page() {
+  return m_webView->page();
+}
 
-DrawingAreaProxy::~DrawingAreaProxy() {}
-
-void DrawingAreaProxy::ensureBackingStore() {
+void DrawingAreaProxyUpdateChunk::ensureBackingStore() {
   if (m_backingStoreBitmap)
     return;
 
@@ -64,31 +58,20 @@ void DrawingAreaProxy::ensureBackingStore() {
   ::SelectObject(m_backingStoreDC.get(), m_backingStoreBitmap.get());
 }
 
-void DrawingAreaProxy::paint(HDC hdc, RECT dirtyRect) {
-  if (m_isWaitingForDidSetFrameNotification) {
-    WebPageProxy* page = m_webView->page();
-    if (!page->isValid())
-      return;
+void DrawingAreaProxyUpdateChunk::invalidateBackingStore() {
+  m_backingStoreBitmap.clear();
+}
 
-    std::auto_ptr<CoreIPC::ArgumentDecoder> arguments =
-        page->process()->connection()->waitFor(
-            DrawingAreaProxyMessage::DidSetSize, page->pageID(), 0.04);
-    if (arguments.get())
-      didReceiveMessage(page->process()->connection(),
-                        CoreIPC::MessageID(DrawingAreaProxyMessage::DidSetSize),
-                        *arguments.get());
-  }
-
+void DrawingAreaProxyUpdateChunk::platformPaint(const IntRect& rect, HDC hdc) {
   if (!m_backingStoreBitmap)
     return;
 
   // BitBlt from the backing-store to the passed in hdc.
-  IntRect rect(dirtyRect);
   ::BitBlt(hdc, rect.x(), rect.y(), rect.width(), rect.height(),
            m_backingStoreDC.get(), rect.x(), rect.y(), SRCCOPY);
 }
 
-void DrawingAreaProxy::drawUpdateChunkIntoBackingStore(
+void DrawingAreaProxyUpdateChunk::drawUpdateChunkIntoBackingStore(
     UpdateChunk* updateChunk) {
   ensureBackingStore();
 
@@ -123,75 +106,6 @@ void DrawingAreaProxy::drawUpdateChunkIntoBackingStore(
   // Invalidate the WebView's HWND.
   RECT rect = updateChunk->frame();
   ::InvalidateRect(m_webView->window(), &rect, false);
-}
-
-void DrawingAreaProxy::setSize(const IntSize& viewSize) {
-  WebPageProxy* page = m_webView->page();
-  if (!page->isValid())
-    return;
-
-  if (viewSize.isEmpty())
-    return;
-
-  m_viewSize = viewSize;
-  m_lastSetViewSize = viewSize;
-
-  if (m_isWaitingForDidSetFrameNotification)
-    return;
-  m_isWaitingForDidSetFrameNotification = true;
-
-  page->process()->responsivenessTimer()->start();
-  page->process()->connection()->send(DrawingAreaMessage::SetSize,
-                                      page->pageID(), CoreIPC::In(viewSize));
-}
-
-void DrawingAreaProxy::didSetSize(UpdateChunk* updateChunk) {
-  ASSERT(m_isWaitingForDidSetFrameNotification);
-  m_isWaitingForDidSetFrameNotification = false;
-
-  IntSize viewSize = updateChunk->frame().size();
-  if (viewSize != m_lastSetViewSize)
-    setSize(m_lastSetViewSize);
-
-  // Invalidate the backing store.
-  m_backingStoreBitmap.clear();
-  drawUpdateChunkIntoBackingStore(updateChunk);
-
-  WebPageProxy* page = m_webView->page();
-  page->process()->responsivenessTimer()->stop();
-}
-
-void DrawingAreaProxy::update(UpdateChunk* updateChunk) {
-  drawUpdateChunkIntoBackingStore(updateChunk);
-
-  WebPageProxy* page = m_webView->page();
-  page->process()->connection()->send(DrawingAreaMessage::DidUpdate,
-                                      page->pageID(), CoreIPC::In());
-}
-
-void DrawingAreaProxy::didReceiveMessage(CoreIPC::Connection*,
-                                         CoreIPC::MessageID messageID,
-                                         CoreIPC::ArgumentDecoder& arguments) {
-  switch (messageID.get<DrawingAreaProxyMessage::Kind>()) {
-    case DrawingAreaProxyMessage::Update: {
-      UpdateChunk updateChunk;
-      if (!arguments.decode(updateChunk))
-        return;
-
-      update(&updateChunk);
-      break;
-    }
-    case DrawingAreaProxyMessage::DidSetSize: {
-      UpdateChunk updateChunk;
-      if (!arguments.decode(CoreIPC::Out(updateChunk)))
-        return;
-
-      didSetSize(&updateChunk);
-      break;
-    }
-    default:
-      ASSERT_NOT_REACHED();
-  }
 }
 
 }  // namespace WebKit

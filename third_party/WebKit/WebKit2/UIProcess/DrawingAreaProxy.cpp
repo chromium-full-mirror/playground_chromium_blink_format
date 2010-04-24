@@ -23,61 +23,12 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef DrawingAreaProxy_h
-#define DrawingAreaProxy_h
-
-#include "ArgumentEncoder.h"
-#include <WebCore/IntSize.h>
-#include <wtf/OwnPtr.h>
-
-namespace CoreIPC {
-class ArgumentDecoder;
-class Connection;
-class MessageID;
-}
+#include "DrawingAreaProxy.h"
 
 namespace WebKit {
 
-class UpdateChunk;
-class WebView;
+DrawingAreaProxy::DrawingAreaProxy(Type type) : m_type(type) {}
 
-class DrawingAreaProxy {
- public:
-  enum Type { DrawingAreaUpdateChunkType };
-
-  DrawingAreaProxy(WebView*);
-  ~DrawingAreaProxy();
-
-  void paint(HDC, RECT);
-  void setSize(const WebCore::IntSize&);
-
-  void didReceiveMessage(CoreIPC::Connection*,
-                         CoreIPC::MessageID,
-                         CoreIPC::ArgumentDecoder&);
-
-  // The DrawingAreaProxy should never be decoded itself. Instead, the
-  // DrawingArea should be decoded.
-  void encode(CoreIPC::ArgumentEncoder& encoder) const {
-    encoder.encode(static_cast<uint32_t>(DrawingAreaUpdateChunkType));
-  }
-
- private:
-  void ensureBackingStore();
-  void drawUpdateChunkIntoBackingStore(UpdateChunk*);
-  void didSetSize(UpdateChunk*);
-  void update(UpdateChunk*);
-
-  OwnPtr<HDC> m_backingStoreDC;
-  OwnPtr<HBITMAP> m_backingStoreBitmap;
-
-  bool m_isWaitingForDidSetFrameNotification;
-
-  WebCore::IntSize m_viewSize;  // Size of the BackingStore as well.
-  WebCore::IntSize m_lastSetViewSize;
-
-  WebView* m_webView;
-};
+DrawingAreaProxy::~DrawingAreaProxy() {}
 
 }  // namespace WebKit
-
-#endif  // DrawingAreaProxy_h

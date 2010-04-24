@@ -23,48 +23,79 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef DrawingAreaProxy_h
-#define DrawingAreaProxy_h
+#ifndef DrawingAreaProxyUpdateChunk_h
+#define DrawingAreaProxyUpdateChunk_h
 
-#include "ArgumentEncoder.h"
+#include "DrawingAreaProxy.h"
+#include <WebCore/IntSize.h>
 
-namespace CoreIPC {
-class ArgumentDecoder;
-class Connection;
-class MessageID;
-}
-
-namespace WebCore {
-class IntSize;
-}
+#if PLATFORM(MAC)
+#include <wtf/RetainPtr.h>
+#ifdef __OBJC__
+@class WKView;
+#else
+class WKView;
+#endif
+#endif
 
 namespace WebKit {
 
-class DrawingAreaProxy {
+class UpdateChunk;
+class WebPageProxy;
+
+#if PLATFORM(MAC)
+typedef WKView PlatformWebView;
+typedef CGContextRef PlatformDrawingContext;
+#elif PLATFORM(WIN)
+class WebView;
+typedef WebView PlatformWebView;
+typedef HDC PlatformDrawingContext;
+#endif
+
+class DrawingAreaProxyUpdateChunk : public DrawingAreaProxy {
  public:
-  enum Type { DrawingAreaUpdateChunkType };
+  DrawingAreaProxyUpdateChunk(PlatformWebView*);
+  virtual ~DrawingAreaProxyUpdateChunk();
 
-  virtual ~DrawingAreaProxy();
-
-  virtual void drawRectIntoContext(CGRect, CGContextRef) = 0;
-  virtual void setSize(const WebCore::IntSize&) = 0;
+  virtual void paint(const WebCore::IntRect&, PlatformDrawingContext);
+  virtual void setSize(const WebCore::IntSize&);
 
   virtual void didReceiveMessage(CoreIPC::Connection*,
                                  CoreIPC::MessageID,
-                                 CoreIPC::ArgumentDecoder&) = 0;
+                                 CoreIPC::ArgumentDecoder&);
 
   // The DrawingAreaProxy should never be decoded itself. Instead, the
   // DrawingArea should be decoded.
   virtual void encode(CoreIPC::ArgumentEncoder& encoder) const {
-    encoder.encode(static_cast<uint32_t>(m_type));
+    DrawingAreaProxy::encode(encoder);
   }
 
- protected:
-  DrawingAreaProxy(Type);
+ private:
+  WebPageProxy* page();
 
-  Type m_type;
+  void ensureBackingStore();
+  void invalidateBackingStore();
+  void platformPaint(const WebCore::IntRect&, PlatformDrawingContext);
+  void drawUpdateChunkIntoBackingStore(UpdateChunk*);
+  void didSetSize(UpdateChunk*);
+  void update(UpdateChunk*);
+
+  bool m_isWaitingForDidSetFrameNotification;
+  WebCore::IntSize m_viewSize;  // Size of the BackingStore as well.
+  WebCore::IntSize m_lastSetViewSize;
+
+#if PLATFORM(MAC)
+  // BackingStore
+  RetainPtr<CGContextRef> m_bitmapContext;
+#elif PLATFORM(WIN)
+  // BackingStore
+  OwnPtr<HDC> m_backingStoreDC;
+  OwnPtr<HBITMAP> m_backingStoreBitmap;
+#endif
+
+  PlatformWebView* m_webView;
 };
 
 }  // namespace WebKit
 
-#endif  // DrawingAreaProxy_h
+#endif  // DrawingAreaProxyUpdateChunk_h
