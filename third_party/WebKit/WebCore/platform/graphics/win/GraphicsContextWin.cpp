@@ -44,8 +44,6 @@ using namespace std;
 
 namespace WebCore {
 
-class SVGResourceImage;
-
 static void fillWithClearColor(HBITMAP bitmap) {
   BITMAP bmpInfo;
   GetObject(bitmap, sizeof(bmpInfo), &bmpInfo);
@@ -194,12 +192,4 @@ void GraphicsContextPlatformPrivate::concatCTM(
   XFORM xform = transform.toTransformationMatrix();
   ModifyWorldTransform(m_hdc, &xform, MWT_LEFTMULTIPLY);
 }
-
-#if ENABLE(SVG)
-GraphicsContext* contextForImage(SVGResourceImage*) {
-  // FIXME: This should go in GraphicsContextCG.cpp
-  notImplemented();
-  return 0;
-}
-#endif
 }

@@ -26,7 +26,7 @@
 #include "GraphicsContext.h"
 #include "ImageBuffer.h"
 #include "IntSize.h"
-#include "RenderSVGResource.h"
+#include "RenderSVGResourceContainer.h"
 #include "SVGMaskElement.h"
 #include "SVGUnitTypes.h"
 
@@ -36,17 +36,16 @@
 namespace WebCore {
 
 struct MaskerData {
-  MaskerData(FloatRect rect = FloatRect(), bool emptyObject = false)
-      : maskRect(rect), emptyMask(emptyObject) {}
+  MaskerData() : emptyMask(false) {}
 
   OwnPtr<ImageBuffer> maskImage;
   FloatRect maskRect;
   bool emptyMask;
 };
 
-class RenderSVGResourceMasker : public RenderSVGResource {
+class RenderSVGResourceMasker : public RenderSVGResourceContainer {
  public:
-  RenderSVGResourceMasker(SVGStyledElement*);
+  RenderSVGResourceMasker(SVGMaskElement*);
   virtual ~RenderSVGResourceMasker();
 
   virtual const char* renderName() const { return "RenderSVGResourceMasker"; }
@@ -54,7 +53,10 @@ class RenderSVGResourceMasker : public RenderSVGResource {
   virtual void invalidateClients();
   virtual void invalidateClient(RenderObject*);
 
-  virtual bool applyResource(RenderObject*, GraphicsContext*&);
+  virtual bool applyResource(RenderObject*,
+                             RenderStyle*,
+                             GraphicsContext*&,
+                             unsigned short resourceMode);
   virtual FloatRect resourceBoundingBox(const FloatRect&) const;
 
   SVGUnitTypes::SVGUnitType maskUnits() const {

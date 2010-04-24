@@ -24,7 +24,7 @@
 #if ENABLE(SVG)
 #include "FloatRect.h"
 #include "RenderObject.h"
-#include "RenderSVGResource.h"
+#include "RenderSVGResourceContainer.h"
 #include "SVGMarkerElement.h"
 #include "SVGStyledElement.h"
 
@@ -34,9 +34,9 @@ namespace WebCore {
 
 class AffineTransform;
 
-class RenderSVGResourceMarker : public RenderSVGResource {
+class RenderSVGResourceMarker : public RenderSVGResourceContainer {
  public:
-  RenderSVGResourceMarker(SVGStyledElement*);
+  RenderSVGResourceMarker(SVGMarkerElement*);
   virtual ~RenderSVGResourceMarker();
 
   virtual const char* renderName() const { return "RenderSVGResourceMarker"; }
@@ -60,7 +60,12 @@ class RenderSVGResourceMarker : public RenderSVGResource {
                                        float angle,
                                        float strokeWidth) const;
 
-  virtual bool applyResource(RenderObject*, GraphicsContext*&) { return false; }
+  virtual bool applyResource(RenderObject*,
+                             RenderStyle*,
+                             GraphicsContext*&,
+                             unsigned short) {
+    return false;
+  }
   virtual FloatRect resourceBoundingBox(const FloatRect&) const {
     return FloatRect();
   }

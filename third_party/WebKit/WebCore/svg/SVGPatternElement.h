@@ -22,8 +22,6 @@
 #define SVGPatternElement_h
 
 #if ENABLE(SVG)
-#include "RenderObject.h"
-#include "RenderSVGResourcePattern.h"
 #include "SVGExternalResourcesRequired.h"
 #include "SVGFitToViewBox.h"
 #include "SVGLangSpace.h"
@@ -59,7 +57,8 @@ class SVGPatternElement : public SVGStyledElement,
                                int childCountDelta = 0);
 
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
-  virtual SVGResource* canvasResource(const RenderObject*);
+
+  PatternAttributes collectPatternProperties() const;
 
  private:
   DECLARE_ANIMATED_PROPERTY(SVGPatternElement, SVGNames::xAttr, SVGLength, X, x)
@@ -115,14 +114,6 @@ class SVGPatternElement : public SVGStyledElement,
                             SVGPreserveAspectRatio,
                             PreserveAspectRatio,
                             preserveAspectRatio)
-
-  mutable RefPtr<SVGPaintServerPattern> m_resource;
-
- private:
-  friend class SVGPaintServerPattern;
-  void buildPattern(const FloatRect& targetRect) const;
-
-  PatternAttributes collectPatternProperties() const;
 };
 
 }  // namespace WebCore

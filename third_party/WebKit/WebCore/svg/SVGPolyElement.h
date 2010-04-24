@@ -48,9 +48,6 @@ class SVGPolyElement : public SVGStyledTransformableElement,
   virtual void svgAttributeChanged(const QualifiedName&);
   virtual void synchronizeProperty(const QualifiedName&);
 
-  virtual bool rendererIsNeeded(RenderStyle* style) {
-    return StyledElement::rendererIsNeeded(style);
-  }
   virtual bool supportsMarkers() const { return true; }
 
  private:

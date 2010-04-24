@@ -53,8 +53,10 @@ namespace WebCore {
 RenderSVGResourceType RenderSVGResourceFilter::s_resourceType =
     FilterResourceType;
 
-RenderSVGResourceFilter::RenderSVGResourceFilter(SVGStyledElement* node)
-    : RenderSVGResource(node), m_savedContext(0), m_sourceGraphicBuffer(0) {}
+RenderSVGResourceFilter::RenderSVGResourceFilter(SVGFilterElement* node)
+    : RenderSVGResourceContainer(node),
+      m_savedContext(0),
+      m_sourceGraphicBuffer(0) {}
 
 RenderSVGResourceFilter::~RenderSVGResourceFilter() {
   deleteAllValues(m_filter);
@@ -87,6 +89,7 @@ void RenderSVGResourceFilter::invalidateClient(RenderObject* object) {
     return;
 
   delete m_filter.take(object);
+  markForLayoutAndResourceInvalidation(object);
 }
 
 PassOwnPtr<SVGFilterBuilder> RenderSVGResourceFilter::buildPrimitives() {
@@ -136,9 +139,12 @@ bool RenderSVGResourceFilter::fitsInMaximumImageSize(const FloatSize& size,
 }
 
 bool RenderSVGResourceFilter::applyResource(RenderObject* object,
-                                            GraphicsContext*& context) {
+                                            RenderStyle*,
+                                            GraphicsContext*& context,
+                                            unsigned short resourceMode) {
   ASSERT(object);
   ASSERT(context);
+  ASSERT(resourceMode == ApplyToDefaultMode);
 
   // Returning false here, to avoid drawings onto the context. We just want to
   // draw the stored filter output, not the unfiltered object as well.
@@ -239,9 +245,11 @@ bool RenderSVGResourceFilter::applyResource(RenderObject* object,
 }
 
 void RenderSVGResourceFilter::postApplyResource(RenderObject* object,
-                                                GraphicsContext*& context) {
+                                                GraphicsContext*& context,
+                                                unsigned short resourceMode) {
   ASSERT(object);
   ASSERT(context);
+  ASSERT(resourceMode == ApplyToDefaultMode);
 
   if (!m_filter.contains(object))
     return;

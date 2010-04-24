@@ -29,7 +29,7 @@
 namespace WebCore {
 
 class RenderObject;
-class SVGPaintServer;
+class RenderSVGResource;
 
 class TextRun {
  public:
@@ -55,7 +55,7 @@ class TextRun {
 #if ENABLE(SVG_FONTS)
         ,
         m_referencingRenderObject(0),
-        m_activePaintServer(0)
+        m_activePaintingResource(0)
 #endif
   {
   }
@@ -81,7 +81,7 @@ class TextRun {
 #if ENABLE(SVG_FONTS)
         ,
         m_referencingRenderObject(0),
-        m_activePaintServer(0)
+        m_activePaintingResource(0)
 #endif
   {
   }
@@ -124,9 +124,11 @@ class TextRun {
     m_referencingRenderObject = object;
   }
 
-  SVGPaintServer* activePaintServer() const { return m_activePaintServer; }
-  void setActivePaintServer(SVGPaintServer* object) {
-    m_activePaintServer = object;
+  RenderSVGResource* activePaintingResource() const {
+    return m_activePaintingResource;
+  }
+  void setActivePaintingResource(RenderSVGResource* object) {
+    m_activePaintingResource = object;
   }
 #endif
 
@@ -145,7 +147,7 @@ class TextRun {
 
 #if ENABLE(SVG_FONTS)
   RenderObject* m_referencingRenderObject;
-  SVGPaintServer* m_activePaintServer;
+  RenderSVGResource* m_activePaintingResource;
 #endif
 };
 }

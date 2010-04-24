@@ -42,7 +42,6 @@
 #include "SVGNames.h"
 #include "SVGRenderStyle.h"
 #include "SVGRenderSupport.h"
-#include "SVGResource.h"
 #include "SVGSVGElement.h"
 #include "SVGUseElement.h"
 #include <wtf/Assertions.h>
@@ -62,9 +61,7 @@ void mapAttributeToCSSProperty(
 SVGStyledElement::SVGStyledElement(const QualifiedName& tagName, Document* doc)
     : SVGElement(tagName, doc) {}
 
-SVGStyledElement::~SVGStyledElement() {
-  SVGResource::removeClient(this);
-}
+SVGStyledElement::~SVGStyledElement() {}
 
 String SVGStyledElement::title() const {
   // According to spec, we should not return titles when hovering over <svg>
@@ -252,20 +249,23 @@ void SVGStyledElement::svgAttributeChanged(const QualifiedName& attrName) {
   if (attrName.matches(HTMLNames::classAttr))
     classAttributeChanged(className());
 
+  RenderObject* object = renderer();
+
   if (attrName == idAttributeName()) {
     // Notify resources about id changes, this is important as we cache
     // resources by id in SVGDocumentExtensions
-    if (renderer() && renderer()->isSVGResource()) {
-      RenderSVGResource* resource = renderer()->toRenderSVGResource();
-      resource->idChanged();
-    }
+    if (object && object->isSVGResourceContainer())
+      object->toRenderSVGResourceContainer()->idChanged();
   }
 
-  // If we're the child of a resource element, be sure to invalidate it.
-  invalidateResourcesInAncestorChain();
+  if (!document()->parsing() && object) {
+    // If we're the child of a resource element, tell the resource (and
+    // eventually its resources) that we've changed.
+    invalidateResourcesInAncestorChain();
 
-  // If the element is using resources, invalidate them.
-  invalidateResources();
+    // If we're referencing resources, tell them we've changed.
+    deregisterFromResources(object);
+  }
 
   // Invalidate all SVGElementInstances associated with us
   SVGElementInstance::invalidateAllInstancesOfElement(this);
@@ -278,19 +278,6 @@ void SVGStyledElement::synchronizeProperty(const QualifiedName& attrName) {
     synchronizeClassName();
 }
 
-void SVGStyledElement::invalidateResources() {
-  RenderObject* object = renderer();
-  if (!object)
-    return;
-
-  Document* document = this->document();
-
-  if (document->parsing())
-    return;
-
-  deregisterFromResources(object);
-}
-
 void SVGStyledElement::invalidateResourcesInAncestorChain() const {
   Node* node = parentNode();
   while (node) {
@@ -299,25 +286,24 @@ void SVGStyledElement::invalidateResourcesInAncestorChain() const {
 
     SVGElement* element = static_cast<SVGElement*>(node);
     if (SVGStyledElement* styledElement =
-            static_cast<SVGStyledElement*>(element->isStyled() ? element : 0))
-      styledElement->invalidateCanvasResources();
+            static_cast<SVGStyledElement*>(element->isStyled() ? element : 0)) {
+      styledElement->invalidateResourceClients();
+
+      // If we found the first resource in the ancestor chain, immediately stop.
+      break;
+    }
 
     node = node->parentNode();
   }
 }
 
-void SVGStyledElement::invalidateCanvasResources() {
+void SVGStyledElement::invalidateResourceClients() {
   RenderObject* object = renderer();
   if (!object)
     return;
 
-  if (object->isSVGResource())
-    object->toRenderSVGResource()->invalidateClients();
-
-  // The following lines will be removed soon, once all resources are handled by
-  // renderers.
-  if (SVGResource* resource = canvasResource(object))
-    resource->invalidate();
+  if (object->isSVGResourceContainer())
+    object->toRenderSVGResourceContainer()->invalidateClients();
 }
 
 void SVGStyledElement::childrenChanged(bool changedByParser,
@@ -328,7 +314,8 @@ void SVGStyledElement::childrenChanged(bool changedByParser,
                               childCountDelta);
 
   // Invalidate all SVGElementInstances associated with us
-  SVGElementInstance::invalidateAllInstancesOfElement(this);
+  if (!changedByParser)
+    SVGElementInstance::invalidateAllInstancesOfElement(this);
 }
 
 PassRefPtr<RenderStyle> SVGStyledElement::resolveStyle(
@@ -366,11 +353,6 @@ PassRefPtr<CSSValue> SVGStyledElement::getPresentationAttribute(
     addCSSProperty(cssSVGAttr, propId, cssSVGAttr->value());
   }
   return cssSVGAttr->style()->getPropertyCSSValue(name);
-}
-
-void SVGStyledElement::detach() {
-  SVGResource::removeClient(this);
-  SVGElement::detach();
 }
 
 bool SVGStyledElement::instanceUpdatesBlocked() const {

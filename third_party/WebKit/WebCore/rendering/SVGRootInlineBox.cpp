@@ -4,6 +4,7 @@
  * Copyright (C) 2006 Oliver Hunt <ojh16@student.canterbury.ac.nz>
  *           (C) 2006 Apple Computer Inc.
  *           (C) 2007 Nikolas Zimmermann <zimmermann@kde.org>
+ * Copyright (C) Research In Motion Limited 2010. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -32,12 +33,12 @@
 #include "Frame.h"
 #include "GraphicsContext.h"
 #include "RenderBlock.h"
+#include "RenderSVGResource.h"
 #include "RenderSVGResourceFilter.h"
 #include "RenderSVGRoot.h"
 #include "SVGInlineFlowBox.h"
 #include "SVGInlineTextBox.h"
 #include "SVGFontElement.h"
-#include "SVGPaintServer.h"
 #include "SVGRenderStyleDefs.h"
 #include "SVGRenderSupport.h"
 #include "SVGTextPositioningElement.h"
@@ -369,19 +370,19 @@ struct SVGRootInlineBoxPaintWalker {
                       rootBox->height()),
         m_filter(0),
         m_rootFilter(rootFilter),
-        m_fillPaintServer(0),
-        m_strokePaintServer(0),
-        m_fillPaintServerObject(0),
-        m_strokePaintServerObject(0),
+        m_fillPaintingResource(0),
+        m_strokePaintingResource(0),
+        m_fillPaintingResourceObject(0),
+        m_strokePaintingResourceObject(0),
         m_tx(tx),
         m_ty(ty) {}
 
   ~SVGRootInlineBoxPaintWalker() {
     ASSERT(!m_filter);
-    ASSERT(!m_fillPaintServer);
-    ASSERT(!m_fillPaintServerObject);
-    ASSERT(!m_strokePaintServer);
-    ASSERT(!m_strokePaintServerObject);
+    ASSERT(!m_fillPaintingResource);
+    ASSERT(!m_fillPaintingResourceObject);
+    ASSERT(!m_strokePaintingResource);
+    ASSERT(!m_strokePaintingResourceObject);
     ASSERT(!m_chunkStarted);
   }
 
@@ -392,26 +393,25 @@ struct SVGRootInlineBoxPaintWalker {
   }
 
   void teardownFillPaintServer() {
-    if (!m_fillPaintServer)
+    if (!m_fillPaintingResource)
       return;
 
-    m_fillPaintServer->teardown(m_paintInfo.context, m_fillPaintServerObject,
-                                ApplyToFillTargetType, true);
-
-    m_fillPaintServer = 0;
-    m_fillPaintServerObject = 0;
+    m_fillPaintingResource->postApplyResource(
+        m_fillPaintingResourceObject, m_paintInfo.context,
+        ApplyToFillMode | ApplyToTextMode);
+    m_fillPaintingResource = 0;
+    m_fillPaintingResourceObject = 0;
   }
 
   void teardownStrokePaintServer() {
-    if (!m_strokePaintServer)
+    if (!m_strokePaintingResource)
       return;
 
-    m_strokePaintServer->teardown(m_paintInfo.context,
-                                  m_strokePaintServerObject,
-                                  ApplyToStrokeTargetType, true);
-
-    m_strokePaintServer = 0;
-    m_strokePaintServerObject = 0;
+    m_strokePaintingResource->postApplyResource(
+        m_strokePaintingResourceObject, m_paintInfo.context,
+        ApplyToStrokeMode | ApplyToTextMode);
+    m_strokePaintingResource = 0;
+    m_strokePaintingResourceObject = 0;
   }
 
   void chunkStartCallback(InlineBox* box) {
@@ -458,7 +458,7 @@ struct SVGRootInlineBoxPaintWalker {
     m_paintInfo.rect = m_savedInfo.rect;
   }
 
-  bool setupBackground(SVGInlineTextBox* /*box*/) {
+  bool setupBackground(SVGInlineTextBox*) {
     m_textPaintInfo.subphase = SVGTextPaintSubphaseBackground;
     return true;
   }
@@ -470,16 +470,17 @@ struct SVGRootInlineBoxPaintWalker {
     RenderObject* object = flowBox->renderer();
     ASSERT(object);
 
-    ASSERT(!m_strokePaintServer);
+    ASSERT(!m_strokePaintingResource);
     teardownFillPaintServer();
 
     m_textPaintInfo.subphase = SVGTextPaintSubphaseGlyphFill;
-    m_fillPaintServer =
-        SVGPaintServer::fillPaintServer(object->style(), object);
-    if (m_fillPaintServer) {
-      m_fillPaintServer->setup(m_paintInfo.context, object,
-                               ApplyToFillTargetType, true);
-      m_fillPaintServerObject = object;
+    m_fillPaintingResource =
+        RenderSVGResource::fillPaintingResource(object, object->style());
+    if (m_fillPaintingResource) {
+      m_fillPaintingResource->applyResource(object, object->style(),
+                                            m_paintInfo.context,
+                                            ApplyToFillMode | ApplyToTextMode);
+      m_fillPaintingResourceObject = object;
       return true;
     }
 
@@ -496,18 +497,19 @@ struct SVGRootInlineBoxPaintWalker {
     if (!style)
       style = object->style();
 
-    ASSERT(!m_strokePaintServer);
+    ASSERT(!m_strokePaintingResource);
     teardownFillPaintServer();
 
     if (!mayHaveSelection(box))
       return false;
 
     m_textPaintInfo.subphase = SVGTextPaintSubphaseGlyphFillSelection;
-    m_fillPaintServer = SVGPaintServer::fillPaintServer(style, object);
-    if (m_fillPaintServer) {
-      m_fillPaintServer->setup(m_paintInfo.context, object, style,
-                               ApplyToFillTargetType, true);
-      m_fillPaintServerObject = object;
+    m_fillPaintingResource =
+        RenderSVGResource::fillPaintingResource(object, style);
+    if (m_fillPaintingResource) {
+      m_fillPaintingResource->applyResource(object, style, m_paintInfo.context,
+                                            ApplyToFillMode | ApplyToTextMode);
+      m_fillPaintingResourceObject = object;
       return true;
     }
 
@@ -527,13 +529,13 @@ struct SVGRootInlineBoxPaintWalker {
     teardownStrokePaintServer();
 
     m_textPaintInfo.subphase = SVGTextPaintSubphaseGlyphStroke;
-    m_strokePaintServer =
-        SVGPaintServer::strokePaintServer(object->style(), object);
-
-    if (m_strokePaintServer) {
-      m_strokePaintServer->setup(m_paintInfo.context, object,
-                                 ApplyToStrokeTargetType, true);
-      m_strokePaintServerObject = object;
+    m_strokePaintingResource =
+        RenderSVGResource::strokePaintingResource(object, object->style());
+    if (m_strokePaintingResource) {
+      m_strokePaintingResource->applyResource(
+          object, object->style(), m_paintInfo.context,
+          ApplyToStrokeMode | ApplyToTextMode);
+      m_strokePaintingResourceObject = object;
       return true;
     }
 
@@ -559,18 +561,20 @@ struct SVGRootInlineBoxPaintWalker {
       return false;
 
     m_textPaintInfo.subphase = SVGTextPaintSubphaseGlyphStrokeSelection;
-    m_strokePaintServer = SVGPaintServer::strokePaintServer(style, object);
-    if (m_strokePaintServer) {
-      m_strokePaintServer->setup(m_paintInfo.context, object, style,
-                                 ApplyToStrokeTargetType, true);
-      m_strokePaintServerObject = object;
+    m_strokePaintingResource =
+        RenderSVGResource::strokePaintingResource(object, style);
+    if (m_strokePaintingResource) {
+      m_strokePaintingResource->applyResource(
+          object, style, m_paintInfo.context,
+          ApplyToStrokeMode | ApplyToTextMode);
+      m_strokePaintingResourceObject = object;
       return true;
     }
 
     return false;
   }
 
-  bool setupForeground(SVGInlineTextBox* /*box*/) {
+  bool setupForeground(SVGInlineTextBox*) {
     teardownFillPaintServer();
     teardownStrokePaintServer();
 
@@ -579,16 +583,16 @@ struct SVGRootInlineBoxPaintWalker {
     return true;
   }
 
-  SVGPaintServer* activePaintServer() const {
+  RenderSVGResource* activePaintingResource() const {
     switch (m_textPaintInfo.subphase) {
       case SVGTextPaintSubphaseGlyphFill:
       case SVGTextPaintSubphaseGlyphFillSelection:
-        ASSERT(m_fillPaintServer);
-        return m_fillPaintServer;
+        ASSERT(m_fillPaintingResource);
+        return m_fillPaintingResource;
       case SVGTextPaintSubphaseGlyphStroke:
       case SVGTextPaintSubphaseGlyphStrokeSelection:
-        ASSERT(m_strokePaintServer);
-        return m_strokePaintServer;
+        ASSERT(m_strokePaintingResource);
+        return m_strokePaintingResource;
       case SVGTextPaintSubphaseBackground:
       case SVGTextPaintSubphaseForeground:
       default:
@@ -681,7 +685,7 @@ struct SVGRootInlineBoxPaintWalker {
                                  textWidth, *it, info);
 
       // Paint text
-      m_textPaintInfo.activePaintServer = activePaintServer();
+      m_textPaintInfo.activePaintingResource = activePaintingResource();
       textBox->paintCharacters(m_paintInfo, m_tx, m_ty, *it, stringStart,
                                stringLength, m_textPaintInfo);
 
@@ -710,11 +714,11 @@ struct SVGRootInlineBoxPaintWalker {
   RenderSVGResourceFilter* m_filter;
   RenderSVGResourceFilter* m_rootFilter;
 
-  SVGPaintServer* m_fillPaintServer;
-  SVGPaintServer* m_strokePaintServer;
+  RenderSVGResource* m_fillPaintingResource;
+  RenderSVGResource* m_strokePaintingResource;
 
-  RenderObject* m_fillPaintServerObject;
-  RenderObject* m_strokePaintServerObject;
+  RenderObject* m_fillPaintingResourceObject;
+  RenderObject* m_strokePaintingResourceObject;
 
   int m_tx;
   int m_ty;

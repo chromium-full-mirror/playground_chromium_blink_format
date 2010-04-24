@@ -30,8 +30,6 @@
 
 namespace WebCore {
 
-class SVGResource;
-
 void mapAttributeToCSSProperty(
     HashMap<AtomicStringImpl*, int>* propertyNameToIdMap,
     const QualifiedName& attrName);
@@ -53,7 +51,6 @@ class SVGStyledElement : public SVGElement, public SVGStylable {
   bool isKnownAttribute(const QualifiedName&);
 
   virtual bool rendererIsNeeded(RenderStyle*);
-  virtual SVGResource* canvasResource(const RenderObject*) { return 0; }
 
   virtual bool mapToEntry(const QualifiedName&, MappedAttributeEntry&) const;
   virtual void parseMappedAttribute(MappedAttribute*);
@@ -69,10 +66,8 @@ class SVGStyledElement : public SVGElement, public SVGStylable {
   // now.
   PassRefPtr<RenderStyle> resolveStyle(RenderStyle* parentStyle);
 
+  void invalidateResourceClients();
   void invalidateResourcesInAncestorChain() const;
-  void invalidateResources();
-
-  virtual void detach();
 
   bool instanceUpdatesBlocked() const;
   void setInstanceUpdatesBlocked(bool);
@@ -82,8 +77,6 @@ class SVGStyledElement : public SVGElement, public SVGStylable {
 
  protected:
   static int cssPropertyIdForSVGAttributeName(const QualifiedName&);
-
-  void invalidateCanvasResources();
 
  private:
   DECLARE_ANIMATED_PROPERTY(SVGStyledElement,

@@ -177,6 +177,9 @@ void RenderSVGText::absoluteQuads(Vector<FloatQuad>& quads) {
 }
 
 void RenderSVGText::paint(PaintInfo& paintInfo, int, int) {
+  if (paintInfo.context->paintingDisabled())
+    return;
+
   PaintInfo pi(paintInfo);
   pi.context->save();
   applyTransformToPaintInfo(pi, localToParentTransform());

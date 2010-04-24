@@ -81,13 +81,14 @@ class SVGElement : public StyledElement {
   void setCursorElement(SVGCursorElement*);
   void setCursorImageValue(CSSCursorImageValue*);
 
+  virtual void updateAnimatedSVGAttribute(const QualifiedName&) const;
+
  protected:
   SVGElement(const QualifiedName&, Document*);
 
   virtual void finishParsingChildren();
   virtual void insertedIntoDocument();
   virtual void attributeChanged(Attribute*, bool preserveDecls = false);
-  virtual void updateAnimatedSVGAttribute(const QualifiedName&) const;
 
   SVGElementRareData* rareSVGData() const;
   SVGElementRareData* ensureRareSVGData();

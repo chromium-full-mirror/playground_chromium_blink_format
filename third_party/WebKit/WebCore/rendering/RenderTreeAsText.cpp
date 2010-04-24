@@ -51,6 +51,7 @@
 #if ENABLE(SVG)
 #include "RenderPath.h"
 #include "RenderSVGContainer.h"
+#include "RenderSVGGradientStop.h"
 #include "RenderSVGImage.h"
 #include "RenderSVGInlineText.h"
 #include "RenderSVGRoot.h"
@@ -420,8 +421,12 @@ void write(TextStream& ts,
     write(ts, *toRenderPath(&o), indent);
     return;
   }
-  if (o.isSVGResource()) {
-    writeSVGResource(ts, o, indent);
+  if (o.isSVGGradientStop()) {
+    writeSVGGradientStop(ts, *toRenderSVGGradientStop(&o), indent);
+    return;
+  }
+  if (o.isSVGResourceContainer()) {
+    writeSVGResourceContainer(ts, o, indent);
     return;
   }
   if (o.isSVGContainer()) {
@@ -669,9 +674,6 @@ String externalRepresentation(Frame* frame, RenderAsTextBehavior behavior) {
     return String();
 
   TextStream ts;
-#if ENABLE(SVG)
-  writeRenderResources(ts, o->document());
-#endif
   if (o->hasLayer()) {
     RenderLayer* l = toRenderBox(o)->layer();
     writeLayers(ts, l, l, IntRect(l->x(), l->y(), l->width(), l->height()), 0,

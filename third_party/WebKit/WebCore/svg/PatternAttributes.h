@@ -21,8 +21,12 @@
 #define PatternAttributes_h
 
 #if ENABLE(SVG)
+#include "SVGLength.h"
 
 namespace WebCore {
+
+class SVGPatternElement;
+
 struct PatternAttributes {
   PatternAttributes()
       : m_x(),
@@ -56,30 +60,37 @@ struct PatternAttributes {
     m_x = value;
     m_xSet = true;
   }
+
   void setY(const SVGLength& value) {
     m_y = value;
     m_ySet = true;
   }
+
   void setWidth(const SVGLength& value) {
     m_width = value;
     m_widthSet = true;
   }
+
   void setHeight(const SVGLength& value) {
     m_height = value;
     m_heightSet = true;
   }
+
   void setBoundingBoxMode(bool value) {
     m_boundingBoxMode = value;
     m_boundingBoxModeSet = true;
   }
+
   void setBoundingBoxModeContent(bool value) {
     m_boundingBoxModeContent = value;
     m_boundingBoxModeContentSet = true;
   }
+
   void setPatternTransform(const AffineTransform& value) {
     m_patternTransform = value;
     m_patternTransformSet = true;
   }
+
   void setPatternContentElement(const SVGPatternElement* value) {
     m_patternContentElement = value;
     m_patternContentElementSet = true;
@@ -120,5 +131,3 @@ struct PatternAttributes {
 
 #endif  // ENABLE(SVG)
 #endif
-
-// vim:ts=4:noet

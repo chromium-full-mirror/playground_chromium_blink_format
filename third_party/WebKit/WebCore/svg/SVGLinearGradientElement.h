@@ -38,13 +38,12 @@ class SVGLinearGradientElement : public SVGGradientElement {
   virtual void svgAttributeChanged(const QualifiedName&);
   virtual void synchronizeProperty(const QualifiedName&);
 
- protected:
-  virtual void buildGradient() const;
-  virtual SVGPaintServerType gradientType() const {
-    return LinearGradientPaintServer;
-  }
+  virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
 
-  LinearGradientAttributes collectGradientProperties() const;
+  LinearGradientAttributes collectGradientProperties();
+  void calculateStartEndPoints(const LinearGradientAttributes&,
+                               FloatPoint& startPoint,
+                               FloatPoint& endPoint);
 
  private:
   DECLARE_ANIMATED_PROPERTY(SVGLinearGradientElement,

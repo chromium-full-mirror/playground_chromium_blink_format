@@ -36,6 +36,7 @@ class RenderSVGGradientStop : public RenderObject {
   RenderSVGGradientStop(SVGStopElement*);
   virtual ~RenderSVGGradientStop();
 
+  virtual bool isSVGGradientStop() const { return true; }
   virtual const char* renderName() const { return "RenderSVGGradientStop"; }
 
   virtual void layout();
@@ -57,6 +58,12 @@ class RenderSVGGradientStop : public RenderObject {
  private:
   SVGGradientElement* gradientElement() const;
 };
+
+inline const RenderSVGGradientStop* toRenderSVGGradientStop(
+    const RenderObject* object) {
+  ASSERT(!object || object->isSVGGradientStop());
+  return static_cast<const RenderSVGGradientStop*>(object);
+}
 }
 
 #endif  // ENABLE(SVG)

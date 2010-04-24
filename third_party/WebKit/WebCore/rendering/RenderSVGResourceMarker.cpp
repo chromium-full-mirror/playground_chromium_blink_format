@@ -36,8 +36,8 @@ namespace WebCore {
 RenderSVGResourceType RenderSVGResourceMarker::s_resourceType =
     MarkerResourceType;
 
-RenderSVGResourceMarker::RenderSVGResourceMarker(SVGStyledElement* node)
-    : RenderSVGResource(node) {}
+RenderSVGResourceMarker::RenderSVGResourceMarker(SVGMarkerElement* node)
+    : RenderSVGResourceContainer(node) {}
 
 RenderSVGResourceMarker::~RenderSVGResourceMarker() {
   m_marker.clear();
@@ -79,6 +79,7 @@ void RenderSVGResourceMarker::invalidateClient(RenderObject* object) {
     return;
 
   m_marker.remove(object);
+  markForLayoutAndResourceInvalidation(object);
 }
 
 void RenderSVGResourceMarker::applyViewportClip(PaintInfo& paintInfo) {

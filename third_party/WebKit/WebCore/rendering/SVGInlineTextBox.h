@@ -24,6 +24,7 @@
 
 #if ENABLE(SVG)
 #include "InlineTextBox.h"
+#include "RenderSVGResource.h"
 
 namespace WebCore {
 
@@ -43,9 +44,9 @@ enum SVGTextPaintSubphase {
 
 struct SVGTextPaintInfo {
   SVGTextPaintInfo()
-      : activePaintServer(0), subphase(SVGTextPaintSubphaseBackground) {}
+      : activePaintingResource(0), subphase(SVGTextPaintSubphaseBackground) {}
 
-  SVGPaintServer* activePaintServer;
+  RenderSVGResource* activePaintingResource;
   SVGTextPaintSubphase subphase;
 };
 

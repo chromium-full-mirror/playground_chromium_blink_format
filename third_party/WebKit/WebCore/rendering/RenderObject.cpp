@@ -67,7 +67,7 @@
 #endif
 
 #if ENABLE(SVG)
-#include "RenderSVGResource.h"
+#include "RenderSVGResourceContainer.h"
 #include "SVGRenderSupport.h"
 #endif
 
@@ -2712,7 +2712,7 @@ const SVGRenderBase* RenderObject::toSVGRenderBase() const {
   return 0;
 }
 
-RenderSVGResource* RenderObject::toRenderSVGResource() {
+RenderSVGResourceContainer* RenderObject::toRenderSVGResourceContainer() {
   ASSERT_NOT_REACHED();
   return 0;
 }

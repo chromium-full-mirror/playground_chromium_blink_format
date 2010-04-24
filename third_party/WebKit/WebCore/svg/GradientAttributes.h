@@ -21,8 +21,12 @@
 #define GradientAttributes_h
 
 #if ENABLE(SVG)
+#include "Color.h"
+#include "Gradient.h"
+#include "SVGLength.h"
 
 namespace WebCore {
+
 struct GradientAttributes {
   GradientAttributes()
       : m_spreadMethod(SpreadMethodPad),
@@ -35,21 +39,24 @@ struct GradientAttributes {
   GradientSpreadMethod spreadMethod() const { return m_spreadMethod; }
   bool boundingBoxMode() const { return m_boundingBoxMode; }
   AffineTransform gradientTransform() const { return m_gradientTransform; }
-  const Vector<SVGGradientStop>& stops() const { return m_stops; }
+  const Vector<Gradient::ColorStop>& stops() const { return m_stops; }
 
   void setSpreadMethod(GradientSpreadMethod value) {
     m_spreadMethod = value;
     m_spreadMethodSet = true;
   }
+
   void setBoundingBoxMode(bool value) {
     m_boundingBoxMode = value;
     m_boundingBoxModeSet = true;
   }
+
   void setGradientTransform(const AffineTransform& value) {
     m_gradientTransform = value;
     m_gradientTransformSet = true;
   }
-  void setStops(const Vector<SVGGradientStop>& value) {
+
+  void setStops(const Vector<Gradient::ColorStop>& value) {
     m_stops = value;
     m_stopsSet = true;
   }
@@ -64,7 +71,7 @@ struct GradientAttributes {
   GradientSpreadMethod m_spreadMethod;
   bool m_boundingBoxMode;
   AffineTransform m_gradientTransform;
-  Vector<SVGGradientStop> m_stops;
+  Vector<Gradient::ColorStop> m_stops;
 
   // Property states
   bool m_spreadMethodSet : 1;
@@ -77,5 +84,3 @@ struct GradientAttributes {
 
 #endif  // ENABLE(SVG)
 #endif
-
-// vim:ts=4:noet
