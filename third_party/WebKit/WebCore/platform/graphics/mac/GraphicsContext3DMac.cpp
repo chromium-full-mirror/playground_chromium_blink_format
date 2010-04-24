@@ -238,7 +238,7 @@ void GraphicsContext3D::beginPaint(WebGLRenderingContext* context) {
 
 void GraphicsContext3D::endPaint() {}
 
-bool GraphicsContext3D::isGLES2Compliant() {
+bool GraphicsContext3D::isGLES2Compliant() const {
   return false;
 }
 
