@@ -105,9 +105,9 @@ class RefPtr : public FastAllocBase {
 
   void swap(RefPtr&);
 
- private:
   static T* hashTableDeletedValue() { return reinterpret_cast<T*>(-1); }
 
+ private:
   T* m_ptr;
 };
 

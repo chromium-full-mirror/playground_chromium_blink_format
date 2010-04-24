@@ -88,6 +88,7 @@ void QualifiedName::deref() {
   if (!m_impl)
     return;
 #endif
+  ASSERT(!isHashTableDeletedValue());
 
   if (m_impl->hasOneRef())
     gNameCache->remove(m_impl);
