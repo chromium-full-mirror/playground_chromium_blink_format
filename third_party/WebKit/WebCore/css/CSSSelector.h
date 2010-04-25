@@ -182,6 +182,7 @@ class CSSSelector : public Noncopyable {
     PseudoInputListButton,
     PseudoInnerSpinButton,
     PseudoOuterSpinButton,
+    PseudoProgressBarValue,
   };
 
   PseudoType pseudoType() const {
