@@ -120,7 +120,6 @@ class WebInspectorFrontendClient : public WebCore::InspectorFrontendClientLocal,
   COMPtr<WebView> m_frontendWebView;
   HWND m_frontendWebViewHwnd;
 
-  bool m_shouldAttachWhenShown;
   bool m_attached;
 
   WebCore::String m_inspectedURL;

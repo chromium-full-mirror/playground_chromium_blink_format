@@ -226,7 +226,6 @@ WebInspectorFrontendClient::WebInspectorFrontendClient(
       m_frontendHwnd(frontendHwnd),
       m_frontendWebView(frontendWebView),
       m_frontendWebViewHwnd(frontendWebViewHwnd),
-      m_shouldAttachWhenShown(false),
       m_attached(false),
       m_destroyingInspectorView(false) {
   ::SetProp(frontendHwnd, kWebInspectorPointerProp,
@@ -366,17 +365,22 @@ void WebInspectorFrontendClient::showWindowWithoutNotifications() {
   ASSERT(m_frontendWebView);
   ASSERT(m_inspectedWebViewHwnd);
 
-  // If no preference is set - default to an attached window. This is important
-  // for inspector LayoutTests.
-  String shouldAttach =
-      m_inspectedWebView->page()->inspectorController()->setting(
-          InspectorController::inspectorStartsAttachedSettingName());
-  m_shouldAttachWhenShown = shouldAttach != "false";
+  bool shouldAttach = false;
+  if (m_attached)
+    shouldAttach = true;
+  else {
+    // If no preference is set - default to an attached window. This is
+    // important for inspector LayoutTests.
+    String shouldAttachPref =
+        m_inspectedWebView->page()->inspectorController()->setting(
+            InspectorController::inspectorStartsAttachedSettingName());
+    shouldAttach = shouldAttachPref != "false";
 
-  if (m_shouldAttachWhenShown && !canAttachWindow())
-    m_shouldAttachWhenShown = false;
+    if (shouldAttach && !canAttachWindow())
+      shouldAttach = false;
+  }
 
-  if (!m_shouldAttachWhenShown) {
+  if (!shouldAttach) {
     // Put the Inspector's WebView inside our window and show it.
     m_frontendWebView->setHostWindow(
         reinterpret_cast<OLE_HANDLE>(m_frontendHwnd));
