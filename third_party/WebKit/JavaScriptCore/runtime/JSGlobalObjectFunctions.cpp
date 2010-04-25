@@ -246,6 +246,8 @@ static double parseInt(const UString& s, int radix) {
   }
 
   if (number >= mantissaOverflowLowerBound) {
+    // FIXME: It is incorrect to use UString::ascii() here because it's not
+    // thread-safe.
     if (radix == 10)
       number = WTF::strtod(
           s.substr(firstDigitPosition, p - firstDigitPosition).ascii(), 0);
@@ -279,6 +281,9 @@ static double parseFloat(const UString& s) {
       (data[p + 1] == 'x' || data[p + 1] == 'X'))
     return 0;
 
+  // FIXME: UString::toDouble will ignore leading ASCII spaces, but we need to
+  // ignore
+  // other StrWhiteSpaceChar values as well.
   return s.toDouble(true /*tolerant*/, false /* NaN for empty string */);
 }
 
