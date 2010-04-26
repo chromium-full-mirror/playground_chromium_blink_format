@@ -148,6 +148,8 @@ class Database : public ThreadSafeShared<Database> {
   SQLTransactionClient* transactionClient() const;
   SQLTransactionCoordinator* transactionCoordinator() const;
 
+  void incrementalVacuumIfNeeded();
+
  private:
   Database(ScriptExecutionContext* context,
            const String& name,
