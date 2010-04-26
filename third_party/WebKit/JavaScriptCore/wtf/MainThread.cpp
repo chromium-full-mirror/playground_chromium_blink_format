@@ -29,16 +29,12 @@
 #include "config.h"
 #include "MainThread.h"
 
-#include "StdLibExtras.h"
 #include "CurrentTime.h"
 #include "Deque.h"
+#include "StdLibExtras.h"
 #include "Threading.h"
 
 namespace WTF {
-
-#if !PLATFORM(MAC) && !PLATFORM(QT)
-static ThreadIdentifier mainThreadIdentifier;
-#endif
 
 struct FunctionWithContext {
   MainThreadFunction* function;
@@ -55,8 +51,11 @@ typedef Deque<FunctionWithContext> FunctionQueue;
 
 static bool
     callbacksPaused;  // This global variable is only accessed from main thread.
+#if !PLATFORM(MAC) && !PLATFORM(QT)
+static ThreadIdentifier mainThreadIdentifier;
+#endif
 
-Mutex& mainThreadFunctionQueueMutex() {
+static Mutex& mainThreadFunctionQueueMutex() {
   DEFINE_STATIC_LOCAL(Mutex, staticMutex, ());
   return staticMutex;
 }
@@ -66,14 +65,45 @@ static FunctionQueue& functionQueue() {
   return staticFunctionQueue;
 }
 
-void initializeMainThread() {
-  mainThreadFunctionQueueMutex();
-  initializeMainThreadPlatform();
+#if !PLATFORM(MAC)
 
-#if !PLATFORM(MAC) && !PLATFORM(QT)
+void initializeMainThread() {
+  static bool initializedMainThread;
+  if (initializedMainThread)
+    return;
+  initializedMainThread = true;
+
+#if !PLATFORM(QT)
   mainThreadIdentifier = currentThread();
 #endif
+
+  mainThreadFunctionQueueMutex();
+  initializeMainThreadPlatform();
 }
+
+#else
+
+static pthread_once_t initializeMainThreadKeyOnce = PTHREAD_ONCE_INIT;
+
+static void initializeMainThreadOnce() {
+  mainThreadFunctionQueueMutex();
+  initializeMainThreadPlatform();
+}
+
+void initializeMainThread() {
+  pthread_once(&initializeMainThreadKeyOnce, initializeMainThreadOnce);
+}
+
+static void initializeMainThreadToProcessMainThreadOnce() {
+  mainThreadFunctionQueueMutex();
+  initializeMainThreadToProcessMainThreadPlatform();
+}
+
+void initializeMainThreadToProcessMainThread() {
+  pthread_once(&initializeMainThreadKeyOnce,
+               initializeMainThreadToProcessMainThreadOnce);
+}
+#endif
 
 // 0.1 sec delays in UI is approximate threshold when they become noticeable.
 // Have a limit that's half of that.

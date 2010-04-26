@@ -167,13 +167,12 @@ static Mutex& threadMapMutex() {
 }
 
 void initializeThreading() {
-  if (!atomicallyInitializedStaticMutex) {
-    atomicallyInitializedStaticMutex = new Mutex;
-    threadMapMutex();
-    initializeRandomNumberGenerator();
-    initializeMainThread();
-    initializeCurrentThreadInternal("Main Thread");
-  }
+  if (atomicallyInitializedStaticMutex)
+    return;
+
+  atomicallyInitializedStaticMutex = new Mutex;
+  threadMapMutex();
+  initializeRandomNumberGenerator();
 }
 
 static HashMap<DWORD, HANDLE>& threadMap() {

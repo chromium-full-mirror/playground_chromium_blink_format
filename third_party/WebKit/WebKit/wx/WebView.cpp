@@ -291,6 +291,7 @@ bool wxWebView::Create(wxWindow* parent,
     return false;
 
   WTF::initializeThreading();
+  WTF::initializeMainThread();
 
 // This is necessary because we are using SharedTimerWin.cpp on Windows,
 // due to a problem with exceptions getting eaten when using the callback

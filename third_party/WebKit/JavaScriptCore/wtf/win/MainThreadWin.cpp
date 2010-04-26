@@ -80,6 +80,8 @@ void initializeMainThreadPlatform() {
                    CW_USEDEFAULT, 0, hWndParent, 0, 0, 0);
   threadingFiredMessage =
       RegisterWindowMessage(L"com.apple.WebKit.MainThreadFired");
+
+  initializeCurrentThreadInternal("Main Thread");
 }
 
 void scheduleDispatchFunctionsOnMainThread() {

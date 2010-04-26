@@ -44,6 +44,7 @@ static const wchar_t* serverName = L"UIProcess";
 static void* webThreadBody(void*) {
   // Initialization
   JSC::initializeThreading();
+  WTF::initializeMainThread();
 
   WebProcess::shared().initialize(serverName, RunLoop::current());
   RunLoop::run();

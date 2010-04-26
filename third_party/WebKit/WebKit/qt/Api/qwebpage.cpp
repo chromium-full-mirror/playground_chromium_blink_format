@@ -83,6 +83,7 @@
 #include "NotificationPresenterClientQt.h"
 #include "PageClientQt.h"
 #include "WorkerThread.h"
+#include "wtf/Threading.h"
 
 #include <QApplication>
 #include <QBasicTimer>
@@ -274,6 +275,7 @@ QWebPagePrivate::QWebPagePrivate(QWebPage* qq)
       inspectorIsInternalOnly(false) {
   WebCore::InitializeLoggingChannelsIfNecessary();
   JSC::initializeThreading();
+  WTF::initializeMainThread();
   WebCore::SecurityOrigin::setLocalLoadPolicy(
       WebCore::SecurityOrigin::AllowLocalLoadsForLocalAndSubstituteData);
 

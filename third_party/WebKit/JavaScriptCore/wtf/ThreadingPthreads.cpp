@@ -65,12 +65,12 @@ static Mutex& threadMapMutex() {
 }
 
 void initializeThreading() {
-  if (!atomicallyInitializedStaticMutex) {
-    atomicallyInitializedStaticMutex = new Mutex;
-    threadMapMutex();
-    initializeRandomNumberGenerator();
-    initializeMainThread();
-  }
+  if (atomicallyInitializedStaticMutex)
+    return;
+
+  atomicallyInitializedStaticMutex = new Mutex;
+  threadMapMutex();
+  initializeRandomNumberGenerator();
 }
 
 void lockAtomicallyInitializedStaticMutex() {
