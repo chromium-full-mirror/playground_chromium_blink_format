@@ -468,7 +468,10 @@ void applyStrokeStyleToContext(GraphicsContext* context,
       object->style(), object->document()->documentElement()->renderStyle());
   float dashOffset = SVGRenderStyle::cssPrimitiveToLength(
       object, style->svgStyle()->strokeDashOffset(), 0.0f);
-  context->setLineDash(dashes, dashOffset);
+  if (dashes.isEmpty())
+    context->setStrokeStyle(SolidStroke);
+  else
+    context->setLineDash(dashes, dashOffset);
 }
 
 const RenderObject* findTextRootObject(const RenderObject* start) {
