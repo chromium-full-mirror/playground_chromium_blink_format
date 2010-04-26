@@ -99,7 +99,7 @@ String TextStream::release() {
   return String::adopt(m_text);
 }
 
-#if OS(WINDOWS) && CPU(X86_64) && COMPILER(MSVC)
+#if OS(WINDOWS) && CPU(X86_64)
 TextStream& TextStream::operator<<(__int64 i) {
   char buffer[printBufferSize];
   snprintf(buffer, sizeof(buffer) - 1, "%I64i", i);

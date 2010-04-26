@@ -341,7 +341,7 @@ void PluginView::stop() {
 
     if (currentWndProc == PluginViewWndProc)
       SetWindowLongPtr(platformPluginWidget(), GWLP_WNDPROC,
-                       (LONG)m_pluginWndProc);
+                       (LONG_PTR)m_pluginWndProc);
 #endif
   }
 #endif  // XP_WIN
