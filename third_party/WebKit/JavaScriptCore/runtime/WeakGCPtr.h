@@ -45,9 +45,12 @@ class WeakGCPtr : Noncopyable {
     return m_ptr;
   }
 
-  void clear(JSCell* ptr) {
-    if (ptr == m_ptr)
+  bool clear(JSCell* ptr) {
+    if (ptr == m_ptr) {
       m_ptr = 0;
+      return true;
+    }
+    return false;
   }
 
   T& operator*() const { return *get(); }
@@ -72,8 +75,8 @@ class WeakGCPtr : Noncopyable {
 
  private:
   void assign(T* ptr) {
-    if (ptr)
-      Heap::markCell(ptr);
+    ASSERT(ptr);
+    Heap::markCell(ptr);
     m_ptr = ptr;
   }
 
