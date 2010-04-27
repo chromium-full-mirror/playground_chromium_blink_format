@@ -165,6 +165,7 @@ class JSImmediate {
   friend class JIT;
   friend class JSValue;
   friend class JSFastMath;
+  friend class JSInterfaceJIT;
   friend JSValue jsNumber(ExecState* exec, double d);
   friend JSValue jsNumber(ExecState*, char i);
   friend JSValue jsNumber(ExecState*, unsigned char i);
