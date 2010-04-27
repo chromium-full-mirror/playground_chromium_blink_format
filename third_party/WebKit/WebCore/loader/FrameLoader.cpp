@@ -564,7 +564,7 @@ void FrameLoader::submitForm(const char* action,
     m_submittedFormURL = u;
   }
 
-  formData->generateFiles(m_frame->page()->chrome()->client());
+  formData->generateFiles(m_frame->document());
 
   if (!m_outgoingReferrer.isEmpty())
     frameRequest.resourceRequest().setHTTPReferrer(m_outgoingReferrer);
@@ -4058,7 +4058,7 @@ void FrameLoader::navigateToDifferentDocument(HistoryItem* item,
   // form.
   NavigationAction action;
   if (formData) {
-    formData->generateFiles(m_frame->page()->chrome()->client());
+    formData->generateFiles(m_frame->document());
 
     request.setHTTPMethod("POST");
     request.setHTTPBody(formData);
