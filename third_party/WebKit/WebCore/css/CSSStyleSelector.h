@@ -88,7 +88,6 @@ class CSSStyleSelector : public Noncopyable {
                    bool matchAuthorAndUserStyles);
   ~CSSStyleSelector();
 
-  void initElement(Element*);
   void initForStyleResolve(Element*,
                            RenderStyle* parentStyle = 0,
                            PseudoId = NOPSEUDO);
@@ -119,6 +118,7 @@ class CSSStyleSelector : public Noncopyable {
 #endif
 
  private:
+  void initElement(Element*);
   RenderStyle* locateSharedStyle();
   Node* locateCousinList(Element* parent, unsigned depth = 1);
   bool canShareStyleWithElement(Node*);
@@ -262,6 +262,7 @@ class CSSStyleSelector : public Noncopyable {
     bool checkScrollbarPseudoClass(CSSSelector*, PseudoId& dynamicPseudo) const;
 
     EInsideLink determineLinkState(Element* element) const;
+    EInsideLink determineLinkStateSlowCase(Element* element) const;
     void allVisitedStateChanged();
     void visitedStateChanged(LinkHash visitedHash);
 
@@ -312,6 +313,17 @@ class CSSStyleSelector : public Noncopyable {
 #endif
 
   StyleImage* styleImage(CSSValue* value);
+
+  EInsideLink currentElementLinkState() const {
+    if (!m_haveCachedLinkState) {
+      m_cachedLinkState = m_checker.determineLinkState(m_element);
+      m_haveCachedLinkState = true;
+    }
+    return m_cachedLinkState;
+  }
+
+  mutable EInsideLink m_cachedLinkState;
+  mutable bool m_haveCachedLinkState;
 
   // We collect the set of decls that match in |m_matchedDecls|.  We then walk
   // the

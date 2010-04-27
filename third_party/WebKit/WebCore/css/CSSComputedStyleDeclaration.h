@@ -42,7 +42,7 @@ class CSSComputedStyleDeclaration : public CSSStyleDeclaration {
 
   virtual String cssText() const;
 
-  virtual unsigned length() const;
+  virtual unsigned virtualLength() const;
   virtual String item(unsigned index) const;
 
   virtual PassRefPtr<CSSValue> getPropertyCSSValue(int propertyID) const;

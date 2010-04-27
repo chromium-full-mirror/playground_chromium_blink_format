@@ -681,8 +681,8 @@ void CSSMutableStyleDeclaration::setLengthProperty(int propertyId,
   setStrictParsing(parseMode);
 }
 
-unsigned CSSMutableStyleDeclaration::length() const {
-  return m_properties.size();
+unsigned CSSMutableStyleDeclaration::virtualLength() const {
+  return length();
 }
 
 String CSSMutableStyleDeclaration::item(unsigned i) const {

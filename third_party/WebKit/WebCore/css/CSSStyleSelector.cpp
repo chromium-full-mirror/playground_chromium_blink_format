@@ -521,6 +521,7 @@ void CSSStyleSelector::addKeyframeStyle(
 
 void CSSStyleSelector::init() {
   m_element = 0;
+  m_haveCachedLinkState = false;
   m_matchedDecls.clear();
   m_ruleList = 0;
   m_rootDefaultStyle = 0;
@@ -757,9 +758,9 @@ void CSSStyleSelector::matchRulesForList(CSSRuleDataList* rules,
   if (!rules)
     return;
 
+  const AtomicString& localName = m_element->localName();
   for (CSSRuleData* d = rules->first(); d; d = d->next()) {
     CSSStyleRule* rule = d->rule();
-    const AtomicString& localName = m_element->localName();
     const AtomicString& selectorLocalName = d->selector()->m_tag.localName();
     if ((localName == selectorLocalName || selectorLocalName == starAtom) &&
         checkSelector(d->selector())) {
@@ -861,7 +862,10 @@ void CSSStyleSelector::sortMatchedRules(unsigned start, unsigned end) {
     m_matchedRules[i] = rulesMergeBuffer[i - start];
 }
 
-void CSSStyleSelector::initElement(Element* e) {
+inline void CSSStyleSelector::initElement(Element* e) {
+  if (m_element != e)
+    m_haveCachedLinkState = false;
+
   m_element = e;
   m_styledElement = m_element && m_element->isStyledElement()
                         ? static_cast<StyledElement*>(m_element)
@@ -936,10 +940,16 @@ CSSStyleSelector::SelectorChecker::SelectorChecker(Document* document,
       m_documentIsHTML(document->isHTMLDocument()),
       m_matchVisitedPseudoClass(false) {}
 
-EInsideLink CSSStyleSelector::SelectorChecker::determineLinkState(
+inline EInsideLink CSSStyleSelector::SelectorChecker::determineLinkState(
     Element* element) const {
   if (!element->isLink())
     return NotInsideLink;
+  return determineLinkStateSlowCase(element);
+}
+
+EInsideLink CSSStyleSelector::SelectorChecker::determineLinkStateSlowCase(
+    Element* element) const {
+  ASSERT(element->isLink());
 
   const AtomicString* attr = linkAttribute(element);
   if (!attr || attr->isNull())
@@ -1099,7 +1109,7 @@ bool CSSStyleSelector::canShareStyleWithElement(Node* n) {
               m_styledElement->mappedAttributes());
         if (mappedAttrsMatch) {
           if (s->isLink()) {
-            if (m_checker.determineLinkState(m_element) != style->insideLink())
+            if (currentElementLinkState() != style->insideLink())
               return false;
           }
           return true;
@@ -1110,7 +1120,7 @@ bool CSSStyleSelector::canShareStyleWithElement(Node* n) {
   return false;
 }
 
-RenderStyle* CSSStyleSelector::locateSharedStyle() {
+ALWAYS_INLINE RenderStyle* CSSStyleSelector::locateSharedStyle() {
   if (m_styledElement && !m_styledElement->inlineStyleDecl() &&
       !m_styledElement->hasID() &&
       !m_styledElement->document()->usesSiblingRules()) {
@@ -1266,7 +1276,7 @@ PassRefPtr<RenderStyle> CSSStyleSelector::styleForElement(
 
   if (e->isLink()) {
     m_style->setIsLink(true);
-    m_style->setInsideLink(m_checker.determineLinkState(e));
+    m_style->setInsideLink(currentElementLinkState());
   }
 
   if (simpleDefaultStyleSheet && !elementCanUseSimpleDefaultStyle(e))
