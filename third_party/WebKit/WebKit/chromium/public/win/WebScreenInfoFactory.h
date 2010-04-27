@@ -40,10 +40,10 @@ namespace WebKit {
 struct WebScreenInfo;
 
 class WebScreenInfoFactory {
- public:
-  WEBKIT_API static WebScreenInfo screenInfo(HWND);
+public:
+    WEBKIT_API static WebScreenInfo screenInfo(HWND);
 };
 
-}  // namespace WebKit
+} // namespace WebKit
 
 #endif
