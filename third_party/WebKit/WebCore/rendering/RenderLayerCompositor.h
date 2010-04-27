@@ -166,6 +166,11 @@ class RenderLayerCompositor {
   // to know if there is non-affine content, e.g. for drawing into an image.
   bool has3DContent() const;
 
+  // Some platforms may wish to connect compositing layer trees between iframes
+  // and
+  // their parent document.
+  static bool shouldPropagateCompositingToIFrameParent();
+
  private:
   // Whether the given RL needs a compositing layer.
   bool needsToBeComposited(const RenderLayer*) const;
