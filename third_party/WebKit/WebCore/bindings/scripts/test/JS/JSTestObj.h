@@ -204,6 +204,16 @@ jsTestObjPrototypeFunctionWithScriptStateObj(JSC::ExecState*,
                                              JSC::JSValue,
                                              const JSC::ArgList&);
 JSC::JSValue JSC_HOST_CALL
+jsTestObjPrototypeFunctionWithScriptStateVoidException(JSC::ExecState*,
+                                                       JSC::JSObject*,
+                                                       JSC::JSValue,
+                                                       const JSC::ArgList&);
+JSC::JSValue JSC_HOST_CALL
+jsTestObjPrototypeFunctionWithScriptStateObjException(JSC::ExecState*,
+                                                      JSC::JSObject*,
+                                                      JSC::JSValue,
+                                                      const JSC::ArgList&);
+JSC::JSValue JSC_HOST_CALL
 jsTestObjPrototypeFunctionMethodWithOptionalArg(JSC::ExecState*,
                                                 JSC::JSObject*,
                                                 JSC::JSValue,

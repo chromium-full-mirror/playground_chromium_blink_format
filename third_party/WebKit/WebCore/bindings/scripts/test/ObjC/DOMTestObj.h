@@ -84,6 +84,8 @@
                                optionalArg:(int)optionalArg;
 - (void)withScriptStateVoid;
 - (DOMTestObj*)withScriptStateObj;
+- (void)withScriptStateVoidException;
+- (DOMTestObj*)withScriptStateObjException;
 - (void)methodWithOptionalArg:(int)opt;
 - (void)methodWithNonOptionalArgAndOptionalArg:(int)nonOpt opt:(int)opt;
 - (void)methodWithNonOptionalArgAndTwoOptionalArgs:(int)nonOpt
