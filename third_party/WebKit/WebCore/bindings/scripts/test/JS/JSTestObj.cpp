@@ -164,7 +164,7 @@ bool JSTestObjConstructor::getOwnPropertyDescriptor(
 #define THUNK_GENERATOR(generator)
 #endif
 
-static const HashTableValue JSTestObjPrototypeTableValues[19] = {
+static const HashTableValue JSTestObjPrototypeTableValues[21] = {
     {"voidMethod", DontDelete | Function,
      (intptr_t) static_cast<NativeFunction>(
          jsTestObjPrototypeFunctionVoidMethod),
@@ -225,6 +225,14 @@ static const HashTableValue JSTestObjPrototypeTableValues[19] = {
      (intptr_t) static_cast<NativeFunction>(
          jsTestObjPrototypeFunctionWithDynamicFrameAndUserGestureASAD),
      (intptr_t)2 THUNK_GENERATOR(0)},
+    {"withScriptStateVoid", DontDelete | Function,
+     (intptr_t) static_cast<NativeFunction>(
+         jsTestObjPrototypeFunctionWithScriptStateVoid),
+     (intptr_t)0 THUNK_GENERATOR(0)},
+    {"withScriptStateObj", DontDelete | Function,
+     (intptr_t) static_cast<NativeFunction>(
+         jsTestObjPrototypeFunctionWithScriptStateObj),
+     (intptr_t)0 THUNK_GENERATOR(0)},
     {"methodWithOptionalArg", DontDelete | Function,
      (intptr_t) static_cast<NativeFunction>(
          jsTestObjPrototypeFunctionMethodWithOptionalArg),
@@ -742,6 +750,39 @@ jsTestObjPrototypeFunctionWithDynamicFrameAndUserGestureASAD(
   imp->withDynamicFrameAndUserGestureASAD(dynamicFrame, intArg, optionalArg,
                                           processingUserGesture(exec));
   return jsUndefined();
+}
+
+JSValue JSC_HOST_CALL
+jsTestObjPrototypeFunctionWithScriptStateVoid(ExecState* exec,
+                                              JSObject*,
+                                              JSValue thisValue,
+                                              const ArgList& args) {
+  UNUSED_PARAM(args);
+  if (!thisValue.inherits(&JSTestObj::s_info))
+    return throwError(exec, TypeError);
+  JSTestObj* castedThisObj = static_cast<JSTestObj*>(asObject(thisValue));
+  TestObj* imp = static_cast<TestObj*>(castedThisObj->impl());
+
+  imp->withScriptStateVoid(exec);
+  return jsUndefined();
+}
+
+JSValue JSC_HOST_CALL
+jsTestObjPrototypeFunctionWithScriptStateObj(ExecState* exec,
+                                             JSObject*,
+                                             JSValue thisValue,
+                                             const ArgList& args) {
+  UNUSED_PARAM(args);
+  if (!thisValue.inherits(&JSTestObj::s_info))
+    return throwError(exec, TypeError);
+  JSTestObj* castedThisObj = static_cast<JSTestObj*>(asObject(thisValue));
+  TestObj* imp = static_cast<TestObj*>(castedThisObj->impl());
+
+  JSC::JSValue result = toJS(exec, castedThisObj->globalObject(),
+                             WTF::getPtr(imp->withScriptStateObj(exec)));
+  if (exec->hadException())
+    return jsUndefined();
+  return result;
 }
 
 JSValue JSC_HOST_CALL

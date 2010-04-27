@@ -184,6 +184,16 @@ jsTestObjPrototypeFunctionWithDynamicFrameAndUserGestureASAD(
     JSC::JSValue,
     const JSC::ArgList&);
 JSC::JSValue JSC_HOST_CALL
+jsTestObjPrototypeFunctionWithScriptStateVoid(JSC::ExecState*,
+                                              JSC::JSObject*,
+                                              JSC::JSValue,
+                                              const JSC::ArgList&);
+JSC::JSValue JSC_HOST_CALL
+jsTestObjPrototypeFunctionWithScriptStateObj(JSC::ExecState*,
+                                             JSC::JSObject*,
+                                             JSC::JSValue,
+                                             const JSC::ArgList&);
+JSC::JSValue JSC_HOST_CALL
 jsTestObjPrototypeFunctionMethodWithOptionalArg(JSC::ExecState*,
                                                 JSC::JSObject*,
                                                 JSC::JSValue,
