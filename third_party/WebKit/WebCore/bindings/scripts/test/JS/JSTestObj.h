@@ -158,6 +158,16 @@ jsTestObjPrototypeFunctionCustomArgsAndException(JSC::ExecState*,
                                                  JSC::JSValue,
                                                  const JSC::ArgList&);
 JSC::JSValue JSC_HOST_CALL
+jsTestObjPrototypeFunctionAddEventListener(JSC::ExecState*,
+                                           JSC::JSObject*,
+                                           JSC::JSValue,
+                                           const JSC::ArgList&);
+JSC::JSValue JSC_HOST_CALL
+jsTestObjPrototypeFunctionRemoveEventListener(JSC::ExecState*,
+                                              JSC::JSObject*,
+                                              JSC::JSValue,
+                                              const JSC::ArgList&);
+JSC::JSValue JSC_HOST_CALL
 jsTestObjPrototypeFunctionWithDynamicFrame(JSC::ExecState*,
                                            JSC::JSObject*,
                                            JSC::JSValue,

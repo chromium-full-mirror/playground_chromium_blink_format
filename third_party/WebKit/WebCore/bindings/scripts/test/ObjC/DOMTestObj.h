@@ -32,6 +32,7 @@
 @class DOMTestObj;
 @class DOMlog;
 @class NSString;
+@protocol DOMEventListener;
 
 @interface DOMTestObj : DOMObject
 - (int)readOnlyIntAttr;
@@ -69,6 +70,12 @@
                       strArg:(NSString*)strArg
                       objArg:(DOMTestObj*)objArg;
 - (void)customArgsAndException:(DOMlog*)intArg;
+- (void)addEventListener:(NSString*)type
+                listener:(id<DOMEventListener>)listener
+              useCapture:(BOOL)useCapture;
+- (void)removeEventListener:(NSString*)type
+                   listener:(id<DOMEventListener>)listener
+                 useCapture:(BOOL)useCapture;
 - (void)withDynamicFrame;
 - (void)withDynamicFrameAndArg:(int)intArg;
 - (void)withDynamicFrameAndOptionalArg:(int)intArg optionalArg:(int)optionalArg;

@@ -63,32 +63,6 @@ JSValue JSNotificationCenter::requestPermission(ExecState* exec,
   return jsUndefined();
 }
 
-JSValue JSNotification::addEventListener(ExecState* exec, const ArgList& args) {
-  JSValue listener = args.at(1);
-  if (!listener.isObject())
-    return jsUndefined();
-
-  impl()->addEventListener(ustringToAtomicString(args.at(0).toString(exec)),
-                           JSEventListener::create(asObject(listener), this,
-                                                   false, currentWorld(exec)),
-                           args.at(2).toBoolean(exec));
-  return jsUndefined();
-}
-
-JSValue JSNotification::removeEventListener(ExecState* exec,
-                                            const ArgList& args) {
-  JSValue listener = args.at(1);
-  if (!listener.isObject())
-    return jsUndefined();
-
-  impl()->removeEventListener(ustringToAtomicString(args.at(0).toString(exec)),
-                              JSEventListener::create(asObject(listener), this,
-                                                      false, currentWorld(exec))
-                                  .get(),
-                              args.at(2).toBoolean(exec));
-  return jsUndefined();
-}
-
 }  // namespace
 
 #endif  // ENABLE(NOTIFICATIONS)
