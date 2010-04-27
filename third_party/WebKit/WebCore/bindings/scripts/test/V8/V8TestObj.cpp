@@ -367,8 +367,8 @@ static v8::Handle<v8::Value> withScriptStateVoidCallback(
   TestObj* imp = V8TestObj::toNative(args.Holder());
   EmptyScriptState state;
   imp->withScriptStateVoid(&state);
-  if (state->hadException())
-    return throwError(state->exception());
+  if (state.hadException())
+    return throwError(state.exception());
   return v8::Handle<v8::Value>();
 }
 
@@ -378,8 +378,8 @@ static v8::Handle<v8::Value> withScriptStateObjCallback(
   TestObj* imp = V8TestObj::toNative(args.Holder());
   EmptyScriptState state;
   RefPtr<TestObj> result = imp->withScriptStateObj(&state);
-  if (state->hadException())
-    return throwError(state->exception());
+  if (state.hadException())
+    return throwError(state.exception());
   return toV8(result.release());
 }
 
