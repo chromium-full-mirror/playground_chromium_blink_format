@@ -245,6 +245,16 @@ JSC::JSValue jsTestObjIntAttr(JSC::ExecState*,
                               JSC::JSValue,
                               const JSC::Identifier&);
 void setJSTestObjIntAttr(JSC::ExecState*, JSC::JSObject*, JSC::JSValue);
+JSC::JSValue jsTestObjLongLongAttr(JSC::ExecState*,
+                                   JSC::JSValue,
+                                   const JSC::Identifier&);
+void setJSTestObjLongLongAttr(JSC::ExecState*, JSC::JSObject*, JSC::JSValue);
+JSC::JSValue jsTestObjUnsignedLongLongAttr(JSC::ExecState*,
+                                           JSC::JSValue,
+                                           const JSC::Identifier&);
+void setJSTestObjUnsignedLongLongAttr(JSC::ExecState*,
+                                      JSC::JSObject*,
+                                      JSC::JSValue);
 JSC::JSValue jsTestObjStringAttr(JSC::ExecState*,
                                  JSC::JSValue,
                                  const JSC::Identifier&);

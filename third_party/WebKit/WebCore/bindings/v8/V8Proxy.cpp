@@ -476,7 +476,7 @@ v8::Local<v8::Value> V8Proxy::callFunction(v8::Handle<v8::Function> function,
 #if ENABLE(INSPECTOR)
     Page* inspectedPage =
         InspectorTimelineAgent::instanceCount() ? m_frame->page() : 0;
-    if (inspectedPage)
+    if (inspectedPage) {
       if (InspectorTimelineAgent* timelineAgent =
               inspectedPage->inspectorTimelineAgent()) {
         v8::ScriptOrigin origin = function->GetScriptOrigin();
@@ -489,6 +489,7 @@ v8::Local<v8::Value> V8Proxy::callFunction(v8::Handle<v8::Function> function,
         timelineAgent->willCallFunction(resourceName, lineNumber);
       } else
         inspectedPage = 0;
+    }
 #endif  // !ENABLE(INSPECTOR)
 
     m_recursion++;
