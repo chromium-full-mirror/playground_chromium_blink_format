@@ -510,9 +510,6 @@ void SQLTransaction::postflightAndCommit() {
     return;
   }
 
-  // The commit was successful, vacuum the database if needed
-  m_database->incrementalVacuumIfNeeded();
-
   // The commit was successful, notify the delegates if the transaction modified
   // this database
   if (m_modifiedDatabase)
