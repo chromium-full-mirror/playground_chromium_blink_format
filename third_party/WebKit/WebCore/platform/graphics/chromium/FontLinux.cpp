@@ -62,7 +62,7 @@ static bool isCanvasMultiLayered(SkCanvas* canvas) {
   return !layerIterator.done();
 }
 
-static bool adjustTextRenderMode(SkPaint* paint, bool isCanvasMultiLayered) {
+static void adjustTextRenderMode(SkPaint* paint, bool isCanvasMultiLayered) {
   // Our layers only have a single alpha channel. This means that subpixel
   // rendered text cannot be compositied correctly when the layer is
   // collapsed. Therefore, subpixel text is disabled when we are drawing
@@ -299,7 +299,7 @@ class TextRunWalker {
     // 2) Convert spacing characters into plain spaces, as some fonts will
     // provide glyphs
     // for characters like '\n' otherwise.
-    for (unsigned i = 0; i < originalRun.length(); ++i) {
+    for (int i = 0; i < originalRun.length(); ++i) {
       UChar ch = originalRun[i];
       UBlockCode block = ::ublock_getCode(ch);
       if (block == UBLOCK_COMBINING_DIACRITICAL_MARKS ||
@@ -324,7 +324,7 @@ class TextRunWalker {
                              normalizedString.length() + 1, error);
     ASSERT(U_SUCCESS(error));
 
-    for (unsigned i = 0; i < normalizedString.length(); ++i) {
+    for (int i = 0; i < normalizedString.length(); ++i) {
       if (Font::treatAsSpace(m_normalizedBuffer[i]))
         m_normalizedBuffer[i] = ' ';
     }
@@ -411,7 +411,7 @@ class TextRunWalker {
 
   void setGlyphXPositions(bool isRTL) {
     double position = 0;
-    for (int iter = 0; iter < m_item.num_glyphs; ++iter) {
+    for (int iter = 0; iter < static_cast<int>(m_item.num_glyphs); ++iter) {
       // Glyphs are stored in logical order, but for layout purposes we always
       // go left to right.
       int i = isRTL ? m_item.num_glyphs - iter - 1 : iter;
@@ -516,7 +516,8 @@ static int glyphIndexForXPositionInScriptRun(const TextRunWalker& walker,
       x -= truncateFixedPointToInteger(advances[glyphIndex]);
     }
   } else {
-    for (glyphIndex = 0; glyphIndex < walker.length(); ++glyphIndex) {
+    for (glyphIndex = 0; glyphIndex < static_cast<int>(walker.length());
+         ++glyphIndex) {
       if (x < truncateFixedPointToInteger(advances[glyphIndex]))
         break;
       x -= truncateFixedPointToInteger(advances[glyphIndex]);
@@ -568,7 +569,7 @@ int Font::offsetForPositionForComplexText(const TextRun& run,
     if (walker.rtl())
       basePosition -= walker.numCodePoints();
 
-    if (x < walker.width()) {
+    if (x < static_cast<int>(walker.width())) {
       // The x value in question is within this script run. We consider
       // each glyph in presentation order and stop when we find the one
       // covering this position.
@@ -630,7 +631,7 @@ FloatRect Font::selectionRectForComplexText(const TextRun& run,
     if (walker.rtl())
       base -= walker.width();
 
-    if (fromX == -1 && from < walker.numCodePoints()) {
+    if (fromX == -1 && from < static_cast<int>(walker.numCodePoints())) {
       // |from| is within this script run. So we index the clusters log to
       // find which glyph this code-point contributed to and find its x
       // position.
@@ -640,7 +641,7 @@ FloatRect Font::selectionRectForComplexText(const TextRun& run,
     } else
       from -= walker.numCodePoints();
 
-    if (toX == -1 && to < walker.numCodePoints()) {
+    if (toX == -1 && to < static_cast<int>(walker.numCodePoints())) {
       int glyph = walker.logClusters()[to];
       toX = base + walker.xPositions()[glyph];
       toAdvance = walker.advances()[glyph];
