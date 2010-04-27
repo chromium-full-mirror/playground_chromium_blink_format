@@ -63,13 +63,4 @@ JSValue JSHTMLFormElement::nameGetter(ExecState* exec,
   return toJS(exec, jsForm->globalObject(),
               StaticNodeList::adopt(namedItems).get());
 }
-
-JSValue JSHTMLFormElement::submit(ExecState* exec, const ArgList&) {
-  Frame* activeFrame =
-      asJSDOMWindow(exec->dynamicGlobalObject())->impl()->frame();
-  if (!activeFrame)
-    return jsUndefined();
-  static_cast<HTMLFormElement*>(impl())->submit(activeFrame);
-  return jsUndefined();
-}
 }
