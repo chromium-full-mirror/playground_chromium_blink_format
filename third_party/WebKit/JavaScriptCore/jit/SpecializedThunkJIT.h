@@ -89,9 +89,9 @@ class SpecializedThunkJIT : public JSInterfaceJIT {
   }
 
  private:
-  unsigned argumentToVirtualRegister(unsigned argument) {
-    return -(RegisterFile::CallFrameHeaderSize +
-             (m_expectedArgCount - argument));
+  int argumentToVirtualRegister(unsigned argument) {
+    return -static_cast<int>(RegisterFile::CallFrameHeaderSize +
+                             (m_expectedArgCount - argument));
   }
 
   void tagReturnAsInt32() {
