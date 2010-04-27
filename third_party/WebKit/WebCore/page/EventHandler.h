@@ -384,7 +384,7 @@ class EventHandler : public Noncopyable {
 
   bool capturesDragging() const { return m_capturesDragging; }
 
-#if PLATFORM(MAC) && defined(__OBJC__) && !ENABLE(EXPERIMENTAL_SINGLE_VIEW_MODE)
+#if PLATFORM(MAC) && defined(__OBJC__)
   NSView* mouseDownViewIfStillGood();
 
   PlatformMouseEvent currentPlatformMouseEvent() const;
@@ -462,10 +462,8 @@ class EventHandler : public Noncopyable {
   RefPtr<Node> m_previousWheelScrolledNode;
 
 #if PLATFORM(MAC)
-#if !ENABLE(EXPERIMENTAL_SINGLE_VIEW_MODE)
   NSView* m_mouseDownView;
   bool m_sendingEventToSubview;
-#endif
   int m_activationEventNumber;
 #endif
 #if ENABLE(TOUCH_EVENTS)
