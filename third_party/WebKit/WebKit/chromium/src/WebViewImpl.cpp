@@ -179,7 +179,9 @@ void WebView::willEnterModalLoop() {
 
   PageGroup* pageGroup = PageGroup::pageGroup(pageGroupName);
   ASSERT(pageGroup);
-  ASSERT(!pageGroup->pages().isEmpty());
+
+  if (pageGroup->pages().isEmpty())
+    return;
 
   // Pick any page in the page group since we are deferring all pages.
   pageGroupLoadDeferrer =
@@ -187,9 +189,6 @@ void WebView::willEnterModalLoop() {
 }
 
 void WebView::didExitModalLoop() {
-  // The embedder must have called willEnterNestedEventLoop.
-  ASSERT(pageGroupLoadDeferrer);
-
   delete pageGroupLoadDeferrer;
   pageGroupLoadDeferrer = 0;
 }
