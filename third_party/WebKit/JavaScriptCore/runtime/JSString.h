@@ -82,6 +82,8 @@ class JS_EXPORTCLASS JSString : public JSCell {
  public:
   friend class JIT;
   friend class JSGlobalData;
+  friend class SpecializedThunkJIT;
+  friend struct ThunkHelpers;
 
   class RopeBuilder {
    public:

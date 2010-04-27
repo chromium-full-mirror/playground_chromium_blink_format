@@ -168,6 +168,9 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
   Interpreter* interpreter;
 #if ENABLE(JIT)
   JITThunks jitStubs;
+  NativeExecutable* getThunk(ThunkGenerator generator) {
+    return jitStubs.specializedThunk(this, generator);
+  }
 #endif
   TimeoutChecker timeoutChecker;
   Terminator terminator;

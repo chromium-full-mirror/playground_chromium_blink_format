@@ -166,6 +166,7 @@ class JSImmediate {
   friend class JSValue;
   friend class JSFastMath;
   friend class JSInterfaceJIT;
+  friend class SpecializedThunkJIT;
   friend JSValue jsNumber(ExecState* exec, double d);
   friend JSValue jsNumber(ExecState*, char i);
   friend JSValue jsNumber(ExecState*, unsigned char i);
@@ -195,7 +196,7 @@ class JSImmediate {
   // begin
   // with a 16-bit pattern within the range 0x0001..0xFFFE.
   static const intptr_t DoubleEncodeOffset = 0x1000000000000ll;
-#else
+#elif USE(JSVALUE32)
   static const intptr_t TagTypeNumber = 0x1;  // bottom bit set indicates
                                               // integer, this dominates the
                                               // following bit

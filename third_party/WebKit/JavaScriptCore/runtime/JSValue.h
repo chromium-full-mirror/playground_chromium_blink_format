@@ -68,6 +68,7 @@ class JSValue {
   friend class JITStubs;
   friend class JITStubCall;
   friend class JSInterfaceJIT;
+  friend class SpecializedThunkJIT;
 
  public:
   static EncodedJSValue encode(JSValue value);
@@ -226,6 +227,10 @@ class JSValue {
   JSObject* toObjectSlowCase(ExecState*) const;
   JSObject* toThisObjectSlowCase(ExecState*) const;
 
+  JSObject* synthesizePrototype(ExecState*) const;
+  JSObject* synthesizeObject(ExecState*) const;
+
+#if USE(JSVALUE32_64)
   enum { Int32Tag = 0xffffffff };
   enum { CellTag = 0xfffffffe };
   enum { TrueTag = 0xfffffffd };
@@ -240,10 +245,6 @@ class JSValue {
   uint32_t tag() const;
   int32_t payload() const;
 
-  JSObject* synthesizePrototype(ExecState*) const;
-  JSObject* synthesizeObject(ExecState*) const;
-
-#if USE(JSVALUE32_64)
   union {
     EncodedJSValue asEncodedJSValue;
     double asDouble;

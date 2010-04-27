@@ -31,6 +31,8 @@
 
 #include "MacroAssemblerCodeRef.h"
 #include "Register.h"
+#include "ThunkGenerators.h"
+#include <wtf/HashMap.h>
 
 #if ENABLE(JIT)
 
@@ -43,16 +45,16 @@ class ExecutablePool;
 class FunctionExecutable;
 class Identifier;
 class JSGlobalData;
-class JSGlobalData;
+class JSGlobalObject;
 class JSObject;
 class JSPropertyNameIterator;
 class JSValue;
 class JSValueEncodedAsPointer;
+class NativeExecutable;
 class Profiler;
 class PropertySlot;
 class PutPropertySlot;
 class RegisterFile;
-class JSGlobalObject;
 class RegExp;
 
 union JITStubArg {
@@ -293,6 +295,7 @@ extern "C" EncodedJSValue ctiTrampoline(void* code,
 class JITThunks {
  public:
   JITThunks(JSGlobalData*);
+  ~JITThunks();
 
   static void tryCacheGetByID(CallFrame*,
                               CodeBlock*,
@@ -324,7 +327,12 @@ class JITThunks {
     return m_trampolineStructure.ctiSoftModulo;
   }
 
+  NativeExecutable* specializedThunk(JSGlobalData* globalData,
+                                     ThunkGenerator generator);
+
  private:
+  typedef HashMap<ThunkGenerator, RefPtr<NativeExecutable>> ThunkMap;
+  ThunkMap m_thunkMap;
   RefPtr<ExecutablePool> m_executablePool;
 
   TrampolineStructure m_trampolineStructure;

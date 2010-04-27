@@ -33,6 +33,7 @@ class FunctionExecutable;
 class FunctionPrototype;
 class JSActivation;
 class JSGlobalObject;
+class NativeExecutable;
 
 class JSFunction : public InternalFunction {
   friend class JIT;
@@ -45,6 +46,12 @@ class JSFunction : public InternalFunction {
              NonNullPassRefPtr<Structure>,
              int length,
              const Identifier&,
+             NativeFunction);
+  JSFunction(ExecState*,
+             NonNullPassRefPtr<Structure>,
+             int length,
+             const Identifier&,
+             NativeExecutable*,
              NativeFunction);
   JSFunction(ExecState*,
              NonNullPassRefPtr<FunctionExecutable>,
