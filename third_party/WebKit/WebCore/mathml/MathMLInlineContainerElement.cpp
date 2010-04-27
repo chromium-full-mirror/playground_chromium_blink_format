@@ -33,7 +33,9 @@
 #include "RenderMathMLBlock.h"
 #include "RenderMathMLFraction.h"
 #include "RenderMathMLMath.h"
+#include "RenderMathMLRoot.h"
 #include "RenderMathMLRow.h"
+#include "RenderMathMLSquareRoot.h"
 #include "RenderMathMLSubSup.h"
 #include "RenderMathMLUnderOver.h"
 
@@ -73,6 +75,10 @@ RenderObject* MathMLInlineContainerElement::createRenderer(RenderArena* arena,
     object = new (arena) RenderMathMLUnderOver(this);
   else if (hasLocalName(MathMLNames::mfracTag))
     object = new (arena) RenderMathMLFraction(this);
+  else if (hasLocalName(MathMLNames::msqrtTag))
+    object = new (arena) RenderMathMLSquareRoot(this);
+  else if (hasLocalName(MathMLNames::mrootTag))
+    object = new (arena) RenderMathMLRoot(this);
   else
     object = new (arena) RenderMathMLBlock(this);
   object->setStyle(style);
