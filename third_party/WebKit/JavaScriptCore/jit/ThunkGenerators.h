@@ -38,6 +38,10 @@ typedef PassRefPtr<NativeExecutable> (*ThunkGenerator)(JSGlobalData*,
                                                        ExecutablePool*);
 PassRefPtr<NativeExecutable> charCodeAtThunkGenerator(JSGlobalData*,
                                                       ExecutablePool*);
+PassRefPtr<NativeExecutable> charAtThunkGenerator(JSGlobalData*,
+                                                  ExecutablePool*);
+PassRefPtr<NativeExecutable> fromCharCodeThunkGenerator(JSGlobalData*,
+                                                        ExecutablePool*);
 }
 #endif
 

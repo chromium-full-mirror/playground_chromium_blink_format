@@ -80,6 +80,16 @@ class SpecializedThunkJIT : public JSInterfaceJIT {
     ret();
   }
 
+  void returnJSCell(RegisterID src) {
+    if (src != regT0)
+      move(src, regT0);
+    tagReturnAsJSCell();
+    loadPtr(Address(callFrameRegister,
+                    RegisterFile::CallerFrame * (int)sizeof(Register)),
+            callFrameRegister);
+    ret();
+  }
+
   PassRefPtr<NativeExecutable> finalize() {
     LinkBuffer patchBuffer(this, m_pool.get());
     patchBuffer.link(
@@ -104,6 +114,12 @@ class SpecializedThunkJIT : public JSInterfaceJIT {
     // If we can't tag the result, give up and jump to the slow case
     m_failures.append(branchAddPtr(Overflow, regT0, regT0));
     addPtr(Imm32(JSImmediate::TagTypeNumber), regT0);
+#endif
+  }
+
+  void tagReturnAsJSCell() {
+#if USE(JSVALUE32_64)
+    move(Imm32(JSValue::CellTag), regT1);
 #endif
   }
 

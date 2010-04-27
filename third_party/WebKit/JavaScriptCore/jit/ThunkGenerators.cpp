@@ -42,10 +42,7 @@ struct ThunkHelpers {
   }
 };
 
-PassRefPtr<NativeExecutable> charCodeAtThunkGenerator(JSGlobalData* globalData,
-                                                      ExecutablePool* pool) {
-  SpecializedThunkJIT jit(1, globalData, pool);
-
+static void stringCharLoad(SpecializedThunkJIT& jit) {
   // load string
   jit.loadJSStringArgument(SpecializedThunkJIT::ThisArgument,
                            SpecializedThunkJIT::regT0);
@@ -78,7 +75,51 @@ PassRefPtr<NativeExecutable> charCodeAtThunkGenerator(JSGlobalData* globalData,
                                        SpecializedThunkJIT::regT1,
                                        MacroAssembler::TimesTwo, 0),
              SpecializedThunkJIT::regT0);
+}
+
+static void charToString(SpecializedThunkJIT& jit,
+                         JSGlobalData* globalData,
+                         MacroAssembler::RegisterID src,
+                         MacroAssembler::RegisterID dst,
+                         MacroAssembler::RegisterID scratch) {
+  jit.appendFailure(jit.branch32(MacroAssembler::AboveOrEqual, src,
+                                 MacroAssembler::Imm32(0x100)));
+  jit.move(
+      MacroAssembler::ImmPtr(globalData->smallStrings.singleCharacterStrings()),
+      scratch);
+  jit.loadPtr(
+      MacroAssembler::BaseIndex(scratch, src, MacroAssembler::ScalePtr, 0),
+      dst);
+  jit.appendFailure(jit.branchTestPtr(MacroAssembler::Zero, dst));
+}
+
+PassRefPtr<NativeExecutable> charCodeAtThunkGenerator(JSGlobalData* globalData,
+                                                      ExecutablePool* pool) {
+  SpecializedThunkJIT jit(1, globalData, pool);
+  stringCharLoad(jit);
   jit.returnInt32(SpecializedThunkJIT::regT0);
+  return jit.finalize();
+}
+
+PassRefPtr<NativeExecutable> charAtThunkGenerator(JSGlobalData* globalData,
+                                                  ExecutablePool* pool) {
+  SpecializedThunkJIT jit(1, globalData, pool);
+  stringCharLoad(jit);
+  charToString(jit, globalData, SpecializedThunkJIT::regT0,
+               SpecializedThunkJIT::regT0, SpecializedThunkJIT::regT1);
+  jit.returnJSCell(SpecializedThunkJIT::regT0);
+  return jit.finalize();
+}
+
+PassRefPtr<NativeExecutable> fromCharCodeThunkGenerator(
+    JSGlobalData* globalData,
+    ExecutablePool* pool) {
+  SpecializedThunkJIT jit(1, globalData, pool);
+  // load char code
+  jit.loadInt32Argument(0, SpecializedThunkJIT::regT0);
+  charToString(jit, globalData, SpecializedThunkJIT::regT0,
+               SpecializedThunkJIT::regT0, SpecializedThunkJIT::regT1);
+  jit.returnJSCell(SpecializedThunkJIT::regT0);
   return jit.finalize();
 }
 }
