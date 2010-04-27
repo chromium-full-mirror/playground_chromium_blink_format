@@ -69,6 +69,8 @@ class ChromiumDataObject : public RefCounted<ChromiumDataObject> {
   void setURL(const KURL& newURL) {
     url = newURL;
     uriList.clear();
+    if (newURL.isEmpty())
+      return;
     uriList.append(newURL.string());
   }
 
