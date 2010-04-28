@@ -455,6 +455,12 @@ void RenderTextControl::forwardEvent(Event* event) {
   m_innerText->defaultEventHandler(event);
 }
 
+IntRect RenderTextControl::controlClipRect(int tx, int ty) const {
+  IntRect clipRect = contentBoxRect();
+  clipRect.move(tx, ty);
+  return clipRect;
+}
+
 static const char* fontFamiliesWithInvalidCharWidth[] = {
     "American Typewriter",
     "Arial Hebrew",
