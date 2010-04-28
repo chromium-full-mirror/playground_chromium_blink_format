@@ -805,14 +805,17 @@ void WebViewHost::didFinishLoad(WebFrame* frame) {
   locationChangeDone(frame);
 }
 
-void WebViewHost::didChangeLocationWithinPage(WebFrame* frame,
-                                              bool isNewNavigation) {
+void WebViewHost::didNavigateWithinPage(WebFrame* frame, bool isNewNavigation) {
   frame->dataSource()->setExtraData(m_pendingExtraData.release());
+
+  updateForCommittedLoad(frame, isNewNavigation);
+}
+
+void WebViewHost::didChangeLocationWithinPage(WebFrame* frame) {
   if (m_shell->shouldDumpFrameLoadCallbacks()) {
     printFrameDescription(frame);
     fputs(" - didChangeLocationWithinPageForFrame\n", stdout);
   }
-  updateForCommittedLoad(frame, isNewNavigation);
 }
 
 void WebViewHost::assignIdentifierToRequest(WebFrame*,
