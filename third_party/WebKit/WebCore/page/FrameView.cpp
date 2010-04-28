@@ -1425,8 +1425,8 @@ void FrameView::scrollToAnchor() {
     m_frame->document()->axObjectCache()->handleScrolledToAnchor(
         anchorNode.get());
 
-  // scrollRectToVisible can call into scrollRectIntoViewRecursively(), which
-  // resets m_maintainScrollPositionAnchor.
+  // scrollRectToVisible can call into setScrollPosition(), which resets
+  // m_maintainScrollPositionAnchor.
   m_maintainScrollPositionAnchor = anchorNode;
 }
 
