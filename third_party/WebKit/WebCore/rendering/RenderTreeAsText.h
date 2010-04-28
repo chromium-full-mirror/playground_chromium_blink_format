@@ -41,10 +41,13 @@ enum RenderAsTextBehaviorFlags {
   RenderAsTextShowLayerNesting = 1 << 1,  // Annotate the layer lists.
   RenderAsTextShowCompositedLayers = 1
                                      << 2,  // Show which layers are composited.
-  RenderAsTextShowAddresses = 1 << 3  // Show layer and renderer addresses.
+  RenderAsTextShowAddresses = 1 << 3,  // Show layer and renderer addresses.
+  RenderAsTextPrintingMode = 1 << 4    // Dump the tree in printing mode.
 };
 typedef unsigned RenderAsTextBehavior;
 
+// You don't need pageWidthInPixels if you don't specify
+// RenderAsTextInPrintingMode.
 String externalRepresentation(
     Frame*,
     RenderAsTextBehavior = RenderAsTextBehaviorNormal);

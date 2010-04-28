@@ -34,7 +34,8 @@ PrintContext::PrintContext(Frame* frame)
     : m_frame(frame), m_isPrinting(false) {}
 
 PrintContext::~PrintContext() {
-  ASSERT(!m_isPrinting);
+  if (m_isPrinting)
+    end();
   m_pageRects.clear();
 }
 

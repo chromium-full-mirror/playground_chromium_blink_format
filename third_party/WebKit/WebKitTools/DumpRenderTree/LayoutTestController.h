@@ -295,6 +295,9 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
     m_handlesAuthenticationChallenges = handlesAuthenticationChallenges;
   }
 
+  bool isPrinting() const { return m_isPrinting; }
+  void setIsPrinting(bool isPrinting) { m_isPrinting = isPrinting; }
+
   const std::string& authenticationUsername() const {
     return m_authenticationUsername;
   }
@@ -416,6 +419,7 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
   bool m_isGeolocationPermissionSet;
   bool m_geolocationPermission;
   bool m_handlesAuthenticationChallenges;
+  bool m_isPrinting;
 
   std::string m_authenticationUsername;
   std::string m_authenticationPassword;
