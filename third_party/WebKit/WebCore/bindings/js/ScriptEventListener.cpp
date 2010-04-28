@@ -113,9 +113,9 @@ PassRefPtr<JSLazyEventListener> createAttributeEventListener(Frame* frame,
       sourceURL, lineNumber, wrapper, mainThreadNormalWorld());
 }
 
-String getEventListenerHandlerBody(ScriptExecutionContext* context,
-                                   ScriptState* scriptState,
-                                   EventListener* eventListener) {
+String eventListenerHandlerBody(ScriptExecutionContext* context,
+                                ScriptState* scriptState,
+                                EventListener* eventListener) {
   const JSEventListener* jsListener = JSEventListener::cast(eventListener);
   if (!jsListener)
     return "";
@@ -123,6 +123,14 @@ String getEventListenerHandlerBody(ScriptExecutionContext* context,
   if (!jsFunction)
     return "";
   return ustringToString(jsFunction->toString(scriptState));
+}
+
+bool eventListenerHandlerLocation(ScriptExecutionContext*,
+                                  ScriptState*,
+                                  EventListener*,
+                                  String&,
+                                  int&) {
+  return false;
 }
 
 }  // namespace WebCore

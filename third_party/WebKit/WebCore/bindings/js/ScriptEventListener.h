@@ -46,10 +46,14 @@ class Node;
 PassRefPtr<JSLazyEventListener> createAttributeEventListener(Node*, Attribute*);
 PassRefPtr<JSLazyEventListener> createAttributeEventListener(Frame*,
                                                              Attribute*);
-String getEventListenerHandlerBody(ScriptExecutionContext*,
-                                   ScriptState*,
-                                   EventListener*);
-
+String eventListenerHandlerBody(ScriptExecutionContext*,
+                                ScriptState*,
+                                EventListener*);
+bool eventListenerHandlerLocation(ScriptExecutionContext*,
+                                  ScriptState*,
+                                  EventListener*,
+                                  String& sourceName,
+                                  int& lineNumber);
 }  // namespace WebCore
 
 #endif  // ScriptEventListener_h

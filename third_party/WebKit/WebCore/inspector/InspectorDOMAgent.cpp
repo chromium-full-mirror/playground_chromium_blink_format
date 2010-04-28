@@ -640,9 +640,17 @@ ScriptObject InspectorDOMAgent::buildObjectForEventListener(
   value.set("useCapture", registeredEventListener.useCapture);
   value.set("isAttribute", eventListener->isAttribute());
   value.set("nodeId", pushNodePathToFrontend(node));
-  value.set("listener", getEventListenerHandlerBody(node->document(),
-                                                    m_frontend->scriptState(),
-                                                    eventListener.get()));
+  value.set("listenerBody", eventListenerHandlerBody(node->document(),
+                                                     m_frontend->scriptState(),
+                                                     eventListener.get()));
+  String sourceName;
+  int lineNumber;
+  if (eventListenerHandlerLocation(node->document(), m_frontend->scriptState(),
+                                   eventListener.get(), sourceName,
+                                   lineNumber)) {
+    value.set("sourceName", sourceName);
+    value.set("lineNumber", lineNumber);
+  }
   return value;
 }
 

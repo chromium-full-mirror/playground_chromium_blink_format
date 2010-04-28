@@ -46,9 +46,14 @@ class ScriptState;
 PassRefPtr<V8LazyEventListener> createAttributeEventListener(Node*, Attribute*);
 PassRefPtr<V8LazyEventListener> createAttributeEventListener(Frame*,
                                                              Attribute*);
-String getEventListenerHandlerBody(ScriptExecutionContext*,
-                                   ScriptState*,
-                                   EventListener*);
+String eventListenerHandlerBody(ScriptExecutionContext*,
+                                ScriptState*,
+                                EventListener*);
+bool eventListenerHandlerLocation(ScriptExecutionContext*,
+                                  ScriptState*,
+                                  EventListener*,
+                                  String& sourceName,
+                                  int& lineNumber);
 
 }  // namespace WebCore
 
