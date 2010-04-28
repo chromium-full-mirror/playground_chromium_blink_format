@@ -269,6 +269,12 @@ void WKCACFLayerRenderer::setRootContents(CGImageRef image) {
   renderSoon();
 }
 
+void WKCACFLayerRenderer::setRootContentsAndDisplay(CGImageRef image) {
+  ASSERT(m_rootLayer);
+  m_rootLayer->setContents(image);
+  paint();
+}
+
 void WKCACFLayerRenderer::setRootChildLayer(WKCACFLayer* layer) {
   if (!m_scrollLayer)
     return;
