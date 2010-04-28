@@ -159,6 +159,10 @@ WebNodeList WebNode::getElementsByTagName(const WebString& tag) const {
   return WebNodeList(m_private->getElementsByTagName(tag));
 }
 
+bool WebNode::hasNonEmptyBoundingBox() const {
+  return m_private->hasNonEmptyBoundingBox();
+}
+
 WebNode::WebNode(const PassRefPtr<Node>& node) : m_private(node) {}
 
 WebNode& WebNode::operator=(const PassRefPtr<Node>& node) {
