@@ -299,6 +299,7 @@ class CSSParser {
     Orientation,
   };
 
+  bool parsePage(int propId, bool important);
   bool parseSize(int propId, bool important);
   SizeParameterType parseSizeParameter(CSSValueList* parsedValues,
                                        CSSParserValue* value,
