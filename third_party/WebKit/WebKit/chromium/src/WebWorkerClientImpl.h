@@ -108,6 +108,10 @@ class WebWorkerClientImpl : public WebCore::WorkerContextProxy,
     // FIXME: Notifications not yet supported in workers.
     return 0;
   }
+  virtual WebApplicationCacheHost* createApplicationCacheHost(
+      WebApplicationCacheHostClient*) {
+    return 0;
+  }
 
  private:
   virtual ~WebWorkerClientImpl();

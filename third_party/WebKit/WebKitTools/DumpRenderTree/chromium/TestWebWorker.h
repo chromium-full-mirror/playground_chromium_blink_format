@@ -94,6 +94,10 @@ class TestWebWorker : public WebKit::WebWorker,
   virtual WebKit::WebNotificationPresenter* notificationPresenter() {
     return 0;
   }
+  virtual WebKit::WebApplicationCacheHost* createApplicationCacheHost(
+      WebKit::WebApplicationCacheHostClient*) {
+    return 0;
+  }
 
  private:
   ~TestWebWorker() {}

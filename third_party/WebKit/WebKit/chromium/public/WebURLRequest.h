@@ -71,7 +71,9 @@ class WebURLRequest {
     TargetIsFontResource = 5,
     TargetIsImage = 6,
     TargetIsObject = 7,
-    TargetIsMedia = 8
+    TargetIsMedia = 8,
+    TargetIsWorker = 9,
+    TargetIsSharedWorker = 10
   };
 
   ~WebURLRequest() { reset(); }
