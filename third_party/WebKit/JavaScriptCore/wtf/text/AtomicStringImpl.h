@@ -29,7 +29,10 @@
 // the namespaces.
 namespace WebCore {
 
-class AtomicStringImpl : public StringImpl {};
+class AtomicStringImpl : public StringImpl {
+ public:
+  AtomicStringImpl() : StringImpl(0) {}
+};
 }
 
 #endif
