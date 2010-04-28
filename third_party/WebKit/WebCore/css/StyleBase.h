@@ -54,6 +54,7 @@ class StyleBase : public RefCounted<StyleBase> {
   virtual bool isKeyframesRule() { return false; }
   virtual bool isMediaRule() { return false; }
   virtual bool isVariablesRule() { return false; }
+  virtual bool isPageRule() { return false; }
 
   virtual bool isRule() { return false; }
   virtual bool isStyleRule() { return false; }

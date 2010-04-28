@@ -36,6 +36,7 @@
 namespace WebCore {
 
 class CSSMutableStyleDeclaration;
+class CSSPageRule;
 class CSSPrimitiveValue;
 class CSSProperty;
 class CSSFontFace;
@@ -189,6 +190,7 @@ class CSSStyleSelector : public Noncopyable {
                                       HashSet<String>& usedBlockVariables);
 
   void addKeyframeStyle(PassRefPtr<WebKitCSSKeyframesRule> rule);
+  void addPageStyle(PassRefPtr<CSSPageRule>);
 
   static bool createTransformOperations(CSSValue* inValue,
                                         RenderStyle* inStyle,

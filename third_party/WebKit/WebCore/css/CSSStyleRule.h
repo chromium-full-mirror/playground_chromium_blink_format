@@ -40,7 +40,7 @@ class CSSStyleRule : public CSSRule {
   }
   virtual ~CSSStyleRule();
 
-  String selectorText() const;
+  virtual String selectorText() const;
   void setSelectorText(const String&, ExceptionCode&);
 
   CSSMutableStyleDeclaration* style() const { return m_style.get(); }
@@ -62,9 +62,10 @@ class CSSStyleRule : public CSSRule {
 
   int sourceLine() { return m_sourceLine; }
 
- private:
+ protected:
   CSSStyleRule(CSSStyleSheet* parent, int sourceLine);
 
+ private:
   virtual bool isStyleRule() { return true; }
 
   // Inherited from CSSRule

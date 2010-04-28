@@ -32,6 +32,7 @@
 #include "CSSFontFaceRule.h"
 #include "CSSImportRule.h"
 #include "CSSMediaRule.h"
+#include "CSSPageRule.h"
 #include "CSSParser.h"
 #include "CSSPrimitiveValueMappings.h"
 #include "CSSPropertyNames.h"
@@ -372,6 +373,7 @@ class CSSRuleSet : public Noncopyable {
                          CSSStyleSelector* = 0);
 
   void addRule(CSSStyleRule* rule, CSSSelector* sel);
+  void addPageRule(CSSStyleRule* rule, CSSSelector* sel);
   void addToRuleSet(AtomicStringImpl* key,
                     AtomRuleMap& map,
                     CSSStyleRule* rule,
@@ -387,13 +389,16 @@ class CSSRuleSet : public Noncopyable {
     return m_tagRules.get(key);
   }
   CSSRuleDataList* getUniversalRules() { return m_universalRules; }
+  CSSRuleDataList* getPageRules() { return m_pageRules; }
 
  public:
   AtomRuleMap m_idRules;
   AtomRuleMap m_classRules;
   AtomRuleMap m_tagRules;
   CSSRuleDataList* m_universalRules;
+  CSSRuleDataList* m_pageRules;
   unsigned m_ruleCount;
+  unsigned m_pageRuleCount;
 };
 
 static CSSRuleSet* defaultStyle;
@@ -2963,7 +2968,9 @@ CSSValue* CSSStyleSelector::resolveVariableDependentValue(
 
 CSSRuleSet::CSSRuleSet() {
   m_universalRules = 0;
+  m_pageRules = 0;
   m_ruleCount = 0;
+  m_pageRuleCount = 0;
 }
 
 CSSRuleSet::~CSSRuleSet() {
@@ -2972,6 +2979,7 @@ CSSRuleSet::~CSSRuleSet() {
   deleteAllValues(m_tagRules);
 
   delete m_universalRules;
+  delete m_pageRules;
 }
 
 void CSSRuleSet::addToRuleSet(AtomicStringImpl* key,
@@ -3011,6 +3019,13 @@ void CSSRuleSet::addRule(CSSStyleRule* rule, CSSSelector* sel) {
     m_universalRules->append(m_ruleCount++, rule, sel);
 }
 
+void CSSRuleSet::addPageRule(CSSStyleRule* rule, CSSSelector* sel) {
+  if (!m_pageRules)
+    m_pageRules = new CSSRuleDataList(m_pageRuleCount++, rule, sel);
+  else
+    m_pageRules->append(m_pageRuleCount++, rule, sel);
+}
+
 void CSSRuleSet::addRulesFromSheet(CSSStyleSheet* sheet,
                                    const MediaQueryEvaluator& medium,
                                    CSSStyleSelector* styleSelector) {
@@ -3027,10 +3042,15 @@ void CSSRuleSet::addRulesFromSheet(CSSStyleSheet* sheet,
   for (int i = 0; i < len; i++) {
     StyleBase* item = sheet->item(i);
     if (item->isStyleRule()) {
-      CSSStyleRule* rule = static_cast<CSSStyleRule*>(item);
-      for (CSSSelector* s = rule->selectorList().first(); s;
-           s = CSSSelectorList::next(s))
-        addRule(rule, s);
+      if (item->isPageRule()) {
+        CSSPageRule* pageRule = static_cast<CSSPageRule*>(item);
+        addPageRule(pageRule, pageRule->selectorList().first());
+      } else {
+        CSSStyleRule* rule = static_cast<CSSStyleRule*>(item);
+        for (CSSSelector* s = rule->selectorList().first(); s;
+             s = CSSSelectorList::next(s))
+          addRule(rule, s);
+      }
     } else if (item->isImportRule()) {
       CSSImportRule* import = static_cast<CSSImportRule*>(item);
       if (!import->media() || medium.eval(import->media(), styleSelector))
