@@ -212,6 +212,10 @@ class CSSParser {
   CSSRule* createStyleRule(Vector<CSSSelector*>* selectors);
   CSSRule* createFontFaceRule();
   CSSRule* createVariablesRule(MediaList*, bool variablesKeyword);
+  CSSRule* createPageRule(CSSSelector* pageSelector);
+  CSSRule* createMarginAtRule(CSSSelector::MarginBoxType marginBox);
+  void startDeclarationsForMarginBox();
+  void endDeclarationsForMarginBox();
 
   MediaQueryExp* createFloatingMediaQueryExp(const AtomicString&,
                                              CSSParserValueList*);
@@ -251,6 +255,7 @@ class CSSParser {
   CSSSelectorList* m_selectorListForParseSelector;
   unsigned m_numParsedProperties;
   unsigned m_maxParsedProperties;
+  unsigned m_numParsedPropertiesBeforeMarginBox;
 
   int m_inParseShorthand;
   int m_currentShorthand;
