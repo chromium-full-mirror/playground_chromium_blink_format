@@ -22,6 +22,7 @@
 #include <qwebpage.h>
 #include <qwebview.h>
 #include <qwebframe.h>
+#include <qwebelement.h>
 #include <qwebhistoryinterface.h>
 #include <QDebug>
 
@@ -76,13 +77,12 @@ class FakeHistoryImplementation : public QWebHistoryInterface {
 void tst_QWebHistoryInterface::visitedLinks() {
   QWebHistoryInterface::setDefaultInterface(new FakeHistoryImplementation);
   m_view->setHtml(
-      "<html><body><a "
-      "href='http://www.trolltech.com'>Trolltech</a></body></html>");
-  QCOMPARE(
-      m_page->mainFrame()
-          ->evaluateJavaScript("document.querySelectorAll(':visited').length;")
-          .toString(),
-      QString::fromLatin1("1"));
+      "<html><style>:link{color:green}:visited{color:red}</style><body><a "
+      "href='http://www.trolltech.com' id='vlink'>Trolltech</a></body></html>");
+  QWebElement anchor =
+      m_view->page()->mainFrame()->findFirstElement("a[id=vlink]");
+  QString linkColor = anchor.styleProperty("color", QWebElement::ComputedStyle);
+  QCOMPARE(linkColor, QString::fromLatin1("rgb(255, 0, 0)"));
 }
 
 QTEST_MAIN(tst_QWebHistoryInterface)

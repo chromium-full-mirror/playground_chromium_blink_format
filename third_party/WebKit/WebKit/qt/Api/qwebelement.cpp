@@ -792,7 +792,7 @@ QString QWebElement::styleProperty(const QString& name,
 
     int propID = cssPropertyID(name);
 
-    RefPtr<CSSComputedStyleDeclaration> style = computedStyle(m_element);
+    RefPtr<CSSComputedStyleDeclaration> style = computedStyle(m_element, true);
     if (!propID || !style)
       return QString();
 
