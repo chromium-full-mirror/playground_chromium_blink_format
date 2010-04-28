@@ -133,7 +133,7 @@ class WebThemeEngine {
                      Part,
                      State,
                      const WebRect&,
-                     const ExtraParams*) {}
+                     const ExtraParams&) {}
 };
 
 }  // namespace WebKit
