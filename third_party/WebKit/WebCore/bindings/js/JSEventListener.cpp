@@ -61,7 +61,8 @@ void JSEventListener::handleEvent(
     ScriptExecutionContext* scriptExecutionContext,
     Event* event) {
   ASSERT(scriptExecutionContext);
-  if (!scriptExecutionContext)
+  if (!scriptExecutionContext ||
+      scriptExecutionContext->isJSExecutionTerminated())
     return;
 
   JSLock lock(SilenceAssertionsOnly);

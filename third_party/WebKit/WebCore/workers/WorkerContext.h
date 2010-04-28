@@ -127,6 +127,7 @@ class WorkerContext : public RefCounted<WorkerContext>,
   virtual void databaseExceededQuota(const String&) {}
 #endif
   virtual bool isContextThread() const;
+  virtual bool isJSExecutionTerminated() const;
 
   // These methods are used for GC marking. See
   // JSWorkerContext::markChildren(MarkStack&) in
