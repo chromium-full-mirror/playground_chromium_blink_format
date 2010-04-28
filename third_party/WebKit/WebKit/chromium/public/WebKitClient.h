@@ -290,7 +290,8 @@ class WebKitClient {
   virtual void stopSharedTimer() {}
 
   // Callable from a background WebKit thread.
-  virtual void callOnMainThread(void (*func)()) {}
+  virtual void callOnMainThread(void (*func)()) {}  // DEPRECATED
+  virtual void callOnMainThread(void (*func)(void*), void* context) {}
 
   // WebGL --------------------------------------------------------------
 

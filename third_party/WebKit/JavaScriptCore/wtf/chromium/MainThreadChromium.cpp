@@ -31,16 +31,37 @@
 #include "config.h"
 #include "MainThread.h"
 
+#include "Assertions.h"
 #include "ChromiumThreading.h"
+#include "Threading.h"
 
 namespace WTF {
 
-void initializeMainThreadPlatform() {
-  ChromiumThreading::initializeMainThread();
+static ThreadIdentifier mainThreadIdentifier;
+
+void initializeMainThread() {
+  static bool initializedMainThread;
+  if (initializedMainThread)
+    return;
+  initializedMainThread = true;
+
+  mainThreadIdentifier = currentThread();
 }
 
-void scheduleDispatchFunctionsOnMainThread() {
-  ChromiumThreading::scheduleDispatchFunctionsOnMainThread();
+void callOnMainThread(MainThreadFunction* function, void* context) {
+  ChromiumThreading::callOnMainThread(function, context);
+}
+
+void callOnMainThreadAndWait(MainThreadFunction*, void*) {
+  ASSERT_NOT_REACHED();
+}
+
+void setMainThreadCallbacksPaused(bool) {
+  ASSERT_NOT_REACHED();
+}
+
+bool isMainThread() {
+  return currentThread() == mainThreadIdentifier;
 }
 
 }  // namespace WTF
