@@ -164,6 +164,7 @@ class WebViewImpl : public WebView, public RefCounted<WebViewImpl> {
       const WebNode&,
       const WebVector<WebString>& suggestions,
       int defaultSuggestionIndex);
+  virtual void hidePopups();
   virtual void hideAutofillPopup();
   virtual void hideSuggestionsPopup();
   virtual void setScrollbarColors(unsigned inactiveColor,
