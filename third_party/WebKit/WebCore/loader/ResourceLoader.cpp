@@ -485,6 +485,15 @@ void ResourceLoader::didCancelAuthenticationChallenge(
   frameLoader()->notifier()->didCancelAuthenticationChallenge(this, challenge);
 }
 
+#if USE(PROTECTION_SPACE_AUTH_CALLBACK)
+bool ResourceLoader::canAuthenticateAgainstProtectionSpace(
+    const ProtectionSpace& protectionSpace) {
+  RefPtr<ResourceLoader> protector(this);
+  return frameLoader()->canAuthenticateAgainstProtectionSpace(this,
+                                                              protectionSpace);
+}
+#endif
+
 void ResourceLoader::receivedCancellation(const AuthenticationChallenge&) {
   cancel();
 }

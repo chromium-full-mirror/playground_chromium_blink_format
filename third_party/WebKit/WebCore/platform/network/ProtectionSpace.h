@@ -47,6 +47,8 @@ enum ProtectionSpaceAuthenticationScheme {
   ProtectionSpaceAuthenticationSchemeHTMLForm = 4,
   ProtectionSpaceAuthenticationSchemeNTLM = 5,
   ProtectionSpaceAuthenticationSchemeNegotiate = 6,
+  ProtectionSpaceAuthenticationSchemeClientCertificateRequested = 7,
+  ProtectionSpaceAuthenticationSchemeServerTrustEvaluationRequested = 8,
   ProtectionSpaceAuthenticationSchemeUnknown = 100,
 };
 

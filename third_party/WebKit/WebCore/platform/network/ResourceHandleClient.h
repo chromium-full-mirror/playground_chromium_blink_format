@@ -47,6 +47,7 @@ namespace WebCore {
 class AuthenticationChallenge;
 class Credential;
 class KURL;
+class ProtectionSpace;
 class ResourceHandle;
 class ResourceError;
 class ResourceRequest;
@@ -89,6 +90,12 @@ class ResourceHandleClient {
   virtual void didCancelAuthenticationChallenge(
       ResourceHandle*,
       const AuthenticationChallenge&) {}
+#if USE(PROTECTION_SPACE_AUTH_CALLBACK)
+  virtual bool canAuthenticateAgainstProtectionSpace(ResourceHandle*,
+                                                     const ProtectionSpace&) {
+    return false;
+  }
+#endif
   virtual void receivedCancellation(ResourceHandle*,
                                     const AuthenticationChallenge&) {}
 

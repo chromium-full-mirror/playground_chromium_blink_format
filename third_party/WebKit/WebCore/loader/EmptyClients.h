@@ -230,6 +230,13 @@ class EmptyFrameLoaderClient : public FrameLoaderClient, public Noncopyable {
       DocumentLoader*,
       unsigned long,
       const AuthenticationChallenge&) {}
+#if USE(PROTECTION_SPACE_AUTH_CALLBACK)
+  virtual bool canAuthenticateAgainstProtectionSpace(DocumentLoader*,
+                                                     unsigned long,
+                                                     const ProtectionSpace&) {
+    return false;
+  }
+#endif
   virtual void dispatchDidReceiveResponse(DocumentLoader*,
                                           unsigned long,
                                           const ResourceResponse&) {}

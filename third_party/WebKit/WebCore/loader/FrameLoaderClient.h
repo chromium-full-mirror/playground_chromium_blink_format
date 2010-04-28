@@ -62,6 +62,7 @@ class HTMLPlugInElement;
 class IntSize;
 class KURL;
 class NavigationAction;
+class ProtectionSpace;
 class PluginView;
 class PolicyChecker;
 class ResourceError;
@@ -122,6 +123,12 @@ class FrameLoaderClient {
       DocumentLoader*,
       unsigned long identifier,
       const AuthenticationChallenge&) = 0;
+#if USE(PROTECTION_SPACE_AUTH_CALLBACK)
+  virtual bool canAuthenticateAgainstProtectionSpace(
+      DocumentLoader*,
+      unsigned long identifier,
+      const ProtectionSpace&) = 0;
+#endif
   virtual void dispatchDidReceiveResponse(DocumentLoader*,
                                           unsigned long identifier,
                                           const ResourceResponse&) = 0;
