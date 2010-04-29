@@ -244,7 +244,7 @@ void FrameLoaderClientQt::makeRepresentation(DocumentLoader*) {
 void FrameLoaderClientQt::forceLayout() {
   FrameView* view = m_frame->view();
   if (view)
-    view->forceLayout(true);
+    view->layout(true);
 }
 
 void FrameLoaderClientQt::forceLayoutForNonHTML() {}

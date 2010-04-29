@@ -1239,7 +1239,7 @@ void QWebPagePrivate::dynamicPropertyChangeEvent(
       WebCore::Frame* frame = QWebFramePrivate::core(q->mainFrame());
       WebCore::FrameView* view = frame->view();
       frame->document()->updateStyleSelector();
-      view->forceLayout();
+      view->layout();
     }
   }
 }
@@ -2204,10 +2204,10 @@ void QWebPage::setPreferredContentsSize(const QSize& size) const {
     if (size.isValid()) {
       view->setUseFixedLayout(true);
       view->setFixedLayoutSize(size);
-      view->forceLayout();
+      view->layout();
     } else if (view->useFixedLayout()) {
       view->setUseFixedLayout(false);
-      view->forceLayout();
+      view->layout();
     }
   }
 }
