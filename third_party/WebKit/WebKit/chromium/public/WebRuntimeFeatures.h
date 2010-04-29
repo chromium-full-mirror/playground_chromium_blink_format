@@ -74,6 +74,9 @@ class WebRuntimeFeatures {
   WEBKIT_API static void enablePushState(bool);
   WEBKIT_API static bool isPushStateEnabled(bool);
 
+  WEBKIT_API static void enableTouch(bool);
+  WEBKIT_API static bool isTouchEnabled();
+
  private:
   WebRuntimeFeatures();
 };
