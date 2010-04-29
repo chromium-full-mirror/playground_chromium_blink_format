@@ -24,6 +24,7 @@
 #include "ExceptionCode.h"
 #include "RuntimeEnabledFeatures.h"
 #include "ScriptCallStack.h"
+#include "SerializedScriptValue.h"
 #include "V8Binding.h"
 #include "V8BindingState.h"
 #include "V8DOMWrapper.h"
@@ -279,6 +280,19 @@ static v8::Handle<v8::Value> objMethodWithArgsCallback(
           ? V8TestObj::toNative(v8::Handle<v8::Object>::Cast(args[2]))
           : 0;
   return toV8(imp->objMethodWithArgs(intArg, strArg, objArg));
+}
+
+static v8::Handle<v8::Value> serializedValueCallback(
+    const v8::Arguments& args) {
+  INC_STATS("DOM.TestObj.serializedValue");
+  TestObj* imp = V8TestObj::toNative(args.Holder());
+  bool serializedArgDidThrow = false;
+  RefPtr<SerializedScriptValue> serializedArg =
+      SerializedScriptValue::create(args[0], serializedArgDidThrow);
+  if (serializedArgDidThrow)
+    return v8::Undefined();
+  imp->serializedValue(serializedArg);
+  return v8::Handle<v8::Value>();
 }
 
 static v8::Handle<v8::Value> methodWithExceptionCallback(
@@ -666,6 +680,7 @@ static const BatchedCallback TestObjCallbacks[] = {
     {"voidMethod", TestObjInternal::voidMethodCallback},
     {"intMethod", TestObjInternal::intMethodCallback},
     {"objMethod", TestObjInternal::objMethodCallback},
+    {"serializedValue", TestObjInternal::serializedValueCallback},
     {"methodWithException", TestObjInternal::methodWithExceptionCallback},
     {"customMethod", V8TestObj::customMethodCallback},
     {"customMethodWithArgs", V8TestObj::customMethodWithArgsCallback},

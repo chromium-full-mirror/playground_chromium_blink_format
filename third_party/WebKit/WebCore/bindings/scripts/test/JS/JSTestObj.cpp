@@ -26,6 +26,7 @@
 #include "JSlog.h"
 #include "KURL.h"
 #include "ScriptCallStack.h"
+#include "SerializedScriptValue.h"
 #include "TestObj.h"
 #include <runtime/Error.h>
 #include <runtime/JSNumberCell.h>
@@ -172,7 +173,7 @@ bool JSTestObjConstructor::getOwnPropertyDescriptor(
 #define THUNK_GENERATOR(generator)
 #endif
 
-static const HashTableValue JSTestObjPrototypeTableValues[25] = {
+static const HashTableValue JSTestObjPrototypeTableValues[26] = {
     {"voidMethod", DontDelete | Function,
      (intptr_t) static_cast<NativeFunction>(
          jsTestObjPrototypeFunctionVoidMethod),
@@ -197,6 +198,10 @@ static const HashTableValue JSTestObjPrototypeTableValues[25] = {
      (intptr_t) static_cast<NativeFunction>(
          jsTestObjPrototypeFunctionObjMethodWithArgs),
      (intptr_t)3 THUNK_GENERATOR(0)},
+    {"serializedValue", DontDelete | Function,
+     (intptr_t) static_cast<NativeFunction>(
+         jsTestObjPrototypeFunctionSerializedValue),
+     (intptr_t)1 THUNK_GENERATOR(0)},
     {"methodWithException", DontDelete | Function,
      (intptr_t) static_cast<NativeFunction>(
          jsTestObjPrototypeFunctionMethodWithException),
@@ -638,6 +643,23 @@ jsTestObjPrototypeFunctionObjMethodWithArgs(ExecState* exec,
       toJS(exec, castedThisObj->globalObject(),
            WTF::getPtr(imp->objMethodWithArgs(intArg, strArg, objArg)));
   return result;
+}
+
+JSValue JSC_HOST_CALL
+jsTestObjPrototypeFunctionSerializedValue(ExecState* exec,
+                                          JSObject*,
+                                          JSValue thisValue,
+                                          const ArgList& args) {
+  UNUSED_PARAM(args);
+  if (!thisValue.inherits(&JSTestObj::s_info))
+    return throwError(exec, TypeError);
+  JSTestObj* castedThisObj = static_cast<JSTestObj*>(asObject(thisValue));
+  TestObj* imp = static_cast<TestObj*>(castedThisObj->impl());
+  RefPtr<SerializedScriptValue> serializedArg =
+      SerializedScriptValue::create(exec, args.at(0));
+
+  imp->serializedValue(serializedArg);
+  return jsUndefined();
 }
 
 JSValue JSC_HOST_CALL
