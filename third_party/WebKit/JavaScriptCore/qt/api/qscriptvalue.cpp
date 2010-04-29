@@ -92,8 +92,12 @@ QScriptValue::QScriptValue(QScriptValuePrivate* d) : d_ptr(d) {}
   Constructs a new QScriptValue with the boolean \a value and
   registers it with the script \a engine.
 */
-QScriptValue::QScriptValue(QScriptEngine* engine, bool value)
-    : d_ptr(new QScriptValuePrivate(engine, value)) {}
+QScriptValue::QScriptValue(QScriptEngine* engine, bool value) {
+  if (engine)
+    d_ptr = new QScriptValuePrivate(QScriptEnginePrivate::get(engine), value);
+  else
+    d_ptr = new QScriptValuePrivate(value);
+}
 
 /*!
   \obsolete
@@ -101,8 +105,12 @@ QScriptValue::QScriptValue(QScriptEngine* engine, bool value)
   Constructs a new QScriptValue with the integer \a value and
   registers it with the script \a engine.
 */
-QScriptValue::QScriptValue(QScriptEngine* engine, int value)
-    : d_ptr(new QScriptValuePrivate(engine, value)) {}
+QScriptValue::QScriptValue(QScriptEngine* engine, int value) {
+  if (engine)
+    d_ptr = new QScriptValuePrivate(QScriptEnginePrivate::get(engine), value);
+  else
+    d_ptr = new QScriptValuePrivate(value);
+}
 
 /*!
   \obsolete
@@ -110,8 +118,12 @@ QScriptValue::QScriptValue(QScriptEngine* engine, int value)
   Constructs a new QScriptValue with the unsigned integer \a value and
   registers it with the script \a engine.
  */
-QScriptValue::QScriptValue(QScriptEngine* engine, uint value)
-    : d_ptr(new QScriptValuePrivate(engine, value)) {}
+QScriptValue::QScriptValue(QScriptEngine* engine, uint value) {
+  if (engine)
+    d_ptr = new QScriptValuePrivate(QScriptEnginePrivate::get(engine), value);
+  else
+    d_ptr = new QScriptValuePrivate(value);
+}
 
 /*!
   \obsolete
@@ -119,8 +131,12 @@ QScriptValue::QScriptValue(QScriptEngine* engine, uint value)
   Constructs a new QScriptValue with the qsreal \a value and
   registers it with the script \a engine.
 */
-QScriptValue::QScriptValue(QScriptEngine* engine, qsreal value)
-    : d_ptr(new QScriptValuePrivate(engine, value)) {}
+QScriptValue::QScriptValue(QScriptEngine* engine, qsreal value) {
+  if (engine)
+    d_ptr = new QScriptValuePrivate(QScriptEnginePrivate::get(engine), value);
+  else
+    d_ptr = new QScriptValuePrivate(value);
+}
 
 /*!
   \obsolete
@@ -128,8 +144,12 @@ QScriptValue::QScriptValue(QScriptEngine* engine, qsreal value)
   Constructs a new QScriptValue with the string \a value and
   registers it with the script \a engine.
 */
-QScriptValue::QScriptValue(QScriptEngine* engine, const QString& value)
-    : d_ptr(new QScriptValuePrivate(engine, value)) {}
+QScriptValue::QScriptValue(QScriptEngine* engine, const QString& value) {
+  if (engine)
+    d_ptr = new QScriptValuePrivate(QScriptEnginePrivate::get(engine), value);
+  else
+    d_ptr = new QScriptValuePrivate(value);
+}
 
 /*!
   \obsolete
@@ -137,8 +157,13 @@ QScriptValue::QScriptValue(QScriptEngine* engine, const QString& value)
   Constructs a new QScriptValue with the string \a value and
   registers it with the script \a engine.
 */
-QScriptValue::QScriptValue(QScriptEngine* engine, const char* value)
-    : d_ptr(new QScriptValuePrivate(engine, QString::fromUtf8(value))) {}
+QScriptValue::QScriptValue(QScriptEngine* engine, const char* value) {
+  if (engine)
+    d_ptr = new QScriptValuePrivate(QScriptEnginePrivate::get(engine),
+                                    QString::fromUtf8(value));
+  else
+    d_ptr = new QScriptValuePrivate(QString::fromUtf8(value));
+}
 
 /*!
   \obsolete
@@ -146,8 +171,12 @@ QScriptValue::QScriptValue(QScriptEngine* engine, const char* value)
   Constructs a new QScriptValue with the special \a value and
   registers it with the script \a engine.
 */
-QScriptValue::QScriptValue(QScriptEngine* engine, SpecialValue value)
-    : d_ptr(new QScriptValuePrivate(engine, value)) {}
+QScriptValue::QScriptValue(QScriptEngine* engine, SpecialValue value) {
+  if (engine)
+    d_ptr = new QScriptValuePrivate(QScriptEnginePrivate::get(engine), value);
+  else
+    d_ptr = new QScriptValuePrivate(value);
+}
 
 /*!
   Constructs a new QScriptValue that is a copy of \a other.
