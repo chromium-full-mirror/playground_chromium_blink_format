@@ -327,7 +327,7 @@ bool DragController::tryDocumentDrag(DragData* dragData,
     }
 
     IntPoint point = frameView->windowToContents(dragData->clientPosition());
-    Element* element = elementUnderMouse(m_documentUnderMouse.get(), point);
+    Element* element = elementUnderMouse(m_documentUnderMouse, point);
     if (!asFileInput(element)) {
       VisibleSelection dragCaret =
           m_documentUnderMouse->frame()->visiblePositionForPoint(point);
@@ -384,7 +384,7 @@ bool DragController::concludeEditDrag(DragData* dragData) {
 
   IntPoint point = m_documentUnderMouse->view()->windowToContents(
       dragData->clientPosition());
-  Element* element = elementUnderMouse(m_documentUnderMouse.get(), point);
+  Element* element = elementUnderMouse(m_documentUnderMouse, point);
   Frame* innerFrame = element->ownerDocument()->frame();
   ASSERT(innerFrame);
 
@@ -475,8 +475,8 @@ bool DragController::concludeEditDrag(DragData* dragData) {
     } else {
       if (setSelectionToDragCaret(innerFrame, dragCaret, range, point))
         applyCommand(ReplaceSelectionCommand::create(
-            m_documentUnderMouse.get(), fragment, true,
-            dragData->canSmartReplace(), chosePlainText));
+            m_documentUnderMouse, fragment, true, dragData->canSmartReplace(),
+            chosePlainText));
     }
   } else {
     String text = dragData->asPlainText();
@@ -491,8 +491,8 @@ bool DragController::concludeEditDrag(DragData* dragData) {
                                                dragData);
     if (setSelectionToDragCaret(innerFrame, dragCaret, range, point))
       applyCommand(ReplaceSelectionCommand::create(
-          m_documentUnderMouse.get(), createFragmentFromText(range.get(), text),
-          true, false, true));
+          m_documentUnderMouse, createFragmentFromText(range.get(), text), true,
+          false, true));
   }
   loader->setAllowStaleResources(false);
 
