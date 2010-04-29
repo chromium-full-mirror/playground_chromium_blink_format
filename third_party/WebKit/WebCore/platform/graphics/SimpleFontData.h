@@ -205,6 +205,8 @@ class SimpleFontData : public FontData {
   float m_spaceWidth;
   float m_adjustedSpaceWidth;
 
+  Glyph m_zeroWidthSpaceGlyph;
+
   GlyphData m_missingGlyphData;
 
   mutable SimpleFontData* m_smallCapsFontData;
@@ -246,15 +248,22 @@ class SimpleFontData : public FontData {
 
 #if !PLATFORM(QT)
 ALWAYS_INLINE FloatRect SimpleFontData::boundsForGlyph(Glyph glyph) const {
+  if (glyph == m_zeroWidthSpaceGlyph && glyph)
+    return FloatRect();
+
   FloatRect bounds = m_glyphToBoundsMap.metricsForGlyph(glyph);
   if (bounds.width() != cGlyphSizeUnknown)
     return bounds;
+
   bounds = platformBoundsForGlyph(glyph);
   m_glyphToBoundsMap.setMetricsForGlyph(glyph, bounds);
   return bounds;
 }
 
 ALWAYS_INLINE float SimpleFontData::widthForGlyph(Glyph glyph) const {
+  if (glyph == m_zeroWidthSpaceGlyph && glyph)
+    return 0;
+
   float width = m_glyphToWidthMap.metricsForGlyph(glyph);
   if (width != cGlyphSizeUnknown)
     return width;
