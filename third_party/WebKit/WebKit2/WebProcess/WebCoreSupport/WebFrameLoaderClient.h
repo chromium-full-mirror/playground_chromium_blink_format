@@ -73,6 +73,12 @@ class WebFrameLoaderClient : public WebCore::FrameLoaderClient {
       WebCore::DocumentLoader*,
       unsigned long identifier,
       const WebCore::AuthenticationChallenge&);
+#if USE(PROTECTION_SPACE_AUTH_CALLBACK)
+  virtual bool canAuthenticateAgainstProtectionSpace(
+      WebCore::DocumentLoader*,
+      unsigned long identifier,
+      const WebCore::ProtectionSpace&);
+#endif
   virtual void dispatchDidReceiveResponse(WebCore::DocumentLoader*,
                                           unsigned long identifier,
                                           const WebCore::ResourceResponse&);
