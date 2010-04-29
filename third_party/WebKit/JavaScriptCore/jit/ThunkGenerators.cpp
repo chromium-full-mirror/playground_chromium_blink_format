@@ -185,9 +185,9 @@ PassRefPtr<NativeExecutable> powThunkGenerator(JSGlobalData* globalData,
     jit.appendFailure(jit.branchDouble(MacroAssembler::DoubleLessThanOrEqual,
                                        SpecializedThunkJIT::fpRegT0,
                                        SpecializedThunkJIT::fpRegT1));
-    jit.appendFailure(jit.branchDouble(MacroAssembler::DoubleNotEqual,
-                                       SpecializedThunkJIT::fpRegT2,
-                                       SpecializedThunkJIT::fpRegT3));
+    jit.appendFailure(jit.branchDouble(
+        MacroAssembler::DoubleNotEqualOrUnordered, SpecializedThunkJIT::fpRegT2,
+        SpecializedThunkJIT::fpRegT3));
     jit.sqrtDouble(SpecializedThunkJIT::fpRegT0, SpecializedThunkJIT::fpRegT0);
     jit.divDouble(SpecializedThunkJIT::fpRegT0, SpecializedThunkJIT::fpRegT1);
     jit.returnDouble(SpecializedThunkJIT::fpRegT1);
