@@ -623,8 +623,6 @@ class JIT : private JSInterfaceJIT {
   void emitJumpSlowCaseIfNotJSCell(RegisterID);
   void emitJumpSlowCaseIfNotJSCell(RegisterID, int VReg);
 #if USE(JSVALUE64)
-  JIT::Jump emitJumpIfImmediateNumber(RegisterID);
-  JIT::Jump emitJumpIfNotImmediateNumber(RegisterID);
 #else
   JIT::Jump emitJumpIfImmediateNumber(RegisterID reg) {
     return emitJumpIfImmediateInteger(reg);

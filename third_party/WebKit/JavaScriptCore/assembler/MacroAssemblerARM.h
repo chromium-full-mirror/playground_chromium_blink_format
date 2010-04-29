@@ -675,11 +675,13 @@ class MacroAssemblerARM : public AbstractMacroAssembler<ARMAssembler> {
 
   bool supportsFloatingPointTruncate() const { return false; }
 
+  bool supportsFloatingPointSqrt() const { return false; }
+
   void loadDouble(ImplicitAddress address, FPRegisterID dest) {
     m_assembler.doubleTransfer(true, dest, address.base, address.offset);
   }
 
-  void loadDouble(void* address, FPRegisterID dest) {
+  void loadDouble(const void* address, FPRegisterID dest) {
     m_assembler.ldr_un_imm(ARMRegisters::S0, (ARMWord)address);
     m_assembler.fdtr_u(true, dest, ARMRegisters::S0, 0);
   }
@@ -724,6 +726,8 @@ class MacroAssemblerARM : public AbstractMacroAssembler<ARMAssembler> {
     loadDouble(src, ARMRegisters::SD0);
     mulDouble(ARMRegisters::SD0, dest);
   }
+
+  void sqrtDouble(FPRegisterID, FPRegisterID) { ASSERT_NOT_REACHED(); }
 
   void convertInt32ToDouble(RegisterID src, FPRegisterID dest) {
     m_assembler.fmsr_r(dest, src);

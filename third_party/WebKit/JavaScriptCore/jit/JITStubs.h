@@ -85,7 +85,7 @@ struct TrampolineStructure {
   MacroAssemblerCodePtr ctiStringLengthTrampoline;
   MacroAssemblerCodePtr ctiVirtualCallLink;
   MacroAssemblerCodePtr ctiVirtualCall;
-  MacroAssemblerCodePtr ctiNativeCallThunk;
+  RefPtr<NativeExecutable> ctiNativeCallThunk;
   MacroAssemblerCodePtr ctiSoftModulo;
 };
 
@@ -320,8 +320,8 @@ class JITThunks {
   MacroAssemblerCodePtr ctiVirtualCall() {
     return m_trampolineStructure.ctiVirtualCall;
   }
-  MacroAssemblerCodePtr ctiNativeCallThunk() {
-    return m_trampolineStructure.ctiNativeCallThunk;
+  NativeExecutable* ctiNativeCallThunk() {
+    return m_trampolineStructure.ctiNativeCallThunk.get();
   }
   MacroAssemblerCodePtr ctiSoftModulo() {
     return m_trampolineStructure.ctiSoftModulo;

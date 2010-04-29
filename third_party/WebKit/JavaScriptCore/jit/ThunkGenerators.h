@@ -42,6 +42,8 @@ PassRefPtr<NativeExecutable> charAtThunkGenerator(JSGlobalData*,
                                                   ExecutablePool*);
 PassRefPtr<NativeExecutable> fromCharCodeThunkGenerator(JSGlobalData*,
                                                         ExecutablePool*);
+PassRefPtr<NativeExecutable> sqrtThunkGenerator(JSGlobalData*, ExecutablePool*);
+PassRefPtr<NativeExecutable> powThunkGenerator(JSGlobalData*, ExecutablePool*);
 }
 #endif
 

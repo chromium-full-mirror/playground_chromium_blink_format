@@ -470,6 +470,8 @@ class MacroAssemblerARMv7 : public AbstractMacroAssembler<ARMv7Assembler> {
   // In short, FIXME:.
   bool supportsFloatingPointTruncate() const { return false; }
 
+  bool supportsFloatingPointSqrt() const { return false; }
+
   void loadDouble(ImplicitAddress address, FPRegisterID dest) {
     RegisterID base = address.base;
     int32_t offset = address.offset;
@@ -526,6 +528,8 @@ class MacroAssemblerARMv7 : public AbstractMacroAssembler<ARMv7Assembler> {
     loadDouble(src, fpTempRegister);
     mulDouble(fpTempRegister, dest);
   }
+
+  void sqrtDouble(FPRegisterID, FPRegisterID) { ASSERT_NOT_REACHED(); }
 
   void convertInt32ToDouble(RegisterID src, FPRegisterID dest) {
     m_assembler.vmov(fpTempRegister, src);

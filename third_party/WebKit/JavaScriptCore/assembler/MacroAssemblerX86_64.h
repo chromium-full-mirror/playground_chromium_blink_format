@@ -81,7 +81,7 @@ class MacroAssemblerX86_64 : public MacroAssemblerX86Common {
     }
   }
 
-  void loadDouble(void* address, FPRegisterID dest) {
+  void loadDouble(const void* address, FPRegisterID dest) {
     move(ImmPtr(address), scratchRegister);
     loadDouble(scratchRegister, dest);
   }
@@ -381,6 +381,7 @@ class MacroAssemblerX86_64 : public MacroAssemblerX86Common {
   bool supportsFloatingPoint() const { return true; }
   // See comment on MacroAssemblerARMv7::supportsFloatingPointTruncate()
   bool supportsFloatingPointTruncate() const { return true; }
+  bool supportsFloatingPointSqrt() const { return true; }
 
  private:
   friend class LinkBuffer;

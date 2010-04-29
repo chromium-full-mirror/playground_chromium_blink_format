@@ -278,6 +278,10 @@ class MacroAssemblerX86Common : public AbstractMacroAssembler<X86Assembler> {
     m_assembler.xorl_mr(src.offset, src.base, dest);
   }
 
+  void sqrtDouble(FPRegisterID src, FPRegisterID dst) {
+    m_assembler.sqrtsd_rr(src, dst);
+  }
+
   // Memory access operations:
   //
   // Loads are of the form load(address, destination) and stores of the form

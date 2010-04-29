@@ -85,7 +85,7 @@ JSFunction::JSFunction(ExecState* exec,
     : Base(&exec->globalData(), structure, name)
 #if ENABLE(JIT)
       ,
-      m_executable(adoptRef(new NativeExecutable(exec)))
+      m_executable(exec->globalData().jitStubs.ctiNativeCallThunk())
 #endif
 {
 #if ENABLE(JIT)
