@@ -52,6 +52,8 @@ class MediaQueryExp : public FastAllocBase {
              other.m_value->cssText() == m_value->cssText()));
   }
 
+  bool isValid() const { return m_isValid; }
+
   bool isViewportDependent() const {
     return m_mediaFeature == MediaFeatureNames::widthMediaFeature ||
            m_mediaFeature == MediaFeatureNames::heightMediaFeature ||
@@ -68,6 +70,7 @@ class MediaQueryExp : public FastAllocBase {
  private:
   AtomicString m_mediaFeature;
   RefPtr<CSSValue> m_value;
+  bool m_isValid;
 };
 
 }  // namespace
