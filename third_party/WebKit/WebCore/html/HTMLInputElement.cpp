@@ -2037,11 +2037,11 @@ void HTMLInputElement::defaultEventHandler(Event* evt) {
   // Having them all in one giant function makes this hard to read, and almost
   // all the handling is type-specific.
 
-  bool clickDefaultFormButton = false;
+  bool implicitSubmission = false;
 
   if (isTextField() && evt->type() == eventNames().textInputEvent &&
       evt->isTextEvent() && static_cast<TextEvent*>(evt)->data() == "\n")
-    clickDefaultFormButton = true;
+    implicitSubmission = true;
 
   if (inputType() == IMAGE && evt->isMouseEvent() &&
       evt->type() == eventNames().clickEvent) {
@@ -2081,7 +2081,7 @@ void HTMLInputElement::defaultEventHandler(Event* evt) {
   // all events in text fields.
   // Makes editing keyboard handling take precedence over the keydown and
   // keypress handling in this function.
-  bool callBaseClassEarly = isTextField() && !clickDefaultFormButton &&
+  bool callBaseClassEarly = isTextField() && !implicitSubmission &&
                             (evt->type() == eventNames().keydownEvent ||
                              evt->type() == eventNames().keypressEvent);
   if (callBaseClassEarly) {
@@ -2142,6 +2142,7 @@ void HTMLInputElement::defaultEventHandler(Event* evt) {
         case MONTH:
         case NUMBER:
         case PASSWORD:
+        case RADIO:
         case RANGE:
         case SEARCH:
         case TELEPHONE:
@@ -2151,7 +2152,7 @@ void HTMLInputElement::defaultEventHandler(Event* evt) {
         case WEEK:
           // Simulate mouse click on the default form button for enter for these
           // types of elements.
-          clickDefaultFormButton = true;
+          implicitSubmission = true;
           break;
         case BUTTON:
         case FILE:
@@ -2161,8 +2162,6 @@ void HTMLInputElement::defaultEventHandler(Event* evt) {
           // Simulate mouse click for enter for these types of elements.
           clickElement = true;
           break;
-        case RADIO:
-          break;  // Don't do anything for enter on a radio button.
       }
     } else if (charCode == ' ') {
       switch (inputType()) {
@@ -2305,7 +2304,7 @@ void HTMLInputElement::defaultEventHandler(Event* evt) {
     }
   }
 
-  if (clickDefaultFormButton) {
+  if (implicitSubmission) {
     if (isSearchField()) {
       addSearchResult();
       onSearch();
@@ -2331,7 +2330,7 @@ void HTMLInputElement::defaultEventHandler(Event* evt) {
     // Form may never have been present, or may have been destroyed by code
     // responding to the change event.
     if (formForSubmission)
-      formForSubmission->submitClick(evt);
+      formForSubmission->submitImplicitly(evt, isTextField());
 
     evt->setDefaultHandled();
     return;
