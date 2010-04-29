@@ -35,13 +35,14 @@ class String;
 class NameNodeList : public DynamicNodeList {
  public:
   static PassRefPtr<NameNodeList> create(PassRefPtr<Node> rootNode,
-                                         const String& name,
-                                         Caches* caches) {
-    return adoptRef(new NameNodeList(rootNode, name, caches));
+                                         const String& name) {
+    return adoptRef(new NameNodeList(rootNode, name));
   }
 
+  virtual ~NameNodeList();
+
  private:
-  NameNodeList(PassRefPtr<Node> rootNode, const String& name, Caches*);
+  NameNodeList(PassRefPtr<Node> rootNode, const String& name);
 
   virtual bool nodeMatches(Element*) const;
 

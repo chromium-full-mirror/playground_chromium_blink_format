@@ -31,12 +31,16 @@ namespace WebCore {
 
 TagNodeList::TagNodeList(PassRefPtr<Node> rootNode,
                          const AtomicString& namespaceURI,
-                         const AtomicString& localName,
-                         DynamicNodeList::Caches* caches)
-    : DynamicNodeList(rootNode, caches),
+                         const AtomicString& localName)
+    : DynamicNodeList(rootNode),
       m_namespaceURI(namespaceURI),
       m_localName(localName) {
   ASSERT(m_namespaceURI.isNull() || !m_namespaceURI.isEmpty());
+}
+
+TagNodeList::~TagNodeList() {
+  m_rootNode->removeCachedTagNodeList(
+      this, QualifiedName(nullAtom, m_localName, m_namespaceURI));
 }
 
 bool TagNodeList::nodeMatches(Element* testNode) const {

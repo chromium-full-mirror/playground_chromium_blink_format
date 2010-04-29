@@ -36,10 +36,14 @@
 namespace WebCore {
 
 ClassNodeList::ClassNodeList(PassRefPtr<Node> rootNode,
-                             const String& classNames,
-                             DynamicNodeList::Caches* caches)
-    : DynamicNodeList(rootNode, caches),
-      m_classNames(classNames, m_rootNode->document()->inCompatMode()) {}
+                             const String& classNames)
+    : DynamicNodeList(rootNode),
+      m_classNames(classNames, m_rootNode->document()->inCompatMode()),
+      m_originalClassNames(classNames) {}
+
+ClassNodeList::~ClassNodeList() {
+  m_rootNode->removeCachedClassNodeList(this, m_originalClassNames);
+}
 
 bool ClassNodeList::nodeMatches(Element* testNode) const {
   if (!testNode->hasClass())

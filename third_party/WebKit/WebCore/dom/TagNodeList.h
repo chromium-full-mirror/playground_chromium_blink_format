@@ -34,16 +34,16 @@ class TagNodeList : public DynamicNodeList {
  public:
   static PassRefPtr<TagNodeList> create(PassRefPtr<Node> rootNode,
                                         const AtomicString& namespaceURI,
-                                        const AtomicString& localName,
-                                        DynamicNodeList::Caches* caches) {
-    return adoptRef(new TagNodeList(rootNode, namespaceURI, localName, caches));
+                                        const AtomicString& localName) {
+    return adoptRef(new TagNodeList(rootNode, namespaceURI, localName));
   }
+
+  virtual ~TagNodeList();
 
  private:
   TagNodeList(PassRefPtr<Node> rootNode,
               const AtomicString& namespaceURI,
-              const AtomicString& localName,
-              DynamicNodeList::Caches* caches);
+              const AtomicString& localName);
 
   virtual bool nodeMatches(Element*) const;
 
