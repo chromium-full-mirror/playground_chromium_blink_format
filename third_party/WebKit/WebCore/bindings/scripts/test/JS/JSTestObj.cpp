@@ -470,24 +470,24 @@ void JSTestObj::put(ExecState* exec,
 }
 
 void setJSTestObjIntAttr(ExecState* exec, JSObject* thisObject, JSValue value) {
-  JSTestObj* castedThisObj = static_cast<JSTestObj*>(thisObject);
-  TestObj* imp = static_cast<TestObj*>(castedThisObj->impl());
+  JSTestObj* castedThis = static_cast<JSTestObj*>(thisObject);
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
   imp->setIntAttr(value.toInt32(exec));
 }
 
 void setJSTestObjLongLongAttr(ExecState* exec,
                               JSObject* thisObject,
                               JSValue value) {
-  JSTestObj* castedThisObj = static_cast<JSTestObj*>(thisObject);
-  TestObj* imp = static_cast<TestObj*>(castedThisObj->impl());
+  JSTestObj* castedThis = static_cast<JSTestObj*>(thisObject);
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
   imp->setLongLongAttr(static_cast<long long>(value.toInteger(exec)));
 }
 
 void setJSTestObjUnsignedLongLongAttr(ExecState* exec,
                                       JSObject* thisObject,
                                       JSValue value) {
-  JSTestObj* castedThisObj = static_cast<JSTestObj*>(thisObject);
-  TestObj* imp = static_cast<TestObj*>(castedThisObj->impl());
+  JSTestObj* castedThis = static_cast<JSTestObj*>(thisObject);
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
   imp->setUnsignedLongLongAttr(
       static_cast<unsigned long long>(value.toInteger(exec)));
 }
@@ -495,40 +495,40 @@ void setJSTestObjUnsignedLongLongAttr(ExecState* exec,
 void setJSTestObjStringAttr(ExecState* exec,
                             JSObject* thisObject,
                             JSValue value) {
-  JSTestObj* castedThisObj = static_cast<JSTestObj*>(thisObject);
-  TestObj* imp = static_cast<TestObj*>(castedThisObj->impl());
+  JSTestObj* castedThis = static_cast<JSTestObj*>(thisObject);
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
   imp->setStringAttr(ustringToString(value.toString(exec)));
 }
 
 void setJSTestObjTestObjAttr(ExecState* exec,
                              JSObject* thisObject,
                              JSValue value) {
-  JSTestObj* castedThisObj = static_cast<JSTestObj*>(thisObject);
-  TestObj* imp = static_cast<TestObj*>(castedThisObj->impl());
+  JSTestObj* castedThis = static_cast<JSTestObj*>(thisObject);
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
   imp->setTestObjAttr(toTestObj(value));
 }
 
 void setJSTestObjAttrWithException(ExecState* exec,
                                    JSObject* thisObject,
                                    JSValue value) {
-  JSTestObj* castedThisObj = static_cast<JSTestObj*>(thisObject);
-  TestObj* imp = static_cast<TestObj*>(castedThisObj->impl());
+  JSTestObj* castedThis = static_cast<JSTestObj*>(thisObject);
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
   imp->setAttrWithException(value.toInt32(exec));
 }
 
 void setJSTestObjAttrWithSetterException(ExecState* exec,
                                          JSObject* thisObject,
                                          JSValue value) {
-  JSTestObj* castedThisObj = static_cast<JSTestObj*>(thisObject);
-  TestObj* imp = static_cast<TestObj*>(castedThisObj->impl());
+  JSTestObj* castedThis = static_cast<JSTestObj*>(thisObject);
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
   imp->setAttrWithSetterException(value.toInt32(exec));
 }
 
 void setJSTestObjAttrWithGetterException(ExecState* exec,
                                          JSObject* thisObject,
                                          JSValue value) {
-  JSTestObj* castedThisObj = static_cast<JSTestObj*>(thisObject);
-  TestObj* imp = static_cast<TestObj*>(castedThisObj->impl());
+  JSTestObj* castedThis = static_cast<JSTestObj*>(thisObject);
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
   imp->setAttrWithGetterException(value.toInt32(exec));
 }
 
@@ -552,8 +552,8 @@ jsTestObjPrototypeFunctionVoidMethod(ExecState* exec,
   UNUSED_PARAM(args);
   if (!thisValue.inherits(&JSTestObj::s_info))
     return throwError(exec, TypeError);
-  JSTestObj* castedThisObj = static_cast<JSTestObj*>(asObject(thisValue));
-  TestObj* imp = static_cast<TestObj*>(castedThisObj->impl());
+  JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
 
   imp->voidMethod();
   return jsUndefined();
@@ -567,8 +567,8 @@ jsTestObjPrototypeFunctionVoidMethodWithArgs(ExecState* exec,
   UNUSED_PARAM(args);
   if (!thisValue.inherits(&JSTestObj::s_info))
     return throwError(exec, TypeError);
-  JSTestObj* castedThisObj = static_cast<JSTestObj*>(asObject(thisValue));
-  TestObj* imp = static_cast<TestObj*>(castedThisObj->impl());
+  JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
   int intArg = args.at(0).toInt32(exec);
   const String& strArg = ustringToString(args.at(1).toString(exec));
   TestObj* objArg = toTestObj(args.at(2));
@@ -584,8 +584,8 @@ JSValue JSC_HOST_CALL jsTestObjPrototypeFunctionIntMethod(ExecState* exec,
   UNUSED_PARAM(args);
   if (!thisValue.inherits(&JSTestObj::s_info))
     return throwError(exec, TypeError);
-  JSTestObj* castedThisObj = static_cast<JSTestObj*>(asObject(thisValue));
-  TestObj* imp = static_cast<TestObj*>(castedThisObj->impl());
+  JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
 
   JSC::JSValue result = jsNumber(exec, imp->intMethod());
   return result;
@@ -599,8 +599,8 @@ jsTestObjPrototypeFunctionIntMethodWithArgs(ExecState* exec,
   UNUSED_PARAM(args);
   if (!thisValue.inherits(&JSTestObj::s_info))
     return throwError(exec, TypeError);
-  JSTestObj* castedThisObj = static_cast<JSTestObj*>(asObject(thisValue));
-  TestObj* imp = static_cast<TestObj*>(castedThisObj->impl());
+  JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
   int intArg = args.at(0).toInt32(exec);
   const String& strArg = ustringToString(args.at(1).toString(exec));
   TestObj* objArg = toTestObj(args.at(2));
@@ -617,11 +617,11 @@ JSValue JSC_HOST_CALL jsTestObjPrototypeFunctionObjMethod(ExecState* exec,
   UNUSED_PARAM(args);
   if (!thisValue.inherits(&JSTestObj::s_info))
     return throwError(exec, TypeError);
-  JSTestObj* castedThisObj = static_cast<JSTestObj*>(asObject(thisValue));
-  TestObj* imp = static_cast<TestObj*>(castedThisObj->impl());
+  JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
 
   JSC::JSValue result =
-      toJS(exec, castedThisObj->globalObject(), WTF::getPtr(imp->objMethod()));
+      toJS(exec, castedThis->globalObject(), WTF::getPtr(imp->objMethod()));
   return result;
 }
 
@@ -633,14 +633,14 @@ jsTestObjPrototypeFunctionObjMethodWithArgs(ExecState* exec,
   UNUSED_PARAM(args);
   if (!thisValue.inherits(&JSTestObj::s_info))
     return throwError(exec, TypeError);
-  JSTestObj* castedThisObj = static_cast<JSTestObj*>(asObject(thisValue));
-  TestObj* imp = static_cast<TestObj*>(castedThisObj->impl());
+  JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
   int intArg = args.at(0).toInt32(exec);
   const String& strArg = ustringToString(args.at(1).toString(exec));
   TestObj* objArg = toTestObj(args.at(2));
 
   JSC::JSValue result =
-      toJS(exec, castedThisObj->globalObject(),
+      toJS(exec, castedThis->globalObject(),
            WTF::getPtr(imp->objMethodWithArgs(intArg, strArg, objArg)));
   return result;
 }
@@ -670,8 +670,8 @@ jsTestObjPrototypeFunctionMethodWithException(ExecState* exec,
   UNUSED_PARAM(args);
   if (!thisValue.inherits(&JSTestObj::s_info))
     return throwError(exec, TypeError);
-  JSTestObj* castedThisObj = static_cast<JSTestObj*>(asObject(thisValue));
-  TestObj* imp = static_cast<TestObj*>(castedThisObj->impl());
+  JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
   ExceptionCode ec = 0;
 
   imp->methodWithException(ec);
@@ -687,8 +687,8 @@ jsTestObjPrototypeFunctionCustomMethod(ExecState* exec,
   UNUSED_PARAM(args);
   if (!thisValue.inherits(&JSTestObj::s_info))
     return throwError(exec, TypeError);
-  JSTestObj* castedThisObj = static_cast<JSTestObj*>(asObject(thisValue));
-  return castedThisObj->customMethod(exec, args);
+  JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
+  return castedThis->customMethod(exec, args);
 }
 
 JSValue JSC_HOST_CALL
@@ -699,8 +699,8 @@ jsTestObjPrototypeFunctionCustomMethodWithArgs(ExecState* exec,
   UNUSED_PARAM(args);
   if (!thisValue.inherits(&JSTestObj::s_info))
     return throwError(exec, TypeError);
-  JSTestObj* castedThisObj = static_cast<JSTestObj*>(asObject(thisValue));
-  return castedThisObj->customMethodWithArgs(exec, args);
+  JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
+  return castedThis->customMethodWithArgs(exec, args);
 }
 
 JSValue JSC_HOST_CALL
@@ -711,8 +711,8 @@ jsTestObjPrototypeFunctionCustomArgsAndException(ExecState* exec,
   UNUSED_PARAM(args);
   if (!thisValue.inherits(&JSTestObj::s_info))
     return throwError(exec, TypeError);
-  JSTestObj* castedThisObj = static_cast<JSTestObj*>(asObject(thisValue));
-  TestObj* imp = static_cast<TestObj*>(castedThisObj->impl());
+  JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
   ExceptionCode ec = 0;
   ScriptCallStack callStack(exec, args, 1);
   log* intArg = tolog(args.at(0));
@@ -730,16 +730,15 @@ jsTestObjPrototypeFunctionAddEventListener(ExecState* exec,
   UNUSED_PARAM(args);
   if (!thisValue.inherits(&JSTestObj::s_info))
     return throwError(exec, TypeError);
-  JSTestObj* castedThisObj = static_cast<JSTestObj*>(asObject(thisValue));
-  TestObj* imp = static_cast<TestObj*>(castedThisObj->impl());
+  JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
   JSValue listener = args.at(1);
   if (!listener.isObject())
     return jsUndefined();
-  imp->addEventListener(
-      ustringToAtomicString(args.at(0).toString(exec)),
-      JSEventListener::create(asObject(listener), castedThisObj, false,
-                              currentWorld(exec)),
-      args.at(2).toBoolean(exec));
+  imp->addEventListener(ustringToAtomicString(args.at(0).toString(exec)),
+                        JSEventListener::create(asObject(listener), castedThis,
+                                                false, currentWorld(exec)),
+                        args.at(2).toBoolean(exec));
   return jsUndefined();
 }
 
@@ -751,14 +750,14 @@ jsTestObjPrototypeFunctionRemoveEventListener(ExecState* exec,
   UNUSED_PARAM(args);
   if (!thisValue.inherits(&JSTestObj::s_info))
     return throwError(exec, TypeError);
-  JSTestObj* castedThisObj = static_cast<JSTestObj*>(asObject(thisValue));
-  TestObj* imp = static_cast<TestObj*>(castedThisObj->impl());
+  JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
   JSValue listener = args.at(1);
   if (!listener.isObject())
     return jsUndefined();
   imp->removeEventListener(
       ustringToAtomicString(args.at(0).toString(exec)),
-      JSEventListener::create(asObject(listener), castedThisObj, false,
+      JSEventListener::create(asObject(listener), castedThis, false,
                               currentWorld(exec))
           .get(),
       args.at(2).toBoolean(exec));
@@ -773,8 +772,8 @@ jsTestObjPrototypeFunctionWithDynamicFrame(ExecState* exec,
   UNUSED_PARAM(args);
   if (!thisValue.inherits(&JSTestObj::s_info))
     return throwError(exec, TypeError);
-  JSTestObj* castedThisObj = static_cast<JSTestObj*>(asObject(thisValue));
-  TestObj* imp = static_cast<TestObj*>(castedThisObj->impl());
+  JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
   Frame* dynamicFrame = toDynamicFrame(exec);
   if (!dynamicFrame)
     return jsUndefined();
@@ -791,8 +790,8 @@ jsTestObjPrototypeFunctionWithDynamicFrameAndArg(ExecState* exec,
   UNUSED_PARAM(args);
   if (!thisValue.inherits(&JSTestObj::s_info))
     return throwError(exec, TypeError);
-  JSTestObj* castedThisObj = static_cast<JSTestObj*>(asObject(thisValue));
-  TestObj* imp = static_cast<TestObj*>(castedThisObj->impl());
+  JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
   Frame* dynamicFrame = toDynamicFrame(exec);
   if (!dynamicFrame)
     return jsUndefined();
@@ -810,8 +809,8 @@ jsTestObjPrototypeFunctionWithDynamicFrameAndOptionalArg(ExecState* exec,
   UNUSED_PARAM(args);
   if (!thisValue.inherits(&JSTestObj::s_info))
     return throwError(exec, TypeError);
-  JSTestObj* castedThisObj = static_cast<JSTestObj*>(asObject(thisValue));
-  TestObj* imp = static_cast<TestObj*>(castedThisObj->impl());
+  JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
   Frame* dynamicFrame = toDynamicFrame(exec);
   if (!dynamicFrame)
     return jsUndefined();
@@ -837,8 +836,8 @@ jsTestObjPrototypeFunctionWithDynamicFrameAndUserGesture(ExecState* exec,
   UNUSED_PARAM(args);
   if (!thisValue.inherits(&JSTestObj::s_info))
     return throwError(exec, TypeError);
-  JSTestObj* castedThisObj = static_cast<JSTestObj*>(asObject(thisValue));
-  TestObj* imp = static_cast<TestObj*>(castedThisObj->impl());
+  JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
   Frame* dynamicFrame = toDynamicFrame(exec);
   if (!dynamicFrame)
     return jsUndefined();
@@ -858,8 +857,8 @@ jsTestObjPrototypeFunctionWithDynamicFrameAndUserGestureASAD(
   UNUSED_PARAM(args);
   if (!thisValue.inherits(&JSTestObj::s_info))
     return throwError(exec, TypeError);
-  JSTestObj* castedThisObj = static_cast<JSTestObj*>(asObject(thisValue));
-  TestObj* imp = static_cast<TestObj*>(castedThisObj->impl());
+  JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
   Frame* dynamicFrame = toDynamicFrame(exec);
   if (!dynamicFrame)
     return jsUndefined();
@@ -886,8 +885,8 @@ jsTestObjPrototypeFunctionWithScriptStateVoid(ExecState* exec,
   UNUSED_PARAM(args);
   if (!thisValue.inherits(&JSTestObj::s_info))
     return throwError(exec, TypeError);
-  JSTestObj* castedThisObj = static_cast<JSTestObj*>(asObject(thisValue));
-  TestObj* imp = static_cast<TestObj*>(castedThisObj->impl());
+  JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
 
   imp->withScriptStateVoid(exec);
   return jsUndefined();
@@ -901,10 +900,10 @@ jsTestObjPrototypeFunctionWithScriptStateObj(ExecState* exec,
   UNUSED_PARAM(args);
   if (!thisValue.inherits(&JSTestObj::s_info))
     return throwError(exec, TypeError);
-  JSTestObj* castedThisObj = static_cast<JSTestObj*>(asObject(thisValue));
-  TestObj* imp = static_cast<TestObj*>(castedThisObj->impl());
+  JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
 
-  JSC::JSValue result = toJS(exec, castedThisObj->globalObject(),
+  JSC::JSValue result = toJS(exec, castedThis->globalObject(),
                              WTF::getPtr(imp->withScriptStateObj(exec)));
   if (exec->hadException())
     return jsUndefined();
@@ -919,8 +918,8 @@ jsTestObjPrototypeFunctionWithScriptStateVoidException(ExecState* exec,
   UNUSED_PARAM(args);
   if (!thisValue.inherits(&JSTestObj::s_info))
     return throwError(exec, TypeError);
-  JSTestObj* castedThisObj = static_cast<JSTestObj*>(asObject(thisValue));
-  TestObj* imp = static_cast<TestObj*>(castedThisObj->impl());
+  JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
   ExceptionCode ec = 0;
 
   imp->withScriptStateVoidException(exec, ec);
@@ -936,12 +935,12 @@ jsTestObjPrototypeFunctionWithScriptStateObjException(ExecState* exec,
   UNUSED_PARAM(args);
   if (!thisValue.inherits(&JSTestObj::s_info))
     return throwError(exec, TypeError);
-  JSTestObj* castedThisObj = static_cast<JSTestObj*>(asObject(thisValue));
-  TestObj* imp = static_cast<TestObj*>(castedThisObj->impl());
+  JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
   ExceptionCode ec = 0;
 
   JSC::JSValue result =
-      toJS(exec, castedThisObj->globalObject(),
+      toJS(exec, castedThis->globalObject(),
            WTF::getPtr(imp->withScriptStateObjException(exec, ec)));
   setDOMException(exec, ec);
   if (exec->hadException())
@@ -957,8 +956,8 @@ jsTestObjPrototypeFunctionMethodWithOptionalArg(ExecState* exec,
   UNUSED_PARAM(args);
   if (!thisValue.inherits(&JSTestObj::s_info))
     return throwError(exec, TypeError);
-  JSTestObj* castedThisObj = static_cast<JSTestObj*>(asObject(thisValue));
-  TestObj* imp = static_cast<TestObj*>(castedThisObj->impl());
+  JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
 
   int argsCount = args.size();
   if (argsCount < 1) {
@@ -981,8 +980,8 @@ jsTestObjPrototypeFunctionMethodWithNonOptionalArgAndOptionalArg(
   UNUSED_PARAM(args);
   if (!thisValue.inherits(&JSTestObj::s_info))
     return throwError(exec, TypeError);
-  JSTestObj* castedThisObj = static_cast<JSTestObj*>(asObject(thisValue));
-  TestObj* imp = static_cast<TestObj*>(castedThisObj->impl());
+  JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
   int nonOpt = args.at(0).toInt32(exec);
 
   int argsCount = args.size();
@@ -1006,8 +1005,8 @@ jsTestObjPrototypeFunctionMethodWithNonOptionalArgAndTwoOptionalArgs(
   UNUSED_PARAM(args);
   if (!thisValue.inherits(&JSTestObj::s_info))
     return throwError(exec, TypeError);
-  JSTestObj* castedThisObj = static_cast<JSTestObj*>(asObject(thisValue));
-  TestObj* imp = static_cast<TestObj*>(castedThisObj->impl());
+  JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
   int nonOpt = args.at(0).toInt32(exec);
 
   int argsCount = args.size();
