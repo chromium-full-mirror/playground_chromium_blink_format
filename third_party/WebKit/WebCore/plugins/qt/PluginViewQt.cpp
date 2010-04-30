@@ -553,7 +553,7 @@ void PluginView::setParentVisible(bool visible) {
 }
 
 NPError PluginView::handlePostReadFile(Vector<char>& buffer,
-                                       uint32 len,
+                                       uint32_t len,
                                        const char* buf) {
   String filename(buf, len);
 
@@ -632,7 +632,7 @@ bool PluginView::platformGetValue(NPNVariable variable,
 
     case NPNVToolkit:
       if (m_plugin->quirks().contains(PluginQuirkRequiresGtkToolKit)) {
-        *((uint32*)value) = 2;
+        *((uint32_t*)value) = 2;
         *result = NPERR_NO_ERROR;
         return true;
       }
