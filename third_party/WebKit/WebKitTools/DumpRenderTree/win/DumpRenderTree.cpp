@@ -1305,6 +1305,7 @@ int main(int argc, char* argv[]) {
   standardPreferencesPrivate->setShouldPaintNativeControls(FALSE);
   standardPreferences->setJavaScriptEnabled(TRUE);
   standardPreferences->setDefaultFontSize(16);
+  standardPreferences->setAcceleratedCompositingEnabled(true);
 
   if (printSupportedFeatures) {
     BOOL acceleratedCompositingAvailable;
