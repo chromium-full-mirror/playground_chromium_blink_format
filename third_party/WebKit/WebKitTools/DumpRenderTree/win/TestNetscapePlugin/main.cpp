@@ -103,8 +103,8 @@ static void executeScript(const PluginObject* object, const char* script) {
 
 NPError NPP_New(NPMIMEType pluginType,
                 NPP instance,
-                uint16 mode,
-                int16 argc,
+                uint16_t mode,
+                int16_t argc,
                 char* argn[],
                 char* argv[],
                 NPSavedData* saved) {
@@ -113,7 +113,7 @@ NPError NPP_New(NPMIMEType pluginType,
         (PluginObject*)browser->createobject(instance, getPluginClass());
     instance->pdata = obj;
 
-    for (int16 i = 0; i < argc; i++) {
+    for (int16_t i = 0; i < argc; i++) {
       if (_stricmp(argn[i], "onstreamload") == 0 && !obj->onStreamLoad)
         obj->onStreamLoad = _strdup(argv[i]);
       else if (_stricmp(argn[i], "onStreamDestroy") == 0 &&
@@ -192,7 +192,7 @@ NPError NPP_NewStream(NPP instance,
                       NPMIMEType type,
                       NPStream* stream,
                       NPBool seekable,
-                      uint16* stype) {
+                      uint16_t* stype) {
   PluginObject* obj = (PluginObject*)instance->pdata;
 
   if (obj->returnErrorFromNewStream)
@@ -220,15 +220,15 @@ NPError NPP_DestroyStream(NPP instance, NPStream* stream, NPReason reason) {
   return NPERR_NO_ERROR;
 }
 
-int32 NPP_WriteReady(NPP instance, NPStream* stream) {
+int32_t NPP_WriteReady(NPP instance, NPStream* stream) {
   return 0;
 }
 
-int32 NPP_Write(NPP instance,
-                NPStream* stream,
-                int32 offset,
-                int32 len,
-                void* buffer) {
+int32_t NPP_Write(NPP instance,
+                  NPStream* stream,
+                  int32_t offset,
+                  int32_t len,
+                  void* buffer) {
   return 0;
 }
 
@@ -236,7 +236,7 @@ void NPP_StreamAsFile(NPP instance, NPStream* stream, const char* fname) {}
 
 void NPP_Print(NPP instance, NPPrint* platformPrint) {}
 
-int16 NPP_HandleEvent(NPP instance, void* event) {
+int16_t NPP_HandleEvent(NPP instance, void* event) {
   PluginObject* obj = (PluginObject*)instance->pdata;
   if (!obj->eventLogging)
     return 0;

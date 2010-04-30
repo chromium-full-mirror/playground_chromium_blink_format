@@ -856,7 +856,7 @@ void PluginView::setNPWindowRect(const IntRect& rect) {
 }
 
 NPError PluginView::handlePostReadFile(Vector<char>& buffer,
-                                       uint32 len,
+                                       uint32_t len,
                                        const char* buf) {
   String filename(buf, len);
 

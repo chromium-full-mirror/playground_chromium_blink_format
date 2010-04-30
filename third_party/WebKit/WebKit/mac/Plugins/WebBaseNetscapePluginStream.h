@@ -116,7 +116,7 @@ class WebNetscapePluginStream
 
   NPP m_plugin;
   uint16 m_transferMode;
-  int32 m_offset;
+  int32_t m_offset;
   NPStream m_stream;
   RetainPtr<NSString> m_path;
   int m_fileDescriptor;
