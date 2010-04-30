@@ -85,7 +85,7 @@ static NPError staticPluginQuirkRequiresGtkToolKit_NPN_GetValue(
     NPNVariable variable,
     void* value) {
   if (variable == NPNVToolkit) {
-    *static_cast<uint32*>(value) = 2;
+    *static_cast<uint32_t*>(value) = 2;
     return NPERR_NO_ERROR;
   }
 
@@ -145,7 +145,7 @@ abort:
   return false;
 }
 
-uint16 PluginPackage::NPVersion() const {
+uint16_t PluginPackage::NPVersion() const {
   return NP_VERSION_MINOR;
 }
 }
