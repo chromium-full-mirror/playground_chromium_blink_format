@@ -42,7 +42,7 @@
                                        NPBool allowed,
                                        void* context))callbackFunc
                      context:(void*)context;
-- (uint32)checkRequestID;
+- (uint32_t)checkRequestID;
 - (void (*)(NPP npp, uint32_t, NPBool, void*))callback;
 - (void*)context;
 

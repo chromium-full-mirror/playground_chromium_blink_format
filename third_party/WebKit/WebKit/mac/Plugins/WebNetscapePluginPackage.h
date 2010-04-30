@@ -43,8 +43,8 @@ typedef enum { WebCFMExecutableType, WebMachOExecutableType } WebExecutableType;
   NPPluginFuncs pluginFuncs;
   NPNetscapeFuncs browserFuncs;
 
-  uint16 pluginSize;
-  uint16 pluginVersion;
+  uint16_t pluginSize;
+  uint16_t pluginVersion;
 
   ResFileRefNum resourceRef;
 
