@@ -75,7 +75,6 @@ void StorageEventDispatcherImpl::dispatchStorageEvent(
     }
   }
 
-  // FIXME: Figure out how to pass in the document URI.
   for (unsigned i = 0; i < frames.size(); ++i) {
     ExceptionCode ec = 0;
     Storage* storage = frames[i]->domWindow()->localStorage(ec);

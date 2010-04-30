@@ -44,23 +44,23 @@ PassRefPtr<StorageEvent> StorageEvent::create(const AtomicString& type,
                                               const String& key,
                                               const String& oldValue,
                                               const String& newValue,
-                                              const String& uri,
+                                              const String& url,
                                               Storage* storageArea) {
   return adoptRef(
-      new StorageEvent(type, key, oldValue, newValue, uri, storageArea));
+      new StorageEvent(type, key, oldValue, newValue, url, storageArea));
 }
 
 StorageEvent::StorageEvent(const AtomicString& type,
                            const String& key,
                            const String& oldValue,
                            const String& newValue,
-                           const String& uri,
+                           const String& url,
                            Storage* storageArea)
     : Event(type, false, false),
       m_key(key),
       m_oldValue(oldValue),
       m_newValue(newValue),
-      m_uri(uri),
+      m_url(url),
       m_storageArea(storageArea) {}
 
 void StorageEvent::initStorageEvent(const AtomicString& type,
@@ -69,7 +69,7 @@ void StorageEvent::initStorageEvent(const AtomicString& type,
                                     const String& key,
                                     const String& oldValue,
                                     const String& newValue,
-                                    const String& uri,
+                                    const String& url,
                                     Storage* storageArea) {
   if (dispatched())
     return;
@@ -79,7 +79,7 @@ void StorageEvent::initStorageEvent(const AtomicString& type,
   m_key = key;
   m_oldValue = oldValue;
   m_newValue = newValue;
-  m_uri = uri;
+  m_url = url;
   m_storageArea = storageArea;
 }
 
