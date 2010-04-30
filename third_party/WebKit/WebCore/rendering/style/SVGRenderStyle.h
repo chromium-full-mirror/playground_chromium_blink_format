@@ -260,11 +260,15 @@ class SVGRenderStyle : public RefCounted<SVGRenderStyle> {
                                                String())
 
   // convenience
+  bool hasMarkers() const {
+    return !markerStartResource().isEmpty() || !markerMidResource().isEmpty() ||
+           !markerEndResource().isEmpty();
+  }
   bool hasStroke() const {
-    return (strokePaint()->paintType() != SVGPaint::SVG_PAINTTYPE_NONE);
+    return strokePaint()->paintType() != SVGPaint::SVG_PAINTTYPE_NONE;
   }
   bool hasFill() const {
-    return (fillPaint()->paintType() != SVGPaint::SVG_PAINTTYPE_NONE);
+    return fillPaint()->paintType() != SVGPaint::SVG_PAINTTYPE_NONE;
   }
 
   static float cssPrimitiveToLength(const RenderObject*,
