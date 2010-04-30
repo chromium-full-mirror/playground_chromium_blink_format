@@ -579,7 +579,7 @@ void PluginView::setParentVisible(bool visible) {
 }
 
 NPError PluginView::handlePostReadFile(Vector<char>& buffer,
-                                       uint32 len,
+                                       uint32_t len,
                                        const char* buf) {
   String filename(buf, len);
 
@@ -615,9 +615,9 @@ bool PluginView::platformGetValueStatic(NPNVariable variable,
   switch (variable) {
     case NPNVToolkit:
 #if defined(XP_UNIX)
-      *static_cast<uint32*>(value) = 2;
+      *static_cast<uint32_t*>(value) = 2;
 #else
-      *static_cast<uint32*>(value) = 0;
+      *static_cast<uint32_t*>(value) = 0;
 #endif
       *result = NPERR_NO_ERROR;
       return true;
