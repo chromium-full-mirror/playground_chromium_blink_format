@@ -445,6 +445,11 @@ class RenderBox : public RenderBoxModelObject {
                        CompositeOperator = CompositeSourceOver,
                        RenderObject* backgroundObject = 0);
 
+  void paintBoxDecorationsWithSize(PaintInfo&,
+                                   int tx,
+                                   int ty,
+                                   int width,
+                                   int height);
   void paintMaskImages(const PaintInfo&, int tx, int ty, int width, int height);
 
 #if PLATFORM(MAC)
