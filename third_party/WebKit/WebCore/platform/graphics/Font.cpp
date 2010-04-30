@@ -196,7 +196,7 @@ void Font::drawText(GraphicsContext* context,
 #endif
 
 #if USE(FONT_FAST_PATH)
-  if (canUseGlyphCache(run))
+  if (codePath(run) != Complex)
     return drawSimpleText(context, run, point, from, to);
 #endif
 
@@ -212,12 +212,14 @@ float Font::floatWidth(const TextRun& run,
 #endif
 
 #if USE(FONT_FAST_PATH)
-  if (canUseGlyphCache(run)) {
+  CodePath codePathToUse = codePath(run);
+  if (codePathToUse != Complex) {
     // If the complex text implementation cannot return fallback fonts, avoid
     // returning them for simple text as well.
     static bool returnFallbackFonts = canReturnFallbackFontsForComplexText();
-    return floatWidthForSimpleText(run, 0,
-                                   returnFallbackFonts ? fallbackFonts : 0);
+    return floatWidthForSimpleText(
+        run, 0, returnFallbackFonts ? fallbackFonts : 0,
+        codePathToUse == SimpleWithGlyphOverflow ? glyphOverflow : 0);
   }
 #endif
 
@@ -240,7 +242,7 @@ float Font::floatWidth(const TextRun& run,
   glyphName = "";
 
 #if USE(FONT_FAST_PATH)
-  if (canUseGlyphCache(run))
+  if (codePath(run) != Complex)
     return floatWidthForSimpleText(run, 0);
 #endif
 
@@ -260,7 +262,7 @@ FloatRect Font::selectionRectForText(const TextRun& run,
   to = (to == -1 ? run.length() : to);
 
 #if USE(FONT_FAST_PATH)
-  if (canUseGlyphCache(run))
+  if (codePath(run) != Complex)
     return selectionRectForSimpleText(run, point, h, from, to);
 #endif
 
@@ -276,7 +278,7 @@ int Font::offsetForPosition(const TextRun& run,
 #endif
 
 #if USE(FONT_FAST_PATH)
-  if (canUseGlyphCache(run))
+  if (codePath(run) != Complex)
     return offsetForPositionForSimpleText(run, x, includePartialGlyphs);
 #endif
 
