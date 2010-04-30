@@ -201,10 +201,10 @@ typedef struct _NPRect {
  */
 enum { NP_SETWINDOW = 1, NP_PRINT };
 
-typedef struct { int32 type; } NPAnyCallbackStruct;
+typedef struct { int32_t type; } NPAnyCallbackStruct;
 
 typedef struct {
-  int32 type;
+  int32_t type;
   Display* display;
   Visual* visual;
   Colormap colormap;
@@ -212,7 +212,7 @@ typedef struct {
 } NPSetWindowCallbackStruct;
 
 typedef struct {
-  int32 type;
+  int32_t type;
   FILE* fp;
 } NPPrintCallbackStruct;
 
