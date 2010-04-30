@@ -208,16 +208,16 @@ static void webkit_test_plugin_stream_as_file(NPP /*instance*/,
                                               NPStream* /*stream*/,
                                               const char* /*fname*/) {}
 
-static int32 webkit_test_plugin_write_ready(NPP /*instance*/,
-                                            NPStream* /*stream*/) {
+static int32_t webkit_test_plugin_write_ready(NPP /*instance*/,
+                                              NPStream* /*stream*/) {
   return 0;
 }
 
-static int32 webkit_test_plugin_write(NPP /*instance*/,
-                                      NPStream* /*stream*/,
-                                      int32_t /*offset*/,
-                                      int32_t /*len*/,
-                                      void* /*buffer*/) {
+static int32_t webkit_test_plugin_write(NPP /*instance*/,
+                                        NPStream* /*stream*/,
+                                        int32_t /*offset*/,
+                                        int32_t /*len*/,
+                                        void* /*buffer*/) {
   return 0;
 }
 
