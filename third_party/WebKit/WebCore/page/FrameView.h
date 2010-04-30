@@ -144,7 +144,7 @@ class FrameView : public ScrollView {
   virtual IntRect windowResizerRect() const;
 
   void setScrollPosition(const IntPoint&);
-  void scrollPositionChanged();
+  virtual void scrollPositionChanged();
 
   String mediaType() const;
   void setMediaType(const String&);

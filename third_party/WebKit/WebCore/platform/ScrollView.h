@@ -374,6 +374,10 @@ class ScrollView : public Widget, public ScrollbarClient {
   // view.
   void updateScrollbars(const IntSize& desiredOffset);
 
+  // Called when the scroll position within this view changes.  FrameView
+  // overrides this to generate repaint invalidations.
+  virtual void scrollPositionChanged() {}
+
   void platformInit();
   void platformDestroy();
   void platformAddChild(Widget*);
