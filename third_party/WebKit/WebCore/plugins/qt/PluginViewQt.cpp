@@ -584,7 +584,7 @@ bool PluginView::platformGetValueStatic(NPNVariable variable,
                                         NPError* result) {
   switch (variable) {
     case NPNVToolkit:
-      *static_cast<uint32*>(value) = 0;
+      *static_cast<uint32_t*>(value) = 0;
       *result = NPERR_NO_ERROR;
       return true;
 
