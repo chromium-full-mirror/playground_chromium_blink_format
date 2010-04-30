@@ -64,6 +64,8 @@ class EditCommand : public RefCounted<EditCommand> {
 
   virtual bool preservesTypingStyle() const;
 
+  bool isTopLevelCommand() const { return !m_parent; }
+
  protected:
   EditCommand(Document*);
 

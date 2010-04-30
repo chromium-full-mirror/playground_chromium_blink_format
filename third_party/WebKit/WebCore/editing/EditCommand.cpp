@@ -62,7 +62,7 @@ void EditCommand::apply() {
 
   Frame* frame = m_document->frame();
 
-  if (!m_parent) {
+  if (isTopLevelCommand()) {
     if (!endingSelection().isContentRichlyEditable()) {
       switch (editingAction()) {
         case EditActionTyping:
@@ -87,7 +87,7 @@ void EditCommand::apply() {
   // that
   // use them perform one if one is necessary (like for the creation of
   // VisiblePositions).
-  if (!m_parent)
+  if (isTopLevelCommand())
     updateLayout();
 
   DeleteButtonController* deleteButtonController =
@@ -96,8 +96,7 @@ void EditCommand::apply() {
   doApply();
   deleteButtonController->enable();
 
-  if (!m_parent) {
-    updateLayout();
+  if (isTopLevelCommand()) {
     // Only need to call appliedEditing for top-level commands, and
     // TypingCommands do it on their
     // own (see TypingCommand::typingAddedToOpenCommand).
@@ -120,7 +119,7 @@ void EditCommand::unapply() {
   // that
   // use them perform one if one is necessary (like for the creation of
   // VisiblePositions).
-  if (!m_parent)
+  if (isTopLevelCommand())
     updateLayout();
 
   DeleteButtonController* deleteButtonController =
@@ -129,10 +128,8 @@ void EditCommand::unapply() {
   doUnapply();
   deleteButtonController->enable();
 
-  if (!m_parent) {
-    updateLayout();
+  if (isTopLevelCommand())
     frame->editor()->unappliedEditing(this);
-  }
 }
 
 void EditCommand::reapply() {
@@ -149,7 +146,7 @@ void EditCommand::reapply() {
   // that
   // use them perform one if one is necessary (like for the creation of
   // VisiblePositions).
-  if (!m_parent)
+  if (isTopLevelCommand())
     updateLayout();
 
   DeleteButtonController* deleteButtonController =
@@ -158,10 +155,8 @@ void EditCommand::reapply() {
   doReapply();
   deleteButtonController->enable();
 
-  if (!m_parent) {
-    updateLayout();
+  if (isTopLevelCommand())
     frame->editor()->reappliedEditing(this);
-  }
 }
 
 void EditCommand::doReapply() {
