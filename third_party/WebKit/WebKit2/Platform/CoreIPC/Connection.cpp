@@ -82,7 +82,7 @@ void Connection::invalidate() {
       WorkItem::create(this, &Connection::platformInvalidate));
 }
 
-bool Connection::sendMessage(unsigned messageID,
+bool Connection::sendMessage(MessageID messageID,
                              auto_ptr<ArgumentEncoder> arguments) {
   if (!isValid())
     return false;
@@ -108,7 +108,7 @@ std::auto_ptr<ArgumentDecoder> Connection::waitForMessage(
     for (size_t i = 0; i < m_incomingMessages.size(); ++i) {
       const IncomingMessage& message = m_incomingMessages[i];
 
-      if (message.messageID() == messageID &&
+      if (equalIgnoringFlags(message.messageID(), messageID) &&
           message.arguments()->destinationID() == destinationID) {
         std::auto_ptr<ArgumentDecoder> arguments(message.arguments());
 
@@ -164,7 +164,7 @@ std::auto_ptr<ArgumentDecoder> Connection::waitForMessage(
 }
 
 std::auto_ptr<ArgumentDecoder> Connection::sendSyncMessage(
-    unsigned messageID,
+    MessageID messageID,
     uint64_t syncRequestID,
     std::auto_ptr<ArgumentEncoder> encoder,
     double timeout) {
@@ -271,8 +271,7 @@ void Connection::dispatchMessages() {
                                       replyEncoder.get());
 
       // Send the reply.
-      sendMessage(MessageID(CoreIPCMessage::SyncMessageReply).toInt(),
-                  replyEncoder);
+      sendMessage(MessageID(CoreIPCMessage::SyncMessageReply), replyEncoder);
     } else
       m_client->didReceiveMessage(this, message.messageID(), arguments);
 
