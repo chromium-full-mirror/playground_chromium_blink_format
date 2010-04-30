@@ -249,7 +249,7 @@ bool GIFImageDecoder::haveDecodedRow(unsigned frameIndex,
   return true;
 }
 
-void GIFImageDecoder::frameComplete(
+bool GIFImageDecoder::frameComplete(
     unsigned frameIndex,
     unsigned frameDuration,
     RGBA32Buffer::FrameDisposalMethod disposalMethod) {
@@ -258,7 +258,7 @@ void GIFImageDecoder::frameComplete(
   RGBA32Buffer& buffer = m_frameBufferCache[frameIndex];
   if ((buffer.status() == RGBA32Buffer::FrameEmpty) &&
       !initFrameBuffer(frameIndex))
-    return;
+    return false;  // initFrameBuffer() has already called setFailed().
 
   buffer.setStatus(RGBA32Buffer::FrameComplete);
   buffer.setDuration(frameDuration);
@@ -297,6 +297,8 @@ void GIFImageDecoder::frameComplete(
         buffer.setHasAlpha(false);
     }
   }
+
+  return true;
 }
 
 void GIFImageDecoder::gifComplete() {
@@ -312,8 +314,11 @@ void GIFImageDecoder::decode(unsigned haltAtFrame, GIFQuery query) {
   if (!m_reader)
     m_reader.set(new GIFImageReader(this));
 
+  // If we couldn't decode the image but we've received all the data, decoding
+  // has failed.
   if (!m_reader->read((const unsigned char*)m_data->data() + m_readOffset,
-                      m_data->size() - m_readOffset, query, haltAtFrame))
+                      m_data->size() - m_readOffset, query, haltAtFrame) &&
+      isAllDataReceived())
     setFailed();
 
   if (failed())

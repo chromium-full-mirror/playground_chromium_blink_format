@@ -116,7 +116,7 @@ class PNGImageReader {
 
   unsigned currentBufferSize() const { return m_currentBufferSize; }
 
-  void decode(const SharedBuffer& data, bool sizeOnly) {
+  bool decode(const SharedBuffer& data, bool sizeOnly) {
     m_decodingSizeOnly = sizeOnly;
     PNGImageDecoder* decoder =
         static_cast<PNGImageDecoder*>(png_get_progressive_ptr(m_png));
@@ -124,8 +124,7 @@ class PNGImageReader {
     // We need to do the setjmp here. Otherwise bad things will happen.
     if (setjmp(m_png->jmpbuf)) {
       close();
-      decoder->setFailed();
-      return;
+      return decoder->setFailed();
     }
 
     const char* segment;
@@ -140,10 +139,9 @@ class PNGImageReader {
       // (recursively) trigger additional decoding if we haven't.
       if (sizeOnly ? decoder->ImageDecoder::isSizeAvailable()
                    : decoder->isComplete())
-        return;
+        return true;
     }
-    if (!decoder->isComplete() && decoder->isAllDataReceived())
-      decoder->pngComplete();
+    return false;
   }
 
   bool decodingSizeOnly() const { return m_decodingSizeOnly; }
@@ -368,7 +366,10 @@ void PNGImageDecoder::decode(bool onlySize) {
   if (!m_reader)
     m_reader.set(new PNGImageReader(this));
 
-  m_reader->decode(*m_data, onlySize);
+  // If we couldn't decode the image but we've received all the data, decoding
+  // has failed.
+  if (!m_reader->decode(*m_data, onlySize) && isAllDataReceived())
+    setFailed();
 
   if (failed() || isComplete())
     m_reader.clear();
