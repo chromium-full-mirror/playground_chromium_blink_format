@@ -2826,6 +2826,11 @@ bool CSSStyleSelector::SelectorChecker::checkOneSelector(
           break;
         return true;
       }
+      case CSSSelector::PseudoLeftPage:
+      case CSSSelector::PseudoRightPage:
+      case CSSSelector::PseudoFirstPage:
+        // Page media related pseudo-classes are not handled yet.
+        return false;
       case CSSSelector::PseudoUnknown:
       case CSSSelector::PseudoNotParsed:
       default:
