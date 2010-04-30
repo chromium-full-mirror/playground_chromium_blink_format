@@ -115,7 +115,7 @@ class WebNetscapePluginStream
   RetainPtr<NSString> m_mimeType;
 
   NPP m_plugin;
-  uint16 m_transferMode;
+  uint16_t m_transferMode;
   int32_t m_offset;
   NPStream m_stream;
   RetainPtr<NSString> m_path;
