@@ -202,6 +202,7 @@ class X86Assembler {
     GROUP1A_OP_POP = 0,
 
     GROUP2_OP_SHL = 4,
+    GROUP2_OP_SHR = 5,
     GROUP2_OP_SAR = 7,
 
     GROUP3_OP_TEST = 0,
@@ -605,6 +606,19 @@ class X86Assembler {
 
   void sarl_CLr(RegisterID dst) {
     m_formatter.oneByteOp(OP_GROUP2_EvCL, GROUP2_OP_SAR, dst);
+  }
+
+  void shrl_i8r(int imm, RegisterID dst) {
+    if (imm == 1)
+      m_formatter.oneByteOp(OP_GROUP2_Ev1, GROUP2_OP_SHR, dst);
+    else {
+      m_formatter.oneByteOp(OP_GROUP2_EvIb, GROUP2_OP_SHR, dst);
+      m_formatter.immediate8(imm);
+    }
+  }
+
+  void shrl_CLr(RegisterID dst) {
+    m_formatter.oneByteOp(OP_GROUP2_EvCL, GROUP2_OP_SHR, dst);
   }
 
   void shll_i8r(int imm, RegisterID dst) {
