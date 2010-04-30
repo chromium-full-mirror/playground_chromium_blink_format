@@ -31,19 +31,19 @@
 #if ENABLE(NETSCAPE_PLUGIN_API)
 
 @interface WebNetscapeContainerCheckContextInfo : NSObject {
-  uint32 _checkRequestID;
-  void (*_callback)(NPP npp, uint32, NPBool, void*);
+  uint32_t _checkRequestID;
+  void (*_callback)(NPP npp, uint32_t, NPBool, void*);
   void* _context;
 }
 
-- (id)initWithCheckRequestID:(uint32)checkRequestID
+- (id)initWithCheckRequestID:(uint32_t)checkRequestID
                 callbackFunc:(void (*)(NPP npp,
-                                       uint32 checkID,
+                                       uint32_t checkID,
                                        NPBool allowed,
                                        void* context))callbackFunc
                      context:(void*)context;
 - (uint32)checkRequestID;
-- (void (*)(NPP npp, uint32, NPBool, void*))callback;
+- (void (*)(NPP npp, uint32_t, NPBool, void*))callback;
 - (void*)context;
 
 @end
