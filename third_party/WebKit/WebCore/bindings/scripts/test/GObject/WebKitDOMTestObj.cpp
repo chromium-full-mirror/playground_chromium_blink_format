@@ -31,8 +31,6 @@
 #include "webkit/WebKitDOMSerializedScriptValuePrivate.h"
 #include "webkit/WebKitDOMTestObj.h"
 #include "webkit/WebKitDOMTestObjPrivate.h"
-#include "webkit/WebKitDOMlog.h"
-#include "webkit/WebKitDOMlogPrivate.h"
 #include "webkitmarshal.h"
 #include "webkitprivate.h"
 
@@ -144,8 +142,6 @@ void webkit_dom_test_obj_method_with_exception(WebKitDOMTestObj* self,
                         ecdesc.name);
   }
 }
-
-/* TODO: custom function webkit_dom_test_obj_custom_args_and_exception */
 
 /* TODO: event function webkit_dom_test_obj_add_event_listener */
 
