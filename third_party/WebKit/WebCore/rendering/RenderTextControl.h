@@ -102,8 +102,6 @@ class RenderTextControl : public RenderBlock {
  private:
   virtual const char* renderName() const { return "RenderTextControl"; }
   virtual bool isTextControl() const { return true; }
-  virtual bool hasControlClip() const { return false; }
-  virtual IntRect controlClipRect(int tx, int ty) const;
   virtual void calcPrefWidths();
   virtual void removeLeftoverAnonymousBlock(RenderBlock*) {}
   virtual bool canHaveChildren() const { return false; }
