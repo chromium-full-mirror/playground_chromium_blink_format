@@ -154,6 +154,8 @@ class EventHandler : public Noncopyable {
 
   bool mouseMoved(const PlatformMouseEvent&);
 
+  void lostMouseCapture();
+
   bool handleMousePressEvent(const PlatformMouseEvent&);
   bool handleMouseMoveEvent(const PlatformMouseEvent&,
                             HitTestResult* hoveredNode = 0);
