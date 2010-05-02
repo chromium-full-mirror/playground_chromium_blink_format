@@ -73,7 +73,7 @@ ThreadGlobalData::ThreadGlobalData()
 {
   // This constructor will have been called on the main thread before being
   // called on
-  // any other thread, and is only called once per thread – this makes this a
+  // any other thread, and is only called once per thread - this makes this a
   // convenient
   // point to call methods that internally perform a one-time initialization
   // that is not
