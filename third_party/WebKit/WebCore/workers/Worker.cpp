@@ -59,7 +59,7 @@ Worker::Worker(const String& url,
   if (ec)
     return;
 
-  m_scriptLoader = new WorkerScriptLoader();
+  m_scriptLoader = new WorkerScriptLoader(ResourceRequestBase::TargetIsWorker);
   m_scriptLoader->loadAsynchronously(scriptExecutionContext(), scriptURL,
                                      DenyCrossOriginRequests, this);
   setPendingActivity(this);  // The worker context does not exist while loading,

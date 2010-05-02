@@ -77,7 +77,8 @@ class SharedWorkerScriptLoader : private WorkerScriptLoaderClient,
         m_name(name),
         m_webWorker(webWorker),
         m_port(port),
-        m_loading(false) {}
+        m_loading(false),
+        m_scriptLoader(ResourceRequestBase::TargetIsSharedWorker) {}
 
   ~SharedWorkerScriptLoader();
   void load();

@@ -64,7 +64,9 @@ class ResourceRequestBase : public FastAllocBase {
     TargetIsFontResource,
     TargetIsImage,
     TargetIsObject,
-    TargetIsMedia
+    TargetIsMedia,
+    TargetIsWorker,
+    TargetIsSharedWorker
   };
 
   static PassOwnPtr<ResourceRequest> adopt(
@@ -214,6 +216,7 @@ struct CrossThreadResourceRequestData : Noncopyable {
   Vector<String> m_responseContentDispositionEncodingFallbackArray;
   RefPtr<FormData> m_httpBody;
   bool m_allowCookies;
+  ResourceRequestBase::TargetType m_targetType;
 };
 
 unsigned initializeMaximumHTTPConnectionCountPerHost();

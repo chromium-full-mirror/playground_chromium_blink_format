@@ -205,7 +205,7 @@ void WorkerContext::importScripts(const Vector<String>& urls,
 
   for (Vector<KURL>::const_iterator it = completedURLs.begin(); it != end;
        ++it) {
-    WorkerScriptLoader scriptLoader;
+    WorkerScriptLoader scriptLoader(ResourceRequestBase::TargetIsScript);
     scriptLoader.loadSynchronously(scriptExecutionContext(), *it,
                                    AllowCrossOriginRequests);
 

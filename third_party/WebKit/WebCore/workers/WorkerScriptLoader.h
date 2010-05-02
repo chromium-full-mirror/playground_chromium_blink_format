@@ -31,6 +31,7 @@
 #if ENABLE(WORKERS)
 
 #include "KURL.h"
+#include "ResourceRequest.h"
 #include "ResourceResponse.h"
 #include "ScriptString.h"
 #include "TextResourceDecoder.h"
@@ -44,7 +45,7 @@ class WorkerScriptLoaderClient;
 
 class WorkerScriptLoader : public ThreadableLoaderClient {
  public:
-  WorkerScriptLoader();
+  explicit WorkerScriptLoader(ResourceRequestBase::TargetType);
 
   void loadSynchronously(ScriptExecutionContext*,
                          const KURL&,
@@ -80,6 +81,7 @@ class WorkerScriptLoader : public ThreadableLoaderClient {
   KURL m_url;
   bool m_failed;
   unsigned long m_identifier;
+  ResourceRequestBase::TargetType m_targetType;
 };
 
 }  // namespace WebCore

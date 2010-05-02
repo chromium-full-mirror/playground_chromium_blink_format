@@ -324,7 +324,8 @@ SharedWorkerScriptLoader::SharedWorkerScriptLoader(
 
 void SharedWorkerScriptLoader::load(const KURL& url) {
   // Mark this object as active for the duration of the load.
-  m_scriptLoader = new WorkerScriptLoader();
+  m_scriptLoader =
+      new WorkerScriptLoader(ResourceRequestBase::TargetIsSharedWorker);
   m_scriptLoader->loadAsynchronously(m_worker->scriptExecutionContext(), url,
                                      DenyCrossOriginRequests, this);
 
