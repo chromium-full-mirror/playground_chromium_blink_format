@@ -64,8 +64,24 @@ DragImageRef scaleDragImage(DragImageRef image, FloatSize scale) {
   return scaledImage;
 }
 
-DragImageRef dissolveDragImageToFraction(DragImageRef image, float) {
-  notImplemented();
+DragImageRef dissolveDragImageToFraction(DragImageRef image, float fraction) {
+  if (!image)
+    return 0;
+
+  image->setIsOpaque(false);
+  image->lockPixels();
+
+  for (int row = 0; row < image->height(); ++row) {
+    for (int column = 0; column < image->width(); ++column) {
+      uint32_t* pixel = image->getAddr32(column, row);
+      *pixel =
+          SkPreMultiplyARGB(SkColorGetA(*pixel) * fraction, SkColorGetR(*pixel),
+                            SkColorGetG(*pixel), SkColorGetB(*pixel));
+    }
+  }
+
+  image->unlockPixels();
+
   return image;
 }
 
@@ -74,7 +90,12 @@ DragImageRef createDragImageFromImage(Image* image) {
     return 0;
 
   NativeImageSkia* bitmap = image->nativeImageForCurrentFrame();
-  return bitmap ? new SkBitmap(*bitmap) : 0;
+  if (!bitmap)
+    return 0;
+
+  SkBitmap* dragImage = new SkBitmap();
+  bitmap->copyTo(dragImage, SkBitmap::kARGB_8888_Config);
+  return dragImage;
 }
 
 DragImageRef createDragImageIconForCachedImage(CachedImage*) {
