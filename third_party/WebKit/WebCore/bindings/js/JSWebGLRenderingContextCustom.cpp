@@ -32,10 +32,8 @@
 #include "ExceptionCode.h"
 #include "HTMLCanvasElement.h"
 #include "HTMLImageElement.h"
-#include "HTMLVideoElement.h"
 #include "JSHTMLCanvasElement.h"
 #include "JSHTMLImageElement.h"
-#include "JSHTMLVideoElement.h"
 #include "JSImageData.h"
 #include "JSWebGLBuffer.h"
 #include "JSWebGLFloatArray.h"
@@ -59,6 +57,11 @@
 #include <runtime/Error.h>
 #include <wtf/FastMalloc.h>
 #include <wtf/OwnFastMallocPtr.h>
+
+#if ENABLE(VIDEO)
+#include "HTMLVideoElement.h"
+#include "JSHTMLVideoElement.h"
+#endif
 
 using namespace JSC;
 
@@ -367,10 +370,12 @@ JSValue JSWebGLRenderingContext::texImage2D(ExecState* exec,
       HTMLCanvasElement* element = static_cast<HTMLCanvasElement*>(
           static_cast<JSHTMLCanvasElement*>(o)->impl());
       context->texImage2D(target, level, element, flipY, premultiplyAlpha, ec);
+#if ENABLE(VIDEO)
     } else if (o->inherits(&JSHTMLVideoElement::s_info)) {
       HTMLVideoElement* element = static_cast<HTMLVideoElement*>(
           static_cast<JSHTMLVideoElement*>(o)->impl());
       context->texImage2D(target, level, element, flipY, premultiplyAlpha, ec);
+#endif
     } else
       ec = TYPE_MISMATCH_ERR;
   } else {
@@ -498,11 +503,13 @@ JSValue JSWebGLRenderingContext::texSubImage2D(ExecState* exec,
           static_cast<JSHTMLCanvasElement*>(o)->impl());
       context->texSubImage2D(target, level, xoff, yoff, element, flipY,
                              premultiplyAlpha, ec);
+#if ENABLE(VIDEO)
     } else if (o->inherits(&JSHTMLVideoElement::s_info)) {
       HTMLVideoElement* element = static_cast<HTMLVideoElement*>(
           static_cast<JSHTMLVideoElement*>(o)->impl());
       context->texSubImage2D(target, level, xoff, yoff, element, flipY,
                              premultiplyAlpha, ec);
+#endif
     } else
       ec = TYPE_MISMATCH_ERR;
   } else {
