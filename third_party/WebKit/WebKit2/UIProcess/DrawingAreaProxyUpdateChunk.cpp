@@ -41,6 +41,7 @@ DrawingAreaProxyUpdateChunk::DrawingAreaProxyUpdateChunk(
     PlatformWebView* webView)
     : DrawingAreaProxy(DrawingAreaUpdateChunkType),
       m_isWaitingForDidSetFrameNotification(false),
+      m_isVisible(true),
       m_webView(webView) {}
 
 DrawingAreaProxyUpdateChunk::~DrawingAreaProxyUpdateChunk() {}
@@ -82,6 +83,20 @@ void DrawingAreaProxyUpdateChunk::setSize(const IntSize& viewSize) {
   page->process()->responsivenessTimer()->start();
   page->process()->connection()->send(DrawingAreaMessage::SetSize,
                                       page->pageID(), CoreIPC::In(viewSize));
+}
+
+void DrawingAreaProxyUpdateChunk::didChangeVisibility() {
+  WebPageProxy* page = this->page();
+  bool isVisible = page->isVisible();
+
+  if (isVisible == m_isVisible)
+    return;
+
+  m_isVisible = isVisible;
+  if (!page->isValid())
+    return;
+
+  // FIXME: Actually notify the web process that the visibility has changed.
 }
 
 void DrawingAreaProxyUpdateChunk::didSetSize(UpdateChunk* updateChunk) {
