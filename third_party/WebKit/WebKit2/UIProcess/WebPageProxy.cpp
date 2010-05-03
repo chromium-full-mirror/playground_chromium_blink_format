@@ -804,7 +804,7 @@ void WebPageProxy::didRunJavaScriptInMainFrame(const String& resultString,
     return;
   }
 
-  callback->performCallbackWithReturnValue(resultString);
+  callback->performCallbackWithReturnValue(resultString.impl());
 }
 
 void WebPageProxy::didGetRenderTreeExternalRepresentation(
@@ -817,7 +817,7 @@ void WebPageProxy::didGetRenderTreeExternalRepresentation(
     return;
   }
 
-  callback->performCallbackWithReturnValue(resultString);
+  callback->performCallbackWithReturnValue(resultString.impl());
 }
 
 void WebPageProxy::processDidBecomeUnresponsive() {
