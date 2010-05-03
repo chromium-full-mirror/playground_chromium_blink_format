@@ -43,7 +43,6 @@ class PageClientImpl : public PageClient {
   virtual void takeFocus(bool direction);
   virtual void toolTipChanged(const WebCore::String& oldToolTip,
                               const WebCore::String& newToolTip);
-  virtual bool isPageVisible();
 
   WKView* m_wkView;
 };

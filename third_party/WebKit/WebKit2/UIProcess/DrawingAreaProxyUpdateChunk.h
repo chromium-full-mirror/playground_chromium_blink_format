@@ -70,7 +70,7 @@ class DrawingAreaProxyUpdateChunk : public DrawingAreaProxy {
                                  CoreIPC::ArgumentDecoder&);
   virtual void paint(const WebCore::IntRect&, PlatformDrawingContext);
   virtual void setSize(const WebCore::IntSize&);
-  virtual void didChangeVisibility();
+  virtual void setPageIsVisible(bool isVisible);
 
   void ensureBackingStore();
   void invalidateBackingStore();
