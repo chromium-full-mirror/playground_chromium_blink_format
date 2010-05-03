@@ -653,6 +653,8 @@ void Geolocation::stopUpdating() {
 
 namespace WebCore {
 
+void Geolocation::clearWatch(int watchId) {}
+
 void Geolocation::disconnectFrame() {}
 
 Geolocation::Geolocation(Frame*) {}
