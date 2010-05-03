@@ -79,7 +79,7 @@ void DrawingAreaProxyUpdateChunk::drawUpdateChunkIntoBackingStore(
 
   // Create a bitmap.
   BitmapInfo bitmapInfo =
-      BitmapInfo::createBottomUp(updateChunk->frame().size());
+      BitmapInfo::createBottomUp(updateChunk->rect().size());
 
   // Duplicate the update chunk handle.
   HANDLE updateChunkHandle;
@@ -95,16 +95,16 @@ void DrawingAreaProxyUpdateChunk::drawUpdateChunkIntoBackingStore(
   ::SelectObject(updateChunkBitmapDC.get(), hBitmap.get());
 
   // BitBlt from the UpdateChunk to the backing store.
-  ::BitBlt(m_backingStoreDC.get(), updateChunk->frame().x(),
-           updateChunk->frame().y(), updateChunk->frame().width(),
-           updateChunk->frame().height(), updateChunkBitmapDC.get(), 0, 0,
+  ::BitBlt(m_backingStoreDC.get(), updateChunk->rect().x(),
+           updateChunk->rect().y(), updateChunk->rect().width(),
+           updateChunk->rect().height(), updateChunkBitmapDC.get(), 0, 0,
            SRCCOPY);
 
   // FIXME: We should not do this here.
   ::CloseHandle(updateChunkHandle);
 
   // Invalidate the WebView's HWND.
-  RECT rect = updateChunk->frame();
+  RECT rect = updateChunk->rect();
   ::InvalidateRect(m_webView->window(), &rect, false);
 }
 
