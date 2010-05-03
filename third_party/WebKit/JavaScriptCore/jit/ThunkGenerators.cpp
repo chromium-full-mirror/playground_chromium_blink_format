@@ -25,6 +25,7 @@
 
 #include "config.h"
 #include "ThunkGenerators.h"
+#include <wtf/text/StringImpl.h>
 
 #include "SpecializedThunkJIT.h"
 
@@ -33,7 +34,9 @@
 namespace JSC {
 
 struct ThunkHelpers {
-  static unsigned stringImplDataOffset() { return StringImpl::dataOffset(); }
+  static unsigned stringImplDataOffset() {
+    return WebCore::StringImpl::dataOffset();
+  }
   static unsigned jsStringLengthOffset() {
     return OBJECT_OFFSETOF(JSString, m_length);
   }

@@ -141,7 +141,6 @@ JSGlobalData::JSGlobalData(GlobalDataType globalDataType,
       identifierTable(globalDataType == Default
                           ? wtfThreadData().currentIdentifierTable()
                           : createIdentifierTable()),
-      literalTable(createLiteralTable()),
       propertyNames(new CommonIdentifiers(this)),
       emptyList(new MarkedArgumentBuffer),
       lexer(new Lexer(this)),
@@ -213,7 +212,6 @@ JSGlobalData::~JSGlobalData() {
   delete propertyNames;
   if (globalDataType != Default)
     deleteIdentifierTable(identifierTable);
-  deleteLiteralTable(literalTable);
 
   delete clientData;
 }
