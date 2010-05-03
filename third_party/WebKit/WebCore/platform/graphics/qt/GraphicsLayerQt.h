@@ -78,6 +78,10 @@ class GraphicsLayerQt : public GraphicsLayer {
   virtual void setContentsToImage(Image*);
   virtual void setContentsToMedia(PlatformLayer*);
   virtual void setContentsBackgroundColor(const Color&);
+#if ENABLE(3D_CANVAS)
+  virtual void setContentsToGraphicsContext3D(const GraphicsContext3D*);
+  virtual void setGraphicsContext3DNeedsDisplay();
+#endif
   virtual void setGeometryOrientation(
       CompositingCoordinatesOrientation orientation);
   virtual void setContentsOrientation(

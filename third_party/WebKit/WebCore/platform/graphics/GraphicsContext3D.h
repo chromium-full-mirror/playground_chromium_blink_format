@@ -743,6 +743,9 @@ class GraphicsContext3D : public Noncopyable {
   // Helpers for notification about paint events
   void beginPaint(WebGLRenderingContext* context);
   void endPaint();
+#if PLATFORM(QT)
+  void paint(QPainter* painter, const QRect& rect) const;
+#endif
 
   // Support for buffer creation and deletion
   unsigned createBuffer();
