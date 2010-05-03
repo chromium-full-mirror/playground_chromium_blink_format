@@ -160,6 +160,9 @@
 
 #define WebKitZoomsTextOnlyPreferenceKey "WebKitZoomsTextOnly"
 
+#define WebKitJavaScriptCanAccessClipboardPreferenceKey \
+  "WebKitJavaScriptCanAccessClipboard"
+
 #define WebKitXSSAuditorEnabledPreferenceKey "WebKitXSSAuditorEnabled"
 
 #define WebKitUseHighResolutionTimersPreferenceKey \

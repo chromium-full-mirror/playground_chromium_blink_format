@@ -1364,6 +1364,25 @@ static JSValueRef setPrivateBrowsingEnabledCallback(
   return JSValueMakeUndefined(context);
 }
 
+static JSValueRef setJavaScriptCanAccessClipboardCallback(
+    JSContextRef context,
+    JSObjectRef function,
+    JSObjectRef thisObject,
+    size_t argumentCount,
+    const JSValueRef arguments[],
+    JSValueRef* exception) {
+  // Has mac & windows implementation
+  if (argumentCount < 1)
+    return JSValueMakeUndefined(context);
+
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->setJavaScriptCanAccessClipboard(
+      JSValueToBoolean(context, arguments[0]));
+
+  return JSValueMakeUndefined(context);
+}
+
 static JSValueRef setXSSAuditorEnabledCallback(JSContextRef context,
                                                JSObjectRef function,
                                                JSObjectRef thisObject,
@@ -2464,6 +2483,9 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
        setWillSendRequestReturnsNullOnRedirectCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setWindowIsKey", setWindowIsKeyCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"setJavaScriptCanAccessClipboard",
+       setJavaScriptCanAccessClipboardCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setXSSAuditorEnabled", setXSSAuditorEnabledCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
