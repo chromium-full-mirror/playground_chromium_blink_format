@@ -43,7 +43,7 @@ class PageClient {
   virtual void toolTipChanged(const WebCore::String&,
                               const WebCore::String&) = 0;
 
-  virtual bool isPageVisible() { return true; };
+  virtual bool isPageVisible() = 0;
 };
 
 }  // namespace WebKit
