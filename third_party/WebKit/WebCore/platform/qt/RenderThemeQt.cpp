@@ -984,7 +984,7 @@ ControlPart RenderThemeQt::initializeCommonQStyleOptions(
     case SearchFieldCancelButtonPart: {
       if (isPressed(o))
         option.state |= QStyle::State_Sunken;
-      else if (result == PushButtonPart)
+      else if (result == PushButtonPart || result == ButtonPart)
         option.state |= QStyle::State_Raised;
       break;
     }
