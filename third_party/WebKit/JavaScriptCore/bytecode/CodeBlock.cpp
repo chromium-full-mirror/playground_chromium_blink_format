@@ -1578,13 +1578,15 @@ void CodeBlock::derefStructures(Instruction* vPC) const {
     return;
   }
   if (vPC[0].u.opcode == interpreter->getOpcode(op_get_by_id_proto) ||
-      vPC[0].u.opcode == interpreter->getOpcode(op_get_by_id_getter_proto)) {
+      vPC[0].u.opcode == interpreter->getOpcode(op_get_by_id_getter_proto) ||
+      vPC[0].u.opcode == interpreter->getOpcode(op_get_by_id_custom_proto)) {
     vPC[4].u.structure->deref();
     vPC[5].u.structure->deref();
     return;
   }
   if (vPC[0].u.opcode == interpreter->getOpcode(op_get_by_id_chain) ||
-      vPC[0].u.opcode == interpreter->getOpcode(op_get_by_id_getter_chain)) {
+      vPC[0].u.opcode == interpreter->getOpcode(op_get_by_id_getter_chain) ||
+      vPC[0].u.opcode == interpreter->getOpcode(op_get_by_id_custom_chain)) {
     vPC[4].u.structure->deref();
     vPC[5].u.structureChain->deref();
     return;
@@ -1609,7 +1611,11 @@ void CodeBlock::derefStructures(Instruction* vPC) const {
       (vPC[0].u.opcode ==
        interpreter->getOpcode(op_get_by_id_getter_proto_list)) ||
       (vPC[0].u.opcode ==
-       interpreter->getOpcode(op_get_by_id_getter_self_list))) {
+       interpreter->getOpcode(op_get_by_id_getter_self_list)) ||
+      (vPC[0].u.opcode ==
+       interpreter->getOpcode(op_get_by_id_custom_proto_list)) ||
+      (vPC[0].u.opcode ==
+       interpreter->getOpcode(op_get_by_id_custom_self_list))) {
     PolymorphicAccessStructureList* polymorphicStructures =
         vPC[4].u.polymorphicStructures;
     polymorphicStructures->derefStructures(vPC[5].u.operand);
@@ -1636,13 +1642,15 @@ void CodeBlock::refStructures(Instruction* vPC) const {
     return;
   }
   if (vPC[0].u.opcode == interpreter->getOpcode(op_get_by_id_proto) ||
-      vPC[0].u.opcode == interpreter->getOpcode(op_get_by_id_getter_proto)) {
+      vPC[0].u.opcode == interpreter->getOpcode(op_get_by_id_getter_proto) ||
+      vPC[0].u.opcode == interpreter->getOpcode(op_get_by_id_custom_proto)) {
     vPC[4].u.structure->ref();
     vPC[5].u.structure->ref();
     return;
   }
   if (vPC[0].u.opcode == interpreter->getOpcode(op_get_by_id_chain) ||
-      vPC[0].u.opcode == interpreter->getOpcode(op_get_by_id_getter_chain)) {
+      vPC[0].u.opcode == interpreter->getOpcode(op_get_by_id_getter_chain) ||
+      vPC[0].u.opcode == interpreter->getOpcode(op_get_by_id_custom_chain)) {
     vPC[4].u.structure->ref();
     vPC[5].u.structureChain->ref();
     return;
