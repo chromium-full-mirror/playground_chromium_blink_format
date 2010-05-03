@@ -419,3 +419,8 @@ wxWebKitParseMode wxWebFrame::GetParseMode() const {
 
   return NoDocument;
 }
+
+void wxWebFrame::GrantUniversalAccess() {
+  if (m_impl->frame && m_impl->frame->document())
+    m_impl->frame->document()->securityOrigin()->grantUniversalAccess();
+}

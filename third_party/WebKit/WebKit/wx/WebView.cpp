@@ -1007,3 +1007,8 @@ wxWebKitParseMode wxWebView::GetParseMode() const {
 
   return NoDocument;
 }
+
+void wxWebView::GrantUniversalAccess() {
+  if (m_mainFrame)
+    m_mainFrame->GrantUniversalAccess();
+}

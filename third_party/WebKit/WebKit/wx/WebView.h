@@ -220,6 +220,12 @@ class WXDLLIMPEXP_WEBKIT wxWebView : public wxWindow {
   wxWebSettings GetWebSettings();
   wxWebKitParseMode GetParseMode() const;
 
+  /*
+      This method allows cross site-scripting (XSS) in the WebView.
+      Use with caution!
+  */
+  void GrantUniversalAccess();
+
  protected:
   // event handlers (these functions should _not_ be virtual)
   void OnPaint(wxPaintEvent& event);
