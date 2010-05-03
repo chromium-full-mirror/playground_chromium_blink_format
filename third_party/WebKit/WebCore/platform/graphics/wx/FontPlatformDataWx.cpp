@@ -92,6 +92,11 @@ FontPlatformData::FontPlatformData(const FontDescription& desc,
       italicToWxFontStyle(desc.italic()),
       fontWeightToWxFontWeight(desc.weight()), false, family.string()));
 #endif
+#if OS(DARWIN)
+  m_atsuFontID = m_font->font()->MacGetATSUFontID();
+  cacheNSFont();
+#endif
+  m_size = desc.computedPixelSize();
   m_fontState = VALID;
   m_size = desc.computedPixelSize();
 }
@@ -133,6 +138,23 @@ bool FontPlatformData::useGDI() const {
 
 HFONT FontPlatformData::hfont() const {
   return static_cast<HFONT>(m_font->font()->GetHFONT());
+}
+#endif
+
+#if OS(DARWIN)
+CGFontRef FontPlatformData::cgFont() const {
+  CGFontRef cgFont = 0;
+#ifdef wxOSX_USE_CORE_TEXT&& wxOSX_USE_CORE_TEXT
+  cgFont = CTFontCopyGraphicsFont((CTFontRef)m_font->font()->OSXGetCTFont(), 0);
+#else
+  ATSFontRef fontRef;
+
+  fontRef = FMGetATSFontRefFromFont(m_atsuFontID);
+
+  if (fontRef)
+    cgFont = CGFontCreateWithPlatformFont((void*)&fontRef);
+#endif
+  return cgFont;
 }
 #endif
 }

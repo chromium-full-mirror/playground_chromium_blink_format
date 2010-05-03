@@ -50,6 +50,4 @@ class wxFontProperties {
   float m_xHeight;
 };
 
-bool wxFontContainsCharacters(const wxFont& font,
-                              const UChar* characters,
-                              int length);
+bool wxFontContainsCharacters(void* font, const UChar* characters, int length);

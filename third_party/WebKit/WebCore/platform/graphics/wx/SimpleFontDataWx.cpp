@@ -36,8 +36,13 @@
 #include <unicode/uchar.h>
 #include <unicode/unorm.h>
 
+#if OS(DARWIN)
+#include "WebCoreSystemInterface.h"
+#endif
+
 #include <wx/defs.h>
 #include <wx/dcscreen.h>
+#include <wx/string.h>
 #include "fontprops.h"
 
 namespace WebCore {
@@ -54,11 +59,12 @@ void SimpleFontData::platformInit() {
     m_lineGap = props.GetLineGap();
   }
 
+  m_syntheticBoldOffset = 0.0f;
+
 #if OS(WINDOWS)
   m_scriptCache = 0;
   m_scriptFontProperties = 0;
   m_isSystemFont = false;
-  m_syntheticBoldOffset = 0.0f;
 #endif
 }
 
@@ -97,8 +103,13 @@ SimpleFontData* SimpleFontData::smallCapsFontData(
 
 bool SimpleFontData::containsCharacters(const UChar* characters,
                                         int length) const {
-  // FIXME: We will need to implement this to load non-ASCII encoding sites
-  return wxFontContainsCharacters(*m_platformData.font(), characters, length);
+// FIXME: We will need to implement this to load non-ASCII encoding sites
+#if OS(WINDOWS)
+  return wxFontContainsCharacters(m_platformData.hfont(), characters, length);
+#elif OS(DARWIN)
+  return wxFontContainsCharacters(m_platformData.nsFont(), characters, length);
+#endif
+  return true;
 }
 
 void SimpleFontData::determinePitch() {
@@ -116,6 +127,18 @@ float SimpleFontData::platformWidthForGlyph(Glyph glyph) const {
 #if __WXMSW__
   // under Windows / wxMSW we currently always use GDI fonts.
   return widthForGDIGlyph(glyph);
+#elif OS(DARWIN)
+  float pointSize = m_platformData.size();
+  CGAffineTransform m = CGAffineTransformMakeScale(pointSize, pointSize);
+  CGSize advance;
+  NSFont* nsfont = (NSFont*)m_platformData.nsFont();
+  if (!wkGetGlyphTransformedAdvances(m_platformData.cgFont(), nsfont, &m,
+                                     &glyph, &advance)) {
+    // LOG_ERROR("Unable to cache glyph widths for %@ %f", [nsfont displayName],
+    // pointSize);
+    advance.width = 0;
+  }
+  return advance.width + m_syntheticBoldOffset;
 #else
   // TODO: fix this! Make GetTextExtents a method of wxFont in 2.9
   int width = 10;

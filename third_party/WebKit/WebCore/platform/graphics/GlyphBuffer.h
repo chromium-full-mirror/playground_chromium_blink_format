@@ -34,7 +34,7 @@
 #include <wtf/UnusedParam.h>
 #include <wtf/Vector.h>
 
-#if PLATFORM(CG)
+#if PLATFORM(CG) || (PLATFORM(WX) && OS(DARWIN))
 #include <ApplicationServices/ApplicationServices.h>
 #endif
 
@@ -59,7 +59,7 @@ typedef Glyph GlyphBufferGlyph;
 
 // CG uses CGSize instead of FloatSize so that the result of advances()
 // can be passed directly to CGContextShowGlyphsWithAdvances in FontMac.mm
-#if PLATFORM(CG)
+#if PLATFORM(CG) || (PLATFORM(WX) && OS(DARWIN))
 typedef CGSize GlyphBufferAdvance;
 #elif OS(WINCE)
 // There is no cross-platform code that uses the height of GlyphBufferAdvance,
@@ -125,7 +125,7 @@ class GlyphBuffer {
   }
 
   float advanceAt(int index) const {
-#if PLATFORM(CG)
+#if PLATFORM(CG) || (PLATFORM(WX) && OS(DARWIN))
     return m_advances[index].width;
 #elif OS(WINCE)
     return m_advances[index];
@@ -157,7 +157,7 @@ class GlyphBuffer {
     m_glyphs.append(glyph);
 #endif
 
-#if PLATFORM(CG)
+#if PLATFORM(CG) || (PLATFORM(WX) && OS(DARWIN))
     CGSize advance = {width, 0};
     m_advances.append(advance);
 #elif OS(WINCE)
