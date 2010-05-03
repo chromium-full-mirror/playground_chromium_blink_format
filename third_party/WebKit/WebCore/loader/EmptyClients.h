@@ -294,6 +294,7 @@ class EmptyFrameLoaderClient : public FrameLoaderClient, public Noncopyable {
 
   virtual void dispatchUnableToImplementPolicy(const ResourceError&) {}
 
+  virtual void dispatchWillSendSubmitEvent(HTMLFormElement*) {}
   virtual void dispatchWillSubmitForm(FramePolicyFunction,
                                       PassRefPtr<FormState>) {}
 

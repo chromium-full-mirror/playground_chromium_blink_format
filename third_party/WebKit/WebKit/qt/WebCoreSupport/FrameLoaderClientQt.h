@@ -165,6 +165,7 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
 
   virtual void dispatchUnableToImplementPolicy(const WebCore::ResourceError&);
 
+  virtual void dispatchWillSendSubmitEvent(HTMLFormElement*) {}
   virtual void dispatchWillSubmitForm(FramePolicyFunction,
                                       PassRefPtr<FormState>);
 

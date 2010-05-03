@@ -305,6 +305,7 @@ class DECLSPEC_UUID("{A3676398-4485-4a9d-87DC-CB5A40E6351D}") WebFrame
   virtual void detachedFromParent2();
   virtual void detachedFromParent3();
   virtual void cancelPolicyCheck();
+  virtual void dispatchWillSendSubmitEvent(WebCore::HTMLFormElement*) {}
   virtual void dispatchWillSubmitForm(WebCore::FramePolicyFunction,
                                       PassRefPtr<WebCore::FormState>);
   virtual void revertToProvisionalState(WebCore::DocumentLoader*);

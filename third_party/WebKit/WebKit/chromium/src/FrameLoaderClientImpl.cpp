@@ -923,6 +923,11 @@ void FrameLoaderClientImpl::dispatchUnableToImplementPolicy(
   m_webFrame->client()->unableToImplementPolicyWithError(m_webFrame, error);
 }
 
+void FrameLoaderClientImpl::dispatchWillSendSubmitEvent(HTMLFormElement* form) {
+  if (m_webFrame->client())
+    m_webFrame->client()->willSendSubmitEvent(m_webFrame, WebFormElement(form));
+}
+
 void FrameLoaderClientImpl::dispatchWillSubmitForm(
     FramePolicyFunction function,
     PassRefPtr<FormState> formState) {

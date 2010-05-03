@@ -115,6 +115,7 @@ class FrameLoaderClientHaiku : public FrameLoaderClient {
   virtual void dispatchShow();
   virtual void cancelPolicyCheck();
 
+  virtual void dispatchWillSendSubmitEvent(HTMLFormElement*) {}
   virtual void dispatchWillSubmitForm(FramePolicyFunction,
                                       PassRefPtr<FormState>);
 
