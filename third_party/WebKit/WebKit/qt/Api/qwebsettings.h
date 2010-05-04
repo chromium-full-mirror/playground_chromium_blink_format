@@ -71,11 +71,11 @@ class QWEBKIT_EXPORT QWebSettings {
     JavaScriptCanAccessClipboard,
     XSSAuditingEnabled,
     AcceleratedCompositingEnabled,
-    WebGLEnabled,
     SpatialNavigationEnabled,
     LocalContentCanAccessFileUrls,
     TiledBackingStoreEnabled,
-    FrameFlatteningEnabled
+    FrameFlatteningEnabled,
+    WebGLEnabled
   };
   enum WebGraphic {
     MissingImageGraphic,
