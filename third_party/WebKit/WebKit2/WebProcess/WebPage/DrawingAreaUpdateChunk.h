@@ -56,8 +56,11 @@ class DrawingAreaUpdateChunk : public DrawingArea {
 
  private:
   void scheduleDisplay();
-  void setSize(const WebCore::IntSize& viewSize);
 
+  // CoreIPC message handlers.
+  void setSize(const WebCore::IntSize& viewSize);
+  void suspendPainting();
+  void resumePainting();
   void didUpdate();
 
   // Platform overrides
@@ -65,6 +68,7 @@ class DrawingAreaUpdateChunk : public DrawingArea {
 
   WebCore::IntRect m_dirtyRect;
   bool m_isWaitingForUpdate;
+  bool m_shouldPaint;
   RunLoop::Timer<DrawingAreaUpdateChunk> m_displayTimer;
 };
 

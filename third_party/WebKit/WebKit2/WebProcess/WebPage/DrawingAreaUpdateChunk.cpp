@@ -40,6 +40,7 @@ namespace WebKit {
 DrawingAreaUpdateChunk::DrawingAreaUpdateChunk(WebPage* webPage)
     : DrawingArea(DrawingAreaUpdateChunkType, webPage),
       m_isWaitingForUpdate(false),
+      m_shouldPaint(true),
       m_displayTimer(WebProcess::shared().runLoop(),
                      this,
                      &DrawingAreaUpdateChunk::display) {}
@@ -77,6 +78,9 @@ void DrawingAreaUpdateChunk::setNeedsDisplay(const IntRect& rect) {
 void DrawingAreaUpdateChunk::display() {
   ASSERT(!m_isWaitingForUpdate);
 
+  if (!m_shouldPaint)
+    return;
+
   if (m_dirtyRect.isEmpty())
     return;
 
@@ -99,6 +103,9 @@ void DrawingAreaUpdateChunk::display() {
 }
 
 void DrawingAreaUpdateChunk::scheduleDisplay() {
+  if (!m_shouldPaint)
+    return;
+
   if (m_isWaitingForUpdate)
     return;
 
@@ -109,6 +116,7 @@ void DrawingAreaUpdateChunk::scheduleDisplay() {
 }
 
 void DrawingAreaUpdateChunk::setSize(const IntSize& viewSize) {
+  ASSERT(m_shouldPaint);
   ASSERT_ARG(viewSize, !viewSize.isEmpty());
 
   // We don't want to wait for an update until we display.
@@ -128,6 +136,22 @@ void DrawingAreaUpdateChunk::setSize(const IntSize& viewSize) {
   WebProcess::shared().connection()->send(DrawingAreaProxyMessage::DidSetSize,
                                           m_webPage->pageID(),
                                           CoreIPC::In(updateChunk));
+}
+
+void DrawingAreaUpdateChunk::suspendPainting() {
+  ASSERT(m_shouldPaint);
+
+  m_shouldPaint = false;
+  m_displayTimer.stop();
+}
+
+void DrawingAreaUpdateChunk::resumePainting() {
+  ASSERT(!m_shouldPaint);
+
+  m_shouldPaint = true;
+
+  // Display if needed.
+  display();
 }
 
 void DrawingAreaUpdateChunk::didUpdate() {
@@ -150,6 +174,14 @@ void DrawingAreaUpdateChunk::didReceiveMessage(
       setSize(size);
       break;
     }
+
+    case DrawingAreaMessage::SuspendPainting:
+      suspendPainting();
+      break;
+
+    case DrawingAreaMessage::ResumePainting:
+      resumePainting();
+      break;
 
     case DrawingAreaMessage::DidUpdate:
       didUpdate();
