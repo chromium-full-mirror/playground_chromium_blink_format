@@ -298,7 +298,7 @@ void PluginView::setParentVisible(bool visible) {
 }
 
 NPError PluginView::handlePostReadFile(Vector<char>& buffer,
-                                       uint32 len,
+                                       uint32_t len,
                                        const char* buf) {
   notImplemented();
   return NPERR_NO_ERROR;
