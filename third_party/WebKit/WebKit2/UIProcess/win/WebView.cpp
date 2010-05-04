@@ -128,6 +128,9 @@ LRESULT WebView::wndProc(HWND hWnd,
     case WM_TIMER:
       lResult = onTimerEvent(hWnd, message, wParam, lParam, handled);
       break;
+    case WM_SHOWWINDOW:
+      lResult = onShowWindowEvent(hWnd, message, wParam, lParam, handled);
+      break;
     default:
       handled = false;
       break;
@@ -399,6 +402,26 @@ LRESULT WebView::onTimerEvent(HWND hWnd,
   return 0;
 }
 
+LRESULT WebView::onShowWindowEvent(HWND hWnd,
+                                   UINT message,
+                                   WPARAM wParam,
+                                   LPARAM lParam,
+                                   bool& handled) {
+  // lParam is 0 when the message is sent because of a ShowWindow call.
+  // FIXME: Is WM_SHOWWINDOW sent when ShowWindow is called on an ancestor of
+  // our window?
+  if (!lParam) {
+    bool isVisible = wParam;
+
+    // Notify the drawing area that the visibility changed.
+    m_page->drawingArea()->setPageIsVisible(isVisible);
+
+    handled = true;
+  }
+
+  return 0;
+}
+
 bool WebView::isActive() {
   HWND activeWindow = ::GetActiveWindow();
   return (activeWindow &&
@@ -512,11 +535,6 @@ void WebView::toolTipChanged(const String&, const String& newToolTip) {
   }
 
   ::SendMessage(m_toolTipWindow, TTM_ACTIVATE, !newToolTip.isEmpty(), 0);
-}
-
-bool WebView::isPageVisible() {
-  // FIXME: We should probably check if the window has a parent/ancestor too.
-  return ::IsWindowVisible(m_window);
 }
 
 // WebCore::WindowMessageListener

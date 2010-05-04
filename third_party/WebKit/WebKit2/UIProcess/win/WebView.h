@@ -92,6 +92,11 @@ class WebView : public RefCounted<WebView>,
                            LPARAM,
                            bool& handled);
   LRESULT onTimerEvent(HWND hWnd, UINT message, WPARAM, LPARAM, bool& handled);
+  LRESULT onShowWindowEvent(HWND hWnd,
+                            UINT message,
+                            WPARAM,
+                            LPARAM,
+                            bool& handled);
 
   bool isActive();
   void updateActiveState();
@@ -107,7 +112,6 @@ class WebView : public RefCounted<WebView>,
   virtual void processDidRevive();
   virtual void takeFocus(bool direction);
   virtual void toolTipChanged(const WebCore::String&, const WebCore::String&);
-  virtual bool isPageVisible();
 
   // WebCore::WindowMessageListener
   virtual void windowReceivedMessage(HWND, UINT message, WPARAM, LPARAM);
