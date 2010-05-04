@@ -34,6 +34,8 @@ class TextMetrics : public RefCounted<TextMetrics> {
  public:
   static PassRefPtr<TextMetrics> create() { return adoptRef(new TextMetrics); }
 
+  // FIXME: Is coercing to an integer value intentional? If so, there should be
+  // a static_cast<unsigned>() here.
   unsigned width() const { return m_width; }
   void setWidth(float w) { m_width = w; }
 
