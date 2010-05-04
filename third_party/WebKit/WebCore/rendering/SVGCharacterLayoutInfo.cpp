@@ -1,6 +1,4 @@
 /*
- * This file is part of the WebKit project.
- *
  * Copyright (C) 2007 Nikolas Zimmermann <zimmermann@kde.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -21,16 +19,16 @@
  */
 
 #include "config.h"
-
-#if ENABLE(SVG)
 #include "SVGCharacterLayoutInfo.h"
 
+#if ENABLE(SVG)
 #include "InlineFlowBox.h"
 #include "InlineTextBox.h"
+#include "RenderSVGTextPath.h"
+#include "SVGCharacterData.h"
 #include "SVGLengthList.h"
 #include "SVGNumberList.h"
 #include "SVGTextPositioningElement.h"
-#include "RenderSVGTextPath.h"
 
 #include <float.h>
 
@@ -152,6 +150,12 @@ float SVGCharacterLayoutInfo::baselineShiftValueNext() const {
   return baselineShiftStack.last();
 }
 
+bool SVGCharacterLayoutInfo::isInitialLayout() const {
+  return xStack.isEmpty() && yStack.isEmpty() && dxStack.isEmpty() &&
+         dyStack.isEmpty() && angleStack.isEmpty() &&
+         baselineShiftStack.isEmpty() && curx == 0.0f && cury == 0.0f;
+}
+
 void SVGCharacterLayoutInfo::processedSingleCharacter() {
   xStackWalk();
   yStackWalk();
@@ -240,8 +244,6 @@ bool SVGCharacterLayoutInfo::nextPathLayoutPointAndAngle(float glyphAdvance,
   angle = layoutPath.normalAngleAtLength(offset, ok);
   ASSERT(ok);
 
-  // fprintf(stderr, "t: %f, x: %f, y: %f, angle: %f, glyphAdvance: %f\n",
-  // currentOffset, x, y, angle, glyphAdvance);
   return true;
 }
 
@@ -259,10 +261,7 @@ void SVGCharacterLayoutInfo::setInPathLayout(bool value) {
 
 void SVGCharacterLayoutInfo::addLayoutInformation(InlineFlowBox* flowBox,
                                                   float textAnchorStartOffset) {
-  bool isInitialLayout = xStack.isEmpty() && yStack.isEmpty() &&
-                         dxStack.isEmpty() && dyStack.isEmpty() &&
-                         angleStack.isEmpty() && baselineShiftStack.isEmpty() &&
-                         curx == 0.0f && cury == 0.0f;
+  bool wasInitialLayout = isInitialLayout();
 
   RenderSVGTextPath* textPath = toRenderSVGTextPath(flowBox->renderer());
   Path path = textPath->layoutPath();
@@ -286,7 +285,7 @@ void SVGCharacterLayoutInfo::addLayoutInformation(InlineFlowBox* flowBox,
   // Only baseline-shift is handled through the normal layout system
   addStackContent(BaselineShiftStack, baselineShift);
 
-  if (isInitialLayout) {
+  if (wasInitialLayout) {
     xStackChanged = false;
     yStackChanged = false;
     dxStackChanged = false;
@@ -298,11 +297,7 @@ void SVGCharacterLayoutInfo::addLayoutInformation(InlineFlowBox* flowBox,
 
 void SVGCharacterLayoutInfo::addLayoutInformation(
     SVGTextPositioningElement* element) {
-  bool isInitialLayout = xStack.isEmpty() && yStack.isEmpty() &&
-                         dxStack.isEmpty() && dyStack.isEmpty() &&
-                         angleStack.isEmpty() && baselineShiftStack.isEmpty() &&
-                         curx == 0.0f && cury == 0.0f;
-
+  bool wasInitialLayout = isInitialLayout();
   float baselineShift = calculateBaselineShift(element->renderer());
 
   addStackContent(XStack, element->x(), element);
@@ -312,7 +307,7 @@ void SVGCharacterLayoutInfo::addLayoutInformation(
   addStackContent(AngleStack, element->rotate());
   addStackContent(BaselineShiftStack, baselineShift);
 
-  if (isInitialLayout) {
+  if (wasInitialLayout) {
     xStackChanged = false;
     yStackChanged = false;
     dxStackChanged = false;
@@ -334,7 +329,7 @@ void SVGCharacterLayoutInfo::addStackContent(StackType type,
   ExceptionCode ec = 0;
   for (unsigned i = 0; i < length; ++i) {
     float value = list->getItem(i, ec);
-    ASSERT(ec == 0);
+    ASSERT(!ec);
 
     newLayoutInfo.append(value);
   }
@@ -354,7 +349,7 @@ void SVGCharacterLayoutInfo::addStackContent(StackType type,
   ExceptionCode ec = 0;
   for (unsigned i = 0; i < length; ++i) {
     float value = list->getItem(i, ec).value(context);
-    ASSERT(ec == 0);
+    ASSERT(!ec);
 
     newLayoutInfo.append(value);
   }
@@ -490,27 +485,6 @@ void SVGCharacterLayoutInfo::baselineShiftStackWalk() {
     baselineShiftStack.removeLast();
     baselineShiftStackChanged = false;
   }
-}
-
-bool SVGChar::isHidden() const {
-  return pathData && pathData->hidden;
-}
-
-AffineTransform SVGChar::characterTransform() const {
-  AffineTransform ctm;
-
-  // Rotate character around angle, and possibly scale.
-  ctm.translate(x, y);
-  ctm.rotate(angle);
-
-  if (pathData) {
-    ctm.scaleNonUniform(pathData->xScale, pathData->yScale);
-    ctm.translate(pathData->xShift, pathData->yShift);
-    ctm.rotate(pathData->orientationAngle);
-  }
-
-  ctm.translate(orientationShiftX - x, orientationShiftY - y);
-  return ctm;
 }
 
 }  // namespace WebCore
