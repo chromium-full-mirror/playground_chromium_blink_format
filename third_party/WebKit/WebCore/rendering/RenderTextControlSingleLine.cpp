@@ -253,7 +253,7 @@ void RenderTextControlSingleLine::layout() {
       innerBlockRenderer ? innerBlockRenderer : innerTextRenderer;
   currentHeight = childBlock->height();
   if (currentHeight < height())
-    childBlock->setLocation(childBlock->x(), (height() - currentHeight) / 2);
+    childBlock->setY((height() - currentHeight) / 2);
 
   // Center the spin button vertically, and move it to the right by
   // padding + border of the text fields.
@@ -419,7 +419,8 @@ void RenderTextControlSingleLine::capsLockStateMayHaveChanged() {
 IntRect RenderTextControlSingleLine::controlClipRect(int tx, int ty) const {
   // This should only get called for search inputs.
   ASSERT(hasControlClip());
-  IntRect clipRect = IntRect(x(), y(), width(), height());
+
+  IntRect clipRect = IntRect(m_innerBlock->renderBox()->frameRect());
   clipRect.move(tx, ty);
   return clipRect;
 }
