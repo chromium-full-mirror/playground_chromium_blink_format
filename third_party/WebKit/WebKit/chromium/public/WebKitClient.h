@@ -92,11 +92,6 @@ class WebKitClient {
     return 0;
   }
 
-  // Return a new SessionStorage namespace.
-  // THIS IS DEPRECATED.  WebViewClient::getSessionStorageNamespace() is the new
-  // way to access this.
-  virtual WebStorageNamespace* createSessionStorageNamespace() { return 0; }
-
   // Called when storage events fire.
   virtual void dispatchStorageEvent(const WebString& key,
                                     const WebString& oldValue,
@@ -294,7 +289,6 @@ class WebKitClient {
   virtual void stopSharedTimer() {}
 
   // Callable from a background WebKit thread.
-  virtual void callOnMainThread(void (*func)()) {}  // DEPRECATED
   virtual void callOnMainThread(void (*func)(void*), void* context) {}
 
   // WebGL --------------------------------------------------------------

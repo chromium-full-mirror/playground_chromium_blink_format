@@ -154,9 +154,6 @@ class WebViewImpl : public WebView, public RefCounted<WebViewImpl> {
   virtual WebDevToolsAgent* devToolsAgent();
   virtual void setDevToolsAgent(WebDevToolsAgent*);
   virtual WebAccessibilityObject accessibilityObject();
-  virtual void applyAutofillSuggestions(const WebNode&,
-                                        const WebVector<WebString>& suggestions,
-                                        int defaultSuggestionIndex);
   virtual void applyAutoFillSuggestions(const WebNode&,
                                         const WebVector<WebString>& names,
                                         const WebVector<WebString>& labels,
@@ -166,8 +163,6 @@ class WebViewImpl : public WebView, public RefCounted<WebViewImpl> {
       const WebVector<WebString>& suggestions,
       int defaultSuggestionIndex);
   virtual void hidePopups();
-  virtual void hideAutofillPopup();
-  virtual void hideSuggestionsPopup();
   virtual void setScrollbarColors(unsigned inactiveColor,
                                   unsigned activeColor,
                                   unsigned trackColor);
@@ -278,6 +273,8 @@ class WebViewImpl : public WebView, public RefCounted<WebViewImpl> {
   void popupOpened(WebCore::PopupContainer* popupContainer);
   void popupClosed(WebCore::PopupContainer* popupContainer);
 
+  void hideSuggestionsPopup();
+
   // HACK: currentInputEvent() is for ChromeClientImpl::show(), until we can
   // fix WebKit to pass enough information up into ChromeClient::show() so we
   // can decide if the window.open event was caused by a middle-mouse click
@@ -318,7 +315,6 @@ class WebViewImpl : public WebView, public RefCounted<WebViewImpl> {
   // Returns true if the view was scrolled.
   bool scrollViewWithKeyboard(int keyCode, int modifiers);
 
-  // Hides the select popup if one is opened.
   void hideSelectPopup();
 
   // Converts |pos| from window coordinates to contents coordinates and gets
