@@ -612,6 +612,8 @@ class WebGLRenderingContext : public CanvasRenderingContext {
 
   void addObject(CanvasObject*);
   void detachAndRemoveAllObjects();
+  PassRefPtr<WebGLTexture> findTexture(Platform3DObject);
+  PassRefPtr<WebGLRenderbuffer> findRenderbuffer(Platform3DObject);
 
   void markContextChanged();
   void cleanupAfterGraphicsCall(bool changed) {

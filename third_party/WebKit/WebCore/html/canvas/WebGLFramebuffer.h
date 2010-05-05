@@ -51,6 +51,8 @@ class WebGLFramebuffer : public CanvasObject {
   virtual void _deleteObject(Platform3DObject);
 
  private:
+  virtual bool isFramebuffer() const { return true; }
+
   bool m_isDepthAttached;
   bool m_isStencilAttached;
   bool m_isDepthStencilAttached;

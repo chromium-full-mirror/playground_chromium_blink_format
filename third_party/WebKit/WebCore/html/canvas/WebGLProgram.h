@@ -52,6 +52,8 @@ class WebGLProgram : public CanvasObject {
   virtual void _deleteObject(Platform3DObject);
 
  private:
+  virtual bool isProgram() const { return true; }
+
   Vector<int> m_activeAttribLocations;
 };
 

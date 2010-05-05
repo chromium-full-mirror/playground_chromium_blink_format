@@ -39,12 +39,6 @@ class WebGLRenderbuffer : public CanvasObject {
 
   static PassRefPtr<WebGLRenderbuffer> create(WebGLRenderingContext*);
 
-  // For querying previously created objects via e.g.
-  // getFramebufferAttachmentParameter
-  // FIXME: should consider canonicalizing these objects
-  static PassRefPtr<WebGLRenderbuffer> create(WebGLRenderingContext*,
-                                              Platform3DObject renderbuffer);
-
   void setInternalformat(unsigned long internalformat) {
     m_internalformat = internalformat;
   }
@@ -52,11 +46,12 @@ class WebGLRenderbuffer : public CanvasObject {
 
  protected:
   WebGLRenderbuffer(WebGLRenderingContext*);
-  WebGLRenderbuffer(WebGLRenderingContext*, Platform3DObject);
 
   virtual void _deleteObject(Platform3DObject);
 
  private:
+  virtual bool isRenderbuffer() const { return true; }
+
   unsigned long m_internalformat;
 };
 
