@@ -75,7 +75,7 @@ RenderPath::RenderPath(SVGStyledTransformableElement* node)
 
 bool RenderPath::fillContains(const FloatPoint& point,
                               bool requiresFill) const {
-  if (m_path.isEmpty())
+  if (!m_fillBoundingBox.contains(point))
     return false;
 
   if (requiresFill && !RenderSVGResource::fillPaintingResource(this, style()))
@@ -86,7 +86,7 @@ bool RenderPath::fillContains(const FloatPoint& point,
 
 bool RenderPath::strokeContains(const FloatPoint& point,
                                 bool requiresStroke) const {
-  if (m_path.isEmpty())
+  if (!m_strokeAndMarkerBoundingBox.contains(point))
     return false;
 
   if (requiresStroke &&
