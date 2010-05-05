@@ -79,7 +79,7 @@ class RenderThemeQt : public RenderTheme {
 
   virtual double caretBlinkInterval() const;
 
-#ifdef Q_WS_MAEMO_5
+#if USE(QT_MOBILE_THEME)
   virtual bool isControlStyled(const RenderStyle*,
                                const BorderData&,
                                const FillLayer&,
