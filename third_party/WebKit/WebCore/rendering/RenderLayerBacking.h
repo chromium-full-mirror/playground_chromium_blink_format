@@ -148,6 +148,8 @@ class RenderLayerBacking : public GraphicsLayerClient, public Noncopyable {
 
   IntRect contentsBox() const;
 
+  RenderLayerCompositor* innerRenderLayerCompositor() const;
+
  private:
   void createGraphicsLayer();
   void destroyGraphicsLayer();
