@@ -48,6 +48,7 @@ class DOMWindow;
 class Event;
 class EventListener;
 class EventSource;
+class FileReader;
 class MessagePort;
 class Node;
 class Notification;
@@ -115,6 +116,9 @@ class EventTarget {
 
 #if ENABLE(NOTIFICATIONS)
   virtual Notification* toNotification();
+#endif
+#if ENABLE(FILE_READER)
+  virtual FileReader* toFileReader();
 #endif
 
   virtual ScriptExecutionContext* scriptExecutionContext() const = 0;

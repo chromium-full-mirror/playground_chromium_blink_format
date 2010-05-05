@@ -34,6 +34,7 @@
 #if ENABLE(FILE_READER) || ENABLE(FILE_WRITER)
 
 #include "ExceptionCode.h"
+#include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 
 namespace WebCore {
@@ -47,7 +48,7 @@ class FileError : public RefCounted<FileError> {
   ExceptionCode code() const { return m_code; }
 
  private:
-  FileError() : m_code(0) {}
+  FileError(ExceptionCode code) : m_code(code) {}
 
   ExceptionCode m_code;
 };

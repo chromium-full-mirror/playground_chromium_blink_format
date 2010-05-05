@@ -66,6 +66,8 @@ class FileStream : public RefCounted<FileStream> {
 
   FileStreamClient* m_client;
   PlatformFileHandle m_handle;
+  long long m_bytesProcessed;
+  long long m_totalBytesToRead;
 };
 
 }  // namespace WebCore
