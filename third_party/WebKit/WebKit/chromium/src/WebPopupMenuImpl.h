@@ -79,6 +79,7 @@ class WebPopupMenuImpl : public WebPopupMenu,
                                       const WebString& text);
   virtual bool queryCompositionStatus(bool* enabled, WebRect* caretRect);
   virtual void setTextDirection(WebTextDirection direction);
+  virtual bool isAcceleratedCompositingActive() const { return false; }
 
   // WebPopupMenuImpl
   void Init(WebCore::FramelessScrollView* widget, const WebRect& bounds);

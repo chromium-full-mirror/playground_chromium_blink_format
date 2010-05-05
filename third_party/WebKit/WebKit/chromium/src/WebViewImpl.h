@@ -99,6 +99,7 @@ class WebViewImpl : public WebView, public RefCounted<WebViewImpl> {
                                       const WebString& text);
   virtual bool queryCompositionStatus(bool* enabled, WebRect* caretRect);
   virtual void setTextDirection(WebTextDirection direction);
+  virtual bool isAcceleratedCompositingActive() const;
 
   // WebView methods:
   virtual void initializeMainFrame(WebFrameClient*);
@@ -332,8 +333,7 @@ class WebViewImpl : public WebView, public RefCounted<WebViewImpl> {
                                              DragAction);
 
 #if USE(ACCELERATED_COMPOSITING)
-  void setAcceleratedCompositing(bool);
-  bool isAcceleratedCompositing() const { return m_isAcceleratedCompositing; }
+  void setIsAcceleratedCompositingActive(bool);
   void updateRootLayerContents(const WebRect&);
 #endif
 
@@ -469,7 +469,7 @@ class WebViewImpl : public WebView, public RefCounted<WebViewImpl> {
 
 #if USE(ACCELERATED_COMPOSITING)
   OwnPtr<WebCore::LayerRendererChromium> m_layerRenderer;
-  bool m_isAcceleratedCompositing;
+  bool m_isAcceleratedCompositingActive;
 #endif
   static const WebInputEvent* m_currentInputEvent;
 };
