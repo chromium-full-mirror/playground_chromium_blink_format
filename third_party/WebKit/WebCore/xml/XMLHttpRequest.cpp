@@ -550,6 +550,7 @@ void XMLHttpRequest::createRequest(ExceptionCode& ec) {
   // in case the upload listeners are
   // added after the request is started.
   m_uploadEventsAllowed =
+      m_sameOriginRequest ||
       !isSimpleCrossOriginAccessRequest(m_method, m_requestHeaders);
 
   ResourceRequest request(m_url);
