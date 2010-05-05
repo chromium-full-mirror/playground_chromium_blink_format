@@ -55,7 +55,11 @@ class WebStorageNamespace {
   WEBKIT_API static WebStorageNamespace* createLocalStorageNamespace(
       const WebString& backingDirectoryPath,
       unsigned quota);
-  WEBKIT_API static WebStorageNamespace* createSessionStorageNamespace();
+  WEBKIT_API static WebStorageNamespace* createSessionStorageNamespace(
+      unsigned quota);
+  WEBKIT_API static WebStorageNamespace* createSessionStorageNamespace() {
+    return createSessionStorageNamespace(noQuota);
+  }
 
   static const unsigned noQuota = UINT_MAX;
 

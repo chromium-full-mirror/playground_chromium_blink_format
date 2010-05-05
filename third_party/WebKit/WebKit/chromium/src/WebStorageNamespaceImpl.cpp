@@ -47,9 +47,10 @@ WebStorageNamespace* WebStorageNamespace::createLocalStorageNamespace(
       WebCore::StorageNamespaceImpl::localStorageNamespace(path, quota));
 }
 
-WebStorageNamespace* WebStorageNamespace::createSessionStorageNamespace() {
+WebStorageNamespace* WebStorageNamespace::createSessionStorageNamespace(
+    unsigned quota) {
   return new WebStorageNamespaceImpl(
-      WebCore::StorageNamespaceImpl::sessionStorageNamespace(noQuota));
+      WebCore::StorageNamespaceImpl::sessionStorageNamespace(quota));
 }
 
 WebStorageNamespaceImpl::WebStorageNamespaceImpl(
