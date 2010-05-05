@@ -3052,6 +3052,10 @@ AccessibilityRole AccessibilityRenderObject::determineAccessibilityRole() {
     return TableRole;
 #endif
 
+  // Table sections should be ignored.
+  if (m_renderer->isTableSection())
+    return IgnoredRole;
+
 #if PLATFORM(GTK)
   if (m_renderer->isHR())
     return SplitterRole;
