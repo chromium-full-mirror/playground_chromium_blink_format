@@ -68,10 +68,12 @@ void Widget::setFrameRect(const IntRect& rect) {
   m_frame = rect;
 }
 
-void Widget::setFocus() {
-  AutoPlatformWidgetLocker locker(topLevelPlatformWidget());
-  if (locker.isLocked())
-    topLevelPlatformWidget()->MakeFocus();
+void Widget::setFocus(bool focused) {
+  if (focused) {
+    AutoPlatformWidgetLocker locker(topLevelPlatformWidget());
+    if (locker.isLocked())
+      topLevelPlatformWidget()->MakeFocus();
+  }
 }
 
 void Widget::setCursor(const Cursor& cursor) {

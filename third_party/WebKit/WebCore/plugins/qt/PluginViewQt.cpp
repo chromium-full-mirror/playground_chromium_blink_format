@@ -137,11 +137,13 @@ void PluginView::updatePluginWidget() {
   invalidate();
 }
 
-void PluginView::setFocus() {
-  if (platformPluginWidget())
-    platformPluginWidget()->setFocus(Qt::OtherFocusReason);
-  else
-    Widget::setFocus();
+void PluginView::setFocus(bool focused) {
+  if (platformPluginWidget()) {
+    if (focused)
+      platformPluginWidget()->setFocus(Qt::OtherFocusReason);
+  } else {
+    Widget::setFocus(focused);
+  }
 }
 
 void PluginView::show() {

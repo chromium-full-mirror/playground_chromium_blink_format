@@ -41,9 +41,11 @@ Widget::Widget(PlatformWidget widget) {
 
 Widget::~Widget() {}
 
-void Widget::setFocus() {
-  if (PlatformWidget widget = platformWidget())
-    widget->SetFocus();
+void Widget::setFocus(bool focused) {
+  if (focused) {
+    if (PlatformWidget widget = platformWidget())
+      widget->SetFocus();
+  }
 }
 
 void Widget::setCursor(const Cursor& cursor) {

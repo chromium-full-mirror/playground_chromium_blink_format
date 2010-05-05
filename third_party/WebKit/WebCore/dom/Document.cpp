@@ -2931,6 +2931,14 @@ bool Document::setFocusedNode(PassRefPtr<Node> newFocusedNode) {
 
     if (oldFocusedNode == oldFocusedNode->rootEditableElement())
       frame()->editor()->didEndEditing();
+
+    if (view()) {
+      Widget* oldWidget = widgetForNode(oldFocusedNode.get());
+      if (oldWidget)
+        oldWidget->setFocus(false);
+      else
+        view()->setFocus(false);
+    }
   }
 
   if (newFocusedNode) {
@@ -2961,7 +2969,7 @@ bool Document::setFocusedNode(PassRefPtr<Node> newFocusedNode) {
       focusChangeBlocked = true;
       goto SetFocusedNodeDone;
     }
-    m_focusedNode->setFocus();
+    m_focusedNode->setFocus(true);
 
     if (m_focusedNode == m_focusedNode->rootEditableElement())
       frame()->editor()->didBeginEditing();
@@ -2979,9 +2987,9 @@ bool Document::setFocusedNode(PassRefPtr<Node> newFocusedNode) {
         focusWidget = widgetForNode(m_focusedNode.get());
       }
       if (focusWidget)
-        focusWidget->setFocus();
+        focusWidget->setFocus(true);
       else
-        view()->setFocus();
+        view()->setFocus(true);
     }
   }
 

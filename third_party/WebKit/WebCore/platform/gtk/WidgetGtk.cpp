@@ -51,11 +51,12 @@ Widget::~Widget() {
   releasePlatformWidget();
 }
 
-void Widget::setFocus() {
-  gtk_widget_grab_focus(
-      platformWidget()
-          ? platformWidget()
-          : GTK_WIDGET(root()->hostWindow()->platformPageClient()));
+void Widget::setFocus(bool focused) {
+  if (focused)
+    gtk_widget_grab_focus(
+        platformWidget()
+            ? platformWidget()
+            : GTK_WIDGET(root()->hostWindow()->platformPageClient()));
 }
 
 static GdkDrawable* gdkDrawable(PlatformWidget widget) {

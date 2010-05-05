@@ -71,7 +71,7 @@ void Widget::setFrameRect(const IntRect& rect) {
   frameRectsChanged();
 }
 
-void Widget::setFocus() {}
+void Widget::setFocus(bool focused) {}
 
 void Widget::setCursor(const Cursor& cursor) {
 #ifndef QT_NO_CURSOR

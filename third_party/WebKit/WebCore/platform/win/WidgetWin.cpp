@@ -92,7 +92,7 @@ void Widget::setCursor(const Cursor& cursor) {
 
 void Widget::paint(GraphicsContext*, const IntRect&) {}
 
-void Widget::setFocus() {}
+void Widget::setFocus(bool focused) {}
 
 void Widget::setIsSelected(bool) {}
 

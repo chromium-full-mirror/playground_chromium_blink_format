@@ -194,7 +194,7 @@ class PluginView : public Widget,
   // Widget functions
   virtual void setFrameRect(const IntRect&);
   virtual void frameRectsChanged();
-  virtual void setFocus();
+  virtual void setFocus(bool);
   virtual void show();
   virtual void hide();
   virtual void paint(GraphicsContext*, const IntRect&);

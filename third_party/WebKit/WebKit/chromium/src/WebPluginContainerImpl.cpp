@@ -127,9 +127,9 @@ void WebPluginContainerImpl::invalidateRect(const IntRect& rect) {
                                                       false /*immediate*/);
 }
 
-void WebPluginContainerImpl::setFocus() {
-  Widget::setFocus();
-  m_webPlugin->updateFocus(true);
+void WebPluginContainerImpl::setFocus(bool focused) {
+  Widget::setFocus(focused);
+  m_webPlugin->updateFocus(focused);
 }
 
 void WebPluginContainerImpl::show() {

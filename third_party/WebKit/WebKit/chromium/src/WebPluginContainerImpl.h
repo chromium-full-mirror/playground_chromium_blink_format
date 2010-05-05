@@ -69,7 +69,7 @@ class WebPluginContainerImpl : public WebCore::Widget,
   virtual void setFrameRect(const WebCore::IntRect&);
   virtual void paint(WebCore::GraphicsContext*, const WebCore::IntRect&);
   virtual void invalidateRect(const WebCore::IntRect&);
-  virtual void setFocus();
+  virtual void setFocus(bool);
   virtual void show();
   virtual void hide();
   virtual void handleEvent(WebCore::Event*);
