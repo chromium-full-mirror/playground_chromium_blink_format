@@ -27,7 +27,7 @@
 #ifndef JNIUtilityPrivate_h
 #define JNIUtilityPrivate_h
 
-#if ENABLE(MAC_JAVA_BRIDGE)
+#if ENABLE(JAVA_BRIDGE)
 
 #include "JNIUtility.h"
 #include <runtime/JSValue.h>
@@ -61,6 +61,6 @@ bool dispatchJNICall(ExecState*,
 
 }  // namespace JSC
 
-#endif  // ENABLE(MAC_JAVA_BRIDGE)
+#endif  // ENABLE(JAVA_BRIDGE)
 
 #endif  // JNIUtilityPrivate_h

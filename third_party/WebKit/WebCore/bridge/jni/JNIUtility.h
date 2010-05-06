@@ -27,7 +27,7 @@
 #ifndef JNIUtility_h
 #define JNIUtility_h
 
-#if ENABLE(MAC_JAVA_BRIDGE)
+#if ENABLE(JAVA_BRIDGE)
 
 #include <JavaVM/jni.h>
 
@@ -266,6 +266,6 @@ T callJNIStaticMethod(jclass cls,
 
 }  // namespace JSC
 
-#endif  // ENABLE(MAC_JAVA_BRIDGE)
+#endif  // ENABLE(JAVA_BRIDGE)
 
 #endif  // JNIUtility_h
