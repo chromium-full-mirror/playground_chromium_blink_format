@@ -94,6 +94,7 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
                                   double longitude,
                                   double accuracy);
   void setPersistentUserStyleSheetLocation(JSStringRef path);
+  void setPluginsEnabled(bool flag);
   void setPopupBlockingEnabled(bool flag);
   void setPrivateBrowsingEnabled(bool flag);
   void setSelectTrailingWhitespaceEnabled(bool flag);

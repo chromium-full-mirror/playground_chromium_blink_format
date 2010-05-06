@@ -165,6 +165,10 @@ void LayoutTestController::setPopupBlockingEnabled(bool popupBlockingEnabled) {
   // FIXME: implement
 }
 
+void LayoutTestController::setPluginsEnabled(bool flag) {
+  // FIXME: Implement
+}
+
 bool LayoutTestController::elementDoesAutoCompleteForElementWithId(
     JSStringRef id) {
   // FIXME: implement

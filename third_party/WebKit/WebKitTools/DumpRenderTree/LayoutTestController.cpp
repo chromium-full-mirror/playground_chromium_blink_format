@@ -1706,6 +1706,23 @@ static JSValueRef setPopupBlockingEnabledCallback(JSContextRef context,
   return JSValueMakeUndefined(context);
 }
 
+static JSValueRef setPluginsEnabledCallback(JSContextRef context,
+                                            JSObjectRef function,
+                                            JSObjectRef thisObject,
+                                            size_t argumentCount,
+                                            const JSValueRef arguments[],
+                                            JSValueRef* exception) {
+  // Has mac & windows implementation
+  if (argumentCount < 1)
+    return JSValueMakeUndefined(context);
+
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->setPluginsEnabled(JSValueToBoolean(context, arguments[0]));
+
+  return JSValueMakeUndefined(context);
+}
+
 static JSValueRef setSmartInsertDeleteEnabledCallback(
     JSContextRef context,
     JSObjectRef function,
@@ -2448,6 +2465,8 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
        setPersistentUserStyleSheetLocationCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setPopupBlockingEnabled", setPopupBlockingEnabledCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"setPluginsEnabled", setPluginsEnabledCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"setPrinting", setPrintingCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},

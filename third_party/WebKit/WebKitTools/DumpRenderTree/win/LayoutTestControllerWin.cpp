@@ -470,6 +470,10 @@ void LayoutTestController::setPopupBlockingEnabled(bool enabled) {
   preferences->setJavaScriptCanOpenWindowsAutomatically(!enabled);
 }
 
+void LayoutTestController::setPluginsEnabled(bool flag) {
+  // FIXME: Implement
+}
+
 void LayoutTestController::setJavaScriptCanAccessClipboard(bool enabled) {
   COMPtr<IWebView> webView;
   if (FAILED(frame->webView(&webView)))
