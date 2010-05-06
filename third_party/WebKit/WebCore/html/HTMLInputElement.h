@@ -287,6 +287,11 @@ class HTMLInputElement : public HTMLTextFormControlElement,
   // 0.
   static bool parseToDateComponents(InputType, const String&, DateComponents*);
 
+#if ENABLE(WCSS)
+  void setWapInputFormat(String& mask);
+  virtual InputElementData data() const { return m_data; }
+#endif
+
  protected:
   virtual void willMoveToNewOwnerDocument();
   virtual void didMoveToNewOwnerDocument();

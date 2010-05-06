@@ -91,6 +91,9 @@ class WMLInputElement : public WMLFormControlElement, public InputElement {
 
   bool isConformedToInputMask(const String&);
   bool isConformedToInputMask(UChar, unsigned, bool isUserInput = true);
+#if ENABLE(WCSS)
+  virtual InputElementData data() const { return m_data; }
+#endif
 
  private:
   friend class WMLCardElement;
