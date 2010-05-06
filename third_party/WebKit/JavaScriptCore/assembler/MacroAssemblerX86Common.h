@@ -342,6 +342,10 @@ class MacroAssemblerX86Common : public AbstractMacroAssembler<X86Assembler> {
                           address.scale, dest);
   }
 
+  void load16(Address address, RegisterID dest) {
+    m_assembler.movzwl_mr(address.offset, address.base, dest);
+  }
+
   DataLabel32 store32WithAddressOffsetPatch(RegisterID src, Address address) {
     m_assembler.movl_rm_disp32(src, address.offset, address.base);
     return DataLabel32(this);
