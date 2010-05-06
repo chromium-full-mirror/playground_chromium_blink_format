@@ -218,7 +218,6 @@ class HTMLInputElement : public HTMLTextFormControlElement,
 
   virtual void* preDispatchEventHandler(Event*);
   virtual void postDispatchEventHandler(Event*, void* dataFromPreDispatch);
-  virtual void defaultEventHandler(Event*);
 
   String altText() const;
 
@@ -291,6 +290,7 @@ class HTMLInputElement : public HTMLTextFormControlElement,
  protected:
   virtual void willMoveToNewOwnerDocument();
   virtual void didMoveToNewOwnerDocument();
+  virtual void defaultEventHandler(Event*);
 
  private:
   bool storesValueSeparateFromAttribute() const;
