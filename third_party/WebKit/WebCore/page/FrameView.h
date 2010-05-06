@@ -106,6 +106,8 @@ class FrameView : public ScrollView {
   // with
   // content rendered via the normal painting path.
   void setNeedsOneShotDrawingSynchronization();
+
+  bool isEnclosedInCompositingLayer() const;
 #endif
   // Only used with accelerated compositing, but outside the #ifdef to make
   // linkage easier.
