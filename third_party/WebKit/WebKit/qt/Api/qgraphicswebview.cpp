@@ -664,10 +664,13 @@ QVariant QGraphicsWebView::itemChange(GraphicsItemChange change,
     // fire 'CursorChange'.
     case ItemCursorChange:
       return value;
-    case ItemCursorHasChanged:
+    case ItemCursorHasChanged: {
       QEvent event(QEvent::CursorChange);
       QApplication::sendEvent(this, &event);
       return value;
+    }
+    default:
+      break;
   }
 
   return QGraphicsWidget::itemChange(change, value);
