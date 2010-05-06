@@ -505,10 +505,6 @@ static void webkit_dom_test_obj_set_property(GObject* object,
       coreSelf->setAttrWithGetterException((g_value_get_long(value)));
       break;
     }
-    case PROP_CUSTOM_ATTR: {
-      coreSelf->setCustomAttr((g_value_get_long(value)));
-      break;
-    }
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
       break;
@@ -567,10 +563,6 @@ static void webkit_dom_test_obj_get_property(GObject* object,
     }
     case PROP_ATTR_WITH_GETTER_EXCEPTION: {
       g_value_set_long(value, coreSelf->attrWithGetterException());
-      break;
-    }
-    case PROP_CUSTOM_ATTR: {
-      g_value_set_long(value, coreSelf->customAttr());
       break;
     }
     default:
@@ -724,20 +716,6 @@ static void webkit_dom_test_obj_class_init(
           G_MAXLONG,                                              /* max */
           0,                                                      /* default */
           WEBKIT_PARAM_READWRITE));
-  g_object_class_install_property(
-      gobjectClass, PROP_CUSTOM_ATTR,
-      g_param_spec_long("custom-attr",          /* name */
-                        "test_obj_custom-attr", /* short description */
-                        "read-write  glong TestObj.custom-attr", /* longer -
-                                                                    could do
-                                                                    with some
-                                                                    extra doc
-                                                                    stuff here
-                                                                    */
-                        G_MINLONG,                               /* min */
-                        G_MAXLONG,                               /* max */
-                        0,                                       /* default */
-                        WEBKIT_PARAM_READWRITE));
 }
 
 static void webkit_dom_test_obj_init(WebKitDOMTestObj* request) {}
