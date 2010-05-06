@@ -254,6 +254,15 @@ class MacroAssemblerARM : public AbstractMacroAssembler<ARMAssembler> {
                          ARMAssembler::getOp2Byte(-address.offset));
   }
 
+  void load16(ImplicitAddress address, RegisterID dest) {
+    if (address.offset >= 0)
+      m_assembler.ldrh_u(dest, address.base,
+                         ARMAssembler::getOp2Byte(address.offset));
+    else
+      m_assembler.ldrh_d(dest, address.base,
+                         ARMAssembler::getOp2Byte(-address.offset));
+  }
+
   DataLabel32 store32WithAddressOffsetPatch(RegisterID src, Address address) {
     DataLabel32 dataLabel(this);
     m_assembler.ldr_un_imm(ARMRegisters::S0, 0);

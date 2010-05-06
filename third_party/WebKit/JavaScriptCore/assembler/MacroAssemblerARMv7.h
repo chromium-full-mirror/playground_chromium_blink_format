@@ -428,6 +428,10 @@ class MacroAssemblerARMv7 : public AbstractMacroAssembler<ARMv7Assembler> {
                      address.scale);
   }
 
+  void load16(ImplicitAddress address, RegisterID dest) {
+    m_assembler.ldrh(dest, address.base, address.offset);
+  }
+
   DataLabel32 store32WithAddressOffsetPatch(RegisterID src, Address address) {
     DataLabel32 label = moveWithPatch(Imm32(address.offset), dataTempRegister);
     store32(src, ArmAddress(address.base, dataTempRegister));
