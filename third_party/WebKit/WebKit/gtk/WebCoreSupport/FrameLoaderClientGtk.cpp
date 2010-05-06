@@ -210,22 +210,22 @@ void FrameLoaderClient::dispatchWillSendRequest(
     unsigned long identifier,
     ResourceRequest& request,
     const ResourceResponse& redirectResponse) {
-  GOwnPtr<WebKitNetworkResponse> networkResponse(0);
+  GRefPtr<WebKitNetworkResponse> networkResponse(0);
 
   // We are adding one more resource to the load, or maybe we are
   // just redirecting a load.
   if (redirectResponse.isNull())
     static_cast<WebKit::DocumentLoader*>(loader)->increaseLoadCount(identifier);
   else
-    networkResponse.set(
+    networkResponse = adoptGRef(
         webkit_network_response_new_with_core_response(redirectResponse));
 
   WebKitWebView* webView = getViewFromFrame(m_frame);
   GOwnPtr<gchar> identifierString(toString(identifier));
   WebKitWebResource* webResource =
       webkit_web_view_get_resource(webView, identifierString.get());
-  GOwnPtr<WebKitNetworkRequest> networkRequest(
-      webkit_network_request_new_with_core_request(request));
+  GRefPtr<WebKitNetworkRequest> networkRequest(
+      adoptGRef(webkit_network_request_new_with_core_request(request)));
 
   if (!redirectResponse.isNull()) {
     // This is a redirect, so we need to update the WebResource's knowledge
@@ -339,8 +339,8 @@ void FrameLoaderClient::dispatchDecidePolicyForMIMEType(
   if (isHandled)
     return;
 
-  GOwnPtr<WebKitNetworkResponse> networkResponse(
-      webkit_web_frame_get_network_response(m_frame));
+  GRefPtr<WebKitNetworkResponse> networkResponse(
+      adoptGRef(webkit_web_frame_get_network_response(m_frame)));
   if (networkResponse) {
     ResourceResponse response = core(networkResponse.get());
     if (response.isAttachment()) {
