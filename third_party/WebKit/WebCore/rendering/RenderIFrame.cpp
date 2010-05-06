@@ -47,6 +47,8 @@ void RenderIFrame::calcHeight() {
 
   if (isScrollable || !style()->height().isFixed()) {
     FrameView* view = static_cast<FrameView*>(widget());
+    if (!view)
+      return;
     int border = borderTop() + borderBottom();
     setHeight(max(height(), view->contentsHeight() + border));
   }
@@ -62,6 +64,8 @@ void RenderIFrame::calcWidth() {
 
   if (isScrollable || !style()->width().isFixed()) {
     FrameView* view = static_cast<FrameView*>(widget());
+    if (!view)
+      return;
     int border = borderLeft() + borderRight();
     setWidth(max(width(), view->contentsWidth() + border));
   }
