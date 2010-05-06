@@ -1704,10 +1704,10 @@ PassRefPtr<WebGLArray> WebGLRenderingContext::readPixels(long x,
       m_context->synthesizeGLError(GraphicsContext3D::INVALID_ENUM);
       return 0;
   }
-  if (!(format == GraphicsContext3D::RGBA &&
-            type == GraphicsContext3D::UNSIGNED_BYTE ||
-        format == m_implementationColorReadFormat &&
-            type == m_implementationColorReadType)) {
+  if (!((format == GraphicsContext3D::RGBA &&
+         type == GraphicsContext3D::UNSIGNED_BYTE) ||
+        (format == m_implementationColorReadFormat &&
+         type == m_implementationColorReadType))) {
     m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
     return 0;
   }
