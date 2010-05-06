@@ -246,8 +246,14 @@ class StringImpl : public StringImplBase {
     return m_refCountAndFlags & s_refCountFlagHasTerminatingNullCharacter;
   }
 
-  bool inTable() const { return m_refCountAndFlags & s_refCountFlagInTable; }
-  void setInTable() { m_refCountAndFlags |= s_refCountFlagInTable; }
+  bool isAtomic() const { return m_refCountAndFlags & s_refCountFlagIsAtomic; }
+  void setIsAtomic(bool isIdentifier) {
+    ASSERT(!isStatic());
+    if (isIdentifier)
+      m_refCountAndFlags |= s_refCountFlagIsAtomic;
+    else
+      m_refCountAndFlags &= ~s_refCountFlagIsAtomic;
+  }
 
   unsigned hash() const {
     if (!m_hash)

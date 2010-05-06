@@ -49,7 +49,13 @@ class AtomicStringTable {
   HashSet<StringImpl*>& table() { return m_table; }
 
  private:
-  static void destroy(AtomicStringTable* table) { delete table; }
+  static void destroy(AtomicStringTable* table) {
+    HashSet<StringImpl*>::iterator end = table->m_table.end();
+    for (HashSet<StringImpl*>::iterator iter = table->m_table.begin();
+         iter != end; ++iter)
+      (*iter)->setIsAtomic(false);
+    delete table;
+  }
 
   HashSet<StringImpl*> m_table;
 };
@@ -82,7 +88,7 @@ struct CStringTranslator {
                         unsigned hash) {
     location = StringImpl::create(c).releaseRef();
     location->setHash(hash);
-    location->setInTable();
+    location->setIsAtomic(true);
   }
 };
 
@@ -164,7 +170,7 @@ struct UCharBufferTranslator {
                         unsigned hash) {
     location = StringImpl::create(buf.s, buf.length).releaseRef();
     location->setHash(hash);
-    location->setInTable();
+    location->setIsAtomic(true);
   }
 };
 
@@ -192,7 +198,7 @@ struct HashAndCharactersTranslator {
     location =
         StringImpl::create(buffer.characters, buffer.length).releaseRef();
     location->setHash(hash);
-    location->setInTable();
+    location->setIsAtomic(true);
   }
 };
 
@@ -250,7 +256,7 @@ PassRefPtr<StringImpl> AtomicString::add(const UChar* s) {
 }
 
 PassRefPtr<StringImpl> AtomicString::add(StringImpl* r) {
-  if (!r || r->inTable())
+  if (!r || r->isAtomic())
     return r;
 
   if (r->length() == 0)
@@ -258,7 +264,7 @@ PassRefPtr<StringImpl> AtomicString::add(StringImpl* r) {
 
   StringImpl* result = *stringTable().add(r).first;
   if (result == r)
-    r->setInTable();
+    r->setIsAtomic(true);
   return result;
 }
 

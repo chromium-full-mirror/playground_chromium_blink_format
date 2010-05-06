@@ -42,7 +42,7 @@ static const unsigned minLengthToShare = 20;
 StringImpl::~StringImpl() {
   ASSERT(!isStatic());
 
-  if (inTable())
+  if (isAtomic())
     AtomicString::remove(this);
 #if USE(JSC)
   if (isIdentifier())
