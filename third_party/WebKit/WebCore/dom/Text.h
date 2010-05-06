@@ -49,7 +49,8 @@ class Text : public CharacterData {
   virtual void attach();
 
  protected:
-  Text(Document*, const String&);
+  Text(Document* document, const String& data)
+      : CharacterData(document, data, CreateText) {}
 
  private:
   virtual String nodeName() const;

@@ -3524,7 +3524,7 @@ void RenderLayer::updateHoverActiveState(const HitTestRequest& request,
     for (RenderObject* curr = activeNode->renderer(); curr;
          curr = curr->parent()) {
       if (curr->node() && !curr->isText())
-        curr->node()->setInActiveChain(false);
+        curr->node()->clearInActiveChain();
     }
     doc->setActiveNode(0);
   } else {
@@ -3536,7 +3536,7 @@ void RenderLayer::updateHoverActiveState(const HitTestRequest& request,
       for (RenderObject* curr = newActiveNode->renderer(); curr;
            curr = curr->parent()) {
         if (curr->node() && !curr->isText()) {
-          curr->node()->setInActiveChain(true);
+          curr->node()->setInActiveChain();
         }
       }
       doc->setActiveNode(newActiveNode);

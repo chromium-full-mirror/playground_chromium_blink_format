@@ -309,7 +309,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
     noninherited_flags._isLink = false;
   }
 
- protected:
+ private:
   RenderStyle();
   // used to create the default style.
   RenderStyle(bool);

@@ -320,7 +320,7 @@ void RenderSlider::updateFromElement() {
         m_thumb->createRenderer(renderArena(), thumbStyle.get()));
     m_thumb->renderer()->setStyle(thumbStyle.release());
     m_thumb->setAttached();
-    m_thumb->setInDocument(true);
+    m_thumb->setInDocument();
     addChild(m_thumb->renderer());
   }
   setNeedsLayout(true);

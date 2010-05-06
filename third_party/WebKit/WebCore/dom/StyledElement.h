@@ -26,6 +26,7 @@
 #ifndef StyledElement_h
 #define StyledElement_h
 
+#include "CSSMutableStyleDeclaration.h"
 #include "CSSPrimitiveValue.h"
 #include "Element.h"
 #include "MappedAttributeEntry.h"
@@ -34,7 +35,6 @@
 namespace WebCore {
 
 class CSSMappedAttributeDeclaration;
-class CSSMutableStyleDeclaration;
 class MappedAttribute;
 
 class StyledElement : public Element {
@@ -105,7 +105,10 @@ class StyledElement : public Element {
                                                 const AtomicString& value);
 
  protected:
-  StyledElement(const QualifiedName&, Document*, ConstructionType);
+  StyledElement(const QualifiedName& name,
+                Document* document,
+                ConstructionType type)
+      : Element(name, document, type) {}
 
   virtual void attributeChanged(Attribute*, bool preserveDecls = false);
   virtual void parseMappedAttribute(MappedAttribute*);
@@ -121,8 +124,6 @@ class StyledElement : public Element {
   virtual void didMoveToNewOwnerDocument();
 
  private:
-  virtual bool isStyledElement() const { return true; }
-
   void createMappedDecl(MappedAttribute*);
 
   void createInlineStyleDecl();
@@ -135,7 +136,7 @@ class StyledElement : public Element {
 };
 
 inline void StyledElement::invalidateStyleAttribute() {
-  m_isStyleAttributeValid = false;
+  clearIsStyleAttributeValid();
 }
 
 }  // namespace

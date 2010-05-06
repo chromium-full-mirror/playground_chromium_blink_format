@@ -72,9 +72,7 @@ class SVGElement : public StyledElement {
 
   virtual AffineTransform* supplementalTransform() { return 0; }
 
-  void setSynchronizedSVGAttributes(bool value) {
-    m_areSVGAttributesValid = value;
-  }
+  void invalidateSVGAttributes() { clearAreSVGAttributesValid(); }
 
   const HashSet<SVGElementInstance*>& instancesForElement() const;
 
@@ -96,7 +94,6 @@ class SVGElement : public StyledElement {
  private:
   friend class SVGElementInstance;
 
-  virtual bool isSVGElement() const { return true; }
   virtual bool isSupported(StringImpl* feature, StringImpl* version) const;
 
   virtual ContainerNode* eventParentNode();

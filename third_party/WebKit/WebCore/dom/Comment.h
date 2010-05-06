@@ -37,7 +37,6 @@ class Comment : public CharacterData {
   virtual String nodeName() const;
   virtual NodeType nodeType() const;
   virtual PassRefPtr<Node> cloneNode(bool deep);
-  virtual bool isCommentNode() const { return true; }
   virtual bool childTypeAllowed(NodeType);
 };
 
