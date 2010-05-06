@@ -1530,11 +1530,16 @@ void JIT::emit_op_new_error(Instruction* currentInstruction) {
 }
 
 void JIT::emit_op_debug(Instruction* currentInstruction) {
+#if ENABLE(DEBUG_WITH_BREAKPOINT)
+  UNUSED_PARAM(currentInstruction);
+  breakpoint();
+#else
   JITStubCall stubCall(this, cti_op_debug);
   stubCall.addArgument(Imm32(currentInstruction[1].u.operand));
   stubCall.addArgument(Imm32(currentInstruction[2].u.operand));
   stubCall.addArgument(Imm32(currentInstruction[3].u.operand));
   stubCall.call();
+#endif
 }
 
 void JIT::emit_op_enter(Instruction*) {
@@ -2923,11 +2928,16 @@ void JIT::emit_op_new_error(Instruction* currentInstruction) {
 }
 
 void JIT::emit_op_debug(Instruction* currentInstruction) {
+#if ENABLE(DEBUG_WITH_BREAKPOINT)
+  UNUSED_PARAM(currentInstruction);
+  breakpoint();
+#else
   JITStubCall stubCall(this, cti_op_debug);
   stubCall.addArgument(Imm32(currentInstruction[1].u.operand));
   stubCall.addArgument(Imm32(currentInstruction[2].u.operand));
   stubCall.addArgument(Imm32(currentInstruction[3].u.operand));
   stubCall.call();
+#endif
 }
 
 void JIT::emit_op_eq_null(Instruction* currentInstruction) {
