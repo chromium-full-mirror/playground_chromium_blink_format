@@ -47,9 +47,9 @@ class ClipboardGtk : public Clipboard {
   }
 
   static PassRefPtr<ClipboardGtk> create(ClipboardAccessPolicy policy,
+                                         PassRefPtr<DataObjectGtk> dataObject,
                                          bool isForDragging) {
-    return adoptRef(
-        new ClipboardGtk(policy, DataObjectGtk::create(), isForDragging));
+    return adoptRef(new ClipboardGtk(policy, dataObject, isForDragging));
   }
   virtual ~ClipboardGtk();
 
@@ -77,6 +77,9 @@ class ClipboardGtk : public Clipboard {
   virtual void writePlainText(const String&);
 
   virtual bool hasData();
+
+  PasteboardHelper* helper() { return m_helper; }
+  PassRefPtr<DataObjectGtk> dataObject() { return m_dataObject; }
 
  private:
   ClipboardGtk(ClipboardAccessPolicy, GtkClipboard*);
