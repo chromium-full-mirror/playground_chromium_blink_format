@@ -549,13 +549,18 @@ Location* DOMWindow::location() const {
 }
 
 #if ENABLE(DOM_STORAGE)
-Storage* DOMWindow::sessionStorage() const {
+Storage* DOMWindow::sessionStorage(ExceptionCode& ec) const {
   if (m_sessionStorage)
     return m_sessionStorage.get();
 
   Document* document = this->document();
   if (!document)
     return 0;
+
+  if (!document->securityOrigin()->canAccessLocalStorage()) {
+    ec = SECURITY_ERR;
+    return 0;
+  }
 
   Page* page = document->page();
   if (!page)
