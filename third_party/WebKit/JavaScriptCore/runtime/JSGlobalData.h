@@ -29,6 +29,7 @@
 #ifndef JSGlobalData_h
 #define JSGlobalData_h
 
+#include "CachedTranscendentalFunction.h"
 #include "Collector.h"
 #include "DateInstanceCache.h"
 #include "ExecutableAllocator.h"
@@ -207,6 +208,8 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
 #ifndef NDEBUG
   ThreadIdentifier exclusiveThread;
 #endif
+
+  CachedTranscendentalFunction<sin> cachedSin;
 
   void resetDateCache();
 
