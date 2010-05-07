@@ -25,6 +25,7 @@
 
 namespace WebCore {
 
+class HTMLTokenizer;
 class SegmentedString;
 class XSSAuditor;
 
@@ -59,6 +60,7 @@ class Tokenizer : public Noncopyable {
   virtual void executeScriptsWaitingForStylesheets() {}
 
   virtual bool isHTMLTokenizer() const { return false; }
+  virtual HTMLTokenizer* asHTMLTokenizer() { return 0; }
 
   XSSAuditor* xssAuditor() const { return m_XSSAuditor; }
   void setXSSAuditor(XSSAuditor* auditor) { m_XSSAuditor = auditor; }
