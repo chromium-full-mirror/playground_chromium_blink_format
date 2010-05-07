@@ -39,4 +39,7 @@ double randomNumber();
 double weakRandomNumber();
 }
 
+using WTF::randomNumber;
+using WTF::weakRandomNumber;
+
 #endif
