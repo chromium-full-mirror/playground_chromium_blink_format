@@ -50,7 +50,7 @@ class CharacterData : public Node {
   CharacterData(Document* document, const String& text, ConstructionType type)
       : Node(document, type),
         m_data(text.impl() ? text.impl() : StringImpl::empty()) {
-    ASSERT(type == CreateOther || type == CreateText);
+    ASSERT(type == CreateComment || type == CreateText);
   }
 
   virtual bool rendererIsNeeded(RenderStyle*);
