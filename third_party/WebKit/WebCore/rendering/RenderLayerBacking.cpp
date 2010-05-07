@@ -900,6 +900,9 @@ FloatPoint RenderLayerBacking::contentsToGraphicsLayerCoordinates(
 }
 
 bool RenderLayerBacking::paintingGoesToWindow() const {
+  if (!RenderLayerCompositor::shouldPropagateCompositingToIFrameParent())
+    return m_owningLayer->isRootLayer();
+
   if (!m_owningLayer->isRootLayer())
     return false;
 
