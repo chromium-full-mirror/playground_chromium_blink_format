@@ -46,7 +46,7 @@ ASSERT_CLASS_FITS_IN_CELL(JSTestObj);
 #define THUNK_GENERATOR(generator)
 #endif
 
-static const HashTableValue JSTestObjTableValues[14] = {
+static const HashTableValue JSTestObjTableValues[15] = {
     {"readOnlyIntAttr", DontDelete | ReadOnly,
      (intptr_t) static_cast<PropertySlot::GetValueFunc>(
          jsTestObjReadOnlyIntAttr),
@@ -90,6 +90,10 @@ static const HashTableValue JSTestObjTableValues[14] = {
     {"customAttr", DontDelete,
      (intptr_t) static_cast<PropertySlot::GetValueFunc>(jsTestObjCustomAttr),
      (intptr_t)setJSTestObjCustomAttr THUNK_GENERATOR(0)},
+    {"scriptStringAttr", DontDelete | ReadOnly,
+     (intptr_t) static_cast<PropertySlot::GetValueFunc>(
+         jsTestObjScriptStringAttr),
+     (intptr_t)0 THUNK_GENERATOR(0)},
     {"constructor", DontEnum | ReadOnly,
      (intptr_t) static_cast<PropertySlot::GetValueFunc>(jsTestObjConstructor),
      (intptr_t)0 THUNK_GENERATOR(0)},
@@ -453,6 +457,16 @@ JSValue jsTestObjCustomAttr(ExecState* exec,
                             const Identifier&) {
   JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(slotBase));
   return castedThis->customAttr(exec);
+}
+
+JSValue jsTestObjScriptStringAttr(ExecState* exec,
+                                  JSValue slotBase,
+                                  const Identifier&) {
+  JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(slotBase));
+  UNUSED_PARAM(exec);
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
+  JSValue result = jsOwnedStringOrNull(exec, imp->scriptStringAttr());
+  return result;
 }
 
 JSValue jsTestObjConstructor(ExecState* exec,

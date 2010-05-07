@@ -223,6 +223,14 @@ static void attrWithGetterExceptionAttrSetter(v8::Local<v8::String> name,
   return;
 }
 
+static v8::Handle<v8::Value> scriptStringAttrAttrGetter(
+    v8::Local<v8::String> name,
+    const v8::AccessorInfo& info) {
+  INC_STATS("DOM.TestObj.scriptStringAttr._get");
+  TestObj* imp = V8TestObj::toNative(info.Holder());
+  v8StringOrNull(exec, imp->scriptStringAttr());
+}
+
 static v8::Handle<v8::Value> voidMethodCallback(const v8::Arguments& args) {
   INC_STATS("DOM.TestObj.voidMethod");
   TestObj* imp = V8TestObj::toNative(args.Holder());
@@ -674,6 +682,11 @@ static const BatchedAttribute TestObjAttrs[] = {
     {"customAttr", V8TestObj::customAttrAccessorGetter,
      V8TestObj::customAttrAccessorSetter, 0 /* no data */,
      static_cast<v8::AccessControl>(v8::DEFAULT),
+     static_cast<v8::PropertyAttribute>(v8::None), 0 /* on instance */},
+    // Attribute 'scriptStringAttr' (Type: 'readonly attribute' ExtAttr:
+    // 'ConvertScriptString')
+    {"scriptStringAttr", TestObjInternal::scriptStringAttrAttrGetter, 0,
+     0 /* no data */, static_cast<v8::AccessControl>(v8::DEFAULT),
      static_cast<v8::PropertyAttribute>(v8::None), 0 /* on instance */},
 };
 static const BatchedCallback TestObjCallbacks[] = {
