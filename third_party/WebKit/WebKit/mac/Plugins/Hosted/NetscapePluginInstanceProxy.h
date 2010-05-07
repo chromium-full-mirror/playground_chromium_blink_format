@@ -83,9 +83,9 @@ class NetscapePluginInstanceProxy
     m_renderContextID = renderContextID;
   }
 
-  bool useSoftwareRenderer() const { return m_useSoftwareRenderer; }
-  void setUseSoftwareRenderer(bool useSoftwareRenderer) {
-    m_useSoftwareRenderer = useSoftwareRenderer;
+  RendererType rendererType() const { return m_rendererType; }
+  void setRendererType(RendererType rendererType) {
+    m_rendererType = rendererType;
   }
 
   WebHostedNetscapePluginView* pluginView() const {
@@ -282,15 +282,15 @@ class NetscapePluginInstanceProxy
 
     InstantiatePluginReply(kern_return_t resultCode,
                            uint32_t renderContextID,
-                           boolean_t useSoftwareRenderer)
+                           RendererType rendererType)
         : Reply(InstantiatePlugin),
           m_resultCode(resultCode),
           m_renderContextID(renderContextID),
-          m_useSoftwareRenderer(useSoftwareRenderer) {}
+          m_rendererType(rendererType) {}
 
     kern_return_t m_resultCode;
     uint32_t m_renderContextID;
-    boolean_t m_useSoftwareRenderer;
+    RendererType m_rendererType;
   };
 
   struct GetScriptableNPObjectReply : public Reply {
@@ -377,7 +377,7 @@ class NetscapePluginInstanceProxy
 
   uint32_t m_pluginID;
   uint32_t m_renderContextID;
-  boolean_t m_useSoftwareRenderer;
+  RendererType m_rendererType;
 
   bool m_waitingForReply;
   HashMap<uint32_t, Reply*> m_replies;
