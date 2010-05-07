@@ -85,7 +85,7 @@ void SVGElementInstance::appendChild(PassRefPtr<SVGElementInstance> child) {
 }
 
 void SVGElementInstance::invalidateAllInstancesOfElement(SVGElement* element) {
-  if (!element)
+  if (!element || !element->inDocument())
     return;
 
   if (element->isStyled() &&
@@ -103,6 +103,9 @@ void SVGElementInstance::invalidateAllInstancesOfElement(SVGElement* element) {
     ASSERT((*it)->correspondingElement() == element);
     (*it)->correspondingUseElement()->invalidateShadowTree();
   }
+
+  // Be sure to rebuild use trees, if needed
+  element->document()->updateLayoutIgnorePendingStylesheets();
 }
 
 ScriptExecutionContext* SVGElementInstance::scriptExecutionContext() const {
@@ -140,14 +143,21 @@ bool SVGElementInstance::dispatchEvent(PassRefPtr<Event> prpEvent) {
 }
 
 EventTargetData* SVGElementInstance::eventTargetData() {
-  return m_element->eventTargetData();
+  // EventTarget would use these methods if we were actually using its
+  // add/removeEventListener logic.
+  // As we're forwarding those calls to the correspondingElement(), no one
+  // should ever call this function.
+  ASSERT_NOT_REACHED();
+  return 0;
 }
 
 EventTargetData* SVGElementInstance::ensureEventTargetData() {
-  // Avoid crashing - return a default dummy value
-  DEFINE_STATIC_LOCAL(EventTargetData, dummyEventTargetData, ());
-  dummyEventTargetData.eventListenerMap.clear();
-  return &dummyEventTargetData;
+  // EventTarget would use these methods if we were actually using its
+  // add/removeEventListener logic.
+  // As we're forwarding those calls to the correspondingElement(), no one
+  // should ever call this function.
+  ASSERT_NOT_REACHED();
+  return 0;
 }
 }
 
