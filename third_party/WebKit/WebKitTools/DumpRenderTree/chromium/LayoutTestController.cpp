@@ -798,7 +798,7 @@ bool LayoutTestController::elementDoesAutoCompleteForElementWithId(
   if (element.isNull() || !element.hasTagName("input"))
     return false;
 
-  WebInputElement inputElement = element.toElement<WebInputElement>();
+  WebInputElement inputElement = element.to<WebInputElement>();
   return inputElement.autoComplete();
 }
 
