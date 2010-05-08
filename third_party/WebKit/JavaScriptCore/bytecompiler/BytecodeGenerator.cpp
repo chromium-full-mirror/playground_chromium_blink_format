@@ -1143,7 +1143,8 @@ RegisterID* BytecodeGenerator::emitResolve(RegisterID* dst,
 #endif
     }
 
-    if (index != missingSymbolMarker() && !forceGlobalResolve) {
+    if (index != missingSymbolMarker() && !forceGlobalResolve &&
+        !requiresDynamicChecks) {
       // Directly index the property lookup across multiple scopes.
       return emitGetScopedVar(dst, depth, index, globalObject);
     }

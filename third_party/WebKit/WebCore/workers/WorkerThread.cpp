@@ -180,6 +180,9 @@ class WorkerThreadShutdownFinishTask : public ScriptExecutionContext::Task {
   virtual void performTask(ScriptExecutionContext* context) {
     ASSERT(context->isWorkerContext());
     WorkerContext* workerContext = static_cast<WorkerContext*>(context);
+    // It's not safe to call clearScript until all the cleanup tasks posted by
+    // functions initiated by WorkerThreadShutdownStartTask have completed.
+    workerContext->clearScript();
     workerContext->thread()->runLoop().terminate();
   }
 
@@ -209,7 +212,6 @@ class WorkerThreadShutdownStartTask : public ScriptExecutionContext::Task {
     // Also, they have references to JS objects,
     // which become dangling once Heap is destroyed.
     workerContext->removeAllEventListeners();
-    workerContext->clearScript();
 
 #if ENABLE(DATABASE)
     // We wait for the database thread to clean up all its stuff so that we
