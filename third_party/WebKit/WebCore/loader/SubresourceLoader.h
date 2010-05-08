@@ -65,6 +65,7 @@ class SubresourceLoader : public ResourceLoader {
                               int,
                               long long lengthReceived,
                               bool allAtOnce);
+  virtual void didReceiveCachedMetadata(const char*, int);
   virtual void didFinishLoading();
   virtual void didFail(const ResourceError&);
   virtual bool shouldUseCredentialStorage();

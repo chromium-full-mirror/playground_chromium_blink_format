@@ -86,6 +86,7 @@ class ResourceLoader : public RefCounted<ResourceLoader>,
                               int,
                               long long lengthReceived,
                               bool allAtOnce);
+  virtual void didReceiveCachedMetadata(const char*, int) {}
   void willStopBufferingData(const char*, int);
   virtual void didFinishLoading();
   virtual void didFail(const ResourceError&);
@@ -111,6 +112,11 @@ class ResourceLoader : public RefCounted<ResourceLoader>,
                               const char*,
                               int,
                               int lengthReceived);
+  virtual void didReceiveCachedMetadata(ResourceHandle*,
+                                        const char* data,
+                                        int length) {
+    didReceiveCachedMetadata(data, length);
+  }
   virtual void didFinishLoading(ResourceHandle*);
   virtual void didFail(ResourceHandle*, const ResourceError&);
   virtual void wasBlocked(ResourceHandle*);
