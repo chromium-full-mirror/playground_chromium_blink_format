@@ -70,7 +70,7 @@ class PageGroup : public Noncopyable {
   StorageNamespace* localStorage();
   bool hasLocalStorage() { return m_localStorage; }
 #endif
-#if ENABLE(DOM_STORAGE)
+#if ENABLE(INDEXED_DATABASE)
   IndexedDatabase* indexedDatabase();
 #endif
 
