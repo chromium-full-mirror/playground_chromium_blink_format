@@ -94,7 +94,8 @@ void WebSharedWorkerImpl::connectTask(ScriptExecutionContext* context,
 void WebSharedWorkerImpl::startWorkerContext(const WebURL& url,
                                              const WebString& name,
                                              const WebString& userAgent,
-                                             const WebString& sourceCode) {
+                                             const WebString& sourceCode,
+                                             long long) {
   initializeLoader(url);
   setWorkerThread(SharedWorkerThread::create(name, url, userAgent, sourceCode,
                                              *this, *this));

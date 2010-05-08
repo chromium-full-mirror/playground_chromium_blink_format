@@ -78,7 +78,8 @@ class SharedWorkerScriptLoader : private WorkerScriptLoaderClient,
         m_webWorker(webWorker),
         m_port(port),
         m_scriptLoader(ResourceRequestBase::TargetIsSharedWorker),
-        m_loading(false) {}
+        m_loading(false),
+        m_responseAppCacheID(0) {}
 
   ~SharedWorkerScriptLoader();
   void load();
@@ -86,6 +87,7 @@ class SharedWorkerScriptLoader : private WorkerScriptLoaderClient,
 
  private:
   // WorkerScriptLoaderClient callback
+  virtual void didReceiveResponse(const ResourceResponse&);
   virtual void notifyFinished();
 
   virtual void connected();
@@ -103,6 +105,7 @@ class SharedWorkerScriptLoader : private WorkerScriptLoaderClient,
   OwnPtr<MessagePortChannel> m_port;
   WorkerScriptLoader m_scriptLoader;
   bool m_loading;
+  long long m_responseAppCacheID;
 };
 
 static Vector<SharedWorkerScriptLoader*>& pendingLoaders() {
@@ -156,6 +159,11 @@ static WebMessagePortChannel* getWebPort(PassOwnPtr<MessagePortChannel> port) {
   return webPort;
 }
 
+void SharedWorkerScriptLoader::didReceiveResponse(
+    const ResourceResponse& response) {
+  m_responseAppCacheID = response.appCacheID();
+}
+
 void SharedWorkerScriptLoader::notifyFinished() {
   if (m_scriptLoader.failed()) {
     m_worker->dispatchEvent(
@@ -171,7 +179,7 @@ void SharedWorkerScriptLoader::notifyFinished() {
     // Pass the script off to the worker, then send a connect event.
     m_webWorker->startWorkerContext(
         m_url, m_name, m_worker->scriptExecutionContext()->userAgent(m_url),
-        m_scriptLoader.script());
+        m_scriptLoader.script(), m_responseAppCacheID);
     sendConnect();
   }
 }

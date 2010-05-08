@@ -58,7 +58,8 @@ class WebSharedWorkerImpl : public WebWorkerBase, public WebSharedWorker {
   virtual void startWorkerContext(const WebURL&,
                                   const WebString& name,
                                   const WebString& userAgent,
-                                  const WebString& sourceCode);
+                                  const WebString& sourceCode,
+                                  long long);
   virtual void connect(WebMessagePortChannel*, ConnectListener*);
   virtual void terminateWorkerContext();
   virtual void clientDestroyed();
