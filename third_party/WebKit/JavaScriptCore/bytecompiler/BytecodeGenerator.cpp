@@ -1044,6 +1044,7 @@ bool BytecodeGenerator::findScopedProperty(const Identifier& property,
                                            int& index,
                                            size_t& stackDepth,
                                            bool forWriting,
+                                           bool& requiresDynamicChecks,
                                            JSObject*& globalObject) {
   // Cases where we cannot statically optimize the lookup.
   if (property == propertyNames().arguments || !canOptimizeNonLocals()) {
@@ -1059,7 +1060,7 @@ bool BytecodeGenerator::findScopedProperty(const Identifier& property,
   }
 
   size_t depth = 0;
-
+  requiresDynamicChecks = false;
   ScopeChainIterator iter = m_scopeChain->begin();
   ScopeChainIterator end = m_scopeChain->end();
   for (; iter != end; ++iter, ++depth) {
@@ -1086,10 +1087,11 @@ bool BytecodeGenerator::findScopedProperty(const Identifier& property,
         globalObject = currentVariableObject;
       return true;
     }
-    if (currentVariableObject->isDynamicScope())
+    bool scopeRequiresDynamicChecks = false;
+    if (currentVariableObject->isDynamicScope(scopeRequiresDynamicChecks))
       break;
+    requiresDynamicChecks |= scopeRequiresDynamicChecks;
   }
-
   // Can't locate the property but we're able to avoid a few lookups.
   stackDepth = depth;
   index = missingSymbolMarker();
@@ -1116,7 +1118,9 @@ RegisterID* BytecodeGenerator::emitResolve(RegisterID* dst,
   size_t depth = 0;
   int index = 0;
   JSObject* globalObject = 0;
-  if (!findScopedProperty(property, index, depth, false, globalObject) &&
+  bool requiresDynamicChecks = false;
+  if (!findScopedProperty(property, index, depth, false, requiresDynamicChecks,
+                          globalObject) &&
       !globalObject) {
     // We can't optimise at all :-(
     emitOpcode(op_resolve);
@@ -1149,12 +1153,23 @@ RegisterID* BytecodeGenerator::emitResolve(RegisterID* dst,
 #else
     m_codeBlock->addGlobalResolveInstruction(instructions().size());
 #endif
-    emitOpcode(op_resolve_global);
+    emitOpcode(requiresDynamicChecks ? op_resolve_global_dynamic
+                                     : op_resolve_global);
     instructions().append(dst->index());
     instructions().append(globalObject);
     instructions().append(addConstant(property));
     instructions().append(0);
     instructions().append(0);
+    if (requiresDynamicChecks)
+      instructions().append(depth);
+    return dst;
+  }
+
+  if (requiresDynamicChecks) {
+    // If we get here we have eval nested inside a |with| just give up
+    emitOpcode(op_resolve);
+    instructions().append(dst->index());
+    instructions().append(addConstant(property));
     return dst;
   }
 
@@ -1214,8 +1229,10 @@ RegisterID* BytecodeGenerator::emitResolveBase(RegisterID* dst,
   size_t depth = 0;
   int index = 0;
   JSObject* globalObject = 0;
-  findScopedProperty(property, index, depth, false, globalObject);
-  if (!globalObject) {
+  bool requiresDynamicChecks = false;
+  findScopedProperty(property, index, depth, false, requiresDynamicChecks,
+                     globalObject);
+  if (!globalObject || requiresDynamicChecks) {
     // We can't optimise at all :-(
     emitOpcode(op_resolve_base);
     instructions().append(dst->index());
@@ -1233,8 +1250,10 @@ RegisterID* BytecodeGenerator::emitResolveWithBase(RegisterID* baseDst,
   size_t depth = 0;
   int index = 0;
   JSObject* globalObject = 0;
-  if (!findScopedProperty(property, index, depth, false, globalObject) ||
-      !globalObject) {
+  bool requiresDynamicChecks = false;
+  if (!findScopedProperty(property, index, depth, false, requiresDynamicChecks,
+                          globalObject) ||
+      !globalObject || requiresDynamicChecks) {
     // We can't optimise at all :-(
     emitOpcode(op_resolve_with_base);
     instructions().append(baseDst->index());
@@ -1270,12 +1289,15 @@ RegisterID* BytecodeGenerator::emitResolveWithBase(RegisterID* baseDst,
 #else
   m_codeBlock->addGlobalResolveInstruction(instructions().size());
 #endif
-  emitOpcode(op_resolve_global);
+  emitOpcode(requiresDynamicChecks ? op_resolve_global_dynamic
+                                   : op_resolve_global);
   instructions().append(propDst->index());
   instructions().append(globalObject);
   instructions().append(addConstant(property));
   instructions().append(0);
   instructions().append(0);
+  if (requiresDynamicChecks)
+    instructions().append(depth);
   return baseDst;
 }
 

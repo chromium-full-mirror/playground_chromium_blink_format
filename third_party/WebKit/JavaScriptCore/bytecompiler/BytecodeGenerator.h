@@ -124,6 +124,7 @@ class BytecodeGenerator : public FastAllocBase {
                           int& index,
                           size_t& depth,
                           bool forWriting,
+                          bool& includesDynamicScopes,
                           JSObject*& globalObject);
 
   // Returns the register storing "this"

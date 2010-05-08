@@ -581,7 +581,7 @@ ExecState* JSGlobalObject::globalExec() {
                            RegisterFile::CallFrameHeaderSize);
 }
 
-bool JSGlobalObject::isDynamicScope() const {
+bool JSGlobalObject::isDynamicScope(bool&) const {
   return true;
 }
 

@@ -305,6 +305,7 @@ void JIT::privateCompileMainPass() {
       DEFINE_OP(op_resolve)
       DEFINE_OP(op_resolve_base)
       DEFINE_OP(op_resolve_global)
+      DEFINE_OP(op_resolve_global_dynamic)
       DEFINE_OP(op_resolve_skip)
       DEFINE_OP(op_resolve_with_base)
       DEFINE_OP(op_ret)
@@ -369,9 +370,7 @@ void JIT::privateCompileSlowCases() {
   Instruction* instructionsBegin = m_codeBlock->instructions().begin();
 
   m_propertyAccessInstructionIndex = 0;
-#if USE(JSVALUE32_64)
   m_globalResolveInfoIndex = 0;
-#endif
   m_callLinkInfoIndex = 0;
 
   for (Vector<SlowCaseEntry>::iterator iter = m_slowCases.begin();
@@ -432,9 +431,8 @@ void JIT::privateCompileSlowCases() {
       DEFINE_SLOWCASE_OP(op_pre_inc)
       DEFINE_SLOWCASE_OP(op_put_by_id)
       DEFINE_SLOWCASE_OP(op_put_by_val)
-#if USE(JSVALUE32_64)
       DEFINE_SLOWCASE_OP(op_resolve_global)
-#endif
+      DEFINE_SLOWCASE_OP(op_resolve_global_dynamic)
       DEFINE_SLOWCASE_OP(op_rshift)
       DEFINE_SLOWCASE_OP(op_urshift)
       DEFINE_SLOWCASE_OP(op_stricteq)

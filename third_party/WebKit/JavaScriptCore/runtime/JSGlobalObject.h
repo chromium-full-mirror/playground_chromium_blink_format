@@ -302,7 +302,7 @@ class JSGlobalObject : public JSVariableObject {
 
   virtual bool allowsAccessFrom(const JSGlobalObject*) const { return true; }
 
-  virtual bool isDynamicScope() const;
+  virtual bool isDynamicScope(bool& requiresDynamicChecks) const;
 
   HashSet<GlobalCodeBlock*>& codeBlocks() { return d()->codeBlocks; }
 

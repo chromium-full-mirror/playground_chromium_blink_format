@@ -171,6 +171,9 @@ class Interpreter : public FastAllocBase {
   NEVER_INLINE bool resolveGlobal(CallFrame*,
                                   Instruction*,
                                   JSValue& exceptionValue);
+  NEVER_INLINE bool resolveGlobalDynamic(CallFrame*,
+                                         Instruction*,
+                                         JSValue& exceptionValue);
   NEVER_INLINE void resolveBase(CallFrame*, Instruction* vPC);
   NEVER_INLINE bool resolveBaseAndProperty(CallFrame*,
                                            Instruction*,

@@ -48,7 +48,7 @@ class JSActivation : public JSVariableObject {
 
   virtual void markChildren(MarkStack&);
 
-  virtual bool isDynamicScope() const;
+  virtual bool isDynamicScope(bool& requiresDynamicChecks) const;
 
   virtual bool isActivationObject() const { return true; }
 

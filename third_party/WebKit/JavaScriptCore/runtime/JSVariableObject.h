@@ -58,7 +58,7 @@ class JSVariableObject : public JSObject {
       EnumerationMode mode = ExcludeDontEnumProperties);
 
   virtual bool isVariableObject() const;
-  virtual bool isDynamicScope() const = 0;
+  virtual bool isDynamicScope(bool& requiresDynamicChecks) const = 0;
 
   Register& registerAt(int index) const { return d->registers[index]; }
 

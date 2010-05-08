@@ -962,7 +962,8 @@ class JIT : private JSInterfaceJIT {
   void emit_op_put_setter(Instruction*);
   void emit_op_resolve(Instruction*);
   void emit_op_resolve_base(Instruction*);
-  void emit_op_resolve_global(Instruction*);
+  void emit_op_resolve_global(Instruction*, bool dynamic = false);
+  void emit_op_resolve_global_dynamic(Instruction*);
   void emit_op_resolve_skip(Instruction*);
   void emit_op_resolve_with_base(Instruction*);
   void emit_op_ret(Instruction*);
@@ -1033,6 +1034,8 @@ class JIT : private JSInterfaceJIT {
   void emitSlow_op_put_by_val(Instruction*, Vector<SlowCaseEntry>::iterator&);
   void emitSlow_op_resolve_global(Instruction*,
                                   Vector<SlowCaseEntry>::iterator&);
+  void emitSlow_op_resolve_global_dynamic(Instruction*,
+                                          Vector<SlowCaseEntry>::iterator&);
   void emitSlow_op_rshift(Instruction*, Vector<SlowCaseEntry>::iterator&);
   void emitSlow_op_stricteq(Instruction*, Vector<SlowCaseEntry>::iterator&);
   void emitSlow_op_sub(Instruction*, Vector<SlowCaseEntry>::iterator&);

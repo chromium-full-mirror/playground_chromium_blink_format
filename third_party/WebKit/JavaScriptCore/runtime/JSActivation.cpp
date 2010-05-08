@@ -140,8 +140,9 @@ JSObject* JSActivation::toThisObject(ExecState* exec) const {
   return exec->globalThisValue();
 }
 
-bool JSActivation::isDynamicScope() const {
-  return d()->functionExecutable->usesEval();
+bool JSActivation::isDynamicScope(bool& requiresDynamicChecks) const {
+  requiresDynamicChecks = d()->functionExecutable->usesEval();
+  return false;
 }
 
 JSValue JSActivation::argumentsGetter(ExecState* exec,

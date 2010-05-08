@@ -796,7 +796,8 @@ void JIT::emit_op_resolve_skip(Instruction* currentInstruction) {
   stubCall.call(currentInstruction[1].u.operand);
 }
 
-void JIT::emit_op_resolve_global(Instruction* currentInstruction) {
+void JIT::emit_op_resolve_global(Instruction* currentInstruction,
+                                 bool dynamic) {
   // FIXME: Optimize to use patching instead of so many memory accesses.
 
   unsigned dst = currentInstruction[1].u.operand;
@@ -820,7 +821,9 @@ void JIT::emit_op_resolve_global(Instruction* currentInstruction) {
   load32(BaseIndex(regT2, regT3, TimesEight), regT0);     // payload
   load32(BaseIndex(regT2, regT3, TimesEight, 4), regT1);  // tag
   emitStore(dst, regT1, regT0);
-  map(m_bytecodeIndex + OPCODE_LENGTH(op_resolve_global), dst, regT1, regT0);
+  map(m_bytecodeIndex + OPCODE_LENGTH(dynamic ? op_resolve_global_dynamic
+                                              : op_resolve_global),
+      dst, regT1, regT0);
 }
 
 void JIT::emitSlow_op_resolve_global(Instruction* currentInstruction,
@@ -2423,11 +2426,9 @@ void JIT::emit_op_resolve_skip(Instruction* currentInstruction) {
   stubCall.call(currentInstruction[1].u.operand);
 }
 
-void JIT::emit_op_resolve_global(Instruction* currentInstruction) {
+void JIT::emit_op_resolve_global(Instruction* currentInstruction, bool) {
   // Fast case
   void* globalObject = currentInstruction[2].u.jsCell;
-  Identifier* ident = &m_codeBlock->identifier(currentInstruction[3].u.operand);
-
   unsigned currentIndex = m_globalResolveInfoIndex++;
   void* structureAddress =
       &(m_codeBlock->globalResolveInfo(currentIndex).structure);
@@ -2436,10 +2437,10 @@ void JIT::emit_op_resolve_global(Instruction* currentInstruction) {
   // Check Structure of global object
   move(ImmPtr(globalObject), regT0);
   loadPtr(structureAddress, regT1);
-  Jump noMatch = branchPtr(
+  addSlowCase(branchPtr(
       NotEqual, regT1,
-      Address(regT0,
-              OBJECT_OFFSETOF(JSCell, m_structure)));  // Structures don't match
+      Address(regT0, OBJECT_OFFSETOF(JSCell,
+                                     m_structure))));  // Structures don't match
 
   // Load cached property
   // Assume that the global object always uses external storage.
@@ -2448,16 +2449,22 @@ void JIT::emit_op_resolve_global(Instruction* currentInstruction) {
   load32(offsetAddr, regT1);
   loadPtr(BaseIndex(regT0, regT1, ScalePtr), regT0);
   emitPutVirtualRegister(currentInstruction[1].u.operand);
-  Jump end = jump();
+}
 
-  // Slow case
-  noMatch.link(this);
+void JIT::emitSlow_op_resolve_global(Instruction* currentInstruction,
+                                     Vector<SlowCaseEntry>::iterator& iter) {
+  unsigned dst = currentInstruction[1].u.operand;
+  void* globalObject = currentInstruction[2].u.jsCell;
+  Identifier* ident = &m_codeBlock->identifier(currentInstruction[3].u.operand);
+
+  unsigned currentIndex = m_globalResolveInfoIndex++;
+
+  linkSlowCase(iter);
   JITStubCall stubCall(this, cti_op_resolve_global);
   stubCall.addArgument(ImmPtr(globalObject));
   stubCall.addArgument(ImmPtr(ident));
   stubCall.addArgument(Imm32(currentIndex));
-  stubCall.call(currentInstruction[1].u.operand);
-  end.link(this);
+  stubCall.call(dst);
 }
 
 void JIT::emit_op_not(Instruction* currentInstruction) {
@@ -2488,7 +2495,8 @@ void JIT::emit_op_jfalse(Instruction* currentInstruction) {
 
   isNonZero.link(this);
   RECORD_JUMP_TARGET(target);
-};
+}
+
 void JIT::emit_op_jeq_null(Instruction* currentInstruction) {
   unsigned src = currentInstruction[1].u.operand;
   unsigned target = currentInstruction[2].u.operand;
@@ -3295,6 +3303,45 @@ void JIT::emitSlow_op_to_jsnumber(Instruction* currentInstruction,
 }
 
 #endif  // USE(JSVALUE32_64)
+
+void JIT::emit_op_resolve_global_dynamic(Instruction* currentInstruction) {
+  int skip =
+      currentInstruction[6].u.operand + m_codeBlock->needsFullScopeChain();
+
+  emitGetFromCallFrameHeaderPtr(RegisterFile::ScopeChain, regT0);
+  while (skip--) {
+    loadPtr(Address(regT0, OBJECT_OFFSETOF(ScopeChainNode, object)), regT1);
+    addSlowCase(checkStructure(regT1, m_globalData->activationStructure.get()));
+    loadPtr(Address(regT0, OBJECT_OFFSETOF(ScopeChainNode, next)), regT0);
+  }
+  emit_op_resolve_global(currentInstruction, true);
+}
+
+void JIT::emitSlow_op_resolve_global_dynamic(
+    Instruction* currentInstruction,
+    Vector<SlowCaseEntry>::iterator& iter) {
+  unsigned dst = currentInstruction[1].u.operand;
+  void* globalObject = currentInstruction[2].u.jsCell;
+  Identifier* ident = &m_codeBlock->identifier(currentInstruction[3].u.operand);
+  int skip =
+      currentInstruction[6].u.operand + m_codeBlock->needsFullScopeChain();
+  while (skip--)
+    linkSlowCase(iter);
+  JITStubCall resolveStubCall(this, cti_op_resolve);
+  resolveStubCall.addArgument(ImmPtr(ident));
+  resolveStubCall.call(dst);
+  emitJumpSlowToHot(jump(), OPCODE_LENGTH(op_resolve_global_dynamic));
+
+  unsigned currentIndex = m_globalResolveInfoIndex++;
+
+  linkSlowCase(iter);  // We managed to skip all the nodes in the scope chain,
+                       // but the cache missed.
+  JITStubCall stubCall(this, cti_op_resolve_global);
+  stubCall.addArgument(ImmPtr(globalObject));
+  stubCall.addArgument(ImmPtr(ident));
+  stubCall.addArgument(Imm32(currentIndex));
+  stubCall.call(dst);
+}
 
 // For both JSValue32_64 and JSValue32
 #if ENABLE(JIT_OPTIMIZE_MOD)
