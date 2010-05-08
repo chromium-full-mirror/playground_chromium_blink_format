@@ -122,8 +122,10 @@ class MediaPlayerPrivateQuickTimeVisualContext
                                                 const String& codecs);
   static bool isAvailable();
 
+#if USE(ACCELERATED_COMPOSITING)
   virtual bool supportsAcceleratedRendering() const;
   virtual void acceleratedRenderingStateChanged();
+#endif
 
   enum MediaRenderingMode {
     MediaRenderingNone,
