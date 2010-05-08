@@ -28,7 +28,7 @@
 
 #if ENABLE(VIDEO)
 
-#include "QTMovieWin.h"
+#include "QTMovieGWorld.h"
 
 #include <WebCore/HTMLMediaElement.h>
 #include <WebCore/Image.h>
@@ -107,7 +107,7 @@ class HUDSlider : public HUDWidget {
   int m_dragStartOffset;
 };
 
-class FullscreenVideoController : QTMovieWinFullscreenClient,
+class FullscreenVideoController : QTMovieGWorldFullscreenClient,
                                   public Noncopyable {
  public:
   FullscreenVideoController();
@@ -122,11 +122,11 @@ class FullscreenVideoController : QTMovieWinFullscreenClient,
   void exitFullscreen();
 
  private:
-  // QTMovieWinFullscreenClient
+  // QTMovieGWorldFullscreenClient
   virtual LRESULT fullscreenClientWndProc(HWND, UINT message, WPARAM, LPARAM);
 
   void ensureWindow();
-  QTMovieWin* movie() const;
+  QTMovieGWorld* movie() const;
 
   bool canPlay() const;
   void play();

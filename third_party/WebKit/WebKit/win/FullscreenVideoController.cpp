@@ -216,8 +216,8 @@ FullscreenVideoController::~FullscreenVideoController() {
     movie()->exitFullscreen();
 }
 
-QTMovieWin* FullscreenVideoController::movie() const {
-  return m_mediaElement ? reinterpret_cast<QTMovieWin*>(
+QTMovieGWorld* FullscreenVideoController::movie() const {
+  return m_mediaElement ? reinterpret_cast<QTMovieGWorld*>(
                               m_mediaElement->platformMedia().qtMovie)
                         : 0;
 }

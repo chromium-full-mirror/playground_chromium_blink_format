@@ -23,11 +23,12 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef QTMovieWin_h
-#define QTMovieWin_h
+#ifndef QTMovie_h
+#define QTMovie_h
 
 #include <Unicode.h>
 #include <windows.h>
+#include <wtf/RefCounted.h>
 
 #ifdef QTMOVIEWIN_EXPORTS
 #define QTMOVIEWIN_API __declspec(dllexport)
@@ -35,23 +36,15 @@
 #define QTMOVIEWIN_API __declspec(dllimport)
 #endif
 
-class QTMovieWin;
-class QTMovieWinPrivate;
+class QTMovie;
+class QTMoviePrivate;
+typedef struct MovieType** Movie;
 
-class QTMovieWinClient {
+class QTMovieClient {
  public:
-  virtual void movieEnded(QTMovieWin*) = 0;
-  virtual void movieLoadStateChanged(QTMovieWin*) = 0;
-  virtual void movieTimeChanged(QTMovieWin*) = 0;
-  virtual void movieNewImageAvailable(QTMovieWin*) = 0;
-};
-
-class QTMovieWinFullscreenClient {
- public:
-  virtual LRESULT fullscreenClientWndProc(HWND,
-                                          UINT message,
-                                          WPARAM,
-                                          LPARAM) = 0;
+  virtual void movieEnded(QTMovie*) = 0;
+  virtual void movieLoadStateChanged(QTMovie*) = 0;
+  virtual void movieTimeChanged(QTMovie*) = 0;
 };
 
 enum {
@@ -64,19 +57,20 @@ enum {
 
 typedef const struct __CFURL* CFURLRef;
 
-class QTMOVIEWIN_API QTMovieWin {
+class QTMOVIEWIN_API QTMovie : public RefCounted<QTMovie> {
  public:
   static bool initializeQuickTime();
-
-  typedef void (*SetTaskTimerDelayFunc)(double);
-  typedef void (*StopTaskTimerFunc)();
-  static void setTaskTimerFuncs(SetTaskTimerDelayFunc, StopTaskTimerFunc);
   static void taskTimerFired();
 
-  QTMovieWin(QTMovieWinClient*);
-  ~QTMovieWin();
+  QTMovie(QTMovieClient*);
+  ~QTMovie();
+
+  void addClient(QTMovieClient*);
+  void removeClient(QTMovieClient*);
 
   void load(const UChar* url, int len, bool preservesPitch);
+  void load(CFURLRef, bool preservesPitch);
+
   long loadState() const;
   float maxTimeLoaded() const;
 
@@ -96,18 +90,11 @@ class QTMOVIEWIN_API QTMovieWin {
   unsigned dataSize() const;
 
   void getNaturalSize(int& width, int& height);
-  void setSize(int width, int height);
-
-  void setVisible(bool);
-  void paint(HDC, int x, int y);
-  void getCurrentFrameInfo(void*& buffer,
-                           unsigned& bitsPerPixel,
-                           unsigned& rowBytes,
-                           unsigned& width,
-                           unsigned& height);
 
   void disableUnsupportedTracks(unsigned& enabledTrackCount,
                                 unsigned& totalTrackCount);
+
+  bool isDisabled() const;
   void setDisabled(bool);
 
   bool hasVideo() const;
@@ -121,17 +108,11 @@ class QTMOVIEWIN_API QTMovieWin {
                                const UChar*& str,
                                unsigned& len);
 
-  // Returns the full-screen window created
-  HWND enterFullscreen(QTMovieWinFullscreenClient*);
-  void exitFullscreen();
+  Movie getMovieHandle() const;
 
  private:
-  void load(CFURLRef, bool preservesPitch);
-  static LRESULT fullscreenWndProc(HWND, UINT message, WPARAM, LPARAM);
-
-  QTMovieWinPrivate* m_private;
-  bool m_disabled;
-  friend class QTMovieWinPrivate;
+  QTMoviePrivate* m_private;
+  friend class QTMoviePrivate;
 };
 
 #endif
