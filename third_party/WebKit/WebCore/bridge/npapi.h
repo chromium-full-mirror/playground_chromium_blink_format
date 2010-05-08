@@ -1,3 +1,4 @@
+/* -*- Mode: C; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -34,10 +35,6 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-/*
- *  Netscape client plug-in API spec
- */
-
 #ifndef _NPAPI_H_
 #define _NPAPI_H_
 
@@ -53,8 +50,8 @@
 #if defined(_WIN32) && !defined(__SYMBIAN32__)
 #ifndef XP_WIN
 #define XP_WIN 1
-#endif /* XP_WIN */
-#endif /* _WIN32 */
+#endif
+#endif
 
 #ifdef __SYMBIAN32__
 #ifndef XP_SYMBIAN
@@ -117,14 +114,14 @@
 #endif
 
 /*----------------------------------------------------------------------*/
-/*             Plugin Version Constants                                 */
+/*                        Plugin Version Constants                      */
 /*----------------------------------------------------------------------*/
 
 #define NP_VERSION_MAJOR 0
 #define NP_VERSION_MINOR 24
 
 /*----------------------------------------------------------------------*/
-/*             Definition of Basic Types                                */
+/*                       Definition of Basic Types                      */
 /*----------------------------------------------------------------------*/
 
 #ifndef FALSE
@@ -143,7 +140,7 @@ typedef int16_t NPReason;
 typedef char* NPMIMEType;
 
 /*----------------------------------------------------------------------*/
-/*             Structures and definitions             */
+/*                       Structures and definitions                     */
 /*----------------------------------------------------------------------*/
 
 #if !defined(__LP64__)
@@ -228,6 +225,24 @@ typedef struct {
 
 #endif /* XP_UNIX */
 
+#ifdef XP_MACOSX
+typedef enum {
+#ifndef NP_NO_QUICKDRAW
+  NPDrawingModelQuickDraw = 0,
+#endif
+  NPDrawingModelCoreGraphics = 1,
+  NPDrawingModelOpenGL = 2,
+  NPDrawingModelCoreAnimation = 3
+} NPDrawingModel;
+
+typedef enum {
+#ifndef NP_NO_CARBON
+  NPEventModelCarbon = 0,
+#endif
+  NPEventModelCocoa = 1
+} NPEventModel;
+#endif
+
 /*
  *   The following masks are applied on certain platforms to NPNV and
  *   NPPV selectors that pass around pointers to COM interfaces. Newer
@@ -235,7 +250,7 @@ typedef struct {
  *   compatible with older compilers. To prevent older plugins from
  *   not understanding a new browser's ABI, these masks change the
  *   values of those selectors on those platforms. To remain backwards
- *   compatible with differenet versions of the browser, plugins can
+ *   compatible with different versions of the browser, plugins can
  *   use these masks to dynamically determine and use the correct C++
  *   ABI that the browser is expecting. This does not apply to Windows
  *   as Microsoft's COM ABI will likely not change.
@@ -253,13 +268,6 @@ typedef struct {
 #endif
 
 #define NP_ABI_MACHO_MASK 0x01000000
-/*
- *   On OSX, the Mach-O executable format is significantly
- *   different than CFM. In addition to having a different
- *   C++ ABI, it also has has different C calling convention.
- *   You must use glue code when calling between CFM and
- *   Mach-O C functions.
- */
 #if (defined(TARGET_RT_MAC_MACHO))
 #define _NP_ABI_MIXIN_FOR_MACHO NP_ABI_MACHO_MASK
 #else
@@ -276,53 +284,55 @@ typedef enum {
   NPPVpluginDescriptionString,
   NPPVpluginWindowBool,
   NPPVpluginTransparentBool,
-
   NPPVjavaClass,           /* Not implemented in WebKit */
   NPPVpluginWindowSize,    /* Not implemented in WebKit */
   NPPVpluginTimerInterval, /* Not implemented in WebKit */
-
   NPPVpluginScriptableInstance =
-      (10 | NP_ABI_MASK),       /* Not implemented in WebKit */
-  NPPVpluginScriptableIID = 11, /* Not implemented in WebKit */
-
-  /* 12 and over are available on Mozilla builds starting with 0.9.9 */
+      (10 | NP_ABI_MASK),             /* Not implemented in WebKit */
+  NPPVpluginScriptableIID = 11,       /* Not implemented in WebKit */
   NPPVjavascriptPushCallerBool = 12,  /* Not implemented in WebKit */
   NPPVpluginKeepLibraryInMemory = 13, /* Not implemented in WebKit */
   NPPVpluginNeedsXEmbed = 14,         /* Not implemented in WebKit */
 
-  /* Get the NPObject for scripting the plugin. */
+  /* Get the NPObject for scripting the plugin. Introduced in NPAPI minor
+   * version 14.
+   */
   NPPVpluginScriptableNPObject = 15,
 
   /* Get the plugin value (as \0-terminated UTF-8 string data) for
    * form submission if the plugin is part of a form. Use
-   * NPN_MemAlloc() to allocate memory for the string data.
+   * NPN_MemAlloc() to allocate memory for the string data. Introduced
+   * in NPAPI minor version 15.
    */
   NPPVformValue = 16, /* Not implemented in WebKit */
 
   NPPVpluginUrlRequestsDisplayedBool = 17, /* Not implemented in WebKit */
 
   /* Checks if the plugin is interested in receiving the http body of
-   * failed http requests (http status != 200).
+   * all http requests (including failed ones, http status != 200).
    */
   NPPVpluginWantsAllNetworkStreams = 18,
 
   /* Checks to see if the plug-in would like the browser to load the "src"
      attribute. */
-  NPPVpluginCancelSrcStream = 20,
+  NPPVpluginCancelSrcStream = 20
 
 #ifdef XP_MACOSX
   /* Used for negotiating drawing models */
-  NPPVpluginDrawingModel = 1000,
+  ,
+  NPPVpluginDrawingModel = 1000
   /* Used for negotiating event models */
-  NPPVpluginEventModel = 1001,
+  ,
+  NPPVpluginEventModel = 1001
   /* In the NPDrawingModelCoreAnimation drawing model, the browser asks the
      plug-in for a Core Animation layer. */
+  ,
   NPPVpluginCoreAnimationLayer = 1003
 #endif
 } NPPVariable;
 
 /*
- * List of variable names for which NPN_GetValue is implemented by Mozilla
+ * List of variable names for which NPN_GetValue should be implemented.
  */
 typedef enum {
   NPNVxDisplay = 1,
@@ -332,7 +342,6 @@ typedef enum {
   NPNVasdEnabledBool,
   NPNVisOfflineBool,
 
-  /* 10 and over are available on Mozilla builds starting with 0.9.4 */
   NPNVserviceManager = (10 | NP_ABI_MASK), /* Not implemented in WebKit */
   NPNVDOMElement = (11 | NP_ABI_MASK),     /* Not implemented in WebKit */
   NPNVDOMWindow = (12 | NP_ABI_MASK),      /* Not implemented in WebKit */
@@ -350,24 +359,17 @@ typedef enum {
   NPNVprivateModeBool = 18
 
 #ifdef XP_MACOSX
+  /* Used for negotiating drawing models */
   ,
-  NPNVpluginDrawingModel = 1000 /* The NPDrawingModel specified by the plugin */
-
+  NPNVpluginDrawingModel = 1000
 #ifndef NP_NO_QUICKDRAW
   ,
-  NPNVsupportsQuickDrawBool =
-      2000 /* TRUE if the browser supports the QuickDraw drawing model */
+  NPNVsupportsQuickDrawBool = 2000
 #endif
   ,
-  NPNVsupportsCoreGraphicsBool =
-      2001 /* TRUE if the browser supports the CoreGraphics drawing model */
-  ,
-  NPNVsupportsOpenGLBool = 2002 /* TRUE if the browser supports the OpenGL
-                                   drawing model (CGL on Mac) */
-  ,
-  NPNVsupportsCoreAnimationBool =
-      2003 /* TRUE if the browser supports the CoreAnimation drawing model */
-
+  NPNVsupportsCoreGraphicsBool = 2001,
+  NPNVsupportsOpenGLBool = 2002,
+  NPNVsupportsCoreAnimationBool = 2003
 #ifndef NP_NO_CARBON
   ,
   NPNVsupportsCarbonBool =
@@ -376,8 +378,7 @@ typedef enum {
   ,
   NPNVsupportsCocoaBool =
       3001 /* TRUE if the browser supports the Cocoa event model */
-
-#endif /* XP_MACOSX */
+#endif     /* XP_MACOSX */
 } NPNVariable;
 
 typedef enum { NPNURLVCookie = 501, NPNURLVProxy } NPNURLVariable;
@@ -388,33 +389,135 @@ typedef enum { NPNURLVCookie = 501, NPNURLVProxy } NPNURLVariable;
  */
 typedef enum { NPWindowTypeWindow = 1, NPWindowTypeDrawable } NPWindowType;
 
+typedef struct _NPWindow {
+  void* window;   /* Platform specific window handle */
+                  /* OS/2: x - Position of bottom left corner */
+                  /* OS/2: y - relative to visible netscape window */
+  int32_t x;      /* Position of top left corner relative */
+  int32_t y;      /* to a netscape page. */
+  uint32_t width; /* Maximum window size */
+  uint32_t height;
+  NPRect clipRect; /* Clipping rectangle in port coordinates */
+#if defined(XP_UNIX) || defined(XP_SYMBIAN)
+  void* ws_info;     /* Platform-dependent additonal data */
+#endif               /* XP_UNIX || XP_SYMBIAN */
+  NPWindowType type; /* Is this a window or a drawable? */
+} NPWindow;
+
+typedef struct _NPFullPrint {
+  NPBool pluginPrinted; /* Set TRUE if plugin handled fullscreen printing */
+  NPBool printOne;      /* TRUE if plugin should print one copy to default
+                           printer */
+  void* platformPrint;  /* Platform-specific printing info */
+} NPFullPrint;
+
+typedef struct _NPEmbedPrint {
+  NPWindow window;
+  void* platformPrint; /* Platform-specific printing info */
+} NPEmbedPrint;
+
+typedef struct _NPPrint {
+  uint16_t mode; /* NP_FULL or NP_EMBED */
+  union {
+    NPFullPrint fullPrint;   /* if mode is NP_FULL */
+    NPEmbedPrint embedPrint; /* if mode is NP_EMBED */
+  } print;
+} NPPrint;
+
+#if defined(XP_MAC) || defined(XP_MACOSX)
+#ifndef NP_NO_CARBON
+typedef EventRecord NPEvent;
+#endif
+#elif defined(XP_SYMBIAN)
+typedef QEvent NPEvent;
+#elif defined(XP_WIN)
+typedef struct _NPEvent {
+  uint16_t event;
+  uintptr_t wParam;
+  uintptr_t lParam;
+} NPEvent;
+#elif defined(XP_UNIX)
+typedef XEvent NPEvent;
+#else
+typedef void* NPEvent;
+#endif
+
+#if defined(XP_MAC)
+typedef RgnHandle NPRegion;
+#elif defined(XP_MACOSX)
+typedef void* NPRegion;
+#ifndef NP_NO_QUICKDRAW
+typedef RgnHandle NPQDRegion;
+#endif
+typedef CGPathRef NPCGRegion;
+#elif defined(XP_WIN)
+typedef HRGN NPRegion;
+#elif defined(XP_UNIX)
+typedef Region NPRegion;
+#elif defined(XP_SYMBIAN)
+typedef QRegion* NPRegion;
+#else
+typedef void* NPRegion;
+#endif
+
+typedef struct _NPNSString NPNSString;
+typedef struct _NPNSWindow NPNSWindow;
+typedef struct _NPNSMenu NPNSMenu;
+
+#ifdef XP_MACOSX
+typedef NPNSMenu NPMenu;
+#else
+typedef void* NPMenu;
+#endif
+
+typedef enum {
+  NPCoordinateSpacePlugin = 1,
+  NPCoordinateSpaceWindow,
+  NPCoordinateSpaceFlippedWindow,
+  NPCoordinateSpaceScreen,
+  NPCoordinateSpaceFlippedScreen
+} NPCoordinateSpace;
+
 #ifdef XP_MACOSX
 
-/*
- * The drawing model for a Mac OS X plugin.  These are the possible values for
- * the NPNVpluginDrawingModel variable.
- */
-
-typedef enum {
 #ifndef NP_NO_QUICKDRAW
-  NPDrawingModelQuickDraw = 0,
-#endif
-  NPDrawingModelCoreGraphics = 1,
-  NPDrawingModelOpenGL = 2,
-  NPDrawingModelCoreAnimation = 3
-} NPDrawingModel;
+typedef struct NP_Port {
+  CGrafPtr port;
+  int32_t portx; /* position inside the topmost window */
+  int32_t porty;
+} NP_Port;
+#endif /* NP_NO_QUICKDRAW */
 
 /*
- * The event model for a Mac OS X plugin. These are the possible values for the
- * NPNVpluginEventModel variable.
+ * NP_CGContext is the type of the NPWindow's 'window' when the plugin specifies
+ * NPDrawingModelCoreGraphics
+ * as its drawing model.
  */
 
-typedef enum {
-#ifndef NP_NO_CARBON
-  NPEventModelCarbon = 0,
+typedef struct NP_CGContext {
+  CGContextRef context;
+#ifdef NP_NO_CARBON
+  NPNSWindow* window;
+#else
+  void* window; /* A WindowRef or NULL for the Cocoa event model. */
 #endif
-  NPEventModelCocoa = 1,
-} NPEventModel;
+} NP_CGContext;
+
+/*
+ * NP_GLContext is the type of the NPWindow's 'window' when the plugin specifies
+ * NPDrawingModelOpenGL as its
+ * drawing model.
+ */
+
+typedef struct NP_GLContext {
+  CGLContextObj context;
+#ifdef NP_NO_CARBON
+  NPNSWindow* window;
+#else
+  void* window; /* Can be either an NSWindow or a WindowRef depending on the
+                   event model */
+#endif
+} NP_GLContext;
 
 typedef enum {
   NPCocoaEventDrawRect = 1,
@@ -433,14 +536,9 @@ typedef enum {
   NPCocoaEventTextInput
 } NPCocoaEventType;
 
-typedef struct _NPNSString NPNSString;
-typedef struct _NPNSWindow NPNSWindow;
-typedef struct _NPNSMenu NPNSMenu;
-
 typedef struct _NPCocoaEvent {
   NPCocoaEventType type;
   uint32_t version;
-
   union {
     struct {
       uint32_t modifierFlags;
@@ -461,7 +559,6 @@ typedef struct _NPCocoaEvent {
     } key;
     struct {
       CGContextRef context;
-
       double x;
       double y;
       double width;
@@ -476,173 +573,13 @@ typedef struct _NPCocoaEvent {
   } data;
 } NPCocoaEvent;
 
-#endif
-
-typedef struct _NPWindow {
-  void* window;   /* Platform specific window handle */
-  int32_t x;      /* Position of top left corner relative */
-  int32_t y;      /*    to a netscape page.                    */
-  uint32_t width; /* Maximum window size */
-  uint32_t height;
-  NPRect clipRect; /* Clipping rectangle in port coordinates */
-                   /* Used by MAC only.              */
-#if defined(XP_UNIX) || defined(XP_SYMBIAN)
-  void* ws_info;     /* Platform-dependent additonal data */
-#endif               /* XP_UNIX || XP_SYMBIAN */
-  NPWindowType type; /* Is this a window or a drawable? */
-} NPWindow;
-
-typedef struct _NPFullPrint {
-  NPBool pluginPrinted; /* Set TRUE if plugin handled fullscreen */
-                        /*    printing                             */
-  NPBool printOne;      /* TRUE if plugin should print one copy  */
-                        /*    to default printer                     */
-  void* platformPrint;  /* Platform-specific printing info */
-} NPFullPrint;
-
-typedef struct _NPEmbedPrint {
-  NPWindow window;
-  void* platformPrint; /* Platform-specific printing info */
-} NPEmbedPrint;
-
-typedef struct _NPPrint {
-  uint16_t mode; /* NP_FULL or NP_EMBED */
-  union {
-    NPFullPrint fullPrint;   /* if mode is NP_FULL */
-    NPEmbedPrint embedPrint; /* if mode is NP_EMBED */
-  } print;
-} NPPrint;
-
-#ifdef XP_MACOSX
-typedef NPNSMenu NPMenu;
-#else
-typedef void* NPMenu;
-#endif
-
-typedef enum {
-  NPCoordinateSpacePlugin = 1,
-  NPCoordinateSpaceWindow,
-  NPCoordinateSpaceFlippedWindow,
-  NPCoordinateSpaceScreen,
-  NPCoordinateSpaceFlippedScreen
-} NPCoordinateSpace;
-
-#if defined(XP_MAC) || defined(XP_MACOSX)
-
-#ifndef NP_NO_CARBON
-typedef EventRecord NPEvent;
-#endif
-
-#elif defined(XP_SYMBIAN)
-typedef QEvent NPEvent;
-#elif defined(XP_WIN)
-typedef struct _NPEvent {
-  uint16_t event;
-  uintptr_t wParam;
-  uintptr_t lParam;
-} NPEvent;
-#elif defined(XP_UNIX)
-typedef XEvent NPEvent;
-#else
-typedef void* NPEvent;
-#endif /* XP_MAC */
-
-#if defined(XP_MAC)
-typedef RgnHandle NPRegion;
-#elif defined(XP_MACOSX)
-/*
- * NPRegion's type depends on the drawing model specified by the plugin (see
- * NPNVpluginDrawingModel).
- * NPQDRegion represents a QuickDraw RgnHandle and is used with the QuickDraw
- * drawing model.
- * NPCGRegion repesents a graphical region when using any other drawing model.
- */
-typedef void* NPRegion;
-#ifndef NP_NO_QUICKDRAW
-typedef RgnHandle NPQDRegion;
-#endif
-typedef CGPathRef NPCGRegion;
-#elif defined(XP_WIN)
-typedef HRGN NPRegion;
-#elif defined(XP_UNIX)
-typedef Region NPRegion;
-#elif defined(XP_SYMBIAN)
-typedef QRegion* NPRegion;
-#else
-typedef void* NPRegion;
-#endif /* XP_MAC */
-
-#ifdef XP_MACOSX
-
-/*
- * NP_CGContext is the type of the NPWindow's 'window' when the plugin specifies
- * NPDrawingModelCoreGraphics
- * as its drawing model.
- */
-
-typedef struct NP_CGContext {
-  CGContextRef context;
-#ifdef NP_NO_CARBON
-  NPNSWindow* window;
-#else
-  void* window;  // Can be either an NSWindow or a WindowRef depending on the
-                 // event model
-#endif
-} NP_CGContext;
-
-/*
- * NP_GLContext is the type of the NPWindow's 'window' when the plugin specifies
- * NPDrawingModelOpenGL as its
- * drawing model.
- */
-
-typedef struct NP_GLContext {
-  CGLContextObj context;
-#ifdef NP_NO_CARBON
-  NPNSWindow* window;
-#else
-  void* window;  // Can be either an NSWindow or a WindowRef depending on the
-                 // event model
-#endif
-} NP_GLContext;
-
 #endif /* XP_MACOSX */
 
 #if defined(XP_MAC) || defined(XP_MACOSX)
-
-/*
- *  Mac-specific structures and definitions.
- */
-
-#ifndef NP_NO_QUICKDRAW
-
-/*
- * NP_Port is the type of the NPWindow's 'window' when the plugin specifies
- * NPDrawingModelQuickDraw as its
- * drawing model, or the plugin does not specify a drawing model.
- *
- * It is not recommended that new plugins use NPDrawingModelQuickDraw or
- * NP_Port, as QuickDraw has been
- * deprecated in Mac OS X 10.5.  CoreGraphics is the preferred drawing API.
- *
- * NP_Port is not available in 64-bit.
- */
-
-typedef struct NP_Port {
-  CGrafPtr port; /* Grafport */
-  int32_t portx; /* position inside the topmost window */
-  int32_t porty;
-} NP_Port;
-
-#endif /* NP_NO_QUICKDRAW */
-
-/*
- *  Non-standard event types that can be passed to HandleEvent
- */
+/*  Non-standard event types that can be passed to HandleEvent */
 #define getFocusEvent (osEvt + 16)
 #define loseFocusEvent (osEvt + 17)
 #define adjustCursorEvent (osEvt + 18)
-
 #endif /* XP_MAC */
 
 /*
@@ -668,11 +605,11 @@ typedef struct NP_Port {
 #endif /* __LP64__ */
 
 /*----------------------------------------------------------------------*/
-/*             Error and Reason Code definitions            */
+/*       Error and Reason Code definitions                              */
 /*----------------------------------------------------------------------*/
 
 /*
- *    Values of type NPError:
+ * Values of type NPError:
  */
 #define NPERR_BASE 0
 #define NPERR_NO_ERROR (NPERR_BASE + 0)
@@ -691,7 +628,7 @@ typedef struct NP_Port {
 #define NPERR_STREAM_NOT_SEEKABLE (NPERR_BASE + 13)
 
 /*
- *    Values of type NPReason:
+ * Values of type NPReason:
  */
 #define NPRES_BASE 0
 #define NPRES_DONE (NPRES_BASE + 0)
@@ -699,7 +636,7 @@ typedef struct NP_Port {
 #define NPRES_USER_BREAK (NPRES_BASE + 2)
 
 /*
- *      Don't use these obsolete error codes any more.
+ * Don't use these obsolete error codes any more.
  */
 #define NP_NOERR NP_NOERR_is_obsolete_use_NPERR_NO_ERROR
 #define NP_EINVAL NP_EINVAL_is_obsolete_use_NPERR_GENERIC_ERROR
@@ -729,7 +666,7 @@ typedef struct NP_Port {
 #define NPVERS_HAS_CANCEL_SRC_STREAM 24
 
 /*----------------------------------------------------------------------*/
-/*             Function Prototypes                */
+/*                        Function Prototypes                           */
 /*----------------------------------------------------------------------*/
 
 #if defined(_WINDOWS) && !defined(WIN32)
@@ -742,13 +679,11 @@ typedef struct NP_Port {
 extern "C" {
 #endif
 
-/*
- * NPP_* functions are provided by the plugin and called by the navigator.
- */
+/* NPP_* functions are provided by the plugin and called by the navigator. */
 
 #ifdef XP_UNIX
 char* NPP_GetMIMEDescription(void);
-#endif /* XP_UNIX */
+#endif
 
 NPError NPP_Initialize(void);
 void NPP_Shutdown(void);
@@ -788,10 +723,7 @@ jref NP_LOADDS NPP_GetJavaClass(void);
 NPError NPP_GetValue(NPP instance, NPPVariable variable, void* value);
 NPError NPP_SetValue(NPP instance, NPNVariable variable, void* value);
 
-/*
- * NPN_* functions are provided by the navigator and called by the plugin.
- */
-
+/* NPN_* functions are provided by the navigator and called by the plugin. */
 void NPN_Version(int* plugin_major,
                  int* plugin_minor,
                  int* netscape_major,

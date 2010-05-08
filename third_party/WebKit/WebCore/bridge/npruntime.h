@@ -1,5 +1,6 @@
+/* -*- Mode: C; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
 /*
- * Copyright (C) 2004, Apple Computer, Inc. and The Mozilla Foundation.
+ * Copyright (c) 2004, Apple Computer, Inc. and The Mozilla Foundation.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,43 +29,6 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Revision 1 (March 4, 2004):
- * Initial proposal.
- *
- * Revision 2 (March 10, 2004):
- * All calls into script were made asynchronous.  Results are
- * provided via the NPScriptResultFunctionPtr callback.
- *
- * Revision 3 (March 10, 2004):
- * Corrected comments to not refer to class retain/release FunctionPtrs.
- *
- * Revision 4 (March 11, 2004):
- * Added additional convenience NPN_SetExceptionWithUTF8().
- * Changed NPHasPropertyFunctionPtr and NPHasMethodFunctionPtr to take NPClass
- * pointers instead of NPObject pointers.
- * Added NPIsValidIdentifier().
- *
- * Revision 5 (March 17, 2004):
- * Added context parameter to result callbacks from ScriptObject functions.
- *
- * Revision 6 (March 29, 2004):
- * Renamed functions implemented by user agent to NPN_*.  Removed _ from
- * type names.
- * Renamed "JavaScript" types to "Script".
- *
- * Revision 7 (April 21, 2004):
- * NPIdentifier becomes a void*, was int32_t
- * Remove NP_IsValidIdentifier, renamed NP_IdentifierFromUTF8 to
- * NP_GetIdentifier
- * Added NPVariant and modified functions to use this new type.
- *
- * Revision 8 (July 9, 2004):
- * Updated to joint Apple-Mozilla license.
- *
- * Revision 9 (August 12, 2004):
- * Changed NPVariantType enum values to form PVariantType_XXX
- * Added NPP arguments to NPObject functions.
- * Replaced NPVariant functions with macros.
  */
 #ifndef _NP_RUNTIME_H_
 #define _NP_RUNTIME_H_
@@ -106,6 +70,11 @@ extern "C" {
     language used by the scripting environment have been minimized.
 */
 
+#define NP_BEGIN_MACRO do {
+#define NP_END_MACRO \
+  }                  \
+  while (0)
+
 /*
     Objects (non-primitive data) passed between 'C' and script is
     always wrapped in an NPObject.  The 'interface' of an NPObject is
@@ -142,14 +111,14 @@ typedef struct _NPVariant {
 } NPVariant;
 
 /*
-    NPN_ReleaseVariantValue is called on all 'out' parameters references.
-    Specifically it is called on variants that are resultant out parameters
-    in NPGetPropertyFunctionPtr and NPInvokeFunctionPtr.  Resultant variants
-    from these two functions should be initialized using the
-    NPN_InitializeVariantXXX() functions.
+    NPN_ReleaseVariantValue is called on all 'out' parameters
+    references.  Specifically it is to be called on variants that own
+    their value, as is the case with all non-const NPVariant*
+    arguments after a successful call to any methods (except this one)
+    in this API.
 
-    After calling NPReleaseVariantValue, the type of the variant will
-    be set to NPVariantUndefinedType.
+    After calling NPN_ReleaseVariantValue, the type of the variant
+    will be NPVariantType_Void.
 */
 void NPN_ReleaseVariantValue(NPVariant* variant);
 
@@ -167,67 +136,68 @@ void NPN_ReleaseVariantValue(NPVariant* variant);
 #define NPVARIANT_TO_STRING(_v) ((_v).value.stringValue)
 #define NPVARIANT_TO_OBJECT(_v) ((_v).value.objectValue)
 
-#define NP_BEGIN_MACRO do {
-#define NP_END_MACRO \
-  }                  \
-  while (0)
-
 #define VOID_TO_NPVARIANT(_v)                   \
   NP_BEGIN_MACRO(_v).type = NPVariantType_Void; \
   (_v).value.objectValue = NULL;                \
   NP_END_MACRO
+
 #define NULL_TO_NPVARIANT(_v)                   \
   NP_BEGIN_MACRO(_v).type = NPVariantType_Null; \
   (_v).value.objectValue = NULL;                \
   NP_END_MACRO
+
 #define BOOLEAN_TO_NPVARIANT(_val, _v)          \
   NP_BEGIN_MACRO(_v).type = NPVariantType_Bool; \
   (_v).value.boolValue = !!(_val);              \
   NP_END_MACRO
+
 #define INT32_TO_NPVARIANT(_val, _v)             \
   NP_BEGIN_MACRO(_v).type = NPVariantType_Int32; \
   (_v).value.intValue = _val;                    \
   NP_END_MACRO
+
 #define DOUBLE_TO_NPVARIANT(_val, _v)             \
   NP_BEGIN_MACRO(_v).type = NPVariantType_Double; \
   (_v).value.doubleValue = _val;                  \
   NP_END_MACRO
+
 #define STRINGZ_TO_NPVARIANT(_val, _v)            \
   NP_BEGIN_MACRO(_v).type = NPVariantType_String; \
-  NPString str = {_val, strlen(_val)};            \
+  NPString str = {_val, uint32_t(strlen(_val))};  \
   (_v).value.stringValue = str;                   \
   NP_END_MACRO
+
 #define STRINGN_TO_NPVARIANT(_val, _len, _v)      \
   NP_BEGIN_MACRO(_v).type = NPVariantType_String; \
-  NPString str = {_val, _len};                    \
+  NPString str = {_val, uint32_t(_len)};          \
   (_v).value.stringValue = str;                   \
   NP_END_MACRO
+
 #define OBJECT_TO_NPVARIANT(_val, _v)             \
   NP_BEGIN_MACRO(_v).type = NPVariantType_Object; \
   (_v).value.objectValue = _val;                  \
   NP_END_MACRO
 
 /*
-        Type mappings (JavaScript types have been used for illustration
+  Type mappings (JavaScript types have been used for illustration
     purposes):
 
-        JavaScript       to             C (NPVariant with type:)
-        undefined                       NPVariantType_Void
-        null                            NPVariantType_Null
-        Boolean                         NPVariantType_Bool
-        Number                          NPVariantType_Double or
-   NPVariantType_Int32
-        String                          NPVariantType_String
-        Object                          NPVariantType_Object
+  JavaScript       to             C (NPVariant with type:)
+  undefined                       NPVariantType_Void
+  null                            NPVariantType_Null
+  Boolean                         NPVariantType_Bool
+  Number                          NPVariantType_Double or NPVariantType_Int32
+  String                          NPVariantType_String
+  Object                          NPVariantType_Object
 
-        C (NPVariant with type:)   to   JavaScript
-        NPVariantType_Void              undefined
-        NPVariantType_Null              null
-        NPVariantType_Bool              Boolean
-        NPVariantType_Int32             Number
-        NPVariantType_Double            Number
-        NPVariantType_String            String
-        NPVariantType_Object            Object
+  C (NPVariant with type:)   to   JavaScript
+  NPVariantType_Void              undefined
+  NPVariantType_Null              null
+  NPVariantType_Bool              Boolean
+  NPVariantType_Int32             Number
+  NPVariantType_Double            Number
+  NPVariantType_String            String
+  NPVariantType_Object            Object
 */
 
 typedef void* NPIdentifier;
@@ -239,7 +209,9 @@ typedef void* NPIdentifier;
     methods and properties can be identified by either strings or
     integers (i.e. foo["bar"] vs foo[1]). NPIdentifiers can be
     compared using ==.  In case of any errors, the requested
-    NPIdentifier(s) will be NULL.
+    NPIdentifier(s) will be NULL. NPIdentifier lifetime is controlled
+    by the browser. Plugins do not need to worry about memory management
+    with regards to NPIdentifiers.
 */
 NPIdentifier NPN_GetStringIdentifier(const NPUTF8* name);
 void NPN_GetStringIdentifiers(const NPUTF8** names,
@@ -267,10 +239,10 @@ int32_t NPN_IntFromIdentifier(NPIdentifier identifier);
     applicable) should be released using NPN_ReleaseVariantValue().
 */
 typedef NPObject* (*NPAllocateFunctionPtr)(NPP npp, NPClass* aClass);
-typedef void (*NPDeallocateFunctionPtr)(NPObject* obj);
-typedef void (*NPInvalidateFunctionPtr)(NPObject* obj);
-typedef bool (*NPHasMethodFunctionPtr)(NPObject* obj, NPIdentifier name);
-typedef bool (*NPInvokeFunctionPtr)(NPObject* obj,
+typedef void (*NPDeallocateFunctionPtr)(NPObject* npobj);
+typedef void (*NPInvalidateFunctionPtr)(NPObject* npobj);
+typedef bool (*NPHasMethodFunctionPtr)(NPObject* npobj, NPIdentifier name);
+typedef bool (*NPInvokeFunctionPtr)(NPObject* npobj,
                                     NPIdentifier name,
                                     const NPVariant* args,
                                     uint32_t argCount,
@@ -279,11 +251,11 @@ typedef bool (*NPInvokeDefaultFunctionPtr)(NPObject* npobj,
                                            const NPVariant* args,
                                            uint32_t argCount,
                                            NPVariant* result);
-typedef bool (*NPHasPropertyFunctionPtr)(NPObject* obj, NPIdentifier name);
-typedef bool (*NPGetPropertyFunctionPtr)(NPObject* obj,
+typedef bool (*NPHasPropertyFunctionPtr)(NPObject* npobj, NPIdentifier name);
+typedef bool (*NPGetPropertyFunctionPtr)(NPObject* npobj,
                                          NPIdentifier name,
                                          NPVariant* result);
-typedef bool (*NPSetPropertyFunctionPtr)(NPObject* obj,
+typedef bool (*NPSetPropertyFunctionPtr)(NPObject* npobj,
                                          NPIdentifier name,
                                          const NPVariant* value);
 typedef bool (*NPRemovePropertyFunctionPtr)(NPObject* npobj, NPIdentifier name);
@@ -296,25 +268,22 @@ typedef bool (*NPConstructFunctionPtr)(NPObject* npobj,
                                        NPVariant* result);
 
 /*
-    NPObjects returned by create have a reference count of one.  It is the
-   caller's responsibility
-    to release the returned object.
+    NPObjects returned by create, retain, invoke, and getProperty pass
+    a reference count to the caller.  That is, the callee adds a
+    reference count which passes to the caller.  It is the caller's
+    responsibility to release the returned object.
 
-    NPInvokeFunctionPtr function may return false to indicate a the method could
-   not be invoked.
+    NPInvokeFunctionPtr function may return 0 to indicate a void
+    result.
 
-    NPGetPropertyFunctionPtr and NPSetPropertyFunctionPtr may return false to
-   indicate a property doesn't
-    exist.
-
-    NPInvalidateFunctionPtr is called by the scripting environment when the
-   native code is
-    shutdown.  Any attempt to message a NPObject instance after the invalidate
-    callback has been called will result in undefined behavior, even if the
-    native code is still retaining those NPObject instances.
-    (The runtime will typically return immediately, with 0 or NULL, from an
-   attempt to
-    dispatch to a NPObject, but this behavior should not be depended upon.)
+    NPInvalidateFunctionPtr is called by the scripting environment
+    when the native code is shutdown.  Any attempt to message a
+    NPObject instance after the invalidate callback has been
+    called will result in undefined behavior, even if the native code
+    is still retaining those NPObject instances.  (The runtime
+    will typically return immediately, with 0 or NULL, from an attempt
+    to dispatch to a NPObject, but this behavior should not be
+    depended upon.)
 
     The NPEnumerationFunctionPtr function may pass an array of
     NPIdentifiers back to the caller. The callee allocs the memory of
@@ -338,41 +307,43 @@ struct NPClass {
 };
 
 #define NP_CLASS_STRUCT_VERSION 3
+
 #define NP_CLASS_STRUCT_VERSION_ENUM 2
 #define NP_CLASS_STRUCT_VERSION_CTOR 3
 
 #define NP_CLASS_STRUCT_VERSION_HAS_ENUM(npclass) \
   ((npclass)->structVersion >= NP_CLASS_STRUCT_VERSION_ENUM)
+
 #define NP_CLASS_STRUCT_VERSION_HAS_CTOR(npclass) \
   ((npclass)->structVersion >= NP_CLASS_STRUCT_VERSION_CTOR)
 
 struct NPObject {
   NPClass* _class;
   uint32_t referenceCount;
-  // Additional space may be allocated here by types of NPObjects
+  /*
+   * Additional space may be allocated here by types of NPObjects
+   */
 };
 
 /*
-    If the class has an allocate function, NPN_CreateObject invokes that
-   function,
-    otherwise a NPObject is allocated and returned.  If a class has an allocate
-    function it is the responsibility of that implementation to set the initial
-   retain
-    count to 1.
+    If the class has an allocate function, NPN_CreateObject invokes
+    that function, otherwise a NPObject is allocated and
+    returned. This method will initialize the referenceCount member of
+    the NPObject to 1.
 */
 NPObject* NPN_CreateObject(NPP npp, NPClass* aClass);
 
 /*
     Increment the NPObject's reference count.
 */
-NPObject* NPN_RetainObject(NPObject* obj);
+NPObject* NPN_RetainObject(NPObject* npobj);
 
 /*
     Decremented the NPObject's reference count.  If the reference
     count goes to zero, the class's destroy function is invoke if
     specified, otherwise the object is freed directly.
 */
-void NPN_ReleaseObject(NPObject* obj);
+void NPN_ReleaseObject(NPObject* npobj);
 
 /*
     Functions to access script objects represented by NPObject.
@@ -385,6 +356,7 @@ void NPN_ReleaseObject(NPObject* obj);
     Calls made from plugin code to script must be made from the thread
     on which the plugin was initialized.
 */
+
 bool NPN_Invoke(NPP npp,
                 NPObject* npobj,
                 NPIdentifier methodName,
@@ -422,10 +394,12 @@ bool NPN_Construct(NPP npp,
                    NPVariant* result);
 
 /*
-    NPN_SetException may be called to trigger a script exception upon return
-    from entry points into NPObjects.
+    NPN_SetException may be called to trigger a script exception upon
+    return from entry points into NPObjects.  Typical usage:
+
+    NPN_SetException (npobj, message);
 */
-void NPN_SetException(NPObject* obj, const NPUTF8* message);
+void NPN_SetException(NPObject* npobj, const NPUTF8* message);
 
 #ifdef __cplusplus
 }
