@@ -301,8 +301,7 @@ static void renderThemeEflColorClassSelectionActive(void* data,
                                                     Evas_Object* o,
                                                     const char* signal,
                                                     const char* source) {
-  RenderThemeEfl::RenderThemeEfl* that =
-      static_cast<RenderThemeEfl::RenderThemeEfl*>(data);
+  RenderThemeEfl* that = static_cast<RenderThemeEfl*>(data);
   int fr, fg, fb, fa, br, bg, bb, ba;
 
   if (!edje_object_color_class_get(o, source, &fr, &fg, &fb, &fa, &br, &bg, &bb,
@@ -316,8 +315,7 @@ static void renderThemeEflColorClassSelectionInactive(void* data,
                                                       Evas_Object* o,
                                                       const char* signal,
                                                       const char* source) {
-  RenderThemeEfl::RenderThemeEfl* that =
-      static_cast<RenderThemeEfl::RenderThemeEfl*>(data);
+  RenderThemeEfl* that = static_cast<RenderThemeEfl*>(data);
   int fr, fg, fb, fa, br, bg, bb, ba;
 
   if (!edje_object_color_class_get(o, source, &fr, &fg, &fb, &fa, &br, &bg, &bb,
@@ -331,8 +329,7 @@ static void renderThemeEflColorClassFocusRing(void* data,
                                               Evas_Object* o,
                                               const char* signal,
                                               const char* source) {
-  RenderThemeEfl::RenderThemeEfl* that =
-      static_cast<RenderThemeEfl::RenderThemeEfl*>(data);
+  RenderThemeEfl* that = static_cast<RenderThemeEfl*>(data);
   int fr, fg, fb, fa;
 
   if (!edje_object_color_class_get(o, source, &fr, &fg, &fb, &fa, 0, 0, 0, 0, 0,
@@ -346,8 +343,7 @@ static void renderThemeEflColorClassButtonText(void* data,
                                                Evas_Object* o,
                                                const char* signal,
                                                const char* source) {
-  RenderThemeEfl::RenderThemeEfl* that =
-      static_cast<RenderThemeEfl::RenderThemeEfl*>(data);
+  RenderThemeEfl* that = static_cast<RenderThemeEfl*>(data);
   int fr, fg, fb, fa, br, bg, bb, ba;
 
   if (!edje_object_color_class_get(o, source, &fr, &fg, &fb, &fa, &br, &bg, &bb,
@@ -361,8 +357,7 @@ static void renderThemeEflColorClassComboText(void* data,
                                               Evas_Object* o,
                                               const char* signal,
                                               const char* source) {
-  RenderThemeEfl::RenderThemeEfl* that =
-      static_cast<RenderThemeEfl::RenderThemeEfl*>(data);
+  RenderThemeEfl* that = static_cast<RenderThemeEfl*>(data);
   int fr, fg, fb, fa, br, bg, bb, ba;
 
   if (!edje_object_color_class_get(o, source, &fr, &fg, &fb, &fa, &br, &bg, &bb,
@@ -376,8 +371,7 @@ static void renderThemeEflColorClassEntryText(void* data,
                                               Evas_Object* o,
                                               const char* signal,
                                               const char* source) {
-  RenderThemeEfl::RenderThemeEfl* that =
-      static_cast<RenderThemeEfl::RenderThemeEfl*>(data);
+  RenderThemeEfl* that = static_cast<RenderThemeEfl*>(data);
   int fr, fg, fb, fa, br, bg, bb, ba;
 
   if (!edje_object_color_class_get(o, source, &fr, &fg, &fb, &fa, &br, &bg, &bb,
@@ -391,8 +385,7 @@ static void renderThemeEflColorClassSearchText(void* data,
                                                Evas_Object* o,
                                                const char* signal,
                                                const char* source) {
-  RenderThemeEfl::RenderThemeEfl* that =
-      static_cast<RenderThemeEfl::RenderThemeEfl*>(data);
+  RenderThemeEfl* that = static_cast<RenderThemeEfl*>(data);
   int fr, fg, fb, fa, br, bg, bb, ba;
   if (!edje_object_color_class_get(o, source, &fr, &fg, &fb, &fa, &br, &bg, &bb,
                                    &ba, 0, 0, 0, 0))
@@ -778,7 +771,7 @@ void RenderThemeEfl::adjustCheckboxStyle(CSSStyleSelector* selector,
                                          RenderStyle* style,
                                          Element* e) const {
   if (!m_page && e && e->document()->page()) {
-    static_cast<RenderThemeEfl::RenderThemeEfl*>(e->document()->page()->theme())
+    static_cast<RenderThemeEfl*>(e->document()->page()->theme())
         ->adjustCheckboxStyle(selector, style, e);
     return;
   }
@@ -802,7 +795,7 @@ void RenderThemeEfl::adjustRadioStyle(CSSStyleSelector* selector,
                                       RenderStyle* style,
                                       Element* e) const {
   if (!m_page && e && e->document()->page()) {
-    static_cast<RenderThemeEfl::RenderThemeEfl*>(e->document()->page()->theme())
+    static_cast<RenderThemeEfl*>(e->document()->page()->theme())
         ->adjustRadioStyle(selector, style, e);
     return;
   }
@@ -826,7 +819,7 @@ void RenderThemeEfl::adjustButtonStyle(CSSStyleSelector* selector,
                                        RenderStyle* style,
                                        Element* e) const {
   if (!m_page && e && e->document()->page()) {
-    static_cast<RenderThemeEfl::RenderThemeEfl*>(e->document()->page()->theme())
+    static_cast<RenderThemeEfl*>(e->document()->page()->theme())
         ->adjustButtonStyle(selector, style, e);
     return;
   }
@@ -852,7 +845,7 @@ void RenderThemeEfl::adjustMenuListStyle(CSSStyleSelector* selector,
                                          RenderStyle* style,
                                          Element* e) const {
   if (!m_page && e && e->document()->page()) {
-    static_cast<RenderThemeEfl::RenderThemeEfl*>(e->document()->page()->theme())
+    static_cast<RenderThemeEfl*>(e->document()->page()->theme())
         ->adjustMenuListStyle(selector, style, e);
     return;
   }
@@ -873,7 +866,7 @@ void RenderThemeEfl::adjustTextFieldStyle(CSSStyleSelector* selector,
                                           RenderStyle* style,
                                           Element* e) const {
   if (!m_page && e && e->document()->page()) {
-    static_cast<RenderThemeEfl::RenderThemeEfl*>(e->document()->page()->theme())
+    static_cast<RenderThemeEfl*>(e->document()->page()->theme())
         ->adjustTextFieldStyle(selector, style, e);
     return;
   }
@@ -907,7 +900,7 @@ void RenderThemeEfl::adjustSearchFieldDecorationStyle(
     RenderStyle* style,
     Element* e) const {
   if (!m_page && e && e->document()->page()) {
-    static_cast<RenderThemeEfl::RenderThemeEfl*>(e->document()->page()->theme())
+    static_cast<RenderThemeEfl*>(e->document()->page()->theme())
         ->adjustSearchFieldDecorationStyle(selector, style, e);
     return;
   }
@@ -928,7 +921,7 @@ void RenderThemeEfl::adjustSearchFieldResultsButtonStyle(
     RenderStyle* style,
     Element* e) const {
   if (!m_page && e && e->document()->page()) {
-    static_cast<RenderThemeEfl::RenderThemeEfl*>(e->document()->page()->theme())
+    static_cast<RenderThemeEfl*>(e->document()->page()->theme())
         ->adjustSearchFieldResultsButtonStyle(selector, style, e);
     return;
   }
@@ -949,7 +942,7 @@ void RenderThemeEfl::adjustSearchFieldResultsDecorationStyle(
     RenderStyle* style,
     Element* e) const {
   if (!m_page && e && e->document()->page()) {
-    static_cast<RenderThemeEfl::RenderThemeEfl*>(e->document()->page()->theme())
+    static_cast<RenderThemeEfl*>(e->document()->page()->theme())
         ->adjustSearchFieldResultsDecorationStyle(selector, style, e);
     return;
   }
@@ -970,7 +963,7 @@ void RenderThemeEfl::adjustSearchFieldCancelButtonStyle(
     RenderStyle* style,
     Element* e) const {
   if (!m_page && e && e->document()->page()) {
-    static_cast<RenderThemeEfl::RenderThemeEfl*>(e->document()->page()->theme())
+    static_cast<RenderThemeEfl*>(e->document()->page()->theme())
         ->adjustSearchFieldCancelButtonStyle(selector, style, e);
     return;
   }
@@ -990,7 +983,7 @@ void RenderThemeEfl::adjustSearchFieldStyle(CSSStyleSelector* selector,
                                             RenderStyle* style,
                                             Element* e) const {
   if (!m_page && e && e->document()->page()) {
-    static_cast<RenderThemeEfl::RenderThemeEfl*>(e->document()->page()->theme())
+    static_cast<RenderThemeEfl*>(e->document()->page()->theme())
         ->adjustSearchFieldStyle(selector, style, e);
     return;
   }
