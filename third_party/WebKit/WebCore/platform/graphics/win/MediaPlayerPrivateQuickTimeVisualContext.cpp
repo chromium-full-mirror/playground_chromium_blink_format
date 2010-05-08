@@ -92,6 +92,7 @@ class MediaPlayerPrivateQuickTimeVisualContext::MovieClient
   MediaPlayerPrivateQuickTimeVisualContext* m_parent;
 };
 
+#if USE(ACCELERATED_COMPOSITING)
 // Interface declaration for MediaPlayerPrivateQuickTimeVisualContext's
 // GraphicsLayerClient aggregate
 class MediaPlayerPrivateQuickTimeVisualContext::LayerClient
@@ -112,6 +113,7 @@ class MediaPlayerPrivateQuickTimeVisualContext::LayerClient
  private:
   MediaPlayerPrivateQuickTimeVisualContext* m_parent;
 };
+#endif
 
 class MediaPlayerPrivateQuickTimeVisualContext::VisualContextClient
     : public QTMovieVisualContextClient {
@@ -156,12 +158,17 @@ MediaPlayerPrivateQuickTimeVisualContext::
       m_visible(false),
       m_newFrameAvailable(false),
       m_movieClient(
-          new MediaPlayerPrivateQuickTimeVisualContext::MovieClient(this)),
+          new MediaPlayerPrivateQuickTimeVisualContext::MovieClient(this))
+#if USE(ACCELERATED_COMPOSITING)
+      ,
       m_layerClient(
-          new MediaPlayerPrivateQuickTimeVisualContext::LayerClient(this)),
+          new MediaPlayerPrivateQuickTimeVisualContext::LayerClient(this))
+#endif
+      ,
       m_visualContextClient(
           new MediaPlayerPrivateQuickTimeVisualContext::VisualContextClient(
-              this)) {}
+              this)) {
+}
 
 MediaPlayerPrivateQuickTimeVisualContext::
     ~MediaPlayerPrivateQuickTimeVisualContext() {
@@ -689,6 +696,7 @@ static CFDictionaryRef QTCFDictionaryCreateWithDataCallback(
 }
 
 static CGImageRef CreateCGImageFromPixelBuffer(QTPixelBuffer buffer) {
+#if USE(ACCELERATED_COMPOSITING)
   CGDataProviderRef provider = 0;
   CGColorSpaceRef colorSpace = 0;
   CGImageRef image = 0;
@@ -746,12 +754,16 @@ Bail:
     CGColorSpaceRelease(colorSpace);
 
   return image;
+#else
+  return 0;
+#endif
 }
 
 void MediaPlayerPrivateQuickTimeVisualContext::retrieveCurrentImage() {
   if (!m_visualContext)
     return;
 
+#if USE(ACCELERATED_COMPOSITING)
   if (!m_qtVideoLayer)
     return;
 
@@ -790,6 +802,7 @@ void MediaPlayerPrivateQuickTimeVisualContext::retrieveCurrentImage() {
     layer->rootLayer()->setNeedsRender();
   }
   m_visualContext->task();
+#endif
 }
 
 static HashSet<String> mimeTypeCache() {
@@ -977,13 +990,13 @@ void MediaPlayerPrivateQuickTimeVisualContext::destroyLayerForMovie() {
 #endif
 }
 
+#if USE(ACCELERATED_COMPOSITING)
 void MediaPlayerPrivateQuickTimeVisualContext::LayerClient::paintContents(
     const GraphicsLayer*,
     GraphicsContext&,
     GraphicsLayerPaintingPhase,
     const IntRect& inClip) {}
 
-#if USE(ACCELERATED_COMPOSITING)
 bool MediaPlayerPrivateQuickTimeVisualContext::supportsAcceleratedRendering()
     const {
   return isReadyForRendering();

@@ -62,8 +62,9 @@ class MediaPlayerPrivateQuickTimeVisualContext
 
   virtual bool supportsFullscreen() const;
   virtual PlatformMedia platformMedia() const;
+#if USE(ACCELERATED_COMPOSITING)
   PlatformLayer* platformLayer() const;
-
+#endif
   IntSize naturalSize() const;
   bool hasVideo() const;
   bool hasAudio() const;
@@ -151,9 +152,11 @@ class MediaPlayerPrivateQuickTimeVisualContext
   friend class MovieClient;
   OwnPtr<MovieClient> m_movieClient;
 
+#if USE(ACCELERATED_COMPOSITING)
   class LayerClient;
   friend class LayerClient;
   OwnPtr<LayerClient> m_layerClient;
+#endif
 
   class VisualContextClient;
   friend class VisualContextClient;
@@ -161,7 +164,9 @@ class MediaPlayerPrivateQuickTimeVisualContext
 
   MediaPlayer* m_player;
   RefPtr<QTMovie> m_movie;
+#if USE(ACCELERATED_COMPOSITING)
   OwnPtr<GraphicsLayer> m_qtVideoLayer;
+#endif
   RefPtr<QTMovieVisualContext> m_visualContext;
   float m_seekTo;
   Timer<MediaPlayerPrivateQuickTimeVisualContext> m_seekTimer;
