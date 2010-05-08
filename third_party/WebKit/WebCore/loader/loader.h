@@ -94,7 +94,6 @@ class Loader : public Noncopyable {
     virtual void didReceiveResponse(SubresourceLoader*,
                                     const ResourceResponse&);
     virtual void didReceiveData(SubresourceLoader*, const char*, int);
-    virtual void didReceiveCachedMetadata(SubresourceLoader*, const char*, int);
     virtual void didFinishLoading(SubresourceLoader*);
     virtual void didFail(SubresourceLoader*, const ResourceError&);
 
