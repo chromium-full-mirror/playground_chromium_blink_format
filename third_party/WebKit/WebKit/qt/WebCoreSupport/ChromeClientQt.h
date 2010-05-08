@@ -33,6 +33,7 @@
 #include "RefCounted.h"
 #include "KURL.h"
 #include "PlatformString.h"
+#include "QtPlatformPlugin.h"
 
 QT_BEGIN_NAMESPACE
 class QEventLoop;
@@ -194,6 +195,8 @@ class ChromeClientQt : public ChromeClient {
   bool statusBarVisible;
   bool menuBarVisible;
   QEventLoop* m_eventLoop;
+
+  QtPlatformPlugin m_platformPlugin;
 };
 }
 
