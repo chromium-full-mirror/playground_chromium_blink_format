@@ -138,6 +138,12 @@ JSValue JSWorkerContext::messageChannel(ExecState* exec) const {
 }
 #endif
 
+#if ENABLE(DATABASE)
+JSValue JSWorkerContext::openDatabaseSync(ExecState*, const ArgList&) {
+  return jsUndefined();
+}
+#endif
+
 }  // namespace WebCore
 
 #endif  // ENABLE(WORKERS)

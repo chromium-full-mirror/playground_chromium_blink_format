@@ -62,8 +62,11 @@ class DatabaseSync : public RefCounted<DatabaseSync> {
   String version() const;
   void changeVersion(const String& oldVersion,
                      const String& newVersion,
-                     PassRefPtr<SQLTransactionSyncCallback>);
-  void transaction(PassRefPtr<SQLTransactionSyncCallback>, bool readOnly);
+                     PassRefPtr<SQLTransactionSyncCallback>,
+                     ExceptionCode&);
+  void transaction(PassRefPtr<SQLTransactionSyncCallback>,
+                   bool readOnly,
+                   ExceptionCode&);
 
   // Internal engine support
   ScriptExecutionContext* scriptExecutionContext() const;

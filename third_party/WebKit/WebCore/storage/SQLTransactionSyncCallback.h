@@ -44,9 +44,7 @@ class SQLTransactionSyncCallback
     : public RefCounted<SQLTransactionSyncCallback> {
  public:
   virtual ~SQLTransactionSyncCallback() {}
-  virtual void handleEvent(ScriptExecutionContext*,
-                           SQLTransactionSync*,
-                           bool& raisedException) = 0;
+  virtual bool handleEvent(ScriptExecutionContext*, SQLTransactionSync*) = 0;
 };
 }
 
