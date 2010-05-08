@@ -171,7 +171,7 @@ class WebFrameImpl : public WebFrame, public RefCounted<WebFrameImpl> {
   virtual void cancelPendingScopingEffort();
   virtual void increaseMatchCount(int count, int identifier);
   virtual void resetMatchCount();
-  virtual void registerPasswordListener(WebInputElement,
+  virtual bool registerPasswordListener(WebInputElement,
                                         WebPasswordAutocompleteListener*);
 
   virtual WebString contentAsText(size_t maxChars) const;
