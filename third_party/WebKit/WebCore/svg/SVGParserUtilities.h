@@ -72,10 +72,10 @@ bool pathSegListFromSVGData(SVGPathSegList* pathSegList,
                             const String& d,
                             bool process = false);
 Vector<String> parseDelimitedString(const String& input, const char seperator);
-void parseKerningUnicodeString(const String& input,
+bool parseKerningUnicodeString(const String& input,
                                UnicodeRanges&,
                                HashSet<String>& stringList);
-void parseGlyphName(const String& input, HashSet<String>& values);
+bool parseGlyphName(const String& input, HashSet<String>& values);
 
 }  // namespace WebCore
 
