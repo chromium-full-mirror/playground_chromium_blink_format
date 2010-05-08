@@ -28,6 +28,7 @@
 #include "ResourceHandle.h"
 
 #include "Base64.h"
+#include "CString.h"
 #include "ChromeClient.h"
 #include "CookieJarSoup.h"
 #include "DocLoader.h"
@@ -45,15 +46,14 @@
 #include "ResourceResponse.h"
 #include "SharedBuffer.h"
 #include "TextEncoding.h"
-#include <wtf/text/CString.h>
 
 #include <errno.h>
 #include <fcntl.h>
 #include <gio/gio.h>
-#include <gtk/gtk.h>
+#include <glib.h>
 #include <libsoup/soup.h>
-#include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 #include <unistd.h>
 
 namespace WebCore {
@@ -344,8 +344,8 @@ static void finishedCallback(SoupSession* session,
 }
 
 // parseDataUrl() is taken from the CURL http backend.
-static gboolean parseDataUrl(gpointer callback_data) {
-  ResourceHandle* handle = static_cast<ResourceHandle*>(callback_data);
+static gboolean parseDataUrl(gpointer callbackData) {
+  ResourceHandle* handle = static_cast<ResourceHandle*>(callbackData);
   ResourceHandleClient* client = handle->client();
   ResourceHandleInternal* d = handle->getInternal();
   if (d->m_cancelled)
@@ -936,7 +936,6 @@ static bool startGio(ResourceHandle* handle, KURL url) {
 
 SoupSession* ResourceHandle::defaultSession() {
   static SoupSession* session = createSoupSession();
-  ;
 
   return session;
 }
