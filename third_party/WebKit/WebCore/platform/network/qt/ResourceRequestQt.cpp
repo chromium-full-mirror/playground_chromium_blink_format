@@ -83,6 +83,17 @@ QNetworkRequest ResourceRequest::toNetworkRequest(
       break;
   }
 
+#if QT_VERSION >= QT_VERSION_CHECK(4, 7, 0)
+  if (!allowCookies()) {
+    request.setAttribute(QNetworkRequest::CookieLoadControlAttribute,
+                         QNetworkRequest::Manual);
+    request.setAttribute(QNetworkRequest::CookieSaveControlAttribute,
+                         QNetworkRequest::Manual);
+    request.setAttribute(QNetworkRequest::AuthenticationReuseAttribute,
+                         QNetworkRequest::Manual);
+  }
+#endif
+
   return request;
 }
 }
