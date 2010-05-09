@@ -39,7 +39,7 @@ inline long long maxDistance() {
   return numeric_limits<long long>::max();
 }
 
-inline unsigned int fudgeFactor() {
+inline int fudgeFactor() {
   return 2;
 }
 
