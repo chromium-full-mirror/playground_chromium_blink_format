@@ -899,8 +899,8 @@ void Node::removeCachedTagNodeList(TagNodeList* list,
   ASSERT_UNUSED(list, list->hasOwnCaches());
 
   NodeListsNodeData* data = rareData()->nodeLists();
-  ASSERT_UNUSED(list, list == data->m_tagNodeListCache.get(name));
-  data->m_tagNodeListCache.remove(name);
+  ASSERT_UNUSED(list, list == data->m_tagNodeListCache.get(name.impl()));
+  data->m_tagNodeListCache.remove(name.impl());
 }
 
 Node* Node::traverseNextNode(const Node* stayWithin) const {
@@ -1525,7 +1525,7 @@ PassRefPtr<NodeList> Node::getElementsByTagNameNS(
 
   pair<NodeListsNodeData::TagNodeListCache::iterator, bool> result =
       data->nodeLists()->m_tagNodeListCache.add(
-          QualifiedName(nullAtom, localNameAtom, namespaceURI), 0);
+          QualifiedName(nullAtom, localNameAtom, namespaceURI).impl(), 0);
   if (!result.second)
     return PassRefPtr<TagNodeList>(result.first->second);
 
