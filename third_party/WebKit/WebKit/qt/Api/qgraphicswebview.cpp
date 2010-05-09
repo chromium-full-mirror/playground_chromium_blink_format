@@ -83,7 +83,6 @@ class QGraphicsWebViewPrivate : public QWebPageClient {
         resizesToContents(false)
 #if USE(ACCELERATED_COMPOSITING)
         ,
-        rootGraphicsLayer(0),
         shouldSync(false)
 #endif
   {
@@ -163,7 +162,7 @@ class QGraphicsWebViewPrivate : public QWebPageClient {
   enum { RootGraphicsLayerZValue, OverlayZValue };
 
 #if USE(ACCELERATED_COMPOSITING)
-  QGraphicsItem* rootGraphicsLayer;
+  QWeakPointer<QGraphicsObject> rootGraphicsLayer;
   // we need to sync the layers if we get a special call from the WebCore
   // compositor telling us to do so. We'll get that call from ChromeClientQt
   bool shouldSync;
@@ -176,12 +175,12 @@ class QGraphicsWebViewPrivate : public QWebPageClient {
 
 QGraphicsWebViewPrivate::~QGraphicsWebViewPrivate() {
 #if USE(ACCELERATED_COMPOSITING)
-  if (rootGraphicsLayer) {
-    // we don't need to delete the root graphics layer
-    // The lifecycle is managed in GraphicsLayerQt.cpp
-    rootGraphicsLayer->setParentItem(0);
-    q->scene()->removeItem(rootGraphicsLayer);
-  }
+  if (!rootGraphicsLayer)
+    return;
+  // we don't need to delete the root graphics layer. The lifecycle is managed
+  // in GraphicsLayerQt.cpp.
+  rootGraphicsLayer.data()->setParentItem(0);
+  q->scene()->removeItem(rootGraphicsLayer.data());
 #endif
 }
 
@@ -210,14 +209,14 @@ void QGraphicsWebViewPrivate::createOrDeleteOverlay() {
 #if USE(ACCELERATED_COMPOSITING)
 void QGraphicsWebViewPrivate::setRootGraphicsLayer(QGraphicsItem* layer) {
   if (rootGraphicsLayer) {
-    rootGraphicsLayer->setParentItem(0);
-    q->scene()->removeItem(rootGraphicsLayer);
+    rootGraphicsLayer.data()->setParentItem(0);
+    q->scene()->removeItem(rootGraphicsLayer.data());
     QWebFramePrivate::core(q->page()->mainFrame())
         ->view()
         ->syncCompositingStateRecursive();
   }
 
-  rootGraphicsLayer = layer;
+  rootGraphicsLayer = layer ? layer->toGraphicsObject() : 0;
 
   if (layer) {
     layer->setFlag(QGraphicsItem::ItemClipsChildrenToShape, true);
@@ -237,7 +236,7 @@ void QGraphicsWebViewPrivate::markForSync(bool scheduleSync) {
 void QGraphicsWebViewPrivate::updateCompositingScrollPosition() {
   if (rootGraphicsLayer && q->page() && q->page()->mainFrame()) {
     const QPoint scrollPosition = q->page()->mainFrame()->scrollPosition();
-    rootGraphicsLayer->setPos(-scrollPosition);
+    rootGraphicsLayer.data()->setPos(-scrollPosition);
   }
 }
 #endif
