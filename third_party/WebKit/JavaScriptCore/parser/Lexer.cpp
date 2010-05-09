@@ -50,10 +50,7 @@ static const UChar byteOrderMark = 0xFEFF;
 Lexer::Lexer(JSGlobalData* globalData)
     : m_isReparsing(false),
       m_globalData(globalData),
-      m_keywordTable(JSC::mainTable) {
-  m_buffer8.reserveInitialCapacity(initialReadBufferCapacity);
-  m_buffer16.reserveInitialCapacity(initialReadBufferCapacity);
-}
+      m_keywordTable(JSC::mainTable) {}
 
 Lexer::~Lexer() {
   m_keywordTable.deleteTable();
@@ -139,6 +136,9 @@ void Lexer::setCode(const SourceCode& source, ParserArena& arena) {
   m_codeEnd = data + source.endOffset();
   m_error = false;
   m_atLineStart = true;
+
+  m_buffer8.reserveInitialCapacity(initialReadBufferCapacity);
+  m_buffer16.reserveInitialCapacity((m_codeEnd - m_code) / 2);
 
   // ECMA-262 calls for stripping all Cf characters, but we only strip BOM
   // characters.
@@ -1003,11 +1003,9 @@ void Lexer::clear() {
   m_codeWithoutBOMs.clear();
 
   Vector<char> newBuffer8;
-  newBuffer8.reserveInitialCapacity(initialReadBufferCapacity);
   m_buffer8.swap(newBuffer8);
 
   Vector<UChar> newBuffer16;
-  newBuffer16.reserveInitialCapacity(initialReadBufferCapacity);
   m_buffer16.swap(newBuffer16);
 
   m_isReparsing = false;
