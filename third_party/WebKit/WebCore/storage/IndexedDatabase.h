@@ -40,8 +40,6 @@ namespace WebCore {
 class Frame;
 class IDBDatabase;
 
-typedef IDBCallbacks<IDBDatabase> IDBDatabaseCallbacks;
-
 // This class is shared by IndexedDatabaseRequest (async) and
 // IndexedDatabaseSync (sync).
 // This is implemented by IndexedDatabaseImpl and optionally others (in order to
@@ -57,7 +55,7 @@ class IndexedDatabase : public ThreadSafeShared<IndexedDatabase> {
   virtual void open(const String& name,
                     const String& description,
                     bool modifyDatabase,
-                    PassRefPtr<IDBDatabaseCallbacks>,
+                    PassRefPtr<IDBCallbacks>,
                     Frame*,
                     ExceptionCode&) = 0;
 };

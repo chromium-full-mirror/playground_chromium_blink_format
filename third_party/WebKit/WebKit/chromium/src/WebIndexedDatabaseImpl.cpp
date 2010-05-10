@@ -47,10 +47,10 @@ WebIndexedDatabaseImpl::~WebIndexedDatabaseImpl() {}
 void WebIndexedDatabaseImpl::open(const WebString& name,
                                   const WebString& description,
                                   bool modifyDatabase,
-                                  WebIDBCallbacks<WebIDBDatabase>* callbacksPtr,
+                                  WebIDBCallbacks* callbacksPtr,
                                   WebFrame*,
                                   int& exceptionCode) {
-  OwnPtr<WebIDBCallbacks<WebIDBDatabase>*> callbacks(callbacksPtr);
+  OwnPtr<WebIDBCallbacks> callbacks(callbacksPtr);
   callbacks->onError(WebIDBDatabaseError(0, "Not implemented"));
   // FIXME: Implement for realz.
 }

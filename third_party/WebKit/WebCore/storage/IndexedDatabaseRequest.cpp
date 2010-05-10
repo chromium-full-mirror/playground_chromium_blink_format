@@ -30,7 +30,9 @@
 #include "IndexedDatabaseRequest.h"
 
 #include "ExceptionCode.h"
+#include "Frame.h"
 #include "IDBDatabase.h"
+#include "IDBRequest.h"
 #include "IndexedDatabase.h"
 
 #if ENABLE(INDEXED_DATABASE)
@@ -43,13 +45,14 @@ IndexedDatabaseRequest::IndexedDatabaseRequest(IndexedDatabase* indexedDatabase,
 
 IndexedDatabaseRequest::~IndexedDatabaseRequest() {}
 
-void IndexedDatabaseRequest::open(const String& name,
-                                  const String& description,
-                                  bool modifyDatabase,
-                                  PassRefPtr<IDBDatabaseCallbacks> callbacks,
-                                  ExceptionCode& exception) {
-  m_indexedDatabase->open(name, description, modifyDatabase, callbacks, m_frame,
+PassRefPtr<IDBRequest> IndexedDatabaseRequest::open(const String& name,
+                                                    const String& description,
+                                                    bool modifyDatabase,
+                                                    ExceptionCode& exception) {
+  RefPtr<IDBRequest> request = IDBRequest::create(m_frame->document());
+  m_indexedDatabase->open(name, description, modifyDatabase, request, m_frame,
                           exception);
+  return request;
 }
 
 }  // namespace WebCore

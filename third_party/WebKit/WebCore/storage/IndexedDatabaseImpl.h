@@ -42,7 +42,7 @@ class IndexedDatabaseImpl : public IndexedDatabase {
   virtual void open(const String& name,
                     const String& description,
                     bool modifyDatabase,
-                    PassRefPtr<IDBCallbacks<IDBDatabase>>,
+                    PassRefPtr<IDBCallbacks>,
                     Frame*,
                     ExceptionCode&);
 

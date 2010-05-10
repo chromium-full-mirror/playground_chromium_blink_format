@@ -47,7 +47,7 @@ class IndexedDatabaseProxy : public IndexedDatabase {
   virtual void open(const String& name,
                     const String& description,
                     bool modifyDatabase,
-                    PassRefPtr<IDBDatabaseCallbacks>,
+                    PassRefPtr<IDBCallbacks>,
                     Frame*,
                     ExceptionCode&);
 
