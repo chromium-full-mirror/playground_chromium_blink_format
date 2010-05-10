@@ -54,7 +54,7 @@ class RenderSVGResourceClipper : public RenderSVGResourceContainer {
                              RenderStyle*,
                              GraphicsContext*&,
                              unsigned short resourceMode);
-  virtual FloatRect resourceBoundingBox(const FloatRect&) const;
+  virtual FloatRect resourceBoundingBox(const FloatRect&);
 
   virtual RenderSVGResourceType resourceType() const {
     return ClipperResourceType;
@@ -78,7 +78,9 @@ class RenderSVGResourceClipper : public RenderSVGResourceContainer {
                               GraphicsContext*);
   bool pathOnlyClipping(GraphicsContext*, const FloatRect&);
   bool createClipData(ClipperData*, const FloatRect&, const FloatRect&);
+  void calculateClipContentRepaintRect();
 
+  FloatRect m_clipBoundaries;
   HashMap<RenderObject*, ClipperData*> m_clipper;
 };
 }

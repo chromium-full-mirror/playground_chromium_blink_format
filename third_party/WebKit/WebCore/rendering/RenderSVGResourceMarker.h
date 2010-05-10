@@ -66,7 +66,7 @@ class RenderSVGResourceMarker : public RenderSVGResourceContainer {
                              unsigned short) {
     return false;
   }
-  virtual FloatRect resourceBoundingBox(const FloatRect&) const {
+  virtual FloatRect resourceBoundingBox(const FloatRect&) {
     return FloatRect();
   }
 

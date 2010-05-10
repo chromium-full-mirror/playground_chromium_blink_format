@@ -66,7 +66,7 @@ class RenderSVGResource {
   virtual void postApplyResource(RenderObject*,
                                  GraphicsContext*&,
                                  unsigned short) {}
-  virtual FloatRect resourceBoundingBox(const FloatRect&) const = 0;
+  virtual FloatRect resourceBoundingBox(const FloatRect&) = 0;
 
   virtual RenderSVGResourceType resourceType() const = 0;
 

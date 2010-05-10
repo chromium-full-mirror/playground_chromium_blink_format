@@ -300,7 +300,7 @@ void RenderSVGResourceFilter::postApplyResource(RenderObject* object,
 }
 
 FloatRect RenderSVGResourceFilter::resourceBoundingBox(
-    const FloatRect& objectBoundingBox) const {
+    const FloatRect& objectBoundingBox) {
   if (SVGFilterElement* element = static_cast<SVGFilterElement*>(node()))
     return element->filterBoundingBox(objectBoundingBox);
 

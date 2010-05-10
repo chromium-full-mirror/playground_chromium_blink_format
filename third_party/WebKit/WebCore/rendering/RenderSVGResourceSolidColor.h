@@ -43,7 +43,7 @@ class RenderSVGResourceSolidColor : public RenderSVGResource {
   virtual void postApplyResource(RenderObject*,
                                  GraphicsContext*&,
                                  unsigned short resourceMode);
-  virtual FloatRect resourceBoundingBox(const FloatRect&) const {
+  virtual FloatRect resourceBoundingBox(const FloatRect&) {
     return FloatRect();
   }
 

@@ -64,6 +64,7 @@ void RenderSVGResourceClipper::invalidateClients() {
   }
   deleteAllValues(m_clipper);
   m_clipper.clear();
+  m_clipBoundaries = FloatRect();
 }
 
 void RenderSVGResourceClipper::invalidateClient(RenderObject* object) {
@@ -283,11 +284,9 @@ bool RenderSVGResourceClipper::createClipData(
   return true;
 }
 
-FloatRect RenderSVGResourceClipper::resourceBoundingBox(
-    const FloatRect& objectBoundingBox) const {
+void RenderSVGResourceClipper::calculateClipContentRepaintRect() {
   // This is a rough heuristic to appraise the clip size and doesn't consider
   // clip on clip.
-  FloatRect clipRect;
   for (Node* childNode = node()->firstChild(); childNode;
        childNode = childNode->nextSibling()) {
     RenderObject* renderer = childNode->renderer();
@@ -297,9 +296,18 @@ FloatRect RenderSVGResourceClipper::resourceBoundingBox(
     if (!renderer->isRenderPath() && !renderer->isSVGText() &&
         !renderer->isSVGShadowTreeRootContainer())
       continue;
-    clipRect.unite(renderer->localToParentTransform().mapRect(
+    RenderStyle* style = renderer->style();
+    if (!style || style->display() == NONE || style->visibility() != VISIBLE)
+      continue;
+    m_clipBoundaries.unite(renderer->localToParentTransform().mapRect(
         renderer->repaintRectInLocalCoordinates()));
   }
+}
+
+FloatRect RenderSVGResourceClipper::resourceBoundingBox(
+    const FloatRect& objectBoundingBox) {
+  if (m_clipBoundaries.isEmpty())
+    calculateClipContentRepaintRect();
 
   if (static_cast<SVGClipPathElement*>(node())->clipPathUnits() ==
       SVGUnitTypes::SVG_UNIT_TYPE_OBJECTBOUNDINGBOX) {
@@ -307,9 +315,9 @@ FloatRect RenderSVGResourceClipper::resourceBoundingBox(
     transform.translate(objectBoundingBox.x(), objectBoundingBox.y());
     transform.scaleNonUniform(objectBoundingBox.width(),
                               objectBoundingBox.height());
-    return transform.mapRect(clipRect);
+    return transform.mapRect(m_clipBoundaries);
   }
 
-  return clipRect;
+  return m_clipBoundaries;
 }
 }
