@@ -69,6 +69,13 @@ void SourceAlpha::apply(Filter* filter) {
 
 void SourceAlpha::dump() {}
 
+TextStream& SourceAlpha::externalRepresentation(TextStream& ts,
+                                                int indent) const {
+  writeIndent(ts, indent);
+  ts << "[SourceAlpha]\n";
+  return ts;
+}
+
 }  // namespace WebCore
 
 #endif  // ENABLE(FILTERS)

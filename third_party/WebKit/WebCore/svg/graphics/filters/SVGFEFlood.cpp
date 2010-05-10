@@ -67,11 +67,12 @@ void FEFlood::apply(Filter*) {
 
 void FEFlood::dump() {}
 
-TextStream& FEFlood::externalRepresentation(TextStream& ts) const {
-  ts << "[type=FLOOD] ";
+TextStream& FEFlood::externalRepresentation(TextStream& ts, int indent) const {
+  writeIndent(ts, indent);
+  ts << "[feFlood";
   FilterEffect::externalRepresentation(ts);
-  ts << " [color=" << floodColor() << "]"
-     << " [opacity=" << floodOpacity() << "]";
+  ts << " flood-color=\"" << floodColor() << "\" "
+     << "flood-opacity=\"" << floodOpacity() << "\"]\n";
   return ts;
 }
 

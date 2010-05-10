@@ -38,6 +38,7 @@ class SourceAlpha : public FilterEffect {
   virtual FloatRect calculateEffectRect(Filter*);
   void apply(Filter*);
   void dump();
+  TextStream& externalRepresentation(TextStream&, int indent) const;
 
  private:
   SourceAlpha() {}

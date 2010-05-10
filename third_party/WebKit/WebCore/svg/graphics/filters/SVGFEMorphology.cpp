@@ -170,8 +170,9 @@ void FEMorphology::apply(Filter* filter) {
 
 void FEMorphology::dump() {}
 
-static TextStream& operator<<(TextStream& ts, MorphologyOperatorType t) {
-  switch (t) {
+static TextStream& operator<<(TextStream& ts,
+                              const MorphologyOperatorType& type) {
+  switch (type) {
     case FEMORPHOLOGY_OPERATOR_UNKNOWN:
       ts << "UNKNOWN";
       break;
@@ -185,11 +186,14 @@ static TextStream& operator<<(TextStream& ts, MorphologyOperatorType t) {
   return ts;
 }
 
-TextStream& FEMorphology::externalRepresentation(TextStream& ts) const {
-  ts << "[type=MORPHOLOGY] ";
+TextStream& FEMorphology::externalRepresentation(TextStream& ts,
+                                                 int indent) const {
+  writeIndent(ts, indent);
+  ts << "[feMorphology";
   FilterEffect::externalRepresentation(ts);
-  ts << " [operator type=" << morphologyOperator() << "]"
-     << " [radius x=" << radiusX() << " y=" << radiusY() << "]";
+  ts << " operator=\"" << morphologyOperator() << "\" "
+     << "radius=\"" << radiusX() << ", " << radiusY() << "\"]\n";
+  m_in->externalRepresentation(ts, indent + 1);
   return ts;
 }
 

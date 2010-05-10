@@ -255,11 +255,6 @@ TextStream& operator<<(TextStream& ts, const Color& c) {
   return ts << c.name();
 }
 
-static void writeIndent(TextStream& ts, int indent) {
-  for (int i = 0; i != indent; ++i)
-    ts << "  ";
-}
-
 // FIXME: Maybe this should be in KCanvasRenderingStyle.cpp
 static TextStream& operator<<(TextStream& ts, const DashArray& a) {
   ts << "{";
@@ -609,43 +604,24 @@ void writeSVGResourceContainer(TextStream& ts,
         static_cast<RenderSVGResourceMasker*>(resource);
     writeNameValuePair(ts, "maskUnits", masker->maskUnits());
     writeNameValuePair(ts, "maskContentUnits", masker->maskContentUnits());
+    ts << "\n";
 #if ENABLE(FILTERS)
   } else if (resource->resourceType() == FilterResourceType) {
     RenderSVGResourceFilter* filter =
         static_cast<RenderSVGResourceFilter*>(resource);
     writeNameValuePair(ts, "filterUnits", filter->filterUnits());
     writeNameValuePair(ts, "primitiveUnits", filter->primitiveUnits());
+    ts << "\n";
     if (OwnPtr<SVGFilterBuilder> builder = filter->buildPrimitives()) {
-      ts << "\n";
-      const HashMap<AtomicString, RefPtr<FilterEffect>>& effects =
-          builder->namedEffects();
-      HashMap<AtomicString, RefPtr<FilterEffect>>::const_iterator end =
-          effects.end();
-      for (HashMap<AtomicString, RefPtr<FilterEffect>>::const_iterator it =
-               effects.begin();
-           it != end; ++it) {
-        writeIndent(ts, indent);
-        ts << "  [primitve=\"" << it->first << "\" ";
-        it->second->externalRepresentation(ts);
-        ts << "]\n";
-      }
-      writeIndent(ts, indent);
-      // FIXME: Some effects don't give a representation back. So we miss some
-      // more informations
-      // after '[last primitive' .
-      // We also just dump named effects and the last effect at the moment, more
-      // effects
-      // without a name might be in the pipe.
-      ts << "  [last primitive ";
       if (FilterEffect* lastEffect = builder->lastEffect())
-        lastEffect->externalRepresentation(ts);
-      ts << "]";
+        lastEffect->externalRepresentation(ts, indent + 1);
     }
 #endif
   } else if (resource->resourceType() == ClipperResourceType) {
     RenderSVGResourceClipper* clipper =
         static_cast<RenderSVGResourceClipper*>(resource);
     writeNameValuePair(ts, "clipPathUnits", clipper->clipPathUnits());
+    ts << "\n";
   } else if (resource->resourceType() == MarkerResourceType) {
     RenderSVGResourceMarker* marker =
         static_cast<RenderSVGResourceMarker*>(resource);
@@ -654,9 +630,9 @@ void writeSVGResourceContainer(TextStream& ts,
     ts << " [angle=";
     if (marker->angle() == -1)
       ts << "auto"
-         << "]";
+         << "]\n";
     else
-      ts << marker->angle() << "]";
+      ts << marker->angle() << "]\n";
   } else if (resource->resourceType() == PatternResourceType) {
     RenderSVGResourcePattern* pattern =
         static_cast<RenderSVGResourcePattern*>(resource);
@@ -677,6 +653,7 @@ void writeSVGResourceContainer(TextStream& ts,
     AffineTransform transform = attributes.patternTransform();
     if (!transform.isIdentity())
       ts << " [patternTransform=" << transform << "]";
+    ts << "\n";
   } else if (resource->resourceType() == LinearGradientResourceType) {
     RenderSVGResourceLinearGradient* gradient =
         static_cast<RenderSVGResourceLinearGradient*>(resource);
@@ -699,7 +676,7 @@ void writeSVGResourceContainer(TextStream& ts,
     linearGradientElement->calculateStartEndPoints(attributes, startPoint,
                                                    endPoint);
 
-    ts << " [start=" << startPoint << "] [end=" << endPoint << "]";
+    ts << " [start=" << startPoint << "] [end=" << endPoint << "]\n";
   } else if (resource->resourceType() == RadialGradientResourceType) {
     RenderSVGResourceRadialGradient* gradient =
         static_cast<RenderSVGResourceRadialGradient*>(resource);
@@ -724,10 +701,9 @@ void writeSVGResourceContainer(TextStream& ts,
         attributes, focalPoint, centerPoint, radius);
 
     ts << " [center=" << centerPoint << "] [focal=" << focalPoint
-       << "] [radius=" << radius << "]";
-  }
-
-  ts << "\n";
+       << "] [radius=" << radius << "]\n";
+  } else
+    ts << "\n";
   writeChildren(ts, object, indent);
 }
 

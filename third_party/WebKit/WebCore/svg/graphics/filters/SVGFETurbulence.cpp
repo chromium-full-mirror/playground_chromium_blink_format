@@ -104,8 +104,8 @@ void FETurbulence::apply(Filter*) {}
 
 void FETurbulence::dump() {}
 
-static TextStream& operator<<(TextStream& ts, TurbulanceType t) {
-  switch (t) {
+static TextStream& operator<<(TextStream& ts, const TurbulanceType& type) {
+  switch (type) {
     case FETURBULENCE_TYPE_UNKNOWN:
       ts << "UNKNOWN";
       break;
@@ -119,16 +119,17 @@ static TextStream& operator<<(TextStream& ts, TurbulanceType t) {
   return ts;
 }
 
-TextStream& FETurbulence::externalRepresentation(TextStream& ts) const {
-  ts << "[type=TURBULENCE] ";
+TextStream& FETurbulence::externalRepresentation(TextStream& ts,
+                                                 int indent) const {
+  writeIndent(ts, indent);
+  ts << "[feTurbulence";
   FilterEffect::externalRepresentation(ts);
-  ts << " [turbulence type=" << type() << "]"
-     << " [base frequency x=" << baseFrequencyX() << " y=" << baseFrequencyY()
-     << "]"
-     << " [seed=" << seed() << "]"
-     << " [num octaves=" << numOctaves() << "]"
-     << " [stitch tiles=" << stitchTiles() << "]";
-
+  ts << " type=\"" << type() << "\" "
+     << "baseFrequency=\"" << baseFrequencyX() << ", " << baseFrequencyY()
+     << "\" "
+     << "seed=\"" << seed() << "\" "
+     << "numOctaves=\"" << numOctaves() << "\" "
+     << "stitchTiles=\"" << stitchTiles() << "\"]\n";
   return ts;
 }
 

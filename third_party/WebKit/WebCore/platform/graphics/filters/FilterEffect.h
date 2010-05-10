@@ -26,6 +26,7 @@
 #include "FloatRect.h"
 #include "GraphicsContext.h"
 #include "ImageBuffer.h"
+#include "RenderTreeAsText.h"
 #include "TextStream.h"
 
 #include <wtf/PassOwnPtr.h>
@@ -98,7 +99,8 @@ class FilterEffect : public RefCounted<FilterEffect> {
 
   virtual bool isSourceInput() { return false; }
 
-  virtual TextStream& externalRepresentation(TextStream&) const;
+  virtual TextStream& externalRepresentation(TextStream&,
+                                             int indention = 0) const;
 
  protected:
   FilterEffect();

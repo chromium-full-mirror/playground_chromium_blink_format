@@ -68,7 +68,7 @@ class FESpecularLighting : public FilterEffect {
   }
   void apply(Filter*);
   void dump();
-  TextStream& externalRepresentation(TextStream& ts) const;
+  TextStream& externalRepresentation(TextStream&, int indent) const;
 
  private:
   FESpecularLighting(FilterEffect*,

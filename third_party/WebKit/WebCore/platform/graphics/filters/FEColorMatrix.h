@@ -55,6 +55,7 @@ class FEColorMatrix : public FilterEffect {
   }
   void apply(Filter*);
   void dump();
+  TextStream& externalRepresentation(TextStream&, int indent) const;
 
  private:
   FEColorMatrix(FilterEffect*, ColorMatrixType, const Vector<float>&);

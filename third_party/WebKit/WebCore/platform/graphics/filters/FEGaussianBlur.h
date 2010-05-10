@@ -45,6 +45,7 @@ class FEGaussianBlur : public FilterEffect {
   }
   void apply(Filter*);
   void dump();
+  TextStream& externalRepresentation(TextStream&, int indent) const;
 
  private:
   FEGaussianBlur(FilterEffect*, const float&, const float&);

@@ -56,6 +56,7 @@ class FEBlend : public FilterEffect {
   }
   void apply(Filter*);
   void dump();
+  TextStream& externalRepresentation(TextStream&, int indent) const;
 
  private:
   FEBlend(FilterEffect*, FilterEffect*, BlendModeType);

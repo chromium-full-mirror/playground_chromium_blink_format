@@ -122,12 +122,15 @@ void FESpecularLighting::apply(Filter*) {}
 
 void FESpecularLighting::dump() {}
 
-TextStream& FESpecularLighting::externalRepresentation(TextStream& ts) const {
-  ts << "[type=SPECULAR-LIGHTING] ";
+TextStream& FESpecularLighting::externalRepresentation(TextStream& ts,
+                                                       int indent) const {
+  writeIndent(ts, indent);
+  ts << "[feSpecularLighting";
   FilterEffect::externalRepresentation(ts);
-  ts << " [surface scale=" << m_surfaceScale << "]"
-     << " [specual constant=" << m_specularConstant << "]"
-     << " [specular exponent=" << m_specularExponent << "]";
+  ts << " surfaceScale=\"" << m_surfaceScale << "\" "
+     << "specualConstant=\"" << m_specularConstant << "\" "
+     << "specularExponent=\"" << m_specularExponent << "\"]\n";
+  m_in->externalRepresentation(ts, indent + 1);
   return ts;
 }
 

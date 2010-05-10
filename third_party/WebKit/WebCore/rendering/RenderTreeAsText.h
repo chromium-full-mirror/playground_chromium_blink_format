@@ -55,6 +55,7 @@ void write(TextStream&,
            const RenderObject&,
            int indent = 0,
            RenderAsTextBehavior = RenderAsTextBehaviorNormal);
+void writeIndent(TextStream&, int indent);
 
 // Helper function shared with SVGRenderTreeAsText
 String quoteAndEscapeNonPrintables(const String&);

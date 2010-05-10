@@ -134,8 +134,8 @@ void FEConvolveMatrix::apply(Filter*) {}
 
 void FEConvolveMatrix::dump() {}
 
-static TextStream& operator<<(TextStream& ts, EdgeModeType t) {
-  switch (t) {
+static TextStream& operator<<(TextStream& ts, const EdgeModeType& type) {
+  switch (type) {
     case EDGEMODE_UNKNOWN:
       ts << "UNKNOWN";
       break;
@@ -152,17 +152,21 @@ static TextStream& operator<<(TextStream& ts, EdgeModeType t) {
   return ts;
 }
 
-TextStream& FEConvolveMatrix::externalRepresentation(TextStream& ts) const {
-  ts << "[type=CONVOLVE-MATRIX] ";
+TextStream& FEConvolveMatrix::externalRepresentation(TextStream& ts,
+                                                     int indent) const {
+  writeIndent(ts, indent);
+  ts << "[feConvolveMatrix";
   FilterEffect::externalRepresentation(ts);
-  ts << " [order " << m_kernelSize << "]"
-     << " [kernel matrix=" << m_kernelMatrix << "]"
-     << " [divisor=" << m_divisor << "]"
-     << " [bias=" << m_bias << "]"
-     << " [target " << m_targetOffset << "]"
-     << " [edge mode=" << m_edgeMode << "]"
-     << " [kernel unit length " << m_kernelUnitLength << "]"
-     << " [preserve alpha=" << m_preserveAlpha << "]";
+  ts << " order=\"" << m_kernelSize << "\" "
+     << "kernelMatrix=\"" << m_kernelMatrix << "\" "
+     << "divisor=\"" << m_divisor << "\" "
+     << "bias=\"" << m_bias << "\" "
+     << "target=\"" << m_targetOffset << "\" "
+     << "edgeMode=\"" << m_edgeMode << "\" "
+     << "kernelUnitLength=\"" << m_kernelUnitLength << "\" "
+     << "preserveAlpha=\"" << m_preserveAlpha << "\"]\n";
+  m_in->externalRepresentation(ts, indent + 1);
+  m_in2->externalRepresentation(ts, indent + 1);
   return ts;
 }
 

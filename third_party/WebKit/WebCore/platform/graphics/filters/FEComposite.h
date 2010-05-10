@@ -71,6 +71,7 @@ class FEComposite : public FilterEffect {
   }
   void apply(Filter*);
   void dump();
+  TextStream& externalRepresentation(TextStream&, int indent) const;
 
  private:
   FEComposite(FilterEffect*,

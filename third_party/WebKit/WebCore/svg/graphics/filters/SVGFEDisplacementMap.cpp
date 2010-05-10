@@ -153,8 +153,8 @@ void FEDisplacementMap::apply(Filter* filter) {
 
 void FEDisplacementMap::dump() {}
 
-static TextStream& operator<<(TextStream& ts, ChannelSelectorType t) {
-  switch (t) {
+static TextStream& operator<<(TextStream& ts, const ChannelSelectorType& type) {
+  switch (type) {
     case CHANNEL_UNKNOWN:
       ts << "UNKNOWN";
       break;
@@ -174,12 +174,16 @@ static TextStream& operator<<(TextStream& ts, ChannelSelectorType t) {
   return ts;
 }
 
-TextStream& FEDisplacementMap::externalRepresentation(TextStream& ts) const {
-  ts << "[type=DISPLACEMENT-MAP] ";
+TextStream& FEDisplacementMap::externalRepresentation(TextStream& ts,
+                                                      int indent) const {
+  writeIndent(ts, indent);
+  ts << "[feDisplacementMap";
   FilterEffect::externalRepresentation(ts);
-  ts << "[scale=" << m_scale << "]"
-     << " [x channel selector=" << m_xChannelSelector << "]"
-     << " [y channel selector=" << m_yChannelSelector << "]";
+  ts << " scale=\"" << m_scale << "\" "
+     << "xChannelSelector=\"" << m_xChannelSelector << "\" "
+     << "yChannelSelector=\"" << m_yChannelSelector << "\"]\n";
+  m_in->externalRepresentation(ts, indent + 1);
+  m_in2->externalRepresentation(ts, indent + 1);
   return ts;
 }
 

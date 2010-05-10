@@ -43,7 +43,7 @@ class FEOffset : public FilterEffect {
   }
   void apply(Filter*);
   void dump();
-  TextStream& externalRepresentation(TextStream& ts) const;
+  TextStream& externalRepresentation(TextStream&, int indent) const;
 
  private:
   FEOffset(FilterEffect*, const float&, const float&);
