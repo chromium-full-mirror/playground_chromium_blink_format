@@ -61,7 +61,6 @@ class GCController;
 namespace WebCore {
 
 class WebPage;
-class NetworkAccessManager;
 
 class DumpRenderTree : public QObject {
   Q_OBJECT
@@ -88,9 +87,6 @@ class DumpRenderTree : public QObject {
   EventSender* eventSender() const { return m_eventSender; }
   TextInputController* textInputController() const {
     return m_textInputController;
-  }
-  NetworkAccessManager* networkAccessManager() const {
-    return m_networkAccessManager;
   }
 
   QWebPage* createWindow();
@@ -140,7 +136,6 @@ class DumpRenderTree : public QObject {
   EventSender* m_eventSender;
   TextInputController* m_textInputController;
   GCController* m_gcController;
-  NetworkAccessManager* m_networkAccessManager;
 
   QFile* m_stdin;
 
