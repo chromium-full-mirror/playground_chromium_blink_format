@@ -35,6 +35,7 @@
 
 #include "Database.h"
 #include "V8Binding.h"
+#include "V8BindingMacros.h"
 #include "V8SQLTransactionCallback.h"
 #include "V8SQLTransactionErrorCallback.h"
 #include "V8CustomVoidCallback.h"
@@ -47,11 +48,10 @@ v8::Handle<v8::Value> V8Database::changeVersionCallback(
   INC_STATS("DOM.Database.changeVersion()");
 
   if (args.Length() < 2)
-    return throwError("The old and new version strings are required.",
-                      V8Proxy::SyntaxError);
+    return throwError(SYNTAX_ERR);
 
-  if (!(args[0]->IsString() && args[1]->IsString()))
-    return throwError("The old and new versions must be strings.");
+  EXCEPTION_BLOCK(String, oldVersion, toWebCoreString(args[0]));
+  EXCEPTION_BLOCK(String, newVersion, toWebCoreString(args[1]));
 
   Database* database = V8Database::toNative(args.Holder());
 
@@ -62,8 +62,7 @@ v8::Handle<v8::Value> V8Database::changeVersionCallback(
   RefPtr<V8SQLTransactionCallback> callback;
   if (args.Length() > 2) {
     if (!args[2]->IsObject())
-      return throwError(
-          "changeVersion transaction callback must be of valid type.");
+      return throwError(TYPE_MISMATCH_ERR);
 
     callback = V8SQLTransactionCallback::create(args[2], frame);
   }
@@ -71,7 +70,7 @@ v8::Handle<v8::Value> V8Database::changeVersionCallback(
   RefPtr<V8SQLTransactionErrorCallback> errorCallback;
   if (args.Length() > 3) {
     if (!args[3]->IsObject())
-      return throwError("changeVersion error callback must be of valid type.");
+      return throwError(TYPE_MISMATCH_ERR);
 
     errorCallback = V8SQLTransactionErrorCallback::create(args[3], frame);
   }
@@ -79,15 +78,13 @@ v8::Handle<v8::Value> V8Database::changeVersionCallback(
   RefPtr<V8CustomVoidCallback> successCallback;
   if (args.Length() > 4) {
     if (!args[4]->IsObject())
-      return throwError(
-          "changeVersion success callback must be of valid type.");
+      return throwError(TYPE_MISMATCH_ERR);
 
     successCallback = V8CustomVoidCallback::create(args[4], frame);
   }
 
-  database->changeVersion(toWebCoreString(args[0]), toWebCoreString(args[1]),
-                          callback.release(), errorCallback.release(),
-                          successCallback.release());
+  database->changeVersion(oldVersion, newVersion, callback.release(),
+                          errorCallback.release(), successCallback.release());
 
   return v8::Undefined();
 }
@@ -95,11 +92,10 @@ v8::Handle<v8::Value> V8Database::changeVersionCallback(
 static v8::Handle<v8::Value> createTransaction(const v8::Arguments& args,
                                                bool readOnly) {
   if (!args.Length())
-    return throwError("Transaction callback is required.",
-                      V8Proxy::SyntaxError);
+    return throwError(SYNTAX_ERR);
 
   if (!args[0]->IsObject())
-    return throwError("Transaction callback must be of valid type.");
+    return throwError(TYPE_MISMATCH_ERR);
 
   Database* database = V8Database::toNative(args.Holder());
 
@@ -113,7 +109,7 @@ static v8::Handle<v8::Value> createTransaction(const v8::Arguments& args,
   RefPtr<V8SQLTransactionErrorCallback> errorCallback;
   if (args.Length() > 1 && !isUndefinedOrNull(args[1])) {
     if (!args[1]->IsObject())
-      return throwError("Transaction error callback must be of valid type.");
+      return throwError(TYPE_MISMATCH_ERR);
 
     errorCallback = V8SQLTransactionErrorCallback::create(args[1], frame);
   }
@@ -121,7 +117,7 @@ static v8::Handle<v8::Value> createTransaction(const v8::Arguments& args,
   RefPtr<V8CustomVoidCallback> successCallback;
   if (args.Length() > 2 && !isUndefinedOrNull(args[2])) {
     if (!args[2]->IsObject())
-      return throwError("Transaction success callback must be of valid type.");
+      return throwError(TYPE_MISMATCH_ERR);
 
     successCallback = V8CustomVoidCallback::create(args[2], frame);
   }
