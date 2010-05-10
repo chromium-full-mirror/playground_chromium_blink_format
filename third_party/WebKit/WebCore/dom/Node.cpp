@@ -417,6 +417,7 @@ static void setDidMoveToNewOwnerDocumentWasCalled(bool wasCalled) {
 #endif
 
 void Node::setDocument(Document* document) {
+  ASSERT(!inDocument() || m_document == document);
   if (inDocument() || m_document == document)
     return;
 
