@@ -129,6 +129,8 @@ NPError NPP_New(NPMIMEType pluginType,
             pluginLog(instance, "src: %s", argv[i]);
       } else if (_stricmp(argn[i], "testdocumentopenindestroystream") == 0)
         obj->testDocumentOpenInDestroyStream = TRUE;
+      else if (_stricmp(argn[i], "testGetURLOnDestroy") == 0)
+        obj->testGetURLOnDestroy = TRUE;
       else if (_stricmp(argn[i], "testwindowopen") == 0)
         obj->testWindowOpen = TRUE;
       else if (_stricmp(argn[i], "onSetWindow") == 0 && !obj->onSetWindow)
@@ -145,6 +147,9 @@ NPError NPP_New(NPMIMEType pluginType,
 NPError NPP_Destroy(NPP instance, NPSavedData** save) {
   PluginObject* obj = (PluginObject*)instance->pdata;
   if (obj) {
+    if (obj->testGetURLOnDestroy)
+      browser->geturlnotify(obj->npp, "about:blank", "", "");
+
     if (obj->onStreamLoad)
       free(obj->onStreamLoad);
 
