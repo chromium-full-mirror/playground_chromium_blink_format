@@ -228,7 +228,7 @@ static v8::Handle<v8::Value> scriptStringAttrAttrGetter(
     const v8::AccessorInfo& info) {
   INC_STATS("DOM.TestObj.scriptStringAttr._get");
   TestObj* imp = V8TestObj::toNative(info.Holder());
-  v8StringOrNull(exec, imp->scriptStringAttr());
+  return v8StringOrNull(imp->scriptStringAttr());
 }
 
 static v8::Handle<v8::Value> voidMethodCallback(const v8::Arguments& args) {
