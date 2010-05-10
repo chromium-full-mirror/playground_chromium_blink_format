@@ -83,6 +83,12 @@ class WebViewClient : virtual public WebWidgetClient {
   virtual WebWidget* createPopupMenu(const WebPopupMenuInfo&) { return 0; }
 
   // Create a session storage namespace object associated with this WebView.
+
+  // FIXME: This is needed while subclasses implement the method without the
+  // quota parameter but callers inside WebKit pass a quota argument.
+  virtual WebStorageNamespace* createSessionStorageNamespace(unsigned quota) {
+    return createSessionStorageNamespace();
+  }
   virtual WebStorageNamespace* createSessionStorageNamespace() { return 0; }
 
   // Misc ----------------------------------------------------------------

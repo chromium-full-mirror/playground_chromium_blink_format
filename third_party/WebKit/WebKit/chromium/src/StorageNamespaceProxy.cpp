@@ -57,7 +57,7 @@ PassRefPtr<StorageNamespace> StorageNamespace::sessionStorageNamespace(
       static_cast<WebKit::ChromeClientImpl*>(page->chrome()->client());
   WebKit::WebViewClient* webViewClient = chromeClientImpl->webView()->client();
   return adoptRef(new StorageNamespaceProxy(
-      webViewClient->createSessionStorageNamespace(), SessionStorage));
+      webViewClient->createSessionStorageNamespace(quota), SessionStorage));
 }
 
 StorageNamespaceProxy::StorageNamespaceProxy(
