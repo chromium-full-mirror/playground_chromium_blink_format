@@ -92,8 +92,12 @@ FontPlatformData::FontPlatformData(const FontDescription& desc,
       italicToWxFontStyle(desc.italic()),
       fontWeightToWxFontWeight(desc.weight()), false, family.string()));
 #endif
-#if OS(DARWIN)
+#if OS(DARWIN) && !defined(wxOSX_USE_CORE_TEXT)
+#if wxCHECK_VERSION(2, 9, 0)
+  m_atsuFontID = m_font->font()->OSXGetATSUFontID();
+#else
   m_atsuFontID = m_font->font()->MacGetATSUFontID();
+#endif
   cacheNSFont();
 #endif
   m_size = desc.computedPixelSize();
