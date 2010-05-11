@@ -31,24 +31,10 @@ namespace WebCore {
 class SVGRootInlineBox;
 
 struct SVGChar;
+struct SVGCharacterLayoutInfo;
+struct SVGLastGlyphInfo;
 struct SVGTextDecorationInfo;
-
-enum SVGTextPaintSubphase {
-  SVGTextPaintSubphaseBackground,
-  SVGTextPaintSubphaseGlyphFill,
-  SVGTextPaintSubphaseGlyphFillSelection,
-  SVGTextPaintSubphaseGlyphStroke,
-  SVGTextPaintSubphaseGlyphStrokeSelection,
-  SVGTextPaintSubphaseForeground
-};
-
-struct SVGTextPaintInfo {
-  SVGTextPaintInfo()
-      : activePaintingResource(0), subphase(SVGTextPaintSubphaseBackground) {}
-
-  RenderSVGResource* activePaintingResource;
-  SVGTextPaintSubphase subphase;
-};
+struct SVGTextPaintInfo;
 
 class SVGInlineTextBox : public InlineTextBox {
  public:
@@ -57,8 +43,8 @@ class SVGInlineTextBox : public InlineTextBox {
   virtual int virtualHeight() const { return m_height; }
   void setHeight(int h) { m_height = h; }
 
-  virtual int selectionTop();
-  virtual int selectionHeight();
+  virtual int selectionTop() { return m_y; }
+  virtual int selectionHeight() { return m_height; }
 
   virtual int offsetForPosition(int x, bool includePartialGlyphs = true) const;
   virtual int positionForOffset(int offset) const;
@@ -114,6 +100,8 @@ class SVGInlineTextBox : public InlineTextBox {
                                      int offset,
                                      const SVGChar&) const;
   SVGChar* closestCharacterToPosition(int x, int y, int& offset) const;
+
+  void buildLayoutInformation(SVGCharacterLayoutInfo&, SVGLastGlyphInfo&);
 
  private:
   friend class RenderSVGInlineText;

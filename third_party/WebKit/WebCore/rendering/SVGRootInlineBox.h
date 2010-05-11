@@ -29,22 +29,15 @@
 #include "RootInlineBox.h"
 #include "SVGCharacterData.h"
 #include "SVGCharacterLayoutInfo.h"
-#include "SVGTextChunkLayoutInfo.h"
 #include "SVGRenderSupport.h"
+#include "SVGTextChunkLayoutInfo.h"
 
 namespace WebCore {
 
 class InlineTextBox;
 class RenderSVGRoot;
 class SVGInlineTextBox;
-
-struct LastGlyphInfo {
-  LastGlyphInfo() : isValid(false) {}
-
-  String unicode;
-  String glyphName;
-  bool isValid;
-};
+struct SVGLastGlyphInfo;
 
 class SVGRootInlineBox : public RootInlineBox, protected SVGRenderBase {
  public:
@@ -71,7 +64,7 @@ class SVGRootInlineBox : public RootInlineBox, protected SVGRenderBase {
   }
 
   // Used by SVGInlineTextBox
-  const Vector<SVGTextChunk>& svgTextChunks() const;
+  const Vector<SVGTextChunk>& svgTextChunks() const { return m_svgTextChunks; }
 
   void walkTextChunks(SVGTextChunkWalkerBase*,
                       const SVGInlineTextBox* textBox = 0);
@@ -88,9 +81,6 @@ class SVGRootInlineBox : public RootInlineBox, protected SVGRenderBase {
                          int& maxY);
 
   void buildLayoutInformation(InlineFlowBox* start, SVGCharacterLayoutInfo&);
-  void buildLayoutInformationForTextBox(SVGCharacterLayoutInfo&,
-                                        InlineTextBox*,
-                                        LastGlyphInfo&);
 
   void buildTextChunks(Vector<SVGChar>&,
                        Vector<SVGTextChunk>&,
@@ -110,18 +100,6 @@ class SVGRootInlineBox : public RootInlineBox, protected SVGRenderBase {
 };
 
 // Shared with SVGRenderTreeAsText / SVGInlineTextBox
-TextRun svgTextRunForInlineTextBox(const UChar*,
-                                   int len,
-                                   RenderStyle* style,
-                                   const InlineTextBox* textBox,
-                                   float xPos);
-FloatPoint topLeftPositionOfCharacterRange(Vector<SVGChar>::iterator start,
-                                           Vector<SVGChar>::iterator end);
-float cummulatedWidthOfInlineBoxCharacterRange(
-    SVGInlineBoxCharacterRange& range);
-float cummulatedHeightOfInlineBoxCharacterRange(
-    SVGInlineBoxCharacterRange& range);
-
 RenderSVGRoot* findSVGRootObject(RenderObject* start);
 
 }  // namespace WebCore
