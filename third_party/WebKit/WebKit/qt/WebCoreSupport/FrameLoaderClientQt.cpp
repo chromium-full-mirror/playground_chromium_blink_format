@@ -413,12 +413,12 @@ void FrameLoaderClientQt::dispatchDidFinishLoad() {
 }
 
 void FrameLoaderClientQt::dispatchDidFirstLayout() {
-  if (m_webFrame)
-    emit m_webFrame->initialLayoutCompleted();
+  notImplemented();
 }
 
 void FrameLoaderClientQt::dispatchDidFirstVisuallyNonEmptyLayout() {
-  notImplemented();
+  if (m_webFrame)
+    emit m_webFrame->initialLayoutCompleted();
 }
 
 void FrameLoaderClientQt::dispatchShow() {
