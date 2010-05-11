@@ -185,6 +185,9 @@ class FileThreadTask3 : public FileThread::Task {
   P3 m_parameter3;
 };
 
+PassOwnPtr<FileThread::Task> createFileThreadTask(FileStream* const callee,
+                                                  void (FileStream::*method)());
+
 PassOwnPtr<FileThread::Task> createFileThreadTask(
     FileStream* const callee,
     void (FileStream::*method)()) {
