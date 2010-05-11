@@ -73,7 +73,7 @@ JSValue JSSQLTransaction::executeSql(ExecState* exec, const ArgList& args) {
       if (exec->hadException())
         return jsUndefined();
 
-      if (value.isNull())
+      if (value.isUndefinedOrNull())
         sqlValues.append(SQLValue());
       else if (value.isNumber())
         sqlValues.append(value.uncheckedGetNumber());
