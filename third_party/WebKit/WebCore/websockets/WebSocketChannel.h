@@ -35,8 +35,10 @@
 
 #include "SocketStreamHandleClient.h"
 #include "ThreadableWebSocketChannel.h"
+#include "Timer.h"
 #include "WebSocketHandshake.h"
 #include <wtf/RefCounted.h>
+#include <wtf/Vector.h>
 
 namespace WebCore {
 
@@ -64,6 +66,9 @@ class WebSocketChannel : public RefCounted<WebSocketChannel>,
   virtual void close();
   virtual void disconnect();  // Will suppress didClose().
 
+  virtual void suspend();
+  virtual void resume();
+
   virtual void didOpen(SocketStreamHandle*);
   virtual void didClose(SocketStreamHandle*);
   virtual void didReceiveData(SocketStreamHandle*, const char*, int);
@@ -89,6 +94,7 @@ class WebSocketChannel : public RefCounted<WebSocketChannel>,
 
   bool appendToBuffer(const char* data, int len);
   void skipBuffer(int len);
+  bool processBuffer();
 
   ScriptExecutionContext* m_context;
   WebSocketChannelClient* m_client;
@@ -96,6 +102,10 @@ class WebSocketChannel : public RefCounted<WebSocketChannel>,
   RefPtr<SocketStreamHandle> m_handle;
   char* m_buffer;
   int m_bufferSize;
+
+  bool m_suspended;
+  bool m_closed;
+  unsigned long m_unhandledBufferedAmount;
 };
 
 }  // namespace WebCore

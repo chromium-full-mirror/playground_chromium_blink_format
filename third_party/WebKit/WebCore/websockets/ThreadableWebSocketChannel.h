@@ -56,6 +56,9 @@ class ThreadableWebSocketChannel : public Noncopyable {
   virtual void close() = 0;
   virtual void disconnect() = 0;  // Will suppress didClose().
 
+  virtual void suspend() = 0;
+  virtual void resume() = 0;
+
   void ref() { refThreadableWebSocketChannel(); }
   void deref() { derefThreadableWebSocketChannel(); }
 
