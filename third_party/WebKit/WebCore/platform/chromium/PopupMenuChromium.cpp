@@ -568,6 +568,10 @@ int PopupContainer::menuItemFontSize() const {
   return m_listBox->getRowFont(0).size();
 }
 
+PopupMenuStyle PopupContainer::menuStyle() const {
+  return m_listBox->m_popupClient->menuStyle();
+}
+
 const WTF::Vector<PopupItem*>& PopupContainer::popupData() const {
   return m_listBox->items();
 }

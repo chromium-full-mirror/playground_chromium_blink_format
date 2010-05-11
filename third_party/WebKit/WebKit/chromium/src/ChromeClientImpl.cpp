@@ -635,6 +635,7 @@ void ChromeClientImpl::getPopupMenuInfo(PopupContainer* popupContainer,
   info->itemFontSize = popupContainer->menuItemFontSize();
   info->selectedIndex = popupContainer->selectedIndex();
   info->items.swap(outputItems);
+  info->rightAligned = popupContainer->menuStyle().textDirection() == RTL;
 }
 
 void ChromeClientImpl::didChangeAccessibilityObjectState(
