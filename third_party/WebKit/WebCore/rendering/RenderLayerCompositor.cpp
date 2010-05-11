@@ -119,14 +119,6 @@ void RenderLayerCompositor::enableCompositingMode(bool enable /* = true */) {
       ensureRootPlatformLayer();
     else
       destroyRootPlatformLayer();
-
-    if (shouldPropagateCompositingToIFrameParent()) {
-      if (Element* ownerElement = enclosingIFrameElement()) {
-        // Trigger a recalcStyle in the parent document, to update compositing
-        // in that document.
-        ownerElement->setNeedsStyleRecalc(SyntheticStyleChange);
-      }
-    }
   }
 }
 
@@ -830,11 +822,12 @@ void RenderLayerCompositor::rebuildCompositingLayerTree(
 
   if (layerBacking) {
     bool parented = false;
-    if (shouldPropagateCompositingToIFrameParent() &&
-        layer->renderer()->isRenderIFrame()) {
+    if (layer->renderer()->isRenderIFrame()) {
       RenderLayerCompositor* innerCompositor =
           iframeContentsCompositor(toRenderIFrame(layer->renderer()));
-      if (innerCompositor->inCompositingMode()) {
+      if (innerCompositor->inCompositingMode() &&
+          innerCompositor->rootLayerAttachment() ==
+              RootLayerAttachedViaEnclosingIframe) {
         // This is an iframe parent. Make it the parent of the iframe document's
         // root
         layerBacking->parentForSublayers()->removeAllChildren();
@@ -1034,7 +1027,7 @@ GraphicsLayer* RenderLayerCompositor::rootPlatformLayer() const {
 }
 
 void RenderLayerCompositor::didMoveOnscreen() {
-  RootLayerAttachment attachment = shouldPropagateCompositingToIFrameParent()
+  RootLayerAttachment attachment = shouldPropagateCompositingToEnclosingIFrame()
                                        ? RootLayerAttachedViaEnclosingIframe
                                        : RootLayerAttachedViaChromeClient;
   attachRootPlatformLayer(attachment);
@@ -1066,7 +1059,8 @@ bool RenderLayerCompositor::has3DContent() const {
   return layerHas3DContent(rootRenderLayer());
 }
 
-bool RenderLayerCompositor::shouldPropagateCompositingToIFrameParent() {
+bool RenderLayerCompositor::shouldPropagateCompositingToEnclosingIFrame()
+    const {
 // Parent document content needs to be able to render on top of a composited
 // iframe, so correct behavior
 // is to have the parent document become composited too. However, this can cause
@@ -1074,10 +1068,12 @@ bool RenderLayerCompositor::shouldPropagateCompositingToIFrameParent() {
 // use native views for frames (like Mac), so disable that behavior on those
 // platforms for now.
 #if !PLATFORM(MAC)
-  return true;
-#else
-  return false;
+  if (Element* ownerElement = enclosingIFrameElement()) {
+    if (RenderObject* renderer = ownerElement->renderer())
+      return renderer->isRenderIFrame();
+  }
 #endif
+  return false;
 }
 
 Element* RenderLayerCompositor::enclosingIFrameElement() const {
@@ -1242,9 +1238,16 @@ bool RenderLayerCompositor::requiresCompositingForPlugin(
 
 bool RenderLayerCompositor::requiresCompositingForIFrame(
     RenderObject* renderer) const {
-  return shouldPropagateCompositingToIFrameParent() &&
-         renderer->isRenderIFrame() &&
-         toRenderIFrame(renderer)->requiresAcceleratedCompositing();
+  if (!renderer->isRenderIFrame())
+    return false;
+
+  RenderIFrame* iframe = toRenderIFrame(renderer);
+
+  if (!iframe->requiresAcceleratedCompositing())
+    return false;
+
+  RenderLayerCompositor* innerCompositor = iframeContentsCompositor(iframe);
+  return innerCompositor->shouldPropagateCompositingToEnclosingIFrame();
 }
 
 bool RenderLayerCompositor::requiresCompositingForAnimation(
@@ -1277,7 +1280,7 @@ bool RenderLayerCompositor::needsContentsCompositingLayer(
 
 void RenderLayerCompositor::ensureRootPlatformLayer() {
   RootLayerAttachment expectedAttachment =
-      (shouldPropagateCompositingToIFrameParent() && enclosingIFrameElement())
+      shouldPropagateCompositingToEnclosingIFrame()
           ? RootLayerAttachedViaEnclosingIframe
           : RootLayerAttachedViaChromeClient;
   if (expectedAttachment == m_rootLayerAttachment)

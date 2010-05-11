@@ -891,14 +891,11 @@ FloatPoint RenderLayerBacking::contentsToGraphicsLayerCoordinates(
 }
 
 bool RenderLayerBacking::paintingGoesToWindow() const {
-  if (!RenderLayerCompositor::shouldPropagateCompositingToIFrameParent())
-    return m_owningLayer->isRootLayer();
+  if (m_owningLayer->isRootLayer())
+    return compositor()->rootLayerAttachment() ==
+           RenderLayerCompositor::RootLayerAttachedViaChromeClient;
 
-  if (!m_owningLayer->isRootLayer())
-    return false;
-
-  // Iframe root layers paint into backing store.
-  return !toRenderView(renderer())->document()->ownerElement();
+  return false;
 }
 
 void RenderLayerBacking::setContentsNeedDisplay() {
