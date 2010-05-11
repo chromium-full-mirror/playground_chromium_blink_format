@@ -34,6 +34,7 @@ namespace WebCore {
 #define PROFILE_LAYER_REBUILD 0
 
 class GraphicsLayer;
+class RenderIFrame;
 #if ENABLE(VIDEO)
 class RenderVideo;
 #endif
@@ -170,6 +171,9 @@ class RenderLayerCompositor {
   // and
   // their parent document.
   static bool shouldPropagateCompositingToIFrameParent();
+
+  Element* enclosingIFrameElement() const;
+  static RenderLayerCompositor* iframeContentsCompositor(RenderIFrame*);
 
   void setRootPlatformLayerClippingBox(const IntRect& contentsBox);
 
