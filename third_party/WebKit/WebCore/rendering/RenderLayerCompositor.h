@@ -159,11 +159,11 @@ class RenderLayerCompositor {
   RootLayerAttachment rootLayerAttachment() const {
     return m_rootLayerAttachment;
   }
+  void updateRootLayerAttachment();
+  void updateRootLayerPosition();
 
   void didMoveOnscreen();
   void willMoveOffscreen();
-
-  void updateRootLayerPosition();
 
   void didStartAcceleratedAnimation();
 
@@ -183,7 +183,10 @@ class RenderLayerCompositor {
   bool shouldPropagateCompositingToEnclosingIFrame() const;
 
   Element* enclosingIFrameElement() const;
+
   static RenderLayerCompositor* iframeContentsCompositor(RenderIFrame*);
+  // Return true if the layers changed.
+  static bool parentIFrameContentLayers(RenderIFrame*);
 
   void setRootPlatformLayerClippingBox(const IntRect& contentsBox);
 
@@ -237,6 +240,8 @@ class RenderLayerCompositor {
 
   void attachRootPlatformLayer(RootLayerAttachment);
   void detachRootPlatformLayer();
+
+  void rootLayerAttachmentChanged();
 
   // Whether a running transition or animation enforces the need for a
   // compositing layer.

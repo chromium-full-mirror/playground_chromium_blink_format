@@ -231,14 +231,9 @@ void RenderLayerCompositor::updateCompositingLayers(
 
     // Host the document layer in the RenderView's root layer.
     if (updateRoot == rootRenderLayer()) {
-      if (childList.isEmpty()) {
-        detachRootPlatformLayer();
-        if (m_clippingLayer) {
-          m_clippingLayer->removeAllChildren();
-          m_clippingLayer = 0;
-        }
-        m_rootPlatformLayer = 0;
-      } else
+      if (childList.isEmpty())
+        destroyRootPlatformLayer();
+      else
         m_rootPlatformLayer->setChildren(childList);
     }
   } else if (needGeometryUpdate) {
@@ -320,6 +315,14 @@ bool RenderLayerCompositor::updateBacking(
     video->acceleratedRenderingStateChanged();
   }
 #endif
+
+  if (layerChanged && layer->renderer()->isRenderIFrame()) {
+    RenderLayerCompositor* innerCompositor =
+        iframeContentsCompositor(toRenderIFrame(layer->renderer()));
+    if (innerCompositor && innerCompositor->inCompositingMode())
+      innerCompositor->updateRootLayerAttachment();
+  }
+
   return layerChanged;
 }
 
@@ -339,7 +342,7 @@ bool RenderLayerCompositor::updateLayerCompositingState(
 
 void RenderLayerCompositor::repaintOnCompositingChange(RenderLayer* layer) {
   // If the renderer is not attached yet, no need to repaint.
-  if (!layer->renderer()->parent())
+  if (layer->renderer() != m_renderView && !layer->renderer()->parent())
     return;
 
   RenderBoxModelObject* repaintContainer =
@@ -822,22 +825,8 @@ void RenderLayerCompositor::rebuildCompositingLayerTree(
 
   if (layerBacking) {
     bool parented = false;
-    if (layer->renderer()->isRenderIFrame()) {
-      RenderLayerCompositor* innerCompositor =
-          iframeContentsCompositor(toRenderIFrame(layer->renderer()));
-      if (innerCompositor->inCompositingMode() &&
-          innerCompositor->rootLayerAttachment() ==
-              RootLayerAttachedViaEnclosingIframe) {
-        // This is an iframe parent. Make it the parent of the iframe document's
-        // root
-        layerBacking->parentForSublayers()->removeAllChildren();
-        GraphicsLayer* innerRootLayer = innerCompositor->rootPlatformLayer();
-        if (innerRootLayer) {
-          layerBacking->parentForSublayers()->addChild(innerRootLayer);
-          parented = true;
-        }
-      }
-    }
+    if (layer->renderer()->isRenderIFrame())
+      parented = parentIFrameContentLayers(toRenderIFrame(layer->renderer()));
 
     if (!parented)
       layerBacking->parentForSublayers()->setChildren(layerChildren);
@@ -864,6 +853,28 @@ RenderLayerCompositor* RenderLayerCompositor::iframeContentsCompositor(
       return view->compositor();
   }
   return 0;
+}
+
+bool RenderLayerCompositor::parentIFrameContentLayers(RenderIFrame* renderer) {
+  RenderLayerCompositor* innerCompositor = iframeContentsCompositor(renderer);
+  if (!innerCompositor || !innerCompositor->inCompositingMode() ||
+      innerCompositor->rootLayerAttachment() !=
+          RootLayerAttachedViaEnclosingIframe)
+    return false;
+
+  RenderLayer* layer = renderer->layer();
+  if (!layer->isComposited())
+    return false;
+
+  RenderLayerBacking* backing = layer->backing();
+  GraphicsLayer* hostingLayer = backing->parentForSublayers();
+  GraphicsLayer* rootLayer = innerCompositor->rootPlatformLayer();
+  if (hostingLayer->children().size() != 1 ||
+      hostingLayer->children()[0] != rootLayer) {
+    hostingLayer->removeAllChildren();
+    hostingLayer->addChild(rootLayer);
+  }
+  return true;
 }
 
 // This just updates layer geometry without changing the hierarchy.
@@ -1061,18 +1072,38 @@ bool RenderLayerCompositor::has3DContent() const {
 
 bool RenderLayerCompositor::shouldPropagateCompositingToEnclosingIFrame()
     const {
-// Parent document content needs to be able to render on top of a composited
-// iframe, so correct behavior
-// is to have the parent document become composited too. However, this can cause
-// problems on platforms that
-// use native views for frames (like Mac), so disable that behavior on those
-// platforms for now.
+  // Parent document content needs to be able to render on top of a composited
+  // iframe, so correct behavior
+  // is to have the parent document become composited too. However, this can
+  // cause problems on platforms that
+  // use native views for frames (like Mac), so disable that behavior on those
+  // platforms for now.
+  Element* ownerElement = enclosingIFrameElement();
+  RenderObject* renderer = ownerElement ? ownerElement->renderer() : 0;
+  if (!renderer || !renderer->isRenderIFrame())
+    return false;
+
 #if !PLATFORM(MAC)
-  if (Element* ownerElement = enclosingIFrameElement()) {
-    if (RenderObject* renderer = ownerElement->renderer())
-      return renderer->isRenderIFrame();
-  }
+  // On non-Mac platforms, let compositing propagate for all iframes.
+  return true;
 #endif
+
+  // On Mac, only propagate compositing if the iframe is overlapped in the
+  // parent
+  // document, or the parent is already compositing.
+  RenderIFrame* iframeRenderer = toRenderIFrame(renderer);
+  if (iframeRenderer->widget()) {
+    ASSERT(iframeRenderer->widget()->isFrameView());
+    FrameView* view = static_cast<FrameView*>(iframeRenderer->widget());
+    if (view->isOverlapped())
+      return true;
+
+    if (RenderView* view = iframeRenderer->view()) {
+      if (view->compositor()->inCompositingMode())
+        return true;
+    }
+  }
+
   return false;
 }
 
@@ -1306,16 +1337,25 @@ void RenderLayerCompositor::ensureRootPlatformLayer() {
           ? GraphicsLayer::CompositingCoordinatesTopDown
           : GraphicsLayer::compositingCoordinatesOrientation());
 
-  if (expectedAttachment == RootLayerAttachedViaEnclosingIframe &&
-      !m_clippingLayer) {
-    // Create a clipping layer if this is an iframe
-    m_clippingLayer = GraphicsLayer::create(0);
+  if (expectedAttachment == RootLayerAttachedViaEnclosingIframe) {
+    if (!m_clippingLayer) {
+      // Create a clipping layer if this is an iframe
+      m_clippingLayer = GraphicsLayer::create(0);
 #ifndef NDEBUG
-    m_clippingLayer->setName("iframe Clipping");
+      m_clippingLayer->setName("iframe Clipping");
 #endif
-    m_clippingLayer->setMasksToBounds(true);
-    m_clippingLayer->addChild(m_rootPlatformLayer.get());
+      m_clippingLayer->setMasksToBounds(true);
+      m_clippingLayer->addChild(m_rootPlatformLayer.get());
+    }
+  } else if (m_clippingLayer) {
+    m_clippingLayer->removeAllChildren();
+    m_clippingLayer->removeFromParent();
+    m_clippingLayer = 0;
   }
+
+  // Check to see if we have to change the attachment
+  if (m_rootLayerAttachment != RootLayerUnattached)
+    detachRootPlatformLayer();
 
   attachRootPlatformLayer(expectedAttachment);
 }
@@ -1325,6 +1365,10 @@ void RenderLayerCompositor::destroyRootPlatformLayer() {
     return;
 
   detachRootPlatformLayer();
+  if (m_clippingLayer) {
+    m_clippingLayer->removeAllChildren();
+    m_clippingLayer = 0;
+  }
   m_rootPlatformLayer = 0;
 }
 
@@ -1358,6 +1402,7 @@ void RenderLayerCompositor::attachRootPlatformLayer(
   }
 
   m_rootLayerAttachment = attachment;
+  rootLayerAttachmentChanged();
 }
 
 void RenderLayerCompositor::detachRootPlatformLayer() {
@@ -1369,6 +1414,10 @@ void RenderLayerCompositor::detachRootPlatformLayer() {
       // The layer will get unhooked up via
       // RenderLayerBacking::updateGraphicsLayerConfiguration()
       // for the iframe's renderer in the parent document.
+      if (m_clippingLayer)
+        m_clippingLayer->removeFromParent();
+      else
+        m_rootPlatformLayer->removeFromParent();
       m_renderView->document()->ownerElement()->setNeedsStyleRecalc(
           SyntheticStyleChange);
       break;
@@ -1386,6 +1435,20 @@ void RenderLayerCompositor::detachRootPlatformLayer() {
   }
 
   m_rootLayerAttachment = RootLayerUnattached;
+  rootLayerAttachmentChanged();
+}
+
+void RenderLayerCompositor::updateRootLayerAttachment() {
+  ensureRootPlatformLayer();
+}
+
+void RenderLayerCompositor::rootLayerAttachmentChanged() {
+  // The attachment can affect whether the RenderView layer's
+  // paintingGoesToWindow() behavior,
+  // so call updateGraphicsLayerGeometry() to udpate that.
+  RenderLayer* layer = m_renderView->layer();
+  if (RenderLayerBacking* backing = layer ? layer->backing() : 0)
+    backing->updateDrawsContent();
 }
 
 bool RenderLayerCompositor::layerHas3DContent(const RenderLayer* layer) const {
