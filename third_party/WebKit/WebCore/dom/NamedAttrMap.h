@@ -81,6 +81,8 @@ class NamedNodeMap : public RefCounted<NamedNodeMap> {
   }
   Attribute* getAttributeItem(const QualifiedName&) const;
 
+  void copyAttributesToVector(Vector<RefPtr<Attribute>>&);
+
   void shrinkToLength() { m_attributes.shrinkCapacity(length()); }
   void reserveInitialCapacity(unsigned capacity) {
     m_attributes.reserveInitialCapacity(capacity);
