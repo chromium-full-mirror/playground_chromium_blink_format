@@ -95,8 +95,8 @@ RenderLayerCompositor::RenderLayerCompositor(RenderView* renderView)
       m_showRepaintCounter(false),
       m_compositingConsultsOverlap(true),
       m_compositing(false),
-      m_rootLayerAttached(false),
-      m_compositingLayersNeedRebuild(false)
+      m_compositingLayersNeedRebuild(false),
+      m_rootLayerAttachment(RootLayerUnattached)
 #if PROFILE_LAYER_REBUILD
       ,
       m_rootLayerUpdateCount(0)
@@ -105,7 +105,7 @@ RenderLayerCompositor::RenderLayerCompositor(RenderView* renderView)
 }
 
 RenderLayerCompositor::~RenderLayerCompositor() {
-  ASSERT(!m_rootLayerAttached);
+  ASSERT(m_rootLayerAttachment == RootLayerUnattached);
 }
 
 void RenderLayerCompositor::enableCompositingMode(bool enable /* = true */) {
@@ -240,7 +240,11 @@ void RenderLayerCompositor::updateCompositingLayers(
     // Host the document layer in the RenderView's root layer.
     if (updateRoot == rootRenderLayer()) {
       if (childList.isEmpty()) {
-        willMoveOffscreen();
+        detachRootPlatformLayer();
+        if (m_clippingLayer) {
+          m_clippingLayer->removeAllChildren();
+          m_clippingLayer = 0;
+        }
         m_rootPlatformLayer = 0;
       } else
         m_rootPlatformLayer->setChildren(childList);
@@ -1030,56 +1034,14 @@ GraphicsLayer* RenderLayerCompositor::rootPlatformLayer() const {
 }
 
 void RenderLayerCompositor::didMoveOnscreen() {
-  if (!m_rootPlatformLayer)
-    return;
-
-  bool attached = false;
-  if (shouldPropagateCompositingToIFrameParent()) {
-    if (Element* ownerElement = enclosingIFrameElement()) {
-      // The layer will get hooked up via
-      // RenderLayerBacking::updateGraphicsLayerConfiguration()
-      // for the iframe's renderer in the parent document.
-      ownerElement->setNeedsStyleRecalc(SyntheticStyleChange);
-      attached = true;
-    }
-  }
-
-  if (!attached) {
-    Frame* frame = m_renderView->frameView()->frame();
-    Page* page = frame ? frame->page() : 0;
-    if (!page)
-      return;
-
-    page->chrome()->client()->attachRootGraphicsLayer(
-        frame, m_rootPlatformLayer.get());
-  }
-  m_rootLayerAttached = true;
+  RootLayerAttachment attachment = shouldPropagateCompositingToIFrameParent()
+                                       ? RootLayerAttachedViaEnclosingIframe
+                                       : RootLayerAttachedViaChromeClient;
+  attachRootPlatformLayer(attachment);
 }
 
 void RenderLayerCompositor::willMoveOffscreen() {
-  if (!m_rootPlatformLayer || !m_rootLayerAttached)
-    return;
-
-  bool detached = false;
-  if (shouldPropagateCompositingToIFrameParent()) {
-    if (Element* ownerElement = enclosingIFrameElement()) {
-      // The layer will get hooked up via
-      // RenderLayerBacking::updateGraphicsLayerConfiguration()
-      // for the iframe's renderer in the parent document.
-      ownerElement->setNeedsStyleRecalc(SyntheticStyleChange);
-      detached = true;
-    }
-  }
-
-  if (!detached) {
-    Frame* frame = m_renderView->frameView()->frame();
-    Page* page = frame ? frame->page() : 0;
-    if (!page)
-      return;
-
-    page->chrome()->client()->attachRootGraphicsLayer(frame, 0);
-  }
-  m_rootLayerAttached = false;
+  detachRootPlatformLayer();
 }
 
 void RenderLayerCompositor::updateRootLayerPosition() {
@@ -1314,29 +1276,35 @@ bool RenderLayerCompositor::needsContentsCompositingLayer(
 }
 
 void RenderLayerCompositor::ensureRootPlatformLayer() {
-  if (m_rootPlatformLayer)
+  RootLayerAttachment expectedAttachment =
+      (shouldPropagateCompositingToIFrameParent() && enclosingIFrameElement())
+          ? RootLayerAttachedViaEnclosingIframe
+          : RootLayerAttachedViaChromeClient;
+  if (expectedAttachment == m_rootLayerAttachment)
     return;
 
-  bool isHostedInIFrame =
-      shouldPropagateCompositingToIFrameParent() && enclosingIFrameElement();
-
-  m_rootPlatformLayer = GraphicsLayer::create(0);
+  if (!m_rootPlatformLayer) {
+    m_rootPlatformLayer = GraphicsLayer::create(0);
 #ifndef NDEBUG
-  m_rootPlatformLayer->setName("Root platform");
+    m_rootPlatformLayer->setName("Root platform");
 #endif
-  m_rootPlatformLayer->setSize(FloatSize(m_renderView->rightLayoutOverflow(),
-                                         m_renderView->bottomLayoutOverflow()));
-  m_rootPlatformLayer->setPosition(FloatPoint());
+    m_rootPlatformLayer->setSize(
+        FloatSize(m_renderView->rightLayoutOverflow(),
+                  m_renderView->bottomLayoutOverflow()));
+    m_rootPlatformLayer->setPosition(FloatPoint());
+
+    // Need to clip to prevent transformed content showing outside this frame
+    m_rootPlatformLayer->setMasksToBounds(true);
+  }
 
   // The root layer does flipping if we need it on this platform.
   m_rootPlatformLayer->setGeometryOrientation(
-      isHostedInIFrame ? GraphicsLayer::CompositingCoordinatesTopDown
-                       : GraphicsLayer::compositingCoordinatesOrientation());
+      expectedAttachment == RootLayerAttachedViaEnclosingIframe
+          ? GraphicsLayer::CompositingCoordinatesTopDown
+          : GraphicsLayer::compositingCoordinatesOrientation());
 
-  // Need to clip to prevent transformed content showing outside this frame
-  m_rootPlatformLayer->setMasksToBounds(true);
-
-  if (isHostedInIFrame) {
+  if (expectedAttachment == RootLayerAttachedViaEnclosingIframe &&
+      !m_clippingLayer) {
     // Create a clipping layer if this is an iframe
     m_clippingLayer = GraphicsLayer::create(0);
 #ifndef NDEBUG
@@ -1346,15 +1314,75 @@ void RenderLayerCompositor::ensureRootPlatformLayer() {
     m_clippingLayer->addChild(m_rootPlatformLayer.get());
   }
 
-  didMoveOnscreen();
+  attachRootPlatformLayer(expectedAttachment);
 }
 
 void RenderLayerCompositor::destroyRootPlatformLayer() {
   if (!m_rootPlatformLayer)
     return;
 
-  willMoveOffscreen();
+  detachRootPlatformLayer();
   m_rootPlatformLayer = 0;
+}
+
+void RenderLayerCompositor::attachRootPlatformLayer(
+    RootLayerAttachment attachment) {
+  if (!m_rootPlatformLayer)
+    return;
+
+  switch (attachment) {
+    case RootLayerUnattached:
+      ASSERT_NOT_REACHED();
+      break;
+    case RootLayerAttachedViaChromeClient: {
+      Frame* frame = m_renderView->frameView()->frame();
+      Page* page = frame ? frame->page() : 0;
+      if (!page)
+        return;
+
+      page->chrome()->client()->attachRootGraphicsLayer(
+          frame, m_rootPlatformLayer.get());
+      break;
+    }
+    case RootLayerAttachedViaEnclosingIframe: {
+      // The layer will get hooked up via
+      // RenderLayerBacking::updateGraphicsLayerConfiguration()
+      // for the iframe's renderer in the parent document.
+      m_renderView->document()->ownerElement()->setNeedsStyleRecalc(
+          SyntheticStyleChange);
+      break;
+    }
+  }
+
+  m_rootLayerAttachment = attachment;
+}
+
+void RenderLayerCompositor::detachRootPlatformLayer() {
+  if (!m_rootPlatformLayer || m_rootLayerAttachment == RootLayerUnattached)
+    return;
+
+  switch (m_rootLayerAttachment) {
+    case RootLayerAttachedViaEnclosingIframe: {
+      // The layer will get unhooked up via
+      // RenderLayerBacking::updateGraphicsLayerConfiguration()
+      // for the iframe's renderer in the parent document.
+      m_renderView->document()->ownerElement()->setNeedsStyleRecalc(
+          SyntheticStyleChange);
+      break;
+    }
+    case RootLayerAttachedViaChromeClient: {
+      Frame* frame = m_renderView->frameView()->frame();
+      Page* page = frame ? frame->page() : 0;
+      if (!page)
+        return;
+
+      page->chrome()->client()->attachRootGraphicsLayer(frame, 0);
+    } break;
+    case RootLayerUnattached:
+      break;
+  }
+
+  m_rootLayerAttachment = RootLayerUnattached;
 }
 
 bool RenderLayerCompositor::layerHas3DContent(const RenderLayer* layer) const {
