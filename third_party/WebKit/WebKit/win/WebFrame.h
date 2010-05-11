@@ -249,6 +249,11 @@ class DECLSPEC_UUID("{A3676398-4485-4a9d-87DC-CB5A40E6351D}") WebFrame
       /* [in] */ RECT rect,
       /* [in] */ OLE_HANDLE deviceContext);
 
+  virtual HRESULT STDMETHODCALLTYPE paintDocumentRectToContextAtPoint(
+      /* [in] */ RECT rect,
+      /* [in] */ POINT pt,
+      /* [in] */ OLE_HANDLE deviceContext);
+
   virtual HRESULT STDMETHODCALLTYPE elementDoesAutoComplete(
       /* [in] */ IDOMElement* element,
       /* [retval][out] */ BOOL* result);
