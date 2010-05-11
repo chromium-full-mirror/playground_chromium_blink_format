@@ -47,21 +47,6 @@ class RopeImpl : public StringImplBase {
     return 0;
   }
 
-  void initializeFiber(unsigned& index, Fiber fiber) {
-    m_fibers[index++] = fiber;
-    fiber->ref();
-    m_length += fiber->length();
-  }
-
-  unsigned fiberCount() { return m_fiberCount; }
-  Fiber& fibers(unsigned index) { return m_fibers[index]; }
-
-  ALWAYS_INLINE void deref() {
-    m_refCountAndFlags -= s_refCountIncrement;
-    if (!(m_refCountAndFlags & s_refCountMask))
-      destructNonRecursive();
-  }
-
   static bool isRope(Fiber fiber) { return !fiber->isStringImpl(); }
 
   static void deref(Fiber fiber) {
@@ -71,9 +56,24 @@ class RopeImpl : public StringImplBase {
       static_cast<UStringImpl*>(fiber)->deref();
   }
 
+  void initializeFiber(unsigned& index, Fiber fiber) {
+    m_fibers[index++] = fiber;
+    fiber->ref();
+    m_length += fiber->length();
+  }
+
+  unsigned fiberCount() { return m_size; }
+  Fiber* fibers() { return m_fibers; }
+
+  ALWAYS_INLINE void deref() {
+    m_refCountAndFlags -= s_refCountIncrement;
+    if (!(m_refCountAndFlags & s_refCountMask))
+      destructNonRecursive();
+  }
+
  private:
   RopeImpl(unsigned fiberCount)
-      : StringImplBase(ConstructNonStringImpl), m_fiberCount(fiberCount) {}
+      : StringImplBase(ConstructNonStringImpl), m_size(fiberCount) {}
 
   void destructNonRecursive();
   void derefFibersNonRecursive(Vector<RopeImpl*, 32>& workQueue);
@@ -82,7 +82,7 @@ class RopeImpl : public StringImplBase {
     return (m_refCountAndFlags & s_refCountMask) == s_refCountIncrement;
   }
 
-  unsigned m_fiberCount;
+  unsigned m_size;
   Fiber m_fibers[1];
 };
 }
