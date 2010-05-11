@@ -64,6 +64,10 @@ void WebInputElement::setActivatedSubmit(bool activated) {
   unwrap<HTMLInputElement>()->setActivatedSubmit(activated);
 }
 
+int WebInputElement::size() const {
+  return constUnwrap<HTMLInputElement>()->size();
+}
+
 void WebInputElement::setValue(const WebString& value) {
   unwrap<HTMLInputElement>()->setValue(value);
 }
