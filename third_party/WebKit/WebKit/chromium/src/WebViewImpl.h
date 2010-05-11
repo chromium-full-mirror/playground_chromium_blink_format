@@ -289,6 +289,12 @@ class WebViewImpl : public WebView, public RefCounted<WebViewImpl> {
 
   WebCore::PopupContainer* selectPopup() const { return m_selectPopup.get(); }
 
+  // Returns true if the event leads to scrolling.
+  static bool mapKeyCodeForScroll(
+      int keyCode,
+      WebCore::ScrollDirection* scrollDirection,
+      WebCore::ScrollGranularity* scrollGranularity);
+
  private:
   friend class WebView;  // So WebView::Create can call our constructor
   friend class WTF::RefCounted<WebViewImpl>;
