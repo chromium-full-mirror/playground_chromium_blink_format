@@ -141,6 +141,7 @@ class HTMLInputElement : public HTMLTextFormControlElement,
            m_type == DATETIMELOCAL || m_type == MONTH || m_type == TIME ||
            m_type == WEEK;
   }
+  virtual bool canTriggerImplicitSubmission() const { return isTextField(); }
 
   bool checked() const { return m_checked; }
   void setChecked(bool, bool sendChangeEvent = false);

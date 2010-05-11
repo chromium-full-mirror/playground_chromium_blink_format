@@ -93,7 +93,7 @@ class HTMLFormElement : public HTMLElement {
 
   virtual bool isURLAttribute(Attribute*) const;
 
-  void submitImplicitly(Event*, bool fromTextField);
+  void submitImplicitly(Event*, bool fromImplicitSubmissionTrigger);
   bool formWouldHaveSecureSubmission(const String& url);
 
   String name() const;
