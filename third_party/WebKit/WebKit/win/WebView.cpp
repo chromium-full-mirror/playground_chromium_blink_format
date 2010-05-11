@@ -1088,7 +1088,7 @@ void WebView::paintIntoBackingStore(FrameView* frameView,
 
 #if FLASH_BACKING_STORE_REDRAW
   HDC dc = ::GetDC(m_viewWindow);
-  OwnPtr<HBRUSH> yellowBrush = CreateSolidBrush(RGB(255, 255, 0));
+  OwnPtr<HBRUSH> yellowBrush(CreateSolidBrush(RGB(255, 255, 0)));
   FillRect(dc, &rect, yellowBrush.get());
   GdiFlush();
   Sleep(50);
