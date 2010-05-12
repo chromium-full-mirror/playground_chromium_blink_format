@@ -27,6 +27,7 @@
 #if ENABLE(SVG)
 #include "SVGPathSegList.h"
 
+#include "FloatConversion.h"
 #include "FloatPoint.h"
 #include "Path.h"
 #include "PathTraversalState.h"
@@ -48,7 +49,7 @@ SVGPathSegList::SVGPathSegList(const QualifiedName& attributeName)
 
 SVGPathSegList::~SVGPathSegList() {}
 
-unsigned SVGPathSegList::getPathSegAtLength(double, ExceptionCode& ec) {
+unsigned SVGPathSegList::getPathSegAtLength(double length, ExceptionCode& ec) {
   // FIXME : to be useful this will need to support non-normalized
   // SVGPathSegLists
   int len = numberOfItems();
@@ -56,6 +57,7 @@ unsigned SVGPathSegList::getPathSegAtLength(double, ExceptionCode& ec) {
   // until then PathTraversalState is less useful as we could just use locals
   PathTraversalState traversalState(
       PathTraversalState::TraversalSegmentAtLength);
+  traversalState.m_desiredLength = narrowPrecisionToFloat(length);
   for (int i = 0; i < len; ++i) {
     SVGPathSeg* segment = getItem(i, ec).get();
     if (ec)
@@ -96,14 +98,17 @@ unsigned SVGPathSegList::getPathSegAtLength(double, ExceptionCode& ec) {
     traversalState.m_totalLength += segmentLength;
     if ((traversalState.m_action ==
          PathTraversalState::TraversalSegmentAtLength) &&
-        (traversalState.m_totalLength > traversalState.m_desiredLength)) {
+        (traversalState.m_totalLength >= traversalState.m_desiredLength)) {
       return traversalState.m_segmentIndex;
     }
     traversalState.m_segmentIndex++;
   }
 
-  return 0;  // The SVG spec is unclear as to what to return when the distance
-             // is not on the path
+  // The SVG spec is unclear as to what to return when the distance is not on
+  // the path.
+  // WebKit/Opera/FF all return the last path segment if the distance exceeds
+  // the actual path length:
+  return traversalState.m_segmentIndex ? traversalState.m_segmentIndex - 1 : 0;
 }
 
 Path SVGPathSegList::toPathData() {
