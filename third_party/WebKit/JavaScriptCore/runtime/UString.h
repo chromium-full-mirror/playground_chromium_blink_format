@@ -134,6 +134,8 @@ class UString {
     return m_rep->cost();
   }
 
+  ALWAYS_INLINE ~UString() {}
+
  private:
   RefPtr<Rep> m_rep;
 

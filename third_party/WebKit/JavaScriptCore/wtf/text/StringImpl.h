@@ -165,9 +165,9 @@ class StringImpl : public StringImplBase {
   static PassRefPtr<StringImpl> create(const UChar*,
                                        unsigned length,
                                        PassRefPtr<SharedUChar> sharedBuffer);
-  static PassRefPtr<StringImpl> create(PassRefPtr<StringImpl> rep,
-                                       unsigned offset,
-                                       unsigned length) {
+  static ALWAYS_INLINE PassRefPtr<StringImpl> create(PassRefPtr<StringImpl> rep,
+                                                     unsigned offset,
+                                                     unsigned length) {
     ASSERT(rep);
     ASSERT(length <= rep->length());
 
@@ -182,8 +182,9 @@ class StringImpl : public StringImplBase {
 
   static PassRefPtr<StringImpl> createUninitialized(unsigned length,
                                                     UChar*& data);
-  static PassRefPtr<StringImpl> tryCreateUninitialized(unsigned length,
-                                                       UChar*& output) {
+  static ALWAYS_INLINE PassRefPtr<StringImpl> tryCreateUninitialized(
+      unsigned length,
+      UChar*& output) {
     if (!length) {
       output = 0;
       return empty();
