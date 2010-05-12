@@ -265,6 +265,10 @@ class ChromiumBridge {
                             int state,
                             int classicState,
                             const IntRect&);
+  static void paintProgressBar(GraphicsContext*,
+                               const IntRect& barRect,
+                               int valuePart,
+                               const IntRect& valueRect);
 #endif
 
   // Trace Event --------------------------------------------------------

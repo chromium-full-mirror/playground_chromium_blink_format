@@ -34,8 +34,9 @@ class RenderProgress : public RenderBlock {
   RenderProgress(HTMLProgressElement*);
   virtual ~RenderProgress();
 
-  double position() { return m_position; }
-  double animationProgress();
+  double position() const { return m_position; }
+  double animationProgress() const;
+  bool isDeterminate() const;
 
   HTMLProgressElement* progressElement() const;
 

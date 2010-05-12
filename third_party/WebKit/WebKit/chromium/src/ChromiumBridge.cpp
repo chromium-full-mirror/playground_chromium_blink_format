@@ -645,6 +645,14 @@ void ChromiumBridge::paintTrackbar(GraphicsContext* gc,
                                                part, state, classicState, rect);
 }
 
+void ChromiumBridge::paintProgressBar(GraphicsContext* gc,
+                                      const IntRect& barRect,
+                                      int valuePart,
+                                      const IntRect& valueRect) {
+  webKitClient()->themeEngine()->paintProgressBar(
+      gc->platformContext()->canvas(), barRect, valuePart, valueRect);
+}
+
 #endif
 
 // Trace Event ----------------------------------------------------------------

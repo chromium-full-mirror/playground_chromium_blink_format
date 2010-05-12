@@ -102,6 +102,17 @@ class RenderThemeChromiumWin : public RenderThemeChromiumSkia {
   // ugliness of this hack.
   static void setDefaultFontSize(int);
 
+#if ENABLE(PROGRESS_TAG)
+  virtual double animationRepeatIntervalForProgressBar(RenderProgress*) const;
+  virtual double animationDurationForProgressBar(RenderProgress*) const;
+  virtual void adjustProgressBarStyle(CSSStyleSelector*,
+                                      RenderStyle*,
+                                      Element*) const;
+  virtual bool paintProgressBar(RenderObject*,
+                                const RenderObject::PaintInfo&,
+                                const IntRect&);
+#endif
+
  protected:
   virtual double caretBlinkIntervalInternal() const;
 
