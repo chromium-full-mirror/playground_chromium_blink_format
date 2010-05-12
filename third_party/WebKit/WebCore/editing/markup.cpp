@@ -414,8 +414,11 @@ static void appendStartMarkup(
     case Node::TEXT_NODE: {
       if (Node* parent = node->parentNode()) {
         if (parent->hasTagName(scriptTag) || parent->hasTagName(styleTag) ||
-            parent->hasTagName(textareaTag) || parent->hasTagName(xmpTag)) {
+            parent->hasTagName(xmpTag)) {
           appendUCharRange(result, ucharRange(node, range));
+          break;
+        } else if (parent->hasTagName(textareaTag)) {
+          appendEscapedContent(result, ucharRange(node, range), documentIsHTML);
           break;
         }
       }
