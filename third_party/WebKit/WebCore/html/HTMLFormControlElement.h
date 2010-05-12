@@ -132,6 +132,8 @@ class HTMLFormControlElement : public HTMLElement {
   virtual void dispatchFocusEvent();
   virtual void dispatchBlurEvent();
 
+  bool isLabelable() const;
+
  protected:
   void removeFromForm();
   // This must be called any time the result of willValidate() has changed.

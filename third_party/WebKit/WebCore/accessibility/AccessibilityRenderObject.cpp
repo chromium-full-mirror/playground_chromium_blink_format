@@ -1237,7 +1237,7 @@ static HTMLLabelElement* labelForElement(Element* element) {
   for (unsigned i = 0; i < len; i++) {
     if (list->item(i)->hasTagName(labelTag)) {
       HTMLLabelElement* label = static_cast<HTMLLabelElement*>(list->item(i));
-      if (label->correspondingControl() == element)
+      if (label->control() == element)
         return label;
     }
   }
@@ -2881,7 +2881,7 @@ AccessibilityRenderObject::correspondingControlForLabelElement() const {
   if (!labelElement)
     return 0;
 
-  HTMLElement* correspondingControl = labelElement->correspondingControl();
+  HTMLElement* correspondingControl = labelElement->control();
   if (!correspondingControl)
     return 0;
 
