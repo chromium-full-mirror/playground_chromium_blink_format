@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2003, 2006 Apple Computer, Inc.
+ * Copyright (C) 2003, 2006, 2010 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -32,23 +32,10 @@ class EllipsisBox : public InlineBox {
   EllipsisBox(RenderObject* obj,
               const AtomicString& ellipsisStr,
               InlineFlowBox* parent,
-              int width,
-              int height,
-              int y,
+              const IntRect& frameRect,
               bool firstLine,
               InlineBox* markupBox)
-      : InlineBox(obj,
-                  0,
-                  y,
-                  width,
-                  firstLine,
-                  true,
-                  false,
-                  false,
-                  0,
-                  0,
-                  parent),
-        m_height(height),
+      : InlineBox(obj, frameRect, firstLine, true, false, false, 0, 0, parent),
         m_str(ellipsisStr),
         m_markupBox(markupBox),
         m_selectionState(RenderObject::SelectionNone) {}
@@ -66,7 +53,6 @@ class EllipsisBox : public InlineBox {
   IntRect selectionRect(int tx, int ty);
 
  private:
-  virtual int height() const { return m_height; }
   virtual RenderObject::SelectionState selectionState() {
     return m_selectionState;
   }
@@ -76,7 +62,6 @@ class EllipsisBox : public InlineBox {
                       RenderStyle*,
                       const Font&);
 
-  int m_height;
   AtomicString m_str;
   InlineBox* m_markupBox;
   RenderObject::SelectionState m_selectionState;

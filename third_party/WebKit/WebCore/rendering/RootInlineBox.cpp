@@ -87,10 +87,11 @@ void RootInlineBox::placeEllipsis(const AtomicString& ellipsisStr,
                                   int ellipsisWidth,
                                   InlineBox* markupBox) {
   // Create an ellipsis box.
-  EllipsisBox* ellipsisBox = new (renderer()->renderArena())
-      EllipsisBox(renderer(), ellipsisStr, this,
-                  ellipsisWidth - (markupBox ? markupBox->width() : 0),
-                  height(), y(), !prevRootBox(), markupBox);
+  EllipsisBox* ellipsisBox = new (renderer()->renderArena()) EllipsisBox(
+      renderer(), ellipsisStr, this,
+      IntRect(0, y(), ellipsisWidth - (markupBox ? markupBox->width() : 0),
+              height()),
+      !prevRootBox(), markupBox);
 
   if (!gEllipsisBoxMap)
     gEllipsisBoxMap = new EllipsisBoxMap();
@@ -99,7 +100,7 @@ void RootInlineBox::placeEllipsis(const AtomicString& ellipsisStr,
 
   // FIXME: Do we need an RTL version of this?
   if (ltr && (x() + width() + ellipsisWidth) <= blockRightEdge) {
-    ellipsisBox->m_x = x() + width();
+    ellipsisBox->setX(right());
     return;
   }
 
@@ -109,8 +110,8 @@ void RootInlineBox::placeEllipsis(const AtomicString& ellipsisStr,
   // not painting (as being
   // truncated).
   bool foundBox = false;
-  ellipsisBox->m_x = placeEllipsisBox(ltr, blockLeftEdge, blockRightEdge,
-                                      ellipsisWidth, foundBox);
+  ellipsisBox->setX(placeEllipsisBox(ltr, blockLeftEdge, blockRightEdge,
+                                     ellipsisWidth, foundBox));
 }
 
 int RootInlineBox::placeEllipsisBox(bool ltr,
@@ -156,7 +157,7 @@ void RootInlineBox::addHighlightOverflow() {
   setVerticalOverflowPositions(
       topLayoutOverflow(), bottomLayoutOverflow(),
       min(topVisualOverflow(), inflatedRect.y()),
-      max(bottomVisualOverflow(), inflatedRect.bottom()), height());
+      max(bottomVisualOverflow(), inflatedRect.bottom()));
 }
 
 void RootInlineBox::paintCustomHighlight(RenderObject::PaintInfo& paintInfo,
@@ -407,7 +408,7 @@ static bool isEditableLeaf(InlineBox* leaf) {
          leaf->renderer()->node()->isContentEditable();
 }
 
-InlineBox* RootInlineBox::closestLeafChildForXPos(int x,
+InlineBox* RootInlineBox::closestLeafChildForXPos(int xPos,
                                                   bool onlyEditableLeaves) {
   InlineBox* firstLeaf = firstLeafChild();
   InlineBox* lastLeaf = lastLeafChild();
@@ -416,14 +417,13 @@ InlineBox* RootInlineBox::closestLeafChildForXPos(int x,
     return firstLeaf;
 
   // Avoid returning a list marker when possible.
-  if (x <= firstLeaf->m_x && !firstLeaf->renderer()->isListMarker() &&
+  if (xPos <= firstLeaf->x() && !firstLeaf->renderer()->isListMarker() &&
       (!onlyEditableLeaves || isEditableLeaf(firstLeaf)))
     // The x coordinate is less or equal to left edge of the firstLeaf.
     // Return it.
     return firstLeaf;
 
-  if (x >= lastLeaf->m_x + lastLeaf->m_width &&
-      !lastLeaf->renderer()->isListMarker() &&
+  if (xPos >= lastLeaf->right() && !lastLeaf->renderer()->isListMarker() &&
       (!onlyEditableLeaves || isEditableLeaf(lastLeaf)))
     // The x coordinate is greater or equal to right edge of the lastLeaf.
     // Return it.
@@ -434,7 +434,7 @@ InlineBox* RootInlineBox::closestLeafChildForXPos(int x,
     if (!leaf->renderer()->isListMarker() &&
         (!onlyEditableLeaves || isEditableLeaf(leaf))) {
       closestLeaf = leaf;
-      if (x < leaf->m_x + leaf->m_width)
+      if (xPos < leaf->right())
         // The x coordinate is less than the right edge of the box.
         // Return it.
         return leaf;

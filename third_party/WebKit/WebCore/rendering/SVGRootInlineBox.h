@@ -41,12 +41,9 @@ struct SVGLastGlyphInfo;
 
 class SVGRootInlineBox : public RootInlineBox, protected SVGRenderBase {
  public:
-  SVGRootInlineBox(RenderObject* obj) : RootInlineBox(obj), m_height(0) {}
+  SVGRootInlineBox(RenderObject* obj) : RootInlineBox(obj) {}
 
   virtual bool isSVGRootInlineBox() { return true; }
-
-  virtual int virtualHeight() const { return m_height; }
-  void setHeight(int h) { m_height = h; }
 
   virtual void paint(RenderObject::PaintInfo&, int tx, int ty);
 
@@ -94,7 +91,6 @@ class SVGRootInlineBox : public RootInlineBox, protected SVGRenderBase {
       RenderObject* start);
 
  private:
-  int m_height;
   Vector<SVGChar> m_svgChars;
   Vector<SVGTextChunk> m_svgTextChunks;
 };
