@@ -74,6 +74,7 @@ class WebGeolocationServiceBridgeImpl : public GeolocationServiceBridge,
   virtual void suspend();
   virtual void resume();
   virtual int getBridgeId() const;
+  virtual void attachBridgeIfNeeded();
 
   // WebGeolocationServiceBridge
   virtual void setIsAllowed(bool allowed);
@@ -106,14 +107,7 @@ GeolocationServiceBridge* createGeolocationServiceBridgeImpl(
 
 WebGeolocationServiceBridgeImpl::WebGeolocationServiceBridgeImpl(
     GeolocationServiceChromium* geolocationServiceChromium)
-    : m_GeolocationServiceChromium(geolocationServiceChromium) {
-  // We need to attach ourselves here: Geolocation calls
-  // requestPermissionForFrame()
-  // directly, and we need to be attached so that the embedder can call
-  // our setIsAllowed().
-  m_bridgeId = getWebViewClient()->geolocationService()->attachBridge(this);
-  ASSERT(m_bridgeId);
-}
+    : m_GeolocationServiceChromium(geolocationServiceChromium), m_bridgeId(0) {}
 
 WebGeolocationServiceBridgeImpl::~WebGeolocationServiceBridgeImpl() {
   WebKit::WebViewClient* webViewClient = getWebViewClient();
@@ -128,8 +122,7 @@ WebGeolocationServiceBridgeImpl::~WebGeolocationServiceBridgeImpl() {
 
 bool WebGeolocationServiceBridgeImpl::startUpdating(
     PositionOptions* positionOptions) {
-  if (!m_bridgeId)
-    m_bridgeId = getWebViewClient()->geolocationService()->attachBridge(this);
+  attachBridgeIfNeeded();
   getWebViewClient()->geolocationService()->startUpdating(
       m_bridgeId, m_GeolocationServiceChromium->frame()->document()->url(),
       positionOptions->enableHighAccuracy());
@@ -157,6 +150,11 @@ void WebGeolocationServiceBridgeImpl::resume() {
 
 int WebGeolocationServiceBridgeImpl::getBridgeId() const {
   return m_bridgeId;
+}
+
+void WebGeolocationServiceBridgeImpl::attachBridgeIfNeeded() {
+  if (!m_bridgeId)
+    m_bridgeId = getWebViewClient()->geolocationService()->attachBridge(this);
 }
 
 void WebGeolocationServiceBridgeImpl::setIsAllowed(bool allowed) {

@@ -658,6 +658,7 @@ void ChromeClientImpl::requestGeolocationPermissionForFrame(
   GeolocationServiceChromium* geolocationService =
       static_cast<GeolocationServiceChromium*>(
           geolocation->getGeolocationService());
+  geolocationService->geolocationServiceBridge()->attachBridgeIfNeeded();
   m_webView->client()->geolocationService()->requestPermissionForFrame(
       geolocationService->geolocationServiceBridge()->getBridgeId(),
       frame->document()->url());
