@@ -146,7 +146,7 @@ class String {
     return StringImpl::adopt(vector);
   }
 
-  unsigned length() const {
+  ALWAYS_INLINE unsigned length() const {
     if (!m_impl)
       return 0;
     return m_impl->length();
@@ -320,7 +320,7 @@ class String {
   String threadsafeCopy() const;
 
   bool isNull() const { return !m_impl; }
-  bool isEmpty() const { return !m_impl || !m_impl->length(); }
+  ALWAYS_INLINE bool isEmpty() const { return !m_impl || !m_impl->length(); }
 
   StringImpl* impl() const { return m_impl.get(); }
 

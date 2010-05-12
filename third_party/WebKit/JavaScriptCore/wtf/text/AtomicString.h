@@ -137,7 +137,7 @@ class AtomicString {
                                     unsigned length,
                                     unsigned existingHash);
   static PassRefPtr<StringImpl> add(const UChar*);
-  PassRefPtr<StringImpl> add(StringImpl* r) {
+  ALWAYS_INLINE PassRefPtr<StringImpl> add(StringImpl* r) {
     if (!r || r->isAtomic())
       return r;
     return addSlowCase(r);
