@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006, 2007, 2008, 2009 Apple Inc. All rights reserved.
+ * Copyright (C) 2006, 2007, 2008, 2009, 2010 Apple Inc. All rights reserved.
  * Copyright (C) 2008 Nokia Corporation and/or its subsidiary(-ies)
  * Copyright (C) 2008, 2009 Torch Mobile Inc. All rights reserved.
  * (http://www.torchmobile.com/)
@@ -54,18 +54,16 @@ class ScheduledNavigation : public Noncopyable {
   ScheduledNavigation(double delay,
                       bool lockHistory,
                       bool lockBackForwardList,
-                      bool wasDuringLoad)
+                      bool wasDuringLoad,
+                      bool isLocationChange)
       : m_delay(delay),
         m_lockHistory(lockHistory),
         m_lockBackForwardList(lockBackForwardList),
-        m_wasDuringLoad(wasDuringLoad) {}
+        m_wasDuringLoad(wasDuringLoad),
+        m_isLocationChange(isLocationChange) {}
   virtual ~ScheduledNavigation() {}
 
   virtual void fire(Frame*) = 0;
-
-  // This method feels a bit like RTTI, but I don't see a cleaner way to get the
-  // behavior we want.
-  virtual bool isLocationChange() const { return true; }
 
   virtual bool shouldStartTimer(Frame*) { return true; }
   virtual void didStartTimer(Frame*, Timer<RedirectScheduler>*) {}
@@ -75,12 +73,14 @@ class ScheduledNavigation : public Noncopyable {
   bool lockHistory() const { return m_lockHistory; }
   bool lockBackForwardList() const { return m_lockBackForwardList; }
   bool wasDuringLoad() const { return m_wasDuringLoad; }
+  bool isLocationChange() const { return m_isLocationChange; }
 
  private:
   double m_delay;
   bool m_lockHistory;
   bool m_lockBackForwardList;
   bool m_wasDuringLoad;
+  bool m_isLocationChange;
 };
 
 class ScheduledURLNavigation : public ScheduledNavigation {
@@ -91,11 +91,13 @@ class ScheduledURLNavigation : public ScheduledNavigation {
                          bool lockHistory,
                          bool lockBackForwardList,
                          bool wasUserGesture,
-                         bool duringLoad)
+                         bool duringLoad,
+                         bool isLocationChange)
       : ScheduledNavigation(delay,
                             lockHistory,
                             lockBackForwardList,
-                            duringLoad),
+                            duringLoad,
+                            isLocationChange),
         m_url(url),
         m_referrer(referrer),
         m_wasUserGesture(wasUserGesture),
@@ -146,9 +148,9 @@ class ScheduledRedirect : public ScheduledURLNavigation {
                                lockHistory,
                                lockBackForwardList,
                                wasUserGesture,
+                               false,
                                false) {}
 
-  virtual bool isLocationChange() const { return false; }
   virtual bool shouldStartTimer(Frame* frame) {
     return frame->loader()->allAncestorsAreComplete();
   }
@@ -168,7 +170,8 @@ class ScheduledLocationChange : public ScheduledURLNavigation {
                                lockHistory,
                                lockBackForwardList,
                                wasUserGesture,
-                               duringLoad) {}
+                               duringLoad,
+                               true) {}
 };
 
 class ScheduledRefresh : public ScheduledURLNavigation {
@@ -182,7 +185,8 @@ class ScheduledRefresh : public ScheduledURLNavigation {
                                true,
                                true,
                                wasUserGesture,
-                               false) {}
+                               false,
+                               true) {}
 
   virtual void fire(Frame* frame) {
     frame->loader()->changeLocation(KURL(ParsedURLString, url()), referrer(),
@@ -194,7 +198,7 @@ class ScheduledRefresh : public ScheduledURLNavigation {
 class ScheduledHistoryNavigation : public ScheduledNavigation {
  public:
   explicit ScheduledHistoryNavigation(int historySteps)
-      : ScheduledNavigation(0, false, false, false),
+      : ScheduledNavigation(0, false, false, false, true),
         m_historySteps(historySteps) {}
 
   virtual void fire(Frame* frame) {
@@ -222,7 +226,11 @@ class ScheduledFormSubmission : public ScheduledNavigation {
                           PassRefPtr<Event> event,
                           PassRefPtr<FormState> formState,
                           bool duringLoad)
-      : ScheduledNavigation(0, lockHistory, lockBackForwardList, duringLoad),
+      : ScheduledNavigation(0,
+                            lockHistory,
+                            lockBackForwardList,
+                            duringLoad,
+                            true),
         m_frameRequest(frameRequest),
         m_event(event),
         m_formState(formState),
@@ -271,6 +279,10 @@ RedirectScheduler::~RedirectScheduler() {}
 
 bool RedirectScheduler::redirectScheduledDuringLoad() {
   return m_redirect && m_redirect->wasDuringLoad();
+}
+
+bool RedirectScheduler::locationChangePending() {
+  return m_redirect && m_redirect->isLocationChange();
 }
 
 void RedirectScheduler::clear() {
@@ -385,12 +397,6 @@ void RedirectScheduler::scheduleRefresh(bool wasUserGesture) {
 
   schedule(new ScheduledRefresh(
       url.string(), m_frame->loader()->outgoingReferrer(), wasUserGesture));
-}
-
-bool RedirectScheduler::locationChangePending() {
-  if (!m_redirect)
-    return false;
-  return m_redirect->isLocationChange();
 }
 
 void RedirectScheduler::scheduleHistoryNavigation(int steps) {
