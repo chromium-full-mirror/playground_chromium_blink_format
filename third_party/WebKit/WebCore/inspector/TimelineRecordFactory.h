@@ -79,6 +79,9 @@ class TimelineRecordFactory {
                                                     bool isMainResource,
                                                     const ResourceRequest&);
 
+  static ScriptObject createScheduleResourceRequestData(InspectorFrontend*,
+                                                        const String&);
+
   static ScriptObject createResourceReceiveResponseData(
       InspectorFrontend*,
       unsigned long identifier,

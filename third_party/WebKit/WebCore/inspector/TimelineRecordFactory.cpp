@@ -145,6 +145,14 @@ ScriptObject TimelineRecordFactory::createMarkTimelineData(
   return data;
 }
 
+ScriptObject TimelineRecordFactory::createScheduleResourceRequestData(
+    InspectorFrontend* frontend,
+    const String& url) {
+  ScriptObject data = frontend->newScriptObject();
+  data.set("url", url);
+  return data;
+}
+
 ScriptObject TimelineRecordFactory::createResourceSendRequestData(
     InspectorFrontend* frontend,
     unsigned long identifier,
