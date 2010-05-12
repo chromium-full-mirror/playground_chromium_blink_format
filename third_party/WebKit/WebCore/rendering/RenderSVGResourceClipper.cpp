@@ -21,6 +21,7 @@
  */
 
 #include "config.h"
+#if ENABLE(SVG)
 #include "RenderSVGResourceClipper.h"
 
 #include "AffineTransform.h"
@@ -321,3 +322,5 @@ FloatRect RenderSVGResourceClipper::resourceBoundingBox(
   return m_clipBoundaries;
 }
 }
+
+#endif  // ENABLE(SVG)

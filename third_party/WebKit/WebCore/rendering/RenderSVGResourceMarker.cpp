@@ -21,6 +21,7 @@
  */
 
 #include "config.h"
+#if ENABLE(SVG)
 #include "RenderSVGResourceMarker.h"
 
 #include "GraphicsContext.h"
@@ -200,3 +201,5 @@ void RenderSVGResourceMarker::calcViewport() {
   m_viewport = FloatRect(0, 0, w, h);
 }
 }
+
+#endif  // ENABLE(SVG)
