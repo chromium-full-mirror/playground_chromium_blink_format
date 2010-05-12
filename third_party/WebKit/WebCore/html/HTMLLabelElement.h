@@ -25,6 +25,7 @@
 #define HTMLLabelElement_h
 
 #include "HTMLElement.h"
+#include "HTMLFormControlElement.h"
 
 namespace WebCore {
 
@@ -46,7 +47,7 @@ class HTMLLabelElement : public HTMLElement {
   // Overridden to either click() or focus() the corresponding control.
   virtual void defaultEventHandler(Event*);
 
-  HTMLElement* control();
+  HTMLFormControlElement* control();
 
   String accessKey() const;
   void setAccessKey(const String&);

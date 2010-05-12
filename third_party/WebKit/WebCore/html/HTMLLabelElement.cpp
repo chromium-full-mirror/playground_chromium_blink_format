@@ -60,7 +60,7 @@ bool HTMLLabelElement::isFocusable() const {
   return false;
 }
 
-HTMLElement* HTMLLabelElement::control() {
+HTMLFormControlElement* HTMLLabelElement::control() {
   const AtomicString& controlId = getAttribute(forAttr);
   if (controlId.isNull()) {
     // Search the children and descendants of the label element for a form
