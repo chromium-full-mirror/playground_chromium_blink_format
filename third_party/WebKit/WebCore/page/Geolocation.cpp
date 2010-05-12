@@ -223,8 +223,6 @@ void Geolocation::disconnectFrame() {
 }
 
 Geoposition* Geolocation::lastPosition() {
-  ASSERT(isAllowed());
-
 #if ENABLE(CLIENT_BASED_GEOLOCATION)
   if (!m_frame)
     return 0;
@@ -536,8 +534,8 @@ void Geolocation::requestPermission() {
   page->chrome()->requestGeolocationPermissionForFrame(m_frame, this);
 }
 
-void Geolocation::positionChanged(PassRefPtr<Geoposition> newPosition) {
-  m_positionCache->setCachedPosition(newPosition.get());
+void Geolocation::positionChangedInternal() {
+  m_positionCache->setCachedPosition(lastPosition());
 
   // Stop all currently running timers.
   stopTimers();
@@ -578,8 +576,8 @@ void Geolocation::makeSuccessCallbacks() {
 
 #if ENABLE(CLIENT_BASED_GEOLOCATION)
 
-void Geolocation::setPosition(GeolocationPosition* position) {
-  positionChanged(createGeoposition(position));
+void Geolocation::positionChanged() {
+  positionChangedInternal();
 }
 
 void Geolocation::setError(GeolocationError* error) {
@@ -594,7 +592,7 @@ void Geolocation::geolocationServicePositionChanged(
   ASSERT_UNUSED(service, service == m_service);
   ASSERT(m_service->lastPosition());
 
-  positionChanged(m_service->lastPosition());
+  positionChangedInternal();
 }
 
 void Geolocation::geolocationServiceErrorOccurred(GeolocationService* service) {

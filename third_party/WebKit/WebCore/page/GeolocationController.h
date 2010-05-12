@@ -57,6 +57,7 @@ class GeolocationController : public Noncopyable {
   Page* m_page;
   GeolocationControllerClient* m_client;
 
+  RefPtr<GeolocationPosition> m_lastPosition;
   HashSet<RefPtr<Geolocation>> m_observers;
 };
 
