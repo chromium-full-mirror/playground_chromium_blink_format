@@ -58,9 +58,9 @@ struct FontPlatformDataCacheKey : FastAllocBase {
       bool italic = false,
       bool isPrinterFont = false,
       FontRenderingMode renderingMode = NormalRenderingMode)
-      : m_family(family),
-        m_size(size),
+      : m_size(size),
         m_weight(weight),
+        m_family(family),
         m_italic(italic),
         m_printerFont(isPrinterFont),
         m_renderingMode(renderingMode) {}
@@ -78,9 +78,9 @@ struct FontPlatformDataCacheKey : FastAllocBase {
            m_renderingMode == other.m_renderingMode;
   }
 
-  AtomicString m_family;
   unsigned m_size;
   unsigned m_weight;
+  AtomicString m_family;
   bool m_italic;
   bool m_printerFont;
   FontRenderingMode m_renderingMode;
