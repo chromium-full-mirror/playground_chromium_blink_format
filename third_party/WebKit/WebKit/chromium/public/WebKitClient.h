@@ -149,8 +149,7 @@ class WebKitClient {
   // Opens a database file; dirHandle should be 0 if the caller does not need
   // a handle to the directory containing this file
   virtual FileHandle databaseOpenFile(const WebString& vfsFileName,
-                                      int desiredFlags,
-                                      FileHandle* dirHandle) {
+                                      int desiredFlags) {
     return FileHandle();
   }
 

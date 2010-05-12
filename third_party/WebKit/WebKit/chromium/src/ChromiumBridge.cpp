@@ -414,12 +414,9 @@ GeolocationServiceBridge* ChromiumBridge::createGeolocationServiceBridge(
 // HTML5 DB -------------------------------------------------------------------
 
 #if ENABLE(DATABASE)
-PlatformFileHandle ChromiumBridge::databaseOpenFile(
-    const String& vfsFileName,
-    int desiredFlags,
-    PlatformFileHandle* dirHandle) {
-  return webKitClient()->databaseOpenFile(WebString(vfsFileName), desiredFlags,
-                                          dirHandle);
+PlatformFileHandle ChromiumBridge::databaseOpenFile(const String& vfsFileName,
+                                                    int desiredFlags) {
+  return webKitClient()->databaseOpenFile(WebString(vfsFileName), desiredFlags);
 }
 
 int ChromiumBridge::databaseDeleteFile(const String& vfsFileName,
