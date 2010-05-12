@@ -37,15 +37,18 @@
 #include "public/WebFrameClient.h"
 #include "public/WebViewClient.h"
 #include <wtf/HashMap.h>
+#include <wtf/HashSet.h>
 #include <wtf/Vector.h>
+#include <wtf/text/WTFString.h>
 
 class LayoutTestController;
 class TestShell;
 namespace WebKit {
 class WebFrame;
 class WebURL;
-struct WebURLError;
 struct WebRect;
+struct WebURLError;
+struct WebWindowFeatures;
 }
 namespace skia {
 class PlatformCanvas;
@@ -86,12 +89,21 @@ class WebViewHost : public WebKit::WebViewClient,
     return m_navigationController.get();
   }
 
+  void addClearHeader(const WebCore::String& header) {
+    m_clearHeaders.add(header);
+  }
+  const HashSet<WebCore::String>& clearHeaders() const {
+    return m_clearHeaders;
+  }
+
   // NavigationHost
   virtual bool navigate(const TestNavigationEntry&, bool reload);
 
   // WebKit::WebViewClient
   virtual WebKit::WebView* createView(WebKit::WebFrame*);
-  virtual WebKit::WebWidget* createPopupMenu(bool activatable);
+  virtual WebKit::WebView* createView(WebKit::WebFrame*,
+                                      const WebKit::WebWindowFeatures&);
+  virtual WebKit::WebWidget* createPopupMenu(WebKit::WebPopupType);
   virtual WebKit::WebWidget* createPopupMenu(const WebKit::WebPopupMenuInfo&);
   virtual WebKit::WebStorageNamespace* createSessionStorageNamespace(
       unsigned quota);
@@ -136,13 +148,15 @@ class WebViewHost : public WebKit::WebViewClient,
   virtual void showContextMenu(WebKit::WebFrame*,
                                const WebKit::WebContextMenuData&);
   virtual void setStatusText(const WebKit::WebString&);
-  virtual void startDragging(const WebKit::WebPoint&,
-                             const WebKit::WebDragData&,
-                             WebKit::WebDragOperationsMask);
+  virtual void startDragging(const WebKit::WebDragData&,
+                             WebKit::WebDragOperationsMask,
+                             const WebKit::WebImage&,
+                             const WebKit::WebPoint&);
   virtual void navigateBackForwardSoon(int offset);
   virtual int historyBackListCount();
   virtual int historyForwardListCount();
   virtual void focusAccessibilityObject(const WebKit::WebAccessibilityObject&);
+  virtual WebKit::WebNotificationPresenter* notificationPresenter();
 
   // WebKit::WebWidgetClient
   virtual void didInvalidateRect(const WebKit::WebRect&);
@@ -167,6 +181,9 @@ class WebViewHost : public WebKit::WebViewClient,
   virtual WebKit::WebMediaPlayer* createMediaPlayer(
       WebKit::WebFrame*,
       WebKit::WebMediaPlayerClient*);
+  virtual WebKit::WebApplicationCacheHost* createApplicationCacheHost(
+      WebKit::WebFrame*,
+      WebKit::WebApplicationCacheHostClient*);
   virtual bool allowPlugins(WebKit::WebFrame*, bool enabledPerSettings);
   virtual bool allowImages(WebKit::WebFrame*, bool enabledPerSettings);
   virtual void loadURLExternally(WebKit::WebFrame*,
@@ -302,6 +319,9 @@ class WebViewHost : public WebKit::WebViewClient,
 
   // true if we want to enable selection of trailing whitespaces
   bool m_selectTrailingWhitespaceEnabled;
+
+  // Set of headers to clear in willSendRequest.
+  HashSet<WebCore::String> m_clearHeaders;
 
   // true if we should block any redirects
   bool m_blocksRedirects;

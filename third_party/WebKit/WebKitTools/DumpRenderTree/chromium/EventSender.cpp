@@ -50,6 +50,7 @@
 #include "public/WebDragOperation.h"
 #include "public/WebPoint.h"
 #include "public/WebString.h"
+#include "public/WebTouchPoint.h"
 #include "public/WebView.h"
 #include "webkit/support/webkit_support.h"
 #include <wtf/Deque.h>
@@ -65,7 +66,6 @@ using namespace base;
 using namespace std;
 using namespace WebKit;
 
-TestShell* EventSender::testShell = 0;
 WebPoint EventSender::lastMousePos;
 WebMouseEvent::Button EventSender::pressedButton = WebMouseEvent::ButtonNone;
 WebMouseEvent::Button EventSender::lastButtonType = WebMouseEvent::ButtonNone;
@@ -89,6 +89,8 @@ static WebDragOperation currentDragEffect;
 static WebDragOperationsMask currentDragEffectsAllowed;
 static bool replayingSavedEvents = false;
 static Deque<SavedEvent> mouseEventQueue;
+static int touchModifiers;
+static Vector<WebTouchPoint> touchPoints;
 
 // Time and place of the last mouse up event.
 static double lastClickTimeSec = 0;
@@ -157,7 +159,7 @@ static bool applyKeyModifier(const string& modifierName, WebInputEvent* event) {
     event->modifiers |= WebInputEvent::AltKey;
 #if !OS(MAC_OS_X)
     // On Windows all keys with Alt modifier will be marked as system key.
-    // We keep the same behavior on Linux, see:
+    // We keep the same behavior on Linux and everywhere non-Mac, see:
     // WebKit/chromium/src/gtk/WebInputEventFactory.cpp
     // If we want to change this behavior on Linux, this piece of code must be
     // kept in sync with the related code in above file.
@@ -242,13 +244,8 @@ enum KeyLocationCode {
   DOMKeyLocationNumpad = 0x03
 };
 
-EventSender::EventSender(TestShell* shell) : m_methodFactory(this) {
-  // Set static testShell variable since we can't do it in an initializer list.
-  // We also need to be careful not to assign testShell to new windows which are
-  // temporary.
-  if (!testShell)
-    testShell = shell;
-
+EventSender::EventSender(TestShell* shell)
+    : m_methodFactory(this), m_shell(shell) {
   // Initialize the map that associates methods of this class with the names
   // they will use when called by JavaScript.  The actual binding of those
   // names to their methods will be done by calling bindToJavaScript() (defined
@@ -272,6 +269,16 @@ EventSender::EventSender(TestShell* shell) : m_methodFactory(this) {
   bindMethod("scheduleAsynchronousClick",
              &EventSender::scheduleAsynchronousClick);
   bindMethod("beginDragWithFiles", &EventSender::beginDragWithFiles);
+  bindMethod("addTouchPoint", &EventSender::addTouchPoint);
+  bindMethod("cancelTouchPoint", &EventSender::cancelTouchPoint);
+  bindMethod("clearTouchPoints", &EventSender::clearTouchPoints);
+  bindMethod("releaseTouchPoint", &EventSender::releaseTouchPoint);
+  bindMethod("updateTouchPoint", &EventSender::updateTouchPoint);
+  bindMethod("setTouchModifier", &EventSender::setTouchModifier);
+  bindMethod("touchCancel", &EventSender::touchCancel);
+  bindMethod("touchEnd", &EventSender::touchEnd);
+  bindMethod("touchMove", &EventSender::touchMove);
+  bindMethod("touchStart", &EventSender::touchStart);
 
   // When set to true (the default value), we batch mouse move and mouse up
   // events so we can simulate drag & drop.
@@ -312,14 +319,15 @@ void EventSender::reset() {
   clickCount = 0;
   lastButtonType = WebMouseEvent::ButtonNone;
   timeOffsetMs = 0;
+  touchModifiers = 0;
+  touchPoints.clear();
 }
 
 WebView* EventSender::webview() {
-  return testShell->webView();
+  return m_shell->webView();
 }
 
-void EventSender::doDragDrop(const WebKit::WebPoint& eventPos,
-                             const WebDragData& dragData,
+void EventSender::doDragDrop(const WebDragData& dragData,
                              WebDragOperationsMask mask) {
   WebMouseEvent event;
   initMouseEvent(WebInputEvent::MouseDown, pressedButton, lastMousePos, &event);
@@ -615,11 +623,11 @@ void EventSender::keyDown(const CppArgumentList& arguments,
   // We just simulate the same behavior here.
   string editCommand;
   if (getEditCommand(eventDown, &editCommand))
-    testShell->webViewHost()->setEditCommand(editCommand, "");
+    m_shell->webViewHost()->setEditCommand(editCommand, "");
 
   webview()->handleInputEvent(eventDown);
 
-  testShell->webViewHost()->clearEditCommand();
+  m_shell->webViewHost()->clearEditCommand();
 
   if (generateChar) {
     eventChar.type = WebInputEvent::Char;
@@ -790,6 +798,120 @@ void EventSender::beginDragWithFiles(const CppArgumentList& arguments,
   pressedButton = WebMouseEvent::ButtonLeft;
 
   result->setNull();
+}
+
+void EventSender::addTouchPoint(const CppArgumentList& arguments,
+                                CppVariant* result) {
+  result->setNull();
+
+  WebTouchPoint touchPoint;
+  touchPoint.state = WebTouchPoint::StatePressed;
+  touchPoint.position =
+      WebPoint(arguments[0].toInt32(), arguments[1].toInt32());
+  touchPoint.id = touchPoints.size();
+  touchPoints.append(touchPoint);
+}
+
+void EventSender::clearTouchPoints(const CppArgumentList&, CppVariant* result) {
+  result->setNull();
+  touchPoints.clear();
+}
+
+void EventSender::releaseTouchPoint(const CppArgumentList& arguments,
+                                    CppVariant* result) {
+  result->setNull();
+
+  const unsigned index = arguments[0].toInt32();
+  ASSERT(index < touchPoints.size());
+
+  WebTouchPoint* touchPoint = &touchPoints[index];
+  touchPoint->state = WebTouchPoint::StateReleased;
+}
+
+void EventSender::setTouchModifier(const CppArgumentList& arguments,
+                                   CppVariant* result) {
+  result->setNull();
+
+  int mask = 0;
+  const string keyName = arguments[0].toString();
+  if (keyName == "shift")
+    mask = WebInputEvent::ShiftKey;
+  else if (keyName == "alt")
+    mask = WebInputEvent::AltKey;
+  else if (keyName == "ctrl")
+    mask = WebInputEvent::ControlKey;
+  else if (keyName == "meta")
+    mask = WebInputEvent::MetaKey;
+
+  if (arguments[1].toBoolean())
+    touchModifiers |= mask;
+  else
+    touchModifiers &= ~mask;
+}
+
+void EventSender::updateTouchPoint(const CppArgumentList& arguments,
+                                   CppVariant* result) {
+  result->setNull();
+
+  const unsigned index = arguments[0].toInt32();
+  ASSERT(index < touchPoints.size());
+
+  WebPoint position(arguments[1].toInt32(), arguments[2].toInt32());
+  WebTouchPoint* touchPoint = &touchPoints[index];
+  touchPoint->state = WebTouchPoint::StateMoved;
+  touchPoint->position = position;
+}
+
+void EventSender::cancelTouchPoint(const CppArgumentList& arguments,
+                                   CppVariant* result) {
+  result->setNull();
+
+  const unsigned index = arguments[0].toInt32();
+  ASSERT(index < touchPoints.size());
+
+  WebTouchPoint* touchPoint = &touchPoints[index];
+  touchPoint->state = WebTouchPoint::StateCancelled;
+}
+
+void EventSender::sendCurrentTouchEvent(const WebInputEvent::Type type) {
+  ASSERT(static_cast<unsigned>(WebTouchEvent::touchPointsLengthCap) >
+         touchPoints.size());
+  WebTouchEvent touchEvent;
+  touchEvent.type = type;
+  touchEvent.modifiers = touchModifiers;
+  touchEvent.touchPointsLength = touchPoints.size();
+  for (unsigned i = 0; i < touchPoints.size(); ++i)
+    touchEvent.touchPoints[i] = touchPoints[i];
+  webview()->handleInputEvent(touchEvent);
+
+  for (unsigned i = 0; i < touchPoints.size(); ++i) {
+    WebTouchPoint* touchPoint = &touchPoints[i];
+    if (touchPoint->state == WebTouchPoint::StateReleased) {
+      touchPoints.remove(i);
+      --i;
+    } else
+      touchPoint->state = WebTouchPoint::StateStationary;
+  }
+}
+
+void EventSender::touchEnd(const CppArgumentList&, CppVariant* result) {
+  result->setNull();
+  sendCurrentTouchEvent(WebInputEvent::TouchEnd);
+}
+
+void EventSender::touchMove(const CppArgumentList&, CppVariant* result) {
+  result->setNull();
+  sendCurrentTouchEvent(WebInputEvent::TouchMove);
+}
+
+void EventSender::touchStart(const CppArgumentList&, CppVariant* result) {
+  result->setNull();
+  sendCurrentTouchEvent(WebInputEvent::TouchStart);
+}
+
+void EventSender::touchCancel(const CppArgumentList&, CppVariant* result) {
+  result->setNull();
+  sendCurrentTouchEvent(WebInputEvent::TouchCancel);
 }
 
 //
