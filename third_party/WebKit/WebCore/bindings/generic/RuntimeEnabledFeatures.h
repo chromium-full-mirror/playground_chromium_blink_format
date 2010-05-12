@@ -89,6 +89,7 @@ class RuntimeEnabledFeatures {
 
 #if ENABLE(DATABASE)
   static bool openDatabaseEnabled();
+  static bool openDatabaseSyncEnabled();
 #endif
 
 #if ENABLE(3D_CANVAS)
