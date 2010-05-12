@@ -48,10 +48,12 @@ class WebIndexedDatabase {
 
   virtual ~WebIndexedDatabase() {}
 
+  // The WebKit implementation of open ignores the WebFrame* parameter.
   virtual void open(const WebString& name,
                     const WebString& description,
                     bool modifyDatabase,
                     WebIDBCallbacks*,
+                    const WebString& origin,
                     WebFrame*,
                     int& exceptionCode) = 0;
 };

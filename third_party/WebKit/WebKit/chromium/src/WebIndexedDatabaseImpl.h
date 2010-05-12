@@ -41,6 +41,7 @@ class WebIndexedDatabaseImpl : public WebIndexedDatabase {
                     const WebString& description,
                     bool modifyDatabase,
                     WebIDBCallbacks*,
+                    const WebString& origin,
                     WebFrame*,
                     int& exceptionCode);
 };
