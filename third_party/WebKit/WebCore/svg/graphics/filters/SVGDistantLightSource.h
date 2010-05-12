@@ -37,6 +37,9 @@ class DistantLightSource : public LightSource {
   float azimuth() const { return m_azimuth; }
   float elevation() const { return m_elevation; }
 
+  virtual void initPaintingData(PaintingData&);
+  virtual void updatePaintingData(PaintingData&, int x, int y, float z);
+
   virtual TextStream& externalRepresentation(TextStream&) const;
 
  private:

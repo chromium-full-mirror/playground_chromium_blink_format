@@ -23,22 +23,19 @@
 #define SVGFESpecularLighting_h
 
 #if ENABLE(SVG) && ENABLE(FILTERS)
-#include "Color.h"
-#include "FilterEffect.h"
-#include "SVGLightSource.h"
-#include "Filter.h"
+#include "SVGFELighting.h"
 
 namespace WebCore {
 
-class FESpecularLighting : public FilterEffect {
+class FESpecularLighting : public FELighting {
  public:
   static PassRefPtr<FESpecularLighting> create(FilterEffect*,
                                                const Color&,
-                                               const float&,
-                                               const float&,
-                                               const float&,
-                                               const float&,
-                                               const float&,
+                                               float,
+                                               float,
+                                               float,
+                                               float,
+                                               float,
                                                PassRefPtr<LightSource>);
   virtual ~FESpecularLighting();
 
@@ -63,31 +60,18 @@ class FESpecularLighting : public FilterEffect {
   const LightSource* lightSource() const;
   void setLightSource(PassRefPtr<LightSource>);
 
-  virtual FloatRect uniteEffectRect(Filter* filter) {
-    return calculateUnionOfChildEffectSubregions(filter, m_in.get());
-  }
-  void apply(Filter*);
   void dump();
   TextStream& externalRepresentation(TextStream&, int indent) const;
 
  private:
   FESpecularLighting(FilterEffect*,
                      const Color&,
-                     const float&,
-                     const float&,
-                     const float&,
-                     const float&,
-                     const float&,
+                     float,
+                     float,
+                     float,
+                     float,
+                     float,
                      PassRefPtr<LightSource>);
-
-  RefPtr<FilterEffect> m_in;
-  Color m_lightingColor;
-  float m_surfaceScale;
-  float m_specularConstant;
-  float m_specularExponent;
-  float m_kernelUnitLengthX;
-  float m_kernelUnitLengthY;
-  RefPtr<LightSource> m_lightSource;
 };
 
 }  // namespace WebCore

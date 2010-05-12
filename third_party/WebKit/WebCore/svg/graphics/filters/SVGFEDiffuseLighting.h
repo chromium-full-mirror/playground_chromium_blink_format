@@ -23,22 +23,20 @@
 #define SVGFEDiffuseLighting_h
 
 #if ENABLE(SVG) && ENABLE(FILTERS)
-#include "Color.h"
-#include "FilterEffect.h"
-#include "Filter.h"
+#include "SVGFELighting.h"
 
 namespace WebCore {
 
 class LightSource;
 
-class FEDiffuseLighting : public FilterEffect {
+class FEDiffuseLighting : public FELighting {
  public:
   static PassRefPtr<FEDiffuseLighting> create(FilterEffect*,
                                               const Color&,
-                                              const float&,
-                                              const float&,
-                                              const float&,
-                                              const float&,
+                                              float,
+                                              float,
+                                              float,
+                                              float,
                                               PassRefPtr<LightSource>);
   virtual ~FEDiffuseLighting();
 
@@ -60,29 +58,17 @@ class FEDiffuseLighting : public FilterEffect {
   const LightSource* lightSource() const;
   void setLightSource(PassRefPtr<LightSource>);
 
-  virtual FloatRect uniteChildEffectSubregions(Filter* filter) {
-    return calculateUnionOfChildEffectSubregions(filter, m_in.get());
-  }
-  void apply(Filter*);
   void dump();
   TextStream& externalRepresentation(TextStream&, int indent) const;
 
  private:
   FEDiffuseLighting(FilterEffect*,
                     const Color&,
-                    const float&,
-                    const float&,
-                    const float&,
-                    const float&,
+                    float,
+                    float,
+                    float,
+                    float,
                     PassRefPtr<LightSource>);
-
-  RefPtr<FilterEffect> m_in;
-  Color m_lightingColor;
-  float m_surfaceScale;
-  float m_diffuseConstant;
-  float m_kernelUnitLengthX;
-  float m_kernelUnitLengthY;
-  RefPtr<LightSource> m_lightSource;
 };
 
 }  // namespace WebCore

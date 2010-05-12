@@ -24,7 +24,6 @@
 #define SVGPointLightSource_h
 
 #if ENABLE(SVG) && ENABLE(FILTERS)
-#include "FloatPoint3D.h"
 #include "SVGLightSource.h"
 
 namespace WebCore {
@@ -36,6 +35,9 @@ class PointLightSource : public LightSource {
   }
 
   const FloatPoint3D& position() const { return m_position; }
+
+  virtual void initPaintingData(PaintingData&);
+  virtual void updatePaintingData(PaintingData&, int x, int y, float z);
 
   virtual TextStream& externalRepresentation(TextStream&) const;
 

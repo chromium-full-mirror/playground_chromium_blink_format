@@ -24,7 +24,6 @@
 #define SVGSpotLightSource_h
 
 #if ENABLE(SVG) && ENABLE(FILTERS)
-#include "FloatPoint3D.h"
 #include "SVGLightSource.h"
 
 namespace WebCore {
@@ -44,6 +43,9 @@ class SpotLightSource : public LightSource {
 
   float specularExponent() const { return m_specularExponent; }
   float limitingConeAngle() const { return m_limitingConeAngle; }
+
+  virtual void initPaintingData(PaintingData&);
+  virtual void updatePaintingData(PaintingData&, int x, int y, float z);
 
   virtual TextStream& externalRepresentation(TextStream&) const;
 
