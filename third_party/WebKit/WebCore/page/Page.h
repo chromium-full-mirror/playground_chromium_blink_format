@@ -100,6 +100,7 @@ class Page : public Noncopyable {
   static void refreshPlugins(bool reload);
   PluginData* pluginData() const;
 
+  MediaCanStartListener* takeAnyMediaCanStartListener();
   void setCanStartMedia(bool);
   bool canStartMedia() const { return m_canStartMedia; }
   void addMediaCanStartListener(MediaCanStartListener*);
