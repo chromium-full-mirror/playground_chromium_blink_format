@@ -250,7 +250,7 @@ PassRefPtr<StringImpl> AtomicString::add(const UChar* s) {
   return addResult.second ? adoptRef(*addResult.first) : *addResult.first;
 }
 
-PassRefPtr<StringImpl> AtomicString::add(StringImpl* r) {
+PassRefPtr<StringImpl> AtomicString::addSlowCase(StringImpl* r) {
   if (!r || r->isAtomic())
     return r;
 

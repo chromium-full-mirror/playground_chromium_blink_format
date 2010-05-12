@@ -37,12 +37,6 @@ using namespace WTF::Unicode;
 
 namespace WebCore {
 
-String::String(const UChar* str, unsigned len) {
-  if (!str)
-    return;
-  m_impl = StringImpl::create(str, len);
-}
-
 String::String(const UChar* str) {
   if (!str)
     return;
@@ -52,18 +46,6 @@ String::String(const UChar* str) {
     len++;
 
   m_impl = StringImpl::create(str, len);
-}
-
-String::String(const char* str) {
-  if (!str)
-    return;
-  m_impl = StringImpl::create(str);
-}
-
-String::String(const char* str, unsigned length) {
-  if (!str)
-    return;
-  m_impl = StringImpl::create(str, length);
 }
 
 void String::append(const String& str) {
@@ -202,22 +184,10 @@ void String::insert(const UChar* charactersToInsert,
   m_impl = newImpl.release();
 }
 
-UChar String::operator[](unsigned i) const {
-  if (!m_impl || i >= m_impl->length())
-    return 0;
-  return m_impl->characters()[i];
-}
-
 UChar32 String::characterStartingAt(unsigned i) const {
   if (!m_impl || i >= m_impl->length())
     return 0;
   return m_impl->characterStartingAt(i);
-}
-
-unsigned String::length() const {
-  if (!m_impl)
-    return 0;
-  return m_impl->length();
 }
 
 void String::truncate(unsigned position) {
@@ -296,12 +266,6 @@ bool String::percentage(int& result) const {
 
   result = charactersToIntStrict(m_impl->characters(), m_impl->length() - 1);
   return true;
-}
-
-const UChar* String::characters() const {
-  if (!m_impl)
-    return 0;
-  return m_impl->characters();
 }
 
 const UChar* String::charactersWithNullTermination() {
@@ -550,10 +514,6 @@ String String::crossThreadString() const {
   if (!m_impl)
     return String();
   return m_impl->crossThreadString();
-}
-
-bool String::isEmpty() const {
-  return !m_impl || !m_impl->length();
 }
 
 void String::split(const String& separator,

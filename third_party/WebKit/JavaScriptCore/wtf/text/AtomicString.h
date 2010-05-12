@@ -137,7 +137,12 @@ class AtomicString : public FastAllocBase {
                                     unsigned length,
                                     unsigned existingHash);
   static PassRefPtr<StringImpl> add(const UChar*);
-  static PassRefPtr<StringImpl> add(StringImpl*);
+  PassRefPtr<StringImpl> add(StringImpl* r) {
+    if (!r || r->isAtomic())
+      return r;
+    return addSlowCase(r);
+  }
+  static PassRefPtr<StringImpl> addSlowCase(StringImpl*);
 };
 
 inline bool operator==(const AtomicString& a, const AtomicString& b) {
