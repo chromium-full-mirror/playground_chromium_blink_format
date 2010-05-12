@@ -139,22 +139,23 @@ HTMLMediaElement::HTMLMediaElement(const QualifiedName& tagName, Document* doc)
 }
 
 HTMLMediaElement::~HTMLMediaElement() {
-  if (m_isWaitingUntilMediaCanStart) {
-    if (Page* page = document()->page())
-      page->removeMediaCanStartListener(this);
-  }
-
+  if (m_isWaitingUntilMediaCanStart)
+    document()->removeMediaCanStartListener(this);
   document()->unregisterForDocumentActivationCallbacks(this);
   document()->unregisterForMediaVolumeCallbacks(this);
 }
 
 void HTMLMediaElement::willMoveToNewOwnerDocument() {
+  if (m_isWaitingUntilMediaCanStart)
+    document()->removeMediaCanStartListener(this);
   document()->unregisterForDocumentActivationCallbacks(this);
   document()->unregisterForMediaVolumeCallbacks(this);
   HTMLElement::willMoveToNewOwnerDocument();
 }
 
 void HTMLMediaElement::didMoveToNewOwnerDocument() {
+  if (m_isWaitingUntilMediaCanStart)
+    document()->addMediaCanStartListener(this);
   document()->registerForDocumentActivationCallbacks(this);
   document()->registerForMediaVolumeCallbacks(this);
   HTMLElement::didMoveToNewOwnerDocument();
@@ -537,7 +538,7 @@ void HTMLMediaElement::loadInternal() {
   if (page && !page->canStartMedia()) {
     if (m_isWaitingUntilMediaCanStart)
       return;
-    page->addMediaCanStartListener(this);
+    document()->addMediaCanStartListener(this);
     m_isWaitingUntilMediaCanStart = true;
     return;
   }

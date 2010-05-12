@@ -4976,6 +4976,20 @@ void Document::enqueuePopstateEvent(
   dispatchWindowEvent(PopStateEvent::create(stateObject));
 }
 
+void Document::addMediaCanStartListener(MediaCanStartListener* listener) {
+  // The plan is to move m_mediaCanStartListeners from Page to Document soon.
+  // For now, this simply forwards the call to the page if any.
+  if (Page* page = this->page())
+    page->addMediaCanStartListener(listener);
+}
+
+void Document::removeMediaCanStartListener(MediaCanStartListener* listener) {
+  // The plan is to move m_mediaCanStartListeners from Page to Document soon.
+  // For now, this simply forwards the call to the page if any.
+  if (Page* page = this->page())
+    page->removeMediaCanStartListener(listener);
+}
+
 #if ENABLE(XHTMLMP)
 bool Document::isXHTMLMPDocument() const {
   if (!frame() || !frame()->loader())
