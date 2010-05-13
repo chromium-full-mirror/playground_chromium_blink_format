@@ -105,12 +105,16 @@ PageClientQGraphicsWidget::~PageClientQGraphicsWidget() {
 void PageClientQGraphicsWidget::scroll(int dx,
                                        int dy,
                                        const QRect& rectToScroll) {
+  view->scroll(qreal(dx), qreal(dy), rectToScroll);
+
 #if USE(ACCELERATED_COMPOSITING)
   updateCompositingScrollPosition();
 #endif
 }
 
 void PageClientQGraphicsWidget::update(const QRect& dirtyRect) {
+  view->update(dirtyRect);
+
   createOrDeleteOverlay();
   if (overlay)
     overlay->update(QRectF(dirtyRect));
