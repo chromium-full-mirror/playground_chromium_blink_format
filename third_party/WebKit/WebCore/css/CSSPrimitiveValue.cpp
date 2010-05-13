@@ -45,6 +45,12 @@ using namespace WTF;
 
 namespace WebCore {
 
+typedef HashMap<const CSSPrimitiveValue*, String> CSSTextCache;
+static CSSTextCache& cssTextCache() {
+  DEFINE_STATIC_LOCAL(CSSTextCache, cache, ());
+  return cache;
+}
+
 // A more stylish solution than sharing would be to turn CSSPrimitiveValue (or
 // CSSValues in general) into non-virtual,
 // non-refcounted simple type with value semantics. In practice these sharing
@@ -153,28 +159,31 @@ static const AtomicString& valueOrPropertyName(int valueOrPropertyID) {
   return nullAtom;
 }
 
-CSSPrimitiveValue::CSSPrimitiveValue() : m_type(0) {}
+CSSPrimitiveValue::CSSPrimitiveValue() : m_type(0), m_hasCachedCSSText(false) {}
 
-CSSPrimitiveValue::CSSPrimitiveValue(int ident) : m_type(CSS_IDENT) {
+CSSPrimitiveValue::CSSPrimitiveValue(int ident)
+    : m_type(CSS_IDENT), m_hasCachedCSSText(false) {
   m_value.ident = ident;
 }
 
 CSSPrimitiveValue::CSSPrimitiveValue(double num, UnitTypes type)
-    : m_type(type) {
+    : m_type(type), m_hasCachedCSSText(false) {
   m_value.num = num;
 }
 
 CSSPrimitiveValue::CSSPrimitiveValue(const String& str, UnitTypes type)
-    : m_type(type) {
+    : m_type(type), m_hasCachedCSSText(false) {
   if ((m_value.string = str.impl()))
     m_value.string->ref();
 }
 
-CSSPrimitiveValue::CSSPrimitiveValue(RGBA32 color) : m_type(CSS_RGBCOLOR) {
+CSSPrimitiveValue::CSSPrimitiveValue(RGBA32 color)
+    : m_type(CSS_RGBCOLOR), m_hasCachedCSSText(false) {
   m_value.rgbcolor = color;
 }
 
-CSSPrimitiveValue::CSSPrimitiveValue(const Length& length) {
+CSSPrimitiveValue::CSSPrimitiveValue(const Length& length)
+    : m_hasCachedCSSText(false) {
   switch (length.type()) {
     case Auto:
       m_type = CSS_IDENT;
@@ -259,7 +268,10 @@ void CSSPrimitiveValue::cleanup() {
   }
 
   m_type = 0;
-  m_cachedCSSText = String();
+  if (m_hasCachedCSSText) {
+    cssTextCache().remove(this);
+    m_hasCachedCSSText = false;
+  }
 }
 
 int CSSPrimitiveValue::computeLengthInt(RenderStyle* style,
@@ -648,8 +660,11 @@ int CSSPrimitiveValue::getIdent() {
 String CSSPrimitiveValue::cssText() const {
   // FIXME: return the original value instead of a generated one (e.g. color
   // name if it was specified) - check what spec says about this
-  if (!m_cachedCSSText.isNull())
-    return m_cachedCSSText;
+
+  if (m_hasCachedCSSText) {
+    ASSERT(cssTextCache().contains(this));
+    return cssTextCache().get(this);
+  }
 
   String text;
   switch (m_type) {
@@ -854,7 +869,8 @@ String CSSPrimitiveValue::cssText() const {
       text = quoteCSSStringIfNeeded(m_value.string);
       break;
   }
-  m_cachedCSSText = text;
+  cssTextCache().set(this, text);
+  m_hasCachedCSSText = true;
   return text;
 }
 
