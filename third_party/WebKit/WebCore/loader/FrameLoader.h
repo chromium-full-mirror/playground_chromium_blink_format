@@ -636,7 +636,7 @@ class FrameLoader : public Noncopyable {
 
   bool m_didCallImplicitClose;
   bool m_wasUnloadEventEmitted;
-  bool m_unloadEventBeingDispatched;
+  bool m_pageDismissalEventBeingDispatched;
   bool m_isComplete;
   bool m_isLoadingMainResource;
 

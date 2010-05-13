@@ -191,7 +191,7 @@ FrameLoader::FrameLoader(Frame* frame, FrameLoaderClient* client)
       m_isExecutingJavaScriptFormAction(false),
       m_didCallImplicitClose(false),
       m_wasUnloadEventEmitted(false),
-      m_unloadEventBeingDispatched(false),
+      m_pageDismissalEventBeingDispatched(false),
       m_isComplete(false),
       m_isLoadingMainResource(false),
       m_needsClear(false),
@@ -604,7 +604,7 @@ void FrameLoader::stopLoading(UnloadEventPolicy unloadEventPolicy,
         Node* currentFocusedNode = m_frame->document()->focusedNode();
         if (currentFocusedNode)
           currentFocusedNode->aboutToUnload();
-        m_unloadEventBeingDispatched = true;
+        m_pageDismissalEventBeingDispatched = true;
         if (m_frame->domWindow()) {
           if (unloadEventPolicy == UnloadEventPolicyUnloadAndPageHide)
             m_frame->domWindow()->dispatchEvent(
@@ -616,7 +616,7 @@ void FrameLoader::stopLoading(UnloadEventPolicy unloadEventPolicy,
                 Event::create(eventNames().unloadEvent, false, false),
                 m_frame->domWindow()->document());
         }
-        m_unloadEventBeingDispatched = false;
+        m_pageDismissalEventBeingDispatched = false;
         if (m_frame->document())
           m_frame->document()->updateStyleIfNeeded();
         m_wasUnloadEventEmitted = true;
@@ -2037,7 +2037,7 @@ void FrameLoader::loadURL(const KURL& newURL,
     return;
   }
 
-  if (m_unloadEventBeingDispatched)
+  if (m_pageDismissalEventBeingDispatched)
     return;
 
   NavigationAction action(newURL, newLoadType, isFormSubmission, event);
@@ -2188,7 +2188,7 @@ void FrameLoader::loadWithDocumentLoader(DocumentLoader* loader,
 
   ASSERT(m_frame->view());
 
-  if (m_unloadEventBeingDispatched)
+  if (m_pageDismissalEventBeingDispatched)
     return;
 
   policyChecker()->setLoadType(type);
@@ -2457,7 +2457,7 @@ void FrameLoader::stopLoadingSubframes() {
 
 void FrameLoader::stopAllLoaders(DatabasePolicy databasePolicy) {
   ASSERT(!m_frame->document() || !m_frame->document()->inPageCache());
-  if (m_unloadEventBeingDispatched)
+  if (m_pageDismissalEventBeingDispatched)
     return;
 
   // If this method is called from within this method, infinite recursion can
@@ -3955,12 +3955,12 @@ void FrameLoader::cachePageForHistoryItem(HistoryItem* item) {
 }
 
 void FrameLoader::pageHidden() {
-  m_unloadEventBeingDispatched = true;
+  m_pageDismissalEventBeingDispatched = true;
   if (m_frame->domWindow())
     m_frame->domWindow()->dispatchEvent(
         PageTransitionEvent::create(eventNames().pagehideEvent, true),
         m_frame->document());
-  m_unloadEventBeingDispatched = false;
+  m_pageDismissalEventBeingDispatched = false;
 
   // Send pagehide event for subframes as well
   for (Frame* child = m_frame->tree()->firstChild(); child;
