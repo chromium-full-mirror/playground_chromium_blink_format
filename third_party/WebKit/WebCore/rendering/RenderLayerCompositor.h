@@ -188,7 +188,10 @@ class RenderLayerCompositor {
   // Return true if the layers changed.
   static bool parentIFrameContentLayers(RenderIFrame*);
 
-  void setRootPlatformLayerClippingBox(const IntRect& contentsBox);
+  // Update the geometry of the layers used for clipping and scrolling in
+  // frames.
+  void updateContentLayerOffset(const IntPoint& contentsOffset);
+  void updateContentLayerScrollPosition(const IntPoint&);
 
  private:
   // Whether the given RL needs a compositing layer.
@@ -268,7 +271,8 @@ class RenderLayerCompositor {
   RootLayerAttachment m_rootLayerAttachment;
 
   // Enclosing clipping layer for iframe content
-  OwnPtr<GraphicsLayer> m_clippingLayer;
+  OwnPtr<GraphicsLayer> m_clipLayer;
+  OwnPtr<GraphicsLayer> m_scrollLayer;
 
 #if PROFILE_LAYER_REBUILD
   int m_rootLayerUpdateCount;

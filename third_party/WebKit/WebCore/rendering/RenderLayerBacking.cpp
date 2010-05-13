@@ -451,7 +451,7 @@ void RenderLayerBacking::updateGraphicsLayerGeometry() {
     if (RenderLayerCompositor* innerCompositor =
             RenderLayerCompositor::iframeContentsCompositor(
                 toRenderIFrame(renderer())))
-      innerCompositor->setRootPlatformLayerClippingBox(contentsBox());
+      innerCompositor->updateContentLayerOffset(contentsBox().location());
   }
 }
 
