@@ -435,6 +435,8 @@ class FrameLoader : public Noncopyable {
              bool clearScriptObjects = true,
              bool clearFrameView = true);
 
+  bool shouldClose();
+
  private:
   bool canCachePageContainingThisFrame();
 #ifndef NDEBUG
