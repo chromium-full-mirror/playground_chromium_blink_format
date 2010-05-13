@@ -113,6 +113,7 @@ CanvasRenderingContext2D::~CanvasRenderingContext2D() {}
 void CanvasRenderingContext2D::reset() {
   m_stateStack.resize(1);
   m_stateStack.first() = State();
+  m_path.clear();
 }
 
 CanvasRenderingContext2D::State::State()
