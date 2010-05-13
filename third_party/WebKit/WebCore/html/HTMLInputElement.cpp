@@ -1400,6 +1400,7 @@ void HTMLInputElement::setChecked(bool nowChecked, bool sendChangeEvent) {
 
   m_useDefaultChecked = false;
   m_checked = nowChecked;
+  setNeedsValidityCheck();
   setNeedsStyleRecalc();
 
   updateCheckedRadioButtons();
