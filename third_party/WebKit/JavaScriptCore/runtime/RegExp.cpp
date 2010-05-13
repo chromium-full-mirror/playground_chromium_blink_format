@@ -109,7 +109,7 @@ int RegExp::match(const UString& s, int startOffset, Vector<int, 32>* ovector) {
   if (startOffset < 0)
     startOffset = 0;
   if (ovector)
-    ovector->clear();
+    ovector->resize(0);
 
   if (static_cast<unsigned>(startOffset) > s.size() || s.isNull())
     return -1;

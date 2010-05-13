@@ -123,12 +123,12 @@ inline RegExpConstructor* asRegExpConstructor(JSValue value) {
   to calculate,
   e.g., RegExp.lastMatch and RegExp.leftParen.
 */
-inline void RegExpConstructor::performMatch(RegExp* r,
-                                            const UString& s,
-                                            int startOffset,
-                                            int& position,
-                                            int& length,
-                                            int** ovector) {
+ALWAYS_INLINE void RegExpConstructor::performMatch(RegExp* r,
+                                                   const UString& s,
+                                                   int startOffset,
+                                                   int& position,
+                                                   int& length,
+                                                   int** ovector) {
   position = r->match(s, startOffset, &d->tempOvector());
 
   if (ovector)

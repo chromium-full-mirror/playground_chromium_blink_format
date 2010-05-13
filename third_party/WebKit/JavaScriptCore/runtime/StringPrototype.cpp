@@ -351,20 +351,14 @@ struct StringRange {
   int length;
 };
 
-JSValue jsSpliceSubstringsWithSeparators(ExecState* exec,
-                                         JSString* sourceVal,
-                                         const UString& source,
-                                         const StringRange* substringRanges,
-                                         int rangeCount,
-                                         const UString* separators,
-                                         int separatorCount);
-JSValue jsSpliceSubstringsWithSeparators(ExecState* exec,
-                                         JSString* sourceVal,
-                                         const UString& source,
-                                         const StringRange* substringRanges,
-                                         int rangeCount,
-                                         const UString* separators,
-                                         int separatorCount) {
+static ALWAYS_INLINE JSValue
+jsSpliceSubstringsWithSeparators(ExecState* exec,
+                                 JSString* sourceVal,
+                                 const UString& source,
+                                 const StringRange* substringRanges,
+                                 int rangeCount,
+                                 const UString* separators,
+                                 int separatorCount) {
   if (rangeCount == 1 && separatorCount == 0) {
     int sourceSize = source.size();
     int position = substringRanges[0].position;
@@ -922,21 +916,20 @@ JSValue JSC_HOST_CALL stringProtoFuncSubstring(ExecState* exec,
   JSValue a1 = args.at(1);
 
   double start = a0.toNumber(exec);
-  double end = a1.toNumber(exec);
-  if (isnan(start))
+  double end;
+  if (!(start >= 0))  // check for negative values or NaN
     start = 0;
-  if (isnan(end))
-    end = 0;
-  if (start < 0)
-    start = 0;
-  if (end < 0)
-    end = 0;
-  if (start > len)
+  else if (start > len)
     start = len;
-  if (end > len)
-    end = len;
   if (a1.isUndefined())
     end = len;
+  else {
+    end = a1.toNumber(exec);
+    if (!(end >= 0))  // check for negative values or NaN
+      end = 0;
+    else if (end > len)
+      end = len;
+  }
   if (start > end) {
     double temp = end;
     end = start;
