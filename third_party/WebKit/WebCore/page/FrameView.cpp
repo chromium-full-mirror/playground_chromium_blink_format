@@ -488,6 +488,14 @@ bool FrameView::hasCompositedContent() const {
   return false;
 }
 
+// Sometimes (for plug-ins) we need to eagerly go into compositing mode.
+void FrameView::enterCompositingMode() {
+#if USE(ACCELERATED_COMPOSITING)
+  if (RenderView* view = m_frame->contentRenderer())
+    return view->compositor()->enableCompositingMode();
+#endif
+}
+
 bool FrameView::isEnclosedInCompositingLayer() const {
 #if USE(ACCELERATED_COMPOSITING)
   RenderObject* frameOwnerRenderer = m_frame->ownerRenderer();

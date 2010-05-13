@@ -109,6 +109,7 @@ class FrameView : public ScrollView {
 #endif
 
   bool hasCompositedContent() const;
+  void enterCompositingMode();
   bool isEnclosedInCompositingLayer() const;
 
   // Only used with accelerated compositing, but outside the #ifdef to make
