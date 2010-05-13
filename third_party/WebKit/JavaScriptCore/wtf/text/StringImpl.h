@@ -191,12 +191,16 @@ class StringImpl : public StringImplBase {
     }
 
     if (length > ((std::numeric_limits<size_t>::max() - sizeof(StringImpl)) /
-                  sizeof(UChar)))
+                  sizeof(UChar))) {
+      output = 0;
       return 0;
+    }
     StringImpl* resultImpl;
     if (!tryFastMalloc(sizeof(UChar) * length + sizeof(StringImpl))
-             .getValue(resultImpl))
+             .getValue(resultImpl)) {
+      output = 0;
       return 0;
+    }
     output = reinterpret_cast<UChar*>(resultImpl + 1);
     return adoptRef(new (resultImpl) StringImpl(length));
   }
