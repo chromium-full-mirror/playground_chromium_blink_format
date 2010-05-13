@@ -207,6 +207,8 @@ class FillLayer : public FastAllocBase {
 
   FillLayer() {}
 
+  FillLayer* m_next;
+
   RefPtr<StyleImage> m_image;
 
   Length m_xPosition;
@@ -233,8 +235,6 @@ class FillLayer : public FastAllocBase {
   bool m_compositeSet : 1;
 
   unsigned m_type : 1;  // EFillLayerType
-
-  FillLayer* m_next;
 };
 
 }  // namespace WebCore

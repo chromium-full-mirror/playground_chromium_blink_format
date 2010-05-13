@@ -25,7 +25,8 @@
 namespace WebCore {
 
 FillLayer::FillLayer(EFillLayerType type)
-    : m_image(FillLayer::initialFillImage(type)),
+    : m_next(0),
+      m_image(FillLayer::initialFillImage(type)),
       m_xPosition(FillLayer::initialFillXPosition(type)),
       m_yPosition(FillLayer::initialFillYPosition(type)),
       m_attachment(FillLayer::initialFillAttachment(type)),
@@ -45,11 +46,11 @@ FillLayer::FillLayer(EFillLayerType type)
       m_xPosSet(false),
       m_yPosSet(false),
       m_compositeSet(type == MaskFillLayer),
-      m_type(type),
-      m_next(0) {}
+      m_type(type) {}
 
 FillLayer::FillLayer(const FillLayer& o)
-    : m_image(o.m_image),
+    : m_next(o.m_next ? new FillLayer(*o.m_next) : 0),
+      m_image(o.m_image),
       m_xPosition(o.m_xPosition),
       m_yPosition(o.m_yPosition),
       m_attachment(o.m_attachment),
@@ -69,8 +70,7 @@ FillLayer::FillLayer(const FillLayer& o)
       m_xPosSet(o.m_xPosSet),
       m_yPosSet(o.m_yPosSet),
       m_compositeSet(o.m_compositeSet),
-      m_type(o.m_type),
-      m_next(o.m_next ? new FillLayer(*o.m_next) : 0) {}
+      m_type(o.m_type) {}
 
 FillLayer::~FillLayer() {
   delete m_next;
