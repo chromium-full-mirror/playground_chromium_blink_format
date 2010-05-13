@@ -214,23 +214,27 @@ CSSPrimitiveValue::CSSPrimitiveValue(const Length& length)
 
 void CSSPrimitiveValue::init(PassRefPtr<Counter> c) {
   m_type = CSS_COUNTER;
+  m_hasCachedCSSText = false;
   m_value.counter = c.releaseRef();
 }
 
 void CSSPrimitiveValue::init(PassRefPtr<Rect> r) {
   m_type = CSS_RECT;
+  m_hasCachedCSSText = false;
   m_value.rect = r.releaseRef();
 }
 
 #if ENABLE(DASHBOARD_SUPPORT)
 void CSSPrimitiveValue::init(PassRefPtr<DashboardRegion> r) {
   m_type = CSS_DASHBOARD_REGION;
+  m_hasCachedCSSText = false;
   m_value.region = r.releaseRef();
 }
 #endif
 
 void CSSPrimitiveValue::init(PassRefPtr<Pair> p) {
   m_type = CSS_PAIR;
+  m_hasCachedCSSText = false;
   m_value.pair = p.releaseRef();
 }
 
@@ -869,6 +873,8 @@ String CSSPrimitiveValue::cssText() const {
       text = quoteCSSStringIfNeeded(m_value.string);
       break;
   }
+
+  ASSERT(!cssTextCache().contains(this));
   cssTextCache().set(this, text);
   m_hasCachedCSSText = true;
   return text;
