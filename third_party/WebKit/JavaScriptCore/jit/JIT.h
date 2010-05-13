@@ -314,7 +314,14 @@ class JIT : private JSInterfaceJIT {
                        CallLinkInfo*,
                        int callerArgCount,
                        JSGlobalData*);
-  static void unlinkCall(CallLinkInfo*);
+  static void linkConstruct(JSFunction* callee,
+                            CodeBlock* callerCodeBlock,
+                            CodeBlock* calleeCodeBlock,
+                            JITCode&,
+                            CallLinkInfo*,
+                            int callerArgCount,
+                            JSGlobalData*);
+  static void unlinkCallOrConstruct(CallLinkInfo*);
 
  private:
   struct JSRInfo {

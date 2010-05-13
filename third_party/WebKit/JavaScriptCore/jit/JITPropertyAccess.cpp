@@ -146,7 +146,7 @@ void JIT::emitSlow_op_get_by_val(Instruction* currentInstruction,
   Jump notString =
       branchPtr(NotEqual, Address(regT0), ImmPtr(m_globalData->jsStringVPtr));
   emitNakedCall(m_globalData->getThunk(stringGetByValStubGenerator)
-                    ->generatedJITCode()
+                    ->generatedJITCodeForCall()
                     .addressForCall());
   Jump failed = branchTestPtr(Zero, regT0);
   emitPutVirtualRegister(dst, regT0);

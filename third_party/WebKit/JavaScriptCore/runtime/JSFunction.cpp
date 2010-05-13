@@ -121,8 +121,10 @@ JSFunction::~JSFunction() {
   if (!isHostFunction()) {
 #if ENABLE(JIT_OPTIMIZE_CALL)
     ASSERT(m_executable);
-    if (jsExecutable()->isGenerated())
-      jsExecutable()->generatedBytecode().unlinkCallers();
+    if (jsExecutable()->isGeneratedForCall())
+      jsExecutable()->generatedBytecodeForCall().unlinkCallers();
+    if (jsExecutable()->isGeneratedForConstruct())
+      jsExecutable()->generatedBytecodeForConstruct().unlinkCallers();
 #endif
     scopeChain().~ScopeChain();  // FIXME: Don't we need to do this in the
                                  // interpreter too?
@@ -151,7 +153,7 @@ JSValue JSFunction::call(ExecState* exec,
                          JSValue thisValue,
                          const ArgList& args) {
   ASSERT(!isHostFunction());
-  return exec->interpreter()->execute(
+  return exec->interpreter()->executeCall(
       jsExecutable(), exec, this, thisValue.toThisObject(exec), args,
       scopeChain().node(), exec->exceptionSlot());
 }
@@ -306,9 +308,9 @@ JSObject* JSFunction::construct(ExecState* exec, const ArgList& args) {
     structure = exec->lexicalGlobalObject()->emptyObjectStructure();
   JSObject* thisObj = new (exec) JSObject(structure);
 
-  JSValue result =
-      exec->interpreter()->execute(jsExecutable(), exec, this, thisObj, args,
-                                   scopeChain().node(), exec->exceptionSlot());
+  JSValue result = exec->interpreter()->executeConstruct(
+      jsExecutable(), exec, this, thisObj, args, scopeChain().node(),
+      exec->exceptionSlot());
   if (exec->hadException() || !result.isObject())
     return thisObj;
   return asObject(result);

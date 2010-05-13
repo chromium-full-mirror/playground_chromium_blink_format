@@ -257,7 +257,8 @@ class CodeBlock : public FastAllocBase {
             CodeType,
             PassRefPtr<SourceProvider>,
             unsigned sourceOffset,
-            SymbolTable* symbolTable);
+            SymbolTable* symbolTable,
+            bool isConstructor);
 
  public:
   virtual ~CodeBlock();
@@ -346,8 +347,7 @@ class CodeBlock : public FastAllocBase {
     return binaryChop<CallReturnOffsetToBytecodeIndex, unsigned,
                       getCallReturnOffset>(
                callReturnIndexVector().begin(), callReturnIndexVector().size(),
-               ownerExecutable()->generatedJITCode().offsetOf(
-                   returnAddress.value()))
+               getJITCode().offsetOf(returnAddress.value()))
         ->bytecodeIndex;
   }
 
@@ -371,10 +371,11 @@ class CodeBlock : public FastAllocBase {
 #endif
 
 #if ENABLE(JIT)
-  JITCode& getJITCode() { return ownerExecutable()->generatedJITCode(); }
-  ExecutablePool* executablePool() {
-    return ownerExecutable()->getExecutablePool();
+  JITCode& getJITCode() {
+    return m_isConstructor ? ownerExecutable()->generatedJITCodeForConstruct()
+                           : ownerExecutable()->generatedJITCodeForCall();
   }
+  ExecutablePool* executablePool() { return getJITCode().getExecutablePool(); }
 #endif
 
   ScriptExecutable* ownerExecutable() const { return m_ownerExecutable; }
@@ -606,6 +607,7 @@ class CodeBlock : public FastAllocBase {
   int m_numCalleeRegisters;
   int m_numVars;
   int m_numParameters;
+  bool m_isConstructor;
 
  private:
 #if !defined(NDEBUG) || ENABLE(OPCODE_SAMPLING)
@@ -721,7 +723,8 @@ class GlobalCodeBlock : public CodeBlock {
                   codeType,
                   sourceProvider,
                   sourceOffset,
-                  &m_unsharedSymbolTable),
+                  &m_unsharedSymbolTable,
+                  false),
         m_globalObject(globalObject) {
     m_globalObject->codeBlocks().add(this);
   }
@@ -791,12 +794,14 @@ class FunctionCodeBlock : public CodeBlock {
   FunctionCodeBlock(FunctionExecutable* ownerExecutable,
                     CodeType codeType,
                     PassRefPtr<SourceProvider> sourceProvider,
-                    unsigned sourceOffset)
+                    unsigned sourceOffset,
+                    bool isConstructor)
       : CodeBlock(ownerExecutable,
                   codeType,
                   sourceProvider,
                   sourceOffset,
-                  new SharedSymbolTable) {}
+                  new SharedSymbolTable,
+                  isConstructor) {}
   ~FunctionCodeBlock() { sharedSymbolTable()->deref(); }
 };
 

@@ -36,6 +36,7 @@ namespace JSC {
 class CodeBlock;
 class Debugger;
 class EvalCodeBlock;
+class FunctionCodeBlock;
 class ProgramCodeBlock;
 class ScopeChainNode;
 
@@ -49,28 +50,37 @@ class ExecutableBase : public RefCounted<ExecutableBase> {
   static const int NUM_PARAMETERS_NOT_COMPILED = -1;
 
  public:
-  ExecutableBase(int numParameters) : m_numParameters(numParameters) {}
+  ExecutableBase(int numParameters)
+      : m_numParametersForCall(numParameters),
+        m_numParametersForConstruct(numParameters) {}
 
   virtual ~ExecutableBase() {}
 
   bool isHostFunction() const {
-    return m_numParameters == NUM_PARAMETERS_IS_HOST;
+    ASSERT((m_numParametersForCall == NUM_PARAMETERS_IS_HOST) ==
+           (m_numParametersForConstruct == NUM_PARAMETERS_IS_HOST));
+    return m_numParametersForCall == NUM_PARAMETERS_IS_HOST;
   }
 
  protected:
-  int m_numParameters;
+  int m_numParametersForCall;
+  int m_numParametersForConstruct;
 
 #if ENABLE(JIT)
  public:
-  JITCode& generatedJITCode() {
-    ASSERT(m_jitCode);
-    return m_jitCode;
+  JITCode& generatedJITCodeForCall() {
+    ASSERT(m_jitCodeForCall);
+    return m_jitCodeForCall;
   }
 
-  ExecutablePool* getExecutablePool() { return m_jitCode.getExecutablePool(); }
+  JITCode& generatedJITCodeForConstruct() {
+    ASSERT(m_jitCodeForConstruct);
+    return m_jitCodeForConstruct;
+  }
 
  protected:
-  JITCode m_jitCode;
+  JITCode m_jitCodeForCall;
+  JITCode m_jitCodeForConstruct;
 #endif
 };
 
@@ -78,10 +88,16 @@ class ExecutableBase : public RefCounted<ExecutableBase> {
 class NativeExecutable : public ExecutableBase {
  public:
   NativeExecutable(ExecState* exec) : ExecutableBase(NUM_PARAMETERS_IS_HOST) {
-    m_jitCode = exec->globalData().jitStubs.ctiNativeCallThunk()->m_jitCode;
+    m_jitCodeForCall =
+        exec->globalData().jitStubs.ctiNativeCallThunk()->m_jitCodeForCall;
+    m_jitCodeForConstruct = exec->globalData()
+                                .jitStubs.ctiNativeCallThunk()
+                                ->m_jitCodeForCall;  // FIXME: this thunk should
+                                                     // have a construct form
   }
   NativeExecutable(JITCode thunk) : ExecutableBase(NUM_PARAMETERS_IS_HOST) {
-    m_jitCode = thunk;
+    m_jitCodeForCall = thunk;
+    m_jitCodeForConstruct = thunk;
   }
 
   ~NativeExecutable();
@@ -181,9 +197,9 @@ class EvalExecutable : public ScriptExecutable {
 #if ENABLE(JIT)
  public:
   JITCode& jitCode(ExecState* exec, ScopeChainNode* scopeChainNode) {
-    if (!m_jitCode)
+    if (!m_jitCodeForCall)
       generateJITCode(exec, scopeChainNode);
-    return m_jitCode;
+    return m_jitCodeForCall;
   }
 
  private:
@@ -228,9 +244,9 @@ class ProgramExecutable : public ScriptExecutable {
 #if ENABLE(JIT)
  public:
   JITCode& jitCode(ExecState* exec, ScopeChainNode* scopeChainNode) {
-    if (!m_jitCode)
+    if (!m_jitCodeForCall)
       generateJITCode(exec, scopeChainNode);
-    return m_jitCode;
+    return m_jitCodeForCall;
   }
 
  private:
@@ -272,24 +288,41 @@ class FunctionExecutable : public ScriptExecutable {
     return new (exec) JSFunction(exec, this, scopeChain);
   }
 
-  CodeBlock& bytecode(ExecState* exec, ScopeChainNode* scopeChainNode) {
+  FunctionCodeBlock& bytecodeForCall(ExecState* exec,
+                                     ScopeChainNode* scopeChainNode) {
     ASSERT(scopeChainNode);
-    if (!m_codeBlock)
-      compile(exec, scopeChainNode);
-    return *m_codeBlock;
+    if (!m_codeBlockForCall)
+      compileForCall(exec, scopeChainNode);
+    return *m_codeBlockForCall;
   }
 
-  bool isGenerated() const { return m_codeBlock; }
+  bool isGeneratedForCall() const { return m_codeBlockForCall; }
 
-  CodeBlock& generatedBytecode() {
-    ASSERT(m_codeBlock);
-    return *m_codeBlock;
+  FunctionCodeBlock& generatedBytecodeForCall() {
+    ASSERT(m_codeBlockForCall);
+    return *m_codeBlockForCall;
+  }
+
+  FunctionCodeBlock& bytecodeForConstruct(ExecState* exec,
+                                          ScopeChainNode* scopeChainNode) {
+    ASSERT(scopeChainNode);
+    if (!m_codeBlockForConstruct)
+      compileForConstruct(exec, scopeChainNode);
+    return *m_codeBlockForConstruct;
+  }
+
+  bool isGeneratedForConstruct() const { return m_codeBlockForConstruct; }
+
+  FunctionCodeBlock& generatedBytecodeForConstruct() {
+    ASSERT(m_codeBlockForConstruct);
+    return *m_codeBlockForConstruct;
   }
 
   const Identifier& name() { return m_name; }
   size_t parameterCount() const { return m_parameters->size(); }
   size_t variableCount() const { return m_numVariables; }
   UString paramString() const;
+  SharedSymbolTable* symbolTable() const { return m_symbolTable; }
 
   void recompile(ExecState*);
   ExceptionInfo* reparseExceptionInfo(JSGlobalData*,
@@ -314,9 +347,11 @@ class FunctionExecutable : public ScriptExecutable {
       : ScriptExecutable(globalData, source),
         m_forceUsesArguments(forceUsesArguments),
         m_parameters(parameters),
-        m_codeBlock(0),
+        m_codeBlockForCall(0),
+        m_codeBlockForConstruct(0),
         m_name(name),
-        m_numVariables(0) {
+        m_numVariables(0),
+        m_symbolTable(0) {
     m_firstLine = firstLine;
     m_lastLine = lastLine;
   }
@@ -331,31 +366,44 @@ class FunctionExecutable : public ScriptExecutable {
       : ScriptExecutable(exec, source),
         m_forceUsesArguments(forceUsesArguments),
         m_parameters(parameters),
-        m_codeBlock(0),
+        m_codeBlockForCall(0),
+        m_codeBlockForConstruct(0),
         m_name(name),
-        m_numVariables(0) {
+        m_numVariables(0),
+        m_symbolTable(0) {
     m_firstLine = firstLine;
     m_lastLine = lastLine;
   }
 
-  void compile(ExecState*, ScopeChainNode*);
+  void compileForCall(ExecState*, ScopeChainNode*);
+  void compileForConstruct(ExecState*, ScopeChainNode*);
 
   bool m_forceUsesArguments;
   RefPtr<FunctionParameters> m_parameters;
-  CodeBlock* m_codeBlock;
+  FunctionCodeBlock* m_codeBlockForCall;
+  FunctionCodeBlock* m_codeBlockForConstruct;
   Identifier m_name;
   size_t m_numVariables;
+  SharedSymbolTable* m_symbolTable;
 
 #if ENABLE(JIT)
  public:
-  JITCode& jitCode(ExecState* exec, ScopeChainNode* scopeChainNode) {
-    if (!m_jitCode)
-      generateJITCode(exec, scopeChainNode);
-    return m_jitCode;
+  JITCode& jitCodeForCall(ExecState* exec, ScopeChainNode* scopeChainNode) {
+    if (!m_jitCodeForCall)
+      generateJITCodeForCall(exec, scopeChainNode);
+    return m_jitCodeForCall;
+  }
+
+  JITCode& jitCodeForConstruct(ExecState* exec,
+                               ScopeChainNode* scopeChainNode) {
+    if (!m_jitCodeForConstruct)
+      generateJITCodeForConstruct(exec, scopeChainNode);
+    return m_jitCodeForConstruct;
   }
 
  private:
-  void generateJITCode(ExecState*, ScopeChainNode*);
+  void generateJITCodeForCall(ExecState*, ScopeChainNode*);
+  void generateJITCodeForConstruct(ExecState*, ScopeChainNode*);
 #endif
 };
 

@@ -640,7 +640,7 @@ void JIT::emitPutVariableObjectRegister(RegisterID src,
 #endif
 
 #if ENABLE(JIT_OPTIMIZE_CALL)
-void JIT::unlinkCall(CallLinkInfo* callLinkInfo) {
+void JIT::unlinkCallOrConstruct(CallLinkInfo* callLinkInfo) {
   // When the JSFunction is deleted the pointer embedded in the instruction
   // stream will no longer be valid
   // (and, if a new JSFunction happened to be constructed at the same location,
@@ -680,6 +680,34 @@ void JIT::linkCall(JSFunction* callee,
   // patch the call so we do not continue to try to link.
   repatchBuffer.relink(callLinkInfo->callReturnLocation,
                        globalData->jitStubs.ctiVirtualCall());
+}
+
+void JIT::linkConstruct(JSFunction* callee,
+                        CodeBlock* callerCodeBlock,
+                        CodeBlock* calleeCodeBlock,
+                        JITCode& code,
+                        CallLinkInfo* callLinkInfo,
+                        int callerArgCount,
+                        JSGlobalData* globalData) {
+  RepatchBuffer repatchBuffer(callerCodeBlock);
+
+  // Currently we only link calls with the exact number of arguments.
+  // If this is a native call calleeCodeBlock is null so the number of
+  // parameters is unimportant
+  if (!calleeCodeBlock ||
+      (callerArgCount == calleeCodeBlock->m_numParameters)) {
+    ASSERT(!callLinkInfo->isLinked());
+
+    if (calleeCodeBlock)
+      calleeCodeBlock->addCaller(callLinkInfo);
+
+    repatchBuffer.repatch(callLinkInfo->hotPathBegin, callee);
+    repatchBuffer.relink(callLinkInfo->hotPathOther, code.addressForCall());
+  }
+
+  // patch the call so we do not continue to try to link.
+  repatchBuffer.relink(callLinkInfo->callReturnLocation,
+                       globalData->jitStubs.ctiVirtualConstruct());
 }
 #endif  // ENABLE(JIT_OPTIMIZE_CALL)
 
