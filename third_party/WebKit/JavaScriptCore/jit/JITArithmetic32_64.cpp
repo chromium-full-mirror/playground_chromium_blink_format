@@ -325,7 +325,7 @@ void JIT::emit_op_jlesseq(Instruction* currentInstruction, bool invert) {
   if (isOperandConstantImmediateInt(op1)) {
     emitLoad(op2, regT3, regT2);
     notInt32Op2.append(branch32(NotEqual, regT3, Imm32(JSValue::Int32Tag)));
-    addJump(branch32(invert ? LessThan : GreaterThan, regT2,
+    addJump(branch32(invert ? LessThan : GreaterThanOrEqual, regT2,
                      Imm32(getConstantOperand(op1).asInt32())),
             target);
   } else if (isOperandConstantImmediateInt(op2)) {
@@ -1191,7 +1191,7 @@ void JIT::emitBinaryDoubleOp(OpcodeID opcodeID,
         break;
       case op_jlesseq:
         emitLoadDouble(op2, fpRegT1);
-        addJump(branchDouble(DoubleLessThanOrEqual, fpRegT1, fpRegT0), dst);
+        addJump(branchDouble(DoubleLessThanOrEqual, fpRegT0, fpRegT1), dst);
         break;
       default:
         ASSERT_NOT_REACHED();
