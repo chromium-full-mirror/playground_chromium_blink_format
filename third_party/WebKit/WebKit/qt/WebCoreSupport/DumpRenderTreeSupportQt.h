@@ -26,10 +26,9 @@
 #include "qwebkitglobal.h"
 #include <QVariant>
 
-#include "qwebelement.h"
-
-class QWebPage;
+class QWebElement;
 class QWebFrame;
+class QWebPage;
 
 class QWEBKIT_EXPORT DumpRenderTreeSupportQt {
  public:
@@ -107,6 +106,8 @@ class QWEBKIT_EXPORT DumpRenderTreeSupportQt {
   static int workerThreadCount();
 
   static QString markerTextForListItem(const QWebElement& listItem);
+  static QVariantMap computedStyleIncludingVisitedInfo(
+      const QWebElement& element);
 };
 
 #endif

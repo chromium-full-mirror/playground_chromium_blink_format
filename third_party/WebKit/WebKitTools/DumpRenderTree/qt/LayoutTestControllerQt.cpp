@@ -616,6 +616,11 @@ QString LayoutTestController::markerTextForListItem(
   return DumpRenderTreeSupportQt::markerTextForListItem(listItem);
 }
 
+QVariantMap LayoutTestController::computedStyleIncludingVisitedInfo(
+    const QWebElement& element) const {
+  return DumpRenderTreeSupportQt::computedStyleIncludingVisitedInfo(element);
+}
+
 void LayoutTestController::authenticateSession(const QString&,
                                                const QString&,
                                                const QString&) {
