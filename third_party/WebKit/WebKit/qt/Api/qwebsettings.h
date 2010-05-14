@@ -63,7 +63,7 @@ class QWEBKIT_EXPORT QWebSettings {
     OfflineStorageDatabaseEnabled,
     OfflineWebApplicationCacheEnabled,
     LocalStorageEnabled,
-#ifdef QT_DEPRECATED
+#if defined(QT_DEPRECATED) || defined(qdoc)
     LocalStorageDatabaseEnabled = LocalStorageEnabled,
 #endif
     LocalContentCanAccessRemoteUrls,

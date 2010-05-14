@@ -40,7 +40,7 @@ static void gCleanupInterface() {
 /*!
   Sets a new default interface, \a defaultInterface, that will be used by all of
   WebKit
-  for managing history.
+  to keep track of visited links.
 
   If an interface without a parent has already been set, the old interface will
   be deleted.
@@ -68,8 +68,11 @@ void QWebHistoryInterface::setDefaultInterface(
 }
 
 /*!
-  Returns the default interface that will be used by WebKit. If no
-  default interface has been set, QtWebkit will not track history.
+  Returns the default interface that will be used by WebKit. If no default
+  interface has been set,
+  Webkit will not keep track of visited links and a null pointer will be
+  returned.
+  \sa setDefaultInterface
 */
 QWebHistoryInterface* QWebHistoryInterface::defaultInterface() {
   return default_interface;
@@ -84,11 +87,17 @@ QWebHistoryInterface* QWebHistoryInterface::defaultInterface() {
   \inmodule QtWebKit
 
   The QWebHistoryInterface is an interface that can be used to
-  implement link history. It contains two pure virtual methods that
-  are called by the WebKit engine.  addHistoryEntry() is used to add
-  pages that have been visited to the interface, while
-  historyContains() is used to query whether this page has been
-  visited by the user.
+  keep track of visited links. It contains two pure virtual methods that
+  are called by the WebKit engine: addHistoryEntry() is used to add
+  urls that have been visited to the interface, while
+  historyContains() is used to query whether the given url has been
+  visited by the user. By default the QWebHistoryInterface is not set, so WebKit
+  does not keep
+  track of visited links.
+
+  \note The history tracked by QWebHistoryInterface is not specific to an
+  instance of QWebPage
+  but applies to all pages.
 */
 
 /*!
@@ -97,7 +106,8 @@ QWebHistoryInterface* QWebHistoryInterface::defaultInterface() {
 QWebHistoryInterface::QWebHistoryInterface(QObject* parent) : QObject(parent) {}
 
 /*!
-    Destructor.  If this is currently the default interface it will be unset.
+    Destroys the interface.  If this is currently the default interface it will
+   be unset.
 */
 QWebHistoryInterface::~QWebHistoryInterface() {
   if (default_interface == this)
