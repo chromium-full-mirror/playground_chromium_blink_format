@@ -61,6 +61,7 @@ class WebMediaPlayerClientImpl : public WebMediaPlayerClient,
   virtual void rateChanged();
   virtual void sizeChanged();
   virtual void sawUnsupportedTracks();
+  virtual float volume() const;
 
   // MediaPlayerPrivateInterface methods:
   virtual void load(const WebCore::String& url);
