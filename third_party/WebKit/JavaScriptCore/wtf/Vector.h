@@ -651,6 +651,13 @@ Vector<T, inlineCapacity>& Vector<T, inlineCapacity>::operator=(
       return *this;
   }
 
+// Works around an assert in VS2010. See
+// https://connect.microsoft.com/VisualStudio/feedback/details/558044/std-copy-should-not-check-dest-when-first-last
+#if COMPILER(MSVC) && defined(_ITERATOR_DEBUG_LEVEL) && _ITERATOR_DEBUG_LEVEL
+  if (!begin())
+    return *this;
+#endif
+
   std::copy(other.begin(), other.begin() + size(), begin());
   TypeOperations::uninitializedCopy(other.begin() + size(), other.end(), end());
   m_size = other.size();
@@ -673,6 +680,13 @@ Vector<T, inlineCapacity>& Vector<T, inlineCapacity>::operator=(
     if (!begin())
       return *this;
   }
+
+// Works around an assert in VS2010. See
+// https://connect.microsoft.com/VisualStudio/feedback/details/558044/std-copy-should-not-check-dest-when-first-last
+#if COMPILER(MSVC) && defined(_ITERATOR_DEBUG_LEVEL) && _ITERATOR_DEBUG_LEVEL
+  if (!begin())
+    return *this;
+#endif
 
   std::copy(other.begin(), other.begin() + size(), begin());
   TypeOperations::uninitializedCopy(other.begin() + size(), other.end(), end());
