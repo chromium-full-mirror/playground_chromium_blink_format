@@ -129,6 +129,14 @@ static WebCookieJar* getCookieJar(const Document* document) {
   return cookieJar;
 }
 
+// Cache ----------------------------------------------------------------------
+
+void ChromiumBridge::cacheMetadata(const KURL& url,
+                                   double responseTime,
+                                   const Vector<char>& data) {
+  webKitClient()->cacheMetadata(url, responseTime, data.data(), data.size());
+}
+
 // Clipboard ------------------------------------------------------------------
 
 bool ChromiumBridge::clipboardIsFormatAvailable(

@@ -31,6 +31,7 @@
 #include "config.h"
 #include "ResourceHandle.h"
 
+#include "ChromiumBridge.h"
 #include "ResourceHandleClient.h"
 #include "ResourceRequest.h"
 #include "SharedBuffer.h"
@@ -74,6 +75,9 @@ class ResourceHandleInternal : public WebURLLoaderClient {
                            unsigned long long totalBytesToBeSent);
   virtual void didReceiveResponse(WebURLLoader*, const WebURLResponse&);
   virtual void didReceiveData(WebURLLoader*, const char* data, int dataLength);
+  virtual void didReceiveCachedMetadata(WebURLLoader*,
+                                        const char* data,
+                                        int dataLength);
   virtual void didFinishLoading(WebURLLoader*);
   virtual void didFail(WebURLLoader*, const WebURLError&);
 
@@ -173,6 +177,17 @@ void ResourceHandleInternal::didReceiveData(WebURLLoader*,
   // dataLength and that the latter parameter can be eliminated.
   // See WebKit bug: https://bugs.webkit.org/show_bug.cgi?id=31019
   m_client->didReceiveData(m_owner, data, dataLength, dataLength);
+}
+
+void ResourceHandleInternal::didReceiveCachedMetadata(WebURLLoader*,
+                                                      const char* data,
+                                                      int dataLength) {
+  ASSERT(m_client);
+  if (m_state != ConnectionStateReceivedResponse &&
+      m_state != ConnectionStateReceivingData)
+    CRASH();
+
+  m_client->didReceiveCachedMetadata(m_owner, data, dataLength);
 }
 
 void ResourceHandleInternal::didFinishLoading(WebURLLoader*) {
@@ -304,7 +319,7 @@ bool ResourceHandle::willLoadFromCache(ResourceRequest& request, Frame*) {
 // static
 void ResourceHandle::cacheMetadata(const ResourceResponse& response,
                                    const Vector<char>& data) {
-  // FIXME
+  ChromiumBridge::cacheMetadata(response.url(), response.responseTime(), data);
 }
 
 }  // namespace WebCore

@@ -60,6 +60,12 @@ class WebURLLoaderClient {
                               const char* data,
                               int dataLength) = 0;
 
+  // Called when a chunk of renderer-generated metadata is received from the
+  // cache.
+  virtual void didReceiveCachedMetadata(WebURLLoader*,
+                                        const char* data,
+                                        int dataLength) {}
+
   // Called when the load completes successfully.
   virtual void didFinishLoading(WebURLLoader*) = 0;
 

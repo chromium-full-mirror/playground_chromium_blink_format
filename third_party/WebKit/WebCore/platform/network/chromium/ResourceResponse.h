@@ -39,7 +39,8 @@ class ResourceResponse : public ResourceResponseBase {
       : m_isContentFiltered(false),
         m_appCacheID(0),
         m_wasFetchedViaSPDY(false),
-        m_isMultipartPayload(false) {}
+        m_isMultipartPayload(false),
+        m_responseTime(0) {}
 
   ResourceResponse(const KURL& url,
                    const String& mimeType,
@@ -54,7 +55,8 @@ class ResourceResponse : public ResourceResponseBase {
         m_isContentFiltered(false),
         m_appCacheID(0),
         m_wasFetchedViaSPDY(false),
-        m_isMultipartPayload(false) {}
+        m_isMultipartPayload(false),
+        m_responseTime(0) {}
 
   const CString& getSecurityInfo() const { return m_securityInfo; }
   void setSecurityInfo(const CString& securityInfo) {
@@ -77,6 +79,9 @@ class ResourceResponse : public ResourceResponseBase {
 
   bool isMultipartPayload() const { return m_isMultipartPayload; }
   void setIsMultipartPayload(bool value) { m_isMultipartPayload = value; }
+
+  double responseTime() const { return m_responseTime; }
+  void setResponseTime(double responseTime) { m_responseTime = responseTime; }
 
  private:
   friend class ResourceResponseBase;
@@ -104,6 +109,10 @@ class ResourceResponse : public ResourceResponseBase {
 
   // Set to true if this is part of a multipart response.
   bool m_isMultipartPayload;
+
+  // The time at which the response headers were received.  For cached
+  // responses, this time could be "far" in the past.
+  double m_responseTime;
 };
 
 }  // namespace WebCore
