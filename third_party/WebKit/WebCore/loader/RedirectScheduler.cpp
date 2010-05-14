@@ -241,9 +241,9 @@ class ScheduledFormSubmission : public ScheduledNavigation {
   }
 
   virtual void fire(Frame* frame) {
-    UserGestureIndicator gestureIndicator(m_wasProcessingUserGesture
-                                              ? DefinitelyProcessingUserGesture
-                                              : PossiblyProcessingUserGesture);
+    UserGestureIndicator gestureIndicator(
+        m_wasProcessingUserGesture ? DefinitelyProcessingUserGesture
+                                   : DefinitelyNotProcessingUserGesture);
 
     // The submitForm function will find a target frame before using the
     // redirection timer.

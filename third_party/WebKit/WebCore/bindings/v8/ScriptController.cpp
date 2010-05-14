@@ -150,7 +150,8 @@ bool ScriptController::processingUserGesture(DOMWrapperWorld*) const {
   // No script is running, so it is user-initiated unless the gesture stack
   // explicitly says it is not.
   if (!activeFrame)
-    return UserGestureIndicator::processingUserGesture();
+    return UserGestureIndicator::getUserGestureState() !=
+           DefinitelyNotProcessingUserGesture;
 
   V8Proxy* activeProxy = activeFrame->script()->proxy();
 
