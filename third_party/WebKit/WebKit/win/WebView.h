@@ -706,6 +706,10 @@ class WebView : public IWebView,
       /* [in] */ POINT pt,
       /* [in] */ OLE_HANDLE dc);
 
+  virtual HRESULT STDMETHODCALLTYPE reportException(
+      /* [in] */ JSContextRef context,
+      /* [in] */ JSValueRef exception);
+
   virtual HRESULT STDMETHODCALLTYPE setCustomHTMLTokenizerTimeDelay(
       /* [in] */ double timeDelay);
 
