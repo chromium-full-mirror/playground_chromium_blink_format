@@ -676,6 +676,9 @@ class WebGLRenderingContext : public CanvasRenderingContext {
   TextureUnitState m_textureUnits[32];
   unsigned long m_activeTextureUnit;
 
+  RefPtr<WebGLTexture> m_blackTexture2D;
+  RefPtr<WebGLTexture> m_blackTextureCubeMap;
+
   int m_packAlignment;
   int m_unpackAlignment;
   unsigned long m_implementationColorReadFormat;
@@ -725,6 +728,10 @@ class WebGLRenderingContext : public CanvasRenderingContext {
                      bool flipY,
                      bool premultiplyAlpha,
                      ExceptionCode&);
+
+  void handleNPOTTextures(bool prepareToDraw);
+
+  void createFallbackBlackTextures1x1();
 
   friend class WebGLStateRestorer;
 };

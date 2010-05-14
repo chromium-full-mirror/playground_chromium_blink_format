@@ -45,6 +45,18 @@ class WebGLTexture : public CanvasObject {
     cubeMapRWrapModeInitialized = initialized;
   }
 
+  void setTarget(unsigned long);
+  void setParameteri(unsigned long pname, int param);
+  void setParameterf(unsigned long pname, float param);
+  void setSize(unsigned long target, unsigned width, unsigned height);
+
+  static bool isNPOT(unsigned, unsigned);
+
+  bool isNPOT() const { return m_isNPOT; }
+  // Determine if texture sampling should always return [0, 0, 0, 1] (OpenGL ES
+  // 2.0 Sec 3.8.2).
+  bool needToUseBlackTexture() const { return m_needToUseBlackTexture; }
+
  protected:
   WebGLTexture(WebGLRenderingContext*);
 
@@ -53,7 +65,22 @@ class WebGLTexture : public CanvasObject {
  private:
   virtual bool isTexture() const { return true; }
 
+  void updateNPOTStates();
+
   bool cubeMapRWrapModeInitialized;
+
+  unsigned long m_target;
+
+  int m_minFilter;
+  int m_magFilter;
+  int m_wrapS;
+  int m_wrapT;
+
+  unsigned m_width[6];
+  unsigned m_height[6];
+
+  bool m_isNPOT;
+  bool m_needToUseBlackTexture;
 };
 
 }  // namespace WebCore
