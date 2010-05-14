@@ -461,7 +461,8 @@ static CFDictionaryRef createConnectionProperties(
 
   CFDictionaryRef sessionID =
       shouldUseCredentialStorage
-          ? CFDictionaryCreate(0, 0, 0, 0, 0, 0)
+          ? CFDictionaryCreate(0, 0, 0, 0, &kCFTypeDictionaryKeyCallBacks,
+                               &kCFTypeDictionaryValueCallBacks)
           : CFDictionaryCreate(0, (const void**)&_kCFURLConnectionSessionID,
                                (const void**)&webKitPrivateSessionCF, 1,
                                &kCFTypeDictionaryKeyCallBacks,
