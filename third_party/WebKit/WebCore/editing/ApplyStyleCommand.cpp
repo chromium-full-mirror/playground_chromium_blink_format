@@ -233,7 +233,7 @@ void StyleChange::extractTextStyles(CSSMutableStyleDeclaration* style) {
     ASSERT(colorValue->isPrimitiveValue());
     CSSPrimitiveValue* primitiveColor =
         static_cast<CSSPrimitiveValue*>(colorValue.get());
-    RGBA32 rgba;
+    RGBA32 rgba = 0;
     if (primitiveColor->primitiveType() != CSSPrimitiveValue::CSS_RGBCOLOR) {
       CSSParser::parseColor(rgba, colorValue->cssText());
       // Need to take care of named color such as green and black

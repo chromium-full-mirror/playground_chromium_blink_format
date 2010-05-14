@@ -287,7 +287,6 @@ bool CSSParser::parseValue(CSSMutableStyleDeclaration* declaration,
 // color will only be changed when string contains a valid css color, making it
 // possible to set up a default color.
 bool CSSParser::parseColor(RGBA32& color, const String& string, bool strict) {
-  color = 0;
   CSSParser parser(true);
 
   // First try creating a color specified by name or the "#" syntax.
