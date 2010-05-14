@@ -26,6 +26,7 @@
 #include "Frame.h"
 #include "JSEvent.h"
 #include "JSEventTarget.h"
+#include "JSMainThreadExecState.h"
 #include <runtime/JSLock.h>
 #include <wtf/RefCountedLeakCounter.h>
 
@@ -119,12 +120,22 @@ void JSEventListener::handleEvent(
                                               : globalObject);
 
     globalData->timeoutChecker.start();
-    JSValue retval =
-        handleEventFunction
-            ? JSC::call(exec, handleEventFunction, callType, callData,
-                        jsFunction, args)
-            : JSC::call(exec, jsFunction, callType, callData,
-                        toJS(exec, globalObject, event->currentTarget()), args);
+    JSValue retval;
+    if (handleEventFunction) {
+      retval =
+          scriptExecutionContext->isDocument()
+              ? JSMainThreadExecState::call(exec, handleEventFunction, callType,
+                                            callData, jsFunction, args)
+              : JSC::call(exec, handleEventFunction, callType, callData,
+                          jsFunction, args);
+    } else {
+      JSValue currentTarget = toJS(exec, globalObject, event->currentTarget());
+      retval = scriptExecutionContext->isDocument()
+                   ? JSMainThreadExecState::call(exec, jsFunction, callType,
+                                                 callData, currentTarget, args)
+                   : JSC::call(exec, jsFunction, callType, callData,
+                               currentTarget, args);
+    }
     globalData->timeoutChecker.stop();
 
     globalObject->setCurrentEvent(savedEvent);

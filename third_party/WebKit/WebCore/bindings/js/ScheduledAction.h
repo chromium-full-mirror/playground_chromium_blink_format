@@ -58,7 +58,9 @@ class ScheduledAction : public Noncopyable {
   ScheduledAction(const String& code, DOMWrapperWorld* isolatedWorld)
       : m_code(code), m_isolatedWorld(isolatedWorld) {}
 
-  void executeFunctionInContext(JSC::JSGlobalObject*, JSC::JSValue thisValue);
+  void executeFunctionInContext(JSC::JSGlobalObject*,
+                                JSC::JSValue thisValue,
+                                ScriptExecutionContext*);
   void execute(Document*);
 #if ENABLE(WORKERS)
   void execute(WorkerContext*);
