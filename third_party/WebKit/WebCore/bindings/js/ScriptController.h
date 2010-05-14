@@ -126,7 +126,6 @@ class ScriptController {
   bool processingUserGesture(DOMWrapperWorld*) const;
   bool anyPageIsProcessingUserGesture() const;
 
-  static bool canAccessFromCurrentOrigin(Frame*);
   bool canExecuteScripts(ReasonForCallingCanExecuteScripts);
 
   // Debugger can be 0 to detach any existing Debugger.

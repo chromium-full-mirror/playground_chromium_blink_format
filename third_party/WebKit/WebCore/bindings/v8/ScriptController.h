@@ -127,8 +127,6 @@ class ScriptController {
   // Check if the javascript engine has been initialized.
   bool haveInterpreter() const;
 
-  static bool canAccessFromCurrentOrigin(Frame*);
-
   bool canExecuteScripts(ReasonForCallingCanExecuteScripts);
 
   // FIXME: void* is a compile hack.
