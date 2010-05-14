@@ -436,9 +436,10 @@ JSValue jsTestObjAttrWithSetterException(ExecState* exec,
                                          JSValue slotBase,
                                          const Identifier&) {
   JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(slotBase));
-  UNUSED_PARAM(exec);
+  ExceptionCode ec = 0;
   TestObj* imp = static_cast<TestObj*>(castedThis->impl());
-  JSValue result = jsNumber(exec, imp->attrWithSetterException());
+  JSC::JSValue result = jsNumber(exec, imp->attrWithSetterException(ec));
+  setDOMException(exec, ec);
   return result;
 }
 
@@ -535,7 +536,9 @@ void setJSTestObjAttrWithSetterException(ExecState* exec,
                                          JSValue value) {
   JSTestObj* castedThis = static_cast<JSTestObj*>(thisObject);
   TestObj* imp = static_cast<TestObj*>(castedThis->impl());
-  imp->setAttrWithSetterException(value.toInt32(exec));
+  ExceptionCode ec = 0;
+  imp->setAttrWithSetterException(value.toInt32(exec), ec);
+  setDOMException(exec, ec);
 }
 
 void setJSTestObjAttrWithGetterException(ExecState* exec,
@@ -543,7 +546,9 @@ void setJSTestObjAttrWithGetterException(ExecState* exec,
                                          JSValue value) {
   JSTestObj* castedThis = static_cast<JSTestObj*>(thisObject);
   TestObj* imp = static_cast<TestObj*>(castedThis->impl());
-  imp->setAttrWithGetterException(value.toInt32(exec));
+  ExceptionCode ec = 0;
+  imp->setAttrWithGetterException(value.toInt32(exec), ec);
+  setDOMException(exec, ec);
 }
 
 void setJSTestObjCustomAttr(ExecState* exec,

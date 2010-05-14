@@ -184,18 +184,21 @@ WEBKIT_API void webkit_dom_test_obj_set_attr_with_exception(
     glong value);
 
 WEBKIT_API glong
-webkit_dom_test_obj_get_attr_with_setter_exception(WebKitDOMTestObj* self);
+webkit_dom_test_obj_get_attr_with_setter_exception(WebKitDOMTestObj* self,
+                                                   GError** error);
 
 WEBKIT_API void webkit_dom_test_obj_set_attr_with_setter_exception(
     WebKitDOMTestObj* self,
-    glong value);
+    glong value,
+    GError** error);
 
 WEBKIT_API glong
 webkit_dom_test_obj_get_attr_with_getter_exception(WebKitDOMTestObj* self);
 
 WEBKIT_API void webkit_dom_test_obj_set_attr_with_getter_exception(
     WebKitDOMTestObj* self,
-    glong value);
+    glong value,
+    GError** error);
 
 WEBKIT_API gchar* webkit_dom_test_obj_get_script_string_attr(
     WebKitDOMTestObj* self);

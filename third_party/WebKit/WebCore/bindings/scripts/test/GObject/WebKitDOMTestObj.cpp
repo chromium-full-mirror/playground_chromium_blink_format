@@ -377,19 +377,34 @@ void webkit_dom_test_obj_set_attr_with_exception(WebKitDOMTestObj* self,
   item->setAttrWithException(value);
 }
 
-glong webkit_dom_test_obj_get_attr_with_setter_exception(
-    WebKitDOMTestObj* self) {
+glong webkit_dom_test_obj_get_attr_with_setter_exception(WebKitDOMTestObj* self,
+                                                         GError** error) {
   g_return_val_if_fail(self, 0);
   WebCore::TestObj* item = WebKit::core(self);
-  glong res = item->attrWithSetterException();
+  WebCore::ExceptionCode ec = 0;
+  glong res = item->attrWithSetterException(ec);
+  if (ec) {
+    WebCore::ExceptionCodeDescription ecdesc;
+    WebCore::getExceptionCodeDescription(ec, ecdesc);
+    g_set_error_literal(error, g_quark_from_string("WEBKIT_DOM"), ecdesc.code,
+                        ecdesc.name);
+  }
   return res;
 }
 
 void webkit_dom_test_obj_set_attr_with_setter_exception(WebKitDOMTestObj* self,
-                                                        glong value) {
+                                                        glong value,
+                                                        GError** error) {
   g_return_if_fail(self);
   WebCore::TestObj* item = WebKit::core(self);
-  item->setAttrWithSetterException(value);
+  WebCore::ExceptionCode ec = 0;
+  item->setAttrWithSetterException(value, ec);
+  if (ec) {
+    WebCore::ExceptionCodeDescription ecdesc;
+    WebCore::getExceptionCodeDescription(ec, ecdesc);
+    g_set_error_literal(error, g_quark_from_string("WEBKIT_DOM"), ecdesc.code,
+                        ecdesc.name);
+  }
 }
 
 glong webkit_dom_test_obj_get_attr_with_getter_exception(
@@ -401,10 +416,18 @@ glong webkit_dom_test_obj_get_attr_with_getter_exception(
 }
 
 void webkit_dom_test_obj_set_attr_with_getter_exception(WebKitDOMTestObj* self,
-                                                        glong value) {
+                                                        glong value,
+                                                        GError** error) {
   g_return_if_fail(self);
   WebCore::TestObj* item = WebKit::core(self);
-  item->setAttrWithGetterException(value);
+  WebCore::ExceptionCode ec = 0;
+  item->setAttrWithGetterException(value, ec);
+  if (ec) {
+    WebCore::ExceptionCodeDescription ecdesc;
+    WebCore::getExceptionCodeDescription(ec, ecdesc);
+    g_set_error_literal(error, g_quark_from_string("WEBKIT_DOM"), ecdesc.code,
+                        ecdesc.name);
+  }
 }
 
 gchar* webkit_dom_test_obj_get_script_string_attr(WebKitDOMTestObj* self) {
@@ -506,11 +529,13 @@ static void webkit_dom_test_obj_set_property(GObject* object,
       break;
     }
     case PROP_ATTR_WITH_SETTER_EXCEPTION: {
-      coreSelf->setAttrWithSetterException((g_value_get_long(value)));
+      WebCore::ExceptionCode ec = 0;
+      coreSelf->setAttrWithSetterException((g_value_get_long(value)), ec);
       break;
     }
     case PROP_ATTR_WITH_GETTER_EXCEPTION: {
-      coreSelf->setAttrWithGetterException((g_value_get_long(value)));
+      WebCore::ExceptionCode ec = 0;
+      coreSelf->setAttrWithGetterException((g_value_get_long(value)), ec);
       break;
     }
     default:
@@ -566,7 +591,8 @@ static void webkit_dom_test_obj_get_property(GObject* object,
       break;
     }
     case PROP_ATTR_WITH_SETTER_EXCEPTION: {
-      g_value_set_long(value, coreSelf->attrWithSetterException());
+      WebCore::ExceptionCode ec = 0;
+      g_value_set_long(value, coreSelf->attrWithSetterException(ec));
       break;
     }
     case PROP_ATTR_WITH_GETTER_EXCEPTION: {

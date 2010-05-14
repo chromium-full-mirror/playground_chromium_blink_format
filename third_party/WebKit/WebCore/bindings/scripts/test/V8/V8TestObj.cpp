@@ -192,7 +192,13 @@ static v8::Handle<v8::Value> attrWithSetterExceptionAttrGetter(
     const v8::AccessorInfo& info) {
   INC_STATS("DOM.TestObj.attrWithSetterException._get");
   TestObj* imp = V8TestObj::toNative(info.Holder());
-  return v8::Integer::New(imp->attrWithSetterException());
+  ExceptionCode ec = 0;
+  int v = imp->attrWithSetterException(ec);
+  if (UNLIKELY(ec)) {
+    V8Proxy::setDOMException(ec);
+    return v8::Handle<v8::Value>();
+  }
+  return v8::Integer::New(v);
 }
 
 static void attrWithSetterExceptionAttrSetter(v8::Local<v8::String> name,
@@ -201,7 +207,10 @@ static void attrWithSetterExceptionAttrSetter(v8::Local<v8::String> name,
   INC_STATS("DOM.TestObj.attrWithSetterException._set");
   TestObj* imp = V8TestObj::toNative(info.Holder());
   int v = toInt32(value);
-  imp->setAttrWithSetterException(v);
+  ExceptionCode ec = 0;
+  imp->setAttrWithSetterException(v, ec);
+  if (UNLIKELY(ec))
+    V8Proxy::setDOMException(ec);
   return;
 }
 
@@ -219,7 +228,10 @@ static void attrWithGetterExceptionAttrSetter(v8::Local<v8::String> name,
   INC_STATS("DOM.TestObj.attrWithGetterException._set");
   TestObj* imp = V8TestObj::toNative(info.Holder());
   int v = toInt32(value);
-  imp->setAttrWithGetterException(v);
+  ExceptionCode ec = 0;
+  imp->setAttrWithGetterException(v, ec);
+  if (UNLIKELY(ec))
+    V8Proxy::setDOMException(ec);
   return;
 }
 
