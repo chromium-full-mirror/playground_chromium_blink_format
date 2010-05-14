@@ -33,16 +33,16 @@
 #include "ImageBuffer.h"
 #include "NotImplemented.h"
 #include "WebGLActiveInfo.h"
-#include "WebGLArray.h"
+#include "ArrayBufferView.h"
 #include "WebGLBuffer.h"
-#include "WebGLFloatArray.h"
+#include "FloatArray.h"
 #include "WebGLFramebuffer.h"
-#include "WebGLIntArray.h"
+#include "Int32Array.h"
 #include "WebGLProgram.h"
 #include "WebGLRenderbuffer.h"
 #include "WebGLShader.h"
 #include "WebGLTexture.h"
-#include "WebGLUnsignedByteArray.h"
+#include "Uint8Array.h"
 #include <CoreGraphics/CGBitmapContext.h>
 #include <OpenGL/CGLRenderers.h>
 #include <OpenGL/gl.h>
@@ -469,7 +469,7 @@ void GraphicsContext3D::bufferData(unsigned long target,
   ::glBufferData(target, size, 0, usage);
 }
 void GraphicsContext3D::bufferData(unsigned long target,
-                                   WebGLArray* array,
+                                   ArrayBufferView* array,
                                    unsigned long usage) {
   if (!array || !array->length())
     return;
@@ -480,7 +480,7 @@ void GraphicsContext3D::bufferData(unsigned long target,
 
 void GraphicsContext3D::bufferSubData(unsigned long target,
                                       long offset,
-                                      WebGLArray* array) {
+                                      ArrayBufferView* array) {
   if (!array || !array->length())
     return;
 

@@ -36,22 +36,22 @@
 #include "JSHTMLImageElement.h"
 #include "JSImageData.h"
 #include "JSWebGLBuffer.h"
-#include "JSWebGLFloatArray.h"
+#include "JSFloatArray.h"
 #include "JSWebGLFramebuffer.h"
-#include "JSWebGLIntArray.h"
+#include "JSInt32Array.h"
 #include "JSWebGLProgram.h"
 #include "JSWebGLRenderbuffer.h"
 #include "JSWebGLShader.h"
 #include "JSWebGLTexture.h"
 #include "JSWebGLUniformLocation.h"
-#include "JSWebGLUnsignedByteArray.h"
+#include "JSUint8Array.h"
 #include "JSWebKitCSSMatrix.h"
 #include "NotImplemented.h"
 #include "WebGLBuffer.h"
-#include "WebGLFloatArray.h"
+#include "FloatArray.h"
 #include "WebGLFramebuffer.h"
 #include "WebGLGetInfo.h"
-#include "WebGLIntArray.h"
+#include "Int32Array.h"
 #include "WebGLProgram.h"
 #include "WebGLRenderingContext.h"
 #include <runtime/Error.h>
@@ -82,7 +82,7 @@ JSValue JSWebGLRenderingContext::bufferData(JSC::ExecState* exec,
     static_cast<WebGLRenderingContext*>(impl())->bufferData(target, count,
                                                             usage, ec);
   } else {
-    WebGLArray* array = toWebGLArray(args.at(1));
+    ArrayBufferView* array = toArrayBufferView(args.at(1));
     static_cast<WebGLRenderingContext*>(impl())->bufferData(target, array,
                                                             usage, ec);
   }
@@ -100,7 +100,7 @@ JSValue JSWebGLRenderingContext::bufferSubData(JSC::ExecState* exec,
   unsigned offset = args.at(1).toInt32(exec);
   ExceptionCode ec = 0;
 
-  WebGLArray* array = toWebGLArray(args.at(2));
+  ArrayBufferView* array = toArrayBufferView(args.at(2));
 
   static_cast<WebGLRenderingContext*>(impl())->bufferSubData(target, offset,
                                                              array, ec);
@@ -318,7 +318,7 @@ JSValue JSWebGLRenderingContext::getVertexAttrib(ExecState* exec,
 
 //   void texImage2D(in GLenum target, in GLint level, in GLenum internalformat,
 //   in GLsizei width, in GLsizei height, in GLint border, in GLenum format, in
-//   GLenum type, in WebGLArray pixels);
+//   GLenum type, in ArrayBufferView pixels);
 //   void texImage2D(in GLenum target, in GLint level, in ImageData pixels,
 //   [Optional] GLboolean flipY, [Optional] in premultiplyAlpha);
 //   void texImage2D(in GLenum target, in GLint level, in HTMLImageElement
@@ -382,7 +382,7 @@ JSValue JSWebGLRenderingContext::texImage2D(ExecState* exec,
     if (args.size() != 9)
       return throwError(exec, SyntaxError);
 
-    // This must be the WebGLArray case
+    // This must be the ArrayBufferView case
     unsigned internalformat = args.at(2).toInt32(exec);
     if (exec->hadException())
       return jsUndefined();
@@ -416,12 +416,12 @@ JSValue JSWebGLRenderingContext::texImage2D(ExecState* exec,
     else if (value.isObject()) {
       o = asObject(value);
 
-      if (o->inherits(&JSWebGLArray::s_info)) {
-        // FIXME: Need to check to make sure WebGLArray is a WebGLByteArray or
-        // WebGLShortArray,
+      if (o->inherits(&JSArrayBufferView::s_info)) {
+        // FIXME: Need to check to make sure ArrayBufferView is a Int8Array or
+        // Int16Array,
         // depending on the passed type parameter.
-        WebGLArray* obj =
-            static_cast<WebGLArray*>(static_cast<JSWebGLArray*>(o)->impl());
+        ArrayBufferView* obj = static_cast<ArrayBufferView*>(
+            static_cast<JSArrayBufferView*>(o)->impl());
         context->texImage2D(target, level, internalformat, width, height,
                             border, format, type, obj, ec);
       } else
@@ -436,7 +436,7 @@ JSValue JSWebGLRenderingContext::texImage2D(ExecState* exec,
 
 //   void texSubImage2D(in GLenum target, in GLint level, in GLint xoffset, in
 //   GLint yoffset, in GLsizei width, in GLsizei height, in GLenum format, in
-//   GLenum type, in WebGLArray pixels);
+//   GLenum type, in ArrayBufferView pixels);
 //   void texSubImage2D(in GLenum target, in GLint level, in GLint xoffset, in
 //   GLint yoffset, in ImageData pixels, [Optional] GLboolean flipY, [Optional]
 //   in premultiplyAlpha);
@@ -513,7 +513,7 @@ JSValue JSWebGLRenderingContext::texSubImage2D(ExecState* exec,
     } else
       ec = TYPE_MISMATCH_ERR;
   } else {
-    // This must be the WebGLArray form
+    // This must be the ArrayBufferView form
     if (args.size() != 9)
       return throwError(exec, SyntaxError);
 
@@ -540,9 +540,9 @@ JSValue JSWebGLRenderingContext::texSubImage2D(ExecState* exec,
     else {
       o = asObject(value);
 
-      if (o->inherits(&JSWebGLArray::s_info)) {
-        WebGLArray* obj =
-            static_cast<WebGLArray*>(static_cast<JSWebGLArray*>(o)->impl());
+      if (o->inherits(&JSArrayBufferView::s_info)) {
+        ArrayBufferView* obj = static_cast<ArrayBufferView*>(
+            static_cast<JSArrayBufferView*>(o)->impl());
         context->texSubImage2D(target, level, xoff, yoff, width, height, format,
                                type, obj, ec);
       } else
@@ -625,7 +625,7 @@ static JSC::JSValue dataFunctionf(DataFunctionToCall f,
   if (exec->hadException())
     return jsUndefined();
 
-  RefPtr<WebGLFloatArray> webGLArray = toWebGLFloatArray(args.at(1));
+  RefPtr<FloatArray> webGLArray = toFloatArray(args.at(1));
   if (exec->hadException())
     return jsUndefined();
 
@@ -709,7 +709,7 @@ static JSC::JSValue dataFunctioni(DataFunctionToCall f,
   if (exec->hadException())
     return jsUndefined();
 
-  RefPtr<WebGLIntArray> webGLArray = toWebGLIntArray(args.at(1));
+  RefPtr<Int32Array> webGLArray = toInt32Array(args.at(1));
   if (exec->hadException())
     return jsUndefined();
 
@@ -777,7 +777,7 @@ static JSC::JSValue dataFunctionMatrix(DataFunctionMatrixToCall f,
   if (exec->hadException())
     return jsUndefined();
 
-  RefPtr<WebGLFloatArray> webGLArray = toWebGLFloatArray(args.at(2));
+  RefPtr<FloatArray> webGLArray = toFloatArray(args.at(2));
   if (exec->hadException())
     return jsUndefined();
 

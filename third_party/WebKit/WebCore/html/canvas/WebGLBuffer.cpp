@@ -74,7 +74,8 @@ bool WebGLBuffer::associateBufferData(unsigned long target, int size) {
   return false;
 }
 
-bool WebGLBuffer::associateBufferData(unsigned long target, WebGLArray* array) {
+bool WebGLBuffer::associateBufferData(unsigned long target,
+                                      ArrayBufferView* array) {
   if (!array)
     return false;
 
@@ -84,7 +85,7 @@ bool WebGLBuffer::associateBufferData(unsigned long target, WebGLArray* array) {
     // We must always clone the incoming data because client-side
     // modifications without calling bufferData or bufferSubData
     // must never be able to change the validation results.
-    m_elementArrayBuffer = WebGLArrayBuffer::create(array->buffer().get());
+    m_elementArrayBuffer = ArrayBuffer::create(array->buffer().get());
     return true;
   }
 
@@ -98,7 +99,7 @@ bool WebGLBuffer::associateBufferData(unsigned long target, WebGLArray* array) {
 
 bool WebGLBuffer::associateBufferSubData(unsigned long target,
                                          long offset,
-                                         WebGLArray* array) {
+                                         ArrayBufferView* array) {
   if (!array)
     return false;
 

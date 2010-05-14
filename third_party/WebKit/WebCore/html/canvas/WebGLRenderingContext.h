@@ -28,10 +28,10 @@
 
 #include "CanvasRenderingContext.h"
 #include "ExceptionCode.h"
-#include "WebGLFloatArray.h"
+#include "FloatArray.h"
 #include "WebGLGetInfo.h"
-#include "WebGLIntArray.h"
-#include "WebGLUnsignedByteArray.h"
+#include "Int32Array.h"
+#include "Uint8Array.h"
 #include "GraphicsContext3D.h"
 #include "PlatformString.h"
 
@@ -92,12 +92,12 @@ class WebGLRenderingContext : public CanvasRenderingContext {
                   unsigned long usage,
                   ExceptionCode&);
   void bufferData(unsigned long target,
-                  WebGLArray* data,
+                  ArrayBufferView* data,
                   unsigned long usage,
                   ExceptionCode&);
   void bufferSubData(unsigned long target,
                      long offset,
-                     WebGLArray* data,
+                     ArrayBufferView* data,
                      ExceptionCode&);
 
   unsigned long checkFramebufferStatus(unsigned long target);
@@ -257,12 +257,12 @@ class WebGLRenderingContext : public CanvasRenderingContext {
   void pixelStorei(unsigned long pname, long param);
   void polygonOffset(double factor, double units);
 
-  PassRefPtr<WebGLArray> readPixels(long x,
-                                    long y,
-                                    unsigned long width,
-                                    unsigned long height,
-                                    unsigned long format,
-                                    unsigned long type);
+  PassRefPtr<ArrayBufferView> readPixels(long x,
+                                         long y,
+                                         unsigned long width,
+                                         unsigned long height,
+                                         unsigned long format,
+                                         unsigned long type);
 
   void releaseShaderCompiler();
   void renderbufferStorage(unsigned long target,
@@ -293,7 +293,7 @@ class WebGLRenderingContext : public CanvasRenderingContext {
                   unsigned border,
                   unsigned format,
                   unsigned type,
-                  WebGLArray* pixels,
+                  ArrayBufferView* pixels,
                   ExceptionCode&);
   void texImage2D(unsigned target,
                   unsigned level,
@@ -367,7 +367,7 @@ class WebGLRenderingContext : public CanvasRenderingContext {
                      unsigned height,
                      unsigned format,
                      unsigned type,
-                     WebGLArray* pixels,
+                     ArrayBufferView* pixels,
                      ExceptionCode&);
   void texSubImage2D(unsigned target,
                      unsigned level,
@@ -456,7 +456,7 @@ class WebGLRenderingContext : public CanvasRenderingContext {
 
   void uniform1f(const WebGLUniformLocation* location, float x, ExceptionCode&);
   void uniform1fv(const WebGLUniformLocation* location,
-                  WebGLFloatArray* v,
+                  FloatArray* v,
                   ExceptionCode&);
   void uniform1fv(const WebGLUniformLocation* location,
                   float* v,
@@ -464,7 +464,7 @@ class WebGLRenderingContext : public CanvasRenderingContext {
                   ExceptionCode&);
   void uniform1i(const WebGLUniformLocation* location, int x, ExceptionCode&);
   void uniform1iv(const WebGLUniformLocation* location,
-                  WebGLIntArray* v,
+                  Int32Array* v,
                   ExceptionCode&);
   void uniform1iv(const WebGLUniformLocation* location,
                   int* v,
@@ -475,7 +475,7 @@ class WebGLRenderingContext : public CanvasRenderingContext {
                  float y,
                  ExceptionCode&);
   void uniform2fv(const WebGLUniformLocation* location,
-                  WebGLFloatArray* v,
+                  FloatArray* v,
                   ExceptionCode&);
   void uniform2fv(const WebGLUniformLocation* location,
                   float* v,
@@ -486,7 +486,7 @@ class WebGLRenderingContext : public CanvasRenderingContext {
                  int y,
                  ExceptionCode&);
   void uniform2iv(const WebGLUniformLocation* location,
-                  WebGLIntArray* v,
+                  Int32Array* v,
                   ExceptionCode&);
   void uniform2iv(const WebGLUniformLocation* location,
                   int* v,
@@ -498,7 +498,7 @@ class WebGLRenderingContext : public CanvasRenderingContext {
                  float z,
                  ExceptionCode&);
   void uniform3fv(const WebGLUniformLocation* location,
-                  WebGLFloatArray* v,
+                  FloatArray* v,
                   ExceptionCode&);
   void uniform3fv(const WebGLUniformLocation* location,
                   float* v,
@@ -510,7 +510,7 @@ class WebGLRenderingContext : public CanvasRenderingContext {
                  int z,
                  ExceptionCode&);
   void uniform3iv(const WebGLUniformLocation* location,
-                  WebGLIntArray* v,
+                  Int32Array* v,
                   ExceptionCode&);
   void uniform3iv(const WebGLUniformLocation* location,
                   int* v,
@@ -523,7 +523,7 @@ class WebGLRenderingContext : public CanvasRenderingContext {
                  float w,
                  ExceptionCode&);
   void uniform4fv(const WebGLUniformLocation* location,
-                  WebGLFloatArray* v,
+                  FloatArray* v,
                   ExceptionCode&);
   void uniform4fv(const WebGLUniformLocation* location,
                   float* v,
@@ -536,7 +536,7 @@ class WebGLRenderingContext : public CanvasRenderingContext {
                  int w,
                  ExceptionCode&);
   void uniform4iv(const WebGLUniformLocation* location,
-                  WebGLIntArray* v,
+                  Int32Array* v,
                   ExceptionCode&);
   void uniform4iv(const WebGLUniformLocation* location,
                   int* v,
@@ -544,7 +544,7 @@ class WebGLRenderingContext : public CanvasRenderingContext {
                   ExceptionCode&);
   void uniformMatrix2fv(const WebGLUniformLocation* location,
                         bool transpose,
-                        WebGLFloatArray* value,
+                        FloatArray* value,
                         ExceptionCode&);
   void uniformMatrix2fv(const WebGLUniformLocation* location,
                         bool transpose,
@@ -553,7 +553,7 @@ class WebGLRenderingContext : public CanvasRenderingContext {
                         ExceptionCode&);
   void uniformMatrix3fv(const WebGLUniformLocation* location,
                         bool transpose,
-                        WebGLFloatArray* value,
+                        FloatArray* value,
                         ExceptionCode&);
   void uniformMatrix3fv(const WebGLUniformLocation* location,
                         bool transpose,
@@ -562,7 +562,7 @@ class WebGLRenderingContext : public CanvasRenderingContext {
                         ExceptionCode&);
   void uniformMatrix4fv(const WebGLUniformLocation* location,
                         bool transpose,
-                        WebGLFloatArray* value,
+                        FloatArray* value,
                         ExceptionCode&);
   void uniformMatrix4fv(const WebGLUniformLocation* location,
                         bool transpose,
@@ -574,16 +574,16 @@ class WebGLRenderingContext : public CanvasRenderingContext {
   void validateProgram(WebGLProgram*, ExceptionCode&);
 
   void vertexAttrib1f(unsigned long indx, float x);
-  void vertexAttrib1fv(unsigned long indx, WebGLFloatArray* values);
+  void vertexAttrib1fv(unsigned long indx, FloatArray* values);
   void vertexAttrib1fv(unsigned long indx, float* values, int size);
   void vertexAttrib2f(unsigned long indx, float x, float y);
-  void vertexAttrib2fv(unsigned long indx, WebGLFloatArray* values);
+  void vertexAttrib2fv(unsigned long indx, FloatArray* values);
   void vertexAttrib2fv(unsigned long indx, float* values, int size);
   void vertexAttrib3f(unsigned long indx, float x, float y, float z);
-  void vertexAttrib3fv(unsigned long indx, WebGLFloatArray* values);
+  void vertexAttrib3fv(unsigned long indx, FloatArray* values);
   void vertexAttrib3fv(unsigned long indx, float* values, int size);
   void vertexAttrib4f(unsigned long indx, float x, float y, float z, float w);
-  void vertexAttrib4fv(unsigned long indx, WebGLFloatArray* values);
+  void vertexAttrib4fv(unsigned long indx, FloatArray* values);
   void vertexAttrib4fv(unsigned long indx, float* values, int size);
   void vertexAttribPointer(unsigned long indx,
                            long size,
