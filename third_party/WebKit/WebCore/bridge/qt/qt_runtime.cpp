@@ -1444,8 +1444,8 @@ JSValue QtRuntimeMetaMethod::call(ExecState* exec,
     if ((methodIndex = findMethodIndex(exec, obj->metaObject(), d->m_signature,
                                        d->m_allowPrivate, args, vargs,
                                        (void**)qargs, &errorObj)) != -1) {
-      if (obj->qt_metacall(QMetaObject::InvokeMetaMethod, methodIndex, qargs) >=
-          0)
+      if (QMetaObject::metacall(obj, QMetaObject::InvokeMetaMethod, methodIndex,
+                                qargs) >= 0)
         return jsUndefined();
 
       if (vargs[0].isValid())
