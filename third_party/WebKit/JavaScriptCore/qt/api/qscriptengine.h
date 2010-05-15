@@ -48,6 +48,7 @@ class QScriptEngine : public QObject {
   void reportAdditionalMemoryCost(int cost);
 
   QScriptString toStringHandle(const QString& str);
+  QScriptValue toObject(const QScriptValue& value);
 
   QScriptValue nullValue();
   QScriptValue undefinedValue();
