@@ -2360,6 +2360,13 @@ void Document::processHttpEquiv(const String& equiv, const String& content) {
     if (frameLoader->shouldInterruptLoadForXFrameOptions(content, url())) {
       frameLoader->stopAllLoaders();
       frame->redirectScheduler()->scheduleLocationChange(blankURL(), String());
+
+      DEFINE_STATIC_LOCAL(String, consoleMessage,
+                          ("Refused to display document because display "
+                           "forbidden by X-Frame-Options.\n"));
+      frame->domWindow()->console()->addMessage(JSMessageSource, LogMessageType,
+                                                ErrorMessageLevel,
+                                                consoleMessage, 1, String());
     }
   }
 }
