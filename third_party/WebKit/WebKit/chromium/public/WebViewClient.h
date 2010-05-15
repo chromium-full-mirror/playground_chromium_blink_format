@@ -256,6 +256,9 @@ class WebViewClient : virtual public WebWidgetClient {
   virtual void focusNext() {}
   virtual void focusPrevious() {}
 
+  // Called when a new node gets focused.
+  virtual void focusedNodeChanged(const WebNode&) {}
+
   // Session history -----------------------------------------------------
 
   // Tells the embedder to navigate back or forward in session history by
