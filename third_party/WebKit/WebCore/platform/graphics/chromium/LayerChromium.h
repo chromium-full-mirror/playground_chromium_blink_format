@@ -78,6 +78,8 @@ class LayerChromium : public RefCounted<LayerChromium> {
 
   void addSublayer(PassRefPtr<LayerChromium>);
   void insertSublayer(PassRefPtr<LayerChromium>, size_t index);
+  void replaceSublayer(LayerChromium* reference,
+                       PassRefPtr<LayerChromium> newLayer);
   void removeFromSuperlayer();
 
   void setAnchorPoint(const FloatPoint& anchorPoint) {
@@ -202,7 +204,6 @@ class LayerChromium : public RefCounted<LayerChromium> {
     return m_sublayerTransform;
   }
 
-  void setSuperlayer(LayerChromium* superlayer);
   LayerChromium* superlayer() const;
 
   void setTransform(const TransformationMatrix& transform) {
@@ -233,6 +234,8 @@ class LayerChromium : public RefCounted<LayerChromium> {
   LayerChromium(LayerType, GraphicsLayerChromium* owner);
 
   void setNeedsCommit();
+
+  void setSuperlayer(LayerChromium* superlayer) { m_superlayer = superlayer; }
 
   void paintMe();
 
