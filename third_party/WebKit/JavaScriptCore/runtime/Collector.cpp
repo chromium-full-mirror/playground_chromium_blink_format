@@ -1140,6 +1140,10 @@ Heap::Statistics Heap::statistics() const {
   return statistics;
 }
 
+size_t Heap::size() const {
+  return m_heap.usedBlocks * BLOCK_SIZE;
+}
+
 size_t Heap::globalObjectCount() {
   size_t count = 0;
   if (JSGlobalObject* head = m_globalData->head) {

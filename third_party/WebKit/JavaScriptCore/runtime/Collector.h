@@ -96,6 +96,7 @@ class Heap : public Noncopyable {
     size_t free;
   };
   Statistics statistics() const;
+  size_t size() const;
 
   void protect(JSValue);
   // Returns true if the value is no longer protected by any protect pointers
