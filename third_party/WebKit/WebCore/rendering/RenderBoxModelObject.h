@@ -66,7 +66,8 @@ class RenderBoxModelObject : public RenderObject {
   RenderLayer* layer() const { return m_layer; }
   virtual bool requiresLayer() const {
     return isRoot() || isPositioned() || isRelPositioned() || isTransparent() ||
-           hasOverflowClip() || hasTransform() || hasMask() || hasReflection();
+           hasOverflowClip() || hasTransform() || hasMask() ||
+           hasReflection() || style()->specifiesColumns();
   }
 
   // This will work on inlines to return the bounding box of all of the lines'

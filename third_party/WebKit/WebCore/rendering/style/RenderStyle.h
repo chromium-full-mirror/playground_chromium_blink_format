@@ -901,6 +901,9 @@ class RenderStyle : public RefCounted<RenderStyle> {
   bool hasAutoColumnCount() const {
     return rareNonInheritedData->m_multiCol->m_autoCount;
   }
+  bool specifiesColumns() const {
+    return !hasAutoColumnCount() || !hasAutoColumnWidth();
+  }
   float columnGap() const { return rareNonInheritedData->m_multiCol->m_gap; }
   bool hasNormalColumnGap() const {
     return rareNonInheritedData->m_multiCol->m_normalGap;
