@@ -98,6 +98,12 @@ class TestWebWorker : public WebKit::WebWorker,
       WebKit::WebApplicationCacheHostClient*) {
     return 0;
   }
+  virtual bool allowDatabase(WebKit::WebFrame*,
+                             const WebKit::WebString&,
+                             const WebKit::WebString&,
+                             unsigned long) {
+    return true;
+  }
 
  private:
   ~TestWebWorker() {}
