@@ -219,6 +219,9 @@ class LayerChromium : public RefCounted<LayerChromium> {
 
   void updateContents();
 
+  void setContents(NativeImagePtr contents);
+  NativeImagePtr contents() const { return m_contents; }
+
   skia::PlatformCanvas* platformCanvas() { return m_canvas.get(); }
   GraphicsContext* graphicsContext() { return m_graphicsContext.get(); }
 
@@ -241,17 +244,19 @@ class LayerChromium : public RefCounted<LayerChromium> {
   // This should only be called from removeFromSuperlayer.
   void removeSublayer(LayerChromium*);
 
-  // Re-create the canvas and graphics context. This method
-  // must be called every time the layer is resized.
+  // Re-creates the canvas and graphics context. This method
+  // must be called every time the layer is resized. Only layers
   void updateGraphicsContext(const IntSize&);
 
   Vector<RefPtr<LayerChromium>> m_sublayers;
   LayerChromium* m_superlayer;
 
   GraphicsLayerChromium* m_owner;
+#if PLATFORM(SKIA)
   OwnPtr<skia::PlatformCanvas> m_canvas;
   OwnPtr<PlatformContextSkia> m_skiaContext;
   OwnPtr<GraphicsContext> m_graphicsContext;
+#endif
 
   LayerType m_layerType;
 
@@ -281,6 +286,7 @@ class LayerChromium : public RefCounted<LayerChromium> {
   bool m_needsDisplayOnBoundsChange;
 
   ContentsGravityType m_contentsGravity;
+  NativeImagePtr m_contents;
   String m_name;
 };
 }

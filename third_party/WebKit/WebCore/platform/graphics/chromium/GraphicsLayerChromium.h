@@ -141,6 +141,8 @@ class GraphicsLayerChromium : public GraphicsLayer {
 
   ContentsLayerPurpose m_contentsLayerPurpose;
   bool m_contentsLayerHasBackgroundColor : 1;
+
+  NativeImagePtr m_pendingContentsImage;
 };
 
 }  // namespace WebCore
