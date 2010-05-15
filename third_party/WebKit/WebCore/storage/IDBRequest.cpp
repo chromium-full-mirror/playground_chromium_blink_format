@@ -99,11 +99,9 @@ void IDBRequest::stop() {
 
 void IDBRequest::suspend() {
   m_timer.stop();
-  m_suspended = true;
 }
 
 void IDBRequest::resume() {
-  m_suspended = false;
   // We only hold our self ref when we're waiting to dispatch an event.
   if (m_selfRef && !m_aborted)
     m_timer.startOneShot(0);
@@ -120,7 +118,7 @@ EventTargetData* IDBRequest::ensureEventTargetData() {
 void IDBRequest::timerFired(Timer<IDBRequest>*) {
   ASSERT(m_readyState == DONE);
   ASSERT(m_selfRef);
-  ASSERT(!m_suspended);
+  ASSERT(!m_stopped);
   ASSERT(!m_aborted);
 
   // We need to keep self-referencing ourself, otherwise it's possible we'll be
@@ -152,7 +150,7 @@ void IDBRequest::onEventCommon() {
 
   m_readyState = DONE;
   m_selfRef = this;
-  if (!m_suspended)
+  if (!m_stopped)
     m_timer.startOneShot(0);
 }
 
