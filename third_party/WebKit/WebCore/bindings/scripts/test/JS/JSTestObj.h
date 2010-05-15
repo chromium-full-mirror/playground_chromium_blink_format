@@ -235,6 +235,11 @@ jsTestObjPrototypeFunctionMethodWithNonOptionalArgAndTwoOptionalArgs(
     JSC::JSObject*,
     JSC::JSValue,
     const JSC::ArgList&);
+JSC::JSValue JSC_HOST_CALL
+jsTestObjPrototypeFunctionOverloadedMethod(JSC::ExecState*,
+                                           JSC::JSObject*,
+                                           JSC::JSValue,
+                                           const JSC::ArgList&);
 // Attributes
 
 JSC::JSValue jsTestObjReadOnlyIntAttr(JSC::ExecState*,
