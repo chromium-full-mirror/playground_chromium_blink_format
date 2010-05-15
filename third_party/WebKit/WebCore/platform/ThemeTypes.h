@@ -78,6 +78,7 @@ enum ControlPart {
   MenulistButtonPart,
   MenulistTextPart,
   MenulistTextFieldPart,
+  MeterPart,
   OuterSpinButtonPart,
   ProgressBarPart,
   ProgressBarValuePart,

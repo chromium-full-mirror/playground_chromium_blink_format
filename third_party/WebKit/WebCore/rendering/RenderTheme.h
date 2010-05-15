@@ -332,6 +332,15 @@ class RenderTheme : public RefCounted<RenderTheme> {
     return true;
   }
 
+#if ENABLE(METER_TAG)
+  virtual void adjustMeterStyle(CSSStyleSelector*,
+                                RenderStyle*,
+                                Element*) const;
+  virtual bool paintMeter(RenderObject*,
+                          const RenderObject::PaintInfo&,
+                          const IntRect&);
+#endif
+
 #if ENABLE(PROGRESS_TAG)
   virtual void adjustProgressBarStyle(CSSStyleSelector*,
                                       RenderStyle*,
