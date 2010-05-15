@@ -1272,11 +1272,8 @@ static void externalSubsetHandler(void* closure,
       (extId == "-//W3C//DTD XHTML 1.0 Frameset//EN") ||
       (extId == "-//W3C//DTD XHTML Basic 1.0//EN") ||
       (extId == "-//W3C//DTD XHTML 1.1 plus MathML 2.0//EN") ||
-      (extId == "-//W3C//DTD XHTML 1.1 plus MathML 2.0 plus SVG 1.1//EN")
-#if ENABLE(XHTMLMP)
-      || (extId == "-//WAPFORUM//DTD XHTML Mobile 1.0//EN")
-#endif
-          )
+      (extId == "-//W3C//DTD XHTML 1.1 plus MathML 2.0 plus SVG 1.1//EN") ||
+      (extId == "-//WAPFORUM//DTD XHTML Mobile 1.0//EN"))
     getTokenizer(closure)->setIsXHTMLDocument(
         true);  // controls if we replace entities or not.
 }
