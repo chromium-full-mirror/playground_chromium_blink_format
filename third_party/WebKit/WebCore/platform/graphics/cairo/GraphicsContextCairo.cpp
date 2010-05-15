@@ -75,10 +75,12 @@ static inline void setColor(cairo_t* cr, const Color& col) {
 static inline void setPlatformFill(GraphicsContext* context,
                                    cairo_t* cr,
                                    GraphicsContextPrivate* gcp) {
+  cairo_pattern_t* pattern = 0;
   cairo_save(cr);
   if (gcp->state.fillPattern) {
     AffineTransform affine;
-    cairo_set_source(cr, gcp->state.fillPattern->createPlatformPattern(affine));
+    pattern = gcp->state.fillPattern->createPlatformPattern(affine);
+    cairo_set_source(cr, pattern);
   } else if (gcp->state.fillGradient)
     cairo_set_source(cr, gcp->state.fillGradient->platformGradient());
   else
@@ -86,16 +88,19 @@ static inline void setPlatformFill(GraphicsContext* context,
   cairo_clip_preserve(cr);
   cairo_paint_with_alpha(cr, gcp->state.globalAlpha);
   cairo_restore(cr);
+  if (pattern)
+    cairo_pattern_destroy(pattern);
 }
 
 static inline void setPlatformStroke(GraphicsContext* context,
                                      cairo_t* cr,
                                      GraphicsContextPrivate* gcp) {
+  cairo_pattern_t* pattern = 0;
   cairo_save(cr);
   if (gcp->state.strokePattern) {
     AffineTransform affine;
-    cairo_set_source(cr,
-                     gcp->state.strokePattern->createPlatformPattern(affine));
+    pattern = gcp->state.strokePattern->createPlatformPattern(affine);
+    cairo_set_source(cr, pattern);
   } else if (gcp->state.strokeGradient)
     cairo_set_source(cr, gcp->state.strokeGradient->platformGradient());
   else {
@@ -112,6 +117,8 @@ static inline void setPlatformStroke(GraphicsContext* context,
   }
   cairo_stroke_preserve(cr);
   cairo_restore(cr);
+  if (pattern)
+    cairo_pattern_destroy(pattern);
 }
 
 // A fillRect helper
