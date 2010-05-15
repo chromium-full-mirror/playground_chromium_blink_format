@@ -1206,7 +1206,7 @@ void LayoutTestController::addOriginAccessWhitelistEntry(
   if (!url.isValid())
     return;
 
-  WebSecurityPolicy::whiteListAccessFromOrigin(
+  WebSecurityPolicy::addOriginAccessWhitelistEntry(
       url, WebString::fromUTF8(arguments[1].toString()),
       WebString::fromUTF8(arguments[2].toString()), arguments[3].toBoolean());
 }
