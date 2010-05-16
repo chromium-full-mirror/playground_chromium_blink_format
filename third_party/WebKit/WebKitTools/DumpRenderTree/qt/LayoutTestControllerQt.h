@@ -163,6 +163,7 @@ class LayoutTestController : public QObject {
   bool sampleSVGAnimationForElementAtTime(const QString& animationId,
                                           double time,
                                           const QString& elementId);
+  bool elementDoesAutoCompleteForElementWithId(const QString& elementId);
 
   unsigned numberOfActiveAnimations() const;
 

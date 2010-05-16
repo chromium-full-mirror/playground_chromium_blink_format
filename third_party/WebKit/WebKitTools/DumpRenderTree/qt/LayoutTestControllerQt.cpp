@@ -621,6 +621,12 @@ QVariantMap LayoutTestController::computedStyleIncludingVisitedInfo(
   return DumpRenderTreeSupportQt::computedStyleIncludingVisitedInfo(element);
 }
 
+bool LayoutTestController::elementDoesAutoCompleteForElementWithId(
+    const QString& elementId) {
+  return DumpRenderTreeSupportQt::elementDoesAutoCompleteForElementWithId(
+      m_drt->webPage()->mainFrame(), elementId);
+}
+
 void LayoutTestController::authenticateSession(const QString&,
                                                const QString&,
                                                const QString&) {
