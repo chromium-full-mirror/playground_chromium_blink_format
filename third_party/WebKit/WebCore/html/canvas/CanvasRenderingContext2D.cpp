@@ -1449,12 +1449,12 @@ PassRefPtr<ImageData> CanvasRenderingContext2D::createImageData(
     float sh,
     ExceptionCode& ec) const {
   ec = 0;
-  if (!isfinite(sw) || !isfinite(sh)) {
-    ec = NOT_SUPPORTED_ERR;
-    return 0;
-  }
   if (!sw || !sh) {
     ec = INDEX_SIZE_ERR;
+    return 0;
+  }
+  if (!isfinite(sw) || !isfinite(sh)) {
+    ec = NOT_SUPPORTED_ERR;
     return 0;
   }
 
@@ -1476,6 +1476,14 @@ PassRefPtr<ImageData> CanvasRenderingContext2D::getImageData(
     ExceptionCode& ec) const {
   if (!canvas()->originClean()) {
     ec = SECURITY_ERR;
+    return 0;
+  }
+  if (!sw || !sh) {
+    ec = INDEX_SIZE_ERR;
+    return 0;
+  }
+  if (!isfinite(sx) || !isfinite(sy) || !isfinite(sw) || !isfinite(sh)) {
+    ec = NOT_SUPPORTED_ERR;
     return 0;
   }
 
@@ -1516,7 +1524,7 @@ void CanvasRenderingContext2D::putImageData(ImageData* data,
   }
   if (!isfinite(dx) || !isfinite(dy) || !isfinite(dirtyX) ||
       !isfinite(dirtyY) || !isfinite(dirtyWidth) || !isfinite(dirtyHeight)) {
-    ec = INDEX_SIZE_ERR;
+    ec = NOT_SUPPORTED_ERR;
     return;
   }
 
