@@ -102,7 +102,6 @@ class QGraphicsItemOverlay : public QGraphicsItem {
 
   void prepareGraphicsItemGeometryChange() { prepareGeometryChange(); }
 
-  friend class QGraphicsWidget;
   QGraphicsWidget* q;
   QWebPage* page;
 };
