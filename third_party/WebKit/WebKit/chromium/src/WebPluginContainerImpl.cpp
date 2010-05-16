@@ -35,6 +35,7 @@
 #include "ChromeClientImpl.h"
 #include "WebCursorInfo.h"
 #include "WebDataSourceImpl.h"
+#include "WebElement.h"
 #include "WebInputEvent.h"
 #include "WebInputEventConversion.h"
 #include "WebKit.h"
@@ -224,6 +225,10 @@ bool WebPluginContainerImpl::printPage(int pageNumber,
 
 void WebPluginContainerImpl::printEnd() {
   return m_webPlugin->printEnd();
+}
+
+WebElement WebPluginContainerImpl::element() {
+  return WebElement(m_element);
 }
 
 void WebPluginContainerImpl::invalidate() {
