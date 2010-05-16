@@ -778,8 +778,8 @@ void ScrollView::paintScrollbars(GraphicsContext* context,
 }
 
 void ScrollView::paintPanScrollIcon(GraphicsContext* context) {
-  DEFINE_STATIC_LOCAL(Image*, panScrollIcon,
-                      (Image::loadPlatformResource("panIcon").releaseRef()));
+  static Image* panScrollIcon =
+      Image::loadPlatformResource("panIcon").releaseRef();
   context->drawImage(panScrollIcon, DeviceColorSpace, m_panScrollIconPoint);
 }
 
