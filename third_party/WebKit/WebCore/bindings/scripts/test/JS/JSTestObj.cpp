@@ -177,7 +177,7 @@ bool JSTestObjConstructor::getOwnPropertyDescriptor(
 #define THUNK_GENERATOR(generator)
 #endif
 
-static const HashTableValue JSTestObjPrototypeTableValues[27] = {
+static const HashTableValue JSTestObjPrototypeTableValues[29] = {
     {"voidMethod", DontDelete | Function,
      (intptr_t) static_cast<NativeFunction>(
          jsTestObjPrototypeFunctionVoidMethod),
@@ -202,6 +202,14 @@ static const HashTableValue JSTestObjPrototypeTableValues[27] = {
      (intptr_t) static_cast<NativeFunction>(
          jsTestObjPrototypeFunctionObjMethodWithArgs),
      (intptr_t)3 THUNK_GENERATOR(0)},
+    {"methodThatRequiresAllArgs", DontDelete | Function,
+     (intptr_t) static_cast<NativeFunction>(
+         jsTestObjPrototypeFunctionMethodThatRequiresAllArgs),
+     (intptr_t)2 THUNK_GENERATOR(0)},
+    {"methodThatRequiresAllArgsAndThrows", DontDelete | Function,
+     (intptr_t) static_cast<NativeFunction>(
+         jsTestObjPrototypeFunctionMethodThatRequiresAllArgsAndThrows),
+     (intptr_t)2 THUNK_GENERATOR(0)},
     {"serializedValue", DontDelete | Function,
      (intptr_t) static_cast<NativeFunction>(
          jsTestObjPrototypeFunctionSerializedValue),
@@ -289,7 +297,7 @@ static JSC_CONST_HASHTABLE HashTable JSTestObjPrototypeTable =
 #if ENABLE(PERFECT_HASH_SIZE)
     {8191, JSTestObjPrototypeTableValues, 0};
 #else
-    {67, 63, JSTestObjPrototypeTableValues, 0};
+    {69, 63, JSTestObjPrototypeTableValues, 0};
 #endif
 
 const ClassInfo JSTestObjPrototype::s_info = {"TestObjPrototype", 0,
@@ -665,6 +673,51 @@ jsTestObjPrototypeFunctionObjMethodWithArgs(ExecState* exec,
   JSC::JSValue result =
       toJS(exec, castedThis->globalObject(),
            WTF::getPtr(imp->objMethodWithArgs(intArg, strArg, objArg)));
+  return result;
+}
+
+JSValue JSC_HOST_CALL
+jsTestObjPrototypeFunctionMethodThatRequiresAllArgs(ExecState* exec,
+                                                    JSObject*,
+                                                    JSValue thisValue,
+                                                    const ArgList& args) {
+  UNUSED_PARAM(args);
+  if (!thisValue.inherits(&JSTestObj::s_info))
+    return throwError(exec, TypeError);
+  JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
+  if (args.size() < 2)
+    return jsUndefined();
+  const String& strArg = ustringToString(args.at(0).toString(exec));
+  TestObj* objArg = toTestObj(args.at(1));
+
+  JSC::JSValue result =
+      toJS(exec, castedThis->globalObject(),
+           WTF::getPtr(imp->methodThatRequiresAllArgs(strArg, objArg)));
+  return result;
+}
+
+JSValue JSC_HOST_CALL
+jsTestObjPrototypeFunctionMethodThatRequiresAllArgsAndThrows(
+    ExecState* exec,
+    JSObject*,
+    JSValue thisValue,
+    const ArgList& args) {
+  UNUSED_PARAM(args);
+  if (!thisValue.inherits(&JSTestObj::s_info))
+    return throwError(exec, TypeError);
+  JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
+  if (args.size() < 2)
+    return throwError(exec, SyntaxError, "Not enough arguments");
+  ExceptionCode ec = 0;
+  const String& strArg = ustringToString(args.at(0).toString(exec));
+  TestObj* objArg = toTestObj(args.at(1));
+
+  JSC::JSValue result = toJS(
+      exec, castedThis->globalObject(),
+      WTF::getPtr(imp->methodThatRequiresAllArgsAndThrows(strArg, objArg, ec)));
+  setDOMException(exec, ec);
   return result;
 }
 

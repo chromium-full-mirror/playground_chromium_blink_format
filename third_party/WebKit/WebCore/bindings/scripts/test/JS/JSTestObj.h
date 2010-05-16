@@ -138,6 +138,17 @@ jsTestObjPrototypeFunctionObjMethodWithArgs(JSC::ExecState*,
                                             JSC::JSValue,
                                             const JSC::ArgList&);
 JSC::JSValue JSC_HOST_CALL
+jsTestObjPrototypeFunctionMethodThatRequiresAllArgs(JSC::ExecState*,
+                                                    JSC::JSObject*,
+                                                    JSC::JSValue,
+                                                    const JSC::ArgList&);
+JSC::JSValue JSC_HOST_CALL
+jsTestObjPrototypeFunctionMethodThatRequiresAllArgsAndThrows(
+    JSC::ExecState*,
+    JSC::JSObject*,
+    JSC::JSValue,
+    const JSC::ArgList&);
+JSC::JSValue JSC_HOST_CALL
 jsTestObjPrototypeFunctionSerializedValue(JSC::ExecState*,
                                           JSC::JSObject*,
                                           JSC::JSValue,
