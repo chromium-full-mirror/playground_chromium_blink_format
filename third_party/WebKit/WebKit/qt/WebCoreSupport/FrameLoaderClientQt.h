@@ -272,6 +272,13 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
 
   QString chooseFile(const QString& oldFile);
 
+  static bool dumpFrameLoaderCallbacks;
+  static bool dumpResourceLoadCallbacks;
+  static QString dumpResourceLoadCallbacksPath;
+  static bool sendRequestReturnsNullOnRedirect;
+  static bool sendRequestReturnsNull;
+  static QStringList sendRequestClearHeaders;
+
  private:
   Frame* m_frame;
   QWebFrame* m_webFrame;

@@ -51,6 +51,8 @@ class NotificationPresenterClientQt : public NotificationPresenter {
   virtual void requestPermission(SecurityOrigin*, PassRefPtr<VoidCallback>);
   virtual NotificationPresenter::Permission checkPermission(const KURL&);
 
+  static bool dumpNotification;
+
  private:
 #ifndef QT_NO_SYSTEMTRAYICON
   QSystemTrayIcon m_tray;
