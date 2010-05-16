@@ -36,11 +36,10 @@ namespace WebCore {
 class ResourceResponse : public ResourceResponseBase {
  public:
   ResourceResponse()
-      : m_appCacheID(0),
-        m_isContentFiltered(false),
-        m_isMultipartPayload(false),
+      : m_isContentFiltered(false),
+        m_appCacheID(0),
         m_wasFetchedViaSPDY(false),
-        m_wasNpnNegotiated(false),
+        m_isMultipartPayload(false),
         m_responseTime(0) {}
 
   ResourceResponse(const KURL& url,
@@ -53,16 +52,20 @@ class ResourceResponse : public ResourceResponseBase {
                              expectedLength,
                              textEncodingName,
                              filename),
-        m_appCacheID(0),
         m_isContentFiltered(false),
-        m_isMultipartPayload(false),
+        m_appCacheID(0),
         m_wasFetchedViaSPDY(false),
-        m_wasNpnNegotiated(false),
+        m_isMultipartPayload(false),
         m_responseTime(0) {}
 
   const CString& getSecurityInfo() const { return m_securityInfo; }
   void setSecurityInfo(const CString& securityInfo) {
     m_securityInfo = securityInfo;
+  }
+
+  bool isContentFiltered() const { return m_isContentFiltered; }
+  void setIsContentFiltered(bool isContentFiltered) {
+    m_isContentFiltered = isContentFiltered;
   }
 
   long long appCacheID() const { return m_appCacheID; }
@@ -71,14 +74,8 @@ class ResourceResponse : public ResourceResponseBase {
   const KURL& appCacheManifestURL() const { return m_appCacheManifestURL; }
   void setAppCacheManifestURL(const KURL& url) { m_appCacheManifestURL = url; }
 
-  bool isContentFiltered() const { return m_isContentFiltered; }
-  void setIsContentFiltered(bool value) { m_isContentFiltered = value; }
-
   bool wasFetchedViaSPDY() const { return m_wasFetchedViaSPDY; }
   void setWasFetchedViaSPDY(bool value) { m_wasFetchedViaSPDY = value; }
-
-  bool wasNpnNegotiated() const { return m_wasNpnNegotiated; }
-  void setWasNpnNegotiated(bool value) { m_wasNpnNegotiated = value; }
 
   bool isMultipartPayload() const { return m_isMultipartPayload; }
   void setIsMultipartPayload(bool value) { m_isMultipartPayload = value; }
@@ -96,6 +93,10 @@ class ResourceResponse : public ResourceResponseBase {
 
   void doUpdateResourceResponse() { notImplemented(); }
 
+  // Whether the contents for this response has been altered/blocked (usually
+  // for security reasons.
+  bool m_isContentFiltered;
+
   // The id of the appcache this response was retrieved from, or zero if
   // the response was not retrieved from an appcache.
   long long m_appCacheID;
@@ -104,19 +105,10 @@ class ResourceResponse : public ResourceResponseBase {
   // Note: only valid for main resource responses.
   KURL m_appCacheManifestURL;
 
-  // Whether the contents for this response has been altered/blocked (usually
-  // for security reasons.
-  bool m_isContentFiltered;
+  bool m_wasFetchedViaSPDY;
 
   // Set to true if this is part of a multipart response.
   bool m_isMultipartPayload;
-
-  // Was the resource fetched over SPDY.  See http://dev.chromium.org/spdy
-  bool m_wasFetchedViaSPDY;
-
-  // Was the resource fetched over a channel which used
-  // TLS/Next-Protocol-Negotiation (also SPDY related).
-  bool m_wasNpnNegotiated;
 
   // The time at which the response headers were received.  For cached
   // responses, this time could be "far" in the past.
