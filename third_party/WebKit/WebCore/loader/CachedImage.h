@@ -86,7 +86,7 @@ class CachedImage : public CachedResource, public ImageObserver {
   void clear();
 
   bool stillNeedsLoad() const {
-    return !m_errorOccurred && m_status == Unknown && m_loading == false;
+    return !errorOccurred() && status() == Unknown && !isLoading();
   }
   void load();
 
