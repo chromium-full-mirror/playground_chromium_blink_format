@@ -194,7 +194,7 @@ class SimpleFontData : public FontData {
 
   FontPlatformData m_platformData;
 
-  mutable GlyphMetricsMap<FloatRect> m_glyphToBoundsMap;
+  mutable OwnPtr<GlyphMetricsMap<FloatRect>> m_glyphToBoundsMap;
   mutable GlyphMetricsMap<float> m_glyphToWidthMap;
 
   bool m_treatAsFixedPitch;
@@ -258,12 +258,17 @@ ALWAYS_INLINE FloatRect SimpleFontData::boundsForGlyph(Glyph glyph) const {
   if (glyph == m_zeroWidthSpaceGlyph && glyph)
     return FloatRect();
 
-  FloatRect bounds = m_glyphToBoundsMap.metricsForGlyph(glyph);
-  if (bounds.width() != cGlyphSizeUnknown)
-    return bounds;
+  FloatRect bounds;
+  if (m_glyphToBoundsMap) {
+    bounds = m_glyphToBoundsMap->metricsForGlyph(glyph);
+    if (bounds.width() != cGlyphSizeUnknown)
+      return bounds;
+  }
 
   bounds = platformBoundsForGlyph(glyph);
-  m_glyphToBoundsMap.setMetricsForGlyph(glyph, bounds);
+  if (!m_glyphToBoundsMap)
+    m_glyphToBoundsMap.set(new GlyphMetricsMap<FloatRect>());
+  m_glyphToBoundsMap->setMetricsForGlyph(glyph, bounds);
   return bounds;
 }
 
