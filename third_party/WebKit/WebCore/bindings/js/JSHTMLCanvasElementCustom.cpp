@@ -78,9 +78,11 @@ JSValue JSHTMLCanvasElement::getContext(ExecState* exec, const ArgList& args) {
     }
   }
 #endif
-  return toJS(
-      exec, globalObject(),
-      WTF::getPtr(canvas->getContext(ustringToString(contextId), attrs.get())));
+  CanvasRenderingContext* context =
+      canvas->getContext(ustringToString(contextId), attrs.get());
+  if (!context)
+    return jsNull();
+  return toJS(exec, globalObject(), WTF::getPtr(context));
 }
 
 }  // namespace WebCore
