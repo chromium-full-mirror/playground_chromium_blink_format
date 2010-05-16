@@ -57,7 +57,7 @@ class QtField : public Field {
 
   virtual JSValue valueFromInstance(ExecState*, const Instance*) const;
   virtual void setValueToInstance(ExecState*, const Instance*, JSValue) const;
-  virtual const char* name() const;
+  QByteArray name() const;
   QtFieldType fieldType() const { return m_type; }
 
  private:
