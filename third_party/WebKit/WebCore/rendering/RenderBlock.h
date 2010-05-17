@@ -390,8 +390,11 @@ class RenderBlock : public RenderBox {
                                          bool firstLine,
                                          BidiRun* firstRun,
                                          BidiRun* trailingSpaceRun,
-                                         bool reachedEnd);
-  void computeVerticalPositionsForLine(RootInlineBox*, BidiRun*);
+                                         bool reachedEnd,
+                                         GlyphOverflowAndFallbackFontsMap&);
+  void computeVerticalPositionsForLine(RootInlineBox*,
+                                       BidiRun*,
+                                       GlyphOverflowAndFallbackFontsMap&);
   void deleteEllipsisLineBoxes();
   void checkLinesForTextOverflow();
   void addOverflowFromInlineChildren();

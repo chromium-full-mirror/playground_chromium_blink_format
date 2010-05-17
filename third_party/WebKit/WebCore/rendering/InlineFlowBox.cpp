@@ -248,7 +248,10 @@ void InlineFlowBox::determineSpacingForFlowBoxes(bool lastLine,
   }
 }
 
-int InlineFlowBox::placeBoxesHorizontally(int xPos, bool& needsWordSpacing) {
+int InlineFlowBox::placeBoxesHorizontally(
+    int xPos,
+    bool& needsWordSpacing,
+    GlyphOverflowAndFallbackFontsMap& textBoxDataMap) {
   // Set our x position.
   setX(xPos);
 
@@ -291,8 +294,10 @@ int InlineFlowBox::placeBoxesHorizontally(int xPos, bool& needsWordSpacing) {
       rightLayoutOverflow =
           max(xPos + text->width() - letterSpacing, rightLayoutOverflow);
 
+      GlyphOverflowAndFallbackFontsMap::iterator it =
+          textBoxDataMap.find(static_cast<InlineTextBox*>(curr));
       GlyphOverflow* glyphOverflow =
-          static_cast<InlineTextBox*>(curr)->glyphOverflow();
+          it == textBoxDataMap.end() ? 0 : &it->second.second;
 
       int leftGlyphOverflow =
           -strokeOverflow - (glyphOverflow ? glyphOverflow->left : 0);
@@ -332,7 +337,8 @@ int InlineFlowBox::placeBoxesHorizontally(int xPos, bool& needsWordSpacing) {
       if (curr->renderer()->isRenderInline()) {
         InlineFlowBox* flow = static_cast<InlineFlowBox*>(curr);
         xPos += flow->marginLeft();
-        xPos = flow->placeBoxesHorizontally(xPos, needsWordSpacing);
+        xPos = flow->placeBoxesHorizontally(xPos, needsWordSpacing,
+                                            textBoxDataMap);
         xPos += flow->marginRight();
         leftLayoutOverflow =
             min(leftLayoutOverflow, flow->leftLayoutOverflow());
@@ -415,11 +421,13 @@ static int verticalPositionForBox(InlineBox* curr, bool firstLine) {
   return toRenderInline(curr->renderer())->verticalPositionFromCache(firstLine);
 }
 
-void InlineFlowBox::computeLogicalBoxHeights(int& maxPositionTop,
-                                             int& maxPositionBottom,
-                                             int& maxAscent,
-                                             int& maxDescent,
-                                             bool strictMode) {
+void InlineFlowBox::computeLogicalBoxHeights(
+    int& maxPositionTop,
+    int& maxPositionBottom,
+    int& maxAscent,
+    int& maxDescent,
+    bool strictMode,
+    GlyphOverflowAndFallbackFontsMap& textBoxDataMap) {
   if (isRootInlineBox()) {
     // Examine our root box.
     int height = lineHeight(true);
@@ -443,8 +451,11 @@ void InlineFlowBox::computeLogicalBoxHeights(int& maxPositionTop,
     int lineHeight;
     int baseline;
     Vector<const SimpleFontData*>* usedFonts = 0;
-    if (curr->isInlineTextBox())
-      usedFonts = static_cast<InlineTextBox*>(curr)->fallbackFonts();
+    if (curr->isInlineTextBox()) {
+      GlyphOverflowAndFallbackFontsMap::iterator it =
+          textBoxDataMap.find(static_cast<InlineTextBox*>(curr));
+      usedFonts = it == textBoxDataMap.end() ? 0 : &it->second.first;
+    }
 
     if (usedFonts) {
       usedFonts->append(
@@ -512,7 +523,8 @@ void InlineFlowBox::computeLogicalBoxHeights(int& maxPositionTop,
 
     if (curr->isInlineFlowBox())
       static_cast<InlineFlowBox*>(curr)->computeLogicalBoxHeights(
-          maxPositionTop, maxPositionBottom, maxAscent, maxDescent, strictMode);
+          maxPositionTop, maxPositionBottom, maxAscent, maxDescent, strictMode,
+          textBoxDataMap);
   }
 }
 
@@ -590,9 +602,11 @@ void InlineFlowBox::placeBoxesVertically(int yPos,
   }
 }
 
-void InlineFlowBox::computeVerticalOverflow(int lineTop,
-                                            int lineBottom,
-                                            bool strictMode) {
+void InlineFlowBox::computeVerticalOverflow(
+    int lineTop,
+    int lineBottom,
+    bool strictMode,
+    GlyphOverflowAndFallbackFontsMap& textBoxDataMap) {
   int boxHeight = height();
 
   // Any spillage outside of the line top and bottom is not considered overflow.
@@ -634,8 +648,10 @@ void InlineFlowBox::computeVerticalOverflow(int lineTop,
       int strokeOverflow =
           static_cast<int>(ceilf(rt->style()->textStrokeWidth() / 2.0f));
 
+      GlyphOverflowAndFallbackFontsMap::iterator it =
+          textBoxDataMap.find(static_cast<InlineTextBox*>(curr));
       GlyphOverflow* glyphOverflow =
-          static_cast<InlineTextBox*>(curr)->glyphOverflow();
+          it == textBoxDataMap.end() ? 0 : &it->second.second;
 
       int topGlyphOverflow =
           -strokeOverflow - (glyphOverflow ? glyphOverflow->top : 0);
@@ -659,7 +675,8 @@ void InlineFlowBox::computeVerticalOverflow(int lineTop,
               bottomVisualOverflow);
     } else if (curr->renderer()->isRenderInline()) {
       InlineFlowBox* flow = static_cast<InlineFlowBox*>(curr);
-      flow->computeVerticalOverflow(lineTop, lineBottom, strictMode);
+      flow->computeVerticalOverflow(lineTop, lineBottom, strictMode,
+                                    textBoxDataMap);
       topLayoutOverflow = min(topLayoutOverflow, flow->topLayoutOverflow());
       bottomLayoutOverflow =
           max(bottomLayoutOverflow, flow->bottomLayoutOverflow());
