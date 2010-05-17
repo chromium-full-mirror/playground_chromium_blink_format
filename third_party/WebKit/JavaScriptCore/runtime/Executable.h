@@ -320,7 +320,7 @@ class FunctionExecutable : public ScriptExecutable {
 
   const Identifier& name() { return m_name; }
   size_t parameterCount() const { return m_parameters->size(); }
-  size_t variableCount() const { return m_numVariables; }
+  unsigned variableCount() const { return m_numVariables; }
   UString paramString() const;
   SharedSymbolTable* symbolTable() const { return m_symbolTable; }
 
@@ -345,12 +345,12 @@ class FunctionExecutable : public ScriptExecutable {
                      int firstLine,
                      int lastLine)
       : ScriptExecutable(globalData, source),
+        m_numVariables(0),
         m_forceUsesArguments(forceUsesArguments),
         m_parameters(parameters),
         m_codeBlockForCall(0),
         m_codeBlockForConstruct(0),
         m_name(name),
-        m_numVariables(0),
         m_symbolTable(0) {
     m_firstLine = firstLine;
     m_lastLine = lastLine;
@@ -364,12 +364,12 @@ class FunctionExecutable : public ScriptExecutable {
                      int firstLine,
                      int lastLine)
       : ScriptExecutable(exec, source),
+        m_numVariables(0),
         m_forceUsesArguments(forceUsesArguments),
         m_parameters(parameters),
         m_codeBlockForCall(0),
         m_codeBlockForConstruct(0),
         m_name(name),
-        m_numVariables(0),
         m_symbolTable(0) {
     m_firstLine = firstLine;
     m_lastLine = lastLine;
@@ -378,12 +378,13 @@ class FunctionExecutable : public ScriptExecutable {
   void compileForCall(ExecState*, ScopeChainNode*);
   void compileForConstruct(ExecState*, ScopeChainNode*);
 
-  bool m_forceUsesArguments;
+  unsigned m_numVariables : 31;
+  bool m_forceUsesArguments : 1;
+
   RefPtr<FunctionParameters> m_parameters;
   FunctionCodeBlock* m_codeBlockForCall;
   FunctionCodeBlock* m_codeBlockForConstruct;
   Identifier m_name;
-  size_t m_numVariables;
   SharedSymbolTable* m_symbolTable;
 
 #if ENABLE(JIT)
