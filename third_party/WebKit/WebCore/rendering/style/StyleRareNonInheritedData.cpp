@@ -42,7 +42,9 @@ StyleRareNonInheritedData::StyleRareNonInheritedData()
       matchNearestMailBlockquoteColor(
           RenderStyle::initialMatchNearestMailBlockquoteColor()),
       m_appearance(RenderStyle::initialAppearance()),
-      m_borderFit(RenderStyle::initialBorderFit())
+      m_borderFit(RenderStyle::initialBorderFit()),
+      m_counterIncrement(0),
+      m_counterReset(0)
 #if USE(ACCELERATED_COMPOSITING)
       ,
       m_runningAcceleratedAnimation(false)
@@ -81,7 +83,9 @@ StyleRareNonInheritedData::StyleRareNonInheritedData(
       marginBottomCollapse(o.marginBottomCollapse),
       matchNearestMailBlockquoteColor(o.matchNearestMailBlockquoteColor),
       m_appearance(o.m_appearance),
-      m_borderFit(o.m_borderFit)
+      m_borderFit(o.m_borderFit),
+      m_counterIncrement(o.m_counterIncrement),
+      m_counterReset(o.m_counterReset)
 #if USE(ACCELERATED_COMPOSITING)
       ,
       m_runningAcceleratedAnimation(o.m_runningAcceleratedAnimation)
@@ -134,7 +138,9 @@ bool StyleRareNonInheritedData::operator==(
          marginTopCollapse == o.marginTopCollapse &&
          marginBottomCollapse == o.marginBottomCollapse &&
          matchNearestMailBlockquoteColor == o.matchNearestMailBlockquoteColor &&
-         m_appearance == o.m_appearance && m_borderFit == o.m_borderFit
+         m_appearance == o.m_appearance && m_borderFit == o.m_borderFit &&
+         m_counterIncrement == o.m_counterIncrement &&
+         m_counterReset == o.m_counterReset
 #if USE(ACCELERATED_COMPOSITING)
          && !m_runningAcceleratedAnimation && !o.m_runningAcceleratedAnimation
 #endif

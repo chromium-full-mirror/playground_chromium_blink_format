@@ -114,6 +114,10 @@ class StyleRareNonInheritedData : public RefCounted<StyleRareNonInheritedData> {
                                             // been added.
   unsigned m_appearance : 6;                // EAppearance
   unsigned m_borderFit : 1;                 // EBorderFit
+
+  short m_counterIncrement;
+  short m_counterReset;
+
 #if USE(ACCELERATED_COMPOSITING)
   bool m_runningAcceleratedAnimation : 1;
 #endif

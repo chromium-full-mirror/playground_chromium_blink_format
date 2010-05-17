@@ -548,7 +548,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
   int fontSize() const { return inherited->font.pixelSize(); }
 
   const Color& color() const { return inherited->color; }
-  Length textIndent() const { return inherited->indent; }
+  Length textIndent() const { return rareInheritedData->indent; }
   ETextAlign textAlign() const {
     return static_cast<ETextAlign>(inherited_flags._text_align);
   }
@@ -563,7 +563,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
   int letterSpacing() const { return inherited->font.letterSpacing(); }
 
   float zoom() const { return visual->m_zoom; }
-  float effectiveZoom() const { return inherited->m_effectiveZoom; }
+  float effectiveZoom() const { return rareInheritedData->m_effectiveZoom; }
 
   TextDirection direction() const {
     return static_cast<TextDirection>(inherited_flags._direction);
@@ -727,8 +727,10 @@ class RenderStyle : public RefCounted<RenderStyle> {
     return static_cast<ECaptionSide>(inherited_flags._caption_side);
   }
 
-  short counterIncrement() const { return visual->counterIncrement; }
-  short counterReset() const { return visual->counterReset; }
+  short counterIncrement() const {
+    return rareNonInheritedData->m_counterIncrement;
+  }
+  short counterReset() const { return rareNonInheritedData->m_counterReset; }
 
   EListStyleType listStyleType() const {
     return static_cast<EListStyleType>(inherited_flags._list_style_type);
@@ -756,15 +758,15 @@ class RenderStyle : public RefCounted<RenderStyle> {
     return static_cast<ECursor>(inherited_flags._cursor_style);
   }
 
-  CursorList* cursors() const { return inherited->cursorData.get(); }
+  CursorList* cursors() const { return rareInheritedData->cursorData.get(); }
 
   EInsideLink insideLink() const {
     return static_cast<EInsideLink>(inherited_flags._insideLink);
   }
   bool isLink() const { return noninherited_flags._isLink; }
 
-  short widows() const { return inherited->widows; }
-  short orphans() const { return inherited->orphans; }
+  short widows() const { return rareInheritedData->widows; }
+  short orphans() const { return rareInheritedData->orphans; }
   EPageBreak pageBreakInside() const {
     return static_cast<EPageBreak>(noninherited_flags._page_break_inside);
   }
@@ -1244,7 +1246,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
   void setBlendedFontSize(int);
 
   void setColor(const Color& v) { SET_VAR(inherited, color, v) }
-  void setTextIndent(Length v) { SET_VAR(inherited, indent, v) }
+  void setTextIndent(Length v) { SET_VAR(rareInheritedData, indent, v) }
   void setTextAlign(ETextAlign v) { inherited_flags._text_align = v; }
   void setTextTransform(ETextTransform v) {
     inherited_flags._text_transform = v;
@@ -1262,7 +1264,9 @@ class RenderStyle : public RefCounted<RenderStyle> {
     SET_VAR(visual, m_zoom, f);
     setEffectiveZoom(effectiveZoom() * zoom());
   }
-  void setEffectiveZoom(float f) { SET_VAR(inherited, m_effectiveZoom, f) }
+  void setEffectiveZoom(float f) {
+    SET_VAR(rareInheritedData, m_effectiveZoom, f)
+  }
 
   void setWhiteSpace(EWhiteSpace v) { inherited_flags._white_space = v; }
 
@@ -1322,8 +1326,12 @@ class RenderStyle : public RefCounted<RenderStyle> {
   void setEmptyCells(EEmptyCell v) { inherited_flags._empty_cells = v; }
   void setCaptionSide(ECaptionSide v) { inherited_flags._caption_side = v; }
 
-  void setCounterIncrement(short v) { SET_VAR(visual, counterIncrement, v) }
-  void setCounterReset(short v) { SET_VAR(visual, counterReset, v) }
+  void setCounterIncrement(short v) {
+    SET_VAR(rareNonInheritedData, m_counterIncrement, v)
+  }
+  void setCounterReset(short v) {
+    SET_VAR(rareNonInheritedData, m_counterReset, v)
+  }
 
   void setListStyleType(EListStyleType v) {
     inherited_flags._list_style_type = v;
@@ -1380,8 +1388,8 @@ class RenderStyle : public RefCounted<RenderStyle> {
     SET_VAR(m_box, m_zIndex, v)
   }
 
-  void setWidows(short w) { SET_VAR(inherited, widows, w); }
-  void setOrphans(short o) { SET_VAR(inherited, orphans, o); }
+  void setWidows(short w) { SET_VAR(rareInheritedData, widows, w); }
+  void setOrphans(short o) { SET_VAR(rareInheritedData, orphans, o); }
   void setPageBreakInside(EPageBreak b) {
     noninherited_flags._page_break_inside = b;
   }
