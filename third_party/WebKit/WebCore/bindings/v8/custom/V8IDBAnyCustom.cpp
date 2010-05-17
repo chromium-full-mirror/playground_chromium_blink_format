@@ -32,33 +32,33 @@
 
 #if ENABLE(INDEXED_DATABASE)
 
-#include "JSIDBRequest.h"
+#include "V8IDBAny.h"
 
-#include "IDBDatabaseRequest.h"
-#include "IDBRequest.h"
-#include "JSIDBDatabaseRequest.h"
 #include "SerializedScriptValue.h"
-
-using namespace JSC;
+#include "V8IDBDatabaseRequest.h"
+#include "V8IndexedDatabaseRequest.h"
 
 namespace WebCore {
 
-JSValue JSIDBRequest::result(ExecState* exec) const {
-  IDBRequest* idbRequest = static_cast<IDBRequest*>(impl());
-  switch (idbRequest->resultType()) {
-    case IDBRequest::UNDEFINED:
-      return jsUndefined();
-    case IDBRequest::IDBDATABASE:
-      return toJS(exec, globalObject(), idbRequest->idbDatabaseResult());
-    case IDBRequest::SERIALIZEDSCRIPTVALUE:
-      return idbRequest->serializedScriptValueResult()->deserialize(
-          exec, globalObject());
+v8::Handle<v8::Value> toV8(IDBAny* impl) {
+  if (!impl)
+    return v8::Null();
+
+  switch (impl->type()) {
+    case IDBAny::UndefinedType:
+      return v8::Undefined();
+    case IDBAny::IDBDatabaseRequestType:
+      return toV8(impl->idbDatabaseRequest());
+    case IDBAny::IndexedDatabaseRequestType:
+      return toV8(impl->indexedDatabaseRequest());
+    case IDBAny::SerializedScriptValueType:
+      return impl->serializedScriptValue()->deserialize();
   }
 
   ASSERT_NOT_REACHED();
-  return jsUndefined();
+  return v8::Undefined();
 }
 
-}  // namespace WebCore
-
 #endif  // ENABLE(INDEXED_DATABASE)
+
+}  // namespace WebCore

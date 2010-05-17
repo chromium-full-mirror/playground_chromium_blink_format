@@ -39,8 +39,9 @@
 
 namespace WebCore {
 
-class IndexedDatabase;
 class Frame;
+class IDBAny;
+class IndexedDatabase;
 
 class IndexedDatabaseRequest : public RefCounted<IndexedDatabaseRequest> {
  public:
@@ -61,7 +62,8 @@ class IndexedDatabaseRequest : public RefCounted<IndexedDatabaseRequest> {
  private:
   IndexedDatabaseRequest(IndexedDatabase*, Frame*);
 
-  PassRefPtr<IndexedDatabase> m_indexedDatabase;
+  RefPtr<IndexedDatabase> m_indexedDatabase;
+  RefPtr<IDBAny> m_this;
   Frame* m_frame;
 };
 

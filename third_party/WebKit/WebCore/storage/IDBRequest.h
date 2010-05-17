@@ -35,6 +35,7 @@
 #include "EventListener.h"
 #include "EventNames.h"
 #include "EventTarget.h"
+#include "IDBAny.h"
 #include "IDBCallbacks.h"
 #include "Timer.h"
 
@@ -46,24 +47,18 @@ class IDBRequest : public IDBCallbacks,
                    public EventTarget,
                    public ActiveDOMObject {
  public:
-  static PassRefPtr<IDBRequest> create(ScriptExecutionContext* context) {
-    return adoptRef(new IDBRequest(context));
+  static PassRefPtr<IDBRequest> create(ScriptExecutionContext* context,
+                                       PassRefPtr<IDBAny> source) {
+    return adoptRef(new IDBRequest(context, source));
   }
   virtual ~IDBRequest();
-
-  // The result attribute of this class can represent many different WebCore
-  // types.
-  enum ResultType { UNDEFINED = 0, IDBDATABASE, SERIALIZEDSCRIPTVALUE };
-  ResultType resultType() const { return m_resultType; }
-  PassRefPtr<IDBDatabaseRequest> idbDatabaseResult();
-  PassRefPtr<SerializedScriptValue> serializedScriptValueResult();
-  // FIXME: Have one such getter for each possible result type.
 
   // Defined in the IDL
   void abort();
   enum ReadyState { INITIAL = 0, LOADING = 1, DONE = 2 };
   unsigned short readyState() const { return m_readyState; }
   PassRefPtr<IDBDatabaseError> error() const { return m_error; }
+  PassRefPtr<IDBAny> result() { return m_result; }
   DEFINE_ATTRIBUTE_EVENT_LISTENER(success);
   DEFINE_ATTRIBUTE_EVENT_LISTENER(error);
 
@@ -86,7 +81,7 @@ class IDBRequest : public IDBCallbacks,
   using RefCounted<IDBCallbacks>::deref;
 
  private:
-  IDBRequest(ScriptExecutionContext*);
+  IDBRequest(ScriptExecutionContext*, PassRefPtr<IDBAny> source);
 
   void timerFired(Timer<IDBRequest>*);
   void onEventCommon();
@@ -97,11 +92,9 @@ class IDBRequest : public IDBCallbacks,
   virtual EventTargetData* eventTargetData();
   virtual EventTargetData* ensureEventTargetData();
 
-  ResultType m_resultType;
-  // Only one of the following should ever be in use at any given time.
-  // m_resultType defines which one.
-  RefPtr<IDBDatabaseRequest> m_idbDatabaseResult;
-  RefPtr<SerializedScriptValue> m_serializedScriptValueResult;
+  RefPtr<IDBAny> m_source;
+
+  RefPtr<IDBAny> m_result;
   RefPtr<IDBDatabaseError> m_error;
 
   // Used to fire events asynchronously.

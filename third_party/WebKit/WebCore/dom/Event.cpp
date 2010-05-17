@@ -161,6 +161,16 @@ bool Event::isStorageEvent() const {
 }
 #endif
 
+#if ENABLE(INDEXED_DATABASE)
+bool Event::isIDBErrorEvent() const {
+  return false;
+}
+
+bool Event::isIDBSuccessEvent() const {
+  return false;
+}
+#endif
+
 #if ENABLE(WORKERS)
 bool Event::isErrorEvent() const {
   return false;
