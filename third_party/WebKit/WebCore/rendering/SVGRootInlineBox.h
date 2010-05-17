@@ -50,8 +50,10 @@ class SVGRootInlineBox : public RootInlineBox, protected SVGRenderBase {
   virtual int placeBoxesHorizontally(int x,
                                      int& leftPosition,
                                      int& rightPosition,
-                                     bool& needsWordSpacing);
-  virtual int verticallyAlignBoxes(int heightOfBlock);
+                                     bool& needsWordSpacing,
+                                     GlyphOverflowAndFallbackFontsMap&);
+  virtual int verticallyAlignBoxes(int heightOfBlock,
+                                   GlyphOverflowAndFallbackFontsMap&);
 
   virtual void computePerCharacterLayoutInformation();
 

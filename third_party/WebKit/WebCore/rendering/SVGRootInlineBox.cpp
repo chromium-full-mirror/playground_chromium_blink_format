@@ -473,17 +473,20 @@ void SVGRootInlineBox::paint(RenderObject::PaintInfo& paintInfo,
   paintInfo.context->restore();
 }
 
-int SVGRootInlineBox::placeBoxesHorizontally(int,
-                                             int& leftPosition,
-                                             int& rightPosition,
-                                             bool&) {
+int SVGRootInlineBox::placeBoxesHorizontally(
+    int,
+    int& leftPosition,
+    int& rightPosition,
+    bool&,
+    GlyphOverflowAndFallbackFontsMap&) {
   // Remove any offsets caused by RTL text layout
   leftPosition = 0;
   rightPosition = 0;
   return 0;
 }
 
-int SVGRootInlineBox::verticallyAlignBoxes(int) {
+int SVGRootInlineBox::verticallyAlignBoxes(int,
+                                           GlyphOverflowAndFallbackFontsMap&) {
   // height is set by layoutInlineBoxes.
   return height();
 }

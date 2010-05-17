@@ -37,8 +37,8 @@ class SVGInlineFlowBox : public InlineFlowBox {
   virtual int placeBoxesHorizontally(int x,
                                      int& leftPosition,
                                      int& rightPosition,
-                                     bool& needsWordSpacing);
-  virtual int verticallyAlignBoxes(int heightOfBlock);
+                                     bool& needsWordSpacing,
+                                     GlyphOverflowAndFallbackFontsMap&);
 };
 
 }  // namespace WebCore
