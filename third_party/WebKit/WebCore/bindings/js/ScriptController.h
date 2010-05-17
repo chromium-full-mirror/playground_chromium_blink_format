@@ -108,7 +108,9 @@ class ScriptController {
   // Returns true if argument is a JavaScript URL.
   bool executeIfJavaScriptURL(const KURL&,
                               bool userGesture = false,
-                              bool replaceDocument = true);
+                              ShouldReplaceDocumentIfJavaScriptURL
+                                  shouldReplaceDocumentIfJavaScriptURL =
+                                      ReplaceDocumentIfJavaScriptURL);
 
   // This function must be called from the main thread. It is safe to call it
   // repeatedly.

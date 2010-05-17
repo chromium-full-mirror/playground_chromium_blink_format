@@ -532,6 +532,15 @@ class FrameLoader : public Noncopyable {
 
   void dispatchDidCommitLoad();
 
+  void urlSelected(const ResourceRequest&,
+                   const String& target,
+                   PassRefPtr<Event>,
+                   bool lockHistory,
+                   bool lockBackForwardList,
+                   bool userGesture,
+                   ReferrerPolicy,
+                   ShouldReplaceDocumentIfJavaScriptURL);
+
   void loadWithDocumentLoader(
       DocumentLoader*,
       FrameLoadType,

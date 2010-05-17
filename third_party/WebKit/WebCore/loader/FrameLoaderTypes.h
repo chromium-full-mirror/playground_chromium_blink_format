@@ -113,6 +113,17 @@ enum SandboxFlag {
 
 enum SecurityCheckPolicy { SkipSecurityCheck, DoSecurityCheck };
 
+// Passed to FrameLoader::urlSelected() and
+// ScriptController::executeIfJavaScriptURL()
+// to control whether, in the case of a JavaScript URL, executeIfJavaScriptURL()
+// should
+// replace the document.  It is a FIXME to eliminate this extra parameter from
+// executeIfJavaScriptURL(), in which case this enum can go away.
+enum ShouldReplaceDocumentIfJavaScriptURL {
+  ReplaceDocumentIfJavaScriptURL,
+  DoNotReplaceDocumentIfJavaScriptURL
+};
+
 enum ReasonForCallingAllowPlugins {
   AboutToInstantiatePlugin,
   NotAboutToInstantiatePlugin

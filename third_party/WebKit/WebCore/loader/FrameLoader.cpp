@@ -357,11 +357,8 @@ void FrameLoader::changeLocation(const KURL& url,
   ResourceRequest request(url, referrer, refresh ? ReloadIgnoringCacheData
                                                  : UseProtocolCachePolicy);
 
-  if (m_frame->script()->executeIfJavaScriptURL(request.url(), userGesture))
-    return;
-
   urlSelected(request, "_self", 0, lockHistory, lockBackForwardList,
-              userGesture, SendReferrer);
+              userGesture, SendReferrer, ReplaceDocumentIfJavaScriptURL);
 }
 
 void FrameLoader::urlSelected(const ResourceRequest& request,
@@ -371,10 +368,27 @@ void FrameLoader::urlSelected(const ResourceRequest& request,
                               bool lockBackForwardList,
                               bool userGesture,
                               ReferrerPolicy referrerPolicy) {
+  urlSelected(request, passedTarget, triggeringEvent, lockHistory,
+              lockBackForwardList, userGesture, referrerPolicy,
+              DoNotReplaceDocumentIfJavaScriptURL);
+}
+
+// This overload will go away when the FIXME to eliminate the
+// shouldReplaceDocumentIfJavaScriptURL
+// parameter from ScriptController::executeIfJavaScriptURL() is addressed.
+void FrameLoader::urlSelected(
+    const ResourceRequest& request,
+    const String& passedTarget,
+    PassRefPtr<Event> triggeringEvent,
+    bool lockHistory,
+    bool lockBackForwardList,
+    bool userGesture,
+    ReferrerPolicy referrerPolicy,
+    ShouldReplaceDocumentIfJavaScriptURL shouldReplaceDocumentIfJavaScriptURL) {
   ASSERT(!m_suppressOpenerInNewFrame);
 
-  if (m_frame->script()->executeIfJavaScriptURL(request.url(), userGesture,
-                                                false))
+  if (m_frame->script()->executeIfJavaScriptURL(
+          request.url(), userGesture, shouldReplaceDocumentIfJavaScriptURL))
     return;
 
   String target = passedTarget;
@@ -518,7 +532,8 @@ void FrameLoader::submitForm(const char* action,
 
   if (protocolIsJavaScript(u)) {
     m_isExecutingJavaScriptFormAction = true;
-    m_frame->script()->executeIfJavaScriptURL(u, false, false);
+    m_frame->script()->executeIfJavaScriptURL(
+        u, false, DoNotReplaceDocumentIfJavaScriptURL);
     m_isExecutingJavaScriptFormAction = false;
     return;
   }

@@ -71,9 +71,10 @@ ScriptValue ScriptController::executeScript(
   return result;
 }
 
-bool ScriptController::executeIfJavaScriptURL(const KURL& url,
-                                              bool userGesture,
-                                              bool replaceDocument) {
+bool ScriptController::executeIfJavaScriptURL(
+    const KURL& url,
+    bool userGesture,
+    ShouldReplaceDocumentIfJavaScriptURL shouldReplaceDocumentIfJavaScriptURL) {
   if (!protocolIsJavaScript(url))
     return false;
 
@@ -105,7 +106,7 @@ bool ScriptController::executeIfJavaScriptURL(const KURL& url,
   // FIXME: We should always replace the document, but doing so
   //        synchronously can cause crashes:
   //        http://bugs.webkit.org/show_bug.cgi?id=16782
-  if (replaceDocument)
+  if (shouldReplaceDocumentIfJavaScriptURL == ReplaceDocumentIfJavaScriptURL)
     m_frame->loader()->writer()->replaceDocument(scriptResult);
 
   return true;
