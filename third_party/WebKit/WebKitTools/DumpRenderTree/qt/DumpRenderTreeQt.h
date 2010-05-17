@@ -88,6 +88,7 @@ class DumpRenderTree : public QObject {
   TextInputController* textInputController() const {
     return m_textInputController;
   }
+  QString persistentStoragePath() const { return m_persistentStoragePath; }
 
   QWebPage* createWindow();
   int windowCount() const;
@@ -142,6 +143,7 @@ class DumpRenderTree : public QObject {
   QList<QObject*> windows;
   bool m_enableTextOutput;
   bool m_singleFileMode;
+  QString m_persistentStoragePath;
 };
 
 class NetworkAccessManager : public QNetworkAccessManager {
