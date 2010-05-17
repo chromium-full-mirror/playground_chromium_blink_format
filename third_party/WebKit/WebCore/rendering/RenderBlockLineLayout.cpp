@@ -32,6 +32,7 @@
 #include "RenderInline.h"
 #include "RenderListMarker.h"
 #include "RenderView.h"
+#include "TrailingFloatsRootInlineBox.h"
 #include "break_lines.h"
 #include <wtf/AlwaysInline.h>
 #include <wtf/RefCountedLeakCounter.h>
@@ -573,7 +574,6 @@ void RenderBlock::computeVerticalPositionsForLine(
     else if (r->m_object->isBox())
       toRenderBox(r->m_object)->positionLineBox(r->m_box);
   }
-
   // Positioned objects and zero-length text nodes destroy their boxes in
   // position(), which unnecessarily dirties the line.
   lineBox->markDirty(false);
@@ -964,15 +964,14 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
       if (checkForFloatsFromLastLine) {
         int bottomVisualOverflow = lastRootBox()->bottomVisualOverflow();
         int bottomLayoutOverflow = lastRootBox()->bottomLayoutOverflow();
-        RootInlineBox* trailingFloatsLineBox =
-            new (renderArena()) RootInlineBox(this);
+        TrailingFloatsRootInlineBox* trailingFloatsLineBox =
+            new (renderArena()) TrailingFloatsRootInlineBox(this);
         m_lineBoxes.appendLineBox(trailingFloatsLineBox);
         trailingFloatsLineBox->setConstructed();
         GlyphOverflowAndFallbackFontsMap textBoxDataMap;
         trailingFloatsLineBox->verticallyAlignBoxes(height(), textBoxDataMap);
-        trailingFloatsLineBox->setHeight(0);
         trailingFloatsLineBox->setVerticalOverflowPositions(
-            height(), bottomLayoutOverflow, height(), bottomVisualOverflow);
+            height(), bottomLayoutOverflow, height(), bottomVisualOverflow, 0);
         trailingFloatsLineBox->setBlockHeight(height());
       }
       if (lastFloat) {

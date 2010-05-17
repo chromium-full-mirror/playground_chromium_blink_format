@@ -108,8 +108,9 @@ class InlineTextBox : public InlineBox {
   virtual bool isLineBreak() const;
 
   void setSpaceAdd(int add) {
-    setWidth(width() - m_toAdd + add);
+    m_width -= m_toAdd;
     m_toAdd = add;
+    m_width += m_toAdd;
   }
 
  private:

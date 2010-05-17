@@ -132,7 +132,9 @@ FloatQuad RenderSVGInlineText::computeRepaintQuadForRange(
 }
 
 InlineTextBox* RenderSVGInlineText::createTextBox() {
-  return new (renderArena()) SVGInlineTextBox(this);
+  InlineTextBox* box = new (renderArena()) SVGInlineTextBox(this);
+  box->setHasVirtualHeight();
+  return box;
 }
 
 IntRect RenderSVGInlineText::localCaretRect(InlineBox*, int, int*) {

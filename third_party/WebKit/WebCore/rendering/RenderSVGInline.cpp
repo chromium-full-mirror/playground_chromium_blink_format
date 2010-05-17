@@ -37,7 +37,9 @@ namespace WebCore {
 RenderSVGInline::RenderSVGInline(Node* n) : RenderInline(n) {}
 
 InlineFlowBox* RenderSVGInline::createInlineFlowBox() {
-  return new (renderArena()) SVGInlineFlowBox(this);
+  InlineFlowBox* box = new (renderArena()) SVGInlineFlowBox(this);
+  box->setHasVirtualHeight();
+  return box;
 }
 
 void RenderSVGInline::absoluteRects(Vector<IntRect>& rects, int, int) {

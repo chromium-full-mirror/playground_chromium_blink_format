@@ -57,7 +57,7 @@ void EllipsisBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
   context->drawText(style->font(),
                     TextRun(str.characters(), str.length(), false, 0, 0, false,
                             style->visuallyOrdered()),
-                    IntPoint(x() + tx, y() + ty + style->font().ascent()));
+                    IntPoint(m_x + tx, m_y + ty + style->font().ascent()));
 
   // Restore the regular fill color.
   if (textColor != context->fillColor())
@@ -68,8 +68,8 @@ void EllipsisBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
 
   if (m_markupBox) {
     // Paint the markup box
-    tx += frameRect().right() - m_markupBox->x();
-    ty += y() + style->font().ascent() -
+    tx += m_x + m_width - m_markupBox->x();
+    ty += m_y + style->font().ascent() -
           (m_markupBox->y() +
            m_markupBox->renderer()->style(m_firstLine)->font().ascent());
     m_markupBox->paint(paintInfo, tx, ty);
@@ -82,7 +82,7 @@ IntRect EllipsisBox::selectionRect(int tx, int ty) {
   return enclosingIntRect(f.selectionRectForText(
       TextRun(m_str.characters(), m_str.length(), false, 0, 0, false,
               style->visuallyOrdered()),
-      IntPoint(x() + tx, y() + ty + root()->selectionTop()),
+      IntPoint(m_x + tx, m_y + ty + root()->selectionTop()),
       root()->selectionHeight()));
 }
 
@@ -103,42 +103,41 @@ void EllipsisBox::paintSelection(GraphicsContext* context,
     c = Color(0xff - c.red(), 0xff - c.green(), 0xff - c.blue());
 
   context->save();
-  int t = root()->selectionTop();
+  int y = root()->selectionTop();
   int h = root()->selectionHeight();
-  context->clip(IntRect(x() + tx, t + ty, width(), h));
+  context->clip(IntRect(m_x + tx, y + ty, m_width, h));
   context->drawHighlightForText(
       font, TextRun(m_str.characters(), m_str.length(), false, 0, 0, false,
                     style->visuallyOrdered()),
-      IntPoint(x() + tx, y() + ty + t), h, c, style->colorSpace());
+      IntPoint(m_x + tx, m_y + ty + y), h, c, style->colorSpace());
   context->restore();
 }
 
 bool EllipsisBox::nodeAtPoint(const HitTestRequest& request,
                               HitTestResult& result,
-                              int pointX,
-                              int pointY,
+                              int x,
+                              int y,
                               int tx,
                               int ty) {
-  tx += x();
-  ty += y();
+  tx += m_x;
+  ty += m_y;
 
   // Hit test the markup box.
   if (m_markupBox) {
     RenderStyle* style = m_renderer->style(m_firstLine);
-    int mtx = tx + width() - m_markupBox->x();
+    int mtx = tx + m_width - m_markupBox->x();
     int mty = ty + style->font().ascent() -
               (m_markupBox->y() +
                m_markupBox->renderer()->style(m_firstLine)->font().ascent());
-    if (m_markupBox->nodeAtPoint(request, result, pointX, pointY, mtx, mty)) {
-      renderer()->updateHitTestResult(result,
-                                      IntPoint(pointX - mtx, pointY - mty));
+    if (m_markupBox->nodeAtPoint(request, result, x, y, mtx, mty)) {
+      renderer()->updateHitTestResult(result, IntPoint(x - mtx, y - mty));
       return true;
     }
   }
 
   if (visibleToHitTesting() &&
-      IntRect(tx, ty, width(), height()).contains(pointX, pointY)) {
-    renderer()->updateHitTestResult(result, IntPoint(pointX - tx, pointY - ty));
+      IntRect(tx, ty, m_width, m_height).contains(x, y)) {
+    renderer()->updateHitTestResult(result, IntPoint(x - tx, y - ty));
     return true;
   }
 
