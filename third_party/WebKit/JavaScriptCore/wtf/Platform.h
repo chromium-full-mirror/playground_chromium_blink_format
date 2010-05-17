@@ -505,19 +505,7 @@
 #define WTF_PLATFORM_CAIRO 1
 #endif
 
-/* OS(WINCE) && PLATFORM(QT)
-   We can not determine the endianess at compile time. For
-   Qt for Windows CE the endianess is specified in the
-   device specific makespec
-*/
 #if OS(WINCE) && PLATFORM(QT)
-#include <QtGlobal>
-#undef WTF_CPU_BIG_ENDIAN
-#undef WTF_CPU_MIDDLE_ENDIAN
-#if Q_BYTE_ORDER == Q_BIG_ENDIAN
-#define WTF_CPU_BIG_ENDIAN 1
-#endif
-
 #include <ce_time.h>
 #endif
 
