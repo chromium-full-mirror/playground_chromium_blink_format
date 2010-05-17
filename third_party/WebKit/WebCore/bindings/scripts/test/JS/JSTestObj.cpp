@@ -1092,11 +1092,6 @@ jsTestObjPrototypeFunctionMethodWithNonOptionalArgAndTwoOptionalArgs(
   }
 
   int opt1 = args.at(1).toInt32(exec);
-  if (argsCount < 3) {
-    imp->methodWithNonOptionalArgAndTwoOptionalArgs(nonOpt, opt1);
-    return jsUndefined();
-  }
-
   int opt2 = args.at(2).toInt32(exec);
 
   imp->methodWithNonOptionalArgAndTwoOptionalArgs(nonOpt, opt1, opt2);
