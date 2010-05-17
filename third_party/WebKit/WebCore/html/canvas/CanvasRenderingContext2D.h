@@ -303,6 +303,8 @@ class CanvasRenderingContext2D : public CanvasRenderingContext {
                                           const String& repetitionType,
                                           ExceptionCode&);
 
+  PassRefPtr<ImageData> createImageData(PassRefPtr<ImageData> imageData,
+                                        ExceptionCode&) const;
   PassRefPtr<ImageData> createImageData(float width,
                                         float height,
                                         ExceptionCode&) const;
