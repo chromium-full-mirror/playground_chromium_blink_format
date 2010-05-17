@@ -260,6 +260,10 @@ class ChromeClient {
   virtual void enterFullscreenForNode(Node*) {}
   virtual void exitFullscreenForNode(Node*) {}
 
+#if ENABLE(TILED_BACKING_STORE)
+  virtual IntRect visibleRectForTiledBackingStore() const { return IntRect(); }
+#endif
+
 #if PLATFORM(MAC)
   virtual KeyboardUIMode keyboardUIMode() { return KeyboardAccessDefault; }
 

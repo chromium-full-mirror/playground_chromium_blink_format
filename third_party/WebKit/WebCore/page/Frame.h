@@ -343,6 +343,7 @@ class Frame : public RefCounted<Frame>
   virtual void tiledBackingStorePaint(GraphicsContext*, const IntRect&);
   virtual void tiledBackingStorePaintEnd(const Vector<IntRect>& paintedArea);
   virtual IntRect tiledBackingStoreContentsRect();
+  virtual IntRect tiledBackingStoreVisibleRect();
 #endif
 
 #if PLATFORM(MAC)
