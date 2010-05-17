@@ -23,6 +23,8 @@
 #include "QtAbstractWebPopup.h"
 #include <QComboBox>
 
+#ifndef QT_NO_COMBOBOX
+
 QT_BEGIN_NAMESPACE
 class QGraphicsProxyWidget;
 QT_END_NAMESPACE
@@ -65,5 +67,7 @@ class QtFallbackWebPopupCombo : public QComboBox {
   QtFallbackWebPopup& m_ownerPopup;
 };
 }
+
+#endif  // QT_NO_COMBOBOX
 
 #endif  // QtFallbackWebPopup_h

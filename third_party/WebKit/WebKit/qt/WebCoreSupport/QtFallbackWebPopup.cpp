@@ -21,6 +21,8 @@
 #include "config.h"
 #include "QtFallbackWebPopup.h"
 
+#ifndef QT_NO_COMBOBOX
+
 #include "HostWindow.h"
 #include "PopupMenuClient.h"
 #include "QWebPageClient.h"
@@ -222,3 +224,5 @@ void QtFallbackWebPopup::activeChanged(int index) {
   valueChanged(index);
 }
 }
+
+#endif  // QT_NO_COMBOBOX
