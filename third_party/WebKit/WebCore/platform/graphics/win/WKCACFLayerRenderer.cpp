@@ -227,7 +227,8 @@ WKCACFLayerRenderer::WKCACFLayerRenderer()
       m_renderTimer(this, &WKCACFLayerRenderer::renderTimerFired),
       m_scrollPosition(0, 0),
       m_scrollSize(1, 1),
-      m_backingStoreDirty(false) {
+      m_backingStoreDirty(false),
+      m_mustResetLostDeviceBeforeRendering(false) {
 #ifndef NDEBUG
   char* printTreeFlag = getenv("CA_PRINT_TREE");
   m_printTree = printTreeFlag && atoi(printTreeFlag);
@@ -420,7 +421,10 @@ void WKCACFLayerRenderer::resize() {
   if (!m_d3dDevice)
     return;
 
-  resetDevice();
+  // Resetting the device might fail here. But that's OK, because if it does it
+  // we will attempt to
+  // reset the device the next time we try to render.
+  resetDevice(ChangedWindowSize);
 
   if (m_rootLayer) {
     m_rootLayer->setFrame(bounds());
@@ -485,6 +489,12 @@ void WKCACFLayerRenderer::paint() {
 void WKCACFLayerRenderer::render(const Vector<CGRect>& dirtyRects) {
   ASSERT(m_d3dDevice);
 
+  if (m_mustResetLostDeviceBeforeRendering && !resetDevice(LostDevice)) {
+    // We can't reset the device right now. Try again soon.
+    renderSoon();
+    return;
+  }
+
   // Flush the root layer to the render tree.
   WKCACFContextFlusher::shared().flushAllContexts();
 
@@ -543,9 +553,12 @@ void WKCACFLayerRenderer::render(const Vector<CGRect>& dirtyRects) {
     err = m_d3dDevice->Present(0, 0, 0, 0);
 
     if (err == D3DERR_DEVICELOST) {
-      // Lost device situation.
-      resetDevice();
       CARenderUpdateAddRect(u, &bounds);
+      if (!resetDevice(LostDevice)) {
+        // We can't reset the device right now. Try again soon.
+        renderSoon();
+        return;
+      }
     }
   } while (err == D3DERR_DEVICELOST);
 
@@ -585,8 +598,26 @@ void WKCACFLayerRenderer::initD3DGeometry() {
   m_d3dDevice->SetTransform(D3DTS_PROJECTION, &projection);
 }
 
-void WKCACFLayerRenderer::resetDevice() {
+bool WKCACFLayerRenderer::resetDevice(ResetReason reason) {
   ASSERT(m_d3dDevice);
+  ASSERT(m_renderContext);
+
+  HRESULT hr = m_d3dDevice->TestCooperativeLevel();
+
+  if (hr == D3DERR_DEVICELOST || hr == D3DERR_DRIVERINTERNALERROR) {
+    // The device cannot be reset at this time. Try again soon.
+    m_mustResetLostDeviceBeforeRendering = true;
+    return false;
+  }
+
+  m_mustResetLostDeviceBeforeRendering = false;
+
+  if (reason == LostDevice && hr == D3D_OK) {
+    // The device wasn't lost after all.
+    return true;
+  }
+
+  // We can reset the device.
 
   // We have to purge the CARenderOGLContext whenever we reset the
   // IDirect3DDevice9 in order to
@@ -597,8 +628,15 @@ void WKCACFLayerRenderer::resetDevice() {
   CARenderOGLPurge(m_renderer);
 
   D3DPRESENT_PARAMETERS parameters = initialPresentationParameters();
-  m_d3dDevice->Reset(&parameters);
+  hr = m_d3dDevice->Reset(&parameters);
+
+  // TestCooperativeLevel told us the device may be reset now, so we should
+  // not be told here that the device is lost.
+  ASSERT(hr != D3DERR_DEVICELOST);
+
   initD3DGeometry();
+
+  return true;
 }
 }
 

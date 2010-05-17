@@ -84,7 +84,14 @@ class WKCACFLayerRenderer : public Noncopyable {
   CGRect bounds() const;
 
   void initD3DGeometry();
-  void resetDevice();
+
+  // Call this when the device window has changed size or when
+  // IDirect3DDevice9::Present returns
+  // D3DERR_DEVICELOST. Returns true if the device was recovered, false if
+  // rendering must be
+  // aborted and reattempted soon.
+  enum ResetReason { ChangedWindowSize, LostDevice };
+  bool resetDevice(ResetReason);
 
   void render(const Vector<CGRect>& dirtyRects = Vector<CGRect>());
   void paint();
@@ -104,6 +111,7 @@ class WKCACFLayerRenderer : public Noncopyable {
   IntPoint m_scrollPosition;
   IntSize m_scrollSize;
   bool m_backingStoreDirty;
+  bool m_mustResetLostDeviceBeforeRendering;
 #ifndef NDEBUG
   bool m_printTree;
 #endif
