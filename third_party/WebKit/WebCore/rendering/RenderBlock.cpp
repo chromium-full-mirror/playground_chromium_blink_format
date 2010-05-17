@@ -1271,9 +1271,8 @@ int RenderBlock::estimateVerticalPosition(RenderBox* child,
 }
 
 void RenderBlock::determineHorizontalPosition(RenderBox* child) {
+  int xPos = borderLeft() + paddingLeft();
   if (style()->direction() == LTR) {
-    int xPos = borderLeft() + paddingLeft();
-
     // Add in our left margin.
     int chPos = xPos + child->marginLeft();
 
@@ -1308,8 +1307,7 @@ void RenderBlock::determineHorizontalPosition(RenderBox* child) {
     view()->addLayoutDelta(IntSize(child->x() - chPos, 0));
     child->setLocation(chPos, child->y());
   } else {
-    int xPos =
-        width() - borderRight() - paddingRight() - verticalScrollbarWidth();
+    xPos += availableWidth();
     int chPos = xPos - (child->width() + child->marginRight());
     if (child->avoidsFloats()) {
       int rightOff = rightOffset(height(), false);
@@ -3784,13 +3782,17 @@ bool RenderBlock::nodeAtPoint(const HitTestRequest& request,
 
     // Hit test contents if we don't have columns.
     if (!hasColumns() && hitTestContents(request, result, _x, _y, scrolledX,
-                                         scrolledY, hitTestAction))
+                                         scrolledY, hitTestAction)) {
+      updateHitTestResult(result, IntPoint(_x - tx, _y - ty));
       return true;
+    }
 
     // Hit test our columns if we do have them.
     if (hasColumns() && hitTestColumns(request, result, _x, _y, scrolledX,
-                                       scrolledY, hitTestAction))
+                                       scrolledY, hitTestAction)) {
+      updateHitTestResult(result, IntPoint(_x - tx, _y - ty));
       return true;
+    }
 
     // Hit test floats.
     if (hitTestAction == HitTestFloat && m_floatingObjects) {
@@ -3885,11 +3887,8 @@ bool RenderBlock::hitTestContents(const HitTestRequest& request,
                                   HitTestAction hitTestAction) {
   if (childrenInline() && !isTable()) {
     // We have to hit-test our line boxes.
-    if (m_lineBoxes.hitTest(this, request, result, x, y, tx, ty,
-                            hitTestAction)) {
-      updateHitTestResult(result, IntPoint(x - tx, y - ty));
+    if (m_lineBoxes.hitTest(this, request, result, x, y, tx, ty, hitTestAction))
       return true;
-    }
   } else {
     // Hit test our children.
     HitTestAction childHitTest = hitTestAction;
@@ -3898,10 +3897,8 @@ bool RenderBlock::hitTestContents(const HitTestRequest& request,
     for (RenderBox* child = lastChildBox(); child;
          child = child->previousSiblingBox()) {
       if (!child->hasSelfPaintingLayer() && !child->isFloating() &&
-          child->nodeAtPoint(request, result, x, y, tx, ty, childHitTest)) {
-        updateHitTestResult(result, IntPoint(x - tx, y - ty));
+          child->nodeAtPoint(request, result, x, y, tx, ty, childHitTest))
         return true;
-      }
     }
   }
 
@@ -4472,7 +4469,8 @@ void RenderBlock::adjustForColumns(IntSize& offset,
 
   int gapWidth = columnGap();
 
-  int xOffset = 0;
+  int xOffset =
+      style()->direction() == LTR ? 0 : contentWidth() - columnRects[0].width();
   int yOffset = 0;
   size_t columnCount = columnRects.size();
   for (size_t i = 0; i < columnCount; ++i) {
