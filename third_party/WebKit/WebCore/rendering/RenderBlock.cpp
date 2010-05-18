@@ -2241,12 +2241,14 @@ static void clipOutPositionedObjects(
     const RenderObject::PaintInfo* paintInfo,
     int tx,
     int ty,
-    ListHashSet<RenderBox*>* positionedObjects) {
+    RenderBlock::PositionedObjectsListHashSet* positionedObjects) {
   if (!positionedObjects)
     return;
 
-  ListHashSet<RenderBox*>::const_iterator end = positionedObjects->end();
-  for (ListHashSet<RenderBox*>::const_iterator it = positionedObjects->begin();
+  RenderBlock::PositionedObjectsListHashSet::const_iterator end =
+      positionedObjects->end();
+  for (RenderBlock::PositionedObjectsListHashSet::const_iterator it =
+           positionedObjects->begin();
        it != end; ++it) {
     RenderBox* r = *it;
     paintInfo->context->clipOut(
@@ -2630,7 +2632,7 @@ int RenderBlock::rightSelectionOffset(RenderBlock* rootBlock, int yPos) {
 void RenderBlock::insertPositionedObject(RenderBox* o) {
   // Create the list of special objects if we don't aleady have one
   if (!m_positionedObjects)
-    m_positionedObjects = new ListHashSet<RenderBox*>;
+    m_positionedObjects = new RenderBlock::PositionedObjectsListHashSet;
 
   m_positionedObjects->add(o);
 }
