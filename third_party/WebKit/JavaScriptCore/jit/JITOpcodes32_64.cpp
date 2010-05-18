@@ -386,7 +386,10 @@ void JIT::privateCompileCTIMachineTrampolines(
   // Plant callframe
   move(callFrameRegister, X86Registers::edx);
 
-  call(Address(X86Registers::eax, OBJECT_OFFSETOF(JSFunction, m_data)));
+  loadPtr(Address(X86Registers::eax, OBJECT_OFFSETOF(JSFunction, m_executable)),
+          X86Registers::ebx);
+  call(Address(X86Registers::eax,
+               OBJECT_OFFSETOF(NativeExecutable, m_function)));
 
   // JSValue is a non-POD type, so eax points to it
   emitLoad(0, regT1, regT0, X86Registers::eax);
@@ -394,7 +397,10 @@ void JIT::privateCompileCTIMachineTrampolines(
   emitGetFromCallFrameHeaderPtr(RegisterFile::Callee,
                                 X86Registers::edx);  // callee
   move(callFrameRegister, X86Registers::ecx);        // callFrame
-  call(Address(X86Registers::edx, OBJECT_OFFSETOF(JSFunction, m_data)));
+  loadPtr(Address(X86Registers::edx, OBJECT_OFFSETOF(JSFunction, m_executable)),
+          X86Registers::ebx);
+  call(Address(X86Registers::ebx,
+               OBJECT_OFFSETOF(NativeExecutable, m_function)));
 #endif
 
   // We've put a few temporaries on the stack in addition to the actual
@@ -460,7 +466,8 @@ void JIT::privateCompileCTIMachineTrampolines(
   // Setup arg0:
   move(stackPointerRegister, regT0);
 
-  call(Address(regT2, OBJECT_OFFSETOF(JSFunction, m_data)));
+  loadPtr(Address(regT2, OBJECT_OFFSETOF(JSFunction, m_executable)), regT3);
+  call(Address(regT3, OBJECT_OFFSETOF(NativeExecutable, m_function)));
 
   load32(Address(stackPointerRegister, 0), regT0);
   load32(Address(stackPointerRegister, 4), regT1);
@@ -489,7 +496,8 @@ void JIT::privateCompileCTIMachineTrampolines(
   // Setup arg1:
   move(callFrameRegister, regT1);
 
-  call(Address(regT2, OBJECT_OFFSETOF(JSFunction, m_data)));
+  loadPtr(Address(regT2, OBJECT_OFFSETOF(JSFunction, m_executable)), regT3);
+  call(Address(regT3, OBJECT_OFFSETOF(NativeExecutable, m_function)));
 
   // Load return value
   load32(Address(stackPointerRegister, 16), regT0);
@@ -572,8 +580,7 @@ void JIT::privateCompileCTIMachineTrampolines(
   trampolines->ctiVirtualCall = trampolineAt(finalCode, virtualCallBegin);
   trampolines->ctiVirtualConstruct =
       trampolineAt(finalCode, virtualConstructBegin);
-  trampolines->ctiNativeCallThunk = adoptRef(new NativeExecutable(JITCode(
-      JITCode::HostFunction(trampolineAt(finalCode, nativeCallThunk)))));
+  trampolines->ctiNativeCall = trampolineAt(finalCode, nativeCallThunk);
 #if ENABLE(JIT_OPTIMIZE_PROPERTY_ACCESS)
   trampolines->ctiStringLengthTrampoline =
       trampolineAt(finalCode, stringLengthBegin);

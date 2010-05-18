@@ -22,6 +22,8 @@
 #include "config.h"
 #include "StringConstructor.h"
 
+#include "Executable.h"
+#include "JITCode.h"
 #include "JSFunction.h"
 #include "JSGlobalObject.h"
 #include "PrototypeFunction.h"
@@ -68,8 +70,8 @@ StringConstructor::StringConstructor(ExecState* exec,
       exec, new (exec) NativeFunctionWrapper(
                 exec, prototypeFunctionStructure, 1,
                 exec->propertyNames().fromCharCode,
-                exec->globalData().getThunk(fromCharCodeThunkGenerator),
-                stringFromCharCode),
+                exec->globalData().getNativeExecutable(
+                    stringFromCharCode, fromCharCodeThunkGenerator)),
       DontEnum);
 #else
   putDirectFunctionWithoutTransition(

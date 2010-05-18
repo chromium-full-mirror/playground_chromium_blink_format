@@ -51,8 +51,7 @@ class JSFunction : public InternalFunction {
              NonNullPassRefPtr<Structure>,
              int length,
              const Identifier&,
-             NativeExecutable*,
-             NativeFunction);
+             PassRefPtr<NativeExecutable>);
   JSFunction(ExecState*,
              NonNullPassRefPtr<FunctionExecutable>,
              ScopeChainNode*);
@@ -61,8 +60,14 @@ class JSFunction : public InternalFunction {
   JSObject* construct(ExecState*, const ArgList&);
   JSValue call(ExecState*, JSValue thisValue, const ArgList&);
 
-  void setScope(const ScopeChain& scopeChain) { setScopeChain(scopeChain); }
-  ScopeChain& scope() { return scopeChain(); }
+  ScopeChain& scope() {
+    ASSERT(!isHostFunctionNonInline());
+    return m_scopeChain;
+  }
+  void setScope(const ScopeChain& scopeChain) {
+    ASSERT(!isHostFunctionNonInline());
+    m_scopeChain = scopeChain;
+  }
 
   ExecutableBase* executable() const { return m_executable.get(); }
 
@@ -77,9 +82,7 @@ class JSFunction : public InternalFunction {
                              AnonymousSlotCount);
   }
 
-  NativeFunction nativeFunction() {
-    return *WTF::bitwise_cast<NativeFunction*>(m_data);
-  }
+  NativeFunction nativeFunction();
 
   virtual ConstructType getConstructData(ConstructData&);
   virtual CallType getCallData(CallData&);
@@ -118,26 +121,7 @@ class JSFunction : public InternalFunction {
   static JSValue lengthGetter(ExecState*, JSValue, const Identifier&);
 
   RefPtr<ExecutableBase> m_executable;
-  ScopeChain& scopeChain() {
-    ASSERT(!isHostFunctionNonInline());
-    return *WTF::bitwise_cast<ScopeChain*>(m_data);
-  }
-  void clearScopeChain() {
-    ASSERT(!isHostFunctionNonInline());
-    new (m_data) ScopeChain(NoScopeChain());
-  }
-  void setScopeChain(ScopeChainNode* sc) {
-    ASSERT(!isHostFunctionNonInline());
-    new (m_data) ScopeChain(sc);
-  }
-  void setScopeChain(const ScopeChain& sc) {
-    ASSERT(!isHostFunctionNonInline());
-    *WTF::bitwise_cast<ScopeChain*>(m_data) = sc;
-  }
-  void setNativeFunction(NativeFunction func) {
-    *WTF::bitwise_cast<NativeFunction*>(m_data) = func;
-  }
-  unsigned char m_data[sizeof(void*)];
+  ScopeChain m_scopeChain;
 };
 
 JSFunction* asFunction(JSValue);

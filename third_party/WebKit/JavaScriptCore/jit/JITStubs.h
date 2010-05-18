@@ -87,7 +87,7 @@ struct TrampolineStructure {
   MacroAssemblerCodePtr ctiVirtualConstructLink;
   MacroAssemblerCodePtr ctiVirtualCall;
   MacroAssemblerCodePtr ctiVirtualConstruct;
-  RefPtr<NativeExecutable> ctiNativeCallThunk;
+  MacroAssemblerCodePtr ctiNativeCall;
   MacroAssemblerCodePtr ctiSoftModulo;
 };
 
@@ -328,18 +328,18 @@ class JITThunks {
   MacroAssemblerCodePtr ctiVirtualConstruct() {
     return m_trampolineStructure.ctiVirtualConstruct;
   }
-  NativeExecutable* ctiNativeCallThunk() {
-    return m_trampolineStructure.ctiNativeCallThunk.get();
+  MacroAssemblerCodePtr ctiNativeCall() {
+    return m_trampolineStructure.ctiNativeCall;
   }
   MacroAssemblerCodePtr ctiSoftModulo() {
     return m_trampolineStructure.ctiSoftModulo;
   }
 
-  NativeExecutable* specializedThunk(JSGlobalData* globalData,
-                                     ThunkGenerator generator);
+  MacroAssemblerCodePtr specializedThunk(JSGlobalData* globalData,
+                                         ThunkGenerator generator);
 
  private:
-  typedef HashMap<ThunkGenerator, RefPtr<NativeExecutable>> ThunkMap;
+  typedef HashMap<ThunkGenerator, MacroAssemblerCodePtr> ThunkMap;
   ThunkMap m_thunkMap;
   RefPtr<ExecutablePool> m_executablePool;
 
