@@ -164,8 +164,15 @@ static inline Qt::FillRule toQtFillRule(WindRule rule) {
 }
 
 struct TransparencyLayer : FastAllocBase {
-  TransparencyLayer(const QPainter* p, const QRect& rect)
-      : pixmap(rect.width(), rect.height()) {
+  TransparencyLayer(const QPainter* p,
+                    const QRect& rect,
+                    qreal opacity,
+                    QPixmap& alphaMask)
+      : pixmap(rect.width(), rect.height()),
+        opacity(opacity),
+        alphaMask(alphaMask),
+        saveCounter(1)  // see the comment for saveCounter
+  {
     offset = rect.topLeft();
     pixmap.fill(Qt::transparent);
     painter.begin(&pixmap);
@@ -179,7 +186,9 @@ struct TransparencyLayer : FastAllocBase {
     painter.setFont(p->font());
     if (painter.paintEngine()->hasFeature(QPaintEngine::PorterDuff))
       painter.setCompositionMode(p->compositionMode());
-    painter.setClipPath(p->clipPath());
+    // if the path is an empty region, this assignment disables all painting
+    if (!p->clipPath().isEmpty())
+      painter.setClipPath(p->clipPath());
   }
 
   TransparencyLayer() {}
@@ -188,6 +197,11 @@ struct TransparencyLayer : FastAllocBase {
   QPoint offset;
   QPainter painter;
   qreal opacity;
+  // for clipToImageBuffer
+  QPixmap alphaMask;
+  // saveCounter is only used in combination with alphaMask
+  // otherwise, its value is unspecified
+  int saveCounter;
 
  private:
   TransparencyLayer(const TransparencyLayer&) {}
@@ -212,6 +226,9 @@ class GraphicsContextPlatformPrivate : public Noncopyable {
   bool antiAliasingForRectsAndLines;
 
   QStack<TransparencyLayer*> layers;
+  // Counting real layers. Required by inTransparencyLayer() calls
+  // For example, layers with valid alphaMask are not real layers
+  int layerCount;
   QPainter* redirect;
 
   // reuse this brush for solid color (to prevent expensive QBrush construction)
@@ -228,6 +245,7 @@ class GraphicsContextPlatformPrivate : public Noncopyable {
 
 GraphicsContextPlatformPrivate::GraphicsContextPlatformPrivate(QPainter* p) {
   painter = p;
+  layerCount = 0;
   redirect = 0;
 
   solidColor = QBrush(Qt::black);
@@ -276,10 +294,16 @@ AffineTransform GraphicsContext::getCTM() const {
 }
 
 void GraphicsContext::savePlatformState() {
+  if (!m_data->layers.isEmpty() && !m_data->layers.top()->alphaMask.isNull())
+    ++m_data->layers.top()->saveCounter;
   m_data->p()->save();
 }
 
 void GraphicsContext::restorePlatformState() {
+  if (!m_data->layers.isEmpty() && !m_data->layers.top()->alphaMask.isNull())
+    if (!--m_data->layers.top()->saveCounter)
+      endTransparencyLayer();
+
   m_data->p()->restore();
 
   if (!m_data->currentPath.isEmpty() &&
@@ -687,7 +711,7 @@ void GraphicsContext::addPath(const Path& path) {
 }
 
 bool GraphicsContext::inTransparencyLayer() const {
-  return !m_data->layers.isEmpty();
+  return m_data->layerCount;
 }
 
 PlatformPath* GraphicsContext::currentPath() {
@@ -857,11 +881,10 @@ void GraphicsContext::beginTransparencyLayer(float opacity) {
   w = int(qBound(qreal(0), deviceClip.width(), (qreal)w) + 2);
   h = int(qBound(qreal(0), deviceClip.height(), (qreal)h) + 2);
 
-  TransparencyLayer* layer =
-      new TransparencyLayer(m_data->p(), QRect(x, y, w, h));
-
-  layer->opacity = opacity;
-  m_data->layers.push(layer);
+  QPixmap emptyAlphaMask;
+  m_data->layers.push(new TransparencyLayer(m_data->p(), QRect(x, y, w, h),
+                                            opacity, emptyAlphaMask));
+  ++m_data->layerCount;
 }
 
 void GraphicsContext::endTransparencyLayer() {
@@ -869,6 +892,12 @@ void GraphicsContext::endTransparencyLayer() {
     return;
 
   TransparencyLayer* layer = m_data->layers.pop();
+  if (!layer->alphaMask.isNull()) {
+    layer->painter.resetTransform();
+    layer->painter.setCompositionMode(QPainter::CompositionMode_DestinationIn);
+    layer->painter.drawPixmap(QPoint(), layer->alphaMask);
+  } else
+    --m_data->layerCount;  // see the comment for layerCount
   layer->painter.end();
 
   QPainter* p = m_data->p();
@@ -1091,8 +1120,21 @@ void GraphicsContext::clipOutEllipseInRect(const IntRect& rect) {
   }
 }
 
-void GraphicsContext::clipToImageBuffer(const FloatRect&, const ImageBuffer*) {
-  notImplemented();
+void GraphicsContext::clipToImageBuffer(const FloatRect& floatRect,
+                                        const ImageBuffer* image) {
+  if (paintingDisabled())
+    return;
+
+  QPixmap* nativeImage = image->image()->nativeImageForCurrentFrame();
+  if (!nativeImage)
+    return;
+
+  IntRect rect(floatRect);
+  QPixmap alphaMask = *nativeImage;
+  if (alphaMask.width() != rect.width() || alphaMask.height() != rect.height())
+    alphaMask = alphaMask.scaled(rect.width(), rect.height());
+
+  m_data->layers.push(new TransparencyLayer(m_data->p(), rect, 1.0, alphaMask));
 }
 
 void GraphicsContext::addInnerRoundedRectClip(const IntRect& rect,
