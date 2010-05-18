@@ -34,20 +34,14 @@
 
 namespace WebCore {
 
-class CachedResource;
-class CachedResourceClient;
-class Document;
-
 class HTML5Tokenizer : public Noncopyable {
  public:
-  HTML5Tokenizer(Document*);
+  HTML5Tokenizer();
   ~HTML5Tokenizer();
+
   void begin();
   void write(const SegmentedString&);
   void end();
-  bool inProgress() const { return m_inProgress; }
-
-  bool scanningBody() const;
 
   static unsigned consumeEntity(SegmentedString&, bool& notEnoughCharacters);
 
@@ -58,16 +52,12 @@ class HTML5Tokenizer : public Noncopyable {
   void emitTag();
   void emitCharacter(UChar);
 
-  void tokenizeCSS(UChar);
-  void emitCSSRule();
-
   void processAttribute();
 
   void clearLastCharacters();
   void rememberCharacter(UChar);
   bool lastCharactersMatch(const char*, unsigned count) const;
 
-  bool m_inProgress;
   SegmentedString m_source;
 
   enum State {
@@ -108,30 +98,6 @@ class HTML5Tokenizer : public Noncopyable {
   Vector<UChar, 32> m_attributeName;
   Vector<UChar> m_attributeValue;
   AtomicString m_lastStartTag;
-
-  String m_urlToLoad;
-  String m_charset;
-  bool m_linkIsStyleSheet;
-
-  enum CSSState {
-    CSSInitial,
-    CSSMaybeComment,
-    CSSComment,
-    CSSMaybeCommentEnd,
-    CSSRuleStart,
-    CSSRule,
-    CSSAfterRule,
-    CSSRuleValue,
-    CSSAfterRuleValue
-  };
-  CSSState m_cssState;
-  Vector<UChar, 16> m_cssRule;
-  Vector<UChar> m_cssRuleValue;
-
-  double m_timeUsed;
-
-  bool m_bodySeen;
-  Document* m_document;
 };
 }
 
