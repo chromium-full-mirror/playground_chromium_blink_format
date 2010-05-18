@@ -143,6 +143,7 @@ class FrameLoader : public Noncopyable {
 
   // Called by createWindow in JSDOMWindowBase.cpp, e.g. to fulfill a modal
   // dialog creation
+  // FIXME: Move this method outside of the FrameLoader class.
   Frame* createWindow(FrameLoader* frameLoaderForFrameLookup,
                       const FrameLoadRequest&,
                       const WindowFeatures&,
@@ -609,8 +610,6 @@ class FrameLoader : public Noncopyable {
   bool shouldTreatURLAsSameAsCurrent(const KURL&) const;
 
   void updateSandboxFlags();
-  // FIXME: isDocumentSandboxed should eventually replace isSandboxed.
-  bool isDocumentSandboxed(SandboxFlags) const;
 
   Frame* m_frame;
   FrameLoaderClient* m_client;

@@ -175,6 +175,20 @@ static inline bool canReferToParentFrameEncoding(const Frame* frame,
              frame->document()->securityOrigin());
 }
 
+// This is not in the FrameLoader class to emphasize that it does not depend on
+// private FrameLoader data, and to avoid increasing the number of public
+// functions
+// with access to private data.  Since only this .cpp file needs it, making it
+// non-member lets us exclude it from the header file, thus keeping
+// FrameLoader.h's
+// API simpler.
+//
+// FIXME: isDocumentSandboxed should eventually replace isSandboxed.
+static bool isDocumentSandboxed(Frame* frame, SandboxFlags mask) {
+  return frame->document() &&
+         frame->document()->securityOrigin()->isSandboxed(mask);
+}
+
 FrameLoader::FrameLoader(Frame* frame, FrameLoaderClient* client)
     : m_frame(frame),
       m_client(client),
@@ -289,7 +303,7 @@ Frame* FrameLoader::createWindow(FrameLoader* frameLoaderForFrameLookup,
   }
 
   // Sandboxed frames cannot open new auxiliary browsing contexts.
-  if (isDocumentSandboxed(SandboxNavigation))
+  if (isDocumentSandboxed(m_frame, SandboxNavigation))
     return 0;
 
   // FIXME: Setting the referrer should be the caller's responsibility.
@@ -527,7 +541,7 @@ void FrameLoader::submitForm(const char* action,
   if (u.isEmpty())
     return;
 
-  if (isDocumentSandboxed(SandboxForms))
+  if (isDocumentSandboxed(m_frame, SandboxForms))
     return;
 
   if (protocolIsJavaScript(u)) {
@@ -1252,7 +1266,7 @@ bool FrameLoader::requestObject(RenderEmbeddedObject* renderer,
         (!settings->isJavaEnabled() &&
          MIMETypeRegistry::isJavaAppletMIMEType(mimeType)))
       return false;
-    if (isDocumentSandboxed(SandboxPlugins))
+    if (isDocumentSandboxed(m_frame, SandboxPlugins))
       return false;
     return loadPlugin(renderer, completedURL, mimeType, paramNames, paramValues,
                       useFallback);
@@ -2418,12 +2432,12 @@ bool FrameLoader::shouldAllowNavigation(Frame* targetFrame) const {
   // Let a frame navigate the top-level window that contains it.  This is
   // important to allow because it lets a site "frame-bust" (escape from a
   // frame created by another web site).
-  if (!isDocumentSandboxed(SandboxTopNavigation) &&
+  if (!isDocumentSandboxed(m_frame, SandboxTopNavigation) &&
       targetFrame == m_frame->tree()->top())
     return true;
 
   // A sandboxed frame can only navigate itself and its descendants.
-  if (isDocumentSandboxed(SandboxNavigation) &&
+  if (isDocumentSandboxed(m_frame, SandboxNavigation) &&
       !targetFrame->tree()->isDescendantOf(m_frame))
     return false;
 
@@ -4320,11 +4334,6 @@ void FrameLoader::updateSandboxFlags() {
   for (Frame* child = m_frame->tree()->firstChild(); child;
        child = child->tree()->nextSibling())
     child->loader()->updateSandboxFlags();
-}
-
-bool FrameLoader::isDocumentSandboxed(SandboxFlags mask) const {
-  return m_frame->document() &&
-         m_frame->document()->securityOrigin()->isSandboxed(mask);
 }
 
 PassRefPtr<Widget> FrameLoader::createJavaAppletWidget(
