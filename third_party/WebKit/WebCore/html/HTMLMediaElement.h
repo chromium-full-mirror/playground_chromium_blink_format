@@ -399,6 +399,7 @@ class HTMLMediaElement : public HTMLElement,
 #endif
 
   bool m_dispatchingCanPlayEvent : 1;
+  bool m_loadInitiatedByUserGesture : 1;
 };
 
 }  // namespace
