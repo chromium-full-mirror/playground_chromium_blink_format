@@ -147,7 +147,7 @@ class ScriptController {
     return m_sourceURL;
   }  // 0 if we are not evaluating any script
 
-  void clearWindowShell();
+  void clearWindowShell(bool goingIntoPageCache = false);
   void updateDocument();
 
   // Notifies the ScriptController that the securityOrigin of the current
