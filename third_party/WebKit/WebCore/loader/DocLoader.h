@@ -135,7 +135,7 @@ class DocLoader : public Noncopyable {
 
   int m_requestCount;
 
-  ListHashSet<CachedResource*> m_preloads;
+  OwnPtr<ListHashSet<CachedResource*>> m_preloads;
   struct PendingPreload {
     CachedResource::Type m_type;
     String m_url;
