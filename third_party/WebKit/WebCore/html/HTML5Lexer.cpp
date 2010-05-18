@@ -26,7 +26,7 @@
  */
 
 #include "config.h"
-#include "HTML5Tokenizer.h"
+#include "HTML5Lexer.h"
 
 #include "AtomicString.h"
 #include "HTMLNames.h"
@@ -57,17 +57,17 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-HTML5Tokenizer::HTML5Tokenizer() {}
+HTML5Lexer::HTML5Lexer() {}
 
-HTML5Tokenizer::~HTML5Tokenizer() {}
+HTML5Lexer::~HTML5Lexer() {}
 
-void HTML5Tokenizer::begin() {
+void HTML5Lexer::begin() {
   reset();
 }
 
-void HTML5Tokenizer::end() {}
+void HTML5Lexer::end() {}
 
-void HTML5Tokenizer::reset() {
+void HTML5Lexer::reset() {
   m_source.clear();
 
   m_state = DataState;
@@ -85,7 +85,7 @@ void HTML5Tokenizer::reset() {
   clearLastCharacters();
 }
 
-void HTML5Tokenizer::write(const SegmentedString& source) {
+void HTML5Lexer::write(const SegmentedString& source) {
   tokenize(source);
 }
 
@@ -93,17 +93,17 @@ static inline bool isWhitespace(UChar c) {
   return c == ' ' || c == '\n' || c == '\r' || c == '\t';
 }
 
-inline void HTML5Tokenizer::clearLastCharacters() {
+inline void HTML5Lexer::clearLastCharacters() {
   memset(m_lastCharacters, 0, lastCharactersBufferSize * sizeof(UChar));
 }
 
-inline void HTML5Tokenizer::rememberCharacter(UChar c) {
+inline void HTML5Lexer::rememberCharacter(UChar c) {
   m_lastCharacterIndex = (m_lastCharacterIndex + 1) % lastCharactersBufferSize;
   m_lastCharacters[m_lastCharacterIndex] = c;
 }
 
-inline bool HTML5Tokenizer::lastCharactersMatch(const char* chars,
-                                                unsigned count) const {
+inline bool HTML5Lexer::lastCharactersMatch(const char* chars,
+                                            unsigned count) const {
   unsigned pos = m_lastCharacterIndex;
   while (count) {
     if (chars[count - 1] != m_lastCharacters[pos])
@@ -123,8 +123,8 @@ static inline unsigned legalEntityFor(unsigned value) {
   return value;
 }
 
-unsigned HTML5Tokenizer::consumeEntity(SegmentedString& source,
-                                       bool& notEnoughCharacters) {
+unsigned HTML5Lexer::consumeEntity(SegmentedString& source,
+                                   bool& notEnoughCharacters) {
   enum EntityState { Initial, NumberType, MaybeHex, Hex, Decimal, Named };
   EntityState entityState = Initial;
   unsigned result = 0;
@@ -239,7 +239,7 @@ outOfCharacters:
   return 0;
 }
 
-void HTML5Tokenizer::tokenize(const SegmentedString& source) {
+void HTML5Lexer::tokenize(const SegmentedString& source) {
   m_source.append(source);
 
   // Source: http://www.whatwg.org/specs/web-apps/current-work/#tokenisation0
@@ -499,7 +499,7 @@ void HTML5Tokenizer::tokenize(const SegmentedString& source) {
   }
 }
 
-void HTML5Tokenizer::processAttribute() {
+void HTML5Lexer::processAttribute() {
   AtomicString tag = AtomicString(m_tagName.data(), m_tagName.size());
   AtomicString attribute =
       AtomicString(m_attributeName.data(), m_attributeName.size());
@@ -507,11 +507,11 @@ void HTML5Tokenizer::processAttribute() {
   String value(m_attributeValue.data(), m_attributeValue.size());
 }
 
-inline void HTML5Tokenizer::emitCharacter(UChar) {}
+inline void HTML5Lexer::emitCharacter(UChar) {}
 
-inline void HTML5Tokenizer::emitParseError() {}
+inline void HTML5Lexer::emitParseError() {}
 
-void HTML5Tokenizer::emitTag() {
+void HTML5Lexer::emitTag() {
   if (m_closeTag) {
     m_contentModel = PCDATA;
     clearLastCharacters();
