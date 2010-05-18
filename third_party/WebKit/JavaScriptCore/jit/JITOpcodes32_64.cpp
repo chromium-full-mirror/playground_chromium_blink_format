@@ -388,7 +388,7 @@ void JIT::privateCompileCTIMachineTrampolines(
 
   loadPtr(Address(X86Registers::eax, OBJECT_OFFSETOF(JSFunction, m_executable)),
           X86Registers::ebx);
-  call(Address(X86Registers::eax,
+  call(Address(X86Registers::ebx,
                OBJECT_OFFSETOF(NativeExecutable, m_function)));
 
   // JSValue is a non-POD type, so eax points to it
