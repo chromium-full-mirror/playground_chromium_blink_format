@@ -175,10 +175,10 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
   Terminator terminator;
   Heap heap;
 
+#if ENABLE(JIT)
   typedef HashMap<NativeFunction, RefPtr<NativeExecutable>> NativeExecutableMap;
   NativeExecutableMap m_nativeExecutableMap;
   PassRefPtr<NativeExecutable> getNativeExecutable(NativeFunction function);
-#if ENABLE(JIT)
   PassRefPtr<NativeExecutable> getNativeExecutable(NativeFunction function,
                                                    ThunkGenerator generator);
 #endif

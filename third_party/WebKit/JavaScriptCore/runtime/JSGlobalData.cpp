@@ -271,6 +271,7 @@ const Vector<Instruction>& JSGlobalData::numericCompareFunction(
   return lazyNumericCompareFunction;
 }
 
+#if ENABLE(JIT)
 PassRefPtr<NativeExecutable> JSGlobalData::getNativeExecutable(
     NativeFunction function) {
   std::pair<NativeExecutableMap::iterator, bool> entry =
@@ -281,7 +282,6 @@ PassRefPtr<NativeExecutable> JSGlobalData::getNativeExecutable(
   return entry.first->second;
 }
 
-#if ENABLE(JIT)
 PassRefPtr<NativeExecutable> JSGlobalData::getNativeExecutable(
     NativeFunction function,
     ThunkGenerator generator) {

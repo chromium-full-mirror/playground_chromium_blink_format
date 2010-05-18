@@ -425,10 +425,12 @@ inline bool JSFunction::isHostFunction() const {
   return m_executable->isHostFunction();
 }
 
+#if ENABLE(JIT)
 inline NativeFunction JSFunction::nativeFunction() {
   ASSERT(isHostFunction());
   return static_cast<NativeExecutable*>(m_executable.get())->function();
 }
+#endif
 }
 
 #endif
