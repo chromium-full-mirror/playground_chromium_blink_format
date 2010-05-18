@@ -821,6 +821,10 @@ bool Frame::isContentEditable() const {
   return m_doc->inDesignMode();
 }
 
+void Frame::setTypingStyle(CSSMutableStyleDeclaration* style) {
+  m_typingStyle = style;
+}
+
 void Frame::computeAndSetTypingStyle(CSSStyleDeclaration* style,
                                      EditAction editingAction) {
   if (!style || !style->length()) {
