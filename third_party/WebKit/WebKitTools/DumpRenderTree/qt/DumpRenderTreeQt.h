@@ -61,6 +61,7 @@ class GCController;
 namespace WebCore {
 
 class WebPage;
+class NetworkAccessManager;
 
 class DumpRenderTree : public QObject {
   Q_OBJECT
@@ -89,6 +90,9 @@ class DumpRenderTree : public QObject {
     return m_textInputController;
   }
   QString persistentStoragePath() const { return m_persistentStoragePath; }
+  NetworkAccessManager* networkAccessManager() const {
+    return m_networkAccessManager;
+  }
 
   QWebPage* createWindow();
   int windowCount() const;
@@ -137,6 +141,7 @@ class DumpRenderTree : public QObject {
   EventSender* m_eventSender;
   TextInputController* m_textInputController;
   GCController* m_gcController;
+  NetworkAccessManager* m_networkAccessManager;
 
   QFile* m_stdin;
 
