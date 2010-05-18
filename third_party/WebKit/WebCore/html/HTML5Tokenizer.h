@@ -50,8 +50,8 @@ class HTML5Tokenizer : public Noncopyable {
   void reset();
 
   void emitTag();
-  void emitCharacter(UChar);
-
+  inline void emitCharacter(UChar);
+  inline void emitParseError();
   void processAttribute();
 
   void clearLastCharacters();
