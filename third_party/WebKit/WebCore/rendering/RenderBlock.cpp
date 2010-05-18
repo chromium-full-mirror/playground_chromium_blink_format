@@ -2632,7 +2632,7 @@ int RenderBlock::rightSelectionOffset(RenderBlock* rootBlock, int yPos) {
 void RenderBlock::insertPositionedObject(RenderBox* o) {
   // Create the list of special objects if we don't aleady have one
   if (!m_positionedObjects)
-    m_positionedObjects = new RenderBlock::PositionedObjectsListHashSet;
+    m_positionedObjects = new PositionedObjectsListHashSet;
 
   m_positionedObjects->add(o);
 }
