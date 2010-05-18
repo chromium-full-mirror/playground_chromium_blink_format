@@ -54,6 +54,8 @@ class HTML5Lexer : public Noncopyable {
   inline void emitParseError();
   void processAttribute();
 
+  inline bool temporaryBufferIs(const char*);
+
   void clearLastCharacters();
   void rememberCharacter(UChar);
   bool lastCharactersMatch(const char*, unsigned count) const;
@@ -87,7 +89,7 @@ class HTML5Lexer : public Noncopyable {
     ScriptDataEscapedDashDashState,
     ScriptDataEscapedLessThanSignState,
     ScriptDataEscapedEndTagOpenState,
-    ScriptDataEscapedEndtagNameState,
+    ScriptDataEscapedEndTagNameState,
     ScriptDataDoubleEscapeStartState,
     ScriptDataDoubleEscapedState,
     ScriptDataDoubleEscapedDashState,
