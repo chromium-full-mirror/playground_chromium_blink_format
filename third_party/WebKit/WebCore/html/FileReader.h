@@ -70,7 +70,7 @@ class FileReader : public RefCounted<FileReader>,
   void readAsDataURL(File*);
   void abort();
 
-  ReadyState readyState() const { return m_state; }
+  ReadyState readyState() const;
   PassRefPtr<FileError> error() { return m_error; }
   const ScriptString& result();
 
@@ -104,6 +104,7 @@ class FileReader : public RefCounted<FileReader>,
 
  private:
   enum ReadType { ReadFileAsBinaryString, ReadFileAsText, ReadFileAsDataURL };
+  enum InternalState { None, Starting, Opening, Reading, Completed };
 
   FileReader(ScriptExecutionContext*);
 
@@ -121,7 +122,7 @@ class FileReader : public RefCounted<FileReader>,
   void convertToText();
   void convertToDataURL();
 
-  ReadyState m_state;
+  InternalState m_state;
   EventTargetData m_eventTargetData;
 
   RefPtr<Blob> m_fileBlob;
@@ -157,7 +158,6 @@ class FileReader : public RefCounted<FileReader>,
   long long m_bytesLoaded;
   long long m_totalBytes;
   double m_lastProgressNotificationTimeMS;
-  bool m_alreadyStarted;
 };
 
 }  // namespace WebCore
