@@ -143,6 +143,10 @@ PassRefPtr<Node> NamedNodeMap::setNamedItem(Node* arg, ExceptionCode& ec) {
   return r.release();
 }
 
+PassRefPtr<Node> NamedNodeMap::setNamedItemNS(Node* node, ExceptionCode& ec) {
+  return setNamedItem(node, ec);
+}
+
 // The DOM2 spec doesn't say that removeAttribute[NS] throws NOT_FOUND_ERR
 // if the attribute is not found, but at this level we have to throw
 // NOT_FOUND_ERR
