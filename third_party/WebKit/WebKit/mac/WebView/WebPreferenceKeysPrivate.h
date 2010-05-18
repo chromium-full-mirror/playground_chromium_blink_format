@@ -125,6 +125,7 @@
 #define WebKitPluginAllowedRunTimePreferenceKey @"WebKitPluginAllowedRunTime"
 #define WebKitFrameFlatteningEnabledPreferenceKey \
   @"WebKitFrameFlatteningEnabled"
+#define WebKitHTML5ParserEnabledPreferenceKey @"WebKitHTML5ParserEnabled"
 
 // These are private both because callers should be using the cover methods and
 // because the

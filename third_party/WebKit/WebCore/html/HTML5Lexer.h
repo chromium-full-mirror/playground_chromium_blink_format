@@ -41,26 +41,16 @@ class HTML5Lexer : public Noncopyable {
   HTML5Lexer();
   ~HTML5Lexer();
 
-  void begin();
-  void write(const SegmentedString&, HTML5Token&);
-  void end();
+  void reset();
+  void nextToken(SegmentedString&, HTML5Token&);
 
   static unsigned consumeEntity(SegmentedString&, bool& notEnoughCharacters);
 
  private:
-  void tokenize(const SegmentedString&);
-  void reset();
-
-  void emitTag();
   inline void emitCharacter(UChar);
   inline void emitParseError();
-  void processAttribute();
 
   inline bool temporaryBufferIs(const char*);
-
-  void clearLastCharacters();
-  void rememberCharacter(UChar);
-  bool lastCharactersMatch(const char*, unsigned count) const;
 
   SegmentedString m_source;
   HTML5Token* m_outputToken;
@@ -142,22 +132,6 @@ class HTML5Lexer : public Noncopyable {
 
   // http://www.whatwg.org/specs/web-apps/current-work/#temporary-buffer
   Vector<UChar, 1024> m_temporaryBuffer;
-
-  bool m_escape;
-  enum ContentModel { PCDATA, RCDATA, CDATA, PLAINTEXT };
-  ContentModel m_contentModel;
-  unsigned m_commentPos;
-  State m_stateBeforeEntityInAttributeValue;
-
-  static const unsigned lastCharactersBufferSize = 8;
-  UChar m_lastCharacters[lastCharactersBufferSize];
-  unsigned m_lastCharacterIndex;
-
-  bool m_closeTag;
-  Vector<UChar, 32> m_tagName;
-  Vector<UChar, 32> m_attributeName;
-  Vector<UChar> m_attributeValue;
-  AtomicString m_lastStartTag;
 };
 }
 
