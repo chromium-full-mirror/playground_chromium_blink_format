@@ -201,6 +201,10 @@ class RenderLayerBacking : public GraphicsLayerClient, public Noncopyable {
   static int graphicsLayerToCSSProperty(AnimatedPropertyID);
   static AnimatedPropertyID cssToGraphicsLayerProperty(int);
 
+#ifndef NDEBUG
+  String nameForLayer() const;
+#endif
+
  private:
   RenderLayer* m_owningLayer;
 
