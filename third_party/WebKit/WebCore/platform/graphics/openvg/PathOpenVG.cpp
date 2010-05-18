@@ -432,8 +432,9 @@ void Path::transform(const AffineTransform& transformation) {
   delete m_path;
   m_path = dst;
 
-  m_path->m_currentPoint = transform.mapPoint(m_path->m_currentPoint);
-  m_path->m_subpathStartPoint = transform.mapPoint(m_path->m_subpathStartPoint);
+  m_path->m_currentPoint = transformation.mapPoint(m_path->m_currentPoint);
+  m_path->m_subpathStartPoint =
+      transformation.mapPoint(m_path->m_subpathStartPoint);
 }
 
 // Path::length(), Path::pointAtLength() and Path::normalAngleAtLength() are

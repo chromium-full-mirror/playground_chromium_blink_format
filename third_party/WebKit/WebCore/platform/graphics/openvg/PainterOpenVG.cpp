@@ -786,7 +786,7 @@ void PainterOpenVG::clipPath(const Path& path,
   vgRenderToMask(path.platformPath()->vgPath(), VG_FILL_PATH,
                  (VGMaskOperation)maskOp);
   ASSERT_VG_NO_ERROR();
-#elseif
+#else
   notImplemented();
 #endif
 }
