@@ -98,6 +98,7 @@ FontPlatformData::FontPlatformData(const FontDescription& desc,
 #else
   m_atsuFontID = m_font->font()->MacGetATSUFontID();
 #endif
+  m_nsFont = 0;
   cacheNSFont();
 #endif
   m_size = desc.computedPixelSize();
