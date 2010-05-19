@@ -72,6 +72,8 @@ class PageClientQWidget : public QWebPageClient {
 
   virtual QStyle* style() const;
 
+  virtual bool viewResizesToContentsEnabled() const { return false; }
+
   QWidget* view;
 };
 
@@ -153,6 +155,10 @@ class PageClientQGraphicsWidget : public QWebPageClient {
   virtual QObject* pluginParent() const;
 
   virtual QStyle* style() const;
+
+  virtual bool viewResizesToContentsEnabled() const {
+    return viewResizesToContents;
+  }
 
   void createOrDeleteOverlay();
 
