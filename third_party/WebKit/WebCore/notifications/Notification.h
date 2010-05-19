@@ -80,6 +80,11 @@ class Notification : public RefCounted<Notification>,
   KURL iconURL() { return m_contents.icon(); }
   NotificationContents& contents() { return m_contents; }
 
+  String dir() const { return m_direction; }
+  void setDir(const String& dir) { m_direction = dir; }
+  String replaceId() const { return m_replaceId; }
+  void setReplaceId(const String& replaceId) { m_replaceId = replaceId; }
+
   DEFINE_ATTRIBUTE_EVENT_LISTENER(display);
   DEFINE_ATTRIBUTE_EVENT_LISTENER(error);
   DEFINE_ATTRIBUTE_EVENT_LISTENER(close);
@@ -112,6 +117,9 @@ class Notification : public RefCounted<Notification>,
   bool m_isHTML;
   KURL m_notificationURL;
   NotificationContents m_contents;
+
+  String m_direction;
+  String m_replaceId;
 
   bool m_isShowing;
 
