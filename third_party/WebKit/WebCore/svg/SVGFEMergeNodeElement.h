@@ -32,7 +32,7 @@ class SVGFEMergeNodeElement : public SVGElement {
   SVGFEMergeNodeElement(const QualifiedName&, Document*);
   virtual ~SVGFEMergeNodeElement();
 
-  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void parseMappedAttribute(Attribute*);
   virtual void synchronizeProperty(const QualifiedName&);
 
  private:

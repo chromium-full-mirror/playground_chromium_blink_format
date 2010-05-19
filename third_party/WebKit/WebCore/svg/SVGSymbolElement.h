@@ -37,7 +37,7 @@ class SVGSymbolElement : public SVGStyledElement,
   SVGSymbolElement(const QualifiedName&, Document*);
   virtual ~SVGSymbolElement();
 
-  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void parseMappedAttribute(Attribute*);
   virtual void synchronizeProperty(const QualifiedName&);
   virtual bool rendererIsNeeded(RenderStyle*) { return false; }
 

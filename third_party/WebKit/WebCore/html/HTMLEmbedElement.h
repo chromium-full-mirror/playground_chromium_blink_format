@@ -43,7 +43,7 @@ class HTMLEmbedElement : public HTMLPlugInImageElement {
 
   virtual bool mapToEntry(const QualifiedName& attrName,
                           MappedAttributeEntry& result) const;
-  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void parseMappedAttribute(Attribute*);
 
   virtual void attach();
   virtual bool canLazyAttach() { return false; }

@@ -25,6 +25,7 @@
 #include "config.h"
 #include "HTMLFormControlElement.h"
 
+#include "Attribute.h"
 #include "CharacterNames.h"
 #include "Chrome.h"
 #include "ChromeClient.h"
@@ -38,7 +39,6 @@
 #include "HTMLNames.h"
 #include "HTMLParser.h"
 #include "HTMLTokenizer.h"
-#include "MappedAttribute.h"
 #include "Page.h"
 #include "RenderBox.h"
 #include "RenderTextControl.h"
@@ -91,7 +91,7 @@ ValidityState* HTMLFormControlElement::validity() {
   return m_validityState.get();
 }
 
-void HTMLFormControlElement::parseMappedAttribute(MappedAttribute* attr) {
+void HTMLFormControlElement::parseMappedAttribute(Attribute* attr) {
   if (attr->name() == disabledAttr) {
     bool oldDisabled = m_disabled;
     m_disabled = !attr->isNull();
@@ -566,7 +566,7 @@ VisibleSelection HTMLTextFormControlElement::selection() const {
       ->selection(cachedSelectionStart(), cachedSelectionEnd());
 }
 
-void HTMLTextFormControlElement::parseMappedAttribute(MappedAttribute* attr) {
+void HTMLTextFormControlElement::parseMappedAttribute(Attribute* attr) {
   if (attr->name() == placeholderAttr)
     updatePlaceholderVisibility(true);
   else if (attr->name() == onselectAttr)

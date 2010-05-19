@@ -65,7 +65,7 @@ class WMLSelectElement : public WMLFormControlElement, public SelectElement {
                                Node* afterChange = 0,
                                int childCountDelta = 0);
 
-  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void parseMappedAttribute(Attribute*);
 
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual bool appendFormData(FormDataList&, bool);

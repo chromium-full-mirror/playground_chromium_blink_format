@@ -37,7 +37,7 @@ class HTMLStyleElement : public HTMLElement, public StyleElement {
   virtual bool checkDTD(const Node* newChild) { return newChild->isTextNode(); }
 
   // overload from HTMLElement
-  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void parseMappedAttribute(Attribute*);
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
   virtual void childrenChanged(bool changedByParser = false,

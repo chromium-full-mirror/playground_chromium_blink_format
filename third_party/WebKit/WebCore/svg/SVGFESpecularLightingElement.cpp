@@ -24,7 +24,7 @@
 #if ENABLE(SVG) && ENABLE(FILTERS)
 #include "SVGFESpecularLightingElement.h"
 
-#include "MappedAttribute.h"
+#include "Attribute.h"
 #include "RenderObject.h"
 #include "SVGColor.h"
 #include "SVGFELightElement.h"
@@ -43,7 +43,7 @@ SVGFESpecularLightingElement::SVGFESpecularLightingElement(
 
 SVGFESpecularLightingElement::~SVGFESpecularLightingElement() {}
 
-void SVGFESpecularLightingElement::parseMappedAttribute(MappedAttribute* attr) {
+void SVGFESpecularLightingElement::parseMappedAttribute(Attribute* attr) {
   const String& value = attr->value();
   if (attr->name() == SVGNames::inAttr)
     setIn1BaseValue(value);

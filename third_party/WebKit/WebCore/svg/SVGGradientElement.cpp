@@ -24,8 +24,8 @@
 #if ENABLE(SVG)
 #include "SVGGradientElement.h"
 
+#include "Attribute.h"
 #include "CSSStyleSelector.h"
-#include "MappedAttribute.h"
 #include "RenderPath.h"
 #include "RenderSVGHiddenContainer.h"
 #include "RenderSVGResourceLinearGradient.h"
@@ -49,7 +49,7 @@ SVGGradientElement::SVGGradientElement(const QualifiedName& tagName,
 
 SVGGradientElement::~SVGGradientElement() {}
 
-void SVGGradientElement::parseMappedAttribute(MappedAttribute* attr) {
+void SVGGradientElement::parseMappedAttribute(Attribute* attr) {
   if (attr->name() == SVGNames::gradientUnitsAttr) {
     if (attr->value() == "userSpaceOnUse")
       setGradientUnitsBaseValue(SVGUnitTypes::SVG_UNIT_TYPE_USERSPACEONUSE);

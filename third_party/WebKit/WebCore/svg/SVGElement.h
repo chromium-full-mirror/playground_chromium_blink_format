@@ -49,7 +49,7 @@ class SVGElement : public StyledElement {
 
   SVGDocumentExtensions* accessDocumentSVGExtensions() const;
 
-  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void parseMappedAttribute(Attribute*);
 
   virtual bool isStyled() const { return false; }
   virtual bool isStyledTransformable() const { return false; }

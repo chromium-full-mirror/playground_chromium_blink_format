@@ -53,7 +53,7 @@ class SVGStyledElement : public SVGElement, public SVGStylable {
   virtual bool rendererIsNeeded(RenderStyle*);
 
   virtual bool mapToEntry(const QualifiedName&, MappedAttributeEntry&) const;
-  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void parseMappedAttribute(Attribute*);
   virtual void svgAttributeChanged(const QualifiedName&);
   virtual void synchronizeProperty(const QualifiedName&);
 

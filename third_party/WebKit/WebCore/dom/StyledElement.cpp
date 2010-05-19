@@ -24,12 +24,12 @@
 #include "config.h"
 #include "StyledElement.h"
 
+#include "Attribute.h"
 #include "CSSStyleSelector.h"
 #include "CSSStyleSheet.h"
 #include "CSSValueKeywords.h"
 #include "Document.h"
 #include "HTMLNames.h"
-#include "MappedAttribute.h"
 #include <wtf/HashFunctions.h>
 
 using namespace std;
@@ -149,7 +149,7 @@ StyledElement::~StyledElement() {
 PassRefPtr<Attribute> StyledElement::createAttribute(
     const QualifiedName& name,
     const AtomicString& value) {
-  return MappedAttribute::create(name, value);
+  return Attribute::createMapped(name, value);
 }
 
 void StyledElement::createInlineStyleDecl() {
@@ -174,9 +174,8 @@ void StyledElement::attributeChanged(Attribute* attr, bool preserveDecls) {
     return;
   }
 
-  MappedAttribute* mappedAttr = toMappedAttribute(attr);
-  if (mappedAttr->decl() && !preserveDecls) {
-    mappedAttr->setDecl(0);
+  if (attr->decl() && !preserveDecls) {
+    attr->setDecl(0);
     setNeedsStyleRecalc();
     if (namedAttrMap)
       mappedAttributes()->declRemoved();
@@ -186,7 +185,7 @@ void StyledElement::attributeChanged(Attribute* attr, bool preserveDecls) {
   MappedAttributeEntry entry;
   bool needToParse = mapToEntry(attr->name(), entry);
   if (preserveDecls) {
-    if (mappedAttr->decl()) {
+    if (attr->decl()) {
       setNeedsStyleRecalc();
       if (namedAttrMap)
         mappedAttributes()->declAdded();
@@ -195,7 +194,7 @@ void StyledElement::attributeChanged(Attribute* attr, bool preserveDecls) {
   } else if (!attr->isNull() && entry != eNone) {
     CSSMappedAttributeDeclaration* decl = getMappedAttributeDecl(entry, attr);
     if (decl) {
-      mappedAttr->setDecl(decl);
+      attr->setDecl(decl);
       setNeedsStyleRecalc();
       if (namedAttrMap)
         mappedAttributes()->declAdded();
@@ -214,17 +213,17 @@ void StyledElement::attributeChanged(Attribute* attr, bool preserveDecls) {
   // webarchive/adopt-attribute-styled-node-webarchive.html should catch any
   // resulting crashes.
   if (needToParse)
-    parseMappedAttribute(mappedAttr);
+    parseMappedAttribute(attr);
 
   if (entry == eNone)
     recalcStyleIfNeededAfterAttributeChanged(attr);
 
-  if (checkDecl && mappedAttr->decl()) {
+  if (checkDecl && attr->decl()) {
     // Add the decl to the table in the appropriate spot.
-    setMappedAttributeDecl(entry, attr, mappedAttr->decl());
-    mappedAttr->decl()->setMappedState(entry, attr->name(), attr->value());
-    mappedAttr->decl()->setParent(0);
-    mappedAttr->decl()->setNode(0);
+    setMappedAttributeDecl(entry, attr, attr->decl());
+    attr->decl()->setMappedState(entry, attr->name(), attr->value());
+    attr->decl()->setParent(0);
+    attr->decl()->setNode(0);
     if (namedAttrMap)
       mappedAttributes()->declAdded();
   }
@@ -258,7 +257,7 @@ void StyledElement::classAttributeChanged(const AtomicString& newClassString) {
   dispatchSubtreeModifiedEvent();
 }
 
-void StyledElement::parseMappedAttribute(MappedAttribute* attr) {
+void StyledElement::parseMappedAttribute(Attribute* attr) {
   if (attr->name() == idAttributeName()) {
     // unique id
     setHasID(!attr->isNull());
@@ -297,7 +296,7 @@ CSSStyleDeclaration* StyledElement::style() {
   return getInlineStyleDecl();
 }
 
-void StyledElement::addCSSProperty(MappedAttribute* attr,
+void StyledElement::addCSSProperty(Attribute* attr,
                                    int id,
                                    const String& value) {
   if (!attr->decl())
@@ -305,13 +304,13 @@ void StyledElement::addCSSProperty(MappedAttribute* attr,
   attr->decl()->setProperty(id, value, false);
 }
 
-void StyledElement::addCSSProperty(MappedAttribute* attr, int id, int value) {
+void StyledElement::addCSSProperty(Attribute* attr, int id, int value) {
   if (!attr->decl())
     createMappedDecl(attr);
   attr->decl()->setProperty(id, value, false);
 }
 
-void StyledElement::addCSSImageProperty(MappedAttribute* attr,
+void StyledElement::addCSSImageProperty(Attribute* attr,
                                         int id,
                                         const String& url) {
   if (!attr->decl())
@@ -319,9 +318,7 @@ void StyledElement::addCSSImageProperty(MappedAttribute* attr,
   attr->decl()->setImageProperty(id, url, false);
 }
 
-void StyledElement::addCSSLength(MappedAttribute* attr,
-                                 int id,
-                                 const String& value) {
+void StyledElement::addCSSLength(Attribute* attr, int id, const String& value) {
   // FIXME: This function should not spin up the CSS parser, but should instead
   // just figure out the correct
   // length unit and make the appropriate parsed value.
@@ -358,9 +355,7 @@ void StyledElement::addCSSLength(MappedAttribute* attr,
 }
 
 /* color parsing that tries to match as close as possible IE 6. */
-void StyledElement::addCSSColor(MappedAttribute* attr,
-                                int id,
-                                const String& c) {
+void StyledElement::addCSSColor(Attribute* attr, int id, const String& c) {
   // this is the only case no color gets applied in IE.
   if (!c.length())
     return;
@@ -434,7 +429,7 @@ void StyledElement::addCSSColor(MappedAttribute* attr,
   attr->decl()->setProperty(id, CSSValueBlack, false);
 }
 
-void StyledElement::createMappedDecl(MappedAttribute* attr) {
+void StyledElement::createMappedDecl(Attribute* attr) {
   RefPtr<CSSMappedAttributeDeclaration> decl =
       CSSMappedAttributeDeclaration::create();
   attr->setDecl(decl);

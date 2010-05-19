@@ -22,9 +22,9 @@
 #include "config.h"
 #include "HTMLUListElement.h"
 
+#include "Attribute.h"
 #include "CSSPropertyNames.h"
 #include "HTMLNames.h"
-#include "MappedAttribute.h"
 
 namespace WebCore {
 
@@ -45,7 +45,7 @@ bool HTMLUListElement::mapToEntry(const QualifiedName& attrName,
   return HTMLElement::mapToEntry(attrName, result);
 }
 
-void HTMLUListElement::parseMappedAttribute(MappedAttribute* attr) {
+void HTMLUListElement::parseMappedAttribute(Attribute* attr) {
   if (attr->name() == typeAttr)
     addCSSProperty(attr, CSSPropertyListStyleType, attr->value());
   else

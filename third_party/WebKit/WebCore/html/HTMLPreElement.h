@@ -34,7 +34,7 @@ class HTMLPreElement : public HTMLElement {
   virtual int tagPriority() const { return 5; }
 
   bool mapToEntry(const QualifiedName&, MappedAttributeEntry&) const;
-  void parseMappedAttribute(MappedAttribute*);
+  void parseMappedAttribute(Attribute*);
 
   int width() const;
   void setWidth(int w);

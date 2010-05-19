@@ -22,7 +22,7 @@
 #if ENABLE(SVG) && ENABLE(FILTERS)
 #include "SVGFEMorphologyElement.h"
 
-#include "MappedAttribute.h"
+#include "Attribute.h"
 #include "SVGNames.h"
 #include "SVGParserUtilities.h"
 
@@ -42,7 +42,7 @@ void SVGFEMorphologyElement::setRadius(float, float) {
   // FIXME: Needs an implementation.
 }
 
-void SVGFEMorphologyElement::parseMappedAttribute(MappedAttribute* attr) {
+void SVGFEMorphologyElement::parseMappedAttribute(Attribute* attr) {
   const String& value = attr->value();
   if (attr->name() == SVGNames::operatorAttr) {
     if (value == "erode")

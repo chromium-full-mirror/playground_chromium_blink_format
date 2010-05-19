@@ -128,7 +128,7 @@ class SVGPathElement : public SVGStyledTransformableElement,
   virtual SVGPathSegList* animatedPathSegList() const;
   virtual SVGPathSegList* animatedNormalizedPathSegList() const;
 
-  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void parseMappedAttribute(Attribute*);
   virtual void svgAttributeChanged(const QualifiedName&);
   virtual void synchronizeProperty(const QualifiedName&);
 

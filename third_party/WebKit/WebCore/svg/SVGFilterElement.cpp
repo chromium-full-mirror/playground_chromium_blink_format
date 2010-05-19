@@ -28,7 +28,6 @@
 
 #include "Attr.h"
 #include "FloatSize.h"
-#include "MappedAttribute.h"
 #include "PlatformString.h"
 #include "RenderSVGResourceFilter.h"
 #include "SVGFilterBuilder.h"
@@ -64,7 +63,7 @@ SVGFilterElement::~SVGFilterElement() {}
 
 void SVGFilterElement::setFilterRes(unsigned long, unsigned long) const {}
 
-void SVGFilterElement::parseMappedAttribute(MappedAttribute* attr) {
+void SVGFilterElement::parseMappedAttribute(Attribute* attr) {
   const String& value = attr->value();
   if (attr->name() == SVGNames::filterUnitsAttr) {
     if (value == "userSpaceOnUse")

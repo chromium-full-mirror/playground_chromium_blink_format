@@ -34,7 +34,7 @@ class SVGLinearGradientElement : public SVGGradientElement {
   SVGLinearGradientElement(const QualifiedName&, Document*);
   virtual ~SVGLinearGradientElement();
 
-  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void parseMappedAttribute(Attribute*);
   virtual void svgAttributeChanged(const QualifiedName&);
   virtual void synchronizeProperty(const QualifiedName&);
 

@@ -35,7 +35,7 @@ class SVGStyleElement : public SVGElement,
   SVGStyleElement(const QualifiedName&, Document*, bool createdByParser);
 
   // Derived from: 'Element'
-  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void parseMappedAttribute(Attribute*);
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
   virtual void childrenChanged(bool changedByParser = false,

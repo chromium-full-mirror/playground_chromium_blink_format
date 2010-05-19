@@ -68,7 +68,7 @@ class WMLInputElement : public WMLFormControlElement, public InputElement {
 
   virtual void select();
   virtual void accessKeyAction(bool sendToAnyElement);
-  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void parseMappedAttribute(Attribute*);
 
   virtual void copyNonAttributeProperties(const Element* source);
 

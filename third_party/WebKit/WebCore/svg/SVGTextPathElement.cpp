@@ -23,8 +23,8 @@
 #include "SVGTextPathElement.h"
 
 #include "AffineTransform.h"
+#include "Attribute.h"
 #include "FloatRect.h"
-#include "MappedAttribute.h"
 #include "RenderSVGTextPath.h"
 #include "SVGLengthList.h"
 #include "SVGPathElement.h"
@@ -43,7 +43,7 @@ SVGTextPathElement::SVGTextPathElement(const QualifiedName& tagName,
 
 SVGTextPathElement::~SVGTextPathElement() {}
 
-void SVGTextPathElement::parseMappedAttribute(MappedAttribute* attr) {
+void SVGTextPathElement::parseMappedAttribute(Attribute* attr) {
   const String& value = attr->value();
 
   if (attr->name() == SVGNames::startOffsetAttr)

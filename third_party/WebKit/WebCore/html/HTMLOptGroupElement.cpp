@@ -104,7 +104,7 @@ void HTMLOptGroupElement::childrenChanged(bool changedByParser,
                                           afterChange, childCountDelta);
 }
 
-void HTMLOptGroupElement::parseMappedAttribute(MappedAttribute* attr) {
+void HTMLOptGroupElement::parseMappedAttribute(Attribute* attr) {
   HTMLFormControlElement::parseMappedAttribute(attr);
   recalcSelectOptions();
 }

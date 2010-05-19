@@ -43,7 +43,7 @@ class SVGFEImageElement : public SVGFilterPrimitiveStandardAttributes,
   SVGFEImageElement(const QualifiedName&, Document*);
   virtual ~SVGFEImageElement();
 
-  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void parseMappedAttribute(Attribute*);
   virtual void synchronizeProperty(const QualifiedName&);
   virtual void notifyFinished(CachedResource*);
 

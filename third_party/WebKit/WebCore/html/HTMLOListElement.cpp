@@ -22,10 +22,10 @@
 #include "config.h"
 #include "HTMLOListElement.h"
 
+#include "Attribute.h"
 #include "CSSPropertyNames.h"
 #include "CSSValueKeywords.h"
 #include "HTMLNames.h"
-#include "MappedAttribute.h"
 #include "RenderListItem.h"
 
 namespace WebCore {
@@ -47,7 +47,7 @@ bool HTMLOListElement::mapToEntry(const QualifiedName& attrName,
   return HTMLElement::mapToEntry(attrName, result);
 }
 
-void HTMLOListElement::parseMappedAttribute(MappedAttribute* attr) {
+void HTMLOListElement::parseMappedAttribute(Attribute* attr) {
   if (attr->name() == typeAttr) {
     if (attr->value() == "a")
       addCSSProperty(attr, CSSPropertyListStyleType, CSSValueLowerAlpha);

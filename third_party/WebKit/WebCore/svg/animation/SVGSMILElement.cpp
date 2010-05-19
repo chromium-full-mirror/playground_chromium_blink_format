@@ -28,6 +28,7 @@
 #if ENABLE(SVG_ANIMATION)
 #include "SVGSMILElement.h"
 
+#include "Attribute.h"
 #include "CSSPropertyNames.h"
 #include "Document.h"
 #include "Event.h"
@@ -35,7 +36,6 @@
 #include "FloatConversion.h"
 #include "FrameView.h"
 #include "HTMLNames.h"
-#include "MappedAttribute.h"
 #include "SMILTimeContainer.h"
 #include "SVGNames.h"
 #include "SVGParserUtilities.h"
@@ -340,7 +340,7 @@ void SVGSMILElement::parseBeginOrEnd(const String& parseString,
   sortTimeList(timeList);
 }
 
-void SVGSMILElement::parseMappedAttribute(MappedAttribute* attr) {
+void SVGSMILElement::parseMappedAttribute(Attribute* attr) {
   if (attr->name() == SVGNames::beginAttr) {
     if (!m_conditions.isEmpty()) {
       disconnectConditions();

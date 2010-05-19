@@ -35,7 +35,7 @@ SVGSymbolElement::SVGSymbolElement(const QualifiedName& tagName, Document* doc)
 
 SVGSymbolElement::~SVGSymbolElement() {}
 
-void SVGSymbolElement::parseMappedAttribute(MappedAttribute* attr) {
+void SVGSymbolElement::parseMappedAttribute(Attribute* attr) {
   if (SVGLangSpace::parseMappedAttribute(attr))
     return;
   if (SVGExternalResourcesRequired::parseMappedAttribute(attr))

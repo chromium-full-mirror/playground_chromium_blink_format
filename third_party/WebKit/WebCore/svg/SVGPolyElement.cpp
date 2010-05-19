@@ -23,9 +23,9 @@
 #if ENABLE(SVG)
 #include "SVGPolyElement.h"
 
+#include "Attribute.h"
 #include "Document.h"
 #include "FloatPoint.h"
-#include "MappedAttribute.h"
 #include "RenderPath.h"
 #include "SVGNames.h"
 #include "SVGParserUtilities.h"
@@ -54,7 +54,7 @@ SVGPointList* SVGPolyElement::animatedPoints() const {
   return 0;
 }
 
-void SVGPolyElement::parseMappedAttribute(MappedAttribute* attr) {
+void SVGPolyElement::parseMappedAttribute(Attribute* attr) {
   const AtomicString& value = attr->value();
   if (attr->name() == SVGNames::pointsAttr) {
     ExceptionCode ec = 0;

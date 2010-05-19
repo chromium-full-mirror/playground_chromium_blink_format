@@ -24,8 +24,8 @@
 #if ENABLE(WML)
 #include "WMLSetvarElement.h"
 
+#include "Attribute.h"
 #include "HTMLNames.h"
-#include "MappedAttribute.h"
 #include "WMLErrorHandling.h"
 #include "WMLTaskElement.h"
 #include "WMLVariables.h"
@@ -37,7 +37,7 @@ WMLSetvarElement::WMLSetvarElement(const QualifiedName& tagName, Document* doc)
 
 WMLSetvarElement::~WMLSetvarElement() {}
 
-void WMLSetvarElement::parseMappedAttribute(MappedAttribute* attr) {
+void WMLSetvarElement::parseMappedAttribute(Attribute* attr) {
   if (attr->name() == HTMLNames::nameAttr) {
     if (!isValidVariableName(parseValueSubstitutingVariableReferences(
             attr->value(), WMLErrorInvalidVariableName))) {

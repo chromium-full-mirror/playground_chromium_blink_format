@@ -44,7 +44,7 @@ class SVGPolyElement : public SVGStyledTransformableElement,
   virtual SVGPointList* points() const;
   virtual SVGPointList* animatedPoints() const;
 
-  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void parseMappedAttribute(Attribute*);
   virtual void svgAttributeChanged(const QualifiedName&);
   virtual void synchronizeProperty(const QualifiedName&);
 

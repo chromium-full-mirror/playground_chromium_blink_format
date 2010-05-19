@@ -35,7 +35,7 @@ class HTMLParagraphElement : public HTMLElement {
   virtual bool checkDTD(const Node* newChild);
 
   virtual bool mapToEntry(const QualifiedName&, MappedAttributeEntry&) const;
-  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void parseMappedAttribute(Attribute*);
 
   String align() const;
   void setAlign(const String&);

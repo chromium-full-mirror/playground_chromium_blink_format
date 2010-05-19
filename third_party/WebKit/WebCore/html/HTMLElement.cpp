@@ -25,6 +25,7 @@
 #include "config.h"
 #include "HTMLElement.h"
 
+#include "Attribute.h"
 #include "CSSPropertyNames.h"
 #include "CSSValueKeywords.h"
 #include "DocumentFragment.h"
@@ -40,7 +41,6 @@
 #include "HTMLFormElement.h"
 #include "HTMLNames.h"
 #include "HTMLTokenizer.h"
-#include "MappedAttribute.h"
 #include "RenderWordBreak.h"
 #include "ScriptEventListener.h"
 #include "Settings.h"
@@ -147,7 +147,7 @@ bool HTMLElement::mapToEntry(const QualifiedName& attrName,
   return StyledElement::mapToEntry(attrName, result);
 }
 
-void HTMLElement::parseMappedAttribute(MappedAttribute* attr) {
+void HTMLElement::parseMappedAttribute(Attribute* attr) {
   if (attr->name() == idAttributeName() || attr->name() == classAttr ||
       attr->name() == styleAttr)
     return StyledElement::parseMappedAttribute(attr);
@@ -636,12 +636,12 @@ void HTMLElement::insertAdjacentText(const String& where,
   insertAdjacent(where, textNode.get(), ec);
 }
 
-void HTMLElement::addHTMLAlignment(MappedAttribute* attr) {
+void HTMLElement::addHTMLAlignment(Attribute* attr) {
   addHTMLAlignmentToStyledElement(this, attr);
 }
 
 void HTMLElement::addHTMLAlignmentToStyledElement(StyledElement* element,
-                                                  MappedAttribute* attr) {
+                                                  Attribute* attr) {
   // Vertical alignment with respect to the current baseline of the text
   // right or left means floating images.
   int floatValue = CSSValueInvalid;
@@ -734,7 +734,7 @@ String HTMLElement::contentEditable() const {
   }
 }
 
-void HTMLElement::setContentEditable(MappedAttribute* attr) {
+void HTMLElement::setContentEditable(Attribute* attr) {
   const AtomicString& enabled = attr->value();
   if (enabled.isEmpty() || equalIgnoringCase(enabled, "true")) {
     addCSSProperty(attr, CSSPropertyWebkitUserModify, CSSValueReadWrite);

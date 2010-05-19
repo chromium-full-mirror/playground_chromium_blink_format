@@ -23,9 +23,9 @@
 #include "config.h"
 #include "HTMLParamElement.h"
 
+#include "Attribute.h"
 #include "Document.h"
 #include "HTMLNames.h"
-#include "MappedAttribute.h"
 
 namespace WebCore {
 
@@ -38,7 +38,7 @@ HTMLParamElement::HTMLParamElement(const QualifiedName& tagName, Document* doc)
 
 HTMLParamElement::~HTMLParamElement() {}
 
-void HTMLParamElement::parseMappedAttribute(MappedAttribute* attr) {
+void HTMLParamElement::parseMappedAttribute(Attribute* attr) {
   if (attr->name() == idAttributeName()) {
     // Must call base class so that hasID bit gets set.
     HTMLElement::parseMappedAttribute(attr);

@@ -46,7 +46,7 @@ void SVGTRefElement::updateReferencedText() {
   setTextContent(textContent, ignore);
 }
 
-void SVGTRefElement::parseMappedAttribute(MappedAttribute* attr) {
+void SVGTRefElement::parseMappedAttribute(Attribute* attr) {
   if (SVGURIReference::parseMappedAttribute(attr)) {
     updateReferencedText();
     return;

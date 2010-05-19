@@ -24,8 +24,8 @@
 #include "SVGTextElement.h"
 
 #include "AffineTransform.h"
+#include "Attribute.h"
 #include "FloatRect.h"
-#include "MappedAttribute.h"
 #include "RenderSVGText.h"
 #include "SVGLengthList.h"
 #include "SVGRenderStyle.h"
@@ -41,7 +41,7 @@ SVGTextElement::SVGTextElement(const QualifiedName& tagName, Document* doc)
 
 SVGTextElement::~SVGTextElement() {}
 
-void SVGTextElement::parseMappedAttribute(MappedAttribute* attr) {
+void SVGTextElement::parseMappedAttribute(Attribute* attr) {
   if (SVGTransformable::isKnownAttribute(attr->name())) {
     SVGTransformList* localTransforms = transformBaseValue();
     if (!SVGTransformable::parseTransformAttribute(localTransforms,

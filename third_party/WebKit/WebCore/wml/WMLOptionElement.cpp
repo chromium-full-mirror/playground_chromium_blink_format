@@ -24,8 +24,8 @@
 #if ENABLE(WML)
 #include "WMLOptionElement.h"
 
+#include "Attribute.h"
 #include "HTMLNames.h"
-#include "MappedAttribute.h"
 #include "NodeRenderStyle.h"
 #include "RenderStyle.h"
 #include "WMLNames.h"
@@ -72,7 +72,7 @@ void WMLOptionElement::childrenChanged(bool changedByParser,
                                          afterChange, childCountDelta);
 }
 
-void WMLOptionElement::parseMappedAttribute(MappedAttribute* attr) {
+void WMLOptionElement::parseMappedAttribute(Attribute* attr) {
   if (attr->name() == HTMLNames::valueAttr)
     m_data.setValue(parseValueSubstitutingVariableReferences(attr->value()));
   else if (attr->name() == HTMLNames::titleAttr)

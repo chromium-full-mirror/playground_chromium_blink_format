@@ -38,7 +38,7 @@ class HTMLMarqueeElement : public HTMLElement, private ActiveDOMObject {
   virtual int tagPriority() const { return 3; }
 
   virtual bool mapToEntry(const QualifiedName&, MappedAttributeEntry&) const;
-  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void parseMappedAttribute(Attribute*);
 
   int minimumDelay() const { return m_minimumDelay; }
 

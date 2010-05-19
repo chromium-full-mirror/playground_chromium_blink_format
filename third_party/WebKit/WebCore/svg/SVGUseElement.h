@@ -53,7 +53,7 @@ class SVGUseElement : public SVGStyledTransformableElement,
   virtual void removedFromDocument();
   virtual void buildPendingResource();
 
-  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void parseMappedAttribute(Attribute*);
   virtual void svgAttributeChanged(const QualifiedName&);
   virtual void synchronizeProperty(const QualifiedName&);
 

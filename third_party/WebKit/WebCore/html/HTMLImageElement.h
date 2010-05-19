@@ -49,7 +49,7 @@ class HTMLImageElement : public HTMLElement {
 
   virtual bool mapToEntry(const QualifiedName& attrName,
                           MappedAttributeEntry& result) const;
-  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void parseMappedAttribute(Attribute*);
 
   virtual void attach();
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);

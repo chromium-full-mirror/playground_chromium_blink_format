@@ -25,12 +25,12 @@
 #if ENABLE(SVG)
 #include "SVGUseElement.h"
 
+#include "Attribute.h"
 #include "CSSStyleSelector.h"
 #include "Document.h"
 #include "Event.h"
 #include "EventListener.h"
 #include "HTMLNames.h"
-#include "MappedAttribute.h"
 #include "NodeRenderStyle.h"
 #include "RegisteredEventListener.h"
 #include "RenderSVGShadowTreeRootContainer.h"
@@ -39,9 +39,9 @@
 #include "SVGGElement.h"
 #include "SVGLength.h"
 #include "SVGPreserveAspectRatio.h"
-#include "SVGShadowTreeElements.h"
 #include "SVGSMILElement.h"
 #include "SVGSVGElement.h"
+#include "SVGShadowTreeElements.h"
 #include "SVGSymbolElement.h"
 #include "XLinkNames.h"
 #include "XMLSerializer.h"
@@ -88,7 +88,7 @@ SVGElementInstance* SVGUseElement::animatedInstanceRoot() const {
   return 0;
 }
 
-void SVGUseElement::parseMappedAttribute(MappedAttribute* attr) {
+void SVGUseElement::parseMappedAttribute(Attribute* attr) {
   if (attr->name() == SVGNames::xAttr)
     setXBaseValue(SVGLength(LengthModeWidth, attr->value()));
   else if (attr->name() == SVGNames::yAttr)

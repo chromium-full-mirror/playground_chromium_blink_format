@@ -32,7 +32,7 @@ class WMLMetaElement : public WMLElement {
   WMLMetaElement(const QualifiedName& tagName, Document*);
   virtual ~WMLMetaElement();
 
-  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void parseMappedAttribute(Attribute*);
   virtual void insertedIntoDocument();
 
  private:

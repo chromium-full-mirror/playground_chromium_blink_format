@@ -29,7 +29,6 @@
 #include "CSSStyleSelector.h"
 #include "Document.h"
 #include "HTMLNames.h"
-#include "MappedAttribute.h"
 #include "PlatformString.h"
 #include "RenderObject.h"
 #include "RenderSVGResource.h"
@@ -210,7 +209,7 @@ bool SVGStyledElement::mapToEntry(const QualifiedName& attrName,
   return SVGElement::mapToEntry(attrName, result);
 }
 
-void SVGStyledElement::parseMappedAttribute(MappedAttribute* attr) {
+void SVGStyledElement::parseMappedAttribute(Attribute* attr) {
   const QualifiedName& attrName = attr->name();
   // NOTE: Any subclass which overrides parseMappedAttribute for a property
   // handled by
@@ -335,7 +334,7 @@ PassRefPtr<CSSValue> SVGStyledElement::getPresentationAttribute(
   if (!attr || !attr->isMappedAttribute() || !attr->style())
     return 0;
 
-  MappedAttribute* cssSVGAttr = toMappedAttribute(attr);
+  Attribute* cssSVGAttr = attr;
   // This function returns a pointer to a CSSValue which can be mutated from
   // JavaScript.
   // If the associated MappedAttribute uses the same

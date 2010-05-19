@@ -23,7 +23,7 @@
 #if ENABLE(SVG) && ENABLE(FILTERS)
 #include "SVGComponentTransferFunctionElement.h"
 
-#include "MappedAttribute.h"
+#include "Attribute.h"
 #include "SVGFEComponentTransferElement.h"
 #include "SVGNames.h"
 #include "SVGNumberList.h"
@@ -43,7 +43,7 @@ SVGComponentTransferFunctionElement::SVGComponentTransferFunctionElement(
 SVGComponentTransferFunctionElement::~SVGComponentTransferFunctionElement() {}
 
 void SVGComponentTransferFunctionElement::parseMappedAttribute(
-    MappedAttribute* attr) {
+    Attribute* attr) {
   const String& value = attr->value();
   if (attr->name() == SVGNames::typeAttr) {
     if (value == "identity")

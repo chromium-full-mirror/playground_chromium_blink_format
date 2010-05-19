@@ -23,7 +23,7 @@
 #if ENABLE(SVG)
 #include "SVGPathElement.h"
 
-#include "MappedAttribute.h"
+#include "Attribute.h"
 #include "RenderPath.h"
 #include "SVGNames.h"
 #include "SVGParserUtilities.h"
@@ -200,7 +200,7 @@ SVGPathElement::createSVGPathSegCurvetoQuadraticSmoothRel(float x, float y) {
   return SVGPathSegCurvetoQuadraticSmoothRel::create(x, y);
 }
 
-void SVGPathElement::parseMappedAttribute(MappedAttribute* attr) {
+void SVGPathElement::parseMappedAttribute(Attribute* attr) {
   if (attr->name() == SVGNames::dAttr) {
     ExceptionCode ec;
     pathSegList()->clear(ec);

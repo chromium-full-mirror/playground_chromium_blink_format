@@ -27,7 +27,6 @@
 #include "Attr.h"
 #include "Document.h"
 #include "FloatRect.h"
-#include "MappedAttribute.h"
 #include "SVGNames.h"
 #include "SVGParserUtilities.h"
 #include "SVGPreserveAspectRatio.h"
@@ -95,7 +94,7 @@ AffineTransform SVGFitToViewBox::viewBoxToViewTransform(
 }
 
 bool SVGFitToViewBox::parseMappedAttribute(Document* document,
-                                           MappedAttribute* attr) {
+                                           Attribute* attr) {
   if (attr->name() == SVGNames::viewBoxAttr) {
     float x = 0.0f, y = 0.0f, w = 0.0f, h = 0.0f;
     const UChar* c = attr->value().characters();

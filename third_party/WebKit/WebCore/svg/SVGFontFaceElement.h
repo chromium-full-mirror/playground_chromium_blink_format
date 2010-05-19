@@ -36,7 +36,7 @@ class SVGFontFaceElement : public SVGElement {
   SVGFontFaceElement(const QualifiedName&, Document*);
   virtual ~SVGFontFaceElement();
 
-  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void parseMappedAttribute(Attribute*);
 
   virtual void childrenChanged(bool changedByParser = false,
                                Node* beforeChange = 0,

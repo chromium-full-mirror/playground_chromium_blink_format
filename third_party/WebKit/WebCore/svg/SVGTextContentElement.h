@@ -60,7 +60,7 @@ class SVGTextContentElement : public SVGStyledElement,
   int getCharNumAtPosition(const FloatPoint&) const;
   void selectSubString(unsigned charnum, unsigned nchars, ExceptionCode&) const;
 
-  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void parseMappedAttribute(Attribute*);
   virtual void synchronizeProperty(const QualifiedName&);
 
   bool isKnownAttribute(const QualifiedName&);

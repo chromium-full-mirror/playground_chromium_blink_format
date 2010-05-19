@@ -27,7 +27,7 @@
 
 namespace WebCore {
 
-class MappedAttribute;
+class Attribute;
 
 // Notes on a SVG 1.1 spec discrepancy:
 // The SVG DOM defines the attribute externalResourcesRequired as being of type
@@ -43,7 +43,7 @@ class SVGExternalResourcesRequired {
   SVGExternalResourcesRequired();
   virtual ~SVGExternalResourcesRequired();
 
-  bool parseMappedAttribute(MappedAttribute*);
+  bool parseMappedAttribute(Attribute*);
   bool isKnownAttribute(const QualifiedName&);
 
  protected:

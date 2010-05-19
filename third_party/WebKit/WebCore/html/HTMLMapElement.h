@@ -42,7 +42,7 @@ class HTMLMapElement : public HTMLElement {
 
   const AtomicString& getName() const { return m_name; }
 
-  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void parseMappedAttribute(Attribute*);
 
   bool mapMouseEvent(int x, int y, const IntSize&, HitTestResult&);
 

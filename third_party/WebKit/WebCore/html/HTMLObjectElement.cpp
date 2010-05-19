@@ -25,6 +25,7 @@
 #include "config.h"
 #include "HTMLObjectElement.h"
 
+#include "Attribute.h"
 #include "CSSHelper.h"
 #include "EventNames.h"
 #include "ExceptionCode.h"
@@ -33,13 +34,12 @@
 #include "HTMLFormElement.h"
 #include "HTMLImageLoader.h"
 #include "HTMLNames.h"
-#include "ScriptEventListener.h"
 #include "MIMETypeRegistry.h"
-#include "MappedAttribute.h"
 #include "RenderEmbeddedObject.h"
 #include "RenderImage.h"
 #include "RenderWidget.h"
 #include "ScriptController.h"
+#include "ScriptEventListener.h"
 #include "Text.h"
 
 namespace WebCore {
@@ -70,7 +70,7 @@ RenderWidget* HTMLObjectElement::renderWidgetForJSBindings() const {
   return toRenderWidget(renderer());
 }
 
-void HTMLObjectElement::parseMappedAttribute(MappedAttribute* attr) {
+void HTMLObjectElement::parseMappedAttribute(Attribute* attr) {
   String val = attr->value();
   int pos;
   if (attr->name() == typeAttr) {

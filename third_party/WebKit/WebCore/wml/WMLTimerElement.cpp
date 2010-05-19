@@ -24,8 +24,8 @@
 #if ENABLE(WML)
 #include "WMLTimerElement.h"
 
+#include "Attribute.h"
 #include "HTMLNames.h"
-#include "MappedAttribute.h"
 #include "WMLCardElement.h"
 #include "WMLDocument.h"
 #include "WMLNames.h"
@@ -40,7 +40,7 @@ using namespace WMLNames;
 WMLTimerElement::WMLTimerElement(const QualifiedName& tagName, Document* doc)
     : WMLElement(tagName, doc), m_timer(this, &WMLTimerElement::timerFired) {}
 
-void WMLTimerElement::parseMappedAttribute(MappedAttribute* attr) {
+void WMLTimerElement::parseMappedAttribute(Attribute* attr) {
   if (attr->name() == HTMLNames::nameAttr)
     m_name = parseValueForbiddingVariableReferences(attr->value());
   else

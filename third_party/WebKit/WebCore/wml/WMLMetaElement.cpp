@@ -24,9 +24,9 @@
 #if ENABLE(WML)
 #include "WMLMetaElement.h"
 
+#include "Attribute.h"
 #include "Document.h"
 #include "HTMLNames.h"
-#include "MappedAttribute.h"
 
 namespace WebCore {
 
@@ -35,7 +35,7 @@ WMLMetaElement::WMLMetaElement(const QualifiedName& tagName, Document* doc)
 
 WMLMetaElement::~WMLMetaElement() {}
 
-void WMLMetaElement::parseMappedAttribute(MappedAttribute* attr) {
+void WMLMetaElement::parseMappedAttribute(Attribute* attr) {
   if (attr->name() == HTMLNames::http_equivAttr)
     m_equiv = parseValueForbiddingVariableReferences(attr->value());
   else if (attr->name() == HTMLNames::contentAttr)

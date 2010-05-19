@@ -24,8 +24,8 @@
 #if ENABLE(SVG) && ENABLE(FILTERS)
 #include "SVGFilterPrimitiveStandardAttributes.h"
 
+#include "Attribute.h"
 #include "FilterEffect.h"
-#include "MappedAttribute.h"
 #include "SVGLength.h"
 #include "SVGNames.h"
 #include "SVGStyledElement.h"
@@ -50,7 +50,7 @@ SVGFilterPrimitiveStandardAttributes::SVGFilterPrimitiveStandardAttributes(
 SVGFilterPrimitiveStandardAttributes::~SVGFilterPrimitiveStandardAttributes() {}
 
 void SVGFilterPrimitiveStandardAttributes::parseMappedAttribute(
-    MappedAttribute* attr) {
+    Attribute* attr) {
   const AtomicString& value = attr->value();
   if (attr->name() == SVGNames::xAttr)
     setXBaseValue(SVGLength(LengthModeWidth, value));

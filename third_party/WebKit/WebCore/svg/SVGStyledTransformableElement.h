@@ -52,7 +52,7 @@ class SVGStyledTransformableElement : public SVGStyledLocatableElement,
 
   virtual FloatRect getBBox() const;
 
-  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void parseMappedAttribute(Attribute*);
   virtual void synchronizeProperty(const QualifiedName&);
   bool isKnownAttribute(const QualifiedName&);
 

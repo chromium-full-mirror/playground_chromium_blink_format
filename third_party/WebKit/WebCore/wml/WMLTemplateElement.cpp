@@ -24,7 +24,7 @@
 #if ENABLE(WML)
 #include "WMLTemplateElement.h"
 
-#include "MappedAttribute.h"
+#include "Attribute.h"
 #include "NodeList.h"
 #include "WMLCardElement.h"
 #include "WMLDocument.h"
@@ -41,7 +41,7 @@ WMLTemplateElement::WMLTemplateElement(const QualifiedName& tagName,
 
 WMLTemplateElement::~WMLTemplateElement() {}
 
-void WMLTemplateElement::parseMappedAttribute(MappedAttribute* attr) {
+void WMLTemplateElement::parseMappedAttribute(Attribute* attr) {
   WMLIntrinsicEventType eventType = WMLIntrinsicEventUnknown;
 
   if (attr->name() == onenterforwardAttr)

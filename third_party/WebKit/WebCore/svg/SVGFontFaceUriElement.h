@@ -37,7 +37,7 @@ class SVGFontFaceUriElement : public SVGElement, public CachedResourceClient {
 
   PassRefPtr<CSSFontFaceSrcValue> srcValue() const;
 
-  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void parseMappedAttribute(Attribute*);
   virtual void childrenChanged(bool changedByParser = false,
                                Node* beforeChange = 0,
                                Node* afterChange = 0,

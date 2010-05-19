@@ -57,7 +57,7 @@ class WMLOptGroupElement : public WMLFormControlElement,
                                Node* beforeChange = 0,
                                Node* afterChange = 0,
                                int childCountDelta = 0);
-  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void parseMappedAttribute(Attribute*);
 
   virtual void attach();
   virtual void detach();

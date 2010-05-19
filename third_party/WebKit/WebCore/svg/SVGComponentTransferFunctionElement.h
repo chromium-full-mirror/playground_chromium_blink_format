@@ -34,7 +34,7 @@ class SVGComponentTransferFunctionElement : public SVGElement {
   SVGComponentTransferFunctionElement(const QualifiedName&, Document*);
   virtual ~SVGComponentTransferFunctionElement();
 
-  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void parseMappedAttribute(Attribute*);
   virtual void synchronizeProperty(const QualifiedName&);
 
   ComponentTransferFunction transferFunction() const;

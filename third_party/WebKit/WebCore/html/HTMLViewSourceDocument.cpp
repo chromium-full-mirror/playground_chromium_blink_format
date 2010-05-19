@@ -25,6 +25,7 @@
 #include "config.h"
 #include "HTMLViewSourceDocument.h"
 
+#include "Attribute.h"
 #include "DOMImplementation.h"
 #include "HTMLAnchorElement.h"
 #include "HTMLBodyElement.h"
@@ -36,7 +37,6 @@
 #include "HTMLTableRowElement.h"
 #include "HTMLTableSectionElement.h"
 #include "HTMLTokenizer.h"
-#include "MappedAttribute.h"
 #include "Text.h"
 #include "TextDocument.h"
 
@@ -79,7 +79,7 @@ void HTMLViewSourceDocument::createContainingTable() {
   RefPtr<HTMLDivElement> div = new HTMLDivElement(divTag, this);
   RefPtr<NamedMappedAttrMap> attrs = NamedMappedAttrMap::create();
   attrs->addAttribute(
-      MappedAttribute::create(classAttr, "webkit-line-gutter-backdrop"));
+      Attribute::createMapped(classAttr, "webkit-line-gutter-backdrop"));
   div->setAttributeMap(attrs.release());
   body->addChild(div);
   div->attach();
@@ -218,7 +218,7 @@ PassRefPtr<Element> HTMLViewSourceDocument::addSpanWithClassName(
 
   RefPtr<HTMLElement> span = HTMLElement::create(spanTag, this);
   RefPtr<NamedMappedAttrMap> attrs = NamedMappedAttrMap::create();
-  attrs->addAttribute(MappedAttribute::create(classAttr, className));
+  attrs->addAttribute(Attribute::createMapped(classAttr, className));
   span->setAttributeMap(attrs.release());
   m_current->addChild(span);
   span->attach();
@@ -235,7 +235,7 @@ void HTMLViewSourceDocument::addLine(const String& className) {
   // stylesheet using counters).
   RefPtr<HTMLTableCellElement> td = new HTMLTableCellElement(tdTag, this);
   RefPtr<NamedMappedAttrMap> attrs = NamedMappedAttrMap::create();
-  attrs->addAttribute(MappedAttribute::create(classAttr, "webkit-line-number"));
+  attrs->addAttribute(Attribute::createMapped(classAttr, "webkit-line-number"));
   td->setAttributeMap(attrs.release());
   trow->addChild(td);
   td->attach();
@@ -244,7 +244,7 @@ void HTMLViewSourceDocument::addLine(const String& className) {
   td = new HTMLTableCellElement(tdTag, this);
   attrs = NamedMappedAttrMap::create();
   attrs->addAttribute(
-      MappedAttribute::create(classAttr, "webkit-line-content"));
+      Attribute::createMapped(classAttr, "webkit-line-content"));
   td->setAttributeMap(attrs.release());
   trow->addChild(td);
   td->attach();
@@ -309,9 +309,9 @@ PassRefPtr<Element> HTMLViewSourceDocument::addLink(const String& url,
     classValue = "webkit-html-attribute-value webkit-html-external-link";
   else
     classValue = "webkit-html-attribute-value webkit-html-resource-link";
-  attrs->addAttribute(MappedAttribute::create(classAttr, classValue));
-  attrs->addAttribute(MappedAttribute::create(targetAttr, "_blank"));
-  attrs->addAttribute(MappedAttribute::create(hrefAttr, url));
+  attrs->addAttribute(Attribute::createMapped(classAttr, classValue));
+  attrs->addAttribute(Attribute::createMapped(targetAttr, "_blank"));
+  attrs->addAttribute(Attribute::createMapped(hrefAttr, url));
   anchor->setAttributeMap(attrs.release());
   m_current->addChild(anchor);
   anchor->attach();

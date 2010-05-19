@@ -72,7 +72,7 @@ class HTMLFormElement : public HTMLElement {
 
   bool autoComplete() const { return m_autocomplete; }
 
-  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void parseMappedAttribute(Attribute*);
 
   void registerFormElement(HTMLFormControlElement*);
   void removeFormElement(HTMLFormControlElement*);

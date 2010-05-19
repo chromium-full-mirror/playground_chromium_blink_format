@@ -22,6 +22,7 @@
 #include "config.h"
 #include "SelectElement.h"
 
+#include "Attribute.h"
 #include "CharacterNames.h"
 #include "Chrome.h"
 #include "ChromeClient.h"
@@ -31,11 +32,10 @@
 #include "FormDataList.h"
 #include "Frame.h"
 #include "HTMLFormElement.h"
-#include "HTMLNames.h"
 #include "HTMLKeygenElement.h"
+#include "HTMLNames.h"
 #include "HTMLSelectElement.h"
 #include "KeyboardEvent.h"
-#include "MappedAttribute.h"
 #include "MouseEvent.h"
 #include "OptionElement.h"
 #include "OptionGroupElement.h"
@@ -482,7 +482,7 @@ void SelectElement::restoreFormControlState(SelectElementData& data,
 
 void SelectElement::parseMultipleAttribute(SelectElementData& data,
                                            Element* element,
-                                           MappedAttribute* attribute) {
+                                           Attribute* attribute) {
   bool oldUsesMenuList = data.usesMenuList();
   data.setMultiple(!attribute->isNull());
   if (oldUsesMenuList != data.usesMenuList() && element->attached()) {

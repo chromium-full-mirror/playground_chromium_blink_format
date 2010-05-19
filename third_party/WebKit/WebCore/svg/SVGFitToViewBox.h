@@ -47,7 +47,7 @@ class SVGFitToViewBox {
                                                 float viewWidth,
                                                 float viewHeight);
 
-  bool parseMappedAttribute(Document*, MappedAttribute*);
+  bool parseMappedAttribute(Document*, Attribute*);
   bool isKnownAttribute(const QualifiedName&);
 
   virtual void setViewBoxBaseValue(

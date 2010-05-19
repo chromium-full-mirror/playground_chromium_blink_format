@@ -27,11 +27,11 @@
 #if ENABLE(WML)
 #include "WMLPElement.h"
 
+#include "Attribute.h"
 #include "CSSPropertyNames.h"
 #include "CSSValueKeywords.h"
 #include "Document.h"
 #include "HTMLNames.h"
-#include "MappedAttribute.h"
 #include "NodeList.h"
 #include "WMLNames.h"
 
@@ -52,7 +52,7 @@ bool WMLPElement::mapToEntry(const QualifiedName& attrName,
   return WMLElement::mapToEntry(attrName, result);
 }
 
-void WMLPElement::parseMappedAttribute(MappedAttribute* attr) {
+void WMLPElement::parseMappedAttribute(Attribute* attr) {
   if (attr->name() == HTMLNames::alignAttr) {
     const AtomicString& value = attr->value();
     if (equalIgnoringCase(value, "middle") ||

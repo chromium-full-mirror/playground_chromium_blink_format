@@ -35,7 +35,7 @@ class WMLTableElement : public WMLElement {
   virtual ~WMLTableElement();
 
   virtual bool mapToEntry(const QualifiedName&, MappedAttributeEntry&) const;
-  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void parseMappedAttribute(Attribute*);
 
   virtual void finishParsingChildren();
 

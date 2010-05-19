@@ -24,9 +24,9 @@
 #if ENABLE(WML)
 #include "WMLElement.h"
 
+#include "Attribute.h"
 #include "CSSPropertyNames.h"
 #include "HTMLNames.h"
-#include "MappedAttribute.h"
 #include "RenderObject.h"
 #include "WMLErrorHandling.h"
 #include "WMLNames.h"
@@ -57,7 +57,7 @@ bool WMLElement::mapToEntry(const QualifiedName& attrName,
   return StyledElement::mapToEntry(attrName, result);
 }
 
-void WMLElement::parseMappedAttribute(MappedAttribute* attr) {
+void WMLElement::parseMappedAttribute(Attribute* attr) {
   if (attr->name() == idAttributeName() ||
       attr->name() == HTMLNames::classAttr ||
       attr->name() == HTMLNames::styleAttr)

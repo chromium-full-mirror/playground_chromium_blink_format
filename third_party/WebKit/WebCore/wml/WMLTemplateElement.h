@@ -33,7 +33,7 @@ class WMLTemplateElement : public WMLElement, public WMLEventHandlingElement {
   WMLTemplateElement(const QualifiedName&, Document*);
   virtual ~WMLTemplateElement();
 
-  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void parseMappedAttribute(Attribute*);
 
   static void registerTemplatesInDocument(Document*);
 };

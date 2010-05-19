@@ -193,7 +193,7 @@ class HTMLInputElement : public HTMLTextFormControlElement,
 
   virtual bool mapToEntry(const QualifiedName& attrName,
                           MappedAttributeEntry& result) const;
-  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void parseMappedAttribute(Attribute*);
 
   virtual void copyNonAttributeProperties(const Element* source);
 

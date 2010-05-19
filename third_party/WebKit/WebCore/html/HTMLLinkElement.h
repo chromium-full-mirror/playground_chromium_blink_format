@@ -84,7 +84,7 @@ class HTMLLinkElement : public HTMLElement, public CachedResourceClient {
   StyleSheet* sheet() const;
 
   // overload from HTMLElement
-  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void parseMappedAttribute(Attribute*);
 
   void process();
 

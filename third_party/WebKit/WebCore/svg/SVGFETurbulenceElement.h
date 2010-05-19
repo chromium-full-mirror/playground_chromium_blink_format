@@ -41,7 +41,7 @@ class SVGFETurbulenceElement : public SVGFilterPrimitiveStandardAttributes {
   SVGFETurbulenceElement(const QualifiedName&, Document*);
   virtual ~SVGFETurbulenceElement();
 
-  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void parseMappedAttribute(Attribute*);
   virtual void synchronizeProperty(const QualifiedName&);
   virtual PassRefPtr<FilterEffect> build(SVGFilterBuilder*);
 

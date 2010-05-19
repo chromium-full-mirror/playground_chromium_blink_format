@@ -28,12 +28,12 @@
 
 namespace WebCore {
 
+class Attribute;
 class Element;
 class Event;
 class FormDataList;
 class HTMLFormElement;
 class KeyboardEvent;
-class MappedAttribute;
 class SelectElementData;
 class String;
 
@@ -120,9 +120,7 @@ class SelectElement {
   static void restoreFormControlState(SelectElementData&,
                                       Element*,
                                       const String& state);
-  static void parseMultipleAttribute(SelectElementData&,
-                                     Element*,
-                                     MappedAttribute*);
+  static void parseMultipleAttribute(SelectElementData&, Element*, Attribute*);
   static bool appendFormData(SelectElementData&, Element*, FormDataList&);
   static void reset(SelectElementData&, Element*);
   static void defaultEventHandler(SelectElementData&, Element*, Event*);

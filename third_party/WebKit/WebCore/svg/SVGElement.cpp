@@ -27,6 +27,7 @@
 #if ENABLE(SVG)
 #include "SVGElement.h"
 
+#include "Attribute.h"
 #include "CSSCursorImageValue.h"
 #include "DOMImplementation.h"
 #include "Document.h"
@@ -35,7 +36,6 @@
 #include "EventNames.h"
 #include "FrameView.h"
 #include "HTMLNames.h"
-#include "MappedAttribute.h"
 #include "RegisteredEventListener.h"
 #include "RenderObject.h"
 #include "SVGCursorElement.h"
@@ -182,7 +182,7 @@ void SVGElement::setCursorImageValue(CSSCursorImageValue* cursorImageValue) {
   ensureRareSVGData()->setCursorImageValue(cursorImageValue);
 }
 
-void SVGElement::parseMappedAttribute(MappedAttribute* attr) {
+void SVGElement::parseMappedAttribute(Attribute* attr) {
   // standard events
   if (attr->name() == onloadAttr)
     setAttributeEventListener(eventNames().loadEvent,

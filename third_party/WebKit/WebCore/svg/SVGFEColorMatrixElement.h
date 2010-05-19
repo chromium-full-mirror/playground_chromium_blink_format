@@ -33,7 +33,7 @@ class SVGFEColorMatrixElement : public SVGFilterPrimitiveStandardAttributes {
   SVGFEColorMatrixElement(const QualifiedName&, Document*);
   virtual ~SVGFEColorMatrixElement();
 
-  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void parseMappedAttribute(Attribute*);
   virtual void synchronizeProperty(const QualifiedName&);
   virtual PassRefPtr<FilterEffect> build(SVGFilterBuilder*);
 

@@ -25,8 +25,8 @@
 #include "config.h"
 #include "HTMLIsIndexElement.h"
 
+#include "Attribute.h"
 #include "HTMLNames.h"
-#include "MappedAttribute.h"
 
 namespace WebCore {
 
@@ -40,7 +40,7 @@ HTMLIsIndexElement::HTMLIsIndexElement(const QualifiedName& tagName,
   setDefaultName(isindexTag.localName());
 }
 
-void HTMLIsIndexElement::parseMappedAttribute(MappedAttribute* attr) {
+void HTMLIsIndexElement::parseMappedAttribute(Attribute* attr) {
   if (attr->name() == promptAttr)
     setValue(attr->value());
   else if (attr->name() == placeholderAttr)

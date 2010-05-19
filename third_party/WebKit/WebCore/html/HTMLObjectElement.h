@@ -59,7 +59,7 @@ class HTMLObjectElement : public HTMLPlugInImageElement {
 
   virtual int tagPriority() const { return 5; }
 
-  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void parseMappedAttribute(Attribute*);
 
   virtual void attach();
   virtual bool canLazyAttach() { return false; }

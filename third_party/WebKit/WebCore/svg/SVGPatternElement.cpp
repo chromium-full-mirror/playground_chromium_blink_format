@@ -26,11 +26,11 @@
 #include "SVGPatternElement.h"
 
 #include "AffineTransform.h"
+#include "Attribute.h"
 #include "Document.h"
 #include "FloatConversion.h"
 #include "GraphicsContext.h"
 #include "ImageBuffer.h"
-#include "MappedAttribute.h"
 #include "PatternAttributes.h"
 #include "RenderSVGContainer.h"
 #include "RenderSVGResourcePattern.h"
@@ -69,7 +69,7 @@ SVGPatternElement::SVGPatternElement(const QualifiedName& tagName,
 
 SVGPatternElement::~SVGPatternElement() {}
 
-void SVGPatternElement::parseMappedAttribute(MappedAttribute* attr) {
+void SVGPatternElement::parseMappedAttribute(Attribute* attr) {
   if (attr->name() == SVGNames::patternUnitsAttr) {
     if (attr->value() == "userSpaceOnUse")
       setPatternUnitsBaseValue(SVGUnitTypes::SVG_UNIT_TYPE_USERSPACEONUSE);

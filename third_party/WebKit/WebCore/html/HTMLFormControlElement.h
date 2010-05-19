@@ -54,7 +54,7 @@ class HTMLFormControlElement : public HTMLElement {
   virtual bool isTextFormControl() const { return false; }
   virtual bool isEnabledFormControl() const { return !disabled(); }
 
-  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void parseMappedAttribute(Attribute*);
   virtual void attach();
   virtual void insertedIntoTree(bool deep);
   virtual void removedFromTree(bool deep);
@@ -201,7 +201,7 @@ class HTMLTextFormControlElement : public HTMLFormControlElementWithState {
   void updatePlaceholderVisibility(bool);
   virtual int cachedSelectionStart() const = 0;
   virtual int cachedSelectionEnd() const = 0;
-  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void parseMappedAttribute(Attribute*);
 
  private:
   // A subclass should return true if placeholder processing is needed.

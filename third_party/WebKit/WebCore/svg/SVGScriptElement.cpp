@@ -23,10 +23,10 @@
 #if ENABLE(SVG)
 #include "SVGScriptElement.h"
 
+#include "Attribute.h"
 #include "Document.h"
 #include "Event.h"
 #include "EventNames.h"
-#include "MappedAttribute.h"
 #include "SVGNames.h"
 
 namespace WebCore {
@@ -47,7 +47,7 @@ String SVGScriptElement::scriptContent() const {
   return m_data.scriptContent();
 }
 
-void SVGScriptElement::parseMappedAttribute(MappedAttribute* attr) {
+void SVGScriptElement::parseMappedAttribute(Attribute* attr) {
   const QualifiedName& attrName = attr->name();
 
   if (attrName == SVGNames::typeAttr)

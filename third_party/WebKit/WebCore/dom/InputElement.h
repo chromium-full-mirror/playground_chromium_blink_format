@@ -27,11 +27,11 @@
 
 namespace WebCore {
 
+class Attribute;
 class Document;
 class Element;
 class Event;
 class InputElementData;
-class MappedAttribute;
 
 class InputElement {
  public:
@@ -91,11 +91,11 @@ class InputElement {
                                             InputElement*,
                                             Element*,
                                             Event*);
-  static void parseSizeAttribute(InputElementData&, Element*, MappedAttribute*);
+  static void parseSizeAttribute(InputElementData&, Element*, Attribute*);
   static void parseMaxLengthAttribute(InputElementData&,
                                       InputElement*,
                                       Element*,
-                                      MappedAttribute*);
+                                      Attribute*);
   static void updateValueIfNeeded(InputElementData&, InputElement*);
   static void notifyFormStateChanged(Element*);
 #if ENABLE(WCSS)

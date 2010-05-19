@@ -37,7 +37,7 @@ class SVGFESpecularLightingElement
   SVGFESpecularLightingElement(const QualifiedName&, Document*);
   virtual ~SVGFESpecularLightingElement();
 
-  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void parseMappedAttribute(Attribute*);
   virtual void synchronizeProperty(const QualifiedName&);
   virtual PassRefPtr<FilterEffect> build(SVGFilterBuilder*);
 

@@ -34,7 +34,7 @@ SVGMPathElement::SVGMPathElement(const QualifiedName& qname, Document* doc)
 
 SVGMPathElement::~SVGMPathElement() {}
 
-void SVGMPathElement::parseMappedAttribute(MappedAttribute* attr) {
+void SVGMPathElement::parseMappedAttribute(Attribute* attr) {
   if (SVGURIReference::parseMappedAttribute(attr))
     return;
   SVGElement::parseMappedAttribute(attr);

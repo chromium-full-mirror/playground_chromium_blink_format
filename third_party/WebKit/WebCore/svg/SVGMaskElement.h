@@ -43,7 +43,7 @@ class SVGMaskElement : public SVGStyledLocatableElement,
   virtual bool isValid() const { return SVGTests::isValid(); }
 
   FloatRect maskBoundingBox(const FloatRect&) const;
-  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void parseMappedAttribute(Attribute*);
   virtual void svgAttributeChanged(const QualifiedName&);
   virtual void synchronizeProperty(const QualifiedName&);
   virtual void childrenChanged(bool changedByParser = false,

@@ -32,7 +32,7 @@ class SVGStopElement : public SVGStyledElement {
   SVGStopElement(const QualifiedName&, Document*);
   virtual ~SVGStopElement();
 
-  virtual void parseMappedAttribute(MappedAttribute*);
+  virtual void parseMappedAttribute(Attribute*);
   virtual void synchronizeProperty(const QualifiedName&);
 
   Color stopColorIncludingOpacity() const;

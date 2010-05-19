@@ -23,8 +23,8 @@
 #if ENABLE(SVG)
 #include "SVGStopElement.h"
 
+#include "Attribute.h"
 #include "Document.h"
-#include "MappedAttribute.h"
 #include "RenderSVGGradientStop.h"
 #include "SVGGradientElement.h"
 #include "SVGNames.h"
@@ -36,7 +36,7 @@ SVGStopElement::SVGStopElement(const QualifiedName& tagName, Document* doc)
 
 SVGStopElement::~SVGStopElement() {}
 
-void SVGStopElement::parseMappedAttribute(MappedAttribute* attr) {
+void SVGStopElement::parseMappedAttribute(Attribute* attr) {
   if (attr->name() == SVGNames::offsetAttr) {
     const String& value = attr->value();
     if (value.endsWith("%"))
