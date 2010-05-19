@@ -64,6 +64,10 @@ class ExecState;
 
 enum CodeType { GlobalCode, EvalCode, FunctionCode };
 
+inline int unmodifiedArgumentsRegister(int argumentsRegister) {
+  return argumentsRegister - 1;
+}
+
 static ALWAYS_INLINE int missingThisObjectMarker() {
   return std::numeric_limits<int>::max();
 }
@@ -391,8 +395,17 @@ class CodeBlock : public FastAllocBase {
   bool needsFullScopeChain() const { return m_needsFullScopeChain; }
   void setUsesEval(bool usesEval) { m_usesEval = usesEval; }
   bool usesEval() const { return m_usesEval; }
-  void setUsesArguments(bool usesArguments) { m_usesArguments = usesArguments; }
-  bool usesArguments() const { return m_usesArguments; }
+
+  void setArgumentsRegister(int argumentsRegister) {
+    ASSERT(argumentsRegister != -1);
+    m_argumentsRegister = argumentsRegister;
+    ASSERT(usesArguments());
+  }
+  int argumentsRegister() {
+    ASSERT(usesArguments());
+    return m_argumentsRegister;
+  }
+  bool usesArguments() const { return m_argumentsRegister != -1; }
 
   CodeType codeType() const { return m_codeType; }
 
@@ -655,10 +668,10 @@ class CodeBlock : public FastAllocBase {
 #endif
 
   int m_thisRegister;
+  int m_argumentsRegister;
 
   bool m_needsFullScopeChain;
   bool m_usesEval;
-  bool m_usesArguments;
   bool m_isNumericCompareFunction;
 
   CodeType m_codeType;

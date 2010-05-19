@@ -135,15 +135,8 @@ class ExecState : private Register {
   CallFrame* callerFrame() const {
     return this[RegisterFile::CallerFrame].callFrame();
   }
-  Arguments* optionalCalleeArguments() const {
-    return this[RegisterFile::OptionalCalleeArguments].arguments();
-  }
   Instruction* returnPC() const { return this[RegisterFile::ReturnPC].vPC(); }
 
-  void setCalleeArguments(JSValue arguments) {
-    static_cast<Register*>(this)[RegisterFile::OptionalCalleeArguments] =
-        arguments;
-  }
   void setCallerFrame(CallFrame* callerFrame) {
     static_cast<Register*>(this)[RegisterFile::CallerFrame] = callerFrame;
   }
@@ -172,7 +165,6 @@ class ExecState : private Register {
     setArgumentCount(argc);  // original argument count (for the sake of the
                              // "arguments" object)
     setCallee(function);
-    setCalleeArguments(JSValue());
   }
 
   // Read a register from the codeframe (or constant from the CodeBlock).

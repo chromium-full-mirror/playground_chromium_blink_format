@@ -64,7 +64,7 @@ class JSActivation : public JSVariableObject {
 
   virtual JSObject* toThisObject(ExecState*) const;
 
-  void copyRegisters(Arguments* arguments);
+  void copyRegisters();
 
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;

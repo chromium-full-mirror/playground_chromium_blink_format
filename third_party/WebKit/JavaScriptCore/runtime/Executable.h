@@ -295,6 +295,16 @@ class FunctionExecutable : public ScriptExecutable {
     return new (exec) JSFunction(exec, this, scopeChain);
   }
 
+  // Returns either call or construct bytecode. This can be appropriate
+  // for answering questions that that don't vary between call and construct --
+  // for example, argumentsRegister().
+  FunctionCodeBlock& generatedByteCode() {
+    if (m_codeBlockForCall)
+      return *m_codeBlockForCall;
+    ASSERT(m_codeBlockForConstruct);
+    return *m_codeBlockForConstruct;
+  }
+
   FunctionCodeBlock& bytecodeForCall(ExecState* exec,
                                      ScopeChainNode* scopeChainNode) {
     ASSERT(scopeChainNode);

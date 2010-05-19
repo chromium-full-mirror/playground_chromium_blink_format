@@ -47,9 +47,9 @@ struct CallFrameClosure {
       newCallFrame[arg - RegisterFile::CallFrameHeaderSize - expectedParams -
                    providedParams] = value;
   }
+
   void resetCallFrame() {
     newCallFrame->setScopeChain(scopeChain);
-    newCallFrame->setCalleeArguments(JSValue());
     for (int i = providedParams; i < expectedParams; ++i)
       newCallFrame[i - RegisterFile::CallFrameHeaderSize - expectedParams] =
           jsUndefined();

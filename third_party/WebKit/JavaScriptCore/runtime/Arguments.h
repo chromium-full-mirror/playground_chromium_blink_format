@@ -239,7 +239,7 @@ inline void Arguments::copyRegisters() {
 
 // This JSActivation function is defined here so it can get at
 // Arguments::setRegisters.
-inline void JSActivation::copyRegisters(Arguments* arguments) {
+inline void JSActivation::copyRegisters() {
   ASSERT(!d()->registerArray);
 
   size_t numParametersMinusThis = d()->functionExecutable->parameterCount();
@@ -256,14 +256,6 @@ inline void JSActivation::copyRegisters(Arguments* arguments) {
   Register* registerArray =
       copyRegisterArray(d()->registers - registerOffset, registerArraySize);
   setRegisters(registerArray + registerOffset, registerArray);
-  if (arguments && !arguments->isTornOff())
-    static_cast<Arguments*>(arguments)->setActivation(this);
-}
-
-ALWAYS_INLINE Arguments* Register::arguments() const {
-  if (jsValue() == JSValue())
-    return 0;
-  return asArguments(jsValue());
 }
 
 }  // namespace JSC
