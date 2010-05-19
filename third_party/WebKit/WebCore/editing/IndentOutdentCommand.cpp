@@ -80,14 +80,10 @@ bool IndentOutdentCommand::tryIndentingAsListItem(
   if (!listNode)
     return false;
 
-  // Find the list item enclosing the current paragraph
+  // Find the block that we want to indent.  If it's not a list item (e.g., a
+  // div inside a list item), we bail out.
   Element* selectedListItem =
       static_cast<Element*>(enclosingBlock(lastNodeInSelectedParagraph));
-  // FIXME: enclosingBlock shouldn't return the passed in element.  See the
-  // comment on the function about how to fix rather than having to adjust here.
-  if (selectedListItem == lastNodeInSelectedParagraph)
-    selectedListItem = static_cast<Element*>(
-        enclosingBlock(lastNodeInSelectedParagraph->parentNode()));
 
   // FIXME: we need to deal with the case where there is no li (malformed HTML)
   if (!selectedListItem->hasTagName(liTag))
@@ -130,7 +126,9 @@ void IndentOutdentCommand::indentIntoBlockquote(
   else
     nodeToSplitTo = editableRootForPosition(start);
 
-  RefPtr<Node> outerBlock = splitTreeToNode(start.node(), nodeToSplitTo);
+  RefPtr<Node> outerBlock = (start.node() == nodeToSplitTo)
+                                ? start.node()
+                                : splitTreeToNode(start.node(), nodeToSplitTo);
 
   if (!targetBlockquote) {
     // Create a new blockquote and insert it as a child of the root editable
