@@ -337,7 +337,8 @@ class LayoutTestController : public CppBoundClass {
   // queueScript.
   class WorkQueue {
    public:
-    WorkQueue(LayoutTestController* controller) : m_controller(controller) {}
+    WorkQueue(LayoutTestController* controller)
+        : m_frozen(false), m_controller(controller) {}
     virtual ~WorkQueue();
     void processWorkSoon();
 
@@ -452,10 +453,6 @@ class LayoutTestController : public CppBoundClass {
 
   // If true, don't dump output until notifyDone is called.
   bool m_waitUntilDone;
-
-  // To prevent infinite loops, only the first page of a test can add to a
-  // work queue (since we may well come back to that same page).
-  bool m_workQueueFrozen;
 
   WorkQueue m_workQueue;
 
