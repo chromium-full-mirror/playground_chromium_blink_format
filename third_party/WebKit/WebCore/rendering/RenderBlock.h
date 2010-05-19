@@ -195,6 +195,9 @@ class RenderBlock : public RenderBox {
                               bool isLineEmpty = true,
                               bool previousLineBrokeCleanly = true);
 
+  Vector<IntRect>* columnRects() const;
+  int columnGap() const;
+
  protected:
   void moveChildTo(RenderObject* to,
                    RenderObjectChildList* toChildList,
@@ -532,9 +535,7 @@ class RenderBlock : public RenderBox {
 
   int desiredColumnWidth() const;
   unsigned desiredColumnCount() const;
-  Vector<IntRect>* columnRects() const;
   void setDesiredColumnCountAndWidth(int count, int width);
-  int columnGap() const;
 
   void paintContinuationOutlines(PaintInfo&, int tx, int ty);
 

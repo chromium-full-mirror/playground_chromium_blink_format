@@ -326,6 +326,7 @@ class RenderLayer : public ScrollbarClient {
     CheckForRepaint = 1 << 1,
     IsCompositingUpdateRoot = 1 << 2,
     UpdateCompositingLayers = 1 << 3,
+    UpdatePagination = 1 << 4
   };
   typedef unsigned UpdateLayerPositionsFlags;
   void updateLayerPositions(
@@ -548,7 +549,33 @@ class RenderLayer : public ScrollbarClient {
                   PaintBehavior,
                   RenderObject* paintingRoot,
                   RenderObject::OverlapTestRequestMap* = 0,
-                  PaintLayerFlags paintFlags = 0);
+                  PaintLayerFlags = 0);
+  void paintList(Vector<RenderLayer*>*,
+                 RenderLayer* rootLayer,
+                 GraphicsContext* p,
+                 const IntRect& paintDirtyRect,
+                 PaintBehavior,
+                 RenderObject* paintingRoot,
+                 RenderObject::OverlapTestRequestMap*,
+                 PaintLayerFlags);
+  void paintPaginatedChildLayer(RenderLayer* childLayer,
+                                RenderLayer* rootLayer,
+                                GraphicsContext*,
+                                const IntRect& paintDirtyRect,
+                                PaintBehavior,
+                                RenderObject* paintingRoot,
+                                RenderObject::OverlapTestRequestMap*,
+                                PaintLayerFlags);
+  void paintChildLayerIntoColumns(RenderLayer* childLayer,
+                                  RenderLayer* rootLayer,
+                                  GraphicsContext*,
+                                  const IntRect& paintDirtyRect,
+                                  PaintBehavior,
+                                  RenderObject* paintingRoot,
+                                  RenderObject::OverlapTestRequestMap*,
+                                  PaintLayerFlags,
+                                  const Vector<RenderLayer*>& columnLayers,
+                                  size_t columnIndex);
 
   RenderLayer* hitTestLayer(RenderLayer* rootLayer,
                             RenderLayer* containerLayer,
@@ -559,6 +586,38 @@ class RenderLayer : public ScrollbarClient {
                             bool appliedTransform,
                             const HitTestingTransformState* transformState = 0,
                             double* zOffset = 0);
+  RenderLayer* hitTestList(
+      Vector<RenderLayer*>*,
+      RenderLayer* rootLayer,
+      const HitTestRequest& request,
+      HitTestResult& result,
+      const IntRect& hitTestRect,
+      const IntPoint& hitTestPoint,
+      const HitTestingTransformState* transformState,
+      double* zOffsetForDescendants,
+      double* zOffset,
+      const HitTestingTransformState* unflattenedTransformState,
+      bool depthSortDescendants);
+  RenderLayer* hitTestPaginatedChildLayer(
+      RenderLayer* childLayer,
+      RenderLayer* rootLayer,
+      const HitTestRequest& request,
+      HitTestResult& result,
+      const IntRect& hitTestRect,
+      const IntPoint& hitTestPoint,
+      const HitTestingTransformState* transformState,
+      double* zOffset);
+  RenderLayer* hitTestChildLayerColumns(
+      RenderLayer* childLayer,
+      RenderLayer* rootLayer,
+      const HitTestRequest& request,
+      HitTestResult& result,
+      const IntRect& hitTestRect,
+      const IntPoint& hitTestPoint,
+      const HitTestingTransformState* transformState,
+      double* zOffset,
+      const Vector<RenderLayer*>& columnLayers,
+      size_t columnIndex);
 
   PassRefPtr<HitTestingTransformState> createLocalTransformState(
       RenderLayer* rootLayer,
@@ -635,6 +694,9 @@ class RenderLayer : public ScrollbarClient {
 
   void updateScrollCornerStyle();
   void updateResizerStyle();
+
+  void updatePagination();
+  bool isPaginated() const { return m_isPaginated; }
 
 #if USE(ACCELERATED_COMPOSITING)
   bool hasCompositingDescendant() const { return m_hasCompositingDescendant; }
@@ -740,6 +802,9 @@ class RenderLayer : public ScrollbarClient {
   bool m_hasVisibleContent : 1;
   bool m_visibleDescendantStatusDirty : 1;
   bool m_hasVisibleDescendant : 1;
+
+  bool m_isPaginated : 1;  // If we think this layer is split by a multi-column
+                           // ancestor, then this bit will be set.
 
   bool m_3DTransformedDescendantStatusDirty : 1;
   bool m_has3DTransformedDescendant : 1;  // Set on a stacking context layer

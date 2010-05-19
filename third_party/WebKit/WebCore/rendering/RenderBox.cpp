@@ -1312,24 +1312,12 @@ void RenderBox::computeRectForRepaint(RenderBoxModelObject* repaintContainer,
 
   EPosition position = style()->position();
 
-  if (o->isBlockFlow() && position != AbsolutePosition &&
-      position != FixedPosition) {
-    RenderBlock* cb = toRenderBlock(o);
-    if (cb->hasColumns()) {
-      IntRect repaintRect(topLeft, rect.size());
-      cb->adjustRectForColumns(repaintRect);
-      topLeft = repaintRect.location();
-      rect = repaintRect;
-    }
-  }
-
   // We are now in our parent container's coordinate space.  Apply our transform
   // to obtain a bounding box
   // in the parent's coordinate space that encloses us.
   if (layer() && layer()->transform()) {
     fixed = position == FixedPosition;
     rect = layer()->transform()->mapRect(rect);
-    // FIXME: this clobbers topLeft adjustment done for multicol above
     topLeft = rect.location();
     topLeft.move(x(), y());
   } else if (position == FixedPosition)
@@ -1346,6 +1334,17 @@ void RenderBox::computeRectForRepaint(RenderBoxModelObject* repaintContainer,
     // relative position
     // flag on the RenderObject has been cleared, so use the one on the style().
     topLeft += layer()->relativePositionOffset();
+  }
+
+  if (o->isBlockFlow() && position != AbsolutePosition &&
+      position != FixedPosition) {
+    RenderBlock* cb = toRenderBlock(o);
+    if (cb->hasColumns()) {
+      IntRect repaintRect(topLeft, rect.size());
+      cb->adjustRectForColumns(repaintRect);
+      topLeft = repaintRect.location();
+      rect = repaintRect;
+    }
   }
 
   // FIXME: We ignore the lightweight clipping rect that controls use, since if
