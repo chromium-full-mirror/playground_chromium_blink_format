@@ -51,6 +51,7 @@ class HTML5Lexer : public Noncopyable {
   inline void emitCharacter(UChar);
   inline void emitParseError();
   inline void emitCurrentTagToken();
+  inline void emitCurrentDoctypeToken();
 
   inline bool temporaryBufferIs(const char*);
 
