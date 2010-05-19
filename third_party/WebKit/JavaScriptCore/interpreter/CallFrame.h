@@ -24,6 +24,7 @@
 #define CallFrame_h
 
 #include "JSGlobalData.h"
+#include "MacroAssemblerCodeRef.h"
 #include "RegisterFile.h"
 #include "ScopeChain.h"
 
@@ -135,7 +136,13 @@ class ExecState : private Register {
   CallFrame* callerFrame() const {
     return this[RegisterFile::CallerFrame].callFrame();
   }
+#if ENABLE(JIT)
+  ReturnAddressPtr returnPC() const {
+    return ReturnAddressPtr(this[RegisterFile::ReturnPC].vPC());
+  }
+#else
   Instruction* returnPC() const { return this[RegisterFile::ReturnPC].vPC(); }
+#endif
 
   void setCallerFrame(CallFrame* callerFrame) {
     static_cast<Register*>(this)[RegisterFile::CallerFrame] = callerFrame;
