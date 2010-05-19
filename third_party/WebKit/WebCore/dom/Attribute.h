@@ -55,7 +55,7 @@ class Attribute : public RefCounted<Attribute> {
 
   const QualifiedName& name() const { return m_name; }
 
-  Attr* attr() const { return m_impl; }
+  Attr* attr() const;
   PassRefPtr<Attr> createAttrIfNeeded(Element*);
 
   bool isNull() const { return m_value.isNull(); }
@@ -81,9 +81,9 @@ class Attribute : public RefCounted<Attribute> {
             bool isMappedAttribute,
             CSSMappedAttributeDeclaration* styleDecl)
       : m_isMappedAttribute(isMappedAttribute),
+        m_hasAttr(false),
         m_name(name),
         m_value(value),
-        m_impl(0),
         m_styleDecl(styleDecl) {}
 
   Attribute(const AtomicString& name,
@@ -91,22 +91,25 @@ class Attribute : public RefCounted<Attribute> {
             bool isMappedAttribute,
             CSSMappedAttributeDeclaration* styleDecl)
       : m_isMappedAttribute(isMappedAttribute),
+        m_hasAttr(false),
         m_name(nullAtom, name, nullAtom),
         m_value(value),
-        m_impl(0),
         m_styleDecl(styleDecl) {}
 
  private:
-  // This boolean will go into the spare 32-bits of padding from RefCounted in
+  void bindAttr(Attr*);
+  void unbindAttr(Attr*);
+
+  // These booleans will go into the spare 32-bits of padding from RefCounted in
   // 64-bit.
   bool m_isMappedAttribute;
+  bool m_hasAttr;
 
   QualifiedName m_name;
   AtomicString m_value;
-  Attr* m_impl;
   RefPtr<CSSMappedAttributeDeclaration> m_styleDecl;
 };
 
-}  // namespace
+}  // namespace WebCore
 
-#endif
+#endif  // Attribute_h

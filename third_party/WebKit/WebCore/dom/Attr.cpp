@@ -42,7 +42,7 @@ inline Attr::Attr(Element* element,
       m_ignoreChildrenChanged(0),
       m_specified(true) {
   ASSERT(!m_attribute->attr());
-  m_attribute->m_impl = this;
+  m_attribute->bindAttr(this);
 }
 
 PassRefPtr<Attr> Attr::create(Element* element,
@@ -55,7 +55,7 @@ PassRefPtr<Attr> Attr::create(Element* element,
 
 Attr::~Attr() {
   ASSERT(m_attribute->attr() == this);
-  m_attribute->m_impl = 0;
+  m_attribute->unbindAttr(this);
 }
 
 void Attr::createTextChild() {
