@@ -65,12 +65,15 @@ inline UChar toLowerCase(UChar cc) {
   return cc + lowerCaseOffset;
 }
 
-HTML5Lexer::HTML5Lexer() : m_token(0), m_additionalAllowedCharacter('\0') {}
+HTML5Lexer::HTML5Lexer() : m_token(0), m_additionalAllowedCharacter('\0') {
+  reset();
+}
 
 HTML5Lexer::~HTML5Lexer() {}
 
 void HTML5Lexer::reset() {
   m_state = DataState;
+  m_emitPending = false;
 }
 
 static inline bool isWhitespace(UChar c) {
@@ -210,9 +213,14 @@ void HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
       case DataState: {
         if (cc == '&')
           m_state = CharacterReferenceInDataState;
-        else if (cc == '<')
+        else if (cc == '<') {
+          if (m_token->type() == HTML5Token::Character) {
+            // We have a bunch of character tokens queued up that we
+            // are emitting lazily here.
+            return;
+          }
           m_state = TagOpenState;
-        else
+        } else
           emitCharacter(cc);
         break;
       }
@@ -296,8 +304,8 @@ void HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         else if (cc == '/')
           m_state = SelfClosingStartTagState;
         else if (cc == '>') {
+          emitCurrentTagToken();
           m_state = DataState;
-          return emitCurrentTagToken();
         } else if (cc >= 'A' && cc <= 'Z')
           m_token->appendToName(toLowerCase(cc));
         else
@@ -1187,6 +1195,10 @@ void HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
       }
     }
     source.advance();
+    if (m_emitPending) {
+      m_emitPending = false;
+      return;
+    }
   }
   m_token = 0;
 }
@@ -1196,12 +1208,14 @@ inline bool HTML5Lexer::temporaryBufferIs(const char*) {
   return true;
 }
 
-inline void HTML5Lexer::emitCommentToken() {
-  notImplemented();
-}
+inline void HTML5Lexer::emitCommentToken() {}
 
-inline void HTML5Lexer::emitCharacter(UChar) {
-  notImplemented();
+inline void HTML5Lexer::emitCharacter(UChar character) {
+  if (m_token->type() != HTML5Token::Character) {
+    m_token->beginCharacter(character);
+    return;
+  }
+  m_token->appendToCharacter(character);
 }
 
 inline void HTML5Lexer::emitParseError() {
@@ -1209,7 +1223,7 @@ inline void HTML5Lexer::emitParseError() {
 }
 
 inline void HTML5Lexer::emitCurrentTagToken() {
-  notImplemented();
+  m_emitPending = true;
 }
 
 inline void HTML5Lexer::emitCurrentDoctypeToken() {}
