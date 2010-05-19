@@ -89,7 +89,7 @@ static int depth(CodeBlock* codeBlock, ScopeChain& sc) {
   return sc.localDepth();
 }
 
-#if USE(INTERPRETER)
+#if !ENABLE(JIT)
 NEVER_INLINE bool Interpreter::resolve(CallFrame* callFrame,
                                        Instruction* vPC,
                                        JSValue& exceptionValue) {
@@ -321,7 +321,7 @@ NEVER_INLINE bool Interpreter::resolveBaseAndProperty(CallFrame* callFrame,
   return false;
 }
 
-#endif  // USE(INTERPRETER)
+#endif  // !ENABLE(JIT)
 
 ALWAYS_INLINE CallFrame* Interpreter::slideRegisterWindowForCall(
     CodeBlock* newCodeBlock,
@@ -368,7 +368,7 @@ ALWAYS_INLINE CallFrame* Interpreter::slideRegisterWindowForCall(
   return CallFrame::create(r);
 }
 
-#if USE(INTERPRETER)
+#if !ENABLE(JIT)
 static NEVER_INLINE bool isInvalidParamForIn(CallFrame* callFrame,
                                              CodeBlock* codeBlock,
                                              const Instruction* vPC,
@@ -1245,7 +1245,7 @@ NEVER_INLINE void Interpreter::debug(CallFrame* callFrame,
   }
 }
 
-#if USE(INTERPRETER)
+#if !ENABLE(JIT)
 NEVER_INLINE ScopeChainNode* Interpreter::createExceptionScope(
     CallFrame* callFrame,
     const Instruction* vPC) {
@@ -1493,7 +1493,7 @@ NEVER_INLINE void Interpreter::uncacheGetByID(CodeBlock* codeBlock,
   vPC[4] = 0;
 }
 
-#endif  // USE(INTERPRETER)
+#endif  // !ENABLE(JIT)
 
 JSValue Interpreter::privateExecute(ExecutionFlag flag,
                                     RegisterFile* registerFile,
@@ -1516,7 +1516,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
   // Mixing Interpreter + JIT is not supported.
   ASSERT_NOT_REACHED();
 #endif
-#if !USE(INTERPRETER)
+#if !!ENABLE(JIT)
   UNUSED_PARAM(registerFile);
   UNUSED_PARAM(callFrame);
   UNUSED_PARAM(exception);
@@ -4896,11 +4896,11 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
 #if !HAVE(COMPUTED_GOTO)
 }  // iterator loop ends
 #endif
-#endif  // USE(INTERPRETER)
 #undef NEXT_INSTRUCTION
 #undef DEFINE_OPCODE
 #undef CHECK_FOR_EXCEPTION
 #undef CHECK_FOR_TIMEOUT
+#endif  // !ENABLE(JIT)
 }
 
 JSValue Interpreter::retrieveArguments(CallFrame* callFrame,
