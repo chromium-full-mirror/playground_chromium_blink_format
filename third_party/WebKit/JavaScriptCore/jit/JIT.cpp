@@ -85,11 +85,11 @@ JIT::JIT(JSGlobalData* globalData, CodeBlock* codeBlock)
           codeBlock ? codeBlock->numberOfStructureStubInfos() : 0),
       m_callStructureStubCompilationInfo(
           codeBlock ? codeBlock->numberOfCallLinkInfos() : 0),
-      m_bytecodeIndex((unsigned)-1)
+      m_bytecodeOffset((unsigned)-1)
 #if USE(JSVALUE32_64)
       ,
       m_jumpTargetIndex(0),
-      m_mappedBytecodeIndex((unsigned)-1),
+      m_mappedBytecodeOffset((unsigned)-1),
       m_mappedVirtualRegisterIndex((unsigned)-1),
       m_mappedTag((RegisterID)-1),
       m_mappedPayload((RegisterID)-1)
@@ -120,8 +120,8 @@ void JIT::emitTimeoutCheck() {
 }
 #endif
 
-#define NEXT_OPCODE(name)                 \
-  m_bytecodeIndex += OPCODE_LENGTH(name); \
+#define NEXT_OPCODE(name)                  \
+  m_bytecodeOffset += OPCODE_LENGTH(name); \
   break;
 
 #if USE(JSVALUE32_64)
@@ -182,23 +182,23 @@ void JIT::privateCompileMainPass() {
   m_globalResolveInfoIndex = 0;
   m_callLinkInfoIndex = 0;
 
-  for (m_bytecodeIndex = 0; m_bytecodeIndex < instructionCount;) {
-    Instruction* currentInstruction = instructionsBegin + m_bytecodeIndex;
+  for (m_bytecodeOffset = 0; m_bytecodeOffset < instructionCount;) {
+    Instruction* currentInstruction = instructionsBegin + m_bytecodeOffset;
     ASSERT_WITH_MESSAGE(m_interpreter->isOpcode(currentInstruction->u.opcode),
                         "privateCompileMainPass gone bad @ %d",
-                        m_bytecodeIndex);
+                        m_bytecodeOffset);
 
 #if ENABLE(OPCODE_SAMPLING)
-    if (m_bytecodeIndex > 0)  // Avoid the overhead of sampling op_enter twice.
+    if (m_bytecodeOffset > 0)  // Avoid the overhead of sampling op_enter twice.
       sampleInstruction(currentInstruction);
 #endif
 
 #if !USE(JSVALUE32_64)
-    if (m_labels[m_bytecodeIndex].isUsed())
+    if (m_labels[m_bytecodeOffset].isUsed())
       killLastResultRegister();
 #endif
 
-    m_labels[m_bytecodeIndex] = label();
+    m_labels[m_bytecodeOffset] = label();
 
     switch (m_interpreter->getOpcodeID(currentInstruction->u.opcode)) {
       DEFINE_BINARY_OP(op_del_by_val)
@@ -356,14 +356,14 @@ void JIT::privateCompileMainPass() {
 
 #ifndef NDEBUG
   // Reset this, in order to guard its use with ASSERTs.
-  m_bytecodeIndex = (unsigned)-1;
+  m_bytecodeOffset = (unsigned)-1;
 #endif
 }
 
 void JIT::privateCompileLinkPass() {
   unsigned jmpTableCount = m_jmpTable.size();
   for (unsigned i = 0; i < jmpTableCount; ++i)
-    m_jmpTable[i].from.linkTo(m_labels[m_jmpTable[i].toBytecodeIndex], this);
+    m_jmpTable[i].from.linkTo(m_labels[m_jmpTable[i].toBytecodeOffset], this);
   m_jmpTable.clear();
 }
 
@@ -380,11 +380,11 @@ void JIT::privateCompileSlowCases() {
     killLastResultRegister();
 #endif
 
-    m_bytecodeIndex = iter->to;
+    m_bytecodeOffset = iter->to;
 #ifndef NDEBUG
-    unsigned firstTo = m_bytecodeIndex;
+    unsigned firstTo = m_bytecodeOffset;
 #endif
-    Instruction* currentInstruction = instructionsBegin + m_bytecodeIndex;
+    Instruction* currentInstruction = instructionsBegin + m_bytecodeOffset;
 
     switch (m_interpreter->getOpcodeID(currentInstruction->u.opcode)) {
       DEFINE_SLOWCASE_OP(op_add)
@@ -460,7 +460,7 @@ void JIT::privateCompileSlowCases() {
 
 #ifndef NDEBUG
   // Reset this, in order to guard its use with ASSERTs.
-  m_bytecodeIndex = (unsigned)-1;
+  m_bytecodeOffset = (unsigned)-1;
 #endif
 }
 
@@ -496,10 +496,10 @@ JITCode JIT::privateCompile() {
 
   if (m_codeBlock->codeType() == FunctionCode) {
     registerFileCheck.link(this);
-    m_bytecodeIndex = 0;
+    m_bytecodeOffset = 0;
     JITStubCall(this, cti_register_file_check).call();
 #ifndef NDEBUG
-    m_bytecodeIndex =
+    m_bytecodeOffset =
         (unsigned)-1;  // Reset this, in order to guard its use with ASSERTs.
 #endif
     jump(functionBody);
@@ -514,7 +514,7 @@ JITCode JIT::privateCompile() {
   // tables.
   for (unsigned i = 0; i < m_switches.size(); ++i) {
     SwitchRecord record = m_switches[i];
-    unsigned bytecodeIndex = record.bytecodeIndex;
+    unsigned bytecodeOffset = record.bytecodeOffset;
 
     if (record.type != SwitchRecord::String) {
       ASSERT(record.type == SwitchRecord::Immediate ||
@@ -523,20 +523,20 @@ JITCode JIT::privateCompile() {
              record.jumpTable.simpleJumpTable->ctiOffsets.size());
 
       record.jumpTable.simpleJumpTable->ctiDefault = patchBuffer.locationOf(
-          m_labels[bytecodeIndex + record.defaultOffset]);
+          m_labels[bytecodeOffset + record.defaultOffset]);
 
       for (unsigned j = 0;
            j < record.jumpTable.simpleJumpTable->branchOffsets.size(); ++j) {
         unsigned offset = record.jumpTable.simpleJumpTable->branchOffsets[j];
         record.jumpTable.simpleJumpTable->ctiOffsets[j] =
-            offset ? patchBuffer.locationOf(m_labels[bytecodeIndex + offset])
+            offset ? patchBuffer.locationOf(m_labels[bytecodeOffset + offset])
                    : record.jumpTable.simpleJumpTable->ctiDefault;
       }
     } else {
       ASSERT(record.type == SwitchRecord::String);
 
       record.jumpTable.stringJumpTable->ctiDefault = patchBuffer.locationOf(
-          m_labels[bytecodeIndex + record.defaultOffset]);
+          m_labels[bytecodeOffset + record.defaultOffset]);
 
       StringJumpTable::StringOffsetTable::iterator end =
           record.jumpTable.stringJumpTable->offsetTable.end();
@@ -545,7 +545,7 @@ JITCode JIT::privateCompile() {
            it != end; ++it) {
         unsigned offset = it->second.branchOffset;
         it->second.ctiOffset =
-            offset ? patchBuffer.locationOf(m_labels[bytecodeIndex + offset])
+            offset ? patchBuffer.locationOf(m_labels[bytecodeOffset + offset])
                    : record.jumpTable.stringJumpTable->ctiDefault;
       }
     }
@@ -567,9 +567,9 @@ JITCode JIT::privateCompile() {
     for (Vector<CallRecord>::iterator iter = m_calls.begin();
          iter != m_calls.end(); ++iter)
       m_codeBlock->callReturnIndexVector().append(
-          CallReturnOffsetToBytecodeIndex(
+          CallReturnOffsetToBytecodeOffset(
               patchBuffer.returnAddressOffset(iter->from),
-              iter->bytecodeIndex));
+              iter->bytecodeOffset));
   }
 
   // Link absolute addresses for jsr

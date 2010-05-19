@@ -107,7 +107,7 @@ struct GetByIdExceptionInfo {
 struct CallLinkInfo {
   CallLinkInfo() : callee(0), position(0), hasSeenShouldRepatch(0) {}
 
-  unsigned bytecodeIndex;
+  unsigned bytecodeOffset;
   CodeLocationNearCall callReturnLocation;
   CodeLocationDataLabelPtr hotPathBegin;
   CodeLocationNearCall hotPathOther;
@@ -172,13 +172,13 @@ struct GlobalResolveInfo {
 // (given as an offset in bytes into the JIT code) back to
 // the bytecode index of the corresponding bytecode operation.
 // This is then used to look up the corresponding handler.
-struct CallReturnOffsetToBytecodeIndex {
-  CallReturnOffsetToBytecodeIndex(unsigned callReturnOffset,
-                                  unsigned bytecodeIndex)
-      : callReturnOffset(callReturnOffset), bytecodeIndex(bytecodeIndex) {}
+struct CallReturnOffsetToBytecodeOffset {
+  CallReturnOffsetToBytecodeOffset(unsigned callReturnOffset,
+                                   unsigned bytecodeOffset)
+      : callReturnOffset(callReturnOffset), bytecodeOffset(bytecodeOffset) {}
 
   unsigned callReturnOffset;
-  unsigned bytecodeIndex;
+  unsigned bytecodeOffset;
 };
 
 // valueAtPosition helpers for the binaryChop algorithm below.
@@ -197,7 +197,7 @@ inline void* getMethodCallLinkInfoReturnLocation(
   return methodCallLinkInfo->callReturnLocation.executableAddress();
 }
 
-inline unsigned getCallReturnOffset(CallReturnOffsetToBytecodeIndex* pc) {
+inline unsigned getCallReturnOffset(CallReturnOffsetToBytecodeOffset* pc) {
   return pc->callReturnOffset;
 }
 
@@ -249,7 +249,7 @@ struct ExceptionInfo : FastAllocBase {
   Vector<GetByIdExceptionInfo> m_getByIdExceptionInfo;
 
 #if ENABLE(JIT)
-  Vector<CallReturnOffsetToBytecodeIndex> m_callReturnIndexVector;
+  Vector<CallReturnOffsetToBytecodeOffset> m_callReturnIndexVector;
 #endif
 };
 
@@ -345,14 +345,14 @@ class CodeBlock : public FastAllocBase {
         returnAddress.value()));
   }
 
-  unsigned getBytecodeIndex(CallFrame* callFrame,
-                            ReturnAddressPtr returnAddress) {
+  unsigned bytecodeOffset(CallFrame* callFrame,
+                          ReturnAddressPtr returnAddress) {
     reparseForExceptionInfoIfNecessary(callFrame);
-    return binaryChop<CallReturnOffsetToBytecodeIndex, unsigned,
+    return binaryChop<CallReturnOffsetToBytecodeOffset, unsigned,
                       getCallReturnOffset>(
                callReturnIndexVector().begin(), callReturnIndexVector().size(),
                getJITCode().offsetOf(returnAddress.value()))
-        ->bytecodeIndex;
+        ->bytecodeOffset;
   }
 
   bool functionRegisterForBytecodeOffset(unsigned bytecodeOffset,
@@ -504,7 +504,7 @@ class CodeBlock : public FastAllocBase {
   }
 
 #if ENABLE(JIT)
-  Vector<CallReturnOffsetToBytecodeIndex>& callReturnIndexVector() {
+  Vector<CallReturnOffsetToBytecodeOffset>& callReturnIndexVector() {
     ASSERT(m_exceptionInfo);
     return m_exceptionInfo->m_callReturnIndexVector;
   }

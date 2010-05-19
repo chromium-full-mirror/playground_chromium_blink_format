@@ -139,7 +139,7 @@ void JIT::compileOpCallVarargsSlowCase(Instruction* instruction,
   stubCall.call(
       dst);  // In the interpreter, the callee puts the return value in dst.
 
-  map(m_bytecodeIndex + OPCODE_LENGTH(op_call_varargs), dst, regT1, regT0);
+  map(m_bytecodeOffset + OPCODE_LENGTH(op_call_varargs), dst, regT1, regT0);
   sampleCodeBlock(m_codeBlock);
 }
 
@@ -404,7 +404,7 @@ void JIT::compileOpCall(OpcodeID opcodeID,
 
   // Put the return value in dst. In the interpreter, op_ret does this.
   emitStore(dst, regT1, regT0);
-  map(m_bytecodeIndex + opcodeLengths[opcodeID], dst, regT1, regT0);
+  map(m_bytecodeOffset + opcodeLengths[opcodeID], dst, regT1, regT0);
 
   sampleCodeBlock(m_codeBlock);
 }

@@ -251,11 +251,11 @@ void JIT::emit_op_method_check(Instruction* currentInstruction) {
 
   match.link(this);
   emitStore(dst, regT1, regT0);
-  map(m_bytecodeIndex + OPCODE_LENGTH(op_method_check), dst, regT1, regT0);
+  map(m_bytecodeOffset + OPCODE_LENGTH(op_method_check), dst, regT1, regT0);
 
   // We've already generated the following get_by_id, so make sure it's skipped
   // over.
-  m_bytecodeIndex += OPCODE_LENGTH(op_get_by_id);
+  m_bytecodeOffset += OPCODE_LENGTH(op_get_by_id);
 }
 
 void JIT::emitSlow_op_method_check(Instruction* currentInstruction,
@@ -271,7 +271,7 @@ void JIT::emitSlow_op_method_check(Instruction* currentInstruction,
 
   // We've already generated the following get_by_id, so make sure it's skipped
   // over.
-  m_bytecodeIndex += OPCODE_LENGTH(op_get_by_id);
+  m_bytecodeOffset += OPCODE_LENGTH(op_get_by_id);
 }
 
 #else  //! ENABLE(JIT_OPTIMIZE_METHOD_CALLS)
@@ -349,7 +349,7 @@ void JIT::emit_op_get_by_val(Instruction* currentInstruction) {
   addSlowCase(branch32(Equal, regT1, Imm32(JSValue::EmptyValueTag)));
 
   emitStore(dst, regT1, regT0);
-  map(m_bytecodeIndex + OPCODE_LENGTH(op_get_by_val), dst, regT1, regT0);
+  map(m_bytecodeOffset + OPCODE_LENGTH(op_get_by_val), dst, regT1, regT0);
 }
 
 void JIT::emitSlow_op_get_by_val(Instruction* currentInstruction,
@@ -454,7 +454,7 @@ void JIT::emit_op_get_by_id(Instruction* currentInstruction) {
   emitJumpSlowCaseIfNotJSCell(base, regT1);
   compileGetByIdHotPath();
   emitStore(dst, regT1, regT0);
-  map(m_bytecodeIndex + OPCODE_LENGTH(op_get_by_id), dst, regT1, regT0);
+  map(m_bytecodeOffset + OPCODE_LENGTH(op_get_by_id), dst, regT1, regT0);
 }
 
 void JIT::compileGetByIdHotPath() {
@@ -1449,7 +1449,7 @@ void JIT::emit_op_get_by_pname(Instruction* currentInstruction) {
   compileGetDirectOffset(regT2, regT1, regT0, regT0, regT3);
 
   emitStore(dst, regT1, regT0);
-  map(m_bytecodeIndex + OPCODE_LENGTH(op_get_by_pname), dst, regT1, regT0);
+  map(m_bytecodeOffset + OPCODE_LENGTH(op_get_by_pname), dst, regT1, regT0);
 }
 
 void JIT::emitSlow_op_get_by_pname(Instruction* currentInstruction,

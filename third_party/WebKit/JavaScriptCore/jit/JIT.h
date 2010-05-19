@@ -71,20 +71,21 @@ struct StructureStubInfo;
 
 struct CallRecord {
   MacroAssembler::Call from;
-  unsigned bytecodeIndex;
+  unsigned bytecodeOffset;
   void* to;
 
   CallRecord() {}
 
-  CallRecord(MacroAssembler::Call from, unsigned bytecodeIndex, void* to = 0)
-      : from(from), bytecodeIndex(bytecodeIndex), to(to) {}
+  CallRecord(MacroAssembler::Call from, unsigned bytecodeOffset, void* to = 0)
+      : from(from), bytecodeOffset(bytecodeOffset), to(to) {}
 };
 
 struct JumpTable {
   MacroAssembler::Jump from;
-  unsigned toBytecodeIndex;
+  unsigned toBytecodeOffset;
 
-  JumpTable(MacroAssembler::Jump f, unsigned t) : from(f), toBytecodeIndex(t) {}
+  JumpTable(MacroAssembler::Jump f, unsigned t)
+      : from(f), toBytecodeOffset(t) {}
 };
 
 struct SlowCaseEntry {
@@ -106,22 +107,24 @@ struct SwitchRecord {
     StringJumpTable* stringJumpTable;
   } jumpTable;
 
-  unsigned bytecodeIndex;
+  unsigned bytecodeOffset;
   unsigned defaultOffset;
 
   SwitchRecord(SimpleJumpTable* jumpTable,
-               unsigned bytecodeIndex,
+               unsigned bytecodeOffset,
                unsigned defaultOffset,
                Type type)
-      : type(type), bytecodeIndex(bytecodeIndex), defaultOffset(defaultOffset) {
+      : type(type),
+        bytecodeOffset(bytecodeOffset),
+        defaultOffset(defaultOffset) {
     this->jumpTable.simpleJumpTable = jumpTable;
   }
 
   SwitchRecord(StringJumpTable* jumpTable,
-               unsigned bytecodeIndex,
+               unsigned bytecodeOffset,
                unsigned defaultOffset)
       : type(String),
-        bytecodeIndex(bytecodeIndex),
+        bytecodeOffset(bytecodeOffset),
         defaultOffset(defaultOffset) {
     this->jumpTable.stringJumpTable = jumpTable;
   }
@@ -471,8 +474,8 @@ class JIT : private JSInterfaceJIT {
   void emitStoreBool(unsigned index, RegisterID tag, bool indexIsBool = false);
   void emitStoreDouble(unsigned index, FPRegisterID value);
 
-  bool isLabeled(unsigned bytecodeIndex);
-  void map(unsigned bytecodeIndex,
+  bool isLabeled(unsigned bytecodeOffset);
+  void map(unsigned bytecodeOffset,
            unsigned virtualRegisterIndex,
            RegisterID tag,
            RegisterID payload);
@@ -1162,7 +1165,7 @@ class JIT : private JSInterfaceJIT {
   Vector<MethodCallCompilationInfo> m_methodCallCompilationInfo;
   Vector<JumpTable> m_jmpTable;
 
-  unsigned m_bytecodeIndex;
+  unsigned m_bytecodeOffset;
   Vector<JSRInfo> m_jsrSites;
   Vector<SlowCaseEntry> m_slowCases;
   Vector<SwitchRecord> m_switches;
@@ -1173,7 +1176,7 @@ class JIT : private JSInterfaceJIT {
 
 #if USE(JSVALUE32_64)
   unsigned m_jumpTargetIndex;
-  unsigned m_mappedBytecodeIndex;
+  unsigned m_mappedBytecodeOffset;
   unsigned m_mappedVirtualRegisterIndex;
   RegisterID m_mappedTag;
   RegisterID m_mappedPayload;
