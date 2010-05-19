@@ -303,8 +303,12 @@ void Path::addArc(const FloatPoint& p,
     span += ea - sa;
   }
 
-  // connect to the previous point by a straight line
-  m_path.lineTo(QPointF(xc + radius * cos(sar), yc - radius * sin(sar)));
+  // If the path is empty, move to where the arc will start to avoid painting a
+  // line from (0,0)
+  // NOTE: QPainterPath::isEmpty() won't work here since it ignores a lone
+  // MoveToElement
+  if (!m_path.elementCount())
+    m_path.arcMoveTo(xs, ys, width, height, sa);
 
   m_path.arcTo(xs, ys, width, height, sa, span);
 }
