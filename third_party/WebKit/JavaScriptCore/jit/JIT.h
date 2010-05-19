@@ -283,6 +283,13 @@ class JIT : private JSInterfaceJIT {
                                             trampolines);
   }
 
+  static CodePtr compileCTINativeCall(JSGlobalData* globalData,
+                                      PassRefPtr<ExecutablePool> executablePool,
+                                      NativeFunction func) {
+    JIT jit(globalData);
+    return jit.privateCompileCTINativeCall(executablePool, globalData, func);
+  }
+
   static void patchGetByIdSelf(CodeBlock* codeblock,
                                StructureStubInfo*,
                                Structure*,
@@ -392,6 +399,9 @@ class JIT : private JSInterfaceJIT {
       RefPtr<ExecutablePool>* executablePool,
       JSGlobalData* data,
       TrampolineStructure* trampolines);
+  CodePtr privateCompileCTINativeCall(PassRefPtr<ExecutablePool> executablePool,
+                                      JSGlobalData* data,
+                                      NativeFunction func);
   void privateCompilePatchGetArrayLength(ReturnAddressPtr returnAddress);
 
   void addSlowCase(Jump);

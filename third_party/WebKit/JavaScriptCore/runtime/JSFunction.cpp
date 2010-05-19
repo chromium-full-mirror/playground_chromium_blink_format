@@ -85,7 +85,7 @@ JSFunction::JSFunction(ExecState* exec,
     : Base(&exec->globalData(), structure, name)
 #if ENABLE(JIT)
       ,
-      m_executable(exec->globalData().getNativeExecutable(func))
+      m_executable(exec->globalData().getHostFunction(func))
 #endif
       ,
       m_scopeChain(NoScopeChain()) {

@@ -167,21 +167,16 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
   Interpreter* interpreter;
 #if ENABLE(JIT)
   JITThunks jitStubs;
-  MacroAssemblerCodePtr getThunk(ThunkGenerator generator) {
-    return jitStubs.specializedThunk(this, generator);
+  MacroAssemblerCodePtr getCTIStub(ThunkGenerator generator) {
+    return jitStubs.ctiStub(this, generator);
   }
+  PassRefPtr<NativeExecutable> getHostFunction(NativeFunction function);
+  PassRefPtr<NativeExecutable> getHostFunction(NativeFunction function,
+                                               ThunkGenerator generator);
 #endif
   TimeoutChecker timeoutChecker;
   Terminator terminator;
   Heap heap;
-
-#if ENABLE(JIT)
-  typedef HashMap<NativeFunction, RefPtr<NativeExecutable>> NativeExecutableMap;
-  NativeExecutableMap m_nativeExecutableMap;
-  PassRefPtr<NativeExecutable> getNativeExecutable(NativeFunction function);
-  PassRefPtr<NativeExecutable> getNativeExecutable(NativeFunction function,
-                                                   ThunkGenerator generator);
-#endif
 
   JSValue exception;
 #if ENABLE(JIT)

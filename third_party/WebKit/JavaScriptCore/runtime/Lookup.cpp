@@ -86,8 +86,8 @@ void setUpStaticFunctionSlot(ExecState* exec,
       function = new (exec) NativeFunctionWrapper(
           exec, exec->lexicalGlobalObject()->prototypeFunctionStructure(),
           entry->functionLength(), propertyName,
-          exec->globalData().getNativeExecutable(entry->function(),
-                                                 entry->generator()));
+          exec->globalData().getHostFunction(entry->function(),
+                                             entry->generator()));
     else
 #endif
       function = new (exec) NativeFunctionWrapper(

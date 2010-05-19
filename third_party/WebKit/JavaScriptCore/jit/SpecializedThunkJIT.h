@@ -134,10 +134,9 @@ class SpecializedThunkJIT : public JSInterfaceJIT {
     ret();
   }
 
-  MacroAssemblerCodePtr finalize() {
+  MacroAssemblerCodePtr finalize(MacroAssemblerCodePtr fallback) {
     LinkBuffer patchBuffer(this, m_pool.get());
-    patchBuffer.link(m_failures,
-                     CodeLocationLabel(m_globalData->jitStubs.ctiNativeCall()));
+    patchBuffer.link(m_failures, CodeLocationLabel(fallback));
     return patchBuffer.finalizeCode().m_code;
   }
 

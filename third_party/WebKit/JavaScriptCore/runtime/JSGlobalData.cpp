@@ -272,25 +272,14 @@ const Vector<Instruction>& JSGlobalData::numericCompareFunction(
 }
 
 #if ENABLE(JIT)
-PassRefPtr<NativeExecutable> JSGlobalData::getNativeExecutable(
+PassRefPtr<NativeExecutable> JSGlobalData::getHostFunction(
     NativeFunction function) {
-  std::pair<NativeExecutableMap::iterator, bool> entry =
-      m_nativeExecutableMap.add(function, 0);
-  if (entry.second)
-    entry.first->second =
-        NativeExecutable::create(jitStubs.ctiNativeCall(), function);
-  return entry.first->second;
+  return jitStubs.hostFunctionStub(this, function);
 }
-
-PassRefPtr<NativeExecutable> JSGlobalData::getNativeExecutable(
+PassRefPtr<NativeExecutable> JSGlobalData::getHostFunction(
     NativeFunction function,
     ThunkGenerator generator) {
-  std::pair<NativeExecutableMap::iterator, bool> entry =
-      m_nativeExecutableMap.add(function, 0);
-  if (entry.second)
-    entry.first->second =
-        NativeExecutable::create(getThunk(generator), function);
-  return entry.first->second;
+  return jitStubs.hostFunctionStub(this, function, generator);
 }
 #endif
 

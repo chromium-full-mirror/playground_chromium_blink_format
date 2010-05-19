@@ -70,8 +70,8 @@ StringConstructor::StringConstructor(ExecState* exec,
       exec, new (exec) NativeFunctionWrapper(
                 exec, prototypeFunctionStructure, 1,
                 exec->propertyNames().fromCharCode,
-                exec->globalData().getNativeExecutable(
-                    stringFromCharCode, fromCharCodeThunkGenerator)),
+                exec->globalData().getHostFunction(stringFromCharCode,
+                                                   fromCharCodeThunkGenerator)),
       DontEnum);
 #else
   putDirectFunctionWithoutTransition(
