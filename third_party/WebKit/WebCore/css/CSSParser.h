@@ -249,6 +249,8 @@ class CSSParser {
 
   void updateLastSelectorLine() { m_lastSelectorLine = m_line; }
 
+  void clearProperties();
+
   bool m_strict;
   bool m_important;
   int m_id;
@@ -284,8 +286,6 @@ class CSSParser {
 
  private:
   void recheckAtKeyword(const UChar* str, int len);
-
-  void clearProperties();
 
   void setupParser(const char* prefix, const String&, const char* suffix);
 

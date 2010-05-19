@@ -5689,6 +5689,8 @@ CSSRule* CSSParser::createMarginAtRule(
   //        - m_parsedProperties: properties at
   //        [m_numParsedPropertiesBeforeMarginBox, m_numParsedProperties) are
   //        for this at-rule.
+  // Don't forget to also update the action for page symbol in CSSGrammar.y such
+  // that margin at-rule data is cleared if page_selector is invalid.
 
   endDeclarationsForMarginBox();
   return 0;  // until this method is implemented.

@@ -82,7 +82,8 @@ class CSSSelector : public Noncopyable {
     PseudoElement,
     Contain,  // css3: E[foo*="bar"]
     Begin,    // css3: E[foo^="bar"]
-    End       // css3: E[foo$="bar"]
+    End,      // css3: E[foo$="bar"]
+    PagePseudoClass
   };
 
   enum Relation {

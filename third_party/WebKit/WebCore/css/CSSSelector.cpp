@@ -495,13 +495,15 @@ CSSSelector::PseudoType CSSSelector::parsePseudoType(const AtomicString& name) {
 }
 
 void CSSSelector::extractPseudoType() const {
-  if (m_match != PseudoClass && m_match != PseudoElement)
+  if (m_match != PseudoClass && m_match != PseudoElement &&
+      m_match != PagePseudoClass)
     return;
 
   m_pseudoType = parsePseudoType(m_value);
 
-  bool element = false;  // pseudo-element
-  bool compat = false;   // single colon compatbility mode
+  bool element = false;            // pseudo-element
+  bool compat = false;             // single colon compatbility mode
+  bool isPagePseudoClass = false;  // Page pseudo-class
 
   switch (m_pseudoType) {
     case PseudoAfter:
@@ -600,13 +602,14 @@ void CSSSelector::extractPseudoType() const {
     case PseudoFirstPage:
     case PseudoLeftPage:
     case PseudoRightPage:
-      // FIXME: These should only be allowed in @page rules. Disabled them
-      // altogether until that's implemented correctly.
-      m_pseudoType = PseudoUnknown;
-      return;
+      isPagePseudoClass = true;
+      break;
   }
 
-  if (m_match == PseudoClass && element) {
+  bool matchPagePseudoClass = (m_match == PagePseudoClass);
+  if (matchPagePseudoClass != isPagePseudoClass)
+    m_pseudoType = PseudoUnknown;
+  else if (m_match == PseudoClass && element) {
     if (!compat)
       m_pseudoType = PseudoUnknown;
     else
@@ -657,7 +660,8 @@ String CSSSelector::selectorText() const {
     } else if (cs->m_match == CSSSelector::Class) {
       str += ".";
       str += cs->m_value;
-    } else if (cs->m_match == CSSSelector::PseudoClass) {
+    } else if (cs->m_match == CSSSelector::PseudoClass ||
+               cs->m_match == CSSSelector::PagePseudoClass) {
       str += ":";
       str += cs->m_value;
       if (cs->pseudoType() == PseudoNot) {
