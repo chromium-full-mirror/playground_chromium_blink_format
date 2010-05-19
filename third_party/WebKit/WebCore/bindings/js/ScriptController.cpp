@@ -30,7 +30,6 @@
 #include "HTMLPlugInElement.h"
 #include "InspectorTimelineAgent.h"
 #include "JSDocument.h"
-#include "JSMainThreadExecState.h"
 #include "NP_jsobject.h"
 #include "Page.h"
 #include "PageGroup.h"
@@ -145,9 +144,9 @@ ScriptValue ScriptController::evaluateInWorld(
 #endif
 
   exec->globalData().timeoutChecker.start();
-  Completion comp = JSMainThreadExecState::evaluate(
-      exec, exec->dynamicGlobalObject()->globalScopeChain(), jsSourceCode,
-      shell);
+  Completion comp =
+      JSC::evaluate(exec, exec->dynamicGlobalObject()->globalScopeChain(),
+                    jsSourceCode, shell);
   exec->globalData().timeoutChecker.stop();
 
 #if ENABLE(INSPECTOR)
@@ -289,15 +288,6 @@ bool ScriptController::anyPageIsProcessingUserGesture() const {
   }
 
   return false;
-}
-
-bool ScriptController::canAccessFromCurrentOrigin(Frame* frame) {
-  ExecState* exec = JSMainThreadExecState::currentState();
-  if (exec)
-    return allowsAccessFromFrame(exec, frame);
-  // If the current state is 0 we're in a call path where the DOM security
-  // check doesn't apply (eg. parser).
-  return true;
 }
 
 void ScriptController::attachDebugger(JSC::Debugger* debugger) {
