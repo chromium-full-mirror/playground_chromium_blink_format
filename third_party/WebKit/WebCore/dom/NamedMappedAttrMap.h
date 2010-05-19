@@ -28,7 +28,6 @@
 #define NamedMappedAttrMap_h
 
 #include "NamedNodeMap.h"
-#include "SpaceSplitString.h"
 
 namespace WebCore {
 
@@ -49,16 +48,9 @@ class NamedMappedAttrMap : public NamedNodeMap {
   bool mapsEquivalent(const NamedMappedAttrMap*) const;
 
  private:
-  NamedMappedAttrMap(Element* element)
-      : NamedNodeMap(element), m_mappedAttributeCount(0) {}
-
-  virtual void clearAttributes();
-  virtual bool isMappedAttributeMap() const;
+  NamedMappedAttrMap(Element* element) : NamedNodeMap(element) {}
 
   int declCount() const;
-
-  SpaceSplitString m_classNames;
-  int m_mappedAttributeCount;
 };
 
 }  // namespace

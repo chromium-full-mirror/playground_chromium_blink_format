@@ -130,8 +130,6 @@ class StyledElement : public Element {
   void destroyInlineStyleDecl();
   virtual void updateStyleAttribute() const;
 
-  virtual void createAttributeMap() const;
-
   RefPtr<CSSMutableStyleDeclaration> m_inlineStyleDecl;
 };
 
