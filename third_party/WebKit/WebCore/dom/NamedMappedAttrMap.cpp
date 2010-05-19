@@ -45,8 +45,7 @@ int NamedMappedAttrMap::declCount() const {
   int result = 0;
   for (unsigned i = 0; i < length(); i++) {
     Attribute* attr = attributeItem(i);
-    if (attr->isMappedAttribute() &&
-        static_cast<MappedAttribute*>(attr)->decl())
+    if (attr->isMappedAttribute() && toMappedAttribute(attr)->decl())
       result++;
   }
   return result;
@@ -61,8 +60,7 @@ bool NamedMappedAttrMap::mapsEquivalent(
   // The values for each decl must match.
   for (unsigned i = 0; i < length(); i++) {
     Attribute* attr = attributeItem(i);
-    if (attr->isMappedAttribute() &&
-        static_cast<MappedAttribute*>(attr)->decl()) {
+    if (attr->isMappedAttribute() && toMappedAttribute(attr)->decl()) {
       Attribute* otherAttr = otherMap->getAttributeItem(attr->name());
       if (!otherAttr || (attr->value() != otherAttr->value()))
         return false;

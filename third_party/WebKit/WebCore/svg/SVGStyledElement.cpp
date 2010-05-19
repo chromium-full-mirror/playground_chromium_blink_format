@@ -335,7 +335,7 @@ PassRefPtr<CSSValue> SVGStyledElement::getPresentationAttribute(
   if (!attr || !attr->isMappedAttribute() || !attr->style())
     return 0;
 
-  MappedAttribute* cssSVGAttr = static_cast<MappedAttribute*>(attr);
+  MappedAttribute* cssSVGAttr = toMappedAttribute(attr);
   // This function returns a pointer to a CSSValue which can be mutated from
   // JavaScript.
   // If the associated MappedAttribute uses the same

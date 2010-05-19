@@ -1366,7 +1366,7 @@ PassRefPtr<RenderStyle> CSSStyleSelector::styleForElement(
         for (unsigned i = 0; i < map->length(); i++) {
           Attribute* attr = map->attributeItem(i);
           if (attr->isMappedAttribute()) {
-            MappedAttribute* mappedAttr = static_cast<MappedAttribute*>(attr);
+            MappedAttribute* mappedAttr = toMappedAttribute(attr);
             if (mappedAttr->decl()) {
               lastAuthorRule = m_matchedDecls.size();
               if (firstAuthorRule == -1)

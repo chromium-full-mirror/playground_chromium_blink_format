@@ -279,7 +279,7 @@ static void updateCSSForAttribute(SVGSVGElement* element,
   Attribute* attribute = element->attributes(false)->getAttributeItem(attrName);
   if (!attribute || !attribute->isMappedAttribute())
     return;
-  element->addCSSProperty(static_cast<MappedAttribute*>(attribute), property,
+  element->addCSSProperty(toMappedAttribute(attribute), property,
                           value.valueAsString());
 }
 
