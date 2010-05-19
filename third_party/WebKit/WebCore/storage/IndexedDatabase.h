@@ -39,6 +39,7 @@ namespace WebCore {
 
 class Frame;
 class IDBDatabase;
+class SecurityOrigin;
 
 // This class is shared by IndexedDatabaseRequest (async) and
 // IndexedDatabaseSync (sync).
@@ -56,6 +57,7 @@ class IndexedDatabase : public ThreadSafeShared<IndexedDatabase> {
                     const String& description,
                     bool modifyDatabase,
                     PassRefPtr<IDBCallbacks>,
+                    PassRefPtr<SecurityOrigin>,
                     Frame*,
                     ExceptionCode&) = 0;
 };

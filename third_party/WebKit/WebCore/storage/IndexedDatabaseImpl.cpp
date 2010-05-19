@@ -49,6 +49,7 @@ void IndexedDatabaseImpl::open(const String& name,
                                const String& description,
                                bool modifyDatabase,
                                PassRefPtr<IDBCallbacks> callbacks,
+                               PassRefPtr<SecurityOrigin>,
                                Frame*,
                                ExceptionCode&) {
   // FIXME: Write for realz.
