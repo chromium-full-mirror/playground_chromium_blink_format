@@ -184,6 +184,10 @@ class HTMLTokenizer : public Tokenizer, public CachedResourceClient {
 
   void reset();
 
+  void willWriteHTML(const SegmentedString&);
+  ALWAYS_INLINE void advance(State&);
+  void didWriteHTML();
+
   PassRefPtr<Node> processToken();
   void processDoctypeToken();
 
