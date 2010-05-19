@@ -158,6 +158,7 @@ class PageClientQGraphicsWidget : public QWebPageClient {
 
 #if ENABLE(TILED_BACKING_STORE)
   void updateTiledBackingStoreScale();
+  virtual QRectF graphicsItemVisibleRect() const;
 #endif
 
 #if USE(ACCELERATED_COMPOSITING)
