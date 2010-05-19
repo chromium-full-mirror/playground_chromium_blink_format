@@ -59,8 +59,13 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-HTML5Lexer::HTML5Lexer()
-    : m_outputToken(0), m_additionalAllowedCharacter('\0') {}
+inline UChar toLowerCase(UChar cc) {
+  ASSERT(cc >= 'A' && cc <= 'Z');
+  const int lowerCaseOffset = 0x20;
+  return cc + lowerCaseOffset;
+}
+
+HTML5Lexer::HTML5Lexer() : m_token(0), m_additionalAllowedCharacter('\0') {}
 
 HTML5Lexer::~HTML5Lexer() {}
 
@@ -196,7 +201,7 @@ outOfCharacters:
 }
 
 void HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
-  m_outputToken = &token;
+  m_token = &token;
   // Source: http://www.whatwg.org/specs/web-apps/current-work/#tokenisation0
   // FIXME: This while should stop as soon as we have a token to return.
   while (!source.isEmpty()) {
@@ -252,10 +257,10 @@ void HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         else if (cc == '/')
           m_state = EndTagOpenState;
         else if (cc >= 'A' && cc <= 'Z') {
-          notImplemented();
+          m_token->beginStartTag(toLowerCase(cc));
           m_state = TagNameState;
         } else if (cc >= 'a' && cc <= 'z') {
-          notImplemented();
+          m_token->beginStartTag(cc);
           m_state = TagNameState;
         } else if (cc == '?') {
           emitParseError();
@@ -270,10 +275,10 @@ void HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
       }
       case EndTagOpenState: {
         if (cc >= 'A' && cc <= 'Z') {
-          notImplemented();
+          m_token->beginEndTag(toLowerCase(cc));
           m_state = TagNameState;
         } else if (cc >= 'a' && cc <= 'z') {
-          notImplemented();
+          m_token->beginEndTag(cc);
           m_state = TagNameState;
         } else if (cc == '>') {
           emitParseError();
@@ -290,12 +295,13 @@ void HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           m_state = BeforeAttributeNameState;
         else if (cc == '/')
           m_state = SelfClosingStartTagState;
-        else if (cc == '>')
+        else if (cc == '>') {
           m_state = DataState;
-        else if (cc >= 'A' && cc <= 'Z')
-          notImplemented();
+          return emitCurrentTagToken();
+        } else if (cc >= 'A' && cc <= 'Z')
+          m_token->appendToName(toLowerCase(cc));
         else
-          notImplemented();
+          m_token->appendToName(cc);
         // FIXME: Handle EOF properly.
         break;
       }
@@ -1182,7 +1188,7 @@ void HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
     }
     source.advance();
   }
-  m_outputToken = 0;
+  m_token = 0;
 }
 
 inline bool HTML5Lexer::temporaryBufferIs(const char*) {
@@ -1194,8 +1200,8 @@ inline void HTML5Lexer::emitCommentToken() {
   notImplemented();
 }
 
-inline void HTML5Lexer::emitCharacter(UChar character) {
-  m_outputToken->setToCharacter(character);
+inline void HTML5Lexer::emitCharacter(UChar) {
+  notImplemented();
 }
 
 inline void HTML5Lexer::emitParseError() {
