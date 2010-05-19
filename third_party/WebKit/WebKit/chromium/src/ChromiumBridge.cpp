@@ -652,10 +652,12 @@ void ChromiumBridge::paintTrackbar(GraphicsContext* gc,
 
 void ChromiumBridge::paintProgressBar(GraphicsContext* gc,
                                       const IntRect& barRect,
-                                      int valuePart,
-                                      const IntRect& valueRect) {
+                                      const IntRect& valueRect,
+                                      bool determinate,
+                                      double animatedSeconds) {
   webKitClient()->themeEngine()->paintProgressBar(
-      gc->platformContext()->canvas(), barRect, valuePart, valueRect);
+      gc->platformContext()->canvas(), barRect, valueRect, determinate,
+      animatedSeconds);
 }
 
 #endif

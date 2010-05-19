@@ -95,8 +95,9 @@ class WebThemeEngine {
 
   virtual void paintProgressBar(WebCanvas*,
                                 const WebRect& barRect,
-                                int valuePart,
-                                const WebRect& valueRect) {}
+                                const WebRect& valueRect,
+                                bool determinate,
+                                double animatedSeconds) {}
 
 #endif
 };

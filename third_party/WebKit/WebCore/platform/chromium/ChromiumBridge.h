@@ -271,8 +271,9 @@ class ChromiumBridge {
                             const IntRect&);
   static void paintProgressBar(GraphicsContext*,
                                const IntRect& barRect,
-                               int valuePart,
-                               const IntRect& valueRect);
+                               const IntRect& valueRect,
+                               bool determinate,
+                               double animatedSeconds);
 #endif
 
   // Trace Event --------------------------------------------------------
