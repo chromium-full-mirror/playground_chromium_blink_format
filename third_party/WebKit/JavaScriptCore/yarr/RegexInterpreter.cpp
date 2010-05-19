@@ -681,8 +681,7 @@ class Interpreter {
           backTrack->inParentheses = 1;
           if (term.capture()) {
             unsigned subpatternId = term.atom.subpatternId;
-            output[(subpatternId << 1) + 1] =
-                input.getPos() + term.inputPosition;
+            output[subpatternId << 1] = input.getPos() + term.inputPosition;
           }
           context->term -= term.atom.parenthesesWidth;
           return true;
