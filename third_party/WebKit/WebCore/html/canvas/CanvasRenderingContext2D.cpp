@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009 Apple Inc. All rights
  * reserved.
- * Copyright (C) 2008 Nokia Corporation and/or its subsidiary(-ies)
+ * Copyright (C) 2008, 2010 Nokia Corporation and/or its subsidiary(-ies)
  * Copyright (C) 2007 Alp Toker <alp@atoker.com>
  * Copyright (C) 2008 Eric Seidel <eric@webkit.org>
  * Copyright (C) 2008 Dirk Schulze <krit@webkit.org>
@@ -117,14 +117,14 @@ void CanvasRenderingContext2D::reset() {
 }
 
 CanvasRenderingContext2D::State::State()
-    : m_strokeStyle(CanvasStyle::create("#000000")),
-      m_fillStyle(CanvasStyle::create("#000000")),
+    : m_strokeStyle(CanvasStyle::create(Color::black)),
+      m_fillStyle(CanvasStyle::create(Color::black)),
       m_lineWidth(1),
       m_lineCap(ButtCap),
       m_lineJoin(MiterJoin),
       m_miterLimit(10),
       m_shadowBlur(0),
-      m_shadowColor("black"),
+      m_shadowColor(Color::transparent),
       m_globalAlpha(1),
       m_globalComposite(CompositeSourceOver),
       m_invertibleCTM(true),
@@ -291,13 +291,13 @@ void CanvasRenderingContext2D::setShadowBlur(float blur) {
 }
 
 String CanvasRenderingContext2D::shadowColor() const {
-  // FIXME: What should this return if you called setShadow with a non-string
-  // color?
-  return state().m_shadowColor;
+  return Color(state().m_shadowColor).serialized();
 }
 
 void CanvasRenderingContext2D::setShadowColor(const String& color) {
-  state().m_shadowColor = color;
+  if (!CSSParser::parseColor(state().m_shadowColor, color))
+    return;
+
   applyShadow();
 }
 
@@ -821,7 +821,7 @@ void CanvasRenderingContext2D::setShadow(float width,
                                          float blur) {
   state().m_shadowOffset = FloatSize(width, height);
   state().m_shadowBlur = blur;
-  state().m_shadowColor = "";
+  state().m_shadowColor = Color::transparent;
   applyShadow();
 }
 
@@ -829,9 +829,11 @@ void CanvasRenderingContext2D::setShadow(float width,
                                          float height,
                                          float blur,
                                          const String& color) {
+  if (!CSSParser::parseColor(state().m_shadowColor, color))
+    return;
+
   state().m_shadowOffset = FloatSize(width, height);
   state().m_shadowBlur = blur;
-  state().m_shadowColor = color;
   applyShadow();
 }
 
@@ -841,15 +843,15 @@ void CanvasRenderingContext2D::setShadow(float width,
                                          float grayLevel) {
   state().m_shadowOffset = FloatSize(width, height);
   state().m_shadowBlur = blur;
-  state().m_shadowColor = "";
+  state().m_shadowColor =
+      makeRGBA32FromFloats(grayLevel, grayLevel, grayLevel, 1.0f);
 
   GraphicsContext* c = drawingContext();
   if (!c)
     return;
 
-  RGBA32 rgba = makeRGBA32FromFloats(grayLevel, grayLevel, grayLevel, 1.0f);
-  c->setShadow(IntSize(width, -height), state().m_shadowBlur, Color(rgba),
-               DeviceColorSpace);
+  c->setShadow(IntSize(width, -height), state().m_shadowBlur,
+               state().m_shadowColor, DeviceColorSpace);
 }
 
 void CanvasRenderingContext2D::setShadow(float width,
@@ -857,19 +859,21 @@ void CanvasRenderingContext2D::setShadow(float width,
                                          float blur,
                                          const String& color,
                                          float alpha) {
+  RGBA32 rgba;
+
+  if (!CSSParser::parseColor(rgba, color))
+    return;
+
+  state().m_shadowColor = colorWithOverrideAlpha(rgba, alpha);
   state().m_shadowOffset = FloatSize(width, height);
   state().m_shadowBlur = blur;
-  state().m_shadowColor = color;
 
   GraphicsContext* c = drawingContext();
   if (!c)
     return;
 
-  RGBA32 rgba = 0;  // default is transparent black
-  if (!state().m_shadowColor.isEmpty())
-    CSSParser::parseColor(rgba, state().m_shadowColor);
   c->setShadow(IntSize(width, -height), state().m_shadowBlur,
-               Color(colorWithOverrideAlpha(rgba, alpha)), DeviceColorSpace);
+               state().m_shadowColor, DeviceColorSpace);
 }
 
 void CanvasRenderingContext2D::setShadow(float width,
@@ -879,15 +883,15 @@ void CanvasRenderingContext2D::setShadow(float width,
                                          float alpha) {
   state().m_shadowOffset = FloatSize(width, height);
   state().m_shadowBlur = blur;
-  state().m_shadowColor = "";
+  state().m_shadowColor =
+      makeRGBA32FromFloats(grayLevel, grayLevel, grayLevel, alpha);
 
   GraphicsContext* c = drawingContext();
   if (!c)
     return;
 
-  RGBA32 rgba = makeRGBA32FromFloats(grayLevel, grayLevel, grayLevel, alpha);
-  c->setShadow(IntSize(width, -height), state().m_shadowBlur, Color(rgba),
-               DeviceColorSpace);
+  c->setShadow(IntSize(width, -height), state().m_shadowBlur,
+               state().m_shadowColor, DeviceColorSpace);
 }
 
 void CanvasRenderingContext2D::setShadow(float width,
@@ -899,16 +903,14 @@ void CanvasRenderingContext2D::setShadow(float width,
                                          float a) {
   state().m_shadowOffset = FloatSize(width, height);
   state().m_shadowBlur = blur;
-  state().m_shadowColor = "";
+  state().m_shadowColor = makeRGBA32FromFloats(r, g, b, a);
 
   GraphicsContext* c = drawingContext();
   if (!c)
     return;
 
-  RGBA32 rgba =
-      makeRGBA32FromFloats(r, g, b, a);  // default is transparent black
-  c->setShadow(IntSize(width, -height), state().m_shadowBlur, Color(rgba),
-               DeviceColorSpace);
+  c->setShadow(IntSize(width, -height), state().m_shadowBlur,
+               state().m_shadowColor, DeviceColorSpace);
 }
 
 void CanvasRenderingContext2D::setShadow(float width,
@@ -921,7 +923,7 @@ void CanvasRenderingContext2D::setShadow(float width,
                                          float a) {
   state().m_shadowOffset = FloatSize(width, height);
   state().m_shadowBlur = blur;
-  state().m_shadowColor = "";
+  state().m_shadowColor = makeRGBAFromCMYKA(c, m, y, k, a);
 
   GraphicsContext* dc = drawingContext();
   if (!dc)
@@ -936,7 +938,7 @@ void CanvasRenderingContext2D::setShadow(float width,
                               shadowColor);
   CGColorRelease(shadowColor);
 #else
-  dc->setShadow(IntSize(width, -height), blur, Color(c, m, y, k, a),
+  dc->setShadow(IntSize(width, -height), blur, state().m_shadowColor,
                 DeviceColorSpace);
 #endif
 }
@@ -944,7 +946,7 @@ void CanvasRenderingContext2D::setShadow(float width,
 void CanvasRenderingContext2D::clearShadow() {
   state().m_shadowOffset = FloatSize();
   state().m_shadowBlur = 0;
-  state().m_shadowColor = "";
+  state().m_shadowColor = Color::transparent;
   applyShadow();
 }
 
@@ -953,13 +955,10 @@ void CanvasRenderingContext2D::applyShadow() {
   if (!c)
     return;
 
-  RGBA32 rgba = 0;  // default is transparent black
-  if (!state().m_shadowColor.isEmpty())
-    CSSParser::parseColor(rgba, state().m_shadowColor);
   float width = state().m_shadowOffset.width();
   float height = state().m_shadowOffset.height();
-  c->setShadow(IntSize(width, -height), state().m_shadowBlur, Color(rgba),
-               DeviceColorSpace);
+  c->setShadow(IntSize(width, -height), state().m_shadowBlur,
+               state().m_shadowColor, DeviceColorSpace);
 }
 
 static IntSize size(HTMLImageElement* image) {

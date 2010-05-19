@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2006, 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies)
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -26,6 +27,7 @@
 #ifndef CanvasStyle_h
 #define CanvasStyle_h
 
+#include "Color.h"
 #include "PlatformString.h"
 
 namespace WebCore {
@@ -36,14 +38,13 @@ class GraphicsContext;
 
 class CanvasStyle : public RefCounted<CanvasStyle> {
  public:
-  static PassRefPtr<CanvasStyle> create(const String& color) {
-    return adoptRef(new CanvasStyle(color));
+  static PassRefPtr<CanvasStyle> create(RGBA32 rgba) {
+    return adoptRef(new CanvasStyle(rgba));
   }
+  static PassRefPtr<CanvasStyle> create(const String& color);
+  static PassRefPtr<CanvasStyle> create(const String& color, float alpha);
   static PassRefPtr<CanvasStyle> create(float grayLevel) {
     return adoptRef(new CanvasStyle(grayLevel));
-  }
-  static PassRefPtr<CanvasStyle> create(const String& color, float alpha) {
-    return adoptRef(new CanvasStyle(color, alpha));
   }
   static PassRefPtr<CanvasStyle> create(float grayLevel, float alpha) {
     return adoptRef(new CanvasStyle(grayLevel, alpha));
@@ -58,14 +59,10 @@ class CanvasStyle : public RefCounted<CanvasStyle> {
                                         float a) {
     return adoptRef(new CanvasStyle(c, m, y, k, a));
   }
-  static PassRefPtr<CanvasStyle> create(PassRefPtr<CanvasGradient> gradient) {
-    return adoptRef(new CanvasStyle(gradient));
-  }
-  static PassRefPtr<CanvasStyle> create(PassRefPtr<CanvasPattern> pattern) {
-    return adoptRef(new CanvasStyle(pattern));
-  }
+  static PassRefPtr<CanvasStyle> create(PassRefPtr<CanvasGradient> gradient);
+  static PassRefPtr<CanvasStyle> create(PassRefPtr<CanvasPattern> pattern);
 
-  String color() const { return m_color; }
+  String color() const { return Color(m_rgba).serialized(); }
   CanvasGradient* canvasGradient() const { return m_gradient.get(); }
   CanvasPattern* canvasPattern() const { return m_pattern.get(); }
 
@@ -73,43 +70,37 @@ class CanvasStyle : public RefCounted<CanvasStyle> {
   void applyStrokeColor(GraphicsContext*);
 
  private:
-  CanvasStyle(const String& color);
+  CanvasStyle(RGBA32 rgba);
   CanvasStyle(float grayLevel);
-  CanvasStyle(const String& color, float alpha);
   CanvasStyle(float grayLevel, float alpha);
   CanvasStyle(float r, float g, float b, float a);
   CanvasStyle(float c, float m, float y, float k, float a);
   CanvasStyle(PassRefPtr<CanvasGradient>);
   CanvasStyle(PassRefPtr<CanvasPattern>);
 
-  enum Type {
-    ColorString,
-    ColorStringWithAlpha,
-    GrayLevel,
-    RGBA,
-    CMYKA,
-    Gradient,
-    ImagePattern
-  };
+  enum Type { RGBA, CMYKA, Gradient, ImagePattern };
 
   Type m_type;
 
-  String m_color;
+  RGBA32 m_rgba;
+
   RefPtr<CanvasGradient> m_gradient;
   RefPtr<CanvasPattern> m_pattern;
 
-  float m_alpha;
-
-  float m_grayLevel;
-
-  float m_red;
-  float m_green;
-  float m_blue;
-
-  float m_cyan;
-  float m_magenta;
-  float m_yellow;
-  float m_black;
+  struct CMYKAValues {
+    CMYKAValues() {}
+    CMYKAValues(float cyan,
+                float magenta,
+                float yellow,
+                float black,
+                float alpha)
+        : c(cyan), m(magenta), y(yellow), k(black), a(alpha) {}
+    float c;
+    float m;
+    float y;
+    float k;
+    float a;
+  } m_cmyka;
 };
 
 }  // namespace WebCore

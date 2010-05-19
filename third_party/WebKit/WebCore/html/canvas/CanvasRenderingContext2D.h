@@ -28,6 +28,7 @@
 
 #include "AffineTransform.h"
 #include "CanvasRenderingContext.h"
+#include "Color.h"
 #include "FloatSize.h"
 #include "Font.h"
 #include "GraphicsTypes.h"
@@ -355,7 +356,7 @@ class CanvasRenderingContext2D : public CanvasRenderingContext {
     float m_miterLimit;
     FloatSize m_shadowOffset;
     float m_shadowBlur;
-    String m_shadowColor;
+    RGBA32 m_shadowColor;
     float m_globalAlpha;
     CompositeOperator m_globalComposite;
     AffineTransform m_transform;
