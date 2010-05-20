@@ -813,6 +813,7 @@ static void resetDefaultsToConsistentValues(IWebPreferences* preferences) {
   preferences->setTabsToLinks(FALSE);
   preferences->setShouldPrintBackgrounds(TRUE);
   preferences->setLoadsImagesAutomatically(TRUE);
+  preferences->setEditingBehavior(WebKitEditingWinBehavior);
 
   if (persistentUserStyleSheetLocation) {
     Vector<wchar_t> urlCharacters(
