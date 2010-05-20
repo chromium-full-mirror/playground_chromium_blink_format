@@ -2175,13 +2175,11 @@ void WebFrame::drawHeader(PlatformGraphicsContext* pctx,
                           const IntRect& pageRect,
                           float headerHeight) {
   HDC hdc = hdcFromContext(pctx);
-  const IntRect& marginRect = printerMarginRect(hdc);
 
-  const float scale = scaleFactor(hdc, marginRect, pageRect);
-  int x = static_cast<int>(scale * pageRect.x());
+  int x = pageRect.x();
   int y = 0;
-  RECT headerRect = {x, y, x + static_cast<int>(scale * pageRect.width()),
-                     y + static_cast<int>(scale * headerHeight)};
+  RECT headerRect = {x, y, x + pageRect.width(),
+                     y + static_cast<int>(headerHeight)};
 
   ui->drawHeaderInRect(d->webView, &headerRect,
                        static_cast<OLE_HANDLE>(reinterpret_cast<LONG64>(hdc)));
@@ -2195,19 +2193,30 @@ void WebFrame::drawFooter(PlatformGraphicsContext* pctx,
                           float headerHeight,
                           float footerHeight) {
   HDC hdc = hdcFromContext(pctx);
-  const IntRect& marginRect = printerMarginRect(hdc);
 
-  const float scale = scaleFactor(hdc, marginRect, pageRect);
-  int x = static_cast<int>(scale * pageRect.x());
-  int y = static_cast<int>(
-      scale * max(static_cast<int>(headerHeight) + pageRect.height(),
-                  m_pageHeight - static_cast<int>(footerHeight)));
-  RECT footerRect = {x, y, x + static_cast<int>(scale * pageRect.width()),
-                     y + static_cast<int>(scale * footerHeight)};
+  int x = pageRect.x();
+  int y = max(static_cast<int>(headerHeight) + pageRect.height(),
+              m_pageHeight - static_cast<int>(footerHeight));
+  RECT footerRect = {x, y, x + pageRect.width(),
+                     y + static_cast<int>(footerHeight)};
 
   ui->drawFooterInRect(d->webView, &footerRect,
                        static_cast<OLE_HANDLE>(reinterpret_cast<LONG64>(hdc)),
                        page + 1, pageCount);
+}
+
+static XFORM buildXFORMFromCairo(HDC targetDC, cairo_t* previewContext) {
+  XFORM scaled;
+  GetWorldTransform(targetDC, &scaled);
+
+  cairo_matrix_t ctm;
+  cairo_get_matrix(previewContext, &ctm);
+
+  // Scale to the preview screen bounds
+  scaled.eM11 = ctm.xx;
+  scaled.eM22 = ctm.yy;
+
+  return scaled;
 }
 
 void WebFrame::spoolPage(PlatformGraphicsContext* pctx,
@@ -2223,34 +2232,60 @@ void WebFrame::spoolPage(PlatformGraphicsContext* pctx,
   const IntRect& pageRect = m_pageRects[page];
   const IntRect& marginRect = printerMarginRect(printDC);
 
-  cairo_save(pctx);
+  // In preview, the printDC is a placeholder, so just always use the HDC
+  // backing the graphics context.
+  HDC hdc = hdcFromContext(pctx);
+
   spoolCtx->save();
+
+  XFORM original, scaled;
+  GetWorldTransform(hdc, &original);
+
+  bool preview = (hdc != printDC);
+  if (preview) {
+    // If this is a preview, the Windows HDC was set to a non-scaled state so
+    // that Cairo will
+    // draw correctly.  We need to retain the correct preview scale here for use
+    // when the Cairo
+    // drawing completes so that we can scale our GDI-based header/footer calls.
+    // This is a
+    // workaround for a bug in Cairo (see
+    // https://bugs.freedesktop.org/show_bug.cgi?id=28161)
+    scaled = buildXFORMFromCairo(hdc, pctx);
+  }
+
   float scale = scaleFactor(printDC, marginRect, pageRect);
-  cairo_scale(pctx, scale, scale);
 
   IntRect cairoMarginRect(marginRect);
   cairoMarginRect.scale(1 / scale);
 
-  // Modify Cairo and GDI World Transform to account for margin in the
-  // subsequent WebKit-controlled 'paintContents' drawing operations:
-  spoolCtx->translate(cairoMarginRect.x(), cairoMarginRect.y() + headerHeight);
+  // We cannot scale the display HDC because the print surface also scales
+  // fonts,
+  // resulting in invalid printing (and print preview)
+  cairo_scale(pctx, scale, scale);
+  cairo_translate(pctx, cairoMarginRect.x(),
+                  cairoMarginRect.y() + headerHeight);
 
   // Modify Cairo (only) to account for page position.
   cairo_translate(pctx, -pageRect.x(), -pageRect.y());
   coreFrame->view()->paintContents(spoolCtx, pageRect);
-
   cairo_translate(pctx, pageRect.x(), pageRect.y());
 
-  XFORM originalWorld;
-  ::GetWorldTransform(printDC, &originalWorld);
+  if (preview) {
+    // If this is a preview, the Windows HDC was set to a non-scaled state so
+    // that Cairo would
+    // draw correctly.  We need to rescale the HDC to the correct preview scale
+    // so our GDI-based
+    // header/footer calls will draw properly.  This is a workaround for a bug
+    // in Cairo.
+    // (see https://bugs.freedesktop.org/show_bug.cgi?id=28161)
+    SetWorldTransform(hdc, &scaled);
+  }
 
-  // Position GDI world transform to account for margin in GDI-only
-  // header/footer calls
-  XFORM newWorld = originalWorld;
-  newWorld.eDx = marginRect.x();
-  newWorld.eDy = marginRect.y();
-
-  ::SetWorldTransform(printDC, &newWorld);
+  XFORM xform = TransformationMatrix()
+                    .translate(marginRect.x(), marginRect.y())
+                    .scale(scale);
+  ModifyWorldTransform(hdc, &xform, MWT_LEFTMULTIPLY);
 
   if (headerHeight)
     drawHeader(pctx, ui, pageRect, headerHeight);
@@ -2258,13 +2293,33 @@ void WebFrame::spoolPage(PlatformGraphicsContext* pctx,
   if (footerHeight)
     drawFooter(pctx, ui, pageRect, page, pageCount, headerHeight, footerHeight);
 
-  ::SetWorldTransform(printDC, &originalWorld);
+  SetWorldTransform(hdc, &original);
 
   cairo_show_page(pctx);
   ASSERT(!cairo_status(pctx));
   spoolCtx->restore();
-  cairo_restore(pctx);
 }
+
+static void setCairoTransformToPreviewHDC(cairo_t* previewCtx, HDC previewDC) {
+  XFORM passedCTM;
+  GetWorldTransform(previewDC, &passedCTM);
+
+  // Reset HDC WorldTransform to unscaled state.  Scaling must be
+  // done in Cairo to avoid drawing errors.
+  XFORM unscaledCTM = passedCTM;
+  unscaledCTM.eM11 = 1.0;
+  unscaledCTM.eM22 = 1.0;
+
+  SetWorldTransform(previewDC, &unscaledCTM);
+
+  // Make the Cairo transform match the information passed to WebKit
+  // in the HDC's WorldTransform.
+  cairo_matrix_t ctm = {passedCTM.eM11, passedCTM.eM12, passedCTM.eM21,
+                        passedCTM.eM22, passedCTM.eDx,  passedCTM.eDy};
+
+  cairo_set_matrix(previewCtx, &ctm);
+}
+
 #endif
 
 HRESULT STDMETHODCALLTYPE WebFrame::spoolPages(
@@ -2283,12 +2338,29 @@ HRESULT STDMETHODCALLTYPE WebFrame::spoolPages(
     return E_POINTER;
   }
 
-  cairo_surface_t* printSurface = cairo_win32_printing_surface_create(printDC);
-  ctx = cairo_create(printSurface);
-  if (!ctx) {
+  HDC targetDC = (ctx) ? (HDC)ctx : printDC;
+
+  cairo_surface_t* printSurface = 0;
+  if (ctx)
+    printSurface = cairo_win32_surface_create(targetDC);  // in-memory
+  else
+    printSurface = cairo_win32_printing_surface_create(targetDC);  // metafile
+
+  PlatformGraphicsContext* pctx =
+      (PlatformGraphicsContext*)cairo_create(printSurface);
+  if (!pctx) {
     cairo_surface_destroy(printSurface);
     return E_FAIL;
   }
+
+  if (ctx) {
+    // If this is a preview, the Windows HDC was sent with scaling information.
+    // Retrieve it and reset it so that it draws properly.  This is a workaround
+    // for a bug in Cairo (see
+    // https://bugs.freedesktop.org/show_bug.cgi?id=28161)
+    setCairoTransformToPreviewHDC(pctx, targetDC);
+  }
+
   cairo_surface_set_fallback_resolution(printSurface, 72.0, 72.0);
 #endif
 
@@ -2302,7 +2374,9 @@ HRESULT STDMETHODCALLTYPE WebFrame::spoolPages(
     return E_FAIL;
 
   UINT pageCount = (UINT)m_pageRects.size();
+#if PLATFORM(CG)
   PlatformGraphicsContext* pctx = (PlatformGraphicsContext*)ctx;
+#endif
 
   if (!pageCount || startPage > pageCount) {
     ASSERT_NOT_REACHED();
