@@ -1329,7 +1329,7 @@ bool EventHandler::handleMousePressEvent(const PlatformMouseEvent& mouseEvent) {
 
 #if ENABLE(PAN_SCROLLING)
   Page* page = m_frame->page();
-  if (page && page->mainFrame()->eventHandler()->panScrollInProgress() ||
+  if ((page && page->mainFrame()->eventHandler()->panScrollInProgress()) ||
       m_autoscrollInProgress) {
     stopAutoscrollTimer();
     invalidateClick();

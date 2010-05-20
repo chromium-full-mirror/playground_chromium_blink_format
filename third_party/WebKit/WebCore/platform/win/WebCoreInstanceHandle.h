@@ -33,10 +33,10 @@ namespace WebCore {
 // The global DLL or application instance used for all windows.
 extern HINSTANCE s_instanceHandle;
 
-static void setInstanceHandle(HINSTANCE instanceHandle) {
+inline void setInstanceHandle(HINSTANCE instanceHandle) {
   s_instanceHandle = instanceHandle;
 }
-static HINSTANCE instanceHandle() {
+inline HINSTANCE instanceHandle() {
   return s_instanceHandle;
 }
 }

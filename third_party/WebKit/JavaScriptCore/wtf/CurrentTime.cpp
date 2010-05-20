@@ -167,7 +167,6 @@ double currentTime() {
   // calls will use QueryPerformanceCounter
   // by itself, adding the delta to the saved ftime.  We periodically re-sync to
   // correct for drift.
-  static bool started;
   static double syncLowResUTCTime;
   static double syncHighResUpTime;
   static double lastUTCTime;

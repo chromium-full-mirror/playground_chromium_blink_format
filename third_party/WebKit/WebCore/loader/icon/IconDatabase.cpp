@@ -1874,12 +1874,12 @@ void IconDatabase::pruneUnretainedIcons() {
     pageDeleteSQL.prepare();
     for (size_t i = 0; i < numToDelete; ++i) {
       LOG(IconDatabase, "Pruning page with rowid %lli from disk",
-          pageIDsToDelete[i]);
+          static_cast<long long>(pageIDsToDelete[i]));
       pageDeleteSQL.bindInt64(1, pageIDsToDelete[i]);
       int result = pageDeleteSQL.step();
       if (result != SQLResultDone)
         LOG_ERROR("Unabled to delete page with id %lli from disk",
-                  pageIDsToDelete[i]);
+                  static_cast<long long>(pageIDsToDelete[i]));
       pageDeleteSQL.reset();
 
       // If the thread was asked to terminate, we should commit what pruning
