@@ -202,6 +202,7 @@ inline JSInterfaceJIT::Jump JSInterfaceJIT::emitLoadJSCell(
 
 inline JSInterfaceJIT::Jump JSInterfaceJIT::emitJumpIfNotJSCell(
     unsigned virtualRegisterIndex) {
+  ASSERT(static_cast<int>(virtualRegisterIndex) < FirstConstantRegisterIndex);
   return branch32(NotEqual, tagFor(virtualRegisterIndex),
                   Imm32(JSValue::CellTag));
 }
@@ -209,20 +210,25 @@ inline JSInterfaceJIT::Jump JSInterfaceJIT::emitJumpIfNotJSCell(
 inline JSInterfaceJIT::Jump JSInterfaceJIT::emitLoadInt32(
     unsigned virtualRegisterIndex,
     RegisterID dst) {
+  ASSERT(static_cast<int>(virtualRegisterIndex) < FirstConstantRegisterIndex);
   loadPtr(payloadFor(virtualRegisterIndex), dst);
   return branch32(NotEqual, tagFor(virtualRegisterIndex),
                   Imm32(JSValue::Int32Tag));
 }
 
-inline JSInterfaceJIT::Address JSInterfaceJIT::tagFor(unsigned index,
-                                                      RegisterID base) {
-  return Address(base, (index * sizeof(Register)) +
+inline JSInterfaceJIT::Address JSInterfaceJIT::tagFor(
+    unsigned virtualRegisterIndex,
+    RegisterID base) {
+  ASSERT(static_cast<int>(virtualRegisterIndex) < FirstConstantRegisterIndex);
+  return Address(base, (virtualRegisterIndex * sizeof(Register)) +
                            OBJECT_OFFSETOF(JSValue, u.asBits.tag));
 }
 
-inline JSInterfaceJIT::Address JSInterfaceJIT::payloadFor(unsigned index,
-                                                          RegisterID base) {
-  return Address(base, (index * sizeof(Register)) +
+inline JSInterfaceJIT::Address JSInterfaceJIT::payloadFor(
+    unsigned virtualRegisterIndex,
+    RegisterID base) {
+  ASSERT(static_cast<int>(virtualRegisterIndex) < FirstConstantRegisterIndex);
+  return Address(base, (virtualRegisterIndex * sizeof(Register)) +
                            OBJECT_OFFSETOF(JSValue, u.asBits.payload));
 }
 
@@ -230,6 +236,7 @@ inline JSInterfaceJIT::Jump JSInterfaceJIT::emitLoadDouble(
     unsigned virtualRegisterIndex,
     FPRegisterID dst,
     RegisterID scratch) {
+  ASSERT(static_cast<int>(virtualRegisterIndex) < FirstConstantRegisterIndex);
   loadPtr(tagFor(virtualRegisterIndex), scratch);
   Jump isDouble = branch32(Below, scratch, Imm32(JSValue::LowestTag));
   Jump notInt = branch32(NotEqual, scratch, Imm32(JSValue::Int32Tag));
@@ -319,15 +326,19 @@ ALWAYS_INLINE void JSInterfaceJIT::emitFastArithImmToInt(RegisterID reg) {
 #endif
 
 #if !USE(JSVALUE32_64)
-inline JSInterfaceJIT::Address JSInterfaceJIT::payloadFor(unsigned index,
-                                                          RegisterID base) {
-  return addressFor(index, base);
+inline JSInterfaceJIT::Address JSInterfaceJIT::payloadFor(
+    unsigned virtualRegisterIndex,
+    RegisterID base) {
+  ASSERT(static_cast<int>(virtualRegisterIndex) < FirstConstantRegisterIndex);
+  return addressFor(virtualRegisterIndex, base);
 }
 #endif
 
-inline JSInterfaceJIT::Address JSInterfaceJIT::addressFor(unsigned index,
-                                                          RegisterID base) {
-  return Address(base, (index * sizeof(Register)));
+inline JSInterfaceJIT::Address JSInterfaceJIT::addressFor(
+    unsigned virtualRegisterIndex,
+    RegisterID base) {
+  ASSERT(static_cast<int>(virtualRegisterIndex) < FirstConstantRegisterIndex);
+  return Address(base, (virtualRegisterIndex * sizeof(Register)));
 }
 }
 
