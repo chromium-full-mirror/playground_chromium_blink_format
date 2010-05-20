@@ -219,6 +219,7 @@ class LayerChromium : public RefCounted<LayerChromium> {
   bool geometryFlipped() const { return m_geometryFlipped; }
 
   void updateContents();
+  bool contentsDirty() { return m_contentsDirty; }
 
   void setContents(NativeImagePtr contents);
   NativeImagePtr contents() const { return m_contents; }
@@ -226,9 +227,13 @@ class LayerChromium : public RefCounted<LayerChromium> {
   skia::PlatformCanvas* platformCanvas() { return m_canvas.get(); }
   GraphicsContext* graphicsContext() { return m_graphicsContext.get(); }
 
-  void setBackingStoreRect(const IntSize&);
+  void setBackingStoreSize(const IntSize&);
 
-  void drawDebugBorder();
+  bool drawsContent() { return m_owner && m_owner->drawsContent(); }
+
+  // This method should be called every time the status drawsContent()
+  // status changes to ensure that the internal graphics context is in sync.
+  void drawsContentUpdated();
 
  private:
   LayerChromium(LayerType, GraphicsLayerChromium* owner);
@@ -249,7 +254,8 @@ class LayerChromium : public RefCounted<LayerChromium> {
 
   // Re-creates the canvas and graphics context. This method
   // must be called every time the layer is resized. Only layers
-  void updateGraphicsContext(const IntSize&);
+  // that do drawing and the root layer get a context.
+  void updateGraphicsContext();
 
   Vector<RefPtr<LayerChromium>> m_sublayers;
   LayerChromium* m_superlayer;
@@ -260,11 +266,12 @@ class LayerChromium : public RefCounted<LayerChromium> {
   OwnPtr<PlatformContextSkia> m_skiaContext;
   OwnPtr<GraphicsContext> m_graphicsContext;
 #endif
+  bool m_hasContext;
 
   LayerType m_layerType;
 
   IntSize m_bounds;
-  IntSize m_backingStoreRect;
+  IntSize m_backingStoreSize;
   FloatPoint m_position;
   FloatPoint m_anchorPoint;
   Color m_backgroundColor;
@@ -287,6 +294,8 @@ class LayerChromium : public RefCounted<LayerChromium> {
   bool m_opaque;
   bool m_geometryFlipped;
   bool m_needsDisplayOnBoundsChange;
+
+  bool m_contentsDirty;
 
   ContentsGravityType m_contentsGravity;
   NativeImagePtr m_contents;
