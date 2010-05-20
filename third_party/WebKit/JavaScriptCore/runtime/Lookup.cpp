@@ -80,7 +80,7 @@ void setUpStaticFunctionSlot(ExecState* exec,
   JSValue* location = thisObj->getDirectLocation(propertyName);
 
   if (!location) {
-    InternalFunction* function;
+    NativeFunctionWrapper* function;
 #if ENABLE(JIT)
     if (entry->generator())
       function = new (exec) NativeFunctionWrapper(

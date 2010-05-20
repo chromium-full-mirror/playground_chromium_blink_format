@@ -24,7 +24,7 @@
 #ifndef JSFunction_h
 #define JSFunction_h
 
-#include "InternalFunction.h"
+#include "JSObject.h"
 
 namespace JSC {
 
@@ -35,11 +35,11 @@ class JSActivation;
 class JSGlobalObject;
 class NativeExecutable;
 
-class JSFunction : public InternalFunction {
+class JSFunction : public JSObject {
   friend class JIT;
   friend class JSGlobalData;
 
-  typedef InternalFunction Base;
+  typedef JSObject Base;
 
  public:
   JSFunction(ExecState*,
@@ -59,6 +59,10 @@ class JSFunction : public InternalFunction {
 
   JSObject* construct(ExecState*, const ArgList&);
   JSValue call(ExecState*, JSValue thisValue, const ArgList&);
+
+  const UString& name(ExecState*);
+  const UString displayName(ExecState*);
+  const UString calculatedDisplayName(ExecState*);
 
   ScopeChain& scope() {
     ASSERT(!isHostFunctionNonInline());
@@ -91,7 +95,7 @@ class JSFunction : public InternalFunction {
   const static unsigned StructureFlags =
       OverridesGetOwnPropertySlot | ImplementsHasInstance |
       OverridesMarkChildren | OverridesGetPropertyNames |
-      InternalFunction::StructureFlags;
+      JSObject::StructureFlags;
 
  private:
   JSFunction(NonNullPassRefPtr<Structure>);

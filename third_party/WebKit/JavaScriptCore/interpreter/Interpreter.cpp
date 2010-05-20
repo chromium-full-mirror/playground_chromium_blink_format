@@ -4918,7 +4918,7 @@ JSValue Interpreter::retrieveArguments(CallFrame* callFrame,
 }
 
 JSValue Interpreter::retrieveCaller(CallFrame* callFrame,
-                                    InternalFunction* function) const {
+                                    JSFunction* function) const {
   CallFrame* functionCallFrame = findFunctionCallFrame(callFrame, function);
   if (!functionCallFrame)
     return jsNull();
@@ -4961,7 +4961,7 @@ void Interpreter::retrieveLastCaller(CallFrame* callFrame,
 }
 
 CallFrame* Interpreter::findFunctionCallFrame(CallFrame* callFrame,
-                                              InternalFunction* function) {
+                                              JSFunction* function) {
   for (CallFrame* candidate = callFrame; candidate;
        candidate = candidate->callerFrame()->removeHostCallFrameFlag()) {
     if (candidate->callee() == function)
