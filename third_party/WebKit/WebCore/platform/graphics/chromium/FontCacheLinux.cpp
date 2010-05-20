@@ -125,8 +125,10 @@ FontPlatformData* FontCache::createFontPlatformData(
         break;
       }
     }
-    // if we fall out of the loop, it's ok for name to still be 0
-  } else {  // convert the name to utf8
+    if (!name)
+      name = "";
+  } else {
+    // convert the name to utf8
     s = family.string().utf8();
     name = s.data();
   }
