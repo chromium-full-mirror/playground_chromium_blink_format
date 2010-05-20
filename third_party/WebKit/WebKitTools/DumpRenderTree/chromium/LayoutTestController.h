@@ -213,6 +213,8 @@ class LayoutTestController : public CppBoundClass {
   // Grants permission for desktop notifications to an origin
   void grantDesktopNotificationPermission(const CppArgumentList&, CppVariant*);
 
+  void setEditingBehavior(const CppArgumentList&, CppVariant*);
+
   // The following are only stubs.  TODO(pamg): Implement any of these that
   // are needed to pass the layout tests.
   void dumpAsWebArchive(const CppArgumentList&, CppVariant*);

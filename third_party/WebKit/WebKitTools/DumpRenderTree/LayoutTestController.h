@@ -107,6 +107,7 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
   void setFrameFlatteningEnabled(bool enable);
   void setSpatialNavigationEnabled(bool enable);
   void setScrollbarPolicy(JSStringRef orientation, JSStringRef policy);
+  void setEditingBehavior(const char* editingBehavior);
 
   void waitForPolicyDelegate();
   size_t webHistoryItemCount();

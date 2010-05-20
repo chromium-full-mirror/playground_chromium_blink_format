@@ -632,5 +632,9 @@ void LayoutTestController::setIconDatabaseEnabled(bool enable) {
     QWebSettings::setIconDatabasePath(QString());
 }
 
+void LayoutTestController::setEditingBehavior(const QString& editingBehavior) {
+  // FIXME: Implement.
+}
+
 const unsigned LayoutTestController::maxViewWidth = 800;
 const unsigned LayoutTestController::maxViewHeight = 600;

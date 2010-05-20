@@ -85,6 +85,7 @@ class WebSettingsImpl : public WebSettings {
   virtual void setOfflineWebApplicationCacheEnabled(bool);
   virtual void setExperimentalWebGLEnabled(bool);
   virtual void setShowDebugBorders(bool);
+  virtual void setEditingBehavior(EditingBehavior);
 
  private:
   WebCore::Settings* m_settings;

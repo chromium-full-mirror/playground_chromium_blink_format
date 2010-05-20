@@ -212,6 +212,8 @@ class LayoutTestController : public QObject {
                            const QString& username,
                            const QString& password);
 
+  void setEditingBehavior(const QString& editingBehavior);
+
  private slots:
   void processWork();
 

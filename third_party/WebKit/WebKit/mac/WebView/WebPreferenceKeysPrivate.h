@@ -141,6 +141,7 @@
 #define WebKitCacheModelPreferenceKey @"WebKitCacheModelPreferenceKey"
 #define WebKitTextDirectionSubmenuInclusionBehaviorPreferenceKey \
   @"WebKitTextDirectionSubmenuInclusionBehaviorPreferenceKey"
+#define WebKitEditingBehaviorPreferenceKey @"WebKitEditingBehavior"
 
 // CoreGraphics deferred updates are disabled if
 // WebKitEnableCoalescedUpdatesPreferenceKey is set
