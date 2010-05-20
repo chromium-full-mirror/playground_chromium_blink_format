@@ -680,7 +680,11 @@ void ApplyStyleCommand::applyBlockStyle(CSSMutableStyleDeclaration* style) {
         if (!m_removeOnly)
           addBlockStyle(styleChange, static_cast<HTMLElement*>(block.get()));
       }
+
+      if (nextParagraphStart.isOrphan())
+        nextParagraphStart = endOfParagraph(paragraphStart).next();
     }
+
     paragraphStart = nextParagraphStart;
     nextParagraphStart = endOfParagraph(paragraphStart).next();
   }

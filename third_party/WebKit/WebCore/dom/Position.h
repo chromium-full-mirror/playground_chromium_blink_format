@@ -129,6 +129,7 @@ class Position {
 
   bool isNull() const { return !m_anchorNode; }
   bool isNotNull() const { return m_anchorNode; }
+  bool isOrphan() const { return m_anchorNode && !m_anchorNode->inDocument(); }
 
   Element* element() const;
   PassRefPtr<CSSComputedStyleDeclaration> computedStyle() const;
