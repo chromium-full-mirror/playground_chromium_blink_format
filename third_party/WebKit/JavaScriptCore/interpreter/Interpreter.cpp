@@ -4297,7 +4297,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
 
       NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_constructor_ret) {
+    DEFINE_OPCODE(op_ret_object_or_this) {
       /* ret result(r)
 
          Return register result as the return value of the current
