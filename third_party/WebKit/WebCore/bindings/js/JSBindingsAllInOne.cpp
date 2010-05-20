@@ -86,6 +86,7 @@
 #include "JSJavaScriptCallFrameCustom.cpp"
 #include "JSLazyEventListener.cpp"
 #include "JSLocationCustom.cpp"
+#include "JSMainThreadExecState.cpp"
 #include "JSMessageChannelConstructor.cpp"
 #include "JSMessageChannelCustom.cpp"
 #include "JSMessageEventCustom.cpp"
