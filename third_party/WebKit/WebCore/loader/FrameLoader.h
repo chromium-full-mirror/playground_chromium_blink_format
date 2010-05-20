@@ -257,7 +257,7 @@ class FrameLoader : public Noncopyable {
                       bool lockBackForwardList = true,
                       bool userGesture = false,
                       bool refresh = false);
-  void urlSelected(const ResourceRequest&,
+  void urlSelected(const KURL&,
                    const String& target,
                    PassRefPtr<Event>,
                    bool lockHistory,

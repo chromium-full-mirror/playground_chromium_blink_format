@@ -375,21 +375,22 @@ void FrameLoader::changeLocation(const KURL& url,
               userGesture, SendReferrer, ReplaceDocumentIfJavaScriptURL);
 }
 
-void FrameLoader::urlSelected(const ResourceRequest& request,
+void FrameLoader::urlSelected(const KURL& url,
                               const String& passedTarget,
                               PassRefPtr<Event> triggeringEvent,
                               bool lockHistory,
                               bool lockBackForwardList,
                               bool userGesture,
                               ReferrerPolicy referrerPolicy) {
-  urlSelected(request, passedTarget, triggeringEvent, lockHistory,
+  urlSelected(ResourceRequest(url), passedTarget, triggeringEvent, lockHistory,
               lockBackForwardList, userGesture, referrerPolicy,
               DoNotReplaceDocumentIfJavaScriptURL);
 }
 
-// This overload will go away when the FIXME to eliminate the
-// shouldReplaceDocumentIfJavaScriptURL
-// parameter from ScriptController::executeIfJavaScriptURL() is addressed.
+// The shouldReplaceDocumentIfJavaScriptURL parameter will go away when the
+// FIXME to eliminate the
+// corresponding parameter from ScriptController::executeIfJavaScriptURL() is
+// addressed.
 void FrameLoader::urlSelected(
     const ResourceRequest& request,
     const String& passedTarget,
