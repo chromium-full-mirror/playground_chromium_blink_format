@@ -150,7 +150,7 @@ class WebBindings {
   // NPN_UTF8FromIdentifier
   WEBKIT_API static NPUTF8* utf8FromIdentifier(NPIdentifier);
 
-  // Miscellaneous utility functions ------------------------------------
+  // Miscellaneous utility functions ----------------------------------------
 
   // Complement to NPN_Get___Identifier functions.  Extracts data from the
   // NPIdentifier data
@@ -185,6 +185,15 @@ class WebBindings {
   // Return true (success) if the given npobj is a range object.
   // If so, return that range as a WebRange object.
   WEBKIT_API static bool getRange(NPObject* range, WebRange*);
+
+  // Exceptions -------------------------------------------------------------
+
+  typedef void(ExceptionHandler)(void* data, const NPUTF8* message);
+
+  // The exception handler will be notified of any exceptions thrown while
+  // operating on a NPObject.
+  WEBKIT_API static void pushExceptionHandler(ExceptionHandler, void* data);
+  WEBKIT_API static void popExceptionHandler();
 };
 
 }  // namespace WebKit

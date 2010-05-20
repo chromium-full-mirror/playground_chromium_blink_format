@@ -39,6 +39,8 @@
 
 #include <v8.h>
 
+namespace WebCore {
+
 // These functions can be replaced by normal JS operation.
 // Getters
 v8::Handle<v8::Value> npObjectNamedPropertyGetter(v8::Local<v8::String> name,
@@ -79,5 +81,7 @@ v8::Local<v8::Object> createV8ObjectForNPObject(NPObject*, NPObject* root);
 // NPObject will be removed so that it
 // cannot be referred to.
 void forgetV8ObjectForNPObject(NPObject*);
+
+}  // namespace WebCore
 
 #endif  // V8NPObject_h
