@@ -70,6 +70,7 @@
 #include "JSDataGridColumn.cpp"
 #include "JSDataGridColumnList.cpp"
 #include "JSDedicatedWorkerContext.cpp"
+#include "JSDeviceOrientationEvent.cpp"
 #include "JSDocument.cpp"
 #include "JSDocumentFragment.cpp"
 #include "JSDocumentType.cpp"
