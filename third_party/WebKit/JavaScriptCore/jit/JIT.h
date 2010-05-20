@@ -910,7 +910,6 @@ class JIT : private JSInterfaceJIT {
   void emit_op_call_varargs(Instruction*);
   void emit_op_catch(Instruction*);
   void emit_op_construct(Instruction*);
-  void emit_op_construct_verify(Instruction*);
   void emit_op_convert_this(Instruction*);
   void emit_op_create_arguments(Instruction*);
   void emit_op_debug(Instruction*);
@@ -987,6 +986,7 @@ class JIT : private JSInterfaceJIT {
   void emit_op_resolve_skip(Instruction*);
   void emit_op_resolve_with_base(Instruction*);
   void emit_op_ret(Instruction*);
+  void emit_op_constructor_ret(Instruction*);
   void emit_op_rshift(Instruction*);
   void emit_op_sret(Instruction*);
   void emit_op_strcat(Instruction*);
@@ -1015,8 +1015,6 @@ class JIT : private JSInterfaceJIT {
   void emitSlow_op_call_eval(Instruction*, Vector<SlowCaseEntry>::iterator&);
   void emitSlow_op_call_varargs(Instruction*, Vector<SlowCaseEntry>::iterator&);
   void emitSlow_op_construct(Instruction*, Vector<SlowCaseEntry>::iterator&);
-  void emitSlow_op_construct_verify(Instruction*,
-                                    Vector<SlowCaseEntry>::iterator&);
   void emitSlow_op_convert_this(Instruction*, Vector<SlowCaseEntry>::iterator&);
   void emitSlow_op_div(Instruction*, Vector<SlowCaseEntry>::iterator&);
   void emitSlow_op_eq(Instruction*, Vector<SlowCaseEntry>::iterator&);

@@ -1250,6 +1250,13 @@ void CodeBlock::dump(ExecState* exec,
       printf("[%4d] ret\t\t %s\n", location, registerName(exec, r0).data());
       break;
     }
+    case op_constructor_ret: {
+      int r0 = (++it)->u.operand;
+      int r1 = (++it)->u.operand;
+      printf("[%4d] constructor_ret\t\t %s %s\n", location,
+             registerName(exec, r0).data(), registerName(exec, r1).data());
+      break;
+    }
     case op_construct: {
       int dst = (++it)->u.operand;
       int func = (++it)->u.operand;
@@ -1261,13 +1268,6 @@ void CodeBlock::dump(ExecState* exec,
              registerName(exec, dst).data(), registerName(exec, func).data(),
              argCount, registerOffset, registerName(exec, proto).data(),
              registerName(exec, thisRegister).data());
-      break;
-    }
-    case op_construct_verify: {
-      int r0 = (++it)->u.operand;
-      int r1 = (++it)->u.operand;
-      printf("[%4d] construct_verify\t %s, %s\n", location,
-             registerName(exec, r0).data(), registerName(exec, r1).data());
       break;
     }
     case op_strcat: {

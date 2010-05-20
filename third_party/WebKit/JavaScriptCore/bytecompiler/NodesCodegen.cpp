@@ -2321,7 +2321,9 @@ RegisterID* FunctionBodyNode::emitBytecode(BytecodeGenerator& generator,
       return 0;
   }
 
-  RegisterID* r0 = generator.emitLoad(0, jsUndefined());
+  RegisterID* r0 = generator.isConstructor()
+                       ? generator.thisRegister()
+                       : generator.emitLoad(0, jsUndefined());
   generator.emitDebugHook(WillLeaveCallFrame, firstLine(), lastLine());
   generator.emitReturn(r0);
   return 0;

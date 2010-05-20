@@ -97,6 +97,8 @@ class BytecodeGenerator : public FastAllocBase {
     return *m_globalData->propertyNames;
   }
 
+  bool isConstructor() { return m_codeBlock->m_isConstructor; }
+
   void generate();
 
   // Returns the register corresponding to a local variable, or 0 if no
