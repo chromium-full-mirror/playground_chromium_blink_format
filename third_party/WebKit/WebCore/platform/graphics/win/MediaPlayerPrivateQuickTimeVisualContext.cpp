@@ -64,6 +64,8 @@ const CFStringRef kMinCoreVideoVersion = CFSTR("1.0.0.2");
 
 namespace WebCore {
 
+static CGImageRef CreateCGImageFromPixelBuffer(QTPixelBuffer buffer);
+
 SOFT_LINK_LIBRARY(Wininet)
 SOFT_LINK(Wininet,
           InternetSetCookieExW,
@@ -173,6 +175,7 @@ MediaPlayerPrivateQuickTimeVisualContext::
 MediaPlayerPrivateQuickTimeVisualContext::
     ~MediaPlayerPrivateQuickTimeVisualContext() {
   tearDownVideoRendering();
+  m_visualContext->setMovie(0);
   cancelCallOnMainThread(&VisualContextClient::retrieveCurrentImageProc, this);
 }
 
@@ -326,6 +329,7 @@ void MediaPlayerPrivateQuickTimeVisualContext::load(const String& url) {
   CFDictionaryRef options = QTMovieVisualContext::getCGImageOptions();
   m_visualContext =
       adoptRef(new QTMovieVisualContext(m_visualContextClient.get(), options));
+  m_visualContext->setMovie(m_movie.get());
 }
 
 void MediaPlayerPrivateQuickTimeVisualContext::play() {
@@ -652,7 +656,20 @@ void MediaPlayerPrivateQuickTimeVisualContext::paint(GraphicsContext* p,
   if (m_qtVideoLayer)
     return;
 #endif
+  QTPixelBuffer buffer = m_visualContext->imageForTime(0);
+  if (buffer.pixelBufferRef()) {
+    CGImageRef image = CreateCGImageFromPixelBuffer(buffer);
 
+    CGContextRef context = p->platformContext();
+    CGContextSaveGState(context);
+    CGContextTranslateCTM(context, r.x(), r.y());
+    CGContextTranslateCTM(context, 0, r.height());
+    CGContextScaleCTM(context, 1, -1);
+    CGContextDrawImage(context, CGRectMake(0, 0, r.width(), r.height()), image);
+    CGContextRestoreGState(context);
+
+    CGImageRelease(image);
+  }
   paintCompleted(*p, r);
 }
 
@@ -681,7 +698,8 @@ void MediaPlayerPrivateQuickTimeVisualContext::VisualContextClient::
 
 void MediaPlayerPrivateQuickTimeVisualContext::visualContextTimerFired(
     Timer<MediaPlayerPrivateQuickTimeVisualContext>*) {
-  retrieveCurrentImage();
+  if (m_visualContext && m_visualContext->isImageAvailableForTime(0))
+    retrieveCurrentImage();
 }
 
 static CFDictionaryRef QTCFDictionaryCreateWithDataCallback(
@@ -767,28 +785,29 @@ void MediaPlayerPrivateQuickTimeVisualContext::retrieveCurrentImage() {
     return;
 
 #if USE(ACCELERATED_COMPOSITING)
-  if (!m_qtVideoLayer)
-    return;
+  if (m_qtVideoLayer) {
+    QTPixelBuffer buffer = m_visualContext->imageForTime(0);
+    if (!buffer.pixelBufferRef())
+      return;
 
-  QTPixelBuffer buffer = m_visualContext->imageForTime(0);
-  if (!buffer.pixelBufferRef())
-    return;
+    WKCACFLayer* layer =
+        static_cast<WKCACFLayer*>(m_qtVideoLayer->platformLayer());
 
-  WKCACFLayer* layer =
-      static_cast<WKCACFLayer*>(m_qtVideoLayer->platformLayer());
+    if (!buffer.lockBaseAddress()) {
+      CFTimeInterval imageTime = QTMovieVisualContext::currentHostTime();
 
-  if (!buffer.lockBaseAddress()) {
-    CFTimeInterval imageTime = QTMovieVisualContext::currentHostTime();
+      CGImageRef image = CreateCGImageFromPixelBuffer(buffer);
+      layer->setContents(image);
+      CGImageRelease(image);
 
-    CGImageRef image = CreateCGImageFromPixelBuffer(buffer);
-    layer->setContents(image);
-    CGImageRelease(image);
-
-    buffer.unlockBaseAddress();
-    layer->rootLayer()->setNeedsRender();
-  }
-  m_visualContext->task();
+      buffer.unlockBaseAddress();
+      layer->rootLayer()->setNeedsRender();
+    }
+  } else
 #endif
+    m_player->repaint();
+
+  m_visualContext->task();
 }
 
 static HashSet<String> mimeTypeCache() {
@@ -918,8 +937,6 @@ void MediaPlayerPrivateQuickTimeVisualContext::setUpVideoRendering() {
       preferredMode == MediaRenderingMovieLayer)
     m_player->mediaPlayerClient()->mediaPlayerRenderingModeChanged(m_player);
 #endif
-
-  m_visualContext->setMovie(m_movie.get());
 }
 
 void MediaPlayerPrivateQuickTimeVisualContext::tearDownVideoRendering() {
@@ -927,8 +944,6 @@ void MediaPlayerPrivateQuickTimeVisualContext::tearDownVideoRendering() {
   if (m_qtVideoLayer)
     destroyLayerForMovie();
 #endif
-
-  m_visualContext->setMovie(0);
 }
 
 bool MediaPlayerPrivateQuickTimeVisualContext::hasSetUpVideoRendering() const {
