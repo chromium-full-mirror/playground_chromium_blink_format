@@ -559,6 +559,9 @@ String Frame::matchLabelsAgainstElement(const Vector<String>& labels,
 
 void Frame::notifyRendererOfSelectionChange(bool userTriggered) {
   RenderObject* renderer = 0;
+
+  document()->updateStyleIfNeeded();
+
   if (selection()->rootEditableElement())
     renderer =
         selection()->rootEditableElement()->shadowAncestorNode()->renderer();
