@@ -518,7 +518,6 @@ void Interpreter::dumpRegisters(CallFrame* callFrame) {
   ++it;
   printf("[ReturnPC]                 | %10p | %p \n", it, (*it).vPC());
   ++it;
-  printf("[ReturnValueRegister]      | %10p | %d \n", it, (*it).i());
   ++it;
   printf("[ArgumentCount]            | %10p | %d \n", it, (*it).i());
   ++it;
@@ -736,17 +735,19 @@ NEVER_INLINE HandlerInfo* Interpreter::throwException(CallFrame*& callFrame,
   // we'll never reach the relevant op_profile_did_call.
   if (Profiler* profiler = *Profiler::enabledProfilerReference()) {
 #if !ENABLE(JIT)
+    // FIXME: Why 8? - work out what this magic value is, replace the constant
+    // with something more helpful.
     if (isCallBytecode(codeBlock->instructions()[bytecodeOffset].u.opcode))
       profiler->didExecute(
           callFrame,
-          callFrame->r(codeBlock->instructions()[bytecodeOffset + 2].u.operand)
+          callFrame->r(codeBlock->instructions()[bytecodeOffset + 1].u.operand)
               .jsValue());
     else if (codeBlock->instructions().size() > (bytecodeOffset + 8) &&
              codeBlock->instructions()[bytecodeOffset + 8].u.opcode ==
                  getOpcode(op_construct))
       profiler->didExecute(
           callFrame,
-          callFrame->r(codeBlock->instructions()[bytecodeOffset + 10].u.operand)
+          callFrame->r(codeBlock->instructions()[bytecodeOffset + 9].u.operand)
               .jsValue());
 #else
     int functionRegisterIndex;
@@ -1520,6 +1521,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
   Instruction* vPC = callFrame->codeBlock()->instructions().begin();
   Profiler** enabledProfilerReference = Profiler::enabledProfilerReference();
   unsigned tickCount = globalData->timeoutChecker.ticksUntilNextCheck();
+  JSValue functionReturnValue;
 
 #define CHECK_FOR_EXCEPTION()                           \
   do {                                                  \
@@ -3906,7 +3908,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
       NEXT_INSTRUCTION();
     }
     DEFINE_OPCODE(op_call_eval) {
-      /* call_eval dst(r) func(r) argCount(n) registerOffset(n)
+      /* call_eval func(r) argCount(n) registerOffset(n)
 
          Call a function named "eval" with no explicit "this" value
          (which may therefore be the eval operator). If register
@@ -3917,10 +3919,9 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
          opcode). Otherwise, act exactly as the "call" opcode would.
        */
 
-      int dst = vPC[1].u.operand;
-      int func = vPC[2].u.operand;
-      int argCount = vPC[3].u.operand;
-      int registerOffset = vPC[4].u.operand;
+      int func = vPC[1].u.operand;
+      int argCount = vPC[2].u.operand;
+      int registerOffset = vPC[3].u.operand;
 
       JSValue funcVal = callFrame->r(func).jsValue();
 
@@ -3936,7 +3937,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
                                   registerOffset, exceptionValue);
         if (exceptionValue)
           goto vm_throw;
-        callFrame->r(dst) = result;
+        functionReturnValue = result;
 
         vPC += OPCODE_LENGTH(op_call_eval);
         NEXT_INSTRUCTION();
@@ -3947,7 +3948,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
       // fall through to op_call
     }
     DEFINE_OPCODE(op_call) {
-      /* call dst(r) func(r) argCount(n) registerOffset(n)
+      /* call func(r) argCount(n) registerOffset(n)
 
          Perform a function call.
 
@@ -3957,10 +3958,9 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
          dst is where op_ret should store its result.
        */
 
-      int dst = vPC[1].u.operand;
-      int func = vPC[2].u.operand;
-      int argCount = vPC[3].u.operand;
-      int registerOffset = vPC[4].u.operand;
+      int func = vPC[1].u.operand;
+      int argCount = vPC[2].u.operand;
+      int registerOffset = vPC[3].u.operand;
 
       JSValue v = callFrame->r(func).jsValue();
 
@@ -3983,8 +3983,9 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
           goto vm_throw;
         }
 
-        callFrame->init(newCodeBlock, vPC + 5, callDataScopeChain,
-                        previousCallFrame, dst, argCount, asFunction(v));
+        callFrame->init(newCodeBlock, vPC + OPCODE_LENGTH(op_call),
+                        callDataScopeChain, previousCallFrame, 0, argCount,
+                        asFunction(v));
         vPC = newCodeBlock->instructions().begin();
 
 #if ENABLE(OPCODE_STATS)
@@ -3998,7 +3999,8 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
         ScopeChainNode* scopeChain = callFrame->scopeChain();
         CallFrame* newCallFrame =
             CallFrame::create(callFrame->registers() + registerOffset);
-        newCallFrame->init(0, vPC + 5, scopeChain, callFrame, dst, argCount, 0);
+        newCallFrame->init(0, vPC + OPCODE_LENGTH(op_call), scopeChain,
+                           callFrame, 0, argCount, 0);
 
         Register* thisRegister = newCallFrame->registers() -
                                  RegisterFile::CallFrameHeaderSize - argCount;
@@ -4018,7 +4020,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
         }
         CHECK_FOR_EXCEPTION();
 
-        callFrame->r(dst) = returnValue;
+        functionReturnValue = returnValue;
 
         vPC += OPCODE_LENGTH(op_call);
         NEXT_INSTRUCTION();
@@ -4134,7 +4136,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
       NEXT_INSTRUCTION();
     }
     DEFINE_OPCODE(op_call_varargs) {
-      /* call_varargs dst(r) func(r) argCountReg(r) baseRegisterOffset(n)
+      /* call_varargs func(r) argCountReg(r) baseRegisterOffset(n)
 
        Perform a function call with a dynamic set of arguments.
 
@@ -4145,10 +4147,9 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
        dst is where op_ret should store its result.
        */
 
-      int dst = vPC[1].u.operand;
-      int func = vPC[2].u.operand;
-      int argCountReg = vPC[3].u.operand;
-      int registerOffset = vPC[4].u.operand;
+      int func = vPC[1].u.operand;
+      int argCountReg = vPC[2].u.operand;
+      int registerOffset = vPC[3].u.operand;
 
       JSValue v = callFrame->r(func).jsValue();
       int argCount = callFrame->r(argCountReg).i();
@@ -4172,8 +4173,9 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
           goto vm_throw;
         }
 
-        callFrame->init(newCodeBlock, vPC + 5, callDataScopeChain,
-                        previousCallFrame, dst, argCount, asFunction(v));
+        callFrame->init(newCodeBlock, vPC + OPCODE_LENGTH(op_call_varargs),
+                        callDataScopeChain, previousCallFrame, 0, argCount,
+                        asFunction(v));
         vPC = newCodeBlock->instructions().begin();
 
 #if ENABLE(OPCODE_STATS)
@@ -4187,7 +4189,8 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
         ScopeChainNode* scopeChain = callFrame->scopeChain();
         CallFrame* newCallFrame =
             CallFrame::create(callFrame->registers() + registerOffset);
-        newCallFrame->init(0, vPC + 5, scopeChain, callFrame, dst, argCount, 0);
+        newCallFrame->init(0, vPC + OPCODE_LENGTH(op_call_varargs), scopeChain,
+                           callFrame, 0, argCount, 0);
 
         Register* thisRegister = newCallFrame->registers() -
                                  RegisterFile::CallFrameHeaderSize - argCount;
@@ -4207,7 +4210,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
         }
         CHECK_FOR_EXCEPTION();
 
-        callFrame->r(dst) = returnValue;
+        functionReturnValue = returnValue;
 
         vPC += OPCODE_LENGTH(op_call_varargs);
         NEXT_INSTRUCTION();
@@ -4273,10 +4276,10 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
       /* ret result(r)
 
          Return register result as the return value of the current
-         function call, writing it into the caller's expected return
-         value register. In addition, unwind one call frame and
-         restore the scope chain, code block instruction pointer and
-         register base to those of the calling function.
+         function call, writing it into functionReturnValue.
+         In addition, unwind one call frame and restore the scope
+         chain, code block instruction pointer and register base
+         to those of the calling function.
       */
 
       int result = vPC[1].u.operand;
@@ -4287,14 +4290,25 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
       JSValue returnValue = callFrame->r(result).jsValue();
 
       vPC = callFrame->returnPC();
-      int dst = callFrame->returnValueRegister();
       callFrame = callFrame->callerFrame();
 
       if (callFrame->hasHostCallFrameFlag())
         return returnValue;
 
-      callFrame->r(dst) = returnValue;
+      functionReturnValue = returnValue;
 
+      NEXT_INSTRUCTION();
+    }
+    DEFINE_OPCODE(op_call_put_result) {
+      /* ret_result result(r)
+
+         Move call result from functionReturnValue to caller's
+         expected return value register.
+      */
+
+      callFrame->r(vPC[1].u.operand) = functionReturnValue;
+
+      vPC += OPCODE_LENGTH(op_call_put_result);
       NEXT_INSTRUCTION();
     }
     DEFINE_OPCODE(op_ret_object_or_this) {
@@ -4318,13 +4332,12 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
         returnValue = callFrame->r(vPC[2].u.operand).jsValue();
 
       vPC = callFrame->returnPC();
-      int dst = callFrame->returnValueRegister();
       callFrame = callFrame->callerFrame();
 
       if (callFrame->hasHostCallFrameFlag())
         return returnValue;
 
-      callFrame->r(dst) = returnValue;
+      functionReturnValue = returnValue;
 
       NEXT_INSTRUCTION();
     }
@@ -4425,7 +4438,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
       NEXT_INSTRUCTION();
     }
     DEFINE_OPCODE(op_construct) {
-      /* construct dst(r) func(r) argCount(n) registerOffset(n) proto(r)
+      /* construct func(r) argCount(n) registerOffset(n) proto(r)
          thisRegister(r)
 
          Invoke register "func" as a constructor. For JS
@@ -4440,12 +4453,11 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
          caching of this lookup.
       */
 
-      int dst = vPC[1].u.operand;
-      int func = vPC[2].u.operand;
-      int argCount = vPC[3].u.operand;
-      int registerOffset = vPC[4].u.operand;
-      int proto = vPC[5].u.operand;
-      int thisRegister = vPC[6].u.operand;
+      int func = vPC[1].u.operand;
+      int argCount = vPC[2].u.operand;
+      int registerOffset = vPC[3].u.operand;
+      int proto = vPC[4].u.operand;
+      int thisRegister = vPC[5].u.operand;
 
       JSValue v = callFrame->r(func).jsValue();
 
@@ -4478,8 +4490,9 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
           goto vm_throw;
         }
 
-        callFrame->init(newCodeBlock, vPC + 7, callDataScopeChain,
-                        previousCallFrame, dst, argCount, asFunction(v));
+        callFrame->init(newCodeBlock, vPC + OPCODE_LENGTH(op_construct),
+                        callDataScopeChain, previousCallFrame, 0, argCount,
+                        asFunction(v));
         vPC = newCodeBlock->instructions().begin();
 
 #if ENABLE(OPCODE_STATS)
@@ -4495,7 +4508,8 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
         ScopeChainNode* scopeChain = callFrame->scopeChain();
         CallFrame* newCallFrame =
             CallFrame::create(callFrame->registers() + registerOffset);
-        newCallFrame->init(0, vPC + 7, scopeChain, callFrame, dst, argCount, 0);
+        newCallFrame->init(0, vPC + OPCODE_LENGTH(op_construct), scopeChain,
+                           callFrame, 0, argCount, 0);
 
         JSValue returnValue;
         {
@@ -4504,7 +4518,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
               constructData.native.function(newCallFrame, asObject(v), args);
         }
         CHECK_FOR_EXCEPTION();
-        callFrame->r(dst) = JSValue(returnValue);
+        functionReturnValue = JSValue(returnValue);
 
         vPC += OPCODE_LENGTH(op_construct);
         NEXT_INSTRUCTION();

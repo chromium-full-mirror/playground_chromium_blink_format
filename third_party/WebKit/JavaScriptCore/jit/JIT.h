@@ -908,6 +908,7 @@ class JIT : private JSInterfaceJIT {
   void emit_op_call(Instruction*);
   void emit_op_call_eval(Instruction*);
   void emit_op_call_varargs(Instruction*);
+  void emit_op_call_put_result(Instruction*);
   void emit_op_catch(Instruction*);
   void emit_op_construct(Instruction*);
   void emit_op_convert_this(Instruction*);

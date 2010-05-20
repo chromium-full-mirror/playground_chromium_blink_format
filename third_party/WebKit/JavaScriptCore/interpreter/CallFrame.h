@@ -155,7 +155,7 @@ class ExecState : private Register {
                           Instruction* vPC,
                           ScopeChainNode* scopeChain,
                           CallFrame* callerFrame,
-                          int returnValueRegister,
+                          int,
                           int argc,
                           JSFunction* function) {
     ASSERT(callerFrame);  // Use noCaller() rather than 0 for the outer host
@@ -167,8 +167,6 @@ class ExecState : private Register {
     static_cast<Register*>(this)[RegisterFile::ReturnPC] =
         vPC;  // This is either an Instruction* or a pointer into JIT generated
               // code stored as an Instruction*.
-    static_cast<Register*>(this)[RegisterFile::ReturnValueRegister] =
-        Register::withInt(returnValueRegister);
     setArgumentCount(argc);  // original argument count (for the sake of the
                              // "arguments" object)
     setCallee(function);
@@ -179,9 +177,6 @@ class ExecState : private Register {
 
   static CallFrame* noCaller() {
     return reinterpret_cast<CallFrame*>(HostCallFrameFlag);
-  }
-  int returnValueRegister() const {
-    return this[RegisterFile::ReturnValueRegister].i();
   }
 
   bool hasHostCallFrameFlag() const {

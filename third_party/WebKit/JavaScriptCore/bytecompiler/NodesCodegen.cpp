@@ -342,8 +342,9 @@ RegisterID* ArgumentListNode::emitBytecode(BytecodeGenerator& generator,
 RegisterID* NewExprNode::emitBytecode(BytecodeGenerator& generator,
                                       RegisterID* dst) {
   RefPtr<RegisterID> func = generator.emitNode(m_expr);
-  return generator.emitConstruct(generator.finalDestination(dst), func.get(),
-                                 m_args, divot(), startOffset(), endOffset());
+  return generator.emitConstruct(generator.finalDestinationOrIgnored(dst),
+                                 func.get(), m_args, divot(), startOffset(),
+                                 endOffset());
 }
 
 // ------------------------------ EvalFunctionCallNode
@@ -369,9 +370,9 @@ RegisterID* FunctionCallValueNode::emitBytecode(BytecodeGenerator& generator,
   RefPtr<RegisterID> func = generator.emitNode(m_expr);
   RefPtr<RegisterID> thisRegister =
       generator.emitLoad(generator.newTemporary(), jsNull());
-  return generator.emitCall(generator.finalDestination(dst, func.get()),
-                            func.get(), thisRegister.get(), m_args, divot(),
-                            startOffset(), endOffset());
+  return generator.emitCall(
+      generator.finalDestinationOrIgnored(dst, func.get()), func.get(),
+      thisRegister.get(), m_args, divot(), startOffset(), endOffset());
 }
 
 // ------------------------------ FunctionCallResolveNode
@@ -383,8 +384,9 @@ RegisterID* FunctionCallResolveNode::emitBytecode(BytecodeGenerator& generator,
     RefPtr<RegisterID> thisRegister =
         generator.emitLoad(generator.newTemporary(), jsNull());
     return generator.emitCall(
-        generator.finalDestination(dst, thisRegister.get()), local.get(),
-        thisRegister.get(), m_args, divot(), startOffset(), endOffset());
+        generator.finalDestinationOrIgnored(dst, thisRegister.get()),
+        local.get(), thisRegister.get(), m_args, divot(), startOffset(),
+        endOffset());
   }
 
   int index = 0;
@@ -398,9 +400,9 @@ RegisterID* FunctionCallResolveNode::emitBytecode(BytecodeGenerator& generator,
         generator.newTemporary(), depth, index, globalObject);
     RefPtr<RegisterID> thisRegister =
         generator.emitLoad(generator.newTemporary(), jsNull());
-    return generator.emitCall(generator.finalDestination(dst, func.get()),
-                              func.get(), thisRegister.get(), m_args, divot(),
-                              startOffset(), endOffset());
+    return generator.emitCall(
+        generator.finalDestinationOrIgnored(dst, func.get()), func.get(),
+        thisRegister.get(), m_args, divot(), startOffset(), endOffset());
   }
 
   RefPtr<RegisterID> func = generator.newTemporary();
@@ -409,9 +411,9 @@ RegisterID* FunctionCallResolveNode::emitBytecode(BytecodeGenerator& generator,
   generator.emitExpressionInfo(identifierStart + m_ident.size(), m_ident.size(),
                                0);
   generator.emitResolveWithBase(thisRegister.get(), func.get(), m_ident);
-  return generator.emitCall(generator.finalDestination(dst, func.get()),
-                            func.get(), thisRegister.get(), m_args, divot(),
-                            startOffset(), endOffset());
+  return generator.emitCall(
+      generator.finalDestinationOrIgnored(dst, func.get()), func.get(),
+      thisRegister.get(), m_args, divot(), startOffset(), endOffset());
 }
 
 // ------------------------------ FunctionCallBracketNode
@@ -428,9 +430,9 @@ RegisterID* FunctionCallBracketNode::emitBytecode(BytecodeGenerator& generator,
       generator.tempDestination(dst), base.get(), property);
   RefPtr<RegisterID> thisRegister =
       generator.emitMove(generator.newTemporary(), base.get());
-  return generator.emitCall(generator.finalDestination(dst, function.get()),
-                            function.get(), thisRegister.get(), m_args, divot(),
-                            startOffset(), endOffset());
+  return generator.emitCall(
+      generator.finalDestinationOrIgnored(dst, function.get()), function.get(),
+      thisRegister.get(), m_args, divot(), startOffset(), endOffset());
 }
 
 // ------------------------------ FunctionCallDotNode
@@ -446,9 +448,9 @@ RegisterID* FunctionCallDotNode::emitBytecode(BytecodeGenerator& generator,
                                m_subexpressionEndOffset);
   generator.emitMethodCheck();
   generator.emitGetById(function.get(), thisRegister.get(), m_ident);
-  return generator.emitCall(generator.finalDestination(dst, function.get()),
-                            function.get(), thisRegister.get(), m_args, divot(),
-                            startOffset(), endOffset());
+  return generator.emitCall(
+      generator.finalDestinationOrIgnored(dst, function.get()), function.get(),
+      thisRegister.get(), m_args, divot(), startOffset(), endOffset());
 }
 
 RegisterID* CallFunctionCallDotNode::emitBytecode(BytecodeGenerator& generator,
@@ -461,8 +463,8 @@ RegisterID* CallFunctionCallDotNode::emitBytecode(BytecodeGenerator& generator,
                                m_subexpressionEndOffset);
   RefPtr<RegisterID> function = generator.emitGetById(
       generator.tempDestination(dst), base.get(), m_ident);
-  RefPtr<RegisterID> finalDestination =
-      generator.finalDestination(dst, function.get());
+  RefPtr<RegisterID> finalDestinationOrIgnored =
+      generator.finalDestinationOrIgnored(dst, function.get());
   generator.emitJumpIfNotFunctionCall(function.get(), realCall.get());
   {
     RefPtr<RegisterID> realFunction =
@@ -475,7 +477,7 @@ RegisterID* CallFunctionCallDotNode::emitBytecode(BytecodeGenerator& generator,
     } else
       generator.emitLoad(thisRegister.get(), jsNull());
 
-    generator.emitCall(finalDestination.get(), realFunction.get(),
+    generator.emitCall(finalDestinationOrIgnored.get(), realFunction.get(),
                        thisRegister.get(), m_args, divot(), startOffset(),
                        endOffset());
     generator.emitJump(end.get());
@@ -485,12 +487,12 @@ RegisterID* CallFunctionCallDotNode::emitBytecode(BytecodeGenerator& generator,
   {
     RefPtr<RegisterID> thisRegister =
         generator.emitMove(generator.newTemporary(), base.get());
-    generator.emitCall(finalDestination.get(), function.get(),
+    generator.emitCall(finalDestinationOrIgnored.get(), function.get(),
                        thisRegister.get(), m_args, divot(), startOffset(),
                        endOffset());
   }
   generator.emitLabel(end.get());
-  return finalDestination.get();
+  return finalDestinationOrIgnored.get();
 }
 
 static bool areTrivialApplyArguments(ArgumentsNode* args) {
@@ -516,8 +518,8 @@ RegisterID* ApplyFunctionCallDotNode::emitBytecode(BytecodeGenerator& generator,
                                m_subexpressionEndOffset);
   RefPtr<RegisterID> function = generator.emitGetById(
       generator.tempDestination(dst), base.get(), m_ident);
-  RefPtr<RegisterID> finalDestination =
-      generator.finalDestination(dst, function.get());
+  RefPtr<RegisterID> finalDestinationOrIgnored =
+      generator.finalDestinationOrIgnored(dst, function.get());
   generator.emitJumpIfNotFunctionApply(function.get(), realCall.get());
   {
     if (mayBeCall) {
@@ -537,7 +539,7 @@ RegisterID* ApplyFunctionCallDotNode::emitBytecode(BytecodeGenerator& generator,
         }
       } else
         generator.emitLoad(thisRegister.get(), jsNull());
-      generator.emitCall(finalDestination.get(), realFunction.get(),
+      generator.emitCall(finalDestinationOrIgnored.get(), realFunction.get(),
                          thisRegister.get(), m_args, divot(), startOffset(),
                          endOffset());
       m_args->m_listNode = oldList;
@@ -565,9 +567,10 @@ RegisterID* ApplyFunctionCallDotNode::emitBytecode(BytecodeGenerator& generator,
         generator.emitNode(args->m_expr);
 
       generator.emitLoadVarargs(argsCountRegister.get(), argsRegister.get());
-      generator.emitCallVarargs(finalDestination.get(), realFunction.get(),
-                                thisRegister.get(), argsCountRegister.get(),
-                                divot(), startOffset(), endOffset());
+      generator.emitCallVarargs(finalDestinationOrIgnored.get(),
+                                realFunction.get(), thisRegister.get(),
+                                argsCountRegister.get(), divot(), startOffset(),
+                                endOffset());
     }
     generator.emitJump(end.get());
   }
@@ -575,12 +578,12 @@ RegisterID* ApplyFunctionCallDotNode::emitBytecode(BytecodeGenerator& generator,
   {
     RefPtr<RegisterID> thisRegister =
         generator.emitMove(generator.newTemporary(), base.get());
-    generator.emitCall(finalDestination.get(), function.get(),
+    generator.emitCall(finalDestinationOrIgnored.get(), function.get(),
                        thisRegister.get(), m_args, divot(), startOffset(),
                        endOffset());
   }
   generator.emitLabel(end.get());
-  return finalDestination.get();
+  return finalDestinationOrIgnored.get();
 }
 
 // ------------------------------ PostfixResolveNode
