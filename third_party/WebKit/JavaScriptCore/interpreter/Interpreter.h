@@ -44,7 +44,6 @@ namespace JSC {
 class CodeBlock;
 class EvalExecutable;
 class FunctionExecutable;
-class InternalFunction;
 class JSFunction;
 class JSGlobalObject;
 class ProgramExecutable;
@@ -120,7 +119,7 @@ class Interpreter : public FastAllocBase {
                   JSValue* exception);
 
   JSValue retrieveArguments(CallFrame*, JSFunction*) const;
-  JSValue retrieveCaller(CallFrame*, InternalFunction*) const;
+  JSValue retrieveCaller(CallFrame*, JSFunction*) const;
   void retrieveLastCaller(CallFrame*,
                           int& lineNumber,
                           intptr_t& sourceID,
@@ -215,7 +214,7 @@ class Interpreter : public FastAllocBase {
       size_t registerOffset,
       int argc);
 
-  static CallFrame* findFunctionCallFrame(CallFrame*, InternalFunction*);
+  static CallFrame* findFunctionCallFrame(CallFrame*, JSFunction*);
 
   JSValue privateExecute(ExecutionFlag,
                          RegisterFile*,

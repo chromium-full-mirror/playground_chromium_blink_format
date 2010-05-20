@@ -44,7 +44,7 @@ namespace JSC {
 
 ASSERT_CLASS_FITS_IN_CELL(JSFunction);
 
-const ClassInfo JSFunction::info = {"Function", &InternalFunction::info, 0, 0};
+const ClassInfo JSFunction::info = {"Function", 0, 0, 0};
 
 bool JSFunction::isHostFunctionNonInline() const {
   return isHostFunction();
@@ -60,13 +60,16 @@ JSFunction::JSFunction(ExecState* exec,
                        int length,
                        const Identifier& name,
                        PassRefPtr<NativeExecutable> thunk)
-    : Base(&exec->globalData(), structure, name)
+    : Base(structure)
 #if ENABLE(JIT)
       ,
       m_executable(thunk)
 #endif
       ,
       m_scopeChain(NoScopeChain()) {
+  putDirect(exec->globalData().propertyNames->name,
+            jsString(exec, name.isNull() ? "" : name.ustring()),
+            DontDelete | ReadOnly | DontEnum);
 #if ENABLE(JIT)
   putDirect(exec->propertyNames().length, jsNumber(exec, length),
             DontDelete | ReadOnly | DontEnum);
@@ -82,13 +85,16 @@ JSFunction::JSFunction(ExecState* exec,
                        int length,
                        const Identifier& name,
                        NativeFunction func)
-    : Base(&exec->globalData(), structure, name)
+    : Base(structure)
 #if ENABLE(JIT)
       ,
       m_executable(exec->globalData().getHostFunction(func))
 #endif
       ,
       m_scopeChain(NoScopeChain()) {
+  putDirect(exec->globalData().propertyNames->name,
+            jsString(exec, name.isNull() ? "" : name.ustring()),
+            DontDelete | ReadOnly | DontEnum);
 #if ENABLE(JIT)
   putDirect(exec->propertyNames().length, jsNumber(exec, length),
             DontDelete | ReadOnly | DontEnum);
@@ -102,11 +108,15 @@ JSFunction::JSFunction(ExecState* exec,
 JSFunction::JSFunction(ExecState* exec,
                        NonNullPassRefPtr<FunctionExecutable> executable,
                        ScopeChainNode* scopeChainNode)
-    : Base(&exec->globalData(),
-           exec->lexicalGlobalObject()->functionStructure(),
-           executable->name()),
+    : Base(exec->lexicalGlobalObject()->functionStructure()),
       m_executable(executable),
-      m_scopeChain(scopeChainNode) {}
+      m_scopeChain(scopeChainNode) {
+  const Identifier& name =
+      static_cast<FunctionExecutable*>(m_executable.get())->name();
+  putDirect(exec->globalData().propertyNames->name,
+            jsString(exec, name.isNull() ? "" : name.ustring()),
+            DontDelete | ReadOnly | DontEnum);
+}
 
 JSFunction::~JSFunction() {
   ASSERT(vptr() == JSGlobalData::jsFunctionVPtr);
@@ -126,6 +136,30 @@ JSFunction::~JSFunction() {
       jsExecutable()->generatedBytecodeForConstruct().unlinkCallers();
 #endif
   }
+}
+
+const UString& JSFunction::name(ExecState* exec) {
+  return asString(getDirect(exec->globalData().propertyNames->name))
+      ->value(exec);
+}
+
+const UString JSFunction::displayName(ExecState* exec) {
+  JSValue displayName =
+      getDirect(exec->globalData().propertyNames->displayName);
+
+  if (displayName && isJSString(&exec->globalData(), displayName))
+    return asString(displayName)->value(exec);
+
+  return UString::null();
+}
+
+const UString JSFunction::calculatedDisplayName(ExecState* exec) {
+  const UString explicitName = displayName(exec);
+
+  if (!explicitName.isEmpty())
+    return explicitName;
+
+  return name(exec);
 }
 
 void JSFunction::markChildren(MarkStack& markStack) {

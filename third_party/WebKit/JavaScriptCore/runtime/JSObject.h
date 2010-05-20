@@ -223,6 +223,9 @@ class JSObject : public JSCell {
   void putDirectFunction(ExecState* exec,
                          InternalFunction* function,
                          unsigned attr = 0);
+  void putDirectFunction(ExecState* exec,
+                         JSFunction* function,
+                         unsigned attr = 0);
 
   void putDirectWithoutTransition(const Identifier& propertyName,
                                   JSValue value,
@@ -232,6 +235,9 @@ class JSObject : public JSCell {
                                           unsigned attr = 0);
   void putDirectFunctionWithoutTransition(ExecState* exec,
                                           InternalFunction* function,
+                                          unsigned attr = 0);
+  void putDirectFunctionWithoutTransition(ExecState* exec,
+                                          JSFunction* function,
                                           unsigned attr = 0);
 
   // Fast access to known property offsets.
