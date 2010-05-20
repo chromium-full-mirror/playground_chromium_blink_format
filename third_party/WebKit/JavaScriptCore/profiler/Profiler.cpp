@@ -32,7 +32,6 @@
 #include "CommonIdentifiers.h"
 #include "CallFrame.h"
 #include "CodeBlock.h"
-#include "InternalFunction.h"
 #include "JSFunction.h"
 #include "JSGlobalObject.h"
 #include "Nodes.h"
@@ -166,10 +165,6 @@ CallIdentifier Profiler::createCallIdentifier(ExecState* exec,
     if (!function->executable()->isHostFunction())
       return createCallIdentifierFromFunctionImp(exec, function);
   }
-  if (asObject(functionValue)->inherits(&JSFunction::info))
-    return CallIdentifier(
-        static_cast<JSFunction*>(asObject(functionValue))->name(exec),
-        defaultSourceURL, defaultLineNumber);
   if (asObject(functionValue)->inherits(&InternalFunction::info))
     return CallIdentifier(
         static_cast<InternalFunction*>(asObject(functionValue))->name(exec),

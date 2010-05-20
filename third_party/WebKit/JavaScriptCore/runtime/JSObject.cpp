@@ -28,7 +28,6 @@
 #include "DatePrototype.h"
 #include "ErrorConstructor.h"
 #include "GetterSetter.h"
-#include "JSFunction.h"
 #include "JSGlobalObject.h"
 #include "NativeErrorConstructor.h"
 #include "ObjectPrototype.h"
@@ -545,21 +544,8 @@ void JSObject::putDirectFunction(ExecState* exec,
   putDirectFunction(Identifier(exec, function->name(exec)), function, attr);
 }
 
-void JSObject::putDirectFunction(ExecState* exec,
-                                 JSFunction* function,
-                                 unsigned attr) {
-  putDirectFunction(Identifier(exec, function->name(exec)), function, attr);
-}
-
 void JSObject::putDirectFunctionWithoutTransition(ExecState* exec,
                                                   InternalFunction* function,
-                                                  unsigned attr) {
-  putDirectFunctionWithoutTransition(Identifier(exec, function->name(exec)),
-                                     function, attr);
-}
-
-void JSObject::putDirectFunctionWithoutTransition(ExecState* exec,
-                                                  JSFunction* function,
                                                   unsigned attr) {
   putDirectFunctionWithoutTransition(Identifier(exec, function->name(exec)),
                                      function, attr);
