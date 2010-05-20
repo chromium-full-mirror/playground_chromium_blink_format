@@ -38,7 +38,6 @@ typedef struct __CVBuffer* CVBufferRef;
 typedef CVBufferRef CVPixelBufferRef;
 typedef struct CGImage* CGImageRef;
 typedef int32_t CVReturn;
-typedef const struct __CFDictionary* CFDictionaryRef;
 
 // QTPixelBuffer wraps QuickTime's implementation of CVPixelBuffer, so its
 // functions are
@@ -79,7 +78,6 @@ class QTMOVIEWIN_API QTPixelBuffer {
                          size_t* right,
                          size_t* top,
                          size_t* bottom) const;
-  CFDictionaryRef attachments() const;
 
   // Generic CFRetain/CFRelease callbacks
   static void releaseCallback(void* refcon);
