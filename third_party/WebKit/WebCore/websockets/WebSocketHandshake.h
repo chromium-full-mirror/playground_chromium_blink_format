@@ -40,8 +40,8 @@
 
 namespace WebCore {
 
-class ScriptExecutionContext;
 class HTTPHeaderMap;
+class ScriptExecutionContext;
 
 class WebSocketHandshake : public Noncopyable {
  public:
@@ -94,7 +94,7 @@ class WebSocketHandshake : public Noncopyable {
                               const char* end,
                               HTTPHeaderMap* headers);
   bool processHeaders(const HTTPHeaderMap& headers);
-  void checkResponseHeaders();
+  bool checkResponseHeaders();
 
   KURL m_url;
   String m_clientProtocol;
@@ -108,6 +108,11 @@ class WebSocketHandshake : public Noncopyable {
   String m_wsProtocol;
   String m_setCookie;
   String m_setCookie2;
+
+  String m_secWebSocketKey1;
+  String m_secWebSocketKey2;
+  unsigned char m_key3[8];
+  unsigned char m_expectedChallengeResponse[16];
 };
 
 }  // namespace WebCore
