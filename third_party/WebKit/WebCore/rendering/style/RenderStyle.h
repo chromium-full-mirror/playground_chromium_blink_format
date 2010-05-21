@@ -910,6 +910,9 @@ class RenderStyle : public RefCounted<RenderStyle> {
   bool columnRuleIsTransparent() const {
     return rareNonInheritedData->m_multiCol->m_rule.isTransparent();
   }
+  bool columnSpan() const {
+    return rareNonInheritedData->m_multiCol->m_columnSpan;
+  }
   EPageBreak columnBreakBefore() const {
     return static_cast<EPageBreak>(
         rareNonInheritedData->m_multiCol->m_breakBefore);
@@ -1527,6 +1530,9 @@ class RenderStyle : public RefCounted<RenderStyle> {
   }
   void resetColumnRule() {
     SET_VAR(rareNonInheritedData.access()->m_multiCol, m_rule, BorderValue())
+  }
+  void setColumnSpan(bool b) {
+    SET_VAR(rareNonInheritedData.access(), m_multiCol, m_columnSpan, b);
   }
   void setColumnBreakBefore(EPageBreak p) {
     SET_VAR(rareNonInheritedData.access()->m_multiCol, m_breakBefore, p);
