@@ -46,8 +46,8 @@ WKCACFContextFlusher::~WKCACFContextFlusher() {}
 void WKCACFContextFlusher::addContext(CACFContextRef context) {
   ASSERT(context);
 
-  m_contexts.add(context);
-  CFRetain(context);
+  if (m_contexts.add(context).second)
+    CFRetain(context);
 }
 
 void WKCACFContextFlusher::removeContext(CACFContextRef context) {
