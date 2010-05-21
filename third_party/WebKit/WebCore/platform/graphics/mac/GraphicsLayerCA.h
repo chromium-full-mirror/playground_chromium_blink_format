@@ -204,6 +204,8 @@ class GraphicsLayerCA : public GraphicsLayer {
   void commitLayerChangesBeforeSublayers();
   void commitLayerChangesAfterSublayers();
 
+  FloatSize constrainedSize() const;
+
   bool requiresTiledLayer(const FloatSize&) const;
   void swapFromOrToTiledLayer(bool useTiledLayer);
 
