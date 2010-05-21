@@ -5390,6 +5390,11 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
           style(), m_rootElementStyle, zoomFactor));
       return;
     }
+    case CSSPropertyWebkitColumnSpan: {
+      HANDLE_INHERIT_AND_INITIAL(columnSpan, ColumnSpan)
+      m_style->setColumnSpan(primitiveValue->getIdent() == CSSValueAll);
+      return;
+    }
     case CSSPropertyWebkitColumnWidth: {
       if (isInherit) {
         if (m_parentStyle->hasAutoColumnWidth())
