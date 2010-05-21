@@ -53,6 +53,8 @@ class RenderDataGrid : public RenderBlock, private ScrollbarClient {
  private:
   virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);
 
+  virtual bool requiresForcedStyleRecalcPropagation() const { return true; }
+
   RenderStyle* columnStyle(DataGridColumn*);
   RenderStyle* headerStyle(DataGridColumn*);
   void recalcStyleForColumns();
