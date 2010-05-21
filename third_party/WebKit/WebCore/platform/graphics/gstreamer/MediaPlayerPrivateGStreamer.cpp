@@ -33,6 +33,7 @@
 #include "Frame.h"
 #include "FrameView.h"
 #include "GOwnPtrGStreamer.h"
+#include "GStreamerGWorld.h"
 #include "GraphicsContext.h"
 #include "GraphicsTypes.h"
 #include "ImageGStreamer.h"
@@ -1320,6 +1321,13 @@ bool MediaPlayerPrivateGStreamer::supportsFullscreen() const {
   return true;
 }
 
+PlatformMedia MediaPlayerPrivateGStreamer::platformMedia() const {
+  PlatformMedia p;
+  p.type = PlatformMedia::GStreamerGWorldType;
+  p.media.gstreamerGWorld = m_gstGWorld.get();
+  return p;
+}
+
 void MediaPlayerPrivateGStreamer::setPreload(MediaPlayer::Preload preload) {
   ASSERT(m_playBin);
 
@@ -1341,6 +1349,8 @@ void MediaPlayerPrivateGStreamer::setPreload(MediaPlayer::Preload preload) {
 void MediaPlayerPrivateGStreamer::createGSTPlayBin() {
   ASSERT(!m_playBin);
   m_playBin = gst_element_factory_make("playbin2", "play");
+
+  m_gstGWorld = GStreamerGWorld::createGWorld(this);
 
   GstBus* bus = gst_pipeline_get_bus(GST_PIPELINE(m_playBin));
   gst_bus_add_signal_watch(bus);
