@@ -31,6 +31,7 @@ class FunctionPrototype;
 class FunctionConstructor : public InternalFunction {
  public:
   FunctionConstructor(ExecState*,
+                      JSGlobalObject*,
                       NonNullPassRefPtr<Structure>,
                       FunctionPrototype*);
 

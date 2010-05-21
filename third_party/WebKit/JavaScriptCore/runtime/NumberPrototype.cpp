@@ -66,6 +66,7 @@ static JSValue JSC_HOST_CALL numberProtoFuncToPrecision(ExecState*,
 // ECMA 15.7.4
 
 NumberPrototype::NumberPrototype(ExecState* exec,
+                                 JSGlobalObject* globalObject,
                                  NonNullPassRefPtr<Structure> structure,
                                  Structure* prototypeFunctionStructure)
     : NumberObject(structure) {
@@ -75,35 +76,35 @@ NumberPrototype::NumberPrototype(ExecState* exec,
   // constructed
 
   putDirectFunctionWithoutTransition(
-      exec, new (exec) NativeFunctionWrapper(exec, prototypeFunctionStructure,
-                                             1, exec->propertyNames().toString,
-                                             numberProtoFuncToString),
+      exec, new (exec) NativeFunctionWrapper(
+                exec, globalObject, prototypeFunctionStructure, 1,
+                exec->propertyNames().toString, numberProtoFuncToString),
       DontEnum);
   putDirectFunctionWithoutTransition(
       exec,
-      new (exec) NativeFunctionWrapper(exec, prototypeFunctionStructure, 0,
-                                       exec->propertyNames().toLocaleString,
-                                       numberProtoFuncToLocaleString),
-      DontEnum);
-  putDirectFunctionWithoutTransition(
-      exec, new (exec) NativeFunctionWrapper(exec, prototypeFunctionStructure,
-                                             0, exec->propertyNames().valueOf,
-                                             numberProtoFuncValueOf),
-      DontEnum);
-  putDirectFunctionWithoutTransition(
-      exec, new (exec) NativeFunctionWrapper(exec, prototypeFunctionStructure,
-                                             1, exec->propertyNames().toFixed,
-                                             numberProtoFuncToFixed),
-      DontEnum);
-  putDirectFunctionWithoutTransition(
-      exec,
-      new (exec) NativeFunctionWrapper(exec, prototypeFunctionStructure, 1,
-                                       exec->propertyNames().toExponential,
-                                       numberProtoFuncToExponential),
+      new (exec) NativeFunctionWrapper(
+          exec, globalObject, prototypeFunctionStructure, 0,
+          exec->propertyNames().toLocaleString, numberProtoFuncToLocaleString),
       DontEnum);
   putDirectFunctionWithoutTransition(
       exec, new (exec) NativeFunctionWrapper(
-                exec, prototypeFunctionStructure, 1,
+                exec, globalObject, prototypeFunctionStructure, 0,
+                exec->propertyNames().valueOf, numberProtoFuncValueOf),
+      DontEnum);
+  putDirectFunctionWithoutTransition(
+      exec, new (exec) NativeFunctionWrapper(
+                exec, globalObject, prototypeFunctionStructure, 1,
+                exec->propertyNames().toFixed, numberProtoFuncToFixed),
+      DontEnum);
+  putDirectFunctionWithoutTransition(
+      exec,
+      new (exec) NativeFunctionWrapper(
+          exec, globalObject, prototypeFunctionStructure, 1,
+          exec->propertyNames().toExponential, numberProtoFuncToExponential),
+      DontEnum);
+  putDirectFunctionWithoutTransition(
+      exec, new (exec) NativeFunctionWrapper(
+                exec, globalObject, prototypeFunctionStructure, 1,
                 exec->propertyNames().toPrecision, numberProtoFuncToPrecision),
       DontEnum);
 }

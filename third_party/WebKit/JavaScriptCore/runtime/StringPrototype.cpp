@@ -231,8 +231,10 @@ toLowerCase and toUpperCase
 
 // ECMA 15.5.4
 StringPrototype::StringPrototype(ExecState* exec,
+                                 JSGlobalObject* globalObject,
                                  NonNullPassRefPtr<Structure> structure)
     : StringObject(exec, structure) {
+  putAnonymousValue(0, globalObject);
   // The constructor will be added later, after StringConstructor has been built
   putDirectWithoutTransition(exec->propertyNames().length, jsNumber(exec, 0),
                              DontDelete | ReadOnly | DontEnum);

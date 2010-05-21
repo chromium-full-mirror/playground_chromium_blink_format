@@ -31,6 +31,7 @@ class DatePrototype;
 class DateConstructor : public InternalFunction {
  public:
   DateConstructor(ExecState*,
+                  JSGlobalObject*,
                   NonNullPassRefPtr<Structure>,
                   Structure* prototypeFunctionStructure,
                   DatePrototype*);

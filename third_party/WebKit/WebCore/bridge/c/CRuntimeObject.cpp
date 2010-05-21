@@ -36,8 +36,10 @@ namespace Bindings {
 const ClassInfo CRuntimeObject::s_info = {"CRuntimeObject",
                                           &RuntimeObject::s_info, 0, 0};
 
-CRuntimeObject::CRuntimeObject(ExecState* exec, PassRefPtr<CInstance> instance)
-    : RuntimeObject(exec, instance) {}
+CRuntimeObject::CRuntimeObject(ExecState* exec,
+                               JSGlobalObject* globalObject,
+                               PassRefPtr<CInstance> instance)
+    : RuntimeObject(exec, globalObject, instance) {}
 
 CRuntimeObject::~CRuntimeObject() {}
 

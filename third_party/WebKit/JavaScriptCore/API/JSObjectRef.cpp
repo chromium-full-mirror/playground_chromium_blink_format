@@ -80,9 +80,11 @@ JSObjectRef JSObjectMake(JSContextRef ctx, JSClassRef jsClass, void* data) {
         exec->lexicalGlobalObject()
             ->emptyObjectStructure()));  // slightly more efficient
 
-  JSCallbackObject<JSObject>* object = new (exec) JSCallbackObject<JSObject>(
-      exec, exec->lexicalGlobalObject()->callbackObjectStructure(), jsClass,
-      data);
+  JSCallbackObject<JSObjectWithGlobalObject>* object =
+      new (exec) JSCallbackObject<JSObjectWithGlobalObject>(
+          exec, exec->lexicalGlobalObject(),
+          exec->lexicalGlobalObject()->callbackObjectStructure(), jsClass,
+          data);
   if (JSObject* prototype = jsClass->prototype(exec))
     object->setPrototype(prototype);
 
@@ -99,7 +101,8 @@ JSObjectRef JSObjectMakeFunctionWithCallback(
   Identifier nameID = name ? name->identifier(&exec->globalData())
                            : Identifier(exec, "anonymous");
 
-  return toRef(new (exec) JSCallbackFunction(exec, callAsFunction, nameID));
+  return toRef(new (exec) JSCallbackFunction(exec, exec->lexicalGlobalObject(),
+                                             callAsFunction, nameID));
 }
 
 JSObjectRef JSObjectMakeConstructor(
@@ -114,6 +117,7 @@ JSObjectRef JSObjectMakeConstructor(
     jsPrototype = exec->lexicalGlobalObject()->objectPrototype();
 
   JSCallbackConstructor* constructor = new (exec) JSCallbackConstructor(
+      exec->lexicalGlobalObject(),
       exec->lexicalGlobalObject()->callbackConstructorStructure(), jsClass,
       callAsConstructor);
   constructor->putDirect(exec->propertyNames().prototype, jsPrototype,
@@ -384,8 +388,10 @@ void* JSObjectGetPrivate(JSObjectRef object) {
   if (jsObject->inherits(&JSCallbackObject<JSGlobalObject>::info))
     return static_cast<JSCallbackObject<JSGlobalObject>*>(jsObject)
         ->getPrivate();
-  else if (jsObject->inherits(&JSCallbackObject<JSObject>::info))
-    return static_cast<JSCallbackObject<JSObject>*>(jsObject)->getPrivate();
+  else if (jsObject->inherits(
+               &JSCallbackObject<JSObjectWithGlobalObject>::info))
+    return static_cast<JSCallbackObject<JSObjectWithGlobalObject>*>(jsObject)
+        ->getPrivate();
 
   return 0;
 }
@@ -396,8 +402,10 @@ bool JSObjectSetPrivate(JSObjectRef object, void* data) {
   if (jsObject->inherits(&JSCallbackObject<JSGlobalObject>::info)) {
     static_cast<JSCallbackObject<JSGlobalObject>*>(jsObject)->setPrivate(data);
     return true;
-  } else if (jsObject->inherits(&JSCallbackObject<JSObject>::info)) {
-    static_cast<JSCallbackObject<JSObject>*>(jsObject)->setPrivate(data);
+  } else if (jsObject->inherits(
+                 &JSCallbackObject<JSObjectWithGlobalObject>::info)) {
+    static_cast<JSCallbackObject<JSObjectWithGlobalObject>*>(jsObject)
+        ->setPrivate(data);
     return true;
   }
 
@@ -415,10 +423,10 @@ JSValueRef JSObjectGetPrivateProperty(JSContextRef ctx,
   if (jsObject->inherits(&JSCallbackObject<JSGlobalObject>::info))
     result = static_cast<JSCallbackObject<JSGlobalObject>*>(jsObject)
                  ->getPrivateProperty(name);
-  else if (jsObject->inherits(&JSCallbackObject<JSObject>::info))
-    result =
-        static_cast<JSCallbackObject<JSObject>*>(jsObject)->getPrivateProperty(
-            name);
+  else if (jsObject->inherits(
+               &JSCallbackObject<JSObjectWithGlobalObject>::info))
+    result = static_cast<JSCallbackObject<JSObjectWithGlobalObject>*>(jsObject)
+                 ->getPrivateProperty(name);
   return toRef(exec, result);
 }
 
@@ -436,9 +444,9 @@ bool JSObjectSetPrivateProperty(JSContextRef ctx,
         ->setPrivateProperty(name, jsValue);
     return true;
   }
-  if (jsObject->inherits(&JSCallbackObject<JSObject>::info)) {
-    static_cast<JSCallbackObject<JSObject>*>(jsObject)->setPrivateProperty(
-        name, jsValue);
+  if (jsObject->inherits(&JSCallbackObject<JSObjectWithGlobalObject>::info)) {
+    static_cast<JSCallbackObject<JSObjectWithGlobalObject>*>(jsObject)
+        ->setPrivateProperty(name, jsValue);
     return true;
   }
   return false;
@@ -456,9 +464,9 @@ bool JSObjectDeletePrivateProperty(JSContextRef ctx,
         ->deletePrivateProperty(name);
     return true;
   }
-  if (jsObject->inherits(&JSCallbackObject<JSObject>::info)) {
-    static_cast<JSCallbackObject<JSObject>*>(jsObject)->deletePrivateProperty(
-        name);
+  if (jsObject->inherits(&JSCallbackObject<JSObjectWithGlobalObject>::info)) {
+    static_cast<JSCallbackObject<JSObjectWithGlobalObject>*>(jsObject)
+        ->deletePrivateProperty(name);
     return true;
   }
   return false;

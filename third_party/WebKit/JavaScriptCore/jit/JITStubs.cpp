@@ -3160,6 +3160,7 @@ DEFINE_STUB_FUNCTION(JSObject*, op_new_regexp) {
   STUB_INIT_STACK_FRAME(stackFrame);
 
   return new (stackFrame.globalData) RegExpObject(
+      stackFrame.callFrame->lexicalGlobalObject(),
       stackFrame.callFrame->lexicalGlobalObject()->regExpStructure(),
       stackFrame.args[0].regExp());
 }

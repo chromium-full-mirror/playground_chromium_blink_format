@@ -63,7 +63,7 @@ void JSWeakObjectMapSet(JSContextRef ctx,
   if (!obj)
     return;
   ASSERT(obj->inherits(&JSCallbackObject<JSGlobalObject>::info) ||
-         obj->inherits(&JSCallbackObject<JSObject>::info));
+         obj->inherits(&JSCallbackObject<JSObjectWithGlobalObject>::info));
   map->map().set(key, obj);
 }
 

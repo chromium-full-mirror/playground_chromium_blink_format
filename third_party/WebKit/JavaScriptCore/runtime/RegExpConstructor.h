@@ -54,7 +54,10 @@ struct RegExpConstructorPrivate : FastAllocBase {
 
 class RegExpConstructor : public InternalFunction {
  public:
-  RegExpConstructor(ExecState*, NonNullPassRefPtr<Structure>, RegExpPrototype*);
+  RegExpConstructor(ExecState*,
+                    JSGlobalObject*,
+                    NonNullPassRefPtr<Structure>,
+                    RegExpPrototype*);
 
   static PassRefPtr<Structure> createStructure(JSValue prototype) {
     return Structure::create(prototype, TypeInfo(ObjectType, StructureFlags),

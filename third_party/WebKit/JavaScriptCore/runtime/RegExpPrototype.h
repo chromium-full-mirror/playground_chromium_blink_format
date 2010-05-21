@@ -29,6 +29,7 @@ namespace JSC {
 class RegExpPrototype : public JSObject {
  public:
   RegExpPrototype(ExecState*,
+                  JSGlobalObject*,
                   NonNullPassRefPtr<Structure>,
                   Structure* prototypeFunctionStructure);
 

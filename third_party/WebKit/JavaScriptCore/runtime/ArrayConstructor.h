@@ -31,6 +31,7 @@ class ArrayPrototype;
 class ArrayConstructor : public InternalFunction {
  public:
   ArrayConstructor(ExecState*,
+                   JSGlobalObject*,
                    NonNullPassRefPtr<Structure>,
                    ArrayPrototype*,
                    Structure*);

@@ -57,7 +57,7 @@ JavaInstance::~JavaInstance() {
 }
 
 RuntimeObject* JavaInstance::newRuntimeObject(ExecState* exec) {
-  return new (exec) JavaRuntimeObject(exec, this);
+  return new (exec) JavaRuntimeObject(exec, exec->lexicalGlobalObject(), this);
 }
 
 #define NUM_LOCAL_REFS 64
@@ -109,9 +109,10 @@ JSValue JavaInstance::booleanValue() const {
 class JavaRuntimeMethod : public RuntimeMethod {
  public:
   JavaRuntimeMethod(ExecState* exec,
+                    JSGlobalObject* globalObject,
                     const Identifier& name,
                     Bindings::MethodList& list)
-      : RuntimeMethod(exec, name, list) {}
+      : RuntimeMethod(exec, globalObject, name, list) {}
 
   virtual const ClassInfo* classInfo() const { return &s_info; }
 
@@ -124,7 +125,8 @@ const ClassInfo JavaRuntimeMethod::s_info = {"JavaRuntimeMethod",
 JSValue JavaInstance::getMethod(ExecState* exec,
                                 const Identifier& propertyName) {
   MethodList methodList = getClass()->methodsNamed(propertyName, this);
-  return new (exec) JavaRuntimeMethod(exec, propertyName, methodList);
+  return new (exec) JavaRuntimeMethod(exec, exec->lexicalGlobalObject(),
+                                      propertyName, methodList);
 }
 
 JSValue JavaInstance::invokeMethod(ExecState* exec,

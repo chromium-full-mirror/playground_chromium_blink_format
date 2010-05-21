@@ -36,10 +36,12 @@ const ClassInfo NativeErrorConstructor::info = {"Function",
 
 NativeErrorConstructor::NativeErrorConstructor(
     ExecState* exec,
+    JSGlobalObject* globalObject,
     NonNullPassRefPtr<Structure> structure,
     NativeErrorPrototype* nativeErrorPrototype)
     : InternalFunction(
           &exec->globalData(),
+          globalObject,
           structure,
           Identifier(exec,
                      nativeErrorPrototype->getDirect(exec->propertyNames().name)

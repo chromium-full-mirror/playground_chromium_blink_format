@@ -100,8 +100,10 @@ JSGlobalContextRef JSGlobalContextCreateInGroup(JSContextGroupRef group,
     return JSGlobalContextRetain(toGlobalRef(globalObject->globalExec()));
   }
 
-  JSGlobalObject* globalObject = new (globalData.get())
-      JSCallbackObject<JSGlobalObject>(globalObjectClass);
+  JSGlobalObject* globalObject =
+      new (globalData.get()) JSCallbackObject<JSGlobalObject>(
+          globalObjectClass,
+          JSCallbackObject<JSGlobalObject>::createStructure(jsNull()));
   ExecState* exec = globalObject->globalExec();
   JSValue prototype = globalObjectClass->prototype(exec);
   if (!prototype)

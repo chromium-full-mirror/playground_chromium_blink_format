@@ -31,6 +31,7 @@ class ObjectPrototype;
 class ErrorPrototype : public ErrorInstance {
  public:
   ErrorPrototype(ExecState*,
+                 JSGlobalObject*,
                  NonNullPassRefPtr<Structure>,
                  Structure* prototypeFunctionStructure);
 };

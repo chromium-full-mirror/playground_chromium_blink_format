@@ -31,8 +31,13 @@ namespace JSC {
 
 class PrototypeFunction : public InternalFunction {
  public:
-  PrototypeFunction(ExecState*, int length, const Identifier&, NativeFunction);
   PrototypeFunction(ExecState*,
+                    JSGlobalObject*,
+                    int length,
+                    const Identifier&,
+                    NativeFunction);
+  PrototypeFunction(ExecState*,
+                    JSGlobalObject*,
                     NonNullPassRefPtr<Structure>,
                     int length,
                     const Identifier&,

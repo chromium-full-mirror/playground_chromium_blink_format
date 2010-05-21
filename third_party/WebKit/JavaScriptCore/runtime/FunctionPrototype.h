@@ -30,8 +30,9 @@ class PrototypeFunction;
 
 class FunctionPrototype : public InternalFunction {
  public:
-  FunctionPrototype(ExecState*, NonNullPassRefPtr<Structure>);
+  FunctionPrototype(ExecState*, JSGlobalObject*, NonNullPassRefPtr<Structure>);
   void addFunctionProperties(ExecState*,
+                             JSGlobalObject*,
                              Structure* prototypeFunctionStructure,
                              NativeFunctionWrapper** callFunction,
                              NativeFunctionWrapper** applyFunction);

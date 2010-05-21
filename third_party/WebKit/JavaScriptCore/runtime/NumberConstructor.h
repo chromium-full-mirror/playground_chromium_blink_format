@@ -30,7 +30,10 @@ class NumberPrototype;
 
 class NumberConstructor : public InternalFunction {
  public:
-  NumberConstructor(ExecState*, NonNullPassRefPtr<Structure>, NumberPrototype*);
+  NumberConstructor(ExecState*,
+                    JSGlobalObject*,
+                    NonNullPassRefPtr<Structure>,
+                    NumberPrototype*);
 
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   virtual bool getOwnPropertyDescriptor(ExecState*,

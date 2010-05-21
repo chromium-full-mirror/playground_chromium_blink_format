@@ -56,17 +56,18 @@ JSFunction::JSFunction(NonNullPassRefPtr<Structure> structure)
       m_scopeChain(NoScopeChain()) {}
 
 JSFunction::JSFunction(ExecState* exec,
+                       JSGlobalObject* globalObject,
                        NonNullPassRefPtr<Structure> structure,
                        int length,
                        const Identifier& name,
                        PassRefPtr<NativeExecutable> thunk)
-    : Base(structure)
+    : Base(globalObject, structure)
 #if ENABLE(JIT)
       ,
       m_executable(thunk)
 #endif
       ,
-      m_scopeChain(NoScopeChain()) {
+      m_scopeChain(globalObject->globalScopeChain()) {
   putDirect(exec->globalData().propertyNames->name,
             jsString(exec, name.isNull() ? "" : name.ustring()),
             DontDelete | ReadOnly | DontEnum);
@@ -81,17 +82,18 @@ JSFunction::JSFunction(ExecState* exec,
 }
 
 JSFunction::JSFunction(ExecState* exec,
+                       JSGlobalObject* globalObject,
                        NonNullPassRefPtr<Structure> structure,
                        int length,
                        const Identifier& name,
                        NativeFunction func)
-    : Base(structure)
+    : Base(globalObject, structure)
 #if ENABLE(JIT)
       ,
       m_executable(exec->globalData().getHostFunction(func))
 #endif
       ,
-      m_scopeChain(NoScopeChain()) {
+      m_scopeChain(globalObject->globalScopeChain()) {
   putDirect(exec->globalData().propertyNames->name,
             jsString(exec, name.isNull() ? "" : name.ustring()),
             DontDelete | ReadOnly | DontEnum);
@@ -108,7 +110,8 @@ JSFunction::JSFunction(ExecState* exec,
 JSFunction::JSFunction(ExecState* exec,
                        NonNullPassRefPtr<FunctionExecutable> executable,
                        ScopeChainNode* scopeChainNode)
-    : Base(exec->lexicalGlobalObject()->functionStructure()),
+    : Base(scopeChainNode->globalObject,
+           scopeChainNode->globalObject->functionStructure()),
       m_executable(executable),
       m_scopeChain(scopeChainNode) {
   const Identifier& name =

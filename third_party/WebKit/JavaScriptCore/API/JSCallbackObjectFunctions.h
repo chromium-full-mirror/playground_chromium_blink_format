@@ -49,10 +49,11 @@ inline JSCallbackObject<Base>* JSCallbackObject<Base>::asCallbackObject(
 
 template <class Base>
 JSCallbackObject<Base>::JSCallbackObject(ExecState* exec,
+                                         JSGlobalObject* globalObject,
                                          NonNullPassRefPtr<Structure> structure,
                                          JSClassRef jsClass,
                                          void* data)
-    : Base(structure),
+    : Base(globalObject, structure),
       m_callbackObjectData(new JSCallbackObjectData(data, jsClass)) {
   init(exec);
 }
@@ -61,8 +62,10 @@ JSCallbackObject<Base>::JSCallbackObject(ExecState* exec,
 // FIXME: Move this into a separate JSGlobalCallbackObject class derived from
 // this one.
 template <class Base>
-JSCallbackObject<Base>::JSCallbackObject(JSClassRef jsClass)
-    : Base(), m_callbackObjectData(new JSCallbackObjectData(0, jsClass)) {
+JSCallbackObject<Base>::JSCallbackObject(JSClassRef jsClass,
+                                         NonNullPassRefPtr<Structure> structure)
+    : Base(structure),
+      m_callbackObjectData(new JSCallbackObjectData(0, jsClass)) {
   ASSERT(Base::isGlobalObject());
   init(static_cast<JSGlobalObject*>(this)->globalExec());
 }
@@ -620,8 +623,9 @@ JSValue JSCallbackObject<Base>::staticFunctionGetter(
               staticFunctions->get(propertyName.ustring().rep())) {
         if (JSObjectCallAsFunctionCallback callAsFunction =
                 entry->callAsFunction) {
-          JSObject* o =
-              new (exec) JSCallbackFunction(exec, callAsFunction, propertyName);
+          JSObject* o = new (exec) JSCallbackFunction(
+              exec, asGlobalObject(thisObj->getAnonymousValue(0)),
+              callAsFunction, propertyName);
           thisObj->putDirect(propertyName, o, entry->attributes);
           return o;
         }

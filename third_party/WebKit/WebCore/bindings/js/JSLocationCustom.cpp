@@ -45,7 +45,8 @@ static JSValue nonCachingStaticReplaceFunctionGetter(
     JSValue,
     const Identifier& propertyName) {
   return new (exec) NativeFunctionWrapper(
-      exec, exec->lexicalGlobalObject()->prototypeFunctionStructure(), 1,
+      exec, exec->lexicalGlobalObject(),
+      exec->lexicalGlobalObject()->prototypeFunctionStructure(), 1,
       propertyName, jsLocationPrototypeFunctionReplace);
 }
 
@@ -54,7 +55,8 @@ static JSValue nonCachingStaticReloadFunctionGetter(
     JSValue,
     const Identifier& propertyName) {
   return new (exec) NativeFunctionWrapper(
-      exec, exec->lexicalGlobalObject()->prototypeFunctionStructure(), 0,
+      exec, exec->lexicalGlobalObject(),
+      exec->lexicalGlobalObject()->prototypeFunctionStructure(), 0,
       propertyName, jsLocationPrototypeFunctionReload);
 }
 
@@ -63,7 +65,8 @@ static JSValue nonCachingStaticAssignFunctionGetter(
     JSValue,
     const Identifier& propertyName) {
   return new (exec) NativeFunctionWrapper(
-      exec, exec->lexicalGlobalObject()->prototypeFunctionStructure(), 1,
+      exec, exec->lexicalGlobalObject(),
+      exec->lexicalGlobalObject()->prototypeFunctionStructure(), 1,
       propertyName, jsLocationPrototypeFunctionAssign);
 }
 

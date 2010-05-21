@@ -87,7 +87,7 @@ CInstance::~CInstance() {
 }
 
 RuntimeObject* CInstance::newRuntimeObject(ExecState* exec) {
-  return new (exec) CRuntimeObject(exec, this);
+  return new (exec) CRuntimeObject(exec, exec->lexicalGlobalObject(), this);
 }
 
 Class* CInstance::getClass() const {
@@ -103,9 +103,10 @@ bool CInstance::supportsInvokeDefaultMethod() const {
 class CRuntimeMethod : public RuntimeMethod {
  public:
   CRuntimeMethod(ExecState* exec,
+                 JSGlobalObject* globalObject,
                  const Identifier& name,
                  Bindings::MethodList& list)
-      : RuntimeMethod(exec, name, list) {}
+      : RuntimeMethod(exec, globalObject, name, list) {}
 
   virtual const ClassInfo* classInfo() const { return &s_info; }
 
@@ -117,7 +118,8 @@ const ClassInfo CRuntimeMethod::s_info = {"CRuntimeMethod",
 
 JSValue CInstance::getMethod(ExecState* exec, const Identifier& propertyName) {
   MethodList methodList = getClass()->methodsNamed(propertyName, this);
-  return new (exec) CRuntimeMethod(exec, propertyName, methodList);
+  return new (exec) CRuntimeMethod(exec, exec->lexicalGlobalObject(),
+                                   propertyName, methodList);
 }
 
 JSValue CInstance::invokeMethod(ExecState* exec,

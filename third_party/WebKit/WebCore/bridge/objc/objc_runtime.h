@@ -29,6 +29,7 @@
 #include "Bridge.h"
 #include "objc_header.h"
 #include <runtime/JSGlobalObject.h>
+#include <runtime/JSObjectWithGlobalObject.h>
 #include <wtf/RetainPtr.h>
 
 namespace JSC {
@@ -95,9 +96,10 @@ class ObjcArray : public Array {
   RetainPtr<ObjectStructPtr> _array;
 };
 
-class ObjcFallbackObjectImp : public JSObject {
+class ObjcFallbackObjectImp : public JSObjectWithGlobalObject {
  public:
   ObjcFallbackObjectImp(ExecState*,
+                        JSGlobalObject*,
                         ObjcInstance*,
                         const Identifier& propertyName);
 

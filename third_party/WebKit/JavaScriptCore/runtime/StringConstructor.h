@@ -31,6 +31,7 @@ class StringPrototype;
 class StringConstructor : public InternalFunction {
  public:
   StringConstructor(ExecState*,
+                    JSGlobalObject*,
                     NonNullPassRefPtr<Structure>,
                     Structure* prototypeFunctionStructure,
                     StringPrototype*);

@@ -45,6 +45,7 @@ const ClassInfo RuntimeMethod::s_info = {"RuntimeMethod",
                                          &InternalFunction::info, 0, 0};
 
 RuntimeMethod::RuntimeMethod(ExecState* exec,
+                             JSGlobalObject* globalObject,
                              const Identifier& ident,
                              Bindings::MethodList& m)
     // FIXME: deprecatedGetDOMStructure uses the prototype off of the wrong
@@ -53,6 +54,7 @@ RuntimeMethod::RuntimeMethod(ExecState* exec,
     // Callers will need to pass in the right global object corresponding to
     // this native object "m".
     : InternalFunction(&exec->globalData(),
+                       globalObject,
                        deprecatedGetDOMStructure<RuntimeMethod>(exec),
                        ident),
       _methodList(new MethodList(m)) {}

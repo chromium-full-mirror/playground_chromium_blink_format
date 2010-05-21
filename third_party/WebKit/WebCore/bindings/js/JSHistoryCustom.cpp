@@ -43,7 +43,8 @@ static JSValue nonCachingStaticBackFunctionGetter(
     JSValue,
     const Identifier& propertyName) {
   return new (exec) NativeFunctionWrapper(
-      exec, exec->lexicalGlobalObject()->prototypeFunctionStructure(), 0,
+      exec, exec->lexicalGlobalObject(),
+      exec->lexicalGlobalObject()->prototypeFunctionStructure(), 0,
       propertyName, jsHistoryPrototypeFunctionBack);
 }
 
@@ -52,7 +53,8 @@ static JSValue nonCachingStaticForwardFunctionGetter(
     JSValue,
     const Identifier& propertyName) {
   return new (exec) NativeFunctionWrapper(
-      exec, exec->lexicalGlobalObject()->prototypeFunctionStructure(), 0,
+      exec, exec->lexicalGlobalObject(),
+      exec->lexicalGlobalObject()->prototypeFunctionStructure(), 0,
       propertyName, jsHistoryPrototypeFunctionForward);
 }
 
@@ -61,7 +63,8 @@ static JSValue nonCachingStaticGoFunctionGetter(
     JSValue,
     const Identifier& propertyName) {
   return new (exec) NativeFunctionWrapper(
-      exec, exec->lexicalGlobalObject()->prototypeFunctionStructure(), 1,
+      exec, exec->lexicalGlobalObject(),
+      exec->lexicalGlobalObject()->prototypeFunctionStructure(), 1,
       propertyName, jsHistoryPrototypeFunctionGo);
 }
 

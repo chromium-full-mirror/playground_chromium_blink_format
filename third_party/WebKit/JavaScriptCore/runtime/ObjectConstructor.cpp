@@ -67,10 +67,12 @@ static JSValue JSC_HOST_CALL objectConstructorCreate(ExecState*,
                                                      const ArgList&);
 
 ObjectConstructor::ObjectConstructor(ExecState* exec,
+                                     JSGlobalObject* globalObject,
                                      NonNullPassRefPtr<Structure> structure,
                                      ObjectPrototype* objectPrototype,
                                      Structure* prototypeFunctionStructure)
     : InternalFunction(&exec->globalData(),
+                       globalObject,
                        structure,
                        Identifier(exec, "Object")) {
   // ECMA 15.2.3.1
@@ -82,44 +84,44 @@ ObjectConstructor::ObjectConstructor(ExecState* exec,
                              ReadOnly | DontEnum | DontDelete);
 
   putDirectFunctionWithoutTransition(
-      exec,
-      new (exec) NativeFunctionWrapper(exec, prototypeFunctionStructure, 1,
-                                       exec->propertyNames().getPrototypeOf,
-                                       objectConstructorGetPrototypeOf),
+      exec, new (exec) NativeFunctionWrapper(
+                exec, globalObject, prototypeFunctionStructure, 1,
+                exec->propertyNames().getPrototypeOf,
+                objectConstructorGetPrototypeOf),
       DontEnum);
   putDirectFunctionWithoutTransition(
       exec, new (exec) NativeFunctionWrapper(
-                exec, prototypeFunctionStructure, 2,
+                exec, globalObject, prototypeFunctionStructure, 2,
                 exec->propertyNames().getOwnPropertyDescriptor,
                 objectConstructorGetOwnPropertyDescriptor),
       DontEnum);
   putDirectFunctionWithoutTransition(
-      exec, new (exec)
-                NativeFunctionWrapper(exec, prototypeFunctionStructure, 1,
-                                      exec->propertyNames().getOwnPropertyNames,
-                                      objectConstructorGetOwnPropertyNames),
+      exec, new (exec) NativeFunctionWrapper(
+                exec, globalObject, prototypeFunctionStructure, 1,
+                exec->propertyNames().getOwnPropertyNames,
+                objectConstructorGetOwnPropertyNames),
       DontEnum);
   putDirectFunctionWithoutTransition(
-      exec, new (exec) NativeFunctionWrapper(exec, prototypeFunctionStructure,
-                                             1, exec->propertyNames().keys,
-                                             objectConstructorKeys),
+      exec, new (exec) NativeFunctionWrapper(
+                exec, globalObject, prototypeFunctionStructure, 1,
+                exec->propertyNames().keys, objectConstructorKeys),
       DontEnum);
   putDirectFunctionWithoutTransition(
-      exec,
-      new (exec) NativeFunctionWrapper(exec, prototypeFunctionStructure, 3,
-                                       exec->propertyNames().defineProperty,
-                                       objectConstructorDefineProperty),
+      exec, new (exec) NativeFunctionWrapper(
+                exec, globalObject, prototypeFunctionStructure, 3,
+                exec->propertyNames().defineProperty,
+                objectConstructorDefineProperty),
       DontEnum);
   putDirectFunctionWithoutTransition(
-      exec,
-      new (exec) NativeFunctionWrapper(exec, prototypeFunctionStructure, 2,
-                                       exec->propertyNames().defineProperties,
-                                       objectConstructorDefineProperties),
+      exec, new (exec) NativeFunctionWrapper(
+                exec, globalObject, prototypeFunctionStructure, 2,
+                exec->propertyNames().defineProperties,
+                objectConstructorDefineProperties),
       DontEnum);
   putDirectFunctionWithoutTransition(
-      exec, new (exec) NativeFunctionWrapper(exec, prototypeFunctionStructure,
-                                             2, exec->propertyNames().create,
-                                             objectConstructorCreate),
+      exec, new (exec) NativeFunctionWrapper(
+                exec, globalObject, prototypeFunctionStructure, 2,
+                exec->propertyNames().create, objectConstructorCreate),
       DontEnum);
 }
 

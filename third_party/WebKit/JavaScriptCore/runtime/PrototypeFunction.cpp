@@ -34,11 +34,13 @@ namespace JSC {
 ASSERT_CLASS_FITS_IN_CELL(PrototypeFunction);
 
 PrototypeFunction::PrototypeFunction(ExecState* exec,
+                                     JSGlobalObject* globalObject,
                                      int length,
                                      const Identifier& name,
                                      NativeFunction function)
     : InternalFunction(
           &exec->globalData(),
+          globalObject,
           exec->lexicalGlobalObject()->prototypeFunctionStructure(),
           name),
       m_function(function) {
@@ -49,11 +51,15 @@ PrototypeFunction::PrototypeFunction(ExecState* exec,
 
 PrototypeFunction::PrototypeFunction(
     ExecState* exec,
+    JSGlobalObject* globalObject,
     NonNullPassRefPtr<Structure> prototypeFunctionStructure,
     int length,
     const Identifier& name,
     NativeFunction function)
-    : InternalFunction(&exec->globalData(), prototypeFunctionStructure, name),
+    : InternalFunction(&exec->globalData(),
+                       globalObject,
+                       prototypeFunctionStructure,
+                       name),
       m_function(function) {
   ASSERT_ARG(function, function);
   putDirect(exec->propertyNames().length, jsNumber(exec, length),

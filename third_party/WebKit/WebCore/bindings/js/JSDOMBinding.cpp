@@ -728,7 +728,8 @@ JSValue objectToStringFunctionGetter(ExecState* exec,
                                      JSValue,
                                      const Identifier& propertyName) {
   return new (exec) NativeFunctionWrapper(
-      exec, exec->lexicalGlobalObject()->prototypeFunctionStructure(), 0,
+      exec, exec->lexicalGlobalObject(),
+      exec->lexicalGlobalObject()->prototypeFunctionStructure(), 0,
       propertyName, objectProtoFuncToString);
 }
 

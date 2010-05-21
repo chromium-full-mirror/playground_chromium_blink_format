@@ -162,6 +162,18 @@ class JSGlobalObject : public JSVariableObject {
   explicit JSGlobalObject()
       : JSVariableObject(JSGlobalObject::createStructure(jsNull()),
                          new JSGlobalObjectData(destroyJSGlobalObjectData)) {
+    COMPILE_ASSERT(JSGlobalObject::AnonymousSlotCount == 1,
+                   JSGlobalObject_has_only_a_single_slot);
+    putAnonymousValue(0, this);
+    init(this);
+  }
+
+  explicit JSGlobalObject(NonNullPassRefPtr<Structure> structure)
+      : JSVariableObject(structure,
+                         new JSGlobalObjectData(destroyJSGlobalObjectData)) {
+    COMPILE_ASSERT(JSGlobalObject::AnonymousSlotCount == 1,
+                   JSGlobalObject_has_only_a_single_slot);
+    putAnonymousValue(0, this);
     init(this);
   }
 
@@ -170,6 +182,9 @@ class JSGlobalObject : public JSVariableObject {
                  JSGlobalObjectData* data,
                  JSObject* thisValue)
       : JSVariableObject(structure, data) {
+    COMPILE_ASSERT(JSGlobalObject::AnonymousSlotCount == 1,
+                   JSGlobalObject_has_only_a_single_slot);
+    putAnonymousValue(0, this);
     init(thisValue);
   }
 
@@ -328,6 +343,8 @@ class JSGlobalObject : public JSVariableObject {
   }
 
  protected:
+  static const unsigned AnonymousSlotCount =
+      JSVariableObject::AnonymousSlotCount + 1;
   static const unsigned StructureFlags =
       OverridesGetOwnPropertySlot | OverridesMarkChildren |
       OverridesGetPropertyNames | JSVariableObject::StructureFlags;

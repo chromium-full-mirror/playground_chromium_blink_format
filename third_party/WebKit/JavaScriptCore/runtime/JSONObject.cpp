@@ -30,6 +30,7 @@
 #include "Error.h"
 #include "ExceptionHelpers.h"
 #include "JSArray.h"
+#include "JSGlobalObject.h"
 #include "LiteralParser.h"
 #include "Lookup.h"
 #include "PropertyNameArray.h"
@@ -53,6 +54,10 @@ static JSValue JSC_HOST_CALL JSONProtoFuncStringify(ExecState*,
 #include "JSONObject.lut.h"
 
 namespace JSC {
+
+JSONObject::JSONObject(JSGlobalObject* globalObject,
+                       NonNullPassRefPtr<Structure> structure)
+    : JSObjectWithGlobalObject(globalObject, structure) {}
 
 // PropertyNameForFunctionCall objects must be on the stack, since the JSValue
 // that they create is not marked.

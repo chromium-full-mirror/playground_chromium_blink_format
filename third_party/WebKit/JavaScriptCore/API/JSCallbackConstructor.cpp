@@ -38,10 +38,13 @@ namespace JSC {
 const ClassInfo JSCallbackConstructor::info = {"CallbackConstructor", 0, 0, 0};
 
 JSCallbackConstructor::JSCallbackConstructor(
+    JSGlobalObject* globalObject,
     NonNullPassRefPtr<Structure> structure,
     JSClassRef jsClass,
     JSObjectCallAsConstructorCallback callback)
-    : JSObject(structure), m_class(jsClass), m_callback(callback) {
+    : JSObjectWithGlobalObject(globalObject, structure),
+      m_class(jsClass),
+      m_callback(callback) {
   if (m_class)
     JSClassRetain(jsClass);
 }

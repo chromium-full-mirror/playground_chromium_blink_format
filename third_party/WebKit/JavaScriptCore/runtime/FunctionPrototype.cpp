@@ -50,8 +50,10 @@ static JSValue JSC_HOST_CALL functionProtoFuncCall(ExecState*,
                                                    const ArgList&);
 
 FunctionPrototype::FunctionPrototype(ExecState* exec,
+                                     JSGlobalObject* globalObject,
                                      NonNullPassRefPtr<Structure> structure)
     : InternalFunction(&exec->globalData(),
+                       globalObject,
                        structure,
                        exec->propertyNames().nullIdentifier) {
   putDirectWithoutTransition(exec->propertyNames().length, jsNumber(exec, 0),
@@ -60,20 +62,21 @@ FunctionPrototype::FunctionPrototype(ExecState* exec,
 
 void FunctionPrototype::addFunctionProperties(
     ExecState* exec,
+    JSGlobalObject* globalObject,
     Structure* prototypeFunctionStructure,
     NativeFunctionWrapper** callFunction,
     NativeFunctionWrapper** applyFunction) {
   putDirectFunctionWithoutTransition(
-      exec, new (exec) NativeFunctionWrapper(exec, prototypeFunctionStructure,
-                                             0, exec->propertyNames().toString,
-                                             functionProtoFuncToString),
+      exec, new (exec) NativeFunctionWrapper(
+                exec, globalObject, prototypeFunctionStructure, 0,
+                exec->propertyNames().toString, functionProtoFuncToString),
       DontEnum);
   *applyFunction = new (exec) NativeFunctionWrapper(
-      exec, prototypeFunctionStructure, 2, exec->propertyNames().apply,
-      functionProtoFuncApply);
+      exec, globalObject, prototypeFunctionStructure, 2,
+      exec->propertyNames().apply, functionProtoFuncApply);
   putDirectFunctionWithoutTransition(exec, *applyFunction, DontEnum);
   *callFunction = new (exec)
-      NativeFunctionWrapper(exec, prototypeFunctionStructure, 1,
+      NativeFunctionWrapper(exec, globalObject, prototypeFunctionStructure, 1,
                             exec->propertyNames().call, functionProtoFuncCall);
   putDirectFunctionWithoutTransition(exec, *callFunction, DontEnum);
 }

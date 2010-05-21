@@ -29,6 +29,7 @@ namespace JSC {
 class ObjectPrototype : public JSObject {
  public:
   ObjectPrototype(ExecState*,
+                  JSGlobalObject*,
                   NonNullPassRefPtr<Structure>,
                   Structure* prototypeFunctionStructure);
 

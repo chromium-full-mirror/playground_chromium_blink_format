@@ -132,7 +132,8 @@ JSValue nonCachingStaticFunctionGetter(ExecState* exec,
                                        JSValue,
                                        const Identifier& propertyName) {
   return new (exec) NativeFunctionWrapper(
-      exec, exec->lexicalGlobalObject()->prototypeFunctionStructure(), length,
+      exec, exec->lexicalGlobalObject(),
+      exec->lexicalGlobalObject()->prototypeFunctionStructure(), length,
       propertyName, nativeFunction);
 }
 

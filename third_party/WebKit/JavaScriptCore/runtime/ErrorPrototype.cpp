@@ -40,6 +40,7 @@ static JSValue JSC_HOST_CALL errorProtoFuncToString(ExecState*,
 
 // ECMA 15.9.4
 ErrorPrototype::ErrorPrototype(ExecState* exec,
+                               JSGlobalObject* globalObject,
                                NonNullPassRefPtr<Structure> structure,
                                Structure* prototypeFunctionStructure)
     : ErrorInstance(structure) {
@@ -52,9 +53,9 @@ ErrorPrototype::ErrorPrototype(ExecState* exec,
                              DontEnum);
 
   putDirectFunctionWithoutTransition(
-      exec, new (exec) NativeFunctionWrapper(exec, prototypeFunctionStructure,
-                                             0, exec->propertyNames().toString,
-                                             errorProtoFuncToString),
+      exec, new (exec) NativeFunctionWrapper(
+                exec, globalObject, prototypeFunctionStructure, 0,
+                exec->propertyNames().toString, errorProtoFuncToString),
       DontEnum);
 }
 

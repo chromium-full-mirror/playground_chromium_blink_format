@@ -104,9 +104,11 @@ const ClassInfo RegExpConstructor::info = {
 */
 
 RegExpConstructor::RegExpConstructor(ExecState* exec,
+                                     JSGlobalObject* globalObject,
                                      NonNullPassRefPtr<Structure> structure,
                                      RegExpPrototype* regExpPrototype)
     : InternalFunction(&exec->globalData(),
+                       globalObject,
                        structure,
                        Identifier(exec, "RegExp")),
       d(new RegExpConstructorPrivate) {
@@ -354,7 +356,8 @@ JSObject* constructRegExp(ExecState* exec, const ArgList& args) {
     return throwError(
         exec, SyntaxError,
         makeString("Invalid regular expression: ", regExp->errorMessage()));
-  return new (exec) RegExpObject(exec->lexicalGlobalObject()->regExpStructure(),
+  return new (exec) RegExpObject(exec->lexicalGlobalObject(),
+                                 exec->lexicalGlobalObject()->regExpStructure(),
                                  regExp.release());
 }
 

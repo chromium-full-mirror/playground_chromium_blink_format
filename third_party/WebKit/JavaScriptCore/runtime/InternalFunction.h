@@ -24,14 +24,14 @@
 #ifndef InternalFunction_h
 #define InternalFunction_h
 
-#include "JSObject.h"
+#include "JSObjectWithGlobalObject.h"
 #include "Identifier.h"
 
 namespace JSC {
 
 class FunctionPrototype;
 
-class InternalFunction : public JSObject {
+class InternalFunction : public JSObjectWithGlobalObject {
  public:
   virtual const ClassInfo* classInfo() const;
   static JS_EXPORTDATA const ClassInfo info;
@@ -49,9 +49,11 @@ class InternalFunction : public JSObject {
   static const unsigned StructureFlags =
       ImplementsHasInstance | JSObject::StructureFlags;
 
-  InternalFunction(NonNullPassRefPtr<Structure> structure)
-      : JSObject(structure) {}
+  // Only used to allow us to determine the JSFunction vptr
+  InternalFunction(NonNullPassRefPtr<Structure> structure);
+
   InternalFunction(JSGlobalData*,
+                   JSGlobalObject*,
                    NonNullPassRefPtr<Structure>,
                    const Identifier&);
 

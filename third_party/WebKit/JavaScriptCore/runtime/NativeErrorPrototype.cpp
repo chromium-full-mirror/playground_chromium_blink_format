@@ -23,6 +23,7 @@
 #include "NativeErrorPrototype.h"
 
 #include "ErrorPrototype.h"
+#include "JSGlobalObject.h"
 #include "JSString.h"
 #include "UString.h"
 
@@ -32,10 +33,11 @@ ASSERT_CLASS_FITS_IN_CELL(NativeErrorPrototype);
 
 NativeErrorPrototype::NativeErrorPrototype(
     ExecState* exec,
+    JSGlobalObject* globalObject,
     NonNullPassRefPtr<Structure> structure,
     const UString& name,
     const UString& message)
-    : JSObject(structure) {
+    : JSObjectWithGlobalObject(globalObject, structure) {
   putDirect(exec->propertyNames().name, jsString(exec, name), 0);
   putDirect(exec->propertyNames().message, jsString(exec, message), 0);
 }

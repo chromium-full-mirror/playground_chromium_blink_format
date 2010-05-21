@@ -126,8 +126,9 @@ bool JSValueIsObjectOfClass(JSContextRef ctx,
     if (o->inherits(&JSCallbackObject<JSGlobalObject>::info))
       return static_cast<JSCallbackObject<JSGlobalObject>*>(o)->inherits(
           jsClass);
-    else if (o->inherits(&JSCallbackObject<JSObject>::info))
-      return static_cast<JSCallbackObject<JSObject>*>(o)->inherits(jsClass);
+    else if (o->inherits(&JSCallbackObject<JSObjectWithGlobalObject>::info))
+      return static_cast<JSCallbackObject<JSObjectWithGlobalObject>*>(o)
+          ->inherits(jsClass);
   }
   return false;
 }

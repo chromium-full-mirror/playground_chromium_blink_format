@@ -33,6 +33,7 @@ class JSGlobalObject;
 class GlobalEvalFunction : public PrototypeFunction {
  public:
   GlobalEvalFunction(ExecState*,
+                     JSGlobalObject*,
                      NonNullPassRefPtr<Structure>,
                      int len,
                      const Identifier&,

@@ -31,6 +31,7 @@ class BooleanPrototype;
 class BooleanConstructor : public InternalFunction {
  public:
   BooleanConstructor(ExecState*,
+                     JSGlobalObject*,
                      NonNullPassRefPtr<Structure>,
                      BooleanPrototype*);
 

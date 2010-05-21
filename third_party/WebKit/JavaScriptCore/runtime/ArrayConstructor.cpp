@@ -41,11 +41,13 @@ static JSValue JSC_HOST_CALL arrayConstructorIsArray(ExecState*,
                                                      const ArgList&);
 
 ArrayConstructor::ArrayConstructor(ExecState* exec,
+                                   JSGlobalObject* globalObject,
                                    NonNullPassRefPtr<Structure> structure,
                                    ArrayPrototype* arrayPrototype,
                                    Structure* prototypeFunctionStructure)
     : InternalFunction(
           &exec->globalData(),
+          globalObject,
           structure,
           Identifier(exec, arrayPrototype->classInfo()->className)) {
   // ECMA 15.4.3.1 Array.prototype
@@ -58,9 +60,9 @@ ArrayConstructor::ArrayConstructor(ExecState* exec,
 
   // ES5
   putDirectFunctionWithoutTransition(
-      exec, new (exec) NativeFunctionWrapper(exec, prototypeFunctionStructure,
-                                             1, exec->propertyNames().isArray,
-                                             arrayConstructorIsArray),
+      exec, new (exec) NativeFunctionWrapper(
+                exec, globalObject, prototypeFunctionStructure, 1,
+                exec->propertyNames().isArray, arrayConstructorIsArray),
       DontEnum);
 }
 
