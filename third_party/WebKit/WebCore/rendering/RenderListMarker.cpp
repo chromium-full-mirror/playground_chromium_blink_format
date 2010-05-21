@@ -105,9 +105,10 @@ static inline String toAlphabeticOrNumeric(int number,
   int length = 1;
 
   if (type == AlphabeticSequence) {
-    while ((numberShadow /= sequenceSize) > 0)
-      letters[lettersSize - ++length] =
-          sequence[numberShadow % sequenceSize - 1];
+    while ((numberShadow /= sequenceSize) > 0) {
+      --numberShadow;
+      letters[lettersSize - ++length] = sequence[numberShadow % sequenceSize];
+    }
   } else {
     while ((numberShadow /= sequenceSize) > 0)
       letters[lettersSize - ++length] = sequence[numberShadow % sequenceSize];
