@@ -64,7 +64,8 @@ class WebView : public IWebView,
                 public IWebViewEditingActions,
                 public IWebNotificationObserver,
                 public IDropTarget,
-                WebCore::WindowMessageListener {
+                WebCore::WindowMessageListener,
+                WebCore::WKCACFLayerRendererClient {
  public:
   static WebView* createInstance();
 
@@ -990,6 +991,9 @@ class WebView : public IWebView,
   // drag-and-drop operation.
   // (see https://bugs.webkit.org/show_bug.cgi?id=29264)
   DWORD m_lastDropEffect;
+
+  // WKCACFLayerRendererClient
+  virtual bool shouldRender() const;
 
  protected:
   static bool registerWebViewWindowClass();
