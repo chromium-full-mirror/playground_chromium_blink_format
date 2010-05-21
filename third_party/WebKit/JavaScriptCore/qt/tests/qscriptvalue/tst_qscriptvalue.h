@@ -25,6 +25,9 @@
 #include <QtCore/qnumeric.h>
 #include <QtTest/qtest.h>
 
+#define DEFINE_TEST_VALUE(expr) \
+  m_values.insert(QString::fromLatin1(#expr), expr)
+
 Q_DECLARE_METATYPE(QScriptValue*);
 Q_DECLARE_METATYPE(QScriptValue);
 
