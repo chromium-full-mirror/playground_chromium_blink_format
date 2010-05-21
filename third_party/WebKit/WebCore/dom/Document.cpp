@@ -2438,12 +2438,13 @@ void Document::processViewport(const String& features) {
   if (!frame)
     return;
 
-  ViewportArguments arguments;
-  processArguments(features, (void*)&arguments, &setViewportFeature);
+  if (frame->page()) {
+    ViewportArguments arguments;
+    processArguments(features, (void*)&arguments, &setViewportFeature);
 
-  if (frame->page())
     frame->page()->chrome()->client()->didReceiveViewportArguments(frame,
                                                                    arguments);
+  }
 }
 
 MouseEventWithHitTestResults Document::prepareMouseEvent(
