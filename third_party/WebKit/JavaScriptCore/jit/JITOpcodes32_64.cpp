@@ -1077,8 +1077,7 @@ void JIT::emit_op_put_global_var(Instruction* currentInstruction) {
 void JIT::emit_op_get_scoped_var(Instruction* currentInstruction) {
   int dst = currentInstruction[1].u.operand;
   int index = currentInstruction[2].u.operand;
-  int skip =
-      currentInstruction[3].u.operand + m_codeBlock->needsFullScopeChain();
+  int skip = currentInstruction[3].u.operand;
 
   emitGetFromCallFrameHeaderPtr(RegisterFile::ScopeChain, regT2);
   while (skip--)
@@ -1097,8 +1096,7 @@ void JIT::emit_op_get_scoped_var(Instruction* currentInstruction) {
 
 void JIT::emit_op_put_scoped_var(Instruction* currentInstruction) {
   int index = currentInstruction[1].u.operand;
-  int skip =
-      currentInstruction[2].u.operand + m_codeBlock->needsFullScopeChain();
+  int skip = currentInstruction[2].u.operand;
   int value = currentInstruction[3].u.operand;
 
   emitLoad(value, regT1, regT0);
@@ -1196,8 +1194,7 @@ void JIT::emit_op_resolve_skip(Instruction* currentInstruction) {
   JITStubCall stubCall(this, cti_op_resolve_skip);
   stubCall.addArgument(
       ImmPtr(&m_codeBlock->identifier(currentInstruction[2].u.operand)));
-  stubCall.addArgument(Imm32(currentInstruction[3].u.operand +
-                             m_codeBlock->needsFullScopeChain()));
+  stubCall.addArgument(Imm32(currentInstruction[3].u.operand));
   stubCall.call(currentInstruction[1].u.operand);
 }
 

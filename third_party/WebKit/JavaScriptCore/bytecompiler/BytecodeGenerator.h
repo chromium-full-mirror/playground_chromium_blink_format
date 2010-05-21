@@ -119,9 +119,6 @@ class BytecodeGenerator : public FastAllocBase {
   // VariableObject that defines the property.  If the property cannot be found
   // statically, depth will contain the depth of the scope chain where dynamic
   // lookup must begin.
-  //
-  // NB: depth does _not_ include the local scope.  eg. a depth of 0 refers
-  // to the scope containing this codeblock.
   bool findScopedProperty(const Identifier&,
                           int& index,
                           size_t& depth,
