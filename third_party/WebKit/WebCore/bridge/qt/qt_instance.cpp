@@ -47,7 +47,7 @@ static QObjectInstanceMap cachedInstances;
 // Derived RuntimeObject
 class QtRuntimeObject : public RuntimeObject {
  public:
-  QtRuntimeObject(ExecState*, PassRefPtr<Instance>);
+  QtRuntimeObject(ExecState*, JSGlobalObject*, PassRefPtr<Instance>);
 
   static const ClassInfo s_info;
 
@@ -74,8 +74,11 @@ class QtRuntimeObject : public RuntimeObject {
 const ClassInfo QtRuntimeObject::s_info = {"QtRuntimeObject",
                                            &RuntimeObject::s_info, 0, 0};
 
-QtRuntimeObject::QtRuntimeObject(ExecState* exec, PassRefPtr<Instance> instance)
+QtRuntimeObject::QtRuntimeObject(ExecState* exec,
+                                 JSGlobalObject* globalObject,
+                                 PassRefPtr<Instance> instance)
     : RuntimeObject(exec,
+                    globalObject,
                     WebCore::deprecatedGetDOMStructure<QtRuntimeObject>(exec),
                     instance) {}
 
@@ -191,7 +194,7 @@ Class* QtInstance::getClass() const {
 
 RuntimeObject* QtInstance::newRuntimeObject(ExecState* exec) {
   JSLock lock(SilenceAssertionsOnly);
-  return new (exec) QtRuntimeObject(exec, this);
+  return new (exec) QtRuntimeObject(exec, exec->lexicalGlobalObject(), this);
 }
 
 void QtInstance::markAggregate(MarkStack& markStack) {
@@ -249,7 +252,8 @@ JSValue QtInstance::getMethod(ExecState* exec, const Identifier& propertyName) {
   if (!getClass())
     return jsNull();
   MethodList methodList = m_class->methodsNamed(propertyName, this);
-  return new (exec) RuntimeMethod(exec, propertyName, methodList);
+  return new (exec) RuntimeMethod(exec, exec->lexicalGlobalObject(),
+                                  propertyName, methodList);
 }
 
 JSValue QtInstance::invokeMethod(ExecState*, RuntimeMethod*, const ArgList&) {

@@ -149,7 +149,7 @@ struct QtPixmapMetaData {
 // Derived RuntimeObject
 class QtPixmapRuntimeObject : public RuntimeObject {
  public:
-  QtPixmapRuntimeObject(ExecState*, PassRefPtr<Instance>);
+  QtPixmapRuntimeObject(ExecState*, JSGlobalObject*, PassRefPtr<Instance>);
 
   static const ClassInfo s_info;
 
@@ -167,9 +167,11 @@ class QtPixmapRuntimeObject : public RuntimeObject {
 };
 
 QtPixmapRuntimeObject::QtPixmapRuntimeObject(ExecState* exec,
+                                             JSGlobalObject* globalObject,
                                              PassRefPtr<Instance> instance)
     : RuntimeObject(
           exec,
+          globalObject,
           WebCore::deprecatedGetDOMStructure<QtPixmapRuntimeObject>(exec),
           instance) {}
 
@@ -185,7 +187,8 @@ Class* QtPixmapInstance::getClass() const {
 JSValue QtPixmapInstance::getMethod(ExecState* exec,
                                     const Identifier& propertyName) {
   MethodList methodList = getClass()->methodsNamed(propertyName, this);
-  return new (exec) RuntimeMethod(exec, propertyName, methodList);
+  return new (exec) RuntimeMethod(exec, exec->lexicalGlobalObject(),
+                                  propertyName, methodList);
 }
 
 JSValue QtPixmapInstance::invokeMethod(ExecState* exec,
@@ -357,8 +360,8 @@ JSObject* QtPixmapInstance::createRuntimeObject(ExecState* exec,
                                                 PassRefPtr<RootObject> root,
                                                 const QVariant& data) {
   JSLock lock(SilenceAssertionsOnly);
-  return new (exec)
-      QtPixmapRuntimeObject(exec, new QtPixmapInstance(root, data));
+  return new (exec) QtPixmapRuntimeObject(exec, exec->lexicalGlobalObject(),
+                                          new QtPixmapInstance(root, data));
 }
 
 bool QtPixmapInstance::canHandle(QMetaType::Type hint) {
