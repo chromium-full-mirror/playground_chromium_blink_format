@@ -263,7 +263,7 @@ bool SVGImage::dataChanged(bool allDataReceived) {
     // holding Frames and won't know to break the cycle. But
     m_page.set(new Page(m_chromeClient.get(), dummyContextMenuClient,
                         dummyEditorClient, dummyDragClient,
-                        dummyInspectorClient, 0, 0));
+                        dummyInspectorClient, 0, 0, 0));
     m_page->settings()->setMediaEnabled(false);
     m_page->settings()->setJavaScriptEnabled(false);
     m_page->settings()->setPluginsEnabled(false);
