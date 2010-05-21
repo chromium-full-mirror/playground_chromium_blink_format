@@ -2322,6 +2322,10 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_get_by_val) {
   if (LIKELY(baseValue.isCell() && subscript.isString())) {
     Identifier propertyName(callFrame, asString(subscript)->value(callFrame));
     PropertySlot slot(asCell(baseValue));
+    // JSString::value may have thrown, but we shouldn't find a property with a
+    // null identifier,
+    // so we should miss this case and wind up in the
+    // CHECK_FOR_EXCEPTION_AT_END, below.
     if (asCell(baseValue)->fastGetOwnPropertySlot(callFrame, propertyName,
                                                   slot)) {
       JSValue result = slot.getValue(callFrame, propertyName);
@@ -3258,9 +3262,11 @@ DEFINE_STUB_FUNCTION(int, has_property) {
 
   JSObject* base = stackFrame.args[0].jsObject();
   JSString* property = stackFrame.args[1].jsString();
-  return base->hasProperty(
+  int result = base->hasProperty(
       stackFrame.callFrame,
       Identifier(stackFrame.callFrame, property->value(stackFrame.callFrame)));
+  CHECK_FOR_EXCEPTION_AT_END();
+  return result;
 }
 
 DEFINE_STUB_FUNCTION(JSObject*, op_push_scope) {
@@ -3335,8 +3341,9 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_stricteq) {
   JSValue src1 = stackFrame.args[0].jsValue();
   JSValue src2 = stackFrame.args[1].jsValue();
 
-  return JSValue::encode(
-      jsBoolean(JSValue::strictEqual(stackFrame.callFrame, src1, src2)));
+  bool result = JSValue::strictEqual(stackFrame.callFrame, src1, src2);
+  CHECK_FOR_EXCEPTION_AT_END();
+  return JSValue::encode(jsBoolean(result));
 }
 
 DEFINE_STUB_FUNCTION(EncodedJSValue, op_to_primitive) {
@@ -3363,8 +3370,9 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_nstricteq) {
   JSValue src1 = stackFrame.args[0].jsValue();
   JSValue src2 = stackFrame.args[1].jsValue();
 
-  return JSValue::encode(
-      jsBoolean(!JSValue::strictEqual(stackFrame.callFrame, src1, src2)));
+  bool result = !JSValue::strictEqual(stackFrame.callFrame, src1, src2);
+  CHECK_FOR_EXCEPTION_AT_END();
+  return JSValue::encode(jsBoolean(result));
 }
 
 DEFINE_STUB_FUNCTION(EncodedJSValue, op_to_jsnumber) {
@@ -3485,6 +3493,7 @@ DEFINE_STUB_FUNCTION(void*, op_switch_char) {
                    .executableAddress();
   }
 
+  CHECK_FOR_EXCEPTION_AT_END();
   return result;
 }
 
@@ -3506,6 +3515,7 @@ DEFINE_STUB_FUNCTION(void*, op_switch_string) {
                  .executableAddress();
   }
 
+  CHECK_FOR_EXCEPTION_AT_END();
   return result;
 }
 

@@ -331,10 +331,9 @@ class JS_EXPORTCLASS JSString : public JSCell {
       resolveRope(exec);
     return m_value;
   }
-  const UString tryGetValue() const {
-    // If this is a rope, m_value should be null -
-    // if this is not a rope, m_value should be non-null.
-    ASSERT(isRope() == m_value.isNull());
+  const UString& tryGetValue() const {
+    if (isRope())
+      resolveRope(0);
     return m_value;
   }
   unsigned length() { return m_length; }
@@ -528,7 +527,7 @@ inline JSString* JSString::getIndex(ExecState* exec, unsigned i) {
   if (isRope())
     return getIndexSlowCase(exec, i);
   ASSERT(i < m_value.size());
-  return jsSingleCharacterSubstring(exec, value(exec), i);
+  return jsSingleCharacterSubstring(exec, m_value, i);
 }
 
 inline JSString* jsString(JSGlobalData* globalData, const UString& s) {

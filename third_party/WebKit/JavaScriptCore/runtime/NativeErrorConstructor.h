@@ -34,8 +34,9 @@ class NativeErrorConstructor : public InternalFunction {
  public:
   NativeErrorConstructor(ExecState*,
                          JSGlobalObject*,
-                         NonNullPassRefPtr<Structure>,
-                         NativeErrorPrototype*);
+                         NonNullPassRefPtr<Structure> structure,
+                         NonNullPassRefPtr<Structure> prototypeStructure,
+                         const UString&);
 
   static const ClassInfo info;
 
