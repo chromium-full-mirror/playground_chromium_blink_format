@@ -113,6 +113,6 @@ ScriptExecutionContext* DatabaseSync::scriptExecutionContext() const {
   return m_scriptExecutionContext.get();
 }
 
-#endif  // ENABLE(DATABASE)
-
 }  // namespace WebCore
+
+#endif  // ENABLE(DATABASE)
