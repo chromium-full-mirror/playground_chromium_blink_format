@@ -444,6 +444,8 @@ class PluginView : public Widget,
   bool m_isHalted;
   bool m_hasBeenHalted;
 
+  bool m_haveCalledSetWindow;
+
   static PluginView* s_currentPluginView;
 };
 
