@@ -52,6 +52,10 @@ class ImageGStreamer : public RefCounted<ImageGStreamer> {
   ImageGStreamer(GstBuffer*&, IntSize, cairo_format_t&);
   cairo_surface_t* m_surface;
 #endif
+
+#if PLATFORM(MAC)
+  ImageGStreamer(GstBuffer*&, IntSize);
+#endif
 };
 }
 
