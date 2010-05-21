@@ -852,6 +852,7 @@ JSValue convertQVariantToValue(ExecState* exec,
           JSC::RegExp::create(&exec->globalData(), pattern, uflags);
       if (regExp->isValid())
         return new (exec) RegExpObject(
+            exec->lexicalGlobalObject(),
             exec->lexicalGlobalObject()->regExpStructure(), regExp.release());
       else
         return jsNull();
@@ -989,6 +990,7 @@ QtRuntimeMethod::QtRuntimeMethod(QtRuntimeMethodData* dd,
                                  const Identifier& ident,
                                  PassRefPtr<QtInstance> inst)
     : InternalFunction(&exec->globalData(),
+                       exec->lexicalGlobalObject(),
                        deprecatedGetDOMStructure<QtRuntimeMethod>(exec),
                        ident),
       d_ptr(dd) {
