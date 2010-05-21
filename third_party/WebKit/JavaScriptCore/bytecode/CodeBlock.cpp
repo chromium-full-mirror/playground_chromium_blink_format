@@ -1247,7 +1247,7 @@ void CodeBlock::dump(ExecState* exec,
     }
     case op_call_put_result: {
       int r0 = (++it)->u.operand;
-      printf("[%4d] ret_result\t\t %s\n", location,
+      printf("[%4d] op_call_put_result\t\t %s\n", location,
              registerName(exec, r0).data());
       break;
     }
