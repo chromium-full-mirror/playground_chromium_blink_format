@@ -100,10 +100,12 @@ class WebAccessibilityObject {
 
   WebRect boundingBoxRect() const;
   WebString helpText() const;
+  int headingLevel() const;
   WebAccessibilityObject hitTest(const WebPoint&) const;
   WebString keyboardShortcut() const;
   bool performDefaultAction() const;
   WebAccessibilityRole roleValue() const;
+  void setFocused(bool) const;
   WebString stringValue() const;
   WebString title() const;
 

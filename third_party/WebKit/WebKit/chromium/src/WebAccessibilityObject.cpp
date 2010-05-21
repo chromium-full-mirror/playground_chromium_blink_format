@@ -274,6 +274,14 @@ WebString WebAccessibilityObject::helpText() const {
   return m_private->helpText();
 }
 
+int WebAccessibilityObject::headingLevel() const {
+  if (!m_private)
+    return 0;
+
+  m_private->updateBackingStore();
+  return m_private->headingLevel();
+}
+
 WebAccessibilityObject WebAccessibilityObject::hitTest(
     const WebPoint& point) const {
   if (!m_private)
@@ -336,6 +344,11 @@ WebAccessibilityRole WebAccessibilityObject::roleValue() const {
 
   m_private->updateBackingStore();
   return static_cast<WebAccessibilityRole>(m_private->roleValue());
+}
+
+void WebAccessibilityObject::setFocused(bool on) const {
+  if (m_private)
+    m_private->setFocused(on);
 }
 
 WebString WebAccessibilityObject::stringValue() const {
