@@ -50,6 +50,7 @@
 #include "HTMLElement.h"
 #include "HTMLNames.h"
 #include "InlineTextBox.h"
+#include "KURL.h"
 #include "Logging.h"
 #include "ProcessingInstruction.h"
 #include "QualifiedName.h"
@@ -1429,5 +1430,16 @@ String createFullMarkup(const Range* range) {
   // method.
   return frame->documentTypeString() +
          createMarkup(range, 0, AnnotateForInterchange);
+}
+
+String urlToMarkup(const KURL& url, const String& title) {
+  Vector<UChar> markup;
+  append(markup, "<a href=\"");
+  append(markup, url.string());
+  append(markup, "\">");
+  appendEscapedContent(markup, make_pair(title.characters(), title.length()),
+                       false);
+  append(markup, "</a>");
+  return String::adopt(markup);
 }
 }

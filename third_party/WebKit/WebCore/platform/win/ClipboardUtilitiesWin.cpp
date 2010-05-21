@@ -208,16 +208,6 @@ void markupToCF_HTML(const String& markup,
 #undef NUMBER_FORMAT
 }
 
-String urlToMarkup(const KURL& url, const String& title) {
-  Vector<UChar> markup;
-  append(markup, "<a href=\"");
-  append(markup, url.string());
-  append(markup, "\">");
-  append(markup, title);
-  append(markup, "</a>");
-  return String::adopt(markup);
-}
-
 void replaceNewlinesWithWindowsStyleNewlines(String& str) {
   static const UChar Newline = '\n';
   static const char* const WindowsNewline("\r\n");

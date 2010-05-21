@@ -52,7 +52,6 @@ FORMATETC* smartPasteFormat();
 void markupToCF_HTML(const String& markup,
                      const String& srcURL,
                      Vector<char>& result);
-String urlToMarkup(const KURL& url, const String& title);
 
 void replaceNewlinesWithWindowsStyleNewlines(String&);
 void replaceNBSPWithSpace(String&);
