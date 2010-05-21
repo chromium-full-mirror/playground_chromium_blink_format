@@ -57,6 +57,18 @@ void write(TextStream&,
            RenderAsTextBehavior = RenderAsTextBehaviorNormal);
 void writeIndent(TextStream&, int indent);
 
+class RenderTreeAsText {
+  // FIXME: This is a cheesy hack to allow easy access to RenderStyle colors.
+  // It won't be needed if we convert
+  // it to use visitedDependentColor instead. (This just involves rebaselining
+  // many results though, so for now it's
+  // not being done).
+ public:
+  static void writeRenderObject(TextStream& ts,
+                                const RenderObject& o,
+                                RenderAsTextBehavior behavior);
+};
+
 // Helper function shared with SVGRenderTreeAsText
 String quoteAndEscapeNonPrintables(const String&);
 

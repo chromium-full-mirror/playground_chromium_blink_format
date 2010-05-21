@@ -34,6 +34,8 @@ class CSSPrimitiveValue;
 class HTMLElement;
 class StyleChange;
 
+enum ShouldIncludeTypingStyle { IncludeTypingStyle, IgnoreTypingStyle };
+
 class ApplyStyleCommand : public CompositeEditCommand {
  public:
   enum EPropertyLevel { PropertyDefault, ForceBlockProperties };
@@ -61,6 +63,10 @@ class ApplyStyleCommand : public CompositeEditCommand {
       EditAction action = EditActionChangeAttributes) {
     return adoptRef(new ApplyStyleCommand(element, removeOnly, action));
   }
+
+  static PassRefPtr<CSSMutableStyleDeclaration> editingStyleAtPosition(
+      Position pos,
+      ShouldIncludeTypingStyle shouldIncludeTypingStyle = IgnoreTypingStyle);
 
  private:
   ApplyStyleCommand(Document*,
@@ -161,11 +167,6 @@ RefPtr<CSSMutableStyleDeclaration> getPropertiesNotInComputedStyle(
     CSSStyleDeclaration* style,
     CSSComputedStyleDeclaration* computedStyle);
 
-enum ShouldIncludeTypingStyle { IncludeTypingStyle, IgnoreTypingStyle };
-
-PassRefPtr<CSSMutableStyleDeclaration> editingStyleAtPosition(
-    Position,
-    ShouldIncludeTypingStyle = IgnoreTypingStyle);
 void prepareEditingStyleToApplyAt(CSSMutableStyleDeclaration*, Position);
 void removeStylesAddedByNode(CSSMutableStyleDeclaration*, Node*);
 

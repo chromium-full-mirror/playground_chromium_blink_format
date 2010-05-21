@@ -131,7 +131,8 @@ void RenderFieldset::paintBoxDecorations(PaintInfo& paintInfo, int tx, int ty) {
 
   paintBoxShadow(paintInfo.context, tx, ty, w, h, style(), Normal);
 
-  paintFillLayers(paintInfo, style()->backgroundColor(),
+  paintFillLayers(paintInfo,
+                  style()->visitedDependentColor(CSSPropertyBackgroundColor),
                   style()->backgroundLayers(), tx, ty, w, h);
   paintBoxShadow(paintInfo.context, tx, ty, w, h, style(), Inset);
 

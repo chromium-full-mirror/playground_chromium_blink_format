@@ -32,6 +32,7 @@
 #include "CSSHelper.h"
 #include "CSSImageGeneratorValue.h"
 #include "CSSPrimitiveValue.h"
+#include "CSSPropertyNames.h"
 #include "CSSReflectionDirection.h"
 #include "CSSValueList.h"
 #include "CachedImage.h"
@@ -116,8 +117,22 @@ class StyleImage;
 typedef Vector<RefPtr<RenderStyle>, 4> PseudoStyleCache;
 
 class RenderStyle : public RefCounted<RenderStyle> {
-  friend class CSSStyleSelector;
-
+  friend class AnimationBase;  // Used by CSS animations. We can't allow them to
+                               // animate based off visited colors.
+  friend class ApplyStyleCommand;  // Editing has to only reveal unvisited info.
+  friend class CSSStyleSelector;   // Sets members directly.
+  friend class CSSComputedStyleDeclaration;  // Ignores visited styles, so needs
+                                             // to be able to see unvisited
+                                             // info.
+  friend class PropertyWrapperMaybeInvalidColor;  // Used by CSS animations. We
+                                                  // can't allow them to animate
+                                                  // based off visited colors.
+  friend class RenderSVGResource;  // FIXME: Needs to alter the visited state by
+                                   // hand. Should clean the SVG code up and
+                                   // move it into RenderStyle perhaps.
+  friend class RenderTreeAsText;   // FIXME: Only needed so the render tree can
+                                   // keep lying and dump the wrong colors.
+                                  // Rebaselining would allow this to be yanked.
  protected:
   // The following bitfield is 32-bits long, which optimizes padding with the
   // int refCount in the base class. Beware when adding more bits.
@@ -366,11 +381,6 @@ class RenderStyle : public RefCounted<RenderStyle> {
   bool hasPadding() const { return surround->padding.nonZero(); }
   bool hasOffset() const { return surround->offset.nonZero(); }
 
-  bool hasBackground() const {
-    if (backgroundColor().isValid() && backgroundColor().alpha() > 0)
-      return true;
-    return m_background->background().hasImage();
-  }
   bool hasBackgroundImage() const {
     return m_background->background().hasImage();
   }
@@ -454,9 +464,6 @@ class RenderStyle : public RefCounted<RenderStyle> {
   EBorderStyle borderLeftStyle() const {
     return surround->border.left().style();
   }
-  const Color& borderLeftColor() const {
-    return surround->border.left().color();
-  }
   bool borderLeftIsTransparent() const {
     return surround->border.left().isTransparent();
   }
@@ -466,9 +473,6 @@ class RenderStyle : public RefCounted<RenderStyle> {
   EBorderStyle borderRightStyle() const {
     return surround->border.right().style();
   }
-  const Color& borderRightColor() const {
-    return surround->border.right().color();
-  }
   bool borderRightIsTransparent() const {
     return surround->border.right().isTransparent();
   }
@@ -476,7 +480,6 @@ class RenderStyle : public RefCounted<RenderStyle> {
     return surround->border.borderTopWidth();
   }
   EBorderStyle borderTopStyle() const { return surround->border.top().style(); }
-  const Color& borderTopColor() const { return surround->border.top().color(); }
   bool borderTopIsTransparent() const {
     return surround->border.top().isTransparent();
   }
@@ -485,9 +488,6 @@ class RenderStyle : public RefCounted<RenderStyle> {
   }
   EBorderStyle borderBottomStyle() const {
     return surround->border.bottom().style();
-  }
-  const Color& borderBottomColor() const {
-    return surround->border.bottom().color();
   }
   bool borderBottomIsTransparent() const {
     return surround->border.bottom().isTransparent();
@@ -506,7 +506,6 @@ class RenderStyle : public RefCounted<RenderStyle> {
   }
   EBorderStyle outlineStyle() const { return m_background->outline().style(); }
   bool outlineStyleIsAuto() const { return m_background->outline().isAuto(); }
-  const Color& outlineColor() const { return m_background->outline().color(); }
 
   EOverflow overflowX() const {
     return static_cast<EOverflow>(noninherited_flags._overflowX);
@@ -547,7 +546,6 @@ class RenderStyle : public RefCounted<RenderStyle> {
   }
   int fontSize() const { return inherited->font.pixelSize(); }
 
-  const Color& color() const { return inherited->color; }
   Length textIndent() const { return rareInheritedData->indent; }
   ETextAlign textAlign() const {
     return static_cast<ETextAlign>(inherited_flags._text_align);
@@ -626,7 +624,6 @@ class RenderStyle : public RefCounted<RenderStyle> {
     return wordBreak() == BreakWordBreak || wordWrap() == BreakWordWrap;
   }
 
-  const Color& backgroundColor() const { return m_background->color(); }
   StyleImage* backgroundImage() const {
     return m_background->background().image();
   }
@@ -789,13 +786,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
   }
 
   const ShadowData* textShadow() const { return rareInheritedData->textShadow; }
-  const Color& textStrokeColor() const {
-    return rareInheritedData->textStrokeColor;
-  }
   float textStrokeWidth() const { return rareInheritedData->textStrokeWidth; }
-  const Color& textFillColor() const {
-    return rareInheritedData->textFillColor;
-  }
   ColorSpace colorSpace() const {
     return static_cast<ColorSpace>(rareInheritedData->colorSpace);
   }
@@ -909,9 +900,6 @@ class RenderStyle : public RefCounted<RenderStyle> {
   float columnGap() const { return rareNonInheritedData->m_multiCol->m_gap; }
   bool hasNormalColumnGap() const {
     return rareNonInheritedData->m_multiCol->m_normalGap;
-  }
-  const Color& columnRuleColor() const {
-    return rareNonInheritedData->m_multiCol->m_rule.color();
   }
   EBorderStyle columnRuleStyle() const {
     return rareNonInheritedData->m_multiCol->m_rule.style();
@@ -1730,7 +1718,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
   unsigned childIndex() const { return m_childIndex; }
   void setChildIndex(unsigned index) { m_childIndex = index; }
 
-  Color visitedDependentColor(int colorProperty) const;
+  const Color visitedDependentColor(int colorProperty) const;
 
   // Initial values for all the properties
   static bool initialBorderCollapse() { return false; }
@@ -1840,6 +1828,35 @@ class RenderStyle : public RefCounted<RenderStyle> {
   static const Vector<StyleDashboardRegion>& initialDashboardRegions();
   static const Vector<StyleDashboardRegion>& noneDashboardRegions();
 #endif
+
+ private:
+  // Color accessors are all private to make sure callers use
+  // visitedDependentColor instead to access them.
+  const Color& borderLeftColor() const {
+    return surround->border.left().color();
+  }
+  const Color& borderRightColor() const {
+    return surround->border.right().color();
+  }
+  const Color& borderTopColor() const { return surround->border.top().color(); }
+  const Color& borderBottomColor() const {
+    return surround->border.bottom().color();
+  }
+  const Color& backgroundColor() const { return m_background->color(); }
+  const Color& color() const { return inherited->color; }
+  const Color& columnRuleColor() const {
+    return rareNonInheritedData->m_multiCol->m_rule.color();
+  }
+  const Color& outlineColor() const { return m_background->outline().color(); }
+  const Color& textFillColor() const {
+    return rareInheritedData->textFillColor;
+  }
+  const Color& textStrokeColor() const {
+    return rareInheritedData->textStrokeColor;
+  }
+
+  const Color colorIncludingFallback(int colorProperty,
+                                     EBorderStyle borderStyle) const;
 };
 
 }  // namespace WebCore

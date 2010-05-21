@@ -1140,7 +1140,8 @@ String createMarkup(const Range* range,
   Node* parentOfLastClosed = lastClosed ? lastClosed->parentNode() : 0;
   if (parentOfLastClosed && parentOfLastClosed->renderer()) {
     RefPtr<CSSMutableStyleDeclaration> style =
-        editingStyleAtPosition(Position(parentOfLastClosed, 0));
+        ApplyStyleCommand::editingStyleAtPosition(
+            Position(parentOfLastClosed, 0));
 
     // Styles that Mail blockquotes contribute should only be placed on the Mail
     // blockquote, to help
@@ -1172,7 +1173,8 @@ String createMarkup(const Range* range,
     // and user
     // applied styles.
     RefPtr<CSSMutableStyleDeclaration> defaultStyle =
-        editingStyleAtPosition(Position(document->documentElement(), 0));
+        ApplyStyleCommand::editingStyleAtPosition(
+            Position(document->documentElement(), 0));
 
     if (defaultStyle->length() > 0)
       addStyleMarkup(preMarkups, markups, defaultStyle.get(), document);

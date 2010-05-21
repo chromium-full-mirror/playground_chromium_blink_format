@@ -193,7 +193,7 @@ void RenderBox::styleDidChange(StyleDifference diff,
 
   // Set the text color if we're the body.
   if (isBody())
-    document()->setTextColor(style()->color());
+    document()->setTextColor(style()->visitedDependentColor(CSSPropertyColor));
 }
 
 void RenderBox::updateBoxModelInfoFromStyle() {
@@ -579,10 +579,9 @@ void RenderBox::paint(PaintInfo& paintInfo, int tx, int ty) {
 
 void RenderBox::paintRootBoxDecorations(PaintInfo& paintInfo, int tx, int ty) {
   const FillLayer* bgLayer = style()->backgroundLayers();
-  Color bgColor = style()->backgroundColor();
+  Color bgColor = style()->visitedDependentColor(CSSPropertyBackgroundColor);
   RenderObject* bodyObject = 0;
-  if (!style()->hasBackground() && node() &&
-      node()->hasTagName(HTMLNames::htmlTag)) {
+  if (!hasBackground() && node() && node()->hasTagName(HTMLNames::htmlTag)) {
     // Locate the <body> element using the DOM.  This is easier than trying
     // to crawl around a render tree with potential :before/:after content and
     // anonymous blocks created by inline <body> tags etc.  We can locate the
@@ -592,7 +591,8 @@ void RenderBox::paintRootBoxDecorations(PaintInfo& paintInfo, int tx, int ty) {
     bodyObject = (body && body->hasLocalName(bodyTag)) ? body->renderer() : 0;
     if (bodyObject) {
       bgLayer = bodyObject->style()->backgroundLayers();
-      bgColor = bodyObject->style()->backgroundColor();
+      bgColor = bodyObject->style()->visitedDependentColor(
+          CSSPropertyBackgroundColor);
     }
   }
 
@@ -667,10 +667,10 @@ void RenderBox::paintBoxDecorationsWithSize(PaintInfo& paintInfo,
     // independent of the body.  Go through the DOM to get to the root element's
     // render object,
     // since the root could be inline and wrapped in an anonymous block.
-    if (!isBody() ||
-        document()->documentElement()->renderer()->style()->hasBackground())
-      paintFillLayers(paintInfo, style()->backgroundColor(),
-                      style()->backgroundLayers(), tx, ty, width, height);
+    if (!isBody() || document()->documentElement()->renderer()->hasBackground())
+      paintFillLayers(
+          paintInfo, style()->visitedDependentColor(CSSPropertyBackgroundColor),
+          style()->backgroundLayers(), tx, ty, width, height);
     if (style()->hasAppearance())
       theme()->paintDecorations(this, paintInfo,
                                 IntRect(tx, ty, width, height));
@@ -863,12 +863,10 @@ bool RenderBox::repaintLayerRectsForImage(WrappedImagePtr image,
       // if we haven't already
       if (!layerRenderer) {
         bool drawingRootBackground =
-            drawingBackground && (isRoot() || (isBody() &&
-                                               !document()
-                                                    ->documentElement()
-                                                    ->renderer()
-                                                    ->style()
-                                                    ->hasBackground()));
+            drawingBackground &&
+            (isRoot() ||
+             (isBody() &&
+              !document()->documentElement()->renderer()->hasBackground()));
         if (drawingRootBackground) {
           layerRenderer = view();
 

@@ -1500,8 +1500,11 @@ Color RenderObject::selectionBackgroundColor() const {
   Color color;
   if (style()->userSelect() != SELECT_NONE) {
     RefPtr<RenderStyle> pseudoStyle = getUncachedPseudoStyle(SELECTION);
-    if (pseudoStyle && pseudoStyle->backgroundColor().isValid())
-      color = pseudoStyle->backgroundColor().blendWithWhite();
+    if (pseudoStyle &&
+        pseudoStyle->visitedDependentColor(CSSPropertyBackgroundColor)
+            .isValid())
+      color = pseudoStyle->visitedDependentColor(CSSPropertyBackgroundColor)
+                  .blendWithWhite();
     else
       color = document()->frame()->selection()->isFocusedAndActive()
                   ? theme()->activeSelectionBackgroundColor()
@@ -1517,9 +1520,9 @@ Color RenderObject::selectionForegroundColor() const {
     return color;
 
   if (RefPtr<RenderStyle> pseudoStyle = getUncachedPseudoStyle(SELECTION)) {
-    color = pseudoStyle->textFillColor();
+    color = pseudoStyle->visitedDependentColor(CSSPropertyWebkitTextFillColor);
     if (!color.isValid())
-      color = pseudoStyle->color();
+      color = pseudoStyle->visitedDependentColor(CSSPropertyColor);
   } else
     color = document()->frame()->selection()->isFocusedAndActive()
                 ? theme()->activeSelectionForegroundColor()

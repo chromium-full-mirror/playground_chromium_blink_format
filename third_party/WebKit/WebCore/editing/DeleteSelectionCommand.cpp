@@ -352,7 +352,7 @@ void DeleteSelectionCommand::saveTypingStyleState() {
     return;
 
   // Figure out the typing style in effect before the delete is done.
-  m_typingStyle = editingStyleAtPosition(
+  m_typingStyle = ApplyStyleCommand::editingStyleAtPosition(
       positionBeforeTabSpan(m_selectionToDelete.start()));
 
   removeEnclosingAnchorStyle(m_typingStyle.get(), m_selectionToDelete.start());
@@ -363,7 +363,7 @@ void DeleteSelectionCommand::saveTypingStyleState() {
   // of a Mail blockquote
   if (nearestMailBlockquote(m_selectionToDelete.start().node()))
     m_deleteIntoBlockquoteStyle =
-        editingStyleAtPosition(m_selectionToDelete.end());
+        ApplyStyleCommand::editingStyleAtPosition(m_selectionToDelete.end());
   else
     m_deleteIntoBlockquoteStyle = 0;
 }

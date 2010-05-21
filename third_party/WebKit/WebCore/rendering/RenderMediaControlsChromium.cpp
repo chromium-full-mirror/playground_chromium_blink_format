@@ -124,9 +124,13 @@ static bool paintMediaSlider(RenderObject* object,
   context->save();
   context->setShouldAntialias(true);
   context->setStrokeStyle(SolidStroke);
-  context->setStrokeColor(style->borderLeftColor(), DeviceColorSpace);
+  context->setStrokeColor(
+      style->visitedDependentColor(CSSPropertyBorderLeftColor),
+      DeviceColorSpace);
   context->setStrokeThickness(style->borderLeftWidth());
-  context->setFillColor(style->backgroundColor(), DeviceColorSpace);
+  context->setFillColor(
+      style->visitedDependentColor(CSSPropertyBackgroundColor),
+      DeviceColorSpace);
   context->drawRect(rect);
   context->restore();
 
@@ -154,7 +158,7 @@ static bool paintMediaSlider(RenderObject* object,
     sliderTopRight.move(0, bufferedRect.height());
 
     RefPtr<Gradient> gradient = Gradient::create(sliderTopLeft, sliderTopRight);
-    Color startColor = object->style()->color();
+    Color startColor = object->style()->visitedDependentColor(CSSPropertyColor);
     gradient->addColorStop(0.0, startColor);
     gradient->addColorStop(1.0,
                            Color(startColor.red() / 2, startColor.green() / 2,
@@ -238,15 +242,21 @@ static bool paintMediaTimelineContainer(
 
     // Draw the left border using CSS defined width and color.
     context->setStrokeThickness(object->style()->borderLeftWidth());
-    context->setStrokeColor(object->style()->borderLeftColor().rgb(),
-                            DeviceColorSpace);
+    context->setStrokeColor(
+        object->style()
+            ->visitedDependentColor(CSSPropertyBorderLeftColor)
+            .rgb(),
+        DeviceColorSpace);
     context->drawLine(IntPoint(rect.x() + 1, rect.y()),
                       IntPoint(rect.x() + 1, rect.y() + rect.height()));
 
     // Draw the right border using CSS defined width and color.
     context->setStrokeThickness(object->style()->borderRightWidth());
-    context->setStrokeColor(object->style()->borderRightColor().rgb(),
-                            DeviceColorSpace);
+    context->setStrokeColor(
+        object->style()
+            ->visitedDependentColor(CSSPropertyBorderRightColor)
+            .rgb(),
+        DeviceColorSpace);
     context->drawLine(
         IntPoint(rect.x() + rect.width() - 1, rect.y()),
         IntPoint(rect.x() + rect.width() - 1, rect.y() + rect.height()));

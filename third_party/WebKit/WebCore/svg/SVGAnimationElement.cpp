@@ -501,7 +501,8 @@ static inline void adjustForCurrentColor(String& value, SVGElement* target) {
     return;
 
   if (RenderObject* targetRenderer = target->renderer())
-    value = targetRenderer->style()->color().name();
+    value =
+        targetRenderer->style()->visitedDependentColor(CSSPropertyColor).name();
 }
 
 void SVGAnimationElement::startedActiveInterval() {

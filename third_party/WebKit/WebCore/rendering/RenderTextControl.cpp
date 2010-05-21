@@ -142,8 +142,9 @@ void RenderTextControl::adjustInnerTextStyle(
 
   bool disabled = updateUserModifyProperty(node(), textBlockStyle);
   if (disabled)
-    textBlockStyle->setColor(disabledTextColor(textBlockStyle->color(),
-                                               startStyle->backgroundColor()));
+    textBlockStyle->setColor(disabledTextColor(
+        textBlockStyle->visitedDependentColor(CSSPropertyColor),
+        startStyle->visitedDependentColor(CSSPropertyBackgroundColor)));
 }
 
 void RenderTextControl::createSubtreeIfNeeded(

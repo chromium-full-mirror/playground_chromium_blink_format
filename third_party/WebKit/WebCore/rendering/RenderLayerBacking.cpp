@@ -62,7 +62,7 @@ namespace WebCore {
 using namespace HTMLNames;
 
 static bool hasBorderOutlineOrShadow(const RenderStyle*);
-static bool hasBoxDecorationsOrBackground(const RenderStyle*);
+static bool hasBoxDecorationsOrBackground(const RenderObject*);
 static bool hasBoxDecorationsOrBackgroundImage(const RenderStyle*);
 
 static inline bool is3DCanvas(RenderObject* renderer) {
@@ -586,8 +586,9 @@ static bool hasBorderOutlineOrShadow(const RenderStyle* style) {
          style->hasOutline() || style->hasAppearance() || style->boxShadow();
 }
 
-static bool hasBoxDecorationsOrBackground(const RenderStyle* style) {
-  return hasBorderOutlineOrShadow(style) || style->hasBackground();
+static bool hasBoxDecorationsOrBackground(const RenderObject* renderer) {
+  return hasBorderOutlineOrShadow(renderer->style()) ||
+         renderer->hasBackground();
 }
 
 static bool hasBoxDecorationsOrBackgroundImage(const RenderStyle* style) {
@@ -601,35 +602,33 @@ bool RenderLayerBacking::rendererHasBackground() const {
     if (!htmlObject)
       return false;
 
-    RenderStyle* style = htmlObject->style();
-    if (style->hasBackground())
+    if (htmlObject->hasBackground())
       return true;
 
     RenderObject* bodyObject = htmlObject->firstChild();
     if (!bodyObject)
       return false;
 
-    style = bodyObject->style();
-    return style->hasBackground();
+    return bodyObject->hasBackground();
   }
 
-  return renderer()->style()->hasBackground();
+  return renderer()->hasBackground();
 }
 
-const Color& RenderLayerBacking::rendererBackgroundColor() const {
+const Color RenderLayerBacking::rendererBackgroundColor() const {
   // FIXME: share more code here
   if (renderer()->node() && renderer()->node()->isDocumentNode()) {
     RenderObject* htmlObject = renderer()->firstChild();
-    RenderStyle* style = htmlObject->style();
-    if (style->hasBackground())
-      return style->backgroundColor();
+    if (htmlObject->hasBackground())
+      return htmlObject->style()->visitedDependentColor(
+          CSSPropertyBackgroundColor);
 
     RenderObject* bodyObject = htmlObject->firstChild();
-    style = bodyObject->style();
-    return style->backgroundColor();
+    return bodyObject->style()->visitedDependentColor(
+        CSSPropertyBackgroundColor);
   }
 
-  return renderer()->style()->backgroundColor();
+  return renderer()->style()->visitedDependentColor(CSSPropertyBackgroundColor);
 }
 
 // A "simple container layer" is a RenderLayer which has no visible content to
@@ -648,7 +647,7 @@ bool RenderLayerBacking::isSimpleContainerCompositingLayer() const {
   // Reject anything that has a border, a border-radius or outline,
   // or any background (color or image).
   // FIXME: we could optimize layers for simple backgrounds.
-  if (hasBoxDecorationsOrBackground(style))
+  if (hasBoxDecorationsOrBackground(renderObject))
     return false;
 
   // If we have got this far and the renderer has no children, then we're ok.
@@ -762,7 +761,7 @@ bool RenderLayerBacking::containsPaintedContent() const {
   // and set background color on the layer in that case, instead of allocating
   // backing store and painting.
   if (renderer()->isVideo() || is3DCanvas(renderer()))
-    return hasBoxDecorationsOrBackground(renderer()->style());
+    return hasBoxDecorationsOrBackground(renderer());
 
   return true;
 }
@@ -773,7 +772,7 @@ bool RenderLayerBacking::containsPaintedContent() const {
 bool RenderLayerBacking::isDirectlyCompositedImage() const {
   RenderObject* renderObject = renderer();
   return renderObject->isImage() &&
-         !hasBoxDecorationsOrBackground(renderObject->style());
+         !hasBoxDecorationsOrBackground(renderObject);
 }
 
 void RenderLayerBacking::rendererContentChanged() {

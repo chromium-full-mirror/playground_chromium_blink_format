@@ -27,7 +27,9 @@
 
 namespace WebCore {
 
+class Color;
 class CSSMutableStyleDeclaration;
+class CSSPrimitiveValue;
 class ShadowData;
 
 enum EUpdateLayout { DoNotUpdateLayout = false, UpdateLayout = true };
@@ -78,6 +80,8 @@ class CSSComputedStyleDeclaration : public CSSStyleDeclaration {
                            ExceptionCode&);
 
   PassRefPtr<CSSValue> valueForShadow(const ShadowData*, int) const;
+  PassRefPtr<CSSPrimitiveValue> currentColorOrValidColor(RenderStyle*,
+                                                         const Color&) const;
 
   RefPtr<Node> m_node;
   PseudoId m_pseudoElementSpecifier;

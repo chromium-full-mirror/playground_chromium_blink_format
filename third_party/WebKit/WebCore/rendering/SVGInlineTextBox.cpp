@@ -537,7 +537,7 @@ void SVGInlineTextBox::paintSelection(int boxStartOffset,
   if (startPos >= endPos)
     return;
 
-  Color textColor = style->color();
+  Color textColor = style->visitedDependentColor(CSSPropertyColor);
   Color color = renderer()->selectionBackgroundColor();
   if (!color.isValid() || !color.alpha())
     return;

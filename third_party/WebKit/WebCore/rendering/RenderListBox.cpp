@@ -314,8 +314,10 @@ void RenderListBox::paintItemForeground(PaintInfo& paintInfo,
   if (!itemStyle)
     itemStyle = style();
 
-  Color textColor = element->renderStyle() ? element->renderStyle()->color()
-                                           : style()->color();
+  Color textColor =
+      element->renderStyle()
+          ? element->renderStyle()->visitedDependentColor(CSSPropertyColor)
+          : style()->visitedDependentColor(CSSPropertyColor);
   if (optionElement && optionElement->selected()) {
     if (document()->frame()->selection()->isFocusedAndActive() &&
         document()->focusedNode() == node())
@@ -363,9 +365,11 @@ void RenderListBox::paintItemBackground(PaintInfo& paintInfo,
     else
       backColor = theme()->inactiveListBoxSelectionBackgroundColor();
   } else
-    backColor = element->renderStyle()
-                    ? element->renderStyle()->backgroundColor()
-                    : style()->backgroundColor();
+    backColor =
+        element->renderStyle()
+            ? element->renderStyle()->visitedDependentColor(
+                  CSSPropertyBackgroundColor)
+            : style()->visitedDependentColor(CSSPropertyBackgroundColor);
 
   // Draw the background for this list box item
   if (!element->renderStyle() ||

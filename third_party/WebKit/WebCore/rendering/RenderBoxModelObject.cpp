@@ -328,7 +328,7 @@ void RenderBoxModelObject::updateBoxModelInfoFromStyle() {
   // Set the appropriate bits for a box model object.  Since all bits are
   // cleared in styleWillChange,
   // we only check for bits that could possibly be set to true.
-  setHasBoxDecorations(style()->hasBorder() || style()->hasBackground() ||
+  setHasBoxDecorations(hasBackground() || style()->hasBorder() ||
                        style()->hasAppearance() || style()->boxShadow());
   setInline(style()->isDisplayInlineType());
   setRelPositioned(style()->position() == RelativePosition);
@@ -1552,7 +1552,8 @@ void RenderBoxModelObject::paintBoxShadow(GraphicsContext* context,
   }
 
   bool hasOpaqueBackground =
-      s->backgroundColor().isValid() && s->backgroundColor().alpha() == 255;
+      s->visitedDependentColor(CSSPropertyBackgroundColor).isValid() &&
+      s->visitedDependentColor(CSSPropertyBackgroundColor).alpha() == 255;
   for (const ShadowData* shadow = s->boxShadow(); shadow;
        shadow = shadow->next()) {
     if (shadow->style() != shadowStyle)

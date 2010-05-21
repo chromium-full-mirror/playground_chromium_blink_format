@@ -1047,7 +1047,7 @@ void CompositeEditCommand::moveParagraphs(
   // it later.
   RefPtr<CSSMutableStyleDeclaration> styleInEmptyParagraph;
   if (startOfParagraphToMove == endOfParagraphToMove && preserveStyle) {
-    styleInEmptyParagraph = editingStyleAtPosition(
+    styleInEmptyParagraph = ApplyStyleCommand::editingStyleAtPosition(
         startOfParagraphToMove.deepEquivalent(), IncludeTypingStyle);
     // The moved paragraph should assume the block style of the destination.
     styleInEmptyParagraph->removeBlockProperties();
@@ -1129,7 +1129,8 @@ bool CompositeEditCommand::breakOutOfEmptyListItem() {
     return false;
 
   RefPtr<CSSMutableStyleDeclaration> style =
-      editingStyleAtPosition(endingSelection().start(), IncludeTypingStyle);
+      ApplyStyleCommand::editingStyleAtPosition(endingSelection().start(),
+                                                IncludeTypingStyle);
 
   Node* listNode = emptyListItem->parentNode();
   // FIXME: Can't we do something better when the immediate parent wasn't a list

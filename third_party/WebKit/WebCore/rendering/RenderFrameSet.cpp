@@ -76,9 +76,10 @@ void RenderFrameSet::paintColumnBorder(const PaintInfo& paintInfo,
   // Fill first.
   GraphicsContext* context = paintInfo.context;
   ColorSpace colorSpace = style()->colorSpace();
-  context->fillRect(borderRect,
-                    frameSet()->hasBorderColor() ? style()->borderLeftColor()
-                                                 : borderFillColor(),
+  context->fillRect(borderRect, frameSet()->hasBorderColor()
+                                    ? style()->visitedDependentColor(
+                                          CSSPropertyBorderLeftColor)
+                                    : borderFillColor(),
                     colorSpace);
 
   // Now stroke the edges but only if we have enough room to paint both edges
@@ -103,9 +104,10 @@ void RenderFrameSet::paintRowBorder(const PaintInfo& paintInfo,
   // Fill first.
   GraphicsContext* context = paintInfo.context;
   ColorSpace colorSpace = style()->colorSpace();
-  context->fillRect(borderRect,
-                    frameSet()->hasBorderColor() ? style()->borderLeftColor()
-                                                 : borderFillColor(),
+  context->fillRect(borderRect, frameSet()->hasBorderColor()
+                                    ? style()->visitedDependentColor(
+                                          CSSPropertyBorderLeftColor)
+                                    : borderFillColor(),
                     colorSpace);
 
   // Now stroke the edges but only if we have enough room to paint both edges

@@ -635,7 +635,8 @@ static bool handleStyleSpansBeforeInsertion(ReplacementFragment& fragment,
   RefPtr<Node> copiedRangeStyleSpan = sourceDocumentStyleSpan->firstChild();
 
   RefPtr<CSSMutableStyleDeclaration> styleAtInsertionPos =
-      editingStyleAtPosition(rangeCompliantEquivalent(insertionPos));
+      ApplyStyleCommand::editingStyleAtPosition(
+          rangeCompliantEquivalent(insertionPos));
 
   String styleText = styleAtInsertionPos->cssText();
 
@@ -714,9 +715,10 @@ void ReplaceSelectionCommand::handleStyleSpans() {
                              : nearestMailBlockquote(context);
   if (blockquoteNode) {
     RefPtr<CSSMutableStyleDeclaration> blockquoteStyle =
-        editingStyleAtPosition(Position(blockquoteNode, 0));
+        ApplyStyleCommand::editingStyleAtPosition(Position(blockquoteNode, 0));
     RefPtr<CSSMutableStyleDeclaration> parentStyle =
-        editingStyleAtPosition(Position(blockquoteNode->parentNode(), 0));
+        ApplyStyleCommand::editingStyleAtPosition(
+            Position(blockquoteNode->parentNode(), 0));
     parentStyle->diff(blockquoteStyle.get());
 
     CSSMutableStyleDeclaration::const_iterator end = blockquoteStyle->end();
@@ -912,8 +914,8 @@ void ReplaceSelectionCommand::doApply() {
     return;
 
   if (m_matchStyle)
-    m_insertionStyle =
-        editingStyleAtPosition(selection.start(), IncludeTypingStyle);
+    m_insertionStyle = ApplyStyleCommand::editingStyleAtPosition(
+        selection.start(), IncludeTypingStyle);
 
   VisiblePosition visibleStart = selection.visibleStart();
   VisiblePosition visibleEnd = selection.visibleEnd();

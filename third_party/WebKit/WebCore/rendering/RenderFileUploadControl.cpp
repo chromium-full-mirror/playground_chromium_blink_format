@@ -230,7 +230,9 @@ void RenderFileUploadControl::paintObject(PaintInfo& paintInfo,
                 buttonRenderer->paddingTop() +
                 buttonRenderer->baselinePosition(true, false);
 
-    paintInfo.context->setFillColor(style()->color(), style()->colorSpace());
+    paintInfo.context->setFillColor(
+        style()->visitedDependentColor(CSSPropertyColor),
+        style()->colorSpace());
 
     // Draw the filename
     paintInfo.context->drawBidiText(style()->font(), textRun,

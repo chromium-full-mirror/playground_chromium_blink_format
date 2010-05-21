@@ -144,9 +144,10 @@ static bool isDeletableElement(const Node* node) {
     if (!parentStyle)
       return false;
 
-    if (style->hasBackground() &&
-        (!parentStyle->hasBackground() ||
-         style->backgroundColor() != parentStyle->backgroundColor()))
+    if (renderer->hasBackground() &&
+        (!parentRenderer->hasBackground() ||
+         style->visitedDependentColor(CSSPropertyBackgroundColor) !=
+             parentStyle->visitedDependentColor(CSSPropertyBackgroundColor)))
       return true;
   }
 

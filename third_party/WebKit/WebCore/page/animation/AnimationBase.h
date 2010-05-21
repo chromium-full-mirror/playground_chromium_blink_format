@@ -265,6 +265,9 @@ class AnimationBase : public RefCounted<AnimationBase> {
   double m_totalDuration, m_nextIterationDuration;
 
   AnimationBase* m_next;
+
+ private:
+  static void ensurePropertyMap();
 };
 
 }  // namespace WebCore

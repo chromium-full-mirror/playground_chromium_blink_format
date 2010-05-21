@@ -30,7 +30,7 @@ namespace WebCore {
 void EllipsisBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
   GraphicsContext* context = paintInfo.context;
   RenderStyle* style = m_renderer->style(m_firstLine);
-  Color textColor = style->color();
+  Color textColor = style->visitedDependentColor(CSSPropertyColor);
   if (textColor != context->fillColor())
     context->setFillColor(textColor, style->colorSpace());
   bool setShadow = false;
@@ -91,7 +91,7 @@ void EllipsisBox::paintSelection(GraphicsContext* context,
                                  int ty,
                                  RenderStyle* style,
                                  const Font& font) {
-  Color textColor = style->color();
+  Color textColor = style->visitedDependentColor(CSSPropertyColor);
   Color c = m_renderer->selectionBackgroundColor();
   if (!c.isValid() || !c.alpha())
     return;
