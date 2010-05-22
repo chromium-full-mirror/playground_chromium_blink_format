@@ -140,6 +140,9 @@ class HTML5Lexer : public Noncopyable {
 
   bool m_emitPending;
 
+  Vector<UChar, 32> m_attributeName;
+  Vector<UChar, 32> m_attributeValue;
+
   // http://www.whatwg.org/specs/web-apps/current-work/#temporary-buffer
   Vector<UChar, 1024> m_temporaryBuffer;
 

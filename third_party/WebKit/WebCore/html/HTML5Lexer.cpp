@@ -680,12 +680,14 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           emitCurrentTagToken();
           m_state = DataState;
         } else if (cc >= 'A' && cc <= 'Z') {
-          notImplemented();
+          m_token->addNewAttribute();
+          m_token->appendToAttributeName(toLowerCase(cc));
           m_state = AttributeNameState;
         } else {
           if (cc == '"' || cc == '\'' || cc == '<' || cc == '=')
             emitParseError();
-          notImplemented();
+          m_token->addNewAttribute();
+          m_token->appendToAttributeName(cc);
           m_state = AttributeNameState;
         }
         // FIXME: Handle EOF properly.
@@ -702,11 +704,11 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           emitCurrentTagToken();
           m_state = DataState;
         } else if (cc >= 'A' && cc <= 'Z')
-          notImplemented();
+          m_token->appendToAttributeName(toLowerCase(cc));
         else {
           if (cc == '"' || cc == '\'' || cc == '<' || cc == '=')
             emitParseError();
-          notImplemented();
+          m_token->appendToAttributeName(cc);
           m_state = AttributeNameState;
         }
         // FIXME: Handle EOF properly.
@@ -723,12 +725,14 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           emitCurrentTagToken();
           m_state = DataState;
         } else if (cc >= 'A' && cc <= 'Z') {
-          notImplemented();
+          m_token->addNewAttribute();
+          m_token->appendToAttributeName(toLowerCase(cc));
           m_state = AttributeNameState;
         } else {
           if (cc == '"' || cc == '\'' || cc == '<')
             emitParseError();
-          notImplemented();
+          m_token->addNewAttribute();
+          m_token->appendToAttributeName(cc);
           m_state = AttributeNameState;
         }
         // FIXME: Handle EOF properly.
@@ -751,7 +755,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         } else {
           if (cc == '<' || cc == '=' || cc == '`')
             emitParseError();
-          notImplemented();
+          m_token->appendToAttributeValue(cc);
           m_state = AttributeValueUnquotedState;
         }
         break;
@@ -763,7 +767,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           m_state = CharacterReferenceInAttributeValueState;
           m_additionalAllowedCharacter = '"';
         } else
-          notImplemented();
+          m_token->appendToAttributeValue(cc);
         // FIXME: Handle EOF properly.
         break;
       }
@@ -774,7 +778,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           m_state = CharacterReferenceInAttributeValueState;
           m_additionalAllowedCharacter = '\'';
         } else
-          notImplemented();
+          m_token->appendToAttributeValue(cc);
         // FIXME: Handle EOF properly.
         break;
       }
@@ -790,7 +794,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         } else {
           if (cc == '"' || cc == '\'' || cc == '<' || cc == '=' || cc == '`')
             emitParseError();
-          notImplemented();
+          m_token->appendToAttributeValue(cc);
         }
         // FIXME: Handle EOF properly.
         break;
