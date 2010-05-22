@@ -26,6 +26,7 @@
 namespace WebCore {
 
 GdkDragAction dragOperationToGdkDragActions(DragOperation);
+DragOperation gdkDragActionToDragOperation(GdkDragAction);
 }
 
 #endif  // ClipboardUtilitiesGtk_h
