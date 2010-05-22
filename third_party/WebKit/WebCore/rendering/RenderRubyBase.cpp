@@ -121,7 +121,7 @@ void RenderRubyBase::moveBlockChildren(RenderRubyBase* toBase,
         if (child->isAnonymousBlock()) {
           RenderBlock* anonBlock = toRenderBlock(child);
           ASSERT(anonBlock->childrenInline());
-          ASSERT(!anonBlock->inlineContinuation());
+          ASSERT(!anonBlock->inlineElementContinuation());
           anonBlock->moveAllChildrenTo(toBase, toBase->children());
           anonBlock->deleteLineBoxTree();
           anonBlock->destroy();
@@ -148,7 +148,7 @@ void RenderRubyBase::moveBlockChildren(RenderRubyBase* toBase,
 
           RenderBlock* anonBlock = toRenderBlock(child);
           ASSERT(anonBlock->childrenInline());
-          ASSERT(!anonBlock->inlineContinuation());
+          ASSERT(!anonBlock->inlineElementContinuation());
           // Move inline children out of anonymous block.
           anonBlock->moveAllChildrenTo(this, children(), anonBlock);
           anonBlock->deleteLineBoxTree();

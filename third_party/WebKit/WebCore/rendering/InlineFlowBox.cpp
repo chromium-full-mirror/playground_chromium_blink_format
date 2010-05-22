@@ -203,7 +203,7 @@ void InlineFlowBox::determineSpacingForFlowBoxes(bool lastLine,
     // we know the inline began on this line (unless we are a continuation).
     RenderLineBoxList* lineBoxList = rendererLineBoxes();
     if (!lineBoxList->firstLineBox()->isConstructed() &&
-        !renderer()->isInlineContinuation()) {
+        !renderer()->isInlineElementContinuation()) {
       if (ltr && lineBoxList->firstLineBox() == this)
         includeLeftEdge = true;
       else if (!ltr && lineBoxList->lastLineBox() == this)
@@ -753,7 +753,7 @@ void InlineFlowBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
           renderer()->hasOutline() && !isRootInlineBox()) {
         RenderInline* inlineFlow = toRenderInline(renderer());
         if ((inlineFlow->continuation() ||
-             inlineFlow->isInlineContinuation()) &&
+             inlineFlow->isInlineElementContinuation()) &&
             !boxModelObject()->hasSelfPaintingLayer()) {
           // Add ourselves to the containing block of the entire continuation so
           // that it can
@@ -761,7 +761,7 @@ void InlineFlowBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
           RenderBlock* block = renderer()->containingBlock()->containingBlock();
           block->addContinuationWithOutline(
               toRenderInline(renderer()->node()->renderer()));
-        } else if (!inlineFlow->isInlineContinuation())
+        } else if (!inlineFlow->isInlineElementContinuation())
           paintInfo.outlineObjects->add(inlineFlow);
       }
     } else if (paintInfo.phase == PaintPhaseMask) {

@@ -179,8 +179,16 @@ class RenderBlock : public RenderBox {
 
   void addContinuationWithOutline(RenderInline*);
 
-  RenderInline* inlineContinuation() const { return m_inlineContinuation; }
-  void setInlineContinuation(RenderInline* c) { m_inlineContinuation = c; }
+  RenderBoxModelObject* continuation() const { return m_continuation; }
+  void setContinuation(RenderBoxModelObject* c) { m_continuation = c; }
+  virtual RenderBoxModelObject* virtualContinuation() const {
+    return continuation();
+  }
+  bool isAnonymousBlockContinuation() const {
+    return continuation() && isAnonymousBlock();
+  }
+  RenderInline* inlineElementContinuation() const;
+  RenderBlock* blockElementContinuation() const;
 
   // This function is a convenience helper for creating an anonymous block that
   // inherits its
@@ -713,7 +721,7 @@ class RenderBlock : public RenderBox {
   // split into a sequence of inlines and blocks.  The continuation will either
   // be
   // an anonymous block (that houses other blocks) or it will be an inline flow.
-  RenderInline* m_inlineContinuation;
+  RenderBoxModelObject* m_continuation;
 
   // Allocated only when some of these fields have non-default values
   struct MaxMargin : Noncopyable {
