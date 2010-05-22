@@ -48,20 +48,23 @@ bool ScriptController::canExecuteScripts(
 }
 
 ScriptValue ScriptController::executeScript(const String& script,
-                                            bool forceUserGesture) {
-  return executeScript(ScriptSourceCode(
-      script, forceUserGesture ? KURL() : m_frame->loader()->url()));
+                                            bool forceUserGesture,
+                                            ShouldAllowXSS shouldAllowXSS) {
+  return executeScript(
+      ScriptSourceCode(script,
+                       forceUserGesture ? KURL() : m_frame->loader()->url()),
+      shouldAllowXSS);
 }
 
-ScriptValue ScriptController::executeScript(
-    const ScriptSourceCode& sourceCode) {
+ScriptValue ScriptController::executeScript(const ScriptSourceCode& sourceCode,
+                                            ShouldAllowXSS shouldAllowXSS) {
   if (!canExecuteScripts(AboutToExecuteScript) || isPaused())
     return ScriptValue();
 
   bool wasInExecuteScript = m_inExecuteScript;
   m_inExecuteScript = true;
 
-  ScriptValue result = evaluate(sourceCode);
+  ScriptValue result = evaluate(sourceCode, shouldAllowXSS);
 
   if (!wasInExecuteScript) {
     m_inExecuteScript = false;
@@ -86,11 +89,11 @@ bool ScriptController::executeIfJavaScriptURL(
 
   const int javascriptSchemeLength = sizeof("javascript:") - 1;
 
-  String script =
-      decodeURLEscapeSequences(url.string().substring(javascriptSchemeLength));
+  String decodedURL = decodeURLEscapeSequences(url.string());
   ScriptValue result;
-  if (xssAuditor()->canEvaluateJavaScriptURL(script))
-    result = executeScript(script, userGesture);
+  if (xssAuditor()->canEvaluateJavaScriptURL(decodedURL))
+    result = executeScript(decodedURL.substring(javascriptSchemeLength),
+                           userGesture, AllowXSS);
 
   String scriptResult;
 #if USE(JSC)
