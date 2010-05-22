@@ -164,7 +164,7 @@ ScriptValue ScriptController::evaluateInWorld(
   // so we start the keep alive timer here.
   m_frame->keepAlive();
 
-  m_inEvaluateInWorld = false;
+  m_inEvaluateInWorld = wasInEvaluateInWorld;
 
   if (comp.complType() == Normal || comp.complType() == ReturnValue) {
     m_sourceURL = savedSourceURL;
