@@ -60,3 +60,5 @@ void TestShell::waitTestFinished() {
   alarm(0);
   signal(SIGALRM, SIG_DFL);
 }
+
+void platformInit() {}

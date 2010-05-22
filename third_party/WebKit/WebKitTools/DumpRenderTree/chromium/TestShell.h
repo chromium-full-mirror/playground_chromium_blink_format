@@ -165,3 +165,5 @@ class TestShell {
   HANDLE m_finishedEvent;
 #endif
 };
+
+void platformInit();
