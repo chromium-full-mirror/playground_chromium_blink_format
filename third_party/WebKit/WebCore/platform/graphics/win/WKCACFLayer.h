@@ -74,9 +74,13 @@ class WKCACFLayer : public RefCounted<WKCACFLayer> {
   virtual ~WKCACFLayer();
 
   virtual void setNeedsRender() {}
+
   virtual void drawInContext(PlatformGraphicsContext*) {}
-  virtual void setNeedsDisplay(const CGRect* dirtyRect);
-  void setNeedsDisplay();
+
+  void setNeedsDisplay(const CGRect* dirtyRect = 0) {
+    internalSetNeedsDisplay(dirtyRect);
+    setNeedsCommit();
+  }
 
   // Makes this layer the root when the passed context is rendered
   void becomeRootLayerForContext(CACFContextRef);
@@ -130,12 +134,24 @@ class WKCACFLayer : public RefCounted<WKCACFLayer> {
   bool isTransformLayer() const;
 
   void addSublayer(PassRefPtr<WKCACFLayer> sublayer);
-  void insertSublayer(PassRefPtr<WKCACFLayer>, size_t index);
   void insertSublayerAboveLayer(PassRefPtr<WKCACFLayer>,
                                 const WKCACFLayer* reference);
   void insertSublayerBelowLayer(PassRefPtr<WKCACFLayer>,
                                 const WKCACFLayer* reference);
   void replaceSublayer(WKCACFLayer* reference, PassRefPtr<WKCACFLayer>);
+  void adoptSublayers(WKCACFLayer* source);
+
+  void removeAllSublayers() { internalRemoveAllSublayers(); }
+  void setSublayers(const Vector<RefPtr<WKCACFLayer>>& sublayers) {
+    internalSetSublayers(sublayers);
+  }
+
+  void insertSublayer(PassRefPtr<WKCACFLayer> layer, size_t index) {
+    internalInsertSublayer(layer, index);
+  }
+
+  size_t sublayerCount() const { return internalSublayerCount(); }
+
   void removeFromSuperlayer();
 
   WKCACFLayer* ancestorOrSelfWithSuperlayer(WKCACFLayer*) const;
@@ -172,7 +188,7 @@ class WKCACFLayer : public RefCounted<WKCACFLayer> {
   }
   CGFloat borderWidth() const { return CACFLayerGetBorderWidth(layer()); }
 
-  void setBounds(const CGRect&);
+  virtual void setBounds(const CGRect&);
   CGRect bounds() const { return CACFLayerGetBounds(layer()); }
 
   void setClearsContext(bool clears) {
@@ -218,9 +234,6 @@ class WKCACFLayer : public RefCounted<WKCACFLayer> {
     setNeedsCommit();
   }
   CFArrayRef filters() const { return CACFLayerGetFilters(layer()); }
-
-  void setFrame(const CGRect&);
-  CGRect frame() const { return CACFLayerGetFrame(layer()); }
 
   void setHidden(bool hidden) {
     CACFLayerSetHidden(layer(), hidden);
@@ -292,10 +305,6 @@ class WKCACFLayer : public RefCounted<WKCACFLayer> {
   }
   bool sortsSublayers() const { return CACFLayerGetSortsSublayers(layer()); }
 
-  void removeAllSublayers();
-
-  void setSublayers(const Vector<RefPtr<WKCACFLayer>>&);
-
   void setSublayerTransform(const CATransform3D& transform) {
     CACFLayerSetSublayerTransform(layer(), transform);
     setNeedsCommit();
@@ -328,27 +337,30 @@ class WKCACFLayer : public RefCounted<WKCACFLayer> {
 
   void setNeedsCommit();
 
- private:
   CACFLayerRef layer() const { return m_layer.get(); }
-  size_t numSublayers() const {
-    CFArrayRef sublayers = CACFLayerGetSublayers(layer());
-    return sublayers ? CFArrayGetCount(sublayers) : 0;
-  }
+  // This should only be called from removeFromSuperlayer.
+  void removeSublayer(const WKCACFLayer*);
 
-  const WKCACFLayer* sublayerAtIndex(int) const;
+  // Methods to be overridden for sublayer and rendering management
+  virtual WKCACFLayer* internalSublayerAtIndex(int) const;
 
   // Returns the index of the passed layer in this layer's sublayers list
   // or -1 if not found
-  int indexOfSublayer(const WKCACFLayer*);
+  virtual int internalIndexOfSublayer(const WKCACFLayer*);
 
-  // This should only be called from removeFromSuperlayer.
-  void removeSublayer(const WKCACFLayer*);
+  virtual size_t internalSublayerCount() const;
+  virtual void internalInsertSublayer(PassRefPtr<WKCACFLayer>, size_t index);
+  virtual void internalRemoveAllSublayers();
+  virtual void internalSetSublayers(const Vector<RefPtr<WKCACFLayer>>&);
+
+  virtual void internalSetNeedsDisplay(const CGRect* dirtyRect);
 
 #ifndef NDEBUG
   // Print this layer and its children to the console
   void printLayer(int indent) const;
 #endif
 
+ private:
   RetainPtr<CACFLayerRef> m_layer;
   bool m_needsDisplayOnBoundsChange;
 };
