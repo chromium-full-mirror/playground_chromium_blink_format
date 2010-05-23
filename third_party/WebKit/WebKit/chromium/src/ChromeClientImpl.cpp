@@ -462,12 +462,14 @@ void ChromeClientImpl::invalidateContentsAndWindow(const IntRect& updateRect,
 void ChromeClientImpl::invalidateContentsForSlowScroll(
     const IntRect& updateRect,
     bool immediate) {
+  m_webView->hidePopups();
   invalidateContentsAndWindow(updateRect, immediate);
 }
 
 void ChromeClientImpl::scroll(const IntSize& scrollDelta,
                               const IntRect& scrollRect,
                               const IntRect& clipRect) {
+  m_webView->hidePopups();
   if (m_webView->client()) {
     int dx = scrollDelta.width();
     int dy = scrollDelta.height();
