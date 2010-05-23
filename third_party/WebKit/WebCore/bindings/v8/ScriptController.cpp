@@ -235,7 +235,8 @@ ScriptValue ScriptController::evaluate(const ScriptSourceCode& sourceCode,
   const String* savedSourceURL = m_sourceURL;
   m_sourceURL = &sourceURL;
 
-  if (!shouldAllowXSS && !m_XSSAuditor->canEvaluate(sourceCode.source())) {
+  if (shouldAllowXSS == DoNotAllowXSS &&
+      !m_XSSAuditor->canEvaluate(sourceCode.source())) {
     // This script is not safe to be evaluated.
     return ScriptValue();
   }
