@@ -39,6 +39,7 @@
 #include "public/WebConsoleMessage.h"
 #include "public/WebDocument.h"
 #include "public/WebFrame.h"
+#include "public/WebGeolocationServiceMock.h"
 #include "public/WebInputElement.h"
 #include "public/WebKit.h"
 #include "public/WebNotificationPresenter.h"
@@ -208,6 +209,13 @@ LayoutTestController::LayoutTestController(TestShell* shell)
   bindMethod("forceRedSelectionColors",
              &LayoutTestController::forceRedSelectionColors);
   bindMethod("setEditingBehavior", &LayoutTestController::setEditingBehavior);
+
+  bindMethod("setGeolocationPermission",
+             &LayoutTestController::setGeolocationPermission);
+  bindMethod("setMockGeolocationPosition",
+             &LayoutTestController::setMockGeolocationPosition);
+  bindMethod("setMockGeolocationError",
+             &LayoutTestController::setMockGeolocationError);
 
   // The fallback method is called when an unknown method is invoked.
   bindFallbackMethod(&LayoutTestController::fallbackMethod);
@@ -934,7 +942,7 @@ void LayoutTestController::grantDesktopNotificationPermission(
     return;
   }
   m_shell->notificationPresenter()->grantPermission(
-      WebString::fromUTF8(arguments[0].toString()));
+      cppVariantToWebString(arguments[0]));
   result->set(true);
 }
 
@@ -1049,7 +1057,7 @@ void LayoutTestController::evaluateScriptInIsolatedWorld(
     CppVariant* result) {
   if (arguments.size() >= 2 && arguments[0].isNumber() &&
       arguments[1].isString()) {
-    WebScriptSource source(WebString::fromUTF8(arguments[1].toString()));
+    WebScriptSource source(cppVariantToWebString(arguments[1]));
     // This relies on the iframe focusing itself when it loads. This is a bit
     // sketchy, but it seems to be what other tests do.
     m_shell->webView()->focusedFrame()->executeScriptInIsolatedWorld(
@@ -1209,8 +1217,8 @@ void LayoutTestController::addOriginAccessWhitelistEntry(
     return;
 
   WebSecurityPolicy::addOriginAccessWhitelistEntry(
-      url, WebString::fromUTF8(arguments[1].toString()),
-      WebString::fromUTF8(arguments[2].toString()), arguments[3].toBoolean());
+      url, cppVariantToWebString(arguments[1]),
+      cppVariantToWebString(arguments[2]), arguments[3].toBoolean());
 }
 
 void LayoutTestController::removeOriginAccessWhitelistEntry(
@@ -1228,8 +1236,8 @@ void LayoutTestController::removeOriginAccessWhitelistEntry(
     return;
 
   WebSecurityPolicy::removeOriginAccessWhitelistEntry(
-      url, WebString::fromUTF8(arguments[1].toString()),
-      WebString::fromUTF8(arguments[2].toString()), arguments[3].toBoolean());
+      url, cppVariantToWebString(arguments[1]),
+      cppVariantToWebString(arguments[2]), arguments[3].toBoolean());
 }
 
 void LayoutTestController::clearAllDatabases(const CppArgumentList& arguments,
@@ -1371,8 +1379,8 @@ void LayoutTestController::addUserScript(const CppArgumentList& arguments,
   if (arguments.size() < 2 || !arguments[0].isString() ||
       !arguments[1].isBool())
     return;
-  m_shell->webView()->addUserScript(
-      WebString::fromUTF8(arguments[0].toString()), arguments[1].toBoolean());
+  m_shell->webView()->addUserScript(cppVariantToWebString(arguments[0]),
+                                    arguments[1].toBoolean());
 }
 
 void LayoutTestController::addUserStyleSheet(const CppArgumentList& arguments,
@@ -1380,8 +1388,7 @@ void LayoutTestController::addUserStyleSheet(const CppArgumentList& arguments,
   result->setNull();
   if (arguments.size() < 1 || !arguments[0].isString())
     return;
-  m_shell->webView()->addUserStyleSheet(
-      WebString::fromUTF8(arguments[0].toString()));
+  m_shell->webView()->addUserStyleSheet(cppVariantToWebString(arguments[0]));
 }
 
 void LayoutTestController::setEditingBehavior(const CppArgumentList& arguments,
@@ -1395,4 +1402,37 @@ void LayoutTestController::setEditingBehavior(const CppArgumentList& arguments,
   else
     logErrorToConsole(
         "Passed invalid editing behavior. Should be 'mac' or 'win'.");
+}
+
+void LayoutTestController::setGeolocationPermission(
+    const CppArgumentList& arguments,
+    CppVariant* result) {
+  result->setNull();
+  if (arguments.size() < 1 || !arguments[0].isBool())
+    return;
+  WebGeolocationServiceMock::setMockGeolocationPermission(
+      arguments[0].toBoolean());
+}
+
+void LayoutTestController::setMockGeolocationPosition(
+    const CppArgumentList& arguments,
+    CppVariant* result) {
+  result->setNull();
+  if (arguments.size() < 3 || !arguments[0].isNumber() ||
+      !arguments[1].isNumber() || !arguments[2].isNumber())
+    return;
+  WebGeolocationServiceMock::setMockGeolocationPosition(
+      arguments[0].toDouble(), arguments[1].toDouble(),
+      arguments[2].toDouble());
+}
+
+void LayoutTestController::setMockGeolocationError(
+    const CppArgumentList& arguments,
+    CppVariant* result) {
+  result->setNull();
+  if (arguments.size() < 2 || !arguments[0].isInt32() ||
+      !arguments[1].isString())
+    return;
+  WebGeolocationServiceMock::setMockGeolocationError(
+      arguments[0].toInt32(), cppVariantToWebString(arguments[1]));
 }
