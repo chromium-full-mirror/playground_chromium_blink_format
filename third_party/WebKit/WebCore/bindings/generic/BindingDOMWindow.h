@@ -114,7 +114,7 @@ Frame* BindingDOMWindow<Binding>::createWindow(
                                          userGesture);
     else if (!url.isEmpty())
       newFrame->redirectScheduler()->scheduleLocationChange(
-          completedUrl.string(), referrer, false, userGesture);
+          completedUrl.string(), referrer, false, false, userGesture);
   }
 
   return newFrame;
