@@ -1103,7 +1103,7 @@ LauncherApplication::LauncherApplication(int& argc, char** argv)
     : QApplication(argc, argv, QApplication::GuiServer), m_isRobotized(false) {
   // To allow QWebInspector's configuration persistence
   setOrganizationName("Nokia");
-  setApplicationName("QtLauncher");
+  setApplicationName("QtTestBrowser");
   setApplicationVersion("0.1");
 
   applyDefaultSettings();
@@ -1122,7 +1122,7 @@ static void requiresGraphicsView(const QString& option) {
 void LauncherApplication::handleUserOptions() {
   QStringList args = arguments();
   QFileInfo program(args.at(0));
-  QString programName("QtLauncher");
+  QString programName("QtTestBrowser");
   if (program.exists())
     programName = program.baseName();
 
