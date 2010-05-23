@@ -126,7 +126,6 @@ class HTML5Lexer : public Noncopyable {
   static unsigned consumeEntity(SegmentedString&, bool& notEnoughCharacters);
 
  private:
-  inline void emitCommentToken();
   inline void emitCharacter(UChar);
   inline void emitParseError();
   inline void emitCurrentToken();
