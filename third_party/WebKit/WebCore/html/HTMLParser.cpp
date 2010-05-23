@@ -1679,7 +1679,7 @@ void HTMLParser::createHead() {
 PassRefPtr<Node> HTMLParser::handleIsindex(Token* t) {
   RefPtr<Node> n = new HTMLDivElement(divTag, m_document);
 
-  NamedMappedAttrMap* attrs = t->attrs.get();
+  NamedNodeMap* attrs = t->attrs.get();
 
   RefPtr<HTMLIsIndexElement> isIndex = new HTMLIsIndexElement(
       isindexTag, m_document, m_currentFormElement.get());
