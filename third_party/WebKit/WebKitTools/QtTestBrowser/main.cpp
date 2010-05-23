@@ -888,7 +888,7 @@ void LauncherWindow::createChrome() {
                                   SLOT(toggleResizesToContents(bool)));
   toggleResizesToContents->setCheckable(true);
   toggleResizesToContents->setChecked(false);
-  toggleResizesToContents->setEnabled(false);
+  toggleResizesToContents->setEnabled(isGraphicsBased());
   toggleResizesToContents->connect(toggleGraphicsView, SIGNAL(toggled(bool)),
                                    SLOT(setEnabled(bool)));
 
@@ -896,7 +896,7 @@ void LauncherWindow::createChrome() {
       "Toggle Tiled Backing Store", this, SLOT(toggleTiledBackingStore(bool)));
   toggleTiledBackingStore->setCheckable(true);
   toggleTiledBackingStore->setChecked(false);
-  toggleTiledBackingStore->setEnabled(false);
+  toggleTiledBackingStore->setEnabled(isGraphicsBased());
   toggleTiledBackingStore->connect(toggleGraphicsView, SIGNAL(toggled(bool)),
                                    SLOT(setEnabled(bool)));
 
