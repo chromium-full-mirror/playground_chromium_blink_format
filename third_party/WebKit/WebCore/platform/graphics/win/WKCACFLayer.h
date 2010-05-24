@@ -197,14 +197,11 @@ class WKCACFLayer : public RefCounted<WKCACFLayer> {
   }
   bool clearsContext() const { return CACFLayerGetClearsContext(layer()); }
 
-  void setContents(CGImageRef contents) {
+  void setContents(CFTypeRef contents) {
     CACFLayerSetContents(layer(), contents);
     setNeedsCommit();
   }
-  CGImageRef contents() const {
-    return static_cast<CGImageRef>(
-        const_cast<void*>(CACFLayerGetContents(layer())));
-  }
+  CFTypeRef contents() const { return CACFLayerGetContents(layer()); }
 
   void setContentsRect(const CGRect& contentsRect) {
     CACFLayerSetContentsRect(layer(), contentsRect);
@@ -292,10 +289,10 @@ class WKCACFLayer : public RefCounted<WKCACFLayer> {
   CGFloat zPosition() const { return CACFLayerGetZPosition(layer()); }
 
   void setSpeed(float speed) { CACFLayerSetSpeed(layer(), speed); }
-  CFTimeInterval speed() const { CACFLayerGetSpeed(layer()); }
+  CFTimeInterval speed() const { return CACFLayerGetSpeed(layer()); }
 
   void setTimeOffset(CFTimeInterval t) { CACFLayerSetTimeOffset(layer(), t); }
-  CFTimeInterval timeOffset() const { CACFLayerGetTimeOffset(layer()); }
+  CFTimeInterval timeOffset() const { return CACFLayerGetTimeOffset(layer()); }
 
   WKCACFLayer* rootLayer() const;
 
