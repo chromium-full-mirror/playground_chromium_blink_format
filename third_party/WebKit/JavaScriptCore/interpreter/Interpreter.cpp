@@ -4282,7 +4282,6 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
 
       vPC = callFrame->returnPC();
       callFrame = callFrame->callerFrame();
-      codeBlock = callFrame->codeBlock();
 
       if (callFrame->hasHostCallFrameFlag())
         return returnValue;
@@ -4327,7 +4326,6 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
 
       vPC = callFrame->returnPC();
       callFrame = callFrame->callerFrame();
-      codeBlock = callFrame->codeBlock();
 
       if (callFrame->hasHostCallFrameFlag())
         return returnValue;
