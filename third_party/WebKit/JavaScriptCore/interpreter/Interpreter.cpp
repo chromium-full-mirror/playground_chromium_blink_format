@@ -4282,6 +4282,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
 
       vPC = callFrame->returnPC();
       callFrame = callFrame->callerFrame();
+      codeBlock = callFrame->codeBlock();
 
       if (callFrame->hasHostCallFrameFlag())
         return returnValue;
@@ -4326,6 +4327,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
 
       vPC = callFrame->returnPC();
       callFrame = callFrame->callerFrame();
+      codeBlock = callFrame->codeBlock();
 
       if (callFrame->hasHostCallFrameFlag())
         return returnValue;
@@ -4374,6 +4376,48 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
           callFrame->scopeChain()->copy()->push(activation));
 
       vPC += OPCODE_LENGTH(op_enter_with_activation);
+      NEXT_INSTRUCTION();
+    }
+    DEFINE_OPCODE(op_get_callee) {
+      /* op_get_callee callee(r)
+
+         Move callee into a register.
+      */
+
+      callFrame->r(vPC[1].u.operand) = callFrame->callee();
+
+      vPC += OPCODE_LENGTH(op_get_callee);
+      NEXT_INSTRUCTION();
+    }
+    DEFINE_OPCODE(op_create_this) {
+      /* op_create_this this(r) proto(r)
+
+         Allocate an object as 'this', fr use in construction.
+
+         This opcode should only be used at the beginning of a code
+         block.
+      */
+
+      int thisRegister = vPC[1].u.operand;
+      int protoRegister = vPC[2].u.operand;
+
+      JSFunction* constructor = asFunction(callFrame->callee());
+#if !ASSERT_DISABLED
+      ConstructData constructData;
+      ASSERT(constructor->getConstructData(constructData) == ConstructTypeJS);
+#endif
+
+      Structure* structure;
+      JSValue proto = callFrame->r(protoRegister).jsValue();
+      if (proto.isObject())
+        structure = asObject(proto)->inheritorID();
+      else
+        structure =
+            constructor->scope().node()->globalObject->emptyObjectStructure();
+      callFrame->r(thisRegister) =
+          new (&callFrame->globalData()) JSObject(structure);
+
+      vPC += OPCODE_LENGTH(op_create_this);
       NEXT_INSTRUCTION();
     }
     DEFINE_OPCODE(op_convert_this) {
@@ -4447,8 +4491,6 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
       int func = vPC[1].u.operand;
       int argCount = vPC[2].u.operand;
       int registerOffset = vPC[3].u.operand;
-      int proto = vPC[4].u.operand;
-      int thisRegister = vPC[5].u.operand;
 
       JSValue v = callFrame->r(func).jsValue();
 
@@ -4460,16 +4502,6 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
         CodeBlock* newCodeBlock =
             &constructData.js.functionExecutable->bytecodeForConstruct(
                 callFrame, callDataScopeChain);
-
-        Structure* structure;
-        JSValue prototype = callFrame->r(proto).jsValue();
-        if (prototype.isObject())
-          structure = asObject(prototype)->inheritorID();
-        else
-          structure = callDataScopeChain->globalObject->emptyObjectStructure();
-        JSObject* newObject = new (globalData) JSObject(structure);
-
-        callFrame->r(thisRegister) = JSValue(newObject);  // "this" value
 
         CallFrame* previousCallFrame = callFrame;
 
@@ -4495,13 +4527,15 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
       }
 
       if (constructType == ConstructTypeHost) {
-        ArgList args(callFrame->registers() + thisRegister + 1, argCount - 1);
-
         ScopeChainNode* scopeChain = callFrame->scopeChain();
         CallFrame* newCallFrame =
             CallFrame::create(callFrame->registers() + registerOffset);
         newCallFrame->init(0, vPC + OPCODE_LENGTH(op_construct), scopeChain,
                            callFrame, 0, argCount, 0);
+
+        Register* thisRegister = newCallFrame->registers() -
+                                 RegisterFile::CallFrameHeaderSize - argCount;
+        ArgList args(thisRegister + 1, argCount - 1);
 
         JSValue returnValue;
         {

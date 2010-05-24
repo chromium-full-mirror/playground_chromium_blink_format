@@ -88,6 +88,7 @@ struct TrampolineStructure {
   MacroAssemblerCodePtr ctiVirtualCall;
   MacroAssemblerCodePtr ctiVirtualConstruct;
   MacroAssemblerCodePtr ctiNativeCall;
+  MacroAssemblerCodePtr ctiNativeConstruct;
   MacroAssemblerCodePtr ctiSoftModulo;
 };
 
@@ -331,6 +332,9 @@ class JITThunks {
   MacroAssemblerCodePtr ctiNativeCall() {
     return m_trampolineStructure.ctiNativeCall;
   }
+  MacroAssemblerCodePtr ctiNativeConstruct() {
+    return m_trampolineStructure.ctiNativeConstruct;
+  }
   MacroAssemblerCodePtr ctiSoftModulo() {
     return m_trampolineStructure.ctiSoftModulo;
   }
@@ -363,6 +367,7 @@ EncodedJSValue JIT_STUB cti_op_bitxor(STUB_ARGS_DECLARATION);
 EncodedJSValue JIT_STUB cti_op_call_NotJSFunction(STUB_ARGS_DECLARATION);
 EncodedJSValue JIT_STUB cti_op_call_eval(STUB_ARGS_DECLARATION);
 EncodedJSValue JIT_STUB cti_op_construct_NotJSConstruct(STUB_ARGS_DECLARATION);
+EncodedJSValue JIT_STUB cti_op_create_this(STUB_ARGS_DECLARATION);
 EncodedJSValue JIT_STUB cti_op_convert_this(STUB_ARGS_DECLARATION);
 EncodedJSValue JIT_STUB cti_op_create_arguments(STUB_ARGS_DECLARATION);
 EncodedJSValue JIT_STUB
@@ -421,7 +426,6 @@ EncodedJSValue JIT_STUB cti_op_typeof(STUB_ARGS_DECLARATION);
 EncodedJSValue JIT_STUB cti_op_urshift(STUB_ARGS_DECLARATION);
 EncodedJSValue JIT_STUB cti_to_object(STUB_ARGS_DECLARATION);
 EncodedJSValue JIT_STUB cti_vm_throw(STUB_ARGS_DECLARATION);
-JSObject* JIT_STUB cti_op_construct_JSConstruct(STUB_ARGS_DECLARATION);
 JSObject* JIT_STUB cti_op_new_array(STUB_ARGS_DECLARATION);
 JSObject* JIT_STUB cti_op_new_error(STUB_ARGS_DECLARATION);
 JSObject* JIT_STUB cti_op_new_func(STUB_ARGS_DECLARATION);
