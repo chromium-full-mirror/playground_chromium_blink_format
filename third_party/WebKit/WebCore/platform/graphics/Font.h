@@ -293,12 +293,15 @@ class Font {
   SVGFontElement* svgFont() const;
 #endif
 
+  bool needsTranscoding() const { return m_needsTranscoding; }
+
  private:
   FontDescription m_fontDescription;
   mutable RefPtr<FontFallbackList> m_fontList;
   short m_letterSpacing;
   short m_wordSpacing;
   bool m_isPlatformFont;
+  bool m_needsTranscoding;
 };
 
 inline Font::~Font() {}

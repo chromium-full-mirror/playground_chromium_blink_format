@@ -26,6 +26,7 @@
 
 #include "FloatRect.h"
 #include "FontCache.h"
+#include "FontTranscoder.h"
 #include "IntPoint.h"
 #include "GlyphBuffer.h"
 #include "WidthIterator.h"
@@ -84,19 +85,27 @@ Font::CodePath Font::s_codePath = Auto;
 // Font Implementation (Cross-Platform Portion)
 // ============================================================================================
 
-Font::Font() : m_letterSpacing(0), m_wordSpacing(0), m_isPlatformFont(false) {}
+Font::Font()
+    : m_letterSpacing(0),
+      m_wordSpacing(0),
+      m_isPlatformFont(false),
+      m_needsTranscoding(false) {}
 
 Font::Font(const FontDescription& fd, short letterSpacing, short wordSpacing)
     : m_fontDescription(fd),
       m_letterSpacing(letterSpacing),
       m_wordSpacing(wordSpacing),
-      m_isPlatformFont(false) {}
+      m_isPlatformFont(false),
+      m_needsTranscoding(
+          fontTranscoder().needsTranscoding(family().family().string())) {}
 
 Font::Font(const FontPlatformData& fontData, bool isPrinterFont)
     : m_fontList(FontFallbackList::create()),
       m_letterSpacing(0),
       m_wordSpacing(0),
-      m_isPlatformFont(true) {
+      m_isPlatformFont(true),
+      m_needsTranscoding(
+          fontTranscoder().needsTranscoding(family().family().string())) {
   m_fontDescription.setUsePrinterFont(isPrinterFont);
   m_fontList->setPlatformFont(fontData);
 }
@@ -106,7 +115,9 @@ Font::Font(const Font& other)
       m_fontList(other.m_fontList),
       m_letterSpacing(other.m_letterSpacing),
       m_wordSpacing(other.m_wordSpacing),
-      m_isPlatformFont(other.m_isPlatformFont) {}
+      m_isPlatformFont(other.m_isPlatformFont),
+      m_needsTranscoding(
+          fontTranscoder().needsTranscoding(family().family().string())) {}
 
 Font& Font::operator=(const Font& other) {
   m_fontDescription = other.m_fontDescription;
@@ -114,6 +125,7 @@ Font& Font::operator=(const Font& other) {
   m_letterSpacing = other.m_letterSpacing;
   m_wordSpacing = other.m_wordSpacing;
   m_isPlatformFont = other.m_isPlatformFont;
+  m_needsTranscoding = other.m_needsTranscoding;
   return *this;
 }
 
