@@ -58,6 +58,7 @@ struct SecurityOriginTraits;
 
 class DatabaseTracker : public Noncopyable {
  public:
+  static void initializeTracker(const String& databasePath);
   static DatabaseTracker& tracker();
   // This singleton will potentially be used from multiple worker threads and
   // the page's context thread simultaneously.  To keep this safe, it's
@@ -89,7 +90,7 @@ class DatabaseTracker : public Noncopyable {
   void databaseChanged(Database*);
 
  private:
-  DatabaseTracker();
+  DatabaseTracker(const String& databasePath);
 
   typedef HashSet<Database*> DatabaseSet;
   typedef HashMap<String, DatabaseSet*> DatabaseNameMap;
