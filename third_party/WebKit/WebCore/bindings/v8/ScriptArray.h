@@ -41,6 +41,7 @@ class ScriptState;
 class ScriptArray : public ScriptObject {
  public:
   ScriptArray(ScriptState* scriptState, v8::Handle<v8::Array>);
+  ScriptArray(){};
   virtual ~ScriptArray() {}
 
   bool set(unsigned index, const ScriptObject&);

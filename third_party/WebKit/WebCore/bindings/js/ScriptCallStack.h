@@ -31,6 +31,7 @@
 #ifndef ScriptCallStack_h
 #define ScriptCallStack_h
 
+#include "ScriptArray.h"
 #include "ScriptCallFrame.h"
 #include "ScriptState.h"
 #include "ScriptString.h"
@@ -57,7 +58,7 @@ class ScriptCallStack : public Noncopyable {
   // frame retrieval methods
   const ScriptCallFrame& at(unsigned);
   unsigned size();
-  static bool callLocation(String*, int*, String*);
+  static bool stackTrace(int, ScriptState*, ScriptArray&);
 
  private:
   void initialize();
