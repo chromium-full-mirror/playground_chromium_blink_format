@@ -39,6 +39,8 @@ class JSObjectWithGlobalObject : public JSObject {
                              AnonymousSlotCount);
   }
 
+  JSGlobalObject* globalObject() const;
+
  protected:
   JSObjectWithGlobalObject(JSGlobalObject*, NonNullPassRefPtr<Structure>);
 
@@ -47,7 +49,9 @@ class JSObjectWithGlobalObject : public JSObject {
     // Should only be used by JSFunction when we aquire the JSFunction vptr.
   }
   static const unsigned AnonymousSlotCount = JSObject::AnonymousSlotCount + 1;
+  static const unsigned GlobalObjectSlot = 0;
 };
-}
+
+}  // namespace JSC
 
 #endif  // JSObjectWithGlobalObject_h

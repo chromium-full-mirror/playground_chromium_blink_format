@@ -61,8 +61,7 @@ class SVGElement;
 class DOMObjectWithGlobalPointer : public DOMObject {
  public:
   JSDOMGlobalObject* globalObject() const {
-    return static_cast<JSDOMGlobalObject*>(
-        getAnonymousValue(GlobalObjectSlot).asCell());
+    return static_cast<JSDOMGlobalObject*>(DOMObject::globalObject());
   }
 
   ScriptExecutionContext* scriptExecutionContext() const {
@@ -77,21 +76,16 @@ class DOMObjectWithGlobalPointer : public DOMObject {
   }
 
  protected:
-  static const unsigned AnonymousSlotCount = 1 + DOMObject::AnonymousSlotCount;
-  static const unsigned GlobalObjectSlot = AnonymousSlotCount - 1;
-
   DOMObjectWithGlobalPointer(NonNullPassRefPtr<JSC::Structure> structure,
                              JSDOMGlobalObject* globalObject)
-      : DOMObject(structure) {
+      : DOMObject(globalObject, structure) {
     // FIXME: This ASSERT is valid, but fires in fast/dom/gc-6.html when trying
     // to create
     // new JavaScript objects on detached windows due to DOMWindow::document()
     // needing to reach through the frame to get to the Document*.  See bug
     // 27640.
     // ASSERT(globalObject->scriptExecutionContext());
-    putAnonymousValue(GlobalObjectSlot, globalObject);
   }
-  virtual ~DOMObjectWithGlobalPointer() {}
 };
 
 // Base class for all constructor objects in the JSC bindings.
