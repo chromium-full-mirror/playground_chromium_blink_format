@@ -1422,6 +1422,7 @@ class OpacityAnimationQt : public AnimationQt<qreal> {
     if (m_fillsForwards)
       setCurrentTime(1);
   }
+
   virtual void applyFrame(const qreal& fromValue,
                           const qreal& toValue,
                           qreal progress) {
@@ -1430,7 +1431,7 @@ class OpacityAnimationQt : public AnimationQt<qreal> {
 
     // FIXME: This is a hack, due to a probable QGraphicsScene bug.
     // Without this the opacity change doesn't always have immediate effect.
-    if (!m_layer.data()->opacity() && opacity)
+    if (m_layer.data()->scene() && !m_layer.data()->opacity() && opacity)
       m_layer.data()->scene()->update();
 
     m_layer.data()->m_layer->setOpacity(opacity);
