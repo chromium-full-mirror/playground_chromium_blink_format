@@ -136,9 +136,13 @@ class EventHandler : public Noncopyable {
 
   static Frame* subframeForTargetNode(Node*);
 
-  bool scrollOverflow(ScrollDirection, ScrollGranularity);
+  bool scrollOverflow(ScrollDirection,
+                      ScrollGranularity,
+                      Node* startingNode = 0);
 
-  bool scrollRecursively(ScrollDirection, ScrollGranularity);
+  bool scrollRecursively(ScrollDirection,
+                         ScrollGranularity,
+                         Node* startingNode = 0);
 
 #if ENABLE(DRAG_SUPPORT)
   bool shouldDragAutoNode(Node*,
