@@ -402,6 +402,7 @@ class JIT : private JSInterfaceJIT {
       RefPtr<ExecutablePool>* executablePool,
       JSGlobalData* data,
       TrampolineStructure* trampolines);
+  Label privateCompileCTINativeCall(JSGlobalData*, bool isConstruct = false);
   CodePtr privateCompileCTINativeCall(PassRefPtr<ExecutablePool> executablePool,
                                       JSGlobalData* data,
                                       NativeFunction func);
@@ -911,6 +912,8 @@ class JIT : private JSInterfaceJIT {
   void emit_op_call_put_result(Instruction*);
   void emit_op_catch(Instruction*);
   void emit_op_construct(Instruction*);
+  void emit_op_get_callee(Instruction*);
+  void emit_op_create_this(Instruction*);
   void emit_op_convert_this(Instruction*);
   void emit_op_create_arguments(Instruction*);
   void emit_op_debug(Instruction*);
