@@ -387,6 +387,6 @@ void LayoutTestController::authenticateSession(JSStringRef,
                                                JSStringRef,
                                                JSStringRef) {}
 
-void LayoutTestController::setEditingBehavior(JSStringRef editingBehavior) {
+void LayoutTestController::setEditingBehavior(const char* editingBehavior) {
   // FIXME: Implement
 }
