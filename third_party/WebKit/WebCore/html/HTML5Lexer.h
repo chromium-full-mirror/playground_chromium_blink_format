@@ -108,7 +108,6 @@ class HTML5Lexer : public Noncopyable {
     AfterDOCTYPESystemIdentifierState,
     BogusDOCTYPEState,
     CDATASectionState,
-    TokenizingCharacterReferencesState,
   };
 
   HTML5Lexer();
@@ -123,18 +122,20 @@ class HTML5Lexer : public Noncopyable {
 
   void setState(State state) { m_state = state; }
 
-  static unsigned consumeEntity(SegmentedString&, bool& notEnoughCharacters);
-
  private:
   inline void emitCharacter(UChar);
   inline void emitParseError();
   inline void emitCurrentToken();
+
+  UChar consumeEntity(SegmentedString&, bool& notEnoughCharacters);
 
   inline bool temporaryBufferIs(const String&);
   inline bool isAppropriateEndTag();
 
   inline void maybeFlushBufferedEndTag();
   inline void flushBufferedEndTag();
+
+  inline bool haveBufferedCharacterToken();
 
   State m_state;
 
