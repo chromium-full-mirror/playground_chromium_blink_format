@@ -196,7 +196,7 @@ EventHandler::EventHandler(Frame* frame)
 #endif
       ,
       m_resizeLayer(0),
-      m_capturingMouseEventsNode(0),
+      m_eventHandlerWillResetCapturingMouseEventsNode(0),
       m_clickCount(0),
       m_mouseDownTimestamp(0),
       m_useLatchedWheelEventNode(false),
@@ -1327,8 +1327,10 @@ bool EventHandler::handleMousePressEvent(const PlatformMouseEvent& mouseEvent) {
     // the m_mousePressed flag, which may happen if an AppKit widget entered a
     // modal event loop.
     m_capturesDragging = subframe->eventHandler()->capturesDragging();
-    if (m_mousePressed && m_capturesDragging)
+    if (m_mousePressed && m_capturesDragging) {
       m_capturingMouseEventsNode = mev.targetNode();
+      m_eventHandlerWillResetCapturingMouseEventsNode = true;
+    }
     invalidateClick();
     return true;
   }
@@ -1434,10 +1436,10 @@ bool EventHandler::handleMouseDoubleClickEvent(
   HitTestRequest request(HitTestRequest::Active);
   MouseEventWithHitTestResults mev = prepareMouseEvent(request, mouseEvent);
   Frame* subframe = subframeForHitTestResult(mev);
-  if (subframe && passMousePressEventToSubframe(mev, subframe)) {
+  if (m_eventHandlerWillResetCapturingMouseEventsNode)
     m_capturingMouseEventsNode = 0;
+  if (subframe && passMousePressEventToSubframe(mev, subframe))
     return true;
-  }
 
   m_clickCount = mouseEvent.clickCount();
   bool swallowMouseUpEvent =
@@ -1657,10 +1659,10 @@ bool EventHandler::handleMouseReleaseEvent(
       m_capturingMouseEventsNode.get()
           ? subframeForTargetNode(m_capturingMouseEventsNode.get())
           : subframeForHitTestResult(mev);
-  if (subframe && passMouseReleaseEventToSubframe(mev, subframe)) {
+  if (m_eventHandlerWillResetCapturingMouseEventsNode)
     m_capturingMouseEventsNode = 0;
+  if (subframe && passMouseReleaseEventToSubframe(mev, subframe))
     return true;
-  }
 
   bool swallowMouseUpEvent =
       dispatchMouseEvent(eventNames().mouseupEvent, mev.targetNode(), true,
@@ -1857,6 +1859,7 @@ void EventHandler::clearDragState() {
 
 void EventHandler::setCapturingMouseEventsNode(PassRefPtr<Node> n) {
   m_capturingMouseEventsNode = n;
+  m_eventHandlerWillResetCapturingMouseEventsNode = false;
 }
 
 MouseEventWithHitTestResults EventHandler::prepareMouseEvent(
