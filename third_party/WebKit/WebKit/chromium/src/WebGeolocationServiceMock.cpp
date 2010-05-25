@@ -36,6 +36,7 @@
 #include "GeolocationServiceMock.h"
 #include "WebString.h"
 #include <wtf/CurrentTime.h>
+#include <wtf/HashMap.h>
 
 #if ENABLE(GEOLOCATION)
 
@@ -120,7 +121,24 @@ void GeolocationServiceChromiumMock::geolocationServiceErrorOccurred(
 
 namespace WebKit {
 
+class WebGeolocationServiceMockImpl : public WebGeolocationServiceMock {
+ public:
+  virtual ~WebGeolocationServiceMockImpl() {}
+  virtual void requestPermissionForFrame(int bridgeId, const WebURL& url);
+  virtual int attachBridge(WebGeolocationServiceBridge*);
+  virtual void detachBridge(int bridgeId);
+
+ private:
+  typedef HashMap<int, WebGeolocationServiceBridge*> IdToBridgeMap;
+  IdToBridgeMap m_idToBridgeMap;
+};
+
 bool WebGeolocationServiceMock::s_mockGeolocationPermission = false;
+
+WebGeolocationServiceMock*
+WebGeolocationServiceMock::createWebGeolocationServiceMock() {
+  return new WebGeolocationServiceMockImpl;
+}
 
 void WebGeolocationServiceMock::setMockGeolocationPermission(bool allowed) {
   s_mockGeolocationPermission = allowed;
@@ -148,15 +166,16 @@ void WebGeolocationServiceMock::setMockGeolocationError(
   GeolocationServiceMock::setError(positionError);
 }
 
-void WebGeolocationServiceMock::requestPermissionForFrame(int bridgeId,
-                                                          const WebURL& url) {
+void WebGeolocationServiceMockImpl::requestPermissionForFrame(
+    int bridgeId,
+    const WebURL& url) {
   IdToBridgeMap::iterator iter = m_idToBridgeMap.find(bridgeId);
   if (iter == m_idToBridgeMap.end())
     return;
   iter->second->setIsAllowed(s_mockGeolocationPermission);
 }
 
-int WebGeolocationServiceMock::attachBridge(
+int WebGeolocationServiceMockImpl::attachBridge(
     WebGeolocationServiceBridge* bridge) {
   static int nextAvailableWatchId = 1;
   // In case of overflow, make sure the ID remains positive, but reuse the ID
@@ -167,7 +186,7 @@ int WebGeolocationServiceMock::attachBridge(
   return nextAvailableWatchId++;
 }
 
-void WebGeolocationServiceMock::detachBridge(int bridgeId) {
+void WebGeolocationServiceMockImpl::detachBridge(int bridgeId) {
   m_idToBridgeMap.remove(bridgeId);
 }
 
