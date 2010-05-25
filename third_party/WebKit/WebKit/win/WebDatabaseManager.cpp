@@ -387,17 +387,16 @@ void WebDatabaseManager::dispatchDidModifyDatabase(SecurityOrigin* origin,
                                      securityOrigin.get(), userInfoBag.get());
 }
 
-void WebKitSetWebDatabasesPathIfNecessary() {
-  static bool pathSet = false;
-  if (pathSet)
+void WebKitInitializeWebDatabasesIfNecessary() {
+  static bool initialized = false;
+  if (initialized)
     return;
 
   WebCore::String databasesDirectory = WebCore::pathByAppendingComponent(
       WebCore::localUserSpecificStorageDirectory(), "Databases");
-  WebCore::DatabaseTracker::tracker().setDatabaseDirectoryPath(
-      databasesDirectory);
+  WebCore::DatabaseTracker::initializeTracker(databasesDirectory);
 
-  pathSet = true;
+  initialized = true;
 }
 
 #endif

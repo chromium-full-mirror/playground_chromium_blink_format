@@ -90,7 +90,7 @@ class WebDatabaseManager : public IWebDatabaseManager,
   ULONG m_refCount;
 };
 
-void WebKitSetWebDatabasesPathIfNecessary();
+void WebKitInitializeWebDatabasesIfNecessary();
 
 #endif
 
