@@ -344,7 +344,8 @@ static void resetDefaultsToConsistentValues() {
                "default-monospace-font-size", 13, "minimum-font-size", 1,
                "enable-caret-browsing", FALSE, "enable-page-cache", FALSE,
                "auto-resize-window", TRUE, "enable-java-applet", FALSE,
-               "enable-plugins", TRUE, NULL);
+               "enable-plugins", TRUE, "editing-behavior",
+               WEBKIT_EDITING_BEHAVIOR_WINDOWS, NULL);
 
   webkit_web_frame_clear_main_frame_name(mainFrame);
 
