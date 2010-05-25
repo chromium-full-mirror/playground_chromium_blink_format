@@ -344,6 +344,16 @@ void DumpRenderTreeSupportQt::whiteListAccessFromOrigin(
       destinationHost, allowDestinationSubdomains);
 }
 
+void DumpRenderTreeSupportQt::removeWhiteListAccessFromOrigin(
+    const QString& sourceOrigin,
+    const QString& destinationProtocol,
+    const QString& destinationHost,
+    bool allowDestinationSubdomains) {
+  SecurityOrigin::removeOriginAccessWhitelistEntry(
+      *SecurityOrigin::createFromString(sourceOrigin), destinationProtocol,
+      destinationHost, allowDestinationSubdomains);
+}
+
 void DumpRenderTreeSupportQt::resetOriginAccessWhiteLists() {
   SecurityOrigin::resetOriginAccessWhitelists();
 }
