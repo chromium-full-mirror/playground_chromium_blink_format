@@ -41,6 +41,7 @@
 typedef struct CGImage* CGImageRef;
 class QTMovie;
 class QTMovieVisualContext;
+class WKCAImageQueue;
 
 namespace WebCore {
 
@@ -48,7 +49,6 @@ class GraphicsContext;
 class IntSize;
 class IntRect;
 class String;
-class WKCAImageQueue;
 
 class MediaPlayerPrivateQuickTimeVisualContext
     : public MediaPlayerPrivateInterface {
@@ -170,7 +170,6 @@ class MediaPlayerPrivateQuickTimeVisualContext
   OwnPtr<GraphicsLayer> m_qtVideoLayer;
 #endif
   RefPtr<QTMovieVisualContext> m_visualContext;
-  OwnPtr<WKCAImageQueue> m_imageQueue;
   float m_seekTo;
   Timer<MediaPlayerPrivateQuickTimeVisualContext> m_seekTimer;
   Timer<MediaPlayerPrivateQuickTimeVisualContext> m_visualContextTimer;
