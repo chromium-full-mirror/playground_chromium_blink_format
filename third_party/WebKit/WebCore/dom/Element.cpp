@@ -942,8 +942,8 @@ void Element::recalcStyle(StyleChange change) {
 
     if (ch != NoChange ||
         pseudoStyleCacheIsInvalid(currentStyle.get(), newStyle.get()) ||
-        change == Force && renderer() &&
-            renderer()->requiresForcedStyleRecalcPropagation()) {
+        (change == Force && renderer() &&
+         renderer()->requiresForcedStyleRecalcPropagation())) {
       setRenderStyle(newStyle);
     } else if (needsStyleRecalc() &&
                (styleChangeType() != SyntheticStyleChange) &&
