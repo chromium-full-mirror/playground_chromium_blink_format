@@ -635,7 +635,8 @@ void LayoutTestController::setIconDatabaseEnabled(bool enable) {
 }
 
 void LayoutTestController::setEditingBehavior(const QString& editingBehavior) {
-  // FIXME: Implement.
+  DumpRenderTreeSupportQt::setEditingBehavior(m_drt->webPage(),
+                                              editingBehavior);
 }
 
 const unsigned LayoutTestController::maxViewWidth = 800;

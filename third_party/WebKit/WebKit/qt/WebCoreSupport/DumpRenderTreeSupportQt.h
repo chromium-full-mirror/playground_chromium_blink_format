@@ -98,6 +98,8 @@ class QWEBKIT_EXPORT DumpRenderTreeSupportQt {
   static bool hasDocumentElement(QWebFrame* frame);
   static bool elementDoesAutoCompleteForElementWithId(QWebFrame* frame,
                                                       const QString& elementId);
+  static void setEditingBehavior(QWebPage* page,
+                                 const QString& editingBehavior);
 
   static void whiteListAccessFromOrigin(const QString& sourceOrigin,
                                         const QString& destinationProtocol,

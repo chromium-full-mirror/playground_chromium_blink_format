@@ -507,6 +507,23 @@ bool DumpRenderTreeSupportQt::elementDoesAutoCompleteForElementWithId(
           inputElement->autoComplete());
 }
 
+void DumpRenderTreeSupportQt::setEditingBehavior(
+    QWebPage* page,
+    const QString& editingBehavior) {
+  WebCore::EditingBehavior coreEditingBehavior;
+
+  if (editingBehavior == "win")
+    coreEditingBehavior = EditingWindowsBehavior;
+  else if (editingBehavior == "mac")
+    coreEditingBehavior = EditingMacBehavior;
+
+  Page* corePage = QWebPagePrivate::core(page);
+  if (!corePage)
+    return;
+
+  corePage->settings()->setEditingBehavior(coreEditingBehavior);
+}
+
 void DumpRenderTreeSupportQt::dumpFrameLoader(bool b) {
   FrameLoaderClientQt::dumpFrameLoaderCallbacks = b;
 }
