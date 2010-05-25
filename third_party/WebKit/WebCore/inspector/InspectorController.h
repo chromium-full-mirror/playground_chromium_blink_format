@@ -286,7 +286,7 @@ class InspectorController
                                    int firstLine,
                                    int errorLine,
                                    const String& errorMessage);
-  virtual void didPause();
+  virtual void didPause(ScriptState*);
   virtual void didContinue();
 #endif
 

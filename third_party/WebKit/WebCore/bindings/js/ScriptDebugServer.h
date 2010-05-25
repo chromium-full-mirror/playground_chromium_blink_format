@@ -34,7 +34,6 @@
 
 #include "PlatformString.h"
 #include "ScriptBreakpoint.h"
-#include "ScriptState.h"
 #include "Timer.h"
 
 #include <debugger/Debugger.h>
@@ -90,13 +89,13 @@ class ScriptDebugServer : JSC::Debugger, public Noncopyable {
   void recompileAllJSFunctions(Timer<ScriptDebugServer>* = 0);
 
   JavaScriptCallFrame* currentCallFrame();
-  ScriptState* currentCallFrameState();
 
   void pageCreated(Page*);
 
  private:
   typedef HashSet<ScriptDebugListener*> ListenerSet;
-  typedef void (ScriptDebugListener::*JavaScriptExecutionCallback)();
+  typedef void (ScriptDebugServer::*JavaScriptExecutionCallback)(
+      ScriptDebugListener*);
 
   ScriptDebugServer();
   ~ScriptDebugServer();
@@ -116,6 +115,8 @@ class ScriptDebugServer : JSC::Debugger, public Noncopyable {
   void dispatchFunctionToListeners(JavaScriptExecutionCallback, Page*);
   void dispatchFunctionToListeners(const ListenerSet& listeners,
                                    JavaScriptExecutionCallback callback);
+  void dispatchDidPause(ScriptDebugListener*);
+  void dispatchDidContinue(ScriptDebugListener*);
   void dispatchDidParseSource(const ListenerSet& listeners,
                               const JSC::SourceCode& source);
   void dispatchFailedToParseSource(const ListenerSet& listeners,

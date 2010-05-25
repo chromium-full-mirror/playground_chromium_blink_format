@@ -1701,9 +1701,7 @@ void InspectorController::failedToParseSource(const String& url,
                                         errorMessage);
 }
 
-void InspectorController::didPause() {
-  ScriptState* scriptState =
-      ScriptDebugServer::shared().currentCallFrameState();
+void InspectorController::didPause(ScriptState* scriptState) {
   ASSERT(scriptState);
   InjectedScript injectedScript =
       m_injectedScriptHost->injectedScriptFor(scriptState);

@@ -32,6 +32,8 @@
 
 #if ENABLE(JAVASCRIPT_DEBUGGER)
 
+#include "ScriptState.h"
+
 namespace WebCore {
 
 class String;
@@ -49,7 +51,7 @@ class ScriptDebugListener {
                                    int firstLine,
                                    int errorLine,
                                    const String& errorMessage) = 0;
-  virtual void didPause() = 0;
+  virtual void didPause(ScriptState*) = 0;
   virtual void didContinue() = 0;
 };
 

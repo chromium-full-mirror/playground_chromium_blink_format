@@ -36,12 +36,12 @@
 #include "JavaScriptCallFrame.h"
 #include "PlatformString.h"
 #include "ScriptBreakpoint.h"
-#include "ScriptState.h"
 #include "StringHash.h"
 #include "Timer.h"
 #include <v8-debug.h>
 #include <wtf/HashMap.h>
 #include <wtf/Noncopyable.h>
+#include <wtf/PassOwnPtr.h>
 
 namespace WebCore {
 
@@ -79,17 +79,19 @@ class ScriptDebugServer : public Noncopyable {
   void recompileAllJSFunctionsSoon() {}
   void recompileAllJSFunctions(Timer<ScriptDebugServer>* = 0) {}
 
-  ScriptState* currentCallFrameState();
-
   void pageCreated(Page*) {}
 
   // v8-specific methods.
   void setDebuggerScriptSource(const String& scriptSource);
 
-  typedef void (*MessageLoopDispatchHandler)(const Vector<WebCore::Page*>&);
-  static void setMessageLoopDispatchHandler(
-      MessageLoopDispatchHandler messageLoopDispatchHandler) {
-    s_messageLoopDispatchHandler = messageLoopDispatchHandler;
+  class ClientMessageLoop {
+   public:
+    virtual ~ClientMessageLoop() {}
+    virtual void run(Page*) = 0;
+    virtual void quitNow() = 0;
+  };
+  void setClientMessageLoop(PassOwnPtr<ClientMessageLoop> clientMessageLoop) {
+    m_clientMessageLoop = clientMessageLoop;
   }
 
   PassRefPtr<JavaScriptCallFrame> currentCallFrame();
@@ -98,11 +100,10 @@ class ScriptDebugServer : public Noncopyable {
   ScriptDebugServer();
   ~ScriptDebugServer() {}
 
-  static void onV8DebugMessage(const v8::Debug::Message& message);
-  static void onV8DebugHostDispatch();
-
-  void handleV8DebugMessage(const v8::Debug::Message& message);
-  void handleV8DebugHostDispatch();
+#if ENABLE(V8_SCRIPT_DEBUG_SERVER)
+  static void v8DebugEventCallback(const v8::Debug::EventDetails& eventDetails);
+  void handleV8DebugEvent(const v8::Debug::EventDetails& eventDetails);
+#endif
 
   void dispatchDidParseSource(ScriptDebugListener* listener,
                               v8::Handle<v8::Object> sourceObject);
@@ -115,11 +116,10 @@ class ScriptDebugServer : public Noncopyable {
   String m_debuggerScriptSource;
   PauseOnExceptionsState m_pauseOnExceptionsState;
   OwnHandle<v8::Object> m_debuggerScript;
-  ScriptState* m_currentCallFrameState;
   RefPtr<JavaScriptCallFrame> m_currentCallFrame;
   OwnHandle<v8::Object> m_executionState;
-
-  static MessageLoopDispatchHandler s_messageLoopDispatchHandler;
+  OwnPtr<ClientMessageLoop> m_clientMessageLoop;
+  Page* m_pausedPage;
 };
 
 }  // namespace WebCore
