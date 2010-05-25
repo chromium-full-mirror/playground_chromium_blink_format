@@ -63,6 +63,7 @@ class HTML5Token : public Noncopyable {
     clearData();
     m_selfClosing = false;
     m_currentAttribute = 0;
+    m_attributes.clear();
 
     m_data.append(character);
   }
@@ -74,6 +75,7 @@ class HTML5Token : public Noncopyable {
     clearData();
     m_selfClosing = false;
     m_currentAttribute = 0;
+    m_attributes.clear();
 
     m_data.append(characters);
   }
