@@ -1973,6 +1973,17 @@ DEFINE_STUB_FUNCTION(void*, op_call_arityCheck) {
   if (argCount > newCodeBlock->m_numParameters) {
     size_t numParameters = newCodeBlock->m_numParameters;
     r = callFrame->registers() + numParameters;
+    Register* newEnd = r + newCodeBlock->m_numCalleeRegisters;
+    if (!stackFrame.registerFile->grow(newEnd)) {
+      // Rewind to the previous call frame because op_call already
+      // optimistically
+      // moved the call frame forward.
+      stackFrame.callFrame = oldCallFrame;
+      throwStackOverflowError(oldCallFrame, stackFrame.globalData,
+                              stackFrame.args[1].returnAddress(),
+                              STUB_RETURN_ADDRESS);
+      RETURN_POINTER_PAIR(0, 0);
+    }
 
     Register* argv =
         r - RegisterFile::CallFrameHeaderSize - numParameters - argCount;
@@ -2003,6 +2014,7 @@ DEFINE_STUB_FUNCTION(void*, op_call_arityCheck) {
   callFrame->setCallee(callee);
   callFrame->setScopeChain(callee->scope().node());
 
+  ASSERT((void*)callFrame <= stackFrame.registerFile->end());
   return callFrame;
 }
 
@@ -2024,6 +2036,17 @@ DEFINE_STUB_FUNCTION(void*, op_construct_arityCheck) {
   if (argCount > newCodeBlock->m_numParameters) {
     size_t numParameters = newCodeBlock->m_numParameters;
     r = callFrame->registers() + numParameters;
+    Register* newEnd = r + newCodeBlock->m_numCalleeRegisters;
+    if (!stackFrame.registerFile->grow(newEnd)) {
+      // Rewind to the previous call frame because op_call already
+      // optimistically
+      // moved the call frame forward.
+      stackFrame.callFrame = oldCallFrame;
+      throwStackOverflowError(oldCallFrame, stackFrame.globalData,
+                              stackFrame.args[1].returnAddress(),
+                              STUB_RETURN_ADDRESS);
+      RETURN_POINTER_PAIR(0, 0);
+    }
 
     Register* argv =
         r - RegisterFile::CallFrameHeaderSize - numParameters - argCount;
@@ -2054,6 +2077,7 @@ DEFINE_STUB_FUNCTION(void*, op_construct_arityCheck) {
   callFrame->setCallee(callee);
   callFrame->setScopeChain(callee->scope().node());
 
+  ASSERT((void*)callFrame <= stackFrame.registerFile->end());
   return callFrame;
 }
 
