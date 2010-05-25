@@ -191,7 +191,6 @@ class ExecState : private Register {
                                         ~HostCallFrameFlag);
   }
 
- private:
   void setArgumentCount(int count) {
     static_cast<Register*>(this)[RegisterFile::ArgumentCount] =
         Register::withInt(count);
@@ -203,6 +202,7 @@ class ExecState : private Register {
     static_cast<Register*>(this)[RegisterFile::CodeBlock] = codeBlock;
   }
 
+ private:
   static const intptr_t HostCallFrameFlag = 1;
 
   ExecState();
