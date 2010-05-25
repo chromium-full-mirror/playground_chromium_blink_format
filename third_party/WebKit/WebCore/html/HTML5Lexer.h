@@ -130,9 +130,11 @@ class HTML5Lexer : public Noncopyable {
   inline void emitParseError();
   inline void emitCurrentToken();
 
-  inline bool temporaryBufferIs(const char*);
-
+  inline bool temporaryBufferIs(const String&);
   inline bool isAppropriateEndTag();
+
+  inline void maybeFlushBufferedEndTag();
+  inline void flushBufferedEndTag();
 
   State m_state;
 
