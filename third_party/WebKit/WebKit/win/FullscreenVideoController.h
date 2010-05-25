@@ -28,7 +28,7 @@
 
 #if ENABLE(VIDEO)
 
-#include "QTMovieGWorld.h"
+#include "MediaPlayerPrivateFullscreenWindow.h"
 
 #include <WebCore/HTMLMediaElement.h>
 #include <WebCore/Image.h>
@@ -38,6 +38,9 @@
 
 namespace WebCore {
 class GraphicsContext;
+#if USE(ACCELERATED_COMPOSITING)
+class WKCACFLayer;
+#endif
 }
 
 class HUDWidget {
@@ -107,7 +110,7 @@ class HUDSlider : public HUDWidget {
   int m_dragStartOffset;
 };
 
-class FullscreenVideoController : QTMovieGWorldFullscreenClient,
+class FullscreenVideoController : WebCore::MediaPlayerPrivateFullscreenClient,
                                   public Noncopyable {
  public:
   FullscreenVideoController();
@@ -122,11 +125,10 @@ class FullscreenVideoController : QTMovieGWorldFullscreenClient,
   void exitFullscreen();
 
  private:
-  // QTMovieGWorldFullscreenClient
+  // MediaPlayerPrivateFullscreenWindowClient
   virtual LRESULT fullscreenClientWndProc(HWND, UINT message, WPARAM, LPARAM);
 
   void ensureWindow();
-  QTMovieGWorld* movie() const;
 
   bool canPlay() const;
   void play();
@@ -157,13 +159,21 @@ class FullscreenVideoController : QTMovieGWorldFullscreenClient,
   void onMouseDown(const WebCore::IntPoint&);
   void onMouseMove(const WebCore::IntPoint&);
   void onMouseUp(const WebCore::IntPoint&);
+  void onKeyDown(int virtualKey);
 
   RefPtr<WebCore::HTMLMediaElement> m_mediaElement;
 
-  HWND m_hudWindow, m_videoWindow;
+  HWND m_hudWindow;
   OwnPtr<HBITMAP> m_bitmap;
   WebCore::IntSize m_fullscreenSize;
   WebCore::IntPoint m_hudPosition;
+  OwnPtr<WebCore::MediaPlayerPrivateFullscreenWindow> m_fullscreenWindow;
+#if USE(ACCELERATED_COMPOSITING)
+  RefPtr<WebCore::WKCACFLayer> m_rootChild;
+  class LayoutClient;
+  friend class LayoutClient;
+  OwnPtr<LayoutClient> m_layoutClient;
+#endif
 
   HUDButton m_playPauseButton;
   HUDButton m_timeSliderButton;

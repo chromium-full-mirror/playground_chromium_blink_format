@@ -44,8 +44,15 @@
 
 namespace WebCore {
 
-class WKCACFAnimation;
-class WKCACFTimingFunction;
+class WKCACFLayer;
+
+class WKCACFLayerLayoutClient {
+ public:
+  virtual void layoutSublayersOfLayer(WKCACFLayer*) = 0;
+
+ protected:
+  virtual ~WKCACFLayerLayoutClient() {}
+};
 
 class WKCACFLayer : public RefCounted<WKCACFLayer> {
  public:
@@ -76,6 +83,10 @@ class WKCACFLayer : public RefCounted<WKCACFLayer> {
   virtual void setNeedsRender() {}
 
   virtual void drawInContext(PlatformGraphicsContext*) {}
+
+  void setLayoutClient(WKCACFLayerLayoutClient*);
+  WKCACFLayerLayoutClient* layoutClient() const { return m_layoutClient; }
+  void setNeedsLayout() { CACFLayerSetNeedsLayout(layer()); }
 
   void setNeedsDisplay(const CGRect* dirtyRect = 0) {
     internalSetNeedsDisplay(dirtyRect);
@@ -232,6 +243,9 @@ class WKCACFLayer : public RefCounted<WKCACFLayer> {
   }
   CFArrayRef filters() const { return CACFLayerGetFilters(layer()); }
 
+  virtual void setFrame(const CGRect&);
+  CGRect frame() const { return CACFLayerGetFrame(layer()); }
+
   void setHidden(bool hidden) {
     CACFLayerSetHidden(layer(), hidden);
     setNeedsCommit();
@@ -358,7 +372,10 @@ class WKCACFLayer : public RefCounted<WKCACFLayer> {
 #endif
 
  private:
+  static void layoutSublayersProc(CACFLayerRef);
+
   RetainPtr<CACFLayerRef> m_layer;
+  WKCACFLayerLayoutClient* m_layoutClient;
   bool m_needsDisplayOnBoundsChange;
 };
 }

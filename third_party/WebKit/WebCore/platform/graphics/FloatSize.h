@@ -63,6 +63,13 @@ class FloatSize {
 
   bool isEmpty() const { return m_width <= 0 || m_height <= 0; }
 
+  float aspectRatio() const { return m_width / m_height; }
+
+  void scale(float scale) {
+    m_width *= scale;
+    m_height *= scale;
+  }
+
   FloatSize expandedTo(const FloatSize& other) const {
     return FloatSize(m_width > other.m_width ? m_width : other.m_width,
                      m_height > other.m_height ? m_height : other.m_height);

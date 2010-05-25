@@ -71,6 +71,14 @@ void WebTiledLayer::setBounds(const CGRect& rect) {
   updateTiles();
 }
 
+void WebTiledLayer::setFrame(const CGRect& rect) {
+  if (CGRectEqualToRect(rect, frame()))
+    return;
+
+  WebLayer::setFrame(rect);
+  updateTiles();
+}
+
 void WebTiledLayer::internalSetNeedsDisplay(const CGRect* dirtyRect) {
   // FIXME: Only setNeedsDisplay for tiles that are currently visible
   int numTileLayers = tileCount();

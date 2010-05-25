@@ -172,6 +172,7 @@ PassRefPtr<WKCACFLayer> WKCACFLayer::create(LayerType type) {
 
 WKCACFLayer::WKCACFLayer(LayerType type)
     : m_layer(AdoptCF, CACFLayerCreate(toCACFLayerType(type))),
+      m_layoutClient(0),
       m_needsDisplayOnBoundsChange(false) {
   CACFLayerSetUserData(layer(), this);
   CACFLayerSetDisplayCallback(layer(), displayCallback);
@@ -296,11 +297,10 @@ void WKCACFLayer::adoptSublayers(WKCACFLayer* source) {
 
 void WKCACFLayer::removeFromSuperlayer() {
   WKCACFLayer* superlayer = this->superlayer();
-  if (!superlayer)
-    return;
-
   CACFLayerRemoveFromSuperlayer(layer());
-  superlayer->setNeedsCommit();
+
+  if (superlayer)
+    superlayer->setNeedsCommit();
 }
 
 WKCACFLayer* WKCACFLayer::internalSublayerAtIndex(int index) const {
@@ -349,6 +349,19 @@ void WKCACFLayer::setBounds(const CGRect& rect) {
   setNeedsCommit();
 
   if (m_needsDisplayOnBoundsChange)
+    setNeedsDisplay();
+}
+
+void WKCACFLayer::setFrame(const CGRect& rect) {
+  CGRect oldFrame = frame();
+  if (CGRectEqualToRect(rect, oldFrame))
+    return;
+
+  CACFLayerSetFrame(layer(), rect);
+  setNeedsCommit();
+
+  if (m_needsDisplayOnBoundsChange &&
+      !CGSizeEqualToSize(rect.size, oldFrame.size))
     setNeedsDisplay();
 }
 
@@ -418,6 +431,20 @@ WKCACFLayer* WKCACFLayer::superlayer() const {
 
 void WKCACFLayer::internalSetNeedsDisplay(const CGRect* dirtyRect) {
   CACFLayerSetNeedsDisplay(layer(), dirtyRect);
+}
+
+void WKCACFLayer::setLayoutClient(WKCACFLayerLayoutClient* layoutClient) {
+  if (layoutClient == m_layoutClient)
+    return;
+
+  m_layoutClient = layoutClient;
+  CACFLayerSetLayoutCallback(layer(), m_layoutClient ? layoutSublayersProc : 0);
+}
+
+void WKCACFLayer::layoutSublayersProc(CACFLayerRef caLayer) {
+  WKCACFLayer* layer = WKCACFLayer::layer(caLayer);
+  if (layer && layer->m_layoutClient)
+    layer->m_layoutClient->layoutSublayersOfLayer(layer);
 }
 
 #ifndef NDEBUG

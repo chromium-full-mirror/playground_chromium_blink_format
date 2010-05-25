@@ -74,6 +74,10 @@ class IntSize {
   bool isEmpty() const { return m_width <= 0 || m_height <= 0; }
   bool isZero() const { return !m_width && !m_height; }
 
+  float aspectRatio() const {
+    return static_cast<float>(m_width) / static_cast<float>(m_height);
+  }
+
   void expand(int width, int height) {
     m_width += width;
     m_height += height;
