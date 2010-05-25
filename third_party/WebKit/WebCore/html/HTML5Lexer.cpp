@@ -100,7 +100,7 @@ inline bool isAlphaNumeric(UChar cc) {
          (cc >= 'A' && cc <= 'Z');
 }
 
-void uncomsumeCharacters(SegmentedString& source,
+void unconsumeCharacters(SegmentedString& source,
                          const Vector<UChar, 10>& consumedCharacters) {
   if (consumedCharacters.size() == 1)
     source.push(consumedCharacters[0]);
@@ -265,7 +265,7 @@ UChar HTML5Lexer::consumeEntity(SegmentedString& source,
           source.advanceAndASSERT(cc);
         }
         notEnoughCharacters = source.isEmpty();
-        uncomsumeCharacters(source, consumedCharacters);
+        unconsumeCharacters(source, consumedCharacters);
         return 0;
       }
     }
@@ -274,7 +274,7 @@ UChar HTML5Lexer::consumeEntity(SegmentedString& source,
   }
   ASSERT(source.isEmpty());
   notEnoughCharacters = true;
-  uncomsumeCharacters(source, consumedCharacters);
+  unconsumeCharacters(source, consumedCharacters);
   return 0;
 }
 
