@@ -260,74 +260,8 @@ void JIT::privateCompileCTIMachineTrampolines(
           regT0);
   jump(regT0);
 
-  // NativeCall Trampoline
-  Label nativeCallThunk = privateCompileCTINativeCall(globalData);
-  Label nativeConstructThunk = privateCompileCTINativeCall(globalData, true);
-
-#if ENABLE(JIT_OPTIMIZE_PROPERTY_ACCESS)
-  Call string_failureCases1Call = makeTailRecursiveCall(string_failureCases1);
-  Call string_failureCases2Call = makeTailRecursiveCall(string_failureCases2);
-  Call string_failureCases3Call = makeTailRecursiveCall(string_failureCases3);
-#endif
-
-  // All trampolines constructed! copy the code, link up calls, and set the
-  // pointers on the Machine object.
-  LinkBuffer patchBuffer(
-      this, m_globalData->executableAllocator.poolForSize(m_assembler.size()));
-
-#if ENABLE(JIT_OPTIMIZE_PROPERTY_ACCESS)
-  patchBuffer.link(string_failureCases1Call,
-                   FunctionPtr(cti_op_get_by_id_string_fail));
-  patchBuffer.link(string_failureCases2Call,
-                   FunctionPtr(cti_op_get_by_id_string_fail));
-  patchBuffer.link(string_failureCases3Call,
-                   FunctionPtr(cti_op_get_by_id_string_fail));
-#endif
-#if ENABLE(JIT_OPTIMIZE_CALL)
-  patchBuffer.link(callArityCheck1, FunctionPtr(cti_op_call_arityCheck));
-  patchBuffer.link(callJSFunction1, FunctionPtr(cti_op_call_jitCompile));
-  patchBuffer.link(callLazyLinkCall1, FunctionPtr(cti_vm_lazyLinkCall));
-  patchBuffer.link(callArityCheck2, FunctionPtr(cti_op_construct_arityCheck));
-  patchBuffer.link(callJSFunction2, FunctionPtr(cti_op_construct_jitCompile));
-  patchBuffer.link(callLazyLinkCall2, FunctionPtr(cti_vm_lazyLinkConstruct));
-#endif
-  patchBuffer.link(callArityCheck3, FunctionPtr(cti_op_call_arityCheck));
-  patchBuffer.link(callJSFunction3, FunctionPtr(cti_op_call_jitCompile));
-  patchBuffer.link(callArityCheck4, FunctionPtr(cti_op_construct_arityCheck));
-  patchBuffer.link(callJSFunction4, FunctionPtr(cti_op_construct_jitCompile));
-
-  CodeRef finalCode = patchBuffer.finalizeCode();
-  *executablePool = finalCode.m_executablePool;
-
-  trampolines->ctiVirtualCall = trampolineAt(finalCode, virtualCallBegin);
-  trampolines->ctiVirtualConstruct =
-      trampolineAt(finalCode, virtualConstructBegin);
-  trampolines->ctiNativeCall = trampolineAt(finalCode, nativeCallThunk);
-  trampolines->ctiNativeConstruct =
-      trampolineAt(finalCode, nativeConstructThunk);
-#if ENABLE(JIT_OPTIMIZE_PROPERTY_ACCESS)
-  trampolines->ctiStringLengthTrampoline =
-      trampolineAt(finalCode, stringLengthBegin);
-#endif
-#if ENABLE(JIT_OPTIMIZE_CALL)
-  trampolines->ctiVirtualCallLink =
-      trampolineAt(finalCode, virtualCallLinkBegin);
-  trampolines->ctiVirtualConstructLink =
-      trampolineAt(finalCode, virtualConstructLinkBegin);
-#endif
-#if ENABLE(JIT_OPTIMIZE_MOD)
-  trampolines->ctiSoftModulo = trampolineAt(finalCode, softModBegin);
-#endif
-}
-
-JIT::Label JIT::privateCompileCTINativeCall(JSGlobalData* globalData,
-                                            bool isConstruct) {
-  int executableOffsetToFunction =
-      isConstruct ? OBJECT_OFFSETOF(NativeExecutable, m_constructor)
-                  : OBJECT_OFFSETOF(NativeExecutable, m_function);
-
-  Label nativeCallThunk = align();
 #if CPU(X86) || CPU(ARM_TRADITIONAL)
+  Label nativeCallThunk = align();
   preserveReturnAddressAfterCall(regT0);
   emitPutToCallFrameHeader(regT0,
                            RegisterFile::ReturnPC);  // Push return address
@@ -455,7 +389,8 @@ JIT::Label JIT::privateCompileCTINativeCall(JSGlobalData* globalData,
 
   loadPtr(Address(X86Registers::eax, OBJECT_OFFSETOF(JSFunction, m_executable)),
           X86Registers::ebx);
-  call(Address(X86Registers::ebx, executableOffsetToFunction));
+  call(Address(X86Registers::ebx,
+               OBJECT_OFFSETOF(NativeExecutable, m_function)));
 
   // JSValue is a non-POD type, so eax points to it
   emitLoad(0, regT1, regT0, X86Registers::eax);
@@ -465,7 +400,8 @@ JIT::Label JIT::privateCompileCTINativeCall(JSGlobalData* globalData,
   move(callFrameRegister, X86Registers::ecx);        // callFrame
   loadPtr(Address(X86Registers::edx, OBJECT_OFFSETOF(JSFunction, m_executable)),
           X86Registers::ebx);
-  call(Address(X86Registers::ebx, executableOffsetToFunction));
+  call(Address(X86Registers::ebx,
+               OBJECT_OFFSETOF(NativeExecutable, m_function)));
 #endif
 
   // We've put a few temporaries on the stack in addition to the actual
@@ -532,7 +468,7 @@ JIT::Label JIT::privateCompileCTINativeCall(JSGlobalData* globalData,
   move(stackPointerRegister, regT0);
 
   loadPtr(Address(regT2, OBJECT_OFFSETOF(JSFunction, m_executable)), regT3);
-  call(Address(regT3, executableOffsetToFunction));
+  call(Address(regT3, OBJECT_OFFSETOF(NativeExecutable, m_function)));
 
   load32(Address(stackPointerRegister, 0), regT0);
   load32(Address(stackPointerRegister, 4), regT1);
@@ -562,7 +498,7 @@ JIT::Label JIT::privateCompileCTINativeCall(JSGlobalData* globalData,
   move(callFrameRegister, regT1);
 
   loadPtr(Address(regT2, OBJECT_OFFSETOF(JSFunction, m_executable)), regT3);
-  call(Address(regT3, executableOffsetToFunction));
+  call(Address(regT3, OBJECT_OFFSETOF(NativeExecutable, m_function)));
 
   // Load return value
   load32(Address(stackPointerRegister, 16), regT0);
@@ -607,7 +543,58 @@ JIT::Label JIT::privateCompileCTINativeCall(JSGlobalData* globalData,
   breakpoint();
 #endif
 
-  return nativeCallThunk;
+#if ENABLE(JIT_OPTIMIZE_PROPERTY_ACCESS)
+  Call string_failureCases1Call = makeTailRecursiveCall(string_failureCases1);
+  Call string_failureCases2Call = makeTailRecursiveCall(string_failureCases2);
+  Call string_failureCases3Call = makeTailRecursiveCall(string_failureCases3);
+#endif
+
+  // All trampolines constructed! copy the code, link up calls, and set the
+  // pointers on the Machine object.
+  LinkBuffer patchBuffer(
+      this, m_globalData->executableAllocator.poolForSize(m_assembler.size()));
+
+#if ENABLE(JIT_OPTIMIZE_PROPERTY_ACCESS)
+  patchBuffer.link(string_failureCases1Call,
+                   FunctionPtr(cti_op_get_by_id_string_fail));
+  patchBuffer.link(string_failureCases2Call,
+                   FunctionPtr(cti_op_get_by_id_string_fail));
+  patchBuffer.link(string_failureCases3Call,
+                   FunctionPtr(cti_op_get_by_id_string_fail));
+#endif
+#if ENABLE(JIT_OPTIMIZE_CALL)
+  patchBuffer.link(callArityCheck1, FunctionPtr(cti_op_call_arityCheck));
+  patchBuffer.link(callJSFunction1, FunctionPtr(cti_op_call_jitCompile));
+  patchBuffer.link(callLazyLinkCall1, FunctionPtr(cti_vm_lazyLinkCall));
+  patchBuffer.link(callArityCheck2, FunctionPtr(cti_op_construct_arityCheck));
+  patchBuffer.link(callJSFunction2, FunctionPtr(cti_op_construct_jitCompile));
+  patchBuffer.link(callLazyLinkCall2, FunctionPtr(cti_vm_lazyLinkConstruct));
+#endif
+  patchBuffer.link(callArityCheck3, FunctionPtr(cti_op_call_arityCheck));
+  patchBuffer.link(callJSFunction3, FunctionPtr(cti_op_call_jitCompile));
+  patchBuffer.link(callArityCheck4, FunctionPtr(cti_op_construct_arityCheck));
+  patchBuffer.link(callJSFunction4, FunctionPtr(cti_op_construct_jitCompile));
+
+  CodeRef finalCode = patchBuffer.finalizeCode();
+  *executablePool = finalCode.m_executablePool;
+
+  trampolines->ctiVirtualCall = trampolineAt(finalCode, virtualCallBegin);
+  trampolines->ctiVirtualConstruct =
+      trampolineAt(finalCode, virtualConstructBegin);
+  trampolines->ctiNativeCall = trampolineAt(finalCode, nativeCallThunk);
+#if ENABLE(JIT_OPTIMIZE_PROPERTY_ACCESS)
+  trampolines->ctiStringLengthTrampoline =
+      trampolineAt(finalCode, stringLengthBegin);
+#endif
+#if ENABLE(JIT_OPTIMIZE_CALL)
+  trampolines->ctiVirtualCallLink =
+      trampolineAt(finalCode, virtualCallLinkBegin);
+  trampolines->ctiVirtualConstructLink =
+      trampolineAt(finalCode, virtualConstructLinkBegin);
+#endif
+#if ENABLE(JIT_OPTIMIZE_MOD)
+  trampolines->ctiSoftModulo = trampolineAt(finalCode, softModBegin);
+#endif
 }
 
 JIT::CodePtr JIT::privateCompileCTINativeCall(
@@ -1998,20 +1985,6 @@ void JIT::emit_op_init_arguments(Instruction* currentInstruction) {
 
   emitStore(dst, JSValue());
   emitStore(unmodifiedArgumentsRegister(dst), JSValue());
-}
-
-void JIT::emit_op_get_callee(Instruction* currentInstruction) {
-  int dst = currentInstruction[1].u.operand;
-  emitGetFromCallFrameHeaderPtr(RegisterFile::Callee, regT0);
-  emitStoreCell(dst, regT0);
-}
-
-void JIT::emit_op_create_this(Instruction* currentInstruction) {
-  unsigned protoRegister = currentInstruction[2].u.operand;
-  emitLoad(protoRegister, regT1, regT0);
-  JITStubCall stubCall(this, cti_op_create_this);
-  stubCall.addArgument(regT1, regT0);
-  stubCall.call(currentInstruction[1].u.operand);
 }
 
 void JIT::emit_op_convert_this(Instruction* currentInstruction) {

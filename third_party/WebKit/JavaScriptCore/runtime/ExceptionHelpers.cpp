@@ -248,16 +248,16 @@ JSObject* createNotAnObjectError(ExecState* exec,
                                  JSNotAnObjectErrorStub* error,
                                  unsigned bytecodeOffset,
                                  CodeBlock* codeBlock) {
-  // Both op_create_this and op_instanceof require a use of op_get_by_id to get
+  // Both op_construct and op_instanceof require a use of op_get_by_id to get
   // the prototype property from an object. The exception messages for
   // exceptions
   // thrown by these instances op_get_by_id need to reflect this.
   OpcodeID followingOpcodeID;
   if (codeBlock->getByIdExceptionInfoForBytecodeOffset(exec, bytecodeOffset,
                                                        followingOpcodeID)) {
-    ASSERT(followingOpcodeID == op_create_this ||
+    ASSERT(followingOpcodeID == op_construct ||
            followingOpcodeID == op_instanceof);
-    if (followingOpcodeID == op_create_this)
+    if (followingOpcodeID == op_construct)
       return createNotAConstructorError(
           exec, error->isNull() ? jsNull() : jsUndefined(), bytecodeOffset,
           codeBlock);

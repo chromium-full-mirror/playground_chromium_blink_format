@@ -601,19 +601,6 @@ void CodeBlock::dump(ExecState* exec,
              registerName(exec, r0).data());
       break;
     }
-    case op_get_callee: {
-      int r0 = (++it)->u.operand;
-      printf("[%4d] op_get_callee %s\n", location,
-             registerName(exec, r0).data());
-      break;
-    }
-    case op_create_this: {
-      int r0 = (++it)->u.operand;
-      int r1 = (++it)->u.operand;
-      printf("[%4d] create_this %s %s\n", location,
-             registerName(exec, r0).data(), registerName(exec, r1).data());
-      break;
-    }
     case op_convert_this: {
       int r0 = (++it)->u.operand;
       printf("[%4d] convert_this %s\n", location,
@@ -1275,8 +1262,12 @@ void CodeBlock::dump(ExecState* exec,
       int func = (++it)->u.operand;
       int argCount = (++it)->u.operand;
       int registerOffset = (++it)->u.operand;
-      printf("[%4d] construct\t %s, %d, %d\n", location,
-             registerName(exec, func).data(), argCount, registerOffset);
+      int proto = (++it)->u.operand;
+      int thisRegister = (++it)->u.operand;
+      printf("[%4d] construct\t %s, %d, %d, %s, %s\n", location,
+             registerName(exec, func).data(), argCount, registerOffset,
+             registerName(exec, proto).data(),
+             registerName(exec, thisRegister).data());
       break;
     }
     case op_strcat: {
@@ -1899,8 +1890,8 @@ bool CodeBlock::getByIdExceptionInfoForBytecodeOffset(CallFrame* callFrame,
           bytecodeOffset)
     return false;
 
-  opcodeID = m_exceptionInfo->m_getByIdExceptionInfo[low - 1].isOpCreateThis
-                 ? op_create_this
+  opcodeID = m_exceptionInfo->m_getByIdExceptionInfo[low - 1].isOpConstruct
+                 ? op_construct
                  : op_instanceof;
   return true;
 }

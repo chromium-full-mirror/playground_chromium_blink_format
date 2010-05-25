@@ -35,11 +35,6 @@ class JSActivation;
 class JSGlobalObject;
 class NativeExecutable;
 
-JSValue JSC_HOST_CALL callHostFunctionAsConstructor(ExecState*,
-                                                    JSObject*,
-                                                    JSValue,
-                                                    const ArgList&);
-
 class JSFunction : public JSObjectWithGlobalObject {
   friend class JIT;
   friend class JSGlobalData;
