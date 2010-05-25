@@ -1182,10 +1182,12 @@ void CSSStyleSelector::matchUARules(int& firstUARule, int& lastUARule) {
 }
 
 PassRefPtr<RenderStyle> CSSStyleSelector::styleForDocument(Document* document) {
+  FrameView* view = document->view();
+
   RefPtr<RenderStyle> documentStyle = RenderStyle::create();
   documentStyle->setDisplay(BLOCK);
   documentStyle->setVisuallyOrdered(document->visuallyOrdered());
-  documentStyle->setZoom(document->frame()->pageZoomFactor());
+  documentStyle->setZoom(view ? view->pageZoomFactor() : 1);
 
   FontDescription fontDescription;
   fontDescription.setUsePrinterFont(document->printing());
@@ -4441,9 +4443,12 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
         lineHeight = Length(-100.0, Percent);
       else if (CSSPrimitiveValue::isUnitTypeLength(type)) {
         double multiplier = zoomFactor;
-        if (m_style->textSizeAdjust() && m_checker.m_document->frame() &&
-            m_checker.m_document->frame()->shouldApplyTextZoom())
-          multiplier *= m_checker.m_document->frame()->textZoomFactor();
+        if (m_style->textSizeAdjust()) {
+          if (FrameView* view = m_checker.m_document->view()) {
+            if (view->shouldApplyTextZoom())
+              multiplier *= view->textZoomFactor();
+          }
+        }
         lineHeight = Length(primitiveValue->computeLengthIntForLength(
                                 style(), m_rootElementStyle, multiplier),
                             Fixed);
@@ -6515,8 +6520,8 @@ float CSSStyleSelector::getComputedSizeFromSpecifiedSize(Document* document,
   float zoomFactor = 1.0f;
   if (!useSVGZoomRules) {
     zoomFactor = style->effectiveZoom();
-    if (document->frame() && document->frame()->shouldApplyTextZoom())
-      zoomFactor *= document->frame()->textZoomFactor();
+    if (document->view() && document->view()->shouldApplyTextZoom())
+      zoomFactor *= document->view()->textZoomFactor();
   }
 
   // We support two types of minimum font size.  The first is a hard override

@@ -233,6 +233,17 @@ class FrameView : public ScrollView {
   }
   void invalidateScrollCorner();
 
+  void setZoomFactor(float scale, ZoomMode);
+  float zoomFactor() const { return m_zoomFactor; }
+  bool shouldApplyTextZoom() const;
+  bool shouldApplyPageZoom() const;
+  float pageZoomFactor() const {
+    return shouldApplyPageZoom() ? m_zoomFactor : 1.0f;
+  }
+  float textZoomFactor() const {
+    return shouldApplyTextZoom() ? m_zoomFactor : 1.0f;
+  }
+
  private:
   FrameView(Frame*);
 
@@ -310,7 +321,8 @@ class FrameView : public ScrollView {
   unsigned m_slowRepaintObjectCount;
   unsigned m_fixedObjectCount;
 
-  int m_borderX, m_borderY;
+  int m_borderX;
+  int m_borderY;
 
   Timer<FrameView> m_layoutTimer;
   bool m_delayedLayout;
@@ -366,6 +378,8 @@ class FrameView : public ScrollView {
 
   // Renderer to hold our custom scroll corner.
   RenderScrollbarPart* m_scrollCorner;
+
+  float m_zoomFactor;
 };
 
 #if ENABLE(INSPECTOR)

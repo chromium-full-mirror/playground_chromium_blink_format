@@ -103,6 +103,11 @@ class ImageDocumentElement : public HTMLImageElement {
 
 // --------
 
+static float pageZoomFactor(Document* document) {
+  FrameView* view = document->view();
+  return view ? view->pageZoomFactor() : 1;
+}
+
 void ImageTokenizer::write(const SegmentedString&, bool) {
   // <https://bugs.webkit.org/show_bug.cgi?id=25397>: JS code can always call
   // document.write, we need to handle it.
@@ -143,7 +148,7 @@ void ImageTokenizer::finish() {
     cachedImage->setResponse(
         m_doc->frame()->loader()->documentLoader()->response());
 
-    IntSize size = cachedImage->imageSize(m_doc->frame()->pageZoomFactor());
+    IntSize size = cachedImage->imageSize(pageZoomFactor(m_doc));
     if (size.width()) {
       // Compute the title, we use the decoded filename of the resource, falling
       // back on the (decoded) hostname if there is no path.
@@ -214,10 +219,13 @@ float ImageDocument::scale() const {
   if (!m_imageElement)
     return 1.0f;
 
+  FrameView* view = frame()->view();
+  if (!view)
+    return 1;
+
   IntSize imageSize =
-      m_imageElement->cachedImage()->imageSize(frame()->pageZoomFactor());
-  IntSize windowSize =
-      IntSize(frame()->view()->width(), frame()->view()->height());
+      m_imageElement->cachedImage()->imageSize(view->pageZoomFactor());
+  IntSize windowSize = IntSize(view->width(), view->height());
 
   float widthScale = (float)windowSize.width() / imageSize.width();
   float heightScale = (float)windowSize.height() / imageSize.height();
@@ -230,7 +238,7 @@ void ImageDocument::resizeImageToFit() {
     return;
 
   IntSize imageSize =
-      m_imageElement->cachedImage()->imageSize(frame()->pageZoomFactor());
+      m_imageElement->cachedImage()->imageSize(pageZoomFactor(this));
 
   float scale = this->scale();
   m_imageElement->setWidth(static_cast<int>(imageSize.width() * scale));
@@ -270,9 +278,7 @@ void ImageDocument::imageChanged() {
   if (m_imageSizeIsKnown)
     return;
 
-  if (m_imageElement->cachedImage()
-          ->imageSize(frame()->pageZoomFactor())
-          .isEmpty())
+  if (m_imageElement->cachedImage()->imageSize(pageZoomFactor(this)).isEmpty())
     return;
 
   m_imageSizeIsKnown = true;
@@ -287,12 +293,10 @@ void ImageDocument::restoreImageSize() {
   if (!m_imageElement || !m_imageSizeIsKnown)
     return;
 
-  m_imageElement->setWidth(m_imageElement->cachedImage()
-                               ->imageSize(frame()->pageZoomFactor())
-                               .width());
-  m_imageElement->setHeight(m_imageElement->cachedImage()
-                                ->imageSize(frame()->pageZoomFactor())
-                                .height());
+  m_imageElement->setWidth(
+      m_imageElement->cachedImage()->imageSize(pageZoomFactor(this)).width());
+  m_imageElement->setHeight(
+      m_imageElement->cachedImage()->imageSize(pageZoomFactor(this)).height());
 
   ExceptionCode ec;
   if (imageFitsInWindow())
@@ -307,10 +311,11 @@ bool ImageDocument::imageFitsInWindow() const {
   if (!m_imageElement)
     return true;
 
+  FrameView* view = frame()->view();
+
   IntSize imageSize =
-      m_imageElement->cachedImage()->imageSize(frame()->pageZoomFactor());
-  IntSize windowSize =
-      IntSize(frame()->view()->width(), frame()->view()->height());
+      m_imageElement->cachedImage()->imageSize(view->pageZoomFactor());
+  IntSize windowSize = IntSize(view->width(), view->height());
 
   return imageSize.width() <= windowSize.width() &&
          imageSize.height() <= windowSize.height();

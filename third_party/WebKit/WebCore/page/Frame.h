@@ -209,21 +209,6 @@ class Frame : public RefCounted<Frame>
  private:
   void lifeSupportTimerFired(Timer<Frame>*);
 
-  // === to be moved into FrameView
-
- public:
-  void setZoomFactor(float scale, ZoomMode);
-  float zoomFactor() const;
-  ZoomMode zoomMode() const;
-  bool shouldApplyTextZoom() const;
-  bool shouldApplyPageZoom() const;
-  float pageZoomFactor() const {
-    return shouldApplyPageZoom() ? zoomFactor() : 1.0f;
-  }
-  float textZoomFactor() const {
-    return shouldApplyTextZoom() ? zoomFactor() : 1.0f;
-  }
-
   // === to be moved into Chrome
 
  public:
@@ -254,7 +239,6 @@ class Frame : public RefCounted<Frame>
                                 EditAction = EditActionUnspecified);
   String selectionStartStylePropertyValue(int stylePropertyID) const;
   void applyEditingStyleToBodyElement() const;
-  void removeEditingStyleFromBodyElement() const;
   void applyEditingStyleToElement(Element*) const;
 
   IntRect firstRectForRange(Range*) const;
@@ -335,8 +319,9 @@ class Frame : public RefCounted<Frame>
   VisiblePosition visiblePositionForPoint(const IntPoint& framePoint);
   Document* documentAtPoint(const IntPoint& windowPoint);
 
- private:
 #if ENABLE(TILED_BACKING_STORE)
+
+ private:
   // TiledBackingStoreClient interface
   virtual void tiledBackingStorePaintBegin();
   virtual void tiledBackingStorePaint(GraphicsContext*, const IntRect&);
@@ -406,8 +391,6 @@ class Frame : public RefCounted<Frame>
 
   String m_kjsStatusBarText;
   String m_kjsDefaultStatusBarText;
-
-  float m_zoomFactor;
 
   mutable SelectionController m_selectionController;
   mutable VisibleSelection m_mark;
@@ -481,10 +464,6 @@ inline void Frame::setMark(const VisibleSelection& s) {
   ASSERT(!s.end().node() || s.end().node()->document() == document());
 
   m_mark = s;
-}
-
-inline float Frame::zoomFactor() const {
-  return m_zoomFactor;
 }
 
 inline String Frame::jsStatusBarText() const {

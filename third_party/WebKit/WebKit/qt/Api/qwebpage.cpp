@@ -2745,8 +2745,7 @@ void QWebPage::setContentEditable(bool editable) {
         frame->applyEditingStyleToBodyElement();
         // FIXME: mac port calls this if there is no selectedDOMRange
         // frame->setSelectionFromNone();
-      } else
-        frame->removeEditingStyleFromBodyElement();
+      }
     }
 
     d->updateEditorActions();
