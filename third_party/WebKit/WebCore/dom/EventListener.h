@@ -42,7 +42,8 @@ class EventListener : public RefCounted<EventListener> {
     InspectorDOMAgentType,
     InspectorDOMStorageResourceType,
     ObjCEventListenerType,
-    ConditionEventListenerType
+    ConditionEventListenerType,
+    GObjectEventListenerType
   };
 
   virtual ~EventListener() {}

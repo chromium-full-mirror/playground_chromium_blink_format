@@ -37,7 +37,7 @@
 namespace WebKit {
 
 gpointer kit(WebCore::TestObj* obj) {
-  g_return_val_if_fail(obj != 0, 0);
+  g_return_val_if_fail(obj, 0);
 
   if (gpointer ret = DOMObjectCache::get(obj))
     return ret;
@@ -485,31 +485,12 @@ G_DEFINE_TYPE(WebKitDOMTestObj, webkit_dom_test_obj, WEBKIT_TYPE_DOM_OBJECT)
 
 namespace WebKit {
 
-WebKitDOMTestObj* wrapTestObj(WebCore::TestObj* coreObject) {
-  g_return_val_if_fail(coreObject != 0, 0);
-
-  WebKitDOMTestObj* wrapper =
-      WEBKIT_DOM_TEST_OBJ(g_object_new(WEBKIT_TYPE_DOM_TEST_OBJ, NULL));
-  g_return_val_if_fail(wrapper != 0, 0);
-
-  /* We call ref() rather than using a C++ smart pointer because we can't store
-   * a C++ object
-   * in a C-allocated GObject structure.  See the finalize() code for the
-   * matching deref().
-   */
-
-  coreObject->ref();
-  WEBKIT_DOM_OBJECT(wrapper)->coreObject = coreObject;
-
-  return wrapper;
-}
-
 WebCore::TestObj* core(WebKitDOMTestObj* request) {
-  g_return_val_if_fail(request != 0, 0);
+  g_return_val_if_fail(request, 0);
 
   WebCore::TestObj* coreObject =
       static_cast<WebCore::TestObj*>(WEBKIT_DOM_OBJECT(request)->coreObject);
-  g_return_val_if_fail(coreObject != 0, 0);
+  g_return_val_if_fail(coreObject, 0);
 
   return coreObject;
 }
@@ -535,7 +516,7 @@ enum {
 static void webkit_dom_test_obj_finalize(GObject* object) {
   WebKitDOMObject* dom_object = WEBKIT_DOM_OBJECT(object);
 
-  if (dom_object->coreObject != NULL) {
+  if (dom_object->coreObject) {
     WebCore::TestObj* coreObject =
         static_cast<WebCore::TestObj*>(dom_object->coreObject);
 
@@ -812,3 +793,24 @@ static void webkit_dom_test_obj_class_init(
 }
 
 static void webkit_dom_test_obj_init(WebKitDOMTestObj* request) {}
+
+namespace WebKit {
+WebKitDOMTestObj* wrapTestObj(WebCore::TestObj* coreObject) {
+  g_return_val_if_fail(coreObject, 0);
+
+  WebKitDOMTestObj* wrapper =
+      WEBKIT_DOM_TEST_OBJ(g_object_new(WEBKIT_TYPE_DOM_TEST_OBJ, NULL));
+  g_return_val_if_fail(wrapper, 0);
+
+  /* We call ref() rather than using a C++ smart pointer because we can't store
+   * a C++ object
+   * in a C-allocated GObject structure.  See the finalize() code for the
+   * matching deref().
+   */
+
+  coreObject->ref();
+  WEBKIT_DOM_OBJECT(wrapper)->coreObject = coreObject;
+
+  return wrapper;
+}
+}  // namespace WebKit
