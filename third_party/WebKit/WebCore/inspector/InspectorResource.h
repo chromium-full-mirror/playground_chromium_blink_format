@@ -165,6 +165,7 @@ class InspectorResource : public RefCounted<InspectorResource> {
   bool m_failed;
   int m_length;
   int m_responseStatusCode;
+  String m_responseStatusText;
   double m_startTime;
   double m_responseReceivedTime;
   double m_endTime;
