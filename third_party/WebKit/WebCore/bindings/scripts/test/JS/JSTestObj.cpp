@@ -122,7 +122,8 @@ class JSTestObjConstructor : public DOMConstructorObject {
                                  globalObject->objectPrototype()),
                              globalObject) {
     putDirect(exec->propertyNames().prototype,
-              JSTestObjPrototype::self(exec, globalObject), None);
+              JSTestObjPrototype::self(exec, globalObject),
+              DontDelete | ReadOnly);
   }
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   virtual bool getOwnPropertyDescriptor(ExecState*,
@@ -322,6 +323,7 @@ JSTestObj::~JSTestObj() {
 JSObject* JSTestObj::createPrototype(ExecState* exec,
                                      JSGlobalObject* globalObject) {
   return new (exec) JSTestObjPrototype(
+      globalObject,
       JSTestObjPrototype::createStructure(globalObject->objectPrototype()));
 }
 
