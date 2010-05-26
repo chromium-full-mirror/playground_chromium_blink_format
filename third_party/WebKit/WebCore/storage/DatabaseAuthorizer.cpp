@@ -265,8 +265,8 @@ int DatabaseAuthorizer::dropVTable(const String& tableName,
   if (m_readOnly && m_securityEnabled)
     return SQLAuthDeny;
 
-  // fts2 is used in Chromium
-  if (moduleName != "fts2")
+  // Allow only the FTS3 extension
+  if (moduleName != "fts3")
     return SQLAuthDeny;
 
   return denyBasedOnTableName(tableName);
