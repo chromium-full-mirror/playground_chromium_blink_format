@@ -58,6 +58,8 @@ class HTMLLabelElement : public HTMLElement {
   void focus(bool restorePreviousSelection = true);
 
  private:
+  virtual void parseMappedAttribute(Attribute*);
+
   String m_formElementID;
 };
 

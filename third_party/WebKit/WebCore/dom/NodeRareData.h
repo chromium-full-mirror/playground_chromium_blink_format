@@ -52,6 +52,8 @@ struct NodeListsNodeData : Noncopyable {
       TagNodeListCache;
   TagNodeListCache m_tagNodeListCache;
 
+  RefPtr<DynamicNodeList> m_labelsNodeListCache;
+
   static PassOwnPtr<NodeListsNodeData> create() {
     return new NodeListsNodeData;
   }
@@ -62,7 +64,8 @@ struct NodeListsNodeData : Noncopyable {
 
  private:
   NodeListsNodeData()
-      : m_childNodeListCaches(DynamicNodeList::Caches::create()) {}
+      : m_childNodeListCaches(DynamicNodeList::Caches::create()),
+        m_labelsNodeListCache(0) {}
 };
 
 class NodeRareData : public Noncopyable {

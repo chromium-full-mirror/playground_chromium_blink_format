@@ -55,6 +55,7 @@
 #include "HTMLNames.h"
 #include "InspectorTimelineAgent.h"
 #include "KeyboardEvent.h"
+#include "LabelsNodeList.h"
 #include "Logging.h"
 #include "MouseEvent.h"
 #include "MutationEvent.h"
@@ -873,6 +874,17 @@ void Node::notifyNodeListsChildrenChanged() {
     n->notifyLocalNodeListsChildrenChanged();
 }
 
+void Node::notifyLocalNodeListsLabelChanged() {
+  if (!hasRareData())
+    return;
+  NodeRareData* data = rareData();
+  if (!data->nodeLists())
+    return;
+
+  if (data->nodeLists()->m_labelsNodeListCache)
+    data->nodeLists()->m_labelsNodeListCache->invalidateCache();
+}
+
 void Node::removeCachedClassNodeList(ClassNodeList* list,
                                      const String& className) {
   ASSERT(rareData());
@@ -904,6 +916,15 @@ void Node::removeCachedTagNodeList(TagNodeList* list,
   NodeListsNodeData* data = rareData()->nodeLists();
   ASSERT_UNUSED(list, list == data->m_tagNodeListCache.get(name.impl()));
   data->m_tagNodeListCache.remove(name.impl());
+}
+
+void Node::removeCachedLabelsNodeList(DynamicNodeList* list) {
+  ASSERT(rareData());
+  ASSERT(rareData()->nodeLists());
+  ASSERT_UNUSED(list, list->hasOwnCaches());
+
+  NodeListsNodeData* data = rareData()->nodeLists();
+  data->m_labelsNodeListCache = 0;
 }
 
 Node* Node::traverseNextNode(const Node* stayWithin) const {
@@ -2194,6 +2215,9 @@ void Node::formatForDebugger(char* buffer, unsigned length) const {
 
 void NodeListsNodeData::invalidateCaches() {
   m_childNodeListCaches->reset();
+
+  if (m_labelsNodeListCache)
+    m_labelsNodeListCache->invalidateCache();
   TagNodeListCache::const_iterator tagCacheEnd = m_tagNodeListCache.end();
   for (TagNodeListCache::const_iterator it = m_tagNodeListCache.begin();
        it != tagCacheEnd; ++it)
@@ -2211,6 +2235,8 @@ void NodeListsNodeData::invalidateCachesThatDependOnAttributes() {
   for (NameNodeListCache::iterator it = m_nameNodeListCache.begin();
        it != nameCacheEnd; ++it)
     it->second->invalidateCache();
+  if (m_labelsNodeListCache)
+    m_labelsNodeListCache->invalidateCache();
 }
 
 bool NodeListsNodeData::isEmpty() const {
@@ -2240,6 +2266,9 @@ bool NodeListsNodeData::isEmpty() const {
     if (it->second->refCount())
       return false;
   }
+
+  if (m_labelsNodeListCache)
+    return false;
 
   return true;
 }
