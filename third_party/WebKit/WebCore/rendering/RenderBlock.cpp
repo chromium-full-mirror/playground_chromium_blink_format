@@ -684,52 +684,28 @@ RootInlineBox* RenderBlock::createAndAppendRootInlineBox() {
   return rootBox;
 }
 
-void RenderBlock::moveChildTo(RenderObject* to,
-                              RenderObjectChildList* toChildList,
-                              RenderObject* child) {
-  ASSERT(this == child->parent());
-  toChildList->appendChildNode(
-      to, children()->removeChildNode(this, child, false), false);
-}
-
-void RenderBlock::moveChildTo(RenderObject* to,
-                              RenderObjectChildList* toChildList,
+void RenderBlock::moveChildTo(RenderBlock* to,
+                              RenderObject* child,
                               RenderObject* beforeChild,
-                              RenderObject* child) {
+                              bool fullRemoveInsert) {
   ASSERT(this == child->parent());
   ASSERT(!beforeChild || to == beforeChild->parent());
-  toChildList->insertChildNode(
-      to, children()->removeChildNode(this, child, false), beforeChild, false);
+  to->children()->insertChildNode(
+      to, children()->removeChildNode(this, child, fullRemoveInsert),
+      beforeChild, fullRemoveInsert);
 }
 
-void RenderBlock::moveAllChildrenTo(RenderObject* to,
-                                    RenderObjectChildList* toChildList,
-                                    bool fullRemoveAppend) {
-  RenderObject* nextChild = children()->firstChild();
-  while (nextChild) {
-    RenderObject* child = nextChild;
-    nextChild = child->nextSibling();
-    toChildList->appendChildNode(
-        to, children()->removeChildNode(this, child, fullRemoveAppend),
-        fullRemoveAppend);
-  }
-}
-
-void RenderBlock::moveAllChildrenTo(RenderObject* to,
-                                    RenderObjectChildList* toChildList,
-                                    RenderObject* beforeChild) {
+void RenderBlock::moveAllChildrenTo(RenderBlock* to,
+                                    RenderObject* beforeChild,
+                                    bool fullRemoveInsert) {
   ASSERT(!beforeChild || to == beforeChild->parent());
-  if (!beforeChild) {
-    moveAllChildrenTo(to, toChildList);
-    return;
-  }
   RenderObject* nextChild = children()->firstChild();
   while (nextChild) {
     RenderObject* child = nextChild;
     nextChild = child->nextSibling();
-    toChildList->insertChildNode(
-        to, children()->removeChildNode(this, child, false), beforeChild,
-        false);
+    to->children()->insertChildNode(
+        to, children()->removeChildNode(this, child, fullRemoveInsert),
+        beforeChild, fullRemoveInsert);
   }
 }
 
@@ -772,9 +748,9 @@ void RenderBlock::makeChildrenNonInline(RenderObject* insertionPoint) {
       RenderObject* no = o;
       o = no->nextSibling();
 
-      moveChildTo(block, block->children(), no);
+      moveChildTo(block, no);
     }
-    moveChildTo(block, block->children(), inlineRunEnd);
+    moveChildTo(block, inlineRunEnd);
   }
 
 #ifndef NDEBUG
@@ -905,8 +881,7 @@ void RenderBlock::removeChild(RenderObject* oldChild) {
       // Take all the children out of the |next| block and put them in
       // the |prev| block.
       nextBlock->moveAllChildrenTo(
-          prevBlock, prevBlock->children(),
-          nextBlock->hasLayer() || prevBlock->hasLayer());
+          prevBlock, nextBlock->hasLayer() || prevBlock->hasLayer());
 
       // Delete the now-empty block's lines and nuke it.
       nextBlock->deleteLineBoxTree();
@@ -926,7 +901,7 @@ void RenderBlock::removeChild(RenderObject* oldChild) {
     setChildrenInline(child->childrenInline());
     RenderBlock* anonBlock = toRenderBlock(
         children()->removeChildNode(this, child, child->hasLayer()));
-    anonBlock->moveAllChildrenTo(this, children(), child->hasLayer());
+    anonBlock->moveAllChildrenTo(this, child->hasLayer());
     // Delete the now-empty block's lines and nuke it.
     anonBlock->deleteLineBoxTree();
     anonBlock->destroy();
