@@ -36,6 +36,7 @@
 #include "LinkHash.h"
 #include "PassRefPtr.h"
 #include "PasteboardPrivate.h"
+#include "PluginData.h"
 
 #include <wtf/Vector.h>
 
@@ -64,7 +65,6 @@ class String;
 class Widget;
 
 struct Cookie;
-struct PluginInfo;
 struct FontRenderStyle;
 
 // An interface to the embedding layer, which has the ability to answer
@@ -197,7 +197,7 @@ class ChromiumBridge {
   static String preferredExtensionForMIMEType(const String& mimeType);
 
   // Plugin -------------------------------------------------------------
-  static bool plugins(bool refresh, Vector<PluginInfo*>*);
+  static bool plugins(bool refresh, Vector<PluginInfo>*);
   static NPObject* pluginScriptableObject(Widget*);
   static bool popupsAllowed(NPP);
 

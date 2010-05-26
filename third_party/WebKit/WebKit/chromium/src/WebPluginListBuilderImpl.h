@@ -40,7 +40,7 @@ namespace WebKit {
 
 class WebPluginListBuilderImpl : public WebPluginListBuilder {
  public:
-  WebPluginListBuilderImpl(Vector<WebCore::PluginInfo*>* results)
+  WebPluginListBuilderImpl(Vector<WebCore::PluginInfo>* results)
       : m_results(results) {}
 
   // WebPluginListBuilder methods:
@@ -52,7 +52,7 @@ class WebPluginListBuilderImpl : public WebPluginListBuilder {
   virtual void addFileExtensionToLastMediaType(const WebString& extension);
 
  private:
-  Vector<WebCore::PluginInfo*>* m_results;
+  Vector<WebCore::PluginInfo>* m_results;
 };
 
 }  // namespace WebKit

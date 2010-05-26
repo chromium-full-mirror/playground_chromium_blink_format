@@ -29,18 +29,23 @@ namespace WebCore {
 class Page;
 struct PluginInfo;
 
-struct MimeClassInfo : Noncopyable {
+struct MimeClassInfo {
   String type;
   String desc;
   String suffixes;
-  PluginInfo* plugin;
+  unsigned pluginIndex;
 };
 
-struct PluginInfo : Noncopyable {
+inline bool operator==(const MimeClassInfo& a, const MimeClassInfo& b) {
+  return a.type == b.type && a.desc == b.desc && a.suffixes == b.suffixes &&
+         a.pluginIndex == b.pluginIndex;
+}
+
+struct PluginInfo {
   String name;
   String file;
   String desc;
-  Vector<MimeClassInfo*> mimes;
+  Vector<MimeClassInfo> mimes;
 };
 
 // FIXME: merge with PluginDatabase in the future
@@ -49,13 +54,12 @@ class PluginData : public RefCounted<PluginData> {
   static PassRefPtr<PluginData> create(const Page* page) {
     return adoptRef(new PluginData(page));
   }
-  ~PluginData();
 
   void disconnectPage() { m_page = 0; }
   const Page* page() const { return m_page; }
 
-  const Vector<PluginInfo*>& plugins() const { return m_plugins; }
-  const Vector<MimeClassInfo*>& mimes() const { return m_mimes; }
+  const Vector<PluginInfo>& plugins() const { return m_plugins; }
+  const Vector<MimeClassInfo>& mimes() const { return m_mimes; }
 
   bool supportsMimeType(const String& mimeType) const;
   String pluginNameForMimeType(const String& mimeType) const;
@@ -66,8 +70,8 @@ class PluginData : public RefCounted<PluginData> {
   PluginData(const Page*);
   void initPlugins();
 
-  Vector<PluginInfo*> m_plugins;
-  Vector<MimeClassInfo*> m_mimes;
+  Vector<PluginInfo> m_plugins;
+  Vector<MimeClassInfo> m_mimes;
   const Page* m_page;
 };
 }

@@ -34,41 +34,41 @@ PluginArray::PluginArray(Frame* frame) : m_frame(frame) {}
 PluginArray::~PluginArray() {}
 
 unsigned PluginArray::length() const {
-  PluginData* data = getPluginData();
+  PluginData* data = pluginData();
   if (!data)
     return 0;
   return data->plugins().size();
 }
 
 PassRefPtr<Plugin> PluginArray::item(unsigned index) {
-  PluginData* data = getPluginData();
+  PluginData* data = pluginData();
   if (!data)
     return 0;
-  const Vector<PluginInfo*>& plugins = data->plugins();
+  const Vector<PluginInfo>& plugins = data->plugins();
   if (index >= plugins.size())
     return 0;
   return Plugin::create(data, index).get();
 }
 
 bool PluginArray::canGetItemsForName(const AtomicString& propertyName) {
-  PluginData* data = getPluginData();
+  PluginData* data = pluginData();
   if (!data)
     return 0;
-  const Vector<PluginInfo*>& plugins = data->plugins();
+  const Vector<PluginInfo>& plugins = data->plugins();
   for (unsigned i = 0; i < plugins.size(); ++i) {
-    if (plugins[i]->name == propertyName)
+    if (plugins[i].name == propertyName)
       return true;
   }
   return false;
 }
 
 PassRefPtr<Plugin> PluginArray::namedItem(const AtomicString& propertyName) {
-  PluginData* data = getPluginData();
+  PluginData* data = pluginData();
   if (!data)
     return 0;
-  const Vector<PluginInfo*>& plugins = data->plugins();
+  const Vector<PluginInfo>& plugins = data->plugins();
   for (unsigned i = 0; i < plugins.size(); ++i) {
-    if (plugins[i]->name == propertyName)
+    if (plugins[i].name == propertyName)
       return Plugin::create(data, i).get();
   }
   return 0;
@@ -78,13 +78,13 @@ void PluginArray::refresh(bool reload) {
   Page::refreshPlugins(reload);
 }
 
-PluginData* PluginArray::getPluginData() const {
+PluginData* PluginArray::pluginData() const {
   if (!m_frame)
     return 0;
-  Page* p = m_frame->page();
-  if (!p)
+  Page* page = m_frame->page();
+  if (!page)
     return 0;
-  return p->pluginData();
+  return page->pluginData();
 }
 
 }  // namespace WebCore

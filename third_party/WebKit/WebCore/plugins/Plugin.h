@@ -49,6 +49,10 @@ class Plugin : public RefCounted<Plugin> {
   PassRefPtr<MimeType> namedItem(const AtomicString& propertyName);
 
  private:
+  const PluginInfo& pluginInfo() const {
+    return m_pluginData->plugins()[m_index];
+  }
+
   Plugin(PluginData*, unsigned index);
   RefPtr<PluginData> m_pluginData;
   unsigned m_index;

@@ -50,7 +50,7 @@ class PluginArray : public RefCounted<PluginArray> {
 
  private:
   PluginArray(Frame*);
-  PluginData* getPluginData() const;
+  PluginData* pluginData() const;
 
   Frame* m_frame;
 };
