@@ -78,24 +78,28 @@ class SegmentedString {
       : m_pushedChar1(0),
         m_pushedChar2(0),
         m_currentChar(0),
-        m_composite(false) {}
+        m_composite(false),
+        m_closed(false) {}
   SegmentedString(const UChar* str, int length)
       : m_pushedChar1(0),
         m_pushedChar2(0),
         m_currentString(str, length),
         m_currentChar(m_currentString.m_current),
-        m_composite(false) {}
+        m_composite(false),
+        m_closed(false) {}
   SegmentedString(const String& str)
       : m_pushedChar1(0),
         m_pushedChar2(0),
         m_currentString(str),
         m_currentChar(m_currentString.m_current),
-        m_composite(false) {}
+        m_composite(false),
+        m_closed(false) {}
   SegmentedString(const SegmentedString&);
 
   const SegmentedString& operator=(const SegmentedString&);
 
   void clear();
+  void close() { m_closed = true; }
 
   void append(const SegmentedString&);
   void prepend(const SegmentedString&);
@@ -118,6 +122,8 @@ class SegmentedString {
 
   bool isEmpty() const { return !current(); }
   unsigned length() const;
+
+  bool isClosed() const { return m_closed; }
 
   enum LookAheadResult {
     DidNotMatch,
@@ -230,6 +236,7 @@ class SegmentedString {
   const UChar* m_currentChar;
   Deque<SegmentedSubstring> m_substrings;
   bool m_composite;
+  bool m_closed;
 };
 }
 

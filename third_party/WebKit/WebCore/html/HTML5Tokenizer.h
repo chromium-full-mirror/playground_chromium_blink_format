@@ -57,6 +57,8 @@ class HTML5Tokenizer : public Tokenizer, public CachedResourceClient {
   virtual bool isWaitingForScripts() const;
 
  private:
+  void pumpLexer();
+
   SegmentedString m_source;
 
   // We hold m_token here because it might be partially complete.

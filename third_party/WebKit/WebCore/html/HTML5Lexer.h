@@ -139,7 +139,7 @@ class HTML5Lexer : public Noncopyable {
   inline void maybeFlushBufferedEndTag();
   inline void flushBufferedEndTag();
 
-  inline bool haveBufferedCharacterToken();
+  inline bool shouldEmitBufferedCharacterToken(const SegmentedString&);
 
   State m_state;
 

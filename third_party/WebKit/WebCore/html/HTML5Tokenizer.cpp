@@ -45,15 +45,21 @@ HTML5Tokenizer::~HTML5Tokenizer() {}
 
 void HTML5Tokenizer::begin() {}
 
-void HTML5Tokenizer::write(const SegmentedString& source, bool) {
-  m_source.append(source);
+void HTML5Tokenizer::pumpLexer() {
   while (m_lexer->nextToken(m_source, m_token)) {
     m_treeBuilder->constructTreeFromToken(m_token);
     m_token.clear();
   }
 }
 
+void HTML5Tokenizer::write(const SegmentedString& source, bool) {
+  m_source.append(source);
+  pumpLexer();
+}
+
 void HTML5Tokenizer::end() {
+  m_source.close();
+  pumpLexer();
   m_treeBuilder->finished();
 }
 
