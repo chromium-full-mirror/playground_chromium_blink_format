@@ -106,7 +106,7 @@ void RenderRubyBase::moveInlineChildren(RenderRubyBase* toBase,
   // Move our inline children into the target block we determined above.
   for (RenderObject* child = firstChild(); child != fromBeforeChild;
        child = firstChild())
-    moveChildTo(toBlock, child);
+    moveChildTo(toBlock, toBlock->children(), child);
 }
 
 void RenderRubyBase::moveBlockChildren(RenderRubyBase* toBase,
@@ -122,12 +122,12 @@ void RenderRubyBase::moveBlockChildren(RenderRubyBase* toBase,
           RenderBlock* anonBlock = toRenderBlock(child);
           ASSERT(anonBlock->childrenInline());
           ASSERT(!anonBlock->inlineElementContinuation());
-          anonBlock->moveAllChildrenTo(toBase);
+          anonBlock->moveAllChildrenTo(toBase, toBase->children());
           anonBlock->deleteLineBoxTree();
           anonBlock->destroy();
         } else {
           ASSERT(child->isFloatingOrPositioned());
-          moveChildTo(toBase, child);
+          moveChildTo(toBase, toBase->children(), child);
         }
       }
     } else {
@@ -150,7 +150,7 @@ void RenderRubyBase::moveBlockChildren(RenderRubyBase* toBase,
           ASSERT(anonBlock->childrenInline());
           ASSERT(!anonBlock->inlineElementContinuation());
           // Move inline children out of anonymous block.
-          anonBlock->moveAllChildrenTo(this, anonBlock);
+          anonBlock->moveAllChildrenTo(this, children(), anonBlock);
           anonBlock->deleteLineBoxTree();
           anonBlock->destroy();
         }
@@ -182,14 +182,15 @@ void RenderRubyBase::mergeBlockChildren(RenderRubyBase* toBase,
       lastChildThere->isAnonymousBlock() && lastChildThere->childrenInline()) {
     RenderBlock* anonBlockHere = toRenderBlock(firstChildHere);
     RenderBlock* anonBlockThere = toRenderBlock(lastChildThere);
-    anonBlockHere->moveAllChildrenTo(anonBlockThere);
+    anonBlockHere->moveAllChildrenTo(anonBlockThere,
+                                     anonBlockThere->children());
     anonBlockHere->deleteLineBoxTree();
     anonBlockHere->destroy();
   }
   // Move all remaining children normally.
   for (RenderObject* child = firstChild(); child != fromBeforeChild;
        child = firstChild())
-    moveChildTo(toBase, child);
+    moveChildTo(toBase, toBase->children(), child);
 }
 
 }  // namespace WebCore
