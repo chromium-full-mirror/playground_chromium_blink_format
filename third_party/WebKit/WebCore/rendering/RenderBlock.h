@@ -194,6 +194,10 @@ class RenderBlock : public RenderBox {
   // inherits its
   // style from this RenderBlock.
   RenderBlock* createAnonymousBlock(bool isFlexibleBox = false) const;
+  RenderBlock* createAnonymousColumnsBlock() const;
+  RenderBlock* createAnonymousColumnSpanBlock() const;
+  RenderBlock* createAnonymousBlockWithSameTypeAs(
+      RenderBlock* otherAnonymousBlock) const;
 
   static void appendRunsForObject(int start,
                                   int end,
@@ -214,7 +218,9 @@ class RenderBlock : public RenderBox {
                    RenderObjectChildList* toChildList,
                    RenderObject* beforeChild,
                    RenderObject* child);
-  void moveAllChildrenTo(RenderObject* to, RenderObjectChildList* toChildList);
+  void moveAllChildrenTo(RenderObject* to,
+                         RenderObjectChildList* toChildList,
+                         bool fullRemoveAppend = false);
   void moveAllChildrenTo(RenderObject* to,
                          RenderObjectChildList* toChildList,
                          RenderObject* beforeChild);
@@ -314,6 +320,12 @@ class RenderBlock : public RenderBox {
   virtual void dirtyLinesFromChangedChild(RenderObject* child) {
     m_lineBoxes.dirtyLinesFromChangedChild(this, child);
   }
+
+  void addChildToAnonymousColumnBlocks(RenderObject* newChild,
+                                       RenderObject* beforeChild);
+  virtual void addChildIgnoringAnonymousColumnBlocks(
+      RenderObject* newChild,
+      RenderObject* beforeChild = 0);
 
   virtual bool isSelfCollapsingBlock() const;
 
@@ -573,10 +585,15 @@ class RenderBlock : public RenderBox {
   void calcColumnWidth();
   int layoutColumns(int endOfContent = -1, int requestedColumnHeight = -1);
   int visibleTopOfHighestFloatExtendingBelow(int bottom, int maxHeight) const;
+  void makeChildrenAnonymousColumnBlocks(RenderObject* beforeChild,
+                                         RenderBlock* newBlockBox,
+                                         RenderObject* newChild);
 
   bool expandsToEncloseOverhangingFloats() const;
 
   void updateScrollInfoAfterLayout();
+
+  RenderObject* splitAnonymousBlocksAroundChild(RenderObject* beforeChild);
 
   struct FloatingObject : Noncopyable {
     enum Type { FloatLeft, FloatRight };

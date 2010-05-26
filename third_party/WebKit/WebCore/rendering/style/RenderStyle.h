@@ -1543,6 +1543,10 @@ class RenderStyle : public RefCounted<RenderStyle> {
   void setColumnBreakAfter(EPageBreak p) {
     SET_VAR(rareNonInheritedData.access()->m_multiCol, m_breakAfter, p);
   }
+  void inheritColumnPropertiesFrom(RenderStyle* parent) {
+    rareNonInheritedData.access()->m_multiCol =
+        parent->rareNonInheritedData->m_multiCol;
+  }
   void setTransform(const TransformOperations& ops) {
     SET_VAR(rareNonInheritedData.access()->m_transform, m_operations, ops);
   }

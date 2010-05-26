@@ -416,6 +416,12 @@ class RenderObject : public CachedResourceClient {
     return m_isAnonymous && style()->display() == BLOCK &&
            style()->styleType() == NOPSEUDO && !isListMarker();
   }
+  bool isAnonymousColumnsBlock() const {
+    return style()->specifiesColumns() && isAnonymousBlock();
+  }
+  bool isAnonymousColumnSpanBlock() const {
+    return style()->columnSpan() && isAnonymousBlock();
+  }
   bool isElementContinuation() const {
     return node() && node()->renderer() != this;
   }
