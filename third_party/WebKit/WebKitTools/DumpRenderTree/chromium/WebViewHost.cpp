@@ -1238,7 +1238,7 @@ void WebViewHost::paintRect(const WebRect& rect) {
 #if PLATFORM(CG)
   webWidget()->paint(m_canvas->getTopPlatformDevice().GetBitmapContext(), rect);
 #else
-  webWidget()->paint(m_canvas.get(), rect);
+  webWidget()->paint(canvas(), rect);
 #endif
   m_isPainting = false;
 }
