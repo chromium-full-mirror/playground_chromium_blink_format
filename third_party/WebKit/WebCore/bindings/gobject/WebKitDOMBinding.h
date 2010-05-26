@@ -30,11 +30,13 @@
 namespace WebCore {
 class Node;
 class Element;
+class EventTarget;
 }  // namespace WebCore
 
 namespace WebKit {
 gpointer kit(WebCore::Node* node);
 gpointer kit(WebCore::Element* element);
+gpointer kit(WebCore::EventTarget* target);
 
 class DOMObjectCache {
  public:
