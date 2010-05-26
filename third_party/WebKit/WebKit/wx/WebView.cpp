@@ -323,7 +323,7 @@ bool wxWebView::Create(wxWindow* parent,
   m_impl->page = new WebCore::Page(new WebCore::ChromeClientWx(this),
                                    new WebCore::ContextMenuClientWx(),
                                    editorClient, new WebCore::DragClientWx(),
-                                   new WebCore::InspectorClientWx(), 0, 0);
+                                   new WebCore::InspectorClientWx(), 0, 0, 0);
   editorClient->setPage(m_impl->page);
 
   m_mainFrame = new wxWebFrame(this);
