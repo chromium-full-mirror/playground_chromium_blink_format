@@ -111,6 +111,17 @@ void unconsumeCharacters(SegmentedString& source,
     source.prepend(SegmentedString(
         String(consumedCharacters.data(), consumedCharacters.size())));
 }
+
+inline bool isEndTagBufferingState(HTML5Lexer::State state) {
+  return state == HTML5Lexer::RCDATAEndTagOpenState ||
+         state == HTML5Lexer::RCDATAEndTagNameState ||
+         state == HTML5Lexer::RAWTEXTEndTagOpenState ||
+         state == HTML5Lexer::RAWTEXTEndTagNameState ||
+         state == HTML5Lexer::ScriptDataEndTagOpenState ||
+         state == HTML5Lexer::ScriptDataEndTagNameState ||
+         state == HTML5Lexer::ScriptDataEscapedEndTagOpenState ||
+         state == HTML5Lexer::ScriptDataEscapedEndTagNameState;
+}
 }
 
 HTML5Lexer::HTML5Lexer() {
@@ -285,7 +296,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
          token.type() == HTML5Token::Uninitialized);
   m_token = &token;
 
-  if (!m_bufferedEndTagName.isEmpty()) {
+  if (!m_bufferedEndTagName.isEmpty() && !isEndTagBufferingState(m_state)) {
     // FIXME: This should call flushBufferedEndTag().
     // We started an end tag during our last iteration.
     m_token->beginEndTag(m_bufferedEndTagName);
@@ -429,11 +440,11 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
       case RCDATAEndTagOpenState: {
         if (cc >= 'A' && cc <= 'Z') {
           m_temporaryBuffer.append(cc);
-          m_bufferedEndTagName.append(toLowerCase(cc));
+          addToPossibleEndTag(toLowerCase(cc));
           m_state = RCDATAEndTagNameState;
         } else if (cc >= 'a' && cc <= 'z') {
           m_temporaryBuffer.append(cc);
-          m_bufferedEndTagName.append(cc);
+          addToPossibleEndTag(cc);
           m_state = RCDATAEndTagNameState;
         } else {
           emitCharacter('<');
@@ -446,10 +457,10 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
       case RCDATAEndTagNameState: {
         if (cc >= 'A' && cc <= 'Z') {
           m_temporaryBuffer.append(cc);
-          m_bufferedEndTagName.append(toLowerCase(cc));
+          addToPossibleEndTag(toLowerCase(cc));
         } else if (cc >= 'a' && cc <= 'z') {
           m_temporaryBuffer.append(cc);
-          m_bufferedEndTagName.append(cc);
+          addToPossibleEndTag(cc);
         } else {
           if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ') {
             if (isAppropriateEndTag()) {
@@ -494,11 +505,11 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
       case RAWTEXTEndTagOpenState: {
         if (cc >= 'A' && cc <= 'Z') {
           m_temporaryBuffer.append(cc);
-          m_bufferedEndTagName.append(toLowerCase(cc));
+          addToPossibleEndTag(toLowerCase(cc));
           m_state = RAWTEXTEndTagNameState;
         } else if (cc >= 'a' && cc <= 'z') {
           m_temporaryBuffer.append(cc);
-          m_bufferedEndTagName.append(cc);
+          addToPossibleEndTag(cc);
           m_state = RAWTEXTEndTagNameState;
         } else {
           emitCharacter('<');
@@ -511,10 +522,10 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
       case RAWTEXTEndTagNameState: {
         if (cc >= 'A' && cc <= 'Z') {
           m_temporaryBuffer.append(cc);
-          m_bufferedEndTagName.append(toLowerCase(cc));
+          addToPossibleEndTag(toLowerCase(cc));
         } else if (cc >= 'a' && cc <= 'z') {
           m_temporaryBuffer.append(cc);
-          m_bufferedEndTagName.append(cc);
+          addToPossibleEndTag(cc);
         } else {
           if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ') {
             if (isAppropriateEndTag()) {
@@ -563,11 +574,11 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
       case ScriptDataEndTagOpenState: {
         if (cc >= 'A' && cc <= 'Z') {
           m_temporaryBuffer.append(cc);
-          m_bufferedEndTagName.append(toLowerCase(cc));
+          addToPossibleEndTag(toLowerCase(cc));
           m_state = ScriptDataEndTagNameState;
         } else if (cc >= 'a' && cc <= 'z') {
           m_temporaryBuffer.append(cc);
-          m_bufferedEndTagName.append(cc);
+          addToPossibleEndTag(cc);
           m_state = ScriptDataEndTagNameState;
         } else {
           emitCharacter('<');
@@ -580,10 +591,10 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
       case ScriptDataEndTagNameState: {
         if (cc >= 'A' && cc <= 'Z') {
           m_temporaryBuffer.append(cc);
-          m_bufferedEndTagName.append(toLowerCase(cc));
+          addToPossibleEndTag(toLowerCase(cc));
         } else if (cc >= 'a' && cc <= 'z') {
           m_temporaryBuffer.append(cc);
-          m_bufferedEndTagName.append(cc);
+          addToPossibleEndTag(cc);
         } else {
           if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ') {
             if (isAppropriateEndTag()) {
@@ -699,11 +710,11 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
       case ScriptDataEscapedEndTagOpenState: {
         if (cc >= 'A' && cc <= 'Z') {
           m_temporaryBuffer.append(cc);
-          m_bufferedEndTagName.append(toLowerCase(cc));
+          addToPossibleEndTag(toLowerCase(cc));
           m_state = ScriptDataEscapedEndTagNameState;
         } else if (cc >= 'a' && cc <= 'z') {
           m_temporaryBuffer.append(cc);
-          m_bufferedEndTagName.append(cc);
+          addToPossibleEndTag(cc);
           m_state = ScriptDataEscapedEndTagNameState;
         } else {
           emitCharacter('<');
@@ -716,10 +727,10 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
       case ScriptDataEscapedEndTagNameState: {
         if (cc >= 'A' && cc <= 'Z') {
           m_temporaryBuffer.append(cc);
-          m_bufferedEndTagName.append(toLowerCase(cc));
+          addToPossibleEndTag(toLowerCase(cc));
         } else if (cc >= 'a' && cc <= 'z') {
           m_temporaryBuffer.append(cc);
-          m_bufferedEndTagName.append(cc);
+          addToPossibleEndTag(cc);
         } else {
           if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ') {
             if (isAppropriateEndTag()) {
@@ -1468,6 +1479,11 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
 
 inline bool HTML5Lexer::temporaryBufferIs(const String& expectedString) {
   return vectorEqualsString(m_temporaryBuffer, expectedString);
+}
+
+inline void HTML5Lexer::addToPossibleEndTag(UChar cc) {
+  ASSERT(isEndTagBufferingState(m_state));
+  m_bufferedEndTagName.append(cc);
 }
 
 inline bool HTML5Lexer::isAppropriateEndTag() {
