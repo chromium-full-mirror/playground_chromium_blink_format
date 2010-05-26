@@ -55,7 +55,6 @@ class IndexedDatabase : public ThreadSafeShared<IndexedDatabase> {
 
   virtual void open(const String& name,
                     const String& description,
-                    bool modifyDatabase,
                     PassRefPtr<IDBCallbacks>,
                     PassRefPtr<SecurityOrigin>,
                     Frame*,

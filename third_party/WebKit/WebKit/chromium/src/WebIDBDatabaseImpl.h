@@ -46,7 +46,10 @@ class WebIDBDatabaseImpl : public WebIDBDatabase {
   WebIDBDatabaseImpl(WTF::PassRefPtr<WebCore::IDBDatabase> idbDatabase);
   virtual ~WebIDBDatabaseImpl();
 
-  // FIXME: Implement.
+  virtual WebString name();
+  virtual WebString description();
+  virtual WebString version();
+  virtual WebVector<WebString> objectStores();
 
  private:
   WTF::RefPtr<WebCore::IDBDatabase> m_idbDatabase;

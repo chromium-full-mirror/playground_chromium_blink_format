@@ -29,6 +29,7 @@
 #include "config.h"
 #include "WebIDBDatabaseImpl.h"
 
+#include "DOMStringList.h"
 #include "IDBDatabase.h"
 
 #if ENABLE(INDEXED_DATABASE)
@@ -37,9 +38,26 @@ using namespace WebCore;
 
 namespace WebKit {
 
-WebIDBDatabaseImpl::WebIDBDatabaseImpl(PassRefPtr<IDBDatabase> idbDatabase) {}
+WebIDBDatabaseImpl::WebIDBDatabaseImpl(PassRefPtr<IDBDatabase> idbDatabase)
+    : m_idbDatabase(idbDatabase) {}
 
 WebIDBDatabaseImpl::~WebIDBDatabaseImpl() {}
+
+WebString WebIDBDatabaseImpl::name() {
+  return m_idbDatabase->name();
+}
+
+WebString WebIDBDatabaseImpl::description() {
+  return m_idbDatabase->description();
+}
+
+WebString WebIDBDatabaseImpl::version() {
+  return m_idbDatabase->version();
+}
+
+WebVector<WebString> WebIDBDatabaseImpl::objectStores() {
+  return m_idbDatabase->objectStores()->strings();
+}
 
 }  // namespace WebCore
 

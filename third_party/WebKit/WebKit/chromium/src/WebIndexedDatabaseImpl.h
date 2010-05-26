@@ -45,7 +45,6 @@ class WebIndexedDatabaseImpl : public WebIndexedDatabase {
 
   virtual void open(const WebString& name,
                     const WebString& description,
-                    bool modifyDatabase,
                     WebIDBCallbacks*,
                     const WebSecurityOrigin&,
                     WebFrame*,

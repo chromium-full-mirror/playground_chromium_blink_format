@@ -47,6 +47,11 @@ class IDBDatabaseProxy : public IDBDatabase {
   static PassRefPtr<IDBDatabase> create(PassOwnPtr<WebKit::WebIDBDatabase>);
   virtual ~IDBDatabaseProxy();
 
+  virtual String name();
+  virtual String description();
+  virtual String version();
+  virtual PassRefPtr<DOMStringList> objectStores();
+
   // FIXME: Add other methods.
 
  private:

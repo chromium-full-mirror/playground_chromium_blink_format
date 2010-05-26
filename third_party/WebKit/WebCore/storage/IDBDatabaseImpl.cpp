@@ -25,14 +25,31 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 #include "config.h"
-#include "IDBDatabase.h"
+#include "IDBDatabaseImpl.h"
+
+#include "DOMStringList.h"
+#include "SecurityOrigin.h"
+#include <wtf/Threading.h>
+#include <wtf/UnusedParam.h>
 
 #if ENABLE(INDEXED_DATABASE)
 
 namespace WebCore {
 
-// FIXME: Write.
+IDBDatabaseImpl::IDBDatabaseImpl(const String& name,
+                                 const String& description,
+                                 const String& version)
+    : m_name(name), m_description(description), m_version(version) {}
+
+IDBDatabaseImpl::~IDBDatabaseImpl() {}
+
+PassRefPtr<DOMStringList> IDBDatabaseImpl::objectStores() {
+  // FIXME: This should return the actual list.
+  ASSERT_NOT_REACHED();
+  return DOMStringList::create();
+}
 
 }  // namespace WebCore
 
