@@ -342,13 +342,15 @@ void InspectorController::clearConsoleMessages() {
 }
 
 void InspectorController::startGroup(MessageSource source,
-                                     ScriptCallStack* callStack) {
+                                     ScriptCallStack* callStack,
+                                     bool collapsed) {
   ++m_groupLevel;
 
   addConsoleMessage(
       callStack->state(),
-      new ConsoleMessage(source, StartGroupMessageType, LogMessageLevel,
-                         callStack, m_groupLevel));
+      new ConsoleMessage(source, collapsed ? StartGroupCollapsedMessageType
+                                           : StartGroupMessageType,
+                         LogMessageLevel, callStack, m_groupLevel));
 }
 
 void InspectorController::endGroup(MessageSource source,

@@ -241,7 +241,9 @@ class InspectorController
   void startTiming(const String& title);
   bool stopTiming(const String& title, double& elapsed);
 
-  void startGroup(MessageSource source, ScriptCallStack* callFrame);
+  void startGroup(MessageSource source,
+                  ScriptCallStack* callFrame,
+                  bool collapsed = false);
   void endGroup(MessageSource source,
                 unsigned lineNumber,
                 const String& sourceURL);
