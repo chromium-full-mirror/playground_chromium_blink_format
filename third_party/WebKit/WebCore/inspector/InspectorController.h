@@ -65,7 +65,7 @@ class InjectedScript;
 class InjectedScriptHost;
 class InspectorBackend;
 class InspectorClient;
-struct InspectorCSSStore;
+class InspectorCSSStore;
 class InspectorFrontend;
 class InspectorFrontendClient;
 class InspectorTimelineAgent;
@@ -231,6 +231,8 @@ class InspectorController
 #endif
 
   const ResourcesMap& resources() const { return m_resources; }
+  InspectorResource* resourceForURL(const String& url);
+  InspectorFrontend* inspectorFrontend() { return m_frontend.get(); }
 
   void drawNodeHighlight(GraphicsContext&) const;
 
@@ -309,8 +311,6 @@ class InspectorController
 
   // Following are used from InspectorBackend and internally.
   void setSearchingForNode(bool enabled);
-
-  // Following are used from InspectorBackend and internally.
   void storeLastActivePanel(const String& panelName);
   InspectorDOMAgent* domAgent() { return m_domAgent.get(); }
   void releaseDOMAgent();
