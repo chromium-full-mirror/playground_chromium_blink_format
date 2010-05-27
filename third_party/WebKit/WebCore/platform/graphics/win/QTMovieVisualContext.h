@@ -55,8 +55,10 @@ class QTMovieVisualContextClient {
 class QTMOVIEWIN_API QTMovieVisualContext
     : public RefCounted<QTMovieVisualContext> {
  public:
+  enum Type { ConfigureForCGImage, ConfigureForCAImageQueue };
+
   static PassRefPtr<QTMovieVisualContext> create(QTMovieVisualContextClient*,
-                                                 CFDictionaryRef options = 0);
+                                                 Type);
   ~QTMovieVisualContext();
 
   bool isImageAvailableForTime(const QTCVTimeStamp*) const;
@@ -68,12 +70,10 @@ class QTMOVIEWIN_API QTMovieVisualContext
   void setMovie(PassRefPtr<QTMovie>);
   QTMovie* movie() const;
 
-  static CFDictionaryRef getCGImageOptions();
   static double currentHostTime();
 
  protected:
-  QTMovieVisualContext(QTMovieVisualContextClient*,
-                       CFDictionaryRef options = 0);
+  QTMovieVisualContext(QTMovieVisualContextClient*, Type);
   void setupVisualContext();
 
   friend class QTMovieVisualContextPriv;
