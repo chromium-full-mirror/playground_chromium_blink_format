@@ -194,7 +194,7 @@ void RenderObjectChildList::insertChildNode(RenderObject* owner,
                                             RenderObject* beforeChild,
                                             bool fullInsert) {
   if (!beforeChild) {
-    appendChildNode(owner, child);
+    appendChildNode(owner, child, fullInsert);
     return;
   }
 
