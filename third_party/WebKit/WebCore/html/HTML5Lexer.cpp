@@ -133,6 +133,7 @@ HTML5Lexer::~HTML5Lexer() {}
 void HTML5Lexer::reset() {
   m_state = DataState;
   m_token = 0;
+  m_skipLeadingNewLineForListing = false;
   m_emitPending = false;
   m_additionalAllowedCharacter = '\0';
 }
@@ -306,6 +307,12 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
       return true;
     }
   }
+
+  // http://www.whatwg.org/specs/web-apps/current-work/multipage/tokenization.html#parsing-main-inbody
+  if (m_skipLeadingNewLineForListing && m_state == DataState &&
+      !source.isEmpty() && *source == '\x0A')
+    source.advanceAndASSERT('\x0A');
+  m_skipLeadingNewLineForListing = false;
 
   // Source: http://www.whatwg.org/specs/web-apps/current-work/#tokenisation0
   // FIXME: This while should stop as soon as we have a token to return.
