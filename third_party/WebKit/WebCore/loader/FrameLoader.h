@@ -369,7 +369,7 @@ class FrameLoader : public Noncopyable {
   void setTitle(const String&);
   void setIconURL(const String&);
 
-  void commitProvisionalLoad();
+  void commitProvisionalLoad(PassRefPtr<CachedPage>);
   bool isLoadingFromCachedPage() const { return m_loadingFromCachedPage; }
 
   bool committingFirstRealLoad() const {
@@ -436,8 +436,6 @@ class FrameLoader : public Noncopyable {
              bool clearScriptObjects = true,
              bool clearFrameView = true);
 
-  bool quickRedirectComing() const { return m_quickRedirectComing; }
-
   bool shouldClose();
 
  private:
@@ -465,7 +463,8 @@ class FrameLoader : public Noncopyable {
   void navigateWithinDocument(HistoryItem*);
   void navigateToDifferentDocument(HistoryItem*, FrameLoadType);
 
-  void loadProvisionalItemFromCachedPage();
+  bool loadProvisionalItemFromCachedPage();
+  void cachePageForHistoryItem(HistoryItem*);
   void pageHidden();
 
   void receivedFirstData();
@@ -526,7 +525,7 @@ class FrameLoader : public Noncopyable {
   void setState(FrameState);
 
   void closeOldDataSources();
-  void prepareForCachedPageRestore();
+  void open(CachedPage&);
 
   void updateHistoryAfterClientRedirect();
 

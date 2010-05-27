@@ -257,7 +257,7 @@ void DocumentLoader::setupForReplace() {
 void DocumentLoader::commitIfReady() {
   if (m_gotFirstByte && !m_committed) {
     m_committed = true;
-    frameLoader()->commitProvisionalLoad();
+    frameLoader()->commitProvisionalLoad(0);
   }
 }
 
