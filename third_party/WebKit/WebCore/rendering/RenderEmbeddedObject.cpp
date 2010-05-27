@@ -90,7 +90,7 @@ bool RenderEmbeddedObject::allowsAcceleratedCompositing() const {
 #endif
 
 static bool isURLAllowed(Document* doc, const String& url) {
-  if (doc->frame()->page()->frameCount() >= 200)
+  if (doc->frame()->page()->frameCount() >= Page::maxNumberOfFrames)
     return false;
 
   // We allow one level of self-reference because some sites depend on that.
