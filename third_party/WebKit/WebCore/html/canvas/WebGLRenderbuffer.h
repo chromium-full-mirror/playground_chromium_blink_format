@@ -44,6 +44,9 @@ class WebGLRenderbuffer : public CanvasObject {
   }
   unsigned long getInternalformat() const { return m_internalformat; }
 
+  bool isInitialized() const { return m_initialized; }
+  void setInitialized() { m_initialized = true; }
+
  protected:
   WebGLRenderbuffer(WebGLRenderingContext*);
 
@@ -53,6 +56,7 @@ class WebGLRenderbuffer : public CanvasObject {
   virtual bool isRenderbuffer() const { return true; }
 
   unsigned long m_internalformat;
+  bool m_initialized;
 };
 
 }  // namespace WebCore

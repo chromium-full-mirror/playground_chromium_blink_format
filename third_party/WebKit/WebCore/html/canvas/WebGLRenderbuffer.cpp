@@ -38,7 +38,9 @@ PassRefPtr<WebGLRenderbuffer> WebGLRenderbuffer::create(
 }
 
 WebGLRenderbuffer::WebGLRenderbuffer(WebGLRenderingContext* ctx)
-    : CanvasObject(ctx), m_internalformat(GraphicsContext3D::RGBA4) {
+    : CanvasObject(ctx),
+      m_internalformat(GraphicsContext3D::RGBA4),
+      m_initialized(false) {
   setObject(context()->graphicsContext3D()->createRenderbuffer());
 }
 
