@@ -97,9 +97,9 @@ class ScriptElementData : private CachedResourceClient {
   ScriptElement* m_scriptElement;
   Element* m_element;
   CachedResourceHandle<CachedScript> m_cachedScript;
-  bool m_createdByParser;
+  bool m_createdByParser;  // HTML5: "parser-inserted"
   bool m_requested;
-  bool m_evaluated;
+  bool m_evaluated;  // HTML5: "already started"
   bool m_firedLoad;
 };
 
