@@ -363,15 +363,8 @@ RenderObject* RenderBlock::splitAnonymousBlocksAroundChild(
       RenderBlock* parentBlock = toRenderBlock(blockToSplit->parent());
       parentBlock->children()->insertChildNode(parentBlock, post,
                                                blockToSplit->nextSibling());
-      RenderObject* o = beforeChild;
-      while (o) {
-        RenderObject* no = o;
-        o = no->nextSibling();
-        post->children()->appendChildNode(
-            post, blockToSplit->children()->removeChildNode(blockToSplit, no));
-        no->setNeedsLayoutAndPrefWidthsRecalc();
-      }
-
+      blockToSplit->moveChildrenTo(post, beforeChild, 0,
+                                   blockToSplit->hasLayer());
       post->setNeedsLayoutAndPrefWidthsRecalc();
       blockToSplit->setNeedsLayoutAndPrefWidthsRecalc();
       beforeChild = post;
@@ -416,27 +409,10 @@ void RenderBlock::makeChildrenAnonymousColumnBlocks(RenderObject* beforeChild,
     block->children()->insertChildNode(block, post, boxFirst);
   block->setChildrenInline(false);
 
-  RenderObject* o = boxFirst;
-  while (o) {
-    if (o == beforeChild)
-      break;
-    ASSERT(pre);
-    RenderObject* no = o;
-    o = no->nextSibling();
-    pre->children()->appendChildNode(
-        pre, block->children()->removeChildNode(block, no));
-    no->setNeedsLayoutAndPrefWidthsRecalc();
-  }
-
-  o = beforeChild;
-  while (o) {
-    ASSERT(post);
-    RenderObject* no = o;
-    o = no->nextSibling();
-    post->children()->appendChildNode(
-        post, block->children()->removeChildNode(block, no));
-    no->setNeedsLayoutAndPrefWidthsRecalc();
-  }
+  // The pre/post blocks always have layers, so we know to always do a full
+  // insert/remove (so we pass true as the last argument).
+  block->moveChildrenTo(pre, boxFirst, beforeChild, true);
+  block->moveChildrenTo(post, beforeChild, 0, true);
 
   // We already know the newBlockBox isn't going to contain inline kids, so
   // avoid wasting
@@ -684,52 +660,32 @@ RootInlineBox* RenderBlock::createAndAppendRootInlineBox() {
   return rootBox;
 }
 
-void RenderBlock::moveChildTo(RenderObject* to,
-                              RenderObjectChildList* toChildList,
-                              RenderObject* child) {
-  ASSERT(this == child->parent());
-  toChildList->appendChildNode(
-      to, children()->removeChildNode(this, child, false), false);
-}
-
-void RenderBlock::moveChildTo(RenderObject* to,
-                              RenderObjectChildList* toChildList,
+void RenderBlock::moveChildTo(RenderBlock* to,
+                              RenderObject* child,
                               RenderObject* beforeChild,
-                              RenderObject* child) {
+                              bool fullRemoveInsert) {
   ASSERT(this == child->parent());
   ASSERT(!beforeChild || to == beforeChild->parent());
-  toChildList->insertChildNode(
-      to, children()->removeChildNode(this, child, false), beforeChild, false);
+  to->children()->insertChildNode(
+      to, children()->removeChildNode(this, child, fullRemoveInsert),
+      beforeChild, fullRemoveInsert);
 }
 
-void RenderBlock::moveAllChildrenTo(RenderObject* to,
-                                    RenderObjectChildList* toChildList,
-                                    bool fullRemoveAppend) {
-  RenderObject* nextChild = children()->firstChild();
-  while (nextChild) {
-    RenderObject* child = nextChild;
-    nextChild = child->nextSibling();
-    toChildList->appendChildNode(
-        to, children()->removeChildNode(this, child, fullRemoveAppend),
-        fullRemoveAppend);
-  }
-}
-
-void RenderBlock::moveAllChildrenTo(RenderObject* to,
-                                    RenderObjectChildList* toChildList,
-                                    RenderObject* beforeChild) {
+void RenderBlock::moveChildrenTo(RenderBlock* to,
+                                 RenderObject* startChild,
+                                 RenderObject* endChild,
+                                 RenderObject* beforeChild,
+                                 bool fullRemoveInsert) {
   ASSERT(!beforeChild || to == beforeChild->parent());
-  if (!beforeChild) {
-    moveAllChildrenTo(to, toChildList);
-    return;
-  }
-  RenderObject* nextChild = children()->firstChild();
-  while (nextChild) {
+  RenderObject* nextChild = startChild;
+  while (nextChild && nextChild != endChild) {
     RenderObject* child = nextChild;
     nextChild = child->nextSibling();
-    toChildList->insertChildNode(
-        to, children()->removeChildNode(this, child, false), beforeChild,
-        false);
+    to->children()->insertChildNode(
+        to, children()->removeChildNode(this, child, fullRemoveInsert),
+        beforeChild, fullRemoveInsert);
+    if (child == endChild)
+      return;
   }
 }
 
@@ -767,14 +723,7 @@ void RenderBlock::makeChildrenNonInline(RenderObject* insertionPoint) {
 
     RenderBlock* block = createAnonymousBlock();
     children()->insertChildNode(this, block, inlineRunStart);
-    RenderObject* o = inlineRunStart;
-    while (o != inlineRunEnd) {
-      RenderObject* no = o;
-      o = no->nextSibling();
-
-      moveChildTo(block, block->children(), no);
-    }
-    moveChildTo(block, block->children(), inlineRunEnd);
+    moveChildrenTo(block, inlineRunStart, child);
   }
 
 #ifndef NDEBUG
@@ -905,8 +854,7 @@ void RenderBlock::removeChild(RenderObject* oldChild) {
       // Take all the children out of the |next| block and put them in
       // the |prev| block.
       nextBlock->moveAllChildrenTo(
-          prevBlock, prevBlock->children(),
-          nextBlock->hasLayer() || prevBlock->hasLayer());
+          prevBlock, nextBlock->hasLayer() || prevBlock->hasLayer());
 
       // Delete the now-empty block's lines and nuke it.
       nextBlock->deleteLineBoxTree();
@@ -926,7 +874,7 @@ void RenderBlock::removeChild(RenderObject* oldChild) {
     setChildrenInline(child->childrenInline());
     RenderBlock* anonBlock = toRenderBlock(
         children()->removeChildNode(this, child, child->hasLayer()));
-    anonBlock->moveAllChildrenTo(this, children(), child->hasLayer());
+    anonBlock->moveAllChildrenTo(this, child->hasLayer());
     // Delete the now-empty block's lines and nuke it.
     anonBlock->deleteLineBoxTree();
     anonBlock->destroy();
