@@ -186,7 +186,9 @@ inline bool operator!=(const char* s1, const UString& s2) {
   return !JSC::operator==(s1, s2);
 }
 
-int compare(const UString&, const UString&);
+inline int codePointCompare(const UString& s1, const UString& s2) {
+  return codePointCompare(s1.rep(), s2.rep());
+}
 
 // Rule from ECMA 15.2 about what an array index is.
 // Must exactly match string form of an unsigned integer, and be less than 2^32

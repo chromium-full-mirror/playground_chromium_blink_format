@@ -464,6 +464,8 @@ inline bool charactersAreAllASCII(const UChar* characters, size_t length) {
   return !(ored & 0xFF80);
 }
 
+int codePointCompare(const String&, const String&);
+
 inline int find(const UChar* characters,
                 size_t length,
                 UChar character,
