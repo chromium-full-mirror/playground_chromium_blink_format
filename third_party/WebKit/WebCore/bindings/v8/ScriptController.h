@@ -185,6 +185,9 @@ class ScriptController {
   void clearWindowShell(bool = false);
   void updateDocument();
 
+  void namedItemAdded(HTMLDocument*, const AtomicString&);
+  void namedItemRemoved(HTMLDocument*, const AtomicString&);
+
   void updateSecurityOrigin();
   void clearScriptObjects();
   void updatePlatformScriptObjects();
