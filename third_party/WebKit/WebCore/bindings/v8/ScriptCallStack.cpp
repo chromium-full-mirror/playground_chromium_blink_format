@@ -61,6 +61,7 @@ bool ScriptCallStack::callLocation(String* sourceName,
   if (stackTrace.IsEmpty())
     return false;
   if (stackTrace->GetFrameCount() <= 0) {
+    // Successfully grabbed stack trace, but there are no frames.
     // Fallback to setting lineNumber to 0, and source and function name to
     // "undefined".
     *sourceName = toWebCoreString(v8::Undefined());
@@ -69,9 +70,15 @@ bool ScriptCallStack::callLocation(String* sourceName,
     return true;
   }
   v8::Handle<v8::StackFrame> frame = stackTrace->GetFrame(0);
-  *sourceName = toWebCoreString(frame->GetScriptName());
+  // There must be at least one valid frame.
+  ASSERT(!frame.IsEmpty());
+  v8::Local<v8::String> sourceNameValue(frame->GetScriptName());
+  v8::Local<v8::String> functionNameValue(frame->GetFunctionName());
+  *sourceName =
+      sourceNameValue.IsEmpty() ? "" : toWebCoreString(sourceNameValue);
+  *functionName =
+      functionNameValue.IsEmpty() ? "" : toWebCoreString(functionNameValue);
   *sourceLineNumber = frame->GetLineNumber();
-  *functionName = toWebCoreString(frame->GetFunctionName());
   return true;
 }
 
