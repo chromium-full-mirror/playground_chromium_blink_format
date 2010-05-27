@@ -41,13 +41,13 @@
 #include "EventHandler.h"
 #include "FormatBlockCommand.h"
 #include "Frame.h"
+#include "FrameView.h"
 #include "HTMLFontElement.h"
 #include "HTMLHRElement.h"
 #include "HTMLImageElement.h"
 #include "IndentOutdentCommand.h"
 #include "InsertListCommand.h"
 #include "Page.h"
-#include "RenderBox.h"
 #include "ReplaceSelectionCommand.h"
 #include "Scrollbar.h"
 #include "Settings.h"
@@ -300,7 +300,8 @@ static int verticalScrollDistance(Frame* frame) {
   if (!(style->overflowY() == OSCROLL || style->overflowY() == OAUTO ||
         focusedNode->isContentEditable()))
     return 0;
-  int height = toRenderBox(renderer)->clientHeight();
+  int height = std::min<int>(toRenderBox(renderer)->clientHeight(),
+                             frame->view()->visibleHeight());
   return max(max<int>(height * Scrollbar::minFractionToStepWhenPaging(),
                       height - Scrollbar::maxOverlapBetweenPages()),
              1);
@@ -860,7 +861,9 @@ static bool executeMovePageDown(Frame* frame,
   int distance = verticalScrollDistance(frame);
   if (!distance)
     return false;
-  return frame->selection()->modify(SelectionController::MOVE, distance, true);
+  return frame->selection()->modify(
+      SelectionController::MOVE, distance, true,
+      SelectionController::AlignCursorOnScrollAlways);
 }
 
 static bool executeMovePageDownAndModifySelection(Frame* frame,
@@ -870,8 +873,9 @@ static bool executeMovePageDownAndModifySelection(Frame* frame,
   int distance = verticalScrollDistance(frame);
   if (!distance)
     return false;
-  return frame->selection()->modify(SelectionController::EXTEND, distance,
-                                    true);
+  return frame->selection()->modify(
+      SelectionController::EXTEND, distance, true,
+      SelectionController::AlignCursorOnScrollAlways);
 }
 
 static bool executeMovePageUp(Frame* frame,
@@ -881,7 +885,9 @@ static bool executeMovePageUp(Frame* frame,
   int distance = verticalScrollDistance(frame);
   if (!distance)
     return false;
-  return frame->selection()->modify(SelectionController::MOVE, -distance, true);
+  return frame->selection()->modify(
+      SelectionController::MOVE, -distance, true,
+      SelectionController::AlignCursorOnScrollAlways);
 }
 
 static bool executeMovePageUpAndModifySelection(Frame* frame,
@@ -891,8 +897,9 @@ static bool executeMovePageUpAndModifySelection(Frame* frame,
   int distance = verticalScrollDistance(frame);
   if (!distance)
     return false;
-  return frame->selection()->modify(SelectionController::EXTEND, -distance,
-                                    true);
+  return frame->selection()->modify(
+      SelectionController::EXTEND, -distance, true,
+      SelectionController::AlignCursorOnScrollAlways);
 }
 
 static bool executeMoveRight(Frame* frame,
