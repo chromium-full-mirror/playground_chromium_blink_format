@@ -47,6 +47,7 @@
 #include "HTMLImageElement.h"
 #include "IndentOutdentCommand.h"
 #include "InsertListCommand.h"
+#include "KillRing.h"
 #include "Page.h"
 #include "ReplaceSelectionCommand.h"
 #include "Scrollbar.h"
@@ -1469,8 +1470,8 @@ static bool executeYank(Frame* frame,
                         EditorCommandSource,
                         const String&) {
   frame->editor()->insertTextWithoutSendingTextEvent(
-      frame->editor()->yankFromKillRing(), false, 0);
-  frame->editor()->setKillRingToYankedState();
+      frame->editor()->killRing()->yank(), false, 0);
+  frame->editor()->killRing()->setToYankedState();
   return true;
 }
 
@@ -1479,8 +1480,8 @@ static bool executeYankAndSelect(Frame* frame,
                                  EditorCommandSource,
                                  const String&) {
   frame->editor()->insertTextWithoutSendingTextEvent(
-      frame->editor()->yankFromKillRing(), true, 0);
-  frame->editor()->setKillRingToYankedState();
+      frame->editor()->killRing()->yank(), true, 0);
+  frame->editor()->killRing()->setToYankedState();
   return true;
 }
 

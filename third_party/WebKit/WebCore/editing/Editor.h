@@ -43,6 +43,7 @@ class EditorClient;
 class EditorInternalCommand;
 class HTMLElement;
 class HitTestResult;
+class KillRing;
 class Pasteboard;
 class SimpleFontData;
 class Text;
@@ -322,11 +323,7 @@ class Editor {
 
   VisibleSelection selectionForCommand(Event*);
 
-  void appendToKillRing(const String&);
-  void prependToKillRing(const String&);
-  String yankFromKillRing();
-  void startNewKillRingSequence();
-  void setKillRingToYankedState();
+  KillRing* killRing() const { return m_killRing.get(); }
 
   PassRefPtr<Range> selectedRange();
 
@@ -355,6 +352,7 @@ class Editor {
   bool m_ignoreCompositionSelectionChange;
   bool m_shouldStartNewKillRingSequence;
   bool m_shouldStyleWithCSS;
+  OwnPtr<KillRing> m_killRing;
 
   bool canDeleteRange(Range*) const;
   bool canSmartReplaceWithPasteboard(Pasteboard*);
