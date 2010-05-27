@@ -47,7 +47,6 @@ IDBDatabaseImpl::~IDBDatabaseImpl() {}
 
 PassRefPtr<DOMStringList> IDBDatabaseImpl::objectStores() {
   // FIXME: This should return the actual list.
-  ASSERT_NOT_REACHED();
   return DOMStringList::create();
 }
 
