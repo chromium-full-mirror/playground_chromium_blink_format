@@ -19,14 +19,14 @@
  */
 
 #include "config.h"
-#include "Identifier.h"
-
 #include "qt_class.h"
+
+#include "Identifier.h"
 #include "qt_instance.h"
 #include "qt_runtime.h"
 
-#include <qmetaobject.h>
 #include <qdebug.h>
+#include <qmetaobject.h>
 
 namespace JSC {
 namespace Bindings {
@@ -145,14 +145,12 @@ Field* QtClass::fieldNamed(const Identifier& identifier,
       if (f->fieldType() == QtField::MetaProperty)
         return f;
 #ifndef QT_NO_PROPERTIES
-      else if (f->fieldType() == QtField::DynamicProperty) {
+      if (f->fieldType() == QtField::DynamicProperty) {
         if (obj->dynamicPropertyNames().indexOf(ascii) >= 0)
           return f;
-        else {
-          // Dynamic property that disappeared
-          qtinst->m_fields.remove(name);
-          delete f;
-        }
+        // Dynamic property that disappeared
+        qtinst->m_fields.remove(name);
+        delete f;
       }
 #endif
       else {
@@ -206,23 +204,22 @@ Field* QtClass::fieldNamed(const Identifier& identifier,
 
     // Nothing named this
     return 0;
-  } else {
-    // For compatibility with qtscript, cached methods don't cause
-    // errors until they are accessed, so don't blindly create an error
-    // here.
-    if (qtinst->m_methods.contains(ascii))
-      return 0;
+  }
+  // For compatibility with qtscript, cached methods don't cause
+  // errors until they are accessed, so don't blindly create an error
+  // here.
+  if (qtinst->m_methods.contains(ascii))
+    return 0;
 
 #ifndef QT_NO_PROPERTIES
-    // deleted qobject, but can't throw an error from here (no exec)
-    // create a fake QtField that will throw upon access
-    if (!f) {
-      f = new QtField(ascii);
-      qtinst->m_fields.insert(name, f);
-    }
-#endif
-    return f;
+  // deleted qobject, but can't throw an error from here (no exec)
+  // create a fake QtField that will throw upon access
+  if (!f) {
+    f = new QtField(ascii);
+    qtinst->m_fields.insert(name, f);
   }
+#endif
+  return f;
 }
 }
 }
