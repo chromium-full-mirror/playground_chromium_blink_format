@@ -56,6 +56,9 @@
 #include "Settings.h"
 #include "SubstituteData.h"
 #include "Threading.h"
+#if __WXMSW__
+#include "WebCoreInstanceHandle.h"
+#endif
 
 #include "ChromeClientWx.h"
 #include "ContextMenuClientWx.h"
@@ -308,7 +311,7 @@ bool wxWebView::Create(wxWindow* parent,
 // due to a problem with exceptions getting eaten when using the callback
 // approach to timers (which wx itself uses).
 #if __WXMSW__
-  WebCore::Page::setInstanceHandle(wxGetInstance());
+  WebCore::setInstanceHandle(wxGetInstance());
 #endif
 
   // this helps reduce flicker on platforms like MSW
