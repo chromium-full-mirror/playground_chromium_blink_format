@@ -145,6 +145,12 @@ class ClientMessageLoopAdapter
     s_instance->m_frozenViews.remove(view);
   }
 
+  static void didNavigate() {
+    // Release render thread if necessary.
+    if (s_instance && s_instance->m_running)
+      WebCore::ScriptDebugServer::shared().continueProgram();
+  }
+
  private:
   ClientMessageLoopAdapter(
       PassOwnPtr<WebKit::WebDevToolsAgentClient::WebKitClientMessageLoop>
@@ -276,6 +282,9 @@ void WebDevToolsAgentImpl::detach() {
 }
 
 void WebDevToolsAgentImpl::didNavigate() {
+#if ENABLE(V8_SCRIPT_DEBUG_SERVER)
+  ClientMessageLoopAdapter::didNavigate();
+#endif
   DebuggerAgentManager::onNavigate();
 }
 
