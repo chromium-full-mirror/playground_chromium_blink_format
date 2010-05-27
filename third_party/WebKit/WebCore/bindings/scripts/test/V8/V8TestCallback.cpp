@@ -23,7 +23,6 @@
 
 #if ENABLE(DATABASE)
 
-#include "Frame.h"
 #include "ScriptExecutionContext.h"
 #include "V8Class1.h"
 #include "V8Class2.h"
@@ -32,9 +31,8 @@
 
 namespace WebCore {
 
-V8TestCallback::V8TestCallback(v8::Local<v8::Object> callback, Frame* frame)
+V8TestCallback::V8TestCallback(v8::Local<v8::Object> callback)
     : m_callback(v8::Persistent<v8::Object>::New(callback)),
-      m_frame(frame),
       m_worldContext(UseCurrentWorld) {}
 
 V8TestCallback::~V8TestCallback() {
@@ -55,10 +53,8 @@ bool V8TestCallback::callbackWithClass1Param(ScriptExecutionContext* context,
 
   v8::Handle<v8::Value> argv[] = {toV8(class1Param)};
 
-  RefPtr<Frame> protect(m_frame);
-
   bool callbackReturnValue = false;
-  return !invokeCallback(m_callback, 1, argv, callbackReturnValue);
+  return !invokeCallback(m_callback, 1, argv, callbackReturnValue, context);
 }
 
 bool V8TestCallback::callbackWithClass2Param(ScriptExecutionContext* context,
@@ -74,10 +70,8 @@ bool V8TestCallback::callbackWithClass2Param(ScriptExecutionContext* context,
 
   v8::Handle<v8::Value> argv[] = {toV8(class2Param), toV8(strArg)};
 
-  RefPtr<Frame> protect(m_frame);
-
   bool callbackReturnValue = false;
-  return !invokeCallback(m_callback, 2, argv, callbackReturnValue);
+  return !invokeCallback(m_callback, 2, argv, callbackReturnValue, context);
 }
 
 }  // namespace WebCore

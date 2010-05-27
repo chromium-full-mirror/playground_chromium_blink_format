@@ -31,14 +31,16 @@
 #include "config.h"
 #include "V8CustomVoidCallback.h"
 
-#include "Frame.h"
+#include "ScriptExecutionContext.h"
 #include "V8Binding.h"
+#include "V8Proxy.h"
 
 namespace WebCore {
 
 V8CustomVoidCallback::V8CustomVoidCallback(v8::Local<v8::Object> callback,
-                                           Frame* frame)
-    : m_callback(v8::Persistent<v8::Object>::New(callback)), m_frame(frame) {}
+                                           ScriptExecutionContext* context)
+    : m_callback(v8::Persistent<v8::Object>::New(callback)),
+      m_scriptExecutionContext(context) {}
 
 V8CustomVoidCallback::~V8CustomVoidCallback() {
   m_callback.Dispose();
@@ -47,23 +49,23 @@ V8CustomVoidCallback::~V8CustomVoidCallback() {
 void V8CustomVoidCallback::handleEvent() {
   v8::HandleScope handleScope;
 
-  v8::Handle<v8::Context> context = V8Proxy::context(m_frame.get());
-  if (context.IsEmpty())
+  v8::Handle<v8::Context> v8Context = toV8Context(
+      m_scriptExecutionContext.get(), WorldContextHandle(UseCurrentWorld));
+  if (v8Context.IsEmpty())
     return;
 
-  v8::Context::Scope scope(context);
-
-  // Protect the frame until the callback returns.
-  RefPtr<Frame> protector(m_frame);
+  v8::Context::Scope scope(v8Context);
 
   bool callbackReturnValue = false;
-  invokeCallback(m_callback, 0, 0, callbackReturnValue);
+  invokeCallback(m_callback, 0, 0, callbackReturnValue,
+                 m_scriptExecutionContext.get());
 }
 
 bool invokeCallback(v8::Persistent<v8::Object> callback,
                     int argc,
                     v8::Handle<v8::Value> argv[],
-                    bool& callbackReturnValue) {
+                    bool& callbackReturnValue,
+                    ScriptExecutionContext* scriptExecutionContext) {
   v8::TryCatch exceptionCatcher;
 
   v8::Local<v8::Function> callbackFunction;
@@ -83,16 +85,12 @@ bool invokeCallback(v8::Persistent<v8::Object> callback,
 
   v8::Handle<v8::Object> thisObject = v8::Context::GetCurrent()->Global();
 
-  V8Proxy* proxy = V8Proxy::retrieve();
-  ASSERT(proxy);
-
-  v8::Handle<v8::Value> result =
-      proxy->callFunction(callbackFunction, thisObject, argc, argv);
+  v8::Handle<v8::Value> result = callbackFunction->Call(thisObject, argc, argv);
   callbackReturnValue = !result.IsEmpty() && result->BooleanValue();
 
   if (exceptionCatcher.HasCaught()) {
     v8::Local<v8::Message> message = exceptionCatcher.Message();
-    proxy->frame()->document()->reportException(
+    scriptExecutionContext->reportException(
         toWebCoreString(message->Get()), message->GetLineNumber(),
         toWebCoreString(message->GetScriptResourceName()));
     return true;

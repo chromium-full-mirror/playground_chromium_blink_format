@@ -34,9 +34,9 @@
 
 #include "V8SQLStatementErrorCallback.h"
 
-#include "Frame.h"
 #include "ScriptExecutionContext.h"
 #include "V8CustomVoidCallback.h"
+#include "V8Proxy.h"
 #include "V8SQLError.h"
 #include "V8SQLTransaction.h"
 
@@ -55,15 +55,15 @@ bool V8SQLStatementErrorCallback::handleEvent(ScriptExecutionContext* context,
 
   v8::Handle<v8::Value> argv[] = {toV8(transaction), toV8(error)};
 
-  // Protect the frame until the callback returns.
-  RefPtr<Frame> protector(m_frame);
+  // Protect the context until the callback returns.
+  RefPtr<ScriptExecutionContext> protector(context);
 
   bool callbackReturnValue = false;
   // Step 6: If the error callback returns false, then move on to the next
   // statement, if any, or onto the next overall step otherwise. Otherwise,
   // the error callback did not return false, or there was no error callback.
   // Jump to the last step in the overall steps.
-  return invokeCallback(m_callback, 2, argv, callbackReturnValue) ||
+  return invokeCallback(m_callback, 2, argv, callbackReturnValue, context) ||
          callbackReturnValue;
 }
 

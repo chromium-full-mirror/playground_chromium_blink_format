@@ -858,7 +858,7 @@ v8::Handle<v8::Value> V8DOMWindow::openDatabaseCallback(
     if (!args[4]->IsObject())
       return throwError(TYPE_MISMATCH_ERR);
 
-    creationCallback = V8DatabaseCallback::create(args[4], imp->frame());
+    creationCallback = V8DatabaseCallback::create(args[4]);
   }
 
   ExceptionCode ec = 0;
