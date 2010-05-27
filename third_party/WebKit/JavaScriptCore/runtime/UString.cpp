@@ -250,6 +250,11 @@ double UString::toDouble(bool tolerateTrailingJunk,
   // encounters invalid UTF-16. Further, we have no need to convert the
   // non-ASCII characters to UTF-8, so the UTF8String does quite a bit of
   // unnecessary work.
+
+  // FIXME: The space skipping code below skips only ASCII spaces, but callers
+  // need to skip all StrWhiteSpace. The isStrWhiteSpace function does the
+  // right thing but requires UChar, not char, for its argument.
+
   CString s = UTF8String();
   if (s.isNull())
     return NaN;
@@ -313,13 +318,13 @@ double UString::toDouble(bool tolerateTrailingJunk,
     }
   }
 
-  // allow trailing white space
-  while (isASCIISpace(*c))
-    c++;
-  // don't allow anything after - unless tolerant=true
-  // FIXME: If string contains a U+0000 character, then this check is incorrect.
-  if (!tolerateTrailingJunk && *c != '\0')
-    d = NaN;
+  if (!tolerateTrailingJunk) {
+    // allow trailing white space
+    while (isASCIISpace(*c))
+      c++;
+    if (c != s.data() + s.length())
+      d = NaN;
+  }
 
   return d;
 }
