@@ -4294,7 +4294,7 @@ WebKitCacheModel webkit_get_cache_model() {
  *
  * Returns: the #WebKitDOMDocument currently loaded in the @webView
  *
- * Since: 1.3.0
+ * Since: 1.3.1
  **/
 WebKitDOMDocument* webkit_web_view_get_dom_document(WebKitWebView* webView) {
   g_return_val_if_fail(WEBKIT_IS_WEB_VIEW(webView), 0);
