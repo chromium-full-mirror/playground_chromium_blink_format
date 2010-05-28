@@ -130,8 +130,10 @@ class HTML5Lexer : public Noncopyable {
   inline void emitCharacter(UChar);
   inline void emitParseError();
   inline void emitCurrentToken();
+  inline void emitCodePoint(unsigned);
 
-  UChar consumeEntity(SegmentedString&, bool& notEnoughCharacters);
+  unsigned consumeEntity(SegmentedString&, bool& notEnoughCharacters);
+  inline bool processEntity(SegmentedString& source);
 
   inline bool temporaryBufferIs(const String&);
 
