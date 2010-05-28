@@ -60,6 +60,9 @@
 
 using namespace WebCore;
 
+CheckPermissionFunctionType* checkPermissionFunction = 0;
+RequestPermissionFunctionType* requestPermissionFunction = 0;
+
 DumpRenderTreeSupportQt::DumpRenderTreeSupportQt() {}
 
 DumpRenderTreeSupportQt::~DumpRenderTreeSupportQt() {}
@@ -563,6 +566,30 @@ void DumpRenderTreeSupportQt::dumpNotification(bool b) {
   NotificationPresenterClientQt::dumpNotification = b;
 #endif
 }
+
+void DumpRenderTreeSupportQt::setNotificationsReceiver(QWebPage* page,
+                                                       QObject* receiver) {
+  page->d->notificationPresenterClient->setReceiver(receiver);
+}
+
+void DumpRenderTreeSupportQt::allowNotificationForOrigin(
+    QWebPage* page,
+    const QString& origin) {
+#if ENABLE(NOTIFICATIONS)
+  page->d->notificationPresenterClient->allowNotificationForOrigin(origin);
+#endif
+}
+
+void DumpRenderTreeSupportQt::setCheckPermissionFunction(
+    CheckPermissionFunctionType* f) {
+  checkPermissionFunction = f;
+}
+
+void DumpRenderTreeSupportQt::setRequestPermissionFunction(
+    RequestPermissionFunctionType* f) {
+  requestPermissionFunction = f;
+}
+
 // Provide a backward compatibility with previously exported private symbols as
 // of QtWebKit 4.6 release
 

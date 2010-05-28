@@ -51,6 +51,7 @@
 #include "HTMLFormElement.h"
 #include "HTMLPlugInElement.h"
 #include "HTTPParsers.h"
+#include "NotificationPresenterClientQt.h"
 #include "NotImplemented.h"
 #include "QNetworkReplyHandler.h"
 #include "ResourceHandleInternal.h"
@@ -573,8 +574,13 @@ void FrameLoaderClientQt::dispatchDidClearWindowObjectInWorld(
   if (world != mainThreadNormalWorld())
     return;
 
-  if (m_webFrame)
+  if (m_webFrame) {
     emit m_webFrame->javaScriptWindowObjectCleared();
+#if ENABLE(NOTIFICATIONS)
+    m_webFrame->page()
+        ->d->notificationPresenterClient->clearNotificationsList();
+#endif
+  }
 }
 
 void FrameLoaderClientQt::documentElementAvailable() {

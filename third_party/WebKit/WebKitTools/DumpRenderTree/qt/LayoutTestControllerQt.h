@@ -237,6 +237,7 @@ class LayoutTestController : public QObject {
   QWebFrame* m_topLoadingFrame;
   WebCore::DumpRenderTree* m_drt;
   QWebHistory* m_webHistory;
+  QStringList m_desktopNotificationAllowedOrigins;
 };
 
 #endif  // LayoutTestControllerQt_h

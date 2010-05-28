@@ -136,6 +136,18 @@ class NullPrinter : public QPrinter {
 };
 #endif
 
+void checkPermissionCallback(QObject* receiver,
+                             const QUrl& url,
+                             NotificationPermission& permission) {
+  qobject_cast<DumpRenderTree*>(receiver)->checkPermission(url, permission);
+}
+
+void requestPermissionCallback(QObject* receiver,
+                               QWebPage* page,
+                               const QString& origin) {
+  qobject_cast<DumpRenderTree*>(receiver)->requestPermission(page, origin);
+}
+
 WebPage::WebPage(QObject* parent, DumpRenderTree* drt)
     : QWebPage(parent), m_webInspector(0), m_drt(drt) {
   QWebSettings* globalSettings = QWebSettings::globalSettings();
@@ -162,6 +174,11 @@ WebPage::WebPage(QObject* parent, DumpRenderTree* drt)
 
   setNetworkAccessManager(m_drt->networkAccessManager());
   setPluginFactory(new TestPlugin(this));
+
+  DumpRenderTreeSupportQt::setNotificationsReceiver(this, m_drt);
+  DumpRenderTreeSupportQt::setCheckPermissionFunction(checkPermissionCallback);
+  DumpRenderTreeSupportQt::setRequestPermissionFunction(
+      requestPermissionCallback);
 }
 
 WebPage::~WebPage() {
@@ -912,6 +929,18 @@ void DumpRenderTree::switchFocus(bool focused) {
   QFocusEvent event((focused) ? QEvent::FocusIn : QEvent::FocusOut,
                     Qt::ActiveWindowFocusReason);
   QApplication::sendEvent(m_mainView, &event);
+}
+
+void DumpRenderTree::checkPermission(const QUrl& url,
+                                     NotificationPermission& permission) {
+  permission = m_controller->checkDesktopNotificationPermission(
+                   url.scheme() + "://" + url.host())
+                   ? NotificationAllowed
+                   : NotificationDenied;
+}
+
+void DumpRenderTree::requestPermission(QWebPage* page, const QString& origin) {
+  DumpRenderTreeSupportQt::allowNotificationForOrigin(page, origin);
 }
 
 #if defined(Q_WS_X11)
