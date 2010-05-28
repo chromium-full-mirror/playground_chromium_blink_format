@@ -176,8 +176,10 @@ class JIT : private JSInterfaceJIT {
   static const int patchGetByIdDefaultOffset = 256;
 
  public:
-  static JITCode compile(JSGlobalData* globalData, CodeBlock* codeBlock) {
-    return JIT(globalData, codeBlock).privateCompile();
+  static JITCode compile(JSGlobalData* globalData,
+                         CodeBlock* codeBlock,
+                         CodePtr* functionEntryArityCheck = 0) {
+    return JIT(globalData, codeBlock).privateCompile(functionEntryArityCheck);
   }
 
   static void compileGetByIdProto(JSGlobalData* globalData,
@@ -320,14 +322,14 @@ class JIT : private JSInterfaceJIT {
   static void linkCall(JSFunction* callee,
                        CodeBlock* callerCodeBlock,
                        CodeBlock* calleeCodeBlock,
-                       JITCode&,
+                       CodePtr,
                        CallLinkInfo*,
                        int callerArgCount,
                        JSGlobalData*);
   static void linkConstruct(JSFunction* callee,
                             CodeBlock* callerCodeBlock,
                             CodeBlock* calleeCodeBlock,
-                            JITCode&,
+                            CodePtr,
                             CallLinkInfo*,
                             int callerArgCount,
                             JSGlobalData*);
@@ -347,7 +349,7 @@ class JIT : private JSInterfaceJIT {
   void privateCompileMainPass();
   void privateCompileLinkPass();
   void privateCompileSlowCases();
-  JITCode privateCompile();
+  JITCode privateCompile(CodePtr* functionEntryArityCheck);
   void privateCompileGetByIdProto(StructureStubInfo*,
                                   Structure*,
                                   Structure* prototypeStructure,

@@ -466,16 +466,18 @@ void JIT::privateCompileSlowCases() {
 #endif
 }
 
-JITCode JIT::privateCompile() {
-  sampleCodeBlock(m_codeBlock);
-#if ENABLE(OPCODE_SAMPLING)
-  sampleInstruction(m_codeBlock->instructions().begin());
-#endif
-
+JITCode JIT::privateCompile(CodePtr* functionEntryArityCheck) {
   // Could use a pop_m, but would need to offset the following instruction if
   // so.
   preserveReturnAddressAfterCall(regT2);
   emitPutToCallFrameHeader(regT2, RegisterFile::ReturnPC);
+
+  Label beginLabel(this);
+
+  sampleCodeBlock(m_codeBlock);
+#if ENABLE(OPCODE_SAMPLING)
+  sampleInstruction(m_codeBlock->instructions().begin());
+#endif
 
   Jump registerFileCheck;
   if (m_codeBlock->codeType() == FunctionCode) {
@@ -496,6 +498,8 @@ JITCode JIT::privateCompile() {
   privateCompileLinkPass();
   privateCompileSlowCases();
 
+  Label arityCheck;
+  Call callArityCheck;
   if (m_codeBlock->codeType() == FunctionCode) {
     registerFileCheck.link(this);
     m_bytecodeOffset = 0;
@@ -505,6 +509,16 @@ JITCode JIT::privateCompile() {
         (unsigned)-1;  // Reset this, in order to guard its use with ASSERTs.
 #endif
     jump(functionBody);
+
+    arityCheck = label();
+    preserveReturnAddressAfterCall(regT2);
+    emitPutToCallFrameHeader(regT2, RegisterFile::ReturnPC);
+    branch32(Equal, regT1, Imm32(m_codeBlock->m_numParameters))
+        .linkTo(beginLabel, this);
+    restoreArgumentReference();
+    callArityCheck = call();
+    move(regT0, callFrameRegister);
+    jump(beginLabel);
   }
 
   ASSERT(m_jmpTable.isEmpty());
@@ -614,6 +628,14 @@ JITCode JIT::privateCompile() {
             .callReturnLocation;
   }
 
+  if (m_codeBlock->codeType() == FunctionCode && functionEntryArityCheck) {
+    patchBuffer.link(
+        callArityCheck,
+        FunctionPtr(m_codeBlock->m_isConstructor ? cti_op_construct_arityCheck
+                                                 : cti_op_call_arityCheck));
+    *functionEntryArityCheck = patchBuffer.locationOf(arityCheck);
+  }
+
   return patchBuffer.finalizeCode();
 }
 
@@ -659,7 +681,7 @@ void JIT::unlinkCallOrConstruct(CallLinkInfo* callLinkInfo) {
 void JIT::linkCall(JSFunction* callee,
                    CodeBlock* callerCodeBlock,
                    CodeBlock* calleeCodeBlock,
-                   JITCode& code,
+                   JIT::CodePtr code,
                    CallLinkInfo* callLinkInfo,
                    int callerArgCount,
                    JSGlobalData* globalData) {
@@ -676,7 +698,7 @@ void JIT::linkCall(JSFunction* callee,
       calleeCodeBlock->addCaller(callLinkInfo);
 
     repatchBuffer.repatch(callLinkInfo->hotPathBegin, callee);
-    repatchBuffer.relink(callLinkInfo->hotPathOther, code.addressForCall());
+    repatchBuffer.relink(callLinkInfo->hotPathOther, code);
   }
 
   // patch the call so we do not continue to try to link.
@@ -687,7 +709,7 @@ void JIT::linkCall(JSFunction* callee,
 void JIT::linkConstruct(JSFunction* callee,
                         CodeBlock* callerCodeBlock,
                         CodeBlock* calleeCodeBlock,
-                        JITCode& code,
+                        JIT::CodePtr code,
                         CallLinkInfo* callLinkInfo,
                         int callerArgCount,
                         JSGlobalData* globalData) {
@@ -704,7 +726,7 @@ void JIT::linkConstruct(JSFunction* callee,
       calleeCodeBlock->addCaller(callLinkInfo);
 
     repatchBuffer.repatch(callLinkInfo->hotPathBegin, callee);
-    repatchBuffer.relink(callLinkInfo->hotPathOther, code.addressForCall());
+    repatchBuffer.relink(callLinkInfo->hotPathOther, code);
   }
 
   // patch the call so we do not continue to try to link.

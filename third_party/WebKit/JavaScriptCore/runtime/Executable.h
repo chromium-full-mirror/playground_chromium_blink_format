@@ -82,6 +82,8 @@ class ExecutableBase : public RefCounted<ExecutableBase> {
  protected:
   JITCode m_jitCodeForCall;
   JITCode m_jitCodeForConstruct;
+  MacroAssemblerCodePtr m_jitCodeForCallWithArityCheck;
+  MacroAssemblerCodePtr m_jitCodeForConstructWithArityCheck;
 #endif
 };
 
@@ -114,6 +116,8 @@ class NativeExecutable : public ExecutableBase {
         m_constructor(constructor) {
     m_jitCodeForCall = callThunk;
     m_jitCodeForConstruct = constructThunk;
+    m_jitCodeForCallWithArityCheck = callThunk.addressForCall();
+    m_jitCodeForConstructWithArityCheck = constructThunk.addressForCall();
   }
 
   NativeFunction m_function;
@@ -431,6 +435,18 @@ class FunctionExecutable : public ScriptExecutable {
     if (!m_jitCodeForConstruct)
       generateJITCodeForConstruct(exec, scopeChainNode);
     return m_jitCodeForConstruct;
+  }
+
+  MacroAssemblerCodePtr generatedJITCodeForCallWithArityCheck() {
+    ASSERT(m_jitCodeForCall);
+    ASSERT(m_jitCodeForCallWithArityCheck);
+    return m_jitCodeForCallWithArityCheck;
+  }
+
+  MacroAssemblerCodePtr generatedJITCodeForConstructWithArityCheck() {
+    ASSERT(m_jitCodeForConstruct);
+    ASSERT(m_jitCodeForConstructWithArityCheck);
+    return m_jitCodeForConstructWithArityCheck;
   }
 
  private:

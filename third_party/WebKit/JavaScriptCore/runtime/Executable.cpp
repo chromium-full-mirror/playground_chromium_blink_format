@@ -210,7 +210,8 @@ void FunctionExecutable::generateJITCodeForCall(
     ExecState* exec,
     ScopeChainNode* scopeChainNode) {
   CodeBlock* codeBlock = &bytecodeForCall(exec, scopeChainNode);
-  m_jitCodeForCall = JIT::compile(scopeChainNode->globalData, codeBlock);
+  m_jitCodeForCall = JIT::compile(scopeChainNode->globalData, codeBlock,
+                                  &m_jitCodeForCallWithArityCheck);
 
 #if !ENABLE(OPCODE_SAMPLING)
   if (!BytecodeGenerator::dumpsGeneratedCode())
@@ -222,7 +223,8 @@ void FunctionExecutable::generateJITCodeForConstruct(
     ExecState* exec,
     ScopeChainNode* scopeChainNode) {
   CodeBlock* codeBlock = &bytecodeForConstruct(exec, scopeChainNode);
-  m_jitCodeForConstruct = JIT::compile(scopeChainNode->globalData, codeBlock);
+  m_jitCodeForConstruct = JIT::compile(scopeChainNode->globalData, codeBlock,
+                                       &m_jitCodeForConstructWithArityCheck);
 
 #if !ENABLE(OPCODE_SAMPLING)
   if (!BytecodeGenerator::dumpsGeneratedCode())
