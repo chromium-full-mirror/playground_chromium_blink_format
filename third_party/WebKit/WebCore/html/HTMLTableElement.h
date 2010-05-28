@@ -36,11 +36,8 @@ class HTMLTableSectionElement;
 
 class HTMLTableElement : public HTMLElement {
  public:
-  HTMLTableElement(const QualifiedName&, Document*);
-
-  virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
-  virtual int tagPriority() const { return 9; }
-  virtual bool checkDTD(const Node*);
+  static PassRefPtr<HTMLTableElement> create(Document*);
+  static PassRefPtr<HTMLTableElement> create(const QualifiedName&, Document*);
 
   HTMLTableCaptionElement* caption() const;
   void setCaption(PassRefPtr<HTMLTableCaptionElement>, ExceptionCode&);
@@ -91,9 +88,21 @@ class HTMLTableElement : public HTMLElement {
   void setWidth(const String&);
 
   virtual ContainerNode* addChild(PassRefPtr<Node>);
+
+  virtual void attach();
+
+  void addSharedCellDecls(Vector<CSSMutableStyleDeclaration*>&);
+  void addSharedGroupDecls(bool rows, Vector<CSSMutableStyleDeclaration*>&);
+
+ private:
+  HTMLTableElement(const QualifiedName&, Document*);
+
+  virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
+  virtual int tagPriority() const { return 9; }
+  virtual bool checkDTD(const Node*);
+
   virtual bool mapToEntry(const QualifiedName&, MappedAttributeEntry&) const;
   virtual void parseMappedAttribute(Attribute*);
-  virtual void attach();
   virtual bool isURLAttribute(Attribute*) const;
 
   // Used to obtain either a solid or outset border decl and to deal with the
@@ -102,12 +111,9 @@ class HTMLTableElement : public HTMLElement {
   virtual bool canHaveAdditionalAttributeStyleDecls() const { return true; }
   virtual void additionalAttributeStyleDecls(
       Vector<CSSMutableStyleDeclaration*>&);
-  void addSharedCellDecls(Vector<CSSMutableStyleDeclaration*>&);
-  void addSharedGroupDecls(bool rows, Vector<CSSMutableStyleDeclaration*>&);
 
   virtual void addSubresourceAttributeURLs(ListHashSet<KURL>&) const;
 
- private:
   void addSharedCellBordersDecl(Vector<CSSMutableStyleDeclaration*>&);
   void addSharedCellPaddingDecl(Vector<CSSMutableStyleDeclaration*>&);
 

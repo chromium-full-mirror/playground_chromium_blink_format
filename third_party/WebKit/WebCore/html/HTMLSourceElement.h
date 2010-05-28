@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007, 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2007, 2008, 2010 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -30,21 +30,12 @@
 
 #include "HTMLElement.h"
 #include "Timer.h"
-#include <limits>
 
 namespace WebCore {
 
-class KURL;
-
 class HTMLSourceElement : public HTMLElement {
  public:
-  HTMLSourceElement(const QualifiedName&, Document*);
-  virtual ~HTMLSourceElement();
-
-  virtual HTMLTagStatus endTagRequirement() const { return TagStatusForbidden; }
-  virtual int tagPriority() const { return 0; }
-
-  virtual void insertedIntoDocument();
+  static PassRefPtr<HTMLSourceElement> create(const QualifiedName&, Document*);
 
   KURL src() const;
   String media() const;
@@ -57,6 +48,13 @@ class HTMLSourceElement : public HTMLElement {
   void cancelPendingErrorEvent();
 
  private:
+  HTMLSourceElement(const QualifiedName&, Document*);
+
+  virtual HTMLTagStatus endTagRequirement() const { return TagStatusForbidden; }
+  virtual int tagPriority() const { return 0; }
+
+  virtual void insertedIntoDocument();
+
   void errorEventTimerFired(Timer<HTMLSourceElement>*);
 
   Timer<HTMLSourceElement> m_errorEventTimer;

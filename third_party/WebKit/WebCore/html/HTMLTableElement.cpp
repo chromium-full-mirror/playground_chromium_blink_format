@@ -4,7 +4,8 @@
  *           (C) 1998 Waldo Bastian (bastian@kde.org)
  *           (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
- * Copyright (C) 2003, 2004, 2005, 2006, 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2003, 2004, 2005, 2006, 2008, 2010 Apple Inc. All rights
+ * reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -42,14 +43,25 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-HTMLTableElement::HTMLTableElement(const QualifiedName& tagName, Document* doc)
-    : HTMLElement(tagName, doc),
+HTMLTableElement::HTMLTableElement(const QualifiedName& tagName,
+                                   Document* document)
+    : HTMLElement(tagName, document),
       m_borderAttr(false),
       m_borderColorAttr(false),
       m_frameAttr(false),
       m_rulesAttr(UnsetRules),
       m_padding(1) {
   ASSERT(hasTagName(tableTag));
+}
+
+PassRefPtr<HTMLTableElement> HTMLTableElement::create(Document* document) {
+  return new HTMLTableElement(tableTag, document);
+}
+
+PassRefPtr<HTMLTableElement> HTMLTableElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new HTMLTableElement(tagName, document);
 }
 
 bool HTMLTableElement::checkDTD(const Node* newChild) {
@@ -122,7 +134,7 @@ PassRefPtr<HTMLElement> HTMLTableElement::createTHead() {
   if (HTMLTableSectionElement* existingHead = tHead())
     return existingHead;
   RefPtr<HTMLTableSectionElement> head =
-      new HTMLTableSectionElement(theadTag, document());
+      HTMLTableSectionElement::create(theadTag, document());
   ExceptionCode ec;
   setTHead(head, ec);
   return head.release();
@@ -137,7 +149,7 @@ PassRefPtr<HTMLElement> HTMLTableElement::createTFoot() {
   if (HTMLTableSectionElement* existingFoot = tFoot())
     return existingFoot;
   RefPtr<HTMLTableSectionElement> foot =
-      new HTMLTableSectionElement(tfootTag, document());
+      HTMLTableSectionElement::create(tfootTag, document());
   ExceptionCode ec;
   setTFoot(foot, ec);
   return foot.release();
@@ -203,17 +215,16 @@ PassRefPtr<HTMLElement> HTMLTableElement::insertRow(int index,
     parent = lastBody();
     if (!parent) {
       RefPtr<HTMLTableSectionElement> newBody =
-          new HTMLTableSectionElement(tbodyTag, document());
+          HTMLTableSectionElement::create(tbodyTag, document());
       RefPtr<HTMLTableRowElement> newRow =
-          new HTMLTableRowElement(trTag, document());
+          HTMLTableRowElement::create(document());
       newBody->appendChild(newRow, ec);
       appendChild(newBody.release(), ec);
       return newRow.release();
     }
   }
 
-  RefPtr<HTMLTableRowElement> newRow =
-      new HTMLTableRowElement(trTag, document());
+  RefPtr<HTMLTableRowElement> newRow = HTMLTableRowElement::create(document());
   parent->insertBefore(newRow, row, ec);
   return newRow.release();
 }

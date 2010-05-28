@@ -4,7 +4,8 @@
  *           (C) 1998 Waldo Bastian (bastian@kde.org)
  *           (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
- * Copyright (C) 2003, 2004, 2005, 2006, 2007 Apple Inc. All rights reserved.
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2010 Apple Inc. All rights
+ * reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -39,9 +40,20 @@ namespace WebCore {
 using namespace HTMLNames;
 
 HTMLTableRowElement::HTMLTableRowElement(const QualifiedName& tagName,
-                                         Document* doc)
-    : HTMLTablePartElement(tagName, doc) {
+                                         Document* document)
+    : HTMLTablePartElement(tagName, document) {
   ASSERT(hasTagName(trTag));
+}
+
+PassRefPtr<HTMLTableRowElement> HTMLTableRowElement::create(
+    Document* document) {
+  return new HTMLTableRowElement(trTag, document);
+}
+
+PassRefPtr<HTMLTableRowElement> HTMLTableRowElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new HTMLTableRowElement(tagName, document);
 }
 
 bool HTMLTableRowElement::checkDTD(const Node* newChild) {
@@ -140,18 +152,19 @@ PassRefPtr<HTMLElement> HTMLTableRowElement::insertCell(int index,
     return 0;
   }
 
-  RefPtr<HTMLTableCellElement> c = new HTMLTableCellElement(tdTag, document());
+  RefPtr<HTMLTableCellElement> cell =
+      HTMLTableCellElement::create(tdTag, document());
   if (index < 0 || index >= numCells)
-    appendChild(c, ec);
+    appendChild(cell, ec);
   else {
     Node* n;
     if (index < 1)
       n = firstChild();
     else
       n = children->item(index);
-    insertBefore(c, n, ec);
+    insertBefore(cell, n, ec);
   }
-  return c.release();
+  return cell.release();
 }
 
 void HTMLTableRowElement::deleteCell(int index, ExceptionCode& ec) {
