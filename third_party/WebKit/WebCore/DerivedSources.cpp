@@ -175,6 +175,7 @@
 #include "JSIDBDatabaseRequest.cpp"
 #include "JSIDBErrorEvent.cpp"
 #include "JSIDBEvent.cpp"
+#include "JSIDBIndexRequest.cpp"
 #include "JSIDBObjectStoreRequest.cpp"
 #include "JSIDBRequest.cpp"
 #include "JSIDBSuccessEvent.cpp"

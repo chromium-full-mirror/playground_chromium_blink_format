@@ -52,7 +52,9 @@ class IDBCallbacksProxy : public IDBCallbacks {
   virtual ~IDBCallbacksProxy();
 
   virtual void onError(PassRefPtr<IDBDatabaseError>);
+  virtual void onSuccess();  // For "null".
   virtual void onSuccess(PassRefPtr<IDBDatabase>);
+  virtual void onSuccess(PassRefPtr<IDBIndex>);
   virtual void onSuccess(PassRefPtr<SerializedScriptValue>);
 
  private:

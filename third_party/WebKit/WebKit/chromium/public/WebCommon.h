@@ -111,4 +111,6 @@ WEBKIT_API void failedAssertion(const char* file,
   } while (0)
 #endif
 
+#define WEBKIT_ASSERT_NOT_REACHED() WEBKIT_ASSERT(0)
+
 #endif
