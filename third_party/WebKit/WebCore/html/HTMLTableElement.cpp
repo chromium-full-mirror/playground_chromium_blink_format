@@ -152,7 +152,7 @@ PassRefPtr<HTMLElement> HTMLTableElement::createCaption() {
   if (HTMLTableCaptionElement* existingCaption = caption())
     return existingCaption;
   RefPtr<HTMLTableCaptionElement> caption =
-      new HTMLTableCaptionElement(captionTag, document());
+      HTMLTableCaptionElement::create(captionTag, document());
   ExceptionCode ec;
   setCaption(caption, ec);
   return caption.release();

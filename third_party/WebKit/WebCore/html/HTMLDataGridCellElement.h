@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009 Apple Inc. All rights reserved.
+ * Copyright (C) 2009, 2010 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -34,10 +34,8 @@ namespace WebCore {
 
 class HTMLDataGridCellElement : public HTMLElement {
  public:
-  HTMLDataGridCellElement(const QualifiedName&, Document*);
-
-  virtual HTMLTagStatus endTagRequirement() const { return TagStatusForbidden; }
-  virtual int tagPriority() const { return 0; }
+  static PassRefPtr<HTMLDataGridCellElement> create(const QualifiedName&,
+                                                    Document*);
 
   String label() const;
   void setLabel(const String&);
@@ -53,6 +51,12 @@ class HTMLDataGridCellElement : public HTMLElement {
 
   float progress() const;
   void setProgress(float);
+
+ private:
+  HTMLDataGridCellElement(const QualifiedName&, Document*);
+
+  virtual HTMLTagStatus endTagRequirement() const { return TagStatusForbidden; }
+  virtual int tagPriority() const { return 0; }
 };
 
 }  // namespace WebCore

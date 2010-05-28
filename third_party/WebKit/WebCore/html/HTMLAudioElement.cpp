@@ -41,6 +41,12 @@ HTMLAudioElement::HTMLAudioElement(const QualifiedName& tagName,
   ASSERT(hasTagName(audioTag));
 }
 
+PassRefPtr<HTMLAudioElement> HTMLAudioElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new HTMLAudioElement(tagName, document);
+}
+
 PassRefPtr<HTMLAudioElement> HTMLAudioElement::createForJSConstructor(
     Document* document,
     const String& src) {

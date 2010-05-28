@@ -1,7 +1,8 @@
 /*
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
- * Copyright (C) 2003, 2004, 2005, 2006, 2009 Apple Inc. All rights reserved.
+ * Copyright (C) 2003, 2004, 2005, 2006, 2009, 2010 Apple Inc. All rights
+ * reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -29,10 +30,16 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-HTMLBaseFontElement::HTMLBaseFontElement(const QualifiedName& tagName,
-                                         Document* document)
+inline HTMLBaseFontElement::HTMLBaseFontElement(const QualifiedName& tagName,
+                                                Document* document)
     : HTMLElement(tagName, document) {
   ASSERT(hasTagName(basefontTag));
+}
+
+PassRefPtr<HTMLBaseFontElement> HTMLBaseFontElement::create(
+    const QualifiedName& tagName,
+    Document* document) {
+  return new HTMLBaseFontElement(tagName, document);
 }
 
 int HTMLBaseFontElement::size() const {

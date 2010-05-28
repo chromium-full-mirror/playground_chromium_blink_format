@@ -597,9 +597,8 @@ bool HTMLParser::handleError(Node* n,
             createHead();
 
           popBlock(headTag);
-          e = new HTMLBodyElement(bodyTag, m_document);
           startBody();
-          insertNode(e);
+          insertNode(HTMLBodyElement::create(m_document).get());
           handled = true;
         } else
           reportError(MisplacedFramesetContentError, &localName);
@@ -612,9 +611,8 @@ bool HTMLParser::handleError(Node* n,
         if (!m_haveFrameSet) {
           ASSERT(currentTagName == headTag);
           popBlock(currentTagName);
-          e = new HTMLBodyElement(bodyTag, m_document);
           startBody();
-          insertNode(e);
+          insertNode(HTMLBodyElement::create(m_document).get());
           handled = true;
         } else
           reportError(MisplacedFramesetContentError, &localName);
