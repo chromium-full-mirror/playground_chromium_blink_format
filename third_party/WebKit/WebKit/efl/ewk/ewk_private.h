@@ -90,9 +90,11 @@ Eina_Bool ewk_view_run_javascript_prompt(Evas_Object* o,
                                          const char* defaultValue,
                                          char** value);
 Eina_Bool ewk_view_should_interrupt_javascript(Evas_Object* o);
-void ewk_view_exceeded_database_quota(Evas_Object* o,
-                                      Evas_Object* frame,
-                                      const char* databaseName);
+uint64_t ewk_view_exceeded_database_quota(Evas_Object* o,
+                                          Evas_Object* frame,
+                                          const char* databaseName,
+                                          uint64_t current_size,
+                                          uint64_t expected_size);
 
 void ewk_view_repaint(Evas_Object* o,
                       Evas_Coord x,
