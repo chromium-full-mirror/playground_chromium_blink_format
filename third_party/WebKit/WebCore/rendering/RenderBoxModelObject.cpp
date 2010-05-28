@@ -205,6 +205,27 @@ void RenderBoxModelObject::highQualityRepaintTimerFired(
   RenderBoxModelScaleObserver::highQualityRepaintTimerFired(this);
 }
 
+void RenderBoxModelObject::setSelectionState(SelectionState s) {
+  if (selectionState() == s)
+    return;
+
+  if (s == SelectionInside && selectionState() != SelectionNone)
+    return;
+
+  if ((s == SelectionStart && selectionState() == SelectionEnd) ||
+      (s == SelectionEnd && selectionState() == SelectionStart))
+    RenderObject::setSelectionState(SelectionBoth);
+  else
+    RenderObject::setSelectionState(s);
+
+  // FIXME:
+  // We should consider whether it is OK propagating to ancestor RenderInlines.
+  // This is a workaround for http://webkit.org/b/32123
+  RenderBlock* cb = containingBlock();
+  if (cb && !cb->isRenderView())
+    cb->setSelectionState(s);
+}
+
 RenderBoxModelObject::RenderBoxModelObject(Node* node)
     : RenderObject(node), m_layer(0) {}
 

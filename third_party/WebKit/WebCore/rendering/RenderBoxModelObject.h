@@ -156,6 +156,8 @@ class RenderBoxModelObject : public RenderObject {
 
   void highQualityRepaintTimerFired(Timer<RenderBoxModelObject>*);
 
+  virtual void setSelectionState(SelectionState s);
+
  protected:
   void calculateBackgroundImageGeometry(const FillLayer*,
                                         int tx,

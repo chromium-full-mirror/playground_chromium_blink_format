@@ -134,8 +134,6 @@ class RenderBlock : public RenderBox {
 
   bool containsNonZeroBidiLevel() const;
 
-  virtual void setSelectionState(SelectionState s);
-
   GapRects selectionGapRectsForRepaint(RenderBoxModelObject* repaintContainer);
   IntRect fillLeftSelectionGap(RenderObject* selObj,
                                int xPos,
