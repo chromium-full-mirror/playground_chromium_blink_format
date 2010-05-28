@@ -67,6 +67,7 @@ class WebDocument : public WebNode {
   // frameless.
   WEBKIT_API WebFrame* frame() const;
   WEBKIT_API bool isHTMLDocument() const;
+  WEBKIT_API bool isXHTMLDocument() const;
   WEBKIT_API bool isPluginDocument() const;
   WEBKIT_API WebURL baseURL() const;
   WEBKIT_API WebURL firstPartyForCookies() const;

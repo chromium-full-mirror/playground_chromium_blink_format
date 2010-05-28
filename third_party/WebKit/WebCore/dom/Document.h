@@ -391,6 +391,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
 
   // Other methods (not part of DOM)
   bool isHTMLDocument() const { return m_isHTML; }
+  bool isXHTMLDocument() const { return m_isXHTML; }
   virtual bool isImageDocument() const { return false; }
 #if ENABLE(SVG)
   virtual bool isSVGDocument() const { return false; }
