@@ -75,7 +75,7 @@ class WKRetainPtr {
       WKRetain(ptr);
   }
 
-  ~RetainPtr() {
+  ~WKRetainPtr() {
     if (PtrType ptr = m_ptr)
       WKRelease(ptr);
   }
@@ -208,5 +208,7 @@ inline bool operator!=(T* a, const WKRetainPtr<U>& b) {
 }
 
 }  // namespace WebKit
+
+using WebKit::WKRetainPtr;
 
 #endif  // WKRetainPtr_h
