@@ -1243,21 +1243,29 @@ void QWebPagePrivate::dynamicPropertyChangeEvent(
   } else if (event->propertyName() == "_q_HTMLTokenizerTimeDelay") {
     double timeDelay = q->property("_q_HTMLTokenizerTimeDelay").toDouble();
     q->handle()->page->setCustomHTMLTokenizerTimeDelay(timeDelay);
-  } else if (event->propertyName() == "_q_TiledBackingStoreTileSize") {
-    QSize tileSize = q->property("_q_TiledBackingStoreTileSize").toSize();
+  }
+#if ENABLE(TILED_BACKING_STORE)
+  else if (event->propertyName() == "_q_TiledBackingStoreTileSize") {
     WebCore::Frame* frame = QWebFramePrivate::core(q->mainFrame());
+    if (!frame->tiledBackingStore())
+      return;
+    QSize tileSize = q->property("_q_TiledBackingStoreTileSize").toSize();
     frame->tiledBackingStore()->setTileSize(tileSize);
   } else if (event->propertyName() == "_q_TiledBackingStoreTileCreationDelay") {
+    WebCore::Frame* frame = QWebFramePrivate::core(q->mainFrame());
+    if (!frame->tiledBackingStore())
+      return;
     int tileCreationDelay =
         q->property("_q_TiledBackingStoreTileCreationDelay").toInt();
-    WebCore::Frame* frame = QWebFramePrivate::core(q->mainFrame());
     frame->tiledBackingStore()->setTileCreationDelay(
         static_cast<double>(tileCreationDelay) / 1000.);
   } else if (event->propertyName() ==
              "_q_TiledBackingStoreKeepAreaMultiplier") {
+    WebCore::Frame* frame = QWebFramePrivate::core(q->mainFrame());
+    if (!frame->tiledBackingStore())
+      return;
     FloatSize keepMultiplier;
     FloatSize coverMultiplier;
-    WebCore::Frame* frame = QWebFramePrivate::core(q->mainFrame());
     frame->tiledBackingStore()->getKeepAndCoverAreaMultipliers(keepMultiplier,
                                                                coverMultiplier);
     QSizeF qSize =
@@ -1267,9 +1275,11 @@ void QWebPagePrivate::dynamicPropertyChangeEvent(
                                                                coverMultiplier);
   } else if (event->propertyName() ==
              "_q_TiledBackingStoreCoverAreaMultiplier") {
+    WebCore::Frame* frame = QWebFramePrivate::core(q->mainFrame());
+    if (!frame->tiledBackingStore())
+      return;
     FloatSize keepMultiplier;
     FloatSize coverMultiplier;
-    WebCore::Frame* frame = QWebFramePrivate::core(q->mainFrame());
     frame->tiledBackingStore()->getKeepAndCoverAreaMultipliers(keepMultiplier,
                                                                coverMultiplier);
     QSizeF qSize =
@@ -1278,6 +1288,7 @@ void QWebPagePrivate::dynamicPropertyChangeEvent(
     frame->tiledBackingStore()->setKeepAndCoverAreaMultipliers(keepMultiplier,
                                                                coverMultiplier);
   }
+#endif
 }
 
 void QWebPagePrivate::shortcutOverrideEvent(QKeyEvent* event) {
