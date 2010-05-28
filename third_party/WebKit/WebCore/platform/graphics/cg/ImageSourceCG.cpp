@@ -218,7 +218,6 @@ int ImageSource::repetitionCount() {
   if (!initialized())
     return result;
 
-  // A property with value 0 means loop forever.
   RetainPtr<CFDictionaryRef> properties(
       AdoptCF, CGImageSourceCopyProperties(m_decoder, imageSourceOptions()));
   if (properties) {
@@ -227,8 +226,12 @@ int ImageSource::repetitionCount() {
     if (gifProperties) {
       CFNumberRef num = (CFNumberRef)CFDictionaryGetValue(
           gifProperties, kCGImagePropertyGIFLoopCount);
-      if (num)
+      if (num) {
+        // A property with value 0 means loop forever.
         CFNumberGetValue(num, kCFNumberIntType, &result);
+        if (!result)
+          result = cAnimationLoopInfinite;
+      }
     } else
       result = cAnimationNone;  // Turns out we're not a GIF after all, so we
                                 // don't animate.
