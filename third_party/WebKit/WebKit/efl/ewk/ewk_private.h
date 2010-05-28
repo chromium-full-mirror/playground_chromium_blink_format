@@ -41,6 +41,11 @@ extern "C" {
 // If defined, ewk will do type checking to ensure objects are of correct type
 #define EWK_TYPE_CHECK 1
 
+// forward declarations
+namespace WebCore {
+struct PopupMenuClient;
+}
+
 void ewk_view_ready(Evas_Object* o);
 void ewk_view_title_set(Evas_Object* o, const char* title);
 void ewk_view_uri_changed(Evas_Object* o);
@@ -126,6 +131,11 @@ WTF::PassRefPtr<WebCore::Widget> ewk_view_plugin_create(
     const WTF::Vector<WebCore::String>& paramValues,
     const WebCore::String& mimeType,
     bool loadManually);
+
+void ewk_view_popup_new(Evas_Object* o,
+                        WebCore::PopupMenuClient* client,
+                        int selected,
+                        const WebCore::IntRect& rect);
 
 Ewk_History* ewk_history_new(WebCore::BackForwardList* history);
 void ewk_history_free(Ewk_History* history);
