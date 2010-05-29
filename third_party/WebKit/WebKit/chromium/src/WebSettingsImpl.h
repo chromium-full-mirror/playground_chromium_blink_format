@@ -86,6 +86,7 @@ class WebSettingsImpl : public WebSettings {
   virtual void setExperimentalWebGLEnabled(bool);
   virtual void setShowDebugBorders(bool);
   virtual void setEditingBehavior(EditingBehavior);
+  virtual void setAcceleratedCompositingEnabled(bool);
 
  private:
   WebCore::Settings* m_settings;
