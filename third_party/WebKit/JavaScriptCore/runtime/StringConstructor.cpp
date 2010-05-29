@@ -63,7 +63,7 @@ StringConstructor::StringConstructor(ExecState* exec,
                              ReadOnly | DontEnum | DontDelete);
 
 // ECMA 15.5.3.2 fromCharCode()
-#if ENABLE(JIT)
+#if ENABLE(JIT) && ENABLE(JIT_OPTIMIZE_NATIVE_CALL)
   putDirectFunctionWithoutTransition(
       exec, new (exec) NativeFunctionWrapper(
                 exec, globalObject, prototypeFunctionStructure, 1,
