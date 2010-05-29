@@ -2405,6 +2405,7 @@ static bool canAccessAncestor(const SecurityOrigin* activeSecurityOrigin,
   if (!targetFrame)
     return false;
 
+  const bool isLocalActiveOrigin = activeSecurityOrigin->isLocal();
   for (Frame* ancestorFrame = targetFrame; ancestorFrame;
        ancestorFrame = ancestorFrame->tree()->parent()) {
     Document* ancestorDocument = ancestorFrame->document();
@@ -2414,6 +2415,11 @@ static bool canAccessAncestor(const SecurityOrigin* activeSecurityOrigin,
     const SecurityOrigin* ancestorSecurityOrigin =
         ancestorDocument->securityOrigin();
     if (activeSecurityOrigin->canAccess(ancestorSecurityOrigin))
+      return true;
+
+    // Allow file URL descendant navigation even when
+    // allowFileAccessFromFileURLs is false.
+    if (isLocalActiveOrigin && ancestorSecurityOrigin->isLocal())
       return true;
   }
 
