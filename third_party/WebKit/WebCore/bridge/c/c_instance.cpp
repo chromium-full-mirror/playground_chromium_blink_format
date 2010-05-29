@@ -122,9 +122,7 @@ JSValue CInstance::getMethod(ExecState* exec, const Identifier& propertyName) {
                                    propertyName, methodList);
 }
 
-JSValue CInstance::invokeMethod(ExecState* exec,
-                                RuntimeMethod* runtimeMethod,
-                                const ArgList& args) {
+JSValue CInstance::invokeMethod(ExecState* exec, RuntimeMethod* runtimeMethod) {
   if (!asObject(runtimeMethod)->inherits(&CRuntimeMethod::s_info))
     return throwError(
         exec, TypeError,
@@ -142,12 +140,12 @@ JSValue CInstance::invokeMethod(ExecState* exec,
   if (!_object->_class->hasMethod(_object, ident))
     return jsUndefined();
 
-  unsigned count = args.size();
+  unsigned count = exec->argumentCount();
   Vector<NPVariant, 8> cArgs(count);
 
   unsigned i;
   for (i = 0; i < count; i++)
-    convertValueToNPVariant(exec, args.at(i), &cArgs[i]);
+    convertValueToNPVariant(exec, exec->argument(i), &cArgs[i]);
 
   // Invoke the 'C' method.
   bool retval = true;
@@ -174,16 +172,16 @@ JSValue CInstance::invokeMethod(ExecState* exec,
   return resultValue;
 }
 
-JSValue CInstance::invokeDefaultMethod(ExecState* exec, const ArgList& args) {
+JSValue CInstance::invokeDefaultMethod(ExecState* exec) {
   if (!_object->_class->invokeDefault)
     return jsUndefined();
 
-  unsigned count = args.size();
+  unsigned count = exec->argumentCount();
   Vector<NPVariant, 8> cArgs(count);
 
   unsigned i;
   for (i = 0; i < count; i++)
-    convertValueToNPVariant(exec, args.at(i), &cArgs[i]);
+    convertValueToNPVariant(exec, exec->argument(i), &cArgs[i]);
 
   // Invoke the 'C' method.
   bool retval = true;

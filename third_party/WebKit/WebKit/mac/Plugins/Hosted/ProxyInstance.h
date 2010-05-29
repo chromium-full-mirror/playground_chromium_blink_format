@@ -71,13 +71,10 @@ class ProxyInstance : public JSC::Bindings::Instance {
 
   virtual JSC::JSValue getMethod(JSC::ExecState* exec,
                                  const JSC::Identifier& propertyName);
-  virtual JSC::JSValue invokeMethod(JSC::ExecState*,
-                                    JSC::RuntimeMethod*,
-                                    const JSC::ArgList& args);
+  virtual JSC::JSValue invokeMethod(JSC::ExecState*, JSC::RuntimeMethod*);
 
   virtual bool supportsInvokeDefaultMethod() const;
-  virtual JSC::JSValue invokeDefaultMethod(JSC::ExecState*,
-                                           const JSC::ArgList&);
+  virtual JSC::JSValue invokeDefaultMethod(JSC::ExecState*);
 
   virtual bool supportsConstruct() const;
   virtual JSC::JSValue invokeConstruct(JSC::ExecState*, const JSC::ArgList&);
@@ -95,7 +92,7 @@ class ProxyInstance : public JSC::Bindings::Instance {
   JSC::JSValue invoke(JSC::ExecState*,
                       InvokeType,
                       uint64_t identifier,
-                      const JSC::ArgList& args);
+                      const JSC::ArgList&);
 
   template <typename T>
   std::auto_ptr<T> waitForReply(uint32_t requestID) const {

@@ -67,12 +67,8 @@ ConstructType ErrorConstructor::getConstructData(ConstructData& constructData) {
   return ConstructTypeHost;
 }
 
-// ECMA 15.9.2
-static JSValue JSC_HOST_CALL callErrorConstructor(ExecState* exec,
-                                                  JSObject*,
-                                                  JSValue,
-                                                  const ArgList& args) {
-  // "Error()" gives the sames result as "new Error()"
+static JSValue JSC_HOST_CALL callErrorConstructor(ExecState* exec) {
+  ArgList args(exec);
   return constructError(exec, args);
 }
 

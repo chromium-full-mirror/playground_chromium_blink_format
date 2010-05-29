@@ -39,7 +39,7 @@ namespace JSC {
 class CodeBlock;
 class ExecState;
 class JSActivation;
-class JSFunction;
+class JSObject;
 class JSPropertyNameIterator;
 class ScopeChainNode;
 
@@ -58,7 +58,6 @@ class Register : public WTF::FastAllocBase {
   Register& operator=(JSActivation*);
   Register& operator=(CallFrame*);
   Register& operator=(CodeBlock*);
-  Register& operator=(JSFunction*);
   Register& operator=(JSPropertyNameIterator*);
   Register& operator=(ScopeChainNode*);
   Register& operator=(Instruction*);
@@ -67,7 +66,7 @@ class Register : public WTF::FastAllocBase {
   JSActivation* activation() const;
   CallFrame* callFrame() const;
   CodeBlock* codeBlock() const;
-  JSFunction* function() const;
+  JSObject* function() const;
   JSPropertyNameIterator* propertyNameIterator() const;
   ScopeChainNode* scopeChain() const;
   Instruction* vPC() const;
@@ -75,6 +74,12 @@ class Register : public WTF::FastAllocBase {
   static Register withInt(int32_t i) {
     Register r;
     r.u.i = i;
+    return r;
+  }
+
+  static Register withCallee(JSObject* callee) {
+    Register r;
+    r.u.function = callee;
     return r;
   }
 
@@ -86,7 +91,7 @@ class Register : public WTF::FastAllocBase {
     JSActivation* activation;
     CallFrame* callFrame;
     CodeBlock* codeBlock;
-    JSFunction* function;
+    JSObject* function;
     JSPropertyNameIterator* propertyNameIterator;
     ScopeChainNode* scopeChain;
     Instruction* vPC;
@@ -135,11 +140,6 @@ ALWAYS_INLINE Register& Register::operator=(CodeBlock* codeBlock) {
   return *this;
 }
 
-ALWAYS_INLINE Register& Register::operator=(JSFunction* function) {
-  u.function = function;
-  return *this;
-}
-
 ALWAYS_INLINE Register& Register::operator=(Instruction* vPC) {
   u.vPC = vPC;
   return *this;
@@ -172,7 +172,7 @@ ALWAYS_INLINE CodeBlock* Register::codeBlock() const {
   return u.codeBlock;
 }
 
-ALWAYS_INLINE JSFunction* Register::function() const {
+ALWAYS_INLINE JSObject* Register::function() const {
   return u.function;
 }
 

@@ -374,10 +374,8 @@ ConstructType RegExpConstructor::getConstructData(
 }
 
 // ECMA 15.10.3
-static JSValue JSC_HOST_CALL callRegExpConstructor(ExecState* exec,
-                                                   JSObject*,
-                                                   JSValue,
-                                                   const ArgList& args) {
+static JSValue JSC_HOST_CALL callRegExpConstructor(ExecState* exec) {
+  ArgList args(exec);
   return constructRegExp(exec, args);
 }
 

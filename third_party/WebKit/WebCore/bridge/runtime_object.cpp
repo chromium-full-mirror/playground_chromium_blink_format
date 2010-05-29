@@ -269,15 +269,12 @@ JSValue RuntimeObject::defaultValue(ExecState* exec,
   return result;
 }
 
-static JSValue JSC_HOST_CALL callRuntimeObject(ExecState* exec,
-                                               JSObject* function,
-                                               JSValue,
-                                               const ArgList& args) {
-  ASSERT(function->inherits(&RuntimeObject::s_info));
+static JSValue JSC_HOST_CALL callRuntimeObject(ExecState* exec) {
+  ASSERT(exec->callee()->inherits(&RuntimeObject::s_info));
   RefPtr<Instance> instance(
-      static_cast<RuntimeObject*>(function)->getInternalInstance());
+      static_cast<RuntimeObject*>(exec->callee())->getInternalInstance());
   instance->begin();
-  JSValue result = instance->invokeDefaultMethod(exec, args);
+  JSValue result = instance->invokeDefaultMethod(exec);
   instance->end();
   return result;
 }

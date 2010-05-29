@@ -36,18 +36,9 @@ namespace JSC {
 
 ASSERT_CLASS_FITS_IN_CELL(FunctionPrototype);
 
-static JSValue JSC_HOST_CALL functionProtoFuncToString(ExecState*,
-                                                       JSObject*,
-                                                       JSValue,
-                                                       const ArgList&);
-static JSValue JSC_HOST_CALL functionProtoFuncApply(ExecState*,
-                                                    JSObject*,
-                                                    JSValue,
-                                                    const ArgList&);
-static JSValue JSC_HOST_CALL functionProtoFuncCall(ExecState*,
-                                                   JSObject*,
-                                                   JSValue,
-                                                   const ArgList&);
+static JSValue JSC_HOST_CALL functionProtoFuncToString(ExecState*);
+static JSValue JSC_HOST_CALL functionProtoFuncApply(ExecState*);
+static JSValue JSC_HOST_CALL functionProtoFuncCall(ExecState*);
 
 FunctionPrototype::FunctionPrototype(ExecState* exec,
                                      JSGlobalObject* globalObject,
@@ -81,10 +72,7 @@ void FunctionPrototype::addFunctionProperties(
   putDirectFunctionWithoutTransition(exec, *callFunction, DontEnum);
 }
 
-static JSValue JSC_HOST_CALL callFunctionPrototype(ExecState*,
-                                                   JSObject*,
-                                                   JSValue,
-                                                   const ArgList&) {
+static JSValue JSC_HOST_CALL callFunctionPrototype(ExecState*) {
   return jsUndefined();
 }
 
@@ -114,10 +102,8 @@ static inline void insertSemicolonIfNeeded(UString& functionBody) {
   }
 }
 
-JSValue JSC_HOST_CALL functionProtoFuncToString(ExecState* exec,
-                                                JSObject*,
-                                                JSValue thisValue,
-                                                const ArgList&) {
+JSValue JSC_HOST_CALL functionProtoFuncToString(ExecState* exec) {
+  JSValue thisValue = exec->hostThisValue();
   if (thisValue.inherits(&JSFunction::info)) {
     JSFunction* function = asFunction(thisValue);
     if (function->isHostFunction())
@@ -140,16 +126,14 @@ JSValue JSC_HOST_CALL functionProtoFuncToString(ExecState* exec,
   return throwError(exec, TypeError);
 }
 
-JSValue JSC_HOST_CALL functionProtoFuncApply(ExecState* exec,
-                                             JSObject*,
-                                             JSValue thisValue,
-                                             const ArgList& args) {
+JSValue JSC_HOST_CALL functionProtoFuncApply(ExecState* exec) {
+  JSValue thisValue = exec->hostThisValue();
   CallData callData;
   CallType callType = thisValue.getCallData(callData);
   if (callType == CallTypeNone)
     return throwError(exec, TypeError);
 
-  JSValue array = args.at(1);
+  JSValue array = exec->argument(1);
 
   MarkedArgumentBuffer applyArgs;
   if (!array.isUndefinedOrNull()) {
@@ -169,21 +153,21 @@ JSValue JSC_HOST_CALL functionProtoFuncApply(ExecState* exec,
       return throwError(exec, TypeError);
   }
 
-  return call(exec, thisValue, callType, callData, args.at(0), applyArgs);
+  return call(exec, thisValue, callType, callData, exec->argument(0),
+              applyArgs);
 }
 
-JSValue JSC_HOST_CALL functionProtoFuncCall(ExecState* exec,
-                                            JSObject*,
-                                            JSValue thisValue,
-                                            const ArgList& args) {
+JSValue JSC_HOST_CALL functionProtoFuncCall(ExecState* exec) {
+  JSValue thisValue = exec->hostThisValue();
   CallData callData;
   CallType callType = thisValue.getCallData(callData);
   if (callType == CallTypeNone)
     return throwError(exec, TypeError);
 
+  ArgList args(exec);
   ArgList callArgs;
   args.getSlice(1, callArgs);
-  return call(exec, thisValue, callType, callData, args.at(0), callArgs);
+  return call(exec, thisValue, callType, callData, exec->argument(0), callArgs);
 }
 
 }  // namespace JSC

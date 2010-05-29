@@ -39,10 +39,10 @@ using namespace JSC;
 
 namespace WebCore {
 
-JSValue JSDOMFormData::append(ExecState* exec, const ArgList& args) {
-  if (args.size() >= 2) {
-    String name = ustringToString(args.at(0).toString(exec));
-    JSValue value = args.at(1);
+JSValue JSDOMFormData::append(ExecState* exec) {
+  if (exec->argumentCount() >= 2) {
+    String name = ustringToString(exec->argument(0).toString(exec));
+    JSValue value = exec->argument(1);
     if (value.inherits(&JSBlob::s_info))
       impl()->append(name, toBlob(value));
     else

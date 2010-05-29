@@ -48,8 +48,8 @@ JSC::JSValue toJS(JSC::ExecState* exec,
   return getDOMObjectWrapper<JSFloatArray>(exec, globalObject, object);
 }
 
-JSC::JSValue JSFloatArray::set(JSC::ExecState* exec, JSC::ArgList const& args) {
-  return setWebGLArrayHelper(exec, impl(), args, toFloatArray);
+JSC::JSValue JSFloatArray::set(JSC::ExecState* exec) {
+  return setWebGLArrayHelper(exec, impl(), toFloatArray);
 }
 
 }  // namespace WebCore

@@ -53,12 +53,10 @@ class ObjcInstance : public Instance {
   virtual JSValue defaultValue(ExecState*, PreferredPrimitiveType) const;
 
   virtual JSValue getMethod(ExecState* exec, const Identifier& propertyName);
-  JSValue invokeObjcMethod(ExecState*, ObjcMethod* method, const ArgList&);
-  virtual JSValue invokeMethod(ExecState*,
-                               RuntimeMethod* method,
-                               const ArgList&);
+  JSValue invokeObjcMethod(ExecState*, ObjcMethod* method);
+  virtual JSValue invokeMethod(ExecState*, RuntimeMethod* method);
   virtual bool supportsInvokeDefaultMethod() const;
-  virtual JSValue invokeDefaultMethod(ExecState*, const ArgList&);
+  virtual JSValue invokeDefaultMethod(ExecState*);
 
   JSValue getValueOfUndefinedField(ExecState*, const Identifier&) const;
   virtual bool setValueOfUndefinedField(ExecState*, const Identifier&, JSValue);

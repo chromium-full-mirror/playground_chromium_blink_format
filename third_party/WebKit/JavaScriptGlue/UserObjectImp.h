@@ -49,9 +49,7 @@ class UserObjectImp : public JSObject {
       PropertyNameArray&,
       EnumerationMode mode = ExcludeDontEnumProperties);
 
-  virtual JSValue callAsFunction(ExecState* exec,
-                                 JSObject* thisObj,
-                                 const ArgList& args);
+  virtual JSValue callAsFunction(ExecState* exec);
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,

@@ -837,14 +837,15 @@ static bool domWindowAllowPopUp(Frame* activeFrame, ExecState* exec) {
   return DOMWindow::allowPopUp(activeFrame);
 }
 
-JSValue JSDOMWindow::open(ExecState* exec, const ArgList& args) {
-  String urlString = valueToStringWithUndefinedOrNullCheck(exec, args.at(0));
+JSValue JSDOMWindow::open(ExecState* exec) {
+  String urlString =
+      valueToStringWithUndefinedOrNullCheck(exec, exec->argument(0));
   AtomicString frameName =
-      args.at(1).isUndefinedOrNull()
+      exec->argument(1).isUndefinedOrNull()
           ? "_blank"
-          : ustringToAtomicString(args.at(1).toString(exec));
+          : ustringToAtomicString(exec->argument(1).toString(exec));
   WindowFeatures windowFeatures(
-      valueToStringWithUndefinedOrNullCheck(exec, args.at(2)));
+      valueToStringWithUndefinedOrNullCheck(exec, exec->argument(2)));
 
   Frame* frame = impl()->frame();
   if (!frame)
@@ -929,10 +930,11 @@ JSValue JSDOMWindow::open(ExecState* exec, const ArgList& args) {
   return toJS(exec, frame->domWindow());
 }
 
-JSValue JSDOMWindow::showModalDialog(ExecState* exec, const ArgList& args) {
-  String url = valueToStringWithUndefinedOrNullCheck(exec, args.at(0));
-  JSValue dialogArgs = args.at(1);
-  String featureArgs = valueToStringWithUndefinedOrNullCheck(exec, args.at(2));
+JSValue JSDOMWindow::showModalDialog(ExecState* exec) {
+  String url = valueToStringWithUndefinedOrNullCheck(exec, exec->argument(0));
+  JSValue dialogArgs = exec->argument(1);
+  String featureArgs =
+      valueToStringWithUndefinedOrNullCheck(exec, exec->argument(2));
 
   Frame* frame = impl()->frame();
   if (!frame)
@@ -1026,24 +1028,24 @@ JSValue JSDOMWindow::showModalDialog(ExecState* exec, const ArgList& args) {
   return jsUndefined();
 }
 
-JSValue JSDOMWindow::postMessage(ExecState* exec, const ArgList& args) {
+JSValue JSDOMWindow::postMessage(ExecState* exec) {
   DOMWindow* window = impl();
 
   DOMWindow* source = asJSDOMWindow(exec->lexicalGlobalObject())->impl();
   PassRefPtr<SerializedScriptValue> message =
-      SerializedScriptValue::create(exec, args.at(0));
+      SerializedScriptValue::create(exec, exec->argument(0));
 
   if (exec->hadException())
     return jsUndefined();
 
   MessagePortArray messagePorts;
-  if (args.size() > 2)
-    fillMessagePortArray(exec, args.at(1), messagePorts);
+  if (exec->argumentCount() > 2)
+    fillMessagePortArray(exec, exec->argument(1), messagePorts);
   if (exec->hadException())
     return jsUndefined();
 
   String targetOrigin = valueToStringWithUndefinedOrNullCheck(
-      exec, args.at((args.size() == 2) ? 1 : 2));
+      exec, exec->argument((exec->argumentCount() == 2) ? 1 : 2));
   if (exec->hadException())
     return jsUndefined();
 
@@ -1054,12 +1056,12 @@ JSValue JSDOMWindow::postMessage(ExecState* exec, const ArgList& args) {
   return jsUndefined();
 }
 
-JSValue JSDOMWindow::setTimeout(ExecState* exec, const ArgList& args) {
+JSValue JSDOMWindow::setTimeout(ExecState* exec) {
   OwnPtr<ScheduledAction> action =
-      ScheduledAction::create(exec, args, currentWorld(exec));
+      ScheduledAction::create(exec, currentWorld(exec));
   if (exec->hadException())
     return jsUndefined();
-  int delay = args.at(1).toInt32(exec);
+  int delay = exec->argument(1).toInt32(exec);
 
   ExceptionCode ec = 0;
   int result = impl()->setTimeout(action.release(), delay, ec);
@@ -1068,12 +1070,12 @@ JSValue JSDOMWindow::setTimeout(ExecState* exec, const ArgList& args) {
   return jsNumber(exec, result);
 }
 
-JSValue JSDOMWindow::setInterval(ExecState* exec, const ArgList& args) {
+JSValue JSDOMWindow::setInterval(ExecState* exec) {
   OwnPtr<ScheduledAction> action =
-      ScheduledAction::create(exec, args, currentWorld(exec));
+      ScheduledAction::create(exec, currentWorld(exec));
   if (exec->hadException())
     return jsUndefined();
-  int delay = args.at(1).toInt32(exec);
+  int delay = exec->argument(1).toInt32(exec);
 
   ExceptionCode ec = 0;
   int result = impl()->setInterval(action.release(), delay, ec);
@@ -1082,72 +1084,74 @@ JSValue JSDOMWindow::setInterval(ExecState* exec, const ArgList& args) {
   return jsNumber(exec, result);
 }
 
-JSValue JSDOMWindow::addEventListener(ExecState* exec, const ArgList& args) {
+JSValue JSDOMWindow::addEventListener(ExecState* exec) {
   Frame* frame = impl()->frame();
   if (!frame)
     return jsUndefined();
 
-  JSValue listener = args.at(1);
+  JSValue listener = exec->argument(1);
   if (!listener.isObject())
     return jsUndefined();
 
-  impl()->addEventListener(ustringToAtomicString(args.at(0).toString(exec)),
-                           JSEventListener::create(asObject(listener), this,
-                                                   false, currentWorld(exec)),
-                           args.at(2).toBoolean(exec));
+  impl()->addEventListener(
+      ustringToAtomicString(exec->argument(0).toString(exec)),
+      JSEventListener::create(asObject(listener), this, false,
+                              currentWorld(exec)),
+      exec->argument(2).toBoolean(exec));
   return jsUndefined();
 }
 
-JSValue JSDOMWindow::removeEventListener(ExecState* exec, const ArgList& args) {
+JSValue JSDOMWindow::removeEventListener(ExecState* exec) {
   Frame* frame = impl()->frame();
   if (!frame)
     return jsUndefined();
 
-  JSValue listener = args.at(1);
+  JSValue listener = exec->argument(1);
   if (!listener.isObject())
     return jsUndefined();
 
-  impl()->removeEventListener(ustringToAtomicString(args.at(0).toString(exec)),
-                              JSEventListener::create(asObject(listener), this,
-                                                      false, currentWorld(exec))
-                                  .get(),
-                              args.at(2).toBoolean(exec));
+  impl()->removeEventListener(
+      ustringToAtomicString(exec->argument(0).toString(exec)),
+      JSEventListener::create(asObject(listener), this, false,
+                              currentWorld(exec))
+          .get(),
+      exec->argument(2).toBoolean(exec));
   return jsUndefined();
 }
 
 #if ENABLE(DATABASE)
-JSValue JSDOMWindow::openDatabase(ExecState* exec, const ArgList& args) {
-  if (!allowsAccessFrom(exec) || (args.size() < 4)) {
+JSValue JSDOMWindow::openDatabase(ExecState* exec) {
+  if (!allowsAccessFrom(exec) || (exec->argumentCount() < 4)) {
     setDOMException(exec, SYNTAX_ERR);
     return jsUndefined();
   }
 
-  String name = ustringToString(args.at(0).toString(exec));
+  String name = ustringToString(exec->argument(0).toString(exec));
   if (exec->hadException())
     return jsUndefined();
 
-  String version = ustringToString(args.at(1).toString(exec));
+  String version = ustringToString(exec->argument(1).toString(exec));
   if (exec->hadException())
     return jsUndefined();
 
-  String displayName = ustringToString(args.at(2).toString(exec));
+  String displayName = ustringToString(exec->argument(2).toString(exec));
   if (exec->hadException())
     return jsUndefined();
 
-  // args.at(3) = estimated size
-  unsigned long estimatedSize = args.at(3).toUInt32(exec);
+  // exec->argument(3) = estimated size
+  unsigned long estimatedSize = exec->argument(3).toUInt32(exec);
   if (exec->hadException())
     return jsUndefined();
 
   RefPtr<DatabaseCallback> creationCallback;
-  if (args.size() >= 5) {
-    if (!args.at(4).isObject()) {
+  if (exec->argumentCount() >= 5) {
+    if (!exec->argument(4).isObject()) {
       setDOMException(exec, TYPE_MISMATCH_ERR);
       return jsUndefined();
     }
 
     creationCallback =
-        JSDatabaseCallback::create(asObject(args.at(4)), globalObject());
+        JSDatabaseCallback::create(asObject(exec->argument(4)), globalObject());
   }
 
   ExceptionCode ec = 0;

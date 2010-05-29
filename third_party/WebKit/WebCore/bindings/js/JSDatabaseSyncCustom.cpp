@@ -42,16 +42,16 @@ namespace WebCore {
 
 using namespace JSC;
 
-JSValue JSDatabaseSync::changeVersion(ExecState* exec, const ArgList& args) {
-  String oldVersion = ustringToString(args.at(0).toString(exec));
+JSValue JSDatabaseSync::changeVersion(ExecState* exec) {
+  String oldVersion = ustringToString(exec->argument(0).toString(exec));
   if (exec->hadException())
     return jsUndefined();
 
-  String newVersion = ustringToString(args.at(1).toString(exec));
+  String newVersion = ustringToString(exec->argument(1).toString(exec));
   if (exec->hadException())
     return jsUndefined();
 
-  JSObject* object = args.at(2).getObject();
+  JSObject* object = exec->argument(2).getObject();
   if (!object) {
     setDOMException(exec, TYPE_MISMATCH_ERR);
     return jsUndefined();
@@ -69,11 +69,10 @@ JSValue JSDatabaseSync::changeVersion(ExecState* exec, const ArgList& args) {
 }
 
 static JSValue createTransaction(ExecState* exec,
-                                 const ArgList& args,
                                  DatabaseSync* database,
                                  JSDOMGlobalObject* globalObject,
                                  bool readOnly) {
-  JSObject* object = args.at(0).getObject();
+  JSObject* object = exec->argument(0).getObject();
   if (!object) {
     setDOMException(exec, TYPE_MISMATCH_ERR);
     return jsUndefined();
@@ -89,14 +88,14 @@ static JSValue createTransaction(ExecState* exec,
   return jsUndefined();
 }
 
-JSValue JSDatabaseSync::transaction(ExecState* exec, const ArgList& args) {
-  return createTransaction(exec, args, m_impl.get(),
+JSValue JSDatabaseSync::transaction(ExecState* exec) {
+  return createTransaction(exec, m_impl.get(),
                            static_cast<JSDOMGlobalObject*>(globalObject()),
                            false);
 }
 
-JSValue JSDatabaseSync::readTransaction(ExecState* exec, const ArgList& args) {
-  return createTransaction(exec, args, m_impl.get(),
+JSValue JSDatabaseSync::readTransaction(ExecState* exec) {
+  return createTransaction(exec, m_impl.get(),
                            static_cast<JSDOMGlobalObject*>(globalObject()),
                            true);
 }

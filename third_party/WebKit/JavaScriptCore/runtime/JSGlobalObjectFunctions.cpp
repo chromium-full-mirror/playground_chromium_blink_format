@@ -52,10 +52,8 @@ using namespace Unicode;
 
 namespace JSC {
 
-static JSValue encode(ExecState* exec,
-                      const ArgList& args,
-                      const char* doNotEscape) {
-  UString str = args.at(0).toString(exec);
+static JSValue encode(ExecState* exec, const char* doNotEscape) {
+  UString str = exec->argument(0).toString(exec);
   CString cstr = str.UTF8String(true);
   if (!cstr.data())
     return throwError(exec, URIError,
@@ -76,12 +74,9 @@ static JSValue encode(ExecState* exec,
   return builder.build(exec);
 }
 
-static JSValue decode(ExecState* exec,
-                      const ArgList& args,
-                      const char* doNotUnescape,
-                      bool strict) {
+static JSValue decode(ExecState* exec, const char* doNotUnescape, bool strict) {
   JSStringBuilder builder;
-  UString str = args.at(0).toString(exec);
+  UString str = exec->argument(0).toString(exec);
   int k = 0;
   int len = str.size();
   const UChar* d = str.data();
@@ -286,19 +281,17 @@ static double parseFloat(const UString& s) {
   return s.toDouble(true /*tolerant*/, false /* NaN for empty string */);
 }
 
-JSValue JSC_HOST_CALL globalFuncEval(ExecState* exec,
-                                     JSObject* function,
-                                     JSValue thisValue,
-                                     const ArgList& args) {
-  JSObject* thisObject = thisValue.toThisObject(exec);
+JSValue JSC_HOST_CALL globalFuncEval(ExecState* exec) {
+  JSObject* thisObject = exec->hostThisValue().toThisObject(exec);
   JSObject* unwrappedObject = thisObject->unwrappedObject();
   if (!unwrappedObject->isGlobalObject() ||
-      static_cast<JSGlobalObject*>(unwrappedObject)->evalFunction() != function)
+      static_cast<JSGlobalObject*>(unwrappedObject)->evalFunction() !=
+          exec->callee())
     return throwError(exec, EvalError,
                       "The \"this\" value passed to eval must be the global "
                       "object from which eval originated");
 
-  JSValue x = args.at(0);
+  JSValue x = exec->argument(0);
   if (!x.isString())
     return x;
 
@@ -321,12 +314,9 @@ JSValue JSC_HOST_CALL globalFuncEval(ExecState* exec,
       exec->exceptionSlot());
 }
 
-JSValue JSC_HOST_CALL globalFuncParseInt(ExecState* exec,
-                                         JSObject*,
-                                         JSValue,
-                                         const ArgList& args) {
-  JSValue value = args.at(0);
-  int32_t radix = args.at(1).toInt32(exec);
+JSValue JSC_HOST_CALL globalFuncParseInt(ExecState* exec) {
+  JSValue value = exec->argument(0);
+  int32_t radix = exec->argument(1).toInt32(exec);
 
   if (radix != 0 && radix != 10)
     return jsNumber(exec, parseInt(value.toString(exec), radix));
@@ -346,74 +336,50 @@ JSValue JSC_HOST_CALL globalFuncParseInt(ExecState* exec,
   return jsNumber(exec, parseInt(value.toString(exec), radix));
 }
 
-JSValue JSC_HOST_CALL globalFuncParseFloat(ExecState* exec,
-                                           JSObject*,
-                                           JSValue,
-                                           const ArgList& args) {
-  return jsNumber(exec, parseFloat(args.at(0).toString(exec)));
+JSValue JSC_HOST_CALL globalFuncParseFloat(ExecState* exec) {
+  return jsNumber(exec, parseFloat(exec->argument(0).toString(exec)));
 }
 
-JSValue JSC_HOST_CALL globalFuncIsNaN(ExecState* exec,
-                                      JSObject*,
-                                      JSValue,
-                                      const ArgList& args) {
-  return jsBoolean(isnan(args.at(0).toNumber(exec)));
+JSValue JSC_HOST_CALL globalFuncIsNaN(ExecState* exec) {
+  return jsBoolean(isnan(exec->argument(0).toNumber(exec)));
 }
 
-JSValue JSC_HOST_CALL globalFuncIsFinite(ExecState* exec,
-                                         JSObject*,
-                                         JSValue,
-                                         const ArgList& args) {
-  double n = args.at(0).toNumber(exec);
+JSValue JSC_HOST_CALL globalFuncIsFinite(ExecState* exec) {
+  double n = exec->argument(0).toNumber(exec);
   return jsBoolean(!isnan(n) && !isinf(n));
 }
 
-JSValue JSC_HOST_CALL globalFuncDecodeURI(ExecState* exec,
-                                          JSObject*,
-                                          JSValue,
-                                          const ArgList& args) {
+JSValue JSC_HOST_CALL globalFuncDecodeURI(ExecState* exec) {
   static const char do_not_unescape_when_decoding_URI[] = "#$&+,/:;=?@";
 
-  return decode(exec, args, do_not_unescape_when_decoding_URI, true);
+  return decode(exec, do_not_unescape_when_decoding_URI, true);
 }
 
-JSValue JSC_HOST_CALL globalFuncDecodeURIComponent(ExecState* exec,
-                                                   JSObject*,
-                                                   JSValue,
-                                                   const ArgList& args) {
-  return decode(exec, args, "", true);
+JSValue JSC_HOST_CALL globalFuncDecodeURIComponent(ExecState* exec) {
+  return decode(exec, "", true);
 }
 
-JSValue JSC_HOST_CALL globalFuncEncodeURI(ExecState* exec,
-                                          JSObject*,
-                                          JSValue,
-                                          const ArgList& args) {
+JSValue JSC_HOST_CALL globalFuncEncodeURI(ExecState* exec) {
   static const char do_not_escape_when_encoding_URI[] =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
       "abcdefghijklmnopqrstuvwxyz"
       "0123456789"
       "!#$&'()*+,-./:;=?@_~";
 
-  return encode(exec, args, do_not_escape_when_encoding_URI);
+  return encode(exec, do_not_escape_when_encoding_URI);
 }
 
-JSValue JSC_HOST_CALL globalFuncEncodeURIComponent(ExecState* exec,
-                                                   JSObject*,
-                                                   JSValue,
-                                                   const ArgList& args) {
+JSValue JSC_HOST_CALL globalFuncEncodeURIComponent(ExecState* exec) {
   static const char do_not_escape_when_encoding_URI_component[] =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
       "abcdefghijklmnopqrstuvwxyz"
       "0123456789"
       "!'()*-._~";
 
-  return encode(exec, args, do_not_escape_when_encoding_URI_component);
+  return encode(exec, do_not_escape_when_encoding_URI_component);
 }
 
-JSValue JSC_HOST_CALL globalFuncEscape(ExecState* exec,
-                                       JSObject*,
-                                       JSValue,
-                                       const ArgList& args) {
+JSValue JSC_HOST_CALL globalFuncEscape(ExecState* exec) {
   static const char do_not_escape[] =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
       "abcdefghijklmnopqrstuvwxyz"
@@ -421,7 +387,7 @@ JSValue JSC_HOST_CALL globalFuncEscape(ExecState* exec,
       "*+-./@_";
 
   JSStringBuilder builder;
-  UString str = args.at(0).toString(exec);
+  UString str = exec->argument(0).toString(exec);
   const UChar* c = str.data();
   for (unsigned k = 0; k < str.size(); k++, c++) {
     int u = c[0];
@@ -441,12 +407,9 @@ JSValue JSC_HOST_CALL globalFuncEscape(ExecState* exec,
   return builder.build(exec);
 }
 
-JSValue JSC_HOST_CALL globalFuncUnescape(ExecState* exec,
-                                         JSObject*,
-                                         JSValue,
-                                         const ArgList& args) {
+JSValue JSC_HOST_CALL globalFuncUnescape(ExecState* exec) {
   StringBuilder builder;
-  UString str = args.at(0).toString(exec);
+  UString str = exec->argument(0).toString(exec);
   int k = 0;
   int len = str.size();
   while (k < len) {
@@ -473,11 +436,8 @@ JSValue JSC_HOST_CALL globalFuncUnescape(ExecState* exec,
 }
 
 #ifndef NDEBUG
-JSValue JSC_HOST_CALL globalFuncJSCPrint(ExecState* exec,
-                                         JSObject*,
-                                         JSValue,
-                                         const ArgList& args) {
-  CString string = args.at(0).toString(exec).UTF8String();
+JSValue JSC_HOST_CALL globalFuncJSCPrint(ExecState* exec) {
+  CString string = exec->argument(0).toString(exec).UTF8String();
   puts(string.data());
   return jsUndefined();
 }

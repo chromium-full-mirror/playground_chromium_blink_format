@@ -40,8 +40,8 @@ class RegExpObject : public JSObjectWithGlobalObject {
   void setLastIndex(double lastIndex) { d->lastIndex = lastIndex; }
   double lastIndex() const { return d->lastIndex; }
 
-  JSValue test(ExecState*, const ArgList&);
-  JSValue exec(ExecState*, const ArgList&);
+  JSValue test(ExecState*);
+  JSValue exec(ExecState*);
 
   virtual bool getOwnPropertySlot(ExecState*,
                                   const Identifier& propertyName,
@@ -67,7 +67,7 @@ class RegExpObject : public JSObjectWithGlobalObject {
       OverridesGetOwnPropertySlot | JSObjectWithGlobalObject::StructureFlags;
 
  private:
-  bool match(ExecState*, const ArgList&);
+  bool match(ExecState*);
 
   virtual CallType getCallData(CallData&);
 

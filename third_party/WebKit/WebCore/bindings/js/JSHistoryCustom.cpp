@@ -191,19 +191,19 @@ void JSHistory::getOwnPropertyNames(ExecState* exec,
   Base::getOwnPropertyNames(exec, propertyNames, mode);
 }
 
-JSValue JSHistory::pushState(ExecState* exec, const ArgList& args) {
+JSValue JSHistory::pushState(ExecState* exec) {
   RefPtr<SerializedScriptValue> historyState =
-      SerializedScriptValue::create(exec, args.at(0));
+      SerializedScriptValue::create(exec, exec->argument(0));
   if (exec->hadException())
     return jsUndefined();
 
-  String title = valueToStringWithUndefinedOrNullCheck(exec, args.at(1));
+  String title = valueToStringWithUndefinedOrNullCheck(exec, exec->argument(1));
   if (exec->hadException())
     return jsUndefined();
 
   String url;
-  if (args.size() > 2) {
-    url = valueToStringWithUndefinedOrNullCheck(exec, args.at(2));
+  if (exec->argumentCount() > 2) {
+    url = valueToStringWithUndefinedOrNullCheck(exec, exec->argument(2));
     if (exec->hadException())
       return jsUndefined();
   }
@@ -216,19 +216,19 @@ JSValue JSHistory::pushState(ExecState* exec, const ArgList& args) {
   return jsUndefined();
 }
 
-JSValue JSHistory::replaceState(ExecState* exec, const ArgList& args) {
+JSValue JSHistory::replaceState(ExecState* exec) {
   RefPtr<SerializedScriptValue> historyState =
-      SerializedScriptValue::create(exec, args.at(0));
+      SerializedScriptValue::create(exec, exec->argument(0));
   if (exec->hadException())
     return jsUndefined();
 
-  String title = valueToStringWithUndefinedOrNullCheck(exec, args.at(1));
+  String title = valueToStringWithUndefinedOrNullCheck(exec, exec->argument(1));
   if (exec->hadException())
     return jsUndefined();
 
   String url;
-  if (args.size() > 2) {
-    url = valueToStringWithUndefinedOrNullCheck(exec, args.at(2));
+  if (exec->argumentCount() > 2) {
+    url = valueToStringWithUndefinedOrNullCheck(exec, exec->argument(2));
     if (exec->hadException())
       return jsUndefined();
   }

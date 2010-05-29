@@ -1929,7 +1929,7 @@ DEFINE_STUB_FUNCTION(void*, op_call_jitCompile) {
   ASSERT(stackFrame.callFrame->callee()->getCallData(callData) == CallTypeJS);
 #endif
 
-  JSFunction* function = stackFrame.callFrame->callee();
+  JSFunction* function = asFunction(stackFrame.callFrame->callee());
   ASSERT(!function->isHostFunction());
   FunctionExecutable* executable = function->jsExecutable();
   ScopeChainNode* callDataScopeChain = function->scope().node();
@@ -1943,11 +1943,11 @@ DEFINE_STUB_FUNCTION(void*, op_construct_jitCompile) {
 
 #if !ASSERT_DISABLED
   ConstructData constructData;
-  ASSERT(stackFrame.callFrame->callee()->getConstructData(constructData) ==
-         ConstructTypeJS);
+  ASSERT(asFunction(stackFrame.callFrame->callee())
+             ->getConstructData(constructData) == ConstructTypeJS);
 #endif
 
-  JSFunction* function = stackFrame.callFrame->callee();
+  JSFunction* function = asFunction(stackFrame.callFrame->callee());
   ASSERT(!function->isHostFunction());
   FunctionExecutable* executable = function->jsExecutable();
   ScopeChainNode* callDataScopeChain = function->scope().node();
@@ -1960,10 +1960,10 @@ DEFINE_STUB_FUNCTION(void*, op_call_arityCheck) {
   STUB_INIT_STACK_FRAME(stackFrame);
 
   CallFrame* callFrame = stackFrame.callFrame;
-  JSFunction* callee = callFrame->callee();
+  JSFunction* callee = asFunction(callFrame->callee());
   ASSERT(!callee->isHostFunction());
   CodeBlock* newCodeBlock = &callee->jsExecutable()->generatedBytecodeForCall();
-  int argCount = callFrame->argumentCount();
+  int argCount = callFrame->argumentCountIncludingThis();
   ReturnAddressPtr pc = callFrame->returnPC();
 
   ASSERT(argCount != newCodeBlock->m_numParameters);
@@ -2010,7 +2010,7 @@ DEFINE_STUB_FUNCTION(void*, op_call_arityCheck) {
 
   callFrame = CallFrame::create(r);
   callFrame->setCallerFrame(oldCallFrame);
-  callFrame->setArgumentCount(argCount);
+  callFrame->setArgumentCountIncludingThis(argCount);
   callFrame->setCallee(callee);
   callFrame->setScopeChain(callee->scope().node());
   callFrame->setReturnPC(pc.value());
@@ -2023,11 +2023,11 @@ DEFINE_STUB_FUNCTION(void*, op_construct_arityCheck) {
   STUB_INIT_STACK_FRAME(stackFrame);
 
   CallFrame* callFrame = stackFrame.callFrame;
-  JSFunction* callee = callFrame->callee();
+  JSFunction* callee = asFunction(callFrame->callee());
   ASSERT(!callee->isHostFunction());
   CodeBlock* newCodeBlock =
       &callee->jsExecutable()->generatedBytecodeForConstruct();
-  int argCount = callFrame->argumentCount();
+  int argCount = callFrame->argumentCountIncludingThis();
   ReturnAddressPtr pc = callFrame->returnPC();
 
   ASSERT(argCount != newCodeBlock->m_numParameters);
@@ -2074,7 +2074,7 @@ DEFINE_STUB_FUNCTION(void*, op_construct_arityCheck) {
 
   callFrame = CallFrame::create(r);
   callFrame->setCallerFrame(oldCallFrame);
-  callFrame->setArgumentCount(argCount);
+  callFrame->setArgumentCountIncludingThis(argCount);
   callFrame->setCallee(callee);
   callFrame->setScopeChain(callee->scope().node());
   callFrame->setReturnPC(pc.value());
@@ -2087,7 +2087,7 @@ DEFINE_STUB_FUNCTION(void*, op_construct_arityCheck) {
 DEFINE_STUB_FUNCTION(void*, vm_lazyLinkCall) {
   STUB_INIT_STACK_FRAME(stackFrame);
   CallFrame* callFrame = stackFrame.callFrame;
-  JSFunction* callee = callFrame->callee();
+  JSFunction* callee = asFunction(callFrame->callee());
   ExecutableBase* executable = callee->executable();
 
   MacroAssemblerCodePtr codePtr;
@@ -2100,7 +2100,8 @@ DEFINE_STUB_FUNCTION(void*, vm_lazyLinkCall) {
     codeBlock = &functionExecutable->bytecodeForCall(stackFrame.callFrame,
                                                      callee->scope().node());
     functionExecutable->jitCodeForCall(callFrame, callee->scope().node());
-    if (callFrame->argumentCount() == codeBlock->m_numParameters)
+    if (callFrame->argumentCountIncludingThis() ==
+        static_cast<size_t>(codeBlock->m_numParameters))
       codePtr = functionExecutable->generatedJITCodeForCall().addressForCall();
     else
       codePtr = functionExecutable->generatedJITCodeForCallWithArityCheck();
@@ -2113,7 +2114,8 @@ DEFINE_STUB_FUNCTION(void*, vm_lazyLinkCall) {
     callLinkInfo->setSeen();
   else
     JIT::linkCall(callee, stackFrame.callFrame->callerFrame()->codeBlock(),
-                  codeBlock, codePtr, callLinkInfo, callFrame->argumentCount(),
+                  codeBlock, codePtr, callLinkInfo,
+                  callFrame->argumentCountIncludingThis(),
                   stackFrame.globalData);
 
   return codePtr.executableAddress();
@@ -2122,7 +2124,7 @@ DEFINE_STUB_FUNCTION(void*, vm_lazyLinkCall) {
 DEFINE_STUB_FUNCTION(void*, vm_lazyLinkConstruct) {
   STUB_INIT_STACK_FRAME(stackFrame);
   CallFrame* callFrame = stackFrame.callFrame;
-  JSFunction* callee = callFrame->callee();
+  JSFunction* callee = asFunction(callFrame->callee());
   ExecutableBase* executable = callee->executable();
 
   MacroAssemblerCodePtr codePtr;
@@ -2135,7 +2137,8 @@ DEFINE_STUB_FUNCTION(void*, vm_lazyLinkConstruct) {
     codeBlock = &functionExecutable->bytecodeForConstruct(
         stackFrame.callFrame, callee->scope().node());
     functionExecutable->jitCodeForConstruct(callFrame, callee->scope().node());
-    if (callFrame->argumentCount() == codeBlock->m_numParameters)
+    if (callFrame->argumentCountIncludingThis() ==
+        static_cast<size_t>(codeBlock->m_numParameters))
       codePtr =
           functionExecutable->generatedJITCodeForConstruct().addressForCall();
     else
@@ -2151,7 +2154,8 @@ DEFINE_STUB_FUNCTION(void*, vm_lazyLinkConstruct) {
   else
     JIT::linkConstruct(callee, stackFrame.callFrame->callerFrame()->codeBlock(),
                        codeBlock, codePtr, callLinkInfo,
-                       callFrame->argumentCount(), stackFrame.globalData);
+                       callFrame->argumentCountIncludingThis(),
+                       stackFrame.globalData);
 
   return codePtr.executableAddress();
 }
@@ -2187,26 +2191,14 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_call_NotJSFunction) {
         CallFrame::create(previousCallFrame->registers() + registerOffset);
 
     callFrame->init(0, static_cast<Instruction*>((STUB_RETURN_ADDRESS).value()),
-                    previousCallFrame->scopeChain(), previousCallFrame, 0,
-                    argCount, 0);
+                    previousCallFrame->scopeChain(), previousCallFrame,
+                    argCount, asObject(funcVal));
     stackFrame.callFrame = callFrame;
-
-    Register* argv = stackFrame.callFrame->registers() -
-                     RegisterFile::CallFrameHeaderSize - argCount;
-    ArgList argList(argv + 1, argCount - 1);
 
     JSValue returnValue;
     {
       SamplingTool::HostCallRecord callRecord(CTI_SAMPLER);
-
-      // FIXME: All host methods should be calling toThisObject, but this is not
-      // presently the case.
-      JSValue thisValue = argv[0].jsValue();
-      if (thisValue == jsNull())
-        thisValue = callFrame->globalThisValue();
-
-      returnValue = callData.native.function(callFrame, asObject(funcVal),
-                                             thisValue, argList);
+      returnValue = callData.native.function(callFrame);
     }
     stackFrame.callFrame = previousCallFrame;
     CHECK_FOR_EXCEPTION();
@@ -2619,7 +2611,7 @@ DEFINE_STUB_FUNCTION(int, op_load_varargs) {
       VM_THROW_EXCEPTION();
     }
     int32_t expectedParams =
-        callFrame->callee()->jsExecutable()->parameterCount();
+        asFunction(callFrame->callee())->jsExecutable()->parameterCount();
     int32_t inplaceArgs = min(providedParams, expectedParams);
 
     Register* inplaceArgsDst = callFrame->registers() + argsOffset;
@@ -3242,10 +3234,10 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_call_eval) {
 
   Register* newCallFrame = callFrame->registers() + registerOffset;
   Register* argv = newCallFrame - RegisterFile::CallFrameHeaderSize - argCount;
-  JSValue thisValue = argv[0].jsValue();
+  JSValue baseValue = argv[0].jsValue();
   JSGlobalObject* globalObject = callFrame->scopeChain()->globalObject;
 
-  if (thisValue == globalObject && funcVal == globalObject->evalFunction()) {
+  if (baseValue == globalObject && funcVal == globalObject->evalFunction()) {
     JSValue exceptionValue;
     JSValue result =
         interpreter->callEval(callFrame, registerFile, argv, argCount,

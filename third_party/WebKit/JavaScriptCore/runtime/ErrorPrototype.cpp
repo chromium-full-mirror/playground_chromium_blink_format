@@ -33,10 +33,7 @@ namespace JSC {
 
 ASSERT_CLASS_FITS_IN_CELL(ErrorPrototype);
 
-static JSValue JSC_HOST_CALL errorProtoFuncToString(ExecState*,
-                                                    JSObject*,
-                                                    JSValue,
-                                                    const ArgList&);
+static JSValue JSC_HOST_CALL errorProtoFuncToString(ExecState*);
 
 // ECMA 15.9.4
 ErrorPrototype::ErrorPrototype(ExecState* exec,
@@ -59,11 +56,8 @@ ErrorPrototype::ErrorPrototype(ExecState* exec,
       DontEnum);
 }
 
-JSValue JSC_HOST_CALL errorProtoFuncToString(ExecState* exec,
-                                             JSObject*,
-                                             JSValue thisValue,
-                                             const ArgList&) {
-  JSObject* thisObj = thisValue.toThisObject(exec);
+JSValue JSC_HOST_CALL errorProtoFuncToString(ExecState* exec) {
+  JSObject* thisObj = exec->hostThisValue().toThisObject(exec);
   JSValue name = thisObj->get(exec, exec->propertyNames().name);
   JSValue message = thisObj->get(exec, exec->propertyNames().message);
 

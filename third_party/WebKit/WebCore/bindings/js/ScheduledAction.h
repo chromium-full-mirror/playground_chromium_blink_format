@@ -46,14 +46,13 @@ class WorkerContext;
 class ScheduledAction : public Noncopyable {
  public:
   static PassOwnPtr<ScheduledAction> create(JSC::ExecState*,
-                                            const JSC::ArgList&,
                                             DOMWrapperWorld* isolatedWorld);
 
   void execute(ScriptExecutionContext*);
 
  private:
-  ScheduledAction(JSC::JSValue function,
-                  const JSC::ArgList&,
+  ScheduledAction(JSC::ExecState*,
+                  JSC::JSValue function,
                   DOMWrapperWorld* isolatedWorld);
   ScheduledAction(const String& code, DOMWrapperWorld* isolatedWorld)
       : m_code(code), m_isolatedWorld(isolatedWorld) {}

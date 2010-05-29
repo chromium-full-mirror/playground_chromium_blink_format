@@ -121,22 +121,19 @@ void setRegExpObjectLastIndex(ExecState* exec,
   asRegExpObject(baseObject)->setLastIndex(value.toInteger(exec));
 }
 
-JSValue RegExpObject::test(ExecState* exec, const ArgList& args) {
-  return jsBoolean(match(exec, args));
+JSValue RegExpObject::test(ExecState* exec) {
+  return jsBoolean(match(exec));
 }
 
-JSValue RegExpObject::exec(ExecState* exec, const ArgList& args) {
-  if (match(exec, args))
+JSValue RegExpObject::exec(ExecState* exec) {
+  if (match(exec))
     return exec->lexicalGlobalObject()->regExpConstructor()->arrayOfMatches(
         exec);
   return jsNull();
 }
 
-static JSValue JSC_HOST_CALL callRegExpObject(ExecState* exec,
-                                              JSObject* function,
-                                              JSValue,
-                                              const ArgList& args) {
-  return asRegExpObject(function)->exec(exec, args);
+static JSValue JSC_HOST_CALL callRegExpObject(ExecState* exec) {
+  return asRegExpObject(exec->callee())->exec(exec);
 }
 
 CallType RegExpObject::getCallData(CallData& callData) {
@@ -145,12 +142,12 @@ CallType RegExpObject::getCallData(CallData& callData) {
 }
 
 // Shared implementation used by test and exec.
-bool RegExpObject::match(ExecState* exec, const ArgList& args) {
+bool RegExpObject::match(ExecState* exec) {
   RegExpConstructor* regExpConstructor =
       exec->lexicalGlobalObject()->regExpConstructor();
 
-  UString input =
-      args.isEmpty() ? regExpConstructor->input() : args.at(0).toString(exec);
+  UString input = !exec->argumentCount() ? regExpConstructor->input()
+                                         : exec->argument(0).toString(exec);
   if (input.isNull()) {
     throwError(exec, GeneralError,
                makeString("No input to ", toString(exec), "."));

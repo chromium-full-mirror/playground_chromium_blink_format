@@ -47,16 +47,16 @@ namespace WebCore {
 
 using namespace JSC;
 
-JSValue JSDatabase::changeVersion(ExecState* exec, const ArgList& args) {
-  String oldVersion = ustringToString(args.at(0).toString(exec));
+JSValue JSDatabase::changeVersion(ExecState* exec) {
+  String oldVersion = ustringToString(exec->argument(0).toString(exec));
   if (exec->hadException())
     return jsUndefined();
 
-  String newVersion = ustringToString(args.at(1).toString(exec));
+  String newVersion = ustringToString(exec->argument(1).toString(exec));
   if (exec->hadException())
     return jsUndefined();
 
-  JSObject* object = args.at(2).getObject();
+  JSObject* object = exec->argument(2).getObject();
   if (!object) {
     setDOMException(exec, TYPE_MISMATCH_ERR);
     return jsUndefined();
@@ -66,8 +66,8 @@ JSValue JSDatabase::changeVersion(ExecState* exec, const ArgList& args) {
       object, static_cast<JSDOMGlobalObject*>(globalObject())));
 
   RefPtr<SQLTransactionErrorCallback> errorCallback;
-  if (!args.at(3).isNull()) {
-    object = args.at(3).getObject();
+  if (!exec->argument(3).isNull()) {
+    object = exec->argument(3).getObject();
     if (!object) {
       setDOMException(exec, TYPE_MISMATCH_ERR);
       return jsUndefined();
@@ -78,8 +78,8 @@ JSValue JSDatabase::changeVersion(ExecState* exec, const ArgList& args) {
   }
 
   RefPtr<VoidCallback> successCallback;
-  if (!args.at(4).isNull()) {
-    object = args.at(4).getObject();
+  if (!exec->argument(4).isNull()) {
+    object = exec->argument(4).getObject();
     if (!object) {
       setDOMException(exec, TYPE_MISMATCH_ERR);
       return jsUndefined();
@@ -96,11 +96,10 @@ JSValue JSDatabase::changeVersion(ExecState* exec, const ArgList& args) {
 }
 
 static JSValue createTransaction(ExecState* exec,
-                                 const ArgList& args,
                                  Database* database,
                                  JSDOMGlobalObject* globalObject,
                                  bool readOnly) {
-  JSObject* object = args.at(0).getObject();
+  JSObject* object = exec->argument(0).getObject();
 
   if (!object) {
     setDOMException(exec, TYPE_MISMATCH_ERR);
@@ -110,8 +109,8 @@ static JSValue createTransaction(ExecState* exec,
   RefPtr<SQLTransactionCallback> callback(
       JSSQLTransactionCallback::create(object, globalObject));
   RefPtr<SQLTransactionErrorCallback> errorCallback;
-  if (args.size() > 1 && !args.at(1).isNull()) {
-    object = args.at(1).getObject();
+  if (exec->argumentCount() > 1 && !exec->argument(1).isNull()) {
+    object = exec->argument(1).getObject();
     if (!object) {
       setDOMException(exec, TYPE_MISMATCH_ERR);
       return jsUndefined();
@@ -121,8 +120,8 @@ static JSValue createTransaction(ExecState* exec,
   }
 
   RefPtr<VoidCallback> successCallback;
-  if (args.size() > 2 && !args.at(2).isNull()) {
-    object = args.at(2).getObject();
+  if (exec->argumentCount() > 2 && !exec->argument(2).isNull()) {
+    object = exec->argument(2).getObject();
     if (!object) {
       setDOMException(exec, TYPE_MISMATCH_ERR);
       return jsUndefined();
@@ -136,14 +135,14 @@ static JSValue createTransaction(ExecState* exec,
   return jsUndefined();
 }
 
-JSValue JSDatabase::transaction(ExecState* exec, const ArgList& args) {
-  return createTransaction(exec, args, m_impl.get(),
+JSValue JSDatabase::transaction(ExecState* exec) {
+  return createTransaction(exec, m_impl.get(),
                            static_cast<JSDOMGlobalObject*>(globalObject()),
                            false);
 }
 
-JSValue JSDatabase::readTransaction(ExecState* exec, const ArgList& args) {
-  return createTransaction(exec, args, m_impl.get(),
+JSValue JSDatabase::readTransaction(ExecState* exec) {
+  return createTransaction(exec, m_impl.get(),
                            static_cast<JSDOMGlobalObject*>(globalObject()),
                            true);
 }

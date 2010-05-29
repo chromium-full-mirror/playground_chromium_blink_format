@@ -41,14 +41,16 @@ namespace WebCore {
 ScriptCallFrame::ScriptCallFrame(const UString& functionName,
                                  const UString& urlString,
                                  int lineNumber,
-                                 const ArgList& args,
+                                 ExecState* exec,
                                  unsigned skipArgumentCount)
     : m_functionName(functionName),
       m_sourceURL(ParsedURLString, ustringToString(urlString)),
       m_lineNumber(lineNumber) {
-  size_t argumentCount = args.size();
+  if (!exec)
+    return;
+  size_t argumentCount = exec->argumentCount();
   for (size_t i = skipArgumentCount; i < argumentCount; ++i)
-    m_arguments.append(ScriptValue(args.at(i)));
+    m_arguments.append(ScriptValue(exec->argument(i)));
 }
 
 ScriptCallFrame::~ScriptCallFrame() {}

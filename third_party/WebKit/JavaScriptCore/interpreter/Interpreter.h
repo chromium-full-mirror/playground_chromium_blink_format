@@ -98,12 +98,12 @@ class Interpreter : public FastAllocBase {
                   ScopeChainNode*,
                   JSObject* thisObj,
                   JSValue* exception);
-  JSValue executeCall(FunctionExecutable*,
-                      CallFrame*,
-                      JSFunction*,
-                      JSObject* thisObj,
-                      const ArgList& args,
-                      ScopeChainNode*,
+  JSValue executeCall(CallFrame*,
+                      JSObject* function,
+                      CallType,
+                      const CallData&,
+                      JSValue thisValue,
+                      const ArgList&,
                       JSValue* exception);
   JSValue executeConstruct(FunctionExecutable*,
                            CallFrame*,

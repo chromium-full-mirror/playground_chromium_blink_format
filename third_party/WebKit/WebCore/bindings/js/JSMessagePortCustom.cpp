@@ -54,9 +54,8 @@ void JSMessagePort::markChildren(MarkStack& markStack) {
   m_impl->markJSEventListeners(markStack);
 }
 
-JSC::JSValue JSMessagePort::postMessage(JSC::ExecState* exec,
-                                        const JSC::ArgList& args) {
-  return handlePostMessage(exec, args, impl());
+JSC::JSValue JSMessagePort::postMessage(JSC::ExecState* exec) {
+  return handlePostMessage(exec, impl());
 }
 
 void fillMessagePortArray(JSC::ExecState* exec,

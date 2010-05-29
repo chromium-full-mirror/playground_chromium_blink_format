@@ -101,14 +101,10 @@ class Instance : public RefCounted<Instance> {
 
   virtual JSValue getMethod(ExecState* exec,
                             const Identifier& propertyName) = 0;
-  virtual JSValue invokeMethod(ExecState*,
-                               RuntimeMethod* method,
-                               const ArgList& args) = 0;
+  virtual JSValue invokeMethod(ExecState*, RuntimeMethod* method) = 0;
 
   virtual bool supportsInvokeDefaultMethod() const { return false; }
-  virtual JSValue invokeDefaultMethod(ExecState*, const ArgList&) {
-    return jsUndefined();
-  }
+  virtual JSValue invokeDefaultMethod(ExecState*) { return jsUndefined(); }
 
   virtual bool supportsConstruct() const { return false; }
   virtual JSValue invokeConstruct(ExecState*, const ArgList&) {

@@ -37,9 +37,8 @@ using namespace JSC;
 
 namespace WebCore {
 
-JSC::JSValue JSWorker::postMessage(JSC::ExecState* exec,
-                                   const JSC::ArgList& args) {
-  return handlePostMessage(exec, args, impl());
+JSC::JSValue JSWorker::postMessage(JSC::ExecState* exec) {
+  return handlePostMessage(exec, impl());
 }
 
 }  // namespace WebCore

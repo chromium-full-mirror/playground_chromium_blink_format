@@ -72,52 +72,19 @@ static void cleanupGlobalData(JSGlobalData*);
 static bool fillBufferWithContentsOfFile(const UString& fileName,
                                          Vector<char>& buffer);
 
-static JSValue JSC_HOST_CALL functionPrint(ExecState*,
-                                           JSObject*,
-                                           JSValue,
-                                           const ArgList&);
-static JSValue JSC_HOST_CALL functionDebug(ExecState*,
-                                           JSObject*,
-                                           JSValue,
-                                           const ArgList&);
-static JSValue JSC_HOST_CALL functionGC(ExecState*,
-                                        JSObject*,
-                                        JSValue,
-                                        const ArgList&);
-static JSValue JSC_HOST_CALL functionVersion(ExecState*,
-                                             JSObject*,
-                                             JSValue,
-                                             const ArgList&);
-static JSValue JSC_HOST_CALL functionRun(ExecState*,
-                                         JSObject*,
-                                         JSValue,
-                                         const ArgList&);
-static JSValue JSC_HOST_CALL functionLoad(ExecState*,
-                                          JSObject*,
-                                          JSValue,
-                                          const ArgList&);
-static JSValue JSC_HOST_CALL functionCheckSyntax(ExecState*,
-                                                 JSObject*,
-                                                 JSValue,
-                                                 const ArgList&);
-static JSValue JSC_HOST_CALL functionReadline(ExecState*,
-                                              JSObject*,
-                                              JSValue,
-                                              const ArgList&);
-static NO_RETURN_WITH_VALUE JSValue JSC_HOST_CALL functionQuit(ExecState*,
-                                                               JSObject*,
-                                                               JSValue,
-                                                               const ArgList&);
+static JSValue JSC_HOST_CALL functionPrint(ExecState*);
+static JSValue JSC_HOST_CALL functionDebug(ExecState*);
+static JSValue JSC_HOST_CALL functionGC(ExecState*);
+static JSValue JSC_HOST_CALL functionVersion(ExecState*);
+static JSValue JSC_HOST_CALL functionRun(ExecState*);
+static JSValue JSC_HOST_CALL functionLoad(ExecState*);
+static JSValue JSC_HOST_CALL functionCheckSyntax(ExecState*);
+static JSValue JSC_HOST_CALL functionReadline(ExecState*);
+static NO_RETURN_WITH_VALUE JSValue JSC_HOST_CALL functionQuit(ExecState*);
 
 #if ENABLE(SAMPLING_FLAGS)
-static JSValue JSC_HOST_CALL functionSetSamplingFlags(ExecState*,
-                                                      JSObject*,
-                                                      JSValue,
-                                                      const ArgList&);
-static JSValue JSC_HOST_CALL functionClearSamplingFlags(ExecState*,
-                                                        JSObject*,
-                                                        JSValue,
-                                                        const ArgList&);
+static JSValue JSC_HOST_CALL functionSetSamplingFlags(ExecState*);
+static JSValue JSC_HOST_CALL functionClearSamplingFlags(ExecState*);
 #endif
 
 struct Script {
@@ -231,15 +198,12 @@ GlobalObject::GlobalObject(const Vector<UString>& arguments)
   putDirect(Identifier(globalExec(), "arguments"), array);
 }
 
-JSValue JSC_HOST_CALL functionPrint(ExecState* exec,
-                                    JSObject*,
-                                    JSValue,
-                                    const ArgList& args) {
-  for (unsigned i = 0; i < args.size(); ++i) {
+JSValue JSC_HOST_CALL functionPrint(ExecState* exec) {
+  for (unsigned i = 0; i < exec->argumentCount(); ++i) {
     if (i)
       putchar(' ');
 
-    printf("%s", args.at(i).toString(exec).UTF8String().data());
+    printf("%s", exec->argument(i).toString(exec).UTF8String().data());
   }
 
   putchar('\n');
@@ -247,39 +211,28 @@ JSValue JSC_HOST_CALL functionPrint(ExecState* exec,
   return jsUndefined();
 }
 
-JSValue JSC_HOST_CALL functionDebug(ExecState* exec,
-                                    JSObject*,
-                                    JSValue,
-                                    const ArgList& args) {
-  fprintf(stderr, "--> %s\n", args.at(0).toString(exec).UTF8String().data());
+JSValue JSC_HOST_CALL functionDebug(ExecState* exec) {
+  fprintf(stderr, "--> %s\n",
+          exec->argument(0).toString(exec).UTF8String().data());
   return jsUndefined();
 }
 
-JSValue JSC_HOST_CALL functionGC(ExecState* exec,
-                                 JSObject*,
-                                 JSValue,
-                                 const ArgList&) {
+JSValue JSC_HOST_CALL functionGC(ExecState* exec) {
   JSLock lock(SilenceAssertionsOnly);
   exec->heap()->collectAllGarbage();
   return jsUndefined();
 }
 
-JSValue JSC_HOST_CALL functionVersion(ExecState*,
-                                      JSObject*,
-                                      JSValue,
-                                      const ArgList&) {
+JSValue JSC_HOST_CALL functionVersion(ExecState*) {
   // We need this function for compatibility with the Mozilla JS tests but for
   // now
   // we don't actually do any version-specific handling
   return jsUndefined();
 }
 
-JSValue JSC_HOST_CALL functionRun(ExecState* exec,
-                                  JSObject*,
-                                  JSValue,
-                                  const ArgList& args) {
+JSValue JSC_HOST_CALL functionRun(ExecState* exec) {
   StopWatch stopWatch;
-  UString fileName = args.at(0).toString(exec);
+  UString fileName = exec->argument(0).toString(exec);
   Vector<char> script;
   if (!fillBufferWithContentsOfFile(fileName, script))
     return throwError(exec, GeneralError, "Could not open file.");
@@ -294,13 +247,8 @@ JSValue JSC_HOST_CALL functionRun(ExecState* exec,
   return jsNumber(globalObject->globalExec(), stopWatch.getElapsedMS());
 }
 
-JSValue JSC_HOST_CALL functionLoad(ExecState* exec,
-                                   JSObject* o,
-                                   JSValue v,
-                                   const ArgList& args) {
-  UNUSED_PARAM(o);
-  UNUSED_PARAM(v);
-  UString fileName = args.at(0).toString(exec);
+JSValue JSC_HOST_CALL functionLoad(ExecState* exec) {
+  UString fileName = exec->argument(0).toString(exec);
   Vector<char> script;
   if (!fillBufferWithContentsOfFile(fileName, script))
     return throwError(exec, GeneralError, "Could not open file.");
@@ -314,13 +262,8 @@ JSValue JSC_HOST_CALL functionLoad(ExecState* exec,
   return result.value();
 }
 
-JSValue JSC_HOST_CALL functionCheckSyntax(ExecState* exec,
-                                          JSObject* o,
-                                          JSValue v,
-                                          const ArgList& args) {
-  UNUSED_PARAM(o);
-  UNUSED_PARAM(v);
-  UString fileName = args.at(0).toString(exec);
+JSValue JSC_HOST_CALL functionCheckSyntax(ExecState* exec) {
+  UString fileName = exec->argument(0).toString(exec);
   Vector<char> script;
   if (!fillBufferWithContentsOfFile(fileName, script))
     return throwError(exec, GeneralError, "Could not open file.");
@@ -334,24 +277,18 @@ JSValue JSC_HOST_CALL functionCheckSyntax(ExecState* exec,
 }
 
 #if ENABLE(SAMPLING_FLAGS)
-JSValue JSC_HOST_CALL functionSetSamplingFlags(ExecState* exec,
-                                               JSObject*,
-                                               JSValue,
-                                               const ArgList& args) {
-  for (unsigned i = 0; i < args.size(); ++i) {
-    unsigned flag = static_cast<unsigned>(args.at(i).toNumber(exec));
+JSValue JSC_HOST_CALL functionSetSamplingFlags(ExecState* exec) {
+  for (unsigned i = 0; i < exec->argumentCount(); ++i) {
+    unsigned flag = static_cast<unsigned>(exec->argument(i).toNumber(exec));
     if ((flag >= 1) && (flag <= 32))
       SamplingFlags::setFlag(flag);
   }
   return jsNull();
 }
 
-JSValue JSC_HOST_CALL functionClearSamplingFlags(ExecState* exec,
-                                                 JSObject*,
-                                                 JSValue,
-                                                 const ArgList& args) {
-  for (unsigned i = 0; i < args.size(); ++i) {
-    unsigned flag = static_cast<unsigned>(args.at(i).toNumber(exec));
+JSValue JSC_HOST_CALL functionClearSamplingFlags(ExecState* exec) {
+  for (unsigned i = 0; i < exec->argumentCount(); ++i) {
+    unsigned flag = static_cast<unsigned>(exec->argument(i).toNumber(exec));
     if ((flag >= 1) && (flag <= 32))
       SamplingFlags::clearFlag(flag);
   }
@@ -359,10 +296,7 @@ JSValue JSC_HOST_CALL functionClearSamplingFlags(ExecState* exec,
 }
 #endif
 
-JSValue JSC_HOST_CALL functionReadline(ExecState* exec,
-                                       JSObject*,
-                                       JSValue,
-                                       const ArgList&) {
+JSValue JSC_HOST_CALL functionReadline(ExecState* exec) {
   Vector<char, 256> line;
   int c;
   while ((c = getchar()) != EOF) {
@@ -375,10 +309,7 @@ JSValue JSC_HOST_CALL functionReadline(ExecState* exec,
   return jsString(exec, line.data());
 }
 
-JSValue JSC_HOST_CALL functionQuit(ExecState* exec,
-                                   JSObject*,
-                                   JSValue,
-                                   const ArgList&) {
+JSValue JSC_HOST_CALL functionQuit(ExecState* exec) {
   // Technically, destroying the heap in the middle of JS execution is a no-no,
   // but we want to maintain compatibility with the Mozilla test suite, so
   // we pretend that execution has terminated to avoid ASSERTs, then tear down

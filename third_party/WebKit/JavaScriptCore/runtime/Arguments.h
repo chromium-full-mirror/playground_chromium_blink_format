@@ -139,10 +139,10 @@ ALWAYS_INLINE void Arguments::getArgumentsData(CallFrame* callFrame,
                                                ptrdiff_t& firstParameterIndex,
                                                Register*& argv,
                                                int& argc) {
-  function = callFrame->callee();
+  function = asFunction(callFrame->callee());
 
   int numParameters = function->jsExecutable()->parameterCount();
-  argc = callFrame->argumentCount();
+  argc = callFrame->argumentCountIncludingThis();
 
   if (argc <= numParameters)
     argv = callFrame->registers() - RegisterFile::CallFrameHeaderSize -
@@ -195,9 +195,9 @@ inline Arguments::Arguments(CallFrame* callFrame)
 inline Arguments::Arguments(CallFrame* callFrame, NoParametersType)
     : JSObject(callFrame->lexicalGlobalObject()->argumentsStructure()),
       d(new ArgumentsData) {
-  ASSERT(!callFrame->callee()->jsExecutable()->parameterCount());
+  ASSERT(!asFunction(callFrame->callee())->jsExecutable()->parameterCount());
 
-  unsigned numArguments = callFrame->argumentCount() - 1;
+  unsigned numArguments = callFrame->argumentCount();
 
   d->numParameters = 0;
   d->numArguments = numArguments;
@@ -216,7 +216,7 @@ inline Arguments::Arguments(CallFrame* callFrame, NoParametersType)
 
   d->extraArguments = extraArguments;
 
-  d->callee = callFrame->callee();
+  d->callee = asFunction(callFrame->callee());
   d->overrodeLength = false;
   d->overrodeCallee = false;
 }

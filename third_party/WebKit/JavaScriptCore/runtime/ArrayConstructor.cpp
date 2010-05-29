@@ -35,10 +35,7 @@ namespace JSC {
 
 ASSERT_CLASS_FITS_IN_CELL(ArrayConstructor);
 
-static JSValue JSC_HOST_CALL arrayConstructorIsArray(ExecState*,
-                                                     JSObject*,
-                                                     JSValue,
-                                                     const ArgList&);
+static JSValue JSC_HOST_CALL arrayConstructorIsArray(ExecState*);
 
 ArrayConstructor::ArrayConstructor(ExecState* exec,
                                    JSGlobalObject* globalObject,
@@ -94,10 +91,8 @@ ConstructType ArrayConstructor::getConstructData(ConstructData& constructData) {
   return ConstructTypeHost;
 }
 
-static JSValue JSC_HOST_CALL callArrayConstructor(ExecState* exec,
-                                                  JSObject*,
-                                                  JSValue,
-                                                  const ArgList& args) {
+static JSValue JSC_HOST_CALL callArrayConstructor(ExecState* exec) {
+  ArgList args(exec);
   return constructArrayWithSizeQuirk(exec, args);
 }
 
@@ -108,11 +103,8 @@ CallType ArrayConstructor::getCallData(CallData& callData) {
   return CallTypeHost;
 }
 
-JSValue JSC_HOST_CALL arrayConstructorIsArray(ExecState*,
-                                              JSObject*,
-                                              JSValue,
-                                              const ArgList& args) {
-  return jsBoolean(args.at(0).inherits(&JSArray::info));
+JSValue JSC_HOST_CALL arrayConstructorIsArray(ExecState* exec) {
+  return jsBoolean(exec->argument(0).inherits(&JSArray::info));
 }
 
 }  // namespace JSC
