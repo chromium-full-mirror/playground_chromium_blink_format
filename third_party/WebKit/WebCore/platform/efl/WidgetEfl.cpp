@@ -234,7 +234,7 @@ void Widget::applyFallbackCursor() {
 }
 
 void Widget::applyCursor() {
-  const char* file;
+  const char* file = 0;
   Evas_Coord x, y;
 
   String theme = edjeThemeRecursive();
@@ -242,7 +242,8 @@ void Widget::applyCursor() {
     file = edjeThemeRecursive().utf8().data();
 
   m_data->m_cursorObject = edje_object_add(evas());
-  if (!edje_object_file_set(m_data->m_cursorObject, file,
+  if (file &&
+      !edje_object_file_set(m_data->m_cursorObject, file,
                             m_data->m_cursorGroup.utf8().data())) {
     evas_object_del(m_data->m_cursorObject);
     m_data->m_cursorObject = 0;
