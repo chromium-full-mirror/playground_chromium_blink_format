@@ -210,5 +210,6 @@ inline bool operator!=(T* a, const WKRetainPtr<U>& b) {
 }  // namespace WebKit
 
 using WebKit::WKRetainPtr;
+using WebKit::AdoptWK;
 
 #endif  // WKRetainPtr_h
