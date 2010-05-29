@@ -1424,10 +1424,10 @@ void QtRuntimeMetaMethod::markChildren(MarkStack& markStack) {
 
 JSValue QtRuntimeMetaMethod::call(ExecState* exec) {
   QtRuntimeMetaMethodData* d =
-      static_cast<QtRuntimeMetaMethod*>(functionObject)->d_func();
+      static_cast<QtRuntimeMetaMethod*>(exec->callee())->d_func();
 
   // We're limited to 10 args
-  if (args.size() > 10)
+  if (exec->argumentCount() > 10)
     return jsUndefined();
 
   // We have to pick a method that matches..
@@ -1583,7 +1583,7 @@ QtRuntimeConnectionMethod::QtRuntimeConnectionMethod(
 
 JSValue QtRuntimeConnectionMethod::call(ExecState* exec) {
   QtRuntimeConnectionMethodData* d =
-      static_cast<QtRuntimeConnectionMethod*>(functionObject)->d_func();
+      static_cast<QtRuntimeConnectionMethod*>(exec->callee())->d_func();
 
   JSLock lock(SilenceAssertionsOnly);
 
@@ -1603,7 +1603,7 @@ JSValue QtRuntimeConnectionMethod::call(ExecState* exec) {
           findSignalIndex(sender->metaObject(), d->m_index, d->m_signature);
 
     if (signalIndex != -1) {
-      if (args.size() == 1) {
+      if (exec->argumentCount() == 1) {
         funcObject = args.at(0).toObject(exec);
         CallData callData;
         if (funcObject->getCallData(callData) == CallTypeNone) {
@@ -1615,7 +1615,7 @@ JSValue QtRuntimeConnectionMethod::call(ExecState* exec) {
                 exec, TypeError,
                 "QtMetaMethod.disconnect: target is not a function");
         }
-      } else if (args.size() >= 2) {
+      } else if (exec->argumentCount() >= 2) {
         if (args.at(0).isObject()) {
           thisObject = args.at(0).toObject(exec);
 
