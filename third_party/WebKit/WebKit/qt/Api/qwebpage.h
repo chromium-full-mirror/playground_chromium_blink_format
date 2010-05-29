@@ -174,6 +174,8 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
     AlignLeft,
     AlignRight,
 
+    StopScheduledPageRefresh,
+
     WebActionCount
   };
 
