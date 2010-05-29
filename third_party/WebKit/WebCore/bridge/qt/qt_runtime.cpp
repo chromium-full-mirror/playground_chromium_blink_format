@@ -1129,7 +1129,6 @@ static int findMethodIndex(ExecState* exec,
                            const QMetaObject* meta,
                            const QByteArray& signature,
                            bool allowPrivate,
-                           const ArgList& jsArgs,
                            QVarLengthArray<QVariant, 10>& vars,
                            void** vvars,
                            JSObject** pError) {
@@ -1224,7 +1223,7 @@ static int findMethodIndex(ExecState* exec,
 
     // If the native method requires more arguments than what was passed from
     // JavaScript
-    if (jsArgs.size() + 1 < static_cast<unsigned>(types.count())) {
+    if (exec->argumentCount() + 1 < static_cast<unsigned>(types.count())) {
       qMatchDebug() << "Match:too few args for" << method.signature();
       tooFewArgs.append(index);
       continue;
@@ -1250,7 +1249,8 @@ static int findMethodIndex(ExecState* exec,
     int matchDistance = 0;
     for (unsigned i = 0;
          converted && i + 1 < static_cast<unsigned>(types.count()); ++i) {
-      JSValue arg = i < jsArgs.size() ? jsArgs.at(i) : jsUndefined();
+      JSValue arg =
+          i < exec->argumentCount() ? exec->argument(i) : jsUndefined();
 
       int argdistance = -1;
       QVariant v = convertValueToQVariant(exec, arg, types.at(i + 1).typeId(),
@@ -1271,7 +1271,7 @@ static int findMethodIndex(ExecState* exec,
                   << "distance " << matchDistance;
 
     if (converted) {
-      if ((jsArgs.size() + 1 == static_cast<unsigned>(types.count())) &&
+      if ((exec->argumentCount() + 1 == static_cast<unsigned>(types.count())) &&
           (matchDistance == 0)) {
         // perfect match, use this one
         chosenIndex = index;
@@ -1422,10 +1422,7 @@ void QtRuntimeMetaMethod::markChildren(MarkStack& markStack) {
     markStack.append(d->m_disconnect);
 }
 
-JSValue QtRuntimeMetaMethod::call(ExecState* exec,
-                                  JSObject* functionObject,
-                                  JSValue,
-                                  const ArgList& args) {
+JSValue QtRuntimeMetaMethod::call(ExecState* exec) {
   QtRuntimeMetaMethodData* d =
       static_cast<QtRuntimeMetaMethod*>(functionObject)->d_func();
 
@@ -1444,8 +1441,8 @@ JSValue QtRuntimeMetaMethod::call(ExecState* exec,
     int methodIndex;
     JSObject* errorObj = 0;
     if ((methodIndex = findMethodIndex(exec, obj->metaObject(), d->m_signature,
-                                       d->m_allowPrivate, args, vargs,
-                                       (void**)qargs, &errorObj)) != -1) {
+                                       d->m_allowPrivate, vargs, (void**)qargs,
+                                       &errorObj)) != -1) {
       if (QMetaObject::metacall(obj, QMetaObject::InvokeMetaMethod, methodIndex,
                                 qargs) >= 0)
         return jsUndefined();
@@ -1584,10 +1581,7 @@ QtRuntimeConnectionMethod::QtRuntimeConnectionMethod(
   d->m_isConnect = isConnect;
 }
 
-JSValue QtRuntimeConnectionMethod::call(ExecState* exec,
-                                        JSObject* functionObject,
-                                        JSValue,
-                                        const ArgList& args) {
+JSValue QtRuntimeConnectionMethod::call(ExecState* exec) {
   QtRuntimeConnectionMethodData* d =
       static_cast<QtRuntimeConnectionMethod*>(functionObject)->d_func();
 
