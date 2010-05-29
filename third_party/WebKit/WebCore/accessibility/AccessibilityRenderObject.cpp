@@ -149,7 +149,7 @@ static inline RenderObject* firstChildConsideringContinuation(
 static inline RenderObject* lastChildConsideringContinuation(
     RenderObject* renderer) {
   RenderObject* lastChild = renderer->lastChild();
-  RenderObject* prev = renderer;
+  RenderObject* prev;
   RenderObject* cur = renderer;
 
   if (!cur->isRenderInline() && !cur->isRenderBlock())

@@ -141,7 +141,6 @@ bool DatabaseTracker::canEstablishDatabase(ScriptExecutionContext* context,
   ProposedDatabase details;
 
   unsigned long long requirement;
-  unsigned long long tempUsage;
   {
     MutexLocker lockDatabase(m_databaseGuard);
     Locker<OriginQuotaManager> quotaManagerLocker(originQuotaManager());
@@ -163,7 +162,6 @@ bool DatabaseTracker::canEstablishDatabase(ScriptExecutionContext* context,
 
     // If the database will fit, allow its creation.
     requirement = usage + max(1UL, estimatedSize);
-    tempUsage = usage;
     if (requirement < usage) {
       doneCreatingDatabase(origin, name);
       return false;  // If the estimated size is so big it causes an overflow,

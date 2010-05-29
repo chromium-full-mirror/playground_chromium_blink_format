@@ -241,7 +241,6 @@ void CSSFontSelector::addFontFaceRule(const CSSFontFaceRule* fontFaceRule) {
 
   int srcLength = srcList->length();
 
-  bool foundLocal = false;
   bool foundSVGFont = false;
 
   for (int i = 0; i < srcLength; i++) {
@@ -274,7 +273,6 @@ void CSSFontSelector::addFontFaceRule(const CSSFontFaceRule* fontFaceRule) {
       }
     } else {
       source = new CSSFontFaceSource(item->resource());
-      foundLocal = true;
     }
 
     if (!fontFace)

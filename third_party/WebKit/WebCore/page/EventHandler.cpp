@@ -2084,7 +2084,6 @@ bool EventHandler::handleWheelEvent(PlatformWheelEvent& e) {
 
   Node* node;
   bool isOverWidget;
-  bool didSetLatchedNode = false;
 
   HitTestRequest request(HitTestRequest::ReadOnly);
   HitTestResult result(vPoint);
@@ -2094,7 +2093,6 @@ bool EventHandler::handleWheelEvent(PlatformWheelEvent& e) {
     if (!m_latchedWheelEventNode) {
       m_latchedWheelEventNode = result.innerNode();
       m_widgetIsLatched = result.isOverWidget();
-      didSetLatchedNode = true;
     }
 
     node = m_latchedWheelEventNode.get();

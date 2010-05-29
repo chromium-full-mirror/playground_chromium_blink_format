@@ -3824,9 +3824,8 @@ bool CSSParser::parseFontFaceSrc() {
 
 bool CSSParser::parseFontFaceUnicodeRange() {
   RefPtr<CSSValueList> values = CSSValueList::createCommaSeparated();
-  CSSParserValue* currentValue;
   bool failed = false;
-  while ((currentValue = m_valueList->current())) {
+  while (m_valueList->current()) {
     if (m_valueList->current()->unit != CSSPrimitiveValue::CSS_UNICODE_RANGE) {
       failed = true;
       break;
