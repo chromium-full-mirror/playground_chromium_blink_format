@@ -73,9 +73,7 @@ class QtPixmapHeightField : public Field {
 class QtPixmapRuntimeMethod : public Method {
  public:
   virtual int numParameters() const { return 0; }
-  virtual JSValue invoke(ExecState* exec,
-                         QtPixmapInstance*,
-                         const ArgList&) = 0;
+  virtual JSValue invoke(ExecState* exec, QtPixmapInstance*) = 0;
 };
 
 // this function receives an HTML image element as a parameter, makes it display
@@ -83,13 +81,11 @@ class QtPixmapRuntimeMethod : public Method {
 class QtPixmapAssignToElementMethod : public QtPixmapRuntimeMethod {
  public:
   static const char* name() { return "assignToHTMLImageElement"; }
-  JSValue invoke(ExecState* exec,
-                 QtPixmapInstance* instance,
-                 const ArgList& args) {
-    if (!args.size())
+  JSValue invoke(ExecState* exec, QtPixmapInstance* instance) {
+    if (!exec->argumentCount())
       return jsUndefined();
 
-    JSObject* objectArg = args.at(0).toObject(exec);
+    JSObject* objectArg = exec->argument(0).toObject(exec);
     if (!objectArg)
       return jsUndefined();
 
@@ -117,7 +113,7 @@ class QtPixmapAssignToElementMethod : public QtPixmapRuntimeMethod {
 class QtPixmapToDataUrlMethod : public QtPixmapRuntimeMethod {
  public:
   static const char* name() { return "toDataUrl"; }
-  JSValue invoke(ExecState* exec, QtPixmapInstance* instance, const ArgList&) {
+  JSValue invoke(ExecState* exec, QtPixmapInstance* instance) {
     QByteArray byteArray;
     QBuffer buffer(&byteArray);
     instance->toImage().save(&buffer, "PNG");
@@ -132,7 +128,7 @@ class QtPixmapToDataUrlMethod : public QtPixmapRuntimeMethod {
 class QtPixmapToStringMethod : public QtPixmapRuntimeMethod {
  public:
   static const char* name() { return "toString"; }
-  JSValue invoke(ExecState* exec, QtPixmapInstance* instance, const ArgList&) {
+  JSValue invoke(ExecState* exec, QtPixmapInstance* instance) {
     return instance->valueOf(exec);
   }
 };
@@ -192,8 +188,7 @@ JSValue QtPixmapInstance::getMethod(ExecState* exec,
 }
 
 JSValue QtPixmapInstance::invokeMethod(ExecState* exec,
-                                       RuntimeMethod* runtimeMethod,
-                                       const ArgList& args) {
+                                       RuntimeMethod* runtimeMethod) {
   const MethodList& methods = *runtimeMethod->methods();
 
   if (methods.size() == 1) {

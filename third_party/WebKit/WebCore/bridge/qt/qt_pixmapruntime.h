@@ -35,7 +35,7 @@ class QtPixmapInstance : public Instance {
   QtPixmapInstance(PassRefPtr<RootObject> rootObj, const QVariant& newData);
   virtual Class* getClass() const;
   virtual JSValue getMethod(ExecState* exec, const Identifier& propertyName);
-  virtual JSValue invokeMethod(ExecState*, RuntimeMethod*, const ArgList& args);
+  virtual JSValue invokeMethod(ExecState*, RuntimeMethod*);
   virtual void getPropertyNames(ExecState*, PropertyNameArray&);
 
   virtual JSValue defaultValue(ExecState*, PreferredPrimitiveType) const;
