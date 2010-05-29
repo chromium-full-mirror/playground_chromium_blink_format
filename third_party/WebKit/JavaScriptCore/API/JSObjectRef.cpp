@@ -265,7 +265,7 @@ void JSObjectSetPrototype(JSContextRef ctx,
   JSObject* jsObject = toJS(object);
   JSValue jsValue = toJS(exec, value);
 
-  jsObject->setPrototype(jsValue.isObject() ? jsValue : jsNull());
+  jsObject->setPrototypeWithCycleCheck(jsValue.isObject() ? jsValue : jsNull());
 }
 
 bool JSObjectHasProperty(JSContextRef ctx,

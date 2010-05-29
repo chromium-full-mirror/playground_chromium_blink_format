@@ -111,18 +111,8 @@ void JSObject::put(ExecState* exec,
     // match Mozilla.
     if (!value.isObject() && !value.isNull())
       return;
-
-    JSValue nextPrototypeValue = value;
-    while (nextPrototypeValue && nextPrototypeValue.isObject()) {
-      JSObject* nextPrototype = asObject(nextPrototypeValue)->unwrappedObject();
-      if (nextPrototype == this) {
-        throwError(exec, GeneralError, "cyclic __proto__ value");
-        return;
-      }
-      nextPrototypeValue = nextPrototype->prototype();
-    }
-
-    setPrototype(value);
+    if (!setPrototypeWithCycleCheck(value))
+      throwError(exec, GeneralError, "cyclic __proto__ value");
     return;
   }
 

@@ -92,6 +92,7 @@ class JSObject : public JSCell {
 
   JSValue prototype() const;
   void setPrototype(JSValue prototype);
+  bool setPrototypeWithCycleCheck(JSValue prototype);
 
   void setStructure(NonNullPassRefPtr<Structure>);
   Structure* inheritorID();
@@ -399,6 +400,18 @@ inline JSObject::~JSObject() {
 
 inline JSValue JSObject::prototype() const {
   return m_structure->storedPrototype();
+}
+
+inline bool JSObject::setPrototypeWithCycleCheck(JSValue prototype) {
+  JSValue nextPrototypeValue = prototype;
+  while (nextPrototypeValue && nextPrototypeValue.isObject()) {
+    JSObject* nextPrototype = asObject(nextPrototypeValue)->unwrappedObject();
+    if (nextPrototype == this)
+      return false;
+    nextPrototypeValue = nextPrototype->prototype();
+  }
+  setPrototype(prototype);
+  return true;
 }
 
 inline void JSObject::setPrototype(JSValue prototype) {
