@@ -609,9 +609,9 @@ class Node : public EventTarget,
   void removeCachedTagNodeList(TagNodeList*, const QualifiedName&);
   void removeCachedLabelsNodeList(DynamicNodeList*);
 
-  PassRefPtr<NodeList> getElementsByTagName(const AtomicString&);
+  PassRefPtr<NodeList> getElementsByTagName(const String&);
   PassRefPtr<NodeList> getElementsByTagNameNS(const AtomicString& namespaceURI,
-                                              const AtomicString& localName);
+                                              const String& localName);
   PassRefPtr<NodeList> getElementsByName(const String& elementName);
   PassRefPtr<NodeList> getElementsByClassName(const String& classNames);
 
