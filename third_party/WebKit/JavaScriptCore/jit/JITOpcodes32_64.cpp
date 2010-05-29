@@ -226,17 +226,9 @@ JIT::Label JIT::privateCompileCTINativeCall(JSGlobalData* globalData,
   emitPutToCallFrameHeader(regT1, RegisterFile::ReturnPC);
 
 #if CPU(X86)
-#if COMPILER(MSVC) || OS(LINUX)
-  // Calling convention:      f(edx, ...);
-  // Host function signature: f(ExecState*);
-  move(callFrameRegister, X86Registers::edx);
-
-#else
   // Calling convention:      f(ecx, edx, ...);
   // Host function signature: f(ExecState*);
   move(callFrameRegister, X86Registers::ecx);
-
-#endif  // COMPILER(MSVC) || OS(LINUX)
 
   subPtr(Imm32(16 - sizeof(void*)),
          stackPointerRegister);  // Align stack after call.
@@ -296,17 +288,9 @@ JIT::CodePtr JIT::privateCompileCTINativeCall(
   peek(regT1);
   emitPutToCallFrameHeader(regT1, RegisterFile::ReturnPC);
 
-#if COMPILER(MSVC) || OS(LINUX)
-  // Calling convention:      f(edx, ...);
-  // Host function signature: f(ExecState*);
-  move(callFrameRegister, X86Registers::edx);
-
-#else
   // Calling convention:      f(ecx, edx, ...);
   // Host function signature: f(ExecState*);
   move(callFrameRegister, X86Registers::ecx);
-
-#endif  // COMPILER(MSVC) || OS(LINUX)
 
   subPtr(Imm32(16 - sizeof(void*)),
          stackPointerRegister);  // Align stack after call.
