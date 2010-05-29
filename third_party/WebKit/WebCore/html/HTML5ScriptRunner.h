@@ -50,6 +50,12 @@ class HTML5ScriptRunner : public Noncopyable {
   bool execute(PassRefPtr<Element> scriptToProcess);
   // Processes any pending scripts.
   bool executeScriptsWaitingForLoad(CachedResource*);
+  bool hasScriptsWaitingForStylesheets() const {
+    return m_hasScriptsWaitingForStylesheets;
+  }
+  bool executeScriptsWaitingForStylesheets();
+
+  bool inScriptExecution() { return !!m_scriptNestingLevel; }
 
  private:
   struct PendingScript {
@@ -84,6 +90,12 @@ class HTML5ScriptRunner : public Noncopyable {
   HTML5ScriptRunnerHost* m_host;
   PendingScript m_parsingBlockingScript;
   unsigned m_scriptNestingLevel;
+
+  // We only want stylesheet loads to trigger script execution if script
+  // execution is currently stopped due to stylesheet loads, otherwise we'd
+  // cause nested sript execution when parsing <style> tags since </style>
+  // tags can cause Document to call executeScriptsWaitingForStylesheets.
+  bool m_hasScriptsWaitingForStylesheets;
 };
 }
 

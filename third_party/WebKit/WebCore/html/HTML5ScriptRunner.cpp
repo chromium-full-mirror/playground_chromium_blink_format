@@ -44,7 +44,10 @@ using namespace HTMLNames;
 
 HTML5ScriptRunner::HTML5ScriptRunner(Document* document,
                                      HTML5ScriptRunnerHost* host)
-    : m_document(document), m_host(host), m_scriptNestingLevel(0) {}
+    : m_document(document),
+      m_host(host),
+      m_scriptNestingLevel(0),
+      m_hasScriptsWaitingForStylesheets(false) {}
 
 HTML5ScriptRunner::~HTML5ScriptRunner() {
   // FIXME: Should we be passed a "done loading/parsing" callback sooner than
@@ -85,12 +88,9 @@ ScriptSourceCode HTML5ScriptRunner::sourceFromPendingScript(
 }
 
 bool HTML5ScriptRunner::isPendingScriptReady(const PendingScript& script) {
-  // FIXME: We can't block for stylesheets yet, because that causes us to
-  // re-enter
-  // the parser from executeScriptsWaitingForStylesheets when parsing style
-  // tags.
-  // if (!m_document->haveStylesheetsLoaded())
-  //     return false;
+  m_hasScriptsWaitingForStylesheets = !m_document->haveStylesheetsLoaded();
+  if (m_hasScriptsWaitingForStylesheets)
+    return false;
   if (script.cachedScript && !script.cachedScript->isLoaded())
     return false;
   return true;
@@ -98,11 +98,7 @@ bool HTML5ScriptRunner::isPendingScriptReady(const PendingScript& script) {
 
 void HTML5ScriptRunner::executePendingScript() {
   ASSERT(!m_scriptNestingLevel);
-  // FIXME: We can't block for stylesheets yet, because that causes us to
-  // re-enter
-  // the parser from executeScriptsWaitingForStylesheets when parsing style
-  // tags.
-  // ASSERT(m_document->haveStylesheetsLoaded());
+  ASSERT(m_document->haveStylesheetsLoaded());
   bool errorOccurred = false;
   ASSERT(isPendingScriptReady(m_parsingBlockingScript));
   ScriptSourceCode sourceCode =
@@ -182,8 +178,18 @@ bool HTML5ScriptRunner::executeParsingBlockingScripts() {
 }
 
 bool HTML5ScriptRunner::executeScriptsWaitingForLoad(CachedResource*) {
+  ASSERT(!m_scriptNestingLevel);
   ASSERT(m_parsingBlockingScript.element);
   ASSERT(m_parsingBlockingScript.cachedScript->isLoaded());
+  return executeParsingBlockingScripts();
+}
+
+bool HTML5ScriptRunner::executeScriptsWaitingForStylesheets() {
+  // Callers should check hasScriptsWaitingForStylesheets() before calling
+  // to prevent parser or script re-entry during </style> parsing.
+  ASSERT(m_hasScriptsWaitingForStylesheets);
+  ASSERT(!m_scriptNestingLevel);
+  ASSERT(m_document->haveStylesheetsLoaded());
   return executeParsingBlockingScripts();
 }
 

@@ -56,6 +56,7 @@ class HTML5Tokenizer : public Tokenizer,
   virtual void write(const SegmentedString&, bool appendData);
   virtual void end();
   virtual void finish();
+  virtual int executingScript() const;
   virtual bool isWaitingForScripts() const;
   virtual void executeScriptsWaitingForStylesheets();
 
@@ -80,6 +81,7 @@ class HTML5Tokenizer : public Tokenizer,
   OwnPtr<HTML5Lexer> m_lexer;
   OwnPtr<HTML5ScriptRunner> m_scriptRunner;
   OwnPtr<HTML5TreeBuilder> m_treeBuilder;
+  bool m_wasWaitingOnScriptsDuringFinish;
 };
 }
 
