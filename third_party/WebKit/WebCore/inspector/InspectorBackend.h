@@ -100,6 +100,9 @@ class InspectorBackend : public RefCounted<InspectorBackend> {
 
   void getProfileHeaders(long callId);
   void getProfile(long callId, unsigned uid);
+
+  void removeProfile(unsigned uid);
+  void clearProfiles();
 #endif
 
   void setInjectedScriptSource(const String& source);

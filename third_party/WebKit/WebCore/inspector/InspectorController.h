@@ -260,6 +260,8 @@ class InspectorController
   void addStartProfilingMessageToConsole(const String& title,
                                          unsigned lineNumber,
                                          const String& sourceURL);
+  void removeProfile(unsigned);
+  void clearProfiles();
 
   bool isRecordingUserInitiatedProfile() const {
     return m_recordingUserInitiatedProfile;

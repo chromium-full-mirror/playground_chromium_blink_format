@@ -234,6 +234,16 @@ void InspectorBackend::getProfile(long callId, unsigned uid) {
   if (m_inspectorController)
     m_inspectorController->getProfile(callId, uid);
 }
+
+void InspectorBackend::removeProfile(unsigned uid) {
+  if (m_inspectorController)
+    m_inspectorController->removeProfile(uid);
+}
+
+void InspectorBackend::clearProfiles() {
+  if (m_inspectorController)
+    m_inspectorController->clearProfiles();
+}
 #endif
 
 void InspectorBackend::setInjectedScriptSource(const String& source) {
