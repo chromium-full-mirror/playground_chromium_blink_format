@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2006 Apple Computer, Inc.
+ *  Copyright (C) 2006, 2010 Apple Inc. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -40,11 +40,13 @@ class OwnArrayPtr : public Noncopyable {
     return ptr;
   }
 
+  // FIXME: This should be renamed to adopt.
   void set(T* ptr) {
-    ASSERT(m_ptr != ptr);
+    ASSERT(!ptr || m_ptr != ptr);
     safeDelete();
     m_ptr = ptr;
   }
+
   void clear() {
     safeDelete();
     m_ptr = 0;
