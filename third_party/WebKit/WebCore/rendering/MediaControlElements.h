@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008, 2009 Apple Inc. All rights reserved.
+ * Copyright (C) 2008, 2009, 2010 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -72,14 +72,16 @@ HTMLMediaElement* toParentMediaElement(RenderObject*);
 
 class MediaControlShadowRootElement : public HTMLDivElement {
  public:
-  MediaControlShadowRootElement(Document*, HTMLMediaElement*);
-
-  virtual bool isShadowNode() const { return true; }
-  virtual Node* shadowParentNode() { return m_mediaElement; }
+  static PassRefPtr<MediaControlShadowRootElement> create(HTMLMediaElement*);
 
   void updateStyle();
 
  private:
+  MediaControlShadowRootElement(HTMLMediaElement*);
+
+  virtual bool isShadowNode() const { return true; }
+  virtual Node* shadowParentNode() { return m_mediaElement; }
+
   HTMLMediaElement* m_mediaElement;
 };
 
@@ -87,21 +89,27 @@ class MediaControlShadowRootElement : public HTMLDivElement {
 
 class MediaControlElement : public HTMLDivElement {
  public:
-  MediaControlElement(Document*, PseudoId, HTMLMediaElement*);
-  virtual void attach();
-  virtual bool rendererIsNeeded(RenderStyle*);
+  static PassRefPtr<MediaControlElement> create(HTMLMediaElement*, PseudoId);
 
-  virtual PassRefPtr<RenderStyle> styleForElement();
+  virtual void attach();
   void attachToParent(Element*);
   void update();
-  virtual void updateStyle();
+  void updateStyle();
 
   MediaControlElementType displayType() const { return m_displayType; }
 
   HTMLMediaElement* mediaElement() const { return m_mediaElement; }
-  virtual bool isMediaControlElement() const { return true; }
 
  protected:
+  MediaControlElement(HTMLMediaElement*, PseudoId);
+
+  virtual bool rendererIsNeeded(RenderStyle*);
+
+  virtual PassRefPtr<RenderStyle> styleForElement();
+
+ private:
+  virtual bool isMediaControlElement() const { return true; }
+
   HTMLMediaElement* m_mediaElement;
   PseudoId m_pseudoStyleId;
   MediaControlElementType
@@ -112,7 +120,11 @@ class MediaControlElement : public HTMLDivElement {
 
 class MediaControlTimelineContainerElement : public MediaControlElement {
  public:
-  MediaControlTimelineContainerElement(Document*, HTMLMediaElement*);
+  static PassRefPtr<MediaControlTimelineContainerElement> create(
+      HTMLMediaElement*);
+
+ private:
+  MediaControlTimelineContainerElement(HTMLMediaElement*);
   virtual bool rendererIsNeeded(RenderStyle*);
 };
 
@@ -120,7 +132,9 @@ class MediaControlTimelineContainerElement : public MediaControlElement {
 
 class MediaControlVolumeSliderContainerElement : public MediaControlElement {
  public:
-  MediaControlVolumeSliderContainerElement(Document*, HTMLMediaElement*);
+  static PassRefPtr<MediaControlVolumeSliderContainerElement> create(
+      HTMLMediaElement*);
+
   virtual PassRefPtr<RenderStyle> styleForElement();
   void setVisible(bool);
   bool isVisible() { return m_isVisible; }
@@ -128,6 +142,8 @@ class MediaControlVolumeSliderContainerElement : public MediaControlElement {
   bool hitTest(const IntPoint& absPoint);
 
  private:
+  MediaControlVolumeSliderContainerElement(HTMLMediaElement*);
+
   bool m_isVisible;
   int m_x, m_y;
 };
@@ -136,11 +152,15 @@ class MediaControlVolumeSliderContainerElement : public MediaControlElement {
 
 class MediaControlStatusDisplayElement : public MediaControlElement {
  public:
-  MediaControlStatusDisplayElement(Document*, HTMLMediaElement*);
-  virtual void update();
-  virtual bool rendererIsNeeded(RenderStyle*);
+  static PassRefPtr<MediaControlStatusDisplayElement> create(HTMLMediaElement*);
+
+  void update();
 
  private:
+  MediaControlStatusDisplayElement(HTMLMediaElement*);
+
+  virtual bool rendererIsNeeded(RenderStyle*);
+
   enum StateBeingDisplayed { Nothing, Loading, LiveBroadcast };
   StateBeingDisplayed m_stateBeingDisplayed;
 };
@@ -149,27 +169,32 @@ class MediaControlStatusDisplayElement : public MediaControlElement {
 
 class MediaControlInputElement : public HTMLInputElement {
  public:
-  MediaControlInputElement(Document*,
-                           PseudoId,
-                           const String& type,
-                           HTMLMediaElement*);
-  virtual void attach();
-  virtual bool rendererIsNeeded(RenderStyle*);
-
-  virtual PassRefPtr<RenderStyle> styleForElement();
   void attachToParent(Element*);
   void update();
   void updateStyle();
 
   bool hitTest(const IntPoint& absPoint);
+
   MediaControlElementType displayType() const { return m_displayType; }
 
   HTMLMediaElement* mediaElement() const { return m_mediaElement; }
-  virtual bool isMediaControlElement() const { return true; }
 
  protected:
-  virtual void updateDisplayType() {}
+  MediaControlInputElement(HTMLMediaElement*, PseudoId, const String& type);
+
   void setDisplayType(MediaControlElementType);
+
+  PseudoId pseudoStyleId() const { return m_pseudoStyleId; }
+
+ private:
+  virtual void attach();
+  virtual bool rendererIsNeeded(RenderStyle*);
+
+  virtual PassRefPtr<RenderStyle> styleForElement();
+
+  virtual bool isMediaControlElement() const { return true; }
+
+  virtual void updateDisplayType() {}
 
   HTMLMediaElement* m_mediaElement;
   PseudoId m_pseudoStyleId;
@@ -180,8 +205,13 @@ class MediaControlInputElement : public HTMLInputElement {
 
 class MediaControlMuteButtonElement : public MediaControlInputElement {
  public:
-  MediaControlMuteButtonElement(Document*, HTMLMediaElement*);
+  static PassRefPtr<MediaControlMuteButtonElement> create(HTMLMediaElement*);
+
   virtual void defaultEventHandler(Event*);
+
+ private:
+  MediaControlMuteButtonElement(HTMLMediaElement*);
+
   virtual void updateDisplayType();
 };
 
@@ -189,8 +219,13 @@ class MediaControlMuteButtonElement : public MediaControlInputElement {
 
 class MediaControlPlayButtonElement : public MediaControlInputElement {
  public:
-  MediaControlPlayButtonElement(Document*, HTMLMediaElement*);
+  static PassRefPtr<MediaControlPlayButtonElement> create(HTMLMediaElement*);
+
   virtual void defaultEventHandler(Event*);
+
+ private:
+  MediaControlPlayButtonElement(HTMLMediaElement*);
+
   virtual void updateDisplayType();
 };
 
@@ -198,13 +233,19 @@ class MediaControlPlayButtonElement : public MediaControlInputElement {
 
 class MediaControlSeekButtonElement : public MediaControlInputElement {
  public:
-  MediaControlSeekButtonElement(Document*, HTMLMediaElement*, bool forward);
+  static PassRefPtr<MediaControlSeekButtonElement> create(HTMLMediaElement*,
+                                                          PseudoId);
+
   virtual void defaultEventHandler(Event*);
+
+ private:
+  MediaControlSeekButtonElement(HTMLMediaElement*, PseudoId);
+
+  bool isForwardButton() const;
+
   virtual void detach();
   void seekTimerFired(Timer<MediaControlSeekButtonElement>*);
 
- private:
-  bool m_forward;
   bool m_seeking;
   bool m_capturing;
   Timer<MediaControlSeekButtonElement> m_seekTimer;
@@ -214,8 +255,12 @@ class MediaControlSeekButtonElement : public MediaControlInputElement {
 
 class MediaControlRewindButtonElement : public MediaControlInputElement {
  public:
-  MediaControlRewindButtonElement(Document*, HTMLMediaElement*);
+  static PassRefPtr<MediaControlRewindButtonElement> create(HTMLMediaElement*);
+
   virtual void defaultEventHandler(Event*);
+
+ private:
+  MediaControlRewindButtonElement(HTMLMediaElement*);
 };
 
 // ----------------------------
@@ -223,8 +268,13 @@ class MediaControlRewindButtonElement : public MediaControlInputElement {
 class MediaControlReturnToRealtimeButtonElement
     : public MediaControlInputElement {
  public:
-  MediaControlReturnToRealtimeButtonElement(Document*, HTMLMediaElement*);
+  static PassRefPtr<MediaControlReturnToRealtimeButtonElement> create(
+      HTMLMediaElement*);
+
   virtual void defaultEventHandler(Event*);
+
+ private:
+  MediaControlReturnToRealtimeButtonElement(HTMLMediaElement*);
 };
 
 // ----------------------------
@@ -232,8 +282,14 @@ class MediaControlReturnToRealtimeButtonElement
 class MediaControlToggleClosedCaptionsButtonElement
     : public MediaControlInputElement {
  public:
-  MediaControlToggleClosedCaptionsButtonElement(Document*, HTMLMediaElement*);
+  static PassRefPtr<MediaControlToggleClosedCaptionsButtonElement> create(
+      HTMLMediaElement*);
+
   virtual void defaultEventHandler(Event*);
+
+ private:
+  MediaControlToggleClosedCaptionsButtonElement(HTMLMediaElement*);
+
   virtual void updateDisplayType();
 };
 
@@ -241,40 +297,57 @@ class MediaControlToggleClosedCaptionsButtonElement
 
 class MediaControlTimelineElement : public MediaControlInputElement {
  public:
-  MediaControlTimelineElement(Document*, HTMLMediaElement*);
+  static PassRefPtr<MediaControlTimelineElement> create(HTMLMediaElement*);
+
   virtual void defaultEventHandler(Event*);
   void update(bool updateDuration = true);
+
+ private:
+  MediaControlTimelineElement(HTMLMediaElement*);
 };
 
 // ----------------------------
 
 class MediaControlVolumeSliderElement : public MediaControlInputElement {
  public:
-  MediaControlVolumeSliderElement(Document*, HTMLMediaElement*);
+  static PassRefPtr<MediaControlVolumeSliderElement> create(HTMLMediaElement*);
+
   virtual void defaultEventHandler(Event*);
-  virtual void update();
+  void update();
+
+ private:
+  MediaControlVolumeSliderElement(HTMLMediaElement*);
 };
 
 // ----------------------------
 
 class MediaControlFullscreenButtonElement : public MediaControlInputElement {
  public:
-  MediaControlFullscreenButtonElement(Document*, HTMLMediaElement*);
+  static PassRefPtr<MediaControlFullscreenButtonElement> create(
+      HTMLMediaElement*);
+
   virtual void defaultEventHandler(Event*);
+
+ private:
+  MediaControlFullscreenButtonElement(HTMLMediaElement*);
 };
 
 // ----------------------------
 
 class MediaControlTimeDisplayElement : public MediaControlElement {
  public:
-  MediaControlTimeDisplayElement(Document*, PseudoId, HTMLMediaElement*);
+  static PassRefPtr<MediaControlTimeDisplayElement> create(HTMLMediaElement*,
+                                                           PseudoId);
+
   void setVisible(bool);
-  virtual PassRefPtr<RenderStyle> styleForElement();
 
   void setCurrentValue(float);
   float currentValue() const { return m_currentValue; }
 
  private:
+  MediaControlTimeDisplayElement(HTMLMediaElement*, PseudoId);
+
+  virtual PassRefPtr<RenderStyle> styleForElement();
   float m_currentValue;
   bool m_isVisible;
 };
@@ -290,5 +363,7 @@ class RenderMediaControlShadowRoot : public RenderBlock {
 // ----------------------------
 
 }  // namespace WebCore
-#endif  // enable(video)
+
+#endif  // ENABLE(VIDEO)
+
 #endif  // MediaControlElements_h

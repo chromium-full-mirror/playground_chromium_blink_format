@@ -48,11 +48,10 @@ class HTMLLinkElement : public HTMLElement, public CachedResourceClient {
           m_isDNSPrefetch(false) {}
   };
 
-  HTMLLinkElement(const QualifiedName&, Document*, bool createdByParser);
-  ~HTMLLinkElement();
-
-  virtual HTMLTagStatus endTagRequirement() const { return TagStatusForbidden; }
-  virtual int tagPriority() const { return 0; }
+  static PassRefPtr<HTMLLinkElement> create(const QualifiedName&,
+                                            Document*,
+                                            bool createdByParser);
+  virtual ~HTMLLinkElement();
 
   bool disabled() const;
   void setDisabled(bool);
@@ -83,7 +82,18 @@ class HTMLLinkElement : public HTMLElement, public CachedResourceClient {
 
   StyleSheet* sheet() const;
 
-  // overload from HTMLElement
+  bool isLoading() const;
+
+  bool isDisabled() const { return m_disabledState == Disabled; }
+  bool isEnabledViaScript() const {
+    return m_disabledState == EnabledViaScript;
+  }
+  bool isIcon() const { return m_relAttribute.m_isIcon; }
+
+ private:
+  virtual HTMLTagStatus endTagRequirement() const { return TagStatusForbidden; }
+  virtual int tagPriority() const { return 0; }
+
   virtual void parseMappedAttribute(Attribute*);
 
   void process();
@@ -96,29 +106,27 @@ class HTMLLinkElement : public HTMLElement, public CachedResourceClient {
                                 const KURL& baseURL,
                                 const String& charset,
                                 const CachedCSSStyleSheet* sheet);
-  bool isLoading() const;
   virtual bool sheetLoaded();
 
   bool isAlternate() const {
     return m_disabledState == Unset && m_relAttribute.m_isAlternate;
   }
-  bool isDisabled() const { return m_disabledState == Disabled; }
-  bool isEnabledViaScript() const {
-    return m_disabledState == EnabledViaScript;
-  }
-  bool isIcon() const { return m_relAttribute.m_isIcon; }
 
   void setDisabledState(bool _disabled);
 
   virtual bool isURLAttribute(Attribute*) const;
 
+ public:
   static void tokenizeRelAttribute(const AtomicString& value, RelAttribute&);
 
+ private:
   virtual void addSubresourceAttributeURLs(ListHashSet<KURL>&) const;
 
   virtual void finishParsingChildren();
 
- protected:
+ private:
+  HTMLLinkElement(const QualifiedName&, Document*, bool createdByParser);
+
   enum DisabledState { Unset, EnabledViaScript, Disabled };
 
   CachedResourceHandle<CachedCSSStyleSheet> m_cachedSheet;

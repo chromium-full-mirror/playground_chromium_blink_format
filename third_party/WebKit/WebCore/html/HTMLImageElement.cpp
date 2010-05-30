@@ -43,9 +43,9 @@ namespace WebCore {
 using namespace HTMLNames;
 
 HTMLImageElement::HTMLImageElement(const QualifiedName& tagName,
-                                   Document* doc,
+                                   Document* document,
                                    HTMLFormElement* form)
-    : HTMLElement(tagName, doc),
+    : HTMLElement(tagName, document),
       m_imageLoader(this),
       ismap(false),
       m_form(form),
@@ -53,6 +53,17 @@ HTMLImageElement::HTMLImageElement(const QualifiedName& tagName,
   ASSERT(hasTagName(imgTag));
   if (form)
     form->registerImgElement(this);
+}
+
+PassRefPtr<HTMLImageElement> HTMLImageElement::create(Document* document) {
+  return new HTMLImageElement(imgTag, document);
+}
+
+PassRefPtr<HTMLImageElement> HTMLImageElement::create(
+    const QualifiedName& tagName,
+    Document* document,
+    HTMLFormElement* form) {
+  return new HTMLImageElement(tagName, document, form);
 }
 
 HTMLImageElement::~HTMLImageElement() {

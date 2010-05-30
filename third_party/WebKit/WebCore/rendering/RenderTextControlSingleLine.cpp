@@ -548,7 +548,7 @@ void RenderTextControlSingleLine::createSubtreeIfNeeded() {
   if (!inputElement()->isSearchField()) {
     RenderTextControl::createSubtreeIfNeeded(m_innerBlock.get());
     if (inputElement()->hasSpinButton() && !m_outerSpinButton) {
-      m_outerSpinButton = new SpinButtonElement(document(), node());
+      m_outerSpinButton = SpinButtonElement::create(node());
       m_outerSpinButton->attachInnerElement(
           node(), createOuterSpinButtonStyle(), renderArena());
     }
@@ -557,14 +557,14 @@ void RenderTextControlSingleLine::createSubtreeIfNeeded() {
 
   if (!m_innerBlock) {
     // Create the inner block element
-    m_innerBlock = new TextControlInnerElement(document(), node());
+    m_innerBlock = TextControlInnerElement::create(node());
     m_innerBlock->attachInnerElement(node(), createInnerBlockStyle(style()),
                                      renderArena());
   }
 
   if (!m_resultsButton) {
     // Create the search results button element
-    m_resultsButton = new SearchFieldResultsButtonElement(document());
+    m_resultsButton = SearchFieldResultsButtonElement::create(document());
     m_resultsButton->attachInnerElement(
         m_innerBlock.get(),
         createResultsButtonStyle(m_innerBlock->renderer()->style()),
@@ -576,7 +576,7 @@ void RenderTextControlSingleLine::createSubtreeIfNeeded() {
 
   if (!m_cancelButton) {
     // Create the cancel button element
-    m_cancelButton = new SearchFieldCancelButtonElement(document());
+    m_cancelButton = SearchFieldCancelButtonElement::create(document());
     m_cancelButton->attachInnerElement(
         m_innerBlock.get(),
         createCancelButtonStyle(m_innerBlock->renderer()->style()),

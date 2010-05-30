@@ -36,25 +36,16 @@ class HTMLImageElement : public HTMLElement {
   friend class HTMLFormElement;
 
  public:
+  static PassRefPtr<HTMLImageElement> create(Document*);
+  static PassRefPtr<HTMLImageElement> create(const QualifiedName&,
+                                             Document*,
+                                             HTMLFormElement*);
   static PassRefPtr<HTMLImageElement> createForJSConstructor(
       Document*,
       const int* optionalWidth,
       const int* optionalHeight);
 
-  HTMLImageElement(const QualifiedName&, Document*, HTMLFormElement* = 0);
-  ~HTMLImageElement();
-
-  virtual HTMLTagStatus endTagRequirement() const { return TagStatusForbidden; }
-  virtual int tagPriority() const { return 0; }
-
-  virtual bool mapToEntry(const QualifiedName& attrName,
-                          MappedAttributeEntry& result) const;
-  virtual void parseMappedAttribute(Attribute*);
-
-  virtual void attach();
-  virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
-
-  virtual bool canStartSelection() const { return false; }
+  virtual ~HTMLImageElement();
 
   int width(bool ignorePendingStylesheets = false) const;
   int height(bool ignorePendingStylesheets = false) const;
@@ -66,8 +57,6 @@ class HTMLImageElement : public HTMLElement {
 
   String altText() const;
 
-  virtual bool isURLAttribute(Attribute*) const;
-
   CompositeOperator compositeOperator() const { return m_compositeOperator; }
 
   CachedImage* cachedImage() const { return m_imageLoader.image(); }
@@ -78,8 +67,6 @@ class HTMLImageElement : public HTMLElement {
   }
 
   const AtomicString& alt() const;
-
-  virtual bool draggable() const;
 
   void setHeight(int);
 
@@ -110,12 +97,30 @@ class HTMLImageElement : public HTMLElement {
 
   bool haveFiredLoadEvent() const { return m_imageLoader.haveFiredLoadEvent(); }
 
-  virtual void addSubresourceAttributeURLs(ListHashSet<KURL>&) const;
-
  protected:
+  HTMLImageElement(const QualifiedName&, Document*, HTMLFormElement* = 0);
+
   virtual void willMoveToNewOwnerDocument();
 
  private:
+  virtual HTMLTagStatus endTagRequirement() const { return TagStatusForbidden; }
+  virtual int tagPriority() const { return 0; }
+
+  virtual bool mapToEntry(const QualifiedName& attrName,
+                          MappedAttributeEntry& result) const;
+  virtual void parseMappedAttribute(Attribute*);
+
+  virtual void attach();
+  virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
+
+  virtual bool canStartSelection() const { return false; }
+
+  virtual bool isURLAttribute(Attribute*) const;
+
+  virtual bool draggable() const;
+
+  virtual void addSubresourceAttributeURLs(ListHashSet<KURL>&) const;
+
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
   virtual void insertedIntoTree(bool deep);

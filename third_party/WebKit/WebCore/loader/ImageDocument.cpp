@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006, 2007, 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2006, 2007, 2008, 2010 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -91,15 +91,22 @@ class ImageTokenizer : public Tokenizer {
 
 class ImageDocumentElement : public HTMLImageElement {
  public:
-  ImageDocumentElement(ImageDocument* doc)
-      : HTMLImageElement(imgTag, doc), m_imageDocument(doc) {}
+  static PassRefPtr<ImageDocumentElement> create(ImageDocument*);
+
+ private:
+  ImageDocumentElement(ImageDocument* document)
+      : HTMLImageElement(imgTag, document), m_imageDocument(document) {}
 
   virtual ~ImageDocumentElement();
   virtual void willMoveToNewOwnerDocument();
 
- private:
   ImageDocument* m_imageDocument;
 };
+
+inline PassRefPtr<ImageDocumentElement> ImageDocumentElement::create(
+    ImageDocument* document) {
+  return new ImageDocumentElement(document);
+}
 
 // --------
 
@@ -196,7 +203,8 @@ void ImageDocument::createDocumentStructure() {
 
   rootElement->appendChild(body, ec);
 
-  RefPtr<ImageDocumentElement> imageElement = new ImageDocumentElement(this);
+  RefPtr<ImageDocumentElement> imageElement =
+      ImageDocumentElement::create(this);
 
   imageElement->setAttribute(styleAttr, "-webkit-user-select: none");
   imageElement->setLoadManually(true);
