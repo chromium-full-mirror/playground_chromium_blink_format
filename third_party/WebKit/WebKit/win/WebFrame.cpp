@@ -1097,7 +1097,8 @@ HRESULT WebFrame::elementWithName(BSTR name,
 
   HTMLFormElement* formElement = formElementFromDOMElement(form);
   if (formElement) {
-    Vector<HTMLFormControlElement*>& elements = formElement->formElements;
+    const Vector<HTMLFormControlElement*>& elements =
+        formElement->associatedElements();
     AtomicString targetName((UChar*)name, SysStringLen(name));
     for (unsigned int i = 0; i < elements.size(); i++) {
       HTMLFormControlElement* elt = elements[i];
@@ -1305,7 +1306,7 @@ HRESULT WebFrame::controlsInForm(IDOMElement* form,
     return E_FAIL;
 
   int inCount = *cControls;
-  int count = (int)formElement->formElements.size();
+  int count = (int)formElement->associatedElements().size();
   *cControls = count;
   if (!controls)
     return S_OK;
@@ -1313,7 +1314,8 @@ HRESULT WebFrame::controlsInForm(IDOMElement* form,
     return E_FAIL;
 
   *cControls = 0;
-  Vector<HTMLFormControlElement*>& elements = formElement->formElements;
+  const Vector<HTMLFormControlElement*>& elements =
+      formElement->associatedElements();
   for (int i = 0; i < count; i++) {
     if (elements.at(i)->isEnumeratable()) {  // Skip option elements, other duds
       controls[*cControls] = DOMElement::createInstance(elements.at(i));

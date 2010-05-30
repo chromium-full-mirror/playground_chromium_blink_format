@@ -64,7 +64,8 @@ void findPasswordFormFields(HTMLFormElement* form, PasswordFormFields* fields) {
 
   int firstPasswordIndex = 0;
   // First, find the password fields and activated submit button
-  const Vector<HTMLFormControlElement*>& formElements = form->formElements;
+  const Vector<HTMLFormControlElement*>& formElements =
+      form->associatedElements();
   for (size_t i = 0; i < formElements.size(); i++) {
     HTMLFormControlElement* formElement = formElements[i];
     if (formElement->isActivatedSubmit())

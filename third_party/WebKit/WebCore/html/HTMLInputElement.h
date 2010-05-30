@@ -109,6 +109,7 @@ class HTMLInputElement : public HTMLTextFormControlElement,
   virtual bool isTextField() const;
   virtual bool isSearchField() const { return m_type == SEARCH; }
   virtual bool isInputTypeHidden() const { return m_type == HIDDEN; }
+  virtual bool isPasswordField() const { return m_type == PASSWORD; }
 
   bool checked() const { return m_checked; }
   void setChecked(bool, bool sendChangeEvent = false);
@@ -146,6 +147,14 @@ class HTMLInputElement : public HTMLTextFormControlElement,
   virtual bool rendererIsNeeded(RenderStyle*);
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual void detach();
+
+  // FIXME: For isActivatedSubmit and setActivatedSubmit, we should use the
+  // NVI-idiom here by making
+  // it private virtual in all classes and expose a public method in
+  // HTMLFormControlElement to call
+  // the private virtual method.
+  virtual bool isActivatedSubmit() const;
+  virtual void setActivatedSubmit(bool flag);
 
   InputType inputType() const { return static_cast<InputType>(m_type); }
   void setInputType(const String&);
@@ -245,7 +254,6 @@ class HTMLInputElement : public HTMLTextFormControlElement,
   virtual bool patternMismatch() const;
   virtual bool tooLong() const;
 
-  virtual bool isPasswordField() const { return m_type == PASSWORD; }
   virtual bool hasSpinButton() const {
     return m_type == NUMBER || m_type == DATE || m_type == DATETIME ||
            m_type == DATETIMELOCAL || m_type == MONTH || m_type == TIME ||
@@ -282,8 +290,6 @@ class HTMLInputElement : public HTMLTextFormControlElement,
   virtual bool appendFormData(FormDataList&, bool);
 
   virtual bool isSuccessfulSubmitButton() const;
-  virtual bool isActivatedSubmit() const;
-  virtual void setActivatedSubmit(bool flag);
 
   // Report if this input type uses height & width attributes
   bool respectHeightAndWidthAttrs() const {
