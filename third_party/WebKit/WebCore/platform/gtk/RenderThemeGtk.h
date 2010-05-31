@@ -86,8 +86,9 @@ class RenderThemeGtk : public RenderTheme {
 
   virtual void platformColorsDidChange();
 
-  // System fonts.
+  // System fonts and colors.
   virtual void systemFont(int propId, FontDescription&) const;
+  virtual Color systemColor(int cssValueId) const;
 
 #if ENABLE(VIDEO)
   virtual String extraMediaControlsStyleSheet();
@@ -190,6 +191,7 @@ class RenderThemeGtk : public RenderTheme {
   /*
    * hold the state
    */
+  GtkWidget* gtkButton() const;
   GtkWidget* gtkEntry() const;
   GtkWidget* gtkTreeView() const;
 
@@ -201,6 +203,7 @@ class RenderThemeGtk : public RenderTheme {
 
   mutable GtkWidget* m_gtkWindow;
   mutable GtkContainer* m_gtkContainer;
+  mutable GtkWidget* m_gtkButton;
   mutable GtkWidget* m_gtkEntry;
   mutable GtkWidget* m_gtkTreeView;
 
