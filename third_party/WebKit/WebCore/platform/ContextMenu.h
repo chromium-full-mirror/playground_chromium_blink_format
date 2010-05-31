@@ -41,6 +41,9 @@
 namespace WebCore {
 
 class ContextMenuController;
+#if PLATFORM(EFL)
+class ContextMenuClientEfl;
+#endif
 
 class ContextMenu : public Noncopyable {
  public:
@@ -79,6 +82,9 @@ class ContextMenu : public Noncopyable {
   QList<ContextMenuItem> m_items;
 #elif PLATFORM(CHROMIUM)
   Vector<ContextMenuItem> m_items;
+#elif PLATFORM(EFL)
+  ContextMenuClientEfl* m_contextMenuClient;
+  PlatformMenuDescription m_platformDescription;
 #else
   PlatformMenuDescription m_platformDescription;
 #endif

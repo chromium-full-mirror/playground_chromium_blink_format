@@ -221,6 +221,22 @@ struct PlatformMenuItemDescription {
   bool checked;
   bool enabled;
 };
+#elif PLATFORM(EFL)
+struct PlatformMenuItemDescription {
+  PlatformMenuItemDescription()
+      : type(ActionType),
+        action(ContextMenuItemTagNoAction),
+        title(""),
+        subMenu(0),
+        checked(false),
+        enabled(true) {}
+  ContextMenuItemType type;
+  ContextMenuAction action;
+  String title;
+  ContextMenu* subMenu;
+  bool checked;
+  bool enabled;
+};
 #else
 typedef void* PlatformMenuItemDescription;
 #endif

@@ -29,9 +29,12 @@
 #include "ContextMenuClientEfl.h"
 
 #include "ContextMenu.h"
+#include "EWebKit.h"
+#include "ewk_private.h"
 #include "HitTestResult.h"
 #include "KURL.h"
 #include "NotImplemented.h"
+#include "PlatformMenuDescription.h"
 
 using namespace WebCore;
 
@@ -44,9 +47,11 @@ void ContextMenuClientEfl::contextMenuDestroyed() {
 }
 
 PlatformMenuDescription ContextMenuClientEfl::getCustomMenuFromDefaultItems(
-    ContextMenu*) {
-  notImplemented();
-  return 0;
+    ContextMenu* menu) {
+  PlatformMenuDescription newmenu = ewk_context_menu_custom_get(
+      static_cast<Ewk_Context_Menu*>(menu->releasePlatformDescription()));
+
+  return newmenu;
 }
 
 void ContextMenuClientEfl::contextMenuItemSelected(ContextMenuItem*,
@@ -77,5 +82,25 @@ void ContextMenuClientEfl::speak(const String&) {
 
 void ContextMenuClientEfl::stopSpeaking() {
   notImplemented();
+}
+
+PlatformMenuDescription ContextMenuClientEfl::createPlatformDescription(
+    ContextMenu* menu) {
+  return (PlatformMenuDescription)ewk_context_menu_new(m_view,
+                                                       menu->controller());
+}
+
+void ContextMenuClientEfl::freePlatformDescription(
+    PlatformMenuDescription menu) {
+  ewk_context_menu_free(static_cast<Ewk_Context_Menu*>(menu));
+}
+
+void ContextMenuClientEfl::appendItem(PlatformMenuDescription menu,
+                                      ContextMenuItem& item) {
+  ewk_context_menu_item_append(static_cast<Ewk_Context_Menu*>(menu), item);
+}
+
+void ContextMenuClientEfl::show(PlatformMenuDescription menu) {
+  ewk_context_menu_show(static_cast<Ewk_Context_Menu*>(menu));
 }
 }
