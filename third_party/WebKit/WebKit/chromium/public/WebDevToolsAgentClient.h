@@ -66,6 +66,8 @@ class WebDevToolsAgentClient {
   };
   virtual WebKitClientMessageLoop* createClientMessageLoop() { return 0; }
 
+  virtual bool exposeV8DebuggerProtocol() { return false; }
+
  protected:
   ~WebDevToolsAgentClient() {}
 };

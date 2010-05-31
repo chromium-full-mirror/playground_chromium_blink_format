@@ -83,6 +83,8 @@ String InspectorFrontendClientImpl::localizedStringsURL() {
 }
 
 String InspectorFrontendClientImpl::hiddenPanels() {
+  if (m_client->shouldHideScriptsPanel())
+    return "scripts";
   return "";
 }
 

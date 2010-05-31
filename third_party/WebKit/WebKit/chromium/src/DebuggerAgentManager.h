@@ -72,6 +72,7 @@ class DebuggerAgentManager : public Noncopyable {
                                      int callerId);
   static void setMessageLoopDispatchHandler(
       WebDevToolsAgent::MessageLoopDispatchHandler handler);
+  static void setExposeV8DebuggerProtocol(bool);
 
   // Sets |hostId| as the frame context data. This id is used to filter scripts
   // related to the inspected page.
@@ -120,6 +121,7 @@ class DebuggerAgentManager : public Noncopyable {
 
   static bool s_inUtilityContext;
   static bool s_debugBreakDelayed;
+  static bool s_exposeV8DebuggerProtocol;
 };
 
 }  // namespace WebKit

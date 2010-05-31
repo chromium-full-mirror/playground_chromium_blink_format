@@ -40,14 +40,16 @@ class WebDevToolsFrontendClient {
  public:
   WebDevToolsFrontendClient() {}
 
-  virtual void sendMessageToAgent(const WebDevToolsMessageData&){};
-  virtual void sendDebuggerCommandToAgent(const WebString& command){};
+  virtual void sendMessageToAgent(const WebDevToolsMessageData&) {}
+  virtual void sendDebuggerCommandToAgent(const WebString& command) {}
   virtual void sendDebuggerPauseScript() {}
 
-  virtual void activateWindow(){};
-  virtual void closeWindow(){};
-  virtual void requestDockWindow(){};
-  virtual void requestUndockWindow(){};
+  virtual void activateWindow() {}
+  virtual void closeWindow() {}
+  virtual void requestDockWindow() {}
+  virtual void requestUndockWindow() {}
+
+  virtual bool shouldHideScriptsPanel() { return false; }
 
  protected:
   virtual ~WebDevToolsFrontendClient() {}

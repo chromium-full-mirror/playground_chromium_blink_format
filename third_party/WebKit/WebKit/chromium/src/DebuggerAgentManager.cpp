@@ -55,6 +55,8 @@ bool DebuggerAgentManager::s_inUtilityContext = false;
 
 bool DebuggerAgentManager::s_debugBreakDelayed = false;
 
+bool DebuggerAgentManager::s_exposeV8DebuggerProtocol = false;
+
 namespace {
 
 class CallerIdWrapper : public v8::Debug::ClientData, public Noncopyable {
@@ -120,7 +122,8 @@ DebuggerAgentManager::AttachedAgentsMap*
 
 void DebuggerAgentManager::debugAttach(DebuggerAgentImpl* debuggerAgent) {
 #if ENABLE(V8_SCRIPT_DEBUG_SERVER)
-  return;
+  if (!s_exposeV8DebuggerProtocol)
+    return;
 #endif
   if (!s_attachedAgentsMap) {
     s_attachedAgentsMap = new AttachedAgentsMap();
@@ -135,7 +138,8 @@ void DebuggerAgentManager::debugAttach(DebuggerAgentImpl* debuggerAgent) {
 
 void DebuggerAgentManager::debugDetach(DebuggerAgentImpl* debuggerAgent) {
 #if ENABLE(V8_SCRIPT_DEBUG_SERVER)
-  return;
+  if (!s_exposeV8DebuggerProtocol)
+    return;
 #endif
   if (!s_attachedAgentsMap) {
     ASSERT_NOT_REACHED();
@@ -258,6 +262,10 @@ void DebuggerAgentManager::executeDebuggerCommand(const String& command,
 void DebuggerAgentManager::setMessageLoopDispatchHandler(
     WebDevToolsAgent::MessageLoopDispatchHandler handler) {
   s_messageLoopDispatchHandler = handler;
+}
+
+void DebuggerAgentManager::setExposeV8DebuggerProtocol(bool value) {
+  s_exposeV8DebuggerProtocol = value;
 }
 
 void DebuggerAgentManager::setHostId(WebFrameImpl* webframe, int hostId) {
