@@ -148,7 +148,7 @@ CSSParser::CSSParser(bool strictParsing)
       m_defaultNamespace(starAtom),
       m_ruleBodyStartOffset(0),
       m_ruleBodyEndOffset(0),
-      m_ruleStartEndOffsets(0),
+      m_ruleRanges(0),
       m_data(0),
       yy_start(1),
       m_line(0),
@@ -233,16 +233,16 @@ void CSSParser::setupParser(const char* prefix,
   resetRuleBodyMarks();
 }
 
-void CSSParser::parseSheet(
-    CSSStyleSheet* sheet,
-    const String& string,
-    Vector<std::pair<unsigned, unsigned>>* ruleStartEndOffsets) {
+void CSSParser::parseSheet(CSSStyleSheet* sheet,
+                           const String& string,
+                           StyleRuleRanges* ruleRangeMap) {
   m_styleSheet = sheet;
   m_defaultNamespace = starAtom;  // Reset the default namespace.
-  m_ruleStartEndOffsets = ruleStartEndOffsets;
+  m_ruleRanges = ruleRangeMap;
 
   setupParser("", string, "");
   cssyyparse(this);
+  m_ruleRanges = 0;
   m_rule = 0;
 }
 
@@ -5580,9 +5580,6 @@ CSSRule* CSSParser::createStyleRule(Vector<CSSSelector*>* selectors) {
   if (selectors) {
     RefPtr<CSSStyleRule> rule =
         CSSStyleRule::create(m_styleSheet, m_lastSelectorLine);
-    if (m_ruleStartEndOffsets)
-      m_ruleStartEndOffsets->append(std::pair<unsigned, unsigned>(
-          m_ruleBodyStartOffset, m_ruleBodyEndOffset));
     rule->adoptSelectorVector(*selectors);
     if (m_hasFontFaceOnlyValues)
       deleteFontFaceOnlyValues();
@@ -5590,6 +5587,10 @@ CSSRule* CSSParser::createStyleRule(Vector<CSSSelector*>* selectors) {
         rule.get(), m_parsedProperties, m_numParsedProperties));
     result = rule.get();
     m_parsedStyleObjects.append(rule.release());
+    if (m_ruleRanges)
+      m_ruleRanges->set(result,
+                        std::pair<unsigned, unsigned>(m_ruleBodyStartOffset,
+                                                      m_ruleBodyEndOffset));
   }
   resetRuleBodyMarks();
   clearProperties();

@@ -359,6 +359,17 @@ void InspectorBackend::getComputedStyle(long callId, long nodeId) {
     domAgent->getComputedStyle(callId, nodeId);
 }
 
+void InspectorBackend::getStyleSheet(long callId, long styleSheetId) {
+  if (InspectorDOMAgent* domAgent = inspectorDOMAgent())
+    domAgent->getStyleSheet(callId, styleSheetId);
+}
+
+void InspectorBackend::getRuleRangesForStyleSheetId(long callId,
+                                                    long styleSheetId) {
+  if (InspectorDOMAgent* domAgent = inspectorDOMAgent())
+    domAgent->getRuleRangesForStyleSheetId(callId, styleSheetId);
+}
+
 void InspectorBackend::applyStyleText(long callId,
                                       long styleId,
                                       const String& styleText,

@@ -154,6 +154,7 @@ class InspectorFrontend : public Noncopyable {
   void didGetStyles(long callId, const ScriptValue& styles);
   void didGetAllStyles(long callId, const ScriptArray& styles);
   void didGetInlineStyle(long callId, const ScriptValue& style);
+  void didGetStyleSheet(long callId, const ScriptValue& styleSheet);
   void didGetComputedStyle(long callId, const ScriptValue& style);
   void didApplyStyleText(long callId,
                          bool success,

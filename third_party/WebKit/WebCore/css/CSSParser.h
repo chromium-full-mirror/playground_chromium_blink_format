@@ -29,6 +29,7 @@
 #include "CSSParserValues.h"
 #include "CSSSelectorList.h"
 #include "MediaQuery.h"
+#include <wtf/HashMap.h>
 #include <wtf/HashSet.h>
 #include <wtf/Vector.h>
 
@@ -40,6 +41,7 @@ class CSSProperty;
 class CSSRule;
 class CSSRuleList;
 class CSSSelector;
+class CSSStyleRule;
 class CSSStyleSheet;
 class CSSValue;
 class CSSValueList;
@@ -54,13 +56,14 @@ class WebKitCSSKeyframesRule;
 
 class CSSParser {
  public:
+  typedef HashMap<CSSStyleRule*, std::pair<unsigned, unsigned>> StyleRuleRanges;
+
   CSSParser(bool strictParsing = true);
   ~CSSParser();
 
-  void parseSheet(
-      CSSStyleSheet*,
-      const String&,
-      Vector<std::pair<unsigned, unsigned>>* ruleStartEndPositions = 0);
+  void parseSheet(CSSStyleSheet*,
+                  const String&,
+                  StyleRuleRanges* ruleRangeMap = 0);
   PassRefPtr<CSSRule> parseRule(CSSStyleSheet*, const String&);
   PassRefPtr<CSSRule> parseKeyframeRule(CSSStyleSheet*, const String&);
   bool parseValue(CSSMutableStyleDeclaration*,
@@ -283,7 +286,7 @@ class CSSParser {
   // tokenizer methods and data
   unsigned m_ruleBodyStartOffset;
   unsigned m_ruleBodyEndOffset;
-  Vector<std::pair<unsigned, unsigned>>* m_ruleStartEndOffsets;
+  StyleRuleRanges* m_ruleRanges;
   void markRuleBodyStart();
   void markRuleBodyEnd();
   void resetRuleBodyMarks() { m_ruleBodyStartOffset = m_ruleBodyEndOffset = 0; }

@@ -843,6 +843,42 @@ void InspectorDOMAgent::getAllStyles(long callId) {
   m_frontend->didGetAllStyles(callId, result);
 }
 
+void InspectorDOMAgent::getStyleSheet(long callId, long styleSheetId) {
+  CSSStyleSheet* styleSheet = cssStore()->styleSheetForId(styleSheetId);
+  if (styleSheet && styleSheet->doc())
+    m_frontend->didGetStyleSheet(
+        callId, buildObjectForStyleSheet(styleSheet->doc(), styleSheet));
+  else
+    m_frontend->didGetStyleSheet(callId, ScriptObject::undefined());
+}
+
+void InspectorDOMAgent::getRuleRangesForStyleSheetId(long callId,
+                                                     long styleSheetId) {
+  CSSStyleSheet* styleSheet = cssStore()->styleSheetForId(styleSheetId);
+  if (styleSheet && styleSheet->doc()) {
+    HashMap<long, SourceRange> ruleRanges =
+        cssStore()->getRuleRangesForStyleSheet(styleSheet);
+    if (!ruleRanges.size()) {
+      m_frontend->didGetStyleSheet(callId, ScriptObject::undefined());
+      return;
+    }
+    ScriptObject result = m_frontend->newScriptObject();
+    for (HashMap<long, SourceRange>::iterator it = ruleRanges.begin();
+         it != ruleRanges.end(); ++it) {
+      if (it->second.second) {
+        ScriptObject ruleRange = m_frontend->newScriptObject();
+        result.set(String::number(it->first).utf8().data(), ruleRange);
+        ScriptObject bodyRange = m_frontend->newScriptObject();
+        ruleRange.set("bodyRange", bodyRange);
+        bodyRange.set("start", it->second.first);
+        bodyRange.set("end", it->second.second);
+      }
+    }
+    m_frontend->didGetStyleSheet(callId, result);
+  } else
+    m_frontend->didGetStyleSheet(callId, ScriptObject::undefined());
+}
+
 void InspectorDOMAgent::getInlineStyle(long callId, long nodeId) {
   Node* node = nodeForId(nodeId);
   if (!node || node->nodeType() != Node::ELEMENT_NODE) {
@@ -1162,6 +1198,10 @@ ScriptObject InspectorDOMAgent::buildObjectForStyle(CSSStyleDeclaration* style,
   if (bind) {
     long styleId = cssStore()->bindStyle(style);
     result.set("id", styleId);
+    CSSStyleSheet* parentStyleSheet = getParentStyleSheet(style);
+    if (parentStyleSheet)
+      result.set("parentStyleSheetId",
+                 cssStore()->bindStyleSheet(parentStyleSheet));
 
     DisabledStyleDeclaration* disabledStyle =
         cssStore()->disabledStyleForId(styleId, false);
@@ -1171,18 +1211,6 @@ ScriptObject InspectorDOMAgent::buildObjectForStyle(CSSStyleDeclaration* style,
   }
   result.set("width", style->getPropertyValue("width"));
   result.set("height", style->getPropertyValue("height"));
-  if (bind) {
-    CSSRule* parentRule = style->parentRule();
-    if (parentRule && parentRule->type() == CSSRule::STYLE_RULE) {
-      CSSStyleRule* parentStyleRule = static_cast<CSSStyleRule*>(parentRule);
-      std::pair<unsigned, unsigned> startEnd =
-          cssStore()->getStartEndOffsets(parentStyleRule);
-      if (startEnd.second) {
-        result.set("bodyStartOffset", startEnd.first);
-        result.set("bodyEndOffset", startEnd.second);
-      }
-    }
-  }
   populateObjectWithStyleProperties(style, result);
   return result;
 }
@@ -1232,6 +1260,8 @@ ScriptObject InspectorDOMAgent::buildObjectForStyleSheet(
     Document* ownerDocument,
     CSSStyleSheet* styleSheet) {
   ScriptObject result = m_frontend->newScriptObject();
+  long id = cssStore()->bindStyleSheet(styleSheet);
+  result.set("id", id);
   result.set("disabled", styleSheet->disabled());
   result.set("href", styleSheet->href());
   result.set("title", styleSheet->title());
@@ -1264,6 +1294,8 @@ ScriptObject InspectorDOMAgent::buildObjectForRule(Document* ownerDocument,
     ScriptObject parentStyleSheetValue = m_frontend->newScriptObject();
     result.set("parentStyleSheet", parentStyleSheetValue);
     parentStyleSheetValue.set("href", parentStyleSheet->href());
+    parentStyleSheetValue.set("id",
+                              cssStore()->bindStyleSheet(parentStyleSheet));
   }
   bool isUserAgent = parentStyleSheet && !parentStyleSheet->ownerNode() &&
                      parentStyleSheet->href().isEmpty();
@@ -1362,6 +1394,21 @@ ScriptArray InspectorDOMAgent::toArray(const Vector<String>& data) {
   for (unsigned i = 0; i < data.size(); ++i)
     result.set(i, data[i]);
   return result;
+}
+
+CSSStyleSheet* InspectorDOMAgent::getParentStyleSheet(
+    CSSStyleDeclaration* style) {
+  CSSStyleSheet* parentStyleSheet =
+      style->parentRule() ? style->parentRule()->parentStyleSheet() : 0;
+  if (!parentStyleSheet) {
+    StyleBase* parent = style->parent();
+    if (parent && parent->isCSSStyleSheet()) {
+      parentStyleSheet = static_cast<CSSStyleSheet*>(parent);
+      if (!parentStyleSheet->length())
+        return 0;
+    }
+  }
+  return parentStyleSheet;
 }
 
 }  // namespace WebCore
