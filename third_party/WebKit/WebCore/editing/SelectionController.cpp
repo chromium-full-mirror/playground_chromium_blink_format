@@ -32,8 +32,8 @@
 #include "Element.h"
 #include "EventHandler.h"
 #include "ExceptionCode.h"
-#include "FocusController.h"
 #include "FloatQuad.h"
+#include "FocusController.h"
 #include "Frame.h"
 #include "FrameTree.h"
 #include "FrameView.h"
@@ -789,7 +789,7 @@ bool SelectionController::modify(EAlteration alter,
                                  int verticalDistance,
                                  bool userTriggered,
                                  CursorAlignOnScroll align) {
-  if (verticalDistance == 0)
+  if (!verticalDistance)
     return false;
 
   if (userTriggered) {
@@ -1191,7 +1191,7 @@ void SelectionController::debugRenderer(RenderObject* r, bool selected) const {
             element->localName().string().utf8().data());
   } else if (r->isText()) {
     RenderText* textRenderer = toRenderText(r);
-    if (textRenderer->textLength() == 0 || !textRenderer->firstTextBox()) {
+    if (!textRenderer->textLength() || !textRenderer->firstTextBox()) {
       fprintf(stderr, "%s#text (empty)\n", selected ? "==> " : "    ");
       return;
     }
@@ -1218,22 +1218,16 @@ void SelectionController::debugRenderer(RenderObject* r, bool selected) const {
       if (textLength < max) {
         show = text;
         caret = pos;
-      }
-
-      // too few characters to left
-      else if (pos - mid < 0) {
+      } else if (pos - mid < 0) {
+        // too few characters to left
         show = text.left(max - 3) + "...";
         caret = pos;
-      }
-
-      // enough characters on each side
-      else if (pos - mid >= 0 && pos + mid <= textLength) {
+      } else if (pos - mid >= 0 && pos + mid <= textLength) {
+        // enough characters on each side
         show = "..." + text.substring(pos - mid + 3, max - 6) + "...";
         caret = mid;
-      }
-
-      // too few characters on right
-      else {
+      } else {
+        // too few characters on right
         show = "..." + text.right(max - 3);
         caret = pos - (textLength - show.length());
       }

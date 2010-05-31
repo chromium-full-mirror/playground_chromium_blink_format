@@ -31,9 +31,6 @@
 #include "config.h"
 #include "EditorClientQt.h"
 
-#include "qwebpage.h"
-#include "qwebpage_p.h"
-
 #include "CSSStyleDeclaration.h"
 #include "Document.h"
 #include "EditCommandQt.h"
@@ -46,15 +43,16 @@
 #include "KeyboardEvent.h"
 #include "NotImplemented.h"
 #include "Page.h"
-#include "Page.h"
 #include "PlatformKeyboardEvent.h"
 #include "QWebPageClient.h"
 #include "Range.h"
 #include "WindowsKeyboardCodes.h"
-
-#include <stdio.h>
+#include "qwebpage.h"
+#include "qwebpage_p.h"
 
 #include <QUndoStack>
+#include <stdio.h>
+
 #define methodDebug() qDebug("EditorClientQt: %s", __FUNCTION__);
 
 static QString dumpPath(WebCore::Node* node) {
@@ -242,9 +240,8 @@ void EditorClientQt::registerCommandForUndo(
   Frame* frame = m_page->d->page->focusController()->focusedOrMainFrame();
   if (m_inUndoRedo ||
       (frame &&
-       !frame->editor()->lastEditCommand() /* HACK!! Don't recreate undos */)) {
+       !frame->editor()->lastEditCommand() /* HACK!! Don't recreate undos */))
     return;
-  }
   m_page->undoStack()->push(new EditCommandQt(cmd));
 #endif  // QT_NO_UNDOSTACK
 }
@@ -450,9 +447,9 @@ void EditorClientQt::handleKeyboardEvent(KeyboardEvent* event) {
       }
   } else {
 #ifndef QT_NO_SHORTCUT
-    if (kevent->qtEvent() == QKeySequence::Copy) {
+    if (kevent->qtEvent() == QKeySequence::Copy)
       m_page->triggerAction(QWebPage::Copy);
-    } else
+    else
 #endif  // QT_NO_SHORTCUT
       switch (kevent->windowsVirtualKeyCode()) {
         case VK_UP:

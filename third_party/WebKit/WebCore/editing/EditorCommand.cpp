@@ -26,6 +26,7 @@
  */
 
 #include "config.h"
+#include "Editor.h"
 
 #include "AtomicString.h"
 #include "CSSComputedStyleDeclaration.h"
@@ -35,7 +36,6 @@
 #include "Chrome.h"
 #include "CreateLinkCommand.h"
 #include "DocumentFragment.h"
-#include "Editor.h"
 #include "EditorClient.h"
 #include "Event.h"
 #include "EventHandler.h"
@@ -164,10 +164,10 @@ static bool executeToggleStyleInList(Frame* frame,
   } else if (selectedCSSValue->cssText() == "none")
     newStyle = value->cssText();
 
-  ASSERT(ec == 0);
+  ASSERT(!ec);
   if (nodeToRemove) {
     nodeToRemove->remove(ec);
-    ASSERT(ec == 0);
+    ASSERT(!ec);
   }
 
   // FIXME: We shouldn't be having to convert new style into text.  We should

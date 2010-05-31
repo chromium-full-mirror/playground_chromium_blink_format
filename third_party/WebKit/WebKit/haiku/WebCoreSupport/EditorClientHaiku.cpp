@@ -37,11 +37,10 @@
 #include "FocusController.h"
 #include "Frame.h"
 #include "KeyboardEvent.h"
+#include "NotImplemented.h"
 #include "Page.h"
 #include "PlatformKeyboardEvent.h"
 #include "WindowsKeyboardCodes.h"
-
-#include "NotImplemented.h"
 
 namespace WebCore {
 

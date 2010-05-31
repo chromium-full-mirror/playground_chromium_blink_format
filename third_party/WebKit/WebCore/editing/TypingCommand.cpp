@@ -377,14 +377,13 @@ void TypingCommand::insertText(const String& text, bool selectInsertedText) {
     insertParagraphSeparator();
     offset = newline + 1;
   }
-  if (offset == 0)
+  if (!offset)
     insertTextRunWithoutNewlines(text, selectInsertedText);
   else {
     int length = text.length();
-    if (length != offset) {
+    if (length != offset)
       insertTextRunWithoutNewlines(text.substring(offset, length - offset),
                                    selectInsertedText);
-    }
   }
 }
 
@@ -607,7 +606,7 @@ void TypingCommand::forwardDeleteKeyPressed(TextGranularity granularity,
       // When deleting tables: Select the table first, then perform the deletion
       if (downstreamEnd.node() && downstreamEnd.node()->renderer() &&
           downstreamEnd.node()->renderer()->isTable() &&
-          downstreamEnd.deprecatedEditingOffset() == 0) {
+          !downstreamEnd.deprecatedEditingOffset()) {
         setEndingSelection(VisibleSelection(
             endingSelection().end(),
             lastDeepEditingPositionForNode(downstreamEnd.node()), DOWNSTREAM));
