@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005, 2008 Nikolas Zimmermann <zimmermann@kde.org>
-                  2004, 2005, 2006, 2007 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006, 2007, 2010 Rob Buis <buis@kde.org>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -37,10 +37,7 @@ class SVGFitToViewBox {
   bool parseViewBox(Document*,
                     const UChar*& start,
                     const UChar* end,
-                    float& x,
-                    float& y,
-                    float& w,
-                    float& h,
+                    FloatRect& viewBox,
                     bool validate = true);
   static AffineTransform viewBoxToViewTransform(const FloatRect& viewBoxRect,
                                                 const SVGPreserveAspectRatio&,
@@ -54,6 +51,9 @@ class SVGFitToViewBox {
       SVGAnimatedPropertyTraits<FloatRect>::PassType) = 0;
   virtual void setPreserveAspectRatioBaseValue(
       SVGAnimatedPropertyTraits<SVGPreserveAspectRatio>::PassType) = 0;
+
+ private:
+  bool parseViewBox(Document*, const String&, FloatRect&);
 };
 
 }  // namespace WebCore
