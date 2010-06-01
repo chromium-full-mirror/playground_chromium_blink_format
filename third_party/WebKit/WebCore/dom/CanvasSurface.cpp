@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2010 Google Inc. All rights reserved.
+ * Copyright (C) 2010 Torch Mobile (Beijing) Co. Ltd. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -62,7 +63,9 @@ void CanvasSurface::setSurfaceSize(const IntSize& size) {
   m_imageBuffer.clear();
 }
 
-String CanvasSurface::toDataURL(const String& mimeType, ExceptionCode& ec) {
+String CanvasSurface::toDataURL(const String& mimeType,
+                                double quality,
+                                ExceptionCode& ec) {
   if (!m_originClean) {
     ec = SECURITY_ERR;
     return String();
@@ -79,7 +82,7 @@ String CanvasSurface::toDataURL(const String& mimeType, ExceptionCode& ec) {
       !MIMETypeRegistry::isSupportedImageMIMETypeForEncoding(lowercaseMimeType))
     return buffer()->toDataURL("image/png");
 
-  return buffer()->toDataURL(lowercaseMimeType);
+  return buffer()->toDataURL(lowercaseMimeType, quality);
 }
 
 void CanvasSurface::willDraw(const FloatRect&) {
