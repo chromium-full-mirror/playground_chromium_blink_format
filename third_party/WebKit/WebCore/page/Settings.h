@@ -385,6 +385,13 @@ class Settings : public Noncopyable {
   void setHTML5ParserEnabled(bool flag) { m_html5ParserEnabled = flag; }
   bool html5ParserEnabled() const { return m_html5ParserEnabled; }
 
+  void setPaginateDuringLayoutEnabled(bool flag) {
+    m_paginateDuringLayoutEnabled = flag;
+  }
+  bool paginateDuringLayoutEnabled() const {
+    return m_paginateDuringLayoutEnabled;
+  }
+
  private:
   Page* m_page;
 
@@ -465,6 +472,7 @@ class Settings : public Noncopyable {
   bool m_loadDeferringEnabled : 1;
   bool m_tiledBackingStoreEnabled : 1;
   bool m_html5ParserEnabled : 1;
+  bool m_paginateDuringLayoutEnabled : 1;
 
 #if USE(SAFARI_THEME)
   static bool gShouldPaintNativeControls;

@@ -142,7 +142,8 @@ Settings::Settings(Page* page)
       m_webGLEnabled(false),
       m_loadDeferringEnabled(true),
       m_tiledBackingStoreEnabled(false),
-      m_html5ParserEnabled(false) {
+      m_html5ParserEnabled(false),
+      m_paginateDuringLayoutEnabled(false) {
   // A Frame may not have been created yet, so we initialize the AtomicString
   // hash before trying to use it.
   AtomicString::init();
