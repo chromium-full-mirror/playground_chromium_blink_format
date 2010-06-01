@@ -51,6 +51,26 @@ class Identifier;
 class ScopeChain;
 class ScopeNode;
 
+class CallArguments {
+ public:
+  CallArguments(BytecodeGenerator& generator, ArgumentsNode* argumentsNode);
+
+  RegisterID* thisRegister() { return m_argv[0].get(); }
+  RegisterID* argumentRegister(unsigned i) { return m_argv[i + 1].get(); }
+  unsigned callFrame() {
+    return thisRegister()->index() + count() +
+           RegisterFile::CallFrameHeaderSize;
+  }
+  unsigned count() { return m_argv.size(); }
+  RegisterID* profileHookRegister() { return m_profileHookRegister.get(); }
+  ArgumentsNode* argumentsNode() { return m_argumentsNode; }
+
+ private:
+  RefPtr<RegisterID> m_profileHookRegister;
+  ArgumentsNode* m_argumentsNode;
+  Vector<RefPtr<RegisterID>, 16> m_argv;
+};
+
 struct FinallyContext {
   Label* finallyAddr;
   RegisterID* retAddrDst;
@@ -396,15 +416,13 @@ class BytecodeGenerator : public FastAllocBase {
 
   RegisterID* emitCall(RegisterID* dst,
                        RegisterID* func,
-                       RegisterID* thisRegister,
-                       ArgumentsNode*,
+                       CallArguments&,
                        unsigned divot,
                        unsigned startOffset,
                        unsigned endOffset);
   RegisterID* emitCallEval(RegisterID* dst,
                            RegisterID* func,
-                           RegisterID* thisRegister,
-                           ArgumentsNode*,
+                           CallArguments&,
                            unsigned divot,
                            unsigned startOffset,
                            unsigned endOffset);
@@ -422,7 +440,7 @@ class BytecodeGenerator : public FastAllocBase {
 
   RegisterID* emitConstruct(RegisterID* dst,
                             RegisterID* func,
-                            ArgumentsNode*,
+                            CallArguments&,
                             unsigned divot,
                             unsigned startOffset,
                             unsigned endOffset);
@@ -498,6 +516,8 @@ class BytecodeGenerator : public FastAllocBase {
     m_codeBlockBeingRegeneratedFrom = originalCodeBlock;
   }
 
+  bool shouldEmitProfileHooks() { return m_shouldEmitProfileHooks; }
+
  private:
   void emitOpcode(OpcodeID);
   void retrieveLastBinaryOp(int& dstIndex, int& src1Index, int& src2Index);
@@ -537,8 +557,7 @@ class BytecodeGenerator : public FastAllocBase {
   RegisterID* emitCall(OpcodeID,
                        RegisterID* dst,
                        RegisterID* func,
-                       RegisterID* thisRegister,
-                       ArgumentsNode*,
+                       CallArguments&,
                        unsigned divot,
                        unsigned startOffset,
                        unsigned endOffset);
@@ -573,7 +592,7 @@ class BytecodeGenerator : public FastAllocBase {
   // RegisterID was re-used.
   bool addGlobalVar(const Identifier&, bool isConstant, RegisterID*&);
 
-  RegisterID* addParameter(const Identifier&);
+  void addParameter(const Identifier&, int parameterIndex);
 
   void preserveLastVar();
 
@@ -655,7 +674,6 @@ class BytecodeGenerator : public FastAllocBase {
   Vector<ForInContext> m_forInContextStack;
 
   int m_nextGlobalIndex;
-  int m_nextParameterIndex;
   int m_firstConstantIndex;
   int m_nextConstantOffset;
   unsigned m_globalConstantIndex;

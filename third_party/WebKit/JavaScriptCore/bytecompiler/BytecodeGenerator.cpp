@@ -405,17 +405,16 @@ BytecodeGenerator::BytecodeGenerator(FunctionBodyNode* functionBody,
 
   FunctionParameters& parameters = *functionBody->parameters();
   size_t parameterCount = parameters.size();
-  m_nextParameterIndex =
+  int nextParameterIndex =
       -RegisterFile::CallFrameHeaderSize - parameterCount - 1;
   m_parameters.grow(1 + parameterCount);  // reserve space for "this"
 
   // Add "this" as a parameter
-  m_thisRegister.setIndex(m_nextParameterIndex);
-  ++m_nextParameterIndex;
+  m_thisRegister.setIndex(nextParameterIndex);
   ++m_codeBlock->m_numParameters;
 
   for (size_t i = 0; i < parameterCount; ++i)
-    addParameter(parameters[i]);
+    addParameter(parameters[i], ++nextParameterIndex);
 
   preserveLastVar();
 
@@ -485,23 +484,20 @@ BytecodeGenerator::BytecodeGenerator(EvalNode* evalNode,
   preserveLastVar();
 }
 
-RegisterID* BytecodeGenerator::addParameter(const Identifier& ident) {
+void BytecodeGenerator::addParameter(const Identifier& ident,
+                                     int parameterIndex) {
   // Parameters overwrite var declarations, but not function declarations.
-  RegisterID* result = 0;
   UString::Rep* rep = ident.ustring().rep();
   if (!m_functions.contains(rep)) {
-    symbolTable().set(rep, m_nextParameterIndex);
-    RegisterID& parameter = registerFor(m_nextParameterIndex);
-    parameter.setIndex(m_nextParameterIndex);
-    result = &parameter;
+    symbolTable().set(rep, parameterIndex);
+    RegisterID& parameter = registerFor(parameterIndex);
+    parameter.setIndex(parameterIndex);
   }
 
   // To maintain the calling convention, we have to allocate unique space for
   // each parameter, even if the parameter doesn't make it into the symbol
   // table.
-  ++m_nextParameterIndex;
   ++m_codeBlock->m_numParameters;
-  return result;
 }
 
 RegisterID* BytecodeGenerator::registerFor(const Identifier& ident) {
@@ -1511,13 +1507,12 @@ RegisterID* BytecodeGenerator::emitNewFunctionExpression(RegisterID* r0,
 
 RegisterID* BytecodeGenerator::emitCall(RegisterID* dst,
                                         RegisterID* func,
-                                        RegisterID* thisRegister,
-                                        ArgumentsNode* argumentsNode,
+                                        CallArguments& callArguments,
                                         unsigned divot,
                                         unsigned startOffset,
                                         unsigned endOffset) {
-  return emitCall(op_call, dst, func, thisRegister, argumentsNode, divot,
-                  startOffset, endOffset);
+  return emitCall(op_call, dst, func, callArguments, divot, startOffset,
+                  endOffset);
 }
 
 void BytecodeGenerator::createArgumentsIfNecessary() {
@@ -1531,52 +1526,32 @@ void BytecodeGenerator::createArgumentsIfNecessary() {
 
 RegisterID* BytecodeGenerator::emitCallEval(RegisterID* dst,
                                             RegisterID* func,
-                                            RegisterID* thisRegister,
-                                            ArgumentsNode* argumentsNode,
+                                            CallArguments& callArguments,
                                             unsigned divot,
                                             unsigned startOffset,
                                             unsigned endOffset) {
-  return emitCall(op_call_eval, dst, func, thisRegister, argumentsNode, divot,
-                  startOffset, endOffset);
+  return emitCall(op_call_eval, dst, func, callArguments, divot, startOffset,
+                  endOffset);
 }
 
 RegisterID* BytecodeGenerator::emitCall(OpcodeID opcodeID,
                                         RegisterID* dst,
                                         RegisterID* func,
-                                        RegisterID* thisRegister,
-                                        ArgumentsNode* argumentsNode,
+                                        CallArguments& callArguments,
                                         unsigned divot,
                                         unsigned startOffset,
                                         unsigned endOffset) {
   ASSERT(opcodeID == op_call || opcodeID == op_call_eval);
   ASSERT(func->refCount());
-  ASSERT(thisRegister->refCount());
 
-  RegisterID* originalFunc = func;
-  if (m_shouldEmitProfileHooks) {
-    // If codegen decided to recycle func as this call's destination register,
-    // we need to undo that optimization here so that func will still be around
-    // for the sake of op_profile_did_call.
-    if (dst == func) {
-      RefPtr<RegisterID> movedThisRegister =
-          emitMove(newTemporary(), thisRegister);
-      RefPtr<RegisterID> movedFunc = emitMove(thisRegister, func);
-
-      thisRegister = movedThisRegister.release().releaseRef();
-      func = movedFunc.release().releaseRef();
-    }
-  }
+  if (m_shouldEmitProfileHooks)
+    emitMove(callArguments.profileHookRegister(), func);
 
   // Generate code for arguments.
-  Vector<RefPtr<RegisterID>, 16> argv;
-  argv.append(thisRegister);
-  for (ArgumentListNode* n = argumentsNode->m_listNode; n; n = n->m_next) {
-    argv.append(newTemporary());
-    // op_call requires the arguments to be a sequential range of registers
-    ASSERT(argv[argv.size() - 1]->index() ==
-           argv[argv.size() - 2]->index() + 1);
-    emitNode(argv.last().get(), n);
-  }
+  unsigned argumentIndex = 0;
+  for (ArgumentListNode* n = callArguments.argumentsNode()->m_listNode; n;
+       n = n->m_next)
+    emitNode(callArguments.argumentRegister(argumentIndex++), n);
 
   // Reserve space for call frame.
   Vector<RefPtr<RegisterID>, RegisterFile::CallFrameHeaderSize> callFrame;
@@ -1585,10 +1560,11 @@ RegisterID* BytecodeGenerator::emitCall(OpcodeID opcodeID,
 
   if (m_shouldEmitProfileHooks) {
     emitOpcode(op_profile_will_call);
-    instructions().append(func->index());
+    instructions().append(callArguments.profileHookRegister()->index());
 
 #if ENABLE(JIT)
-    m_codeBlock->addFunctionRegisterInfo(instructions().size(), func->index());
+    m_codeBlock->addFunctionRegisterInfo(
+        instructions().size(), callArguments.profileHookRegister()->index());
 #endif
   }
 
@@ -1600,10 +1576,9 @@ RegisterID* BytecodeGenerator::emitCall(OpcodeID opcodeID,
 
   // Emit call.
   emitOpcode(opcodeID);
-  instructions().append(func->index());  // func
-  instructions().append(argv.size());    // argCount
-  instructions().append(argv[0]->index() + argv.size() +
-                        RegisterFile::CallFrameHeaderSize);  // registerOffset
+  instructions().append(func->index());              // func
+  instructions().append(callArguments.count());      // argCount
+  instructions().append(callArguments.callFrame());  // registerOffset
   if (dst != ignoredResult()) {
     emitOpcode(op_call_put_result);
     instructions().append(dst->index());  // dst
@@ -1611,12 +1586,7 @@ RegisterID* BytecodeGenerator::emitCall(OpcodeID opcodeID,
 
   if (m_shouldEmitProfileHooks) {
     emitOpcode(op_profile_did_call);
-    instructions().append(func->index());
-
-    if (dst == originalFunc) {
-      thisRegister->deref();
-      func->deref();
-    }
+    instructions().append(callArguments.profileHookRegister()->index());
   }
 
   return dst;
@@ -1705,38 +1675,25 @@ RegisterID* BytecodeGenerator::emitUnaryNoDstOp(OpcodeID opcodeID,
 
 RegisterID* BytecodeGenerator::emitConstruct(RegisterID* dst,
                                              RegisterID* func,
-                                             ArgumentsNode* argumentsNode,
+                                             CallArguments& callArguments,
                                              unsigned divot,
                                              unsigned startOffset,
                                              unsigned endOffset) {
   ASSERT(func->refCount());
 
-  RegisterID* originalFunc = func;
-  if (m_shouldEmitProfileHooks) {
-    // If codegen decided to recycle func as this call's destination register,
-    // we need to undo that optimization here so that func will still be around
-    // for the sake of op_profile_did_call.
-    if (dst == func) {
-      RefPtr<RegisterID> movedFunc = emitMove(newTemporary(), func);
-      func = movedFunc.release().releaseRef();
-    }
-  }
+  if (m_shouldEmitProfileHooks)
+    emitMove(callArguments.profileHookRegister(), func);
 
   // Generate code for arguments.
-  Vector<RefPtr<RegisterID>, 16> argv;
-  argv.append(newTemporary());  // reserve space for "this"
-  for (ArgumentListNode* n = argumentsNode ? argumentsNode->m_listNode : 0; n;
-       n = n->m_next) {
-    argv.append(newTemporary());
-    // op_construct requires the arguments to be a sequential range of registers
-    ASSERT(argv[argv.size() - 1]->index() ==
-           argv[argv.size() - 2]->index() + 1);
-    emitNode(argv.last().get(), n);
+  unsigned argumentIndex = 0;
+  if (ArgumentsNode* argumentsNode = callArguments.argumentsNode()) {
+    for (ArgumentListNode* n = argumentsNode->m_listNode; n; n = n->m_next)
+      emitNode(callArguments.argumentRegister(argumentIndex++), n);
   }
 
   if (m_shouldEmitProfileHooks) {
     emitOpcode(op_profile_will_call);
-    instructions().append(func->index());
+    instructions().append(callArguments.profileHookRegister()->index());
   }
 
   // Reserve space for call frame.
@@ -1751,10 +1708,9 @@ RegisterID* BytecodeGenerator::emitConstruct(RegisterID* dst,
 #endif
 
   emitOpcode(op_construct);
-  instructions().append(func->index());  // func
-  instructions().append(argv.size());    // argCount
-  instructions().append(argv[0]->index() + argv.size() +
-                        RegisterFile::CallFrameHeaderSize);  // registerOffset
+  instructions().append(func->index());              // func
+  instructions().append(callArguments.count());      // argCount
+  instructions().append(callArguments.callFrame());  // registerOffset
   if (dst != ignoredResult()) {
     emitOpcode(op_call_put_result);
     instructions().append(dst->index());  // dst
@@ -1762,10 +1718,7 @@ RegisterID* BytecodeGenerator::emitConstruct(RegisterID* dst,
 
   if (m_shouldEmitProfileHooks) {
     emitOpcode(op_profile_did_call);
-    instructions().append(func->index());
-
-    if (dst == originalFunc)
-      func->deref();
+    instructions().append(callArguments.profileHookRegister()->index());
   }
 
   return dst;
