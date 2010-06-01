@@ -45,28 +45,27 @@
 #include <gdk/gdkkeysyms.h>
 #include <string.h>
 
-// TODO: Currently drag and drop related code is left out and
-// should be merged once we have drag and drop support in WebCore.
+// FIXME: Implement support for synthesizing drop events.
 
 extern "C" {
 extern void webkit_web_frame_layout(WebKitWebFrame* frame);
 }
 
-static bool down = false;
-static bool currentEventButton = 1;
-static bool dragMode = true;
-static bool replayingSavedEvents = false;
+static bool dragMode;
+static int timeOffset = 0;
+
 static int lastMousePositionX;
 static int lastMousePositionY;
-
 static int lastClickPositionX;
 static int lastClickPositionY;
-static int clickCount = 0;
+static int lastClickTimeOffset;
+static int lastClickButton;
+static int buttonCurrentlyDown;
+static int clickCount;
 
 struct DelayedMessage {
   GdkEvent event;
   gulong delay;
-  gboolean isDragEvent;
 };
 
 static DelayedMessage msgQueue[1024];
@@ -83,6 +82,10 @@ enum KeyLocationCode {
   DOM_KEY_LOCATION_RIGHT = 0x02,
   DOM_KEY_LOCATION_NUMPAD = 0x03
 };
+
+static void sendOrQueueEvent(GdkEvent event);
+static void dispatchEvent(GdkEvent event);
+static guint getStateFlags();
 
 static JSValueRef getDragModeCallback(JSContextRef context,
                                       JSObjectRef object,
@@ -106,7 +109,13 @@ static JSValueRef leapForwardCallback(JSContextRef context,
                                       size_t argumentCount,
                                       const JSValueRef arguments[],
                                       JSValueRef* exception) {
-  // FIXME: Add proper support for forward leaps
+  if (argumentCount > 0) {
+    msgQueue[endOfQueue].delay =
+        JSValueToNumber(context, arguments[0], exception);
+    timeOffset += msgQueue[endOfQueue].delay;
+    ASSERT(!exception || !*exception);
+  }
+
   return JSValueMakeUndefined(context);
 }
 
@@ -116,8 +125,6 @@ static JSValueRef contextClickCallback(JSContextRef context,
                                        size_t argumentCount,
                                        const JSValueRef arguments[],
                                        JSValueRef* exception) {
-  webkit_web_frame_layout(mainFrame);
-
   WebKitWebView* view = webkit_web_frame_get_web_view(mainFrame);
   if (!view)
     return JSValueMakeUndefined(context);
@@ -129,23 +136,18 @@ static JSValueRef contextClickCallback(JSContextRef context,
   event.button.y = lastMousePositionY;
   event.button.window = GTK_WIDGET(view)->window;
 
-  gboolean return_val;
-  down = true;
   event.type = GDK_BUTTON_PRESS;
-  g_signal_emit_by_name(view, "button_press_event", &event, &return_val);
-
-  down = false;
+  sendOrQueueEvent(event);
   event.type = GDK_BUTTON_RELEASE;
-  g_signal_emit_by_name(view, "button_release_event", &event, &return_val);
+  sendOrQueueEvent(event);
 
   return JSValueMakeUndefined(context);
 }
 
 static void updateClickCount(int button) {
-  // FIXME: take the last clicked button number and the time of last click into
-  // account.
   if (lastClickPositionX != lastMousePositionX ||
-      lastClickPositionY != lastMousePositionY || currentEventButton != button)
+      lastClickPositionY != lastMousePositionY || lastClickButton != button ||
+      timeOffset - lastClickTimeOffset >= 1)
     clickCount = 1;
   else
     clickCount++;
@@ -176,26 +178,26 @@ static JSValueRef mouseDownCallback(JSContextRef context,
   if (!view)
     return JSValueMakeUndefined(context);
 
-  down = true;
-
   GdkEvent event;
   memset(&event, 0, sizeof(event));
-  event.type = GDK_BUTTON_PRESS;
   event.button.button = 1;
 
   if (argumentCount == 1) {
     event.button.button =
-        (int)JSValueToNumber(context, arguments[0], exception) + 1;
+        (int)(JSValueToNumber(context, arguments[0], exception)) + 1;
     g_return_val_if_fail((!exception || !*exception),
                          JSValueMakeUndefined(context));
   }
 
-  currentEventButton = event.button.button;
-
   event.button.x = lastMousePositionX;
   event.button.y = lastMousePositionY;
   event.button.window = GTK_WIDGET(view)->window;
-  event.button.time = GDK_CURRENT_TIME;
+
+  // Mouse up & down events dispatched via g_signal_emit_by_name must offset
+  // their time value, so that WebKit can detect where sequences of mouse
+  // clicks begin and end. This should not interfere with GDK or GTK+ event
+  // processing, because the event is only seen by the widget.
+  event.motion.time = GDK_CURRENT_TIME + timeOffset;
   event.button.device = gdk_device_get_core_pointer();
 
   int x_root, y_root;
@@ -205,45 +207,30 @@ static JSValueRef mouseDownCallback(JSContextRef context,
 #else
   getRootCoords(GTK_WIDGET(view), &x_root, &y_root);
 #endif
-
   event.button.x_root = x_root;
   event.button.y_root = y_root;
 
+  event.type = GDK_BUTTON_PRESS;
+  sendOrQueueEvent(event);
+
   updateClickCount(event.button.button);
-
-  if (!msgQueue[endOfQueue].delay) {
-    webkit_web_frame_layout(mainFrame);
-
-    gboolean return_val;
-    g_signal_emit_by_name(view, "button_press_event", &event, &return_val);
-    if (clickCount == 2) {
-      event.type = GDK_2BUTTON_PRESS;
-      g_signal_emit_by_name(view, "button_press_event", &event, &return_val);
-    }
-  } else {
-    // replaySavedEvents should have the required logic to make leapForward
-    // delays work
-    msgQueue[endOfQueue++].event = event;
-    replaySavedEvents();
+  if (clickCount == 2) {
+    event.type = GDK_2BUTTON_PRESS;
+    sendOrQueueEvent(event);
   }
 
+  buttonCurrentlyDown = event.button.button;
   return JSValueMakeUndefined(context);
 }
 
 static guint getStateFlags() {
-  guint state = 0;
-
-  if (down) {
-    if (currentEventButton == 1)
-      state = GDK_BUTTON1_MASK;
-    else if (currentEventButton == 2)
-      state = GDK_BUTTON2_MASK;
-    else if (currentEventButton == 3)
-      state = GDK_BUTTON3_MASK;
-  } else
-    state = 0;
-
-  return state;
+  if (buttonCurrentlyDown == 1)
+    return GDK_BUTTON1_MASK;
+  if (buttonCurrentlyDown == 2)
+    return GDK_BUTTON2_MASK;
+  if (buttonCurrentlyDown == 3)
+    return GDK_BUTTON3_MASK;
+  return 0;
 }
 
 static JSValueRef mouseUpCallback(JSContextRef context,
@@ -258,7 +245,6 @@ static JSValueRef mouseUpCallback(JSContextRef context,
 
   GdkEvent event;
   memset(&event, 0, sizeof(event));
-  event.type = GDK_BUTTON_RELEASE;
   event.button.button = 1;
 
   if (argumentCount == 1) {
@@ -268,16 +254,17 @@ static JSValueRef mouseUpCallback(JSContextRef context,
                          JSValueMakeUndefined(context));
   }
 
-  currentEventButton = event.button.button;
-
   event.button.x = lastMousePositionX;
   event.button.y = lastMousePositionY;
   event.button.window = GTK_WIDGET(view)->window;
-  event.button.time = GDK_CURRENT_TIME;
+
+  // Mouse up & down events dispatched via g_signal_emit_by_name must offset
+  // their time value, so that WebKit can detect where sequences of mouse
+  // clicks begin and end. This should not interfere with GDK or GTK+ event
+  // processing, because the event is only seen by the widget.
+  event.button.time = GDK_CURRENT_TIME + timeOffset;
   event.button.device = gdk_device_get_core_pointer();
   event.button.state = getStateFlags();
-
-  down = false;
 
   int x_root, y_root;
 #if GTK_CHECK_VERSION(2, 17, 3)
@@ -290,20 +277,14 @@ static JSValueRef mouseUpCallback(JSContextRef context,
   event.button.x_root = x_root;
   event.button.y_root = y_root;
 
-  if ((dragMode && !replayingSavedEvents) || msgQueue[endOfQueue].delay) {
-    msgQueue[endOfQueue].event = event;
-    msgQueue[endOfQueue++].isDragEvent = true;
-    replaySavedEvents();
-  } else {
-    webkit_web_frame_layout(mainFrame);
-
-    gboolean return_val;
-    g_signal_emit_by_name(view, "button_release_event", &event, &return_val);
-  }
-
   lastClickPositionX = lastMousePositionX;
   lastClickPositionY = lastMousePositionY;
+  lastClickButton = buttonCurrentlyDown;
+  lastClickTimeOffset = timeOffset;
+  buttonCurrentlyDown = 0;
 
+  event.type = GDK_BUTTON_RELEASE;
+  sendOrQueueEvent(event);
   return JSValueMakeUndefined(context);
 }
 
@@ -332,6 +313,7 @@ static JSValueRef mouseMoveToCallback(JSContextRef context,
   event.type = GDK_MOTION_NOTIFY;
   event.motion.x = lastMousePositionX;
   event.motion.y = lastMousePositionY;
+
   event.motion.time = GDK_CURRENT_TIME;
   event.motion.window = GTK_WIDGET(view)->window;
   event.motion.device = gdk_device_get_core_pointer();
@@ -343,22 +325,12 @@ static JSValueRef mouseMoveToCallback(JSContextRef context,
 #else
   getRootCoords(GTK_WIDGET(view), &x_root, &y_root);
 #endif
-
   event.motion.x_root = x_root;
   event.motion.y_root = y_root;
 
   event.motion.state = getStateFlags();
 
-  if (dragMode && down && !replayingSavedEvents) {
-    msgQueue[endOfQueue].event = event;
-    msgQueue[endOfQueue++].isDragEvent = true;
-  } else {
-    webkit_web_frame_layout(mainFrame);
-
-    gboolean return_val;
-    g_signal_emit_by_name(view, "motion_notify_event", &event, &return_val);
-  }
-
+  sendOrQueueEvent(event);
   return JSValueMakeUndefined(context);
 }
 
@@ -404,14 +376,7 @@ static JSValueRef mouseWheelToCallback(JSContextRef context,
   else
     g_assert_not_reached();
 
-  if (dragMode && down && !replayingSavedEvents) {
-    msgQueue[endOfQueue].event = event;
-    msgQueue[endOfQueue++].isDragEvent = true;
-  } else {
-    webkit_web_frame_layout(mainFrame);
-    gtk_main_do_event(&event);
-  }
-
+  sendOrQueueEvent(event);
   return JSValueMakeUndefined(context);
 }
 
@@ -429,49 +394,51 @@ static JSValueRef beginDragWithFilesCallback(JSContextRef context,
   return JSValueMakeUndefined(context);
 }
 
-void replaySavedEvents() {
-  // FIXME: This doesn't deal with forward leaps, but it should.
+static void sendOrQueueEvent(GdkEvent event) {
+  // Mouse move events are queued if the previous event was queued or if a
+  // delay was set up by leapForward().
+  if (endOfQueue != startOfQueue || msgQueue[endOfQueue].delay) {
+    msgQueue[endOfQueue++].event = event;
+    replaySavedEvents();
+    return;
+  }
 
+  dispatchEvent(event);
+}
+
+static void dispatchEvent(GdkEvent event) {
+  webkit_web_frame_layout(mainFrame);
   WebKitWebView* view = webkit_web_frame_get_web_view(mainFrame);
   if (!view)
     return;
 
-  replayingSavedEvents = true;
+  gboolean returnValue;
+  if (event.type == GDK_BUTTON_PRESS || event.type == GDK_2BUTTON_PRESS)
+    g_signal_emit_by_name(view, "button_press_event", &event, &returnValue);
+  else if (event.type == GDK_BUTTON_RELEASE)
+    g_signal_emit_by_name(view, "button_release_event", &event, &returnValue);
+  else if (event.type == GDK_MOTION_NOTIFY)
+    g_signal_emit_by_name(view, "motion_notify_event", &event, &returnValue);
+  else if (event.type == GDK_SCROLL)
+    gtk_main_do_event(&event);
+}
 
-  for (unsigned queuePos = 0; queuePos < endOfQueue; queuePos++) {
-    GdkEvent event = msgQueue[queuePos].event;
-    gboolean return_val;
+void replaySavedEvents() {
+  // FIXME: Eventually we may need to have more sophisticated logic to
+  // track drag-and-drop operations.
 
-    switch (event.type) {
-      case GDK_BUTTON_RELEASE:
-        g_signal_emit_by_name(view, "button_release_event", &event,
-                              &return_val);
-        break;
-      case GDK_BUTTON_PRESS:
-        g_signal_emit_by_name(view, "button_press_event", &event, &return_val);
-        break;
-      case GDK_MOTION_NOTIFY:
-        g_signal_emit_by_name(view, "motion_notify_event", &event, &return_val);
-        break;
-      default:
-        continue;
+  // First send all the events that are ready to be sent
+  while (startOfQueue < endOfQueue) {
+    if (msgQueue[startOfQueue].delay) {
+      g_usleep(msgQueue[startOfQueue].delay * 1000);
+      msgQueue[startOfQueue].delay = 0;
     }
 
-    startOfQueue++;
-  }
-
-  int numQueuedMessages = endOfQueue - startOfQueue;
-  if (!numQueuedMessages) {
-    startOfQueue = 0;
-    endOfQueue = 0;
-    replayingSavedEvents = false;
-    return;
+    dispatchEvent(msgQueue[startOfQueue++].event);
   }
 
   startOfQueue = 0;
   endOfQueue = 0;
-
-  replayingSavedEvents = false;
 }
 
 static JSValueRef keyDownCallback(JSContextRef context,
@@ -743,16 +710,23 @@ static JSClassRef getClass(JSContextRef context) {
   return eventSenderClass;
 }
 
-JSObjectRef makeEventSender(JSContextRef context) {
-  down = false;
-  dragMode = true;
-  lastMousePositionX = lastMousePositionY = 0;
-  lastClickPositionX = lastClickPositionY = 0;
+JSObjectRef makeEventSender(JSContextRef context, bool isTopFrame) {
+  if (isTopFrame) {
+    dragMode = true;
 
-  if (!replayingSavedEvents) {
-    // This function can be called in the middle of a test, even
-    // while replaying saved events. Resetting these while doing that
-    // can break things.
+    // Fly forward in time one second when the main frame loads. This will
+    // ensure that when a test begins clicking in the same location as
+    // a previous test, those clicks won't be interpreted as continuations
+    // of the previous test's click sequences.
+    timeOffset += 1000;
+
+    lastMousePositionX = lastMousePositionY = 0;
+    lastClickPositionX = lastClickPositionY = 0;
+    lastClickTimeOffset = 0;
+    lastClickButton = 0;
+    buttonCurrentlyDown = 0;
+    clickCount = 0;
+
     endOfQueue = 0;
     startOfQueue = 0;
   }
