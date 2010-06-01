@@ -315,30 +315,30 @@ bool EditorClientEfl::handleEditingKeyboardEvent(KeyboardEvent* event) {
     switch (keyEvent->windowsVirtualKeyCode()) {
       case VK_LEFT:
         frame->selection()->modify(
-            keyEvent->shiftKey() ? SelectionController::EXTEND
-                                 : SelectionController::MOVE,
-            SelectionController::LEFT,
+            keyEvent->shiftKey() ? SelectionController::AlterationExtend
+                                 : SelectionController::AlterationMove,
+            SelectionController::DirectionLeft,
             keyEvent->ctrlKey() ? WordGranularity : CharacterGranularity, true);
         return true;
       case VK_RIGHT:
         frame->selection()->modify(
-            keyEvent->shiftKey() ? SelectionController::EXTEND
-                                 : SelectionController::MOVE,
-            SelectionController::RIGHT,
+            keyEvent->shiftKey() ? SelectionController::AlterationExtend
+                                 : SelectionController::AlterationMove,
+            SelectionController::DirectionRight,
             keyEvent->ctrlKey() ? WordGranularity : CharacterGranularity, true);
         return true;
       case VK_UP:
         frame->selection()->modify(
-            keyEvent->shiftKey() ? SelectionController::EXTEND
-                                 : SelectionController::MOVE,
-            SelectionController::BACKWARD,
+            keyEvent->shiftKey() ? SelectionController::AlterationExtend
+                                 : SelectionController::AlterationMove,
+            SelectionController::DirectionBackward,
             keyEvent->ctrlKey() ? ParagraphGranularity : LineGranularity, true);
         return true;
       case VK_DOWN:
         frame->selection()->modify(
-            keyEvent->shiftKey() ? SelectionController::EXTEND
-                                 : SelectionController::MOVE,
-            SelectionController::FORWARD,
+            keyEvent->shiftKey() ? SelectionController::AlterationExtend
+                                 : SelectionController::AlterationMove,
+            SelectionController::DirectionForward,
             keyEvent->ctrlKey() ? ParagraphGranularity : LineGranularity, true);
         return true;
     }

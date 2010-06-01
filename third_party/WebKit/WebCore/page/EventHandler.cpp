@@ -2494,28 +2494,32 @@ void EventHandler::handleKeyboardSelectionMovement(KeyboardEvent* event) {
 
   if (key == "Up") {
     m_frame->selection()->modify(
-        (isShifted) ? SelectionController::EXTEND : SelectionController::MOVE,
-        SelectionController::BACKWARD,
+        (isShifted) ? SelectionController::AlterationExtend
+                    : SelectionController::AlterationMove,
+        SelectionController::DirectionBackward,
         (isCommanded) ? DocumentBoundary : LineGranularity, true);
     event->setDefaultHandled();
   } else if (key == "Down") {
     m_frame->selection()->modify(
-        (isShifted) ? SelectionController::EXTEND : SelectionController::MOVE,
-        SelectionController::FORWARD,
+        (isShifted) ? SelectionController::AlterationExtend
+                    : SelectionController::AlterationMove,
+        SelectionController::DirectionForward,
         (isCommanded) ? DocumentBoundary : LineGranularity, true);
     event->setDefaultHandled();
   } else if (key == "Left") {
     m_frame->selection()->modify(
-        (isShifted) ? SelectionController::EXTEND : SelectionController::MOVE,
-        SelectionController::LEFT,
+        (isShifted) ? SelectionController::AlterationExtend
+                    : SelectionController::AlterationMove,
+        SelectionController::DirectionLeft,
         (isCommanded) ? LineBoundary : (isOptioned) ? WordGranularity
                                                     : CharacterGranularity,
         true);
     event->setDefaultHandled();
   } else if (key == "Right") {
     m_frame->selection()->modify(
-        (isShifted) ? SelectionController::EXTEND : SelectionController::MOVE,
-        SelectionController::RIGHT,
+        (isShifted) ? SelectionController::AlterationExtend
+                    : SelectionController::AlterationMove,
+        SelectionController::DirectionRight,
         (isCommanded) ? LineBoundary : (isOptioned) ? WordGranularity
                                                     : CharacterGranularity,
         true);

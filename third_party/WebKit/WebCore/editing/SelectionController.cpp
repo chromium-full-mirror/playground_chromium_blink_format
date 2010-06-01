@@ -284,7 +284,7 @@ void SelectionController::setIsDirectional(bool isDirectional) {
 
 void SelectionController::willBeModified(EAlteration alter,
                                          EDirection direction) {
-  if (alter != EXTEND)
+  if (alter != AlterationExtend)
     return;
 
   Position start = m_selection.start();
@@ -307,13 +307,13 @@ void SelectionController::willBeModified(EAlteration alter,
     // FIXME: This is probably not correct for right and left when the direction
     // is RTL.
     switch (direction) {
-      case RIGHT:
-      case FORWARD:
+      case DirectionRight:
+      case DirectionForward:
         m_selection.setBase(start);
         m_selection.setExtent(end);
         break;
-      case LEFT:
-      case BACKWARD:
+      case DirectionLeft:
+      case DirectionBackward:
         m_selection.setBase(end);
         m_selection.setExtent(start);
         break;
@@ -706,26 +706,26 @@ bool SelectionController::modify(EAlteration alter,
 
   VisiblePosition position;
   switch (direction) {
-    case RIGHT:
-      if (alter == MOVE)
+    case DirectionRight:
+      if (alter == AlterationMove)
         position = modifyMovingRight(granularity);
       else
         position = modifyExtendingRight(granularity);
       break;
-    case FORWARD:
-      if (alter == EXTEND)
+    case DirectionForward:
+      if (alter == AlterationExtend)
         position = modifyExtendingForward(granularity);
       else
         position = modifyMovingForward(granularity);
       break;
-    case LEFT:
-      if (alter == MOVE)
+    case DirectionLeft:
+      if (alter == AlterationMove)
         position = modifyMovingLeft(granularity);
       else
         position = modifyExtendingLeft(granularity);
       break;
-    case BACKWARD:
-      if (alter == EXTEND)
+    case DirectionBackward:
+      if (alter == AlterationExtend)
         position = modifyExtendingBackward(granularity);
       else
         position = modifyMovingBackward(granularity);
@@ -744,10 +744,10 @@ bool SelectionController::modify(EAlteration alter,
   int x = xPosForVerticalArrowNavigation(START);
 
   switch (alter) {
-    case MOVE:
+    case AlterationMove:
       moveTo(position, userTriggered);
       break;
-    case EXTEND:
+    case AlterationExtend:
       if (!settings || settings->editingBehavior() != EditingMacBehavior ||
           m_selection.isCaret() || !isBoundary(granularity))
         setExtent(position, userTriggered);
@@ -756,7 +756,7 @@ bool SelectionController::modify(EAlteration alter,
         // selection rather
         // than leaving the base in place and moving the extent. Matches
         // NSTextView.
-        if (direction == FORWARD || direction == RIGHT)
+        if (direction == DirectionForward || direction == DirectionRight)
           setEnd(position, userTriggered);
         else
           setStart(position, userTriggered);
@@ -771,7 +771,7 @@ bool SelectionController::modify(EAlteration alter,
 
   setNeedsLayout();
 
-  setIsDirectional(alter == EXTEND);
+  setIsDirectional(alter == AlterationExtend);
 
   return true;
 }
@@ -808,18 +808,18 @@ bool SelectionController::modify(EAlteration alter,
   if (up)
     verticalDistance = -verticalDistance;
 
-  willBeModified(alter, up ? BACKWARD : FORWARD);
+  willBeModified(alter, up ? DirectionBackward : DirectionForward);
 
   VisiblePosition pos;
   int xPos = 0;
   switch (alter) {
-    case MOVE:
+    case AlterationMove:
       pos = VisiblePosition(up ? m_selection.start() : m_selection.end(),
                             m_selection.affinity());
       xPos = xPosForVerticalArrowNavigation(up ? START : END);
       m_selection.setAffinity(up ? UPSTREAM : DOWNSTREAM);
       break;
-    case EXTEND:
+    case AlterationExtend:
       pos = VisiblePosition(m_selection.extent(), m_selection.affinity());
       xPos = xPosForVerticalArrowNavigation(EXTENT);
       m_selection.setAffinity(DOWNSTREAM);
@@ -856,10 +856,10 @@ bool SelectionController::modify(EAlteration alter,
     return false;
 
   switch (alter) {
-    case MOVE:
+    case AlterationMove:
       moveTo(result, userTriggered, align);
       break;
-    case EXTEND:
+    case AlterationExtend:
       setExtent(result, userTriggered);
       break;
   }
@@ -867,7 +867,7 @@ bool SelectionController::modify(EAlteration alter,
   if (userTriggered)
     m_granularity = CharacterGranularity;
 
-  setIsDirectional(alter == EXTEND);
+  setIsDirectional(alter == AlterationExtend);
 
   return true;
 }

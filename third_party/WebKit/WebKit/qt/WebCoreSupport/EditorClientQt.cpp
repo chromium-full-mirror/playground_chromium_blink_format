@@ -366,11 +366,13 @@ void EditorClientQt::handleKeyboardEvent(KeyboardEvent* event) {
       switch (kevent->windowsVirtualKeyCode()) {
         case VK_BACK:
           frame->editor()->deleteWithDirection(
-              SelectionController::BACKWARD, CharacterGranularity, false, true);
+              SelectionController::DirectionBackward, CharacterGranularity,
+              false, true);
           break;
         case VK_DELETE:
           frame->editor()->deleteWithDirection(
-              SelectionController::FORWARD, CharacterGranularity, false, true);
+              SelectionController::DirectionForward, CharacterGranularity,
+              false, true);
           break;
         case VK_LEFT:
           if (kevent->shiftKey())
