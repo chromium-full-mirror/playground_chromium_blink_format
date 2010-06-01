@@ -343,6 +343,10 @@ class RenderBlock : public RenderBox {
     m_lineBoxes.dirtyLinesFromChangedChild(this, child);
   }
 
+  void addChildToContinuation(RenderObject* newChild,
+                              RenderObject* beforeChild);
+  void addChildIgnoringContinuation(RenderObject* newChild,
+                                    RenderObject* beforeChild);
   void addChildToAnonymousColumnBlocks(RenderObject* newChild,
                                        RenderObject* beforeChild);
   virtual void addChildIgnoringAnonymousColumnBlocks(
@@ -616,6 +620,19 @@ class RenderBlock : public RenderBox {
   void updateScrollInfoAfterLayout();
 
   RenderObject* splitAnonymousBlocksAroundChild(RenderObject* beforeChild);
+  void splitBlocks(RenderBlock* fromBlock,
+                   RenderBlock* toBlock,
+                   RenderBlock* middleBlock,
+                   RenderObject* beforeChild,
+                   RenderBoxModelObject* oldCont);
+  void splitFlow(RenderObject* beforeChild,
+                 RenderBlock* newBlockBox,
+                 RenderObject* newChild,
+                 RenderBoxModelObject* oldCont);
+  RenderBlock* clone() const;
+  RenderBlock* continuationBefore(RenderObject* beforeChild);
+  RenderBlock* containingColumnsBlock(bool allowAnonymousColumnBlock = true);
+  RenderBlock* columnsBlockForSpanningElement(RenderObject* newChild);
 
   struct FloatingObject : Noncopyable {
     enum Type { FloatLeft, FloatRight };
