@@ -3807,23 +3807,6 @@ void webkit_web_view_set_full_content_zoom(WebKitWebView* webView,
 }
 
 /**
- * webkit_get_default_session:
- *
- * Retrieves the default #SoupSession used by all web views.
- * Note that the session features are added by WebKit on demand,
- * so if you insert your own #SoupCookieJar before any network
- * traffic occurs, WebKit will use it instead of the default.
- *
- * Return value: the default #SoupSession
- *
- * Since: 1.1.1
- */
-SoupSession* webkit_get_default_session() {
-  webkit_init();
-  return ResourceHandle::defaultSession();
-}
-
-/**
  * webkit_web_view_get_load_status:
  * @web_view: a #WebKitWebView
  *
@@ -4209,6 +4192,54 @@ G_CONST_RETURN gchar* webkit_web_view_get_icon_uri(WebKitWebView* webView) {
 }
 
 /**
+ * webkit_web_view_get_dom_document:
+ * @webView: a #WebKitWebView
+ *
+ * Returns: the #WebKitDOMDocument currently loaded in the @webView
+ *
+ * Since: 1.3.1
+ **/
+WebKitDOMDocument* webkit_web_view_get_dom_document(WebKitWebView* webView) {
+  g_return_val_if_fail(WEBKIT_IS_WEB_VIEW(webView), 0);
+
+  Frame* coreFrame = core(webView)->mainFrame();
+  if (!coreFrame)
+    return 0;
+
+  Document* doc = coreFrame->document();
+  if (!doc)
+    return 0;
+
+  return static_cast<WebKitDOMDocument*>(kit(doc));
+}
+
+/**
+ * SECTION:webkit
+ * @short_description: Global functions controlling WebKit
+ *
+ * WebKit manages many resources which are not related to specific
+ * views. These functions relate to cross-view limits, such as cache
+ * sizes, database quotas, and the HTTP session management.
+ */
+
+/**
+ * webkit_get_default_session:
+ *
+ * Retrieves the default #SoupSession used by all web views.
+ * Note that the session features are added by WebKit on demand,
+ * so if you insert your own #SoupCookieJar before any network
+ * traffic occurs, WebKit will use it instead of the default.
+ *
+ * Return value: the default #SoupSession
+ *
+ * Since: 1.1.1
+ */
+SoupSession* webkit_get_default_session() {
+  webkit_init();
+  return ResourceHandle::defaultSession();
+}
+
+/**
  * webkit_set_cache_model:
  * @cache_model: a #WebKitCacheModel
  *
@@ -4286,26 +4317,4 @@ void webkit_set_cache_model(WebKitCacheModel model) {
 WebKitCacheModel webkit_get_cache_model() {
   webkit_init();
   return cacheModel;
-}
-
-/**
- * webkit_web_view_get_dom_document:
- * @webView: a #WebKitWebView
- *
- * Returns: the #WebKitDOMDocument currently loaded in the @webView
- *
- * Since: 1.3.1
- **/
-WebKitDOMDocument* webkit_web_view_get_dom_document(WebKitWebView* webView) {
-  g_return_val_if_fail(WEBKIT_IS_WEB_VIEW(webView), 0);
-
-  Frame* coreFrame = core(webView)->mainFrame();
-  if (!coreFrame)
-    return 0;
-
-  Document* doc = coreFrame->document();
-  if (!doc)
-    return 0;
-
-  return static_cast<WebKitDOMDocument*>(kit(doc));
 }
