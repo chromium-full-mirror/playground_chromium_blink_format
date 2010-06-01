@@ -45,6 +45,10 @@ void DatabaseAuthorizer::reset() {
   m_readOnly = false;
 }
 
+void DatabaseAuthorizer::resetDeletes() {
+  m_hadDeletes = false;
+}
+
 void DatabaseAuthorizer::addWhitelistedFunctions() {
   // SQLite functions used to help implement some operations
   // ALTER TABLE helpers
@@ -130,7 +134,7 @@ int DatabaseAuthorizer::dropTable(const String& tableName) {
   if (m_readOnly && m_securityEnabled)
     return SQLAuthDeny;
 
-  return denyBasedOnTableName(tableName);
+  return updateDeletesBasedOnTableName(tableName);
 }
 
 int DatabaseAuthorizer::dropTempTable(const String& tableName) {
@@ -140,7 +144,7 @@ int DatabaseAuthorizer::dropTempTable(const String& tableName) {
   if (m_readOnly && m_securityEnabled)
     return SQLAuthDeny;
 
-  return denyBasedOnTableName(tableName);
+  return updateDeletesBasedOnTableName(tableName);
 }
 
 int DatabaseAuthorizer::allowAlterTable(const String&,
@@ -175,7 +179,7 @@ int DatabaseAuthorizer::dropIndex(const String&, const String& tableName) {
   if (m_readOnly && m_securityEnabled)
     return SQLAuthDeny;
 
-  return denyBasedOnTableName(tableName);
+  return updateDeletesBasedOnTableName(tableName);
 }
 
 int DatabaseAuthorizer::dropTempIndex(const String&, const String& tableName) {
@@ -185,7 +189,7 @@ int DatabaseAuthorizer::dropTempIndex(const String&, const String& tableName) {
   if (m_readOnly && m_securityEnabled)
     return SQLAuthDeny;
 
-  return denyBasedOnTableName(tableName);
+  return updateDeletesBasedOnTableName(tableName);
 }
 
 int DatabaseAuthorizer::createTrigger(const String&, const String& tableName) {
@@ -211,7 +215,7 @@ int DatabaseAuthorizer::dropTrigger(const String&, const String& tableName) {
   if (m_readOnly && m_securityEnabled)
     return SQLAuthDeny;
 
-  return denyBasedOnTableName(tableName);
+  return updateDeletesBasedOnTableName(tableName);
 }
 
 int DatabaseAuthorizer::dropTempTrigger(const String&,
@@ -222,7 +226,7 @@ int DatabaseAuthorizer::dropTempTrigger(const String&,
   if (m_readOnly && m_securityEnabled)
     return SQLAuthDeny;
 
-  return denyBasedOnTableName(tableName);
+  return updateDeletesBasedOnTableName(tableName);
 }
 
 int DatabaseAuthorizer::createView(const String&) {
@@ -237,14 +241,22 @@ int DatabaseAuthorizer::createTempView(const String&) {
 }
 
 int DatabaseAuthorizer::dropView(const String&) {
-  return (m_readOnly && m_securityEnabled ? SQLAuthDeny : SQLAuthAllow);
+  if (m_readOnly && m_securityEnabled)
+    return SQLAuthDeny;
+
+  m_hadDeletes = true;
+  return SQLAuthAllow;
 }
 
 int DatabaseAuthorizer::dropTempView(const String&) {
   // SQLITE_DROP_TEMP_VIEW results in a DELETE operation, which is not
   // allowed in read-only transactions or private browsing, so we might as
   // well disallow SQLITE_DROP_TEMP_VIEW in these cases
-  return (m_readOnly && m_securityEnabled ? SQLAuthDeny : SQLAuthAllow);
+  if (m_readOnly && m_securityEnabled)
+    return SQLAuthDeny;
+
+  m_hadDeletes = true;
+  return SQLAuthAllow;
 }
 
 int DatabaseAuthorizer::createVTable(const String& tableName,
@@ -269,14 +281,14 @@ int DatabaseAuthorizer::dropVTable(const String& tableName,
   if (moduleName != "fts3")
     return SQLAuthDeny;
 
-  return denyBasedOnTableName(tableName);
+  return updateDeletesBasedOnTableName(tableName);
 }
 
 int DatabaseAuthorizer::allowDelete(const String& tableName) {
   if (m_readOnly && m_securityEnabled)
     return SQLAuthDeny;
 
-  return denyBasedOnTableName(tableName);
+  return updateDeletesBasedOnTableName(tableName);
 }
 
 int DatabaseAuthorizer::allowInsert(const String& tableName) {
@@ -360,6 +372,13 @@ int DatabaseAuthorizer::denyBasedOnTableName(const String& tableName) {
     return SQLAuthDeny;
 
   return SQLAuthAllow;
+}
+
+int DatabaseAuthorizer::updateDeletesBasedOnTableName(const String& tableName) {
+  int allow = denyBasedOnTableName(tableName);
+  if (allow)
+    m_hadDeletes = true;
+  return allow;
 }
 
 }  // namespace WebCore

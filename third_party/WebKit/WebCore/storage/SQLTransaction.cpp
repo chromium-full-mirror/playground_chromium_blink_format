@@ -271,6 +271,7 @@ void SQLTransaction::openTransactionAndPreflight() {
   m_sqliteTransaction.set(
       new SQLiteTransaction(m_database->sqliteDatabase(), m_readOnly));
 
+  m_database->resetDeletes();
   m_database->disableAuthorizer();
   m_sqliteTransaction->begin();
   m_database->enableAuthorizer();
@@ -510,12 +511,14 @@ void SQLTransaction::postflightAndCommit() {
     return;
   }
 
-  // The commit was successful. If the transaction modified this database,
-  // vacuum the database if needed and notify the delegates.
-  if (m_modifiedDatabase) {
+  // Vacuum the database if anything was deleted.
+  if (m_database->hadDeletes())
     m_database->incrementalVacuumIfNeeded();
+
+  // The commit was successful. If the transaction modified this database,
+  // notify the delegates.
+  if (m_modifiedDatabase)
     m_database->transactionClient()->didCommitTransaction(this);
-  }
 
   // Now release our unneeded callbacks, to break reference cycles.
   m_callback = 0;
