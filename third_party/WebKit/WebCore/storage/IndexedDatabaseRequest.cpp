@@ -50,12 +50,10 @@ IndexedDatabaseRequest::IndexedDatabaseRequest(IndexedDatabase* indexedDatabase,
 IndexedDatabaseRequest::~IndexedDatabaseRequest() {}
 
 PassRefPtr<IDBRequest> IndexedDatabaseRequest::open(const String& name,
-                                                    const String& description,
-                                                    ExceptionCode& exception) {
+                                                    const String& description) {
   RefPtr<IDBRequest> request = IDBRequest::create(m_frame->document(), m_this);
   m_indexedDatabase->open(name, description, request,
-                          m_frame->document()->securityOrigin(), m_frame,
-                          exception);
+                          m_frame->document()->securityOrigin(), m_frame);
   return request;
 }
 

@@ -56,11 +56,9 @@ void WebIndexedDatabaseImpl::open(const WebString& name,
                                   const WebString& description,
                                   WebIDBCallbacks* callbacks,
                                   const WebSecurityOrigin& origin,
-                                  WebFrame*,
-                                  int& exceptionCode) {
+                                  WebFrame*) {
   m_indexedDatabase->open(name, description,
-                          IDBCallbacksProxy::create(callbacks), origin, 0,
-                          exceptionCode);
+                          IDBCallbacksProxy::create(callbacks), origin, 0);
 }
 
 }  // namespace WebKit

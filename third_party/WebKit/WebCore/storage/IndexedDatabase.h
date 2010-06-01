@@ -57,8 +57,7 @@ class IndexedDatabase : public ThreadSafeShared<IndexedDatabase> {
                     const String& description,
                     PassRefPtr<IDBCallbacks>,
                     PassRefPtr<SecurityOrigin>,
-                    Frame*,
-                    ExceptionCode&) = 0;
+                    Frame*) = 0;
 };
 
 }  // namespace WebCore

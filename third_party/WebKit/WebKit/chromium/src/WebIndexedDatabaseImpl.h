@@ -47,8 +47,7 @@ class WebIndexedDatabaseImpl : public WebIndexedDatabase {
                     const WebString& description,
                     WebIDBCallbacks*,
                     const WebSecurityOrigin&,
-                    WebFrame*,
-                    int& exceptionCode);
+                    WebFrame*);
 
  private:
   WTF::RefPtr<WebCore::IndexedDatabase> m_indexedDatabase;

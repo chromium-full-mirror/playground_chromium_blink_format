@@ -52,9 +52,7 @@ class IndexedDatabaseRequest : public RefCounted<IndexedDatabaseRequest> {
   }
   ~IndexedDatabaseRequest();
 
-  PassRefPtr<IDBRequest> open(const String& name,
-                              const String& description,
-                              ExceptionCode&);
+  PassRefPtr<IDBRequest> open(const String& name, const String& description);
 
   void disconnectFrame() { m_frame = 0; }
 
