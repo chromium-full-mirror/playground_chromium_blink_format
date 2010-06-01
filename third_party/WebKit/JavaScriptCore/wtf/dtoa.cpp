@@ -142,16 +142,15 @@
 #endif
 #include <math.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <wtf/AlwaysInline.h>
 #include <wtf/Assertions.h>
 #include <wtf/FastMalloc.h>
 #include <wtf/MathExtras.h>
-#include <wtf/Vector.h>
 #include <wtf/Threading.h>
-
-#include <stdio.h>
+#include <wtf/Vector.h>
 
 #if COMPILER(MSVC)
 #pragma warning(disable : 4244)
@@ -205,19 +204,22 @@ Exactly one of IEEE_8087, IEEE_ARM or
 #define dval(x) (x)->d
 #endif
 
-/* The following definition of Storeinc is appropriate for MIPS processors.
- * An alternative that might be better on some machines is
- * #define Storeinc(a,b,c) (*a++ = b << 16 | c & 0xffff)
- */
+  /* The following definition of Storeinc is appropriate for MIPS processors.
+   * An alternative that might be better on some machines is
+   *  *p++ = high << 16 | low & 0xffff;
+   */
+  static ALWAYS_INLINE uint32_t* storeInc(uint32_t * p, uint16_t high,
+                                          uint16_t low) {
+    uint16_t* p16 = reinterpret_cast<uint16_t*>(p);
 #if defined(IEEE_8087) || defined(IEEE_ARM)
-#define Storeinc(a, b, c)                       \
-  (((unsigned short*)a)[1] = (unsigned short)b, \
-   ((unsigned short*)a)[0] = (unsigned short)c, a++)
+    p16[1] = high;
+    p16[0] = low;
 #else
-#define Storeinc(a, b, c)                       \
-  (((unsigned short*)a)[0] = (unsigned short)b, \
-   ((unsigned short*)a)[1] = (unsigned short)c, a++)
+  p16[0] = high;
+  p16[1] = low;
 #endif
+    return p + 1;
+  }
 
 #define Exp_shift 20
 #define Exp_shift1 20
@@ -255,7 +257,7 @@ Exactly one of IEEE_8087, IEEE_ARM or
 #else
 #define Flt_Rounds 1
 #endif
-#endif /*Flt_Rounds*/
+#endif /* Flt_Rounds */
 
 #define rounded_product(a, b) a *= b
 #define rounded_quotient(a, b) a /= b
@@ -455,8 +457,13 @@ Exactly one of IEEE_8087, IEEE_ARM or
     const BigInt* b = &bRef;
     BigInt c;
     int wa, wb, wc;
-    const uint32_t *x = 0, *xa, *xb, *xae, *xbe;
-    uint32_t *xc, *xc0;
+    const uint32_t* x = 0;
+    const uint32_t* xa;
+    const uint32_t* xb;
+    const uint32_t* xae;
+    const uint32_t* xbe;
+    uint32_t* xc;
+    uint32_t* xc0;
     uint32_t y;
 #ifdef USE_LONG_LONG
     unsigned long long carry, z;
@@ -508,7 +515,7 @@ Exactly one of IEEE_8087, IEEE_ARM or
         carry = z >> 16;
         uint32_t z2 = (*x++ >> 16) * y + (*xc >> 16) + carry;
         carry = z2 >> 16;
-        Storeinc(xc, z2, z);
+        xc = storeInc(xc, z2, z);
       } while (x < xae);
       *xc = carry;
     }
@@ -520,7 +527,7 @@ Exactly one of IEEE_8087, IEEE_ARM or
       do {
         z = (*x & 0xffff) * y + (*xc >> 16) + carry;
         carry = z >> 16;
-        Storeinc(xc, z, z2);
+        xc = storeInc(xc, z, z2);
         z2 = (*x++ >> 16) * y + (*xc & 0xffff) + carry;
         carry = z2 >> 16;
       } while (x < xae);
@@ -555,7 +562,7 @@ Exactly one of IEEE_8087, IEEE_ARM or
   };
 
   static P5Node* p5s;
-  static int p5s_count;
+  static int p5sCount;
 
   static ALWAYS_INLINE void pow5mult(BigInt & b, int k) {
     static int p05[3] = {5, 25, 125};
@@ -577,14 +584,14 @@ Exactly one of IEEE_8087, IEEE_ARM or
       i2b(p5->val, 625);
       p5->next = 0;
       p5s = p5;
-      p5s_count = 1;
+      p5sCount = 1;
     }
 
-    int p5s_count_local = p5s_count;
+    int p5sCountLocal = p5sCount;
 #if ENABLE(JSC_MULTIPLE_THREADS)
     s_dtoaP5Mutex->unlock();
 #endif
-    int p5s_used = 0;
+    int p5sUsed = 0;
 
     for (;;) {
       if (k & 1)
@@ -593,20 +600,20 @@ Exactly one of IEEE_8087, IEEE_ARM or
       if (!(k >>= 1))
         break;
 
-      if (++p5s_used == p5s_count_local) {
+      if (++p5sUsed == p5sCountLocal) {
 #if ENABLE(JSC_MULTIPLE_THREADS)
         s_dtoaP5Mutex->lock();
 #endif
-        if (p5s_used == p5s_count) {
+        if (p5sUsed == p5sCount) {
           ASSERT(!p5->next);
           p5->next = new P5Node;
           p5->next->next = 0;
           p5->next->val = p5->val;
           mult(p5->next->val, p5->next->val);
-          ++p5s_count;
+          ++p5sCount;
         }
 
-        p5s_count_local = p5s_count;
+        p5sCountLocal = p5sCount;
 #if ENABLE(JSC_MULTIPLE_THREADS)
         s_dtoaP5Mutex->unlock();
 #endif
@@ -645,7 +652,7 @@ Exactly one of IEEE_8087, IEEE_ARM or
       *dst = hiSubword;
       ASSERT(dst == dstStart + n);
 
-      b.resize(origSize + n + (b.words()[n1 - 1] != 0));
+      b.resize(origSize + n + !!b.words()[n1 - 1]);
     }
 #else
   if (k &= 0xf) {
@@ -657,7 +664,7 @@ Exactly one of IEEE_8087, IEEE_ARM or
     }
     *dst = hiSubword;
     ASSERT(dst == dstStart + n);
-    result->wds = b->wds + n + (result->x[n1 - 1] != 0);
+    result->wds = b->wds + n + !!result->x[n1 - 1];
   }
 #endif
     else {
@@ -746,14 +753,14 @@ Exactly one of IEEE_8087, IEEE_ARM or
     borrow = (y & 0x10000) >> 16;
     uint32_t z = (*xa++ >> 16) - (*xb++ >> 16) - borrow;
     borrow = (z & 0x10000) >> 16;
-    Storeinc(xc, z, y);
+    xc = storeInc(xc, z, y);
   } while (xb < xbe);
   while (xa < xae) {
     uint32_t y = (*xa & 0xffff) - borrow;
     borrow = (y & 0x10000) >> 16;
     uint32_t z = (*xa++ >> 16) - borrow;
     borrow = (z & 0x10000) >> 16;
-    Storeinc(xc, z, y);
+    xc = storeInc(xc, z, y);
   }
 #else
   do {
@@ -826,7 +833,7 @@ Exactly one of IEEE_8087, IEEE_ARM or
       d0 = Exp_1 | (y >> (Ebits - k));
       w = xa > xa0 ? *--xa : 0;
       d1 = (y << (32 - Ebits + k)) | (w >> (Ebits - k));
-      goto ret_d;
+      goto returnD;
     }
     z = xa > xa0 ? *--xa : 0;
     if (k -= Ebits) {
@@ -844,7 +851,7 @@ Exactly one of IEEE_8087, IEEE_ARM or
     w = xa > xa0 ? *--xa : 0;
     y = xa > xa0 ? *--xa : 0;
     d1 = z << k + 16 - Ebits | w << k - Ebits | y >> 16 + Ebits - k;
-    goto ret_d;
+    goto returnD;
   }
   z = xa > xa0 ? *--xa : 0;
   w = xa > xa0 ? *--xa : 0;
@@ -853,7 +860,7 @@ Exactly one of IEEE_8087, IEEE_ARM or
   y = xa > xa0 ? *--xa : 0;
   d1 = w << k + 16 | y << k;
 #endif
-  ret_d:
+  returnD:
 #undef d0
 #undef d1
     return dval(&d);
@@ -861,7 +868,8 @@ Exactly one of IEEE_8087, IEEE_ARM or
 
   static ALWAYS_INLINE void d2b(BigInt & b, U * d, int* e, int* bits) {
     int de, k;
-    uint32_t *x, y, z;
+    uint32_t* x;
+    uint32_t y, z;
 #ifndef Sudden_Underflow
     int i;
 #endif
@@ -1092,7 +1100,7 @@ Exactly one of IEEE_8087, IEEE_ARM or
 
     sign = nz0 = nz = 0;
     dval(&rv) = 0;
-    for (s = s00;; s++)
+    for (s = s00;; s++) {
       switch (*s) {
         case '-':
           sign = 1;
@@ -1113,6 +1121,7 @@ Exactly one of IEEE_8087, IEEE_ARM or
         default:
           goto break2;
       }
+    }
   break2:
     if (*s == '0') {
       nz0 = 1;
@@ -1138,12 +1147,12 @@ Exactly one of IEEE_8087, IEEE_ARM or
           s0 = s;
           nf += nz;
           nz = 0;
-          goto have_dig;
+          goto haveDig;
         }
-        goto dig_done;
+        goto digDone;
       }
       for (; c >= '0' && c <= '9'; c = *++s) {
-      have_dig:
+      haveDig:
         nz++;
         if (c -= '0') {
           nf += nz;
@@ -1160,12 +1169,11 @@ Exactly one of IEEE_8087, IEEE_ARM or
         }
       }
     }
-  dig_done:
+  digDone:
     e = 0;
     if (c == 'e' || c == 'E') {
-      if (!nd && !nz && !nz0) {
+      if (!nd && !nz && !nz0)
         goto ret0;
-      }
       s00 = s;
       esign = 0;
       switch (c = *++s) {
@@ -1477,10 +1485,10 @@ Exactly one of IEEE_8087, IEEE_ARM or
       }
       lshift(delta, Log2P);
       if (cmp(delta, bs) > 0)
-        goto drop_down;
+        goto dropDown;
       break;
     }
-    if (i == 0) {
+    if (!i) {
       /* exactly half-way between */
       if (dsign) {
         if ((word0(&rv) & Bndry_mask1) == Bndry_mask1 &&
@@ -1502,7 +1510,7 @@ Exactly one of IEEE_8087, IEEE_ARM or
           break;
         }
       } else if (!(word0(&rv) & Bndry_mask) && !word1(&rv)) {
-      drop_down:
+      dropDown:
 /* boundary case -- decrement exponent */
 #ifdef Sudden_Underflow /*{{*/
         L = word0(&rv) & Exp_mask;
@@ -1582,7 +1590,7 @@ Exactly one of IEEE_8087, IEEE_ARM or
           aadj1 += 0.5;
       }
 #else
-        if (Flt_Rounds == 0)
+        if (!Flt_Rounds)
           aadj1 += 0.5;
 #endif /*Check_FLT_ROUNDS*/
     }
@@ -1601,8 +1609,8 @@ Exactly one of IEEE_8087, IEEE_ARM or
         word0(&rv) = Big0;
         word1(&rv) = Big1;
         goto cont;
-      } else
-        word0(&rv) += P * Exp_msk1;
+      }
+      word0(&rv) += P * Exp_msk1;
     } else {
 #ifdef Avoid_Underflow
       if (scale && y <= 2 * P * Exp_msk1) {
@@ -1631,8 +1639,8 @@ Exactly one of IEEE_8087, IEEE_ARM or
             word0(&rv) = Tiny0;
             word1(&rv) = Tiny1;
             goto cont;
-          } else
-            word0(&rv) -= P * Exp_msk1;
+          }
+          word0(&rv) -= P * Exp_msk1;
         } else {
           adj.d = aadj1 * ulp(&rv);
           dval(&rv) += adj.d;
@@ -1672,7 +1680,7 @@ Exactly one of IEEE_8087, IEEE_ARM or
           break;
       }
 #endif
-  cont:;
+  cont : {}
   }
 #ifdef SET_INEXACT
   if (inexact) {
@@ -1691,7 +1699,7 @@ Exactly one of IEEE_8087, IEEE_ARM or
     dval(&rv) *= dval(&rv0);
 #ifndef NO_ERRNO
     /* try to avoid the bug of testing an 8087 register value */
-    if (word0(&rv) == 0 && word1(&rv) == 0)
+    if (!word0(&rv) && !word1(&rv))
       errno = ERANGE;
 #endif
   }
@@ -1711,7 +1719,11 @@ ret:
 
 static ALWAYS_INLINE int quorem(BigInt& b, BigInt& S) {
   size_t n;
-  uint32_t *bx, *bxe, q, *sx, *sxe;
+  uint32_t* bx;
+  uint32_t* bxe;
+  uint32_t q;
+  uint32_t* sx;
+  uint32_t* sxe;
 #ifdef USE_LONG_LONG
   unsigned long long borrow, carry, y, ys;
 #else
@@ -1753,7 +1765,7 @@ static ALWAYS_INLINE int quorem(BigInt& b, BigInt& S) {
         borrow = (y & 0x10000) >> 16;
         z = (*bx >> 16) - (zs & 0xffff) - borrow;
         borrow = (z & 0x10000) >> 16;
-        Storeinc(bx, z, y);
+        bx = storeInc(bx, z, y);
 #else
         ys = *sx++ * q + carry;
         carry = ys >> 16;
@@ -1793,7 +1805,7 @@ static ALWAYS_INLINE int quorem(BigInt& b, BigInt& S) {
         borrow = (y & 0x10000) >> 16;
         z = (*bx >> 16) - (zs & 0xffff) - borrow;
         borrow = (z & 0x10000) >> 16;
-        Storeinc(bx, z, y);
+        bx = storeInc(bx, z, y);
 #else
         ys = *sx++ + carry;
         carry = ys >> 16;
@@ -1874,7 +1886,8 @@ void dtoa(DtoaBuffer result,
   BigInt b, b1, delta, mlo, mhi, S;
   U d2, eps, u;
   double ds;
-  char *s, *s0;
+  char* s;
+  char* s0;
 #ifdef SET_INEXACT
   int inexact, oldinexact;
 #endif
@@ -2041,7 +2054,7 @@ if (ilim >= 0 && ilim <= Quick_max && try_quick) {
   }
   if (k_check && dval(&u) < 1. && ilim > 0) {
     if (ilim1 <= 0)
-      goto fast_failed;
+      goto fastFailed;
     ilim = ilim1;
     k--;
     dval(&u) *= 10.;
@@ -2049,15 +2062,15 @@ if (ilim >= 0 && ilim <= Quick_max && try_quick) {
   }
   dval(&eps) = (ieps * dval(&u)) + 7.;
   word0(&eps) -= (P - 1) * Exp_msk1;
-  if (ilim == 0) {
+  if (!ilim) {
     S.clear();
     mhi.clear();
     dval(&u) -= 5.;
     if (dval(&u) > dval(&eps))
-      goto one_digit;
+      goto oneDigit;
     if (dval(&u) < -dval(&eps))
-      goto no_digits;
-    goto fast_failed;
+      goto noDigits;
+    goto fastFailed;
   }
 #ifndef No_leftright
   if (leftright) {
@@ -2072,7 +2085,7 @@ if (ilim >= 0 && ilim <= Quick_max && try_quick) {
       if (dval(&u) < dval(&eps))
         goto ret;
       if (1. - dval(&u) < dval(&eps))
-        goto bump_up;
+        goto bumpUp;
       if (++i >= ilim)
         break;
       dval(&eps) *= 10.;
@@ -2089,8 +2102,8 @@ if (ilim >= 0 && ilim <= Quick_max && try_quick) {
       *s++ = '0' + (int)L;
       if (i == ilim) {
         if (dval(&u) > 0.5 + dval(&eps))
-          goto bump_up;
-        else if (dval(&u) < 0.5 - dval(&eps)) {
+          goto bumpUp;
+        if (dval(&u) < 0.5 - dval(&eps)) {
           while (*--s == '0') {
           }
           s++;
@@ -2102,7 +2115,7 @@ if (ilim >= 0 && ilim <= Quick_max && try_quick) {
 #ifndef No_leftright
   }
 #endif
-fast_failed:
+fastFailed:
   s = s0;
   dval(&u) = dval(&d2);
   k = k0;
@@ -2118,8 +2131,8 @@ if (be >= 0 && k <= Int_max) {
     S.clear();
     mhi.clear();
     if (ilim < 0 || dval(&u) <= 5 * ds)
-      goto no_digits;
-    goto one_digit;
+      goto noDigits;
+    goto oneDigit;
   }
   for (i = 1;; i++, dval(&u) *= 10.) {
     L = (int32_t)(dval(&u) / ds);
@@ -2141,7 +2154,7 @@ if (be >= 0 && k <= Int_max) {
     if (i == ilim) {
       dval(&u) += dval(&u);
       if (dval(&u) > ds || (dval(&u) == ds && (L & 1))) {
-      bump_up:
+      bumpUp:
         while (*--s == '9')
           if (s == s0) {
             k++;
@@ -2267,9 +2280,9 @@ if (leftright) {
     j = cmp(b, mlo);
     diff(delta, S, mhi);
     j1 = delta.sign ? 1 : cmp(b, delta);
-    if (j1 == 0 && !(word1(&u) & 1)) {
+    if (!j1 && !(word1(&u) & 1)) {
       if (dig == '9')
-        goto round_9_up;
+        goto round9up;
       if (j > 0)
         dig++;
 #ifdef SET_INEXACT
@@ -2279,26 +2292,26 @@ if (leftright) {
       *s++ = dig;
       goto ret;
     }
-    if (j < 0 || (j == 0 && !(word1(&u) & 1))) {
+    if (j < 0 || (!j && !(word1(&u) & 1))) {
       if (!b.words()[0] && b.size() <= 1) {
 #ifdef SET_INEXACT
         inexact = 0;
 #endif
-        goto accept_dig;
+        goto acceptDig;
       }
       if (j1 > 0) {
         lshift(b, 1);
         j1 = cmp(b, S);
-        if ((j1 > 0 || (j1 == 0 && (dig & 1))) && dig++ == '9')
-          goto round_9_up;
+        if ((j1 > 0 || (!j1 && (dig & 1))) && dig++ == '9')
+          goto round9up;
       }
-    accept_dig:
+    acceptDig:
       *s++ = dig;
       goto ret;
     }
     if (j1 > 0) {
       if (dig == '9') { /* possible if i == 1 */
-      round_9_up:
+      round9up:
         *s++ = '9';
         goto roundoff;
       }
@@ -2330,7 +2343,7 @@ if (leftright) {
 
 lshift(b, 1);
 j = cmp(b, S);
-if (j > 0 || (j == 0 && (dig & 1))) {
+if (j > 0 || (!j && (dig & 1))) {
 roundoff:
   while (*--s == '9')
     if (s == s0) {
@@ -2345,9 +2358,9 @@ roundoff:
   s++;
 }
 goto ret;
-no_digits : k = -1 - ndigits;
+noDigits : k = -1 - ndigits;
 goto ret;
-one_digit : * s++ = '1';
+oneDigit : * s++ = '1';
 k++;
 goto ret;
 ret :

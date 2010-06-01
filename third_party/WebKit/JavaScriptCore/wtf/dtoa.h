@@ -29,6 +29,8 @@ namespace WTF {
 
 extern WTF::Mutex* s_dtoaP5Mutex;
 
+// s00: input string. Must not be 0 and must be terminated by 0.
+// se: *se will have the last consumed character position + 1.
 double strtod(const char* s00, char** se);
 
 typedef char DtoaBuffer[80];
