@@ -1080,10 +1080,12 @@ void Position::getInlineBoxAndOffset(EAffinity affinity,
       // negate the logic at the beginning
       // of RenderObject::createVisiblePosition().
       Position equivalent = downstreamIgnoringEditingBoundaries(*this);
-      if (equivalent == *this)
+      if (equivalent == *this) {
         equivalent = upstreamIgnoringEditingBoundaries(*this);
-      if (equivalent == *this)
-        return;
+        if (equivalent == *this ||
+            downstreamIgnoringEditingBoundaries(equivalent) == *this)
+          return;
+      }
 
       equivalent.getInlineBoxAndOffset(UPSTREAM, primaryDirection, inlineBox,
                                        caretOffset);
