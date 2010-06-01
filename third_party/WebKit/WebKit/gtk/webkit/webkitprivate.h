@@ -255,7 +255,9 @@ void webkit_web_view_request_download(
     const WebCore::ResourceResponse& response = WebCore::ResourceResponse(),
     WebCore::ResourceHandle* handle = 0);
 
-void webkit_web_view_add_resource(WebKitWebView*, char*, WebKitWebResource*);
+void webkit_web_view_add_resource(WebKitWebView*,
+                                  const char*,
+                                  WebKitWebResource*);
 
 WebKitWebResource* webkit_web_view_get_resource(WebKitWebView*, char*);
 
