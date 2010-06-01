@@ -119,13 +119,24 @@ static JSValueRef leapForwardCallback(JSContextRef context,
   return JSValueMakeUndefined(context);
 }
 
-bool prepareMouseButtonEvent(GdkEvent* event, int button) {
+bool prepareMouseButtonEvent(GdkEvent* event, int eventSenderButtonNumber) {
   WebKitWebView* view = webkit_web_frame_get_web_view(mainFrame);
   if (!view)
     return false;
 
+  // The logic for mapping EventSender button numbers to GDK button
+  // numbers originates from the Windows EventSender.
+  int gdkButtonNumber = 3;
+  if (eventSenderButtonNumber >= 0 && eventSenderButtonNumber <= 2)
+    gdkButtonNumber = eventSenderButtonNumber + 1;
+
+  // fast/events/mouse-click-events expects the 4th button
+  // to be event.button = 1, so send a middle-button event.
+  else if (eventSenderButtonNumber == 3)
+    gdkButtonNumber = 2;
+
   memset(event, 0, sizeof(event));
-  event->button.button = button;
+  event->button.button = gdkButtonNumber;
   event->button.x = lastMousePositionX;
   event->button.y = lastMousePositionY;
   event->button.window = GTK_WIDGET(view)->window;
@@ -158,7 +169,7 @@ static JSValueRef contextClickCallback(JSContextRef context,
                                        const JSValueRef arguments[],
                                        JSValueRef* exception) {
   GdkEvent event;
-  if (!prepareMouseButtonEvent(&event, 3))
+  if (!prepareMouseButtonEvent(&event, 2))
     return JSValueMakeUndefined(context);
 
   event.type = GDK_BUTTON_PRESS;
@@ -199,10 +210,10 @@ static JSValueRef mouseDownCallback(JSContextRef context,
                                     size_t argumentCount,
                                     const JSValueRef arguments[],
                                     JSValueRef* exception) {
-  int button = 1;
+  int button = 0;
   if (argumentCount == 1) {
     button =
-        static_cast<int>(JSValueToNumber(context, arguments[0], exception)) + 1;
+        static_cast<int>(JSValueToNumber(context, arguments[0], exception));
     g_return_val_if_fail((!exception || !*exception),
                          JSValueMakeUndefined(context));
   }
@@ -249,10 +260,10 @@ static JSValueRef mouseUpCallback(JSContextRef context,
                                   size_t argumentCount,
                                   const JSValueRef arguments[],
                                   JSValueRef* exception) {
-  int button = 1;
+  int button = 0;
   if (argumentCount == 1) {
     button =
-        static_cast<int>(JSValueToNumber(context, arguments[0], exception)) + 1;
+        static_cast<int>(JSValueToNumber(context, arguments[0], exception));
     g_return_val_if_fail((!exception || !*exception),
                          JSValueMakeUndefined(context));
   }
