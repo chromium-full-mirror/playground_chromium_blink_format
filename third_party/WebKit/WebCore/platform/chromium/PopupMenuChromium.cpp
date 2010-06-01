@@ -1009,6 +1009,7 @@ void PopupListBox::selectIndex(int index) {
     invalidateRow(m_selectedIndex);
 
     scrollToRevealSelection();
+    m_popupClient->selectionChanged(m_selectedIndex);
   }
 }
 
@@ -1066,6 +1067,7 @@ void PopupListBox::clearSelection() {
   if (m_selectedIndex != -1) {
     invalidateRow(m_selectedIndex);
     m_selectedIndex = -1;
+    m_popupClient->selectionCleared();
   }
 }
 
