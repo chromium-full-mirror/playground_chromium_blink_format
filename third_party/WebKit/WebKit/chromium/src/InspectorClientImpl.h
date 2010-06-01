@@ -54,14 +54,8 @@ class InspectorClientImpl : public WebCore::InspectorClient {
                             const WebCore::String& value);
 
  private:
-  void loadSettings();
-  void saveSettings();
-
   // The WebViewImpl of the page being inspected; gets passed to the constructor
   WebViewImpl* m_inspectedWebView;
-
-  typedef HashMap<WebCore::String, WebCore::String> SettingsMap;
-  OwnPtr<SettingsMap> m_settings;
 };
 
 }  // namespace WebKit

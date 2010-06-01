@@ -290,6 +290,9 @@ class WebViewClient : virtual public WebWidgetClient {
   // changed and should be saved.  See WebView::inspectorSettings.
   virtual void didUpdateInspectorSettings() {}
 
+  virtual void didUpdateInspectorSetting(const WebString& key,
+                                         const WebString& value) {}
+
   // Autofill ------------------------------------------------------------
 
   // Queries the browser for suggestions to be shown for the form text
