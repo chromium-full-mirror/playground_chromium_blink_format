@@ -40,7 +40,8 @@ namespace WebCore {
 V8CustomVoidCallback::V8CustomVoidCallback(v8::Local<v8::Object> callback,
                                            ScriptExecutionContext* context)
     : m_callback(v8::Persistent<v8::Object>::New(callback)),
-      m_scriptExecutionContext(context) {}
+      m_scriptExecutionContext(context),
+      m_worldContext(UseCurrentWorld) {}
 
 V8CustomVoidCallback::~V8CustomVoidCallback() {
   m_callback.Dispose();
@@ -49,8 +50,8 @@ V8CustomVoidCallback::~V8CustomVoidCallback() {
 void V8CustomVoidCallback::handleEvent() {
   v8::HandleScope handleScope;
 
-  v8::Handle<v8::Context> v8Context = toV8Context(
-      m_scriptExecutionContext.get(), WorldContextHandle(UseCurrentWorld));
+  v8::Handle<v8::Context> v8Context =
+      toV8Context(m_scriptExecutionContext.get(), m_worldContext);
   if (v8Context.IsEmpty())
     return;
 

@@ -32,6 +32,7 @@
 #define V8CustomVoidCallback_h
 
 #include "VoidCallback.h"
+#include "WorldContextHandle.h"
 #include <v8.h>
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefPtr.h>
@@ -57,6 +58,7 @@ class V8CustomVoidCallback : public VoidCallback {
 
   v8::Persistent<v8::Object> m_callback;
   RefPtr<ScriptExecutionContext> m_scriptExecutionContext;
+  WorldContextHandle m_worldContext;
 };
 
 // Returns false if callback failed (null, wrong type, or threw exception).
