@@ -58,6 +58,8 @@ class TestPopupMenuClient : public PopupMenuClient {
   virtual void valueChanged(unsigned listIndex, bool fireEvents = true) {
     m_selectIndex = listIndex;
   }
+  virtual void selectionChanged(unsigned, bool) {}
+  virtual void selectionCleared() {}
 
   virtual String itemText(unsigned listIndex) const {
     String str("Item ");
