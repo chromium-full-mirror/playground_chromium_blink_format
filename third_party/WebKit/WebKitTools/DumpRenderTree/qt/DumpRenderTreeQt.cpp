@@ -142,10 +142,8 @@ void checkPermissionCallback(QObject* receiver,
   qobject_cast<DumpRenderTree*>(receiver)->checkPermission(url, permission);
 }
 
-void requestPermissionCallback(QObject* receiver,
-                               QWebPage* page,
-                               const QString& origin) {
-  qobject_cast<DumpRenderTree*>(receiver)->requestPermission(page, origin);
+void requestPermissionCallback(QObject* receiver, const QString& origin) {
+  qobject_cast<DumpRenderTree*>(receiver)->requestPermission(origin);
 }
 
 WebPage::WebPage(QObject* parent, DumpRenderTree* drt)
@@ -174,7 +172,7 @@ WebPage::WebPage(QObject* parent, DumpRenderTree* drt)
   setNetworkAccessManager(m_drt->networkAccessManager());
   setPluginFactory(new TestPlugin(this));
 
-  DumpRenderTreeSupportQt::setNotificationsReceiver(this, m_drt);
+  DumpRenderTreeSupportQt::setNotificationsReceiver(m_drt);
   DumpRenderTreeSupportQt::setCheckPermissionFunction(checkPermissionCallback);
   DumpRenderTreeSupportQt::setRequestPermissionFunction(
       requestPermissionCallback);
@@ -938,8 +936,8 @@ void DumpRenderTree::checkPermission(const QUrl& url,
                    : NotificationDenied;
 }
 
-void DumpRenderTree::requestPermission(QWebPage* page, const QString& origin) {
-  DumpRenderTreeSupportQt::allowNotificationForOrigin(page, origin);
+void DumpRenderTree::requestPermission(const QString& origin) {
+  DumpRenderTreeSupportQt::allowNotificationForOrigin(origin);
 }
 
 #if defined(Q_WS_X11)

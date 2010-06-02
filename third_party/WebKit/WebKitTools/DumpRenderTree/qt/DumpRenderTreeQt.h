@@ -119,7 +119,7 @@ class DumpRenderTree : public QObject {
   void statusBarMessage(const QString& message);
   void windowCloseRequested();
   void checkPermission(const QUrl&, NotificationPermission&);
-  void requestPermission(QWebPage* page, const QString&);
+  void requestPermission(const QString&);
 
  Q_SIGNALS:
   void quit();
