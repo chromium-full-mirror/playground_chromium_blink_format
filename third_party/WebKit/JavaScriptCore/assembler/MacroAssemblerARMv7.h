@@ -429,7 +429,13 @@ class MacroAssemblerARMv7 : public AbstractMacroAssembler<ARMv7Assembler> {
   }
 
   void load16(ImplicitAddress address, RegisterID dest) {
-    m_assembler.ldrh(dest, address.base, address.offset);
+    ARMThumbImmediate armImm = ARMThumbImmediate::makeUInt12(address.offset);
+    if (armImm.isValid())
+      m_assembler.ldrh(dest, address.base, armImm);
+    else {
+      move(Imm32(address.offset), dataTempRegister);
+      m_assembler.ldrh(dest, address.base, dataTempRegister);
+    }
   }
 
   DataLabel32 store32WithAddressOffsetPatch(RegisterID src, Address address) {
