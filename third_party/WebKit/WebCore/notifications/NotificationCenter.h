@@ -54,8 +54,7 @@ class NotificationCenter : public RefCounted<NotificationCenter>,
     return adoptRef(new NotificationCenter(context, presenter));
   }
 
-  PassRefPtr<Notification> createHTMLNotification(const String& URI,
-                                                  ExceptionCode& ec) {
+  Notification* createHTMLNotification(const String& URI, ExceptionCode& ec) {
     if (!presenter()) {
       ec = INVALID_STATE_ERR;
       return 0;
@@ -68,10 +67,10 @@ class NotificationCenter : public RefCounted<NotificationCenter>,
                                 context(), ec, presenter());
   }
 
-  PassRefPtr<Notification> createNotification(const String& iconURI,
-                                              const String& title,
-                                              const String& body,
-                                              ExceptionCode& ec) {
+  Notification* createNotification(const String& iconURI,
+                                   const String& title,
+                                   const String& body,
+                                   ExceptionCode& ec) {
     if (!presenter()) {
       ec = INVALID_STATE_ERR;
       return 0;
