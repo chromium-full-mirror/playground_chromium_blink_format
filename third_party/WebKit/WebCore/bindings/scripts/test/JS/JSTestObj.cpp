@@ -1063,15 +1063,26 @@ jsTestObjPrototypeFunctionOverloadedMethod4(ExecState* exec) {
 
 JSValue JSC_HOST_CALL
 jsTestObjPrototypeFunctionOverloadedMethod(ExecState* exec) {
-    if ((exec->argumentCount() == 2 && (exec->argument(0).isNull() || asObject(exec->argument(0))->inherits(JSTestObj::s_info) && (exec->argument(1).isNull() || exec->argument(1).isUndefined() || exec->argument(1).isString() || exec->argument(1).isObject())))
-        return jsTestObjPrototypeFunctionOverloadedMethod1(exec);
-    if ((exec->argumentCount() == 1 && (exec->argument(0).isNull() || asObject(exec->argument(0))->inherits(JSTestObj::s_info)) || (exec->argumentCount() == 2 && (exec->argument(0).isNull() || asObject(exec->argument(0))->inherits(JSTestObj::s_info)))
-        return jsTestObjPrototypeFunctionOverloadedMethod2(exec);
-    if ((exec->argumentCount() == 1 && (exec->argument(0).isNull() || exec->argument(0).isUndefined() || exec->argument(0).isString() || exec->argument(0).isObject())))
-        return jsTestObjPrototypeFunctionOverloadedMethod3(exec);
-    if (exec->argumentCount() == 1)
-        return jsTestObjPrototypeFunctionOverloadedMethod4(exec);
-    return throwError(exec, TypeError);
+  if ((exec->argumentCount() == 2 &&
+       (exec->argument(0).isNull() ||
+        asObject(exec->argument(0))->inherits(&JSTestObj::s_info)) &&
+       (exec->argument(1).isNull() || exec->argument(1).isUndefined() ||
+        exec->argument(1).isString() || exec->argument(1).isObject())))
+    return jsTestObjPrototypeFunctionOverloadedMethod1(exec);
+  if ((exec->argumentCount() == 1 &&
+       (exec->argument(0).isNull() ||
+        asObject(exec->argument(0))->inherits(&JSTestObj::s_info))) ||
+      (exec->argumentCount() == 2 &&
+       (exec->argument(0).isNull() ||
+        asObject(exec->argument(0))->inherits(&JSTestObj::s_info))))
+    return jsTestObjPrototypeFunctionOverloadedMethod2(exec);
+  if ((exec->argumentCount() == 1 &&
+       (exec->argument(0).isNull() || exec->argument(0).isUndefined() ||
+        exec->argument(0).isString() || exec->argument(0).isObject())))
+    return jsTestObjPrototypeFunctionOverloadedMethod3(exec);
+  if (exec->argumentCount() == 1)
+    return jsTestObjPrototypeFunctionOverloadedMethod4(exec);
+  return throwError(exec, TypeError);
 }
 
 JSC::JSValue toJS(JSC::ExecState* exec,
