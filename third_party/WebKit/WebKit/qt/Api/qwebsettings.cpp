@@ -205,9 +205,10 @@ void QWebSettingsPrivate::apply() {
     settings->setSpatialNavigationEnabled(value);
 
     value = attributes.value(
-        QWebSettings::DOMPasteAllowed,
-        global->attributes.value(QWebSettings::DOMPasteAllowed));
+        QWebSettings::JavascriptCanAccessClipboard,
+        global->attributes.value(QWebSettings::JavascriptCanAccessClipboard));
     settings->setDOMPasteAllowed(value);
+    settings->setJavaScriptCanAccessClipboard(value);
 
     value = attributes.value(
         QWebSettings::DeveloperExtrasEnabled,
@@ -272,11 +273,6 @@ void QWebSettingsPrivate::apply() {
         QWebSettings::LocalContentCanAccessFileUrls,
         global->attributes.value(QWebSettings::LocalContentCanAccessFileUrls));
     settings->setAllowFileAccessFromFileURLs(value);
-
-    value = attributes.value(
-        QWebSettings::JavaScriptCanAccessClipboard,
-        global->attributes.value(QWebSettings::JavaScriptCanAccessClipboard));
-    settings->setJavaScriptCanAccessClipboard(value);
 
     value = attributes.value(
         QWebSettings::XSSAuditingEnabled,
@@ -435,8 +431,6 @@ QWebSettings* QWebSettings::globalSettings() {
    is disabled by default.
     \value JavascriptCanOpenWindows Specifies whether JavaScript programs
         can open new windows. This is disabled by default.
-    \value DOMPasteAllowed Specifies whether JavaScript programs can
-        read clipboard contents.
     \value JavascriptCanAccessClipboard Specifies whether JavaScript programs
         can read or write to the clipboard. This is disabled by default.
     \value DeveloperExtrasEnabled Enables extra tools for Web developers.

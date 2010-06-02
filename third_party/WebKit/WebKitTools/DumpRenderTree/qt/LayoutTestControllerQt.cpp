@@ -389,7 +389,7 @@ void LayoutTestController::setMainFrameIsFirstResponder(bool isFirst) {
 
 void LayoutTestController::setJavaScriptCanAccessClipboard(bool enable) {
   m_drt->webPage()->settings()->setAttribute(
-      QWebSettings::JavaScriptCanAccessClipboard, enable);
+      QWebSettings::JavascriptCanAccessClipboard, enable);
 }
 
 void LayoutTestController::setXSSAuditorEnabled(bool enable) {
