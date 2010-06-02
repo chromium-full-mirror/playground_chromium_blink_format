@@ -84,7 +84,7 @@ PassRefPtr<FilterEffect> SVGFEColorMatrixElement::build(
 
   Vector<float> filterValues;
   SVGNumberList* numbers = values();
-  const ColorMatrixType filterType(static_cast<const ColorMatrixType>(type()));
+  const ColorMatrixType filterType(static_cast<ColorMatrixType>(type()));
 
   // Use defaults if values is empty (SVG 1.1 15.10).
   if (!hasAttribute(SVGNames::valuesAttr)) {
