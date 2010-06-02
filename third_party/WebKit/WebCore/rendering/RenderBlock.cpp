@@ -2383,12 +2383,13 @@ void RenderBlock::paintChildren(PaintInfo& paintInfo, int tx, int ty) {
   PaintInfo info(paintInfo);
   info.phase = newPhase;
   info.paintingRoot = paintingRootForChildren(paintInfo);
-  bool isPrinting = document()->printing();
+  bool checkPageBreaks = document()->printing() &&
+                         !document()->settings()->paginateDuringLayoutEnabled();
 
   for (RenderBox* child = firstChildBox(); child;
        child = child->nextSiblingBox()) {
     // Check for page-break-before: always, and if it's set, break and bail.
-    if (isPrinting && !childrenInline() &&
+    if (checkPageBreaks && !childrenInline() &&
         child->style()->pageBreakBefore() == PBALWAYS &&
         (ty + child->y()) > paintInfo.rect.y() &&
         (ty + child->y()) < paintInfo.rect.bottom()) {
@@ -2397,7 +2398,7 @@ void RenderBlock::paintChildren(PaintInfo& paintInfo, int tx, int ty) {
     }
 
     // Check for page-break-inside: avoid, and it it's set, break and bail.
-    if (isPrinting && !childrenInline() &&
+    if (checkPageBreaks && !childrenInline() &&
         child->style()->pageBreakInside() == PBAVOID &&
         ty + child->y() > paintInfo.rect.y() &&
         ty + child->y() < paintInfo.rect.bottom() &&
@@ -2410,7 +2411,7 @@ void RenderBlock::paintChildren(PaintInfo& paintInfo, int tx, int ty) {
       child->paint(info, tx, ty);
 
     // Check for page-break-after: always, and if it's set, break and bail.
-    if (isPrinting && !childrenInline() &&
+    if (checkPageBreaks && !childrenInline() &&
         child->style()->pageBreakAfter() == PBALWAYS &&
         (ty + child->y() + child->height()) > paintInfo.rect.y() &&
         (ty + child->y() + child->height()) < paintInfo.rect.bottom()) {
