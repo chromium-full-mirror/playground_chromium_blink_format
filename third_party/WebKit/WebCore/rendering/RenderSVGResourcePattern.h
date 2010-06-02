@@ -59,7 +59,9 @@ class RenderSVGResourcePattern : public RenderSVGResourceContainer {
   virtual void postApplyResource(RenderObject*,
                                  GraphicsContext*&,
                                  unsigned short resourceMode);
-  virtual FloatRect resourceBoundingBox(RenderObject*) { return FloatRect(); }
+  virtual FloatRect resourceBoundingBox(const FloatRect&) {
+    return FloatRect();
+  }
 
   virtual RenderSVGResourceType resourceType() const { return s_resourceType; }
   static RenderSVGResourceType s_resourceType;

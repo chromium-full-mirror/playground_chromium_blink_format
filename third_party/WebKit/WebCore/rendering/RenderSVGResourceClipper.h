@@ -54,7 +54,7 @@ class RenderSVGResourceClipper : public RenderSVGResourceContainer {
                              RenderStyle*,
                              GraphicsContext*&,
                              unsigned short resourceMode);
-  virtual FloatRect resourceBoundingBox(RenderObject*);
+  virtual FloatRect resourceBoundingBox(const FloatRect&);
 
   virtual RenderSVGResourceType resourceType() const {
     return ClipperResourceType;

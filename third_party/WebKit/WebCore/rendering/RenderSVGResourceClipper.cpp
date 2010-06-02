@@ -303,22 +303,13 @@ void RenderSVGResourceClipper::calculateClipContentRepaintRect() {
   }
 }
 
-FloatRect RenderSVGResourceClipper::resourceBoundingBox(RenderObject* object) {
-  // Save the reference to the calling object for relayouting it on changing
-  // resource properties.
-  if (!m_clipper.contains(object))
-    m_clipper.set(object, new ClipperData);
-
-  // Resource was not layouted yet. Give back the boundingBox of the object.
-  if (selfNeedsLayout())
-    return object->objectBoundingBox();
-
+FloatRect RenderSVGResourceClipper::resourceBoundingBox(
+    const FloatRect& objectBoundingBox) {
   if (m_clipBoundaries.isEmpty())
     calculateClipContentRepaintRect();
 
   if (static_cast<SVGClipPathElement*>(node())->clipPathUnits() ==
       SVGUnitTypes::SVG_UNIT_TYPE_OBJECTBOUNDINGBOX) {
-    FloatRect objectBoundingBox = object->objectBoundingBox();
     AffineTransform transform;
     transform.translate(objectBoundingBox.x(), objectBoundingBox.y());
     transform.scaleNonUniform(objectBoundingBox.width(),

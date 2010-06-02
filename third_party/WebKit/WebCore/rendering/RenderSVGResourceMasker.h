@@ -57,7 +57,7 @@ class RenderSVGResourceMasker : public RenderSVGResourceContainer {
                              RenderStyle*,
                              GraphicsContext*&,
                              unsigned short resourceMode);
-  virtual FloatRect resourceBoundingBox(RenderObject*);
+  virtual FloatRect resourceBoundingBox(const FloatRect&);
 
   SVGUnitTypes::SVGUnitType maskUnits() const {
     return toUnitType(static_cast<SVGMaskElement*>(node())->maskUnits());

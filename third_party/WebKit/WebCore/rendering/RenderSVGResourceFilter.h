@@ -72,7 +72,7 @@ class RenderSVGResourceFilter : public RenderSVGResourceContainer {
                                  GraphicsContext*&,
                                  unsigned short resourceMode);
 
-  virtual FloatRect resourceBoundingBox(RenderObject*);
+  virtual FloatRect resourceBoundingBox(const FloatRect&);
 
   PassOwnPtr<SVGFilterBuilder> buildPrimitives();
 
