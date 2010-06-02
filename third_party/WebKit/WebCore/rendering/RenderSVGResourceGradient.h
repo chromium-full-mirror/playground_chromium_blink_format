@@ -59,9 +59,7 @@ class RenderSVGResourceGradient : public RenderSVGResourceContainer {
   virtual void postApplyResource(RenderObject*,
                                  GraphicsContext*&,
                                  unsigned short resourceMode);
-  virtual FloatRect resourceBoundingBox(const FloatRect&) {
-    return FloatRect();
-  }
+  virtual FloatRect resourceBoundingBox(RenderObject*) { return FloatRect(); }
 
  protected:
   void addStops(GradientData*, const Vector<Gradient::ColorStop>&) const;
