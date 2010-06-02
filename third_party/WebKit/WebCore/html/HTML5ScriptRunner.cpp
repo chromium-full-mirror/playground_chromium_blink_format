@@ -47,7 +47,9 @@ HTML5ScriptRunner::HTML5ScriptRunner(Document* document,
     : m_document(document),
       m_host(host),
       m_scriptNestingLevel(0),
-      m_hasScriptsWaitingForStylesheets(false) {}
+      m_hasScriptsWaitingForStylesheets(false) {
+  ASSERT(m_host);
+}
 
 HTML5ScriptRunner::~HTML5ScriptRunner() {
   // FIXME: Should we be passed a "done loading/parsing" callback sooner than
@@ -82,9 +84,9 @@ ScriptSourceCode HTML5ScriptRunner::sourceFromPendingScript(
     return ScriptSourceCode(script.cachedScript.get());
   }
   errorOccurred = false;
-  // FIXME: Line numbers are wrong.
   return ScriptSourceCode(script.element->textContent(),
-                          documentURLForScriptExecution(m_document));
+                          documentURLForScriptExecution(m_document),
+                          script.startingLineNumber);
 }
 
 bool HTML5ScriptRunner::isPendingScriptReady(const PendingScript& script) {
@@ -151,12 +153,13 @@ void HTML5ScriptRunner::stopWatchingForLoad(PendingScript& pendingScript) {
 
 // This function should match 10.2.5.11 "An end tag whose tag name is 'script'"
 // Script handling lives outside the tree builder to keep the each class simple.
-bool HTML5ScriptRunner::execute(PassRefPtr<Element> scriptElement) {
+bool HTML5ScriptRunner::execute(PassRefPtr<Element> scriptElement,
+                                int startLine) {
   ASSERT(scriptElement);
   // FIXME: If scripting is disabled, always just return true;
 
   // Try to execute the script given to us.
-  runScript(scriptElement.get());
+  runScript(scriptElement.get(), startLine);
   if (m_scriptNestingLevel)
     return false;  // Don't continue parsing.
   if (!executeParsingBlockingScripts())
@@ -218,7 +221,7 @@ void HTML5ScriptRunner::requestScript(Element* script) {
 
 // This method is meant to match the HTML5 definition of "running a script"
 // http://www.whatwg.org/specs/web-apps/current-work/multipage/scripting-1.html#running-a-script
-void HTML5ScriptRunner::runScript(Element* script) {
+void HTML5ScriptRunner::runScript(Element* script, int startingLineNumber) {
   ASSERT(!m_parsingBlockingScript.element);
   m_scriptNestingLevel++;
   // Check script type and language, current code uses
@@ -231,10 +234,11 @@ void HTML5ScriptRunner::runScript(Element* script) {
     requestScript(script);
   } else if (!m_document->haveStylesheetsLoaded()) {
     m_parsingBlockingScript.element = script;
+    m_parsingBlockingScript.startingLineNumber = startingLineNumber;
   } else {
-    // FIXME: Need a line numbers implemenation.
     ScriptSourceCode sourceCode(script->textContent(),
-                                documentURLForScriptExecution(m_document), 0);
+                                documentURLForScriptExecution(m_document),
+                                startingLineNumber);
     executeScript(script, sourceCode);
   }
   m_scriptNestingLevel--;

@@ -148,6 +148,7 @@ HTML5Lexer::~HTML5Lexer() {}
 void HTML5Lexer::reset() {
   m_state = DataState;
   m_token = 0;
+  m_lineNumber = 0;
   m_skipLeadingNewLineForListing = false;
   m_emitPending = false;
   m_additionalAllowedCharacter = '\0';
@@ -237,7 +238,7 @@ unsigned HTML5Lexer::consumeEntity(SegmentedString& source,
         else if (cc >= 'A' && cc <= 'F')
           result = result * 16 + 10 + cc - 'A';
         else if (cc == ';') {
-          source.advance();
+          source.advancePastNonNewline();
           return legalEntityFor(result);
         } else
           return legalEntityFor(result);
@@ -247,7 +248,7 @@ unsigned HTML5Lexer::consumeEntity(SegmentedString& source,
         if (cc >= '0' && cc <= '9')
           result = result * 10 + cc - '0';
         else if (cc == ';') {
-          source.advance();
+          source.advancePastNonNewline();
           return legalEntityFor(result);
         } else
           return legalEntityFor(result);
@@ -1079,7 +1080,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           if (cc == '>')
             break;
           m_token->appendToComment(cc);
-          source.advance();
+          source.advance(m_lineNumber);
         }
         emitCurrentToken();
         m_state = DataState;
@@ -1519,7 +1520,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         break;
       }
     }
-    source.advance();
+    source.advance(m_lineNumber);
     if (m_emitPending) {
       m_emitPending = false;
       return true;

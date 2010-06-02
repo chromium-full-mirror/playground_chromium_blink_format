@@ -40,6 +40,8 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
+static const int uninitializedLineNumberValue = -1;
+
 HTML5TreeBuilder::HTML5TreeBuilder(HTML5Lexer* lexer,
                                    HTMLDocument* document,
                                    bool reportErrors)
@@ -47,7 +49,9 @@ HTML5TreeBuilder::HTML5TreeBuilder(HTML5Lexer* lexer,
       m_reportErrors(reportErrors),
       m_isPaused(false),
       m_lexer(lexer),
-      m_legacyHTMLParser(new HTMLParser(document, reportErrors)) {}
+      m_legacyHTMLParser(new HTMLParser(document, reportErrors)),
+      m_lastScriptElementStartLine(uninitializedLineNumberValue),
+      m_scriptToProcessStartLine(uninitializedLineNumberValue) {}
 
 HTML5TreeBuilder::~HTML5TreeBuilder() {}
 
@@ -99,22 +103,32 @@ void HTML5TreeBuilder::handleScriptStartTag() {
   notImplemented();  // Save insertion mode.
 }
 
-void HTML5TreeBuilder::handleScriptEndTag(Element* scriptElement) {
+void HTML5TreeBuilder::handleScriptEndTag(Element* scriptElement,
+                                          int scriptStartLine) {
   ASSERT(!m_scriptToProcess);  // Caller never called takeScriptToProcess!
-  notImplemented();            // Save insertion mode and insertion point?
+  ASSERT(m_scriptToProcessStartLine ==
+         uninitializedLineNumberValue);  // Caller never called
+                                         // takeScriptToProcess!
+  notImplemented();  // Save insertion mode and insertion point?
 
   // Pause ourselves so that parsing stops until the script can be processed by
   // the caller.
   m_isPaused = true;
   m_scriptToProcess = scriptElement;
+  // Lexer line numbers are 0-based, ScriptSourceCode expects 1-based lines,
+  // so we convert here before passing the line number off to HTML5ScriptRunner.
+  m_scriptToProcessStartLine = scriptStartLine + 1;
 }
 
-PassRefPtr<Element> HTML5TreeBuilder::takeScriptToProcess() {
+PassRefPtr<Element> HTML5TreeBuilder::takeScriptToProcess(
+    int& scriptStartLine) {
   // Unpause ourselves, callers may pause us again when processing the script.
   // The HTML5 spec is written as though scripts are executed inside the tree
   // builder.  We pause the parser to exit the tree builder, and then resume
   // before running scripts.
   m_isPaused = false;
+  scriptStartLine = m_scriptToProcessStartLine;
+  m_scriptToProcessStartLine = uninitializedLineNumberValue;
   return m_scriptToProcess.release();
 }
 
@@ -141,6 +155,7 @@ PassRefPtr<Node> HTML5TreeBuilder::passTokenToLegacyParser(HTML5Token& token) {
     if (token.name() == scriptTag) {
       handleScriptStartTag();
       m_lastScriptElement = static_pointer_cast<Element>(result);
+      m_lastScriptElementStartLine = m_lexer->lineNumber();
     } else if (token.name() == textareaTag || token.name() == titleTag)
       m_lexer->setState(HTML5Lexer::RCDATAState);
     else if (token.name() == styleTag || token.name() == iframeTag ||
@@ -156,8 +171,11 @@ PassRefPtr<Node> HTML5TreeBuilder::passTokenToLegacyParser(HTML5Token& token) {
   if (token.type() == HTML5Token::EndTag) {
     if (token.name() == scriptTag) {
       if (m_lastScriptElement) {
-        handleScriptEndTag(m_lastScriptElement.get());
+        ASSERT(m_lastScriptElementStartLine != uninitializedLineNumberValue);
+        handleScriptEndTag(m_lastScriptElement.get(),
+                           m_lastScriptElementStartLine);
         m_lastScriptElement = 0;
+        m_lastScriptElementStartLine = uninitializedLineNumberValue;
       }
     }
   }

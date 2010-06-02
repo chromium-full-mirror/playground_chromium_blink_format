@@ -50,7 +50,9 @@ HTML5Tokenizer::HTML5Tokenizer(HTMLDocument* document, bool reportErrors)
 
 HTML5Tokenizer::~HTML5Tokenizer() {}
 
-void HTML5Tokenizer::begin() {}
+void HTML5Tokenizer::begin() {
+  // FIXME: Should we reset the lexer?
+}
 
 void HTML5Tokenizer::pumpLexer() {
   ASSERT(!m_treeBuilder->isPaused());
@@ -63,8 +65,11 @@ void HTML5Tokenizer::pumpLexer() {
 
     // The parser will pause itself when waiting on a script to load or run.
     // ScriptRunner executes scripts at the right times and handles reentrancy.
+    int scriptStartLine = 0;
+    RefPtr<Element> scriptElement =
+        m_treeBuilder->takeScriptToProcess(scriptStartLine);
     bool shouldContinueParsing =
-        m_scriptRunner->execute(m_treeBuilder->takeScriptToProcess());
+        m_scriptRunner->execute(scriptElement.release(), scriptStartLine);
     m_treeBuilder->setPaused(!shouldContinueParsing);
     if (!shouldContinueParsing)
       return;
@@ -102,6 +107,14 @@ void HTML5Tokenizer::finish() {
 
 int HTML5Tokenizer::executingScript() const {
   return m_scriptRunner->inScriptExecution();
+}
+
+int HTML5Tokenizer::lineNumber() const {
+  return m_lexer->lineNumber();
+}
+
+int HTML5Tokenizer::columnNumber() const {
+  return m_lexer->columnNumber();
 }
 
 bool HTML5Tokenizer::isWaitingForScripts() const {

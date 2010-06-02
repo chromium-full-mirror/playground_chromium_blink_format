@@ -47,7 +47,7 @@ class HTML5ScriptRunner : public Noncopyable {
   ~HTML5ScriptRunner();
 
   // Processes the passed in script and any pending scripts if possible.
-  bool execute(PassRefPtr<Element> scriptToProcess);
+  bool execute(PassRefPtr<Element> scriptToProcess, int scriptStartLine);
   // Processes any pending scripts.
   bool executeScriptsWaitingForLoad(CachedResource*);
   bool hasScriptsWaitingForStylesheets() const {
@@ -59,12 +59,13 @@ class HTML5ScriptRunner : public Noncopyable {
 
  private:
   struct PendingScript {
-    PendingScript() : watchingForLoad(false) {}
+    PendingScript() : watchingForLoad(false), startingLineNumber(0) {}
 
     RefPtr<Element> element;
     CachedResourceHandle<CachedScript> cachedScript;
-    bool watchingForLoad;  // Did we pass the cachedScript to the
-                           // HTML5ScriptRunnerHost.
+    bool watchingForLoad;    // Did we pass the cachedScript to the
+                             // HTML5ScriptRunnerHost.
+    int startingLineNumber;  // Only used for inline script tags.
     // HTML5 has an isReady parameter, however isReady ends up equivalent to
     // m_document->haveStylesheetsLoaded() && cachedScript->isLoaded()
   };
@@ -75,7 +76,7 @@ class HTML5ScriptRunner : public Noncopyable {
   void executePendingScript();
 
   void requestScript(Element*);
-  void runScript(Element*);
+  void runScript(Element*, int startingLineNumber);
 
   // Helpers for dealing with HTML5ScriptRunnerHost
   void watchForLoad(PendingScript&);
