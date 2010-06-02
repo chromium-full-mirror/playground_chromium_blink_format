@@ -260,6 +260,9 @@ class SVGRenderStyle : public RefCounted<SVGRenderStyle> {
                                                String())
 
   // convenience
+  bool hasClipper() const { return !clipperResource().isEmpty(); }
+  bool hasMasker() const { return !maskerResource().isEmpty(); }
+  bool hasFilter() const { return !filterResource().isEmpty(); }
   bool hasMarkers() const {
     return !markerStartResource().isEmpty() || !markerMidResource().isEmpty() ||
            !markerEndResource().isEmpty();

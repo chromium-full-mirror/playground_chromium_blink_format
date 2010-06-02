@@ -25,7 +25,7 @@
 #include "CSSParser.h"
 #include "RGBColor.h"
 #include "SVGException.h"
-
+#include <stdio.h>
 namespace WebCore {
 
 SVGColor::SVGColor() : m_colorType(SVG_COLORTYPE_UNKNOWN) {}
@@ -59,10 +59,11 @@ void SVGColor::setRGBColor(const String& rgbColor, ExceptionCode& ec) {
 }
 
 Color SVGColor::colorFromRGBColorString(const String& colorString) {
+  printf("srin\n");
   String s = colorString.stripWhiteSpace();
   // hsl, hsla and rgba are not in the SVG spec.
   // FIXME: rework css parser so it is more svg aware
-  if (s.startsWith("hsl") || s.startsWith("rgba"))
+  if (s.startsWith("hsl"))
     return Color();
   RGBA32 color;
   if (CSSParser::parseColor(color, s))

@@ -66,9 +66,7 @@ class RenderSVGResourceMarker : public RenderSVGResourceContainer {
                              unsigned short) {
     return false;
   }
-  virtual FloatRect resourceBoundingBox(const FloatRect&) {
-    return FloatRect();
-  }
+  virtual FloatRect resourceBoundingBox(RenderObject*) { return FloatRect(); }
 
   FloatPoint referencePoint() const;
   float angle() const;
