@@ -58,15 +58,15 @@ class QWebSelectMethod : public QObject {
 
 class QWebKitPlatformPlugin {
  public:
-  inline ~QWebKitPlatformPlugin() {}
+  virtual ~QWebKitPlatformPlugin() {}
 
   enum Extension { MultipleSelections };
 
-  virtual QWebSelectMethod* createSelectInputMethod() const = 0;
   virtual bool supportsExtension(Extension extension) const = 0;
+  virtual QWebSelectMethod* createSelectInputMethod() const = 0;
 };
 
 Q_DECLARE_INTERFACE(QWebKitPlatformPlugin,
-                    "com.nokia.Qt.WebKit.PlatformPlugin/1.0");
+                    "com.nokia.Qt.WebKit.PlatformPlugin/1.1");
 
 #endif  // QWEBKITPLATFORMPLUGIN_H
