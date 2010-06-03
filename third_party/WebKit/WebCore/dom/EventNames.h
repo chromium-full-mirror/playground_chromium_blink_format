@@ -82,16 +82,11 @@ namespace WebCore {
                                                                                       macro(                                     \
                                                                                           touchcancel)                           \
                                                                                                                                  \
-                                                                                          macro(transformactionstart) macro(     \
-                                                                                              transformactionupdate)             \
+                                                                                          macro(                                 \
+                                                                                              success)                           \
+                                                                                                                                 \
                                                                                               macro(                             \
-                                                                                                  transformactionend)            \
-                                                                                                                                 \
-                                                                                                  macro(                         \
-                                                                                                      success)                   \
-                                                                                                                                 \
-                                                                                                      macro(                     \
-                                                                                                          loadend)               \
+                                                                                                  loadend)                       \
                                                                                                                                  \
       // end of DOM_EVENT_NAMES_FOR_EACH
 

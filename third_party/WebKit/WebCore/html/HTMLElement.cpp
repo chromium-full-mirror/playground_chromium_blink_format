@@ -316,15 +316,6 @@ void HTMLElement::parseMappedAttribute(Attribute* attr) {
   } else if (attr->name() == ontouchcancelAttr) {
     setAttributeEventListener(eventNames().touchcancelEvent,
                               createAttributeEventListener(this, attr));
-  } else if (attr->name() == ontransformactionstartAttr) {
-    setAttributeEventListener(eventNames().transformactionstartEvent,
-                              createAttributeEventListener(this, attr));
-  } else if (attr->name() == ontransformactionupdateAttr) {
-    setAttributeEventListener(eventNames().transformactionupdateEvent,
-                              createAttributeEventListener(this, attr));
-  } else if (attr->name() == ontransformactionendAttr) {
-    setAttributeEventListener(eventNames().transformactionendEvent,
-                              createAttributeEventListener(this, attr));
   }
 }
 

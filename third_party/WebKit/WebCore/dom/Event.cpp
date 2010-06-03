@@ -189,12 +189,6 @@ bool Event::isDeviceOrientationEvent() const {
 }
 #endif
 
-#if ENABLE(TRANSFORMACTION_EVENTS)
-bool Event::isTransformActionEvent() const {
-  return false;
-}
-#endif
-
 bool Event::fromUserGesture() {
   if (!UserGestureIndicator::processingUserGesture())
     return false;
@@ -213,12 +207,6 @@ bool Event::fromUserGesture() {
       type == eventNames().touchmoveEvent ||
       type == eventNames().touchendEvent ||
       type == eventNames().touchcancelEvent
-#endif
-#if ENABLE(TRANSFORMACTION_EVENTS)
-      // transformaction events
-      || type == eventNames().transformactionstartEvent ||
-      type == eventNames().transformactionupdateEvent ||
-      type == eventNames().transformactionendEvent
 #endif
       // other accepted events
       || type == eventNames().selectEvent || type == eventNames().changeEvent ||
