@@ -703,7 +703,7 @@ bool RenderThemeChromiumWin::paintProgressBar(RenderObject* o,
   // because the animation is a platform detail and WebKit doesn't need to know
   // how.
   IntRect valueRect = renderProgress->isDeterminate()
-                          ? determianteProgressValueRectFor(renderProgress, r)
+                          ? determinateProgressValueRectFor(renderProgress, r)
                           : IntRect(0, 0, 0, 0);
   double animatedSeconds =
       renderProgress->animationStartTime()
