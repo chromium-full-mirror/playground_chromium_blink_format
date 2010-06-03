@@ -41,6 +41,8 @@
 #endif
 
 #include "../../../WebKit/qt/WebCoreSupport/DumpRenderTreeSupportQt.h"
+#include <qgraphicsview.h>
+#include <qgraphicswebview.h>
 #include <qwebframe.h>
 #include <qwebinspector.h>
 #include <qwebpage.h>
@@ -79,6 +81,9 @@ class DumpRenderTree : public QObject {
 
   void setSingleFileMode(bool flag) { m_singleFileMode = flag; }
   bool isSingleFileMode() { return m_singleFileMode; }
+
+  void setGraphicsBased(bool flag) { m_graphicsBased = flag; }
+  bool isGraphicsBased() { return m_graphicsBased; }
 
   void setDumpPixels(bool);
 
@@ -139,7 +144,7 @@ class DumpRenderTree : public QObject {
   QString m_expectedHash;
 
   WebPage* m_page;
-  QWebView* m_mainView;
+  QWidget* m_mainView;
 
   EventSender* m_eventSender;
   TextInputController* m_textInputController;
@@ -151,6 +156,7 @@ class DumpRenderTree : public QObject {
   QList<QObject*> windows;
   bool m_enableTextOutput;
   bool m_singleFileMode;
+  bool m_graphicsBased;
   QString m_persistentStoragePath;
 };
 
@@ -216,6 +222,18 @@ class WebPage : public QWebPage {
  private:
   QWebInspector* m_webInspector;
   DumpRenderTree* m_drt;
+};
+
+class WebViewGraphicsBased : public QGraphicsView {
+  Q_OBJECT
+
+ public:
+  WebViewGraphicsBased(QWidget* parent);
+  QGraphicsWebView* graphicsView() const { return m_item; }
+  void setPage(QWebPage* page) { m_item->setPage(page); }
+
+ private:
+  QGraphicsWebView* m_item;
 };
 }
 
