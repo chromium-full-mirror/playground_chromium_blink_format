@@ -200,7 +200,7 @@ static void drawResampledBitmap(SkCanvas& canvas,
   if (!destBitmapSubsetSkI.intersect(resizedImageRect))
     return;  // Resized image does not intersect.
 
-  if (srcIsFull ||
+  if (srcIsFull &&
       bitmap.shouldCacheResampling(
           resizedImageRect.width(), resizedImageRect.height(),
           destBitmapSubsetSkI.width(), destBitmapSubsetSkI.height())) {
