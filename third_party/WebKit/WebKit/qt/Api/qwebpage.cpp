@@ -1226,6 +1226,7 @@ void QWebPagePrivate::inputMethodEvent(QInputMethodEvent* ev) {
   ev->accept();
 }
 
+#ifndef QT_NO_PROPERTIES
 void QWebPagePrivate::dynamicPropertyChangeEvent(
     QDynamicPropertyChangeEvent* event) {
   if (event->propertyName() == "_q_viewMode") {
@@ -1290,6 +1291,7 @@ void QWebPagePrivate::dynamicPropertyChangeEvent(
   }
 #endif
 }
+#endif
 
 void QWebPagePrivate::shortcutOverrideEvent(QKeyEvent* event) {
   WebCore::Frame* frame = page->focusController()->focusedOrMainFrame();
@@ -2753,10 +2755,12 @@ bool QWebPage::event(QEvent* ev) {
       d->touchEvent(static_cast<QTouchEvent*>(ev));
       break;
 #endif
+#ifndef QT_NO_PROPERTIES
     case QEvent::DynamicPropertyChange:
       d->dynamicPropertyChangeEvent(
           static_cast<QDynamicPropertyChangeEvent*>(ev));
       break;
+#endif
     default:
       return QObject::event(ev);
   }

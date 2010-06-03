@@ -114,7 +114,9 @@ class QWebPagePrivate {
 
   void inputMethodEvent(QInputMethodEvent*);
 
+#ifndef QT_NO_PROPERTIES
   void dynamicPropertyChangeEvent(QDynamicPropertyChangeEvent*);
+#endif
 
   void shortcutOverrideEvent(QKeyEvent*);
   void leaveEvent(QEvent*);
