@@ -193,7 +193,7 @@ class QtRuntimeMetaMethod : public QtRuntimeMethod {
 
  private:
   virtual CallType getCallData(CallData&);
-  static JSValue JSC_HOST_CALL call(ExecState* exec);
+  static EncodedJSValue JSC_HOST_CALL call(ExecState* exec);
   static JSValue lengthGetter(ExecState*, JSValue, const Identifier&);
   static JSValue connectGetter(ExecState*, JSValue, const Identifier&);
   static JSValue disconnectGetter(ExecState*, JSValue, const Identifier&);
@@ -225,7 +225,7 @@ class QtRuntimeConnectionMethod : public QtRuntimeMethod {
 
  private:
   virtual CallType getCallData(CallData&);
-  static JSValue JSC_HOST_CALL call(ExecState* exec);
+  static EncodedJSValue JSC_HOST_CALL call(ExecState* exec);
   static JSValue lengthGetter(ExecState*, JSValue, const Identifier&);
   static QMultiMap<QObject*, QtConnectionObject*> connections;
   friend class QtConnectionObject;
