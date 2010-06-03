@@ -279,6 +279,11 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   DEFINE_ATTRIBUTE_EVENT_LISTENER(touchend);
   DEFINE_ATTRIBUTE_EVENT_LISTENER(touchcancel);
 #endif
+#if ENABLE(TRANSFORMACTION_EVENTS)
+  DEFINE_ATTRIBUTE_EVENT_LISTENER(transformactionstart);
+  DEFINE_ATTRIBUTE_EVENT_LISTENER(transformactionupdate);
+  DEFINE_ATTRIBUTE_EVENT_LISTENER(transformactionend);
+#endif
 
   DocumentType* doctype() const { return m_docType.get(); }
 
@@ -723,7 +728,8 @@ class Document : public ContainerNode, public ScriptExecutionContext {
     ANIMATIONITERATION_LISTENER = 0x400,
     TRANSITIONEND_LISTENER = 0x800,
     BEFORELOAD_LISTENER = 0x1000,
-    TOUCH_LISTENER = 0x2000
+    TOUCH_LISTENER = 0x2000,
+    TRANSFORMACTION_LISTENER = 0x4000
   };
 
   bool hasListenerType(ListenerType listenerType) const {

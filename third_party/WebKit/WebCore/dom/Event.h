@@ -143,6 +143,9 @@ class Event : public RefCounted<Event> {
 #if ENABLE(DEVICE_ORIENTATION)
   virtual bool isDeviceOrientationEvent() const;
 #endif
+#if ENABLE(TRANSFORMACTION_EVENTS)
+  virtual bool isTransformActionEvent() const;
+#endif
   bool fromUserGesture();
 
   bool propagationStopped() const {

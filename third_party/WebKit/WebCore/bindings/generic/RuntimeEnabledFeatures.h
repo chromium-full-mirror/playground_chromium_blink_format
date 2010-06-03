@@ -128,6 +128,20 @@ class RuntimeEnabledFeatures {
   static bool ontouchcancelEnabled() { return isTouchEnabled; }
 #endif
 
+#if ENABLE(TRANSFORMACTION_EVENTS)
+  static bool transformactionEnabled() { return isTransformActionEnabled; }
+  static void setTransformActionEnabled(bool isEnabled) {
+    isTransformActionEnabled = isEnabled;
+  }
+  static bool ontransformactionstartEnabled() {
+    return isTransformActionEnabled;
+  }
+  static bool ontransformactionupdateEnabled() {
+    return isTransformActionEnabled;
+  }
+  static bool ontransformactionendEnabled() { return isTransformActionEnabled; }
+#endif
+
  private:
   // Never instantiate.
   RuntimeEnabledFeatures() {}
@@ -141,6 +155,7 @@ class RuntimeEnabledFeatures {
   static bool isWebGLEnabled;
   static bool isPushStateEnabled;
   static bool isTouchEnabled;
+  static bool isTransformActionEnabled;
 };
 
 }  // namespace WebCore

@@ -86,6 +86,10 @@
 #include "JSTouchEvent.h"
 #include "TouchEvent.h"
 #endif
+#if ENABLE(TRANSFORMACTION_EVENTS)
+#include "JSTransformActionEvent.h"
+#include "TransformActionEvent.h"
+#endif
 
 #if ENABLE(INDEXED_DATABASE)
 #include "IDBErrorEvent.h"
@@ -138,6 +142,11 @@ JSValue toJS(ExecState* exec, JSDOMGlobalObject* globalObject, Event* event) {
     else if (event->isTouchEvent())
       wrapper =
           CREATE_DOM_OBJECT_WRAPPER(exec, globalObject, TouchEvent, event);
+#endif
+#if ENABLE(TRANSFORMACTION_EVENTS)
+    else if (event->isTransformActionEvent())
+      wrapper = CREATE_DOM_OBJECT_WRAPPER(exec, globalObject,
+                                          TransformActionEvent, event);
 #endif
     else
       wrapper = CREATE_DOM_OBJECT_WRAPPER(exec, globalObject, UIEvent, event);
