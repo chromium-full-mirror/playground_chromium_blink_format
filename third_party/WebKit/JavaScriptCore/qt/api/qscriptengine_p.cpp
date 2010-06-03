@@ -80,6 +80,11 @@ QScriptValuePrivate* QScriptEnginePrivate::evaluate(
       this, evaluate(program->program(), program->file(), program->line()));
 }
 
+QScriptValuePrivate* QScriptEnginePrivate::newObject() const {
+  return new QScriptValuePrivate(
+      this, JSObjectMake(context(), /* jsClass */ 0, /* userData */ 0));
+}
+
 QScriptValuePrivate* QScriptEnginePrivate::globalObject() const {
   JSObjectRef globalObject = JSContextGetGlobalObject(context());
   return new QScriptValuePrivate(this, globalObject, globalObject);
