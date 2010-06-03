@@ -3996,7 +3996,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
       JSValue v = callFrame->r(func).jsValue();
 
       CallData callData;
-      CallType callType = v.getCallData(callData);
+      CallType callType = getCallData(v, callData);
 
       if (callType == CallTypeJS) {
         ScopeChainNode* callDataScopeChain = callData.js.scopeChain;
@@ -4042,7 +4042,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
         JSValue returnValue;
         {
           SamplingTool::HostCallRecord callRecord(m_sampler.get());
-          returnValue = callData.native.function(newCallFrame);
+          returnValue = JSValue::decode(callData.native.function(newCallFrame));
         }
         CHECK_FOR_EXCEPTION();
 
@@ -4178,7 +4178,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
       int argCount = callFrame->r(argCountReg).i();
       registerOffset += argCount;
       CallData callData;
-      CallType callType = v.getCallData(callData);
+      CallType callType = getCallData(v, callData);
 
       if (callType == CallTypeJS) {
         ScopeChainNode* callDataScopeChain = callData.js.scopeChain;
@@ -4224,7 +4224,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
         JSValue returnValue;
         {
           SamplingTool::HostCallRecord callRecord(m_sampler.get());
-          returnValue = callData.native.function(newCallFrame);
+          returnValue = JSValue::decode(callData.native.function(newCallFrame));
         }
         CHECK_FOR_EXCEPTION();
 
@@ -4519,7 +4519,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
       JSValue v = callFrame->r(func).jsValue();
 
       ConstructData constructData;
-      ConstructType constructType = v.getConstructData(constructData);
+      ConstructType constructType = getConstructData(v, constructData);
 
       if (constructType == ConstructTypeJS) {
         ScopeChainNode* callDataScopeChain = constructData.js.scopeChain;
