@@ -1010,8 +1010,10 @@ static void runTest(const string& testPathOrURL) {
     DispatchMessage(&msg);
   }
 
-  if (shouldEnableDeveloperExtras(pathOrURL.c_str()))
+  if (shouldEnableDeveloperExtras(pathOrURL.c_str())) {
     gLayoutTestController->closeWebInspector();
+    gLayoutTestController->setDeveloperExtrasEnabled(false);
+  }
 
   resetWebViewToConsistentStateBeforeTesting();
 
