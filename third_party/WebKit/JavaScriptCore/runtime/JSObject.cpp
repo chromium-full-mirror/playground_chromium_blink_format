@@ -244,7 +244,7 @@ callDefaultValueFunction(ExecState* exec,
                          const Identifier& propertyName) {
   JSValue function = object->get(exec, propertyName);
   CallData callData;
-  CallType callType = function.getCallData(callData);
+  CallType callType = getCallData(function, callData);
   if (callType == CallTypeNone)
     return exec->exception();
 

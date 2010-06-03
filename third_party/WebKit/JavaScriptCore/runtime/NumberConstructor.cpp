@@ -147,9 +147,9 @@ ConstructType NumberConstructor::getConstructData(
 }
 
 // ECMA 15.7.2
-static JSValue JSC_HOST_CALL callNumberConstructor(ExecState* exec) {
-  return jsNumber(
-      exec, !exec->argumentCount() ? 0 : exec->argument(0).toNumber(exec));
+static EncodedJSValue JSC_HOST_CALL callNumberConstructor(ExecState* exec) {
+  return JSValue::encode(jsNumber(
+      exec, !exec->argumentCount() ? 0 : exec->argument(0).toNumber(exec)));
 }
 
 CallType NumberConstructor::getCallData(CallData& callData) {

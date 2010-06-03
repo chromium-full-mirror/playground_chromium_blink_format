@@ -33,7 +33,7 @@ namespace JSC {
 
 ASSERT_CLASS_FITS_IN_CELL(ErrorPrototype);
 
-static JSValue JSC_HOST_CALL errorProtoFuncToString(ExecState*);
+static EncodedJSValue JSC_HOST_CALL errorProtoFuncToString(ExecState*);
 
 // ECMA 15.9.4
 ErrorPrototype::ErrorPrototype(ExecState* exec,
@@ -56,7 +56,7 @@ ErrorPrototype::ErrorPrototype(ExecState* exec,
       DontEnum);
 }
 
-JSValue JSC_HOST_CALL errorProtoFuncToString(ExecState* exec) {
+EncodedJSValue JSC_HOST_CALL errorProtoFuncToString(ExecState* exec) {
   JSObject* thisObj = exec->hostThisValue().toThisObject(exec);
   JSValue name = thisObj->get(exec, exec->propertyNames().name);
   JSValue message = thisObj->get(exec, exec->propertyNames().message);
@@ -65,13 +65,14 @@ JSValue JSC_HOST_CALL errorProtoFuncToString(ExecState* exec) {
 
   if (!name.isUndefined()) {
     if (!message.isUndefined())
-      return jsMakeNontrivialString(exec, name.toString(exec), ": ",
-                                    message.toString(exec));
-    return jsNontrivialString(exec, name.toString(exec));
+      return JSValue::encode(jsMakeNontrivialString(
+          exec, name.toString(exec), ": ", message.toString(exec)));
+    return JSValue::encode(jsNontrivialString(exec, name.toString(exec)));
   }
   if (!message.isUndefined())
-    return jsMakeNontrivialString(exec, "Error: ", message.toString(exec));
-  return jsNontrivialString(exec, "Error");
+    return JSValue::encode(
+        jsMakeNontrivialString(exec, "Error: ", message.toString(exec)));
+  return JSValue::encode(jsNontrivialString(exec, "Error"));
 }
 
 }  // namespace JSC

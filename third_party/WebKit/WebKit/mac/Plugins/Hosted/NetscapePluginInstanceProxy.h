@@ -47,6 +47,7 @@ namespace Bindings {
 class Instance;
 class RootObject;
 }
+class ArgList;
 }
 @class WebHostedNetscapePluginView;
 @class WebFrame;

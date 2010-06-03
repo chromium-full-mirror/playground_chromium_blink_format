@@ -409,7 +409,7 @@ CallType JSCallbackObject<Base>::getCallData(CallData& callData) {
 }
 
 template <class Base>
-JSValue JSCallbackObject<Base>::call(ExecState* exec) {
+EncodedJSValue JSCallbackObject<Base>::call(ExecState* exec) {
   JSContextRef execRef = toRef(exec);
   JSObjectRef functionRef = toRef(exec->callee());
   JSObjectRef thisObjRef = toRef(exec->hostThisValue().toThisObject(exec));
@@ -433,12 +433,12 @@ JSValue JSCallbackObject<Base>::call(ExecState* exec) {
       }
       if (exception)
         exec->setException(toJS(exec, exception));
-      return result;
+      return JSValue::encode(result);
     }
   }
 
   ASSERT_NOT_REACHED();  // getCallData should prevent us from reaching here
-  return JSValue();
+  return JSValue::encode(JSValue());
 }
 
 template <class Base>

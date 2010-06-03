@@ -52,7 +52,7 @@ JSCallbackFunction::JSCallbackFunction(ExecState* exec,
                        name),
       m_callback(callback) {}
 
-JSValue JSCallbackFunction::call(ExecState* exec) {
+EncodedJSValue JSCallbackFunction::call(ExecState* exec) {
   JSContextRef execRef = toRef(exec);
   JSObjectRef functionRef = toRef(exec->callee());
   JSObjectRef thisObjRef = toRef(exec->hostThisValue().toThisObject(exec));
@@ -73,7 +73,7 @@ JSValue JSCallbackFunction::call(ExecState* exec) {
   if (exception)
     exec->setException(toJS(exec, exception));
 
-  return toJS(exec, result);
+  return JSValue::encode(toJS(exec, result));
 }
 
 CallType JSCallbackFunction::getCallData(CallData& callData) {

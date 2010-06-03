@@ -50,7 +50,7 @@ JSValue JSCallbackData::invokeCallback(MarkedArgumentBuffer& args,
   JSValue function = callback()->get(exec, Identifier(exec, "handleEvent"));
 
   CallData callData;
-  CallType callType = function.getCallData(callData);
+  CallType callType = getCallData(function, callData);
   if (callType == CallTypeNone) {
     callType = callback()->getCallData(callData);
     if (callType == CallTypeNone)

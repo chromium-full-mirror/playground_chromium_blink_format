@@ -132,8 +132,8 @@ JSValue RegExpObject::exec(ExecState* exec) {
   return jsNull();
 }
 
-static JSValue JSC_HOST_CALL callRegExpObject(ExecState* exec) {
-  return asRegExpObject(exec->callee())->exec(exec);
+static EncodedJSValue JSC_HOST_CALL callRegExpObject(ExecState* exec) {
+  return JSValue::encode(asRegExpObject(exec->callee())->exec(exec));
 }
 
 CallType RegExpObject::getCallData(CallData& callData) {

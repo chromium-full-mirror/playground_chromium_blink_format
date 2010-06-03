@@ -2179,7 +2179,7 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_call_NotJSFunction) {
   JSValue funcVal = stackFrame.args[0].jsValue();
 
   CallData callData;
-  CallType callType = funcVal.getCallData(callData);
+  CallType callType = getCallData(funcVal, callData);
 
   ASSERT(callType != CallTypeJS);
 
@@ -2195,7 +2195,7 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_call_NotJSFunction) {
                     argCount, asObject(funcVal));
     stackFrame.callFrame = callFrame;
 
-    JSValue returnValue;
+    EncodedJSValue returnValue;
     {
       SamplingTool::HostCallRecord callRecord(CTI_SAMPLER);
       returnValue = callData.native.function(callFrame);
@@ -2203,7 +2203,7 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_call_NotJSFunction) {
     stackFrame.callFrame = previousCallFrame;
     CHECK_FOR_EXCEPTION();
 
-    return JSValue::encode(returnValue);
+    return returnValue;
   }
 
   ASSERT(callType == CallTypeNone);
@@ -2319,7 +2319,7 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_construct_NotJSConstruct) {
   int argCount = stackFrame.args[2].int32();
 
   ConstructData constructData;
-  ConstructType constructType = constrVal.getConstructData(constructData);
+  ConstructType constructType = getConstructData(constrVal, constructData);
 
   if (constructType == ConstructTypeHost) {
     int registerOffset = stackFrame.args[1].int32();

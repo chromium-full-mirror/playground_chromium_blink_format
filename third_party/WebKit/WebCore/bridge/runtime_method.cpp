@@ -99,11 +99,11 @@ bool RuntimeMethod::getOwnPropertyDescriptor(ExecState* exec,
                                                     descriptor);
 }
 
-static JSValue JSC_HOST_CALL callRuntimeMethod(ExecState* exec) {
+static EncodedJSValue JSC_HOST_CALL callRuntimeMethod(ExecState* exec) {
   RuntimeMethod* method = static_cast<RuntimeMethod*>(exec->callee());
 
   if (method->methods()->isEmpty())
-    return jsUndefined();
+    return JSValue::encode(jsUndefined());
 
   RefPtr<Instance> instance;
 
@@ -113,7 +113,7 @@ static JSValue JSC_HOST_CALL callRuntimeMethod(ExecState* exec) {
         static_cast<RuntimeObject*>(asObject(thisValue));
     instance = runtimeObject->getInternalInstance();
     if (!instance)
-      return RuntimeObject::throwInvalidAccessError(exec);
+      return JSValue::encode(RuntimeObject::throwInvalidAccessError(exec));
   } else {
     // Calling a runtime object of a plugin element?
     if (thisValue.inherits(&JSHTMLElement::s_info)) {
@@ -122,14 +122,14 @@ static JSValue JSC_HOST_CALL callRuntimeMethod(ExecState* exec) {
       instance = pluginInstance(element);
     }
     if (!instance)
-      return throwError(exec, TypeError);
+      return JSValue::encode(throwError(exec, TypeError));
   }
   ASSERT(instance);
 
   instance->begin();
   JSValue result = instance->invokeMethod(exec, method);
   instance->end();
-  return result;
+  return JSValue::encode(result);
 }
 
 CallType RuntimeMethod::getCallData(CallData& callData) {

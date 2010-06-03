@@ -76,10 +76,11 @@ ConstructType NativeErrorConstructor::getConstructData(
   return ConstructTypeHost;
 }
 
-static JSValue JSC_HOST_CALL callNativeErrorConstructor(ExecState* exec) {
+static EncodedJSValue JSC_HOST_CALL
+callNativeErrorConstructor(ExecState* exec) {
   ArgList args(exec);
-  return static_cast<NativeErrorConstructor*>(exec->callee())
-      ->construct(exec, args);
+  return JSValue::encode(static_cast<NativeErrorConstructor*>(exec->callee())
+                             ->construct(exec, args));
 }
 
 CallType NativeErrorConstructor::getCallData(CallData& callData) {

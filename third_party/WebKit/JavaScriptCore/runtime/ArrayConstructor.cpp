@@ -35,7 +35,7 @@ namespace JSC {
 
 ASSERT_CLASS_FITS_IN_CELL(ArrayConstructor);
 
-static JSValue JSC_HOST_CALL arrayConstructorIsArray(ExecState*);
+static EncodedJSValue JSC_HOST_CALL arrayConstructorIsArray(ExecState*);
 
 ArrayConstructor::ArrayConstructor(ExecState* exec,
                                    JSGlobalObject* globalObject,
@@ -91,9 +91,9 @@ ConstructType ArrayConstructor::getConstructData(ConstructData& constructData) {
   return ConstructTypeHost;
 }
 
-static JSValue JSC_HOST_CALL callArrayConstructor(ExecState* exec) {
+static EncodedJSValue JSC_HOST_CALL callArrayConstructor(ExecState* exec) {
   ArgList args(exec);
-  return constructArrayWithSizeQuirk(exec, args);
+  return JSValue::encode(constructArrayWithSizeQuirk(exec, args));
 }
 
 // ECMA 15.6.1
@@ -103,8 +103,8 @@ CallType ArrayConstructor::getCallData(CallData& callData) {
   return CallTypeHost;
 }
 
-JSValue JSC_HOST_CALL arrayConstructorIsArray(ExecState* exec) {
-  return jsBoolean(exec->argument(0).inherits(&JSArray::info));
+EncodedJSValue JSC_HOST_CALL arrayConstructorIsArray(ExecState* exec) {
+  return JSValue::encode(jsBoolean(exec->argument(0).inherits(&JSArray::info)));
 }
 
 }  // namespace JSC

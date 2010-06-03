@@ -67,8 +67,8 @@ ConstructType BooleanConstructor::getConstructData(
 }
 
 // ECMA 15.6.1
-static JSValue JSC_HOST_CALL callBooleanConstructor(ExecState* exec) {
-  return jsBoolean(exec->argument(0).toBoolean(exec));
+static EncodedJSValue JSC_HOST_CALL callBooleanConstructor(ExecState* exec) {
+  return JSValue::encode(jsBoolean(exec->argument(0).toBoolean(exec)));
 }
 
 CallType BooleanConstructor::getCallData(CallData& callData) {

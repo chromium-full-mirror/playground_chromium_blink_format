@@ -35,7 +35,7 @@ class JSActivation;
 class JSGlobalObject;
 class NativeExecutable;
 
-JSValue JSC_HOST_CALL callHostFunctionAsConstructor(ExecState*);
+EncodedJSValue JSC_HOST_CALL callHostFunctionAsConstructor(ExecState*);
 
 class JSFunction : public JSObjectWithGlobalObject {
   friend class JIT;
