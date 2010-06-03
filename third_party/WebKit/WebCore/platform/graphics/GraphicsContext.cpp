@@ -381,7 +381,11 @@ void GraphicsContext::drawImage(Image* image,
                                 const FloatRect& dest,
                                 const FloatRect& src,
                                 CompositeOperator op,
-                                bool useLowQualityScale) {
+                                bool useLowQualityScale,
+                                bool roundToPixels) {
+  if (roundToPixels)
+    roundToDevicePixels(dest);
+
   if (paintingDisabled() || !image)
     return;
 
@@ -418,15 +422,8 @@ void GraphicsContext::drawTiledImage(Image* image,
                                      const IntSize& tileSize,
                                      CompositeOperator op,
                                      bool useLowQualityScale) {
-  if (paintingDisabled() || !image)
-    return;
-  if (useLowQualityScale) {
-    save();
-    setImageInterpolationQuality(InterpolationLow);
-  }
-  image->drawTiled(this, rect, srcPoint, tileSize, styleColorSpace, op);
-  if (useLowQualityScale)
-    restore();
+  drawTiledImage(image, styleColorSpace, FloatRect(rect), FloatPoint(srcPoint),
+                 tileSize, op, useLowQualityScale);
 }
 
 void GraphicsContext::drawTiledImage(Image* image,
@@ -437,18 +434,59 @@ void GraphicsContext::drawTiledImage(Image* image,
                                      Image::TileRule vRule,
                                      CompositeOperator op,
                                      bool useLowQualityScale) {
+  drawTiledImage(image, styleColorSpace, FloatRect(dest), FloatRect(srcRect),
+                 hRule, vRule, op, useLowQualityScale);
+}
+
+void GraphicsContext::drawTiledImage(Image* image,
+                                     ColorSpace styleColorSpace,
+                                     const FloatRect& rect,
+                                     const FloatPoint& srcPoint,
+                                     const IntSize& tileSize,
+                                     CompositeOperator op,
+                                     bool useLowQualityScale,
+                                     bool roundToPixels) {
+  FloatRect dstRect(rect);
+
+  if (roundToPixels)
+    dstRect = roundToDevicePixels(rect);
+
   if (paintingDisabled() || !image)
     return;
+  if (useLowQualityScale) {
+    save();
+    setImageInterpolationQuality(InterpolationLow);
+  }
+  image->drawTiled(this, dstRect, srcPoint, tileSize, styleColorSpace, op);
+  if (useLowQualityScale)
+    restore();
+}
 
+void GraphicsContext::drawTiledImage(Image* image,
+                                     ColorSpace styleColorSpace,
+                                     const FloatRect& dest,
+                                     const FloatRect& srcRect,
+                                     Image::TileRule hRule,
+                                     Image::TileRule vRule,
+                                     CompositeOperator op,
+                                     bool useLowQualityScale,
+                                     bool roundToPixels) {
+  FloatRect dstRect(dest);
+
+  if (roundToPixels)
+    dstRect = roundToDevicePixels(dest);
+
+  if (paintingDisabled() || !image)
+    return;
   if (useLowQualityScale) {
     save();
     setImageInterpolationQuality(InterpolationLow);
   }
   if (hRule == Image::StretchTile && vRule == Image::StretchTile)
     // Just do a scale.
-    drawImage(image, styleColorSpace, dest, srcRect, op);
+    drawImage(image, styleColorSpace, dstRect, srcRect, op);
   else
-    image->drawTiled(this, dest, srcRect, hRule, vRule, styleColorSpace, op);
+    image->drawTiled(this, dstRect, srcRect, hRule, vRule, styleColorSpace, op);
   if (useLowQualityScale)
     restore();
 }
