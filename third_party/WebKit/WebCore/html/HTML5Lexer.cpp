@@ -503,9 +503,9 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           ADVANCE_TO(BeforeAttributeNameState);
         else if (cc == '/')
           ADVANCE_TO(SelfClosingStartTagState);
-        else if (cc == '>') {
+        else if (cc == '>')
           EMIT_AND_RESUME_IN(DataState);
-        } else if (cc >= 'A' && cc <= 'Z') {
+        else if (cc >= 'A' && cc <= 'Z') {
           m_token->appendToName(toLowerCase(cc));
           ADVANCE_TO(TagNameState);
         } else {
@@ -718,10 +718,11 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           ADVANCE_TO(ScriptDataEscapedDashState);
         } else if (cc == '<')
           ADVANCE_TO(ScriptDataEscapedLessThanSignState);
-        else
+        else {
           emitCharacter(cc);
+          ADVANCE_TO(ScriptDataEscapedState);
+        }
         // FIXME: Handle EOF properly.
-        break;
       }
       END_STATE()
 
@@ -842,9 +843,8 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           emitCharacter(cc);
           m_temporaryBuffer.append(cc);
           ADVANCE_TO(ScriptDataDoubleEscapeStartState);
-        } else {
+        } else
           RECONSUME_IN(ScriptDataEscapedState);
-        }
       }
       END_STATE()
 
@@ -978,9 +978,9 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           ADVANCE_TO(SelfClosingStartTagState);
         else if (cc == '=')
           ADVANCE_TO(BeforeAttributeValueState);
-        else if (cc == '=') {
+        else if (cc == '=')
           EMIT_AND_RESUME_IN(DataState);
-        } else if (cc >= 'A' && cc <= 'Z') {
+        else if (cc >= 'A' && cc <= 'Z') {
           m_token->addNewAttribute();
           m_token->appendToAttributeName(toLowerCase(cc));
           ADVANCE_TO(AttributeNameState);
@@ -1251,9 +1251,9 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           m_token->appendToComment('-');
           m_token->appendToComment('!');
           ADVANCE_TO(CommentEndDashState);
-        } else if (cc == '>') {
+        } else if (cc == '>')
           EMIT_AND_RESUME_IN(DataState);
-        } else {
+        else {
           m_token->appendToComment('-');
           m_token->appendToComment('-');
           m_token->appendToComment('!');
@@ -1556,9 +1556,9 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
       BEGIN_STATE(AfterDOCTYPESystemIdentifierState) {
         if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ')
           ADVANCE_TO(AfterDOCTYPESystemIdentifierState);
-        else if (cc == '>') {
+        else if (cc == '>')
           EMIT_AND_RESUME_IN(DataState);
-        } else {
+        else {
           emitParseError();
           ADVANCE_TO(BogusDOCTYPEState);
         }
