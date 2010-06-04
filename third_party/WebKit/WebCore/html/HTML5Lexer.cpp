@@ -320,6 +320,14 @@ inline bool HTML5Lexer::processEntity(SegmentedString& source) {
   return true;
 }
 
+// We'd like to use the standard do { } while (false) pattern here, but it
+// doesn't play nicely with continue.
+#define RECONSUME_IN(stateName) \
+  {                             \
+    m_state = stateName;        \
+    continue;                   \
+  }
+
 bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
   // If we have a token in progress, then we're supposed to be called back
   // with the same token so we can finish it.
@@ -366,8 +374,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
       case CharacterReferenceInDataState: {
         if (!processEntity(source))
           return shouldEmitBufferedCharacterToken(source);
-        m_state = DataState;
-        continue;
+        RECONSUME_IN(DataState);
       }
       case RCDATAState: {
         if (cc == '&')
@@ -381,8 +388,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
       case CharacterReferenceInRCDATAState: {
         if (!processEntity(source))
           return shouldEmitBufferedCharacterToken(source);
-        m_state = RCDATAState;
-        continue;
+        RECONSUME_IN(RCDATAState);
       }
       case RAWTEXTState: {
         if (cc == '<')
@@ -440,8 +446,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           m_state = DataState;
         } else {
           emitParseError();
-          m_state = BogusCommentState;
-          continue;
+          RECONSUME_IN(BogusCommentState);
         }
         // FIXME: Handle EOF properly.
         break;
@@ -468,8 +473,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           m_state = RCDATAEndTagOpenState;
         } else {
           emitCharacter('<');
-          m_state = RCDATAState;
-          continue;
+          RECONSUME_IN(RCDATAState);
         }
         break;
       }
@@ -485,8 +489,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         } else {
           emitCharacter('<');
           emitCharacter('/');
-          m_state = RCDATAState;
-          continue;
+          RECONSUME_IN(RCDATAState);
         }
         break;
       }
@@ -521,8 +524,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           emitCharacter('/');
           m_token->appendToCharacter(m_temporaryBuffer);
           m_bufferedEndTagName.clear();
-          m_state = RCDATAState;
-          continue;
+          RECONSUME_IN(RCDATAState);
         }
         break;
       }
@@ -533,8 +535,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           m_state = RAWTEXTEndTagOpenState;
         } else {
           emitCharacter('<');
-          m_state = RAWTEXTState;
-          continue;
+          RECONSUME_IN(RAWTEXTState);
         }
         break;
       }
@@ -550,8 +551,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         } else {
           emitCharacter('<');
           emitCharacter('/');
-          m_state = RAWTEXTState;
-          continue;
+          RECONSUME_IN(RAWTEXTState);
         }
         break;
       }
@@ -586,8 +586,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           emitCharacter('/');
           m_token->appendToCharacter(m_temporaryBuffer);
           m_bufferedEndTagName.clear();
-          m_state = RAWTEXTState;
-          continue;
+          RECONSUME_IN(RAWTEXTState);
         }
         break;
       }
@@ -602,8 +601,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           m_state = ScriptDataEscapeStartState;
         } else {
           emitCharacter('<');
-          m_state = ScriptDataState;
-          continue;
+          RECONSUME_IN(ScriptDataState);
         }
         break;
       }
@@ -619,8 +617,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         } else {
           emitCharacter('<');
           emitCharacter('/');
-          m_state = ScriptDataState;
-          continue;
+          RECONSUME_IN(ScriptDataState);
         }
         break;
       }
@@ -655,8 +652,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           emitCharacter('/');
           m_token->appendToCharacter(m_temporaryBuffer);
           m_bufferedEndTagName.clear();
-          m_state = ScriptDataState;
-          continue;
+          RECONSUME_IN(ScriptDataState);
         }
         break;
       }
@@ -665,8 +661,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           emitCharacter(cc);
           m_state = ScriptDataEscapeStartDashState;
         } else {
-          m_state = ScriptDataState;
-          continue;
+          RECONSUME_IN(ScriptDataState);
         }
         break;
       }
@@ -675,8 +670,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           emitCharacter(cc);
           m_state = ScriptDataEscapedDashDashState;
         } else {
-          m_state = ScriptDataState;
-          continue;
+          RECONSUME_IN(ScriptDataState);
         }
         break;
       }
@@ -738,8 +732,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           m_state = ScriptDataDoubleEscapeStartState;
         } else {
           emitCharacter('<');
-          m_state = ScriptDataEscapedState;
-          continue;
+          RECONSUME_IN(ScriptDataEscapedState);
         }
         break;
       }
@@ -755,8 +748,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         } else {
           emitCharacter('<');
           emitCharacter('/');
-          m_state = ScriptDataEscapedState;
-          continue;
+          RECONSUME_IN(ScriptDataEscapedState);
         }
         break;
       }
@@ -791,8 +783,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           emitCharacter('/');
           m_token->appendToCharacter(m_temporaryBuffer);
           m_bufferedEndTagName.clear();
-          m_state = ScriptDataEscapedState;
-          continue;
+          RECONSUME_IN(ScriptDataEscapedState);
         }
         break;
       }
@@ -811,8 +802,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           emitCharacter(cc);
           m_temporaryBuffer.append(cc);
         } else {
-          m_state = ScriptDataEscapedState;
-          continue;
+          RECONSUME_IN(ScriptDataEscapedState);
         }
         break;
       }
@@ -864,8 +854,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           m_temporaryBuffer.clear();
           m_state = ScriptDataDoubleEscapeEndState;
         } else {
-          m_state = ScriptDataDoubleEscapedState;
-          continue;
+          RECONSUME_IN(ScriptDataDoubleEscapedState);
         }
         break;
       }
@@ -884,8 +873,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           emitCharacter(cc);
           m_temporaryBuffer.append(cc);
         } else {
-          m_state = ScriptDataDoubleEscapedState;
-          continue;
+          RECONSUME_IN(ScriptDataDoubleEscapedState);
         }
         break;
       }
@@ -962,8 +950,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         else if (cc == '"')
           m_state = AttributeValueDoubleQuotedState;
         else if (cc == '&') {
-          m_state = AttributeValueUnquotedState;
-          continue;
+          RECONSUME_IN(AttributeValueUnquotedState);
         } else if (cc == '\'')
           m_state = AttributeValueSingleQuotedState;
         else if (cc == '>') {
@@ -1054,8 +1041,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           m_state = DataState;
         } else {
           emitParseError();
-          m_state = BeforeAttributeNameState;
-          continue;
+          RECONSUME_IN(BeforeAttributeNameState);
         }
         // FIXME: Handle EOF properly.
         break;
@@ -1067,8 +1053,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           m_state = DataState;
         } else {
           emitParseError();
-          m_state = BeforeAttributeNameState;
-          continue;
+          RECONSUME_IN(BeforeAttributeNameState);
         }
         // FIXME: Handle EOF properly.
         break;
@@ -1099,8 +1084,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
             source.advanceAndASSERT('-');
             source.advanceAndASSERT('-');
             m_token->beginComment();
-            m_state = CommentStartState;
-            continue;
+            RECONSUME_IN(CommentStartState);
           } else if (result == SegmentedString::NotEnoughCharacters)
             return shouldEmitBufferedCharacterToken(source);
         } else if (cc == 'D' || cc == 'd') {
@@ -1108,8 +1092,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
               source.lookAheadIgnoringCase(doctypeString);
           if (result == SegmentedString::DidMatch) {
             advanceStringAndASSERTIgnoringCase(source, "doctype");
-            m_state = DOCTYPEState;
-            continue;
+            RECONSUME_IN(DOCTYPEState);
           } else if (result == SegmentedString::NotEnoughCharacters)
             return shouldEmitBufferedCharacterToken(source);
         }
@@ -1118,8 +1101,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         // foreign content:
         // http://www.whatwg.org/specs/web-apps/current-work/multipage/tokenization.html#markup-declaration-open-state
         emitParseError();
-        m_state = BogusCommentState;
-        continue;
+        RECONSUME_IN(BogusCommentState);
       }
       case CommentStartState: {
         if (cc == '-')
@@ -1235,8 +1217,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           m_state = BeforeDOCTYPENameState;
         else {
           emitParseError();
-          m_state = BeforeDOCTYPENameState;
-          continue;
+          RECONSUME_IN(BeforeDOCTYPENameState);
         }
         // FIXME: Handle EOF properly.
         break;
@@ -1287,8 +1268,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
                 source.lookAheadIgnoringCase(publicString);
             if (result == SegmentedString::DidMatch) {
               advanceStringAndASSERTIgnoringCase(source, "public");
-              m_state = AfterDOCTYPEPublicKeywordState;
-              continue;
+              RECONSUME_IN(AfterDOCTYPEPublicKeywordState);
             } else if (result == SegmentedString::NotEnoughCharacters)
               return shouldEmitBufferedCharacterToken(source);
           } else if (cc == 'S' || cc == 's') {
@@ -1296,8 +1276,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
                 source.lookAheadIgnoringCase(systemString);
             if (result == SegmentedString::DidMatch) {
               advanceStringAndASSERTIgnoringCase(source, "system");
-              m_state = AfterDOCTYPESystemKeywordState;
-              continue;
+              RECONSUME_IN(AfterDOCTYPESystemKeywordState);
             } else if (result == SegmentedString::NotEnoughCharacters)
               return shouldEmitBufferedCharacterToken(source);
           }
