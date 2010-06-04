@@ -71,7 +71,6 @@ RenderSVGRoot* findSVGRootObject(RenderObject* start) {
 // Helper class for paint()
 struct SVGRootInlineBoxPaintWalker {
   SVGRootInlineBoxPaintWalker(SVGRootInlineBox* rootBox,
-                              RenderSVGResourceFilter* rootFilter,
                               RenderObject::PaintInfo paintInfo,
                               int tx,
                               int ty)
@@ -84,7 +83,6 @@ struct SVGRootInlineBoxPaintWalker {
                       rootBox->width(),
                       rootBox->height()),
         m_filter(0),
-        m_rootFilter(rootFilter),
         m_fillPaintingResource(0),
         m_strokePaintingResource(0),
         m_fillPaintingResourceObject(0),
@@ -144,8 +142,8 @@ struct SVGRootInlineBoxPaintWalker {
 
     // FIXME: Why is this done here instead of in RenderSVGText?
     if (!flowBox->isRootInlineBox())
-      SVGRenderBase::prepareToRenderSVGContent(
-          object, m_paintInfo, m_boundingBox, m_filter, m_rootFilter);
+      SVGRenderBase::prepareToRenderSVGContent(object, m_paintInfo,
+                                               m_boundingBox, m_filter);
   }
 
   void chunkEndCallback(InlineBox* box) {
@@ -427,7 +425,6 @@ struct SVGRootInlineBoxPaintWalker {
 
   FloatRect m_boundingBox;
   RenderSVGResourceFilter* m_filter;
-  RenderSVGResourceFilter* m_rootFilter;
 
   RenderSVGResource* m_fillPaintingResource;
   RenderSVGResource* m_strokePaintingResource;
@@ -458,7 +455,7 @@ void SVGRootInlineBox::paint(RenderObject::PaintInfo& paintInfo,
   if (SVGRenderBase::prepareToRenderSVGContent(renderer(), paintInfo,
                                                boundingBox, filter)) {
     // Render text, chunk-by-chunk
-    SVGRootInlineBoxPaintWalker walkerCallback(this, filter, paintInfo, tx, ty);
+    SVGRootInlineBoxPaintWalker walkerCallback(this, paintInfo, tx, ty);
     SVGTextChunkWalker<SVGRootInlineBoxPaintWalker> walker(
         &walkerCallback, &SVGRootInlineBoxPaintWalker::chunkPortionCallback,
         &SVGRootInlineBoxPaintWalker::chunkStartCallback,
