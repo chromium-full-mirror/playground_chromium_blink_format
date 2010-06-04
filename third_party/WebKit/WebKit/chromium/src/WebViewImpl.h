@@ -129,6 +129,9 @@ class WebViewImpl : public WebView, public RefCounted<WebViewImpl> {
   virtual void dragSourceEndedAt(const WebPoint& clientPoint,
                                  const WebPoint& screenPoint,
                                  WebDragOperation operation);
+  virtual void dragSourceMovedTo(const WebPoint& clientPoint,
+                                 const WebPoint& screenPoint,
+                                 WebDragOperation operation);
   virtual void dragSourceSystemDragEnded();
   virtual WebDragOperation dragTargetDragEnter(
       const WebDragData& dragData,
@@ -321,6 +324,8 @@ class WebViewImpl : public WebView, public RefCounted<WebViewImpl> {
 
   // Returns true if the view was scrolled.
   bool scrollViewWithKeyboard(int keyCode, int modifiers);
+
+  void scrollForDragging(const WebPoint&);
 
   void hideSelectPopup();
 
