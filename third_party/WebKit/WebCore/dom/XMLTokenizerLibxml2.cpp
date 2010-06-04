@@ -186,8 +186,7 @@ class PendingCallbacks : public Noncopyable {
   }
 
   void callAndRemoveFirstCallback(XMLTokenizer* tokenizer) {
-    OwnPtr<PendingCallback> callback(m_callbacks.first());
-    m_callbacks.removeFirst();
+    OwnPtr<PendingCallback> callback(m_callbacks.takeFirst());
     callback->call(tokenizer);
   }
 

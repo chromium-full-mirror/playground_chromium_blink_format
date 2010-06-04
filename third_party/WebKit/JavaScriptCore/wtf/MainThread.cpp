@@ -138,8 +138,7 @@ void dispatchFunctionsFromMainThread() {
       MutexLocker locker(mainThreadFunctionQueueMutex());
       if (!functionQueue().size())
         break;
-      invocation = functionQueue().first();
-      functionQueue().removeFirst();
+      invocation = functionQueue().takeFirst();
     }
 
     invocation.function(invocation.context);

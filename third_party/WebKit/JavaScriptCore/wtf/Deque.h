@@ -90,6 +90,7 @@ class Deque : public FastAllocBase {
     ASSERT(m_start != m_end);
     return m_buffer.buffer()[m_start];
   }
+  T takeFirst();
 
   template <typename U>
   void append(const U&);
@@ -493,6 +494,13 @@ void Deque<T>::expandCapacity() {
   }
   m_buffer.deallocateBuffer(oldBuffer);
   checkValidity();
+}
+
+template <typename T>
+inline T Deque<T>::takeFirst() {
+  T oldFirst = first();
+  removeFirst();
+  return oldFirst;
 }
 
 template <typename T>
