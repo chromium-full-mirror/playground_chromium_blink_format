@@ -31,8 +31,8 @@
 namespace WebCore {
 
 #if !PLATFORM(GTK) && !PLATFORM(EFL)
-char* filenameFromString(const String& string) {
-  return fastStrDup(string.utf8().data());
+CString filenameFromString(const String& string) {
+  return string.utf8();
 }
 #endif
 
