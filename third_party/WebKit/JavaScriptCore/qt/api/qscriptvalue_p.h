@@ -56,9 +56,9 @@ class QScriptValue;
     CBool -> QSVP is created from bool and no JSC engine has been associated
   yet. Current value is kept
         in m_number
-    CSpecial -> QSVP is Undefined or Null, but a JSC engine hasn't been
-  associated yet, current value
-        is kept in m_number (cast of QScriptValue::SpecialValue)
+    CNull -> QSVP is null, but a JSC engine hasn't been associated yet.
+    CUndefined -> QSVP is undefined, but a JSC engine hasn't been associated
+  yet.
     JSValue -> QSVP is associated with engine, but there is no information about
   real type, the state
         have really short live cycle. Normally it is created as a function call
@@ -143,7 +143,8 @@ class QScriptValuePrivate : public QSharedData {
     CString = 0x1000,
     CNumber,
     CBool,
-    CSpecial,
+    CNull,
+    CUndefined,
     JSValue = 0x2000,  // JS values are equal or higher then this value.
     JSPrimitive,
     JSObject
@@ -199,7 +200,8 @@ QScriptValuePrivate::QScriptValuePrivate(qsreal number)
     : m_state(CNumber), m_number(number), m_value(0) {}
 
 QScriptValuePrivate::QScriptValuePrivate(QScriptValue::SpecialValue value)
-    : m_state(CSpecial), m_number(value), m_value(0) {}
+    : m_state(value == QScriptValue::NullValue ? CNull : CUndefined),
+      m_value(0) {}
 
 QScriptValuePrivate::QScriptValuePrivate(const QScriptEnginePrivate* engine,
                                          bool value)
@@ -314,8 +316,8 @@ bool QScriptValuePrivate::isNumber() {
 
 bool QScriptValuePrivate::isNull() {
   switch (m_state) {
-    case CSpecial:
-      return m_number == static_cast<int>(QScriptValue::NullValue);
+    case CNull:
+      return true;
     case JSValue:
       if (refinedJSValue() != JSPrimitive)
         return false;
@@ -344,8 +346,8 @@ bool QScriptValuePrivate::isString() {
 
 bool QScriptValuePrivate::isUndefined() {
   switch (m_state) {
-    case CSpecial:
-      return m_number == static_cast<int>(QScriptValue::UndefinedValue);
+    case CUndefined:
+      return true;
     case JSValue:
       if (refinedJSValue() != JSPrimitive)
         return false;
@@ -406,10 +408,10 @@ QString QScriptValuePrivate::toString() const {
       return m_string;
     case CNumber:
       return QScriptConverter::toString(m_number);
-    case CSpecial:
-      return m_number == QScriptValue::NullValue
-                 ? QString::fromLatin1("null")
-                 : QString::fromLatin1("undefined");
+    case CNull:
+      return QString::fromLatin1("null");
+    case CUndefined:
+      return QString::fromLatin1("undefined");
     case JSValue:
     case JSPrimitive:
     case JSObject:
@@ -433,10 +435,11 @@ qsreal QScriptValuePrivate::toNumber() const {
       return m_number;
     case CBool:
       return m_number ? 1 : 0;
+    case CNull:
     case Invalid:
       return 0;
-    case CSpecial:
-      return m_number == QScriptValue::NullValue ? 0 : qQNaN();
+    case CUndefined:
+      return qQNaN();
     case CString:
       bool ok;
       qsreal result = m_string.toDouble(&ok);
@@ -467,7 +470,8 @@ bool QScriptValuePrivate::toBool() const {
     case CBool:
       return m_number;
     case Invalid:
-    case CSpecial:
+    case CNull:
+    case CUndefined:
       return false;
     case CString:
       return m_string.length();
@@ -524,7 +528,8 @@ QScriptValuePrivate* QScriptValuePrivate::toObject(
     QScriptEnginePrivate* engine) {
   switch (m_state) {
     case Invalid:
-    case CSpecial:
+    case CNull:
+    case CUndefined:
       return new QScriptValuePrivate;
     case CString: {
       // Exception can't occur here.
@@ -669,9 +674,11 @@ bool QScriptValuePrivate::assignEngine(QScriptEnginePrivate* engine) {
     case CNumber:
       value = engine->makeJSValue(m_number);
       break;
-    case CSpecial:
-      value = engine->makeJSValue(
-          static_cast<QScriptValue::SpecialValue>(m_number));
+    case CNull:
+      value = engine->makeJSValue(QScriptValue::NullValue);
+      break;
+    case CUndefined:
+      value = engine->makeJSValue(QScriptValue::UndefinedValue);
       break;
     default:
       if (!isJSBased())
@@ -807,7 +814,7 @@ bool QScriptValuePrivate::isJSBased() const {
   Returns true if current value of QSV is placed in m_number.
 */
 bool QScriptValuePrivate::isNumberBased() const {
-  return !isJSBased() && !isStringBased() && m_state != Invalid;
+  return m_state == CNumber || m_state == CBool;
 }
 
 /*!
