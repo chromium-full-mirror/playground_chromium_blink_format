@@ -247,8 +247,7 @@ class GraphicsContext : public Noncopyable {
                  const FloatRect& destRect,
                  const FloatRect& srcRect = FloatRect(0, 0, -1, -1),
                  CompositeOperator = CompositeSourceOver,
-                 bool useLowQualityScale = false,
-                 bool roundToPixels = false);
+                 bool useLowQualityScale = false);
   void drawTiledImage(Image*,
                       ColorSpace styleColorSpace,
                       const IntRect& destRect,
@@ -264,23 +263,6 @@ class GraphicsContext : public Noncopyable {
                       Image::TileRule vRule = Image::StretchTile,
                       CompositeOperator = CompositeSourceOver,
                       bool useLowQualityScale = false);
-  void drawTiledImage(Image*,
-                      ColorSpace styleColorSpace,
-                      const FloatRect& destRect,
-                      const FloatPoint& srcPoint,
-                      const IntSize& tileSize,
-                      CompositeOperator = CompositeSourceOver,
-                      bool useLowQualityScale = false,
-                      bool roundToPixels = false);
-  void drawTiledImage(Image*,
-                      ColorSpace styleColorSpace,
-                      const FloatRect& destRect,
-                      const FloatRect& srcRect,
-                      Image::TileRule hRule = Image::StretchTile,
-                      Image::TileRule vRule = Image::StretchTile,
-                      CompositeOperator = CompositeSourceOver,
-                      bool useLowQualityScale = false,
-                      bool roundToPixels = false);
 
   void setImageInterpolationQuality(InterpolationQuality);
   InterpolationQuality imageInterpolationQuality() const;
