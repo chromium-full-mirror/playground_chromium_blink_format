@@ -456,16 +456,14 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           m_state = TagNameState;
         } else if (cc == '?') {
           emitParseError();
-          m_state = BogusCommentState;
           // The spec consumes the current character before switching
           // to the bogus comment state, but it's easier to implement
           // if we reconsume the current character.
-          continue;
+          RECONSUME_IN(BogusCommentState);
         } else {
           emitParseError();
-          m_state = DataState;
           emitCharacter('<');
-          continue;
+          RECONSUME_IN(DataState);
         }
         break;
       }
@@ -1035,8 +1033,8 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         if (cc == '"')
           m_state = AfterAttributeValueQuotedState;
         else if (cc == '&') {
-          m_state = CharacterReferenceInAttributeValueState;
           m_additionalAllowedCharacter = '"';
+          m_state = CharacterReferenceInAttributeValueState;
         } else
           m_token->appendToAttributeValue(cc);
         // FIXME: Handle EOF properly.
@@ -1048,8 +1046,8 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         if (cc == '\'')
           m_state = AfterAttributeValueQuotedState;
         else if (cc == '&') {
-          m_state = CharacterReferenceInAttributeValueState;
           m_additionalAllowedCharacter = '\'';
+          m_state = CharacterReferenceInAttributeValueState;
         } else
           m_token->appendToAttributeValue(cc);
         // FIXME: Handle EOF properly.
@@ -1061,8 +1059,8 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ')
           m_state = BeforeAttributeNameState;
         else if (cc == '&') {
-          m_state = CharacterReferenceInAttributeValueState;
           m_additionalAllowedCharacter = '>';
+          m_state = CharacterReferenceInAttributeValueState;
         } else if (cc == '>') {
           EMIT_AND_RESUME_IN(DataState);
         } else {
@@ -1093,14 +1091,14 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         // keeping track of this explictly, we observe that the previous
         // state can be determined by m_additionalAllowedCharacter.
         if (m_additionalAllowedCharacter == '"')
-          m_state = AttributeValueDoubleQuotedState;
+          RECONSUME_IN(AttributeValueDoubleQuotedState)
         else if (m_additionalAllowedCharacter == '\'')
-          m_state = AttributeValueSingleQuotedState;
+          RECONSUME_IN(AttributeValueSingleQuotedState)
         else if (m_additionalAllowedCharacter == '>')
-          m_state = AttributeValueUnquotedState;
+          RECONSUME_IN(AttributeValueUnquotedState)
         else
           ASSERT_NOT_REACHED();
-        continue;
+        break;
       }
       END_STATE()
 
