@@ -399,7 +399,7 @@ class GraphicsContext3D : public Noncopyable {
     Attributes()
         : alpha(true),
           depth(true),
-          stencil(true),
+          stencil(false),
           antialias(true),
           premultipliedAlpha(true) {}
 
