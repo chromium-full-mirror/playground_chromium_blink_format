@@ -538,6 +538,7 @@ void WebView::stopTrackingMouseLeave() {
 
 void WebView::close() {
   setHostWindow(0);
+  m_page->close();
 }
 
 // PageClient
