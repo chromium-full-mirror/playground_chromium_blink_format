@@ -663,6 +663,9 @@ void HTMLMediaElement::loadResource(const KURL& initialURL,
 
 bool HTMLMediaElement::isSafeToLoadURL(const KURL& url,
                                        InvalidSourceAction actionIfInvalid) {
+  if (!url.isValid())
+    return false;
+
   Frame* frame = document()->frame();
   FrameLoader* loader = frame ? frame->loader() : 0;
 
@@ -1474,7 +1477,7 @@ KURL HTMLMediaElement::selectNextSourceChild(
 
     // Is it safe to load this url?
     mediaURL = source->src();
-    if (!mediaURL.isValid() || !isSafeToLoadURL(mediaURL, actionIfInvalid) ||
+    if (!isSafeToLoadURL(mediaURL, actionIfInvalid) ||
         !dispatchBeforeLoadEvent(mediaURL.string()))
       goto check_again;
 
@@ -1934,7 +1937,7 @@ void HTMLMediaElement::getPluginProxyParams(KURL& url,
   }
 
   url = src();
-  if (!url.isValid() || !isSafeToLoadURL(url, Complain))
+  if (!isSafeToLoadURL(url, Complain))
     url = selectNextSourceChild(0, DoNothing);
 
   m_currentSrc = url.string();

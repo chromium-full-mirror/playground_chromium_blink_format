@@ -225,7 +225,8 @@ class DocumentLoader : public RefCounted<DocumentLoader> {
   bool deferMainResourceDataLoad() const { return m_deferMainResourceDataLoad; }
 
   void didTellClientAboutLoad(const String& url) {
-    m_resourcesClientKnowsAbout.add(url);
+    if (!url.isEmpty())
+      m_resourcesClientKnowsAbout.add(url);
   }
   bool haveToldClientAboutLoad(const String& url) {
     return m_resourcesClientKnowsAbout.contains(url);
