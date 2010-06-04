@@ -346,6 +346,9 @@ inline bool HTML5Lexer::processEntity(SegmentedString& source) {
     break;                                  \
   }
 
+// When we move away from using a jump table, these macros will be different.
+#define FLUSH_AND_ADVANCE_TO(stateName) FLUSH_EMIT_AND_RESUME_IN(stateName)
+
 bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
   // If we have a token in progress, then we're supposed to be called back
   // with the same token so we can finish it.
@@ -544,15 +547,11 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         } else {
           if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ') {
             if (isAppropriateEndTag()) {
-              m_state = BeforeAttributeNameState;
-              maybeFlushBufferedEndTag();
-              break;
+              FLUSH_AND_ADVANCE_TO(BeforeAttributeNameState);
             }
           } else if (cc == '/') {
             if (isAppropriateEndTag()) {
-              m_state = SelfClosingStartTagState;
-              maybeFlushBufferedEndTag();
-              break;
+              FLUSH_AND_ADVANCE_TO(SelfClosingStartTagState);
             }
           } else if (cc == '>') {
             if (isAppropriateEndTag()) {
@@ -610,15 +609,11 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         } else {
           if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ') {
             if (isAppropriateEndTag()) {
-              m_state = BeforeAttributeNameState;
-              maybeFlushBufferedEndTag();
-              break;
+              FLUSH_AND_ADVANCE_TO(BeforeAttributeNameState);
             }
           } else if (cc == '/') {
             if (isAppropriateEndTag()) {
-              m_state = SelfClosingStartTagState;
-              maybeFlushBufferedEndTag();
-              break;
+              FLUSH_AND_ADVANCE_TO(SelfClosingStartTagState);
             }
           } else if (cc == '>') {
             if (isAppropriateEndTag()) {
@@ -680,15 +675,11 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         } else {
           if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ') {
             if (isAppropriateEndTag()) {
-              m_state = BeforeAttributeNameState;
-              maybeFlushBufferedEndTag();
-              break;
+              FLUSH_AND_ADVANCE_TO(BeforeAttributeNameState);
             }
           } else if (cc == '/') {
             if (isAppropriateEndTag()) {
-              m_state = SelfClosingStartTagState;
-              maybeFlushBufferedEndTag();
-              break;
+              FLUSH_AND_ADVANCE_TO(SelfClosingStartTagState);
             }
           } else if (cc == '>') {
             if (isAppropriateEndTag()) {
@@ -825,15 +816,11 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         } else {
           if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ') {
             if (isAppropriateEndTag()) {
-              m_state = BeforeAttributeNameState;
-              maybeFlushBufferedEndTag();
-              break;
+              FLUSH_AND_ADVANCE_TO(BeforeAttributeNameState);
             }
           } else if (cc == '/') {
             if (isAppropriateEndTag()) {
-              m_state = SelfClosingStartTagState;
-              maybeFlushBufferedEndTag();
-              break;
+              FLUSH_AND_ADVANCE_TO(SelfClosingStartTagState);
             }
           } else if (cc == '>') {
             if (isAppropriateEndTag()) {
