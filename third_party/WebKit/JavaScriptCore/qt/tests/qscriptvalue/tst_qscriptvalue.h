@@ -104,6 +104,9 @@ class tst_QScriptValue : public QObject {
   void toUInt16_data();
   void toUInt16();
 
+  void equals_data();
+  void equals();
+
   void strictlyEquals_data();
   void strictlyEquals();
 
@@ -188,6 +191,10 @@ class tst_QScriptValue : public QObject {
   void toUInt16_initData();
   void toUInt16_makeData(const char*);
   void toUInt16_test(const char*, const QScriptValue&);
+
+  void equals_initData();
+  void equals_makeData(const char*);
+  void equals_test(const char*, const QScriptValue&);
 
   void strictlyEquals_initData();
   void strictlyEquals_makeData(const char*);

@@ -501,7 +501,7 @@ QScriptValue& QScriptValue::operator=(const QScriptValue& other) {
   \sa strictlyEquals(), lessThan()
 */
 bool QScriptValue::equals(const QScriptValue& other) const {
-  return d_ptr == other.d_ptr || d_ptr->equals(QScriptValuePrivate::get(other));
+  return d_ptr->equals(QScriptValuePrivate::get(other));
 }
 
 /*!
