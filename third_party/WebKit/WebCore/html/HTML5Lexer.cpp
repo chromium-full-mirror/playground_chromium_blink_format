@@ -378,6 +378,9 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
   // Source: http://www.whatwg.org/specs/web-apps/current-work/#tokenisation0
   // FIXME: This while should stop as soon as we have a token to return.
   while (!source.isEmpty()) {
+    // FIXME: This is a purposeful style violation because this while loop is
+    // going to be removed soon.
+
     UChar cc = *source;
     switch (m_state) {
       BEGIN_STATE(DataState) {
@@ -1609,7 +1612,9 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
       m_emitPending = false;
       return true;
     }
-  }
+
+  }  // Matches the "while" above.
+
   // We've reached the end of the input stream.  If we have a character
   // token buffered, we should emit it.
   return shouldEmitBufferedCharacterToken(source);
