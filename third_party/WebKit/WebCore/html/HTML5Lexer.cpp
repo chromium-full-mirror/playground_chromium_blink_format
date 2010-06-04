@@ -329,24 +329,27 @@ inline bool HTML5Lexer::processEntity(SegmentedString& source) {
   do {                                \
     emitCurrentToken();               \
     m_state = DataState;              \
+    goto breakLabel;                  \
   } while (false)
 
-#define ADVANCE_TO(stateName) m_state = stateName
+#define ADVANCE_TO(stateName) \
+  do {                        \
+    m_state = stateName;      \
+    goto breakLabel;          \
+  } while (false)
 
-// We'd like to use the standard do { } while (false) pattern here, but it
-// doesn't play nicely with continue.
 #define RECONSUME_IN(stateName) \
-  {                             \
+  do {                          \
     m_state = stateName;        \
-    continue;                   \
-  }
+    goto continueLabel;         \
+  } while (false)
 
 #define FLUSH_EMIT_AND_RESUME_IN(stateName) \
-  {                                         \
+  do {                                      \
     m_state = stateName;                    \
     maybeFlushBufferedEndTag();             \
-    break;                                  \
-  }
+    goto breakLabel;                        \
+  } while (false)
 
 // When we move away from using a jump table, these macros will be different.
 #define FLUSH_AND_ADVANCE_TO(stateName) FLUSH_EMIT_AND_RESUME_IN(stateName)
@@ -393,9 +396,10 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
             return true;
           }
           ADVANCE_TO(TagOpenState);
-        } else
+        } else {
           emitCharacter(cc);
-        break;
+          ADVANCE_TO(DataState);
+        }
       }
       END_STATE()
 
@@ -411,9 +415,10 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           ADVANCE_TO(CharacterReferenceInRCDATAState);
         else if (cc == '<')
           ADVANCE_TO(RCDATALessThanSignState);
-        else
+        else {
           emitCharacter(cc);
-        break;
+          ADVANCE_TO(RCDATAState);
+        }
       }
       END_STATE()
 
@@ -427,24 +432,26 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
       BEGIN_STATE(RAWTEXTState) {
         if (cc == '<')
           ADVANCE_TO(RAWTEXTLessThanSignState);
-        else
+        else {
           emitCharacter(cc);
-        break;
+          ADVANCE_TO(RAWTEXTState);
+        }
       }
       END_STATE()
 
       BEGIN_STATE(ScriptDataState) {
         if (cc == '<')
           ADVANCE_TO(ScriptDataLessThanSignState);
-        else
+        else {
           emitCharacter(cc);
-        break;
+          ADVANCE_TO(ScriptDataState);
+        }
       }
       END_STATE()
 
       BEGIN_STATE(PLAINTEXTState) {
         emitCharacter(cc);
-        break;
+        ADVANCE_TO(PLAINTEXTState);
       }
       END_STATE()
 
@@ -470,7 +477,6 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           emitCharacter('<');
           RECONSUME_IN(DataState);
         }
-        break;
       }
       END_STATE()
 
@@ -489,7 +495,6 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           RECONSUME_IN(BogusCommentState);
         }
         // FIXME: Handle EOF properly.
-        break;
       }
       END_STATE()
 
@@ -500,12 +505,14 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           ADVANCE_TO(SelfClosingStartTagState);
         else if (cc == '>') {
           EMIT_AND_RESUME_IN(DataState);
-        } else if (cc >= 'A' && cc <= 'Z')
+        } else if (cc >= 'A' && cc <= 'Z') {
           m_token->appendToName(toLowerCase(cc));
-        else
+          ADVANCE_TO(TagNameState);
+        } else {
           m_token->appendToName(cc);
+          ADVANCE_TO(TagNameState);
+        }
         // FIXME: Handle EOF properly.
-        break;
       }
       END_STATE()
 
@@ -518,7 +525,6 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           emitCharacter('<');
           RECONSUME_IN(RCDATAState);
         }
-        break;
       }
       END_STATE()
 
@@ -536,7 +542,6 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           emitCharacter('/');
           RECONSUME_IN(RCDATAState);
         }
-        break;
       }
       END_STATE()
 
@@ -544,22 +549,21 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         if (cc >= 'A' && cc <= 'Z') {
           m_temporaryBuffer.append(cc);
           addToPossibleEndTag(toLowerCase(cc));
+          ADVANCE_TO(RCDATAEndTagNameState);
         } else if (cc >= 'a' && cc <= 'z') {
           m_temporaryBuffer.append(cc);
           addToPossibleEndTag(cc);
+          ADVANCE_TO(RCDATAEndTagNameState);
         } else {
           if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ') {
-            if (isAppropriateEndTag()) {
+            if (isAppropriateEndTag())
               FLUSH_AND_ADVANCE_TO(BeforeAttributeNameState);
-            }
           } else if (cc == '/') {
-            if (isAppropriateEndTag()) {
+            if (isAppropriateEndTag())
               FLUSH_AND_ADVANCE_TO(SelfClosingStartTagState);
-            }
           } else if (cc == '>') {
-            if (isAppropriateEndTag()) {
+            if (isAppropriateEndTag())
               FLUSH_EMIT_AND_RESUME_IN(DataState);
-            }
           }
           emitCharacter('<');
           emitCharacter('/');
@@ -567,7 +571,6 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           m_bufferedEndTagName.clear();
           RECONSUME_IN(RCDATAState);
         }
-        break;
       }
       END_STATE()
 
@@ -580,7 +583,6 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           emitCharacter('<');
           RECONSUME_IN(RAWTEXTState);
         }
-        break;
       }
       END_STATE()
 
@@ -598,7 +600,6 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           emitCharacter('/');
           RECONSUME_IN(RAWTEXTState);
         }
-        break;
       }
       END_STATE()
 
@@ -606,22 +607,21 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         if (cc >= 'A' && cc <= 'Z') {
           m_temporaryBuffer.append(cc);
           addToPossibleEndTag(toLowerCase(cc));
+          ADVANCE_TO(RAWTEXTEndTagNameState);
         } else if (cc >= 'a' && cc <= 'z') {
           m_temporaryBuffer.append(cc);
           addToPossibleEndTag(cc);
+          ADVANCE_TO(RAWTEXTEndTagNameState);
         } else {
           if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ') {
-            if (isAppropriateEndTag()) {
+            if (isAppropriateEndTag())
               FLUSH_AND_ADVANCE_TO(BeforeAttributeNameState);
-            }
           } else if (cc == '/') {
-            if (isAppropriateEndTag()) {
+            if (isAppropriateEndTag())
               FLUSH_AND_ADVANCE_TO(SelfClosingStartTagState);
-            }
           } else if (cc == '>') {
-            if (isAppropriateEndTag()) {
+            if (isAppropriateEndTag())
               FLUSH_EMIT_AND_RESUME_IN(DataState);
-            }
           }
           emitCharacter('<');
           emitCharacter('/');
@@ -629,7 +629,6 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           m_bufferedEndTagName.clear();
           RECONSUME_IN(RAWTEXTState);
         }
-        break;
       }
       END_STATE()
 
@@ -646,7 +645,6 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           emitCharacter('<');
           RECONSUME_IN(ScriptDataState);
         }
-        break;
       }
       END_STATE()
 
@@ -664,7 +662,6 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           emitCharacter('/');
           RECONSUME_IN(ScriptDataState);
         }
-        break;
       }
       END_STATE()
 
@@ -672,22 +669,21 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         if (cc >= 'A' && cc <= 'Z') {
           m_temporaryBuffer.append(cc);
           addToPossibleEndTag(toLowerCase(cc));
+          ADVANCE_TO(ScriptDataEndTagNameState);
         } else if (cc >= 'a' && cc <= 'z') {
           m_temporaryBuffer.append(cc);
           addToPossibleEndTag(cc);
+          ADVANCE_TO(ScriptDataEndTagNameState);
         } else {
           if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ') {
-            if (isAppropriateEndTag()) {
+            if (isAppropriateEndTag())
               FLUSH_AND_ADVANCE_TO(BeforeAttributeNameState);
-            }
           } else if (cc == '/') {
-            if (isAppropriateEndTag()) {
+            if (isAppropriateEndTag())
               FLUSH_AND_ADVANCE_TO(SelfClosingStartTagState);
-            }
           } else if (cc == '>') {
-            if (isAppropriateEndTag()) {
+            if (isAppropriateEndTag())
               FLUSH_EMIT_AND_RESUME_IN(DataState);
-            }
           }
           emitCharacter('<');
           emitCharacter('/');
@@ -695,7 +691,6 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           m_bufferedEndTagName.clear();
           RECONSUME_IN(ScriptDataState);
         }
-        break;
       }
       END_STATE()
 
@@ -703,10 +698,8 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         if (cc == '-') {
           emitCharacter(cc);
           ADVANCE_TO(ScriptDataEscapeStartDashState);
-        } else {
+        } else
           RECONSUME_IN(ScriptDataState);
-        }
-        break;
       }
       END_STATE()
 
@@ -714,10 +707,8 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         if (cc == '-') {
           emitCharacter(cc);
           ADVANCE_TO(ScriptDataEscapedDashDashState);
-        } else {
+        } else
           RECONSUME_IN(ScriptDataState);
-        }
-        break;
       }
       END_STATE()
 
@@ -745,14 +736,14 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           ADVANCE_TO(ScriptDataEscapedState);
         }
         // FIXME: Handle EOF properly.
-        break;
       }
       END_STATE()
 
       BEGIN_STATE(ScriptDataEscapedDashDashState) {
-        if (cc == '-')
+        if (cc == '-') {
           emitCharacter(cc);
-        else if (cc == '<')
+          ADVANCE_TO(ScriptDataEscapedDashDashState);
+        } else if (cc == '<')
           ADVANCE_TO(ScriptDataEscapedLessThanSignState);
         else if (cc == '>') {
           emitCharacter(cc);
@@ -762,7 +753,6 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           ADVANCE_TO(ScriptDataEscapedState);
         }
         // FIXME: Handle EOF properly.
-        break;
       }
       END_STATE()
 
@@ -787,7 +777,6 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           emitCharacter('<');
           RECONSUME_IN(ScriptDataEscapedState);
         }
-        break;
       }
       END_STATE()
 
@@ -805,7 +794,6 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           emitCharacter('/');
           RECONSUME_IN(ScriptDataEscapedState);
         }
-        break;
       }
       END_STATE()
 
@@ -813,22 +801,21 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         if (cc >= 'A' && cc <= 'Z') {
           m_temporaryBuffer.append(cc);
           addToPossibleEndTag(toLowerCase(cc));
+          ADVANCE_TO(ScriptDataEscapedEndTagNameState);
         } else if (cc >= 'a' && cc <= 'z') {
           m_temporaryBuffer.append(cc);
           addToPossibleEndTag(cc);
+          ADVANCE_TO(ScriptDataEscapedEndTagNameState);
         } else {
           if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ') {
-            if (isAppropriateEndTag()) {
+            if (isAppropriateEndTag())
               FLUSH_AND_ADVANCE_TO(BeforeAttributeNameState);
-            }
           } else if (cc == '/') {
-            if (isAppropriateEndTag()) {
+            if (isAppropriateEndTag())
               FLUSH_AND_ADVANCE_TO(SelfClosingStartTagState);
-            }
           } else if (cc == '>') {
-            if (isAppropriateEndTag()) {
+            if (isAppropriateEndTag())
               FLUSH_EMIT_AND_RESUME_IN(DataState);
-            }
           }
           emitCharacter('<');
           emitCharacter('/');
@@ -836,7 +823,6 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           m_bufferedEndTagName.clear();
           RECONSUME_IN(ScriptDataEscapedState);
         }
-        break;
       }
       END_STATE()
 
@@ -851,13 +837,14 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         } else if (cc >= 'A' && cc <= 'Z') {
           emitCharacter(cc);
           m_temporaryBuffer.append(toLowerCase(cc));
+          ADVANCE_TO(ScriptDataDoubleEscapeStartState);
         } else if (cc >= 'a' && cc <= 'z') {
           emitCharacter(cc);
           m_temporaryBuffer.append(cc);
+          ADVANCE_TO(ScriptDataDoubleEscapeStartState);
         } else {
           RECONSUME_IN(ScriptDataEscapedState);
         }
-        break;
       }
       END_STATE()
 
@@ -868,10 +855,11 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         } else if (cc == '<') {
           emitCharacter(cc);
           ADVANCE_TO(ScriptDataDoubleEscapedLessThanSignState);
-        } else
+        } else {
           emitCharacter(cc);
+          ADVANCE_TO(ScriptDataDoubleEscapedState);
+        }
         // FIXME: Handle EOF properly.
-        break;
       }
       END_STATE()
 
@@ -887,14 +875,14 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           ADVANCE_TO(ScriptDataDoubleEscapedState);
         }
         // FIXME: Handle EOF properly.
-        break;
       }
       END_STATE()
 
       BEGIN_STATE(ScriptDataDoubleEscapedDashDashState) {
-        if (cc == '-')
+        if (cc == '-') {
           emitCharacter(cc);
-        else if (cc == '<') {
+          ADVANCE_TO(ScriptDataDoubleEscapedDashDashState);
+        } else if (cc == '<') {
           emitCharacter(cc);
           ADVANCE_TO(ScriptDataDoubleEscapedLessThanSignState);
         } else if (cc == '>') {
@@ -905,7 +893,6 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           ADVANCE_TO(ScriptDataDoubleEscapedState);
         }
         // FIXME: Handle EOF properly.
-        break;
       }
       END_STATE()
 
@@ -914,10 +901,8 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           emitCharacter(cc);
           m_temporaryBuffer.clear();
           ADVANCE_TO(ScriptDataDoubleEscapeEndState);
-        } else {
+        } else
           RECONSUME_IN(ScriptDataDoubleEscapedState);
-        }
-        break;
       }
       END_STATE()
 
@@ -932,24 +917,24 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         } else if (cc >= 'A' && cc <= 'Z') {
           emitCharacter(cc);
           m_temporaryBuffer.append(toLowerCase(cc));
+          ADVANCE_TO(ScriptDataDoubleEscapeEndState);
         } else if (cc >= 'a' && cc <= 'z') {
           emitCharacter(cc);
           m_temporaryBuffer.append(cc);
-        } else {
+          ADVANCE_TO(ScriptDataDoubleEscapeEndState);
+        } else
           RECONSUME_IN(ScriptDataDoubleEscapedState);
-        }
-        break;
       }
       END_STATE()
 
       BEGIN_STATE(BeforeAttributeNameState) {
         if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ')
-          break;
+          ADVANCE_TO(BeforeAttributeNameState);
         else if (cc == '/')
           ADVANCE_TO(SelfClosingStartTagState);
-        else if (cc == '>') {
+        else if (cc == '>')
           EMIT_AND_RESUME_IN(DataState);
-        } else if (cc >= 'A' && cc <= 'Z') {
+        else if (cc >= 'A' && cc <= 'Z') {
           m_token->addNewAttribute();
           m_token->appendToAttributeName(toLowerCase(cc));
           ADVANCE_TO(AttributeNameState);
@@ -961,7 +946,6 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           ADVANCE_TO(AttributeNameState);
         }
         // FIXME: Handle EOF properly.
-        break;
       }
       END_STATE()
 
@@ -972,24 +956,24 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           ADVANCE_TO(SelfClosingStartTagState);
         else if (cc == '=')
           ADVANCE_TO(BeforeAttributeValueState);
-        else if (cc == '>') {
+        else if (cc == '>')
           EMIT_AND_RESUME_IN(DataState);
-        } else if (cc >= 'A' && cc <= 'Z')
+        else if (cc >= 'A' && cc <= 'Z') {
           m_token->appendToAttributeName(toLowerCase(cc));
-        else {
+          ADVANCE_TO(AttributeNameState);
+        } else {
           if (cc == '"' || cc == '\'' || cc == '<' || cc == '=')
             emitParseError();
           m_token->appendToAttributeName(cc);
           ADVANCE_TO(AttributeNameState);
         }
         // FIXME: Handle EOF properly.
-        break;
       }
       END_STATE()
 
       BEGIN_STATE(AfterAttributeNameState) {
         if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ')
-          break;
+          ADVANCE_TO(AfterAttributeNameState);
         else if (cc == '/')
           ADVANCE_TO(SelfClosingStartTagState);
         else if (cc == '=')
@@ -1008,18 +992,17 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           ADVANCE_TO(AttributeNameState);
         }
         // FIXME: Handle EOF properly.
-        break;
       }
       END_STATE()
 
       BEGIN_STATE(BeforeAttributeValueState) {
         if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ')
-          break;
+          ADVANCE_TO(BeforeAttributeValueState);
         else if (cc == '"')
           ADVANCE_TO(AttributeValueDoubleQuotedState);
-        else if (cc == '&') {
+        else if (cc == '&')
           RECONSUME_IN(AttributeValueUnquotedState);
-        } else if (cc == '\'')
+        else if (cc == '\'')
           ADVANCE_TO(AttributeValueSingleQuotedState);
         else if (cc == '>') {
           emitParseError();
@@ -1030,7 +1013,6 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           m_token->appendToAttributeValue(cc);
           ADVANCE_TO(AttributeValueUnquotedState);
         }
-        break;
       }
       END_STATE()
 
@@ -1040,10 +1022,11 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         else if (cc == '&') {
           m_additionalAllowedCharacter = '"';
           ADVANCE_TO(CharacterReferenceInAttributeValueState);
-        } else
+        } else {
           m_token->appendToAttributeValue(cc);
+          ADVANCE_TO(AttributeValueDoubleQuotedState);
+        }
         // FIXME: Handle EOF properly.
-        break;
       }
       END_STATE()
 
@@ -1053,10 +1036,11 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         else if (cc == '&') {
           m_additionalAllowedCharacter = '\'';
           ADVANCE_TO(CharacterReferenceInAttributeValueState);
-        } else
+        } else {
           m_token->appendToAttributeValue(cc);
+          ADVANCE_TO(AttributeValueSingleQuotedState);
+        }
         // FIXME: Handle EOF properly.
-        break;
       }
       END_STATE()
 
@@ -1066,15 +1050,15 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         else if (cc == '&') {
           m_additionalAllowedCharacter = '>';
           ADVANCE_TO(CharacterReferenceInAttributeValueState);
-        } else if (cc == '>') {
+        } else if (cc == '>')
           EMIT_AND_RESUME_IN(DataState);
-        } else {
+        else {
           if (cc == '"' || cc == '\'' || cc == '<' || cc == '=' || cc == '`')
             emitParseError();
           m_token->appendToAttributeValue(cc);
+          ADVANCE_TO(AttributeValueUnquotedState);
         }
         // FIXME: Handle EOF properly.
-        break;
       }
       END_STATE()
 
@@ -1096,14 +1080,13 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         // keeping track of this explictly, we observe that the previous
         // state can be determined by m_additionalAllowedCharacter.
         if (m_additionalAllowedCharacter == '"')
-          RECONSUME_IN(AttributeValueDoubleQuotedState)
+          RECONSUME_IN(AttributeValueDoubleQuotedState);
         else if (m_additionalAllowedCharacter == '\'')
-          RECONSUME_IN(AttributeValueSingleQuotedState)
+          RECONSUME_IN(AttributeValueSingleQuotedState);
         else if (m_additionalAllowedCharacter == '>')
-          RECONSUME_IN(AttributeValueUnquotedState)
+          RECONSUME_IN(AttributeValueUnquotedState);
         else
           ASSERT_NOT_REACHED();
-        break;
       }
       END_STATE()
 
@@ -1112,14 +1095,13 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           ADVANCE_TO(BeforeAttributeNameState);
         else if (cc == '/')
           ADVANCE_TO(SelfClosingStartTagState);
-        else if (cc == '>') {
+        else if (cc == '>')
           EMIT_AND_RESUME_IN(DataState);
-        } else {
+        else {
           emitParseError();
           RECONSUME_IN(BeforeAttributeNameState);
         }
         // FIXME: Handle EOF properly.
-        break;
       }
       END_STATE()
 
@@ -1132,7 +1114,6 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           RECONSUME_IN(BeforeAttributeNameState);
         }
         // FIXME: Handle EOF properly.
-        break;
       }
       END_STATE()
 
@@ -1195,7 +1176,6 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           ADVANCE_TO(CommentState);
         }
         // FIXME: Handle EOF properly.
-        break;
       }
       END_STATE()
 
@@ -1211,17 +1191,17 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           ADVANCE_TO(CommentState);
         }
         // FIXME: Handle EOF properly.
-        break;
       }
       END_STATE()
 
       BEGIN_STATE(CommentState) {
         if (cc == '-')
           ADVANCE_TO(CommentEndDashState);
-        else
+        else {
           m_token->appendToComment(cc);
+          ADVANCE_TO(CommentState);
+        }
         // FIXME: Handle EOF properly.
-        break;
       }
       END_STATE()
 
@@ -1234,14 +1214,13 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           ADVANCE_TO(CommentState);
         }
         // FIXME: Handle EOF properly.
-        break;
       }
       END_STATE()
 
       BEGIN_STATE(CommentEndState) {
-        if (cc == '>') {
+        if (cc == '>')
           EMIT_AND_RESUME_IN(DataState);
-        } else if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ') {
+        else if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ') {
           emitParseError();
           m_token->appendToComment('-');
           m_token->appendToComment('-');
@@ -1254,6 +1233,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           emitParseError();
           m_token->appendToComment('-');
           m_token->appendToComment(cc);
+          ADVANCE_TO(CommentEndState);
         } else {
           emitParseError();
           m_token->appendToComment('-');
@@ -1262,7 +1242,6 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           ADVANCE_TO(CommentState);
         }
         // FIXME: Handle EOF properly.
-        break;
       }
       END_STATE()
 
@@ -1282,23 +1261,22 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           ADVANCE_TO(CommentState);
         }
         // FIXME: Handle EOF properly.
-        break;
       }
       END_STATE()
 
       BEGIN_STATE(CommentEndSpaceState) {
-        if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ')
+        if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ') {
           m_token->appendToComment(cc);
-        else if (cc == '-')
+          ADVANCE_TO(CommentEndSpaceState);
+        } else if (cc == '-')
           ADVANCE_TO(CommentEndDashState);
-        else if (cc == '>') {
+        else if (cc == '>')
           EMIT_AND_RESUME_IN(DataState);
-        } else {
+        else {
           m_token->appendToComment(cc);
           ADVANCE_TO(CommentState);
         }
         // FIXME: Handle EOF properly.
-        break;
       }
       END_STATE()
 
@@ -1310,13 +1288,12 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           RECONSUME_IN(BeforeDOCTYPENameState);
         }
         // FIXME: Handle EOF properly.
-        break;
       }
       END_STATE()
 
       BEGIN_STATE(BeforeDOCTYPENameState) {
         if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ')
-          break;
+          ADVANCE_TO(BeforeDOCTYPENameState);
         else if (cc >= 'A' && cc <= 'Z') {
           m_token->beginDOCTYPE(toLowerCase(cc));
           ADVANCE_TO(DOCTYPENameState);
@@ -1330,30 +1307,31 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           ADVANCE_TO(DOCTYPENameState);
         }
         // FIXME: Handle EOF properly.
-        break;
       }
       END_STATE()
 
       BEGIN_STATE(DOCTYPENameState) {
         if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ')
           ADVANCE_TO(AfterDOCTYPENameState);
-        else if (cc == '>') {
+        else if (cc == '>')
           EMIT_AND_RESUME_IN(DataState);
-        } else if (cc >= 'A' && cc <= 'Z')
+        else if (cc >= 'A' && cc <= 'Z') {
           m_token->appendToName(toLowerCase(cc));
-        else
+          ADVANCE_TO(DOCTYPENameState);
+        } else {
           m_token->appendToName(cc);
+          ADVANCE_TO(DOCTYPENameState);
+        }
         // FIXME: Handle EOF properly.
-        break;
       }
       END_STATE()
 
       BEGIN_STATE(AfterDOCTYPENameState) {
         if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ')
-          break;
-        if (cc == '>') {
+          ADVANCE_TO(AfterDOCTYPENameState);
+        if (cc == '>')
           EMIT_AND_RESUME_IN(DataState);
-        } else {
+        else {
           DEFINE_STATIC_LOCAL(String, publicString, ("public"));
           DEFINE_STATIC_LOCAL(String, systemString, ("system"));
           if (cc == 'P' || cc == 'p') {
@@ -1378,7 +1356,6 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           ADVANCE_TO(BogusDOCTYPEState);
         }
         // FIXME: Handle EOF properly.
-        break;
       }
       END_STATE()
 
@@ -1403,13 +1380,12 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           ADVANCE_TO(BogusDOCTYPEState);
         }
         // FIXME: Handle EOF properly.
-        break;
       }
       END_STATE()
 
       BEGIN_STATE(BeforeDOCTYPEPublicIdentifierState) {
         if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ')
-          break;
+          ADVANCE_TO(BeforeDOCTYPEPublicIdentifierState);
         else if (cc == '"') {
           m_token->setPublicIdentifierToEmptyString();
           ADVANCE_TO(DOCTYPEPublicIdentifierDoubleQuotedState);
@@ -1426,7 +1402,6 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           ADVANCE_TO(BogusDOCTYPEState);
         }
         // FIXME: Handle EOF properly.
-        break;
       }
       END_STATE()
 
@@ -1437,10 +1412,11 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           emitParseError();
           notImplemented();
           EMIT_AND_RESUME_IN(DataState);
-        } else
+        } else {
           m_token->appendToPublicIdentifier(cc);
+          ADVANCE_TO(DOCTYPEPublicIdentifierDoubleQuotedState);
+        }
         // FIXME: Handle EOF properly.
-        break;
       }
       END_STATE()
 
@@ -1451,19 +1427,20 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           emitParseError();
           notImplemented();
           EMIT_AND_RESUME_IN(DataState);
-        } else
+        } else {
           m_token->appendToPublicIdentifier(cc);
+          ADVANCE_TO(DOCTYPEPublicIdentifierSingleQuotedState);
+        }
         // FIXME: Handle EOF properly.
-        break;
       }
       END_STATE()
 
       BEGIN_STATE(AfterDOCTYPEPublicIdentifierState) {
         if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ')
           ADVANCE_TO(BetweenDOCTYPEPublicAndSystemIdentifiersState);
-        else if (cc == '>') {
+        else if (cc == '>')
           EMIT_AND_RESUME_IN(DataState);
-        } else if (cc == '"') {
+        else if (cc == '"') {
           emitParseError();
           m_token->setPublicIdentifierToEmptyString();
           ADVANCE_TO(DOCTYPESystemIdentifierDoubleQuotedState);
@@ -1477,16 +1454,15 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           ADVANCE_TO(BogusDOCTYPEState);
         }
         // FIXME: Handle EOF properly.
-        break;
       }
       END_STATE()
 
       BEGIN_STATE(BetweenDOCTYPEPublicAndSystemIdentifiersState) {
         if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ')
           ADVANCE_TO(BetweenDOCTYPEPublicAndSystemIdentifiersState);
-        else if (cc == '>') {
+        else if (cc == '>')
           EMIT_AND_RESUME_IN(DataState);
-        } else if (cc == '"') {
+        else if (cc == '"') {
           m_token->setSystemIdentifierToEmptyString();
           ADVANCE_TO(DOCTYPESystemIdentifierDoubleQuotedState);
         } else if (cc == '\'') {
@@ -1498,7 +1474,6 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           ADVANCE_TO(BogusDOCTYPEState);
         }
         // FIXME: Handle EOF properly.
-        break;
       }
       END_STATE()
 
@@ -1523,13 +1498,12 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           ADVANCE_TO(BogusDOCTYPEState);
         }
         // FIXME: Handle EOF properly.
-        break;
       }
       END_STATE()
 
       BEGIN_STATE(BeforeDOCTYPESystemIdentifierState) {
         if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ')
-          break;
+          ADVANCE_TO(BeforeDOCTYPESystemIdentifierState);
         if (cc == '"') {
           m_token->setSystemIdentifierToEmptyString();
           ADVANCE_TO(DOCTYPESystemIdentifierDoubleQuotedState);
@@ -1546,7 +1520,6 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           ADVANCE_TO(BogusDOCTYPEState);
         }
         // FIXME: Handle EOF properly.
-        break;
       }
       END_STATE()
 
@@ -1557,10 +1530,11 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           emitParseError();
           notImplemented();
           EMIT_AND_RESUME_IN(DataState);
-        } else
+        } else {
           m_token->appendToSystemIdentifier(cc);
+          ADVANCE_TO(DOCTYPESystemIdentifierDoubleQuotedState);
+        }
         // FIXME: Handle EOF properly.
-        break;
       }
       END_STATE()
 
@@ -1571,16 +1545,17 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           emitParseError();
           notImplemented();
           EMIT_AND_RESUME_IN(DataState);
-        } else
+        } else {
           m_token->appendToSystemIdentifier(cc);
+          ADVANCE_TO(DOCTYPESystemIdentifierSingleQuotedState);
+        }
         // FIXME: Handle EOF properly.
-        break;
       }
       END_STATE()
 
       BEGIN_STATE(AfterDOCTYPESystemIdentifierState) {
         if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ')
-          break;
+          ADVANCE_TO(AfterDOCTYPESystemIdentifierState);
         else if (cc == '>') {
           EMIT_AND_RESUME_IN(DataState);
         } else {
@@ -1588,32 +1563,34 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           ADVANCE_TO(BogusDOCTYPEState);
         }
         // FIXME: Handle EOF properly.
-        break;
       }
       END_STATE()
 
       BEGIN_STATE(BogusDOCTYPEState) {
-        if (cc == '>') {
+        if (cc == '>')
           EMIT_AND_RESUME_IN(DataState);
-        }
+        ADVANCE_TO(BogusDOCTYPEState);
         // FIXME: Handle EOF properly.
-        break;
       }
       END_STATE()
 
       BEGIN_STATE(CDATASectionState) {
         notImplemented();
-        break;
+        ADVANCE_TO(CDATASectionState);
       }
       END_STATE()
     }
+
+  breakLabel:
     source.advance(m_lineNumber);
     if (m_emitPending) {
       m_emitPending = false;
       return true;
     }
 
-  }  // Matches the "while" above.
+  continueLabel
+      :;  // We need an empty statement here to make continueLabel happy.
+  }       // Matches the "while" above.
 
   // We've reached the end of the input stream.  If we have a character
   // token buffered, we should emit it.
