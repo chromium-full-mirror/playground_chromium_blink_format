@@ -264,7 +264,7 @@ void ImageBuffer::putPremultipliedImageData(ImageData* source,
                               *context()->platformContext()->bitmap(), m_size);
 }
 
-String ImageBuffer::toDataURL(const String&, double) const {
+String ImageBuffer::toDataURL(const String&, const double*) const {
   // Encode the image into a vector.
   Vector<unsigned char> pngEncodedData;
   PNGImageEncoder::encode(*context()->platformContext()->bitmap(),

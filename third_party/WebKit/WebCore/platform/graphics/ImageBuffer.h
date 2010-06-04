@@ -85,7 +85,7 @@ class ImageBuffer : public Noncopyable {
                                  const IntRect& sourceRect,
                                  const IntPoint& destPoint);
 
-  String toDataURL(const String& mimeType, double quality = 1.0) const;
+  String toDataURL(const String& mimeType, const double* quality = 0) const;
 #if !PLATFORM(CG)
   AffineTransform baseTransform() const { return AffineTransform(); }
   void transformColorSpace(ImageColorSpace srcColorSpace,

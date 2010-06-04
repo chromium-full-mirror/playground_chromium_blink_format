@@ -64,7 +64,7 @@ void CanvasSurface::setSurfaceSize(const IntSize& size) {
 }
 
 String CanvasSurface::toDataURL(const String& mimeType,
-                                double quality,
+                                const double* quality,
                                 ExceptionCode& ec) {
   if (!m_originClean) {
     ec = SECURITY_ERR;

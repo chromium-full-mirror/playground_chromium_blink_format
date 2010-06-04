@@ -59,10 +59,11 @@ class CanvasSurface : public Noncopyable {
   int width() const { return m_size.width(); }
   int height() const { return m_size.height(); }
 
-  String toDataURL(const String& mimeType, double quality, ExceptionCode&);
-
+  String toDataURL(const String& mimeType,
+                   const double* quality,
+                   ExceptionCode&);
   String toDataURL(const String& mimeType, ExceptionCode& ec) {
-    return toDataURL(mimeType, 1.0, ec);
+    return toDataURL(mimeType, 0, ec);
   }
 
   const IntSize& size() const { return m_size; }

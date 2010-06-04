@@ -264,6 +264,13 @@ void ImageBuffer::putPremultipliedImageData(ImageData* source,
   putImageData<Premultiplied>(source, sourceRect, destPoint, m_data, m_size);
 }
 
+static inline CFStringRef jpegUTI() {
+#if PLATFORM(WIN)
+  static const CFStringRef kUTTypeJPEG = CFSTR("public.jpeg");
+#endif
+  return kUTTypeJPEG;
+}
+
 static RetainPtr<CFStringRef> utiFromMIMEType(const String& mimeType) {
 #if PLATFORM(MAC)
   RetainPtr<CFStringRef> mimeTypeCFString(AdoptCF, mimeType.createCFString());
@@ -277,13 +284,12 @@ static RetainPtr<CFStringRef> utiFromMIMEType(const String& mimeType) {
   // from MIMEType to UTI reliably is found.
   // For now, only support PNG, JPEG, and GIF. See <rdar://problem/6095286>.
   static const CFStringRef kUTTypePNG = CFSTR("public.png");
-  static const CFStringRef kUTTypeJPEG = CFSTR("public.jpeg");
   static const CFStringRef kUTTypeGIF = CFSTR("com.compuserve.gif");
 
   if (equalIgnoringCase(mimeType, "image/png"))
     return kUTTypePNG;
   if (equalIgnoringCase(mimeType, "image/jpeg"))
-    return kUTTypeJPEG;
+    return jpegUTI();
   if (equalIgnoringCase(mimeType, "image/gif"))
     return kUTTypeGIF;
 
@@ -292,7 +298,8 @@ static RetainPtr<CFStringRef> utiFromMIMEType(const String& mimeType) {
 #endif
 }
 
-String ImageBuffer::toDataURL(const String& mimeType, double) const {
+String ImageBuffer::toDataURL(const String& mimeType,
+                              const double* quality) const {
   ASSERT(MIMETypeRegistry::isSupportedImageMIMETypeForEncoding(mimeType));
 
   RetainPtr<CGImageRef> image(
@@ -305,13 +312,30 @@ String ImageBuffer::toDataURL(const String& mimeType, double) const {
   if (!data)
     return "data:,";
 
+  RetainPtr<CFStringRef> uti = utiFromMIMEType(mimeType);
+  ASSERT(uti);
+
   RetainPtr<CGImageDestinationRef> destination(
-      AdoptCF, CGImageDestinationCreateWithData(
-                   data.get(), utiFromMIMEType(mimeType).get(), 1, 0));
+      AdoptCF, CGImageDestinationCreateWithData(data.get(), uti.get(), 1, 0));
   if (!destination)
     return "data:,";
 
-  CGImageDestinationAddImage(destination.get(), image.get(), 0);
+  RetainPtr<CFDictionaryRef> imageProperties = 0;
+  if (CFEqual(uti.get(), jpegUTI()) && quality && *quality >= 0.0 &&
+      *quality <= 1.0) {
+    // Apply the compression quality to the image destination.
+    RetainPtr<CFNumberRef> compressionQuality(
+        AdoptCF,
+        CFNumberCreate(kCFAllocatorDefault, kCFNumberDoubleType, quality));
+    const void* key = kCGImageDestinationLossyCompressionQuality;
+    const void* value = compressionQuality.get();
+    imageProperties.adoptCF(
+        CFDictionaryCreate(0, &key, &value, 1, &kCFTypeDictionaryKeyCallBacks,
+                           &kCFTypeDictionaryValueCallBacks));
+  }
+
+  CGImageDestinationAddImage(destination.get(), image.get(),
+                             imageProperties.get());
   CGImageDestinationFinalize(destination.get());
 
   Vector<char> out;
