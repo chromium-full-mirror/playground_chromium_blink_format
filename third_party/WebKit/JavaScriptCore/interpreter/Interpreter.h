@@ -105,13 +105,12 @@ class Interpreter : public FastAllocBase {
                       JSValue thisValue,
                       const ArgList&,
                       JSValue* exception);
-  JSValue executeConstruct(FunctionExecutable*,
-                           CallFrame*,
-                           JSFunction*,
-                           JSObject* thisObj,
-                           const ArgList& args,
-                           ScopeChainNode*,
-                           JSValue* exception);
+  JSObject* executeConstruct(CallFrame*,
+                             JSObject* function,
+                             ConstructType,
+                             const ConstructData&,
+                             const ArgList&,
+                             JSValue* exception);
   JSValue execute(EvalExecutable* evalNode,
                   CallFrame* exec,
                   JSObject* thisObj,

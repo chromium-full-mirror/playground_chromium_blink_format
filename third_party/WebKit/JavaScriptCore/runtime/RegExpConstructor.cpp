@@ -361,10 +361,10 @@ JSObject* constructRegExp(ExecState* exec, const ArgList& args) {
                                  regExp.release());
 }
 
-static JSObject* constructWithRegExpConstructor(ExecState* exec,
-                                                JSObject*,
-                                                const ArgList& args) {
-  return constructRegExp(exec, args);
+static EncodedJSValue JSC_HOST_CALL
+constructWithRegExpConstructor(ExecState* exec) {
+  ArgList args(exec);
+  return JSValue::encode(constructRegExp(exec, args));
 }
 
 ConstructType RegExpConstructor::getConstructData(

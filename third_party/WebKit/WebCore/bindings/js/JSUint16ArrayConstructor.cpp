@@ -55,18 +55,19 @@ JSUint16ArrayConstructor::JSUint16ArrayConstructor(
             ReadOnly | DontDelete | DontEnum);
 }
 
-static JSObject* constructCanvasUnsignedShortArray(ExecState* exec,
-                                                   JSObject* constructor,
-                                                   const ArgList& args) {
+static EncodedJSValue JSC_HOST_CALL
+constructCanvasUnsignedShortArray(ExecState* exec) {
+  ArgList args(exec);
   JSUint16ArrayConstructor* jsConstructor =
-      static_cast<JSUint16ArrayConstructor*>(constructor);
+      static_cast<JSUint16ArrayConstructor*>(exec->callee());
   RefPtr<Uint16Array> array = static_cast<Uint16Array*>(
       construct<Uint16Array, unsigned short>(exec, args).get());
   if (!array.get()) {
     setDOMException(exec, INDEX_SIZE_ERR);
-    return 0;
+    return JSValue::encode(JSValue());
   }
-  return asObject(toJS(exec, jsConstructor->globalObject(), array.get()));
+  return JSValue::encode(
+      asObject(toJS(exec, jsConstructor->globalObject(), array.get())));
 }
 
 JSC::ConstructType JSUint16ArrayConstructor::getConstructData(

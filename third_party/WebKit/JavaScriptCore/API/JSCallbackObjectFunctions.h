@@ -338,9 +338,8 @@ ConstructType JSCallbackObject<Base>::getConstructData(
 }
 
 template <class Base>
-JSObject* JSCallbackObject<Base>::construct(ExecState* exec,
-                                            JSObject* constructor,
-                                            const ArgList& args) {
+EncodedJSValue JSCallbackObject<Base>::construct(ExecState* exec) {
+  JSObject* constructor = exec->callee();
   JSContextRef execRef = toRef(exec);
   JSObjectRef constructorRef = toRef(constructor);
 
@@ -349,10 +348,10 @@ JSObject* JSCallbackObject<Base>::construct(ExecState* exec,
        jsClass; jsClass = jsClass->parentClass) {
     if (JSObjectCallAsConstructorCallback callAsConstructor =
             jsClass->callAsConstructor) {
-      int argumentCount = static_cast<int>(args.size());
+      int argumentCount = static_cast<int>(exec->argumentCount());
       Vector<JSValueRef, 16> arguments(argumentCount);
       for (int i = 0; i < argumentCount; i++)
-        arguments[i] = toRef(exec, args.at(i));
+        arguments[i] = toRef(exec, exec->argument(i));
       JSValueRef exception = 0;
       JSObject* result;
       {
@@ -362,13 +361,13 @@ JSObject* JSCallbackObject<Base>::construct(ExecState* exec,
       }
       if (exception)
         exec->setException(toJS(exec, exception));
-      return result;
+      return JSValue::encode(result);
     }
   }
 
   ASSERT_NOT_REACHED();  // getConstructData should prevent us from reaching
                          // here
-  return 0;
+  return JSValue::encode(JSValue());
 }
 
 template <class Base>

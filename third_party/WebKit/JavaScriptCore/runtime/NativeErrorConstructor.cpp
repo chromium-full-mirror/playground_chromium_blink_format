@@ -63,11 +63,11 @@ ErrorInstance* NativeErrorConstructor::construct(ExecState* exec,
   return object;
 }
 
-static JSObject* constructWithNativeErrorConstructor(ExecState* exec,
-                                                     JSObject* constructor,
-                                                     const ArgList& args) {
-  return static_cast<NativeErrorConstructor*>(constructor)
-      ->construct(exec, args);
+static EncodedJSValue JSC_HOST_CALL
+constructWithNativeErrorConstructor(ExecState* exec) {
+  ArgList args(exec);
+  return JSValue::encode(static_cast<NativeErrorConstructor*>(exec->callee())
+                             ->construct(exec, args));
 }
 
 ConstructType NativeErrorConstructor::getConstructData(

@@ -135,10 +135,10 @@ JSObject* constructDate(ExecState* exec, const ArgList& args) {
   return new (exec) DateInstance(exec, value);
 }
 
-static JSObject* constructWithDateConstructor(ExecState* exec,
-                                              JSObject*,
-                                              const ArgList& args) {
-  return constructDate(exec, args);
+static EncodedJSValue JSC_HOST_CALL
+constructWithDateConstructor(ExecState* exec) {
+  ArgList args(exec);
+  return JSValue::encode(constructDate(exec, args));
 }
 
 ConstructType DateConstructor::getConstructData(ConstructData& constructData) {

@@ -50,16 +50,15 @@ JSAudioConstructor::JSAudioConstructor(ExecState* exec,
             ReadOnly | DontDelete | DontEnum);
 }
 
-static JSObject* constructAudio(ExecState* exec,
-                                JSObject* constructor,
-                                const ArgList& args) {
+static EncodedJSValue JSC_HOST_CALL constructAudio(ExecState* exec) {
   JSAudioConstructor* jsConstructor =
-      static_cast<JSAudioConstructor*>(constructor);
+      static_cast<JSAudioConstructor*>(exec->callee());
 
   Document* document = jsConstructor->document();
   if (!document)
-    return throwError(exec, ReferenceError,
-                      "Audio constructor associated document is unavailable");
+    return JSValue::encode(
+        throwError(exec, ReferenceError,
+                   "Audio constructor associated document is unavailable"));
 
   // Calling toJS on the document causes the JS document wrapper to be
   // added to the window object. This is done to ensure that
@@ -71,14 +70,14 @@ static JSObject* constructAudio(ExecState* exec,
   // FIXME: This converts an undefined argument to the string "undefined", but
   // possibly we
   // should treat it as if no argument was passed instead, by checking the value
-  // of args.at
-  // rather than looking at args.size.
+  // of exec->argument
+  // rather than looking at exec->argumentCount.
   String src;
-  if (args.size() > 0)
-    src = ustringToString(args.at(0).toString(exec));
-  return asObject(
-      toJS(exec, jsConstructor->globalObject(),
-           HTMLAudioElement::createForJSConstructor(document, src)));
+  if (exec->argumentCount() > 0)
+    src = ustringToString(exec->argument(0).toString(exec));
+  return JSValue::encode(
+      asObject(toJS(exec, jsConstructor->globalObject(),
+                    HTMLAudioElement::createForJSConstructor(document, src))));
 }
 
 ConstructType JSAudioConstructor::getConstructData(

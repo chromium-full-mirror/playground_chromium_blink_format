@@ -115,10 +115,10 @@ static ALWAYS_INLINE JSObject* constructObject(ExecState* exec,
   return arg.toObject(exec);
 }
 
-static JSObject* constructWithObjectConstructor(ExecState* exec,
-                                                JSObject*,
-                                                const ArgList& args) {
-  return constructObject(exec, args);
+static EncodedJSValue JSC_HOST_CALL
+constructWithObjectConstructor(ExecState* exec) {
+  ArgList args(exec);
+  return JSValue::encode(constructObject(exec, args));
 }
 
 ConstructType ObjectConstructor::getConstructData(

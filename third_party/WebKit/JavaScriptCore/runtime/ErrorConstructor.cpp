@@ -56,10 +56,10 @@ ErrorInstance* constructError(ExecState* exec, const ArgList& args) {
   return obj;
 }
 
-static JSObject* constructWithErrorConstructor(ExecState* exec,
-                                               JSObject*,
-                                               const ArgList& args) {
-  return constructError(exec, args);
+static EncodedJSValue JSC_HOST_CALL
+constructWithErrorConstructor(ExecState* exec) {
+  ArgList args(exec);
+  return JSValue::encode(constructError(exec, args));
 }
 
 ConstructType ErrorConstructor::getConstructData(ConstructData& constructData) {

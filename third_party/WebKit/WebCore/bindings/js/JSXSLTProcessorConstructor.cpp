@@ -52,14 +52,12 @@ JSXSLTProcessorConstructor::JSXSLTProcessorConstructor(
             JSXSLTProcessorPrototype::self(exec, globalObject), None);
 }
 
-static JSObject* constructXSLTProcessor(ExecState* exec,
-                                        JSObject* constructor,
-                                        const ArgList&) {
+static EncodedJSValue JSC_HOST_CALL constructXSLTProcessor(ExecState* exec) {
   JSXSLTProcessorConstructor* jsConstructor =
-      static_cast<JSXSLTProcessorConstructor*>(constructor);
-  return CREATE_DOM_OBJECT_WRAPPER(exec, jsConstructor->globalObject(),
-                                   XSLTProcessor,
-                                   XSLTProcessor::create().get());
+      static_cast<JSXSLTProcessorConstructor*>(exec->callee());
+  return JSValue::encode(
+      CREATE_DOM_OBJECT_WRAPPER(exec, jsConstructor->globalObject(),
+                                XSLTProcessor, XSLTProcessor::create().get()));
 }
 
 ConstructType JSXSLTProcessorConstructor::getConstructData(

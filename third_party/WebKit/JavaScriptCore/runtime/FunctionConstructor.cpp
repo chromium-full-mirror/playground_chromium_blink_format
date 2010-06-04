@@ -54,10 +54,10 @@ FunctionConstructor::FunctionConstructor(ExecState* exec,
                              ReadOnly | DontDelete | DontEnum);
 }
 
-static JSObject* constructWithFunctionConstructor(ExecState* exec,
-                                                  JSObject*,
-                                                  const ArgList& args) {
-  return constructFunction(exec, args);
+static EncodedJSValue JSC_HOST_CALL
+constructWithFunctionConstructor(ExecState* exec) {
+  ArgList args(exec);
+  return JSValue::encode(constructFunction(exec, args));
 }
 
 ConstructType FunctionConstructor::getConstructData(
