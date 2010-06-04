@@ -4071,10 +4071,6 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
         newCallFrame->init(0, vPC + OPCODE_LENGTH(op_call), scopeChain,
                            callFrame, argCount, asObject(v));
 
-        Register* thisRegister = newCallFrame->registers() -
-                                 RegisterFile::CallFrameHeaderSize - argCount;
-        ArgList args(thisRegister + 1, argCount - 1);
-
         JSValue returnValue;
         {
           SamplingTool::HostCallRecord callRecord(m_sampler.get());
@@ -4252,10 +4248,6 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
             CallFrame::create(callFrame->registers() + registerOffset);
         newCallFrame->init(0, vPC + OPCODE_LENGTH(op_call_varargs), scopeChain,
                            callFrame, argCount, asObject(v));
-
-        Register* thisRegister = newCallFrame->registers() -
-                                 RegisterFile::CallFrameHeaderSize - argCount;
-        ArgList args(thisRegister + 1, argCount - 1);
 
         JSValue returnValue;
         {
@@ -4591,20 +4583,16 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
         CallFrame* newCallFrame =
             CallFrame::create(callFrame->registers() + registerOffset);
         newCallFrame->init(0, vPC + OPCODE_LENGTH(op_construct), scopeChain,
-                           callFrame, argCount, 0);
-
-        Register* thisRegister = newCallFrame->registers() -
-                                 RegisterFile::CallFrameHeaderSize - argCount;
-        ArgList args(thisRegister + 1, argCount - 1);
+                           callFrame, argCount, asObject(v));
 
         JSValue returnValue;
         {
           SamplingTool::HostCallRecord callRecord(m_sampler.get());
           returnValue =
-              constructData.native.function(newCallFrame, asObject(v), args);
+              JSValue::decode(constructData.native.function(newCallFrame));
         }
         CHECK_FOR_EXCEPTION();
-        functionReturnValue = JSValue(returnValue);
+        functionReturnValue = returnValue;
 
         vPC += OPCODE_LENGTH(op_construct);
         NEXT_INSTRUCTION();
