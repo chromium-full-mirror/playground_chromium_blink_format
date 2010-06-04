@@ -71,6 +71,16 @@ static ResamplingMode computeResamplingMode(
     int srcHeight,
     float destWidth,
     float destHeight) {
+  if (platformContext->hasImageResamplingHint()) {
+    IntSize srcSize;
+    FloatSize dstSize;
+    platformContext->getImageResamplingHint(&srcSize, &dstSize);
+    srcWidth = srcSize.width();
+    srcHeight = srcSize.height();
+    destWidth = dstSize.width();
+    destHeight = dstSize.height();
+  }
+
   int destIWidth = static_cast<int>(destWidth);
   int destIHeight = static_cast<int>(destHeight);
 

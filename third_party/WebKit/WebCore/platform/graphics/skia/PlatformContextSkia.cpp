@@ -206,6 +206,8 @@ bool PlatformContextSkia::isDrawingToImageBuffer() const {
 #endif
 
 void PlatformContextSkia::save() {
+  ASSERT(!hasImageResamplingHint());
+
   m_stateStack.append(*m_state);
   m_state = &m_stateStack.last();
 
@@ -548,6 +550,30 @@ const SkBitmap* PlatformContextSkia::bitmap() const {
 
 bool PlatformContextSkia::isPrinting() {
   return m_canvas->getTopPlatformDevice().IsVectorial();
+}
+
+void PlatformContextSkia::getImageResamplingHint(
+    WebCore::IntSize* srcSize,
+    WebCore::FloatSize* dstSize) const {
+  *srcSize = m_imageResamplingHintSrcSize;
+  *dstSize = m_imageResamplingHintDstSize;
+}
+
+void PlatformContextSkia::setImageResamplingHint(
+    const WebCore::IntSize& srcSize,
+    const WebCore::FloatSize& dstSize) {
+  m_imageResamplingHintSrcSize = srcSize;
+  m_imageResamplingHintDstSize = dstSize;
+}
+
+void PlatformContextSkia::clearImageResamplingHint() {
+  m_imageResamplingHintSrcSize = WebCore::IntSize();
+  m_imageResamplingHintDstSize = WebCore::FloatSize();
+}
+
+bool PlatformContextSkia::hasImageResamplingHint() const {
+  return !m_imageResamplingHintSrcSize.isEmpty() &&
+         !m_imageResamplingHintDstSize.isEmpty();
 }
 
 #if OS(LINUX) || OS(WINDOWS)
