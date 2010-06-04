@@ -291,16 +291,27 @@ void Path::addArc(const FloatPoint& p,
   double width = radius * 2;
   double height = radius * 2;
 
-  if (!anticlockwise && (ea < sa))
-    span += 360;
-  else if (anticlockwise && (sa < ea))
-    span -= 360;
+  if ((!anticlockwise && (ea - sa >= 360)) ||
+      (anticlockwise && (sa - ea >= 360)))
+    // If the anticlockwise argument is false and endAngle-startAngle is equal
+    // to or greater than 2*PI, or, if the
+    // anticlockwise argument is true and startAngle-endAngle is equal to or
+    // greater than 2*PI, then the arc is the whole
+    // circumference of this circle.
+    span = 360;
+  else {
+    if (!anticlockwise && (ea < sa))
+      span += 360;
+    else if (anticlockwise && (sa < ea))
+      span -= 360;
 
-  // this is also due to switched coordinate system
-  // we would end up with a 0 span instead of 360
-  if (!(qFuzzyCompare(span + (ea - sa) + 1, 1.0) &&
-        qFuzzyCompare(qAbs(span), 360.0))) {
-    span += ea - sa;
+    // this is also due to switched coordinate system
+    // we would end up with a 0 span instead of 360
+    if (!(qFuzzyCompare(span + (ea - sa) + 1, 1.0) &&
+          qFuzzyCompare(qAbs(span), 360.0))) {
+      // mod 360
+      span += (ea - sa) - (static_cast<int>((ea - sa) / 360)) * 360;
+    }
   }
 
   // If the path is empty, move to where the arc will start to avoid painting a
