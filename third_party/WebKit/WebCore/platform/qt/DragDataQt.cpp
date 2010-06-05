@@ -31,10 +31,10 @@
 #include "DocumentFragment.h"
 #include "markup.h"
 
+#include <QColor>
 #include <QList>
 #include <QMimeData>
 #include <QUrl>
-#include <QColor>
 
 namespace WebCore {
 
