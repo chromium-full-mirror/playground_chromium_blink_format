@@ -33,14 +33,12 @@
 #include "FileSystem.h"
 
 #include "PlatformString.h"
-#include <wtf/text/CString.h>
-
-#include <QDateTime>
-#include <QFile>
-#include <QTemporaryFile>
-#include <QFileInfo>
 #include <QDateTime>
 #include <QDir>
+#include <QFile>
+#include <QFileInfo>
+#include <QTemporaryFile>
+#include <wtf/text/CString.h>
 
 namespace WebCore {
 
