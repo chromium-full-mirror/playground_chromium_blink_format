@@ -333,6 +333,10 @@ void Path::addArc(const FloatPoint& p,
   // MoveToElement
   if (!m_path.elementCount())
     m_path.arcMoveTo(xs, ys, width, height, sa);
+  else if (!radius) {
+    m_path.lineTo(xc, yc);
+    return;
+  }
 
   m_path.arcTo(xs, ys, width, height, sa, span);
 }
