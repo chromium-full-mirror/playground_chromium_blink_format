@@ -528,8 +528,10 @@ class RenderObject : public CachedResourceClient {
   bool isRooted(RenderView** = 0);
 
   Node* node() const { return m_isAnonymous ? 0 : m_node; }
-  Document* document() const { return m_node->document(); }
   void setNode(Node* node) { m_node = node; }
+
+  Document* document() const { return m_node->document(); }
+  Frame* frame() const { return document()->frame(); }
 
   bool hasOutlineAnnotation() const;
   bool hasOutline() const {

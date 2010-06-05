@@ -188,7 +188,7 @@ RenderLayer::RenderLayer(RenderBoxModelObject* renderer)
 
 RenderLayer::~RenderLayer() {
   if (inResizeMode() && !renderer()->documentBeingDestroyed()) {
-    if (Frame* frame = renderer()->document()->frame())
+    if (Frame* frame = renderer()->frame())
       frame->eventHandler()->resizeLayerDestroyed();
   }
 
@@ -1265,7 +1265,7 @@ static inline int adjustedScrollDelta(int beginningDelta) {
 }
 
 void RenderLayer::panScrollFromPoint(const IntPoint& sourcePoint) {
-  Frame* frame = renderer()->document()->frame();
+  Frame* frame = renderer()->frame();
   if (!frame)
     return;
 
@@ -1321,7 +1321,7 @@ void RenderLayer::scrollByRecursively(int xDelta, int yDelta) {
         nextRenderer = nextRenderer->parent();
       }
 
-      Frame* frame = renderer()->document()->frame();
+      Frame* frame = renderer()->frame();
       if (frame)
         frame->eventHandler()->updateAutoscrollRenderer();
     }
@@ -1418,7 +1418,7 @@ void RenderLayer::scrollToOffset(int x,
   IntRect rectForRepaint =
       renderer()->clippedOverflowRectForRepaint(repaintContainer);
 
-  Frame* frame = renderer()->document()->frame();
+  Frame* frame = renderer()->frame();
   if (frame) {
     // The caret rect needs to be invalidated after scrolling
     frame->selection()->setNeedsLayout();
@@ -1646,7 +1646,7 @@ IntRect RenderLayer::getRectToExpose(const IntRect& visibleRect,
 }
 
 void RenderLayer::autoscroll() {
-  Frame* frame = renderer()->document()->frame();
+  Frame* frame = renderer()->frame();
   if (!frame)
     return;
 
@@ -1782,7 +1782,7 @@ void RenderLayer::valueChanged(Scrollbar*) {
 }
 
 bool RenderLayer::isActive() const {
-  Page* page = renderer()->document()->frame()->page();
+  Page* page = renderer()->frame()->page();
   return page && page->focusController()->isActive();
 }
 
@@ -4287,7 +4287,7 @@ void showLayerTree(const WebCore::RenderLayer* layer) {
   if (!layer)
     return;
 
-  if (WebCore::Frame* frame = layer->renderer()->document()->frame()) {
+  if (WebCore::Frame* frame = layer->renderer()->frame()) {
     WebCore::String output = externalRepresentation(
         frame, WebCore::RenderAsTextShowAllLayers |
                    WebCore::RenderAsTextShowLayerNesting |

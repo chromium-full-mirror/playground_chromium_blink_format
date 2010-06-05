@@ -1120,7 +1120,7 @@ void RenderLayerBacking::paintIntoLayer(
 
 #if ENABLE(INSPECTOR)
 static InspectorTimelineAgent* inspectorTimelineAgent(RenderObject* renderer) {
-  Frame* frame = renderer->document()->frame();
+  Frame* frame = renderer->frame();
   if (!frame)
     return 0;
   Page* page = frame->page();

@@ -319,7 +319,7 @@ void RenderListBox::paintItemForeground(PaintInfo& paintInfo,
           ? element->renderStyle()->visitedDependentColor(CSSPropertyColor)
           : style()->visitedDependentColor(CSSPropertyColor);
   if (optionElement && optionElement->selected()) {
-    if (document()->frame()->selection()->isFocusedAndActive() &&
+    if (frame()->selection()->isFocusedAndActive() &&
         document()->focusedNode() == node())
       textColor = theme()->activeListBoxSelectionForegroundColor();
     // Honor the foreground color for disabled items
@@ -359,7 +359,7 @@ void RenderListBox::paintItemBackground(PaintInfo& paintInfo,
 
   Color backColor;
   if (optionElement && optionElement->selected()) {
-    if (document()->frame()->selection()->isFocusedAndActive() &&
+    if (frame()->selection()->isFocusedAndActive() &&
         document()->focusedNode() == node())
       backColor = theme()->activeListBoxSelectionBackgroundColor();
     else
@@ -429,7 +429,7 @@ void RenderListBox::panScroll(const IntPoint& panStartMousePosition) {
   FloatPoint absOffset = localToAbsolute();
 
   IntPoint currentMousePosition =
-      document()->frame()->eventHandler()->currentMousePosition();
+      frame()->eventHandler()->currentMousePosition();
   // We need to check if the current mouse position is out of the window. When
   // the mouse is out of the window, the position is incoherent
   static IntPoint previousMousePosition;
@@ -488,8 +488,8 @@ int RenderListBox::scrollToward(const IntPoint& destination) {
 }
 
 void RenderListBox::autoscroll() {
-  IntPoint pos = document()->frame()->view()->windowToContents(
-      document()->frame()->eventHandler()->currentMousePosition());
+  IntPoint pos = frame()->view()->windowToContents(
+      frame()->eventHandler()->currentMousePosition());
 
   int endIndex = scrollToward(pos);
   if (endIndex >= 0) {
@@ -630,7 +630,7 @@ IntRect RenderListBox::controlClipRect(int tx, int ty) const {
 }
 
 bool RenderListBox::isActive() const {
-  Page* page = document()->frame()->page();
+  Page* page = frame()->page();
   return page && page->focusController()->isActive();
 }
 
