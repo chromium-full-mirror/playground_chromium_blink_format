@@ -4057,9 +4057,7 @@ PassRefPtr<CSSPrimitiveValue> CSSParser::parseColor(CSSParserValue* value) {
   return CSSPrimitiveValue::createColor(c);
 }
 
-bool CSSParser::parseColorFromValue(CSSParserValue* value,
-                                    RGBA32& c,
-                                    bool svg) {
+bool CSSParser::parseColorFromValue(CSSParserValue* value, RGBA32& c) {
   if (!m_strict && value->unit == CSSPrimitiveValue::CSS_NUMBER &&
       value->fValue >= 0. && value->fValue < 1000000.) {
     String str = String::format("%06d", (int)(value->fValue + .5));
@@ -4080,7 +4078,7 @@ bool CSSParser::parseColorFromValue(CSSParserValue* value,
     if (!parseColorParameters(value, colorValues, false))
       return false;
     c = makeRGB(colorValues[0], colorValues[1], colorValues[2]);
-  } else if (!svg) {
+  } else {
     if (value->unit == CSSParserValue::Function && value->function->args != 0 &&
         value->function->args->size() == 7 /* rgba + three commas */ &&
         equalIgnoringCase(value->function->name, "rgba(")) {
@@ -4108,8 +4106,7 @@ bool CSSParser::parseColorFromValue(CSSParserValue* value,
                            colorValues[3]);
     } else
       return false;
-  } else
-    return false;
+  }
 
   return true;
 }
