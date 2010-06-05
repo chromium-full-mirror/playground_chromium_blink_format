@@ -27,13 +27,11 @@
 #include "config.h"
 #include "ContextMenu.h"
 
-#include <wtf/Assertions.h>
-
-#include <QAction>
-
 #include <Document.h>
 #include <Frame.h>
 #include <FrameView.h>
+#include <QAction>
+#include <wtf/Assertions.h>
 
 namespace WebCore {
 
