@@ -31,15 +31,15 @@
 #include "GraphicsContext.h"
 #include "PlatformMouseEvent.h"
 #include "RenderThemeQt.h"
-#include "Scrollbar.h"
 #include "ScrollView.h"
+#include "Scrollbar.h"
 
 #include <QApplication>
 #include <QDebug>
+#include <QMenu>
 #include <QPainter>
 #include <QStyle>
 #include <QStyleOptionSlider>
-#include <QMenu>
 
 namespace WebCore {
 
