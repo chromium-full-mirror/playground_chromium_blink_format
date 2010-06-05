@@ -29,12 +29,11 @@
 
 #include "config.h"
 
-#include <wtf/CurrentTime.h>
-
 #include <QBasicTimer>
 #include <QCoreApplication>
 #include <QDebug>
 #include <QPointer>
+#include <wtf/CurrentTime.h>
 
 namespace WebCore {
 
