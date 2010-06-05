@@ -676,6 +676,11 @@ bool ApplicationCacheStorage::store(ApplicationCacheResource* resource,
 
   openDatabase(true);
 
+  // openDatabase(true) could still fail, for example when cacheStorage is full
+  // or no longer available.
+  if (!m_database.isOpen())
+    return false;
+
   // First, insert the data
   SQLiteStatement dataStatement(
       m_database, "INSERT INTO CacheResourceData (data) VALUES (?)");
@@ -776,6 +781,9 @@ bool ApplicationCacheStorage::store(ApplicationCacheResource* resource,
 
   openDatabase(true);
 
+  if (!m_database.isOpen())
+    return false;
+
   m_isMaximumSizeReached = false;
   m_database.setMaximumSize(m_maximumSize);
 
@@ -806,6 +814,9 @@ bool ApplicationCacheStorage::store(ApplicationCacheResource* resource,
 
 bool ApplicationCacheStorage::storeNewestCache(ApplicationCacheGroup* group) {
   openDatabase(true);
+
+  if (!m_database.isOpen())
+    return false;
 
   m_isMaximumSizeReached = false;
   m_database.setMaximumSize(m_maximumSize);
