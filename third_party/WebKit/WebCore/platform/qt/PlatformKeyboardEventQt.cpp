@@ -31,9 +31,8 @@
 #include "NotImplemented.h"
 #include "WindowsKeyboardCodes.h"
 
-#include <ctype.h>
-
 #include <QKeyEvent>
+#include <ctype.h>
 
 namespace WebCore {
 
@@ -204,7 +203,7 @@ static int windowsKeyCodeForKeyEvent(unsigned int keycode,
         return VK_CLEAR;  // (0C) CLEAR key
       case Qt::Key_Enter:
       case Qt::Key_Return:
-        return VK_RETURN;  //(0D) Return key
+        return VK_RETURN;  // (0D) Return key
       case Qt::Key_Shift:
         return VK_SHIFT;  // (10) SHIFT key
       case Qt::Key_Control:
@@ -308,8 +307,8 @@ static int windowsKeyCodeForKeyEvent(unsigned int keycode,
       case Qt::Key_Execute:
         return VK_EXECUTE;  // (2B) EXECUTE key
                             // dunno on this
-      // case Qt::Key_PrintScreen:
-      //      return VK_SNAPSHOT; // (2C) PRINT SCREEN key
+                            // case Qt::Key_PrintScreen:
+                            // return VK_SNAPSHOT; // (2C) PRINT SCREEN key
       case Qt::Key_Insert:
         return VK_INSERT;  // (2D) INS key
       case Qt::Key_Delete:
@@ -318,88 +317,88 @@ static int windowsKeyCodeForKeyEvent(unsigned int keycode,
         return VK_HELP;  // (2F) HELP key
       case Qt::Key_0:
       case Qt::Key_ParenLeft:
-        return VK_0;  //  (30) 0) key
+        return VK_0;  // (30) 0) key
       case Qt::Key_1:
-        return VK_1;  //  (31) 1 ! key
+        return VK_1;  // (31) 1 ! key
       case Qt::Key_2:
       case Qt::Key_At:
-        return VK_2;  //  (32) 2 & key
+        return VK_2;  // (32) 2 & key
       case Qt::Key_3:
       case Qt::Key_NumberSign:
         return VK_3;  // case '3': case '#';
       case Qt::Key_4:
-      case Qt::Key_Dollar:  //  (34) 4 key '$';
+      case Qt::Key_Dollar:  // (34) 4 key '$';
         return VK_4;
       case Qt::Key_5:
       case Qt::Key_Percent:
-        return VK_5;  //  (35) 5 key  '%'
+        return VK_5;  // (35) 5 key  '%'
       case Qt::Key_6:
       case Qt::Key_AsciiCircum:
-        return VK_6;  //  (36) 6 key  '^'
+        return VK_6;  // (36) 6 key  '^'
       case Qt::Key_7:
       case Qt::Key_Ampersand:
-        return VK_7;  //  (37) 7 key  case '&'
+        return VK_7;  // (37) 7 key  case '&'
       case Qt::Key_8:
       case Qt::Key_Asterisk:
-        return VK_8;  //  (38) 8 key  '*'
+        return VK_8;  // (38) 8 key  '*'
       case Qt::Key_9:
       case Qt::Key_ParenRight:
-        return VK_9;  //  (39) 9 key '('
+        return VK_9;  // (39) 9 key '('
       case Qt::Key_A:
-        return VK_A;  //  (41) A key case 'a': case 'A': return 0x41;
+        return VK_A;  // (41) A key case 'a': case 'A': return 0x41;
       case Qt::Key_B:
-        return VK_B;  //  (42) B key case 'b': case 'B': return 0x42;
+        return VK_B;  // (42) B key case 'b': case 'B': return 0x42;
       case Qt::Key_C:
-        return VK_C;  //  (43) C key case 'c': case 'C': return 0x43;
+        return VK_C;  // (43) C key case 'c': case 'C': return 0x43;
       case Qt::Key_D:
-        return VK_D;  //  (44) D key case 'd': case 'D': return 0x44;
+        return VK_D;  // (44) D key case 'd': case 'D': return 0x44;
       case Qt::Key_E:
-        return VK_E;  //  (45) E key case 'e': case 'E': return 0x45;
+        return VK_E;  // (45) E key case 'e': case 'E': return 0x45;
       case Qt::Key_F:
-        return VK_F;  //  (46) F key case 'f': case 'F': return 0x46;
+        return VK_F;  // (46) F key case 'f': case 'F': return 0x46;
       case Qt::Key_G:
-        return VK_G;  //  (47) G key case 'g': case 'G': return 0x47;
+        return VK_G;  // (47) G key case 'g': case 'G': return 0x47;
       case Qt::Key_H:
-        return VK_H;  //  (48) H key case 'h': case 'H': return 0x48;
+        return VK_H;  // (48) H key case 'h': case 'H': return 0x48;
       case Qt::Key_I:
-        return VK_I;  //  (49) I key case 'i': case 'I': return 0x49;
+        return VK_I;  // (49) I key case 'i': case 'I': return 0x49;
       case Qt::Key_J:
-        return VK_J;  //  (4A) J key case 'j': case 'J': return 0x4A;
+        return VK_J;  // (4A) J key case 'j': case 'J': return 0x4A;
       case Qt::Key_K:
-        return VK_K;  //  (4B) K key case 'k': case 'K': return 0x4B;
+        return VK_K;  // (4B) K key case 'k': case 'K': return 0x4B;
       case Qt::Key_L:
-        return VK_L;  //  (4C) L key case 'l': case 'L': return 0x4C;
+        return VK_L;  // (4C) L key case 'l': case 'L': return 0x4C;
       case Qt::Key_M:
-        return VK_M;  //  (4D) M key case 'm': case 'M': return 0x4D;
+        return VK_M;  // (4D) M key case 'm': case 'M': return 0x4D;
       case Qt::Key_N:
-        return VK_N;  //  (4E) N key case 'n': case 'N': return 0x4E;
+        return VK_N;  // (4E) N key case 'n': case 'N': return 0x4E;
       case Qt::Key_O:
-        return VK_O;  //  (4F) O key case 'o': case 'O': return 0x4F;
+        return VK_O;  // (4F) O key case 'o': case 'O': return 0x4F;
       case Qt::Key_P:
-        return VK_P;  //  (50) P key case 'p': case 'P': return 0x50;
+        return VK_P;  // (50) P key case 'p': case 'P': return 0x50;
       case Qt::Key_Q:
-        return VK_Q;  //  (51) Q key case 'q': case 'Q': return 0x51;
+        return VK_Q;  // (51) Q key case 'q': case 'Q': return 0x51;
       case Qt::Key_R:
-        return VK_R;  //  (52) R key case 'r': case 'R': return 0x52;
+        return VK_R;  // (52) R key case 'r': case 'R': return 0x52;
       case Qt::Key_S:
-        return VK_S;  //  (53) S key case 's': case 'S': return 0x53;
+        return VK_S;  // (53) S key case 's': case 'S': return 0x53;
       case Qt::Key_T:
-        return VK_T;  //  (54) T key case 't': case 'T': return 0x54;
+        return VK_T;  // (54) T key case 't': case 'T': return 0x54;
       case Qt::Key_U:
-        return VK_U;  //  (55) U key case 'u': case 'U': return 0x55;
+        return VK_U;  // (55) U key case 'u': case 'U': return 0x55;
       case Qt::Key_V:
-        return VK_V;  //  (56) V key case 'v': case 'V': return 0x56;
+        return VK_V;  // (56) V key case 'v': case 'V': return 0x56;
       case Qt::Key_W:
-        return VK_W;  //  (57) W key case 'w': case 'W': return 0x57;
+        return VK_W;  // (57) W key case 'w': case 'W': return 0x57;
       case Qt::Key_X:
-        return VK_X;  //  (58) X key case 'x': case 'X': return 0x58;
+        return VK_X;  // (58) X key case 'x': case 'X': return 0x58;
       case Qt::Key_Y:
-        return VK_Y;  //  (59) Y key case 'y': case 'Y': return 0x59;
+        return VK_Y;  // (59) Y key case 'y': case 'Y': return 0x59;
       case Qt::Key_Z:
-        return VK_Z;  //  (5A) Z key case 'z': case 'Z': return 0x5A;
+        return VK_Z;  // (5A) Z key case 'z': case 'Z': return 0x5A;
       case Qt::Key_Meta:
         return VK_LWIN;  // (5B) Left Windows key (Microsoft Natural keyboard)
-      // case Qt::Key_Meta_R: FIXME: What to do here?
+                         // case Qt::Key_Meta_R: FIXME: What to do here?
       //    return VK_RWIN; // (5C) Right Windows key (Natural keyboard)
       // VK_APPS (5D) Applications key (Natural keyboard)
       // VK_SLEEP (5F) Computer Sleep key
@@ -523,14 +522,14 @@ PlatformKeyboardEvent::PlatformKeyboardEvent(QKeyEvent* event) {
   m_unmodifiedText = event->text();  // FIXME: not correct
   m_keyIdentifier = keyIdentifierForQtKeyCode(event->key());
   m_autoRepeat = event->isAutoRepeat();
-  m_ctrlKey = (state & Qt::ControlModifier) != 0;
-  m_altKey = (state & Qt::AltModifier) != 0;
-  m_metaKey = (state & Qt::MetaModifier) != 0;
-  m_isKeypad = (state & Qt::KeypadModifier) != 0;
+  m_ctrlKey = (state & Qt::ControlModifier);
+  m_altKey = (state & Qt::AltModifier);
+  m_metaKey = (state & Qt::MetaModifier);
+  m_isKeypad = (state & Qt::KeypadModifier);
   m_windowsVirtualKeyCode = windowsKeyCodeForKeyEvent(event->key(), m_isKeypad);
   m_nativeVirtualKeyCode = event->nativeVirtualKey();
   m_shiftKey =
-      (state & Qt::ShiftModifier) != 0 ||
+      (state & Qt::ShiftModifier) ||
       event->key() == Qt::Key_Backtab;  // Simulate Shift+Tab with Key_Backtab
   m_qtEvent = event;
 }
