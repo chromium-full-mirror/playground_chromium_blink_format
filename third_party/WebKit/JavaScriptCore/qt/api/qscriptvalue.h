@@ -58,6 +58,7 @@ class QScriptValue {
   QScriptValue& operator=(const QScriptValue& other);
   bool equals(const QScriptValue& other) const;
   bool strictlyEquals(const QScriptValue& other) const;
+  bool instanceOf(const QScriptValue& other) const;
 
   QScriptEngine* engine() const;
 

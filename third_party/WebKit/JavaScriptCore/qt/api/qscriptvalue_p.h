@@ -126,6 +126,7 @@ class QScriptValuePrivate : public QSharedData {
 
   inline bool equals(QScriptValuePrivate* other);
   inline bool strictlyEquals(QScriptValuePrivate* other);
+  inline bool instanceOf(QScriptValuePrivate* other);
   inline bool assignEngine(QScriptEnginePrivate* engine);
 
   inline QScriptValuePrivate* call(const QScriptValuePrivate*,
@@ -663,6 +664,13 @@ bool QScriptValuePrivate::strictlyEquals(QScriptValuePrivate* other) {
     return true;
 
   return false;
+}
+
+inline bool QScriptValuePrivate::instanceOf(QScriptValuePrivate* other) {
+  if (!isJSBased() || !other->isObject())
+    return false;
+  return JSValueIsInstanceOfConstructor(context(), value(), other->object(),
+                                        /* exception */ 0);
 }
 
 /*!
