@@ -29,6 +29,8 @@
 #include "V8CustomVoidCallback.h"
 #include "V8DOMString.h"
 
+#include <wtf/Assertions.h>
+
 namespace WebCore {
 
 V8TestCallback::V8TestCallback(v8::Local<v8::Object> callback)
@@ -51,7 +53,13 @@ bool V8TestCallback::callbackWithClass1Param(ScriptExecutionContext* context,
 
   v8::Context::Scope scope(v8Context);
 
-  v8::Handle<v8::Value> argv[] = {toV8(class1Param)};
+  v8::Handle<v8::Value> class1ParamHandle = toV8(class1Param);
+  if (class1ParamHandle.IsEmpty()) {
+    CRASH();
+    return true;
+  }
+
+  v8::Handle<v8::Value> argv[] = {class1ParamHandle};
 
   bool callbackReturnValue = false;
   return !invokeCallback(m_callback, 1, argv, callbackReturnValue, context);
@@ -68,7 +76,18 @@ bool V8TestCallback::callbackWithClass2Param(ScriptExecutionContext* context,
 
   v8::Context::Scope scope(v8Context);
 
-  v8::Handle<v8::Value> argv[] = {toV8(class2Param), toV8(strArg)};
+  v8::Handle<v8::Value> class2ParamHandle = toV8(class2Param);
+  if (class2ParamHandle.IsEmpty()) {
+    CRASH();
+    return true;
+  }
+  v8::Handle<v8::Value> strArgHandle = toV8(strArg);
+  if (strArgHandle.IsEmpty()) {
+    CRASH();
+    return true;
+  }
+
+  v8::Handle<v8::Value> argv[] = {class2ParamHandle, strArgHandle};
 
   bool callbackReturnValue = false;
   return !invokeCallback(m_callback, 2, argv, callbackReturnValue, context);
