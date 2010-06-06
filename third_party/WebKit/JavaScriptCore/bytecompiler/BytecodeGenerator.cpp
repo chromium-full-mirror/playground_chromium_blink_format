@@ -1995,11 +1995,11 @@ RegisterID* BytecodeGenerator::emitCatch(RegisterID* targetRegister,
 }
 
 RegisterID* BytecodeGenerator::emitNewError(RegisterID* dst,
-                                            ErrorType type,
+                                            bool isReferenceError,
                                             JSValue message) {
   emitOpcode(op_new_error);
   instructions().append(dst->index());
-  instructions().append(static_cast<int>(type));
+  instructions().append(isReferenceError);
   instructions().append(addConstantValue(message)->index());
   return dst;
 }
@@ -2192,9 +2192,8 @@ RegisterID* BytecodeGenerator::emitThrowExpressionTooDeepException() {
   // any useful data
   // is still good enough to get us an accurate line number.
   emitExpressionInfo(0, 0, 0);
-  RegisterID* exception =
-      emitNewError(newTemporary(), SyntaxError,
-                   jsString(globalData(), "Expression too deep"));
+  RegisterID* exception = emitNewError(
+      newTemporary(), false, jsString(globalData(), "Expression too deep"));
   emitThrow(exception);
   return exception;
 }

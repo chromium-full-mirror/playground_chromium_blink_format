@@ -97,7 +97,8 @@ jvalue JavaField::dispatchValueFromInstance(ExecState* exec,
         dispatchJNICall(exec, rootObject->nativeHandle(), fieldJInstance, false,
                         returnType, mid, args, result, 0, exceptionDescription);
         if (exceptionDescription)
-          throwError(exec, GeneralError, exceptionDescription.toString(exec));
+          throwError(exec,
+                     createError(exec, exceptionDescription.toString(exec)));
       }
     }
   }
@@ -191,7 +192,8 @@ void JavaField::dispatchSetValueToInstance(ExecState* exec,
         dispatchJNICall(exec, rootObject->nativeHandle(), fieldJInstance, false,
                         void_type, mid, args, result, 0, exceptionDescription);
         if (exceptionDescription)
-          throwError(exec, GeneralError, exceptionDescription.toString(exec));
+          throwError(exec,
+                     createError(exec, exceptionDescription.toString(exec)));
       }
     }
   }

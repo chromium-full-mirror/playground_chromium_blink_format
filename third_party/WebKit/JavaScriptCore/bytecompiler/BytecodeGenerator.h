@@ -472,7 +472,9 @@ class BytecodeGenerator : public FastAllocBase {
 
   RegisterID* emitCatch(RegisterID*, Label* start, Label* end);
   void emitThrow(RegisterID* exc) { emitUnaryNoDstOp(op_throw, exc); }
-  RegisterID* emitNewError(RegisterID* dst, ErrorType type, JSValue message);
+  RegisterID* emitNewError(RegisterID* dst,
+                           bool isReferenceError,
+                           JSValue message);
   void emitPushNewScope(RegisterID* dst,
                         const Identifier& property,
                         RegisterID* value);

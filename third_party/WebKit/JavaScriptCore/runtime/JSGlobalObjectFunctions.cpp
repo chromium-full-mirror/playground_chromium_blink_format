@@ -56,8 +56,9 @@ static JSValue encode(ExecState* exec, const char* doNotEscape) {
   UString str = exec->argument(0).toString(exec);
   CString cstr = str.UTF8String(true);
   if (!cstr.data())
-    return throwError(exec, URIError,
-                      "String contained an illegal UTF-16 sequence.");
+    return throwError(
+        exec,
+        createURIError(exec, "String contained an illegal UTF-16 sequence."));
 
   JSStringBuilder builder;
   const char* p = cstr.data();
@@ -119,7 +120,7 @@ static JSValue decode(ExecState* exec, const char* doNotUnescape, bool strict) {
       }
       if (charLen == 0) {
         if (strict)
-          return throwError(exec, URIError);
+          return throwError(exec, createURIError(exec, "URI error"));
         // The only case where we don't use "strict" mode is the "unescape"
         // function.
         // For that, it's good to support the wonky "%u" syntax for
@@ -287,10 +288,10 @@ EncodedJSValue JSC_HOST_CALL globalFuncEval(ExecState* exec) {
   if (!unwrappedObject->isGlobalObject() ||
       static_cast<JSGlobalObject*>(unwrappedObject)->evalFunction() !=
           exec->callee())
-    return JSValue::encode(throwError(exec, EvalError,
-                                      "The \"this\" value passed to eval must "
-                                      "be the global object from which eval "
-                                      "originated"));
+    return throwVMError(
+        exec, createEvalError(exec,
+                              "The \"this\" value passed to eval must be the "
+                              "global object from which eval originated"));
 
   JSValue x = exec->argument(0);
   if (!x.isString())
@@ -307,7 +308,7 @@ EncodedJSValue JSC_HOST_CALL globalFuncEval(ExecState* exec) {
       exec,
       static_cast<JSGlobalObject*>(unwrappedObject)->globalScopeChain().node());
   if (error)
-    return JSValue::encode(throwError(exec, error));
+    return throwVMError(exec, error);
 
   return JSValue::encode(exec->interpreter()->execute(
       eval.get(), exec, thisObject,

@@ -25,6 +25,7 @@
 #include "BytecodeGenerator.h"
 #include "Completion.h"
 #include "CurrentTime.h"
+#include "ExceptionHelpers.h"
 #include "InitializeThreading.h"
 #include "JSArray.h"
 #include "JSFunction.h"
@@ -237,7 +238,7 @@ EncodedJSValue JSC_HOST_CALL functionRun(ExecState* exec) {
   Vector<char> script;
   if (!fillBufferWithContentsOfFile(fileName, script))
     return JSValue::encode(
-        throwError(exec, GeneralError, "Could not open file."));
+        throwError(exec, createError(exec, "Could not open file.")));
 
   JSGlobalObject* globalObject = exec->lexicalGlobalObject();
 
@@ -255,14 +256,14 @@ EncodedJSValue JSC_HOST_CALL functionLoad(ExecState* exec) {
   Vector<char> script;
   if (!fillBufferWithContentsOfFile(fileName, script))
     return JSValue::encode(
-        throwError(exec, GeneralError, "Could not open file."));
+        throwError(exec, createError(exec, "Could not open file.")));
 
   JSGlobalObject* globalObject = exec->lexicalGlobalObject();
   Completion result =
       evaluate(globalObject->globalExec(), globalObject->globalScopeChain(),
                makeSource(script.data(), fileName));
   if (result.complType() == Throw)
-    exec->setException(result.value());
+    throwError(exec, result.value());
   return JSValue::encode(result.value());
 }
 
@@ -271,13 +272,13 @@ EncodedJSValue JSC_HOST_CALL functionCheckSyntax(ExecState* exec) {
   Vector<char> script;
   if (!fillBufferWithContentsOfFile(fileName, script))
     return JSValue::encode(
-        throwError(exec, GeneralError, "Could not open file."));
+        throwError(exec, createError(exec, "Could not open file.")));
 
   JSGlobalObject* globalObject = exec->lexicalGlobalObject();
   Completion result = checkSyntax(globalObject->globalExec(),
                                   makeSource(script.data(), fileName));
   if (result.complType() == Throw)
-    exec->setException(result.value());
+    throwError(exec, result.value());
   return JSValue::encode(result.value());
 }
 

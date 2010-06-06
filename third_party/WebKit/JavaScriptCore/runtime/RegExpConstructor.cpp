@@ -25,6 +25,7 @@
 
 #include "ArrayPrototype.h"
 #include "Error.h"
+#include "ExceptionHelpers.h"
 #include "JSArray.h"
 #include "JSFunction.h"
 #include "JSString.h"
@@ -342,9 +343,10 @@ JSObject* constructRegExp(ExecState* exec, const ArgList& args) {
 
   if (arg0.inherits(&RegExpObject::info)) {
     if (!arg1.isUndefined())
-      return throwError(
-          exec, TypeError,
-          "Cannot supply flags when constructing one RegExp from another.");
+      return throwError(exec,
+                        createTypeError(exec,
+                                        "Cannot supply flags when constructing "
+                                        "one RegExp from another."));
     return asObject(arg0);
   }
 
@@ -354,8 +356,8 @@ JSObject* constructRegExp(ExecState* exec, const ArgList& args) {
   RefPtr<RegExp> regExp = RegExp::create(&exec->globalData(), pattern, flags);
   if (!regExp->isValid())
     return throwError(
-        exec, SyntaxError,
-        makeString("Invalid regular expression: ", regExp->errorMessage()));
+        exec, createSyntaxError(exec, makeString("Invalid regular expression: ",
+                                                 regExp->errorMessage())));
   return new (exec) RegExpObject(exec->lexicalGlobalObject(),
                                  exec->lexicalGlobalObject()->regExpStructure(),
                                  regExp.release());

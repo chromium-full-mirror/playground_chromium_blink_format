@@ -72,7 +72,7 @@ PassRefPtr<ArrayBufferView> construct(JSC::ExecState* exec,
         array->get(exec, JSC::Identifier(exec, "length")).toUInt32(exec);
     void* tempValues;
     if (!tryFastCalloc(length, sizeof(T)).getValue(tempValues)) {
-      throwError(exec, JSC::GeneralError);
+      throwError(exec, createError(exec, "Error"));
       return 0;
     }
 

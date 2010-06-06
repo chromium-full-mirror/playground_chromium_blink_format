@@ -65,8 +65,7 @@ static EncodedJSValue JSC_HOST_CALL constructSharedWorker(ExecState* exec) {
       static_cast<JSSharedWorkerConstructor*>(exec->callee());
 
   if (exec->argumentCount() < 1)
-    return JSValue::encode(
-        throwError(exec, SyntaxError, "Not enough arguments"));
+    return throwVMError(exec, createSyntaxError(exec, "Not enough arguments"));
 
   UString scriptURL = exec->argument(0).toString(exec);
   UString name;

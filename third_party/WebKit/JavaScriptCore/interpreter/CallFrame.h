@@ -78,7 +78,6 @@ class ExecState : private Register {
   // But they're used in many places in legacy code, so they're not going away
   // any time soon.
 
-  void setException(JSValue exception) { globalData().exception = exception; }
   void clearException() { globalData().exception = JSValue(); }
   JSValue exception() const { return globalData().exception; }
   JSValue* exceptionSlot() { return &globalData().exception; }

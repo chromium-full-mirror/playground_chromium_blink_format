@@ -58,8 +58,7 @@ static EncodedJSValue JSC_HOST_CALL constructWorker(ExecState* exec) {
       static_cast<JSWorkerConstructor*>(exec->callee());
 
   if (!exec->argumentCount())
-    return JSValue::encode(
-        throwError(exec, SyntaxError, "Not enough arguments"));
+    return throwVMError(exec, createSyntaxError(exec, "Not enough arguments"));
 
   UString scriptURL = exec->argument(0).toString(exec);
   if (exec->hadException())

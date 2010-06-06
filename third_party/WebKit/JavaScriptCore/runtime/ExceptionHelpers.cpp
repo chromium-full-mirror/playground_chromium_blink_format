@@ -71,16 +71,8 @@ JSValue createTerminatedExecutionException(JSGlobalData* globalData) {
   return new (globalData) TerminatedExecutionError(globalData);
 }
 
-static JSValue createError(ExecState* exec, ErrorType e, const char* msg) {
-  return Error::create(exec, e, msg, -1, -1, UString());
-}
-
-JSValue createStackOverflowError(ExecState* exec) {
-  return createError(exec, RangeError, "Maximum call stack size exceeded.");
-}
-
-JSValue createTypeError(ExecState* exec, const char* message) {
-  return createError(exec, TypeError, message);
+JSObject* createStackOverflowError(ExecState* exec) {
+  return createRangeError(exec, "Maximum call stack size exceeded.");
 }
 
 JSValue createUndefinedVariableError(ExecState* exec,
@@ -92,20 +84,11 @@ JSValue createUndefinedVariableError(ExecState* exec,
   int divotPoint = 0;
   int line = codeBlock->expressionRangeForBytecodeOffset(
       exec, bytecodeOffset, divotPoint, startOffset, endOffset);
+  UString message(makeString("Can't find variable: ", ident.ustring()));
   JSObject* exception =
-      Error::create(exec, ReferenceError,
-                    makeString("Can't find variable: ", ident.ustring()), line,
-                    codeBlock->ownerExecutable()->sourceID(),
-                    codeBlock->ownerExecutable()->sourceURL());
-  exception->putWithAttributes(
-      exec, Identifier(exec, expressionBeginOffsetPropertyName),
-      jsNumber(exec, divotPoint - startOffset), ReadOnly | DontDelete);
-  exception->putWithAttributes(
-      exec, Identifier(exec, expressionCaretOffsetPropertyName),
-      jsNumber(exec, divotPoint), ReadOnly | DontDelete);
-  exception->putWithAttributes(
-      exec, Identifier(exec, expressionEndOffsetPropertyName),
-      jsNumber(exec, divotPoint + endOffset), ReadOnly | DontDelete);
+      addErrorInfo(exec, createReferenceError(exec, message), line,
+                   codeBlock->ownerExecutable()->source(), divotPoint,
+                   startOffset, endOffset);
   return exception;
 }
 
@@ -160,18 +143,9 @@ JSObject* createInvalidParamError(ExecState* exec,
       exec, codeBlock, line, divotPoint, divotPoint + endOffset, value,
       makeString("not a valid argument for '", op, "'"));
   JSObject* exception =
-      Error::create(exec, TypeError, errorMessage, line,
-                    codeBlock->ownerExecutable()->sourceID(),
-                    codeBlock->ownerExecutable()->sourceURL());
-  exception->putWithAttributes(
-      exec, Identifier(exec, expressionBeginOffsetPropertyName),
-      jsNumber(exec, divotPoint - startOffset), ReadOnly | DontDelete);
-  exception->putWithAttributes(
-      exec, Identifier(exec, expressionCaretOffsetPropertyName),
-      jsNumber(exec, divotPoint), ReadOnly | DontDelete);
-  exception->putWithAttributes(
-      exec, Identifier(exec, expressionEndOffsetPropertyName),
-      jsNumber(exec, divotPoint + endOffset), ReadOnly | DontDelete);
+      addErrorInfo(exec, createTypeError(exec, errorMessage), line,
+                   codeBlock->ownerExecutable()->source(), divotPoint,
+                   startOffset, endOffset);
   return exception;
 }
 
@@ -196,18 +170,9 @@ JSObject* createNotAConstructorError(ExecState* exec,
       createErrorMessage(exec, codeBlock, line, startPoint, divotPoint, value,
                          "not a constructor");
   JSObject* exception =
-      Error::create(exec, TypeError, errorMessage, line,
-                    codeBlock->ownerExecutable()->sourceID(),
-                    codeBlock->ownerExecutable()->sourceURL());
-  exception->putWithAttributes(
-      exec, Identifier(exec, expressionBeginOffsetPropertyName),
-      jsNumber(exec, divotPoint - startOffset), ReadOnly | DontDelete);
-  exception->putWithAttributes(
-      exec, Identifier(exec, expressionCaretOffsetPropertyName),
-      jsNumber(exec, divotPoint), ReadOnly | DontDelete);
-  exception->putWithAttributes(
-      exec, Identifier(exec, expressionEndOffsetPropertyName),
-      jsNumber(exec, divotPoint + endOffset), ReadOnly | DontDelete);
+      addErrorInfo(exec, createTypeError(exec, errorMessage), line,
+                   codeBlock->ownerExecutable()->source(), divotPoint,
+                   startOffset, endOffset);
   return exception;
 }
 
@@ -224,18 +189,9 @@ JSValue createNotAFunctionError(ExecState* exec,
       createErrorMessage(exec, codeBlock, line, divotPoint - startOffset,
                          divotPoint, value, "not a function");
   JSObject* exception =
-      Error::create(exec, TypeError, errorMessage, line,
-                    codeBlock->ownerExecutable()->sourceID(),
-                    codeBlock->ownerExecutable()->sourceURL());
-  exception->putWithAttributes(
-      exec, Identifier(exec, expressionBeginOffsetPropertyName),
-      jsNumber(exec, divotPoint - startOffset), ReadOnly | DontDelete);
-  exception->putWithAttributes(
-      exec, Identifier(exec, expressionCaretOffsetPropertyName),
-      jsNumber(exec, divotPoint), ReadOnly | DontDelete);
-  exception->putWithAttributes(
-      exec, Identifier(exec, expressionEndOffsetPropertyName),
-      jsNumber(exec, divotPoint + endOffset), ReadOnly | DontDelete);
+      addErrorInfo(exec, createTypeError(exec, errorMessage), line,
+                   codeBlock->ownerExecutable()->source(), divotPoint,
+                   startOffset, endOffset);
   return exception;
 }
 
@@ -275,23 +231,14 @@ JSObject* createNotAnObjectError(ExecState* exec,
       exec, codeBlock, line, divotPoint - startOffset, divotPoint,
       error->isNull() ? jsNull() : jsUndefined(), "not an object");
   JSObject* exception =
-      Error::create(exec, TypeError, errorMessage, line,
-                    codeBlock->ownerExecutable()->sourceID(),
-                    codeBlock->ownerExecutable()->sourceURL());
-  exception->putWithAttributes(
-      exec, Identifier(exec, expressionBeginOffsetPropertyName),
-      jsNumber(exec, divotPoint - startOffset), ReadOnly | DontDelete);
-  exception->putWithAttributes(
-      exec, Identifier(exec, expressionCaretOffsetPropertyName),
-      jsNumber(exec, divotPoint), ReadOnly | DontDelete);
-  exception->putWithAttributes(
-      exec, Identifier(exec, expressionEndOffsetPropertyName),
-      jsNumber(exec, divotPoint + endOffset), ReadOnly | DontDelete);
+      addErrorInfo(exec, createTypeError(exec, errorMessage), line,
+                   codeBlock->ownerExecutable()->source(), divotPoint,
+                   startOffset, endOffset);
   return exception;
 }
 
 JSValue throwOutOfMemoryError(ExecState* exec) {
-  return throwError(exec, GeneralError, "Out of memory");
+  return throwError(exec, createError(exec, "Out of memory"));
 }
 
 }  // namespace JSC

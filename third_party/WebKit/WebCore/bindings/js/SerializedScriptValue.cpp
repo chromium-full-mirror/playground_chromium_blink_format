@@ -36,6 +36,7 @@
 #include "JSImageData.h"
 #include <JavaScriptCore/APICast.h>
 #include <runtime/DateInstance.h>
+#include <runtime/Error.h>
 #include <runtime/ExceptionHelpers.h>
 #include <runtime/JSLock.h>
 #include <runtime/PropertyNameArray.h>
@@ -426,12 +427,12 @@ struct BaseWalker {
   bool didTimeOut() { return m_timeoutChecker.didTimeOut(m_exec); }
 
   void throwStackOverflow() {
-    m_exec->setException(createStackOverflowError(m_exec));
+    throwError(m_exec, createStackOverflowError(m_exec));
   }
 
   void throwInterruptedException() {
-    m_exec->setException(
-        createInterruptedExecutionException(&m_exec->globalData()));
+    throwError(m_exec,
+               createInterruptedExecutionException(&m_exec->globalData()));
   }
 };
 
@@ -562,8 +563,8 @@ struct SerializingTreeWalker : public BaseWalker {
   bool startArray(JSArray* inArray, RefPtr<SerializedArray>) {
     // Cycle detection
     if (!m_cycleDetector.add(inArray).second) {
-      m_exec->setException(
-          createTypeError(m_exec, "Cannot post cyclic structures."));
+      throwError(m_exec,
+                 createTypeError(m_exec, "Cannot post cyclic structures."));
       return false;
     }
     m_gcBuffer.append(inArray);
@@ -578,8 +579,8 @@ struct SerializingTreeWalker : public BaseWalker {
   bool startObject(JSObject* inObject, RefPtr<SerializedObject>) {
     // Cycle detection
     if (!m_cycleDetector.add(inObject).second) {
-      m_exec->setException(
-          createTypeError(m_exec, "Cannot post cyclic structures."));
+      throwError(m_exec,
+                 createTypeError(m_exec, "Cannot post cyclic structures."));
       return false;
     }
     m_gcBuffer.append(inObject);

@@ -28,6 +28,7 @@
 
 #include "APIShims.h"
 #include "APICast.h"
+#include <runtime/Error.h>
 #include <runtime/JSGlobalObject.h>
 #include <runtime/JSLock.h>
 #include <runtime/ObjectPrototype.h>
@@ -75,7 +76,7 @@ static EncodedJSValue JSC_HOST_CALL constructJSCallback(ExecState* exec) {
                         &exception);
     }
     if (exception)
-      exec->setException(toJS(exec, exception));
+      throwError(exec, toJS(exec, exception));
     return JSValue::encode(toJS(result));
   }
 

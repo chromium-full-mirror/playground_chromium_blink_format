@@ -63,9 +63,11 @@ JSMessageChannelConstructor::construct(ExecState* exec) {
       static_cast<JSMessageChannelConstructor*>(exec->callee());
   ScriptExecutionContext* context = jsConstructor->scriptExecutionContext();
   if (!context)
-    return JSValue::encode(throwError(
-        exec, ReferenceError,
-        "MessageChannel constructor associated document is unavailable"));
+    return throwVMError(
+        exec,
+        createReferenceError(
+            exec,
+            "MessageChannel constructor associated document is unavailable"));
 
   return JSValue::encode(asObject(toJS(exec, jsConstructor->globalObject(),
                                        MessageChannel::create(context))));

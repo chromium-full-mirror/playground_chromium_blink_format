@@ -29,6 +29,8 @@
 #ifndef ExceptionHelpers_h
 #define ExceptionHelpers_h
 
+#include "JSValue.h"
+
 namespace JSC {
 
 class CodeBlock;
@@ -37,14 +39,12 @@ class Identifier;
 class JSGlobalData;
 class JSNotAnObjectErrorStub;
 class JSObject;
-class JSValue;
 class Node;
 struct Instruction;
 
 JSValue createInterruptedExecutionException(JSGlobalData*);
 JSValue createTerminatedExecutionException(JSGlobalData*);
-JSValue createStackOverflowError(ExecState*);
-JSValue createTypeError(ExecState*, const char* message);
+JSObject* createStackOverflowError(ExecState*);
 JSValue createUndefinedVariableError(ExecState*,
                                      const Identifier&,
                                      unsigned bytecodeOffset,

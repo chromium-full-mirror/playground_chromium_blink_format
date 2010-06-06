@@ -25,6 +25,7 @@
 
 #include "BooleanConstructor.h"
 #include "BooleanPrototype.h"
+#include "Error.h"
 #include "ExceptionHelpers.h"
 #include "JSGlobalObject.h"
 #include "JSFunction.h"
@@ -61,7 +62,7 @@ JSObject* JSValue::toObjectSlowCase(ExecState* exec) const {
   ASSERT(isUndefinedOrNull());
   JSNotAnObjectErrorStub* exception =
       createNotAnObjectErrorStub(exec, isNull());
-  exec->setException(exception);
+  throwError(exec, exception);
   return new (exec) JSNotAnObject(exec, exception);
 }
 
@@ -85,7 +86,7 @@ JSObject* JSValue::synthesizeObject(ExecState* exec) const {
 
   JSNotAnObjectErrorStub* exception =
       createNotAnObjectErrorStub(exec, isNull());
-  exec->setException(exception);
+  throwError(exec, exception);
   return new (exec) JSNotAnObject(exec, exception);
 }
 
@@ -98,7 +99,7 @@ JSObject* JSValue::synthesizePrototype(ExecState* exec) const {
 
   JSNotAnObjectErrorStub* exception =
       createNotAnObjectErrorStub(exec, isNull());
-  exec->setException(exception);
+  throwError(exec, exception);
   return new (exec) JSNotAnObject(exec, exception);
 }
 

@@ -85,7 +85,7 @@ bool convertJSMethodNameToObjc(const char* JSName,
                                char* buffer,
                                size_t bufferSize);
 
-JSObject* throwError(ExecState*, ErrorType, NSString* message);
+JSObject* throwError(ExecState*, NSString* message);
 
 }  // namespace Bindings
 }  // namespace JSC

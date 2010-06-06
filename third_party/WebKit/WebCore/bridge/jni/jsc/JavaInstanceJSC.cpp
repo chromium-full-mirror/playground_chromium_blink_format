@@ -132,8 +132,9 @@ JSValue JavaInstance::getMethod(ExecState* exec,
 JSValue JavaInstance::invokeMethod(ExecState* exec,
                                    RuntimeMethod* runtimeMethod) {
   if (!asObject(runtimeMethod)->inherits(&JavaRuntimeMethod::s_info))
-    return throwError(exec, TypeError,
-                      "Attempt to invoke non-Java method on Java object.");
+    return throwError(
+        exec, createTypeError(
+                  exec, "Attempt to invoke non-Java method on Java object."));
 
   const MethodList& methodList = *runtimeMethod->methods();
 
@@ -196,7 +197,7 @@ JSValue JavaInstance::invokeMethod(ExecState* exec,
                               jMethod->methodID(obj), jArgs.data(), result,
                               callingURL, exceptionDescription);
     if (exceptionDescription) {
-      throwError(exec, GeneralError, exceptionDescription.toString(exec));
+      throwError(exec, createError(exec, exceptionDescription.toString(exec)));
       return jsUndefined();
     }
   }

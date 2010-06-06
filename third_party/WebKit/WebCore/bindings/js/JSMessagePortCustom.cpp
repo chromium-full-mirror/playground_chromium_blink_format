@@ -89,7 +89,7 @@ void fillMessagePortArray(JSC::ExecState* exec,
     // Validation of Objects implementing an interface, per WebIDL spec 4.1.15.
     RefPtr<MessagePort> port = toMessagePort(value);
     if (!port) {
-      throwError(exec, TypeError);
+      throwTypeError(exec);
       return;
     }
     portArray[i] = port.release();

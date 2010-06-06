@@ -70,7 +70,7 @@ JSValue JSHTMLInputElement::type(ExecState* exec) const {
 JSValue JSHTMLInputElement::selectionStart(ExecState* exec) const {
   HTMLInputElement* input = static_cast<HTMLInputElement*>(impl());
   if (!input->canHaveSelection())
-    return throwError(exec, TypeError);
+    return throwTypeError(exec);
 
   return jsNumber(exec, input->selectionStart());
 }
@@ -78,7 +78,7 @@ JSValue JSHTMLInputElement::selectionStart(ExecState* exec) const {
 void JSHTMLInputElement::setSelectionStart(ExecState* exec, JSValue value) {
   HTMLInputElement* input = static_cast<HTMLInputElement*>(impl());
   if (!input->canHaveSelection())
-    throwError(exec, TypeError);
+    throwTypeError(exec);
 
   input->setSelectionStart(value.toInt32(exec));
 }
@@ -86,7 +86,7 @@ void JSHTMLInputElement::setSelectionStart(ExecState* exec, JSValue value) {
 JSValue JSHTMLInputElement::selectionEnd(ExecState* exec) const {
   HTMLInputElement* input = static_cast<HTMLInputElement*>(impl());
   if (!input->canHaveSelection())
-    return throwError(exec, TypeError);
+    return throwTypeError(exec);
 
   return jsNumber(exec, input->selectionEnd());
 }
@@ -94,7 +94,7 @@ JSValue JSHTMLInputElement::selectionEnd(ExecState* exec) const {
 void JSHTMLInputElement::setSelectionEnd(ExecState* exec, JSValue value) {
   HTMLInputElement* input = static_cast<HTMLInputElement*>(impl());
   if (!input->canHaveSelection())
-    throwError(exec, TypeError);
+    throwTypeError(exec);
 
   input->setSelectionEnd(value.toInt32(exec));
 }
@@ -102,7 +102,7 @@ void JSHTMLInputElement::setSelectionEnd(ExecState* exec, JSValue value) {
 JSValue JSHTMLInputElement::setSelectionRange(ExecState* exec) {
   HTMLInputElement* input = static_cast<HTMLInputElement*>(impl());
   if (!input->canHaveSelection())
-    return throwError(exec, TypeError);
+    return throwTypeError(exec);
 
   int start = exec->argument(0).toInt32(exec);
   int end = exec->argument(1).toInt32(exec);

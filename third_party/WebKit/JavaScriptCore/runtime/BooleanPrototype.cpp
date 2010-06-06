@@ -23,6 +23,7 @@
 #include "BooleanPrototype.h"
 
 #include "Error.h"
+#include "ExceptionHelpers.h"
 #include "JSFunction.h"
 #include "JSString.h"
 #include "ObjectPrototype.h"
@@ -70,7 +71,7 @@ EncodedJSValue JSC_HOST_CALL booleanProtoFuncToString(ExecState* exec) {
     return JSValue::encode(jsNontrivialString(exec, "true"));
 
   if (!thisValue.inherits(&BooleanObject::info))
-    return JSValue::encode(throwError(exec, TypeError));
+    return throwVMTypeError(exec);
 
   if (asBooleanObject(thisValue)->internalValue() == jsBoolean(false))
     return JSValue::encode(jsNontrivialString(exec, "false"));
@@ -85,7 +86,7 @@ EncodedJSValue JSC_HOST_CALL booleanProtoFuncValueOf(ExecState* exec) {
     return JSValue::encode(thisValue);
 
   if (!thisValue.inherits(&BooleanObject::info))
-    return JSValue::encode(throwError(exec, TypeError));
+    return throwVMTypeError(exec);
 
   return JSValue::encode(asBooleanObject(thisValue)->internalValue());
 }

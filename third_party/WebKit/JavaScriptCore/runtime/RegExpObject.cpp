@@ -23,6 +23,7 @@
 #include "RegExpObject.h"
 
 #include "Error.h"
+#include "ExceptionHelpers.h"
 #include "JSArray.h"
 #include "JSGlobalObject.h"
 #include "JSString.h"
@@ -149,8 +150,8 @@ bool RegExpObject::match(ExecState* exec) {
   UString input = !exec->argumentCount() ? regExpConstructor->input()
                                          : exec->argument(0).toString(exec);
   if (input.isNull()) {
-    throwError(exec, GeneralError,
-               makeString("No input to ", toString(exec), "."));
+    throwError(exec, createError(exec, makeString("No input to ",
+                                                  toString(exec), ".")));
     return false;
   }
 

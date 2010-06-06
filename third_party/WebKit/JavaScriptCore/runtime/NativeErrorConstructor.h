@@ -40,8 +40,6 @@ class NativeErrorConstructor : public InternalFunction {
 
   static const ClassInfo info;
 
-  ErrorInstance* construct(ExecState*, const ArgList&);
-
   Structure* errorStructure() { return m_errorStructure.get(); }
 
  private:

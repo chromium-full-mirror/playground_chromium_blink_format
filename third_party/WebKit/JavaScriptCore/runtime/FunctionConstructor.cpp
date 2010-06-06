@@ -24,6 +24,7 @@
 #include "FunctionConstructor.h"
 
 #include "Debugger.h"
+#include "ExceptionHelpers.h"
 #include "FunctionPrototype.h"
 #include "JSFunction.h"
 #include "JSGlobalObject.h"
@@ -109,16 +110,18 @@ JSObject* constructFunction(ExecState* exec,
 
   int errLine;
   UString errMsg;
+  JSGlobalObject* globalObject = exec->lexicalGlobalObject();
+  JSGlobalData* globalData = globalObject->globalData();
   SourceCode source = makeSource(program, sourceURL, lineNumber);
   RefPtr<FunctionExecutable> function = FunctionExecutable::fromGlobalCode(
       functionName, exec, exec->dynamicGlobalObject()->debugger(), source,
       &errLine, &errMsg);
   if (!function)
-    return throwError(exec, SyntaxError, errMsg, errLine,
-                      source.provider()->asID(), source.provider()->url());
+    return throwError(
+        exec, addErrorInfo(globalData, createSyntaxError(globalObject, errMsg),
+                           errLine, source));
 
-  JSGlobalObject* globalObject = exec->lexicalGlobalObject();
-  ScopeChain scopeChain(globalObject, globalObject->globalData(), globalObject,
+  ScopeChain scopeChain(globalObject, globalData, globalObject,
                         exec->globalThisValue());
   return new (exec) JSFunction(exec, function, scopeChain.node());
 }

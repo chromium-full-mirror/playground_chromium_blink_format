@@ -29,4 +29,26 @@ const ClassInfo ErrorInstance::info = {"Error", 0, 0, 0};
 ErrorInstance::ErrorInstance(NonNullPassRefPtr<Structure> structure)
     : JSObject(structure) {}
 
+ErrorInstance::ErrorInstance(JSGlobalData* globalData,
+                             NonNullPassRefPtr<Structure> structure,
+                             const UString& message)
+    : JSObject(structure) {
+  putDirect(globalData->propertyNames->message, jsString(globalData, message));
+}
+
+ErrorInstance* ErrorInstance::create(JSGlobalData* globalData,
+                                     NonNullPassRefPtr<Structure> structure,
+                                     const UString& message) {
+  return new (globalData) ErrorInstance(globalData, structure, message);
+}
+
+ErrorInstance* ErrorInstance::create(ExecState* exec,
+                                     NonNullPassRefPtr<Structure> structure,
+                                     JSValue message) {
+  if (message.isUndefined())
+    return new (exec) ErrorInstance(structure);
+  return new (exec)
+      ErrorInstance(&exec->globalData(), structure, message.toString(exec));
+}
+
 }  // namespace JSC

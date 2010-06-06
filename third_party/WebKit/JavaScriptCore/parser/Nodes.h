@@ -271,14 +271,14 @@ class ThrowableExpressionData {
 
  protected:
   RegisterID* emitThrowError(BytecodeGenerator&,
-                             ErrorType,
+                             bool isReferenceError,
                              const char* message);
   RegisterID* emitThrowError(BytecodeGenerator&,
-                             ErrorType,
+                             bool isReferenceError,
                              const char* message,
                              const UString&);
   RegisterID* emitThrowError(BytecodeGenerator&,
-                             ErrorType,
+                             bool isReferenceError,
                              const char* message,
                              const Identifier&);
 
