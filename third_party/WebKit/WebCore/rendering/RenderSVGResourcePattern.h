@@ -38,6 +38,8 @@ namespace WebCore {
 
 struct PatternData {
   RefPtr<Pattern> pattern;
+  FloatRect boundaries;
+  AffineTransform transform;
 };
 
 struct PatternAttributes;
@@ -65,13 +67,10 @@ class RenderSVGResourcePattern : public RenderSVGResourceContainer {
   static RenderSVGResourceType s_resourceType;
 
  private:
-  PassOwnPtr<ImageBuffer> createTileImage(FloatRect& patternBoundaries,
-                                          AffineTransform& patternTransform,
+  PassOwnPtr<ImageBuffer> createTileImage(PatternData*,
                                           const SVGPatternElement*,
                                           RenderObject*) const;
-  void buildPattern(PatternData*,
-                    const FloatRect& patternBoundaries,
-                    PassOwnPtr<ImageBuffer> tileImage) const;
+  void buildPattern(PatternData*, PassOwnPtr<ImageBuffer> tileImage) const;
   FloatRect calculatePatternBoundariesIncludingOverflow(
       PatternAttributes&,
       const FloatRect& objectBoundingBox,
