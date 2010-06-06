@@ -165,6 +165,9 @@ bool RenderSVGContainer::nodeAtFloatPoint(const HitTestRequest& request,
   FloatPoint localPoint =
       localToParentTransform().inverse().mapPoint(pointInParent);
 
+  if (!pointInClippingArea(this, localPoint))
+    return false;
+
   for (RenderObject* child = lastChild(); child;
        child = child->previousSibling()) {
     if (child->nodeAtFloatPoint(request, result, localPoint, hitTestAction)) {

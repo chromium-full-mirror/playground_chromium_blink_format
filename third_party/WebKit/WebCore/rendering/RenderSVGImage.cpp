@@ -112,7 +112,7 @@ void RenderSVGImage::destroy() {
   RenderImage::destroy();
 }
 
-bool RenderSVGImage::nodeAtFloatPoint(const HitTestRequest&,
+bool RenderSVGImage::nodeAtFloatPoint(const HitTestRequest& request,
                                       HitTestResult& result,
                                       const FloatPoint& pointInParent,
                                       HitTestAction hitTestAction) {
@@ -121,12 +121,14 @@ bool RenderSVGImage::nodeAtFloatPoint(const HitTestRequest&,
     return false;
 
   PointerEventsHitRules hitRules(PointerEventsHitRules::SVG_IMAGE_HITTESTING,
-                                 style()->pointerEvents());
-
+                                 request, style()->pointerEvents());
   bool isVisible = (style()->visibility() == VISIBLE);
   if (isVisible || !hitRules.requireVisible) {
     FloatPoint localPoint =
         localToParentTransform().inverse().mapPoint(pointInParent);
+
+    if (!pointInClippingArea(this, localPoint))
+      return false;
 
     if (hitRules.canHitFill) {
       if (m_localBounds.contains(localPoint)) {

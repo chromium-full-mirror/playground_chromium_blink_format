@@ -60,6 +60,8 @@ class RenderSVGResourceClipper : public RenderSVGResourceContainer {
     return ClipperResourceType;
   }
 
+  bool hitTestClipContent(const FloatRect&, const FloatPoint&);
+
   SVGUnitTypes::SVGUnitType clipPathUnits() const {
     return toUnitType(
         static_cast<SVGClipPathElement*>(node())->clipPathUnits());

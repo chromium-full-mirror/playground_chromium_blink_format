@@ -99,6 +99,8 @@ void applyTransformToPaintInfo(RenderObject::PaintInfo&,
 // ImageBuffer.
 void renderSubtreeToImage(ImageBuffer*, RenderObject*);
 
+bool pointInClippingArea(const RenderObject*, const FloatPoint&);
+
 void deregisterFromResources(RenderObject*);
 void clampImageBufferSizeToViewport(FrameView*, IntSize& imageBufferSize);
 

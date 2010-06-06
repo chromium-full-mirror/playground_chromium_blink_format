@@ -30,6 +30,7 @@
 #include "FloatPoint.h"
 #include "FloatQuad.h"
 #include "GraphicsContext.h"
+#include "HitTestRequest.h"
 #include "PointerEventsHitRules.h"
 #include "RenderSVGContainer.h"
 #include "RenderSVGResourceFilter.h"
@@ -74,14 +75,15 @@ RenderPath::RenderPath(SVGStyledTransformableElement* node)
 {}
 
 bool RenderPath::fillContains(const FloatPoint& point,
-                              bool requiresFill) const {
+                              bool requiresFill,
+                              WindRule fillRule) const {
   if (!m_fillBoundingBox.contains(point))
     return false;
 
   if (requiresFill && !RenderSVGResource::fillPaintingResource(this, style()))
     return false;
 
-  return m_path.contains(point, style()->svgStyle()->fillRule());
+  return m_path.contains(point, fillRule);
 }
 
 bool RenderPath::strokeContains(const FloatPoint& point,
@@ -211,7 +213,7 @@ void RenderPath::addFocusRingRects(Vector<IntRect>& rects, int, int) {
     rects.append(rect);
 }
 
-bool RenderPath::nodeAtFloatPoint(const HitTestRequest&,
+bool RenderPath::nodeAtFloatPoint(const HitTestRequest& request,
                                   HitTestResult& result,
                                   const FloatPoint& pointInParent,
                                   HitTestAction hitTestAction) {
@@ -221,22 +223,27 @@ bool RenderPath::nodeAtFloatPoint(const HitTestRequest&,
 
   FloatPoint localPoint = m_localTransform.inverse().mapPoint(pointInParent);
 
-  PointerEventsHitRules hitRules(PointerEventsHitRules::SVG_PATH_HITTESTING,
-                                 style()->pointerEvents());
+  if (!pointInClippingArea(this, localPoint))
+    return false;
 
+  PointerEventsHitRules hitRules(PointerEventsHitRules::SVG_PATH_HITTESTING,
+                                 request, style()->pointerEvents());
   bool isVisible = (style()->visibility() == VISIBLE);
   if (isVisible || !hitRules.requireVisible) {
+    const SVGRenderStyle* svgStyle = style()->svgStyle();
+    WindRule fillRule = svgStyle->fillRule();
+    if (request.svgClipContent())
+      fillRule = svgStyle->clipRule();
     if ((hitRules.canHitStroke &&
-         (style()->svgStyle()->hasStroke() || !hitRules.requireStroke) &&
+         (svgStyle->hasStroke() || !hitRules.requireStroke) &&
          strokeContains(localPoint, hitRules.requireStroke)) ||
         (hitRules.canHitFill &&
-         (style()->svgStyle()->hasFill() || !hitRules.requireFill) &&
-         fillContains(localPoint, hitRules.requireFill))) {
+         (svgStyle->hasFill() || !hitRules.requireFill) &&
+         fillContains(localPoint, hitRules.requireFill, fillRule))) {
       updateHitTestResult(result, roundedIntPoint(localPoint));
       return true;
     }
   }
-
   return false;
 }
 
