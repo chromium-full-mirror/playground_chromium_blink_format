@@ -209,8 +209,9 @@ PassRefPtr<FormData> HTMLFormElement::createFormData() {
 
   RefPtr<FormData> result =
       (m_formDataBuilder.isMultiPartForm())
-          ? FormData::createMultiPart(*domFormData, document())
-          : FormData::create(*domFormData);
+          ? FormData::createMultiPart(domFormData->items(),
+                                      domFormData->encoding(), document())
+          : FormData::create(domFormData->items(), domFormData->encoding());
 
   result->setIdentifier(generateFormDataIdentifier());
   return result;
