@@ -926,6 +926,9 @@ void RenderTheme::adjustMeterStyle(CSSStyleSelector*,
 bool RenderTheme::paintMeter(RenderObject* renderObject,
                              const RenderObject::PaintInfo& paintInfo,
                              const IntRect& rect) {
+  if (!renderObject->isMeter())
+    return true;
+
   // Some platforms do not have a native gauge widget, so we draw here a default
   // implementation.
   RenderMeter* renderMeter = toRenderMeter(renderObject);

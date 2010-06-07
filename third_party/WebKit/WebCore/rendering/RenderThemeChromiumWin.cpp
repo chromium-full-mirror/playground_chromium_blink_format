@@ -697,6 +697,9 @@ void RenderThemeChromiumWin::adjustProgressBarStyle(CSSStyleSelector*,
 bool RenderThemeChromiumWin::paintProgressBar(RenderObject* o,
                                               const RenderObject::PaintInfo& i,
                                               const IntRect& r) {
+  if (!renderObject->isProgress())
+    return true;
+
   RenderProgress* renderProgress = toRenderProgress(o);
   // For indeterminate bar, valueRect is ignored and it is computed by the theme
   // engine

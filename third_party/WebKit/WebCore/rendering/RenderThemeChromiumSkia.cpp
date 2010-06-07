@@ -919,6 +919,9 @@ bool RenderThemeChromiumSkia::paintProgressBar(
       Image::loadPlatformResource("linuxProgressBorderRight").releaseRef();
   ASSERT(barImage->height() == valueImage->height());
 
+  if (!renderObject->isProgress())
+    return true;
+
   paintInfo.context->platformContext()->setImageResamplingHint(barImage->size(),
                                                                rect.size());
 
