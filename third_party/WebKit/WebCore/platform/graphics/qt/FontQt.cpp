@@ -153,6 +153,7 @@ void Font::drawComplexText(GraphicsContext* ctx,
       line.draw(p, pt);
       p->restore();
     }
+    p->setPen(textFillPen);
     line.draw(p, pt);
     p->restore();
     return;
