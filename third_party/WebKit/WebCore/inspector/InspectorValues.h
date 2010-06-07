@@ -42,6 +42,8 @@
 
 namespace WebCore {
 
+class InspectorArray;
+class InspectorObject;
 class String;
 
 class InspectorValue : public RefCounted<InspectorValue> {
@@ -63,6 +65,14 @@ class InspectorValue : public RefCounted<InspectorValue> {
   } Type;
 
   Type type() const { return m_type; }
+
+  virtual bool asBool(bool* output) const;
+  virtual bool asNumber(double* output) const;
+  virtual bool asString(String* output) const;
+  virtual PassRefPtr<InspectorObject> asObject();
+  virtual PassRefPtr<InspectorArray> asArray();
+
+  static PassRefPtr<InspectorValue> readJSON(const String& json);
 
   String toJSONString() const;
   virtual void writeJSON(Vector<UChar>* output) const;
@@ -87,6 +97,9 @@ class InspectorBasicValue : public InspectorValue {
   static PassRefPtr<InspectorBasicValue> create(double value) {
     return adoptRef(new InspectorBasicValue(value));
   }
+
+  virtual bool asBool(bool* output) const;
+  virtual bool asNumber(double* output) const;
 
   virtual void writeJSON(Vector<UChar>* output) const;
 
@@ -113,6 +126,9 @@ class InspectorString : public InspectorValue {
   static PassRefPtr<InspectorString> create(const char* value) {
     return adoptRef(new InspectorString(value));
   }
+
+  virtual bool asString(String* output) const;
+
   virtual void writeJSON(Vector<UChar>* output) const;
 
  private:
@@ -125,22 +141,42 @@ class InspectorString : public InspectorValue {
 };
 
 class InspectorObject : public InspectorValue {
+ private:
+  typedef HashMap<String, RefPtr<InspectorValue>> Dictionary;
+
+ public:
+  typedef Dictionary::iterator iterator;
+  typedef Dictionary::const_iterator const_iterator;
+
  public:
   static PassRefPtr<InspectorObject> create() {
     return adoptRef(new InspectorObject());
   }
   ~InspectorObject() {}
 
+  virtual PassRefPtr<InspectorObject> asObject();
+
   void setBool(const String& name, bool);
   void setNumber(const String& name, double);
   void setString(const String& name, const String&);
   void set(const String& name, PassRefPtr<InspectorValue>);
 
+  bool getBool(const String& name, bool* output) const;
+  bool getNumber(const String& name, double* output) const;
+  bool getString(const String& name, String* output) const;
+  PassRefPtr<InspectorObject> getObject(const String& name) const;
+  PassRefPtr<InspectorArray> getArray(const String& name) const;
+  PassRefPtr<InspectorValue> get(const String& name) const;
+
   virtual void writeJSON(Vector<UChar>* output) const;
+
+  iterator begin() { return m_data.begin(); }
+  iterator end() { return m_data.end(); }
+  const_iterator begin() const { return m_data.begin(); }
+  const_iterator end() const { return m_data.end(); }
 
  private:
   InspectorObject() : InspectorValue(TypeObject) {}
-  typedef HashMap<String, RefPtr<InspectorValue>> Dictionary;
   Dictionary m_data;
   Vector<String> m_order;
 };
@@ -151,6 +187,8 @@ class InspectorArray : public InspectorValue {
     return adoptRef(new InspectorArray());
   }
   ~InspectorArray() {}
+
+  virtual PassRefPtr<InspectorArray> asArray();
 
   void pushBool(bool);
   void pushNumber(double);
