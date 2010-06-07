@@ -160,7 +160,21 @@ class RenderThemeGtk : public RenderTheme {
                                             const RenderObject::PaintInfo&,
                                             const IntRect&);
 
-  virtual void adjustSliderThumbSize(RenderObject*) const;
+  virtual bool paintSliderTrack(RenderObject*,
+                                const RenderObject::PaintInfo&,
+                                const IntRect&);
+  virtual void adjustSliderTrackStyle(CSSStyleSelector*,
+                                      RenderStyle*,
+                                      Element*) const;
+
+  virtual bool paintSliderThumb(RenderObject*,
+                                const RenderObject::PaintInfo&,
+                                const IntRect&);
+  virtual void adjustSliderThumbStyle(CSSStyleSelector*,
+                                      RenderStyle*,
+                                      Element*) const;
+
+  virtual void adjustSliderThumbSize(RenderObject* object) const;
 
 #if ENABLE(VIDEO)
   virtual void initMediaStyling(GtkStyle* style, bool force);

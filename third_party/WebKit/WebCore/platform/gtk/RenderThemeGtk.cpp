@@ -216,6 +216,8 @@ static bool supportsFocus(ControlPart appearance) {
     case MenulistPart:
     case RadioPart:
     case CheckboxPart:
+    case SliderHorizontalPart:
+    case SliderVerticalPart:
       return true;
     default:
       return false;
@@ -278,8 +280,9 @@ static void adjustMozillaStyle(const RenderThemeGtk* theme,
 }
 
 static void setMozillaState(const RenderTheme* theme,
-                            GtkWidgetState* state,
-                            RenderObject* o) {
+                            GtkThemeWidgetType type,
+                            RenderObject* o,
+                            GtkWidgetState* state) {
   state->active = theme->isPressed(o);
   state->focused = theme->isFocused(o);
   state->inHover = theme->isHovered(o);
@@ -287,7 +290,16 @@ static void setMozillaState(const RenderTheme* theme,
   state->disabled = !theme->isEnabled(o) || theme->isReadOnlyControl(o);
   state->isDefault = false;
   state->canDefault = false;
-  state->depressed = false;
+
+  // FIXME: The depressed value should probably apply for other theme parts too.
+  // It must be used for range thumbs, because otherwise when the thumb is
+  // pressed,
+  // the rendering is incorrect.
+  if (type == MOZ_GTK_SCALE_THUMB_HORIZONTAL ||
+      type == MOZ_GTK_SCALE_THUMB_VERTICAL)
+    state->depressed = theme->isPressed(o);
+  else
+    state->depressed = false;
 }
 
 static bool paintMozillaGtkWidget(const RenderThemeGtk* theme,
@@ -308,7 +320,7 @@ static bool paintMozillaGtkWidget(const RenderThemeGtk* theme,
                                       gdk_visual_get_system()->depth));
 
   GtkWidgetState mozState;
-  setMozillaState(theme, &mozState, o);
+  setMozillaState(theme, type, o, &mozState);
 
   int flags;
 
@@ -568,13 +580,62 @@ bool RenderThemeGtk::paintSearchField(RenderObject* o,
   return paintTextField(o, i, rect);
 }
 
+bool RenderThemeGtk::paintSliderTrack(RenderObject* object,
+                                      const RenderObject::PaintInfo& info,
+                                      const IntRect& rect) {
+  ControlPart part = object->style()->appearance();
+  ASSERT(part == SliderHorizontalPart || part == SliderVerticalPart);
+
+  GtkThemeWidgetType gtkPart = MOZ_GTK_SCALE_HORIZONTAL;
+  if (part == SliderVerticalPart)
+    gtkPart = MOZ_GTK_SCALE_VERTICAL;
+
+  return paintMozillaGtkWidget(this, gtkPart, object, info, rect);
+}
+
+void RenderThemeGtk::adjustSliderTrackStyle(CSSStyleSelector*,
+                                            RenderStyle* style,
+                                            Element*) const {
+  style->setBoxShadow(0);
+}
+
+bool RenderThemeGtk::paintSliderThumb(RenderObject* object,
+                                      const RenderObject::PaintInfo& info,
+                                      const IntRect& rect) {
+  ControlPart part = object->style()->appearance();
+  ASSERT(part == SliderThumbHorizontalPart || part == SliderThumbVerticalPart);
+
+  GtkThemeWidgetType gtkPart = MOZ_GTK_SCALE_THUMB_HORIZONTAL;
+  if (part == SliderThumbVerticalPart)
+    gtkPart = MOZ_GTK_SCALE_THUMB_VERTICAL;
+
+  return paintMozillaGtkWidget(this, gtkPart, object, info, rect);
+}
+
+void RenderThemeGtk::adjustSliderThumbStyle(CSSStyleSelector*,
+                                            RenderStyle* style,
+                                            Element*) const {
+  style->setBoxShadow(0);
+}
+
 void RenderThemeGtk::adjustSliderThumbSize(RenderObject* o) const {
+  ControlPart part = o->style()->appearance();
 #if ENABLE(VIDEO)
-  if (o->style()->appearance() == MediaSliderThumbPart) {
+  if (part == MediaSliderThumbPart) {
     o->style()->setWidth(Length(m_mediaSliderThumbWidth, Fixed));
     o->style()->setHeight(Length(m_mediaSliderThumbHeight, Fixed));
-  }
+  } else
 #endif
+      if (part == SliderThumbHorizontalPart ||
+          part == SliderThumbVerticalPart) {
+    gint width, height;
+    moz_gtk_get_scalethumb_metrics(part == SliderThumbHorizontalPart
+                                       ? GTK_ORIENTATION_HORIZONTAL
+                                       : GTK_ORIENTATION_VERTICAL,
+                                   &width, &height);
+    o->style()->setWidth(Length(width, Fixed));
+    o->style()->setHeight(Length(height, Fixed));
+  }
 }
 
 Color RenderThemeGtk::platformActiveSelectionBackgroundColor() const {
