@@ -332,23 +332,42 @@ inline bool HTML5Lexer::processEntity(SegmentedString& source) {
   ASSERT_NOT_REACHED(); \
   break;
 
+// We use this macro when the HTML5 spec says "reconsume the current input
+// character in the <mumble> state."
 #define RECONSUME_IN(stateName) \
   do {                          \
     m_state = stateName;        \
-    cc = *source;               \
     goto stateName;             \
   } while (false)
 
-#define ADVANCE_TO(stateName)                          \
-  do {                                                 \
-    m_state = stateName;                               \
-    source.advance(m_lineNumber);                      \
-    if (source.isEmpty())                              \
-      return shouldEmitBufferedCharacterToken(source); \
-    cc = *source;                                      \
-    goto stateName;                                    \
+// We use this macro when the HTML5 spec says "consume the next input
+// character ... and switch to the <mumble> state."
+#define ADVANCE_TO(stateName)                                     \
+  do {                                                            \
+    m_state = stateName;                                          \
+    if (!m_inputStreamPreprocessor.advance(source, m_lineNumber)) \
+      return shouldEmitBufferedCharacterToken(source);            \
+    cc = m_inputStreamPreprocessor.nextInputCharacter();          \
+    goto stateName;                                               \
   } while (false)
 
+// Sometimes there's more complicated logic in the spec that separates when
+// we consume the next input character and when we switch to a particular
+// state.  We handle those cases by advancing the source directly and using
+// this macro to switch to the indicated state.
+#define SWITCH_TO(stateName)                                   \
+  do {                                                         \
+    m_state = stateName;                                       \
+    if (!m_inputStreamPreprocessor.peek(source, m_lineNumber)) \
+      return shouldEmitBufferedCharacterToken(source);         \
+    cc = m_inputStreamPreprocessor.nextInputCharacter();       \
+    goto stateName;                                            \
+  } while (false)
+
+// We use this macro when the HTML5 spec says "Emit the current <mumble>
+// token. Switch to the <mumble> state."  We use the word "resume" instead of
+// switch to indicate that this macro actually returns and that we'll end up
+// in the state when we "resume" (i.e., are called again).
 #define EMIT_AND_RESUME_IN(stateName) \
   do {                                \
     m_state = stateName;              \
@@ -368,14 +387,15 @@ inline bool HTML5Lexer::processEntity(SegmentedString& source) {
     m_bufferedEndTagName.clear();                         \
   } while (false)
 
-#define FLUSH_AND_ADVANCE_TO(stateName)                \
-  do {                                                 \
-    m_state = stateName;                               \
-    _FLUSH_BUFFERED_END_TAG();                         \
-    if (source.isEmpty())                              \
-      return shouldEmitBufferedCharacterToken(source); \
-    cc = *source;                                      \
-    goto stateName;                                    \
+#define FLUSH_AND_ADVANCE_TO(stateName)                        \
+  do {                                                         \
+    m_state = stateName;                                       \
+    _FLUSH_BUFFERED_END_TAG();                                 \
+    if (source.isEmpty() ||                                    \
+        !m_inputStreamPreprocessor.peek(source, m_lineNumber)) \
+      return shouldEmitBufferedCharacterToken(source);         \
+    cc = m_inputStreamPreprocessor.nextInputCharacter();       \
+    goto stateName;                                            \
   } while (false)
 
 #define FLUSH_EMIT_AND_RESUME_IN(stateName) \
@@ -403,17 +423,28 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
     }
   }
 
-  // http://www.whatwg.org/specs/web-apps/current-work/multipage/tokenization.html#parsing-main-inbody
-  if (m_skipLeadingNewLineForListing && m_state == DataState &&
-      !source.isEmpty() && *source == '\x0A')
-    source.advanceAndASSERT('\x0A');
-  m_skipLeadingNewLineForListing = false;
-
-  if (source.isEmpty())
+  if (source.isEmpty() || !m_inputStreamPreprocessor.peek(source, m_lineNumber))
     return shouldEmitBufferedCharacterToken(source);
+  UChar cc = m_inputStreamPreprocessor.nextInputCharacter();
+
+  // http://www.whatwg.org/specs/web-apps/current-work/multipage/tokenization.html#parsing-main-inbody
+  // Note that this logic is different than the generic \r\n collapsing
+  // handled in the input stream preprocessor.  This logic is here as an
+  // "authoring convenience" so folks can write:
+  //
+  // <pre>
+  // lorem ipsum
+  // lorem ipsum
+  // </pre>
+  //
+  // without getting an extra newline at the start of their <pre> element.
+  if (m_skipLeadingNewLineForListing) {
+    m_skipLeadingNewLineForListing = false;
+    if (m_state == DataState && cc == '\n')
+      ADVANCE_TO(DataState);
+  }
 
   // Source: http://www.whatwg.org/specs/web-apps/current-work/#tokenisation0
-  UChar cc = *source;
   switch (m_state) {
     BEGIN_STATE(DataState) {
       if (cc == '&')
@@ -435,7 +466,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
     BEGIN_STATE(CharacterReferenceInDataState) {
       if (!processEntity(source))
         return shouldEmitBufferedCharacterToken(source);
-      RECONSUME_IN(DataState);
+      SWITCH_TO(DataState);
     }
     END_STATE()
 
@@ -454,7 +485,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
     BEGIN_STATE(CharacterReferenceInRCDATAState) {
       if (!processEntity(source))
         return shouldEmitBufferedCharacterToken(source);
-      RECONSUME_IN(RCDATAState);
+      SWITCH_TO(RCDATAState);
     }
     END_STATE()
 
@@ -1109,11 +1140,11 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
       // keeping track of this explictly, we observe that the previous
       // state can be determined by m_additionalAllowedCharacter.
       if (m_additionalAllowedCharacter == '"')
-        RECONSUME_IN(AttributeValueDoubleQuotedState);
+        SWITCH_TO(AttributeValueDoubleQuotedState);
       else if (m_additionalAllowedCharacter == '\'')
-        RECONSUME_IN(AttributeValueSingleQuotedState);
+        SWITCH_TO(AttributeValueSingleQuotedState);
       else if (m_additionalAllowedCharacter == '>')
-        RECONSUME_IN(AttributeValueUnquotedState);
+        SWITCH_TO(AttributeValueUnquotedState);
       else
         ASSERT_NOT_REACHED();
     }
@@ -1151,11 +1182,13 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
       // comment early if we don't have the whole input stream available.
       m_token->beginComment();
       while (!source.isEmpty()) {
-        cc = *source;
+        cc = m_inputStreamPreprocessor.nextInputCharacter();
         if (cc == '>')
           EMIT_AND_RESUME_IN(DataState);
         m_token->appendToComment(cc);
-        source.advance(m_lineNumber);
+        m_inputStreamPreprocessor.advance(source, m_lineNumber);
+        // We ignore the return value (which indicates that |source| is
+        // empty) because it's checked by the loop condition above.
       }
       m_state = DataState;
       return true;
@@ -1173,7 +1206,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
           source.advanceAndASSERT('-');
           source.advanceAndASSERT('-');
           m_token->beginComment();
-          RECONSUME_IN(CommentStartState);
+          SWITCH_TO(CommentStartState);
         } else if (result == SegmentedString::NotEnoughCharacters)
           return shouldEmitBufferedCharacterToken(source);
       } else if (cc == 'D' || cc == 'd') {
@@ -1181,7 +1214,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
             source.lookAheadIgnoringCase(doctypeString);
         if (result == SegmentedString::DidMatch) {
           advanceStringAndASSERTIgnoringCase(source, "doctype");
-          RECONSUME_IN(DOCTYPEState);
+          SWITCH_TO(DOCTYPEState);
         } else if (result == SegmentedString::NotEnoughCharacters)
           return shouldEmitBufferedCharacterToken(source);
       }
@@ -1368,7 +1401,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
               source.lookAheadIgnoringCase(publicString);
           if (result == SegmentedString::DidMatch) {
             advanceStringAndASSERTIgnoringCase(source, "public");
-            RECONSUME_IN(AfterDOCTYPEPublicKeywordState);
+            SWITCH_TO(AfterDOCTYPEPublicKeywordState);
           } else if (result == SegmentedString::NotEnoughCharacters)
             return shouldEmitBufferedCharacterToken(source);
         } else if (cc == 'S' || cc == 's') {
@@ -1376,7 +1409,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
               source.lookAheadIgnoringCase(systemString);
           if (result == SegmentedString::DidMatch) {
             advanceStringAndASSERTIgnoringCase(source, "system");
-            RECONSUME_IN(AfterDOCTYPESystemKeywordState);
+            SWITCH_TO(AfterDOCTYPESystemKeywordState);
           } else if (result == SegmentedString::NotEnoughCharacters)
             return shouldEmitBufferedCharacterToken(source);
         }
