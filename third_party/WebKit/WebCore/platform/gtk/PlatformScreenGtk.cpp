@@ -63,7 +63,8 @@ static GdkVisual* getVisual(Widget* widget) {
       return 0;
   }
 
-  return gdk_drawable_get_visual(GDK_DRAWABLE(container->window));
+  return gdk_drawable_get_visual(
+      GDK_DRAWABLE(gtk_widget_get_window(container)));
 }
 
 int screenDepth(Widget* widget) {
@@ -100,8 +101,8 @@ FloatRect screenRect(Widget* widget) {
   if (!screen)
     return FloatRect();
 
-  gint monitor =
-      gdk_screen_get_monitor_at_window(screen, GTK_WIDGET(container)->window);
+  gint monitor = gdk_screen_get_monitor_at_window(
+      screen, gtk_widget_get_window(GTK_WIDGET(container)));
   GdkRectangle geometry;
   gdk_screen_get_monitor_geometry(screen, monitor, &geometry);
 
