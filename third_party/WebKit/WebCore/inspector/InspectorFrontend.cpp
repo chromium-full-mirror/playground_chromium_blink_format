@@ -280,13 +280,15 @@ void InspectorFrontend::debuggerWasDisabled() {
 void InspectorFrontend::parsedScriptSource(const String& sourceID,
                                            const String& url,
                                            const String& data,
-                                           int firstLine) {
+                                           int firstLine,
+                                           int scriptWorldType) {
   ScriptFunctionCall function(m_webInspector, "dispatch");
   function.appendArgument("parsedScriptSource");
   function.appendArgument(sourceID);
   function.appendArgument(url);
   function.appendArgument(data);
   function.appendArgument(firstLine);
+  function.appendArgument(scriptWorldType);
   function.call();
 }
 

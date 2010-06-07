@@ -99,7 +99,8 @@ class InspectorFrontend : public Noncopyable {
   void parsedScriptSource(const String& sourceID,
                           const String& url,
                           const String& data,
-                          int firstLine);
+                          int firstLine,
+                          int scriptWorldType);
   void restoredBreakpoint(const String& sourceID,
                           const String& url,
                           int line,

@@ -1719,8 +1719,9 @@ void InspectorController::removeBreakpoint(const String& sourceID,
 void InspectorController::didParseSource(const String& sourceID,
                                          const String& url,
                                          const String& data,
-                                         int firstLine) {
-  m_frontend->parsedScriptSource(sourceID, url, data, firstLine);
+                                         int firstLine,
+                                         ScriptWorldType worldType) {
+  m_frontend->parsedScriptSource(sourceID, url, data, firstLine, worldType);
 
   if (url.isEmpty())
     return;

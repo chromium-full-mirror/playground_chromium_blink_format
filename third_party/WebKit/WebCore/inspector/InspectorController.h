@@ -286,7 +286,8 @@ class InspectorController
   virtual void didParseSource(const String& sourceID,
                               const String& url,
                               const String& data,
-                              int firstLine);
+                              int firstLine,
+                              ScriptWorldType);
   virtual void failedToParseSource(const String& url,
                                    const String& data,
                                    int firstLine,

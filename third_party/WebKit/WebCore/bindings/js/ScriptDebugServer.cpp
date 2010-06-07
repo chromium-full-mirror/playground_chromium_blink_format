@@ -124,9 +124,6 @@ void ScriptDebugServer::pageCreated(Page* page) {
 bool ScriptDebugServer::hasListenersInterestedInPage(Page* page) {
   ASSERT_ARG(page, page);
 
-  if (hasGlobalListeners())
-    return true;
-
   return m_pageListenersMap.contains(page);
 }
 
@@ -246,7 +243,8 @@ void ScriptDebugServer::dispatchDidContinue(ScriptDebugListener* listener) {
 }
 
 void ScriptDebugServer::dispatchDidParseSource(const ListenerSet& listeners,
-                                               const JSC::SourceCode& source) {
+                                               const JSC::SourceCode& source,
+                                               ScriptWorldType worldType) {
   String sourceID =
       ustringToString(JSC::UString::from(source.provider()->asID()));
   String url = ustringToString(source.provider()->url());
@@ -256,7 +254,7 @@ void ScriptDebugServer::dispatchDidParseSource(const ListenerSet& listeners,
   Vector<ScriptDebugListener*> copy;
   copyToVector(listeners, copy);
   for (size_t i = 0; i < copy.size(); ++i)
-    copy[i]->didParseSource(sourceID, url, data, firstLine);
+    copy[i]->didParseSource(sourceID, url, data, firstLine, worldType);
 }
 
 void ScriptDebugServer::dispatchFailedToParseSource(
@@ -280,6 +278,12 @@ static Page* toPage(JSGlobalObject* globalObject) {
   JSDOMWindow* window = asJSDOMWindow(globalObject);
   Frame* frame = window->impl()->frame();
   return frame ? frame->page() : 0;
+}
+
+static ScriptWorldType currentWorldType(ExecState* exec) {
+  if (currentWorld(exec) == mainThreadNormalWorld())
+    return MAIN_WORLD;
+  return EXTENSIONS_WORLD;
 }
 
 void ScriptDebugServer::detach(JSGlobalObject* globalObject) {
@@ -308,17 +312,11 @@ void ScriptDebugServer::sourceParsed(ExecState* exec,
   if (!page)
     return;
 
+  ScriptWorldType worldType = currentWorldType(exec);
+
   m_callingListeners = true;
 
   bool isError = errorLine != -1;
-
-  if (hasGlobalListeners()) {
-    if (isError)
-      dispatchFailedToParseSource(m_listeners, source, errorLine,
-                                  ustringToString(errorMessage));
-    else
-      dispatchDidParseSource(m_listeners, source);
-  }
 
   if (ListenerSet* pageListeners = m_pageListenersMap.get(page)) {
     ASSERT(!pageListeners->isEmpty());
@@ -326,7 +324,7 @@ void ScriptDebugServer::sourceParsed(ExecState* exec,
       dispatchFailedToParseSource(*pageListeners, source, errorLine,
                                   ustringToString(errorMessage));
     else
-      dispatchDidParseSource(*pageListeners, source);
+      dispatchDidParseSource(*pageListeners, source, worldType);
   }
 
   m_callingListeners = false;
@@ -350,8 +348,6 @@ void ScriptDebugServer::dispatchFunctionToListeners(
   m_callingListeners = true;
 
   ASSERT(hasListeners());
-
-  dispatchFunctionToListeners(m_listeners, callback);
 
   if (ListenerSet* pageListeners = m_pageListenersMap.get(page)) {
     ASSERT(!pageListeners->isEmpty());
@@ -583,7 +579,7 @@ void ScriptDebugServer::didAddListener(Page* page) {
 }
 
 void ScriptDebugServer::didRemoveListener(Page* page) {
-  if (hasGlobalListeners() || (page && hasListenersInterestedInPage(page)))
+  if (page && hasListenersInterestedInPage(page))
     return;
 
   recompileAllJSFunctionsSoon();
