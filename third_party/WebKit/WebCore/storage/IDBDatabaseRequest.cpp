@@ -26,16 +26,37 @@
 #include "config.h"
 #include "IDBDatabaseRequest.h"
 
+#include "IDBAny.h"
+#include "IDBRequest.h"
 #include "IndexedDatabase.h"
+#include "ScriptExecutionContext.h"
 
 #if ENABLE(INDEXED_DATABASE)
 
 namespace WebCore {
 
 IDBDatabaseRequest::IDBDatabaseRequest(PassRefPtr<IDBDatabase> idbDatabase)
-    : m_idbDatabase(idbDatabase) {}
+    : m_idbDatabase(idbDatabase) {
+  m_this = IDBAny::create();
+  m_this->set(this);
+}
 
 IDBDatabaseRequest::~IDBDatabaseRequest() {}
+
+PassRefPtr<IDBRequest> IDBDatabaseRequest::createObjectStore(
+    ScriptExecutionContext* context,
+    const String& name,
+    const String& keyPath,
+    bool autoIncrement) {
+  if (!context->isDocument()) {
+    ASSERT_NOT_REACHED();
+    return 0;
+  }
+
+  RefPtr<IDBRequest> request = IDBRequest::create(context, m_this);
+  m_idbDatabase->createObjectStore(name, keyPath, autoIncrement, request);
+  return request;
+}
 
 }  // namespace WebCore
 

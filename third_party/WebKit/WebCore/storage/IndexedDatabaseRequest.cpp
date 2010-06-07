@@ -40,20 +40,30 @@
 
 namespace WebCore {
 
-IndexedDatabaseRequest::IndexedDatabaseRequest(IndexedDatabase* indexedDatabase,
-                                               Frame* frame)
-    : m_indexedDatabase(indexedDatabase), m_frame(frame) {
+IndexedDatabaseRequest::IndexedDatabaseRequest(IndexedDatabase* indexedDatabase)
+    : m_indexedDatabase(indexedDatabase) {
   m_this = IDBAny::create();
   m_this->set(this);
 }
 
 IndexedDatabaseRequest::~IndexedDatabaseRequest() {}
 
-PassRefPtr<IDBRequest> IndexedDatabaseRequest::open(const String& name,
-                                                    const String& description) {
-  RefPtr<IDBRequest> request = IDBRequest::create(m_frame->document(), m_this);
+PassRefPtr<IDBRequest> IndexedDatabaseRequest::open(
+    ScriptExecutionContext* context,
+    const String& name,
+    const String& description) {
+  if (!context->isDocument()) {
+    // FIXME: make this work with workers.
+    return 0;
+  }
+
+  Document* document = static_cast<Document*>(context);
+  if (!document->frame())
+    return 0;
+
+  RefPtr<IDBRequest> request = IDBRequest::create(document, m_this);
   m_indexedDatabase->open(name, description, request,
-                          m_frame->document()->securityOrigin(), m_frame);
+                          document->securityOrigin(), document->frame());
   return request;
 }
 

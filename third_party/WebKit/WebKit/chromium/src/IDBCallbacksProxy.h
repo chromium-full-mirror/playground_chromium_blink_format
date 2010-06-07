@@ -43,6 +43,7 @@ namespace WebCore {
 
 class IDBDatabaseError;
 class IDBDatabase;
+class IDBObjectStore;
 class SerializedScriptValue;
 
 class IDBCallbacksProxy : public IDBCallbacks {
@@ -55,6 +56,7 @@ class IDBCallbacksProxy : public IDBCallbacks {
   virtual void onSuccess();  // For "null".
   virtual void onSuccess(PassRefPtr<IDBDatabase>);
   virtual void onSuccess(PassRefPtr<IDBIndex>);
+  virtual void onSuccess(PassRefPtr<IDBObjectStore>);
   virtual void onSuccess(PassRefPtr<SerializedScriptValue>);
 
  private:

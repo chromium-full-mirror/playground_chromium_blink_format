@@ -48,7 +48,10 @@ class IDBDatabaseProxy : public IDBDatabase {
   virtual String description();
   virtual String version();
   virtual PassRefPtr<DOMStringList> objectStores();
-
+  virtual void createObjectStore(const String& name,
+                                 const String& keyPath,
+                                 bool autoIncrement,
+                                 PassRefPtr<IDBCallbacks>);
   // FIXME: Add other methods.
 
  private:

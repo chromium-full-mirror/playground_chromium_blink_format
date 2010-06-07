@@ -38,6 +38,7 @@
 #include "IDBDatabaseRequest.h"
 #include "IDBIndexRequest.h"
 #include "IDBErrorEvent.h"
+#include "IDBObjectStoreRequest.h"
 #include "IDBSuccessEvent.h"
 #include "ScriptExecutionContext.h"
 
@@ -76,6 +77,11 @@ void IDBRequest::onSuccess(PassRefPtr<IDBDatabase> idbDatabase) {
 void IDBRequest::onSuccess(PassRefPtr<IDBIndex> idbIndex) {
   onEventCommon();
   m_result->set(IDBIndexRequest::create(idbIndex));
+}
+
+void IDBRequest::onSuccess(PassRefPtr<IDBObjectStore> idbObjectStore) {
+  onEventCommon();
+  m_result->set(IDBObjectStoreRequest::create(idbObjectStore));
 }
 
 void IDBRequest::onSuccess(

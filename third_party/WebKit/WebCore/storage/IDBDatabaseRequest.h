@@ -36,6 +36,10 @@
 
 namespace WebCore {
 
+class IDBAny;
+class IDBRequest;
+class ScriptExecutionContext;
+
 class IDBDatabaseRequest : public RefCounted<IDBDatabaseRequest> {
  public:
   static PassRefPtr<IDBDatabaseRequest> create(
@@ -52,10 +56,16 @@ class IDBDatabaseRequest : public RefCounted<IDBDatabaseRequest> {
     return m_idbDatabase->objectStores();
   }
 
+  PassRefPtr<IDBRequest> createObjectStore(ScriptExecutionContext*,
+                                           const String& name,
+                                           const String& keyPath = "",
+                                           bool autoIncrement = false);
+
  private:
   IDBDatabaseRequest(PassRefPtr<IDBDatabase>);
 
   RefPtr<IDBDatabase> m_idbDatabase;
+  RefPtr<IDBAny> m_this;
 };
 
 }  // namespace WebCore

@@ -45,6 +45,7 @@ class WebIDBCallbacksImpl : public WebKit::WebIDBCallbacks {
   virtual void onSuccess();  // For "null".
   virtual void onSuccess(WebKit::WebIDBDatabase*);
   virtual void onSuccess(WebKit::WebIDBIndex*);
+  virtual void onSuccess(WebKit::WebIDBObjectStore*);
   virtual void onSuccess(const WebKit::WebSerializedScriptValue&);
 
  private:

@@ -47,6 +47,10 @@ class WebIDBDatabaseImpl : public WebIDBDatabase {
   virtual WebString description();
   virtual WebString version();
   virtual WebDOMStringList objectStores();
+  virtual void createObjectStore(const WebString& name,
+                                 const WebString& keyPath,
+                                 bool autoIncrement,
+                                 WebIDBCallbacks* callbacks);
 
  private:
   WTF::RefPtr<WebCore::IDBDatabase> m_idbDatabase;
