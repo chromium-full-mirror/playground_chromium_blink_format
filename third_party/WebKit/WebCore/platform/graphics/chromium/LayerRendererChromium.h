@@ -79,10 +79,12 @@ class LayerRendererChromium : public Noncopyable {
   }
 
  private:
-  void compositeLayersRecursive(LayerChromium*,
-                                const TransformationMatrix&,
-                                float opacity,
-                                const IntRect& visibleRect);
+  void updateLayersRecursive(LayerChromium* layer,
+                             const TransformationMatrix& parentMatrix,
+                             float opacity,
+                             const IntRect& visibleRect);
+
+  void drawLayer(LayerChromium*);
 
   void drawDebugBorder(LayerChromium*, const TransformationMatrix&);
 
@@ -134,6 +136,8 @@ class LayerRendererChromium : public Noncopyable {
   TransformationMatrix m_projectionMatrix;
 
   RefPtr<LayerChromium> m_rootLayer;
+
+  Vector<LayerChromium*> m_layerList;
 
   bool m_needsDisplay;
   IntPoint m_scrollPosition;
