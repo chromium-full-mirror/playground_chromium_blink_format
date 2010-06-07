@@ -42,6 +42,7 @@ class EventListener : public RefCounted<EventListener> {
     InspectorDOMAgentType,
     InspectorDOMStorageResourceType,
     ObjCEventListenerType,
+    CPPEventListenerType,
     ConditionEventListenerType,
     GObjectEventListenerType
   };
