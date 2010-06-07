@@ -46,7 +46,7 @@ v8::Handle<v8::Value> V8NodeList::namedPropertyGetter(
     const v8::AccessorInfo& info) {
   INC_STATS("DOM.NodeList.NamedPropertyGetter");
   NodeList* list = V8NodeList::toNative(info.Holder());
-  String key = toWebCoreString(name);
+  AtomicString key = v8ValueToAtomicWebCoreString(name);
 
   // Length property cannot be overridden.
   DEFINE_STATIC_LOCAL(const AtomicString, length, ("length"));
