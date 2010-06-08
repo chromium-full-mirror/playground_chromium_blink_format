@@ -71,7 +71,6 @@ class SVGRenderStyle : public RefCounted<SVGRenderStyle> {
                           BaselineShift,
                           baselineShift,
                           BS_BASELINE)
-  SVG_RS_DEFINE_ATTRIBUTE(EVectorEffect, VectorEffect, vectorEffect, VE_NONE)
 
   SVG_RS_DEFINE_ATTRIBUTE_INHERITED(LineCap, CapStyle, capStyle, ButtCap)
   SVG_RS_DEFINE_ATTRIBUTE_INHERITED(WindRule, ClipRule, clipRule, RULE_NONZERO)
@@ -333,8 +332,7 @@ class SVGRenderStyle : public RefCounted<SVGRenderStyle> {
         unsigned _alignmentBaseline : 4;  // EAlignmentBaseline
         unsigned _dominantBaseline : 4;   // EDominantBaseline
         unsigned _baselineShift : 2;      // EBaselineShift
-        unsigned _vectorEffect : 1;       // EVectorEffect
-                                          // 21 bits unused
+                                          // 22 bits unused
       } f;
       uint32_t _niflags;
     };
@@ -381,7 +379,6 @@ class SVGRenderStyle : public RefCounted<SVGRenderStyle> {
     svg_noninherited_flags.f._alignmentBaseline = initialAlignmentBaseline();
     svg_noninherited_flags.f._dominantBaseline = initialDominantBaseline();
     svg_noninherited_flags.f._baselineShift = initialBaselineShift();
-    svg_noninherited_flags.f._vectorEffect = initialVectorEffect();
   }
 };
 

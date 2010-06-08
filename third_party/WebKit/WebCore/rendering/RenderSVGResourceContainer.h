@@ -23,8 +23,6 @@
 
 #if ENABLE(SVG)
 #include "RenderSVGHiddenContainer.h"
-
-#include "SVGStyledTransformableElement.h"
 #include "RenderSVGResource.h"
 
 namespace WebCore {
@@ -83,19 +81,6 @@ class RenderSVGResourceContainer : public RenderSVGHiddenContainer,
 
   virtual RenderSVGResourceContainer* toRenderSVGResourceContainer() {
     return this;
-  }
-
-  static AffineTransform transformOnNonScalingStroke(
-      RenderObject* object,
-      const AffineTransform resourceTransform) {
-    if (!object->isRenderPath())
-      return resourceTransform;
-
-    SVGStyledTransformableElement* element =
-        static_cast<SVGStyledTransformableElement*>(object->node());
-    AffineTransform transform = resourceTransform;
-    transform.multiply(element->getScreenCTM());
-    return transform;
   }
 
  private:

@@ -130,8 +130,6 @@ enum EDominantBaseline {
   DB_TEXT_BEFORE_EDGE
 };
 
-enum EVectorEffect { VE_NONE, VE_NON_SCALING_STROKE };
-
 class CSSValue;
 class CSSValueList;
 class SVGPaint;

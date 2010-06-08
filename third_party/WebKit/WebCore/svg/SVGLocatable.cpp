@@ -86,21 +86,17 @@ AffineTransform SVGLocatable::computeCTM(const SVGElement* element,
 
   SVGElement* stopAtElement =
       mode == NearestViewportScope ? nearestViewportElement(element) : 0;
-
-  Node* current = const_cast<SVGElement*>(element);
-  while (current && current->isSVGElement()) {
-    SVGElement* currentElement = static_cast<SVGElement*>(current);
+  for (const Node* current = element; current && current->isSVGElement();
+       current = current->parentNode()) {
+    const SVGElement* currentElement = static_cast<const SVGElement*>(current);
     if (currentElement->isStyled())
-      ctm = static_cast<SVGStyledElement*>(currentElement)
+      ctm = static_cast<const SVGStyledElement*>(currentElement)
                 ->localCoordinateSpaceTransform(mode)
                 .multLeft(ctm);
 
     // For getCTM() computation, stop at the nearest viewport element
     if (currentElement == stopAtElement)
       break;
-
-    current = current->isShadowNode() ? current->shadowParentNode()
-                                      : current->parentNode();
   }
 
   return ctm;
