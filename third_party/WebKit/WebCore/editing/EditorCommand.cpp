@@ -195,7 +195,7 @@ static bool executeToggleStyle(Frame* frame,
   // other: present throughout the selection
   Settings* settings = frame->document()->settings();
   bool styleIsPresent;
-  if (settings && settings->editingBehaviorType() == EditingMacBehavior)
+  if (settings && settings->editingBehavior() == EditingMacBehavior)
     styleIsPresent = frame->editor()->selectionStartHasStyle(style.get());
   else
     styleIsPresent =
