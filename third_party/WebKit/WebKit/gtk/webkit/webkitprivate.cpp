@@ -123,8 +123,8 @@ WebCore::ResourceResponse core(WebKitNetworkResponse* response) {
   return ResourceResponse();
 }
 
-WebCore::EditingBehavior core(WebKitEditingBehavior type) {
-  return (WebCore::EditingBehavior)type;
+WebCore::EditingBehaviorType core(WebKitEditingBehavior type) {
+  return (WebCore::EditingBehaviorType)type;
 }
 
 WebKitHitTestResult* kit(const WebCore::HitTestResult& result) {

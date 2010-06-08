@@ -95,7 +95,7 @@ WebCore::ResourceRequest core(WebKitNetworkRequest* request);
 
 WebCore::ResourceResponse core(WebKitNetworkResponse* response);
 
-WebCore::EditingBehavior core(WebKitEditingBehavior type);
+WebCore::EditingBehaviorType core(WebKitEditingBehavior type);
 
 WebKitSecurityOrigin* kit(WebCore::SecurityOrigin*);
 WebCore::SecurityOrigin* core(WebKitSecurityOrigin*);
