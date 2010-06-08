@@ -26,8 +26,8 @@
 #include "config.h"
 #include "V8Geolocation.h"
 
+#include "Frame.h"
 #include "Geolocation.h"
-
 #include "V8Binding.h"
 #include "V8CustomPositionCallback.h"
 #include "V8CustomPositionErrorCallback.h"
@@ -56,8 +56,7 @@ static PassRefPtr<PositionCallback> createPositionCallback(
     return 0;
   }
 
-  Frame* frame = V8Proxy::retrieveFrameForCurrentContext();
-  return V8CustomPositionCallback::create(value, frame);
+  return V8CustomPositionCallback::create(value, getScriptExecutionContext());
 }
 
 static PassRefPtr<PositionErrorCallback> createPositionErrorCallback(
@@ -76,8 +75,8 @@ static PassRefPtr<PositionErrorCallback> createPositionErrorCallback(
     return 0;
   }
 
-  Frame* frame = V8Proxy::retrieveFrameForCurrentContext();
-  return V8CustomPositionErrorCallback::create(value, frame);
+  return V8CustomPositionErrorCallback::create(value,
+                                               getScriptExecutionContext());
 }
 
 static PassRefPtr<PositionOptions> createPositionOptions(
