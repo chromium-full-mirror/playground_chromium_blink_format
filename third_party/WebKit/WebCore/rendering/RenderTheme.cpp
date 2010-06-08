@@ -240,6 +240,10 @@ void RenderTheme::adjustStyle(CSSStyleSelector* selector,
 #endif
 #if ENABLE(METER_TAG)
     case MeterPart:
+    case RelevancyLevelIndicatorPart:
+    case ContinuousCapacityLevelIndicatorPart:
+    case DiscreteCapacityLevelIndicatorPart:
+    case RatingLevelIndicatorPart:
       return adjustMeterStyle(selector, style, e);
 #endif
     default:
@@ -307,6 +311,10 @@ bool RenderTheme::paint(RenderObject* o,
       return paintMenuList(o, paintInfo, r);
 #if ENABLE(METER_TAG)
     case MeterPart:
+    case RelevancyLevelIndicatorPart:
+    case ContinuousCapacityLevelIndicatorPart:
+    case DiscreteCapacityLevelIndicatorPart:
+    case RatingLevelIndicatorPart:
       return paintMeter(o, paintInfo, r);
 #endif
 #if ENABLE(PROGRESS_TAG)
@@ -407,6 +415,10 @@ bool RenderTheme::paintBorderOnly(RenderObject* o,
     case MenulistPart:
 #if ENABLE(METER_TAG)
     case MeterPart:
+    case RelevancyLevelIndicatorPart:
+    case ContinuousCapacityLevelIndicatorPart:
+    case DiscreteCapacityLevelIndicatorPart:
+    case RatingLevelIndicatorPart:
 #endif
 #if ENABLE(PROGRESS_TAG)
     case ProgressBarPart:
@@ -449,6 +461,10 @@ bool RenderTheme::paintDecorations(RenderObject* o,
     case MenulistPart:
 #if ENABLE(METER_TAG)
     case MeterPart:
+    case RelevancyLevelIndicatorPart:
+    case ContinuousCapacityLevelIndicatorPart:
+    case DiscreteCapacityLevelIndicatorPart:
+    case RatingLevelIndicatorPart:
 #endif
 #if ENABLE(PROGRESS_TAG)
     case ProgressBarPart:
@@ -921,6 +937,11 @@ void RenderTheme::adjustMeterStyle(CSSStyleSelector*,
                                    RenderStyle* style,
                                    Element*) const {
   style->setBoxShadow(0);
+}
+
+IntSize RenderTheme::meterSizeForBounds(const RenderMeter*,
+                                        const IntRect& bounds) const {
+  return bounds.size();
 }
 
 bool RenderTheme::paintMeter(RenderObject* renderObject,

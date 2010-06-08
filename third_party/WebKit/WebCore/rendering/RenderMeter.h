@@ -38,6 +38,8 @@ class RenderMeter : public RenderBlock {
   virtual bool isMeter() const { return true; }
   virtual void layout();
   virtual void updateFromElement();
+  virtual void calcWidth();
+  virtual void calcHeight();
 };
 
 inline RenderMeter* toRenderMeter(RenderObject* object) {

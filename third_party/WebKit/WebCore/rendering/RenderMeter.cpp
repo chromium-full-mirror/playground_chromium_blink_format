@@ -34,6 +34,16 @@ using namespace HTMLNames;
 
 RenderMeter::RenderMeter(HTMLMeterElement* element) : RenderBlock(element) {}
 
+void RenderMeter::calcWidth() {
+  RenderBox::calcWidth();
+  setWidth(theme()->meterSizeForBounds(this, frameRect()).width());
+}
+
+void RenderMeter::calcHeight() {
+  RenderBox::calcHeight();
+  setHeight(theme()->meterSizeForBounds(this, frameRect()).height());
+}
+
 void RenderMeter::layout() {
   ASSERT(needsLayout());
 

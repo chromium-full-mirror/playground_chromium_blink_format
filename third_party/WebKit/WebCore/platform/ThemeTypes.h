@@ -93,8 +93,12 @@ enum ControlPart {
   SearchFieldResultsButtonPart,
   SearchFieldCancelButtonPart,
   TextFieldPart,
-  TextAreaPart,
-  CapsLockIndicatorPart
+  CapsLockIndicatorPart,
+  RelevancyLevelIndicatorPart,
+  ContinuousCapacityLevelIndicatorPart,
+  DiscreteCapacityLevelIndicatorPart,
+  RatingLevelIndicatorPart,
+  TextAreaPart
 };
 
 enum SelectionPart { SelectionBackground, SelectionForeground };

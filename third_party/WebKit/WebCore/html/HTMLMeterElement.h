@@ -30,6 +30,12 @@ class HTMLMeterElement : public HTMLFormControlElement {
  public:
   static PassRefPtr<HTMLMeterElement> create(const QualifiedName&, Document*);
 
+  enum GaugeRegion {
+    GaugeRegionOptimum,
+    GaugeRegionSuboptimal,
+    GaugeRegionEvenLessGood
+  };
+
   double min() const;
   void setMin(double, ExceptionCode&);
 
@@ -47,6 +53,8 @@ class HTMLMeterElement : public HTMLFormControlElement {
 
   double optimum() const;
   void setOptimum(double, ExceptionCode&);
+
+  GaugeRegion gaugeRegion() const;
 
  private:
   HTMLMeterElement(const QualifiedName&, Document*);
