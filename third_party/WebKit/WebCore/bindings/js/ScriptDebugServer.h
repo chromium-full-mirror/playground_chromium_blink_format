@@ -86,6 +86,10 @@ class ScriptDebugServer : JSC::Debugger, public Noncopyable {
   void stepOverStatement();
   void stepOutOfFunction();
 
+  bool editScriptSource(const String& sourceID,
+                        const String& newContent,
+                        String& newSourceOrErrorMessage);
+
   void recompileAllJSFunctionsSoon();
   void recompileAllJSFunctions(Timer<ScriptDebugServer>* = 0);
 

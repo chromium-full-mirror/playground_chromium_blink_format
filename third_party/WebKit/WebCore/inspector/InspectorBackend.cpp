@@ -201,9 +201,12 @@ void InspectorBackend::setPauseOnExceptionsState(long pauseState) {
         ScriptDebugServer::shared().pauseOnExceptionsState());
 }
 
-#endif
-
-#if ENABLE(JAVASCRIPT_DEBUGGER)
+void InspectorBackend::editScriptSource(long callId,
+                                        const String& sourceID,
+                                        const String& newContent) {
+  if (m_inspectorController)
+    m_inspectorController->editScriptSource(callId, sourceID, newContent);
+}
 
 void InspectorBackend::enableProfiler(bool always) {
   if (m_inspectorController)

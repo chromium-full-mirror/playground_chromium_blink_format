@@ -281,7 +281,12 @@ class InspectorController
   void disableDebugger(bool always = false);
   bool debuggerEnabled() const { return m_debuggerEnabled; }
 
+  void editScriptSource(long callId,
+                        const String& sourceID,
+                        const String& newContent);
+
   void resumeDebugger();
+  PassRefPtr<SerializedScriptValue> currentCallFrames();
 
   virtual void didParseSource(const String& sourceID,
                               const String& url,
@@ -407,6 +412,7 @@ class InspectorController
 #if ENABLE(JAVASCRIPT_DEBUGGER)
   bool m_debuggerEnabled;
   bool m_attachDebuggerWhenShown;
+  ScriptState* m_pausedScriptState;
   HashMap<String, String> m_sourceIDToURL;
   HashMap<String, SourceBreakpoints> m_stickyBreakpoints;
 

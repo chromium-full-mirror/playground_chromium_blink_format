@@ -225,6 +225,13 @@ void ScriptDebugServer::stepOutOfFunction() {
   m_doneProcessingDebuggerEvents = true;
 }
 
+bool ScriptDebugServer::editScriptSource(const String&,
+                                         const String&,
+                                         String&) {
+  // FIXME(40300): implement this.
+  return false;
+}
+
 JavaScriptCallFrame* ScriptDebugServer::currentCallFrame() {
   if (!m_paused)
     return 0;
