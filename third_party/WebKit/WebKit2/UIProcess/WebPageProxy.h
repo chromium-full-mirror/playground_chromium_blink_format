@@ -116,6 +116,8 @@ class WebPageProxy : public RefCounted<WebPageProxy> {
   const WebCore::String& pageTitle() const { return m_pageTitle; }
   const WebCore::String& toolTip() const { return m_toolTip; }
 
+  double estimatedProgress() const { return m_estimatedProgress; }
+
   void terminateProcess();
 
   void runJavaScriptInMainFrame(const WebCore::String&,
@@ -232,6 +234,8 @@ class WebPageProxy : public RefCounted<WebPageProxy> {
       m_scriptReturnValueCallbacks;
   HashMap<uint64_t, RefPtr<RenderTreeExternalRepresentationCallback>>
       m_renderTreeExternalRepresentationCallbacks;
+
+  double m_estimatedProgress;
 
   bool m_canGoBack;
   bool m_canGoForward;
