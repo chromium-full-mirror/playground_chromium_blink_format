@@ -41,6 +41,7 @@
 #include "ResourceResponse.h"
 #include "SecurityOrigin.h"
 #include "TextEncodingRegistry.h"
+#include "WebKitDOMBinding.h"
 #include "webkitnetworkresponse.h"
 #include "webkitsoupauthdialog.h"
 #include <libintl.h>
@@ -132,6 +133,7 @@ WebKitHitTestResult* kit(const WebCore::HitTestResult& result) {
   GOwnPtr<char> linkURI(0);
   GOwnPtr<char> imageURI(0);
   GOwnPtr<char> mediaURI(0);
+  WebKitDOMNode* node = 0;
 
   if (!result.absoluteLinkURL().isEmpty()) {
     context |= WEBKIT_HIT_TEST_RESULT_CONTEXT_LINK;
@@ -154,9 +156,13 @@ WebKitHitTestResult* kit(const WebCore::HitTestResult& result) {
   if (result.isContentEditable())
     context |= WEBKIT_HIT_TEST_RESULT_CONTEXT_EDITABLE;
 
-  return WEBKIT_HIT_TEST_RESULT(g_object_new(
-      WEBKIT_TYPE_HIT_TEST_RESULT, "link-uri", linkURI.get(), "image-uri",
-      imageURI.get(), "media-uri", mediaURI.get(), "context", context, NULL));
+  if (result.innerNonSharedNode())
+    node = static_cast<WebKitDOMNode*>(kit(result.innerNonSharedNode()));
+
+  return WEBKIT_HIT_TEST_RESULT(
+      g_object_new(WEBKIT_TYPE_HIT_TEST_RESULT, "link-uri", linkURI.get(),
+                   "image-uri", imageURI.get(), "media-uri", mediaURI.get(),
+                   "context", context, "inner-node", node, NULL));
 }
 
 PasteboardHelperGtk* pasteboardHelperInstance() {
