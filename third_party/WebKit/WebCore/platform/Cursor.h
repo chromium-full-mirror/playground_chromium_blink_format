@@ -114,7 +114,7 @@ class Cursor {
   {
   }
 
-  Cursor(Image*, const IntPoint& hotspot);
+  Cursor(Image*, const IntPoint& hotSpot);
   Cursor(const Cursor&);
   ~Cursor();
   Cursor& operator=(const Cursor&);
@@ -125,6 +125,8 @@ class Cursor {
  private:
   PlatformCursor m_impl;
 };
+
+IntPoint determineHotSpot(Image*, const IntPoint& specifiedHotSpot);
 
 const Cursor& pointerCursor();
 const Cursor& crossCursor();
