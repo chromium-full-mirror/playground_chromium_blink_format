@@ -1362,7 +1362,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
       } else if (cc == '>') {
         emitParseError();
         m_token->beginDOCTYPE();
-        notImplemented();
+        m_token->setForceQuirks();
         EMIT_AND_RESUME_IN(DataState);
       } else {
         m_token->beginDOCTYPE(cc);
@@ -1414,7 +1414,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
             return shouldEmitBufferedCharacterToken(source);
         }
         emitParseError();
-        notImplemented();
+        m_token->setForceQuirks();
         ADVANCE_TO(BogusDOCTYPEState);
       }
       // FIXME: Handle EOF properly.
@@ -1434,11 +1434,11 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         ADVANCE_TO(DOCTYPEPublicIdentifierSingleQuotedState);
       } else if (cc == '>') {
         emitParseError();
-        notImplemented();
+        m_token->setForceQuirks();
         EMIT_AND_RESUME_IN(DataState);
       } else {
         emitParseError();
-        notImplemented();
+        m_token->setForceQuirks();
         ADVANCE_TO(BogusDOCTYPEState);
       }
       // FIXME: Handle EOF properly.
@@ -1456,11 +1456,11 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         ADVANCE_TO(DOCTYPEPublicIdentifierSingleQuotedState);
       } else if (cc == '>') {
         emitParseError();
-        notImplemented();
+        m_token->setForceQuirks();
         EMIT_AND_RESUME_IN(DataState);
       } else {
         emitParseError();
-        notImplemented();
+        m_token->setForceQuirks();
         ADVANCE_TO(BogusDOCTYPEState);
       }
       // FIXME: Handle EOF properly.
@@ -1472,7 +1472,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         ADVANCE_TO(AfterDOCTYPEPublicIdentifierState);
       else if (cc == '>') {
         emitParseError();
-        notImplemented();
+        m_token->setForceQuirks();
         EMIT_AND_RESUME_IN(DataState);
       } else {
         m_token->appendToPublicIdentifier(cc);
@@ -1487,7 +1487,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         ADVANCE_TO(AfterDOCTYPEPublicIdentifierState);
       else if (cc == '>') {
         emitParseError();
-        notImplemented();
+        m_token->setForceQuirks();
         EMIT_AND_RESUME_IN(DataState);
       } else {
         m_token->appendToPublicIdentifier(cc);
@@ -1512,7 +1512,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         ADVANCE_TO(DOCTYPESystemIdentifierSingleQuotedState);
       } else {
         emitParseError();
-        notImplemented();
+        m_token->setForceQuirks();
         ADVANCE_TO(BogusDOCTYPEState);
       }
       // FIXME: Handle EOF properly.
@@ -1532,7 +1532,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         ADVANCE_TO(DOCTYPESystemIdentifierSingleQuotedState);
       } else {
         emitParseError();
-        notImplemented();
+        m_token->setForceQuirks();
         ADVANCE_TO(BogusDOCTYPEState);
       }
       // FIXME: Handle EOF properly.
@@ -1552,11 +1552,11 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         ADVANCE_TO(DOCTYPESystemIdentifierSingleQuotedState);
       } else if (cc == '>') {
         emitParseError();
-        notImplemented();
+        m_token->setForceQuirks();
         EMIT_AND_RESUME_IN(DataState);
       } else {
         emitParseError();
-        notImplemented();
+        m_token->setForceQuirks();
         ADVANCE_TO(BogusDOCTYPEState);
       }
       // FIXME: Handle EOF properly.
@@ -1574,11 +1574,11 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         ADVANCE_TO(DOCTYPESystemIdentifierSingleQuotedState);
       } else if (cc == '>') {
         emitParseError();
-        notImplemented();
+        m_token->setForceQuirks();
         EMIT_AND_RESUME_IN(DataState);
       } else {
         emitParseError();
-        notImplemented();
+        m_token->setForceQuirks();
         ADVANCE_TO(BogusDOCTYPEState);
       }
       // FIXME: Handle EOF properly.
@@ -1590,7 +1590,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         ADVANCE_TO(AfterDOCTYPESystemIdentifierState);
       else if (cc == '>') {
         emitParseError();
-        notImplemented();
+        m_token->setForceQuirks();
         EMIT_AND_RESUME_IN(DataState);
       } else {
         m_token->appendToSystemIdentifier(cc);
@@ -1605,7 +1605,7 @@ bool HTML5Lexer::nextToken(SegmentedString& source, HTML5Token& token) {
         ADVANCE_TO(AfterDOCTYPESystemIdentifierState);
       else if (cc == '>') {
         emitParseError();
-        notImplemented();
+        m_token->setForceQuirks();
         EMIT_AND_RESUME_IN(DataState);
       } else {
         m_token->appendToSystemIdentifier(cc);

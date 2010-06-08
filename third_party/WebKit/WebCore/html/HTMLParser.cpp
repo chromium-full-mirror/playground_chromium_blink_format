@@ -351,6 +351,8 @@ void HTMLParser::parseDoctypeToken(DoctypeToken* t) {
   m_document->addChild(DocumentType::create(
       m_document, String::adopt(t->m_name), String::adopt(t->m_publicID),
       String::adopt(t->m_systemID)));
+  if (t->m_forceQuirks)
+    m_document->setParseMode(Document::Compat);
 }
 
 static bool isTableSection(const Node* n) {

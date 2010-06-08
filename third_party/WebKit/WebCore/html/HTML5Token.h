@@ -188,6 +188,16 @@ class HTML5Token : public Noncopyable {
     m_doctypeData->m_systemIdentifier.clear();
   }
 
+  bool forceQuirks() {
+    ASSERT(m_type == DOCTYPE);
+    return m_doctypeData->m_forceQuirks;
+  }
+
+  void setForceQuirks() {
+    ASSERT(m_type == DOCTYPE);
+    m_doctypeData->m_forceQuirks = true;
+  }
+
   void appendToPublicIdentifier(UChar character) {
     ASSERT(m_type == DOCTYPE);
     ASSERT(m_doctypeData->m_hasPublicIdentifier);
