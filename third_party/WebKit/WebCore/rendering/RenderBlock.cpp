@@ -4527,18 +4527,21 @@ VisiblePosition RenderBlock::positionForPointWithInlineChildren(
     }
   }
 
-  Settings* settings = document()->settings();
-  bool useWindowsBehavior =
-      settings && settings->editingBehavior() == EditingWindowsBehavior;
+  bool moveCaretToBoundary =
+      document()
+          ->frame()
+          ->editor()
+          ->behavior()
+          .shouldMoveCaretToHorizontalBoundaryWhenPastTopOrBottom();
 
-  if (useWindowsBehavior && !closestBox && lastRootBoxWithChildren) {
+  if (!moveCaretToBoundary && !closestBox && lastRootBoxWithChildren) {
     // y coordinate is below last root line box, pretend we hit it
     closestBox =
         lastRootBoxWithChildren->closestLeafChildForXPos(pointInContents.x());
   }
 
   if (closestBox) {
-    if (!useWindowsBehavior &&
+    if (moveCaretToBoundary &&
         pointInContents.y() < firstRootBoxWithChildren->lineTop() -
                                   verticalLineClickFudgeFactor) {
       // y coordinate is above first root line box, so return the start of the
@@ -4556,7 +4559,7 @@ VisiblePosition RenderBlock::positionForPointWithInlineChildren(
   if (lastRootBoxWithChildren) {
     // We hit this case for Mac behavior when the Y coordinate is below the last
     // box.
-    ASSERT(!useWindowsBehavior);
+    ASSERT(moveCaretToBoundary);
     return VisiblePosition(
         positionForBox(lastRootBoxWithChildren->lastLeafChild(), false),
         DOWNSTREAM);

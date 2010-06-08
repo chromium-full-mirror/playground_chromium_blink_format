@@ -392,9 +392,9 @@ class Frame : public RefCounted<Frame>
   String m_kjsStatusBarText;
   String m_kjsDefaultStatusBarText;
 
-  mutable SelectionController m_selectionController;
   mutable VisibleSelection m_mark;
   mutable Editor m_editor;
+  mutable SelectionController m_selectionController;
   mutable EventHandler m_eventHandler;
   mutable AnimationController m_animationController;
 
