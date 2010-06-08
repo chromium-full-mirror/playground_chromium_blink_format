@@ -52,7 +52,6 @@ class PluginTokenizer : public Tokenizer {
 
  private:
   virtual void write(const SegmentedString&, bool appendData);
-  virtual void stopParsing();
   virtual void finish();
   virtual bool isWaitingForScripts() const;
 
@@ -134,10 +133,6 @@ bool PluginTokenizer::writeRawData(const char*, int) {
   }
 
   return false;
-}
-
-void PluginTokenizer::stopParsing() {
-  Tokenizer::stopParsing();
 }
 
 void PluginTokenizer::finish() {

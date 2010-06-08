@@ -72,6 +72,7 @@ class HTML5Tokenizer : public Tokenizer,
 
  private:
   void pumpLexer();
+  void pumpLexerIfPossible();
   void resumeParsingAfterScriptExecution();
 
   void attemptToEnd();

@@ -36,7 +36,6 @@ class SinkTokenizer : public Tokenizer {
 
  private:
   virtual void write(const SegmentedString&, bool) { ASSERT_NOT_REACHED(); }
-  virtual void stopParsing();
   virtual void finish();
   virtual bool isWaitingForScripts() const { return false; }
 
@@ -45,10 +44,6 @@ class SinkTokenizer : public Tokenizer {
 
   Document* m_document;
 };
-
-void SinkTokenizer::stopParsing() {
-  Tokenizer::stopParsing();
-}
 
 void SinkTokenizer::finish() {
   if (!m_parserStopped)
