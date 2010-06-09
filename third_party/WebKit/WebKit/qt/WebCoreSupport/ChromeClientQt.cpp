@@ -29,6 +29,7 @@
 #include "config.h"
 #include "ChromeClientQt.h"
 
+#include "DatabaseTracker.h"
 #include "FileChooser.h"
 #include "Frame.h"
 #include "FrameLoadRequest.h"
@@ -37,11 +38,10 @@
 #include "FrameView.h"
 #include "HitTestResult.h"
 #include "Icon.h"
-#include "NotificationPresenterClientQt.h"
 #include "NotImplemented.h"
+#include "NotificationPresenterClientQt.h"
 #include "ScrollbarTheme.h"
 #include "WindowFeatures.h"
-#include "DatabaseTracker.h"
 #if defined(Q_WS_MAEMO_5)
 #include "QtMaemoWebPopup.h"
 #else
@@ -50,17 +50,17 @@
 #include "QWebPageClient.h"
 #include "SecurityOrigin.h"
 
+#include "qwebframe_p.h"
+#include "qwebpage.h"
+#include "qwebpage_p.h"
+#include "qwebsecurityorigin.h"
+#include "qwebsecurityorigin_p.h"
+#include "qwebview.h"
+
 #include <qdebug.h>
 #include <qeventloop.h>
 #include <qtextdocument.h>
 #include <qtooltip.h>
-
-#include "qwebpage.h"
-#include "qwebpage_p.h"
-#include "qwebframe_p.h"
-#include "qwebsecurityorigin.h"
-#include "qwebsecurityorigin_p.h"
-#include "qwebview.h"
 
 #if USE(ACCELERATED_COMPOSITING)
 #include "GraphicsLayerQt.h"
