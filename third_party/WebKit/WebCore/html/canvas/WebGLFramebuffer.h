@@ -63,6 +63,8 @@ class WebGLFramebuffer : public CanvasObject {
   // clear un-initialized renderbuffers.
   void onAttachedObjectChange(CanvasObject*);
 
+  unsigned long getColorBufferFormat();
+
  protected:
   WebGLFramebuffer(WebGLRenderingContext*);
 
