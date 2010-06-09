@@ -25,9 +25,9 @@
 #include "config.h"
 #include "CSSSelector.h"
 
-#include "wtf/Assertions.h"
+#include "CSSOMUtils.h"
 #include "HTMLNames.h"
-
+#include <wtf/Assertions.h>
 #include <wtf/HashMap.h>
 #include <wtf/StdLibExtras.h>
 
@@ -656,10 +656,10 @@ String CSSSelector::selectorText() const {
   while (true) {
     if (cs->m_match == CSSSelector::Id) {
       str += "#";
-      str += cs->m_value;
+      serializeIdentifier(cs->m_value, str);
     } else if (cs->m_match == CSSSelector::Class) {
       str += ".";
-      str += cs->m_value;
+      serializeIdentifier(cs->m_value, str);
     } else if (cs->m_match == CSSSelector::PseudoClass ||
                cs->m_match == CSSSelector::PagePseudoClass) {
       str += ":";
@@ -712,9 +712,8 @@ String CSSSelector::selectorText() const {
           break;
       }
       if (cs->m_match != CSSSelector::Set) {
-        str += "\"";
-        str += cs->m_value;
-        str += "\"]";
+        serializeString(cs->m_value, str);
+        str += "]";
       }
     }
     if (cs->relation() != CSSSelector::SubSelector || !cs->tagHistory())
