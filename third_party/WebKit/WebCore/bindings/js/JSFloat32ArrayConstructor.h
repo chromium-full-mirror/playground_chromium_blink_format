@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2006 Apple Computer, Inc.  All rights reserved.
- * Copyright (C) 2009 Google Inc. All rights reserved.
+ * Copyright (C) 2009 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -24,17 +23,23 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-module html {
-    interface [
-        Conditional=3D_CANVAS,
-        HasNumericIndexGetter,
-        HasCustomIndexSetter,
-        GenerateNativeConverter,
-        CustomConstructor,
-        CustomToJS
-    ] FloatArray : ArrayBufferView {
-        // void set(in FloatArray array, [Optional] in unsigned long offset);
-        // void set(in sequence<long> array, [Optional] in unsigned long offset);
-        [Custom] void set();
-    };
+#ifndef JSFloat32ArrayConstructor_h
+#define JSFloat32ArrayConstructor_h
+
+#include "JSDOMBinding.h"
+#include "JSDocument.h"
+
+namespace WebCore {
+
+class JSFloat32ArrayConstructor : public DOMConstructorObject {
+ public:
+  JSFloat32ArrayConstructor(JSC::ExecState*, JSDOMGlobalObject*);
+  static const JSC::ClassInfo s_info;
+
+ private:
+  virtual JSC::ConstructType getConstructData(JSC::ConstructData&);
+  virtual const JSC::ClassInfo* classInfo() const { return &s_info; }
+};
 }
+
+#endif  // JSFloat32ArrayConstructor_h

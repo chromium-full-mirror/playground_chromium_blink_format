@@ -30,7 +30,7 @@
 
 #include "WebGLGetInfo.h"
 #include "WebGLBuffer.h"
-#include "FloatArray.h"
+#include "Float32Array.h"
 #include "WebGLFramebuffer.h"
 #include "Int32Array.h"
 #include "WebGLProgram.h"
@@ -57,7 +57,7 @@ WebGLGetInfo::WebGLGetInfo(unsigned long value)
 WebGLGetInfo::WebGLGetInfo(PassRefPtr<WebGLBuffer> value)
     : m_type(kTypeWebGLBuffer), m_webglBuffer(value) {}
 
-WebGLGetInfo::WebGLGetInfo(PassRefPtr<FloatArray> value)
+WebGLGetInfo::WebGLGetInfo(PassRefPtr<Float32Array> value)
     : m_type(kTypeWebGLFloatArray), m_webglFloatArray(value) {}
 
 WebGLGetInfo::WebGLGetInfo(PassRefPtr<WebGLFramebuffer> value)
@@ -114,7 +114,7 @@ PassRefPtr<WebGLBuffer> WebGLGetInfo::getWebGLBuffer() const {
   return m_webglBuffer;
 }
 
-PassRefPtr<FloatArray> WebGLGetInfo::getWebGLFloatArray() const {
+PassRefPtr<Float32Array> WebGLGetInfo::getWebGLFloatArray() const {
   ASSERT(getType() == kTypeWebGLFloatArray);
   return m_webglFloatArray;
 }

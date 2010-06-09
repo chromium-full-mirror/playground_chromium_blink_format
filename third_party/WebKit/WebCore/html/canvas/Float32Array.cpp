@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2009 Apple Inc. All rights reserved.
+ * Copyright (C) 2009 Google Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,23 +24,37 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef JSFloatArrayConstructor_h
-#define JSFloatArrayConstructor_h
+#include "config.h"
 
-#include "JSDOMBinding.h"
-#include "JSDocument.h"
+#if ENABLE(3D_CANVAS)
+
+#include "Float32Array.h"
 
 namespace WebCore {
 
-class JSFloatArrayConstructor : public DOMConstructorObject {
- public:
-  JSFloatArrayConstructor(JSC::ExecState*, JSDOMGlobalObject*);
-  static const JSC::ClassInfo s_info;
-
- private:
-  virtual JSC::ConstructType getConstructData(JSC::ConstructData&);
-  virtual const JSC::ClassInfo* classInfo() const { return &s_info; }
-};
+PassRefPtr<Float32Array> Float32Array::create(unsigned length) {
+  return TypedArrayBase<float>::create<Float32Array>(length);
 }
 
-#endif  // JSFloatArrayConstructor_h
+PassRefPtr<Float32Array> Float32Array::create(float* array, unsigned length) {
+  return TypedArrayBase<float>::create<Float32Array>(array, length);
+}
+
+PassRefPtr<Float32Array> Float32Array::create(PassRefPtr<ArrayBuffer> buffer,
+                                              unsigned byteOffset,
+                                              unsigned length) {
+  return TypedArrayBase<float>::create<Float32Array>(buffer, byteOffset,
+                                                     length);
+}
+
+Float32Array::Float32Array(PassRefPtr<ArrayBuffer> buffer,
+                           unsigned byteOffset,
+                           unsigned length)
+    : TypedArrayBase<float>(buffer, byteOffset, length) {}
+
+PassRefPtr<ArrayBufferView> Float32Array::slice(int start, int end) const {
+  return sliceImpl<Float32Array>(start, end);
+}
+}
+
+#endif  // ENABLE(3D_CANVAS)

@@ -65,7 +65,7 @@
 #include "JSUint32ArrayConstructor.h"
 #include "JSInt16ArrayConstructor.h"
 #include "JSUint16ArrayConstructor.h"
-#include "JSFloatArrayConstructor.h"
+#include "JSFloat32ArrayConstructor.h"
 #endif
 #include "JSWebKitCSSMatrixConstructor.h"
 #include "JSWebKitPointConstructor.h"
@@ -671,8 +671,8 @@ JSValue JSDOMWindow::uint16Array(ExecState* exec) const {
   return getDOMConstructor<JSUint16ArrayConstructor>(exec, this);
 }
 
-JSValue JSDOMWindow::floatArray(ExecState* exec) const {
-  return getDOMConstructor<JSFloatArrayConstructor>(exec, this);
+JSValue JSDOMWindow::float32Array(ExecState* exec) const {
+  return getDOMConstructor<JSFloat32ArrayConstructor>(exec, this);
 }
 
 // Temporary aliases to keep current WebGL content working during transition
@@ -707,7 +707,7 @@ JSValue JSDOMWindow::webGLUnsignedShortArray(ExecState* exec) const {
 }
 
 JSValue JSDOMWindow::webGLFloatArray(ExecState* exec) const {
-  return getDOMConstructor<JSFloatArrayConstructor>(exec, this);
+  return getDOMConstructor<JSFloat32ArrayConstructor>(exec, this);
 }
 #endif
 

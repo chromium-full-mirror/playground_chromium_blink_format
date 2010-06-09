@@ -28,28 +28,28 @@
 #if ENABLE(3D_CANVAS)
 
 #include "JSArrayBufferViewHelper.h"
-#include "JSFloatArray.h"
+#include "JSFloat32Array.h"
 
-#include "FloatArray.h"
+#include "Float32Array.h"
 
 using namespace JSC;
 
 namespace WebCore {
 
-void JSFloatArray::indexSetter(JSC::ExecState* exec,
-                               unsigned index,
-                               JSC::JSValue value) {
+void JSFloat32Array::indexSetter(JSC::ExecState* exec,
+                                 unsigned index,
+                                 JSC::JSValue value) {
   impl()->set(index, static_cast<float>(value.toNumber(exec)));
 }
 
 JSC::JSValue toJS(JSC::ExecState* exec,
                   JSDOMGlobalObject* globalObject,
-                  FloatArray* object) {
-  return getDOMObjectWrapper<JSFloatArray>(exec, globalObject, object);
+                  Float32Array* object) {
+  return getDOMObjectWrapper<JSFloat32Array>(exec, globalObject, object);
 }
 
-JSC::JSValue JSFloatArray::set(JSC::ExecState* exec) {
-  return setWebGLArrayHelper(exec, impl(), toFloatArray);
+JSC::JSValue JSFloat32Array::set(JSC::ExecState* exec) {
+  return setWebGLArrayHelper(exec, impl(), toFloat32Array);
 }
 
 }  // namespace WebCore

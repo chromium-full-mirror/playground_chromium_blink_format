@@ -64,7 +64,7 @@ class WebGLActiveInfo;
 class ArrayBufferView;
 class WebGLBuffer;
 class Uint8Array;
-class FloatArray;
+class Float32Array;
 class WebGLFramebuffer;
 class Int32Array;
 class WebGLProgram;

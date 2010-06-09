@@ -35,7 +35,7 @@
 #include "JSUint16Array.h"
 #include "JSInt32Array.h"
 #include "JSUint32Array.h"
-#include "JSFloatArray.h"
+#include "JSFloat32Array.h"
 
 #include "ArrayBufferView.h"
 
@@ -51,8 +51,8 @@ JSC::JSValue toJS(JSC::ExecState* exec,
 
   if (object) {
     if (object->isFloatArray())
-      return getDOMObjectWrapper<JSFloatArray>(
-          exec, globalObject, static_cast<FloatArray*>(object));
+      return getDOMObjectWrapper<JSFloat32Array>(
+          exec, globalObject, static_cast<Float32Array*>(object));
     if (object->isUnsignedByteArray())
       return getDOMObjectWrapper<JSUint8Array>(
           exec, globalObject, static_cast<Uint8Array*>(object));
