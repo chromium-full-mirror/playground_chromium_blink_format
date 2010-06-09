@@ -50,8 +50,6 @@ class InspectorClientHaiku : public InspectorClient {
                                WebCore::String* value);
   virtual void storeSetting(const WebCore::String& key,
                             const WebCore::String& value);
-
-  virtual bool sendMessageToFrontend(const WebCore::String&);
 };
 }  // namespace WebCore
 

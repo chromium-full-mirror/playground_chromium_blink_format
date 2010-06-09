@@ -66,14 +66,12 @@ static CFBundleRef getWebKitBundle() {
 }
 
 WebInspectorClient::WebInspectorClient(WebView* webView)
-    : m_inspectedWebView(webView), m_frontendPage(0) {
+    : m_inspectedWebView(webView) {
   ASSERT(m_inspectedWebView);
   m_inspectedWebView->viewWindow((OLE_HANDLE*)&m_inspectedWebViewHwnd);
 }
 
-WebInspectorClient::~WebInspectorClient() {
-  m_frontendPage = 0;
-}
+WebInspectorClient::~WebInspectorClient() {}
 
 void WebInspectorClient::inspectorDestroyed() {
   delete this;
@@ -179,12 +177,11 @@ void WebInspectorClient::openInspectorFrontend(
   if (FAILED(frontendWebView->topLevelFrame()->loadRequest(request.get())))
     return;
 
-  m_frontendPage = core(frontendWebView.get());
-  WebInspectorFrontendClient* frontendClient = new WebInspectorFrontendClient(
-      m_inspectedWebView, m_inspectedWebViewHwnd, frontendHwnd, frontendWebView,
-      frontendWebViewHwnd, this);
-  m_frontendPage->inspectorController()->setInspectorFrontendClient(
-      frontendClient);
+  Page* page = core(frontendWebView.get());
+  page->inspectorController()->setInspectorFrontendClient(
+      new WebInspectorFrontendClient(m_inspectedWebView, m_inspectedWebViewHwnd,
+                                     frontendHwnd, frontendWebView,
+                                     frontendWebViewHwnd, this));
   m_frontendHwnd = frontendHwnd;
 }
 

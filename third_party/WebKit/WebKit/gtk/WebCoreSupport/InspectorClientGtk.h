@@ -58,13 +58,8 @@ class InspectorClient : public WebCore::InspectorClient {
   virtual void storeSetting(const WebCore::String& key,
                             const WebCore::String& value);
 
-  virtual bool sendMessageToFrontend(const WebCore::String&);
-
-  void releaseFrontendPage();
-
  private:
   WebKitWebView* m_inspectedWebView;
-  WebCore::Page* m_frontendPage;
 };
 
 class InspectorFrontendClient : public WebCore::InspectorFrontendClientLocal {
@@ -72,8 +67,7 @@ class InspectorFrontendClient : public WebCore::InspectorFrontendClientLocal {
   InspectorFrontendClient(WebKitWebView* inspectedWebView,
                           WebKitWebView* inspectorWebView,
                           WebKitWebInspector* webInspector,
-                          WebCore::Page* inspectorPage,
-                          InspectorClient* inspectorClient);
+                          WebCore::Page* inspectorPage);
 
   void destroyInspectorWindow();
 
@@ -97,7 +91,6 @@ class InspectorFrontendClient : public WebCore::InspectorFrontendClientLocal {
   WebKitWebView* m_inspectorWebView;
   WebKitWebView* m_inspectedWebView;
   WebKitWebInspector* m_webInspector;
-  InspectorClient* m_inspectorClient;
 };
 }
 
