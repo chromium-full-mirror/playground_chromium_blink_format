@@ -1735,13 +1735,13 @@ void WebGLRenderingContext::polygonOffset(double factor, double units) {
   cleanupAfterGraphicsCall(false);
 }
 
-PassRefPtr<ArrayBufferView> WebGLRenderingContext::readPixels(
-    long x,
-    long y,
-    unsigned long width,
-    unsigned long height,
-    unsigned long format,
-    unsigned long type) {
+void WebGLRenderingContext::readPixels(long x,
+                                       long y,
+                                       unsigned long width,
+                                       unsigned long height,
+                                       unsigned long format,
+                                       unsigned long type,
+                                       ArrayBufferView* pixels) {
   // Validate enums.
   unsigned long componentsPerPixel = 0;
   switch (format) {
@@ -1756,7 +1756,7 @@ PassRefPtr<ArrayBufferView> WebGLRenderingContext::readPixels(
       break;
     default:
       m_context->synthesizeGLError(GraphicsContext3D::INVALID_ENUM);
-      return 0;
+      return;
   }
   unsigned long bytesPerComponent = 0;
   switch (type) {
@@ -1771,14 +1771,26 @@ PassRefPtr<ArrayBufferView> WebGLRenderingContext::readPixels(
       break;
     default:
       m_context->synthesizeGLError(GraphicsContext3D::INVALID_ENUM);
-      return 0;
+      return;
+  }
+  if (!pixels) {
+    m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
+    return;
   }
   if (!((format == GraphicsContext3D::RGBA &&
          type == GraphicsContext3D::UNSIGNED_BYTE) ||
         (format == m_implementationColorReadFormat &&
          type == m_implementationColorReadType))) {
     m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
-    return 0;
+    return;
+  }
+  // Validate array type against pixel type.
+  if (type == GraphicsContext3D::UNSIGNED_BYTE &&
+          !pixels->isUnsignedByteArray() ||
+      type != GraphicsContext3D::UNSIGNED_BYTE &&
+          !pixels->isUnsignedShortArray()) {
+    m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
+    return;
   }
   // Calculate array size, taking into consideration of PACK_ALIGNMENT.
   unsigned long bytesPerRow = componentsPerPixel * bytesPerComponent * width;
@@ -1791,12 +1803,11 @@ PassRefPtr<ArrayBufferView> WebGLRenderingContext::readPixels(
   // The last row needs no padding.
   unsigned long totalBytes = bytesPerRow * height - padding;
   unsigned long num = totalBytes / bytesPerComponent;
-  RefPtr<ArrayBufferView> array;
-  if (type == GraphicsContext3D::UNSIGNED_BYTE)
-    array = Uint8Array::create(num);
-  else
-    array = Uint16Array::create(num);
-  void* data = array->baseAddress();
+  if (pixels->length() < num) {
+    m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
+    return;
+  }
+  void* data = pixels->baseAddress();
   m_context->readPixels(x, y, width, height, format, type, data);
 #if PLATFORM(CG)
   // FIXME: remove this section when GL driver bug on Mac is fixed, i.e.,
@@ -1818,7 +1829,6 @@ PassRefPtr<ArrayBufferView> WebGLRenderingContext::readPixels(
   }
 #endif
   cleanupAfterGraphicsCall(false);
-  return array;
 }
 
 void WebGLRenderingContext::releaseShaderCompiler() {
