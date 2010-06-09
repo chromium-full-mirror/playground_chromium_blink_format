@@ -63,4 +63,9 @@ void InspectorClientWx::populateSetting(const String& key, String* setting) {
 void InspectorClientWx::storeSetting(const String& key, const String& setting) {
   notImplemented();
 }
+
+bool InspectorClientWx::sendMessageToFrontend(const String&) {
+  notImplemented();
+  return false;
+}
 };

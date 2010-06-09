@@ -42,6 +42,11 @@ class WebNodeHighlighter;
 class WebView;
 #endif
 
+namespace WebCore {
+
+class Page;
+}
+
 class WebInspectorClient : public WebCore::InspectorClient {
  public:
   WebInspectorClient(WebView*);
@@ -58,9 +63,14 @@ class WebInspectorClient : public WebCore::InspectorClient {
   virtual void storeSetting(const WebCore::String& key,
                             const WebCore::String& value);
 
+  virtual bool sendMessageToFrontend(const WebCore::String&);
+
+  void releaseFrontendPage();
+
  private:
   WebView* m_webView;
   RetainPtr<WebNodeHighlighter> m_highlighter;
+  WebCore::Page* m_frontendPage;
 };
 
 class WebInspectorFrontendClient

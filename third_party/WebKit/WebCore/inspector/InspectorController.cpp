@@ -433,10 +433,9 @@ void InspectorController::setSearchingForNode(bool enabled) {
   }
 }
 
-void InspectorController::setFrontend(PassOwnPtr<InspectorFrontend> frontend) {
-  ASSERT(frontend);
+void InspectorController::connectFrontend(const ScriptObject& webInspector) {
   m_openingFrontend = false;
-  m_frontend = frontend;
+  m_frontend = new InspectorFrontend(webInspector, m_client);
   releaseDOMAgent();
   m_domAgent = InspectorDOMAgent::create(m_cssStore.get(), m_frontend.get());
   if (m_timelineAgent)
