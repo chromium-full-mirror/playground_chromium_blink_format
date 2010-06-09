@@ -28,8 +28,8 @@
 #include "config.h"
 #include "ClipboardQt.h"
 
-#include "CachedImage.h"
 #include "CSSHelper.h"
+#include "CachedImage.h"
 #include "Document.h"
 #include "Element.h"
 #include "FileList.h"
@@ -38,19 +38,19 @@
 #include "Image.h"
 #include "IntPoint.h"
 #include "KURL.h"
-#include "markup.h"
 #include "NotImplemented.h"
 #include "PlatformString.h"
 #include "Range.h"
 #include "RenderImage.h"
 #include "StringHash.h"
+#include "markup.h"
 
+#include <QApplication>
+#include <QClipboard>
 #include <QList>
 #include <QMimeData>
 #include <QStringList>
 #include <QUrl>
-#include <QApplication>
-#include <QClipboard>
 #include <qdebug.h>
 
 #define methodDebug() qDebug("ClipboardQt: %s", __FUNCTION__)
