@@ -65,6 +65,8 @@ class WebInspectorClient : public WebCore::InspectorClient {
   virtual void storeSetting(const WebCore::String& key,
                             const WebCore::String& value);
 
+  virtual bool sendMessageToFrontend(const String&);
+
   virtual void inspectorWindowObjectCleared();
 
   WebPage* m_page;
