@@ -27,26 +27,24 @@ EditCommandQt::EditCommandQt(WTF::RefPtr<EditCommand> cmd, QUndoCommand* parent)
 #ifndef QT_NO_UNDOCOMMAND
       QUndoCommand(parent),
 #endif
-      _cmd(cmd),
-      _first(true) {
+      m_cmd(cmd),
+      m_first(true) {
 }
 
 EditCommandQt::~EditCommandQt() {}
 
 void EditCommandQt::redo() {
-  if (_first) {
-    _first = false;
+  if (m_first) {
+    m_first = false;
     return;
   }
-  if (_cmd) {
-    _cmd->reapply();
-  }
+  if (m_cmd)
+    m_cmd->reapply();
 }
 
 void EditCommandQt::undo() {
-  if (_cmd) {
-    _cmd->unapply();
-  }
+  if (m_cmd)
+    m_cmd->unapply();
 }
 
 // vim: ts=4 sw=4 et
