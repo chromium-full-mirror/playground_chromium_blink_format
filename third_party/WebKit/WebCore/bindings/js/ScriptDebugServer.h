@@ -97,6 +97,8 @@ class ScriptDebugServer : JSC::Debugger, public Noncopyable {
 
   void pageCreated(Page*);
 
+  bool isDebuggerAlwaysEnabled();
+
  private:
   typedef HashSet<ScriptDebugListener*> ListenerSet;
   typedef void (ScriptDebugServer::*JavaScriptExecutionCallback)(

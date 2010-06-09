@@ -100,6 +100,8 @@ class ScriptDebugServer : public Noncopyable {
 
   PassRefPtr<JavaScriptCallFrame> currentCallFrame();
 
+  bool isDebuggerAlwaysEnabled();
+
  private:
   ScriptDebugServer();
   ~ScriptDebugServer() {}

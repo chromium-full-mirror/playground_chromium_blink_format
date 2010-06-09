@@ -60,7 +60,6 @@ class DebuggerAgentImpl : public DebuggerAgent {
   // DebuggerAgent implementation.
   virtual void getContextId();
   virtual void processDebugCommands();
-  virtual void setDebuggerScriptSource(const String&);
 
   void debuggerOutput(const WebCore::String& out);
 
