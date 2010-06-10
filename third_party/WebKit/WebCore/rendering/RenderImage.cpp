@@ -37,6 +37,7 @@
 #include "HTMLNames.h"
 #include "HitTestResult.h"
 #include "Page.h"
+#include "RenderLayer.h"
 #include "RenderTheme.h"
 #include "RenderView.h"
 #include "SelectionController.h"

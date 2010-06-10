@@ -30,7 +30,6 @@
 #define Frame_h
 
 #include "AnimationController.h"
-#include "CSSMutableStyleDeclaration.h"
 #include "DragImage.h"
 #include "Editor.h"
 #include "EventHandler.h"

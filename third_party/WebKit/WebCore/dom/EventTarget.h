@@ -169,6 +169,8 @@ class EventTarget {
   void fireEventListeners(Event*, EventTargetData*, EventListenerVector&);
 };
 
+// FIXME: These macros should be split into separate DEFINE and DECLARE
+// macros to avoid causing so many header includes.
 #define DEFINE_ATTRIBUTE_EVENT_LISTENER(attribute)                      \
   EventListener* on##attribute() {                                      \
     return getAttributeEventListener(eventNames().attribute##Event);    \

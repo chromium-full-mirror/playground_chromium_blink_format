@@ -72,6 +72,8 @@ class RenderSVGResourceContainer;
  *  three phases invoked on them during this phase.
  */
 
+// FIXME: These enums should move to their own header since they're used by
+// other headers.
 enum PaintPhase {
   PaintPhaseBlockBackground,
   PaintPhaseChildBlockBackground,

@@ -37,6 +37,7 @@
 #include "RenderFlexibleBox.h"
 #include "RenderImage.h"
 #include "RenderInline.h"
+#include "RenderLayer.h"
 #include "RenderMarquee.h"
 #include "RenderReplica.h"
 #include "RenderTableCell.h"

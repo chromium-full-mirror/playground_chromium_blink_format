@@ -250,4 +250,8 @@ void HTML5Tokenizer::executeScriptsWaitingForStylesheets() {
   if (shouldContinueParsing)
     resumeParsingAfterScriptExecution();
 }
+
+ScriptController* HTML5Tokenizer::script() const {
+  return m_document->frame() ? m_document->frame()->script() : 0;
+}
 }
