@@ -325,7 +325,7 @@ void GraphicsContext::drawRect(const IntRect& rect) {
 
   if (m_common->state.shadowColor.isValid()) {
     IntSize shadowSize;
-    int shadowBlur;
+    float shadowBlur;
     Color shadowColor;
     if (getShadow(shadowSize, shadowBlur, shadowColor)) {
       IntRect shadowRect = rect;
@@ -363,7 +363,7 @@ void GraphicsContext::drawLine(const IntPoint& point1, const IntPoint& point2) {
   adjustLineToPixelBoundaries(p1, p2, width, style);
 
   IntSize shadowSize;
-  int shadowBlur;
+  float shadowBlur;
   Color shadowColor;
   if (textDrawingMode() == cTextFill &&
       getShadow(shadowSize, shadowBlur, shadowColor)) {
@@ -474,7 +474,7 @@ void GraphicsContext::strokeArc(const IntRect& rect,
   p->setRenderHint(QPainter::Antialiasing, true);
 
   IntSize shadowSize;
-  int shadowBlur;
+  float shadowBlur;
   Color shadowColor;
   startAngle *= 16;
   angleSpan *= 16;
@@ -510,7 +510,7 @@ void GraphicsContext::drawConvexPolygon(size_t npoints,
   p->save();
   p->setRenderHint(QPainter::Antialiasing, shouldAntialias);
   IntSize shadowSize;
-  int shadowBlur;
+  float shadowBlur;
   Color shadowColor;
   if (getShadow(shadowSize, shadowBlur, shadowColor)) {
     p->save();
@@ -541,7 +541,7 @@ static void inline drawFilledShadowPath(GraphicsContext* context,
                                         QPainter* p,
                                         const QPainterPath& path) {
   IntSize shadowSize;
-  int shadowBlur;
+  float shadowBlur;
   Color shadowColor;
   if (context->getShadow(shadowSize, shadowBlur, shadowColor)) {
     p->translate(shadowSize.width(), shadowSize.height());
@@ -591,7 +591,7 @@ void GraphicsContext::strokePath() {
   if (m_common->state.strokePattern || m_common->state.strokeGradient ||
       strokeColor().alpha()) {
     IntSize shadowSize;
-    int shadowBlur;
+    float shadowBlur;
     Color shadowColor;
     if (getShadow(shadowSize, shadowBlur, shadowColor)) {
       QTransform t(p->worldTransform());
@@ -626,7 +626,7 @@ static inline void drawBorderlessRectShadow(GraphicsContext* context,
                                             QPainter* p,
                                             const FloatRect& rect) {
   IntSize shadowSize;
-  int shadowBlur;
+  float shadowBlur;
   Color shadowColor;
   if (context->getShadow(shadowSize, shadowBlur, shadowColor)) {
     FloatRect shadowRect(rect);
@@ -844,7 +844,7 @@ FloatRect GraphicsContext::roundToDevicePixels(const FloatRect& frect) {
 }
 
 void GraphicsContext::setPlatformShadow(const IntSize& size,
-                                        int,
+                                        float,
                                         const Color&,
                                         ColorSpace) {
   // Qt doesn't support shadows natively, they are drawn manually in the draw*

@@ -318,8 +318,8 @@ class GraphicsContext : public Noncopyable {
   void beginTransparencyLayer(float opacity);
   void endTransparencyLayer();
 
-  void setShadow(const IntSize&, int blur, const Color&, ColorSpace);
-  bool getShadow(IntSize&, int&, Color&) const;
+  void setShadow(const IntSize&, float blur, const Color&, ColorSpace);
+  bool getShadow(IntSize&, float&, Color&) const;
   void clearShadow();
 
   void drawFocusRing(const Vector<IntRect>&,
@@ -345,7 +345,7 @@ class GraphicsContext : public Noncopyable {
                                               float& kernelSize,
                                               const FloatRect& sourceRect,
                                               const IntSize& shadowSize,
-                                              int shadowBlur);
+                                              float shadowBlur);
 #endif
 
   void setCompositeOperation(CompositeOperator);
@@ -522,7 +522,7 @@ class GraphicsContext : public Noncopyable {
 
   void setPlatformShouldAntialias(bool b);
 
-  void setPlatformShadow(const IntSize&, int blur, const Color&, ColorSpace);
+  void setPlatformShadow(const IntSize&, float blur, const Color&, ColorSpace);
   void clearPlatformShadow();
 
   static void adjustLineToPixelBoundaries(FloatPoint& p1,

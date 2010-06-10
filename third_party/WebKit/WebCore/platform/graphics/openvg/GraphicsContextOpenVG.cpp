@@ -287,7 +287,7 @@ FloatRect GraphicsContext::roundToDevicePixels(const FloatRect& rect) {
 }
 
 void GraphicsContext::setPlatformShadow(const IntSize& size,
-                                        int blur,
+                                        float blur,
                                         const Color& color,
                                         ColorSpace colorSpace) {
   if (paintingDisabled())

@@ -1258,7 +1258,7 @@ void GraphicsContext::fillRoundedRect(const IntRect& fillRect,
     return;
 
   IntSize shadowSize;
-  int shadowBlur = 0;
+  float shadowBlur = 0;
   Color shadowColor;
 
   getShadow(shadowSize, shadowBlur, shadowColor);
@@ -1570,7 +1570,7 @@ void GraphicsContext::fillRect(const FloatRect& rect) {
 }
 
 void GraphicsContext::setPlatformShadow(const IntSize&,
-                                        int,
+                                        float,
                                         const Color&,
                                         ColorSpace) {
   notImplemented();
@@ -1702,7 +1702,7 @@ void GraphicsContext::drawText(const SimpleFontData* fontData,
   }
 
   IntSize shadowSize;
-  int shadowBlur = 0;
+  float shadowBlur = 0;
   Color shadowColor;
   bool hasShadow = textDrawingMode() == cTextFill &&
                    getShadow(shadowSize, shadowBlur, shadowColor) &&

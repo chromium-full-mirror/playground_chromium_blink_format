@@ -153,7 +153,7 @@ void GraphicsContext::calculateShadowBufferDimensions(
     float& kernelSize,
     const FloatRect& sourceRect,
     const IntSize& shadowSize,
-    int shadowBlur) {
+    float shadowBlur) {
 #if ENABLE(FILTERS)
   // calculate the kernel size according to the HTML5 canvas shadow
   // specification
@@ -176,7 +176,7 @@ static inline void drawPathShadow(GraphicsContext* context,
                                   bool strokeShadow) {
 #if ENABLE(FILTERS)
   IntSize shadowSize;
-  int shadowBlur;
+  float shadowBlur;
   Color shadowColor;
   if (!context->getShadow(shadowSize, shadowBlur, shadowColor))
     return;
@@ -582,7 +582,7 @@ static void drawBorderlessRectShadow(GraphicsContext* context,
                                      const Color& rectColor) {
 #if ENABLE(FILTERS)
   IntSize shadowSize;
-  int shadowBlur;
+  float shadowBlur;
   Color shadowColor;
 
   if (!context->getShadow(shadowSize, shadowBlur, shadowColor))
@@ -868,7 +868,7 @@ void GraphicsContext::clipToImageBuffer(const FloatRect& rect,
 }
 
 void GraphicsContext::setPlatformShadow(IntSize const& size,
-                                        int,
+                                        float,
                                         Color const&,
                                         ColorSpace) {
   // Cairo doesn't support shadows natively, they are drawn manually in the

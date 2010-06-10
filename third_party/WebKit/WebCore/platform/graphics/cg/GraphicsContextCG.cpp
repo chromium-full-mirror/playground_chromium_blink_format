@@ -793,7 +793,7 @@ void GraphicsContext::endTransparencyLayer() {
 }
 
 void GraphicsContext::setPlatformShadow(const IntSize& offset,
-                                        int blur,
+                                        float blur,
                                         const Color& color,
                                         ColorSpace colorSpace) {
   if (paintingDisabled())

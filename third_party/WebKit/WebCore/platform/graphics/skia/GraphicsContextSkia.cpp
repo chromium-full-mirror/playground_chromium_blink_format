@@ -936,21 +936,21 @@ void GraphicsContext::setPlatformFillPattern(Pattern* pattern) {
 }
 
 void GraphicsContext::setPlatformShadow(const IntSize& size,
-                                        int blurInt,
+                                        float blurFloat,
                                         const Color& color,
                                         ColorSpace colorSpace) {
   if (paintingDisabled())
     return;
 
   // Detect when there's no effective shadow and clear the looper.
-  if (!size.width() && !size.height() && !blurInt) {
+  if (!size.width() && !size.height() && !blurFloat) {
     platformContext()->setDrawLooper(0);
     return;
   }
 
   double width = size.width();
   double height = size.height();
-  double blur = blurInt;
+  double blur = blurFloat;
 
   // TODO(tc): This still does not address the issue that shadows
   // within canvas elements should ignore transforms.
