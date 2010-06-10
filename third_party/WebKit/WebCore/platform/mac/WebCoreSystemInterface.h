@@ -140,8 +140,6 @@ extern BOOL (*wkGetNSURLResponseMustRevalidate)(NSURLResponse* response);
 extern void (*wkGetWheelEventDeltas)(NSEvent*,
                                      float* deltaX,
                                      float* deltaY,
-                                     float* wheelTicksX,
-                                     float* wheelTicksY,
                                      BOOL* continuous);
 extern BOOL (*wkHitTestMediaUIPart)(int part,
                                     int themeStyle,
