@@ -223,6 +223,10 @@ class WebViewClient : virtual public WebWidgetClient {
     return true;
   }
 
+  virtual bool supportsFullscreen() { return false; }
+  virtual void enterFullscreenForNode(const WebNode&) {}
+  virtual void exitFullscreenForNode(const WebNode&) {}
+
   // UI ------------------------------------------------------------------
 
   // Called when script modifies window.status
