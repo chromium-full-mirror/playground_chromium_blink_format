@@ -72,6 +72,7 @@ class HTML5ScriptRunner : public Noncopyable {
 
   Frame* frame() const;
 
+  bool haveParsingBlockingScript() const;
   bool executeParsingBlockingScripts();
   void executePendingScript();
 
