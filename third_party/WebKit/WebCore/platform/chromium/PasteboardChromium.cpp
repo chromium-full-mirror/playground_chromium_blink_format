@@ -124,6 +124,10 @@ void Pasteboard::writeImage(Node* node, const KURL&, const String& title) {
   Image* image = cachedImage->image();
   ASSERT(image);
 
+  NativeImagePtr bitmap = image->nativeImageForCurrentFrame();
+  if (!bitmap)
+    return;
+
   // If the image is wrapped in a link, |url| points to the target of the
   // link.  This isn't useful to us, so get the actual image URL.
   AtomicString urlString;
@@ -143,7 +147,6 @@ void Pasteboard::writeImage(Node* node, const KURL&, const String& title) {
                  ? KURL()
                  : node->document()->completeURL(deprecatedParseURL(urlString));
 
-  NativeImagePtr bitmap = image->nativeImageForCurrentFrame();
   ChromiumBridge::clipboardWriteImage(bitmap, url, title);
 }
 

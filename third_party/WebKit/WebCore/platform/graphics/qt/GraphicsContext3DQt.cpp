@@ -1783,6 +1783,12 @@ bool GraphicsContext3D::getImageData(Image* image,
                                      bool* hasAlphaChannel,
                                      AlphaOp* neededAlphaOp,
                                      unsigned int* format) {
+  if (!image)
+    return false;
+  QPixmap* nativePixmap = image->nativeImageForCurrentFrame();
+  if (!nativePixmap)
+    return false;
+
   *hasAlphaChannel = true;
   *format = GraphicsContext3D::RGBA;
 
@@ -1790,7 +1796,6 @@ bool GraphicsContext3D::getImageData(Image* image,
   if (!premultiplyAlpha && *hasAlphaChannel)
     *neededAlphaOp = kAlphaDoUnmultiply;
 
-  QPixmap* nativePixmap = image->nativeImageForCurrentFrame();
   QImage nativeImage =
       nativePixmap->toImage().convertToFormat(QImage::Format_ARGB32);
   outputVector.append(nativeImage.rgbSwapped().bits(), nativeImage.byteCount());
