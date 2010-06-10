@@ -1470,8 +1470,7 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
                 String context(m_rawAttributeBeforeValue.data(),
                                m_rawAttributeBeforeValue.size());
                 if (m_XSSAuditor &&
-                    !m_XSSAuditor->canLoadExternalScriptFromSrc(context,
-                                                                attributeValue))
+                    !m_XSSAuditor->canLoadExternalScriptFromSrc(attributeValue))
                   attributeValue = blankURL().string();
               }
 
@@ -1513,8 +1512,7 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
                 String context(m_rawAttributeBeforeValue.data(),
                                m_rawAttributeBeforeValue.size());
                 if (m_XSSAuditor &&
-                    !m_XSSAuditor->canLoadExternalScriptFromSrc(context,
-                                                                attributeValue))
+                    !m_XSSAuditor->canLoadExternalScriptFromSrc(attributeValue))
                   attributeValue = blankURL().string();
               }
 

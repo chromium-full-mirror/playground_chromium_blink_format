@@ -187,8 +187,7 @@ bool XSSAuditor::canCreateInlineEventListener(const String&,
   return true;
 }
 
-bool XSSAuditor::canLoadExternalScriptFromSrc(const String& context,
-                                              const String& url) const {
+bool XSSAuditor::canLoadExternalScriptFromSrc(const String& url) const {
   if (!isEnabled())
     return true;
 
@@ -196,8 +195,8 @@ bool XSSAuditor::canLoadExternalScriptFromSrc(const String& context,
     return true;
 
   FindTask task;
-  task.context = context;
   task.string = url;
+  task.allowRequestIfNoIllegalURICharacters = true;
 
   if (findInRequest(task)) {
     DEFINE_STATIC_LOCAL(String, consoleMessage,
