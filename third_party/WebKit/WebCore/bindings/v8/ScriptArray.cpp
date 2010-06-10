@@ -39,8 +39,6 @@
 #include "V8Binding.h"
 #include "V8Proxy.h"
 
-#include <v8.h>
-
 namespace WebCore {
 
 ScriptArray::ScriptArray(ScriptState* scriptState,

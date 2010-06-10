@@ -81,7 +81,7 @@ v8::Handle<v8::Value> V8Storage::namedPropertyGetter(
   return storageGetter(name, info);
 }
 
-v8::Handle<v8::Boolean> V8Storage::namedPropertyQuery(
+v8::Handle<v8::Integer> V8Storage::namedPropertyQuery(
     v8::Local<v8::String> v8Name,
     const v8::AccessorInfo& info) {
   INC_STATS("DOM.Storage.NamedPropertyQuery");
@@ -90,9 +90,9 @@ v8::Handle<v8::Boolean> V8Storage::namedPropertyQuery(
   String name = toWebCoreString(v8Name);
 
   if (storage->contains(name) && name != "length")
-    return v8::True();
+    return v8::Integer::New(v8::None);
 
-  return v8::Handle<v8::Boolean>();
+  return v8::Handle<v8::Integer>();
 }
 
 static v8::Handle<v8::Value> storageSetter(v8::Local<v8::String> v8Name,

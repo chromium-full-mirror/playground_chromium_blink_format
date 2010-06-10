@@ -250,12 +250,12 @@ v8::Handle<v8::Value> npObjectGetIndexedProperty(v8::Local<v8::Object> self,
   return npObjectGetProperty(self, identifier, v8::Number::New(index));
 }
 
-v8::Handle<v8::Boolean> npObjectQueryProperty(v8::Local<v8::String> name,
+v8::Handle<v8::Integer> npObjectQueryProperty(v8::Local<v8::String> name,
                                               const v8::AccessorInfo& info) {
   NPIdentifier identifier = getStringIdentifier(name);
   return npObjectGetProperty(info.Holder(), identifier, name).IsEmpty()
-             ? v8::Handle<v8::Boolean>()
-             : v8::True();
+             ? v8::Handle<v8::Integer>()
+             : v8::Integer::New(v8::None);
 }
 
 static v8::Handle<v8::Value> npObjectSetProperty(v8::Local<v8::Object> self,
