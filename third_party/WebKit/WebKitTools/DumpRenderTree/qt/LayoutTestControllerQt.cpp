@@ -504,6 +504,8 @@ void LayoutTestController::overridePreference(const QString& name,
     setCaretBrowsingEnabled(value.toBool());
   else if (name == "WebKitPluginsEnabled")
     settings->setAttribute(QWebSettings::PluginsEnabled, value.toBool());
+  else if (name == "WebKitWebGLEnabled")
+    settings->setAttribute(QWebSettings::WebGLEnabled, value.toBool());
   else
     printf(
         "ERROR: LayoutTestController::overridePreference() does not support "
