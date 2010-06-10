@@ -208,6 +208,11 @@ void InspectorBackend::editScriptSource(long callId,
     m_inspectorController->editScriptSource(callId, sourceID, newContent);
 }
 
+void InspectorBackend::getScriptSource(long callId, const String& sourceID) {
+  if (m_inspectorController)
+    m_inspectorController->getScriptSource(callId, sourceID);
+}
+
 void InspectorBackend::enableProfiler(bool always) {
   if (m_inspectorController)
     m_inspectorController->enableProfiler(always);
