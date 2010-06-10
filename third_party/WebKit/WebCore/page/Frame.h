@@ -30,6 +30,7 @@
 #define Frame_h
 
 #include "AnimationController.h"
+#include "CSSMutableStyleDeclaration.h"
 #include "DragImage.h"
 #include "Editor.h"
 #include "EventHandler.h"
@@ -65,7 +66,6 @@ typedef struct HBITMAP__* HBITMAP;
 
 namespace WebCore {
 
-class CSSMutableStyleDeclaration;
 class HTMLTableCellElement;
 class RegularExpression;
 class RenderPart;
