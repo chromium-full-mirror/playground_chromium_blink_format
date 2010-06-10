@@ -84,13 +84,13 @@ WebSize WebImage::size() const {
 WebImage::WebImage(const PassRefPtr<Image>& image) : m_imageRef(0) {
   NativeImagePtr p;
   if (image.get() && (p = image->nativeImageForCurrentFrame()))
-    assign(*p);
+    assign(p);
 }
 
 WebImage& WebImage::operator=(const PassRefPtr<Image>& image) {
   NativeImagePtr p;
   if (image.get() && (p = image->nativeImageForCurrentFrame()))
-    assign(*p);
+    assign(p);
   else
     reset();
   return *this;
