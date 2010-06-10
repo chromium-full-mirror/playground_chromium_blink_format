@@ -27,19 +27,18 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef FrameLoaderClientQt_H
-#define FrameLoaderClientQt_H
+#ifndef FrameLoaderClientQt_h
+#define FrameLoaderClientQt_h
 
-#include <qobject.h>
-#include <QUrl>
-
-#include "FrameLoaderClient.h"
-#include "KURL.h"
 #include "Frame.h"
 #include "FrameLoader.h"
+#include "FrameLoaderClient.h"
+#include "KURL.h"
+#include "PluginView.h"
 #include "RefCounted.h"
 #include "ResourceResponse.h"
-#include "PluginView.h"
+#include <QUrl>
+#include <qobject.h>
 class QWebFrame;
 
 namespace WebCore {
