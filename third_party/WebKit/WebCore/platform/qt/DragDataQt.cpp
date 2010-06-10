@@ -84,7 +84,7 @@ String DragData::asPlainText() const {
     return text;
 
   // FIXME: Should handle rich text here
-  return asURL(0);
+  return asURL(DoNotConvertFilenames, 0);
 }
 
 Color DragData::asColor() const {
@@ -105,13 +105,15 @@ bool DragData::containsCompatibleContent() const {
          m_platformDragData->hasText();
 }
 
-bool DragData::containsURL() const {
+bool DragData::containsURL(FilenameConversionPolicy filenamePolicy) const {
+  // FIXME: Use filenamePolicy.
   if (!m_platformDragData)
     return false;
   return m_platformDragData->hasUrls();
 }
 
-String DragData::asURL(String*) const {
+String DragData::asURL(FilenameConversionPolicy filenamePolicy, String*) const {
+  // FIXME: Use filenamePolicy.
   if (!m_platformDragData)
     return String();
   QList<QUrl> urls = m_platformDragData->urls();

@@ -32,11 +32,12 @@ PassRefPtr<Clipboard> DragData::createClipboard(
   return 0;
 }
 
-bool DragData::containsURL() const {
+bool DragData::containsURL(FilenameConversionPolicy filenamePolicy) const {
   return false;
 }
 
-String DragData::asURL(String* title) const {
+String DragData::asURL(FilenameConversionPolicy filenamePolicy,
+                       String* title) const {
   return String();
 }
 

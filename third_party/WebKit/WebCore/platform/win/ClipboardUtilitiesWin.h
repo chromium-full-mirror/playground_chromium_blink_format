@@ -65,7 +65,10 @@ PassRefPtr<DocumentFragment> fragmentFromHTML(Document*, IDataObject*);
 PassRefPtr<DocumentFragment> fragmentFromCF_HTML(Document*,
                                                  const String& cf_html);
 
-String getURL(IDataObject*, bool& success, String* title = 0);
+String getURL(IDataObject*,
+              DragData::FilenameConversionPolicy,
+              bool& success,
+              String* title = 0);
 String getPlainText(IDataObject*, bool& success);
 
 }  // namespace WebCore
