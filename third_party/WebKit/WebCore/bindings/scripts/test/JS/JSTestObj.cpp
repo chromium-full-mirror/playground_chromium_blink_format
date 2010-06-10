@@ -812,7 +812,7 @@ jsTestObjPrototypeFunctionWithDynamicFrameAndArg(ExecState* exec) {
   Frame* dynamicFrame = toDynamicFrame(exec);
   if (!dynamicFrame)
     return JSValue::encode(jsUndefined());
-  int intArg = exec->argument(1).toInt32(exec);
+  int intArg = exec->argument(0).toInt32(exec);
 
   imp->withDynamicFrameAndArg(dynamicFrame, intArg);
   return JSValue::encode(jsUndefined());
@@ -828,15 +828,15 @@ jsTestObjPrototypeFunctionWithDynamicFrameAndOptionalArg(ExecState* exec) {
   Frame* dynamicFrame = toDynamicFrame(exec);
   if (!dynamicFrame)
     return JSValue::encode(jsUndefined());
-  int intArg = exec->argument(1).toInt32(exec);
+  int intArg = exec->argument(0).toInt32(exec);
 
   int argsCount = exec->argumentCount();
-  if (argsCount < 3) {
+  if (argsCount < 2) {
     imp->withDynamicFrameAndOptionalArg(dynamicFrame, intArg);
     return JSValue::encode(jsUndefined());
   }
 
-  int optionalArg = exec->argument(2).toInt32(exec);
+  int optionalArg = exec->argument(1).toInt32(exec);
 
   imp->withDynamicFrameAndOptionalArg(dynamicFrame, intArg, optionalArg);
   return JSValue::encode(jsUndefined());
@@ -852,7 +852,7 @@ jsTestObjPrototypeFunctionWithDynamicFrameAndUserGesture(ExecState* exec) {
   Frame* dynamicFrame = toDynamicFrame(exec);
   if (!dynamicFrame)
     return JSValue::encode(jsUndefined());
-  int intArg = exec->argument(1).toInt32(exec);
+  int intArg = exec->argument(0).toInt32(exec);
 
   imp->withDynamicFrameAndUserGesture(dynamicFrame, intArg,
                                       processingUserGesture(exec));
@@ -869,15 +869,15 @@ jsTestObjPrototypeFunctionWithDynamicFrameAndUserGestureASAD(ExecState* exec) {
   Frame* dynamicFrame = toDynamicFrame(exec);
   if (!dynamicFrame)
     return JSValue::encode(jsUndefined());
-  int intArg = exec->argument(1).toInt32(exec);
+  int intArg = exec->argument(0).toInt32(exec);
 
   int argsCount = exec->argumentCount();
-  if (argsCount < 3) {
+  if (argsCount < 2) {
     imp->withDynamicFrameAndUserGestureASAD(dynamicFrame, intArg);
     return JSValue::encode(jsUndefined());
   }
 
-  int optionalArg = exec->argument(2).toInt32(exec);
+  int optionalArg = exec->argument(1).toInt32(exec);
 
   imp->withDynamicFrameAndUserGestureASAD(dynamicFrame, intArg, optionalArg,
                                           processingUserGesture(exec));

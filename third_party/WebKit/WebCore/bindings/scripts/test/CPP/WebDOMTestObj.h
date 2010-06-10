@@ -102,6 +102,7 @@ class WebDOMTestObj : public WebDOMObject {
   WebDOMTestObj withScriptStateObj();
   void withScriptStateVoidException();
   WebDOMTestObj withScriptStateObjException();
+  void withScriptExecutionContext();
   void methodWithOptionalArg(int opt);
   void methodWithNonOptionalArgAndOptionalArg(int nonOpt, int opt);
   void methodWithNonOptionalArgAndTwoOptionalArgs(int nonOpt,
