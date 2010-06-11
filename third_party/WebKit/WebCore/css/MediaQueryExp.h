@@ -2,6 +2,7 @@
  * CSS Media Query
  *
  * Copyright (C) 2006 Kimmo Kinnunen <kimmo.t.kinnunen@nokia.com>.
+ * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -67,10 +68,13 @@ class MediaQueryExp : public FastAllocBase {
            m_mediaFeature == MediaFeatureNames::max_aspect_ratioMediaFeature;
   }
 
+  String serialize() const;
+
  private:
   AtomicString m_mediaFeature;
   RefPtr<CSSValue> m_value;
   bool m_isValid;
+  String m_serializationCache;
 };
 
 }  // namespace

@@ -136,6 +136,9 @@ bool MediaQueryEvaluator::eval(const MediaList* mediaList,
   for (size_t i = 0; i < queries.size() && !result; ++i) {
     MediaQuery* query = queries.at(i);
 
+    if (query->ignored())
+      continue;
+
     if (mediaTypeMatch(query->mediaType())) {
       const Vector<MediaQueryExp*>* exps = query->expressions();
       // iterate through expressions, stop if any of them eval to false
