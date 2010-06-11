@@ -1780,12 +1780,12 @@ void WebGLRenderingContext::polygonOffset(double factor, double units) {
 
 void WebGLRenderingContext::readPixels(long x,
                                        long y,
-                                       unsigned long width,
-                                       unsigned long height,
+                                       long width,
+                                       long height,
                                        unsigned long format,
                                        unsigned long type,
                                        ArrayBufferView* pixels) {
-  // Validate enums.
+  // Validate input parameters.
   unsigned long componentsPerPixel = 0;
   switch (format) {
     case GraphicsContext3D::ALPHA:
@@ -1817,6 +1817,10 @@ void WebGLRenderingContext::readPixels(long x,
       return;
   }
   if (!pixels) {
+    m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
+    return;
+  }
+  if (width < 0 || height < 0) {
     m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
     return;
   }
@@ -1860,8 +1864,8 @@ void WebGLRenderingContext::readPixels(long x,
       !m_context->getContextAttributes().alpha) {
     if (type == GraphicsContext3D::UNSIGNED_BYTE) {
       unsigned char* pixels = reinterpret_cast<unsigned char*>(data);
-      for (unsigned long iy = 0; iy < height; ++iy) {
-        for (unsigned long ix = 0; ix < width; ++ix) {
+      for (long iy = 0; iy < height; ++iy) {
+        for (long ix = 0; ix < width; ++ix) {
           pixels[componentsPerPixel - 1] = 255;
           pixels += componentsPerPixel;
         }
