@@ -51,6 +51,7 @@ class IDBObjectStoreProxy : public IDBObjectStore {
   virtual String name() const;
   virtual String keyPath() const;
   virtual PassRefPtr<DOMStringList> indexNames() const;
+
   virtual void createIndex(const String& name,
                            const String& keyPath,
                            bool unique,

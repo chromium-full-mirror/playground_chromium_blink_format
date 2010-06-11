@@ -54,20 +54,27 @@ class IDBObjectStoreRequest : public RefCounted<IDBObjectStoreRequest> {
   String keyPath() const;
   PassRefPtr<DOMStringList> indexNames() const;
 
-  PassRefPtr<IDBRequest> get(PassRefPtr<SerializedScriptValue> key);
-  PassRefPtr<IDBRequest> add(PassRefPtr<SerializedScriptValue> value,
+  PassRefPtr<IDBRequest> get(ScriptExecutionContext*,
+                             PassRefPtr<SerializedScriptValue> key);
+  PassRefPtr<IDBRequest> add(ScriptExecutionContext*,
+                             PassRefPtr<SerializedScriptValue> value,
                              PassRefPtr<SerializedScriptValue> key = 0);
-  PassRefPtr<IDBRequest> modify(PassRefPtr<SerializedScriptValue> value,
+  PassRefPtr<IDBRequest> modify(ScriptExecutionContext*,
+                                PassRefPtr<SerializedScriptValue> value,
                                 PassRefPtr<SerializedScriptValue> key = 0);
-  PassRefPtr<IDBRequest> addOrModify(PassRefPtr<SerializedScriptValue> value,
+  PassRefPtr<IDBRequest> addOrModify(ScriptExecutionContext*,
+                                     PassRefPtr<SerializedScriptValue> value,
                                      PassRefPtr<SerializedScriptValue> key = 0);
-  PassRefPtr<IDBRequest> remove(PassRefPtr<SerializedScriptValue> key);
+  PassRefPtr<IDBRequest> remove(ScriptExecutionContext*,
+                                PassRefPtr<SerializedScriptValue> key);
 
-  PassRefPtr<IDBRequest> createIndex(const String& name,
+  PassRefPtr<IDBRequest> createIndex(ScriptExecutionContext*,
+                                     const String& name,
                                      const String& keyPath,
-                                     bool unique = false) const;
-  PassRefPtr<IDBIndexRequest> index(const String& name) const;
-  PassRefPtr<IDBRequest> removeIndex(const String& name) const;
+                                     bool unique = false);
+  PassRefPtr<IDBIndexRequest> index(const String& name);
+  PassRefPtr<IDBRequest> removeIndex(ScriptExecutionContext*,
+                                     const String& name);
 
  private:
   IDBObjectStoreRequest(PassRefPtr<IDBObjectStore>);
@@ -80,4 +87,4 @@ class IDBObjectStoreRequest : public RefCounted<IDBObjectStoreRequest> {
 
 #endif
 
-#endif  // IDBDatabaseRequest_h
+#endif  // IDBObjectStoreRequest_h
