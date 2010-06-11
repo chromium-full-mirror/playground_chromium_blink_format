@@ -173,9 +173,7 @@ class Font {
   static void setShouldUseSmoothing(bool);
   static bool shouldUseSmoothing();
 
-#if USE(FONT_FAST_PATH)
   enum CodePath { Auto, Simple, Complex, SimpleWithGlyphOverflow };
-#endif
 
  private:
 #if ENABLE(SVG_FONTS)
@@ -200,7 +198,6 @@ class Font {
 #endif
 
 #if USE(FONT_FAST_PATH)
-  CodePath codePath(const TextRun&) const;
   void drawSimpleText(GraphicsContext*,
                       const TextRun&,
                       const FloatPoint&,
@@ -233,6 +230,7 @@ class Font {
   static bool canReturnFallbackFontsForComplexText();
 #endif
 
+  CodePath codePath(const TextRun&) const;
   void drawComplexText(GraphicsContext*,
                        const TextRun&,
                        const FloatPoint&,
@@ -254,12 +252,12 @@ class Font {
   friend struct WidthIterator;
 
  public:
-// Useful for debugging the different font rendering code paths.
-#if USE(FONT_FAST_PATH)
+  // Useful for debugging the different font rendering code paths.
   static void setCodePath(CodePath);
   static CodePath codePath();
   static CodePath s_codePath;
 
+#if USE(FONT_FAST_PATH)
   static const uint8_t gRoundingHackCharacterTable[256];
   static bool isRoundingHackCharacter(UChar32 c) {
     return (((c & ~0xFF) == 0 && gRoundingHackCharacterTable[c]));
