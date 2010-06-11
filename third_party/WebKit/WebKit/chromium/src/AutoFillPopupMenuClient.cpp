@@ -47,10 +47,11 @@ unsigned AutoFillPopupMenuClient::getSuggestionsCount() const {
 }
 
 WebString AutoFillPopupMenuClient::getSuggestion(unsigned listIndex) const {
-  if (listIndex == m_separatorIndex)
+  if (listIndex == static_cast<unsigned>(m_separatorIndex))
     return WebString();
 
-  if (m_separatorIndex != -1 && listIndex > m_separatorIndex)
+  if (m_separatorIndex != -1 &&
+      listIndex > static_cast<unsigned>(m_separatorIndex))
     --listIndex;
 
   // FIXME: Modify the PopupMenu to add the label in gray right-justified.
@@ -76,7 +77,8 @@ void AutoFillPopupMenuClient::valueChanged(unsigned listIndex,
   if (!webView)
     return;
 
-  if (m_separatorIndex != -1 && listIndex > m_separatorIndex)
+  if (m_separatorIndex != -1 &&
+      listIndex > static_cast<unsigned>(m_separatorIndex))
     --listIndex;
 
   ASSERT(listIndex >= 0 && listIndex < m_names.size());
@@ -92,7 +94,8 @@ void AutoFillPopupMenuClient::selectionChanged(unsigned listIndex,
   if (!webView)
     return;
 
-  if (m_separatorIndex != -1 && listIndex > m_separatorIndex)
+  if (m_separatorIndex != -1 &&
+      listIndex > static_cast<unsigned>(m_separatorIndex))
     --listIndex;
 
   ASSERT(listIndex >= 0 && listIndex < m_names.size());
@@ -120,7 +123,8 @@ void AutoFillPopupMenuClient::popupDidHide() {
 }
 
 bool AutoFillPopupMenuClient::itemIsSeparator(unsigned listIndex) const {
-  return (m_separatorIndex != -1 && m_separatorIndex == listIndex);
+  return (m_separatorIndex != -1 &&
+          static_cast<unsigned>(m_separatorIndex) == listIndex);
 }
 
 void AutoFillPopupMenuClient::initialize(HTMLInputElement* textField,
