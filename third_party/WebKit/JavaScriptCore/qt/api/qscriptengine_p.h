@@ -71,7 +71,7 @@ class QScriptEnginePrivate : public QSharedData {
 
   inline QScriptStringPrivate* toStringHandle(const QString& str) const;
 
-  inline JSGlobalContextRef context() const;
+  inline operator JSGlobalContextRef() const;
 
  private:
   QScriptEngine* q_ptr;
@@ -139,7 +139,8 @@ QScriptStringPrivate* QScriptEnginePrivate::toStringHandle(
   return new QScriptStringPrivate(str);
 }
 
-JSGlobalContextRef QScriptEnginePrivate::context() const {
+QScriptEnginePrivate::operator JSGlobalContextRef() const {
+  Q_ASSERT(this);
   return m_context;
 }
 

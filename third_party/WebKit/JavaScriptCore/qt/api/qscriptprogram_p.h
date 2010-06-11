@@ -55,7 +55,7 @@ class QScriptProgramPrivate : public QSharedData {
   inline bool operator==(const QScriptProgramPrivate& other) const;
   inline bool operator!=(const QScriptProgramPrivate& other) const;
 
-  inline JSStringRef program() const;
+  inline operator JSStringRef() const;
   inline JSStringRef file() const;
   inline int line() const;
 
@@ -117,9 +117,10 @@ bool QScriptProgramPrivate::operator!=(
          !JSStringIsEqual(m_program, other.m_program);
 }
 
-JSStringRef QScriptProgramPrivate::program() const {
+QScriptProgramPrivate::operator JSStringRef() const {
   return m_program;
 }
+
 JSStringRef QScriptProgramPrivate::file() const {
   return m_fileName;
 }
