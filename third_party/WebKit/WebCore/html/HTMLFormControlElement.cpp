@@ -178,8 +178,7 @@ void HTMLFormControlElement::removedFromTree(bool deep) {
   // elements.
   HTMLParser* parser = 0;
   if (Tokenizer* tokenizer = document()->tokenizer())
-    if (tokenizer->isHTMLTokenizer())
-      parser = static_cast<HTMLTokenizer*>(tokenizer)->htmlParser();
+    parser = tokenizer->htmlParser();
 
   if (m_form && !(parser && parser->isHandlingResidualStyleAcrossBlocks()) &&
       findRoot(this) != findRoot(m_form)) {
