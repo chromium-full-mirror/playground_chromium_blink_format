@@ -661,6 +661,7 @@ class WebGLRenderingContext : public CanvasRenderingContext {
     VertexAttribState() : enabled(false), numElements(0) {}
     bool enabled;
     long numElements;
+    RefPtr<WebGLBuffer> bufferBinding;
   };
 
   Vector<VertexAttribState> m_vertexAttribState;
