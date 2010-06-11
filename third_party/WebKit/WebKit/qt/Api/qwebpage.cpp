@@ -270,6 +270,9 @@ QWebPagePrivate::QWebPagePrivate(QWebPage* qq)
   WTF::initializeMainThread();
   WebCore::SecurityOrigin::setLocalLoadPolicy(
       WebCore::SecurityOrigin::AllowLocalLoadsForLocalAndSubstituteData);
+#if QT_VERSION < QT_VERSION_CHECK(4, 7, 0)
+  Font::setCodePath(Font::Complex);
+#endif
 
   chromeClient = new ChromeClientQt(q);
   contextMenuClient = new ContextMenuClientQt();

@@ -197,7 +197,6 @@ class Font {
                                            bool includePartialGlyphs) const;
 #endif
 
-#if USE(FONT_FAST_PATH)
   void drawSimpleText(GraphicsContext*,
                       const TextRun&,
                       const FloatPoint&,
@@ -228,7 +227,6 @@ class Font {
                                        int to) const;
 
   static bool canReturnFallbackFontsForComplexText();
-#endif
 
   CodePath codePath(const TextRun&) const;
   void drawComplexText(GraphicsContext*,
@@ -257,12 +255,10 @@ class Font {
   static CodePath codePath();
   static CodePath s_codePath;
 
-#if USE(FONT_FAST_PATH)
   static const uint8_t gRoundingHackCharacterTable[256];
   static bool isRoundingHackCharacter(UChar32 c) {
     return (((c & ~0xFF) == 0 && gRoundingHackCharacterTable[c]));
   }
-#endif
 
   FontSelector* fontSelector() const;
   static bool treatAsSpace(UChar c) {
