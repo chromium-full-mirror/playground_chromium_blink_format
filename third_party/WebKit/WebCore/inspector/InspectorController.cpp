@@ -1589,6 +1589,8 @@ void InspectorController::stopUserInitiatedProfiling() {
       toJSDOMWindow(m_inspectedPage->mainFrame(), debuggerWorld())
           ->globalExec();
 #else
+  // Use null script state to avoid filtering by context security token.
+  // All functions from all iframes should be visible from Inspector UI.
   ScriptState* scriptState = 0;
 #endif
   RefPtr<ScriptProfile> profile = ScriptProfiler::stop(scriptState, title);

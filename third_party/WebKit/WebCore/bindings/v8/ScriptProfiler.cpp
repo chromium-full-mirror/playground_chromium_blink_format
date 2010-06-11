@@ -46,7 +46,9 @@ PassRefPtr<ScriptProfile> ScriptProfiler::stop(ScriptState* state,
                                                const String& title) {
   v8::HandleScope hs;
   const v8::CpuProfile* profile =
-      v8::CpuProfiler::StopProfiling(v8String(title));
+      state ? v8::CpuProfiler::StopProfiling(
+                  v8String(title), state->context()->GetSecurityToken())
+            : v8::CpuProfiler::StopProfiling(v8String(title));
   return profile ? ScriptProfile::create(profile) : 0;
 }
 
