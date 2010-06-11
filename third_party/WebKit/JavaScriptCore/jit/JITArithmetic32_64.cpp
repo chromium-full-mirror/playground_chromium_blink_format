@@ -506,7 +506,7 @@ void JIT::emitRightShiftSlowCase(Instruction* currentInstruction,
           failures.append(branch32(LessThan, regT0, Imm32(0)));
       } else if (shift)
         rshift32(Imm32(shift & 0x1f), regT0);
-      emitStoreInt32(dst, regT0, dst == op1 || dst == op2);
+      emitStoreInt32(dst, regT0, false);
       emitJumpSlowToHot(jump(), OPCODE_LENGTH(op_rshift));
       failures.link(this);
     }
@@ -528,7 +528,7 @@ void JIT::emitRightShiftSlowCase(Instruction* currentInstruction,
           urshift32(regT2, regT0);
         else
           rshift32(regT2, regT0);
-        emitStoreInt32(dst, regT0, dst == op1 || dst == op2);
+        emitStoreInt32(dst, regT0, false);
         emitJumpSlowToHot(jump(), OPCODE_LENGTH(op_rshift));
         notDouble.link(this);
         notInt.link(this);
