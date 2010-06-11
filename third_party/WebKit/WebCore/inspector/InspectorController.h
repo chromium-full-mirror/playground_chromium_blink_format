@@ -32,6 +32,7 @@
 #include "Console.h"
 #include "Cookie.h"
 #include "InspectorDOMAgent.h"
+#include "InspectorValues.h"
 #include "PlatformString.h"
 #include "ScriptArray.h"
 #include "ScriptBreakpoint.h"
@@ -130,6 +131,7 @@ class InspectorController
 
   String setting(const String& key) const;
   void setSetting(const String& key, const String& value);
+  void setSessionSettings(const String&);
 
   void inspect(Node*);
   void highlight(Node*);
@@ -397,6 +399,7 @@ class InspectorController
 #endif
   SpecialPanels m_showAfterVisible;
   RefPtr<Node> m_highlightedNode;
+  RefPtr<InspectorValue> m_sessionSettings;
   unsigned m_groupLevel;
   bool m_searchingForNode;
   ConsoleMessage* m_previousMessage;

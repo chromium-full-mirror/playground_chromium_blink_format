@@ -56,7 +56,8 @@ class InspectorBackend : public RefCounted<InspectorBackend> {
   InspectorController* inspectorController() { return m_inspectorController; }
   void disconnectController() { m_inspectorController = 0; }
 
-  void saveFrontendSettings(const String&);
+  void saveApplicationSettings(const String&);
+  void saveSessionSettings(const String&);
 
   void storeLastActivePanel(const String& panelName);
 
