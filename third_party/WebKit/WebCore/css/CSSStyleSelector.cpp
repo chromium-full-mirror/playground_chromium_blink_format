@@ -372,6 +372,7 @@ class CSSRuleSet : public Noncopyable {
                          const MediaQueryEvaluator&,
                          CSSStyleSelector* = 0);
 
+  void addStyleRule(StyleBase* item);
   void addRule(CSSStyleRule* rule, CSSSelector* sel);
   void addPageRule(CSSStyleRule* rule, CSSSelector* sel);
   void addToRuleSet(AtomicStringImpl* key,
@@ -3059,15 +3060,7 @@ void CSSRuleSet::addRulesFromSheet(CSSStyleSheet* sheet,
   for (int i = 0; i < len; i++) {
     StyleBase* item = sheet->item(i);
     if (item->isStyleRule()) {
-      if (item->isPageRule()) {
-        CSSPageRule* pageRule = static_cast<CSSPageRule*>(item);
-        addPageRule(pageRule, pageRule->selectorList().first());
-      } else {
-        CSSStyleRule* rule = static_cast<CSSStyleRule*>(item);
-        for (CSSSelector* s = rule->selectorList().first(); s;
-             s = CSSSelectorList::next(s))
-          addRule(rule, s);
-      }
+      addStyleRule(item);
     } else if (item->isImportRule()) {
       CSSImportRule* import = static_cast<CSSImportRule*>(item);
       if (!import->media() || medium.eval(import->media(), styleSelector))
@@ -3082,10 +3075,7 @@ void CSSRuleSet::addRulesFromSheet(CSSStyleSheet* sheet,
           CSSRule* childItem = rules->item(j);
           if (childItem->isStyleRule()) {
             // It is a StyleRule, so append it to our list
-            CSSStyleRule* rule = static_cast<CSSStyleRule*>(childItem);
-            for (CSSSelector* s = rule->selectorList().first(); s;
-                 s = CSSSelectorList::next(s))
-              addRule(rule, s);
+            addStyleRule(childItem);
           } else if (childItem->isFontFaceRule() && styleSelector) {
             // Add this font face to our set.
             const CSSFontFaceRule* fontFaceRule =
@@ -3110,6 +3100,18 @@ void CSSRuleSet::addRulesFromSheet(CSSStyleSheet* sheet,
     } else if (item->isKeyframesRule())
       styleSelector->addKeyframeStyle(
           static_cast<WebKitCSSKeyframesRule*>(item));
+  }
+}
+
+void CSSRuleSet::addStyleRule(StyleBase* item) {
+  if (item->isPageRule()) {
+    CSSPageRule* pageRule = static_cast<CSSPageRule*>(item);
+    addPageRule(pageRule, pageRule->selectorList().first());
+  } else {
+    CSSStyleRule* rule = static_cast<CSSStyleRule*>(item);
+    for (CSSSelector* s = rule->selectorList().first(); s;
+         s = CSSSelectorList::next(s))
+      addRule(rule, s);
   }
 }
 
