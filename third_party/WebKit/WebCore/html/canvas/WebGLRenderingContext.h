@@ -156,7 +156,7 @@ class WebGLRenderingContext : public CanvasRenderingContext {
   void disableVertexAttribArray(unsigned long index, ExceptionCode&);
   void drawArrays(unsigned long mode, long first, long count, ExceptionCode&);
   void drawElements(unsigned long mode,
-                    unsigned long count,
+                    long count,
                     unsigned long type,
                     long offset,
                     ExceptionCode&);
@@ -764,6 +764,9 @@ class WebGLRenderingContext : public CanvasRenderingContext {
                                  long border,
                                  unsigned long format,
                                  unsigned long type);
+
+  // Helper function to validate mode for draw{Arrays/Elements}.
+  bool validateDrawMode(unsigned long);
 
   // Helper function for texParameterf and texParameteri.
   void texParameter(unsigned long target,
