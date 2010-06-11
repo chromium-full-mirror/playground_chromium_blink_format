@@ -193,7 +193,7 @@ class InspectorFrontend : public Noncopyable {
                                    SerializedScriptValue* result,
                                    bool isException);
 
-  void addNodesToSearchResult(const String& nodeIds);
+  void addNodesToSearchResult(const ScriptArray& nodeIds);
 
   void contextMenuItemSelected(int itemId);
   void contextMenuCleared();

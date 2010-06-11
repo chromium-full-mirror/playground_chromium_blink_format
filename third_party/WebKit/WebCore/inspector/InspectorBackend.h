@@ -133,6 +133,8 @@ class InspectorBackend : public RefCounted<InspectorBackend> {
                      long nodeId,
                      const AtomicString& tagName,
                      bool expanded);
+  void performSearch(const String& query, bool runSynchronously);
+  void searchCanceled();
 
   void getStyles(long callId, long nodeId, bool authOnly);
   void getAllStyles(long callId);
