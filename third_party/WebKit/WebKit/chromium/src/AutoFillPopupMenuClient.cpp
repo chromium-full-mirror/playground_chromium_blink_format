@@ -109,6 +109,7 @@ void AutoFillPopupMenuClient::selectionCleared() {
   if (!webView)
     return;
 
+  webView->suggestionsPopupDidHide();
   webView->client()->didClearAutoFillSelection(WebNode(getTextField()));
 }
 
