@@ -296,6 +296,35 @@ class WebGLRenderingContext : public CanvasRenderingContext {
                   ExceptionCode&);
   void texImage2D(unsigned target,
                   unsigned level,
+                  unsigned internalformat,
+                  unsigned format,
+                  unsigned type,
+                  ImageData* pixels,
+                  ExceptionCode&);
+  void texImage2D(unsigned target,
+                  unsigned level,
+                  unsigned internalformat,
+                  unsigned format,
+                  unsigned type,
+                  HTMLImageElement* image,
+                  ExceptionCode&);
+  void texImage2D(unsigned target,
+                  unsigned level,
+                  unsigned internalformat,
+                  unsigned format,
+                  unsigned type,
+                  HTMLCanvasElement* canvas,
+                  ExceptionCode&);
+  void texImage2D(unsigned target,
+                  unsigned level,
+                  unsigned internalformat,
+                  unsigned format,
+                  unsigned type,
+                  HTMLVideoElement* video,
+                  ExceptionCode&);
+  // Obsolete entry points -- to be removed shortly. (FIXME)
+  void texImage2D(unsigned target,
+                  unsigned level,
                   ImageData* pixels,
                   ExceptionCode&);
   void texImage2D(unsigned target,
@@ -368,6 +397,39 @@ class WebGLRenderingContext : public CanvasRenderingContext {
                      unsigned type,
                      ArrayBufferView* pixels,
                      ExceptionCode&);
+  void texSubImage2D(unsigned target,
+                     unsigned level,
+                     unsigned xoffset,
+                     unsigned yoffset,
+                     unsigned format,
+                     unsigned type,
+                     ImageData* pixels,
+                     ExceptionCode&);
+  void texSubImage2D(unsigned target,
+                     unsigned level,
+                     unsigned xoffset,
+                     unsigned yoffset,
+                     unsigned format,
+                     unsigned type,
+                     HTMLImageElement* image,
+                     ExceptionCode&);
+  void texSubImage2D(unsigned target,
+                     unsigned level,
+                     unsigned xoffset,
+                     unsigned yoffset,
+                     unsigned format,
+                     unsigned type,
+                     HTMLCanvasElement* canvas,
+                     ExceptionCode&);
+  void texSubImage2D(unsigned target,
+                     unsigned level,
+                     unsigned xoffset,
+                     unsigned yoffset,
+                     unsigned format,
+                     unsigned type,
+                     HTMLVideoElement* video,
+                     ExceptionCode&);
+  // Obsolete entry points -- to be removed shortly. (FIXME)
   void texSubImage2D(unsigned target,
                      unsigned level,
                      unsigned xoffset,
@@ -686,6 +748,8 @@ class WebGLRenderingContext : public CanvasRenderingContext {
   int m_unpackAlignment;
   unsigned long m_implementationColorReadFormat;
   unsigned long m_implementationColorReadType;
+  bool m_unpackFlipY;
+  bool m_unpackPremultiplyAlpha;
 
   // Helpers for getParameter and others
   WebGLGetInfo getBooleanParameter(unsigned long pname);
@@ -707,12 +771,15 @@ class WebGLRenderingContext : public CanvasRenderingContext {
                       unsigned type,
                       void* pixels,
                       ExceptionCode&);
-  void texImage2D(unsigned target,
-                  unsigned level,
-                  Image* image,
-                  bool flipY,
-                  bool premultiplyAlpha,
-                  ExceptionCode&);
+  void texImage2DImpl(unsigned target,
+                      unsigned level,
+                      unsigned internalformat,
+                      unsigned format,
+                      unsigned type,
+                      Image* image,
+                      bool flipY,
+                      bool premultiplyAlpha,
+                      ExceptionCode&);
   void texSubImage2DBase(unsigned target,
                          unsigned level,
                          unsigned xoffset,
@@ -723,14 +790,16 @@ class WebGLRenderingContext : public CanvasRenderingContext {
                          unsigned type,
                          void* pixels,
                          ExceptionCode&);
-  void texSubImage2D(unsigned target,
-                     unsigned level,
-                     unsigned xoffset,
-                     unsigned yoffset,
-                     Image* image,
-                     bool flipY,
-                     bool premultiplyAlpha,
-                     ExceptionCode&);
+  void texSubImage2DImpl(unsigned target,
+                         unsigned level,
+                         unsigned xoffset,
+                         unsigned yoffset,
+                         unsigned format,
+                         unsigned type,
+                         Image* image,
+                         bool flipY,
+                         bool premultiplyAlpha,
+                         ExceptionCode&);
 
   void handleNPOTTextures(bool prepareToDraw);
 
@@ -772,6 +841,10 @@ class WebGLRenderingContext : public CanvasRenderingContext {
                     float parami,
                     int paramf,
                     bool isFloat);
+
+  // Helper function to print warnings to console. Currently
+  // used only to warn about use of obsolete functions.
+  void printWarningToConsole(const String& message);
 
   friend class WebGLStateRestorer;
 };
