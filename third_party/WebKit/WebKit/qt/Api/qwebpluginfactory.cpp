@@ -67,7 +67,7 @@
 /*!
     \class QWebPluginFactory::Plugin
     \since 4.4
-    \brief the QWebPluginFactory::Plugin structure describes the properties of a
+    \brief The QWebPluginFactory::Plugin structure describes the properties of a
    plugin a QWebPluginFactory can create.
 
     \inmodule QtWebKit
