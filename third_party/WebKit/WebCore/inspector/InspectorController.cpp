@@ -1759,7 +1759,7 @@ void InspectorController::didParseSource(const String& sourceID,
                                          const String& data,
                                          int firstLine,
                                          ScriptWorldType worldType) {
-  // Don't send script content to the front end until it's realy needed.
+  // Don't send script content to the front end until it's really needed.
   m_frontend->parsedScriptSource(sourceID, url, "", firstLine, worldType);
 
   if (url.isEmpty())
