@@ -161,7 +161,7 @@ class WebViewImpl : public WebView, public RefCounted<WebViewImpl> {
   virtual void applyAutoFillSuggestions(const WebNode&,
                                         const WebVector<WebString>& names,
                                         const WebVector<WebString>& labels,
-                                        int defaultSuggestionIndex);
+                                        int separatorIndex);
   virtual void applyAutocompleteSuggestions(
       const WebNode&,
       const WebVector<WebString>& suggestions,

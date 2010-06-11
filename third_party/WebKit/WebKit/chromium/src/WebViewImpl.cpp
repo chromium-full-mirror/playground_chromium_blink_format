@@ -1723,9 +1723,9 @@ WebAccessibilityObject WebViewImpl::accessibilityObject() {
 void WebViewImpl::applyAutoFillSuggestions(const WebNode& node,
                                            const WebVector<WebString>& names,
                                            const WebVector<WebString>& labels,
-                                           int defaultSuggestionIndex) {
+                                           int separatorIndex) {
   ASSERT(names.size() == labels.size());
-  ASSERT(defaultSuggestionIndex < static_cast<int>(names.size()));
+  ASSERT(separatorIndex < static_cast<int>(names.size()));
 
   if (names.isEmpty()) {
     hideSuggestionsPopup();
@@ -1749,8 +1749,7 @@ void WebViewImpl::applyAutoFillSuggestions(const WebNode& node,
   if (!m_autoFillPopupClient.get())
     m_autoFillPopupClient.set(new AutoFillPopupMenuClient);
 
-  m_autoFillPopupClient->initialize(inputElem, names, labels,
-                                    defaultSuggestionIndex);
+  m_autoFillPopupClient->initialize(inputElem, names, labels, separatorIndex);
 
   if (m_suggestionsPopupClient != m_autoFillPopupClient.get()) {
     hideSuggestionsPopup();
@@ -1767,7 +1766,7 @@ void WebViewImpl::applyAutoFillSuggestions(const WebNode& node,
     m_suggestionsPopup = m_autoFillPopup.get();
 
   if (m_suggestionsPopupShowing) {
-    m_autoFillPopupClient->setSuggestions(names, labels);
+    m_autoFillPopupClient->setSuggestions(names, labels, separatorIndex);
     refreshSuggestionsPopup();
   } else {
     m_suggestionsPopup->show(focusedNode->getRect(),
