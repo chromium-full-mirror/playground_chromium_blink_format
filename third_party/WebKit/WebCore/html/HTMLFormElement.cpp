@@ -234,7 +234,7 @@ static inline HTMLFormControlElement* submitElementFromEvent(
 
 bool HTMLFormElement::validateInteractively(Event* event) {
   ASSERT(event);
-  if (noValidate())
+  if (!document()->inStrictMode() || noValidate())
     return true;
 
   HTMLFormControlElement* submitElement = submitElementFromEvent(event);
