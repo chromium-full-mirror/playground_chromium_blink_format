@@ -29,6 +29,7 @@
 class QWebElement;
 class QWebFrame;
 class QWebPage;
+class QWebHistoryItem;
 
 enum NotificationPermission {
   NotificationAllowed,
@@ -149,6 +150,11 @@ class QWEBKIT_EXPORT DumpRenderTreeSupportQt {
   static void allowNotificationForOrigin(const QString& origin);
   static void setCheckPermissionFunction(CheckPermissionFunctionType*);
   static void setRequestPermissionFunction(RequestPermissionFunctionType*);
+
+  static QList<QWebHistoryItem> getChildHistoryItems(
+      const QWebHistoryItem& historyItem);
+  static bool isTargetItem(const QWebHistoryItem& historyItem);
+  static QString historyItemTarget(const QWebHistoryItem& historyItem);
 };
 
 #endif

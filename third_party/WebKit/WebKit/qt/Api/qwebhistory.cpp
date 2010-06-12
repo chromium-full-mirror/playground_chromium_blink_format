@@ -534,3 +534,7 @@ QDataStream& operator>>(QDataStream& source, QWebHistory& history) {
 QWebPagePrivate* QWebHistoryPrivate::page() {
   return QWebFramePrivate::kit(lst->page()->mainFrame())->page()->handle();
 }
+
+WebCore::HistoryItem* QWebHistoryItemPrivate::core(QWebHistoryItem* q) {
+  return q->d->item;
+}
