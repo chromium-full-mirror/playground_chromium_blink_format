@@ -88,6 +88,9 @@ class RenderSVGText : public RenderSVGBlock {
 
   virtual RootInlineBox* createRootInlineBox();
 
+  virtual RenderBlock* firstLineBlock() const;
+  virtual void updateFirstLetter();
+
   bool m_needsTransformUpdate : 1;
   AffineTransform m_localTransform;
 };
