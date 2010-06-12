@@ -88,6 +88,11 @@ ScriptController::ScriptController(Frame* frame)
 ScriptController::~ScriptController() {
   disconnectPlatformScriptObjects();
 
+  if (m_cacheableBindingRootObject) {
+    m_cacheableBindingRootObject->invalidate();
+    m_cacheableBindingRootObject = 0;
+  }
+
   // It's likely that destroying m_windowShells will create a lot of garbage.
   if (!m_windowShells.isEmpty()) {
     while (!m_windowShells.isEmpty())
@@ -333,6 +338,18 @@ void ScriptController::updateDocument() {
 
 void ScriptController::updateSecurityOrigin() {
   // Our bindings do not do anything in this case.
+}
+
+Bindings::RootObject* ScriptController::cacheableBindingRootObject() {
+  if (!canExecuteScripts(NotAboutToExecuteScript))
+    return 0;
+
+  if (!m_cacheableBindingRootObject) {
+    JSLock lock(SilenceAssertionsOnly);
+    m_cacheableBindingRootObject =
+        Bindings::RootObject::create(0, globalObject(pluginWorld()));
+  }
+  return m_cacheableBindingRootObject.get();
 }
 
 Bindings::RootObject* ScriptController::bindingRootObject() {

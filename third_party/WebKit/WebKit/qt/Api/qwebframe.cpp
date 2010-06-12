@@ -483,7 +483,8 @@ void QWebFrame::addToJavaScriptWindowObject(
 
   JSC::JSLock lock(JSC::SilenceAssertionsOnly);
   JSDOMWindow* window = toJSDOMWindow(d->frame, mainThreadNormalWorld());
-  JSC::Bindings::RootObject* root = d->frame->script()->bindingRootObject();
+  JSC::Bindings::RootObject* root =
+      d->frame->script()->cacheableBindingRootObject();
   if (!window) {
     qDebug() << "Warning: couldn't get window object";
     return;
