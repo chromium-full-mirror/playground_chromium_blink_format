@@ -2386,22 +2386,29 @@ void RenderBlock::paintChildren(PaintInfo& paintInfo, int tx, int ty) {
   info.paintingRoot = paintingRootForChildren(paintInfo);
   bool checkPageBreaks = document()->printing() &&
                          !document()->settings()->paginateDuringLayoutEnabled();
+  bool checkColumnBreaks =
+      !checkPageBreaks && !view()->printRect().isEmpty() &&
+      !document()->settings()->paginateDuringLayoutEnabled();
 
   for (RenderBox* child = firstChildBox(); child;
        child = child->nextSiblingBox()) {
     // Check for page-break-before: always, and if it's set, break and bail.
-    if (checkPageBreaks && !childrenInline() &&
-        child->style()->pageBreakBefore() == PBALWAYS &&
-        (ty + child->y()) > paintInfo.rect.y() &&
+    bool checkBeforeAlways =
+        !childrenInline() &&
+        (checkPageBreaks && child->style()->pageBreakBefore() == PBALWAYS ||
+         checkColumnBreaks && child->style()->columnBreakBefore() == PBALWAYS);
+    if (checkBeforeAlways && (ty + child->y()) > paintInfo.rect.y() &&
         (ty + child->y()) < paintInfo.rect.bottom()) {
       view()->setBestTruncatedAt(ty + child->y(), this, true);
       return;
     }
 
     // Check for page-break-inside: avoid, and it it's set, break and bail.
-    if (checkPageBreaks && !childrenInline() &&
-        child->style()->pageBreakInside() == PBAVOID &&
-        ty + child->y() > paintInfo.rect.y() &&
+    bool checkInsideAvoid =
+        !childrenInline() &&
+        (checkPageBreaks && child->style()->pageBreakInside() == PBAVOID ||
+         checkColumnBreaks && child->style()->columnBreakInside() == PBAVOID);
+    if (checkInsideAvoid && ty + child->y() > paintInfo.rect.y() &&
         ty + child->y() < paintInfo.rect.bottom() &&
         ty + child->y() + child->height() > paintInfo.rect.bottom()) {
       view()->setBestTruncatedAt(ty + child->y(), this, true);
@@ -2412,8 +2419,11 @@ void RenderBlock::paintChildren(PaintInfo& paintInfo, int tx, int ty) {
       child->paint(info, tx, ty);
 
     // Check for page-break-after: always, and if it's set, break and bail.
-    if (checkPageBreaks && !childrenInline() &&
-        child->style()->pageBreakAfter() == PBALWAYS &&
+    bool checkAfterAlways =
+        !childrenInline() &&
+        (checkPageBreaks && child->style()->pageBreakAfter() == PBALWAYS ||
+         checkColumnBreaks && child->style()->columnBreakAfter() == PBALWAYS);
+    if (checkAfterAlways &&
         (ty + child->y() + child->height()) > paintInfo.rect.y() &&
         (ty + child->y() + child->height()) < paintInfo.rect.bottom()) {
       view()->setBestTruncatedAt(ty + child->y() + child->height() +
