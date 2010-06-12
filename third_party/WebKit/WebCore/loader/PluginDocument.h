@@ -45,7 +45,7 @@ class PluginDocument : public HTMLDocument {
  private:
   PluginDocument(Frame*);
 
-  virtual Tokenizer* createTokenizer();
+  virtual DocumentParser* createTokenizer();
 };
 }
 

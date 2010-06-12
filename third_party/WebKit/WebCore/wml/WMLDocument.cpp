@@ -27,7 +27,7 @@
 #include "BackForwardList.h"
 #include "Frame.h"
 #include "Page.h"
-#include "Tokenizer.h"
+#include "DocumentParser.h"
 #include "WMLCardElement.h"
 #include "WMLErrorHandling.h"
 #include "WMLPageState.h"
@@ -43,7 +43,7 @@ WMLDocument::WMLDocument(Frame* frame)
 WMLDocument::~WMLDocument() {}
 
 void WMLDocument::finishedParsing() {
-  if (Tokenizer* tokenizer = this->tokenizer()) {
+  if (DocumentParser* tokenizer = this->tokenizer()) {
     if (!tokenizer->wellFormed()) {
       Document::finishedParsing();
       return;

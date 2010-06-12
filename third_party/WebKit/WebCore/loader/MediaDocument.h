@@ -45,7 +45,7 @@ class MediaDocument : public HTMLDocument {
   MediaDocument(Frame*);
 
   virtual bool isMediaDocument() const { return true; }
-  virtual Tokenizer* createTokenizer();
+  virtual DocumentParser* createTokenizer();
 
   virtual void defaultEventHandler(Event*);
 

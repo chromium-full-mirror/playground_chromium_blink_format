@@ -48,7 +48,7 @@ class ImageDocument : public HTMLDocument {
  private:
   ImageDocument(Frame*);
 
-  virtual Tokenizer* createTokenizer();
+  virtual DocumentParser* createTokenizer();
   virtual bool isImageDocument() const { return true; }
 
   void createDocumentStructure();

@@ -31,7 +31,7 @@
 #include "NamedNodeMap.h"
 #include "SegmentedString.h"
 #include "Timer.h"
-#include "Tokenizer.h"
+#include "DocumentParser.h"
 #include <wtf/Deque.h>
 #include <wtf/OwnPtr.h>
 #include <wtf/Vector.h>
@@ -148,7 +148,7 @@ class DoctypeToken {
 // (like dealing with <script> tags).  The HTML lexer bits should be pushed
 // down into a separate HTML lexer class.
 
-class HTMLTokenizer : public Tokenizer, public CachedResourceClient {
+class HTMLTokenizer : public DocumentParser, public CachedResourceClient {
  public:
   HTMLTokenizer(HTMLDocument*, bool reportErrors);
   HTMLTokenizer(HTMLViewSourceDocument*);
@@ -249,7 +249,7 @@ class HTMLTokenizer : public Tokenizer, public CachedResourceClient {
   // the attribute name and the first character of the attribute value.
   Vector<UChar, 32> m_rawAttributeBeforeValue;
 
-  // Tokenizer flags
+  // DocumentParser flags
   //////////////////
   // are we in quotes within a html tag
   enum { NoQuote, SingleQuote, DoubleQuote } tquote;

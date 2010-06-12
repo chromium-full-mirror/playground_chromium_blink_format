@@ -38,7 +38,7 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-class TextTokenizer : public Tokenizer {
+class TextTokenizer : public DocumentParser {
  public:
   TextTokenizer(Document*);
   virtual ~TextTokenizer();
@@ -80,7 +80,7 @@ TextTokenizer::TextTokenizer(Document* doc)
 }
 
 TextTokenizer::TextTokenizer(HTMLViewSourceDocument* doc)
-    : Tokenizer(true), m_doc(doc), m_preElement(0), m_skipLF(false) {
+    : DocumentParser(true), m_doc(doc), m_preElement(0), m_skipLF(false) {
   // Allocate buffer
   m_size = 254;
   m_buffer = static_cast<UChar*>(fastMalloc(sizeof(UChar) * m_size));
@@ -171,11 +171,11 @@ bool TextTokenizer::isWaitingForScripts() const {
 
 TextDocument::TextDocument(Frame* frame) : HTMLDocument(frame) {}
 
-Tokenizer* TextDocument::createTokenizer() {
+DocumentParser* TextDocument::createTokenizer() {
   return new TextTokenizer(this);
 }
 
-Tokenizer* createTextTokenizer(HTMLViewSourceDocument* document) {
+DocumentParser* createTextTokenizer(HTMLViewSourceDocument* document) {
   return new TextTokenizer(document);
 }
 }

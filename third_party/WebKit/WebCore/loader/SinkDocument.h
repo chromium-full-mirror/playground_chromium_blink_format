@@ -39,7 +39,7 @@ class SinkDocument : public HTMLDocument {
  private:
   SinkDocument(Frame*);
 
-  virtual Tokenizer* createTokenizer();
+  virtual DocumentParser* createTokenizer();
 };
 
 };  // namespace WebCore

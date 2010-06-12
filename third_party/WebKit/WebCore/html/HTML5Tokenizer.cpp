@@ -59,7 +59,7 @@ class NestingLevelIncrementer : public Noncopyable {
 }  // namespace
 
 HTML5Tokenizer::HTML5Tokenizer(HTMLDocument* document, bool reportErrors)
-    : Tokenizer(),
+    : DocumentParser(),
       m_document(document),
       m_lexer(new HTML5Lexer),
       m_scriptRunner(new HTML5ScriptRunner(document, this)),

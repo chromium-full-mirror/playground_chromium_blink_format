@@ -154,7 +154,7 @@ inline void Token::addAttribute(AtomicString& attrName,
 // ----------------------------------------------------------------------------
 
 HTMLTokenizer::HTMLTokenizer(HTMLDocument* doc, bool reportErrors)
-    : Tokenizer(),
+    : DocumentParser(),
       m_buffer(0),
       m_scriptCode(0),
       m_scriptCodeSize(0),
@@ -175,7 +175,7 @@ HTMLTokenizer::HTMLTokenizer(HTMLDocument* doc, bool reportErrors)
 }
 
 HTMLTokenizer::HTMLTokenizer(HTMLViewSourceDocument* doc)
-    : Tokenizer(true),
+    : DocumentParser(true),
       m_buffer(0),
       m_scriptCode(0),
       m_scriptCodeSize(0),
@@ -1899,10 +1899,11 @@ void HTMLTokenizer::write(const SegmentedString& str, bool appendData) {
 }
 
 void HTMLTokenizer::stopParsing() {
-  Tokenizer::stopParsing();
+  DocumentParser::stopParsing();
   m_timer.stop();
 
-  // FIXME: Why is HTMLTokenizer the only Tokenizer which calls checkCompleted?
+  // FIXME: Why is HTMLTokenizer the only DocumentParser which calls
+  // checkCompleted?
   // The FrameLoader needs to know that the tokenizer has finished with its
   // data,
   // regardless of whether it happened naturally or due to manual intervention.

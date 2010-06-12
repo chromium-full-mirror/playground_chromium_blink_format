@@ -88,7 +88,7 @@ class HTMLDocument : public Document, public CachedResourceClient {
                                             ExceptionCode&);
 
   virtual bool isFrameSet() const;
-  virtual Tokenizer* createTokenizer();
+  virtual DocumentParser* createTokenizer();
   virtual void determineParseMode();
 
   void addItemToMap(HashCountedSet<AtomicStringImpl*>&, const AtomicString&);

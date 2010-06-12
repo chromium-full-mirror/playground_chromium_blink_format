@@ -1701,7 +1701,7 @@ void Document::setVisuallyOrdered() {
     renderer()->style()->setVisuallyOrdered(true);
 }
 
-Tokenizer* Document::createTokenizer() {
+DocumentParser* Document::createTokenizer() {
   // FIXME: this should probably pass the frame instead
   return new XMLTokenizer(this, view());
 }

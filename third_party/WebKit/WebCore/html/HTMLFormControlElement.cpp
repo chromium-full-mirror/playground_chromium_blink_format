@@ -177,7 +177,7 @@ void HTMLFormControlElement::removedFromTree(bool deep) {
   // Otherwise, null out our form and remove ourselves from the form's list of
   // elements.
   HTMLParser* parser = 0;
-  if (Tokenizer* tokenizer = document()->tokenizer())
+  if (DocumentParser* tokenizer = document()->tokenizer())
     parser = tokenizer->htmlParser();
 
   if (m_form && !(parser && parser->isHandlingResidualStyleAcrossBlocks()) &&
