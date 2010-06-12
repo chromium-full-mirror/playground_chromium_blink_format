@@ -135,7 +135,8 @@ int HTMLElement::tagPriority() const {
 
 bool HTMLElement::mapToEntry(const QualifiedName& attrName,
                              MappedAttributeEntry& result) const {
-  if (attrName == alignAttr || attrName == contenteditableAttr) {
+  if (attrName == alignAttr || attrName == contenteditableAttr ||
+      attrName == hiddenAttr) {
     result = eUniversal;
     return false;
   }
@@ -158,6 +159,8 @@ void HTMLElement::parseMappedAttribute(Attribute* attr) {
       addCSSProperty(attr, CSSPropertyTextAlign, "center");
     else
       addCSSProperty(attr, CSSPropertyTextAlign, attr->value());
+  } else if (attr->name() == hiddenAttr) {
+    addCSSProperty(attr, CSSPropertyDisplay, CSSValueNone);
   } else if (attr->name() == contenteditableAttr) {
     setContentEditable(attr);
   } else if (attr->name() == tabindexAttr) {
