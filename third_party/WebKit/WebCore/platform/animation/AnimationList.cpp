@@ -32,6 +32,11 @@ namespace WebCore {
       animation(i)->propSet(animation(j)->propGet());    \
   }
 
+AnimationList::AnimationList(const AnimationList& o) {
+  for (size_t i = 0; i < o.size(); ++i)
+    m_animations.append(Animation::create(o.animation(i)));
+}
+
 void AnimationList::fillUnsetProperties() {
   size_t i;
   FILL_UNSET_PROPERTY(isDelaySet, delay, setDelay);

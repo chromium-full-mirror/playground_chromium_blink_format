@@ -33,6 +33,9 @@ namespace WebCore {
 
 class AnimationList : public FastAllocBase {
  public:
+  AnimationList() {}
+  AnimationList(const AnimationList&);
+
   void fillUnsetProperties();
   bool operator==(const AnimationList& o) const;
   bool operator!=(const AnimationList& o) const { return !(*this == o); }
@@ -48,6 +51,8 @@ class AnimationList : public FastAllocBase {
   const Animation* animation(size_t i) const { return m_animations[i].get(); }
 
  private:
+  AnimationList& operator=(const AnimationList&);
+
   Vector<RefPtr<Animation>> m_animations;
 };
 
