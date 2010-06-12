@@ -153,6 +153,9 @@ class HTML5Tokenizer : public Tokenizer,
     SegmentedString m_next;
   };
 
+  void willPumpLexer();
+  void didPumpLexer();
+
   void pumpLexer();
   void pumpLexerIfPossible();
   void resumeParsingAfterScriptExecution();
