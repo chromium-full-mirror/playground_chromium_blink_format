@@ -35,7 +35,7 @@
 #ifdef __GNUC__
 // The main tokenizer includes this too so we are getting two copies of the
 // data. However, this way the code gets inlined.
-#include "HTMLEntityNames.c"
+#include "HTMLEntityNames.cpp"
 #else
 // Not inlined for non-GCC compilers
 struct Entity {
