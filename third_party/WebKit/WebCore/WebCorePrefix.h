@@ -61,7 +61,9 @@
 #endif
 
 #else
+#if !defined(BUILDING_BREWMP__)
 #include <pthread.h>
+#endif
 #endif  // defined(WIN32) || defined(_WIN32)
 
 #if defined(ANDROID)
@@ -77,8 +79,10 @@
 #include <JavaScriptCore/config.h>
 #endif
 
+#if !defined(BUILDING_BREWMP__)
 #include <sys/types.h>
 #include <fcntl.h>
+#endif
 #if defined(__APPLE__)
 #include <regex.h>
 #endif
@@ -109,11 +113,15 @@
 
 #endif
 
+#if !defined(BUILDING_BREWMP__)
 #include <sys/types.h>
+#endif
 #if defined(__APPLE__)
 #include <sys/param.h>
 #endif
+#if !defined(BUILDING_BREWMP__)
 #include <sys/stat.h>
+#endif
 #if defined(__APPLE__)
 #include <sys/time.h>
 #include <sys/resource.h>
