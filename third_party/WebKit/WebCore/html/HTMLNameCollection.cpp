@@ -62,7 +62,7 @@ Element* HTMLNameCollection::itemAfter(Element* previous) const {
             e->hasTagName(objectTag))
           if (e->getAttribute(nameAttr) == m_name)
             return e;
-        if (e->getAttribute(e->idAttributeName()) == m_name)
+        if (e->getIdAttribute() == m_name)
           return e;
         break;
       case DocumentNamedItems:
@@ -75,17 +75,16 @@ Element* HTMLNameCollection::itemAfter(Element* previous) const {
             return e;
         } else if (e->hasTagName(appletTag)) {
           if (e->getAttribute(nameAttr) == m_name ||
-              e->getAttribute(e->idAttributeName()) == m_name)
+              e->getIdAttribute() == m_name)
             return e;
         } else if (e->hasTagName(objectTag)) {
           if ((e->getAttribute(nameAttr) == m_name ||
-               e->getAttribute(e->idAttributeName()) == m_name) &&
+               e->getIdAttribute() == m_name) &&
               static_cast<HTMLObjectElement*>(e)->isDocNamedItem())
             return e;
         } else if (e->hasTagName(imgTag)) {
           if (e->getAttribute(nameAttr) == m_name ||
-              (e->getAttribute(e->idAttributeName()) == m_name &&
-               e->hasAttribute(nameAttr)))
+              (e->getIdAttribute() == m_name && e->hasAttribute(nameAttr)))
             return e;
         }
         break;

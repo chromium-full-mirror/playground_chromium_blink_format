@@ -603,7 +603,7 @@ static bool executeInsertHorizontalRule(Frame* frame,
                                         const String& value) {
   RefPtr<HTMLHRElement> rule = HTMLHRElement::create(frame->document());
   if (!value.isEmpty())
-    rule->setAttribute(rule->idAttributeName(), value);
+    rule->setIdAttribute(value);
   return executeInsertNode(frame, rule.release());
 }
 

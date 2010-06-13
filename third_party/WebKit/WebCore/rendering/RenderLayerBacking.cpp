@@ -1366,9 +1366,8 @@ String RenderLayerBacking::nameForLayer() const {
   if (Node* node = renderer()->node()) {
     if (node->isElementNode())
       name += " " + static_cast<Element*>(node)->tagName();
-
-    if (node->isHTMLElement() && static_cast<HTMLElement*>(node)->hasID())
-      name += " \'" + static_cast<Element*>(node)->getIDAttribute() + "\'";
+    if (node->hasID())
+      name += " \'" + static_cast<Element*>(node)->getIdAttribute() + "\'";
   }
 
   if (m_owningLayer->isReflection())

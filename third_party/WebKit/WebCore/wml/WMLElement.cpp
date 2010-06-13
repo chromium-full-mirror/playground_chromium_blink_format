@@ -58,8 +58,7 @@ bool WMLElement::mapToEntry(const QualifiedName& attrName,
 }
 
 void WMLElement::parseMappedAttribute(Attribute* attr) {
-  if (attr->name() == idAttributeName() ||
-      attr->name() == HTMLNames::classAttr ||
+  if (isIdAttributeName(attr->name()) || attr->name() == HTMLNames::classAttr ||
       attr->name() == HTMLNames::styleAttr)
     return StyledElement::parseMappedAttribute(attr);
 

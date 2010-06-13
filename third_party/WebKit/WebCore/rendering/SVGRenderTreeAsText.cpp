@@ -340,7 +340,7 @@ static void writeSVGPaintingResource(TextStream& ts,
   else if (resource->resourceType() == RadialGradientResourceType)
     ts << "[type=RADIAL-GRADIENT]";
 
-  ts << " [id=\"" << static_cast<SVGElement*>(node)->getIDAttribute() << "\"]";
+  ts << " [id=\"" << static_cast<SVGElement*>(node)->getIdAttribute() << "\"]";
 }
 
 static void writeStyle(TextStream& ts, const RenderObject& object) {
@@ -596,7 +596,7 @@ void writeSVGResourceContainer(TextStream& ts,
   writeStandardPrefix(ts, object, indent);
 
   Element* element = static_cast<Element*>(object.node());
-  const AtomicString& id = element->getIDAttribute();
+  const AtomicString& id = element->getIdAttribute();
   writeNameAndQuotedValue(ts, "id", id);
 
   RenderSVGResourceContainer* resource =

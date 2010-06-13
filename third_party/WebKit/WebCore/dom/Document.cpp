@@ -420,7 +420,8 @@ Document::Document(Frame* frame, bool isXHTML, bool isHTML)
       m_containsWMLContent(false)
 #endif
       ,
-      m_weakReference(DocumentWeakReference::create(this)) {
+      m_weakReference(DocumentWeakReference::create(this)),
+      m_idAttributeName(idAttr) {
   m_document = this;
 
   m_pageGroupUserSheetCacheValid = false;
@@ -957,8 +958,7 @@ Element* Document::getElementById(const AtomicString& elementId) const {
     for (Node* n = traverseNextNode(); n != 0; n = n->traverseNextNode()) {
       if (n->isElementNode()) {
         element = static_cast<Element*>(n);
-        if (element->hasID() &&
-            element->getAttribute(element->idAttributeName()) == elementId) {
+        if (element->hasID() && element->getIdAttribute() == elementId) {
           m_duplicateIds.remove(elementId.impl());
           m_elementsById.set(elementId.impl(), element);
           return element;
