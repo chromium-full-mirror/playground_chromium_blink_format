@@ -30,9 +30,9 @@
 
 namespace WebCore {
 
-class SinkTokenizer : public DocumentParser {
+class SinkDocumentParser : public DocumentParser {
  public:
-  SinkTokenizer(Document* document) : m_document(document) {}
+  SinkDocumentParser(Document* document) : m_document(document) {}
 
  private:
   virtual void write(const SegmentedString&, bool) { ASSERT_NOT_REACHED(); }
@@ -45,7 +45,7 @@ class SinkTokenizer : public DocumentParser {
   Document* m_document;
 };
 
-void SinkTokenizer::finish() {
+void SinkDocumentParser::finish() {
   if (!m_parserStopped)
     m_document->finishedParsing();
 }
@@ -55,7 +55,7 @@ SinkDocument::SinkDocument(Frame* frame) : HTMLDocument(frame) {
 }
 
 DocumentParser* SinkDocument::createTokenizer() {
-  return new SinkTokenizer(this);
+  return new SinkDocumentParser(this);
 }
 
 }  // namespace WebCore

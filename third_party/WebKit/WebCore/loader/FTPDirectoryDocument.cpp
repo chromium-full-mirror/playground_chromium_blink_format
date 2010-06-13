@@ -48,9 +48,9 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-class FTPDirectoryTokenizer : public HTMLDocumentParser {
+class FTPDirectoryDocumentParser : public HTMLDocumentParser {
  public:
-  FTPDirectoryTokenizer(HTMLDocument*);
+  FTPDirectoryDocumentParser(HTMLDocument*);
 
   virtual void write(const SegmentedString&, bool appendData);
   virtual void finish();
@@ -99,7 +99,7 @@ class FTPDirectoryTokenizer : public HTMLDocumentParser {
   ListState m_listState;
 };
 
-FTPDirectoryTokenizer::FTPDirectoryTokenizer(HTMLDocument* doc)
+FTPDirectoryDocumentParser::FTPDirectoryDocumentParser(HTMLDocument* doc)
     : HTMLDocumentParser(doc, false),
       m_doc(doc),
       m_skipLF(false),
@@ -108,10 +108,10 @@ FTPDirectoryTokenizer::FTPDirectoryTokenizer(HTMLDocument* doc)
       m_buffer(static_cast<UChar*>(fastMalloc(sizeof(UChar) * m_size))),
       m_dest(m_buffer) {}
 
-void FTPDirectoryTokenizer::appendEntry(const String& filename,
-                                        const String& size,
-                                        const String& date,
-                                        bool isDirectory) {
+void FTPDirectoryDocumentParser::appendEntry(const String& filename,
+                                             const String& size,
+                                             const String& date,
+                                             bool isDirectory) {
   ExceptionCode ec;
 
   RefPtr<Element> rowElement = m_tableElement->insertRow(-1, ec);
@@ -141,7 +141,7 @@ void FTPDirectoryTokenizer::appendEntry(const String& filename,
   rowElement->appendChild(element, ec);
 }
 
-PassRefPtr<Element> FTPDirectoryTokenizer::createTDForFilename(
+PassRefPtr<Element> FTPDirectoryDocumentParser::createTDForFilename(
     const String& filename) {
   ExceptionCode ec;
 
@@ -269,7 +269,8 @@ static String processFileDateString(const FTPTime& fileTime) {
   return dateString + timeOfDay;
 }
 
-void FTPDirectoryTokenizer::parseAndAppendOneLine(const String& inputLine) {
+void FTPDirectoryDocumentParser::parseAndAppendOneLine(
+    const String& inputLine) {
   ListResult result;
   CString latin1Input = inputLine.latin1();
 
@@ -310,7 +311,7 @@ static inline PassRefPtr<SharedBuffer> createTemplateDocumentData(
   return buffer.release();
 }
 
-bool FTPDirectoryTokenizer::loadDocumentTemplate() {
+bool FTPDirectoryDocumentParser::loadDocumentTemplate() {
   DEFINE_STATIC_LOCAL(RefPtr<SharedBuffer>, templateDocumentData,
                       (createTemplateDocumentData(m_doc->settings())));
   // FIXME: Instead of storing the data, we'd rather actually parse the template
@@ -361,7 +362,7 @@ bool FTPDirectoryTokenizer::loadDocumentTemplate() {
   return true;
 }
 
-void FTPDirectoryTokenizer::createBasicDocument() {
+void FTPDirectoryDocumentParser::createBasicDocument() {
   LOG(FTP, "Creating a basic FTP document structure as no template was loaded");
 
   // FIXME: Make this "basic document" more acceptable
@@ -378,8 +379,8 @@ void FTPDirectoryTokenizer::createBasicDocument() {
   bodyElement->appendChild(m_tableElement, ec);
 }
 
-void FTPDirectoryTokenizer::write(const SegmentedString& s,
-                                  bool /*appendData*/) {
+void FTPDirectoryDocumentParser::write(const SegmentedString& s,
+                                       bool /*appendData*/) {
   // Make sure we have the table element to append to by loading the template
   // set in the pref, or
   // creating a very basic document with the appropriate table
@@ -442,7 +443,7 @@ void FTPDirectoryTokenizer::write(const SegmentedString& s,
     m_carryOver.append(String(start, cursor - start - 1));
 }
 
-void FTPDirectoryTokenizer::finish() {
+void FTPDirectoryDocumentParser::finish() {
   // Possible the last line in the listing had no newline, so try to parse it
   // now
   if (!m_carryOver.isEmpty()) {
@@ -463,7 +464,7 @@ FTPDirectoryDocument::FTPDirectoryDocument(Frame* frame) : HTMLDocument(frame) {
 }
 
 DocumentParser* FTPDirectoryDocument::createTokenizer() {
-  return new FTPDirectoryTokenizer(this);
+  return new FTPDirectoryDocumentParser(this);
 }
 }
 

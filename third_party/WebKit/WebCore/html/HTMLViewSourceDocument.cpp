@@ -51,7 +51,7 @@ HTMLViewSourceDocument::HTMLViewSourceDocument(Frame* frame,
 }
 
 DocumentParser* HTMLViewSourceDocument::createTokenizer() {
-  // Use HTMLDocumentParser if applicable, otherwise use TextTokenizer.
+  // Use HTMLDocumentParser if applicable, otherwise use TextDocumentParser.
   if (m_type == "text/html" || m_type == "application/xhtml+xml" ||
       m_type == "image/svg+xml" || DOMImplementation::isXMLMIMEType(m_type)
 #if ENABLE(XHTMLMP)
