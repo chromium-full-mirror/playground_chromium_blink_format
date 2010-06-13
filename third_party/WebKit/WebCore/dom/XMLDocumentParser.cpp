@@ -25,7 +25,7 @@
  */
 
 #include "config.h"
-#include "XMLTokenizer.h"
+#include "XMLDocumentParser.h"
 
 #include "CDATASection.h"
 #include "CachedScript.h"
@@ -71,7 +71,7 @@ using namespace HTMLNames;
 const int maxErrors = 25;
 
 #if ENABLE(WML)
-bool XMLTokenizer::isWMLDocument() const {
+bool XMLDocumentParser::isWMLDocument() const {
   if (m_doc)
     return m_doc->isWMLDocument();
 
@@ -79,7 +79,7 @@ bool XMLTokenizer::isWMLDocument() const {
 }
 #endif
 
-void XMLTokenizer::pushCurrentNode(Node* n) {
+void XMLDocumentParser::pushCurrentNode(Node* n) {
   ASSERT(n);
   ASSERT(m_currentNode);
   if (n != m_doc)
@@ -90,7 +90,7 @@ void XMLTokenizer::pushCurrentNode(Node* n) {
     handleError(fatal, "Excessive node nesting.", lineNumber(), columnNumber());
 }
 
-void XMLTokenizer::popCurrentNode() {
+void XMLDocumentParser::popCurrentNode() {
   if (!m_currentNode)
     return;
   ASSERT(m_currentNodeStack.size());
@@ -102,7 +102,7 @@ void XMLTokenizer::popCurrentNode() {
   m_currentNodeStack.removeLast();
 }
 
-void XMLTokenizer::clearCurrentNodeStack() {
+void XMLDocumentParser::clearCurrentNodeStack() {
   if (m_currentNode && m_currentNode != m_doc)
     m_currentNode->deref();
   m_currentNode = 0;
@@ -116,7 +116,7 @@ void XMLTokenizer::clearCurrentNodeStack() {
   }
 }
 
-void XMLTokenizer::write(const SegmentedString& s, bool /*appendData*/) {
+void XMLDocumentParser::write(const SegmentedString& s, bool /*appendData*/) {
   String parseString = s.toString();
 
   if (m_sawXSLTransform || !m_sawFirstElement)
@@ -136,10 +136,10 @@ void XMLTokenizer::write(const SegmentedString& s, bool /*appendData*/) {
   ImageLoader::dispatchPendingBeforeLoadEvents();
 }
 
-void XMLTokenizer::handleError(ErrorType type,
-                               const char* m,
-                               int lineNumber,
-                               int columnNumber) {
+void XMLDocumentParser::handleError(ErrorType type,
+                                    const char* m,
+                                    int lineNumber,
+                                    int columnNumber) {
   if (type == fatal ||
       (m_errorCount < maxErrors && m_lastErrorLine != lineNumber &&
        m_lastErrorColumn != columnNumber)) {
@@ -166,7 +166,7 @@ void XMLTokenizer::handleError(ErrorType type,
     stopParsing();
 }
 
-bool XMLTokenizer::enterText() {
+bool XMLDocumentParser::enterText() {
 #if !USE(QXMLSTREAM)
   ASSERT(m_bufferedText.size() == 0);
 #endif
@@ -183,7 +183,7 @@ static inline String toString(const xmlChar* str, unsigned len) {
 }
 #endif
 
-void XMLTokenizer::exitText() {
+void XMLDocumentParser::exitText() {
   if (m_parserStopped)
     return;
 
@@ -204,7 +204,7 @@ void XMLTokenizer::exitText() {
   popCurrentNode();
 }
 
-void XMLTokenizer::end() {
+void XMLDocumentParser::end() {
   doEnd();
 
   // doEnd() could process a script tag, thus pausing parsing.
@@ -223,7 +223,7 @@ void XMLTokenizer::end() {
     m_doc->finishedParsing();
 }
 
-void XMLTokenizer::finish() {
+void XMLDocumentParser::finish() {
   if (m_parserPaused)
     m_finishCalled = true;
   else
@@ -261,7 +261,7 @@ static inline RefPtr<Element> createXHTMLParserErrorHeader(
   return reportElement;
 }
 
-void XMLTokenizer::insertErrorMessageBlock() {
+void XMLDocumentParser::insertErrorMessageBlock() {
 #if USE(QXMLSTREAM)
   if (m_parsingFragment)
     return;
@@ -323,7 +323,7 @@ void XMLTokenizer::insertErrorMessageBlock() {
   doc->updateStyleIfNeeded();
 }
 
-void XMLTokenizer::notifyFinished(CachedResource* unusedResource) {
+void XMLDocumentParser::notifyFinished(CachedResource* unusedResource) {
   ASSERT_UNUSED(unusedResource, unusedResource == m_pendingScript);
   ASSERT(m_pendingScript->accessCount() > 0);
 
@@ -352,11 +352,11 @@ void XMLTokenizer::notifyFinished(CachedResource* unusedResource) {
     resumeParsing();
 }
 
-bool XMLTokenizer::isWaitingForScripts() const {
+bool XMLDocumentParser::isWaitingForScripts() const {
   return m_pendingScript;
 }
 
-void XMLTokenizer::pauseParsing() {
+void XMLDocumentParser::pauseParsing() {
   if (m_parsingFragment)
     return;
 

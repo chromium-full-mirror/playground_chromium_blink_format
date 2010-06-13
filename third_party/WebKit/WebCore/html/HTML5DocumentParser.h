@@ -43,12 +43,12 @@ class HTML5TreeBuilder;
 class ScriptController;
 class ScriptSourceCode;
 
-class HTML5Tokenizer : public DocumentParser,
-                       HTML5ScriptRunnerHost,
-                       CachedResourceClient {
+class HTML5DocumentParser : public DocumentParser,
+                            HTML5ScriptRunnerHost,
+                            CachedResourceClient {
  public:
-  HTML5Tokenizer(HTMLDocument*, bool reportErrors);
-  virtual ~HTML5Tokenizer();
+  HTML5DocumentParser(HTMLDocument*, bool reportErrors);
+  virtual ~HTML5DocumentParser();
 
   // DocumentParser
   virtual void begin();

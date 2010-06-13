@@ -25,7 +25,7 @@
  */
 
 #include "config.h"
-#include "XMLTokenizer.h"
+#include "XMLDocumentParser.h"
 
 #include "CDATASection.h"
 #include "CachedScript.h"
@@ -39,7 +39,7 @@
 #include "FrameView.h"
 #include "HTMLLinkElement.h"
 #include "HTMLStyleElement.h"
-#include "HTMLTokenizer.h"  // for decodeNamedEntity
+#include "HTMLDocumentParser.h"  // for decodeNamedEntity
 #include "ProcessingInstruction.h"
 #include "ResourceError.h"
 #include "ResourceHandle.h"
@@ -52,7 +52,7 @@
 #include "TextResourceDecoder.h"
 #include "TransformSource.h"
 #include "XMLNSNames.h"
-#include "XMLTokenizerScope.h"
+#include "XMLDocumentParserScope.h"
 #include <libxml/parser.h>
 #include <libxml/parserInternals.h>
 #include <wtf/text/CString.h>
@@ -171,7 +171,7 @@ class PendingCallbacks : public Noncopyable {
     m_callbacks.append(callback);
   }
 
-  void appendErrorCallback(XMLTokenizer::ErrorType type,
+  void appendErrorCallback(XMLDocumentParser::ErrorType type,
                            const xmlChar* message,
                            int lineNumber,
                            int columnNumber) {
@@ -185,7 +185,7 @@ class PendingCallbacks : public Noncopyable {
     m_callbacks.append(callback);
   }
 
-  void callAndRemoveFirstCallback(XMLTokenizer* tokenizer) {
+  void callAndRemoveFirstCallback(XMLDocumentParser* tokenizer) {
     OwnPtr<PendingCallback> callback(m_callbacks.takeFirst());
     callback->call(tokenizer);
   }
@@ -195,7 +195,7 @@ class PendingCallbacks : public Noncopyable {
  private:
   struct PendingCallback {
     virtual ~PendingCallback() {}
-    virtual void call(XMLTokenizer* tokenizer) = 0;
+    virtual void call(XMLDocumentParser* tokenizer) = 0;
   };
 
   struct PendingStartElementNSCallback : public PendingCallback {
@@ -212,7 +212,7 @@ class PendingCallbacks : public Noncopyable {
       xmlFree(attributes);
     }
 
-    virtual void call(XMLTokenizer* tokenizer) {
+    virtual void call(XMLDocumentParser* tokenizer) {
       tokenizer->startElementNs(xmlLocalName, xmlPrefix, xmlURI, nb_namespaces,
                                 const_cast<const xmlChar**>(namespaces),
                                 nb_attributes, nb_defaulted,
@@ -230,13 +230,15 @@ class PendingCallbacks : public Noncopyable {
   };
 
   struct PendingEndElementNSCallback : public PendingCallback {
-    virtual void call(XMLTokenizer* tokenizer) { tokenizer->endElementNs(); }
+    virtual void call(XMLDocumentParser* tokenizer) {
+      tokenizer->endElementNs();
+    }
   };
 
   struct PendingCharactersCallback : public PendingCallback {
     virtual ~PendingCharactersCallback() { xmlFree(s); }
 
-    virtual void call(XMLTokenizer* tokenizer) {
+    virtual void call(XMLDocumentParser* tokenizer) {
       tokenizer->characters(s, len);
     }
 
@@ -250,7 +252,7 @@ class PendingCallbacks : public Noncopyable {
       xmlFree(data);
     }
 
-    virtual void call(XMLTokenizer* tokenizer) {
+    virtual void call(XMLDocumentParser* tokenizer) {
       tokenizer->processingInstruction(target, data);
     }
 
@@ -261,7 +263,7 @@ class PendingCallbacks : public Noncopyable {
   struct PendingCDATABlockCallback : public PendingCallback {
     virtual ~PendingCDATABlockCallback() { xmlFree(s); }
 
-    virtual void call(XMLTokenizer* tokenizer) {
+    virtual void call(XMLDocumentParser* tokenizer) {
       tokenizer->cdataBlock(s, len);
     }
 
@@ -272,7 +274,7 @@ class PendingCallbacks : public Noncopyable {
   struct PendingCommentCallback : public PendingCallback {
     virtual ~PendingCommentCallback() { xmlFree(s); }
 
-    virtual void call(XMLTokenizer* tokenizer) { tokenizer->comment(s); }
+    virtual void call(XMLDocumentParser* tokenizer) { tokenizer->comment(s); }
 
     xmlChar* s;
   };
@@ -284,7 +286,7 @@ class PendingCallbacks : public Noncopyable {
       xmlFree(systemID);
     }
 
-    virtual void call(XMLTokenizer* tokenizer) {
+    virtual void call(XMLDocumentParser* tokenizer) {
       tokenizer->internalSubset(name, externalID, systemID);
     }
 
@@ -296,12 +298,12 @@ class PendingCallbacks : public Noncopyable {
   struct PendingErrorCallback : public PendingCallback {
     virtual ~PendingErrorCallback() { xmlFree(message); }
 
-    virtual void call(XMLTokenizer* tokenizer) {
+    virtual void call(XMLDocumentParser* tokenizer) {
       tokenizer->handleError(type, reinterpret_cast<char*>(message), lineNumber,
                              columnNumber);
     }
 
-    XMLTokenizer::ErrorType type;
+    XMLDocumentParser::ErrorType type;
     xmlChar* message;
     int lineNumber;
     int columnNumber;
@@ -315,11 +317,11 @@ static int globalDescriptor = 0;
 static ThreadIdentifier libxmlLoaderThread = 0;
 
 static int matchFunc(const char*) {
-  // Only match loads initiated due to uses of libxml2 from within XMLTokenizer
-  // to avoid
+  // Only match loads initiated due to uses of libxml2 from within
+  // XMLDocumentParser to avoid
   // interfering with client applications that also use libxml2.
   // http://bugs.webkit.org/show_bug.cgi?id=17353
-  return XMLTokenizerScope::currentDocLoader &&
+  return XMLDocumentParserScope::currentDocLoader &&
          currentThread() == libxmlLoaderThread;
 }
 
@@ -370,9 +372,10 @@ static bool shouldAllowExternalLoad(const KURL& url) {
   // retrieved content.  If we had more context, we could potentially allow
   // the parser to load a DTD.  As things stand, we take the conservative
   // route and allow same-origin requests only.
-  if (!XMLTokenizerScope::currentDocLoader->doc()->securityOrigin()->canRequest(
-          url)) {
-    XMLTokenizerScope::currentDocLoader->printAccessDeniedMessage(url);
+  if (!XMLDocumentParserScope::currentDocLoader->doc()
+           ->securityOrigin()
+           ->canRequest(url)) {
+    XMLDocumentParserScope::currentDocLoader->printAccessDeniedMessage(url);
     return false;
   }
 
@@ -380,7 +383,7 @@ static bool shouldAllowExternalLoad(const KURL& url) {
 }
 
 static void* openFunc(const char* uri) {
-  ASSERT(XMLTokenizerScope::currentDocLoader);
+  ASSERT(XMLDocumentParserScope::currentDocLoader);
   ASSERT(currentThread() == libxmlLoaderThread);
 
   KURL url(KURL(), uri);
@@ -393,8 +396,8 @@ static void* openFunc(const char* uri) {
   Vector<char> data;
 
   {
-    DocLoader* docLoader = XMLTokenizerScope::currentDocLoader;
-    XMLTokenizerScope scope(0);
+    DocLoader* docLoader = XMLDocumentParserScope::currentDocLoader;
+    XMLDocumentParserScope scope(0);
     // FIXME: We should restore the original global error handler as well.
 
     if (docLoader->frame())
@@ -504,7 +507,7 @@ PassRefPtr<XMLParserContext> XMLParserContext::createMemoryParser(
 
 // --------------------------------
 
-XMLTokenizer::XMLTokenizer(Document* _doc, FrameView* _view)
+XMLDocumentParser::XMLDocumentParser(Document* _doc, FrameView* _view)
     : m_doc(_doc),
       m_view(_view),
       m_context(0),
@@ -532,9 +535,10 @@ XMLTokenizer::XMLTokenizer(Document* _doc, FrameView* _view)
       m_scriptingPermission(FragmentScriptingAllowed) {
 }
 
-XMLTokenizer::XMLTokenizer(DocumentFragment* fragment,
-                           Element* parentElement,
-                           FragmentScriptingPermission scriptingPermission)
+XMLDocumentParser::XMLDocumentParser(
+    DocumentFragment* fragment,
+    Element* parentElement,
+    FragmentScriptingPermission scriptingPermission)
     : m_doc(fragment->document()),
       m_view(0),
       m_context(0),
@@ -603,7 +607,7 @@ XMLParserContext::~XMLParserContext() {
   xmlFreeParserCtxt(m_context);
 }
 
-XMLTokenizer::~XMLTokenizer() {
+XMLDocumentParser::~XMLDocumentParser() {
   clearCurrentNodeStack();
   if (m_parsingFragment && m_doc)
     m_doc->deref();
@@ -611,7 +615,7 @@ XMLTokenizer::~XMLTokenizer() {
     m_pendingScript->removeClient(this);
 }
 
-void XMLTokenizer::doWrite(const String& parseString) {
+void XMLDocumentParser::doWrite(const String& parseString) {
   if (!m_context)
     initializeParserContext();
 
@@ -632,7 +636,7 @@ void XMLTokenizer::doWrite(const String& parseString) {
                                               ? XML_CHAR_ENCODING_UTF16LE
                                               : XML_CHAR_ENCODING_UTF16BE);
 
-    XMLTokenizerScope scope(m_doc->docLoader());
+    XMLDocumentParserScope scope(m_doc->docLoader());
     xmlParseChunk(context->context(),
                   reinterpret_cast<const char*>(parseString.characters()),
                   sizeof(UChar) * parseString.length(), 0);
@@ -719,14 +723,14 @@ static inline void handleElementAttributes(
   }
 }
 
-void XMLTokenizer::startElementNs(const xmlChar* xmlLocalName,
-                                  const xmlChar* xmlPrefix,
-                                  const xmlChar* xmlURI,
-                                  int nb_namespaces,
-                                  const xmlChar** libxmlNamespaces,
-                                  int nb_attributes,
-                                  int nb_defaulted,
-                                  const xmlChar** libxmlAttributes) {
+void XMLDocumentParser::startElementNs(const xmlChar* xmlLocalName,
+                                       const xmlChar* xmlPrefix,
+                                       const xmlChar* xmlURI,
+                                       int nb_namespaces,
+                                       const xmlChar** libxmlNamespaces,
+                                       int nb_attributes,
+                                       int nb_defaulted,
+                                       const xmlChar** libxmlAttributes) {
   if (m_parserStopped)
     return;
 
@@ -830,7 +834,7 @@ void XMLTokenizer::startElementNs(const xmlChar* xmlLocalName,
     m_doc->frame()->loader()->dispatchDocumentElementAvailable();
 }
 
-void XMLTokenizer::endElementNs() {
+void XMLDocumentParser::endElementNs() {
   if (m_parserStopped)
     return;
 
@@ -906,7 +910,7 @@ void XMLTokenizer::endElementNs() {
   popCurrentNode();
 }
 
-void XMLTokenizer::characters(const xmlChar* s, int len) {
+void XMLDocumentParser::characters(const xmlChar* s, int len) {
   if (m_parserStopped)
     return;
 
@@ -919,7 +923,9 @@ void XMLTokenizer::characters(const xmlChar* s, int len) {
     m_bufferedText.append(s, len);
 }
 
-void XMLTokenizer::error(ErrorType type, const char* message, va_list args) {
+void XMLDocumentParser::error(ErrorType type,
+                              const char* message,
+                              va_list args) {
   if (m_parserStopped)
     return;
 
@@ -944,8 +950,8 @@ void XMLTokenizer::error(ErrorType type, const char* message, va_list args) {
 #endif
 }
 
-void XMLTokenizer::processingInstruction(const xmlChar* target,
-                                         const xmlChar* data) {
+void XMLDocumentParser::processingInstruction(const xmlChar* target,
+                                              const xmlChar* data) {
   if (m_parserStopped)
     return;
 
@@ -979,7 +985,7 @@ void XMLTokenizer::processingInstruction(const xmlChar* target,
 #endif
 }
 
-void XMLTokenizer::cdataBlock(const xmlChar* s, int len) {
+void XMLDocumentParser::cdataBlock(const xmlChar* s, int len) {
   if (m_parserStopped)
     return;
 
@@ -997,7 +1003,7 @@ void XMLTokenizer::cdataBlock(const xmlChar* s, int len) {
     newNode->attach();
 }
 
-void XMLTokenizer::comment(const xmlChar* s) {
+void XMLDocumentParser::comment(const xmlChar* s) {
   if (m_parserStopped)
     return;
 
@@ -1014,9 +1020,9 @@ void XMLTokenizer::comment(const xmlChar* s) {
     newNode->attach();
 }
 
-void XMLTokenizer::startDocument(const xmlChar* version,
-                                 const xmlChar* encoding,
-                                 int standalone) {
+void XMLDocumentParser::startDocument(const xmlChar* version,
+                                      const xmlChar* encoding,
+                                      int standalone) {
   ExceptionCode ec = 0;
 
   if (version)
@@ -1027,16 +1033,16 @@ void XMLTokenizer::startDocument(const xmlChar* version,
     m_doc->setXMLEncoding(toString(encoding));
 }
 
-void XMLTokenizer::endDocument() {
+void XMLDocumentParser::endDocument() {
   exitText();
 #if ENABLE(XHTMLMP)
   m_hasDocTypeDeclaration = false;
 #endif
 }
 
-void XMLTokenizer::internalSubset(const xmlChar* name,
-                                  const xmlChar* externalID,
-                                  const xmlChar* systemID) {
+void XMLDocumentParser::internalSubset(const xmlChar* name,
+                                       const xmlChar* externalID,
+                                       const xmlChar* systemID) {
   if (m_parserStopped)
     return;
 
@@ -1083,9 +1089,9 @@ void XMLTokenizer::internalSubset(const xmlChar* name,
   }
 }
 
-static inline XMLTokenizer* getTokenizer(void* closure) {
+static inline XMLDocumentParser* getTokenizer(void* closure) {
   xmlParserCtxtPtr ctxt = static_cast<xmlParserCtxtPtr>(closure);
-  return static_cast<XMLTokenizer*>(ctxt->_private);
+  return static_cast<XMLDocumentParser*>(ctxt->_private);
 }
 
 // This is a hack around http://bugzilla.gnome.org/show_bug.cgi?id=159219
@@ -1163,7 +1169,7 @@ WTF_ATTRIBUTE_PRINTF(2, 3)
 static void warningHandler(void* closure, const char* message, ...) {
   va_list args;
   va_start(args, message);
-  getTokenizer(closure)->error(XMLTokenizer::warning, message, args);
+  getTokenizer(closure)->error(XMLDocumentParser::warning, message, args);
   va_end(args);
 }
 
@@ -1171,7 +1177,7 @@ WTF_ATTRIBUTE_PRINTF(2, 3)
 static void fatalErrorHandler(void* closure, const char* message, ...) {
   va_list args;
   va_start(args, message);
-  getTokenizer(closure)->error(XMLTokenizer::fatal, message, args);
+  getTokenizer(closure)->error(XMLDocumentParser::fatal, message, args);
   va_end(args);
 }
 
@@ -1179,7 +1185,7 @@ WTF_ATTRIBUTE_PRINTF(2, 3)
 static void normalErrorHandler(void* closure, const char* message, ...) {
   va_list args;
   va_start(args, message);
-  getTokenizer(closure)->error(XMLTokenizer::nonFatal, message, args);
+  getTokenizer(closure)->error(XMLDocumentParser::nonFatal, message, args);
   va_end(args);
 }
 
@@ -1283,7 +1289,7 @@ static void ignorableWhitespaceHandler(void*, const xmlChar*, int) {
   // http://bugs.webkit.org/show_bug.cgi?id=5792
 }
 
-void XMLTokenizer::initializeParserContext(const char* chunk) {
+void XMLDocumentParser::initializeParserContext(const char* chunk) {
   xmlSAXHandler sax;
   memset(&sax, 0, sizeof(sax));
 
@@ -1309,14 +1315,14 @@ void XMLTokenizer::initializeParserContext(const char* chunk) {
   m_sawXSLTransform = false;
   m_sawFirstElement = false;
 
-  XMLTokenizerScope scope(m_doc->docLoader());
+  XMLDocumentParserScope scope(m_doc->docLoader());
   if (m_parsingFragment)
     m_context = XMLParserContext::createMemoryParser(&sax, this, chunk);
   else
     m_context = XMLParserContext::createStringParser(&sax, this);
 }
 
-void XMLTokenizer::doEnd() {
+void XMLDocumentParser::doEnd() {
 #if ENABLE(XSLT)
   if (m_sawXSLTransform) {
     void* doc =
@@ -1338,7 +1344,7 @@ void XMLTokenizer::doEnd() {
   if (m_context) {
     // Tell libxml we're done.
     {
-      XMLTokenizerScope scope(m_doc->docLoader());
+      XMLDocumentParserScope scope(m_doc->docLoader());
       xmlParseChunk(context(), 0, 0, 1);
     }
 
@@ -1361,7 +1367,7 @@ void* xmlDocPtrForString(DocLoader* docLoader,
   const unsigned char BOMHighByte =
       *reinterpret_cast<const unsigned char*>(&BOM);
 
-  XMLTokenizerScope scope(docLoader, errorFunc, 0);
+  XMLDocumentParserScope scope(docLoader, errorFunc, 0);
   xmlDocPtr sourceDoc = xmlReadMemory(
       reinterpret_cast<const char*>(source.characters()),
       source.length() * sizeof(UChar), url.latin1().data(),
@@ -1370,21 +1376,21 @@ void* xmlDocPtrForString(DocLoader* docLoader,
 }
 #endif
 
-int XMLTokenizer::lineNumber() const {
+int XMLDocumentParser::lineNumber() const {
   return context() ? context()->input->line : 1;
 }
 
-int XMLTokenizer::columnNumber() const {
+int XMLDocumentParser::columnNumber() const {
   return context() ? context()->input->col : 1;
 }
 
-void XMLTokenizer::stopParsing() {
+void XMLDocumentParser::stopParsing() {
   DocumentParser::stopParsing();
   if (context())
     xmlStopParser(context());
 }
 
-void XMLTokenizer::resumeParsing() {
+void XMLDocumentParser::resumeParsing() {
   ASSERT(m_parserPaused);
 
   m_parserPaused = false;
@@ -1416,7 +1422,7 @@ bool parseXMLDocumentFragment(const String& chunk,
   if (!chunk.length())
     return true;
 
-  XMLTokenizer tokenizer(fragment, parent, scriptingPermission);
+  XMLDocumentParser tokenizer(fragment, parent, scriptingPermission);
 
   CString chunkAsUtf8 = chunk.utf8();
   tokenizer.initializeParserContext(chunkAsUtf8.data());

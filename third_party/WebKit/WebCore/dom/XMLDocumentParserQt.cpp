@@ -25,7 +25,7 @@
  */
 
 #include "config.h"
-#include "XMLTokenizer.h"
+#include "XMLDocumentParser.h"
 
 #include "CDATASection.h"
 #include "CachedScript.h"
@@ -39,7 +39,7 @@
 #include "FrameView.h"
 #include "HTMLLinkElement.h"
 #include "HTMLStyleElement.h"
-#include "HTMLTokenizer.h"
+#include "HTMLDocumentParser.h"
 #include "ProcessingInstruction.h"
 #include "ResourceError.h"
 #include "ResourceHandle.h"
@@ -77,7 +77,7 @@ QString EntityResolver::resolveUndeclaredEntity(const QString& name) {
 
 // --------------------------------
 
-XMLTokenizer::XMLTokenizer(Document* _doc, FrameView* _view)
+XMLDocumentParser::XMLDocumentParser(Document* _doc, FrameView* _view)
     : m_doc(_doc),
       m_view(_view),
       m_wroteText(false),
@@ -105,9 +105,9 @@ XMLTokenizer::XMLTokenizer(Document* _doc, FrameView* _view)
   m_stream.setEntityResolver(new EntityResolver);
 }
 
-XMLTokenizer::XMLTokenizer(DocumentFragment* fragment,
-                           Element* parentElement,
-                           FragmentScriptingPermission permission)
+XMLDocumentParser::XMLDocumentParser(DocumentFragment* fragment,
+                                     Element* parentElement,
+                                     FragmentScriptingPermission permission)
     : m_doc(fragment->document()),
       m_view(0),
       m_wroteText(false),
@@ -173,7 +173,7 @@ XMLTokenizer::XMLTokenizer(DocumentFragment* fragment,
     m_defaultNamespaceURI = parentElement->namespaceURI();
 }
 
-XMLTokenizer::~XMLTokenizer() {
+XMLDocumentParser::~XMLDocumentParser() {
   clearCurrentNodeStack();
   if (m_parsingFragment && m_doc)
     m_doc->deref();
@@ -182,7 +182,7 @@ XMLTokenizer::~XMLTokenizer() {
   delete m_stream.entityResolver();
 }
 
-void XMLTokenizer::doWrite(const String& parseString) {
+void XMLDocumentParser::doWrite(const String& parseString) {
   m_wroteText = true;
 
   if (m_doc->decoder() && m_doc->decoder()->sawError()) {
@@ -200,14 +200,14 @@ void XMLTokenizer::doWrite(const String& parseString) {
   return;
 }
 
-void XMLTokenizer::initializeParserContext(const char*) {
+void XMLDocumentParser::initializeParserContext(const char*) {
   m_parserStopped = false;
   m_sawError = false;
   m_sawXSLTransform = false;
   m_sawFirstElement = false;
 }
 
-void XMLTokenizer::doEnd() {
+void XMLDocumentParser::doEnd() {
 #if ENABLE(XSLT)
   if (m_sawXSLTransform) {
     m_doc->setTransformSource(
@@ -226,19 +226,19 @@ void XMLTokenizer::doEnd() {
                 columnNumber());
 }
 
-int XMLTokenizer::lineNumber() const {
+int XMLDocumentParser::lineNumber() const {
   return m_stream.lineNumber();
 }
 
-int XMLTokenizer::columnNumber() const {
+int XMLDocumentParser::columnNumber() const {
   return m_stream.columnNumber();
 }
 
-void XMLTokenizer::stopParsing() {
+void XMLDocumentParser::stopParsing() {
   DocumentParser::stopParsing();
 }
 
-void XMLTokenizer::resumeParsing() {
+void XMLDocumentParser::resumeParsing() {
   ASSERT(m_parserPaused);
 
   m_parserPaused = false;
@@ -266,7 +266,7 @@ bool parseXMLDocumentFragment(const String& chunk,
   if (!chunk.length())
     return true;
 
-  XMLTokenizer tokenizer(fragment, parent, scriptingPermission);
+  XMLDocumentParser tokenizer(fragment, parent, scriptingPermission);
 
   tokenizer.write(String("<qxmlstreamdummyelement>"), false);
   tokenizer.write(chunk, false);
@@ -362,7 +362,7 @@ static inline void handleElementAttributes(
   }
 }
 
-void XMLTokenizer::parse() {
+void XMLDocumentParser::parse() {
   while (!m_parserStopped && !m_parserPaused && !m_stream.atEnd()) {
     m_stream.readNext();
     switch (m_stream.tokenType()) {
@@ -442,7 +442,7 @@ void XMLTokenizer::parse() {
   }
 }
 
-void XMLTokenizer::startDocument() {
+void XMLDocumentParser::startDocument() {
   initializeParserContext();
   ExceptionCode ec = 0;
 
@@ -458,7 +458,7 @@ void XMLTokenizer::startDocument() {
   }
 }
 
-void XMLTokenizer::parseStartElement() {
+void XMLDocumentParser::parseStartElement() {
   if (!m_sawFirstElement && m_parsingFragment) {
     // skip dummy element for fragments
     m_sawFirstElement = true;
@@ -539,7 +539,7 @@ void XMLTokenizer::parseStartElement() {
     m_doc->frame()->loader()->dispatchDocumentElementAvailable();
 }
 
-void XMLTokenizer::parseEndElement() {
+void XMLDocumentParser::parseEndElement() {
   exitText();
 
   Node* n = m_currentNode;
@@ -608,14 +608,14 @@ void XMLTokenizer::parseEndElement() {
   popCurrentNode();
 }
 
-void XMLTokenizer::parseCharacters() {
+void XMLDocumentParser::parseCharacters() {
   if (m_currentNode->isTextNode() || enterText()) {
     ExceptionCode ec = 0;
     static_cast<Text*>(m_currentNode)->appendData(m_stream.text(), ec);
   }
 }
 
-void XMLTokenizer::parseProcessingInstruction() {
+void XMLDocumentParser::parseProcessingInstruction() {
   exitText();
 
   // ### handle exceptions
@@ -642,7 +642,7 @@ void XMLTokenizer::parseProcessingInstruction() {
 #endif
 }
 
-void XMLTokenizer::parseCdata() {
+void XMLDocumentParser::parseCdata() {
   exitText();
 
   RefPtr<Node> newNode = CDATASection::create(m_doc, m_stream.text());
@@ -652,7 +652,7 @@ void XMLTokenizer::parseCdata() {
     newNode->attach();
 }
 
-void XMLTokenizer::parseComment() {
+void XMLDocumentParser::parseComment() {
   exitText();
 
   RefPtr<Node> newNode = Comment::create(m_doc, m_stream.text());
@@ -661,17 +661,17 @@ void XMLTokenizer::parseComment() {
     newNode->attach();
 }
 
-void XMLTokenizer::endDocument() {
+void XMLDocumentParser::endDocument() {
 #if ENABLE(XHTMLMP)
   m_hasDocTypeDeclaration = false;
 #endif
 }
 
-bool XMLTokenizer::hasError() const {
+bool XMLDocumentParser::hasError() const {
   return m_stream.hasError();
 }
 
-void XMLTokenizer::parseDtd() {
+void XMLDocumentParser::parseDtd() {
   QStringRef name = m_stream.dtdName();
   QStringRef publicId = m_stream.dtdPublicId();
   QStringRef systemId = m_stream.dtdSystemId();

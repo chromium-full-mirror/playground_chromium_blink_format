@@ -43,7 +43,7 @@
 #include "FrameView.h"
 #include "HTMLElement.h"
 #include "HTMLNames.h"
-#include "HTMLTokenizer.h"
+#include "HTMLDocumentParser.h"
 #include "InspectorController.h"
 #include "NodeList.h"
 #include "NodeRenderStyle.h"
@@ -53,7 +53,7 @@
 #include "RenderWidget.h"
 #include "TextIterator.h"
 #include "XMLNames.h"
-#include "XMLTokenizer.h"
+#include "XMLDocumentParser.h"
 #include <wtf/text/CString.h>
 
 #if ENABLE(SVG)

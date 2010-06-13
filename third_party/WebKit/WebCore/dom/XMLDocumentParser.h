@@ -71,11 +71,11 @@ class XMLParserContext : public RefCounted<XMLParserContext> {
 };
 #endif
 
-class XMLTokenizer : public DocumentParser, public CachedResourceClient {
+class XMLDocumentParser : public DocumentParser, public CachedResourceClient {
  public:
-  XMLTokenizer(Document*, FrameView* = 0);
-  XMLTokenizer(DocumentFragment*, Element*, FragmentScriptingPermission);
-  ~XMLTokenizer();
+  XMLDocumentParser(Document*, FrameView* = 0);
+  XMLDocumentParser(DocumentFragment*, Element*, FragmentScriptingPermission);
+  ~XMLDocumentParser();
 
   enum ErrorType { warning, nonFatal, fatal };
 

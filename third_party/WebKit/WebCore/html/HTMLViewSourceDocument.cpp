@@ -36,7 +36,7 @@
 #include "HTMLTableElement.h"
 #include "HTMLTableRowElement.h"
 #include "HTMLTableSectionElement.h"
-#include "HTMLTokenizer.h"
+#include "HTMLDocumentParser.h"
 #include "Text.h"
 #include "TextDocument.h"
 
@@ -51,7 +51,7 @@ HTMLViewSourceDocument::HTMLViewSourceDocument(Frame* frame,
 }
 
 DocumentParser* HTMLViewSourceDocument::createTokenizer() {
-  // Use HTMLTokenizer if applicable, otherwise use TextTokenizer.
+  // Use HTMLDocumentParser if applicable, otherwise use TextTokenizer.
   if (m_type == "text/html" || m_type == "application/xhtml+xml" ||
       m_type == "image/svg+xml" || DOMImplementation::isXMLMIMEType(m_type)
 #if ENABLE(XHTMLMP)
@@ -59,7 +59,7 @@ DocumentParser* HTMLViewSourceDocument::createTokenizer() {
 #endif
       ) {
     // FIXME: Should respect Settings::html5ParserEnabled()
-    return new HTMLTokenizer(this);
+    return new HTMLDocumentParser(this);
   }
 
   return createTextTokenizer(this);
@@ -158,7 +158,7 @@ void HTMLViewSourceDocument::addViewSourceToken(Token* token) {
             } else {
               const String& value = attr->value().string();
 
-              // Compare ignoring case since HTMLTokenizer doesn't
+              // Compare ignoring case since HTMLDocumentParser doesn't
               // lower names when passing in tokens to
               // HTMLViewSourceDocument.
               if (equalIgnoringCase(token->tagName, "base") &&

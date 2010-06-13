@@ -107,7 +107,7 @@
 #include "TextResourceDecoder.h"
 #include "WindowFeatures.h"
 #include "XMLHttpRequest.h"
-#include "XMLTokenizer.h"
+#include "XMLDocumentParser.h"
 #include "XSSAuditor.h"
 #include <wtf/text/CString.h>
 #include <wtf/CurrentTime.h>

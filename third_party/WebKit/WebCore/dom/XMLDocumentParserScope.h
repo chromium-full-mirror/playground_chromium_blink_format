@@ -36,18 +36,18 @@ namespace WebCore {
 
 class DocLoader;
 
-class XMLTokenizerScope : public Noncopyable {
+class XMLDocumentParserScope : public Noncopyable {
  public:
-  XMLTokenizerScope(DocLoader* docLoader);
-  ~XMLTokenizerScope();
+  XMLDocumentParserScope(DocLoader* docLoader);
+  ~XMLDocumentParserScope();
 
   static DocLoader* currentDocLoader;
 
 #if ENABLE(XSLT)
-  XMLTokenizerScope(DocLoader* docLoader,
-                    xmlGenericErrorFunc genericErrorFunc,
-                    xmlStructuredErrorFunc structuredErrorFunc = 0,
-                    void* errorContext = 0);
+  XMLDocumentParserScope(DocLoader* docLoader,
+                         xmlGenericErrorFunc genericErrorFunc,
+                         xmlStructuredErrorFunc structuredErrorFunc = 0,
+                         void* errorContext = 0);
 #endif
 
  private:

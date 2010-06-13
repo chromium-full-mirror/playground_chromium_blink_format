@@ -24,13 +24,13 @@
  */
 
 #include "config.h"
-#include "XMLTokenizerScope.h"
+#include "XMLDocumentParserScope.h"
 
 namespace WebCore {
 
-DocLoader* XMLTokenizerScope::currentDocLoader = 0;
+DocLoader* XMLDocumentParserScope::currentDocLoader = 0;
 
-XMLTokenizerScope::XMLTokenizerScope(DocLoader* docLoader)
+XMLDocumentParserScope::XMLDocumentParserScope(DocLoader* docLoader)
     : m_oldDocLoader(currentDocLoader)
 #if ENABLE(XSLT)
       ,
@@ -43,10 +43,11 @@ XMLTokenizerScope::XMLTokenizerScope(DocLoader* docLoader)
 }
 
 #if ENABLE(XSLT)
-XMLTokenizerScope::XMLTokenizerScope(DocLoader* docLoader,
-                                     xmlGenericErrorFunc genericErrorFunc,
-                                     xmlStructuredErrorFunc structuredErrorFunc,
-                                     void* errorContext)
+XMLDocumentParserScope::XMLDocumentParserScope(
+    DocLoader* docLoader,
+    xmlGenericErrorFunc genericErrorFunc,
+    xmlStructuredErrorFunc structuredErrorFunc,
+    void* errorContext)
     : m_oldDocLoader(currentDocLoader),
       m_oldGenericErrorFunc(xmlGenericError),
       m_oldStructuredErrorFunc(xmlStructuredError),
@@ -59,7 +60,7 @@ XMLTokenizerScope::XMLTokenizerScope(DocLoader* docLoader,
 }
 #endif
 
-XMLTokenizerScope::~XMLTokenizerScope() {
+XMLDocumentParserScope::~XMLDocumentParserScope() {
   currentDocLoader = m_oldDocLoader;
 #if ENABLE(XSLT)
   xmlSetGenericErrorFunc(m_oldErrorContext, m_oldGenericErrorFunc);

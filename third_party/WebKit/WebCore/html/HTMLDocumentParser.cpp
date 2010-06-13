@@ -28,7 +28,7 @@
 */
 
 #include "config.h"
-#include "HTMLTokenizer.h"
+#include "HTMLDocumentParser.h"
 
 #include "Attribute.h"
 #include "CSSHelper.h"
@@ -153,7 +153,7 @@ inline void Token::addAttribute(AtomicString& attrName,
 
 // ----------------------------------------------------------------------------
 
-HTMLTokenizer::HTMLTokenizer(HTMLDocument* doc, bool reportErrors)
+HTMLDocumentParser::HTMLDocumentParser(HTMLDocument* doc, bool reportErrors)
     : DocumentParser(),
       m_buffer(0),
       m_scriptCode(0),
@@ -163,9 +163,10 @@ HTMLTokenizer::HTMLTokenizer(HTMLDocument* doc, bool reportErrors)
       m_executingScript(0),
       m_requestingScript(false),
       m_hasScriptsWaitingForStylesheets(false),
-      m_timer(this, &HTMLTokenizer::timerFired),
-      m_externalScriptsTimer(this,
-                             &HTMLTokenizer::executeExternalScriptsTimerFired),
+      m_timer(this, &HTMLDocumentParser::timerFired),
+      m_externalScriptsTimer(
+          this,
+          &HTMLDocumentParser::executeExternalScriptsTimerFired),
       m_doc(doc),
       m_parser(new HTMLParser(doc, reportErrors)),
       m_inWrite(false),
@@ -174,7 +175,7 @@ HTMLTokenizer::HTMLTokenizer(HTMLDocument* doc, bool reportErrors)
   begin();
 }
 
-HTMLTokenizer::HTMLTokenizer(HTMLViewSourceDocument* doc)
+HTMLDocumentParser::HTMLDocumentParser(HTMLViewSourceDocument* doc)
     : DocumentParser(true),
       m_buffer(0),
       m_scriptCode(0),
@@ -184,9 +185,10 @@ HTMLTokenizer::HTMLTokenizer(HTMLViewSourceDocument* doc)
       m_executingScript(0),
       m_requestingScript(false),
       m_hasScriptsWaitingForStylesheets(false),
-      m_timer(this, &HTMLTokenizer::timerFired),
-      m_externalScriptsTimer(this,
-                             &HTMLTokenizer::executeExternalScriptsTimerFired),
+      m_timer(this, &HTMLDocumentParser::timerFired),
+      m_externalScriptsTimer(
+          this,
+          &HTMLDocumentParser::executeExternalScriptsTimerFired),
       m_doc(doc),
       m_parser(0),
       m_inWrite(false),
@@ -195,8 +197,9 @@ HTMLTokenizer::HTMLTokenizer(HTMLViewSourceDocument* doc)
   begin();
 }
 
-HTMLTokenizer::HTMLTokenizer(DocumentFragment* frag,
-                             FragmentScriptingPermission scriptingPermission)
+HTMLDocumentParser::HTMLDocumentParser(
+    DocumentFragment* frag,
+    FragmentScriptingPermission scriptingPermission)
     : m_buffer(0),
       m_scriptCode(0),
       m_scriptCodeSize(0),
@@ -205,9 +208,10 @@ HTMLTokenizer::HTMLTokenizer(DocumentFragment* frag,
       m_executingScript(0),
       m_requestingScript(false),
       m_hasScriptsWaitingForStylesheets(false),
-      m_timer(this, &HTMLTokenizer::timerFired),
-      m_externalScriptsTimer(this,
-                             &HTMLTokenizer::executeExternalScriptsTimerFired),
+      m_timer(this, &HTMLDocumentParser::timerFired),
+      m_externalScriptsTimer(
+          this,
+          &HTMLDocumentParser::executeExternalScriptsTimerFired),
       m_doc(frag->document()),
       m_parser(new HTMLParser(frag, scriptingPermission)),
       m_inWrite(false),
@@ -216,7 +220,7 @@ HTMLTokenizer::HTMLTokenizer(DocumentFragment* frag,
   begin();
 }
 
-void HTMLTokenizer::reset() {
+void HTMLDocumentParser::reset() {
   ASSERT(m_executingScript == 0);
 
   while (!m_pendingScripts.isEmpty()) {
@@ -246,7 +250,7 @@ void HTMLTokenizer::reset() {
   m_hasScriptsWaitingForStylesheets = false;
 }
 
-void HTMLTokenizer::begin() {
+void HTMLDocumentParser::begin() {
   m_executingScript = 0;
   m_requestingScript = false;
   m_hasScriptsWaitingForStylesheets = false;
@@ -281,12 +285,13 @@ void HTMLTokenizer::begin() {
     m_tokenizerChunkSize = defaultTokenizerChunkSize;
 }
 
-void HTMLTokenizer::setForceSynchronous(bool force) {
+void HTMLDocumentParser::setForceSynchronous(bool force) {
   m_state.setForceSynchronous(force);
 }
 
-HTMLTokenizer::State HTMLTokenizer::processListing(SegmentedString list,
-                                                   State state) {
+HTMLDocumentParser::State HTMLDocumentParser::processListing(
+    SegmentedString list,
+    State state) {
   // This function adds the listing 'list' as
   // preformatted text-tokens to the token-collection
   while (!list.isEmpty()) {
@@ -322,8 +327,9 @@ HTMLTokenizer::State HTMLTokenizer::processListing(SegmentedString list,
   return state;
 }
 
-HTMLTokenizer::State HTMLTokenizer::parseNonHTMLText(SegmentedString& src,
-                                                     State state) {
+HTMLDocumentParser::State HTMLDocumentParser::parseNonHTMLText(
+    SegmentedString& src,
+    State state) {
   ASSERT(state.inTextArea() || state.inTitle() || state.inIFrame() ||
          !state.hasEntityState());
   ASSERT(!state.hasTagState());
@@ -436,7 +442,7 @@ HTMLTokenizer::State HTMLTokenizer::parseNonHTMLText(SegmentedString& src,
   return state;
 }
 
-HTMLTokenizer::State HTMLTokenizer::scriptHandler(State state) {
+HTMLDocumentParser::State HTMLDocumentParser::scriptHandler(State state) {
   // We are inside a <script>
   bool doScriptExec = false;
   int startLine = m_currentScriptTagStartLineNumber + 1;  // Script line numbers
@@ -583,7 +589,7 @@ HTMLTokenizer::State HTMLTokenizer::scriptHandler(State state) {
   return state;
 }
 
-HTMLTokenizer::State HTMLTokenizer::scriptExecution(
+HTMLDocumentParser::State HTMLDocumentParser::scriptExecution(
     const ScriptSourceCode& sourceCode,
     State state) {
   if (m_fragment || !m_doc->frame())
@@ -640,8 +646,8 @@ HTMLTokenizer::State HTMLTokenizer::scriptExecution(
   return state;
 }
 
-HTMLTokenizer::State HTMLTokenizer::parseComment(SegmentedString& src,
-                                                 State state) {
+HTMLDocumentParser::State HTMLDocumentParser::parseComment(SegmentedString& src,
+                                                           State state) {
   // FIXME: Why does this code even run for comments inside <script> and
   // <style>? This seems bogus.
   checkScriptBuffer(src.length());
@@ -691,8 +697,8 @@ HTMLTokenizer::State HTMLTokenizer::parseComment(SegmentedString& src,
   return state;
 }
 
-HTMLTokenizer::State HTMLTokenizer::parseServer(SegmentedString& src,
-                                                State state) {
+HTMLDocumentParser::State HTMLDocumentParser::parseServer(SegmentedString& src,
+                                                          State state) {
   checkScriptBuffer(src.length());
   while (!src.isEmpty()) {
     UChar ch = *src;
@@ -709,7 +715,7 @@ HTMLTokenizer::State HTMLTokenizer::parseServer(SegmentedString& src,
   return state;
 }
 
-HTMLTokenizer::State HTMLTokenizer::parseProcessingInstruction(
+HTMLDocumentParser::State HTMLDocumentParser::parseProcessingInstruction(
     SegmentedString& src,
     State state) {
   UChar oldchar = 0;
@@ -736,8 +742,8 @@ HTMLTokenizer::State HTMLTokenizer::parseProcessingInstruction(
   return state;
 }
 
-HTMLTokenizer::State HTMLTokenizer::parseText(SegmentedString& src,
-                                              State state) {
+HTMLDocumentParser::State HTMLDocumentParser::parseText(SegmentedString& src,
+                                                        State state) {
   while (!src.isEmpty()) {
     UChar cc = *src;
 
@@ -763,12 +769,12 @@ HTMLTokenizer::State HTMLTokenizer::parseText(SegmentedString& src,
   return state;
 }
 
-HTMLTokenizer::State HTMLTokenizer::parseEntity(SegmentedString& src,
-                                                UChar*& dest,
-                                                State state,
-                                                unsigned& cBufferPos,
-                                                bool start,
-                                                bool parsingTag) {
+HTMLDocumentParser::State HTMLDocumentParser::parseEntity(SegmentedString& src,
+                                                          UChar*& dest,
+                                                          State state,
+                                                          unsigned& cBufferPos,
+                                                          bool start,
+                                                          bool parsingTag) {
   if (start) {
     cBufferPos = 0;
     state.setEntityState(SearchEntity);
@@ -943,8 +949,8 @@ HTMLTokenizer::State HTMLTokenizer::parseEntity(SegmentedString& src,
   return state;
 }
 
-HTMLTokenizer::State HTMLTokenizer::parseDoctype(SegmentedString& src,
-                                                 State state) {
+HTMLDocumentParser::State HTMLDocumentParser::parseDoctype(SegmentedString& src,
+                                                           State state) {
   ASSERT(state.inDoctype());
   while (!src.isEmpty() && state.inDoctype()) {
     UChar c = *src;
@@ -1163,8 +1169,8 @@ HTMLTokenizer::State HTMLTokenizer::parseDoctype(SegmentedString& src,
   return state;
 }
 
-HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
-                                             State state) {
+HTMLDocumentParser::State HTMLDocumentParser::parseTag(SegmentedString& src,
+                                                       State state) {
   ASSERT(!state.hasEntityState());
 
   unsigned cBufferPos = m_cBufferPos;
@@ -1672,9 +1678,9 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
   return state;
 }
 
-inline bool HTMLTokenizer::continueProcessing(int& processedCount,
-                                              double startTime,
-                                              State& state) {
+inline bool HTMLDocumentParser::continueProcessing(int& processedCount,
+                                                   double startTime,
+                                                   State& state) {
   // We don't want to be checking elapsed time with every character, so we only
   // check after we've
   // processed a certain number of characters.
@@ -1704,7 +1710,7 @@ inline bool HTMLTokenizer::continueProcessing(int& processedCount,
 
 // Turns the statemachine one crank using the passed in State object.
 // This does not modify m_state directly in order to be reentrant.
-ALWAYS_INLINE void HTMLTokenizer::advance(State& state) {
+ALWAYS_INLINE void HTMLDocumentParser::advance(State& state) {
   // do we need to enlarge the buffer?
   checkBuffer();
 
@@ -1815,21 +1821,21 @@ ALWAYS_INLINE void HTMLTokenizer::advance(State& state) {
   }
 }
 
-void HTMLTokenizer::willWriteHTML(const SegmentedString& source) {
+void HTMLDocumentParser::willWriteHTML(const SegmentedString& source) {
 #if ENABLE(INSPECTOR)
   if (InspectorTimelineAgent* timelineAgent = m_doc->inspectorTimelineAgent())
     timelineAgent->willWriteHTML(source.length(), m_lineNumber);
 #endif
 }
 
-void HTMLTokenizer::didWriteHTML() {
+void HTMLDocumentParser::didWriteHTML() {
 #if ENABLE(INSPECTOR)
   if (InspectorTimelineAgent* timelineAgent = m_doc->inspectorTimelineAgent())
     timelineAgent->didWriteHTML(m_lineNumber);
 #endif
 }
 
-void HTMLTokenizer::write(const SegmentedString& str, bool appendData) {
+void HTMLDocumentParser::write(const SegmentedString& str, bool appendData) {
   if (!m_buffer)
     return;
 
@@ -1898,11 +1904,11 @@ void HTMLTokenizer::write(const SegmentedString& str, bool appendData) {
   ImageLoader::dispatchPendingBeforeLoadEvents();
 }
 
-void HTMLTokenizer::stopParsing() {
+void HTMLDocumentParser::stopParsing() {
   DocumentParser::stopParsing();
   m_timer.stop();
 
-  // FIXME: Why is HTMLTokenizer the only DocumentParser which calls
+  // FIXME: Why is HTMLDocumentParser the only DocumentParser which calls
   // checkCompleted?
   // The FrameLoader needs to know that the tokenizer has finished with its
   // data,
@@ -1911,11 +1917,11 @@ void HTMLTokenizer::stopParsing() {
     m_doc->frame()->loader()->checkCompleted();
 }
 
-bool HTMLTokenizer::processingData() const {
+bool HTMLDocumentParser::processingData() const {
   return m_timer.isActive() || m_inWrite;
 }
 
-void HTMLTokenizer::timerFired(Timer<HTMLTokenizer>*) {
+void HTMLDocumentParser::timerFired(Timer<HTMLDocumentParser>*) {
   if (m_doc->view() && m_doc->view()->layoutPending() &&
       !m_doc->minimumLayoutDelay()) {
     // Restart the timer and let layout win.  This is basically a way of
@@ -1930,7 +1936,7 @@ void HTMLTokenizer::timerFired(Timer<HTMLTokenizer>*) {
   write(SegmentedString(), true);
 }
 
-void HTMLTokenizer::end() {
+void HTMLDocumentParser::end() {
   ASSERT(!m_timer.isActive());
   m_timer.stop();  // Only helps if assertion above fires, but do it anyway.
 
@@ -1953,7 +1959,7 @@ void HTMLTokenizer::end() {
     m_doc->finishedParsing();
 }
 
-void HTMLTokenizer::finish() {
+void HTMLDocumentParser::finish() {
   // do this as long as we don't find matching comment ends
   while ((m_state.inComment() || m_state.inServer()) && m_scriptCode &&
          m_scriptCodeSize) {
@@ -1993,7 +1999,7 @@ void HTMLTokenizer::finish() {
     end();  // this actually causes us to be deleted
 }
 
-PassRefPtr<Node> HTMLTokenizer::processToken() {
+PassRefPtr<Node> HTMLDocumentParser::processToken() {
   ScriptController* scriptController =
       (!m_fragment && m_doc->frame()) ? m_doc->frame()->script() : 0;
   if (scriptController &&
@@ -2036,7 +2042,7 @@ PassRefPtr<Node> HTMLTokenizer::processToken() {
   return n.release();
 }
 
-void HTMLTokenizer::processDoctypeToken() {
+void HTMLDocumentParser::processDoctypeToken() {
   if (inViewSourceMode())
     static_cast<HTMLViewSourceDocument*>(m_doc)->addViewSourceDoctypeToken(
         &m_doctypeToken);
@@ -2044,12 +2050,12 @@ void HTMLTokenizer::processDoctypeToken() {
     m_parser->parseDoctypeToken(&m_doctypeToken);
 }
 
-HTMLTokenizer::~HTMLTokenizer() {
+HTMLDocumentParser::~HTMLDocumentParser() {
   ASSERT(!m_inWrite);
   reset();
 }
 
-void HTMLTokenizer::enlargeBuffer(int len) {
+void HTMLDocumentParser::enlargeBuffer(int len) {
   // Resize policy: Always at least double the size of the buffer each time.
   int delta = max(len, m_bufferSize);
 
@@ -2068,7 +2074,7 @@ void HTMLTokenizer::enlargeBuffer(int len) {
   m_bufferSize = newSize;
 }
 
-void HTMLTokenizer::enlargeScriptBuffer(int len) {
+void HTMLDocumentParser::enlargeScriptBuffer(int len) {
   // Resize policy: Always at least double the size of the buffer each time.
   int delta = max(len, m_scriptCodeCapacity);
 
@@ -2093,18 +2099,18 @@ void HTMLTokenizer::enlargeScriptBuffer(int len) {
   m_scriptCodeCapacity = newSize;
 }
 
-void HTMLTokenizer::executeScriptsWaitingForStylesheets() {
+void HTMLDocumentParser::executeScriptsWaitingForStylesheets() {
   ASSERT(m_doc->haveStylesheetsLoaded());
 
   if (m_hasScriptsWaitingForStylesheets)
     notifyFinished(0);
 }
 
-void HTMLTokenizer::notifyFinished(CachedResource*) {
+void HTMLDocumentParser::notifyFinished(CachedResource*) {
   executeExternalScriptsIfReady();
 }
 
-void HTMLTokenizer::executeExternalScriptsIfReady() {
+void HTMLDocumentParser::executeExternalScriptsIfReady() {
   ASSERT(!m_pendingScripts.isEmpty());
 
   // Make external scripts wait for external stylesheets.
@@ -2172,7 +2178,8 @@ void HTMLTokenizer::executeExternalScriptsIfReady() {
   }
 }
 
-void HTMLTokenizer::executeExternalScriptsTimerFired(Timer<HTMLTokenizer>*) {
+void HTMLDocumentParser::executeExternalScriptsTimerFired(
+    Timer<HTMLDocumentParser>*) {
   if (m_doc->view() && m_doc->view()->layoutPending() &&
       !m_doc->minimumLayoutDelay()) {
     // Restart the timer and do layout first.
@@ -2184,7 +2191,7 @@ void HTMLTokenizer::executeExternalScriptsTimerFired(Timer<HTMLTokenizer>*) {
   executeExternalScriptsIfReady();
 }
 
-bool HTMLTokenizer::continueExecutingExternalScripts(double startTime) {
+bool HTMLDocumentParser::continueExecutingExternalScripts(double startTime) {
   if (m_externalScriptsTimer.isActive())
     return false;
 
@@ -2196,11 +2203,11 @@ bool HTMLTokenizer::continueExecutingExternalScripts(double startTime) {
   return true;
 }
 
-bool HTMLTokenizer::isWaitingForScripts() const {
+bool HTMLDocumentParser::isWaitingForScripts() const {
   return m_state.loadingExtScript();
 }
 
-void HTMLTokenizer::setSrc(const SegmentedString& source) {
+void HTMLDocumentParser::setSrc(const SegmentedString& source) {
   m_src = source;
 }
 
@@ -2208,7 +2215,7 @@ void parseHTMLDocumentFragment(
     const String& source,
     DocumentFragment* fragment,
     FragmentScriptingPermission scriptingPermission) {
-  HTMLTokenizer tok(fragment, scriptingPermission);
+  HTMLDocumentParser tok(fragment, scriptingPermission);
   tok.setForceSynchronous(true);
   tok.write(source, true);
   tok.finish();

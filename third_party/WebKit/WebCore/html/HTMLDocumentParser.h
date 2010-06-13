@@ -148,13 +148,13 @@ class DoctypeToken {
 // (like dealing with <script> tags).  The HTML lexer bits should be pushed
 // down into a separate HTML lexer class.
 
-class HTMLTokenizer : public DocumentParser, public CachedResourceClient {
+class HTMLDocumentParser : public DocumentParser, public CachedResourceClient {
  public:
-  HTMLTokenizer(HTMLDocument*, bool reportErrors);
-  HTMLTokenizer(HTMLViewSourceDocument*);
-  HTMLTokenizer(DocumentFragment*,
-                FragmentScriptingPermission = FragmentScriptingAllowed);
-  virtual ~HTMLTokenizer();
+  HTMLDocumentParser(HTMLDocument*, bool reportErrors);
+  HTMLDocumentParser(HTMLViewSourceDocument*);
+  HTMLDocumentParser(DocumentFragment*,
+                     FragmentScriptingPermission = FragmentScriptingAllowed);
+  virtual ~HTMLDocumentParser();
 
   virtual void write(const SegmentedString&, bool appendData);
   virtual void finish();
@@ -175,7 +175,7 @@ class HTMLTokenizer : public DocumentParser, public CachedResourceClient {
   virtual void executeScriptsWaitingForStylesheets();
 
   virtual HTMLParser* htmlParser() const { return m_parser.get(); }
-  virtual HTMLTokenizer* asHTMLTokenizer() { return this; }
+  virtual HTMLDocumentParser* asHTMLTokenizer() { return this; }
 
  private:
   class State;
@@ -227,14 +227,14 @@ class HTMLTokenizer : public DocumentParser, public CachedResourceClient {
   void enlargeScriptBuffer(int len);
 
   bool continueProcessing(int& processedCount, double startTime, State&);
-  void timerFired(Timer<HTMLTokenizer>*);
+  void timerFired(Timer<HTMLDocumentParser>*);
   void allDataProcessed();
 
   // from CachedResourceClient
   void notifyFinished(CachedResource*);
 
   void executeExternalScriptsIfReady();
-  void executeExternalScriptsTimerFired(Timer<HTMLTokenizer>*);
+  void executeExternalScriptsTimerFired(Timer<HTMLDocumentParser>*);
   bool continueExecutingExternalScripts(double startTime);
 
   // Internal buffers
@@ -453,10 +453,10 @@ class HTMLTokenizer : public DocumentParser, public CachedResourceClient {
   int m_tokenizerChunkSize;
 
   // The timer for continued processing.
-  Timer<HTMLTokenizer> m_timer;
+  Timer<HTMLDocumentParser> m_timer;
 
   // The timer for continued executing external scripts.
-  Timer<HTMLTokenizer> m_externalScriptsTimer;
+  Timer<HTMLDocumentParser> m_externalScriptsTimer;
 
 // This buffer can hold arbitrarily long user-defined attribute names, such as
 // in EMBED tags.

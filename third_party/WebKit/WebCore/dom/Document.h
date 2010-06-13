@@ -343,7 +343,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
 
   void setXMLEncoding(const String& encoding) {
     m_xmlEncoding = encoding;
-  }  // read-only property, only to be set from XMLTokenizer
+  }  // read-only property, only to be set from XMLDocumentParser
   void setXMLVersion(const String&, ExceptionCode&);
   void setXMLStandalone(bool, ExceptionCode&);
 
