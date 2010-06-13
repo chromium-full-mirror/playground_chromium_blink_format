@@ -195,6 +195,9 @@ class LayoutTestController : public QObject {
                                float height = 0);
   int numberOfPages(float width = maxViewWidth, float height = maxViewHeight);
   bool callShouldCloseOnWebView();
+  // For now, this is a no-op. This may change depending on outcome of
+  // https://bugs.webkit.org/show_bug.cgi?id=33333
+  void setCallCloseOnWebViews() {}
 
   /*
       Policy values: 'on', 'auto' or 'off'.

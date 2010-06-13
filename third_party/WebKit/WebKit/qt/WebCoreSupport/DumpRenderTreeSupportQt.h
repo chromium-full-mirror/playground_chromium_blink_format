@@ -155,6 +155,8 @@ class QWEBKIT_EXPORT DumpRenderTreeSupportQt {
       const QWebHistoryItem& historyItem);
   static bool isTargetItem(const QWebHistoryItem& historyItem);
   static QString historyItemTarget(const QWebHistoryItem& historyItem);
+
+  static bool shouldClose(QWebFrame* frame);
 };
 
 #endif
