@@ -55,7 +55,6 @@ void WebPluginListBuilderImpl::addMediaTypeToLastPlugin(
   MimeClassInfo info;
   info.type = name;
   info.desc = description;
-  info.pluginIndex = m_results->size() - 1;
   m_results->last().mimes.append(info);
 }
 
