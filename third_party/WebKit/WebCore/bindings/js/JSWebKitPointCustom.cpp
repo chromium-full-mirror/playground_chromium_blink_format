@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009 Apple Inc. All rights reserved.
+ * Copyright (C) 2009, 2010 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,23 +23,32 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef JSWebKitPointConstructor_h
-#define JSWebKitPointConstructor_h
+#include "config.h"
+#include "JSWebKitPoint.h"
 
-#include "JSDOMBinding.h"
-#include "JSDocument.h"
+#include "WebKitPoint.h"
+
+using namespace JSC;
 
 namespace WebCore {
 
-class JSWebKitPointConstructor : public DOMConstructorObject {
- public:
-  JSWebKitPointConstructor(JSC::ExecState*, JSDOMGlobalObject*);
-  static const JSC::ClassInfo s_info;
+EncodedJSValue JSC_HOST_CALL
+JSWebKitPointConstructor::constructJSWebKitPoint(ExecState* exec) {
+  JSWebKitPointConstructor* jsConstructor =
+      static_cast<JSWebKitPointConstructor*>(exec->callee());
 
- private:
-  virtual JSC::ConstructType getConstructData(JSC::ConstructData&);
-  virtual const JSC::ClassInfo* classInfo() const { return &s_info; }
-};
+  float x = 0;
+  float y = 0;
+  if (exec->argumentCount() >= 2) {
+    x = static_cast<float>(exec->argument(0).toNumber(exec));
+    y = static_cast<float>(exec->argument(1).toNumber(exec));
+    if (isnan(x))
+      x = 0;
+    if (isnan(y))
+      y = 0;
+  }
+  return JSValue::encode(asObject(
+      toJS(exec, jsConstructor->globalObject(), WebKitPoint::create(x, y))));
 }
 
-#endif  // JSWebKitPointConstructor_h
+}  // namespace WebCore
