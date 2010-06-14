@@ -125,6 +125,7 @@ class HTML5Lexer : public Noncopyable {
     return 1;
   }  // Matches HTMLDocumentParser.h behavior.
 
+  State state() const { return m_state; }
   void setState(State state) { m_state = state; }
 
   // Hack to skip leading newline in <pre>/<listing> for authoring ease.
