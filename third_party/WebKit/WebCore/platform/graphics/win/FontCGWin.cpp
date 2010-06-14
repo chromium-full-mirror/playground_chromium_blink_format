@@ -155,7 +155,7 @@ static void drawGDIGlyphs(GraphicsContext* graphicsContext,
     drawIntoBitmap =
         fillColor.alpha() != 255 || graphicsContext->inTransparencyLayer();
     if (!drawIntoBitmap) {
-      IntSize size;
+      FloatSize size;
       float blur;
       Color color;
       graphicsContext->getShadow(size, blur, color);
@@ -393,7 +393,7 @@ void Font::drawGlyphs(GraphicsContext* graphicsContext,
   wkSetCGContextFontRenderingStyle(cgContext, font->isSystemFont(), false,
                                    font->platformData().useGDI());
 
-  IntSize shadowSize;
+  FloatSize shadowSize;
   float shadowBlur;
   Color shadowColor;
   graphicsContext->getShadow(shadowSize, shadowBlur, shadowColor);

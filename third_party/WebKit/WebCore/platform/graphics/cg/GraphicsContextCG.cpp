@@ -792,7 +792,7 @@ void GraphicsContext::endTransparencyLayer() {
   m_data->m_userToDeviceTransformKnownToBeIdentity = false;
 }
 
-void GraphicsContext::setPlatformShadow(const IntSize& offset,
+void GraphicsContext::setPlatformShadow(const FloatSize& offset,
                                         float blur,
                                         const Color& color,
                                         ColorSpace colorSpace) {

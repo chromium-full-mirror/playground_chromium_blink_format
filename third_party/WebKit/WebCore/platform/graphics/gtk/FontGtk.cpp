@@ -222,7 +222,7 @@ void Font::drawComplexText(GraphicsContext* context,
   float red, green, blue, alpha;
 
   // Text shadow, inspired by FontMac
-  IntSize shadowSize;
+  FloatSize shadowSize;
   float shadowBlur = 0;
   Color shadowColor;
   bool hasShadow = context->textDrawingMode() == cTextFill &&

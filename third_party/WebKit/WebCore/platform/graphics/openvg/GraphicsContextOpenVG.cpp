@@ -286,7 +286,7 @@ FloatRect GraphicsContext::roundToDevicePixels(const FloatRect& rect) {
   return FloatRect(enclosingIntRect(m_data->transformation().mapRect(rect)));
 }
 
-void GraphicsContext::setPlatformShadow(const IntSize& size,
+void GraphicsContext::setPlatformShadow(const FloatSize& size,
                                         float blur,
                                         const Color& color,
                                         ColorSpace colorSpace) {

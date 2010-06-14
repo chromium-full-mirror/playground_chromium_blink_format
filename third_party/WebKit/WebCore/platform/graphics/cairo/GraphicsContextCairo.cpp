@@ -152,7 +152,7 @@ void GraphicsContext::calculateShadowBufferDimensions(
     FloatRect& shadowRect,
     float& kernelSize,
     const FloatRect& sourceRect,
-    const IntSize& shadowSize,
+    const FloatSize& shadowSize,
     float shadowBlur) {
 #if ENABLE(FILTERS)
   // calculate the kernel size according to the HTML5 canvas shadow
@@ -175,7 +175,7 @@ static inline void drawPathShadow(GraphicsContext* context,
                                   bool fillShadow,
                                   bool strokeShadow) {
 #if ENABLE(FILTERS)
-  IntSize shadowSize;
+  FloatSize shadowSize;
   float shadowBlur;
   Color shadowColor;
   if (!context->getShadow(shadowSize, shadowBlur, shadowColor))
@@ -581,7 +581,7 @@ static void drawBorderlessRectShadow(GraphicsContext* context,
                                      const FloatRect& rect,
                                      const Color& rectColor) {
 #if ENABLE(FILTERS)
-  IntSize shadowSize;
+  FloatSize shadowSize;
   float shadowBlur;
   Color shadowColor;
 
@@ -867,7 +867,7 @@ void GraphicsContext::clipToImageBuffer(const FloatRect& rect,
   notImplemented();
 }
 
-void GraphicsContext::setPlatformShadow(IntSize const& size,
+void GraphicsContext::setPlatformShadow(FloatSize const& size,
                                         float,
                                         Color const&,
                                         ColorSpace) {
@@ -879,7 +879,7 @@ void GraphicsContext::setPlatformShadow(IntSize const& size,
     // Meaning that this graphics context is associated with a
     // CanvasRenderingContext
     // We flip the height since CG and HTML5 Canvas have opposite Y axis
-    m_common->state.shadowSize = IntSize(size.width(), -size.height());
+    m_common->state.shadowSize = FloatSize(size.width(), -size.height());
   }
 }
 

@@ -506,7 +506,7 @@ void GraphicsContext::clearPlatformShadow() {
   notImplemented();
 }
 
-void GraphicsContext::setPlatformShadow(IntSize const&,
+void GraphicsContext::setPlatformShadow(FloatSize const&,
                                         float,
                                         Color const&,
                                         ColorSpace) {

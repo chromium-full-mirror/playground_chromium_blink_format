@@ -116,7 +116,7 @@ void GraphicsContext::setStrokeColor(const Color& color,
   setPlatformStrokeColor(color, colorSpace);
 }
 
-void GraphicsContext::setShadow(const IntSize& size,
+void GraphicsContext::setShadow(const FloatSize& size,
                                 float blur,
                                 const Color& color,
                                 ColorSpace colorSpace) {
@@ -133,7 +133,7 @@ void GraphicsContext::clearShadow() {
   clearPlatformShadow();
 }
 
-bool GraphicsContext::getShadow(IntSize& size,
+bool GraphicsContext::getShadow(FloatSize& size,
                                 float& blur,
                                 Color& color) const {
   size = m_common->state.shadowSize;
