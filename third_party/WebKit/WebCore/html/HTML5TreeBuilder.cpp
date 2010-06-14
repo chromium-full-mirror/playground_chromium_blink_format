@@ -31,7 +31,7 @@
 #include "HTML5Token.h"
 #include "HTMLDocument.h"
 #include "HTMLNames.h"
-#include "HTMLParser.h"
+#include "LegacyHTMLTreeConstructor.h"
 #include "HTMLDocumentParser.h"
 #include "NotImplemented.h"
 #include <wtf/UnusedParam.h>
@@ -50,7 +50,8 @@ HTML5TreeBuilder::HTML5TreeBuilder(HTML5Lexer* lexer,
       m_isPaused(false),
       m_insertionMode(Initial),
       m_lexer(lexer),
-      m_legacyTreeConstructor(new HTMLParser(document, reportErrors)),
+      m_legacyTreeConstructor(
+          new LegacyHTMLTreeConstructor(document, reportErrors)),
       m_lastScriptElementStartLine(uninitializedLineNumberValue),
       m_scriptToProcessStartLine(uninitializedLineNumberValue) {}
 

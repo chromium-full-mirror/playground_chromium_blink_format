@@ -38,7 +38,7 @@
 #include "HTMLFormElement.h"
 #include "HTMLInputElement.h"
 #include "HTMLNames.h"
-#include "HTMLParser.h"
+#include "LegacyHTMLTreeConstructor.h"
 #include "HTMLDocumentParser.h"
 #include "LabelsNodeList.h"
 #include "Page.h"
@@ -176,7 +176,7 @@ void HTMLFormControlElement::removedFromTree(bool deep) {
   // to the form.
   // Otherwise, null out our form and remove ourselves from the form's list of
   // elements.
-  HTMLParser* treeConstructor = 0;
+  LegacyHTMLTreeConstructor* treeConstructor = 0;
   if (DocumentParser* parser = document()->parser())
     treeConstructor = parser->htmlTreeConstructor();
 
