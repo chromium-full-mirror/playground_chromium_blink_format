@@ -243,6 +243,84 @@ static v8::Handle<v8::Value> scriptStringAttrAttrGetter(
   return v8StringOrNull(imp->scriptStringAttr());
 }
 
+#if ENABLE(Condition1)
+
+static v8::Handle<v8::Value> conditionalAttr1AttrGetter(
+    v8::Local<v8::String> name,
+    const v8::AccessorInfo& info) {
+  INC_STATS("DOM.TestObj.conditionalAttr1._get");
+  TestObj* imp = V8TestObj::toNative(info.Holder());
+  return v8::Integer::New(imp->conditionalAttr1());
+}
+
+#endif  // ENABLE(Condition1)
+
+#if ENABLE(Condition1)
+
+static void conditionalAttr1AttrSetter(v8::Local<v8::String> name,
+                                       v8::Local<v8::Value> value,
+                                       const v8::AccessorInfo& info) {
+  INC_STATS("DOM.TestObj.conditionalAttr1._set");
+  TestObj* imp = V8TestObj::toNative(info.Holder());
+  int v = toInt32(value);
+  imp->setConditionalAttr1(v);
+  return;
+}
+
+#endif  // ENABLE(Condition1)
+
+#if ENABLE(Condition1) && ENABLE(Condition2)
+
+static v8::Handle<v8::Value> conditionalAttr2AttrGetter(
+    v8::Local<v8::String> name,
+    const v8::AccessorInfo& info) {
+  INC_STATS("DOM.TestObj.conditionalAttr2._get");
+  TestObj* imp = V8TestObj::toNative(info.Holder());
+  return v8::Integer::New(imp->conditionalAttr2());
+}
+
+#endif  // ENABLE(Condition1) && ENABLE(Condition2)
+
+#if ENABLE(Condition1) && ENABLE(Condition2)
+
+static void conditionalAttr2AttrSetter(v8::Local<v8::String> name,
+                                       v8::Local<v8::Value> value,
+                                       const v8::AccessorInfo& info) {
+  INC_STATS("DOM.TestObj.conditionalAttr2._set");
+  TestObj* imp = V8TestObj::toNative(info.Holder());
+  int v = toInt32(value);
+  imp->setConditionalAttr2(v);
+  return;
+}
+
+#endif  // ENABLE(Condition1) && ENABLE(Condition2)
+
+#if ENABLE(Condition1) || ENABLE(Condition2)
+
+static v8::Handle<v8::Value> conditionalAttr3AttrGetter(
+    v8::Local<v8::String> name,
+    const v8::AccessorInfo& info) {
+  INC_STATS("DOM.TestObj.conditionalAttr3._get");
+  TestObj* imp = V8TestObj::toNative(info.Holder());
+  return v8::Integer::New(imp->conditionalAttr3());
+}
+
+#endif  // ENABLE(Condition1) || ENABLE(Condition2)
+
+#if ENABLE(Condition1) || ENABLE(Condition2)
+
+static void conditionalAttr3AttrSetter(v8::Local<v8::String> name,
+                                       v8::Local<v8::Value> value,
+                                       const v8::AccessorInfo& info) {
+  INC_STATS("DOM.TestObj.conditionalAttr3._set");
+  TestObj* imp = V8TestObj::toNative(info.Holder());
+  int v = toInt32(value);
+  imp->setConditionalAttr3(v);
+  return;
+}
+
+#endif  // ENABLE(Condition1) || ENABLE(Condition2)
+
 static v8::Handle<v8::Value> descriptionAttrGetter(
     v8::Local<v8::String> name,
     const v8::AccessorInfo& info) {
@@ -781,6 +859,27 @@ static const BatchedAttribute TestObjAttrs[] = {
     {"scriptStringAttr", TestObjInternal::scriptStringAttrAttrGetter, 0,
      0 /* no data */, static_cast<v8::AccessControl>(v8::DEFAULT),
      static_cast<v8::PropertyAttribute>(v8::None), 0 /* on instance */},
+#if ENABLE(Condition1)
+    // Attribute 'conditionalAttr1' (Type: 'attribute' ExtAttr: 'Conditional')
+    {"conditionalAttr1", TestObjInternal::conditionalAttr1AttrGetter,
+     TestObjInternal::conditionalAttr1AttrSetter, 0 /* no data */,
+     static_cast<v8::AccessControl>(v8::DEFAULT),
+     static_cast<v8::PropertyAttribute>(v8::None), 0 /* on instance */},
+#endif  // ENABLE(Condition1)
+#if ENABLE(Condition1) && ENABLE(Condition2)
+    // Attribute 'conditionalAttr2' (Type: 'attribute' ExtAttr: 'Conditional')
+    {"conditionalAttr2", TestObjInternal::conditionalAttr2AttrGetter,
+     TestObjInternal::conditionalAttr2AttrSetter, 0 /* no data */,
+     static_cast<v8::AccessControl>(v8::DEFAULT),
+     static_cast<v8::PropertyAttribute>(v8::None), 0 /* on instance */},
+#endif  // ENABLE(Condition1) && ENABLE(Condition2)
+#if ENABLE(Condition1) || ENABLE(Condition2)
+    // Attribute 'conditionalAttr3' (Type: 'attribute' ExtAttr: 'Conditional')
+    {"conditionalAttr3", TestObjInternal::conditionalAttr3AttrGetter,
+     TestObjInternal::conditionalAttr3AttrSetter, 0 /* no data */,
+     static_cast<v8::AccessControl>(v8::DEFAULT),
+     static_cast<v8::PropertyAttribute>(v8::None), 0 /* on instance */},
+#endif  // ENABLE(Condition1) || ENABLE(Condition2)
     // Attribute 'description' (Type: 'readonly attribute' ExtAttr: '')
     {"description", TestObjInternal::descriptionAttrGetter, 0, 0 /* no data */,
      static_cast<v8::AccessControl>(v8::DEFAULT),

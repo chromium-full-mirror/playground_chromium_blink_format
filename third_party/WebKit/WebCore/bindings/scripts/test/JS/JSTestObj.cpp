@@ -46,7 +46,7 @@ ASSERT_CLASS_FITS_IN_CELL(JSTestObj);
 #define THUNK_GENERATOR(generator)
 #endif
 
-static const HashTableValue JSTestObjTableValues[18] = {
+static const HashTableValue JSTestObjTableValues[21] = {
     {"readOnlyIntAttr", DontDelete | ReadOnly,
      (intptr_t) static_cast<PropertySlot::GetValueFunc>(
          jsTestObjReadOnlyIntAttr),
@@ -94,6 +94,24 @@ static const HashTableValue JSTestObjTableValues[18] = {
      (intptr_t) static_cast<PropertySlot::GetValueFunc>(
          jsTestObjScriptStringAttr),
      (intptr_t)0 THUNK_GENERATOR(0)},
+#if ENABLE(Condition1)
+    {"conditionalAttr1", DontDelete,
+     (intptr_t) static_cast<PropertySlot::GetValueFunc>(
+         jsTestObjConditionalAttr1),
+     (intptr_t)setJSTestObjConditionalAttr1 THUNK_GENERATOR(0)},
+#endif
+#if ENABLE(Condition1) && ENABLE(Condition2)
+    {"conditionalAttr2", DontDelete,
+     (intptr_t) static_cast<PropertySlot::GetValueFunc>(
+         jsTestObjConditionalAttr2),
+     (intptr_t)setJSTestObjConditionalAttr2 THUNK_GENERATOR(0)},
+#endif
+#if ENABLE(Condition1) || ENABLE(Condition2)
+    {"conditionalAttr3", DontDelete,
+     (intptr_t) static_cast<PropertySlot::GetValueFunc>(
+         jsTestObjConditionalAttr3),
+     (intptr_t)setJSTestObjConditionalAttr3 THUNK_GENERATOR(0)},
+#endif
     {"description", DontDelete | ReadOnly,
      (intptr_t) static_cast<PropertySlot::GetValueFunc>(jsTestObjDescription),
      (intptr_t)0 THUNK_GENERATOR(0)},
@@ -109,7 +127,7 @@ static const HashTableValue JSTestObjTableValues[18] = {
     {0, 0, 0, 0 THUNK_GENERATOR(0)}};
 
 #undef THUNK_GENERATOR
-static JSC_CONST_HASHTABLE HashTable JSTestObjTable = {65, 63,
+static JSC_CONST_HASHTABLE HashTable JSTestObjTable = {66, 63,
                                                        JSTestObjTableValues, 0};
 /* Hash table for constructor */
 #if ENABLE(JIT)
@@ -126,34 +144,40 @@ static JSC_CONST_HASHTABLE HashTable JSTestObjConstructorTable = {
     1, 0, JSTestObjConstructorTableValues, 0};
 class JSTestObjConstructor : public DOMConstructorObject {
  public:
-  JSTestObjConstructor(ExecState* exec, JSDOMGlobalObject* globalObject)
-      : DOMConstructorObject(JSTestObjConstructor::createStructure(
-                                 globalObject->objectPrototype()),
-                             globalObject) {
-    putDirect(exec->propertyNames().prototype,
-              JSTestObjPrototype::self(exec, globalObject),
-              DontDelete | ReadOnly);
-  }
-  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
-  virtual bool getOwnPropertyDescriptor(ExecState*,
-                                        const Identifier&,
-                                        PropertyDescriptor&);
-  virtual const ClassInfo* classInfo() const { return &s_info; }
-  static const ClassInfo s_info;
+  JSTestObjConstructor(JSC::ExecState*, JSDOMGlobalObject*);
 
-  static PassRefPtr<Structure> createStructure(JSValue proto) {
-    return Structure::create(proto, TypeInfo(ObjectType, StructureFlags),
-                             AnonymousSlotCount);
+  virtual bool getOwnPropertySlot(JSC::ExecState*,
+                                  const JSC::Identifier&,
+                                  JSC::PropertySlot&);
+  virtual bool getOwnPropertyDescriptor(JSC::ExecState*,
+                                        const JSC::Identifier&,
+                                        JSC::PropertyDescriptor&);
+  virtual const JSC::ClassInfo* classInfo() const { return &s_info; }
+  static const JSC::ClassInfo s_info;
+  static PassRefPtr<JSC::Structure> createStructure(JSC::JSValue prototype) {
+    return JSC::Structure::create(
+        prototype, JSC::TypeInfo(JSC::ObjectType, StructureFlags),
+        AnonymousSlotCount);
   }
 
  protected:
-  static const unsigned StructureFlags = OverridesGetOwnPropertySlot |
-                                         ImplementsHasInstance |
+  static const unsigned StructureFlags = JSC::OverridesGetOwnPropertySlot |
+                                         JSC::ImplementsHasInstance |
                                          DOMConstructorObject::StructureFlags;
 };
 
 const ClassInfo JSTestObjConstructor::s_info = {"TestObjConstructor", 0,
                                                 &JSTestObjConstructorTable, 0};
+
+JSTestObjConstructor::JSTestObjConstructor(ExecState* exec,
+                                           JSDOMGlobalObject* globalObject)
+    : DOMConstructorObject(JSTestObjConstructor::createStructure(
+                               globalObject->objectPrototype()),
+                           globalObject) {
+  putDirect(exec->propertyNames().prototype,
+            JSTestObjPrototype::self(exec, globalObject),
+            DontDelete | ReadOnly);
+}
 
 bool JSTestObjConstructor::getOwnPropertySlot(ExecState* exec,
                                               const Identifier& propertyName,
@@ -482,6 +506,42 @@ JSValue jsTestObjScriptStringAttr(ExecState* exec,
   return result;
 }
 
+#if ENABLE(Condition1)
+JSValue jsTestObjConditionalAttr1(ExecState* exec,
+                                  JSValue slotBase,
+                                  const Identifier&) {
+  JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(slotBase));
+  UNUSED_PARAM(exec);
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
+  JSValue result = jsNumber(exec, imp->conditionalAttr1());
+  return result;
+}
+#endif
+
+#if ENABLE(Condition1) && ENABLE(Condition2)
+JSValue jsTestObjConditionalAttr2(ExecState* exec,
+                                  JSValue slotBase,
+                                  const Identifier&) {
+  JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(slotBase));
+  UNUSED_PARAM(exec);
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
+  JSValue result = jsNumber(exec, imp->conditionalAttr2());
+  return result;
+}
+#endif
+
+#if ENABLE(Condition1) || ENABLE(Condition2)
+JSValue jsTestObjConditionalAttr3(ExecState* exec,
+                                  JSValue slotBase,
+                                  const Identifier&) {
+  JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(slotBase));
+  UNUSED_PARAM(exec);
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
+  JSValue result = jsNumber(exec, imp->conditionalAttr3());
+  return result;
+}
+#endif
+
 JSValue jsTestObjDescription(ExecState* exec,
                              JSValue slotBase,
                              const Identifier&) {
@@ -594,6 +654,36 @@ void setJSTestObjCustomAttr(ExecState* exec,
                             JSValue value) {
   static_cast<JSTestObj*>(thisObject)->setCustomAttr(exec, value);
 }
+
+#if ENABLE(Condition1)
+void setJSTestObjConditionalAttr1(ExecState* exec,
+                                  JSObject* thisObject,
+                                  JSValue value) {
+  JSTestObj* castedThis = static_cast<JSTestObj*>(thisObject);
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
+  imp->setConditionalAttr1(value.toInt32(exec));
+}
+#endif
+
+#if ENABLE(Condition1) && ENABLE(Condition2)
+void setJSTestObjConditionalAttr2(ExecState* exec,
+                                  JSObject* thisObject,
+                                  JSValue value) {
+  JSTestObj* castedThis = static_cast<JSTestObj*>(thisObject);
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
+  imp->setConditionalAttr2(value.toInt32(exec));
+}
+#endif
+
+#if ENABLE(Condition1) || ENABLE(Condition2)
+void setJSTestObjConditionalAttr3(ExecState* exec,
+                                  JSObject* thisObject,
+                                  JSValue value) {
+  JSTestObj* castedThis = static_cast<JSTestObj*>(thisObject);
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
+  imp->setConditionalAttr3(value.toInt32(exec));
+}
+#endif
 
 void setJSTestObjId(ExecState* exec, JSObject* thisObject, JSValue value) {
   JSTestObj* castedThis = static_cast<JSTestObj*>(thisObject);
@@ -1066,7 +1156,7 @@ jsTestObjPrototypeFunctionMethodWithNonOptionalArgAndTwoOptionalArgs(
   return JSValue::encode(jsUndefined());
 }
 
-EncodedJSValue JSC_HOST_CALL
+static EncodedJSValue JSC_HOST_CALL
 jsTestObjPrototypeFunctionOverloadedMethod1(ExecState* exec) {
   JSValue thisValue = exec->hostThisValue();
   if (!thisValue.inherits(&JSTestObj::s_info))
@@ -1080,7 +1170,7 @@ jsTestObjPrototypeFunctionOverloadedMethod1(ExecState* exec) {
   return JSValue::encode(jsUndefined());
 }
 
-EncodedJSValue JSC_HOST_CALL
+static EncodedJSValue JSC_HOST_CALL
 jsTestObjPrototypeFunctionOverloadedMethod2(ExecState* exec) {
   JSValue thisValue = exec->hostThisValue();
   if (!thisValue.inherits(&JSTestObj::s_info))
@@ -1101,7 +1191,7 @@ jsTestObjPrototypeFunctionOverloadedMethod2(ExecState* exec) {
   return JSValue::encode(jsUndefined());
 }
 
-EncodedJSValue JSC_HOST_CALL
+static EncodedJSValue JSC_HOST_CALL
 jsTestObjPrototypeFunctionOverloadedMethod3(ExecState* exec) {
   JSValue thisValue = exec->hostThisValue();
   if (!thisValue.inherits(&JSTestObj::s_info))
@@ -1114,7 +1204,7 @@ jsTestObjPrototypeFunctionOverloadedMethod3(ExecState* exec) {
   return JSValue::encode(jsUndefined());
 }
 
-EncodedJSValue JSC_HOST_CALL
+static EncodedJSValue JSC_HOST_CALL
 jsTestObjPrototypeFunctionOverloadedMethod4(ExecState* exec) {
   JSValue thisValue = exec->hostThisValue();
   if (!thisValue.inherits(&JSTestObj::s_info))
@@ -1131,16 +1221,19 @@ EncodedJSValue JSC_HOST_CALL
 jsTestObjPrototypeFunctionOverloadedMethod(ExecState* exec) {
   if ((exec->argumentCount() == 2 &&
        (exec->argument(0).isNull() ||
-        asObject(exec->argument(0))->inherits(&JSTestObj::s_info)) &&
+        exec->argument(0).isObject() &&
+            asObject(exec->argument(0))->inherits(&JSTestObj::s_info)) &&
        (exec->argument(1).isNull() || exec->argument(1).isUndefined() ||
         exec->argument(1).isString() || exec->argument(1).isObject())))
     return jsTestObjPrototypeFunctionOverloadedMethod1(exec);
   if ((exec->argumentCount() == 1 &&
        (exec->argument(0).isNull() ||
-        asObject(exec->argument(0))->inherits(&JSTestObj::s_info))) ||
+        exec->argument(0).isObject() &&
+            asObject(exec->argument(0))->inherits(&JSTestObj::s_info))) ||
       (exec->argumentCount() == 2 &&
        (exec->argument(0).isNull() ||
-        asObject(exec->argument(0))->inherits(&JSTestObj::s_info))))
+        exec->argument(0).isObject() &&
+            asObject(exec->argument(0))->inherits(&JSTestObj::s_info))))
     return jsTestObjPrototypeFunctionOverloadedMethod2(exec);
   if ((exec->argumentCount() == 1 &&
        (exec->argument(0).isNull() || exec->argument(0).isUndefined() ||
@@ -1148,7 +1241,7 @@ jsTestObjPrototypeFunctionOverloadedMethod(ExecState* exec) {
     return jsTestObjPrototypeFunctionOverloadedMethod3(exec);
   if (exec->argumentCount() == 1)
     return jsTestObjPrototypeFunctionOverloadedMethod4(exec);
-  return throwTypeError(exec);
+  return JSValue::encode(throwTypeError(exec));
 }
 
 JSC::JSValue toJS(JSC::ExecState* exec,

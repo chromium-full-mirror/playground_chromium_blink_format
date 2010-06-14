@@ -24,6 +24,8 @@
 #ifndef WebDOMTestInterface_h
 #define WebDOMTestInterface_h
 
+#if ENABLE(Condition1) || ENABLE(Condition2)
+
 #include <WebDOMObject.h>
 #include <WebDOMString.h>
 
@@ -49,3 +51,4 @@ WebCore::TestInterface* toWebCore(const WebDOMTestInterface&);
 WebDOMTestInterface toWebKit(WebCore::TestInterface*);
 
 #endif
+#endif  // ENABLE(Condition1) || ENABLE(Condition2)

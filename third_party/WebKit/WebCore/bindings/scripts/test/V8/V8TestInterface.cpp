@@ -21,6 +21,8 @@
 #include "config.h"
 #include "V8TestInterface.h"
 
+#if ENABLE(Condition1) || ENABLE(Condition2)
+
 #include "RuntimeEnabledFeatures.h"
 #include "V8Binding.h"
 #include "V8BindingState.h"
@@ -109,3 +111,5 @@ void V8TestInterface::derefObject(void* object) {
 }
 
 }  // namespace WebCore
+
+#endif  // ENABLE(Condition1) || ENABLE(Condition2)

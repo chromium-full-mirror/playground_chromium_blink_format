@@ -21,6 +21,8 @@
 #ifndef WEB_KIT_DOM_TEST_CALLBACK_PRIVATE_H
 #define WEB_KIT_DOM_TEST_CALLBACK_PRIVATE_H
 
+#if ENABLE(DATABASE)
+
 #include <glib-object.h>
 #include <webkit/WebKitDOMObject.h>
 #include "TestCallback.h"
@@ -32,5 +34,7 @@ WebCore::TestCallback* core(WebKitDOMTestCallback* request);
 gpointer kit(WebCore::TestCallback* node);
 
 }  // namespace WebKit
+
+#endif /* ENABLE(DATABASE) */
 
 #endif /* WEB_KIT_DOM_TEST_CALLBACK_PRIVATE_H */
