@@ -123,6 +123,14 @@ CString StringBlobItem::convertToCString(const String& text,
   if (ending == EndingTransparent)
     return result;
 
+  if (ending == EndingNative) {
+#if OS(WINDOWS)
+    ending = EndingCRLF;
+#else
+    ending = EndingLF;
+#endif
+  }
+
   const char* endingChars =
       (ending == EndingCRLF) ? "\r\n" : ((ending == EndingCR) ? "\r" : "\n");
 

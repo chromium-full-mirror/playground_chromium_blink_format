@@ -41,7 +41,10 @@ namespace WebCore {
 
 class Blob : public RefCounted<Blob> {
  public:
-  static PassRefPtr<Blob> create() { return adoptRef(new Blob()); }
+  static PassRefPtr<Blob> create(const String& type,
+                                 const BlobItemList& items) {
+    return adoptRef(new Blob(type, items));
+  }
 
   // FIXME: Deprecated method.  This is called only from
   // bindings/v8/SerializedScriptValue.cpp and the usage in it will become
@@ -60,7 +63,6 @@ class Blob : public RefCounted<Blob> {
   // FIXME: Deprecated method.
   const String& path() const;
 
-  void append(PassRefPtr<BlobItem>);
   const BlobItemList& items() const { return m_items; }
 
 #if ENABLE(BLOB_SLICE)
@@ -68,7 +70,7 @@ class Blob : public RefCounted<Blob> {
 #endif
 
  protected:
-  Blob() {}
+  Blob(const String& type, const BlobItemList&);
 
   // FIXME: Deprecated constructor.  See also the comment for
   // Blob::create(path).
