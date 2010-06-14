@@ -127,6 +127,11 @@ class QWEBKIT_EXPORT DumpRenderTreeSupportQt {
       bool allowDestinationSubdomains);
   static void resetOriginAccessWhiteLists();
 
+  static void setMockGeolocationPosition(double latitude,
+                                         double longitude,
+                                         double accuracy);
+  static void setMockGeolocationError(int errorCode, const QString& message);
+
   static int workerThreadCount();
 
   static QString markerTextForListItem(const QWebElement& listItem);

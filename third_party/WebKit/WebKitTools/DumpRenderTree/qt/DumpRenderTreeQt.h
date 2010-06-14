@@ -205,6 +205,7 @@ class WebPage : public QWebPage {
 
  public slots:
   bool shouldInterruptJavaScript() { return false; }
+  bool allowGeolocationRequest(QWebFrame* frame);
 
  protected:
   bool acceptNavigationRequest(QWebFrame* frame,

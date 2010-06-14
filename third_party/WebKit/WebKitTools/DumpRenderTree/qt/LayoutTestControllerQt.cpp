@@ -641,5 +641,22 @@ void LayoutTestController::setEditingBehavior(const QString& editingBehavior) {
                                               editingBehavior);
 }
 
+void LayoutTestController::setGeolocationPermission(bool allow) {
+  m_isGeolocationPermissionSet = true;
+  m_geolocationPermission = allow;
+}
+
+void LayoutTestController::setMockGeolocationError(int code,
+                                                   const QString& message) {
+  DumpRenderTreeSupportQt::setMockGeolocationError(code, message);
+}
+
+void LayoutTestController::setMockGeolocationPosition(double latitude,
+                                                      double longitude,
+                                                      double accuracy) {
+  DumpRenderTreeSupportQt::setMockGeolocationPosition(latitude, longitude,
+                                                      accuracy);
+}
+
 const unsigned LayoutTestController::maxViewWidth = 800;
 const unsigned LayoutTestController::maxViewHeight = 600;
