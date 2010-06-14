@@ -105,6 +105,12 @@ AccessibilityUIElement AccessibilityUIElement::elementAtPoint(int x, int y) {
   return 0;
 }
 
+AccessibilityUIElement AccessibilityUIElement::linkedUIElementAtIndex(
+    unsigned index) {
+  // FIXME: implement
+  return 0;
+}
+
 AccessibilityUIElement AccessibilityUIElement::getChildAtIndex(unsigned index) {
   Vector<AccessibilityUIElement> children;
   getChildrenWithRange(children, index, index + 1);
