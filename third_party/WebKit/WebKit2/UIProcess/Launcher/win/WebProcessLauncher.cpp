@@ -70,8 +70,12 @@ ProcessInfo launchWebProcess(CoreIPC::Connection::Client* client,
       break;
     }
     case ProcessModelSecondaryProcess: {
-      // FIXME: We would like to pass a full path to the .exe here.
+// FIXME: We would like to pass a full path to the .exe here.
+#ifndef DEBUG_ALL
+      String commandLine(L"WebKit2WebProcess.exe");
+#else
       String commandLine(L"WebKit2WebProcess_debug.exe");
+#endif
 
       STARTUPINFO startupInfo = {0};
       startupInfo.cb = sizeof(startupInfo);
