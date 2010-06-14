@@ -128,7 +128,6 @@
 #include "JSWorkerContextCustom.cpp"
 #include "JSWorkerContextErrorHandler.cpp"
 #include "JSWorkerCustom.cpp"
-#include "JSXMLHttpRequestConstructor.cpp"
 #include "JSXMLHttpRequestCustom.cpp"
 #include "JSXMLHttpRequestUploadCustom.cpp"
 #include "JSXSLTProcessorConstructor.cpp"
