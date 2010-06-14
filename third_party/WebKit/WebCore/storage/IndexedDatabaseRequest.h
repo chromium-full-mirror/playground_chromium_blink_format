@@ -40,9 +40,11 @@
 namespace WebCore {
 
 class IDBAny;
+class IDBKeyRange;
 class IDBRequest;
 class IndexedDatabase;
 class ScriptExecutionContext;
+class SerializedScriptValue;
 
 class IndexedDatabaseRequest : public RefCounted<IndexedDatabaseRequest> {
  public:
@@ -55,6 +57,19 @@ class IndexedDatabaseRequest : public RefCounted<IndexedDatabaseRequest> {
   PassRefPtr<IDBRequest> open(ScriptExecutionContext*,
                               const String& name,
                               const String& description);
+  PassRefPtr<IDBKeyRange> makeSingleKeyRange(
+      PassRefPtr<SerializedScriptValue> value);
+  PassRefPtr<IDBKeyRange> makeLeftBoundKeyRange(
+      PassRefPtr<SerializedScriptValue> bound,
+      bool open = false);
+  PassRefPtr<IDBKeyRange> makeRightBoundKeyRange(
+      PassRefPtr<SerializedScriptValue> bound,
+      bool open = false);
+  PassRefPtr<IDBKeyRange> makeBoundKeyRange(
+      PassRefPtr<SerializedScriptValue> left,
+      PassRefPtr<SerializedScriptValue> right,
+      bool openLeft = false,
+      bool openRight = false);
 
  private:
   IndexedDatabaseRequest(IndexedDatabase*);
