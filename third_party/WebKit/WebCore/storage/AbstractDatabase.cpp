@@ -31,6 +31,10 @@
 
 #if ENABLE(DATABASE)
 
-namespace WebCore {}  // namespace WebCore
+namespace WebCore {
+
+AbstractDatabase::~AbstractDatabase() {}
+
+}  // namespace WebCore
 
 #endif  // ENABLE(DATABASE)

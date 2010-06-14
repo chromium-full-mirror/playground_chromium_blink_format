@@ -36,7 +36,7 @@
 
 #if WEBKIT_IMPLEMENTATION
 namespace WebCore {
-class Database;
+class AbstractDatabase;
 }
 namespace WTF {
 template <typename T>
@@ -82,9 +82,9 @@ class WebDatabase {
       const WebString& databaseName);
 
 #if WEBKIT_IMPLEMENTATION
-  WebDatabase(const WTF::PassRefPtr<WebCore::Database>&);
-  WebDatabase& operator=(const WTF::PassRefPtr<WebCore::Database>&);
-  operator WTF::PassRefPtr<WebCore::Database>() const;
+  WebDatabase(const WTF::PassRefPtr<WebCore::AbstractDatabase>&);
+  WebDatabase& operator=(const WTF::PassRefPtr<WebCore::AbstractDatabase>&);
+  operator WTF::PassRefPtr<WebCore::AbstractDatabase>() const;
 #endif
 
  private:

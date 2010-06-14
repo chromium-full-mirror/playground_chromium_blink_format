@@ -38,7 +38,7 @@
 
 namespace WebCore {
 
-class Database;
+class AbstractDatabase;
 class OriginUsageRecord;
 
 class OriginQuotaManager : public Noncopyable {
@@ -57,7 +57,8 @@ class OriginQuotaManager : public Noncopyable {
   void removeDatabase(SecurityOrigin*, const String& databaseIdentifier);
   void removeOrigin(SecurityOrigin*);
 
-  void markDatabase(Database*);  // Mark dirtiness of a specific database.
+  void markDatabase(
+      AbstractDatabase*);  // Mark dirtiness of a specific database.
   unsigned long long diskUsage(SecurityOrigin*) const;
 
  private:

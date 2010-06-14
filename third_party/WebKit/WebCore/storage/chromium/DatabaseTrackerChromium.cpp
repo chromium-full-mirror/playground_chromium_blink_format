@@ -31,7 +31,7 @@
 #include "config.h"
 #include "DatabaseTracker.h"
 
-#include "Database.h"
+#include "AbstractDatabase.h"
 #include "DatabaseObserver.h"
 #include "DatabaseThread.h"
 #include "QuotaTracker.h"
@@ -77,7 +77,7 @@ String DatabaseTracker::fullPathForDatabase(SecurityOrigin* origin,
   return origin->databaseIdentifier() + "/" + name + "#";
 }
 
-void DatabaseTracker::addOpenDatabase(Database* database) {
+void DatabaseTracker::addOpenDatabase(AbstractDatabase* database) {
   ASSERT(database->scriptExecutionContext()->isContextThread());
   MutexLocker openDatabaseMapLock(m_openDatabaseMapGuard);
   if (!m_openDatabaseMap)
@@ -104,7 +104,7 @@ void DatabaseTracker::addOpenDatabase(Database* database) {
 class TrackerRemoveOpenDatabaseTask : public ScriptExecutionContext::Task {
  public:
   static PassOwnPtr<TrackerRemoveOpenDatabaseTask> create(
-      PassRefPtr<Database> database) {
+      PassRefPtr<AbstractDatabase> database) {
     return new TrackerRemoveOpenDatabaseTask(database);
   }
 
@@ -113,13 +113,13 @@ class TrackerRemoveOpenDatabaseTask : public ScriptExecutionContext::Task {
   }
 
  private:
-  TrackerRemoveOpenDatabaseTask(PassRefPtr<Database> database)
+  TrackerRemoveOpenDatabaseTask(PassRefPtr<AbstractDatabase> database)
       : m_database(database) {}
 
-  RefPtr<Database> m_database;
+  RefPtr<AbstractDatabase> m_database;
 };
 
-void DatabaseTracker::removeOpenDatabase(Database* database) {
+void DatabaseTracker::removeOpenDatabase(AbstractDatabase* database) {
   if (!database->scriptExecutionContext()->isContextThread()) {
     database->scriptExecutionContext()->postTask(
         TrackerRemoveOpenDatabaseTask::create(database));
@@ -147,9 +147,10 @@ void DatabaseTracker::removeOpenDatabase(Database* database) {
   DatabaseObserver::databaseClosed(database);
 }
 
-void DatabaseTracker::getOpenDatabases(SecurityOrigin* origin,
-                                       const String& name,
-                                       HashSet<RefPtr<Database>>* databases) {
+void DatabaseTracker::getOpenDatabases(
+    SecurityOrigin* origin,
+    const String& name,
+    HashSet<RefPtr<AbstractDatabase>>* databases) {
   MutexLocker openDatabaseMapLock(m_openDatabaseMapGuard);
   if (!m_openDatabaseMap)
     return;
@@ -168,7 +169,7 @@ void DatabaseTracker::getOpenDatabases(SecurityOrigin* origin,
 }
 
 unsigned long long DatabaseTracker::getMaxSizeForDatabase(
-    const Database* database) {
+    const AbstractDatabase* database) {
   ASSERT(currentThread() ==
          database->scriptExecutionContext()->databaseThread()->getThreadID());
   unsigned long long spaceAvailable = 0;

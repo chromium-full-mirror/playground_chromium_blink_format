@@ -44,7 +44,7 @@
 
 namespace WebCore {
 
-class Database;
+class AbstractDatabase;
 class ScriptExecutionContext;
 class SecurityOrigin;
 
@@ -80,19 +80,19 @@ class DatabaseTracker : public Noncopyable {
                              const String& name,
                              bool createIfDoesNotExist = true);
 
-  void addOpenDatabase(Database*);
-  void removeOpenDatabase(Database*);
+  void addOpenDatabase(AbstractDatabase*);
+  void removeOpenDatabase(AbstractDatabase*);
   void getOpenDatabases(SecurityOrigin* origin,
                         const String& name,
-                        HashSet<RefPtr<Database>>* databases);
+                        HashSet<RefPtr<AbstractDatabase>>* databases);
 
-  unsigned long long getMaxSizeForDatabase(const Database*);
-  void databaseChanged(Database*);
+  unsigned long long getMaxSizeForDatabase(const AbstractDatabase*);
+  void databaseChanged(AbstractDatabase*);
 
  private:
   DatabaseTracker(const String& databasePath);
 
-  typedef HashSet<Database*> DatabaseSet;
+  typedef HashSet<AbstractDatabase*> DatabaseSet;
   typedef HashMap<String, DatabaseSet*> DatabaseNameMap;
   typedef HashMap<RefPtr<SecurityOrigin>, DatabaseNameMap*, SecurityOriginHash>
       DatabaseOriginMap;
