@@ -974,11 +974,12 @@ const Animation* RenderStyle::transitionForProperty(int property) const {
 }
 
 void RenderStyle::setBlendedFontSize(int size) {
+  FontSelector* currentFontSelector = font().fontSelector();
   FontDescription desc(fontDescription());
   desc.setSpecifiedSize(size);
   desc.setComputedSize(size);
   setFontDescription(desc);
-  font().update(font().fontSelector());
+  font().update(currentFontSelector);
 }
 
 void RenderStyle::getBoxShadowExtent(int& top,
