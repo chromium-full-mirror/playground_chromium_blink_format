@@ -140,6 +140,12 @@ class InspectorController
   void show();
   void showPanel(SpecialPanels);
   void close();
+
+  // We are in transition from JS transport via webInspector to native
+  // transport via InspectorClient. After migration, webInspector parameter
+  // should
+  // be removed.
+  void connectFrontend(const ScriptObject& webInspector);
   void disconnectFrontend();
 
   void addMessageToConsole(MessageSource,
@@ -167,7 +173,6 @@ class InspectorController
   void inspectedWindowScriptObjectCleared(Frame*);
 
   bool windowVisible();
-  void setFrontend(PassOwnPtr<InspectorFrontend>);
 
   void didCommitLoad(DocumentLoader*);
   void frameDetachedFromParent(Frame*);

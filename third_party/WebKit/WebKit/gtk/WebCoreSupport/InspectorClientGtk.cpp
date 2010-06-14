@@ -20,6 +20,7 @@
 #include "config.h"
 #include "InspectorClientGtk.h"
 
+#include "Frame.h"
 #include "webkitwebview.h"
 #include "webkitwebinspector.h"
 #include "webkitprivate.h"
@@ -39,7 +40,14 @@ static void notifyWebViewDestroyed(
 }
 
 InspectorClient::InspectorClient(WebKitWebView* webView)
-    : m_inspectedWebView(webView) {}
+    : m_inspectedWebView(webView), m_frontendPage(0), m_frontendClient(0) {}
+
+InspectorClient::~InspectorClient() {
+  if (m_frontendClient) {
+    m_frontendClient->disconnectInspectorClient();
+    m_frontendClient = 0;
+  }
+}
 
 void InspectorClient::inspectorDestroyed() {
   delete this;
@@ -84,10 +92,15 @@ void InspectorClient::openInspectorFrontend(InspectorController* controller) {
 
   gtk_widget_show(GTK_WIDGET(inspectorWebView));
 
-  Page* inspectorPage = core(inspectorWebView);
-  inspectorPage->inspectorController()->setInspectorFrontendClient(
-      new InspectorFrontendClient(m_inspectedWebView, inspectorWebView,
-                                  webInspector, inspectorPage));
+  m_frontendPage = core(inspectorWebView);
+  m_frontendClient = new InspectorFrontendClient(
+      m_inspectedWebView, inspectorWebView, webInspector, m_frontendPage, this);
+  m_frontendPage->inspectorController()->setInspectorFrontendClient(
+      m_frontendClient);
+}
+
+void InspectorClient::releaseFrontendPage() {
+  m_frontendPage = 0;
 }
 
 void InspectorClient::highlight(Node* node) {
@@ -106,24 +119,49 @@ void InspectorClient::storeSetting(const String& key, const String& value) {
   notImplemented();
 }
 
+bool InspectorClient::sendMessageToFrontend(const String& message) {
+  if (!m_frontendPage)
+    return false;
+
+  Frame* frame = m_frontendPage->mainFrame();
+  if (!frame)
+    return false;
+
+  ScriptController* scriptController = frame->script();
+  if (!scriptController)
+    return false;
+
+  String dispatchToFrontend("WebInspector.dispatchMessageToFrontend(");
+  dispatchToFrontend += message;
+  dispatchToFrontend += ");";
+  scriptController->executeScript(dispatchToFrontend);
+  return true;
+}
+
 bool destroyed = TRUE;
 
 InspectorFrontendClient::InspectorFrontendClient(
     WebKitWebView* inspectedWebView,
     WebKitWebView* inspectorWebView,
     WebKitWebInspector* webInspector,
-    Page* inspectorPage)
+    Page* inspectorPage,
+    InspectorClient* inspectorClient)
     : InspectorFrontendClientLocal(
           core(inspectedWebView)->inspectorController(),
           inspectorPage),
       m_inspectorWebView(inspectorWebView),
       m_inspectedWebView(inspectedWebView),
-      m_webInspector(webInspector) {
+      m_webInspector(webInspector),
+      m_inspectorClient(inspectorClient) {
   g_signal_connect(m_inspectorWebView, "destroy",
                    G_CALLBACK(notifyWebViewDestroyed), (gpointer) this);
 }
 
 InspectorFrontendClient::~InspectorFrontendClient() {
+  if (m_inspectorClient) {
+    m_inspectorClient->disconnectFrontendClient();
+    m_inspectorClient = 0;
+  }
   ASSERT(!m_webInspector);
 }
 
@@ -142,6 +180,9 @@ void InspectorFrontendClient::destroyInspectorWindow() {
   gboolean handled = FALSE;
   g_signal_emit_by_name(webInspector, "close-window", &handled);
   ASSERT(handled);
+
+  if (m_inspectorClient)
+    m_inspectorClient->releaseFrontendPage();
 
   /* we should now dispose our own reference */
   g_object_unref(webInspector);

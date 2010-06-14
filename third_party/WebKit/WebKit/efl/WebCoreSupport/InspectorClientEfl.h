@@ -50,6 +50,8 @@ class InspectorClientEfl : public WebCore::InspectorClient {
 
   virtual void populateSetting(const String& key, String* value);
   virtual void storeSetting(const String& key, const String& value);
+
+  virtual bool sendMessageToFrontend(const String&);
 };
 }
 
