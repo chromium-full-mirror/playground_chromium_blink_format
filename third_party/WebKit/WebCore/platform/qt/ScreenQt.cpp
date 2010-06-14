@@ -29,12 +29,12 @@
 #include "config.h"
 #include "Screen.h"
 
-#include "Page.h"
+#include "FloatRect.h"
 #include "Frame.h"
 #include "FrameView.h"
-#include "Widget.h"
 #include "IntRect.h"
-#include "FloatRect.h"
+#include "Page.h"
+#include "Widget.h"
 
 #include <QApplication>
 #include <QDesktopWidget>
