@@ -61,7 +61,7 @@ class DocumentParser : public Noncopyable {
   virtual void executeScriptsWaitingForStylesheets() {}
 
   virtual HTMLParser* htmlParser() const { return 0; }
-  virtual HTMLDocumentParser* asHTMLTokenizer() { return 0; }
+  virtual HTMLDocumentParser* asHTMLDocumentParser() { return 0; }
 
   XSSAuditor* xssAuditor() const { return m_XSSAuditor; }
   void setXSSAuditor(XSSAuditor* auditor) { m_XSSAuditor = auditor; }
