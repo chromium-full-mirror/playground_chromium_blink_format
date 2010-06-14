@@ -452,7 +452,7 @@ void FocusController::findFocusableNodeInDirection(
     Node* focusedNode,
     FocusDirection direction,
     KeyboardEvent* event,
-    FocusCandidate& closestFocusCandidate,
+    FocusCandidate& closest,
     const FocusCandidate& candidateParent) {
   ASSERT(outer);
   ASSERT(candidateParent.isNull() ||
@@ -460,25 +460,23 @@ void FocusController::findFocusableNodeInDirection(
          candidateParent.node->hasTagName(iframeTag) ||
          isScrollableContainerNode(candidateParent.node));
 
-  // Walk all the child nodes and update closestFocusCandidate if we find a
-  // nearer node.
-  Node* candidate = outer;
-  while (candidate) {
+  // Walk all the child nodes and update closest if we find a nearer node.
+  Node* node = outer;
+  while (node) {
     // Inner documents case.
-    if (candidate->isFrameOwnerElement()) {
-      deepFindFocusableNodeInDirection(candidate, focusedNode, direction, event,
-                                       closestFocusCandidate);
+    if (node->isFrameOwnerElement()) {
+      deepFindFocusableNodeInDirection(node, focusedNode, direction, event,
+                                       closest);
 
       // Scrollable block elements (e.g. <div>, etc) case.
-    } else if (isScrollableContainerNode(candidate)) {
-      deepFindFocusableNodeInDirection(candidate, focusedNode, direction, event,
-                                       closestFocusCandidate);
-      candidate = candidate->traverseNextSibling();
+    } else if (isScrollableContainerNode(node)) {
+      deepFindFocusableNodeInDirection(node, focusedNode, direction, event,
+                                       closest);
+      node = node->traverseNextSibling();
       continue;
 
-    } else if (candidate != focusedNode &&
-               candidate->isKeyboardFocusable(event)) {
-      FocusCandidate currentFocusCandidate(candidate);
+    } else if (node != focusedNode && node->isKeyboardFocusable(event)) {
+      FocusCandidate candidate(node);
 
       // There are two ways to identify we are in a recursive call from
       // deepFindFocusableNodeInDirection
@@ -491,32 +489,31 @@ void FocusController::findFocusableNodeInDirection(
       // 2) Parent of outer is <frame> or <iframe>;
       // 3) Parent is any other scrollable block element.
       if (!candidateParent.isNull()) {
-        currentFocusCandidate.parentAlignment = candidateParent.alignment;
-        currentFocusCandidate.parentDistance = candidateParent.distance;
-        currentFocusCandidate.enclosingScrollableBox = candidateParent.node;
+        candidate.parentAlignment = candidateParent.alignment;
+        candidate.parentDistance = candidateParent.distance;
+        candidate.enclosingScrollableBox = candidateParent.node;
 
       } else if (!isInRootDocument(outer)) {
         if (Document* document = static_cast<Document*>(outer->parent()))
-          currentFocusCandidate.enclosingScrollableBox =
+          candidate.enclosingScrollableBox =
               static_cast<Node*>(document->ownerElement());
 
       } else if (isScrollableContainerNode(outer->parent()))
-        currentFocusCandidate.enclosingScrollableBox = outer->parent();
+        candidate.enclosingScrollableBox = outer->parent();
 
       // Get distance and alignment from current candidate.
-      distanceDataForNode(direction, focusedNode, currentFocusCandidate);
+      distanceDataForNode(direction, focusedNode, candidate);
 
       // Bail out if distance is maximum.
-      if (currentFocusCandidate.distance == maxDistance()) {
-        candidate = candidate->traverseNextNode(outer->parent());
+      if (candidate.distance == maxDistance()) {
+        node = node->traverseNextNode(outer->parent());
         continue;
       }
 
-      updateFocusCandidateIfCloser(focusedNode, currentFocusCandidate,
-                                   closestFocusCandidate);
+      updateFocusCandidateIfCloser(focusedNode, candidate, closest);
     }
 
-    candidate = candidate->traverseNextNode(outer->parent());
+    node = node->traverseNextNode(outer->parent());
   }
 }
 
@@ -525,7 +522,7 @@ void FocusController::deepFindFocusableNodeInDirection(
     Node* focusedNode,
     FocusDirection direction,
     KeyboardEvent* event,
-    FocusCandidate& closestFocusCandidate) {
+    FocusCandidate& closest) {
   ASSERT(container->hasTagName(frameTag) || container->hasTagName(iframeTag) ||
          isScrollableContainerNode(container));
 
@@ -556,7 +553,7 @@ void FocusController::deepFindFocusableNodeInDirection(
 
   if (descendantOfContainer) {
     findFocusableNodeInDirection(firstChild, focusedNode, direction, event,
-                                 closestFocusCandidate);
+                                 closest);
     return;
   }
 
@@ -570,9 +567,9 @@ void FocusController::deepFindFocusableNodeInDirection(
     return;
 
   // FIXME: Consider alignment?
-  if (candidateParent.distance < closestFocusCandidate.distance)
+  if (candidateParent.distance < closest.distance)
     findFocusableNodeInDirection(firstChild, focusedNode, direction, event,
-                                 closestFocusCandidate, candidateParent);
+                                 closest, candidateParent);
 }
 
 static bool relinquishesEditingFocus(Node* node) {
