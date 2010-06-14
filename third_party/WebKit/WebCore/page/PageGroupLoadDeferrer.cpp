@@ -44,8 +44,10 @@ PageGroupLoadDeferrer::PageGroupLoadDeferrer(Page* page, bool deferSelf) {
       // JS code executed beneath modal
       // windows or sheets, which is exactly when PageGroupLoadDeferrer is used.
       for (Frame* frame = otherPage->mainFrame(); frame;
-           frame = frame->tree()->traverseNext())
+           frame = frame->tree()->traverseNext()) {
         frame->document()->suspendActiveDOMObjects();
+        frame->document()->suspendExecuteScriptSoonTimer();
+      }
     }
   }
 
@@ -61,8 +63,10 @@ PageGroupLoadDeferrer::~PageGroupLoadDeferrer() {
       page->setDefersLoading(false);
 
       for (Frame* frame = page->mainFrame(); frame;
-           frame = frame->tree()->traverseNext())
+           frame = frame->tree()->traverseNext()) {
         frame->document()->resumeActiveDOMObjects();
+        frame->document()->resumeExecuteScriptSoonTimer();
+      }
     }
   }
 }
