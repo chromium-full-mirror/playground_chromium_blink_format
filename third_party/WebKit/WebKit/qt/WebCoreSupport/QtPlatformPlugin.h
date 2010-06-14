@@ -27,6 +27,7 @@
 
 class QWebSelectMethod;
 class QWebKitPlatformPlugin;
+class QWebNotificationPresenter;
 
 namespace WebCore {
 
@@ -52,6 +53,9 @@ class QtPlatformPlugin {
   ~QtPlatformPlugin();
 
   QtAbstractWebPopup* createSelectInputMethod();
+  QWebNotificationPresenter* createNotificationPresenter();
+
+  QWebKitPlatformPlugin* plugin();
 
  private:
   bool m_loaded;
@@ -59,8 +63,6 @@ class QtPlatformPlugin {
   QPluginLoader m_loader;
   bool load();
   bool load(const QString& file);
-
-  QWebKitPlatformPlugin* plugin();
 };
 }
 

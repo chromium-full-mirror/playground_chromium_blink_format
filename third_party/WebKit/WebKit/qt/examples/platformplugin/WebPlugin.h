@@ -21,6 +21,7 @@
 #define WEBPLUGIN_H
 
 #include "qwebkitplatformplugin.h"
+#include "WebNotificationPresenter.h"
 
 #include <QDialog>
 
@@ -86,6 +87,9 @@ class WebPlugin : public QObject, public QWebKitPlatformPlugin {
     return new WebPopup();
   }
   virtual bool supportsExtension(Extension extension) const;
+  virtual QWebNotificationPresenter* createNotificationPresenter() const {
+    return new WebNotificationPresenter();
+  }
 };
 
 #endif  // WEBPLUGIN_H

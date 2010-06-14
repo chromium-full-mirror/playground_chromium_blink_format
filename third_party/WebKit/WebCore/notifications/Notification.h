@@ -107,6 +107,9 @@ class Notification : public RefCounted<Notification>,
   SharedBuffer* iconData() { return m_iconData.get(); }
   void releaseIconData() { m_iconData = 0; }
 
+  // Called if the presenter is deleted before the notification is GC'd
+  void detachPresenter() { m_presenter = 0; }
+
   virtual void didReceiveResponse(const ResourceResponse&);
   virtual void didReceiveData(const char* data, int lengthReceived);
   virtual void didFinishLoading(unsigned long identifier);

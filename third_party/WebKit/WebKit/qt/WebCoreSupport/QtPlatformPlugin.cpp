@@ -156,4 +156,11 @@ QtAbstractWebPopup* QtPlatformPlugin::createSelectInputMethod() {
 
   return new SelectInputMethodWrapper(selector);
 }
+
+QWebNotificationPresenter* QtPlatformPlugin::createNotificationPresenter() {
+  QWebKitPlatformPlugin* p = plugin();
+  if (!p)
+    return 0;
+  return p->createNotificationPresenter();
+}
 }
