@@ -40,10 +40,10 @@ class TextDocument : public HTMLDocument {
  private:
   TextDocument(Frame*);
 
-  virtual DocumentParser* createTokenizer();
+  virtual DocumentParser* createParser();
 };
 
-DocumentParser* createTextTokenizer(HTMLViewSourceDocument*);
+DocumentParser* createTextDocumentParser(HTMLViewSourceDocument*);
 }
 
 #endif  // TextDocument_h

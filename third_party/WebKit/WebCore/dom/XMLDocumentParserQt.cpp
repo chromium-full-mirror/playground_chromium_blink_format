@@ -266,13 +266,13 @@ bool parseXMLDocumentFragment(const String& chunk,
   if (!chunk.length())
     return true;
 
-  XMLDocumentParser tokenizer(fragment, parent, scriptingPermission);
+  XMLDocumentParser parser(fragment, parent, scriptingPermission);
 
-  tokenizer.write(String("<qxmlstreamdummyelement>"), false);
-  tokenizer.write(chunk, false);
-  tokenizer.write(String("</qxmlstreamdummyelement>"), false);
-  tokenizer.finish();
-  return !tokenizer.hasError();
+  parser.write(String("<qxmlstreamdummyelement>"), false);
+  parser.write(chunk, false);
+  parser.write(String("</qxmlstreamdummyelement>"), false);
+  parser.finish();
+  return !parser.hasError();
 }
 
 // --------------------------------

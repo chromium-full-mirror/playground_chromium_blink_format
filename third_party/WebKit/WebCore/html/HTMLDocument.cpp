@@ -267,7 +267,7 @@ void HTMLDocument::captureEvents() {}
 
 void HTMLDocument::releaseEvents() {}
 
-DocumentParser* HTMLDocument::createTokenizer() {
+DocumentParser* HTMLDocument::createParser() {
   bool reportErrors = false;
 #if ENABLE(INSPECTOR)
   if (Page* page = this->page())

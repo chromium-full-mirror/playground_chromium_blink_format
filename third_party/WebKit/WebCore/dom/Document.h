@@ -594,8 +594,8 @@ class Document : public ContainerNode, public ScriptExecutionContext {
   CSSStyleSheet* elementSheet();
   CSSStyleSheet* mappedElementSheet();
 
-  virtual DocumentParser* createTokenizer();
-  DocumentParser* tokenizer() { return m_tokenizer.get(); }
+  virtual DocumentParser* createParser();
+  DocumentParser* parser() { return m_parser.get(); }
 
   bool printing() const { return m_printing; }
   void setPrinting(bool p) { m_printing = p; }
@@ -1183,7 +1183,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
 
   Frame* m_frame;
   OwnPtr<DocLoader> m_docLoader;
-  OwnPtr<DocumentParser> m_tokenizer;
+  OwnPtr<DocumentParser> m_parser;
   bool m_wellFormed;
 
   // Document URLs.

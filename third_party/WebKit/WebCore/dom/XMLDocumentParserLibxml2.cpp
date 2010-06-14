@@ -185,9 +185,9 @@ class PendingCallbacks : public Noncopyable {
     m_callbacks.append(callback);
   }
 
-  void callAndRemoveFirstCallback(XMLDocumentParser* tokenizer) {
+  void callAndRemoveFirstCallback(XMLDocumentParser* parser) {
     OwnPtr<PendingCallback> callback(m_callbacks.takeFirst());
-    callback->call(tokenizer);
+    callback->call(parser);
   }
 
   bool isEmpty() const { return m_callbacks.isEmpty(); }
@@ -195,7 +195,7 @@ class PendingCallbacks : public Noncopyable {
  private:
   struct PendingCallback {
     virtual ~PendingCallback() {}
-    virtual void call(XMLDocumentParser* tokenizer) = 0;
+    virtual void call(XMLDocumentParser* parser) = 0;
   };
 
   struct PendingStartElementNSCallback : public PendingCallback {
@@ -212,11 +212,11 @@ class PendingCallbacks : public Noncopyable {
       xmlFree(attributes);
     }
 
-    virtual void call(XMLDocumentParser* tokenizer) {
-      tokenizer->startElementNs(xmlLocalName, xmlPrefix, xmlURI, nb_namespaces,
-                                const_cast<const xmlChar**>(namespaces),
-                                nb_attributes, nb_defaulted,
-                                const_cast<const xmlChar**>(attributes));
+    virtual void call(XMLDocumentParser* parser) {
+      parser->startElementNs(xmlLocalName, xmlPrefix, xmlURI, nb_namespaces,
+                             const_cast<const xmlChar**>(namespaces),
+                             nb_attributes, nb_defaulted,
+                             const_cast<const xmlChar**>(attributes));
     }
 
     xmlChar* xmlLocalName;
@@ -230,17 +230,13 @@ class PendingCallbacks : public Noncopyable {
   };
 
   struct PendingEndElementNSCallback : public PendingCallback {
-    virtual void call(XMLDocumentParser* tokenizer) {
-      tokenizer->endElementNs();
-    }
+    virtual void call(XMLDocumentParser* parser) { parser->endElementNs(); }
   };
 
   struct PendingCharactersCallback : public PendingCallback {
     virtual ~PendingCharactersCallback() { xmlFree(s); }
 
-    virtual void call(XMLDocumentParser* tokenizer) {
-      tokenizer->characters(s, len);
-    }
+    virtual void call(XMLDocumentParser* parser) { parser->characters(s, len); }
 
     xmlChar* s;
     int len;
@@ -252,8 +248,8 @@ class PendingCallbacks : public Noncopyable {
       xmlFree(data);
     }
 
-    virtual void call(XMLDocumentParser* tokenizer) {
-      tokenizer->processingInstruction(target, data);
+    virtual void call(XMLDocumentParser* parser) {
+      parser->processingInstruction(target, data);
     }
 
     xmlChar* target;
@@ -263,9 +259,7 @@ class PendingCallbacks : public Noncopyable {
   struct PendingCDATABlockCallback : public PendingCallback {
     virtual ~PendingCDATABlockCallback() { xmlFree(s); }
 
-    virtual void call(XMLDocumentParser* tokenizer) {
-      tokenizer->cdataBlock(s, len);
-    }
+    virtual void call(XMLDocumentParser* parser) { parser->cdataBlock(s, len); }
 
     xmlChar* s;
     int len;
@@ -274,7 +268,7 @@ class PendingCallbacks : public Noncopyable {
   struct PendingCommentCallback : public PendingCallback {
     virtual ~PendingCommentCallback() { xmlFree(s); }
 
-    virtual void call(XMLDocumentParser* tokenizer) { tokenizer->comment(s); }
+    virtual void call(XMLDocumentParser* parser) { parser->comment(s); }
 
     xmlChar* s;
   };
@@ -286,8 +280,8 @@ class PendingCallbacks : public Noncopyable {
       xmlFree(systemID);
     }
 
-    virtual void call(XMLDocumentParser* tokenizer) {
-      tokenizer->internalSubset(name, externalID, systemID);
+    virtual void call(XMLDocumentParser* parser) {
+      parser->internalSubset(name, externalID, systemID);
     }
 
     xmlChar* name;
@@ -298,9 +292,9 @@ class PendingCallbacks : public Noncopyable {
   struct PendingErrorCallback : public PendingCallback {
     virtual ~PendingErrorCallback() { xmlFree(message); }
 
-    virtual void call(XMLDocumentParser* tokenizer) {
-      tokenizer->handleError(type, reinterpret_cast<char*>(message), lineNumber,
-                             columnNumber);
+    virtual void call(XMLDocumentParser* parser) {
+      parser->handleError(type, reinterpret_cast<char*>(message), lineNumber,
+                          columnNumber);
     }
 
     XMLDocumentParser::ErrorType type;
@@ -1089,7 +1083,7 @@ void XMLDocumentParser::internalSubset(const xmlChar* name,
   }
 }
 
-static inline XMLDocumentParser* getTokenizer(void* closure) {
+static inline XMLDocumentParser* getParser(void* closure) {
   xmlParserCtxtPtr ctxt = static_cast<xmlParserCtxtPtr>(closure);
   return static_cast<XMLDocumentParser*>(ctxt->_private);
 }
@@ -1120,9 +1114,9 @@ static void startElementNsHandler(void* closure,
   if (hackAroundLibXMLEntityBug(closure))
     return;
 
-  getTokenizer(closure)->startElementNs(localname, prefix, uri, nb_namespaces,
-                                        namespaces, nb_attributes, nb_defaulted,
-                                        libxmlAttributes);
+  getParser(closure)->startElementNs(localname, prefix, uri, nb_namespaces,
+                                     namespaces, nb_attributes, nb_defaulted,
+                                     libxmlAttributes);
 }
 
 static void endElementNsHandler(void* closure,
@@ -1132,14 +1126,14 @@ static void endElementNsHandler(void* closure,
   if (hackAroundLibXMLEntityBug(closure))
     return;
 
-  getTokenizer(closure)->endElementNs();
+  getParser(closure)->endElementNs();
 }
 
 static void charactersHandler(void* closure, const xmlChar* s, int len) {
   if (hackAroundLibXMLEntityBug(closure))
     return;
 
-  getTokenizer(closure)->characters(s, len);
+  getParser(closure)->characters(s, len);
 }
 
 static void processingInstructionHandler(void* closure,
@@ -1148,28 +1142,28 @@ static void processingInstructionHandler(void* closure,
   if (hackAroundLibXMLEntityBug(closure))
     return;
 
-  getTokenizer(closure)->processingInstruction(target, data);
+  getParser(closure)->processingInstruction(target, data);
 }
 
 static void cdataBlockHandler(void* closure, const xmlChar* s, int len) {
   if (hackAroundLibXMLEntityBug(closure))
     return;
 
-  getTokenizer(closure)->cdataBlock(s, len);
+  getParser(closure)->cdataBlock(s, len);
 }
 
 static void commentHandler(void* closure, const xmlChar* comment) {
   if (hackAroundLibXMLEntityBug(closure))
     return;
 
-  getTokenizer(closure)->comment(comment);
+  getParser(closure)->comment(comment);
 }
 
 WTF_ATTRIBUTE_PRINTF(2, 3)
 static void warningHandler(void* closure, const char* message, ...) {
   va_list args;
   va_start(args, message);
-  getTokenizer(closure)->error(XMLDocumentParser::warning, message, args);
+  getParser(closure)->error(XMLDocumentParser::warning, message, args);
   va_end(args);
 }
 
@@ -1177,7 +1171,7 @@ WTF_ATTRIBUTE_PRINTF(2, 3)
 static void fatalErrorHandler(void* closure, const char* message, ...) {
   va_list args;
   va_start(args, message);
-  getTokenizer(closure)->error(XMLDocumentParser::fatal, message, args);
+  getParser(closure)->error(XMLDocumentParser::fatal, message, args);
   va_end(args);
 }
 
@@ -1185,7 +1179,7 @@ WTF_ATTRIBUTE_PRINTF(2, 3)
 static void normalErrorHandler(void* closure, const char* message, ...) {
   va_list args;
   va_start(args, message);
-  getTokenizer(closure)->error(XMLDocumentParser::nonFatal, message, args);
+  getParser(closure)->error(XMLDocumentParser::nonFatal, message, args);
   va_end(args);
 }
 
@@ -1230,12 +1224,12 @@ static xmlEntityPtr getEntityHandler(void* closure, const xmlChar* name) {
   }
 
   ent = xmlGetDocEntity(ctxt->myDoc, name);
-  if (!ent && (getTokenizer(closure)->isXHTMLDocument()
+  if (!ent && (getParser(closure)->isXHTMLDocument()
 #if ENABLE(XHTMLMP)
-               || getTokenizer(closure)->isXHTMLMPDocument()
+               || getParser(closure)->isXHTMLMPDocument()
 #endif
 #if ENABLE(WML)
-               || getTokenizer(closure)->isWMLDocument()
+               || getParser(closure)->isWMLDocument()
 #endif
                    )) {
     ent = getXHTMLEntity(name);
@@ -1248,13 +1242,13 @@ static xmlEntityPtr getEntityHandler(void* closure, const xmlChar* name) {
 
 static void startDocumentHandler(void* closure) {
   xmlParserCtxt* ctxt = static_cast<xmlParserCtxt*>(closure);
-  getTokenizer(closure)->startDocument(ctxt->version, ctxt->encoding,
-                                       ctxt->standalone);
+  getParser(closure)->startDocument(ctxt->version, ctxt->encoding,
+                                    ctxt->standalone);
   xmlSAX2StartDocument(closure);
 }
 
 static void endDocumentHandler(void* closure) {
-  getTokenizer(closure)->endDocument();
+  getParser(closure)->endDocument();
   xmlSAX2EndDocument(closure);
 }
 
@@ -1262,7 +1256,7 @@ static void internalSubsetHandler(void* closure,
                                   const xmlChar* name,
                                   const xmlChar* externalID,
                                   const xmlChar* systemID) {
-  getTokenizer(closure)->internalSubset(name, externalID, systemID);
+  getParser(closure)->internalSubset(name, externalID, systemID);
   xmlSAX2InternalSubset(closure, name, externalID, systemID);
 }
 
@@ -1279,7 +1273,7 @@ static void externalSubsetHandler(void* closure,
       (extId == "-//W3C//DTD XHTML 1.1 plus MathML 2.0//EN") ||
       (extId == "-//W3C//DTD XHTML 1.1 plus MathML 2.0 plus SVG 1.1//EN") ||
       (extId == "-//WAPFORUM//DTD XHTML Mobile 1.0//EN"))
-    getTokenizer(closure)->setIsXHTMLDocument(
+    getParser(closure)->setIsXHTMLDocument(
         true);  // controls if we replace entities or not.
 }
 
@@ -1422,24 +1416,24 @@ bool parseXMLDocumentFragment(const String& chunk,
   if (!chunk.length())
     return true;
 
-  XMLDocumentParser tokenizer(fragment, parent, scriptingPermission);
+  XMLDocumentParser parser(fragment, parent, scriptingPermission);
 
   CString chunkAsUtf8 = chunk.utf8();
-  tokenizer.initializeParserContext(chunkAsUtf8.data());
+  parser.initializeParserContext(chunkAsUtf8.data());
 
-  xmlParseContent(tokenizer.context());
+  xmlParseContent(parser.context());
 
-  tokenizer.endDocument();
+  parser.endDocument();
 
   // Check if all the chunk has been processed.
-  long bytesProcessed = xmlByteConsumed(tokenizer.context());
+  long bytesProcessed = xmlByteConsumed(parser.context());
   if (bytesProcessed == -1 ||
       ((unsigned long)bytesProcessed) != chunkAsUtf8.length())
     return false;
 
   // No error if the chunk is well formed or it is not but we have no error.
-  return tokenizer.context()->wellFormed ||
-         xmlCtxtGetLastError(tokenizer.context()) == 0;
+  return parser.context()->wellFormed ||
+         xmlCtxtGetLastError(parser.context()) == 0;
 }
 
 // --------------------------------

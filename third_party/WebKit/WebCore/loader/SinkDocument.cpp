@@ -54,7 +54,7 @@ SinkDocument::SinkDocument(Frame* frame) : HTMLDocument(frame) {
   setParseMode(Compat);
 }
 
-DocumentParser* SinkDocument::createTokenizer() {
+DocumentParser* SinkDocument::createParser() {
   return new SinkDocumentParser(this);
 }
 

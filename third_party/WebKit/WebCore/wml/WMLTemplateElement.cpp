@@ -96,7 +96,7 @@ void WMLTemplateElement::registerTemplatesInDocument(Document* doc) {
 
   // Only one template element should be allowed in a document
   // Calling setTemplateElement() twice on a WMLCardElement, will result in a
-  // tokenizer error.
+  // parser error.
   for (unsigned i = 0; i < length; ++i) {
     WMLTemplateElement* temp =
         static_cast<WMLTemplateElement*>(nodeList->item(i));

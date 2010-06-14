@@ -39,7 +39,7 @@ class FTPDirectoryDocument : public HTMLDocument {
 
  private:
   FTPDirectoryDocument(Frame*);
-  virtual DocumentParser* createTokenizer();
+  virtual DocumentParser* createParser();
 };
 
 }  // namespace WebCore

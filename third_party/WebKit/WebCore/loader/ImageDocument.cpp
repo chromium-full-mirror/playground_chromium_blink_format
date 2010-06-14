@@ -188,7 +188,7 @@ ImageDocument::ImageDocument(Frame* frame)
   setParseMode(Compat);
 }
 
-DocumentParser* ImageDocument::createTokenizer() {
+DocumentParser* ImageDocument::createParser() {
   return new ImageTokenizer(this);
 }
 

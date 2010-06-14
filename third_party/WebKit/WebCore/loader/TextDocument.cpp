@@ -171,11 +171,11 @@ bool TextDocumentParser::isWaitingForScripts() const {
 
 TextDocument::TextDocument(Frame* frame) : HTMLDocument(frame) {}
 
-DocumentParser* TextDocument::createTokenizer() {
+DocumentParser* TextDocument::createParser() {
   return new TextDocumentParser(this);
 }
 
-DocumentParser* createTextTokenizer(HTMLViewSourceDocument* document) {
+DocumentParser* createTextDocumentParser(HTMLViewSourceDocument* document) {
   return new TextDocumentParser(document);
 }
 }

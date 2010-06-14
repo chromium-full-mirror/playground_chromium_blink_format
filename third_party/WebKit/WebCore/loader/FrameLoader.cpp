@@ -626,8 +626,8 @@ void FrameLoader::submitForm(const char* action,
 
 void FrameLoader::stopLoading(UnloadEventPolicy unloadEventPolicy,
                               DatabasePolicy databasePolicy) {
-  if (m_frame->document() && m_frame->document()->tokenizer())
-    m_frame->document()->tokenizer()->stopParsing();
+  if (m_frame->document() && m_frame->document()->parser())
+    m_frame->document()->parser()->stopParsing();
 
   if (unloadEventPolicy != UnloadEventPolicyNone) {
     if (m_frame->document()) {
@@ -705,8 +705,8 @@ void FrameLoader::stop() {
   // checkCompleted().
   RefPtr<Frame> protector(m_frame);
 
-  if (m_frame->document()->tokenizer())
-    m_frame->document()->tokenizer()->stopParsing();
+  if (m_frame->document()->parser())
+    m_frame->document()->parser()->stopParsing();
   m_frame->document()->finishParsing();
 
   if (m_iconLoader)
