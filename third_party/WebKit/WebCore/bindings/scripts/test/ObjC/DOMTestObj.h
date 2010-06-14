@@ -57,6 +57,10 @@
 - (int)customAttr;
 - (void)setCustomAttr:(int)newCustomAttr;
 - (NSString*)scriptStringAttr;
+- (int)descriptionName;
+- (int)idName;
+- (void)setIdName:(int)newIdName;
+- (NSString*)hashName;
 - (void)voidMethod;
 - (void)voidMethodWithArgs:(int)intArg
                     strArg:(NSString*)strArg

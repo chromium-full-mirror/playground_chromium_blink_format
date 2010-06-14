@@ -227,6 +227,14 @@ void setJSTestObjCustomAttr(JSC::ExecState*, JSC::JSObject*, JSC::JSValue);
 JSC::JSValue jsTestObjScriptStringAttr(JSC::ExecState*,
                                        JSC::JSValue,
                                        const JSC::Identifier&);
+JSC::JSValue jsTestObjDescription(JSC::ExecState*,
+                                  JSC::JSValue,
+                                  const JSC::Identifier&);
+JSC::JSValue jsTestObjId(JSC::ExecState*, JSC::JSValue, const JSC::Identifier&);
+void setJSTestObjId(JSC::ExecState*, JSC::JSObject*, JSC::JSValue);
+JSC::JSValue jsTestObjHash(JSC::ExecState*,
+                           JSC::JSValue,
+                           const JSC::Identifier&);
 JSC::JSValue jsTestObjConstructor(JSC::ExecState*,
                                   JSC::JSValue,
                                   const JSC::Identifier&);

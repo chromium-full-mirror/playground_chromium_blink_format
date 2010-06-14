@@ -46,7 +46,7 @@ ASSERT_CLASS_FITS_IN_CELL(JSTestObj);
 #define THUNK_GENERATOR(generator)
 #endif
 
-static const HashTableValue JSTestObjTableValues[15] = {
+static const HashTableValue JSTestObjTableValues[18] = {
     {"readOnlyIntAttr", DontDelete | ReadOnly,
      (intptr_t) static_cast<PropertySlot::GetValueFunc>(
          jsTestObjReadOnlyIntAttr),
@@ -94,13 +94,22 @@ static const HashTableValue JSTestObjTableValues[15] = {
      (intptr_t) static_cast<PropertySlot::GetValueFunc>(
          jsTestObjScriptStringAttr),
      (intptr_t)0 THUNK_GENERATOR(0)},
+    {"description", DontDelete | ReadOnly,
+     (intptr_t) static_cast<PropertySlot::GetValueFunc>(jsTestObjDescription),
+     (intptr_t)0 THUNK_GENERATOR(0)},
+    {"id", DontDelete,
+     (intptr_t) static_cast<PropertySlot::GetValueFunc>(jsTestObjId),
+     (intptr_t)setJSTestObjId THUNK_GENERATOR(0)},
+    {"hash", DontDelete | ReadOnly,
+     (intptr_t) static_cast<PropertySlot::GetValueFunc>(jsTestObjHash),
+     (intptr_t)0 THUNK_GENERATOR(0)},
     {"constructor", DontEnum | ReadOnly,
      (intptr_t) static_cast<PropertySlot::GetValueFunc>(jsTestObjConstructor),
      (intptr_t)0 THUNK_GENERATOR(0)},
     {0, 0, 0, 0 THUNK_GENERATOR(0)}};
 
 #undef THUNK_GENERATOR
-static JSC_CONST_HASHTABLE HashTable JSTestObjTable = {34, 31,
+static JSC_CONST_HASHTABLE HashTable JSTestObjTable = {65, 63,
                                                        JSTestObjTableValues, 0};
 /* Hash table for constructor */
 #if ENABLE(JIT)
@@ -473,6 +482,32 @@ JSValue jsTestObjScriptStringAttr(ExecState* exec,
   return result;
 }
 
+JSValue jsTestObjDescription(ExecState* exec,
+                             JSValue slotBase,
+                             const Identifier&) {
+  JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(slotBase));
+  UNUSED_PARAM(exec);
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
+  JSValue result = jsNumber(exec, imp->description());
+  return result;
+}
+
+JSValue jsTestObjId(ExecState* exec, JSValue slotBase, const Identifier&) {
+  JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(slotBase));
+  UNUSED_PARAM(exec);
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
+  JSValue result = jsNumber(exec, imp->id());
+  return result;
+}
+
+JSValue jsTestObjHash(ExecState* exec, JSValue slotBase, const Identifier&) {
+  JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(slotBase));
+  UNUSED_PARAM(exec);
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
+  JSValue result = jsString(exec, imp->hash());
+  return result;
+}
+
 JSValue jsTestObjConstructor(ExecState* exec,
                              JSValue slotBase,
                              const Identifier&) {
@@ -558,6 +593,12 @@ void setJSTestObjCustomAttr(ExecState* exec,
                             JSObject* thisObject,
                             JSValue value) {
   static_cast<JSTestObj*>(thisObject)->setCustomAttr(exec, value);
+}
+
+void setJSTestObjId(ExecState* exec, JSObject* thisObject, JSValue value) {
+  JSTestObj* castedThis = static_cast<JSTestObj*>(thisObject);
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
+  imp->setId(value.toInt32(exec));
 }
 
 JSValue JSTestObj::getConstructor(ExecState* exec,

@@ -487,6 +487,33 @@ gchar* webkit_dom_test_obj_get_script_string_attr(WebKitDOMTestObj* self) {
   return res;
 }
 
+glong webkit_dom_test_obj_get_description(WebKitDOMTestObj* self) {
+  g_return_val_if_fail(self, 0);
+  WebCore::TestObj* item = WebKit::core(self);
+  glong res = item->description();
+  return res;
+}
+
+glong webkit_dom_test_obj_get_id(WebKitDOMTestObj* self) {
+  g_return_val_if_fail(self, 0);
+  WebCore::TestObj* item = WebKit::core(self);
+  glong res = item->id();
+  return res;
+}
+
+void webkit_dom_test_obj_set_id(WebKitDOMTestObj* self, glong value) {
+  g_return_if_fail(self);
+  WebCore::TestObj* item = WebKit::core(self);
+  item->setId(value);
+}
+
+gchar* webkit_dom_test_obj_get_hash(WebKitDOMTestObj* self) {
+  g_return_val_if_fail(self, 0);
+  WebCore::TestObj* item = WebKit::core(self);
+  gchar* res = convertToUTF8String(item->hash());
+  return res;
+}
+
 G_DEFINE_TYPE(WebKitDOMTestObj, webkit_dom_test_obj, WEBKIT_TYPE_DOM_OBJECT)
 
 namespace WebKit {
@@ -517,6 +544,9 @@ enum {
   PROP_ATTR_WITH_GETTER_EXCEPTION,
   PROP_CUSTOM_ATTR,
   PROP_SCRIPT_STRING_ATTR,
+  PROP_DESCRIPTION,
+  PROP_ID,
+  PROP_HASH,
 };
 
 static void webkit_dom_test_obj_finalize(GObject* object) {
@@ -567,6 +597,10 @@ static void webkit_dom_test_obj_set_property(GObject* object,
     case PROP_ATTR_WITH_GETTER_EXCEPTION: {
       WebCore::ExceptionCode ec = 0;
       coreSelf->setAttrWithGetterException((g_value_get_long(value)), ec);
+      break;
+    }
+    case PROP_ID: {
+      coreSelf->setId((g_value_get_long(value)));
       break;
     }
     default:
@@ -633,6 +667,18 @@ static void webkit_dom_test_obj_get_property(GObject* object,
     case PROP_SCRIPT_STRING_ATTR: {
       g_value_take_string(value,
                           convertToUTF8String(coreSelf->scriptStringAttr()));
+      break;
+    }
+    case PROP_DESCRIPTION: {
+      g_value_set_long(value, coreSelf->description());
+      break;
+    }
+    case PROP_ID: {
+      g_value_set_long(value, coreSelf->id());
+      break;
+    }
+    case PROP_HASH: {
+      g_value_take_string(value, convertToUTF8String(coreSelf->hash()));
       break;
     }
     default:
@@ -795,6 +841,37 @@ static void webkit_dom_test_obj_class_init(
                                                               with some extra
                                                               doc stuff here */
           "",                                              /* default */
+          WEBKIT_PARAM_READABLE));
+  g_object_class_install_property(
+      gobjectClass, PROP_DESCRIPTION,
+      g_param_spec_long(
+          "description",                          /* name */
+          "test_obj_description",                 /* short description */
+          "read-only  glong TestObj.description", /* longer - could do with some
+                                                     extra doc stuff here */
+          G_MINLONG,                              /* min */
+          G_MAXLONG,                              /* max */
+          0,                                      /* default */
+          WEBKIT_PARAM_READABLE));
+  g_object_class_install_property(
+      gobjectClass, PROP_ID,
+      g_param_spec_long("id",                           /* name */
+                        "test_obj_id",                  /* short description */
+                        "read-write  glong TestObj.id", /* longer - could do
+                                                           with some extra doc
+                                                           stuff here */
+                        G_MINLONG,                      /* min */
+                        G_MAXLONG,                      /* max */
+                        0,                              /* default */
+                        WEBKIT_PARAM_READWRITE));
+  g_object_class_install_property(
+      gobjectClass, PROP_HASH,
+      g_param_spec_string(
+          "hash",                            /* name */
+          "test_obj_hash",                   /* short description */
+          "read-only  gchar*  TestObj.hash", /* longer - could do with some
+                                                extra doc stuff here */
+          "",                                /* default */
           WEBKIT_PARAM_READABLE));
 }
 
