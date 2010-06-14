@@ -546,7 +546,7 @@ void EventSender::keyDown(const CppArgumentList& arguments,
   else if ("upArrow" == codeStr)
     code = base::VKEY_UP;
   else if ("delete" == codeStr)
-    code = base::VK_DELETE;
+    code = base::VKEY_DELETE;
   else if ("pageUp" == codeStr)
     code = base::VKEY_PRIOR;
   else if ("pageDown" == codeStr)
