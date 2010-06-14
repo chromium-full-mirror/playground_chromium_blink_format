@@ -168,7 +168,7 @@ HTMLDocumentParser::HTMLDocumentParser(HTMLDocument* doc, bool reportErrors)
           this,
           &HTMLDocumentParser::executeExternalScriptsTimerFired),
       m_doc(doc),
-      m_parser(new HTMLParser(doc, reportErrors)),
+      m_treeConstructor(new HTMLParser(doc, reportErrors)),
       m_inWrite(false),
       m_fragment(false),
       m_scriptingPermission(FragmentScriptingAllowed) {
@@ -190,7 +190,6 @@ HTMLDocumentParser::HTMLDocumentParser(HTMLViewSourceDocument* doc)
           this,
           &HTMLDocumentParser::executeExternalScriptsTimerFired),
       m_doc(doc),
-      m_parser(0),
       m_inWrite(false),
       m_fragment(false),
       m_scriptingPermission(FragmentScriptingAllowed) {
@@ -213,7 +212,7 @@ HTMLDocumentParser::HTMLDocumentParser(
           this,
           &HTMLDocumentParser::executeExternalScriptsTimerFired),
       m_doc(frag->document()),
-      m_parser(new HTMLParser(frag, scriptingPermission)),
+      m_treeConstructor(new HTMLParser(frag, scriptingPermission)),
       m_inWrite(false),
       m_fragment(true),
       m_scriptingPermission(scriptingPermission) {
@@ -464,7 +463,7 @@ HTMLDocumentParser::State HTMLDocumentParser::scriptHandler(State state) {
   if (!inViewSourceMode()) {
     if (!m_scriptTagSrcAttrValue.isEmpty() && m_doc->frame()) {
       // forget what we just got; load from src url instead
-      if (!m_parser->skipMode() && !followingFrameset) {
+      if (!m_treeConstructor->skipMode() && !followingFrameset) {
         // The parser might have been stopped by for example a window.close call
         // in an earlier script.
         // If so, we don't want to load scripts.
@@ -515,7 +514,7 @@ HTMLDocumentParser::State HTMLDocumentParser::scriptHandler(State state) {
   SegmentedString prependingSrc;
   m_currentPrependingSrc = &prependingSrc;
 
-  if (!m_parser->skipMode() && !followingFrameset) {
+  if (!m_treeConstructor->skipMode() && !followingFrameset) {
     if (cs) {
       if (savedPrependingSrc)
         savedPrependingSrc->append(m_src);
@@ -1472,7 +1471,7 @@ HTMLDocumentParser::State HTMLDocumentParser::parseTag(SegmentedString& src,
 
               if (m_currentToken.beginTag &&
                   m_currentToken.tagName == scriptTag && !inViewSourceMode() &&
-                  !m_parser->skipMode() && m_attrName == srcAttr) {
+                  !m_treeConstructor->skipMode() && m_attrName == srcAttr) {
                 String context(m_rawAttributeBeforeValue.data(),
                                m_rawAttributeBeforeValue.size());
                 if (m_XSSAuditor &&
@@ -1514,7 +1513,7 @@ HTMLDocumentParser::State HTMLDocumentParser::parseTag(SegmentedString& src,
 
               if (m_currentToken.beginTag &&
                   m_currentToken.tagName == scriptTag && !inViewSourceMode() &&
-                  !m_parser->skipMode() && m_attrName == srcAttr) {
+                  !m_treeConstructor->skipMode() && m_attrName == srcAttr) {
                 String context(m_rawAttributeBeforeValue.data(),
                                m_rawAttributeBeforeValue.size());
                 if (m_XSSAuditor &&
@@ -1573,7 +1572,7 @@ HTMLDocumentParser::State HTMLDocumentParser::parseTag(SegmentedString& src,
         bool beginTag =
             !m_currentToken.selfClosingTag && m_currentToken.beginTag;
         if (m_currentToken.beginTag && m_currentToken.tagName == scriptTag &&
-            !inViewSourceMode() && !m_parser->skipMode()) {
+            !inViewSourceMode() && !m_treeConstructor->skipMode()) {
           Attribute* a = 0;
           m_scriptTagSrcAttrValue = String();
           m_scriptTagCharsetAttrValue = String();
@@ -1953,7 +1952,7 @@ void HTMLDocumentParser::end() {
   }
 
   if (!inViewSourceMode())
-    m_parser->finished();
+    m_treeConstructor->finished();
   else
     m_doc->finishedParsing();
 }
@@ -2032,7 +2031,7 @@ PassRefPtr<Node> HTMLDocumentParser::processToken() {
           &m_currentToken);
     else
       // pass the token over to the parser, the parser DOES NOT delete the token
-      n = m_parser->parseToken(&m_currentToken);
+      n = m_treeConstructor->parseToken(&m_currentToken);
   }
   m_currentToken.reset();
   if (scriptController)
@@ -2046,7 +2045,7 @@ void HTMLDocumentParser::processDoctypeToken() {
     static_cast<HTMLViewSourceDocument*>(m_doc)->addViewSourceDoctypeToken(
         &m_doctypeToken);
   else
-    m_parser->parseDoctypeToken(&m_doctypeToken);
+    m_treeConstructor->parseDoctypeToken(&m_doctypeToken);
 }
 
 HTMLDocumentParser::~HTMLDocumentParser() {

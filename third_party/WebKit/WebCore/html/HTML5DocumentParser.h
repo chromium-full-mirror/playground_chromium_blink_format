@@ -62,7 +62,7 @@ class HTML5DocumentParser : public DocumentParser,
   virtual int columnNumber() const;
   // FIXME: HTMLFormControlElement accesses the HTMLParser via this method.
   // Remove this when the HTMLParser is no longer used.
-  virtual HTMLParser* htmlParser() const;
+  virtual HTMLParser* htmlTreeConstructor() const;
 
   // HTML5ScriptRunnerHost
   virtual void watchForLoad(CachedResource*);
@@ -171,7 +171,7 @@ class HTML5DocumentParser : public DocumentParser,
   HTMLDocument* m_document;
   OwnPtr<HTML5Lexer> m_lexer;
   OwnPtr<HTML5ScriptRunner> m_scriptRunner;
-  OwnPtr<HTML5TreeBuilder> m_treeBuilder;
+  OwnPtr<HTML5TreeBuilder> m_treeConstructor;
   bool m_endWasDelayed;
   int m_writeNestingLevel;
 };
