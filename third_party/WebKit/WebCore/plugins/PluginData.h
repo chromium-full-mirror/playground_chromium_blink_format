@@ -37,8 +37,7 @@ struct MimeClassInfo {
 };
 
 inline bool operator==(const MimeClassInfo& a, const MimeClassInfo& b) {
-  return a.type == b.type && a.desc == b.desc && a.suffixes == b.suffixes &&
-         a.pluginIndex == b.pluginIndex;
+  return a.type == b.type && a.desc == b.desc && a.suffixes == b.suffixes;
 }
 
 struct PluginInfo {
@@ -60,6 +59,9 @@ class PluginData : public RefCounted<PluginData> {
 
   const Vector<PluginInfo>& plugins() const { return m_plugins; }
   const Vector<MimeClassInfo>& mimes() const { return m_mimes; }
+  const Vector<size_t>& mimePluginIndices() const {
+    return m_mimePluginIndices;
+  }
 
   bool supportsMimeType(const String& mimeType) const;
   String pluginNameForMimeType(const String& mimeType) const;
@@ -72,6 +74,8 @@ class PluginData : public RefCounted<PluginData> {
 
   Vector<PluginInfo> m_plugins;
   Vector<MimeClassInfo> m_mimes;
+  Vector<size_t> m_mimePluginIndices;
+
   const Page* m_page;
 };
 }

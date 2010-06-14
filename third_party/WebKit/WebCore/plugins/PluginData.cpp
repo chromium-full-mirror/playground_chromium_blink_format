@@ -31,8 +31,10 @@ PluginData::PluginData(const Page* page) : m_page(page) {
 
   for (unsigned i = 0; i < m_plugins.size(); ++i) {
     const PluginInfo& plugin = m_plugins[i];
-    for (unsigned j = 0; j < plugin.mimes.size(); ++j)
+    for (unsigned j = 0; j < plugin.mimes.size(); ++j) {
       m_mimes.append(plugin.mimes[j]);
+      m_mimePluginIndices.append(i);
+    }
   }
 }
 
@@ -48,7 +50,7 @@ String PluginData::pluginNameForMimeType(const String& mimeType) const {
     const MimeClassInfo& info = m_mimes[i];
 
     if (info.type == mimeType)
-      return m_plugins[info.pluginIndex].name;
+      return m_plugins[m_mimePluginIndices[i]].name;
   }
 
   return String();

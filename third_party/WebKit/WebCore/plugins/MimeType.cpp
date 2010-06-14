@@ -52,7 +52,8 @@ PassRefPtr<Plugin> MimeType::enabledPlugin() const {
       !p->mainFrame()->loader()->allowPlugins(NotAboutToInstantiatePlugin))
     return 0;
 
-  return Plugin::create(m_pluginData.get(), mimeClassInfo().pluginIndex);
+  return Plugin::create(m_pluginData.get(),
+                        m_pluginData->mimePluginIndices()[m_index]);
 }
 
 }  // namespace WebCore
