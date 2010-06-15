@@ -39,6 +39,7 @@
 #include "Frame.h"
 #include "FrameView.h"
 #include "GraphicsContext.h"
+#include "GtkVersioning.h"
 #include "HTMLNames.h"
 #include "HTMLPlugInElement.h"
 #include "HostWindow.h"
@@ -211,8 +212,8 @@ void PluginView::paint(GraphicsContext* context, const IntRect& rect) {
     GdkDrawable* gdkBackingStore = 0;
     gint xoff = 0, yoff = 0;
 
-    gdk_window_get_internal_paint_info(widget->window, &gdkBackingStore, &xoff,
-                                       &yoff);
+    gdk_window_get_internal_paint_info(gtk_widget_get_window(widget),
+                                       &gdkBackingStore, &xoff, &yoff);
 
     GC gc = XDefaultGC(GDK_DISPLAY(),
                        gdk_screen_get_number(gdk_screen_get_default()));
@@ -357,7 +358,8 @@ void PluginView::initXEvent(XEvent* xEvent) {
   // and MotionNotify
   // events; thus, this is right:
   GtkWidget* widget = m_parentFrame->view()->hostWindow()->platformPageClient();
-  xEvent->xany.window = widget ? GDK_WINDOW_XWINDOW(widget->window) : 0;
+  xEvent->xany.window =
+      widget ? GDK_WINDOW_XWINDOW(gtk_widget_get_window(widget)) : 0;
 }
 
 static void setXButtonEventSpecificFields(XEvent* xEvent,
@@ -682,13 +684,15 @@ bool PluginView::platformGetValue(NPNVariable variable,
     case NPNVnetscapeWindow: {
 #if defined(XP_UNIX)
       void* w = reinterpret_cast<void*>(value);
-      *((XID*)w) = GDK_WINDOW_XWINDOW(
-          m_parentFrame->view()->hostWindow()->platformPageClient()->window);
+      GtkWidget* widget =
+          m_parentFrame->view()->hostWindow()->platformPageClient();
+      *((XID*)w) = GDK_WINDOW_XWINDOW(gtk_widget_get_window(widget));
 #endif
 #ifdef GDK_WINDOWING_WIN32
       HGDIOBJ* w = reinterpret_cast<HGDIOBJ*>(value);
-      *w = GDK_WINDOW_HWND(
-          m_parentFrame->view()->hostWindow()->platformPageClient()->window);
+      GtkWidget* widget =
+          m_parentFrame->view()->hostWindow()->platformPageClient();
+      *w = GDK_WINDOW_HWND(gtk_widget_get_window(widget));
 #endif
       *result = NPERR_NO_ERROR;
       return true;
@@ -844,7 +848,7 @@ bool PluginView::platformStart() {
       g_signal_connect(platformPluginWidget(), "plug-removed",
                        G_CALLBACK(plugRemovedCallback), NULL);
     } else
-      setPlatformWidget(gtk_xtbin_new(pageClient->window, 0));
+      setPlatformWidget(gtk_xtbin_new(gtk_widget_get_window(pageClient), 0));
 #else
     setPlatformWidget(gtk_socket_new());
     gtk_container_add(GTK_CONTAINER(pageClient), platformPluginWidget());
@@ -865,17 +869,18 @@ bool PluginView::platformStart() {
     m_npWindow.type = NPWindowTypeWindow;
 #if defined(XP_UNIX)
     if (m_needsXEmbed) {
-      gtk_widget_realize(platformPluginWidget());
+      GtkWidget* widget = platformPluginWidget();
+      gtk_widget_realize(widget);
       m_npWindow.window =
           (void*)gtk_socket_get_id(GTK_SOCKET(platformPluginWidget()));
-      ws->display = GDK_WINDOW_XDISPLAY(platformPluginWidget()->window);
-      ws->visual = GDK_VISUAL_XVISUAL(gdk_drawable_get_visual(
-          GDK_DRAWABLE(platformPluginWidget()->window)));
+      GdkWindow* window = gtk_widget_get_window(widget);
+      ws->display = GDK_WINDOW_XDISPLAY(window);
+      ws->visual =
+          GDK_VISUAL_XVISUAL(gdk_drawable_get_visual(GDK_DRAWABLE(window)));
       ws->depth =
-          gdk_drawable_get_visual(GDK_DRAWABLE(platformPluginWidget()->window))
-              ->depth;
-      ws->colormap = GDK_COLORMAP_XCOLORMAP(gdk_drawable_get_colormap(
-          GDK_DRAWABLE(platformPluginWidget()->window)));
+          gdk_visual_get_depth(gdk_drawable_get_visual(GDK_DRAWABLE(window)));
+      ws->colormap = GDK_COLORMAP_XCOLORMAP(
+          gdk_drawable_get_colormap(GDK_DRAWABLE(window)));
     } else {
       m_npWindow.window = (void*)GTK_XTBIN(platformPluginWidget())->xtwindow;
       ws->display = GTK_XTBIN(platformPluginWidget())->xtdisplay;
@@ -885,7 +890,8 @@ bool PluginView::platformStart() {
     }
     XFlush(ws->display);
 #elif defined(GDK_WINDOWING_WIN32)
-    m_npWindow.window = (void*)GDK_WINDOW_HWND(platformPluginWidget()->window);
+    m_npWindow.window =
+        (void*)GDK_WINDOW_HWND(gtk_widget_get_window(platformPluginWidget()));
 #endif
   } else {
     m_npWindow.type = NPWindowTypeDrawable;
@@ -895,15 +901,16 @@ bool PluginView::platformStart() {
     GdkScreen* gscreen = gdk_screen_get_default();
     GdkVisual* gvisual = gdk_screen_get_system_visual(gscreen);
 
-    if (gvisual->depth == 32 ||
+    if (gdk_visual_get_depth(gvisual) == 32 ||
         !m_plugin->quirks().contains(PluginQuirkRequiresDefaultScreenDepth)) {
       getVisualAndColormap(32, &m_visual, &m_colormap);
       ws->depth = 32;
     }
 
     if (!m_visual) {
-      getVisualAndColormap(gvisual->depth, &m_visual, &m_colormap);
-      ws->depth = gvisual->depth;
+      getVisualAndColormap(gdk_visual_get_depth(gvisual), &m_visual,
+                           &m_colormap);
+      ws->depth = gdk_visual_get_depth(gvisual);
     }
 
     ws->display = GDK_DISPLAY();
