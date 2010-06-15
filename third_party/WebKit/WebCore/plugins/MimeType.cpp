@@ -26,6 +26,7 @@
 #include "Plugin.h"
 #include "PluginData.h"
 #include "Settings.h"
+#include "StringBuilder.h"
 
 namespace WebCore {
 
@@ -38,8 +39,16 @@ const String& MimeType::type() const {
   return mimeClassInfo().type;
 }
 
-const String& MimeType::suffixes() const {
-  return mimeClassInfo().suffixes;
+String MimeType::suffixes() const {
+  const Vector<String>& extensions = mimeClassInfo().extensions;
+
+  StringBuilder builder;
+  for (size_t i = 0; i < extensions.size(); ++i) {
+    if (i)
+      builder.append(',');
+    builder.append(extensions[i]);
+  }
+  return builder.toString();
 }
 
 const String& MimeType::description() const {
