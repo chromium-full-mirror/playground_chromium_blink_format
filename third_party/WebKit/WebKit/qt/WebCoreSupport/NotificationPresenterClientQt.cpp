@@ -63,8 +63,8 @@ NotificationPresenterClientQt::notificationPresenter() {
 
 #endif
 
-NotificationIconWrapper::NotificationIconWrapper()
-    : m_closeTimer(this, &NotificationIconWrapper::close) {
+NotificationWrapper::NotificationWrapper()
+    : m_closeTimer(this, &NotificationWrapper::close) {
 #if ENABLE(NOTIFICATIONS)
 
 #ifndef QT_NO_SYSTEMTRAYICON
@@ -74,13 +74,13 @@ NotificationIconWrapper::NotificationIconWrapper()
 #endif
 }
 
-void NotificationIconWrapper::close(Timer<NotificationIconWrapper>*) {
+void NotificationWrapper::close(Timer<NotificationWrapper>*) {
 #if ENABLE(NOTIFICATIONS)
   NotificationPresenterClientQt::notificationPresenter()->cancel(this);
 #endif
 }
 
-const QString NotificationIconWrapper::title() const {
+const QString NotificationWrapper::title() const {
 #if ENABLE(NOTIFICATIONS)
   Notification* notification =
       NotificationPresenterClientQt::notificationPresenter()
@@ -91,7 +91,7 @@ const QString NotificationIconWrapper::title() const {
   return QString();
 }
 
-const QString NotificationIconWrapper::message() const {
+const QString NotificationWrapper::message() const {
 #if ENABLE(NOTIFICATIONS)
   Notification* notification =
       NotificationPresenterClientQt::notificationPresenter()
@@ -102,7 +102,7 @@ const QString NotificationIconWrapper::message() const {
   return QString();
 }
 
-const QByteArray NotificationIconWrapper::iconData() const {
+const QByteArray NotificationWrapper::iconData() const {
   QByteArray iconData;
 #if ENABLE(NOTIFICATIONS)
   Notification* notification =
@@ -117,7 +117,7 @@ const QByteArray NotificationIconWrapper::iconData() const {
   return iconData;
 }
 
-void NotificationIconWrapper::notificationClosed() {
+void NotificationWrapper::notificationClosed() {
 #if ENABLE(NOTIFICATIONS)
   NotificationPresenterClientQt::notificationPresenter()->cancel(this);
 #endif
@@ -164,7 +164,7 @@ bool NotificationPresenterClientQt::show(Notification* notification) {
 void NotificationPresenterClientQt::displayNotification(
     Notification* notification,
     const QByteArray& bytes) {
-  NotificationIconWrapper* wrapper = new NotificationIconWrapper();
+  NotificationWrapper* wrapper = new NotificationWrapper();
   m_notifications.insert(notification, wrapper);
   QString title;
   QString message;
@@ -231,14 +231,14 @@ void NotificationPresenterClientQt::cancel(Notification* notification) {
   }
 }
 
-void NotificationPresenterClientQt::cancel(NotificationIconWrapper* wrapper) {
+void NotificationPresenterClientQt::cancel(NotificationWrapper* wrapper) {
   Notification* notification = notificationForWrapper(wrapper);
   if (notification)
     cancel(notification);
 }
 
 Notification* NotificationPresenterClientQt::notificationForWrapper(
-    const NotificationIconWrapper* wrapper) const {
+    const NotificationWrapper* wrapper) const {
   NotificationsQueue::ConstIterator end = m_notifications.end();
   NotificationsQueue::ConstIterator iter = m_notifications.begin();
   while (iter != end && iter.value() != wrapper)
