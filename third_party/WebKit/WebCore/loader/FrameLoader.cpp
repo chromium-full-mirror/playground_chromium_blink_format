@@ -63,9 +63,6 @@
 #include "HTMLAppletElement.h"
 #include "HTMLFormElement.h"
 #include "HTMLFrameElement.h"
-#if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
-#include "HTMLMediaElement.h"
-#endif
 #include "HTMLNames.h"
 #include "HTMLObjectElement.h"
 #include "HTTPParsers.h"
@@ -86,9 +83,6 @@
 #include "PluginDocument.h"
 #include "ProgressTracker.h"
 #include "RenderEmbeddedObject.h"
-#if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
-#include "RenderVideo.h"
-#endif
 #include "RenderView.h"
 #include "ResourceHandle.h"
 #include "ResourceRequest.h"
@@ -99,19 +93,23 @@
 #include "SecurityOrigin.h"
 #include "SegmentedString.h"
 #include "Settings.h"
+#include "TextResourceDecoder.h"
+#include "WindowFeatures.h"
+#include "XMLDocumentParser.h"
+#include "XMLHttpRequest.h"
+#include "XSSAuditor.h"
+#include <wtf/CurrentTime.h>
+#include <wtf/StdLibExtras.h>
+#include <wtf/text/CString.h>
+
+#if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
+#include "HTMLMediaElement.h"
+#include "RenderVideo.h"
+#endif
 
 #if ENABLE(SHARED_WORKERS)
 #include "SharedWorkerRepository.h"
 #endif
-
-#include "TextResourceDecoder.h"
-#include "WindowFeatures.h"
-#include "XMLHttpRequest.h"
-#include "XMLDocumentParser.h"
-#include "XSSAuditor.h"
-#include <wtf/text/CString.h>
-#include <wtf/CurrentTime.h>
-#include <wtf/StdLibExtras.h>
 
 #if ENABLE(SVG)
 #include "SVGDocument.h"
@@ -125,10 +123,11 @@
 
 namespace WebCore {
 
+using namespace HTMLNames;
+
 #if ENABLE(SVG)
 using namespace SVGNames;
 #endif
-using namespace HTMLNames;
 
 #if ENABLE(XHTMLMP)
 static const char defaultAcceptHeader[] =
@@ -140,6 +139,7 @@ static const char defaultAcceptHeader[] =
     "application/xml,application/xhtml+xml,text/html;q=0.9,text/"
     "plain;q=0.8,image/png,*/*;q=0.5";
 #endif
+
 static double storedTimeOfLastCompletedLoad;
 
 bool isBackForwardLoadType(FrameLoadType type) {
@@ -769,8 +769,10 @@ bool FrameLoader::didOpenURL(const KURL& url) {
   // setJSStatusBarText
   // since it may cause clients to attempt to render the frame.
   if (!m_creatingInitialEmptyDocument) {
-    m_frame->setJSStatusBarText(String());
-    m_frame->setJSDefaultStatusBarText(String());
+    if (DOMWindow* window = m_frame->existingDOMWindow()) {
+      window->setStatus(String());
+      window->setDefaultStatus(String());
+    }
   }
   m_URL = url;
   if (m_URL.protocolInHTTPFamily() && !m_URL.host().isEmpty() &&
@@ -2678,8 +2680,10 @@ void FrameLoader::prepareForCachedPageRestore() {
 
   // Delete old status bar messages (if it _was_ activated on last URL).
   if (m_frame->script()->canExecuteScripts(NotAboutToExecuteScript)) {
-    m_frame->setJSStatusBarText(String());
-    m_frame->setJSDefaultStatusBarText(String());
+    if (DOMWindow* window = m_frame->existingDOMWindow()) {
+      window->setStatus(String());
+      window->setDefaultStatus(String());
+    }
   }
 }
 
@@ -3540,8 +3544,7 @@ void FrameLoader::continueLoadAfterNavigationPolicy(
   //    2) User responded Cancel to an alert popped up by the before unload
   //    event handler.
   // The "before unload" event handler runs only for the main frame.
-  bool canContinue =
-      shouldContinue && (!isLoadingMainFrame() || m_frame->shouldClose());
+  bool canContinue = shouldContinue && (!isLoadingMainFrame() || shouldClose());
 
   if (!canContinue) {
     // If we were waiting for a quick redirect, but the policy delegate decided

@@ -458,7 +458,18 @@ class DOMWindow : public RefCounted<DOMWindow>, public EventTarget {
 #endif
 
   EventTargetData m_eventTargetData;
+
+  String m_status;
+  String m_defaultStatus;
 };
+
+inline String DOMWindow::status() const {
+  return m_status;
+}
+
+inline String DOMWindow::defaultStatus() const {
+  return m_defaultStatus;
+}
 
 }  // namespace WebCore
 
