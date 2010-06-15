@@ -35,6 +35,10 @@
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 
+namespace WebCore {
+class String;
+};
+
 namespace WebKit {
 
 class WebPageNamespace;
@@ -46,7 +50,9 @@ class WebProcessProxy : public RefCounted<WebProcessProxy>,
   typedef HashMap<uint64_t, RefPtr<WebPageProxy>> WebPageProxyMap;
   typedef WebPageProxyMap::const_iterator::Values pages_const_iterator;
 
-  static PassRefPtr<WebProcessProxy> create(ProcessModel);
+  static PassRefPtr<WebProcessProxy> create(
+      ProcessModel,
+      const WebCore::String& injectedBundlePath);
   ~WebProcessProxy();
 
   void terminate();
@@ -73,7 +79,8 @@ class WebProcessProxy : public RefCounted<WebProcessProxy>,
   }
 
  private:
-  explicit WebProcessProxy(ProcessModel);
+  explicit WebProcessProxy(ProcessModel,
+                           const WebCore::String& injectedBundlePath);
 
   void connect();
 

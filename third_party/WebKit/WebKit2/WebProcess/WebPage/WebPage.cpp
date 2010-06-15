@@ -27,6 +27,7 @@
 
 #include "Arguments.h"
 #include "DrawingArea.h"
+#include "InjectedBundle.h"
 #include "MessageID.h"
 #include "WebChromeClient.h"
 #include "WebContextMenuClient.h"
@@ -115,6 +116,9 @@ WebPage::WebPage(uint64_t pageID,
   WebProcess::shared().connection()->send(
       WebPageProxyMessage::DidCreateMainFrame, m_pageID,
       CoreIPC::In(m_mainFrame->frameID()));
+
+  if (WebProcess::shared().injectedBundle())
+    WebProcess::shared().injectedBundle()->didCreatePage(this);
 
 #ifndef NDEBUG
   webPageCounter.increment();

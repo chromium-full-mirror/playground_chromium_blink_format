@@ -29,6 +29,10 @@
 #include "WebPageProxy.h"
 #include "WebProcessLauncher.h"
 #include "WebProcessManager.h"
+#include "WebProcessMessageKinds.h"
+#include <WebCore/PlatformString.h>
+
+using namespace WebCore;
 
 namespace WebKit {
 
@@ -37,13 +41,23 @@ static uint64_t generatePageID() {
   return uniquePageID++;
 }
 
-PassRefPtr<WebProcessProxy> WebProcessProxy::create(ProcessModel processModel) {
-  return adoptRef(new WebProcessProxy(processModel));
+PassRefPtr<WebProcessProxy> WebProcessProxy::create(
+    ProcessModel processModel,
+    const String& injectedBundlePath) {
+  return adoptRef(new WebProcessProxy(processModel, injectedBundlePath));
 }
 
-WebProcessProxy::WebProcessProxy(ProcessModel processModel)
+WebProcessProxy::WebProcessProxy(ProcessModel processModel,
+                                 const String& injectedBundlePath)
     : m_responsivenessTimer(this), m_processModel(processModel) {
   connect();
+
+  // FIXME: We could instead send the bundle path as part of the arguments to
+  // process creation?
+  // Would that be better than sending a connection?
+  if (!injectedBundlePath.isEmpty())
+    connection()->send(WebProcessMessage::LoadInjectedBundle, 0,
+                       CoreIPC::In(injectedBundlePath));
 }
 
 WebProcessProxy::~WebProcessProxy() {

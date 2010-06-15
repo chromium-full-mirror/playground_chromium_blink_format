@@ -25,6 +25,10 @@
 
 #include "WebProcessManager.h"
 
+#include <WebCore/PlatformString.h>
+
+using namespace WebCore;
+
 namespace WebKit {
 
 WebProcessManager& WebProcessManager::shared() {
@@ -34,18 +38,19 @@ WebProcessManager& WebProcessManager::shared() {
 
 WebProcessManager::WebProcessManager() {}
 
-WebProcessProxy* WebProcessManager::getWebProcess(ProcessModel processModel) {
+WebProcessProxy* WebProcessManager::getWebProcess(
+    ProcessModel processModel,
+    const String& injectedBundlePath) {
   switch (processModel) {
     case ProcessModelSecondaryProcess:
       if (!m_sharedProcess)
-        m_sharedProcess = WebProcessProxy::create(processModel);
-
+        m_sharedProcess =
+            WebProcessProxy::create(processModel, injectedBundlePath);
       return m_sharedProcess.get();
-
     case ProcessModelSecondaryThread:
       if (!m_sharedThread)
-        m_sharedThread = WebProcessProxy::create(processModel);
-
+        m_sharedThread =
+            WebProcessProxy::create(processModel, injectedBundlePath);
       return m_sharedThread.get();
   }
 
