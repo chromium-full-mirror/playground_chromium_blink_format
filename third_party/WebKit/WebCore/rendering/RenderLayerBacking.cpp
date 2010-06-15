@@ -772,7 +772,8 @@ bool RenderLayerBacking::containsPaintedContent() const {
 bool RenderLayerBacking::isDirectlyCompositedImage() const {
   RenderObject* renderObject = renderer();
   return renderObject->isImage() &&
-         !hasBoxDecorationsOrBackground(renderObject);
+         !hasBoxDecorationsOrBackground(renderObject) &&
+         !renderObject->hasClip();
 }
 
 void RenderLayerBacking::rendererContentChanged() {
