@@ -736,10 +736,10 @@ void JIT::privateCompilePutByIdTransition(StructureStubInfo* stubInfo,
            Address(regT0, OBJECT_OFFSETOF(JSCell, m_structure)));
 
   load32(Address(stackPointerRegister,
-                 offsetof(struct JITStackFrame, args[2]) + sizeof(void*)),
+                 OBJECT_OFFSETOF(JITStackFrame, args[2]) + sizeof(void*)),
          regT3);
   load32(Address(stackPointerRegister,
-                 offsetof(struct JITStackFrame, args[2]) + sizeof(void*) + 4),
+                 OBJECT_OFFSETOF(JITStackFrame, args[2]) + sizeof(void*) + 4),
          regT2);
 
   // Write the value
