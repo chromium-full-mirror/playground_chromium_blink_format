@@ -29,6 +29,7 @@
 #include "Element.h"
 #include "Frame.h"
 #include "HTML5Lexer.h"
+#include "HTML5PreloadScanner.h"
 #include "HTML5ScriptRunner.h"
 #include "HTML5TreeBuilder.h"
 #include "HTMLDocument.h"
@@ -117,7 +118,16 @@ void HTML5DocumentParser::pumpLexer() {
         m_scriptRunner->execute(scriptElement.release(), scriptStartLine);
     m_treeConstructor->setPaused(!shouldContinueParsing);
     if (!shouldContinueParsing)
-      return;
+      break;
+  }
+
+  if (isWaitingForScripts()) {
+    ASSERT(m_lexer->state() == HTML5Lexer::DataState);
+    if (!m_preloadScanner) {
+      m_preloadScanner.set(new HTML5PreloadScanner(m_document));
+      m_preloadScanner->appendToEnd(m_input.current());
+    }
+    m_preloadScanner->scan();
   }
 
   didPumpLexer();
@@ -152,6 +162,9 @@ void HTML5DocumentParser::write(const SegmentedString& source,
 
   if (appendData) {
     m_input.appendToEnd(source);
+    if (m_preloadScanner)
+      m_preloadScanner->appendToEnd(source);
+
     if (m_writeNestingLevel > 1) {
       // We've gotten data off the network in a nested call to write().
       // We don't want to consume any more of the input stream now.  Do
@@ -220,6 +233,7 @@ bool HTML5DocumentParser::isWaitingForScripts() const {
 void HTML5DocumentParser::resumeParsingAfterScriptExecution() {
   ASSERT(!m_scriptRunner->inScriptExecution());
   ASSERT(!m_treeConstructor->isPaused());
+
   pumpLexerIfPossible();
 
   // The document already finished parsing we were just waiting on scripts when
