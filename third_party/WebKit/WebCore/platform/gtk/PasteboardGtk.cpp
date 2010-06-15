@@ -65,7 +65,8 @@ void Pasteboard::writeSelection(Range* selectedRange,
   GtkClipboard* clipboard = m_helper->getClipboard(frame);
   DataObjectGtk* dataObject = DataObjectGtk::forClipboard(clipboard);
   dataObject->setText(frame->selectedText());
-  dataObject->setMarkup(createMarkup(selectedRange, 0, AnnotateForInterchange));
+  dataObject->setMarkup(createMarkup(selectedRange, 0, AnnotateForInterchange,
+                                     false, AbsoluteURLs));
   m_helper->writeClipboardContents(clipboard);
 }
 
