@@ -654,7 +654,7 @@ QList<QWebHistoryItem> DumpRenderTreeSupportQt::getChildHistoryItems(
 
 bool DumpRenderTreeSupportQt::shouldClose(QWebFrame* frame) {
   WebCore::Frame* coreFrame = QWebFramePrivate::core(frame);
-  return coreFrame->shouldClose();
+  return coreFrame->loader()->shouldClose();
 }
 
 // Provide a backward compatibility with previously exported private symbols as
