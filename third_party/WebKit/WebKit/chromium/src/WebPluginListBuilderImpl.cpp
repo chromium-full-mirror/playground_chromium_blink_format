@@ -61,9 +61,7 @@ void WebPluginListBuilderImpl::addMediaTypeToLastPlugin(
 void WebPluginListBuilderImpl::addFileExtensionToLastMediaType(
     const WebString& extension) {
   MimeClassInfo& info = m_results->last().mimes.last();
-  if (!info.suffixes.isEmpty())
-    info.suffixes.append(',');
-  info.suffixes.append(extension);
+  info.extensions.append(extension);
 }
 
 }  // namespace WebKit
