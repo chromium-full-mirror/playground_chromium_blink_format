@@ -59,7 +59,6 @@ class HistoryController : public Noncopyable {
   void invalidateCurrentItemCachedPage();
 
   void goToItem(HistoryItem*, FrameLoadType);
-  bool urlsMatchItem(HistoryItem*) const;
 
   void updateForBackForwardNavigation();
   void updateForReload();

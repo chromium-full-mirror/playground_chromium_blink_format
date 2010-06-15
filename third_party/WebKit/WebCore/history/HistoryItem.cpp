@@ -37,7 +37,7 @@
 
 namespace WebCore {
 
-static long long generateDocumentSequenceNumber() {
+static long long generateSequenceNumber() {
   // Initialize to the current time to reduce the likelihood of generating
   // identifiers that overlap with those from past/future browser sessions.
   static long long next = static_cast<long long>(currentTime() * 1000000.0);
@@ -55,7 +55,8 @@ HistoryItem::HistoryItem()
       m_lastVisitWasFailure(false),
       m_isTargetItem(false),
       m_visitCount(0),
-      m_documentSequenceNumber(generateDocumentSequenceNumber()) {}
+      m_itemSequenceNumber(generateSequenceNumber()),
+      m_documentSequenceNumber(generateSequenceNumber()) {}
 
 HistoryItem::HistoryItem(const String& urlString,
                          const String& title,
@@ -68,7 +69,8 @@ HistoryItem::HistoryItem(const String& urlString,
       m_lastVisitWasFailure(false),
       m_isTargetItem(false),
       m_visitCount(0),
-      m_documentSequenceNumber(generateDocumentSequenceNumber()) {
+      m_itemSequenceNumber(generateSequenceNumber()),
+      m_documentSequenceNumber(generateSequenceNumber()) {
   iconDatabase()->retainIconForPageURL(m_urlString);
 }
 
@@ -85,7 +87,8 @@ HistoryItem::HistoryItem(const String& urlString,
       m_lastVisitWasFailure(false),
       m_isTargetItem(false),
       m_visitCount(0),
-      m_documentSequenceNumber(generateDocumentSequenceNumber()) {
+      m_itemSequenceNumber(generateSequenceNumber()),
+      m_documentSequenceNumber(generateSequenceNumber()) {
   iconDatabase()->retainIconForPageURL(m_urlString);
 }
 
@@ -103,7 +106,8 @@ HistoryItem::HistoryItem(const KURL& url,
       m_lastVisitWasFailure(false),
       m_isTargetItem(false),
       m_visitCount(0),
-      m_documentSequenceNumber(generateDocumentSequenceNumber()) {
+      m_itemSequenceNumber(generateSequenceNumber()),
+      m_documentSequenceNumber(generateSequenceNumber()) {
   iconDatabase()->retainIconForPageURL(m_urlString);
 }
 
@@ -133,7 +137,8 @@ inline HistoryItem::HistoryItem(const HistoryItem& item)
       m_visitCount(item.m_visitCount),
       m_dailyVisitCounts(item.m_dailyVisitCounts),
       m_weeklyVisitCounts(item.m_weeklyVisitCounts),
-      m_documentSequenceNumber(generateDocumentSequenceNumber()),
+      m_itemSequenceNumber(item.m_itemSequenceNumber),
+      m_documentSequenceNumber(item.m_documentSequenceNumber),
       m_formContentType(item.m_formContentType) {
   if (item.m_formData)
     m_formData = item.m_formData->copy();
