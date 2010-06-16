@@ -705,7 +705,8 @@ void dump() {
       COMPtr<IWebFramePrivate> framePrivate;
       if (FAILED(frame->QueryInterface(&framePrivate)))
         goto fail;
-      framePrivate->renderTreeAsExternalRepresentation(&resultString);
+      framePrivate->renderTreeAsExternalRepresentation(
+          gLayoutTestController->isPrinting(), &resultString);
     }
 
     if (!resultString)

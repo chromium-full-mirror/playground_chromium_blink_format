@@ -159,8 +159,9 @@ class DECLSPEC_UUID("{A3676398-4485-4a9d-87DC-CB5A40E6351D}") WebFrame
   virtual /* [local] */ JSGlobalContextRef STDMETHODCALLTYPE globalContext();
 
   // IWebFramePrivate
-  virtual HRESULT STDMETHODCALLTYPE renderTreeAsExternalRepresentation(
-      /* [retval][out] */ BSTR* result);
+  virtual HRESULT STDMETHODCALLTYPE unused1(BSTR*) { return E_NOTIMPL; }
+  virtual HRESULT STDMETHODCALLTYPE
+  renderTreeAsExternalRepresentation(BOOL forPrinting, BSTR* result);
 
   virtual HRESULT STDMETHODCALLTYPE counterValueForElementById(
       /* [in] */ BSTR id,
