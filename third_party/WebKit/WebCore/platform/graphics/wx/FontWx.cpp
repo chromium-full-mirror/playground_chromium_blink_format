@@ -76,7 +76,7 @@ void Font::drawGlyphs(GraphicsContext* graphicsContext,
 }
 
 FloatRect Font::selectionRectForComplexText(const TextRun& run,
-                                            const IntPoint& point,
+                                            const FloatPoint& point,
                                             int h,
                                             int from,
                                             int to) const {
@@ -174,7 +174,7 @@ float Font::floatWidthForComplexText(
 }
 
 int Font::offsetForPositionForComplexText(const TextRun& run,
-                                          int x,
+                                          float x,
                                           bool includePartialGlyphs) const {
 #if OS(WINDOWS) || OS(DARWIN)
   ComplexTextController controller(this, run);

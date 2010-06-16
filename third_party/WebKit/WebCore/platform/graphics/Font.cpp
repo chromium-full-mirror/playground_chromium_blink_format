@@ -230,7 +230,7 @@ float Font::floatWidth(const TextRun& run,
 }
 
 FloatRect Font::selectionRectForText(const TextRun& run,
-                                     const IntPoint& point,
+                                     const FloatPoint& point,
                                      int h,
                                      int from,
                                      int to) const {
@@ -248,7 +248,7 @@ FloatRect Font::selectionRectForText(const TextRun& run,
 }
 
 int Font::offsetForPosition(const TextRun& run,
-                            int x,
+                            float x,
                             bool includePartialGlyphs) const {
 #if ENABLE(SVG_FONTS)
   if (primaryFont()->isSVGFont())

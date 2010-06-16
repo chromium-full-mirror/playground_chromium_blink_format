@@ -54,13 +54,13 @@ float Font::floatWidthForComplexText(const TextRun&,
   return 0.0f;
 }
 
-int Font::offsetForPositionForComplexText(const TextRun&, int, bool) const {
+int Font::offsetForPositionForComplexText(const TextRun&, float, bool) const {
   notImplemented();
   return 0;
 }
 
 FloatRect Font::selectionRectForComplexText(const TextRun&,
-                                            const IntPoint&,
+                                            const FloatPoint&,
                                             int,
                                             int,
                                             int) const {

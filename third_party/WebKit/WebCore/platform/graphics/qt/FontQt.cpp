@@ -276,7 +276,7 @@ float Font::floatWidthForComplexText(const TextRun& run,
 }
 
 int Font::offsetForPositionForSimpleText(const TextRun& run,
-                                         int position,
+                                         float position,
                                          bool includePartialGlyphs) const {
 #if QT_VERSION >= QT_VERSION_CHECK(4, 7, 0)
   String sanitized =
@@ -284,7 +284,7 @@ int Font::offsetForPositionForSimpleText(const TextRun& run,
   QString string = fromRawDataWithoutRef(sanitized);
 
   QFontMetrics fm(font());
-  float delta = (float)position;
+  float delta = position;
   int curPos = 0;
   do {
     float charWidth = fm.width(string[curPos]);
@@ -306,7 +306,7 @@ int Font::offsetForPositionForSimpleText(const TextRun& run,
 }
 
 int Font::offsetForPositionForComplexText(const TextRun& run,
-                                          int position,
+                                          float position,
                                           bool) const {
   String sanitized =
       Font::normalizeSpaces(String(run.characters(), run.length()));
@@ -318,7 +318,7 @@ int Font::offsetForPositionForComplexText(const TextRun& run,
 }
 
 FloatRect Font::selectionRectForSimpleText(const TextRun& run,
-                                           const IntPoint& pt,
+                                           const FloatPoint& pt,
                                            int h,
                                            int from,
                                            int to) const {
@@ -341,7 +341,7 @@ FloatRect Font::selectionRectForSimpleText(const TextRun& run,
 }
 
 FloatRect Font::selectionRectForComplexText(const TextRun& run,
-                                            const IntPoint& pt,
+                                            const FloatPoint& pt,
                                             int h,
                                             int from,
                                             int to) const {

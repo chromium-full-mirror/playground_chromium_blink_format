@@ -50,7 +50,6 @@ class FontSelector;
 class GlyphBuffer;
 class GlyphPageTreeNode;
 class GraphicsContext;
-class IntPoint;
 class SVGFontElement;
 
 struct GlyphData;
@@ -108,10 +107,10 @@ class Font {
                    String& glyphName) const;
 
   int offsetForPosition(const TextRun&,
-                        int position,
+                        float position,
                         bool includePartialGlyphs) const;
   FloatRect selectionRectForText(const TextRun&,
-                                 const IntPoint&,
+                                 const FloatPoint&,
                                  int h,
                                  int from = 0,
                                  int to = -1) const;
@@ -188,12 +187,12 @@ class Font {
                                int& charsConsumed,
                                String& glyphName) const;
   FloatRect selectionRectForTextUsingSVGFont(const TextRun&,
-                                             const IntPoint&,
+                                             const FloatPoint&,
                                              int h,
                                              int from,
                                              int to) const;
   int offsetForPositionForTextUsingSVGFont(const TextRun&,
-                                           int position,
+                                           float position,
                                            bool includePartialGlyphs) const;
 #endif
 
@@ -218,10 +217,10 @@ class Font {
       HashSet<const SimpleFontData*>* fallbackFonts = 0,
       GlyphOverflow* = 0) const;
   int offsetForPositionForSimpleText(const TextRun&,
-                                     int position,
+                                     float position,
                                      bool includePartialGlyphs) const;
   FloatRect selectionRectForSimpleText(const TextRun&,
-                                       const IntPoint&,
+                                       const FloatPoint&,
                                        int h,
                                        int from,
                                        int to) const;
@@ -239,10 +238,10 @@ class Font {
       HashSet<const SimpleFontData*>* fallbackFonts = 0,
       GlyphOverflow* = 0) const;
   int offsetForPositionForComplexText(const TextRun&,
-                                      int position,
+                                      float position,
                                       bool includePartialGlyphs) const;
   FloatRect selectionRectForComplexText(const TextRun&,
-                                        const IntPoint&,
+                                        const FloatPoint&,
                                         int h,
                                         int from,
                                         int to) const;

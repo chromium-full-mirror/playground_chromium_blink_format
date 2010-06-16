@@ -100,7 +100,8 @@ ComplexTextController::ComplexTextController(
   adjustGlyphsAndAdvances();
 }
 
-int ComplexTextController::offsetForPosition(int h, bool includePartialGlyphs) {
+int ComplexTextController::offsetForPosition(float h,
+                                             bool includePartialGlyphs) {
   if (h >= m_totalWidth)
     return m_run.ltr() ? m_end : 0;
   if (h < 0)

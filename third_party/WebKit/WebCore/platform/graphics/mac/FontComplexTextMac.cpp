@@ -41,7 +41,7 @@ using namespace std;
 namespace WebCore {
 
 FloatRect Font::selectionRectForComplexText(const TextRun& run,
-                                            const IntPoint& point,
+                                            const FloatPoint& point,
                                             int h,
                                             int from,
                                             int to) const {
@@ -119,7 +119,7 @@ float Font::floatWidthForComplexText(
 }
 
 int Font::offsetForPositionForComplexText(const TextRun& run,
-                                          int x,
+                                          float x,
                                           bool includePartialGlyphs) const {
   ComplexTextController controller(this, run);
   return controller.offsetForPosition(x, includePartialGlyphs);
