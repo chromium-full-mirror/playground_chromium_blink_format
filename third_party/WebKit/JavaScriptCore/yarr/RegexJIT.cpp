@@ -1314,10 +1314,12 @@ class RegexGenerator : private MacroAssembler {
         move(index, returnRegister);
         if (alternative->m_minimumSize)
           sub32(Imm32(alternative->m_minimumSize), returnRegister);
+
+        store32(returnRegister, output);
       } else
-        pop(returnRegister);
+        load32(Address(output), returnRegister);
+
       store32(index, Address(output, 4));
-      store32(returnRegister, output);
 
       generateReturn();
 
@@ -1440,7 +1442,7 @@ class RegexGenerator : private MacroAssembler {
       if (!m_pattern.m_body->m_hasFixedSize) {
         move(index, regT0);
         sub32(Imm32(countCheckedForCurrentAlternative - 1), regT0);
-        poke(regT0, m_pattern.m_body->m_callFrameSize);
+        store32(regT0, Address(output));
       }
 
       // Update index if necessary, and loop (without checking).
@@ -1455,9 +1457,9 @@ class RegexGenerator : private MacroAssembler {
       if (countCheckedForCurrentAlternative - 1) {
         move(index, regT0);
         sub32(Imm32(countCheckedForCurrentAlternative - 1), regT0);
-        poke(regT0, m_pattern.m_body->m_callFrameSize);
+        store32(regT0, Address(output));
       } else
-        poke(index, m_pattern.m_body->m_callFrameSize);
+        store32(index, Address(output));
     }
     // Check if there is sufficent input to run the first alternative again.
     jumpIfAvailableInput(incrementForNextIter)
@@ -1501,11 +1503,9 @@ class RegexGenerator : private MacroAssembler {
     // (countToCheckForFirstAlternative + 1) ...
     // but since we're about to return a failure this doesn't really matter!)
 
-    unsigned frameSize = m_pattern.m_body->m_callFrameSize;
-    if (!m_pattern.m_body->m_hasFixedSize)
-      ++frameSize;
-    if (frameSize)
-      addPtr(Imm32(frameSize * sizeof(void*)), stackPointerRegister);
+    if (m_pattern.m_body->m_callFrameSize)
+      addPtr(Imm32(m_pattern.m_body->m_callFrameSize * sizeof(void*)),
+             stackPointerRegister);
 
     move(Imm32(-1), returnRegister);
 
@@ -1570,9 +1570,8 @@ class RegexGenerator : private MacroAssembler {
   void generate() {
     generateEnter();
 
-    // TODO: do I really want this on the stack?
     if (!m_pattern.m_body->m_hasFixedSize)
-      push(index);
+      store32(index, Address(output));
 
     if (m_pattern.m_body->m_callFrameSize)
       subPtr(Imm32(m_pattern.m_body->m_callFrameSize * sizeof(void*)),
