@@ -1258,6 +1258,13 @@ int LayoutTestController::numberOfPages(float pageWidthInPixels,
   return pageNumber;
 }
 
+JSRetainPtr<JSStringRef> LayoutTestController::pageProperty(
+    const char* propertyName,
+    int pageNumber) const {
+  // FIXME: Implement this.
+  return JSRetainPtr<JSStringRef>();
+}
+
 void LayoutTestController::apiTestNewWindowDataLoadBaseURL(
     JSStringRef utf8Data,
     JSStringRef baseURL) {}

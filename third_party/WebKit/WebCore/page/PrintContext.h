@@ -31,6 +31,7 @@ class FloatRect;
 class FloatSize;
 class GraphicsContext;
 class IntRect;
+class String;
 
 class PrintContext {
  public:
@@ -59,6 +60,9 @@ class PrintContext {
 
   // Used by layout tests.
   static int pageNumberForElement(Element*, const FloatSize& pageSizeInPixels);
+  static String pageProperty(Frame* frame,
+                             const char* propertyName,
+                             int pageNumber);
   static int numberOfPages(Frame*, const FloatSize& pageSizeInPixels);
 
  protected:

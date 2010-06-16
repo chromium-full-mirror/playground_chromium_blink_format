@@ -67,6 +67,8 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
   int pageNumberForElementById(JSStringRef id,
                                float pageWidthInPixels,
                                float pageHeightInPixels);
+  JSRetainPtr<JSStringRef> pageProperty(const char* propertyName,
+                                        int pageNumber) const;
   JSStringRef pathToLocalResource(JSContextRef, JSStringRef url);
   void queueBackNavigation(int howFarBackward);
   void queueForwardNavigation(int howFarForward);
