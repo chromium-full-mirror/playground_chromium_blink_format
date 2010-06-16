@@ -490,7 +490,7 @@ RenderLayer* RenderLayerCompositor::enclosingNonStackingClippingLayer(
     if (curr->isStackingContext())
       return 0;
 
-    if (curr->renderer()->hasOverflowClip())
+    if (curr->renderer()->hasOverflowClip() || curr->renderer()->hasClip())
       return curr;
   }
   return 0;
@@ -1236,9 +1236,8 @@ bool RenderLayerCompositor::clippedByAncestor(RenderLayer* layer) const {
 // hierarchy.
 bool RenderLayerCompositor::clipsCompositingDescendants(
     const RenderLayer* layer) const {
-  // FIXME: need to look at hasClip() too eventually
   return layer->hasCompositingDescendant() &&
-         layer->renderer()->hasOverflowClip();
+         (layer->renderer()->hasOverflowClip() || layer->renderer()->hasClip());
 }
 
 bool RenderLayerCompositor::requiresCompositingForTransform(
