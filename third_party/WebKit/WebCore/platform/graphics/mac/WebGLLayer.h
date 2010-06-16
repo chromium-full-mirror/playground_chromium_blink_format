@@ -23,8 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef Canvas3DLayer_h
-#define Canvas3DLayer_h
+#ifndef WebGLLayer_h
+#define WebGLLayer_h
 
 #if USE(ACCELERATED_COMPOSITING)
 
@@ -35,7 +35,7 @@ class GraphicsLayer;
 class GraphicsContext3D;
 }
 
-@interface Canvas3DLayer : CAOpenGLLayer {
+@interface WebGLLayer : CAOpenGLLayer {
   WebCore::GraphicsLayer* m_layerOwner;
   WebCore::GraphicsContext3D* m_context;
   CGLContextObj m_contextObj;
@@ -50,4 +50,4 @@ class GraphicsContext3D;
 
 #endif  // USE(ACCELERATED_COMPOSITING)
 
-#endif  // Canvas3DLayer_h
+#endif  // WebGLLayer_h
