@@ -48,6 +48,7 @@ class DataObjectGtk : public RefCounted<DataObjectGtk> {
   void setDragContext(GdkDragContext* newDragContext) {
     m_dragContext = newDragContext;
   }
+  void setURL(const KURL&, const String&);
   bool hasText() { return m_range || !m_text.isEmpty(); }
   bool hasMarkup() { return m_range || !m_markup.isEmpty(); }
   bool hasURIList() { return !m_uriList.isEmpty(); }
