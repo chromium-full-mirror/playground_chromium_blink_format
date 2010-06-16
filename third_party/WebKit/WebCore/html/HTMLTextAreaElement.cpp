@@ -82,7 +82,7 @@ PassRefPtr<HTMLTextAreaElement> HTMLTextAreaElement::create(
     const QualifiedName& tagName,
     Document* document,
     HTMLFormElement* form) {
-  return new HTMLTextAreaElement(tagName, document, form);
+  return adoptRef(new HTMLTextAreaElement(tagName, document, form));
 }
 
 const AtomicString& HTMLTextAreaElement::formControlType() const {

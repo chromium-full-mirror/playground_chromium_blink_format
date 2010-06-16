@@ -52,7 +52,7 @@ const int defaultWidthNumChars = 34;
 const int buttonShadowHeight = 2;
 
 RenderFileUploadControl::RenderFileUploadControl(HTMLInputElement* input)
-    : RenderBlock(input), m_button(0) {
+    : RenderBlock(input) {
   FileList* list = input->files();
   Vector<String> filenames;
   unsigned length = list ? list->length() : 0;

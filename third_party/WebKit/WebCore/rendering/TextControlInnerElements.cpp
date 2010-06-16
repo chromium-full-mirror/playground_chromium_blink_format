@@ -104,7 +104,8 @@ TextControlInnerElement::TextControlInnerElement(Document* document,
 
 PassRefPtr<TextControlInnerElement> TextControlInnerElement::create(
     Node* shadowParent) {
-  return new TextControlInnerElement(shadowParent->document(), shadowParent);
+  return adoptRef(
+      new TextControlInnerElement(shadowParent->document(), shadowParent));
 }
 
 void TextControlInnerElement::attachInnerElement(Node* parent,
@@ -145,7 +146,7 @@ inline TextControlInnerTextElement::TextControlInnerTextElement(
 PassRefPtr<TextControlInnerTextElement> TextControlInnerTextElement::create(
     Document* document,
     Node* shadowParent) {
-  return new TextControlInnerTextElement(document, shadowParent);
+  return adoptRef(new TextControlInnerTextElement(document, shadowParent));
 }
 
 void TextControlInnerTextElement::defaultEventHandler(Event* event) {
@@ -182,7 +183,7 @@ inline SearchFieldResultsButtonElement::SearchFieldResultsButtonElement(
 
 PassRefPtr<SearchFieldResultsButtonElement>
 SearchFieldResultsButtonElement::create(Document* document) {
-  return new SearchFieldResultsButtonElement(document);
+  return adoptRef(new SearchFieldResultsButtonElement(document));
 }
 
 void SearchFieldResultsButtonElement::defaultEventHandler(Event* event) {
@@ -214,7 +215,7 @@ inline SearchFieldCancelButtonElement::SearchFieldCancelButtonElement(
 
 PassRefPtr<SearchFieldCancelButtonElement>
 SearchFieldCancelButtonElement::create(Document* document) {
-  return new SearchFieldCancelButtonElement(document);
+  return adoptRef(new SearchFieldCancelButtonElement(document));
 }
 
 void SearchFieldCancelButtonElement::detach() {
@@ -268,7 +269,7 @@ inline SpinButtonElement::SpinButtonElement(Node* shadowParent)
       m_onUpButton(false) {}
 
 PassRefPtr<SpinButtonElement> SpinButtonElement::create(Node* shadowParent) {
-  return new SpinButtonElement(shadowParent);
+  return adoptRef(new SpinButtonElement(shadowParent));
 }
 
 void SpinButtonElement::defaultEventHandler(Event* event) {

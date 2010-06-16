@@ -71,7 +71,7 @@ inline MediaControlShadowRootElement::MediaControlShadowRootElement(
 PassRefPtr<MediaControlShadowRootElement> MediaControlShadowRootElement::create(
     HTMLMediaElement* mediaElement) {
   RefPtr<MediaControlShadowRootElement> element =
-      new MediaControlShadowRootElement(mediaElement);
+      adoptRef(new MediaControlShadowRootElement(mediaElement));
 
   RefPtr<RenderStyle> rootStyle = RenderStyle::create();
   rootStyle->inheritFrom(mediaElement->renderer()->style());
@@ -135,7 +135,7 @@ MediaControlElement::MediaControlElement(HTMLMediaElement* mediaElement,
 PassRefPtr<MediaControlElement> MediaControlElement::create(
     HTMLMediaElement* mediaElement,
     PseudoId pseudoStyleId) {
-  return new MediaControlElement(mediaElement, pseudoStyleId);
+  return adoptRef(new MediaControlElement(mediaElement, pseudoStyleId));
 }
 
 void MediaControlElement::attachToParent(Element* parent) {
@@ -226,7 +226,7 @@ inline MediaControlTimelineContainerElement::
 
 PassRefPtr<MediaControlTimelineContainerElement>
 MediaControlTimelineContainerElement::create(HTMLMediaElement* mediaElement) {
-  return new MediaControlTimelineContainerElement(mediaElement);
+  return adoptRef(new MediaControlTimelineContainerElement(mediaElement));
 }
 
 bool MediaControlTimelineContainerElement::rendererIsNeeded(
@@ -257,7 +257,7 @@ inline MediaControlVolumeSliderContainerElement::
 PassRefPtr<MediaControlVolumeSliderContainerElement>
 MediaControlVolumeSliderContainerElement::create(
     HTMLMediaElement* mediaElement) {
-  return new MediaControlVolumeSliderContainerElement(mediaElement);
+  return adoptRef(new MediaControlVolumeSliderContainerElement(mediaElement));
 }
 
 PassRefPtr<RenderStyle>
@@ -300,7 +300,7 @@ inline MediaControlStatusDisplayElement::MediaControlStatusDisplayElement(
 
 PassRefPtr<MediaControlStatusDisplayElement>
 MediaControlStatusDisplayElement::create(HTMLMediaElement* mediaElement) {
-  return new MediaControlStatusDisplayElement(mediaElement);
+  return adoptRef(new MediaControlStatusDisplayElement(mediaElement));
 }
 
 void MediaControlStatusDisplayElement::update() {
@@ -484,7 +484,7 @@ inline MediaControlMuteButtonElement::MediaControlMuteButtonElement(
 
 PassRefPtr<MediaControlMuteButtonElement> MediaControlMuteButtonElement::create(
     HTMLMediaElement* mediaElement) {
-  return new MediaControlMuteButtonElement(mediaElement);
+  return adoptRef(new MediaControlMuteButtonElement(mediaElement));
 }
 
 void MediaControlMuteButtonElement::defaultEventHandler(Event* event) {
@@ -509,7 +509,7 @@ inline MediaControlPlayButtonElement::MediaControlPlayButtonElement(
 
 PassRefPtr<MediaControlPlayButtonElement> MediaControlPlayButtonElement::create(
     HTMLMediaElement* mediaElement) {
-  return new MediaControlPlayButtonElement(mediaElement);
+  return adoptRef(new MediaControlPlayButtonElement(mediaElement));
 }
 
 void MediaControlPlayButtonElement::defaultEventHandler(Event* event) {
@@ -538,7 +538,8 @@ inline MediaControlSeekButtonElement::MediaControlSeekButtonElement(
 PassRefPtr<MediaControlSeekButtonElement> MediaControlSeekButtonElement::create(
     HTMLMediaElement* mediaElement,
     PseudoId pseudoStyleId) {
-  return new MediaControlSeekButtonElement(mediaElement, pseudoStyleId);
+  return adoptRef(
+      new MediaControlSeekButtonElement(mediaElement, pseudoStyleId));
 }
 
 inline bool MediaControlSeekButtonElement::isForwardButton() const {
@@ -601,7 +602,7 @@ inline MediaControlRewindButtonElement::MediaControlRewindButtonElement(
 
 PassRefPtr<MediaControlRewindButtonElement>
 MediaControlRewindButtonElement::create(HTMLMediaElement* mediaElement) {
-  return new MediaControlRewindButtonElement(mediaElement);
+  return adoptRef(new MediaControlRewindButtonElement(mediaElement));
 }
 
 void MediaControlRewindButtonElement::defaultEventHandler(Event* event) {
@@ -623,7 +624,7 @@ inline MediaControlReturnToRealtimeButtonElement::
 PassRefPtr<MediaControlReturnToRealtimeButtonElement>
 MediaControlReturnToRealtimeButtonElement::create(
     HTMLMediaElement* mediaElement) {
-  return new MediaControlReturnToRealtimeButtonElement(mediaElement);
+  return adoptRef(new MediaControlReturnToRealtimeButtonElement(mediaElement));
 }
 
 void MediaControlReturnToRealtimeButtonElement::defaultEventHandler(
@@ -647,7 +648,8 @@ inline MediaControlToggleClosedCaptionsButtonElement::
 PassRefPtr<MediaControlToggleClosedCaptionsButtonElement>
 MediaControlToggleClosedCaptionsButtonElement::create(
     HTMLMediaElement* mediaElement) {
-  return new MediaControlToggleClosedCaptionsButtonElement(mediaElement);
+  return adoptRef(
+      new MediaControlToggleClosedCaptionsButtonElement(mediaElement));
 }
 
 void MediaControlToggleClosedCaptionsButtonElement::defaultEventHandler(
@@ -676,7 +678,7 @@ MediaControlTimelineElement::MediaControlTimelineElement(
 
 PassRefPtr<MediaControlTimelineElement> MediaControlTimelineElement::create(
     HTMLMediaElement* mediaElement) {
-  return new MediaControlTimelineElement(mediaElement);
+  return adoptRef(new MediaControlTimelineElement(mediaElement));
 }
 
 void MediaControlTimelineElement::defaultEventHandler(Event* event) {
@@ -730,7 +732,7 @@ inline MediaControlVolumeSliderElement::MediaControlVolumeSliderElement(
 
 PassRefPtr<MediaControlVolumeSliderElement>
 MediaControlVolumeSliderElement::create(HTMLMediaElement* mediaElement) {
-  return new MediaControlVolumeSliderElement(mediaElement);
+  return adoptRef(new MediaControlVolumeSliderElement(mediaElement));
 }
 
 void MediaControlVolumeSliderElement::defaultEventHandler(Event* event) {
@@ -773,7 +775,7 @@ inline MediaControlFullscreenButtonElement::MediaControlFullscreenButtonElement(
 
 PassRefPtr<MediaControlFullscreenButtonElement>
 MediaControlFullscreenButtonElement::create(HTMLMediaElement* mediaElement) {
-  return new MediaControlFullscreenButtonElement(mediaElement);
+  return adoptRef(new MediaControlFullscreenButtonElement(mediaElement));
 }
 
 void MediaControlFullscreenButtonElement::defaultEventHandler(Event* event) {
@@ -796,7 +798,8 @@ inline MediaControlTimeDisplayElement::MediaControlTimeDisplayElement(
 PassRefPtr<MediaControlTimeDisplayElement>
 MediaControlTimeDisplayElement::create(HTMLMediaElement* mediaElement,
                                        PseudoId pseudoStyleId) {
-  return new MediaControlTimeDisplayElement(mediaElement, pseudoStyleId);
+  return adoptRef(
+      new MediaControlTimeDisplayElement(mediaElement, pseudoStyleId));
 }
 
 PassRefPtr<RenderStyle> MediaControlTimeDisplayElement::styleForElement() {

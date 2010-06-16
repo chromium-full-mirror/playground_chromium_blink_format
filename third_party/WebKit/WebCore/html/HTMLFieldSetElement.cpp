@@ -44,7 +44,7 @@ PassRefPtr<HTMLFieldSetElement> HTMLFieldSetElement::create(
     const QualifiedName& tagName,
     Document* document,
     HTMLFormElement* form) {
-  return new HTMLFieldSetElement(tagName, document, form);
+  return adoptRef(new HTMLFieldSetElement(tagName, document, form));
 }
 
 bool HTMLFieldSetElement::checkDTD(const Node* newChild) {

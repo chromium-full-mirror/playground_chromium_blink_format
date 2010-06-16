@@ -35,6 +35,8 @@ class RenderTextControl;
 class ValidityState;
 class VisibleSelection;
 
+// FIXME: The HTML5 specification calls these form-associated elements.
+// So consider renaming this to HTMLFormAssociatedElement.
 class HTMLFormControlElement : public HTMLElement {
  public:
   virtual ~HTMLFormControlElement();
@@ -82,10 +84,9 @@ class HTMLFormControlElement : public HTMLElement {
   virtual bool isRadioButton() const { return false; }
   virtual bool canTriggerImplicitSubmission() const { return false; }
 
-  /* Override in derived classes to get the encoded name=value pair for
-   * submitting.
-   * Return true for a successful control (see HTML4-17.13.2).
-   */
+  // Override in derived classes to get the encoded name=value pair for
+  // submitting.
+  // Return true for a successful control (see HTML4-17.13.2).
   virtual bool appendFormData(FormDataList&, bool) { return false; }
 
   virtual bool isSuccessfulSubmitButton() const { return false; }
@@ -114,8 +115,7 @@ class HTMLFormControlElement : public HTMLElement {
  protected:
   HTMLFormControlElement(const QualifiedName& tagName,
                          Document*,
-                         HTMLFormElement*,
-                         ConstructionType = CreateHTMLElementZeroRefCount);
+                         HTMLFormElement*);
 
   virtual void parseMappedAttribute(Attribute*);
   virtual void attach();
@@ -131,6 +131,7 @@ class HTMLFormControlElement : public HTMLElement {
   virtual void dispatchBlurEvent();
 
   void removeFromForm();
+
   // This must be called any time the result of willValidate() has changed.
   void setNeedsWillValidateCheck();
   virtual bool recalcWillValidate() const;
@@ -158,16 +159,19 @@ class HTMLFormControlElement : public HTMLElement {
   bool m_readOnly : 1;
   bool m_required : 1;
   bool m_valueMatchesRenderer : 1;
-  // The initial value of m_willValidate depends on a subclass, and we can't
+
+  // The initial value of m_willValidate depends on the derived class. We can't
   // initialize it with a virtual function in the constructor. m_willValidate
-  // is not deterministic during m_willValidateInitialized=false.
+  // is not deterministic as long as m_willValidateInitialized is false.
   mutable bool m_willValidateInitialized : 1;
   mutable bool m_willValidate : 1;
+
   // Cache of validity()->valid().
-  // "candidate for constraint validation" doesn't affect to m_isValid.
+  // But "candidate for constraint validation" doesn't affect m_isValid.
   bool m_isValid : 1;
 };
 
+// FIXME: Give this class its own header file.
 class HTMLFormControlElementWithState : public HTMLFormControlElement {
  public:
   virtual ~HTMLFormControlElementWithState();
@@ -188,6 +192,7 @@ class HTMLFormControlElementWithState : public HTMLFormControlElement {
   virtual void finishParsingChildren();
 };
 
+// FIXME: Give this class its own header file.
 class HTMLTextFormControlElement : public HTMLFormControlElementWithState {
  public:
   virtual ~HTMLTextFormControlElement();
@@ -219,10 +224,10 @@ class HTMLTextFormControlElement : public HTMLFormControlElementWithState {
   virtual int cachedSelectionStart() const = 0;
   virtual int cachedSelectionEnd() const = 0;
 
-  // A subclass should return true if placeholder processing is needed.
+  // The derived class should return true if placeholder processing is needed.
   virtual bool supportsPlaceholder() const = 0;
-  // Returns true if user-editable value is empty.  This is used to check
-  // placeholder visibility.
+  // Returns true if user-editable value is empty. Used to check placeholder
+  // visibility.
   virtual bool isEmptyValue() const = 0;
   // Called in dispatchFocusEvent(), after placeholder process, before calling
   // parent's dispatchFocusEvent().
@@ -230,6 +235,7 @@ class HTMLTextFormControlElement : public HTMLFormControlElementWithState {
   // Called in dispatchBlurEvent(), after placeholder process, before calling
   // parent's dispatchBlurEvent().
   virtual void handleBlurEvent() {}
+
   RenderTextControl* textRendererAfterUpdateLayout();
 };
 

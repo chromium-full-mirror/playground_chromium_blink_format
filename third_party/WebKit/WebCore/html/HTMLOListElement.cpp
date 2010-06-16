@@ -40,13 +40,13 @@ HTMLOListElement::HTMLOListElement(const QualifiedName& tagName,
 }
 
 PassRefPtr<HTMLOListElement> HTMLOListElement::create(Document* document) {
-  return new HTMLOListElement(olTag, document);
+  return adoptRef(new HTMLOListElement(olTag, document));
 }
 
 PassRefPtr<HTMLOListElement> HTMLOListElement::create(
     const QualifiedName& tagName,
     Document* document) {
-  return new HTMLOListElement(tagName, document);
+  return adoptRef(new HTMLOListElement(tagName, document));
 }
 
 bool HTMLOListElement::mapToEntry(const QualifiedName& attrName,

@@ -38,7 +38,7 @@ inline HTMLPreElement::HTMLPreElement(const QualifiedName& tagName,
 
 PassRefPtr<HTMLPreElement> HTMLPreElement::create(const QualifiedName& tagName,
                                                   Document* document) {
-  return new HTMLPreElement(tagName, document);
+  return adoptRef(new HTMLPreElement(tagName, document));
 }
 
 bool HTMLPreElement::mapToEntry(const QualifiedName& attrName,

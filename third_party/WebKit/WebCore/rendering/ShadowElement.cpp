@@ -25,18 +25,20 @@
 
 namespace WebCore {
 
+using namespace HTMLNames;
+
 PassRefPtr<ShadowBlockElement> ShadowBlockElement::create(Node* shadowParent) {
   return new ShadowBlockElement(shadowParent);
 }
 
 ShadowBlockElement::ShadowBlockElement(Node* shadowParent)
-    : ShadowElement<HTMLDivElement>(HTMLNames::divTag, shadowParent) {}
+    : ShadowElement<HTMLDivElement>(divTag, shadowParent) {}
 
 PassRefPtr<ShadowInputElement> ShadowInputElement::create(Node* shadowParent) {
   return new ShadowInputElement(shadowParent);
 }
 
 ShadowInputElement::ShadowInputElement(Node* shadowParent)
-    : ShadowElement<HTMLInputElement>(HTMLNames::inputTag, shadowParent) {}
+    : ShadowElement<HTMLInputElement>(inputTag, shadowParent) {}
 
 }  // namespace WebCore

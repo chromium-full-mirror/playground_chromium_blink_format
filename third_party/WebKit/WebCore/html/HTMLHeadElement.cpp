@@ -38,13 +38,13 @@ HTMLHeadElement::HTMLHeadElement(const QualifiedName& tagName,
 }
 
 PassRefPtr<HTMLHeadElement> HTMLHeadElement::create(Document* document) {
-  return new HTMLHeadElement(headTag, document);
+  return adoptRef(new HTMLHeadElement(headTag, document));
 }
 
 PassRefPtr<HTMLHeadElement> HTMLHeadElement::create(
     const QualifiedName& tagName,
     Document* document) {
-  return new HTMLHeadElement(tagName, document);
+  return adoptRef(new HTMLHeadElement(tagName, document));
 }
 
 String HTMLHeadElement::profile() const {

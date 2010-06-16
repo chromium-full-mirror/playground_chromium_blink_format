@@ -43,7 +43,7 @@ HTMLFontElement::HTMLFontElement(const QualifiedName& tagName,
 PassRefPtr<HTMLFontElement> HTMLFontElement::create(
     const QualifiedName& tagName,
     Document* document) {
-  return new HTMLFontElement(tagName, document);
+  return adoptRef(new HTMLFontElement(tagName, document));
 }
 
 // Allows leading spaces.

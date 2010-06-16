@@ -35,7 +35,7 @@ inline HTMLModElement::HTMLModElement(const QualifiedName& tagName,
 
 PassRefPtr<HTMLModElement> HTMLModElement::create(const QualifiedName& tagName,
                                                   Document* document) {
-  return new HTMLModElement(tagName, document);
+  return adoptRef(new HTMLModElement(tagName, document));
 }
 
 String HTMLModElement::cite() const {

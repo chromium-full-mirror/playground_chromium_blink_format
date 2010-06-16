@@ -38,13 +38,13 @@ HTMLUListElement::HTMLUListElement(const QualifiedName& tagName,
 }
 
 PassRefPtr<HTMLUListElement> HTMLUListElement::create(Document* document) {
-  return new HTMLUListElement(ulTag, document);
+  return adoptRef(new HTMLUListElement(ulTag, document));
 }
 
 PassRefPtr<HTMLUListElement> HTMLUListElement::create(
     const QualifiedName& tagName,
     Document* document) {
-  return new HTMLUListElement(tagName, document);
+  return adoptRef(new HTMLUListElement(tagName, document));
 }
 
 bool HTMLUListElement::mapToEntry(const QualifiedName& attrName,

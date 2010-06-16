@@ -48,7 +48,7 @@ PassRefPtr<HTMLScriptElement> HTMLScriptElement::create(
     const QualifiedName& tagName,
     Document* document,
     bool createdByParser) {
-  return new HTMLScriptElement(tagName, document, createdByParser);
+  return adoptRef(new HTMLScriptElement(tagName, document, createdByParser));
 }
 
 bool HTMLScriptElement::isURLAttribute(Attribute* attr) const {

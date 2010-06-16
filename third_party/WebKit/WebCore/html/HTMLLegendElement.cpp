@@ -43,7 +43,7 @@ PassRefPtr<HTMLLegendElement> HTMLLegendElement::create(
     const QualifiedName& tagName,
     Document* document,
     HTMLFormElement* form) {
-  return new HTMLLegendElement(tagName, document, form);
+  return adoptRef(new HTMLLegendElement(tagName, document, form));
 }
 
 bool HTMLLegendElement::supportsFocus() const {

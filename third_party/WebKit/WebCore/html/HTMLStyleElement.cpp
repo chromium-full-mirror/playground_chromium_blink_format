@@ -45,7 +45,7 @@ PassRefPtr<HTMLStyleElement> HTMLStyleElement::create(
     const QualifiedName& tagName,
     Document* document,
     bool createdByParser) {
-  return new HTMLStyleElement(tagName, document, createdByParser);
+  return adoptRef(new HTMLStyleElement(tagName, document, createdByParser));
 }
 
 // other stuff...

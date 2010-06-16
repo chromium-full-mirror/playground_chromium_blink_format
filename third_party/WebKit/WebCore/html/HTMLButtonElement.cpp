@@ -53,7 +53,7 @@ PassRefPtr<HTMLButtonElement> HTMLButtonElement::create(
     const QualifiedName& tagName,
     Document* document,
     HTMLFormElement* form) {
-  return new HTMLButtonElement(tagName, document, form);
+  return adoptRef(new HTMLButtonElement(tagName, document, form));
 }
 
 RenderObject* HTMLButtonElement::createRenderer(RenderArena* arena,

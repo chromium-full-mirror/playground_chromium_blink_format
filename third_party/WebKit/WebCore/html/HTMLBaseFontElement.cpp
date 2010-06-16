@@ -39,7 +39,7 @@ inline HTMLBaseFontElement::HTMLBaseFontElement(const QualifiedName& tagName,
 PassRefPtr<HTMLBaseFontElement> HTMLBaseFontElement::create(
     const QualifiedName& tagName,
     Document* document) {
-  return new HTMLBaseFontElement(tagName, document);
+  return adoptRef(new HTMLBaseFontElement(tagName, document));
 }
 
 int HTMLBaseFontElement::size() const {

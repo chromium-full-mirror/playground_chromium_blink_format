@@ -41,13 +41,13 @@ HTMLHtmlElement::HTMLHtmlElement(const QualifiedName& tagName,
 }
 
 PassRefPtr<HTMLHtmlElement> HTMLHtmlElement::create(Document* document) {
-  return new HTMLHtmlElement(htmlTag, document);
+  return adoptRef(new HTMLHtmlElement(htmlTag, document));
 }
 
 PassRefPtr<HTMLHtmlElement> HTMLHtmlElement::create(
     const QualifiedName& tagName,
     Document* document) {
-  return new HTMLHtmlElement(tagName, document);
+  return adoptRef(new HTMLHtmlElement(tagName, document));
 }
 
 String HTMLHtmlElement::version() const {

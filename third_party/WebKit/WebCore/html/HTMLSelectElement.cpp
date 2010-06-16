@@ -59,7 +59,7 @@ PassRefPtr<HTMLSelectElement> HTMLSelectElement::create(
     Document* document,
     HTMLFormElement* form) {
   ASSERT(tagName.matches(selectTag));
-  return new HTMLSelectElement(tagName, document, form);
+  return adoptRef(new HTMLSelectElement(tagName, document, form));
 }
 
 bool HTMLSelectElement::checkDTD(const Node* newChild) {

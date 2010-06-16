@@ -51,14 +51,14 @@ HTMLOptionElement::HTMLOptionElement(const QualifiedName& tagName,
 
 PassRefPtr<HTMLOptionElement> HTMLOptionElement::create(Document* document,
                                                         HTMLFormElement* form) {
-  return new HTMLOptionElement(optionTag, document, form);
+  return adoptRef(new HTMLOptionElement(optionTag, document, form));
 }
 
 PassRefPtr<HTMLOptionElement> HTMLOptionElement::create(
     const QualifiedName& tagName,
     Document* document,
     HTMLFormElement* form) {
-  return new HTMLOptionElement(tagName, document, form);
+  return adoptRef(new HTMLOptionElement(tagName, document, form));
 }
 
 PassRefPtr<HTMLOptionElement> HTMLOptionElement::createForJSConstructor(
@@ -69,7 +69,7 @@ PassRefPtr<HTMLOptionElement> HTMLOptionElement::createForJSConstructor(
     bool selected,
     ExceptionCode& ec) {
   RefPtr<HTMLOptionElement> element =
-      new HTMLOptionElement(optionTag, document);
+      adoptRef(new HTMLOptionElement(optionTag, document));
 
   RefPtr<Text> text = Text::create(document, data.isNull() ? "" : data);
 

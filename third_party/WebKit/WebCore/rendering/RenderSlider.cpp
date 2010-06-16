@@ -51,7 +51,6 @@ static double sliderPosition(HTMLInputElement* element) {
   return range.proportionFromValue(range.valueFromElement(element));
 }
 
-// FIXME: Could share code with the SliderDivElement class in RenderProgress.
 class SliderThumbElement : public ShadowBlockElement {
  public:
   static PassRefPtr<SliderThumbElement> create(Node* shadowParent);
@@ -73,7 +72,7 @@ inline SliderThumbElement::SliderThumbElement(Node* shadowParent)
 
 inline PassRefPtr<SliderThumbElement> SliderThumbElement::create(
     Node* shadowParent) {
-  return new SliderThumbElement(shadowParent);
+  return adoptRef(new SliderThumbElement(shadowParent));
 }
 
 void SliderThumbElement::defaultEventHandler(Event* event) {
@@ -103,7 +102,7 @@ void SliderThumbElement::defaultEventHandler(Event* event) {
 
         m_inDragMode = true;
         document()->frame()->eventHandler()->setCapturingMouseEventsNode(
-            shadowParentNode());
+            shadowParent());
         event->setDefaultHandled();
         return;
       }

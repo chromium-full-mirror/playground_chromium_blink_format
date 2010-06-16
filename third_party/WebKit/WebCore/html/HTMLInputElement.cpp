@@ -130,7 +130,7 @@ PassRefPtr<HTMLInputElement> HTMLInputElement::create(
     const QualifiedName& tagName,
     Document* document,
     HTMLFormElement* form) {
-  return new HTMLInputElement(tagName, document, form);
+  return adoptRef(new HTMLInputElement(tagName, document, form));
 }
 
 HTMLInputElement::~HTMLInputElement() {

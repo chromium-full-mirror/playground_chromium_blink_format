@@ -91,9 +91,7 @@ class HTMLElement : public StyledElement {
   static void addHTMLAlignmentToStyledElement(StyledElement*, Attribute*);
 
  protected:
-  HTMLElement(const QualifiedName& tagName,
-              Document*,
-              ConstructionType = CreateHTMLElementZeroRefCount);
+  HTMLElement(const QualifiedName& tagName, Document*);
 
   void addHTMLAlignment(Attribute*);
 
@@ -125,9 +123,8 @@ class HTMLElement : public StyledElement {
 };
 
 inline HTMLElement::HTMLElement(const QualifiedName& tagName,
-                                Document* document,
-                                ConstructionType type)
-    : StyledElement(tagName, document, type) {
+                                Document* document)
+    : StyledElement(tagName, document, CreateHTMLElement) {
   ASSERT(tagName.localName().impl());
 }
 

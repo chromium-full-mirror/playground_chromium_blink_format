@@ -66,13 +66,13 @@ HTMLCanvasElement::HTMLCanvasElement(const QualifiedName& tagName,
 }
 
 PassRefPtr<HTMLCanvasElement> HTMLCanvasElement::create(Document* document) {
-  return new HTMLCanvasElement(canvasTag, document);
+  return adoptRef(new HTMLCanvasElement(canvasTag, document));
 }
 
 PassRefPtr<HTMLCanvasElement> HTMLCanvasElement::create(
     const QualifiedName& tagName,
     Document* document) {
-  return new HTMLCanvasElement(tagName, document);
+  return adoptRef(new HTMLCanvasElement(tagName, document));
 }
 
 HTMLCanvasElement::~HTMLCanvasElement() {
