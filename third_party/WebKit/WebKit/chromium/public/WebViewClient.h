@@ -73,7 +73,8 @@ class WebViewClient : virtual public WebWidgetClient {
   // so any subsequent calls to createSessionStorageNamespace conform to the
   // WebStorage specification.
   virtual WebView* createView(WebFrame* creator,
-                              const WebWindowFeatures& features) {
+                              const WebWindowFeatures& features,
+                              const WebString& name) {
     return 0;
   }
 

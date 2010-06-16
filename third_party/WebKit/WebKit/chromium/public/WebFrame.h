@@ -105,6 +105,7 @@ class WebFrame {
   // The name of this frame.
   virtual WebString name() const = 0;
   virtual void clearName() = 0;
+  virtual void setName(const WebString&) = 0;
 
   // The url of the document loaded in this frame.  This is equivalent to
   // dataSource()->request().url().

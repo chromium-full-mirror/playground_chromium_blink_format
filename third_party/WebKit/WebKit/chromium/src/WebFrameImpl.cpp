@@ -446,6 +446,10 @@ void WebFrameImpl::clearName() {
   m_frame->tree()->clearName();
 }
 
+void WebFrameImpl::setName(const WebString& name) {
+  m_frame->tree()->setName(name);
+}
+
 WebURL WebFrameImpl::url() const {
   const WebDataSource* ds = dataSource();
   if (!ds)
