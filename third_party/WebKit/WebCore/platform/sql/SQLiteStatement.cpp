@@ -64,7 +64,7 @@ SQLiteStatement::~SQLiteStatement() {
 
 int SQLiteStatement::prepare() {
   ASSERT(!m_isPrepared);
-  const void* tail;
+  const void* tail = 0;
   LOG(SQLDatabase, "SQL - prepare - %s", m_query.ascii().data());
   String strippedQuery = m_query.stripWhiteSpace();
   int error = sqlite3_prepare16_v2(
