@@ -83,6 +83,11 @@ void DragClient::startDrag(DragImageRef image,
       currentEvent.get());
   webView->priv->draggingDataObjects.set(context, dataObject);
 
+  // A drag starting should prevent a double-click from happening. This might
+  // happen if a drag is followed very quickly by another click (like in the
+  // DRT).
+  webView->priv->previousClickTime = 0;
+
   if (image)
     gtk_drag_set_icon_pixbuf(context, image, eventPos.x() - dragImageOrigin.x(),
                              eventPos.y() - dragImageOrigin.y());
