@@ -57,6 +57,7 @@ class HTML5DocumentParser : public DocumentParser,
   virtual void write(const SegmentedString&, bool isFromNetwork);
   virtual void end();
   virtual void finish();
+  virtual bool finishWasCalled();
   virtual int executingScript() const;
   virtual bool processingData() const;
   virtual void stopParsing();
@@ -107,6 +108,7 @@ class HTML5DocumentParser : public DocumentParser,
     }
 
     void close() { m_last->close(); }
+    bool isClosed() { return m_last->isClosed(); }
 
     SegmentedString& current() { return m_first; }
 

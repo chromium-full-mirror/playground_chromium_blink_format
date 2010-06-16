@@ -82,6 +82,7 @@ class XMLDocumentParser : public DocumentParser, public CachedResourceClient {
   // from DocumentParser
   virtual void write(const SegmentedString&, bool appendData);
   virtual void finish();
+  virtual bool finishWasCalled();
   virtual bool isWaitingForScripts() const;
   virtual void stopParsing();
 

@@ -158,6 +158,7 @@ class HTMLDocumentParser : public DocumentParser, public CachedResourceClient {
 
   virtual void write(const SegmentedString&, bool appendData);
   virtual void finish();
+  virtual bool finishWasCalled();
   virtual bool forceSynchronous() const { return m_state.forceSynchronous(); }
   virtual void setForceSynchronous(bool force);
   virtual bool isWaitingForScripts() const;

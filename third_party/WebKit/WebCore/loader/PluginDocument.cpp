@@ -53,6 +53,7 @@ class PluginDocumentParser : public DocumentParser {
  private:
   virtual void write(const SegmentedString&, bool appendData);
   virtual void finish();
+  virtual bool finishWasCalled();
   virtual bool isWaitingForScripts() const;
 
   virtual bool wantsRawData() const { return true; }
@@ -138,6 +139,12 @@ bool PluginDocumentParser::writeRawData(const char*, int) {
 void PluginDocumentParser::finish() {
   if (!m_parserStopped)
     m_doc->finishedParsing();
+}
+
+bool PluginDocumentParser::finishWasCalled() {
+  // finish() always calls m_doc->finishedParsing() so we'll be deleted
+  // after finish().
+  return false;
 }
 
 bool PluginDocumentParser::isWaitingForScripts() const {
