@@ -36,6 +36,7 @@
 
 #include <Ecore.h>
 #include <Edje.h>
+#include <Evas.h>
 #include <string>
 #include <wtf/text/CString.h>
 
