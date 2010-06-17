@@ -92,13 +92,18 @@ CSSMutableStyleDeclaration::CSSMutableStyleDeclaration(
 #endif
 {
   m_properties.reserveInitialCapacity(numProperties);
+  HashSet<int> candidates;
   for (int i = 0; i < numProperties; ++i) {
     ASSERT(properties[i]);
-    m_properties.append(*properties[i]);
     if (properties[i]->value()->isVariableDependentValue())
       m_variableDependentValueCount++;
+    else if (candidates.contains(properties[i]->id()))
+      removeProperty(properties[i]->id(), false);
+    m_properties.append(*properties[i]);
+    if (!getPropertyPriority(properties[i]->id()) &&
+        !properties[i]->isImportant())
+      candidates.add(properties[i]->id());
   }
-  // FIXME: This allows duplicate properties.
 }
 
 CSSMutableStyleDeclaration& CSSMutableStyleDeclaration::operator=(
