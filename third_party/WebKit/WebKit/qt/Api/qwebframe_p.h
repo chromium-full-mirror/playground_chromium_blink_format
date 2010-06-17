@@ -71,7 +71,8 @@ class QWebFramePrivate {
         page(0),
         allowsScrolling(true),
         marginWidth(-1),
-        marginHeight(-1) {}
+        marginHeight(-1),
+        initialLayoutComplete(false) {}
   void init(QWebFrame* qframe, QWebFrameData* frameData);
   void setPage(QWebPage*);
 
@@ -103,6 +104,7 @@ class QWebFramePrivate {
   bool allowsScrolling;
   int marginWidth;
   int marginHeight;
+  bool initialLayoutComplete;
 };
 
 class QWebHitTestResultPrivate {

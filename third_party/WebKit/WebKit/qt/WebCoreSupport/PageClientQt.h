@@ -74,6 +74,8 @@ class PageClientQWidget : public QWebPageClient {
 
   virtual bool viewResizesToContentsEnabled() const { return false; }
 
+  virtual QRectF windowRect() const;
+
   QWidget* view;
 };
 
@@ -176,6 +178,8 @@ class PageClientQGraphicsWidget : public QWebPageClient {
   // QGraphicsWebView can render composited layers
   virtual bool allowsAcceleratedCompositing() const { return true; }
 #endif
+
+  virtual QRectF windowRect() const;
 
   QGraphicsWidget* view;
   QWebPage* page;

@@ -91,6 +91,10 @@ QStyle* PageClientQWidget::style() const {
   return view->style();
 }
 
+QRectF PageClientQWidget::windowRect() const {
+  return QRectF(view->window()->geometry());
+}
+
 PageClientQGraphicsWidget::~PageClientQGraphicsWidget() {
 #if USE(ACCELERATED_COMPOSITING)
   if (!rootGraphicsLayer)
@@ -296,4 +300,14 @@ QObject* PageClientQGraphicsWidget::pluginParent() const {
 QStyle* PageClientQGraphicsWidget::style() const {
   return view->style();
 }
+
+QRectF PageClientQGraphicsWidget::windowRect() const {
+  if (!view->scene())
+    return QRectF();
+
+  // The sceneRect is a good approximation of the size of the application,
+  // independent of the view.
+  return view->scene()->sceneRect();
 }
+
+}  // namespace WebCore

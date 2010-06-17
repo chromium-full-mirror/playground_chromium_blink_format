@@ -90,6 +90,8 @@ class QWebPageClient {
 
   virtual bool viewResizesToContentsEnabled() const = 0;
 
+  virtual QRectF windowRect() const = 0;
+
  protected:
 #ifndef QT_NO_CURSOR
   virtual QCursor cursor() const = 0;
