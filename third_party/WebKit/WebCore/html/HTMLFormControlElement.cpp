@@ -215,7 +215,7 @@ bool HTMLFormControlElement::autofocus() const {
 }
 
 void HTMLFormControlElement::setAutofocus(bool b) {
-  setAttribute(autofocusAttr, b ? "autofocus" : 0);
+  setAttribute(autofocusAttr, b ? "" : 0);
 }
 
 bool HTMLFormControlElement::required() const {
@@ -223,7 +223,7 @@ bool HTMLFormControlElement::required() const {
 }
 
 void HTMLFormControlElement::setRequired(bool b) {
-  setAttribute(requiredAttr, b ? "required" : 0);
+  setAttribute(requiredAttr, b ? "" : 0);
 }
 
 static void updateFromElementCallback(Node* node) {
