@@ -404,7 +404,9 @@ class InspectorController
 #endif
   SpecialPanels m_showAfterVisible;
   RefPtr<Node> m_highlightedNode;
+#if ENABLE(INSPECTOR)
   RefPtr<InspectorValue> m_sessionSettings;
+#endif
   unsigned m_groupLevel;
   bool m_searchingForNode;
   ConsoleMessage* m_previousMessage;
