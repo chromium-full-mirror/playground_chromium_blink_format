@@ -33,7 +33,10 @@
 #include "WebPage.h"
 #include "WebPageProxyMessageKinds.h"
 #include "WebProcess.h"
+#include <JavaScriptCore/APICast.h>
+#include <JavaScriptCore/JSObject.h>
 #include <WebCore/Chrome.h>
+#include <WebCore/DOMWrapperWorld.h>
 #include <WebCore/DocumentLoader.h>
 #include <WebCore/FormState.h>
 #include <WebCore/Frame.h>
@@ -784,8 +787,21 @@ String WebFrameLoaderClient::overrideMediaType() const {
 }
 
 void WebFrameLoaderClient::dispatchDidClearWindowObjectInWorld(
-    DOMWrapperWorld*) {
-  notImplemented();
+    DOMWrapperWorld* world) {
+  WebPage* webPage = m_frame->page();
+  if (!webPage)
+    return;
+
+  if (world != mainThreadNormalWorld())
+    return;
+
+  JSContextRef context =
+      toRef(m_frame->coreFrame()->script()->globalObject(world)->globalExec());
+  JSObjectRef windowObject =
+      toRef(m_frame->coreFrame()->script()->globalObject(world));
+
+  webPage->injectedBundleClient().didClearWindowObjectForFrame(
+      webPage, m_frame, context, windowObject);
 }
 
 void WebFrameLoaderClient::documentElementAvailable() {
