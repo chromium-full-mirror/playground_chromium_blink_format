@@ -89,7 +89,7 @@ unsigned long WebGLFramebuffer::getColorBufferFormat() {
     if (m_colorAttachment->isRenderbuffer()) {
       unsigned long format =
           (reinterpret_cast<WebGLRenderbuffer*>(m_colorAttachment))
-              ->getInternalformat();
+              ->getInternalFormat();
       switch (format) {
         case GraphicsContext3D::RGBA4:
         case GraphicsContext3D::RGB5_A1:
@@ -99,7 +99,7 @@ unsigned long WebGLFramebuffer::getColorBufferFormat() {
       }
     } else if (m_colorAttachment->isTexture())
       return (reinterpret_cast<WebGLTexture*>(m_colorAttachment))
-          ->getInternalformat();
+          ->getInternalFormat();
   }
   return 0;
 }

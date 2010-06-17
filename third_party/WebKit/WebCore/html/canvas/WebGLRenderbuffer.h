@@ -39,10 +39,10 @@ class WebGLRenderbuffer : public CanvasObject {
 
   static PassRefPtr<WebGLRenderbuffer> create(WebGLRenderingContext*);
 
-  void setInternalformat(unsigned long internalformat) {
-    m_internalformat = internalformat;
+  void setInternalFormat(unsigned long internalformat) {
+    m_internalFormat = internalformat;
   }
-  unsigned long getInternalformat() const { return m_internalformat; }
+  unsigned long getInternalFormat() const { return m_internalFormat; }
 
   bool isInitialized() const { return m_initialized; }
   void setInitialized() { m_initialized = true; }
@@ -55,7 +55,7 @@ class WebGLRenderbuffer : public CanvasObject {
  private:
   virtual bool isRenderbuffer() const { return true; }
 
-  unsigned long m_internalformat;
+  unsigned long m_internalFormat;
   bool m_initialized;
 };
 

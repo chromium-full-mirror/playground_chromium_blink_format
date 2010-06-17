@@ -485,7 +485,7 @@ void WebGLRenderingContext::copyTexImage2D(unsigned long target,
     return;
   if (!isGLES2Compliant()) {
     if (m_framebufferBinding && m_framebufferBinding->object() &&
-        !isTexInternalformatColorBufferCombinationValid(
+        !isTexInternalFormatColorBufferCombinationValid(
             internalformat, m_framebufferBinding->getColorBufferFormat())) {
       m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
       return;
@@ -504,7 +504,7 @@ void WebGLRenderingContext::copyTexImage2D(unsigned long target,
     if (tex && !level)  // only for level 0
       tex->setSize(target, width, height);
     if (tex)
-      tex->setInternalformat(internalformat);
+      tex->setInternalFormat(internalformat);
   }
   if (m_framebufferBinding && tex)
     m_framebufferBinding->onAttachedObjectChange(tex);
@@ -522,8 +522,8 @@ void WebGLRenderingContext::copyTexSubImage2D(unsigned long target,
   if (!isGLES2Compliant()) {
     WebGLTexture* tex = getTextureBinding(target);
     if (m_framebufferBinding && m_framebufferBinding->object() && tex &&
-        !isTexInternalformatColorBufferCombinationValid(
-            tex->getInternalformat(),
+        !isTexInternalFormatColorBufferCombinationValid(
+            tex->getInternalFormat(),
             m_framebufferBinding->getColorBufferFormat())) {
       m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
       return;
@@ -987,21 +987,21 @@ void WebGLRenderingContext::framebufferRenderbuffer(
         if (m_framebufferBinding->isDepthStencilAttached() ||
             m_framebufferBinding->isStencilAttached())
           isConflicted = true;
-        if (buffer->getInternalformat() != GraphicsContext3D::DEPTH_COMPONENT16)
+        if (buffer->getInternalFormat() != GraphicsContext3D::DEPTH_COMPONENT16)
           isConflicted = true;
         break;
       case GraphicsContext3D::STENCIL_ATTACHMENT:
         if (m_framebufferBinding->isDepthStencilAttached() ||
             m_framebufferBinding->isDepthAttached())
           isConflicted = true;
-        if (buffer->getInternalformat() != GraphicsContext3D::STENCIL_INDEX8)
+        if (buffer->getInternalFormat() != GraphicsContext3D::STENCIL_INDEX8)
           isConflicted = true;
         break;
       case GraphicsContext3D::DEPTH_STENCIL_ATTACHMENT:
         if (m_framebufferBinding->isDepthAttached() ||
             m_framebufferBinding->isStencilAttached())
           isConflicted = true;
-        if (buffer->getInternalformat() != GraphicsContext3D::DEPTH_STENCIL)
+        if (buffer->getInternalFormat() != GraphicsContext3D::DEPTH_STENCIL)
           isConflicted = true;
         break;
     }
@@ -1446,7 +1446,7 @@ WebGLGetInfo WebGLRenderingContext::getRenderbufferParameter(
         m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
         return WebGLGetInfo();
       }
-      return WebGLGetInfo(m_renderbufferBinding->getInternalformat());
+      return WebGLGetInfo(m_renderbufferBinding->getInternalFormat());
     default:
       m_context->synthesizeGLError(GraphicsContext3D::INVALID_ENUM);
       return WebGLGetInfo();
@@ -1937,7 +1937,7 @@ void WebGLRenderingContext::renderbufferStorage(unsigned long target,
     case GraphicsContext3D::DEPTH_STENCIL:
       m_context->renderbufferStorage(target, internalformat, width, height);
       if (m_renderbufferBinding) {
-        m_renderbufferBinding->setInternalformat(internalformat);
+        m_renderbufferBinding->setInternalFormat(internalformat);
         if (m_framebufferBinding)
           m_framebufferBinding->onAttachedObjectChange(
               m_renderbufferBinding.get());
@@ -2041,7 +2041,7 @@ void WebGLRenderingContext::texImage2DBase(unsigned target,
     if (tex && !level)  // only for level 0
       tex->setSize(target, width, height);
     if (tex)
-      tex->setInternalformat(internalformat);
+      tex->setInternalFormat(internalformat);
   }
   if (m_framebufferBinding && tex)
     m_framebufferBinding->onAttachedObjectChange(tex);
@@ -3724,17 +3724,17 @@ void WebGLRenderingContext::createFallbackBlackTextures1x1() {
   m_context->bindTexture(GraphicsContext3D::TEXTURE_CUBE_MAP, 0);
 }
 
-bool WebGLRenderingContext::isTexInternalformatColorBufferCombinationValid(
-    unsigned long texInternalformat,
+bool WebGLRenderingContext::isTexInternalFormatColorBufferCombinationValid(
+    unsigned long texInternalFormat,
     unsigned long colorBufferFormat) {
   switch (colorBufferFormat) {
     case GraphicsContext3D::ALPHA:
-      if (texInternalformat == GraphicsContext3D::ALPHA)
+      if (texInternalFormat == GraphicsContext3D::ALPHA)
         return true;
       break;
     case GraphicsContext3D::RGB:
-      if (texInternalformat == GraphicsContext3D::LUMINANCE ||
-          texInternalformat == GraphicsContext3D::RGB)
+      if (texInternalFormat == GraphicsContext3D::LUMINANCE ||
+          texInternalFormat == GraphicsContext3D::RGB)
         return true;
       break;
     case GraphicsContext3D::RGBA:
