@@ -27,7 +27,6 @@
 #define WebPage_h
 
 #include "DrawingArea.h"
-#include "InjectedBundlePageClient.h"
 #include <WebCore/FrameLoaderTypes.h>
 #include <WebCore/IntRect.h>
 #include <wtf/HashMap.h>
@@ -96,12 +95,6 @@ class WebPage : public RefCounted<WebPage> {
                          CoreIPC::MessageID,
                          CoreIPC::ArgumentDecoder&);
 
-  // -- InjectedBundle methods
-  void initializeInjectedBundleClient(WKBundlePageClient*);
-  InjectedBundlePageClient& injectedBundleClient() { return m_client; }
-
-  WebCore::String mainFrameURL() const;
-
  private:
   WebPage(uint64_t pageID,
           const WebCore::IntSize& viewSize,
@@ -140,8 +133,6 @@ class WebPage : public RefCounted<WebPage> {
 
   bool m_canGoBack;
   bool m_canGoForward;
-
-  InjectedBundlePageClient m_client;
 
   uint64_t m_pageID;
 };

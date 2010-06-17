@@ -23,39 +23,25 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef WKBundlePage_h
-#define WKBundlePage_h
+#include <stdio.h>
+#include <WebKit2/WKBundle.h>
+#include <WebKit2/WKBundleInitialize.h>
 
-#include <JavaScriptCore/JavaScriptCore.h>
-#include <WebKit2/WKBase.h>
-#include <WebKit2/WKBundleBase.h>
+static WKBundleRef globalBundle;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-// Client
-typedef void (*WKBundleDidClearWindowObjectForFrameCallback)(
-    WKBundlePageRef page,
-    WKBundleFrameRef frame,
-    JSContextRef ctx,
-    JSObjectRef window,
-    const void* clientInfo);
-
-struct WKBundlePageClient {
-  int version;
-  const void* clientInfo;
-  WKBundleDidClearWindowObjectForFrameCallback didClearWindowObjectForFrame;
-};
-typedef struct WKBundlePageClient WKBundlePageClient;
-
-WK_EXPORT void WKBundlePageSetClient(WKBundlePageRef page,
-                                     WKBundlePageClient* client);
-
-WK_EXPORT WKURLRef WKBundlePageGetMainFrameURL(WKBundlePageRef page);
-
-#ifdef __cplusplus
+void _didCreatePage(WKBundlePageRef page, const void* clientInfo)
+{
+    printf("WKBundleClient - didCreatePage\n");
 }
-#endif
 
-#endif /* WKBundlePage_h */
+void WKBundleInitialize(WKBundleRef bundle)
+{
+    globalBundle = bundle;
+
+    WKBundleClient client = {
+        0,
+        0,
+        _didCreatePage
+    };
+    WKBundleSetClient(bundle, &client);
+}
