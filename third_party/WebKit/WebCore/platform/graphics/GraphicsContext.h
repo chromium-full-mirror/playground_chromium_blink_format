@@ -47,9 +47,7 @@ class SurfaceOpenVG;
 }
 typedef class WebCore::SurfaceOpenVG PlatformGraphicsContext;
 #elif PLATFORM(QT)
-QT_BEGIN_NAMESPACE
-class QPainter;
-QT_END_NAMESPACE
+#include <QPainter>
 typedef QPainter PlatformGraphicsContext;
 #elif PLATFORM(WX)
 class wxGCDC;
@@ -491,6 +489,7 @@ class GraphicsContext : public Noncopyable {
   bool inTransparencyLayer() const;
   PlatformPath* currentPath();
   QPen pen();
+  static QPainter::CompositionMode toQtCompositionMode(CompositeOperator op);
 #endif
 
 #if PLATFORM(GTK)
