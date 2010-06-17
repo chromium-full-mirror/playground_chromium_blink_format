@@ -52,7 +52,6 @@
 #include "WebGLUniformLocation.h"
 
 #include <wtf/ByteArray.h>
-#include <wtf/MathExtras.h>
 
 namespace WebCore {
 
@@ -3811,8 +3810,7 @@ bool WebGLRenderingContext::validateTexFuncParameters(
 
   switch (target) {
     case GraphicsContext3D::TEXTURE_2D:
-      if (width > m_maxTextureSize || height > m_maxTextureSize ||
-          level > log(static_cast<double>(m_maxTextureSize)) / log(2.0)) {
+      if (width > m_maxTextureSize || height > m_maxTextureSize) {
         m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
         return false;
       }
@@ -3823,9 +3821,7 @@ bool WebGLRenderingContext::validateTexFuncParameters(
     case GraphicsContext3D::TEXTURE_CUBE_MAP_NEGATIVE_Y:
     case GraphicsContext3D::TEXTURE_CUBE_MAP_POSITIVE_Z:
     case GraphicsContext3D::TEXTURE_CUBE_MAP_NEGATIVE_Z:
-      if (width != height || width > m_maxCubeMapTextureSize ||
-          level >
-              log(static_cast<double>(m_maxCubeMapTextureSize)) / log(2.0)) {
+      if (width != height || width > m_maxCubeMapTextureSize) {
         m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
         return false;
       }
