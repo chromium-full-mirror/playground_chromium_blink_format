@@ -140,7 +140,7 @@ void TestShellPrinter::handleImage(const char* actualHash,
   if (imageData && imageSize) {
     ASSERT(fileName);
     FILE* fp = fopen(fileName, "wb");
-    if (fp) {
+    if (!fp) {
       perror(fileName);
       exit(EXIT_FAILURE);
     }
