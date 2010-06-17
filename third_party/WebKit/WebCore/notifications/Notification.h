@@ -102,6 +102,9 @@ class Notification : public RefCounted<Notification>,
   }
   virtual Notification* toNotification() { return this; }
 
+  // ActiveDOMObject interface
+  virtual void contextDestroyed();
+
   void stopLoading();
 
   SharedBuffer* iconData() { return m_iconData.get(); }

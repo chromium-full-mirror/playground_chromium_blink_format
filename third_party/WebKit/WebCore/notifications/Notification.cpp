@@ -95,8 +95,6 @@ Notification::~Notification() {
     ASSERT_NOT_REACHED();
     cancel();
   }
-  if (m_presenter)
-    m_presenter->notificationObjectDestroyed(this);
 }
 
 void Notification::show() {
@@ -139,6 +137,12 @@ EventTargetData* Notification::eventTargetData() {
 
 EventTargetData* Notification::ensureEventTargetData() {
   return &m_eventTargetData;
+}
+
+void Notification::contextDestroyed() {
+  ActiveDOMObject::contextDestroyed();
+  if (m_presenter)
+    m_presenter->notificationObjectDestroyed(this);
 }
 
 void Notification::startLoading() {
