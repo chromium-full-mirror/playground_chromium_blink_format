@@ -58,10 +58,9 @@ JSUint16ArrayConstructor::constructJSUint16Array(ExecState* exec) {
       static_cast<JSUint16ArrayConstructor*>(exec->callee());
   RefPtr<Uint16Array> array = static_cast<Uint16Array*>(
       constructArrayBufferView<Uint16Array, unsigned short>(exec).get());
-  if (!array.get()) {
-    setDOMException(exec, INDEX_SIZE_ERR);
+  if (!array.get())
+    // Exception has already been thrown.
     return JSValue::encode(JSValue());
-  }
   return JSValue::encode(
       asObject(toJS(exec, jsConstructor->globalObject(), array.get())));
 }

@@ -59,10 +59,9 @@ JSInt8ArrayConstructor::constructJSInt8Array(ExecState* exec) {
       static_cast<JSInt8ArrayConstructor*>(exec->callee());
   RefPtr<Int8Array> array = static_cast<Int8Array*>(
       constructArrayBufferView<Int8Array, signed char>(exec).get());
-  if (!array.get()) {
-    setDOMException(exec, INDEX_SIZE_ERR);
+  if (!array.get())
+    // Exception has already been thrown.
     return JSValue::encode(JSValue());
-  }
   return JSValue::encode(
       asObject(toJS(exec, jsConstructor->globalObject(), array.get())));
 }
