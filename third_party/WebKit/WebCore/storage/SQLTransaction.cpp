@@ -256,7 +256,7 @@ void SQLTransaction::openTransactionAndPreflight() {
   // If the database was deleted, jump to the error callback
   if (m_database->deleted()) {
     m_transactionError = SQLError::create(
-        0,
+        SQLError::UNKNOWN_ERR,
         "unable to open a transaction, because the user deleted the database");
     handleTransactionError(false);
     return;
@@ -281,8 +281,8 @@ void SQLTransaction::openTransactionAndPreflight() {
   if (!m_sqliteTransaction->inProgress()) {
     ASSERT(!m_database->sqliteDatabase().transactionInProgress());
     m_sqliteTransaction.clear();
-    m_transactionError =
-        SQLError::create(0, "unable to open a transaction to the database");
+    m_transactionError = SQLError::create(
+        SQLError::DATABASE_ERR, "unable to open a transaction to the database");
     handleTransactionError(false);
     return;
   }
@@ -295,7 +295,8 @@ void SQLTransaction::openTransactionAndPreflight() {
     m_transactionError = m_wrapper->sqlError();
     if (!m_transactionError)
       m_transactionError =
-          SQLError::create(0, "unknown error occured setting up transaction");
+          SQLError::create(SQLError::UNKNOWN_ERR,
+                           "unknown error occured setting up transaction");
 
     handleTransactionError(false);
     return;
@@ -324,7 +325,8 @@ void SQLTransaction::deliverTransactionCallback() {
   // exception, jump to the error callback
   if (shouldDeliverErrorCallback) {
     m_transactionError = SQLError::create(
-        0, "the SQLTransactionCallback was null or threw an exception");
+        SQLError::UNKNOWN_ERR,
+        "the SQLTransactionCallback was null or threw an exception");
     deliverTransactionErrorCallback();
   } else
     scheduleToRunStatements();
@@ -442,8 +444,8 @@ void SQLTransaction::handleCurrentStatementError() {
   } else {
     m_transactionError = m_currentStatement->sqlError();
     if (!m_transactionError)
-      m_transactionError =
-          SQLError::create(1, "the statement failed to execute");
+      m_transactionError = SQLError::create(SQLError::DATABASE_ERR,
+                                            "the statement failed to execute");
     handleTransactionError(false);
   }
 }
@@ -460,7 +462,7 @@ void SQLTransaction::deliverStatementCallback() {
 
   if (result) {
     m_transactionError =
-        SQLError::create(0,
+        SQLError::create(SQLError::UNKNOWN_ERR,
                          "the statement callback raised an exception or "
                          "statement error callback did not return false");
     handleTransactionError(true);
@@ -489,7 +491,8 @@ void SQLTransaction::postflightAndCommit() {
     m_transactionError = m_wrapper->sqlError();
     if (!m_transactionError)
       m_transactionError =
-          SQLError::create(0, "unknown error occured setting up transaction");
+          SQLError::create(SQLError::UNKNOWN_ERR,
+                           "unknown error occured setting up transaction");
     handleTransactionError(false);
     return;
   }
@@ -504,8 +507,8 @@ void SQLTransaction::postflightAndCommit() {
 
   // If the commit failed, the transaction will still be marked as "in progress"
   if (m_sqliteTransaction->inProgress()) {
-    m_transactionError =
-        SQLError::create(0, "failed to commit the transaction");
+    m_transactionError = SQLError::create(SQLError::DATABASE_ERR,
+                                          "failed to commit the transaction");
     handleTransactionError(false);
     return;
   }
