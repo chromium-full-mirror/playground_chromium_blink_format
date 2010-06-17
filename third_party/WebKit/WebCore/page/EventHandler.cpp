@@ -1045,6 +1045,10 @@ bool EventHandler::scrollOverflow(ScrollDirection direction,
 bool EventHandler::scrollRecursively(ScrollDirection direction,
                                      ScrollGranularity granularity,
                                      Node* startingNode) {
+  // The layout needs to be up to date to determine if we can scroll. We may be
+  // here because of an onLoad event, in which case the final layout hasn't been
+  // performed yet.
+  m_frame->document()->updateLayoutIgnorePendingStylesheets();
   bool handled = scrollOverflow(direction, granularity, startingNode);
   if (!handled) {
     Frame* frame = m_frame;
