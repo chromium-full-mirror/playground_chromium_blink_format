@@ -82,9 +82,12 @@ unsigned long long FileBlobItem::size() const {
 #if ENABLE(BLOB_SLICE)
 PassRefPtr<BlobItem> FileBlobItem::slice(long long start, long long length) {
   ASSERT(start >= 0 && length >= 0);
-  ASSERT(static_cast<unsigned long long>(start) < size());
-  if (!start && size() <= static_cast<unsigned long long>(length))
+  long long fileSize = size();
+  ASSERT(start < fileSize);
+  if (!start && fileSize <= length)
     return this;
+  if (start + length > fileSize)
+    length = fileSize - start;
   const FileRangeBlobItem* fileRangeItem = toFileRangeBlobItem();
   double modificationTime = fileRangeItem
                                 ? fileRangeItem->snapshotModificationTime()
@@ -144,6 +147,7 @@ CString StringBlobItem::convertToCString(const String& text,
     if (c == '\r') {
       // Safe to look ahead because of trailing '\0'.
       if (*p == '\n' && ending != EndingCRLF) {
+        p++;
         calculatedLength += (endingLength - 2);
         ++needFix;
       } else if (ending != EndingCR) {
@@ -166,6 +170,7 @@ CString StringBlobItem::convertToCString(const String& text,
   while (char c = *p++) {
     if (c == '\r') {
       if (*p == '\n' && ending != EndingCRLF) {
+        p++;
         memcpy(q, endingChars, endingLength);
         q += endingLength;
       } else if (*p != '\n' && ending != EndingCR) {
@@ -208,7 +213,7 @@ DataRangeBlobItem::DataRangeBlobItem(PassRefPtr<DataBlobItem> item,
                                      long long start,
                                      long long length)
     : m_length(length) {
-  const DataRangeBlobItem* rangeItem = m_item->toDataRangeBlobItem();
+  const DataRangeBlobItem* rangeItem = item->toDataRangeBlobItem();
   if (rangeItem) {
     m_item = rangeItem->m_item;
     m_start = start + rangeItem->m_start;
