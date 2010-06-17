@@ -111,7 +111,15 @@ typedef HashMap<RefPtr<UString::Rep>,
     SymbolTable;
 
 class SharedSymbolTable : public SymbolTable,
-                          public RefCounted<SharedSymbolTable> {};
+                          public RefCounted<SharedSymbolTable> {
+ public:
+  static PassRefPtr<SharedSymbolTable> create() {
+    return adoptRef(new SharedSymbolTable);
+  }
+
+ private:
+  SharedSymbolTable() {}
+};
 
 }  // namespace JSC
 

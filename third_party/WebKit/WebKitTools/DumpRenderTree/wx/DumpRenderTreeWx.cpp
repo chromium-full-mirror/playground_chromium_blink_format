@@ -58,7 +58,7 @@ using namespace std;
 
 FILE* logOutput;
 
-LayoutTestController* gLayoutTestController = 0;
+RefPtr<LayoutTestController> gLayoutTestController;
 static wxWebView* webView;
 static wxTimer* idleTimer;
 
@@ -224,8 +224,7 @@ void dump() {
   fflush(stdout);
   fflush(stderr);
 
-  gLayoutTestController->deref();
-  gLayoutTestController = 0;
+  gLayoutTestController.clear();
 }
 
 static void runTest(const wxString testPathOrURL) {
@@ -247,7 +246,7 @@ static void runTest(const wxString testPathOrURL) {
     pathOrURL.insert(0, "file://");
 
   gLayoutTestController =
-      new LayoutTestController(pathOrURL, expectedPixelHash);
+      LayoutTestController::create(pathOrURL, expectedPixelHash);
   if (!gLayoutTestController) {
     wxTheApp->ExitMainLoop();
   }
@@ -342,9 +341,6 @@ bool MyApp::OnInit() {
   wxLog::SetActiveTarget(NULL);
   delete logger;
   fclose(logOutput);
-
-  delete gLayoutTestController;
-  gLayoutTestController = 0;
 
   // returning false shuts the app down
   return false;

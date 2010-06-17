@@ -34,12 +34,14 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 
 class LayoutTestController : public RefCounted<LayoutTestController> {
  public:
-  LayoutTestController(const std::string& testPathOrURL,
-                       const std::string& expectedPixelHash);
+  static PassRefPtr<LayoutTestController> create(
+      const std::string& testPathOrURL,
+      const std::string& expectedPixelHash);
   ~LayoutTestController();
 
   void makeWindowObject(JSContextRef context,
@@ -387,6 +389,9 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
   static const unsigned maxViewHeight;
 
  private:
+  LayoutTestController(const std::string& testPathOrURL,
+                       const std::string& expectedPixelHash);
+
   bool m_dumpAsPDF;
   bool m_dumpAsText;
   bool m_dumpBackForwardList;

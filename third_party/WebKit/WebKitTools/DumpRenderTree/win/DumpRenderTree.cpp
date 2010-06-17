@@ -108,7 +108,7 @@ COMPtr<HistoryDelegate> sharedHistoryDelegate;
 IWebFrame* frame;
 HWND webViewWindow;
 
-LayoutTestController* gLayoutTestController = 0;
+RefPtr<LayoutTestController> gLayoutTestController;
 
 UINT_PTR waitToDumpWatchdog = 0;
 
@@ -947,7 +947,7 @@ static void runTest(const string& testPathOrURL) {
   CFRelease(url);
 
   ::gLayoutTestController =
-      new LayoutTestController(pathOrURL, expectedPixelHash);
+      LayoutTestController::create(pathOrURL, expectedPixelHash);
   done = false;
   topLoadingFrame = 0;
 
@@ -1044,8 +1044,7 @@ static void runTest(const string& testPathOrURL) {
 
 exit:
   SysFreeString(urlBStr);
-  ::gLayoutTestController->deref();
-  ::gLayoutTestController = 0;
+  ::gLayoutTestController.clear();
 
   return;
 }

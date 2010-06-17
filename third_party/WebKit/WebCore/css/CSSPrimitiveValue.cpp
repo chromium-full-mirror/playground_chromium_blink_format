@@ -57,18 +57,34 @@ static CSSTextCache& cssTextCache() {
 // tricks get similar memory benefits
 // with less need for refactoring.
 
+inline PassRefPtr<CSSPrimitiveValue>
+CSSPrimitiveValue::createUncachedIdentifier(int identifier) {
+  return adoptRef(new CSSPrimitiveValue(identifier));
+}
+
+inline PassRefPtr<CSSPrimitiveValue> CSSPrimitiveValue::createUncachedColor(
+    unsigned rgbValue) {
+  return adoptRef(new CSSPrimitiveValue(rgbValue));
+}
+
+inline PassRefPtr<CSSPrimitiveValue> CSSPrimitiveValue::createUncached(
+    double value,
+    UnitTypes type) {
+  return adoptRef(new CSSPrimitiveValue(value, type));
+}
+
 PassRefPtr<CSSPrimitiveValue> CSSPrimitiveValue::createIdentifier(int ident) {
   static RefPtr<CSSPrimitiveValue>* identValueCache =
       new RefPtr<CSSPrimitiveValue>[numCSSValueKeywords];
   if (ident >= 0 && ident < numCSSValueKeywords) {
     RefPtr<CSSPrimitiveValue> primitiveValue = identValueCache[ident];
     if (!primitiveValue) {
-      primitiveValue = adoptRef(new CSSPrimitiveValue(ident));
+      primitiveValue = createUncachedIdentifier(ident);
       identValueCache[ident] = primitiveValue;
     }
     return primitiveValue.release();
   }
-  return adoptRef(new CSSPrimitiveValue(ident));
+  return createUncachedIdentifier(ident);
 }
 
 PassRefPtr<CSSPrimitiveValue> CSSPrimitiveValue::createColor(
@@ -78,17 +94,18 @@ PassRefPtr<CSSPrimitiveValue> CSSPrimitiveValue::createColor(
   // These are the empty and deleted values of the hash table.
   if (rgbValue == Color::transparent) {
     static CSSPrimitiveValue* colorTransparent =
-        new CSSPrimitiveValue(Color::transparent);
+        createUncachedColor(Color::transparent).releaseRef();
     return colorTransparent;
   }
   if (rgbValue == Color::white) {
-    static CSSPrimitiveValue* colorWhite = new CSSPrimitiveValue(Color::white);
+    static CSSPrimitiveValue* colorWhite =
+        createUncachedColor(Color::white).releaseRef();
     return colorWhite;
   }
   RefPtr<CSSPrimitiveValue> primitiveValue = colorValueCache->get(rgbValue);
   if (primitiveValue)
     return primitiveValue.release();
-  primitiveValue = adoptRef(new CSSPrimitiveValue(rgbValue));
+  primitiveValue = createUncachedColor(rgbValue);
   // Just wipe out the cache and start rebuilding when it gets too big.
   const int maxColorCacheSize = 512;
   if (colorValueCache->size() >= maxColorCacheSize)
@@ -113,14 +130,14 @@ PassRefPtr<CSSPrimitiveValue> CSSPrimitiveValue::create(double value,
       RefPtr<CSSPrimitiveValue> primitiveValue =
           integerValueCache[intValue][type];
       if (!primitiveValue) {
-        primitiveValue = adoptRef(new CSSPrimitiveValue(value, type));
+        primitiveValue = createUncached(value, type);
         integerValueCache[intValue][type] = primitiveValue;
       }
       return primitiveValue.release();
     }
   }
 
-  return adoptRef(new CSSPrimitiveValue(value, type));
+  return createUncached(value, type);
 }
 
 PassRefPtr<CSSPrimitiveValue> CSSPrimitiveValue::create(const String& value,

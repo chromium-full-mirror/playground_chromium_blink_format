@@ -63,12 +63,9 @@ class NetscapePluginInstanceProxy
     : public RefCounted<NetscapePluginInstanceProxy> {
  public:
   static PassRefPtr<NetscapePluginInstanceProxy> create(
-      NetscapePluginHostProxy* pluginHostProxy,
-      WebHostedNetscapePluginView* pluginView,
-      bool fullFramePlugin) {
-    return adoptRef(new NetscapePluginInstanceProxy(pluginHostProxy, pluginView,
-                                                    fullFramePlugin));
-  }
+      NetscapePluginHostProxy*,
+      WebHostedNetscapePluginView*,
+      bool fullFramePlugin);
   ~NetscapePluginInstanceProxy();
 
   uint32_t pluginID() const {

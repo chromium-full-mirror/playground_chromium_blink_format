@@ -132,9 +132,9 @@ static inline Frame* parentFromOwnerElement(
   return ownerElement->document()->frame();
 }
 
-Frame::Frame(Page* page,
-             HTMLFrameOwnerElement* ownerElement,
-             FrameLoaderClient* frameLoaderClient)
+inline Frame::Frame(Page* page,
+                    HTMLFrameOwnerElement* ownerElement,
+                    FrameLoaderClient* frameLoaderClient)
     : m_page(page),
       m_treeNode(this, parentFromOwnerElement(ownerElement)),
       m_loader(this, frameLoaderClient),
@@ -178,23 +178,33 @@ Frame::Frame(Page* page,
   XMLNames::init();
 
   if (!ownerElement) {
-    page->setMainFrame(this);
 #if ENABLE(TILED_BACKING_STORE)
     // Top level frame only for now.
     setTiledBackingStoreEnabled(page->settings()->tiledBackingStoreEnabled());
 #endif
   } else {
     page->incrementFrameCount();
+
     // Make sure we will not end up with two frames referencing the same owner
     // element.
-    ASSERT((!(ownerElement->m_contentFrame)) ||
-           (ownerElement->m_contentFrame->ownerElement() != ownerElement));
-    ownerElement->m_contentFrame = this;
+    Frame*& contentFrameSlot = ownerElement->m_contentFrame;
+    ASSERT(!contentFrameSlot ||
+           contentFrameSlot->ownerElement() != ownerElement);
+    contentFrameSlot = this;
   }
 
 #ifndef NDEBUG
   frameCounter.increment();
 #endif
+}
+
+PassRefPtr<Frame> Frame::create(Page* page,
+                                HTMLFrameOwnerElement* ownerElement,
+                                FrameLoaderClient* client) {
+  RefPtr<Frame> frame = adoptRef(new Frame(page, ownerElement, client));
+  if (!ownerElement)
+    page->setMainFrame(frame);
+  return frame.release();
 }
 
 Frame::~Frame() {

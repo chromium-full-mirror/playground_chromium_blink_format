@@ -82,6 +82,12 @@ LayoutTestController::LayoutTestController(const std::string& testPathOrURL,
       m_testPathOrURL(testPathOrURL),
       m_expectedPixelHash(expectedPixelHash) {}
 
+PassRefPtr<LayoutTestController> LayoutTestController::create(
+    const std::string& testPathOrURL,
+    const std::string& expectedPixelHash) {
+  return adoptRef(new LayoutTestController(testPathOrURL, expectedPixelHash));
+}
+
 // Static Functions
 
 static JSValueRef dumpAsPDFCallback(JSContextRef context,

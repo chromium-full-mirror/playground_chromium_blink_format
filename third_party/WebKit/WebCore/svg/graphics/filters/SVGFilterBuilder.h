@@ -34,7 +34,9 @@ namespace WebCore {
 
 class SVGFilterBuilder : public RefCounted<SVGFilterBuilder> {
  public:
-  SVGFilterBuilder();
+  static PassRefPtr<SVGFilterBuilder> create() {
+    return adoptRef(new SVGFilterBuilder);
+  }
 
   void add(const AtomicString& id, RefPtr<FilterEffect> effect);
 
@@ -48,6 +50,8 @@ class SVGFilterBuilder : public RefCounted<SVGFilterBuilder> {
   void clearEffects();
 
  private:
+  SVGFilterBuilder();
+
   HashMap<AtomicString, RefPtr<FilterEffect>> m_builtinEffects;
   HashMap<AtomicString, RefPtr<FilterEffect>> m_namedEffects;
 

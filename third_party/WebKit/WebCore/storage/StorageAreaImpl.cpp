@@ -43,18 +43,11 @@ StorageAreaImpl::~StorageAreaImpl() {
   ASSERT(isMainThread());
 }
 
-PassRefPtr<StorageAreaImpl> StorageAreaImpl::create(
+inline StorageAreaImpl::StorageAreaImpl(
     StorageType storageType,
     PassRefPtr<SecurityOrigin> origin,
     PassRefPtr<StorageSyncManager> syncManager,
-    unsigned quota) {
-  return adoptRef(new StorageAreaImpl(storageType, origin, syncManager, quota));
-}
-
-StorageAreaImpl::StorageAreaImpl(StorageType storageType,
-                                 PassRefPtr<SecurityOrigin> origin,
-                                 PassRefPtr<StorageSyncManager> syncManager,
-                                 unsigned quota)
+    unsigned quota)
     : m_storageType(storageType),
       m_securityOrigin(origin),
       m_storageMap(StorageMap::create(quota)),
@@ -67,15 +60,27 @@ StorageAreaImpl::StorageAreaImpl(StorageType storageType,
   ASSERT(isMainThread());
   ASSERT(m_securityOrigin);
   ASSERT(m_storageMap);
+}
+
+PassRefPtr<StorageAreaImpl> StorageAreaImpl::create(
+    StorageType storageType,
+    PassRefPtr<SecurityOrigin> origin,
+    PassRefPtr<StorageSyncManager> syncManager,
+    unsigned quota) {
+  RefPtr<StorageAreaImpl> area =
+      adoptRef(new StorageAreaImpl(storageType, origin, syncManager, quota));
 
   // FIXME: If there's no backing storage for LocalStorage, the default WebKit
   // behavior should be that of private browsing,
-  // not silently ignoring it.  https://bugs.webkit.org/show_bug.cgi?id=25894
-  if (m_storageSyncManager) {
-    m_storageAreaSync = StorageAreaSync::create(
-        m_storageSyncManager, this, m_securityOrigin->databaseIdentifier());
-    ASSERT(m_storageAreaSync);
+  // not silently ignoring it. https://bugs.webkit.org/show_bug.cgi?id=25894
+  if (area->m_storageSyncManager) {
+    area->m_storageAreaSync =
+        StorageAreaSync::create(area->m_storageSyncManager, area.get(),
+                                area->m_securityOrigin->databaseIdentifier());
+    ASSERT(area->m_storageAreaSync);
   }
+
+  return area.release();
 }
 
 PassRefPtr<StorageAreaImpl> StorageAreaImpl::copy() {
