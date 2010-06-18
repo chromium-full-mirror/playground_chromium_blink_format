@@ -28,9 +28,6 @@
 
 @protocol WebCoreViewFactory
 
-- (NSArray*)pluginsInfo;  // array of id <WebCorePluginInfo>
-- (void)refreshPlugins;
-
 - (NSString*)inputElementAltText;
 - (NSString*)resetButtonDefaultLabel;
 - (NSString*)searchableIndexIntroduction;
@@ -176,13 +173,4 @@
 @end
 
 @interface WebCoreViewFactory (SubclassResponsibility)<WebCoreViewFactory>
-@end
-
-@protocol WebCorePluginInfo<NSObject>
-- (NSString*)name;
-- (NSString*)filename;
-- (NSString*)pluginDescription;
-- (NSEnumerator*)MIMETypeEnumerator;
-- (NSString*)descriptionForMIMEType:(NSString*)MIMEType;
-- (NSArray*)extensionsForMIMEType:(NSString*)MIMEType;
 @end
