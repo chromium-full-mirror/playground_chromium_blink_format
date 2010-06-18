@@ -196,6 +196,7 @@ class HTMLMediaElement : public HTMLElement,
   virtual ~HTMLMediaElement();
 
   virtual void parseMappedAttribute(Attribute*);
+  virtual bool isURLAttribute(Attribute*) const;
   virtual void attach();
 
   virtual void willMoveToNewOwnerDocument();

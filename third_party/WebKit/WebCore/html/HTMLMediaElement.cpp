@@ -2045,6 +2045,10 @@ void HTMLMediaElement::mediaCanStart() {
   m_isWaitingUntilMediaCanStart = false;
   loadInternal();
 }
+
+bool HTMLMediaElement::isURLAttribute(Attribute* attribute) const {
+  return attribute->name() == srcAttr;
+}
 }
 
 #endif
