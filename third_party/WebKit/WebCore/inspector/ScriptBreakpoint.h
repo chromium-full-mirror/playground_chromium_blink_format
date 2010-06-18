@@ -35,6 +35,11 @@
 
 namespace WebCore {
 
+class InspectorObject;
+struct ScriptBreakpoint;
+
+typedef HashMap<int, ScriptBreakpoint> SourceBreakpoints;
+
 struct ScriptBreakpoint {
   ScriptBreakpoint(bool enabled, const String& condition)
       : enabled(enabled), condition(condition) {}
@@ -43,9 +48,12 @@ struct ScriptBreakpoint {
 
   bool enabled;
   String condition;
-};
 
-typedef HashMap<int, ScriptBreakpoint> SourceBreakpoints;
+  static void sourceBreakpointsFromInspectorObject(PassRefPtr<InspectorObject>,
+                                                   SourceBreakpoints*);
+  static PassRefPtr<InspectorObject> inspectorObjectFromSourceBreakpoints(
+      const SourceBreakpoints&);
+};
 
 }  // namespace WebCore
 

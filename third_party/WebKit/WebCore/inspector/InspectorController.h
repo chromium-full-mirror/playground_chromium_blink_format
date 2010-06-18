@@ -386,6 +386,12 @@ class InspectorController
 
   void didEvaluateForTestInFrontend(long callId, const String& jsonResult);
 
+#if ENABLE(JAVASCRIPT_DEBUGGER)
+  String breakpointsSettingKey();
+  void loadBreakpoints();
+  void saveBreakpoints();
+#endif
+
   Page* m_inspectedPage;
   InspectorClient* m_client;
   OwnPtr<InspectorFrontendClient> m_inspectorFrontendClient;
@@ -435,6 +441,7 @@ class InspectorController
   HashMap<String, String> m_sourceIDToURL;
   HashMap<String, String> m_scriptIDToContent;
   HashMap<String, SourceBreakpoints> m_stickyBreakpoints;
+  bool m_breakpointsLoaded;
 
   bool m_profilerEnabled;
   bool m_recordingUserInitiatedProfile;

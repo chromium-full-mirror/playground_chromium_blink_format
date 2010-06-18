@@ -72,7 +72,7 @@ class InspectorValue : public RefCounted<InspectorValue> {
   virtual PassRefPtr<InspectorObject> asObject();
   virtual PassRefPtr<InspectorArray> asArray();
 
-  static PassRefPtr<InspectorValue> readJSON(const String& json);
+  static PassRefPtr<InspectorValue> parseJSON(const String& json);
 
   String toJSONString() const;
   virtual void writeJSON(Vector<UChar>* output) const;
