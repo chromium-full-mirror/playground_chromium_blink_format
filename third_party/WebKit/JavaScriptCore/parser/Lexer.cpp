@@ -1019,20 +1019,21 @@ SourceCode Lexer::sourceCode(int openBrace, int closeBrace, int firstLine) {
   const UChar* data = m_source->provider()->data();
 
   ASSERT(openBrace < closeBrace);
-
-  int numBOMsBeforeOpenBrace = 0;
-  int numBOMsBetweenBraces = 0;
-
   int i;
-  for (i = m_source->startOffset(); i < openBrace; ++i)
-    numBOMsBeforeOpenBrace += data[i] == byteOrderMark;
-  for (; i < closeBrace; ++i)
-    numBOMsBetweenBraces += data[i] == byteOrderMark;
+  for (i = m_source->startOffset(); i < openBrace; ++i) {
+    if (data[i] == byteOrderMark) {
+      openBrace++;
+      closeBrace++;
+    }
+  }
+  for (; i < closeBrace; ++i) {
+    if (data[i] == byteOrderMark)
+      closeBrace++;
+  }
 
-  return SourceCode(
-      m_source->provider(), openBrace + numBOMsBeforeOpenBrace,
-      closeBrace + numBOMsBeforeOpenBrace + numBOMsBetweenBraces + 1,
-      firstLine);
+  ASSERT(openBrace < closeBrace);
+
+  return SourceCode(m_source->provider(), openBrace, closeBrace + 1, firstLine);
 }
 
 }  // namespace JSC
