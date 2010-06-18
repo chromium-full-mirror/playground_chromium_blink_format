@@ -24,7 +24,6 @@
 #include <wtf/GetPtr.h>
 #include <wtf/RefPtr.h>
 #include "ExceptionCode.h"
-#include "HTMLNames.h"
 #include "TestObj.h"
 #include "WebKitDOMBinding.h"
 #include "gobject/ConvertToUTF8String.h"
@@ -62,10 +61,10 @@ void webkit_dom_test_obj_void_method_with_args(WebKitDOMTestObj* self,
   WebCore::TestObj* item = WebKit::core(self);
   g_return_if_fail(str_arg);
   g_return_if_fail(obj_arg);
-  WebCore::String converted_str_arg = WebCore::String::fromUTF8(str_arg);
-  WebCore::TestObj* converted_obj_arg = WebKit::core(obj_arg);
-  g_return_if_fail(converted_obj_arg);
-  item->voidMethodWithArgs(int_arg, converted_str_arg, converted_obj_arg);
+  WebCore::String _g_str_arg = WebCore::String::fromUTF8(str_arg);
+  WebCore::TestObj* _g_obj_arg = WebKit::core(obj_arg);
+  g_return_if_fail(_g_obj_arg);
+  item->voidMethodWithArgs(int_arg, _g_str_arg, _g_obj_arg);
 }
 
 glong webkit_dom_test_obj_int_method(WebKitDOMTestObj* self) {
@@ -83,11 +82,10 @@ glong webkit_dom_test_obj_int_method_with_args(WebKitDOMTestObj* self,
   WebCore::TestObj* item = WebKit::core(self);
   g_return_val_if_fail(str_arg, 0);
   g_return_val_if_fail(obj_arg, 0);
-  WebCore::String converted_str_arg = WebCore::String::fromUTF8(str_arg);
-  WebCore::TestObj* converted_obj_arg = WebKit::core(obj_arg);
-  g_return_val_if_fail(converted_obj_arg, 0);
-  glong res =
-      item->intMethodWithArgs(int_arg, converted_str_arg, converted_obj_arg);
+  WebCore::String _g_str_arg = WebCore::String::fromUTF8(str_arg);
+  WebCore::TestObj* _g_obj_arg = WebKit::core(obj_arg);
+  g_return_val_if_fail(_g_obj_arg, 0);
+  glong res = item->intMethodWithArgs(int_arg, _g_str_arg, _g_obj_arg);
   return res;
 }
 
@@ -109,11 +107,11 @@ WebKitDOMTestObj* webkit_dom_test_obj_obj_method_with_args(
   WebCore::TestObj* item = WebKit::core(self);
   g_return_val_if_fail(str_arg, 0);
   g_return_val_if_fail(obj_arg, 0);
-  WebCore::String converted_str_arg = WebCore::String::fromUTF8(str_arg);
-  WebCore::TestObj* converted_obj_arg = WebKit::core(obj_arg);
-  g_return_val_if_fail(converted_obj_arg, 0);
-  PassRefPtr<WebCore::TestObj> g_res = WTF::getPtr(
-      item->objMethodWithArgs(int_arg, converted_str_arg, converted_obj_arg));
+  WebCore::String _g_str_arg = WebCore::String::fromUTF8(str_arg);
+  WebCore::TestObj* _g_obj_arg = WebKit::core(obj_arg);
+  g_return_val_if_fail(_g_obj_arg, 0);
+  PassRefPtr<WebCore::TestObj> g_res =
+      WTF::getPtr(item->objMethodWithArgs(int_arg, _g_str_arg, _g_obj_arg));
   WebKitDOMTestObj* res =
       static_cast<WebKitDOMTestObj*>(WebKit::kit(g_res.get()));
   return res;
@@ -127,11 +125,11 @@ WebKitDOMTestObj* webkit_dom_test_obj_method_that_requires_all_args(
   WebCore::TestObj* item = WebKit::core(self);
   g_return_val_if_fail(str_arg, 0);
   g_return_val_if_fail(obj_arg, 0);
-  WebCore::String converted_str_arg = WebCore::String::fromUTF8(str_arg);
-  WebCore::TestObj* converted_obj_arg = WebKit::core(obj_arg);
-  g_return_val_if_fail(converted_obj_arg, 0);
-  PassRefPtr<WebCore::TestObj> g_res = WTF::getPtr(
-      item->methodThatRequiresAllArgs(converted_str_arg, converted_obj_arg));
+  WebCore::String _g_str_arg = WebCore::String::fromUTF8(str_arg);
+  WebCore::TestObj* _g_obj_arg = WebKit::core(obj_arg);
+  g_return_val_if_fail(_g_obj_arg, 0);
+  PassRefPtr<WebCore::TestObj> g_res =
+      WTF::getPtr(item->methodThatRequiresAllArgs(_g_str_arg, _g_obj_arg));
   WebKitDOMTestObj* res =
       static_cast<WebKitDOMTestObj*>(WebKit::kit(g_res.get()));
   return res;
@@ -146,13 +144,12 @@ WebKitDOMTestObj* webkit_dom_test_obj_method_that_requires_all_args_and_throws(
   WebCore::TestObj* item = WebKit::core(self);
   g_return_val_if_fail(str_arg, 0);
   g_return_val_if_fail(obj_arg, 0);
-  WebCore::String converted_str_arg = WebCore::String::fromUTF8(str_arg);
-  WebCore::TestObj* converted_obj_arg = WebKit::core(obj_arg);
-  g_return_val_if_fail(converted_obj_arg, 0);
+  WebCore::String _g_str_arg = WebCore::String::fromUTF8(str_arg);
+  WebCore::TestObj* _g_obj_arg = WebKit::core(obj_arg);
+  g_return_val_if_fail(_g_obj_arg, 0);
   WebCore::ExceptionCode ec = 0;
-  PassRefPtr<WebCore::TestObj> g_res =
-      WTF::getPtr(item->methodThatRequiresAllArgsAndThrows(
-          converted_str_arg, converted_obj_arg, ec));
+  PassRefPtr<WebCore::TestObj> g_res = WTF::getPtr(
+      item->methodThatRequiresAllArgsAndThrows(_g_str_arg, _g_obj_arg, ec));
   if (ec) {
     WebCore::ExceptionCodeDescription ecdesc;
     WebCore::getExceptionCodeDescription(ec, ecdesc);
@@ -170,10 +167,10 @@ void webkit_dom_test_obj_serialized_value(
   g_return_if_fail(self);
   WebCore::TestObj* item = WebKit::core(self);
   g_return_if_fail(serialized_arg);
-  WebCore::SerializedScriptValue* converted_serialized_arg =
+  WebCore::SerializedScriptValue* _g_serialized_arg =
       WebKit::core(serialized_arg);
-  g_return_if_fail(converted_serialized_arg);
-  item->serializedValue(converted_serialized_arg);
+  g_return_if_fail(_g_serialized_arg);
+  item->serializedValue(_g_serialized_arg);
 }
 
 void webkit_dom_test_obj_method_with_exception(WebKitDOMTestObj* self,
@@ -392,8 +389,8 @@ void webkit_dom_test_obj_set_string_attr(WebKitDOMTestObj* self, gchar* value) {
   g_return_if_fail(self);
   WebCore::TestObj* item = WebKit::core(self);
   g_return_if_fail(value);
-  WebCore::String converted_value = WebCore::String::fromUTF8(value);
-  item->setStringAttr(converted_value);
+  WebCore::String _g_value = WebCore::String::fromUTF8(value);
+  item->setStringAttr(_g_value);
 }
 
 WebKitDOMTestObj* webkit_dom_test_obj_get_test_obj_attr(
@@ -411,182 +408,37 @@ void webkit_dom_test_obj_set_test_obj_attr(WebKitDOMTestObj* self,
   g_return_if_fail(self);
   WebCore::TestObj* item = WebKit::core(self);
   g_return_if_fail(value);
-  WebCore::TestObj* converted_value = WebKit::core(value);
-  g_return_if_fail(converted_value);
-  item->setTestObjAttr(converted_value);
+  WebCore::TestObj* _g_value = WebKit::core(value);
+  g_return_if_fail(_g_value);
+  item->setTestObjAttr(_g_value);
 }
 
-gchar* webkit_dom_test_obj_get_reflected_string_attr(WebKitDOMTestObj* self) {
+glong webkit_dom_test_obj_get_attr_with_exception(WebKitDOMTestObj* self) {
   g_return_val_if_fail(self, 0);
   WebCore::TestObj* item = WebKit::core(self);
-  gchar* res = convertToUTF8String(
-      item->getAttribute(WebCore::HTMLNames::reflectedstringattrAttr));
+  glong res = item->attrWithException();
   return res;
 }
 
-void webkit_dom_test_obj_set_reflected_string_attr(WebKitDOMTestObj* self,
-                                                   gchar* value) {
+void webkit_dom_test_obj_set_attr_with_exception(WebKitDOMTestObj* self,
+                                                 glong value) {
   g_return_if_fail(self);
   WebCore::TestObj* item = WebKit::core(self);
-  g_return_if_fail(value);
-  WebCore::String converted_value = WebCore::String::fromUTF8(value);
-  item->setAttribute(WebCore::HTMLNames::reflectedstringattrAttr,
-                     converted_value);
+  item->setAttrWithException(value);
 }
 
-glong webkit_dom_test_obj_get_reflected_integral_attr(WebKitDOMTestObj* self) {
-  g_return_val_if_fail(self, 0);
-  WebCore::TestObj* item = WebKit::core(self);
-  glong res =
-      item->getIntegralAttribute(WebCore::HTMLNames::reflectedintegralattrAttr);
-  return res;
-}
-
-void webkit_dom_test_obj_set_reflected_integral_attr(WebKitDOMTestObj* self,
-                                                     glong value) {
-  g_return_if_fail(self);
-  WebCore::TestObj* item = WebKit::core(self);
-  item->setAttribute(WebCore::HTMLNames::reflectedintegralattrAttr, value);
-}
-
-gboolean webkit_dom_test_obj_get_reflected_boolean_attr(
-    WebKitDOMTestObj* self) {
-  g_return_val_if_fail(self, 0);
-  WebCore::TestObj* item = WebKit::core(self);
-  gboolean res =
-      item->hasAttribute(WebCore::HTMLNames::reflectedbooleanattrAttr);
-  return res;
-}
-
-void webkit_dom_test_obj_set_reflected_boolean_attr(WebKitDOMTestObj* self,
-                                                    gboolean value) {
-  g_return_if_fail(self);
-  WebCore::TestObj* item = WebKit::core(self);
-  item->setAttribute(WebCore::HTMLNames::reflectedbooleanattrAttr, value);
-}
-
-gchar* webkit_dom_test_obj_get_reflected_url_attr(WebKitDOMTestObj* self) {
-  g_return_val_if_fail(self, 0);
-  WebCore::TestObj* item = WebKit::core(self);
-  gchar* res = convertToUTF8String(
-      item->getURLAttribute(WebCore::HTMLNames::reflectedurlattrAttr));
-  return res;
-}
-
-void webkit_dom_test_obj_set_reflected_url_attr(WebKitDOMTestObj* self,
-                                                gchar* value) {
-  g_return_if_fail(self);
-  WebCore::TestObj* item = WebKit::core(self);
-  g_return_if_fail(value);
-  WebCore::String converted_value = WebCore::String::fromUTF8(value);
-  item->setAttribute(WebCore::HTMLNames::reflectedurlattrAttr, converted_value);
-}
-
-gchar* webkit_dom_test_obj_get_reflected_string_attr(WebKitDOMTestObj* self) {
-  g_return_val_if_fail(self, 0);
-  WebCore::TestObj* item = WebKit::core(self);
-  gchar* res = convertToUTF8String(
-      item->getAttribute(WebCore::HTMLNames::customContentStringAttrAttr));
-  return res;
-}
-
-void webkit_dom_test_obj_set_reflected_string_attr(WebKitDOMTestObj* self,
-                                                   gchar* value) {
-  g_return_if_fail(self);
-  WebCore::TestObj* item = WebKit::core(self);
-  g_return_if_fail(value);
-  WebCore::String converted_value = WebCore::String::fromUTF8(value);
-  item->setAttribute(WebCore::HTMLNames::customContentStringAttrAttr,
-                     converted_value);
-}
-
-glong webkit_dom_test_obj_get_reflected_custom_integral_attr(
-    WebKitDOMTestObj* self) {
-  g_return_val_if_fail(self, 0);
-  WebCore::TestObj* item = WebKit::core(self);
-  glong res = item->getIntegralAttribute(
-      WebCore::HTMLNames::customContentIntegralAttrAttr);
-  return res;
-}
-
-void webkit_dom_test_obj_set_reflected_custom_integral_attr(
-    WebKitDOMTestObj* self,
-    glong value) {
-  g_return_if_fail(self);
-  WebCore::TestObj* item = WebKit::core(self);
-  item->setAttribute(WebCore::HTMLNames::customContentIntegralAttrAttr, value);
-}
-
-gboolean webkit_dom_test_obj_get_reflected_custom_boolean_attr(
-    WebKitDOMTestObj* self) {
-  g_return_val_if_fail(self, 0);
-  WebCore::TestObj* item = WebKit::core(self);
-  gboolean res =
-      item->hasAttribute(WebCore::HTMLNames::customContentBooleanAttrAttr);
-  return res;
-}
-
-void webkit_dom_test_obj_set_reflected_custom_boolean_attr(
-    WebKitDOMTestObj* self,
-    gboolean value) {
-  g_return_if_fail(self);
-  WebCore::TestObj* item = WebKit::core(self);
-  item->setAttribute(WebCore::HTMLNames::customContentBooleanAttrAttr, value);
-}
-
-gchar* webkit_dom_test_obj_get_reflected_url_attr(WebKitDOMTestObj* self) {
-  g_return_val_if_fail(self, 0);
-  WebCore::TestObj* item = WebKit::core(self);
-  gchar* res = convertToUTF8String(
-      item->getURLAttribute(WebCore::HTMLNames::customContentURLAttrAttr));
-  return res;
-}
-
-void webkit_dom_test_obj_set_reflected_url_attr(WebKitDOMTestObj* self,
-                                                gchar* value) {
-  g_return_if_fail(self);
-  WebCore::TestObj* item = WebKit::core(self);
-  g_return_if_fail(value);
-  WebCore::String converted_value = WebCore::String::fromUTF8(value);
-  item->setAttribute(WebCore::HTMLNames::customContentURLAttrAttr,
-                     converted_value);
-}
-
-glong webkit_dom_test_obj_get_attr_with_getter_exception(WebKitDOMTestObj* self,
+glong webkit_dom_test_obj_get_attr_with_setter_exception(WebKitDOMTestObj* self,
                                                          GError** error) {
   g_return_val_if_fail(self, 0);
   WebCore::TestObj* item = WebKit::core(self);
   WebCore::ExceptionCode ec = 0;
-  glong res = item->attrWithGetterException(ec);
+  glong res = item->attrWithSetterException(ec);
   if (ec) {
     WebCore::ExceptionCodeDescription ecdesc;
     WebCore::getExceptionCodeDescription(ec, ecdesc);
     g_set_error_literal(error, g_quark_from_string("WEBKIT_DOM"), ecdesc.code,
                         ecdesc.name);
   }
-  return res;
-}
-
-void webkit_dom_test_obj_set_attr_with_getter_exception(WebKitDOMTestObj* self,
-                                                        glong value,
-                                                        GError** error) {
-  g_return_if_fail(self);
-  WebCore::TestObj* item = WebKit::core(self);
-  WebCore::ExceptionCode ec = 0;
-  item->setAttrWithGetterException(value, ec);
-  if (ec) {
-    WebCore::ExceptionCodeDescription ecdesc;
-    WebCore::getExceptionCodeDescription(ec, ecdesc);
-    g_set_error_literal(error, g_quark_from_string("WEBKIT_DOM"), ecdesc.code,
-                        ecdesc.name);
-  }
-}
-
-glong webkit_dom_test_obj_get_attr_with_setter_exception(
-    WebKitDOMTestObj* self) {
-  g_return_val_if_fail(self, 0);
-  WebCore::TestObj* item = WebKit::core(self);
-  glong res = item->attrWithSetterException();
   return res;
 }
 
@@ -605,52 +457,21 @@ void webkit_dom_test_obj_set_attr_with_setter_exception(WebKitDOMTestObj* self,
   }
 }
 
-gchar* webkit_dom_test_obj_get_string_attr_with_getter_exception(
-    WebKitDOMTestObj* self,
-    GError** error) {
-  g_return_val_if_fail(self, 0);
-  WebCore::TestObj* item = WebKit::core(self);
-  WebCore::ExceptionCode ec = 0;
-  gchar* res = convertToUTF8String(item->stringAttrWithGetterException(ec));
-  return res;
-}
-
-void webkit_dom_test_obj_set_string_attr_with_getter_exception(
-    WebKitDOMTestObj* self,
-    gchar* value,
-    GError** error) {
-  g_return_if_fail(self);
-  WebCore::TestObj* item = WebKit::core(self);
-  g_return_if_fail(value);
-  WebCore::String converted_value = WebCore::String::fromUTF8(value);
-  WebCore::ExceptionCode ec = 0;
-  item->setStringAttrWithGetterException(converted_value, ec);
-  if (ec) {
-    WebCore::ExceptionCodeDescription ecdesc;
-    WebCore::getExceptionCodeDescription(ec, ecdesc);
-    g_set_error_literal(error, g_quark_from_string("WEBKIT_DOM"), ecdesc.code,
-                        ecdesc.name);
-  }
-}
-
-gchar* webkit_dom_test_obj_get_string_attr_with_setter_exception(
+glong webkit_dom_test_obj_get_attr_with_getter_exception(
     WebKitDOMTestObj* self) {
   g_return_val_if_fail(self, 0);
   WebCore::TestObj* item = WebKit::core(self);
-  gchar* res = convertToUTF8String(item->stringAttrWithSetterException());
+  glong res = item->attrWithGetterException();
   return res;
 }
 
-void webkit_dom_test_obj_set_string_attr_with_setter_exception(
-    WebKitDOMTestObj* self,
-    gchar* value,
-    GError** error) {
+void webkit_dom_test_obj_set_attr_with_getter_exception(WebKitDOMTestObj* self,
+                                                        glong value,
+                                                        GError** error) {
   g_return_if_fail(self);
   WebCore::TestObj* item = WebKit::core(self);
-  g_return_if_fail(value);
-  WebCore::String converted_value = WebCore::String::fromUTF8(value);
   WebCore::ExceptionCode ec = 0;
-  item->setStringAttrWithSetterException(converted_value, ec);
+  item->setAttrWithGetterException(value, ec);
   if (ec) {
     WebCore::ExceptionCodeDescription ecdesc;
     WebCore::getExceptionCodeDescription(ec, ecdesc);
@@ -772,18 +593,9 @@ enum {
   PROP_UNSIGNED_LONG_LONG_ATTR,
   PROP_STRING_ATTR,
   PROP_TEST_OBJ_ATTR,
-  PROP_REFLECTED_STRING_ATTR,
-  PROP_REFLECTED_INTEGRAL_ATTR,
-  PROP_REFLECTED_BOOLEAN_ATTR,
-  PROP_REFLECTED_URL_ATTR,
-  PROP_REFLECTED_STRING_ATTR,
-  PROP_REFLECTED_CUSTOM_INTEGRAL_ATTR,
-  PROP_REFLECTED_CUSTOM_BOOLEAN_ATTR,
-  PROP_REFLECTED_URL_ATTR,
-  PROP_ATTR_WITH_GETTER_EXCEPTION,
+  PROP_ATTR_WITH_EXCEPTION,
   PROP_ATTR_WITH_SETTER_EXCEPTION,
-  PROP_STRING_ATTR_WITH_GETTER_EXCEPTION,
-  PROP_STRING_ATTR_WITH_SETTER_EXCEPTION,
+  PROP_ATTR_WITH_GETTER_EXCEPTION,
   PROP_CUSTOM_ATTR,
   PROP_SCRIPT_STRING_ATTR,
 #if ENABLE(Condition1)
@@ -836,57 +648,8 @@ static void webkit_dom_test_obj_set_property(GObject* object,
           WebCore::String::fromUTF8(g_value_get_string(value)));
       break;
     }
-    case PROP_REFLECTED_STRING_ATTR: {
-      coreSelf->setAttribute(
-          WebCore::HTMLNames::reflectedstringattrAttr,
-          WebCore::String::fromUTF8(g_value_get_string(value)));
-      break;
-    }
-    case PROP_REFLECTED_INTEGRAL_ATTR: {
-      coreSelf->setIntegralAttribute(
-          WebCore::HTMLNames::reflectedintegralattrAttr,
-          (g_value_get_long(value)));
-      break;
-    }
-    case PROP_REFLECTED_BOOLEAN_ATTR: {
-      coreSelf->setBooleanAttribute(
-          WebCore::HTMLNames::reflectedbooleanattrAttr,
-          (g_value_get_boolean(value)));
-      break;
-    }
-    case PROP_REFLECTED_URL_ATTR: {
-      coreSelf->setAttribute(
-          WebCore::HTMLNames::reflectedurlattrAttr,
-          WebCore::String::fromUTF8(g_value_get_string(value)));
-      break;
-    }
-    case PROP_REFLECTED_STRING_ATTR: {
-      coreSelf->setAttribute(
-          WebCore::HTMLNames::customContentStringAttrAttr,
-          WebCore::String::fromUTF8(g_value_get_string(value)));
-      break;
-    }
-    case PROP_REFLECTED_CUSTOM_INTEGRAL_ATTR: {
-      coreSelf->setIntegralAttribute(
-          WebCore::HTMLNames::customContentIntegralAttrAttr,
-          (g_value_get_long(value)));
-      break;
-    }
-    case PROP_REFLECTED_CUSTOM_BOOLEAN_ATTR: {
-      coreSelf->setBooleanAttribute(
-          WebCore::HTMLNames::customContentBooleanAttrAttr,
-          (g_value_get_boolean(value)));
-      break;
-    }
-    case PROP_REFLECTED_URL_ATTR: {
-      coreSelf->setAttribute(
-          WebCore::HTMLNames::customContentURLAttrAttr,
-          WebCore::String::fromUTF8(g_value_get_string(value)));
-      break;
-    }
-    case PROP_ATTR_WITH_GETTER_EXCEPTION: {
-      WebCore::ExceptionCode ec = 0;
-      coreSelf->setAttrWithGetterException((g_value_get_long(value)), ec);
+    case PROP_ATTR_WITH_EXCEPTION: {
+      coreSelf->setAttrWithException((g_value_get_long(value)));
       break;
     }
     case PROP_ATTR_WITH_SETTER_EXCEPTION: {
@@ -894,16 +657,9 @@ static void webkit_dom_test_obj_set_property(GObject* object,
       coreSelf->setAttrWithSetterException((g_value_get_long(value)), ec);
       break;
     }
-    case PROP_STRING_ATTR_WITH_GETTER_EXCEPTION: {
+    case PROP_ATTR_WITH_GETTER_EXCEPTION: {
       WebCore::ExceptionCode ec = 0;
-      coreSelf->setStringAttrWithGetterException(
-          WebCore::String::fromUTF8(g_value_get_string(value)), ec);
-      break;
-    }
-    case PROP_STRING_ATTR_WITH_SETTER_EXCEPTION: {
-      WebCore::ExceptionCode ec = 0;
-      coreSelf->setStringAttrWithSetterException(
-          WebCore::String::fromUTF8(g_value_get_string(value)), ec);
+      coreSelf->setAttrWithGetterException((g_value_get_long(value)), ec);
       break;
     }
 #if ENABLE(Condition1)
@@ -976,66 +732,17 @@ static void webkit_dom_test_obj_get_property(GObject* object,
       g_value_set_object(value, WebKit::kit(ptr.get()));
       break;
     }
-    case PROP_REFLECTED_STRING_ATTR: {
-      g_value_take_string(value,
-                          convertToUTF8String(coreSelf->getAttribute(
-                              WebCore::HTMLNames::reflectedstringattrAttr)));
-      break;
-    }
-    case PROP_REFLECTED_INTEGRAL_ATTR: {
-      g_value_set_long(value, coreSelf->reflectedIntegralAttr());
-      break;
-    }
-    case PROP_REFLECTED_BOOLEAN_ATTR: {
-      g_value_set_boolean(value, coreSelf->reflectedBooleanAttr());
-      break;
-    }
-    case PROP_REFLECTED_URL_ATTR: {
-      g_value_take_string(value,
-                          convertToUTF8String(coreSelf->getURLAttribute(
-                              WebCore::HTMLNames::reflectedurlattrAttr)));
-      break;
-    }
-    case PROP_REFLECTED_STRING_ATTR: {
-      g_value_take_string(
-          value, convertToUTF8String(coreSelf->getAttribute(
-                     WebCore::HTMLNames::customContentStringAttrAttr)));
-      break;
-    }
-    case PROP_REFLECTED_CUSTOM_INTEGRAL_ATTR: {
-      g_value_set_long(value, coreSelf->reflectedCustomIntegralAttr());
-      break;
-    }
-    case PROP_REFLECTED_CUSTOM_BOOLEAN_ATTR: {
-      g_value_set_boolean(value, coreSelf->reflectedCustomBooleanAttr());
-      break;
-    }
-    case PROP_REFLECTED_URL_ATTR: {
-      g_value_take_string(value,
-                          convertToUTF8String(coreSelf->getURLAttribute(
-                              WebCore::HTMLNames::customContentURLAttrAttr)));
-      break;
-    }
-    case PROP_ATTR_WITH_GETTER_EXCEPTION: {
-      WebCore::ExceptionCode ec = 0;
-      g_value_set_long(value, coreSelf->attrWithGetterException(ec));
+    case PROP_ATTR_WITH_EXCEPTION: {
+      g_value_set_long(value, coreSelf->attrWithException());
       break;
     }
     case PROP_ATTR_WITH_SETTER_EXCEPTION: {
-      g_value_set_long(value, coreSelf->attrWithSetterException());
-      break;
-    }
-    case PROP_STRING_ATTR_WITH_GETTER_EXCEPTION: {
       WebCore::ExceptionCode ec = 0;
-      g_value_take_string(
-          value,
-          convertToUTF8String(coreSelf->stringAttrWithGetterException(ec)));
+      g_value_set_long(value, coreSelf->attrWithSetterException(ec));
       break;
     }
-    case PROP_STRING_ATTR_WITH_SETTER_EXCEPTION: {
-      g_value_take_string(
-          value,
-          convertToUTF8String(coreSelf->stringAttrWithSetterException()));
+    case PROP_ATTR_WITH_GETTER_EXCEPTION: {
+      g_value_set_long(value, coreSelf->attrWithGetterException());
       break;
     }
     case PROP_SCRIPT_STRING_ATTR: {
@@ -1183,119 +890,16 @@ static void webkit_dom_test_obj_class_init(
           WEBKIT_TYPE_DOM_TEST_OBJ, /* gobject type */
           WEBKIT_PARAM_READWRITE));
   g_object_class_install_property(
-      gobjectClass, PROP_REFLECTED_STRING_ATTR,
-      g_param_spec_string(
-          "reflected-string-attr",          /* name */
-          "test_obj_reflected-string-attr", /* short description */
-          "read-write  gchar*  TestObj.reflected-string-attr", /* longer - could
-                                                                  do with some
-                                                                  extra doc
-                                                                  stuff here */
-          "",                                                  /* default */
-          WEBKIT_PARAM_READWRITE));
-  g_object_class_install_property(
-      gobjectClass, PROP_REFLECTED_INTEGRAL_ATTR,
+      gobjectClass, PROP_ATTR_WITH_EXCEPTION,
       g_param_spec_long(
-          "reflected-integral-attr",          /* name */
-          "test_obj_reflected-integral-attr", /* short description */
-          "read-write  glong TestObj.reflected-integral-attr", /* longer - could
-                                                                  do with some
-                                                                  extra doc
-                                                                  stuff here */
-          G_MINLONG,                                           /* min */
-          G_MAXLONG,                                           /* max */
-          0,                                                   /* default */
-          WEBKIT_PARAM_READWRITE));
-  g_object_class_install_property(
-      gobjectClass, PROP_REFLECTED_BOOLEAN_ATTR,
-      g_param_spec_boolean(
-          "reflected-boolean-attr",          /* name */
-          "test_obj_reflected-boolean-attr", /* short description */
-          "read-write  gboolean TestObj.reflected-boolean-attr", /* longer -
-                                                                    could do
-                                                                    with some
-                                                                    extra doc
-                                                                    stuff here
-                                                                    */
-          FALSE,                                                 /* default */
-          WEBKIT_PARAM_READWRITE));
-  g_object_class_install_property(
-      gobjectClass, PROP_REFLECTED_URL_ATTR,
-      g_param_spec_string(
-          "reflected-url-attr",          /* name */
-          "test_obj_reflected-url-attr", /* short description */
-          "read-write  gchar*  TestObj.reflected-url-attr", /* longer - could do
-                                                               with some extra
-                                                               doc stuff here */
-          "",                                               /* default */
-          WEBKIT_PARAM_READWRITE));
-  g_object_class_install_property(
-      gobjectClass, PROP_REFLECTED_STRING_ATTR,
-      g_param_spec_string(
-          "reflected-string-attr",          /* name */
-          "test_obj_reflected-string-attr", /* short description */
-          "read-write  gchar*  TestObj.reflected-string-attr", /* longer - could
-                                                                  do with some
-                                                                  extra doc
-                                                                  stuff here */
-          "",                                                  /* default */
-          WEBKIT_PARAM_READWRITE));
-  g_object_class_install_property(
-      gobjectClass, PROP_REFLECTED_CUSTOM_INTEGRAL_ATTR,
-      g_param_spec_long("reflected-custom-integral-attr",          /* name */
-                        "test_obj_reflected-custom-integral-attr", /* short
-                                                                      description
-                                                                      */
-                        "read-write  glong "
-                        "TestObj.reflected-custom-integral-attr", /* longer -
-                                                                     could do
-                                                                     with some
-                                                                     extra doc
-                                                                     stuff here
-                                                                     */
-                        G_MINLONG,                                /* min */
-                        G_MAXLONG,                                /* max */
-                        0,                                        /* default */
-                        WEBKIT_PARAM_READWRITE));
-  g_object_class_install_property(
-      gobjectClass, PROP_REFLECTED_CUSTOM_BOOLEAN_ATTR,
-      g_param_spec_boolean("reflected-custom-boolean-attr",          /* name */
-                           "test_obj_reflected-custom-boolean-attr", /* short
-                                                                        description
-                                                                        */
-                           "read-write  gboolean "
-                           "TestObj.reflected-custom-boolean-attr", /* longer -
-                                                                       could do
-                                                                       with some
-                                                                       extra doc
-                                                                       stuff
-                                                                       here */
-                           FALSE, /* default */
-                           WEBKIT_PARAM_READWRITE));
-  g_object_class_install_property(
-      gobjectClass, PROP_REFLECTED_URL_ATTR,
-      g_param_spec_string(
-          "reflected-url-attr",          /* name */
-          "test_obj_reflected-url-attr", /* short description */
-          "read-write  gchar*  TestObj.reflected-url-attr", /* longer - could do
-                                                               with some extra
-                                                               doc stuff here */
-          "",                                               /* default */
-          WEBKIT_PARAM_READWRITE));
-  g_object_class_install_property(
-      gobjectClass, PROP_ATTR_WITH_GETTER_EXCEPTION,
-      g_param_spec_long(
-          "attr-with-getter-exception",          /* name */
-          "test_obj_attr-with-getter-exception", /* short description */
-          "read-write  glong TestObj.attr-with-getter-exception", /* longer -
-                                                                     could do
-                                                                     with some
-                                                                     extra doc
-                                                                     stuff here
-                                                                     */
-          G_MINLONG,                                              /* min */
-          G_MAXLONG,                                              /* max */
-          0,                                                      /* default */
+          "attr-with-exception",          /* name */
+          "test_obj_attr-with-exception", /* short description */
+          "read-write  glong TestObj.attr-with-exception", /* longer - could do
+                                                              with some extra
+                                                              doc stuff here */
+          G_MINLONG,                                       /* min */
+          G_MAXLONG,                                       /* max */
+          0,                                               /* default */
           WEBKIT_PARAM_READWRITE));
   g_object_class_install_property(
       gobjectClass, PROP_ATTR_WITH_SETTER_EXCEPTION,
@@ -1312,34 +916,21 @@ static void webkit_dom_test_obj_class_init(
           G_MAXLONG,                                              /* max */
           0,                                                      /* default */
           WEBKIT_PARAM_READWRITE));
-  g_object_class_install_property(gobjectClass,
-                                  PROP_STRING_ATTR_WITH_GETTER_EXCEPTION,
-                                  g_param_spec_string(
-                                      "string-attr-with-getter-exception", /* name
-                                                                              */
-                                      "test_obj_string-attr-with-getter-"
-                                      "exception", /* short description */
-                                      "read-write  gchar*  "
-                                      "TestObj.string-attr-with-getter-"
-                                      "exception", /* longer - could do with
-                                                      some extra doc stuff here
-                                                      */
-                                      "",          /* default */
-                                      WEBKIT_PARAM_READWRITE));
-  g_object_class_install_property(gobjectClass,
-                                  PROP_STRING_ATTR_WITH_SETTER_EXCEPTION,
-                                  g_param_spec_string(
-                                      "string-attr-with-setter-exception", /* name
-                                                                              */
-                                      "test_obj_string-attr-with-setter-"
-                                      "exception", /* short description */
-                                      "read-write  gchar*  "
-                                      "TestObj.string-attr-with-setter-"
-                                      "exception", /* longer - could do with
-                                                      some extra doc stuff here
-                                                      */
-                                      "",          /* default */
-                                      WEBKIT_PARAM_READWRITE));
+  g_object_class_install_property(
+      gobjectClass, PROP_ATTR_WITH_GETTER_EXCEPTION,
+      g_param_spec_long(
+          "attr-with-getter-exception",          /* name */
+          "test_obj_attr-with-getter-exception", /* short description */
+          "read-write  glong TestObj.attr-with-getter-exception", /* longer -
+                                                                     could do
+                                                                     with some
+                                                                     extra doc
+                                                                     stuff here
+                                                                     */
+          G_MINLONG,                                              /* min */
+          G_MAXLONG,                                              /* max */
+          0,                                                      /* default */
+          WEBKIT_PARAM_READWRITE));
   g_object_class_install_property(
       gobjectClass, PROP_SCRIPT_STRING_ATTR,
       g_param_spec_string(
