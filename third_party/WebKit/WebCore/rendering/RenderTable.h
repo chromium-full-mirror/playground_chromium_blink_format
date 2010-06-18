@@ -71,7 +71,7 @@ class RenderTable : public RenderBlock {
 
     ColumnStruct() : span(1), width(WidthUndefined) {}
 
-    unsigned short span;
+    unsigned span;
     unsigned width;  // the calculated position of the column
   };
 
