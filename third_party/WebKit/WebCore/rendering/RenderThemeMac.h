@@ -92,6 +92,7 @@ class RenderThemeMac : public RenderTheme {
   virtual bool paintMeter(RenderObject*,
                           const RenderObject::PaintInfo&,
                           const IntRect&);
+  virtual bool supportsMeter(ControlPart, bool isHorizontal) const;
 #endif
 
 #if ENABLE(PROGRESS_TAG)
