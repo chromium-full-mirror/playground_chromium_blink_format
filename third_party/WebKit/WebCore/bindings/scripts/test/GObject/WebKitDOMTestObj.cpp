@@ -987,11 +987,15 @@ static void webkit_dom_test_obj_get_property(GObject* object,
       break;
     }
     case PROP_REFLECTED_INTEGRAL_ATTR: {
-      g_value_set_long(value, coreSelf->reflectedIntegralAttr());
+      g_value_set_long(value,
+                       coreSelf->getIntegralAttribute(
+                           WebCore::HTMLNames::reflectedintegralattrAttr));
       break;
     }
     case PROP_REFLECTED_BOOLEAN_ATTR: {
-      g_value_set_boolean(value, coreSelf->reflectedBooleanAttr());
+      g_value_set_boolean(
+          value,
+          coreSelf->hasAttribute(WebCore::HTMLNames::reflectedbooleanattrAttr));
       break;
     }
     case PROP_REFLECTED_URL_ATTR: {
@@ -1007,11 +1011,15 @@ static void webkit_dom_test_obj_get_property(GObject* object,
       break;
     }
     case PROP_REFLECTED_CUSTOM_INTEGRAL_ATTR: {
-      g_value_set_long(value, coreSelf->reflectedCustomIntegralAttr());
+      g_value_set_long(value,
+                       coreSelf->getIntegralAttribute(
+                           WebCore::HTMLNames::customContentIntegralAttrAttr));
       break;
     }
     case PROP_REFLECTED_CUSTOM_BOOLEAN_ATTR: {
-      g_value_set_boolean(value, coreSelf->reflectedCustomBooleanAttr());
+      g_value_set_boolean(
+          value, coreSelf->hasAttribute(
+                     WebCore::HTMLNames::customContentBooleanAttrAttr));
       break;
     }
     case PROP_REFLECTED_URL_ATTR: {
