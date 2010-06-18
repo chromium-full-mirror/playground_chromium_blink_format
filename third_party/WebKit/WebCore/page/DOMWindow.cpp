@@ -26,6 +26,7 @@
 #include "config.h"
 #include "DOMWindow.h"
 
+#include "AbstractDatabase.h"
 #include "Base64.h"
 #include "BarInfo.h"
 #include "BeforeUnloadEvent.h"
@@ -1198,7 +1199,7 @@ PassRefPtr<Database> DOMWindow::openDatabase(
     PassRefPtr<DatabaseCallback> creationCallback,
     ExceptionCode& ec) {
   RefPtr<Database> database = 0;
-  if (m_frame && Database::isAvailable() &&
+  if (m_frame && AbstractDatabase::isAvailable() &&
       m_frame->document()->securityOrigin()->canAccessDatabase())
     database =
         Database::openDatabase(m_frame->document(), name, version, displayName,

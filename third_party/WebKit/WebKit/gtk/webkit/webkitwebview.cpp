@@ -42,6 +42,7 @@
 #include "webkitwebhistoryitem.h"
 
 #include "AXObjectCache.h"
+#include "AbstractDatabase.h"
 #include "BackForwardList.h"
 #include "Cache.h"
 #include "ChromeClientGtk.h"
@@ -50,7 +51,6 @@
 #include "ContextMenuController.h"
 #include "ContextMenu.h"
 #include "Cursor.h"
-#include "Database.h"
 #include "Document.h"
 #include "DocumentLoader.h"
 #include "DragClientGtk.h"
@@ -2661,7 +2661,7 @@ static void webkit_web_view_update_settings(WebKitWebView* webView) {
   settings->setPrivateBrowsingEnabled(enablePrivateBrowsing);
   settings->setCaretBrowsingEnabled(enableCaretBrowsing);
 #if ENABLE(DATABASE)
-  Database::setIsAvailable(enableHTML5Database);
+  AbstractDatabase::setIsAvailable(enableHTML5Database);
 #endif
   settings->setLocalStorageEnabled(enableHTML5LocalStorage);
   settings->setXSSAuditorEnabled(enableXSSAuditor);
@@ -2760,7 +2760,7 @@ static void webkit_web_view_settings_notify(WebKitWebSettings* webSettings,
     settings->setCaretBrowsingEnabled(g_value_get_boolean(&value));
 #if ENABLE(DATABASE)
   else if (name == g_intern_string("enable-html5-database")) {
-    Database::setIsAvailable(g_value_get_boolean(&value));
+    AbstractDatabase::setIsAvailable(g_value_get_boolean(&value));
   }
 #endif
   else if (name == g_intern_string("enable-html5-local-storage"))

@@ -74,7 +74,7 @@
 #include <wtf/text/CString.h>
 
 #if ENABLE(DATABASE)
-#include "Database.h"
+#include "AbstractDatabase.h"
 #include "DatabaseTracker.h"
 #endif
 
@@ -969,14 +969,14 @@ wxString wxWebView::GetDatabaseDirectory() {
 /* static */
 void wxWebView::SetDatabasesEnabled(bool enabled) {
 #if ENABLE(DATABASE)
-  WebCore::Database::setIsAvailable(enabled);
+  WebCore::AbstractDatabase::setIsAvailable(enabled);
 #endif
 }
 
 /* static */
 bool wxWebView::AreDatabasesEnabled() {
 #if ENABLE(DATABASE)
-  return WebCore::Database::isAvailable();
+  return WebCore::AbstractDatabase::isAvailable();
 #endif
   return false;
 }

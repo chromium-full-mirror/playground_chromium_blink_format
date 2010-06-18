@@ -31,11 +31,14 @@
 
 #include "WorkerContext.h"
 
+#include "AbstractDatabase.h"
 #include "ActiveDOMObject.h"
+#include "Database.h"
+#include "DatabaseCallback.h"
+#include "DatabaseSync.h"
 #include "DatabaseTracker.h"
 #include "DOMTimer.h"
 #include "DOMWindow.h"
-#include "Database.h"
 #include "ErrorEvent.h"
 #include "Event.h"
 #include "EventException.h"
@@ -280,7 +283,8 @@ PassRefPtr<Database> WorkerContext::openDatabase(
     unsigned long estimatedSize,
     PassRefPtr<DatabaseCallback> creationCallback,
     ExceptionCode& ec) {
-  if (!securityOrigin()->canAccessDatabase() || !Database::isAvailable()) {
+  if (!securityOrigin()->canAccessDatabase() ||
+      !AbstractDatabase::isAvailable()) {
     ec = SECURITY_ERR;
     return 0;
   }
@@ -305,14 +309,11 @@ PassRefPtr<DatabaseSync> WorkerContext::openDatabaseSync(
     unsigned long estimatedSize,
     PassRefPtr<DatabaseCallback> creationCallback,
     ExceptionCode& ec) {
-  if (!securityOrigin()->canAccessDatabase()) {
+  if (!securityOrigin()->canAccessDatabase() ||
+      !AbstractDatabase::isAvailable()) {
     ec = SECURITY_ERR;
     return 0;
   }
-
-  ASSERT(DatabaseSync::isAvailable());
-  if (!DatabaseSync::isAvailable())
-    return 0;
 
   return DatabaseSync::openDatabaseSync(this, name, version, displayName,
                                         estimatedSize, creationCallback, ec);

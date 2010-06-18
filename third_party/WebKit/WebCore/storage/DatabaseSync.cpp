@@ -45,16 +45,6 @@ const String& DatabaseSync::databaseInfoTableName() {
   return name;
 }
 
-static bool isSyncDatabaseAvailable = true;
-
-void DatabaseSync::setIsAvailable(bool available) {
-  isSyncDatabaseAvailable = available;
-}
-
-bool DatabaseSync::isAvailable() {
-  return isSyncDatabaseAvailable;
-}
-
 PassRefPtr<DatabaseSync> DatabaseSync::openDatabaseSync(
     ScriptExecutionContext*,
     const String&,
