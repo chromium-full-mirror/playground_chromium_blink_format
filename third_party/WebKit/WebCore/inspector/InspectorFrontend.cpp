@@ -251,6 +251,14 @@ void InspectorFrontend::searchingForNodeWasDisabled() {
   callSimpleFunction("searchingForNodeWasDisabled");
 }
 
+void InspectorFrontend::monitoringXHRWasEnabled() {
+  callSimpleFunction("monitoringXHRWasEnabled");
+}
+
+void InspectorFrontend::monitoringXHRWasDisabled() {
+  callSimpleFunction("monitoringXHRWasDisabled");
+}
+
 void InspectorFrontend::updatePauseOnExceptionsState(long state) {
   ScriptFunctionCall function(m_webInspector, "dispatch");
   function.appendArgument("updatePauseOnExceptionsState");

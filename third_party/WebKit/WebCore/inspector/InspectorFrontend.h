@@ -97,6 +97,9 @@ class InspectorFrontend : public Noncopyable {
   void searchingForNodeWasEnabled();
   void searchingForNodeWasDisabled();
 
+  void monitoringXHRWasEnabled();
+  void monitoringXHRWasDisabled();
+
   void updatePauseOnExceptionsState(long state);
 
 #if ENABLE(JAVASCRIPT_DEBUGGER)

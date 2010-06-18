@@ -123,6 +123,7 @@ static const char* const profilerEnabledSettingName = "profilerEnabled";
 static const char* const inspectorAttachedHeightName =
     "inspectorAttachedHeight";
 static const char* const lastActivePanelSettingName = "lastActivePanel";
+static const char* const monitoringXHRSettingName = "xhrMonitor";
 
 const String& InspectorController::frontendSettingsSettingName() {
   DEFINE_STATIC_LOCAL(String, settingName, ("frontendSettings"));
@@ -152,9 +153,10 @@ InspectorController::InspectorController(Page* page, InspectorClient* client)
       m_sessionSettings(InspectorObject::create()),
       m_groupLevel(0),
       m_searchingForNode(false),
+      m_monitoringXHR(false),
       m_previousMessage(0),
       m_resourceTrackingEnabled(false),
-      m_resourceTrackingSettingsLoaded(false),
+      m_settingsLoaded(false),
       m_inspectorBackend(InspectorBackend::create(this)),
       m_injectedScriptHost(InjectedScriptHost::create(this))
 #if ENABLE(JAVASCRIPT_DEBUGGER)
@@ -438,6 +440,19 @@ void InspectorController::setSearchingForNode(bool enabled) {
   }
 }
 
+void InspectorController::setMonitoringXHR(bool enabled) {
+  if (m_monitoringXHR == enabled)
+    return;
+  m_monitoringXHR = enabled;
+  setSetting(monitoringXHRSettingName, enabled ? "true" : "false");
+  if (m_frontend) {
+    if (enabled)
+      m_frontend->monitoringXHRWasEnabled();
+    else
+      m_frontend->monitoringXHRWasDisabled();
+  }
+}
+
 void InspectorController::connectFrontend(const ScriptObject& webInspector) {
   m_openingFrontend = false;
   m_frontend = new InspectorFrontend(webInspector, m_client);
@@ -571,8 +586,9 @@ void InspectorController::populateScriptObjects() {
 
   if (m_searchingForNode)
     m_frontend->searchingForNodeWasEnabled();
-  else
-    m_frontend->searchingForNodeWasDisabled();
+
+  if (m_monitoringXHR)
+    m_frontend->monitoringXHRWasEnabled();
 
 #if ENABLE(JAVASCRIPT_DEBUGGER)
   if (m_profilerEnabled)
@@ -826,7 +842,7 @@ void InspectorController::didLoadResourceFromMemoryCache(
   ASSERT(m_inspectedPage);
   bool isMainResource = isMainResourceLoader(
       loader, KURL(ParsedURLString, cachedResource->url()));
-  ensureResourceTrackingSettingsLoaded();
+  ensureSettingsLoaded();
   if (!isMainResource && !m_resourceTrackingEnabled)
     return;
 
@@ -854,7 +870,7 @@ void InspectorController::identifierForInitialRequest(
   ASSERT(m_inspectedPage);
 
   bool isMainResource = isMainResourceLoader(loader, request.url());
-  ensureResourceTrackingSettingsLoaded();
+  ensureSettingsLoaded();
   if (!isMainResource && !m_resourceTrackingEnabled)
     return;
 
@@ -1045,8 +1061,19 @@ void InspectorController::didFailLoading(unsigned long identifier,
 
 void InspectorController::resourceRetrievedByXMLHttpRequest(
     unsigned long identifier,
-    const ScriptString& sourceString) {
-  if (!enabled() || !m_resourceTrackingEnabled)
+    const ScriptString& sourceString,
+    const String& url,
+    const String& sendURL,
+    unsigned sendLineNumber) {
+  if (!enabled())
+    return;
+
+  if (m_monitoringXHR)
+    addMessageToConsole(JSMessageSource, LogMessageType, LogMessageLevel,
+                        "XHR finished loading: \"" + url + "\".",
+                        sendLineNumber, sendURL);
+
+  if (!m_resourceTrackingEnabled)
     return;
 
   InspectorResource* resource = m_resources.get(identifier).get();
@@ -1107,14 +1134,18 @@ void InspectorController::disableResourceTracking(bool always) {
     m_frontend->resourceTrackingWasDisabled();
 }
 
-void InspectorController::ensureResourceTrackingSettingsLoaded() {
-  if (m_resourceTrackingSettingsLoaded)
+void InspectorController::ensureSettingsLoaded() {
+  if (m_settingsLoaded)
     return;
-  m_resourceTrackingSettingsLoaded = true;
+  m_settingsLoaded = true;
 
   String resourceTracking = setting(resourceTrackingEnabledSettingName);
   if (resourceTracking == "true")
     m_resourceTrackingEnabled = true;
+
+  String monitoringXHR = setting(monitoringXHRSettingName);
+  if (monitoringXHR == "true")
+    m_monitoringXHR = true;
 }
 
 void InspectorController::startTimelineProfiler() {
