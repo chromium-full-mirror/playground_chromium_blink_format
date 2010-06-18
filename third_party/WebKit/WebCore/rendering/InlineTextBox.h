@@ -74,9 +74,9 @@ class InlineTextBox : public InlineBox {
  public:
   virtual IntRect selectionRect(int absx, int absy, int startPos, int endPos);
   bool isSelected(int startPos, int endPos) const;
-  void selectionStartEnd(int& sPos, int& ePos);
+  virtual void selectionStartEnd(int& sPos, int& ePos);
 
- private:
+ protected:
   virtual void paint(RenderObject::PaintInfo&, int tx, int ty);
   virtual bool nodeAtPoint(const HitTestRequest&,
                            HitTestResult&,
@@ -114,7 +114,7 @@ class InlineTextBox : public InlineBox {
   }
 
  private:
-  virtual bool isInlineTextBox() { return true; }
+  virtual bool isInlineTextBox() const { return true; }
 
  public:
   virtual int caretMinOffset() const;

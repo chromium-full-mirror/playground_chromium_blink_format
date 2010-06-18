@@ -80,12 +80,11 @@ class RenderSVGText : public RenderSVGBlock {
                                    bool fixed,
                                    TransformState&) const;
 
-  virtual FloatRect objectBoundingBox() const;
+  virtual FloatRect objectBoundingBox() const { return frameRect(); }
   virtual FloatRect strokeBoundingBox() const;
   virtual FloatRect repaintRectInLocalCoordinates() const;
 
   virtual AffineTransform localTransform() const { return m_localTransform; }
-
   virtual RootInlineBox* createRootInlineBox();
 
   virtual RenderBlock* firstLineBlock() const;
@@ -98,5 +97,3 @@ class RenderSVGText : public RenderSVGBlock {
 
 #endif  // ENABLE(SVG)
 #endif
-
-// vim:ts=4:noet

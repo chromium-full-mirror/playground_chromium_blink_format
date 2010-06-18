@@ -59,7 +59,7 @@ class PositionedFloatVector : public PositionedVector<float> {};
 struct SVGChar;
 
 struct SVGCharacterLayoutInfo {
-  SVGCharacterLayoutInfo(Vector<SVGChar>&);
+  SVGCharacterLayoutInfo();
 
   enum StackType {
     XStack,
@@ -121,7 +121,7 @@ struct SVGCharacterLayoutInfo {
   float pathChunkLength;
 
   // Result vector
-  Vector<SVGChar>& svgChars;
+  Vector<SVGChar> svgChars;
   bool nextDrawnSeperated : 1;
 
  private:

@@ -121,19 +121,6 @@ void SVGTextElement::synchronizeProperty(const QualifiedName& attrName) {
   if (attrName == anyQName() || SVGTransformable::isKnownAttribute(attrName))
     synchronizeTransform();
 }
-
-void SVGTextElement::childrenChanged(bool changedByParser,
-                                     Node* beforeChange,
-                                     Node* afterChange,
-                                     int childCountDelta) {
-  SVGTextPositioningElement::childrenChanged(changedByParser, beforeChange,
-                                             afterChange, childCountDelta);
-
-  if (!renderer())
-    return;
-
-  renderer()->setNeedsLayout(true);
-}
 }
 
 #endif  // ENABLE(SVG)
