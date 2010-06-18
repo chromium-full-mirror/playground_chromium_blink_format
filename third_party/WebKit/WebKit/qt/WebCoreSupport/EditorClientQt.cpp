@@ -596,6 +596,8 @@ void EditorClientQt::setInputMethodState(bool active) {
                                           inputElement->isEmailField());
         webPageClient->setInputMethodHint(Qt::ImhUrlCharactersOnly,
                                           inputElement->isUrlField());
+        webPageClient->setInputMethodHint(Qt::ImhHiddenText,
+                                          inputElement->isPasswordField());
       }
     }
 
