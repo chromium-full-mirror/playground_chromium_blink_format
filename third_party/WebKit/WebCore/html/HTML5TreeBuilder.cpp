@@ -27,6 +27,7 @@
 #include "HTML5TreeBuilder.h"
 
 #include "Element.h"
+#include "Frame.h"
 #include "HTML5Lexer.h"
 #include "HTML5Token.h"
 #include "HTMLDocument.h"
@@ -34,6 +35,7 @@
 #include "LegacyHTMLTreeConstructor.h"
 #include "HTMLDocumentParser.h"
 #include "NotImplemented.h"
+#include "ScriptController.h"
 #include <wtf/UnusedParam.h>
 
 namespace WebCore {
@@ -139,15 +141,15 @@ PassRefPtr<Element> HTML5TreeBuilder::takeScriptToProcess(
 
 HTML5Lexer::State HTML5TreeBuilder::adjustedLexerState(
     HTML5Lexer::State state,
-    const AtomicString& tagName) {
+    const AtomicString& tagName,
+    Frame* frame) {
   if (tagName == textareaTag || tagName == titleTag)
     return HTML5Lexer::RCDATAState;
 
   if (tagName == styleTag || tagName == iframeTag || tagName == xmpTag ||
-      tagName == noembedTag) {
-    // FIXME: noscript and noframes may conditionally enter this state as well.
+      tagName == noembedTag || tagName == noframesTag ||
+      (tagName == noscriptTag && isScriptingFlagEnabled(frame)))
     return HTML5Lexer::RAWTEXTState;
-  }
 
   if (tagName == plaintextTag)
     return HTML5Lexer::PLAINTEXTState;
@@ -183,8 +185,8 @@ PassRefPtr<Node> HTML5TreeBuilder::passTokenToLegacyParser(HTML5Token& token) {
                oldStyleToken.tagName == listingTag)
       m_lexer->skipLeadingNewLineForListing();
     else
-      m_lexer->setState(
-          adjustedLexerState(m_lexer->state(), oldStyleToken.tagName));
+      m_lexer->setState(adjustedLexerState(
+          m_lexer->state(), oldStyleToken.tagName, m_document->frame()));
   } else if (token.type() == HTML5Token::EndTag) {
     if (oldStyleToken.tagName == scriptTag &&
         insertionMode() != AfterFrameset) {
@@ -232,5 +234,13 @@ void HTML5TreeBuilder::finished() {
   // We should call m_document->finishedParsing() here, except
   // m_legacyTreeConstructor->finished() does it for us.
   m_legacyTreeConstructor->finished();
+}
+
+bool HTML5TreeBuilder::isScriptingFlagEnabled(Frame* frame) {
+  if (!frame)
+    return false;
+  if (ScriptController* scriptController = frame->script())
+    return scriptController->canExecuteScripts(NotAboutToExecuteScript);
+  return false;
 }
 }

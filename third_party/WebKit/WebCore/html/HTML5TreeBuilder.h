@@ -60,7 +60,8 @@ class HTML5TreeBuilder : public Noncopyable {
   void finished();
 
   static HTML5Lexer::State adjustedLexerState(HTML5Lexer::State,
-                                              const AtomicString& tagName);
+                                              const AtomicString& tagName,
+                                              Frame*);
 
   // FIXME: This is a dirty, rotten hack to keep HTMLFormControlElement happy
   // until we stop using the legacy parser. DO NOT CALL THIS METHOD.
@@ -85,6 +86,8 @@ class HTML5TreeBuilder : public Noncopyable {
 
   void setInsertionMode(InsertionMode value) { m_insertionMode = value; }
   InsertionMode insertionMode() const { return m_insertionMode; }
+
+  static bool isScriptingFlagEnabled(Frame* frame);
 
   Document* m_document;  // This is only used by the m_legacyParser for now.
   bool m_reportErrors;
