@@ -150,7 +150,7 @@ void SelectionController::setSelection(const VisibleSelection& s,
   // <http://bugs.webkit.org/show_bug.cgi?id=23464>: Infinite recursion at
   // SelectionController::setSelection
   // if document->frame() == m_frame we can get into an infinite loop
-  if (document && document->frame() != m_frame &&
+  if (document && document->frame() && document->frame() != m_frame &&
       document != m_frame->document()) {
     document->frame()->selection()->setSelection(
         s, closeTyping, clearTypingStyle, userTriggered);
