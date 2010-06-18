@@ -52,7 +52,7 @@ PassRefPtr<HTMLScriptElement> HTMLScriptElement::create(
 }
 
 bool HTMLScriptElement::isURLAttribute(Attribute* attr) const {
-  return attr->name() == sourceAttributeValue();
+  return attr->name() == srcAttr;
 }
 
 bool HTMLScriptElement::shouldExecuteAsJavaScript() const {
