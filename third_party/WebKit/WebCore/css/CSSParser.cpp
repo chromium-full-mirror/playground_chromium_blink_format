@@ -1035,13 +1035,17 @@ bool CSSParser::parseValue(int propId, bool important) {
         validPrimitive = true;
       break;
 
-    case CSSPropertyTextIndent:     // <length> | <percentage> | inherit
+    case CSSPropertyTextIndent:  // <length> | <percentage> | inherit
+      validPrimitive = (!id && validUnit(value, FLength | FPercent, m_strict));
+      break;
+
     case CSSPropertyPaddingTop:     //// <padding-width> | inherit
     case CSSPropertyPaddingRight:   //   Which is defined as
     case CSSPropertyPaddingBottom:  //   <length> | <percentage>
     case CSSPropertyPaddingLeft:    ////
     case CSSPropertyWebkitPaddingStart:
-      validPrimitive = (!id && validUnit(value, FLength | FPercent, m_strict));
+      validPrimitive =
+          (!id && validUnit(value, FLength | FPercent | FNonNeg, m_strict));
       break;
 
     case CSSPropertyMaxHeight:  // <length> | <percentage> | none | inherit
