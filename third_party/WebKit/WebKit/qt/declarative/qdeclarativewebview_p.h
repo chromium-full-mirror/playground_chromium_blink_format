@@ -111,10 +111,12 @@ class QDeclarativeWebView : public QDeclarativeItem {
   Q_PROPERTY(qreal progress READ progress NOTIFY progressChanged)
   Q_PROPERTY(Status status READ status NOTIFY statusChanged)
 
+#ifndef QT_NO_ACTION
   Q_PROPERTY(QAction* reload READ reloadAction CONSTANT)
   Q_PROPERTY(QAction* back READ backAction CONSTANT)
   Q_PROPERTY(QAction* forward READ forwardAction CONSTANT)
   Q_PROPERTY(QAction* stop READ stopAction CONSTANT)
+#endif
 
   Q_PROPERTY(QDeclarativeWebSettings* settings READ settingsObject CONSTANT)
 
@@ -160,10 +162,12 @@ class QDeclarativeWebView : public QDeclarativeItem {
   qreal progress() const;
   QString statusText() const;
 
+#ifndef QT_NO_ACTION
   QAction* reloadAction() const;
   QAction* backAction() const;
   QAction* forwardAction() const;
   QAction* stopAction() const;
+#endif
 
   QWebPage* page() const;
   void setPage(QWebPage* page);
