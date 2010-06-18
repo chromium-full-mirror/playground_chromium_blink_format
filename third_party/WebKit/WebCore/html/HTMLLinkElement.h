@@ -90,6 +90,9 @@ class HTMLLinkElement : public HTMLElement, public CachedResourceClient {
   }
   bool isIcon() const { return m_relAttribute.m_isIcon; }
 
+  virtual void attach();
+  virtual bool canLazyAttach() { return false; }
+
  private:
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusForbidden; }
   virtual int tagPriority() const { return 0; }
@@ -97,6 +100,7 @@ class HTMLLinkElement : public HTMLElement, public CachedResourceClient {
   virtual void parseMappedAttribute(Attribute*);
 
   void process();
+  static void processCallback(Node*);
 
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
@@ -138,6 +142,7 @@ class HTMLLinkElement : public HTMLElement, public CachedResourceClient {
   RelAttribute m_relAttribute;
   bool m_loading;
   bool m_createdByParser;
+  bool m_shouldProcessAfterAttach;
 };
 
 }  // namespace
