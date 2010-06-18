@@ -1905,6 +1905,7 @@ void InspectorController::didEvaluateForTestInFrontend(
   function.call();
 }
 
+#if ENABLE(JAVASCRIPT_DEBUGGER)
 String InspectorController::breakpointsSettingKey() {
   DEFINE_STATIC_LOCAL(String, keyPrefix, ("breakpoints:"));
   return keyPrefix + md5Base16(m_mainResource->requestURL());
@@ -1947,6 +1948,7 @@ void InspectorController::saveBreakpoints() {
   }
   setSetting(breakpointsSettingKey(), breakpoints->toJSONString());
 }
+#endif
 
 static Path quadToPath(const FloatQuad& quad) {
   Path quadPath;
