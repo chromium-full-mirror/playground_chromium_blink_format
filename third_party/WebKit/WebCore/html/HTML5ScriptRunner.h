@@ -48,8 +48,10 @@ class HTML5ScriptRunner : public Noncopyable {
 
   // Processes the passed in script and any pending scripts if possible.
   bool execute(PassRefPtr<Element> scriptToProcess, int scriptStartLine);
-  // Processes any pending scripts.
+
+  bool hasScriptsWaitingForLoad() const;
   bool executeScriptsWaitingForLoad(CachedResource*);
+
   bool hasScriptsWaitingForStylesheets() const {
     return m_hasScriptsWaitingForStylesheets;
   }
@@ -59,12 +61,25 @@ class HTML5ScriptRunner : public Noncopyable {
 
  private:
   struct PendingScript {
-    PendingScript() : watchingForLoad(false), startingLineNumber(0) {}
+    // This state controls whether we need to do anything with this script
+    // when we get a executeScriptsWaitingForLoad callback.
+    // We ignore callbacks during RegisteringForWatch.
+    enum WatchingForLoadState {
+      NotWatchingForLoad,
+      RegisteringForWatch,
+      WatchingForLoad,
+    };
+
+    PendingScript()
+        : watchingForLoadState(NotWatchingForLoad), startingLineNumber(0) {}
+
+    bool watchingForLoad() {
+      return watchingForLoadState != NotWatchingForLoad;
+    }
 
     RefPtr<Element> element;
     CachedResourceHandle<CachedScript> cachedScript;
-    bool watchingForLoad;    // Did we pass the cachedScript to the
-                             // HTML5ScriptRunnerHost.
+    WatchingForLoadState watchingForLoadState;
     int startingLineNumber;  // Only used for inline script tags.
     // HTML5 has an isReady parameter, however isReady ends up equivalent to
     // m_document->haveStylesheetsLoaded() && cachedScript->isLoaded()
@@ -95,7 +110,7 @@ class HTML5ScriptRunner : public Noncopyable {
 
   // We only want stylesheet loads to trigger script execution if script
   // execution is currently stopped due to stylesheet loads, otherwise we'd
-  // cause nested sript execution when parsing <style> tags since </style>
+  // cause nested script execution when parsing <style> tags since </style>
   // tags can cause Document to call executeScriptsWaitingForStylesheets.
   bool m_hasScriptsWaitingForStylesheets;
 };
