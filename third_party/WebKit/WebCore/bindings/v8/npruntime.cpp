@@ -284,7 +284,6 @@ NPObject* _NPN_RetainObject(NPObject* npObject) {
 // to kill objects which plugins may not have properly released.
 void _NPN_DeallocateObject(NPObject* npObject) {
   ASSERT(npObject);
-  ASSERT(npObject->referenceCount >= 0);
 
   if (npObject) {
     // NPObjects that remain in pure C++ may never have wrappers.

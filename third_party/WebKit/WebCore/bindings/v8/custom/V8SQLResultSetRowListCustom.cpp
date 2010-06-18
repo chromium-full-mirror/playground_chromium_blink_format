@@ -56,7 +56,7 @@ v8::Handle<v8::Value> V8SQLResultSetRowList::itemCallback(
   SQLResultSetRowList* rowList = V8SQLResultSetRowList::toNative(args.Holder());
 
   unsigned long index = args[0]->IntegerValue();
-  if (index < 0 || index >= rowList->length()) {
+  if (index >= rowList->length()) {
     V8Proxy::throwError(V8Proxy::RangeError, "Item index is out of range.");
     return v8::Undefined();
   }
