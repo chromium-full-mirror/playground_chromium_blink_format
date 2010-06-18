@@ -600,7 +600,7 @@ void CompositeEditCommand::deleteInsignificantText(const Position& start,
       int startOffset =
           node == start.node() ? start.deprecatedEditingOffset() : 0;
       int endOffset = node == end.node() ? end.deprecatedEditingOffset()
-                                         : textNode->length();
+                                         : static_cast<int>(textNode->length());
       deleteInsignificantText(textNode, startOffset, endOffset);
     }
     if (node == end.node())

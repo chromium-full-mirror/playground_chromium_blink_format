@@ -265,7 +265,7 @@ inline Position positionAfterNode(Node* anchorNode) {
 
 inline int lastOffsetInNode(Node* node) {
   return node->offsetInCharacters() ? node->maxCharacterOffset()
-                                    : node->childNodeCount();
+                                    : static_cast<int>(node->childNodeCount());
 }
 
 // firstPositionInNode and lastPositionInNode return parent-anchored positions,
