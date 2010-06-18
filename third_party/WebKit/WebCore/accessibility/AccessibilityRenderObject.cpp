@@ -3094,12 +3094,12 @@ bool AccessibilityRenderObject::inheritsPresentationalRole() const {
   // those child elements are also presentational. For example, <li> becomes
   // presentational from <ul>.
   // http://www.w3.org/WAI/PF/aria/complete#presentation
+  DEFINE_STATIC_LOCAL(HashSet<QualifiedName>, listItemParents, ());
 
   HashSet<QualifiedName>* possibleParentTagNames = 0;
   switch (roleValue()) {
     case ListItemRole:
     case ListMarkerRole:
-      DEFINE_STATIC_LOCAL(HashSet<QualifiedName>, listItemParents, ());
       if (listItemParents.isEmpty()) {
         listItemParents.add(ulTag);
         listItemParents.add(olTag);
