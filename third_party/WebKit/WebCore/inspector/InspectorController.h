@@ -285,6 +285,8 @@ class InspectorController
   void enableProfiler(bool always = false, bool skipRecompile = false);
   void disableProfiler(bool always = false);
   bool profilerEnabled() const { return enabled() && m_profilerEnabled; }
+
+  void takeHeapSnapshot();
 #endif
 
 #if ENABLE(JAVASCRIPT_DEBUGGER)

@@ -1675,6 +1675,13 @@ void InspectorController::disableProfiler(bool always) {
   if (m_frontend)
     m_frontend->profilerWasDisabled();
 }
+
+void InspectorController::takeHeapSnapshot() {
+  if (!enabled())
+    return;
+
+  ScriptProfiler::takeHeapSnapshot();
+}
 #endif
 
 #if ENABLE(JAVASCRIPT_DEBUGGER)
