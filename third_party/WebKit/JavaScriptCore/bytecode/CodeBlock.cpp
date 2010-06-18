@@ -1767,6 +1767,7 @@ void CodeBlock::reparseForExceptionInfoIfNecessary(CallFrame* callFrame) {
   if (m_exceptionInfo)
     return;
 
+  ASSERT(!m_rareData || !m_rareData->m_exceptionHandlers.size());
   ScopeChainNode* scopeChain = callFrame->scopeChain();
   if (m_needsFullScopeChain) {
     ScopeChain sc(scopeChain);

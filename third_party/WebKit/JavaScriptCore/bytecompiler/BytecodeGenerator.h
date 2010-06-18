@@ -471,7 +471,11 @@ class BytecodeGenerator : public FastAllocBase {
                                    Label* target);
 
   RegisterID* emitCatch(RegisterID*, Label* start, Label* end);
-  void emitThrow(RegisterID* exc) { emitUnaryNoDstOp(op_throw, exc); }
+  void emitThrow(RegisterID* exc) {
+    m_usesExceptions = true;
+    emitUnaryNoDstOp(op_throw, exc);
+  }
+
   RegisterID* emitNewError(RegisterID* dst,
                            bool isReferenceError,
                            JSValue message);
@@ -694,6 +698,7 @@ class BytecodeGenerator : public FastAllocBase {
 
   unsigned m_emitNodeDepth;
 
+  bool m_usesExceptions;
   bool m_regeneratingForExceptionInfo;
   CodeBlock* m_codeBlockBeingRegeneratedFrom;
 
