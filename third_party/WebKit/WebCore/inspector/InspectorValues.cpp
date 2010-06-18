@@ -601,14 +601,14 @@ PassRefPtr<InspectorObject> InspectorObject::getObject(
     const String& name) const {
   PassRefPtr<InspectorValue> value = get(name);
   if (!value)
-    return false;
+    return 0;
   return value->asObject();
 }
 
 PassRefPtr<InspectorArray> InspectorObject::getArray(const String& name) const {
   PassRefPtr<InspectorValue> value = get(name);
   if (!value)
-    return false;
+    return 0;
   return value->asArray();
 }
 

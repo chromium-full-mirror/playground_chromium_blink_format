@@ -41,7 +41,7 @@ struct BidiRun;
 template <class Iterator, class Run>
 class BidiResolver;
 template <class Iterator>
-class MidpointState;
+struct MidpointState;
 typedef BidiResolver<InlineIterator, BidiRun> InlineBidiResolver;
 typedef MidpointState<InlineIterator> LineMidpointState;
 

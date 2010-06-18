@@ -60,7 +60,7 @@ struct FrameData;
 // that's not copyable.
 namespace WTF {
 template <>
-class VectorTraits<WebCore::FrameData> : public SimpleClassVectorTraits {};
+struct VectorTraits<WebCore::FrameData> : public SimpleClassVectorTraits {};
 }
 
 namespace WebCore {
