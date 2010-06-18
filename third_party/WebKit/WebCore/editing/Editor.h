@@ -381,8 +381,7 @@ class Editor {
 
   void changeSelectionAfterCommand(const VisibleSelection& newSelection,
                                    bool closeTyping,
-                                   bool clearTypingStyle,
-                                   EditCommand*);
+                                   bool clearTypingStyle);
 };
 
 inline void Editor::setStartNewKillRingSequence(bool flag) {
