@@ -95,6 +95,7 @@ class WebSocketChannel : public RefCounted<WebSocketChannel>,
   bool appendToBuffer(const char* data, int len);
   void skipBuffer(int len);
   bool processBuffer();
+  void resumeTimerFired(Timer<WebSocketChannel>* timer);
 
   ScriptExecutionContext* m_context;
   WebSocketChannelClient* m_client;
@@ -103,6 +104,7 @@ class WebSocketChannel : public RefCounted<WebSocketChannel>,
   char* m_buffer;
   int m_bufferSize;
 
+  Timer<WebSocketChannel> m_resumeTimer;
   bool m_suspended;
   bool m_closed;
   unsigned long m_unhandledBufferedAmount;
