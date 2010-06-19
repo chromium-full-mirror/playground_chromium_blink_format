@@ -83,6 +83,10 @@ class WebWidgetClient {
   // displayed.
   virtual WebScreenInfo screenInfo() { return WebScreenInfo(); }
 
+  // When this method gets called, WebWidgetClient implementation should
+  // reset the input method by cancelling any ongoing composition.
+  virtual void resetInputMethod() {}
+
  protected:
   ~WebWidgetClient() {}
 };
