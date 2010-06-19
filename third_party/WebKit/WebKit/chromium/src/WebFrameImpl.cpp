@@ -442,10 +442,6 @@ WebString WebFrameImpl::name() const {
   return m_frame->tree()->name();
 }
 
-void WebFrameImpl::clearName() {
-  m_frame->tree()->clearName();
-}
-
 void WebFrameImpl::setName(const WebString& name) {
   m_frame->tree()->setName(name);
 }
