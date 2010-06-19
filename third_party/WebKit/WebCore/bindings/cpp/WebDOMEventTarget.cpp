@@ -22,6 +22,7 @@
 #include "WebDOMEventTarget.h"
 
 #include "DOMApplicationCache.h"
+#include "DOMWindow.h"
 #include "DedicatedWorkerContext.h"
 #include "EventSource.h"
 #include "MessagePort.h"
@@ -31,6 +32,7 @@
 #include "SharedWorkerContext.h"
 #include "ThreadCheck.h"
 #include "WebDOMDOMApplicationCache.h"
+#include "WebDOMDOMWindow.h"
 #include "WebDOMDedicatedWorkerContext.h"
 #include "WebDOMEventSource.h"
 #include "WebDOMMessagePort.h"
@@ -75,11 +77,59 @@ WebCore::EventTarget* WebDOMEventTarget::impl() const {
   return m_impl ? m_impl->impl.get() : 0;
 }
 
-WebCore::EventTarget* toWebCore(const WebDOMEventTarget& wrapper) {
+#define ConvertTo(type)                                   \
+  WebDOM##type WebDOMEventTarget::to##type() {            \
+    WebCore::EventTarget* target = impl();                \
+    return WebDOM##type(target ? target->to##type() : 0); \
+  }
+
+ConvertTo(Node) ConvertTo(DOMWindow) ConvertTo(XMLHttpRequest)
+    ConvertTo(XMLHttpRequestUpload) ConvertTo(MessagePort)
+#if ENABLE(EVENTSOURCE)
+        ConvertTo(EventSource)
+#endif
+
+#if ENABLE(OFFLINE_WEB_APPLICATIONS)
+            ConvertTo(DOMApplicationCache)
+#endif
+
+#if ENABLE(WORKERS)
+                ConvertTo(Worker) ConvertTo(DedicatedWorkerContext)
+#endif
+
+#if ENABLE(SHARED_WORKERS)
+                    ConvertTo(SharedWorker) ConvertTo(SharedWorkerContext)
+#endif
+
+#if ENABLE(NOTIFICATIONS)
+                        ConvertTo(Notification)
+#endif
+
+#if ENABLE(WEB_SOCKETS)
+                            ConvertTo(WebSocket)
+#endif
+
+                                WebCore::EventTarget* toWebCore(
+                                    const WebDOMEventTarget& wrapper) {
   return wrapper.impl();
 }
 
 WebDOMEventTarget toWebKit(WebCore::EventTarget* value) {
+  if (WebCore::Node* node = value->toNode())
+    return toWebKit(node);
+
+  if (WebCore::DOMWindow* window = value->toDOMWindow())
+    return toWebKit(window);
+
+  if (WebCore::XMLHttpRequest* xhr = value->toXMLHttpRequest())
+    return toWebKit(xhr);
+
+  if (WebCore::XMLHttpRequestUpload* upload = value->toXMLHttpRequestUpload())
+    return toWebKit(upload);
+
+  if (WebCore::MessagePort* messagePort = value->toMessagePort())
+    return toWebKit(messagePort);
+
 #if ENABLE(EVENTSOURCE)
   if (WebCore::EventSource* eventSource = value->toEventSource())
     return toWebKit(eventSource);
@@ -93,22 +143,10 @@ WebDOMEventTarget toWebKit(WebCore::EventTarget* value) {
     return toWebKit(instance);
 #endif
 
-  if (WebCore::Node* node = value->toNode())
-    return toWebKit(node);
-
-  if (WebCore::XMLHttpRequest* xhr = value->toXMLHttpRequest())
-    return toWebKit(xhr);
-
-  if (WebCore::XMLHttpRequestUpload* upload = value->toXMLHttpRequestUpload())
-    return toWebKit(upload);
-
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
   if (WebCore::DOMApplicationCache* cache = value->toDOMApplicationCache())
     return toWebKit(cache);
 #endif
-
-  if (WebCore::MessagePort* messagePort = value->toMessagePort())
-    return toWebKit(messagePort);
 
 #if ENABLE(WORKERS)
   if (WebCore::Worker* worker = value->toWorker())
