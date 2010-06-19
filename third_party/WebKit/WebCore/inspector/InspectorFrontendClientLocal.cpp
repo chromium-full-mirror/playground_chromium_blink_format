@@ -161,7 +161,8 @@ void InspectorFrontendClientLocal::restoreAttachedWindowHeight() {
       m_inspectorController->setting(inspectorAttachedHeightName);
   bool success = true;
   int height = attachedHeight.toInt(&success);
-  unsigned preferredHeight = success ? height : defaultAttachedHeight;
+  unsigned preferredHeight =
+      success ? static_cast<unsigned>(height) : defaultAttachedHeight;
 
   // This call might not go through (if the window starts out detached), but if
   // the window is initially created attached,
