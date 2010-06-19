@@ -222,6 +222,10 @@ class HTMLInputElement : public HTMLTextFormControlElement,
   HTMLOptionElement* selectedOption() const;
 #endif
 
+#if ENABLE(WCSS)
+  void setWapInputFormat(String& mask);
+#endif
+
  protected:
   HTMLInputElement(const QualifiedName&, Document*, HTMLFormElement* = 0);
 
@@ -366,7 +370,6 @@ class HTMLInputElement : public HTMLTextFormControlElement,
 #endif
 
 #if ENABLE(WCSS)
-  void setWapInputFormat(String& mask);
   virtual InputElementData data() const { return m_data; }
 #endif
 
