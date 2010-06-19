@@ -49,6 +49,7 @@ class QWebHistoryItem;
 class QWebSecurityOrigin;
 class QWebElement;
 class QWebElementCollection;
+class QWebScriptWorld;
 
 class DumpRenderTreeSupportQt;
 namespace WebCore {
@@ -206,6 +207,8 @@ class QWEBKIT_EXPORT QWebFrame : public QObject {
 
  public Q_SLOTS:
   QVariant evaluateJavaScript(const QString& scriptSource);
+  QVariant evaluateScriptInIsolatedWorld(QWebScriptWorld* scriptWorld,
+                                         const QString& scriptSource);
 #ifndef QT_NO_PRINTER
   void print(QPrinter* printer) const;
 #endif

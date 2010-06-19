@@ -83,9 +83,6 @@ class QWEBKIT_EXPORT DumpRenderTreeSupportQt {
   static void setMediaType(QWebFrame* qframe, const QString& type);
   static void setDumpRenderTreeModeEnabled(bool b);
 
-  static void evaluateScriptInIsolatedWorld(QWebFrame* frame,
-                                            int worldId,
-                                            const QString& script);
   static void garbageCollectorCollect();
   static void garbageCollectorCollectOnAlternateThread(bool waitUntilDone);
   static void setJavaScriptProfilingEnabled(QWebFrame*, bool enabled);

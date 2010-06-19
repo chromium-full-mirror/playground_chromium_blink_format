@@ -333,18 +333,6 @@ void DumpRenderTreeSupportQt::resumeActiveDOMObjects(QWebFrame* frame) {
     coreFrame->document()->resumeActiveDOMObjects();
 }
 
-void DumpRenderTreeSupportQt::evaluateScriptInIsolatedWorld(
-    QWebFrame* frame,
-    int worldId,
-    const QString& script) {
-  Frame* coreFrame = QWebFramePrivate::core(frame);
-  if (coreFrame)
-    JSC::JSValue result =
-        coreFrame->script()
-            ->executeScriptInWorld(mainThreadNormalWorld(), script, true)
-            .jsValue();
-}
-
 void DumpRenderTreeSupportQt::whiteListAccessFromOrigin(
     const QString& sourceOrigin,
     const QString& destinationProtocol,
