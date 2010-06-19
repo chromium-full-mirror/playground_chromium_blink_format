@@ -30,7 +30,7 @@
 
 class QWebSelectData {
  public:
-  inline ~QWebSelectData() {}
+  virtual ~QWebSelectData() {}
 
   enum ItemType { Option, Group, Separator };
 
@@ -46,7 +46,7 @@ class QWebSelectData {
 class QWebSelectMethod : public QObject {
   Q_OBJECT
  public:
-  inline ~QWebSelectMethod() {}
+  virtual ~QWebSelectMethod() {}
 
   virtual void show(const QWebSelectData&) = 0;
   virtual void hide() = 0;
@@ -58,6 +58,8 @@ class QWebSelectMethod : public QObject {
 
 class QWebNotificationData {
  public:
+  virtual ~QWebNotificationData() {}
+
   virtual const QString title() const = 0;
   virtual const QString message() const = 0;
   virtual const QByteArray iconData() const = 0;

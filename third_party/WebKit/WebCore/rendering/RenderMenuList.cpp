@@ -325,8 +325,8 @@ void RenderMenuList::listBoxSelectItem(int listIndex,
                                        bool shift,
                                        bool fireOnChangeNow) {
   SelectElement* select = toSelectElement(static_cast<Element*>(node()));
-  select->listBoxSelectItem(select->listToOptionIndex(listIndex),
-                            allowMultiplySelections, shift, fireOnChangeNow);
+  select->listBoxSelectItem(listIndex, allowMultiplySelections, shift,
+                            fireOnChangeNow);
 }
 
 bool RenderMenuList::multiple() {

@@ -115,7 +115,7 @@ void HTMLSelectElement::listBoxSelectItem(int listIndex,
                                           bool shift,
                                           bool fireOnChangeNow) {
   if (!multiple())
-    setSelectedIndexByUser(listIndex, true, fireOnChangeNow);
+    setSelectedIndexByUser(listToOptionIndex(listIndex), true, fireOnChangeNow);
   else {
     updateSelectedState(m_data, this, listIndex, allowMultiplySelections,
                         shift);
