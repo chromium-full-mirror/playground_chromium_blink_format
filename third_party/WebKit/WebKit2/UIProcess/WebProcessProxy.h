@@ -41,6 +41,7 @@ class String;
 
 namespace WebKit {
 
+class WebContext;
 class WebPageNamespace;
 
 class WebProcessProxy : public RefCounted<WebProcessProxy>,
@@ -50,9 +51,7 @@ class WebProcessProxy : public RefCounted<WebProcessProxy>,
   typedef HashMap<uint64_t, RefPtr<WebPageProxy>> WebPageProxyMap;
   typedef WebPageProxyMap::const_iterator::Values pages_const_iterator;
 
-  static PassRefPtr<WebProcessProxy> create(
-      ProcessModel,
-      const WebCore::String& injectedBundlePath);
+  static PassRefPtr<WebProcessProxy> create(WebContext*);
   ~WebProcessProxy();
 
   void terminate();
@@ -72,15 +71,12 @@ class WebProcessProxy : public RefCounted<WebProcessProxy>,
 
   bool isValid() const { return m_connection; }
 
-  ProcessModel processModel() const { return m_processModel; }
-
   PlatformProcessIdentifier processIdentifier() const {
     return m_platformProcessIdentifier;
   }
 
  private:
-  explicit WebProcessProxy(ProcessModel,
-                           const WebCore::String& injectedBundlePath);
+  explicit WebProcessProxy(WebContext*);
 
   void connect();
 
@@ -102,7 +98,7 @@ class WebProcessProxy : public RefCounted<WebProcessProxy>,
   RefPtr<CoreIPC::Connection> m_connection;
   PlatformProcessIdentifier m_platformProcessIdentifier;
 
-  ProcessModel m_processModel;
+  WebContext* m_context;
 
   // NOTE: This map is for pages in all WebPageNamespaces that use this process.
   WebPageProxyMap m_pageMap;
