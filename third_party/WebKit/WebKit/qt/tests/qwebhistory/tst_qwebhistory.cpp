@@ -76,7 +76,8 @@ tst_QWebHistory::~tst_QWebHistory() {}
 void tst_QWebHistory::init() {
   page = new QWebPage(this);
   frame = page->mainFrame();
-  connect(page, SIGNAL(loadFinished(bool)), &waitForLoadFinished, SLOT(quit()));
+  connect(page, SIGNAL(loadFinished(bool)), &waitForLoadFinished, SLOT(quit()),
+          Qt::QueuedConnection);
 
   for (int i = 1; i < 6; i++) {
     loadPage(i);
@@ -115,6 +116,7 @@ void tst_QWebHistory::back() {
   }
   // try one more time (too many). crash test
   hist->back();
+  QCOMPARE(page->mainFrame()->toPlainText(), QString("page1"));
 }
 
 /**
@@ -135,6 +137,8 @@ void tst_QWebHistory::forward() {
   }
   // try one more time (too many). crash test
   hist->forward();
+  QCOMPARE(page->mainFrame()->toPlainText(),
+           QString("page") + QString::number(histsize));
 }
 
 /**
