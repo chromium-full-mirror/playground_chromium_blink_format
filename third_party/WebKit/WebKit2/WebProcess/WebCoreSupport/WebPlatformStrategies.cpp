@@ -25,6 +25,8 @@
 
 #include "WebPlatformStrategies.h"
 
+#if USE(PLATFORM_STRATEGIES)
+
 using namespace WebCore;
 
 namespace WebKit {
@@ -52,3 +54,5 @@ void WebPlatformStrategies::getPluginInfo(
 }
 
 }  // namespace WebKit
+
+#endif  // USE(PLATFORM_STRATEGIES)

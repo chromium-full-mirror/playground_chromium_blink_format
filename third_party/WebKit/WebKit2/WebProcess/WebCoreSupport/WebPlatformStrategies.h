@@ -26,6 +26,8 @@
 #ifndef WebPlatformStrategies_h
 #define WebPlatformStrategies_h
 
+#if USE(PLATFORM_STRATEGIES)
+
 #include <WebCore/PlatformStrategies.h>
 #include <WebCore/PluginStrategy.h>
 
@@ -48,5 +50,7 @@ class WebPlatformStrategies : public WebCore::PlatformStrategies,
 };
 
 }  // namespace WebKit
+
+#endif  // USE(PLATFORM_STRATEGIES)
 
 #endif  // WebPlatformStrategies_h
