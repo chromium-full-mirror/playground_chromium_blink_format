@@ -58,6 +58,7 @@ class DocumentLoader;
 class Event;
 class FormData;
 class FormState;
+class FormSubmission;
 class Frame;
 class FrameLoaderClient;
 class HistoryItem;
@@ -270,15 +271,7 @@ class FrameLoader : public Noncopyable {
                     bool lockHistory = true,
                     bool lockBackForwardList = true);
 
-  void submitForm(const char* action,
-                  const String& url,
-                  PassRefPtr<FormData>,
-                  const String& target,
-                  const String& contentType,
-                  const String& boundary,
-                  bool lockHistory,
-                  PassRefPtr<Event>,
-                  PassRefPtr<FormState>);
+  void submitForm(PassRefPtr<FormSubmission>);
 
   void stop();
   void stopLoading(UnloadEventPolicy, DatabasePolicy = DatabasePolicyStop);
