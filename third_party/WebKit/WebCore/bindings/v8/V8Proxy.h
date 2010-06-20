@@ -53,6 +53,7 @@
 
 namespace WebCore {
 
+class CachedScript;
 class DOMWindow;
 class Frame;
 class Node;
@@ -301,7 +302,8 @@ class V8Proxy {
 
   static v8::Handle<v8::Script> compileScript(v8::Handle<v8::String> code,
                                               const String& fileName,
-                                              int baseLine);
+                                              int baseLine,
+                                              v8::ScriptData* = 0);
 
   // If the exception code is different from zero, a DOM exception is
   // schedule to be thrown.
@@ -360,6 +362,9 @@ class V8Proxy {
   void releaseStorageMutex();
 
   void resetIsolatedWorlds();
+
+  PassOwnPtr<v8::ScriptData> precompileScript(v8::Handle<v8::String>,
+                                              CachedScript*);
 
   // Returns false when we're out of memory in V8.
   bool setInjectedScriptContextDebugId(v8::Handle<v8::Context> targetContext);
