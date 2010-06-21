@@ -35,7 +35,7 @@ class String;
 namespace WebKit {
 
 class WebFrameProxy;
-class WebNavigationDataStore;
+struct WebNavigationDataStore;
 class WebPageProxy;
 
 class WebHistoryClient {
