@@ -105,7 +105,7 @@ void WebMediaPlayerProxy::initEngine() {
     }
   }
   serviceType = "application/x-mplayer2";
-  frame->loader()->requestObject(
+  frame->loader()->subframeLoader()->requestObject(
       static_cast<RenderPartObject*>(element->renderer()), url, nullAtom,
       serviceType, paramNames, paramValues);
   m_init = true;

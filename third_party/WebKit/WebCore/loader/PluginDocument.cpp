@@ -118,7 +118,8 @@ bool PluginDocumentParser::writeRawData(const char*, int) {
   if (Frame* frame = m_doc->frame()) {
     Settings* settings = frame->settings();
     if (settings &&
-        frame->loader()->allowPlugins(NotAboutToInstantiatePlugin)) {
+        frame->loader()->subframeLoader()->allowPlugins(
+            NotAboutToInstantiatePlugin)) {
       m_doc->updateLayout();
 
       if (RenderWidget* renderer = toRenderWidget(m_embedElement->renderer())) {

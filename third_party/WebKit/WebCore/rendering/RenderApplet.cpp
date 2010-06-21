@@ -75,7 +75,7 @@ void RenderApplet::createWidgetIfNecessary() {
 
   Frame* frame = this->frame();
   ASSERT(frame);
-  setWidget(frame->loader()->createJavaAppletWidget(
+  setWidget(frame->loader()->subframeLoader()->createJavaAppletWidget(
       IntSize(contentWidth, contentHeight), element, m_args));
 }
 

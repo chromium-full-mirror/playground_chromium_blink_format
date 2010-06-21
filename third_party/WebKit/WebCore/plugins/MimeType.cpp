@@ -58,7 +58,8 @@ const String& MimeType::description() const {
 PassRefPtr<Plugin> MimeType::enabledPlugin() const {
   const Page* p = m_pluginData->page();
   if (!p ||
-      !p->mainFrame()->loader()->allowPlugins(NotAboutToInstantiatePlugin))
+      !p->mainFrame()->loader()->subframeLoader()->allowPlugins(
+          NotAboutToInstantiatePlugin))
     return 0;
 
   return Plugin::create(m_pluginData.get(),

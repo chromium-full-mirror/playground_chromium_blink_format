@@ -107,7 +107,7 @@ static bool logCanCacheFrameDecision(Frame* frame, int indentLevel) {
       PCLOG("   -Main document has an error");
       cannotCache = true;
     }
-    if (frame->loader()->containsPlugins()) {
+    if (frame->loader()->subframeLoader()->containsPlugins()) {
       PCLOG("   -Frame contains plugins");
       cannotCache = true;
     }
@@ -265,7 +265,7 @@ bool PageCache::canCachePageContainingThisFrame(Frame* frame) {
          // way that we can recreate
          // the right NPObjects. See <rdar://problem/5197041> for more
          // information.
-         && !frame->loader()->containsPlugins() &&
+         && !frame->loader()->subframeLoader()->containsPlugins() &&
          !frame->loader()->url().protocolIs("https") &&
          (!frame->domWindow() ||
           !frame->domWindow()->hasEventListeners(eventNames().unloadEvent))
