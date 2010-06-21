@@ -211,7 +211,7 @@ using WTF::fastMallocAllow;
 #endif
 
 #if !defined(_CRTDBG_MAP_ALLOC) && \
-    !(defined(USE_SYSTEM_MALLOC) && USE_SYSTEM_MALLOC)
+    !(defined(USE_SYSTEM_MALLOC) && USE_SYSTEM_MALLOC && !PLATFORM(BREWMP))
 
 // The nothrow functions here are actually not all that helpful, because
 // fastMalloc will
