@@ -80,7 +80,8 @@ TestShell::TestShell(bool testShellMode)
     : m_testIsPending(false),
       m_testIsPreparing(false),
       m_focusedWidget(0),
-      m_testShellMode(testShellMode) {
+      m_testShellMode(testShellMode),
+      m_allowExternalPages(false) {
   WebRuntimeFeatures::enableGeolocation(true);
   m_accessibilityController.set(new AccessibilityController(this));
   m_layoutTestController.set(new LayoutTestController(this));

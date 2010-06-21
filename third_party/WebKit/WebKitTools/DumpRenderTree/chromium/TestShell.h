@@ -116,6 +116,11 @@ class TestShell {
   // the test results.
   void testTimedOut();
 
+  bool allowExternalPages() const { return m_allowExternalPages; }
+  void setAllowExternalPages(bool allowExternalPages) {
+    m_allowExternalPages = allowExternalPages;
+  }
+
 #if defined(OS_WIN)
   // Access to the finished event.  Used by the static WatchDog thread.
   HANDLE finishedEvent() { return m_finishedEvent; }
@@ -158,6 +163,7 @@ class TestShell {
   OwnPtr<TestEventPrinter> m_printer;
   TestParams m_params;
   int m_timeout;  // timeout value in millisecond
+  bool m_allowExternalPages;
 
   // List of all windows in this process.
   // The main window should be put into windowList[0].
