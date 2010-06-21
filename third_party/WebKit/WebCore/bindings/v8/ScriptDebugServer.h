@@ -100,6 +100,7 @@ class ScriptDebugServer : public Noncopyable {
 
   PassRefPtr<JavaScriptCallFrame> currentCallFrame();
 
+  void setEnabled(bool);
   bool isDebuggerAlwaysEnabled();
 
  private:
@@ -126,6 +127,7 @@ class ScriptDebugServer : public Noncopyable {
   OwnHandle<v8::Object> m_executionState;
   OwnPtr<ClientMessageLoop> m_clientMessageLoop;
   Page* m_pausedPage;
+  bool m_enabled;
 };
 
 }  // namespace WebCore
