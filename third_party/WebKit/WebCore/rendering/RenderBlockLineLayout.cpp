@@ -25,6 +25,7 @@
 
 #include "BidiResolver.h"
 #include "CharacterNames.h"
+#include "Hyphenation.h"
 #include "InlineIterator.h"
 #include "InlineTextBox.h"
 #include "Logging.h"
@@ -331,6 +332,8 @@ RootInlineBox* RenderBlock::constructLine(unsigned runCount,
       text->setStart(r->m_start);
       text->setLen(r->m_stop - r->m_start);
       text->m_dirOverride = r->dirOverride(visuallyOrdered);
+      if (r->m_hasHyphen)
+        text->setHasHyphen(true);
     }
   }
 
@@ -394,6 +397,15 @@ void RenderBlock::computeHorizontalPositionsForLine(
       GlyphOverflow glyphOverflow;
       r->m_box->setWidth(rt->width(r->m_start, r->m_stop - r->m_start, totWidth,
                                    firstLine, &fallbackFonts, &glyphOverflow));
+      int hyphenWidth = 0;
+      if (static_cast<InlineTextBox*>(r->m_box)->hasHyphen()) {
+        const AtomicString& hyphenString = rt->style()->hyphenString();
+        hyphenWidth = rt->style(firstLine)->font().width(
+            TextRun(hyphenString.characters(), hyphenString.length()));
+      }
+      r->m_box->setWidth(rt->width(r->m_start, r->m_stop - r->m_start, totWidth,
+                                   firstLine, &fallbackFonts, &glyphOverflow) +
+                         hyphenWidth);
       if (!fallbackFonts.isEmpty()) {
         ASSERT(r->m_box->isText());
         GlyphOverflowAndFallbackFontsMap::iterator it =
@@ -767,8 +779,9 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
       isLineEmpty = true;
 
       EClear clear = CNONE;
+      bool hyphenated;
       end = findNextLineBreak(resolver, firstLine, isLineEmpty,
-                              previousLineBrokeCleanly, &clear);
+                              previousLineBrokeCleanly, hyphenated, &clear);
       if (resolver.position().atEnd()) {
         resolver.deleteRuns();
         checkForFloatsFromLastLine = true;
@@ -842,6 +855,8 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren,
 
         RootInlineBox* lineBox = 0;
         if (resolver.runCount()) {
+          if (hyphenated)
+            resolver.logicallyLastRun()->m_hasHyphen = true;
           lineBox = constructLine(resolver.runCount(), resolver.firstRun(),
                                   resolver.lastRun(), firstLine, !end.obj,
                                   end.obj && !end.pos ? end.obj : 0);
@@ -1544,10 +1559,53 @@ static inline unsigned textWidth(RenderText* text,
       TextRun(text->characters() + from, len, !collapseWhiteSpace, xPos));
 }
 
+static void tryHyphenating(RenderText* text,
+                           const Font& font,
+                           int lastSpace,
+                           int pos,
+                           int xPos,
+                           int availableWidth,
+                           bool isFixedPitch,
+                           bool collapseWhiteSpace,
+                           int lastSpaceWordSpacing,
+                           InlineIterator& lineBreak,
+                           int nextBreakable,
+                           bool& hyphenated) {
+  const AtomicString& hyphenString = text->style()->hyphenString();
+  int hyphenWidth =
+      font.width(TextRun(hyphenString.characters(), hyphenString.length()));
+
+  unsigned prefixLength = font.offsetForPosition(
+      TextRun(text->characters() + lastSpace, pos - lastSpace,
+              !collapseWhiteSpace, xPos + lastSpaceWordSpacing),
+      availableWidth - xPos - hyphenWidth - lastSpaceWordSpacing, false);
+  if (!prefixLength)
+    return;
+
+  prefixLength = 1 + lastHyphenLocation(text->characters() + lastSpace + 1,
+                                        pos - lastSpace - 1, prefixLength - 1);
+  if (prefixLength <= 1)
+    return;
+
+#if !ASSERT_DISABLED
+  int prefixWidth = hyphenWidth +
+                    textWidth(text, lastSpace, prefixLength, font, xPos,
+                              isFixedPitch, collapseWhiteSpace) +
+                    lastSpaceWordSpacing;
+  ASSERT(xPos + prefixWidth <= availableWidth);
+#endif
+
+  lineBreak.obj = text;
+  lineBreak.pos = lastSpace + prefixLength;
+  lineBreak.nextBreakablePosition = nextBreakable;
+  hyphenated = true;
+}
+
 InlineIterator RenderBlock::findNextLineBreak(InlineBidiResolver& resolver,
                                               bool firstLine,
                                               bool& isLineEmpty,
                                               bool& previousLineBrokeCleanly,
+                                              bool& hyphenated,
                                               EClear* clear) {
   ASSERT(resolver.position().block == this);
 
@@ -1588,6 +1646,8 @@ InlineIterator RenderBlock::findNextLineBreak(InlineBidiResolver& resolver,
 
   bool prevLineBrokeCleanly = previousLineBrokeCleanly;
   previousLineBrokeCleanly = false;
+
+  hyphenated = false;
 
   bool autoWrapWasEverTrueOnLine = false;
   bool floatsFitOnLine = true;
@@ -1786,8 +1846,10 @@ InlineIterator RenderBlock::findNextLineBreak(InlineBidiResolver& resolver,
       int len = strlen - pos;
       const UChar* str = t->characters();
 
-      const Font& f = t->style(firstLine)->font();
+      RenderStyle* style = t->style(firstLine);
+      const Font& f = style->font();
       bool isFixedPitch = f.isFixedPitch();
+      bool canHyphenate = style->hyphens() == HyphensAuto;
 
       int lastSpace = pos;
       int wordSpacing = o->style()->wordSpacing();
@@ -1873,6 +1935,12 @@ InlineIterator RenderBlock::findNextLineBreak(InlineBidiResolver& resolver,
           lastSpaceWordSpacing = 0;
           lastSpace =
               pos;  // Cheesy hack to prevent adding in widths of the run twice.
+          if (style->hyphens() == HyphensNone) {
+            // Prevent a line break at the soft hyphen by ensuring that
+            // betweenWords is false
+            // in the next iteration.
+            atStart = true;
+          }
           continue;
         }
 
@@ -1959,6 +2027,14 @@ InlineIterator RenderBlock::findNextLineBreak(InlineBidiResolver& resolver,
                 skipTrailingWhitespace(lBreak, isLineEmpty,
                                        previousLineBrokeCleanly);
               }
+            }
+            if (canHyphenate && w + tmpW > width) {
+              tryHyphenating(t, f, lastSpace, pos, w + tmpW - additionalTmpW,
+                             width, isFixedPitch, collapseWhiteSpace,
+                             lastSpaceWordSpacing, lBreak, nextBreakable,
+                             hyphenated);
+              if (hyphenated)
+                goto end;
             }
             if (lineWasTooWide || w + tmpW > width) {
               if (lBreak.obj && shouldPreserveNewline(lBreak.obj) &&
@@ -2080,11 +2156,21 @@ InlineIterator RenderBlock::findNextLineBreak(InlineBidiResolver& resolver,
       }
 
       // IMPORTANT: pos is > length here!
-      if (!ignoringSpaces)
-        tmpW += textWidth(t, lastSpace, pos - lastSpace, f, w + tmpW,
-                          isFixedPitch, collapseWhiteSpace) +
-                lastSpaceWordSpacing;
+      int additionalTmpW =
+          ignoringSpaces ? 0
+                         : textWidth(t, lastSpace, pos - lastSpace, f, w + tmpW,
+                                     isFixedPitch, collapseWhiteSpace) +
+                               lastSpaceWordSpacing;
+      tmpW += additionalTmpW;
       tmpW += inlineWidth(o, !appliedStartWidth, true);
+
+      if (canHyphenate && w + tmpW > width) {
+        tryHyphenating(t, f, lastSpace, pos, w + tmpW - additionalTmpW, width,
+                       isFixedPitch, collapseWhiteSpace, lastSpaceWordSpacing,
+                       lBreak, nextBreakable, hyphenated);
+        if (hyphenated)
+          goto end;
+      }
     } else
       ASSERT_NOT_REACHED();
 

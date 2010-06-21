@@ -54,7 +54,7 @@ class InlineBox {
         ,
         m_endsWithBreak(false),
         m_hasSelectedChildren(false),
-        m_hasEllipsisBox(false),
+        m_hasEllipsisBoxOrHyphen(false),
         m_dirOverride(false),
         m_isText(false),
         m_determinedIfNextOnLineExists(false),
@@ -99,7 +99,7 @@ class InlineBox {
         ,
         m_endsWithBreak(false),
         m_hasSelectedChildren(false),
-        m_hasEllipsisBox(false),
+        m_hasEllipsisBoxOrHyphen(false),
         m_dirOverride(false),
         m_isText(false),
         m_determinedIfNextOnLineExists(false),
@@ -320,7 +320,7 @@ class InlineBox {
   bool m_hasSelectedChildren : 1;  // Whether we have any children selected
                                    // (this bit will also be set if the <br>
                                    // that terminates our line is selected).
-  bool m_hasEllipsisBox : 1;
+  bool m_hasEllipsisBoxOrHyphen : 1;
 
   // for InlineTextBox
  public:

@@ -41,7 +41,8 @@ struct BidiRun : BidiCharacterRun {
           WTF::Unicode::Direction dir)
       : BidiCharacterRun(start, stop, context, dir),
         m_object(object),
-        m_box(0) {}
+        m_box(0),
+        m_hasHyphen(false) {}
 
   void destroy();
 
@@ -60,6 +61,7 @@ struct BidiRun : BidiCharacterRun {
  public:
   RenderObject* m_object;
   InlineBox* m_box;
+  bool m_hasHyphen;
 };
 }
 

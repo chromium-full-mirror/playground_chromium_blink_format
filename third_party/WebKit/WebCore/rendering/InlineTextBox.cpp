@@ -1,7 +1,8 @@
 /*
  * (C) 1999 Lars Knoll (knoll@kde.org)
  * (C) 2000 Dirk Mueller (mueller@kde.org)
- * Copyright (C) 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010 Apple Inc. All rights
+ * reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -104,6 +105,21 @@ RenderObject::SelectionState InlineTextBox::selectionState() {
   return state;
 }
 
+typedef Vector<UChar, 256> BufferForAppendingHyphen;
+
+static void adjustCharactersAndLengthForHyphen(
+    BufferForAppendingHyphen& charactersWithHyphen,
+    RenderStyle* style,
+    const UChar*& characters,
+    int& length) {
+  const AtomicString& hyphenString = style->hyphenString();
+  charactersWithHyphen.reserveCapacity(length + hyphenString.length());
+  charactersWithHyphen.append(characters, length);
+  charactersWithHyphen.append(hyphenString.characters(), hyphenString.length());
+  characters = charactersWithHyphen.data();
+  length += hyphenString.length();
+}
+
 IntRect InlineTextBox::selectionRect(int tx, int ty, int startPos, int endPos) {
   int sPos = max(startPos - m_start, 0);
   int ePos = min(endPos - m_start, (int)m_len);
@@ -114,12 +130,21 @@ IntRect InlineTextBox::selectionRect(int tx, int ty, int startPos, int endPos) {
   RenderText* textObj = textRenderer();
   int selTop = selectionTop();
   int selHeight = selectionHeight();
-  const Font& f = textObj->style(m_firstLine)->font();
+  RenderStyle* styleToUse = textObj->style(m_firstLine);
+  const Font& f = styleToUse->font();
+
+  const UChar* characters = textObj->text()->characters() + m_start;
+  int len = m_len;
+  BufferForAppendingHyphen charactersWithHyphen;
+  if (ePos == len && hasHyphen()) {
+    adjustCharactersAndLengthForHyphen(charactersWithHyphen, styleToUse,
+                                       characters, len);
+    ePos = len;
+  }
 
   IntRect r = enclosingIntRect(f.selectionRectForText(
-      TextRun(textObj->text()->characters() + m_start, m_len,
-              textObj->allowTabs(), textPos(), m_toAdd, direction() == RTL,
-              m_dirOverride),
+      TextRun(characters, len, textObj->allowTabs(), textPos(), m_toAdd,
+              direction() == RTL, m_dirOverride),
       IntPoint(tx + m_x, ty + selTop), selHeight, sPos, ePos));
   if (r.x() > tx + m_x + m_width)
     r.setWidth(0);
@@ -533,11 +558,17 @@ void InlineTextBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
     }
   }
 
+  const UChar* characters = textRenderer()->text()->characters() + m_start;
+  int length = m_len;
+  BufferForAppendingHyphen charactersWithHyphen;
+  if (hasHyphen())
+    adjustCharactersAndLengthForHyphen(charactersWithHyphen, styleToUse,
+                                       characters, length);
+
   int baseline = renderer()->style(m_firstLine)->font().ascent();
   IntPoint textOrigin(m_x + tx, m_y + ty + baseline);
-  TextRun textRun(textRenderer()->text()->characters() + m_start, m_len,
-                  textRenderer()->allowTabs(), textPos(), m_toAdd,
-                  direction() == RTL,
+  TextRun textRun(characters, length, textRenderer()->allowTabs(), textPos(),
+                  m_toAdd, direction() == RTL,
                   m_dirOverride || styleToUse->visuallyOrdered());
 
   int sPos = 0;
@@ -545,7 +576,6 @@ void InlineTextBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
   if (paintSelectedTextOnly || paintSelectedTextSeparately)
     selectionStartEnd(sPos, ePos);
 
-  int length = m_len;
   if (m_truncation != cNoTruncation) {
     sPos = min<int>(sPos, m_truncation);
     ePos = min<int>(ePos, m_truncation);
@@ -681,12 +711,20 @@ void InlineTextBox::paintSelection(GraphicsContext* context,
   // If the text is truncated, let the thing being painted in the truncation
   // draw its own highlight.
   int length = m_truncation != cNoTruncation ? m_truncation : m_len;
+  const UChar* characters = textRenderer()->text()->characters() + m_start;
+
+  BufferForAppendingHyphen charactersWithHyphen;
+  if (ePos == length && hasHyphen()) {
+    adjustCharactersAndLengthForHyphen(charactersWithHyphen, style, characters,
+                                       length);
+    ePos = length;
+  }
+
   context->clip(IntRect(m_x + tx, y + ty, m_width, h));
   context->drawHighlightForText(
-      font,
-      TextRun(textRenderer()->text()->characters() + m_start, length,
-              textRenderer()->allowTabs(), textPos(), m_toAdd,
-              direction() == RTL, m_dirOverride || style->visuallyOrdered()),
+      font, TextRun(characters, length, textRenderer()->allowTabs(), textPos(),
+                    m_toAdd, direction() == RTL,
+                    m_dirOverride || style->visuallyOrdered()),
       IntPoint(m_x + tx, y + ty), h, c, style->colorSpace(), sPos, ePos);
   context->restore();
 }

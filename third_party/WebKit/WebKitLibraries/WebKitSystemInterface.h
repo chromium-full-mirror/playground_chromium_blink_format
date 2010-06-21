@@ -369,6 +369,8 @@ NSMutableArray* WKNoteOpenPanelFiles(NSArray* paths);
 void WKSyncSurfaceToView(NSView* view);
 #endif
 
+CFIndex WKGetHyphenationLocationBeforeIndex(CFStringRef string, CFIndex index);
+
 #ifdef __cplusplus
 }
 #endif

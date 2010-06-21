@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 1999 Antti Koivisto (koivisto@kde.org)
- * Copyright (C) 2004, 2005, 2006, 2007, 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010 Apple Inc. All rights
+ * reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -43,7 +44,8 @@ StyleRareInheritedData::StyleRareInheritedData()
       textSizeAdjust(RenderStyle::initialTextSizeAdjust()),
       resize(RenderStyle::initialResize()),
       userSelect(RenderStyle::initialUserSelect()),
-      colorSpace(DeviceColorSpace) {}
+      colorSpace(DeviceColorSpace),
+      hyphens(HyphensManual) {}
 
 StyleRareInheritedData::StyleRareInheritedData(const StyleRareInheritedData& o)
     : RefCounted<StyleRareInheritedData>(),
@@ -66,7 +68,9 @@ StyleRareInheritedData::StyleRareInheritedData(const StyleRareInheritedData& o)
       textSizeAdjust(o.textSizeAdjust),
       resize(o.resize),
       userSelect(o.userSelect),
-      colorSpace(o.colorSpace) {}
+      colorSpace(o.colorSpace),
+      hyphens(o.hyphens),
+      hyphenateCharacter(o.hyphenateCharacter) {}
 
 StyleRareInheritedData::~StyleRareInheritedData() {
   delete textShadow;
@@ -92,7 +96,8 @@ bool StyleRareInheritedData::operator==(const StyleRareInheritedData& o) const {
          wordBreak == o.wordBreak && wordWrap == o.wordWrap &&
          nbspMode == o.nbspMode && khtmlLineBreak == o.khtmlLineBreak &&
          textSizeAdjust == o.textSizeAdjust && resize == o.resize &&
-         userSelect == o.userSelect && colorSpace == o.colorSpace;
+         userSelect == o.userSelect && colorSpace == o.colorSpace &&
+         hyphens == o.hyphens && hyphenateCharacter == o.hyphenateCharacter;
 }
 
 bool StyleRareInheritedData::shadowDataEquivalent(

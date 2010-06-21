@@ -84,6 +84,9 @@ class StyleRareInheritedData : public RefCounted<StyleRareInheritedData> {
   unsigned resize : 2;          // EResize
   unsigned userSelect : 1;      // EUserSelect
   unsigned colorSpace : 1;      // ColorSpace
+  unsigned hyphens : 2;         // Hyphens
+
+  AtomicString hyphenateCharacter;
 
  private:
   StyleRareInheritedData();

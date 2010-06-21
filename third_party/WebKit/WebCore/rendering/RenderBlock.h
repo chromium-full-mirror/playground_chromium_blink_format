@@ -440,7 +440,8 @@ class RenderBlock : public RenderBox {
                                    bool firstLine,
                                    bool& isLineEmpty,
                                    bool& previousLineBrokeCleanly,
-                                   EClear* clear = 0);
+                                   bool& hyphenated,
+                                   EClear* = 0);
   RootInlineBox* constructLine(unsigned runCount,
                                BidiRun* firstRun,
                                BidiRun* lastRun,

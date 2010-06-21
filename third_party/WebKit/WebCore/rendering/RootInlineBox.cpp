@@ -45,11 +45,11 @@ void RootInlineBox::destroy(RenderArena* arena) {
 }
 
 void RootInlineBox::detachEllipsisBox(RenderArena* arena) {
-  if (m_hasEllipsisBox) {
+  if (hasEllipsisBox()) {
     EllipsisBox* box = gEllipsisBoxMap->take(this);
     box->setParent(0);
     box->destroy(arena);
-    m_hasEllipsisBox = false;
+    setHasEllipsisBox(false);
   }
 }
 
@@ -58,7 +58,7 @@ RenderLineBoxList* RootInlineBox::rendererLineBoxes() const {
 }
 
 void RootInlineBox::clearTruncation() {
-  if (m_hasEllipsisBox) {
+  if (hasEllipsisBox()) {
     detachEllipsisBox(renderer()->renderArena());
     InlineFlowBox::clearTruncation();
   }
@@ -95,7 +95,7 @@ void RootInlineBox::placeEllipsis(const AtomicString& ellipsisStr,
   if (!gEllipsisBoxMap)
     gEllipsisBoxMap = new EllipsisBoxMap();
   gEllipsisBoxMap->add(this, ellipsisBox);
-  m_hasEllipsisBox = true;
+  setHasEllipsisBox(true);
 
   // FIXME: Do we need an RTL version of this?
   if (ltr && (x() + width() + ellipsisWidth) <= blockRightEdge) {
@@ -128,7 +128,7 @@ int RootInlineBox::placeEllipsisBox(bool ltr,
 void RootInlineBox::paintEllipsisBox(RenderObject::PaintInfo& paintInfo,
                                      int tx,
                                      int ty) const {
-  if (m_hasEllipsisBox && renderer()->shouldPaintWithinRoot(paintInfo) &&
+  if (hasEllipsisBox() && renderer()->shouldPaintWithinRoot(paintInfo) &&
       renderer()->style()->visibility() == VISIBLE &&
       paintInfo.phase == PaintPhaseForeground)
     ellipsisBox()->paint(paintInfo, tx, ty);
@@ -203,7 +203,7 @@ bool RootInlineBox::nodeAtPoint(const HitTestRequest& request,
                                 int y,
                                 int tx,
                                 int ty) {
-  if (m_hasEllipsisBox && visibleToHitTesting()) {
+  if (hasEllipsisBox() && visibleToHitTesting()) {
     if (ellipsisBox()->nodeAtPoint(request, result, x, y, tx, ty)) {
       renderer()->updateHitTestResult(result, IntPoint(x - tx, y - ty));
       return true;
@@ -469,7 +469,7 @@ void RootInlineBox::setLineBreakInfo(RenderObject* obj,
 }
 
 EllipsisBox* RootInlineBox::ellipsisBox() const {
-  if (!m_hasEllipsisBox)
+  if (!hasEllipsisBox())
     return 0;
   return gEllipsisBoxMap->get(this);
 }
