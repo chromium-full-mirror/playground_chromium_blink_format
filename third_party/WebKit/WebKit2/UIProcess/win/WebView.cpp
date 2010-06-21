@@ -25,7 +25,7 @@
 
 #include "WebView.h"
 
-#include "DrawingAreaProxyUpdateChunk.h"
+#include "ChunkedUpdateDrawingArea.h"
 #include "RunLoop.h"
 #include "WebEventFactory.h"
 #include "WebPageNamespace.h"
@@ -182,7 +182,7 @@ WebView::WebView(RECT rect, WebPageNamespace* pageNamespace, HWND hostWindow)
   m_page = pageNamespace->createWebPage();
   m_page->setPageClient(this);
   m_page->initializeWebPage(IntRect(rect).size(),
-                            new DrawingAreaProxyUpdateChunk(this));
+                            new ChunkedUpdateDrawingArea(this));
 
   m_window = ::CreateWindowEx(
       0, kWebKit2WebViewWindowClassName, 0,
