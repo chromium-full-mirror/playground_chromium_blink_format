@@ -80,6 +80,8 @@ class WebProcessProxy : public RefCounted<WebProcessProxy>,
 
   void connect();
 
+  void forwardMessageToWebContext(const WebCore::String&);
+
   // CoreIPC::Connection::Client
   void didReceiveMessage(CoreIPC::Connection*,
                          CoreIPC::MessageID,

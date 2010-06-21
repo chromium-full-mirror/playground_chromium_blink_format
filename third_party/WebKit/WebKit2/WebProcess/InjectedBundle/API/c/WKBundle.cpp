@@ -25,12 +25,17 @@
 
 #include "WKBundle.h"
 
-#include "WKBundleAPICast.h"
 #include "InjectedBundle.h"
+#include "WKAPICast.h"
+#include "WKBundleAPICast.h"
 
 using namespace WebKit;
 
 void WKBundleSetClient(WKBundleRef bundleRef, WKBundleClient* wkClient) {
   if (wkClient && !wkClient->version)
     toWK(bundleRef)->initializeClient(wkClient);
+}
+
+void WKBundlePostMessage(WKBundleRef bundleRef, WKStringRef messageRef) {
+  toWK(bundleRef)->postMessage(toWK(messageRef));
 }

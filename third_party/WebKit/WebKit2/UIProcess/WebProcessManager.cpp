@@ -77,6 +77,7 @@ void WebProcessManager::processDidClose(WebProcessProxy* process,
   if (it != m_processMap.end()) {
     ASSERT(it->second == process);
     m_processMap.remove(it);
+    return;
   }
 
   // The shared thread connection should never be closed.

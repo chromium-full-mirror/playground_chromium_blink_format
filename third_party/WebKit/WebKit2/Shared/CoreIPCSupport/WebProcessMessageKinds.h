@@ -32,7 +32,7 @@
 
 namespace WebProcessMessage {
 
-enum Kind { LoadInjectedBundle, Create };
+enum Kind { LoadInjectedBundle, Create, PostMessage };
 }
 
 namespace CoreIPC {

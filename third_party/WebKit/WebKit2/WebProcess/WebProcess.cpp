@@ -67,7 +67,7 @@ void WebProcess::initialize(CoreIPC::Connection::Identifier serverIdentifier,
   m_runLoop = runLoop;
 }
 
-void WebProcess::loadInjectedBundle(const WebCore::String& path) {
+void WebProcess::loadInjectedBundle(const String& path) {
   ASSERT(m_pageMap.isEmpty());
   ASSERT(!path.isEmpty());
 
@@ -76,6 +76,13 @@ void WebProcess::loadInjectedBundle(const WebCore::String& path) {
     // Don't keep around the InjectedBundle reference if the load fails.
     m_injectedBundle.clear();
   }
+}
+
+void WebProcess::forwardMessageToInjectedBundle(const String& message) {
+  if (!m_injectedBundle)
+    return;
+
+  m_injectedBundle->didRecieveMessage(message);
 }
 
 WebPage* WebProcess::webPage(uint64_t pageID) const {
@@ -139,7 +146,7 @@ void WebProcess::didReceiveMessage(CoreIPC::Connection* connection,
   if (messageID.is<CoreIPC::MessageClassWebProcess>()) {
     switch (messageID.get<WebProcessMessage::Kind>()) {
       case WebProcessMessage::LoadInjectedBundle: {
-        WebCore::String path;
+        String path;
         if (!arguments->decode(CoreIPC::Out(path)))
           return;
 
@@ -156,6 +163,14 @@ void WebProcess::didReceiveMessage(CoreIPC::Connection* connection,
 
         createWebPage(pageID, viewSize, store,
                       static_cast<DrawingArea::Type>(drawingAreaType));
+        return;
+      }
+      case WebProcessMessage::PostMessage: {
+        String message;
+        if (!arguments->decode(CoreIPC::Out(message)))
+          return;
+
+        forwardMessageToInjectedBundle(message);
         return;
       }
     }
