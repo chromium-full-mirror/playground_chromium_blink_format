@@ -38,6 +38,7 @@
 #include "Frame.h"
 #include "FrameLoader.h"
 #include "FrameLoaderClient.h"
+#include "FrameLoaderStateMachine.h"
 #include "FrameTree.h"
 #include "FrameView.h"
 #include "HistoryItem.h"
@@ -84,7 +85,7 @@ void HistoryController::saveScrollPositionAndViewStateToItem(
  fails.  We then successfully restore it when the layout happens.
 */
 void HistoryController::restoreScrollPositionAndViewState() {
-  if (!m_frame->loader()->committedFirstRealDocumentLoad())
+  if (!m_frame->loader()->stateMachine()->committedFirstRealDocumentLoad())
     return;
 
   ASSERT(m_currentItem);
@@ -118,7 +119,7 @@ void HistoryController::saveDocumentState() {
   // FIXME: Reading this bit of FrameLoader state here is unfortunate.  I need
   // to study
   // this more to see if we can remove this dependency.
-  if (m_frame->loader()->creatingInitialEmptyDocument())
+  if (m_frame->loader()->stateMachine()->creatingInitialEmptyDocument())
     return;
 
   // For a standard page load, we will have a previous item set, which will be

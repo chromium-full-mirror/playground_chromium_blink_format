@@ -34,6 +34,7 @@
 
 #include "CachePolicy.h"
 #include "DocumentWriter.h"
+#include "FrameLoaderStateMachine.h"
 #include "FrameLoaderTypes.h"
 #include "HistoryController.h"
 #include "PolicyCallback.h"
@@ -232,7 +233,6 @@ class FrameLoader : public Noncopyable {
   CachePolicy subresourceCachePolicy() const;
 
   void didFirstLayout();
-  bool firstLayoutDone() const;
 
   void didFirstVisuallyNonEmptyLayout();
 
@@ -363,15 +363,7 @@ class FrameLoader : public Noncopyable {
   void commitProvisionalLoad();
   bool isLoadingFromCachedPage() const { return m_loadingFromCachedPage; }
 
-  bool committingFirstRealLoad() const {
-    return !m_creatingInitialEmptyDocument && !m_committedFirstRealDocumentLoad;
-  }
-  bool committedFirstRealDocumentLoad() const {
-    return m_committedFirstRealDocumentLoad;
-  }
-  bool creatingInitialEmptyDocument() const {
-    return m_creatingInitialEmptyDocument;
-  }
+  FrameLoaderStateMachine* stateMachine() const { return &m_stateMachine; }
 
   void iconLoadDecisionAvailable();
 
@@ -418,10 +410,6 @@ class FrameLoader : public Noncopyable {
 
   static ObjectContentType defaultObjectContentType(const KURL& url,
                                                     const String& mimeType);
-
-  bool isDisplayingInitialEmptyDocument() const {
-    return m_isDisplayingInitialEmptyDocument;
-  }
 
   void clear(bool clearWindowProperties = true,
              bool clearScriptObjects = true,
@@ -610,6 +598,7 @@ class FrameLoader : public Noncopyable {
   mutable HistoryController m_history;
   mutable ResourceLoadNotifier m_notifer;
   mutable DocumentWriter m_writer;
+  mutable FrameLoaderStateMachine m_stateMachine;
 
   FrameState m_state;
   FrameLoadType m_loadType;
@@ -627,7 +616,6 @@ class FrameLoader : public Noncopyable {
 
   bool m_delegateIsHandlingProvisionalLoadError;
 
-  bool m_firstLayoutDone;
   bool m_quickRedirectComing;
   bool m_sentRedirectNotification;
   bool m_inStopAllLoaders;
@@ -650,10 +638,7 @@ class FrameLoader : public Noncopyable {
   OwnPtr<IconLoader> m_iconLoader;
   bool m_mayLoadIconLater;
 
-  bool m_cancellingWithLoadInProgress;
-
   bool m_needsClear;
-  bool m_receivedData;
 
   bool m_containsPlugIns;
 
@@ -665,10 +650,6 @@ class FrameLoader : public Noncopyable {
 
   Frame* m_opener;
   HashSet<Frame*> m_openedFrames;
-
-  bool m_creatingInitialEmptyDocument;
-  bool m_isDisplayingInitialEmptyDocument;
-  bool m_committedFirstRealDocumentLoad;
 
   bool m_didPerformFirstNavigation;
   bool m_loadingFromCachedPage;

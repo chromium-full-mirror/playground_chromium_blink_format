@@ -34,6 +34,7 @@
 #include "Frame.h"
 #include "FrameLoader.h"
 #include "FrameLoaderClient.h"
+#include "FrameLoaderStateMachine.h"
 #include "FrameView.h"
 #include "PlaceholderDocument.h"
 #include "PluginDocument.h"
@@ -75,7 +76,7 @@ void DocumentWriter::begin() {
 }
 
 PassRefPtr<Document> DocumentWriter::createDocument() {
-  if (!m_frame->loader()->isDisplayingInitialEmptyDocument() &&
+  if (!m_frame->loader()->stateMachine()->isDisplayingInitialEmptyDocument() &&
       m_frame->loader()->client()->shouldUsePluginDocument(m_mimeType))
     return PluginDocument::create(m_frame);
   if (!m_frame->loader()->client()->hasHTMLView())
@@ -104,7 +105,7 @@ void DocumentWriter::begin(const KURL& url,
     document = SinkDocument::create(m_frame);
 
   bool resetScripting =
-      !(m_frame->loader()->isDisplayingInitialEmptyDocument() &&
+      !(m_frame->loader()->stateMachine()->isDisplayingInitialEmptyDocument() &&
         m_frame->document()->securityOrigin()->isSecureTransitionTo(url));
   m_frame->loader()->clear(resetScripting, resetScripting);
   if (resetScripting)

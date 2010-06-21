@@ -41,6 +41,7 @@
 #include "Frame.h"
 #include "FrameLoadRequest.h"
 #include "FrameLoader.h"
+#include "FrameLoaderStateMachine.h"
 #include "HistoryItem.h"
 #include "HTMLFormElement.h"
 #include "HTMLFrameOwnerElement.h"
@@ -344,7 +345,7 @@ void RedirectScheduler::scheduleLocationChange(const String& url,
 
   // Handle a location change of a page with no document as a special case.
   // This may happen when a frame changes the location of another frame.
-  bool duringLoad = !loader->committedFirstRealDocumentLoad();
+  bool duringLoad = !loader->stateMachine()->committedFirstRealDocumentLoad();
 
   schedule(new ScheduledLocationChange(url, referrer, lockHistory,
                                        lockBackForwardList, wasUserGesture,
@@ -362,7 +363,8 @@ void RedirectScheduler::scheduleFormSubmission(
 
   // Handle a location change of a page with no document as a special case.
   // This may happen when a frame changes the location of another frame.
-  bool duringLoad = !m_frame->loader()->committedFirstRealDocumentLoad();
+  bool duringLoad =
+      !m_frame->loader()->stateMachine()->committedFirstRealDocumentLoad();
 
   // If this is a child frame and the form submission was triggered by a script,
   // lock the back/forward list
