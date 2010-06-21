@@ -347,7 +347,8 @@ class CodeBlock : public FastAllocBase {
 
   unsigned bytecodeOffset(CallFrame* callFrame,
                           ReturnAddressPtr returnAddress) {
-    reparseForExceptionInfoIfNecessary(callFrame);
+    if (!reparseForExceptionInfoIfNecessary(callFrame))
+      return 0;
     return binaryChop<CallReturnOffsetToBytecodeOffset, unsigned,
                       getCallReturnOffset>(
                callReturnIndexVector().begin(), callReturnIndexVector().size(),
@@ -656,7 +657,7 @@ class CodeBlock : public FastAllocBase {
                       const char* op) const;
 #endif
 
-  void reparseForExceptionInfoIfNecessary(CallFrame*);
+  bool reparseForExceptionInfoIfNecessary(CallFrame*) WARN_UNUSED_RETURN;
 
   void createRareDataIfNecessary() {
     if (!m_rareData)

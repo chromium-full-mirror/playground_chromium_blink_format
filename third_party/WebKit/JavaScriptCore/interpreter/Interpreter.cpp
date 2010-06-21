@@ -766,6 +766,10 @@ JSValue Interpreter::execute(ProgramExecutable* program,
   }
 
   CodeBlock* codeBlock = &program->bytecode(callFrame, scopeChain);
+  if (!codeBlock) {
+    *exception = createStackOverflowError(callFrame);
+    return jsNull();
+  }
 
   Register* oldEnd = m_registerFile.end();
   Register* newEnd = oldEnd + codeBlock->m_numParameters +
@@ -858,11 +862,15 @@ JSValue Interpreter::executeCall(CallFrame* callFrame,
 
   if (callType == CallTypeJS) {
     ScopeChainNode* callDataScopeChain = callData.js.scopeChain;
-    CodeBlock* newCodeBlock = &callData.js.functionExecutable->bytecodeForCall(
+    CodeBlock* newCodeBlock = callData.js.functionExecutable->bytecodeForCall(
         callFrame, callDataScopeChain);
 
-    newCallFrame = slideRegisterWindowForCall(
-        newCodeBlock, &m_registerFile, newCallFrame, registerOffset, argCount);
+    if (newCodeBlock)
+      newCallFrame =
+          slideRegisterWindowForCall(newCodeBlock, &m_registerFile,
+                                     newCallFrame, registerOffset, argCount);
+    else
+      newCallFrame = 0;
     if (UNLIKELY(!newCallFrame)) {
       *exception = createStackOverflowError(callFrame);
       m_registerFile.shrink(oldEnd);
@@ -961,11 +969,15 @@ JSObject* Interpreter::executeConstruct(CallFrame* callFrame,
   if (constructType == ConstructTypeJS) {
     ScopeChainNode* constructDataScopeChain = constructData.js.scopeChain;
     CodeBlock* newCodeBlock =
-        &constructData.js.functionExecutable->bytecodeForConstruct(
+        constructData.js.functionExecutable->bytecodeForConstruct(
             callFrame, constructDataScopeChain);
+    if (newCodeBlock)
+      newCallFrame =
+          slideRegisterWindowForCall(newCodeBlock, &m_registerFile,
+                                     newCallFrame, registerOffset, argCount);
+    else
+      newCallFrame = 0;
 
-    newCallFrame = slideRegisterWindowForCall(
-        newCodeBlock, &m_registerFile, newCallFrame, registerOffset, argCount);
     if (UNLIKELY(!newCallFrame)) {
       *exception = createStackOverflowError(callFrame);
       m_registerFile.shrink(oldEnd);
@@ -1068,10 +1080,13 @@ CallFrameClosure Interpreter::prepareForRepeatCall(
     newCallFrame->r(++dst) = jsUndefined();
 
   CodeBlock* codeBlock =
-      &FunctionExecutable->bytecodeForCall(callFrame, scopeChain);
-  newCallFrame = slideRegisterWindowForCall(
-      codeBlock, &m_registerFile, newCallFrame,
-      argc + RegisterFile::CallFrameHeaderSize, argc);
+      FunctionExecutable->bytecodeForCall(callFrame, scopeChain);
+  if (codeBlock)
+    newCallFrame = slideRegisterWindowForCall(
+        codeBlock, &m_registerFile, newCallFrame,
+        argc + RegisterFile::CallFrameHeaderSize, argc);
+  else
+    newCallFrame = 0;
   if (UNLIKELY(!newCallFrame)) {
     *exception = createStackOverflowError(callFrame);
     m_registerFile.shrink(oldEnd);
@@ -1157,6 +1172,10 @@ JSValue Interpreter::execute(EvalExecutable* eval,
                                              scopeChain->globalObject);
 
   EvalCodeBlock* codeBlock = &eval->bytecode(callFrame, scopeChain);
+  if (!codeBlock) {
+    *exception = createStackOverflowError(callFrame);
+    return jsNull();
+  }
 
   JSVariableObject* variableObject;
   for (ScopeChainNode* node = scopeChain;; node = node->next) {
@@ -4002,13 +4021,15 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
       if (callType == CallTypeJS) {
         ScopeChainNode* callDataScopeChain = callData.js.scopeChain;
         CodeBlock* newCodeBlock =
-            &callData.js.functionExecutable->bytecodeForCall(
-                callFrame, callDataScopeChain);
+            callData.js.functionExecutable->bytecodeForCall(callFrame,
+                                                            callDataScopeChain);
 
         CallFrame* previousCallFrame = callFrame;
-
-        callFrame = slideRegisterWindowForCall(
-            newCodeBlock, registerFile, callFrame, registerOffset, argCount);
+        if (newCodeBlock)
+          callFrame = slideRegisterWindowForCall(
+              newCodeBlock, registerFile, callFrame, registerOffset, argCount);
+        else
+          callFrame = 0;
         if (UNLIKELY(!callFrame)) {
           callFrame = previousCallFrame;
           exceptionValue = createStackOverflowError(callFrame);
@@ -4185,13 +4206,15 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
       if (callType == CallTypeJS) {
         ScopeChainNode* callDataScopeChain = callData.js.scopeChain;
         CodeBlock* newCodeBlock =
-            &callData.js.functionExecutable->bytecodeForCall(
-                callFrame, callDataScopeChain);
+            callData.js.functionExecutable->bytecodeForCall(callFrame,
+                                                            callDataScopeChain);
 
         CallFrame* previousCallFrame = callFrame;
-
-        callFrame = slideRegisterWindowForCall(
-            newCodeBlock, registerFile, callFrame, registerOffset, argCount);
+        if (newCodeBlock)
+          callFrame = slideRegisterWindowForCall(
+              newCodeBlock, registerFile, callFrame, registerOffset, argCount);
+        else
+          callFrame = 0;
         if (UNLIKELY(!callFrame)) {
           callFrame = previousCallFrame;
           exceptionValue = createStackOverflowError(callFrame);
@@ -4526,13 +4549,17 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
       if (constructType == ConstructTypeJS) {
         ScopeChainNode* callDataScopeChain = constructData.js.scopeChain;
         CodeBlock* newCodeBlock =
-            &constructData.js.functionExecutable->bytecodeForConstruct(
+            constructData.js.functionExecutable->bytecodeForConstruct(
                 callFrame, callDataScopeChain);
 
         CallFrame* previousCallFrame = callFrame;
 
-        callFrame = slideRegisterWindowForCall(
-            newCodeBlock, registerFile, callFrame, registerOffset, argCount);
+        if (newCodeBlock)
+          callFrame = slideRegisterWindowForCall(
+              newCodeBlock, registerFile, callFrame, registerOffset, argCount);
+        else
+          callFrame = 0;
+
         if (UNLIKELY(!callFrame)) {
           callFrame = previousCallFrame;
           exceptionValue = createStackOverflowError(callFrame);

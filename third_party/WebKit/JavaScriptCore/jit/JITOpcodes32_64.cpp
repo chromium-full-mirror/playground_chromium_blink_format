@@ -70,8 +70,8 @@ void JIT::privateCompileCTIMachineTrampolines(
 #endif
 
 // (2) Trampolines for the slow cases of op_call / op_call_eval / op_construct.
-
 #if ENABLE(JIT_OPTIMIZE_CALL)
+  JumpList callLazyLinkFailures;
   // VirtualCallLink Trampoline
   // regT0 holds callee, regT1 holds argCount.  regT2 will hold the
   // FunctionExecutable.
@@ -81,6 +81,7 @@ void JIT::privateCompileCTIMachineTrampolines(
   emitPutToCallFrameHeader(regT3, RegisterFile::ReturnPC);
   restoreArgumentReference();
   Call callLazyLinkCall = call();
+  callLazyLinkFailures.append(branchTestPtr(Zero, regT0));
   restoreReturnAddressBeforeReturn(regT3);
   emitGetFromCallFrameHeader32(RegisterFile::ArgumentCount, regT1);
   jump(regT0);
@@ -95,8 +96,23 @@ void JIT::privateCompileCTIMachineTrampolines(
   restoreArgumentReference();
   Call callLazyLinkConstruct = call();
   restoreReturnAddressBeforeReturn(regT3);
+  callLazyLinkFailures.append(branchTestPtr(Zero, regT0));
   emitGetFromCallFrameHeader32(RegisterFile::ArgumentCount, regT1);
   jump(regT0);
+
+  // If the parser fails we want to be able to be able to keep going,
+  // So we handle this as a parse failure.
+  callLazyLinkFailures.link(this);
+  emitGetFromCallFrameHeaderPtr(RegisterFile::ReturnPC, regT1);
+  emitGetFromCallFrameHeaderPtr(RegisterFile::CallerFrame, callFrameRegister);
+  restoreReturnAddressBeforeReturn(regT1);
+  move(ImmPtr(&globalData->exceptionLocation), regT2);
+  storePtr(regT1, regT2);
+  poke(callFrameRegister,
+       1 + OBJECT_OFFSETOF(struct JITStackFrame, callFrame) / sizeof(void*));
+  poke(ImmPtr(FunctionPtr(ctiVMThrowTrampoline).value()));
+  ret();
+
 #endif  // ENABLE(JIT_OPTIMIZE_CALL)
 
   // VirtualCall Trampoline

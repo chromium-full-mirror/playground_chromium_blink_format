@@ -323,12 +323,12 @@ class FunctionExecutable : public ScriptExecutable {
     return *m_codeBlockForConstruct;
   }
 
-  FunctionCodeBlock& bytecodeForCall(ExecState* exec,
+  FunctionCodeBlock* bytecodeForCall(ExecState* exec,
                                      ScopeChainNode* scopeChainNode) {
     ASSERT(scopeChainNode);
     if (!m_codeBlockForCall)
       compileForCall(exec, scopeChainNode);
-    return *m_codeBlockForCall;
+    return m_codeBlockForCall;
   }
 
   bool isGeneratedForCall() const { return m_codeBlockForCall; }
@@ -338,12 +338,12 @@ class FunctionExecutable : public ScriptExecutable {
     return *m_codeBlockForCall;
   }
 
-  FunctionCodeBlock& bytecodeForConstruct(ExecState* exec,
+  FunctionCodeBlock* bytecodeForConstruct(ExecState* exec,
                                           ScopeChainNode* scopeChainNode) {
     ASSERT(scopeChainNode);
     if (!m_codeBlockForConstruct)
       compileForConstruct(exec, scopeChainNode);
-    return *m_codeBlockForConstruct;
+    return m_codeBlockForConstruct;
   }
 
   bool isGeneratedForConstruct() const { return m_codeBlockForConstruct; }
@@ -410,8 +410,8 @@ class FunctionExecutable : public ScriptExecutable {
     m_lastLine = lastLine;
   }
 
-  void compileForCall(ExecState*, ScopeChainNode*);
-  void compileForConstruct(ExecState*, ScopeChainNode*);
+  bool compileForCall(ExecState*, ScopeChainNode*);
+  bool compileForConstruct(ExecState*, ScopeChainNode*);
 
   unsigned m_numVariables : 31;
   bool m_forceUsesArguments : 1;

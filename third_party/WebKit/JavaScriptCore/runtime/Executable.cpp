@@ -130,11 +130,13 @@ JSObject* ProgramExecutable::compile(ExecState* exec,
   return 0;
 }
 
-void FunctionExecutable::compileForCall(ExecState*,
+bool FunctionExecutable::compileForCall(ExecState*,
                                         ScopeChainNode* scopeChainNode) {
   JSGlobalData* globalData = scopeChainNode->globalData;
   RefPtr<FunctionBodyNode> body =
       globalData->parser->parse<FunctionBodyNode>(globalData, 0, 0, m_source);
+  if (!body)
+    return false;
   if (m_forceUsesArguments)
     body->setUsesArguments();
   body->finishParsing(m_parameters, m_name);
@@ -156,13 +158,16 @@ void FunctionExecutable::compileForCall(ExecState*,
   m_symbolTable = m_codeBlockForCall->sharedSymbolTable();
 
   body->destroyData();
+  return true;
 }
 
-void FunctionExecutable::compileForConstruct(ExecState*,
+bool FunctionExecutable::compileForConstruct(ExecState*,
                                              ScopeChainNode* scopeChainNode) {
   JSGlobalData* globalData = scopeChainNode->globalData;
   RefPtr<FunctionBodyNode> body =
       globalData->parser->parse<FunctionBodyNode>(globalData, 0, 0, m_source);
+  if (!body)
+    return false;
   if (m_forceUsesArguments)
     body->setUsesArguments();
   body->finishParsing(m_parameters, m_name);
@@ -184,6 +189,7 @@ void FunctionExecutable::compileForConstruct(ExecState*,
   m_symbolTable = m_codeBlockForConstruct->sharedSymbolTable();
 
   body->destroyData();
+  return true;
 }
 
 #if ENABLE(JIT)
@@ -213,7 +219,7 @@ void ProgramExecutable::generateJITCode(ExecState* exec,
 void FunctionExecutable::generateJITCodeForCall(
     ExecState* exec,
     ScopeChainNode* scopeChainNode) {
-  CodeBlock* codeBlock = &bytecodeForCall(exec, scopeChainNode);
+  CodeBlock* codeBlock = bytecodeForCall(exec, scopeChainNode);
   m_jitCodeForCall = JIT::compile(scopeChainNode->globalData, codeBlock,
                                   &m_jitCodeForCallWithArityCheck);
 
@@ -226,7 +232,7 @@ void FunctionExecutable::generateJITCodeForCall(
 void FunctionExecutable::generateJITCodeForConstruct(
     ExecState* exec,
     ScopeChainNode* scopeChainNode) {
-  CodeBlock* codeBlock = &bytecodeForConstruct(exec, scopeChainNode);
+  CodeBlock* codeBlock = bytecodeForConstruct(exec, scopeChainNode);
   m_jitCodeForConstruct = JIT::compile(scopeChainNode->globalData, codeBlock,
                                        &m_jitCodeForConstructWithArityCheck);
 
@@ -251,6 +257,8 @@ ExceptionInfo* FunctionExecutable::reparseExceptionInfo(
     CodeBlock* codeBlock) {
   RefPtr<FunctionBodyNode> newFunctionBody =
       globalData->parser->parse<FunctionBodyNode>(globalData, 0, 0, m_source);
+  if (!newFunctionBody)
+    return 0;
   if (m_forceUsesArguments)
     newFunctionBody->setUsesArguments();
   newFunctionBody->finishParsing(m_parameters, m_name);
@@ -290,6 +298,8 @@ ExceptionInfo* EvalExecutable::reparseExceptionInfo(
     CodeBlock* codeBlock) {
   RefPtr<EvalNode> newEvalBody =
       globalData->parser->parse<EvalNode>(globalData, 0, 0, m_source);
+  if (!newEvalBody)
+    return 0;
 
   ScopeChain scopeChain(scopeChainNode);
   JSGlobalObject* globalObject = scopeChain.globalObject();
