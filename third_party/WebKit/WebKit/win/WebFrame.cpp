@@ -931,7 +931,7 @@ HRESULT STDMETHODCALLTYPE WebFrame::firstLayoutDone(
   if (!coreFrame)
     return E_FAIL;
 
-  *result = coreFrame->loader()->firstLayoutDone();
+  *result = coreFrame->loader()->stateMachine()->firstLayoutDone();
   return S_OK;
 }
 
