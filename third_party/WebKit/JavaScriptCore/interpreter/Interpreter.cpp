@@ -4033,6 +4033,11 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
         ScopeChainNode* scopeChain = callFrame->scopeChain();
         CallFrame* newCallFrame =
             CallFrame::create(callFrame->registers() + registerOffset);
+        if (!registerFile->grow(newCallFrame->registers())) {
+          exceptionValue = createStackOverflowError(callFrame);
+          goto vm_throw;
+        }
+
         newCallFrame->init(0, vPC + OPCODE_LENGTH(op_call), scopeChain,
                            callFrame, argCount, asObject(v));
 
@@ -4211,6 +4216,10 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
         ScopeChainNode* scopeChain = callFrame->scopeChain();
         CallFrame* newCallFrame =
             CallFrame::create(callFrame->registers() + registerOffset);
+        if (!registerFile->grow(newCallFrame->registers())) {
+          exceptionValue = createStackOverflowError(callFrame);
+          goto vm_throw;
+        }
         newCallFrame->init(0, vPC + OPCODE_LENGTH(op_call_varargs), scopeChain,
                            callFrame, argCount, asObject(v));
 
@@ -4547,6 +4556,10 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
         ScopeChainNode* scopeChain = callFrame->scopeChain();
         CallFrame* newCallFrame =
             CallFrame::create(callFrame->registers() + registerOffset);
+        if (!registerFile->grow(newCallFrame->registers())) {
+          exceptionValue = createStackOverflowError(callFrame);
+          goto vm_throw;
+        }
         newCallFrame->init(0, vPC + OPCODE_LENGTH(op_construct), scopeChain,
                            callFrame, argCount, asObject(v));
 

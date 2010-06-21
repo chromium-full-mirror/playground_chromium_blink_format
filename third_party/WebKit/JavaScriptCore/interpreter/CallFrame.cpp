@@ -42,5 +42,10 @@ void CallFrame::dumpCaller() {
                                     function);
   printf("Callpoint => %s:%d\n", urlString.ascii(), signedLineNumber);
 }
+
+RegisterFile* CallFrame::registerFile() {
+  return &interpreter()->registerFile();
+}
+
 #endif
 }

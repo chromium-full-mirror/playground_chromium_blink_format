@@ -2190,7 +2190,11 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_call_NotJSFunction) {
     CallFrame* previousCallFrame = stackFrame.callFrame;
     CallFrame* callFrame =
         CallFrame::create(previousCallFrame->registers() + registerOffset);
-
+    if (!stackFrame.registerFile->grow(callFrame->registers())) {
+      throwStackOverflowError(previousCallFrame, stackFrame.globalData,
+                              callFrame->returnPC(), STUB_RETURN_ADDRESS);
+      VM_THROW_EXCEPTION();
+    }
     callFrame->init(0, static_cast<Instruction*>((STUB_RETURN_ADDRESS).value()),
                     previousCallFrame->scopeChain(), previousCallFrame,
                     argCount, asObject(funcVal));
@@ -2327,6 +2331,11 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_construct_NotJSConstruct) {
     CallFrame* previousCallFrame = stackFrame.callFrame;
     CallFrame* callFrame =
         CallFrame::create(previousCallFrame->registers() + registerOffset);
+    if (!stackFrame.registerFile->grow(callFrame->registers())) {
+      throwStackOverflowError(previousCallFrame, stackFrame.globalData,
+                              callFrame->returnPC(), STUB_RETURN_ADDRESS);
+      VM_THROW_EXCEPTION();
+    }
 
     callFrame->init(0, static_cast<Instruction*>((STUB_RETURN_ADDRESS).value()),
                     previousCallFrame->scopeChain(), previousCallFrame,

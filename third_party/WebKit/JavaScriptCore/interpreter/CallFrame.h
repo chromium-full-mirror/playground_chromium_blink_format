@@ -155,6 +155,9 @@ class ExecState : private Register {
                           JSObject* callee) {
     ASSERT(callerFrame);  // Use noCaller() rather than 0 for the outer host
                           // call frame caller.
+    ASSERT(callerFrame == noCaller() ||
+           callerFrame->removeHostCallFrameFlag()->registerFile()->end() >=
+               this);
 
     setCodeBlock(codeBlock);
     setScopeChain(scopeChain);
@@ -220,7 +223,9 @@ class ExecState : private Register {
 
  private:
   static const intptr_t HostCallFrameFlag = 1;
-
+#ifndef NDEBUG
+  RegisterFile* registerFile();
+#endif
   ExecState();
   ~ExecState();
 };
