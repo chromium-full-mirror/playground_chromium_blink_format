@@ -40,6 +40,7 @@
 #if PLATFORM(SKIA)
 #include "NativeImageSkia.h"
 #elif PLATFORM(QT)
+#include <QPixmap>
 #include <QImage>
 #endif
 
@@ -135,8 +136,7 @@ class RGBA32Buffer {
   }
 
 #if PLATFORM(QT)
-  void setDecodedImage(const QImage& image);
-  QImage decodedImage() const { return m_image; }
+  void setPixmap(const QPixmap& pixmap);
 #endif
 
  private:
@@ -147,6 +147,8 @@ class RGBA32Buffer {
 #if PLATFORM(SKIA)
     return m_bitmap.getAddr32(x, y);
 #elif PLATFORM(QT)
+    m_image = m_pixmap.toImage();
+    m_pixmap = QPixmap();
     return reinterpret_cast<QRgb*>(m_image.scanLine(y)) + x;
 #else
     return m_bytes.data() + (y * width()) + x;
@@ -175,6 +177,7 @@ class RGBA32Buffer {
 #if PLATFORM(SKIA)
   NativeImageSkia m_bitmap;
 #elif PLATFORM(QT)
+  mutable QPixmap m_pixmap;
   mutable QImage m_image;
   bool m_hasAlpha;
   IntSize m_size;
