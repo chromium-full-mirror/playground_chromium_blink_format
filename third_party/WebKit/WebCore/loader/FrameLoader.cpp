@@ -2496,7 +2496,7 @@ void FrameLoader::transitionToCommitted(PassRefPtr<CachedPage> cachedPage) {
           // history in a similar manner as
           // for a standard load with the exception of updating the back/forward
           // list (<rdar://problem/8091103>).
-          if (!m_committedFirstRealDocumentLoad)
+          if (!m_stateMachine.committedFirstRealDocumentLoad())
             history()->updateForStandardLoad(
                 HistoryController::UpdateAllExceptBackForwardList);
 
