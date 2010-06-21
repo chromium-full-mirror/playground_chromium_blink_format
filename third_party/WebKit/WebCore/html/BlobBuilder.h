@@ -31,8 +31,6 @@
 #ifndef BlobBuilder_h
 #define BlobBuilder_h
 
-#if ENABLE(FILE_WRITER)
-
 #include "BlobItem.h"
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
@@ -49,17 +47,16 @@ class BlobBuilder : public RefCounted<BlobBuilder> {
     return adoptRef(new BlobBuilder());
   }
 
-  bool appendString(const String& text, const String& ending, ExceptionCode&);
-  bool appendBlob(PassRefPtr<Blob>);
+  bool append(PassRefPtr<Blob>);
+  bool append(const String& text, ExceptionCode&);
+  bool append(const String& text, const String& ending, ExceptionCode&);
 
-  PassRefPtr<Blob> getBlob(const String& contentType) const;
+  PassRefPtr<Blob> getBlob(const String& contentType = String()) const;
 
  private:
   BlobItemList m_items;
 };
 
 }  // namespace WebCore
-
-#endif  // ENABLE(FILE_WRITER)
 
 #endif  // BlobBuilder_h

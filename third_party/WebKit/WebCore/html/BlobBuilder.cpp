@@ -30,8 +30,6 @@
 
 #include "config.h"
 
-#if ENABLE(FILE_WRITER)
-
 #include "BlobBuilder.h"
 
 #include "AtomicString.h"
@@ -57,9 +55,9 @@ static bool getLineEndingTypeFromString(const AtomicString& typeString,
   return false;
 }
 
-bool BlobBuilder::appendString(const String& text,
-                               const String& type,
-                               ExceptionCode& ec) {
+bool BlobBuilder::append(const String& text,
+                         const String& type,
+                         ExceptionCode& ec) {
   ec = 0;
   LineEnding endingType;
   if (!getLineEndingTypeFromString(type, endingType)) {
@@ -70,7 +68,11 @@ bool BlobBuilder::appendString(const String& text,
   return true;
 }
 
-bool BlobBuilder::appendBlob(PassRefPtr<Blob> blob) {
+bool BlobBuilder::append(const String& text, ExceptionCode& ec) {
+  return append(text, String(), ec);
+}
+
+bool BlobBuilder::append(PassRefPtr<Blob> blob) {
   if (blob) {
     for (size_t i = 0; i < blob->items().size(); ++i)
       m_items.append(blob->items()[i]);
@@ -84,5 +86,3 @@ PassRefPtr<Blob> BlobBuilder::getBlob(const String& contentType) const {
 }
 
 }  // namespace WebCore
-
-#endif  // ENABLE(FILE_WRITER)
