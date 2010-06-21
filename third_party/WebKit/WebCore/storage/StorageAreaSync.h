@@ -82,6 +82,7 @@ class StorageAreaSync : public RefCounted<StorageAreaSync> {
   // Called from the background thread
   void performImport();
   void performSync();
+  void deleteEmptyDatabase();
 
  private:
   enum OpenDatabaseParamType { CreateIfNonExistent, SkipIfNonExistent };

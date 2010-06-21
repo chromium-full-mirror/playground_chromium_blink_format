@@ -39,7 +39,7 @@ class LocalStorageThread;
 // FIXME: Rename this class to StorageTask
 class LocalStorageTask : public Noncopyable {
  public:
-  enum Type { AreaImport, AreaSync, TerminateThread };
+  enum Type { AreaImport, AreaSync, DeleteEmptyDatabase, TerminateThread };
 
   ~LocalStorageTask();
 
@@ -48,6 +48,10 @@ class LocalStorageTask : public Noncopyable {
   }
   static PassOwnPtr<LocalStorageTask> createSync(StorageAreaSync* area) {
     return new LocalStorageTask(AreaSync, area);
+  }
+  static PassOwnPtr<LocalStorageTask> createDeleteEmptyDatabase(
+      StorageAreaSync* area) {
+    return new LocalStorageTask(DeleteEmptyDatabase, area);
   }
   static PassOwnPtr<LocalStorageTask> createTerminate(
       LocalStorageThread* thread) {
