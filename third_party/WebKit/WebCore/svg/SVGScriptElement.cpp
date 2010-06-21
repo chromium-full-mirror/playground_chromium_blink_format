@@ -187,6 +187,14 @@ String SVGScriptElement::eventAttributeValue() const {
   return String();
 }
 
+bool SVGScriptElement::asyncAttributeValue() const {
+  return false;
+}
+
+bool SVGScriptElement::deferAttributeValue() const {
+  return false;
+}
+
 void SVGScriptElement::dispatchLoadEvent() {
   bool externalResourcesRequired = externalResourcesRequiredBaseValue();
 
