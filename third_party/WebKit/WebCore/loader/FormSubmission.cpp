@@ -35,13 +35,15 @@
 #include "FormData.h"
 #include "FormState.h"
 #include "Frame.h"
+#include "FrameLoadRequest.h"
+#include "FrameLoader.h"
 #include "HTMLFormElement.h"
 #include <wtf/PassRefPtr.h>
 
 namespace WebCore {
 
 FormSubmission::FormSubmission(Method method,
-                               const String& action,
+                               const KURL& action,
                                const String& target,
                                const String& contentType,
                                PassRefPtr<FormState> state,
@@ -60,7 +62,7 @@ FormSubmission::FormSubmission(Method method,
       m_event(event) {}
 
 PassRefPtr<FormSubmission> FormSubmission::create(Method method,
-                                                  const String& action,
+                                                  const KURL& action,
                                                   const String& target,
                                                   const String& contentType,
                                                   PassRefPtr<FormState> state,
@@ -70,5 +72,31 @@ PassRefPtr<FormSubmission> FormSubmission::create(Method method,
                                                   PassRefPtr<Event> event) {
   return adoptRef(new FormSubmission(method, action, target, contentType, state,
                                      data, boundary, lockHistory, event));
+}
+
+void FormSubmission::populateFrameLoadRequest(FrameLoadRequest& frameRequest) {
+  if (!m_target.isEmpty())
+    frameRequest.setFrameName(m_target);
+
+  if (!m_referrer.isEmpty())
+    frameRequest.resourceRequest().setHTTPReferrer(m_referrer);
+
+  if (m_method == FormSubmission::GetMethod)
+    m_action.setQuery(m_formData->flattenToString());
+  else {
+    frameRequest.resourceRequest().setHTTPMethod("POST");
+    frameRequest.resourceRequest().setHTTPBody(m_formData);
+
+    // construct some user headers if necessary
+    if (m_contentType.isNull() ||
+        m_contentType == "application/x-www-form-urlencoded")
+      frameRequest.resourceRequest().setHTTPContentType(m_contentType);
+    else  // contentType must be "multipart/form-data"
+      frameRequest.resourceRequest().setHTTPContentType(
+          m_contentType + "; boundary=" + m_boundary);
+  }
+
+  frameRequest.resourceRequest().setURL(m_action);
+  FrameLoader::addHTTPOriginIfNeeded(frameRequest.resourceRequest(), m_origin);
 }
 }

@@ -41,6 +41,7 @@
 namespace WebCore {
 
 class FormState;
+class FormSubmission;
 class Frame;
 class String;
 
@@ -61,10 +62,7 @@ class RedirectScheduler : public Noncopyable {
                               bool lockHistory = true,
                               bool lockBackForwardList = true,
                               bool userGesture = false);
-  void scheduleFormSubmission(const FrameLoadRequest&,
-                              bool lockHistory,
-                              PassRefPtr<Event>,
-                              PassRefPtr<FormState>);
+  void scheduleFormSubmission(PassRefPtr<FormSubmission>);
   void scheduleRefresh(bool userGesture = false);
   void scheduleHistoryNavigation(int steps);
 
