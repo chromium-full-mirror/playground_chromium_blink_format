@@ -374,3 +374,5 @@ void NotificationPresenterClientQt::dumpShowText(Notification* notification) {
 
 #endif  // ENABLE(NOTIFICATIONS)
 }
+
+#include "moc_NotificationPresenterClientQt.cpp"
