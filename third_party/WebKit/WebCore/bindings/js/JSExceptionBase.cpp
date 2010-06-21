@@ -36,6 +36,9 @@
 #if ENABLE(XPATH)
 #include "JSXPathException.h"
 #endif
+#if ENABLE(XPATH)
+#include "JSSQLException.h"
+#endif
 
 namespace WebCore {
 
@@ -55,6 +58,10 @@ ExceptionBase* toExceptionBase(JSC::JSValue value) {
 #endif
 #if ENABLE(XPATH)
   if (XPathException* pathException = toXPathException(value))
+    return reinterpret_cast<ExceptionBase*>(pathException);
+#endif
+#if ENABLE(DATABASE)
+  if (SQLException* pathException = toSQLException(value))
     return reinterpret_cast<ExceptionBase*>(pathException);
 #endif
 

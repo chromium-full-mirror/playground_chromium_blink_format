@@ -73,6 +73,11 @@
 #include "XPathException.h"
 #endif
 
+#if ENABLE(DATABASE)
+#include "JSSQLException.h"
+#include "SQLException.h"
+#endif
+
 using namespace JSC;
 
 namespace WebCore {
@@ -639,6 +644,11 @@ void setDOMException(ExecState* exec, ExceptionCode ec) {
     case XPathExceptionType:
       errorObject =
           toJS(exec, globalObject, XPathException::create(description));
+      break;
+#endif
+#if ENABLE(DATABASE)
+    case SQLExceptionType:
+      errorObject = toJS(exec, globalObject, SQLException::create(description));
       break;
 #endif
   }

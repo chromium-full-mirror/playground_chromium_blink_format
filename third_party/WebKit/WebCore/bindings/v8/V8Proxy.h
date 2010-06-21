@@ -382,6 +382,10 @@ class V8Proxy {
   static const char* svgExceptionName(int exceptionCode);
 #endif
 
+#if ENABLE(DATABASE)
+  static const char* sqlExceptionName(int exceptionCode);
+#endif
+
   Frame* m_frame;
 
   // For the moment, we have one of these.  Soon we will have one per

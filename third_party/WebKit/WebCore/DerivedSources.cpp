@@ -222,6 +222,7 @@
 #include "JSSharedWorker.cpp"
 #include "JSSharedWorkerContext.cpp"
 #include "JSSQLError.cpp"
+#include "JSSQLException.cpp"
 #include "JSSQLResultSet.cpp"
 #include "JSSQLResultSetRowList.cpp"
 #include "JSSQLStatementCallback.cpp"

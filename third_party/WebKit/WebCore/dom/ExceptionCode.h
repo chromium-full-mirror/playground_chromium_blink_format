@@ -81,6 +81,10 @@ enum ExceptionType {
   ,
   SVGExceptionType
 #endif
+#if ENABLE(DATABASE)
+  ,
+  SQLExceptionType
+#endif
 };
 
 struct ExceptionCodeDescription {
