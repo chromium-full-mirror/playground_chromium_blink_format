@@ -1593,6 +1593,8 @@ static void tryHyphenating(RenderText* text,
                               isFixedPitch, collapseWhiteSpace) +
                     lastSpaceWordSpacing;
   ASSERT(xPos + prefixWidth <= availableWidth);
+#else
+  UNUSED_PARAM(isFixedPitch);
 #endif
 
   lineBreak.obj = text;
