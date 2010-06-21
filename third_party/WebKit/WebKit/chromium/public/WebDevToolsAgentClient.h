@@ -73,13 +73,9 @@ class WebDevToolsAgentClient {
   ~WebDevToolsAgentClient() {}
 };
 
-class WebDevToolsMessageTransport {
- public:
-  virtual ~WebDevToolsMessageTransport() {}
-  virtual void sendMessageToFrontendOnIOThread(
-      const WebDevToolsMessageData&) = 0;
-};
-
 }  // namespace WebKit
+
+// FIXME(40914): Remove after adding #include into devtools_agent_filter.cc
+#include "WebDevToolsMessageTransport.h"
 
 #endif

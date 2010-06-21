@@ -76,8 +76,6 @@ class WebDevToolsAgent {
   WEBKIT_API static void debuggerPauseScript();
 
   WEBKIT_API static bool dispatchMessageFromFrontendOnIOThread(
-      const WebDevToolsMessageData&);
-  WEBKIT_API static bool dispatchMessageFromFrontendOnIOThread(
       WebDevToolsMessageTransport*,
       const WebDevToolsMessageData&);
 
