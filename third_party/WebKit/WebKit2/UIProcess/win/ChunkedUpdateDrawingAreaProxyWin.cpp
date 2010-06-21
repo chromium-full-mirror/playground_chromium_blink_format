@@ -23,7 +23,7 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "ChunkedUpdateDrawingArea.h"
+#include "ChunkedUpdateDrawingAreaProxy.h"
 
 #include "UpdateChunk.h"
 #include "WebProcessProxy.h"
@@ -34,11 +34,11 @@ using namespace WebCore;
 
 namespace WebKit {
 
-WebPageProxy* ChunkedUpdateDrawingArea::page() {
+WebPageProxy* ChunkedUpdateDrawingAreaProxy::page() {
   return m_webView->page();
 }
 
-void ChunkedUpdateDrawingArea::ensureBackingStore() {
+void ChunkedUpdateDrawingAreaProxy::ensureBackingStore() {
   if (m_backingStoreBitmap)
     return;
 
@@ -58,11 +58,12 @@ void ChunkedUpdateDrawingArea::ensureBackingStore() {
   ::SelectObject(m_backingStoreDC.get(), m_backingStoreBitmap.get());
 }
 
-void ChunkedUpdateDrawingArea::invalidateBackingStore() {
+void ChunkedUpdateDrawingAreaProxy::invalidateBackingStore() {
   m_backingStoreBitmap.clear();
 }
 
-void ChunkedUpdateDrawingArea::platformPaint(const IntRect& rect, HDC hdc) {
+void ChunkedUpdateDrawingAreaProxy::platformPaint(const IntRect& rect,
+                                                  HDC hdc) {
   if (!m_backingStoreBitmap)
     return;
 
@@ -71,7 +72,7 @@ void ChunkedUpdateDrawingArea::platformPaint(const IntRect& rect, HDC hdc) {
            m_backingStoreDC.get(), rect.x(), rect.y(), SRCCOPY);
 }
 
-void ChunkedUpdateDrawingArea::drawUpdateChunkIntoBackingStore(
+void ChunkedUpdateDrawingAreaProxy::drawUpdateChunkIntoBackingStore(
     UpdateChunk* updateChunk) {
   ensureBackingStore();
 

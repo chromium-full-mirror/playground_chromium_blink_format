@@ -49,7 +49,7 @@ typedef HDC PlatformDrawingContext;
 
 class DrawingAreaProxy {
  public:
-  enum Type { DrawingAreaUpdateChunkType };
+  enum Type { ChunkedUpdateDrawingAreaType };
 
   virtual ~DrawingAreaProxy();
 

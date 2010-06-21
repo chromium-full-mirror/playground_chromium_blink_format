@@ -26,15 +26,15 @@
 #include "DrawingArea.h"
 
 // Subclasses
-#include "DrawingAreaUpdateChunk.h"
+#include "ChunkedUpdateDrawingArea.h"
 
 namespace WebKit {
 
 DrawingArea* DrawingArea::create(Type type, WebPage* webPage) {
   DrawingArea* drawingArea = 0;
   switch (type) {
-    case DrawingAreaUpdateChunkType:
-      drawingArea = new DrawingAreaUpdateChunk(webPage);
+    case ChunkedUpdateDrawingAreaType:
+      drawingArea = new ChunkedUpdateDrawingArea(webPage);
       break;
   }
 
