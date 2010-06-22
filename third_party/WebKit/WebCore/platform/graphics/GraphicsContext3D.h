@@ -40,11 +40,20 @@
 
 #if PLATFORM(MAC)
 #include <OpenGL/OpenGL.h>
+#include <wtf/RetainPtr.h>
 
-typedef void* PlatformGraphicsContext3D;
+typedef CGLContextObj PlatformGraphicsContext3D;
 const PlatformGraphicsContext3D NullPlatformGraphicsContext3D = 0;
 typedef GLuint Platform3DObject;
 const Platform3DObject NullPlatform3DObject = 0;
+
+#ifdef __OBJC__
+@class CALayer;
+@class WebGLLayer;
+#else
+typedef void* CALayer;
+typedef void* WebGLLayer;
+#endif
 #elif PLATFORM(QT)
 class QPainter;
 class QRect;
@@ -423,6 +432,9 @@ class GraphicsContext3D : public Noncopyable {
     return m_contextObj;
   }
   Platform3DObject platformTexture() const { return m_texture; }
+  CALayer* platformLayer() const {
+    return static_cast<CALayer*>(m_webGLLayer.get());
+  }
 #elif PLATFORM(CHROMIUM)
   PlatformGraphicsContext3D platformGraphicsContext3D() const;
   Platform3DObject platformTexture() const;
@@ -824,6 +836,7 @@ class GraphicsContext3D : public Noncopyable {
   Vector<Vector<float>> m_vertexArray;
 
   CGLContextObj m_contextObj;
+  RetainPtr<WebGLLayer> m_webGLLayer;
   GLuint m_texture;
   GLuint m_fbo;
   GLuint m_depthStencilBuffer;

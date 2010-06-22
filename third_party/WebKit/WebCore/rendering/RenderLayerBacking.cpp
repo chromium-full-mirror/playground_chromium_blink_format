@@ -227,9 +227,9 @@ bool RenderLayerBacking::updateGraphicsLayerConfiguration() {
         static_cast<HTMLCanvasElement*>(renderer()->node());
     WebGLRenderingContext* context =
         static_cast<WebGLRenderingContext*>(canvas->renderingContext());
-    if (context->graphicsContext3D()->platformGraphicsContext3D())
-      m_graphicsLayer->setContentsToGraphicsContext3D(
-          context->graphicsContext3D());
+    if (context->graphicsContext3D()->platformLayer())
+      m_graphicsLayer->setContentsToWebGL(
+          context->graphicsContext3D()->platformLayer());
   }
 #endif
 
@@ -794,7 +794,7 @@ void RenderLayerBacking::rendererContentChanged() {
 
 #if ENABLE(3D_CANVAS)
   if (is3DCanvas(renderer())) {
-    m_graphicsLayer->setGraphicsContext3DNeedsDisplay();
+    m_graphicsLayer->setContentsNeedsDisplay();
     return;
   }
 #endif
