@@ -44,6 +44,10 @@ class PNGImageDecoder : public ImageDecoder {
   virtual bool isSizeAvailable();
   virtual bool setSize(unsigned width, unsigned height);
   virtual RGBA32Buffer* frameBufferAtIndex(size_t index);
+  // CAUTION: setFailed() deletes |m_reader|.  Be careful to avoid
+  // accessing deleted memory, especially when calling this from inside
+  // PNGImageReader!
+  virtual bool setFailed();
 
   // Callbacks from libpng
   void headerAvailable();
@@ -64,6 +68,7 @@ class PNGImageDecoder : public ImageDecoder {
   void decode(bool onlySize);
 
   OwnPtr<PNGImageReader> m_reader;
+  bool m_doNothingOnFailure;
 };
 
 }  // namespace WebCore

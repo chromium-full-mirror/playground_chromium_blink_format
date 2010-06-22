@@ -160,10 +160,8 @@ class JPEGImageReader {
     m_bufferLength = data.size();
 
     // We need to do the setjmp here. Otherwise bad things will happen
-    if (setjmp(m_err.setjmp_buffer)) {
-      close();
+    if (setjmp(m_err.setjmp_buffer))
       return m_decoder->setFailed();
-    }
 
     switch (m_state) {
       case JPEG_HEADER:
@@ -385,6 +383,11 @@ RGBA32Buffer* JPEGImageDecoder::frameBufferAtIndex(size_t index) {
   return &frame;
 }
 
+bool JPEGImageDecoder::setFailed() {
+  m_reader.clear();
+  return ImageDecoder::setFailed();
+}
+
 bool JPEGImageDecoder::outputScanlines() {
   if (m_frameBufferCache.isEmpty())
     return false;
@@ -465,10 +468,10 @@ void JPEGImageDecoder::decode(bool onlySize) {
   // has failed.
   if (!m_reader->decode(m_data->buffer(), onlySize) && isAllDataReceived())
     setFailed();
-
-  if (failed() ||
-      (!m_frameBufferCache.isEmpty() &&
-       m_frameBufferCache[0].status() == RGBA32Buffer::FrameComplete))
+  // If we're done decoding the image, we don't need the JPEGImageReader
+  // anymore.  (If we failed, |m_reader| has already been cleared.)
+  else if (!m_frameBufferCache.isEmpty() &&
+           (m_frameBufferCache[0].status() == RGBA32Buffer::FrameComplete))
     m_reader.clear();
 }
 }

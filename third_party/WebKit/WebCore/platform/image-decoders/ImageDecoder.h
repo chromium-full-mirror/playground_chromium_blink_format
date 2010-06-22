@@ -233,7 +233,7 @@ class ImageDecoder : public Noncopyable {
   bool isAllDataReceived() const { return m_isAllDataReceived; }
 
   virtual void setData(SharedBuffer* data, bool allDataReceived) {
-    if (failed())
+    if (m_failed)
       return;
     m_data = data;
     m_isAllDataReceived = allDataReceived;
@@ -292,7 +292,8 @@ class ImageDecoder : public Noncopyable {
 
   // Sets the "decode failure" flag.  For caller convenience (since so
   // many callers want to return false after calling this), returns false
-  // to enable easy tailcalling.
+  // to enable easy tailcalling.  Subclasses may override this to also
+  // clean up any local data.
   virtual bool setFailed() {
     m_failed = true;
     return false;
