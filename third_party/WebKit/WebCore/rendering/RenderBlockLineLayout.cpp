@@ -395,8 +395,6 @@ void RenderBlock::computeHorizontalPositionsForLine(
       }
       HashSet<const SimpleFontData*> fallbackFonts;
       GlyphOverflow glyphOverflow;
-      r->m_box->setWidth(rt->width(r->m_start, r->m_stop - r->m_start, totWidth,
-                                   firstLine, &fallbackFonts, &glyphOverflow));
       int hyphenWidth = 0;
       if (static_cast<InlineTextBox*>(r->m_box)->hasHyphen()) {
         const AtomicString& hyphenString = rt->style()->hyphenString();
@@ -2030,15 +2028,15 @@ InlineIterator RenderBlock::findNextLineBreak(InlineBidiResolver& resolver,
                                        previousLineBrokeCleanly);
               }
             }
-            if (canHyphenate && w + tmpW > width) {
-              tryHyphenating(t, f, lastSpace, pos, w + tmpW - additionalTmpW,
-                             width, isFixedPitch, collapseWhiteSpace,
-                             lastSpaceWordSpacing, lBreak, nextBreakable,
-                             hyphenated);
-              if (hyphenated)
-                goto end;
-            }
             if (lineWasTooWide || w + tmpW > width) {
+              if (canHyphenate && w + tmpW > width) {
+                tryHyphenating(t, f, lastSpace, pos, w + tmpW - additionalTmpW,
+                               width, isFixedPitch, collapseWhiteSpace,
+                               lastSpaceWordSpacing, lBreak, nextBreakable,
+                               hyphenated);
+                if (hyphenated)
+                  goto end;
+              }
               if (lBreak.obj && shouldPreserveNewline(lBreak.obj) &&
                   lBreak.obj->isText() &&
                   toRenderText(lBreak.obj)->textLength() &&
