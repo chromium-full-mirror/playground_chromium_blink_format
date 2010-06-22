@@ -49,6 +49,7 @@
 #include "Lookup.h"
 #include "Nodes.h"
 #include "Parser.h"
+#include "RegExpCache.h"
 #include <wtf/WTFThreadData.h>
 
 #if ENABLE(JSC_MULTIPLE_THREADS)
@@ -162,7 +163,8 @@ JSGlobalData::JSGlobalData(GlobalDataType globalDataType,
       weakRandom(static_cast<int>(currentTime())),
       maxReentryDepth(threadStackType == ThreadStackTypeSmall
                           ? MaxSmallThreadReentryDepth
-                          : MaxLargeThreadReentryDepth)
+                          : MaxLargeThreadReentryDepth),
+      m_regExpCache(new RegExpCache(this))
 #ifndef NDEBUG
       ,
       exclusiveThread(0)
@@ -214,6 +216,7 @@ JSGlobalData::~JSGlobalData() {
     deleteIdentifierTable(identifierTable);
 
   delete clientData;
+  delete m_regExpCache;
 }
 
 PassRefPtr<JSGlobalData> JSGlobalData::createContextGroup(

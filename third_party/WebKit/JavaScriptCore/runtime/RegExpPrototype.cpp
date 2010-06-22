@@ -34,6 +34,7 @@
 #include "PrototypeFunction.h"
 #include "RegExpObject.h"
 #include "RegExp.h"
+#include "RegExpCache.h"
 
 namespace JSC {
 
@@ -111,7 +112,7 @@ EncodedJSValue JSC_HOST_CALL regExpProtoFuncCompile(ExecState* exec) {
     UString pattern =
         !exec->argumentCount() ? UString("") : arg0.toString(exec);
     UString flags = arg1.isUndefined() ? UString("") : arg1.toString(exec);
-    regExp = RegExp::create(&exec->globalData(), pattern, flags);
+    regExp = exec->globalData().regExpCache()->lookupOrCreate(pattern, flags);
   }
 
   if (!regExp->isValid())

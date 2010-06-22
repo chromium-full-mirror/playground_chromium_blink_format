@@ -58,6 +58,7 @@ class JSGlobalObject;
 class JSObject;
 class Lexer;
 class Parser;
+class RegExpCache;
 class Stringifier;
 class Structure;
 class UString;
@@ -208,6 +209,9 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
   WeakRandom weakRandom;
 
   int maxReentryDepth;
+
+  RegExpCache* m_regExpCache;
+
 #ifndef NDEBUG
   ThreadIdentifier exclusiveThread;
 #endif
@@ -219,6 +223,7 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
   void startSampling();
   void stopSampling();
   void dumpSampleData(ExecState* exec);
+  RegExpCache* regExpCache() { return m_regExpCache; }
 
  private:
   JSGlobalData(GlobalDataType, ThreadStackType);

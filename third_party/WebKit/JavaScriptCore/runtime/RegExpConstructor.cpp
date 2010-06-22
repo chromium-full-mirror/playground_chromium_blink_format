@@ -35,6 +35,7 @@
 #include "RegExpObject.h"
 #include "RegExpPrototype.h"
 #include "RegExp.h"
+#include "RegExpCache.h"
 
 namespace JSC {
 
@@ -353,7 +354,8 @@ JSObject* constructRegExp(ExecState* exec, const ArgList& args) {
   UString pattern = arg0.isUndefined() ? UString("") : arg0.toString(exec);
   UString flags = arg1.isUndefined() ? UString("") : arg1.toString(exec);
 
-  RefPtr<RegExp> regExp = RegExp::create(&exec->globalData(), pattern, flags);
+  RefPtr<RegExp> regExp =
+      exec->globalData().regExpCache()->lookupOrCreate(pattern, flags);
   if (!regExp->isValid())
     return throwError(
         exec, createSyntaxError(exec, makeString("Invalid regular expression: ",
