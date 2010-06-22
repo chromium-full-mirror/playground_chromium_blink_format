@@ -91,6 +91,7 @@ class AXObjectCache : public Noncopyable {
   void handleFocusedUIElementChanged(RenderObject* oldFocusedRenderer,
                                      RenderObject* newFocusedRenderer);
   void handleScrolledToAnchor(const Node* anchorNode);
+  void handleAriaExpandedChange(RenderObject*);
 
   static void enableAccessibility() { gAccessibilityEnabled = true; }
   static void enableEnhancedUserInterfaceAccessibility() {
@@ -126,6 +127,9 @@ class AXObjectCache : public Noncopyable {
     AXScrolledToAnchor,
     AXLiveRegionChanged,
     AXMenuListValueChanged,
+    AXRowCountChanged,
+    AXRowCollapsed,
+    AXRowExpanded,
   };
 
   void postNotification(RenderObject*,
@@ -177,6 +181,7 @@ inline void AXObjectCache::handleFocusedUIElementChanged(RenderObject*,
                                                          RenderObject*) {}
 inline void AXObjectCache::handleScrolledToAnchor(const Node*) {}
 inline void AXObjectCache::contentChanged(RenderObject*) {}
+inline void AXObjectCache::handleAriaExpandedChange(RenderObject*) {}
 #endif
 }
 
