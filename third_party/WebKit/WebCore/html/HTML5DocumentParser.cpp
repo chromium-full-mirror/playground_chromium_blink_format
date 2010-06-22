@@ -373,20 +373,6 @@ bool HTML5DocumentParser::shouldLoadExternalScriptFromSrc(
   return m_XSSAuditor->canLoadExternalScriptFromSrc(srcValue);
 }
 
-void HTML5DocumentParser::executeScript(const ScriptSourceCode& sourceCode) {
-  ASSERT(m_scriptRunner->inScriptExecution());
-  if (!m_document->frame())
-    return;
-  InsertionPointRecord savedInsertionPoint(m_input);
-  m_document->frame()->script()->executeScript(sourceCode);
-}
-
-bool HTML5DocumentParser::dispatchBeforeLoad(Element* script,
-                                             const AtomicString& srcValue) {
-  InsertionPointRecord savedInsertionPoint(m_input);
-  return script->dispatchBeforeLoadEvent(srcValue);
-}
-
 void HTML5DocumentParser::notifyFinished(CachedResource* cachedResource) {
   // Ignore calls unless we have a script blocking the parser waiting
   // for its own load.  Otherwise this may be a load callback from
