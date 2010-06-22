@@ -27,7 +27,7 @@
 
 #include "CachedResourceClient.h"
 #include "CachedResourceHandle.h"
-#include "MappedAttributeEntry.h"
+#include "FragmentScriptingPermission.h"
 #include "NamedNodeMap.h"
 #include "SegmentedString.h"
 #include "Timer.h"
@@ -480,7 +480,7 @@ class HTMLDocumentParser : public DocumentParser, public CachedResourceClient {
   OwnPtr<PreloadScanner> m_preloadScanner;
 };
 
-void parseHTMLDocumentFragment(
+void parseLegacyHTMLDocumentFragment(
     const String&,
     DocumentFragment*,
     FragmentScriptingPermission = FragmentScriptingAllowed);

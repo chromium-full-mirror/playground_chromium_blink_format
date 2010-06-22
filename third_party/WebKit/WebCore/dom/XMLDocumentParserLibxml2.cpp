@@ -1409,6 +1409,8 @@ void XMLDocumentParser::resumeParsing() {
     end();
 }
 
+// FIXME: This method should be possible to implement using the DocumentParser
+// API, instead of needing to grab at libxml2 state directly.
 bool parseXMLDocumentFragment(const String& chunk,
                               DocumentFragment* fragment,
                               Element* parent,

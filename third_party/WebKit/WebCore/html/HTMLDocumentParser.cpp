@@ -2212,7 +2212,7 @@ void HTMLDocumentParser::setSrc(const SegmentedString& source) {
   m_src = source;
 }
 
-void parseHTMLDocumentFragment(
+void parseLegacyHTMLDocumentFragment(
     const String& source,
     DocumentFragment* fragment,
     FragmentScriptingPermission scriptingPermission) {

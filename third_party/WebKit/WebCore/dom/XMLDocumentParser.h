@@ -28,10 +28,10 @@
 
 #include "CachedResourceClient.h"
 #include "CachedResourceHandle.h"
-#include "MappedAttributeEntry.h"
 #include "SegmentedString.h"
 #include "StringHash.h"
 #include "DocumentParser.h"
+#include "FragmentScriptingPermission.h"
 #include <wtf/HashMap.h>
 #include <wtf/OwnPtr.h>
 
