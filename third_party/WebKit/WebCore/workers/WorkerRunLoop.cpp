@@ -32,6 +32,7 @@
 
 #if ENABLE(WORKERS)
 
+#include "AutodrainedPool.h"
 #include "ScriptExecutionContext.h"
 #include "SharedTimer.h"
 #include "ThreadGlobalData.h"
@@ -109,11 +110,13 @@ class RunLoopSetup : public Noncopyable {
 };
 
 void WorkerRunLoop::run(WorkerContext* context) {
+  AutodrainedPool pool;
   RunLoopSetup setup(*this);
   ModePredicate modePredicate(defaultMode());
   MessageQueueWaitResult result;
   do {
     result = runInMode(context, modePredicate);
+    pool.cycle();
   } while (result != MessageQueueTerminated);
 }
 
