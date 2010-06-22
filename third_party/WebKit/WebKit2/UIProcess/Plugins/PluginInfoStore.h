@@ -46,6 +46,7 @@ class PluginInfoStore {
     WebCore::PluginInfo info;
 #if PLATFORM(MAC)
     cpu_type_t pluginArchitecture;
+    WebCore::String bundleIdentifier;
     unsigned versionNumber;
 #endif
   };
