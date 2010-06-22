@@ -175,6 +175,11 @@ inline void AXObjectCache::postNotification(RenderObject*,
                                             AXNotification,
                                             bool postToElement,
                                             PostType) {}
+inline void AXObjectCache::postNotification(AccessibilityObject*,
+                                            Document*,
+                                            AXNotification,
+                                            bool postToElement,
+                                            PostType = PostAsynchronously) {}
 inline void AXObjectCache::postPlatformNotification(AccessibilityObject*,
                                                     AXNotification) {}
 inline void AXObjectCache::handleFocusedUIElementChanged(RenderObject*,
