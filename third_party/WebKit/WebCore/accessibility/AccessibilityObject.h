@@ -440,6 +440,7 @@ class AccessibilityObject : public RefCounted<AccessibilityObject> {
   virtual void addChildren() {}
   virtual bool canHaveChildren() const { return true; }
   virtual bool hasChildren() const { return m_haveChildren; }
+  virtual void updateChildrenIfNecessary() {}
   virtual void selectedChildren(AccessibilityChildrenVector&) {}
   virtual void visibleChildren(AccessibilityChildrenVector&) {}
   virtual void tabChildren(AccessibilityChildrenVector&) {}
