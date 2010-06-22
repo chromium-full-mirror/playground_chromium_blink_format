@@ -65,7 +65,7 @@ class HTML5ScriptRunner : public Noncopyable {
   // lifetime in order to guarantee that the data buffer will not be purged.
   class PendingScript : public CachedResourceClient {
    public:
-    PendingScript() : m_watchingForLoad(false), startingLineNumber(0) {}
+    PendingScript() : startingLineNumber(0), m_watchingForLoad(false) {}
 
     ~PendingScript();
 

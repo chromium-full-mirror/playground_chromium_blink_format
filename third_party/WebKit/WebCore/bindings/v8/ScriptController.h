@@ -165,7 +165,9 @@ class ScriptController {
   static void gcUnprotectJSWrapper(void*);
 
   void finishedWithEvent(Event*);
-  void setEventHandlerLineNumber(int lineNumber);
+
+  int eventHandlerLineNumber() const;
+  int eventHandlerColumnNumber() const;
 
   void setProcessingTimerCallback(bool processingTimerCallback) {
     m_processingTimerCallback = processingTimerCallback;

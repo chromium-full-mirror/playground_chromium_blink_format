@@ -34,6 +34,7 @@
 
 #include "PlatformBridge.h"
 #include "Document.h"
+#include "DocumentParser.h"
 #include "DOMWindow.h"
 #include "Event.h"
 #include "EventListener.h"
@@ -265,8 +266,16 @@ ScriptValue ScriptController::evaluate(const ScriptSourceCode& sourceCode,
   return ScriptValue(object);
 }
 
-void ScriptController::setEventHandlerLineNumber(int lineNumber) {
-  m_proxy->setEventHandlerLineNumber(lineNumber);
+int ScriptController::eventHandlerLineNumber() const {
+  if (DocumentParser* parser = m_frame->document()->parser())
+    return parser->lineNumber();
+  return 0;
+}
+
+int ScriptController::eventHandlerColumnNumber() const {
+  if (DocumentParser* parser = m_frame->document()->parser())
+    return parser->columnNumber();
+  return 0;
 }
 
 void ScriptController::finishedWithEvent(Event* event) {

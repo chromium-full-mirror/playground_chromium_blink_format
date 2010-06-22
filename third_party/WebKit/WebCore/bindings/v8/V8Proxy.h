@@ -204,9 +204,6 @@ class V8Proxy {
   }
 #endif
 
-  void setEventHandlerLineNumber(int lineNumber) {
-    m_handlerLineNumber = lineNumber;
-  }
   void finishedWithEvent(Event*) {}
 
   // Evaluate JavaScript in a new isolated world. The script gets its own
@@ -391,8 +388,6 @@ class V8Proxy {
   // For the moment, we have one of these.  Soon we will have one per
   // DOMWrapperWorld.
   RefPtr<V8DOMWindowShell> m_windowShell;
-
-  int m_handlerLineNumber;
 
   // True for <a href="javascript:foo()"> and false for <script>foo()</script>.
   // Only valid during execution.
