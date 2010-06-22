@@ -68,6 +68,7 @@ namespace WebKit {
 class AutocompletePopupMenuClient;
 class AutoFillPopupMenuClient;
 class ContextMenuClientImpl;
+class DragScrollTimer;
 class SuggestionsPopupMenuClient;
 class WebAccessibilityObject;
 class WebDevToolsAgentPrivate;
@@ -337,8 +338,6 @@ class WebViewImpl : public WebView, public RefCounted<WebViewImpl> {
   // Returns true if the view was scrolled.
   bool scrollViewWithKeyboard(int keyCode, int modifiers);
 
-  void scrollForDragging(const WebPoint&);
-
   void hideSelectPopup();
 
   // Converts |pos| from window coordinates to contents coordinates and gets
@@ -482,6 +481,7 @@ class WebViewImpl : public WebView, public RefCounted<WebViewImpl> {
 
   typedef HashMap<WebCore::String, WebCore::String> SettingsMap;
   OwnPtr<SettingsMap> m_inspectorSettingsMap;
+  OwnPtr<DragScrollTimer> m_dragScrollTimer;
 
 #if ENABLE(NOTIFICATIONS)
   // The provider of desktop notifications;

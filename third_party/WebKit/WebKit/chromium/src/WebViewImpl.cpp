@@ -46,6 +46,7 @@
 #include "DocumentLoader.h"
 #include "DOMUtilitiesPrivate.h"
 #include "DragController.h"
+#include "DragScrollTimer.h"
 #include "DragData.h"
 #include "Editor.h"
 #include "EventHandler.h"
@@ -82,6 +83,7 @@
 #include "SecurityOrigin.h"
 #include "SelectionController.h"
 #include "Settings.h"
+#include "Timer.h"
 #include "TypingCommand.h"
 #include "WebAccessibilityObject.h"
 #include "WebDevToolsAgentPrivate.h"
@@ -236,7 +238,8 @@ WebViewImpl::WebViewImpl(WebViewClient* client)
       m_suggestionsPopupClient(0),
       m_suggestionsPopup(0),
       m_isTransparent(false),
-      m_tabsToLinks(false)
+      m_tabsToLinks(false),
+      m_dragScrollTimer(new DragScrollTimer())
 #if USE(ACCELERATED_COMPOSITING)
       ,
       m_layerRenderer(0),
@@ -819,44 +822,6 @@ bool WebViewImpl::mapKeyCodeForScroll(
   }
 
   return true;
-}
-
-// Computes the distance from a point outside a rect to the nearest edge of the
-// rect.
-static IntSize distanceToRect(const IntPoint& point, const IntRect& rect) {
-  int dx = 0, dy = 0;
-  if (point.x() < rect.x())
-    dx = point.x() - rect.x();
-  else if (rect.right() < point.x())
-    dx = point.x() - rect.right();
-  if (point.y() < rect.y())
-    dy = point.y() - rect.y();
-  else if (rect.bottom() < point.y())
-    dy = point.y() - rect.bottom();
-  return IntSize(dx, dy);
-}
-
-void WebViewImpl::scrollForDragging(const WebPoint& clientPoint) {
-  // This margin approximates Safari behavior, derived from an observation.
-  static const int scrollMargin = 30;
-
-  FrameView* view = mainFrameImpl()->frameView();
-  if (!view)
-    return;
-
-  IntRect bounds(0, 0, view->visibleWidth(), view->visibleHeight());
-  bounds.setY(bounds.y() + scrollMargin);
-  bounds.setHeight(bounds.height() - scrollMargin * 2);
-  bounds.setX(bounds.x() + scrollMargin);
-  bounds.setWidth(bounds.width() - scrollMargin * 2);
-
-  IntPoint point = clientPoint;
-  if (bounds.contains(point))
-    return;
-
-  IntSize toScroll = distanceToRect(point, bounds);
-  if (!toScroll.isZero())
-    view->scrollBy(toScroll);
 }
 
 void WebViewImpl::hideSelectPopup() {
@@ -1618,12 +1583,13 @@ void WebViewImpl::dragSourceEndedAt(const WebPoint& clientPoint,
                          0, false, false, false, false, 0);
   m_page->mainFrame()->eventHandler()->dragSourceEndedAt(
       pme, static_cast<DragOperation>(operation));
+  m_dragScrollTimer->stop();
 }
 
 void WebViewImpl::dragSourceMovedTo(const WebPoint& clientPoint,
                                     const WebPoint& screenPoint,
                                     WebDragOperation operation) {
-  scrollForDragging(clientPoint);
+  m_dragScrollTimer->triggerScroll(mainFrameImpl()->frameView(), clientPoint);
 }
 
 void WebViewImpl::dragSourceSystemDragEnded() {
@@ -1703,6 +1669,7 @@ void WebViewImpl::dragTargetDrop(const WebPoint& clientPoint,
   m_dropEffect = DropEffectDefault;
   m_dragOperation = WebDragOperationNone;
   m_dragIdentity = 0;
+  m_dragScrollTimer->stop();
 }
 
 int WebViewImpl::dragIdentity() {
@@ -1737,7 +1704,9 @@ WebDragOperation WebViewImpl::dragTargetDragEnterOrOver(
     m_dragOperation = static_cast<WebDragOperation>(effect);
 
   if (dragAction == DragOver)
-    scrollForDragging(clientPoint);
+    m_dragScrollTimer->triggerScroll(mainFrameImpl()->frameView(), clientPoint);
+  else
+    m_dragScrollTimer->stop();
 
   return m_dragOperation;
 }
