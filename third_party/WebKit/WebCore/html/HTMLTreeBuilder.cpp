@@ -24,7 +24,7 @@
  */
 
 #include "config.h"
-#include "HTML5TreeBuilder.h"
+#include "HTMLTreeBuilder.h"
 
 #include "DocumentFragment.h"
 #include "Element.h"
@@ -45,9 +45,9 @@ using namespace HTMLNames;
 
 static const int uninitializedLineNumberValue = -1;
 
-HTML5TreeBuilder::HTML5TreeBuilder(HTMLTokenizer* tokenizer,
-                                   HTMLDocument* document,
-                                   bool reportErrors)
+HTMLTreeBuilder::HTMLTreeBuilder(HTMLTokenizer* tokenizer,
+                                 HTMLDocument* document,
+                                 bool reportErrors)
     : m_document(document),
       m_reportErrors(reportErrors),
       m_isPaused(false),
@@ -61,7 +61,7 @@ HTML5TreeBuilder::HTML5TreeBuilder(HTMLTokenizer* tokenizer,
 
 // FIXME: Member variables should be grouped into self-initializing structs to
 // minimize code duplication between these constructors.
-HTML5TreeBuilder::HTML5TreeBuilder(
+HTMLTreeBuilder::HTMLTreeBuilder(
     HTMLTokenizer* tokenizer,
     DocumentFragment* fragment,
     FragmentScriptingPermission scriptingPermission)
@@ -77,7 +77,7 @@ HTML5TreeBuilder::HTML5TreeBuilder(
       m_scriptToProcessStartLine(uninitializedLineNumberValue),
       m_fragmentScriptingPermission(scriptingPermission) {}
 
-HTML5TreeBuilder::~HTML5TreeBuilder() {}
+HTMLTreeBuilder::~HTMLTreeBuilder() {}
 
 static void convertToOldStyle(HTMLToken& token, Token& oldStyleToken) {
   switch (token.type()) {
@@ -124,14 +124,14 @@ static void convertToOldStyle(HTMLToken& token, Token& oldStyleToken) {
   }
 }
 
-void HTML5TreeBuilder::handleScriptStartTag() {
+void HTMLTreeBuilder::handleScriptStartTag() {
   notImplemented();  // The HTML frgment case?
   m_tokenizer->setState(HTMLTokenizer::ScriptDataState);
   notImplemented();  // Save insertion mode.
 }
 
-void HTML5TreeBuilder::handleScriptEndTag(Element* scriptElement,
-                                          int scriptStartLine) {
+void HTMLTreeBuilder::handleScriptEndTag(Element* scriptElement,
+                                         int scriptStartLine) {
   ASSERT(!m_scriptToProcess);  // Caller never called takeScriptToProcess!
   ASSERT(m_scriptToProcessStartLine ==
          uninitializedLineNumberValue);  // Caller never called
@@ -147,8 +147,7 @@ void HTML5TreeBuilder::handleScriptEndTag(Element* scriptElement,
   m_scriptToProcessStartLine = scriptStartLine + 1;
 }
 
-PassRefPtr<Element> HTML5TreeBuilder::takeScriptToProcess(
-    int& scriptStartLine) {
+PassRefPtr<Element> HTMLTreeBuilder::takeScriptToProcess(int& scriptStartLine) {
   // Unpause ourselves, callers may pause us again when processing the script.
   // The HTML5 spec is written as though scripts are executed inside the tree
   // builder.  We pause the parser to exit the tree builder, and then resume
@@ -159,7 +158,7 @@ PassRefPtr<Element> HTML5TreeBuilder::takeScriptToProcess(
   return m_scriptToProcess.release();
 }
 
-HTMLTokenizer::State HTML5TreeBuilder::adjustedLexerState(
+HTMLTokenizer::State HTMLTreeBuilder::adjustedLexerState(
     HTMLTokenizer::State state,
     const AtomicString& tagName,
     Frame* frame) {
@@ -177,7 +176,7 @@ HTMLTokenizer::State HTML5TreeBuilder::adjustedLexerState(
   return state;
 }
 
-PassRefPtr<Node> HTML5TreeBuilder::passTokenToLegacyParser(HTMLToken& token) {
+PassRefPtr<Node> HTMLTreeBuilder::passTokenToLegacyParser(HTMLToken& token) {
   if (token.type() == HTMLToken::DOCTYPE) {
     DoctypeToken doctypeToken;
     doctypeToken.m_name.append(token.name().data(), token.name().size());
@@ -229,7 +228,7 @@ PassRefPtr<Node> HTML5TreeBuilder::passTokenToLegacyParser(HTMLToken& token) {
   return result.release();
 }
 
-PassRefPtr<Node> HTML5TreeBuilder::constructTreeFromToken(HTMLToken& token) {
+PassRefPtr<Node> HTMLTreeBuilder::constructTreeFromToken(HTMLToken& token) {
   // Make MSVC ignore our unreachable code for now.
   if (true)
     return passTokenToLegacyParser(token);
@@ -248,21 +247,21 @@ PassRefPtr<Node> HTML5TreeBuilder::constructTreeFromToken(HTMLToken& token) {
   return processToken(token);
 }
 
-PassRefPtr<Node> HTML5TreeBuilder::processToken(HTMLToken& token,
-                                                UChar currentCharacter) {
+PassRefPtr<Node> HTMLTreeBuilder::processToken(HTMLToken& token,
+                                               UChar currentCharacter) {
   UNUSED_PARAM(token);
   UNUSED_PARAM(currentCharacter);
   // Implementation coming in the next patch.
   return 0;
 }
 
-void HTML5TreeBuilder::finished() {
+void HTMLTreeBuilder::finished() {
   // We should call m_document->finishedParsing() here, except
   // m_legacyTreeConstructor->finished() does it for us.
   m_legacyTreeConstructor->finished();
 }
 
-bool HTML5TreeBuilder::isScriptingFlagEnabled(Frame* frame) {
+bool HTMLTreeBuilder::isScriptingFlagEnabled(Frame* frame) {
   if (!frame)
     return false;
   if (ScriptController* scriptController = frame->script())

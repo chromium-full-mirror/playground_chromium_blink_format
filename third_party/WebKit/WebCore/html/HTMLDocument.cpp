@@ -65,7 +65,7 @@
 #include "FrameLoader.h"
 #include "FrameTree.h"
 #include "FrameView.h"
-#include "HTML5DocumentParser.h"
+#include "HTMLDocumentParser.h"
 #include "HTMLBodyElement.h"
 #include "HTMLElementFactory.h"
 #include "HTMLNames.h"
@@ -275,7 +275,7 @@ DocumentParser* HTMLDocument::createParser() {
 #endif
 
   if (settings() && settings()->html5ParserEnabled())
-    return new HTML5DocumentParser(this, reportErrors);
+    return new HTMLDocumentParser(this, reportErrors);
 
   return new LegacyHTMLDocumentParser(this, reportErrors);
 }

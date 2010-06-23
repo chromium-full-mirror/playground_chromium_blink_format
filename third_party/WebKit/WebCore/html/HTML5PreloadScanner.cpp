@@ -31,7 +31,7 @@
 #include "CSSHelper.h"
 #include "DocLoader.h"
 #include "Document.h"
-#include "HTML5TreeBuilder.h"
+#include "HTMLTreeBuilder.h"
 #include "HTMLLinkElement.h"
 #include "HTMLNames.h"
 
@@ -127,7 +127,7 @@ void HTML5PreloadScanner::appendToEnd(const SegmentedString& source) {
 }
 
 void HTML5PreloadScanner::scan() {
-  // FIXME: We should save and re-use these tokens in HTML5DocumentParser if
+  // FIXME: We should save and re-use these tokens in HTMLDocumentParser if
   // the pending script doesn't end up calling document.write.
   while (m_tokenizer.nextToken(m_source, m_token)) {
     processToken();
@@ -149,7 +149,7 @@ void HTML5PreloadScanner::processToken() {
     return;
 
   PreloadTask task(m_token);
-  m_tokenizer.setState(HTML5TreeBuilder::adjustedLexerState(
+  m_tokenizer.setState(HTMLTreeBuilder::adjustedLexerState(
       m_tokenizer.state(), task.tagName(), m_document->frame()));
   if (task.tagName() == scriptTag) {
     // The tree builder handles scriptTag separately from the other tokenizer
