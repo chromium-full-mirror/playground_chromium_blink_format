@@ -52,7 +52,7 @@ class HTML5PreloadScanner : public Noncopyable {
 
   Document* m_document;
   SegmentedString m_source;
-  HTMLTokenizer m_lexer;
+  HTMLTokenizer m_tokenizer;
   HTML5Token m_token;
   CSSPreloadScanner m_cssScanner;
   bool m_bodySeen;

@@ -63,10 +63,10 @@ class NestingLevelIncrementer : public Noncopyable {
 HTML5DocumentParser::HTML5DocumentParser(HTMLDocument* document,
                                          bool reportErrors)
     : m_document(document),
-      m_lexer(new HTMLTokenizer),
+      m_tokenizer(new HTMLTokenizer),
       m_scriptRunner(new HTML5ScriptRunner(document, this)),
       m_treeConstructor(
-          new HTML5TreeBuilder(m_lexer.get(), document, reportErrors)),
+          new HTML5TreeBuilder(m_tokenizer.get(), document, reportErrors)),
       m_parserScheduler(new HTMLParserScheduler(this)),
       m_endWasDelayed(false),
       m_writeNestingLevel(0) {
@@ -79,9 +79,10 @@ HTML5DocumentParser::HTML5DocumentParser(
     DocumentFragment* fragment,
     FragmentScriptingPermission scriptingPermission)
     : m_document(fragment->document()),
-      m_lexer(new HTMLTokenizer),
-      m_treeConstructor(
-          new HTML5TreeBuilder(m_lexer.get(), fragment, scriptingPermission)),
+      m_tokenizer(new HTMLTokenizer),
+      m_treeConstructor(new HTML5TreeBuilder(m_tokenizer.get(),
+                                             fragment,
+                                             scriptingPermission)),
       m_endWasDelayed(false),
       m_writeNestingLevel(0) {
   begin();
@@ -95,7 +96,7 @@ HTML5DocumentParser::~HTML5DocumentParser() {
 }
 
 void HTML5DocumentParser::begin() {
-  // FIXME: Should we reset the lexer?
+  // FIXME: Should we reset the tokenizer?
 }
 
 void HTML5DocumentParser::stopParsing() {
@@ -107,7 +108,7 @@ bool HTML5DocumentParser::processingData() const {
   return isScheduledForResume() || inWrite();
 }
 
-void HTML5DocumentParser::pumpLexerIfPossible(SynchronousMode mode) {
+void HTML5DocumentParser::pumpTokenizerIfPossible(SynchronousMode mode) {
   if (m_parserStopped || m_treeConstructor->isPaused())
     return;
 
@@ -117,7 +118,7 @@ void HTML5DocumentParser::pumpLexerIfPossible(SynchronousMode mode) {
     return;
   }
 
-  pumpLexer(mode);
+  pumpTokenizer(mode);
 }
 
 bool HTML5DocumentParser::isScheduledForResume() const {
@@ -126,9 +127,10 @@ bool HTML5DocumentParser::isScheduledForResume() const {
 
 // Used by HTMLParserScheduler
 void HTML5DocumentParser::resumeParsingAfterYield() {
-  // We should never be here unless we can pump immediately.  Call pumpLexer()
+  // We should never be here unless we can pump immediately.  Call
+  // pumpTokenizer()
   // directly so that ASSERTS will fire if we're wrong.
-  pumpLexer(AllowYield);
+  pumpTokenizer(AllowYield);
 }
 
 bool HTML5DocumentParser::runScriptsForPausedTreeConstructor() {
@@ -143,7 +145,7 @@ bool HTML5DocumentParser::runScriptsForPausedTreeConstructor() {
   return m_scriptRunner->execute(scriptElement.release(), scriptStartLine);
 }
 
-void HTML5DocumentParser::pumpLexer(SynchronousMode mode) {
+void HTML5DocumentParser::pumpTokenizer(SynchronousMode mode) {
   ASSERT(!m_parserStopped);
   ASSERT(!m_treeConstructor->isPaused());
   ASSERT(!isScheduledForResume());
@@ -157,7 +159,7 @@ void HTML5DocumentParser::pumpLexer(SynchronousMode mode) {
   while (
       mode == ForceSynchronous ||
       (!m_parserStopped && m_parserScheduler->shouldContinueParsing(session))) {
-    if (!m_lexer->nextToken(m_input.current(), m_token))
+    if (!m_tokenizer->nextToken(m_input.current(), m_token))
       break;
 
     m_treeConstructor->constructTreeFromToken(m_token);
@@ -176,7 +178,7 @@ void HTML5DocumentParser::pumpLexer(SynchronousMode mode) {
   }
 
   if (isWaitingForScripts()) {
-    ASSERT(m_lexer->state() == HTMLTokenizer::DataState);
+    ASSERT(m_tokenizer->state() == HTMLTokenizer::DataState);
     if (!m_preloadScanner) {
       m_preloadScanner.set(new HTML5PreloadScanner(m_document));
       m_preloadScanner->appendToEnd(m_input.current());
@@ -195,7 +197,7 @@ void HTML5DocumentParser::willPumpLexer() {
   if (InspectorTimelineAgent* timelineAgent =
           m_document->inspectorTimelineAgent())
     timelineAgent->willWriteHTML(m_input.current().length(),
-                                 m_lexer->lineNumber());
+                                 m_tokenizer->lineNumber());
 #endif
 }
 
@@ -203,7 +205,7 @@ void HTML5DocumentParser::didPumpLexer() {
 #if ENABLE(INSPECTOR)
   if (InspectorTimelineAgent* timelineAgent =
           m_document->inspectorTimelineAgent())
-    timelineAgent->didWriteHTML(m_lexer->lineNumber());
+    timelineAgent->didWriteHTML(m_tokenizer->lineNumber());
 #endif
 }
 
@@ -228,7 +230,7 @@ void HTML5DocumentParser::write(const SegmentedString& source,
   } else
     m_input.insertAtCurrentInsertionPoint(source);
 
-  pumpLexerIfPossible(isFromNetwork ? AllowYield : ForceSynchronous);
+  pumpTokenizerIfPossible(isFromNetwork ? AllowYield : ForceSynchronous);
   endIfDelayed();
 }
 
@@ -236,7 +238,7 @@ void HTML5DocumentParser::end() {
   ASSERT(!isScheduledForResume());
   // NOTE: This pump should only ever emit buffered character tokens,
   // so ForceSynchronous vs. AllowYield should be meaningless.
-  pumpLexerIfPossible(ForceSynchronous);
+  pumpTokenizerIfPossible(ForceSynchronous);
 
   // Informs the the rest of WebCore that parsing is really finished (and
   // deletes this).
@@ -290,11 +292,11 @@ bool HTML5DocumentParser::inScriptExecution() const {
 }
 
 int HTML5DocumentParser::lineNumber() const {
-  return m_lexer->lineNumber();
+  return m_tokenizer->lineNumber();
 }
 
 int HTML5DocumentParser::columnNumber() const {
-  return m_lexer->columnNumber();
+  return m_tokenizer->columnNumber();
 }
 
 LegacyHTMLTreeConstructor* HTML5DocumentParser::htmlTreeConstructor() const {
@@ -309,7 +311,7 @@ void HTML5DocumentParser::resumeParsingAfterScriptExecution() {
   ASSERT(!inScriptExecution());
   ASSERT(!m_treeConstructor->isPaused());
 
-  pumpLexerIfPossible(AllowYield);
+  pumpTokenizerIfPossible(AllowYield);
 
   // The document already finished parsing we were just waiting on scripts when
   // finished() was called.

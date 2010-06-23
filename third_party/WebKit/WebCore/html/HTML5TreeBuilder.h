@@ -101,9 +101,9 @@ class HTML5TreeBuilder : public Noncopyable {
 
   InsertionMode m_insertionMode;
 
-  // HTML5 spec requires that we be able to change the state of the lexer
+  // HTML5 spec requires that we be able to change the state of the tokenizer
   // from within parser actions.
-  HTMLTokenizer* m_lexer;
+  HTMLTokenizer* m_tokenizer;
 
   // We're re-using logic from the old LegacyHTMLTreeConstructor while this
   // class is being written.
