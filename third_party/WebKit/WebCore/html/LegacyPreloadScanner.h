@@ -37,10 +37,10 @@ class CachedResource;
 class CachedResourceClient;
 class Document;
 
-class PreloadScanner : public Noncopyable {
+class LegacyPreloadScanner : public Noncopyable {
  public:
-  PreloadScanner(Document*);
-  ~PreloadScanner();
+  LegacyPreloadScanner(Document*);
+  ~LegacyPreloadScanner();
   void begin();
   void write(const SegmentedString&);
   void end();

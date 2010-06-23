@@ -47,7 +47,7 @@ class HTMLViewSourceDocument;
 class FrameView;
 class LegacyHTMLTreeConstructor;
 class Node;
-class PreloadScanner;
+class LegacyPreloadScanner;
 class ScriptSourceCode;
 
 /**
@@ -480,7 +480,7 @@ class LegacyHTMLDocumentParser : public DocumentParser,
   bool m_fragment;
   FragmentScriptingPermission m_scriptingPermission;
 
-  OwnPtr<PreloadScanner> m_preloadScanner;
+  OwnPtr<LegacyPreloadScanner> m_preloadScanner;
 };
 
 void parseLegacyHTMLDocumentFragment(

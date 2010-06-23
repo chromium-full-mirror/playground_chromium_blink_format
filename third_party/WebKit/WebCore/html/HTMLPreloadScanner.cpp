@@ -26,7 +26,7 @@
  */
 
 #include "config.h"
-#include "HTML5PreloadScanner.h"
+#include "HTMLPreloadScanner.h"
 
 #include "CSSHelper.h"
 #include "DocLoader.h"
@@ -116,17 +116,17 @@ class PreloadTask {
 
 }  // namespace
 
-HTML5PreloadScanner::HTML5PreloadScanner(Document* document)
+HTMLPreloadScanner::HTMLPreloadScanner(Document* document)
     : m_document(document),
       m_cssScanner(document),
       m_bodySeen(false),
       m_inStyle(false) {}
 
-void HTML5PreloadScanner::appendToEnd(const SegmentedString& source) {
+void HTMLPreloadScanner::appendToEnd(const SegmentedString& source) {
   m_source.append(source);
 }
 
-void HTML5PreloadScanner::scan() {
+void HTMLPreloadScanner::scan() {
   // FIXME: We should save and re-use these tokens in HTMLDocumentParser if
   // the pending script doesn't end up calling document.write.
   while (m_tokenizer.nextToken(m_source, m_token)) {
@@ -135,7 +135,7 @@ void HTML5PreloadScanner::scan() {
   }
 }
 
-void HTML5PreloadScanner::processToken() {
+void HTMLPreloadScanner::processToken() {
   if (m_inStyle) {
     if (m_token.type() == HTMLToken::Character)
       m_cssScanner.scan(m_token, scanningBody());
@@ -167,7 +167,7 @@ void HTML5PreloadScanner::processToken() {
   task.preload(m_document, scanningBody());
 }
 
-bool HTML5PreloadScanner::scanningBody() const {
+bool HTMLPreloadScanner::scanningBody() const {
   return m_document->body() || m_bodySeen;
 }
 }
