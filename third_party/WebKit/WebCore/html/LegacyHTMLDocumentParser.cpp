@@ -28,7 +28,7 @@
 */
 
 #include "config.h"
-#include "HTMLDocumentParser.h"
+#include "LegacyHTMLDocumentParser.h"
 
 #include "Attribute.h"
 #include "CSSHelper.h"
@@ -150,7 +150,8 @@ inline void Token::addAttribute(AtomicString& attrName,
 
 // ----------------------------------------------------------------------------
 
-HTMLDocumentParser::HTMLDocumentParser(HTMLDocument* doc, bool reportErrors)
+LegacyHTMLDocumentParser::LegacyHTMLDocumentParser(HTMLDocument* doc,
+                                                   bool reportErrors)
     : DocumentParser(),
       m_buffer(0),
       m_scriptCode(0),
@@ -160,10 +161,10 @@ HTMLDocumentParser::HTMLDocumentParser(HTMLDocument* doc, bool reportErrors)
       m_executingScript(0),
       m_requestingScript(false),
       m_hasScriptsWaitingForStylesheets(false),
-      m_timer(this, &HTMLDocumentParser::timerFired),
+      m_timer(this, &LegacyHTMLDocumentParser::timerFired),
       m_externalScriptsTimer(
           this,
-          &HTMLDocumentParser::executeExternalScriptsTimerFired),
+          &LegacyHTMLDocumentParser::executeExternalScriptsTimerFired),
       m_doc(doc),
       m_treeConstructor(new LegacyHTMLTreeConstructor(doc, reportErrors)),
       m_inWrite(false),
@@ -172,7 +173,7 @@ HTMLDocumentParser::HTMLDocumentParser(HTMLDocument* doc, bool reportErrors)
   begin();
 }
 
-HTMLDocumentParser::HTMLDocumentParser(HTMLViewSourceDocument* doc)
+LegacyHTMLDocumentParser::LegacyHTMLDocumentParser(HTMLViewSourceDocument* doc)
     : DocumentParser(true),
       m_buffer(0),
       m_scriptCode(0),
@@ -182,10 +183,10 @@ HTMLDocumentParser::HTMLDocumentParser(HTMLViewSourceDocument* doc)
       m_executingScript(0),
       m_requestingScript(false),
       m_hasScriptsWaitingForStylesheets(false),
-      m_timer(this, &HTMLDocumentParser::timerFired),
+      m_timer(this, &LegacyHTMLDocumentParser::timerFired),
       m_externalScriptsTimer(
           this,
-          &HTMLDocumentParser::executeExternalScriptsTimerFired),
+          &LegacyHTMLDocumentParser::executeExternalScriptsTimerFired),
       m_doc(doc),
       m_inWrite(false),
       m_fragment(false),
@@ -193,7 +194,7 @@ HTMLDocumentParser::HTMLDocumentParser(HTMLViewSourceDocument* doc)
   begin();
 }
 
-HTMLDocumentParser::HTMLDocumentParser(
+LegacyHTMLDocumentParser::LegacyHTMLDocumentParser(
     DocumentFragment* frag,
     FragmentScriptingPermission scriptingPermission)
     : m_buffer(0),
@@ -204,10 +205,10 @@ HTMLDocumentParser::HTMLDocumentParser(
       m_executingScript(0),
       m_requestingScript(false),
       m_hasScriptsWaitingForStylesheets(false),
-      m_timer(this, &HTMLDocumentParser::timerFired),
+      m_timer(this, &LegacyHTMLDocumentParser::timerFired),
       m_externalScriptsTimer(
           this,
-          &HTMLDocumentParser::executeExternalScriptsTimerFired),
+          &LegacyHTMLDocumentParser::executeExternalScriptsTimerFired),
       m_doc(frag->document()),
       m_treeConstructor(
           new LegacyHTMLTreeConstructor(frag, scriptingPermission)),
@@ -217,7 +218,7 @@ HTMLDocumentParser::HTMLDocumentParser(
   begin();
 }
 
-void HTMLDocumentParser::reset() {
+void LegacyHTMLDocumentParser::reset() {
   ASSERT(m_executingScript == 0);
 
   while (!m_pendingScripts.isEmpty()) {
@@ -247,7 +248,7 @@ void HTMLDocumentParser::reset() {
   m_hasScriptsWaitingForStylesheets = false;
 }
 
-void HTMLDocumentParser::begin() {
+void LegacyHTMLDocumentParser::begin() {
   m_executingScript = 0;
   m_requestingScript = false;
   m_hasScriptsWaitingForStylesheets = false;
@@ -282,11 +283,11 @@ void HTMLDocumentParser::begin() {
     m_tokenizerChunkSize = defaultTokenizerChunkSize;
 }
 
-void HTMLDocumentParser::setForceSynchronous(bool force) {
+void LegacyHTMLDocumentParser::setForceSynchronous(bool force) {
   m_state.setForceSynchronous(force);
 }
 
-HTMLDocumentParser::State HTMLDocumentParser::processListing(
+LegacyHTMLDocumentParser::State LegacyHTMLDocumentParser::processListing(
     SegmentedString list,
     State state) {
   // This function adds the listing 'list' as
@@ -324,7 +325,7 @@ HTMLDocumentParser::State HTMLDocumentParser::processListing(
   return state;
 }
 
-HTMLDocumentParser::State HTMLDocumentParser::parseNonHTMLText(
+LegacyHTMLDocumentParser::State LegacyHTMLDocumentParser::parseNonHTMLText(
     SegmentedString& src,
     State state) {
   ASSERT(state.inTextArea() || state.inTitle() || state.inIFrame() ||
@@ -439,7 +440,8 @@ HTMLDocumentParser::State HTMLDocumentParser::parseNonHTMLText(
   return state;
 }
 
-HTMLDocumentParser::State HTMLDocumentParser::scriptHandler(State state) {
+LegacyHTMLDocumentParser::State LegacyHTMLDocumentParser::scriptHandler(
+    State state) {
   // We are inside a <script>
   bool doScriptExec = false;
   int startLine = m_currentScriptTagStartLineNumber + 1;  // Script line numbers
@@ -586,7 +588,7 @@ HTMLDocumentParser::State HTMLDocumentParser::scriptHandler(State state) {
   return state;
 }
 
-HTMLDocumentParser::State HTMLDocumentParser::scriptExecution(
+LegacyHTMLDocumentParser::State LegacyHTMLDocumentParser::scriptExecution(
     const ScriptSourceCode& sourceCode,
     State state) {
   if (m_fragment || !m_doc->frame())
@@ -643,8 +645,9 @@ HTMLDocumentParser::State HTMLDocumentParser::scriptExecution(
   return state;
 }
 
-HTMLDocumentParser::State HTMLDocumentParser::parseComment(SegmentedString& src,
-                                                           State state) {
+LegacyHTMLDocumentParser::State LegacyHTMLDocumentParser::parseComment(
+    SegmentedString& src,
+    State state) {
   // FIXME: Why does this code even run for comments inside <script> and
   // <style>? This seems bogus.
   checkScriptBuffer(src.length());
@@ -694,8 +697,9 @@ HTMLDocumentParser::State HTMLDocumentParser::parseComment(SegmentedString& src,
   return state;
 }
 
-HTMLDocumentParser::State HTMLDocumentParser::parseServer(SegmentedString& src,
-                                                          State state) {
+LegacyHTMLDocumentParser::State LegacyHTMLDocumentParser::parseServer(
+    SegmentedString& src,
+    State state) {
   checkScriptBuffer(src.length());
   while (!src.isEmpty()) {
     UChar ch = *src;
@@ -712,9 +716,9 @@ HTMLDocumentParser::State HTMLDocumentParser::parseServer(SegmentedString& src,
   return state;
 }
 
-HTMLDocumentParser::State HTMLDocumentParser::parseProcessingInstruction(
-    SegmentedString& src,
-    State state) {
+LegacyHTMLDocumentParser::State
+LegacyHTMLDocumentParser::parseProcessingInstruction(SegmentedString& src,
+                                                     State state) {
   UChar oldchar = 0;
   while (!src.isEmpty()) {
     UChar chbegin = *src;
@@ -739,8 +743,9 @@ HTMLDocumentParser::State HTMLDocumentParser::parseProcessingInstruction(
   return state;
 }
 
-HTMLDocumentParser::State HTMLDocumentParser::parseText(SegmentedString& src,
-                                                        State state) {
+LegacyHTMLDocumentParser::State LegacyHTMLDocumentParser::parseText(
+    SegmentedString& src,
+    State state) {
   while (!src.isEmpty()) {
     UChar cc = *src;
 
@@ -766,12 +771,13 @@ HTMLDocumentParser::State HTMLDocumentParser::parseText(SegmentedString& src,
   return state;
 }
 
-HTMLDocumentParser::State HTMLDocumentParser::parseEntity(SegmentedString& src,
-                                                          UChar*& dest,
-                                                          State state,
-                                                          unsigned& cBufferPos,
-                                                          bool start,
-                                                          bool parsingTag) {
+LegacyHTMLDocumentParser::State LegacyHTMLDocumentParser::parseEntity(
+    SegmentedString& src,
+    UChar*& dest,
+    State state,
+    unsigned& cBufferPos,
+    bool start,
+    bool parsingTag) {
   if (start) {
     cBufferPos = 0;
     state.setEntityState(SearchEntity);
@@ -946,8 +952,9 @@ HTMLDocumentParser::State HTMLDocumentParser::parseEntity(SegmentedString& src,
   return state;
 }
 
-HTMLDocumentParser::State HTMLDocumentParser::parseDoctype(SegmentedString& src,
-                                                           State state) {
+LegacyHTMLDocumentParser::State LegacyHTMLDocumentParser::parseDoctype(
+    SegmentedString& src,
+    State state) {
   ASSERT(state.inDoctype());
   while (!src.isEmpty() && state.inDoctype()) {
     UChar c = *src;
@@ -1166,8 +1173,9 @@ HTMLDocumentParser::State HTMLDocumentParser::parseDoctype(SegmentedString& src,
   return state;
 }
 
-HTMLDocumentParser::State HTMLDocumentParser::parseTag(SegmentedString& src,
-                                                       State state) {
+LegacyHTMLDocumentParser::State LegacyHTMLDocumentParser::parseTag(
+    SegmentedString& src,
+    State state) {
   ASSERT(!state.hasEntityState());
 
   unsigned cBufferPos = m_cBufferPos;
@@ -1675,9 +1683,9 @@ HTMLDocumentParser::State HTMLDocumentParser::parseTag(SegmentedString& src,
   return state;
 }
 
-inline bool HTMLDocumentParser::continueProcessing(int& processedCount,
-                                                   double startTime,
-                                                   State& state) {
+inline bool LegacyHTMLDocumentParser::continueProcessing(int& processedCount,
+                                                         double startTime,
+                                                         State& state) {
   // We don't want to be checking elapsed time with every character, so we only
   // check after we've
   // processed a certain number of characters.
@@ -1707,7 +1715,7 @@ inline bool HTMLDocumentParser::continueProcessing(int& processedCount,
 
 // Turns the statemachine one crank using the passed in State object.
 // This does not modify m_state directly in order to be reentrant.
-ALWAYS_INLINE void HTMLDocumentParser::advance(State& state) {
+ALWAYS_INLINE void LegacyHTMLDocumentParser::advance(State& state) {
   // do we need to enlarge the buffer?
   checkBuffer();
 
@@ -1818,21 +1826,22 @@ ALWAYS_INLINE void HTMLDocumentParser::advance(State& state) {
   }
 }
 
-void HTMLDocumentParser::willWriteHTML(const SegmentedString& source) {
+void LegacyHTMLDocumentParser::willWriteHTML(const SegmentedString& source) {
 #if ENABLE(INSPECTOR)
   if (InspectorTimelineAgent* timelineAgent = m_doc->inspectorTimelineAgent())
     timelineAgent->willWriteHTML(source.length(), m_lineNumber);
 #endif
 }
 
-void HTMLDocumentParser::didWriteHTML() {
+void LegacyHTMLDocumentParser::didWriteHTML() {
 #if ENABLE(INSPECTOR)
   if (InspectorTimelineAgent* timelineAgent = m_doc->inspectorTimelineAgent())
     timelineAgent->didWriteHTML(m_lineNumber);
 #endif
 }
 
-void HTMLDocumentParser::write(const SegmentedString& str, bool appendData) {
+void LegacyHTMLDocumentParser::write(const SegmentedString& str,
+                                     bool appendData) {
   if (!m_buffer)
     return;
 
@@ -1901,11 +1910,11 @@ void HTMLDocumentParser::write(const SegmentedString& str, bool appendData) {
   ImageLoader::dispatchPendingBeforeLoadEvents();
 }
 
-void HTMLDocumentParser::stopParsing() {
+void LegacyHTMLDocumentParser::stopParsing() {
   DocumentParser::stopParsing();
   m_timer.stop();
 
-  // FIXME: Why is HTMLDocumentParser the only DocumentParser which calls
+  // FIXME: Why is LegacyHTMLDocumentParser the only DocumentParser which calls
   // checkCompleted?
   // The FrameLoader needs to know that the parser has finished with its data,
   // regardless of whether it happened naturally or due to manual intervention.
@@ -1913,11 +1922,11 @@ void HTMLDocumentParser::stopParsing() {
     m_doc->frame()->loader()->checkCompleted();
 }
 
-bool HTMLDocumentParser::processingData() const {
+bool LegacyHTMLDocumentParser::processingData() const {
   return m_timer.isActive() || m_inWrite;
 }
 
-void HTMLDocumentParser::timerFired(Timer<HTMLDocumentParser>*) {
+void LegacyHTMLDocumentParser::timerFired(Timer<LegacyHTMLDocumentParser>*) {
   if (m_doc->view() && m_doc->view()->layoutPending() &&
       !m_doc->minimumLayoutDelay()) {
     // Restart the timer and let layout win.  This is basically a way of
@@ -1932,7 +1941,7 @@ void HTMLDocumentParser::timerFired(Timer<HTMLDocumentParser>*) {
   write(SegmentedString(), true);
 }
 
-void HTMLDocumentParser::end() {
+void LegacyHTMLDocumentParser::end() {
   ASSERT(!m_timer.isActive());
   m_timer.stop();  // Only helps if assertion above fires, but do it anyway.
 
@@ -1955,7 +1964,7 @@ void HTMLDocumentParser::end() {
     m_doc->finishedParsing();
 }
 
-void HTMLDocumentParser::finish() {
+void LegacyHTMLDocumentParser::finish() {
   // do this as long as we don't find matching comment ends
   while ((m_state.inComment() || m_state.inServer()) && m_scriptCode &&
          m_scriptCodeSize) {
@@ -1995,11 +2004,11 @@ void HTMLDocumentParser::finish() {
     end();  // this actually causes us to be deleted
 }
 
-bool HTMLDocumentParser::finishWasCalled() {
+bool LegacyHTMLDocumentParser::finishWasCalled() {
   return m_noMoreData;
 }
 
-PassRefPtr<Node> HTMLDocumentParser::processToken() {
+PassRefPtr<Node> LegacyHTMLDocumentParser::processToken() {
   if (m_dest > m_buffer) {
     m_currentToken.text =
         StringImpl::createStrippingNullCharacters(m_buffer, m_dest - m_buffer);
@@ -2029,7 +2038,7 @@ PassRefPtr<Node> HTMLDocumentParser::processToken() {
   return n.release();
 }
 
-void HTMLDocumentParser::processDoctypeToken() {
+void LegacyHTMLDocumentParser::processDoctypeToken() {
   if (inViewSourceMode())
     static_cast<HTMLViewSourceDocument*>(m_doc)->addViewSourceDoctypeToken(
         &m_doctypeToken);
@@ -2037,12 +2046,12 @@ void HTMLDocumentParser::processDoctypeToken() {
     m_treeConstructor->parseDoctypeToken(&m_doctypeToken);
 }
 
-HTMLDocumentParser::~HTMLDocumentParser() {
+LegacyHTMLDocumentParser::~LegacyHTMLDocumentParser() {
   ASSERT(!m_inWrite);
   reset();
 }
 
-void HTMLDocumentParser::enlargeBuffer(int len) {
+void LegacyHTMLDocumentParser::enlargeBuffer(int len) {
   // Resize policy: Always at least double the size of the buffer each time.
   int delta = max(len, m_bufferSize);
 
@@ -2061,7 +2070,7 @@ void HTMLDocumentParser::enlargeBuffer(int len) {
   m_bufferSize = newSize;
 }
 
-void HTMLDocumentParser::enlargeScriptBuffer(int len) {
+void LegacyHTMLDocumentParser::enlargeScriptBuffer(int len) {
   // Resize policy: Always at least double the size of the buffer each time.
   int delta = max(len, m_scriptCodeCapacity);
 
@@ -2086,18 +2095,18 @@ void HTMLDocumentParser::enlargeScriptBuffer(int len) {
   m_scriptCodeCapacity = newSize;
 }
 
-void HTMLDocumentParser::executeScriptsWaitingForStylesheets() {
+void LegacyHTMLDocumentParser::executeScriptsWaitingForStylesheets() {
   ASSERT(m_doc->haveStylesheetsLoaded());
 
   if (m_hasScriptsWaitingForStylesheets)
     notifyFinished(0);
 }
 
-void HTMLDocumentParser::notifyFinished(CachedResource*) {
+void LegacyHTMLDocumentParser::notifyFinished(CachedResource*) {
   executeExternalScriptsIfReady();
 }
 
-void HTMLDocumentParser::executeExternalScriptsIfReady() {
+void LegacyHTMLDocumentParser::executeExternalScriptsIfReady() {
   ASSERT(!m_pendingScripts.isEmpty());
 
   // Make external scripts wait for external stylesheets.
@@ -2165,8 +2174,8 @@ void HTMLDocumentParser::executeExternalScriptsIfReady() {
   }
 }
 
-void HTMLDocumentParser::executeExternalScriptsTimerFired(
-    Timer<HTMLDocumentParser>*) {
+void LegacyHTMLDocumentParser::executeExternalScriptsTimerFired(
+    Timer<LegacyHTMLDocumentParser>*) {
   if (m_doc->view() && m_doc->view()->layoutPending() &&
       !m_doc->minimumLayoutDelay()) {
     // Restart the timer and do layout first.
@@ -2178,7 +2187,8 @@ void HTMLDocumentParser::executeExternalScriptsTimerFired(
   executeExternalScriptsIfReady();
 }
 
-bool HTMLDocumentParser::continueExecutingExternalScripts(double startTime) {
+bool LegacyHTMLDocumentParser::continueExecutingExternalScripts(
+    double startTime) {
   if (m_externalScriptsTimer.isActive())
     return false;
 
@@ -2190,11 +2200,11 @@ bool HTMLDocumentParser::continueExecutingExternalScripts(double startTime) {
   return true;
 }
 
-bool HTMLDocumentParser::isWaitingForScripts() const {
+bool LegacyHTMLDocumentParser::isWaitingForScripts() const {
   return m_state.loadingExtScript();
 }
 
-void HTMLDocumentParser::setSrc(const SegmentedString& source) {
+void LegacyHTMLDocumentParser::setSrc(const SegmentedString& source) {
   m_src = source;
 }
 
@@ -2202,7 +2212,7 @@ void parseLegacyHTMLDocumentFragment(
     const String& source,
     DocumentFragment* fragment,
     FragmentScriptingPermission scriptingPermission) {
-  HTMLDocumentParser parser(fragment, scriptingPermission);
+  LegacyHTMLDocumentParser parser(fragment, scriptingPermission);
   parser.setForceSynchronous(true);
   parser.write(source, true);
   parser.finish();

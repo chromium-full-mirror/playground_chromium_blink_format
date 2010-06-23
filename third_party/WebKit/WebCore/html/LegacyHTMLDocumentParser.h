@@ -148,13 +148,15 @@ class DoctypeToken {
 // (like dealing with <script> tags).  The HTML lexer bits should be pushed
 // down into a separate HTML lexer class.
 
-class HTMLDocumentParser : public DocumentParser, public CachedResourceClient {
+class LegacyHTMLDocumentParser : public DocumentParser,
+                                 public CachedResourceClient {
  public:
-  HTMLDocumentParser(HTMLDocument*, bool reportErrors);
-  HTMLDocumentParser(HTMLViewSourceDocument*);
-  HTMLDocumentParser(DocumentFragment*,
-                     FragmentScriptingPermission = FragmentScriptingAllowed);
-  virtual ~HTMLDocumentParser();
+  LegacyHTMLDocumentParser(HTMLDocument*, bool reportErrors);
+  LegacyHTMLDocumentParser(HTMLViewSourceDocument*);
+  LegacyHTMLDocumentParser(
+      DocumentFragment*,
+      FragmentScriptingPermission = FragmentScriptingAllowed);
+  virtual ~LegacyHTMLDocumentParser();
 
   virtual void write(const SegmentedString&, bool appendData);
   virtual void finish();
@@ -178,7 +180,7 @@ class HTMLDocumentParser : public DocumentParser, public CachedResourceClient {
   virtual LegacyHTMLTreeConstructor* htmlTreeConstructor() const {
     return m_treeConstructor.get();
   }
-  virtual HTMLDocumentParser* asHTMLDocumentParser() { return this; }
+  virtual LegacyHTMLDocumentParser* asHTMLDocumentParser() { return this; }
 
  private:
   class State;
@@ -230,14 +232,14 @@ class HTMLDocumentParser : public DocumentParser, public CachedResourceClient {
   void enlargeScriptBuffer(int len);
 
   bool continueProcessing(int& processedCount, double startTime, State&);
-  void timerFired(Timer<HTMLDocumentParser>*);
+  void timerFired(Timer<LegacyHTMLDocumentParser>*);
   void allDataProcessed();
 
   // from CachedResourceClient
   void notifyFinished(CachedResource*);
 
   void executeExternalScriptsIfReady();
-  void executeExternalScriptsTimerFired(Timer<HTMLDocumentParser>*);
+  void executeExternalScriptsTimerFired(Timer<LegacyHTMLDocumentParser>*);
   bool continueExecutingExternalScripts(double startTime);
 
   // Internal buffers
@@ -456,10 +458,10 @@ class HTMLDocumentParser : public DocumentParser, public CachedResourceClient {
   int m_tokenizerChunkSize;
 
   // The timer for continued processing.
-  Timer<HTMLDocumentParser> m_timer;
+  Timer<LegacyHTMLDocumentParser> m_timer;
 
   // The timer for continued executing external scripts.
-  Timer<HTMLDocumentParser> m_externalScriptsTimer;
+  Timer<LegacyHTMLDocumentParser> m_externalScriptsTimer;
 
 // This buffer can hold arbitrarily long user-defined attribute names, such as
 // in EMBED tags.

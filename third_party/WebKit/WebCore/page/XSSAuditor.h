@@ -68,7 +68,8 @@ class ScriptSourceCode;
 // * ScriptEventListener::createAttributeEventListener - used to create
 // JavaScript event handlers.
 // * HTMLBaseElement::process - used to set the document base URL.
-// * HTMLDocumentParser::parseTag - used to load external JavaScript scripts.
+// * LegacyHTMLDocumentParser::parseTag - used to load external JavaScript
+// scripts.
 // * SubframeLoader::requestObject - used to load <object>/<embed> elements.
 //
 class XSSAuditor : public Noncopyable {

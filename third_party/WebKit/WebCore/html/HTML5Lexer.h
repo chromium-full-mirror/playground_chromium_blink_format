@@ -123,7 +123,7 @@ class HTML5Lexer : public Noncopyable {
   int lineNumber() const { return m_lineNumber; }
   int columnNumber() const {
     return 1;
-  }  // Matches HTMLDocumentParser.h behavior.
+  }  // Matches LegacyHTMLDocumentParser.h behavior.
 
   State state() const { return m_state; }
   void setState(State state) { m_state = state; }

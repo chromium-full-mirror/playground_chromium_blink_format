@@ -54,7 +54,7 @@
 #include "HTMLTableCellElement.h"
 #include "HTMLTableRowElement.h"
 #include "HTMLTableSectionElement.h"
-#include "HTMLDocumentParser.h"
+#include "LegacyHTMLDocumentParser.h"
 #include "LocalizedStrings.h"
 #include "Page.h"
 #include "Settings.h"
@@ -1778,8 +1778,8 @@ void LegacyHTMLTreeConstructor::reportErrorToConsole(
   if (!frame)
     return;
 
-  HTMLDocumentParser* htmlTokenizer =
-      static_cast<HTMLDocumentParser*>(m_document->parser());
+  LegacyHTMLDocumentParser* htmlTokenizer =
+      static_cast<LegacyHTMLDocumentParser*>(m_document->parser());
   int lineNumber = htmlTokenizer->lineNumber() + 1;
 
   AtomicString tag1;

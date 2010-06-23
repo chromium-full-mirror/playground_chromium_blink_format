@@ -81,7 +81,7 @@
 #include "LegacyHTMLTreeConstructor.h"
 #include "HTMLStyleElement.h"
 #include "HTMLTitleElement.h"
-#include "HTMLDocumentParser.h"
+#include "LegacyHTMLDocumentParser.h"
 #include "HTTPParsers.h"
 #include "HistoryItem.h"
 #include "HitTestRequest.h"
@@ -2011,7 +2011,7 @@ void Document::write(const SegmentedString& text, Document* ownerDocument) {
   // the parser (after running external scripts, etc.) thus necessitating a
   // separate state for forceSynchronous.
   bool wasForcedSynchronous = false;
-  HTMLDocumentParser* parser = m_parser->asHTMLDocumentParser();
+  LegacyHTMLDocumentParser* parser = m_parser->asHTMLDocumentParser();
   if (parser) {
     wasForcedSynchronous = parser->forceSynchronous();
     parser->setForceSynchronous(true);
