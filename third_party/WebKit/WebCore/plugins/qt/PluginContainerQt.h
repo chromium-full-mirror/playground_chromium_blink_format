@@ -16,8 +16,8 @@
     the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
     Boston, MA 02110-1301, USA.
 */
-#ifndef PluginContainerQt_H
-#define PluginContainerQt_H
+#ifndef PluginContainerQt_h
+#define PluginContainerQt_h
 
 #include <QX11EmbedContainer>
 
@@ -58,4 +58,4 @@ class PluginClientWrapper : public QWidget {
 };
 }
 
-#endif  // PluginContainerQt_H
+#endif  // PluginContainerQt_h

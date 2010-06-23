@@ -34,8 +34,8 @@
 // this file.
 // *Utils files are not very WebKit-ty.
 
-#ifndef FontUtilsWin_h
-#define FontUtilsWin_h
+#ifndef FontUtilsChromiumWin_h
+#define FontUtilsChromiumWin_h
 
 #include <usp10.h>
 #include <wchar.h>
@@ -101,4 +101,4 @@ int getStyleFromLogfont(const LOGFONT*);
 
 }  // namespace WebCore
 
-#endif  // FontUtilsWin_h
+#endif  // FontUtilsChromiumWin_h

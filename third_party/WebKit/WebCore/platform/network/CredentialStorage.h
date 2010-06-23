@@ -23,8 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SessionCredentialStorage_h
-#define SessionCredentialStorage_h
+#ifndef CredentialStorage_h
+#define CredentialStorage_h
 
 namespace WebCore {
 
@@ -56,4 +56,4 @@ class CredentialStorage {
 
 }  // namespace WebCore
 
-#endif  // SessionCredentialStorage_h
+#endif  // CredentialStorage_h

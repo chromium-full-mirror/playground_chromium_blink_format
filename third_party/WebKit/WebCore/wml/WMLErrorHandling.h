@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef WMLErrorCodes_h
-#define WMLErrorCodes_h
+#ifndef WMLErrorHandling_h
+#define WMLErrorHandling_h
 
 #if ENABLE(WML)
 namespace WebCore {

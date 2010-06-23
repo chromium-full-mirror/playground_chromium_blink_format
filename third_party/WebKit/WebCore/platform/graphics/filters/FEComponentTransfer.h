@@ -19,8 +19,8 @@
     Boston, MA 02110-1301, USA.
 */
 
-#ifndef SVGFEComponentTransfer_h
-#define SVGFEComponentTransfer_h
+#ifndef FEComponentTransfer_h
+#define FEComponentTransfer_h
 
 #if ENABLE(FILTERS)
 #include "FilterEffect.h"
@@ -105,4 +105,4 @@ class FEComponentTransfer : public FilterEffect {
 
 #endif  // ENABLE(FILTERS)
 
-#endif  // SVGFEComponentTransfer_h
+#endif  // FEComponentTransfer_h

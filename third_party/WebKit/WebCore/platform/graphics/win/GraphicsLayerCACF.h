@@ -23,8 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GraphicsLayerCACF_h_
-#define GraphicsLayerCACF_h_
+#ifndef GraphicsLayerCACF_h
+#define GraphicsLayerCACF_h
 
 #if USE(ACCELERATED_COMPOSITING)
 
@@ -143,4 +143,4 @@ class GraphicsLayerCACF : public GraphicsLayer {
 
 #endif  // USE(ACCELERATED_COMPOSITING)
 
-#endif  // GraphicsLayerCACF_h_
+#endif  // GraphicsLayerCACF_h
