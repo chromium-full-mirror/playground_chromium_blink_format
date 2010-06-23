@@ -28,8 +28,8 @@
 
 #include "CachedResourceClient.h"
 #include "FragmentScriptingPermission.h"
-#include "HTML5ScriptRunnerHost.h"
-#include "HTML5Token.h"
+#include "HTMLScriptRunnerHost.h"
+#include "HTMLToken.h"
 #include "HTMLInputStream.h"
 #include "SegmentedString.h"
 #include "DocumentParser.h"
@@ -43,7 +43,7 @@ class DocumentFragment;
 class HTMLDocument;
 class HTMLParserScheduler;
 class HTMLTokenizer;
-class HTML5ScriptRunner;
+class HTMLScriptRunner;
 class HTML5TreeBuilder;
 class HTML5PreloadScanner;
 class LegacyHTMLTreeConstructor;
@@ -51,7 +51,7 @@ class ScriptController;
 class ScriptSourceCode;
 
 class HTML5DocumentParser : public DocumentParser,
-                            HTML5ScriptRunnerHost,
+                            HTMLScriptRunnerHost,
                             CachedResourceClient {
  public:
   // FIXME: These constructors should be made private and replaced by create()
@@ -78,7 +78,7 @@ class HTML5DocumentParser : public DocumentParser,
   // Remove this when the LegacyHTMLTreeConstructor is no longer used.
   virtual LegacyHTMLTreeConstructor* htmlTreeConstructor() const;
 
-  // HTML5ScriptRunnerHost
+  // HTMLScriptRunnerHost
   virtual void watchForLoad(CachedResource*);
   virtual void stopWatchingForLoad(CachedResource*);
   virtual bool shouldLoadExternalScriptFromSrc(const AtomicString&);
@@ -117,13 +117,13 @@ class HTML5DocumentParser : public DocumentParser,
   HTMLInputStream m_input;
 
   // We hold m_token here because it might be partially complete.
-  HTML5Token m_token;
+  HTMLToken m_token;
 
   // We must support parsing into a Document* and not just HTMLDocument*
   // to support DocumentFragment (which has a Document*).
   Document* m_document;
   OwnPtr<HTMLTokenizer> m_tokenizer;
-  OwnPtr<HTML5ScriptRunner> m_scriptRunner;
+  OwnPtr<HTMLScriptRunner> m_scriptRunner;
   OwnPtr<HTML5TreeBuilder> m_treeConstructor;
   OwnPtr<HTML5PreloadScanner> m_preloadScanner;
   OwnPtr<HTMLParserScheduler> m_parserScheduler;
