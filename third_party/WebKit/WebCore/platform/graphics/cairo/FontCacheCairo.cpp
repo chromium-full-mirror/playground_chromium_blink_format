@@ -130,9 +130,6 @@ FontPlatformData* FontCache::createFontPlatformData(
                           reinterpret_cast<const FcChar8*>(fcfamily)))
     return 0;
 
-  FcConfigSubstitute(0, pattern.get(), FcMatchPattern);
-  FcDefaultSubstitute(pattern.get());
-
   GOwnPtr<FcObjectSet> objectSet(FcObjectSetCreate());
   if (!FcObjectSetAdd(objectSet.get(), FC_FAMILY))
     return 0;
