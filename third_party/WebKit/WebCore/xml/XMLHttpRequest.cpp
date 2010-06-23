@@ -528,12 +528,12 @@ void XMLHttpRequest::createRequest(ExceptionCode& ec) {
   // permit cross origin requests should look exactly like POSTing to an URL
   // that does not respond at all.
   // Also, only async requests support upload progress events.
-  bool forcePreflight = false;
+  bool uploadEvents = false;
   if (m_async) {
     m_progressEventThrottle.dispatchEvent(
         XMLHttpRequestProgressEvent::create(eventNames().loadstartEvent));
     if (m_requestEntityBody && m_upload) {
-      forcePreflight = m_upload->hasEventListeners();
+      uploadEvents = m_upload->hasEventListeners();
       m_upload->dispatchEvent(
           XMLHttpRequestProgressEvent::create(eventNames().loadstartEvent));
     }
@@ -546,7 +546,7 @@ void XMLHttpRequest::createRequest(ExceptionCode& ec) {
   // in case the upload listeners are
   // added after the request is started.
   m_uploadEventsAllowed =
-      m_sameOriginRequest ||
+      m_sameOriginRequest || uploadEvents ||
       !isSimpleCrossOriginAccessRequest(m_method, m_requestHeaders);
 
   ResourceRequest request(m_url);
@@ -564,7 +564,7 @@ void XMLHttpRequest::createRequest(ExceptionCode& ec) {
   ThreadableLoaderOptions options;
   options.sendLoadCallbacks = true;
   options.sniffContent = false;
-  options.forcePreflight = forcePreflight;
+  options.forcePreflight = uploadEvents;
   options.allowCredentials = m_sameOriginRequest || m_includeCredentials;
   options.crossOriginRequestPolicy = UseAccessControl;
 
