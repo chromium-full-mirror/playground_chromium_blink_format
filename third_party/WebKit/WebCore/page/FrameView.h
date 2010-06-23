@@ -257,6 +257,11 @@ class FrameView : public ScrollView {
   static void setRepaintThrottlingDeferredRepaintDelayIncrementDuringLoading(
       double p);
 
+ protected:
+  virtual bool scrollContentsFastPath(const IntSize& scrollDelta,
+                                      const IntRect& rectToScroll,
+                                      const IntRect& clipRect);
+
  private:
   FrameView(Frame*);
 
