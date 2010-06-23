@@ -29,29 +29,18 @@
 #include "DocumentFragment.h"
 #include "Element.h"
 #include "Frame.h"
-#include "FrameView.h"  // Only for isLayoutTimerActive
+#include "HTMLParserScheduler.h"
 #include "HTML5Lexer.h"
 #include "HTML5PreloadScanner.h"
 #include "HTML5ScriptRunner.h"
 #include "HTML5TreeBuilder.h"
 #include "HTMLDocument.h"
-#include "Page.h"
 #include "XSSAuditor.h"
 #include <wtf/CurrentTime.h>
 
 #if ENABLE(INSPECTOR)
 #include "InspectorTimelineAgent.h"
 #endif
-
-// defaultParserChunkSize is used to define how many tokens the parser will
-// process before checking against parserTimeLimit and possibly yielding.
-// This is a performance optimization to prevent checking after every token.
-static const int defaultParserChunkSize = 4096;
-
-// defaultParserTimeLimit is the seconds the parser will run in one write() call
-// before yielding.  Inline <script> execution can cause it to excede the limit.
-// FIXME: We would like this value to be 0.2.
-static const double defaultParserTimeLimit = 0.500;
 
 namespace WebCore {
 
@@ -71,22 +60,6 @@ class NestingLevelIncrementer : public Noncopyable {
 
 }  // namespace
 
-static double parserTimeLimit(Page* page) {
-  // We're using the poorly named customHTMLTokenizerTimeDelay setting.
-  if (page && page->hasCustomHTMLTokenizerTimeDelay())
-    return page->customHTMLTokenizerTimeDelay();
-  return defaultParserTimeLimit;
-}
-
-static int parserChunkSize(Page* page) {
-  // FIXME: We may need to divide the value from customHTMLTokenizerChunkSize
-  // by some constant to translate from the "character" based behavior of the
-  // old HTMLDocumentParser to the token-based behavior of this parser.
-  if (page && page->hasCustomHTMLTokenizerChunkSize())
-    return page->customHTMLTokenizerChunkSize();
-  return defaultParserChunkSize;
-}
-
 HTML5DocumentParser::HTML5DocumentParser(HTMLDocument* document,
                                          bool reportErrors)
     : m_document(document),
@@ -94,13 +67,9 @@ HTML5DocumentParser::HTML5DocumentParser(HTMLDocument* document,
       m_scriptRunner(new HTML5ScriptRunner(document, this)),
       m_treeConstructor(
           new HTML5TreeBuilder(m_lexer.get(), document, reportErrors)),
+      m_parserScheduler(new HTMLParserScheduler(this)),
       m_endWasDelayed(false),
-      m_writeNestingLevel(0),
-      m_parserTimeLimit(parserTimeLimit(document->page())),
-      m_parserChunkSize(parserChunkSize(document->page())),
-      m_continueNextChunkTimer(
-          this,
-          &HTML5DocumentParser::continueNextChunkTimerFired) {
+      m_writeNestingLevel(0) {
   begin();
 }
 
@@ -114,14 +83,7 @@ HTML5DocumentParser::HTML5DocumentParser(
       m_treeConstructor(
           new HTML5TreeBuilder(m_lexer.get(), fragment, scriptingPermission)),
       m_endWasDelayed(false),
-      m_writeNestingLevel(0)
-      // FIXME: Parser yielding should be a separate class.
-      ,
-      m_parserTimeLimit(0),
-      m_parserChunkSize(0),
-      m_continueNextChunkTimer(
-          this,
-          &HTML5DocumentParser::continueNextChunkTimerFired) {
+      m_writeNestingLevel(0) {
   begin();
 }
 
@@ -138,19 +100,19 @@ void HTML5DocumentParser::begin() {
 
 void HTML5DocumentParser::stopParsing() {
   DocumentParser::stopParsing();
-  m_continueNextChunkTimer.stop();
+  m_parserScheduler.clear();  // Deleting the scheduler will clear any timers.
 }
 
 bool HTML5DocumentParser::processingData() const {
-  return m_continueNextChunkTimer.isActive() || inWrite();
+  return isScheduledForResume() || inWrite();
 }
 
 void HTML5DocumentParser::pumpLexerIfPossible(SynchronousMode mode) {
   if (m_parserStopped || m_treeConstructor->isPaused())
     return;
 
-  // Once a timer is set, it has control of when the parser continues.
-  if (m_continueNextChunkTimer.isActive()) {
+  // Once a resume is scheduled, HTMLParserScheduler controls when we next pump.
+  if (isScheduledForResume()) {
     ASSERT(mode == AllowYield);
     return;
   }
@@ -158,29 +120,15 @@ void HTML5DocumentParser::pumpLexerIfPossible(SynchronousMode mode) {
   pumpLexer(mode);
 }
 
-struct HTML5DocumentParser::PumpSession {
-  PumpSession() : processedTokens(0), startTime(currentTime()) {}
+bool HTML5DocumentParser::isScheduledForResume() const {
+  return m_parserScheduler && m_parserScheduler->isScheduledForResume();
+}
 
-  int processedTokens;
-  double startTime;
-};
-
-inline bool HTML5DocumentParser::shouldContinueParsing(PumpSession& session) {
-  if (m_parserStopped)
-    return false;
-
-  if (session.processedTokens > m_parserChunkSize) {
-    session.processedTokens = 0;
-    double elapsedTime = currentTime() - session.startTime;
-    if (elapsedTime > m_parserTimeLimit) {
-      // Schedule an immediate timer and yield from the parser.
-      m_continueNextChunkTimer.startOneShot(0);
-      return false;
-    }
-  }
-
-  ++session.processedTokens;
-  return true;
+// Used by HTMLParserScheduler
+void HTML5DocumentParser::resumeParsingAfterYield() {
+  // We should never be here unless we can pump immediately.  Call pumpLexer()
+  // directly so that ASSERTS will fire if we're wrong.
+  pumpLexer(AllowYield);
 }
 
 bool HTML5DocumentParser::runScriptsForPausedTreeConstructor() {
@@ -198,15 +146,17 @@ bool HTML5DocumentParser::runScriptsForPausedTreeConstructor() {
 void HTML5DocumentParser::pumpLexer(SynchronousMode mode) {
   ASSERT(!m_parserStopped);
   ASSERT(!m_treeConstructor->isPaused());
-  ASSERT(!m_continueNextChunkTimer.isActive());
+  ASSERT(!isScheduledForResume());
 
   // We tell the InspectorTimelineAgent about every pump, even if we
   // end up pumping nothing.  It can filter out empty pumps itself.
   willPumpLexer();
 
-  PumpSession session;
+  HTMLParserScheduler::PumpSession session;
   // FIXME: This loop body has is now too long and needs cleanup.
-  while (mode == ForceSynchronous || shouldContinueParsing(session)) {
+  while (
+      mode == ForceSynchronous ||
+      (!m_parserStopped && m_parserScheduler->shouldContinueParsing(session))) {
     if (!m_lexer->nextToken(m_input.current(), m_token))
       break;
 
@@ -235,28 +185,6 @@ void HTML5DocumentParser::pumpLexer(SynchronousMode mode) {
   }
 
   didPumpLexer();
-}
-
-// FIXME: This belongs on Document.
-static bool isLayoutTimerActive(Document* doc) {
-  ASSERT(doc);
-  return doc->view() && doc->view()->layoutPending() &&
-         !doc->minimumLayoutDelay();
-}
-
-void HTML5DocumentParser::continueNextChunkTimerFired(
-    Timer<HTML5DocumentParser>* timer) {
-  ASSERT_UNUSED(timer, timer == &m_continueNextChunkTimer);
-  // FIXME: The timer class should handle timer priorities instead of this code.
-  // If a layout is scheduled, wait again to let the layout timer run first.
-  if (isLayoutTimerActive(m_document)) {
-    m_continueNextChunkTimer.startOneShot(0);
-    return;
-  }
-
-  // We should never be here unless we can pump immediately.  Call pumpLexer()
-  // directly so that ASSERTS will fire if we're wrong.
-  pumpLexer(AllowYield);
 }
 
 void HTML5DocumentParser::willPumpLexer() {
@@ -305,7 +233,7 @@ void HTML5DocumentParser::write(const SegmentedString& source,
 }
 
 void HTML5DocumentParser::end() {
-  ASSERT(!m_continueNextChunkTimer.isActive());
+  ASSERT(!isScheduledForResume());
   // NOTE: This pump should only ever emit buffered character tokens,
   // so ForceSynchronous vs. AllowYield should be meaningless.
   pumpLexerIfPossible(ForceSynchronous);
@@ -320,7 +248,7 @@ void HTML5DocumentParser::attemptToEnd() {
   // an external script to load, we can't finish parsing quite yet.
 
   if (inWrite() || isWaitingForScripts() || executingScript() ||
-      m_continueNextChunkTimer.isActive()) {
+      isScheduledForResume()) {
     m_endWasDelayed = true;
     return;
   }
@@ -331,7 +259,7 @@ void HTML5DocumentParser::endIfDelayed() {
   // We don't check inWrite() here since inWrite() will be true if this was
   // called from write().
   if (!m_endWasDelayed || isWaitingForScripts() || executingScript() ||
-      m_continueNextChunkTimer.isActive())
+      isScheduledForResume())
     return;
 
   m_endWasDelayed = false;
