@@ -235,7 +235,7 @@ void SVGStyledElement::parseMappedAttribute(Attribute* attr) {
 }
 
 bool SVGStyledElement::isKnownAttribute(const QualifiedName& attrName) {
-  return isIdAttributeName(attrName) || attrName == HTMLNames::styleAttr;
+  return isIdAttributeName(attrName);
 }
 
 void SVGStyledElement::svgAttributeChanged(const QualifiedName& attrName) {
