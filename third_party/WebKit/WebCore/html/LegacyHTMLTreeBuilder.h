@@ -52,13 +52,12 @@ struct Token;
  * LegacyHTMLDocumentParser, and
  * builds up the Document structure from it.
  */
-class LegacyHTMLTreeConstructor : public Noncopyable {
+class LegacyHTMLTreeBuilder : public Noncopyable {
  public:
-  LegacyHTMLTreeConstructor(HTMLDocument*, bool reportErrors);
-  LegacyHTMLTreeConstructor(
-      DocumentFragment*,
-      FragmentScriptingPermission = FragmentScriptingAllowed);
-  virtual ~LegacyHTMLTreeConstructor();
+  LegacyHTMLTreeBuilder(HTMLDocument*, bool reportErrors);
+  LegacyHTMLTreeBuilder(DocumentFragment*,
+                        FragmentScriptingPermission = FragmentScriptingAllowed);
+  virtual ~LegacyHTMLTreeBuilder();
 
   /**
    * parses one token delivered by the tokenizer

@@ -25,7 +25,7 @@
 
 namespace WebCore {
 
-class LegacyHTMLTreeConstructor;
+class LegacyHTMLTreeBuilder;
 class LegacyHTMLDocumentParser;
 class SegmentedString;
 class XSSAuditor;
@@ -65,7 +65,7 @@ class DocumentParser : public Noncopyable {
 
   virtual void executeScriptsWaitingForStylesheets() {}
 
-  virtual LegacyHTMLTreeConstructor* htmlTreeConstructor() const { return 0; }
+  virtual LegacyHTMLTreeBuilder* htmlTreeBuilder() const { return 0; }
   virtual LegacyHTMLDocumentParser* asHTMLDocumentParser() { return 0; }
 
   XSSAuditor* xssAuditor() const { return m_XSSAuditor; }
