@@ -498,7 +498,7 @@ void InspectorController::connectFrontend(const ScriptObject& webInspector) {
     enableDebuggerFromFrontend(false);
   } else {
     String debuggerEnabled = setting(debuggerEnabledSettingName);
-    if (debuggerEnabled == "true")
+    if (debuggerEnabled == "true" || m_attachDebuggerWhenShown)
       enableDebugger();
     String profilerEnabled = setting(profilerEnabledSettingName);
     if (profilerEnabled == "true")
@@ -513,10 +513,6 @@ void InspectorController::connectFrontend(const ScriptObject& webInspector) {
 
   if (m_nodeToFocus)
     focusNode();
-#if ENABLE(JAVASCRIPT_DEBUGGER)
-  if (m_attachDebuggerWhenShown)
-    enableDebugger();
-#endif
   showPanel(m_showAfterVisible);
 }
 
@@ -569,8 +565,7 @@ void InspectorController::disconnectFrontend() {
   // opening.
   bool debuggerWasEnabled = m_debuggerEnabled;
   disableDebugger();
-  if (debuggerWasEnabled)
-    m_attachDebuggerWhenShown = true;
+  m_attachDebuggerWhenShown = debuggerWasEnabled;
 #endif
   setSearchingForNode(false);
   unbindAllResources();
@@ -1711,6 +1706,7 @@ void InspectorController::takeHeapSnapshot() {
 
 #if ENABLE(JAVASCRIPT_DEBUGGER)
 void InspectorController::enableDebuggerFromFrontend(bool always) {
+  ASSERT(!m_debuggerEnabled);
   if (always)
     setSetting(debuggerEnabledSettingName, "true");
 
