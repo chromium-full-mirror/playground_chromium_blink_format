@@ -22,8 +22,8 @@
     Boston, MA 02110-1301, USA.
 */
 
-#ifndef LegacyHTMLTreeConstructor_h
-#define LegacyHTMLTreeConstructor_h
+#ifndef LegacyHTMLTreeBuilder_h
+#define LegacyHTMLTreeBuilder_h
 
 #include "FragmentScriptingPermission.h"
 #include "HTMLParserErrorCodes.h"
@@ -239,4 +239,4 @@ bool parseToDoubleForNumberType(const String&, double*);
 String serializeForNumberType(double);
 }
 
-#endif  // LegacyHTMLTreeConstructor_h
+#endif  // LegacyHTMLTreeBuilder_h
