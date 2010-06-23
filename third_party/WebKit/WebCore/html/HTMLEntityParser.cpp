@@ -26,7 +26,7 @@
  */
 
 #include "config.h"
-#include "HTML5EntityParser.h"
+#include "HTMLEntityParser.h"
 
 #include <wtf/Vector.h>
 
@@ -97,9 +97,9 @@ void unconsumeCharacters(SegmentedString& source,
 }
 }
 
-unsigned consumeHTML5Entity(SegmentedString& source,
-                            bool& notEnoughCharacters,
-                            UChar additionalAllowedCharacter) {
+unsigned consumeHTMLEntity(SegmentedString& source,
+                           bool& notEnoughCharacters,
+                           UChar additionalAllowedCharacter) {
   ASSERT(!additionalAllowedCharacter || additionalAllowedCharacter == '"' ||
          additionalAllowedCharacter == '\'' ||
          additionalAllowedCharacter == '>');
