@@ -29,7 +29,7 @@
 #include "DocumentFragment.h"
 #include "Element.h"
 #include "Frame.h"
-#include "HTML5Lexer.h"
+#include "HTMLTokenizer.h"
 #include "HTML5Token.h"
 #include "HTMLDocument.h"
 #include "LegacyHTMLDocumentParser.h"
@@ -45,7 +45,7 @@ using namespace HTMLNames;
 
 static const int uninitializedLineNumberValue = -1;
 
-HTML5TreeBuilder::HTML5TreeBuilder(HTML5Lexer* lexer,
+HTML5TreeBuilder::HTML5TreeBuilder(HTMLTokenizer* lexer,
                                    HTMLDocument* document,
                                    bool reportErrors)
     : m_document(document),
@@ -62,7 +62,7 @@ HTML5TreeBuilder::HTML5TreeBuilder(HTML5Lexer* lexer,
 // FIXME: Member variables should be grouped into self-initializing structs to
 // minimize code duplication between these constructors.
 HTML5TreeBuilder::HTML5TreeBuilder(
-    HTML5Lexer* lexer,
+    HTMLTokenizer* lexer,
     DocumentFragment* fragment,
     FragmentScriptingPermission scriptingPermission)
     : m_document(fragment->document()),
@@ -126,7 +126,7 @@ static void convertToOldStyle(HTML5Token& token, Token& oldStyleToken) {
 
 void HTML5TreeBuilder::handleScriptStartTag() {
   notImplemented();  // The HTML frgment case?
-  m_lexer->setState(HTML5Lexer::ScriptDataState);
+  m_lexer->setState(HTMLTokenizer::ScriptDataState);
   notImplemented();  // Save insertion mode.
 }
 
@@ -159,20 +159,20 @@ PassRefPtr<Element> HTML5TreeBuilder::takeScriptToProcess(
   return m_scriptToProcess.release();
 }
 
-HTML5Lexer::State HTML5TreeBuilder::adjustedLexerState(
-    HTML5Lexer::State state,
+HTMLTokenizer::State HTML5TreeBuilder::adjustedLexerState(
+    HTMLTokenizer::State state,
     const AtomicString& tagName,
     Frame* frame) {
   if (tagName == textareaTag || tagName == titleTag)
-    return HTML5Lexer::RCDATAState;
+    return HTMLTokenizer::RCDATAState;
 
   if (tagName == styleTag || tagName == iframeTag || tagName == xmpTag ||
       tagName == noembedTag || tagName == noframesTag ||
       (tagName == noscriptTag && isScriptingFlagEnabled(frame)))
-    return HTML5Lexer::RAWTEXTState;
+    return HTMLTokenizer::RAWTEXTState;
 
   if (tagName == plaintextTag)
-    return HTML5Lexer::PLAINTEXTState;
+    return HTMLTokenizer::PLAINTEXTState;
 
   return state;
 }
