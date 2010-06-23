@@ -1014,6 +1014,7 @@ class RenderStyle : public RefCounted<RenderStyle> {
   Length perspectiveOriginY() const {
     return rareNonInheritedData->m_perspectiveOriginY;
   }
+  LengthSize pageSize() const { return rareNonInheritedData->m_pageSize; }
 
 #if USE(ACCELERATED_COMPOSITING)
   // When set, this ensures that styles compare as different. Used during
@@ -1611,6 +1612,9 @@ class RenderStyle : public RefCounted<RenderStyle> {
   }
   void setPerspectiveOriginY(Length l) {
     SET_VAR(rareNonInheritedData, m_perspectiveOriginY, l);
+  }
+  void setPageSize(LengthSize s) {
+    SET_VAR(rareNonInheritedData, m_pageSize, s);
   }
 
 #if USE(ACCELERATED_COMPOSITING)

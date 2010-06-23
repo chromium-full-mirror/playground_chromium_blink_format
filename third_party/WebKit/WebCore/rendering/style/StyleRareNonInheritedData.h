@@ -40,6 +40,7 @@ namespace WebCore {
 
 class AnimationList;
 class CSSStyleSelector;
+class LengthSize;
 class ShadowData;
 class StyleFlexibleBoxData;
 class StyleMarqueeData;
@@ -136,6 +137,8 @@ class StyleRareNonInheritedData : public RefCounted<StyleRareNonInheritedData> {
   float m_perspective;
   Length m_perspectiveOriginX;
   Length m_perspectiveOriginY;
+
+  LengthSize m_pageSize;
 
 #if ENABLE(XBL)
   OwnPtr<BindingURI> bindingURI;  // The XBL binding URI list.

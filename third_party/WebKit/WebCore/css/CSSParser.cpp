@@ -2432,13 +2432,13 @@ CSSParser::SizeParameterType CSSParser::parseSizeParameter(
       if (prevParamType == None || prevParamType == Orientation) {
         // Normalize to Page Size then Orientation order by prepending.
         // This is not specified by the CSS3 Paged Media specification, but for
-        // simpler processing hereafter.
+        // simpler processing later (CSSStyleSelector::applyPageSizeProperty).
         parsedValues->prepend(CSSPrimitiveValue::createIdentifier(value->id));
         return PageSize;
       }
       return None;
     case 0:
-      if (validUnit(value, FLength, m_strict) &&
+      if (validUnit(value, FLength | FNonNeg, m_strict) &&
           (prevParamType == None || prevParamType == Length)) {
         parsedValues->append(CSSPrimitiveValue::create(
             value->fValue,

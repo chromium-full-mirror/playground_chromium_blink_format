@@ -325,6 +325,13 @@ class CSSStyleSelector : public Noncopyable {
   void mapNinePieceImage(CSSValue*, NinePieceImage&);
 
   void applyProperty(int id, CSSValue*);
+  void applyPageSizeProperty(CSSValue*);
+  bool pageSizeFromName(CSSPrimitiveValue*,
+                        CSSPrimitiveValue*,
+                        Length& width,
+                        Length& height);
+  Length mmLength(double mm);
+  Length inchLength(double inch);
 #if ENABLE(SVG)
   void applySVGProperty(int id, CSSValue*);
 #endif

@@ -1269,6 +1269,23 @@ void LayoutTestController::apiTestNewWindowDataLoadBaseURL(
     JSStringRef utf8Data,
     JSStringRef baseURL) {}
 
+bool LayoutTestController::isPageBoxVisible(int pageNumber) const {
+  // FIXME: implement
+  return false;
+}
+
+JSRetainPtr<JSStringRef> LayoutTestController::pageAreaRectInPixels(
+    int pageNumber) const {
+  // FIXME: implement
+  return JSRetainPtr<JSStringRef>();
+}
+
+JSRetainPtr<JSStringRef> LayoutTestController::preferredPageSizeInPixels(
+    int pageNumber) const {
+  // FIXME: implement
+  return JSRetainPtr<JSStringRef>();
+}
+
 void LayoutTestController::apiTestGoToCurrentBackForwardItem() {
   COMPtr<IWebView> webView;
   if (FAILED(frame->webView(&webView)))
