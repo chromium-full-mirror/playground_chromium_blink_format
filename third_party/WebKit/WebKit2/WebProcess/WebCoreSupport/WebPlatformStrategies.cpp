@@ -38,7 +38,8 @@ void WebPlatformStrategies::initialize() {
   setPlatformStrategies(&platformStrategies);
 }
 
-WebPlatformStrategies::WebPlatformStrategies() {}
+WebPlatformStrategies::WebPlatformStrategies()
+    : m_pluginCacheIsPopulated(false), m_shouldRefreshPlugins(false) {}
 
 // PluginStrategy
 
@@ -46,15 +47,33 @@ PluginStrategy* WebPlatformStrategies::createPluginStrategy() {
   return this;
 }
 
-void WebPlatformStrategies::refreshPlugins() {
+void WebPlatformStrategies::populatePluginCache() {
+  if (m_pluginCacheIsPopulated)
+    return;
+
+  ASSERT(m_cachedPlugins.isEmpty());
+
   // FIXME: This should call out to the UI process.
-  PluginInfoStore::shared().refresh();
+  if (m_shouldRefreshPlugins)
+    PluginInfoStore::shared().refresh();
+
+  PluginInfoStore::shared().getPlugins(m_cachedPlugins);
+  m_shouldRefreshPlugins = false;
+  m_pluginCacheIsPopulated = true;
+}
+
+void WebPlatformStrategies::refreshPlugins() {
+  m_cachedPlugins.clear();
+  m_pluginCacheIsPopulated = false;
+  m_shouldRefreshPlugins = true;
+
+  populatePluginCache();
 }
 
 void WebPlatformStrategies::getPluginInfo(
     Vector<WebCore::PluginInfo>& plugins) {
-  // FIXME: This should call out to the UI process.
-  PluginInfoStore::shared().getPlugins(plugins);
+  populatePluginCache();
+  plugins = m_cachedPlugins;
 }
 
 }  // namespace WebKit
