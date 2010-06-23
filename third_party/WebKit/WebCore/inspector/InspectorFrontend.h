@@ -170,6 +170,7 @@ class InspectorFrontend : public Noncopyable {
   void didChangeTagName(long callId, long nodeId);
   void didGetOuterHTML(long callId, const String& outerHTML);
   void didSetOuterHTML(long callId, long nodeId);
+  void didPushNodeByPathToFrontend(long callId, long nodeId);
 
   void didGetStyles(long callId, const ScriptValue& styles);
   void didGetAllStyles(long callId, const ScriptArray& styles);
