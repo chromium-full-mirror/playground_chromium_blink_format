@@ -91,7 +91,8 @@ static bool isWellKnownFontName(const AtomicString family) {
   // they are used in Layout Tests indicate web compatibility issues
   // if we do not handle them correctly.
   if (equalIgnoringCase(family, "sans-serif") ||
-      equalIgnoringCase(family, "serif") ||
+      equalIgnoringCase(family, "sans") || equalIgnoringCase(family, "serif") ||
+      equalIgnoringCase(family, "mono") ||
       equalIgnoringCase(family, "monospace") ||
       equalIgnoringCase(family, "cursive") ||
       equalIgnoringCase(family, "fantasy") ||
