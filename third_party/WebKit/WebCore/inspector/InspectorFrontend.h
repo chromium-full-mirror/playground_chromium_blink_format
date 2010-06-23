@@ -87,6 +87,7 @@ class InspectorFrontend : public Noncopyable {
   void showPanel(int panel);
   void populateInterface();
   void reset();
+  void resetProfilesPanel();
 
   void bringToFront();
   void inspectedURLChanged(const String&);

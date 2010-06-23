@@ -224,6 +224,10 @@ void InspectorFrontend::reset() {
   callSimpleFunction("reset");
 }
 
+void InspectorFrontend::resetProfilesPanel() {
+  callSimpleFunction("resetProfilesPanel");
+}
+
 void InspectorFrontend::bringToFront() {
   callSimpleFunction("bringToFront");
 }
