@@ -1825,35 +1825,11 @@ void WebGLRenderingContext::readPixels(long x,
                                        unsigned long type,
                                        ArrayBufferView* pixels) {
   // Validate input parameters.
-  unsigned long componentsPerPixel = 0;
-  switch (format) {
-    case GraphicsContext3D::ALPHA:
-      componentsPerPixel = 1;
-      break;
-    case GraphicsContext3D::RGB:
-      componentsPerPixel = 3;
-      break;
-    case GraphicsContext3D::RGBA:
-      componentsPerPixel = 4;
-      break;
-    default:
-      m_context->synthesizeGLError(GraphicsContext3D::INVALID_ENUM);
-      return;
-  }
-  unsigned long bytesPerComponent = 0;
-  switch (type) {
-    case GraphicsContext3D::UNSIGNED_BYTE:
-      bytesPerComponent = sizeof(unsigned char);
-      break;
-    case GraphicsContext3D::UNSIGNED_SHORT_5_6_5:
-    case GraphicsContext3D::UNSIGNED_SHORT_4_4_4_4:
-    case GraphicsContext3D::UNSIGNED_SHORT_5_5_5_1:
-      componentsPerPixel = 1;
-      bytesPerComponent = sizeof(unsigned short);
-      break;
-    default:
-      m_context->synthesizeGLError(GraphicsContext3D::INVALID_ENUM);
-      return;
+  unsigned long componentsPerPixel, bytesPerComponent;
+  if (!m_context->computeFormatAndTypeParameters(
+          format, type, &componentsPerPixel, &bytesPerComponent)) {
+    m_context->synthesizeGLError(GraphicsContext3D::INVALID_ENUM);
+    return;
   }
   if (!pixels) {
     m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
@@ -2055,18 +2031,20 @@ void WebGLRenderingContext::texImage2DImpl(unsigned target,
                                            bool flipY,
                                            bool premultiplyAlpha,
                                            ExceptionCode& ec) {
-  // FIXME: pay attention to the user's supplied internalformat, format and type
-  // FIXME: pay attention to UNPACK_ROW_WIDTH
-  UNUSED_PARAM(type);
   ec = 0;
   Vector<uint8_t> data;
-  if (!m_context->extractImageData(image, flipY, premultiplyAlpha, data,
-                                   &format, &internalformat)) {
+  if (!m_context->extractImageData(image, format, type, flipY, premultiplyAlpha,
+                                   data)) {
     m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
     return;
   }
+  if (m_unpackAlignment != 1)
+    m_context->pixelStorei(GraphicsContext3D::UNPACK_ALIGNMENT, 1);
   texImage2DBase(target, level, internalformat, image->width(), image->height(),
-                 0, format, GraphicsContext3D::UNSIGNED_BYTE, data.data(), ec);
+                 0, format, type, data.data(), ec);
+  if (m_unpackAlignment != 1)
+    m_context->pixelStorei(GraphicsContext3D::UNPACK_ALIGNMENT,
+                           m_unpackAlignment);
 }
 
 void WebGLRenderingContext::texImage2D(unsigned target,
@@ -2092,20 +2070,20 @@ void WebGLRenderingContext::texImage2D(unsigned target,
                                        unsigned type,
                                        ImageData* pixels,
                                        ExceptionCode& ec) {
-  UNUSED_PARAM(internalformat);
-  UNUSED_PARAM(format);
-  UNUSED_PARAM(type);
-  // FIXME: pay attention to the user's supplied internalformat, format and type
   ec = 0;
   Vector<uint8_t> data;
-  if (!m_context->extractImageData(pixels, m_unpackFlipY,
+  if (!m_context->extractImageData(pixels, format, type, m_unpackFlipY,
                                    m_unpackPremultiplyAlpha, data)) {
     m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
     return;
   }
-  texImage2DBase(target, level, GraphicsContext3D::RGBA, pixels->width(),
-                 pixels->height(), 0, GraphicsContext3D::RGBA,
-                 GraphicsContext3D::UNSIGNED_BYTE, data.data(), ec);
+  if (m_unpackAlignment != 1)
+    m_context->pixelStorei(GraphicsContext3D::UNPACK_ALIGNMENT, 1);
+  texImage2DBase(target, level, internalformat, pixels->width(),
+                 pixels->height(), 0, format, type, data.data(), ec);
+  if (m_unpackAlignment != 1)
+    m_context->pixelStorei(GraphicsContext3D::UNPACK_ALIGNMENT,
+                           m_unpackAlignment);
 }
 
 void WebGLRenderingContext::texImage2D(unsigned target,
@@ -2195,7 +2173,9 @@ void WebGLRenderingContext::texImage2D(unsigned target,
       "pixels, GLboolean flipY, GLboolean premultiplyAlpha)");
   ec = 0;
   Vector<uint8_t> data;
-  if (!m_context->extractImageData(pixels, flipY, premultiplyAlpha, data)) {
+  if (!m_context->extractImageData(pixels, GraphicsContext3D::RGBA,
+                                   GraphicsContext3D::UNSIGNED_BYTE, flipY,
+                                   premultiplyAlpha, data)) {
     m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
     return;
   }
@@ -2410,20 +2390,15 @@ void WebGLRenderingContext::texSubImage2DImpl(unsigned target,
                                               bool flipY,
                                               bool premultiplyAlpha,
                                               ExceptionCode& ec) {
-  UNUSED_PARAM(type);
-  // FIXME: pay attention to the user's supplied format and type
-  // FIXME: pay attention to UNPACK_ROW_WIDTH
   ec = 0;
   Vector<uint8_t> data;
-  unsigned int internalformat;
-  if (!m_context->extractImageData(image, flipY, premultiplyAlpha, data,
-                                   &format, &internalformat)) {
+  if (!m_context->extractImageData(image, format, type, flipY, premultiplyAlpha,
+                                   data)) {
     m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
     return;
   }
   texSubImage2DBase(target, level, xoffset, yoffset, image->width(),
-                    image->height(), format, GraphicsContext3D::UNSIGNED_BYTE,
-                    data.data(), ec);
+                    image->height(), format, type, data.data(), ec);
 }
 
 void WebGLRenderingContext::texSubImage2D(unsigned target,
@@ -2450,19 +2425,15 @@ void WebGLRenderingContext::texSubImage2D(unsigned target,
                                           unsigned type,
                                           ImageData* pixels,
                                           ExceptionCode& ec) {
-  UNUSED_PARAM(format);
-  UNUSED_PARAM(type);
-  // FIXME: pay attention to the user's supplied format and type
   ec = 0;
   Vector<uint8_t> data;
-  if (!m_context->extractImageData(pixels, m_unpackFlipY,
+  if (!m_context->extractImageData(pixels, format, type, m_unpackFlipY,
                                    m_unpackPremultiplyAlpha, data)) {
     m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
     return;
   }
   texSubImage2DBase(target, level, xoffset, yoffset, pixels->width(),
-                    pixels->height(), GraphicsContext3D::RGBA,
-                    GraphicsContext3D::UNSIGNED_BYTE, data.data(), ec);
+                    pixels->height(), format, type, data.data(), ec);
 }
 
 void WebGLRenderingContext::texSubImage2D(unsigned target,
@@ -2562,7 +2533,9 @@ void WebGLRenderingContext::texSubImage2D(unsigned target,
       "premultiplyAlpha)");
   ec = 0;
   Vector<uint8_t> data;
-  if (!m_context->extractImageData(pixels, flipY, premultiplyAlpha, data)) {
+  if (!m_context->extractImageData(pixels, GraphicsContext3D::RGBA,
+                                   GraphicsContext3D::UNSIGNED_BYTE, flipY,
+                                   premultiplyAlpha, data)) {
     m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
     return;
   }
@@ -3796,6 +3769,35 @@ bool WebGLRenderingContext::validateTexFuncFormatAndType(unsigned long format,
       return false;
   }
 
+  // Verify that the combination of format and type is supported.
+  switch (format) {
+    case GraphicsContext3D::ALPHA:
+    case GraphicsContext3D::LUMINANCE:
+    case GraphicsContext3D::LUMINANCE_ALPHA:
+      if (type != GraphicsContext3D::UNSIGNED_BYTE) {
+        m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
+        return false;
+      }
+      break;
+    case GraphicsContext3D::RGB:
+      if (type != GraphicsContext3D::UNSIGNED_BYTE &&
+          type != GraphicsContext3D::UNSIGNED_SHORT_5_6_5) {
+        m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
+        return false;
+      }
+      break;
+    case GraphicsContext3D::RGBA:
+      if (type != GraphicsContext3D::UNSIGNED_BYTE &&
+          type != GraphicsContext3D::UNSIGNED_SHORT_4_4_4_4 &&
+          type != GraphicsContext3D::UNSIGNED_SHORT_5_5_5_1) {
+        m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
+        return false;
+      }
+      break;
+    default:
+      ASSERT_NOT_REACHED();
+  }
+
   return true;
 }
 
@@ -3808,6 +3810,12 @@ bool WebGLRenderingContext::validateTexFuncParameters(
     long border,
     unsigned long format,
     unsigned long type) {
+  // We absolutely have to validate the format and type combination.
+  // The texImage2D entry points taking HTMLImage, etc. will produce
+  // temporary data based on this combination, so it must be legal.
+  if (!validateTexFuncFormatAndType(format, type))
+    return false;
+
   if (isGLES2Compliant())
     return true;
 
@@ -3849,7 +3857,7 @@ bool WebGLRenderingContext::validateTexFuncParameters(
     return false;
   }
 
-  return validateTexFuncFormatAndType(format, type);
+  return true;
 }
 
 bool WebGLRenderingContext::validateDrawMode(unsigned long mode) {
