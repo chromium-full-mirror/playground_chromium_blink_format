@@ -33,8 +33,8 @@ class SVGSVGElement;
 
 class SVGDocument : public Document {
  public:
-  static PassRefPtr<SVGDocument> create(Frame* frame, const KURL& url) {
-    return adoptRef(new SVGDocument(frame, url));
+  static PassRefPtr<SVGDocument> create(Frame* frame) {
+    return adoptRef(new SVGDocument(frame));
   }
 
   virtual ~SVGDocument();
@@ -50,7 +50,7 @@ class SVGDocument : public Document {
   void updatePan(const FloatPoint& pos) const;
 
  private:
-  SVGDocument(Frame*, const KURL&);
+  SVGDocument(Frame*);
 
   virtual bool isSVGDocument() const { return true; }
 

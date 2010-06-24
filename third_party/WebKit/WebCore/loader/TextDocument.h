@@ -33,12 +33,12 @@ class HTMLViewSourceDocument;
 
 class TextDocument : public HTMLDocument {
  public:
-  static PassRefPtr<TextDocument> create(Frame* frame, const KURL& url) {
-    return adoptRef(new TextDocument(frame, url));
+  static PassRefPtr<TextDocument> create(Frame* frame) {
+    return adoptRef(new TextDocument(frame));
   }
 
  private:
-  TextDocument(Frame*, const KURL&);
+  TextDocument(Frame*);
 
   virtual DocumentParser* createParser();
 };

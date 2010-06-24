@@ -364,7 +364,7 @@ class DocumentWeakReference : public ThreadSafeShared<DocumentWeakReference> {
   Document* m_document;
 };
 
-Document::Document(Frame* frame, const KURL& url, bool isXHTML, bool isHTML)
+Document::Document(Frame* frame, bool isXHTML, bool isHTML)
     : ContainerNode(0),
       m_domtree_version(0),
       m_styleSheets(StyleSheetList::create(this)),
@@ -431,9 +431,6 @@ Document::Document(Frame* frame, const KURL& url, bool isXHTML, bool isHTML)
   m_ignoreAutofocus = false;
 
   m_frame = frame;
-
-  if (!url.isEmpty())
-    setURL(url);
 
   m_axObjectCache = 0;
 
@@ -4688,9 +4685,10 @@ void Document::initSecurityContext() {
 
   // In the common case, create the security context from the currently
   // loading URL.
-  m_cookieURL = m_url;
+  const KURL& url = m_frame->loader()->url();
+  m_cookieURL = url;
   ScriptExecutionContext::setSecurityOrigin(
-      SecurityOrigin::create(m_url, m_frame->loader()->sandboxFlags()));
+      SecurityOrigin::create(url, m_frame->loader()->sandboxFlags()));
 
   if (SecurityOrigin::allowSubstituteDataAccessToLocal()) {
     // If this document was loaded with substituteData, then the document can

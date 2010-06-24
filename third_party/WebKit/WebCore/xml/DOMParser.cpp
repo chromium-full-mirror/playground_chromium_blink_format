@@ -31,7 +31,7 @@ PassRefPtr<Document> DOMParser::parseFromString(const String& str,
     return 0;
 
   RefPtr<Document> doc =
-      DOMImplementation::createDocument(contentType, 0, KURL(), false);
+      DOMImplementation::createDocument(contentType, 0, false);
 
   doc->open();
   doc->write(str);

@@ -75,13 +75,10 @@ PassRefPtr<Document> XSLTProcessor::createDocumentFromSource(
 
   RefPtr<Document> result;
   if (sourceMIMEType == "text/plain") {
-    result = Document::create(frame,
-                              sourceIsDocument ? ownerDocument->url() : KURL());
+    result = Document::create(frame);
     transformTextStringToXHTMLDocumentString(documentSource);
   } else
-    result = DOMImplementation::createDocument(
-        sourceMIMEType, frame, sourceIsDocument ? ownerDocument->url() : KURL(),
-        false);
+    result = DOMImplementation::createDocument(sourceMIMEType, frame, false);
 
   // Before parsing, we need to save & detach the old document and get the new
   // document
@@ -93,6 +90,8 @@ PassRefPtr<Document> XSLTProcessor::createDocumentFromSource(
     frame->setDocument(result);
   }
 
+  if (sourceIsDocument)
+    result->setURL(ownerDocument->url());
   result->open();
 
   RefPtr<TextResourceDecoder> decoder =

@@ -75,13 +75,13 @@ void DocumentWriter::begin() {
   begin(KURL());
 }
 
-PassRefPtr<Document> DocumentWriter::createDocument(const KURL& url) {
+PassRefPtr<Document> DocumentWriter::createDocument() {
   if (!m_frame->loader()->stateMachine()->isDisplayingInitialEmptyDocument() &&
       m_frame->loader()->client()->shouldUsePluginDocument(m_mimeType))
-    return PluginDocument::create(m_frame, url);
+    return PluginDocument::create(m_frame);
   if (!m_frame->loader()->client()->hasHTMLView())
-    return PlaceholderDocument::create(m_frame, url);
-  return DOMImplementation::createDocument(m_mimeType, m_frame, url,
+    return PlaceholderDocument::create(m_frame);
+  return DOMImplementation::createDocument(m_mimeType, m_frame,
                                            m_frame->inViewSourceMode());
 }
 
@@ -94,7 +94,7 @@ void DocumentWriter::begin(const KURL& url,
 
   // Create a new document before clearing the frame, because it may need to
   // inherit an aliased security context.
-  RefPtr<Document> document = createDocument(url);
+  RefPtr<Document> document = createDocument();
 
   // If the new document is for a Plugin but we're supposed to be sandboxed from
   // Plugins,
@@ -102,7 +102,7 @@ void DocumentWriter::begin(const KURL& url,
   // data (bug 39323)
   if (document->isPluginDocument() &&
       m_frame->loader()->isSandboxed(SandboxPlugins))
-    document = SinkDocument::create(m_frame, url);
+    document = SinkDocument::create(m_frame);
 
   bool resetScripting =
       !(m_frame->loader()->stateMachine()->isDisplayingInitialEmptyDocument() &&
@@ -112,6 +112,7 @@ void DocumentWriter::begin(const KURL& url,
     m_frame->script()->updatePlatformScriptObjects();
 
   m_frame->loader()->setURL(url);
+  document->setURL(url);
   m_frame->setDocument(document);
 
   if (m_decoder)

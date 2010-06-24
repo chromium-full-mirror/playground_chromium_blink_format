@@ -55,8 +55,7 @@ bool SinkDocumentParser::finishWasCalled() {
   return false;
 }
 
-SinkDocument::SinkDocument(Frame* frame, const KURL& url)
-    : HTMLDocument(frame, url) {
+SinkDocument::SinkDocument(Frame* frame) : HTMLDocument(frame) {
   setParseMode(Compat);
 }
 
