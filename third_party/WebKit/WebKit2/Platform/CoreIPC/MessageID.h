@@ -49,10 +49,11 @@ template <typename>
 struct MessageKindTraits {};
 
 /*
-    MessageID Layout
+    MessageID Layout (the most significant bit is reserved and therefore always
+   zero)
 
     ---------
-    | Flags | 8 bits
+    | Flags | 7 bits
     |-------|
     | Class | 8 bits
     |-------|
@@ -63,13 +64,15 @@ struct MessageKindTraits {};
 
 class MessageID {
  public:
-  enum Flags { SyncMessage = 1 << 0, MessageBodyIsOOL = 1 << 1 };
+  enum Flags {
+    SyncMessage = 1 << 0,
+  };
 
   template <typename EnumType>
   explicit MessageID(EnumType messageKind, unsigned char flags = 0)
-      : m_messageID(flags << 24 |
-                    (MessageKindTraits<EnumType>::messageClass) << 16 |
-                    messageKind) {}
+      : m_messageID(stripMostSignificantBit(
+            flags << 24 | (MessageKindTraits<EnumType>::messageClass) << 16 |
+            messageKind)) {}
 
   template <typename EnumType>
   EnumType get() const {
@@ -84,35 +87,32 @@ class MessageID {
 
   template <typename EnumType>
   bool operator==(EnumType messageKind) const {
-    return (m_messageID & 0xffffff) ==
-           (MessageID(messageKind).m_messageID & 0xffffff);
+    return m_messageID == MessageID(messageKind).m_messageID;
   }
 
-  MessageID copyAddingFlags(unsigned char flags) {
-    return MessageID(Encoded, flags << 24 | m_messageID);
+  static MessageID fromInt(unsigned i) {
+    MessageID messageID;
+    messageID.m_messageID = stripMostSignificantBit(i);
+
+    return messageID;
   }
 
-  static MessageID fromInt(unsigned i) { return MessageID(Encoded, i); }
   unsigned toInt() const { return m_messageID; }
 
   bool isSync() const { return getFlags() & SyncMessage; }
-  bool isMessageBodyOOL() const { return getFlags() & MessageBodyIsOOL; }
 
  private:
+  static inline unsigned stripMostSignificantBit(unsigned value) {
+    return value & 0x7fffffff;
+  }
+
   unsigned char getFlags() const { return (m_messageID & 0xff000000) >> 24; }
   unsigned char getClass() const { return (m_messageID & 0x00ff0000) >> 16; }
 
   MessageID() : m_messageID(0) {}
 
-  enum EncodedTag { Encoded };
-  MessageID(EncodedTag, unsigned messageID) : m_messageID(messageID) {}
-
   unsigned m_messageID;
 };
-
-inline bool equalIgnoringFlags(MessageID a, MessageID b) {
-  return (a.toInt() & 0xffffff) == (b.toInt() & 0xffffff);
-}
 
 }  // namespace CoreIPC
 

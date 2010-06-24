@@ -36,6 +36,8 @@ namespace CoreIPC {
 
 static const size_t inlineMessageMaxSize = 4096;
 
+enum { MessageBodyIsOOL = 1 << 31 };
+
 void Connection::platformInvalidate() {
   if (!m_isConnected)
     return;
@@ -139,8 +141,6 @@ void Connection::sendOutgoingMessage(MessageID messageID,
     numberOfOOLMemoryDescriptors++;
     messageSize = machMessageSize(0, numberOfPortDescriptors,
                                   numberOfOOLMemoryDescriptors);
-
-    messageID = messageID.copyAddingFlags(MessageID::MessageBodyIsOOL);
   }
 
   bool isComplex = (numberOfPortDescriptors + numberOfOOLMemoryDescriptors > 0);
@@ -154,6 +154,8 @@ void Connection::sendOutgoingMessage(MessageID messageID,
   header->msgh_remote_port = m_sendPort;
   header->msgh_local_port = MACH_PORT_NULL;
   header->msgh_id = messageID.toInt();
+  if (messageBodyIsOOL)
+    header->msgh_id |= MessageBodyIsOOL;
 
   uint8_t* messageData;
 
@@ -226,7 +228,7 @@ static auto_ptr<ArgumentDecoder> createArgumentDecoder(
     return auto_ptr<ArgumentDecoder>(new ArgumentDecoder(body, bodySize));
   }
 
-  MessageID messageID = MessageID::fromInt(header->msgh_id);
+  bool messageBodyIsOOL = header->msgh_id & MessageBodyIsOOL;
 
   mach_msg_body_t* body = reinterpret_cast<mach_msg_body_t*>(header + 1);
   mach_msg_size_t numDescriptors = body->msgh_descriptor_count;
@@ -238,7 +240,7 @@ static auto_ptr<ArgumentDecoder> createArgumentDecoder(
 
   // If the message body was sent out-of-line, don't treat the last descriptor
   // as an attachment, since it is really the message body.
-  if (messageID.isMessageBodyOOL())
+  if (messageBodyIsOOL)
     --numDescriptors;
 
   for (mach_msg_size_t i = 0; i < numDescriptors; ++i) {
@@ -262,7 +264,7 @@ static auto_ptr<ArgumentDecoder> createArgumentDecoder(
     }
   }
 
-  if (messageID.isMessageBodyOOL()) {
+  if (messageBodyIsOOL) {
     mach_msg_descriptor_t* descriptor =
         reinterpret_cast<mach_msg_descriptor_t*>(descriptorData);
     ASSERT(descriptor->type.type == MACH_MSG_OOL_DESCRIPTOR);
