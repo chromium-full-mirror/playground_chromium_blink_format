@@ -59,6 +59,10 @@ typedef struct HINSTANCE__* HINSTANCE;
 typedef HINSTANCE HMODULE;
 #endif
 
+#if PLATFORM(BREWMP)
+typedef struct _IFile IFile;
+#endif
+
 namespace WTF {
 class CString;
 }
@@ -110,6 +114,11 @@ typedef HANDLE PlatformFileHandle;
 // avoid using Windows headers in headers.  We'd rather move this into the .cpp.
 const PlatformFileHandle invalidPlatformFileHandle =
     reinterpret_cast<HANDLE>(-1);
+#elif PLATFORM(BREWMP)
+typedef IFile* PlatformFileHandle;
+const PlatformFileHandle invalidPlatformFileHandle = 0;
+typedef void* PlatformModule;
+typedef unsigned PlatformModuleVersion;
 #else
 typedef int PlatformFileHandle;
 const PlatformFileHandle invalidPlatformFileHandle = -1;
