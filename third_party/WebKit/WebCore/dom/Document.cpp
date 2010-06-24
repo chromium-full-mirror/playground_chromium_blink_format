@@ -1758,7 +1758,7 @@ void Document::open(Document* ownerDocument) {
 
   if (m_frame) {
     if (m_frame->loader()->isLoadingMainResource() ||
-        (parser() && parser()->executingScript()))
+        (parser() && parser()->isExecutingScript()))
       return;
 
     if (m_frame->loader()->state() == FrameStateProvisional)

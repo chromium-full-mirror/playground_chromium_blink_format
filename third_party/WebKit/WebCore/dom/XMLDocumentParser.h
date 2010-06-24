@@ -79,12 +79,15 @@ class XMLDocumentParser : public DocumentParser, public CachedResourceClient {
 
   enum ErrorType { warning, nonFatal, fatal };
 
-  // from DocumentParser
+  // From DocumentParser
   virtual void write(const SegmentedString&, bool appendData);
   virtual void finish();
   virtual bool finishWasCalled();
   virtual bool isWaitingForScripts() const;
   virtual void stopParsing();
+  virtual bool wellFormed() const { return !m_sawError; }
+  virtual int lineNumber() const;
+  virtual int columnNumber() const;
 
   void end();
 
@@ -104,15 +107,10 @@ class XMLDocumentParser : public DocumentParser, public CachedResourceClient {
   // from CachedResourceClient
   virtual void notifyFinished(CachedResource* finishedObj);
 
-  void handleError(ErrorType type,
-                   const char* m,
+  void handleError(ErrorType,
+                   const char* message,
                    int lineNumber,
                    int columnNumber);
-
-  virtual bool wellFormed() const { return !m_sawError; }
-
-  int lineNumber() const;
-  int columnNumber() const;
 
 #if USE(QXMLSTREAM)
  private:
