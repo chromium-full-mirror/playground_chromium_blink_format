@@ -23,8 +23,8 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef WebCoreTypeArgumentMarshalling_h
-#define WebCoreTypeArgumentMarshalling_h
+#ifndef WebCoreArgumentCoders_h
+#define WebCoreArgumentCoders_h
 
 #include "ArgumentCoders.h"
 #include "ArgumentDecoder.h"
@@ -74,4 +74,4 @@ struct ArgumentCoder<WebCore::String> {
 
 }  // namespace CoreIPC
 
-#endif  // WebCoreTypeArgumentMarshalling_h
+#endif  // WebCoreArgumentCoders_h
