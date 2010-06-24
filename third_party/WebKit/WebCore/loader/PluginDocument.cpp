@@ -26,39 +26,29 @@
 #include "PluginDocument.h"
 
 #include "DocumentLoader.h"
-#include "Element.h"
 #include "Frame.h"
-#include "FrameLoader.h"
 #include "FrameLoaderClient.h"
 #include "HTMLEmbedElement.h"
 #include "HTMLNames.h"
 #include "MainResourceLoader.h"
 #include "Page.h"
+#include "RawDataDocumentParser.h"
 #include "RenderEmbeddedObject.h"
-#include "RenderWidget.h"
-#include "SegmentedString.h"
 #include "Settings.h"
-#include "Text.h"
-#include "XMLDocumentParser.h"
 
 namespace WebCore {
 
 using namespace HTMLNames;
 
-class PluginDocumentParser : public DocumentParser {
+// FIXME: Share more code with MediaDocumentParser.
+class PluginDocumentParser : public RawDataDocumentParser {
  public:
   PluginDocumentParser(Document* document)
-      : DocumentParser(document), m_embedElement(0) {}
+      : RawDataDocumentParser(document), m_embedElement(0) {}
 
   static Widget* pluginWidgetFromDocument(Document*);
 
  private:
-  virtual void write(const SegmentedString&, bool appendData);
-  virtual void finish();
-  virtual bool finishWasCalled();
-  virtual bool isWaitingForScripts() const;
-
-  virtual bool wantsRawData() const { return true; }
   virtual bool writeRawData(const char* data, int len);
 
   void createDocumentStructure();
@@ -77,10 +67,6 @@ Widget* PluginDocumentParser::pluginWidgetFromDocument(Document* doc) {
     }
   }
   return 0;
-}
-
-void PluginDocumentParser::write(const SegmentedString&, bool) {
-  ASSERT_NOT_REACHED();
 }
 
 void PluginDocumentParser::createDocumentStructure() {
@@ -135,22 +121,6 @@ bool PluginDocumentParser::writeRawData(const char*, int) {
     }
   }
 
-  return false;
-}
-
-void PluginDocumentParser::finish() {
-  if (!m_parserStopped)
-    document()->finishedParsing();
-}
-
-bool PluginDocumentParser::finishWasCalled() {
-  // finish() always calls document()->finishedParsing() so we'll be deleted
-  // after finish().
-  return false;
-}
-
-bool PluginDocumentParser::isWaitingForScripts() const {
-  // A plugin document is never waiting for scripts
   return false;
 }
 

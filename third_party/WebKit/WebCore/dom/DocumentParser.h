@@ -57,6 +57,7 @@ class DocumentParser : public Noncopyable {
 
   virtual bool wantsRawData() const { return false; }
   virtual bool writeRawData(const char* /*data*/, int /*length*/) {
+    ASSERT_NOT_REACHED();
     return false;
   }
 
