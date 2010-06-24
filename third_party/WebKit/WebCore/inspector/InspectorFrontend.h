@@ -83,7 +83,6 @@ class InspectorFrontend : public Noncopyable {
   void didGetResourceContent(long callId, const String& content);
 
   void updateFocusedNode(long nodeId);
-  void setAttachedWindow(bool attached);
   void showPanel(int panel);
   void populateInterface();
   void reset();

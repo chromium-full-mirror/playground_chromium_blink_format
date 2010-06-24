@@ -31,6 +31,8 @@
 #include "config.h"
 #include "InspectorFrontendClientImpl.h"
 
+#include "Document.h"
+#include "Frame.h"
 #include "InspectorFrontendHost.h"
 #include "Page.h"
 #include "PlatformString.h"
@@ -108,8 +110,8 @@ void InspectorFrontendClientImpl::changeAttachedWindowHeight(unsigned) {
   // Do nothing;
 }
 
-void InspectorFrontendClientImpl::inspectedURLChanged(const String&) {
-  // Do nothing;
+void InspectorFrontendClientImpl::inspectedURLChanged(const String& url) {
+  m_frontendPage->mainFrame()->document()->setTitle("Developer Tools - " + url);
 }
 
 }  // namespace WebKit
