@@ -81,6 +81,7 @@ class WebProcessProxy : public RefCounted<WebProcessProxy>,
   void connect();
 
   void forwardMessageToWebContext(const WebCore::String&);
+  void getPlugins(bool refresh, Vector<WebCore::PluginInfo>&);
 
   // CoreIPC::Connection::Client
   void didReceiveMessage(CoreIPC::Connection*,
