@@ -190,7 +190,7 @@ class PopupMenu : public RefCounted<PopupMenu>
                                    gboolean*,
                                    PopupMenu*);
   static void menuRemoveItem(GtkWidget*, PopupMenu*);
-#elif PLATFORM(EFL)
+#elif PLATFORM(EFL) || PLATFORM(BREWMP)
   FrameView* m_view;
 #elif PLATFORM(WX)
   wxMenu* m_menu;
