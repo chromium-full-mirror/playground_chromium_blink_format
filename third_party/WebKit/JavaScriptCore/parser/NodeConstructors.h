@@ -42,7 +42,13 @@ inline ParserArenaRefCounted::ParserArenaRefCounted(JSGlobalData* globalData) {
 }
 
 inline Node::Node(JSGlobalData* globalData)
-    : m_line(globalData->lexer->lineNumber()) {}
+#if ENABLE(RECURSIVE_PARSE)
+    : m_line(globalData->lexer->lastLineNumber())
+#else
+    : m_line(globalData->lexer->lineNumber())
+#endif
+{
+}
 
 inline ExpressionNode::ExpressionNode(JSGlobalData* globalData,
                                       ResultType resultType)
