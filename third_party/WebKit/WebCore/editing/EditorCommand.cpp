@@ -1272,6 +1272,14 @@ static bool executePasteAndMatchStyle(Frame* frame,
   return true;
 }
 
+static bool executePasteAsPlainText(Frame* frame,
+                                    Event*,
+                                    EditorCommandSource,
+                                    const String&) {
+  frame->editor()->pasteAsPlainText();
+  return true;
+}
+
 static bool executePrint(Frame* frame,
                          Event*,
                          EditorCommandSource,
@@ -2136,6 +2144,9 @@ static const CommandMap& createCommandMap() {
         notTextInsertion, allowExecutionWhenDisabled}},
       {"PasteAndMatchStyle",
        {executePasteAndMatchStyle, supportedPaste, enabledPaste, stateNone,
+        valueNull, notTextInsertion, allowExecutionWhenDisabled}},
+      {"PasteAsPlainText",
+       {executePasteAsPlainText, supportedPaste, enabledPaste, stateNone,
         valueNull, notTextInsertion, allowExecutionWhenDisabled}},
       {"Print",
        {executePrint, supported, enabled, stateNone, valueNull,
