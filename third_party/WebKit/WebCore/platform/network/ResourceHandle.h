@@ -105,7 +105,7 @@ class ResourceHandle : public RefCounted<ResourceHandle>
                  bool defersLoading,
                  bool shouldContentSniff);
 
-  enum FailureType { BlockedFailure, InvalidURLFailure };
+  enum FailureType { NoFailure, BlockedFailure, InvalidURLFailure };
 
  public:
   // FIXME: should not need the Frame
@@ -226,6 +226,8 @@ class ResourceHandle : public RefCounted<ResourceHandle>
   using RefCounted<ResourceHandle>::deref;
 
  private:
+  void platformSetDefersLoading(bool);
+
   void scheduleFailure(FailureType);
 
   bool start(Frame*);

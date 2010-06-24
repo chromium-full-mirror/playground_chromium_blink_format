@@ -76,7 +76,7 @@ PassRefPtr<ResourceHandle> ResourceHandle::create(
 }
 
 void ResourceHandle::scheduleFailure(FailureType type) {
-  d->m_failureType = type;
+  d->m_scheduledFailureType = type;
   d->m_failureTimer.startOneShot(0);
 }
 
@@ -84,11 +84,16 @@ void ResourceHandle::fireFailure(Timer<ResourceHandle>*) {
   if (!client())
     return;
 
-  switch (d->m_failureType) {
+  switch (d->m_scheduledFailureType) {
+    case NoFailure:
+      ASSERT_NOT_REACHED();
+      return;
     case BlockedFailure:
+      d->m_scheduledFailureType = NoFailure;
       client()->wasBlocked(this);
       return;
     case InvalidURLFailure:
+      d->m_scheduledFailureType = NoFailure;
       client()->cannotShowURL(this);
       return;
   }
@@ -135,6 +140,28 @@ bool ResourceHandle::shouldContentSniffURL(const KURL& url) {
 
 void ResourceHandle::forceContentSniffing() {
   shouldForceContentSniffing = true;
+}
+
+void ResourceHandle::setDefersLoading(bool defers) {
+  LOG(Network, "Handle %p setDefersLoading(%s)", this,
+      defers ? "true" : "false");
+
+  ASSERT(d->m_defersLoading != defers);  // Deferring is not counted, so calling
+                                         // setDefersLoading() repeatedly is
+                                         // likely to be in error.
+  d->m_defersLoading = defers;
+
+  if (defers) {
+    ASSERT(d->m_failureTimer.isActive() ==
+           (d->m_scheduledFailureType != NoFailure));
+    if (d->m_failureTimer.isActive())
+      d->m_failureTimer.stop();
+  } else if (d->m_scheduledFailureType != NoFailure) {
+    ASSERT(!d->m_failureTimer.isActive());
+    d->m_failureTimer.startOneShot(0);
+  }
+
+  platformSetDefersLoading(defers);
 }
 
 #if !USE(SOUP)

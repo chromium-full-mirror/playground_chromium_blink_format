@@ -144,6 +144,7 @@ class ResourceHandleInternal : public Noncopyable {
         m_currentMacChallenge(nil)
 #endif
         ,
+        m_scheduledFailureType(ResourceHandle::NoFailure),
         m_failureTimer(loader, &ResourceHandle::fireFailure) {
     const KURL& url = m_request.url();
     m_user = url.user();
@@ -233,7 +234,7 @@ class ResourceHandleInternal : public Noncopyable {
 #endif
   AuthenticationChallenge m_currentWebChallenge;
 
-  ResourceHandle::FailureType m_failureType;
+  ResourceHandle::FailureType m_scheduledFailureType;
   Timer<ResourceHandle> m_failureTimer;
 };
 
