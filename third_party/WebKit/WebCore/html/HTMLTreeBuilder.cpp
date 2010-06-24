@@ -51,7 +51,7 @@ HTMLTreeBuilder::HTMLTreeBuilder(HTMLTokenizer* tokenizer,
     : m_document(document),
       m_reportErrors(reportErrors),
       m_isPaused(false),
-      m_insertionMode(Initial),
+      m_insertionMode(InitialMode),
       m_tokenizer(tokenizer),
       m_legacyTreeBuilder(new LegacyHTMLTreeBuilder(document, reportErrors)),
       m_lastScriptElementStartLine(uninitializedLineNumberValue),
@@ -68,7 +68,7 @@ HTMLTreeBuilder::HTMLTreeBuilder(
       m_reportErrors(false)  // FIXME: Why not report errors in fragments?
       ,
       m_isPaused(false),
-      m_insertionMode(Initial),
+      m_insertionMode(InitialMode),
       m_tokenizer(tokenizer),
       m_legacyTreeBuilder(
           new LegacyHTMLTreeBuilder(fragment, scriptingPermission)),
@@ -215,14 +215,14 @@ PassRefPtr<Node> HTMLTreeBuilder::passTokenToLegacyParser(HTMLToken& token) {
           // a DocumentFragment for pasting so that javascript content
           // does not show up in pasted HTML.
           m_lastScriptElement->removeChildren();
-        } else if (insertionMode() != AfterFrameset)
+        } else if (insertionMode() != AfterFramesetMode)
           handleScriptEndTag(m_lastScriptElement.get(),
                              m_lastScriptElementStartLine);
         m_lastScriptElement = 0;
         m_lastScriptElementStartLine = uninitializedLineNumberValue;
       }
     } else if (oldStyleToken.tagName == framesetTag)
-      setInsertionMode(AfterFrameset);
+      setInsertionMode(AfterFramesetMode);
   }
   return result.release();
 }
