@@ -182,8 +182,8 @@ void WebPage::stopLoading() {
   m_mainFrame->coreFrame()->loader()->stopForUserCancel();
 }
 
-void WebPage::reload() {
-  m_mainFrame->coreFrame()->loader()->reload(false);
+void WebPage::reload(bool reloadFromOrigin) {
+  m_mainFrame->coreFrame()->loader()->reload(reloadFromOrigin);
 }
 
 void WebPage::goForward() {
@@ -429,7 +429,11 @@ void WebPage::didReceiveMessage(CoreIPC::Connection* connection,
       stopLoading();
       break;
     case WebPageMessage::Reload:
-      reload();
+      bool reloadFromOrigin;
+      if (!arguments.decode(CoreIPC::Out(reloadFromOrigin)))
+        return;
+
+      reload(reloadFromOrigin);
       break;
     case WebPageMessage::GoForward:
       goForward();

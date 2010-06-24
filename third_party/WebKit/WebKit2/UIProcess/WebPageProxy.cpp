@@ -217,11 +217,11 @@ void WebPageProxy::stopLoading() {
                                 CoreIPC::In());
 }
 
-void WebPageProxy::reload() {
+void WebPageProxy::reload(bool reloadFromOrigin) {
   if (!isValid())
     return;
   process()->connection()->send(WebPageMessage::Reload, m_pageID,
-                                CoreIPC::In());
+                                CoreIPC::In(reloadFromOrigin));
 }
 
 void WebPageProxy::goForward() {

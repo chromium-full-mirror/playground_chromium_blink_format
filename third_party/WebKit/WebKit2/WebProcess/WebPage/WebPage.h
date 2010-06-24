@@ -115,7 +115,7 @@ class WebPage : public RefCounted<WebPage> {
   void tryClose();
   void loadURL(const WebCore::String&);
   void stopLoading();
-  void reload();
+  void reload(bool reloadFromOrigin);
   void goForward();
   void goBack();
   void setActive(bool);
