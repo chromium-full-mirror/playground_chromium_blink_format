@@ -48,6 +48,8 @@ class HTMLMediaElement;
   BOOL _isEndingFullscreen;
   BOOL _isWindowLoaded;
   BOOL _forceDisableAnimation;
+  uint32_t _idleDisplaySleepAssertion;
+  uint32_t _idleSystemSleepAssertion;
   SystemUIMode _savedUIMode;
   SystemUIOptions _savedUIOptions;
 }
