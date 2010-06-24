@@ -71,6 +71,7 @@ class ContextMenuClientImpl;
 class DragScrollTimer;
 class SuggestionsPopupMenuClient;
 class WebAccessibilityObject;
+class WebDevToolsAgentClient;
 class WebDevToolsAgentPrivate;
 class WebFrameImpl;
 class WebImage;
@@ -318,7 +319,7 @@ class WebViewImpl : public WebView, public RefCounted<WebViewImpl> {
 
   enum DragAction { DragEnter, DragOver };
 
-  WebViewImpl(WebViewClient* client);
+  WebViewImpl(WebViewClient* client, WebDevToolsAgentClient* devToolsClient);
   ~WebViewImpl();
 
   // Returns true if the event was actually processed.
