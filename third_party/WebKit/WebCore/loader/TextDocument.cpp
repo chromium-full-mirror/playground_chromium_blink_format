@@ -62,7 +62,6 @@ class TextDocumentParser : public DocumentParser {
   }
 
  private:
-  Document* m_doc;
   Element* m_preElement;
 
   bool m_skipLF;
@@ -72,16 +71,16 @@ class TextDocumentParser : public DocumentParser {
   UChar* m_dest;
 };
 
-TextDocumentParser::TextDocumentParser(Document* doc)
-    : m_doc(doc), m_preElement(0), m_skipLF(false) {
+TextDocumentParser::TextDocumentParser(Document* document)
+    : DocumentParser(document), m_preElement(0), m_skipLF(false) {
   // Allocate buffer
   m_size = 254;
   m_buffer = static_cast<UChar*>(fastMalloc(sizeof(UChar) * m_size));
   m_dest = m_buffer;
 }
 
-TextDocumentParser::TextDocumentParser(HTMLViewSourceDocument* doc)
-    : DocumentParser(true), m_doc(doc), m_preElement(0), m_skipLF(false) {
+TextDocumentParser::TextDocumentParser(HTMLViewSourceDocument* document)
+    : DocumentParser(document, true), m_preElement(0), m_skipLF(false) {
   // Allocate buffer
   m_size = 254;
   m_buffer = static_cast<UChar*>(fastMalloc(sizeof(UChar) * m_size));
@@ -124,13 +123,13 @@ void TextDocumentParser::write(const SegmentedString& s, bool) {
   }
 
   if (!m_preElement && !inViewSourceMode()) {
-    RefPtr<Element> rootElement = m_doc->createElement(htmlTag, false);
-    m_doc->appendChild(rootElement, ec);
+    RefPtr<Element> rootElement = document()->createElement(htmlTag, false);
+    document()->appendChild(rootElement, ec);
 
-    RefPtr<Element> body = m_doc->createElement(bodyTag, false);
+    RefPtr<Element> body = document()->createElement(bodyTag, false);
     rootElement->appendChild(body, ec);
 
-    RefPtr<Element> preElement = m_doc->createElement(preTag, false);
+    RefPtr<Element> preElement = document()->createElement(preTag, false);
     preElement->setAttribute(
         "style", "word-wrap: break-word; white-space: pre-wrap;", ec);
 
@@ -141,14 +140,15 @@ void TextDocumentParser::write(const SegmentedString& s, bool) {
 
   String string = String(m_buffer, m_dest - m_buffer);
   if (inViewSourceMode()) {
-    static_cast<HTMLViewSourceDocument*>(m_doc)->addViewSourceText(string);
+    static_cast<HTMLViewSourceDocument*>(document())->addViewSourceText(string);
     return;
   }
 
   unsigned charsLeft = string.length();
   while (charsLeft) {
     // split large text to nodes of manageable size
-    RefPtr<Text> text = Text::createWithLengthLimit(m_doc, string, charsLeft);
+    RefPtr<Text> text =
+        Text::createWithLengthLimit(document(), string, charsLeft);
     m_preElement->appendChild(text, ec);
   }
 }
@@ -162,11 +162,11 @@ void TextDocumentParser::finish() {
   m_buffer = 0;
   m_dest = 0;
 
-  m_doc->finishedParsing();
+  document()->finishedParsing();
 }
 
 bool TextDocumentParser::finishWasCalled() {
-  // finish() always calls m_doc->finishedParsing() so we'll be deleted
+  // finish() always calls document()->finishedParsing() so we'll be deleted
   // after finish().
   return false;
 }

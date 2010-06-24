@@ -150,9 +150,9 @@ inline void Token::addAttribute(AtomicString& attrName,
 
 // ----------------------------------------------------------------------------
 
-LegacyHTMLDocumentParser::LegacyHTMLDocumentParser(HTMLDocument* doc,
+LegacyHTMLDocumentParser::LegacyHTMLDocumentParser(HTMLDocument* document,
                                                    bool reportErrors)
-    : DocumentParser(),
+    : DocumentParser(document),
       m_buffer(0),
       m_scriptCode(0),
       m_scriptCodeSize(0),
@@ -165,16 +165,16 @@ LegacyHTMLDocumentParser::LegacyHTMLDocumentParser(HTMLDocument* doc,
       m_externalScriptsTimer(
           this,
           &LegacyHTMLDocumentParser::executeExternalScriptsTimerFired),
-      m_doc(doc),
-      m_treeBuilder(new LegacyHTMLTreeBuilder(doc, reportErrors)),
+      m_treeBuilder(new LegacyHTMLTreeBuilder(document, reportErrors)),
       m_inWrite(false),
       m_fragment(false),
       m_scriptingPermission(FragmentScriptingAllowed) {
   begin();
 }
 
-LegacyHTMLDocumentParser::LegacyHTMLDocumentParser(HTMLViewSourceDocument* doc)
-    : DocumentParser(true),
+LegacyHTMLDocumentParser::LegacyHTMLDocumentParser(
+    HTMLViewSourceDocument* document)
+    : DocumentParser(document, true),
       m_buffer(0),
       m_scriptCode(0),
       m_scriptCodeSize(0),
@@ -187,7 +187,6 @@ LegacyHTMLDocumentParser::LegacyHTMLDocumentParser(HTMLViewSourceDocument* doc)
       m_externalScriptsTimer(
           this,
           &LegacyHTMLDocumentParser::executeExternalScriptsTimerFired),
-      m_doc(doc),
       m_inWrite(false),
       m_fragment(false),
       m_scriptingPermission(FragmentScriptingAllowed) {
@@ -197,7 +196,8 @@ LegacyHTMLDocumentParser::LegacyHTMLDocumentParser(HTMLViewSourceDocument* doc)
 LegacyHTMLDocumentParser::LegacyHTMLDocumentParser(
     DocumentFragment* frag,
     FragmentScriptingPermission scriptingPermission)
-    : m_buffer(0),
+    : DocumentParser(frag->document()),
+      m_buffer(0),
       m_scriptCode(0),
       m_scriptCodeSize(0),
       m_scriptCodeCapacity(0),
@@ -209,7 +209,6 @@ LegacyHTMLDocumentParser::LegacyHTMLDocumentParser(
       m_externalScriptsTimer(
           this,
           &LegacyHTMLDocumentParser::executeExternalScriptsTimerFired),
-      m_doc(frag->document()),
       m_treeBuilder(new LegacyHTMLTreeBuilder(frag, scriptingPermission)),
       m_inWrite(false),
       m_fragment(true),
@@ -270,7 +269,7 @@ void LegacyHTMLDocumentParser::begin() {
   m_currentTagStartLineNumber = 0;
   m_state.setForceSynchronous(false);
 
-  Page* page = m_doc->page();
+  Page* page = document()->page();
   if (page && page->hasCustomHTMLTokenizerTimeDelay())
     m_tokenizerTimeDelay = page->customHTMLTokenizerTimeDelay();
   else
@@ -455,12 +454,12 @@ LegacyHTMLDocumentParser::State LegacyHTMLDocumentParser::scriptHandler(
   // (Bugzilla 3837) Scripts following a frameset element should not execute or,
   // in the case of extern scripts, even load.
   bool followingFrameset =
-      (m_doc->body() && m_doc->body()->hasTagName(framesetTag));
+      (document()->body() && document()->body()->hasTagName(framesetTag));
 
   CachedScript* cs = 0;
   // don't load external scripts for standalone documents (for now)
   if (!inViewSourceMode()) {
-    if (!m_scriptTagSrcAttrValue.isEmpty() && m_doc->frame()) {
+    if (!m_scriptTagSrcAttrValue.isEmpty() && document()->frame()) {
       // forget what we just got; load from src url instead
       if (!m_treeBuilder->skipMode() && !followingFrameset) {
         // The parser might have been stopped by for example a window.close call
@@ -468,7 +467,7 @@ LegacyHTMLDocumentParser::State LegacyHTMLDocumentParser::scriptHandler(
         // If so, we don't want to load scripts.
         if (!m_parserStopped &&
             m_scriptNode->dispatchBeforeLoadEvent(m_scriptTagSrcAttrValue) &&
-            (cs = m_doc->docLoader()->requestScript(
+            (cs = document()->docLoader()->requestScript(
                  m_scriptTagSrcAttrValue, m_scriptTagCharsetAttrValue)))
           m_pendingScripts.append(cs);
         else
@@ -481,7 +480,7 @@ LegacyHTMLDocumentParser::State LegacyHTMLDocumentParser::scriptHandler(
       doScriptExec = m_scriptNode->shouldExecuteAsJavaScript();
 #if ENABLE(XHTMLMP)
       if (!doScriptExec)
-        m_doc->setShouldProcessNoscriptElement(true);
+        document()->setShouldProcessNoscriptElement(true);
 #endif
       m_scriptNode = 0;
     }
@@ -541,10 +540,11 @@ LegacyHTMLDocumentParser::State LegacyHTMLDocumentParser::scriptHandler(
         prependingSrc = m_src;
       setSrc(SegmentedString());
       state = scriptExecution(
-          ScriptSourceCode(
-              scriptString,
-              m_doc->frame() ? m_doc->frame()->document()->url() : KURL(),
-              startLine),
+          ScriptSourceCode(scriptString,
+                           document()->frame()
+                               ? document()->frame()->document()->url()
+                               : KURL(),
+                           startLine),
           state);
     }
   }
@@ -575,7 +575,7 @@ LegacyHTMLDocumentParser::State LegacyHTMLDocumentParser::scriptHandler(
 #if PRELOAD_SCANNER_ENABLED
   if (!m_pendingScripts.isEmpty() && !m_executingScript) {
     if (!m_preloadScanner)
-      m_preloadScanner.set(new LegacyPreloadScanner(m_doc));
+      m_preloadScanner.set(new LegacyPreloadScanner(document()));
     if (!m_preloadScanner->inProgress()) {
       m_preloadScanner->begin();
       m_preloadScanner->write(m_pendingSrc);
@@ -590,7 +590,7 @@ LegacyHTMLDocumentParser::State LegacyHTMLDocumentParser::scriptHandler(
 LegacyHTMLDocumentParser::State LegacyHTMLDocumentParser::scriptExecution(
     const ScriptSourceCode& sourceCode,
     State state) {
-  if (m_fragment || !m_doc->frame())
+  if (m_fragment || !document()->frame())
     return state;
   m_executingScript++;
 
@@ -599,7 +599,7 @@ LegacyHTMLDocumentParser::State LegacyHTMLDocumentParser::scriptExecution(
   m_currentPrependingSrc = &prependingSrc;
 
   m_state = state;
-  m_doc->frame()->script()->executeScript(sourceCode);
+  document()->frame()->script()->executeScript(sourceCode);
   state = m_state;
 
   state.setAllowYield(true);
@@ -627,7 +627,7 @@ LegacyHTMLDocumentParser::State LegacyHTMLDocumentParser::scriptExecution(
 #if PRELOAD_SCANNER_ENABLED
       // We are stuck waiting for another script. Lets check the source that
       // was just document.write()n for anything to load.
-      LegacyPreloadScanner documentWritePreloadScanner(m_doc);
+      LegacyPreloadScanner documentWritePreloadScanner(document());
       documentWritePreloadScanner.begin();
       documentWritePreloadScanner.write(prependingSrc);
       documentWritePreloadScanner.end();
@@ -1207,7 +1207,7 @@ LegacyHTMLDocumentParser::State LegacyHTMLDocumentParser::parseTag(
               // Fix bug 34302 at kde.bugs.org.  Go ahead and treat
               // <!--> as a valid comment, since both mozilla and IE on windows
               // can handle this case.  Only do this in quirks mode. -dwh
-              if (!src.isEmpty() && *src == '>' && m_doc->inCompatMode()) {
+              if (!src.isEmpty() && *src == '>' && document()->inCompatMode()) {
                 state.setInComment(false);
                 src.advancePastNonNewline();
                 if (!src.isEmpty())
@@ -1582,12 +1582,14 @@ LegacyHTMLDocumentParser::State LegacyHTMLDocumentParser::parseTag(
           m_scriptTagSrcAttrValue = String();
           m_scriptTagCharsetAttrValue = String();
           if (m_currentToken.attrs && !m_fragment) {
-            if (m_doc->frame() &&
-                m_doc->frame()->script()->canExecuteScripts(
+            if (document()->frame() &&
+                document()->frame()->script()->canExecuteScripts(
                     NotAboutToExecuteScript)) {
               if ((a = m_currentToken.attrs->getAttributeItem(srcAttr)))
                 m_scriptTagSrcAttrValue =
-                    m_doc->completeURL(deprecatedParseURL(a->value())).string();
+                    document()
+                        ->completeURL(deprecatedParseURL(a->value()))
+                        .string();
             }
           }
         }
@@ -1700,8 +1702,9 @@ inline bool LegacyHTMLDocumentParser::continueProcessing(int& processedCount,
          load, but this hurts overall performance on slower machines.  For now
       turn this
          off.
-      || (!m_doc->haveStylesheetsLoaded() &&
-          (m_doc->documentElement()->id() != ID_HTML || m_doc->body()))) {*/
+      || (!document()->haveStylesheetsLoaded() &&
+          (document()->documentElement()->id() != ID_HTML ||
+      document()->body()))) {*/
       // Schedule the timer to keep processing as soon as possible.
       m_timer.startOneShot(0);
       return false;
@@ -1827,14 +1830,16 @@ ALWAYS_INLINE void LegacyHTMLDocumentParser::advance(State& state) {
 
 void LegacyHTMLDocumentParser::willWriteHTML(const SegmentedString& source) {
 #if ENABLE(INSPECTOR)
-  if (InspectorTimelineAgent* timelineAgent = m_doc->inspectorTimelineAgent())
+  if (InspectorTimelineAgent* timelineAgent =
+          document()->inspectorTimelineAgent())
     timelineAgent->willWriteHTML(source.length(), m_lineNumber);
 #endif
 }
 
 void LegacyHTMLDocumentParser::didWriteHTML() {
 #if ENABLE(INSPECTOR)
-  if (InspectorTimelineAgent* timelineAgent = m_doc->inspectorTimelineAgent())
+  if (InspectorTimelineAgent* timelineAgent =
+          document()->inspectorTimelineAgent())
     timelineAgent->didWriteHTML(m_lineNumber);
 #endif
 }
@@ -1884,7 +1889,7 @@ void LegacyHTMLDocumentParser::write(const SegmentedString& str,
 
   willWriteHTML(source);
 
-  Frame* frame = m_doc->frame();
+  Frame* frame = document()->frame();
   State state = m_state;
   int processedCount = 0;
   double startTime = currentTime();
@@ -1917,8 +1922,8 @@ void LegacyHTMLDocumentParser::stopParsing() {
   // checkCompleted?
   // The FrameLoader needs to know that the parser has finished with its data,
   // regardless of whether it happened naturally or due to manual intervention.
-  if (!m_fragment && m_doc->frame())
-    m_doc->frame()->loader()->checkCompleted();
+  if (!m_fragment && document()->frame())
+    document()->frame()->loader()->checkCompleted();
 }
 
 bool LegacyHTMLDocumentParser::processingData() const {
@@ -1926,8 +1931,8 @@ bool LegacyHTMLDocumentParser::processingData() const {
 }
 
 void LegacyHTMLDocumentParser::timerFired(Timer<LegacyHTMLDocumentParser>*) {
-  if (m_doc->view() && m_doc->view()->layoutPending() &&
-      !m_doc->minimumLayoutDelay()) {
+  if (document()->view() && document()->view()->layoutPending() &&
+      !document()->minimumLayoutDelay()) {
     // Restart the timer and let layout win.  This is basically a way of
     // ensuring that the layout
     // timer has higher priority than our timer.
@@ -1960,7 +1965,7 @@ void LegacyHTMLDocumentParser::end() {
   if (!inViewSourceMode())
     m_treeBuilder->finished();
   else
-    m_doc->finishedParsing();
+    document()->finishedParsing();
 }
 
 void LegacyHTMLDocumentParser::finish() {
@@ -2026,8 +2031,8 @@ PassRefPtr<Node> LegacyHTMLDocumentParser::processToken() {
     if (NamedNodeMap* map = m_currentToken.attrs.get())
       map->shrinkToLength();
     if (inViewSourceMode())
-      static_cast<HTMLViewSourceDocument*>(m_doc)->addViewSourceToken(
-          &m_currentToken);
+      static_cast<HTMLViewSourceDocument*>(document())
+          ->addViewSourceToken(&m_currentToken);
     else
       // pass the token over to the parser, the parser DOES NOT delete the token
       n = m_treeBuilder->parseToken(&m_currentToken);
@@ -2039,8 +2044,8 @@ PassRefPtr<Node> LegacyHTMLDocumentParser::processToken() {
 
 void LegacyHTMLDocumentParser::processDoctypeToken() {
   if (inViewSourceMode())
-    static_cast<HTMLViewSourceDocument*>(m_doc)->addViewSourceDoctypeToken(
-        &m_doctypeToken);
+    static_cast<HTMLViewSourceDocument*>(document())
+        ->addViewSourceDoctypeToken(&m_doctypeToken);
   else
     m_treeBuilder->parseDoctypeToken(&m_doctypeToken);
 }
@@ -2095,7 +2100,7 @@ void LegacyHTMLDocumentParser::enlargeScriptBuffer(int len) {
 }
 
 void LegacyHTMLDocumentParser::executeScriptsWaitingForStylesheets() {
-  ASSERT(m_doc->haveStylesheetsLoaded());
+  ASSERT(document()->haveStylesheetsLoaded());
 
   if (m_hasScriptsWaitingForStylesheets)
     notifyFinished(0);
@@ -2110,7 +2115,7 @@ void LegacyHTMLDocumentParser::executeExternalScriptsIfReady() {
 
   // Make external scripts wait for external stylesheets.
   // FIXME: This needs to be done for inline scripts too.
-  m_hasScriptsWaitingForStylesheets = !m_doc->haveStylesheetsLoaded();
+  m_hasScriptsWaitingForStylesheets = !document()->haveStylesheetsLoaded();
   if (m_hasScriptsWaitingForStylesheets)
     return;
 
@@ -2141,7 +2146,7 @@ void LegacyHTMLDocumentParser::executeExternalScriptsIfReady() {
         m_state = scriptExecution(sourceCode, m_state);
 #if ENABLE(XHTMLMP)
       else
-        m_doc->setShouldProcessNoscriptElement(true);
+        document()->setShouldProcessNoscriptElement(true);
 #endif
       n->dispatchEvent(Event::create(eventNames().loadEvent, false, false));
     }
@@ -2175,8 +2180,8 @@ void LegacyHTMLDocumentParser::executeExternalScriptsIfReady() {
 
 void LegacyHTMLDocumentParser::executeExternalScriptsTimerFired(
     Timer<LegacyHTMLDocumentParser>*) {
-  if (m_doc->view() && m_doc->view()->layoutPending() &&
-      !m_doc->minimumLayoutDelay()) {
+  if (document()->view() && document()->view()->layoutPending() &&
+      !document()->minimumLayoutDelay()) {
     // Restart the timer and do layout first.
     m_externalScriptsTimer.startOneShot(0);
     return;

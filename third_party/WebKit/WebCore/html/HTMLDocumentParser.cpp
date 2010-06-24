@@ -62,7 +62,7 @@ class NestingLevelIncrementer : public Noncopyable {
 
 HTMLDocumentParser::HTMLDocumentParser(HTMLDocument* document,
                                        bool reportErrors)
-    : m_document(document),
+    : DocumentParser(document),
       m_tokenizer(new HTMLTokenizer),
       m_scriptRunner(new HTMLScriptRunner(document, this)),
       m_treeBuilder(
@@ -78,7 +78,7 @@ HTMLDocumentParser::HTMLDocumentParser(HTMLDocument* document,
 HTMLDocumentParser::HTMLDocumentParser(
     DocumentFragment* fragment,
     FragmentScriptingPermission scriptingPermission)
-    : m_document(fragment->document()),
+    : DocumentParser(fragment->document()),
       m_tokenizer(new HTMLTokenizer),
       m_treeBuilder(new HTMLTreeBuilder(m_tokenizer.get(),
                                         fragment,

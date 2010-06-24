@@ -53,7 +53,8 @@ using namespace HTMLNames;
 
 class MediaDocumentParser : public DocumentParser {
  public:
-  MediaDocumentParser(Document* doc) : m_doc(doc), m_mediaElement(0) {}
+  MediaDocumentParser(Document* document)
+      : DocumentParser(document), m_mediaElement(0) {}
 
  private:
   virtual void write(const SegmentedString&, bool appendData);
@@ -66,7 +67,6 @@ class MediaDocumentParser : public DocumentParser {
 
   void createDocumentStructure();
 
-  Document* m_doc;
   HTMLMediaElement* m_mediaElement;
 };
 
@@ -76,15 +76,15 @@ void MediaDocumentParser::write(const SegmentedString&, bool) {
 
 void MediaDocumentParser::createDocumentStructure() {
   ExceptionCode ec;
-  RefPtr<Element> rootElement = m_doc->createElement(htmlTag, false);
-  m_doc->appendChild(rootElement, ec);
+  RefPtr<Element> rootElement = document()->createElement(htmlTag, false);
+  document()->appendChild(rootElement, ec);
 
-  RefPtr<Element> body = m_doc->createElement(bodyTag, false);
+  RefPtr<Element> body = document()->createElement(bodyTag, false);
   body->setAttribute(styleAttr, "background-color: rgb(38,38,38);");
 
   rootElement->appendChild(body, ec);
 
-  RefPtr<Element> mediaElement = m_doc->createElement(videoTag, false);
+  RefPtr<Element> mediaElement = document()->createElement(videoTag, false);
 
   m_mediaElement = static_cast<HTMLVideoElement*>(mediaElement.get());
   m_mediaElement->setAttribute(controlsAttr, "");
@@ -94,11 +94,11 @@ void MediaDocumentParser::createDocumentStructure() {
                                "right: 0; bottom: 0; left: 0;");
 
   m_mediaElement->setAttribute(nameAttr, "media");
-  m_mediaElement->setSrc(m_doc->url());
+  m_mediaElement->setSrc(document()->url());
 
   body->appendChild(mediaElement, ec);
 
-  Frame* frame = m_doc->frame();
+  Frame* frame = document()->frame();
   if (!frame)
     return;
 
@@ -120,11 +120,11 @@ bool MediaDocumentParser::writeRawData(const char*, int) {
 
 void MediaDocumentParser::finish() {
   if (!m_parserStopped)
-    m_doc->finishedParsing();
+    document()->finishedParsing();
 }
 
 bool MediaDocumentParser::finishWasCalled() {
-  // finish() always calls m_doc->finishedParsing() so we'll be deleted
+  // finish() always calls document()->finishedParsing() so we'll be deleted
   // after finish().
   return false;
 }

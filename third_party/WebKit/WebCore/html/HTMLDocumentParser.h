@@ -88,7 +88,6 @@ class HTMLDocumentParser : public DocumentParser,
   virtual void notifyFinished(CachedResource*);
 
   // Exposed for HTMLParserScheduler
-  Document* document() const { return m_document; }
   void resumeParsingAfterYield();
 
  private:
@@ -119,9 +118,6 @@ class HTMLDocumentParser : public DocumentParser,
   // We hold m_token here because it might be partially complete.
   HTMLToken m_token;
 
-  // We must support parsing into a Document* and not just HTMLDocument*
-  // to support DocumentFragment (which has a Document*).
-  Document* m_document;
   OwnPtr<HTMLTokenizer> m_tokenizer;
   OwnPtr<HTMLScriptRunner> m_scriptRunner;
   OwnPtr<HTMLTreeBuilder> m_treeBuilder;
