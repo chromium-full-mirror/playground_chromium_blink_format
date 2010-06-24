@@ -48,7 +48,7 @@ class RenderSVGImage : public RenderImage, protected SVGRenderBase {
     return m_localTransform;
   }
 
-  virtual FloatRect objectBoundingBox() const;
+  virtual FloatRect objectBoundingBox() const { return m_localBounds; }
   virtual FloatRect strokeBoundingBox() const { return m_localBounds; }
   virtual FloatRect repaintRectInLocalCoordinates() const;
 
@@ -100,5 +100,3 @@ class RenderSVGImage : public RenderImage, protected SVGRenderBase {
 
 #endif  // ENABLE(SVG)
 #endif  // RenderSVGImage_h
-
-// vim:ts=4:noet

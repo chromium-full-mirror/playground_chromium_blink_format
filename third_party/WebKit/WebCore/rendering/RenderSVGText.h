@@ -38,15 +38,11 @@ class RenderSVGText : public RenderSVGBlock {
   RenderSVGText(SVGTextElement* node);
 
   virtual void setNeedsTransformUpdate() { m_needsTransformUpdate = true; }
+  virtual FloatRect repaintRectInLocalCoordinates() const;
 
  private:
   virtual const char* renderName() const { return "RenderSVGText"; }
-
   virtual bool isSVGText() const { return true; }
-
-  virtual const AffineTransform& localToParentTransform() const {
-    return m_localTransform;
-  }
 
   virtual void paint(PaintInfo&, int tx, int ty);
   virtual bool nodeAtPoint(const HitTestRequest&,
@@ -66,7 +62,6 @@ class RenderSVGText : public RenderSVGBlock {
 
   virtual void destroy();
 
-  virtual void absoluteRects(Vector<IntRect>&, int tx, int ty);
   virtual void absoluteQuads(Vector<FloatQuad>&);
 
   virtual IntRect clippedOverflowRectForRepaint(
@@ -82,8 +77,10 @@ class RenderSVGText : public RenderSVGBlock {
 
   virtual FloatRect objectBoundingBox() const { return frameRect(); }
   virtual FloatRect strokeBoundingBox() const;
-  virtual FloatRect repaintRectInLocalCoordinates() const;
 
+  virtual const AffineTransform& localToParentTransform() const {
+    return m_localTransform;
+  }
   virtual AffineTransform localTransform() const { return m_localTransform; }
   virtual RootInlineBox* createRootInlineBox();
 

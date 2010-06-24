@@ -36,6 +36,8 @@ class RenderSVGBlock : public RenderBlock, protected SVGRenderBase {
  private:
   virtual void setStyle(PassRefPtr<RenderStyle>);
   virtual void updateBoxModelInfoFromStyle();
+
+  virtual void absoluteRects(Vector<IntRect>&, int tx, int ty);
 };
 }
 #endif

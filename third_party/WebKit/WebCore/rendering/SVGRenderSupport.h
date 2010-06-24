@@ -61,9 +61,6 @@ class SVGRenderBase {
   // Helper function determining wheter overflow is hidden
   static bool isOverflowHidden(const RenderObject*);
 
-  // strokeBoundingBox() includes the marker boundaries for a RenderPath object
-  virtual FloatRect strokeBoundingBox() const { return FloatRect(); }
-
   // Calculates the repaintRect in combination with filter, clipper and masker
   // in local coordinates.
   void intersectRepaintRectWithResources(const RenderObject*, FloatRect&) const;

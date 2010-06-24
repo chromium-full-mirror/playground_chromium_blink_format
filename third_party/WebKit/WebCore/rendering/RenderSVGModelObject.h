@@ -61,7 +61,7 @@ class RenderSVGModelObject : public RenderObject, protected SVGRenderBase {
       RenderBoxModelObject* repaintContainer,
       IntPoint*) const;
 
-  virtual void absoluteRects(Vector<IntRect>& rects, int tx, int ty);
+  virtual void absoluteRects(Vector<IntRect>&, int tx, int ty);
   virtual void absoluteQuads(Vector<FloatQuad>&);
 
   virtual void destroy();

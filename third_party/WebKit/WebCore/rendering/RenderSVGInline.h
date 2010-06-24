@@ -56,6 +56,7 @@ class RenderSVGInline : public RenderInline, protected SVGRenderBase {
                                    bool useTransforms,
                                    bool fixed,
                                    TransformState&) const;
+  virtual void absoluteQuads(Vector<FloatQuad>&);
 
  private:
   virtual InlineFlowBox* createInlineFlowBox();

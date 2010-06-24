@@ -152,10 +152,6 @@ bool RenderSVGImage::nodeAtPoint(const HitTestRequest&,
   return false;
 }
 
-FloatRect RenderSVGImage::objectBoundingBox() const {
-  return m_localBounds;
-}
-
 FloatRect RenderSVGImage::repaintRectInLocalCoordinates() const {
   // If we already have a cached repaint rect, return that
   if (!m_cachedLocalRepaintRect.isEmpty())
@@ -210,12 +206,14 @@ void RenderSVGImage::addFocusRingRects(Vector<IntRect>& rects, int, int) {
     rects.append(contentRect);
 }
 
-void RenderSVGImage::absoluteRects(Vector<IntRect>& rects, int, int) {
-  rects.append(absoluteClippedOverflowRect());
+void RenderSVGImage::absoluteRects(Vector<IntRect>&, int, int) {
+  // This code path should never be taken for SVG, as we're assuming
+  // useTransforms=true everywhere, absoluteQuads should be used.
+  ASSERT_NOT_REACHED();
 }
 
 void RenderSVGImage::absoluteQuads(Vector<FloatQuad>& quads) {
-  quads.append(FloatRect(absoluteClippedOverflowRect()));
+  quads.append(localToAbsoluteQuad(strokeBoundingBox()));
 }
 }
 

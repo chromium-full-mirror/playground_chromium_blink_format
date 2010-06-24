@@ -82,12 +82,14 @@ IntRect RenderSVGModelObject::outlineBoundsForRepaint(
   return containerRelativeQuad.enclosingBoundingBox();
 }
 
-void RenderSVGModelObject::absoluteRects(Vector<IntRect>& rects, int, int) {
-  rects.append(absoluteClippedOverflowRect());
+void RenderSVGModelObject::absoluteRects(Vector<IntRect>&, int, int) {
+  // This code path should never be taken for SVG, as we're assuming
+  // useTransforms=true everywhere, absoluteQuads should be used.
+  ASSERT_NOT_REACHED();
 }
 
 void RenderSVGModelObject::absoluteQuads(Vector<FloatQuad>& quads) {
-  quads.append(absoluteClippedOverflowRect());
+  quads.append(localToAbsoluteQuad(strokeBoundingBox()));
 }
 
 void RenderSVGModelObject::destroy() {
