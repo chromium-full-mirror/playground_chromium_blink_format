@@ -131,19 +131,9 @@ static AccessibilityObject* core(AtkDocument* document) {
   return core(ATK_OBJECT(document));
 }
 
-static const gchar* nameFromChildren(AccessibilityObject* object) {
-  if (!object)
-    return 0;
-
-  AccessibilityRenderObject::AccessibilityChildrenVector children =
-      object->children();
-  // Currently, object->stringValue() should be an empty String. This might not
-  // be the case down the road.
-  String name = object->stringValue();
-  for (unsigned i = 0; i < children.size(); ++i)
-    name += children.at(i).get()->stringValue();
-  return returnString(name);
-}
+static gchar* webkit_accessible_text_get_text(AtkText* text,
+                                              gint startOffset,
+                                              gint endOffset);
 
 static const gchar* webkit_accessible_get_name(AtkObject* object) {
   AccessibilityObject* coreObject = core(object);
@@ -155,8 +145,11 @@ static const gchar* webkit_accessible_get_name(AtkObject* object) {
   if (coreObject->isControl()) {
     AccessibilityObject* label =
         renderObject->correspondingLabelForControlElement();
-    if (label)
-      return returnString(nameFromChildren(label));
+    if (label) {
+      AtkObject* atkObject = label->wrapper();
+      if (ATK_IS_TEXT(atkObject))
+        return webkit_accessible_text_get_text(ATK_TEXT(atkObject), 0, -1);
+    }
   }
 
   if (renderObject->isImage() || renderObject->isInputImage()) {
@@ -1590,8 +1583,8 @@ static const gchar* webkit_accessible_table_get_column_description(
     AtkTable* table,
     gint column) {
   AtkObject* columnHeader = atk_table_get_column_header(table, column);
-  if (columnHeader)
-    return returnString(nameFromChildren(core(columnHeader)));
+  if (columnHeader && ATK_IS_TEXT(columnHeader))
+    return webkit_accessible_text_get_text(ATK_TEXT(columnHeader), 0, -1);
 
   return 0;
 }
@@ -1599,8 +1592,8 @@ static const gchar* webkit_accessible_table_get_column_description(
 static const gchar* webkit_accessible_table_get_row_description(AtkTable* table,
                                                                 gint row) {
   AtkObject* rowHeader = atk_table_get_row_header(table, row);
-  if (rowHeader)
-    return returnString(nameFromChildren(core(rowHeader)));
+  if (rowHeader && ATK_IS_TEXT(rowHeader))
+    return webkit_accessible_text_get_text(ATK_TEXT(rowHeader), 0, -1);
 
   return 0;
 }
