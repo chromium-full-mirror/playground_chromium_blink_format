@@ -522,7 +522,6 @@ void Interpreter::dumpRegisters(CallFrame* callFrame) {
   ++it;
   printf("[ReturnPC]                 | %10p | %p \n", it, (*it).vPC());
   ++it;
-  ++it;
   printf("[ArgumentCount]            | %10p | %d \n", it, (*it).i());
   ++it;
   printf("[Callee]                   | %10p | %p \n", it, (*it).function());
