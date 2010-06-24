@@ -246,6 +246,10 @@ void RenderTheme::adjustStyle(CSSStyleSelector* selector,
     case RatingLevelIndicatorPart:
       return adjustMeterStyle(selector, style, e);
 #endif
+#if ENABLE(INPUT_SPEECH)
+    case InputSpeechButtonPart:
+// FIXME: Adjust the speech button's style and sizes.
+#endif
     default:
       break;
   }
@@ -381,6 +385,10 @@ bool RenderTheme::paint(RenderObject* o,
       return paintSearchFieldResultsDecoration(o, paintInfo, r);
     case SearchFieldResultsButtonPart:
       return paintSearchFieldResultsButton(o, paintInfo, r);
+#if ENABLE(INPUT_SPEECH)
+    case InputSpeechButtonPart:
+// FIXME: Add painting code to draw the speech button.
+#endif
     default:
       break;
   }
@@ -431,6 +439,9 @@ bool RenderTheme::paintBorderOnly(RenderObject* o,
     case SearchFieldDecorationPart:
     case SearchFieldResultsDecorationPart:
     case SearchFieldResultsButtonPart:
+#if ENABLE(INPUT_SPEECH)
+    case InputSpeechButtonPart:
+#endif
     default:
       break;
   }
@@ -478,6 +489,9 @@ bool RenderTheme::paintDecorations(RenderObject* o,
     case SearchFieldDecorationPart:
     case SearchFieldResultsDecorationPart:
     case SearchFieldResultsButtonPart:
+#if ENABLE(INPUT_SPEECH)
+    case InputSpeechButtonPart:
+#endif
     default:
       break;
   }

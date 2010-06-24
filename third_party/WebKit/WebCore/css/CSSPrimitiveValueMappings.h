@@ -342,6 +342,11 @@ inline CSSPrimitiveValue::CSSPrimitiveValue(ControlPart e)
     case CapsLockIndicatorPart:
       m_value.ident = CSSValueCapsLockIndicator;
       break;
+    case InputSpeechButtonPart:
+#if ENABLE(INPUT_SPEECH)
+      m_value.ident = CSSValueInputSpeechButton;
+#endif
+      break;
   }
 }
 

@@ -6,6 +6,7 @@
  * reserved.
  *           (C) 2006 Alexey Proskuryakov (ap@nypop.com)
  * Copyright (C) 2007 Samuel Weinig (sam@webkit.org)
+ * Copyright (C) 2010 Google Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -2789,6 +2790,22 @@ void HTMLInputElement::setWapInputFormat(String& mask) {
   String validateMask = validateInputMask(m_data, mask);
   if (!validateMask.isEmpty())
     m_data.setInputFormatMask(validateMask);
+}
+#endif
+
+#if ENABLE(INPUT_SPEECH)
+bool HTMLInputElement::isSpeechEnabled() const {
+  switch (inputType()) {
+    // FIXME: Add support for RANGE, EMAIL, URL, COLOR and DATE/TIME input
+    // types.
+    case TEXT:
+    case PASSWORD:
+    case SEARCH:
+    case NUMBER:
+    case TELEPHONE:
+      return hasAttribute(speechAttr);
+  }
+  return false;
 }
 #endif
 

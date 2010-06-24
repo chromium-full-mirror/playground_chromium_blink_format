@@ -191,6 +191,9 @@ class CSSSelector : public Noncopyable {
     PseudoMeterVerticalSuboptimal,
     PseudoMeterVerticalEvenLessGood,
     PseudoInputListButton,
+#if ENABLE(INPUT_SPEECH)
+    PseudoInputSpeechButton,
+#endif
     PseudoInnerSpinButton,
     PseudoOuterSpinButton,
     PseudoProgressBarValue,

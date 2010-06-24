@@ -55,6 +55,7 @@ enum ControlPart {
   ButtonBevelPart,
   DefaultButtonPart,
   InnerSpinButtonPart,
+  InputSpeechButtonPart,
   ListButtonPart,
   ListboxPart,
   ListItemPart,
