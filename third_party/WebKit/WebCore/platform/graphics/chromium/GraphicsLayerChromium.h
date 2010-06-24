@@ -136,13 +136,12 @@ class GraphicsLayerChromium : public GraphicsLayer {
   enum ContentsLayerPurpose {
     NoContentsLayer = 0,
     ContentsLayerForImage,
-    ContentsLayerForVideo
+    ContentsLayerForVideo,
+    ContentsLayerForWebGL
   };
 
   ContentsLayerPurpose m_contentsLayerPurpose;
   bool m_contentsLayerHasBackgroundColor : 1;
-
-  NativeImagePtr m_pendingContentsImage;
 };
 
 }  // namespace WebCore

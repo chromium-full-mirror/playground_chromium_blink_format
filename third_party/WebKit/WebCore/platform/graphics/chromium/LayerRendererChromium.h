@@ -46,6 +46,16 @@ namespace WebCore {
 class GLES2Context;
 class Page;
 
+class ShaderProgram {
+ public:
+  ShaderProgram();
+
+  unsigned m_shaderProgramId;
+  int m_samplerLocation;
+  int m_matrixLocation;
+  int m_alphaLocation;
+};
+
 // Class that handles drawing of composited render layers using GL.
 class LayerRendererChromium : public Noncopyable {
  public:
@@ -79,6 +89,14 @@ class LayerRendererChromium : public Noncopyable {
   }
 
  private:
+  enum ShaderProgramType {
+    DebugBorderProgram,
+    ScrollLayerProgram,
+    ContentLayerProgram,
+    WebGLLayerProgram,
+    NumShaderProgramTypes
+  };
+
   void updateLayersRecursive(LayerChromium* layer,
                              const TransformationMatrix& parentMatrix,
                              float opacity,
@@ -91,14 +109,19 @@ class LayerRendererChromium : public Noncopyable {
   void drawTexturedQuad(const TransformationMatrix& matrix,
                         float width,
                         float height,
-                        float opacity,
-                        bool scrolling);
+                        float opacity);
 
   bool isLayerVisible(LayerChromium*,
                       const TransformationMatrix&,
                       const IntRect& visibleRect);
 
-  void bindCommonAttribLocation(int location, char* attribName);
+  bool createLayerShader(ShaderProgramType,
+                         const char* vertexShaderSource,
+                         const char* fragmentShaderSource);
+
+  void useShaderProgram(ShaderProgramType);
+
+  void bindCommonAttribLocations(ShaderProgramType);
 
   enum VboIds { Vertices, LayerElements };
 
@@ -111,12 +134,9 @@ class LayerRendererChromium : public Noncopyable {
   int getTextureId(LayerChromium*);
   int assignTextureForLayer(LayerChromium*);
 
-  // GL shader program object IDs.
-  unsigned int m_layerProgramObject;
-  unsigned int m_borderProgramObject;
-  unsigned int m_scrollProgramObject;
+  ShaderProgram m_shaderPrograms[NumShaderProgramTypes];
 
-  unsigned int m_rootLayerTextureId;
+  unsigned m_rootLayerTextureId;
   int m_rootLayerTextureWidth;
   int m_rootLayerTextureHeight;
 
@@ -126,13 +146,9 @@ class LayerRendererChromium : public Noncopyable {
   int m_samplerLocation;
   int m_matrixLocation;
   int m_alphaLocation;
-  int m_scrollMatrixLocation;
-  int m_scrollSamplerLocation;
-
-  int m_borderMatrixLocation;
   int m_borderColorLocation;
 
-  unsigned int m_quadVboIds[3];
+  unsigned m_quadVboIds[3];
   TransformationMatrix m_projectionMatrix;
 
   RefPtr<LayerChromium> m_rootLayer;
@@ -143,8 +159,10 @@ class LayerRendererChromium : public Noncopyable {
   IntPoint m_scrollPosition;
   bool m_hardwareCompositing;
 
+  ShaderProgramType m_currentShaderProgramType;
+
   // Map associating layers with textures ids used by the GL compositor.
-  typedef HashMap<LayerChromium*, unsigned int> TextureIdMap;
+  typedef HashMap<LayerChromium*, unsigned> TextureIdMap;
   TextureIdMap m_textureIdMap;
 
 #if PLATFORM(SKIA)
