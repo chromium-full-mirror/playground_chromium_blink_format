@@ -400,7 +400,6 @@ class FrameLoader : public Noncopyable {
   void navigateToDifferentDocument(HistoryItem*, FrameLoadType);
 
   void loadProvisionalItemFromCachedPage();
-  void pageHidden();
 
   void receivedFirstData();
 

@@ -127,6 +127,7 @@ CachedFrame::CachedFrame(Frame* frame) : CachedFrameBase(frame) {
   m_document->documentWillBecomeInactive();
   frame->clearTimers();
   m_document->setInPageCache(true);
+  frame->loader()->stopLoading(UnloadEventPolicyUnloadAndPageHide);
 
   frame->loader()->client()->savePlatformDataToCachedFrame(this);
 
