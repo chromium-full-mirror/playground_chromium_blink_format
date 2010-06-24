@@ -47,6 +47,8 @@
 //      WebGLES2Context. This is done so we have a place to inject an
 //      implementation which creates the GL ES context.
 
+using namespace WebKit;
+
 namespace WebCore {
 
 class GLES2ContextInternal {
@@ -56,22 +58,19 @@ class GLES2ContextInternal {
 
   bool initialize(Page*);
 
-  WebKit::WebGLES2Context* getWebGLES2Context() { return m_impl.get(); }
+  WebGLES2Context* getWebGLES2Context() { return m_impl; }
 
  private:
-  OwnPtr<WebKit::WebGLES2Context> m_impl;
+  WebGLES2Context* m_impl;
 };
 
 bool GLES2ContextInternal::initialize(Page* page) {
-  m_impl = WebKit::webKitClient()->createGLES2Context();
+  ASSERT(page);
+  WebViewImpl* webView = WebViewImpl::fromPage(page);
+  m_impl = webView->gles2Context();
   if (!m_impl)
     return false;
 
-  WebKit::WebViewImpl* webView = WebKit::WebViewImpl::fromPage(page);
-  if (!m_impl->initialize(webView)) {
-    m_impl.clear();
-    return false;
-  }
   return true;
 }
 
@@ -89,21 +88,21 @@ PassOwnPtr<GLES2Context> GLES2Context::create(Page* page) {
 GLES2Context::~GLES2Context() {}
 
 bool GLES2Context::makeCurrent() {
-  WebKit::WebGLES2Context* webContext = m_internal->getWebGLES2Context();
+  WebGLES2Context* webContext = m_internal->getWebGLES2Context();
   if (!webContext)
     return false;
   return webContext->makeCurrent();
 }
 
 bool GLES2Context::destroy() {
-  WebKit::WebGLES2Context* webContext = m_internal->getWebGLES2Context();
+  WebGLES2Context* webContext = m_internal->getWebGLES2Context();
   if (!webContext)
     return false;
   return webContext->destroy();
 }
 
 bool GLES2Context::swapBuffers() {
-  WebKit::WebGLES2Context* webContext = m_internal->getWebGLES2Context();
+  WebGLES2Context* webContext = m_internal->getWebGLES2Context();
   if (!webContext)
     return false;
   return webContext->swapBuffers();
