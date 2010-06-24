@@ -31,7 +31,6 @@
 #ifndef WebViewImpl_h
 #define WebViewImpl_h
 
-#include "WebDevToolsAgentImpl.h"
 #include "WebNavigationPolicy.h"
 #include "WebPoint.h"
 #include "WebSize.h"
@@ -41,10 +40,10 @@
 #include "BackForwardListClientImpl.h"
 #include "ChromeClientImpl.h"
 #include "ContextMenuClientImpl.h"
-#include "DocumentLoader.h"
 #include "DragClientImpl.h"
 #include "EditorClientImpl.h"
 #include "GraphicsLayer.h"
+#include "InspectorClientImpl.h"
 #include "LayerRendererChromium.h"
 #include "NotificationPresenterImpl.h"
 #include <wtf/OwnPtr.h>
@@ -72,7 +71,7 @@ class ContextMenuClientImpl;
 class DragScrollTimer;
 class SuggestionsPopupMenuClient;
 class WebAccessibilityObject;
-class WebDevToolsAgentClient;
+class WebDevToolsAgentPrivate;
 class WebFrameImpl;
 class WebImage;
 class WebKeyboardEvent;
@@ -170,6 +169,7 @@ class WebViewImpl : public WebView, public RefCounted<WebViewImpl> {
   virtual void setInspectorSetting(const WebString& key,
                                    const WebString& value);
   virtual WebDevToolsAgent* devToolsAgent();
+  virtual void setDevToolsAgent(WebDevToolsAgent*);
   virtual WebAccessibilityObject accessibilityObject();
   virtual void applyAutoFillSuggestions(const WebNode&,
                                         const WebVector<WebString>& names,
@@ -318,7 +318,7 @@ class WebViewImpl : public WebView, public RefCounted<WebViewImpl> {
 
   enum DragAction { DragEnter, DragOver };
 
-  WebViewImpl(WebViewClient* client, WebDevToolsAgentClient* devToolsClient);
+  WebViewImpl(WebViewClient* client);
   ~WebViewImpl();
 
   // Returns true if the event was actually processed.
@@ -363,13 +363,11 @@ class WebViewImpl : public WebView, public RefCounted<WebViewImpl> {
   ContextMenuClientImpl m_contextMenuClientImpl;
   DragClientImpl m_dragClientImpl;
   EditorClientImpl m_editorClientImpl;
+  InspectorClientImpl m_inspectorClientImpl;
 
   WebSize m_size;
 
   WebPoint m_lastMousePosition;
-
-  OwnPtr<WebDevToolsAgentImpl> m_devToolsAgent;
-
   OwnPtr<WebCore::Page> m_page;
 
   // This flag is set when a new navigation is detected. It is used to satisfy
@@ -469,6 +467,8 @@ class WebViewImpl : public WebView, public RefCounted<WebViewImpl> {
 
   // The AutoComplete suggestions popup.
   RefPtr<WebCore::PopupContainer> m_autocompletePopup;
+
+  OwnPtr<WebDevToolsAgentPrivate> m_devToolsAgent;
 
   // Whether the webview is rendering transparently.
   bool m_isTransparent;
