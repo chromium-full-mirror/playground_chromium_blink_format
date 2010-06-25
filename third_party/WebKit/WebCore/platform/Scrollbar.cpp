@@ -40,6 +40,13 @@
 
 using namespace std;
 
+#if PLATFORM(CHROMIUM) && OS(LINUX)
+// The position of the scrollbar thumb affects the appearance of the steppers,
+// so
+// when the thumb moves, we have to invalidate them for painting.
+#define THUMB_POSITION_AFFECTS_BUTTONS
+#endif
+
 namespace WebCore {
 
 #if !PLATFORM(GTK) && !PLATFORM(EFL)
@@ -163,12 +170,20 @@ bool Scrollbar::scroll(ScrollDirection direction,
   return setCurrentPos(max(min(newPos, maxPos), 0.0f));
 }
 
-void Scrollbar::updateThumbPosition() {
+void Scrollbar::updateThumb() {
+#ifdef THUMB_POSITION_AFFECTS_BUTTONS
+  invalidate();
+#else
   theme()->invalidateParts(this, ForwardTrackPart | BackTrackPart | ThumbPart);
+#endif
+}
+
+void Scrollbar::updateThumbPosition() {
+  updateThumb();
 }
 
 void Scrollbar::updateThumbProportion() {
-  theme()->invalidateParts(this, ForwardTrackPart | BackTrackPart | ThumbPart);
+  updateThumb();
 }
 
 void Scrollbar::paint(GraphicsContext* context, const IntRect& damageRect) {

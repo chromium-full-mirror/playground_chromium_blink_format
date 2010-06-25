@@ -142,6 +142,7 @@ class Scrollbar : public Widget {
             ScrollbarControlSize,
             ScrollbarTheme* = 0);
 
+  void updateThumb();
   virtual void updateThumbPosition();
   virtual void updateThumbProportion();
 
