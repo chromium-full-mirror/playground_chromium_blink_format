@@ -407,9 +407,6 @@ class RenderBlock : public RenderBox {
   };
 
   // The following functions' implementations are in RenderBlockLineLayout.cpp.
-  void bidiReorderLine(InlineBidiResolver&,
-                       const InlineIterator& end,
-                       bool previousLineBrokeCleanly);
   RootInlineBox* determineStartPosition(bool& firstLine,
                                         bool& fullLayout,
                                         bool& previousLineBrokeCleanly,
