@@ -56,6 +56,10 @@ class QScriptValue {
   ~QScriptValue();
 
   QScriptValue& operator=(const QScriptValue& other);
+
+  QScriptValue prototype() const;
+  void setPrototype(const QScriptValue& prototype);
+
   bool equals(const QScriptValue& other) const;
   bool strictlyEquals(const QScriptValue& other) const;
   bool instanceOf(const QScriptValue& other) const;

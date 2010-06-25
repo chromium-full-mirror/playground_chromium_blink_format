@@ -48,6 +48,7 @@ class tst_QScriptValue : public QObject {
   void dataSharing();
   void constructors_data();
   void constructors();
+  void getSetPrototype();
   void call();
   void ctor();
   void toObjectSimple();
