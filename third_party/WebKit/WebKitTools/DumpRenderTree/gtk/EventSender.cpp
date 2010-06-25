@@ -87,6 +87,18 @@ static void sendOrQueueEvent(GdkEvent, bool = true);
 static void dispatchEvent(GdkEvent event);
 static guint getStateFlags();
 
+#if !GTK_CHECK_VERSION(2, 17, 3)
+static void gdk_window_get_root_coords(GdkWindow* window,
+                                       gint x,
+                                       gint y,
+                                       gint* rootX,
+                                       gint* rootY) {
+  gdk_window_get_root_origin(window, rootX, rootY);
+  *rootX = *rootX + x;
+  *rootY = *rootY + y;
+}
+#endif
+
 static JSValueRef getDragModeCallback(JSContextRef context,
                                       JSObjectRef object,
                                       JSStringRef propertyName,
@@ -119,21 +131,6 @@ static JSValueRef leapForwardCallback(JSContextRef context,
   return JSValueMakeUndefined(context);
 }
 
-#if !GTK_CHECK_VERSION(2, 17, 3)
-static void getRootCoords(GtkWidget* view, int* rootX, int* rootY) {
-  GtkWidget* window = gtk_widget_get_toplevel(GTK_WIDGET(view));
-  int tmpX, tmpY;
-
-  gtk_widget_translate_coordinates(view, window, lastMousePositionX,
-                                   lastMousePositionY, &tmpX, &tmpY);
-
-  gdk_window_get_origin(window->window, rootX, rootY);
-
-  *rootX += tmpX;
-  *rootY += tmpY;
-}
-#endif
-
 bool prepareMouseButtonEvent(GdkEvent* event, int eventSenderButtonNumber) {
   WebKitWebView* view = webkit_web_frame_get_web_view(mainFrame);
   if (!view)
@@ -160,12 +157,8 @@ bool prepareMouseButtonEvent(GdkEvent* event, int eventSenderButtonNumber) {
   event->button.time = GDK_CURRENT_TIME;
 
   int xRoot, yRoot;
-#if GTK_CHECK_VERSION(2, 17, 3)
   gdk_window_get_root_coords(GTK_WIDGET(view)->window, lastMousePositionX,
                              lastMousePositionY, &xRoot, &yRoot);
-#else
-  getRootCoords(GTK_WIDGET(view), &xRoot, &yRoot);
-#endif
   event->button.x_root = xRoot;
   event->button.y_root = yRoot;
 
@@ -310,12 +303,8 @@ static JSValueRef mouseMoveToCallback(JSContextRef context,
   event.motion.state = getStateFlags();
 
   int xRoot, yRoot;
-#if GTK_CHECK_VERSION(2, 17, 3)
   gdk_window_get_root_coords(GTK_WIDGET(view)->window, lastMousePositionX,
                              lastMousePositionY, &xRoot, &yRoot);
-#else
-  getRootCoords(GTK_WIDGET(view), &xRoot, &yRoot);
-#endif
   event.motion.x_root = xRoot;
   event.motion.y_root = yRoot;
 
