@@ -30,12 +30,6 @@
 
 namespace WebCore {
 
-// FIXME: It seems wrong that RawDataDocumentParser is a subclass of
-// DocumentParser.  RawDataDocumentParser, just wants to override an earlier
-// version of write() before the data is decoded.  Seems the decoding could
-// move into the base-class DocumentParser, and then RawDataDocumentParser
-// would just be short-circuting.  That could simplify some of the
-// DocumentWriter logic.
 class RawDataDocumentParser : public DocumentParser {
  public:
   RawDataDocumentParser(Document* document) : DocumentParser(document) {}
@@ -62,9 +56,6 @@ class RawDataDocumentParser : public DocumentParser {
   }
 
   virtual bool isWaitingForScripts() const { return false; }
-
-  virtual bool wantsRawData() const { return true; }
-  virtual bool writeRawData(const char*, int) { return false; }
 };
 };
 

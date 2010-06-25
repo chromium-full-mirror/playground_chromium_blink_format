@@ -69,6 +69,10 @@ class DocumentWriter : public Noncopyable {
 
   void setDecoder(TextResourceDecoder*);
 
+  // Exposed for DoucmentParser::appendBytes
+  TextResourceDecoder* createDecoderIfNeeded();
+  void reportDataRecieved();
+
  private:
   PassRefPtr<Document> createDocument(const KURL&);
 

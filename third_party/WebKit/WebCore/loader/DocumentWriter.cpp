@@ -70,8 +70,8 @@ void DocumentWriter::replaceDocument(const String& source) {
       m_frame->document()->setParseMode(Document::Strict);
     }
 
-    // FIXME: If we wanted to support the <img src='javascript:'imagedata'>
-    // case then we would need to call addData(char*, int) instead.
+    // FIXME: This should call DocumentParser::appendBytes instead of append
+    // to support RawDataDocumentParsers.
     if (DocumentParser* parser = m_frame->document()->parser())
       parser->append(source);
   }
@@ -145,20 +145,7 @@ void DocumentWriter::begin(const KURL& url,
     m_frame->view()->setContentsSize(IntSize());
 }
 
-void DocumentWriter::addData(const char* str, int len, bool flush) {
-  if (len == 0 && !flush)
-    return;
-
-  if (len == -1)
-    len = strlen(str);
-
-  DocumentParser* parser = m_frame->document()->parser();
-  if (parser && parser->wantsRawData()) {
-    if (len > 0)
-      parser->writeRawData(str, len);
-    return;
-  }
-
+TextResourceDecoder* DocumentWriter::createDecoderIfNeeded() {
   if (!m_decoder) {
     if (Settings* settings = m_frame->settings()) {
       m_decoder = TextResourceDecoder::create(
@@ -191,24 +178,26 @@ void DocumentWriter::addData(const char* str, int len, bool flush) {
     }
     m_frame->document()->setDecoder(m_decoder.get());
   }
+  return m_decoder.get();
+}
 
-  String decoded = m_decoder->decode(str, len);
-  if (flush)
-    decoded += m_decoder->flush();
-  if (decoded.isEmpty())
-    return;
-
+void DocumentWriter::reportDataRecieved() {
+  ASSERT(m_decoder);
   if (!m_receivedData) {
     m_receivedData = true;
     if (m_decoder->encoding().usesVisualOrdering())
       m_frame->document()->setVisuallyOrdered();
     m_frame->document()->recalcStyle(Node::Force);
   }
+}
 
-  if (parser) {
-    ASSERT(!parser->wantsRawData());
-    parser->append(decoded);
-  }
+void DocumentWriter::addData(const char* str, int len, bool flush) {
+  if (len == -1)
+    len = strlen(str);
+
+  DocumentParser* parser = m_frame->document()->parser();
+  if (parser)
+    parser->appendBytes(this, str, len, flush);
 }
 
 void DocumentWriter::end() {

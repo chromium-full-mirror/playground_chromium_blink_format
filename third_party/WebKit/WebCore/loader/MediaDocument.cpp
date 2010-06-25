@@ -51,7 +51,7 @@ class MediaDocumentParser : public RawDataDocumentParser {
       : RawDataDocumentParser(document), m_mediaElement(0) {}
 
  private:
-  virtual bool writeRawData(const char* data, int len);
+  virtual void appendBytes(DocumentWriter*, const char*, int, bool);
 
   void createDocumentStructure();
 
@@ -92,14 +92,13 @@ void MediaDocumentParser::createDocumentStructure() {
       ->setShouldBufferData(false);
 }
 
-bool MediaDocumentParser::writeRawData(const char*, int) {
+void MediaDocumentParser::appendBytes(DocumentWriter*, const char*, int, bool) {
   ASSERT(!m_mediaElement);
   if (m_mediaElement)
-    return false;
+    return;
 
   createDocumentStructure();
   finish();
-  return false;
 }
 
 MediaDocument::MediaDocument(Frame* frame, const KURL& url)
