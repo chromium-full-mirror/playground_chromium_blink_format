@@ -42,6 +42,15 @@ namespace WebCore {
 
 WebGLGetInfo::WebGLGetInfo(bool value) : m_type(kTypeBool), m_bool(value) {}
 
+WebGLGetInfo::WebGLGetInfo(const bool* value, int size)
+    : m_type(kTypeBoolArray) {
+  if (!value || size <= 0)
+    return;
+  m_boolArray.resize(size);
+  for (int ii = 0; ii < size; ++ii)
+    m_boolArray[ii] = value[ii];
+}
+
 WebGLGetInfo::WebGLGetInfo(float value) : m_type(kTypeFloat), m_float(value) {}
 
 WebGLGetInfo::WebGLGetInfo(long value) : m_type(kTypeLong), m_long(value) {}
@@ -87,6 +96,11 @@ WebGLGetInfo::Type WebGLGetInfo::getType() const {
 bool WebGLGetInfo::getBool() const {
   ASSERT(getType() == kTypeBool);
   return m_bool;
+}
+
+const Vector<bool>& WebGLGetInfo::getBoolArray() const {
+  ASSERT(getType() == kTypeBoolArray);
+  return m_boolArray;
 }
 
 float WebGLGetInfo::getFloat() const {
