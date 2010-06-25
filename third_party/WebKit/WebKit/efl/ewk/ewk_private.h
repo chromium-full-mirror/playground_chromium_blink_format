@@ -102,6 +102,12 @@ uint64_t ewk_view_exceeded_database_quota(Evas_Object* o,
                                           uint64_t current_size,
                                           uint64_t expected_size);
 
+Eina_Bool ewk_view_run_open_panel(Evas_Object* o,
+                                  Evas_Object* frame,
+                                  Eina_Bool allows_multiple_files,
+                                  const Eina_List* suggested_filenames,
+                                  Eina_List** selected_filenames);
+
 void ewk_view_repaint(Evas_Object* o,
                       Evas_Coord x,
                       Evas_Coord y,
