@@ -361,6 +361,7 @@ class RenderObject : public CachedResourceClient {
   virtual bool isSVGHiddenContainer() const { return false; }
   virtual bool isRenderPath() const { return false; }
   virtual bool isSVGText() const { return false; }
+  virtual bool isSVGInlineText() const { return false; }
   virtual bool isSVGImage() const { return false; }
   virtual bool isSVGForeignObject() const { return false; }
   virtual bool isSVGResourceContainer() const { return false; }

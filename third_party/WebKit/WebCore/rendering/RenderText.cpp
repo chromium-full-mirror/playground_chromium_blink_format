@@ -1119,7 +1119,7 @@ void RenderText::setTextInternal(PassRefPtr<StringImpl> text) {
   ASSERT(m_text);
 
 #if ENABLE(SVG)
-  if (isSVGText()) {
+  if (isSVGInlineText()) {
     if (style() && style()->whiteSpace() == PRE) {
       // Spec: When xml:space="preserve", the SVG user agent will do the
       // following using a

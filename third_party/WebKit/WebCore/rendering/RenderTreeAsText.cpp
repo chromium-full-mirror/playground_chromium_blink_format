@@ -440,10 +440,11 @@ void write(TextStream& ts,
     return;
   }
   if (o.isSVGText()) {
-    if (!o.isText())
-      writeSVGText(ts, *toRenderBlock(&o), indent);
-    else
-      writeSVGInlineText(ts, *toRenderText(&o), indent);
+    writeSVGText(ts, *toRenderBlock(&o), indent);
+    return;
+  }
+  if (o.isSVGInlineText()) {
+    writeSVGInlineText(ts, *toRenderText(&o), indent);
     return;
   }
   if (o.isSVGImage()) {
