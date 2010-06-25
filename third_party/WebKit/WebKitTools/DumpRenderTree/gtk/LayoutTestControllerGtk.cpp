@@ -740,3 +740,5 @@ void LayoutTestController::setEditingBehavior(const char* editingBehavior) {
     g_object_set(G_OBJECT(settings), "editing-behavior",
                  WEBKIT_EDITING_BEHAVIOR_MAC, NULL);
 }
+
+void LayoutTestController::abortModal() {}

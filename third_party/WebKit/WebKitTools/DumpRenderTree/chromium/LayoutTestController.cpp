@@ -216,6 +216,7 @@ LayoutTestController::LayoutTestController(TestShell* shell)
              &LayoutTestController::setMockGeolocationPosition);
   bindMethod("setMockGeolocationError",
              &LayoutTestController::setMockGeolocationError);
+  bindMethod("abortModal", &LayoutTestController::abortModal);
 
   // The fallback method is called when an unknown method is invoked.
   bindFallbackMethod(&LayoutTestController::fallbackMethod);
@@ -1433,4 +1434,9 @@ void LayoutTestController::setMockGeolocationError(
     return;
   WebGeolocationServiceMock::setMockGeolocationError(
       arguments[0].toInt32(), cppVariantToWebString(arguments[1]));
+}
+
+void LayoutTestController::abortModal(const CppArgumentList& arguments,
+                                      CppVariant* result) {
+  result->setNull();
 }

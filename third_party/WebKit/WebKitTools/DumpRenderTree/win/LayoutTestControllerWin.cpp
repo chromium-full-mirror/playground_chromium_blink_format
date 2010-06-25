@@ -1324,3 +1324,5 @@ void LayoutTestController::setEditingBehavior(const char* editingBehavior) {
   if (behaviorString == "win")
     preferences->setEditingBehavior(WebKitEditingWinBehavior);
 }
+
+void LayoutTestController::abortModal() {}

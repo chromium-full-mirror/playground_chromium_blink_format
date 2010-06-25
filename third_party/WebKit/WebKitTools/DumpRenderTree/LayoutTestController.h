@@ -370,9 +370,7 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
 
   void setWebViewEditable(bool);
 
-#if PLATFORM(MAC)
   void abortModal();
-#endif
 
   // The following API test functions should probably be moved to
   // platform-specific
