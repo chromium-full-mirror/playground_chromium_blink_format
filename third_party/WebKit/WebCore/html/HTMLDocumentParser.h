@@ -70,8 +70,8 @@ class HTMLDocumentParser : public DocumentParser,
 
  private:
   // DocumentParser
-  virtual void begin();
-  virtual void write(const SegmentedString&, bool isFromNetwork);
+  virtual void insert(const SegmentedString&);
+  virtual void append(const SegmentedString&);
   virtual void finish();
   virtual bool finishWasCalled();
   virtual bool processingData() const;
@@ -108,6 +108,7 @@ class HTMLDocumentParser : public DocumentParser,
   bool runScriptsForPausedTreeBuilder();
   void resumeParsingAfterScriptExecution();
 
+  void begin();
   void attemptToEnd();
   void endIfDelayed();
   void end();

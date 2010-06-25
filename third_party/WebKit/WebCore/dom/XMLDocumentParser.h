@@ -94,9 +94,16 @@ class XMLDocumentParser : public DocumentParser, public CachedResourceClient {
   bool isWMLDocument() const;
 #endif
 
+  static bool parseDocumentFragment(
+      const String&,
+      DocumentFragment*,
+      Element* parent = 0,
+      FragmentScriptingPermission = FragmentScriptingAllowed);
+
  private:
   // From DocumentParser
-  virtual void write(const SegmentedString&, bool appendData);
+  virtual void insert(const SegmentedString&);
+  virtual void append(const SegmentedString&);
   virtual void finish();
   virtual bool finishWasCalled();
   virtual bool isWaitingForScripts() const;
@@ -153,11 +160,6 @@ class XMLDocumentParser : public DocumentParser, public CachedResourceClient {
   void endDocument();
 #endif
  private:
-  friend bool parseXMLDocumentFragment(const String&,
-                                       DocumentFragment*,
-                                       Element*,
-                                       FragmentScriptingPermission);
-
   void initializeParserContext(const char* chunk = 0);
 
   void pushCurrentNode(Node*);
@@ -226,11 +228,6 @@ void* xmlDocPtrForString(DocLoader*, const String& source, const String& url);
 #endif
 
 HashMap<String, String> parseAttributes(const String&, bool& attrsOK);
-bool parseXMLDocumentFragment(
-    const String&,
-    DocumentFragment*,
-    Element* parent = 0,
-    FragmentScriptingPermission = FragmentScriptingAllowed);
 
 }  // namespace WebCore
 

@@ -25,12 +25,12 @@
 #include "config.h"
 #include "TextDocument.h"
 
+#include "DocumentParser.h"
 #include "Element.h"
 #include "HTMLNames.h"
 #include "HTMLViewSourceDocument.h"
 #include "SegmentedString.h"
 #include "Text.h"
-#include "XMLDocumentParser.h"
 
 using namespace std;
 
@@ -45,7 +45,8 @@ class TextDocumentParser : public DocumentParser {
   TextDocumentParser(HTMLViewSourceDocument*);
 
  private:
-  virtual void write(const SegmentedString&, bool appendData);
+  virtual void insert(const SegmentedString&);
+  virtual void append(const SegmentedString&);
   virtual void finish();
   virtual bool finishWasCalled();
   virtual bool isWaitingForScripts() const;
@@ -92,7 +93,11 @@ TextDocumentParser::~TextDocumentParser() {
   ASSERT(!m_buffer);
 }
 
-void TextDocumentParser::write(const SegmentedString& s, bool) {
+void TextDocumentParser::insert(const SegmentedString&) {
+  ASSERT_NOT_REACHED();
+}
+
+void TextDocumentParser::append(const SegmentedString& s) {
   ExceptionCode ec;
 
   m_dest = m_buffer;
@@ -155,8 +160,8 @@ void TextDocumentParser::write(const SegmentedString& s, bool) {
 
 void TextDocumentParser::finish() {
   if (!m_preElement)
-    write(SegmentedString(),
-          true);  // Create document structure for an empty text document.
+    append(SegmentedString());  // Create document structure for an empty text
+                                // document.
   m_preElement = 0;
   fastFree(m_buffer);
   m_buffer = 0;
