@@ -291,6 +291,9 @@ class AtomicHTMLToken : public Noncopyable {
     }
   }
 
+  AtomicHTMLToken(HTMLToken::Type type, AtomicString name)
+      : m_type(type), m_name(name) {}
+
   HTMLToken::Type type() const { return m_type; }
 
   const AtomicString& name() const {

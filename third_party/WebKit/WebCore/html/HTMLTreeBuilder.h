@@ -110,6 +110,9 @@ class HTMLTreeBuilder : public Noncopyable {
 
   PassRefPtr<Node> insertDoctype(AtomicHTMLToken&);
   PassRefPtr<Node> insertComment(AtomicHTMLToken&);
+  PassRefPtr<Node> insertElement(AtomicHTMLToken&);
+
+  RefPtr<Node> m_headElement;
 
   // FIXME: Implement error reporting.
   void parseError(AtomicHTMLToken&) {}
