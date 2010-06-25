@@ -339,10 +339,12 @@ void JIT::emit_op_get_by_val(Instruction* currentInstruction) {
                Address(regT0, OBJECT_OFFSETOF(JSArray, m_vectorLength))));
 
   load32(BaseIndex(regT3, regT2, TimesEight,
-                   OBJECT_OFFSETOF(ArrayStorage, m_vector[0]) + 4),
+                   OBJECT_OFFSETOF(ArrayStorage, m_vector[0]) +
+                       OBJECT_OFFSETOF(JSValue, u.asBits.tag)),
          regT1);  // tag
   load32(BaseIndex(regT3, regT2, TimesEight,
-                   OBJECT_OFFSETOF(ArrayStorage, m_vector[0])),
+                   OBJECT_OFFSETOF(ArrayStorage, m_vector[0]) +
+                       OBJECT_OFFSETOF(JSValue, u.asBits.payload)),
          regT0);  // payload
   addSlowCase(branch32(Equal, regT1, Imm32(JSValue::EmptyValueTag)));
 
@@ -399,17 +401,19 @@ void JIT::emit_op_put_by_val(Instruction* currentInstruction) {
 
   Jump empty =
       branch32(Equal, BaseIndex(regT3, regT2, TimesEight,
-                                OBJECT_OFFSETOF(ArrayStorage, m_vector[0]) + 4),
+                                OBJECT_OFFSETOF(ArrayStorage, m_vector[0]) +
+                                    OBJECT_OFFSETOF(JSValue, u.asBits.tag)),
                Imm32(JSValue::EmptyValueTag));
 
   Label storeResult(this);
   emitLoad(value, regT1, regT0);
-  store32(regT0,
-          BaseIndex(regT3, regT2, TimesEight,
-                    OBJECT_OFFSETOF(ArrayStorage, m_vector[0])));  // payload
-  store32(regT1,
-          BaseIndex(regT3, regT2, TimesEight,
-                    OBJECT_OFFSETOF(ArrayStorage, m_vector[0]) + 4));  // tag
+  store32(regT0, BaseIndex(regT3, regT2, TimesEight,
+                           OBJECT_OFFSETOF(ArrayStorage, m_vector[0]) +
+                               OBJECT_OFFSETOF(JSValue,
+                                               u.asBits.payload)));  // payload
+  store32(regT1, BaseIndex(regT3, regT2, TimesEight,
+                           OBJECT_OFFSETOF(ArrayStorage, m_vector[0]) +
+                               OBJECT_OFFSETOF(JSValue, u.asBits.tag)));  // tag
   Jump end = jump();
 
   empty.link(this);
@@ -664,9 +668,11 @@ void JIT::compileGetDirectOffset(JSObject* base,
                                  RegisterID resultPayload,
                                  size_t cachedOffset) {
   if (base->isUsingInlineStorage()) {
-    load32(reinterpret_cast<char*>(&base->m_inlineStorage[cachedOffset]),
+    load32(reinterpret_cast<char*>(&base->m_inlineStorage[cachedOffset]) +
+               OBJECT_OFFSETOF(JSValue, u.asBits.payload),
            resultPayload);
-    load32(reinterpret_cast<char*>(&base->m_inlineStorage[cachedOffset]) + 4,
+    load32(reinterpret_cast<char*>(&base->m_inlineStorage[cachedOffset]) +
+               OBJECT_OFFSETOF(JSValue, u.asBits.tag),
            resultTag);
     return;
   }
@@ -675,8 +681,10 @@ void JIT::compileGetDirectOffset(JSObject* base,
 
   PropertyStorage* protoPropertyStorage = &base->m_externalStorage;
   loadPtr(static_cast<void*>(protoPropertyStorage), temp);
-  load32(Address(temp, offset), resultPayload);
-  load32(Address(temp, offset + 4), resultTag);
+  load32(Address(temp, offset + OBJECT_OFFSETOF(JSValue, u.asBits.payload)),
+         resultPayload);
+  load32(Address(temp, offset + OBJECT_OFFSETOF(JSValue, u.asBits.tag)),
+         resultTag);
 }
 
 void JIT::testPrototype(Structure* structure, JumpList& failureCases) {
@@ -736,10 +744,12 @@ void JIT::privateCompilePutByIdTransition(StructureStubInfo* stubInfo,
            Address(regT0, OBJECT_OFFSETOF(JSCell, m_structure)));
 
   load32(Address(stackPointerRegister,
-                 OBJECT_OFFSETOF(JITStackFrame, args[2]) + sizeof(void*)),
+                 OBJECT_OFFSETOF(JITStackFrame, args[2]) + sizeof(void*) +
+                     OBJECT_OFFSETOF(JSValue, u.asBits.payload)),
          regT3);
   load32(Address(stackPointerRegister,
-                 OBJECT_OFFSETOF(JITStackFrame, args[2]) + sizeof(void*) + 4),
+                 OBJECT_OFFSETOF(JITStackFrame, args[2]) + sizeof(void*) +
+                     OBJECT_OFFSETOF(JSValue, u.asBits.tag)),
          regT2);
 
   // Write the value
@@ -797,12 +807,14 @@ void JIT::patchGetByIdSelf(CodeBlock* codeBlock,
   repatchBuffer.repatch(
       stubInfo->hotPathBegin.dataLabelPtrAtOffset(patchOffsetGetByIdStructure),
       structure);
-  repatchBuffer.repatch(stubInfo->hotPathBegin.dataLabel32AtOffset(
-                            patchOffsetGetByIdPropertyMapOffset1),
-                        offset);  // payload
-  repatchBuffer.repatch(stubInfo->hotPathBegin.dataLabel32AtOffset(
-                            patchOffsetGetByIdPropertyMapOffset2),
-                        offset + 4);  // tag
+  repatchBuffer.repatch(
+      stubInfo->hotPathBegin.dataLabel32AtOffset(
+          patchOffsetGetByIdPropertyMapOffset1),
+      offset + OBJECT_OFFSETOF(JSValue, u.asBits.payload));  // payload
+  repatchBuffer.repatch(
+      stubInfo->hotPathBegin.dataLabel32AtOffset(
+          patchOffsetGetByIdPropertyMapOffset2),
+      offset + OBJECT_OFFSETOF(JSValue, u.asBits.tag));  // tag
 }
 
 void JIT::patchMethodCallProto(CodeBlock* codeBlock,
@@ -865,12 +877,14 @@ void JIT::patchPutByIdReplace(CodeBlock* codeBlock,
   repatchBuffer.repatch(
       stubInfo->hotPathBegin.dataLabelPtrAtOffset(patchOffsetPutByIdStructure),
       structure);
-  repatchBuffer.repatch(stubInfo->hotPathBegin.dataLabel32AtOffset(
-                            patchOffsetPutByIdPropertyMapOffset1),
-                        offset);  // payload
-  repatchBuffer.repatch(stubInfo->hotPathBegin.dataLabel32AtOffset(
-                            patchOffsetPutByIdPropertyMapOffset2),
-                        offset + 4);  // tag
+  repatchBuffer.repatch(
+      stubInfo->hotPathBegin.dataLabel32AtOffset(
+          patchOffsetPutByIdPropertyMapOffset1),
+      offset + OBJECT_OFFSETOF(JSValue, u.asBits.payload));  // payload
+  repatchBuffer.repatch(
+      stubInfo->hotPathBegin.dataLabel32AtOffset(
+          patchOffsetPutByIdPropertyMapOffset2),
+      offset + OBJECT_OFFSETOF(JSValue, u.asBits.tag));  // tag
 }
 
 void JIT::privateCompilePatchGetArrayLength(ReturnAddressPtr returnAddress) {
