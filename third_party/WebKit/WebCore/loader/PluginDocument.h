@@ -33,8 +33,8 @@ class Node;
 class Widget;
 class PluginDocument : public HTMLDocument {
  public:
-  static PassRefPtr<PluginDocument> create(Frame* frame) {
-    return adoptRef(new PluginDocument(frame));
+  static PassRefPtr<PluginDocument> create(Frame* frame, const KURL& url) {
+    return adoptRef(new PluginDocument(frame, url));
   }
 
   Widget* pluginWidget();
@@ -43,7 +43,7 @@ class PluginDocument : public HTMLDocument {
   virtual bool isPluginDocument() const { return true; }
 
  private:
-  PluginDocument(Frame*);
+  PluginDocument(Frame*, const KURL&);
 
   virtual DocumentParser* createParser();
 };

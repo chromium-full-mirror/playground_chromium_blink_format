@@ -34,6 +34,7 @@ class Document;
 class DocumentType;
 class Frame;
 class HTMLDocument;
+class KURL;
 class String;
 
 typedef int ExceptionCode;
@@ -69,6 +70,7 @@ class DOMImplementation : public RefCounted<DOMImplementation> {
   // Other methods (not part of DOM)
   static PassRefPtr<Document> createDocument(const String& MIMEType,
                                              Frame*,
+                                             const KURL&,
                                              bool inViewSourceMode);
 
   static bool isXMLMIMEType(const String& MIMEType);
