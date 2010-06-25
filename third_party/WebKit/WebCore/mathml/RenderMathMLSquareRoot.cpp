@@ -67,6 +67,9 @@ RenderMathMLSquareRoot::RenderMathMLSquareRoot(Node* expression)
 void RenderMathMLSquareRoot::paint(PaintInfo& info, int tx, int ty) {
   RenderMathMLBlock::paint(info, tx, ty);
 
+  if (info.context->paintingDisabled())
+    return;
+
   tx += x();
   ty += y();
 

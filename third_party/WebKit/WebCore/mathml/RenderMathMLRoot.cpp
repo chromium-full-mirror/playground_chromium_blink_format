@@ -94,6 +94,9 @@ void RenderMathMLRoot::addChild(RenderObject* child, RenderObject*) {
 void RenderMathMLRoot::paint(PaintInfo& info, int tx, int ty) {
   RenderMathMLBlock::paint(info, tx, ty);
 
+  if (info.context->paintingDisabled())
+    return;
+
   tx += x();
   ty += y();
 
