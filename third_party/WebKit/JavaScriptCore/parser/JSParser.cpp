@@ -25,14 +25,12 @@
 
 #include "config.h"
 
-#if ENABLE(RECURSIVE_PARSE)
 #include "JSParser.h"
 
 using namespace JSC;
 
 #include "JSGlobalData.h"
 #include "NodeInfo.h"
-#include "Grammar.h"
 #include "ASTBuilder.h"
 #include <utility>
 
@@ -1638,5 +1636,3 @@ TreeExpression JSParser::parseUnaryExpression(TreeBuilder& context) {
   return expr;
 }
 }
-
-#endif
