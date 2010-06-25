@@ -44,6 +44,7 @@
 #include "NotificationContents.h"
 #include "RegisteredEventListener.h"
 #include "SharedBuffer.h"
+#include "TextDirection.h"
 #include "ThreadableLoader.h"
 #include "ThreadableLoaderClient.h"
 #include <wtf/OwnPtr.h>
@@ -88,6 +89,8 @@ class Notification : public RefCounted<Notification>,
   void setDir(const String& dir) { m_direction = dir; }
   String replaceId() const { return m_replaceId; }
   void setReplaceId(const String& replaceId) { m_replaceId = replaceId; }
+
+  TextDirection direction() const { return dir() == "rtl" ? RTL : LTR; }
 
   DEFINE_ATTRIBUTE_EVENT_LISTENER(display);
   DEFINE_ATTRIBUTE_EVENT_LISTENER(error);
