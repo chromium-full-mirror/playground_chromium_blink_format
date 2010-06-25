@@ -44,6 +44,7 @@ class TextDocumentParser : public DocumentParser {
   virtual ~TextDocumentParser();
   TextDocumentParser(HTMLViewSourceDocument*);
 
+ private:
   virtual void write(const SegmentedString&, bool appendData);
   virtual void finish();
   virtual bool finishWasCalled();
@@ -61,7 +62,6 @@ class TextDocumentParser : public DocumentParser {
     }
   }
 
- private:
   Element* m_preElement;
 
   bool m_skipLF;
