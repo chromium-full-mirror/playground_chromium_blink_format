@@ -24,6 +24,7 @@
  */
 
 #include "WKBundlePage.h"
+#include "WKBundlePagePrivate.h"
 
 #include "WKAPICast.h"
 #include "WKBundleAPICast.h"
@@ -40,4 +41,9 @@ void WKBundlePageSetClient(WKBundlePageRef pageRef,
 
 WKURLRef WKBundlePageGetMainFrameURL(WKBundlePageRef pageRef) {
   return toURLRef(toWK(pageRef)->mainFrameURL().impl());
+}
+
+WKStringRef WKBundlePageRenderTreeExternalRepresentation(
+    WKBundlePageRef pageRef) {
+  return toRef(toWK(pageRef)->renderTreeExternalRepresentation().impl());
 }

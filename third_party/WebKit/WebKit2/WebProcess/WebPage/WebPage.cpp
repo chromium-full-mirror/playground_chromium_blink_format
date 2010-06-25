@@ -141,6 +141,11 @@ String WebPage::mainFrameURL() const {
   return m_mainFrame->coreFrame()->loader()->url().string();
 }
 
+String WebPage::renderTreeExternalRepresentation() const {
+  return externalRepresentation(m_mainFrame->coreFrame(),
+                                RenderAsTextBehaviorNormal);
+}
+
 WebFrame* WebPage::webFrame(uint64_t frameID) const {
   return m_frameMap.get(frameID);
 }
@@ -316,8 +321,7 @@ void WebPage::runJavaScriptInMainFrame(const WebCore::String& script,
 }
 
 void WebPage::getRenderTreeExternalRepresentation(uint64_t callbackID) {
-  String resultString = externalRepresentation(m_mainFrame->coreFrame(),
-                                               RenderAsTextBehaviorNormal);
+  String resultString = renderTreeExternalRepresentation();
   WebProcess::shared().connection()->send(
       WebPageProxyMessage::DidGetRenderTreeExternalRepresentation, m_pageID,
       CoreIPC::In(resultString, callbackID));

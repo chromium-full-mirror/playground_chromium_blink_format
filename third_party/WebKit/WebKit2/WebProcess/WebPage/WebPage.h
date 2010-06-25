@@ -101,6 +101,7 @@ class WebPage : public RefCounted<WebPage> {
   InjectedBundlePageClient& injectedBundleClient() { return m_client; }
 
   WebCore::String mainFrameURL() const;
+  WebCore::String renderTreeExternalRepresentation() const;
 
  private:
   WebPage(uint64_t pageID,
