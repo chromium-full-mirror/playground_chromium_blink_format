@@ -43,6 +43,7 @@ class PasteboardPrivate {
   enum ClipboardBuffer {
     StandardBuffer,
     SelectionBuffer,
+    DragBuffer,
   };
 };
 

@@ -38,6 +38,7 @@
 #include "PasteboardPrivate.h"
 #include "PluginData.h"
 
+#include <wtf/HashSet.h>
 #include <wtf/Vector.h>
 
 typedef struct NPObject NPObject;
@@ -60,6 +61,7 @@ typedef struct HFONT__* HFONT;
 
 namespace WebCore {
 
+class ClipboardData;
 class Color;
 class Cursor;
 class Document;
@@ -106,6 +108,18 @@ class ChromiumBridge {
   static void clipboardWritePlainText(const String&);
   static void clipboardWriteURL(const KURL&, const String&);
   static void clipboardWriteImage(NativeImagePtr, const KURL&, const String&);
+  static void clipboardWriteData(ClipboardData*);
+
+  // Interface for handling copy and paste, drag and drop, and selection copy.
+  static HashSet<String> clipboardReadAvailableTypes(
+      PasteboardPrivate::ClipboardBuffer,
+      bool* containsFilenames);
+  static bool clipboardReadData(PasteboardPrivate::ClipboardBuffer,
+                                const String& type,
+                                String& data,
+                                String& metadata);
+  static Vector<String> clipboardReadFilenames(
+      PasteboardPrivate::ClipboardBuffer);
 
   // Cookies ------------------------------------------------------------
   static void setCookies(const Document*, const KURL&, const String& value);
