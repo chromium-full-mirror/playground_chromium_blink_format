@@ -134,6 +134,11 @@ class WebURLResponse {
   WEBKIT_API bool wasNpnNegotiated() const;
   WEBKIT_API void setWasNpnNegotiated(bool);
 
+  // Flag whether this request was made when "Alternate-Protocol: xxx"
+  // is present in server's response.
+  WEBKIT_API bool wasAlternateProtocolAvailable() const;
+  WEBKIT_API void setWasAlternateProtocolAvailable(bool);
+
   // Flag whether this request was loaded via an explicit proxy (HTTP, SOCKS,
   // etc).
   WEBKIT_API bool wasFetchedViaProxy() const;
