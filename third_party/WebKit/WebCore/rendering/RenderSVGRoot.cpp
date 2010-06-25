@@ -142,14 +142,20 @@ void RenderSVGRoot::paint(PaintInfo& paintInfo, int parentX, int parentY) {
   if (paintInfo.context->paintingDisabled())
     return;
 
+  bool isVisible = style()->visibility() == VISIBLE;
   IntPoint parentOriginInContainer(parentX, parentY);
   IntPoint borderBoxOriginInContainer =
       parentOriginInContainer + parentOriginToBorderBox();
 
-  if (hasBoxDecorations() && (paintInfo.phase == PaintPhaseForeground ||
-                              paintInfo.phase == PaintPhaseSelection))
+  if (hasBoxDecorations() &&
+      (paintInfo.phase == PaintPhaseBlockBackground ||
+       paintInfo.phase == PaintPhaseChildBlockBackground) &&
+      isVisible)
     paintBoxDecorations(paintInfo, borderBoxOriginInContainer.x(),
                         borderBoxOriginInContainer.y());
+
+  if (paintInfo.phase == PaintPhaseBlockBackground)
+    return;
 
   // An empty viewport disables rendering.  FIXME: Should we still render
   // filters?
@@ -194,7 +200,7 @@ void RenderSVGRoot::paint(PaintInfo& paintInfo, int parentX, int parentY) {
 
   if ((paintInfo.phase == PaintPhaseOutline ||
        paintInfo.phase == PaintPhaseSelfOutline) &&
-      style()->outlineWidth() && style()->visibility() == VISIBLE)
+      style()->outlineWidth() && isVisible)
     paintOutline(paintInfo.context, borderBoxOriginInContainer.x(),
                  borderBoxOriginInContainer.y(), width(), height());
 }

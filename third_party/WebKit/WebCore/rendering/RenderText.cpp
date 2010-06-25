@@ -326,8 +326,7 @@ void RenderText::absoluteRectsForRange(Vector<IntRect>& rects,
 
 void RenderText::absoluteQuads(Vector<FloatQuad>& quads) {
   for (InlineTextBox* box = firstTextBox(); box; box = box->nextTextBox())
-    quads.append(localToAbsoluteQuad(
-        FloatRect(box->x(), box->y(), box->width(), box->height())));
+    quads.append(localToAbsoluteQuad(FloatRect(box->calculateBoundaries())));
 }
 
 void RenderText::absoluteQuadsForRange(Vector<FloatQuad>& quads,
@@ -353,7 +352,7 @@ void RenderText::absoluteQuadsForRange(Vector<FloatQuad>& quads,
     // Note: box->end() returns the index of the last character, not the index
     // past it
     if (start <= box->start() && box->end() < end) {
-      IntRect r = IntRect(box->x(), box->y(), box->width(), box->height());
+      IntRect r(box->calculateBoundaries());
       if (useSelectionHeight) {
         IntRect selectionRect = box->selectionRect(0, 0, start, end);
         r.setHeight(selectionRect.height());

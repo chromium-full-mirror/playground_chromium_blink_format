@@ -102,6 +102,7 @@ class SVGInlineTextBox : public InlineTextBox {
                                              RenderStyle*);
   void restoreGraphicsContextAfterTextPainting(GraphicsContext*&, TextRun&);
 
+  void computeTextMatchMarkerRect(RenderStyle*);
   void paintDecoration(GraphicsContext*,
                        const FloatPoint& textOrigin,
                        ETextDecoration,
@@ -117,7 +118,13 @@ class SVGInlineTextBox : public InlineTextBox {
                  const FloatPoint& textOrigin,
                  RenderStyle*,
                  RenderStyle* selectionStyle,
-                 bool hasSelection);
+                 bool hasSelection,
+                 bool paintSelectedTextOnly);
+
+  FloatRect selectionRectForTextChunkPart(const SVGTextChunkPart&,
+                                          int partStartPos,
+                                          int partEndPos,
+                                          RenderStyle*);
 
  private:
   int m_height;

@@ -158,9 +158,12 @@ void RenderSVGText::absoluteQuads(Vector<FloatQuad>& quads) {
 }
 
 void RenderSVGText::paint(PaintInfo& paintInfo, int, int) {
-  if (paintInfo.context->paintingDisabled() ||
-      (paintInfo.phase != PaintPhaseForeground &&
-       paintInfo.phase != PaintPhaseSelfOutline))
+  if (paintInfo.context->paintingDisabled())
+    return;
+
+  if (paintInfo.phase != PaintPhaseForeground &&
+      paintInfo.phase != PaintPhaseSelfOutline &&
+      paintInfo.phase != PaintPhaseSelection)
     return;
 
   PaintInfo blockInfo(paintInfo);
