@@ -365,7 +365,7 @@ void QNetworkReplyHandler::sendResponseIfNeeded() {
     newRequest.setURL(newUrl);
 
     if (((statusCode >= 301 && statusCode <= 303) || statusCode == 307) &&
-        m_method == QNetworkAccessManager::PostOperation) {
+        newRequest.httpMethod() == "POST") {
       m_method = QNetworkAccessManager::GetOperation;
       newRequest.setHTTPMethod("GET");
     }
