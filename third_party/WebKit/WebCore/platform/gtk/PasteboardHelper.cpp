@@ -113,8 +113,9 @@ void PasteboardHelper::getClipboardContents(GtkClipboard* clipboard) {
             gtk_clipboard_wait_for_contents(clipboard, gdkMarkupAtom)) {
       RefPtr<TextResourceDecoder> decoder(
           TextResourceDecoder::create("text/plain", "UTF-8", true));
-      String markup = String::fromUTF8(gtk_selection_data_get_data(data),
-                                       gtk_selection_data_get_length(data));
+      String markup(decoder->decode(
+          reinterpret_cast<const char*>(gtk_selection_data_get_data(data)),
+          gtk_selection_data_get_length(data)));
       markup += decoder->flush();
       dataObject->setMarkup(markup);
       gtk_selection_data_free(data);
