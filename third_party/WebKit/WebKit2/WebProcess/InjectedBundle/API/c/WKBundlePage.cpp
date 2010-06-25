@@ -43,7 +43,10 @@ WKURLRef WKBundlePageGetMainFrameURL(WKBundlePageRef pageRef) {
   return toURLRef(toWK(pageRef)->mainFrameURL().impl());
 }
 
-WKStringRef WKBundlePageRenderTreeExternalRepresentation(
+WKStringRef WKBundlePageCopyRenderTreeExternalRepresentation(
     WKBundlePageRef pageRef) {
-  return toRef(toWK(pageRef)->renderTreeExternalRepresentation().impl());
+  WebCore::StringImpl* string =
+      toWK(pageRef)->renderTreeExternalRepresentation().impl();
+  string->ref();
+  return toRef(string);
 }

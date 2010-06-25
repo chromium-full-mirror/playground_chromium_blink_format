@@ -34,7 +34,7 @@ extern "C" {
 #endif
 
 WK_EXPORT WKStringRef
-WKBundlePageRenderTreeExternalRepresentation(WKBundlePageRef page);
+WKBundlePageCopyRenderTreeExternalRepresentation(WKBundlePageRef page);
 
 #ifdef __cplusplus
 }
