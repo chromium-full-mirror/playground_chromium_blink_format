@@ -171,7 +171,7 @@ HTMLTokenizer::State HTMLTreeBuilder::adjustedLexerState(
   return state;
 }
 
-PassRefPtr<Node> HTMLTreeBuilder::passTokenToLegacyParser(HTMLToken& token) {
+void HTMLTreeBuilder::passTokenToLegacyParser(HTMLToken& token) {
   if (token.type() == HTMLToken::DOCTYPE) {
     DoctypeToken doctypeToken;
     doctypeToken.m_name.append(token.name().data(), token.name().size());
@@ -180,7 +180,7 @@ PassRefPtr<Node> HTMLTreeBuilder::passTokenToLegacyParser(HTMLToken& token) {
     doctypeToken.m_forceQuirks = token.forceQuirks();
 
     m_legacyTreeBuilder->parseDoctypeToken(&doctypeToken);
-    return 0;
+    return;
   }
 
   // For now, we translate into an old-style token for testing.
@@ -221,13 +221,14 @@ PassRefPtr<Node> HTMLTreeBuilder::passTokenToLegacyParser(HTMLToken& token) {
     } else if (oldStyleToken.tagName == framesetTag)
       setInsertionMode(AfterFramesetMode);
   }
-  return result.release();
 }
 
-PassRefPtr<Node> HTMLTreeBuilder::constructTreeFromToken(HTMLToken& rawToken) {
+void HTMLTreeBuilder::constructTreeFromToken(HTMLToken& rawToken) {
   // Make MSVC ignore our unreachable code for now.
-  if (true)
-    return passTokenToLegacyParser(rawToken);
+  if (true) {
+    passTokenToLegacyParser(rawToken);
+    return;
+  }
 
   AtomicHTMLToken token(rawToken);
 
@@ -240,13 +241,12 @@ PassRefPtr<Node> HTMLTreeBuilder::constructTreeFromToken(HTMLToken& rawToken) {
     // FIXME: Calling processToken for each character is probably slow.
     for (unsigned i = 0; i < characters->length(); ++i)
       processToken(token, (*characters)[i]);
-    return 0;  // FIXME: Should we be returning the Text node?
+    return;
   }
   return processToken(token);
 }
 
-PassRefPtr<Node> HTMLTreeBuilder::processToken(AtomicHTMLToken& token,
-                                               UChar cc) {
+void HTMLTreeBuilder::processToken(AtomicHTMLToken& token, UChar cc) {
 reprocessToken:
   switch (insertionMode()) {
     case InitialMode: {
@@ -255,12 +255,14 @@ reprocessToken:
           ASSERT_NOT_REACHED();
           break;
         case HTMLToken::DOCTYPE:
-          return insertDoctype(token);
+          insertDoctype(token);
+          return;
         case HTMLToken::Comment:
-          return insertComment(token);
+          insertComment(token);
+          return;
         case HTMLToken::Character:
           if (isTreeBuilderWhiteSpace(cc))
-            return 0;
+            return;
           break;
         case HTMLToken::StartTag:
         case HTMLToken::EndTag:
@@ -279,18 +281,19 @@ reprocessToken:
           break;
         case HTMLToken::DOCTYPE:
           parseError(token);
-          return 0;
+          return;
         case HTMLToken::Comment:
-          return insertComment(token);
+          insertComment(token);
+          return;
         case HTMLToken::Character:
           if (isTreeBuilderWhiteSpace(cc))
-            return 0;
+            return;
           break;
         case HTMLToken::StartTag:
           if (token.name() == htmlTag) {
             notImplemented();
             setInsertionMode(BeforeHeadMode);
-            return 0;
+            return;
           }
           break;
         case HTMLToken::EndTag:
@@ -298,7 +301,7 @@ reprocessToken:
               token.name() == htmlTag || token.name() == brTag)
             break;
           parseError(token);
-          return 0;
+          return;
         case HTMLToken::EndOfFile:
           break;
       }
@@ -313,22 +316,23 @@ reprocessToken:
           break;
         case HTMLToken::Character:
           if (isTreeBuilderWhiteSpace(cc))
-            return 0;
+            return;
           break;
         case HTMLToken::Comment:
-          return insertComment(token);
+          insertComment(token);
+          return;
         case HTMLToken::DOCTYPE:
           parseError(token);
-          return 0;
+          return;
         case HTMLToken::StartTag:
           if (token.name() == htmlTag) {
             notImplemented();
-            return 0;
+            return;
           }
           if (token.name() == headTag) {
             m_headElement = insertElement(token);
             setInsertionMode(InHeadMode);
-            return m_headElement;
+            return;
           }
           break;
         case HTMLToken::EndTag:
@@ -339,7 +343,7 @@ reprocessToken:
             goto reprocessToken;
           }
           parseError(token);
-          return 0;
+          return;
         case HTMLToken::EndOfFile:
           break;
       }
@@ -354,47 +358,53 @@ reprocessToken:
           break;
         case HTMLToken::Character:
           insertCharacter(cc);
-          break;
+          return;
         case HTMLToken::Comment:
-          return insertComment(token);
+          insertComment(token);
+          return;
         case HTMLToken::DOCTYPE:
           parseError(token);
-          return 0;
+          return;
         case HTMLToken::StartTag:
           if (token.name() == htmlTag) {
             notImplemented();
-            return 0;
+            return;
           }
           // FIXME: Atomize "command".
           if (token.name() == baseTag || token.name() == "command" ||
               token.name() == linkTag) {
-            PassRefPtr<Node> node = insertElement(token);
+            insertElement(token);
             m_openElements.pop();
             notImplemented();
-            return node;
           }
           if (token.name() == metaTag) {
-            PassRefPtr<Node> node = insertElement(token);
+            insertElement(token);
             m_openElements.pop();
             notImplemented();
-            return node;
           }
-          if (token.name() == titleTag)
-            return insertGenericRCDATAElement(token);
+          if (token.name() == titleTag) {
+            insertGenericRCDATAElement(token);
+            return;
+          }
           if (token.name() == noscriptTag) {
-            if (isScriptingFlagEnabled(m_document->frame()))
-              return insertGenericRawTextElement(token);
-            PassRefPtr<Node> node = insertElement(token);
+            if (isScriptingFlagEnabled(m_document->frame())) {
+              insertGenericRawTextElement(token);
+              return;
+            }
+            insertElement(token);
             setInsertionMode(InHeadNoscriptMode);
-            return node;
           }
-          if (token.name() == noframesTag || token.name() == styleTag)
-            return insertGenericRawTextElement(token);
-          if (token.name() == scriptTag)
-            return insertScriptElement(token);
+          if (token.name() == noframesTag || token.name() == styleTag) {
+            insertGenericRawTextElement(token);
+            return;
+          }
+          if (token.name() == scriptTag) {
+            insertScriptElement(token);
+            return;
+          }
           if (token.name() == headTag) {
             notImplemented();
-            return 0;
+            return;
           }
           break;
         case HTMLToken::EndTag:
@@ -402,13 +412,13 @@ reprocessToken:
             ASSERT(m_openElements.top()->tagQName() == headTag);
             m_openElements.pop();
             setInsertionMode(AfterHeadMode);
-            return 0;
+            return;
           }
           if (token.name() == bodyTag || token.name() == htmlTag ||
               token.name() == brTag)
             break;
           parseError(token);
-          return 0;
+          return;
           break;
         case HTMLToken::EndOfFile:
           break;
@@ -424,20 +434,20 @@ reprocessToken:
           break;
         case HTMLToken::DOCTYPE:
           parseError(token);
-          return 0;
+          return;
         case HTMLToken::StartTag:
           if (token.name() == htmlTag) {
             notImplemented();
-            return 0;
+            return;
           }
           if (token.name() == linkTag || token.name() == metaTag ||
               token.name() == noframesTag || token.name() == styleTag) {
             notImplemented();
-            return 0;
+            return;
           }
           if (token.name() == htmlTag || token.name() == noscriptTag) {
             parseError(token);
-            return 0;
+            return;
           }
           break;
         case HTMLToken::EndTag:
@@ -446,18 +456,18 @@ reprocessToken:
             m_openElements.pop();
             ASSERT(m_openElements.top()->tagQName() == headTag);
             setInsertionMode(InHeadMode);
-            return 0;
+            return;
           }
           if (token.name() == brTag)
             break;
           parseError(token);
-          return 0;
+          return;
         case HTMLToken::Character:
           notImplemented();
           break;
         case HTMLToken::Comment:
           notImplemented();
-          return 0;
+          return;
         case HTMLToken::EndOfFile:
           break;
       }
@@ -473,27 +483,29 @@ reprocessToken:
         case HTMLToken::Character:
           if (isTreeBuilderWhiteSpace(cc)) {
             insertCharacter(cc);
-            return 0;
+            return;
           }
           break;
         case HTMLToken::Comment:
-          return insertComment(token);
+          insertComment(token);
+          return;
         case HTMLToken::DOCTYPE:
           parseError(token);
-          return 0;
+          return;
         case HTMLToken::StartTag:
           if (token.name() == htmlTag) {
             notImplemented();
-            return 0;
+            return;
           }
           if (token.name() == bodyTag) {
             m_framesetOk = false;
-            return insertElement(token);
+            insertElement(token);
+            return;
           }
           if (token.name() == framesetTag) {
-            PassRefPtr<Node> node = insertElement(token);
+            insertElement(token);
             setInsertionMode(InFramesetMode);
-            return node;
+            return;
           }
           if (token.name() == baseTag || token.name() == linkTag ||
               token.name() == metaTag || token.name() == noframesTag ||
@@ -504,10 +516,11 @@ reprocessToken:
             m_openElements.push(m_headElement.get());
             notImplemented();
             m_openElements.remove(m_headElement.get());
+            return;
           }
           if (token.name() == headTag) {
             parseError(token);
-            return 0;
+            return;
           }
           break;
         case HTMLToken::EndTag:
@@ -515,7 +528,7 @@ reprocessToken:
               token.name() == brTag)
             break;
           parseError(token);
-          return 0;
+          return;
         case HTMLToken::EndOfFile:
           break;
       }
@@ -541,21 +554,18 @@ reprocessToken:
     case AfterFramesetMode:
     case AfterAfterBodyMode:
     case AfterAfterFramesetMode:
+      notImplemented();
       ASSERT_NOT_REACHED();
   }
-
-  // Implementation coming in the next patch.
-  return 0;
+  ASSERT_NOT_REACHED();
 }
 
-PassRefPtr<Node> HTMLTreeBuilder::insertDoctype(AtomicHTMLToken& token) {
+void HTMLTreeBuilder::insertDoctype(AtomicHTMLToken& token) {
   ASSERT_UNUSED(token, token.type() == HTMLToken::DOCTYPE);
-  return 0;
 }
 
-PassRefPtr<Node> HTMLTreeBuilder::insertComment(AtomicHTMLToken& token) {
+void HTMLTreeBuilder::insertComment(AtomicHTMLToken& token) {
   ASSERT_UNUSED(token, token.type() == HTMLToken::Comment);
-  return 0;
 }
 
 PassRefPtr<Element> HTMLTreeBuilder::insertElement(AtomicHTMLToken& token) {
@@ -567,21 +577,16 @@ void HTMLTreeBuilder::insertCharacter(UChar cc) {
   ASSERT_UNUSED(cc, cc);
 }
 
-PassRefPtr<Node> HTMLTreeBuilder::insertGenericRCDATAElement(
-    AtomicHTMLToken& token) {
+void HTMLTreeBuilder::insertGenericRCDATAElement(AtomicHTMLToken& token) {
   ASSERT_UNUSED(token, token.type() == HTMLToken::StartTag);
-  return 0;
 }
 
-PassRefPtr<Node> HTMLTreeBuilder::insertGenericRawTextElement(
-    AtomicHTMLToken& token) {
+void HTMLTreeBuilder::insertGenericRawTextElement(AtomicHTMLToken& token) {
   ASSERT_UNUSED(token, token.type() == HTMLToken::StartTag);
-  return 0;
 }
 
-PassRefPtr<Node> HTMLTreeBuilder::insertScriptElement(AtomicHTMLToken& token) {
+void HTMLTreeBuilder::insertScriptElement(AtomicHTMLToken& token) {
   ASSERT_UNUSED(token, token.type() == HTMLToken::StartTag);
-  return 0;
 }
 
 void HTMLTreeBuilder::finished() {
