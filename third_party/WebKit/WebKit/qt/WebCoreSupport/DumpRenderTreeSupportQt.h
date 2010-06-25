@@ -30,6 +30,7 @@ class QWebElement;
 class QWebFrame;
 class QWebPage;
 class QWebHistoryItem;
+class QWebScriptWorld;
 
 enum NotificationPermission {
   NotificationAllowed,
@@ -44,6 +45,7 @@ typedef void(RequestPermissionFunctionType)(QObject* receiver, const QString&);
 
 extern CheckPermissionFunctionType* checkPermissionFunction;
 extern RequestPermissionFunctionType* requestPermissionFunction;
+extern QMap<int, QWebScriptWorld*> m_worldMap;
 
 class QWEBKIT_EXPORT DumpRenderTreeSupportQt {
  public:
@@ -159,6 +161,11 @@ class QWEBKIT_EXPORT DumpRenderTreeSupportQt {
   static QString historyItemTarget(const QWebHistoryItem& historyItem);
 
   static bool shouldClose(QWebFrame* frame);
+
+  static void clearScriptWorlds();
+  static void evaluateScriptInIsolatedWorld(QWebFrame* frame,
+                                            int worldID,
+                                            const QString& script);
 };
 
 #endif

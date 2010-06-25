@@ -253,7 +253,6 @@ class LayoutTestController : public QObject {
   bool m_isGeolocationPermissionSet;
   bool m_geolocationPermission;
 
-  QMap<int, QWebScriptWorld*> m_worldMap;
   QUrl m_userStyleSheetLocation;
   QBasicTimer m_timeoutTimer;
   QWebFrame* m_topLoadingFrame;
