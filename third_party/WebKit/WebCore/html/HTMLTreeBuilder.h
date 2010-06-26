@@ -108,7 +108,7 @@ class HTMLTreeBuilder : public Noncopyable {
   class ElementStack : public Noncopyable {
    public:
     void pop() {}
-    void push(Element*) {}
+    void push(PassRefPtr<Element>) {}
     void remove(Element*) {}
     Element* top() const { return 0; }
   };
@@ -139,6 +139,9 @@ class HTMLTreeBuilder : public Noncopyable {
   void insertGenericRCDATAElement(AtomicHTMLToken&);
   void insertGenericRawTextElement(AtomicHTMLToken&);
   void insertScriptElement(AtomicHTMLToken&);
+
+  void insertHTMLStartTagBeforeHTML(AtomicHTMLToken&);
+  void insertHTMLStartTagInBody(AtomicHTMLToken&);
 
   RefPtr<Element> m_headElement;
   ElementStack m_openElements;
