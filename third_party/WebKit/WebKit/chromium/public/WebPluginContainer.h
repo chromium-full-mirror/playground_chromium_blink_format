@@ -36,6 +36,7 @@ struct NPObject;
 namespace WebKit {
 
 class WebElement;
+class WebPlugin;
 class WebString;
 class WebURL;
 class WebURLRequest;
@@ -78,6 +79,9 @@ class WebPluginContainer {
                                 const WebString& target,
                                 bool notifyNeeded,
                                 void* notifyData) = 0;
+
+  virtual WebPlugin* plugin() = 0;
+  virtual void setPlugin(WebPlugin*) = 0;
 
  protected:
   ~WebPluginContainer() {}
