@@ -2421,6 +2421,10 @@ void HTMLInputElement::setDefaultValue(const String& value) {
   setAttribute(valueAttr, value);
 }
 
+bool HTMLInputElement::defaultChecked() const {
+  return !getAttribute(checkedAttr).isNull();
+}
+
 void HTMLInputElement::setDefaultName(const AtomicString& name) {
   m_data.setName(name);
 }
