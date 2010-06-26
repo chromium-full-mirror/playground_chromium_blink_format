@@ -203,11 +203,8 @@ void WebGLRenderingContext::attachShader(WebGLProgram* program,
                                          WebGLShader* shader,
                                          ExceptionCode& ec) {
   UNUSED_PARAM(ec);
-  if (!program || program->context() != this || !shader ||
-      shader->context() != this) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
+  if (!validateWebGLObject(program) || !validateWebGLObject(shader))
     return;
-  }
   m_context->attachShader(program, shader);
   cleanupAfterGraphicsCall(false);
 }
@@ -1566,110 +1563,121 @@ WebGLGetInfo WebGLRenderingContext::getUniform(
     ActiveInfo info;
     if (!m_context->getActiveUniform(program, i, info))
       return WebGLGetInfo();
-    // Now need to look this up by name again to find its location
-    long loc = m_context->getUniformLocation(program, info.name);
-    if (loc == location) {
-      // Found it. Use the type in the ActiveInfo to determine the return type.
-      GraphicsContext3D::WebGLEnumType baseType;
-      unsigned length;
-      switch (info.type) {
-        case GraphicsContext3D::BOOL:
-          baseType = GraphicsContext3D::BOOL;
-          length = 1;
-          break;
-        case GraphicsContext3D::BOOL_VEC2:
-          baseType = GraphicsContext3D::BOOL;
-          length = 2;
-          break;
-        case GraphicsContext3D::BOOL_VEC3:
-          baseType = GraphicsContext3D::BOOL;
-          length = 3;
-          break;
-        case GraphicsContext3D::BOOL_VEC4:
-          baseType = GraphicsContext3D::BOOL;
-          length = 4;
-          break;
-        case GraphicsContext3D::INT:
-          baseType = GraphicsContext3D::INT;
-          length = 1;
-          break;
-        case GraphicsContext3D::INT_VEC2:
-          baseType = GraphicsContext3D::INT;
-          length = 2;
-          break;
-        case GraphicsContext3D::INT_VEC3:
-          baseType = GraphicsContext3D::INT;
-          length = 3;
-          break;
-        case GraphicsContext3D::INT_VEC4:
-          baseType = GraphicsContext3D::INT;
-          length = 4;
-          break;
-        case GraphicsContext3D::FLOAT:
-          baseType = GraphicsContext3D::FLOAT;
-          length = 1;
-          break;
-        case GraphicsContext3D::FLOAT_VEC2:
-          baseType = GraphicsContext3D::FLOAT;
-          length = 2;
-          break;
-        case GraphicsContext3D::FLOAT_VEC3:
-          baseType = GraphicsContext3D::FLOAT;
-          length = 3;
-          break;
-        case GraphicsContext3D::FLOAT_VEC4:
-          baseType = GraphicsContext3D::FLOAT;
-          length = 4;
-          break;
-        case GraphicsContext3D::FLOAT_MAT2:
-          baseType = GraphicsContext3D::FLOAT;
-          length = 4;
-          break;
-        case GraphicsContext3D::FLOAT_MAT3:
-          baseType = GraphicsContext3D::FLOAT;
-          length = 9;
-          break;
-        case GraphicsContext3D::FLOAT_MAT4:
-          baseType = GraphicsContext3D::FLOAT;
-          length = 16;
-          break;
-        default:
-          // Can't handle this type
-          // FIXME: what to do about samplers?
-          m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
-          return WebGLGetInfo();
+    // Strip "[0]" from the name if it's an array.
+    if (info.size > 1)
+      info.name = info.name.left(info.name.length() - 3);
+    // If it's an array, we need to iterate through each element, appending
+    // "[index]" to the name.
+    for (int index = 0; index < info.size; ++index) {
+      String name = info.name;
+      if (info.size > 1 && index >= 1) {
+        name.append('[');
+        name.append(String::number(index));
+        name.append(']');
       }
-      switch (baseType) {
-        case GraphicsContext3D::FLOAT: {
-          float value[16] = {0};
-          m_context->getUniformfv(program, location, value);
-          if (length == 1)
-            return WebGLGetInfo(value[0]);
-          else
+      // Now need to look this up by name again to find its location
+      long loc = m_context->getUniformLocation(program, name);
+      if (loc == location) {
+        // Found it. Use the type in the ActiveInfo to determine the return
+        // type.
+        GraphicsContext3D::WebGLEnumType baseType;
+        unsigned length;
+        switch (info.type) {
+          case GraphicsContext3D::BOOL:
+            baseType = GraphicsContext3D::BOOL;
+            length = 1;
+            break;
+          case GraphicsContext3D::BOOL_VEC2:
+            baseType = GraphicsContext3D::BOOL;
+            length = 2;
+            break;
+          case GraphicsContext3D::BOOL_VEC3:
+            baseType = GraphicsContext3D::BOOL;
+            length = 3;
+            break;
+          case GraphicsContext3D::BOOL_VEC4:
+            baseType = GraphicsContext3D::BOOL;
+            length = 4;
+            break;
+          case GraphicsContext3D::INT:
+            baseType = GraphicsContext3D::INT;
+            length = 1;
+            break;
+          case GraphicsContext3D::INT_VEC2:
+            baseType = GraphicsContext3D::INT;
+            length = 2;
+            break;
+          case GraphicsContext3D::INT_VEC3:
+            baseType = GraphicsContext3D::INT;
+            length = 3;
+            break;
+          case GraphicsContext3D::INT_VEC4:
+            baseType = GraphicsContext3D::INT;
+            length = 4;
+            break;
+          case GraphicsContext3D::FLOAT:
+            baseType = GraphicsContext3D::FLOAT;
+            length = 1;
+            break;
+          case GraphicsContext3D::FLOAT_VEC2:
+            baseType = GraphicsContext3D::FLOAT;
+            length = 2;
+            break;
+          case GraphicsContext3D::FLOAT_VEC3:
+            baseType = GraphicsContext3D::FLOAT;
+            length = 3;
+            break;
+          case GraphicsContext3D::FLOAT_VEC4:
+            baseType = GraphicsContext3D::FLOAT;
+            length = 4;
+            break;
+          case GraphicsContext3D::FLOAT_MAT2:
+            baseType = GraphicsContext3D::FLOAT;
+            length = 4;
+            break;
+          case GraphicsContext3D::FLOAT_MAT3:
+            baseType = GraphicsContext3D::FLOAT;
+            length = 9;
+            break;
+          case GraphicsContext3D::FLOAT_MAT4:
+            baseType = GraphicsContext3D::FLOAT;
+            length = 16;
+            break;
+          default:
+            // Can't handle this type
+            // FIXME: what to do about samplers?
+            m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
+            return WebGLGetInfo();
+        }
+        switch (baseType) {
+          case GraphicsContext3D::FLOAT: {
+            float value[16] = {0};
+            m_context->getUniformfv(program, location, value);
+            if (length == 1)
+              return WebGLGetInfo(value[0]);
             return WebGLGetInfo(Float32Array::create(value, length));
-        }
-        case GraphicsContext3D::INT: {
-          int value[16] = {0};
-          m_context->getUniformiv(program, location, value);
-          if (length == 1)
-            return WebGLGetInfo(static_cast<long>(value[0]));
-          else
-            return WebGLGetInfo(Int32Array::create(value, length));
-        }
-        case GraphicsContext3D::BOOL: {
-          int value[16] = {0};
-          m_context->getUniformiv(program, location, value);
-          if (length == 1)
-            return WebGLGetInfo(static_cast<bool>(value[0]));
-          else {
-            unsigned char boolValue[16] = {0};
-            for (unsigned j = 0; j < length; j++)
-              boolValue[j] = static_cast<bool>(value[j]);
-            return WebGLGetInfo(Uint8Array::create(boolValue, length));
           }
+          case GraphicsContext3D::INT: {
+            int value[16] = {0};
+            m_context->getUniformiv(program, location, value);
+            if (length == 1)
+              return WebGLGetInfo(static_cast<long>(value[0]));
+            return WebGLGetInfo(Int32Array::create(value, length));
+          }
+          case GraphicsContext3D::BOOL: {
+            int value[16] = {0};
+            m_context->getUniformiv(program, location, value);
+            if (length > 1) {
+              unsigned char boolValue[16] = {0};
+              for (unsigned j = 0; j < length; j++)
+                boolValue[j] = static_cast<bool>(value[j]);
+              return WebGLGetInfo(Uint8Array::create(boolValue, length));
+            }
+            return WebGLGetInfo(static_cast<bool>(value[0]));
+          }
+          default:
+            notImplemented();
         }
-        default:
-          notImplemented();
       }
     }
   }
@@ -3334,11 +3342,10 @@ void WebGLRenderingContext::uniformMatrix4fv(
 void WebGLRenderingContext::useProgram(WebGLProgram* program,
                                        ExceptionCode& ec) {
   UNUSED_PARAM(ec);
-  if (!program || program->context() != this) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
+  if (program && program->context() != this) {
+    m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
     return;
   }
-
   m_currentProgram = program;
   m_context->useProgram(program);
   cleanupAfterGraphicsCall(false);
@@ -3347,11 +3354,8 @@ void WebGLRenderingContext::useProgram(WebGLProgram* program,
 void WebGLRenderingContext::validateProgram(WebGLProgram* program,
                                             ExceptionCode& ec) {
   UNUSED_PARAM(ec);
-  if (!program || program->context() != this) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
+  if (!validateWebGLObject(program))
     return;
-  }
-
   m_context->validateProgram(program);
   cleanupAfterGraphicsCall(false);
 }
