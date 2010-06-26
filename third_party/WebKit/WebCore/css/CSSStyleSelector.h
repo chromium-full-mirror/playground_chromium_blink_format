@@ -65,6 +65,7 @@ class StyleImage;
 class StyleSheet;
 class StyleSheetList;
 class StyledElement;
+class WebKitCSSKeyframeRule;
 class WebKitCSSKeyframesRule;
 
 class MediaQueryResult : public Noncopyable {
@@ -129,6 +130,10 @@ class CSSStyleSelector : public Noncopyable {
   bool canShareStyleWithElement(Node*);
 
   RenderStyle* style() const { return m_style.get(); }
+
+  PassRefPtr<RenderStyle> styleForKeyframe(const RenderStyle*,
+                                           const WebKitCSSKeyframeRule*,
+                                           KeyframeList&);
 
  public:
   // These methods will give back the set of rules that matched for a given
