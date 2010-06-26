@@ -89,6 +89,10 @@ class QWEBKIT_EXPORT DumpRenderTreeSupportQt {
   static void garbageCollectorCollectOnAlternateThread(bool waitUntilDone);
   static void setJavaScriptProfilingEnabled(QWebFrame*, bool enabled);
   static int javaScriptObjectsCount();
+  static void clearScriptWorlds();
+  static void evaluateScriptInIsolatedWorld(QWebFrame* frame,
+                                            int worldID,
+                                            const QString& script);
 
   static void setTimelineProfilingEnabled(QWebPage*, bool enabled);
   static void webInspectorExecuteScript(QWebPage* page,
@@ -148,6 +152,7 @@ class QWEBKIT_EXPORT DumpRenderTreeSupportQt {
   static void dumpSetAcceptsEditing(bool b);
 
   static void dumpNotification(bool b);
+
   // These functions should eventually turn into public API
   // and the "receiver" concept would go away
   static void setNotificationsReceiver(QObject* receiver);
@@ -162,10 +167,7 @@ class QWEBKIT_EXPORT DumpRenderTreeSupportQt {
 
   static bool shouldClose(QWebFrame* frame);
 
-  static void clearScriptWorlds();
-  static void evaluateScriptInIsolatedWorld(QWebFrame* frame,
-                                            int worldID,
-                                            const QString& script);
+  static void setCustomPolicyDelegate(bool enabled, bool permissive);
 };
 
 #endif

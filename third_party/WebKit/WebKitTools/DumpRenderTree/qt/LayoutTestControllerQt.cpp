@@ -70,6 +70,7 @@ void LayoutTestController::reset() {
   DumpRenderTreeSupportQt::setWillSendRequestReturnsNull(false);
   DumpRenderTreeSupportQt::setWillSendRequestClearHeaders(QStringList());
   DumpRenderTreeSupportQt::clearScriptWorlds();
+  DumpRenderTreeSupportQt::setCustomPolicyDelegate(false, false);
   setIconDatabaseEnabled(false);
 
   emit hidePage();
@@ -478,6 +479,11 @@ void LayoutTestController::removeOriginAccessWhitelistEntry(
   DumpRenderTreeSupportQt::removeWhiteListAccessFromOrigin(
       sourceOrigin, destinationProtocol, destinationHost,
       allowDestinationSubdomains);
+}
+
+void LayoutTestController::setCustomPolicyDelegate(bool enabled,
+                                                   bool permissive) {
+  DumpRenderTreeSupportQt::setCustomPolicyDelegate(enabled, permissive);
 }
 
 void LayoutTestController::waitForPolicyDelegate() {

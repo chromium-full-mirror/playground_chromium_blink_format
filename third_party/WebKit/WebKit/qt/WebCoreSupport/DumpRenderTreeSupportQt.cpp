@@ -556,6 +556,12 @@ void DumpRenderTreeSupportQt::setWillSendRequestClearHeaders(
   FrameLoaderClientQt::sendRequestClearHeaders = headers;
 }
 
+void DumpRenderTreeSupportQt::setCustomPolicyDelegate(bool enabled,
+                                                      bool permissive) {
+  FrameLoaderClientQt::policyDelegateEnabled = enabled;
+  FrameLoaderClientQt::policyDelegatePermissive = permissive;
+}
+
 void DumpRenderTreeSupportQt::dumpEditingCallbacks(bool b) {
   EditorClientQt::dumpEditingCallbacks = b;
 }
