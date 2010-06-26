@@ -32,16 +32,7 @@ class HTMLParamElement : public HTMLElement {
   static PassRefPtr<HTMLParamElement> create(const QualifiedName&, Document*);
 
   String name() const { return m_name; }
-  void setName(const String&);
-
-  String type() const;
-  void setType(const String&);
-
   String value() const { return m_value; }
-  void setValue(const String&);
-
-  String valueType() const;
-  void setValueType(const String&);
 
  private:
   HTMLParamElement(const QualifiedName&, Document*);

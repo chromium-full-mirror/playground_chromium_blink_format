@@ -74,12 +74,4 @@ void HTMLParagraphElement::parseMappedAttribute(Attribute* attr) {
   } else
     HTMLElement::parseMappedAttribute(attr);
 }
-
-String HTMLParagraphElement::align() const {
-  return getAttribute(alignAttr);
-}
-
-void HTMLParagraphElement::setAlign(const String& value) {
-  setAttribute(alignAttr, value);
-}
 }

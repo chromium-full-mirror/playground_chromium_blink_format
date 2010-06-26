@@ -35,9 +35,6 @@ class HTMLIsIndexElement : public HTMLInputElement {
                                                Document*,
                                                HTMLFormElement*);
 
-  String prompt() const;
-  void setPrompt(const String&);
-
  private:
   HTMLIsIndexElement(const QualifiedName&, Document*, HTMLFormElement*);
 

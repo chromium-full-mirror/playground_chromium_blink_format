@@ -35,9 +35,6 @@ class HTMLTableCaptionElement : public HTMLTablePartElement {
   static PassRefPtr<HTMLTableCaptionElement> create(const QualifiedName&,
                                                     Document*);
 
-  String align() const;
-  void setAlign(const String&);
-
  private:
   HTMLTableCaptionElement(const QualifiedName&, Document*);
 

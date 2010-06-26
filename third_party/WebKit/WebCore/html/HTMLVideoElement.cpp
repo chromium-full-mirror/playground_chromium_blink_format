@@ -147,22 +147,10 @@ unsigned HTMLVideoElement::width() const {
   return ok ? w : 0;
 }
 
-void HTMLVideoElement::setWidth(unsigned value) {
-  setAttribute(widthAttr, String::number(value));
-}
-
 unsigned HTMLVideoElement::height() const {
   bool ok;
   unsigned h = getAttribute(heightAttr).string().toUInt(&ok);
   return ok ? h : 0;
-}
-
-void HTMLVideoElement::setHeight(unsigned value) {
-  setAttribute(heightAttr, String::number(value));
-}
-
-void HTMLVideoElement::setPoster(const String& value) {
-  setAttribute(posterAttr, value);
 }
 
 bool HTMLVideoElement::isURLAttribute(Attribute* attribute) const {

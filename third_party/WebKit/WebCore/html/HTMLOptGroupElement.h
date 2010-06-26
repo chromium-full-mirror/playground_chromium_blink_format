@@ -38,9 +38,6 @@ class HTMLOptGroupElement : public HTMLFormControlElement,
                                                 Document*,
                                                 HTMLFormElement*);
 
-  String label() const;
-  void setLabel(const String&);
-
   HTMLSelectElement* ownerSelectElement() const;
 
   virtual String groupLabelText() const;

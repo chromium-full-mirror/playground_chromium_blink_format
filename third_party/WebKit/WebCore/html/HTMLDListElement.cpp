@@ -40,12 +40,4 @@ PassRefPtr<HTMLDListElement> HTMLDListElement::create(
     Document* document) {
   return adoptRef(new HTMLDListElement(tagName, document));
 }
-
-bool HTMLDListElement::compact() const {
-  return !getAttribute(compactAttr).isNull();
-}
-
-void HTMLDListElement::setCompact(bool b) {
-  setAttribute(compactAttr, b ? "" : 0);
-}
 }

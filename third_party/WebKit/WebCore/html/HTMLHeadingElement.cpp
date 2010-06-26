@@ -47,12 +47,4 @@ bool HTMLHeadingElement::checkDTD(const Node* newChild) {
 
   return inEitherTagList(newChild);
 }
-
-String HTMLHeadingElement::align() const {
-  return getAttribute(alignAttr);
-}
-
-void HTMLHeadingElement::setAlign(const String& value) {
-  setAttribute(alignAttr, value);
-}
 }

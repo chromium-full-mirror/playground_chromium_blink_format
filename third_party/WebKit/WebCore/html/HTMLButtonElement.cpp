@@ -168,20 +168,8 @@ void HTMLButtonElement::accessKeyAction(bool sendToAnyElement) {
   dispatchSimulatedClick(0, sendToAnyElement);
 }
 
-String HTMLButtonElement::accessKey() const {
-  return getAttribute(accesskeyAttr);
-}
-
-void HTMLButtonElement::setAccessKey(const String& value) {
-  setAttribute(accesskeyAttr, value);
-}
-
 String HTMLButtonElement::value() const {
   return getAttribute(valueAttr);
-}
-
-void HTMLButtonElement::setValue(const String& value) {
-  setAttribute(valueAttr, value);
 }
 
 }  // namespace

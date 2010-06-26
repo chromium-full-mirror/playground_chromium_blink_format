@@ -32,12 +32,6 @@ class HTMLUListElement : public HTMLElement {
   static PassRefPtr<HTMLUListElement> create(Document*);
   static PassRefPtr<HTMLUListElement> create(const QualifiedName&, Document*);
 
-  bool compact() const;
-  void setCompact(bool);
-
-  String type() const;
-  void setType(const String&);
-
  private:
   HTMLUListElement(const QualifiedName&, Document*);
 

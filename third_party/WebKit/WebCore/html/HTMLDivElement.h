@@ -32,9 +32,6 @@ class HTMLDivElement : public HTMLElement {
   static PassRefPtr<HTMLDivElement> create(Document*);
   static PassRefPtr<HTMLDivElement> create(const QualifiedName&, Document*);
 
-  String align() const;
-  void setAlign(const String&);
-
  protected:
   HTMLDivElement(const QualifiedName&, Document*);
 

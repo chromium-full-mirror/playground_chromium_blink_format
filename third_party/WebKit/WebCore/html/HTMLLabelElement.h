@@ -35,12 +35,6 @@ class HTMLLabelElement : public HTMLElement {
 
   HTMLFormControlElement* control();
 
-  String accessKey() const;
-  void setAccessKey(const String&);
-
-  String htmlFor() const;
-  void setHtmlFor(const String&);
-
  private:
   HTMLLabelElement(const QualifiedName&, Document*);
 

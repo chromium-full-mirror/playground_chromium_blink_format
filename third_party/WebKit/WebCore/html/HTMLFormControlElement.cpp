@@ -80,10 +80,6 @@ bool HTMLFormControlElement::formNoValidate() const {
   return !getAttribute(formnovalidateAttr).isNull();
 }
 
-void HTMLFormControlElement::setFormNoValidate(bool formnovalidate) {
-  setAttribute(formnovalidateAttr, formnovalidate ? "" : 0);
-}
-
 ValidityState* HTMLFormControlElement::validity() {
   if (!m_validityState)
     m_validityState = ValidityState::create(this);
@@ -205,24 +201,12 @@ void HTMLFormControlElement::setDisabled(bool b) {
   setAttribute(disabledAttr, b ? "" : 0);
 }
 
-void HTMLFormControlElement::setReadOnly(bool b) {
-  setAttribute(readonlyAttr, b ? "" : 0);
-}
-
 bool HTMLFormControlElement::autofocus() const {
   return hasAttribute(autofocusAttr);
 }
 
-void HTMLFormControlElement::setAutofocus(bool b) {
-  setAttribute(autofocusAttr, b ? "" : 0);
-}
-
 bool HTMLFormControlElement::required() const {
   return m_required;
-}
-
-void HTMLFormControlElement::setRequired(bool b) {
-  setAttribute(requiredAttr, b ? "" : 0);
 }
 
 static void updateFromElementCallback(Node* node) {

@@ -41,26 +41,7 @@ class HTMLScriptElement : public HTMLElement, public ScriptElement {
   String text() const;
   void setText(const String&);
 
-  String htmlFor() const;
-  void setHtmlFor(const String&);
-
-  String event() const;
-  void setEvent(const String&);
-
-  String charset() const;
-  void setCharset(const String&);
-
-  bool async() const;
-  void setAsync(bool);
-
-  bool defer() const;
-  void setDefer(bool);
-
   KURL src() const;
-  void setSrc(const String&);
-
-  String type() const;
-  void setType(const String&);
 
   virtual String scriptCharset() const;
 

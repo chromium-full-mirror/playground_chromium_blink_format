@@ -45,7 +45,6 @@ class HTMLFormControlElement : public HTMLElement {
   ValidityState* validity();
 
   bool formNoValidate() const;
-  void setFormNoValidate(bool);
 
   virtual void reset() {}
 
@@ -64,14 +63,10 @@ class HTMLFormControlElement : public HTMLElement {
   virtual bool isFocusable() const;
   virtual bool isEnumeratable() const { return false; }
 
-  void setReadOnly(bool);
-
-  // Determines whether or not a control will be automatically focused
+  // Determines whether or not a control will be automatically focused.
   virtual bool autofocus() const;
-  void setAutofocus(bool);
 
   bool required() const;
-  void setRequired(bool);
 
   const AtomicString& type() const { return formControlType(); }
   const AtomicString& name() const { return formControlName(); }

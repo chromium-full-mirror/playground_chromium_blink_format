@@ -53,9 +53,6 @@ class HTMLTextAreaElement : public HTMLTextFormControlElement {
 
   void rendererWillBeDestroyed();
 
-  const AtomicString& accessKey() const;
-  void setAccessKey(const String&);
-
   void setCols(int);
   void setRows(int);
 

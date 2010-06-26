@@ -32,9 +32,6 @@ class HTMLParagraphElement : public HTMLElement {
   static PassRefPtr<HTMLParagraphElement> create(const QualifiedName&,
                                                  Document*);
 
-  String align() const;
-  void setAlign(const String&);
-
  private:
   HTMLParagraphElement(const QualifiedName&, Document*);
 

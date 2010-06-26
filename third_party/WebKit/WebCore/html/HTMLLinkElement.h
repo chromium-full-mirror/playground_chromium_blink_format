@@ -53,32 +53,12 @@ class HTMLLinkElement : public HTMLElement, public CachedResourceClient {
                                             bool createdByParser);
   virtual ~HTMLLinkElement();
 
-  bool disabled() const;
-  void setDisabled(bool);
-
-  String charset() const;
-  void setCharset(const String&);
-
   KURL href() const;
-  void setHref(const String&);
-
-  String hreflang() const;
-  void setHreflang(const String&);
-
-  String media() const;
-  void setMedia(const String&);
-
   String rel() const;
-  void setRel(const String&);
-
-  String rev() const;
-  void setRev(const String&);
 
   virtual String target() const;
-  void setTarget(const String&);
 
   String type() const;
-  void setType(const String&);
 
   StyleSheet* sheet() const;
 

@@ -34,12 +34,6 @@ class HTMLLegendElement : public HTMLFormControlElement {
                                               Document*,
                                               HTMLFormElement*);
 
-  String accessKey() const;
-  void setAccessKey(const String&);
-
-  String align() const;
-  void setAlign(const String&);
-
  private:
   HTMLLegendElement(const QualifiedName&, Document*, HTMLFormElement*);
 

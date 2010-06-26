@@ -41,12 +41,4 @@ PassRefPtr<HTMLBaseFontElement> HTMLBaseFontElement::create(
     Document* document) {
   return adoptRef(new HTMLBaseFontElement(tagName, document));
 }
-
-int HTMLBaseFontElement::size() const {
-  return getAttribute(sizeAttr).toInt();
-}
-
-void HTMLBaseFontElement::setSize(int value) {
-  setAttribute(sizeAttr, String::number(value));
-}
 }

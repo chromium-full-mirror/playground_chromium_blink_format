@@ -33,9 +33,6 @@ class HTMLBaseFontElement : public HTMLElement {
   static PassRefPtr<HTMLBaseFontElement> create(const QualifiedName&,
                                                 Document*);
 
-  int size() const;
-  void setSize(int);
-
  private:
   HTMLBaseFontElement(const QualifiedName&, Document*);
 
