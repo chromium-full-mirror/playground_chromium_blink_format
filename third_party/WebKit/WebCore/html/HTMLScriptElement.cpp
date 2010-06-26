@@ -79,6 +79,9 @@ void HTMLScriptElement::parseMappedAttribute(Attribute* attr) {
   else if (attrName == onbeforeloadAttr)
     setAttributeEventListener(eventNames().beforeloadEvent,
                               createAttributeEventListener(this, attr));
+  else if (attrName == onbeforeprocessAttr)
+    setAttributeEventListener(eventNames().beforeprocessEvent,
+                              createAttributeEventListener(this, attr));
   else
     HTMLElement::parseMappedAttribute(attr);
 }
