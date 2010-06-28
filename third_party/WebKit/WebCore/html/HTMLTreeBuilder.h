@@ -254,6 +254,7 @@ class HTMLTreeBuilder : public Noncopyable {
   // FragmentScriptingNotAllowed causes the Parser to remove children
   // from <script> tags (so javascript doesn't show up in pastes).
   FragmentScriptingPermission m_fragmentScriptingPermission;
+  bool m_isParsingFragment;
 };
 }
 

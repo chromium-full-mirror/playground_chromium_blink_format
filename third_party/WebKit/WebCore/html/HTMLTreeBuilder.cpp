@@ -82,7 +82,8 @@ HTMLTreeBuilder::HTMLTreeBuilder(HTMLTokenizer* tokenizer,
               : 0),
       m_lastScriptElementStartLine(uninitializedLineNumberValue),
       m_scriptToProcessStartLine(uninitializedLineNumberValue),
-      m_fragmentScriptingPermission(FragmentScriptingAllowed) {}
+      m_fragmentScriptingPermission(FragmentScriptingAllowed),
+      m_isParsingFragment(false) {}
 
 // FIXME: Member variables should be grouped into self-initializing structs to
 // minimize code duplication between these constructors.
@@ -104,7 +105,8 @@ HTMLTreeBuilder::HTMLTreeBuilder(
               : 0),
       m_lastScriptElementStartLine(uninitializedLineNumberValue),
       m_scriptToProcessStartLine(uninitializedLineNumberValue),
-      m_fragmentScriptingPermission(scriptingPermission) {}
+      m_fragmentScriptingPermission(scriptingPermission),
+      m_isParsingFragment(true) {}
 
 HTMLTreeBuilder::~HTMLTreeBuilder() {}
 
@@ -952,8 +954,18 @@ void HTMLTreeBuilder::reconstructTheActiveFormattingElements() {
 void HTMLTreeBuilder::finished() {
   // We should call m_document->finishedParsing() here, except
   // m_legacyTreeBuilder->finished() does it for us.
-  if (m_legacyTreeBuilder)
+  if (m_legacyTreeBuilder) {
     m_legacyTreeBuilder->finished();
+    return;
+  }
+
+  AtomicHTMLToken eofToken(HTMLToken::EndOfFile, nullAtom);
+  processToken(eofToken);
+
+  // Warning, this may delete the parser, so don't try to do anything else after
+  // this.
+  if (!m_isParsingFragment)
+    m_document->finishedParsing();
 }
 
 bool HTMLTreeBuilder::isScriptingFlagEnabled(Frame* frame) {
