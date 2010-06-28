@@ -137,7 +137,7 @@ class DumpRenderTree : public QObject {
 
  private:
   QString dumpFramesAsText(QWebFrame* frame);
-  QString dumpBackForwardList();
+  QString dumpBackForwardList(QWebPage* page);
   LayoutTestController* m_controller;
 
   bool m_dumpPixels;
