@@ -1165,6 +1165,16 @@ class RenderStyle : public RefCounted<RenderStyle> {
                              IntSize& topRight,
                              IntSize& bottomLeft,
                              IntSize& bottomRight) const;
+  void getInnerBorderRadiiForRectWithBorderWidths(
+      const IntRect&,
+      unsigned short topWidth,
+      unsigned short bottomWidth,
+      unsigned short leftWidth,
+      unsigned short rightWidth,
+      IntSize& innerTopLeft,
+      IntSize& innerTopRight,
+      IntSize& innerBottomLeft,
+      IntSize& innerBottomRight) const;
 
   void setBorderLeftWidth(unsigned short v) {
     SET_VAR(surround, border.m_left.m_width, v)

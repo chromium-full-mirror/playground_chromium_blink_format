@@ -176,6 +176,15 @@ class RenderBoxModelObject : public RenderObject {
 
   IntSize calculateFillTileSize(const FillLayer*, IntSize scaledSize) const;
 
+  void clipBorderSidePolygon(GraphicsContext*,
+                             const IntRect&,
+                             const IntSize& topLeft,
+                             const IntSize& topRight,
+                             const IntSize& bottomLeft,
+                             const IntSize& bottomRight,
+                             const BoxSide side,
+                             const RenderStyle* style);
+
   friend class RenderView;
 
   RenderLayer* m_layer;
