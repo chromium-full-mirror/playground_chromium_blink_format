@@ -2,6 +2,7 @@
  *  Copyright (C) 1999-2000 Harri Porten (porten@kde.org)
  *  Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Apple Inc. All
  * rights reserved.
+ *  Copyright (C) 2010 Zoltan Herczeg (zherczeg@inf.u-szeged.hu)
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -27,6 +28,7 @@
 #include "ParserArena.h"
 #include "SourceCode.h"
 #include <wtf/ASCIICType.h>
+#include <wtf/AlwaysInline.h>
 #include <wtf/SegmentedVector.h>
 #include <wtf/Vector.h>
 #include <wtf/unicode/Unicode.h>
@@ -71,24 +73,24 @@ class Lexer : public Noncopyable {
   Lexer(JSGlobalData*);
   ~Lexer();
 
-  void shift1();
-  void shift2();
-  void shift3();
-  void shift4();
-  void shiftLineTerminator();
-
   void record8(int);
   void record16(int);
   void record16(UChar);
 
   void copyCodeWithoutBOMs();
 
-  int currentOffset() const;
-  const UChar* currentCharacter() const;
+  ALWAYS_INLINE void shift();
+  ALWAYS_INLINE int peek(int offset);
+  int getUnicodeCharacter();
+  void shiftLineTerminator();
 
-  const Identifier* makeIdentifier(const UChar* characters, size_t length);
+  ALWAYS_INLINE const UChar* currentCharacter() const;
+  ALWAYS_INLINE int currentOffset() const;
 
-  bool lastTokenWasRestrKeyword() const;
+  ALWAYS_INLINE const Identifier* makeIdentifier(const UChar* characters,
+                                                 size_t length);
+
+  ALWAYS_INLINE bool lastTokenWasRestrKeyword() const;
 
   static const size_t initialReadBufferCapacity = 32;
 
@@ -112,9 +114,6 @@ class Lexer : public Noncopyable {
   // current and following unicode characters (int to allow for -1 for
   // end-of-file marker)
   int m_current;
-  int m_next1;
-  int m_next2;
-  int m_next3;
 
   IdentifierArena* m_arena;
 

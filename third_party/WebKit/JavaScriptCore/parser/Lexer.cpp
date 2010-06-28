@@ -2,6 +2,7 @@
  *  Copyright (C) 1999-2000 Harri Porten (porten@kde.org)
  *  Copyright (C) 2006, 2007, 2008, 2009 Apple Inc. All Rights Reserved.
  *  Copyright (C) 2007 Cameron Zwarich (cwzwarich@uwaterloo.ca)
+ *  Copyright (C) 2010 Zoltan Herczeg (zherczeg@inf.u-szeged.hu)
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -55,69 +56,13 @@ Lexer::~Lexer() {
   m_keywordTable.deleteTable();
 }
 
-inline const UChar* Lexer::currentCharacter() const {
-  return m_code - 4;
+ALWAYS_INLINE const UChar* Lexer::currentCharacter() const {
+  ASSERT(m_code <= m_codeEnd);
+  return m_code;
 }
 
-inline int Lexer::currentOffset() const {
+ALWAYS_INLINE int Lexer::currentOffset() const {
   return currentCharacter() - m_codeStart;
-}
-
-ALWAYS_INLINE void Lexer::shift1() {
-  m_current = m_next1;
-  m_next1 = m_next2;
-  m_next2 = m_next3;
-  if (LIKELY(m_code < m_codeEnd))
-    m_next3 = m_code[0];
-  else
-    m_next3 = -1;
-
-  ++m_code;
-}
-
-ALWAYS_INLINE void Lexer::shift2() {
-  m_current = m_next2;
-  m_next1 = m_next3;
-  if (LIKELY(m_code + 1 < m_codeEnd)) {
-    m_next2 = m_code[0];
-    m_next3 = m_code[1];
-  } else {
-    m_next2 = m_code < m_codeEnd ? m_code[0] : -1;
-    m_next3 = -1;
-  }
-
-  m_code += 2;
-}
-
-ALWAYS_INLINE void Lexer::shift3() {
-  m_current = m_next3;
-  if (LIKELY(m_code + 2 < m_codeEnd)) {
-    m_next1 = m_code[0];
-    m_next2 = m_code[1];
-    m_next3 = m_code[2];
-  } else {
-    m_next1 = m_code < m_codeEnd ? m_code[0] : -1;
-    m_next2 = m_code + 1 < m_codeEnd ? m_code[1] : -1;
-    m_next3 = -1;
-  }
-
-  m_code += 3;
-}
-
-ALWAYS_INLINE void Lexer::shift4() {
-  if (LIKELY(m_code + 3 < m_codeEnd)) {
-    m_current = m_code[0];
-    m_next1 = m_code[1];
-    m_next2 = m_code[2];
-    m_next3 = m_code[3];
-  } else {
-    m_current = m_code < m_codeEnd ? m_code[0] : -1;
-    m_next1 = m_code + 1 < m_codeEnd ? m_code[1] : -1;
-    m_next2 = m_code + 2 < m_codeEnd ? m_code[2] : -1;
-    m_next3 = -1;
-  }
-
-  m_code += 4;
 }
 
 void Lexer::setCode(const SourceCode& source, ParserArena& arena) {
@@ -151,8 +96,10 @@ void Lexer::setCode(const SourceCode& source, ParserArena& arena) {
     }
   }
 
-  // Read the first characters into the 4-character buffer.
-  shift4();
+  if (LIKELY(m_code < m_codeEnd))
+    m_current = *m_code;
+  else
+    m_current = -1;
   ASSERT(currentOffset() == source.startOffset());
 }
 
@@ -177,14 +124,48 @@ void Lexer::copyCodeWithoutBOMs() {
   m_codeEnd = m_codeWithoutBOMs.data() + m_codeWithoutBOMs.size();
 }
 
+ALWAYS_INLINE void Lexer::shift() {
+  // Faster than an if-else sequence
+  ASSERT(m_current != -1);
+  m_current = -1;
+  ++m_code;
+  if (LIKELY(m_code < m_codeEnd))
+    m_current = *m_code;
+}
+
+ALWAYS_INLINE int Lexer::peek(int offset) {
+  // Only use if necessary
+  ASSERT(offset > 0 && offset < 5);
+  const UChar* code = m_code + offset;
+  return (code < m_codeEnd) ? *code : -1;
+}
+
+int Lexer::getUnicodeCharacter() {
+  int char1 = peek(1);
+  int char2 = peek(2);
+  int char3 = peek(3);
+
+  if (UNLIKELY(!isASCIIHexDigit(m_current) || !isASCIIHexDigit(char1) ||
+               !isASCIIHexDigit(char2) || !isASCIIHexDigit(char3)))
+    return -1;
+
+  int result = convertUnicode(m_current, char1, char2, char3);
+  shift();
+  shift();
+  shift();
+  shift();
+  return result;
+}
+
 void Lexer::shiftLineTerminator() {
   ASSERT(isLineTerminator(m_current));
 
+  int m_prev = m_current;
+  shift();
+
   // Allow both CRLF and LFCR.
-  if (m_current + m_next1 == '\n' + '\r')
-    shift2();
-  else
-    shift1();
+  if (m_prev + m_current == '\n' + '\r')
+    shift();
 
   ++m_lineNumber;
 }
@@ -194,7 +175,7 @@ ALWAYS_INLINE const Identifier* Lexer::makeIdentifier(const UChar* characters,
   return &m_arena->makeIdentifier(m_globalData, characters, length);
 }
 
-inline bool Lexer::lastTokenWasRestrKeyword() const {
+ALWAYS_INLINE bool Lexer::lastTokenWasRestrKeyword() const {
   return m_lastToken == CONTINUE || m_lastToken == BREAK ||
          m_lastToken == RETURN || m_lastToken == THROW;
 }
@@ -268,7 +249,7 @@ int Lexer::lex(void* p1, void* p2) {
 
 start:
   while (isWhiteSpace(m_current))
-    shift1();
+    shift();
 
   int startOffset = currentOffset();
 
@@ -284,204 +265,196 @@ start:
   m_delimited = false;
   switch (m_current) {
     case '>':
-      if (m_next1 == '>' && m_next2 == '>') {
-        if (m_next3 == '=') {
-          shift4();
-          token = URSHIFTEQUAL;
+      shift();
+      if (m_current == '>') {
+        shift();
+        if (m_current == '>') {
+          shift();
+          if (m_current == '=') {
+            shift();
+            token = URSHIFTEQUAL;
+            break;
+          }
+          token = URSHIFT;
           break;
         }
-        shift3();
-        token = URSHIFT;
-        break;
-      }
-      if (m_next1 == '>') {
-        if (m_next2 == '=') {
-          shift3();
+        if (m_current == '=') {
+          shift();
           token = RSHIFTEQUAL;
           break;
         }
-        shift2();
         token = RSHIFT;
         break;
       }
-      if (m_next1 == '=') {
-        shift2();
+      if (m_current == '=') {
+        shift();
         token = GE;
         break;
       }
-      shift1();
       token = '>';
       break;
     case '=':
-      if (m_next1 == '=') {
-        if (m_next2 == '=') {
-          shift3();
+      shift();
+      if (m_current == '=') {
+        shift();
+        if (m_current == '=') {
+          shift();
           token = STREQ;
           break;
         }
-        shift2();
         token = EQEQ;
         break;
       }
-      shift1();
       token = '=';
       break;
     case '!':
-      if (m_next1 == '=') {
-        if (m_next2 == '=') {
-          shift3();
+      shift();
+      if (m_current == '=') {
+        shift();
+        if (m_current == '=') {
+          shift();
           token = STRNEQ;
           break;
         }
-        shift2();
         token = NE;
         break;
       }
-      shift1();
       token = '!';
       break;
     case '<':
-      if (m_next1 == '!' && m_next2 == '-' && m_next3 == '-') {
+      shift();
+      if (m_current == '!' && peek(1) == '-' && peek(2) == '-') {
         // <!-- marks the beginning of a line comment (for www usage)
-        shift4();
         goto inSingleLineComment;
       }
-      if (m_next1 == '<') {
-        if (m_next2 == '=') {
-          shift3();
+      if (m_current == '<') {
+        shift();
+        if (m_current == '=') {
+          shift();
           token = LSHIFTEQUAL;
           break;
         }
-        shift2();
         token = LSHIFT;
         break;
       }
-      if (m_next1 == '=') {
-        shift2();
+      if (m_current == '=') {
+        shift();
         token = LE;
         break;
       }
-      shift1();
       token = '<';
       break;
     case '+':
-      if (m_next1 == '+') {
-        shift2();
-        if (m_terminator) {
-          token = AUTOPLUSPLUS;
-          break;
-        }
-        token = PLUSPLUS;
+      shift();
+      if (m_current == '+') {
+        shift();
+        token = (!m_terminator) ? PLUSPLUS : AUTOPLUSPLUS;
         break;
       }
-      if (m_next1 == '=') {
-        shift2();
+      if (m_current == '=') {
+        shift();
         token = PLUSEQUAL;
         break;
       }
-      shift1();
       token = '+';
       break;
     case '-':
-      if (m_next1 == '-') {
-        if (m_atLineStart && m_next2 == '>') {
-          shift3();
+      shift();
+      if (m_current == '-') {
+        shift();
+        if (m_atLineStart && m_current == '>') {
+          shift();
           goto inSingleLineComment;
         }
-        shift2();
-        if (m_terminator) {
-          token = AUTOMINUSMINUS;
-          break;
-        }
-        token = MINUSMINUS;
+        token = (!m_terminator) ? MINUSMINUS : AUTOMINUSMINUS;
         break;
       }
-      if (m_next1 == '=') {
-        shift2();
+      if (m_current == '=') {
+        shift();
         token = MINUSEQUAL;
         break;
       }
-      shift1();
       token = '-';
       break;
     case '*':
-      if (m_next1 == '=') {
-        shift2();
+      shift();
+      if (m_current == '=') {
+        shift();
         token = MULTEQUAL;
         break;
       }
-      shift1();
       token = '*';
       break;
     case '/':
-      if (m_next1 == '/') {
-        shift2();
+      shift();
+      if (m_current == '/') {
+        shift();
         goto inSingleLineComment;
       }
-      if (m_next1 == '*')
+      if (m_current == '*') {
+        shift();
         goto inMultiLineComment;
-      if (m_next1 == '=') {
-        shift2();
+      }
+      if (m_current == '=') {
+        shift();
         token = DIVEQUAL;
         break;
       }
-      shift1();
       token = '/';
       break;
     case '&':
-      if (m_next1 == '&') {
-        shift2();
+      shift();
+      if (m_current == '&') {
+        shift();
         token = AND;
         break;
       }
-      if (m_next1 == '=') {
-        shift2();
+      if (m_current == '=') {
+        shift();
         token = ANDEQUAL;
         break;
       }
-      shift1();
       token = '&';
       break;
     case '^':
-      if (m_next1 == '=') {
-        shift2();
+      shift();
+      if (m_current == '=') {
+        shift();
         token = XOREQUAL;
         break;
       }
-      shift1();
       token = '^';
       break;
     case '%':
-      if (m_next1 == '=') {
-        shift2();
+      shift();
+      if (m_current == '=') {
+        shift();
         token = MODEQUAL;
         break;
       }
-      shift1();
       token = '%';
       break;
     case '|':
-      if (m_next1 == '=') {
-        shift2();
+      shift();
+      if (m_current == '=') {
+        shift();
         token = OREQUAL;
         break;
       }
-      if (m_next1 == '|') {
-        shift2();
+      if (m_current == '|') {
+        shift();
         token = OR;
         break;
       }
-      shift1();
       token = '|';
       break;
     case '.':
-      if (isASCIIDigit(m_next1)) {
+      shift();
+      if (isASCIIDigit(m_current)) {
         record8('.');
-        shift1();
         goto inNumberAfterDecimalPoint;
       }
       token = '.';
-      shift1();
       break;
     case ',':
     case '~':
@@ -492,22 +465,22 @@ start:
     case '[':
     case ']':
       token = m_current;
-      shift1();
+      shift();
       break;
     case ';':
-      shift1();
       m_delimited = true;
+      shift();
       token = ';';
       break;
     case '{':
       lvalp->intValue = currentOffset();
-      shift1();
+      shift();
       token = OPENBRACE;
       break;
     case '}':
       lvalp->intValue = currentOffset();
-      shift1();
       m_delimited = true;
+      shift();
       token = CLOSEBRACE;
       break;
     case '\\':
@@ -548,7 +521,7 @@ start:
 
 startString : {
   int stringQuoteCharacter = m_current;
-  shift1();
+  shift();
 
   const UChar* stringStart = currentCharacter();
   while (m_current != stringQuoteCharacter) {
@@ -560,10 +533,10 @@ startString : {
       m_buffer16.append(stringStart, currentCharacter() - stringStart);
       goto inString;
     }
-    shift1();
+    shift();
   }
   lvalp->ident = makeIdentifier(stringStart, currentCharacter() - stringStart);
-  shift1();
+  shift();
   m_atLineStart = false;
   m_delimited = false;
   token = STRING;
@@ -578,17 +551,19 @@ inString:
     if (UNLIKELY(m_current == -1))
       goto returnError;
     record16(m_current);
-    shift1();
+    shift();
   }
   goto doneString;
 
 inStringEscapeSequence:
-  shift1();
+  shift();
   if (m_current == 'x') {
-    shift1();
-    if (isASCIIHexDigit(m_current) && isASCIIHexDigit(m_next1)) {
-      record16(convertHex(m_current, m_next1));
-      shift2();
+    shift();
+    if (isASCIIHexDigit(m_current) && isASCIIHexDigit(peek(1))) {
+      int prev = m_current;
+      shift();
+      record16(convertHex(prev, m_current));
+      shift();
       goto inString;
     }
     record16('x');
@@ -597,11 +572,10 @@ inStringEscapeSequence:
     goto inString;
   }
   if (m_current == 'u') {
-    shift1();
-    if (isASCIIHexDigit(m_current) && isASCIIHexDigit(m_next1) &&
-        isASCIIHexDigit(m_next2) && isASCIIHexDigit(m_next3)) {
-      record16(convertUnicode(m_current, m_next1, m_next2, m_next3));
-      shift4();
+    shift();
+    token = getUnicodeCharacter();
+    if (token != -1) {
+      record16(token);
       goto inString;
     }
     if (m_current == stringQuoteCharacter) {
@@ -611,19 +585,22 @@ inStringEscapeSequence:
     goto returnError;
   }
   if (isASCIIOctalDigit(m_current)) {
-    if (m_current >= '0' && m_current <= '3' && isASCIIOctalDigit(m_next1) &&
-        isASCIIOctalDigit(m_next2)) {
-      record16((m_current - '0') * 64 + (m_next1 - '0') * 8 + m_next2 - '0');
-      shift3();
+    int char1 = m_current;
+    shift();
+    if (char1 >= '0' && char1 <= '3' && isASCIIOctalDigit(m_current) &&
+        isASCIIOctalDigit(peek(1))) {
+      int char2 = m_current;
+      shift();
+      record16((char1 - '0') * 64 + (char2 - '0') * 8 + m_current - '0');
+      shift();
       goto inString;
     }
-    if (isASCIIOctalDigit(m_next1)) {
-      record16((m_current - '0') * 8 + m_next1 - '0');
-      shift2();
+    if (isASCIIOctalDigit(m_current)) {
+      record16((char1 - '0') * 8 + m_current - '0');
+      shift();
       goto inString;
     }
-    record16(m_current - '0');
-    shift1();
+    record16(char1 - '0');
     goto inString;
   }
   if (isLineTerminator(m_current)) {
@@ -633,29 +610,31 @@ inStringEscapeSequence:
   if (m_current == -1)
     goto returnError;
   record16(singleEscape(m_current));
-  shift1();
+  shift();
   goto inString;
 }
 
-startIdentifierWithBackslash:
-  shift1();
+startIdentifierWithBackslash : {
+  shift();
   if (UNLIKELY(m_current != 'u'))
     goto returnError;
-  shift1();
-  if (UNLIKELY(!isASCIIHexDigit(m_current) || !isASCIIHexDigit(m_next1) ||
-               !isASCIIHexDigit(m_next2) || !isASCIIHexDigit(m_next3)))
+  shift();
+
+  token = getUnicodeCharacter();
+  if (UNLIKELY(token == -1))
     goto returnError;
-  token = convertUnicode(m_current, m_next1, m_next2, m_next3);
   if (UNLIKELY(!isIdentStart(token)))
     goto returnError;
   goto inIdentifierAfterCharacterCheck;
+}
 
 startIdentifierOrKeyword : {
   const UChar* identifierStart = currentCharacter();
-  shift1();
+  shift();
   while (isIdentPart(m_current))
-    shift1();
+    shift();
   if (LIKELY(m_current != '\\')) {
+    // Fast case for idents which does not contain \uCCCC characters
     lvalp->ident =
         makeIdentifier(identifierStart, currentCharacter() - identifierStart);
     goto doneIdentifierOrKeyword;
@@ -664,23 +643,21 @@ startIdentifierOrKeyword : {
 }
 
   do {
-    shift1();
+    shift();
     if (UNLIKELY(m_current != 'u'))
       goto returnError;
-    shift1();
-    if (UNLIKELY(!isASCIIHexDigit(m_current) || !isASCIIHexDigit(m_next1) ||
-                 !isASCIIHexDigit(m_next2) || !isASCIIHexDigit(m_next3)))
+    shift();
+    token = getUnicodeCharacter();
+    if (UNLIKELY(token == -1))
       goto returnError;
-    token = convertUnicode(m_current, m_next1, m_next2, m_next3);
     if (UNLIKELY(!isIdentPart(token)))
       goto returnError;
   inIdentifierAfterCharacterCheck:
     record16(token);
-    shift4();
 
     while (isIdentPart(m_current)) {
       record16(m_current);
-      shift1();
+      shift();
     }
   } while (UNLIKELY(m_current == '\\'));
   goto doneIdentifier;
@@ -689,7 +666,7 @@ inSingleLineComment:
   while (!isLineTerminator(m_current)) {
     if (UNLIKELY(m_current == -1))
       return 0;
-    shift1();
+    shift();
   }
   shiftLineTerminator();
   m_atLineStart = true;
@@ -699,36 +676,43 @@ inSingleLineComment:
   goto start;
 
 inMultiLineComment:
-  shift2();
-  while (m_current != '*' || m_next1 != '/') {
+  while (true) {
+    if (UNLIKELY(m_current == '*')) {
+      shift();
+      if (m_current == '/')
+        break;
+      if (m_current == '*')
+        continue;
+    }
+
+    if (UNLIKELY(m_current == -1))
+      goto returnError;
+
     if (isLineTerminator(m_current))
       shiftLineTerminator();
-    else {
-      shift1();
-      if (UNLIKELY(m_current == -1))
-        goto returnError;
-    }
+    else
+      shift();
   }
-  shift2();
+  shift();
   m_atLineStart = false;
   goto start;
 
 startNumberWithZeroDigit:
-  shift1();
-  if ((m_current | 0x20) == 'x' && isASCIIHexDigit(m_next1)) {
-    shift1();
+  shift();
+  if ((m_current | 0x20) == 'x' && isASCIIHexDigit(peek(1))) {
+    shift();
     goto inHex;
   }
   if (m_current == '.') {
     record8('0');
     record8('.');
-    shift1();
+    shift();
     goto inNumberAfterDecimalPoint;
   }
   if ((m_current | 0x20) == 'e') {
     record8('0');
     record8('e');
-    shift1();
+    shift();
     goto inExponentIndicator;
   }
   if (isASCIIOctalDigit(m_current))
@@ -741,11 +725,11 @@ startNumberWithZeroDigit:
 inNumberAfterDecimalPoint:
   while (isASCIIDigit(m_current)) {
     record8(m_current);
-    shift1();
+    shift();
   }
   if ((m_current | 0x20) == 'e') {
     record8('e');
-    shift1();
+    shift();
     goto inExponentIndicator;
   }
   goto doneNumber;
@@ -753,20 +737,20 @@ inNumberAfterDecimalPoint:
 inExponentIndicator:
   if (m_current == '+' || m_current == '-') {
     record8(m_current);
-    shift1();
+    shift();
   }
   if (!isASCIIDigit(m_current))
     goto returnError;
   do {
     record8(m_current);
-    shift1();
+    shift();
   } while (isASCIIDigit(m_current));
   goto doneNumber;
 
 inOctal : {
   do {
     record8(m_current);
-    shift1();
+    shift();
   } while (isASCIIOctalDigit(m_current));
   if (isASCIIDigit(m_current))
     goto startNumber;
@@ -790,7 +774,7 @@ inOctal : {
 inHex : {
   do {
     record8(m_current);
-    shift1();
+    shift();
   } while (isASCIIHexDigit(m_current));
 
   double dval = 0;
@@ -811,19 +795,19 @@ inHex : {
 
 startNumber:
   record8(m_current);
-  shift1();
+  shift();
   while (isASCIIDigit(m_current)) {
     record8(m_current);
-    shift1();
+    shift();
   }
   if (m_current == '.') {
     record8('.');
-    shift1();
+    shift();
     goto inNumberAfterDecimalPoint;
   }
   if ((m_current | 0x20) == 'e') {
     record8('e');
-    shift1();
+    shift();
     goto inExponentIndicator;
   }
 
@@ -871,7 +855,7 @@ doneIdentifierOrKeyword : {
 
 doneString:
   // Atomize constant strings in case they're later used in property lookup.
-  shift1();
+  shift();
   m_atLineStart = false;
   m_delimited = false;
   lvalp->ident = makeIdentifier(m_buffer16.data(), m_buffer16.size());
@@ -918,7 +902,7 @@ bool Lexer::scanRegExp(const Identifier*& pattern,
       return false;
     }
 
-    shift1();
+    shift();
 
     if (current == '/' && !lastWasEscape && !inBrackets)
       break;
@@ -948,7 +932,7 @@ bool Lexer::scanRegExp(const Identifier*& pattern,
 
   while (isIdentPart(m_current)) {
     record16(m_current);
-    shift1();
+    shift();
   }
 
   flags = makeIdentifier(m_buffer16.data(), m_buffer16.size());
@@ -967,7 +951,7 @@ bool Lexer::skipRegExp() {
     if (isLineTerminator(current) || current == -1)
       return false;
 
-    shift1();
+    shift();
 
     if (current == '/' && !lastWasEscape && !inBrackets)
       break;
@@ -991,7 +975,7 @@ bool Lexer::skipRegExp() {
   }
 
   while (isIdentPart(m_current))
-    shift1();
+    shift();
 
   return true;
 }
