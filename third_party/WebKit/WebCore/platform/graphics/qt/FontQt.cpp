@@ -260,7 +260,7 @@ float Font::floatWidthForComplexText(const TextRun& run,
     return 0;
 
   if (run.length() == 1 && treatAsSpace(run[0]))
-    return QFontMetrics(font()).width(run[0]) + run.padding();
+    return QFontMetrics(font()).width(space) + run.padding();
 
   String sanitized =
       Font::normalizeSpaces(String(run.characters(), run.length()));
