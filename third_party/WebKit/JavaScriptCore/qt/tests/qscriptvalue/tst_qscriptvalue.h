@@ -52,6 +52,7 @@ class tst_QScriptValue : public QObject {
   void call();
   void ctor();
   void toObjectSimple();
+  void propertySimple();
 
   // Generated test functions.
   void isBool_data();
