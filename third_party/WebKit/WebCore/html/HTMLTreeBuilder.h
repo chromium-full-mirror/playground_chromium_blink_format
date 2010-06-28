@@ -196,6 +196,7 @@ class HTMLTreeBuilder : public Noncopyable {
   void insertGenericRCDATAElement(AtomicHTMLToken&);
   void insertGenericRawTextElement(AtomicHTMLToken&);
   void insertScriptElement(AtomicHTMLToken&);
+  void insertTextNode(AtomicHTMLToken&);
 
   void insertHTMLStartTagBeforeHTML(AtomicHTMLToken&);
   void insertHTMLStartTagInBody(AtomicHTMLToken&);
