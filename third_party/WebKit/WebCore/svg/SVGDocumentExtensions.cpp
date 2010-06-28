@@ -37,7 +37,7 @@
 #include "SVGSMILElement.h"
 #include "SVGSVGElement.h"
 #include "SMILTimeContainer.h"
-#include "XMLDocumentParser.h"
+#include "ScriptableDocumentParser.h"
 #include "ScriptController.h"
 
 namespace WebCore {
@@ -120,19 +120,29 @@ bool SVGDocumentExtensions::sampleAnimationAtTime(const String& elementId,
   return true;
 }
 
-void SVGDocumentExtensions::reportWarning(const String& message) {
-  if (Frame* frame = m_doc->frame())
+// FIXME: Callers should probably use ScriptController::eventHandlerLineNumber()
+static int parserLineNumber(Document* document) {
+  ScriptableDocumentParser* parser = document->scriptableDocumentParser();
+  if (!parser)
+    return 1;
+  return parser->lineNumber();
+}
+
+static void reportMessage(Document* document,
+                          MessageLevel level,
+                          const String& message) {
+  if (Frame* frame = document->frame())
     frame->domWindow()->console()->addMessage(
-        JSMessageSource, LogMessageType, ErrorMessageLevel,
-        "Warning: " + message,
-        m_doc->parser() ? m_doc->parser()->lineNumber() : 1, String());
+        JSMessageSource, LogMessageType, level, message,
+        parserLineNumber(document), String());
+}
+
+void SVGDocumentExtensions::reportWarning(const String& message) {
+  reportMessage(m_doc, WarningMessageLevel, "Warning: " + message);
 }
 
 void SVGDocumentExtensions::reportError(const String& message) {
-  if (Frame* frame = m_doc->frame())
-    frame->domWindow()->console()->addMessage(
-        JSMessageSource, LogMessageType, ErrorMessageLevel, "Error: " + message,
-        m_doc->parser() ? m_doc->parser()->lineNumber() : 1, String());
+  reportMessage(m_doc, ErrorMessageLevel, "Error: " + message);
 }
 
 void SVGDocumentExtensions::addPendingResource(const AtomicString& id,

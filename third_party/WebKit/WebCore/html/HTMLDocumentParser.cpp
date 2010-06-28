@@ -62,7 +62,7 @@ class NestingLevelIncrementer : public Noncopyable {
 
 HTMLDocumentParser::HTMLDocumentParser(HTMLDocument* document,
                                        bool reportErrors)
-    : DocumentParser(document),
+    : ScriptableDocumentParser(document),
       m_tokenizer(new HTMLTokenizer),
       m_scriptRunner(new HTMLScriptRunner(document, this)),
       m_treeBuilder(
@@ -78,7 +78,7 @@ HTMLDocumentParser::HTMLDocumentParser(HTMLDocument* document,
 HTMLDocumentParser::HTMLDocumentParser(
     DocumentFragment* fragment,
     FragmentScriptingPermission scriptingPermission)
-    : DocumentParser(fragment->document()),
+    : ScriptableDocumentParser(fragment->document()),
       m_tokenizer(new HTMLTokenizer),
       m_treeBuilder(new HTMLTreeBuilder(m_tokenizer.get(),
                                         fragment,
@@ -341,9 +341,9 @@ void HTMLDocumentParser::stopWatchingForLoad(CachedResource* cachedScript) {
 
 bool HTMLDocumentParser::shouldLoadExternalScriptFromSrc(
     const AtomicString& srcValue) {
-  if (!m_XSSAuditor)
+  if (!xssAuditor())
     return true;
-  return m_XSSAuditor->canLoadExternalScriptFromSrc(srcValue);
+  return xssAuditor()->canLoadExternalScriptFromSrc(srcValue);
 }
 
 void HTMLDocumentParser::notifyFinished(CachedResource* cachedResource) {

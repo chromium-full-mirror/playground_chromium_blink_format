@@ -1770,6 +1770,10 @@ DocumentParser* Document::createParser() {
   return new XMLDocumentParser(this, view());
 }
 
+ScriptableDocumentParser* Document::scriptableDocumentParser() const {
+  return parser() ? parser()->asScriptableDocumentParser() : 0;
+}
+
 void Document::open(Document* ownerDocument) {
   if (ownerDocument) {
     setURL(ownerDocument->url());
@@ -1778,8 +1782,9 @@ void Document::open(Document* ownerDocument) {
   }
 
   if (m_frame) {
+    ScriptableDocumentParser* parser = scriptableDocumentParser();
     if (m_frame->loader()->isLoadingMainResource() ||
-        (parser() && parser()->isExecutingScript()))
+        (parser && parser->isExecutingScript()))
       return;
 
     if (m_frame->loader()->state() == FrameStateProvisional)
@@ -1816,8 +1821,9 @@ void Document::implicitOpen() {
   m_parser = createParser();
   setParsing(true);
 
-  if (m_frame)
-    m_parser->setXSSAuditor(m_frame->script()->xssAuditor());
+  ScriptableDocumentParser* parser = scriptableDocumentParser();
+  if (m_frame && parser)
+    parser->setXSSAuditor(m_frame->script()->xssAuditor());
 
   // If we reload, the animation controller sticks around and has
   // a stale animation time. We need to update it here.
@@ -1901,7 +1907,8 @@ void Document::implicitClose() {
 
   m_processingLoadEvent = true;
 
-  m_wellFormed = m_parser && m_parser->wellFormed();
+  ScriptableDocumentParser* parser = scriptableDocumentParser();
+  m_wellFormed = parser && parser->wellFormed();
 
   // We have to clear the parser, in case someone document.write()s from the
   // onLoad event handler, as in Radar 3206524.
@@ -2672,8 +2679,9 @@ void Document::removePendingSheet() {
 
   updateStyleSelector();
 
-  if (!m_pendingStylesheets && m_parser)
-    m_parser->executeScriptsWaitingForStylesheets();
+  ScriptableDocumentParser* parser = scriptableDocumentParser();
+  if (!m_pendingStylesheets && parser)
+    parser->executeScriptsWaitingForStylesheets();
 
   if (!m_pendingStylesheets && m_gotoAnchorNeededAfterStylesheetsLoad && view())
     view()->scrollToFragment(m_frame->loader()->url());

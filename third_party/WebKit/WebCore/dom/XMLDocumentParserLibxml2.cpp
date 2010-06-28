@@ -501,7 +501,7 @@ PassRefPtr<XMLParserContext> XMLParserContext::createMemoryParser(
 // --------------------------------
 
 XMLDocumentParser::XMLDocumentParser(Document* document, FrameView* frameView)
-    : DocumentParser(document),
+    : ScriptableDocumentParser(document),
       m_view(frameView),
       m_context(0),
       m_pendingCallbacks(new PendingCallbacks),
@@ -532,7 +532,7 @@ XMLDocumentParser::XMLDocumentParser(
     DocumentFragment* fragment,
     Element* parentElement,
     FragmentScriptingPermission scriptingPermission)
-    : DocumentParser(fragment->document()),
+    : ScriptableDocumentParser(fragment->document()),
       m_view(0),
       m_context(0),
       m_pendingCallbacks(new PendingCallbacks),

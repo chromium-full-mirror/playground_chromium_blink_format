@@ -28,10 +28,10 @@
 
 #include "CachedResourceClient.h"
 #include "CachedResourceHandle.h"
+#include "FragmentScriptingPermission.h"
+#include "ScriptableDocumentParser.h"
 #include "SegmentedString.h"
 #include "StringHash.h"
-#include "DocumentParser.h"
-#include "FragmentScriptingPermission.h"
 #include <wtf/HashMap.h>
 #include <wtf/OwnPtr.h>
 
@@ -71,7 +71,8 @@ class XMLParserContext : public RefCounted<XMLParserContext> {
 };
 #endif
 
-class XMLDocumentParser : public DocumentParser, public CachedResourceClient {
+class XMLDocumentParser : public ScriptableDocumentParser,
+                          public CachedResourceClient {
  public:
   XMLDocumentParser(Document*, FrameView* = 0);
   XMLDocumentParser(DocumentFragment*, Element*, FragmentScriptingPermission);
