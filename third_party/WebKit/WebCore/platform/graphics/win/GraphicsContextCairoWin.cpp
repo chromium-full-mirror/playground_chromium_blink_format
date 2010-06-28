@@ -80,6 +80,13 @@ GraphicsContext::GraphicsContext(HDC dc, bool hasAlpha)
   }
 }
 
+static void setRGBABitmapAlpha(unsigned char* bytes,
+                               size_t length,
+                               unsigned char level) {
+  for (size_t i = 0; i < length; i += 4)
+    bytes[i + 3] = level;
+}
+
 void GraphicsContext::releaseWindowsContext(HDC hdc,
                                             const IntRect& dstRect,
                                             bool supportAlphaBlend,
@@ -98,12 +105,19 @@ void GraphicsContext::releaseWindowsContext(HDC hdc,
   GetObject(bitmap, sizeof(info), &info);
   ASSERT(info.bmBitsPixel == 32);
 
+  // If this context does not support alpha blending, then it may have
+  // been drawn with GDI functions which always set the alpha channel
+  // to zero. We need to manually set the bitmap to be fully opaque.
+  unsigned char* bytes = reinterpret_cast<unsigned char*>(info.bmBits);
+  if (!supportAlphaBlend)
+    setRGBABitmapAlpha(bytes, info.bmHeight * info.bmWidthBytes, 255);
+
   // Need to make a cairo_surface_t out of the bitmap's pixel buffer and then
   // draw
   // it into our context.
   cairo_surface_t* image = cairo_image_surface_create_for_data(
-      (unsigned char*)info.bmBits, CAIRO_FORMAT_ARGB32, info.bmWidth,
-      info.bmHeight, info.bmWidthBytes);
+      bytes, CAIRO_FORMAT_ARGB32, info.bmWidth, info.bmHeight,
+      info.bmWidthBytes);
 
   // Scale the target surface to the new image size, and flip it
   // so that when we set the srcImage as the surface it will draw
