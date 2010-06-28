@@ -99,6 +99,13 @@ static void gdk_window_get_root_coords(GdkWindow* window,
 }
 #endif
 
+#if !GTK_CHECK_VERSION(2, 14, 0)
+static GdkWindow* gtk_widget_get_window(GtkWidget* widget) {
+  g_return_val_if_fail(GTK_IS_WIDGET(widget), 0);
+  return widget->window;
+}
+#endif
+
 static JSValueRef getDragModeCallback(JSContextRef context,
                                       JSObjectRef object,
                                       JSStringRef propertyName,
@@ -151,14 +158,15 @@ bool prepareMouseButtonEvent(GdkEvent* event, int eventSenderButtonNumber) {
   event->button.button = gdkButtonNumber;
   event->button.x = lastMousePositionX;
   event->button.y = lastMousePositionY;
-  event->button.window = GTK_WIDGET(view)->window;
+  event->button.window = gtk_widget_get_window(GTK_WIDGET(view));
   event->button.device = gdk_device_get_core_pointer();
   event->button.state = getStateFlags();
   event->button.time = GDK_CURRENT_TIME;
 
   int xRoot, yRoot;
-  gdk_window_get_root_coords(GTK_WIDGET(view)->window, lastMousePositionX,
-                             lastMousePositionY, &xRoot, &yRoot);
+  gdk_window_get_root_coords(gtk_widget_get_window(GTK_WIDGET(view)),
+                             lastMousePositionX, lastMousePositionY, &xRoot,
+                             &yRoot);
   event->button.x_root = xRoot;
   event->button.y_root = yRoot;
 
@@ -298,13 +306,14 @@ static JSValueRef mouseMoveToCallback(JSContextRef context,
   event.motion.y = lastMousePositionY;
 
   event.motion.time = GDK_CURRENT_TIME;
-  event.motion.window = GTK_WIDGET(view)->window;
+  event.motion.window = gtk_widget_get_window(GTK_WIDGET(view));
   event.motion.device = gdk_device_get_core_pointer();
   event.motion.state = getStateFlags();
 
   int xRoot, yRoot;
-  gdk_window_get_root_coords(GTK_WIDGET(view)->window, lastMousePositionX,
-                             lastMousePositionY, &xRoot, &yRoot);
+  gdk_window_get_root_coords(gtk_widget_get_window(GTK_WIDGET(view)),
+                             lastMousePositionX, lastMousePositionY, &xRoot,
+                             &yRoot);
   event.motion.x_root = xRoot;
   event.motion.y_root = yRoot;
 
@@ -341,7 +350,7 @@ static JSValueRef mouseWheelToCallback(JSContextRef context,
   event.scroll.x = lastMousePositionX;
   event.scroll.y = lastMousePositionY;
   event.scroll.time = GDK_CURRENT_TIME;
-  event.scroll.window = GTK_WIDGET(view)->window;
+  event.scroll.window = gtk_widget_get_window(GTK_WIDGET(view));
 
   if (horizontal < 0)
     event.scroll.direction = GDK_SCROLL_LEFT;
@@ -554,7 +563,7 @@ static JSValueRef keyDownCallback(JSContextRef context,
   memset(&event, 0, sizeof(event));
   event.key.keyval = gdkKeySym;
   event.key.state = state;
-  event.key.window = GTK_WIDGET(view)->window;
+  event.key.window = gtk_widget_get_window(GTK_WIDGET(view));
 
   // When synthesizing an event, an invalid hardware_keycode value
   // can cause it to be badly processed by Gtk+.

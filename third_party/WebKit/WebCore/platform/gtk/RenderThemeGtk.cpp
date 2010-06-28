@@ -349,8 +349,9 @@ static bool paintMozillaGtkWidget(const RenderThemeGtk* theme,
     // backed by a GdkDrawable. In those situations, we render onto a pixmap and
     // then
     // copy the rendered data back to the GraphicsContext via Cairo.
-    drawable = adoptGRef(gdk_pixmap_new(0, rect.width(), rect.height(),
-                                        gdk_visual_get_system()->depth));
+    drawable = adoptGRef(
+        gdk_pixmap_new(0, rect.width(), rect.height(),
+                       gdk_visual_get_depth(gdk_visual_get_system())));
     paintRect = clipRect = IntRect(0, 0, rect.width(), rect.height());
   }
 
@@ -628,42 +629,42 @@ void RenderThemeGtk::adjustSliderThumbSize(RenderObject* o) const {
 
 Color RenderThemeGtk::platformActiveSelectionBackgroundColor() const {
   GtkWidget* widget = gtkEntry();
-  return widget->style->base[GTK_STATE_SELECTED];
+  return gtk_widget_get_style(widget)->base[GTK_STATE_SELECTED];
 }
 
 Color RenderThemeGtk::platformInactiveSelectionBackgroundColor() const {
   GtkWidget* widget = gtkEntry();
-  return widget->style->base[GTK_STATE_ACTIVE];
+  return gtk_widget_get_style(widget)->base[GTK_STATE_ACTIVE];
 }
 
 Color RenderThemeGtk::platformActiveSelectionForegroundColor() const {
   GtkWidget* widget = gtkEntry();
-  return widget->style->text[GTK_STATE_SELECTED];
+  return gtk_widget_get_style(widget)->text[GTK_STATE_SELECTED];
 }
 
 Color RenderThemeGtk::platformInactiveSelectionForegroundColor() const {
   GtkWidget* widget = gtkEntry();
-  return widget->style->text[GTK_STATE_ACTIVE];
+  return gtk_widget_get_style(widget)->text[GTK_STATE_ACTIVE];
 }
 
 Color RenderThemeGtk::activeListBoxSelectionBackgroundColor() const {
   GtkWidget* widget = gtkTreeView();
-  return widget->style->base[GTK_STATE_SELECTED];
+  return gtk_widget_get_style(widget)->base[GTK_STATE_SELECTED];
 }
 
 Color RenderThemeGtk::inactiveListBoxSelectionBackgroundColor() const {
   GtkWidget* widget = gtkTreeView();
-  return widget->style->base[GTK_STATE_ACTIVE];
+  return gtk_widget_get_style(widget)->base[GTK_STATE_ACTIVE];
 }
 
 Color RenderThemeGtk::activeListBoxSelectionForegroundColor() const {
   GtkWidget* widget = gtkTreeView();
-  return widget->style->text[GTK_STATE_SELECTED];
+  return gtk_widget_get_style(widget)->text[GTK_STATE_SELECTED];
 }
 
 Color RenderThemeGtk::inactiveListBoxSelectionForegroundColor() const {
   GtkWidget* widget = gtkTreeView();
-  return widget->style->text[GTK_STATE_ACTIVE];
+  return gtk_widget_get_style(widget)->text[GTK_STATE_ACTIVE];
 }
 
 double RenderThemeGtk::caretBlinkInterval() const {
@@ -690,9 +691,9 @@ void RenderThemeGtk::systemFont(int, FontDescription&) const {
 Color RenderThemeGtk::systemColor(int cssValueId) const {
   switch (cssValueId) {
     case CSSValueButtontext:
-      return Color(gtkButton()->style->fg[GTK_STATE_NORMAL]);
+      return Color(gtk_widget_get_style(gtkButton())->fg[GTK_STATE_NORMAL]);
     case CSSValueCaptiontext:
-      return Color(gtkEntry()->style->fg[GTK_STATE_NORMAL]);
+      return Color(gtk_widget_get_style(gtkEntry())->fg[GTK_STATE_NORMAL]);
     default:
       return RenderTheme::systemColor(cssValueId);
   }
