@@ -2395,8 +2395,9 @@ void RenderBlock::paintChildren(PaintInfo& paintInfo, int tx, int ty) {
     // Check for page-break-before: always, and if it's set, break and bail.
     bool checkBeforeAlways =
         !childrenInline() &&
-        (checkPageBreaks && child->style()->pageBreakBefore() == PBALWAYS ||
-         checkColumnBreaks && child->style()->columnBreakBefore() == PBALWAYS);
+        ((checkPageBreaks && child->style()->pageBreakBefore() == PBALWAYS) ||
+         (checkColumnBreaks &&
+          child->style()->columnBreakBefore() == PBALWAYS));
     if (checkBeforeAlways && (ty + child->y()) > paintInfo.rect.y() &&
         (ty + child->y()) < paintInfo.rect.bottom()) {
       view()->setBestTruncatedAt(ty + child->y(), this, true);
@@ -2406,8 +2407,8 @@ void RenderBlock::paintChildren(PaintInfo& paintInfo, int tx, int ty) {
     // Check for page-break-inside: avoid, and it it's set, break and bail.
     bool checkInsideAvoid =
         !childrenInline() &&
-        (checkPageBreaks && child->style()->pageBreakInside() == PBAVOID ||
-         checkColumnBreaks && child->style()->columnBreakInside() == PBAVOID);
+        ((checkPageBreaks && child->style()->pageBreakInside() == PBAVOID) ||
+         (checkColumnBreaks && child->style()->columnBreakInside() == PBAVOID));
     if (checkInsideAvoid && ty + child->y() > paintInfo.rect.y() &&
         ty + child->y() < paintInfo.rect.bottom() &&
         ty + child->y() + child->height() > paintInfo.rect.bottom()) {
@@ -2421,8 +2422,8 @@ void RenderBlock::paintChildren(PaintInfo& paintInfo, int tx, int ty) {
     // Check for page-break-after: always, and if it's set, break and bail.
     bool checkAfterAlways =
         !childrenInline() &&
-        (checkPageBreaks && child->style()->pageBreakAfter() == PBALWAYS ||
-         checkColumnBreaks && child->style()->columnBreakAfter() == PBALWAYS);
+        ((checkPageBreaks && child->style()->pageBreakAfter() == PBALWAYS) ||
+         (checkColumnBreaks && child->style()->columnBreakAfter() == PBALWAYS));
     if (checkAfterAlways &&
         (ty + child->y() + child->height()) > paintInfo.rect.y() &&
         (ty + child->y() + child->height()) < paintInfo.rect.bottom()) {
