@@ -63,7 +63,9 @@ StyleRareNonInheritedData::StyleRareNonInheritedData()
       ,
       bindingURI(0)
 #endif
-{
+      ,
+      m_pageSize(),
+      m_pageSizeType(PAGE_SIZE_AUTO) {
 }
 
 StyleRareNonInheritedData::StyleRareNonInheritedData(
@@ -106,7 +108,9 @@ StyleRareNonInheritedData::StyleRareNonInheritedData(
       ,
       bindingURI(o.bindingURI ? o.bindingURI->copy() : 0)
 #endif
-{
+      ,
+      m_pageSize(o.m_pageSize),
+      m_pageSizeType(o.m_pageSizeType) {
 }
 
 StyleRareNonInheritedData::~StyleRareNonInheritedData() {}
@@ -154,7 +158,8 @@ bool StyleRareNonInheritedData::operator==(
          (m_backfaceVisibility == o.m_backfaceVisibility) &&
          (m_perspective == o.m_perspective) &&
          (m_perspectiveOriginX == o.m_perspectiveOriginX) &&
-         (m_perspectiveOriginY == o.m_perspectiveOriginY);
+         (m_perspectiveOriginY == o.m_perspectiveOriginY) &&
+         (m_pageSize == o.m_pageSize) && (m_pageSizeType == o.m_pageSizeType);
 }
 
 bool StyleRareNonInheritedData::contentDataEquivalent(

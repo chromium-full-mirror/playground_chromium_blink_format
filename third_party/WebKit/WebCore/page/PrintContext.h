@@ -64,8 +64,14 @@ class PrintContext {
                              const char* propertyName,
                              int pageNumber);
   static bool isPageBoxVisible(Frame* frame, int pageNumber);
-  static String pageAreaRectInPixels(Frame* frame, int pageNumber);
-  static String preferredPageSizeInPixels(Frame* frame, int pageNumber);
+  static String pageSizeAndMarginsInPixels(Frame* frame,
+                                           int pageNumber,
+                                           int width,
+                                           int height,
+                                           int marginTop,
+                                           int marginRight,
+                                           int marginBottom,
+                                           int marginLeft);
   static int numberOfPages(Frame*, const FloatSize& pageSizeInPixels);
 
  protected:

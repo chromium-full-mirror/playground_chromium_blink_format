@@ -816,11 +816,82 @@ static bool parsePageNumber(JSContextRef context,
                             JSValueRef* exception,
                             int& pageNumber) {
   pageNumber = 0;
-  if (argumentCount != 1)
-    return false;
-  pageNumber =
-      static_cast<int>(JSValueToNumber(context, arguments[0], exception));
-  return !*exception;
+  switch (argumentCount) {
+    case 1:
+      pageNumber =
+          static_cast<int>(JSValueToNumber(context, arguments[0], exception));
+      if (*exception)
+        return false;
+    // Fall through.
+    case 0:
+      return true;
+    default:
+      return false;
+  }
+}
+
+static bool parsePageNumberSizeMarings(JSContextRef context,
+                                       int argumentCount,
+                                       const JSValueRef* arguments,
+                                       JSValueRef* exception,
+                                       int& pageNumber,
+                                       int& width,
+                                       int& height,
+                                       int& marginTop,
+                                       int& marginRight,
+                                       int& marginBottom,
+                                       int& marginLeft) {
+  pageNumber = 0;
+  width = height = 0;
+  marginTop = marginRight = marginBottom = marginLeft = 0;
+
+  switch (argumentCount) {
+    case 7:
+      marginLeft =
+          static_cast<int>(JSValueToNumber(context, arguments[6], exception));
+      if (*exception)
+        return false;
+    // Fall through.
+    case 6:
+      marginBottom =
+          static_cast<int>(JSValueToNumber(context, arguments[5], exception));
+      if (*exception)
+        return false;
+    // Fall through.
+    case 5:
+      marginRight =
+          static_cast<int>(JSValueToNumber(context, arguments[4], exception));
+      if (*exception)
+        return false;
+    // Fall through.
+    case 4:
+      marginTop =
+          static_cast<int>(JSValueToNumber(context, arguments[3], exception));
+      if (*exception)
+        return false;
+    // Fall through.
+    case 3:
+      height =
+          static_cast<int>(JSValueToNumber(context, arguments[2], exception));
+      if (*exception)
+        return false;
+    // Fall through.
+    case 2:
+      width =
+          static_cast<int>(JSValueToNumber(context, arguments[1], exception));
+      if (*exception)
+        return false;
+    // Fall through.
+    case 1:
+      pageNumber =
+          static_cast<int>(JSValueToNumber(context, arguments[0], exception));
+      if (*exception)
+        return false;
+      // Fall through.
+      return true;
+    default:
+      return false;
+  }
 }
 
 static JSValueRef pageNumberForElementByIdCallback(JSContextRef context,
@@ -902,24 +973,7 @@ static JSValueRef isPageBoxVisibleCallback(JSContextRef context,
   return JSValueMakeBoolean(context, controller->isPageBoxVisible(pageNumber));
 }
 
-static JSValueRef pageAreaRectInPixelsCallback(JSContextRef context,
-                                               JSObjectRef function,
-                                               JSObjectRef thisObject,
-                                               size_t argumentCount,
-                                               const JSValueRef arguments[],
-                                               JSValueRef* exception) {
-  int pageNumber = 0;
-  if (!parsePageNumber(context, argumentCount, arguments, exception,
-                       pageNumber))
-    return JSValueMakeUndefined(context);
-
-  LayoutTestController* controller =
-      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
-  return JSValueMakeString(context,
-                           controller->pageAreaRectInPixels(pageNumber).get());
-}
-
-static JSValueRef preferredPageSizeInPixelsCallback(
+static JSValueRef pageSizeAndMarginsInPixelsCallback(
     JSContextRef context,
     JSObjectRef function,
     JSObjectRef thisObject,
@@ -927,14 +981,21 @@ static JSValueRef preferredPageSizeInPixelsCallback(
     const JSValueRef arguments[],
     JSValueRef* exception) {
   int pageNumber = 0;
-  if (!parsePageNumber(context, argumentCount, arguments, exception,
-                       pageNumber))
+  int width = 0, height = 0;
+  int marginTop = 0, marginRight = 0, marginBottom = 0, marginLeft = 0;
+  if (!parsePageNumberSizeMarings(context, argumentCount, arguments, exception,
+                                  pageNumber, width, height, marginTop,
+                                  marginRight, marginBottom, marginLeft))
     return JSValueMakeUndefined(context);
 
   LayoutTestController* controller =
       static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
   return JSValueMakeString(
-      context, controller->preferredPageSizeInPixels(pageNumber).get());
+      context,
+      controller
+          ->pageSizeAndMarginsInPixels(pageNumber, width, height, marginTop,
+                                       marginRight, marginBottom, marginLeft)
+          .get());
 }
 
 static JSValueRef queueBackNavigationCallback(JSContextRef context,
@@ -2550,7 +2611,7 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"pageNumberForElementById", pageNumberForElementByIdCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
-      {"pageAreaRectInPixels", pageAreaRectInPixelsCallback,
+      {"pageSizeAndMarginsInPixels", pageSizeAndMarginsInPixelsCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"pageProperty", pagePropertyCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
@@ -2561,8 +2622,6 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"pauseTransitionAtTimeOnElementWithId",
        pauseTransitionAtTimeOnElementWithIdCallback,
-       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
-      {"preferredPageSizeInPixels", preferredPageSizeInPixelsCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"sampleSVGAnimationForElementAtTime",
        sampleSVGAnimationForElementAtTimeCallback,
