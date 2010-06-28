@@ -108,6 +108,8 @@ class WebPluginContainerImpl : public WebCore::Widget,
   // Ends the print operation.
   void printEnd();
 
+  WebString selectedText();
+
   // Resource load events for the plugin's source data:
   void didReceiveResponse(const WebCore::ResourceResponse&);
   void didReceiveData(const char* data, int dataLength);

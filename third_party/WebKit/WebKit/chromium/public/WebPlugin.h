@@ -32,6 +32,7 @@
 #define WebPlugin_h
 
 #include "WebCanvas.h"
+#include "WebString.h"
 
 struct NPObject;
 
@@ -98,6 +99,8 @@ class WebPlugin {
   virtual bool printPage(int pageNumber, WebCanvas* canvas) { return false; }
   // Ends the print operation.
   virtual void printEnd() {}
+
+  virtual WebString selectedText() { return WebString(); }
 
  protected:
   ~WebPlugin() {}
