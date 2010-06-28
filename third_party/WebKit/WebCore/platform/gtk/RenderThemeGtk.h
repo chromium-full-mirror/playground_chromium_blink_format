@@ -201,6 +201,17 @@ class RenderThemeGtk : public RenderTheme {
                                      const IntRect&);
 #endif
 
+#if ENABLE(PROGRESS_TAG)
+  virtual double animationRepeatIntervalForProgressBar(RenderProgress*) const;
+  virtual double animationDurationForProgressBar(RenderProgress*) const;
+  virtual void adjustProgressBarStyle(CSSStyleSelector*,
+                                      RenderStyle*,
+                                      Element*) const;
+  virtual bool paintProgressBar(RenderObject*,
+                                const RenderObject::PaintInfo&,
+                                const IntRect&);
+#endif
+
  private:
   /*
    * hold the state
