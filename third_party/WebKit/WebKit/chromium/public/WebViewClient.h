@@ -140,9 +140,6 @@ class WebViewClient : virtual public WebWidgetClient {
   virtual bool isSmartInsertDeleteEnabled() { return true; }
   virtual bool isSelectTrailingWhitespaceEnabled() { return true; }
 
-  // DEPRECATED: replaced by WebWidgetClient::resetInputMethod().
-  virtual void setInputMethodEnabled(bool enabled) {}
-
   virtual void didBeginEditing() {}
   virtual void didChangeSelection(bool isSelectionEmpty) {}
   virtual void didChangeContents() {}

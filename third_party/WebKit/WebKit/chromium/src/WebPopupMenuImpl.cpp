@@ -210,15 +210,6 @@ void WebPopupMenuImpl::mouseCaptureLost() {}
 
 void WebPopupMenuImpl::setFocus(bool enable) {}
 
-// DEPRECATED, will be removed later.
-bool WebPopupMenuImpl::handleCompositionEvent(WebCompositionCommand command,
-                                              int cursorPosition,
-                                              int targetStart,
-                                              int targetEnd,
-                                              const WebString& imeString) {
-  return false;
-}
-
 bool WebPopupMenuImpl::setComposition(
     const WebString& text,
     const WebVector<WebCompositionUnderline>& underlines,
@@ -228,12 +219,6 @@ bool WebPopupMenuImpl::setComposition(
 }
 
 bool WebPopupMenuImpl::confirmComposition() {
-  return false;
-}
-
-// DEPRECATED, will be removed later.
-bool WebPopupMenuImpl::queryCompositionStatus(bool* enabled,
-                                              WebRect* caretRect) {
   return false;
 }
 
