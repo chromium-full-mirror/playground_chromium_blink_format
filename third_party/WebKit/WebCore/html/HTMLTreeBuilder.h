@@ -172,6 +172,7 @@ class HTMLTreeBuilder : public Noncopyable {
 
   void insertDoctype(AtomicHTMLToken&);
   void insertComment(AtomicHTMLToken&);
+  void insertCommentOnDocument(AtomicHTMLToken&);
   void insertElement(AtomicHTMLToken&);
   void insertSelfClosingElement(AtomicHTMLToken&);
   void insertFormatingElement(AtomicHTMLToken&);
