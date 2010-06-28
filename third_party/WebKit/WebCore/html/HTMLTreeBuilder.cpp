@@ -276,9 +276,9 @@ void HTMLTreeBuilder::processDoctypeToken(AtomicHTMLToken& token) {
   parseError(token);
 }
 
-void HTMLTreeBuilder::insertHTMLStartTagBeforeHTML(AtomicHTMLToken&) {
+void HTMLTreeBuilder::insertHTMLStartTagBeforeHTML(AtomicHTMLToken& token) {
   RefPtr<Element> element = HTMLHtmlElement::create(m_document);
-  // FIXME: Add attributes to |element|.
+  element->setAttributeMap(token.attributes(), m_fragmentScriptingPermission);
   m_document->addChild(element);
   m_openElements.push(element.release());
 }
@@ -871,6 +871,7 @@ void HTMLTreeBuilder::insertScriptElement(AtomicHTMLToken& token) {
   ASSERT_UNUSED(token, token.type() == HTMLToken::StartTag);
   RefPtr<HTMLScriptElement> element =
       HTMLScriptElement::create(scriptTag, m_document, true);
+  element->setAttributeMap(token.attributes(), m_fragmentScriptingPermission);
   currentElement()->addChild(element);
   m_openElements.push(element.release());
   m_tokenizer->setState(HTMLTokenizer::ScriptDataState);
@@ -879,8 +880,10 @@ void HTMLTreeBuilder::insertScriptElement(AtomicHTMLToken& token) {
 }
 
 PassRefPtr<Element> HTMLTreeBuilder::createElement(AtomicHTMLToken& token) {
-  return HTMLElementFactory::createHTMLElement(
+  RefPtr<Element> element = HTMLElementFactory::createHTMLElement(
       QualifiedName(nullAtom, token.name(), xhtmlNamespaceURI), m_document, 0);
+  element->setAttributeMap(token.attributes(), m_fragmentScriptingPermission);
+  return element.release();
 }
 
 void HTMLTreeBuilder::reconstructTheActiveFormattingElements() {
