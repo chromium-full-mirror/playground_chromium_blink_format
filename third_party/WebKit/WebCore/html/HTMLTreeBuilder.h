@@ -174,6 +174,7 @@ class HTMLTreeBuilder : public Noncopyable {
   void insertComment(AtomicHTMLToken&);
   void insertElement(AtomicHTMLToken&);
   void insertSelfClosingElement(AtomicHTMLToken&);
+  void insertFormatingElement(AtomicHTMLToken&);
   void insertGenericRCDATAElement(AtomicHTMLToken&);
   void insertGenericRawTextElement(AtomicHTMLToken&);
   void insertScriptElement(AtomicHTMLToken&);
@@ -182,11 +183,14 @@ class HTMLTreeBuilder : public Noncopyable {
   void insertHTMLStartTagInBody(AtomicHTMLToken&);
 
   PassRefPtr<Element> createElement(AtomicHTMLToken&);
+  void reconstructTheActiveFormattingElements();
 
   Element* currentElement() { return m_openElements.top(); }
 
   RefPtr<Element> m_headElement;
+  RefPtr<Element> m_formElement;
   ElementStack m_openElements;
+  Vector<Element*> m_activeFormattingElements;
   bool m_framesetOk;
 
   // FIXME: Implement error reporting.
