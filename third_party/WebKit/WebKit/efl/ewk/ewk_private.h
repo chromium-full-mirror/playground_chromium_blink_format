@@ -151,6 +151,8 @@ void ewk_view_popup_new(Evas_Object* o,
                         int selected,
                         const WebCore::IntRect& rect);
 
+void ewk_view_download_request(Evas_Object* o, Ewk_Download* download);
+
 Ewk_History* ewk_history_new(WebCore::BackForwardList* history);
 void ewk_history_free(Ewk_History* history);
 
