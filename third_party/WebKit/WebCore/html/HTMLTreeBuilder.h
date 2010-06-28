@@ -26,6 +26,7 @@
 #ifndef HTMLTreeBuilder_h
 #define HTMLTreeBuilder_h
 
+#include "Element.h"
 #include "FragmentScriptingPermission.h"
 #include "HTMLTokenizer.h"
 #include <wtf/Noncopyable.h>
@@ -40,7 +41,6 @@ namespace WebCore {
 class AtomicHTMLToken;
 class Document;
 class DocumentFragment;
-class Element;
 class Frame;
 class HTMLToken;
 class HTMLDocument;
@@ -123,10 +123,14 @@ class HTMLTreeBuilder : public Noncopyable {
 
   class ElementStack : public Noncopyable {
    public:
-    void pop() { m_top = m_top->releaseNext(); }
+    void pop() {
+      top()->finishParsingChildren();
+      m_top = m_top->releaseNext();
+    }
 
     void push(PassRefPtr<Element> element) {
       m_top.set(new ElementRecord(element, m_top.release()));
+      top()->beginParsingChildren();
     }
 
     Element* top() const { return m_top->element(); }
