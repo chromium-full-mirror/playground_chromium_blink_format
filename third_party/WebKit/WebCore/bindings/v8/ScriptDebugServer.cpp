@@ -148,6 +148,8 @@ bool ScriptDebugServer::setBreakpoint(const String& sourceID,
   ASSERT(result->Int32Value() >= 0);
   *actualLineNumber = result->Int32Value();
   return true;
+#else
+  return false;
 #endif
 }
 
