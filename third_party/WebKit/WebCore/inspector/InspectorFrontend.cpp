@@ -291,6 +291,17 @@ void InspectorFrontend::debuggerWasDisabled() {
   callSimpleFunction("debuggerWasDisabled");
 }
 
+void InspectorFrontend::didSetBreakpoint(long callId,
+                                         bool success,
+                                         unsigned line) {
+  ScriptFunctionCall function(m_webInspector, "dispatch");
+  function.appendArgument("didSetBreakpoint");
+  function.appendArgument(callId);
+  function.appendArgument(success);
+  function.appendArgument(line);
+  function.call();
+}
+
 void InspectorFrontend::parsedScriptSource(const String& sourceID,
                                            const String& url,
                                            const String& data,

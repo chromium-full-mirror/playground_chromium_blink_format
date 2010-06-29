@@ -124,9 +124,10 @@ void ScriptDebugServer::removeListener(ScriptDebugListener* listener,
   // FIXME: Remove all breakpoints set by the agent.
 }
 
-void ScriptDebugServer::setBreakpoint(const String& sourceID,
+bool ScriptDebugServer::setBreakpoint(const String& sourceID,
+                                      ScriptBreakpoint breakpoint,
                                       unsigned lineNumber,
-                                      ScriptBreakpoint breakpoint) {
+                                      unsigned* actualLineNumber) {
 #if ENABLE(V8_SCRIPT_DEBUG_SERVER)
   v8::HandleScope scope;
   v8::Local<v8::Context> debuggerContext = v8::Debug::GetDebugContext();
@@ -141,7 +142,12 @@ void ScriptDebugServer::setBreakpoint(const String& sourceID,
   v8::Handle<v8::Function> setBreakpointFunction =
       v8::Local<v8::Function>::Cast(
           m_debuggerScript.get()->Get(v8::String::New("setBreakpoint")));
-  v8::Debug::Call(setBreakpointFunction, args);
+  v8::Handle<v8::Value> result = v8::Debug::Call(setBreakpointFunction, args);
+  if (!result->IsNumber())
+    return false;
+  ASSERT(result->Int32Value() >= 0);
+  *actualLineNumber = result->Int32Value();
+  return true;
 #endif
 }
 

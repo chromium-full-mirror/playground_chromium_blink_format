@@ -107,6 +107,8 @@ class InspectorFrontend : public Noncopyable {
   void debuggerWasEnabled();
   void debuggerWasDisabled();
 
+  void didSetBreakpoint(long callId, bool success, unsigned line);
+
   void parsedScriptSource(const String& sourceID,
                           const String& url,
                           const String& data,

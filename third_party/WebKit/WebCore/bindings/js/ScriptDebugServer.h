@@ -63,9 +63,10 @@ class ScriptDebugServer : JSC::Debugger, public Noncopyable {
   void addListener(ScriptDebugListener*, Page*);
   void removeListener(ScriptDebugListener*, Page*);
 
-  void setBreakpoint(const String& sourceID,
+  bool setBreakpoint(const String& sourceID,
+                     ScriptBreakpoint breakpoint,
                      unsigned lineNumber,
-                     ScriptBreakpoint breakpoint);
+                     unsigned* actualLineNumber);
   void removeBreakpoint(const String& sourceID, unsigned lineNumber);
   void clearBreakpoints();
   void setBreakpointsActivated(bool activated);

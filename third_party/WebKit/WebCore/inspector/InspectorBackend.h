@@ -79,7 +79,8 @@ class InspectorBackend : public RefCounted<InspectorBackend> {
   void enableDebugger(bool always);
   void disableDebugger(bool always);
 
-  void setBreakpoint(const String& sourceID,
+  void setBreakpoint(long callId,
+                     const String& sourceID,
                      unsigned lineNumber,
                      bool enabled,
                      const String& condition);

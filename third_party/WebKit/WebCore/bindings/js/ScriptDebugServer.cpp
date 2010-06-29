@@ -130,16 +130,19 @@ bool ScriptDebugServer::hasListenersInterestedInPage(Page* page) {
   return m_pageListenersMap.contains(page);
 }
 
-void ScriptDebugServer::setBreakpoint(const String& sourceID,
+bool ScriptDebugServer::setBreakpoint(const String& sourceID,
+                                      ScriptBreakpoint breakpoint,
                                       unsigned lineNumber,
-                                      ScriptBreakpoint breakpoint) {
+                                      unsigned* actualLineNumber) {
   intptr_t sourceIDValue = sourceID.toIntPtr();
   if (!sourceIDValue)
-    return;
+    return false;
   BreakpointsMap::iterator it = m_breakpoints.find(sourceIDValue);
   if (it == m_breakpoints.end())
     it = m_breakpoints.set(sourceIDValue, SourceBreakpoints()).first;
   it->second.set(lineNumber, breakpoint);
+  *actualLineNumber = lineNumber;
+  return true;
 }
 
 void ScriptDebugServer::removeBreakpoint(const String& sourceID,

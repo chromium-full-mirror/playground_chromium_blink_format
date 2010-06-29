@@ -164,12 +164,13 @@ void InspectorBackend::disableDebugger(bool always) {
     m_inspectorController->disableDebugger(always);
 }
 
-void InspectorBackend::setBreakpoint(const String& sourceID,
+void InspectorBackend::setBreakpoint(long callId,
+                                     const String& sourceID,
                                      unsigned lineNumber,
                                      bool enabled,
                                      const String& condition) {
   if (m_inspectorController)
-    m_inspectorController->setBreakpoint(sourceID, lineNumber, enabled,
+    m_inspectorController->setBreakpoint(callId, sourceID, lineNumber, enabled,
                                          condition);
 }
 
