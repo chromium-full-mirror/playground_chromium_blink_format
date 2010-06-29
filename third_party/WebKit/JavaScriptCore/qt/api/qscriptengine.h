@@ -53,6 +53,7 @@ class QScriptEngine : public QObject {
   QScriptValue nullValue();
   QScriptValue undefinedValue();
   QScriptValue newObject();
+  QScriptValue newArray(uint length = 0);
   QScriptValue globalObject() const;
 
  private:
