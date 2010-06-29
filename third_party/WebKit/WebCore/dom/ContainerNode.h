@@ -59,6 +59,8 @@ class ContainerNode : public Node {
                            bool shouldLazyAttach = false);
 
   virtual ContainerNode* addChild(PassRefPtr<Node>);
+  virtual void parserAddChild(PassRefPtr<Node>);
+
   bool hasChildNodes() const { return m_firstChild; }
   virtual void attach();
   virtual void detach();
