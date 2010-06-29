@@ -110,6 +110,8 @@ class ContainerNode : public Node {
   void setLastChild(Node* child) { m_lastChild = child; }
 
  private:
+  void addChildCommon(PassRefPtr<Node>);
+
   static void dispatchPostAttachCallbacks();
 
   bool getUpperLeftCorner(FloatPoint&) const;
