@@ -448,7 +448,7 @@ void HTMLTreeBuilder::processStartTag(AtomicHTMLToken& token) {
       if (token.name() == aTag) {
         notImplemented();
         reconstructTheActiveFormattingElements();
-        insertFormatingElement(token);
+        insertFormattingElement(token);
         return;
       }
       if (token.name() == bTag || token.name() == bigTag ||
@@ -458,13 +458,13 @@ void HTMLTreeBuilder::processStartTag(AtomicHTMLToken& token) {
           token.name() == strikeTag || token.name() == strongTag ||
           token.name() == ttTag || token.name() == uTag) {
         reconstructTheActiveFormattingElements();
-        insertFormatingElement(token);
+        insertFormattingElement(token);
         return;
       }
       if (token.name() == nobrTag) {
         reconstructTheActiveFormattingElements();
         notImplemented();
-        insertFormatingElement(token);
+        insertFormattingElement(token);
         return;
       }
       if (token.name() == appletTag || token.name() == marqueeTag ||
@@ -902,7 +902,10 @@ void HTMLTreeBuilder::insertSelfClosingElement(AtomicHTMLToken& token) {
   // http://www.whatwg.org/specs/web-apps/current-work/multipage/tokenization.html#acknowledge-self-closing-flag
 }
 
-void HTMLTreeBuilder::insertFormatingElement(AtomicHTMLToken& token) {
+void HTMLTreeBuilder::insertFormattingElement(AtomicHTMLToken& token) {
+  // http://www.whatwg.org/specs/web-apps/current-work/multipage/parsing.html#the-stack-of-open-elements
+  // Possible active formatting elements include:
+  // a, b, big, code, em, font, i, nobr, s, small, strike, strong, tt, and u.
   insertElement(token);
   m_activeFormattingElements.append(currentElement());
 }
@@ -945,8 +948,38 @@ PassRefPtr<Element> HTMLTreeBuilder::createElement(AtomicHTMLToken& token) {
   return element.release();
 }
 
+unsigned HTMLTreeBuilder::indexOfLastOpenFormattingElementOrMarker() const {
+  ASSERT(!m_activeFormattingElements.isEmpty());
+  for (int index = m_activeFormattingElements.size() - 1; index >= 0; --index) {
+    const FormattingElementEntry& entry = m_activeFormattingElements[index];
+    if (entry.isMarker() || m_openElements.contains(entry.element()))
+      return index;
+  }
+  return -1;  // No elements are open!
+}
+
+void HTMLTreeBuilder::reopenFormattingElementsAfterIndex(
+    unsigned lastOpenElementIndex) {
+  Vector<FormattingElementEntry>& stack = m_activeFormattingElements;
+  unsigned unopenEntryIndex = lastOpenElementIndex + 1;
+  ASSERT(unopenEntryIndex < stack.size());
+  for (; unopenEntryIndex < stack.size(); ++unopenEntryIndex) {
+    FormattingElementEntry& unopenedEntry = stack[unopenEntryIndex];
+    // FIXME: We're supposed to save the original token in the entry.
+    AtomicHTMLToken fakeToken(HTMLToken::StartTag,
+                              unopenedEntry.element()->localName());
+    insertElement(fakeToken);
+    unopenedEntry.replaceElement(currentElement());
+  }
+}
+
 void HTMLTreeBuilder::reconstructTheActiveFormattingElements() {
-  notImplemented();
+  if (m_activeFormattingElements.isEmpty())
+    return;
+
+  unsigned lastOpenElementIndex = indexOfLastOpenFormattingElementOrMarker();
+  if (lastOpenElementIndex < m_activeFormattingElements.size() - 1)
+    reopenFormattingElementsAfterIndex(lastOpenElementIndex);
 }
 
 void HTMLTreeBuilder::finished() {
