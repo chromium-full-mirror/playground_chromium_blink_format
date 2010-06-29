@@ -139,64 +139,66 @@ void HTMLBodyElement::parseMappedAttribute(Attribute* attr) {
       document()->recalcStyle(Force);
   } else if (attr->name() == onloadAttr)
     document()->setWindowAttributeEventListener(
-        eventNames().loadEvent, createWindowAttributeEventListener(this, attr));
+        eventNames().loadEvent,
+        createAttributeEventListener(document()->frame(), attr));
   else if (attr->name() == onbeforeunloadAttr)
     document()->setWindowAttributeEventListener(
         eventNames().beforeunloadEvent,
-        createWindowAttributeEventListener(this, attr));
+        createAttributeEventListener(document()->frame(), attr));
   else if (attr->name() == onunloadAttr)
     document()->setWindowAttributeEventListener(
         eventNames().unloadEvent,
-        createWindowAttributeEventListener(this, attr));
+        createAttributeEventListener(document()->frame(), attr));
   else if (attr->name() == onpagehideAttr)
     document()->setWindowAttributeEventListener(
         eventNames().pagehideEvent,
-        createWindowAttributeEventListener(this, attr));
+        createAttributeEventListener(document()->frame(), attr));
   else if (attr->name() == onpageshowAttr)
     document()->setWindowAttributeEventListener(
         eventNames().pageshowEvent,
-        createWindowAttributeEventListener(this, attr));
+        createAttributeEventListener(document()->frame(), attr));
   else if (attr->name() == onpopstateAttr)
     document()->setWindowAttributeEventListener(
         eventNames().popstateEvent,
-        createWindowAttributeEventListener(this, attr));
+        createAttributeEventListener(document()->frame(), attr));
   else if (attr->name() == onblurAttr)
     document()->setWindowAttributeEventListener(
-        eventNames().blurEvent, createWindowAttributeEventListener(this, attr));
+        eventNames().blurEvent,
+        createAttributeEventListener(document()->frame(), attr));
   else if (attr->name() == onfocusAttr)
     document()->setWindowAttributeEventListener(
         eventNames().focusEvent,
-        createWindowAttributeEventListener(this, attr));
+        createAttributeEventListener(document()->frame(), attr));
 #if ENABLE(ORIENTATION_EVENTS)
   else if (attr->name() == onorientationchangeAttr)
     document()->setWindowAttributeEventListener(
         eventNames().orientationchangeEvent,
-        createWindowAttributeEventListener(this, attr));
+        createAttributeEventListener(document()->frame(), attr));
 #endif
   else if (attr->name() == onhashchangeAttr)
     document()->setWindowAttributeEventListener(
         eventNames().hashchangeEvent,
-        createWindowAttributeEventListener(this, attr));
+        createAttributeEventListener(document()->frame(), attr));
   else if (attr->name() == onresizeAttr)
     document()->setWindowAttributeEventListener(
         eventNames().resizeEvent,
-        createWindowAttributeEventListener(this, attr));
+        createAttributeEventListener(document()->frame(), attr));
   else if (attr->name() == onscrollAttr)
     document()->setWindowAttributeEventListener(
         eventNames().scrollEvent,
-        createWindowAttributeEventListener(this, attr));
+        createAttributeEventListener(document()->frame(), attr));
   else if (attr->name() == onstorageAttr)
     document()->setWindowAttributeEventListener(
         eventNames().storageEvent,
-        createWindowAttributeEventListener(this, attr));
+        createAttributeEventListener(document()->frame(), attr));
   else if (attr->name() == ononlineAttr)
     document()->setWindowAttributeEventListener(
         eventNames().onlineEvent,
-        createWindowAttributeEventListener(this, attr));
+        createAttributeEventListener(document()->frame(), attr));
   else if (attr->name() == onofflineAttr)
     document()->setWindowAttributeEventListener(
         eventNames().offlineEvent,
-        createWindowAttributeEventListener(this, attr));
+        createAttributeEventListener(document()->frame(), attr));
   else
     HTMLElement::parseMappedAttribute(attr);
 }

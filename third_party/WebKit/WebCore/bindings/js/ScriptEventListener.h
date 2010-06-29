@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2009 Google Inc. All rights reserved.
- * Copyright (C) 2010 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -45,9 +44,8 @@ class Frame;
 class Node;
 
 PassRefPtr<JSLazyEventListener> createAttributeEventListener(Node*, Attribute*);
-PassRefPtr<JSLazyEventListener> createWindowAttributeEventListener(
-    Element* windowEquivalentElement,
-    Attribute*);
+PassRefPtr<JSLazyEventListener> createAttributeEventListener(Frame*,
+                                                             Attribute*);
 String eventListenerHandlerBody(ScriptExecutionContext*,
                                 ScriptState*,
                                 EventListener*);
