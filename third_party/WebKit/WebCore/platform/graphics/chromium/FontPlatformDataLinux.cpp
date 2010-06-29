@@ -143,6 +143,7 @@ void FontPlatformData::setupPaint(SkPaint* paint) const {
   paint->setTypeface(m_typeface);
   paint->setFakeBoldText(m_fakeBold);
   paint->setTextSkewX(m_fakeItalic ? -SK_Scalar1 / 4 : 0);
+  paint->setAutohinting(m_style.useAutoHint);
 
   if (m_style.useAntiAlias == 1 ||
       (m_style.useAntiAlias == FontRenderStyle::NoPreference &&
@@ -169,7 +170,8 @@ bool FontPlatformData::operator==(const FontPlatformData& a) const {
     typefacesEqual = SkTypeface::Equal(m_typeface, a.m_typeface);
 
   return typefacesEqual && m_textSize == a.m_textSize &&
-         m_fakeBold == a.m_fakeBold && m_fakeItalic == a.m_fakeItalic;
+         m_fakeBold == a.m_fakeBold && m_fakeItalic == a.m_fakeItalic &&
+         m_style == a.m_style;
 }
 
 unsigned FontPlatformData::hash() const {
