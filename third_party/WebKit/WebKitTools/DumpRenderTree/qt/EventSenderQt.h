@@ -105,6 +105,7 @@ class EventSender : public QObject {
       Qt::KeyboardModifiers,
       Qt::Orientation);
   void sendEvent(QObject* receiver, QEvent* event);
+  void postEvent(QObject* receiver, QEvent* event);
 
  private:
   void sendTouchEvent(QEvent::Type);
