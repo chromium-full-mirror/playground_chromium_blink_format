@@ -90,13 +90,9 @@ class RenderTheme : public RefCounted<RenderTheme> {
   // text of a button, is always rendered by the engine itself.  The boolean
   // return value indicates
   // whether the CSS border/background should also be painted.
-  bool paint(RenderObject*, const RenderObject::PaintInfo&, const IntRect&);
-  bool paintBorderOnly(RenderObject*,
-                       const RenderObject::PaintInfo&,
-                       const IntRect&);
-  bool paintDecorations(RenderObject*,
-                        const RenderObject::PaintInfo&,
-                        const IntRect&);
+  bool paint(RenderObject*, const PaintInfo&, const IntRect&);
+  bool paintBorderOnly(RenderObject*, const PaintInfo&, const IntRect&);
+  bool paintDecorations(RenderObject*, const PaintInfo&, const IntRect&);
 
   // The remaining methods should be implemented by the platform-specific
   // portion of the theme, e.g.,
@@ -209,7 +205,7 @@ class RenderTheme : public RefCounted<RenderTheme> {
 
   // Method for painting the caps lock indicator
   virtual bool paintCapsLockIndicator(RenderObject*,
-                                      const RenderObject::PaintInfo&,
+                                      const PaintInfo&,
                                       const IntRect&) {
     return 0;
   };
@@ -259,9 +255,7 @@ class RenderTheme : public RefCounted<RenderTheme> {
   virtual void adjustCheckboxStyle(CSSStyleSelector*,
                                    RenderStyle*,
                                    Element*) const;
-  virtual bool paintCheckbox(RenderObject*,
-                             const RenderObject::PaintInfo&,
-                             const IntRect&) {
+  virtual bool paintCheckbox(RenderObject*, const PaintInfo&, const IntRect&) {
     return true;
   }
   virtual void setCheckboxSize(RenderStyle*) const {}
@@ -269,9 +263,7 @@ class RenderTheme : public RefCounted<RenderTheme> {
   virtual void adjustRadioStyle(CSSStyleSelector*,
                                 RenderStyle*,
                                 Element*) const;
-  virtual bool paintRadio(RenderObject*,
-                          const RenderObject::PaintInfo&,
-                          const IntRect&) {
+  virtual bool paintRadio(RenderObject*, const PaintInfo&, const IntRect&) {
     return true;
   }
   virtual void setRadioSize(RenderStyle*) const {}
@@ -279,9 +271,7 @@ class RenderTheme : public RefCounted<RenderTheme> {
   virtual void adjustButtonStyle(CSSStyleSelector*,
                                  RenderStyle*,
                                  Element*) const;
-  virtual bool paintButton(RenderObject*,
-                           const RenderObject::PaintInfo&,
-                           const IntRect&) {
+  virtual bool paintButton(RenderObject*, const PaintInfo&, const IntRect&) {
     return true;
   }
   virtual void setButtonSize(RenderStyle*) const {}
@@ -290,7 +280,7 @@ class RenderTheme : public RefCounted<RenderTheme> {
                                           RenderStyle*,
                                           Element*) const;
   virtual bool paintInnerSpinButton(RenderObject*,
-                                    const RenderObject::PaintInfo&,
+                                    const PaintInfo&,
                                     const IntRect&) {
     return true;
   }
@@ -298,7 +288,7 @@ class RenderTheme : public RefCounted<RenderTheme> {
                                           RenderStyle*,
                                           Element*) const;
   virtual bool paintOuterSpinButton(RenderObject*,
-                                    const RenderObject::PaintInfo&,
+                                    const PaintInfo&,
                                     const IntRect&) {
     return true;
   }
@@ -307,27 +297,21 @@ class RenderTheme : public RefCounted<RenderTheme> {
   virtual void adjustTextFieldStyle(CSSStyleSelector*,
                                     RenderStyle*,
                                     Element*) const;
-  virtual bool paintTextField(RenderObject*,
-                              const RenderObject::PaintInfo&,
-                              const IntRect&) {
+  virtual bool paintTextField(RenderObject*, const PaintInfo&, const IntRect&) {
     return true;
   }
 
   virtual void adjustTextAreaStyle(CSSStyleSelector*,
                                    RenderStyle*,
                                    Element*) const;
-  virtual bool paintTextArea(RenderObject*,
-                             const RenderObject::PaintInfo&,
-                             const IntRect&) {
+  virtual bool paintTextArea(RenderObject*, const PaintInfo&, const IntRect&) {
     return true;
   }
 
   virtual void adjustMenuListStyle(CSSStyleSelector*,
                                    RenderStyle*,
                                    Element*) const;
-  virtual bool paintMenuList(RenderObject*,
-                             const RenderObject::PaintInfo&,
-                             const IntRect&) {
+  virtual bool paintMenuList(RenderObject*, const PaintInfo&, const IntRect&) {
     return true;
   }
 
@@ -335,7 +319,7 @@ class RenderTheme : public RefCounted<RenderTheme> {
                                          RenderStyle*,
                                          Element*) const;
   virtual bool paintMenuListButton(RenderObject*,
-                                   const RenderObject::PaintInfo&,
+                                   const PaintInfo&,
                                    const IntRect&) {
     return true;
   }
@@ -344,9 +328,7 @@ class RenderTheme : public RefCounted<RenderTheme> {
   virtual void adjustMeterStyle(CSSStyleSelector*,
                                 RenderStyle*,
                                 Element*) const;
-  virtual bool paintMeter(RenderObject*,
-                          const RenderObject::PaintInfo&,
-                          const IntRect&);
+  virtual bool paintMeter(RenderObject*, const PaintInfo&, const IntRect&);
 #endif
 
 #if ENABLE(PROGRESS_TAG)
@@ -354,7 +336,7 @@ class RenderTheme : public RefCounted<RenderTheme> {
                                       RenderStyle*,
                                       Element*) const;
   virtual bool paintProgressBar(RenderObject*,
-                                const RenderObject::PaintInfo&,
+                                const PaintInfo&,
                                 const IntRect&) {
     return true;
   }
@@ -364,7 +346,7 @@ class RenderTheme : public RefCounted<RenderTheme> {
                                       RenderStyle*,
                                       Element*) const;
   virtual bool paintSliderTrack(RenderObject*,
-                                const RenderObject::PaintInfo&,
+                                const PaintInfo&,
                                 const IntRect&) {
     return true;
   }
@@ -373,7 +355,7 @@ class RenderTheme : public RefCounted<RenderTheme> {
                                       RenderStyle*,
                                       Element*) const;
   virtual bool paintSliderThumb(RenderObject*,
-                                const RenderObject::PaintInfo&,
+                                const PaintInfo&,
                                 const IntRect&) {
     return true;
   }
@@ -382,7 +364,7 @@ class RenderTheme : public RefCounted<RenderTheme> {
                                       RenderStyle*,
                                       Element*) const;
   virtual bool paintSearchField(RenderObject*,
-                                const RenderObject::PaintInfo&,
+                                const PaintInfo&,
                                 const IntRect&) {
     return true;
   }
@@ -391,7 +373,7 @@ class RenderTheme : public RefCounted<RenderTheme> {
                                                   RenderStyle*,
                                                   Element*) const;
   virtual bool paintSearchFieldCancelButton(RenderObject*,
-                                            const RenderObject::PaintInfo&,
+                                            const PaintInfo&,
                                             const IntRect&) {
     return true;
   }
@@ -400,7 +382,7 @@ class RenderTheme : public RefCounted<RenderTheme> {
                                                 RenderStyle*,
                                                 Element*) const;
   virtual bool paintSearchFieldDecoration(RenderObject*,
-                                          const RenderObject::PaintInfo&,
+                                          const PaintInfo&,
                                           const IntRect&) {
     return true;
   }
@@ -409,7 +391,7 @@ class RenderTheme : public RefCounted<RenderTheme> {
                                                        RenderStyle*,
                                                        Element*) const;
   virtual bool paintSearchFieldResultsDecoration(RenderObject*,
-                                                 const RenderObject::PaintInfo&,
+                                                 const PaintInfo&,
                                                  const IntRect&) {
     return true;
   }
@@ -418,89 +400,88 @@ class RenderTheme : public RefCounted<RenderTheme> {
                                                    RenderStyle*,
                                                    Element*) const;
   virtual bool paintSearchFieldResultsButton(RenderObject*,
-                                             const RenderObject::PaintInfo&,
+                                             const PaintInfo&,
                                              const IntRect&) {
     return true;
   }
 
   virtual bool paintMediaFullscreenButton(RenderObject*,
-                                          const RenderObject::PaintInfo&,
+                                          const PaintInfo&,
                                           const IntRect&) {
     return true;
   }
   virtual bool paintMediaPlayButton(RenderObject*,
-                                    const RenderObject::PaintInfo&,
+                                    const PaintInfo&,
                                     const IntRect&) {
     return true;
   }
   virtual bool paintMediaMuteButton(RenderObject*,
-                                    const RenderObject::PaintInfo&,
+                                    const PaintInfo&,
                                     const IntRect&) {
     return true;
   }
   virtual bool paintMediaSeekBackButton(RenderObject*,
-                                        const RenderObject::PaintInfo&,
+                                        const PaintInfo&,
                                         const IntRect&) {
     return true;
   }
   virtual bool paintMediaSeekForwardButton(RenderObject*,
-                                           const RenderObject::PaintInfo&,
+                                           const PaintInfo&,
                                            const IntRect&) {
     return true;
   }
   virtual bool paintMediaSliderTrack(RenderObject*,
-                                     const RenderObject::PaintInfo&,
+                                     const PaintInfo&,
                                      const IntRect&) {
     return true;
   }
   virtual bool paintMediaSliderThumb(RenderObject*,
-                                     const RenderObject::PaintInfo&,
+                                     const PaintInfo&,
                                      const IntRect&) {
     return true;
   }
   virtual bool paintMediaVolumeSliderContainer(RenderObject*,
-                                               const RenderObject::PaintInfo&,
+                                               const PaintInfo&,
                                                const IntRect&) {
     return true;
   }
   virtual bool paintMediaVolumeSliderTrack(RenderObject*,
-                                           const RenderObject::PaintInfo&,
+                                           const PaintInfo&,
                                            const IntRect&) {
     return true;
   }
   virtual bool paintMediaVolumeSliderThumb(RenderObject*,
-                                           const RenderObject::PaintInfo&,
+                                           const PaintInfo&,
                                            const IntRect&) {
     return true;
   }
   virtual bool paintMediaRewindButton(RenderObject*,
-                                      const RenderObject::PaintInfo&,
+                                      const PaintInfo&,
                                       const IntRect&) {
     return true;
   }
   virtual bool paintMediaReturnToRealtimeButton(RenderObject*,
-                                                const RenderObject::PaintInfo&,
+                                                const PaintInfo&,
                                                 const IntRect&) {
     return true;
   }
-  virtual bool paintMediaToggleClosedCaptionsButton(
-      RenderObject*,
-      const RenderObject::PaintInfo&,
-      const IntRect&) {
+  virtual bool paintMediaToggleClosedCaptionsButton(RenderObject*,
+                                                    const PaintInfo&,
+                                                    const IntRect&) {
     return true;
   }
   virtual bool paintMediaControlsBackground(RenderObject*,
-                                            const RenderObject::PaintInfo&,
+                                            const PaintInfo&,
                                             const IntRect&) {
     return true;
   }
   virtual bool paintMediaCurrentTime(RenderObject*,
-                                     const RenderObject::PaintInfo&,
+                                     const PaintInfo&,
                                      const IntRect&) {
     return true;
   }
   virtual bool paintMediaTimeRemaining(RenderObject*,
-                                       const RenderObject::PaintInfo&,
+                                       const PaintInfo&,
                                        const IntRect&) {
     return true;
   }

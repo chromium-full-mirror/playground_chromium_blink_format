@@ -56,7 +56,7 @@ const int listboxPadding = 5;
 // the color of selection in TextViews in the system.
 const RGBA32 selectionColor = makeRGB(255, 146, 0);
 
-static SkCanvas* getCanvasFromInfo(const RenderObject::PaintInfo& info) {
+static SkCanvas* getCanvasFromInfo(const PaintInfo& info) {
   return info.context->platformContext()->mCanvas;
 }
 
@@ -192,14 +192,14 @@ void RenderThemeAndroid::adjustButtonStyle(CSSStyleSelector*,
 }
 
 bool RenderThemeAndroid::paintCheckbox(RenderObject* obj,
-                                       const RenderObject::PaintInfo& info,
+                                       const PaintInfo& info,
                                        const IntRect& rect) {
   RenderSkinRadio::Draw(getCanvasFromInfo(info), obj->node(), rect, true);
   return false;
 }
 
 bool RenderThemeAndroid::paintButton(RenderObject* obj,
-                                     const RenderObject::PaintInfo& info,
+                                     const PaintInfo& info,
                                      const IntRect& rect) {
   // If it is a disabled button, simply paint it to the master picture.
   Node* node = obj->node();
@@ -216,7 +216,7 @@ bool RenderThemeAndroid::paintButton(RenderObject* obj,
 }
 
 bool RenderThemeAndroid::paintRadio(RenderObject* obj,
-                                    const RenderObject::PaintInfo& info,
+                                    const PaintInfo& info,
                                     const IntRect& rect) {
   RenderSkinRadio::Draw(getCanvasFromInfo(info), obj->node(), rect, false);
   return false;
@@ -239,7 +239,7 @@ void RenderThemeAndroid::adjustTextFieldStyle(CSSStyleSelector*,
 }
 
 bool RenderThemeAndroid::paintTextField(RenderObject*,
-                                        const RenderObject::PaintInfo&,
+                                        const PaintInfo&,
                                         const IntRect&) {
   return true;
 }
@@ -251,7 +251,7 @@ void RenderThemeAndroid::adjustTextAreaStyle(CSSStyleSelector*,
 }
 
 bool RenderThemeAndroid::paintTextArea(RenderObject* obj,
-                                       const RenderObject::PaintInfo& info,
+                                       const PaintInfo& info,
                                        const IntRect& rect) {
   if (!obj->isListBox())
     return true;
@@ -314,7 +314,7 @@ void RenderThemeAndroid::adjustSearchFieldStyle(CSSStyleSelector*,
 }
 
 bool RenderThemeAndroid::paintSearchField(RenderObject*,
-                                          const RenderObject::PaintInfo&,
+                                          const PaintInfo&,
                                           const IntRect&) {
   return true;
 }
@@ -342,7 +342,7 @@ void RenderThemeAndroid::adjustMenuListStyle(CSSStyleSelector*,
 }
 
 bool RenderThemeAndroid::paintCombo(RenderObject* obj,
-                                    const RenderObject::PaintInfo& info,
+                                    const PaintInfo& info,
                                     const IntRect& rect) {
   if (obj->style() && !obj->style()->backgroundColor().alpha())
     return true;
@@ -351,7 +351,7 @@ bool RenderThemeAndroid::paintCombo(RenderObject* obj,
 }
 
 bool RenderThemeAndroid::paintMenuList(RenderObject* obj,
-                                       const RenderObject::PaintInfo& info,
+                                       const PaintInfo& info,
                                        const IntRect& rect) {
   return paintCombo(obj, info, rect);
 }
@@ -380,10 +380,9 @@ void RenderThemeAndroid::adjustMenuListButtonStyle(CSSStyleSelector*,
   adjustMenuListStyleCommon(style, e);
 }
 
-bool RenderThemeAndroid::paintMenuListButton(
-    RenderObject* obj,
-    const RenderObject::PaintInfo& info,
-    const IntRect& rect) {
+bool RenderThemeAndroid::paintMenuListButton(RenderObject* obj,
+                                             const PaintInfo& info,
+                                             const IntRect& rect) {
   return paintCombo(obj, info, rect);
 }
 

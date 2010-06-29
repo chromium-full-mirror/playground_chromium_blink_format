@@ -437,7 +437,7 @@ NSControlSize RenderThemeSafari::controlSizeForSystemFont(
 }
 
 bool RenderThemeSafari::paintCheckbox(RenderObject* o,
-                                      const RenderObject::PaintInfo& paintInfo,
+                                      const PaintInfo& paintInfo,
                                       const IntRect& r) {
   ASSERT(SafariThemeLibrary());
 
@@ -475,7 +475,7 @@ void RenderThemeSafari::setCheckboxSize(RenderStyle* style) const {
 }
 
 bool RenderThemeSafari::paintRadio(RenderObject* o,
-                                   const RenderObject::PaintInfo& paintInfo,
+                                   const PaintInfo& paintInfo,
                                    const IntRect& r) {
   ASSERT(SafariThemeLibrary());
 
@@ -605,7 +605,7 @@ void RenderThemeSafari::setButtonSize(RenderStyle* style) const {
 }
 
 bool RenderThemeSafari::paintButton(RenderObject* o,
-                                    const RenderObject::PaintInfo& paintInfo,
+                                    const PaintInfo& paintInfo,
                                     const IntRect& r) {
   ASSERT(SafariThemeLibrary());
 
@@ -643,7 +643,7 @@ bool RenderThemeSafari::paintButton(RenderObject* o,
 }
 
 bool RenderThemeSafari::paintTextField(RenderObject* o,
-                                       const RenderObject::PaintInfo& paintInfo,
+                                       const PaintInfo& paintInfo,
                                        const IntRect& r) {
   ASSERT(SafariThemeLibrary());
 
@@ -657,10 +657,9 @@ void RenderThemeSafari::adjustTextFieldStyle(CSSStyleSelector*,
                                              RenderStyle*,
                                              Element*) const {}
 
-bool RenderThemeSafari::paintCapsLockIndicator(
-    RenderObject* o,
-    const RenderObject::PaintInfo& paintInfo,
-    const IntRect& r) {
+bool RenderThemeSafari::paintCapsLockIndicator(RenderObject* o,
+                                               const PaintInfo& paintInfo,
+                                               const IntRect& r) {
 #if defined(SAFARI_THEME_VERSION) && SAFARI_THEME_VERSION >= 1
   ASSERT(SafariThemeLibrary());
 
@@ -677,7 +676,7 @@ bool RenderThemeSafari::paintCapsLockIndicator(
 }
 
 bool RenderThemeSafari::paintTextArea(RenderObject* o,
-                                      const RenderObject::PaintInfo& paintInfo,
+                                      const PaintInfo& paintInfo,
                                       const IntRect& r) {
   ASSERT(SafariThemeLibrary());
 
@@ -709,7 +708,7 @@ const int* RenderThemeSafari::popupButtonPadding(NSControlSize size) const {
 }
 
 bool RenderThemeSafari::paintMenuList(RenderObject* o,
-                                      const RenderObject::PaintInfo& info,
+                                      const PaintInfo& info,
                                       const IntRect& r) {
   ASSERT(SafariThemeLibrary());
 
@@ -784,10 +783,9 @@ static void TrackGradientInterpolate(void* info,
     outData[i] = (1.0f - a) * dark[i] + a * light[i];
 }
 
-void RenderThemeSafari::paintMenuListButtonGradients(
-    RenderObject* o,
-    const RenderObject::PaintInfo& paintInfo,
-    const IntRect& r) {
+void RenderThemeSafari::paintMenuListButtonGradients(RenderObject* o,
+                                                     const PaintInfo& paintInfo,
+                                                     const IntRect& r) {
   if (r.isEmpty())
     return;
 
@@ -883,10 +881,9 @@ void RenderThemeSafari::paintMenuListButtonGradients(
   paintInfo.context->restore();
 }
 
-bool RenderThemeSafari::paintMenuListButton(
-    RenderObject* o,
-    const RenderObject::PaintInfo& paintInfo,
-    const IntRect& r) {
+bool RenderThemeSafari::paintMenuListButton(RenderObject* o,
+                                            const PaintInfo& paintInfo,
+                                            const IntRect& r) {
   IntRect bounds = IntRect(r.x() + o->style()->borderLeftWidth(),
                            r.y() + o->style()->borderTopWidth(),
                            r.width() - o->style()->borderLeftWidth() -
@@ -1042,10 +1039,9 @@ int RenderThemeSafari::minimumMenuListSize(RenderStyle* style) const {
 const int trackWidth = 5;
 const int trackRadius = 2;
 
-bool RenderThemeSafari::paintSliderTrack(
-    RenderObject* o,
-    const RenderObject::PaintInfo& paintInfo,
-    const IntRect& r) {
+bool RenderThemeSafari::paintSliderTrack(RenderObject* o,
+                                         const PaintInfo& paintInfo,
+                                         const IntRect& r) {
   IntRect bounds = r;
 
   if (o->style()->appearance() == SliderHorizontalPart) {
@@ -1094,10 +1090,9 @@ void RenderThemeSafari::adjustSliderThumbStyle(CSSStyleSelector* selector,
 
 const float verticalSliderHeightPadding = 0.1f;
 
-bool RenderThemeSafari::paintSliderThumb(
-    RenderObject* o,
-    const RenderObject::PaintInfo& paintInfo,
-    const IntRect& r) {
+bool RenderThemeSafari::paintSliderThumb(RenderObject* o,
+                                         const PaintInfo& paintInfo,
+                                         const IntRect& r) {
   ASSERT(SafariThemeLibrary());
 
   ASSERT(o->parent()->isSlider());
@@ -1128,10 +1123,9 @@ void RenderThemeSafari::adjustSliderThumbSize(RenderObject* o) const {
 #endif
 }
 
-bool RenderThemeSafari::paintSearchField(
-    RenderObject* o,
-    const RenderObject::PaintInfo& paintInfo,
-    const IntRect& r) {
+bool RenderThemeSafari::paintSearchField(RenderObject* o,
+                                         const PaintInfo& paintInfo,
+                                         const IntRect& r) {
   ASSERT(SafariThemeLibrary());
 
   paintThemePart(SafariTheme::SearchFieldPart,
@@ -1185,10 +1179,9 @@ void RenderThemeSafari::adjustSearchFieldStyle(CSSStyleSelector* selector,
   setFontFromControlSize(selector, style, controlSize);
 }
 
-bool RenderThemeSafari::paintSearchFieldCancelButton(
-    RenderObject* o,
-    const RenderObject::PaintInfo& paintInfo,
-    const IntRect&) {
+bool RenderThemeSafari::paintSearchFieldCancelButton(RenderObject* o,
+                                                     const PaintInfo& paintInfo,
+                                                     const IntRect&) {
   ASSERT(SafariThemeLibrary());
 
   Node* input = o->node()->shadowAncestorNode();
@@ -1236,10 +1229,9 @@ void RenderThemeSafari::adjustSearchFieldDecorationStyle(
   style->setHeight(Length(size.height(), Fixed));
 }
 
-bool RenderThemeSafari::paintSearchFieldDecoration(
-    RenderObject*,
-    const RenderObject::PaintInfo&,
-    const IntRect&) {
+bool RenderThemeSafari::paintSearchFieldDecoration(RenderObject*,
+                                                   const PaintInfo&,
+                                                   const IntRect&) {
   return false;
 }
 
@@ -1254,7 +1246,7 @@ void RenderThemeSafari::adjustSearchFieldResultsDecorationStyle(
 
 bool RenderThemeSafari::paintSearchFieldResultsDecoration(
     RenderObject* o,
-    const RenderObject::PaintInfo& paintInfo,
+    const PaintInfo& paintInfo,
     const IntRect&) {
   ASSERT(SafariThemeLibrary());
 
@@ -1284,7 +1276,7 @@ void RenderThemeSafari::adjustSearchFieldResultsButtonStyle(
 
 bool RenderThemeSafari::paintSearchFieldResultsButton(
     RenderObject* o,
-    const RenderObject::PaintInfo& paintInfo,
+    const PaintInfo& paintInfo,
     const IntRect&) {
   ASSERT(SafariThemeLibrary());
 
@@ -1302,58 +1294,51 @@ bool RenderThemeSafari::paintSearchFieldResultsButton(
   return false;
 }
 #if ENABLE(VIDEO)
-bool RenderThemeSafari::paintMediaFullscreenButton(
-    RenderObject* o,
-    const RenderObject::PaintInfo& paintInfo,
-    const IntRect& r) {
+bool RenderThemeSafari::paintMediaFullscreenButton(RenderObject* o,
+                                                   const PaintInfo& paintInfo,
+                                                   const IntRect& r) {
   return RenderMediaControls::paintMediaControlsPart(MediaFullscreenButton, o,
                                                      paintInfo, r);
 }
 
-bool RenderThemeSafari::paintMediaMuteButton(
-    RenderObject* o,
-    const RenderObject::PaintInfo& paintInfo,
-    const IntRect& r) {
+bool RenderThemeSafari::paintMediaMuteButton(RenderObject* o,
+                                             const PaintInfo& paintInfo,
+                                             const IntRect& r) {
   return RenderMediaControls::paintMediaControlsPart(MediaMuteButton, o,
                                                      paintInfo, r);
 }
 
-bool RenderThemeSafari::paintMediaPlayButton(
-    RenderObject* o,
-    const RenderObject::PaintInfo& paintInfo,
-    const IntRect& r) {
+bool RenderThemeSafari::paintMediaPlayButton(RenderObject* o,
+                                             const PaintInfo& paintInfo,
+                                             const IntRect& r) {
   return RenderMediaControls::paintMediaControlsPart(MediaPlayButton, o,
                                                      paintInfo, r);
 }
 
-bool RenderThemeSafari::paintMediaSeekBackButton(
-    RenderObject* o,
-    const RenderObject::PaintInfo& paintInfo,
-    const IntRect& r) {
+bool RenderThemeSafari::paintMediaSeekBackButton(RenderObject* o,
+                                                 const PaintInfo& paintInfo,
+                                                 const IntRect& r) {
   return RenderMediaControls::paintMediaControlsPart(MediaSeekBackButton, o,
                                                      paintInfo, r);
 }
 
-bool RenderThemeSafari::paintMediaSeekForwardButton(
-    RenderObject* o,
-    const RenderObject::PaintInfo& paintInfo,
-    const IntRect& r) {
+bool RenderThemeSafari::paintMediaSeekForwardButton(RenderObject* o,
+                                                    const PaintInfo& paintInfo,
+                                                    const IntRect& r) {
   return RenderMediaControls::paintMediaControlsPart(MediaSeekForwardButton, o,
                                                      paintInfo, r);
 }
 
-bool RenderThemeSafari::paintMediaSliderTrack(
-    RenderObject* o,
-    const RenderObject::PaintInfo& paintInfo,
-    const IntRect& r) {
+bool RenderThemeSafari::paintMediaSliderTrack(RenderObject* o,
+                                              const PaintInfo& paintInfo,
+                                              const IntRect& r) {
   return RenderMediaControls::paintMediaControlsPart(MediaSlider, o, paintInfo,
                                                      r);
 }
 
-bool RenderThemeSafari::paintMediaSliderThumb(
-    RenderObject* o,
-    const RenderObject::PaintInfo& paintInfo,
-    const IntRect& r) {
+bool RenderThemeSafari::paintMediaSliderThumb(RenderObject* o,
+                                              const PaintInfo& paintInfo,
+                                              const IntRect& r) {
   return RenderMediaControls::paintMediaControlsPart(MediaSliderThumb, o,
                                                      paintInfo, r);
 }

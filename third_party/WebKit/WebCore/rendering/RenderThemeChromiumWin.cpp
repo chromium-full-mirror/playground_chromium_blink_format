@@ -389,18 +389,18 @@ void RenderThemeChromiumWin::adjustSliderThumbSize(RenderObject* o) const {
 }
 
 bool RenderThemeChromiumWin::paintCheckbox(RenderObject* o,
-                                           const RenderObject::PaintInfo& i,
+                                           const PaintInfo& i,
                                            const IntRect& r) {
   return paintButton(o, i, r);
 }
 bool RenderThemeChromiumWin::paintRadio(RenderObject* o,
-                                        const RenderObject::PaintInfo& i,
+                                        const PaintInfo& i,
                                         const IntRect& r) {
   return paintButton(o, i, r);
 }
 
 bool RenderThemeChromiumWin::paintButton(RenderObject* o,
-                                         const RenderObject::PaintInfo& i,
+                                         const PaintInfo& i,
                                          const IntRect& r) {
   const ThemeData& themeData = getThemeData(o);
 
@@ -412,13 +412,13 @@ bool RenderThemeChromiumWin::paintButton(RenderObject* o,
 }
 
 bool RenderThemeChromiumWin::paintTextField(RenderObject* o,
-                                            const RenderObject::PaintInfo& i,
+                                            const PaintInfo& i,
                                             const IntRect& r) {
   return paintTextFieldInternal(o, i, r, true);
 }
 
 bool RenderThemeChromiumWin::paintSliderTrack(RenderObject* o,
-                                              const RenderObject::PaintInfo& i,
+                                              const PaintInfo& i,
                                               const IntRect& r) {
   const ThemeData& themeData = getThemeData(o);
 
@@ -430,14 +430,14 @@ bool RenderThemeChromiumWin::paintSliderTrack(RenderObject* o,
 }
 
 bool RenderThemeChromiumWin::paintSliderThumb(RenderObject* o,
-                                              const RenderObject::PaintInfo& i,
+                                              const PaintInfo& i,
                                               const IntRect& r) {
   return paintSliderTrack(o, i, r);
 }
 
 // Used to paint unstyled menulists (i.e. with the default border)
 bool RenderThemeChromiumWin::paintMenuList(RenderObject* o,
-                                           const RenderObject::PaintInfo& i,
+                                           const PaintInfo& i,
                                            const IntRect& r) {
   if (!o->isBox())
     return false;
@@ -624,11 +624,10 @@ ThemeData RenderThemeChromiumWin::getThemeData(RenderObject* o) {
   return result;
 }
 
-bool RenderThemeChromiumWin::paintTextFieldInternal(
-    RenderObject* o,
-    const RenderObject::PaintInfo& i,
-    const IntRect& r,
-    bool drawEdges) {
+bool RenderThemeChromiumWin::paintTextFieldInternal(RenderObject* o,
+                                                    const PaintInfo& i,
+                                                    const IntRect& r,
+                                                    bool drawEdges) {
   // Fallback to white if the specified color object is invalid.
   // (Note ChromiumBridge::paintTextField duplicates this check).
   Color backgroundColor(Color::white);
@@ -695,7 +694,7 @@ void RenderThemeChromiumWin::adjustProgressBarStyle(CSSStyleSelector*,
                                                     Element*) const {}
 
 bool RenderThemeChromiumWin::paintProgressBar(RenderObject* o,
-                                              const RenderObject::PaintInfo& i,
+                                              const PaintInfo& i,
                                               const IntRect& r) {
   if (!o->isProgress())
     return true;

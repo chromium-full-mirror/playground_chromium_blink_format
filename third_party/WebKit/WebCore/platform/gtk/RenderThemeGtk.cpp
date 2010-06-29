@@ -309,7 +309,7 @@ static void setMozillaState(const RenderTheme* theme,
 static bool paintMozillaGtkWidget(const RenderThemeGtk* theme,
                                   GtkThemeWidgetType type,
                                   RenderObject* o,
-                                  const RenderObject::PaintInfo& i,
+                                  const PaintInfo& i,
                                   const IntRect& rect) {
   // Painting is disabled so just claim to have succeeded
   if (i.context->paintingDisabled())
@@ -431,7 +431,7 @@ void RenderThemeGtk::setCheckboxSize(RenderStyle* style) const {
 }
 
 bool RenderThemeGtk::paintCheckbox(RenderObject* o,
-                                   const RenderObject::PaintInfo& i,
+                                   const PaintInfo& i,
                                    const IntRect& rect) {
   return paintMozillaGtkWidget(this, MOZ_GTK_CHECKBUTTON, o, i, rect);
 }
@@ -441,7 +441,7 @@ void RenderThemeGtk::setRadioSize(RenderStyle* style) const {
 }
 
 bool RenderThemeGtk::paintRadio(RenderObject* o,
-                                const RenderObject::PaintInfo& i,
+                                const PaintInfo& i,
                                 const IntRect& rect) {
   return paintMozillaGtkWidget(this, MOZ_GTK_RADIOBUTTON, o, i, rect);
 }
@@ -464,7 +464,7 @@ void RenderThemeGtk::adjustButtonStyle(CSSStyleSelector* selector,
 }
 
 bool RenderThemeGtk::paintButton(RenderObject* o,
-                                 const RenderObject::PaintInfo& i,
+                                 const PaintInfo& i,
                                  const IntRect& rect) {
   return paintMozillaGtkWidget(this, MOZ_GTK_BUTTON, o, i, rect);
 }
@@ -480,7 +480,7 @@ void RenderThemeGtk::adjustMenuListStyle(CSSStyleSelector* selector,
 }
 
 bool RenderThemeGtk::paintMenuList(RenderObject* o,
-                                   const RenderObject::PaintInfo& i,
+                                   const PaintInfo& i,
                                    const IntRect& rect) {
   return paintMozillaGtkWidget(this, MOZ_GTK_DROPDOWN, o, i, rect);
 }
@@ -496,13 +496,13 @@ void RenderThemeGtk::adjustTextFieldStyle(CSSStyleSelector* selector,
 }
 
 bool RenderThemeGtk::paintTextField(RenderObject* o,
-                                    const RenderObject::PaintInfo& i,
+                                    const PaintInfo& i,
                                     const IntRect& rect) {
   return paintMozillaGtkWidget(this, MOZ_GTK_ENTRY, o, i, rect);
 }
 
 bool RenderThemeGtk::paintTextArea(RenderObject* o,
-                                   const RenderObject::PaintInfo& i,
+                                   const PaintInfo& i,
                                    const IntRect& r) {
   return paintTextField(o, i, r);
 }
@@ -514,10 +514,9 @@ void RenderThemeGtk::adjustSearchFieldResultsButtonStyle(
   adjustSearchFieldCancelButtonStyle(selector, style, e);
 }
 
-bool RenderThemeGtk::paintSearchFieldResultsButton(
-    RenderObject* o,
-    const RenderObject::PaintInfo& i,
-    const IntRect& rect) {
+bool RenderThemeGtk::paintSearchFieldResultsButton(RenderObject* o,
+                                                   const PaintInfo& i,
+                                                   const IntRect& rect) {
   return paintMozillaGtkWidget(this, MOZ_GTK_DROPDOWN_ARROW, o, i, rect);
 }
 
@@ -534,10 +533,9 @@ void RenderThemeGtk::adjustSearchFieldResultsDecorationStyle(
   style->setHeight(Length(size.height(), Fixed));
 }
 
-bool RenderThemeGtk::paintSearchFieldResultsDecoration(
-    RenderObject* o,
-    const RenderObject::PaintInfo& i,
-    const IntRect& rect) {
+bool RenderThemeGtk::paintSearchFieldResultsDecoration(RenderObject* o,
+                                                       const PaintInfo& i,
+                                                       const IntRect& rect) {
   return paintMozillaGtkWidget(this, MOZ_GTK_CHECKMENUITEM, o, i, rect);
 }
 
@@ -554,10 +552,9 @@ void RenderThemeGtk::adjustSearchFieldCancelButtonStyle(
   style->setHeight(Length(size.height(), Fixed));
 }
 
-bool RenderThemeGtk::paintSearchFieldCancelButton(
-    RenderObject* o,
-    const RenderObject::PaintInfo& i,
-    const IntRect& rect) {
+bool RenderThemeGtk::paintSearchFieldCancelButton(RenderObject* o,
+                                                  const PaintInfo& i,
+                                                  const IntRect& rect) {
   return paintMozillaGtkWidget(this, MOZ_GTK_CHECKMENUITEM, o, i, rect);
 }
 
@@ -568,13 +565,13 @@ void RenderThemeGtk::adjustSearchFieldStyle(CSSStyleSelector* selector,
 }
 
 bool RenderThemeGtk::paintSearchField(RenderObject* o,
-                                      const RenderObject::PaintInfo& i,
+                                      const PaintInfo& i,
                                       const IntRect& rect) {
   return paintTextField(o, i, rect);
 }
 
 bool RenderThemeGtk::paintSliderTrack(RenderObject* object,
-                                      const RenderObject::PaintInfo& info,
+                                      const PaintInfo& info,
                                       const IntRect& rect) {
   ControlPart part = object->style()->appearance();
   ASSERT(part == SliderHorizontalPart || part == SliderVerticalPart);
@@ -593,7 +590,7 @@ void RenderThemeGtk::adjustSliderTrackStyle(CSSStyleSelector*,
 }
 
 bool RenderThemeGtk::paintSliderThumb(RenderObject* object,
-                                      const RenderObject::PaintInfo& info,
+                                      const PaintInfo& info,
                                       const IntRect& rect) {
   ControlPart part = object->style()->appearance();
   ASSERT(part == SliderThumbHorizontalPart || part == SliderThumbVerticalPart);
@@ -791,18 +788,16 @@ static inline bool paintMediaButton(GraphicsContext* context,
   return false;
 }
 
-bool RenderThemeGtk::paintMediaFullscreenButton(
-    RenderObject* o,
-    const RenderObject::PaintInfo& paintInfo,
-    const IntRect& r) {
+bool RenderThemeGtk::paintMediaFullscreenButton(RenderObject* o,
+                                                const PaintInfo& paintInfo,
+                                                const IntRect& r) {
   return paintMediaButton(paintInfo.context, r, m_fullscreenButton.get(),
                           m_panelColor, m_mediaIconSize);
 }
 
-bool RenderThemeGtk::paintMediaMuteButton(
-    RenderObject* o,
-    const RenderObject::PaintInfo& paintInfo,
-    const IntRect& r) {
+bool RenderThemeGtk::paintMediaMuteButton(RenderObject* o,
+                                          const PaintInfo& paintInfo,
+                                          const IntRect& r) {
   HTMLMediaElement* mediaElement = getMediaElementFromRenderObject(o);
   if (!mediaElement)
     return false;
@@ -813,10 +808,9 @@ bool RenderThemeGtk::paintMediaMuteButton(
       m_panelColor, m_mediaIconSize);
 }
 
-bool RenderThemeGtk::paintMediaPlayButton(
-    RenderObject* o,
-    const RenderObject::PaintInfo& paintInfo,
-    const IntRect& r) {
+bool RenderThemeGtk::paintMediaPlayButton(RenderObject* o,
+                                          const PaintInfo& paintInfo,
+                                          const IntRect& r) {
   HTMLMediaElement* mediaElement = getMediaElementFromRenderObject(o);
   if (!mediaElement)
     return false;
@@ -827,26 +821,23 @@ bool RenderThemeGtk::paintMediaPlayButton(
       m_panelColor, m_mediaIconSize);
 }
 
-bool RenderThemeGtk::paintMediaSeekBackButton(
-    RenderObject* o,
-    const RenderObject::PaintInfo& paintInfo,
-    const IntRect& r) {
+bool RenderThemeGtk::paintMediaSeekBackButton(RenderObject* o,
+                                              const PaintInfo& paintInfo,
+                                              const IntRect& r) {
   return paintMediaButton(paintInfo.context, r, m_seekBackButton.get(),
                           m_panelColor, m_mediaIconSize);
 }
 
-bool RenderThemeGtk::paintMediaSeekForwardButton(
-    RenderObject* o,
-    const RenderObject::PaintInfo& paintInfo,
-    const IntRect& r) {
+bool RenderThemeGtk::paintMediaSeekForwardButton(RenderObject* o,
+                                                 const PaintInfo& paintInfo,
+                                                 const IntRect& r) {
   return paintMediaButton(paintInfo.context, r, m_seekForwardButton.get(),
                           m_panelColor, m_mediaIconSize);
 }
 
-bool RenderThemeGtk::paintMediaSliderTrack(
-    RenderObject* o,
-    const RenderObject::PaintInfo& paintInfo,
-    const IntRect& r) {
+bool RenderThemeGtk::paintMediaSliderTrack(RenderObject* o,
+                                           const PaintInfo& paintInfo,
+                                           const IntRect& r) {
   GraphicsContext* context = paintInfo.context;
 
   context->fillRect(FloatRect(r), m_panelColor, DeviceColorSpace);
@@ -894,10 +885,9 @@ bool RenderThemeGtk::paintMediaSliderTrack(
   return false;
 }
 
-bool RenderThemeGtk::paintMediaSliderThumb(
-    RenderObject* o,
-    const RenderObject::PaintInfo& paintInfo,
-    const IntRect& r) {
+bool RenderThemeGtk::paintMediaSliderThumb(RenderObject* o,
+                                           const PaintInfo& paintInfo,
+                                           const IntRect& r) {
   // Make the thumb nicer with rounded corners.
   paintInfo.context->fillRoundedRect(r, IntSize(3, 3), IntSize(3, 3),
                                      IntSize(3, 3), IntSize(3, 3),
@@ -927,7 +917,7 @@ void RenderThemeGtk::adjustProgressBarStyle(CSSStyleSelector*,
 }
 
 bool RenderThemeGtk::paintProgressBar(RenderObject* renderObject,
-                                      const RenderObject::PaintInfo& paintInfo,
+                                      const PaintInfo& paintInfo,
                                       const IntRect& rect) {
   if (!renderObject->isProgress())
     return true;

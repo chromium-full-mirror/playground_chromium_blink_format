@@ -403,8 +403,8 @@ static void paintTextWithShadows(GraphicsContext* context,
   } while (shadow || stroked || !opaque);
 }
 
-void InlineTextBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
-  if (isLineBreak() || !renderer()->shouldPaintWithinRoot(paintInfo) ||
+void InlineTextBox::paint(PaintInfo& paintInfo, int tx, int ty) {
+  if (isLineBreak() || !paintInfo.shouldPaintWithinRoot(renderer()) ||
       renderer()->style()->visibility() != VISIBLE ||
       m_truncation == cFullTruncation || paintInfo.phase == PaintPhaseOutline)
     return;

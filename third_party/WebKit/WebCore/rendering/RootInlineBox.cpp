@@ -125,10 +125,10 @@ int RootInlineBox::placeEllipsisBox(bool ltr,
   return result;
 }
 
-void RootInlineBox::paintEllipsisBox(RenderObject::PaintInfo& paintInfo,
+void RootInlineBox::paintEllipsisBox(PaintInfo& paintInfo,
                                      int tx,
                                      int ty) const {
-  if (hasEllipsisBox() && renderer()->shouldPaintWithinRoot(paintInfo) &&
+  if (hasEllipsisBox() && paintInfo.shouldPaintWithinRoot(renderer()) &&
       renderer()->style()->visibility() == VISIBLE &&
       paintInfo.phase == PaintPhaseForeground)
     ellipsisBox()->paint(paintInfo, tx, ty);
@@ -159,11 +159,11 @@ void RootInlineBox::addHighlightOverflow() {
       max(bottomVisualOverflow(), inflatedRect.bottom()), height());
 }
 
-void RootInlineBox::paintCustomHighlight(RenderObject::PaintInfo& paintInfo,
+void RootInlineBox::paintCustomHighlight(PaintInfo& paintInfo,
                                          int tx,
                                          int ty,
                                          const AtomicString& highlightType) {
-  if (!renderer()->shouldPaintWithinRoot(paintInfo) ||
+  if (!paintInfo.shouldPaintWithinRoot(renderer()) ||
       renderer()->style()->visibility() != VISIBLE ||
       paintInfo.phase != PaintPhaseForeground)
     return;
@@ -186,7 +186,7 @@ void RootInlineBox::paintCustomHighlight(RenderObject::PaintInfo& paintInfo,
 
 #endif
 
-void RootInlineBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
+void RootInlineBox::paint(PaintInfo& paintInfo, int tx, int ty) {
   InlineFlowBox::paint(paintInfo, tx, ty);
   paintEllipsisBox(paintInfo, tx, ty);
 #if PLATFORM(MAC)
@@ -273,15 +273,14 @@ int RootInlineBox::verticallyAlignBoxes(
   return heightOfBlock;
 }
 
-GapRects RootInlineBox::fillLineSelectionGap(
-    int selTop,
-    int selHeight,
-    RenderBlock* rootBlock,
-    int blockX,
-    int blockY,
-    int tx,
-    int ty,
-    const RenderObject::PaintInfo* paintInfo) {
+GapRects RootInlineBox::fillLineSelectionGap(int selTop,
+                                             int selHeight,
+                                             RenderBlock* rootBlock,
+                                             int blockX,
+                                             int blockY,
+                                             int tx,
+                                             int ty,
+                                             const PaintInfo* paintInfo) {
   RenderObject::SelectionState lineState = selectionState();
 
   bool leftGap, rightGap;

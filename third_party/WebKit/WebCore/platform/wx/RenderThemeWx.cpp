@@ -57,7 +57,7 @@ class RenderThemeWx : public RenderTheme {
   virtual bool supportsHover(const RenderStyle*) const { return true; }
 
   virtual bool paintCheckbox(RenderObject* o,
-                             const RenderObject::PaintInfo& i,
+                             const PaintInfo& i,
                              const IntRect& r) {
     return paintButton(o, i, r);
   }
@@ -65,7 +65,7 @@ class RenderThemeWx : public RenderTheme {
   virtual void setCheckboxSize(RenderStyle*) const;
 
   virtual bool paintRadio(RenderObject* o,
-                          const RenderObject::PaintInfo& i,
+                          const PaintInfo& i,
                           const IntRect& r) {
     return paintButton(o, i, r);
   }
@@ -77,31 +77,25 @@ class RenderThemeWx : public RenderTheme {
   virtual void adjustButtonStyle(CSSStyleSelector*,
                                  RenderStyle*,
                                  Element*) const;
-  virtual bool paintButton(RenderObject*,
-                           const RenderObject::PaintInfo&,
-                           const IntRect&);
+  virtual bool paintButton(RenderObject*, const PaintInfo&, const IntRect&);
 
   virtual void adjustTextFieldStyle(CSSStyleSelector*,
                                     RenderStyle*,
                                     Element*) const;
-  virtual bool paintTextField(RenderObject*,
-                              const RenderObject::PaintInfo&,
-                              const IntRect&);
+  virtual bool paintTextField(RenderObject*, const PaintInfo&, const IntRect&);
 
   virtual int minimumMenuListSize(RenderStyle*) const;
 
   virtual void adjustMenuListStyle(CSSStyleSelector*,
                                    RenderStyle*,
                                    Element*) const;
-  virtual bool paintMenuList(RenderObject*,
-                             const RenderObject::PaintInfo&,
-                             const IntRect&);
+  virtual bool paintMenuList(RenderObject*, const PaintInfo&, const IntRect&);
 
   virtual void adjustMenuListButtonStyle(CSSStyleSelector*,
                                          RenderStyle*,
                                          Element*) const;
   virtual bool paintMenuListButton(RenderObject*,
-                                   const RenderObject::PaintInfo&,
+                                   const PaintInfo&,
                                    const IntRect&);
 
   virtual bool isControlStyled(const RenderStyle*,
@@ -280,7 +274,7 @@ void RenderThemeWx::adjustButtonStyle(CSSStyleSelector* selector,
 }
 
 bool RenderThemeWx::paintButton(RenderObject* o,
-                                const RenderObject::PaintInfo& i,
+                                const PaintInfo& i,
                                 const IntRect& r) {
   wxWindow* window = nativeWindowForRenderObject(o);
   wxDC* dc = static_cast<wxDC*>(i.context->platformContext());
@@ -338,7 +332,7 @@ void RenderThemeWx::adjustTextFieldStyle(CSSStyleSelector*,
                                          Element*) const {}
 
 bool RenderThemeWx::paintTextField(RenderObject* o,
-                                   const RenderObject::PaintInfo& i,
+                                   const PaintInfo& i,
                                    const IntRect& r) {
   wxWindow* window = nativeWindowForRenderObject(o);
   wxDC* dc = static_cast<wxDC*>(i.context->platformContext());
@@ -360,7 +354,7 @@ void RenderThemeWx::adjustMenuListStyle(CSSStyleSelector*,
                                         Element*) const {}
 
 bool RenderThemeWx::paintMenuList(RenderObject* o,
-                                  const RenderObject::PaintInfo& i,
+                                  const PaintInfo& i,
                                   const IntRect& r) {
   wxWindow* window = nativeWindowForRenderObject(o);
   wxDC* dc = static_cast<wxDC*>(i.context->platformContext());
@@ -391,7 +385,7 @@ void RenderThemeWx::adjustMenuListButtonStyle(CSSStyleSelector*,
 }
 
 bool RenderThemeWx::paintMenuListButton(RenderObject* o,
-                                        const RenderObject::PaintInfo& i,
+                                        const PaintInfo& i,
                                         const IntRect& r) {
   wxWindow* window = nativeWindowForRenderObject(o);
   wxDC* dc = static_cast<wxDC*>(i.context->platformContext());

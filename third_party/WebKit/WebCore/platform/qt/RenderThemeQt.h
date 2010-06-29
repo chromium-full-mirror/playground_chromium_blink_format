@@ -95,46 +95,40 @@ class RenderThemeQt : public RenderTheme {
 
  protected:
   virtual bool paintCheckbox(RenderObject* o,
-                             const RenderObject::PaintInfo& i,
+                             const PaintInfo& i,
                              const IntRect& r);
   virtual void setCheckboxSize(RenderStyle*) const;
 
   virtual bool paintRadio(RenderObject* o,
-                          const RenderObject::PaintInfo& i,
+                          const PaintInfo& i,
                           const IntRect& r);
   virtual void setRadioSize(RenderStyle*) const;
 
   virtual void adjustButtonStyle(CSSStyleSelector*,
                                  RenderStyle*,
                                  Element*) const;
-  virtual bool paintButton(RenderObject*,
-                           const RenderObject::PaintInfo&,
-                           const IntRect&);
+  virtual bool paintButton(RenderObject*, const PaintInfo&, const IntRect&);
   virtual void setButtonSize(RenderStyle*) const;
 
-  virtual bool paintTextField(RenderObject*,
-                              const RenderObject::PaintInfo&,
-                              const IntRect&);
+  virtual bool paintTextField(RenderObject*, const PaintInfo&, const IntRect&);
   virtual void adjustTextFieldStyle(CSSStyleSelector*,
                                     RenderStyle*,
                                     Element*) const;
 
-  virtual bool paintTextArea(RenderObject*,
-                             const RenderObject::PaintInfo&,
-                             const IntRect&);
+  virtual bool paintTextArea(RenderObject*, const PaintInfo&, const IntRect&);
   virtual void adjustTextAreaStyle(CSSStyleSelector*,
                                    RenderStyle*,
                                    Element*) const;
 
   virtual bool paintMenuList(RenderObject* o,
-                             const RenderObject::PaintInfo& i,
+                             const PaintInfo& i,
                              const IntRect& r);
   virtual void adjustMenuListStyle(CSSStyleSelector*,
                                    RenderStyle*,
                                    Element*) const;
 
   virtual bool paintMenuListButton(RenderObject*,
-                                   const RenderObject::PaintInfo&,
+                                   const PaintInfo&,
                                    const IntRect&);
   virtual void adjustMenuListButtonStyle(CSSStyleSelector*,
                                          RenderStyle*,
@@ -145,26 +139,26 @@ class RenderThemeQt : public RenderTheme {
                                       RenderStyle*,
                                       Element*) const;
   virtual bool paintProgressBar(RenderObject*,
-                                const RenderObject::PaintInfo&,
+                                const PaintInfo&,
                                 const IntRect&);
 #endif
 
   virtual bool paintSliderTrack(RenderObject*,
-                                const RenderObject::PaintInfo&,
+                                const PaintInfo&,
                                 const IntRect&);
   virtual void adjustSliderTrackStyle(CSSStyleSelector*,
                                       RenderStyle*,
                                       Element*) const;
 
   virtual bool paintSliderThumb(RenderObject*,
-                                const RenderObject::PaintInfo&,
+                                const PaintInfo&,
                                 const IntRect&);
   virtual void adjustSliderThumbStyle(CSSStyleSelector*,
                                       RenderStyle*,
                                       Element*) const;
 
   virtual bool paintSearchField(RenderObject*,
-                                const RenderObject::PaintInfo&,
+                                const PaintInfo&,
                                 const IntRect&);
   virtual void adjustSearchFieldStyle(CSSStyleSelector*,
                                       RenderStyle*,
@@ -174,21 +168,21 @@ class RenderThemeQt : public RenderTheme {
                                                   RenderStyle*,
                                                   Element*) const;
   virtual bool paintSearchFieldCancelButton(RenderObject*,
-                                            const RenderObject::PaintInfo&,
+                                            const PaintInfo&,
                                             const IntRect&);
 
   virtual void adjustSearchFieldDecorationStyle(CSSStyleSelector*,
                                                 RenderStyle*,
                                                 Element*) const;
   virtual bool paintSearchFieldDecoration(RenderObject*,
-                                          const RenderObject::PaintInfo&,
+                                          const PaintInfo&,
                                           const IntRect&);
 
   virtual void adjustSearchFieldResultsDecorationStyle(CSSStyleSelector*,
                                                        RenderStyle*,
                                                        Element*) const;
   virtual bool paintSearchFieldResultsDecoration(RenderObject*,
-                                                 const RenderObject::PaintInfo&,
+                                                 const PaintInfo&,
                                                  const IntRect&);
 
 #if ENABLE(PROGRESS_TAG)
@@ -202,34 +196,34 @@ class RenderThemeQt : public RenderTheme {
 
 #if ENABLE(VIDEO)
   virtual bool paintMediaFullscreenButton(RenderObject*,
-                                          const RenderObject::PaintInfo&,
+                                          const PaintInfo&,
                                           const IntRect&);
   virtual bool paintMediaPlayButton(RenderObject*,
-                                    const RenderObject::PaintInfo&,
+                                    const PaintInfo&,
                                     const IntRect&);
   virtual bool paintMediaMuteButton(RenderObject*,
-                                    const RenderObject::PaintInfo&,
+                                    const PaintInfo&,
                                     const IntRect&);
   virtual bool paintMediaSeekBackButton(RenderObject*,
-                                        const RenderObject::PaintInfo&,
+                                        const PaintInfo&,
                                         const IntRect&);
   virtual bool paintMediaSeekForwardButton(RenderObject*,
-                                           const RenderObject::PaintInfo&,
+                                           const PaintInfo&,
                                            const IntRect&);
   virtual bool paintMediaSliderTrack(RenderObject*,
-                                     const RenderObject::PaintInfo&,
+                                     const PaintInfo&,
                                      const IntRect&);
   virtual bool paintMediaSliderThumb(RenderObject*,
-                                     const RenderObject::PaintInfo&,
+                                     const PaintInfo&,
                                      const IntRect&);
   virtual bool paintMediaCurrentTime(RenderObject*,
-                                     const RenderObject::PaintInfo&,
+                                     const PaintInfo&,
                                      const IntRect&);
   virtual bool paintMediaVolumeSliderTrack(RenderObject*,
-                                           const RenderObject::PaintInfo&,
+                                           const PaintInfo&,
                                            const IntRect&);
   virtual bool paintMediaVolumeSliderThumb(RenderObject*,
-                                           const RenderObject::PaintInfo&,
+                                           const PaintInfo&,
                                            const IntRect&);
   virtual String formatMediaControlsCurrentTime(float currentTime,
                                                 float duration) const;
@@ -271,7 +265,7 @@ class RenderThemeQt : public RenderTheme {
 
 class StylePainter {
  public:
-  explicit StylePainter(RenderThemeQt*, const RenderObject::PaintInfo&);
+  explicit StylePainter(RenderThemeQt*, const PaintInfo&);
   explicit StylePainter(ScrollbarThemeQt*, GraphicsContext*);
   ~StylePainter();
 

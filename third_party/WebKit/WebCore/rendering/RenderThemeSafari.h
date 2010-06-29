@@ -95,61 +95,49 @@ class RenderThemeSafari : public RenderTheme {
 
  protected:
   // Methods for each appearance value.
-  virtual bool paintCheckbox(RenderObject*,
-                             const RenderObject::PaintInfo&,
-                             const IntRect&);
+  virtual bool paintCheckbox(RenderObject*, const PaintInfo&, const IntRect&);
   virtual void setCheckboxSize(RenderStyle*) const;
 
-  virtual bool paintRadio(RenderObject*,
-                          const RenderObject::PaintInfo&,
-                          const IntRect&);
+  virtual bool paintRadio(RenderObject*, const PaintInfo&, const IntRect&);
   virtual void setRadioSize(RenderStyle*) const;
 
   virtual void adjustButtonStyle(CSSStyleSelector*,
                                  RenderStyle*,
                                  WebCore::Element*) const;
-  virtual bool paintButton(RenderObject*,
-                           const RenderObject::PaintInfo&,
-                           const IntRect&);
+  virtual bool paintButton(RenderObject*, const PaintInfo&, const IntRect&);
   virtual void setButtonSize(RenderStyle*) const;
 
-  virtual bool paintTextField(RenderObject*,
-                              const RenderObject::PaintInfo&,
-                              const IntRect&);
+  virtual bool paintTextField(RenderObject*, const PaintInfo&, const IntRect&);
   virtual void adjustTextFieldStyle(CSSStyleSelector*,
                                     RenderStyle*,
                                     Element*) const;
 
-  virtual bool paintTextArea(RenderObject*,
-                             const RenderObject::PaintInfo&,
-                             const IntRect&);
+  virtual bool paintTextArea(RenderObject*, const PaintInfo&, const IntRect&);
   virtual void adjustTextAreaStyle(CSSStyleSelector*,
                                    RenderStyle*,
                                    Element*) const;
 
-  virtual bool paintMenuList(RenderObject*,
-                             const RenderObject::PaintInfo&,
-                             const IntRect&);
+  virtual bool paintMenuList(RenderObject*, const PaintInfo&, const IntRect&);
   virtual void adjustMenuListStyle(CSSStyleSelector*,
                                    RenderStyle*,
                                    Element*) const;
 
   virtual bool paintMenuListButton(RenderObject*,
-                                   const RenderObject::PaintInfo&,
+                                   const PaintInfo&,
                                    const IntRect&);
   virtual void adjustMenuListButtonStyle(CSSStyleSelector*,
                                          RenderStyle*,
                                          Element*) const;
 
   virtual bool paintSliderTrack(RenderObject*,
-                                const RenderObject::PaintInfo&,
+                                const PaintInfo&,
                                 const IntRect&);
   virtual bool paintSliderThumb(RenderObject*,
-                                const RenderObject::PaintInfo&,
+                                const PaintInfo&,
                                 const IntRect&);
 
   virtual bool paintSearchField(RenderObject*,
-                                const RenderObject::PaintInfo&,
+                                const PaintInfo&,
                                 const IntRect&);
   virtual void adjustSearchFieldStyle(CSSStyleSelector*,
                                       RenderStyle*,
@@ -159,55 +147,55 @@ class RenderThemeSafari : public RenderTheme {
                                                   RenderStyle*,
                                                   Element*) const;
   virtual bool paintSearchFieldCancelButton(RenderObject*,
-                                            const RenderObject::PaintInfo&,
+                                            const PaintInfo&,
                                             const IntRect&);
 
   virtual void adjustSearchFieldDecorationStyle(CSSStyleSelector*,
                                                 RenderStyle*,
                                                 Element*) const;
   virtual bool paintSearchFieldDecoration(RenderObject*,
-                                          const RenderObject::PaintInfo&,
+                                          const PaintInfo&,
                                           const IntRect&);
 
   virtual void adjustSearchFieldResultsDecorationStyle(CSSStyleSelector*,
                                                        RenderStyle*,
                                                        Element*) const;
   virtual bool paintSearchFieldResultsDecoration(RenderObject*,
-                                                 const RenderObject::PaintInfo&,
+                                                 const PaintInfo&,
                                                  const IntRect&);
 
   virtual void adjustSearchFieldResultsButtonStyle(CSSStyleSelector*,
                                                    RenderStyle*,
                                                    Element*) const;
   virtual bool paintSearchFieldResultsButton(RenderObject*,
-                                             const RenderObject::PaintInfo&,
+                                             const PaintInfo&,
                                              const IntRect&);
 
   virtual bool paintCapsLockIndicator(RenderObject*,
-                                      const RenderObject::PaintInfo&,
+                                      const PaintInfo&,
                                       const IntRect&);
 
 #if ENABLE(VIDEO)
   virtual bool paintMediaFullscreenButton(RenderObject*,
-                                          const RenderObject::PaintInfo&,
+                                          const PaintInfo&,
                                           const IntRect&);
   virtual bool paintMediaPlayButton(RenderObject*,
-                                    const RenderObject::PaintInfo&,
+                                    const PaintInfo&,
                                     const IntRect&);
   virtual bool paintMediaMuteButton(RenderObject*,
-                                    const RenderObject::PaintInfo&,
+                                    const PaintInfo&,
                                     const IntRect&);
   virtual bool paintMediaSeekBackButton(RenderObject*,
-                                        const RenderObject::PaintInfo&,
+                                        const PaintInfo&,
                                         const IntRect&);
   virtual bool paintMediaSeekForwardButton(RenderObject*,
-                                           const RenderObject::PaintInfo&,
+                                           const PaintInfo&,
                                            const IntRect&);
   virtual bool paintMediaSliderTrack(RenderObject*,
-                                     const RenderObject::PaintInfo&,
+                                     const PaintInfo&,
                                      const IntRect&);
   virtual bool paintMediaSliderThumb(RenderObject*,
-                                     const RenderObject::PaintInfo&,
+                                     const PaintInfo&,
                                      const IntRect&);
 #endif
 
@@ -245,7 +233,7 @@ class RenderThemeSafari : public RenderTheme {
   const int* popupButtonMargins(NSControlSize) const;
   const int* popupButtonPadding(NSControlSize) const;
   void paintMenuListButtonGradients(RenderObject*,
-                                    const RenderObject::PaintInfo&,
+                                    const PaintInfo&,
                                     const IntRect&);
   const IntSize* menuListSizes() const;
 

@@ -101,11 +101,10 @@ void RenderMediaControls::adjustMediaSliderThumbSize(RenderObject* o) {
       Length(static_cast<int>(mediaSliderThumbHeight * zoomLevel), Fixed));
 }
 
-bool RenderMediaControls::paintMediaControlsPart(
-    MediaControlElementType part,
-    RenderObject* o,
-    const RenderObject::PaintInfo& paintInfo,
-    const IntRect& r) {
+bool RenderMediaControls::paintMediaControlsPart(MediaControlElementType part,
+                                                 RenderObject* o,
+                                                 const PaintInfo& paintInfo,
+                                                 const IntRect& r) {
   ASSERT(SafariThemeLibrary());
 
   switch (part) {

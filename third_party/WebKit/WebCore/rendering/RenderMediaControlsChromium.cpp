@@ -67,7 +67,7 @@ static bool paintMediaButton(GraphicsContext* context,
 }
 
 static bool paintMediaMuteButton(RenderObject* object,
-                                 const RenderObject::PaintInfo& paintInfo,
+                                 const PaintInfo& paintInfo,
                                  const IntRect& rect) {
   HTMLMediaElement* mediaElement = toParentMediaElement(object);
   if (!mediaElement)
@@ -85,7 +85,7 @@ static bool paintMediaMuteButton(RenderObject* object,
 }
 
 static bool paintMediaPlayButton(RenderObject* object,
-                                 const RenderObject::PaintInfo& paintInfo,
+                                 const PaintInfo& paintInfo,
                                  const IntRect& rect) {
   HTMLMediaElement* mediaElement = toParentMediaElement(object);
   if (!mediaElement)
@@ -108,7 +108,7 @@ static Image* getMediaSliderThumb() {
 }
 
 static bool paintMediaSlider(RenderObject* object,
-                             const RenderObject::PaintInfo& paintInfo,
+                             const PaintInfo& paintInfo,
                              const IntRect& rect) {
   HTMLMediaElement* mediaElement = toParentMediaElement(object);
   if (!mediaElement)
@@ -175,7 +175,7 @@ static bool paintMediaSlider(RenderObject* object,
 }
 
 static bool paintMediaSliderThumb(RenderObject* object,
-                                  const RenderObject::PaintInfo& paintInfo,
+                                  const PaintInfo& paintInfo,
                                   const IntRect& rect) {
   if (!object->parent()->isSlider())
     return false;
@@ -192,7 +192,7 @@ static bool paintMediaSliderThumb(RenderObject* object,
 }
 
 static bool paintMediaVolumeSlider(RenderObject* object,
-                                   const RenderObject::PaintInfo& paintInfo,
+                                   const PaintInfo& paintInfo,
                                    const IntRect& rect) {
   HTMLMediaElement* mediaElement = toParentMediaElement(object);
   if (!mediaElement)
@@ -212,10 +212,9 @@ static bool paintMediaVolumeSlider(RenderObject* object,
   return true;
 }
 
-static bool paintMediaVolumeSliderThumb(
-    RenderObject* object,
-    const RenderObject::PaintInfo& paintInfo,
-    const IntRect& rect) {
+static bool paintMediaVolumeSliderThumb(RenderObject* object,
+                                        const PaintInfo& paintInfo,
+                                        const IntRect& rect) {
   if (!object->parent()->isSlider())
     return false;
 
@@ -224,10 +223,9 @@ static bool paintMediaVolumeSliderThumb(
   return paintMediaButton(paintInfo.context, rect, mediaVolumeSliderThumb);
 }
 
-static bool paintMediaTimelineContainer(
-    RenderObject* object,
-    const RenderObject::PaintInfo& paintInfo,
-    const IntRect& rect) {
+static bool paintMediaTimelineContainer(RenderObject* object,
+                                        const PaintInfo& paintInfo,
+                                        const IntRect& rect) {
   HTMLMediaElement* mediaElement = toParentMediaElement(object);
   if (!mediaElement)
     return false;
@@ -292,7 +290,7 @@ bool RenderMediaControlsChromium::shouldRenderMediaControlPart(ControlPart part,
 bool RenderMediaControlsChromium::paintMediaControlsPart(
     MediaControlElementType part,
     RenderObject* object,
-    const RenderObject::PaintInfo& paintInfo,
+    const PaintInfo& paintInfo,
     const IntRect& rect) {
   switch (part) {
     case MediaMuteButton:

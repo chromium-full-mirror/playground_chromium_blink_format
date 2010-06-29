@@ -64,14 +64,14 @@ class RenderThemeWince : public RenderTheme {
   virtual Color systemColor(int cssValueId) const;
 
   virtual bool paintCheckbox(RenderObject* o,
-                             const RenderObject::PaintInfo& i,
+                             const PaintInfo& i,
                              const IntRect& r) {
     return paintButton(o, i, r);
   }
   virtual void setCheckboxSize(RenderStyle*) const;
 
   virtual bool paintRadio(RenderObject* o,
-                          const RenderObject::PaintInfo& i,
+                          const PaintInfo& i,
                           const IntRect& r) {
     return paintButton(o, i, r);
   }
@@ -79,16 +79,12 @@ class RenderThemeWince : public RenderTheme {
     return setCheckboxSize(style);
   }
 
-  virtual bool paintButton(RenderObject*,
-                           const RenderObject::PaintInfo&,
-                           const IntRect&);
+  virtual bool paintButton(RenderObject*, const PaintInfo&, const IntRect&);
 
-  virtual bool paintTextField(RenderObject*,
-                              const RenderObject::PaintInfo&,
-                              const IntRect&);
+  virtual bool paintTextField(RenderObject*, const PaintInfo&, const IntRect&);
 
   virtual bool paintTextArea(RenderObject* o,
-                             const RenderObject::PaintInfo& i,
+                             const PaintInfo& i,
                              const IntRect& r) {
     return paintTextField(o, i, r);
   }
@@ -96,22 +92,20 @@ class RenderThemeWince : public RenderTheme {
   virtual void adjustMenuListStyle(CSSStyleSelector* selector,
                                    RenderStyle* style,
                                    Element* e) const;
-  virtual bool paintMenuList(RenderObject*,
-                             const RenderObject::PaintInfo&,
-                             const IntRect&);
+  virtual bool paintMenuList(RenderObject*, const PaintInfo&, const IntRect&);
   virtual void adjustMenuListButtonStyle(CSSStyleSelector* selector,
                                          RenderStyle* style,
                                          Element* e) const;
 
   virtual bool paintMenuListButton(RenderObject*,
-                                   const RenderObject::PaintInfo&,
+                                   const PaintInfo&,
                                    const IntRect&);
 
   virtual bool paintSliderTrack(RenderObject* o,
-                                const RenderObject::PaintInfo& i,
+                                const PaintInfo& i,
                                 const IntRect& r);
   virtual bool paintSliderThumb(RenderObject* o,
-                                const RenderObject::PaintInfo& i,
+                                const PaintInfo& i,
                                 const IntRect& r);
   virtual void adjustSliderThumbSize(RenderObject*) const;
 
@@ -126,21 +120,21 @@ class RenderThemeWince : public RenderTheme {
                                       RenderStyle*,
                                       Element*) const;
   virtual bool paintSearchField(RenderObject*,
-                                const RenderObject::PaintInfo&,
+                                const PaintInfo&,
                                 const IntRect&);
 
   virtual void adjustSearchFieldCancelButtonStyle(CSSStyleSelector*,
                                                   RenderStyle*,
                                                   Element*) const;
   virtual bool paintSearchFieldCancelButton(RenderObject*,
-                                            const RenderObject::PaintInfo&,
+                                            const PaintInfo&,
                                             const IntRect&);
 
   virtual void adjustSearchFieldDecorationStyle(CSSStyleSelector*,
                                                 RenderStyle*,
                                                 Element*) const;
   virtual bool paintSearchFieldDecoration(RenderObject*,
-                                          const RenderObject::PaintInfo&,
+                                          const PaintInfo&,
                                           const IntRect&) {
     return false;
   }
@@ -149,14 +143,14 @@ class RenderThemeWince : public RenderTheme {
                                                        RenderStyle*,
                                                        Element*) const;
   virtual bool paintSearchFieldResultsDecoration(RenderObject*,
-                                                 const RenderObject::PaintInfo&,
+                                                 const PaintInfo&,
                                                  const IntRect&);
 
   virtual void adjustSearchFieldResultsButtonStyle(CSSStyleSelector*,
                                                    RenderStyle*,
                                                    Element*) const;
   virtual bool paintSearchFieldResultsButton(RenderObject*,
-                                             const RenderObject::PaintInfo&,
+                                             const PaintInfo&,
                                              const IntRect&);
 
   virtual void themeChanged();
@@ -177,25 +171,25 @@ class RenderThemeWince : public RenderTheme {
 
 #if ENABLE(VIDEO)
   virtual bool paintMediaFullscreenButton(RenderObject*,
-                                          const RenderObject::PaintInfo&,
+                                          const PaintInfo&,
                                           const IntRect&);
   virtual bool paintMediaPlayButton(RenderObject*,
-                                    const RenderObject::PaintInfo&,
+                                    const PaintInfo&,
                                     const IntRect&);
   virtual bool paintMediaMuteButton(RenderObject*,
-                                    const RenderObject::PaintInfo&,
+                                    const PaintInfo&,
                                     const IntRect&);
   virtual bool paintMediaSeekBackButton(RenderObject*,
-                                        const RenderObject::PaintInfo&,
+                                        const PaintInfo&,
                                         const IntRect&);
   virtual bool paintMediaSeekForwardButton(RenderObject*,
-                                           const RenderObject::PaintInfo&,
+                                           const PaintInfo&,
                                            const IntRect&);
   virtual bool paintMediaSliderTrack(RenderObject*,
-                                     const RenderObject::PaintInfo&,
+                                     const PaintInfo&,
                                      const IntRect&);
   virtual bool paintMediaSliderThumb(RenderObject*,
-                                     const RenderObject::PaintInfo&,
+                                     const PaintInfo&,
                                      const IntRect&);
 #endif
 

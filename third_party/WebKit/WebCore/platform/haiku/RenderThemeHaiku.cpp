@@ -93,7 +93,7 @@ void RenderThemeHaiku::systemFont(int propId, FontDescription&) const {
 }
 
 bool RenderThemeHaiku::paintCheckbox(RenderObject*,
-                                     const RenderObject::PaintInfo& info,
+                                     const PaintInfo& info,
                                      const IntRect& intRect) {
   if (info.context->paintingDisabled())
     return false;
@@ -126,7 +126,7 @@ void RenderThemeHaiku::setCheckboxSize(RenderStyle* style) const {
 }
 
 bool RenderThemeHaiku::paintRadio(RenderObject*,
-                                  const RenderObject::PaintInfo& info,
+                                  const PaintInfo& info,
                                   const IntRect& intRect) {
   if (info.context->paintingDisabled())
     return false;
@@ -157,7 +157,7 @@ void RenderThemeHaiku::adjustMenuListStyle(CSSStyleSelector*,
 }
 
 bool RenderThemeHaiku::paintMenuList(RenderObject*,
-                                     const RenderObject::PaintInfo&,
+                                     const PaintInfo&,
                                      const IntRect&) {
   notImplemented();
   return false;

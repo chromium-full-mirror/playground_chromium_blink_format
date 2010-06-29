@@ -39,7 +39,7 @@ class RenderMediaControlsChromium {
   static bool shouldRenderMediaControlPart(ControlPart, Element*);
   static bool paintMediaControlsPart(MediaControlElementType,
                                      RenderObject*,
-                                     const RenderObject::PaintInfo&,
+                                     const PaintInfo&,
                                      const IntRect&);
   static void adjustMediaSliderThumbSize(RenderObject*);
 };

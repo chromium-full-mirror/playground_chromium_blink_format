@@ -549,7 +549,7 @@ class RenderLayer : public ScrollbarClient {
                   const IntRect& paintDirtyRect,
                   PaintBehavior,
                   RenderObject* paintingRoot,
-                  RenderObject::OverlapTestRequestMap* = 0,
+                  OverlapTestRequestMap* = 0,
                   PaintLayerFlags = 0);
   void paintList(Vector<RenderLayer*>*,
                  RenderLayer* rootLayer,
@@ -557,7 +557,7 @@ class RenderLayer : public ScrollbarClient {
                  const IntRect& paintDirtyRect,
                  PaintBehavior,
                  RenderObject* paintingRoot,
-                 RenderObject::OverlapTestRequestMap*,
+                 OverlapTestRequestMap*,
                  PaintLayerFlags);
   void paintPaginatedChildLayer(RenderLayer* childLayer,
                                 RenderLayer* rootLayer,
@@ -565,7 +565,7 @@ class RenderLayer : public ScrollbarClient {
                                 const IntRect& paintDirtyRect,
                                 PaintBehavior,
                                 RenderObject* paintingRoot,
-                                RenderObject::OverlapTestRequestMap*,
+                                OverlapTestRequestMap*,
                                 PaintLayerFlags);
   void paintChildLayerIntoColumns(RenderLayer* childLayer,
                                   RenderLayer* rootLayer,
@@ -573,7 +573,7 @@ class RenderLayer : public ScrollbarClient {
                                   const IntRect& paintDirtyRect,
                                   PaintBehavior,
                                   RenderObject* paintingRoot,
-                                  RenderObject::OverlapTestRequestMap*,
+                                  OverlapTestRequestMap*,
                                   PaintLayerFlags,
                                   const Vector<RenderLayer*>& columnLayers,
                                   size_t columnIndex);

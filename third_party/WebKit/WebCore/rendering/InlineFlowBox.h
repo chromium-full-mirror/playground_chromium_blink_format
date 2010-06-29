@@ -103,9 +103,9 @@ class InlineFlowBox : public InlineBox {
 
   virtual void clearTruncation();
 
-  virtual void paintBoxDecorations(RenderObject::PaintInfo&, int tx, int ty);
-  virtual void paintMask(RenderObject::PaintInfo&, int tx, int ty);
-  void paintFillLayers(const RenderObject::PaintInfo&,
+  virtual void paintBoxDecorations(PaintInfo&, int tx, int ty);
+  virtual void paintMask(PaintInfo&, int tx, int ty);
+  void paintFillLayers(const PaintInfo&,
                        const Color&,
                        const FillLayer*,
                        int tx,
@@ -113,7 +113,7 @@ class InlineFlowBox : public InlineBox {
                        int w,
                        int h,
                        CompositeOperator = CompositeSourceOver);
-  void paintFillLayer(const RenderObject::PaintInfo&,
+  void paintFillLayer(const PaintInfo&,
                       const Color&,
                       const FillLayer*,
                       int tx,
@@ -128,11 +128,11 @@ class InlineFlowBox : public InlineBox {
                       int ty,
                       int w,
                       int h);
-  virtual void paintTextDecorations(RenderObject::PaintInfo&,
+  virtual void paintTextDecorations(PaintInfo&,
                                     int tx,
                                     int ty,
                                     bool paintedChildren = false);
-  virtual void paint(RenderObject::PaintInfo&, int tx, int ty);
+  virtual void paint(PaintInfo&, int tx, int ty);
   virtual bool nodeAtPoint(const HitTestRequest&,
                            HitTestResult&,
                            int x,

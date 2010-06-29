@@ -735,7 +735,7 @@ bool InlineFlowBox::nodeAtPoint(const HitTestRequest& request,
   return false;
 }
 
-void InlineFlowBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
+void InlineFlowBox::paint(PaintInfo& paintInfo, int tx, int ty) {
   IntRect overflowRect(visibleOverflowRect());
   overflowRect.inflate(renderer()->maximalOutlineSize(paintInfo.phase));
   overflowRect.move(tx, ty);
@@ -782,9 +782,9 @@ void InlineFlowBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
   PaintPhase paintPhase = paintInfo.phase == PaintPhaseChildOutlines
                               ? PaintPhaseOutline
                               : paintInfo.phase;
-  RenderObject::PaintInfo childInfo(paintInfo);
+  PaintInfo childInfo(paintInfo);
   childInfo.phase = paintPhase;
-  childInfo.paintingRoot = renderer()->paintingRootForChildren(paintInfo);
+  childInfo.updatePaintingRootForChildren(renderer());
 
   // 3. Paint our children.
   if (paintPhase != PaintPhaseSelfOutline) {
@@ -801,7 +801,7 @@ void InlineFlowBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
     paintTextDecorations(paintInfo, tx, ty, true);
 }
 
-void InlineFlowBox::paintFillLayers(const RenderObject::PaintInfo& paintInfo,
+void InlineFlowBox::paintFillLayers(const PaintInfo& paintInfo,
                                     const Color& c,
                                     const FillLayer* fillLayer,
                                     int _tx,
@@ -815,7 +815,7 @@ void InlineFlowBox::paintFillLayers(const RenderObject::PaintInfo& paintInfo,
   paintFillLayer(paintInfo, c, fillLayer, _tx, _ty, w, h, op);
 }
 
-void InlineFlowBox::paintFillLayer(const RenderObject::PaintInfo& paintInfo,
+void InlineFlowBox::paintFillLayer(const PaintInfo& paintInfo,
                                    const Color& c,
                                    const FillLayer* fillLayer,
                                    int tx,
@@ -877,10 +877,8 @@ void InlineFlowBox::paintBoxShadow(GraphicsContext* context,
   }
 }
 
-void InlineFlowBox::paintBoxDecorations(RenderObject::PaintInfo& paintInfo,
-                                        int tx,
-                                        int ty) {
-  if (!renderer()->shouldPaintWithinRoot(paintInfo) ||
+void InlineFlowBox::paintBoxDecorations(PaintInfo& paintInfo, int tx, int ty) {
+  if (!paintInfo.shouldPaintWithinRoot(renderer()) ||
       renderer()->style()->visibility() != VISIBLE ||
       paintInfo.phase != PaintPhaseForeground)
     return;
@@ -970,10 +968,8 @@ void InlineFlowBox::paintBoxDecorations(RenderObject::PaintInfo& paintInfo,
   }
 }
 
-void InlineFlowBox::paintMask(RenderObject::PaintInfo& paintInfo,
-                              int tx,
-                              int ty) {
-  if (!renderer()->shouldPaintWithinRoot(paintInfo) ||
+void InlineFlowBox::paintMask(PaintInfo& paintInfo, int tx, int ty) {
+  if (!paintInfo.shouldPaintWithinRoot(renderer()) ||
       renderer()->style()->visibility() != VISIBLE ||
       paintInfo.phase != PaintPhaseMask)
     return;
@@ -1076,7 +1072,7 @@ static bool shouldDrawTextDecoration(RenderObject* obj) {
   return false;
 }
 
-void InlineFlowBox::paintTextDecorations(RenderObject::PaintInfo& paintInfo,
+void InlineFlowBox::paintTextDecorations(PaintInfo& paintInfo,
                                          int tx,
                                          int ty,
                                          bool paintedChildren) {
@@ -1084,7 +1080,7 @@ void InlineFlowBox::paintTextDecorations(RenderObject::PaintInfo& paintInfo,
   // aren't in quirks mode (i.e., in
   // almost-strict mode or strict mode).
   if (renderer()->style()->htmlHacks() ||
-      !renderer()->shouldPaintWithinRoot(paintInfo) ||
+      !paintInfo.shouldPaintWithinRoot(renderer()) ||
       renderer()->style()->visibility() != VISIBLE)
     return;
 

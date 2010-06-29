@@ -64,23 +64,15 @@ class RenderThemeChromiumWin : public RenderThemeChromiumSkia {
   virtual void adjustSliderThumbSize(RenderObject*) const;
 
   // Various paint functions.
-  virtual bool paintCheckbox(RenderObject*,
-                             const RenderObject::PaintInfo&,
-                             const IntRect&);
-  virtual bool paintRadio(RenderObject*,
-                          const RenderObject::PaintInfo&,
-                          const IntRect&);
-  virtual bool paintButton(RenderObject*,
-                           const RenderObject::PaintInfo&,
-                           const IntRect&);
-  virtual bool paintTextField(RenderObject*,
-                              const RenderObject::PaintInfo&,
-                              const IntRect&);
+  virtual bool paintCheckbox(RenderObject*, const PaintInfo&, const IntRect&);
+  virtual bool paintRadio(RenderObject*, const PaintInfo&, const IntRect&);
+  virtual bool paintButton(RenderObject*, const PaintInfo&, const IntRect&);
+  virtual bool paintTextField(RenderObject*, const PaintInfo&, const IntRect&);
   virtual bool paintSliderTrack(RenderObject*,
-                                const RenderObject::PaintInfo&,
+                                const PaintInfo&,
                                 const IntRect&);
   virtual bool paintSliderThumb(RenderObject*,
-                                const RenderObject::PaintInfo&,
+                                const PaintInfo&,
                                 const IntRect&);
 
   // MenuList refers to an unstyled menulist (meaning a menulist without
@@ -92,9 +84,7 @@ class RenderThemeChromiumWin : public RenderThemeChromiumSkia {
   // In short, we either go down the MenuList code path or the MenuListButton
   // codepath. We never go down both. And in both cases, they render the
   // entire menulist.
-  virtual bool paintMenuList(RenderObject*,
-                             const RenderObject::PaintInfo&,
-                             const IntRect&);
+  virtual bool paintMenuList(RenderObject*, const PaintInfo&, const IntRect&);
 
   // Override RenderThemeChromiumSkia's setDefaultFontSize method to also reset
   // the local font property caches.
@@ -109,7 +99,7 @@ class RenderThemeChromiumWin : public RenderThemeChromiumSkia {
                                       RenderStyle*,
                                       Element*) const;
   virtual bool paintProgressBar(RenderObject*,
-                                const RenderObject::PaintInfo&,
+                                const PaintInfo&,
                                 const IntRect&);
 #endif
 
@@ -127,7 +117,7 @@ class RenderThemeChromiumWin : public RenderThemeChromiumSkia {
   ThemeData getThemeData(RenderObject*);
 
   bool paintTextFieldInternal(RenderObject*,
-                              const RenderObject::PaintInfo&,
+                              const PaintInfo&,
                               const IntRect&,
                               bool);
 };

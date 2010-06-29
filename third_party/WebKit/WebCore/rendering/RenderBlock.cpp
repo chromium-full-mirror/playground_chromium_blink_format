@@ -2254,7 +2254,7 @@ void RenderBlock::paint(PaintInfo& paintInfo, int tx, int ty) {
   if (hasOverflowClip() && style()->visibility() == VISIBLE &&
       (phase == PaintPhaseBlockBackground ||
        phase == PaintPhaseChildBlockBackground) &&
-      shouldPaintWithinRoot(paintInfo))
+      paintInfo.shouldPaintWithinRoot(this))
     layer()->paintOverflowControls(paintInfo.context, tx, ty, paintInfo.rect);
 }
 
@@ -2383,7 +2383,7 @@ void RenderBlock::paintChildren(PaintInfo& paintInfo, int tx, int ty) {
   // backgrounds.
   PaintInfo info(paintInfo);
   info.phase = newPhase;
-  info.paintingRoot = paintingRootForChildren(paintInfo);
+  info.updatePaintingRootForChildren(this);
   bool checkPageBreaks = document()->printing() &&
                          !document()->settings()->paginateDuringLayoutEnabled();
   bool checkColumnBreaks =
@@ -2592,7 +2592,7 @@ void RenderBlock::paintFloats(PaintInfo& paintInfo,
 }
 
 void RenderBlock::paintEllipsisBoxes(PaintInfo& paintInfo, int tx, int ty) {
-  if (!shouldPaintWithinRoot(paintInfo) || !firstLineBox())
+  if (!paintInfo.shouldPaintWithinRoot(this) || !firstLineBox())
     return;
 
   if (style()->visibility() == VISIBLE &&
@@ -2766,7 +2766,7 @@ void RenderBlock::paintSelection(PaintInfo& paintInfo, int tx, int ty) {
 
 #ifndef BUILDING_ON_TIGER
 static void clipOutPositionedObjects(
-    const RenderObject::PaintInfo* paintInfo,
+    const PaintInfo* paintInfo,
     int tx,
     int ty,
     RenderBlock::PositionedObjectsListHashSet* positionedObjects) {
@@ -4837,8 +4837,7 @@ int RenderBlock::layoutColumns(int endOfContent, int requestedColumnHeight) {
     v->setPrintRect(pageRect);
     v->setTruncatedAt(truncationPoint);
     GraphicsContext context((PlatformGraphicsContext*)0);
-    RenderObject::PaintInfo paintInfo(&context, pageRect, PaintPhaseForeground,
-                                      false, 0, 0);
+    PaintInfo paintInfo(&context, pageRect, PaintPhaseForeground, false, 0, 0);
 
     setHasColumns(false);
     paintObject(paintInfo, 0, 0);

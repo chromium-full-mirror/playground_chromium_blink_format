@@ -80,8 +80,7 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-StylePainter::StylePainter(RenderThemeQt* theme,
-                           const RenderObject::PaintInfo& paintInfo) {
+StylePainter::StylePainter(RenderThemeQt* theme, const PaintInfo& paintInfo) {
   init(paintInfo.context ? paintInfo.context : 0, theme->qStyle());
 }
 
@@ -424,7 +423,7 @@ void RenderThemeQt::setCheckboxSize(RenderStyle* style) const {
 }
 
 bool RenderThemeQt::paintCheckbox(RenderObject* o,
-                                  const RenderObject::PaintInfo& i,
+                                  const PaintInfo& i,
                                   const IntRect& r) {
   return paintButton(o, i, r);
 }
@@ -434,7 +433,7 @@ void RenderThemeQt::setRadioSize(RenderStyle* style) const {
 }
 
 bool RenderThemeQt::paintRadio(RenderObject* o,
-                               const RenderObject::PaintInfo& i,
+                               const PaintInfo& i,
                                const IntRect& r) {
   return paintButton(o, i, r);
 }
@@ -520,7 +519,7 @@ void RenderThemeQt::setButtonPadding(RenderStyle* style) const {
 }
 
 bool RenderThemeQt::paintButton(RenderObject* o,
-                                const RenderObject::PaintInfo& i,
+                                const PaintInfo& i,
                                 const IntRect& r) {
   StylePainter p(this, i);
   if (!p.isValid())
@@ -555,7 +554,7 @@ void RenderThemeQt::adjustTextFieldStyle(CSSStyleSelector*,
 }
 
 bool RenderThemeQt::paintTextField(RenderObject* o,
-                                   const RenderObject::PaintInfo& i,
+                                   const PaintInfo& i,
                                    const IntRect& r) {
   StylePainter p(this, i);
   if (!p.isValid())
@@ -589,7 +588,7 @@ void RenderThemeQt::adjustTextAreaStyle(CSSStyleSelector* selector,
 }
 
 bool RenderThemeQt::paintTextArea(RenderObject* o,
-                                  const RenderObject::PaintInfo& i,
+                                  const PaintInfo& i,
                                   const IntRect& r) {
   return paintTextField(o, i, r);
 }
@@ -624,7 +623,7 @@ void RenderThemeQt::setPopupPadding(RenderStyle* style) const {
 }
 
 bool RenderThemeQt::paintMenuList(RenderObject* o,
-                                  const RenderObject::PaintInfo& i,
+                                  const PaintInfo& i,
                                   const IntRect& r) {
   StylePainter p(this, i);
   if (!p.isValid())
@@ -670,7 +669,7 @@ void RenderThemeQt::adjustMenuListButtonStyle(CSSStyleSelector*,
 }
 
 bool RenderThemeQt::paintMenuListButton(RenderObject* o,
-                                        const RenderObject::PaintInfo& i,
+                                        const PaintInfo& i,
                                         const IntRect& r) {
   StylePainter p(this, i);
   if (!p.isValid())
@@ -723,7 +722,7 @@ void RenderThemeQt::adjustProgressBarStyle(CSSStyleSelector*,
 }
 
 bool RenderThemeQt::paintProgressBar(RenderObject* o,
-                                     const RenderObject::PaintInfo& pi,
+                                     const PaintInfo& pi,
                                      const IntRect& r) {
   if (!o->isProgress())
     return true;
@@ -778,7 +777,7 @@ bool RenderThemeQt::paintProgressBar(RenderObject* o,
 #endif
 
 bool RenderThemeQt::paintSliderTrack(RenderObject* o,
-                                     const RenderObject::PaintInfo& pi,
+                                     const PaintInfo& pi,
                                      const IntRect& r) {
   StylePainter p(this, pi);
   if (!p.isValid())
@@ -834,7 +833,7 @@ void RenderThemeQt::adjustSliderTrackStyle(CSSStyleSelector*,
 }
 
 bool RenderThemeQt::paintSliderThumb(RenderObject* o,
-                                     const RenderObject::PaintInfo& pi,
+                                     const PaintInfo& pi,
                                      const IntRect& r) {
   // We've already painted it in paintSliderTrack(), no need to do anything
   // here.
@@ -848,7 +847,7 @@ void RenderThemeQt::adjustSliderThumbStyle(CSSStyleSelector*,
 }
 
 bool RenderThemeQt::paintSearchField(RenderObject* o,
-                                     const RenderObject::PaintInfo& pi,
+                                     const PaintInfo& pi,
                                      const IntRect& r) {
   return true;
 }
@@ -868,10 +867,9 @@ void RenderThemeQt::adjustSearchFieldCancelButtonStyle(
   RenderTheme::adjustSearchFieldCancelButtonStyle(selector, style, e);
 }
 
-bool RenderThemeQt::paintSearchFieldCancelButton(
-    RenderObject* o,
-    const RenderObject::PaintInfo& pi,
-    const IntRect& r) {
+bool RenderThemeQt::paintSearchFieldCancelButton(RenderObject* o,
+                                                 const PaintInfo& pi,
+                                                 const IntRect& r) {
   notImplemented();
   return RenderTheme::paintSearchFieldCancelButton(o, pi, r);
 }
@@ -883,10 +881,9 @@ void RenderThemeQt::adjustSearchFieldDecorationStyle(CSSStyleSelector* selector,
   RenderTheme::adjustSearchFieldDecorationStyle(selector, style, e);
 }
 
-bool RenderThemeQt::paintSearchFieldDecoration(
-    RenderObject* o,
-    const RenderObject::PaintInfo& pi,
-    const IntRect& r) {
+bool RenderThemeQt::paintSearchFieldDecoration(RenderObject* o,
+                                               const PaintInfo& pi,
+                                               const IntRect& r) {
   notImplemented();
   return RenderTheme::paintSearchFieldDecoration(o, pi, r);
 }
@@ -899,10 +896,9 @@ void RenderThemeQt::adjustSearchFieldResultsDecorationStyle(
   RenderTheme::adjustSearchFieldResultsDecorationStyle(selector, style, e);
 }
 
-bool RenderThemeQt::paintSearchFieldResultsDecoration(
-    RenderObject* o,
-    const RenderObject::PaintInfo& pi,
-    const IntRect& r) {
+bool RenderThemeQt::paintSearchFieldResultsDecoration(RenderObject* o,
+                                                      const PaintInfo& pi,
+                                                      const IntRect& r) {
   notImplemented();
   return RenderTheme::paintSearchFieldResultsDecoration(o, pi, r);
 }
@@ -1065,17 +1061,15 @@ QColor RenderThemeQt::getMediaControlForegroundColor(RenderObject* o) const {
   return fgColor;
 }
 
-bool RenderThemeQt::paintMediaFullscreenButton(
-    RenderObject* o,
-    const RenderObject::PaintInfo& paintInfo,
-    const IntRect& r) {
+bool RenderThemeQt::paintMediaFullscreenButton(RenderObject* o,
+                                               const PaintInfo& paintInfo,
+                                               const IntRect& r) {
   return RenderTheme::paintMediaFullscreenButton(o, paintInfo, r);
 }
 
-bool RenderThemeQt::paintMediaMuteButton(
-    RenderObject* o,
-    const RenderObject::PaintInfo& paintInfo,
-    const IntRect& r) {
+bool RenderThemeQt::paintMediaMuteButton(RenderObject* o,
+                                         const PaintInfo& paintInfo,
+                                         const IntRect& r) {
   HTMLMediaElement* mediaElement = getMediaElementFromRenderObject(o);
   if (!mediaElement)
     return false;
@@ -1100,10 +1094,9 @@ bool RenderThemeQt::paintMediaMuteButton(
   return false;
 }
 
-bool RenderThemeQt::paintMediaPlayButton(
-    RenderObject* o,
-    const RenderObject::PaintInfo& paintInfo,
-    const IntRect& r) {
+bool RenderThemeQt::paintMediaPlayButton(RenderObject* o,
+                                         const PaintInfo& paintInfo,
+                                         const IntRect& r) {
   HTMLMediaElement* mediaElement = getMediaElementFromRenderObject(o);
   if (!mediaElement)
     return false;
@@ -1131,23 +1124,22 @@ bool RenderThemeQt::paintMediaPlayButton(
 }
 
 bool RenderThemeQt::paintMediaSeekBackButton(RenderObject*,
-                                             const RenderObject::PaintInfo&,
+                                             const PaintInfo&,
                                              const IntRect&) {
   // We don't want to paint this at the moment.
   return false;
 }
 
 bool RenderThemeQt::paintMediaSeekForwardButton(RenderObject*,
-                                                const RenderObject::PaintInfo&,
+                                                const PaintInfo&,
                                                 const IntRect&) {
   // We don't want to paint this at the moment.
   return false;
 }
 
-bool RenderThemeQt::paintMediaCurrentTime(
-    RenderObject* o,
-    const RenderObject::PaintInfo& paintInfo,
-    const IntRect& r) {
+bool RenderThemeQt::paintMediaCurrentTime(RenderObject* o,
+                                          const PaintInfo& paintInfo,
+                                          const IntRect& r) {
   StylePainter p(this, paintInfo);
   if (!p.isValid())
     return true;
@@ -1169,10 +1161,9 @@ String RenderThemeQt::formatMediaControlsRemainingTime(float currentTime,
   return String();
 }
 
-bool RenderThemeQt::paintMediaVolumeSliderTrack(
-    RenderObject* o,
-    const RenderObject::PaintInfo& paintInfo,
-    const IntRect& r) {
+bool RenderThemeQt::paintMediaVolumeSliderTrack(RenderObject* o,
+                                                const PaintInfo& paintInfo,
+                                                const IntRect& r) {
   StylePainter p(this, paintInfo);
   if (!p.isValid())
     return true;
@@ -1222,10 +1213,9 @@ bool RenderThemeQt::paintMediaVolumeSliderTrack(
   return false;
 }
 
-bool RenderThemeQt::paintMediaVolumeSliderThumb(
-    RenderObject* o,
-    const RenderObject::PaintInfo& paintInfo,
-    const IntRect& r) {
+bool RenderThemeQt::paintMediaVolumeSliderThumb(RenderObject* o,
+                                                const PaintInfo& paintInfo,
+                                                const IntRect& r) {
   StylePainter p(this, paintInfo);
   if (!p.isValid())
     return true;
@@ -1234,10 +1224,9 @@ bool RenderThemeQt::paintMediaVolumeSliderThumb(
   return false;
 }
 
-bool RenderThemeQt::paintMediaSliderTrack(
-    RenderObject* o,
-    const RenderObject::PaintInfo& paintInfo,
-    const IntRect& r) {
+bool RenderThemeQt::paintMediaSliderTrack(RenderObject* o,
+                                          const PaintInfo& paintInfo,
+                                          const IntRect& r) {
   HTMLMediaElement* mediaElement = getMediaElementFromRenderObject(o);
   if (!mediaElement)
     return false;
@@ -1275,10 +1264,9 @@ bool RenderThemeQt::paintMediaSliderTrack(
   return false;
 }
 
-bool RenderThemeQt::paintMediaSliderThumb(
-    RenderObject* o,
-    const RenderObject::PaintInfo& paintInfo,
-    const IntRect& r) {
+bool RenderThemeQt::paintMediaSliderThumb(RenderObject* o,
+                                          const PaintInfo& paintInfo,
+                                          const IntRect& r) {
   StylePainter p(this, paintInfo);
   if (!p.isValid())
     return true;

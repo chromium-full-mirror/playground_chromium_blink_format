@@ -145,8 +145,8 @@ void InlineBox::adjustPosition(int dx, int dy) {
   }
 }
 
-void InlineBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
-  if (!renderer()->shouldPaintWithinRoot(paintInfo) ||
+void InlineBox::paint(PaintInfo& paintInfo, int tx, int ty) {
+  if (!paintInfo.shouldPaintWithinRoot(renderer()) ||
       (paintInfo.phase != PaintPhaseForeground &&
        paintInfo.phase != PaintPhaseSelection))
     return;
@@ -158,7 +158,7 @@ void InlineBox::paint(RenderObject::PaintInfo& paintInfo, int tx, int ty) {
   // specification.)
   bool preservePhase = paintInfo.phase == PaintPhaseSelection ||
                        paintInfo.phase == PaintPhaseTextClip;
-  RenderObject::PaintInfo info(paintInfo);
+  PaintInfo info(paintInfo);
   info.phase = preservePhase ? paintInfo.phase : PaintPhaseBlockBackground;
   renderer()->paint(info, tx, ty);
   if (!preservePhase) {

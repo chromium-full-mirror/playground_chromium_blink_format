@@ -254,7 +254,7 @@ void RenderThemeEfl::applyEdjeStateFromForm(Evas_Object* o,
 
 bool RenderThemeEfl::paintThemePart(RenderObject* o,
                                     FormType type,
-                                    const RenderObject::PaintInfo& i,
+                                    const PaintInfo& i,
                                     const IntRect& rect) {
   struct ThemePartCacheEntry* ce;
   Eina_List* updates;
@@ -787,7 +787,7 @@ void RenderThemeEfl::adjustCheckboxStyle(CSSStyleSelector* selector,
 }
 
 bool RenderThemeEfl::paintCheckbox(RenderObject* o,
-                                   const RenderObject::PaintInfo& i,
+                                   const PaintInfo& i,
                                    const IntRect& rect) {
   return paintThemePart(o, CheckBox, i, rect);
 }
@@ -811,7 +811,7 @@ void RenderThemeEfl::adjustRadioStyle(CSSStyleSelector* selector,
 }
 
 bool RenderThemeEfl::paintRadio(RenderObject* o,
-                                const RenderObject::PaintInfo& i,
+                                const PaintInfo& i,
                                 const IntRect& rect) {
   return paintThemePart(o, RadioButton, i, rect);
 }
@@ -837,7 +837,7 @@ void RenderThemeEfl::adjustButtonStyle(CSSStyleSelector* selector,
 }
 
 bool RenderThemeEfl::paintButton(RenderObject* o,
-                                 const RenderObject::PaintInfo& i,
+                                 const PaintInfo& i,
                                  const IntRect& rect) {
   return paintThemePart(o, Button, i, rect);
 }
@@ -858,7 +858,7 @@ void RenderThemeEfl::adjustMenuListStyle(CSSStyleSelector* selector,
 }
 
 bool RenderThemeEfl::paintMenuList(RenderObject* o,
-                                   const RenderObject::PaintInfo& i,
+                                   const PaintInfo& i,
                                    const IntRect& rect) {
   return paintThemePart(o, ComboBox, i, rect);
 }
@@ -879,7 +879,7 @@ void RenderThemeEfl::adjustTextFieldStyle(CSSStyleSelector* selector,
 }
 
 bool RenderThemeEfl::paintTextField(RenderObject* o,
-                                    const RenderObject::PaintInfo& i,
+                                    const PaintInfo& i,
                                     const IntRect& rect) {
   return paintThemePart(o, TextField, i, rect);
 }
@@ -891,7 +891,7 @@ void RenderThemeEfl::adjustTextAreaStyle(CSSStyleSelector* selector,
 }
 
 bool RenderThemeEfl::paintTextArea(RenderObject* o,
-                                   const RenderObject::PaintInfo& i,
+                                   const PaintInfo& i,
                                    const IntRect& r) {
   return paintTextField(o, i, r);
 }
@@ -910,10 +910,9 @@ void RenderThemeEfl::adjustSearchFieldDecorationStyle(
   style->setWhiteSpace(PRE);
 }
 
-bool RenderThemeEfl::paintSearchFieldDecoration(
-    RenderObject* o,
-    const RenderObject::PaintInfo& i,
-    const IntRect& rect) {
+bool RenderThemeEfl::paintSearchFieldDecoration(RenderObject* o,
+                                                const PaintInfo& i,
+                                                const IntRect& rect) {
   return paintThemePart(o, SearchFieldDecoration, i, rect);
 }
 
@@ -931,10 +930,9 @@ void RenderThemeEfl::adjustSearchFieldResultsButtonStyle(
   style->setWhiteSpace(PRE);
 }
 
-bool RenderThemeEfl::paintSearchFieldResultsButton(
-    RenderObject* o,
-    const RenderObject::PaintInfo& i,
-    const IntRect& rect) {
+bool RenderThemeEfl::paintSearchFieldResultsButton(RenderObject* o,
+                                                   const PaintInfo& i,
+                                                   const IntRect& rect) {
   return paintThemePart(o, SearchFieldResultsButton, i, rect);
 }
 
@@ -952,10 +950,9 @@ void RenderThemeEfl::adjustSearchFieldResultsDecorationStyle(
   style->setWhiteSpace(PRE);
 }
 
-bool RenderThemeEfl::paintSearchFieldResultsDecoration(
-    RenderObject* o,
-    const RenderObject::PaintInfo& i,
-    const IntRect& rect) {
+bool RenderThemeEfl::paintSearchFieldResultsDecoration(RenderObject* o,
+                                                       const PaintInfo& i,
+                                                       const IntRect& rect) {
   return paintThemePart(o, SearchFieldResultsDecoration, i, rect);
 }
 
@@ -973,10 +970,9 @@ void RenderThemeEfl::adjustSearchFieldCancelButtonStyle(
   style->setWhiteSpace(PRE);
 }
 
-bool RenderThemeEfl::paintSearchFieldCancelButton(
-    RenderObject* o,
-    const RenderObject::PaintInfo& i,
-    const IntRect& rect) {
+bool RenderThemeEfl::paintSearchFieldCancelButton(RenderObject* o,
+                                                  const PaintInfo& i,
+                                                  const IntRect& rect) {
   return paintThemePart(o, SearchFieldCancelButton, i, rect);
 }
 
@@ -996,7 +992,7 @@ void RenderThemeEfl::adjustSearchFieldStyle(CSSStyleSelector* selector,
 }
 
 bool RenderThemeEfl::paintSearchField(RenderObject* o,
-                                      const RenderObject::PaintInfo& i,
+                                      const PaintInfo& i,
                                       const IntRect& rect) {
   return paintThemePart(o, SearchField, i, rect);
 }

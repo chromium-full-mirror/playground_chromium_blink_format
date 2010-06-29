@@ -126,7 +126,7 @@ class InlineBox {
 
   virtual void adjustPosition(int dx, int dy);
 
-  virtual void paint(RenderObject::PaintInfo&, int tx, int ty);
+  virtual void paint(PaintInfo&, int tx, int ty);
   virtual bool nodeAtPoint(const HitTestRequest&,
                            HitTestResult&,
                            int x,

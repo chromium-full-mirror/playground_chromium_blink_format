@@ -226,7 +226,7 @@ IntRect center(const IntRect& original, int width, int height) {
 }
 
 bool RenderThemeChromiumSkia::paintCheckbox(RenderObject* o,
-                                            const RenderObject::PaintInfo& i,
+                                            const PaintInfo& i,
                                             const IntRect& rect) {
   static Image* const checkedImage =
       Image::loadPlatformResource("linuxCheckboxOn").releaseRef();
@@ -264,7 +264,7 @@ void RenderThemeChromiumSkia::setCheckboxSize(RenderStyle* style) const {
 }
 
 bool RenderThemeChromiumSkia::paintRadio(RenderObject* o,
-                                         const RenderObject::PaintInfo& i,
+                                         const PaintInfo& i,
                                          const IntRect& rect) {
   static Image* const checkedImage =
       Image::loadPlatformResource("linuxRadioOn").releaseRef();
@@ -306,7 +306,7 @@ static SkColor brightenColor(double h,
 
 static void paintButtonLike(RenderTheme* theme,
                             RenderObject* o,
-                            const RenderObject::PaintInfo& i,
+                            const PaintInfo& i,
                             const IntRect& rect) {
   SkCanvas* const canvas = i.context->platformContext()->canvas();
   SkPaint paint;
@@ -366,7 +366,7 @@ static void paintButtonLike(RenderTheme* theme,
 }
 
 bool RenderThemeChromiumSkia::paintButton(RenderObject* o,
-                                          const RenderObject::PaintInfo& i,
+                                          const PaintInfo& i,
                                           const IntRect& rect) {
   paintButtonLike(this, o, i, rect);
   return false;
@@ -382,13 +382,13 @@ void RenderThemeChromiumSkia::adjustButtonStyle(CSSStyleSelector*,
 }
 
 bool RenderThemeChromiumSkia::paintTextField(RenderObject* o,
-                                             const RenderObject::PaintInfo& i,
+                                             const PaintInfo& i,
                                              const IntRect& rect) {
   return true;
 }
 
 bool RenderThemeChromiumSkia::paintTextArea(RenderObject* o,
-                                            const RenderObject::PaintInfo& i,
+                                            const PaintInfo& i,
                                             const IntRect& r) {
   return paintTextField(o, i, r);
 }
@@ -401,7 +401,7 @@ void RenderThemeChromiumSkia::adjustSearchFieldStyle(CSSStyleSelector*,
 }
 
 bool RenderThemeChromiumSkia::paintSearchField(RenderObject* o,
-                                               const RenderObject::PaintInfo& i,
+                                               const PaintInfo& i,
                                                const IntRect& r) {
   return paintTextField(o, i, r);
 }
@@ -437,7 +437,7 @@ IntRect RenderThemeChromiumSkia::convertToPaintingRect(
 
 bool RenderThemeChromiumSkia::paintSearchFieldCancelButton(
     RenderObject* cancelButtonObject,
-    const RenderObject::PaintInfo& paintInfo,
+    const PaintInfo& paintInfo,
     const IntRect& r) {
   // Get the renderer of <input> element.
   Node* input = cancelButtonObject->node()->shadowAncestorNode();
@@ -497,7 +497,7 @@ void RenderThemeChromiumSkia::adjustSearchFieldResultsDecorationStyle(
 
 bool RenderThemeChromiumSkia::paintSearchFieldResultsDecoration(
     RenderObject* magnifierObject,
-    const RenderObject::PaintInfo& paintInfo,
+    const PaintInfo& paintInfo,
     const IntRect& r) {
   // Get the renderer of <input> element.
   Node* input = magnifierObject->node()->shadowAncestorNode();
@@ -548,7 +548,7 @@ void RenderThemeChromiumSkia::adjustSearchFieldResultsButtonStyle(
 
 bool RenderThemeChromiumSkia::paintSearchFieldResultsButton(
     RenderObject* magnifierObject,
-    const RenderObject::PaintInfo& paintInfo,
+    const PaintInfo& paintInfo,
     const IntRect& r) {
   // Get the renderer of <input> element.
   Node* input = magnifierObject->node()->shadowAncestorNode();
@@ -580,7 +580,7 @@ bool RenderThemeChromiumSkia::paintSearchFieldResultsButton(
 
 bool RenderThemeChromiumSkia::paintMediaControlsBackground(
     RenderObject* object,
-    const RenderObject::PaintInfo& paintInfo,
+    const PaintInfo& paintInfo,
     const IntRect& rect) {
 #if ENABLE(VIDEO)
   return RenderMediaControlsChromium::paintMediaControlsPart(
@@ -593,10 +593,9 @@ bool RenderThemeChromiumSkia::paintMediaControlsBackground(
 #endif
 }
 
-bool RenderThemeChromiumSkia::paintMediaSliderTrack(
-    RenderObject* object,
-    const RenderObject::PaintInfo& paintInfo,
-    const IntRect& rect) {
+bool RenderThemeChromiumSkia::paintMediaSliderTrack(RenderObject* object,
+                                                    const PaintInfo& paintInfo,
+                                                    const IntRect& rect) {
 #if ENABLE(VIDEO)
   return RenderMediaControlsChromium::paintMediaControlsPart(
       MediaSlider, object, paintInfo, rect);
@@ -610,7 +609,7 @@ bool RenderThemeChromiumSkia::paintMediaSliderTrack(
 
 bool RenderThemeChromiumSkia::paintMediaVolumeSliderTrack(
     RenderObject* object,
-    const RenderObject::PaintInfo& paintInfo,
+    const PaintInfo& paintInfo,
     const IntRect& rect) {
 #if ENABLE(VIDEO)
   return RenderMediaControlsChromium::paintMediaControlsPart(
@@ -632,10 +631,9 @@ void RenderThemeChromiumSkia::adjustSliderThumbSize(
 #endif
 }
 
-bool RenderThemeChromiumSkia::paintMediaSliderThumb(
-    RenderObject* object,
-    const RenderObject::PaintInfo& paintInfo,
-    const IntRect& rect) {
+bool RenderThemeChromiumSkia::paintMediaSliderThumb(RenderObject* object,
+                                                    const PaintInfo& paintInfo,
+                                                    const IntRect& rect) {
 #if ENABLE(VIDEO)
   return RenderMediaControlsChromium::paintMediaControlsPart(
       MediaSliderThumb, object, paintInfo, rect);
@@ -649,7 +647,7 @@ bool RenderThemeChromiumSkia::paintMediaSliderThumb(
 
 bool RenderThemeChromiumSkia::paintMediaVolumeSliderThumb(
     RenderObject* object,
-    const RenderObject::PaintInfo& paintInfo,
+    const PaintInfo& paintInfo,
     const IntRect& rect) {
 #if ENABLE(VIDEO)
   return RenderMediaControlsChromium::paintMediaControlsPart(
@@ -662,10 +660,9 @@ bool RenderThemeChromiumSkia::paintMediaVolumeSliderThumb(
 #endif
 }
 
-bool RenderThemeChromiumSkia::paintMediaPlayButton(
-    RenderObject* object,
-    const RenderObject::PaintInfo& paintInfo,
-    const IntRect& rect) {
+bool RenderThemeChromiumSkia::paintMediaPlayButton(RenderObject* object,
+                                                   const PaintInfo& paintInfo,
+                                                   const IntRect& rect) {
 #if ENABLE(VIDEO)
   return RenderMediaControlsChromium::paintMediaControlsPart(
       MediaPlayButton, object, paintInfo, rect);
@@ -677,10 +674,9 @@ bool RenderThemeChromiumSkia::paintMediaPlayButton(
 #endif
 }
 
-bool RenderThemeChromiumSkia::paintMediaMuteButton(
-    RenderObject* object,
-    const RenderObject::PaintInfo& paintInfo,
-    const IntRect& rect) {
+bool RenderThemeChromiumSkia::paintMediaMuteButton(RenderObject* object,
+                                                   const PaintInfo& paintInfo,
+                                                   const IntRect& rect) {
 #if ENABLE(VIDEO)
   return RenderMediaControlsChromium::paintMediaControlsPart(
       MediaMuteButton, object, paintInfo, rect);
@@ -700,7 +696,7 @@ void RenderThemeChromiumSkia::adjustMenuListStyle(CSSStyleSelector* selector,
 }
 
 bool RenderThemeChromiumSkia::paintMenuList(RenderObject* o,
-                                            const RenderObject::PaintInfo& i,
+                                            const PaintInfo& i,
                                             const IntRect& rect) {
   SkCanvas* const canvas = i.context->platformContext()->canvas();
   const int right = rect.x() + rect.width();
@@ -733,15 +729,14 @@ void RenderThemeChromiumSkia::adjustMenuListButtonStyle(
 }
 
 // Used to paint styled menulists (i.e. with a non-default border)
-bool RenderThemeChromiumSkia::paintMenuListButton(
-    RenderObject* o,
-    const RenderObject::PaintInfo& i,
-    const IntRect& rect) {
+bool RenderThemeChromiumSkia::paintMenuListButton(RenderObject* o,
+                                                  const PaintInfo& i,
+                                                  const IntRect& rect) {
   return paintMenuList(o, i, rect);
 }
 
 bool RenderThemeChromiumSkia::paintSliderTrack(RenderObject*,
-                                               const RenderObject::PaintInfo& i,
+                                               const PaintInfo& i,
                                                const IntRect& rect) {
   // Just paint a grey box for now (matches the color of a scrollbar background.
   SkCanvas* const canvas = i.context->platformContext()->canvas();
@@ -761,7 +756,7 @@ bool RenderThemeChromiumSkia::paintSliderTrack(RenderObject*,
 }
 
 bool RenderThemeChromiumSkia::paintSliderThumb(RenderObject* o,
-                                               const RenderObject::PaintInfo& i,
+                                               const PaintInfo& i,
                                                const IntRect& rect) {
   // Make a thumb similar to the scrollbar thumb.
   const bool hovered =
@@ -905,10 +900,9 @@ double RenderThemeChromiumSkia::animationDurationForProgressBar(
          2;  // "2" for back and forth
 }
 
-bool RenderThemeChromiumSkia::paintProgressBar(
-    RenderObject* renderObject,
-    const RenderObject::PaintInfo& paintInfo,
-    const IntRect& rect) {
+bool RenderThemeChromiumSkia::paintProgressBar(RenderObject* renderObject,
+                                               const PaintInfo& paintInfo,
+                                               const IntRect& rect) {
   static Image* barImage =
       Image::loadPlatformResource("linuxProgressBar").releaseRef();
   static Image* valueImage =

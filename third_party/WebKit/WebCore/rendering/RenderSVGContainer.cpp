@@ -90,7 +90,7 @@ void RenderSVGContainer::paint(PaintInfo& paintInfo, int, int) {
   // Let the RenderSVGViewportContainer subclass clip if necessary
   applyViewportClip(childPaintInfo);
 
-  applyTransformToPaintInfo(childPaintInfo, localToParentTransform());
+  childPaintInfo.applyTransform(localToParentTransform());
 
   RenderSVGResourceFilter* filter = 0;
   FloatRect boundingBox = repaintRectInLocalCoordinates();
@@ -101,7 +101,7 @@ void RenderSVGContainer::paint(PaintInfo& paintInfo, int, int) {
         prepareToRenderSVGContent(this, childPaintInfo, boundingBox, filter);
 
   if (continueRendering) {
-    childPaintInfo.paintingRoot = paintingRootForChildren(childPaintInfo);
+    childPaintInfo.updatePaintingRootForChildren(this);
     for (RenderObject* child = firstChild(); child;
          child = child->nextSibling())
       child->paint(childPaintInfo, 0, 0);

@@ -53,7 +53,7 @@ class EllipsisBox : public InlineBox {
         m_markupBox(markupBox),
         m_selectionState(RenderObject::SelectionNone) {}
 
-  virtual void paint(RenderObject::PaintInfo&, int tx, int ty);
+  virtual void paint(PaintInfo&, int tx, int ty);
   virtual bool nodeAtPoint(const HitTestRequest&,
                            HitTestResult&,
                            int x,

@@ -211,8 +211,8 @@ IntRect SVGInlineTextBox::selectionRect(int, int, int startPos, int endPos) {
   return enclosingIntRect(m_chunkTransformation.mapRect(selectionRect));
 }
 
-void SVGInlineTextBox::paint(RenderObject::PaintInfo& paintInfo, int, int) {
-  ASSERT(renderer()->shouldPaintWithinRoot(paintInfo));
+void SVGInlineTextBox::paint(PaintInfo& paintInfo, int, int) {
+  ASSERT(paintInfo.shouldPaintWithinRoot(renderer()));
   ASSERT(paintInfo.phase == PaintPhaseForeground ||
          paintInfo.phase == PaintPhaseSelection);
   ASSERT(truncation() == cNoTruncation);

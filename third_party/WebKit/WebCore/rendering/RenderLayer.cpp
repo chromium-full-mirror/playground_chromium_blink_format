@@ -2448,12 +2448,11 @@ void RenderLayer::paint(GraphicsContext* p,
                         const IntRect& damageRect,
                         PaintBehavior paintBehavior,
                         RenderObject* paintingRoot) {
-  RenderObject::OverlapTestRequestMap overlapTestRequests;
+  OverlapTestRequestMap overlapTestRequests;
   paintLayer(this, p, damageRect, paintBehavior, paintingRoot,
              &overlapTestRequests);
-  RenderObject::OverlapTestRequestMap::iterator end = overlapTestRequests.end();
-  for (RenderObject::OverlapTestRequestMap::iterator it =
-           overlapTestRequests.begin();
+  OverlapTestRequestMap::iterator end = overlapTestRequests.end();
+  for (OverlapTestRequestMap::iterator it = overlapTestRequests.begin();
        it != end; ++it)
     it->first->setOverlapTestResult(false);
 }
@@ -2475,13 +2474,11 @@ static void restoreClip(GraphicsContext* p,
   p->restore();
 }
 
-static void performOverlapTests(
-    RenderObject::OverlapTestRequestMap& overlapTestRequests,
-    const IntRect& layerBounds) {
+static void performOverlapTests(OverlapTestRequestMap& overlapTestRequests,
+                                const IntRect& layerBounds) {
   Vector<OverlapTestRequestClient*> overlappedRequestClients;
-  RenderObject::OverlapTestRequestMap::iterator end = overlapTestRequests.end();
-  for (RenderObject::OverlapTestRequestMap::iterator it =
-           overlapTestRequests.begin();
+  OverlapTestRequestMap::iterator end = overlapTestRequests.end();
+  for (OverlapTestRequestMap::iterator it = overlapTestRequests.begin();
        it != end; ++it) {
     if (!layerBounds.intersects(it->second))
       continue;
@@ -2500,14 +2497,13 @@ static bool shouldDoSoftwarePaint(const RenderLayer* layer,
 }
 #endif
 
-void RenderLayer::paintLayer(
-    RenderLayer* rootLayer,
-    GraphicsContext* p,
-    const IntRect& paintDirtyRect,
-    PaintBehavior paintBehavior,
-    RenderObject* paintingRoot,
-    RenderObject::OverlapTestRequestMap* overlapTestRequests,
-    PaintLayerFlags paintFlags) {
+void RenderLayer::paintLayer(RenderLayer* rootLayer,
+                             GraphicsContext* p,
+                             const IntRect& paintDirtyRect,
+                             PaintBehavior paintBehavior,
+                             RenderObject* paintingRoot,
+                             OverlapTestRequestMap* overlapTestRequests,
+                             PaintLayerFlags paintFlags) {
 #if USE(ACCELERATED_COMPOSITING)
   if (isComposited()) {
     // The updatingControlTints() painting pass goes through compositing layers,
@@ -2652,8 +2648,8 @@ void RenderLayer::paintLayer(
     setClip(p, paintDirtyRect, damageRect);
 
     // Paint the background.
-    RenderObject::PaintInfo paintInfo(p, damageRect, PaintPhaseBlockBackground,
-                                      false, paintingRootForRenderer, 0);
+    PaintInfo paintInfo(p, damageRect, PaintPhaseBlockBackground, false,
+                        paintingRootForRenderer, 0);
     renderer()->paint(paintInfo, tx, ty);
 
     // Restore the clip.
@@ -2673,7 +2669,7 @@ void RenderLayer::paintLayer(
 
     // Set up the clip used when painting our children.
     setClip(p, paintDirtyRect, clipRectToApply);
-    RenderObject::PaintInfo paintInfo(
+    PaintInfo paintInfo(
         p, clipRectToApply,
         selectionOnly ? PaintPhaseSelection : PaintPhaseChildBlockBackgrounds,
         forceBlackText, paintingRootForRenderer, 0);
@@ -2694,8 +2690,8 @@ void RenderLayer::paintLayer(
 
   if (!outlineRect.isEmpty() && isSelfPaintingLayer()) {
     // Paint our own outline
-    RenderObject::PaintInfo paintInfo(p, outlineRect, PaintPhaseSelfOutline,
-                                      false, paintingRootForRenderer, 0);
+    PaintInfo paintInfo(p, outlineRect, PaintPhaseSelfOutline, false,
+                        paintingRootForRenderer, 0);
     setClip(p, paintDirtyRect, outlineRect);
     renderer()->paint(paintInfo, tx, ty);
     restoreClip(p, paintDirtyRect, outlineRect);
@@ -2714,8 +2710,8 @@ void RenderLayer::paintLayer(
     setClip(p, paintDirtyRect, damageRect);
 
     // Paint the mask.
-    RenderObject::PaintInfo paintInfo(p, damageRect, PaintPhaseMask, false,
-                                      paintingRootForRenderer, 0);
+    PaintInfo paintInfo(p, damageRect, PaintPhaseMask, false,
+                        paintingRootForRenderer, 0);
     renderer()->paint(paintInfo, tx, ty);
 
     // Restore the clip.
@@ -2730,15 +2726,14 @@ void RenderLayer::paintLayer(
   }
 }
 
-void RenderLayer::paintList(
-    Vector<RenderLayer*>* list,
-    RenderLayer* rootLayer,
-    GraphicsContext* p,
-    const IntRect& paintDirtyRect,
-    PaintBehavior paintBehavior,
-    RenderObject* paintingRoot,
-    RenderObject::OverlapTestRequestMap* overlapTestRequests,
-    PaintLayerFlags paintFlags) {
+void RenderLayer::paintList(Vector<RenderLayer*>* list,
+                            RenderLayer* rootLayer,
+                            GraphicsContext* p,
+                            const IntRect& paintDirtyRect,
+                            PaintBehavior paintBehavior,
+                            RenderObject* paintingRoot,
+                            OverlapTestRequestMap* overlapTestRequests,
+                            PaintLayerFlags paintFlags) {
   if (!list)
     return;
 
@@ -2761,7 +2756,7 @@ void RenderLayer::paintPaginatedChildLayer(
     const IntRect& paintDirtyRect,
     PaintBehavior paintBehavior,
     RenderObject* paintingRoot,
-    RenderObject::OverlapTestRequestMap* overlapTestRequests,
+    OverlapTestRequestMap* overlapTestRequests,
     PaintLayerFlags paintFlags) {
   // We need to do multiple passes, breaking up our child layer into strips.
   ASSERT(!renderer()->isPositioned());
@@ -2790,7 +2785,7 @@ void RenderLayer::paintChildLayerIntoColumns(
     const IntRect& paintDirtyRect,
     PaintBehavior paintBehavior,
     RenderObject* paintingRoot,
-    RenderObject::OverlapTestRequestMap* overlapTestRequests,
+    OverlapTestRequestMap* overlapTestRequests,
     PaintLayerFlags paintFlags,
     const Vector<RenderLayer*>& columnLayers,
     size_t colIndex) {

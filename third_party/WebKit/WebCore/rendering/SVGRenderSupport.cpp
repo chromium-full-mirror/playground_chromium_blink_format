@@ -94,7 +94,7 @@ void SVGRenderBase::mapLocalToContainer(const RenderObject* object,
 
 bool SVGRenderBase::prepareToRenderSVGContent(
     RenderObject* object,
-    RenderObject::PaintInfo& paintInfo,
+    PaintInfo& paintInfo,
     const FloatRect& repaintRect,
     RenderSVGResourceFilter*& filter) {
 #if !ENABLE(FILTERS)
@@ -173,7 +173,7 @@ bool SVGRenderBase::prepareToRenderSVGContent(
 }
 
 void SVGRenderBase::finishRenderSVGContent(RenderObject* object,
-                                           RenderObject::PaintInfo& paintInfo,
+                                           PaintInfo& paintInfo,
                                            RenderSVGResourceFilter*& filter,
                                            GraphicsContext* savedContext) {
 #if !ENABLE(FILTERS)
@@ -215,8 +215,7 @@ void renderSubtreeToImage(ImageBuffer* image, RenderObject* item) {
   FrameView* frameView = item->document()->view();
   if (frameView)
     rect = IntRect(0, 0, frameView->visibleWidth(), frameView->visibleHeight());
-  RenderObject::PaintInfo info(image->context(), rect, PaintPhaseForeground, 0,
-                               0, 0);
+  PaintInfo info(image->context(), rect, PaintPhaseForeground, 0, 0, 0);
 
   // FIXME: isSVGContainer returns true for RenderSVGViewportContainer, so if
   // this is ever
@@ -434,16 +433,6 @@ void deregisterFromResources(RenderObject* object) {
     invalidatePaintingResource(svgStyle->fillPaint(), object);
   if (svgStyle->hasStroke())
     invalidatePaintingResource(svgStyle->strokePaint(), object);
-}
-
-void applyTransformToPaintInfo(
-    RenderObject::PaintInfo& paintInfo,
-    const AffineTransform& localToAncestorTransform) {
-  if (localToAncestorTransform.isIdentity())
-    return;
-
-  paintInfo.context->concatCTM(localToAncestorTransform);
-  paintInfo.rect = localToAncestorTransform.inverse().mapRect(paintInfo.rect);
 }
 
 DashArray dashArrayFromRenderingStyle(const RenderStyle* style,

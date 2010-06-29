@@ -36,7 +36,7 @@ class RenderMediaControls {
  public:
   static bool paintMediaControlsPart(MediaControlElementType,
                                      RenderObject*,
-                                     const RenderObject::PaintInfo&,
+                                     const PaintInfo&,
                                      const IntRect&);
   static void adjustMediaSliderThumbSize(RenderObject*);
 };

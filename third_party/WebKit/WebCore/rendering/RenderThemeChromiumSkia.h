@@ -68,43 +68,33 @@ class RenderThemeChromiumSkia : public RenderTheme {
 
   virtual int minimumMenuListSize(RenderStyle*) const;
 
-  virtual bool paintCheckbox(RenderObject*,
-                             const RenderObject::PaintInfo&,
-                             const IntRect&);
+  virtual bool paintCheckbox(RenderObject*, const PaintInfo&, const IntRect&);
   virtual void setCheckboxSize(RenderStyle*) const;
 
-  virtual bool paintRadio(RenderObject*,
-                          const RenderObject::PaintInfo&,
-                          const IntRect&);
+  virtual bool paintRadio(RenderObject*, const PaintInfo&, const IntRect&);
   virtual void setRadioSize(RenderStyle*) const;
 
-  virtual bool paintButton(RenderObject*,
-                           const RenderObject::PaintInfo&,
-                           const IntRect&);
+  virtual bool paintButton(RenderObject*, const PaintInfo&, const IntRect&);
   virtual void adjustButtonStyle(CSSStyleSelector*,
                                  RenderStyle*,
                                  Element*) const;
 
-  virtual bool paintTextField(RenderObject*,
-                              const RenderObject::PaintInfo&,
-                              const IntRect&);
+  virtual bool paintTextField(RenderObject*, const PaintInfo&, const IntRect&);
 
-  virtual bool paintTextArea(RenderObject*,
-                             const RenderObject::PaintInfo&,
-                             const IntRect&);
+  virtual bool paintTextArea(RenderObject*, const PaintInfo&, const IntRect&);
 
   virtual void adjustSearchFieldStyle(CSSStyleSelector*,
                                       RenderStyle*,
                                       Element*) const;
   virtual bool paintSearchField(RenderObject*,
-                                const RenderObject::PaintInfo&,
+                                const PaintInfo&,
                                 const IntRect&);
 
   virtual void adjustSearchFieldCancelButtonStyle(CSSStyleSelector*,
                                                   RenderStyle*,
                                                   Element*) const;
   virtual bool paintSearchFieldCancelButton(RenderObject*,
-                                            const RenderObject::PaintInfo&,
+                                            const PaintInfo&,
                                             const IntRect&);
 
   virtual void adjustSearchFieldDecorationStyle(CSSStyleSelector*,
@@ -115,37 +105,37 @@ class RenderThemeChromiumSkia : public RenderTheme {
                                                        RenderStyle*,
                                                        Element*) const;
   virtual bool paintSearchFieldResultsDecoration(RenderObject*,
-                                                 const RenderObject::PaintInfo&,
+                                                 const PaintInfo&,
                                                  const IntRect&);
 
   virtual void adjustSearchFieldResultsButtonStyle(CSSStyleSelector*,
                                                    RenderStyle*,
                                                    Element*) const;
   virtual bool paintSearchFieldResultsButton(RenderObject*,
-                                             const RenderObject::PaintInfo&,
+                                             const PaintInfo&,
                                              const IntRect&);
 
   virtual bool paintMediaControlsBackground(RenderObject*,
-                                            const RenderObject::PaintInfo&,
+                                            const PaintInfo&,
                                             const IntRect&);
   virtual bool paintMediaSliderTrack(RenderObject*,
-                                     const RenderObject::PaintInfo&,
+                                     const PaintInfo&,
                                      const IntRect&);
   virtual bool paintMediaVolumeSliderTrack(RenderObject*,
-                                           const RenderObject::PaintInfo&,
+                                           const PaintInfo&,
                                            const IntRect&);
   virtual void adjustSliderThumbSize(RenderObject*) const;
   virtual bool paintMediaSliderThumb(RenderObject*,
-                                     const RenderObject::PaintInfo&,
+                                     const PaintInfo&,
                                      const IntRect&);
   virtual bool paintMediaVolumeSliderThumb(RenderObject*,
-                                           const RenderObject::PaintInfo&,
+                                           const PaintInfo&,
                                            const IntRect&);
   virtual bool paintMediaPlayButton(RenderObject*,
-                                    const RenderObject::PaintInfo&,
+                                    const PaintInfo&,
                                     const IntRect&);
   virtual bool paintMediaMuteButton(RenderObject*,
-                                    const RenderObject::PaintInfo&,
+                                    const PaintInfo&,
                                     const IntRect&);
 
   // MenuList refers to an unstyled menulist (meaning a menulist without
@@ -160,28 +150,26 @@ class RenderThemeChromiumSkia : public RenderTheme {
   virtual void adjustMenuListStyle(CSSStyleSelector*,
                                    RenderStyle*,
                                    Element*) const;
-  virtual bool paintMenuList(RenderObject*,
-                             const RenderObject::PaintInfo&,
-                             const IntRect&);
+  virtual bool paintMenuList(RenderObject*, const PaintInfo&, const IntRect&);
   virtual void adjustMenuListButtonStyle(CSSStyleSelector*,
                                          RenderStyle*,
                                          Element*) const;
   virtual bool paintMenuListButton(RenderObject*,
-                                   const RenderObject::PaintInfo&,
+                                   const PaintInfo&,
                                    const IntRect&);
 
   virtual bool paintSliderTrack(RenderObject*,
-                                const RenderObject::PaintInfo&,
+                                const PaintInfo&,
                                 const IntRect&);
   virtual bool paintSliderThumb(RenderObject*,
-                                const RenderObject::PaintInfo&,
+                                const PaintInfo&,
                                 const IntRect&);
 
 #if ENABLE(PROGRESS_TAG)
   virtual double animationRepeatIntervalForProgressBar(RenderProgress*) const;
   virtual double animationDurationForProgressBar(RenderProgress*) const;
   virtual bool paintProgressBar(RenderObject*,
-                                const RenderObject::PaintInfo&,
+                                const PaintInfo&,
                                 const IntRect&);
 #endif
 

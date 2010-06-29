@@ -115,7 +115,7 @@ RenderBox* RenderFieldset::findLegend() const {
 }
 
 void RenderFieldset::paintBoxDecorations(PaintInfo& paintInfo, int tx, int ty) {
-  if (!shouldPaintWithinRoot(paintInfo))
+  if (!paintInfo.shouldPaintWithinRoot(this))
     return;
 
   int w = width();

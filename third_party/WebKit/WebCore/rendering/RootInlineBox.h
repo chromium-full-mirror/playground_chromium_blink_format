@@ -104,7 +104,7 @@ class RootInlineBox : public InlineFlowBox {
 
   EllipsisBox* ellipsisBox() const;
 
-  void paintEllipsisBox(RenderObject::PaintInfo&, int tx, int ty) const;
+  void paintEllipsisBox(PaintInfo&, int tx, int ty) const;
   bool hitTestEllipsisBox(HitTestResult&,
                           int x,
                           int y,
@@ -117,13 +117,13 @@ class RootInlineBox : public InlineFlowBox {
 
 #if PLATFORM(MAC)
   void addHighlightOverflow();
-  void paintCustomHighlight(RenderObject::PaintInfo&,
+  void paintCustomHighlight(PaintInfo&,
                             int tx,
                             int ty,
                             const AtomicString& highlightType);
 #endif
 
-  virtual void paint(RenderObject::PaintInfo&, int tx, int ty);
+  virtual void paint(PaintInfo&, int tx, int ty);
   virtual bool nodeAtPoint(const HitTestRequest&,
                            HitTestResult&,
                            int,
@@ -145,7 +145,7 @@ class RootInlineBox : public InlineFlowBox {
                                 int blockY,
                                 int tx,
                                 int ty,
-                                const RenderObject::PaintInfo*);
+                                const PaintInfo*);
 
   RenderBlock* block() const;
 
