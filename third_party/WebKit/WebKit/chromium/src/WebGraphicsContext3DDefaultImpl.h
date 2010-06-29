@@ -67,7 +67,8 @@ class WebGraphicsContext3DDefaultImpl : public WebGraphicsContext3D {
 
   //----------------------------------------------------------------------
   // WebGraphicsContext3D methods
-  virtual bool initialize(WebGraphicsContext3D::Attributes attributes);
+  virtual bool initialize(WebGraphicsContext3D::Attributes attributes,
+                          WebView*);
   virtual bool makeContextCurrent();
 
   virtual int width();
@@ -80,6 +81,9 @@ class WebGraphicsContext3DDefaultImpl : public WebGraphicsContext3D {
   virtual void reshape(int width, int height);
 
   virtual bool readBackFramebuffer(unsigned char* pixels, size_t bufferSize);
+
+  virtual unsigned int getPlatformTextureId();
+  virtual void prepareTexture();
 
   virtual void synthesizeGLError(unsigned long error);
 

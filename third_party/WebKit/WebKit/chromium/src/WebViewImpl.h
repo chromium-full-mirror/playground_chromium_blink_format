@@ -183,6 +183,7 @@ class WebViewImpl : public WebView, public RefCounted<WebViewImpl> {
   virtual void addUserScript(const WebString& sourceCode, bool runAtStart);
   virtual void addUserStyleSheet(const WebString& sourceCode);
   virtual void removeAllUserContent();
+  virtual WebGLES2Context* gles2Context();
 
   // WebViewImpl
 
@@ -303,10 +304,6 @@ class WebViewImpl : public WebView, public RefCounted<WebViewImpl> {
       int keyCode,
       WebCore::ScrollDirection* scrollDirection,
       WebCore::ScrollGranularity* scrollGranularity);
-
-  // Returns the GLES2Context associated with this WebView. One will be created
-  // if it doesn't already exist.
-  WebGLES2Context* gles2Context();
 
  private:
   friend class WebView;  // So WebView::Create can call our constructor

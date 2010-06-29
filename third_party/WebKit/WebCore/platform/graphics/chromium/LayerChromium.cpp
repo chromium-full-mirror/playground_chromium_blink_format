@@ -299,7 +299,6 @@ void LayerChromium::removeAllSublayers() {
     ASSERT(layer->superlayer());
     layer->removeFromSuperlayer();
   }
-  setNeedsCommit();
 }
 
 void LayerChromium::setSublayers(

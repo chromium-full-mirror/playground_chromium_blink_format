@@ -86,6 +86,7 @@ class GraphicsLayerChromium : public GraphicsLayer {
 
   virtual void setContentsToImage(Image*);
   virtual void setContentsToVideo(PlatformLayer*);
+  virtual void setContentsToWebGL(PlatformLayer*);
 
   virtual PlatformLayer* platformLayer() const;
 

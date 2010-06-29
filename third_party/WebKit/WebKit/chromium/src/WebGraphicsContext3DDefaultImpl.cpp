@@ -199,7 +199,8 @@ WebGraphicsContext3DDefaultImpl::~WebGraphicsContext3DDefaultImpl() {
 }
 
 bool WebGraphicsContext3DDefaultImpl::initialize(
-    WebGraphicsContext3D::Attributes attributes) {
+    WebGraphicsContext3D::Attributes attributes,
+    WebView* webView) {
 #if OS(WINDOWS)
   WNDCLASS wc;
   if (!GetClassInfo(GetModuleHandle(0), L"CANVASGL", &wc)) {
@@ -463,6 +464,15 @@ int WebGraphicsContext3DDefaultImpl::sizeInBytes(int type) {
 
 bool WebGraphicsContext3DDefaultImpl::isGLES2Compliant() {
   return false;
+}
+
+unsigned int WebGraphicsContext3DDefaultImpl::getPlatformTextureId() {
+  ASSERT_NOT_REACHED();
+  return 0;
+}
+
+void WebGraphicsContext3DDefaultImpl::prepareTexture() {
+  ASSERT_NOT_REACHED();
 }
 
 static int createTextureObject(GLenum target) {
