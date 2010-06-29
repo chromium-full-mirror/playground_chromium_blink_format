@@ -2,6 +2,7 @@
     Copyright (C) 2004, 2005, 2006, 2007 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005 Rob Buis <buis@kde.org>
                   2005 Eric Seidel <eric@webkit.org>
+                  2010 Zoltan Herczeg <zherczeg@webkit.org>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -27,6 +28,7 @@
 #include "FloatPoint.h"
 #include "FloatSize.h"
 #include "Filter.h"
+#include <wtf/AlwaysInline.h>
 #include <wtf/Vector.h>
 
 namespace WebCore {
@@ -38,21 +40,22 @@ enum EdgeModeType {
   EDGEMODE_NONE = 3
 };
 
+class CanvasPixelArray;
+
 class FEConvolveMatrix : public FilterEffect {
  public:
   static PassRefPtr<FEConvolveMatrix> create(FilterEffect*,
-                                             FilterEffect*,
-                                             const FloatSize&,
-                                             const float&,
-                                             const float&,
-                                             const FloatSize&,
+                                             const IntSize&,
+                                             float,
+                                             float,
+                                             const IntPoint&,
                                              EdgeModeType,
                                              const FloatPoint&,
                                              bool,
                                              const Vector<float>&);
 
-  FloatSize kernelSize() const;
-  void setKernelSize(FloatSize);
+  IntSize kernelSize() const;
+  void setKernelSize(IntSize);
 
   const Vector<float>& kernel() const;
   void setKernel(const Vector<float>&);
@@ -63,8 +66,8 @@ class FEConvolveMatrix : public FilterEffect {
   float bias() const;
   void setBias(float);
 
-  FloatSize targetOffset() const;
-  void setTargetOffset(FloatSize);
+  IntPoint targetOffset() const;
+  void setTargetOffset(IntPoint);
 
   EdgeModeType edgeMode() const;
   void setEdgeMode(EdgeModeType);
@@ -75,32 +78,26 @@ class FEConvolveMatrix : public FilterEffect {
   bool preserveAlpha() const;
   void setPreserveAlpha(bool);
 
-  virtual FloatRect uniteChildEffectSubregions(Filter* filter) {
-    return calculateUnionOfChildEffectSubregions(filter, m_in.get(),
-                                                 m_in2.get());
-  }
   void apply(Filter*);
   void dump();
   TextStream& externalRepresentation(TextStream&, int indent) const;
 
  private:
   FEConvolveMatrix(FilterEffect*,
-                   FilterEffect*,
-                   const FloatSize&,
-                   const float&,
-                   const float&,
-                   const FloatSize&,
+                   const IntSize&,
+                   float,
+                   float,
+                   const IntPoint&,
                    EdgeModeType,
                    const FloatPoint&,
                    bool,
                    const Vector<float>&);
 
   RefPtr<FilterEffect> m_in;
-  RefPtr<FilterEffect> m_in2;
-  FloatSize m_kernelSize;
+  IntSize m_kernelSize;
   float m_divisor;
   float m_bias;
-  FloatSize m_targetOffset;
+  IntPoint m_targetOffset;
   EdgeModeType m_edgeMode;
   FloatPoint m_kernelUnitLength;
   bool m_preserveAlpha;

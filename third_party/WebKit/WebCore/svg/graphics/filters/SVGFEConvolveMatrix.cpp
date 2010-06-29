@@ -2,6 +2,8 @@
     Copyright (C) 2004, 2005, 2006, 2007 Nikolas Zimmermann <zimmermann@kde.org>
                   2004, 2005 Rob Buis <buis@kde.org>
                   2005 Eric Seidel <eric@webkit.org>
+                  2009 Dirk Schulze <krit@webkit.org>
+                  2010 Zoltan Herczeg <zherczeg@webkit.org>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -23,24 +25,25 @@
 
 #if ENABLE(SVG) && ENABLE(FILTERS)
 #include "SVGFEConvolveMatrix.h"
+
+#include "CanvasPixelArray.h"
 #include "Filter.h"
+#include "ImageData.h"
 #include "SVGRenderTreeAsText.h"
 
 namespace WebCore {
 
 FEConvolveMatrix::FEConvolveMatrix(FilterEffect* in,
-                                   FilterEffect* in2,
-                                   const FloatSize& kernelSize,
-                                   const float& divisor,
-                                   const float& bias,
-                                   const FloatSize& targetOffset,
+                                   const IntSize& kernelSize,
+                                   float divisor,
+                                   float bias,
+                                   const IntPoint& targetOffset,
                                    EdgeModeType edgeMode,
                                    const FloatPoint& kernelUnitLength,
                                    bool preserveAlpha,
                                    const Vector<float>& kernelMatrix)
     : FilterEffect(),
       m_in(in),
-      m_in2(in2),
       m_kernelSize(kernelSize),
       m_divisor(divisor),
       m_bias(bias),
@@ -52,25 +55,24 @@ FEConvolveMatrix::FEConvolveMatrix(FilterEffect* in,
 
 PassRefPtr<FEConvolveMatrix> FEConvolveMatrix::create(
     FilterEffect* in,
-    FilterEffect* in2,
-    const FloatSize& kernelSize,
-    const float& divisor,
-    const float& bias,
-    const FloatSize& targetOffset,
+    const IntSize& kernelSize,
+    float divisor,
+    float bias,
+    const IntPoint& targetOffset,
     EdgeModeType edgeMode,
     const FloatPoint& kernelUnitLength,
     bool preserveAlpha,
     const Vector<float>& kernelMatrix) {
-  return adoptRef(new FEConvolveMatrix(in, in2, kernelSize, divisor, bias,
+  return adoptRef(new FEConvolveMatrix(in, kernelSize, divisor, bias,
                                        targetOffset, edgeMode, kernelUnitLength,
                                        preserveAlpha, kernelMatrix));
 }
 
-FloatSize FEConvolveMatrix::kernelSize() const {
+IntSize FEConvolveMatrix::kernelSize() const {
   return m_kernelSize;
 }
 
-void FEConvolveMatrix::setKernelSize(FloatSize kernelSize) {
+void FEConvolveMatrix::setKernelSize(IntSize kernelSize) {
   m_kernelSize = kernelSize;
 }
 
@@ -98,11 +100,11 @@ void FEConvolveMatrix::setBias(float bias) {
   m_bias = bias;
 }
 
-FloatSize FEConvolveMatrix::targetOffset() const {
+IntPoint FEConvolveMatrix::targetOffset() const {
   return m_targetOffset;
 }
 
-void FEConvolveMatrix::setTargetOffset(FloatSize targetOffset) {
+void FEConvolveMatrix::setTargetOffset(IntPoint targetOffset) {
   m_targetOffset = targetOffset;
 }
 
@@ -166,7 +168,6 @@ TextStream& FEConvolveMatrix::externalRepresentation(TextStream& ts,
      << "kernelUnitLength=\"" << m_kernelUnitLength << "\" "
      << "preserveAlpha=\"" << m_preserveAlpha << "\"]\n";
   m_in->externalRepresentation(ts, indent + 1);
-  m_in2->externalRepresentation(ts, indent + 1);
   return ts;
 }
 

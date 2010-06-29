@@ -280,6 +280,7 @@
 #include "JSSVGFEColorMatrixElement.cpp"
 #include "JSSVGFEComponentTransferElement.cpp"
 #include "JSSVGFECompositeElement.cpp"
+#include "JSSVGFEConvolveMatrixElement.cpp"
 #include "JSSVGFEDiffuseLightingElement.cpp"
 #include "JSSVGFEDisplacementMapElement.cpp"
 #include "JSSVGFEDistantLightElement.cpp"
