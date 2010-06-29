@@ -120,6 +120,12 @@ class SVGInlineTextBox : public InlineTextBox {
                  RenderStyle* selectionStyle,
                  bool hasSelection,
                  bool paintSelectedTextOnly);
+  void paintTextWithShadows(GraphicsContext*,
+                            const FloatPoint& textOrigin,
+                            RenderStyle*,
+                            TextRun&,
+                            int startPos,
+                            int endPos);
 
   FloatRect selectionRectForTextChunkPart(const SVGTextChunkPart&,
                                           int partStartPos,
