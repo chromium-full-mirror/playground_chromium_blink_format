@@ -78,7 +78,7 @@ class WebGraphicsContext3D : public WebNonCopyable {
 
   // Creates a "default" implementation of WebGraphicsContext3D which calls
   // OpenGL directly.
-  static WebGraphicsContext3D* createDefault();
+  WEBKIT_API static WebGraphicsContext3D* createDefault();
 
   // Initializes the graphics context; should be the first operation performed
   // on newly-constructed instances. Returns true on success.

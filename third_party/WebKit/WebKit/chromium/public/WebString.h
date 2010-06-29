@@ -122,14 +122,14 @@ class WebString {
 
   WebString(const NullableString16& s) : m_private(0) {
     if (s.is_null())
-      assign(0);
+      reset();
     else
       assign(s.string().data(), s.string().length());
   }
 
   WebString& operator=(const NullableString16& s) {
     if (s.is_null())
-      assign(0);
+      reset();
     else
       assign(s.string().data(), s.string().length());
     return *this;
