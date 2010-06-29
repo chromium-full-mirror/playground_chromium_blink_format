@@ -43,7 +43,7 @@ void CharacterData::setData(const String& data, ExceptionCode&) {
     detach();
     attach();
   } else if (renderer())
-    toRenderText(renderer())->setText(m_data);
+    toRenderText(renderer())->setTextWithOffset(m_data, 0, oldLength);
 
   dispatchModifiedEvent(oldStr.get());
 
