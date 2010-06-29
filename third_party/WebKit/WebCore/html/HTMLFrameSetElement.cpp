@@ -120,66 +120,64 @@ void HTMLFrameSetElement::parseMappedAttribute(Attribute* attr) {
     }
   } else if (attr->name() == onloadAttr)
     document()->setWindowAttributeEventListener(
-        eventNames().loadEvent,
-        createAttributeEventListener(document()->frame(), attr));
+        eventNames().loadEvent, createWindowAttributeEventListener(this, attr));
   else if (attr->name() == onbeforeunloadAttr)
     document()->setWindowAttributeEventListener(
         eventNames().beforeunloadEvent,
-        createAttributeEventListener(document()->frame(), attr));
+        createWindowAttributeEventListener(this, attr));
   else if (attr->name() == onunloadAttr)
     document()->setWindowAttributeEventListener(
         eventNames().unloadEvent,
-        createAttributeEventListener(document()->frame(), attr));
+        createWindowAttributeEventListener(this, attr));
   else if (attr->name() == onblurAttr)
     document()->setWindowAttributeEventListener(
-        eventNames().blurEvent,
-        createAttributeEventListener(document()->frame(), attr));
+        eventNames().blurEvent, createWindowAttributeEventListener(this, attr));
   else if (attr->name() == onfocusAttr)
     document()->setWindowAttributeEventListener(
         eventNames().focusEvent,
-        createAttributeEventListener(document()->frame(), attr));
+        createWindowAttributeEventListener(this, attr));
   else if (attr->name() == onfocusinAttr)
     document()->setWindowAttributeEventListener(
         eventNames().focusinEvent,
-        createAttributeEventListener(document()->frame(), attr));
+        createWindowAttributeEventListener(this, attr));
   else if (attr->name() == onfocusoutAttr)
     document()->setWindowAttributeEventListener(
         eventNames().focusoutEvent,
-        createAttributeEventListener(document()->frame(), attr));
+        createWindowAttributeEventListener(this, attr));
 #if ENABLE(ORIENTATION_EVENTS)
   else if (attr->name() == onorientationchangeAttr)
     document()->setWindowAttributeEventListener(
         eventNames().orientationchangeEvent,
-        createAttributeEventListener(document()->frame(), attr));
+        createWindowAttributeEventListener(this, attr));
 #endif
   else if (attr->name() == onhashchangeAttr)
     document()->setWindowAttributeEventListener(
         eventNames().hashchangeEvent,
-        createAttributeEventListener(document()->frame(), attr));
+        createWindowAttributeEventListener(this, attr));
   else if (attr->name() == onresizeAttr)
     document()->setWindowAttributeEventListener(
         eventNames().resizeEvent,
-        createAttributeEventListener(document()->frame(), attr));
+        createWindowAttributeEventListener(this, attr));
   else if (attr->name() == onscrollAttr)
     document()->setWindowAttributeEventListener(
         eventNames().scrollEvent,
-        createAttributeEventListener(document()->frame(), attr));
+        createWindowAttributeEventListener(this, attr));
   else if (attr->name() == onstorageAttr)
     document()->setWindowAttributeEventListener(
         eventNames().storageEvent,
-        createAttributeEventListener(document()->frame(), attr));
+        createWindowAttributeEventListener(this, attr));
   else if (attr->name() == ononlineAttr)
     document()->setWindowAttributeEventListener(
         eventNames().onlineEvent,
-        createAttributeEventListener(document()->frame(), attr));
+        createWindowAttributeEventListener(this, attr));
   else if (attr->name() == onofflineAttr)
     document()->setWindowAttributeEventListener(
         eventNames().offlineEvent,
-        createAttributeEventListener(document()->frame(), attr));
+        createWindowAttributeEventListener(this, attr));
   else if (attr->name() == onpopstateAttr)
     document()->setWindowAttributeEventListener(
         eventNames().popstateEvent,
-        createAttributeEventListener(document()->frame(), attr));
+        createWindowAttributeEventListener(this, attr));
   else
     HTMLElement::parseMappedAttribute(attr);
 }
