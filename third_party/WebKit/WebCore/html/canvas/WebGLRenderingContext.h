@@ -821,12 +821,12 @@ class WebGLRenderingContext : public CanvasRenderingContext {
 
   // Helper function to check input format/type for functions
   // {copy}Tex{Sub}Image.
-  // Generate GL error and return false if parameters are invalid.
+  // Generates GL error and returns false if parameters are invalid.
   bool validateTexFuncFormatAndType(unsigned long format, unsigned long type);
 
   // Helper function to check input parameters for functions
   // {copy}Tex{Sub}Image.
-  // Generate GL error and return false if parameters are invalid.
+  // Generates GL error and returns false if parameters are invalid.
   bool validateTexFuncParameters(unsigned long target,
                                  long level,
                                  unsigned long internalformat,
@@ -835,6 +835,15 @@ class WebGLRenderingContext : public CanvasRenderingContext {
                                  long border,
                                  unsigned long format,
                                  unsigned long type);
+
+  // Helper function to validate that the given ArrayBufferView
+  // is of the correct type and contains enough data for the texImage call.
+  // Generates GL error and returns false if parameters are invalid.
+  bool validateTexFuncData(long width,
+                           long height,
+                           unsigned long format,
+                           unsigned long type,
+                           ArrayBufferView* pixels);
 
   // Helper function to validate mode for draw{Arrays/Elements}.
   bool validateDrawMode(unsigned long);

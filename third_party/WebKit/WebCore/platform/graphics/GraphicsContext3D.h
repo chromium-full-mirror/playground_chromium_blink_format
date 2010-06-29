@@ -504,6 +504,21 @@ class GraphicsContext3D : public Noncopyable {
                         bool premultiplyAlpha,
                         Vector<uint8_t>& data);
 
+  // Helper function which extracts the user-supplied texture
+  // data, applying the flipY and premultiplyAlpha parameters.
+  // If the data is not tightly packed according to the passed
+  // unpackAlignment, the output data will be tightly packed.
+  // Returns true if successful, false if any error occurred.
+  bool extractTextureData(unsigned int width,
+                          unsigned int height,
+                          unsigned int format,
+                          unsigned int type,
+                          unsigned int unpackAlignment,
+                          bool flipY,
+                          bool premultiplyAlpha,
+                          ArrayBufferView* pixels,
+                          Vector<uint8_t>& data);
+
   // Flips the given image data vertically, in-place.
   void flipVertically(void* imageData,
                       unsigned int width,
@@ -518,7 +533,13 @@ class GraphicsContext3D : public Noncopyable {
   enum SourceDataFormat {
     kSourceFormatRGBA8,
     kSourceFormatRGB8,
-    kSourceFormatBGRA8
+    kSourceFormatBGRA8,
+    kSourceFormatRGBA5551,
+    kSourceFormatRGBA4444,
+    kSourceFormatRGB565,
+    kSourceFormatR8,
+    kSourceFormatRA8,
+    kSourceFormatA8
   };
 
   //----------------------------------------------------------------------
@@ -846,12 +867,14 @@ class GraphicsContext3D : public Noncopyable {
 
   // Helper for getImageData which implements packing of pixel
   // data into the specified OpenGL destination format and type.
-  // Source data must be in RGBA format with no gaps between
-  // rows. Destination data will have no gaps between rows.
+  // A sourceUnpackAlignment of zero indicates that the source
+  // data is tightly packed. Non-zero values may take a slow path.
+  // Destination data will have no gaps between rows.
   bool packPixels(const uint8_t* sourceData,
                   SourceDataFormat sourceDataFormat,
                   unsigned int width,
                   unsigned int height,
+                  unsigned int sourceUnpackAlignment,
                   unsigned int destinationFormat,
                   unsigned int destinationType,
                   AlphaOp alphaOp,
