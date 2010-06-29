@@ -45,7 +45,7 @@ void RenderForeignObject::paint(PaintInfo& paintInfo, int, int) {
   childPaintInfo.context->save();
   childPaintInfo.applyTransform(localTransform());
 
-  if (SVGRenderBase::isOverflowHidden(this))
+  if (SVGRenderSupport::isOverflowHidden(this))
     childPaintInfo.context->clip(m_viewport);
 
   float opacity = style()->opacity();
@@ -62,15 +62,16 @@ void RenderForeignObject::paint(PaintInfo& paintInfo, int, int) {
 
 IntRect RenderForeignObject::clippedOverflowRectForRepaint(
     RenderBoxModelObject* repaintContainer) {
-  return SVGRenderBase::clippedOverflowRectForRepaint(this, repaintContainer);
+  return SVGRenderSupport::clippedOverflowRectForRepaint(this,
+                                                         repaintContainer);
 }
 
 void RenderForeignObject::computeRectForRepaint(
     RenderBoxModelObject* repaintContainer,
     IntRect& repaintRect,
     bool fixed) {
-  SVGRenderBase::computeRectForRepaint(this, repaintContainer, repaintRect,
-                                       fixed);
+  SVGRenderSupport::computeRectForRepaint(this, repaintContainer, repaintRect,
+                                          fixed);
 }
 
 const AffineTransform& RenderForeignObject::localToParentTransform() const {
@@ -133,7 +134,8 @@ bool RenderForeignObject::nodeAtFloatPoint(const HitTestRequest& request,
   FloatPoint localPoint = localTransform().inverse().mapPoint(pointInParent);
 
   // Early exit if local point is not contained in clipped viewport area
-  if (SVGRenderBase::isOverflowHidden(this) && !m_viewport.contains(localPoint))
+  if (SVGRenderSupport::isOverflowHidden(this) &&
+      !m_viewport.contains(localPoint))
     return false;
 
   IntPoint roundedLocalPoint = roundedIntPoint(localPoint);
@@ -161,8 +163,8 @@ void RenderForeignObject::mapLocalToContainer(
   // useTransforms may not be set to true.
   if (!useTransforms)
     useTransforms = true;
-  SVGRenderBase::mapLocalToContainer(this, repaintContainer, fixed,
-                                     useTransforms, transformState);
+  SVGRenderSupport::mapLocalToContainer(this, repaintContainer, fixed,
+                                        useTransforms, transformState);
 }
 }
 

@@ -33,9 +33,7 @@
 #if ENABLE(SVG)
 #include "RenderSVGModelObject.h"
 
-#include "GraphicsContext.h"
-#include "RenderLayer.h"
-#include "RenderView.h"
+#include "RenderSVGResource.h"
 #include "SVGStyledElement.h"
 
 namespace WebCore {
@@ -45,15 +43,16 @@ RenderSVGModelObject::RenderSVGModelObject(SVGStyledElement* node)
 
 IntRect RenderSVGModelObject::clippedOverflowRectForRepaint(
     RenderBoxModelObject* repaintContainer) {
-  return SVGRenderBase::clippedOverflowRectForRepaint(this, repaintContainer);
+  return SVGRenderSupport::clippedOverflowRectForRepaint(this,
+                                                         repaintContainer);
 }
 
 void RenderSVGModelObject::computeRectForRepaint(
     RenderBoxModelObject* repaintContainer,
     IntRect& repaintRect,
     bool fixed) {
-  SVGRenderBase::computeRectForRepaint(this, repaintContainer, repaintRect,
-                                       fixed);
+  SVGRenderSupport::computeRectForRepaint(this, repaintContainer, repaintRect,
+                                          fixed);
 }
 
 void RenderSVGModelObject::mapLocalToContainer(
@@ -61,14 +60,14 @@ void RenderSVGModelObject::mapLocalToContainer(
     bool fixed,
     bool useTransforms,
     TransformState& transformState) const {
-  SVGRenderBase::mapLocalToContainer(this, repaintContainer, fixed,
-                                     useTransforms, transformState);
+  SVGRenderSupport::mapLocalToContainer(this, repaintContainer, fixed,
+                                        useTransforms, transformState);
 }
 
 // Copied from RenderBox, this method likely requires further refactoring to
 // work easily for both SVG and CSS Box Model content.
-// FIXME: This may also need to move into SVGRenderBase as the RenderBox version
-// depends
+// FIXME: This may also need to move into SVGRenderSupport as the RenderBox
+// version depends
 // on borderBoundingBox() which SVG RenderBox subclases (like SVGRenderBlock) do
 // not implement.
 IntRect RenderSVGModelObject::outlineBoundsForRepaint(
@@ -93,7 +92,7 @@ void RenderSVGModelObject::absoluteQuads(Vector<FloatQuad>& quads) {
 }
 
 void RenderSVGModelObject::destroy() {
-  deregisterFromResources(this);
+  RenderSVGResource::invalidateAllResourcesOfRenderer(this);
   RenderObject::destroy();
 }
 

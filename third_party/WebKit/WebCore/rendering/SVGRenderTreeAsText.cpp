@@ -364,8 +364,9 @@ static void writeStyle(TextStream& ts, const RenderObject& object) {
 
       double dashOffset = SVGRenderStyle::cssPrimitiveToLength(
           &path, svgStyle->strokeDashOffset(), 0.0f);
-      const DashArray& dashArray = dashArrayFromRenderingStyle(
-          style, object.document()->documentElement()->renderStyle());
+      const DashArray& dashArray =
+          SVGRenderSupport::dashArrayFromRenderingStyle(
+              style, object.document()->documentElement()->renderStyle());
       double strokeWidth = SVGRenderStyle::cssPrimitiveToLength(
           &path, svgStyle->strokeWidth(), 1.0f);
 

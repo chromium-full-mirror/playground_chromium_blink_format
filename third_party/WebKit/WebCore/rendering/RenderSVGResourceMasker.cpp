@@ -183,7 +183,8 @@ void RenderSVGResourceMasker::createMaskImage(MaskerData* maskerData,
     RenderStyle* style = renderer->style();
     if (!style || style->display() == NONE || style->visibility() != VISIBLE)
       continue;
-    renderSubtreeToImage(maskerData->maskImage.get(), renderer);
+    SVGRenderSupport::renderSubtreeToImage(maskerData->maskImage.get(),
+                                           renderer);
   }
 
   maskImageContext->restore();

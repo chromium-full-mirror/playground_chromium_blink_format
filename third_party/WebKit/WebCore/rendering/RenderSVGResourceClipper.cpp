@@ -274,8 +274,9 @@ bool RenderSVGResourceClipper::createClipData(
     // apply it's x/y/transform/etc. values when rendering.
     // So if isUseElement is true, refetch the childNode->renderer(), as
     // renderer got overriden above.
-    renderSubtreeToImage(clipperData->clipMaskImage.get(),
-                         isUseElement ? childNode->renderer() : renderer);
+    SVGRenderSupport::renderSubtreeToImage(
+        clipperData->clipMaskImage.get(),
+        isUseElement ? childNode->renderer() : renderer);
 
     renderer->setStyle(oldRenderStyle.release());
   }
@@ -309,7 +310,7 @@ bool RenderSVGResourceClipper::hitTestClipContent(
     const FloatRect& objectBoundingBox,
     const FloatPoint& nodeAtPoint) {
   FloatPoint point = nodeAtPoint;
-  if (!pointInClippingArea(this, point))
+  if (!SVGRenderSupport::pointInClippingArea(this, point))
     return false;
 
   if (static_cast<SVGClipPathElement*>(node())->clipPathUnits() ==

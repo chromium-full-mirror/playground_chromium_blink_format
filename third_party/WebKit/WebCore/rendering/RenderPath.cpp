@@ -54,7 +54,7 @@ class BoundingRectStrokeStyleApplier : public StrokeStyleApplier {
   }
 
   void strokeStyle(GraphicsContext* gc) {
-    applyStrokeStyleToContext(gc, m_style, m_object);
+    SVGRenderSupport::applyStrokeStyleToContext(gc, m_style, m_object);
   }
 
  private:
@@ -194,8 +194,8 @@ void RenderPath::paint(PaintInfo& paintInfo, int, int) {
     if (childPaintInfo.phase == PaintPhaseForeground) {
       PaintInfo savedInfo(childPaintInfo);
 
-      if (prepareToRenderSVGContent(this, childPaintInfo, boundingBox,
-                                    filter)) {
+      if (SVGRenderSupport::prepareToRenderSVGContent(this, childPaintInfo,
+                                                      boundingBox, filter)) {
         const SVGRenderStyle* svgStyle = style()->svgStyle();
         if (svgStyle->shapeRendering() == SR_CRISPEDGES)
           childPaintInfo.context->setShouldAntialias(false);
@@ -206,7 +206,8 @@ void RenderPath::paint(PaintInfo& paintInfo, int, int) {
           m_markerLayoutInfo.drawMarkers(childPaintInfo);
       }
 
-      finishRenderSVGContent(this, childPaintInfo, filter, savedInfo.context);
+      SVGRenderSupport::finishRenderSVGContent(this, childPaintInfo, filter,
+                                               savedInfo.context);
     }
 
     if (drawsOutline)
@@ -237,7 +238,7 @@ bool RenderPath::nodeAtFloatPoint(const HitTestRequest& request,
 
   FloatPoint localPoint = m_localTransform.inverse().mapPoint(pointInParent);
 
-  if (!pointInClippingArea(this, localPoint))
+  if (!SVGRenderSupport::pointInClippingArea(this, localPoint))
     return false;
 
   PointerEventsHitRules hitRules(PointerEventsHitRules::SVG_PATH_HITTESTING,
@@ -349,7 +350,8 @@ void RenderPath::updateCachedBoundaries() {
 
   // Cache smallest possible repaint rectangle
   m_repaintBoundingBox = m_strokeAndMarkerBoundingBox;
-  intersectRepaintRectWithResources(this, m_repaintBoundingBox);
+  SVGRenderSupport::intersectRepaintRectWithResources(this,
+                                                      m_repaintBoundingBox);
 }
 }
 

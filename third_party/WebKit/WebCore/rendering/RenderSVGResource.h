@@ -87,6 +87,8 @@ class RenderSVGResource {
                                                    const RenderStyle*);
   static RenderSVGResourceSolidColor* sharedSolidPaintingResource();
 
+  static void invalidateAllResourcesOfRenderer(RenderObject*);
+
  private:
   static void adjustColorForPseudoRules(const RenderStyle*,
                                         bool useFillPaint,

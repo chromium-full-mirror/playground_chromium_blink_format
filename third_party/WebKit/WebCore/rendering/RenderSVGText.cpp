@@ -36,6 +36,7 @@
 #include "HitTestRequest.h"
 #include "PointerEventsHitRules.h"
 #include "RenderLayer.h"
+#include "RenderSVGResource.h"
 #include "RenderSVGRoot.h"
 #include "SVGLengthList.h"
 #include "SVGRenderSupport.h"
@@ -53,23 +54,24 @@ RenderSVGText::RenderSVGText(SVGTextElement* node)
 
 IntRect RenderSVGText::clippedOverflowRectForRepaint(
     RenderBoxModelObject* repaintContainer) {
-  return SVGRenderBase::clippedOverflowRectForRepaint(this, repaintContainer);
+  return SVGRenderSupport::clippedOverflowRectForRepaint(this,
+                                                         repaintContainer);
 }
 
 void RenderSVGText::computeRectForRepaint(
     RenderBoxModelObject* repaintContainer,
     IntRect& repaintRect,
     bool fixed) {
-  SVGRenderBase::computeRectForRepaint(this, repaintContainer, repaintRect,
-                                       fixed);
+  SVGRenderSupport::computeRectForRepaint(this, repaintContainer, repaintRect,
+                                          fixed);
 }
 
 void RenderSVGText::mapLocalToContainer(RenderBoxModelObject* repaintContainer,
                                         bool fixed,
                                         bool useTransforms,
                                         TransformState& transformState) const {
-  SVGRenderBase::mapLocalToContainer(this, repaintContainer, fixed,
-                                     useTransforms, transformState);
+  SVGRenderSupport::mapLocalToContainer(this, repaintContainer, fixed,
+                                        useTransforms, transformState);
 }
 
 void RenderSVGText::layout() {
@@ -126,7 +128,7 @@ bool RenderSVGText::nodeAtFloatPoint(const HitTestRequest& request,
       FloatPoint localPoint =
           localToParentTransform().inverse().mapPoint(pointInParent);
 
-      if (!pointInClippingArea(this, localPoint))
+      if (!SVGRenderSupport::pointInClippingArea(this, localPoint))
         return false;
 
       return RenderBlock::nodeAtPoint(request, result, (int)localPoint.x(),
@@ -138,7 +140,7 @@ bool RenderSVGText::nodeAtFloatPoint(const HitTestRequest& request,
 }
 
 void RenderSVGText::destroy() {
-  deregisterFromResources(this);
+  RenderSVGResource::invalidateAllResourcesOfRenderer(this);
   RenderSVGBlock::destroy();
 }
 
@@ -185,7 +187,7 @@ FloatRect RenderSVGText::strokeBoundingBox() const {
 
 FloatRect RenderSVGText::repaintRectInLocalCoordinates() const {
   FloatRect repaintRect = strokeBoundingBox();
-  intersectRepaintRectWithResources(this, repaintRect);
+  SVGRenderSupport::intersectRepaintRectWithResources(this, repaintRect);
 
   return repaintRect;
 }

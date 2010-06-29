@@ -95,7 +95,8 @@ static inline bool createMaskAndSwapContextForTextGradient(
     GraphicsContext*& savedContext,
     OwnPtr<ImageBuffer>& imageBuffer,
     const RenderObject* object) {
-  const RenderObject* textRootBlock = findTextRootObject(object);
+  const RenderObject* textRootBlock =
+      SVGRenderSupport::findTextRootObject(object);
 
   AffineTransform transform = absoluteTransformForRenderer(textRootBlock);
   FloatRect maskAbsoluteBoundingBox =
@@ -129,7 +130,8 @@ static inline AffineTransform clipToTextMask(GraphicsContext* context,
                                              OwnPtr<ImageBuffer>& imageBuffer,
                                              const RenderObject* object,
                                              GradientData* gradientData) {
-  const RenderObject* textRootBlock = findTextRootObject(object);
+  const RenderObject* textRootBlock =
+      SVGRenderSupport::findTextRootObject(object);
   context->clipToImageBuffer(textRootBlock->repaintRectInLocalCoordinates(),
                              imageBuffer.get());
 
@@ -235,7 +237,7 @@ bool RenderSVGResourceGradient::applyResource(RenderObject* object,
                                       gradientData->userspaceTransform));
     context->setAlpha(svgStyle->strokeOpacity());
     context->setStrokeGradient(gradientData->gradient);
-    applyStrokeStyleToContext(context, style, object);
+    SVGRenderSupport::applyStrokeStyleToContext(context, style, object);
   }
 
   return true;
@@ -261,7 +263,8 @@ void RenderSVGResourceGradient::postApplyResource(RenderObject* object,
           clipToTextMask(context, m_imageBuffer, object, gradientData));
       context->setFillGradient(gradientData->gradient);
 
-      const RenderObject* textRootBlock = findTextRootObject(object);
+      const RenderObject* textRootBlock =
+          SVGRenderSupport::findTextRootObject(object);
       context->fillRect(textRootBlock->repaintRectInLocalCoordinates());
 
       m_imageBuffer.clear();

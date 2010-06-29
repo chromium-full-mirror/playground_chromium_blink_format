@@ -33,7 +33,7 @@ namespace WebCore {
 class SVGStyledElement;
 class AffineTransform;
 
-class RenderSVGRoot : public RenderBox, protected SVGRenderBase {
+class RenderSVGRoot : public RenderBox {
  public:
   RenderSVGRoot(SVGStyledElement*);
 
@@ -64,14 +64,13 @@ class RenderSVGRoot : public RenderBox, protected SVGRenderBase {
   bool fillContains(const FloatPoint&) const;
   bool strokeContains(const FloatPoint&) const;
 
-  virtual FloatRect objectBoundingBox() const;
+  virtual FloatRect objectBoundingBox() const {
+    return SVGRenderSupport::computeContainerBoundingBox(this, false);
+  }
   virtual FloatRect strokeBoundingBox() const {
-    return computeContainerBoundingBox(this, true);
+    return SVGRenderSupport::computeContainerBoundingBox(this, true);
   }
   virtual FloatRect repaintRectInLocalCoordinates() const;
-
-  // FIXME: This override should be removed.
-  virtual AffineTransform localTransform() const;
 
   virtual bool nodeAtPoint(const HitTestRequest&,
                            HitTestResult&,
@@ -122,5 +121,3 @@ void toRenderSVGRoot(const RenderSVGRoot*);
 
 #endif  // ENABLE(SVG)
 #endif  // RenderSVGRoot_h
-
-// vim:ts=4:noet

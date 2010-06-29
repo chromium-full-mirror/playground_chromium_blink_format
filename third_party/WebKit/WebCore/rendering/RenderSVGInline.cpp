@@ -39,21 +39,21 @@ InlineFlowBox* RenderSVGInline::createInlineFlowBox() {
 }
 
 FloatRect RenderSVGInline::objectBoundingBox() const {
-  if (const RenderObject* object = findTextRootObject(this))
+  if (const RenderObject* object = SVGRenderSupport::findTextRootObject(this))
     return object->objectBoundingBox();
 
   return FloatRect();
 }
 
 FloatRect RenderSVGInline::strokeBoundingBox() const {
-  if (const RenderObject* object = findTextRootObject(this))
+  if (const RenderObject* object = SVGRenderSupport::findTextRootObject(this))
     return object->strokeBoundingBox();
 
   return FloatRect();
 }
 
 FloatRect RenderSVGInline::repaintRectInLocalCoordinates() const {
-  if (const RenderObject* object = findTextRootObject(this))
+  if (const RenderObject* object = SVGRenderSupport::findTextRootObject(this))
     return object->repaintRectInLocalCoordinates();
 
   return FloatRect();
@@ -61,15 +61,16 @@ FloatRect RenderSVGInline::repaintRectInLocalCoordinates() const {
 
 IntRect RenderSVGInline::clippedOverflowRectForRepaint(
     RenderBoxModelObject* repaintContainer) {
-  return SVGRenderBase::clippedOverflowRectForRepaint(this, repaintContainer);
+  return SVGRenderSupport::clippedOverflowRectForRepaint(this,
+                                                         repaintContainer);
 }
 
 void RenderSVGInline::computeRectForRepaint(
     RenderBoxModelObject* repaintContainer,
     IntRect& repaintRect,
     bool fixed) {
-  SVGRenderBase::computeRectForRepaint(this, repaintContainer, repaintRect,
-                                       fixed);
+  SVGRenderSupport::computeRectForRepaint(this, repaintContainer, repaintRect,
+                                          fixed);
 }
 
 void RenderSVGInline::mapLocalToContainer(
@@ -77,12 +78,12 @@ void RenderSVGInline::mapLocalToContainer(
     bool useTransforms,
     bool fixed,
     TransformState& transformState) const {
-  SVGRenderBase::mapLocalToContainer(this, repaintContainer, useTransforms,
-                                     fixed, transformState);
+  SVGRenderSupport::mapLocalToContainer(this, repaintContainer, useTransforms,
+                                        fixed, transformState);
 }
 
 void RenderSVGInline::absoluteQuads(Vector<FloatQuad>& quads) {
-  const RenderObject* object = findTextRootObject(this);
+  const RenderObject* object = SVGRenderSupport::findTextRootObject(this);
   if (!object)
     return;
 

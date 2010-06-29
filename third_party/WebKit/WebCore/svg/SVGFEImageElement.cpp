@@ -28,6 +28,7 @@
 #include "CachedImage.h"
 #include "DocLoader.h"
 #include "Document.h"
+#include "RenderObject.h"
 #include "SVGLength.h"
 #include "SVGNames.h"
 #include "SVGPreserveAspectRatio.h"
@@ -118,7 +119,7 @@ PassRefPtr<FilterEffect> SVGFEImageElement::build(SVGFilterBuilder*) {
     IntRect targetRect = enclosingIntRect(renderer->objectBoundingBox());
     m_targetImage = ImageBuffer::create(targetRect.size(), LinearRGB);
 
-    renderSubtreeToImage(m_targetImage.get(), renderer);
+    SVGRenderSupport::renderSubtreeToImage(m_targetImage.get(), renderer);
   }
 
   return FEImage::create(

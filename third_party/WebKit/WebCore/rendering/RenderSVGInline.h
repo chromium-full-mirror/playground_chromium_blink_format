@@ -31,7 +31,7 @@
 
 namespace WebCore {
 
-class RenderSVGInline : public RenderInline, protected SVGRenderBase {
+class RenderSVGInline : public RenderInline {
  public:
   RenderSVGInline(Node*);
 

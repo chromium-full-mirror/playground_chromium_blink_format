@@ -35,7 +35,7 @@ namespace WebCore {
 
 class SVGInlineTextBox;
 
-class SVGRootInlineBox : public RootInlineBox, protected SVGRenderBase {
+class SVGRootInlineBox : public RootInlineBox {
  public:
   SVGRootInlineBox(RenderObject* obj) : RootInlineBox(obj), m_height(0) {}
 

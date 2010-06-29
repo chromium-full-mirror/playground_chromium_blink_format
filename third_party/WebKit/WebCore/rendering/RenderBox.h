@@ -418,10 +418,6 @@ class RenderBox : public RenderBoxModelObject {
   bool shrinkToAvoidFloats() const;
   virtual bool avoidsFloats() const;
 
-#if ENABLE(SVG)
-  virtual AffineTransform localTransform() const;
-#endif
-
  protected:
   virtual void styleWillChange(StyleDifference, const RenderStyle* newStyle);
   virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);

@@ -57,7 +57,7 @@ void RenderSVGContainer::layout() {
   calculateLocalTransform();  // Allow RenderSVGTransformableContainer to update
                               // its transform
 
-  layoutChildren(this, selfNeedsLayout());
+  SVGRenderSupport::layoutChildren(this, selfNeedsLayout());
   repainter.repaintAfterLayout();
 
   setNeedsLayout(false);
@@ -97,8 +97,8 @@ void RenderSVGContainer::paint(PaintInfo& paintInfo, int, int) {
 
   bool continueRendering = true;
   if (childPaintInfo.phase == PaintPhaseForeground)
-    continueRendering =
-        prepareToRenderSVGContent(this, childPaintInfo, boundingBox, filter);
+    continueRendering = SVGRenderSupport::prepareToRenderSVGContent(
+        this, childPaintInfo, boundingBox, filter);
 
   if (continueRendering) {
     childPaintInfo.updatePaintingRootForChildren(this);
@@ -108,7 +108,8 @@ void RenderSVGContainer::paint(PaintInfo& paintInfo, int, int) {
   }
 
   if (paintInfo.phase == PaintPhaseForeground)
-    finishRenderSVGContent(this, childPaintInfo, filter, paintInfo.context);
+    SVGRenderSupport::finishRenderSVGContent(this, childPaintInfo, filter,
+                                             paintInfo.context);
 
   childPaintInfo.context->restore();
 
@@ -138,18 +139,18 @@ void RenderSVGContainer::addFocusRingRects(Vector<IntRect>& rects, int, int) {
 }
 
 FloatRect RenderSVGContainer::objectBoundingBox() const {
-  return computeContainerBoundingBox(this, false);
+  return SVGRenderSupport::computeContainerBoundingBox(this, false);
 }
 
 FloatRect RenderSVGContainer::strokeBoundingBox() const {
-  return computeContainerBoundingBox(this, true);
+  return SVGRenderSupport::computeContainerBoundingBox(this, true);
 }
 
 // RenderSVGContainer is used for <g> elements which do not themselves have a
 // width or height, so we union all of our child rects as our repaint rect.
 FloatRect RenderSVGContainer::repaintRectInLocalCoordinates() const {
-  FloatRect repaintRect = computeContainerBoundingBox(this, true);
-  intersectRepaintRectWithResources(this, repaintRect);
+  FloatRect repaintRect = strokeBoundingBox();
+  SVGRenderSupport::intersectRepaintRectWithResources(this, repaintRect);
 
   return repaintRect;
 }
@@ -165,7 +166,7 @@ bool RenderSVGContainer::nodeAtFloatPoint(const HitTestRequest& request,
   FloatPoint localPoint =
       localToParentTransform().inverse().mapPoint(pointInParent);
 
-  if (!pointInClippingArea(this, localPoint))
+  if (!SVGRenderSupport::pointInClippingArea(this, localPoint))
     return false;
 
   for (RenderObject* child = lastChild(); child;
