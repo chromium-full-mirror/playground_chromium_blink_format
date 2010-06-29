@@ -110,7 +110,8 @@ class ContainerNode : public Node {
   void setLastChild(Node* child) { m_lastChild = child; }
 
  private:
-  void addChildCommon(PassRefPtr<Node>);
+  // FIXME: This should take a PassRefPtr.
+  void addChildCommon(Node*);
 
   static void dispatchPostAttachCallbacks();
 
