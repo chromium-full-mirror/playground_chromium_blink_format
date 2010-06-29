@@ -63,7 +63,7 @@ class HTMLTableElement : public HTMLElement {
   String rules() const;
   String summary() const;
 
-  virtual ContainerNode* addChild(PassRefPtr<Node>);
+  virtual ContainerNode* legacyParserAddChild(PassRefPtr<Node>);
 
   virtual void attach();
 

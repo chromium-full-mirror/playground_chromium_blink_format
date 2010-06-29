@@ -291,7 +291,7 @@ class Node : public EventTarget,
   // Also does not dispatch DOM mutation events.
   // Returns the appropriate container node for future insertions as you parse,
   // or 0 for failure.
-  virtual ContainerNode* addChild(PassRefPtr<Node>);
+  virtual ContainerNode* legacyParserAddChild(PassRefPtr<Node>);
   // addChild is tied into the logic of the LegacyHTMLTreeBuilder.  We need
   // a "clean" version to use for the HTML5 version of the HTMLTreeBuilder.
   virtual void parserAddChild(PassRefPtr<Node>);

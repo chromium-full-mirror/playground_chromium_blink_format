@@ -118,7 +118,7 @@ static inline RefPtr<DocumentFragment> createFragmentFromSource(
   if (sourceMIMEType == "text/html")
     fragment->parseHTML(sourceString);
   else if (sourceMIMEType == "text/plain")
-    fragment->addChild(Text::create(outputDoc, sourceString));
+    fragment->legacyParserAddChild(Text::create(outputDoc, sourceString));
   else {
     bool successfulParse =
         fragment->parseXML(sourceString, outputDoc->documentElement());

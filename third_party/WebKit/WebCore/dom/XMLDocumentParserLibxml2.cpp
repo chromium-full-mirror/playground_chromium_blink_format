@@ -802,7 +802,7 @@ void XMLDocumentParser::startElementNs(const xmlChar* xmlLocalName,
   if (scriptElement)
     m_scriptStartLine = lineNumber();
 
-  if (!m_currentNode->addChild(newElement.get())) {
+  if (!m_currentNode->legacyParserAddChild(newElement.get())) {
     stopParsing();
     return;
   }
@@ -953,7 +953,7 @@ void XMLDocumentParser::processingInstruction(const xmlChar* target,
 
   pi->setCreatedByParser(true);
 
-  if (!m_currentNode->addChild(pi.get()))
+  if (!m_currentNode->legacyParserAddChild(pi.get()))
     return;
   if (m_view && !pi->attached())
     pi->attach();
@@ -979,7 +979,7 @@ void XMLDocumentParser::cdataBlock(const xmlChar* s, int len) {
   exitText();
 
   RefPtr<Node> newNode = CDATASection::create(document(), toString(s, len));
-  if (!m_currentNode->addChild(newNode.get()))
+  if (!m_currentNode->legacyParserAddChild(newNode.get()))
     return;
   if (m_view && !newNode->attached())
     newNode->attach();
@@ -997,7 +997,7 @@ void XMLDocumentParser::comment(const xmlChar* s) {
   exitText();
 
   RefPtr<Node> newNode = Comment::create(document(), toString(s));
-  m_currentNode->addChild(newNode.get());
+  m_currentNode->legacyParserAddChild(newNode.get());
   if (m_view && !newNode->attached())
     newNode->attach();
 }
@@ -1066,7 +1066,7 @@ void XMLDocumentParser::internalSubset(const xmlChar* name,
     }
 #endif
 
-    document()->addChild(DocumentType::create(
+    document()->legacyParserAddChild(DocumentType::create(
         document(), toString(name), toString(externalID), toString(systemID)));
   }
 }

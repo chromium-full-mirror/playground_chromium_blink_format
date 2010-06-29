@@ -139,7 +139,7 @@ PassRefPtr<MediaControlElement> MediaControlElement::create(
 }
 
 void MediaControlElement::attachToParent(Element* parent) {
-  parent->addChild(this);
+  parent->legacyParserAddChild(this);
 }
 
 void MediaControlElement::update() {
@@ -391,7 +391,7 @@ MediaControlInputElement::MediaControlInputElement(
 }
 
 void MediaControlInputElement::attachToParent(Element* parent) {
-  parent->addChild(this);
+  parent->legacyParserAddChild(this);
 }
 
 void MediaControlInputElement::update() {

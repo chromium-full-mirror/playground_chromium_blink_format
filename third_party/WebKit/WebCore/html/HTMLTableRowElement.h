@@ -37,7 +37,7 @@ class HTMLTableRowElement : public HTMLTablePartElement {
   static PassRefPtr<HTMLTableRowElement> create(const QualifiedName&,
                                                 Document*);
 
-  virtual ContainerNode* addChild(PassRefPtr<Node>);
+  virtual ContainerNode* legacyParserAddChild(PassRefPtr<Node>);
 
   int rowIndex() const;
   void setRowIndex(int);
