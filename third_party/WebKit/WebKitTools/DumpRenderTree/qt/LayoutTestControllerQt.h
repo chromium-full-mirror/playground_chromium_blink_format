@@ -103,6 +103,7 @@ class LayoutTestController : public QObject {
   void dumpEditingCallbacks();
   void dumpFrameLoadCallbacks();
   void dumpResourceLoadCallbacks();
+  void dumpResourceResponseMIMETypes();
   void setWillSendRequestReturnsNullOnRedirect(bool enabled);
   void setWillSendRequestReturnsNull(bool enabled);
   void setWillSendRequestClearHeader(const QStringList& headers);

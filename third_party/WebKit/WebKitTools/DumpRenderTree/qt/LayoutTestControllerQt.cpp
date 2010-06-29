@@ -66,6 +66,7 @@ void LayoutTestController::reset() {
   DumpRenderTreeSupportQt::dumpEditingCallbacks(false);
   DumpRenderTreeSupportQt::dumpFrameLoader(false);
   DumpRenderTreeSupportQt::dumpResourceLoadCallbacks(false);
+  DumpRenderTreeSupportQt::dumpResourceResponseMIMETypes(false);
   DumpRenderTreeSupportQt::setWillSendRequestReturnsNullOnRedirect(false);
   DumpRenderTreeSupportQt::setWillSendRequestReturnsNull(false);
   DumpRenderTreeSupportQt::setWillSendRequestClearHeaders(QStringList());
@@ -215,6 +216,10 @@ void LayoutTestController::dumpFrameLoadCallbacks() {
 
 void LayoutTestController::dumpResourceLoadCallbacks() {
   DumpRenderTreeSupportQt::dumpResourceLoadCallbacks(true);
+}
+
+void LayoutTestController::dumpResourceResponseMIMETypes() {
+  DumpRenderTreeSupportQt::dumpResourceResponseMIMETypes(true);
 }
 
 void LayoutTestController::setWillSendRequestReturnsNullOnRedirect(
