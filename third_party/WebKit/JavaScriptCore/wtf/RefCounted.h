@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006, 2007, 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2006, 2007, 2008, 2009, 2010 Apple Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -24,6 +24,10 @@
 #include <wtf/Assertions.h>
 #include <wtf/Noncopyable.h>
 
+// Remove this once we make all WebKit code compatible with stricter rules about
+// RefCounted.
+#define LOOSE_REF_COUNTED
+
 namespace WTF {
 
 // This base class holds the non-template methods and attributes.
@@ -33,6 +37,9 @@ class RefCountedBase {
  public:
   void ref() {
     ASSERT(!m_deletionHasBegun);
+#ifndef LOOSE_REF_COUNTED
+    ASSERT(!m_adoptionIsRequired);
+#endif
     ++m_refCount;
   }
 
@@ -48,16 +55,26 @@ class RefCountedBase {
       : m_refCount(1)
 #ifndef NDEBUG
         ,
-        m_deletionHasBegun(false)
+        m_deletionHasBegun(false),
+        m_adoptionIsRequired(true)
 #endif
   {
   }
 
-  ~RefCountedBase() {}
+  ~RefCountedBase() {
+#ifndef LOOSE_REF_COUNTED
+    ASSERT(m_deletionHasBegun);
+    ASSERT(!m_adoptionIsRequired);
+#endif
+  }
 
   // Returns whether the pointer should be freed or not.
   bool derefBase() {
     ASSERT(!m_deletionHasBegun);
+#ifndef LOOSE_REF_COUNTED
+    ASSERT(!m_adoptionIsRequired);
+#endif
+
     ASSERT(m_refCount > 0);
     if (m_refCount == 1) {
 #ifndef NDEBUG
@@ -78,16 +95,32 @@ class RefCountedBase {
 #endif
 
  private:
-  template <class T>
+  template <typename T>
   friend class CrossThreadRefCounted;
+
+#ifndef NDEBUG
+  friend void adopted(RefCountedBase*);
+#endif
 
   int m_refCount;
 #ifndef NDEBUG
   bool m_deletionHasBegun;
+  bool m_adoptionIsRequired;
 #endif
 };
 
-template <class T>
+#ifndef NDEBUG
+
+inline void adopted(RefCountedBase* object) {
+  if (!object)
+    return;
+  ASSERT(!object->m_deletionHasBegun);
+  object->m_adoptionIsRequired = false;
+}
+
+#endif
+
+template <typename T>
 class RefCounted : public RefCountedBase, public Noncopyable {
  public:
   void deref() {
@@ -99,7 +132,7 @@ class RefCounted : public RefCountedBase, public Noncopyable {
   ~RefCounted() {}
 };
 
-template <class T>
+template <typename T>
 class RefCountedCustomAllocated : public RefCountedBase,
                                   public NoncopyableCustomAllocated {
  public:

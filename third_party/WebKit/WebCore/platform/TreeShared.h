@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006, 2007, 2009 Apple Inc. All rights reserved.
+ * Copyright (C) 2006, 2007, 2009, 2010 Apple Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -23,17 +23,32 @@
 
 #include <wtf/Assertions.h>
 #include <wtf/Noncopyable.h>
-#ifndef NDEBUG
 #include <wtf/Threading.h>
-#endif
+
+// Remove this once we make all WebKit code compatible with stricter rules about
+// TreeShared.
+#define LOOSE_TREE_SHARED
 
 namespace WebCore {
 
-template <class T>
+#ifndef NDEBUG
+template <typename T>
+class TreeShared;
+template <typename T>
+void adopted(TreeShared<T>*);
+#endif
+
+template <typename T>
 class TreeShared : public Noncopyable {
  public:
   TreeShared(int initialRefCount = 1)
-      : m_refCount(initialRefCount), m_parent(0) {
+      : m_refCount(initialRefCount),
+        m_parent(0)
+#ifndef NDEBUG
+        ,
+        m_adoptionIsRequired(initialRefCount == 1)
+#endif
+  {
     ASSERT(isMainThread());
 #ifndef NDEBUG
     m_deletionHasBegun = false;
@@ -44,12 +59,18 @@ class TreeShared : public Noncopyable {
     ASSERT(isMainThread());
     ASSERT(!m_refCount);
     ASSERT(m_deletionHasBegun);
+#ifndef LOOSE_REF_COUNTED
+    ASSERT(!m_adoptionIsRequired);
+#endif
   }
 
   void ref() {
     ASSERT(isMainThread());
     ASSERT(!m_deletionHasBegun);
     ASSERT(!m_inRemovedLastRefFunction);
+#ifndef LOOSE_REF_COUNTED
+    ASSERT(!m_adoptionIsRequired);
+#endif
     ++m_refCount;
   }
 
@@ -58,6 +79,9 @@ class TreeShared : public Noncopyable {
     ASSERT(m_refCount >= 0);
     ASSERT(!m_deletionHasBegun);
     ASSERT(!m_inRemovedLastRefFunction);
+#ifndef LOOSE_REF_COUNTED
+    ASSERT(!m_adoptionIsRequired);
+#endif
     if (--m_refCount <= 0 && !m_parent) {
 #ifndef NDEBUG
       m_inRemovedLastRefFunction = true;
@@ -90,6 +114,10 @@ class TreeShared : public Noncopyable {
 #endif
 
  private:
+#ifndef NDEBUG
+  friend void adopted<>(TreeShared<T>*);
+#endif
+
   virtual void removedLastRef() {
 #ifndef NDEBUG
     m_deletionHasBegun = true;
@@ -99,7 +127,23 @@ class TreeShared : public Noncopyable {
 
   int m_refCount;
   T* m_parent;
+#ifndef NDEBUG
+  bool m_adoptionIsRequired;
+#endif
 };
+
+#ifndef NDEBUG
+
+template <typename T>
+inline void adopted(TreeShared<T>* object) {
+  if (!object)
+    return;
+  ASSERT(!object->m_deletionHasBegun);
+  ASSERT(!object->m_inRemovedLastRefFunction);
+  object->m_adoptionIsRequired = false;
+}
+
+#endif
 }
 
 #endif  // TreeShared.h
