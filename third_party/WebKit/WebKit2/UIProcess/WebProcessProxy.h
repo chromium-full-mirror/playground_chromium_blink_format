@@ -56,7 +56,14 @@ class WebProcessProxy : public RefCounted<WebProcessProxy>,
 
   void terminate();
 
-  CoreIPC::Connection* connection() const { return m_connection.get(); }
+  template <typename E, typename T>
+  bool send(E messageID, uint64_t destinationID, const T& arguments);
+
+  CoreIPC::Connection* connection() const {
+    ASSERT(m_connection);
+
+    return m_connection.get();
+  }
 
   WebPageProxy* webPage(uint64_t pageID) const;
   WebPageProxy* createWebPage(WebPageNamespace*);
@@ -79,6 +86,7 @@ class WebProcessProxy : public RefCounted<WebProcessProxy>,
   explicit WebProcessProxy(WebContext*);
 
   void connect();
+  bool sendMessage(CoreIPC::MessageID, std::auto_ptr<CoreIPC::ArgumentEncoder>);
 
   void forwardMessageToWebContext(const WebCore::String&);
   void getPlugins(bool refresh, Vector<WebCore::PluginInfo>&);
@@ -106,6 +114,17 @@ class WebProcessProxy : public RefCounted<WebProcessProxy>,
   // NOTE: This map is for pages in all WebPageNamespaces that use this process.
   WebPageProxyMap m_pageMap;
 };
+
+template <typename E, typename T>
+bool WebProcessProxy::send(E messageID,
+                           uint64_t destinationID,
+                           const T& arguments) {
+  std::auto_ptr<CoreIPC::ArgumentEncoder> argumentEncoder(
+      new CoreIPC::ArgumentEncoder(destinationID));
+  argumentEncoder->encode(arguments);
+
+  return sendMessage(CoreIPC::MessageID(messageID), argumentEncoder);
+}
 
 }  // namespace WebKit
 

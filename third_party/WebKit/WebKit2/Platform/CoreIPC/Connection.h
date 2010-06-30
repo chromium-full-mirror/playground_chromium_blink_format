@@ -97,6 +97,8 @@ class Connection : public ThreadSafeShared<Connection> {
                                          uint64_t destinationID,
                                          double timeout);
 
+  bool sendMessage(MessageID, std::auto_ptr<ArgumentEncoder>);
+
  private:
   Connection(Identifier, bool isServer, Client*, RunLoop* clientRunLoop);
   void platformInitialize(Identifier);
@@ -104,7 +106,6 @@ class Connection : public ThreadSafeShared<Connection> {
 
   bool isValid() const { return m_client; }
 
-  bool sendMessage(MessageID, std::auto_ptr<ArgumentEncoder>);
   std::auto_ptr<ArgumentDecoder> sendSyncMessage(MessageID,
                                                  uint64_t syncRequestID,
                                                  std::auto_ptr<ArgumentEncoder>,
