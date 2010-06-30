@@ -45,7 +45,8 @@ enum PluginQuirk {
   PluginQuirkDontSetNullWindowHandleOnDestroy = 1 << 10,
   PluginQuirkDontAllowMultipleInstances = 1 << 11,
   PluginQuirkRequiresGtkToolKit = 1 << 12,
-  PluginQuirkRequiresDefaultScreenDepth = 1 << 13
+  PluginQuirkRequiresDefaultScreenDepth = 1 << 13,
+  PluginQuirkDontCallSetWindowMoreThanOnce = 1 << 14
 };
 
 class PluginQuirkSet {
