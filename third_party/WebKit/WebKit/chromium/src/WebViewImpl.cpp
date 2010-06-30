@@ -262,8 +262,7 @@ WebViewImpl::WebViewImpl(WebViewClient* client,
   m_lastMousePosition = WebPoint(-1, -1);
 
   if (devToolsClient)
-    m_devToolsAgent = static_cast<WebDevToolsAgentImpl*>(
-        WebDevToolsAgent::create(this, devToolsClient));
+    m_devToolsAgent = new WebDevToolsAgentImpl(this, devToolsClient);
 
   m_page.set(new Page(&m_chromeClientImpl, &m_contextMenuClientImpl,
                       &m_editorClientImpl, &m_dragClientImpl,
@@ -1696,11 +1695,6 @@ void WebViewImpl::setInspectorSetting(const WebString& key,
 
 WebDevToolsAgent* WebViewImpl::devToolsAgent() {
   return m_devToolsAgent.get();
-}
-
-void WebViewImpl::setDevToolsAgent(WebDevToolsAgent* devToolsAgent) {
-  ASSERT(!m_devToolsAgent.get());  // May only set once!
-  m_devToolsAgent.set(static_cast<WebDevToolsAgentPrivate*>(devToolsAgent));
 }
 
 WebAccessibilityObject WebViewImpl::accessibilityObject() {

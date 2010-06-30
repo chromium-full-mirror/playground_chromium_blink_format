@@ -59,8 +59,7 @@ class WebView : public WebWidget {
   // Creates a WebView that is NOT yet initialized.  You will need to
   // call initializeMainFrame to finish the initialization.  It is valid
   // to pass null WebViewClient and WebDevToolsAgentClient pointers.
-  WEBKIT_API static WebView* create(WebViewClient*,
-                                    WebDevToolsAgentClient* = 0);
+  WEBKIT_API static WebView* create(WebViewClient*, WebDevToolsAgentClient*);
 
   // After creating a WebView, you should immediately call this method.
   // You can optionally modify the settings before calling this method.
@@ -221,7 +220,6 @@ class WebView : public WebWidget {
   // The embedder may optionally engage a WebDevToolsAgent.  This may only
   // be set once per WebView.
   virtual WebDevToolsAgent* devToolsAgent() = 0;
-  virtual void setDevToolsAgent(WebDevToolsAgent*) = 0;
 
   // Accessibility -------------------------------------------------------
 
