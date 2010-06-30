@@ -30,12 +30,18 @@
 #include "DatabaseAuthorizer.h"
 
 #if ENABLE(DATABASE)
-#include "Database.h"
 #include "PlatformString.h"
+#include <wtf/PassRefPtr.h>
 
 namespace WebCore {
 
-DatabaseAuthorizer::DatabaseAuthorizer() : m_securityEnabled(false) {
+PassRefPtr<DatabaseAuthorizer> DatabaseAuthorizer::create(
+    const String& databaseInfoTableName) {
+  return adoptRef(new DatabaseAuthorizer(databaseInfoTableName));
+}
+
+DatabaseAuthorizer::DatabaseAuthorizer(const String& databaseInfoTableName)
+    : m_securityEnabled(false), m_databaseInfoTableName(databaseInfoTableName) {
   reset();
   addWhitelistedFunctions();
 }
@@ -356,7 +362,7 @@ void DatabaseAuthorizer::setReadOnly() {
   m_readOnly = true;
 }
 
-int DatabaseAuthorizer::denyBasedOnTableName(const String& tableName) {
+int DatabaseAuthorizer::denyBasedOnTableName(const String& tableName) const {
   if (!m_securityEnabled)
     return SQLAuthAllow;
 
@@ -369,7 +375,7 @@ int DatabaseAuthorizer::denyBasedOnTableName(const String& tableName) {
   //    equalIgnoringCase(tableName, Database::databaseInfoTableName()))
   //        return SQLAuthDeny;
 
-  if (equalIgnoringCase(tableName, Database::databaseInfoTableName()))
+  if (equalIgnoringCase(tableName, m_databaseInfoTableName))
     return SQLAuthDeny;
 
   return SQLAuthAllow;

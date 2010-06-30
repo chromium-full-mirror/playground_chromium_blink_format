@@ -33,18 +33,13 @@
 #include "AbstractDatabase.h"
 #include "PlatformString.h"
 #include "SQLiteDatabase.h"
-#ifndef NDEBUG
-#include "SecurityOrigin.h"
-#endif
 
 #include <wtf/Deque.h>
 #include <wtf/Forward.h>
 
 namespace WebCore {
 
-class DatabaseAuthorizer;
 class DatabaseCallback;
-class DatabaseThread;
 class ScriptExecutionContext;
 class SecurityOrigin;
 class SQLTransaction;
@@ -53,8 +48,6 @@ class SQLTransactionClient;
 class SQLTransactionCoordinator;
 class SQLTransactionErrorCallback;
 class VoidCallback;
-
-typedef int ExceptionCode;
 
 class Database : public AbstractDatabase {
  public:
@@ -68,7 +61,7 @@ class Database : public AbstractDatabase {
                                            unsigned long estimatedSize,
                                            PassRefPtr<DatabaseCallback>,
                                            ExceptionCode&);
-  String version() const;
+  virtual String version() const;
   void changeVersion(const String& oldVersion,
                      const String& newVersion,
                      PassRefPtr<SQLTransactionCallback>,
@@ -80,32 +73,10 @@ class Database : public AbstractDatabase {
                    bool readOnly);
 
   // Internal engine support
-  static const String& databaseInfoTableName();
-
-  void disableAuthorizer();
-  void enableAuthorizer();
-  void setAuthorizerReadOnly();
-  bool lastActionChangedDatabase();
-  bool lastActionWasInsert();
-  void resetDeletes();
-  bool hadDeletes();
-
   Vector<String> tableNames();
 
-  virtual ScriptExecutionContext* scriptExecutionContext() const {
-    return m_scriptExecutionContext.get();
-  }
   virtual SecurityOrigin* securityOrigin() const;
   SQLiteDatabase& sqliteDatabase() { return m_sqliteDatabase; }
-  virtual String stringIdentifier() const;
-  virtual String displayName() const;
-  virtual unsigned long estimatedSize() const;
-  virtual String fileName() const;
-
-  bool getVersionFromDatabase(String&);
-  bool setVersionInDatabase(const String&);
-  void setExpectedVersion(const String&);
-  bool versionMatchesExpected() const;
 
   virtual void markAsDeletedAndClose();
   bool deleted() const { return m_deleted; }
@@ -116,29 +87,25 @@ class Database : public AbstractDatabase {
   };
   void close(ClosePolicy);
   virtual void closeImmediately();
-  bool opened() const { return m_opened; }
 
   void stop();
   bool stopped() const { return m_stopped; }
-
-  bool isNew() const { return m_new; }
 
   unsigned long long databaseSize() const;
   unsigned long long maximumSize() const;
 
   // Called from DatabaseThread, must be prepared to work on the background
   // thread
-  void resetAuthorizer();
   void performPolicyChecks();
 
-  bool performOpenAndVerify(ExceptionCode&);
+  virtual bool performOpenAndVerify(bool setVersionInNewDatabase,
+                                    ExceptionCode&);
 
   void inProgressTransactionCompleted();
   void scheduleTransactionCallback(SQLTransaction*);
   void scheduleTransactionStep(SQLTransaction*, bool immediately = false);
 
   Vector<String> performGetTableNames();
-  void performCreationCallback();
 
   SQLTransactionClient* transactionClient() const;
   SQLTransactionCoordinator* transactionCoordinator() const;
@@ -150,48 +117,23 @@ class Database : public AbstractDatabase {
            const String& name,
            const String& expectedVersion,
            const String& displayName,
-           unsigned long estimatedSize,
-           PassRefPtr<DatabaseCallback>);
+           unsigned long estimatedSize);
 
-  bool openAndVerifyVersion(ExceptionCode&);
+  bool openAndVerifyVersion(bool setVersionInNewDatabase, ExceptionCode&);
 
   void scheduleTransaction();
+
+  static void deliverPendingCallback(void*);
 
   Deque<RefPtr<SQLTransaction>> m_transactionQueue;
   Mutex m_transactionInProgressMutex;
   bool m_transactionInProgress;
   bool m_isTransactionQueueEnabled;
 
-  static void deliverPendingCallback(void*);
-
-  RefPtr<ScriptExecutionContext> m_scriptExecutionContext;
-  RefPtr<SecurityOrigin> m_contextThreadSecurityOrigin;
   RefPtr<SecurityOrigin> m_databaseThreadSecurityOrigin;
-  String m_name;
-  int m_guid;
-  String m_expectedVersion;
-  String m_displayName;
-  unsigned long m_estimatedSize;
-  String m_filename;
 
   bool m_deleted;
-
   bool m_stopped;
-
-  bool m_opened;
-
-  bool m_new;
-
-  SQLiteDatabase m_sqliteDatabase;
-  RefPtr<DatabaseAuthorizer> m_databaseAuthorizer;
-
-  RefPtr<DatabaseCallback> m_creationCallback;
-
-#ifndef NDEBUG
-  String databaseDebugName() const {
-    return m_contextThreadSecurityOrigin->toString() + "::" + m_name;
-  }
-#endif
 };
 
 }  // namespace WebCore

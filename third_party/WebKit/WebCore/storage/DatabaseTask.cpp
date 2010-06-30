@@ -84,16 +84,21 @@ void DatabaseTask::performTask() {
 // version.
 
 DatabaseOpenTask::DatabaseOpenTask(Database* database,
+                                   bool setVersionInNewDatabase,
                                    DatabaseTaskSynchronizer* synchronizer,
                                    ExceptionCode& code,
                                    bool& success)
-    : DatabaseTask(database, synchronizer), m_code(code), m_success(success) {
+    : DatabaseTask(database, synchronizer),
+      m_setVersionInNewDatabase(setVersionInNewDatabase),
+      m_code(code),
+      m_success(success) {
   ASSERT(synchronizer);  // A task with output parameters is supposed to be
                          // synchronous.
 }
 
 void DatabaseOpenTask::doPerformTask() {
-  m_success = database()->performOpenAndVerify(m_code);
+  m_success =
+      database()->performOpenAndVerify(m_setVersionInNewDatabase, m_code);
 }
 
 #ifndef NDEBUG

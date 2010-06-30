@@ -30,24 +30,26 @@
 #define DatabaseSync_h
 
 #if ENABLE(DATABASE)
+#include "AbstractDatabase.h"
 #include "PlatformString.h"
 #include <wtf/Forward.h>
+#ifndef NDEBUG
+#include "SecurityOrigin.h"
+#endif
 
 namespace WebCore {
 
 class DatabaseCallback;
 class SQLTransactionSyncCallback;
 class ScriptExecutionContext;
-
-typedef int ExceptionCode;
+class SecurityOrigin;
 
 // Instances of this class should be created and used only on the worker's
 // context thread.
-class DatabaseSync : public RefCounted<DatabaseSync> {
+class DatabaseSync : public AbstractDatabase {
  public:
-  ~DatabaseSync();
+  virtual ~DatabaseSync();
 
-  // Direct support for the DOM API
   static PassRefPtr<DatabaseSync> openDatabaseSync(
       ScriptExecutionContext*,
       const String& name,
@@ -56,7 +58,6 @@ class DatabaseSync : public RefCounted<DatabaseSync> {
       unsigned long estimatedSize,
       PassRefPtr<DatabaseCallback>,
       ExceptionCode&);
-  String version() const;
   void changeVersion(const String& oldVersion,
                      const String& newVersion,
                      PassRefPtr<SQLTransactionSyncCallback>,
@@ -65,29 +66,15 @@ class DatabaseSync : public RefCounted<DatabaseSync> {
                    bool readOnly,
                    ExceptionCode&);
 
-  // Internal engine support
-  ScriptExecutionContext* scriptExecutionContext() const;
-
-  static const String& databaseInfoTableName();
+  virtual void markAsDeletedAndClose();
+  virtual void closeImmediately();
 
  private:
   DatabaseSync(ScriptExecutionContext*,
                const String& name,
                const String& expectedVersion,
                const String& displayName,
-               unsigned long estimatedSize,
-               PassRefPtr<DatabaseCallback>);
-
-  RefPtr<ScriptExecutionContext> m_scriptExecutionContext;
-  String m_name;
-  String m_expectedVersion;
-  String m_displayName;
-  unsigned long m_estimatedSize;
-  RefPtr<DatabaseCallback> m_creationCallback;
-
-#ifndef NDEBUG
-  String databaseDebugName() const { return String(); }
-#endif
+               unsigned long estimatedSize);
 };
 
 }  // namespace WebCore
