@@ -3911,7 +3911,8 @@ bool CSSParser::parseFontFaceUnicodeRange() {
       if (failed)
         break;
     }
-    values->append(CSSUnicodeRangeValue::create(from, to));
+    if (from <= to)
+      values->append(CSSUnicodeRangeValue::create(from, to));
     m_valueList->next();
   }
   if (failed || !values->length())
