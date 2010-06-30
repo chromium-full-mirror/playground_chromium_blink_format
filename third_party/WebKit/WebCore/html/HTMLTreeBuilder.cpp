@@ -202,6 +202,9 @@ void HTMLTreeBuilder::passTokenToLegacyParser(HTMLToken& token) {
     return;
   }
 
+  if (token.type() == HTMLToken::EndOfFile)
+    return;
+
   // For now, we translate into an old-style token for testing.
   Token oldStyleToken;
   AtomicHTMLToken atomicToken(token);

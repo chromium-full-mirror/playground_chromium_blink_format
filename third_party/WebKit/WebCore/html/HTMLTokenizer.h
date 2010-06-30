@@ -165,7 +165,8 @@ class HTMLTokenizer : public Noncopyable {
         // spec as doing
         // that filtering breaks surrogate pair handling and causes us not to
         // match Minefield.
-        if (m_nextInputCharacter == '\0')
+        if (m_nextInputCharacter == '\0' &&
+            !shouldTreatNullAsEndOfFileMarker(source))
           m_nextInputCharacter = 0xFFFD;
       }
       return true;
@@ -179,7 +180,13 @@ class HTMLTokenizer : public Noncopyable {
       return peek(source, lineNumber);
     }
 
+    static const UChar endOfFileMarker;
+
    private:
+    bool shouldTreatNullAsEndOfFileMarker(SegmentedString& source) const {
+      return source.isClosed() && source.length() == 1;
+    }
+
     // http://www.whatwg.org/specs/web-apps/current-work/#next-input-character
     UChar m_nextInputCharacter;
     bool m_skipNextNewLine;
@@ -189,6 +196,7 @@ class HTMLTokenizer : public Noncopyable {
   inline void emitParseError();
   inline void emitCurrentToken();
   inline void emitCodePoint(unsigned);
+  inline void emitEndOfFile();
 
   inline bool processEntity(SegmentedString& source);
 

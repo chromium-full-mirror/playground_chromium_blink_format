@@ -57,6 +57,11 @@ class HTMLToken : public Noncopyable {
 
   void clear() { m_type = Uninitialized; }
 
+  void makeEndOfFile() {
+    ASSERT(m_type == Uninitialized);
+    m_type = EndOfFile;
+  }
+
   void beginStartTag(UChar character) {
     ASSERT(m_type == Uninitialized);
     m_type = StartTag;
