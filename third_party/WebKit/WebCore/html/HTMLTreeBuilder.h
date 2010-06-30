@@ -128,6 +128,8 @@ class HTMLTreeBuilder : public Noncopyable {
 
   bool processStartTagForInHead(AtomicHTMLToken&);
 
+  bool processBodyEndTagForInBody(AtomicHTMLToken&);
+
   template <typename ChildType>
   PassRefPtr<ChildType> attach(Node* parent, PassRefPtr<ChildType> prpChild) {
     RefPtr<ChildType> child = prpChild;

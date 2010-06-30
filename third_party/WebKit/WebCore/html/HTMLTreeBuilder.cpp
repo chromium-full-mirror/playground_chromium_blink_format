@@ -632,6 +632,16 @@ void HTMLTreeBuilder::processStartTag(AtomicHTMLToken& token) {
   }
 }
 
+bool HTMLTreeBuilder::processBodyEndTagForInBody(AtomicHTMLToken& token) {
+  if (!m_openElements.inScope(bodyTag.localName())) {
+    parseError(token);
+    return false;
+  }
+  notImplemented();
+  m_insertionMode = AfterBodyMode;
+  return true;
+}
+
 void HTMLTreeBuilder::processEndTag(AtomicHTMLToken& token) {
   switch (insertionMode()) {
     case InitialMode:
@@ -682,12 +692,12 @@ void HTMLTreeBuilder::processEndTag(AtomicHTMLToken& token) {
     case InBodyMode:
       ASSERT(insertionMode() == InBodyMode);
       if (token.name() == bodyTag) {
-        notImplemented();
-        m_insertionMode = AfterBodyMode;
+        processBodyEndTagForInBody(token);
         return;
       }
       if (token.name() == htmlTag) {
-        notImplemented();
+        if (processBodyEndTagForInBody(token))
+          notImplemented();  // Re-process the curent token.
         return;
       }
       if (token.name() == addressTag || token.name() == articleTag ||
