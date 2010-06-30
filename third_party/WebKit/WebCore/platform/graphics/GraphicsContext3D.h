@@ -635,6 +635,11 @@ class GraphicsContext3D : public Noncopyable {
                         unsigned long index,
                         ActiveInfo&);
 
+  void getAttachedShaders(WebGLProgram* program,
+                          int maxCount,
+                          int* count,
+                          unsigned int* shaders);
+
   int getAttribLocation(WebGLProgram*, const String& name);
 
   void getBooleanv(unsigned long pname, unsigned char* value);

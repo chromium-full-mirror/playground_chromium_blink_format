@@ -186,6 +186,8 @@ class WebGLRenderingContext : public CanvasRenderingContext {
                                                unsigned long index,
                                                ExceptionCode&);
 
+  bool getAttachedShaders(WebGLProgram*, Vector<WebGLShader*>&, ExceptionCode&);
+
   int getAttribLocation(WebGLProgram*, const String& name);
 
   WebGLGetInfo getBufferParameter(unsigned long target,
@@ -676,6 +678,7 @@ class WebGLRenderingContext : public CanvasRenderingContext {
   WebGLTexture* findTexture(Platform3DObject);
   WebGLRenderbuffer* findRenderbuffer(Platform3DObject);
   WebGLBuffer* findBuffer(Platform3DObject);
+  WebGLShader* findShader(Platform3DObject);
 
   void markContextChanged();
   void cleanupAfterGraphicsCall(bool changed) {

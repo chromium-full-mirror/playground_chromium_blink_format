@@ -226,6 +226,11 @@ class WebGraphicsContext3D : public WebNonCopyable {
                                 unsigned long index,
                                 ActiveInfo&) = 0;
 
+  virtual void getAttachedShaders(WebGLId program,
+                                  int maxCount,
+                                  int* count,
+                                  unsigned int* shaders) = 0;
+
   virtual int getAttribLocation(WebGLId program, const char* name) = 0;
 
   virtual void getBooleanv(unsigned long pname, unsigned char* value) = 0;

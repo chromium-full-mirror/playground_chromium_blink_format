@@ -1123,6 +1123,13 @@ bool WebGraphicsContext3DDefaultImpl::getActiveUniform(WebGLId program,
   return true;
 }
 
+DELEGATE_TO_GL_4(getAttachedShaders,
+                 GetAttachedShaders,
+                 WebGLId,
+                 int,
+                 int*,
+                 unsigned int*)
+
 DELEGATE_TO_GL_2R(getAttribLocation,
                   GetAttribLocation,
                   WebGLId,

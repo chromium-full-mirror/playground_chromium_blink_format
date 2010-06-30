@@ -175,6 +175,11 @@ class WebGraphicsContext3DDefaultImpl : public WebGraphicsContext3D {
                                 unsigned long index,
                                 ActiveInfo&);
 
+  virtual void getAttachedShaders(WebGLId program,
+                                  int maxCount,
+                                  int* count,
+                                  unsigned int* shaders);
+
   virtual int getAttribLocation(WebGLId program, const char* name);
 
   virtual void getBooleanv(unsigned long pname, unsigned char* value);
