@@ -34,6 +34,7 @@
 #include "CSSStyleSelector.h"
 #include "ClientRect.h"
 #include "ClientRectList.h"
+#include "DatasetDOMStringMap.h"
 #include "Document.h"
 #include "DocumentFragment.h"
 #include "ElementRareData.h"
@@ -1584,6 +1585,13 @@ bool Element::webkitMatchesSelector(const String& selector, ExceptionCode& ec) {
   }
 
   return false;
+}
+
+DOMStringMap* Element::dataset() {
+  ElementRareData* data = ensureRareData();
+  if (!data->m_datasetDOMStringMap)
+    data->m_datasetDOMStringMap = DatasetDOMStringMap::create(this);
+  return data->m_datasetDOMStringMap.get();
 }
 
 KURL Element::getURLAttribute(const QualifiedName& name) const {
