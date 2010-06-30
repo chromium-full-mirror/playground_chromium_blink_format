@@ -99,7 +99,7 @@ class SegmentedString {
   const SegmentedString& operator=(const SegmentedString&);
 
   void clear();
-  void close() { m_closed = true; }
+  void close();
 
   void append(const SegmentedString&);
   void prepend(const SegmentedString&);

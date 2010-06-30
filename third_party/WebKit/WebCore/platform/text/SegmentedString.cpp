@@ -116,6 +116,12 @@ void SegmentedString::prepend(const SegmentedSubstring& s) {
   }
 }
 
+void SegmentedString::close() {
+  // Closing a stream twice is likely a coding mistake.
+  ASSERT(!m_closed);
+  m_closed = true;
+}
+
 void SegmentedString::append(const SegmentedString& s) {
   ASSERT(!m_closed);
   ASSERT(!s.escaped());
