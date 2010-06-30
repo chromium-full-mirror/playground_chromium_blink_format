@@ -141,8 +141,11 @@ inline bool isScopeMarker(const Element* element) {
          element->hasTagName(appletTag) || element->hasTagName(htmlTag) ||
          element->hasTagName(tableTag) || element->hasTagName(tdTag) ||
          element->hasTagName(thTag) || element->hasTagName(buttonTag) ||
-         element->hasTagName(marqueeTag) || element->hasTagName(objectTag) ||
-         element->hasTagName(SVGNames::foreignObjectTag);
+         element->hasTagName(marqueeTag) || element->hasTagName(objectTag)
+#if ENABLE(SVG_FOREIGN_OBJECT)
+         || element->hasTagName(SVGNames::foreignObjectTag)
+#endif
+      ;
 }
 
 inline bool isListItemScopeMarker(const Element* element) {
