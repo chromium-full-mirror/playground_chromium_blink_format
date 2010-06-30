@@ -715,7 +715,7 @@ bool RenderThemeChromiumWin::paintProgressBar(RenderObject* o,
   ChromiumBridge::paintProgressBar(painter.context(), r, valueRect,
                                    renderProgress->isDeterminate(),
                                    animatedSeconds);
-  return true;
+  return false;
 }
 
 #endif
