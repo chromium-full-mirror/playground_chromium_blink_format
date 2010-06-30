@@ -542,7 +542,8 @@ void FocusController::deepFindFocusableNodeInDirection(
     if (!innerDocument)
       return;
 
-    descendantOfContainer = innerDocument == focusedNode->document();
+    descendantOfContainer =
+        isNodeDeepDescendantOfDocument(focusedNode, innerDocument);
     firstChild = innerDocument->firstChild();
 
     // Scrollable block elements (e.g. <div>, etc)
