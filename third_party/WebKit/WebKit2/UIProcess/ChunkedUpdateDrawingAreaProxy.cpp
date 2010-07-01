@@ -53,6 +53,9 @@ void ChunkedUpdateDrawingAreaProxy::paint(const IntRect& rect,
     if (!page->isValid())
       return;
 
+    if (page->process()->isLaunching())
+      return;
+
     std::auto_ptr<CoreIPC::ArgumentDecoder> arguments =
         page->process()->connection()->waitFor(
             DrawingAreaProxyMessage::DidSetSize, page->pageID(), 0.04);

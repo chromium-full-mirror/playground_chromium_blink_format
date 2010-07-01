@@ -28,6 +28,7 @@
 
 #include "Connection.h"
 #include "PlatformProcessIdentifier.h"
+#include "ProcessLauncher.h"
 #include "ProcessModel.h"
 #include "ResponsivenessTimer.h"
 #include "WebPageProxy.h"
@@ -46,7 +47,8 @@ class WebPageNamespace;
 
 class WebProcessProxy : public RefCounted<WebProcessProxy>,
                         CoreIPC::Connection::Client,
-                        ResponsivenessTimer::Client {
+                        ResponsivenessTimer::Client,
+                        ProcessLauncher::Client {
  public:
   typedef HashMap<uint64_t, RefPtr<WebPageProxy>> WebPageProxyMap;
   typedef WebPageProxyMap::const_iterator::Values pages_const_iterator;
@@ -65,6 +67,10 @@ class WebProcessProxy : public RefCounted<WebProcessProxy>,
     return m_connection.get();
   }
 
+  PlatformProcessIdentifier processIdentifier() const {
+    return m_processLauncher->processIdentifier();
+  }
+
   WebPageProxy* webPage(uint64_t pageID) const;
   WebPageProxy* createWebPage(WebPageNamespace*);
   void addExistingWebPage(WebPageProxy*, uint64_t pageID);
@@ -77,9 +83,8 @@ class WebProcessProxy : public RefCounted<WebProcessProxy>,
   ResponsivenessTimer* responsivenessTimer() { return &m_responsivenessTimer; }
 
   bool isValid() const { return m_connection; }
-
-  PlatformProcessIdentifier processIdentifier() const {
-    return m_platformProcessIdentifier;
+  bool isLaunching() const {
+    return m_processLauncher && m_processLauncher->isLaunching();
   }
 
  private:
@@ -105,9 +110,15 @@ class WebProcessProxy : public RefCounted<WebProcessProxy>,
   void didBecomeUnresponsive(ResponsivenessTimer*);
   void didBecomeResponsive(ResponsivenessTimer*);
 
+  // ProcessLauncher::Client
+  virtual void didFinishLaunching(ProcessLauncher*,
+                                  const CoreIPC::Connection::Identifier&);
+
   ResponsivenessTimer m_responsivenessTimer;
   RefPtr<CoreIPC::Connection> m_connection;
-  PlatformProcessIdentifier m_platformProcessIdentifier;
+
+  Vector<CoreIPC::Connection::OutgoingMessage> m_pendingMessages;
+  RefPtr<ProcessLauncher> m_processLauncher;
 
   WebContext* m_context;
 
