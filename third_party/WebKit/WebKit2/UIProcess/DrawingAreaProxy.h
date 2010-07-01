@@ -49,7 +49,12 @@ typedef HDC PlatformDrawingContext;
 
 class DrawingAreaProxy {
  public:
-  enum Type { ChunkedUpdateDrawingAreaType };
+  enum Type {
+    ChunkedUpdateDrawingAreaType,
+#if USE(ACCELERATED_COMPOSITING)
+    LayerBackedDrawingAreaType,
+#endif
+  };
 
   virtual ~DrawingAreaProxy();
 
@@ -67,6 +72,11 @@ class DrawingAreaProxy {
   virtual void encode(CoreIPC::ArgumentEncoder& encoder) const {
     encoder.encode(static_cast<uint32_t>(m_type));
   }
+
+#if USE(ACCELERATED_COMPOSITING)
+  virtual void attachCompositingContext(uint32_t contextID) = 0;
+  virtual void detachCompositingContext() = 0;
+#endif
 
  protected:
   DrawingAreaProxy(Type);

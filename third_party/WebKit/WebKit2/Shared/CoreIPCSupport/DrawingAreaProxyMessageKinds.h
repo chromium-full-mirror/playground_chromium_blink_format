@@ -32,7 +32,14 @@
 
 namespace DrawingAreaProxyMessage {
 
-enum Kind { Update, DidSetSize };
+enum Kind {
+  Update,
+  DidSetSize,
+#if USE(ACCELERATED_COMPOSITING)
+  AttachCompositingContext,
+  DetachCompositingContext,
+#endif
+};
 }
 
 namespace CoreIPC {

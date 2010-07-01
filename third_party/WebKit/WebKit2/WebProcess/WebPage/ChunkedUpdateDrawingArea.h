@@ -50,6 +50,13 @@ class ChunkedUpdateDrawingArea : public DrawingArea {
   virtual void setNeedsDisplay(const WebCore::IntRect&);
   virtual void display();
 
+#if USE(ACCELERATED_COMPOSITING)
+  virtual void attachCompositingContext(WebCore::GraphicsLayer*) {}
+  virtual void detachCompositingContext() {}
+  virtual void scheduleCompositingLayerSync() {}
+  virtual void syncCompositingLayers() {}
+#endif
+
   virtual void didReceiveMessage(CoreIPC::Connection*,
                                  CoreIPC::MessageID,
                                  CoreIPC::ArgumentDecoder&);
