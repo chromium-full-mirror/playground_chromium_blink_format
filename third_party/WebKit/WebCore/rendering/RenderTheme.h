@@ -342,6 +342,15 @@ class RenderTheme : public RefCounted<RenderTheme> {
   }
 #endif
 
+#if ENABLE(INPUT_SPEECH)
+  virtual void adjustInputFieldSpeechButtonStyle(CSSStyleSelector*,
+                                                 RenderStyle*,
+                                                 Element*) const;
+  virtual bool paintInputFieldSpeechButton(RenderObject*,
+                                           const RenderObject::PaintInfo&,
+                                           const IntRect&);
+#endif
+
   virtual void adjustSliderTrackStyle(CSSStyleSelector*,
                                       RenderStyle*,
                                       Element*) const;

@@ -82,7 +82,8 @@ class QWEBKIT_EXPORT QWebSettings {
     MissingPluginGraphic,
     DefaultFrameIconGraphic,
     TextAreaSizeGripCornerGraphic,
-    DeleteButtonGraphic
+    DeleteButtonGraphic,
+    InputSpeechButtonGraphic
   };
   enum FontSize {
     MinimumFontSize,

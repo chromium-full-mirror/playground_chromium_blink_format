@@ -44,6 +44,10 @@
 #include "RenderMeter.h"
 #endif
 
+#if ENABLE(INPUT_SPEECH)
+#include "RenderInputSpeech.h"
+#endif
+
 // The methods in this file are shared by all themes on every platform.
 
 namespace WebCore {
@@ -248,7 +252,7 @@ void RenderTheme::adjustStyle(CSSStyleSelector* selector,
 #endif
 #if ENABLE(INPUT_SPEECH)
     case InputSpeechButtonPart:
-// FIXME: Adjust the speech button's style and sizes.
+      return adjustInputFieldSpeechButtonStyle(selector, style, e);
 #endif
     default:
       break;
@@ -387,7 +391,7 @@ bool RenderTheme::paint(RenderObject* o,
       return paintSearchFieldResultsButton(o, paintInfo, r);
 #if ENABLE(INPUT_SPEECH)
     case InputSpeechButtonPart:
-// FIXME: Add painting code to draw the speech button.
+      return paintInputFieldSpeechButton(o, paintInfo, r);
 #endif
     default:
       break;
@@ -950,6 +954,23 @@ void RenderTheme::adjustTextAreaStyle(CSSStyleSelector*,
 void RenderTheme::adjustMenuListStyle(CSSStyleSelector*,
                                       RenderStyle*,
                                       Element*) const {}
+
+#if ENABLE(INPUT_SPEECH)
+void RenderTheme::adjustInputFieldSpeechButtonStyle(CSSStyleSelector* selector,
+                                                    RenderStyle* style,
+                                                    Element* element) const {
+  RenderInputSpeech::adjustInputFieldSpeechButtonStyle(selector, style,
+                                                       element);
+}
+
+bool RenderTheme::paintInputFieldSpeechButton(
+    RenderObject* object,
+    const RenderObject::PaintInfo& paintInfo,
+    const IntRect& rect) {
+  return RenderInputSpeech::paintInputFieldSpeechButton(object, paintInfo,
+                                                        rect);
+}
+#endif
 
 #if ENABLE(METER_TAG)
 void RenderTheme::adjustMeterStyle(CSSStyleSelector*,
