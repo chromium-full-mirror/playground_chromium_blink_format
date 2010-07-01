@@ -83,7 +83,7 @@ QNetworkRequest ResourceRequest::toNetworkRequest(
       break;
   }
 
-#if QT_VERSION >= QT_VERSION_CHECK(4, 7, 0) && 0
+#if QT_VERSION >= QT_VERSION_CHECK(4, 7, 0)
   if (!allowCookies()) {
     request.setAttribute(QNetworkRequest::CookieLoadControlAttribute,
                          QNetworkRequest::Manual);
