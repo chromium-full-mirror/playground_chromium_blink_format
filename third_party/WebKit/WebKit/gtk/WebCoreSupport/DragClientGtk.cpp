@@ -81,7 +81,7 @@ void DragClient::startDrag(DragImageRef image,
       GTK_WIDGET(m_webView), targetList.get(),
       dragOperationToGdkDragActions(clipboard->sourceOperation()), 1,
       currentEvent.get());
-  webView->priv->draggingDataObjects->set(context, dataObject);
+  webView->priv->draggingDataObjects.set(context, dataObject);
 
   // A drag starting should prevent a double-click from happening. This might
   // happen if a drag is followed very quickly by another click (like in the
