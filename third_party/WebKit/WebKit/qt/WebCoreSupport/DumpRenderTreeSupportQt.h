@@ -161,7 +161,7 @@ class QWEBKIT_EXPORT DumpRenderTreeSupportQt {
   static void setCheckPermissionFunction(CheckPermissionFunctionType*);
   static void setRequestPermissionFunction(RequestPermissionFunctionType*);
 
-  static QList<QWebHistoryItem> getChildHistoryItems(
+  static QMap<QString, QWebHistoryItem> getChildHistoryItems(
       const QWebHistoryItem& historyItem);
   static bool isTargetItem(const QWebHistoryItem& historyItem);
   static QString historyItemTarget(const QWebHistoryItem& historyItem);

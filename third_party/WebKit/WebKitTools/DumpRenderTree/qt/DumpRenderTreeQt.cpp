@@ -732,10 +732,10 @@ static QString dumpHistoryItem(const QWebHistoryItem& item,
     result.append(QLatin1String("  **nav target**"));
   result.append(QLatin1String("\n"));
 
-  QList<QWebHistoryItem> children =
+  QMap<QString, QWebHistoryItem> children =
       DumpRenderTreeSupportQt::getChildHistoryItems(item);
-  for (int i = 0; i < children.size(); ++i)
-    result += dumpHistoryItem(children.at(i), 12, false);
+  foreach (QWebHistoryItem item, children)
+    result += dumpHistoryItem(item, 12, false);
 
   return result;
 }
