@@ -188,6 +188,28 @@ bool Font::canReturnFallbackFontsForComplexText() {
   return false;
 }
 
+#ifndef GTK_API_VERSION_2
+static void cairo_region_shrink(cairo_region_t* region, int dx, int dy) {
+  int nRects = cairo_region_num_rectangles(region);
+  // Clear region.
+  cairo_region_subtract(region, region);
+
+  for (int i = 0; i < nRects; i++) {
+    cairo_rectangle_int_t rect;
+    cairo_region_get_rectangle(region, i, &rect);
+
+    if (rect.width <= 2 * dx || rect.height <= 2 * dy)
+      continue;
+
+    rect.x += dx;
+    rect.y += dy;
+    rect.width -= 2 * dx;
+    rect.height -= 2 * dy;
+    cairo_region_union_rectangle(region, &rect);
+  }
+}
+#endif
+
 void Font::drawComplexText(GraphicsContext* context,
                            const TextRun& run,
                            const FloatPoint& point,
@@ -207,7 +229,11 @@ void Font::drawComplexText(GraphicsContext* context,
   // Our layouts are single line
   PangoLayoutLine* layoutLine = pango_layout_get_line_readonly(layout, 0);
 
-  GdkRegion* partialRegion = NULL;
+#ifdef GTK_API_VERSION_2
+  GdkRegion* partialRegion = 0;
+#else
+  cairo_region_t* partialRegion = 0;
+#endif
   if (to - from != run.length()) {
     // Clip the region of the run to be rendered
     char* start = g_utf8_offset_to_pointer(utf8, from);
@@ -215,7 +241,11 @@ void Font::drawComplexText(GraphicsContext* context,
     int ranges[] = {start - utf8, end - utf8};
     partialRegion =
         gdk_pango_layout_line_get_clip_region(layoutLine, 0, 0, ranges, 1);
+#ifdef GTK_API_VERSION_2
     gdk_region_shrink(partialRegion, 0, -pixelSize());
+#else
+    cairo_region_shrink(partialRegion, 0, -pixelSize());
+#endif
   }
 
   Color fillColor = context->fillColor();
@@ -280,7 +310,11 @@ void Font::drawComplexText(GraphicsContext* context,
   cairo_new_path(cr);
 
   if (partialRegion)
+#ifdef GTK_API_VERSION_2
     gdk_region_destroy(partialRegion);
+#else
+    cairo_region_destroy(partialRegion);
+#endif
 
   g_free(utf8);
   g_object_unref(layout);
