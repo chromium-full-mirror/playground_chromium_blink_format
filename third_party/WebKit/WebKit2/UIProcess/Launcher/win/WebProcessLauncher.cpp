@@ -38,15 +38,14 @@ using namespace WebCore;
 
 namespace WebKit {
 
-// FIXME: We need to use a better connection identifier.
-static const wchar_t* serverName = L"UIProcess";
+static void* webThreadBody(void* context) {
+  HANDLE clientIdentifier = reinterpret_cast<HANDLE>(context);
 
-static void* webThreadBody(void*) {
   // Initialization
   JSC::initializeThreading();
   WTF::initializeMainThread();
 
-  WebProcess::shared().initialize(serverName, RunLoop::current());
+  WebProcess::shared().initialize(clientIdentifier, RunLoop::current());
   RunLoop::run();
 
   return 0;
@@ -54,19 +53,31 @@ static void* webThreadBody(void*) {
 
 ProcessInfo launchWebProcess(CoreIPC::Connection::Client* client,
                              bool useThread) {
+  // First, create the server and client identifiers.
+  HANDLE serverIdentifier, clientIdentifier;
+  if (!CoreIPC::Connection::createServerAndClientIdentifiers(
+          serverIdentifier, clientIdentifier)) {
+    // FIXME: What should we do here?
+    ASSERT_NOT_REACHED();
+  }
+
   ProcessInfo info = {0, 0};
 
-  info.connection = CoreIPC::Connection::createServerConnection(
-      serverName, client, RunLoop::main());
-  info.connection->open();
-
   if (useThread) {
-    // FIXME: Pass the handle.
     if (createThread(webThreadBody, 0, "WebKit2: WebThread")) {
+      info.connection = CoreIPC::Connection::createServerConnection(
+          serverIdentifier, client, RunLoop::main());
+      info.connection->open();
       info.processIdentifier = ::GetCurrentProcess();
       return info;
     }
   } else {
+    // Ensure that the child process inherits the client identifier.
+    ::SetHandleInformation(clientIdentifier, HANDLE_FLAG_INHERIT,
+                           HANDLE_FLAG_INHERIT);
+
+    Vector<UChar> commandLineVector;
+
 // FIXME: We would like to pass a full path to the .exe here.
 #ifndef DEBUG_ALL
     String commandLine(L"WebKit2WebProcess.exe");
@@ -74,17 +85,30 @@ ProcessInfo launchWebProcess(CoreIPC::Connection::Client* client,
     String commandLine(L"WebKit2WebProcess_debug.exe");
 #endif
 
+    append(commandLineVector, commandLine);
+    append(commandLineVector, " -clientIdentifier ");
+    append(commandLineVector,
+           String::number(reinterpret_cast<uintptr_t>(clientIdentifier)));
+    commandLineVector.append('\0');
+
     STARTUPINFO startupInfo = {0};
     startupInfo.cb = sizeof(startupInfo);
     PROCESS_INFORMATION processInformation = {0};
-    BOOL result = ::CreateProcessW(
-        0, (LPWSTR)commandLine.charactersWithNullTermination(), 0, 0, false, 0,
-        0, 0, &startupInfo, &processInformation);
+    BOOL result = ::CreateProcessW(0, commandLineVector.data(), 0, 0, true, 0,
+                                   0, 0, &startupInfo, &processInformation);
+
+    // We can now close the client identifier handle.
+    ::CloseHandle(clientIdentifier);
+
     if (!result) {
       // FIXME: What should we do here?
       DWORD error = ::GetLastError();
       ASSERT_NOT_REACHED();
     }
+
+    info.connection = CoreIPC::Connection::createServerConnection(
+        serverIdentifier, client, RunLoop::main());
+    info.connection->open();
 
     // Don't leak the thread handle.
     ::CloseHandle(processInformation.hThread);
