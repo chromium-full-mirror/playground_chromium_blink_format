@@ -130,6 +130,7 @@
   @"WebKitHTML5TreeBuilderEnabled"  // Temporary, do not use.
 #define WebKitPaginateDuringLayoutEnabledPreferenceKey \
   @"WebKitPaginateDuringLayoutEnabled"
+#define WebKitDNSPrefetchingEnabledPreferenceKey @"WebKitDNSPrefetchingEnabled"
 
 // These are private both because callers should be using the cover methods and
 // because the
