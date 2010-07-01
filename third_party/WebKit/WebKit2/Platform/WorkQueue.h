@@ -35,6 +35,11 @@
 #include <wtf/Threading.h>
 #include <wtf/Vector.h>
 
+#if PLATFORM(QT)
+class QObject;
+class QThread;
+#endif
+
 class WorkQueue {
  public:
   explicit WorkQueue(const char* name);
@@ -62,6 +67,9 @@ class WorkQueue {
 #elif PLATFORM(WIN)
   void registerHandle(HANDLE, std::auto_ptr<WorkItem>);
   void unregisterHandle(HANDLE);
+#elif PLATFORM(QT)
+  void connectSignal(QObject*, const char* signal, std::auto_ptr<WorkItem>);
+  void disconnectSignal(QObject*, const char* signa);
 #endif
 
  private:
@@ -93,6 +101,11 @@ class WorkQueue {
 
   Mutex m_handlesLock;
   HashMap<HANDLE, WorkItem*> m_handles;
+#elif PLATFORM(QT)
+  class WorkItemQt;
+  HashMap<QObject*, WorkItemQt*> m_signalListeners;
+  QThread* m_workThread;
+  friend class WorkItemQt;
 #endif
 };
 
