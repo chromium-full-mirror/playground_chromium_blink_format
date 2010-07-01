@@ -122,6 +122,7 @@ class GraphicsLayerCA : public GraphicsLayer {
   void recursiveCommitChanges();
 
   virtual void syncCompositingState();
+  virtual void syncCompositingStateForThisLayerOnly();
 
  protected:
   virtual void setOpacityInternal(float);
