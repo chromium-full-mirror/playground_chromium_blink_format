@@ -59,6 +59,10 @@ FormDataIODevice::FormDataIODevice(FormData* data)
       m_currentFile(0),
       m_currentDelta(0) {
   setOpenMode(FormDataIODevice::ReadOnly);
+
+  if (!m_formElements.isEmpty() &&
+      m_formElements[0].m_type == FormDataElement::encodedFile)
+    openFileForCurrentElement();
 }
 
 FormDataIODevice::~FormDataIODevice() {
@@ -76,6 +80,10 @@ void FormDataIODevice::moveToNextElement() {
       m_formElements[0].m_type == FormDataElement::data)
     return;
 
+  openFileForCurrentElement();
+}
+
+void FormDataIODevice::openFileForCurrentElement() {
   if (!m_currentFile)
     m_currentFile = new QFile;
 
