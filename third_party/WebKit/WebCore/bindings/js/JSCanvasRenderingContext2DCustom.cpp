@@ -248,6 +248,7 @@ JSValue JSCanvasRenderingContext2D::drawImage(ExecState* exec) {
       case 3:
         context->drawImage(canvas, exec->argument(1).toFloat(exec),
                            exec->argument(2).toFloat(exec), ec);
+        setDOMException(exec, ec);
         break;
       case 5:
         context->drawImage(canvas, exec->argument(1).toFloat(exec),

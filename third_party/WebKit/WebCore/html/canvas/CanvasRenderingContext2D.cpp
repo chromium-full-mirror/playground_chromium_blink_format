@@ -1151,14 +1151,20 @@ void CanvasRenderingContext2D::drawImage(HTMLCanvasElement* sourceCanvas,
     return;
   }
 
-  ec = 0;
-
   FloatRect srcCanvasRect = FloatRect(FloatPoint(), sourceCanvas->size());
+
+  if (!srcCanvasRect.width() || !srcCanvasRect.height()) {
+    ec = INVALID_STATE_ERR;
+    return;
+  }
+
   if (!srcCanvasRect.contains(normalizeRect(srcRect)) || srcRect.width() == 0 ||
       srcRect.height() == 0) {
     ec = INDEX_SIZE_ERR;
     return;
   }
+
+  ec = 0;
 
   if (!dstRect.width() || !dstRect.height())
     return;
