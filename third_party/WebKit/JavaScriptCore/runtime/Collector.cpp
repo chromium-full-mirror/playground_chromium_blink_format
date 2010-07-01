@@ -191,32 +191,32 @@ void Heap::destroy() {
 
 NEVER_INLINE CollectorBlock* Heap::allocateBlock() {
 #if OS(DARWIN)
-  vm_address_t address = 0;
-  vm_map(current_task(), &address, BLOCK_SIZE, BLOCK_OFFSET_MASK,
-         VM_FLAGS_ANYWHERE | VM_TAG_FOR_COLLECTOR_MEMORY, MEMORY_OBJECT_NULL, 0,
-         FALSE, VM_PROT_DEFAULT, VM_PROT_DEFAULT, VM_INHERIT_DEFAULT);
-#elif OS(SYMBIAN)
-  void* address = m_blockallocator.alloc();
-  if (!address)
-    CRASH();
-#elif OS(WINCE)
-  void* address =
-      VirtualAlloc(NULL, BLOCK_SIZE, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
-#elif OS(WINDOWS)
-#if COMPILER(MINGW) && !COMPILER(MINGW64)
-  void* address = __mingw_aligned_malloc(BLOCK_SIZE, BLOCK_SIZE);
-#else
-  void* address = _aligned_malloc(BLOCK_SIZE, BLOCK_SIZE);
-#endif
-  memset(address, 0, BLOCK_SIZE);
-#elif HAVE(POSIX_MEMALIGN)
-  void* address;
-  posix_memalign(&address, BLOCK_SIZE, BLOCK_SIZE);
-#else
+  /*    vm_address_t address = 0;
+      vm_map(current_task(), &address, BLOCK_SIZE, BLOCK_OFFSET_MASK,
+  VM_FLAGS_ANYWHERE | VM_TAG_FOR_COLLECTOR_MEMORY, MEMORY_OBJECT_NULL, 0, FALSE,
+  VM_PROT_DEFAULT, VM_PROT_DEFAULT, VM_INHERIT_DEFAULT);
+  #elif OS(SYMBIAN)
+      void* address = m_blockallocator.alloc();
+      if (!address)
+          CRASH();
+  #elif OS(WINCE)
+      void* address = VirtualAlloc(NULL, BLOCK_SIZE, MEM_COMMIT | MEM_RESERVE,
+  PAGE_READWRITE);
+  #elif OS(WINDOWS)
+  #if COMPILER(MINGW) && !COMPILER(MINGW64)
+      void* address = __mingw_aligned_malloc(BLOCK_SIZE, BLOCK_SIZE);
+  #else
+      void* address = _aligned_malloc(BLOCK_SIZE, BLOCK_SIZE);
+  #endif
+      memset(address, 0, BLOCK_SIZE);
+  #elif HAVE(POSIX_MEMALIGN)
+      void* address;
+      posix_memalign(&address, BLOCK_SIZE, BLOCK_SIZE);
+  #else
 
-#if ENABLE(JSC_MULTIPLE_THREADS)
-#error Need to initialize pagesize safely.
-#endif
+  #if ENABLE(JSC_MULTIPLE_THREADS)
+  #error Need to initialize pagesize safely.
+  #endif*/
   static size_t pagesize = getpagesize();
 
   size_t extra = 0;

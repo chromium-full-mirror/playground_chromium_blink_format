@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2010 Apple Inc. All rights reserved.
+ * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies)
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -75,6 +76,9 @@ class RunLoop {
 #elif PLATFORM(MAC)
     static void timerFired(CFRunLoopTimerRef, void*);
     CFRunLoopTimerRef m_timer;
+#elif PLATFORM(QT)
+    static void timerFired(RunLoop*, int ID);
+    int m_ID;
 #endif
   };
 
@@ -117,6 +121,11 @@ class RunLoop {
   static void performWork(void*);
   CFRunLoopRef m_runLoop;
   CFRunLoopSourceRef m_runLoopSource;
+#elif PLATFORM(QT)
+  typedef HashMap<int, TimerBase*> TimerMap;
+  TimerMap m_activeTimers;
+  class TimerObject;
+  TimerObject* m_timerObject;
 #endif
 };
 
