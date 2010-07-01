@@ -136,15 +136,18 @@ void RenderSVGContainer::addFocusRingRects(Vector<IntRect>& rects, int, int) {
 }
 
 FloatRect RenderSVGContainer::objectBoundingBox() const {
-  return SVGRenderSupport::computeContainerBoundingBox(this, false);
+  return SVGRenderSupport::computeContainerBoundingBox(
+      this, SVGRenderSupport::ObjectBoundingBox);
 }
 
 FloatRect RenderSVGContainer::strokeBoundingBox() const {
-  return SVGRenderSupport::computeContainerBoundingBox(this, true);
+  return SVGRenderSupport::computeContainerBoundingBox(
+      this, SVGRenderSupport::StrokeBoundingBox);
 }
 
 FloatRect RenderSVGContainer::repaintRectInLocalCoordinates() const {
-  FloatRect repaintRect = strokeBoundingBox();
+  FloatRect repaintRect = SVGRenderSupport::computeContainerBoundingBox(
+      this, SVGRenderSupport::RepaintBoundingBox);
   SVGRenderSupport::intersectRepaintRectWithResources(this, repaintRect);
   return repaintRect;
 }
