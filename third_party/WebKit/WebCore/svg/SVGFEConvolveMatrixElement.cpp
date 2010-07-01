@@ -127,11 +127,13 @@ PassRefPtr<FilterEffect> SVGFEConvolveMatrixElement::build(
   if (hasAttribute(SVGNames::targetXAttr) &&
       (targetXValue < 0 || targetXValue >= orderXValue))
     return 0;
+  // The spec says the default value is: targetX = floor ( orderX / 2 ))
   if (!hasAttribute(SVGNames::targetXAttr))
     targetXValue = static_cast<int>(floorf(orderXValue / 2));
   if (hasAttribute(SVGNames::targetYAttr) &&
       (targetYValue < 0 || targetYValue >= orderYValue))
     return 0;
+  // The spec says the default value is: targetY = floor ( orderY / 2 ))
   if (!hasAttribute(SVGNames::targetYAttr))
     targetYValue = static_cast<int>(floorf(orderYValue / 2));
 

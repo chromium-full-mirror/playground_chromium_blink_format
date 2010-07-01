@@ -78,6 +78,9 @@ class FEConvolveMatrix : public FilterEffect {
   bool preserveAlpha() const;
   void setPreserveAlpha(bool);
 
+  virtual FloatRect uniteChildEffectSubregions(Filter* filter) {
+    return calculateUnionOfChildEffectSubregions(filter, m_in.get());
+  }
   void apply(Filter*);
   void dump();
   TextStream& externalRepresentation(TextStream&, int indent) const;
@@ -92,6 +95,34 @@ class FEConvolveMatrix : public FilterEffect {
                    const FloatPoint&,
                    bool,
                    const Vector<float>&);
+
+  struct PaintingData {
+    CanvasPixelArray* srcPixelArray;
+    CanvasPixelArray* dstPixelArray;
+    int width;
+    int height;
+    float bias;
+  };
+
+  template <bool preserveAlphaValues>
+  ALWAYS_INLINE void fastSetInteriorPixels(PaintingData&,
+                                           int clipRight,
+                                           int clipBottom);
+
+  ALWAYS_INLINE int getPixelValue(PaintingData&, int x, int y);
+
+  template <bool preserveAlphaValues>
+  void fastSetOuterPixels(PaintingData&, int x1, int y1, int x2, int y2);
+
+  // Wrapper functions
+  ALWAYS_INLINE void setInteriorPixels(PaintingData& paintingData,
+                                       int clipRight,
+                                       int clipBottom);
+  ALWAYS_INLINE void setOuterPixels(PaintingData& paintingData,
+                                    int x1,
+                                    int y1,
+                                    int x2,
+                                    int y2);
 
   RefPtr<FilterEffect> m_in;
   IntSize m_kernelSize;
