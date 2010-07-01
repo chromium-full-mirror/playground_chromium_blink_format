@@ -175,6 +175,9 @@ void GraphicsWebView::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
     When this item has keyboard focus, all keyboard input will be sent directly
    to the
     web page within.
+
+    \sa {declarative/modelviews/webview}{WebView example},
+   {demos/declarative/webbrowser}{Web Browser demo}
 */
 
 /*!
