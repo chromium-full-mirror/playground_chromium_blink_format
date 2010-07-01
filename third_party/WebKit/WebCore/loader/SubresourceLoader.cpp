@@ -73,7 +73,7 @@ PassRefPtr<SubresourceLoader> SubresourceLoader::create(
 
   FrameLoader* fl = frame->loader();
   if (securityCheck == DoSecurityCheck &&
-      (fl->state() == FrameStateProvisional ||
+      (fl->state() == FrameStateProvisional || !fl->activeDocumentLoader() ||
        fl->activeDocumentLoader()->isStopping()))
     return 0;
 
