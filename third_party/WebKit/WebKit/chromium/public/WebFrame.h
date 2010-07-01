@@ -483,6 +483,11 @@ class WebFrame {
   virtual bool registerPasswordListener(WebInputElement,
                                         WebPasswordAutocompleteListener*) = 0;
 
+  // Dispatches an Autocompletion notification to registered listener if one
+  // exists that is registered against the WebInputElement specified.
+  virtual void notifiyPasswordListenerOfAutocomplete(
+      const WebInputElement&) = 0;
+
   // Utility -------------------------------------------------------------
 
   // Returns the contents of this frame as a string.  If the text is
