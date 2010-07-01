@@ -54,6 +54,10 @@ inline UChar toLowerCase(UChar cc) {
   return cc + lowerCaseOffset;
 }
 
+inline bool isTokenizerWhitespace(UChar cc) {
+  return cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ';
+}
+
 inline void advanceStringAndASSERTIgnoringCase(SegmentedString& source,
                                                const char* expectedCharacters) {
   while (*expectedCharacters)
@@ -393,7 +397,7 @@ bool HTMLTokenizer::nextToken(SegmentedString& source, HTMLToken& token) {
     END_STATE()
 
     BEGIN_STATE(TagNameState) {
-      if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ')
+      if (isTokenizerWhitespace(cc))
         ADVANCE_TO(BeforeAttributeNameState);
       else if (cc == '/')
         ADVANCE_TO(SelfClosingStartTagState);
@@ -452,7 +456,7 @@ bool HTMLTokenizer::nextToken(SegmentedString& source, HTMLToken& token) {
         addToPossibleEndTag(cc);
         ADVANCE_TO(RCDATAEndTagNameState);
       } else {
-        if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ') {
+        if (isTokenizerWhitespace(cc)) {
           if (isAppropriateEndTag())
             FLUSH_AND_ADVANCE_TO(BeforeAttributeNameState);
         } else if (cc == '/') {
@@ -510,7 +514,7 @@ bool HTMLTokenizer::nextToken(SegmentedString& source, HTMLToken& token) {
         addToPossibleEndTag(cc);
         ADVANCE_TO(RAWTEXTEndTagNameState);
       } else {
-        if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ') {
+        if (isTokenizerWhitespace(cc)) {
           if (isAppropriateEndTag())
             FLUSH_AND_ADVANCE_TO(BeforeAttributeNameState);
         } else if (cc == '/') {
@@ -572,7 +576,7 @@ bool HTMLTokenizer::nextToken(SegmentedString& source, HTMLToken& token) {
         addToPossibleEndTag(cc);
         ADVANCE_TO(ScriptDataEndTagNameState);
       } else {
-        if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ') {
+        if (isTokenizerWhitespace(cc)) {
           if (isAppropriateEndTag())
             FLUSH_AND_ADVANCE_TO(BeforeAttributeNameState);
         } else if (cc == '/') {
@@ -712,7 +716,7 @@ bool HTMLTokenizer::nextToken(SegmentedString& source, HTMLToken& token) {
         addToPossibleEndTag(cc);
         ADVANCE_TO(ScriptDataEscapedEndTagNameState);
       } else {
-        if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ') {
+        if (isTokenizerWhitespace(cc)) {
           if (isAppropriateEndTag())
             FLUSH_AND_ADVANCE_TO(BeforeAttributeNameState);
         } else if (cc == '/') {
@@ -732,8 +736,7 @@ bool HTMLTokenizer::nextToken(SegmentedString& source, HTMLToken& token) {
     END_STATE()
 
     BEGIN_STATE(ScriptDataDoubleEscapeStartState) {
-      if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ' ||
-          cc == '/' || cc == '>') {
+      if (isTokenizerWhitespace(cc) || cc == '/' || cc == '>') {
         bufferCharacter(cc);
         if (temporaryBufferIs(scriptTag.localName()))
           ADVANCE_TO(ScriptDataDoubleEscapedState);
@@ -817,8 +820,7 @@ bool HTMLTokenizer::nextToken(SegmentedString& source, HTMLToken& token) {
     END_STATE()
 
     BEGIN_STATE(ScriptDataDoubleEscapeEndState) {
-      if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ' ||
-          cc == '/' || cc == '>') {
+      if (isTokenizerWhitespace(cc) || cc == '/' || cc == '>') {
         bufferCharacter(cc);
         if (temporaryBufferIs(scriptTag.localName()))
           ADVANCE_TO(ScriptDataEscapedState);
@@ -838,7 +840,7 @@ bool HTMLTokenizer::nextToken(SegmentedString& source, HTMLToken& token) {
     END_STATE()
 
     BEGIN_STATE(BeforeAttributeNameState) {
-      if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ')
+      if (isTokenizerWhitespace(cc))
         ADVANCE_TO(BeforeAttributeNameState);
       else if (cc == '/')
         ADVANCE_TO(SelfClosingStartTagState);
@@ -862,7 +864,7 @@ bool HTMLTokenizer::nextToken(SegmentedString& source, HTMLToken& token) {
     END_STATE()
 
     BEGIN_STATE(AttributeNameState) {
-      if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ')
+      if (isTokenizerWhitespace(cc))
         ADVANCE_TO(AfterAttributeNameState);
       else if (cc == '/')
         ADVANCE_TO(SelfClosingStartTagState);
@@ -886,7 +888,7 @@ bool HTMLTokenizer::nextToken(SegmentedString& source, HTMLToken& token) {
     END_STATE()
 
     BEGIN_STATE(AfterAttributeNameState) {
-      if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ')
+      if (isTokenizerWhitespace(cc))
         ADVANCE_TO(AfterAttributeNameState);
       else if (cc == '/')
         ADVANCE_TO(SelfClosingStartTagState);
@@ -912,7 +914,7 @@ bool HTMLTokenizer::nextToken(SegmentedString& source, HTMLToken& token) {
     END_STATE()
 
     BEGIN_STATE(BeforeAttributeValueState) {
-      if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ')
+      if (isTokenizerWhitespace(cc))
         ADVANCE_TO(BeforeAttributeValueState);
       else if (cc == '"')
         ADVANCE_TO(AttributeValueDoubleQuotedState);
@@ -968,7 +970,7 @@ bool HTMLTokenizer::nextToken(SegmentedString& source, HTMLToken& token) {
     END_STATE()
 
     BEGIN_STATE(AttributeValueUnquotedState) {
-      if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ')
+      if (isTokenizerWhitespace(cc))
         ADVANCE_TO(BeforeAttributeNameState);
       else if (cc == '&') {
         m_additionalAllowedCharacter = '>';
@@ -1017,7 +1019,7 @@ bool HTMLTokenizer::nextToken(SegmentedString& source, HTMLToken& token) {
     END_STATE()
 
     BEGIN_STATE(AfterAttributeValueQuotedState) {
-      if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ')
+      if (isTokenizerWhitespace(cc))
         ADVANCE_TO(BeforeAttributeNameState);
       else if (cc == '/')
         ADVANCE_TO(SelfClosingStartTagState);
@@ -1160,7 +1162,7 @@ bool HTMLTokenizer::nextToken(SegmentedString& source, HTMLToken& token) {
     BEGIN_STATE(CommentEndState) {
       if (cc == '>')
         return emitAndResumeIn(source, DataState);
-      else if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ') {
+      else if (isTokenizerWhitespace(cc)) {
         parseError();
         m_token->appendToComment('-');
         m_token->appendToComment('-');
@@ -1209,7 +1211,7 @@ bool HTMLTokenizer::nextToken(SegmentedString& source, HTMLToken& token) {
     END_STATE()
 
     BEGIN_STATE(CommentEndSpaceState) {
-      if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ') {
+      if (isTokenizerWhitespace(cc)) {
         m_token->appendToComment(cc);
         ADVANCE_TO(CommentEndSpaceState);
       } else if (cc == '-')
@@ -1227,7 +1229,7 @@ bool HTMLTokenizer::nextToken(SegmentedString& source, HTMLToken& token) {
     END_STATE()
 
     BEGIN_STATE(DOCTYPEState) {
-      if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ')
+      if (isTokenizerWhitespace(cc))
         ADVANCE_TO(BeforeDOCTYPENameState);
       else if (cc == InputStreamPreprocessor::endOfFileMarker) {
         parseError();
@@ -1242,7 +1244,7 @@ bool HTMLTokenizer::nextToken(SegmentedString& source, HTMLToken& token) {
     END_STATE()
 
     BEGIN_STATE(BeforeDOCTYPENameState) {
-      if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ')
+      if (isTokenizerWhitespace(cc))
         ADVANCE_TO(BeforeDOCTYPENameState);
       else if (cc >= 'A' && cc <= 'Z') {
         m_token->beginDOCTYPE(toLowerCase(cc));
@@ -1265,7 +1267,7 @@ bool HTMLTokenizer::nextToken(SegmentedString& source, HTMLToken& token) {
     END_STATE()
 
     BEGIN_STATE(DOCTYPENameState) {
-      if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ')
+      if (isTokenizerWhitespace(cc))
         ADVANCE_TO(AfterDOCTYPENameState);
       else if (cc == '>')
         return emitAndResumeIn(source, DataState);
@@ -1284,7 +1286,7 @@ bool HTMLTokenizer::nextToken(SegmentedString& source, HTMLToken& token) {
     END_STATE()
 
     BEGIN_STATE(AfterDOCTYPENameState) {
-      if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ')
+      if (isTokenizerWhitespace(cc))
         ADVANCE_TO(AfterDOCTYPENameState);
       if (cc == '>')
         return emitAndResumeIn(source, DataState);
@@ -1320,7 +1322,7 @@ bool HTMLTokenizer::nextToken(SegmentedString& source, HTMLToken& token) {
     END_STATE()
 
     BEGIN_STATE(AfterDOCTYPEPublicKeywordState) {
-      if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ')
+      if (isTokenizerWhitespace(cc))
         ADVANCE_TO(BeforeDOCTYPEPublicIdentifierState);
       else if (cc == '"') {
         parseError();
@@ -1347,7 +1349,7 @@ bool HTMLTokenizer::nextToken(SegmentedString& source, HTMLToken& token) {
     END_STATE()
 
     BEGIN_STATE(BeforeDOCTYPEPublicIdentifierState) {
-      if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ')
+      if (isTokenizerWhitespace(cc))
         ADVANCE_TO(BeforeDOCTYPEPublicIdentifierState);
       else if (cc == '"') {
         m_token->setPublicIdentifierToEmptyString();
@@ -1408,7 +1410,7 @@ bool HTMLTokenizer::nextToken(SegmentedString& source, HTMLToken& token) {
     END_STATE()
 
     BEGIN_STATE(AfterDOCTYPEPublicIdentifierState) {
-      if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ')
+      if (isTokenizerWhitespace(cc))
         ADVANCE_TO(BetweenDOCTYPEPublicAndSystemIdentifiersState);
       else if (cc == '>')
         return emitAndResumeIn(source, DataState);
@@ -1433,7 +1435,7 @@ bool HTMLTokenizer::nextToken(SegmentedString& source, HTMLToken& token) {
     END_STATE()
 
     BEGIN_STATE(BetweenDOCTYPEPublicAndSystemIdentifiersState) {
-      if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ')
+      if (isTokenizerWhitespace(cc))
         ADVANCE_TO(BetweenDOCTYPEPublicAndSystemIdentifiersState);
       else if (cc == '>')
         return emitAndResumeIn(source, DataState);
@@ -1456,7 +1458,7 @@ bool HTMLTokenizer::nextToken(SegmentedString& source, HTMLToken& token) {
     END_STATE()
 
     BEGIN_STATE(AfterDOCTYPESystemKeywordState) {
-      if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ')
+      if (isTokenizerWhitespace(cc))
         ADVANCE_TO(BeforeDOCTYPESystemIdentifierState);
       else if (cc == '"') {
         parseError();
@@ -1483,7 +1485,7 @@ bool HTMLTokenizer::nextToken(SegmentedString& source, HTMLToken& token) {
     END_STATE()
 
     BEGIN_STATE(BeforeDOCTYPESystemIdentifierState) {
-      if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ')
+      if (isTokenizerWhitespace(cc))
         ADVANCE_TO(BeforeDOCTYPESystemIdentifierState);
       if (cc == '"') {
         m_token->setSystemIdentifierToEmptyString();
@@ -1544,7 +1546,7 @@ bool HTMLTokenizer::nextToken(SegmentedString& source, HTMLToken& token) {
     END_STATE()
 
     BEGIN_STATE(AfterDOCTYPESystemIdentifierState) {
-      if (cc == '\x09' || cc == '\x0A' || cc == '\x0C' || cc == ' ')
+      if (isTokenizerWhitespace(cc))
         ADVANCE_TO(AfterDOCTYPESystemIdentifierState);
       else if (cc == '>')
         return emitAndResumeIn(source, DataState);
