@@ -347,7 +347,7 @@ class RenderTheme : public RefCounted<RenderTheme> {
                                                  RenderStyle*,
                                                  Element*) const;
   virtual bool paintInputFieldSpeechButton(RenderObject*,
-                                           const RenderObject::PaintInfo&,
+                                           const PaintInfo&,
                                            const IntRect&);
 #endif
 

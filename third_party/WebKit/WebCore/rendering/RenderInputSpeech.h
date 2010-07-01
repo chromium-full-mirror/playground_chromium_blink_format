@@ -43,7 +43,7 @@ class RenderInputSpeech {
                                                 RenderStyle*,
                                                 Element*);
   static bool paintInputFieldSpeechButton(RenderObject*,
-                                          const RenderObject::PaintInfo&,
+                                          const PaintInfo&,
                                           const IntRect&);
 };
 

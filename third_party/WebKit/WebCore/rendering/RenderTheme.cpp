@@ -963,10 +963,9 @@ void RenderTheme::adjustInputFieldSpeechButtonStyle(CSSStyleSelector* selector,
                                                        element);
 }
 
-bool RenderTheme::paintInputFieldSpeechButton(
-    RenderObject* object,
-    const RenderObject::PaintInfo& paintInfo,
-    const IntRect& rect) {
+bool RenderTheme::paintInputFieldSpeechButton(RenderObject* object,
+                                              const PaintInfo& paintInfo,
+                                              const IntRect& rect) {
   return RenderInputSpeech::paintInputFieldSpeechButton(object, paintInfo,
                                                         rect);
 }
