@@ -91,6 +91,10 @@ class WebProcessProxy : public RefCounted<WebProcessProxy>,
   explicit WebProcessProxy(WebContext*);
 
   void connect();
+#if USE(ACCELERATED_COMPOSITING)
+  void setUpAcceleratedCompositing();
+#endif
+
   bool sendMessage(CoreIPC::MessageID, std::auto_ptr<CoreIPC::ArgumentEncoder>);
 
   void forwardMessageToWebContext(const WebCore::String&);

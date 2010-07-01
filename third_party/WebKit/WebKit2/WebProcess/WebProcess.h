@@ -61,6 +61,12 @@ class WebProcess : CoreIPC::Connection::Client {
 
   bool isSeparateProcess() const;
 
+#if USE(ACCELERATED_COMPOSITING) && PLATFORM(MAC)
+  mach_port_t compositingRenderServerPort() const {
+    return m_compositingRenderServerPort;
+  }
+#endif
+
  private:
   WebProcess();
   void shutdown();
@@ -85,6 +91,10 @@ class WebProcess : CoreIPC::Connection::Client {
   bool m_inDidClose;
 
   RunLoop* m_runLoop;
+
+#if USE(ACCELERATED_COMPOSITING) && PLATFORM(MAC)
+  mach_port_t m_compositingRenderServerPort;
+#endif
 };
 
 }  // namespace WebKit
