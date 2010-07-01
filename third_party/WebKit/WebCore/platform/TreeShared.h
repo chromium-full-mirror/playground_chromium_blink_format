@@ -25,10 +25,6 @@
 #include <wtf/Noncopyable.h>
 #include <wtf/Threading.h>
 
-// Remove this once we make all WebKit code compatible with stricter rules about
-// TreeShared.
-#define LOOSE_TREE_SHARED
-
 namespace WebCore {
 
 #ifndef NDEBUG
@@ -59,18 +55,14 @@ class TreeShared : public Noncopyable {
     ASSERT(isMainThread());
     ASSERT(!m_refCount);
     ASSERT(m_deletionHasBegun);
-#ifndef LOOSE_REF_COUNTED
     ASSERT(!m_adoptionIsRequired);
-#endif
   }
 
   void ref() {
     ASSERT(isMainThread());
     ASSERT(!m_deletionHasBegun);
     ASSERT(!m_inRemovedLastRefFunction);
-#ifndef LOOSE_REF_COUNTED
     ASSERT(!m_adoptionIsRequired);
-#endif
     ++m_refCount;
   }
 
@@ -79,9 +71,7 @@ class TreeShared : public Noncopyable {
     ASSERT(m_refCount >= 0);
     ASSERT(!m_deletionHasBegun);
     ASSERT(!m_inRemovedLastRefFunction);
-#ifndef LOOSE_REF_COUNTED
     ASSERT(!m_adoptionIsRequired);
-#endif
     if (--m_refCount <= 0 && !m_parent) {
 #ifndef NDEBUG
       m_inRemovedLastRefFunction = true;

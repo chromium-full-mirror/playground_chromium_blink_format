@@ -30,7 +30,7 @@ namespace WebCore {
 using namespace HTMLNames;
 
 PassRefPtr<ShadowBlockElement> ShadowBlockElement::create(Node* shadowParent) {
-  return new ShadowBlockElement(shadowParent);
+  return adoptRef(new ShadowBlockElement(shadowParent));
 }
 
 ShadowBlockElement::ShadowBlockElement(Node* shadowParent)
@@ -104,7 +104,7 @@ bool ShadowBlockElement::partShouldHaveStyle(const RenderObject* parentRenderer,
 }
 
 PassRefPtr<ShadowInputElement> ShadowInputElement::create(Node* shadowParent) {
-  return new ShadowInputElement(shadowParent);
+  return adoptRef(new ShadowInputElement(shadowParent));
 }
 
 ShadowInputElement::ShadowInputElement(Node* shadowParent)
