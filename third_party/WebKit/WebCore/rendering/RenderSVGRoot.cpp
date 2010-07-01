@@ -183,19 +183,16 @@ void RenderSVGRoot::paint(PaintInfo& paintInfo, int parentX, int parentY) {
   childPaintInfo.applyTransform(
       localToRepaintContainerTransform(parentOriginInContainer));
 
-  RenderSVGResourceFilter* filter = 0;
-  FloatRect boundingBox = repaintRectInLocalCoordinates();
-
   bool continueRendering = true;
   if (childPaintInfo.phase == PaintPhaseForeground)
-    continueRendering = SVGRenderSupport::prepareToRenderSVGContent(
-        this, childPaintInfo, boundingBox, filter);
+    continueRendering =
+        SVGRenderSupport::prepareToRenderSVGContent(this, childPaintInfo);
 
   if (continueRendering)
     RenderBox::paint(childPaintInfo, 0, 0);
 
   if (childPaintInfo.phase == PaintPhaseForeground)
-    SVGRenderSupport::finishRenderSVGContent(this, childPaintInfo, filter,
+    SVGRenderSupport::finishRenderSVGContent(this, childPaintInfo,
                                              paintInfo.context);
 
   childPaintInfo.context->restore();

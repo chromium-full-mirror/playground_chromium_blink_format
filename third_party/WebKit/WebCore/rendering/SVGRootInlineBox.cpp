@@ -27,7 +27,6 @@
 #if ENABLE(SVG)
 #include "GraphicsContext.h"
 #include "RenderBlock.h"
-#include "RenderSVGResourceFilter.h"
 #include "SVGInlineFlowBox.h"
 #include "SVGInlineTextBox.h"
 #include "SVGRenderSupport.h"
@@ -50,16 +49,13 @@ void SVGRootInlineBox::paint(PaintInfo& paintInfo, int, int) {
   PaintInfo childPaintInfo(paintInfo);
   childPaintInfo.context->save();
 
-  FloatRect repaintRect = boxRenderer->repaintRectInLocalCoordinates();
-
-  RenderSVGResourceFilter* filter = 0;
-  if (SVGRenderSupport::prepareToRenderSVGContent(boxRenderer, childPaintInfo,
-                                                  repaintRect, filter)) {
+  if (SVGRenderSupport::prepareToRenderSVGContent(boxRenderer,
+                                                  childPaintInfo)) {
     for (InlineBox* child = firstChild(); child; child = child->nextOnLine())
       child->paint(childPaintInfo, 0, 0);
   }
 
-  SVGRenderSupport::finishRenderSVGContent(boxRenderer, childPaintInfo, filter,
+  SVGRenderSupport::finishRenderSVGContent(boxRenderer, childPaintInfo,
                                            paintInfo.context);
   childPaintInfo.context->restore();
 }

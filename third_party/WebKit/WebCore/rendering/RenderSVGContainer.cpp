@@ -84,7 +84,6 @@ void RenderSVGContainer::paint(PaintInfo& paintInfo, int, int) {
     return;
 
   PaintInfo childPaintInfo(paintInfo);
-
   childPaintInfo.context->save();
 
   // Let the RenderSVGViewportContainer subclass clip if necessary
@@ -92,13 +91,10 @@ void RenderSVGContainer::paint(PaintInfo& paintInfo, int, int) {
 
   childPaintInfo.applyTransform(localToParentTransform());
 
-  RenderSVGResourceFilter* filter = 0;
-  FloatRect boundingBox = repaintRectInLocalCoordinates();
-
   bool continueRendering = true;
   if (childPaintInfo.phase == PaintPhaseForeground)
-    continueRendering = SVGRenderSupport::prepareToRenderSVGContent(
-        this, childPaintInfo, boundingBox, filter);
+    continueRendering =
+        SVGRenderSupport::prepareToRenderSVGContent(this, childPaintInfo);
 
   if (continueRendering) {
     childPaintInfo.updatePaintingRootForChildren(this);
@@ -108,7 +104,7 @@ void RenderSVGContainer::paint(PaintInfo& paintInfo, int, int) {
   }
 
   if (paintInfo.phase == PaintPhaseForeground)
-    SVGRenderSupport::finishRenderSVGContent(this, childPaintInfo, filter,
+    SVGRenderSupport::finishRenderSVGContent(this, childPaintInfo,
                                              paintInfo.context);
 
   childPaintInfo.context->restore();
@@ -119,14 +115,15 @@ void RenderSVGContainer::paint(PaintInfo& paintInfo, int, int) {
   // outline rect into parent coords before drawing.
   // FIXME: This means our focus ring won't share our rotation like it should.
   // We should instead disable our clip during PaintPhaseOutline
-  IntRect paintRectInParent = enclosingIntRect(
-      localToParentTransform().mapRect(repaintRectInLocalCoordinates()));
   if ((paintInfo.phase == PaintPhaseOutline ||
        paintInfo.phase == PaintPhaseSelfOutline) &&
-      style()->outlineWidth() && style()->visibility() == VISIBLE)
+      style()->outlineWidth() && style()->visibility() == VISIBLE) {
+    IntRect paintRectInParent = enclosingIntRect(
+        localToParentTransform().mapRect(repaintRectInLocalCoordinates()));
     paintOutline(paintInfo.context, paintRectInParent.x(),
                  paintRectInParent.y(), paintRectInParent.width(),
                  paintRectInParent.height());
+  }
 }
 
 // addFocusRingRects is called from paintOutline and needs to be in the same
@@ -146,12 +143,9 @@ FloatRect RenderSVGContainer::strokeBoundingBox() const {
   return SVGRenderSupport::computeContainerBoundingBox(this, true);
 }
 
-// RenderSVGContainer is used for <g> elements which do not themselves have a
-// width or height, so we union all of our child rects as our repaint rect.
 FloatRect RenderSVGContainer::repaintRectInLocalCoordinates() const {
   FloatRect repaintRect = strokeBoundingBox();
   SVGRenderSupport::intersectRepaintRectWithResources(this, repaintRect);
-
   return repaintRect;
 }
 

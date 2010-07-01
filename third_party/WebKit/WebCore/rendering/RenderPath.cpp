@@ -34,7 +34,6 @@
 #include "HitTestRequest.h"
 #include "PointerEventsHitRules.h"
 #include "RenderSVGContainer.h"
-#include "RenderSVGResourceFilter.h"
 #include "RenderSVGResourceMarker.h"
 #include "StrokeStyleApplier.h"
 #include "SVGRenderSupport.h"
@@ -189,13 +188,11 @@ void RenderPath::paint(PaintInfo& paintInfo, int, int) {
   if (drawsOutline || childPaintInfo.phase == PaintPhaseForeground) {
     childPaintInfo.context->save();
     childPaintInfo.applyTransform(m_localTransform);
-    RenderSVGResourceFilter* filter = 0;
 
     if (childPaintInfo.phase == PaintPhaseForeground) {
       PaintInfo savedInfo(childPaintInfo);
 
-      if (SVGRenderSupport::prepareToRenderSVGContent(this, childPaintInfo,
-                                                      boundingBox, filter)) {
+      if (SVGRenderSupport::prepareToRenderSVGContent(this, childPaintInfo)) {
         const SVGRenderStyle* svgStyle = style()->svgStyle();
         if (svgStyle->shapeRendering() == SR_CRISPEDGES)
           childPaintInfo.context->setShouldAntialias(false);
@@ -206,7 +203,7 @@ void RenderPath::paint(PaintInfo& paintInfo, int, int) {
           m_markerLayoutInfo.drawMarkers(childPaintInfo);
       }
 
-      SVGRenderSupport::finishRenderSVGContent(this, childPaintInfo, filter,
+      SVGRenderSupport::finishRenderSVGContent(this, childPaintInfo,
                                                savedInfo.context);
     }
 
