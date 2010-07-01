@@ -296,7 +296,6 @@ inline GraphicsLayerQtImpl* toGraphicsLayerQtImpl(QGraphicsItem* item) {
 }
 
 inline GraphicsLayerQtImpl* toGraphicsLayerQtImpl(QGraphicsObject* item) {
-  ASSERT(item);
   return qobject_cast<GraphicsLayerQtImpl*>(item);
 }
 
