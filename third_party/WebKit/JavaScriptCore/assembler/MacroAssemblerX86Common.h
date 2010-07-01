@@ -40,6 +40,8 @@ class MacroAssemblerX86Common : public AbstractMacroAssembler<X86Assembler> {
       DoubleConditionBitInvert | DoubleConditionBitSpecial;
 
  public:
+  typedef X86Assembler::FPRegisterID FPRegisterID;
+
   enum Condition {
     Equal = X86Assembler::ConditionE,
     NotEqual = X86Assembler::ConditionNE,
