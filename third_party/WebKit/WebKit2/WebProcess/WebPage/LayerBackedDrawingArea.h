@@ -119,7 +119,9 @@ class LayerBackedDrawingArea : public DrawingArea,
 
   OwnPtr<WebCore::GraphicsLayer> m_backingLayer;
 #if PLATFORM(MAC)
+#if HAVE(HOSTED_CORE_ANIMATION)
   RetainPtr<WKCARemoteLayerClientRef> m_remoteLayerRef;
+#endif
   RetainPtr<CFRunLoopObserverRef> m_updateLayoutRunLoopObserver;
 #endif
 

@@ -44,7 +44,7 @@ LayerBackedDrawingArea::LayerBackedDrawingArea(WebPage* webPage)
       m_syncTimer(WebProcess::shared().runLoop(),
                   this,
                   &LayerBackedDrawingArea::syncCompositingLayers)
-#if PLATFORM(MAC)
+#if PLATFORM(MAC) && HAVE(HOSTED_CORE_ANIMATION)
       ,
       m_remoteLayerRef(0)
 #endif
@@ -87,8 +87,10 @@ void LayerBackedDrawingArea::scroll(const IntSize& scrollDelta,
 }
 
 void LayerBackedDrawingArea::setNeedsDisplay(const IntRect& rect) {
+#if PLATFORM(MAC) && HAVE(HOSTED_CORE_ANIMATION)
   if (!m_remoteLayerRef)
     attachCompositingContext(0);
+#endif
 
   m_backingLayer->setNeedsDisplayInRect(rect);
   m_backingLayer->syncCompositingStateForThisLayerOnly();
