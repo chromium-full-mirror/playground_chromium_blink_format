@@ -147,7 +147,7 @@ void WebContext::didRecieveMessageFromInjectedBundle(
 }
 
 void WebContext::postMessageToInjectedBundle(WebCore::StringImpl* message) {
-  if (!m_process || !m_process->isValid())
+  if (!m_process)
     return;
 
   m_process->send(WebProcessMessage::PostMessage, 0,
