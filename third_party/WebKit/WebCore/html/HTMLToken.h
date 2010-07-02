@@ -63,6 +63,7 @@ class HTMLToken : public Noncopyable {
   }
 
   void beginStartTag(UChar character) {
+    ASSERT(character);
     ASSERT(m_type == Uninitialized);
     m_type = StartTag;
     m_data.clear();
@@ -86,6 +87,7 @@ class HTMLToken : public Noncopyable {
   }
 
   void beginCharacter(UChar character) {
+    ASSERT(character);
     ASSERT(m_type == Uninitialized);
     m_type = Character;
     m_data.clear();
@@ -106,11 +108,13 @@ class HTMLToken : public Noncopyable {
   }
 
   void beginDOCTYPE(UChar character) {
+    ASSERT(character);
     beginDOCTYPE();
     m_data.append(character);
   }
 
   void appendToName(UChar character) {
+    ASSERT(character);
     ASSERT(m_type == StartTag || m_type == EndTag || m_type == DOCTYPE);
     m_data.append(character);
   }
@@ -122,6 +126,7 @@ class HTMLToken : public Noncopyable {
   }
 
   void appendToComment(UChar character) {
+    ASSERT(character);
     ASSERT(m_type == Comment);
     m_data.append(character);
   }
@@ -133,11 +138,13 @@ class HTMLToken : public Noncopyable {
   }
 
   void appendToAttributeName(UChar character) {
+    ASSERT(character);
     ASSERT(m_type == StartTag || m_type == EndTag);
     m_currentAttribute->m_name.append(character);
   }
 
   void appendToAttributeValue(UChar character) {
+    ASSERT(character);
     ASSERT(m_type == StartTag || m_type == EndTag);
     m_currentAttribute->m_value.append(character);
   }
@@ -204,12 +211,14 @@ class HTMLToken : public Noncopyable {
   }
 
   void appendToPublicIdentifier(UChar character) {
+    ASSERT(character);
     ASSERT(m_type == DOCTYPE);
     ASSERT(m_doctypeData->m_hasPublicIdentifier);
     m_doctypeData->m_publicIdentifier.append(character);
   }
 
   void appendToSystemIdentifier(UChar character) {
+    ASSERT(character);
     ASSERT(m_type == DOCTYPE);
     ASSERT(m_doctypeData->m_hasSystemIdentifier);
     m_doctypeData->m_systemIdentifier.append(character);
