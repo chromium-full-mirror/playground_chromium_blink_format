@@ -29,8 +29,10 @@
 
 #include "HTTPHeaderMap.h"
 #include "KURL.h"
+#include "ResourceLoadTiming.h"
 
 #include <wtf/PassOwnPtr.h>
+#include <wtf/RefPtr.h>
 
 namespace WebCore {
 
@@ -97,6 +99,9 @@ class ResourceResponseBase : public FastAllocBase {
   double expires() const;
   double lastModified() const;
 
+  ResourceLoadTiming* resourceLoadTiming() const;
+  void setResourceLoadTiming(PassRefPtr<ResourceLoadTiming>);
+
   // The ResourceResponse subclass may "shadow" this method to provide
   // platform-specific memory usage information
   unsigned memoryUsage() const {
@@ -136,6 +141,7 @@ class ResourceResponseBase : public FastAllocBase {
   String m_httpStatusText;
   HTTPHeaderMap m_httpHeaderFields;
   time_t m_lastModifiedDate;
+  RefPtr<ResourceLoadTiming> m_resourceLoadTiming;
 
   bool m_isNull : 1;
 
@@ -176,6 +182,7 @@ struct CrossThreadResourceResponseData : Noncopyable {
   String m_httpStatusText;
   OwnPtr<CrossThreadHTTPHeaderMapData> m_httpHeaders;
   time_t m_lastModifiedDate;
+  RefPtr<ResourceLoadTiming> m_resourceLoadTiming;
 };
 
 }  // namespace WebCore
