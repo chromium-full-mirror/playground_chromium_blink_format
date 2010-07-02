@@ -314,6 +314,13 @@ void HTMLTreeBuilder::insertHTMLStartTagInBody(AtomicHTMLToken& token) {
   mergeAttributesFromTokenIntoElement(token, m_openElements.htmlElement());
 }
 
+void HTMLTreeBuilder::processFakePEndTagIfPInScope() {
+  if (!m_openElements.inScope(pTag.localName()))
+    return;
+  AtomicHTMLToken endP(HTMLToken::EndTag, pTag.localName());
+  processEndTag(endP);
+}
+
 void HTMLTreeBuilder::processStartTag(AtomicHTMLToken& token) {
   switch (insertionMode()) {
     case InitialMode:
@@ -417,19 +424,20 @@ void HTMLTreeBuilder::processStartTag(AtomicHTMLToken& token) {
           token.name() == menuTag || token.name() == navTag ||
           token.name() == olTag || token.name() == pTag ||
           token.name() == sectionTag || token.name() == ulTag) {
-        notImplemented();
+        processFakePEndTagIfPInScope();
         insertElement(token);
         return;
       }
       if (token.name() == h1Tag || token.name() == h2Tag ||
           token.name() == h3Tag || token.name() == h4Tag ||
           token.name() == h5Tag || token.name() == h6Tag) {
+        processFakePEndTagIfPInScope();
         notImplemented();
         insertElement(token);
         return;
       }
       if (token.name() == preTag || token.name() == listingTag) {
-        notImplemented();
+        processFakePEndTagIfPInScope();
         insertElement(token);
         m_tokenizer->skipLeadingNewLineForListing();
         m_framesetOk = false;
@@ -437,22 +445,25 @@ void HTMLTreeBuilder::processStartTag(AtomicHTMLToken& token) {
       }
       if (token.name() == formTag) {
         notImplemented();
+        processFakePEndTagIfPInScope();
         insertElement(token);
         m_formElement = currentElement();
         return;
       }
       if (token.name() == liTag) {
         notImplemented();
+        processFakePEndTagIfPInScope();
         insertElement(token);
         return;
       }
       if (token.name() == ddTag || token.name() == dtTag) {
         notImplemented();
+        processFakePEndTagIfPInScope();
         insertElement(token);
         return;
       }
       if (token.name() == plaintextTag) {
-        notImplemented();
+        processFakePEndTagIfPInScope();
         insertElement(token);
         m_tokenizer->setState(HTMLTokenizer::PLAINTEXTState);
         return;
@@ -517,7 +528,7 @@ void HTMLTreeBuilder::processStartTag(AtomicHTMLToken& token) {
         return;
       }
       if (token.name() == hrTag) {
-        notImplemented();
+        processFakePEndTagIfPInScope();
         insertSelfClosingElement(token);
         m_framesetOk = false;
         return;
@@ -543,7 +554,7 @@ void HTMLTreeBuilder::processStartTag(AtomicHTMLToken& token) {
         return;
       }
       if (token.name() == xmpTag) {
-        notImplemented();
+        processFakePEndTagIfPInScope();
         reconstructTheActiveFormattingElements();
         m_framesetOk = false;
         insertGenericRawTextElement(token);
