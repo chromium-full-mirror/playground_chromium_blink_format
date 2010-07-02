@@ -438,8 +438,10 @@ QString QScriptValuePrivate::toString() const {
     case JSValue:
     case JSPrimitive:
     case JSObject:
+      JSValueRef exception = 0;
       JSRetainPtr<JSStringRef> ptr(
-          Adopt, JSValueToStringCopy(*m_engine, *this, /* exception */ 0));
+          Adopt, JSValueToStringCopy(*m_engine, *this, &exception));
+      m_engine->setException(exception);
       return QScriptConverter::toString(ptr.get());
   }
 
@@ -452,8 +454,12 @@ qsreal QScriptValuePrivate::toNumber() const {
   switch (m_state) {
     case JSValue:
     case JSPrimitive:
-    case JSObject:
-      return JSValueToNumber(*m_engine, *this, /* exception */ 0);
+    case JSObject: {
+      JSValueRef exception = 0;
+      qsreal result = JSValueToNumber(*m_engine, *this, &exception);
+      m_engine->setException(exception);
+      return result;
+    }
     case CNumber:
       return u.m_number;
     case CBool:
@@ -584,9 +590,13 @@ QScriptValuePrivate* QScriptValuePrivate::toObject(
         qWarning(
             "QScriptEngine::toObject: cannot convert value created in a "
             "different engine");
-      JSObjectRef object = JSValueToObject(*m_engine, *this, /* exception */ 0);
+      JSValueRef exception = 0;
+      JSObjectRef object = JSValueToObject(*m_engine, *this, &exception);
       if (object)
         return new QScriptValuePrivate(m_engine.constData(), object);
+      else
+        m_engine->setException(exception,
+                               QScriptEnginePrivate::NotNullException);
     }
       return new QScriptValuePrivate;
     case JSObject:
@@ -677,7 +687,10 @@ bool QScriptValuePrivate::equals(QScriptValuePrivate* other) {
     }
   }
 
-  return JSValueIsEqual(*m_engine, *this, *other, /* exception */ 0);
+  JSValueRef exception = 0;
+  bool result = JSValueIsEqual(*m_engine, *this, *other, &exception);
+  m_engine->setException(exception);
+  return result;
 }
 
 bool QScriptValuePrivate::strictlyEquals(QScriptValuePrivate* other) {
@@ -721,8 +734,11 @@ bool QScriptValuePrivate::strictlyEquals(QScriptValuePrivate* other) {
 inline bool QScriptValuePrivate::instanceOf(QScriptValuePrivate* other) {
   if (!isJSBased() || !other->isObject())
     return false;
-  return JSValueIsInstanceOfConstructor(*m_engine, *this, *other,
-                                        /* exception */ 0);
+  JSValueRef exception = 0;
+  bool result =
+      JSValueIsInstanceOfConstructor(*m_engine, *this, *other, &exception);
+  m_engine->setException(exception);
+  return result;
 }
 
 /*!
@@ -828,8 +844,10 @@ QScriptValuePrivate* QScriptValuePrivate::call(const QScriptValuePrivate*,
       JSValueRef result =
           JSObjectCallAsFunction(*m_engine, *this, /* thisObject */ 0, argc,
                                  argv.constData(), &exception);
-      if (!result && exception)
+      if (!result && exception) {
+        m_engine->setException(exception);
         return new QScriptValuePrivate(engine(), exception);
+      }
       if (result && !exception)
         return new QScriptValuePrivate(engine(), result);
     }
@@ -868,12 +886,15 @@ bool QScriptValuePrivate::inherits(const char* name) {
   Q_ASSERT(isJSBased());
   JSObjectRef globalObject = JSContextGetGlobalObject(*m_engine);
   JSStringRef errorAttrName = QScriptConverter::toString(name);
-  JSValueRef error = JSObjectGetProperty(*m_engine, globalObject, errorAttrName,
-                                         /* exception */ 0);
+  JSValueRef exception = 0;
+  JSValueRef error =
+      JSObjectGetProperty(*m_engine, globalObject, errorAttrName, &exception);
   JSStringRelease(errorAttrName);
-  return JSValueIsInstanceOfConstructor(
-      *m_engine, *this, JSValueToObject(*m_engine, error, /* exception */ 0),
-      /* exception */ 0);
+  bool result = JSValueIsInstanceOfConstructor(
+      *m_engine, *this, JSValueToObject(*m_engine, error, &exception),
+      &exception);
+  m_engine->setException(exception);
+  return result;
 }
 
 /*!

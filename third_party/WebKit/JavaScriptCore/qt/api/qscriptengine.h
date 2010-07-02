@@ -44,6 +44,12 @@ class QScriptEngine : public QObject {
                         int lineNumber = 1);
   QScriptValue evaluate(const QScriptProgram& program);
 
+  bool hasUncaughtException() const;
+  QScriptValue uncaughtException() const;
+  void clearExceptions();
+  int uncaughtExceptionLineNumber() const;
+  QStringList uncaughtExceptionBacktrace() const;
+
   void collectGarbage();
   void reportAdditionalMemoryCost(int cost);
 
