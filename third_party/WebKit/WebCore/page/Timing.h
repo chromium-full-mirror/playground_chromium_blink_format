@@ -28,12 +28,35 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-module window {
+#ifndef Timing_h
+#define Timing_h
 
-    // See: http://dev.w3.org/2006/webapi/WebTiming/
-    interface [Conditional=WEB_TIMING, OmitConstructor] NavigationTiming {
-        readonly attribute unsigned long navigationStart;
-        // FIXME: Implement remainder of interface.
-    };
+#if ENABLE(WEB_TIMING)
 
+#include <wtf/PassRefPtr.h>
+#include <wtf/RefCounted.h>
+
+namespace WebCore {
+
+class Frame;
+
+class Timing : public RefCounted<Timing> {
+ public:
+  static PassRefPtr<Timing> create(Frame* frame) {
+    return adoptRef(new Timing(frame));
+  }
+
+  Frame* frame() const;
+  void disconnectFrame();
+
+  unsigned long navigationStart() const;
+
+ private:
+  Timing(Frame*);
+
+  Frame* m_frame;
+};
 }
+
+#endif  // !ENABLE(WEB_TIMING)
+#endif  // !defined(Timing_h)
