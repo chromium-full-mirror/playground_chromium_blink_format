@@ -422,6 +422,9 @@ class WebPreferences : public IWebPreferences, public IWebPreferencesPrivate {
   virtual HRESULT STDMETHODCALLTYPE setShowRepaintCounter(BOOL);
   virtual HRESULT STDMETHODCALLTYPE showRepaintCounter(BOOL*);
 
+  virtual HRESULT STDMETHODCALLTYPE setDNSPrefetchingEnabled(BOOL);
+  virtual HRESULT STDMETHODCALLTYPE isDNSPrefetchingEnabled(BOOL*);
+
   // WebPreferences
 
   // This method accesses a different preference key than
