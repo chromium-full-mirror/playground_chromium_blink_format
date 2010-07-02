@@ -83,7 +83,7 @@ class QScriptEnginePrivate : public QSharedData {
   inline JSValueRef makeJSValue(QScriptValue::SpecialValue value) const;
 
   QScriptValuePrivate* newObject() const;
-  QScriptValuePrivate* newArray(uint length) const;
+  QScriptValuePrivate* newArray(uint length);
   QScriptValuePrivate* globalObject() const;
 
   inline QScriptStringPrivate* toStringHandle(const QString& str) const;
