@@ -39,3 +39,7 @@ bool WKBundleFrameIsMainFrame(WKBundleFrameRef frameRef) {
 WKURLRef WKBundleFrameGetURL(WKBundleFrameRef frameRef) {
   return toURLRef(toWK(frameRef)->url().impl());
 }
+
+WKArrayRef WKBundleFrameCopyChildFrames(WKBundleFrameRef frameRef) {
+  return toRef(toWK(frameRef)->childFrames().releaseRef());
+}

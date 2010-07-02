@@ -26,6 +26,7 @@
 #ifndef WebFrame_h
 #define WebFrame_h
 
+#include "ImmutableArray.h"
 #include "WebFrameLoaderClient.h"
 #include <WebCore/FrameLoaderClient.h>
 #include <WebCore/FrameLoaderTypes.h>
@@ -68,6 +69,7 @@ class WebFrame : public RefCounted<WebFrame> {
   // WKBundleFrame API functions
   bool isMainFrame() const;
   WebCore::String url() const;
+  PassRefPtr<ImmutableArray> childFrames();
 
  private:
   WebFrame(WebPage*,
