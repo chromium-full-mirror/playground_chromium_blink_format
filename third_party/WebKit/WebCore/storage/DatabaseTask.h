@@ -60,6 +60,8 @@ class DatabaseTaskSynchronizer : public Noncopyable {
 };
 
 class DatabaseTask : public Noncopyable {
+  friend class Database;
+
  public:
   virtual ~DatabaseTask();
 
@@ -82,24 +84,24 @@ class DatabaseTask : public Noncopyable {
 #endif
 };
 
-class Database::DatabaseOpenTask : public DatabaseTask {
+class DatabaseOpenTask : public DatabaseTask {
  public:
-  static PassOwnPtr<Database::DatabaseOpenTask> create(
+  static PassOwnPtr<DatabaseOpenTask> create(
       Database* db,
       bool setVersionInNewDatabase,
       DatabaseTaskSynchronizer* synchronizer,
       ExceptionCode& code,
       bool& success) {
-    return new Database::DatabaseOpenTask(db, setVersionInNewDatabase,
-                                          synchronizer, code, success);
+    return new DatabaseOpenTask(db, setVersionInNewDatabase, synchronizer, code,
+                                success);
   }
 
  private:
-  Database::DatabaseOpenTask(Database*,
-                             bool setVersionInNewDatabase,
-                             DatabaseTaskSynchronizer*,
-                             ExceptionCode&,
-                             bool& success);
+  DatabaseOpenTask(Database*,
+                   bool setVersionInNewDatabase,
+                   DatabaseTaskSynchronizer*,
+                   ExceptionCode&,
+                   bool& success);
 
   virtual void doPerformTask();
 #ifndef NDEBUG
@@ -111,35 +113,42 @@ class Database::DatabaseOpenTask : public DatabaseTask {
   bool& m_success;
 };
 
-class Database::DatabaseCloseTask : public DatabaseTask {
+class DatabaseCloseTask : public DatabaseTask {
  public:
-  static PassOwnPtr<Database::DatabaseCloseTask> create(
+  static PassOwnPtr<DatabaseCloseTask> create(
       Database* db,
+      Database::ClosePolicy closePolicy,
       DatabaseTaskSynchronizer* synchronizer) {
-    return new Database::DatabaseCloseTask(db, synchronizer);
+    return new DatabaseCloseTask(db, closePolicy, synchronizer);
   }
 
  private:
-  Database::DatabaseCloseTask(Database*, DatabaseTaskSynchronizer*);
+  DatabaseCloseTask(Database*,
+                    Database::ClosePolicy,
+                    DatabaseTaskSynchronizer*);
 
   virtual void doPerformTask();
 #ifndef NDEBUG
   virtual const char* debugTaskName() const;
 #endif
+
+  Database::ClosePolicy m_closePolicy;
 };
 
-class Database::DatabaseTransactionTask : public DatabaseTask {
+class DatabaseTransactionTask : public DatabaseTask {
  public:
   // Transaction task is never synchronous, so no 'synchronizer' parameter.
-  static PassOwnPtr<Database::DatabaseTransactionTask> create(
+  static PassOwnPtr<DatabaseTransactionTask> create(
       PassRefPtr<SQLTransaction> transaction) {
-    return new Database::DatabaseTransactionTask(transaction);
+    return new DatabaseTransactionTask(transaction);
   }
 
   SQLTransaction* transaction() const { return m_transaction.get(); }
 
+  virtual ~DatabaseTransactionTask();
+
  private:
-  Database::DatabaseTransactionTask(PassRefPtr<SQLTransaction>);
+  DatabaseTransactionTask(PassRefPtr<SQLTransaction>);
 
   virtual void doPerformTask();
 #ifndef NDEBUG
@@ -149,19 +158,19 @@ class Database::DatabaseTransactionTask : public DatabaseTask {
   RefPtr<SQLTransaction> m_transaction;
 };
 
-class Database::DatabaseTableNamesTask : public DatabaseTask {
+class DatabaseTableNamesTask : public DatabaseTask {
  public:
-  static PassOwnPtr<Database::DatabaseTableNamesTask> create(
+  static PassOwnPtr<DatabaseTableNamesTask> create(
       Database* db,
       DatabaseTaskSynchronizer* synchronizer,
       Vector<String>& names) {
-    return new Database::DatabaseTableNamesTask(db, synchronizer, names);
+    return new DatabaseTableNamesTask(db, synchronizer, names);
   }
 
  private:
-  Database::DatabaseTableNamesTask(Database*,
-                                   DatabaseTaskSynchronizer*,
-                                   Vector<String>& names);
+  DatabaseTableNamesTask(Database*,
+                         DatabaseTaskSynchronizer*,
+                         Vector<String>& names);
 
   virtual void doPerformTask();
 #ifndef NDEBUG

@@ -73,6 +73,7 @@ void DatabaseTask::performTask() {
 
   m_database->resetAuthorizer();
   doPerformTask();
+  m_database->performPolicyChecks();
 
   if (m_synchronizer)
     m_synchronizer->taskCompleted();
@@ -82,12 +83,11 @@ void DatabaseTask::performTask() {
 // Opens the database file and verifies the version matches the expected
 // version.
 
-Database::DatabaseOpenTask::DatabaseOpenTask(
-    Database* database,
-    bool setVersionInNewDatabase,
-    DatabaseTaskSynchronizer* synchronizer,
-    ExceptionCode& code,
-    bool& success)
+DatabaseOpenTask::DatabaseOpenTask(Database* database,
+                                   bool setVersionInNewDatabase,
+                                   DatabaseTaskSynchronizer* synchronizer,
+                                   ExceptionCode& code,
+                                   bool& success)
     : DatabaseTask(database, synchronizer),
       m_setVersionInNewDatabase(setVersionInNewDatabase),
       m_code(code),
@@ -96,13 +96,13 @@ Database::DatabaseOpenTask::DatabaseOpenTask(
                          // synchronous.
 }
 
-void Database::DatabaseOpenTask::doPerformTask() {
+void DatabaseOpenTask::doPerformTask() {
   m_success =
       database()->performOpenAndVerify(m_setVersionInNewDatabase, m_code);
 }
 
 #ifndef NDEBUG
-const char* Database::DatabaseOpenTask::debugTaskName() const {
+const char* DatabaseOpenTask::debugTaskName() const {
   return "DatabaseOpenTask";
 }
 #endif
@@ -110,17 +110,17 @@ const char* Database::DatabaseOpenTask::debugTaskName() const {
 // *** DatabaseCloseTask ***
 // Closes the database.
 
-Database::DatabaseCloseTask::DatabaseCloseTask(
-    Database* database,
-    DatabaseTaskSynchronizer* synchronizer)
-    : DatabaseTask(database, synchronizer) {}
+DatabaseCloseTask::DatabaseCloseTask(Database* database,
+                                     Database::ClosePolicy closePolicy,
+                                     DatabaseTaskSynchronizer* synchronizer)
+    : DatabaseTask(database, synchronizer), m_closePolicy(closePolicy) {}
 
-void Database::DatabaseCloseTask::doPerformTask() {
-  database()->close();
+void DatabaseCloseTask::doPerformTask() {
+  database()->close(m_closePolicy);
 }
 
 #ifndef NDEBUG
-const char* Database::DatabaseCloseTask::debugTaskName() const {
+const char* DatabaseCloseTask::debugTaskName() const {
   return "DatabaseCloseTask";
 }
 #endif
@@ -128,17 +128,19 @@ const char* Database::DatabaseCloseTask::debugTaskName() const {
 // *** DatabaseTransactionTask ***
 // Starts a transaction that will report its results via a callback.
 
-Database::DatabaseTransactionTask::DatabaseTransactionTask(
+DatabaseTransactionTask::DatabaseTransactionTask(
     PassRefPtr<SQLTransaction> transaction)
     : DatabaseTask(transaction->database(), 0), m_transaction(transaction) {}
 
-void Database::DatabaseTransactionTask::doPerformTask() {
+DatabaseTransactionTask::~DatabaseTransactionTask() {}
+
+void DatabaseTransactionTask::doPerformTask() {
   if (m_transaction->performNextStep())
     m_transaction->database()->inProgressTransactionCompleted();
 }
 
 #ifndef NDEBUG
-const char* Database::DatabaseTransactionTask::debugTaskName() const {
+const char* DatabaseTransactionTask::debugTaskName() const {
   return "DatabaseTransactionTask";
 }
 #endif
@@ -146,7 +148,7 @@ const char* Database::DatabaseTransactionTask::debugTaskName() const {
 // *** DatabaseTableNamesTask ***
 // Retrieves a list of all tables in the database - for WebInspector support.
 
-Database::DatabaseTableNamesTask::DatabaseTableNamesTask(
+DatabaseTableNamesTask::DatabaseTableNamesTask(
     Database* database,
     DatabaseTaskSynchronizer* synchronizer,
     Vector<String>& names)
@@ -155,12 +157,12 @@ Database::DatabaseTableNamesTask::DatabaseTableNamesTask(
                          // synchronous.
 }
 
-void Database::DatabaseTableNamesTask::doPerformTask() {
+void DatabaseTableNamesTask::doPerformTask() {
   m_tableNames = database()->performGetTableNames();
 }
 
 #ifndef NDEBUG
-const char* Database::DatabaseTableNamesTask::debugTaskName() const {
+const char* DatabaseTableNamesTask::debugTaskName() const {
   return "DatabaseTableNamesTask";
 }
 #endif
