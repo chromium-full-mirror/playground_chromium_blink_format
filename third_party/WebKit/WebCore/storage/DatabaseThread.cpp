@@ -114,7 +114,7 @@ void* DatabaseThread::databaseThread() {
     openSetCopy.swap(m_openDatabaseSet);
     DatabaseSet::iterator end = openSetCopy.end();
     for (DatabaseSet::iterator it = openSetCopy.begin(); it != end; ++it)
-      (*it)->close(Database::RemoveDatabaseFromContext);
+      (*it)->close();
   }
 
   // Detach the thread so its resources are no longer of any concern to anyone
