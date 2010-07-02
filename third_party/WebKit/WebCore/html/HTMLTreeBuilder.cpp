@@ -609,7 +609,9 @@ void HTMLTreeBuilder::processStartTag(AtomicHTMLToken& token) {
       insertElement(token);
       break;
     case AfterBodyMode:
-      ASSERT(insertionMode() == AfterBodyMode);
+    case AfterAfterBodyMode:
+      ASSERT(insertionMode() == AfterBodyMode ||
+             insertionMode() == AfterAfterBodyMode);
       if (token.name() == htmlTag) {
         insertHTMLStartTagInBody(token);
         return;
@@ -706,7 +708,7 @@ void HTMLTreeBuilder::processEndTag(AtomicHTMLToken& token) {
       }
       if (token.name() == htmlTag) {
         if (processBodyEndTagForInBody(token))
-          notImplemented();  // Re-process the curent token.
+          processEndTag(token);
         return;
       }
       if (token.name() == addressTag || token.name() == articleTag ||
@@ -848,6 +850,11 @@ void HTMLTreeBuilder::processEndTag(AtomicHTMLToken& token) {
         m_insertionMode = AfterAfterBodyMode;
         return;
       }
+    // Fall through.
+    case AfterAfterBodyMode:
+      ASSERT(insertionMode() == AfterBodyMode ||
+             insertionMode() == AfterAfterBodyMode);
+      parseError(token);
       m_insertionMode = InBodyMode;
       processEndTag(token);
       break;
@@ -887,7 +894,8 @@ void HTMLTreeBuilder::processEndTag(AtomicHTMLToken& token) {
 }
 
 void HTMLTreeBuilder::processComment(AtomicHTMLToken& token) {
-  if (m_insertionMode == InitialMode || m_insertionMode == BeforeHTMLMode) {
+  if (m_insertionMode == InitialMode || m_insertionMode == BeforeHTMLMode ||
+      m_insertionMode == AfterAfterBodyMode) {
     insertCommentOnDocument(token);
     return;
   }
@@ -932,9 +940,13 @@ void HTMLTreeBuilder::processCharacter(AtomicHTMLToken& token) {
       insertTextNode(token);
       break;
     case AfterBodyMode:
-      ASSERT(insertionMode() == AfterBodyMode);
+    case AfterAfterBodyMode:
+      ASSERT(insertionMode() == AfterBodyMode ||
+             insertionMode() == AfterAfterBodyMode);
+      parseError(token);
       m_insertionMode = InBodyMode;
       processCharacter(token);
+      break;
     case TextMode:
       notImplemented();
       insertTextNode(token);
@@ -976,7 +988,9 @@ void HTMLTreeBuilder::processEndOfFile(AtomicHTMLToken& token) {
       notImplemented();
       break;
     case AfterBodyMode:
-      ASSERT(insertionMode() == AfterBodyMode);
+    case AfterAfterBodyMode:
+      ASSERT(insertionMode() == AfterBodyMode ||
+             insertionMode() == AfterAfterBodyMode);
       notImplemented();
       break;
     case InHeadNoscriptMode:
