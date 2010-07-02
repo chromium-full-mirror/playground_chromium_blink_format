@@ -74,7 +74,7 @@ inline bool CollectorHeapIterator::operator!=(
 }
 
 inline JSCell* CollectorHeapIterator::operator*() const {
-  return reinterpret_cast<JSCell*>(m_heap.blocks[m_block]->cells + m_cell);
+  return reinterpret_cast<JSCell*>(&m_heap.blocks[m_block]->cells[m_cell]);
 }
 
 // Iterators advance up to the next-to-last -- and not the last -- cell in a

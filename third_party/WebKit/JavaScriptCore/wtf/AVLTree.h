@@ -33,6 +33,7 @@
 #define AVL_TREE_H_
 
 #include "Assertions.h"
+#include <wtf/FixedArray.h>
 
 namespace WTF {
 
@@ -79,7 +80,7 @@ class AVLTreeDefaultBSet {
   }
 
  private:
-  bool m_data[maxDepth];
+  FixedArray<bool, maxDepth> m_data;
 };
 
 // How to determine maxDepth:

@@ -430,7 +430,7 @@ class JS_EXPORTCLASS JSString : public JSCell {
   struct JSStringFinalizerStruct {
     JSStringFinalizerStruct() : m_finalizerCallback(0) {}
     union {
-      mutable RopeImpl::Fiber m_fibers[s_maxInternalRopeLength];
+      mutable FixedArray<RopeImpl::Fiber, s_maxInternalRopeLength> m_fibers;
       struct {
         JSStringFinalizerCallback m_finalizerCallback;
         void* m_finalizerContext;
