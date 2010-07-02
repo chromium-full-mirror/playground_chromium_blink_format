@@ -2808,18 +2808,9 @@ void WebGLRenderingContext::uniform1fv(const WebGLUniformLocation* location,
                                        Float32Array* v,
                                        ExceptionCode& ec) {
   UNUSED_PARAM(ec);
-  if (!location)
+  if (!validateUniformParameters(location, v, 1))
     return;
 
-  if (location->program() != m_currentProgram) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
-    return;
-  }
-
-  if (!v) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
-    return;
-  }
   m_context->uniform1fv(location->location(), v->data(), v->length());
   cleanupAfterGraphicsCall(false);
 }
@@ -2829,18 +2820,9 @@ void WebGLRenderingContext::uniform1fv(const WebGLUniformLocation* location,
                                        int size,
                                        ExceptionCode& ec) {
   UNUSED_PARAM(ec);
-  if (!location)
+  if (!validateUniformParameters(location, v, size, 1))
     return;
 
-  if (location->program() != m_currentProgram) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
-    return;
-  }
-
-  if (!v) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
-    return;
-  }
   m_context->uniform1fv(location->location(), v, size);
   cleanupAfterGraphicsCall(false);
 }
@@ -2865,18 +2847,9 @@ void WebGLRenderingContext::uniform1iv(const WebGLUniformLocation* location,
                                        Int32Array* v,
                                        ExceptionCode& ec) {
   UNUSED_PARAM(ec);
-  if (!location)
+  if (!validateUniformParameters(location, v, 1))
     return;
 
-  if (location->program() != m_currentProgram) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
-    return;
-  }
-
-  if (!v) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
-    return;
-  }
   m_context->uniform1iv(location->location(), v->data(), v->length());
   cleanupAfterGraphicsCall(false);
 }
@@ -2886,18 +2859,9 @@ void WebGLRenderingContext::uniform1iv(const WebGLUniformLocation* location,
                                        int size,
                                        ExceptionCode& ec) {
   UNUSED_PARAM(ec);
-  if (!location)
+  if (!validateUniformParameters(location, v, size, 1))
     return;
 
-  if (location->program() != m_currentProgram) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
-    return;
-  }
-
-  if (!v) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
-    return;
-  }
   m_context->uniform1iv(location->location(), v, size);
   cleanupAfterGraphicsCall(false);
 }
@@ -2923,19 +2887,9 @@ void WebGLRenderingContext::uniform2fv(const WebGLUniformLocation* location,
                                        Float32Array* v,
                                        ExceptionCode& ec) {
   UNUSED_PARAM(ec);
-  if (!location)
+  if (!validateUniformParameters(location, v, 2))
     return;
 
-  if (location->program() != m_currentProgram) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
-    return;
-  }
-
-  if (!v) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
-    return;
-  }
-  // FIXME: length needs to be a multiple of 2
   m_context->uniform2fv(location->location(), v->data(), v->length() / 2);
   cleanupAfterGraphicsCall(false);
 }
@@ -2945,19 +2899,9 @@ void WebGLRenderingContext::uniform2fv(const WebGLUniformLocation* location,
                                        int size,
                                        ExceptionCode& ec) {
   UNUSED_PARAM(ec);
-  if (!location)
+  if (!validateUniformParameters(location, v, size, 2))
     return;
 
-  if (location->program() != m_currentProgram) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
-    return;
-  }
-
-  if (!v) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
-    return;
-  }
-  // FIXME: length needs to be a multiple of 2
   m_context->uniform2fv(location->location(), v, size / 2);
   cleanupAfterGraphicsCall(false);
 }
@@ -2983,19 +2927,9 @@ void WebGLRenderingContext::uniform2iv(const WebGLUniformLocation* location,
                                        Int32Array* v,
                                        ExceptionCode& ec) {
   UNUSED_PARAM(ec);
-  if (!location)
+  if (!validateUniformParameters(location, v, 2))
     return;
 
-  if (location->program() != m_currentProgram) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
-    return;
-  }
-
-  if (!v) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
-    return;
-  }
-  // FIXME: length needs to be a multiple of 2
   m_context->uniform2iv(location->location(), v->data(), v->length() / 2);
   cleanupAfterGraphicsCall(false);
 }
@@ -3005,19 +2939,9 @@ void WebGLRenderingContext::uniform2iv(const WebGLUniformLocation* location,
                                        int size,
                                        ExceptionCode& ec) {
   UNUSED_PARAM(ec);
-  if (!location)
+  if (!validateUniformParameters(location, v, size, 2))
     return;
 
-  if (location->program() != m_currentProgram) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
-    return;
-  }
-
-  if (!v) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
-    return;
-  }
-  // FIXME: length needs to be a multiple of 2
   m_context->uniform2iv(location->location(), v, size / 2);
   cleanupAfterGraphicsCall(false);
 }
@@ -3044,19 +2968,9 @@ void WebGLRenderingContext::uniform3fv(const WebGLUniformLocation* location,
                                        Float32Array* v,
                                        ExceptionCode& ec) {
   UNUSED_PARAM(ec);
-  if (!location)
+  if (!validateUniformParameters(location, v, 3))
     return;
 
-  if (location->program() != m_currentProgram) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
-    return;
-  }
-
-  if (!v) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
-    return;
-  }
-  // FIXME: length needs to be a multiple of 3
   m_context->uniform3fv(location->location(), v->data(), v->length() / 3);
   cleanupAfterGraphicsCall(false);
 }
@@ -3066,19 +2980,9 @@ void WebGLRenderingContext::uniform3fv(const WebGLUniformLocation* location,
                                        int size,
                                        ExceptionCode& ec) {
   UNUSED_PARAM(ec);
-  if (!location)
+  if (!validateUniformParameters(location, v, size, 3))
     return;
 
-  if (location->program() != m_currentProgram) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
-    return;
-  }
-
-  if (!v) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
-    return;
-  }
-  // FIXME: length needs to be a multiple of 3
   m_context->uniform3fv(location->location(), v, size / 3);
   cleanupAfterGraphicsCall(false);
 }
@@ -3105,19 +3009,9 @@ void WebGLRenderingContext::uniform3iv(const WebGLUniformLocation* location,
                                        Int32Array* v,
                                        ExceptionCode& ec) {
   UNUSED_PARAM(ec);
-  if (!location)
+  if (!validateUniformParameters(location, v, 3))
     return;
 
-  if (location->program() != m_currentProgram) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
-    return;
-  }
-
-  if (!v) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
-    return;
-  }
-  // FIXME: length needs to be a multiple of 3
   m_context->uniform3iv(location->location(), v->data(), v->length() / 3);
   cleanupAfterGraphicsCall(false);
 }
@@ -3127,19 +3021,9 @@ void WebGLRenderingContext::uniform3iv(const WebGLUniformLocation* location,
                                        int size,
                                        ExceptionCode& ec) {
   UNUSED_PARAM(ec);
-  if (!location)
+  if (!validateUniformParameters(location, v, size, 3))
     return;
 
-  if (location->program() != m_currentProgram) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
-    return;
-  }
-
-  if (!v) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
-    return;
-  }
-  // FIXME: length needs to be a multiple of 3
   m_context->uniform3iv(location->location(), v, size / 3);
   cleanupAfterGraphicsCall(false);
 }
@@ -3167,19 +3051,9 @@ void WebGLRenderingContext::uniform4fv(const WebGLUniformLocation* location,
                                        Float32Array* v,
                                        ExceptionCode& ec) {
   UNUSED_PARAM(ec);
-  if (!location)
+  if (!validateUniformParameters(location, v, 4))
     return;
 
-  if (location->program() != m_currentProgram) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
-    return;
-  }
-
-  if (!v) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
-    return;
-  }
-  // FIXME: length needs to be a multiple of 4
   m_context->uniform4fv(location->location(), v->data(), v->length() / 4);
   cleanupAfterGraphicsCall(false);
 }
@@ -3189,19 +3063,9 @@ void WebGLRenderingContext::uniform4fv(const WebGLUniformLocation* location,
                                        int size,
                                        ExceptionCode& ec) {
   UNUSED_PARAM(ec);
-  if (!location)
+  if (!validateUniformParameters(location, v, size, 4))
     return;
 
-  if (location->program() != m_currentProgram) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
-    return;
-  }
-
-  if (!v) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
-    return;
-  }
-  // FIXME: length needs to be a multiple of 4
   m_context->uniform4fv(location->location(), v, size / 4);
   cleanupAfterGraphicsCall(false);
 }
@@ -3229,19 +3093,9 @@ void WebGLRenderingContext::uniform4iv(const WebGLUniformLocation* location,
                                        Int32Array* v,
                                        ExceptionCode& ec) {
   UNUSED_PARAM(ec);
-  if (!location)
+  if (!validateUniformParameters(location, v, 4))
     return;
 
-  if (location->program() != m_currentProgram) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
-    return;
-  }
-
-  if (!v) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
-    return;
-  }
-  // FIXME: length needs to be a multiple of 4
   m_context->uniform4iv(location->location(), v->data(), v->length() / 4);
   cleanupAfterGraphicsCall(false);
 }
@@ -3251,19 +3105,9 @@ void WebGLRenderingContext::uniform4iv(const WebGLUniformLocation* location,
                                        int size,
                                        ExceptionCode& ec) {
   UNUSED_PARAM(ec);
-  if (!location)
+  if (!validateUniformParameters(location, v, size, 4))
     return;
 
-  if (location->program() != m_currentProgram) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
-    return;
-  }
-
-  if (!v) {
-    m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
-    return;
-  }
-  // FIXME: length needs to be a multiple of 4
   m_context->uniform4iv(location->location(), v, size / 4);
   cleanupAfterGraphicsCall(false);
 }
@@ -3274,9 +3118,8 @@ void WebGLRenderingContext::uniformMatrix2fv(
     Float32Array* v,
     ExceptionCode& ec) {
   UNUSED_PARAM(ec);
-  if (!validateUniformMatrixParameters(location, transpose, v))
+  if (!validateUniformMatrixParameters(location, transpose, v, 4))
     return;
-  // FIXME: length needs to be a multiple of 4
   m_context->uniformMatrix2fv(location->location(), transpose, v->data(),
                               v->length() / 4);
   cleanupAfterGraphicsCall(false);
@@ -3289,9 +3132,8 @@ void WebGLRenderingContext::uniformMatrix2fv(
     int size,
     ExceptionCode& ec) {
   UNUSED_PARAM(ec);
-  if (!validateUniformMatrixParameters(location, transpose, v))
+  if (!validateUniformMatrixParameters(location, transpose, v, size, 4))
     return;
-  // FIXME: length needs to be a multiple of 4
   m_context->uniformMatrix2fv(location->location(), transpose, v, size / 4);
   cleanupAfterGraphicsCall(false);
 }
@@ -3302,9 +3144,8 @@ void WebGLRenderingContext::uniformMatrix3fv(
     Float32Array* v,
     ExceptionCode& ec) {
   UNUSED_PARAM(ec);
-  if (!validateUniformMatrixParameters(location, transpose, v))
+  if (!validateUniformMatrixParameters(location, transpose, v, 9))
     return;
-  // FIXME: length needs to be a multiple of 9
   m_context->uniformMatrix3fv(location->location(), transpose, v->data(),
                               v->length() / 9);
   cleanupAfterGraphicsCall(false);
@@ -3317,9 +3158,8 @@ void WebGLRenderingContext::uniformMatrix3fv(
     int size,
     ExceptionCode& ec) {
   UNUSED_PARAM(ec);
-  if (!validateUniformMatrixParameters(location, transpose, v))
+  if (!validateUniformMatrixParameters(location, transpose, v, size, 9))
     return;
-  // FIXME: length needs to be a multiple of 9
   m_context->uniformMatrix3fv(location->location(), transpose, v, size / 9);
   cleanupAfterGraphicsCall(false);
 }
@@ -3330,9 +3170,8 @@ void WebGLRenderingContext::uniformMatrix4fv(
     Float32Array* v,
     ExceptionCode& ec) {
   UNUSED_PARAM(ec);
-  if (!validateUniformMatrixParameters(location, transpose, v))
+  if (!validateUniformMatrixParameters(location, transpose, v, 16))
     return;
-  // FIXME: length needs to be a multiple of 16
   m_context->uniformMatrix4fv(location->location(), transpose, v->data(),
                               v->length() / 16);
   cleanupAfterGraphicsCall(false);
@@ -3345,9 +3184,8 @@ void WebGLRenderingContext::uniformMatrix4fv(
     int size,
     ExceptionCode& ec) {
   UNUSED_PARAM(ec);
-  if (!validateUniformMatrixParameters(location, transpose, v))
+  if (!validateUniformMatrixParameters(location, transpose, v, size, 16))
     return;
-  // FIXME: length needs to be a multiple of 16
   m_context->uniformMatrix4fv(location->location(), transpose, v, size / 16);
   cleanupAfterGraphicsCall(false);
 }
@@ -4034,10 +3872,58 @@ bool WebGLRenderingContext::validateCapability(unsigned long cap) {
   }
 }
 
+bool WebGLRenderingContext::validateUniformParameters(
+    const WebGLUniformLocation* location,
+    Float32Array* v,
+    int requiredMinSize) {
+  if (!v) {
+    m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
+    return false;
+  }
+  return validateUniformMatrixParameters(location, false, v->data(),
+                                         v->length(), requiredMinSize);
+}
+
+bool WebGLRenderingContext::validateUniformParameters(
+    const WebGLUniformLocation* location,
+    Int32Array* v,
+    int requiredMinSize) {
+  if (!v) {
+    m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
+    return false;
+  }
+  return validateUniformMatrixParameters(location, false, v->data(),
+                                         v->length(), requiredMinSize);
+}
+
+bool WebGLRenderingContext::validateUniformParameters(
+    const WebGLUniformLocation* location,
+    void* v,
+    int size,
+    int requiredMinSize) {
+  return validateUniformMatrixParameters(location, false, v, size,
+                                         requiredMinSize);
+}
+
 bool WebGLRenderingContext::validateUniformMatrixParameters(
     const WebGLUniformLocation* location,
     bool transpose,
-    void* v) {
+    Float32Array* v,
+    int requiredMinSize) {
+  if (!v) {
+    m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
+    return false;
+  }
+  return validateUniformMatrixParameters(location, transpose, v->data(),
+                                         v->length(), requiredMinSize);
+}
+
+bool WebGLRenderingContext::validateUniformMatrixParameters(
+    const WebGLUniformLocation* location,
+    bool transpose,
+    void* v,
+    int size,
+    int requiredMinSize) {
   if (!location)
     return false;
   if (location->program() != m_currentProgram) {
@@ -4049,6 +3935,10 @@ bool WebGLRenderingContext::validateUniformMatrixParameters(
     return false;
   }
   if (transpose) {
+    m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
+    return false;
+  }
+  if (size < requiredMinSize) {
     m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
     return false;
   }

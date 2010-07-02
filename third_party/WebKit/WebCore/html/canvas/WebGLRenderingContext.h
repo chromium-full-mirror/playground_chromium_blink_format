@@ -873,10 +873,26 @@ class WebGLRenderingContext : public CanvasRenderingContext {
   // Helper function to validate a GL capability.
   bool validateCapability(unsigned long);
 
-  // Helper function to validate input parameters for uniformMatrix functions.
+  // Helper function to validate input parameters for uniform functions.
+  bool validateUniformParameters(const WebGLUniformLocation* location,
+                                 Float32Array* v,
+                                 int mod);
+  bool validateUniformParameters(const WebGLUniformLocation* location,
+                                 Int32Array* v,
+                                 int mod);
+  bool validateUniformParameters(const WebGLUniformLocation* location,
+                                 void* v,
+                                 int size,
+                                 int mod);
   bool validateUniformMatrixParameters(const WebGLUniformLocation* location,
                                        bool transpose,
-                                       void* v);
+                                       Float32Array* v,
+                                       int mod);
+  bool validateUniformMatrixParameters(const WebGLUniformLocation* location,
+                                       bool transpose,
+                                       void* v,
+                                       int size,
+                                       int mod);
 
   friend class WebGLStateRestorer;
 };
