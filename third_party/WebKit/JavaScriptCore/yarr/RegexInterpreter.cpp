@@ -1714,7 +1714,7 @@ class ByteCompiler {
 
           case PatternTerm::TypeParentheticalAssertion: {
             unsigned alternativeFrameLocation =
-                term.inputPosition +
+                term.frameLocation +
                 RegexStackSpaceForBackTrackInfoParentheticalAssertion;
 
             atomParentheticalAssertionBegin(
