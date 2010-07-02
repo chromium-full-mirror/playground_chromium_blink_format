@@ -35,7 +35,10 @@ class String;
 
 class ScriptSourceProvider : public JSC::SourceProvider {
  public:
-  ScriptSourceProvider(const JSC::UString& url) : SourceProvider(url) {}
+  ScriptSourceProvider(
+      const JSC::UString& url,
+      JSC::SourceBOMPresence hasBOMs = JSC::SourceCouldHaveBOMs)
+      : SourceProvider(url, hasBOMs) {}
 
   virtual const String& source() const = 0;
 };
