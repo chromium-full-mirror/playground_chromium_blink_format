@@ -155,6 +155,7 @@ class FloatRect {
 #if PLATFORM(QT)
   FloatRect(const QRectF&);
   operator QRectF() const;
+  FloatRect normalized() const;
 #endif
 
 #if PLATFORM(WX) && USE(WXGC)
