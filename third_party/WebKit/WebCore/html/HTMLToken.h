@@ -316,6 +316,12 @@ class AtomicHTMLToken : public Noncopyable {
     return m_name;
   }
 
+  void setName(const AtomicString& name) {
+    ASSERT(m_type == HTMLToken::StartTag || m_type == HTMLToken::EndTag ||
+           m_type == HTMLToken::DOCTYPE);
+    m_name = name;
+  }
+
   bool selfClosing() const {
     ASSERT(m_type == HTMLToken::StartTag || m_type == HTMLToken::EndTag);
     return m_selfClosing;
