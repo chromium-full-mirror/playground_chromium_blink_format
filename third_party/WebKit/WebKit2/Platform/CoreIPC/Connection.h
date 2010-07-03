@@ -192,7 +192,7 @@ class Connection : public ThreadSafeShared<Connection> {
   HANDLE m_connectionPipe;
 #elif PLATFORM(QT)
   // Called on the connection queue.
-  void openConnection();
+  void openConnectionHandler();
   void newConnectionHandler();
   void readyReadHandler();
 
