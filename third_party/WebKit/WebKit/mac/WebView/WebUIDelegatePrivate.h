@@ -138,6 +138,8 @@ enum {
     shouldHaltPlugin:(DOMNode*)pluginNode
           isWindowed:(BOOL)isWindowed
           pluginName:(NSString*)pluginName;
+- (BOOL)webView:(WebView*)sender
+    didPressMissingPluginButton:(DOMElement*)element;
 /*!
     @method webView:frame:exceededDatabaseQuotaForSecurityOrigin:database:
     @param sender The WebView sending the delegate method.
