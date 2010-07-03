@@ -172,6 +172,7 @@ class EventHandler : public Noncopyable {
 
 #if ENABLE(CONTEXT_MENUS)
   bool sendContextMenuEvent(const PlatformMouseEvent&);
+  bool sendContextMenuEventForKey();
 #endif
 
   void setMouseDownMayStartAutoscroll() {
