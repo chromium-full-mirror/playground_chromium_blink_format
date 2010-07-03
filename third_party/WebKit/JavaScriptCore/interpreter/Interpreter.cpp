@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008, 2009 Apple Inc. All rights reserved.
+ * Copyright (C) 2008, 2009, 2010 Apple Inc. All rights reserved.
  * Copyright (C) 2008 Cameron Zwarich <cwzwarich@uwaterloo.ca>
  *
  * Redistribution and use in source and binary forms, with or without
@@ -4085,10 +4085,10 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
       int argsOffset = vPC[2].u.operand;
 
       JSValue arguments = callFrame->r(argsOffset).jsValue();
-      int32_t argCount = 0;
+      uint32_t argCount = 0;
       if (!arguments) {
         argCount = (uint32_t)(callFrame->argumentCount());
-        argCount = min(argCount, static_cast<int32_t>(Arguments::MaxArguments));
+        argCount = min<uint32_t>(argCount, Arguments::MaxArguments);
         int32_t sizeDelta =
             argsOffset + argCount + RegisterFile::CallFrameHeaderSize;
         Register* newEnd = callFrame->registers() + sizeDelta;
@@ -4126,8 +4126,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
         if (asObject(arguments)->classInfo() == &Arguments::info) {
           Arguments* args = asArguments(arguments);
           argCount = args->numProvidedArguments(callFrame);
-          argCount =
-              min(argCount, static_cast<int32_t>(Arguments::MaxArguments));
+          argCount = min<uint32_t>(argCount, Arguments::MaxArguments);
           int32_t sizeDelta =
               argsOffset + argCount + RegisterFile::CallFrameHeaderSize;
           Register* newEnd = callFrame->registers() + sizeDelta;
@@ -4141,8 +4140,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
         } else if (isJSArray(&callFrame->globalData(), arguments)) {
           JSArray* array = asArray(arguments);
           argCount = array->length();
-          argCount =
-              min(argCount, static_cast<int32_t>(Arguments::MaxArguments));
+          argCount = min<uint32_t>(argCount, Arguments::MaxArguments);
           int32_t sizeDelta =
               argsOffset + argCount + RegisterFile::CallFrameHeaderSize;
           Register* newEnd = callFrame->registers() + sizeDelta;
@@ -4158,8 +4156,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
           argCount =
               argObject->get(callFrame, callFrame->propertyNames().length)
                   .toUInt32(callFrame);
-          argCount =
-              min(argCount, static_cast<int32_t>(Arguments::MaxArguments));
+          argCount = min<uint32_t>(argCount, Arguments::MaxArguments);
           int32_t sizeDelta =
               argsOffset + argCount + RegisterFile::CallFrameHeaderSize;
           Register* newEnd = callFrame->registers() + sizeDelta;
