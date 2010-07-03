@@ -3925,10 +3925,10 @@ static inline bool isCSSWhitespace(UChar c) {
   return c == ' ' || c == '\t' || c == '\r' || c == '\n' || c == '\f';
 }
 
-static inline bool parseInt(const UChar*& string,
-                            const UChar* end,
-                            UChar terminator,
-                            int& value) {
+static inline bool parseColorInt(const UChar*& string,
+                                 const UChar* end,
+                                 UChar terminator,
+                                 int& value) {
   const UChar* current = string;
   int localValue = 0;
   bool negative = false;
@@ -3940,8 +3940,17 @@ static inline bool parseInt(const UChar*& string,
   }
   if (current == end || !isASCIIDigit(*current))
     return false;
-  while (current != end && isASCIIDigit(*current))
-    localValue = localValue * 10 + *current++ - '0';
+  while (current != end && isASCIIDigit(*current)) {
+    int newValue = localValue * 10 + *current++ - '0';
+    if (newValue >= 255) {
+      // Clamp values at 255.
+      localValue = 255;
+      while (current != end && isASCIIDigit(*current))
+        ++current;
+      break;
+    }
+    localValue = newValue;
+  }
   while (current != end && isCSSWhitespace(*current))
     current++;
   if (current == end || *current++ != terminator)
@@ -3963,11 +3972,11 @@ bool CSSParser::parseColor(const String& name, RGBA32& rgb, bool strict) {
     int red;
     int green;
     int blue;
-    if (!parseInt(current, end, ',', red))
+    if (!parseColorInt(current, end, ',', red))
       return false;
-    if (!parseInt(current, end, ',', green))
+    if (!parseColorInt(current, end, ',', green))
       return false;
-    if (!parseInt(current, end, ')', blue))
+    if (!parseColorInt(current, end, ')', blue))
       return false;
     if (current != end)
       return false;
@@ -3984,6 +3993,22 @@ bool CSSParser::parseColor(const String& name, RGBA32& rgb, bool strict) {
   return false;
 }
 
+static inline int colorIntFromValue(CSSParserValue* v) {
+  if (v->fValue <= 0.0)
+    return 0;
+
+  if (v->unit == CSSPrimitiveValue::CSS_PERCENTAGE) {
+    if (v->fValue >= 100.0)
+      return 255;
+    return static_cast<int>(v->fValue * 256.0 / 100.0);
+  }
+
+  if (v->fValue >= 255.0)
+    return 255;
+
+  return static_cast<int>(v->fValue);
+}
+
 bool CSSParser::parseColorParameters(CSSParserValue* value,
                                      int* colorArray,
                                      bool parseAlpha) {
@@ -3997,9 +4022,7 @@ bool CSSParser::parseColorParameters(CSSParserValue* value,
     unitType = FPercent;
   else
     return false;
-  colorArray[0] = static_cast<int>(
-      v->fValue *
-      (v->unit == CSSPrimitiveValue::CSS_PERCENTAGE ? 256.0 / 100.0 : 1.0));
+  colorArray[0] = colorIntFromValue(v);
   for (int i = 1; i < 3; i++) {
     v = args->next();
     if (v->unit != CSSParserValue::Operator && v->iValue != ',')
@@ -4007,9 +4030,7 @@ bool CSSParser::parseColorParameters(CSSParserValue* value,
     v = args->next();
     if (!validUnit(v, unitType, true))
       return false;
-    colorArray[i] = static_cast<int>(
-        v->fValue *
-        (v->unit == CSSPrimitiveValue::CSS_PERCENTAGE ? 256.0 / 100.0 : 1.0));
+    colorArray[i] = colorIntFromValue(v);
   }
   if (parseAlpha) {
     v = args->next();
