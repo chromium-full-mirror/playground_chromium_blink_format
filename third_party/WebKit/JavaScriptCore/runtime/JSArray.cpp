@@ -1021,10 +1021,10 @@ void JSArray::fillArgList(ExecState* exec, MarkedArgumentBuffer& args) {
 void JSArray::copyToRegisters(ExecState* exec,
                               Register* buffer,
                               uint32_t maxSize) {
-  ASSERT(m_storage->m_length == maxSize);
+  ASSERT(m_storage->m_length >= maxSize);
   UNUSED_PARAM(maxSize);
   JSValue* vector = m_storage->m_vector;
-  unsigned vectorEnd = min(m_storage->m_length, m_vectorLength);
+  unsigned vectorEnd = min(maxSize, m_vectorLength);
   unsigned i = 0;
   for (; i < vectorEnd; ++i) {
     JSValue& v = vector[i];
@@ -1033,7 +1033,7 @@ void JSArray::copyToRegisters(ExecState* exec,
     buffer[i] = v;
   }
 
-  for (; i < m_storage->m_length; ++i)
+  for (; i < maxSize; ++i)
     buffer[i] = get(exec, i);
 }
 

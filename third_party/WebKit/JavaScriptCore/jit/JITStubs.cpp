@@ -2634,6 +2634,7 @@ DEFINE_STUB_FUNCTION(int, op_load_varargs) {
     int providedParams =
         callFrame->registers()[RegisterFile::ArgumentCount].i() - 1;
     argCount = providedParams;
+    argCount = min(argCount, static_cast<uint32_t>(Arguments::MaxArguments));
     int32_t sizeDelta =
         argsOffset + argCount + RegisterFile::CallFrameHeaderSize;
     Register* newEnd = callFrame->registers() + sizeDelta;
@@ -2680,6 +2681,7 @@ DEFINE_STUB_FUNCTION(int, op_load_varargs) {
     if (asObject(arguments)->classInfo() == &Arguments::info) {
       Arguments* argsObject = asArguments(arguments);
       argCount = argsObject->numProvidedArguments(callFrame);
+      argCount = min(argCount, static_cast<uint32_t>(Arguments::MaxArguments));
       int32_t sizeDelta =
           argsOffset + argCount + RegisterFile::CallFrameHeaderSize;
       Register* newEnd = callFrame->registers() + sizeDelta;
@@ -2693,6 +2695,7 @@ DEFINE_STUB_FUNCTION(int, op_load_varargs) {
     } else if (isJSArray(&callFrame->globalData(), arguments)) {
       JSArray* array = asArray(arguments);
       argCount = array->length();
+      argCount = min(argCount, static_cast<uint32_t>(Arguments::MaxArguments));
       int32_t sizeDelta =
           argsOffset + argCount + RegisterFile::CallFrameHeaderSize;
       Register* newEnd = callFrame->registers() + sizeDelta;
@@ -2707,6 +2710,7 @@ DEFINE_STUB_FUNCTION(int, op_load_varargs) {
       JSObject* argObject = asObject(arguments);
       argCount = argObject->get(callFrame, callFrame->propertyNames().length)
                      .toUInt32(callFrame);
+      argCount = min(argCount, static_cast<uint32_t>(Arguments::MaxArguments));
       int32_t sizeDelta =
           argsOffset + argCount + RegisterFile::CallFrameHeaderSize;
       Register* newEnd = callFrame->registers() + sizeDelta;
