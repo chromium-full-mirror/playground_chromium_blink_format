@@ -34,13 +34,9 @@
 
 namespace JSC {
 
-enum SourceBOMPresence { SourceHasNoBOMs, SourceCouldHaveBOMs };
-
 class SourceProvider : public RefCounted<SourceProvider> {
  public:
-  SourceProvider(const UString& url,
-                 SourceBOMPresence hasBOMs = SourceCouldHaveBOMs)
-      : m_url(url), m_hasBOMs(hasBOMs) {}
+  SourceProvider(const UString& url) : m_url(url) {}
   virtual ~SourceProvider() {}
 
   virtual UString getRange(int start, int end) const = 0;
@@ -50,18 +46,16 @@ class SourceProvider : public RefCounted<SourceProvider> {
   const UString& url() { return m_url; }
   intptr_t asID() { return reinterpret_cast<intptr_t>(this); }
 
-  SourceBOMPresence hasBOMs() const { return m_hasBOMs; }
-
  private:
   UString m_url;
-  SourceBOMPresence m_hasBOMs;
 };
 
 class UStringSourceProvider : public SourceProvider {
  public:
   static PassRefPtr<UStringSourceProvider> create(const UString& source,
-                                                  const UString& url) {
-    return adoptRef(new UStringSourceProvider(source, url));
+                                                  const UString& url,
+                                                  bool hasBOMs = true) {
+    return adoptRef(new UStringSourceProvider(source, url, hasBOMs));
   }
 
   UString getRange(int start, int end) const {
@@ -71,8 +65,13 @@ class UStringSourceProvider : public SourceProvider {
   int length() const { return m_source.size(); }
 
  private:
-  UStringSourceProvider(const UString& source, const UString& url)
-      : SourceProvider(url), m_source(source) {}
+  UStringSourceProvider(const UString& source, const UString& url, bool hasBOMs)
+      : SourceProvider(url), m_source(source) {
+    if (hasBOMs && m_source.size()) {
+      bool scratch = false;
+      m_source = UString(m_source.rep()->copyStringWithoutBOMs(false, scratch));
+    }
+  }
 
   UString m_source;
 };
