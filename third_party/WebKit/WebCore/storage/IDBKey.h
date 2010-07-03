@@ -45,7 +45,7 @@ class IDBKey : public RefCounted<IDBKey> {
   static PassRefPtr<IDBKey> create(const String& string) {
     return adoptRef(new IDBKey(string));
   }
-  ~IDBKey();
+  ~IDBKey() {}
 
   // In order of the least to the most precident in terms of sort order.
   enum Type { NullType = 0, StringType, NumberType };
