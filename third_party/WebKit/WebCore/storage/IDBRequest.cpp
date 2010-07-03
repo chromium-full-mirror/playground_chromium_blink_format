@@ -79,6 +79,10 @@ void IDBRequest::onSuccess(PassRefPtr<IDBIndex> idbIndex) {
   m_result->set(IDBIndexRequest::create(idbIndex));
 }
 
+void IDBRequest::onSuccess(PassRefPtr<IDBKey> idbKey) {
+  ASSERT_NOT_REACHED();
+}
+
 void IDBRequest::onSuccess(PassRefPtr<IDBObjectStore> idbObjectStore) {
   onEventCommon();
   m_result->set(IDBObjectStoreRequest::create(idbObjectStore));

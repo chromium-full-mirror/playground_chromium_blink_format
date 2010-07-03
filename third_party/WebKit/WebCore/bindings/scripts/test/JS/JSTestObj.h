@@ -128,6 +128,8 @@ jsTestObjPrototypeFunctionMethodThatRequiresAllArgsAndThrows(JSC::ExecState*);
 JSC::EncodedJSValue JSC_HOST_CALL
 jsTestObjPrototypeFunctionSerializedValue(JSC::ExecState*);
 JSC::EncodedJSValue JSC_HOST_CALL
+jsTestObjPrototypeFunctionIdbKey(JSC::ExecState*);
+JSC::EncodedJSValue JSC_HOST_CALL
 jsTestObjPrototypeFunctionMethodWithException(JSC::ExecState*);
 JSC::EncodedJSValue JSC_HOST_CALL
 jsTestObjPrototypeFunctionCustomMethod(JSC::ExecState*);

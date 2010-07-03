@@ -29,6 +29,7 @@
 
 #if WEBKIT_VERSION_MAX_ALLOWED >= WEBKIT_VERSION_LATEST
 
+@class DOMIDBKey;
 @class DOMTestObj;
 @class DOMlog;
 @class NSString;
@@ -110,6 +111,7 @@
 - (DOMTestObj*)methodThatRequiresAllArgsAndThrows:(NSString*)strArg
                                            objArg:(DOMTestObj*)objArg;
 - (void)serializedValue:(NSString*)serializedArg;
+- (void)idbKey:(DOMIDBKey*)key;
 - (void)methodWithException;
 - (void)customMethod;
 - (void)customMethodWithArgs:(int)intArg

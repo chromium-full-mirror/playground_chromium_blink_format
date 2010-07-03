@@ -29,6 +29,8 @@
 #include "TestObj.h"
 #include "WebKitDOMBinding.h"
 #include "gobject/ConvertToUTF8String.h"
+#include "webkit/WebKitDOMIDBKey.h"
+#include "webkit/WebKitDOMIDBKeyPrivate.h"
 #include "webkit/WebKitDOMSerializedScriptValue.h"
 #include "webkit/WebKitDOMSerializedScriptValuePrivate.h"
 #include "webkit/WebKitDOMTestObj.h"
@@ -184,6 +186,15 @@ void webkit_dom_test_obj_serialized_value(
       WebKit::core(serialized_arg);
   g_return_if_fail(converted_serialized_arg);
   item->serializedValue(converted_serialized_arg);
+}
+
+void webkit_dom_test_obj_idb_key(WebKitDOMTestObj* self, WebKitDOMIDBKey* key) {
+  g_return_if_fail(self);
+  WebCore::TestObj* item = WebKit::core(self);
+  g_return_if_fail(key);
+  WebCore::IDBKey* converted_key = WebKit::core(key);
+  g_return_if_fail(converted_key);
+  item->idbKey(converted_key);
 }
 
 void webkit_dom_test_obj_method_with_exception(WebKitDOMTestObj* self,

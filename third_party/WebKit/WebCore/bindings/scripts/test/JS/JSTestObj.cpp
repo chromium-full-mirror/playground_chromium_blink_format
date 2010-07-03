@@ -22,6 +22,8 @@
 #include "JSTestObj.h"
 
 #include "HTMLNames.h"
+#include "IDBBindingUtilities.h"
+#include "IDBKey.h"
 #include "JSEventListener.h"
 #include "JSTestObj.h"
 #include "JSlog.h"
@@ -238,7 +240,7 @@ bool JSTestObjConstructor::getOwnPropertyDescriptor(
 #define THUNK_GENERATOR(generator)
 #endif
 
-static const HashTableValue JSTestObjPrototypeTableValues[30] = {
+static const HashTableValue JSTestObjPrototypeTableValues[31] = {
     {"voidMethod", DontDelete | Function,
      (intptr_t) static_cast<NativeFunction>(
          jsTestObjPrototypeFunctionVoidMethod),
@@ -274,6 +276,9 @@ static const HashTableValue JSTestObjPrototypeTableValues[30] = {
     {"serializedValue", DontDelete | Function,
      (intptr_t) static_cast<NativeFunction>(
          jsTestObjPrototypeFunctionSerializedValue),
+     (intptr_t)1 THUNK_GENERATOR(0)},
+    {"idbKey", DontDelete | Function,
+     (intptr_t) static_cast<NativeFunction>(jsTestObjPrototypeFunctionIdbKey),
      (intptr_t)1 THUNK_GENERATOR(0)},
     {"methodWithException", DontDelete | Function,
      (intptr_t) static_cast<NativeFunction>(
@@ -359,7 +364,7 @@ static const HashTableValue JSTestObjPrototypeTableValues[30] = {
 
 #undef THUNK_GENERATOR
 static JSC_CONST_HASHTABLE HashTable JSTestObjPrototypeTable = {
-    69, 63, JSTestObjPrototypeTableValues, 0};
+    130, 127, JSTestObjPrototypeTableValues, 0};
 const ClassInfo JSTestObjPrototype::s_info = {"TestObjPrototype", 0,
                                               &JSTestObjPrototypeTable, 0};
 
@@ -1055,6 +1060,18 @@ jsTestObjPrototypeFunctionSerializedValue(ExecState* exec) {
       SerializedScriptValue::create(exec, exec->argument(0));
 
   imp->serializedValue(serializedArg);
+  return JSValue::encode(jsUndefined());
+}
+
+EncodedJSValue JSC_HOST_CALL jsTestObjPrototypeFunctionIdbKey(ExecState* exec) {
+  JSValue thisValue = exec->hostThisValue();
+  if (!thisValue.inherits(&JSTestObj::s_info))
+    return throwVMTypeError(exec);
+  JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(thisValue));
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
+  RefPtr<IDBKey> key = createIDBKeyFromValue(exec, exec->argument(0));
+
+  imp->idbKey(key);
   return JSValue::encode(jsUndefined());
 }
 
