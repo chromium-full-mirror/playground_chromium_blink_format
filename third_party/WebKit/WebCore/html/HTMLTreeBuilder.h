@@ -142,7 +142,7 @@ class HTMLTreeBuilder : public Noncopyable {
     // open elements.
     child->attach();
     return child.release();
-  };
+  }
 
   void insertDoctype(AtomicHTMLToken&);
   void insertComment(AtomicHTMLToken&);
