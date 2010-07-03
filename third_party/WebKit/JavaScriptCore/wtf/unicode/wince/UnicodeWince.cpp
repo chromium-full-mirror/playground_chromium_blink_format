@@ -67,6 +67,10 @@ bool isPunct(wchar_t c) {
   return !!iswpunct(c);
 }
 
+bool isAlphanumeric(wchar_t c) {
+  return !!iswalnum(c);
+}
+
 int toLower(wchar_t* result,
             int resultLength,
             const wchar_t* source,
