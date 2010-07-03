@@ -62,6 +62,9 @@ class LayoutTestController : public QObject {
   bool shouldDumpAsText() const { return m_textDump; }
   bool shouldDumpBackForwardList() const { return m_dumpBackForwardList; }
   bool shouldDumpChildrenAsText() const { return m_dumpChildrenAsText; }
+  bool shouldDumpChildFrameScrollPositions() const {
+    return m_dumpChildFrameScrollPositions;
+  }
   bool shouldDumpDatabaseCallbacks() const { return m_dumpDatabaseCallbacks; }
   bool shouldDumpStatusCallbacks() const { return m_dumpStatusCallbacks; }
   bool shouldWaitUntilDone() const { return m_waitForDone; }
@@ -88,6 +91,9 @@ class LayoutTestController : public QObject {
   void maybeDump(bool ok);
   void dumpAsText() { m_textDump = true; }
   void dumpChildFramesAsText() { m_dumpChildrenAsText = true; }
+  void dumpChildFrameScrollPositions() {
+    m_dumpChildFrameScrollPositions = true;
+  }
   void dumpDatabaseCallbacks() { m_dumpDatabaseCallbacks = true; }
   void dumpStatusCallbacks() { m_dumpStatusCallbacks = true; }
   void setCanOpenWindows() { m_canOpenWindows = true; }
@@ -248,6 +254,7 @@ class LayoutTestController : public QObject {
   bool m_textDump;
   bool m_dumpBackForwardList;
   bool m_dumpChildrenAsText;
+  bool m_dumpChildFrameScrollPositions;
   bool m_canOpenWindows;
   bool m_waitForDone;
   bool m_dumpTitleChanges;
