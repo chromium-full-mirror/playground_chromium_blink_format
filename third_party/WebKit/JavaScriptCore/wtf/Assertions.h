@@ -55,6 +55,10 @@
 #include <e32debug.h>
 #endif
 
+#if PLATFORM(BREWMP)
+#include <AEEStdLib.h>
+#endif
+
 #ifdef NDEBUG
 /* Disable ASSERT* macros in release mode. */
 #define ASSERTIONS_DISABLED_DEFAULT 1
@@ -196,6 +200,13 @@ void WTFLogVerbose(const char* file,
   do {                                  \
     __DEBUGGER();                       \
     User::Panic(_L("Webkit CRASH"), 0); \
+  } while (false)
+#elif PLATFORM(BREWMP)
+#define CRASH()                                                      \
+  do {                                                               \
+    DBGPRINTF_FATAL("WebKit CRASH");                                 \
+    *(int*)(uintptr_t)0xbbadbeef = 0;                                \
+    ((void (*)())0)(); /* More reliable, but doesn't say BBADBEEF */ \
   } while (false)
 #else
 #define CRASH()                                                      \
