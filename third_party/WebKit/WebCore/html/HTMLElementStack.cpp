@@ -38,20 +38,28 @@ namespace WebCore {
 
 using namespace HTMLNames;
 
-class HTMLElementStack::ElementRecord : public Noncopyable {
- public:
-  ElementRecord(PassRefPtr<Element> element, PassOwnPtr<ElementRecord> next)
-      : m_element(element), m_next(next) {}
+HTMLElementStack::ElementRecord::ElementRecord(PassRefPtr<Element> element,
+                                               PassOwnPtr<ElementRecord> next)
+    : m_element(element), m_next(next) {
+  ASSERT(m_element);
+}
 
-  Element* element() const { return m_element.get(); }
-  ElementRecord* next() const { return m_next.get(); }
-  PassOwnPtr<ElementRecord> releaseNext() { return m_next.release(); }
-  void setNext(PassOwnPtr<ElementRecord> next) { m_next = next; }
+HTMLElementStack::ElementRecord::~ElementRecord() {}
 
- private:
-  RefPtr<Element> m_element;
-  OwnPtr<ElementRecord> m_next;
-};
+void HTMLElementStack::ElementRecord::replaceElement(
+    PassRefPtr<Element> element) {
+  ASSERT(element);
+  // FIXME: Should this call finishParsingChildren?
+  m_element = element;
+}
+
+bool HTMLElementStack::ElementRecord::isAbove(ElementRecord* other) const {
+  for (ElementRecord* below = next(); below; below = below->next()) {
+    if (below == other)
+      return true;
+  }
+  return false;
+}
 
 HTMLElementStack::HTMLElementStack()
     : m_htmlElement(0), m_headElement(0), m_bodyElement(0) {}
@@ -89,6 +97,7 @@ void HTMLElementStack::popUntil(Element* element) {
 }
 
 void HTMLElementStack::pushHTMLHtmlElement(PassRefPtr<Element> element) {
+  ASSERT(!m_top);  // <html> should always be the bottom of the stack.
   ASSERT(element->hasTagName(HTMLNames::htmlTag));
   ASSERT(!m_htmlElement);
   m_htmlElement = element.get();
@@ -117,8 +126,43 @@ void HTMLElementStack::push(PassRefPtr<Element> element) {
   pushCommon(element);
 }
 
+void HTMLElementStack::insertAbove(PassRefPtr<Element> element,
+                                   ElementRecord* recordBelow) {
+  ASSERT(element);
+  ASSERT(recordBelow);
+  ASSERT(m_top);
+  ASSERT(!element->hasTagName(HTMLNames::htmlTag));
+  ASSERT(!element->hasTagName(HTMLNames::headTag));
+  ASSERT(!element->hasTagName(HTMLNames::bodyTag));
+  ASSERT(m_htmlElement);
+  if (recordBelow == m_top) {
+    push(element);
+    return;
+  }
+
+  for (ElementRecord* recordAbove = m_top.get(); recordAbove;
+       recordAbove = recordAbove->next()) {
+    if (recordAbove->next() != recordBelow)
+      continue;
+
+    recordAbove->setNext(
+        new ElementRecord(element, recordAbove->releaseNext()));
+    recordAbove->next()->element()->beginParsingChildren();
+    return;
+  }
+  ASSERT_NOT_REACHED();
+}
+
+HTMLElementStack::ElementRecord* HTMLElementStack::topRecord() const {
+  return m_top.get();
+}
+
 Element* HTMLElementStack::top() const {
   return m_top->element();
+}
+
+Element* HTMLElementStack::bottom() const {
+  return htmlElement();
 }
 
 void HTMLElementStack::removeHTMLHeadElement(Element* element) {
@@ -128,7 +172,7 @@ void HTMLElementStack::removeHTMLHeadElement(Element* element) {
     return;
   }
   m_headElement = 0;
-  removeNonFirstCommon(element);
+  removeNonTopCommon(element);
 }
 
 void HTMLElementStack::remove(Element* element) {
@@ -137,41 +181,55 @@ void HTMLElementStack::remove(Element* element) {
     pop();
     return;
   }
-  removeNonFirstCommon(element);
+  removeNonTopCommon(element);
+}
+
+HTMLElementStack::ElementRecord* HTMLElementStack::find(
+    Element* element) const {
+  for (ElementRecord* pos = m_top.get(); pos; pos = pos->next()) {
+    if (pos->element() == element)
+      return pos;
+  }
+  return 0;
+}
+
+HTMLElementStack::ElementRecord* HTMLElementStack::topmost(
+    const AtomicString& tagName) const {
+  for (ElementRecord* pos = m_top.get(); pos; pos = pos->next()) {
+    if (pos->element()->hasLocalName(tagName))
+      return pos;
+  }
+  return 0;
 }
 
 bool HTMLElementStack::contains(Element* element) const {
-  for (ElementRecord* pos = m_top.get(); pos; pos = pos->next()) {
-    if (pos->element() == element)
-      return true;
-  }
-  return false;
+  return !!find(element);
 }
 
 namespace {
 
-inline bool isScopeMarker(const Element* element) {
-  return element->hasTagName(appletTag) || element->hasTagName(captionTag) ||
-         element->hasTagName(appletTag) || element->hasTagName(htmlTag) ||
+inline bool isScopeMarker(Element* element) {
+  return element->hasTagName(appletTag) || element->hasTagName(buttonTag) ||
+         element->hasTagName(captionTag) || element->hasTagName(htmlTag) ||
+         element->hasTagName(marqueeTag) || element->hasTagName(objectTag) ||
          element->hasTagName(tableTag) || element->hasTagName(tdTag) ||
-         element->hasTagName(thTag) || element->hasTagName(buttonTag) ||
-         element->hasTagName(marqueeTag) || element->hasTagName(objectTag)
+         element->hasTagName(thTag)
 #if ENABLE(SVG_FOREIGN_OBJECT)
          || element->hasTagName(SVGNames::foreignObjectTag)
 #endif
       ;
 }
 
-inline bool isListItemScopeMarker(const Element* element) {
+inline bool isListItemScopeMarker(Element* element) {
   return isScopeMarker(element) || element->hasTagName(olTag) ||
          element->hasTagName(ulTag);
 }
-inline bool isTableScopeMarker(const Element* element) {
+inline bool isTableScopeMarker(Element* element) {
   return element->hasTagName(htmlTag) || element->hasTagName(tableTag);
 }
 }
 
-template <bool isMarker(const Element*)>
+template <bool isMarker(Element*)>
 bool inScopeCommon(HTMLElementStack::ElementRecord* top,
                    const AtomicString& targetTag) {
   for (HTMLElementStack::ElementRecord* pos = top; pos; pos = pos->next()) {
@@ -209,22 +267,23 @@ bool HTMLElementStack::inTableScope(const AtomicString& targetTag) const {
   return inScopeCommon<isTableScopeMarker>(m_top.get(), targetTag);
 }
 
-Element* HTMLElementStack::htmlElement() {
+Element* HTMLElementStack::htmlElement() const {
   ASSERT(m_htmlElement);
   return m_htmlElement;
 }
 
-Element* HTMLElementStack::headElement() {
+Element* HTMLElementStack::headElement() const {
   ASSERT(m_headElement);
   return m_headElement;
 }
 
-Element* HTMLElementStack::bodyElement() {
+Element* HTMLElementStack::bodyElement() const {
   ASSERT(m_bodyElement);
   return m_bodyElement;
 }
 
 void HTMLElementStack::pushCommon(PassRefPtr<Element> element) {
+  ASSERT(m_htmlElement);
   m_top.set(new ElementRecord(element, m_top.release()));
   top()->beginParsingChildren();
 }
@@ -237,12 +296,11 @@ void HTMLElementStack::popCommon() {
   m_top = m_top->releaseNext();
 }
 
-void HTMLElementStack::removeNonFirstCommon(Element* element) {
+void HTMLElementStack::removeNonTopCommon(Element* element) {
   ASSERT(!element->hasTagName(HTMLNames::htmlTag));
   ASSERT(!element->hasTagName(HTMLNames::bodyTag));
-  ElementRecord* pos = m_top.get();
-  ASSERT(pos->element() != element);
-  while (pos->next()) {
+  ASSERT(top() != element);
+  for (ElementRecord* pos = m_top.get(); pos; pos = pos->next()) {
     if (pos->next()->element() == element) {
       // FIXME: Is it OK to call finishParsingChildren()
       // when the children aren't actually finished?

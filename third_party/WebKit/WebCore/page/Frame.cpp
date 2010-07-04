@@ -156,6 +156,7 @@ inline Frame::Frame(Page* page,
       m_needsReapplyStyles(false),
       m_isDisconnected(false),
       m_excludeFromTextSearch(false) {
+  ASSERT(page);
   AtomicString::init();
   HTMLNames::init();
   QualifiedName::init();

@@ -550,6 +550,9 @@ bool ContainerNode::appendChild(PassRefPtr<Node> newChild,
 }
 
 void ContainerNode::addChildCommon(Node* newChild) {
+  ASSERT(
+      !newChild
+           ->parent());  // Use appendChild if you need to handle reparenting.
   forbidEventDispatch();
   Node* last = m_lastChild;
   // FIXME: This method should take a PassRefPtr.
@@ -565,7 +568,7 @@ void ContainerNode::addChildCommon(Node* newChild) {
 void ContainerNode::parserAddChild(PassRefPtr<Node> newChild) {
   ASSERT(newChild);
   // This function is only used during parsing.
-  // It does not send any DOM mutation events.
+  // It does not send any DOM mutation events or handle reparenting.
 
   addChildCommon(newChild.get());
 }
