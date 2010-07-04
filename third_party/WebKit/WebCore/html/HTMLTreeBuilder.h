@@ -175,7 +175,6 @@ class HTMLTreeBuilder : public Noncopyable {
   bool indexOfFirstUnopenFormattingElement(
       unsigned& firstUnopenElementIndex) const;
   void reconstructTheActiveFormattingElements();
-  void clearActiveFormatingElementsUpToLastMarker() {}
 
   void generateImpliedEndTags();
   void generateImpliedEndTagsWithExclusion(const AtomicString& tagName);

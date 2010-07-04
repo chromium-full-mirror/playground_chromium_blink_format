@@ -104,6 +104,10 @@ void HTMLFormattingElementList::remove(Element* element) {
     m_entries.remove(index);
 }
 
+void HTMLFormattingElementList::appendMarker() {
+  m_entries.append(Entry::MarkerEntry);
+}
+
 void HTMLFormattingElementList::clearToLastMarker() {
   while (m_entries.size() && !m_entries.last().isMarker())
     m_entries.removeLast();
