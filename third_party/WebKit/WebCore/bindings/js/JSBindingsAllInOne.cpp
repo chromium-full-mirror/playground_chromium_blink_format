@@ -82,7 +82,6 @@
 #include "JSHTMLFormElementCustom.cpp"
 #include "JSHTMLFrameElementCustom.cpp"
 #include "JSHTMLFrameSetElementCustom.cpp"
-#include "JSHTMLIFrameElementCustom.cpp"
 #include "JSHTMLInputElementCustom.cpp"
 #include "JSHTMLObjectElementCustom.cpp"
 #include "JSHTMLOptionsCollectionCustom.cpp"
