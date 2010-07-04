@@ -4098,10 +4098,10 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
           goto vm_throw;
         }
         ASSERT(!asFunction(callFrame->callee())->isHostFunction());
-        int32_t expectedParams =
+        uint32_t expectedParams =
             asFunction(callFrame->callee())->jsExecutable()->parameterCount();
-        int32_t inplaceArgs = min(argCount, expectedParams);
-        int32_t i = 0;
+        uint32_t inplaceArgs = min(argCount, expectedParams);
+        uint32_t i = 0;
         Register* argStore = callFrame->registers() + argsOffset;
 
         // First step is to copy the "expected" parameters from their normal
@@ -4166,7 +4166,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
             goto vm_throw;
           }
           Register* argsBuffer = callFrame->registers() + argsOffset;
-          for (int32_t i = 0; i < argCount; ++i) {
+          for (uint32_t i = 0; i < argCount; ++i) {
             argsBuffer[i] = asObject(arguments)->get(callFrame, i);
             CHECK_FOR_EXCEPTION();
           }
