@@ -33,17 +33,14 @@
 #include <ctype.h>
 #include <limits.h>
 #include <limits>
-#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <wtf/ASCIICType.h>
 #include <wtf/Assertions.h>
 #include <wtf/MathExtras.h>
 #include <wtf/StringExtras.h>
 #include <wtf/Vector.h>
 #include <wtf/unicode/UTF8.h>
-#include <wtf/StringExtras.h>
 
 #if HAVE(STRINGS_H)
 #include <strings.h>
@@ -118,10 +115,10 @@ UString UString::from(long long i) {
   else if (i == std::numeric_limits<long long>::min()) {
     char minBuf[1 + sizeof(i) * 3];
 #if OS(WINDOWS)
-    snprintf(minBuf, sizeof(minBuf) - 1, "%I64d",
+    snprintf(minBuf, sizeof(minBuf), "%I64d",
              std::numeric_limits<long long>::min());
 #else
-    snprintf(minBuf, sizeof(minBuf) - 1, "%lld",
+    snprintf(minBuf, sizeof(minBuf), "%lld",
              std::numeric_limits<long long>::min());
 #endif
     return UString(minBuf);
