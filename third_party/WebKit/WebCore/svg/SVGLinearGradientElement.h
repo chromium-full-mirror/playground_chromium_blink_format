@@ -46,6 +46,8 @@ class SVGLinearGradientElement : public SVGGradientElement {
                                FloatPoint& endPoint);
 
  private:
+  virtual bool selfHasRelativeLengths() const;
+
   DECLARE_ANIMATED_PROPERTY(SVGLinearGradientElement,
                             SVGNames::x1Attr,
                             SVGLength,

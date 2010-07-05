@@ -65,6 +65,9 @@ class SVGTextContentElement : public SVGStyledElement,
 
   bool isKnownAttribute(const QualifiedName&);
 
+ protected:
+  virtual bool selfHasRelativeLengths() const;
+
  private:
   DECLARE_ANIMATED_PROPERTY(SVGTextContentElement,
                             SVGNames::textLengthAttr,

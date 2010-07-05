@@ -45,10 +45,9 @@ class SVGEllipseElement : public SVGStyledTransformableElement,
 
   virtual Path toPathData() const;
 
- protected:
-  virtual bool hasRelativeValues() const;
-
  private:
+  virtual bool selfHasRelativeLengths() const;
+
   DECLARE_ANIMATED_PROPERTY(SVGEllipseElement,
                             SVGNames::cxAttr,
                             SVGLength,

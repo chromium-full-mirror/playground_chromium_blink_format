@@ -122,11 +122,16 @@ void SVGPatternElement::parseMappedAttribute(Attribute* attr) {
 void SVGPatternElement::svgAttributeChanged(const QualifiedName& attrName) {
   SVGStyledElement::svgAttributeChanged(attrName);
 
-  if (attrName == SVGNames::patternUnitsAttr ||
+  bool invalidateClients = false;
+  if (attrName == SVGNames::xAttr || attrName == SVGNames::yAttr ||
+      attrName == SVGNames::widthAttr || attrName == SVGNames::heightAttr) {
+    invalidateClients = true;
+    updateRelativeLengthsInformation();
+  }
+
+  if (invalidateClients || attrName == SVGNames::patternUnitsAttr ||
       attrName == SVGNames::patternContentUnitsAttr ||
       attrName == SVGNames::patternTransformAttr ||
-      attrName == SVGNames::xAttr || attrName == SVGNames::yAttr ||
-      attrName == SVGNames::widthAttr || attrName == SVGNames::heightAttr ||
       SVGURIReference::isKnownAttribute(attrName) ||
       SVGTests::isKnownAttribute(attrName) ||
       SVGLangSpace::isKnownAttribute(attrName) ||
@@ -248,6 +253,11 @@ PatternAttributes SVGPatternElement::collectPatternProperties() const {
   }
 
   return attributes;
+}
+
+bool SVGPatternElement::selfHasRelativeLengths() const {
+  return x().isRelative() || y().isRelative() || width().isRelative() ||
+         height().isRelative();
 }
 }
 

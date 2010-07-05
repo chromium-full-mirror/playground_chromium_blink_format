@@ -75,7 +75,7 @@ class SVGUseElement : public SVGStyledTransformableElement,
   void buildShadowAndInstanceTree(SVGShadowTreeRootElement*);
 
  private:
-  virtual bool hasRelativeValues() const;
+  virtual bool selfHasRelativeLengths() const;
 
   DECLARE_ANIMATED_PROPERTY(SVGUseElement, SVGNames::xAttr, SVGLength, X, x)
   DECLARE_ANIMATED_PROPERTY(SVGUseElement, SVGNames::yAttr, SVGLength, Y, y)

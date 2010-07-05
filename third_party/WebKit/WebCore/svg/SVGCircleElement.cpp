@@ -66,6 +66,13 @@ void SVGCircleElement::parseMappedAttribute(Attribute* attr) {
 void SVGCircleElement::svgAttributeChanged(const QualifiedName& attrName) {
   SVGStyledTransformableElement::svgAttributeChanged(attrName);
 
+  bool isLengthAttribute = attrName == SVGNames::cxAttr ||
+                           attrName == SVGNames::cyAttr ||
+                           attrName == SVGNames::rAttr;
+
+  if (isLengthAttribute)
+    updateRelativeLengthsInformation();
+
   RenderPath* renderer = static_cast<RenderPath*>(this->renderer());
   if (!renderer)
     return;
@@ -76,8 +83,7 @@ void SVGCircleElement::svgAttributeChanged(const QualifiedName& attrName) {
     return;
   }
 
-  if (attrName == SVGNames::cxAttr || attrName == SVGNames::cyAttr ||
-      attrName == SVGNames::rAttr) {
+  if (isLengthAttribute) {
     renderer->setNeedsPathUpdate();
     renderer->setNeedsLayout(true);
     return;
@@ -115,8 +121,8 @@ Path SVGCircleElement::toPathData() const {
                             r().value(this));
 }
 
-bool SVGCircleElement::hasRelativeValues() const {
-  return (cx().isRelative() || cy().isRelative() || r().isRelative());
+bool SVGCircleElement::selfHasRelativeLengths() const {
+  return cx().isRelative() || cy().isRelative() || r().isRelative();
 }
 }
 

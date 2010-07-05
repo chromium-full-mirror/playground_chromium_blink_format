@@ -74,6 +74,8 @@ class SVGMarkerElement : public SVGStyledElement,
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
 
  private:
+  virtual bool selfHasRelativeLengths() const;
+
   DECLARE_ANIMATED_PROPERTY(SVGMarkerElement,
                             SVGNames::refXAttr,
                             SVGLength,

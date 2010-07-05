@@ -78,8 +78,10 @@ void SVGRadialGradientElement::svgAttributeChanged(
 
   if (attrName == SVGNames::cxAttr || attrName == SVGNames::cyAttr ||
       attrName == SVGNames::fxAttr || attrName == SVGNames::fyAttr ||
-      attrName == SVGNames::rAttr)
+      attrName == SVGNames::rAttr) {
+    updateRelativeLengthsInformation();
     invalidateResourceClients();
+  }
 }
 
 void SVGRadialGradientElement::synchronizeProperty(
@@ -225,6 +227,11 @@ void SVGRadialGradientElement::calculateFocalCenterPointsAndRadius(
     deltaY = sinf(angle) * radiusMax;
     focalPoint = FloatPoint(deltaX + centerPoint.x(), deltaY + centerPoint.y());
   }
+}
+
+bool SVGRadialGradientElement::selfHasRelativeLengths() const {
+  return cy().isRelative() || cy().isRelative() || r().isRelative() ||
+         fx().isRelative() || fy().isRelative();
 }
 }
 

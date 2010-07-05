@@ -47,6 +47,8 @@ class SVGRadialGradientElement : public SVGGradientElement {
                                            float& radius);
 
  private:
+  virtual bool selfHasRelativeLengths() const;
+
   DECLARE_ANIMATED_PROPERTY(SVGRadialGradientElement,
                             SVGNames::cxAttr,
                             SVGLength,

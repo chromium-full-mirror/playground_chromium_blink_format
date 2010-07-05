@@ -54,6 +54,8 @@ class SVGMaskElement : public SVGStyledLocatableElement,
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
 
  private:
+  virtual bool selfHasRelativeLengths() const;
+
   DECLARE_ANIMATED_PROPERTY(SVGMaskElement,
                             SVGNames::maskUnitsAttr,
                             int,

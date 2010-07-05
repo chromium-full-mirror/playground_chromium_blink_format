@@ -94,10 +94,15 @@ void SVGMaskElement::parseMappedAttribute(Attribute* attr) {
 void SVGMaskElement::svgAttributeChanged(const QualifiedName& attrName) {
   SVGStyledElement::svgAttributeChanged(attrName);
 
-  if (attrName == SVGNames::maskUnitsAttr ||
+  bool invalidateClients = false;
+  if (attrName == SVGNames::xAttr || attrName == SVGNames::yAttr ||
+      attrName == SVGNames::widthAttr || attrName == SVGNames::heightAttr) {
+    invalidateClients = true;
+    updateRelativeLengthsInformation();
+  }
+
+  if (invalidateClients || attrName == SVGNames::maskUnitsAttr ||
       attrName == SVGNames::maskContentUnitsAttr ||
-      attrName == SVGNames::xAttr || attrName == SVGNames::yAttr ||
-      attrName == SVGNames::widthAttr || attrName == SVGNames::heightAttr ||
       SVGURIReference::isKnownAttribute(attrName) ||
       SVGTests::isKnownAttribute(attrName) ||
       SVGLangSpace::isKnownAttribute(attrName) ||
@@ -164,6 +169,11 @@ FloatRect SVGMaskElement::maskBoundingBox(
 
 RenderObject* SVGMaskElement::createRenderer(RenderArena* arena, RenderStyle*) {
   return new (arena) RenderSVGResourceMasker(this);
+}
+
+bool SVGMaskElement::selfHasRelativeLengths() const {
+  return x().isRelative() || y().isRelative() || width().isRelative() ||
+         height().isRelative();
 }
 }
 

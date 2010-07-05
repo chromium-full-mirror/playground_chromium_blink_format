@@ -27,6 +27,7 @@
 #include "SVGElement.h"
 #include "SVGLocatable.h"
 #include "SVGStylable.h"
+#include <wtf/HashSet.h>
 
 namespace WebCore {
 
@@ -41,7 +42,9 @@ class SVGStyledElement : public SVGElement, public SVGStylable {
 
   virtual String title() const;
 
-  virtual bool hasRelativeValues() const { return false; }
+  // FIXME: The actual code will land in a follow-up patch.
+  bool hasRelativeLengths() const { return selfHasRelativeLengths(); }
+
   virtual bool isStyled() const { return true; }
   virtual bool supportsMarkers() const { return false; }
 
@@ -57,6 +60,8 @@ class SVGStyledElement : public SVGElement, public SVGStylable {
   virtual void svgAttributeChanged(const QualifiedName&);
   virtual void synchronizeProperty(const QualifiedName&);
 
+  virtual void insertedIntoDocument();
+  virtual void removedFromDocument();
   virtual void childrenChanged(bool changedByParser = false,
                                Node* beforeChange = 0,
                                Node* afterChange = 0,
@@ -77,6 +82,13 @@ class SVGStyledElement : public SVGElement, public SVGStylable {
 
  protected:
   static int cssPropertyIdForSVGAttributeName(const QualifiedName&);
+  void updateRelativeLengthsInformation() {
+    updateRelativeLengthsInformation(selfHasRelativeLengths(), this);
+  }
+  void updateRelativeLengthsInformation(bool hasRelativeLengths,
+                                        SVGStyledElement*);
+
+  virtual bool selfHasRelativeLengths() const { return false; }
 
  private:
   DECLARE_ANIMATED_PROPERTY(SVGStyledElement,

@@ -290,19 +290,28 @@ void SVGSVGElement::svgAttributeChanged(const QualifiedName& attrName) {
   // Thus the CSS length value for width is not updated, and width() calcWidth()
   // calculations on RenderSVGRoot will be wrong.
   // https://bugs.webkit.org/show_bug.cgi?id=25387
-  if (attrName == SVGNames::widthAttr)
+  bool updateRelativeLengths = false;
+  if (attrName == SVGNames::widthAttr) {
     updateCSSForAttribute(this, attrName, CSSPropertyWidth, widthBaseValue());
-  else if (attrName == SVGNames::heightAttr)
+    updateRelativeLengths = true;
+  } else if (attrName == SVGNames::heightAttr) {
     updateCSSForAttribute(this, attrName, CSSPropertyHeight, heightBaseValue());
+    updateRelativeLengths = true;
+  }
+
+  if (updateRelativeLengths || attrName == SVGNames::xAttr ||
+      attrName == SVGNames::yAttr ||
+      SVGFitToViewBox::isKnownAttribute(attrName)) {
+    updateRelativeLengths = true;
+    updateRelativeLengthsInformation();
+  }
 
   if (!renderer())
     return;
 
-  if (attrName == SVGNames::xAttr || attrName == SVGNames::yAttr ||
-      SVGTests::isKnownAttribute(attrName) ||
+  if (updateRelativeLengths || SVGTests::isKnownAttribute(attrName) ||
       SVGLangSpace::isKnownAttribute(attrName) ||
       SVGExternalResourcesRequired::isKnownAttribute(attrName) ||
-      SVGFitToViewBox::isKnownAttribute(attrName) ||
       SVGZoomAndPan::isKnownAttribute(attrName) ||
       SVGStyledLocatableElement::isKnownAttribute(attrName))
     renderer()->setNeedsLayout(true);
@@ -487,9 +496,9 @@ void SVGSVGElement::setCurrentTime(float /* seconds */) {
   // FIXME: Implement me, bug 12073
 }
 
-bool SVGSVGElement::hasRelativeValues() const {
-  return (x().isRelative() || width().isRelative() || y().isRelative() ||
-          height().isRelative());
+bool SVGSVGElement::selfHasRelativeLengths() const {
+  return x().isRelative() || y().isRelative() || width().isRelative() ||
+         height().isRelative() || hasAttribute(SVGNames::viewBoxAttr);
 }
 
 bool SVGSVGElement::isOutermostSVG() const {
@@ -556,5 +565,3 @@ void SVGSVGElement::documentDidBecomeActive() {
 }
 
 #endif  // ENABLE(SVG)
-
-// vim:ts=4:noet

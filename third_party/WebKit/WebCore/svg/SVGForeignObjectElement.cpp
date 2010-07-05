@@ -72,6 +72,13 @@ void SVGForeignObjectElement::svgAttributeChanged(
     const QualifiedName& attrName) {
   SVGStyledTransformableElement::svgAttributeChanged(attrName);
 
+  bool isLengthAttribute =
+      attrName == SVGNames::xAttr || attrName == SVGNames::yAttr ||
+      attrName == SVGNames::widthAttr || attrName == SVGNames::heightAttr;
+
+  if (isLengthAttribute)
+    updateRelativeLengthsInformation();
+
   RenderObject* renderer = this->renderer();
   if (!renderer)
     return;
@@ -82,9 +89,7 @@ void SVGForeignObjectElement::svgAttributeChanged(
     return;
   }
 
-  if (attrName == SVGNames::xAttr || attrName == SVGNames::yAttr ||
-      attrName == SVGNames::widthAttr || attrName == SVGNames::heightAttr ||
-      SVGTests::isKnownAttribute(attrName) ||
+  if (isLengthAttribute || SVGTests::isKnownAttribute(attrName) ||
       SVGLangSpace::isKnownAttribute(attrName) ||
       SVGExternalResourcesRequired::isKnownAttribute(attrName))
     renderer->setNeedsLayout(true);
@@ -131,6 +136,11 @@ bool SVGForeignObjectElement::childShouldCreateRenderer(Node* child) const {
 
   // Skip over SVG rules which disallow non-SVG kids
   return StyledElement::childShouldCreateRenderer(child);
+}
+
+bool SVGForeignObjectElement::selfHasRelativeLengths() const {
+  return x().isRelative() || y().isRelative() || width().isRelative() ||
+         height().isRelative();
 }
 }
 

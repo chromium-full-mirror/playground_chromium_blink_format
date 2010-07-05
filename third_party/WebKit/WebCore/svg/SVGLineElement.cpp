@@ -66,6 +66,13 @@ void SVGLineElement::parseMappedAttribute(Attribute* attr) {
 void SVGLineElement::svgAttributeChanged(const QualifiedName& attrName) {
   SVGStyledTransformableElement::svgAttributeChanged(attrName);
 
+  bool isLengthAttribute =
+      attrName == SVGNames::x1Attr || attrName == SVGNames::y1Attr ||
+      attrName == SVGNames::x2Attr || attrName == SVGNames::y2Attr;
+
+  if (isLengthAttribute)
+    updateRelativeLengthsInformation();
+
   RenderPath* renderer = static_cast<RenderPath*>(this->renderer());
   if (!renderer)
     return;
@@ -76,8 +83,7 @@ void SVGLineElement::svgAttributeChanged(const QualifiedName& attrName) {
     return;
   }
 
-  if (attrName == SVGNames::x1Attr || attrName == SVGNames::y1Attr ||
-      attrName == SVGNames::x2Attr || attrName == SVGNames::y2Attr) {
+  if (isLengthAttribute) {
     renderer->setNeedsPathUpdate();
     renderer->setNeedsLayout(true);
     return;
@@ -118,9 +124,9 @@ Path SVGLineElement::toPathData() const {
                           FloatPoint(x2().value(this), y2().value(this)));
 }
 
-bool SVGLineElement::hasRelativeValues() const {
-  return (x1().isRelative() || y1().isRelative() || x2().isRelative() ||
-          y2().isRelative());
+bool SVGLineElement::selfHasRelativeLengths() const {
+  return x1().isRelative() || y1().isRelative() || x2().isRelative() ||
+         y2().isRelative();
 }
 }
 

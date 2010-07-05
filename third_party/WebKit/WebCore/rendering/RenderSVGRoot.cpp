@@ -120,7 +120,7 @@ void RenderSVGRoot::layout() {
   // additonal parameters.
   SVGSVGElement* svg = static_cast<SVGSVGElement*>(node());
   SVGRenderSupport::layoutChildren(
-      this, needsLayout || (svg->hasRelativeValues() && oldSize != size()));
+      this, needsLayout || (svg->hasRelativeLengths() && oldSize != size()));
   repainter.repaintAfterLayout();
 
   view()->enableLayoutState();
@@ -212,7 +212,7 @@ void RenderSVGRoot::destroy() {
 void RenderSVGRoot::calcViewport() {
   SVGSVGElement* svg = static_cast<SVGSVGElement*>(node());
 
-  if (!selfNeedsLayout() && !svg->hasRelativeValues())
+  if (!selfNeedsLayout() && !svg->hasRelativeLengths())
     return;
 
   if (!svg->hasSetContainerSize()) {

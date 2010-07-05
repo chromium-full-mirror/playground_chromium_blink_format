@@ -111,7 +111,7 @@ void RenderPath::layout() {
   // detect these changes, and only
   // update when needed, even when using relative values.
   bool needsPathUpdate = m_needsPathUpdate;
-  if (!needsPathUpdate && element->hasRelativeValues())
+  if (!needsPathUpdate && element->hasRelativeLengths())
     needsPathUpdate = true;
 
   if (needsPathUpdate) {

@@ -38,10 +38,13 @@ class SVGSymbolElement : public SVGStyledElement,
   virtual ~SVGSymbolElement();
 
   virtual void parseMappedAttribute(Attribute*);
+  virtual void svgAttributeChanged(const QualifiedName&);
   virtual void synchronizeProperty(const QualifiedName&);
   virtual bool rendererIsNeeded(RenderStyle*) { return false; }
 
  private:
+  virtual bool selfHasRelativeLengths() const;
+
   // SVGExternalResourcesRequired
   DECLARE_ANIMATED_PROPERTY(SVGSymbolElement,
                             SVGNames::externalResourcesRequiredAttr,

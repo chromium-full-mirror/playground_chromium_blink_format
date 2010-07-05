@@ -134,9 +134,10 @@ class SVGSVGElement : public SVGStyledLocatableElement,
   void inheritViewAttributes(SVGViewElement*);
 
   bool isOutermostSVG() const;
-  virtual bool hasRelativeValues() const;
 
  private:
+  virtual bool selfHasRelativeLengths() const;
+
   DECLARE_ANIMATED_PROPERTY(SVGSVGElement, SVGNames::xAttr, SVGLength, X, x)
   DECLARE_ANIMATED_PROPERTY(SVGSVGElement, SVGNames::yAttr, SVGLength, Y, y)
   DECLARE_ANIMATED_PROPERTY(SVGSVGElement,

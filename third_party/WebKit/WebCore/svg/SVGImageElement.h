@@ -59,9 +59,9 @@ class SVGImageElement : public SVGStyledTransformableElement,
 
  protected:
   virtual bool haveLoadedRequiredResources();
-  virtual bool hasRelativeValues() const;
 
  private:
+  virtual bool selfHasRelativeLengths() const;
   virtual void willMoveToNewOwnerDocument();
 
   DECLARE_ANIMATED_PROPERTY(SVGImageElement, SVGNames::xAttr, SVGLength, X, x)

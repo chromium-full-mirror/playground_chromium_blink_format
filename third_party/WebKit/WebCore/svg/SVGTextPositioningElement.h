@@ -40,6 +40,8 @@ class SVGTextPositioningElement : public SVGTextContentElement {
   bool isKnownAttribute(const QualifiedName&);
 
  private:
+  virtual bool selfHasRelativeLengths() const;
+
   DECLARE_ANIMATED_PROPERTY(SVGTextPositioningElement,
                             SVGNames::xAttr,
                             SVGLengthList*,

@@ -213,6 +213,10 @@ bool SVGTextContentElement::isKnownAttribute(const QualifiedName& attrName) {
           SVGExternalResourcesRequired::isKnownAttribute(attrName) ||
           SVGStyledElement::isKnownAttribute(attrName));
 }
+
+bool SVGTextContentElement::selfHasRelativeLengths() const {
+  return textLength().isRelative();
+}
 }
 
 #endif  // ENABLE(SVG)

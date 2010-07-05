@@ -47,11 +47,14 @@ class SVGFilterElement : public SVGStyledElement,
   FloatRect filterBoundingBox(const FloatRect&) const;
 
   virtual void parseMappedAttribute(Attribute*);
+  virtual void svgAttributeChanged(const QualifiedName&);
   virtual void synchronizeProperty(const QualifiedName&);
 
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
 
  private:
+  virtual bool selfHasRelativeLengths() const;
+
   DECLARE_ANIMATED_PROPERTY(SVGFilterElement,
                             SVGNames::filterUnitsAttr,
                             int,
