@@ -196,6 +196,10 @@ class HTMLTreeBuilder : public Noncopyable {
 
   void setInsertionMode(InsertionMode value) { m_insertionMode = value; }
   InsertionMode insertionMode() const { return m_insertionMode; }
+
+  void setInsertionModeAndEnd(
+      InsertionMode,
+      bool foreign);  // Helper for resetInsertionModeAppropriately
   void resetInsertionModeAppropriately();
 
   static bool isScriptingFlagEnabled(Frame* frame);
@@ -206,6 +210,7 @@ class HTMLTreeBuilder : public Noncopyable {
 
   InsertionMode m_insertionMode;
   InsertionMode m_originalInsertionMode;
+  InsertionMode m_secondaryInsertionMode;
 
   // HTML5 spec requires that we be able to change the state of the tokenizer
   // from within parser actions.
