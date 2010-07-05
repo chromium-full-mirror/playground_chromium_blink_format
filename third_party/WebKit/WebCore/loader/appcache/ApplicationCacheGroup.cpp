@@ -529,8 +529,9 @@ PassRefPtr<ResourceHandle> ApplicationCacheGroup::createResourceHandle(
     inspectorController->identifierForInitialRequest(
         m_currentResourceIdentifier, m_frame->loader()->documentLoader(),
         handle->request());
+    ResourceResponse redirectResponse = ResourceResponse();
     inspectorController->willSendRequest(m_currentResourceIdentifier,
-                                         handle->request(), 0);
+                                         handle->request(), redirectResponse);
   }
 #endif
   return handle;
