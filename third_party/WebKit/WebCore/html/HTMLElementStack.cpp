@@ -63,6 +63,10 @@ inline bool isTableBodyScopeMarker(Element* element) {
   return element->hasTagName(tbodyTag) || element->hasTagName(tfootTag) ||
          element->hasTagName(theadTag) || element->hasTagName(htmlTag);
 }
+
+inline bool isTableRowScopeMarker(Element* element) {
+  return element->hasTagName(trTag) || element->hasTagName(htmlTag);
+}
 }
 
 HTMLElementStack::ElementRecord::ElementRecord(PassRefPtr<Element> element,
@@ -132,6 +136,12 @@ void HTMLElementStack::popUntilTableScopeMarker() {
 void HTMLElementStack::popUntilTableBodyScopeMarker() {
   // http://www.whatwg.org/specs/web-apps/current-work/multipage/tokenization.html#clear-the-stack-back-to-a-table-body-context
   while (!isTableBodyScopeMarker(top()))
+    pop();
+}
+
+void HTMLElementStack::popUntilTableRowScopeMarker() {
+  // http://www.whatwg.org/specs/web-apps/current-work/multipage/tokenization.html#clear-the-stack-back-to-a-table-row-context
+  while (!isTableRowScopeMarker(top()))
     pop();
 }
 
