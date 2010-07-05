@@ -129,6 +129,7 @@ class HTMLTreeBuilder : public Noncopyable {
 
   bool processStartTagForInHead(AtomicHTMLToken&);
   bool processBodyEndTagForInBody(AtomicHTMLToken&);
+  void processAnyOtherEndTagForInBody(AtomicHTMLToken&);
   void processFakePEndTagIfPInScope();
 
   HTMLElementStack::ElementRecord* furthestBlockForFormattingElement(Element*);
