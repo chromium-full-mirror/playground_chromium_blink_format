@@ -196,6 +196,7 @@ class HTMLTreeBuilder : public Noncopyable {
 
   void setInsertionMode(InsertionMode value) { m_insertionMode = value; }
   InsertionMode insertionMode() const { return m_insertionMode; }
+  void resetInsertionModeAppropriately();
 
   static bool isScriptingFlagEnabled(Frame* frame);
 
