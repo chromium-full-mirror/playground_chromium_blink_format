@@ -782,6 +782,22 @@ void InspectorFrontend::updateDOMStorage(long storageId) {
 }
 #endif
 
+#if ENABLE(OFFLINE_WEB_APPLICATIONS)
+void InspectorFrontend::updateApplicationCacheStatus(int status) {
+  ScriptFunctionCall function(m_webInspector, "dispatch");
+  function.appendArgument("updateApplicationCacheStatus");
+  function.appendArgument(status);
+  function.call();
+}
+
+void InspectorFrontend::updateNetworkState(bool isNowOnline) {
+  ScriptFunctionCall function(m_webInspector, "dispatch");
+  function.appendArgument("updateNetworkState");
+  function.appendArgument(isNowOnline);
+  function.call();
+}
+#endif
+
 void InspectorFrontend::addNodesToSearchResult(const ScriptArray& nodeIds) {
   ScriptFunctionCall function(m_webInspector, "dispatch");
   function.appendArgument("addNodesToSearchResult");

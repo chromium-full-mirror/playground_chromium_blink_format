@@ -69,15 +69,16 @@ class ApplicationCacheGroup : public Noncopyable, ResourceHandleClient {
 
   const KURL& manifestURL() const { return m_manifestURL; }
   UpdateStatus updateStatus() const { return m_updateStatus; }
+  void setUpdateStatus(UpdateStatus status);
 
   void setStorageID(unsigned storageID) { m_storageID = storageID; }
   unsigned storageID() const { return m_storageID; }
   void clearStorageID();
 
   void update(Frame*, ApplicationCacheUpdateOption);  // FIXME: Frame should not
-                                                      // bee needed when
-                                                      // updating witout
-                                                      // browsing context.
+                                                      // be needed when updating
+                                                      // without browsing
+                                                      // context.
   void cacheDestroyed(ApplicationCache*);
 
   bool cacheIsBeingUpdated(const ApplicationCache* cache) const {
@@ -114,10 +115,15 @@ class ApplicationCacheGroup : public Noncopyable, ResourceHandleClient {
   // enables application cache also wants it to use credential storage.
   virtual bool shouldUseCredentialStorage(ResourceHandle*) { return true; }
 
+#if ENABLE(INSPECTOR)
+  virtual void willSendRequest(ResourceHandle*,
+                               ResourceRequest&,
+                               const ResourceResponse&);
+#endif
   virtual void didReceiveResponse(ResourceHandle*, const ResourceResponse&);
   virtual void didReceiveData(ResourceHandle*,
                               const char*,
-                              int,
+                              int length,
                               int lengthReceived);
   virtual void didFinishLoading(ResourceHandle*);
   virtual void didFail(ResourceHandle*, const ResourceError&);
@@ -199,6 +205,10 @@ class ApplicationCacheGroup : public Noncopyable, ResourceHandleClient {
 
   RefPtr<ResourceHandle> m_currentHandle;
   RefPtr<ApplicationCacheResource> m_currentResource;
+
+#if ENABLE(INSPECTOR)
+  unsigned long m_currentResourceIdentifier;
+#endif
 
   RefPtr<ApplicationCacheResource> m_manifestResource;
   RefPtr<ResourceHandle> m_manifestHandle;
