@@ -84,6 +84,8 @@ class HTMLElementStack : public Noncopyable {
   void popUntil(Element*);
   void popUntilTableScopeMarker();  // "clear the stack back to a table context"
                                     // in the spec.
+  void popUntilTableBodyScopeMarker();  // "clear the stack back to a table body
+                                        // context" in the spec.
   void popHTMLHeadElement();
   void popHTMLBodyElement();
 

@@ -72,6 +72,10 @@ bool isNumberedHeaderTag(const AtomicString& tagName) {
          tagName == h4Tag || tagName == h5Tag || tagName == h6Tag;
 }
 
+bool isTableBodyContextTag(const AtomicString& tagName) {
+  return tagName == tbodyTag || tagName == tfootTag || tagName == theadTag;
+}
+
 // http://www.whatwg.org/specs/web-apps/current-work/multipage/parsing.html#special
 bool isSpecialTag(const AtomicString& tagName) {
   return tagName == addressTag || tagName == articleTag ||
@@ -93,8 +97,8 @@ bool isSpecialTag(const AtomicString& tagName) {
          tagName == noscriptTag || tagName == olTag || tagName == pTag ||
          tagName == paramTag || tagName == plaintextTag || tagName == preTag ||
          tagName == scriptTag || tagName == sectionTag ||
-         tagName == selectTag || tagName == styleTag || tagName == tbodyTag ||
-         tagName == textareaTag || tagName == tfootTag || tagName == theadTag ||
+         tagName == selectTag || tagName == styleTag ||
+         isTableBodyContextTag(tagName) || tagName == textareaTag ||
          tagName == titleTag || tagName == trTag || tagName == ulTag ||
          tagName == wbrTag || tagName == xmpTag;
 }
@@ -718,8 +722,7 @@ void HTMLTreeBuilder::processStartTag(AtomicHTMLToken& token) {
         notImplemented();
         return;
       }
-      if (token.name() == tbodyTag || token.name() == tfootTag ||
-          token.name() == theadTag) {
+      if (isTableBodyContextTag(token.name())) {
         m_openElements.popUntilTableScopeMarker();
         insertElement(token);
         m_insertionMode = InTableBodyMode;
@@ -751,6 +754,31 @@ void HTMLTreeBuilder::processStartTag(AtomicHTMLToken& token) {
       }
       parseError(token);
       notImplemented();
+      break;
+    case InTableBodyMode:
+      ASSERT(insertionMode() == InTableBodyMode);
+      if (token.name() == trTag) {
+        m_openElements.popUntilTableBodyScopeMarker();  // How is there ever
+                                                        // anything to pop?
+        insertElement(token);
+        m_insertionMode = InRowMode;
+        return;
+      }
+      if (token.name() == thTag || token.name() == tdTag) {
+        parseError(token);
+        AtomicHTMLToken fakeToken(HTMLToken::StartTag, trTag.localName());
+        processStartTag(fakeToken);
+        ASSERT(insertionMode() == InRowMode);
+        processStartTag(token);
+        return;
+      }
+      if (token.name() == captionTag || token.name() == colTag ||
+          token.name() == colgroupTag || isTableBodyContextTag(token.name())) {
+        // FIXME: The spec is unclear as to what is supposed to happen here.
+        notImplemented();
+        return;
+      }
+      notImplemented();  // process using "in table" rules
       break;
     case AfterBodyMode:
     case AfterAfterBodyMode:
@@ -963,9 +991,8 @@ void HTMLTreeBuilder::callTheAdoptionAgency(AtomicHTMLToken& token) {
     }
     // 7
     const AtomicString& commonAncestorTag = commonAncestor->localName();
-    if (commonAncestorTag == tableTag || commonAncestorTag == tbodyTag ||
-        commonAncestorTag == tfootTag || commonAncestorTag == theadTag ||
-        commonAncestorTag == trTag)
+    if (commonAncestorTag == tableTag || commonAncestorTag == trTag ||
+        isTableBodyContextTag(commonAncestorTag))
       findFosterParentFor(lastNode->element());
     else {
       ExceptionCode ec;
