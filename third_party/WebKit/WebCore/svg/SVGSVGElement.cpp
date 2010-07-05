@@ -418,7 +418,7 @@ FloatRect SVGSVGElement::createSVGRect() {
 }
 
 SVGTransform SVGSVGElement::createSVGTransform() {
-  return SVGTransform();
+  return SVGTransform(SVGTransform::SVG_TRANSFORM_MATRIX);
 }
 
 SVGTransform SVGSVGElement::createSVGTransformFromMatrix(
