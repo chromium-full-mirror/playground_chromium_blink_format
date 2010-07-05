@@ -40,7 +40,6 @@
 #include <wtf/Vector.h>
 
 namespace WebCore {
-
 class DOMApplicationCache;
 class DocumentLoader;
 class KURL;
@@ -129,9 +128,13 @@ class ApplicationCacheHost : public Noncopyable {
   void
   stopDeferringEvents();  // Also raises the events that have been queued up.
 
+  ApplicationCache* applicationCacheForInspector() const {
+    return applicationCache();
+  }
+
  private:
   bool isApplicationCacheEnabled();
-  DocumentLoader* documentLoader() { return m_documentLoader; }
+  DocumentLoader* documentLoader() const { return m_documentLoader; }
 
   DOMApplicationCache* m_domApplicationCache;
   DocumentLoader* m_documentLoader;

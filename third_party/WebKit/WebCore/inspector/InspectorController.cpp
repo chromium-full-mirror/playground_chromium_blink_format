@@ -1402,6 +1402,17 @@ ScriptObject InspectorController::buildObjectForCookie(const Cookie& cookie) {
   return value;
 }
 
+void InspectorController::deleteCookie(const String& cookieName,
+                                       const String& domain) {
+  ResourcesMap::iterator resourcesEnd = m_resources.end();
+  for (ResourcesMap::iterator it = m_resources.begin(); it != resourcesEnd;
+       ++it) {
+    Document* document = it->second->frame()->document();
+    if (document->url().host() == domain)
+      WebCore::deleteCookie(document, it->second->requestURL(), cookieName);
+  }
+}
+
 #if ENABLE(DOM_STORAGE)
 void InspectorController::didUseDOMStorage(StorageArea* storageArea,
                                            bool isLocalStorage,
@@ -2227,17 +2238,6 @@ InspectorController::SpecialPanels InspectorController::specialPanelForJSName(
   if (panelName == "console")
     return ConsolePanel;
   return ElementsPanel;
-}
-
-void InspectorController::deleteCookie(const String& cookieName,
-                                       const String& domain) {
-  ResourcesMap::iterator resourcesEnd = m_resources.end();
-  for (ResourcesMap::iterator it = m_resources.begin(); it != resourcesEnd;
-       ++it) {
-    Document* document = it->second->frame()->document();
-    if (document->url().host() == domain)
-      WebCore::deleteCookie(document, it->second->requestURL(), cookieName);
-  }
 }
 
 InjectedScript InspectorController::injectedScriptForNodeId(long id) {
