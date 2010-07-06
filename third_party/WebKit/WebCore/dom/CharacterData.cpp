@@ -60,7 +60,7 @@ String CharacterData::substringData(unsigned offset,
   return m_data->substring(offset, count);
 }
 
-void CharacterData::appendData(const String& arg, ExceptionCode&) {
+PassRefPtr<StringImpl> CharacterData::parserAppendData(const String& arg) {
   String newStr = m_data;
   newStr.append(arg);
 
@@ -73,6 +73,11 @@ void CharacterData::appendData(const String& arg, ExceptionCode&) {
   } else if (renderer())
     toRenderText(renderer())->setTextWithOffset(m_data, oldStr->length(), 0);
 
+  return oldStr.release();
+}
+
+void CharacterData::appendData(const String& arg, ExceptionCode&) {
+  RefPtr<StringImpl> oldStr = parserAppendData(arg);
   dispatchModifiedEvent(oldStr.get());
 }
 
