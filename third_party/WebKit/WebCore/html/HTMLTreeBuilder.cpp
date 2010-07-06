@@ -139,6 +139,15 @@ bool isPhrasingTag(const AtomicString& tagName) {
          !isFormattingTag(tagName);
 }
 
+bool isNotFormattingAndNotPhrasing(const Element* element) {
+  // The spec often says "node is not in the formatting category, and is not
+  // in the phrasing category". !phrasing && !formatting == scoping || special
+  // scoping || special is easier to compute.
+  // FIXME: localName() is wrong for non-html content.
+  const AtomicString& tagName = element->localName();
+  return isScopingTag(tagName) || isSpecialTag(tagName);
+}
+
 }  // namespace
 
 HTMLTreeBuilder::HTMLTreeBuilder(HTMLTokenizer* tokenizer,
@@ -497,6 +506,37 @@ void HTMLTreeBuilder::processIsindexStartTagForInBody(AtomicHTMLToken& token) {
   processFakeEndTag(formTag);
 }
 
+namespace {
+
+bool isLi(const Element* element) {
+  return element->hasTagName(liTag);
+}
+
+bool isDdOrDt(const Element* element) {
+  return element->hasTagName(ddTag) || element->hasTagName(dtTag);
+}
+}
+
+template <bool shouldClose(const Element*)>
+void HTMLTreeBuilder::processCloseWhenNestedTag(AtomicHTMLToken& token) {
+  m_framesetOk = false;
+  HTMLElementStack::ElementRecord* nodeRecord =
+      m_tree.openElements()->topRecord();
+  while (1) {
+    Element* node = nodeRecord->element();
+    if (shouldClose(node)) {
+      processFakeEndTag(node->tagQName());
+      break;
+    }
+    if (isNotFormattingAndNotPhrasing(node) && !node->hasTagName(addressTag) &&
+        !node->hasTagName(divTag) && !node->hasTagName(pTag))
+      break;
+    nodeRecord = nodeRecord->next();
+  }
+  processFakePEndTagIfPInScope();
+  m_tree.insertElement(token);
+}
+
 void HTMLTreeBuilder::processStartTagForInBody(AtomicHTMLToken& token) {
   ASSERT(token.type() == HTMLToken::StartTag);
   if (token.name() == htmlTag) {
@@ -569,15 +609,11 @@ void HTMLTreeBuilder::processStartTagForInBody(AtomicHTMLToken& token) {
     return;
   }
   if (token.name() == liTag) {
-    notImplemented();
-    processFakePEndTagIfPInScope();
-    m_tree.insertElement(token);
+    processCloseWhenNestedTag<isLi>(token);
     return;
   }
   if (token.name() == ddTag || token.name() == dtTag) {
-    notImplemented();
-    processFakePEndTagIfPInScope();
-    m_tree.insertElement(token);
+    processCloseWhenNestedTag<isDdOrDt>(token);
     return;
   }
   if (token.name() == plaintextTag) {
@@ -1178,9 +1214,7 @@ void HTMLTreeBuilder::processAnyOtherEndTagForInBody(AtomicHTMLToken& token) {
       m_tree.openElements()->pop();
       return;
     }
-    // !phrasing && !formatting == scoping || special
-    const AtomicString& tagName = node->localName();
-    if (isScopingTag(tagName) || isSpecialTag(tagName)) {
+    if (isNotFormattingAndNotPhrasing(node)) {
       parseError(token);
       return;
     }
@@ -1196,9 +1230,7 @@ HTMLTreeBuilder::furthestBlockForFormattingElement(Element* formattingElement) {
   for (; record; record = record->next()) {
     if (record->element() == formattingElement)
       return furthestBlock;
-    const AtomicString& tagName = record->element()->localName();
-    // !phrasing && !formatting == scoping || special
-    if (isScopingTag(tagName) || isSpecialTag(tagName))
+    if (isNotFormattingAndNotPhrasing(record->element()))
       furthestBlock = record;
   }
   ASSERT_NOT_REACHED();
