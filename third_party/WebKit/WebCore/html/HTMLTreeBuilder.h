@@ -135,9 +135,9 @@ class HTMLTreeBuilder : public Noncopyable {
   bool processBodyEndTagForInBody(AtomicHTMLToken&);
   void processAnyOtherEndTagForInBody(AtomicHTMLToken&);
 
-  void proesssFakeStartTag(const QualifiedName&,
+  void processFakeStartTag(const QualifiedName&,
                            PassRefPtr<NamedNodeMap> attributes = 0);
-  void proesssFakeEndTag(const QualifiedName&);
+  void processFakeEndTag(const QualifiedName&);
   void processFakeCharacters(const String&);
   void processFakePEndTagIfPInScope();
 
