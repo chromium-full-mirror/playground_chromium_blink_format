@@ -53,4 +53,9 @@ bool PluginInfoStore::shouldUsePlugin(const Plugin& plugin,
   return false;
 }
 
+String PluginInfoStore::mimeTypeFromExtension(const String& extension) {
+  notImplemented();
+  return String();
+}
+
 }  // namespace WebKit
