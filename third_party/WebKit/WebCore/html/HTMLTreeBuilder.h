@@ -110,8 +110,8 @@ class HTMLTreeBuilder : public Noncopyable {
 
   void passTokenToLegacyParser(HTMLToken&);
 
-  // Specialized functions for processing the different types of tokens.
   void processToken(AtomicHTMLToken&);
+
   void processDoctypeToken(AtomicHTMLToken&);
   void processStartTag(AtomicHTMLToken&);
   void processEndTag(AtomicHTMLToken&);
@@ -119,23 +119,19 @@ class HTMLTreeBuilder : public Noncopyable {
   void processCharacter(AtomicHTMLToken&);
   void processEndOfFile(AtomicHTMLToken&);
 
-  // Default processing for the different insertion modes.
-  void processDefaultForInitialMode(AtomicHTMLToken&);
-  void processDefaultForBeforeHTMLMode(AtomicHTMLToken&);
-  void processDefaultForBeforeHeadMode(AtomicHTMLToken&);
-  void processDefaultForInHeadMode(AtomicHTMLToken&);
-  void processDefaultForInHeadNoscriptMode(AtomicHTMLToken&);
-  void processDefaultForAfterHeadMode(AtomicHTMLToken&);
-
   bool processStartTagForInHead(AtomicHTMLToken&);
   void processStartTagForInBody(AtomicHTMLToken&);
+  void processStartTagForInTable(AtomicHTMLToken&);
   void processEndTagForInBody(AtomicHTMLToken&);
-  PassRefPtr<NamedNodeMap> attributesForIsindexInput(AtomicHTMLToken&);
-  void processIsindexStartTagForBody(AtomicHTMLToken&);
+  void processEndTagForInTable(AtomicHTMLToken&);
+
+  void processIsindexStartTagForInBody(AtomicHTMLToken&);
   bool processBodyEndTagForInBody(AtomicHTMLToken&);
   bool processCaptionEndTagForInCaption();
   bool processColgroupEndTagForInColumnGroup();
   bool processTrEndTagForInRow();
+  // FIXME: This function should be inlined into its one call site or it
+  // needs to assert which tokens it can be called with.
   void processAnyOtherEndTagForInBody(AtomicHTMLToken&);
 
   void processFakeStartTag(const QualifiedName&,
@@ -143,6 +139,18 @@ class HTMLTreeBuilder : public Noncopyable {
   void processFakeEndTag(const QualifiedName&);
   void processFakeCharacters(const String&);
   void processFakePEndTagIfPInScope();
+
+  // Default processing for the different insertion modes.
+  // FIXME: These functions need to be renamed to remove "process" from their
+  // names.
+  void processDefaultForInitialMode(AtomicHTMLToken&);
+  void processDefaultForBeforeHTMLMode(AtomicHTMLToken&);
+  void processDefaultForBeforeHeadMode(AtomicHTMLToken&);
+  void processDefaultForInHeadMode(AtomicHTMLToken&);
+  void processDefaultForInHeadNoscriptMode(AtomicHTMLToken&);
+  void processDefaultForAfterHeadMode(AtomicHTMLToken&);
+
+  PassRefPtr<NamedNodeMap> attributesForIsindexInput(AtomicHTMLToken&);
 
   HTMLElementStack::ElementRecord* furthestBlockForFormattingElement(Element*);
   void findFosterParentFor(Element*);
