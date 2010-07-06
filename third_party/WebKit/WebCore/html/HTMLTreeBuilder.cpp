@@ -879,6 +879,54 @@ void HTMLTreeBuilder::processStartTag(AtomicHTMLToken& token) {
       }
       parseError(token);
       break;
+    case InSelectMode:
+      ASSERT(insertionMode() == InSelectMode);
+      if (token.name() == htmlTag) {
+        insertHTMLStartTagInBody(token);
+        return;
+      }
+      if (token.name() == optionTag) {
+        if (currentElement()->hasTagName(optionTag)) {
+          AtomicHTMLToken endOption(HTMLToken::EndTag, optionTag.localName());
+          processEndTag(endOption);
+        }
+        insertElement(token);
+        return;
+      }
+      if (token.name() == optgroupTag) {
+        if (currentElement()->hasTagName(optionTag)) {
+          AtomicHTMLToken endOption(HTMLToken::EndTag, optionTag.localName());
+          processEndTag(endOption);
+        }
+        if (currentElement()->hasTagName(optgroupTag)) {
+          AtomicHTMLToken endOptgroup(HTMLToken::EndTag,
+                                      optgroupTag.localName());
+          processEndTag(endOptgroup);
+        }
+        insertElement(token);
+        return;
+      }
+      if (token.name() == selectTag) {
+        parseError(token);
+        AtomicHTMLToken endSelect(HTMLToken::EndTag, selectTag.localName());
+        processEndTag(endSelect);
+        return;
+      }
+      if (token.name() == inputTag || token.name() == keygenTag ||
+          token.name() == textareaTag) {
+        parseError(token);
+        notImplemented();  // fragment case
+        AtomicHTMLToken endSelect(HTMLToken::EndTag, selectTag.localName());
+        processEndTag(endSelect);
+        processStartTag(token);
+        return;
+      }
+      if (token.name() == scriptTag) {
+        bool didProcess = processStartTagForInHead(token);
+        ASSERT_UNUSED(didProcess, didProcess);
+        return;
+      }
+      break;
     default:
       notImplemented();
   }
@@ -1422,6 +1470,34 @@ void HTMLTreeBuilder::processEndTag(AtomicHTMLToken& token) {
              insertionMode() == AfterAfterFramesetMode);
       parseError(token);
       break;
+    case InSelectMode:
+      ASSERT(insertionMode() == InSelectMode);
+      if (token.name() == optgroupTag) {
+        if (currentElement()->hasTagName(optionTag))
+          notImplemented();
+        if (currentElement()->hasTagName(optgroupTag)) {
+          m_openElements.pop();
+          return;
+        }
+        parseError(token);
+        return;
+      }
+      if (token.name() == optionTag) {
+        if (currentElement()->hasTagName(optionTag)) {
+          m_openElements.pop();
+          return;
+        }
+        parseError(token);
+        return;
+      }
+      if (token.name() == selectTag) {
+        notImplemented();  // fragment case
+        m_openElements.popUntil(selectTag.localName());
+        m_openElements.pop();
+        resetInsertionModeAppropriately();
+        return;
+      }
+      break;
     default:
       notImplemented();
   }
@@ -1499,6 +1575,10 @@ void HTMLTreeBuilder::processCharacter(AtomicHTMLToken& token) {
              insertionMode() == AfterAfterFramesetMode);
       parseError(token);
       break;
+    case InSelectMode:
+      ASSERT(insertionMode() == InSelectMode);
+      insertTextNode(token);
+      break;
     default:
       notImplemented();
   }
@@ -1550,6 +1630,11 @@ void HTMLTreeBuilder::processEndOfFile(AtomicHTMLToken& token) {
     case AfterAfterFramesetMode:
       ASSERT(insertionMode() == AfterFramesetMode ||
              insertionMode() == AfterAfterFramesetMode);
+      break;
+    case InSelectMode:
+      ASSERT(insertionMode() == InSelectMode);
+      if (currentElement() != m_openElements.htmlElement())
+        parseError(token);
       break;
     default:
       notImplemented();
