@@ -1852,7 +1852,9 @@ InlineIterator RenderBlock::findNextLineBreak(InlineBidiResolver& resolver,
       // with their trailing
       // space, then subtract its width.
       int wordTrailingSpaceWidth =
-          f.typesettingFeatures() & Kerning ? f.spaceWidth() + wordSpacing : 0;
+          f.typesettingFeatures() & Kerning
+              ? f.width(TextRun(&space, 1)) + wordSpacing
+              : 0;
 
       int wrapW = tmpW + inlineWidth(o, !appliedStartWidth, true);
       int charWidth = 0;
