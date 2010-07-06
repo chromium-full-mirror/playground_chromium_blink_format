@@ -252,7 +252,7 @@ void InspectorFrontendClientQt::closeWindow() {
 
   // Clear pointer before deleting WebView to avoid recursive calls to its
   // destructor.
-  delete m_inspectorView.release();
+  m_inspectorView.clear();
 }
 
 void InspectorFrontendClientQt::attachWindow() {
