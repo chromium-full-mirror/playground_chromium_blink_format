@@ -561,7 +561,16 @@ void HTMLTreeBuilder::processStartTagForInBody(AtomicHTMLToken& token) {
     return;
   }
   if (token.name() == aTag) {
-    notImplemented();
+    Element* activeATag =
+        m_activeFormattingElements.closestElementInScopeWithName(
+            aTag.localName());
+    if (activeATag) {
+      parseError(token);
+      processFakeEndTag(aTag);
+      m_activeFormattingElements.remove(activeATag);
+      if (m_openElements.contains(activeATag))
+        m_openElements.remove(activeATag);
+    }
     reconstructTheActiveFormattingElements();
     insertFormattingElement(token);
     return;
@@ -581,7 +590,7 @@ void HTMLTreeBuilder::processStartTagForInBody(AtomicHTMLToken& token) {
       token.name() == objectTag) {
     reconstructTheActiveFormattingElements();
     insertElement(token);
-    notImplemented();
+    m_activeFormattingElements.appendMarker();
     m_framesetOk = false;
     return;
   }
@@ -1377,7 +1386,9 @@ void HTMLTreeBuilder::processEndTagForInBody(AtomicHTMLToken& token) {
   if (token.name() == pTag) {
     if (!m_openElements.inScope(token.name())) {
       parseError(token);
-      notImplemented();
+      processFakeStartTag(pTag);
+      ASSERT(m_openElements.inScope(token.name()));
+      processEndTag(token);
       return;
     }
     generateImpliedEndTagsWithExclusion(token.name());
@@ -2080,7 +2091,8 @@ bool HTMLTreeBuilder::indexOfFirstUnopenFormattingElement(
       return firstUnopenElementIndex < m_activeFormattingElements.size();
     }
   } while (index);
-  return false;
+  firstUnopenElementIndex = index;
+  return true;
 }
 
 void HTMLTreeBuilder::reconstructTheActiveFormattingElements() {
