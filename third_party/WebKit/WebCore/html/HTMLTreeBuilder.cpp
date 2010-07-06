@@ -1724,11 +1724,14 @@ void HTMLTreeBuilder::processCharacter(AtomicHTMLToken& token) {
       processDefaultForAfterHeadMode(token);
     // Fall through
     case InBodyMode:
-    case InTableMode:
     case InCaptionMode:
-      ASSERT(insertionMode() == InBodyMode || insertionMode() == InTableMode ||
-             insertionMode() == InCaptionMode);
+      ASSERT(insertionMode() == InBodyMode || insertionMode() == InCaptionMode);
       notImplemented();
+      insertTextNode(token);
+      break;
+    case InTableMode:
+      ASSERT(insertionMode() == InTableMode);
+      notImplemented();  // Crazy pending characters.
       insertTextNode(token);
       break;
     case AfterBodyMode:
@@ -1805,20 +1808,19 @@ void HTMLTreeBuilder::processEndOfFile(AtomicHTMLToken& token) {
       processDefaultForInHeadNoscriptMode(token);
       processToken(token);
       break;
-    case InFramesetMode:
-      ASSERT(insertionMode() == InFramesetMode);
-      if (currentElement() != m_openElements.htmlElement())
-        parseError(token);
-      break;
     case AfterFramesetMode:
     case AfterAfterFramesetMode:
       ASSERT(insertionMode() == AfterFramesetMode ||
              insertionMode() == AfterAfterFramesetMode);
       break;
+    case InFramesetMode:
+    case InTableMode:
     case InSelectInTableMode:
     case InSelectMode:
       ASSERT(insertionMode() == InSelectMode ||
-             insertionMode() == InSelectInTableMode);
+             insertionMode() == InSelectInTableMode ||
+             insertionMode() == InTableMode ||
+             insertionMode() == InFramesetMode);
       if (currentElement() != m_openElements.htmlElement())
         parseError(token);
       break;
