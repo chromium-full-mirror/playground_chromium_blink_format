@@ -334,7 +334,7 @@ void WebWorkerClientImpl::postMessageToWorkerObjectTask(
     PassOwnPtr<MessagePortChannelArray> channels) {
   if (thisPtr->m_worker) {
     OwnPtr<MessagePortArray> ports =
-        MessagePort::entanglePorts(*context, channels.release());
+        MessagePort::entanglePorts(*context, channels);
     RefPtr<SerializedScriptValue> serializedMessage =
         SerializedScriptValue::createFromWire(message);
     thisPtr->m_worker->dispatchEvent(
