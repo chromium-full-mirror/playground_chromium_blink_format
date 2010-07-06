@@ -68,8 +68,9 @@ inline double wtf_vsnprintf(char* buffer,
   return result;
 }
 
-// Work around a bug in Microsoft's implementation of vsnprintf, where
-// vsnprintf does not null terminate the buffer
+// Work around a difference in Microsoft's implementation of vsnprintf, where
+// vsnprintf does not null terminate the buffer. WebKit can rely on the null
+// termination.
 #define vsnprintf(buffer, count, format, args) \
   wtf_vsnprintf(buffer, count, format, args)
 
