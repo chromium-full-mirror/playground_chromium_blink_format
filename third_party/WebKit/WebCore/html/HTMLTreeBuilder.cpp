@@ -707,10 +707,8 @@ void HTMLTreeBuilder::processStartTagForInBody(AtomicHTMLToken& token) {
   }
   if (token.name() == captionTag || token.name() == colTag ||
       token.name() == colgroupTag || token.name() == frameTag ||
-      token.name() == headTag || token.name() == tbodyTag ||
-      token.name() == tdTag || token.name() == tfootTag ||
-      token.name() == thTag || token.name() == theadTag ||
-      token.name() == trTag) {
+      token.name() == headTag || isTableBodyContextTag(token.name()) ||
+      token.name() == tdTag || token.name() == thTag || token.name() == trTag) {
     parseError(token);
     return;
   }
@@ -883,9 +881,8 @@ void HTMLTreeBuilder::processStartTag(AtomicHTMLToken& token) {
     case InCaptionMode:
       ASSERT(insertionMode() == InCaptionMode);
       if (token.name() == captionTag || token.name() == colTag ||
-          token.name() == colgroupTag || token.name() == tbodyTag ||
-          token.name() == tdTag || token.name() == tfootTag ||
-          token.name() == thTag || token.name() == theadTag ||
+          token.name() == colgroupTag || isTableBodyContextTag(token.name()) ||
+          token.name() == tdTag || token.name() == thTag ||
           token.name() == trTag) {
         parseError(token);
         if (!processCaptionEndTagForInCaption()) {
@@ -940,9 +937,7 @@ void HTMLTreeBuilder::processStartTag(AtomicHTMLToken& token) {
           return;
         }
         m_openElements.popUntilTableBodyScopeMarker();
-        ASSERT(currentElement()->tagQName() == tbodyTag ||
-               currentElement()->tagQName() == tfootTag ||
-               currentElement()->tagQName() == theadTag);
+        ASSERT(isTableBodyContextTag(currentElement()->localName()));
         processFakeEndTag(currentElement()->tagQName());
         processStartTag(token);
         return;
@@ -1052,8 +1047,7 @@ void HTMLTreeBuilder::processStartTag(AtomicHTMLToken& token) {
     case InSelectInTableMode:
       ASSERT(insertionMode() == InSelectInTableMode);
       if (token.name() == captionTag || token.name() == tableTag ||
-          token.name() == tbodyTag || token.name() == tfootTag ||
-          token.name() == theadTag || token.name() == trTag ||
+          isTableBodyContextTag(token.name()) || token.name() == trTag ||
           token.name() == tdTag || token.name() == thTag) {
         parseError(token);
         AtomicHTMLToken endSelect(HTMLToken::EndTag, selectTag.localName());
@@ -1562,10 +1556,8 @@ void HTMLTreeBuilder::processEndTagForInTable(AtomicHTMLToken& token) {
   }
   if (token.name() == bodyTag || token.name() == captionTag ||
       token.name() == colTag || token.name() == colgroupTag ||
-      token.name() == htmlTag || token.name() == tbodyTag ||
-      token.name() == tdTag || token.name() == tfootTag ||
-      token.name() == thTag || token.name() == theadTag ||
-      token.name() == trTag) {
+      token.name() == htmlTag || isTableBodyContextTag(token.name()) ||
+      token.name() == tdTag || token.name() == thTag || token.name() == trTag) {
     parseError(token);
     return;
   }
@@ -1647,9 +1639,8 @@ void HTMLTreeBuilder::processEndTag(AtomicHTMLToken& token) {
       }
       if (token.name() == bodyTag || token.name() == colTag ||
           token.name() == colgroupTag || token.name() == htmlTag ||
-          token.name() == tbodyTag || token.name() == tdTag ||
-          token.name() == tfootTag || token.name() == thTag ||
-          token.name() == theadTag || token.name() == trTag) {
+          isTableBodyContextTag(token.name()) || token.name() == tdTag ||
+          token.name() == thTag || token.name() == trTag) {
         parseError(token);
         return;
       }
@@ -1745,8 +1736,7 @@ void HTMLTreeBuilder::processEndTag(AtomicHTMLToken& token) {
       break;
     case InTableBodyMode:
       ASSERT(insertionMode() == InTableBodyMode);
-      if (token.name() == tbodyTag || token.name() == tfootTag ||
-          token.name() == theadTag) {
+      if (isTableBodyContextTag(token.name())) {
         if (!m_openElements.inTableScope(token.name())) {
           parseError(token);
           return;
@@ -1766,9 +1756,7 @@ void HTMLTreeBuilder::processEndTag(AtomicHTMLToken& token) {
           return;
         }
         m_openElements.popUntilTableBodyScopeMarker();
-        ASSERT(currentElement()->tagQName() == tbodyTag ||
-               currentElement()->tagQName() == tfootTag ||
-               currentElement()->tagQName() == theadTag);
+        ASSERT(isTableBodyContextTag(currentElement()->localName()));
         processFakeEndTag(currentElement()->tagQName());
         processEndTag(token);
         return;
@@ -1858,8 +1846,7 @@ void HTMLTreeBuilder::processEndTag(AtomicHTMLToken& token) {
     case InSelectInTableMode:
       ASSERT(insertionMode() == InSelectInTableMode);
       if (token.name() == captionTag || token.name() == tableTag ||
-          token.name() == tbodyTag || token.name() == tfootTag ||
-          token.name() == theadTag || token.name() == trTag ||
+          isTableBodyContextTag(token.name()) || token.name() == trTag ||
           token.name() == tdTag || token.name() == thTag) {
         parseError(token);
         if (m_openElements.inTableScope(token.name())) {
