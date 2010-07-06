@@ -134,6 +134,7 @@ class HTMLTreeBuilder : public Noncopyable {
   void processIsindexStartTagForBody(AtomicHTMLToken&);
   bool processBodyEndTagForInBody(AtomicHTMLToken&);
   bool processCaptionEndTagForInCaption();
+  bool processColgroupEndTagForInColumnGroup();
   void processAnyOtherEndTagForInBody(AtomicHTMLToken&);
 
   void processFakeStartTag(const QualifiedName&,
