@@ -23,22 +23,31 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef WebProcessMain_h
-#define WebProcessMain_h
-
 #include <windows.h>
 
-namespace WebKit {
-
-#if BUILDING_WEBKIT2
-#define DLL_EXPORT __declspec(dllexport)
+#if defined _M_IX86
+#define PROCESSORARCHITECTURE "x86"
+#elif defined _M_IA64
+#define PROCESSORARCHITECTURE "ia64"
+#elif defined _M_X64
+#define PROCESSORARCHITECTURE "amd64"
 #else
-#define DLL_EXPORT __declspec(dllimport)
+#define PROCESSORARCHITECTURE "*"
 #endif
 
-// This is called only from the _tWinMain function of the WebProcess.
-DLL_EXPORT int WebProcessMain(HINSTANCE hInstance, LPWSTR commandLineString);
+#pragma comment(                                                                                                                                  \
+    linker,                                                                                                                                       \
+    "/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='" PROCESSORARCHITECTURE \
+    "' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
-}  // namespace WebKit
+extern "C" __declspec(dllimport) int WebKitMain(HINSTANCE hInstance,
+                                                HINSTANCE hPrevInstance,
+                                                LPTSTR lpstrCmdLine,
+                                                int nCmdShow);
 
-#endif  // WebProcessMain_h
+int WINAPI wWinMain(HINSTANCE hInstance,
+                    HINSTANCE hPrevInstance,
+                    LPTSTR lpstrCmdLine,
+                    int nCmdShow) {
+  return WebKitMain(hInstance, hPrevInstance, lpstrCmdLine, nCmdShow);
+}

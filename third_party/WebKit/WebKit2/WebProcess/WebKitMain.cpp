@@ -23,24 +23,36 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "WebProcessMain.h"
-#include <tchar.h>
-#include <windows.h>
+#include "CommandLine.h"
 
-#if defined _M_IX86
-#define PROCESSORARCHITECTURE "x86"
-#elif defined _M_IA64
-#define PROCESSORARCHITECTURE "ia64"
-#elif defined _M_X64
-#define PROCESSORARCHITECTURE "amd64"
-#else
-#define PROCESSORARCHITECTURE "*"
+#include "WebProcessMain.h"
+
+#if PLATFORM(MAC)
+#include <objc/objc-auto.h>
 #endif
 
-#pragma comment(                                                                                                                                  \
-    linker,                                                                                                                                       \
-    "/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='" PROCESSORARCHITECTURE \
-    "' publicKeyToken='6595b64144ccf1df' language='*'\"")
+using namespace WebCore;
+using namespace WebKit;
+
+#if PLATFORM(MAC)
+
+extern "C" int WebKitMain(int argc, char** argv);
+
+int WebKitMain(int argc, char** argv) {
+  ASSERT(!objc_collectingEnabled());
+
+  CommandLine commandLine;
+  if (!commandLine.parse(argc, argv))
+    return EXIT_FAILURE;
+
+  String mode = commandLine["mode"];
+  if (mode == "legacywebprocess")
+    return WebProcessMain(&commandLine);
+
+  return EXIT_FAILURE;
+}
+
+#elif PLATFORM(WIN)
 
 static void enableTerminationOnHeapCorruption() {
   // Enable termination on heap corruption on OSes that support it (Vista and
@@ -63,11 +75,21 @@ static void enableTerminationOnHeapCorruption() {
   heapSetInformation(0, heapEnableTerminationOnCorruption, 0, 0);
 }
 
-int WINAPI _tWinMain(HINSTANCE hInstance,
-                     HINSTANCE /*hPrevInstance*/,
-                     LPTSTR lpstrCmdLine,
-                     int /*nCmdShow*/) {
+extern "C" __declspec(dllexport) int WebKitMain(HINSTANCE hInstance,
+                                                HINSTANCE hPrevInstance,
+                                                LPTSTR lpstrCmdLine,
+                                                int nCmdShow) {
   enableTerminationOnHeapCorruption();
 
-  return WebKit::WebProcessMain(hInstance, lpstrCmdLine);
+  CommandLine commandLine;
+  if (!commandLine.parse(lpstrCmdLine))
+    return EXIT_FAILURE;
+
+  String mode = commandLine["mode"];
+  if (mode == "webprocess")
+    return WebKit::WebProcessMain(&commandLine);
+
+  return EXIT_FAILURE;
 }
+
+#endif

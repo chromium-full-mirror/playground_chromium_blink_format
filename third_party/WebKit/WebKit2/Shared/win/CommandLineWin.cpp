@@ -23,31 +23,11 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "WebProcessMain.h"
-
-#include "RunLoop.h"
-#include "WebProcess.h"
-#include <runtime/InitializeThreading.h>
-#include <WebCore/PlatformString.h>
-#include <WebCore/StringHash.h>
-#include <wtf/Threading.h>
+#include "CommandLine.h"
 
 using namespace WebCore;
 
 namespace WebKit {
-
-// FIXME: If the Mac port is going to need this we should consider moving it to
-// Platform or Shared.
-class CommandLine {
- public:
-  CommandLine() {}
-  bool parse(LPTSTR commandLineString);
-
-  String operator[](const String&) const;
-
- private:
-  HashMap<String, String> m_args;
-};
 
 bool CommandLine::parse(LPTSTR commandLineString) {
   m_args.clear();
@@ -80,37 +60,6 @@ bool CommandLine::parse(LPTSTR commandLineString) {
 
   ::LocalFree(commandLineArgs);
   return true;
-}
-
-String CommandLine::operator[](const String& key) const {
-  return m_args.get(key);
-}
-
-int WebProcessMain(HINSTANCE hInstance, LPWSTR commandLineString) {
-  CommandLine commandLine;
-
-  // FIXME: Should we return an error code here?
-  if (!commandLine.parse(commandLineString))
-    return 0;
-
-  OleInitialize(0);
-
-  JSC::initializeThreading();
-  WTF::initializeMainThread();
-  RunLoop::initializeMainRunLoop();
-
-  const String& identifierString = commandLine["clientIdentifier"];
-
-  // FIXME: Should we return an error code here?
-  HANDLE clientIdentifier =
-      reinterpret_cast<HANDLE>(identifierString.toUInt64Strict());
-  if (!clientIdentifier)
-    return 0;
-
-  WebProcess::shared().initialize(clientIdentifier, RunLoop::main());
-  RunLoop::run();
-
-  return 0;
 }
 
 }  // namespace WebKit
