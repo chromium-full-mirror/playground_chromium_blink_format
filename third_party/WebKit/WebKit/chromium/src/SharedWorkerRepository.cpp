@@ -237,7 +237,7 @@ void SharedWorkerRepository::connect(PassRefPtr<SharedWorker> worker,
   // worker objects).
   // It will free itself once loading is completed.
   SharedWorkerScriptLoader* loader = new SharedWorkerScriptLoader(
-      worker, url, name, port.release(), webWorker.release());
+      worker, url, name, port, webWorker.release());
   loader->load();
 }
 
