@@ -727,6 +727,19 @@ bool HTMLTreeBuilder::processColgroupEndTagForInColumnGroup() {
   return true;
 }
 
+// http://www.whatwg.org/specs/web-apps/current-work/multipage/tokenization.html#close-the-cell
+void HTMLTreeBuilder::closeTheCell() {
+  ASSERT(insertionMode() == InCellMode);
+  if (m_openElements.inScope(tdTag)) {
+    ASSERT(!m_openElements.inScope(thTag));
+    processFakeEndTag(tdTag);
+    return;
+  }
+  ASSERT(m_openElements.inScope(thTag));
+  processFakeEndTag(thTag);
+  ASSERT(insertionMode() == InRowMode);
+}
+
 void HTMLTreeBuilder::processStartTag(AtomicHTMLToken& token) {
   ASSERT(token.type() == HTMLToken::StartTag);
   switch (insertionMode()) {
@@ -855,9 +868,7 @@ void HTMLTreeBuilder::processStartTag(AtomicHTMLToken& token) {
       }
       parseError(token);
       if (currentElement()->hasTagName(tableTag) ||
-          currentElement()->hasTagName(tbodyTag) ||
-          currentElement()->hasTagName(tfootTag) ||
-          currentElement()->hasTagName(theadTag) ||
+          isTableBodyContextTag(currentElement()->localName()) ||
           currentElement()->hasTagName(trTag))
         notImplemented();  // "whenever a node would be inserted into the
                            // current node, it must instead be foster parented."
@@ -920,6 +931,7 @@ void HTMLTreeBuilder::processStartTag(AtomicHTMLToken& token) {
       notImplemented();  // process using "in table" rules
       break;
     case InRowMode:
+      ASSERT(insertionMode() == InRowMode);
       if (token.name() == thTag || token.name() == tdTag) {
         m_openElements.popUntilTableRowScopeMarker();
         insertElement(token);
@@ -928,10 +940,31 @@ void HTMLTreeBuilder::processStartTag(AtomicHTMLToken& token) {
       }
       if (token.name() == captionTag || token.name() == colTag ||
           token.name() == colgroupTag || isTableBodyContextTag(token.name())) {
-        notImplemented();
+        if (!processTrEndTagForInRow()) {
+          ASSERT(m_isParsingFragment);
+          return;
+        }
+        ASSERT(insertionMode() == InTableBodyMode);
+        processStartTag(token);
         return;
       }
       notImplemented();
+      break;
+    case InCellMode:
+      ASSERT(insertionMode() == InCellMode);
+      if (token.name() == captionTag || token.name() == colTag ||
+          token.name() == colgroupTag || token.name() == thTag ||
+          token.name() == tdTag || isTableBodyContextTag(token.name())) {
+        // FIXME: This could be more efficient.
+        if (!m_openElements.inTableScope(tdTag) ||
+            !m_openElements.inTableScope(thTag)) {
+          parseError(token);
+          return;
+        }
+        closeTheCell();
+        return;
+      }
+      processStartTagForInBody(token);
       break;
     case AfterBodyMode:
     case AfterAfterBodyMode:
@@ -1297,8 +1330,7 @@ void HTMLTreeBuilder::resetInsertionModeAppropriately() {
       return setInsertionModeAndEnd(InCellMode, foreign);
     if (node->hasTagName(trTag))
       return setInsertionModeAndEnd(InRowMode, foreign);
-    if (node->hasTagName(tbodyTag) || node->hasTagName(theadTag) ||
-        node->hasTagName(tfootTag))
+    if (isTableBodyContextTag(node->localName()))
       return setInsertionModeAndEnd(InTableBodyMode, foreign);
     if (node->hasTagName(captionTag))
       return setInsertionModeAndEnd(InCaptionMode, foreign);
@@ -1483,6 +1515,19 @@ bool HTMLTreeBuilder::processCaptionEndTagForInCaption() {
   return true;
 }
 
+bool HTMLTreeBuilder::processTrEndTagForInRow() {
+  if (!m_openElements.inTableScope(trTag.localName())) {
+    ASSERT(m_isParsingFragment);
+    // FIXME: parse error
+    return false;
+  }
+  m_openElements.popUntilTableRowScopeMarker();
+  ASSERT(currentElement()->hasTagName(trTag));
+  m_openElements.pop();
+  m_insertionMode = InTableBodyMode;
+  return true;
+}
+
 void HTMLTreeBuilder::processEndTag(AtomicHTMLToken& token) {
   ASSERT(token.type() == HTMLToken::EndTag);
   switch (insertionMode()) {
@@ -1601,6 +1646,78 @@ void HTMLTreeBuilder::processEndTag(AtomicHTMLToken& token) {
         return;
       }
       processEndTag(token);
+      break;
+    case InRowMode:
+      ASSERT(insertionMode() == InRowMode);
+      if (token.name() == trTag) {
+        processTrEndTagForInRow();
+        return;
+      }
+      if (token.name() == tableTag) {
+        if (!processTrEndTagForInRow()) {
+          ASSERT(m_isParsingFragment);
+          return;
+        }
+        ASSERT(insertionMode() == InTableBodyMode);
+        processEndTag(token);
+        return;
+      }
+      if (isTableBodyContextTag(token.name())) {
+        if (!m_openElements.inTableScope(token.name())) {
+          parseError(token);
+          return;
+        }
+        processFakeEndTag(trTag);
+        ASSERT(insertionMode() == InTableBodyMode);
+        processEndTag(token);
+        return;
+      }
+      if (token.name() == bodyTag || token.name() == captionTag ||
+          token.name() == colTag || token.name() == colgroupTag ||
+          token.name() == htmlTag || token.name() == tdTag ||
+          token.name() == thTag) {
+        parseError(token);
+        return;
+      }
+      notImplemented();
+      break;
+    case InCellMode:
+      ASSERT(insertionMode() == InCellMode);
+      if (token.name() == thTag || token.name() == tdTag) {
+        if (!m_openElements.inTableScope(token.name())) {
+          parseError(token);
+          return;
+        }
+        generateImpliedEndTags();
+        if (!currentElement()->hasLocalName(token.name()))
+          parseError(token);
+        m_openElements.popUntil(token.name());
+        m_openElements.pop();
+        m_activeFormattingElements.clearToLastMarker();
+        m_insertionMode = InRowMode;
+        ASSERT(currentElement()->hasTagName(trTag));
+        return;
+      }
+      if (token.name() == bodyTag || token.name() == captionTag ||
+          token.name() == colTag || token.name() == colgroupTag ||
+          token.name() == htmlTag) {
+        parseError(token);
+        return;
+      }
+      if (token.name() == tableTag || token.name() == trTag ||
+          isTableBodyContextTag(token.name())) {
+        if (!m_openElements.inTableScope(token.name())) {
+          ASSERT(m_isParsingFragment);
+          // FIXME: It is unclear what the exact ASSERT should be.
+          // http://www.w3.org/Bugs/Public/show_bug.cgi?id=10098
+          parseError(token);
+          return;
+        }
+        closeTheCell();
+        processEndTag(token);
+        return;
+      }
+      processEndTagForInBody(token);
       break;
     case AfterBodyMode:
       ASSERT(insertionMode() == AfterBodyMode);
@@ -1770,12 +1887,15 @@ void HTMLTreeBuilder::processCharacter(AtomicHTMLToken& token) {
     // Fall through
     case InBodyMode:
     case InCaptionMode:
-      ASSERT(insertionMode() == InBodyMode || insertionMode() == InCaptionMode);
+    case InCellMode:
+      ASSERT(insertionMode() == InBodyMode ||
+             insertionMode() == InCaptionMode || insertionMode() == InCellMode);
       notImplemented();
       insertTextNode(token);
       break;
     case InTableMode:
-      ASSERT(insertionMode() == InTableMode);
+    case InRowMode:
+      ASSERT(insertionMode() == InTableMode || insertionMode() == InRowMode);
       notImplemented();  // Crazy pending characters.
       insertTextNode(token);
       break;
@@ -1843,7 +1963,8 @@ void HTMLTreeBuilder::processEndOfFile(AtomicHTMLToken& token) {
       processDefaultForAfterHeadMode(token);
     // Fall through
     case InBodyMode:
-      ASSERT(insertionMode() == InBodyMode);
+    case InCellMode:
+      ASSERT(insertionMode() == InBodyMode || insertionMode() == InCellMode);
       notImplemented();
       break;
     case AfterBodyMode:
