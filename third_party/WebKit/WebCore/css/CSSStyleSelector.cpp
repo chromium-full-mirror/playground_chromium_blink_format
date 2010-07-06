@@ -3232,7 +3232,7 @@ void CSSStyleSelector::applyDeclarations(bool isImportant,
         if (applyFirst) {
           COMPILE_ASSERT(firstCSSProperty == CSSPropertyColor,
                          CSS_color_is_first_property);
-          COMPILE_ASSERT(CSSPropertyZoom == CSSPropertyColor + 10,
+          COMPILE_ASSERT(CSSPropertyZoom == CSSPropertyColor + 11,
                          CSS_zoom_is_end_of_first_prop_range);
           COMPILE_ASSERT(CSSPropertyLineHeight == CSSPropertyZoom + 1,
                          CSS_line_height_is_after_zoom);
