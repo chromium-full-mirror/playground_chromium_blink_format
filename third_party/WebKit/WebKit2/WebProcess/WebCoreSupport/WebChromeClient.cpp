@@ -170,6 +170,10 @@ void WebChromeClient::addMessageToConsole(MessageSource,
                                           const String& message,
                                           unsigned int lineNumber,
                                           const String& sourceID) {
+  // Notify the bundle client.
+  m_page->injectedBundleUIClient().addMessageToConsole(m_page, message,
+                                                       lineNumber);
+
   notImplemented();
 }
 

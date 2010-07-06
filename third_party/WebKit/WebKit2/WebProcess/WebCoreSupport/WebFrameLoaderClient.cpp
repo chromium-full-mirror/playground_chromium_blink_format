@@ -191,7 +191,7 @@ void WebFrameLoaderClient::
     return;
 
   // Notify the bundle client.
-  webPage->injectedBundleClient()
+  webPage->injectedBundleLoaderClient()
       .didReceiveServerRedirectForProvisionalLoadForFrame(webPage, m_frame);
 
   // Notify the UIProcess.
@@ -244,8 +244,8 @@ void WebFrameLoaderClient::dispatchDidStartProvisionalLoad() {
   const String& url = provisionalLoader->url().string();
 
   // Notify the bundle client.
-  webPage->injectedBundleClient().didStartProvisionalLoadForFrame(webPage,
-                                                                  m_frame);
+  webPage->injectedBundleLoaderClient().didStartProvisionalLoadForFrame(
+      webPage, m_frame);
 
   // Notify the UIProcess.
   WebProcess::shared().connection()->send(
@@ -259,8 +259,8 @@ void WebFrameLoaderClient::dispatchDidReceiveTitle(const String& title) {
     return;
 
   // Notify the bundle client.
-  webPage->injectedBundleClient().didReceiveTitleForFrame(webPage, title,
-                                                          m_frame);
+  webPage->injectedBundleLoaderClient().didReceiveTitleForFrame(webPage, title,
+                                                                m_frame);
 
   // Notify the UIProcess.
   WebProcess::shared().connection()->send(
@@ -278,7 +278,7 @@ void WebFrameLoaderClient::dispatchDidCommitLoad() {
     return;
 
   // Notify the bundle client.
-  webPage->injectedBundleClient().didCommitLoadForFrame(webPage, m_frame);
+  webPage->injectedBundleLoaderClient().didCommitLoadForFrame(webPage, m_frame);
 
   // Notify the UIProcess.
   WebProcess::shared().connection()->send(
@@ -293,7 +293,7 @@ void WebFrameLoaderClient::dispatchDidFailProvisionalLoad(
     return;
 
   // Notify the bundle client.
-  webPage->injectedBundleClient().didFailProvisionalLoadWithErrorForFrame(
+  webPage->injectedBundleLoaderClient().didFailProvisionalLoadWithErrorForFrame(
       webPage, m_frame);
 
   // Notify the UIProcess.
@@ -308,8 +308,8 @@ void WebFrameLoaderClient::dispatchDidFailLoad(const ResourceError&) {
     return;
 
   // Notify the bundle client.
-  webPage->injectedBundleClient().didFailLoadWithErrorForFrame(webPage,
-                                                               m_frame);
+  webPage->injectedBundleLoaderClient().didFailLoadWithErrorForFrame(webPage,
+                                                                     m_frame);
 
   // Notify the UIProcess.
   WebProcess::shared().connection()->send(
@@ -327,7 +327,7 @@ void WebFrameLoaderClient::dispatchDidFinishLoad() {
     return;
 
   // Notify the bundle client.
-  webPage->injectedBundleClient().didFinishLoadForFrame(webPage, m_frame);
+  webPage->injectedBundleLoaderClient().didFinishLoadForFrame(webPage, m_frame);
 
   // Notify the UIProcess.
   WebProcess::shared().connection()->send(
@@ -850,7 +850,7 @@ void WebFrameLoaderClient::dispatchDidClearWindowObjectInWorld(
   JSObjectRef windowObject =
       toRef(m_frame->coreFrame()->script()->globalObject(world));
 
-  webPage->injectedBundleClient().didClearWindowObjectForFrame(
+  webPage->injectedBundleLoaderClient().didClearWindowObjectForFrame(
       webPage, m_frame, context, windowObject);
 }
 

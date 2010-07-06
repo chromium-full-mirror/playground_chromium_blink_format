@@ -133,8 +133,13 @@ WebPage::~WebPage() {
 #endif
 }
 
-void WebPage::initializeInjectedBundleClient(WKBundlePageClient* client) {
-  m_client.initialize(client);
+void WebPage::initializeInjectedBundleLoaderClient(
+    WKBundlePageLoaderClient* client) {
+  m_loaderClient.initialize(client);
+}
+
+void WebPage::initializeInjectedBundleUIClient(WKBundlePageUIClient* client) {
+  m_uiClient.initialize(client);
 }
 
 String WebPage::renderTreeExternalRepresentation() const {

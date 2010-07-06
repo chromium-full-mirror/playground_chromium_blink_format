@@ -34,7 +34,7 @@
 extern "C" {
 #endif
 
-// Client
+// Loader Client
 typedef void (*WKBundlePageDidStartProvisionalLoadForFrameCallback)(
     WKBundlePageRef page,
     WKBundleFrameRef frame,
@@ -72,7 +72,7 @@ typedef void (*WKBundlePageDidClearWindowObjectForFrameCallback)(
     JSObjectRef window,
     const void* clientInfo);
 
-struct WKBundlePageClient {
+struct WKBundlePageLoaderClient {
   int version;
   const void* clientInfo;
   WKBundlePageDidStartProvisionalLoadForFrameCallback
@@ -87,10 +87,25 @@ struct WKBundlePageClient {
   WKBundlePageDidReceiveTitleForFrameCallback didReceiveTitleForFrame;
   WKBundlePageDidClearWindowObjectForFrameCallback didClearWindowObjectForFrame;
 };
-typedef struct WKBundlePageClient WKBundlePageClient;
+typedef struct WKBundlePageLoaderClient WKBundlePageLoaderClient;
 
-WK_EXPORT void WKBundlePageSetClient(WKBundlePageRef page,
-                                     WKBundlePageClient* client);
+// UI Client
+typedef void (*WKBundlePageAddMessageToConsoleCallback)(WKBundlePageRef page,
+                                                        WKStringRef message,
+                                                        uint32_t lineNumber,
+                                                        const void* clientInfo);
+
+struct WKBundlePageUIClient {
+  int version;
+  const void* clientInfo;
+  WKBundlePageAddMessageToConsoleCallback addMessageToConsole;
+};
+typedef struct WKBundlePageUIClient WKBundlePageUIClient;
+
+WK_EXPORT void WKBundlePageSetLoaderClient(WKBundlePageRef page,
+                                           WKBundlePageLoaderClient* client);
+WK_EXPORT void WKBundlePageSetUIClient(WKBundlePageRef page,
+                                       WKBundlePageUIClient* client);
 
 WK_EXPORT WKBundleFrameRef WKBundlePageGetMainFrame(WKBundlePageRef page);
 

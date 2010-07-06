@@ -23,8 +23,8 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef InjectedBundlePageClient_h
-#define InjectedBundlePageClient_h
+#ifndef InjectedBundlePageLoaderClient_h
+#define InjectedBundlePageLoaderClient_h
 
 #include "WKBundlePage.h"
 #include <JavaScriptCore/JSBase.h>
@@ -38,10 +38,10 @@ namespace WebKit {
 class WebPage;
 class WebFrame;
 
-class InjectedBundlePageClient {
+class InjectedBundlePageLoaderClient {
  public:
-  InjectedBundlePageClient();
-  void initialize(WKBundlePageClient*);
+  InjectedBundlePageLoaderClient();
+  void initialize(WKBundlePageLoaderClient*);
 
   void didStartProvisionalLoadForFrame(WebPage*, WebFrame*);
   void didReceiveServerRedirectForProvisionalLoadForFrame(WebPage*, WebFrame*);
@@ -56,9 +56,9 @@ class InjectedBundlePageClient {
                                     JSObjectRef);
 
  private:
-  WKBundlePageClient m_client;
+  WKBundlePageLoaderClient m_client;
 };
 
 }  // namespace WebKit
 
-#endif  // InjectedBundlePageClient_h
+#endif  // InjectedBundlePageLoaderClient_h
