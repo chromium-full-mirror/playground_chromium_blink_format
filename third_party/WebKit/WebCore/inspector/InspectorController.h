@@ -69,6 +69,7 @@ class InspectorCSSStore;
 class InspectorDOMStorageResource;
 class InspectorDatabaseResource;
 class InspectorFrontend;
+class InspectorFrontend2;
 class InspectorFrontendClient;
 class InspectorResource;
 class InspectorTimelineAgent;
@@ -403,6 +404,7 @@ class InspectorController
   OwnPtr<InspectorFrontendClient> m_inspectorFrontendClient;
   bool m_openingFrontend;
   OwnPtr<InspectorFrontend> m_frontend;
+  OwnPtr<InspectorFrontend2> m_frontend2;
   RefPtr<InspectorDOMAgent> m_domAgent;
   OwnPtr<InspectorCSSStore> m_cssStore;
   OwnPtr<InspectorTimelineAgent> m_timelineAgent;

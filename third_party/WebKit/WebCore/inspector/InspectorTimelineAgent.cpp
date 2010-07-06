@@ -34,8 +34,8 @@
 #if ENABLE(INSPECTOR)
 
 #include "Event.h"
-#include "InspectorFrontend.h"
 #include "IntRect.h"
+#include "RemoteInspectorFrontend2.h"
 #include "ResourceRequest.h"
 #include "ResourceResponse.h"
 #include "TimelineRecordFactory.h"
@@ -46,7 +46,7 @@ namespace WebCore {
 
 int InspectorTimelineAgent::s_instanceCount = 0;
 
-InspectorTimelineAgent::InspectorTimelineAgent(InspectorFrontend* frontend)
+InspectorTimelineAgent::InspectorTimelineAgent(InspectorFrontend2* frontend)
     : m_frontend(frontend) {
   ++s_instanceCount;
   ScriptGCEvent::addEventListener(this);
@@ -286,7 +286,7 @@ void InspectorTimelineAgent::reset() {
 }
 
 void InspectorTimelineAgent::resetFrontendProxyObject(
-    InspectorFrontend* frontend) {
+    InspectorFrontend2* frontend) {
   ASSERT(frontend);
   reset();
   m_frontend = frontend;

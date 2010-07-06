@@ -202,7 +202,6 @@ class InspectorFrontend : public Noncopyable {
 
   void timelineProfilerWasStarted();
   void timelineProfilerWasStopped();
-  void addRecordToTimeline(const RefPtr<InspectorObject>& record);
 
 #if ENABLE(WORKERS)
   void didCreateWorker(const InspectorWorkerResource&);
