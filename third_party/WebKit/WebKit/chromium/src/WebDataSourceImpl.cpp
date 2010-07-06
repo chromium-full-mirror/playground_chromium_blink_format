@@ -143,7 +143,7 @@ void WebDataSourceImpl::setNextPluginLoadObserver(
     PassOwnPtr<WebPluginLoadObserver> observer) {
   // This call should always be followed up with the creation of a
   // WebDataSourceImpl, so we should never leak this object.
-  m_nextPluginLoadObserver = observer.release();
+  m_nextPluginLoadObserver = observer.leakPtr();
 }
 
 WebDataSourceImpl::WebDataSourceImpl(const ResourceRequest& request,
