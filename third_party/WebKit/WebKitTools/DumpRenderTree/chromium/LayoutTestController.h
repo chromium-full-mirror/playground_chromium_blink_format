@@ -130,6 +130,7 @@ class LayoutTestController : public CppBoundClass {
 
   // Shows DevTools window.
   void showWebInspector(const CppArgumentList&, CppVariant*);
+  void closeWebInspector(const CppArgumentList&, CppVariant*);
 
   // Gives focus to the window.
   void setWindowIsKey(const CppArgumentList&, CppVariant*);

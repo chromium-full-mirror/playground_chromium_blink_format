@@ -28,6 +28,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef TestShell_h
+#define TestShell_h
+
 #include "AccessibilityController.h"
 #include "EventSender.h"
 #include "LayoutTestController.h"
@@ -44,6 +47,7 @@
 // various objects. Only one instance is created in one DRT process.
 
 namespace WebKit {
+class WebDevToolsAgentClient;
 class WebFrame;
 class WebNotificationPresenter;
 class WebPreferences;
@@ -53,6 +57,10 @@ class WebURL;
 namespace skia {
 class PlatformCanvas;
 }
+
+class DRTDevToolsAgent;
+class DRTDevToolsCallArgs;
+class DRTDevToolsClient;
 
 struct TestParams {
   bool dumpTree;
@@ -70,6 +78,7 @@ class TestShell {
  public:
   TestShell(bool testShellMode);
   ~TestShell();
+
   // The main WebView.
   WebKit::WebView* webView() const { return m_webView; }
   // Returns the host for the main WebView.
@@ -137,11 +146,18 @@ class TestShell {
   void closeRemainingWindows();
   int windowCount();
   static void resizeWindowForTest(WebViewHost*, const WebKit::WebURL&);
-  void showDevTools() {}  // FIXME: imeplement this.
+
+  void showDevTools();
+  void closeDevTools();
+
+  DRTDevToolsAgent* drtDevToolsAgent() { return m_drtDevToolsAgent.get(); }
+  DRTDevToolsClient* drtDevToolsClient() { return m_drtDevToolsClient.get(); }
 
   static const int virtualWindowBorder = 3;
 
  private:
+  void createDRTDevToolsClient(DRTDevToolsAgent*);
+
   static void resetWebSettings(WebKit::WebView&);
   void dump();
   std::string dumpAllBackForwardLists();
@@ -154,6 +170,9 @@ class TestShell {
   WebKit::WebWidget* m_focusedWidget;
   bool m_testShellMode;
   WebViewHost* m_webViewHost;
+  WebViewHost* m_devTools;
+  OwnPtr<DRTDevToolsAgent> m_drtDevToolsAgent;
+  OwnPtr<DRTDevToolsClient> m_drtDevToolsClient;
   OwnPtr<AccessibilityController> m_accessibilityController;
   OwnPtr<EventSender> m_eventSender;
   OwnPtr<LayoutTestController> m_layoutTestController;
@@ -177,3 +196,5 @@ class TestShell {
 };
 
 void platformInit();
+
+#endif  // TestShell_h

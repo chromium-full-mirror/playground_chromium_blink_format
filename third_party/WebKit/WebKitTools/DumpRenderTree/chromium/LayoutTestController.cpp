@@ -32,6 +32,7 @@
 #include "config.h"
 #include "LayoutTestController.h"
 
+#include "DRTDevToolsAgent.h"
 #include "TestShell.h"
 #include "WebViewHost.h"
 #include "base/string_util.h"
@@ -102,6 +103,7 @@ LayoutTestController::LayoutTestController(TestShell* shell)
   bindMethod("setAlwaysAcceptCookies",
              &LayoutTestController::setAlwaysAcceptCookies);
   bindMethod("showWebInspector", &LayoutTestController::showWebInspector);
+  bindMethod("closeWebInspector", &LayoutTestController::closeWebInspector);
   bindMethod("setWindowIsKey", &LayoutTestController::setWindowIsKey);
   bindMethod("setTabKeyCyclesThroughElements",
              &LayoutTestController::setTabKeyCyclesThroughElements);
@@ -603,6 +605,12 @@ void LayoutTestController::setAlwaysAcceptCookies(
 void LayoutTestController::showWebInspector(const CppArgumentList&,
                                             CppVariant* result) {
   m_shell->showDevTools();
+  result->setNull();
+}
+
+void LayoutTestController::closeWebInspector(const CppArgumentList& args,
+                                             CppVariant* result) {
+  m_shell->closeDevTools();
   result->setNull();
 }
 
@@ -1351,7 +1359,8 @@ void LayoutTestController::setTimelineProfilingEnabled(
   result->setNull();
   if (arguments.size() < 1 || !arguments[0].isBool())
     return;
-  // FIXME: Should call TestShellDevToolsAgent::setTimelineProfilingEnabled().
+  m_shell->drtDevToolsAgent()->setTimelineProfilingEnabled(
+      arguments[0].toBoolean());
 }
 
 void LayoutTestController::evaluateInWebInspector(
@@ -1361,7 +1370,8 @@ void LayoutTestController::evaluateInWebInspector(
   if (arguments.size() < 2 || !arguments[0].isInt32() ||
       !arguments[1].isString())
     return;
-  // FIXME: Should call TestShellDevToolsAgent::evaluateInWebInspector().
+  m_shell->drtDevToolsAgent()->evaluateInWebInspector(arguments[0].toInt32(),
+                                                      arguments[1].toString());
 }
 
 void LayoutTestController::forceRedSelectionColors(
