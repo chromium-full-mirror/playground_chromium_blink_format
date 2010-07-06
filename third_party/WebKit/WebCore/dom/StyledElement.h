@@ -3,8 +3,8 @@
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
  *           (C) 2001 Peter Kelly (pmk@post.com)
  *           (C) 2001 Dirk Mueller (mueller@kde.org)
- * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009 Apple Inc. All rights
- * reserved.
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 Apple Inc. All
+ * rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -27,10 +27,8 @@
 #define StyledElement_h
 
 #include "CSSMutableStyleDeclaration.h"
-#include "CSSPrimitiveValue.h"
 #include "Element.h"
 #include "MappedAttributeEntry.h"
-#include "NamedNodeMap.h"
 
 namespace WebCore {
 
@@ -41,11 +39,8 @@ class StyledElement : public Element {
  public:
   virtual ~StyledElement();
 
-  NamedNodeMap* mappedAttributes() { return namedAttrMap.get(); }
-  const NamedNodeMap* mappedAttributes() const { return namedAttrMap.get(); }
-
   bool hasMappedAttributes() const {
-    return namedAttrMap && mappedAttributes()->hasMappedAttributes();
+    return attributeMap() && attributeMap()->hasMappedAttributes();
   }
   bool isMappedAttribute(const QualifiedName& name) const {
     MappedAttributeEntry res = eNone;
@@ -83,16 +78,12 @@ class StyledElement : public Element {
   }
   virtual bool canHaveAdditionalAttributeStyleDecls() const { return false; }
   virtual void additionalAttributeStyleDecls(
-      Vector<CSSMutableStyleDeclaration*>&){};
+      Vector<CSSMutableStyleDeclaration*>&) {}
   CSSMutableStyleDeclaration* getInlineStyleDecl();
   CSSStyleDeclaration* style();
   void invalidateStyleAttribute();
 
-  const SpaceSplitString& classNames() const {
-    ASSERT(hasClass());
-    ASSERT(mappedAttributes());
-    return mappedAttributes()->classNames();
-  }
+  const SpaceSplitString& classNames() const;
 
   virtual bool mapToEntry(const QualifiedName& attrName,
                           MappedAttributeEntry& result) const;
@@ -128,6 +119,12 @@ class StyledElement : public Element {
 
   RefPtr<CSSMutableStyleDeclaration> m_inlineStyleDecl;
 };
+
+inline const SpaceSplitString& StyledElement::classNames() const {
+  ASSERT(hasClass());
+  ASSERT(attributeMap());
+  return attributeMap()->classNames();
+}
 
 inline void StyledElement::invalidateStyleAttribute() {
   clearIsStyleAttributeValid();
