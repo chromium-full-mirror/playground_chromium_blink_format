@@ -28,6 +28,7 @@
 
 #include "NamedNodeMap.h"
 #include <wtf/Noncopyable.h>
+#include <wtf/PassOwnPtr.h>
 #include <wtf/Vector.h>
 
 namespace WebCore {
@@ -273,7 +274,7 @@ class AtomicHTMLToken : public Noncopyable {
         break;
       case HTMLToken::DOCTYPE:
         m_name = AtomicString(token.name().data(), token.name().size());
-        m_doctypeData.set(token.m_doctypeData.release());
+        m_doctypeData = token.m_doctypeData.release();
         break;
       case HTMLToken::EndOfFile:
         break;

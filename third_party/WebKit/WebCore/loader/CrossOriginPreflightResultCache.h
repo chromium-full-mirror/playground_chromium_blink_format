@@ -31,6 +31,7 @@
 #include "StringHash.h"
 #include <wtf/HashMap.h>
 #include <wtf/HashSet.h>
+#include <wtf/PassOwnPtr.h>
 
 namespace WebCore {
 
@@ -69,7 +70,7 @@ class CrossOriginPreflightResultCache : public Noncopyable {
 
   void appendEntry(const String& origin,
                    const KURL&,
-                   CrossOriginPreflightResultCacheItem*);
+                   PassOwnPtr<CrossOriginPreflightResultCacheItem>);
   bool canSkipPreflight(const String& origin,
                         const KURL&,
                         bool includeCredentials,

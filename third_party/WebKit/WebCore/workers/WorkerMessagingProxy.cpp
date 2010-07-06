@@ -260,7 +260,7 @@ void WorkerMessagingProxy::postMessageToWorkerObject(
     PassRefPtr<SerializedScriptValue> message,
     PassOwnPtr<MessagePortChannelArray> channels) {
   m_scriptExecutionContext->postTask(
-      MessageWorkerTask::create(message, channels.release(), this));
+      MessageWorkerTask::create(message, channels, this));
 }
 
 void WorkerMessagingProxy::postMessageToWorkerContext(
@@ -272,10 +272,10 @@ void WorkerMessagingProxy::postMessageToWorkerContext(
   if (m_workerThread) {
     ++m_unconfirmedMessageCount;
     m_workerThread->runLoop().postTask(
-        MessageWorkerContextTask::create(message, channels.release()));
+        MessageWorkerContextTask::create(message, channels));
   } else
     m_queuedEarlyTasks.append(
-        MessageWorkerContextTask::create(message, channels.release()));
+        MessageWorkerContextTask::create(message, channels));
 }
 
 void WorkerMessagingProxy::postTaskForModeToWorkerContext(

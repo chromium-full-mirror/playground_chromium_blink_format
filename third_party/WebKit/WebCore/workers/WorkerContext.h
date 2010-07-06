@@ -92,9 +92,9 @@ class WorkerContext : public RefCounted<WorkerContext>,
   WorkerNavigator* navigator() const;
 
   // Timers
-  int setTimeout(ScheduledAction*, int timeout);
+  int setTimeout(PassOwnPtr<ScheduledAction>, int timeout);
   void clearTimeout(int timeoutId);
-  int setInterval(ScheduledAction*, int timeout);
+  int setInterval(PassOwnPtr<ScheduledAction>, int timeout);
   void clearInterval(int timeoutId);
 
   // ScriptExecutionContext

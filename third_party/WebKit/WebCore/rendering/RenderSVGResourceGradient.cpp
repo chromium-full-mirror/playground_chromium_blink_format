@@ -119,7 +119,7 @@ static inline bool createMaskAndSwapContextForTextGradient(
                               -maskAbsoluteBoundingBox.y());
   maskImageContext->concatCTM(transform);
 
-  imageBuffer.set(maskImage.release());
+  imageBuffer = maskImage.release();
   savedContext = context;
   context = maskImageContext;
 

@@ -843,7 +843,7 @@ String TextResourceDecoder::decode(const char* data, size_t len) {
   ASSERT(m_encoding.isValid());
 
   if (!m_codec)
-    m_codec.set(newTextCodec(m_encoding).release());
+    m_codec = newTextCodec(m_encoding);
 
   if (m_buffer.isEmpty())
     return m_codec->decode(data + lengthOfBOM, len - lengthOfBOM, false,
@@ -877,7 +877,7 @@ String TextResourceDecoder::flush() {
   }
 
   if (!m_codec)
-    m_codec.set(newTextCodec(m_encoding).release());
+    m_codec = newTextCodec(m_encoding);
 
   String result = m_codec->decode(
       m_buffer.data(), m_buffer.size(), true,

@@ -457,8 +457,8 @@ void DefaultSharedWorkerRepository::connectToWorker(
   if (proxy->thread())
     proxy->thread()->runLoop().postTask(SharedWorkerConnectTask::create(port));
   else {
-    RefPtr<SharedWorkerScriptLoader> loader = adoptRef(
-        new SharedWorkerScriptLoader(worker, port.release(), proxy.release()));
+    RefPtr<SharedWorkerScriptLoader> loader =
+        adoptRef(new SharedWorkerScriptLoader(worker, port, proxy.release()));
     loader->load(url);
   }
 }

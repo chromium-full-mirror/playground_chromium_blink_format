@@ -106,7 +106,7 @@ DocumentThreadableLoader::DocumentThreadableLoader(
                                        crossOriginRequest->httpHeaderFields()))
     makeSimpleCrossOriginAccessRequest(*crossOriginRequest);
   else {
-    m_actualRequest.set(crossOriginRequest.release());
+    m_actualRequest = crossOriginRequest.release();
 
     if (CrossOriginPreflightResultCache::shared().canSkipPreflight(
             document->securityOrigin()->toString(), m_actualRequest->url(),

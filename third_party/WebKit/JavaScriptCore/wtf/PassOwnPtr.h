@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009 Apple Inc. All rights reserved.
+ * Copyright (C) 2009, 2010 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -30,6 +30,10 @@
 #include "OwnPtrCommon.h"
 #include "TypeTraits.h"
 
+// Remove this once we make all WebKit code compatible with stricter rules about
+// PassOwnPtr.
+#define LOOSE_PASS_OWN_PTR
+
 namespace WTF {
 
 // Unlike most of our smart pointers, PassOwnPtr can take either the pointer
@@ -37,6 +41,10 @@ namespace WTF {
 
 template <typename T>
 class OwnPtr;
+template <typename T>
+class PassOwnPtr;
+template <typename T>
+PassOwnPtr<T> adoptPtr(T*);
 
 template <typename T>
 class PassOwnPtr {
@@ -44,26 +52,22 @@ class PassOwnPtr {
   typedef typename RemovePointer<T>::Type ValueType;
   typedef ValueType* PtrType;
 
-  PassOwnPtr(PtrType ptr = 0) : m_ptr(ptr) {}
+  PassOwnPtr() : m_ptr(0) {}
+
   // It somewhat breaks the type system to allow transfer of ownership out of
   // a const PassOwnPtr. However, it makes it much easier to work with
   // PassOwnPtr
-  // temporaries, and we don't really have a need to use real const PassOwnPtrs
-  // anyway.
-  PassOwnPtr(const PassOwnPtr& o) : m_ptr(o.release()) {}
+  // temporaries, and we don't have a need to use real const PassOwnPtrs anyway.
+  PassOwnPtr(const PassOwnPtr& o) : m_ptr(o.leakPtr()) {}
   template <typename U>
-  PassOwnPtr(const PassOwnPtr<U>& o) : m_ptr(o.release()) {}
+  PassOwnPtr(const PassOwnPtr<U>& o) : m_ptr(o.leakPtr()) {}
 
   ~PassOwnPtr() { deleteOwnedPtr(m_ptr); }
 
   PtrType get() const { return m_ptr; }
 
   void clear() { m_ptr = 0; }
-  PtrType release() const {
-    PtrType ptr = m_ptr;
-    m_ptr = 0;
-    return ptr;
-  }
+  PtrType leakPtr() const;
 
   ValueType& operator*() const {
     ASSERT(m_ptr);
@@ -83,29 +87,49 @@ class PassOwnPtr {
     return m_ptr ? &PassOwnPtr::m_ptr : 0;
   }
 
-  PassOwnPtr& operator=(T*);
   PassOwnPtr& operator=(const PassOwnPtr<T>&);
   template <typename U>
   PassOwnPtr& operator=(const PassOwnPtr<U>&);
 
+  template <typename U>
+  friend PassOwnPtr<U> adoptPtr(U*);
+
+#ifdef LOOSE_PASS_OWN_PTR
+  PassOwnPtr(PtrType ptr) : m_ptr(ptr) {}
+  PassOwnPtr& operator=(PtrType);
+#endif
+
  private:
+#ifndef LOOSE_PASS_OWN_PTR
+  explicit PassOwnPtr(PtrType ptr) : m_ptr(ptr) {}
+#endif
+
   mutable PtrType m_ptr;
 };
 
 template <typename T>
-inline PassOwnPtr<T>& PassOwnPtr<T>::operator=(T* optr) {
-  T* ptr = m_ptr;
+inline typename PassOwnPtr<T>::PtrType PassOwnPtr<T>::leakPtr() const {
+  PtrType ptr = m_ptr;
+  m_ptr = 0;
+  return ptr;
+}
+
+#ifdef LOOSE_PASS_OWN_PTR
+template <typename T>
+inline PassOwnPtr<T>& PassOwnPtr<T>::operator=(PtrType optr) {
+  PtrType ptr = m_ptr;
   m_ptr = optr;
   ASSERT(!ptr || m_ptr != ptr);
   if (ptr)
     deleteOwnedPtr(ptr);
   return *this;
 }
+#endif
 
 template <typename T>
 inline PassOwnPtr<T>& PassOwnPtr<T>::operator=(const PassOwnPtr<T>& optr) {
-  T* ptr = m_ptr;
-  m_ptr = optr.release();
+  PtrType ptr = m_ptr;
+  m_ptr = optr.leakPtr();
   ASSERT(!ptr || m_ptr != ptr);
   if (ptr)
     deleteOwnedPtr(ptr);
@@ -115,8 +139,8 @@ inline PassOwnPtr<T>& PassOwnPtr<T>::operator=(const PassOwnPtr<T>& optr) {
 template <typename T>
 template <typename U>
 inline PassOwnPtr<T>& PassOwnPtr<T>::operator=(const PassOwnPtr<U>& optr) {
-  T* ptr = m_ptr;
-  m_ptr = optr.release();
+  PtrType ptr = m_ptr;
+  m_ptr = optr.leakPtr();
   ASSERT(!ptr || m_ptr != ptr);
   if (ptr)
     deleteOwnedPtr(ptr);
@@ -173,14 +197,19 @@ inline bool operator!=(T* a, const PassOwnPtr<U>& b) {
   return a != b.get();
 }
 
+template <typename T>
+inline PassOwnPtr<T> adoptPtr(T* ptr) {
+  return PassOwnPtr<T>(ptr);
+}
+
 template <typename T, typename U>
 inline PassOwnPtr<T> static_pointer_cast(const PassOwnPtr<U>& p) {
-  return PassOwnPtr<T>(static_cast<T*>(p.release()));
+  return adoptPtr(static_cast<T*>(p.leakPtr()));
 }
 
 template <typename T, typename U>
 inline PassOwnPtr<T> const_pointer_cast(const PassOwnPtr<U>& p) {
-  return PassOwnPtr<T>(const_cast<T*>(p.release()));
+  return adoptPtr(const_cast<T*>(p.leakPtr()));
 }
 
 template <typename T>
@@ -191,6 +220,7 @@ inline T* getPtr(const PassOwnPtr<T>& p) {
 }  // namespace WTF
 
 using WTF::PassOwnPtr;
+using WTF::adoptPtr;
 using WTF::const_pointer_cast;
 using WTF::static_pointer_cast;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009 Apple Inc. All rights reserved.
+ * Copyright (C) 2009, 2010 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -31,6 +31,7 @@
 #include "Interpreter.h"
 #include "Nodes.h"
 #include "SamplingTool.h"
+#include <wtf/PassOwnPtr.h>
 
 namespace JSC {
 
@@ -175,9 +176,9 @@ class ScriptExecutable : public ExecutableBase {
            (EvalFeature | ClosureFeature | WithFeature | CatchFeature);
   }
 
-  virtual ExceptionInfo* reparseExceptionInfo(JSGlobalData*,
-                                              ScopeChainNode*,
-                                              CodeBlock*) = 0;
+  virtual PassOwnPtr<ExceptionInfo> reparseExceptionInfo(JSGlobalData*,
+                                                         ScopeChainNode*,
+                                                         CodeBlock*) = 0;
 
  protected:
   void recordParse(CodeFeatures features, int firstLine, int lastLine) {
@@ -206,9 +207,6 @@ class EvalExecutable : public ScriptExecutable {
 
   JSObject* compile(ExecState*, ScopeChainNode*);
 
-  ExceptionInfo* reparseExceptionInfo(JSGlobalData*,
-                                      ScopeChainNode*,
-                                      CodeBlock*);
   static PassRefPtr<EvalExecutable> create(ExecState* exec,
                                            const SourceCode& source) {
     return adoptRef(new EvalExecutable(exec, source));
@@ -217,6 +215,11 @@ class EvalExecutable : public ScriptExecutable {
  private:
   EvalExecutable(ExecState* exec, const SourceCode& source)
       : ScriptExecutable(exec, source), m_evalCodeBlock(0) {}
+
+  virtual PassOwnPtr<ExceptionInfo> reparseExceptionInfo(JSGlobalData*,
+                                                         ScopeChainNode*,
+                                                         CodeBlock*);
+
   EvalCodeBlock* m_evalCodeBlock;
 
 #if ENABLE(JIT)
@@ -252,18 +255,14 @@ class ProgramExecutable : public ScriptExecutable {
   JSObject* checkSyntax(ExecState*);
   JSObject* compile(ExecState*, ScopeChainNode*);
 
-  // CodeBlocks for program code are transient and therefore do not gain from
-  // from throwing out there exception information.
-  ExceptionInfo* reparseExceptionInfo(JSGlobalData*,
-                                      ScopeChainNode*,
-                                      CodeBlock*) {
-    ASSERT_NOT_REACHED();
-    return 0;
-  }
-
  private:
   ProgramExecutable(ExecState* exec, const SourceCode& source)
       : ScriptExecutable(exec, source), m_programCodeBlock(0) {}
+
+  virtual PassOwnPtr<ExceptionInfo> reparseExceptionInfo(JSGlobalData*,
+                                                         ScopeChainNode*,
+                                                         CodeBlock*);
+
   ProgramCodeBlock* m_programCodeBlock;
 
 #if ENABLE(JIT)
@@ -360,9 +359,6 @@ class FunctionExecutable : public ScriptExecutable {
   SharedSymbolTable* symbolTable() const { return m_symbolTable; }
 
   void recompile(ExecState*);
-  ExceptionInfo* reparseExceptionInfo(JSGlobalData*,
-                                      ScopeChainNode*,
-                                      CodeBlock*);
   void markAggregate(MarkStack& markStack);
   static PassRefPtr<FunctionExecutable> fromGlobalCode(const Identifier&,
                                                        ExecState*,
@@ -412,6 +408,10 @@ class FunctionExecutable : public ScriptExecutable {
 
   bool compileForCall(ExecState*, ScopeChainNode*);
   bool compileForConstruct(ExecState*, ScopeChainNode*);
+
+  virtual PassOwnPtr<ExceptionInfo> reparseExceptionInfo(JSGlobalData*,
+                                                         ScopeChainNode*,
+                                                         CodeBlock*);
 
   unsigned m_numVariables : 31;
   bool m_forceUsesArguments : 1;

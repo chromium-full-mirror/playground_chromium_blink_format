@@ -41,13 +41,15 @@ class MediaQuery : public Noncopyable {
  public:
   enum Restrictor { Only, Not, None };
 
-  MediaQuery(Restrictor r,
+  MediaQuery(Restrictor,
              const String& mediaType,
              PassOwnPtr<Vector<MediaQueryExp*>> exprs);
   ~MediaQuery();
 
   Restrictor restrictor() const { return m_restrictor; }
-  const Vector<MediaQueryExp*>* expressions() const { return m_expressions; }
+  const Vector<MediaQueryExp*>* expressions() const {
+    return m_expressions.get();
+  }
   String mediaType() const { return m_mediaType; }
   bool operator==(const MediaQuery& other) const;
   String cssText() const;
@@ -56,7 +58,7 @@ class MediaQuery : public Noncopyable {
  private:
   Restrictor m_restrictor;
   String m_mediaType;
-  Vector<MediaQueryExp*>* m_expressions;
+  OwnPtr<Vector<MediaQueryExp*>> m_expressions;
   bool m_ignored;
   String m_serializationCache;
 

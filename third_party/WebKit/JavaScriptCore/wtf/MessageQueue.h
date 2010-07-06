@@ -95,7 +95,7 @@ MessageQueue<DataType>::~MessageQueue() {
 template <typename DataType>
 inline void MessageQueue<DataType>::append(PassOwnPtr<DataType> message) {
   MutexLocker lock(m_mutex);
-  m_queue.append(message.release());
+  m_queue.append(message.leakPtr());
   m_condition.signal();
 }
 
@@ -105,7 +105,7 @@ inline bool MessageQueue<DataType>::appendAndCheckEmpty(
     PassOwnPtr<DataType> message) {
   MutexLocker lock(m_mutex);
   bool wasEmpty = m_queue.isEmpty();
-  m_queue.append(message.release());
+  m_queue.append(message.leakPtr());
   m_condition.signal();
   return wasEmpty;
 }
@@ -113,7 +113,7 @@ inline bool MessageQueue<DataType>::appendAndCheckEmpty(
 template <typename DataType>
 inline void MessageQueue<DataType>::prepend(PassOwnPtr<DataType> message) {
   MutexLocker lock(m_mutex);
-  m_queue.prepend(message.release());
+  m_queue.prepend(message.leakPtr());
   m_condition.signal();
 }
 

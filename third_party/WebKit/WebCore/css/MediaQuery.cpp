@@ -78,7 +78,7 @@ MediaQuery::MediaQuery(Restrictor r,
                        PassOwnPtr<Vector<MediaQueryExp*>> exprs)
     : m_restrictor(r),
       m_mediaType(mediaType.lower()),
-      m_expressions(exprs.release()),
+      m_expressions(exprs),
       m_ignored(false) {
   if (!m_expressions) {
     m_expressions = new Vector<MediaQueryExp*>;
@@ -105,7 +105,6 @@ MediaQuery::MediaQuery(Restrictor r,
 
 MediaQuery::~MediaQuery() {
   deleteAllValues(*m_expressions);
-  delete m_expressions;
 }
 
 // http://dev.w3.org/csswg/cssom/#compare-media-queries

@@ -82,9 +82,7 @@ struct CrossThreadCopierBase<false, true, T> {
 template <typename T>
 struct CrossThreadCopierBase<false, false, PassOwnPtr<T>> {
   typedef PassOwnPtr<T> Type;
-  static Type copy(const PassOwnPtr<T>& ownPtr) {
-    return PassOwnPtr<T>(static_cast<T*>(ownPtr.release()));
-  }
+  static Type copy(Type ownPtr) { return ownPtr; }
 };
 
 template <>
