@@ -843,7 +843,25 @@ void HTMLTreeBuilder::processStartTag(AtomicHTMLToken& token) {
                            // current node, it must instead be foster parented."
       processStartTagForInBody(token);
       break;
+    case InCaptionMode:
+      ASSERT(insertionMode() == InCaptionMode);
+      if (token.name() == captionTag || token.name() == colTag ||
+          token.name() == colgroupTag || token.name() == tbodyTag ||
+          token.name() == tdTag || token.name() == tfootTag ||
+          token.name() == thTag || token.name() == theadTag ||
+          token.name() == trTag) {
+        parseError(token);
+        if (!processCaptionEndTagForInCaption()) {
+          ASSERT(m_isParsingFragment);
+          return;
+        }
+        processStartTag(token);
+        return;
+      }
+      processStartTagForInBody(token);
+      break;
     case InColumnGroupMode:
+      ASSERT(insertionMode() == InColumnGroupMode);
       if (token.name() == htmlTag) {
         insertHTMLStartTagInBody(token);
         return;
@@ -1421,6 +1439,21 @@ void HTMLTreeBuilder::processEndTagForInBody(AtomicHTMLToken& token) {
   processAnyOtherEndTagForInBody(token);
 }
 
+bool HTMLTreeBuilder::processCaptionEndTagForInCaption() {
+  if (!m_openElements.inTableScope(captionTag.localName())) {
+    ASSERT(m_isParsingFragment);
+    // FIXME: parse error
+    return false;
+  }
+  generateImpliedEndTags();
+  // FIXME: parse error if (!currentElement()->hasTagName(captionTag))
+  m_openElements.popUntil(captionTag.localName());
+  m_openElements.pop();
+  m_activeFormattingElements.clearToLastMarker();
+  m_insertionMode = InTableMode;
+  return true;
+}
+
 void HTMLTreeBuilder::processEndTag(AtomicHTMLToken& token) {
   ASSERT(token.type() == HTMLToken::EndTag);
   switch (insertionMode()) {
@@ -1497,6 +1530,31 @@ void HTMLTreeBuilder::processEndTag(AtomicHTMLToken& token) {
       }
       // FIXME: Do we need to worry about "whenever a node would be inserted
       // into the current node, it must instead be foster parented"?
+      processEndTagForInBody(token);
+      break;
+    case InCaptionMode:
+      ASSERT(insertionMode() == InCaptionMode);
+      if (token.name() == captionTag) {
+        processCaptionEndTagForInCaption();
+        return;
+      }
+      if (token.name() == tableTag) {
+        parseError(token);
+        if (!processCaptionEndTagForInCaption()) {
+          ASSERT(m_isParsingFragment);
+          return;
+        }
+        processEndTag(token);
+        return;
+      }
+      if (token.name() == bodyTag || token.name() == colTag ||
+          token.name() == colgroupTag || token.name() == htmlTag ||
+          token.name() == tbodyTag || token.name() == tdTag ||
+          token.name() == tfootTag || token.name() == thTag ||
+          token.name() == theadTag || token.name() == trTag) {
+        parseError(token);
+        return;
+      }
       processEndTagForInBody(token);
       break;
     case AfterBodyMode:
@@ -1666,7 +1724,10 @@ void HTMLTreeBuilder::processCharacter(AtomicHTMLToken& token) {
       processDefaultForAfterHeadMode(token);
     // Fall through
     case InBodyMode:
-      ASSERT(insertionMode() == InBodyMode);
+    case InTableMode:
+    case InCaptionMode:
+      ASSERT(insertionMode() == InBodyMode || insertionMode() == InTableMode ||
+             insertionMode() == InCaptionMode);
       notImplemented();
       insertTextNode(token);
       break;
@@ -1964,8 +2025,8 @@ bool HTMLTreeBuilder::indexOfFirstUnopenFormattingElement(
     const HTMLFormattingElementList::Entry& entry =
         m_activeFormattingElements[index];
     if (entry.isMarker() || m_openElements.contains(entry.element())) {
-      firstUnopenElementIndex = index;
-      return true;
+      firstUnopenElementIndex = index + 1;
+      return firstUnopenElementIndex < m_activeFormattingElements.size();
     }
   } while (index);
   return false;

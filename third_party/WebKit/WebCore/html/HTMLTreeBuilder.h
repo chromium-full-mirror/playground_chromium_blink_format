@@ -133,6 +133,7 @@ class HTMLTreeBuilder : public Noncopyable {
   PassRefPtr<NamedNodeMap> attributesForIsindexInput(AtomicHTMLToken&);
   void processIsindexStartTagForBody(AtomicHTMLToken&);
   bool processBodyEndTagForInBody(AtomicHTMLToken&);
+  bool processCaptionEndTagForInCaption();
   void processAnyOtherEndTagForInBody(AtomicHTMLToken&);
 
   void processFakeStartTag(const QualifiedName&,
