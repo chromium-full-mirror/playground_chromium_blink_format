@@ -128,10 +128,9 @@ class HTMLTreeBuilder : public Noncopyable {
   void processDefaultForAfterHeadMode(AtomicHTMLToken&);
 
   bool processStartTagForInHead(AtomicHTMLToken&);
-
+  void processStartTagForInBody(AtomicHTMLToken&);
   PassRefPtr<NamedNodeMap> attributesForIsindexInput(AtomicHTMLToken&);
   void processIsindexStartTagForBody(AtomicHTMLToken&);
-
   bool processBodyEndTagForInBody(AtomicHTMLToken&);
   void processAnyOtherEndTagForInBody(AtomicHTMLToken&);
 
