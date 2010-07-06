@@ -31,6 +31,7 @@
 #include "config.h"
 #include "ScriptCallStack.h"
 
+#include "InspectorValues.h"
 #include "ScriptScope.h"
 #include "ScriptController.h"
 #include "ScriptDebugServer.h"
@@ -103,14 +104,33 @@ const ScriptCallFrame& ScriptCallStack::at(unsigned index) const {
 }
 
 bool ScriptCallStack::stackTrace(int frameLimit,
-                                 ScriptState* state,
-                                 ScriptArray& stackTrace) {
-  ScriptScope scope(state);
+                                 const RefPtr<InspectorArray>& stackTrace) {
+  if (!v8::Context::InContext())
+    return false;
+  v8::Handle<v8::Context> context = v8::Context::GetCurrent();
+  if (context.IsEmpty())
+    return false;
+  v8::HandleScope scope;
+  v8::Context::Scope contextScope(context);
   v8::Handle<v8::StackTrace> trace(
       v8::StackTrace::CurrentStackTrace(frameLimit));
-  if (trace.IsEmpty() || !trace->GetFrameCount())
+  int frameCount = trace->GetFrameCount();
+  if (trace.IsEmpty() || !frameCount)
     return false;
-  stackTrace = ScriptArray(state, trace->AsArray());
+  for (int i = 0; i < frameCount; ++i) {
+    v8::Handle<v8::StackFrame> frame = trace->GetFrame(i);
+    RefPtr<InspectorObject> frameObject = InspectorObject::create();
+    v8::Local<v8::String> scriptName = frame->GetScriptName();
+    frameObject->setString(
+        "scriptName", scriptName.IsEmpty() ? "" : toWebCoreString(scriptName));
+    v8::Local<v8::String> functionName = frame->GetFunctionName();
+    frameObject->setString("functionName", functionName.IsEmpty()
+                                               ? ""
+                                               : toWebCoreString(functionName));
+    frameObject->setNumber("lineNumber", frame->GetLineNumber());
+    frameObject->setNumber("column", frame->GetColumn());
+    stackTrace->push(frameObject);
+  }
   return true;
 }
 

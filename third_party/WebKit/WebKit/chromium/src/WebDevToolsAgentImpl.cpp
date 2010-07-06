@@ -574,6 +574,12 @@ bool WebDevToolsAgentImpl::sendMessageToFrontend(
   if (!devToolsAgent)
     return false;
 
+  if (devToolsAgent->m_apuAgentEnabled &&
+      devToolsAgent->m_apuAgentDelegateStub) {
+    devToolsAgent->m_apuAgentDelegateStub->dispatchToApu(message);
+    return true;
+  }
+
   WebVector<WebString> arguments(size_t(1));
   arguments[0] = message;
   WebDevToolsMessageData data;

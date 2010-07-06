@@ -36,6 +36,7 @@
 #include "ScriptState.h"
 #include "ScriptString.h"
 #include <wtf/Noncopyable.h>
+#include <wtf/RefPtr.h>
 
 namespace JSC {
 class ExecState;
@@ -43,6 +44,8 @@ class JSValue;
 }
 
 namespace WebCore {
+
+class InspectorArray;
 
 class ScriptCallStack : public Noncopyable {
  public:
@@ -56,7 +59,7 @@ class ScriptCallStack : public Noncopyable {
   // frame retrieval methods
   const ScriptCallFrame& at(unsigned);
   unsigned size();
-  static bool stackTrace(int, ScriptState*, ScriptArray&);
+  static bool stackTrace(int, const RefPtr<InspectorArray>&);
 
  private:
   void initialize();

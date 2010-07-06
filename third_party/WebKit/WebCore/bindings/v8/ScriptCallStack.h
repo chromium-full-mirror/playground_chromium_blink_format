@@ -36,12 +36,15 @@
 #include "ScriptState.h"
 #include "ScriptValue.h"
 #include <wtf/Noncopyable.h>
+#include <wtf/RefPtr.h>
 
 namespace v8 {
 class Arguments;
 }
 
 namespace WebCore {
+
+class InspectorArray;
 
 class ScriptCallStack : public Noncopyable {
  public:
@@ -60,8 +63,7 @@ class ScriptCallStack : public Noncopyable {
   //   column: <1 based column offset on the line>
   // }
   static bool stackTrace(int frameLimit,
-                         ScriptState* state,
-                         ScriptArray& stackTrace);
+                         const RefPtr<InspectorArray>& stackTrace);
 
   const ScriptCallFrame& at(unsigned) const;
   // FIXME: implement retrieving and storing call stack trace
