@@ -123,6 +123,11 @@ void ScrollView::setGtkAdjustments(GtkAdjustment* hadj,
         reinterpret_cast<ScrollbarGtk*>(verticalScrollbar());
     vScrollbar->attachAdjustment(m_verticalAdjustment);
 
+    // Reconsider having scrollbars early so that doing it doesn't
+    // undo the work that follows, in GtkScrollWindow's eyes
+    setHasVerticalScrollbar(false);
+    setHasHorizontalScrollbar(false);
+
     // We used to reset everything to 0 here, but when page cache
     // is enabled we reuse FrameViews that are cached. Since their
     // size is not going to change when being restored, (which is
