@@ -765,7 +765,8 @@ enum {
 WebCore::ResourceError FrameLoaderClientQt::blockedError(
     const WebCore::ResourceRequest& request) {
   return ResourceError(
-      "WebKit", WebKitErrorCannotUseRestrictedPort, request.url().prettyURL(),
+      "WebKitErrorDomain", WebKitErrorCannotUseRestrictedPort,
+      request.url().prettyURL(),
       QCoreApplication::translate("QWebFrame", "Request blocked", 0,
                                   QCoreApplication::UnicodeUTF8));
 }
@@ -773,7 +774,7 @@ WebCore::ResourceError FrameLoaderClientQt::blockedError(
 WebCore::ResourceError FrameLoaderClientQt::cannotShowURLError(
     const WebCore::ResourceRequest& request) {
   return ResourceError(
-      "WebKit", WebKitErrorCannotShowURL, request.url().string(),
+      "WebKitErrorDomain", WebKitErrorCannotShowURL, request.url().string(),
       QCoreApplication::translate("QWebFrame", "Cannot show URL", 0,
                                   QCoreApplication::UnicodeUTF8));
 }
@@ -781,7 +782,7 @@ WebCore::ResourceError FrameLoaderClientQt::cannotShowURLError(
 WebCore::ResourceError FrameLoaderClientQt::interruptForPolicyChangeError(
     const WebCore::ResourceRequest& request) {
   return ResourceError(
-      "WebKit", WebKitErrorFrameLoadInterruptedByPolicyChange,
+      "WebKitErrorDomain", WebKitErrorFrameLoadInterruptedByPolicyChange,
       request.url().string(),
       QCoreApplication::translate("QWebFrame",
                                   "Frame load interrupted by policy change", 0,
@@ -791,7 +792,8 @@ WebCore::ResourceError FrameLoaderClientQt::interruptForPolicyChangeError(
 WebCore::ResourceError FrameLoaderClientQt::cannotShowMIMETypeError(
     const WebCore::ResourceResponse& response) {
   return ResourceError(
-      "WebKit", WebKitErrorCannotShowMIMEType, response.url().string(),
+      "WebKitErrorDomain", WebKitErrorCannotShowMIMEType,
+      response.url().string(),
       QCoreApplication::translate("QWebFrame", "Cannot show mimetype", 0,
                                   QCoreApplication::UnicodeUTF8));
 }
