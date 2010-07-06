@@ -19,27 +19,28 @@
  */
 
 #include "config.h"
-#include "JSPluginArray.h"
+#include "JSDOMMimeTypeArray.h"
 
 #include "AtomicString.h"
-#include "JSPlugin.h"
-#include "PluginArray.h"
+#include "DOMMimeTypeArray.h"
+#include "JSDOMMimeType.h"
 
 namespace WebCore {
 
 using namespace JSC;
 
-bool JSPluginArray::canGetItemsForName(ExecState*,
-                                       PluginArray* pluginArray,
-                                       const Identifier& propertyName) {
-  return pluginArray->canGetItemsForName(
+bool JSDOMMimeTypeArray::canGetItemsForName(ExecState*,
+                                            DOMMimeTypeArray* mimeTypeArray,
+                                            const Identifier& propertyName) {
+  return mimeTypeArray->canGetItemsForName(
       identifierToAtomicString(propertyName));
 }
 
-JSValue JSPluginArray::nameGetter(ExecState* exec,
-                                  JSValue slotBase,
-                                  const Identifier& propertyName) {
-  JSPluginArray* thisObj = static_cast<JSPluginArray*>(asObject(slotBase));
+JSValue JSDOMMimeTypeArray::nameGetter(ExecState* exec,
+                                       JSValue slotBase,
+                                       const Identifier& propertyName) {
+  JSDOMMimeTypeArray* thisObj =
+      static_cast<JSDOMMimeTypeArray*>(asObject(slotBase));
   return toJS(
       exec, thisObj->impl()->namedItem(identifierToAtomicString(propertyName)));
 }

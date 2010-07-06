@@ -18,15 +18,43 @@
     Boston, MA 02110-1301, USA.
 */
 
-module window {
+#ifndef DOMPluginArray_h
+#define DOMPluginArray_h
 
-    interface [
-        HasNameGetter,
-        HasIndexGetter
-    ] MimeTypeArray {
-        readonly attribute unsigned long length;
-        MimeType item(in unsigned long index);
-        MimeType namedItem(in DOMString name);
-    };
+#include "DOMPlugin.h"
+#include <wtf/PassRefPtr.h>
+#include <wtf/RefCounted.h>
+#include <wtf/Vector.h>
 
-}
+namespace WebCore {
+
+class AtomicString;
+class Frame;
+class PluginData;
+
+class DOMPluginArray : public RefCounted<DOMPluginArray> {
+ public:
+  static PassRefPtr<DOMPluginArray> create(Frame* frame) {
+    return adoptRef(new DOMPluginArray(frame));
+  }
+  ~DOMPluginArray();
+
+  void disconnectFrame() { m_frame = 0; }
+
+  unsigned length() const;
+  PassRefPtr<DOMPlugin> item(unsigned index);
+  bool canGetItemsForName(const AtomicString& propertyName);
+  PassRefPtr<DOMPlugin> namedItem(const AtomicString& propertyName);
+
+  void refresh(bool reload);
+
+ private:
+  DOMPluginArray(Frame*);
+  PluginData* pluginData() const;
+
+  Frame* m_frame;
+};
+
+}  // namespace WebCore
+
+#endif  // PluginArray_h

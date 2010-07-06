@@ -1,6 +1,5 @@
 /*
     Copyright (C) 2008 Nokia Corporation and/or its subsidiary(-ies)
-    Copyright (C) 2008 Apple Inc. All rights reserved.
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -18,18 +17,42 @@
     Boston, MA 02110-1301, USA.
 */
 
-module window {
+#ifndef DOMMimeType_h
+#define DOMMimeType_h
 
-    interface [
-        HasNameGetter,
-        HasIndexGetter
-    ] Plugin {
-        readonly attribute DOMString name;
-        readonly attribute DOMString filename;
-        readonly attribute DOMString description;
-        readonly attribute unsigned long length;
-        MimeType item(in unsigned long index);
-        MimeType namedItem(in DOMString name);
-    };
+#include <wtf/PassRefPtr.h>
+#include <wtf/RefPtr.h>
+#include <wtf/RefCounted.h>
 
+#include "PluginData.h"
+
+namespace WebCore {
+
+class DOMPlugin;
+class String;
+
+class DOMMimeType : public RefCounted<DOMMimeType> {
+ public:
+  static PassRefPtr<DOMMimeType> create(PassRefPtr<PluginData> pluginData,
+                                        unsigned index) {
+    return adoptRef(new DOMMimeType(pluginData, index));
+  }
+  ~DOMMimeType();
+
+  const String& type() const;
+  String suffixes() const;
+  const String& description() const;
+  PassRefPtr<DOMPlugin> enabledPlugin() const;
+
+ private:
+  const MimeClassInfo& mimeClassInfo() const {
+    return m_pluginData->mimes()[m_index];
+  }
+
+  DOMMimeType(PassRefPtr<PluginData>, unsigned index);
+  RefPtr<PluginData> m_pluginData;
+  unsigned m_index;
+};
 }
+
+#endif

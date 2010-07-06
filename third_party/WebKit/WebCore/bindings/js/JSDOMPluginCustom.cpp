@@ -1,6 +1,5 @@
 /*
  *  Copyright (C) 2008 Nokia Corporation and/or its subsidiary(-ies)
- *  Copyright (C) 2008 Apple Inc. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -19,27 +18,26 @@
  */
 
 #include "config.h"
-#include "JSMimeTypeArray.h"
+#include "JSDOMPlugin.h"
 
 #include "AtomicString.h"
-#include "JSMimeType.h"
-#include "MimeTypeArray.h"
+#include "DOMPlugin.h"
+#include "JSDOMMimeType.h"
 
 namespace WebCore {
 
 using namespace JSC;
 
-bool JSMimeTypeArray::canGetItemsForName(ExecState*,
-                                         MimeTypeArray* mimeTypeArray,
-                                         const Identifier& propertyName) {
-  return mimeTypeArray->canGetItemsForName(
-      identifierToAtomicString(propertyName));
+bool JSDOMPlugin::canGetItemsForName(ExecState*,
+                                     DOMPlugin* plugin,
+                                     const Identifier& propertyName) {
+  return plugin->canGetItemsForName(identifierToAtomicString(propertyName));
 }
 
-JSValue JSMimeTypeArray::nameGetter(ExecState* exec,
-                                    JSValue slotBase,
-                                    const Identifier& propertyName) {
-  JSMimeTypeArray* thisObj = static_cast<JSMimeTypeArray*>(asObject(slotBase));
+JSValue JSDOMPlugin::nameGetter(ExecState* exec,
+                                JSValue slotBase,
+                                const Identifier& propertyName) {
+  JSDOMPlugin* thisObj = static_cast<JSDOMPlugin*>(asObject(slotBase));
   return toJS(
       exec, thisObj->impl()->namedItem(identifierToAtomicString(propertyName)));
 }

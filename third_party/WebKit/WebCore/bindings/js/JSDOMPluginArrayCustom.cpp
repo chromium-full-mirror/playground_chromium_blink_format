@@ -1,5 +1,6 @@
 /*
  *  Copyright (C) 2008 Nokia Corporation and/or its subsidiary(-ies)
+ *  Copyright (C) 2008 Apple Inc. All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -18,26 +19,28 @@
  */
 
 #include "config.h"
-#include "JSPlugin.h"
+#include "JSDOMPluginArray.h"
 
 #include "AtomicString.h"
-#include "JSMimeType.h"
-#include "Plugin.h"
+#include "DOMPluginArray.h"
+#include "JSDOMPlugin.h"
 
 namespace WebCore {
 
 using namespace JSC;
 
-bool JSPlugin::canGetItemsForName(ExecState*,
-                                  Plugin* plugin,
-                                  const Identifier& propertyName) {
-  return plugin->canGetItemsForName(identifierToAtomicString(propertyName));
+bool JSDOMPluginArray::canGetItemsForName(ExecState*,
+                                          DOMPluginArray* pluginArray,
+                                          const Identifier& propertyName) {
+  return pluginArray->canGetItemsForName(
+      identifierToAtomicString(propertyName));
 }
 
-JSValue JSPlugin::nameGetter(ExecState* exec,
-                             JSValue slotBase,
-                             const Identifier& propertyName) {
-  JSPlugin* thisObj = static_cast<JSPlugin*>(asObject(slotBase));
+JSValue JSDOMPluginArray::nameGetter(ExecState* exec,
+                                     JSValue slotBase,
+                                     const Identifier& propertyName) {
+  JSDOMPluginArray* thisObj =
+      static_cast<JSDOMPluginArray*>(asObject(slotBase));
   return toJS(
       exec, thisObj->impl()->namedItem(identifierToAtomicString(propertyName)));
 }

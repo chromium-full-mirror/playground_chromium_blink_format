@@ -1,6 +1,5 @@
 /*
     Copyright (C) 2008 Nokia Corporation and/or its subsidiary(-ies)
-    Copyright (C) 2008 Apple Inc. All rights reserved.
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -18,43 +17,47 @@
     Boston, MA 02110-1301, USA.
 */
 
-#ifndef PluginArray_h
-#define PluginArray_h
+#ifndef DOMPlugin_h
+#define DOMPlugin_h
 
-#include "Plugin.h"
-#include <wtf/PassRefPtr.h>
+#include "DOMMimeType.h"
+#include <wtf/RefPtr.h>
 #include <wtf/RefCounted.h>
-#include <wtf/Vector.h>
 
 namespace WebCore {
 
 class AtomicString;
-class Frame;
+class Plugin;
 class PluginData;
+class String;
 
-class PluginArray : public RefCounted<PluginArray> {
+class DOMPlugin : public RefCounted<DOMPlugin> {
  public:
-  static PassRefPtr<PluginArray> create(Frame* frame) {
-    return adoptRef(new PluginArray(frame));
+  static PassRefPtr<DOMPlugin> create(PluginData* pluginData, unsigned index) {
+    return adoptRef(new DOMPlugin(pluginData, index));
   }
-  ~PluginArray();
+  ~DOMPlugin();
 
-  void disconnectFrame() { m_frame = 0; }
+  String name() const;
+  String filename() const;
+  String description() const;
 
   unsigned length() const;
-  PassRefPtr<Plugin> item(unsigned index);
-  bool canGetItemsForName(const AtomicString& propertyName);
-  PassRefPtr<Plugin> namedItem(const AtomicString& propertyName);
 
-  void refresh(bool reload);
+  PassRefPtr<DOMMimeType> item(unsigned index);
+  bool canGetItemsForName(const AtomicString& propertyName);
+  PassRefPtr<DOMMimeType> namedItem(const AtomicString& propertyName);
 
  private:
-  PluginArray(Frame*);
-  PluginData* pluginData() const;
+  const PluginInfo& pluginInfo() const {
+    return m_pluginData->plugins()[m_index];
+  }
 
-  Frame* m_frame;
+  DOMPlugin(PluginData*, unsigned index);
+  RefPtr<PluginData> m_pluginData;
+  unsigned m_index;
 };
 
 }  // namespace WebCore
 
-#endif  // PluginArray_h
+#endif  // Plugin_h
