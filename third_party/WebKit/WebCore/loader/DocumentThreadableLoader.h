@@ -43,6 +43,7 @@ namespace WebCore {
 class Document;
 class KURL;
 class ResourceRequest;
+class String;
 class ThreadableLoaderClient;
 
 class DocumentThreadableLoader : public RefCounted<DocumentThreadableLoader>,
@@ -105,7 +106,7 @@ class DocumentThreadableLoader : public RefCounted<DocumentThreadableLoader>,
   void makeCrossOriginAccessRequestWithPreflight(
       const ResourceRequest& request);
   void preflightSuccess();
-  void preflightFailure();
+  void preflightFailure(const String& url, const String& errorDescription);
 
   void loadRequest(const ResourceRequest&, SecurityCheckPolicy);
   bool isAllowedRedirect(const KURL&);

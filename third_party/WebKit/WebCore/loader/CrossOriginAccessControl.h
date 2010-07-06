@@ -40,6 +40,7 @@ bool isOnAccessControlResponseHeaderWhitelist(const String&);
 
 bool passesAccessControlCheck(const ResourceResponse&,
                               bool includeCredentials,
-                              SecurityOrigin*);
+                              SecurityOrigin*,
+                              String& errorDescription);
 
 }  // namespace WebCore

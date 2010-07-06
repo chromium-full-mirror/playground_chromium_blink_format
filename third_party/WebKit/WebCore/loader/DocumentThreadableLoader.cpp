@@ -91,7 +91,9 @@ DocumentThreadableLoader::DocumentThreadableLoader(
   }
 
   if (m_options.crossOriginRequestPolicy == DenyCrossOriginRequests) {
-    m_client->didFail(ResourceError());
+    m_client->didFail(
+        ResourceError(errorDomainWebKit, 0, request.url().string(),
+                      "Cross origin requests are not supported."));
     return;
   }
 
@@ -127,7 +129,9 @@ void DocumentThreadableLoader::makeSimpleCrossOriginAccessRequest(
   // checking response headers later, but there is no reason to send a request
   // that's guaranteed to be denied.
   if (!request.url().protocolInHTTPFamily()) {
-    m_client->didFail(ResourceError());
+    m_client->didFail(
+        ResourceError(errorDomainWebKit, 0, request.url().string(),
+                      "Cross origin requests are only supported for HTTP."));
     return;
   }
 
@@ -214,21 +218,24 @@ void DocumentThreadableLoader::didReceiveResponse(
   ASSERT(m_client);
   ASSERT_UNUSED(loader, loader == m_loader);
 
+  String accessControlErrorDescription;
   if (m_actualRequest) {
     if (!passesAccessControlCheck(response, m_options.allowCredentials,
-                                  m_document->securityOrigin())) {
-      preflightFailure();
+                                  m_document->securityOrigin(),
+                                  accessControlErrorDescription)) {
+      preflightFailure(response.url(), accessControlErrorDescription);
       return;
     }
 
     OwnPtr<CrossOriginPreflightResultCacheItem> preflightResult(
         new CrossOriginPreflightResultCacheItem(m_options.allowCredentials));
-    if (!preflightResult->parse(response) ||
+    if (!preflightResult->parse(response, accessControlErrorDescription) ||
         !preflightResult->allowsCrossOriginMethod(
-            m_actualRequest->httpMethod()) ||
+            m_actualRequest->httpMethod(), accessControlErrorDescription) ||
         !preflightResult->allowsCrossOriginHeaders(
-            m_actualRequest->httpHeaderFields())) {
-      preflightFailure();
+            m_actualRequest->httpHeaderFields(),
+            accessControlErrorDescription)) {
+      preflightFailure(response.url(), accessControlErrorDescription);
       return;
     }
 
@@ -239,8 +246,11 @@ void DocumentThreadableLoader::didReceiveResponse(
     if (!m_sameOriginRequest &&
         m_options.crossOriginRequestPolicy == UseAccessControl) {
       if (!passesAccessControlCheck(response, m_options.allowCredentials,
-                                    m_document->securityOrigin())) {
-        m_client->didFail(ResourceError());
+                                    m_document->securityOrigin(),
+                                    accessControlErrorDescription)) {
+        m_client->didFail(ResourceError(errorDomainWebKit, 0,
+                                        response.url().string(),
+                                        accessControlErrorDescription));
         return;
       }
     }
@@ -329,10 +339,12 @@ void DocumentThreadableLoader::preflightSuccess() {
   loadRequest(*actualRequest, SkipSecurityCheck);
 }
 
-void DocumentThreadableLoader::preflightFailure() {
+void DocumentThreadableLoader::preflightFailure(
+    const String& url,
+    const String& errorDescription) {
   m_actualRequest =
       0;  // Prevent didFinishLoading() from bypassing access check.
-  m_client->didFail(ResourceError());
+  m_client->didFail(ResourceError(errorDomainWebKit, 0, url, errorDescription));
 }
 
 void DocumentThreadableLoader::loadRequest(const ResourceRequest& request,
