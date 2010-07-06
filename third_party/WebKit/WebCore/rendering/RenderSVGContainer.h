@@ -40,8 +40,8 @@ class RenderSVGContainer : public RenderSVGModelObject {
 
   // <marker> uses these methods to only allow drawing children during a special
   // marker draw time
-  void setDrawsContents(bool);
-  bool drawsContents() const;
+  void setDrawsContents(bool drawsContents) { m_drawsContents = drawsContents; }
+  bool drawsContents() const { return m_drawsContents; }
 
   virtual void paint(PaintInfo&, int parentX, int parentY);
 
@@ -112,5 +112,3 @@ void toRenderSVGContainer(const RenderSVGContainer*);
 
 #endif  // ENABLE(SVG)
 #endif  // RenderSVGContainer_h
-
-// vim:ts=4:noet
