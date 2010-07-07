@@ -134,6 +134,9 @@ class HTMLInputElement : public HTMLTextFormControlElement,
   virtual void setValue(const String&, bool sendChangeEvent = false);
   virtual void setValueForUser(const String&);
 
+  virtual const String& suggestedValue() const;
+  void setSuggestedValue(const String&);
+
   double valueAsDate() const;
   void setValueAsDate(double, ExceptionCode&);
 
@@ -262,9 +265,6 @@ class HTMLInputElement : public HTMLTextFormControlElement,
   }
 
   virtual const AtomicString& formControlType() const;
-
-  virtual const String& suggestedValue() const;
-  void setSuggestedValue(const String&);
 
   virtual bool searchEventsShouldBeDispatched() const;
 
