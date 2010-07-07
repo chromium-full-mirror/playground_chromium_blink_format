@@ -135,9 +135,9 @@ class InspectorTimelineAgent : ScriptGCEventListener, public Noncopyable {
 
  private:
   struct TimelineRecordEntry {
-    TimelineRecordEntry(const RefPtr<InspectorObject>& record,
-                        const RefPtr<InspectorObject>& data,
-                        const RefPtr<InspectorArray>& children,
+    TimelineRecordEntry(PassRefPtr<InspectorObject> record,
+                        PassRefPtr<InspectorObject> data,
+                        PassRefPtr<InspectorArray> children,
                         TimelineRecordType type)
         : record(record), data(data), children(children), type(type) {}
     RefPtr<InspectorObject> record;
@@ -146,12 +146,12 @@ class InspectorTimelineAgent : ScriptGCEventListener, public Noncopyable {
     TimelineRecordType type;
   };
 
-  void pushCurrentRecord(const RefPtr<InspectorObject>&, TimelineRecordType);
-  void setHeapSizeStatistic(const RefPtr<InspectorObject>& record);
+  void pushCurrentRecord(PassRefPtr<InspectorObject>, TimelineRecordType);
+  void setHeapSizeStatistic(InspectorObject* record);
 
   void didCompleteCurrentRecord(TimelineRecordType);
 
-  void addRecordToTimeline(const RefPtr<InspectorObject>&, TimelineRecordType);
+  void addRecordToTimeline(PassRefPtr<InspectorObject>, TimelineRecordType);
 
   void pushGCEventRecords();
 
