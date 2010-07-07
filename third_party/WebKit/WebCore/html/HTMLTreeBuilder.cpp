@@ -1618,7 +1618,7 @@ void HTMLTreeBuilder::processEndTag(AtomicHTMLToken& token) {
     case BeforeHeadMode:
       ASSERT(insertionMode() == BeforeHeadMode);
       if (token.name() != headTag && token.name() != bodyTag &&
-          token.name() != brTag) {
+          token.name() != htmlTag && token.name() != brTag) {
         parseError(token);
         return;
       }
