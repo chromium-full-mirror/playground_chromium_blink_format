@@ -158,7 +158,6 @@ class HTMLTreeBuilder : public Noncopyable {
   PassRefPtr<NamedNodeMap> attributesForIsindexInput(AtomicHTMLToken&);
 
   HTMLElementStack::ElementRecord* furthestBlockForFormattingElement(Element*);
-  void findFosterParentFor(Element*);
   void reparentChildren(Element* oldParent, Element* newParent);
   void callTheAdoptionAgency(AtomicHTMLToken&);
 

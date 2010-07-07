@@ -73,6 +73,12 @@ PassRefPtr<ChildType> HTMLConstructionSite::attach(
     Node* parent,
     PassRefPtr<ChildType> prpChild) {
   RefPtr<ChildType> child = prpChild;
+
+  if (m_redirectAttachToFosterParent) {
+    fosterParent(child.get());
+    return child.release();
+  }
+
   parent->parserAddChild(child);
   // It's slightly unfortunate that we need to hold a reference to child
   // here to call attach().  We should investigate whether we can rely on
@@ -87,7 +93,8 @@ HTMLConstructionSite::HTMLConstructionSite(
     Document* document,
     FragmentScriptingPermission scriptingPermission)
     : m_document(document),
-      m_fragmentScriptingPermission(scriptingPermission) {}
+      m_fragmentScriptingPermission(scriptingPermission),
+      m_redirectAttachToFosterParent(false) {}
 
 HTMLConstructionSite::~HTMLConstructionSite() {}
 
@@ -162,15 +169,18 @@ PassRefPtr<Element> HTMLConstructionSite::createElementAndAttachToCurrent(
 }
 
 void HTMLConstructionSite::insertHTMLHtmlElement(AtomicHTMLToken& token) {
+  ASSERT(!m_redirectAttachToFosterParent);
   m_openElements.pushHTMLHtmlElement(createElementAndAttachToCurrent(token));
 }
 
 void HTMLConstructionSite::insertHTMLHeadElement(AtomicHTMLToken& token) {
+  ASSERT(!m_redirectAttachToFosterParent);
   m_head = createElementAndAttachToCurrent(token);
   m_openElements.pushHTMLHeadElement(m_head);
 }
 
 void HTMLConstructionSite::insertHTMLBodyElement(AtomicHTMLToken& token) {
+  ASSERT(!m_redirectAttachToFosterParent);
   m_openElements.pushHTMLBodyElement(createElementAndAttachToCurrent(token));
 }
 
@@ -272,7 +282,7 @@ void HTMLConstructionSite::generateImpliedEndTags() {
     m_openElements.pop();
 }
 
-void HTMLConstructionSite::fosterParent(Element* element) {
+void HTMLConstructionSite::fosterParent(Node* node) {
   Element* fosterParentElement = 0;
   HTMLElementStack::ElementRecord* lastTableElementRecord =
       m_openElements.topmost(tableTag.localName());
@@ -281,7 +291,8 @@ void HTMLConstructionSite::fosterParent(Element* element) {
     if (lastTableElement->parent()) {
       // FIXME: We need an insertElement which does not send mutation events.
       ExceptionCode ec = 0;
-      lastTableElement->parent()->insertBefore(element, lastTableElement, ec);
+      lastTableElement->parent()->insertBefore(node, lastTableElement, ec);
+      // FIXME: Do we need to call attach()?
       ASSERT(!ec);
       return;
     }
@@ -291,6 +302,7 @@ void HTMLConstructionSite::fosterParent(Element* element) {
     fosterParentElement = m_openElements.bottom();  // <html> element
   }
 
-  fosterParentElement->parserAddChild(element);
+  fosterParentElement->parserAddChild(node);
+  // FIXME: Do we need to call attach()?
 }
 }
