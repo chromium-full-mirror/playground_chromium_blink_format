@@ -56,7 +56,9 @@ SVGFontFaceElement::SVGFontFaceElement(const QualifiedName& tagName,
   m_fontFaceRule->setDeclaration(m_styleDeclaration.get());
 }
 
-SVGFontFaceElement::~SVGFontFaceElement() {}
+SVGFontFaceElement::~SVGFontFaceElement() {
+  removeFromMappedElementSheet();
+}
 
 static int cssPropertyIdForSVGAttributeName(const QualifiedName& attrName) {
   if (!attrName.namespaceURI().isNull())
