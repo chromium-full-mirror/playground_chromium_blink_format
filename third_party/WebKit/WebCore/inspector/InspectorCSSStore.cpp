@@ -126,7 +126,7 @@ HashMap<long, SourceRange> InspectorCSSStore::getRuleRangesForStyleSheet(
           CSSStyleSheet::create(styleSheet->ownerNode());
       CSSParser p;
       CSSParser::StyleRuleRanges ruleRangeMap;
-      p.parseSheet(newStyleSheet.get(), resource->sourceString(),
+      p.parseSheet(newStyleSheet.get(), resource->sourceString(), 0,
                    &ruleRangeMap);
       for (unsigned i = 0, length = newStyleSheet->length(); i < length; ++i) {
         CSSStyleRule* rule = asCSSStyleRule(newStyleSheet->item(i));

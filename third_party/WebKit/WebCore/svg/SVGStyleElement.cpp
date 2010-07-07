@@ -107,7 +107,7 @@ void SVGStyleElement::childrenChanged(bool changedByParser,
                                       int childCountDelta) {
   SVGElement::childrenChanged(changedByParser, beforeChange, afterChange,
                               childCountDelta);
-  StyleElement::process(this);
+  StyleElement::process(this, 0);
 }
 
 StyleSheet* SVGStyleElement::sheet() {

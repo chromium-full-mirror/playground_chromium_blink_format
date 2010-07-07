@@ -94,6 +94,8 @@ class CSSStyleSheet : public StyleSheet {
 
   virtual bool parseString(const String&, bool strict = true);
 
+  bool parseStringAtLine(const String&, bool strict, int startLineNumber);
+
   virtual bool isLoading();
 
   virtual void checkLoaded();

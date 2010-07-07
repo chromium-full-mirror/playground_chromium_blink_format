@@ -27,6 +27,7 @@
 #include "Attribute.h"
 #include "Document.h"
 #include "HTMLNames.h"
+#include "ScriptableDocumentParser.h"
 #include "ScriptEventListener.h"
 
 namespace WebCore {
@@ -38,8 +39,11 @@ inline HTMLStyleElement::HTMLStyleElement(const QualifiedName& tagName,
                                           bool createdByParser)
     : HTMLElement(tagName, document),
       m_loading(false),
-      m_createdByParser(createdByParser) {
+      m_createdByParser(createdByParser),
+      m_startLineNumber(0) {
   ASSERT(hasTagName(styleTag));
+  if (createdByParser && document && document->scriptableDocumentParser())
+    m_startLineNumber = document->scriptableDocumentParser()->lineNumber();
 }
 
 PassRefPtr<HTMLStyleElement> HTMLStyleElement::create(
@@ -60,7 +64,7 @@ void HTMLStyleElement::parseMappedAttribute(Attribute* attr) {
 }
 
 void HTMLStyleElement::finishParsingChildren() {
-  StyleElement::process(this);
+  StyleElement::process(this, m_startLineNumber);
   StyleElement::sheet(this);
   m_createdByParser = false;
   HTMLElement::finishParsingChildren();
@@ -85,7 +89,7 @@ void HTMLStyleElement::childrenChanged(bool changedByParser,
                                        Node* afterChange,
                                        int childCountDelta) {
   if (!changedByParser)
-    StyleElement::process(this);
+    StyleElement::process(this, 0);
   HTMLElement::childrenChanged(changedByParser, beforeChange, afterChange,
                                childCountDelta);
 }
