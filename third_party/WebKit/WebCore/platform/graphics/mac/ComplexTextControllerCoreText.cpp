@@ -153,8 +153,14 @@ void ComplexTextController::collectComplexTextRunsForCharactersCoreText(
 
   if (!m_mayUseNaturalWritingDirection || m_run.directionalOverride()) {
     static const void* optionKeys[] = {kCTTypesetterOptionForcedEmbeddingLevel};
-    static const void* ltrOptionValues[] = {kCFBooleanFalse};
-    static const void* rtlOptionValues[] = {kCFBooleanTrue};
+    const short ltrForcedEmbeddingLevelValue = 0;
+    const short rtlForcedEmbeddingLevelValue = 1;
+    static const void* ltrOptionValues[] = {
+        CFNumberCreate(kCFAllocatorDefault, kCFNumberShortType,
+                       &ltrForcedEmbeddingLevelValue)};
+    static const void* rtlOptionValues[] = {
+        CFNumberCreate(kCFAllocatorDefault, kCFNumberShortType,
+                       &rtlForcedEmbeddingLevelValue)};
     static CFDictionaryRef ltrTypesetterOptions = CFDictionaryCreate(
         kCFAllocatorDefault, optionKeys, ltrOptionValues,
         sizeof(optionKeys) / sizeof(*optionKeys),
