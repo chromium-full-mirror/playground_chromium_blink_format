@@ -26,8 +26,10 @@
  */
 
 #include "config.h"
-#include "WebKitDLL.h"
 #include "WebUserContentURLPattern.h"
+
+#include "MarshallingHelpers.h"
+#include "WebKitDLL.h"
 
 #include <WebCore/BString.h>
 #include <WebCore/KURL.h>
@@ -109,5 +111,12 @@ HRESULT WebUserContentURLPattern::matchesSubdomains(BOOL* matches) {
   if (!matches)
     return E_POINTER;
   *matches = m_pattern.matchSubdomains();
+  return S_OK;
+}
+
+HRESULT WebUserContentURLPattern::matchesURL(BSTR url, BOOL* matches) {
+  if (!matches)
+    return E_POINTER;
+  *matches = m_pattern.matches(MarshallingHelpers::BSTRToKURL(url));
   return S_OK;
 }
