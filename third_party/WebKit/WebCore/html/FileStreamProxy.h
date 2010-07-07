@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2010 Google Inc.  All rights reserved.
+ * Copyright (C) 2010 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -33,7 +34,6 @@
 
 #if ENABLE(FILE_READER) || ENABLE(FILE_WRITER)
 
-#include "ExceptionCode.h"
 #include "FileStreamClient.h"
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
@@ -53,10 +53,8 @@ class String;
 class FileStreamProxy : public RefCounted<FileStreamProxy>,
                         public FileStreamClient {
  public:
-  static PassRefPtr<FileStreamProxy> create(ScriptExecutionContext* context,
-                                            FileStreamClient* client) {
-    return adoptRef(new FileStreamProxy(context, client));
-  }
+  static PassRefPtr<FileStreamProxy> create(ScriptExecutionContext*,
+                                            FileStreamClient*);
   virtual ~FileStreamProxy();
 
   void openForRead(Blob* blob);

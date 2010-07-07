@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2009 Google Inc. All rights reserved.
+ * Copyright (C) 2010 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -33,9 +34,6 @@
 
 #include "AbstractWorker.h"
 
-#include <wtf/PassRefPtr.h>
-#include <wtf/RefPtr.h>
-
 #if ENABLE(SHARED_WORKERS)
 
 namespace WebCore {
@@ -44,20 +42,16 @@ class SharedWorker : public AbstractWorker {
  public:
   static PassRefPtr<SharedWorker> create(const String& url,
                                          const String& name,
-                                         ScriptExecutionContext* context,
-                                         ExceptionCode& ec) {
-    return adoptRef(new SharedWorker(url, name, context, ec));
-  }
-  ~SharedWorker();
+                                         ScriptExecutionContext*,
+                                         ExceptionCode&);
+  virtual ~SharedWorker();
+
   MessagePort* port() const { return m_port.get(); }
 
-  virtual SharedWorker* toSharedWorker() { return this; }
-
  private:
-  SharedWorker(const String& url,
-               const String& name,
-               ScriptExecutionContext*,
-               ExceptionCode&);
+  SharedWorker(ScriptExecutionContext*);
+
+  virtual SharedWorker* toSharedWorker() { return this; }
 
   RefPtr<MessagePort> m_port;
 };
