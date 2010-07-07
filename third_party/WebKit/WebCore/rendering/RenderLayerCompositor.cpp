@@ -1447,8 +1447,7 @@ void RenderLayerCompositor::attachRootPlatformLayer(
       // The layer will get hooked up via
       // RenderLayerBacking::updateGraphicsLayerConfiguration()
       // for the iframe's renderer in the parent document.
-      m_renderView->document()->ownerElement()->setNeedsStyleRecalc(
-          SyntheticStyleChange);
+      scheduleNeedsStyleRecalc(m_renderView->document()->ownerElement());
       break;
     }
   }
@@ -1472,7 +1471,7 @@ void RenderLayerCompositor::detachRootPlatformLayer() {
         m_rootPlatformLayer->removeFromParent();
 
       if (Element* ownerElement = m_renderView->document()->ownerElement())
-        ownerElement->setNeedsStyleRecalc(SyntheticStyleChange);
+        scheduleNeedsStyleRecalc(ownerElement);
       break;
     }
     case RootLayerAttachedViaChromeClient: {
@@ -1504,6 +1503,17 @@ void RenderLayerCompositor::rootLayerAttachmentChanged() {
     backing->updateDrawsContent();
 }
 
+static void needsStyleRecalcCallback(Node* node) {
+  node->setNeedsStyleRecalc(SyntheticStyleChange);
+}
+
+void RenderLayerCompositor::scheduleNeedsStyleRecalc(Element* element) {
+  if (ContainerNode::postAttachCallbacksAreSuspended())
+    ContainerNode::queuePostAttachCallback(needsStyleRecalcCallback, element);
+  else
+    element->setNeedsStyleRecalc(SyntheticStyleChange);
+}
+
 // IFrames are special, because we hook compositing layers together across
 // iframe boundaries
 // when both parent and iframe content are composited. So when this frame
@@ -1519,8 +1529,7 @@ void RenderLayerCompositor::notifyIFramesOfCompositingChange() {
   for (Frame* child = frame->tree()->firstChild(); child;
        child = child->tree()->nextSibling()) {
     if (child->document() && child->document()->ownerElement())
-      child->document()->ownerElement()->setNeedsStyleRecalc(
-          SyntheticStyleChange);
+      scheduleNeedsStyleRecalc(child->document()->ownerElement());
   }
 }
 
