@@ -47,7 +47,7 @@ class HTMLFormattingElementList : public Noncopyable {
   class Entry {
    public:
     // Inline because they're hot and Vector<T> uses them.
-    Entry(Element* element) : m_element(element) { ASSERT(element); }
+    explicit Entry(Element* element) : m_element(element) { ASSERT(element); }
     enum MarkerEntryType { MarkerEntry };
     Entry(MarkerEntryType) : m_element(0) {}
     ~Entry() {}
@@ -71,6 +71,8 @@ class HTMLFormattingElementList : public Noncopyable {
     }
 
    private:
+    friend class HTMLFormattingElementList;
+
     RefPtr<Element> m_element;
   };
 
@@ -117,10 +119,11 @@ class HTMLFormattingElementList : public Noncopyable {
 
  private:
   size_t findIndex(Element* element) const {
+    ASSERT(element);
     // A reverse find is more efficient than Vector<T>::find
     for (size_t i = 1; i <= m_entries.size(); ++i) {
       size_t index = m_entries.size() - i;
-      if (m_entries[index].element() == element)
+      if (m_entries[index].m_element == element)
         return index;
     }
     return notFound;
