@@ -1113,7 +1113,7 @@ bool RenderLayerCompositor::shouldPropagateCompositingToEnclosingIFrame()
   // cause problems on platforms that
   // use native views for frames (like Mac), so disable that behavior on those
   // platforms for now.
-  Element* ownerElement = enclosingIFrameElement();
+  HTMLFrameOwnerElement* ownerElement = enclosingIFrameElement();
   RenderObject* renderer = ownerElement ? ownerElement->renderer() : 0;
   if (!renderer || !renderer->isRenderIFrame())
     return false;
@@ -1142,8 +1142,9 @@ bool RenderLayerCompositor::shouldPropagateCompositingToEnclosingIFrame()
 #endif
 }
 
-Element* RenderLayerCompositor::enclosingIFrameElement() const {
-  if (Element* ownerElement = m_renderView->document()->ownerElement())
+HTMLFrameOwnerElement* RenderLayerCompositor::enclosingIFrameElement() const {
+  if (HTMLFrameOwnerElement* ownerElement =
+          m_renderView->document()->ownerElement())
     return ownerElement->hasTagName(iframeTag) ? ownerElement : 0;
 
   return 0;

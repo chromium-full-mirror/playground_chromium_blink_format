@@ -182,7 +182,7 @@ class RenderLayerCompositor {
   // their parent document.
   bool shouldPropagateCompositingToEnclosingIFrame() const;
 
-  Element* enclosingIFrameElement() const;
+  HTMLFrameOwnerElement* enclosingIFrameElement() const;
 
   static RenderLayerCompositor* iframeContentsCompositor(RenderIFrame*);
   // Return true if the layers changed.
