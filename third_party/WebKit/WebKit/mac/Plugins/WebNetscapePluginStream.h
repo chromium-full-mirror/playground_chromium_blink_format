@@ -36,6 +36,7 @@
 #import <wtf/RefCounted.h>
 #import <wtf/RefPtr.h>
 #import <wtf/RetainPtr.h>
+#import <wtf/text/CString.h>
 
 #import "WebNetscapePluginView.h"
 
@@ -74,7 +75,9 @@ class WebNetscapePluginStream
 
   void cancelLoadAndDestroyStreamWithError(NSError*);
 
-  void setRequestURL(NSURL* requestURL) { m_requestURL = requestURL; }
+  void setRequestURL(const WebCore::KURL& requestURL) {
+    m_requestURL = requestURL;
+  }
 
   void start();
   void stop();
@@ -97,7 +100,7 @@ class WebNetscapePluginStream
   void startStream(NSURL*,
                    long long expectedContentLength,
                    NSDate* lastModifiedDate,
-                   NSString* mimeType,
+                   const WebCore::String& mimeType,
                    NSData* headers);
 
   NSError* pluginCancelledConnectionError() const;
@@ -110,9 +113,9 @@ class WebNetscapePluginStream
   bool wantsAllStreams() const;
 
   RetainPtr<NSMutableData> m_deliveryData;
-  RetainPtr<NSURL> m_requestURL;
+  WebCore::KURL m_requestURL;
   RetainPtr<NSURL> m_responseURL;
-  RetainPtr<NSString> m_mimeType;
+  CString m_mimeType;
 
   NPP m_plugin;
   uint16_t m_transferMode;
