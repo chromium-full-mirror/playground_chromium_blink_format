@@ -64,10 +64,7 @@ class OwnPtr : public Noncopyable {
 
   PtrType get() const { return m_ptr; }
 
-  void clear() {
-    deleteOwnedPtr(m_ptr);
-    m_ptr = 0;
-  }
+  void clear();
   PassOwnPtr<T> release();
   PtrType leakPtr();
 
@@ -107,6 +104,13 @@ template <typename U>
 inline OwnPtr<T>::OwnPtr(const PassOwnPtr<U>& o) : m_ptr(o.leakPtr()) {}
 
 template <typename T>
+inline void OwnPtr<T>::clear() {
+  PtrType ptr = m_ptr;
+  m_ptr = 0;
+  deleteOwnedPtr(ptr);
+}
+
+template <typename T>
 inline PassOwnPtr<T> OwnPtr<T>::release() {
   PtrType ptr = m_ptr;
   m_ptr = 0;
@@ -124,29 +128,28 @@ inline typename OwnPtr<T>::PtrType OwnPtr<T>::leakPtr() {
 template <typename T>
 inline void OwnPtr<T>::set(PtrType ptr) {
   ASSERT(!ptr || m_ptr != ptr);
-  deleteOwnedPtr(m_ptr);
+  PtrType oldPtr = m_ptr;
   m_ptr = ptr;
+  deleteOwnedPtr(oldPtr);
 }
 #endif
 
 template <typename T>
 inline OwnPtr<T>& OwnPtr<T>::operator=(const PassOwnPtr<T>& o) {
-  T* ptr = m_ptr;
+  PtrType ptr = m_ptr;
   m_ptr = o.leakPtr();
   ASSERT(!ptr || m_ptr != ptr);
-  if (ptr)
-    deleteOwnedPtr(ptr);
+  deleteOwnedPtr(ptr);
   return *this;
 }
 
 template <typename T>
 template <typename U>
 inline OwnPtr<T>& OwnPtr<T>::operator=(const PassOwnPtr<U>& o) {
-  T* ptr = m_ptr;
+  PtrType ptr = m_ptr;
   m_ptr = o.leakPtr();
   ASSERT(!ptr || m_ptr != ptr);
-  if (ptr)
-    deleteOwnedPtr(ptr);
+  deleteOwnedPtr(ptr);
   return *this;
 }
 

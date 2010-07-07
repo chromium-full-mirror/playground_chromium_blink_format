@@ -85,11 +85,7 @@ class PassRefPtr {
 
   T* get() const { return m_ptr; }
 
-  void clear() {
-    T* ptr = m_ptr;
-    derefIfNotNull(ptr);
-    m_ptr = 0;
-  }
+  void clear();
   T* leakRef() const;
 
   T& operator*() const { return *m_ptr; }
@@ -165,11 +161,8 @@ class NonNullPassRefPtr {
 
   T* get() const { return m_ptr; }
 
-  void clear() {
-    derefIfNotNull(m_ptr);
-    m_ptr = 0;
-  }
-  T* releaseRef() const {
+  void clear();
+  T* leakRef() const {
     T* tmp = m_ptr;
     m_ptr = 0;
     return tmp;
@@ -177,6 +170,10 @@ class NonNullPassRefPtr {
 
   T& operator*() const { return *m_ptr; }
   T* operator->() const { return m_ptr; }
+
+  // FIXME: Remove releaseRef once we change all callers to call leakRef
+  // instead.
+  T* releaseRef() const { return leakRef(); }
 
  private:
   mutable T* m_ptr;
@@ -187,6 +184,13 @@ template <typename U>
 inline PassRefPtr<T>::PassRefPtr(const RefPtr<U>& o) : m_ptr(o.get()) {
   T* ptr = m_ptr;
   refIfNotNull(ptr);
+}
+
+template <typename T>
+inline void PassRefPtr<T>::clear() {
+  T* ptr = m_ptr;
+  m_ptr = 0;
+  derefIfNotNull(ptr);
 }
 
 template <typename T>
@@ -302,6 +306,13 @@ inline PassRefPtr<T> const_pointer_cast(const PassRefPtr<U>& p) {
 template <typename T>
 inline T* getPtr(const PassRefPtr<T>& p) {
   return p.get();
+}
+
+template <typename T>
+inline void NonNullPassRefPtr<T>::clear() {
+  T* ptr = m_ptr;
+  m_ptr = 0;
+  derefIfNotNull(ptr);
 }
 
 }  // namespace WTF

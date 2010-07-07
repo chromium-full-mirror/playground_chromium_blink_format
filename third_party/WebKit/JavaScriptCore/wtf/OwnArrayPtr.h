@@ -31,7 +31,7 @@ template <typename T>
 class OwnArrayPtr : public Noncopyable {
  public:
   explicit OwnArrayPtr(T* ptr = 0) : m_ptr(ptr) {}
-  ~OwnArrayPtr() { safeDelete(); }
+  ~OwnArrayPtr() { safeDelete(m_ptr); }
 
   T* get() const { return m_ptr; }
   T* release() {
@@ -40,17 +40,15 @@ class OwnArrayPtr : public Noncopyable {
     return ptr;
   }
 
-  // FIXME: This should be renamed to adopt.
+  // FIXME: This should be removed and replaced with PassOwnArrayPtr.
   void set(T* ptr) {
     ASSERT(!ptr || m_ptr != ptr);
-    safeDelete();
+    T* oldPtr = m_ptr;
     m_ptr = ptr;
+    safeDelete(oldPtr);
   }
 
-  void clear() {
-    safeDelete();
-    m_ptr = 0;
-  }
+  void clear();
 
   T& operator*() const {
     ASSERT(m_ptr);
@@ -83,14 +81,24 @@ class OwnArrayPtr : public Noncopyable {
   void swap(OwnArrayPtr& o) { std::swap(m_ptr, o.m_ptr); }
 
  private:
-  void safeDelete() {
-    typedef char known[sizeof(T) ? 1 : -1];
-    if (sizeof(known))
-      delete[] m_ptr;
-  }
+  static void safeDelete(T*);
 
   T* m_ptr;
 };
+
+template <typename T>
+inline void OwnArrayPtr<T>::clear() {
+  T* ptr = m_ptr;
+  m_ptr = 0;
+  safeDelete(ptr);
+}
+
+template <typename T>
+inline void OwnArrayPtr<T>::safeDelete(T* ptr) {
+  typedef char known[sizeof(T) ? 1 : -1];
+  if (sizeof(known))
+    delete[] ptr;
+}
 
 template <typename T>
 inline void swap(OwnArrayPtr<T>& a, OwnArrayPtr<T>& b) {

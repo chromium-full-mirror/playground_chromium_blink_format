@@ -66,7 +66,7 @@ class PassOwnPtr {
 
   PtrType get() const { return m_ptr; }
 
-  void clear() { m_ptr = 0; }
+  void clear();
   PtrType leakPtr() const;
 
   ValueType& operator*() const {
@@ -106,6 +106,13 @@ class PassOwnPtr {
 
   mutable PtrType m_ptr;
 };
+
+template <typename T>
+inline void PassOwnPtr<T>::clear() {
+  PtrType ptr = m_ptr;
+  m_ptr = 0;
+  deleteOwnedPtr(ptr);
+}
 
 template <typename T>
 inline typename PassOwnPtr<T>::PtrType PassOwnPtr<T>::leakPtr() const {

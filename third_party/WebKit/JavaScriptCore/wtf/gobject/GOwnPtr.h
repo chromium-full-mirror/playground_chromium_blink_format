@@ -84,8 +84,9 @@ class GOwnPtr : public Noncopyable {
   }
 
   void clear() {
-    freeOwnedGPtr(m_ptr);
+    T* ptr = m_ptr;
     m_ptr = 0;
+    freeOwnedGPtr(ptr);
   }
 
   T& operator*() const {
