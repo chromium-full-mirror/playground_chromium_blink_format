@@ -1286,6 +1286,8 @@ TreeProperty JSParser::parseProperty(TreeBuilder& context) {
       int openBracePos = 0;
       int closeBracePos = 0;
       int bodyStartLine = 0;
+      failIfFalse(*ident == m_globalData->propertyNames->get ||
+                  *ident == m_globalData->propertyNames->set);
       failIfFalse(parseFunctionInfo<FunctionNeedsName>(
           context, accessorName, parameters, body, openBracePos, closeBracePos,
           bodyStartLine));
