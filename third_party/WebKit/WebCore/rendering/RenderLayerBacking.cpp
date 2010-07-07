@@ -1044,18 +1044,17 @@ void RenderLayerBacking::paintIntoLayer(
 
     // Restore the clip.
     restoreClip(context, paintDirtyRect, damageRect);
+
+    // Now walk the sorted list of children with negative z-indices. Only
+    // RenderLayers without compositing layers will paint.
+    m_owningLayer->paintList(m_owningLayer->negZOrderList(), rootLayer, context,
+                             paintDirtyRect, paintBehavior, paintingRoot, 0, 0);
   }
 
   bool forceBlackText = paintBehavior & PaintBehaviorForceBlackText;
   bool selectionOnly = paintBehavior & PaintBehaviorSelectionOnly;
 
   if (shouldPaint && (paintingPhase & GraphicsLayerPaintForeground)) {
-    // Now walk the sorted list of children with negative z-indices. Only
-    // RenderLayers without compositing layers will paint.
-    // FIXME: should these be painted as background?
-    m_owningLayer->paintList(m_owningLayer->negZOrderList(), rootLayer, context,
-                             paintDirtyRect, paintBehavior, paintingRoot, 0, 0);
-
     // Set up the clip used when painting our children.
     setClip(context, paintDirtyRect, clipRectToApply);
     PaintInfo paintInfo(
