@@ -23,23 +23,27 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "PluginObject.h"
+#include "PluginObject.h"
 
-// Mach-o entry points
-extern "C" {
-NPError NP_Initialize(NPNetscapeFuncs* browserFuncs);
-NPError NP_GetEntryPoints(NPPluginFuncs* pluginFuncs);
-void NP_Shutdown(void);
+#if XP_WIN
+#define STDCALL __stdcall
+
+static inline int strcasecmp(const char* s1, const char* s2) {
+  return _stricmp(s1, s2);
 }
 
-// Mach-o entry points
-NPError NP_Initialize(NPNetscapeFuncs* browserFuncs) {
+#else
+#define STDCALL
+#endif
+
+// Entry points
+extern "C" NPError STDCALL NP_Initialize(NPNetscapeFuncs* browserFuncs) {
   browser = browserFuncs;
   return NPERR_NO_ERROR;
 }
 
-NPError NP_GetEntryPoints(NPPluginFuncs* pluginFuncs) {
-  pluginFuncs->version = 11;
+extern "C" NPError STDCALL NP_GetEntryPoints(NPPluginFuncs* pluginFuncs) {
+  pluginFuncs->version = (NP_VERSION_MAJOR << 8) | NP_VERSION_MINOR;
   pluginFuncs->size = sizeof(pluginFuncs);
   pluginFuncs->newp = NPP_New;
   pluginFuncs->destroy = NPP_Destroy;
@@ -58,7 +62,7 @@ NPError NP_GetEntryPoints(NPPluginFuncs* pluginFuncs) {
   return NPERR_NO_ERROR;
 }
 
-void NP_Shutdown(void) {}
+extern "C" void STDCALL NP_Shutdown(void) {}
 
 static void executeScript(const PluginObject* obj, const char* script);
 
@@ -71,6 +75,7 @@ NPError NPP_New(NPMIMEType pluginType,
                 NPSavedData* saved) {
   bool forceCarbon = false;
 
+#if XP_MAC
   // Always turn on the CG model
   NPBool supportsCoreGraphics;
   if (browser->getvalue(instance, NPNVsupportsCoreGraphicsBool,
@@ -82,6 +87,36 @@ NPError NPP_New(NPMIMEType pluginType,
 
   browser->setvalue(instance, NPPVpluginDrawingModel,
                     (void*)NPDrawingModelCoreGraphics);
+
+#ifndef NP_NO_CARBON
+  NPBool supportsCarbon = false;
+#endif
+  NPBool supportsCocoa = false;
+
+#ifndef NP_NO_CARBON
+  // A browser that doesn't know about NPNVsupportsCarbonBool is one that only
+  // supports Carbon event model.
+  if (browser->getvalue(instance, NPNVsupportsCarbonBool, &supportsCarbon) !=
+      NPERR_NO_ERROR)
+    supportsCarbon = true;
+#endif
+
+  if (browser->getvalue(instance, NPNVsupportsCocoaBool, &supportsCocoa) !=
+      NPERR_NO_ERROR)
+    supportsCocoa = false;
+
+  if (supportsCocoa && !forceCarbon) {
+    obj->eventModel = NPEventModelCocoa;
+#ifndef NP_NO_CARBON
+  } else if (supportsCarbon) {
+    obj->eventModel = NPEventModelCarbon;
+#endif
+  } else {
+    return NPERR_INCOMPATIBLE_VERSION_ERROR;
+  }
+
+  browser->setvalue(instance, NPPVpluginEventModel, (void*)obj->eventModel);
+#endif  // XP_MAC
 
   PluginObject* obj =
       (PluginObject*)browser->createobject(instance, getPluginClass());
@@ -120,41 +155,15 @@ NPError NPP_New(NPMIMEType pluginType,
       obj->testDocumentOpenInDestroyStream = TRUE;
     else if (strcasecmp(argn[i], "testwindowopen") == 0)
       obj->testWindowOpen = TRUE;
+    else if (strcasecmp(argn[i], "testGetURLOnDestroy") == 0)
+      obj->testGetURLOnDestroy = TRUE;
     else if (strcasecmp(argn[i], "src") == 0 &&
              strstr(argv[i], "plugin-document-has-focus.pl"))
       obj->testKeyboardFocusForPlugins = TRUE;
   }
 
-#ifndef NP_NO_CARBON
-  NPBool supportsCarbon = false;
-#endif
-  NPBool supportsCocoa = false;
-
-#ifndef NP_NO_CARBON
-  // A browser that doesn't know about NPNVsupportsCarbonBool is one that only
-  // supports Carbon event model.
-  if (browser->getvalue(instance, NPNVsupportsCarbonBool, &supportsCarbon) !=
-      NPERR_NO_ERROR)
-    supportsCarbon = true;
-#endif
-
-  if (browser->getvalue(instance, NPNVsupportsCocoaBool, &supportsCocoa) !=
-      NPERR_NO_ERROR)
-    supportsCocoa = false;
-
-  if (supportsCocoa && !forceCarbon) {
-    obj->eventModel = NPEventModelCocoa;
-#ifndef NP_NO_CARBON
-  } else if (supportsCarbon) {
-    obj->eventModel = NPEventModelCarbon;
-#endif
-  } else {
-    return NPERR_INCOMPATIBLE_VERSION_ERROR;
-  }
-
   browser->getvalue(instance, NPNVprivateModeBool,
                     (void*)&obj->cachedPrivateBrowsingMode);
-  browser->setvalue(instance, NPPVpluginEventModel, (void*)obj->eventModel);
 
   return NPERR_NO_ERROR;
 }
@@ -162,6 +171,9 @@ NPError NPP_New(NPMIMEType pluginType,
 NPError NPP_Destroy(NPP instance, NPSavedData** save) {
   PluginObject* obj = static_cast<PluginObject*>(instance->pdata);
   if (obj) {
+    if (obj->testGetURLOnDestroy)
+      browser->geturlnotify(obj->npp, "about:blank", "", 0);
+
     if (obj->onDestroy) {
       executeScript(obj, obj->onDestroy);
       free(obj->onDestroy);
@@ -280,6 +292,7 @@ void NPP_StreamAsFile(NPP instance, NPStream* stream, const char* fname) {}
 
 void NPP_Print(NPP instance, NPPrint* platformPrint) {}
 
+#if XP_MAC
 #ifndef NP_NO_CARBON
 static int16_t handleEventCarbon(NPP instance,
                                  PluginObject* obj,
@@ -417,11 +430,14 @@ static int16_t handleEventCocoa(NPP instance,
   return 0;
 }
 
+#endif  // XP_MAC
+
 int16_t NPP_HandleEvent(NPP instance, void* event) {
   PluginObject* obj = static_cast<PluginObject*>(instance->pdata);
   if (!obj->eventLogging)
     return 0;
 
+#if XP_MAC
 #ifndef NP_NO_CARBON
   if (obj->eventModel == NPEventModelCarbon)
     return handleEventCarbon(instance, obj, static_cast<EventRecord*>(event));
@@ -429,6 +445,10 @@ int16_t NPP_HandleEvent(NPP instance, void* event) {
 
   assert(obj->eventModel == NPEventModelCocoa);
   return handleEventCocoa(instance, obj, static_cast<NPCocoaEvent*>(event));
+#else
+  // FIXME: Implement for other platforms.
+  return 0;
+#endif  // XP_MAC
 }
 
 void NPP_URLNotify(NPP instance,
