@@ -73,6 +73,8 @@ class HTMLConstructionSite : public Noncopyable {
   void generateImpliedEndTagsWithExclusion(const AtomicString& tagName);
 
   Element* currentElement() const { return m_openElements.top(); }
+  Element* oneBelowTop() const { return m_openElements.oneBelowTop(); }
+
   HTMLElementStack* openElements() const { return &m_openElements; }
   HTMLFormattingElementList* activeFormattingElements() const {
     return &m_activeFormattingElements;
