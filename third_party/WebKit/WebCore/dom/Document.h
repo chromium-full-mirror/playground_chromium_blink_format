@@ -83,6 +83,7 @@ class HTMLAllCollection;
 class HTMLDocument;
 class HTMLElement;
 class HTMLFormElement;
+class HTMLFrameOwnerElement;
 class HTMLHeadElement;
 class HTMLInputElement;
 class HTMLMapElement;
@@ -813,7 +814,7 @@ class Document : public ContainerNode, public ScriptExecutionContext {
 
   // Returns the owning element in the parent document.
   // Returns 0 if this is the top level document.
-  Element* ownerElement() const;
+  HTMLFrameOwnerElement* ownerElement() const;
 
   String title() const { return m_title; }
   void setTitle(const String&, Element* titleElement = 0);
