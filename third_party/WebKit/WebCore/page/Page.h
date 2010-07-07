@@ -38,6 +38,7 @@ class Debugger;
 
 namespace WebCore {
 
+class BackForwardController;
 class BackForwardList;
 class Chrome;
 class ChromeClient;
@@ -114,7 +115,7 @@ class Page : public Noncopyable {
   bool openedByDOM() const;
   void setOpenedByDOM();
 
-  BackForwardList* backForwardList();
+  BackForwardList* backForwardList() const;
 
   // FIXME: The following three methods don't fall under the responsibilities of
   // the Page object
@@ -327,7 +328,7 @@ class Page : public Noncopyable {
   OwnPtr<Settings> m_settings;
   OwnPtr<ProgressTracker> m_progress;
 
-  RefPtr<BackForwardList> m_backForwardList;
+  OwnPtr<BackForwardController> m_backForwardController;
   RefPtr<Frame> m_mainFrame;
 
   RefPtr<HistoryItem> m_globalHistoryItem;

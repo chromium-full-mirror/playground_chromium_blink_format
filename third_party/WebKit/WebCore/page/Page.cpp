@@ -21,6 +21,7 @@
 #include "config.h"
 #include "Page.h"
 
+#include "BackForwardController.h"
 #include "BackForwardList.h"
 #include "Base64.h"
 #include "CSSStyleSelector.h"
@@ -162,7 +163,7 @@ Page::Page(ChromeClient* chromeClient,
       ,
       m_settings(new Settings(this)),
       m_progress(new ProgressTracker),
-      m_backForwardList(BackForwardList::create(this)),
+      m_backForwardController(new BackForwardController(this, 0)),
       m_theme(RenderTheme::themeForPage(this)),
       m_editorClient(editorClient),
       m_frameCount(0),
@@ -233,7 +234,7 @@ Page::~Page() {
   m_inspectorController->inspectedPageDestroyed();
 #endif
 
-  m_backForwardList->close();
+  backForwardList()->close();
 
 #ifndef NDEBUG
   pageCounter.decrement();
@@ -258,12 +259,12 @@ void Page::setOpenedByDOM() {
   m_openedByDOM = true;
 }
 
-BackForwardList* Page::backForwardList() {
-  return m_backForwardList.get();
+BackForwardList* Page::backForwardList() const {
+  return m_backForwardController->list();
 }
 
 bool Page::goBack() {
-  HistoryItem* item = m_backForwardList->backItem();
+  HistoryItem* item = backForwardList()->backItem();
 
   if (item) {
     goToItem(item, FrameLoadTypeBack);
@@ -273,7 +274,7 @@ bool Page::goBack() {
 }
 
 bool Page::goForward() {
-  HistoryItem* item = m_backForwardList->forwardItem();
+  HistoryItem* item = backForwardList()->forwardItem();
 
   if (item) {
     goToItem(item, FrameLoadTypeForward);
@@ -285,9 +286,9 @@ bool Page::goForward() {
 bool Page::canGoBackOrForward(int distance) const {
   if (distance == 0)
     return true;
-  if (distance > 0 && distance <= m_backForwardList->forwardListCount())
+  if (distance > 0 && distance <= backForwardList()->forwardListCount())
     return true;
-  if (distance < 0 && -distance <= m_backForwardList->backListCount())
+  if (distance < 0 && -distance <= backForwardList()->backListCount())
     return true;
   return false;
 }
@@ -296,16 +297,16 @@ void Page::goBackOrForward(int distance) {
   if (distance == 0)
     return;
 
-  HistoryItem* item = m_backForwardList->itemAtIndex(distance);
+  HistoryItem* item = backForwardList()->itemAtIndex(distance);
   if (!item) {
     if (distance > 0) {
-      int forwardListCount = m_backForwardList->forwardListCount();
+      int forwardListCount = backForwardList()->forwardListCount();
       if (forwardListCount > 0)
-        item = m_backForwardList->itemAtIndex(forwardListCount);
+        item = backForwardList()->itemAtIndex(forwardListCount);
     } else {
-      int backListCount = m_backForwardList->backListCount();
+      int backListCount = backForwardList()->backListCount();
       if (backListCount > 0)
-        item = m_backForwardList->itemAtIndex(-backListCount);
+        item = backForwardList()->itemAtIndex(-backListCount);
     }
   }
 
@@ -344,8 +345,8 @@ void Page::goToItem(HistoryItem* item, FrameLoadType type) {
 }
 
 int Page::getHistoryLength() {
-  return m_backForwardList->backListCount() + 1 +
-         m_backForwardList->forwardListCount();
+  return backForwardList()->backListCount() + 1 +
+         backForwardList()->forwardListCount();
 }
 
 void Page::setGlobalHistoryItem(HistoryItem* item) {
