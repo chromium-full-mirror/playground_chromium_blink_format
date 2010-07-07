@@ -23,17 +23,17 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef DeviceOrientation_h
-#define DeviceOrientation_h
+#ifndef DeviceOrientationController_h
+#define DeviceOrientationController_h
 
 namespace WebCore {
 
 class DeviceOrientationClient;
 class Page;
 
-class DeviceOrientation {
+class DeviceOrientationController {
  public:
-  DeviceOrientation(Page*, DeviceOrientationClient*);
+  DeviceOrientationController(Page*, DeviceOrientationClient*);
 
   // FIXME: Add methods to start and stop the service.
 
@@ -46,4 +46,4 @@ class DeviceOrientation {
 
 }  // namespace WebCore
 
-#endif  // DeviceOrientation_h
+#endif  // DeviceOrientationController_h

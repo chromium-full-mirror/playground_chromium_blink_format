@@ -44,8 +44,8 @@ class Chrome;
 class ChromeClient;
 class ContextMenuClient;
 class ContextMenuController;
-class DeviceOrientation;
 class DeviceOrientationClient;
+class DeviceOrientationController;
 class Document;
 class DragClient;
 class DragController;
@@ -178,8 +178,8 @@ class Page : public Noncopyable {
   }
 #endif
 #if ENABLE(DEVICE_ORIENTATION)
-  DeviceOrientation* deviceOrientation() const {
-    return m_deviceOrientation.get();
+  DeviceOrientationController* deviceOrientationController() const {
+    return m_deviceOrientationController.get();
   }
 #endif
   Settings* settings() const { return m_settings.get(); }
@@ -323,7 +323,7 @@ class Page : public Noncopyable {
   OwnPtr<GeolocationController> m_geolocationController;
 #endif
 #if ENABLE(DEVICE_ORIENTATION)
-  OwnPtr<DeviceOrientation> m_deviceOrientation;
+  OwnPtr<DeviceOrientationController> m_deviceOrientationController;
 #endif
   OwnPtr<Settings> m_settings;
   OwnPtr<ProgressTracker> m_progress;

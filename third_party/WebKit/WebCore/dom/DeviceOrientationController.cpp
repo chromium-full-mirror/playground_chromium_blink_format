@@ -24,7 +24,7 @@
  */
 
 #include "config.h"
-#include "DeviceOrientation.h"
+#include "DeviceOrientationController.h"
 
 #if ENABLE(DEVICE_ORIENTATION)
 
@@ -34,13 +34,14 @@
 
 namespace WebCore {
 
-DeviceOrientation::DeviceOrientation(Page* page,
-                                     DeviceOrientationClient* client)
+DeviceOrientationController::DeviceOrientationController(
+    Page* page,
+    DeviceOrientationClient* client)
     : m_page(page), m_client(client) {}
 
-void DeviceOrientation::onDeviceOrientationChange(double alpha,
-                                                  double beta,
-                                                  double gamma) {
+void DeviceOrientationController::onDeviceOrientationChange(double alpha,
+                                                            double beta,
+                                                            double gamma) {
   // FIXME: Fire DeviceOrientationEvents on the window object of all frames
   // that are listening to orientation.
   UNUSED_PARAM(alpha);
