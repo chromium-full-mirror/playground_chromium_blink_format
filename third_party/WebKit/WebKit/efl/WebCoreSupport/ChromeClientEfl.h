@@ -147,6 +147,10 @@ class ChromeClientEfl : public ChromeClient {
   virtual void cancelGeolocationPermissionRequestForFrame(Frame*);
   virtual void iconForFiles(const Vector<String, 0u>&, PassRefPtr<FileChooser>);
 
+  virtual void didReceiveViewportArguments(
+      Frame* frame,
+      const ViewportArguments& arguments) const;
+
   Evas_Object* m_view;
   KURL m_hoveredLinkURL;
 };
