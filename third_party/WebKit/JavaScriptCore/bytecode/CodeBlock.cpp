@@ -1586,7 +1586,7 @@ CodeBlock::CodeBlock(ScriptExecutable* ownerExecutable,
       m_source(sourceProvider),
       m_sourceOffset(sourceOffset),
       m_symbolTable(symTab),
-      m_exceptionInfo(new ExceptionInfo) {
+      m_exceptionInfo(adoptPtr(new ExceptionInfo)) {
   ASSERT(m_source);
 
 #if DUMP_CODE_BLOCK_STATISTICS

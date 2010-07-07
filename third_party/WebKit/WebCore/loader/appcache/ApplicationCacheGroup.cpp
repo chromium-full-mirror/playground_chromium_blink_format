@@ -1151,7 +1151,7 @@ class CallCacheListenerTask : public ScriptExecutionContext::Task {
   static PassOwnPtr<CallCacheListenerTask> create(
       PassRefPtr<DocumentLoader> loader,
       ApplicationCacheHost::EventID eventID) {
-    return new CallCacheListenerTask(loader, eventID);
+    return adoptPtr(new CallCacheListenerTask(loader, eventID));
   }
 
   virtual void performTask(ScriptExecutionContext* context) {

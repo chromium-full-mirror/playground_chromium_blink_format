@@ -914,7 +914,7 @@ void JSArray::sort(ExecState* exec,
       (m_storage->m_sparseValueMap ? m_storage->m_sparseValueMap->size() : 0));
 
   if (callType == CallTypeJS)
-    tree.abstractor().m_cachedCall.set(new CachedCall(
+    tree.abstractor().m_cachedCall = adoptPtr(new CachedCall(
         exec, asFunction(compareFunction), 2, exec->exceptionSlot()));
 
   if (!tree.abstractor().m_nodes.begin()) {

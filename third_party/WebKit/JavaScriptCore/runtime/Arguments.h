@@ -161,7 +161,7 @@ ALWAYS_INLINE void Arguments::getArgumentsData(CallFrame* callFrame,
 
 inline Arguments::Arguments(CallFrame* callFrame)
     : JSObject(callFrame->lexicalGlobalObject()->argumentsStructure()),
-      d(new ArgumentsData) {
+      d(adoptPtr(new ArgumentsData)) {
   JSFunction* callee;
   ptrdiff_t firstParameterIndex;
   Register* argv;
@@ -198,7 +198,7 @@ inline Arguments::Arguments(CallFrame* callFrame)
 
 inline Arguments::Arguments(CallFrame* callFrame, NoParametersType)
     : JSObject(callFrame->lexicalGlobalObject()->argumentsStructure()),
-      d(new ArgumentsData) {
+      d(adoptPtr(new ArgumentsData)) {
   ASSERT(!asFunction(callFrame->callee())->jsExecutable()->parameterCount());
 
   unsigned numArguments = callFrame->argumentCount();

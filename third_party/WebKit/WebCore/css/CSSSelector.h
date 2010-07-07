@@ -26,6 +26,7 @@
 #include "QualifiedName.h"
 #include <wtf/Noncopyable.h>
 #include <wtf/OwnPtr.h>
+#include <wtf/PassOwnPtr.h>
 
 namespace WebCore {
 
@@ -286,11 +287,10 @@ class CSSSelector : public Noncopyable {
   void extractPseudoType() const;
 
   struct RareData : Noncopyable {
-    RareData(CSSSelector* tagHistory)
+    RareData(PassOwnPtr<CSSSelector> tagHistory)
         : m_a(0),
           m_b(0),
           m_tagHistory(tagHistory),
-          m_simpleSelector(0),
           m_attribute(anyQName()),
           m_argument(nullAtom) {}
 
@@ -308,7 +308,7 @@ class CSSSelector : public Noncopyable {
   void createRareData() {
     if (m_hasRareData)
       return;
-    m_data.m_rareData = new RareData(m_data.m_tagHistory);
+    m_data.m_rareData = new RareData(adoptPtr(m_data.m_tagHistory));
     m_hasRareData = true;
   }
 

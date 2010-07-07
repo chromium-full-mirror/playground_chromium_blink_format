@@ -118,7 +118,7 @@ CachedFrame::CachedFrame(Frame* frame) : CachedFrameBase(frame) {
 
   // Active DOM objects must be suspended before we cached the frame script data
   m_document->suspendActiveDOMObjects();
-  m_cachedFrameScriptData.set(new ScriptCachedFrameData(frame));
+  m_cachedFrameScriptData = adoptPtr(new ScriptCachedFrameData(frame));
 
   // Custom scrollbar renderers will get reattached when the document comes out
   // of the page cache
@@ -238,8 +238,9 @@ void CachedFrame::destroy() {
   clear();
 }
 
-void CachedFrame::setCachedFramePlatformData(CachedFramePlatformData* data) {
-  m_cachedFramePlatformData.set(data);
+void CachedFrame::setCachedFramePlatformData(
+    PassOwnPtr<CachedFramePlatformData> data) {
+  m_cachedFramePlatformData = data;
 }
 
 CachedFramePlatformData* CachedFrame::cachedFramePlatformData() {

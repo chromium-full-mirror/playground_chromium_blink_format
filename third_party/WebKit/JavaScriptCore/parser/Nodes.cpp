@@ -102,11 +102,11 @@ ScopeNode::ScopeNode(JSGlobalData* globalData,
                      int numConstants)
     : StatementNode(globalData),
       ParserArenaRefCounted(globalData),
-      m_data(new ScopeNodeData(globalData->parser->arena(),
-                               children,
-                               varStack,
-                               funcStack,
-                               numConstants)),
+      m_data(adoptPtr(new ScopeNodeData(globalData->parser->arena(),
+                                        children,
+                                        varStack,
+                                        funcStack,
+                                        numConstants))),
       m_features(features),
       m_source(source) {}
 

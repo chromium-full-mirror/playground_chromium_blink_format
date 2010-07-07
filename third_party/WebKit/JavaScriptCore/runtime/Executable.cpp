@@ -75,9 +75,9 @@ JSObject* EvalExecutable::compile(ExecState* exec,
   ASSERT(!m_evalCodeBlock);
   m_evalCodeBlock = new EvalCodeBlock(this, globalObject, source().provider(),
                                       scopeChain.localDepth());
-  OwnPtr<BytecodeGenerator> generator(new BytecodeGenerator(
+  OwnPtr<BytecodeGenerator> generator(adoptPtr(new BytecodeGenerator(
       evalNode.get(), globalObject->debugger(), scopeChain,
-      m_evalCodeBlock->symbolTable(), m_evalCodeBlock));
+      m_evalCodeBlock->symbolTable(), m_evalCodeBlock)));
   generator->generate();
 
   evalNode->destroyData();
@@ -121,9 +121,9 @@ JSObject* ProgramExecutable::compile(ExecState* exec,
   ASSERT(!m_programCodeBlock);
   m_programCodeBlock =
       new ProgramCodeBlock(this, GlobalCode, globalObject, source().provider());
-  OwnPtr<BytecodeGenerator> generator(new BytecodeGenerator(
+  OwnPtr<BytecodeGenerator> generator(adoptPtr(new BytecodeGenerator(
       programNode.get(), globalObject->debugger(), scopeChain,
-      &globalObject->symbolTable(), m_programCodeBlock));
+      &globalObject->symbolTable(), m_programCodeBlock)));
   generator->generate();
 
   programNode->destroyData();
@@ -148,9 +148,9 @@ bool FunctionExecutable::compileForCall(ExecState*,
   ASSERT(!m_codeBlockForCall);
   m_codeBlockForCall = new FunctionCodeBlock(
       this, FunctionCode, source().provider(), source().startOffset(), false);
-  OwnPtr<BytecodeGenerator> generator(new BytecodeGenerator(
+  OwnPtr<BytecodeGenerator> generator(adoptPtr(new BytecodeGenerator(
       body.get(), globalObject->debugger(), scopeChain,
-      m_codeBlockForCall->symbolTable(), m_codeBlockForCall));
+      m_codeBlockForCall->symbolTable(), m_codeBlockForCall)));
   generator->generate();
   m_numParametersForCall = m_codeBlockForCall->m_numParameters;
   ASSERT(m_numParametersForCall);
@@ -179,9 +179,9 @@ bool FunctionExecutable::compileForConstruct(ExecState*,
   ASSERT(!m_codeBlockForConstruct);
   m_codeBlockForConstruct = new FunctionCodeBlock(
       this, FunctionCode, source().provider(), source().startOffset(), true);
-  OwnPtr<BytecodeGenerator> generator(new BytecodeGenerator(
+  OwnPtr<BytecodeGenerator> generator(adoptPtr(new BytecodeGenerator(
       body.get(), globalObject->debugger(), scopeChain,
-      m_codeBlockForConstruct->symbolTable(), m_codeBlockForConstruct));
+      m_codeBlockForConstruct->symbolTable(), m_codeBlockForConstruct)));
   generator->generate();
   m_numParametersForConstruct = m_codeBlockForConstruct->m_numParameters;
   ASSERT(m_numParametersForConstruct);
@@ -278,14 +278,14 @@ PassOwnPtr<ExceptionInfo> FunctionExecutable::reparseExceptionInfo(
   ScopeChain scopeChain(scopeChainNode);
   JSGlobalObject* globalObject = scopeChain.globalObject();
 
-  OwnPtr<CodeBlock> newCodeBlock(new FunctionCodeBlock(
+  OwnPtr<CodeBlock> newCodeBlock(adoptPtr(new FunctionCodeBlock(
       this, FunctionCode, source().provider(), source().startOffset(),
-      codeBlock->m_isConstructor));
+      codeBlock->m_isConstructor)));
   globalData->functionCodeBlockBeingReparsed = newCodeBlock.get();
 
-  OwnPtr<BytecodeGenerator> generator(new BytecodeGenerator(
+  OwnPtr<BytecodeGenerator> generator(adoptPtr(new BytecodeGenerator(
       newFunctionBody.get(), globalObject->debugger(), scopeChain,
-      newCodeBlock->symbolTable(), newCodeBlock.get()));
+      newCodeBlock->symbolTable(), newCodeBlock.get())));
   generator->setRegeneratingForExceptionInfo(
       static_cast<FunctionCodeBlock*>(codeBlock));
   generator->generate();
@@ -321,12 +321,12 @@ PassOwnPtr<ExceptionInfo> EvalExecutable::reparseExceptionInfo(
   ScopeChain scopeChain(scopeChainNode);
   JSGlobalObject* globalObject = scopeChain.globalObject();
 
-  OwnPtr<EvalCodeBlock> newCodeBlock(new EvalCodeBlock(
-      this, globalObject, source().provider(), scopeChain.localDepth()));
+  OwnPtr<EvalCodeBlock> newCodeBlock(adoptPtr(new EvalCodeBlock(
+      this, globalObject, source().provider(), scopeChain.localDepth())));
 
-  OwnPtr<BytecodeGenerator> generator(new BytecodeGenerator(
+  OwnPtr<BytecodeGenerator> generator(adoptPtr(new BytecodeGenerator(
       newEvalBody.get(), globalObject->debugger(), scopeChain,
-      newCodeBlock->symbolTable(), newCodeBlock.get()));
+      newCodeBlock->symbolTable(), newCodeBlock.get())));
   generator->setRegeneratingForExceptionInfo(
       static_cast<EvalCodeBlock*>(codeBlock));
   generator->generate();

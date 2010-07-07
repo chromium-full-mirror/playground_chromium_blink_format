@@ -94,9 +94,9 @@ struct TimingFunction;
 class AnimationValue : public Noncopyable {
  public:
   AnimationValue(float keyTime, const TimingFunction* timingFunction = 0)
-      : m_keyTime(keyTime), m_timingFunction(0) {
+      : m_keyTime(keyTime) {
     if (timingFunction)
-      m_timingFunction.set(new TimingFunction(*timingFunction));
+      m_timingFunction = adoptPtr(new TimingFunction(*timingFunction));
   }
 
   virtual ~AnimationValue() {}
@@ -133,7 +133,7 @@ class TransformAnimationValue : public AnimationValue {
                           const TimingFunction* timingFunction = 0)
       : AnimationValue(keyTime, timingFunction) {
     if (value)
-      m_value.set(new TransformOperations(*value));
+      m_value = adoptPtr(new TransformOperations(*value));
   }
 
   const TransformOperations* value() const { return m_value.get(); }

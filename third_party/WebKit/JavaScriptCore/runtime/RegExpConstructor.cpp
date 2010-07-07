@@ -113,7 +113,7 @@ RegExpConstructor::RegExpConstructor(ExecState* exec,
                        globalObject,
                        structure,
                        Identifier(exec, "RegExp")),
-      d(new RegExpConstructorPrivate) {
+      d(adoptPtr(new RegExpConstructorPrivate)) {
   // ECMA 15.10.5.1 RegExp.prototype
   putDirectWithoutTransition(exec->propertyNames().prototype, regExpPrototype,
                              DontEnum | DontDelete | ReadOnly);

@@ -1094,7 +1094,7 @@ bool ApplicationCacheStorage::storeCopyOfCache(
 
   // Now create a new cache group.
   OwnPtr<ApplicationCacheGroup> groupCopy(
-      new ApplicationCacheGroup(cache->group()->manifestURL(), true));
+      adoptPtr(new ApplicationCacheGroup(cache->group()->manifestURL(), true)));
 
   groupCopy->setNewestCache(cacheCopy);
 

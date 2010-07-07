@@ -64,7 +64,7 @@ RegExpObject::RegExpObject(JSGlobalObject* globalObject,
                            NonNullPassRefPtr<Structure> structure,
                            NonNullPassRefPtr<RegExp> regExp)
     : JSObjectWithGlobalObject(globalObject, structure),
-      d(new RegExpObjectData(regExp, 0)) {}
+      d(adoptPtr(new RegExpObjectData(regExp, 0))) {}
 
 RegExpObject::~RegExpObject() {}
 

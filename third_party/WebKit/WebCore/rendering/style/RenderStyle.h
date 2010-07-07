@@ -1601,12 +1601,14 @@ class RenderStyle : public RefCounted<RenderStyle> {
   }
 
   void inheritAnimations(const AnimationList* parent) {
-    rareNonInheritedData.access()->m_animations.set(
-        parent ? new AnimationList(*parent) : 0);
+    rareNonInheritedData.access()->m_animations =
+        parent ? adoptPtr(new AnimationList(*parent))
+               : PassOwnPtr<AnimationList>();
   }
   void inheritTransitions(const AnimationList* parent) {
-    rareNonInheritedData.access()->m_transitions.set(
-        parent ? new AnimationList(*parent) : 0);
+    rareNonInheritedData.access()->m_transitions =
+        parent ? adoptPtr(new AnimationList(*parent))
+               : PassOwnPtr<AnimationList>();
   }
   void adjustAnimations();
   void adjustTransitions();
