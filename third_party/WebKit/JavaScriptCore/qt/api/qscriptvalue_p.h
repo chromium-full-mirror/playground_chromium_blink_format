@@ -119,6 +119,7 @@ class QScriptValuePrivate : public QSharedData {
   inline bool isError();
   inline bool isObject();
   inline bool isFunction();
+  inline bool isArray();
 
   inline QString toString() const;
   inline qsreal toNumber() const;
@@ -448,6 +449,19 @@ bool QScriptValuePrivate::isFunction() {
     // Fall-through.
     case JSObject:
       return JSObjectIsFunction(*m_engine, *this);
+    default:
+      return false;
+  }
+}
+
+bool QScriptValuePrivate::isArray() {
+  switch (m_state) {
+    case JSValue:
+      if (refinedJSValue() != JSObject)
+        return false;
+    // Fall-through.
+    case JSObject:
+      return m_engine->isArray(*this);
     default:
       return false;
   }
