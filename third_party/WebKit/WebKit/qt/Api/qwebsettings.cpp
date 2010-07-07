@@ -77,10 +77,17 @@ class QWebSettingsPrivate {
 typedef QHash<int, QPixmap> WebGraphicHash;
 Q_GLOBAL_STATIC(WebGraphicHash, _graphics)
 
+static void earlyClearGraphics() {
+  _graphics()->clear();
+}
+
 static WebGraphicHash* graphics() {
   WebGraphicHash* hash = _graphics();
 
   if (hash->isEmpty()) {
+    // prevent ~QPixmap running after ~QApplication (leaks native pixmaps)
+    qAddPostRoutine(earlyClearGraphics);
+
     hash->insert(QWebSettings::MissingImageGraphic,
                  QPixmap(QLatin1String(":webkit/resources/missingImage.png")));
     hash->insert(QWebSettings::MissingPluginGraphic,
