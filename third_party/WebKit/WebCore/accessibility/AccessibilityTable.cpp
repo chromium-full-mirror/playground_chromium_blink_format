@@ -137,7 +137,9 @@ bool AccessibilityTable::isTableExposableThroughAccessibility() {
   unsigned borderedCellCount = 0;
   unsigned backgroundDifferenceCellCount = 0;
 
+  int headersInFirstColumnCount = 0;
   for (int row = 0; row < numRows; ++row) {
+    int headersInFirstRowCount = 0;
     for (int col = 0; col < numCols; ++col) {
       RenderTableCell* cell = firstBody->cellAt(row, col).cell;
       if (!cell)
@@ -153,6 +155,17 @@ bool AccessibilityTable::isTableExposableThroughAccessibility() {
 
       HTMLTableCellElement* cellElement =
           static_cast<HTMLTableCellElement*>(cellNode);
+
+      bool isTHCell = cellElement->hasTagName(thTag);
+      // If the first row is comprised of all <th> tags, assume it is a data
+      // table.
+      if (!row && isTHCell)
+        headersInFirstRowCount++;
+
+      // If the first column is comprised of all <tg> tags, assume it is a data
+      // table.
+      if (!col && isTHCell)
+        headersInFirstColumnCount++;
 
       // in this case, the developer explicitly assigned a "data" table
       // attribute
@@ -184,7 +197,13 @@ bool AccessibilityTable::isTableExposableThroughAccessibility() {
       if (borderedCellCount >= 10 || backgroundDifferenceCellCount >= 10)
         return true;
     }
+
+    if (!row && headersInFirstRowCount == numCols && numCols > 1)
+      return true;
   }
+
+  if (headersInFirstColumnCount == numRows && numRows > 1)
+    return true;
 
   // if there is less than two valid cells, it's not a data table
   if (validCellCount <= 1)
