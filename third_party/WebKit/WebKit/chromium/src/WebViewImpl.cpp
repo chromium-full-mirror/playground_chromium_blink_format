@@ -266,7 +266,7 @@ WebViewImpl::WebViewImpl(WebViewClient* client,
 
   m_page.set(new Page(&m_chromeClientImpl, &m_contextMenuClientImpl,
                       &m_editorClientImpl, &m_dragClientImpl,
-                      &m_inspectorClientImpl, 0, 0, 0));
+                      &m_inspectorClientImpl, 0, 0, 0, 0));
 
   // the page will take ownership of the various clients
 

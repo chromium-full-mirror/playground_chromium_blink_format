@@ -29,6 +29,7 @@
 #include "DrawingArea.h"
 #include "InjectedBundle.h"
 #include "MessageID.h"
+#include "WebBackForwardControllerClient.h"
 #include "WebChromeClient.h"
 #include "WebContextMenuClient.h"
 #include "WebCoreArgumentCoders.h"
@@ -88,7 +89,8 @@ WebPage::WebPage(uint64_t pageID,
                       new WebInspectorClient(this),
                       0,
                       0,
-                      0)),
+                      0,
+                      new WebBackForwardControllerClient(this))),
       m_viewSize(viewSize),
       m_drawingArea(DrawingArea::create(drawingAreaType, this)),
       m_canGoBack(false),

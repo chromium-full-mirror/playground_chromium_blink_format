@@ -39,6 +39,7 @@ class Debugger;
 namespace WebCore {
 
 class BackForwardController;
+class BackForwardControllerClient;
 class BackForwardList;
 class Chrome;
 class ChromeClient;
@@ -96,7 +97,8 @@ class Page : public Noncopyable {
        InspectorClient*,
        PluginHalterClient*,
        GeolocationControllerClient*,
-       DeviceOrientationClient*);
+       DeviceOrientationClient*,
+       BackForwardControllerClient*);
   ~Page();
 
   RenderTheme* theme() const { return m_theme.get(); };
