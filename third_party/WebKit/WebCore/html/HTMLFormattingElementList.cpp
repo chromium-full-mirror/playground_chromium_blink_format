@@ -149,4 +149,18 @@ void HTMLFormattingElementList::clearToLastMarker() {
   while (m_entries.size() && !m_entries.last().isMarker())
     m_entries.removeLast();
 }
+
+#ifndef NDEBUG
+
+void HTMLFormattingElementList::show() {
+  for (unsigned i = 1; i <= m_entries.size(); ++i) {
+    const Entry& entry = m_entries[m_entries.size() - i];
+    if (entry.isMarker())
+      fprintf(stderr, "marker\n");
+    else
+      entry.element()->showNode();
+  }
+}
+
+#endif
 }
