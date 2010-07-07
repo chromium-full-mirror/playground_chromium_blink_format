@@ -78,7 +78,7 @@ static int depth(CodeBlock* codeBlock, ScopeChain& sc) {
   return sc.localDepth();
 }
 
-#if !ENABLE(JIT)
+#if ENABLE(INTERPRETER)
 NEVER_INLINE bool Interpreter::resolve(CallFrame* callFrame,
                                        Instruction* vPC,
                                        JSValue& exceptionValue) {
@@ -310,7 +310,7 @@ NEVER_INLINE bool Interpreter::resolveBaseAndProperty(CallFrame* callFrame,
   return false;
 }
 
-#endif  // !ENABLE(JIT)
+#endif  // ENABLE(INTERPRETER)
 
 ALWAYS_INLINE CallFrame* Interpreter::slideRegisterWindowForCall(
     CodeBlock* newCodeBlock,
@@ -357,7 +357,7 @@ ALWAYS_INLINE CallFrame* Interpreter::slideRegisterWindowForCall(
   return CallFrame::create(r);
 }
 
-#if !ENABLE(JIT)
+#if ENABLE(INTERPRETER)
 static NEVER_INLINE bool isInvalidParamForIn(CallFrame* callFrame,
                                              CodeBlock* codeBlock,
                                              const Instruction* vPC,
@@ -639,8 +639,21 @@ NEVER_INLINE bool Interpreter::unwindCallFrame(CallFrame*& callFrame,
     return false;
 
   codeBlock = callerFrame->codeBlock();
+#if ENABLE(JIT)
+#if ENABLE(INTERPRETER)
+  if (callerFrame->globalData().canUseJIT())
+#endif
+    bytecodeOffset =
+        codeBlock->bytecodeOffset(callerFrame, callFrame->returnPC());
+#if ENABLE(INTERPRETER)
+  else
+    bytecodeOffset =
+        codeBlock->bytecodeOffset(callerFrame, callFrame->returnVPC());
+#endif
+#else
   bytecodeOffset =
-      codeBlock->bytecodeOffset(callerFrame, callFrame->returnPC());
+      codeBlock->bytecodeOffset(callerFrame, callFrame->returnVPC());
+#endif
   callFrame = callerFrame;
   return true;
 }
@@ -702,27 +715,37 @@ NEVER_INLINE HandlerInfo* Interpreter::throwException(CallFrame*& callFrame,
   // the profiler manually that the call instruction has returned, since
   // we'll never reach the relevant op_profile_did_call.
   if (Profiler* profiler = *Profiler::enabledProfilerReference()) {
-#if !ENABLE(JIT)
-    // FIXME: Why 8? - work out what this magic value is, replace the constant
-    // with something more helpful.
-    if (isCallBytecode(codeBlock->instructions()[bytecodeOffset].u.opcode))
-      profiler->didExecute(
-          callFrame,
-          callFrame->r(codeBlock->instructions()[bytecodeOffset + 1].u.operand)
-              .jsValue());
-    else if (codeBlock->instructions().size() > (bytecodeOffset + 8) &&
-             codeBlock->instructions()[bytecodeOffset + 8].u.opcode ==
-                 getOpcode(op_construct))
-      profiler->didExecute(
-          callFrame,
-          callFrame->r(codeBlock->instructions()[bytecodeOffset + 9].u.operand)
-              .jsValue());
-#else
-    int functionRegisterIndex;
-    if (codeBlock->functionRegisterForBytecodeOffset(bytecodeOffset,
-                                                     functionRegisterIndex))
-      profiler->didExecute(callFrame,
-                           callFrame->r(functionRegisterIndex).jsValue());
+#if ENABLE(INTERPRETER)
+    if (!callFrame->globalData().canUseJIT()) {
+      // FIXME: Why 8? - work out what this magic value is, replace the constant
+      // with something more helpful.
+      if (isCallBytecode(codeBlock->instructions()[bytecodeOffset].u.opcode))
+        profiler->didExecute(
+            callFrame,
+            callFrame
+                ->r(codeBlock->instructions()[bytecodeOffset + 1].u.operand)
+                .jsValue());
+      else if (codeBlock->instructions().size() > (bytecodeOffset + 8) &&
+               codeBlock->instructions()[bytecodeOffset + 8].u.opcode ==
+                   getOpcode(op_construct))
+        profiler->didExecute(
+            callFrame,
+            callFrame
+                ->r(codeBlock->instructions()[bytecodeOffset + 9].u.operand)
+                .jsValue());
+    }
+#if ENABLE(JIT)
+    else
+#endif
+#endif
+#if ENABLE(JIT)
+    {
+      int functionRegisterIndex;
+      if (codeBlock->functionRegisterForBytecodeOffset(bytecodeOffset,
+                                                       functionRegisterIndex))
+        profiler->didExecute(callFrame,
+                             callFrame->r(functionRegisterIndex).jsValue());
+    }
 #endif
   }
 
@@ -807,12 +830,20 @@ JSValue Interpreter::execute(ProgramExecutable* program,
 
     m_reentryDepth++;
 #if ENABLE(JIT)
-    result = program->jitCode(newCallFrame, scopeChain)
-                 .execute(&m_registerFile, newCallFrame, scopeChain->globalData,
-                          exception);
-#else
-    result = privateExecute(Normal, &m_registerFile, newCallFrame, exception);
+#if ENABLE(INTERPRETER)
+    if (callFrame->globalData().canUseJIT())
 #endif
+      result = program->jitCode(newCallFrame, scopeChain)
+                   .execute(&m_registerFile, newCallFrame,
+                            scopeChain->globalData, exception);
+#if ENABLE(INTERPRETER)
+    else
+#endif
+#endif
+#if ENABLE(INTERPRETER)
+      result = privateExecute(Normal, &m_registerFile, newCallFrame, exception);
+#endif
+
     m_reentryDepth--;
   }
 
@@ -892,12 +923,20 @@ JSValue Interpreter::executeCall(CallFrame* callFrame,
 
       m_reentryDepth++;
 #if ENABLE(JIT)
-      result = callData.js.functionExecutable
-                   ->jitCodeForCall(newCallFrame, callDataScopeChain)
-                   .execute(&m_registerFile, newCallFrame,
-                            callDataScopeChain->globalData, exception);
-#else
-      result = privateExecute(Normal, &m_registerFile, newCallFrame, exception);
+#if ENABLE(INTERPRETER)
+      if (callFrame->globalData().canUseJIT())
+#endif
+        result = callData.js.functionExecutable
+                     ->jitCodeForCall(newCallFrame, callDataScopeChain)
+                     .execute(&m_registerFile, newCallFrame,
+                              callDataScopeChain->globalData, exception);
+#if ENABLE(INTERPRETER)
+      else
+#endif
+#endif
+#if ENABLE(INTERPRETER)
+        result =
+            privateExecute(Normal, &m_registerFile, newCallFrame, exception);
 #endif
       m_reentryDepth--;
     }
@@ -1000,12 +1039,21 @@ JSObject* Interpreter::executeConstruct(CallFrame* callFrame,
 
       m_reentryDepth++;
 #if ENABLE(JIT)
-      result = constructData.js.functionExecutable
-                   ->jitCodeForConstruct(newCallFrame, constructDataScopeChain)
-                   .execute(&m_registerFile, newCallFrame,
-                            constructDataScopeChain->globalData, exception);
-#else
-      result = privateExecute(Normal, &m_registerFile, newCallFrame, exception);
+#if ENABLE(INTERPRETER)
+      if (callFrame->globalData().canUseJIT())
+#endif
+        result =
+            constructData.js.functionExecutable
+                ->jitCodeForConstruct(newCallFrame, constructDataScopeChain)
+                .execute(&m_registerFile, newCallFrame,
+                         constructDataScopeChain->globalData, exception);
+#if ENABLE(INTERPRETER)
+      else
+#endif
+#endif
+#if ENABLE(INTERPRETER)
+        result =
+            privateExecute(Normal, &m_registerFile, newCallFrame, exception);
 #endif
       m_reentryDepth--;
     }
@@ -1095,9 +1143,11 @@ CallFrameClosure Interpreter::prepareForRepeatCall(
   newCallFrame->init(codeBlock, 0, scopeChain,
                      callFrame->addHostCallFrameFlag(), argc, function);
 #if ENABLE(JIT)
-  FunctionExecutable->jitCodeForCall(newCallFrame, scopeChain);
+#if ENABLE(INTERPRETER)
+  if (callFrame->globalData().canUseJIT())
 #endif
-
+    FunctionExecutable->jitCodeForCall(newCallFrame, scopeChain);
+#endif
   CallFrameClosure result = {callFrame,
                              newCallFrame,
                              function,
@@ -1122,11 +1172,18 @@ JSValue Interpreter::execute(CallFrameClosure& closure, JSValue* exception) {
 
     m_reentryDepth++;
 #if ENABLE(JIT)
-    result = closure.functionExecutable->generatedJITCodeForCall().execute(
-        &m_registerFile, closure.newCallFrame, closure.globalData, exception);
-#else
-    result = privateExecute(Normal, &m_registerFile, closure.newCallFrame,
-                            exception);
+#if ENABLE(INTERPRETER)
+    if (closure.newCallFrame->globalData().canUseJIT())
+#endif
+      result = closure.functionExecutable->generatedJITCodeForCall().execute(
+          &m_registerFile, closure.newCallFrame, closure.globalData, exception);
+#if ENABLE(INTERPRETER)
+    else
+#endif
+#endif
+#if ENABLE(INTERPRETER)
+      result = privateExecute(Normal, &m_registerFile, closure.newCallFrame,
+                              exception);
 #endif
     m_reentryDepth--;
   }
@@ -1237,12 +1294,20 @@ JSValue Interpreter::execute(EvalExecutable* eval,
     SamplingTool::CallRecord callRecord(m_sampler.get());
 
     m_reentryDepth++;
+
 #if ENABLE(JIT)
-    result = eval->jitCode(newCallFrame, scopeChain)
-                 .execute(&m_registerFile, newCallFrame, scopeChain->globalData,
-                          exception);
-#else
-    result = privateExecute(Normal, &m_registerFile, newCallFrame, exception);
+#if ENABLE(INTERPRETER)
+    if (callFrame->globalData().canUseJIT())
+#endif
+      result = eval->jitCode(newCallFrame, scopeChain)
+                   .execute(&m_registerFile, newCallFrame,
+                            scopeChain->globalData, exception);
+#if ENABLE(INTERPRETER)
+    else
+#endif
+#endif
+#if ENABLE(INTERPRETER)
+      result = privateExecute(Normal, &m_registerFile, newCallFrame, exception);
 #endif
     m_reentryDepth--;
   }
@@ -1296,7 +1361,7 @@ NEVER_INLINE void Interpreter::debug(CallFrame* callFrame,
   }
 }
 
-#if !ENABLE(JIT)
+#if ENABLE(INTERPRETER)
 NEVER_INLINE ScopeChainNode* Interpreter::createExceptionScope(
     CallFrame* callFrame,
     const Instruction* vPC) {
@@ -1544,7 +1609,7 @@ NEVER_INLINE void Interpreter::uncacheGetByID(CodeBlock* codeBlock,
   vPC[4] = 0;
 }
 
-#endif  // !ENABLE(JIT)
+#endif  // ENABLE(INTERPRETER)
 
 JSValue Interpreter::privateExecute(ExecutionFlag flag,
                                     RegisterFile* registerFile,
@@ -1564,10 +1629,14 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
   }
 
 #if ENABLE(JIT)
+#if ENABLE(INTERPRETER)
   // Mixing Interpreter + JIT is not supported.
-  ASSERT_NOT_REACHED();
+  if (callFrame->globalData().canUseJIT())
 #endif
-#if !!ENABLE(JIT)
+    ASSERT_NOT_REACHED();
+#endif
+
+#if !ENABLE(INTERPRETER)
   UNUSED_PARAM(registerFile);
   UNUSED_PARAM(callFrame);
   UNUSED_PARAM(exception);
@@ -4098,10 +4167,11 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
           goto vm_throw;
         }
         ASSERT(!asFunction(callFrame->callee())->isHostFunction());
-        uint32_t expectedParams =
+        int32_t expectedParams =
             asFunction(callFrame->callee())->jsExecutable()->parameterCount();
-        uint32_t inplaceArgs = min(argCount, expectedParams);
-        uint32_t i = 0;
+        int32_t inplaceArgs =
+            min(static_cast<int32_t>(argCount), expectedParams);
+        int32_t i = 0;
         Register* argStore = callFrame->registers() + argsOffset;
 
         // First step is to copy the "expected" parameters from their normal
@@ -4112,7 +4182,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
                                      expectedParams];
         // Then we copy any additional arguments that may be further up the
         // stack ('-1' to account for 'this')
-        for (; i < argCount; i++)
+        for (; i < static_cast<int32_t>(argCount); i++)
           argStore[i] =
               callFrame->registers()[i - RegisterFile::CallFrameHeaderSize -
                                      expectedParams - argCount - 1];
@@ -4334,7 +4404,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
 
       JSValue returnValue = callFrame->r(result).jsValue();
 
-      vPC = callFrame->returnPC();
+      vPC = callFrame->returnVPC();
       callFrame = callFrame->callerFrame();
 
       if (callFrame->hasHostCallFrameFlag())
@@ -4378,7 +4448,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
       if (UNLIKELY(!returnValue.isObject()))
         returnValue = callFrame->r(vPC[2].u.operand).jsValue();
 
-      vPC = callFrame->returnPC();
+      vPC = callFrame->returnVPC();
       callFrame = callFrame->callerFrame();
 
       if (callFrame->hasHostCallFrameFlag())
@@ -4574,7 +4644,6 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
                         asFunction(v));
         codeBlock = newCodeBlock;
         vPC = newCodeBlock->instructions().begin();
-
 #if ENABLE(OPCODE_STATS)
         OpcodeStats::resetLastInstruction();
 #endif
@@ -4998,7 +5067,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
 #undef DEFINE_OPCODE
 #undef CHECK_FOR_EXCEPTION
 #undef CHECK_FOR_TIMEOUT
-#endif  // !ENABLE(JIT)
+#endif  // ENABLE(INTERPRETER)
 }
 
 JSValue Interpreter::retrieveArguments(CallFrame* callFrame,
@@ -5058,9 +5127,20 @@ void Interpreter::retrieveLastCaller(CallFrame* callFrame,
   CodeBlock* callerCodeBlock = callerFrame->codeBlock();
   if (!callerCodeBlock)
     return;
-
-  unsigned bytecodeOffset =
+  unsigned bytecodeOffset = 0;
+#if ENABLE(INTERPRETER)
+  if (!callerFrame->globalData().canUseJIT())
+    bytecodeOffset =
+        callerCodeBlock->bytecodeOffset(callerFrame, callFrame->returnVPC());
+#if ENABLE(JIT)
+  else
+    bytecodeOffset =
+        callerCodeBlock->bytecodeOffset(callerFrame, callFrame->returnPC());
+#endif
+#else
+  bytecodeOffset =
       callerCodeBlock->bytecodeOffset(callerFrame, callFrame->returnPC());
+#endif
   lineNumber = callerCodeBlock->lineNumberForBytecodeOffset(callerFrame,
                                                             bytecodeOffset - 1);
   sourceID = callerCodeBlock->ownerExecutable()->sourceID();

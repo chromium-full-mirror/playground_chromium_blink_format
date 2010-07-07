@@ -136,8 +136,9 @@ class ExecState : private Register {
   ReturnAddressPtr returnPC() const {
     return ReturnAddressPtr(this[RegisterFile::ReturnPC].vPC());
   }
-#else
-  Instruction* returnPC() const { return this[RegisterFile::ReturnPC].vPC(); }
+#endif
+#if ENABLE(INTERPRETER)
+  Instruction* returnVPC() const { return this[RegisterFile::ReturnPC].vPC(); }
 #endif
 
   void setCallerFrame(CallFrame* callerFrame) {

@@ -168,7 +168,7 @@ class Interpreter : public FastAllocBase {
                   ScopeChainNode*,
                   JSValue* exception);
 
-#if !ENABLE(JIT)
+#if ENABLE(INTERPRETER)
   NEVER_INLINE bool resolve(CallFrame*, Instruction*, JSValue& exceptionValue);
   NEVER_INLINE bool resolveSkip(CallFrame*,
                                 Instruction*,
@@ -199,7 +199,7 @@ class Interpreter : public FastAllocBase {
                        JSValue baseValue,
                        const PutPropertySlot&);
   void uncachePutByID(CodeBlock*, Instruction* vPC);
-#endif  // !ENABLE(JIT)
+#endif  // ENABLE(INTERPRETER)
 
   NEVER_INLINE bool unwindCallFrame(CallFrame*&,
                                     JSValue,

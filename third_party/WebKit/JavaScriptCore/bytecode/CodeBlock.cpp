@@ -1595,13 +1595,14 @@ CodeBlock::CodeBlock(ScriptExecutable* ownerExecutable,
 }
 
 CodeBlock::~CodeBlock() {
-#if !ENABLE(JIT)
+#if ENABLE(INTERPRETER)
   for (size_t size = m_globalResolveInstructions.size(), i = 0; i < size; ++i)
     derefStructures(&m_instructions[m_globalResolveInstructions[i]]);
 
   for (size_t size = m_propertyAccessInstructions.size(), i = 0; i < size; ++i)
     derefStructures(&m_instructions[m_propertyAccessInstructions[i]]);
-#else
+#endif
+#if ENABLE(JIT)
   for (size_t size = m_globalResolveInfos.size(), i = 0; i < size; ++i) {
     if (m_globalResolveInfos[i].structure)
       m_globalResolveInfos[i].structure->deref();
@@ -1629,7 +1630,7 @@ CodeBlock::~CodeBlock() {
   unlinkCallers();
 #endif
 
-#endif  // !ENABLE(JIT)
+#endif  // ENABLE(JIT)
 
 #if DUMP_CODE_BLOCK_STATISTICS
   liveCodeBlockSet.remove(this);
@@ -1933,7 +1934,7 @@ bool CodeBlock::functionRegisterForBytecodeOffset(unsigned bytecodeOffset,
 }
 #endif
 
-#if !ENABLE(JIT)
+#if ENABLE(INTERPRETER)
 bool CodeBlock::hasGlobalResolveInstructionAtBytecodeOffset(
     unsigned bytecodeOffset) {
   if (m_globalResolveInstructions.isEmpty())
@@ -1953,7 +1954,8 @@ bool CodeBlock::hasGlobalResolveInstructionAtBytecodeOffset(
     return false;
   return true;
 }
-#else
+#endif
+#if ENABLE(JIT)
 bool CodeBlock::hasGlobalResolveInfoAtBytecodeOffset(unsigned bytecodeOffset) {
   if (m_globalResolveInfos.isEmpty())
     return false;
@@ -1977,10 +1979,11 @@ bool CodeBlock::hasGlobalResolveInfoAtBytecodeOffset(unsigned bytecodeOffset) {
 void CodeBlock::shrinkToFit() {
   m_instructions.shrinkToFit();
 
-#if !ENABLE(JIT)
+#if ENABLE(INTERPRETER)
   m_propertyAccessInstructions.shrinkToFit();
   m_globalResolveInstructions.shrinkToFit();
-#else
+#endif
+#if ENABLE(JIT)
   m_structureStubInfos.shrinkToFit();
   m_globalResolveInfos.shrinkToFit();
   m_callLinkInfos.shrinkToFit();
