@@ -244,6 +244,12 @@ class PlatformKeyboardEvent : public FastAllocBase {
 #endif
 };
 
+#if PLATFORM(QT)
+// Used by WebKit2.
+String keyIdentifierForQtKeyCode(int keyCode);
+int windowsKeyCodeForKeyEvent(unsigned int keycode, bool isKeypad = false);
+#endif
+
 }  // namespace WebCore
 
 #endif  // PlatformKeyboardEvent_h
