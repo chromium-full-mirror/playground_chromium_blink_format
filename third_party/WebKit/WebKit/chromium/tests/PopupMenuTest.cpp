@@ -115,8 +115,14 @@ class TestWebWidgetClient : public WebWidgetClient {
 
 class TestWebPopupMenuImpl : public WebPopupMenuImpl {
  public:
-  TestWebPopupMenuImpl(WebWidgetClient* client) : WebPopupMenuImpl(client) {}
+  static PassRefPtr<TestWebPopupMenuImpl> create(WebWidgetClient* client) {
+    return adoptRef(new TestWebPopupMenuImpl(client));
+  }
+
   ~TestWebPopupMenuImpl() {}
+
+ private:
+  TestWebPopupMenuImpl(WebWidgetClient* client) : WebPopupMenuImpl(client) {}
 };
 
 class TestWebWidget : public WebWidget {
@@ -147,10 +153,13 @@ class TestWebWidget : public WebWidget {
 
 class TestWebViewClient : public WebViewClient {
  public:
-  TestWebViewClient() : m_webPopupMenu(&m_webWidgetClient) {}
+  TestWebViewClient()
+      : m_webPopupMenu(TestWebPopupMenuImpl::create(&m_webWidgetClient)) {}
   ~TestWebViewClient() {}
 
-  virtual WebWidget* createPopupMenu(WebPopupType) { return &m_webPopupMenu; }
+  virtual WebWidget* createPopupMenu(WebPopupType) {
+    return m_webPopupMenu.get();
+  }
 
   // We need to override this so that the popup menu size is not 0
   // (the layout code checks to see if the popup fits on the screen).
@@ -163,7 +172,7 @@ class TestWebViewClient : public WebViewClient {
 
  private:
   TestWebWidgetClient m_webWidgetClient;
-  TestWebPopupMenuImpl m_webPopupMenu;
+  RefPtr<TestWebPopupMenuImpl> m_webPopupMenu;
 };
 
 class TestWebFrameClient : public WebFrameClient {
