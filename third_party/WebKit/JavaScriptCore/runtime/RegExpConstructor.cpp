@@ -36,6 +36,7 @@
 #include "RegExpPrototype.h"
 #include "RegExp.h"
 #include "RegExpCache.h"
+#include <wtf/PassOwnPtr.h>
 
 namespace JSC {
 

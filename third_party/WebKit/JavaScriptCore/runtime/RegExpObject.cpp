@@ -30,6 +30,7 @@
 #include "Lookup.h"
 #include "RegExpConstructor.h"
 #include "RegExpPrototype.h"
+#include <wtf/PassOwnPtr.h>
 
 namespace JSC {
 
