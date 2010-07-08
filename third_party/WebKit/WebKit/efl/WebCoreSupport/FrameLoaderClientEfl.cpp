@@ -248,11 +248,28 @@ void FrameLoaderClientEfl::dispatchDidCancelAuthenticationChallenge(
   notImplemented();
 }
 
-void FrameLoaderClientEfl::dispatchWillSendRequest(DocumentLoader*,
-                                                   unsigned long,
-                                                   ResourceRequest&,
-                                                   const ResourceResponse&) {
-  notImplemented();
+void FrameLoaderClientEfl::dispatchWillSendRequest(
+    DocumentLoader* loader,
+    unsigned long identifier,
+    ResourceRequest& coreRequest,
+    const ResourceResponse& coreResponse) {
+  CString url = coreRequest.url().prettyURL().utf8();
+  DBG("Resource url=%s", url.data());
+
+  Ewk_Frame_Resource_Request request = {0, identifier};
+  Ewk_Frame_Resource_Request orig = request; /* Initialize const fields. */
+
+  orig.url = request.url = url.data();
+
+  ewk_frame_request_will_send(m_frame, &request);
+
+  if (request.url != orig.url) {
+    coreRequest.setURL(KURL(KURL(), request.url));
+
+    // Calling client might have changed our url pointer.
+    // Free the new allocated string.
+    free(const_cast<char*>(request.url));
+  }
 }
 
 bool FrameLoaderClientEfl::shouldUseCredentialStorage(DocumentLoader*,
@@ -264,8 +281,12 @@ bool FrameLoaderClientEfl::shouldUseCredentialStorage(DocumentLoader*,
 void FrameLoaderClientEfl::assignIdentifierToInitialRequest(
     unsigned long identifier,
     DocumentLoader*,
-    const ResourceRequest&) {
-  notImplemented();
+    const ResourceRequest& coreRequest) {
+  CString url = coreRequest.url().prettyURL().utf8();
+  DBG("Resource url=%s", url.data());
+
+  Ewk_Frame_Resource_Request request = {0, identifier};
+  ewk_frame_request_assign_identifier(m_frame, &request);
 }
 
 void FrameLoaderClientEfl::postProgressStartedNotification() {
@@ -442,7 +463,7 @@ void FrameLoaderClientEfl::documentElementAvailable() {
 }
 
 void FrameLoaderClientEfl::didPerformFirstNavigation() const {
-  notImplemented();
+  ewk_frame_did_perform_first_navigation(m_frame);
 }
 
 void FrameLoaderClientEfl::registerForIconNotification(bool) {
@@ -471,12 +492,15 @@ void FrameLoaderClientEfl::frameLoadCompleted() {
   // Note: Can be called multiple times.
 }
 
-void FrameLoaderClientEfl::saveViewStateToItem(HistoryItem*) {
-  notImplemented();
+void FrameLoaderClientEfl::saveViewStateToItem(HistoryItem* item) {
+  ewk_frame_view_state_save(m_frame, item);
 }
 
 void FrameLoaderClientEfl::restoreViewState() {
-  notImplemented();
+  ASSERT(m_frame);
+  ASSERT(m_view);
+
+  ewk_view_restore_state(m_view, m_frame);
 }
 
 void FrameLoaderClientEfl::updateGlobalHistoryRedirectLinks() {}
@@ -538,16 +562,30 @@ void FrameLoaderClientEfl::dispatchWillPerformClientRedirect(const KURL&,
 }
 
 void FrameLoaderClientEfl::dispatchDidChangeLocationWithinPage() {
-  notImplemented();
+  ewk_frame_uri_changed(m_frame);
+
+  if (ewk_view_frame_main_get(m_view) != m_frame)
+    return;
+  ewk_view_uri_changed(m_view);
 }
 
 void FrameLoaderClientEfl::dispatchWillClose() {
   notImplemented();
 }
 
-void FrameLoaderClientEfl::dispatchDidReceiveIcon() {}
+void FrameLoaderClientEfl::dispatchDidReceiveIcon() {
+  /* report received favicon only for main frame. */
+  if (ewk_view_frame_main_get(m_view) != m_frame)
+    return;
 
-void FrameLoaderClientEfl::dispatchDidStartProvisionalLoad() {}
+  ewk_view_frame_main_icon_received(m_view);
+}
+
+void FrameLoaderClientEfl::dispatchDidStartProvisionalLoad() {
+  ewk_frame_load_provisional(m_frame);
+  if (ewk_view_frame_main_get(m_view) == m_frame)
+    ewk_view_load_provisional(m_view);
+}
 
 void FrameLoaderClientEfl::dispatchDidReceiveTitle(const String& title) {
   CString cs = title.utf8();
@@ -578,20 +616,20 @@ void FrameLoaderClientEfl::dispatchDidCommitLoad() {
 }
 
 void FrameLoaderClientEfl::dispatchDidFinishDocumentLoad() {
-  notImplemented();
+  ewk_frame_load_document_finished(m_frame);
 }
 
 void FrameLoaderClientEfl::dispatchDidFirstLayout() {
-  // emit m_frame->initialLayoutCompleted();
   m_initLayoutCompleted = true;
+  ewk_frame_load_firstlayout_finished(m_frame);
 }
 
 void FrameLoaderClientEfl::dispatchDidFirstVisuallyNonEmptyLayout() {
-  notImplemented();
+  ewk_frame_load_firstlayout_nonempty_finished(m_frame);
 }
 
 void FrameLoaderClientEfl::dispatchShow() {
-  notImplemented();
+  ewk_view_load_show(m_view);
 }
 
 void FrameLoaderClientEfl::cancelPolicyCheck() {
