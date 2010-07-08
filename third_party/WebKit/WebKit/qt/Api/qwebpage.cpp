@@ -218,10 +218,6 @@ const char* QWebPagePrivate::editorCommandForWebActions(
   return 0;
 }
 
-// If you change this make sure to also adjust the docs for
-// QWebPage::userAgentForUrl
-#define WEBKIT_VERSION "527+"
-
 static inline DragOperation dropActionToDragOp(Qt::DropActions actions) {
   unsigned result = 0;
   if (actions & Qt::CopyAction)
