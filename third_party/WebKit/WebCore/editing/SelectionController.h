@@ -42,6 +42,11 @@ class RenderView;
 class Settings;
 class VisiblePosition;
 
+enum DirectionalityPolicy {
+  MakeNonDirectionalSelection,
+  MakeDirectionalSelection
+};
+
 class SelectionController : public Noncopyable {
  public:
   enum EAlteration { AlterationMove, AlterationExtend };
@@ -86,11 +91,14 @@ class SelectionController : public Noncopyable {
                     bool clearTypingStyle = true,
                     bool userTriggered = false,
                     CursorAlignOnScroll = AlignCursorOnScrollIfNeeded,
-                    TextGranularity = CharacterGranularity);
-  void setSelection(const VisibleSelection& selection,
-                    TextGranularity granularity) {
+                    TextGranularity = CharacterGranularity,
+                    DirectionalityPolicy = MakeDirectionalSelection);
+  void setSelection(
+      const VisibleSelection& selection,
+      TextGranularity granularity,
+      DirectionalityPolicy directionality = MakeDirectionalSelection) {
     setSelection(selection, true, true, false, AlignCursorOnScrollIfNeeded,
-                 granularity);
+                 granularity, directionality);
   }
   bool setSelectedRange(Range*, EAffinity, bool closeTyping);
   void selectAll();
