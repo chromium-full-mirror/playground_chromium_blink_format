@@ -42,6 +42,10 @@ namespace {
 
 class TestImage : public Image {
  public:
+  static PassRefPtr<TestImage> create(const IntSize& size) {
+    return adoptRef(new TestImage(size));
+  }
+
   explicit TestImage(const IntSize& size) : Image(0), m_size(size) {
     m_nativeImage = new NativeImageSkia();
     m_nativeImage->setConfig(SkBitmap::kARGB_8888_Config, size.width(),
@@ -89,8 +93,8 @@ TEST(DragImageTest, NullHandling) {
 }
 
 TEST(DragImageTest, NonNullHandling) {
-  TestImage testImage(IntSize(2, 2));
-  DragImageRef dragImage = createDragImageFromImage(&testImage);
+  RefPtr<TestImage> testImage(TestImage::create(IntSize(2, 2)));
+  DragImageRef dragImage = createDragImageFromImage(testImage.get());
   ASSERT_TRUE(dragImage);
 
   dragImage = scaleDragImage(dragImage, FloatSize(0.5, 0.5));
@@ -109,19 +113,19 @@ TEST(DragImageTest, CreateDragImage) {
   {
     // Tests that the DrageImage implementation doesn't choke on null values
     // of nativeImageForCurrentFrame().
-    TestImage testImage((IntSize()));
-    EXPECT_FALSE(createDragImageFromImage(&testImage));
+    RefPtr<TestImage> testImage(TestImage::create(IntSize()));
+    EXPECT_FALSE(createDragImageFromImage(testImage.get()));
   }
 
   {
     // Tests that the drag image is a deep copy.
-    TestImage testImage(IntSize(1, 1));
-    DragImageRef dragImage = createDragImageFromImage(&testImage);
+    RefPtr<TestImage> testImage(TestImage::create(IntSize(1, 1)));
+    DragImageRef dragImage = createDragImageFromImage(testImage.get());
     ASSERT_TRUE(dragImage);
     SkAutoLockPixels lock1(*dragImage),
-        lock2(*testImage.nativeImageForCurrentFrame());
+        lock2(*(testImage->nativeImageForCurrentFrame()));
     EXPECT_NE(dragImage->getPixels(),
-              testImage.nativeImageForCurrentFrame()->getPixels());
+              testImage->nativeImageForCurrentFrame()->getPixels());
   }
 }
 
