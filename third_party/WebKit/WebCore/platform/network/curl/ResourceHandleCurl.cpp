@@ -184,11 +184,12 @@ void ResourceHandle::loadResourceSynchronously(
     Vector<char>& data,
     Frame*) {
   WebCoreSynchronousLoader syncLoader;
-  ResourceHandle handle(request, &syncLoader, true, false);
+  RefPtr<ResourceHandle> handle =
+      adoptRef(new ResourceHandle(request, &syncLoader, true, false));
 
   ResourceHandleManager* manager = ResourceHandleManager::sharedInstance();
 
-  manager->dispatchSynchronousJob(&handle);
+  manager->dispatchSynchronousJob(handle.get());
 
   error = syncLoader.resourceError();
   data = syncLoader.data();

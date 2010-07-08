@@ -192,9 +192,10 @@ void ResourceHandle::loadResourceSynchronously(
     Vector<char>& data,
     Frame* frame) {
   WebCoreSynchronousLoader syncLoader;
-  ResourceHandle handle(request, &syncLoader, true, false);
+  RefPtr<ResourceHandle> handle =
+      adoptRef(new ResourceHandle(request, &syncLoader, true, false));
 
-  ResourceHandleInternal* d = handle.getInternal();
+  ResourceHandleInternal* d = handle->getInternal();
   if (!(d->m_user.isEmpty() || d->m_pass.isEmpty())) {
     // If credentials were specified for this request, add them to the url,
     // so that they will be passed to QNetworkRequest.
@@ -206,7 +207,7 @@ void ResourceHandle::loadResourceSynchronously(
   d->m_frame =
       static_cast<FrameLoaderClientQt*>(frame->loader()->client())->webFrame();
   d->m_job =
-      new QNetworkReplyHandler(&handle, QNetworkReplyHandler::LoadNormal);
+      new QNetworkReplyHandler(handle.get(), QNetworkReplyHandler::LoadNormal);
 
   syncLoader.waitForCompletion();
   error = syncLoader.resourceError();
