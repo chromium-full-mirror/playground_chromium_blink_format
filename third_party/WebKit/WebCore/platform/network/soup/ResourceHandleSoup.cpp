@@ -677,8 +677,13 @@ void ResourceHandle::loadResourceSynchronously(
     Vector<char>& data,
     Frame* frame) {
   WebCoreSynchronousLoader syncLoader(error, response, data);
+  // FIXME: we should use the ResourceHandle::create method here,
+  // but it makes us timeout in a couple of tests. See
+  // https://bugs.webkit.org/show_bug.cgi?id=41823
   RefPtr<ResourceHandle> handle =
-      create(request, &syncLoader, frame, true, false);
+      adoptRef(new ResourceHandle(request, &syncLoader, true, false));
+  handle->start(frame);
+
   syncLoader.run();
 }
 
