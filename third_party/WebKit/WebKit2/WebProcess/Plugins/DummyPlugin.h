@@ -39,8 +39,10 @@ class DummyPlugin : public Plugin {
   DummyPlugin();
 
   // Plugin
-  virtual void initialize(const WebCore::String& mimeType,
-                          const WebCore::KURL&,
+  virtual bool initialize(const WebCore::KURL&,
+                          const Vector<WebCore::String>& paramNames,
+                          const Vector<WebCore::String>& paramValues,
+                          const WebCore::String& mimeType,
                           bool loadManually);
   virtual void destroy();
   virtual void paint(WebCore::GraphicsContext*,

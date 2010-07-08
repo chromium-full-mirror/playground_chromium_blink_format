@@ -27,6 +27,7 @@
 #define Plugin_h
 
 #include <wtf/RefCounted.h>
+#include <wtf/Vector.h>
 
 namespace WebCore {
 class GraphicsContext;
@@ -41,8 +42,10 @@ class Plugin : public RefCounted<Plugin> {
  public:
   virtual ~Plugin();
 
-  virtual void initialize(const WebCore::String& mimeType,
-                          const WebCore::KURL&,
+  virtual bool initialize(const WebCore::KURL&,
+                          const Vector<WebCore::String>& paramNames,
+                          const Vector<WebCore::String>& paramValues,
+                          const WebCore::String& mimeType,
                           bool loadManually) = 0;
   virtual void destroy() = 0;
   virtual void paint(WebCore::GraphicsContext*,
