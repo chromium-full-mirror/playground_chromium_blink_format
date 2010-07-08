@@ -245,6 +245,16 @@ class LayoutTestController : public QObject {
   void setEditingBehavior(const QString& editingBehavior);
 
   void evaluateScriptInIsolatedWorld(int worldID, const QString& script);
+  bool isPageBoxVisible(int pageIndex);
+  QString pageSizeAndMarginsInPixels(int pageIndex,
+                                     int width,
+                                     int height,
+                                     int marginTop,
+                                     int marginRight,
+                                     int marginBottom,
+                                     int marginLeft);
+  QString pageProperty(const QString& propertyName, int pageNumber);
+  void addUserStyleSheet(const QString& sourceCode);
 
  private slots:
   void processWork();
