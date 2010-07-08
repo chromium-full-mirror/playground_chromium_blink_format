@@ -31,38 +31,64 @@
 namespace WTR {
 
 class InjectedBundlePage {
-public:
-    InjectedBundlePage(WKBundlePageRef);
-    ~InjectedBundlePage();
+ public:
+  InjectedBundlePage(WKBundlePageRef);
+  ~InjectedBundlePage();
 
-    WKBundlePageRef page() const { return m_page; }
+  WKBundlePageRef page() const { return m_page; }
 
-private:
-    // Loader Client
-    static void _didStartProvisionalLoadForFrame(WKBundlePageRef page, WKBundleFrameRef frame, const void *clientInfo);
-    static void _didReceiveServerRedirectForProvisionalLoadForFrame(WKBundlePageRef page, WKBundleFrameRef frame, const void *clientInfo);
-    static void _didFailProvisionalLoadWithErrorForFrame(WKBundlePageRef page, WKBundleFrameRef frame, const void *clientInfo);
-    static void _didCommitLoadForFrame(WKBundlePageRef page, WKBundleFrameRef frame, const void *clientInfo);
-    static void _didFinishLoadForFrame(WKBundlePageRef page, WKBundleFrameRef frame, const void *clientInfo);
-    static void _didFailLoadWithErrorForFrame(WKBundlePageRef page, WKBundleFrameRef frame, const void *clientInfo);
-    static void _didReceiveTitleForFrame(WKBundlePageRef page, WKStringRef title, WKBundleFrameRef frame, const void *clientInfo);
-    static void _didClearWindowForFrame(WKBundlePageRef page, WKBundleFrameRef frame, JSContextRef ctx, JSObjectRef window, const void *clientInfo);
-    void didStartProvisionalLoadForFrame(WKBundleFrameRef frame);
-    void didReceiveServerRedirectForProvisionalLoadForFrame(WKBundleFrameRef frame);
-    void didFailProvisionalLoadWithErrorForFrame(WKBundleFrameRef frame);
-    void didCommitLoadForFrame(WKBundleFrameRef frame);
-    void didFinishLoadForFrame(WKBundleFrameRef frame);
-    void didFailLoadWithErrorForFrame(WKBundleFrameRef frame);
-    void didReceiveTitleForFrame(WKStringRef title, WKBundleFrameRef frame);
-    void didClearWindowForFrame(WKBundleFrameRef frame, JSContextRef ctx, JSObjectRef window);
+ private:
+  // Loader Client
+  static void _didStartProvisionalLoadForFrame(WKBundlePageRef page,
+                                               WKBundleFrameRef frame,
+                                               const void* clientInfo);
+  static void _didReceiveServerRedirectForProvisionalLoadForFrame(
+      WKBundlePageRef page,
+      WKBundleFrameRef frame,
+      const void* clientInfo);
+  static void _didFailProvisionalLoadWithErrorForFrame(WKBundlePageRef page,
+                                                       WKBundleFrameRef frame,
+                                                       const void* clientInfo);
+  static void _didCommitLoadForFrame(WKBundlePageRef page,
+                                     WKBundleFrameRef frame,
+                                     const void* clientInfo);
+  static void _didFinishLoadForFrame(WKBundlePageRef page,
+                                     WKBundleFrameRef frame,
+                                     const void* clientInfo);
+  static void _didFailLoadWithErrorForFrame(WKBundlePageRef page,
+                                            WKBundleFrameRef frame,
+                                            const void* clientInfo);
+  static void _didReceiveTitleForFrame(WKBundlePageRef page,
+                                       WKStringRef title,
+                                       WKBundleFrameRef frame,
+                                       const void* clientInfo);
+  static void _didClearWindowForFrame(WKBundlePageRef page,
+                                      WKBundleFrameRef frame,
+                                      JSContextRef ctx,
+                                      JSObjectRef window,
+                                      const void* clientInfo);
+  void didStartProvisionalLoadForFrame(WKBundleFrameRef frame);
+  void didReceiveServerRedirectForProvisionalLoadForFrame(
+      WKBundleFrameRef frame);
+  void didFailProvisionalLoadWithErrorForFrame(WKBundleFrameRef frame);
+  void didCommitLoadForFrame(WKBundleFrameRef frame);
+  void didFinishLoadForFrame(WKBundleFrameRef frame);
+  void didFailLoadWithErrorForFrame(WKBundleFrameRef frame);
+  void didReceiveTitleForFrame(WKStringRef title, WKBundleFrameRef frame);
+  void didClearWindowForFrame(WKBundleFrameRef frame,
+                              JSContextRef ctx,
+                              JSObjectRef window);
 
-    // UI Client
-    static void _addMessageToConsole(WKBundlePageRef page, WKStringRef message, uint32_t lineNumber, const void *clientInfo);
-    void addMessageToConsole(WKStringRef message, uint32_t lineNumber);
+  // UI Client
+  static void _addMessageToConsole(WKBundlePageRef page,
+                                   WKStringRef message,
+                                   uint32_t lineNumber,
+                                   const void* clientInfo);
+  void addMessageToConsole(WKStringRef message, uint32_t lineNumber);
 
-    WKBundlePageRef m_page;
+  WKBundlePageRef m_page;
 };
 
-} // namespace WTR
+}  // namespace WTR
 
-#endif // InjectedBundlePage_h
+#endif  // InjectedBundlePage_h

@@ -36,155 +36,173 @@
 
 namespace WTR {
 
-InjectedBundlePage::InjectedBundlePage(WKBundlePageRef page)
-    : m_page(page)
-{
-    WKBundlePageLoaderClient loaderClient = {
-        0,
-        this,
-        _didStartProvisionalLoadForFrame,
-        _didReceiveServerRedirectForProvisionalLoadForFrame,
-        _didFailProvisionalLoadWithErrorForFrame,
-        _didCommitLoadForFrame,
-        _didFinishLoadForFrame,
-        _didFailLoadWithErrorForFrame,
-        _didReceiveTitleForFrame,
-        _didClearWindowForFrame
-    };
-    WKBundlePageSetLoaderClient(m_page, &loaderClient);
+InjectedBundlePage::InjectedBundlePage(WKBundlePageRef page) : m_page(page) {
+  WKBundlePageLoaderClient loaderClient = {
+      0,
+      this,
+      _didStartProvisionalLoadForFrame,
+      _didReceiveServerRedirectForProvisionalLoadForFrame,
+      _didFailProvisionalLoadWithErrorForFrame,
+      _didCommitLoadForFrame,
+      _didFinishLoadForFrame,
+      _didFailLoadWithErrorForFrame,
+      _didReceiveTitleForFrame,
+      _didClearWindowForFrame};
+  WKBundlePageSetLoaderClient(m_page, &loaderClient);
 
-    WKBundlePageUIClient uiClient = {
-        0,
-        this,
-        _addMessageToConsole
-    };
-    WKBundlePageSetUIClient(m_page, &uiClient);
-
+  WKBundlePageUIClient uiClient = {0, this, _addMessageToConsole};
+  WKBundlePageSetUIClient(m_page, &uiClient);
 }
 
-InjectedBundlePage::~InjectedBundlePage()
-{
-}
+InjectedBundlePage::~InjectedBundlePage() {}
 
 // Loader Client Callbacks
 
-void InjectedBundlePage::_didStartProvisionalLoadForFrame(WKBundlePageRef page, WKBundleFrameRef frame, const void *clientInfo)
-{
-    static_cast<InjectedBundlePage*>(const_cast<void*>(clientInfo))->didStartProvisionalLoadForFrame(frame);
+void InjectedBundlePage::_didStartProvisionalLoadForFrame(
+    WKBundlePageRef page,
+    WKBundleFrameRef frame,
+    const void* clientInfo) {
+  static_cast<InjectedBundlePage*>(const_cast<void*>(clientInfo))
+      ->didStartProvisionalLoadForFrame(frame);
 }
 
-void InjectedBundlePage::_didReceiveServerRedirectForProvisionalLoadForFrame(WKBundlePageRef page, WKBundleFrameRef frame, const void *clientInfo)
-{
-    static_cast<InjectedBundlePage*>(const_cast<void*>(clientInfo))->didReceiveServerRedirectForProvisionalLoadForFrame(frame);
+void InjectedBundlePage::_didReceiveServerRedirectForProvisionalLoadForFrame(
+    WKBundlePageRef page,
+    WKBundleFrameRef frame,
+    const void* clientInfo) {
+  static_cast<InjectedBundlePage*>(const_cast<void*>(clientInfo))
+      ->didReceiveServerRedirectForProvisionalLoadForFrame(frame);
 }
 
-void InjectedBundlePage::_didFailProvisionalLoadWithErrorForFrame(WKBundlePageRef page, WKBundleFrameRef frame, const void *clientInfo)
-{
-    static_cast<InjectedBundlePage*>(const_cast<void*>(clientInfo))->didFailProvisionalLoadWithErrorForFrame(frame);
+void InjectedBundlePage::_didFailProvisionalLoadWithErrorForFrame(
+    WKBundlePageRef page,
+    WKBundleFrameRef frame,
+    const void* clientInfo) {
+  static_cast<InjectedBundlePage*>(const_cast<void*>(clientInfo))
+      ->didFailProvisionalLoadWithErrorForFrame(frame);
 }
 
-void InjectedBundlePage::_didCommitLoadForFrame(WKBundlePageRef page, WKBundleFrameRef frame, const void *clientInfo)
-{
-    static_cast<InjectedBundlePage*>(const_cast<void*>(clientInfo))->didCommitLoadForFrame(frame);
+void InjectedBundlePage::_didCommitLoadForFrame(WKBundlePageRef page,
+                                                WKBundleFrameRef frame,
+                                                const void* clientInfo) {
+  static_cast<InjectedBundlePage*>(const_cast<void*>(clientInfo))
+      ->didCommitLoadForFrame(frame);
 }
 
-void InjectedBundlePage::_didFinishLoadForFrame(WKBundlePageRef page, WKBundleFrameRef frame, const void *clientInfo)
-{
-    static_cast<InjectedBundlePage*>(const_cast<void*>(clientInfo))->didFinishLoadForFrame(frame);
+void InjectedBundlePage::_didFinishLoadForFrame(WKBundlePageRef page,
+                                                WKBundleFrameRef frame,
+                                                const void* clientInfo) {
+  static_cast<InjectedBundlePage*>(const_cast<void*>(clientInfo))
+      ->didFinishLoadForFrame(frame);
 }
 
-void InjectedBundlePage::_didFailLoadWithErrorForFrame(WKBundlePageRef page, WKBundleFrameRef frame, const void *clientInfo)
-{
-    static_cast<InjectedBundlePage*>(const_cast<void*>(clientInfo))->didFailLoadWithErrorForFrame(frame);
+void InjectedBundlePage::_didFailLoadWithErrorForFrame(WKBundlePageRef page,
+                                                       WKBundleFrameRef frame,
+                                                       const void* clientInfo) {
+  static_cast<InjectedBundlePage*>(const_cast<void*>(clientInfo))
+      ->didFailLoadWithErrorForFrame(frame);
 }
 
-void InjectedBundlePage::_didReceiveTitleForFrame(WKBundlePageRef page, WKStringRef title, WKBundleFrameRef frame, const void *clientInfo)
-{
-    static_cast<InjectedBundlePage*>(const_cast<void*>(clientInfo))->didReceiveTitleForFrame(title, frame);
+void InjectedBundlePage::_didReceiveTitleForFrame(WKBundlePageRef page,
+                                                  WKStringRef title,
+                                                  WKBundleFrameRef frame,
+                                                  const void* clientInfo) {
+  static_cast<InjectedBundlePage*>(const_cast<void*>(clientInfo))
+      ->didReceiveTitleForFrame(title, frame);
 }
 
-void InjectedBundlePage::_didClearWindowForFrame(WKBundlePageRef page, WKBundleFrameRef frame, JSContextRef ctx, JSObjectRef window, const void *clientInfo)
-{
-    static_cast<InjectedBundlePage*>(const_cast<void*>(clientInfo))->didClearWindowForFrame(frame, ctx, window);
+void InjectedBundlePage::_didClearWindowForFrame(WKBundlePageRef page,
+                                                 WKBundleFrameRef frame,
+                                                 JSContextRef ctx,
+                                                 JSObjectRef window,
+                                                 const void* clientInfo) {
+  static_cast<InjectedBundlePage*>(const_cast<void*>(clientInfo))
+      ->didClearWindowForFrame(frame, ctx, window);
 }
 
-void InjectedBundlePage::didStartProvisionalLoadForFrame(WKBundleFrameRef frame)
-{
+void InjectedBundlePage::didStartProvisionalLoadForFrame(
+    WKBundleFrameRef frame) {}
+
+void InjectedBundlePage::didReceiveServerRedirectForProvisionalLoadForFrame(
+    WKBundleFrameRef frame) {}
+
+void InjectedBundlePage::didFailProvisionalLoadWithErrorForFrame(
+    WKBundleFrameRef frame) {}
+
+void InjectedBundlePage::didCommitLoadForFrame(WKBundleFrameRef frame) {}
+
+static std::auto_ptr<Vector<char>> WKStringToUTF8(WKStringRef wkStringRef) {
+  RetainPtr<CFStringRef> cfString(AdoptCF,
+                                  WKStringCopyCFString(0, wkStringRef));
+  CFIndex bufferLength =
+      CFStringGetMaximumSizeForEncoding(CFStringGetLength(cfString.get()),
+                                        kCFStringEncodingUTF8) +
+      1;
+  std::auto_ptr<Vector<char>> buffer(new Vector<char>(bufferLength));
+  if (!CFStringGetCString(cfString.get(), buffer->data(), bufferLength,
+                          kCFStringEncodingUTF8)) {
+    buffer->shrink(1);
+    (*buffer)[0] = 0;
+  } else
+    buffer->shrink(strlen(buffer->data()) + 1);
+  return buffer;
 }
 
-void InjectedBundlePage::didReceiveServerRedirectForProvisionalLoadForFrame(WKBundleFrameRef frame)
-{
+void InjectedBundlePage::didFinishLoadForFrame(WKBundleFrameRef frame) {
+  if (!WKBundleFrameIsMainFrame(frame))
+    return;
+
+  if (InjectedBundle::shared().layoutTestController()->dumpAsText()) {
+    // FIXME: Support dumping subframes when
+    // layoutTestController()->dumpChildFramesAsText() is true.
+    WKRetainPtr<WKStringRef> innerText(AdoptWK,
+                                       WKBundleFrameCopyInnerText(frame));
+    std::auto_ptr<Vector<char>> utf8InnerText = WKStringToUTF8(innerText.get());
+    InjectedBundle::shared().os() << utf8InnerText->data() << "\n";
+  } else {
+    WKRetainPtr<WKStringRef> externalRepresentation(
+        AdoptWK, WKBundlePageCopyRenderTreeExternalRepresentation(m_page));
+    std::auto_ptr<Vector<char>> utf8externalRepresentation =
+        WKStringToUTF8(externalRepresentation.get());
+    InjectedBundle::shared().os() << utf8externalRepresentation->data();
+  }
+  InjectedBundle::shared().done();
 }
 
-void InjectedBundlePage::didFailProvisionalLoadWithErrorForFrame(WKBundleFrameRef frame)
-{
+void InjectedBundlePage::didFailLoadWithErrorForFrame(WKBundleFrameRef frame) {
+  if (!WKBundleFrameIsMainFrame(frame))
+    return;
+
+  InjectedBundle::shared().done();
 }
 
-void InjectedBundlePage::didCommitLoadForFrame(WKBundleFrameRef frame)
-{
-}
+void InjectedBundlePage::didReceiveTitleForFrame(WKStringRef title,
+                                                 WKBundleFrameRef frame) {}
 
-static std::auto_ptr<Vector<char> > WKStringToUTF8(WKStringRef wkStringRef)
-{
-    RetainPtr<CFStringRef> cfString(AdoptCF, WKStringCopyCFString(0, wkStringRef));
-    CFIndex bufferLength = CFStringGetMaximumSizeForEncoding(CFStringGetLength(cfString.get()), kCFStringEncodingUTF8) + 1;
-    std::auto_ptr<Vector<char> > buffer(new Vector<char>(bufferLength));
-    if (!CFStringGetCString(cfString.get(), buffer->data(), bufferLength, kCFStringEncodingUTF8)) {
-        buffer->shrink(1);
-        (*buffer)[0] = 0;
-    } else
-        buffer->shrink(strlen(buffer->data()) + 1);
-    return buffer;
-}
-
-void InjectedBundlePage::didFinishLoadForFrame(WKBundleFrameRef frame)
-{
-    if (!WKBundleFrameIsMainFrame(frame))
-        return;
-
-    if (InjectedBundle::shared().layoutTestController()->dumpAsText()) {
-        // FIXME: Support dumping subframes when layoutTestController()->dumpChildFramesAsText() is true.
-        WKRetainPtr<WKStringRef> innerText(AdoptWK, WKBundleFrameCopyInnerText(frame));
-        std::auto_ptr<Vector<char> > utf8InnerText = WKStringToUTF8(innerText.get());
-        InjectedBundle::shared().os() << utf8InnerText->data() << "\n";
-    } else {
-        WKRetainPtr<WKStringRef> externalRepresentation(AdoptWK, WKBundlePageCopyRenderTreeExternalRepresentation(m_page));
-        std::auto_ptr<Vector<char> > utf8externalRepresentation = WKStringToUTF8(externalRepresentation.get());
-        InjectedBundle::shared().os() << utf8externalRepresentation->data();
-    }
-    InjectedBundle::shared().done();
-}
-
-void InjectedBundlePage::didFailLoadWithErrorForFrame(WKBundleFrameRef frame)
-{
-    if (!WKBundleFrameIsMainFrame(frame))
-        return;
-
-    InjectedBundle::shared().done();
-}
-
-void InjectedBundlePage::didReceiveTitleForFrame(WKStringRef title, WKBundleFrameRef frame)
-{
-}
-
-void InjectedBundlePage::didClearWindowForFrame(WKBundleFrameRef frame, JSContextRef ctx, JSObjectRef window)
-{
-    JSValueRef exception = 0;
-    InjectedBundle::shared().layoutTestController()->makeWindowObject(ctx, window, &exception);
+void InjectedBundlePage::didClearWindowForFrame(WKBundleFrameRef frame,
+                                                JSContextRef ctx,
+                                                JSObjectRef window) {
+  JSValueRef exception = 0;
+  InjectedBundle::shared().layoutTestController()->makeWindowObject(ctx, window,
+                                                                    &exception);
 }
 
 // UI Client Callbacks
 
-void InjectedBundlePage::_addMessageToConsole(WKBundlePageRef page, WKStringRef message, uint32_t lineNumber, const void *clientInfo)
-{
-    static_cast<InjectedBundlePage*>(const_cast<void*>(clientInfo))->addMessageToConsole(message, lineNumber);
+void InjectedBundlePage::_addMessageToConsole(WKBundlePageRef page,
+                                              WKStringRef message,
+                                              uint32_t lineNumber,
+                                              const void* clientInfo) {
+  static_cast<InjectedBundlePage*>(const_cast<void*>(clientInfo))
+      ->addMessageToConsole(message, lineNumber);
 }
 
-void InjectedBundlePage::addMessageToConsole(WKStringRef message, uint32_t lineNumber)
-{
-    // FIXME: Strip file: urls.
-    std::auto_ptr<Vector<char> > utf8Message = WKStringToUTF8(message);
-    InjectedBundle::shared().os() << "CONSOLE MESSAGE: line " << lineNumber << ": " << utf8Message->data() << "\n";
+void InjectedBundlePage::addMessageToConsole(WKStringRef message,
+                                             uint32_t lineNumber) {
+  // FIXME: Strip file: urls.
+  std::auto_ptr<Vector<char>> utf8Message = WKStringToUTF8(message);
+  InjectedBundle::shared().os() << "CONSOLE MESSAGE: line " << lineNumber
+                                << ": " << utf8Message->data() << "\n";
 }
 
-} // namespace WTR
+}  // namespace WTR

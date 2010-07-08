@@ -26,7 +26,6 @@
 #include "InjectedBundle.h"
 #include <WebKit2/WKBundleInitialize.h>
 
-extern "C" void WKBundleInitialize(WKBundleRef bundle)
-{
-    WTR::InjectedBundle::shared().initialize(bundle);
+extern "C" void WKBundleInitialize(WKBundleRef bundle) {
+  WTR::InjectedBundle::shared().initialize(bundle);
 }

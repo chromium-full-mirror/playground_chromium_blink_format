@@ -29,69 +29,87 @@
 
 namespace WTR {
 
-PassRefPtr<LayoutTestController> LayoutTestController::create(const std::string& testPathOrURL)
-{
-    return adoptRef(new LayoutTestController(testPathOrURL));
+PassRefPtr<LayoutTestController> LayoutTestController::create(
+    const std::string& testPathOrURL) {
+  return adoptRef(new LayoutTestController(testPathOrURL));
 }
 
 LayoutTestController::LayoutTestController(const std::string& testPathOrURL)
-    : m_dumpAsText(false)
-    , m_testPathOrURL(testPathOrURL)
-{
-}
+    : m_dumpAsText(false), m_testPathOrURL(testPathOrURL) {}
 
-LayoutTestController::~LayoutTestController()
-{
-}
+LayoutTestController::~LayoutTestController() {}
 
-static JSValueRef dumpAsTextCallback(JSContextRef context, JSObjectRef function, JSObjectRef thisObject, size_t argumentCount, const JSValueRef arguments[], JSValueRef* exception)
-{
-    LayoutTestController* controller = static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
-    controller->setDumpAsText(true);
-    return JSValueMakeUndefined(context);
+static JSValueRef dumpAsTextCallback(JSContextRef context,
+                                     JSObjectRef function,
+                                     JSObjectRef thisObject,
+                                     size_t argumentCount,
+                                     const JSValueRef arguments[],
+                                     JSValueRef* exception) {
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->setDumpAsText(true);
+  return JSValueMakeUndefined(context);
 }
 
 // Object Finalization
 
-static void layoutTestControllerObjectFinalize(JSObjectRef object)
-{
-    LayoutTestController* controller = static_cast<LayoutTestController*>(JSObjectGetPrivate(object));
-    controller->deref();
+static void layoutTestControllerObjectFinalize(JSObjectRef object) {
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(object));
+  controller->deref();
 }
 
 // Object Creation
 
-void LayoutTestController::makeWindowObject(JSContextRef context, JSObjectRef windowObject, JSValueRef* exception)
-{
-    JSRetainPtr<JSStringRef> layoutTestContollerStr(Adopt, JSStringCreateWithUTF8CString("layoutTestController"));
-    ref();
+void LayoutTestController::makeWindowObject(JSContextRef context,
+                                            JSObjectRef windowObject,
+                                            JSValueRef* exception) {
+  JSRetainPtr<JSStringRef> layoutTestContollerStr(
+      Adopt, JSStringCreateWithUTF8CString("layoutTestController"));
+  ref();
 
-    JSClassRef classRef = getJSClass();
-    JSValueRef layoutTestContollerObject = JSObjectMake(context, classRef, this);
-    JSClassRelease(classRef);
+  JSClassRef classRef = getJSClass();
+  JSValueRef layoutTestContollerObject = JSObjectMake(context, classRef, this);
+  JSClassRelease(classRef);
 
-    JSObjectSetProperty(context, windowObject, layoutTestContollerStr.get(), layoutTestContollerObject, kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete, exception);
+  JSObjectSetProperty(
+      context, windowObject, layoutTestContollerStr.get(),
+      layoutTestContollerObject,
+      kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete, exception);
 }
 
-JSClassRef LayoutTestController::getJSClass()
-{
-    static JSStaticFunction* staticFunctions = LayoutTestController::staticFunctions();
-    static JSClassDefinition classDefinition = {
-        0, kJSClassAttributeNone, "LayoutTestController", 0, 0, staticFunctions,
-        0, layoutTestControllerObjectFinalize, 0, 0, 0, 0, 0, 0, 0, 0, 0
-    };
+JSClassRef LayoutTestController::getJSClass() {
+  static JSStaticFunction* staticFunctions =
+      LayoutTestController::staticFunctions();
+  static JSClassDefinition classDefinition = {
+      0,
+      kJSClassAttributeNone,
+      "LayoutTestController",
+      0,
+      0,
+      staticFunctions,
+      0,
+      layoutTestControllerObjectFinalize,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0};
 
-    return JSClassCreate(&classDefinition);
+  return JSClassCreate(&classDefinition);
 }
 
-JSStaticFunction* LayoutTestController::staticFunctions()
-{
-    static JSStaticFunction staticFunctions[] = {
-        { "dumpAsText", dumpAsTextCallback, kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete },
-        { 0, 0, 0 }
-    };
+JSStaticFunction* LayoutTestController::staticFunctions() {
+  static JSStaticFunction staticFunctions[] = {
+      {"dumpAsText", dumpAsTextCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {0, 0, 0}};
 
-    return staticFunctions;
+  return staticFunctions;
 }
 
-} // namespace WTR
+}  // namespace WTR

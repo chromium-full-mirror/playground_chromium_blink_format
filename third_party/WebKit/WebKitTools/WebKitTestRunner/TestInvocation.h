@@ -32,27 +32,27 @@
 namespace WTR {
 
 class TestInvocation : public Noncopyable {
-public:
-    TestInvocation(const char*);
-    ~TestInvocation();
+ public:
+  TestInvocation(const char*);
+  ~TestInvocation();
 
-    void invoke();
-    void didRecieveMessageFromInjectedBundle(WKStringRef message);
+  void invoke();
+  void didRecieveMessageFromInjectedBundle(WKStringRef message);
 
-private:
-    void dump(const char*);
+ private:
+  void dump(const char*);
 
-    // Helper
-    static void runUntil(bool& done);
+  // Helper
+  static void runUntil(bool& done);
 
-    WKRetainPtr<WKURLRef> m_url;
+  WKRetainPtr<WKURLRef> m_url;
 
-    // Invocation state
-    bool m_gotInitialResponse;
-    bool m_gotFinalMessage;
-    bool m_error;
+  // Invocation state
+  bool m_gotInitialResponse;
+  bool m_gotFinalMessage;
+  bool m_error;
 };
 
-} // namespace WTR
+}  // namespace WTR
 
-#endif // TestInvocation_h
+#endif  // TestInvocation_h

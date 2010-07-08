@@ -35,83 +35,79 @@
 
 namespace WTR {
 
-InjectedBundle& InjectedBundle::shared()
-{
-    static InjectedBundle& shared = *new InjectedBundle;
-    return shared;
+InjectedBundle& InjectedBundle::shared() {
+  static InjectedBundle& shared = *new InjectedBundle;
+  return shared;
 }
 
-InjectedBundle::InjectedBundle()
-    : m_bundle(0)
-{
+InjectedBundle::InjectedBundle() : m_bundle(0) {}
+
+void InjectedBundle::_didCreatePage(WKBundleRef bundle,
+                                    WKBundlePageRef page,
+                                    const void* clientInfo) {
+  static_cast<InjectedBundle*>(const_cast<void*>(clientInfo))
+      ->didCreatePage(page);
 }
 
-void InjectedBundle::_didCreatePage(WKBundleRef bundle, WKBundlePageRef page, const void* clientInfo)
-{
-    static_cast<InjectedBundle*>(const_cast<void*>(clientInfo))->didCreatePage(page);
+void InjectedBundle::_willDestroyPage(WKBundleRef bundle,
+                                      WKBundlePageRef page,
+                                      const void* clientInfo) {
+  static_cast<InjectedBundle*>(const_cast<void*>(clientInfo))
+      ->willDestroyPage(page);
 }
 
-void InjectedBundle::_willDestroyPage(WKBundleRef bundle, WKBundlePageRef page, const void* clientInfo)
-{
-    static_cast<InjectedBundle*>(const_cast<void*>(clientInfo))->willDestroyPage(page);
+void InjectedBundle::_didRecieveMessage(WKBundleRef bundle,
+                                        WKStringRef message,
+                                        const void* clientInfo) {
+  static_cast<InjectedBundle*>(const_cast<void*>(clientInfo))
+      ->didRecieveMessage(message);
 }
 
-void InjectedBundle::_didRecieveMessage(WKBundleRef bundle, WKStringRef message, const void *clientInfo)
-{
-    static_cast<InjectedBundle*>(const_cast<void*>(clientInfo))->didRecieveMessage(message);
+void InjectedBundle::initialize(WKBundleRef bundle) {
+  m_bundle = bundle;
+
+  WKBundleClient client = {0, this, _didCreatePage, _willDestroyPage,
+                           _didRecieveMessage};
+  WKBundleSetClient(m_bundle, &client);
 }
 
-void InjectedBundle::initialize(WKBundleRef bundle)
-{
-    m_bundle = bundle;
-
-    WKBundleClient client = {
-        0,
-        this,
-        _didCreatePage,
-        _willDestroyPage,
-        _didRecieveMessage
-    };
-    WKBundleSetClient(m_bundle, &client);
+void InjectedBundle::done() {
+  std::string output = m_outputStream.str();
+  RetainPtr<CFStringRef> outputCFString(
+      AdoptCF,
+      CFStringCreateWithCString(0, output.c_str(), kCFStringEncodingUTF8));
+  WKRetainPtr<WKStringRef> doneMessage(
+      AdoptWK, WKStringCreateWithCFString(outputCFString.get()));
+  WKBundlePostMessage(m_bundle, doneMessage.get());
 }
 
-void InjectedBundle::done()
-{
-    std::string output = m_outputStream.str();
-    RetainPtr<CFStringRef> outputCFString(AdoptCF, CFStringCreateWithCString(0, output.c_str(), kCFStringEncodingUTF8));
-    WKRetainPtr<WKStringRef> doneMessage(AdoptWK, WKStringCreateWithCFString(outputCFString.get()));
-    WKBundlePostMessage(m_bundle, doneMessage.get());
+void InjectedBundle::didCreatePage(WKBundlePageRef page) {
+  m_pages.add(page, new InjectedBundlePage(page));
 }
 
-void InjectedBundle::didCreatePage(WKBundlePageRef page)
-{
-    m_pages.add(page, new InjectedBundlePage(page));
+void InjectedBundle::willDestroyPage(WKBundlePageRef page) {
+  delete m_pages.take(page);
 }
 
-void InjectedBundle::willDestroyPage(WKBundlePageRef page)
-{
-    delete m_pages.take(page);
+void InjectedBundle::didRecieveMessage(WKStringRef message) {
+  CFStringRef cfMessage = WKStringCopyCFString(0, message);
+  if (CFEqual(cfMessage, CFSTR("BeginTest"))) {
+    WKRetainPtr<WKStringRef> ackMessage(
+        AdoptWK, WKStringCreateWithCFString(CFSTR("BeginTestAck")));
+    WKBundlePostMessage(m_bundle, ackMessage.get());
+
+    reset();
+    return;
+  }
+
+  WKRetainPtr<WKStringRef> errorMessage(
+      AdoptWK, WKStringCreateWithCFString(CFSTR("Error: Unknown.")));
+  WKBundlePostMessage(m_bundle, errorMessage.get());
 }
 
-void InjectedBundle::didRecieveMessage(WKStringRef message)
-{
-    CFStringRef cfMessage = WKStringCopyCFString(0, message);
-    if (CFEqual(cfMessage, CFSTR("BeginTest"))) {
-        WKRetainPtr<WKStringRef> ackMessage(AdoptWK, WKStringCreateWithCFString(CFSTR("BeginTestAck")));
-        WKBundlePostMessage(m_bundle, ackMessage.get());
-
-        reset();
-        return;
-    }
-
-    WKRetainPtr<WKStringRef> errorMessage(AdoptWK, WKStringCreateWithCFString(CFSTR("Error: Unknown.")));
-    WKBundlePostMessage(m_bundle, errorMessage.get());
+void InjectedBundle::reset() {
+  m_outputStream.str("");
+  m_layoutTestController = LayoutTestController::create(std::string(""));
 }
 
-void InjectedBundle::reset()
-{
-    m_outputStream.str("");
-    m_layoutTestController = LayoutTestController::create(std::string(""));
-}
-
-} // namespace WTR
+}  // namespace WTR

@@ -44,18 +44,18 @@ typedef HWND PlatformWindow;
 namespace WTR {
 
 class PlatformWebView {
-public:
-    PlatformWebView(WKPageNamespaceRef);
-    ~PlatformWebView();
+ public:
+  PlatformWebView(WKPageNamespaceRef);
+  ~PlatformWebView();
 
-    WKPageRef page();
-    PlatformWKView platformView() { return m_view; }
+  WKPageRef page();
+  PlatformWKView platformView() { return m_view; }
 
-private:
-    PlatformWKView m_view;
-    PlatformWindow m_window;
+ private:
+  PlatformWKView m_view;
+  PlatformWindow m_window;
 };
 
-} // namespace WTR
+}  // namespace WTR
 
-#endif // PlatformWebView_h
+#endif  // PlatformWebView_h

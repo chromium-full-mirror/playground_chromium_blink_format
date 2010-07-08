@@ -37,53 +37,55 @@ class TestInvocation;
 class PlatformWebView;
 
 class TestController {
-public:
-    static TestController& shared();
+ public:
+  static TestController& shared();
 
-    // Initialize the TestController.
-    void initialize(int argc, const char *argv[]);
+  // Initialize the TestController.
+  void initialize(int argc, const char* argv[]);
 
-    // Returns true if all the tests passed, false otherwise.
-    bool run();
+  // Returns true if all the tests passed, false otherwise.
+  bool run();
 
-    bool verbose() const { return m_verbose; }
+  bool verbose() const { return m_verbose; }
 
-    WKStringRef injectedBundlePath() { return m_injectedBundlePath.get(); }
+  WKStringRef injectedBundlePath() { return m_injectedBundlePath.get(); }
 
-    PlatformWebView* mainWebView() { return m_mainWebView; }
-    WKPageNamespaceRef pageNamespace() { return m_pageNamespace.get(); }
-    WKContextRef context() { return m_context.get(); }
+  PlatformWebView* mainWebView() { return m_mainWebView; }
+  WKPageNamespaceRef pageNamespace() { return m_pageNamespace.get(); }
+  WKContextRef context() { return m_context.get(); }
 
-private:
-    TestController();
-    ~TestController();
+ private:
+  TestController();
+  ~TestController();
 
-    void runTestingServerLoop();
-    void runTest(const char* pathOrURL);
-    
-    void initializeInjectedBundlePath();
+  void runTestingServerLoop();
+  void runTest(const char* pathOrURL);
 
-    // WKContextInjectedBundleClient
-    static void _didRecieveMessageFromInjectedBundle(WKContextRef context, WKStringRef message, const void*);
-    void didRecieveMessageFromInjectedBundle(WKStringRef message);
+  void initializeInjectedBundlePath();
 
-    OwnPtr<TestInvocation> m_currentInvocation;
+  // WKContextInjectedBundleClient
+  static void _didRecieveMessageFromInjectedBundle(WKContextRef context,
+                                                   WKStringRef message,
+                                                   const void*);
+  void didRecieveMessageFromInjectedBundle(WKStringRef message);
 
-    bool m_dumpTree;
-    bool m_dumpPixels;
-    bool m_threaded;
-    bool m_forceComplexText;
-    bool m_verbose;
-    bool m_printSeparators;
-    bool m_usingServerMode;
-    std::vector<std::string> m_paths;
-    WKRetainPtr<WKStringRef> m_injectedBundlePath;
+  OwnPtr<TestInvocation> m_currentInvocation;
 
-    PlatformWebView* m_mainWebView;
-    WKRetainPtr<WKContextRef> m_context;
-    WKRetainPtr<WKPageNamespaceRef> m_pageNamespace;
+  bool m_dumpTree;
+  bool m_dumpPixels;
+  bool m_threaded;
+  bool m_forceComplexText;
+  bool m_verbose;
+  bool m_printSeparators;
+  bool m_usingServerMode;
+  std::vector<std::string> m_paths;
+  WKRetainPtr<WKStringRef> m_injectedBundlePath;
+
+  PlatformWebView* m_mainWebView;
+  WKRetainPtr<WKContextRef> m_context;
+  WKRetainPtr<WKPageNamespaceRef> m_pageNamespace;
 };
 
-} // namespace WTR
+}  // namespace WTR
 
-#endif // TestController_h
+#endif  // TestController_h

@@ -39,40 +39,48 @@ namespace WTR {
 class InjectedBundlePage;
 
 class InjectedBundle {
-public:
-    static InjectedBundle& shared();
+ public:
+  static InjectedBundle& shared();
 
-    // Initialize the InjectedBundle.
-    void initialize(WKBundleRef);
+  // Initialize the InjectedBundle.
+  void initialize(WKBundleRef);
 
-    void done();
+  void done();
 
-    LayoutTestController* layoutTestController() { return m_layoutTestController.get(); }
+  LayoutTestController* layoutTestController() {
+    return m_layoutTestController.get();
+  }
 
-    std::ostringstream& os() { return m_outputStream; }
+  std::ostringstream& os() { return m_outputStream; }
 
-private:
-    InjectedBundle();
-    ~InjectedBundle();
+ private:
+  InjectedBundle();
+  ~InjectedBundle();
 
-    static void _didCreatePage(WKBundleRef bundle, WKBundlePageRef page, const void* clientInfo);
-    static void _willDestroyPage(WKBundleRef bundle, WKBundlePageRef page, const void* clientInfo);
-    static void _didRecieveMessage(WKBundleRef bundle, WKStringRef message, const void *clientInfo);
+  static void _didCreatePage(WKBundleRef bundle,
+                             WKBundlePageRef page,
+                             const void* clientInfo);
+  static void _willDestroyPage(WKBundleRef bundle,
+                               WKBundlePageRef page,
+                               const void* clientInfo);
+  static void _didRecieveMessage(WKBundleRef bundle,
+                                 WKStringRef message,
+                                 const void* clientInfo);
 
-    void didCreatePage(WKBundlePageRef page);
-    void willDestroyPage(WKBundlePageRef page);
-    void didRecieveMessage(WKStringRef message);
+  void didCreatePage(WKBundlePageRef page);
+  void willDestroyPage(WKBundlePageRef page);
+  void didRecieveMessage(WKStringRef message);
 
-    void reset();
+  void reset();
 
-    WKBundleRef m_bundle;
-    HashMap<WKBundlePageRef, InjectedBundlePage*> m_pages;
+  WKBundleRef m_bundle;
+  HashMap<WKBundlePageRef, InjectedBundlePage*> m_pages;
 
-    RefPtr<LayoutTestController> m_layoutTestController;
+  RefPtr<LayoutTestController> m_layoutTestController;
 
-    std::ostringstream m_outputStream;
+  std::ostringstream m_outputStream;
 };
 
-} // namespace WTR
+}  // namespace WTR
 
-#endif // InjectedBundle_h
+#endif  // InjectedBundle_h

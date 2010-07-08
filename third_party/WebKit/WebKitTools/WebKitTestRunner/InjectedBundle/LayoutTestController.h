@@ -34,27 +34,30 @@
 namespace WTR {
 
 class LayoutTestController : public RefCounted<LayoutTestController> {
-public:
-    static PassRefPtr<LayoutTestController> create(const std::string& testPathOrURL);
-    ~LayoutTestController();
+ public:
+  static PassRefPtr<LayoutTestController> create(
+      const std::string& testPathOrURL);
+  ~LayoutTestController();
 
-    void makeWindowObject(JSContextRef context, JSObjectRef windowObject, JSValueRef* exception);
+  void makeWindowObject(JSContextRef context,
+                        JSObjectRef windowObject,
+                        JSValueRef* exception);
 
-    bool dumpAsText() const { return m_dumpAsText; }
-    void setDumpAsText(bool dumpAsText) { m_dumpAsText = dumpAsText; }
+  bool dumpAsText() const { return m_dumpAsText; }
+  void setDumpAsText(bool dumpAsText) { m_dumpAsText = dumpAsText; }
 
-private:
-    LayoutTestController(const std::string& testPathOrURL);
+ private:
+  LayoutTestController(const std::string& testPathOrURL);
 
-    bool m_dumpAsText;
+  bool m_dumpAsText;
 
-    std::string m_testPathOrURL;
-    
-    static JSClassRef getJSClass();
-    static JSStaticValue* staticValues();
-    static JSStaticFunction* staticFunctions();
+  std::string m_testPathOrURL;
+
+  static JSClassRef getJSClass();
+  static JSStaticValue* staticValues();
+  static JSStaticFunction* staticFunctions();
 };
 
-} // namespace WTR
+}  // namespace WTR
 
-#endif // LayoutTestController_h
+#endif  // LayoutTestController_h

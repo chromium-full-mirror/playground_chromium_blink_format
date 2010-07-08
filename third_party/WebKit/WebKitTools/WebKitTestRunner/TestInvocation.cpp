@@ -38,96 +38,97 @@ using namespace WebKit;
 
 namespace WTR {
 
-static WKURLRef createWKURL(const char* pathOrURL)
-{
-    RetainPtr<CFStringRef> pathOrURLCFString(AdoptCF, CFStringCreateWithCString(0, pathOrURL, kCFStringEncodingUTF8));
-    RetainPtr<CFURLRef> cfURL;
-    if (CFStringHasPrefix(pathOrURLCFString.get(), CFSTR("http://")) || CFStringHasPrefix(pathOrURLCFString.get(), CFSTR("https://")))
-        cfURL.adoptCF(CFURLCreateWithString(0, pathOrURLCFString.get(), 0));
-    else
-        cfURL.adoptCF(CFURLCreateWithFileSystemPath(0, pathOrURLCFString.get(), kCFURLPOSIXPathStyle, false));
-    return WKURLCreateWithCFURL(cfURL.get());
+static WKURLRef createWKURL(const char* pathOrURL) {
+  RetainPtr<CFStringRef> pathOrURLCFString(
+      AdoptCF, CFStringCreateWithCString(0, pathOrURL, kCFStringEncodingUTF8));
+  RetainPtr<CFURLRef> cfURL;
+  if (CFStringHasPrefix(pathOrURLCFString.get(), CFSTR("http://")) ||
+      CFStringHasPrefix(pathOrURLCFString.get(), CFSTR("https://")))
+    cfURL.adoptCF(CFURLCreateWithString(0, pathOrURLCFString.get(), 0));
+  else
+    cfURL.adoptCF(CFURLCreateWithFileSystemPath(0, pathOrURLCFString.get(),
+                                                kCFURLPOSIXPathStyle, false));
+  return WKURLCreateWithCFURL(cfURL.get());
 }
 
-static std::auto_ptr<Vector<char> > WKStringToUTF8(WKStringRef wkStringRef)
-{
-    RetainPtr<CFStringRef> cfString(AdoptCF, WKStringCopyCFString(0, wkStringRef));
-    CFIndex bufferLength = CFStringGetMaximumSizeForEncoding(CFStringGetLength(cfString.get()), kCFStringEncodingUTF8) + 1;
-    std::auto_ptr<Vector<char> > buffer(new Vector<char>(bufferLength));
-    if (!CFStringGetCString(cfString.get(), buffer->data(), bufferLength, kCFStringEncodingUTF8)) {
-        buffer->shrink(1);
-        (*buffer)[0] = 0;
-    } else
-        buffer->shrink(strlen(buffer->data()) + 1);
-    return buffer;
+static std::auto_ptr<Vector<char>> WKStringToUTF8(WKStringRef wkStringRef) {
+  RetainPtr<CFStringRef> cfString(AdoptCF,
+                                  WKStringCopyCFString(0, wkStringRef));
+  CFIndex bufferLength =
+      CFStringGetMaximumSizeForEncoding(CFStringGetLength(cfString.get()),
+                                        kCFStringEncodingUTF8) +
+      1;
+  std::auto_ptr<Vector<char>> buffer(new Vector<char>(bufferLength));
+  if (!CFStringGetCString(cfString.get(), buffer->data(), bufferLength,
+                          kCFStringEncodingUTF8)) {
+    buffer->shrink(1);
+    (*buffer)[0] = 0;
+  } else
+    buffer->shrink(strlen(buffer->data()) + 1);
+  return buffer;
 }
 
 TestInvocation::TestInvocation(const char* pathOrURL)
-    : m_url(AdoptWK, createWKURL(pathOrURL))
-    , m_gotInitialResponse(false)
-    , m_gotFinalMessage(false)
-    , m_error(false)
-{
+    : m_url(AdoptWK, createWKURL(pathOrURL)),
+      m_gotInitialResponse(false),
+      m_gotFinalMessage(false),
+      m_error(false) {}
+
+TestInvocation::~TestInvocation() {}
+
+void TestInvocation::invoke() {
+  WKRetainPtr<WKStringRef> message(
+      AdoptWK, WKStringCreateWithCFString(CFSTR("BeginTest")));
+  WKContextPostMessageToInjectedBundle(TestController::shared().context(),
+                                       message.get());
+
+  runUntil(m_gotInitialResponse);
+  if (m_error) {
+    dump("FAIL\n");
+    return;
+  }
+
+  WKPageLoadURL(TestController::shared().mainWebView()->page(), m_url.get());
+
+  runUntil(m_gotFinalMessage);
+  if (m_error) {
+    dump("FAIL\n");
+    return;
+  }
 }
 
-TestInvocation::~TestInvocation()
-{
+void TestInvocation::dump(const char* stringToDump) {
+  printf("Content-Type: text/plain\n");
+  printf("%s", stringToDump);
+
+  fputs("#EOF\n", stdout);
+  fputs("#EOF\n", stdout);
+  fputs("#EOF\n", stderr);
+
+  fflush(stdout);
+  fflush(stderr);
 }
 
-void TestInvocation::invoke()
-{
-    WKRetainPtr<WKStringRef> message(AdoptWK, WKStringCreateWithCFString(CFSTR("BeginTest")));
-    WKContextPostMessageToInjectedBundle(TestController::shared().context(), message.get());
+void TestInvocation::didRecieveMessageFromInjectedBundle(WKStringRef message) {
+  RetainPtr<CFStringRef> cfMessage(AdoptCF, WKStringCopyCFString(0, message));
 
-    runUntil(m_gotInitialResponse);
-    if (m_error) {
-        dump("FAIL\n");
-        return;
-    }
-
-    WKPageLoadURL(TestController::shared().mainWebView()->page(), m_url.get());
-
-    runUntil(m_gotFinalMessage);
-    if (m_error) {
-        dump("FAIL\n");
-        return;
-    }
-}
-
-void TestInvocation::dump(const char* stringToDump)
-{
-    printf("Content-Type: text/plain\n");
-    printf("%s", stringToDump);
-
-    fputs("#EOF\n", stdout);
-    fputs("#EOF\n", stdout);
-    fputs("#EOF\n", stderr);
-
-    fflush(stdout);
-    fflush(stderr);
-}
-
-void TestInvocation::didRecieveMessageFromInjectedBundle(WKStringRef message)
-{
-    RetainPtr<CFStringRef> cfMessage(AdoptCF, WKStringCopyCFString(0, message));
-    
-    if (CFEqual(cfMessage.get(), CFSTR("Error"))) {
-        // Set all states to true to stop spinning the runloop.
-        m_gotInitialResponse = true;
-        m_gotFinalMessage = true;
-        m_error = true;
-        return;
-    }
-
-    if (CFEqual(cfMessage.get(), CFSTR("BeginTestAck"))) {
-        m_gotInitialResponse = true;
-        return;
-    }
-
-    std::auto_ptr<Vector<char> > utf8Message = WKStringToUTF8(message);
-
-    dump(utf8Message->data());
+  if (CFEqual(cfMessage.get(), CFSTR("Error"))) {
+    // Set all states to true to stop spinning the runloop.
+    m_gotInitialResponse = true;
     m_gotFinalMessage = true;
+    m_error = true;
+    return;
+  }
+
+  if (CFEqual(cfMessage.get(), CFSTR("BeginTestAck"))) {
+    m_gotInitialResponse = true;
+    return;
+  }
+
+  std::auto_ptr<Vector<char>> utf8Message = WKStringToUTF8(message);
+
+  dump(utf8Message->data());
+  m_gotFinalMessage = true;
 }
 
-} // namespace WTR
+}  // namespace WTR
