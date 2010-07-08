@@ -144,6 +144,7 @@ enum {
   ID_PROPERTY_TEST_OBJECT,
   ID_PROPERTY_LOG_DESTROY,
   ID_PROPERTY_RETURN_ERROR_FROM_NEWSTREAM,
+  ID_PROPERTY_RETURN_NEGATIVE_ONE_FROM_WRITE,
   ID_PROPERTY_PRIVATE_BROWSING_ENABLED,
   ID_PROPERTY_CACHED_PRIVATE_BROWSING_ENABLED,
   ID_PROPERTY_THROW_EXCEPTION_PROPERTY,
@@ -159,6 +160,7 @@ static const NPUTF8* pluginPropertyIdentifierNames[NUM_PROPERTY_IDENTIFIERS] = {
     "testObject",
     "logDestroy",
     "returnErrorFromNewStream",
+    "returnNegativeOneFromWrite",
     "privateBrowsingEnabled",
     "cachedPrivateBrowsingEnabled",
     "testThrowExceptionProperty",
@@ -295,6 +297,10 @@ static bool pluginGetProperty(NPObject* obj,
                          [ID_PROPERTY_RETURN_ERROR_FROM_NEWSTREAM]) {
     BOOLEAN_TO_NPVARIANT(plugin->returnErrorFromNewStream, *result);
     return true;
+  } else if (name == pluginPropertyIdentifiers
+                         [ID_PROPERTY_RETURN_NEGATIVE_ONE_FROM_WRITE]) {
+    BOOLEAN_TO_NPVARIANT(plugin->returnNegativeOneFromWrite, *result);
+    return true;
   } else if (name ==
              pluginPropertyIdentifiers[ID_PROPERTY_PRIVATE_BROWSING_ENABLED]) {
     NPBool privateBrowsingEnabled = FALSE;
@@ -342,6 +348,10 @@ static bool pluginSetProperty(NPObject* obj,
   } else if (name == pluginPropertyIdentifiers
                          [ID_PROPERTY_RETURN_ERROR_FROM_NEWSTREAM]) {
     plugin->returnErrorFromNewStream = NPVARIANT_TO_BOOLEAN(*variant);
+    return true;
+  } else if (name == pluginPropertyIdentifiers
+                         [ID_PROPERTY_RETURN_NEGATIVE_ONE_FROM_WRITE]) {
+    plugin->returnNegativeOneFromWrite = NPVARIANT_TO_BOOLEAN(*variant);
     return true;
   } else if (name ==
              pluginPropertyIdentifiers[ID_PROPERTY_THROW_EXCEPTION_PROPERTY]) {
@@ -1081,6 +1091,7 @@ static NPObject* pluginAllocate(NPP npp, NPClass* theClass) {
   newInstance->logDestroy = FALSE;
   newInstance->logSetWindow = FALSE;
   newInstance->returnErrorFromNewStream = FALSE;
+  newInstance->returnNegativeOneFromWrite = FALSE;
   newInstance->stream = 0;
 
   newInstance->firstUrl = NULL;
