@@ -415,7 +415,7 @@ class ArrayNode : public ExpressionNode {
 
 class PropertyNode : public ParserArenaFreeable {
  public:
-  enum Type { Constant, Getter, Setter };
+  enum Type { Constant = 1, Getter = 2, Setter = 4 };
 
   PropertyNode(JSGlobalData*,
                const Identifier& name,
@@ -424,6 +424,7 @@ class PropertyNode : public ParserArenaFreeable {
   PropertyNode(JSGlobalData*, double name, ExpressionNode* value, Type);
 
   const Identifier& name() const { return m_name; }
+  Type type() const { return m_type; }
 
  private:
   friend class PropertyListNode;

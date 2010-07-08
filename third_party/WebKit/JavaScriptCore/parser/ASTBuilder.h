@@ -316,7 +316,8 @@ class ASTBuilder {
     return FunctionBodyNode::create(m_globalData);
   }
 
-  PropertyNode* createGetterOrSetterProperty(const Identifier* getOrSet,
+  template <bool>
+  PropertyNode* createGetterOrSetterProperty(PropertyNode::Type type,
                                              const Identifier* name,
                                              ParameterNode* params,
                                              FunctionBodyNode* body,
@@ -325,13 +326,6 @@ class ASTBuilder {
                                              int bodyStartLine,
                                              int bodyEndLine) {
     ASSERT(name);
-    PropertyNode::Type type;
-    if (*getOrSet == m_globalData->propertyNames->get)
-      type = PropertyNode::Getter;
-    else if (*getOrSet == m_globalData->propertyNames->set)
-      type = PropertyNode::Setter;
-    else
-      return 0;
     body->setLoc(bodyStartLine, bodyEndLine);
     return new (m_globalData) PropertyNode(
         m_globalData, *name,
@@ -356,13 +350,16 @@ class ASTBuilder {
     return new (m_globalData) ArgumentListNode(m_globalData, args, arg);
   }
 
+  template <bool>
   PropertyNode* createProperty(const Identifier* propertyName,
                                ExpressionNode* node,
                                PropertyNode::Type type) {
     return new (m_globalData)
         PropertyNode(m_globalData, *propertyName, node, type);
   }
-  PropertyNode* createProperty(double propertyName,
+  template <bool>
+  PropertyNode* createProperty(JSGlobalData*,
+                               double propertyName,
                                ExpressionNode* node,
                                PropertyNode::Type type) {
     return new (m_globalData)
@@ -799,6 +796,9 @@ class ASTBuilder {
     assignmentStackDepth--;
     return result;
   }
+
+  const Identifier& getName(Property property) { return property->name(); }
+  PropertyNode::Type getType(Property property) { return property->type(); }
 
  private:
   struct Scope {
