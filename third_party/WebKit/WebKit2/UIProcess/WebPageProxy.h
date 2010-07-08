@@ -60,7 +60,7 @@ namespace WebKit {
 
 class DrawingAreaProxy;
 class PageClient;
-class WebBackForwardListProxy;
+class WebBackForwardList;
 class WebKeyboardEvent;
 class WebMouseEvent;
 class WebPageNamespace;
@@ -83,7 +83,7 @@ class WebPageProxy : public RefCounted<WebPageProxy> {
 
   DrawingAreaProxy* drawingArea() { return m_drawingArea.get(); }
 
-  WebBackForwardListProxy* backForwardList() { return m_backForwardList.get(); }
+  WebBackForwardList* backForwardList() { return m_backForwardList.get(); }
 
   void setPageClient(PageClient*);
   void initializeLoaderClient(WKPageLoaderClient*);
@@ -242,7 +242,7 @@ class WebPageProxy : public RefCounted<WebPageProxy> {
 
   bool m_canGoBack;
   bool m_canGoForward;
-  RefPtr<WebBackForwardListProxy> m_backForwardList;
+  RefPtr<WebBackForwardList> m_backForwardList;
 
   WebCore::String m_toolTip;
 
