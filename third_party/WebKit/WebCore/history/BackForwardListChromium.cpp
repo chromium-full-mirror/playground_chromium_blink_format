@@ -27,7 +27,7 @@
  */
 
 #include "config.h"
-#include "BackForwardList.h"
+#include "BackForwardListImpl.h"
 
 #include "HistoryItem.h"
 #include "Logging.h"
@@ -37,18 +37,18 @@ namespace WebCore {
 static const unsigned DefaultCapacity = 100;
 static const unsigned NoCurrentItemIndex = UINT_MAX;
 
-BackForwardList::BackForwardList(Page* page)
+BackForwardListImpl::BackForwardListImpl(Page* page)
     : m_page(page),
       m_client(0),
       m_capacity(DefaultCapacity),
       m_closed(true),
       m_enabled(true) {}
 
-BackForwardList::~BackForwardList() {
+BackForwardListImpl::~BackForwardListImpl() {
   ASSERT(m_closed);
 }
 
-void BackForwardList::addItem(PassRefPtr<HistoryItem> prpItem) {
+void BackForwardListImpl::addItem(PassRefPtr<HistoryItem> prpItem) {
   ASSERT(prpItem);
   if (m_capacity == 0 || !m_enabled)
     return;
@@ -56,37 +56,37 @@ void BackForwardList::addItem(PassRefPtr<HistoryItem> prpItem) {
   m_client->addItem(prpItem);
 }
 
-void BackForwardList::goToItem(HistoryItem* item) {
+void BackForwardListImpl::goToItem(HistoryItem* item) {
   m_client->goToItem(item);
 }
 
-HistoryItem* BackForwardList::backItem() {
+HistoryItem* BackForwardListImpl::backItem() {
   ASSERT_NOT_REACHED();
   return 0;
 }
 
-HistoryItem* BackForwardList::forwardItem() {
+HistoryItem* BackForwardListImpl::forwardItem() {
   ASSERT_NOT_REACHED();
   return 0;
 }
 
-HistoryItem* BackForwardList::currentItem() {
+HistoryItem* BackForwardListImpl::currentItem() {
   return m_client->currentItem();
 }
 
-int BackForwardList::capacity() {
+int BackForwardListImpl::capacity() {
   return m_capacity;
 }
 
-void BackForwardList::setCapacity(int size) {
+void BackForwardListImpl::setCapacity(int size) {
   m_capacity = size;
 }
 
-bool BackForwardList::enabled() {
+bool BackForwardListImpl::enabled() {
   return m_enabled;
 }
 
-void BackForwardList::setEnabled(bool enabled) {
+void BackForwardListImpl::setEnabled(bool enabled) {
   m_enabled = enabled;
   if (!enabled) {
     int capacity = m_capacity;
@@ -95,19 +95,19 @@ void BackForwardList::setEnabled(bool enabled) {
   }
 }
 
-int BackForwardList::backListCount() {
+int BackForwardListImpl::backListCount() {
   return m_client->backListCount();
 }
 
-int BackForwardList::forwardListCount() {
+int BackForwardListImpl::forwardListCount() {
   return m_client->forwardListCount();
 }
 
-HistoryItem* BackForwardList::itemAtIndex(int index) {
+HistoryItem* BackForwardListImpl::itemAtIndex(int index) {
   return m_client->itemAtIndex(index);
 }
 
-void BackForwardList::pushStateItem(PassRefPtr<HistoryItem> newItem) {
+void BackForwardListImpl::pushStateItem(PassRefPtr<HistoryItem> newItem) {
   RefPtr<HistoryItem> current = m_client->currentItem();
 
   addItem(newItem);
@@ -116,19 +116,19 @@ void BackForwardList::pushStateItem(PassRefPtr<HistoryItem> newItem) {
     current->setStateObject(SerializedScriptValue::create());
 }
 
-HistoryItemVector& BackForwardList::entries() {
+HistoryItemVector& BackForwardListImpl::entries() {
   static HistoryItemVector noEntries;
   return noEntries;
 }
 
-void BackForwardList::close() {
+void BackForwardListImpl::close() {
   if (m_client)
     m_client->close();
   m_page = 0;
   m_closed = true;
 }
 
-bool BackForwardList::closed() {
+bool BackForwardListImpl::closed() {
   return m_closed;
 }
 
