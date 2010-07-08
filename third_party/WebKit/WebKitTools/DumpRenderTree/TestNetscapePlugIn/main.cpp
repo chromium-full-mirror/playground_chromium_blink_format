@@ -87,7 +87,9 @@ NPError NPP_New(NPMIMEType pluginType,
   if (!supportsCoreGraphics)
     return NPERR_INCOMPATIBLE_VERSION_ERROR;
 
+#if !defined(BUILDING_ON_TIGER)
   NPDrawingModel drawingModelToUse = NPDrawingModelCoreGraphics;
+#endif
 
   NPBool supportsCoreAnimation;
   if (browser->getvalue(instance, NPNVsupportsCoreAnimationBool,
@@ -130,7 +132,9 @@ NPError NPP_New(NPMIMEType pluginType,
 
 #if XP_MACOSX
   obj->eventModel = eventModel;
+#if !defined(BUILDING_ON_TIGER)
   obj->coreAnimationLayer = 0;
+#endif
 #endif  // XP_MACOSX
 
   for (int i = 0; i < argc; i++) {
