@@ -4185,7 +4185,8 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag,
         for (; i < static_cast<int32_t>(argCount); i++)
           argStore[i] =
               callFrame->registers()[i - RegisterFile::CallFrameHeaderSize -
-                                     expectedParams - argCount - 1];
+                                     expectedParams -
+                                     static_cast<int32_t>(argCount) - 1];
       } else if (!arguments.isUndefinedOrNull()) {
         if (!arguments.isObject()) {
           exceptionValue = createInvalidParamError(
