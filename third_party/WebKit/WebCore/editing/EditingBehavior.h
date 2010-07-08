@@ -57,6 +57,13 @@ class EditingBehavior {
     return m_type == EditingMacBehavior;
   }
 
+  // On Mac, style is considered present when present at the beginning of
+  // selection. On other platforms,
+  // style has to be present throughout the selection.
+  bool shouldToggleStyleBasedOnStartOfSelection() const {
+    return m_type == EditingMacBehavior;
+  }
+
  private:
   EditingBehaviorType m_type;
 };
