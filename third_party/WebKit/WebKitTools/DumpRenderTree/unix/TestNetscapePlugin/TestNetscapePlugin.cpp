@@ -174,7 +174,7 @@ static NPError webkit_test_plugin_new_stream(NPP instance,
                                              uint16_t* stype) {
   PluginObject* obj = static_cast<PluginObject*>(instance->pdata);
   obj->stream = stream;
-  *stype = NP_ASFILEONLY;
+  *stype = NP_NORMAL;
 
   if (obj->returnErrorFromNewStream)
     return NPERR_GENERIC_ERROR;
@@ -193,8 +193,34 @@ static NPError webkit_test_plugin_destroy_stream(NPP instance,
                                                  NPError /*reason*/) {
   PluginObject* obj = (PluginObject*)instance->pdata;
 
-  if (obj->onStreamDestroy)
-    executeScript(obj, obj->onStreamDestroy);
+  if (obj->onStreamDestroy) {
+    NPObject* windowObject = 0;
+    NPError error =
+        browser->getvalue(instance, NPNVWindowNPObject, &windowObject);
+
+    if (error == NPERR_NO_ERROR) {
+      NPVariant onStreamDestroyVariant;
+      if (browser->getproperty(
+              instance, windowObject,
+              browser->getstringidentifier(obj->onStreamDestroy),
+              &onStreamDestroyVariant)) {
+        if (NPVARIANT_IS_OBJECT(onStreamDestroyVariant)) {
+          NPObject* onStreamDestroyFunction =
+              NPVARIANT_TO_OBJECT(onStreamDestroyVariant);
+
+          NPVariant reasonVariant;
+          INT32_TO_NPVARIANT(reason, reasonVariant);
+
+          NPVariant result;
+          browser->invokeDefault(instance, onStreamDestroyFunction,
+                                 &reasonVariant, 1, &result);
+          browser->releasevariantvalue(&result);
+        }
+        browser->releasevariantvalue(&onStreamDestroyVariant);
+      }
+      browser->releaseobject(windowObject);
+    }
+  }
 
   if (obj->testDocumentOpenInDestroyStream) {
     testDocumentOpen(instance);
@@ -210,15 +236,20 @@ static void webkit_test_plugin_stream_as_file(NPP /*instance*/,
 
 static int32_t webkit_test_plugin_write_ready(NPP /*instance*/,
                                               NPStream* /*stream*/) {
-  return 0;
+  return 4096;
 }
 
-static int32_t webkit_test_plugin_write(NPP /*instance*/,
+static int32_t webkit_test_plugin_write(NPP instance,
                                         NPStream* /*stream*/,
                                         int32_t /*offset*/,
-                                        int32_t /*len*/,
+                                        int32_t len,
                                         void* /*buffer*/) {
-  return 0;
+  PluginObject* obj = (PluginObject*)instance->pdata;
+
+  if (obj->returnNegativeOneFromWrite)
+    return -1;
+
+  return len;
 }
 
 static void webkit_test_plugin_print(NPP /*instance*/,
