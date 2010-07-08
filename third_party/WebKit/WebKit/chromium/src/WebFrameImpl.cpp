@@ -130,6 +130,7 @@
 #include "WebHistoryItem.h"
 #include "WebInputElement.h"
 #include "WebPasswordAutocompleteListener.h"
+#include "WebPlugin.h"
 #include "WebPluginContainerImpl.h"
 #include "WebRange.h"
 #include "WebRect.h"
@@ -248,10 +249,7 @@ static void frameContentAsPlainText(size_t maxChars,
   }
 }
 
-// If the frame hosts a PluginDocument, this method returns the
-// WebPluginContainerImpl
-// that hosts the plugin.
-static WebPluginContainerImpl* pluginContainerFromFrame(Frame* frame) {
+WebPluginContainerImpl* WebFrameImpl::pluginContainerFromFrame(Frame* frame) {
   if (!frame)
     return 0;
   if (!frame->document() || !frame->document()->isPluginDocument())
@@ -334,7 +332,8 @@ class ChromePluginPrintContext : public ChromePrintContext {
   virtual void begin(float width) {}
 
   virtual void end() {
-    WebPluginContainerImpl* pluginContainer = pluginContainerFromFrame(m_frame);
+    WebPluginContainerImpl* pluginContainer =
+        WebFrameImpl::pluginContainerFromFrame(m_frame);
     if (pluginContainer && pluginContainer->supportsPaginatedPrint())
       pluginContainer->printEnd();
     else
@@ -351,7 +350,8 @@ class ChromePluginPrintContext : public ChromePrintContext {
                                 float footerHeight,
                                 float userScaleFactor,
                                 float& outPageHeight) {
-    WebPluginContainerImpl* pluginContainer = pluginContainerFromFrame(m_frame);
+    WebPluginContainerImpl* pluginContainer =
+        WebFrameImpl::pluginContainerFromFrame(m_frame);
     if (pluginContainer && pluginContainer->supportsPaginatedPrint())
       m_pageCount =
           pluginContainer->printBegin(IntRect(printRect), m_printerDPI);
@@ -365,7 +365,8 @@ class ChromePluginPrintContext : public ChromePrintContext {
   // NativeTheme doesn't play well with scaling. Scaling is done browser side
   // instead.  Returns the scale to be applied.
   virtual float spoolPage(GraphicsContext& ctx, int pageNumber) {
-    WebPluginContainerImpl* pluginContainer = pluginContainerFromFrame(m_frame);
+    WebPluginContainerImpl* pluginContainer =
+        WebFrameImpl::pluginContainerFromFrame(m_frame);
     if (pluginContainer && pluginContainer->supportsPaginatedPrint())
       pluginContainer->printPage(pageNumber, &ctx);
     else
@@ -1003,6 +1004,14 @@ bool WebFrameImpl::executeCommand(const WebString& name) {
   if (command[command.length() - 1] == UChar(':'))
     command = command.substring(0, command.length() - 1);
 
+  if (command == "Copy") {
+    WebPluginContainerImpl* pluginContainer = pluginContainerFromFrame(frame());
+    if (pluginContainer) {
+      pluginContainer->copy();
+      return true;
+    }
+  }
+
   bool rv = true;
 
   // Specially handling commands that Editor::execCommand does not directly
@@ -1065,6 +1074,10 @@ bool WebFrameImpl::isContinuousSpellCheckingEnabled() const {
 }
 
 bool WebFrameImpl::hasSelection() const {
+  WebPluginContainerImpl* pluginContainer = pluginContainerFromFrame(frame());
+  if (pluginContainer)
+    return pluginContainer->plugin()->hasSelection();
+
   // frame()->selection()->isNone() never returns true.
   return (frame()->selection()->start() != frame()->selection()->end());
 }
@@ -1074,6 +1087,10 @@ WebRange WebFrameImpl::selectionRange() const {
 }
 
 WebString WebFrameImpl::selectionAsText() const {
+  WebPluginContainerImpl* pluginContainer = pluginContainerFromFrame(frame());
+  if (pluginContainer)
+    return pluginContainer->plugin()->selectionAsText();
+
   RefPtr<Range> range = frame()->selection()->toNormalizedRange();
   if (!range.get())
     return WebString();
@@ -1087,6 +1104,10 @@ WebString WebFrameImpl::selectionAsText() const {
 }
 
 WebString WebFrameImpl::selectionAsMarkup() const {
+  WebPluginContainerImpl* pluginContainer = pluginContainerFromFrame(frame());
+  if (pluginContainer)
+    return pluginContainer->plugin()->selectionAsMarkup();
+
   RefPtr<Range> range = frame()->selection()->toNormalizedRange();
   if (!range.get())
     return WebString();
