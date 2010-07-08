@@ -196,4 +196,4 @@ QWEBKIT_EXPORT int webProcessMain(int argc, char** argv) {
   return 0;
 }
 
-#include "WebProcessLauncherQt.moc"
+#include "ProcessLauncherQt.moc"
