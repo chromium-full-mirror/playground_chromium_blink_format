@@ -73,7 +73,10 @@ JSSharedWorkerConstructor::constructJSSharedWorker(ExecState* exec) {
   RefPtr<SharedWorker> worker =
       SharedWorker::create(ustringToString(scriptURL), ustringToString(name),
                            window->document(), ec);
-  setDOMException(exec, ec);
+  if (ec) {
+    setDOMException(exec, ec);
+    return JSValue::encode(JSValue());
+  }
 
   return JSValue::encode(
       asObject(toJS(exec, jsConstructor->globalObject(), worker.release())));
