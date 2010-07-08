@@ -46,7 +46,7 @@ class DummyPlugin : public Plugin {
   virtual void paint(WebCore::GraphicsContext*,
                      const WebCore::IntRect& dirtyRect);
   virtual void geometryDidChange(const WebCore::IntRect& frameRect);
-}
+};
 
 }  // namespace WebKit
 
