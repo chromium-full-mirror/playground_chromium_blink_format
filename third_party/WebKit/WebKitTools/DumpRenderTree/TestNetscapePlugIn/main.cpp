@@ -87,8 +87,12 @@ NPError NPP_New(NPMIMEType pluginType,
   if (!supportsCoreGraphics)
     return NPERR_INCOMPATIBLE_VERSION_ERROR;
 
-  browser->setvalue(instance, NPPVpluginDrawingModel,
-                    (void*)NPDrawingModelCoreGraphics);
+  NPDrawingModel drawingModelToUse = NPDrawingModelCoreGraphics;
+
+  NPBool supportsCoreAnimation;
+  if (browser->getvalue(instance, NPNVsupportsCoreAnimationBool,
+                        &supportsCoreAnimation) != NPERR_NO_ERROR)
+    supportsCoreAnimation = false;
 
 #ifndef NP_NO_CARBON
   NPBool supportsCarbon = false;
@@ -126,6 +130,7 @@ NPError NPP_New(NPMIMEType pluginType,
 
 #if XP_MACOSX
   obj->eventModel = eventModel;
+  obj->coreAnimationLayer = 0;
 #endif  // XP_MACOSX
 
   for (int i = 0; i < argc; i++) {
@@ -161,7 +166,21 @@ NPError NPP_New(NPMIMEType pluginType,
       obj->testDocumentOpenInDestroyStream = TRUE;
     else if (strcasecmp(argn[i], "testwindowopen") == 0)
       obj->testWindowOpen = TRUE;
-    else if (strcasecmp(argn[i], "testGetURLOnDestroy") == 0) {
+    else if (strcasecmp(argn[i], "drawingmodel") == 0) {
+      const char* value = argv[i];
+      if (strcasecmp(value, "coreanimation") == 0) {
+        if (supportsCoreAnimation)
+          drawingModelToUse = NPDrawingModelCoreAnimation;
+        else
+          return NPERR_INCOMPATIBLE_VERSION_ERROR;
+      } else if (strcasecmp(value, "coregraphics") == 0) {
+        if (supportsCoreGraphics)
+          drawingModelToUse = NPDrawingModelCoreGraphics;
+        else
+          return NPERR_INCOMPATIBLE_VERSION_ERROR;
+      } else
+        return NPERR_INCOMPATIBLE_VERSION_ERROR;
+    } else if (strcasecmp(argn[i], "testGetURLOnDestroy") == 0) {
 #if XP_WIN
       // FIXME: When https://bugs.webkit.org/show_bug.cgi?id=41831 is fixed,
       // this #ifdef can be removed.
@@ -171,6 +190,12 @@ NPError NPP_New(NPMIMEType pluginType,
                strstr(argv[i], "plugin-document-has-focus.pl"))
       obj->testKeyboardFocusForPlugins = TRUE;
   }
+
+#if XP_MACOSX && !defined(BUILDING_ON_TIGER)
+  browser->setvalue(instance, NPPVpluginDrawingModel, (void*)drawingModelToUse);
+  if (drawingModelToUse == NPDrawingModelCoreAnimation)
+    obj->coreAnimationLayer = createCoreAnimationLayer();
+#endif
 
   browser->getvalue(instance, NPNVprivateModeBool,
                     (void*)&obj->cachedPrivateBrowsingMode);
@@ -203,6 +228,11 @@ NPError NPP_Destroy(NPP instance, NPSavedData** save) {
 
     if (obj->logDestroy)
       pluginLog(instance, "NPP_Destroy");
+
+#if XP_MACOSX && !defined(BUILDING_ON_TIGER)
+    if (obj->coreAnimationLayer)
+      CFRelease(obj->coreAnimationLayer);
+#endif
 
     browser->releaseobject(&obj->header);
   }
@@ -514,6 +544,17 @@ NPError NPP_GetValue(NPP instance, NPPVariable variable, void* value) {
     *v = obj;
     return NPERR_NO_ERROR;
   }
+
+#if XP_MACOSX && !defined(BUILDING_ON_TIGER)
+  if (variable == NPPVpluginCoreAnimationLayer) {
+    if (!obj->coreAnimationLayer)
+      return NPERR_GENERIC_ERROR;
+
+    void** v = (void**)value;
+    *v = (void*)CFRetain(obj->coreAnimationLayer);
+    return NPERR_NO_ERROR;
+  }
+#endif
 
   return NPERR_GENERIC_ERROR;
 }
