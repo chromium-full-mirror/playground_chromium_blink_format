@@ -75,7 +75,9 @@ NPError NPP_New(NPMIMEType pluginType,
                 NPSavedData* saved) {
   bool forceCarbon = false;
 
-#if XP_MAC
+#if XP_MACOSX
+  NPEventModel eventModel;
+
   // Always turn on the CG model
   NPBool supportsCoreGraphics;
   if (browser->getvalue(instance, NPNVsupportsCoreGraphicsBool,
@@ -106,21 +108,25 @@ NPError NPP_New(NPMIMEType pluginType,
     supportsCocoa = false;
 
   if (supportsCocoa && !forceCarbon) {
-    obj->eventModel = NPEventModelCocoa;
+    eventModel = NPEventModelCocoa;
 #ifndef NP_NO_CARBON
   } else if (supportsCarbon) {
-    obj->eventModel = NPEventModelCarbon;
+    eventModel = NPEventModelCarbon;
 #endif
   } else {
     return NPERR_INCOMPATIBLE_VERSION_ERROR;
   }
 
-  browser->setvalue(instance, NPPVpluginEventModel, (void*)obj->eventModel);
-#endif  // XP_MAC
+  browser->setvalue(instance, NPPVpluginEventModel, (void*)eventModel);
+#endif  // XP_MACOSX
 
   PluginObject* obj =
       (PluginObject*)browser->createobject(instance, getPluginClass());
   instance->pdata = obj;
+
+#if XP_MACOSX
+  obj->eventModel = eventModel;
+#endif  // XP_MACOSX
 
   for (int i = 0; i < argc; i++) {
     if (strcasecmp(argn[i], "onstreamload") == 0 && !obj->onStreamLoad)
@@ -323,7 +329,7 @@ void NPP_StreamAsFile(NPP instance, NPStream* stream, const char* fname) {}
 
 void NPP_Print(NPP instance, NPPrint* platformPrint) {}
 
-#if XP_MAC
+#if XP_MACOSX
 #ifndef NP_NO_CARBON
 static int16_t handleEventCarbon(NPP instance,
                                  PluginObject* obj,
@@ -461,14 +467,14 @@ static int16_t handleEventCocoa(NPP instance,
   return 0;
 }
 
-#endif  // XP_MAC
+#endif  // XP_MACOSX
 
 int16_t NPP_HandleEvent(NPP instance, void* event) {
   PluginObject* obj = static_cast<PluginObject*>(instance->pdata);
   if (!obj->eventLogging)
     return 0;
 
-#if XP_MAC
+#if XP_MACOSX
 #ifndef NP_NO_CARBON
   if (obj->eventModel == NPEventModelCarbon)
     return handleEventCarbon(instance, obj, static_cast<EventRecord*>(event));
@@ -479,7 +485,7 @@ int16_t NPP_HandleEvent(NPP instance, void* event) {
 #else
   // FIXME: Implement for other platforms.
   return 0;
-#endif  // XP_MAC
+#endif  // XP_MACOSX
 }
 
 void NPP_URLNotify(NPP instance,
