@@ -92,7 +92,7 @@ DocumentThreadableLoader::DocumentThreadableLoader(
 
   if (m_options.crossOriginRequestPolicy == DenyCrossOriginRequests) {
     m_client->didFail(
-        ResourceError(errorDomainWebKit, 0, request.url().string(),
+        ResourceError(errorDomainWebKitInternal, 0, request.url().string(),
                       "Cross origin requests are not supported."));
     return;
   }
@@ -130,7 +130,7 @@ void DocumentThreadableLoader::makeSimpleCrossOriginAccessRequest(
   // that's guaranteed to be denied.
   if (!request.url().protocolInHTTPFamily()) {
     m_client->didFail(
-        ResourceError(errorDomainWebKit, 0, request.url().string(),
+        ResourceError(errorDomainWebKitInternal, 0, request.url().string(),
                       "Cross origin requests are only supported for HTTP."));
     return;
   }
@@ -248,7 +248,7 @@ void DocumentThreadableLoader::didReceiveResponse(
       if (!passesAccessControlCheck(response, m_options.allowCredentials,
                                     m_document->securityOrigin(),
                                     accessControlErrorDescription)) {
-        m_client->didFail(ResourceError(errorDomainWebKit, 0,
+        m_client->didFail(ResourceError(errorDomainWebKitInternal, 0,
                                         response.url().string(),
                                         accessControlErrorDescription));
         return;
@@ -344,7 +344,8 @@ void DocumentThreadableLoader::preflightFailure(
     const String& errorDescription) {
   m_actualRequest =
       0;  // Prevent didFinishLoading() from bypassing access check.
-  m_client->didFail(ResourceError(errorDomainWebKit, 0, url, errorDescription));
+  m_client->didFail(
+      ResourceError(errorDomainWebKitInternal, 0, url, errorDescription));
 }
 
 void DocumentThreadableLoader::loadRequest(const ResourceRequest& request,

@@ -134,8 +134,7 @@ bool CrossOriginPreflightResultCacheItem::allowsCrossOriginMethod(
     return true;
 
   errorDescription =
-      "Method " + method +
-      " is not allowed by Access-Control-Allow-Methods response header field.";
+      "Method " + method + " is not allowed by Access-Control-Allow-Methods.";
   return false;
 }
 
@@ -148,8 +147,7 @@ bool CrossOriginPreflightResultCacheItem::allowsCrossOriginHeaders(
     if (!m_headers.contains(it->first) &&
         !isOnAccessControlSimpleRequestHeaderWhitelist(it->first, it->second)) {
       errorDescription = "Request header field " + it->first +
-                         " is not allowed by Access-Control-Allow-Headers "
-                         "response header field.";
+                         " is not allowed by Access-Control-Allow-Headers.";
       return false;
     }
   }
