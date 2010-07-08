@@ -37,6 +37,7 @@
 #include <wtf/RefCounted.h>
 
 namespace WebCore {
+class KURL;
 class String;
 };
 
@@ -99,6 +100,9 @@ class WebProcessProxy : public RefCounted<WebProcessProxy>,
 
   void forwardMessageToWebContext(const WebCore::String&);
   void getPlugins(bool refresh, Vector<WebCore::PluginInfo>&);
+  void getPluginHostConnection(const WebCore::String& mimeType,
+                               const WebCore::KURL& url,
+                               WebCore::String& pluginPath);
 
   // CoreIPC::Connection::Client
   void didReceiveMessage(CoreIPC::Connection*,

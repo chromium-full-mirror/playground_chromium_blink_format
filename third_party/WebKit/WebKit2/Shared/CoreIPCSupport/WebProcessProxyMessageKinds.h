@@ -32,7 +32,7 @@
 
 namespace WebProcessProxyMessage {
 
-enum Kind { PostMessage, GetPlugins };
+enum Kind { PostMessage, GetPlugins, GetPluginHostConnection };
 }
 
 namespace CoreIPC {
