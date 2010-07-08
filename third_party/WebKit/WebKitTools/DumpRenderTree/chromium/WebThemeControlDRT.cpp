@@ -316,6 +316,12 @@ void WebThemeControlDRT::draw() {
                   m_fgColor);
       break;
 
+    case IndeterminateCheckboxType:
+      // Indeterminate checkbox is a box containing '-'.
+      nestedBoxes(checkIndent, halfHeight, checkIndent, halfHeight, m_bgColor,
+                  m_fgColor);
+      break;
+
     case UncheckedRadioType:
       circle(SkIntToScalar(halfHeight), m_bgColor);
       break;

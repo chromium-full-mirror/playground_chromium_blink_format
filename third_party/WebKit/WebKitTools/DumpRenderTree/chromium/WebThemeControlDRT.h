@@ -99,6 +99,7 @@ class WebThemeControlDRT : public Noncopyable {
     PushButtonType,
     UncheckedBoxType,
     CheckedBoxType,
+    IndeterminateCheckboxType,
     UncheckedRadioType,
     CheckedRadioType,
     HorizontalScrollTrackBackType,
