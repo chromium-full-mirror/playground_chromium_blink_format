@@ -111,6 +111,12 @@ void SVGDocumentExtensions::unpauseAnimations() {
 bool SVGDocumentExtensions::sampleAnimationAtTime(const String& elementId,
                                                   SVGSMILElement* element,
                                                   double time) {
+#if !ENABLE(SVG_ANIMATION)
+  UNUSED_PARAM(elementId);
+  UNUSED_PARAM(element);
+  UNUSED_PARAM(time);
+  return false;
+#else
   ASSERT(element);
   SMILTimeContainer* container = element->timeContainer();
   if (!container || container->isPaused())
@@ -118,6 +124,7 @@ bool SVGDocumentExtensions::sampleAnimationAtTime(const String& elementId,
 
   container->sampleAnimationAtTime(elementId, time);
   return true;
+#endif
 }
 
 // FIXME: Callers should probably use ScriptController::eventHandlerLineNumber()
