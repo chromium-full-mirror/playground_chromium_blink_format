@@ -44,7 +44,7 @@ namespace WebCore {
 
 PassRefPtr<IDBCallbacksProxy> IDBCallbacksProxy::create(
     PassOwnPtr<WebKit::WebIDBCallbacks> callbacks) {
-  return new IDBCallbacksProxy(callbacks);
+  return adoptRef(new IDBCallbacksProxy(callbacks));
 }
 
 IDBCallbacksProxy::IDBCallbacksProxy(
