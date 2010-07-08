@@ -35,6 +35,8 @@
 
 namespace JSC {
 
+union JSTokenData;
+struct JSTokenInfo;
 class RegExp;
 
 class Lexer : public Noncopyable {
@@ -50,7 +52,7 @@ class Lexer : public Noncopyable {
   void setIsReparsing() { m_isReparsing = true; }
 
   // Functions for the parser itself.
-  int lex(void* lvalp, void* llocp);
+  int lex(JSTokenData* lvalp, JSTokenInfo* llocp);
   int lineNumber() const { return m_lineNumber; }
   void setLastLineNumber(int lastLineNumber) {
     m_lastLineNumber = lastLineNumber;
@@ -97,7 +99,7 @@ class Lexer : public Noncopyable {
 
   ALWAYS_INLINE bool lastTokenWasRestrKeyword() const;
 
-  ALWAYS_INLINE bool parseString(void* lvalp);
+  ALWAYS_INLINE bool parseString(JSTokenData* lvalp);
 
   static const size_t initialReadBufferCapacity = 32;
 
@@ -144,11 +146,6 @@ inline unsigned char Lexer::convertHex(int c1, int c2) {
 
 inline UChar Lexer::convertUnicode(int c1, int c2, int c3, int c4) {
   return (convertHex(c1, c2) << 8) | convertHex(c3, c4);
-}
-
-// A bridge for yacc from the C world to the C++ world.
-inline int jscyylex(void* lvalp, void* llocp, void* globalData) {
-  return static_cast<JSGlobalData*>(globalData)->lexer->lex(lvalp, llocp);
 }
 
 }  // namespace JSC
