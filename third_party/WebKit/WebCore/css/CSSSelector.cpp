@@ -3,7 +3,8 @@
  *               1999 Waldo Bastian (bastian@kde.org)
  *               2001 Andreas Schlapbach (schlpbch@iam.unibe.ch)
  *               2001-2003 Dirk Mueller (mueller@kde.org)
- * Copyright (C) 2002, 2006, 2007, 2008 Apple Inc. All rights reserved.
+ * Copyright (C) 2002, 2006, 2007, 2008, 2009, 2010 Apple Inc. All rights
+ * reserved.
  * Copyright (C) 2008 David Smith (catfish.man@gmail.com)
  * Copyright (C) 2010 Google Inc. All rights reserved.
  *
@@ -138,6 +139,8 @@ PseudoId CSSSelector::pseudoId(PseudoType type) {
       return MEDIA_CONTROLS_TIMELINE;
     case PseudoMediaControlsVolumeSlider:
       return MEDIA_CONTROLS_VOLUME_SLIDER;
+    case PseudoMediaControlsVolumeSliderMuteButton:
+      return MEDIA_CONTROLS_VOLUME_SLIDER_MUTE_BUTTON;
     case PseudoMediaControlsSeekBackButton:
       return MEDIA_CONTROLS_SEEK_BACK_BUTTON;
     case PseudoMediaControlsSeekForwardButton:
@@ -334,6 +337,8 @@ nameToPseudoTypeMap() {
                       ("-webkit-media-controls-timeline"));
   DEFINE_STATIC_LOCAL(AtomicString, mediaControlsVolumeSlider,
                       ("-webkit-media-controls-volume-slider"));
+  DEFINE_STATIC_LOCAL(AtomicString, mediaControlsVolumeSliderMuteButton,
+                      ("-webkit-media-controls-volume-slider-mute-button"));
   DEFINE_STATIC_LOCAL(AtomicString, mediaControlsSeekBackButton,
                       ("-webkit-media-controls-seek-back-button"));
   DEFINE_STATIC_LOCAL(AtomicString, mediaControlsSeekForwardButton,
@@ -492,6 +497,9 @@ nameToPseudoTypeMap() {
                           CSSSelector::PseudoMediaControlsTimeline);
     nameToPseudoType->set(mediaControlsVolumeSlider.impl(),
                           CSSSelector::PseudoMediaControlsVolumeSlider);
+    nameToPseudoType->set(
+        mediaControlsVolumeSliderMuteButton.impl(),
+        CSSSelector::PseudoMediaControlsVolumeSliderMuteButton);
     nameToPseudoType->set(mediaControlsSeekBackButton.impl(),
                           CSSSelector::PseudoMediaControlsSeekBackButton);
     nameToPseudoType->set(mediaControlsSeekForwardButton.impl(),
@@ -630,6 +638,7 @@ void CSSSelector::extractPseudoType() const {
     case PseudoMediaControlsTimeRemainingDisplay:
     case PseudoMediaControlsTimeline:
     case PseudoMediaControlsVolumeSlider:
+    case PseudoMediaControlsVolumeSliderMuteButton:
     case PseudoMediaControlsSeekBackButton:
     case PseudoMediaControlsSeekForwardButton:
     case PseudoMediaControlsRewindButton:

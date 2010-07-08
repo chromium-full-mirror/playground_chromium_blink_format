@@ -2,7 +2,7 @@
  * Copyright (C) 2000 Lars Knoll (knoll@kde.org)
  *           (C) 2000 Antti Koivisto (koivisto@kde.org)
  *           (C) 2000 Dirk Mueller (mueller@kde.org)
- * Copyright (C) 2003, 2005, 2006, 2007, 2008, 2009 Apple Inc. All rights
+ * Copyright (C) 2003, 2005, 2006, 2007, 2008, 2009, 2010 Apple Inc. All rights
  * reserved.
  * Copyright (C) 2006 Graham Dennis (graham.dennis@gmail.com)
  * Copyright (C) 2009 Torch Mobile Inc. All rights reserved.
@@ -96,6 +96,7 @@ enum PseudoId {
   MEDIA_CONTROLS_TIMELINE_CONTAINER,
   MEDIA_CONTROLS_VOLUME_SLIDER,
   MEDIA_CONTROLS_VOLUME_SLIDER_CONTAINER,
+  MEDIA_CONTROLS_VOLUME_SLIDER_MUTE_BUTTON,
   MEDIA_CONTROLS_CURRENT_TIME_DISPLAY,
   MEDIA_CONTROLS_TIME_REMAINING_DISPLAY,
   MEDIA_CONTROLS_SEEK_BACK_BUTTON,

@@ -33,6 +33,7 @@
 #include "HTMLNames.h"
 #include "MediaControlElements.h"
 #include "MouseEvent.h"
+#include "Page.h"
 #include "RenderTheme.h"
 #include <wtf/CurrentTime.h>
 #include <wtf/MathExtras.h>
@@ -127,6 +128,8 @@ void RenderMedia::styleDidChange(StyleDifference diff,
       m_timeRemainingDisplay->updateStyle();
     if (m_volumeSliderContainer)
       m_volumeSliderContainer->updateStyle();
+    if (m_volumeSliderMuteButton)
+      m_volumeSliderMuteButton->updateStyle();
     if (m_volumeSlider)
       m_volumeSlider->updateStyle();
   }
@@ -173,7 +176,8 @@ void RenderMedia::createPanel() {
 
 void RenderMedia::createMuteButton() {
   ASSERT(!m_muteButton);
-  m_muteButton = MediaControlMuteButtonElement::create(mediaElement());
+  m_muteButton = MediaControlMuteButtonElement::create(
+      mediaElement(), MediaControlMuteButtonElement::Controller);
   m_muteButton->attachToParent(m_panel.get());
 }
 
@@ -254,6 +258,13 @@ void RenderMedia::createVolumeSlider() {
   m_volumeSlider->attachToParent(m_volumeSliderContainer.get());
 }
 
+void RenderMedia::createVolumeSliderMuteButton() {
+  ASSERT(!m_volumeSliderMuteButton);
+  m_volumeSliderMuteButton = MediaControlMuteButtonElement::create(
+      mediaElement(), MediaControlMuteButtonElement::VolumeSlider);
+  m_volumeSliderMuteButton->attachToParent(m_volumeSliderContainer.get());
+}
+
 void RenderMedia::createCurrentTimeDisplay() {
   ASSERT(!m_currentTimeDisplay);
   m_currentTimeDisplay = MediaControlTimeDisplayElement::create(
@@ -299,6 +310,7 @@ void RenderMedia::updateControls() {
       m_fullscreenButton = 0;
       m_volumeSliderContainer = 0;
       m_volumeSlider = 0;
+      m_volumeSliderMuteButton = 0;
       m_controlsShadowRoot = 0;
       m_toggleClosedCaptionsButton = 0;
     }
@@ -328,8 +340,10 @@ void RenderMedia::updateControls() {
       createFullscreenButton();
       createMuteButton();
       createVolumeSliderContainer();
-      if (m_volumeSliderContainer)
+      if (m_volumeSliderContainer) {
         createVolumeSlider();
+        createVolumeSliderMuteButton();
+      }
       m_panel->attach();
     }
   }
@@ -383,6 +397,8 @@ void RenderMedia::updateControls() {
     m_fullscreenButton->update();
   if (m_volumeSlider)
     m_volumeSlider->update();
+  if (m_volumeSliderMuteButton)
+    m_volumeSliderMuteButton->update();
 
   updateTimeDisplay();
   updateControlVisibility();
@@ -491,15 +507,15 @@ void RenderMedia::updateVolumeSliderContainer(bool visible) {
 
     RefPtr<RenderStyle> s = m_volumeSliderContainer->styleForElement();
     int height = s->height().isPercent() ? 0 : s->height().value();
-    int x = m_muteButton->renderBox()->offsetLeft();
-    int y = m_muteButton->renderBox()->offsetTop() - height;
-    FloatPoint absPoint =
-        m_muteButton->renderer()->localToAbsolute(FloatPoint(x, y), true, true);
-    if (absPoint.y() < 0)
-      y = m_muteButton->renderBox()->offsetTop() +
-          m_muteButton->renderBox()->height();
-    m_volumeSliderContainer->setVisible(true);
+    int width = s->width().isPercent() ? 0 : s->width().value();
+    IntPoint offset =
+        document()->page()->theme()->volumeSliderOffsetFromMuteButton(
+            m_muteButton->renderer()->node(), IntSize(width, height));
+    int x = offset.x() + m_muteButton->renderBox()->offsetLeft();
+    int y = offset.y() + m_muteButton->renderBox()->offsetTop();
+
     m_volumeSliderContainer->setPosition(x, y);
+    m_volumeSliderContainer->setVisible(true);
     m_volumeSliderContainer->update();
     m_volumeSlider->update();
   } else if (!visible && m_volumeSliderContainer->isVisible()) {
@@ -512,8 +528,15 @@ void RenderMedia::forwardEvent(Event* event) {
   if (event->isMouseEvent() && m_controlsShadowRoot) {
     MouseEvent* mouseEvent = static_cast<MouseEvent*>(event);
     IntPoint point(mouseEvent->absoluteLocation());
+
+    bool defaultHandled = false;
+    if (m_volumeSliderMuteButton && m_volumeSliderMuteButton->hitTest(point)) {
+      m_volumeSliderMuteButton->defaultEventHandler(event);
+      defaultHandled = event->defaultHandled();
+    }
+
     bool showVolumeSlider = false;
-    if (m_muteButton && m_muteButton->hitTest(point)) {
+    if (!defaultHandled && m_muteButton && m_muteButton->hitTest(point)) {
       m_muteButton->defaultEventHandler(event);
       if (event->type() != eventNames().mouseoutEvent)
         showVolumeSlider = true;

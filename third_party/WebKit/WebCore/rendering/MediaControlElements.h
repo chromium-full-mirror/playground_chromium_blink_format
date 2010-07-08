@@ -65,7 +65,8 @@ enum MediaControlElementType {
   MediaControlsPanel,
   MediaVolumeSliderContainer,
   MediaVolumeSlider,
-  MediaVolumeSliderThumb
+  MediaVolumeSliderThumb,
+  MediaVolumeSliderMuteButton,
 };
 
 HTMLMediaElement* toParentMediaElement(RenderObject*);
@@ -205,12 +206,14 @@ class MediaControlInputElement : public HTMLInputElement {
 
 class MediaControlMuteButtonElement : public MediaControlInputElement {
  public:
-  static PassRefPtr<MediaControlMuteButtonElement> create(HTMLMediaElement*);
+  enum ButtonLocation { Controller, VolumeSlider };
+  static PassRefPtr<MediaControlMuteButtonElement> create(HTMLMediaElement*,
+                                                          ButtonLocation);
 
   virtual void defaultEventHandler(Event*);
 
  private:
-  MediaControlMuteButtonElement(HTMLMediaElement*);
+  MediaControlMuteButtonElement(HTMLMediaElement*, ButtonLocation);
 
   virtual void updateDisplayType();
 };

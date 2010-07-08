@@ -381,6 +381,9 @@ MediaControlInputElement::MediaControlInputElement(
     case MEDIA_CONTROLS_VOLUME_SLIDER:
       m_displayType = MediaVolumeSlider;
       break;
+    case MEDIA_CONTROLS_VOLUME_SLIDER_MUTE_BUTTON:
+      m_displayType = MediaVolumeSliderMuteButton;
+      break;
     case MEDIA_CONTROLS_TOGGLE_CLOSED_CAPTIONS_BUTTON:
       m_displayType = MediaShowClosedCaptionsButton;
       break;
@@ -477,14 +480,18 @@ void MediaControlInputElement::setDisplayType(
 // ----------------------------
 
 inline MediaControlMuteButtonElement::MediaControlMuteButtonElement(
-    HTMLMediaElement* mediaElement)
+    HTMLMediaElement* mediaElement,
+    ButtonLocation location)
     : MediaControlInputElement(mediaElement,
-                               MEDIA_CONTROLS_MUTE_BUTTON,
+                               location == Controller
+                                   ? MEDIA_CONTROLS_MUTE_BUTTON
+                                   : MEDIA_CONTROLS_VOLUME_SLIDER_MUTE_BUTTON,
                                "button") {}
 
 PassRefPtr<MediaControlMuteButtonElement> MediaControlMuteButtonElement::create(
-    HTMLMediaElement* mediaElement) {
-  return adoptRef(new MediaControlMuteButtonElement(mediaElement));
+    HTMLMediaElement* mediaElement,
+    ButtonLocation location) {
+  return adoptRef(new MediaControlMuteButtonElement(mediaElement, location));
 }
 
 void MediaControlMuteButtonElement::defaultEventHandler(Event* event) {
