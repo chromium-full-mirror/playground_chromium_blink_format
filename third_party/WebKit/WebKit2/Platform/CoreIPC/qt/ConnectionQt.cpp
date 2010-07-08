@@ -27,6 +27,7 @@
 #include "Connection.h"
 
 #include "ArgumentEncoder.h"
+#include "ProcessLauncher.h"
 #include "WebPageProxyMessageKinds.h"
 #include "WorkItem.h"
 #include <QApplication>
@@ -41,25 +42,14 @@ namespace CoreIPC {
 static const size_t messageMaxSize = 4096;
 
 void Connection::platformInitialize(Identifier identifier) {
-  m_serverName = "QtWebKit" + identifier;
-  m_server = 0;
+  m_serverName = identifier;
   m_socket = 0;
   m_readBuffer.resize(messageMaxSize);
   m_currentMessageSize = 0;
 }
 
 void Connection::platformInvalidate() {
-  delete m_server;
   delete m_socket;
-}
-
-void Connection::newConnectionHandler() {
-  m_socket = m_server->nextPendingConnection();
-  m_isConnected = m_socket;
-  if (m_isConnected)
-    m_connectionQueue.connectSignal(
-        m_socket, SIGNAL(readyRead()),
-        WorkItem::create(this, &Connection::readyReadHandler));
 }
 
 void Connection::readyReadHandler() {
@@ -95,19 +85,16 @@ void Connection::readyReadHandler() {
   }
 }
 
-void Connection::openConnectionHandler() {
-  ASSERT(!m_server);
+bool Connection::open() {
   ASSERT(!m_socket);
 
   if (m_isServer) {
-    m_server = new QLocalServer();
-    if (!m_server->listen(m_serverName)) {
-      qDebug() << "failed to create server " << m_serverName;
-      return;
-    }
-    m_connectionQueue.connectSignal(
-        m_server, SIGNAL(newConnection()),
-        WorkItem::create(this, &Connection::newConnectionHandler));
+    m_socket = WebKit::ProcessLauncher::takePendingConnection();
+    m_isConnected = m_socket;
+    if (m_isConnected)
+      m_connectionQueue.connectSignal(
+          m_socket, SIGNAL(readyRead()),
+          WorkItem::create(this, &Connection::readyReadHandler));
   } else {
     m_socket = new QLocalSocket();
     m_socket->connectToServer(m_serverName);
@@ -116,12 +103,7 @@ void Connection::openConnectionHandler() {
         WorkItem::create(this, &Connection::readyReadHandler));
     m_isConnected = m_socket->waitForConnected();
   }
-}
-
-bool Connection::open() {
-  m_connectionQueue.scheduleWork(
-      WorkItem::create(this, &Connection::openConnectionHandler));
-  return false;
+  return m_isConnected;
 }
 
 void Connection::sendOutgoingMessage(MessageID messageID,

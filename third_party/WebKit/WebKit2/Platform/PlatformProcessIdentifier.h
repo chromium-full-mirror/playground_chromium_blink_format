@@ -26,6 +26,10 @@
 #ifndef PlatformProcessIdentifier_h
 #define PlatformProcessIdentifier_h
 
+#if PLATFORM(QT)
+class QProcess;
+#endif
+
 namespace WebKit {
 
 #if PLATFORM(MAC)
@@ -33,7 +37,7 @@ typedef pid_t PlatformProcessIdentifier;
 #elif PLATFORM(WIN)
 typedef HANDLE PlatformProcessIdentifier;
 #elif PLATFORM(QT)
-typedef pid_t PlatformProcessIdentifier;
+typedef QProcess* PlatformProcessIdentifier;
 #endif
 
 }  // namespace WebKit

@@ -31,6 +31,10 @@
 #include <wtf/RefPtr.h>
 #include <wtf/Threading.h>
 
+#if PLATFORM(QT)
+class QLocalSocket;
+#endif
+
 namespace WebKit {
 
 class ProcessLauncher : public ThreadSafeShared<ProcessLauncher> {
@@ -56,6 +60,11 @@ class ProcessLauncher : public ThreadSafeShared<ProcessLauncher> {
   void invalidate();
 
   static CoreIPC::Connection::Identifier createWebThread();
+
+#if PLATFORM(QT)
+  friend class ProcessLauncherHelper;
+  static QLocalSocket* takePendingConnection();
+#endif
 
  private:
   explicit ProcessLauncher(Client*);
