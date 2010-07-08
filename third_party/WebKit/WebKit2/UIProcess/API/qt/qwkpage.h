@@ -65,8 +65,8 @@ class QWEBKIT_EXPORT QWKPage : public QObject {
   void timerEvent(QTimerEvent*);
 
  private:
-  friend class QWKGraphicsWidget;
-  friend class QWKGraphicsWidgetPrivate;
+  friend class QGraphicsWKView;
+  friend class QGraphicsWKViewtPrivate;
   friend class QWKPagePrivate;
   QWKPagePrivate* d;
 };
