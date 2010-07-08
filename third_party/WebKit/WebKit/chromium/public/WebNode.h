@@ -129,7 +129,6 @@ class WebNode {
   operator WTF::PassRefPtr<WebCore::Node>() const;
 #endif
 
- protected:
 #if WEBKIT_IMPLEMENTATION
   template <typename T>
   T* unwrap() {
@@ -142,6 +141,7 @@ class WebNode {
   }
 #endif
 
+ protected:
   WebPrivatePtr<WebCore::Node> m_private;
 };
 

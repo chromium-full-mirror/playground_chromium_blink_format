@@ -1838,8 +1838,7 @@ void WebFrameImpl::setCanHaveScrollbars(bool canHaveScrollbars) {
 bool WebFrameImpl::registerPasswordListener(
     WebInputElement inputElement,
     WebPasswordAutocompleteListener* listener) {
-  RefPtr<HTMLInputElement> element =
-      inputElement.operator PassRefPtr<HTMLInputElement>();
+  RefPtr<HTMLInputElement> element(inputElement.unwrap<HTMLInputElement>());
   if (!m_passwordListeners.add(element, listener).second) {
     delete listener;
     return false;
@@ -1849,10 +1848,9 @@ bool WebFrameImpl::registerPasswordListener(
 
 void WebFrameImpl::notifiyPasswordListenerOfAutocomplete(
     const WebInputElement& inputElement) {
-  RefPtr<HTMLInputElement> element =
-      inputElement.operator PassRefPtr<HTMLInputElement>();
-  WebPasswordAutocompleteListener* listener =
-      getPasswordListener(element.get());
+  const HTMLInputElement* element =
+      inputElement.constUnwrap<HTMLInputElement>();
+  WebPasswordAutocompleteListener* listener = getPasswordListener(element);
   // Password listeners need to autocomplete other fields that depend on the
   // input element with autofill suggestions.
   if (listener)
@@ -1860,8 +1858,9 @@ void WebFrameImpl::notifiyPasswordListenerOfAutocomplete(
 }
 
 WebPasswordAutocompleteListener* WebFrameImpl::getPasswordListener(
-    HTMLInputElement* inputElement) {
-  return m_passwordListeners.get(RefPtr<HTMLInputElement>(inputElement));
+    const HTMLInputElement* inputElement) {
+  return m_passwordListeners.get(
+      RefPtr<HTMLInputElement>(const_cast<HTMLInputElement*>(inputElement)));
 }
 
 // WebFrameImpl private --------------------------------------------------------

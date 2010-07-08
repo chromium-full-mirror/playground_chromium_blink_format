@@ -250,7 +250,7 @@ class WebFrameImpl : public WebFrame, public RefCounted<WebFrameImpl> {
   // Note that the returned listener is owner by the WebFrameImpl and should not
   // be kept around as it is deleted when the page goes away.
   WebPasswordAutocompleteListener* getPasswordListener(
-      WebCore::HTMLInputElement*);
+      const WebCore::HTMLInputElement*);
 
   WebFrameClient* client() const { return m_client; }
   void setClient(WebFrameClient* client) { m_client = client; }
