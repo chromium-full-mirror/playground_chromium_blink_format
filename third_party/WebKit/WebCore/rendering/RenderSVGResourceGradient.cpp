@@ -76,18 +76,14 @@ void RenderSVGResourceGradient::invalidateClient(RenderObject* object) {
 }
 
 #if PLATFORM(CG)
-static inline AffineTransform absoluteTransformForRenderer(
-    const RenderObject* object) {
-  AffineTransform absoluteTransform;
-
-  const RenderObject* currentObject = object;
-  while (currentObject) {
-    absoluteTransform =
-        currentObject->localToParentTransform() * absoluteTransform;
-    currentObject = currentObject->parent();
-  }
-
-  return absoluteTransform;
+static inline AffineTransform absoluteTransformFromContext(
+    GraphicsContext* context) {
+  // Extract current transformation matrix used in the original context. Note
+  // that this coordinate
+  // system is flipped compared to SVGs internal coordinate system, done in
+  // WebKit level. Fix
+  // this transformation by flipping the y component.
+  return context->getCTM() * AffineTransform().flipY();
 }
 
 static inline bool createMaskAndSwapContextForTextGradient(
@@ -98,7 +94,7 @@ static inline bool createMaskAndSwapContextForTextGradient(
   const RenderObject* textRootBlock =
       SVGRenderSupport::findTextRootObject(object);
 
-  AffineTransform transform = absoluteTransformForRenderer(textRootBlock);
+  AffineTransform transform(absoluteTransformFromContext(context));
   FloatRect maskAbsoluteBoundingBox =
       transform.mapRect(textRootBlock->repaintRectInLocalCoordinates());
 
@@ -132,8 +128,17 @@ static inline AffineTransform clipToTextMask(GraphicsContext* context,
                                              GradientData* gradientData) {
   const RenderObject* textRootBlock =
       SVGRenderSupport::findTextRootObject(object);
-  context->clipToImageBuffer(textRootBlock->repaintRectInLocalCoordinates(),
-                             imageBuffer.get());
+
+  // The mask image has been created in the device coordinate space, as the
+  // image should not be scaled.
+  // So the actual masking process has to be done in the device coordinate space
+  // as well.
+  AffineTransform transform(absoluteTransformFromContext(context));
+  context->concatCTM(transform.inverse());
+  context->clipToImageBuffer(
+      transform.mapRect(textRootBlock->repaintRectInLocalCoordinates()),
+      imageBuffer.get());
+  context->concatCTM(transform);
 
   AffineTransform matrix;
   if (gradientData->boundingBoxMode) {
