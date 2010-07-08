@@ -49,13 +49,15 @@ static WTF::RefCountedLeakCounter webContextCounter("WebContext");
 
 WebContext* WebContext::sharedProcessContext() {
   static WebContext* context =
-      new WebContext(ProcessModelSharedSecondaryProcess, String());
+      adoptRef(new WebContext(ProcessModelSharedSecondaryProcess, String()))
+          .leakRef();
   return context;
 }
 
 WebContext* WebContext::sharedThreadContext() {
   static WebContext* context =
-      new WebContext(ProcessModelSharedSecondaryThread, String());
+      adoptRef(new WebContext(ProcessModelSharedSecondaryThread, String()))
+          .leakRef();
   return context;
 }
 

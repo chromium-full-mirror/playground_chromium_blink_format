@@ -73,6 +73,9 @@ class WebFrame : public RefCounted<WebFrame> {
   PassRefPtr<ImmutableArray> childFrames();
 
  private:
+  static PassRefPtr<WebFrame> create(WebPage*,
+                                     const WebCore::String& frameName,
+                                     WebCore::HTMLFrameOwnerElement*);
   WebFrame(WebPage*,
            const WebCore::String& frameName,
            WebCore::HTMLFrameOwnerElement*);
