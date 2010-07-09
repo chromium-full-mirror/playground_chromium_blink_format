@@ -28,7 +28,6 @@
 #define AXObjectCache_h
 
 #include "AccessibilityObject.h"
-#include "EventHandler.h"
 #include "Timer.h"
 #include <limits.h>
 #include <wtf/HashMap.h>
