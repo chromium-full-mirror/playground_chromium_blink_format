@@ -66,7 +66,7 @@ class QWEBKIT_EXPORT QWKPage : public QObject {
 
  private:
   friend class QGraphicsWKView;
-  friend class QGraphicsWKViewtPrivate;
+  friend class QGraphicsWKViewPrivate;
   friend class QWKPagePrivate;
   QWKPagePrivate* d;
 };
