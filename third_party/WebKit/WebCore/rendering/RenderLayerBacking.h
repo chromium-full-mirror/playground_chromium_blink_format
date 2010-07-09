@@ -130,6 +130,8 @@ class RenderLayerBacking : public GraphicsLayerClient, public Noncopyable {
   void setCompositedBounds(const IntRect&);
   void updateCompositedBounds();
 
+  void updateAfterWidgetResize();
+
   FloatPoint graphicsLayerToContentsCoordinates(const GraphicsLayer*,
                                                 const FloatPoint&);
   FloatPoint contentsToGraphicsLayerCoordinates(const GraphicsLayer*,
