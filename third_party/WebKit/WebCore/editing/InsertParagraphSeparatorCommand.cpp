@@ -181,10 +181,13 @@ void InsertParagraphSeparatorCommand::doApply() {
   Element* startBlock = static_cast<Element*>(startBlockNode);
   if (!startBlockNode || !startBlockNode->isElementNode() ||
       !startBlock->parentNode() || isTableCell(startBlock) ||
-      startBlock->hasTagName(formTag) ||
-      (canonicalPos.node()->renderer() &&
-       canonicalPos.node()->renderer()->isTable()) ||
-      canonicalPos.node()->hasTagName(hrTag)) {
+      startBlock->hasTagName(formTag)
+      // FIXME: If the node is hidden, we don't have a canonical position so we
+      // will do the wrong thing for tables and <hr>.
+      // https://bugs.webkit.org/show_bug.cgi?id=40342
+      || (!canonicalPos.isNull() && canonicalPos.node()->renderer() &&
+          canonicalPos.node()->renderer()->isTable()) ||
+      (!canonicalPos.isNull() && canonicalPos.node()->hasTagName(hrTag))) {
     applyCommandToComposite(InsertLineBreakCommand::create(document()));
     return;
   }
