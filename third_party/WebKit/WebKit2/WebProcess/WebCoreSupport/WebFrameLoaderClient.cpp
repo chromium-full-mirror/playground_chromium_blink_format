@@ -30,7 +30,7 @@
 
 #include "DummyPlugin.h"
 #if PLATFORM(MAC)
-#include "NetscapePluginModule.h"
+#include "NetscapePlugin.h"
 #endif
 
 #include "PluginView.h"
@@ -822,9 +822,12 @@ PassRefPtr<Widget> WebFrameLoaderClient::createPlugin(
       NetscapePluginModule::create(pluginPath);
   if (!pluginModule)
     return 0;
+
+  RefPtr<Plugin> plugin = NetscapePlugin::create(pluginModule.release());
+#else
+  RefPtr<Plugin> plugin = DummyPlugin::create();
 #endif
 
-  RefPtr<Plugin> plugin = DummyPlugin::create();
   if (!plugin->initialize(url, paramNames, paramValues, mimeType, loadManually))
     return 0;
 
