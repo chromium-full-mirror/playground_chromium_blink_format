@@ -70,8 +70,13 @@ enum FrameLoadType {
 };
 
 struct FrameLoadTimeline {
-  FrameLoadTimeline() : unloadEventEnd(0), loadEventStart(0), loadEventEnd(0) {}
+  FrameLoadTimeline()
+      : navigationStart(0),
+        unloadEventEnd(0),
+        loadEventStart(0),
+        loadEventEnd(0) {}
 
+  double navigationStart;
   double unloadEventEnd;
   double loadEventStart;
   double loadEventEnd;

@@ -1655,6 +1655,7 @@ void FrameLoader::loadWithDocumentLoader(DocumentLoader* loader,
     return;
 
   m_frameLoadTimeline = FrameLoadTimeline();
+  m_frameLoadTimeline.navigationStart = currentTime();
 
   policyChecker()->setLoadType(type);
   RefPtr<FormState> formState = prpFormState;
