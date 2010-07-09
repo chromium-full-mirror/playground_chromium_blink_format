@@ -162,36 +162,38 @@ void HTMLConstructionSite::insertCommentOnHTMLHtmlElement(
          Comment::create(m_document, token.comment()));
 }
 
-PassRefPtr<Element> HTMLConstructionSite::createElementAndAttachToCurrent(
+PassRefPtr<Element> HTMLConstructionSite::createHTMLElementAndAttachToCurrent(
     AtomicHTMLToken& token) {
   ASSERT(token.type() == HTMLToken::StartTag);
-  return attach(currentElement(), createElement(token));
+  return attach(currentElement(), createHTMLElement(token));
 }
 
 void HTMLConstructionSite::insertHTMLHtmlElement(AtomicHTMLToken& token) {
   ASSERT(!m_redirectAttachToFosterParent);
-  m_openElements.pushHTMLHtmlElement(createElementAndAttachToCurrent(token));
+  m_openElements.pushHTMLHtmlElement(
+      createHTMLElementAndAttachToCurrent(token));
 }
 
 void HTMLConstructionSite::insertHTMLHeadElement(AtomicHTMLToken& token) {
   ASSERT(!m_redirectAttachToFosterParent);
-  m_head = createElementAndAttachToCurrent(token);
+  m_head = createHTMLElementAndAttachToCurrent(token);
   m_openElements.pushHTMLHeadElement(m_head);
 }
 
 void HTMLConstructionSite::insertHTMLBodyElement(AtomicHTMLToken& token) {
   ASSERT(!m_redirectAttachToFosterParent);
-  m_openElements.pushHTMLBodyElement(createElementAndAttachToCurrent(token));
+  m_openElements.pushHTMLBodyElement(
+      createHTMLElementAndAttachToCurrent(token));
 }
 
 void HTMLConstructionSite::insertHTMLElement(AtomicHTMLToken& token) {
-  m_openElements.push(createElementAndAttachToCurrent(token));
+  m_openElements.push(createHTMLElementAndAttachToCurrent(token));
 }
 
 void HTMLConstructionSite::insertSelfClosingHTMLElement(
     AtomicHTMLToken& token) {
   ASSERT(token.type() == HTMLToken::StartTag);
-  attach(currentElement(), createElement(token));
+  attach(currentElement(), createHTMLElement(token));
   // FIXME: Do we want to acknowledge the token's self-closing flag?
   // http://www.whatwg.org/specs/web-apps/current-work/multipage/tokenization.html#acknowledge-self-closing-flag
 }
@@ -225,7 +227,7 @@ void HTMLConstructionSite::insertTextNode(AtomicHTMLToken& token) {
   attach(currentElement(), Text::create(m_document, token.characters()));
 }
 
-PassRefPtr<Element> HTMLConstructionSite::createElement(
+PassRefPtr<Element> HTMLConstructionSite::createHTMLElement(
     AtomicHTMLToken& token) {
   RefPtr<Element> element = HTMLElementFactory::createHTMLElement(
       QualifiedName(nullAtom, token.name(), xhtmlNamespaceURI), m_document, 0);
