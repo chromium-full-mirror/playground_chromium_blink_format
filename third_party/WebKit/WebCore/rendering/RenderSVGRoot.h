@@ -78,6 +78,8 @@ class RenderSVGRoot : public RenderBox {
                            int ty,
                            HitTestAction);
 
+  virtual IntRect clippedOverflowRectForRepaint(
+      RenderBoxModelObject* repaintContainer);
   virtual void computeRectForRepaint(RenderBoxModelObject* repaintContainer,
                                      IntRect& repaintRect,
                                      bool fixed);

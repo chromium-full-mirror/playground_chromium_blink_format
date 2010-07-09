@@ -282,11 +282,17 @@ FloatRect RenderSVGRoot::strokeBoundingBox() const {
 }
 
 FloatRect RenderSVGRoot::repaintRectInLocalCoordinates() const {
-  // FIXME: This does not include the border but it should!
   FloatRect repaintRect = SVGRenderSupport::computeContainerBoundingBox(
       this, SVGRenderSupport::RepaintBoundingBox);
   style()->svgStyle()->inflateForShadow(repaintRect);
+  repaintRect.inflate(borderAndPaddingWidth());
   return repaintRect;
+}
+
+IntRect RenderSVGRoot::clippedOverflowRectForRepaint(
+    RenderBoxModelObject* repaintContainer) {
+  return SVGRenderSupport::clippedOverflowRectForRepaint(this,
+                                                         repaintContainer);
 }
 
 void RenderSVGRoot::computeRectForRepaint(
