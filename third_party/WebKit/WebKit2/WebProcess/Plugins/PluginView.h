@@ -50,6 +50,7 @@ class PluginView : public WebCore::Widget {
   virtual ~PluginView();
 
   void viewGeometryDidChange();
+  WebCore::IntRect clipRectInWindowCoordinates() const;
 
   // WebCore::Widget
   virtual void setFrameRect(const WebCore::IntRect&);
