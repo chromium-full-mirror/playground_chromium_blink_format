@@ -1632,6 +1632,10 @@ WebGLGetInfo WebGLRenderingContext::getUniform(
   UNUSED_PARAM(ec);
   if (!validateWebGLObject(program))
     return WebGLGetInfo();
+  if (!uniformLocation) {
+    m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
+    return WebGLGetInfo();
+  }
   if (uniformLocation->program() != program) {
     m_context->synthesizeGLError(GraphicsContext3D::INVALID_OPERATION);
     return WebGLGetInfo();

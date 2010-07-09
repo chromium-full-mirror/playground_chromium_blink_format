@@ -517,11 +517,11 @@ static v8::Handle<v8::Value> vertexAttribAndUniformHelperf(
     return v8::Undefined();
   }
 
-  v8::Handle<v8::Array> array = v8::Local<v8::Array>::Cast(args[1]);
-  if (array.IsEmpty()) {
-    V8Proxy::setDOMException(SYNTAX_ERR);
+  if (args[1].IsEmpty() || !args[1]->IsArray()) {
+    V8Proxy::throwTypeError();
     return notHandledByInterceptor();
   }
+  v8::Handle<v8::Array> array = v8::Local<v8::Array>::Cast(args[1]);
   uint32_t len = array->Length();
   float* data = jsArrayToFloatArray(array, len);
   if (!data) {
@@ -613,11 +613,11 @@ static v8::Handle<v8::Value> uniformHelperi(const v8::Arguments& args,
     return v8::Undefined();
   }
 
-  v8::Handle<v8::Array> array = v8::Local<v8::Array>::Cast(args[1]);
-  if (array.IsEmpty()) {
-    V8Proxy::setDOMException(SYNTAX_ERR);
+  if (args[1].IsEmpty() || !args[1]->IsArray()) {
+    V8Proxy::throwTypeError();
     return notHandledByInterceptor();
   }
+  v8::Handle<v8::Array> array = v8::Local<v8::Array>::Cast(args[1]);
   uint32_t len = array->Length();
   int* data = jsArrayToIntArray(array, len);
   if (!data) {
@@ -746,11 +746,11 @@ static v8::Handle<v8::Value> uniformMatrixHelper(const v8::Arguments& args,
     return v8::Undefined();
   }
 
-  v8::Handle<v8::Array> array = v8::Local<v8::Array>::Cast(args[2]);
-  if (array.IsEmpty()) {
-    V8Proxy::setDOMException(SYNTAX_ERR);
+  if (args[2].IsEmpty() || !args[2]->IsArray()) {
+    V8Proxy::throwTypeError();
     return notHandledByInterceptor();
   }
+  v8::Handle<v8::Array> array = v8::Local<v8::Array>::Cast(args[2]);
   uint32_t len = array->Length();
   float* data = jsArrayToFloatArray(array, len);
   if (!data) {
