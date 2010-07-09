@@ -6030,7 +6030,8 @@ HRESULT WebView::addUserScriptToGroup(
                                   toStringVector(blacklistCount, blacklist),
                                   injectionTime == WebInjectAtDocumentStart
                                       ? InjectAtDocumentStart
-                                      : InjectAtDocumentEnd);
+                                      : InjectAtDocumentEnd,
+                                  InjectInAllFrames);
 
   return S_OK;
 }
@@ -6059,7 +6060,7 @@ HRESULT WebView::addUserStyleSheetToGroup(BSTR groupName,
   pageGroup->addUserStyleSheetToWorld(
       world->world(), toString(source), toKURL(url),
       toStringVector(whitelistCount, whitelist),
-      toStringVector(blacklistCount, blacklist));
+      toStringVector(blacklistCount, blacklist), InjectInAllFrames);
 
   return S_OK;
 }

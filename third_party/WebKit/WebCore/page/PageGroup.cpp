@@ -204,11 +204,12 @@ void PageGroup::addUserScriptToWorld(DOMWrapperWorld* world,
                                      const KURL& url,
                                      PassOwnPtr<Vector<String>> whitelist,
                                      PassOwnPtr<Vector<String>> blacklist,
-                                     UserScriptInjectionTime injectionTime) {
+                                     UserScriptInjectionTime injectionTime,
+                                     UserContentInjectedFrames injectedFrames) {
   ASSERT_ARG(world, world);
 
-  OwnPtr<UserScript> userScript(
-      new UserScript(source, url, whitelist, blacklist, injectionTime));
+  OwnPtr<UserScript> userScript(new UserScript(
+      source, url, whitelist, blacklist, injectionTime, injectedFrames));
   if (!m_userScripts)
     m_userScripts.set(new UserScriptMap);
   UserScriptVector*& scriptsInWorld =
@@ -218,15 +219,17 @@ void PageGroup::addUserScriptToWorld(DOMWrapperWorld* world,
   scriptsInWorld->append(userScript.release());
 }
 
-void PageGroup::addUserStyleSheetToWorld(DOMWrapperWorld* world,
-                                         const String& source,
-                                         const KURL& url,
-                                         PassOwnPtr<Vector<String>> whitelist,
-                                         PassOwnPtr<Vector<String>> blacklist) {
+void PageGroup::addUserStyleSheetToWorld(
+    DOMWrapperWorld* world,
+    const String& source,
+    const KURL& url,
+    PassOwnPtr<Vector<String>> whitelist,
+    PassOwnPtr<Vector<String>> blacklist,
+    UserContentInjectedFrames injectedFrames) {
   ASSERT_ARG(world, world);
 
   OwnPtr<UserStyleSheet> userStyleSheet(
-      new UserStyleSheet(source, url, whitelist, blacklist));
+      new UserStyleSheet(source, url, whitelist, blacklist, injectedFrames));
   if (!m_userStyleSheets)
     m_userStyleSheets.set(new UserStyleSheetMap);
   UserStyleSheetVector*& styleSheetsInWorld =

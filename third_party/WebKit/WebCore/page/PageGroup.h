@@ -79,12 +79,14 @@ class PageGroup : public Noncopyable {
                             const KURL&,
                             PassOwnPtr<Vector<String>> whitelist,
                             PassOwnPtr<Vector<String>> blacklist,
-                            UserScriptInjectionTime);
+                            UserScriptInjectionTime,
+                            UserContentInjectedFrames);
   void addUserStyleSheetToWorld(DOMWrapperWorld*,
                                 const String& source,
                                 const KURL&,
                                 PassOwnPtr<Vector<String>> whitelist,
-                                PassOwnPtr<Vector<String>> blacklist);
+                                PassOwnPtr<Vector<String>> blacklist,
+                                UserContentInjectedFrames);
 
   void removeUserScriptFromWorld(DOMWrapperWorld*, const KURL&);
   void removeUserStyleSheetFromWorld(DOMWrapperWorld*, const KURL&);
