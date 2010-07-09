@@ -54,7 +54,7 @@ Notification::Notification(const KURL& url,
       m_state(Idle),
       m_presenter(provider) {
   ASSERT(m_presenter);
-  if (m_presenter->checkPermission(context->url()) !=
+  if (m_presenter->checkPermission(context) !=
       NotificationPresenter::PermissionAllowed) {
     ec = SECURITY_ERR;
     return;
@@ -78,7 +78,7 @@ Notification::Notification(const NotificationContents& contents,
       m_state(Idle),
       m_presenter(provider) {
   ASSERT(m_presenter);
-  if (m_presenter->checkPermission(context->url()) !=
+  if (m_presenter->checkPermission(context) !=
       NotificationPresenter::PermissionAllowed) {
     ec = SECURITY_ERR;
     return;

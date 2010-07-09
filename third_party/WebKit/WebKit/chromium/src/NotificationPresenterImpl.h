@@ -55,10 +55,11 @@ class NotificationPresenterImpl : public WebCore::NotificationPresenter {
   virtual void cancel(WebCore::Notification* object);
   virtual void notificationObjectDestroyed(WebCore::Notification* object);
   virtual WebCore::NotificationPresenter::Permission checkPermission(
-      const WebCore::KURL& sourceURL);
+      WebCore::ScriptExecutionContext*);
   virtual void requestPermission(
-      WebCore::SecurityOrigin* origin,
+      WebCore::ScriptExecutionContext*,
       WTF::PassRefPtr<WebCore::VoidCallback> callback);
+  virtual void cancelRequestsForPermission(WebCore::ScriptExecutionContext*) {}
 
  private:
   // WebNotificationPresenter that this object delegates to.

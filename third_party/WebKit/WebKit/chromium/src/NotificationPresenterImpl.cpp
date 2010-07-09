@@ -35,6 +35,7 @@
 
 #include "KURL.h"
 #include "Notification.h"
+#include "ScriptExecutionContext.h"
 #include "SecurityOrigin.h"
 
 #include "WebNotification.h"
@@ -86,15 +87,15 @@ void NotificationPresenterImpl::notificationObjectDestroyed(
 }
 
 NotificationPresenter::Permission NotificationPresenterImpl::checkPermission(
-    const KURL& sourceURL) {
-  int result = m_presenter->checkPermission(sourceURL);
+    ScriptExecutionContext* context) {
+  int result = m_presenter->checkPermission(context->url());
   return static_cast<NotificationPresenter::Permission>(result);
 }
 
 void NotificationPresenterImpl::requestPermission(
-    SecurityOrigin* origin,
+    ScriptExecutionContext* context,
     PassRefPtr<VoidCallback> callback) {
-  m_presenter->requestPermission(WebSecurityOrigin(origin),
+  m_presenter->requestPermission(WebSecurityOrigin(context->securityOrigin()),
                                  new VoidCallbackClient(callback));
 }
 
