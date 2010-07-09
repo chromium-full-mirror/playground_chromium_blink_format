@@ -1203,8 +1203,7 @@ void HTMLTreeBuilder::processAnyOtherEndTagForInBody(AtomicHTMLToken& token) {
         if (!m_tree.openElements()->contains(node))
           return;
       }
-      m_tree.openElements()->popUntil(node);
-      m_tree.openElements()->pop();
+      m_tree.openElements()->popUntilPopped(node);
       return;
     }
     if (isNotFormattingAndNotPhrasing(node)) {
@@ -1271,8 +1270,7 @@ void HTMLTreeBuilder::callTheAdoptionAgency(AtomicHTMLToken& token) {
         furthestBlockForFormattingElement(formattingElement);
     // 3.
     if (!furthestBlock) {
-      m_tree.openElements()->popUntil(formattingElement);
-      m_tree.openElements()->pop();
+      m_tree.openElements()->popUntilPopped(formattingElement);
       m_tree.activeFormattingElements()->remove(formattingElement);
       return;
     }
@@ -1455,8 +1453,7 @@ void HTMLTreeBuilder::processEndTagForInBody(AtomicHTMLToken& token) {
     m_tree.generateImpliedEndTags();
     if (!m_tree.currentElement()->hasLocalName(token.name()))
       parseError(token);
-    m_tree.openElements()->popUntil(token.name());
-    m_tree.openElements()->pop();
+    m_tree.openElements()->popUntilPopped(token.name());
     return;
   }
   if (token.name() == formTag) {
@@ -1481,8 +1478,7 @@ void HTMLTreeBuilder::processEndTagForInBody(AtomicHTMLToken& token) {
     m_tree.generateImpliedEndTagsWithExclusion(token.name());
     if (!m_tree.currentElement()->hasLocalName(token.name()))
       parseError(token);
-    m_tree.openElements()->popUntil(token.name());
-    m_tree.openElements()->pop();
+    m_tree.openElements()->popUntilPopped(token.name());
     return;
   }
   if (token.name() == liTag) {
@@ -1493,8 +1489,7 @@ void HTMLTreeBuilder::processEndTagForInBody(AtomicHTMLToken& token) {
     m_tree.generateImpliedEndTagsWithExclusion(token.name());
     if (!m_tree.currentElement()->hasLocalName(token.name()))
       parseError(token);
-    m_tree.openElements()->popUntil(token.name());
-    m_tree.openElements()->pop();
+    m_tree.openElements()->popUntilPopped(token.name());
     return;
   }
   if (token.name() == ddTag || token.name() == dtTag) {
@@ -1505,8 +1500,7 @@ void HTMLTreeBuilder::processEndTagForInBody(AtomicHTMLToken& token) {
     m_tree.generateImpliedEndTagsWithExclusion(token.name());
     if (!m_tree.currentElement()->hasLocalName(token.name()))
       parseError(token);
-    m_tree.openElements()->popUntil(token.name());
-    m_tree.openElements()->pop();
+    m_tree.openElements()->popUntilPopped(token.name());
     return;
   }
   if (isNumberedHeaderTag(token.name())) {
@@ -1517,8 +1511,7 @@ void HTMLTreeBuilder::processEndTagForInBody(AtomicHTMLToken& token) {
     m_tree.generateImpliedEndTags();
     if (!m_tree.currentElement()->hasLocalName(token.name()))
       parseError(token);
-    m_tree.openElements()->popUntil(token.name());
-    m_tree.openElements()->pop();
+    m_tree.openElements()->popUntilPopped(token.name());
     return;
   }
   if (token.name() == "sarcasm") {
@@ -1538,8 +1531,7 @@ void HTMLTreeBuilder::processEndTagForInBody(AtomicHTMLToken& token) {
     m_tree.generateImpliedEndTags();
     if (!m_tree.currentElement()->hasLocalName(token.name()))
       parseError(token);
-    m_tree.openElements()->popUntil(token.name());
-    m_tree.openElements()->pop();
+    m_tree.openElements()->popUntilPopped(token.name());
     m_tree.activeFormattingElements()->clearToLastMarker();
     return;
   }
@@ -1559,8 +1551,7 @@ bool HTMLTreeBuilder::processCaptionEndTagForInCaption() {
   }
   m_tree.generateImpliedEndTags();
   // FIXME: parse error if (!m_tree.currentElement()->hasTagName(captionTag))
-  m_tree.openElements()->popUntil(captionTag.localName());
-  m_tree.openElements()->pop();
+  m_tree.openElements()->popUntilPopped(captionTag.localName());
   m_tree.activeFormattingElements()->clearToLastMarker();
   m_insertionMode = InTableMode;
   return true;
@@ -1585,8 +1576,7 @@ bool HTMLTreeBuilder::processTableEndTagForInTable() {
     // FIXME: parse error.
     return false;
   }
-  m_tree.openElements()->popUntil(tableTag.localName());
-  m_tree.openElements()->pop();
+  m_tree.openElements()->popUntilPopped(tableTag.localName());
   resetInsertionModeAppropriately();
   return true;
 }
@@ -1747,8 +1737,7 @@ void HTMLTreeBuilder::processEndTag(AtomicHTMLToken& token) {
         m_tree.generateImpliedEndTags();
         if (!m_tree.currentElement()->hasLocalName(token.name()))
           parseError(token);
-        m_tree.openElements()->popUntil(token.name());
-        m_tree.openElements()->pop();
+        m_tree.openElements()->popUntilPopped(token.name());
         m_tree.activeFormattingElements()->clearToLastMarker();
         m_insertionMode = InRowMode;
         ASSERT(m_tree.currentElement()->hasTagName(trTag));
@@ -1921,8 +1910,7 @@ void HTMLTreeBuilder::processEndTag(AtomicHTMLToken& token) {
       }
       if (token.name() == selectTag) {
         notImplemented();  // fragment case
-        m_tree.openElements()->popUntil(selectTag.localName());
-        m_tree.openElements()->pop();
+        m_tree.openElements()->popUntilPopped(selectTag.localName());
         resetInsertionModeAppropriately();
         return;
       }
