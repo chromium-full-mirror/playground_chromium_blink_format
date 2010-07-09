@@ -195,6 +195,9 @@ class HTMLTreeBuilder : public Noncopyable {
   bool m_reportErrors;
   bool m_isPaused;
 
+  // FIXME: InsertionModes should be a separate object to prevent direct
+  // manipulation of these variables.  For now, be careful to always use
+  // setInsertionMode and never set m_insertionMode directly.
   InsertionMode m_insertionMode;
   InsertionMode m_originalInsertionMode;
   InsertionMode m_secondaryInsertionMode;
