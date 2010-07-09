@@ -69,6 +69,14 @@ enum FrameLoadType {
   FrameLoadTypeBackWMLDeckNotAccessible
 };
 
+struct FrameLoadTimeline {
+  FrameLoadTimeline() : unloadEventEnd(0), loadEventStart(0), loadEventEnd(0) {}
+
+  double unloadEventEnd;
+  double loadEventStart;
+  double loadEventEnd;
+};
+
 enum NavigationType {
   NavigationTypeLinkClicked,
   NavigationTypeFormSubmitted,
