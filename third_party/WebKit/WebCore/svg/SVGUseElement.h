@@ -69,6 +69,8 @@ class SVGUseElement : public SVGStyledTransformableElement,
   SVGElementInstance* instanceForShadowTreeElement(Node* element) const;
   void invalidateShadowTree();
 
+  void setUpdatesBlocked(bool blocked) { m_updatesBlocked = blocked; }
+
  private:
   friend class RenderSVGShadowTreeRootContainer;
   bool isPendingResource() const { return m_isPendingResource; }
@@ -139,6 +141,7 @@ class SVGUseElement : public SVGStyledTransformableElement,
   void updateContainerOffsets();
   void updateContainerSizes();
 
+  bool m_updatesBlocked;
   bool m_isPendingResource;
   bool m_needsShadowTreeRecreation;
   String m_resourceId;
