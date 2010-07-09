@@ -26,14 +26,19 @@
 #include "PluginView.h"
 
 #include "Plugin.h"
+#include <WebCore/FrameView.h>
 #include <WebCore/GraphicsContext.h>
+#include <WebCore/HTMLPlugInElement.h>
+#include <WebCore/RenderLayer.h>
 #include <WebCore/ScrollView.h>
 
 using namespace WebCore;
 
 namespace WebKit {
 
-PluginView::PluginView(PassRefPtr<Plugin> plugin) : m_plugin(plugin) {}
+PluginView::PluginView(PassRefPtr<Plugin> plugin,
+                       HTMLPlugInElement* pluginElement)
+    : m_plugin(plugin), m_pluginElement(pluginElement) {}
 
 PluginView::~PluginView() {
   m_plugin->destroy();
@@ -69,10 +74,21 @@ void PluginView::viewGeometryDidChange() {
   if (!parent())
     return;
 
+  // Get the frame rect in window coordinates.
   IntRect frameRectInWindowCoordinates =
       parent()->contentsToWindow(frameRect());
 
-  m_plugin->geometryDidChange(frameRectInWindowCoordinates);
+  // Get the window clip rect for the enclosing layer (in window coordinates).
+  RenderLayer* layer = m_pluginElement->renderer()->enclosingLayer();
+  FrameView* parentView = m_pluginElement->document()->frame()->view();
+  IntRect windowClipRect = parentView->windowClipRectForLayer(layer, true);
+
+  // Intersect the two rects to get the view clip rect in window coordinates.
+  IntRect clipRectInWindowCoordinates =
+      intersection(frameRectInWindowCoordinates, windowClipRect);
+
+  m_plugin->geometryDidChange(frameRectInWindowCoordinates,
+                              clipRectInWindowCoordinates);
 }
 
 void PluginView::invalidateRect(const IntRect&) {}

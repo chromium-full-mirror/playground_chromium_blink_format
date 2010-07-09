@@ -28,6 +28,7 @@
 
 #include "NetscapePluginModule.h"
 #include "Plugin.h"
+#include <WebCore/IntRect.h>
 
 namespace WebKit {
 
@@ -42,6 +43,8 @@ class NetscapePlugin : public Plugin {
  private:
   NetscapePlugin(PassRefPtr<NetscapePluginModule> pluginModule);
 
+  void callSetWindow();
+
   // Plugin
   virtual bool initialize(const WebCore::KURL&,
                           const Vector<WebCore::String>& paramNames,
@@ -51,10 +54,15 @@ class NetscapePlugin : public Plugin {
   virtual void destroy();
   virtual void paint(WebCore::GraphicsContext*,
                      const WebCore::IntRect& dirtyRect);
-  virtual void geometryDidChange(const WebCore::IntRect& frameRect);
+  virtual void geometryDidChange(const WebCore::IntRect& frameRect,
+                                 const WebCore::IntRect& clipRect);
 
   RefPtr<NetscapePluginModule> m_pluginModule;
   NPP_t m_npp;
+  NPWindow m_npWindow;
+
+  WebCore::IntRect m_frameRect;
+  WebCore::IntRect m_clipRect;
 };
 
 }  // namespace WebKit

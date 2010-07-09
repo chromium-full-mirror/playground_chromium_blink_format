@@ -794,7 +794,7 @@ void WebFrameLoaderClient::didTransferChildFrameToNewDocument() {
 
 PassRefPtr<Widget> WebFrameLoaderClient::createPlugin(
     const IntSize&,
-    HTMLPlugInElement*,
+    HTMLPlugInElement* pluginElement,
     const KURL& url,
     const Vector<String>& paramNames,
     const Vector<String>& paramValues,
@@ -826,7 +826,7 @@ PassRefPtr<Widget> WebFrameLoaderClient::createPlugin(
   if (!plugin->initialize(url, paramNames, paramValues, mimeType, loadManually))
     return 0;
 
-  return PluginView::create(plugin.release());
+  return PluginView::create(plugin.release(), pluginElement);
 #else
   return 0;
 #endif

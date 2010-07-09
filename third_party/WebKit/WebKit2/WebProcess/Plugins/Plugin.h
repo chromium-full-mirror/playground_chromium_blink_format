@@ -50,7 +50,8 @@ class Plugin : public RefCounted<Plugin> {
   virtual void destroy() = 0;
   virtual void paint(WebCore::GraphicsContext*,
                      const WebCore::IntRect& dirtyRect) = 0;
-  virtual void geometryDidChange(const WebCore::IntRect& frameRect) = 0;
+  virtual void geometryDidChange(const WebCore::IntRect& frameRect,
+                                 const WebCore::IntRect& clipRect) = 0;
 
  protected:
   Plugin();
