@@ -40,6 +40,13 @@ class NetscapePlugin : public Plugin {
   }
   virtual ~NetscapePlugin();
 
+  static PassRefPtr<NetscapePlugin> fromNPP(NPP);
+
+#if PLATFORM(MAC)
+  NPError setDrawingModel(NPDrawingModel);
+  NPError setEventModel(NPEventModel);
+#endif
+
  private:
   NetscapePlugin(PassRefPtr<NetscapePluginModule> pluginModule);
 
@@ -69,6 +76,7 @@ class NetscapePlugin : public Plugin {
   WebCore::IntRect m_clipRect;
 
   bool m_isStarted;
+  bool m_inNPPNew;
 
 #if PLATFORM(MAC)
   NPDrawingModel m_drawingModel;

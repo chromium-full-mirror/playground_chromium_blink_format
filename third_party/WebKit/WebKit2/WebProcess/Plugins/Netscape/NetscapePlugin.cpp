@@ -35,7 +35,8 @@ namespace WebKit {
 NetscapePlugin::NetscapePlugin(PassRefPtr<NetscapePluginModule> pluginModule)
     : m_pluginModule(pluginModule),
       m_npWindow(),
-      m_isStarted(false)
+      m_isStarted(false),
+      m_inNPPNew(false)
 #if PLATFORM(MAC)
       ,
       m_drawingModel(static_cast<NPDrawingModel>(-1)),
@@ -46,7 +47,22 @@ NetscapePlugin::NetscapePlugin(PassRefPtr<NetscapePluginModule> pluginModule)
   m_npp.pdata = 0;
 }
 
-NetscapePlugin::~NetscapePlugin() {}
+NetscapePlugin::~NetscapePlugin() {
+  ASSERT(!m_isStarted);
+}
+
+PassRefPtr<NetscapePlugin> NetscapePlugin::fromNPP(NPP npp) {
+  if (npp) {
+    NetscapePlugin* plugin = static_cast<NetscapePlugin*>(npp->ndata);
+    ASSERT(npp == &plugin->m_npp);
+
+    return plugin;
+  }
+
+  // FIXME: Return the current NetscapePlugin here.
+  ASSERT_NOT_REACHED();
+  return 0;
+}
 
 void NetscapePlugin::callSetWindow() {
   m_npWindow.x = m_frameRect.x();
@@ -68,9 +84,14 @@ bool NetscapePlugin::initialize(const KURL&,
                                 bool loadManually) {
   uint16_t mode = loadManually ? NP_FULL : NP_EMBED;
 
+  m_inNPPNew = true;
+
   // FIXME: Pass arguments to NPP_New.
   NPError error =
       m_pluginModule->pluginFuncs().newp(0, &m_npp, mode, 0, 0, 0, 0);
+
+  m_inNPPNew = false;
+
   if (error != NPERR_NO_ERROR)
     return false;
 
