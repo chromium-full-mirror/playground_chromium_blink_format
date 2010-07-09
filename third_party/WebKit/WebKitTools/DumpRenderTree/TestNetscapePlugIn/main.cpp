@@ -87,9 +87,7 @@ NPError NPP_New(NPMIMEType pluginType,
   if (!supportsCoreGraphics)
     return NPERR_INCOMPATIBLE_VERSION_ERROR;
 
-#if !defined(BUILDING_ON_TIGER)
   NPDrawingModel drawingModelToUse = NPDrawingModelCoreGraphics;
-#endif
 
   NPBool supportsCoreAnimation;
   if (browser->getvalue(instance, NPNVsupportsCoreAnimationBool,
@@ -197,10 +195,12 @@ NPError NPP_New(NPMIMEType pluginType,
       obj->testKeyboardFocusForPlugins = TRUE;
   }
 
-#if XP_MACOSX && !defined(BUILDING_ON_TIGER)
+#if XP_MACOSX
   browser->setvalue(instance, NPPVpluginDrawingModel, (void*)drawingModelToUse);
+#if !defined(BUILDING_ON_TIGER)
   if (drawingModelToUse == NPDrawingModelCoreAnimation)
     obj->coreAnimationLayer = createCoreAnimationLayer();
+#endif
 #endif
 
   browser->getvalue(instance, NPNVprivateModeBool,
