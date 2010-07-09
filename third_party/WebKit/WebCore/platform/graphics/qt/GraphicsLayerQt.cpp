@@ -1223,6 +1223,14 @@ void GraphicsLayerQt::syncCompositingState() {
 }
 
 /* \reimp (GraphicsLayer.h)
+*/
+void GraphicsLayerQt::syncCompositingStateForThisLayerOnly() {
+  // We can't call flushChanges recursively here
+  m_impl->flushChanges(false);
+  GraphicsLayer::syncCompositingStateForThisLayerOnly();
+}
+
+/* \reimp (GraphicsLayer.h)
  */
 NativeLayer GraphicsLayerQt::nativeLayer() const {
   return m_impl.get();
