@@ -49,8 +49,8 @@ class HTMLConstructionSite : public Noncopyable {
   void insertComment(AtomicHTMLToken&);
   void insertCommentOnDocument(AtomicHTMLToken&);
   void insertCommentOnHTMLHtmlElement(AtomicHTMLToken&);
-  void insertElement(AtomicHTMLToken&);
-  void insertSelfClosingElement(AtomicHTMLToken&);
+  void insertHTMLElement(AtomicHTMLToken&);
+  void insertSelfClosingHTMLElement(AtomicHTMLToken&);
   void insertFormattingElement(AtomicHTMLToken&);
   void insertHTMLHtmlElement(AtomicHTMLToken&);
   void insertHTMLHeadElement(AtomicHTMLToken&);
