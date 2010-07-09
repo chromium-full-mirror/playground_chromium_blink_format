@@ -37,7 +37,7 @@
 class DRTUndoManager;
 class DRTDesktopNotificationPresenter;
 
-class UIDelegate : public IWebUIDelegate2, IWebUIDelegatePrivate {
+class UIDelegate : public IWebUIDelegate2, IWebUIDelegatePrivate3 {
  public:
   UIDelegate();
 
@@ -381,6 +381,24 @@ class UIDelegate : public IWebUIDelegate2, IWebUIDelegatePrivate {
       /* [in] */ IWebView* webView,
       /* [in] */ HDC hDC,
       /* [in] */ RECT rect);
+
+  virtual HRESULT STDMETHODCALLTYPE
+  createWebViewWithRequest(IWebView* sender,
+                           IWebURLRequest* request,
+                           IPropertyBag* windowFeatures,
+                           IWebView** newWebView);
+
+  virtual HRESULT STDMETHODCALLTYPE drawBackground(IWebView* sender,
+                                                   OLE_HANDLE hdc,
+                                                   const RECT* dirtyRect);
+
+  virtual HRESULT STDMETHODCALLTYPE
+  decidePolicyForGeolocationRequest(IWebView* sender,
+                                    IWebFrame* frame,
+                                    IWebSecurityOrigin* origin,
+                                    IWebGeolocationPolicyListener* listener);
+
+  virtual HRESULT STDMETHODCALLTYPE didPressMissingPluginButton(IDOMElement*);
 
  protected:
   // IWebUIDelegatePrivate

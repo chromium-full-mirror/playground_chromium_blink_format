@@ -152,6 +152,7 @@ class ChromeClient {
   // End methods used by HostWindow.
 
   virtual void scrollbarsModeDidChange() const = 0;
+  virtual bool shouldMissingPluginMessageBeButton() const { return false; }
   virtual void missingPluginButtonClicked(Element*) const {}
   virtual void mouseDidMoveOverElement(const HitTestResult&,
                                        unsigned modifierFlags) = 0;

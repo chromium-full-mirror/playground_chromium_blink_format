@@ -28,6 +28,8 @@
 
 namespace WebCore {
 
+class MouseEvent;
+
 // Renderer for embeds and objects, often, but not always, rendered via
 // plug-ins.
 // For example, <embed src="foo.html"> does not invoke a plug-in.
@@ -44,6 +46,8 @@ class RenderEmbeddedObject : public RenderPart {
   }
 
   bool hasFallbackContent() const { return m_hasFallbackContent; }
+
+  void handleMissingPluginIndicatorEvent(Event*);
 
 #if USE(ACCELERATED_COMPOSITING)
   virtual bool allowsAcceleratedCompositing() const;
@@ -63,9 +67,22 @@ class RenderEmbeddedObject : public RenderPart {
   virtual void layout();
   virtual void viewCleared();
 
+  void setMissingPluginIndicatorIsPressed(bool);
+  bool isInMissingPluginIndicator(MouseEvent*);
+  bool getReplacementTextGeometry(int tx,
+                                  int ty,
+                                  FloatRect& contentRect,
+                                  Path&,
+                                  FloatRect& replacementTextRect,
+                                  Font&,
+                                  TextRun&,
+                                  float& textWidth);
+
   String m_replacementText;
   bool m_hasFallbackContent;
   bool m_showsMissingPluginIndicator;
+  bool m_missingPluginIndicatorIsPressed;
+  bool m_mouseDownWasInMissingPluginIndicator;
 };
 
 inline RenderEmbeddedObject* toRenderEmbeddedObject(RenderObject* object) {
