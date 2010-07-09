@@ -77,6 +77,7 @@ class RuntimeEnabledFeatures {
   static bool htmlAudioElementEnabled();
   static bool htmlVideoElementEnabled();
   static bool mediaErrorEnabled();
+  static bool timeRangesEnabled();
 #endif
 
 #if ENABLE(SHARED_WORKERS)

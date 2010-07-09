@@ -70,6 +70,10 @@ bool RuntimeEnabledFeatures::mediaErrorEnabled() {
   return MediaPlayer::isAvailable();
 }
 
+bool RuntimeEnabledFeatures::timeRangesEnabled() {
+  return MediaPlayer::isAvailable();
+}
+
 #endif
 
 #if ENABLE(SHARED_WORKERS)
