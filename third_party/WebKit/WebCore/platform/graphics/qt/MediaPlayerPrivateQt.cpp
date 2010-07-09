@@ -76,7 +76,7 @@ MediaPlayer::SupportsType MediaPlayerPrivate::supportsType(
     return MediaPlayer::IsNotSupported;
 
   if (QMediaPlayer::hasSupport(mime, QStringList(codec)) >=
-      QtMediaServices::ProbablySupported)
+      QtMultimediaKit::ProbablySupported)
     return MediaPlayer::IsSupported;
 
   return MediaPlayer::MayBeSupported;
@@ -94,7 +94,7 @@ MediaPlayerPrivate::MediaPlayerPrivate(MediaPlayer* player)
       m_isSeeking(false),
       m_composited(false),
       m_queuedSeek(-1) {
-  m_videoItem->setMediaObject(m_mediaPlayer);
+  m_mediaPlayer->bind(m_videoItem);
   m_videoScene->addItem(m_videoItem);
 
   // Signal Handlers
@@ -120,7 +120,7 @@ MediaPlayerPrivate::MediaPlayerPrivate(MediaPlayer* player)
   QMediaService* service = m_mediaPlayer->service();
   if (service) {
     m_mediaPlayerControl = qobject_cast<QMediaPlayerControl*>(
-        service->control(QMediaPlayerControl_iid));
+        service->requestControl(QMediaPlayerControl_iid));
   }
 }
 
@@ -339,8 +339,8 @@ unsigned MediaPlayerPrivate::bytesLoaded() const {
 }
 
 unsigned MediaPlayerPrivate::totalBytes() const {
-  if (m_mediaPlayer->availableMetaData().contains(QtMediaServices::Size))
-    return m_mediaPlayer->metaData(QtMediaServices::Size).toInt();
+  if (m_mediaPlayer->availableMetaData().contains(QtMultimediaKit::Size))
+    return m_mediaPlayer->metaData(QtMultimediaKit::Size).toInt();
 
   return 100;
 }
