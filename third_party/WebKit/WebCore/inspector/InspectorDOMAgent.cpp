@@ -55,15 +55,14 @@
 #include "FrameTree.h"
 #include "HTMLElement.h"
 #include "HTMLFrameOwnerElement.h"
-#include "InspectorFrontend.h"
 #include "MutationEvent.h"
 #include "Node.h"
 #include "NodeList.h"
 #include "PlatformString.h"
+#include "RemoteInspectorFrontend2.h"
 #include "RenderStyle.h"
 #include "RenderStyleConstants.h"
 #include "ScriptEventListener.h"
-#include "ScriptObject.h"
 #include "StyleSheetList.h"
 #include "Text.h"
 
@@ -200,7 +199,7 @@ class MatchPlainTextJob : public MatchXPathJob {
 }
 
 InspectorDOMAgent::InspectorDOMAgent(InspectorCSSStore* cssStore,
-                                     InspectorFrontend* frontend)
+                                     InspectorFrontend2* frontend)
     : EventListener(InspectorDOMAgentType),
       m_cssStore(cssStore),
       m_frontend(frontend),
@@ -234,7 +233,7 @@ void InspectorDOMAgent::setDocument(Document* doc) {
     if (doc->documentElement())
       pushDocumentToFrontend();
   } else
-    m_frontend->setDocument(ScriptObject());
+    m_frontend->setDocument(InspectorValue::null());
 }
 
 void InspectorDOMAgent::releaseDanglingNodes() {
@@ -281,11 +280,12 @@ void InspectorDOMAgent::handleEvent(ScriptExecutionContext*, Event* event) {
       // Re-add frame owner element together with its new children.
       long parentId = m_documentNodeToIdMap.get(innerParentNode(node));
       m_frontend->childNodeRemoved(parentId, frameOwnerId);
-      ScriptObject value = buildObjectForNode(node, 0, &m_documentNodeToIdMap);
+      RefPtr<InspectorObject> value =
+          buildObjectForNode(node, 0, &m_documentNodeToIdMap);
       Node* previousSibling = innerPreviousSibling(node);
       long prevId =
           previousSibling ? m_documentNodeToIdMap.get(previousSibling) : 0;
-      m_frontend->childNodeInserted(parentId, prevId, value);
+      m_frontend->childNodeInserted(parentId, prevId, value.release());
       // Invalidate children requested flag for the element.
       m_childrenRequested.remove(m_childrenRequested.find(frameOwnerId));
     }
@@ -348,9 +348,10 @@ void InspectorDOMAgent::pushChildNodesToFrontend(long nodeId) {
     return;
 
   NodeToIdMap* nodeMap = m_idToNodesMap.get(nodeId);
-  ScriptArray children = buildArrayForContainerChildren(node, 1, nodeMap);
+  RefPtr<InspectorArray> children =
+      buildArrayForContainerChildren(node, 1, nodeMap);
   m_childrenRequested.add(nodeId);
-  m_frontend->setChildNodes(nodeId, children);
+  m_frontend->setChildNodes(nodeId, children.release());
 }
 
 long InspectorDOMAgent::pushNodeByPathToFrontend(const String& path) {
@@ -584,13 +585,13 @@ void InspectorDOMAgent::setTextNodeValue(long callId,
 
 void InspectorDOMAgent::getEventListenersForNode(long callId, long nodeId) {
   Node* node = nodeForId(nodeId);
-  ScriptArray listenersArray = m_frontend->newScriptArray();
-  unsigned counter = 0;
+  RefPtr<InspectorArray> listenersArray = InspectorArray::create();
   EventTargetData* d;
 
   // Quick break if a null node or no listeners at all
   if (!node || !(d = node->eventTargetData())) {
-    m_frontend->didGetEventListenersForNode(callId, nodeId, listenersArray);
+    m_frontend->didGetEventListenersForNode(callId, nodeId,
+                                            listenersArray.release());
     return;
   }
 
@@ -605,7 +606,8 @@ void InspectorDOMAgent::getEventListenersForNode(long callId, long nodeId) {
   // Quick break if no useful listeners
   size_t eventTypesLength = eventTypes.size();
   if (eventTypesLength == 0) {
-    m_frontend->didGetEventListenersForNode(callId, nodeId, listenersArray);
+    m_frontend->didGetEventListenersForNode(callId, nodeId,
+                                            listenersArray.release());
     return;
   }
 
@@ -643,8 +645,8 @@ void InspectorDOMAgent::getEventListenersForNode(long callId, long nodeId) {
     for (size_t j = 0; j < vector.size(); ++j) {
       const RegisteredEventListener& listener = vector[j];
       if (listener.useCapture)
-        listenersArray.set(counter++, buildObjectForEventListener(
-                                          listener, info.eventType, info.node));
+        listenersArray->push(
+            buildObjectForEventListener(listener, info.eventType, info.node));
     }
   }
 
@@ -655,12 +657,13 @@ void InspectorDOMAgent::getEventListenersForNode(long callId, long nodeId) {
     for (size_t j = 0; j < vector.size(); ++j) {
       const RegisteredEventListener& listener = vector[j];
       if (!listener.useCapture)
-        listenersArray.set(counter++, buildObjectForEventListener(
-                                          listener, info.eventType, info.node));
+        listenersArray->push(
+            buildObjectForEventListener(listener, info.eventType, info.node));
     }
   }
 
-  m_frontend->didGetEventListenersForNode(callId, nodeId, listenersArray);
+  m_frontend->didGetEventListenersForNode(callId, nodeId,
+                                          listenersArray.release());
 }
 
 void InspectorDOMAgent::addInspectedNode(long nodeId) {
@@ -793,10 +796,11 @@ String InspectorDOMAgent::documentURLString(Document* document) const {
   return document->url().string();
 }
 
-ScriptObject InspectorDOMAgent::buildObjectForNode(Node* node,
-                                                   int depth,
-                                                   NodeToIdMap* nodesMap) {
-  ScriptObject value = m_frontend->newScriptObject();
+PassRefPtr<InspectorObject> InspectorDOMAgent::buildObjectForNode(
+    Node* node,
+    int depth,
+    NodeToIdMap* nodesMap) {
+  RefPtr<InspectorObject> value = InspectorObject::create();
 
   long id = bind(node, nodesMap);
   String nodeName;
@@ -821,109 +825,104 @@ ScriptObject InspectorDOMAgent::buildObjectForNode(Node* node,
       break;
   }
 
-  value.set("id", id);
-  value.set("nodeType", node->nodeType());
-  value.set("nodeName", nodeName);
-  value.set("localName", localName);
-  value.set("nodeValue", nodeValue);
+  value->setNumber("id", id);
+  value->setNumber("nodeType", node->nodeType());
+  value->setString("nodeName", nodeName);
+  value->setString("localName", localName);
+  value->setString("nodeValue", nodeValue);
 
   if (node->nodeType() == Node::ELEMENT_NODE ||
       node->nodeType() == Node::DOCUMENT_NODE ||
       node->nodeType() == Node::DOCUMENT_FRAGMENT_NODE) {
     int nodeCount = innerChildNodeCount(node);
-    value.set("childNodeCount", nodeCount);
-    ScriptArray children =
+    value->setNumber("childNodeCount", nodeCount);
+    RefPtr<InspectorArray> children =
         buildArrayForContainerChildren(node, depth, nodesMap);
-    if (children.length() > 0)
-      value.set("children", children);
+    if (children->length() > 0)
+      value->set("children", children.release());
 
     if (node->nodeType() == Node::ELEMENT_NODE) {
       Element* element = static_cast<Element*>(node);
-      value.set("attributes", buildArrayForElementAttributes(element));
+      value->set("attributes", buildArrayForElementAttributes(element));
       if (node->isFrameOwnerElement()) {
         HTMLFrameOwnerElement* frameOwner =
             static_cast<HTMLFrameOwnerElement*>(node);
-        value.set("documentURL",
-                  documentURLString(frameOwner->contentDocument()));
+        value->setString("documentURL",
+                         documentURLString(frameOwner->contentDocument()));
       }
     } else if (node->nodeType() == Node::DOCUMENT_NODE) {
       Document* document = static_cast<Document*>(node);
-      value.set("documentURL", documentURLString(document));
+      value->setString("documentURL", documentURLString(document));
     }
   } else if (node->nodeType() == Node::DOCUMENT_TYPE_NODE) {
     DocumentType* docType = static_cast<DocumentType*>(node);
-    value.set("publicId", docType->publicId());
-    value.set("systemId", docType->systemId());
-    value.set("internalSubset", docType->internalSubset());
+    value->setString("publicId", docType->publicId());
+    value->setString("systemId", docType->systemId());
+    value->setString("internalSubset", docType->internalSubset());
   }
-  return value;
+  return value.release();
 }
 
-ScriptArray InspectorDOMAgent::buildArrayForElementAttributes(
+PassRefPtr<InspectorArray> InspectorDOMAgent::buildArrayForElementAttributes(
     Element* element) {
-  ScriptArray attributesValue = m_frontend->newScriptArray();
+  RefPtr<InspectorArray> attributesValue = InspectorArray::create();
   // Go through all attributes and serialize them.
   const NamedNodeMap* attrMap = element->attributes(true);
   if (!attrMap)
-    return attributesValue;
+    return attributesValue.release();
   unsigned numAttrs = attrMap->length();
-  int index = 0;
   for (unsigned i = 0; i < numAttrs; ++i) {
     // Add attribute pair
     const Attribute* attribute = attrMap->attributeItem(i);
-    attributesValue.set(index++, attribute->name().toString());
-    attributesValue.set(index++, attribute->value());
+    attributesValue->pushString(attribute->name().toString());
+    attributesValue->pushString(attribute->value());
   }
-  return attributesValue;
+  return attributesValue.release();
 }
 
-ScriptArray InspectorDOMAgent::buildArrayForContainerChildren(
+PassRefPtr<InspectorArray> InspectorDOMAgent::buildArrayForContainerChildren(
     Node* container,
     int depth,
     NodeToIdMap* nodesMap) {
-  ScriptArray children = m_frontend->newScriptArray();
+  RefPtr<InspectorArray> children = InspectorArray::create();
   if (depth == 0) {
-    int index = 0;
     // Special case the_only text child.
     if (innerChildNodeCount(container) == 1) {
       Node* child = innerFirstChild(container);
       if (child->nodeType() == Node::TEXT_NODE)
-        children.set(index++, buildObjectForNode(child, 0, nodesMap));
+        children->push(buildObjectForNode(child, 0, nodesMap));
     }
-    return children;
+    return children.release();
   } else if (depth > 0) {
     depth--;
   }
 
-  int index = 0;
   for (Node* child = innerFirstChild(container); child;
        child = innerNextSibling(child))
-    children.set(index++, buildObjectForNode(child, depth, nodesMap));
-  return children;
+    children->push(buildObjectForNode(child, depth, nodesMap));
+  return children.release();
 }
 
-ScriptObject InspectorDOMAgent::buildObjectForEventListener(
+PassRefPtr<InspectorObject> InspectorDOMAgent::buildObjectForEventListener(
     const RegisteredEventListener& registeredEventListener,
     const AtomicString& eventType,
     Node* node) {
   RefPtr<EventListener> eventListener = registeredEventListener.listener;
-  ScriptObject value = m_frontend->newScriptObject();
-  value.set("type", eventType);
-  value.set("useCapture", registeredEventListener.useCapture);
-  value.set("isAttribute", eventListener->isAttribute());
-  value.set("nodeId", pushNodePathToFrontend(node));
-  value.set("listenerBody", eventListenerHandlerBody(node->document(),
-                                                     m_frontend->scriptState(),
-                                                     eventListener.get()));
+  RefPtr<InspectorObject> value = InspectorObject::create();
+  value->setString("type", eventType);
+  value->setBool("useCapture", registeredEventListener.useCapture);
+  value->setBool("isAttribute", eventListener->isAttribute());
+  value->setNumber("nodeId", pushNodePathToFrontend(node));
+  value->setString("listenerBody", eventListenerHandlerBody(
+                                       node->document(), eventListener.get()));
   String sourceName;
   int lineNumber;
-  if (eventListenerHandlerLocation(node->document(), m_frontend->scriptState(),
-                                   eventListener.get(), sourceName,
-                                   lineNumber)) {
-    value.set("sourceName", sourceName);
-    value.set("lineNumber", lineNumber);
+  if (eventListenerHandlerLocation(node->document(), eventListener.get(),
+                                   sourceName, lineNumber)) {
+    value->setString("sourceName", sourceName);
+    value->setNumber("lineNumber", lineNumber);
   }
-  return value;
+  return value.release();
 }
 
 Node* InspectorDOMAgent::innerFirstChild(Node* node) {
@@ -1014,8 +1013,9 @@ void InspectorDOMAgent::didInsertDOMNode(Node* node) {
     // Children have been requested -> return value of a new child.
     Node* prevSibling = innerPreviousSibling(node);
     long prevId = prevSibling ? m_documentNodeToIdMap.get(prevSibling) : 0;
-    ScriptObject value = buildObjectForNode(node, 0, &m_documentNodeToIdMap);
-    m_frontend->childNodeInserted(parentId, prevId, value);
+    RefPtr<InspectorObject> value =
+        buildObjectForNode(node, 0, &m_documentNodeToIdMap);
+    m_frontend->childNodeInserted(parentId, prevId, value.release());
   }
 }
 
@@ -1050,13 +1050,13 @@ void InspectorDOMAgent::didModifyDOMAttr(Element* element) {
 void InspectorDOMAgent::getStyles(long callId, long nodeId, bool authorOnly) {
   Node* node = nodeForId(nodeId);
   if (!node || node->nodeType() != Node::ELEMENT_NODE) {
-    m_frontend->didGetStyles(callId, ScriptValue::undefined());
+    m_frontend->didGetStyles(callId, InspectorValue::null());
     return;
   }
 
   DOMWindow* defaultView = node->ownerDocument()->defaultView();
   if (!defaultView) {
-    m_frontend->didGetStyles(callId, ScriptValue::undefined());
+    m_frontend->didGetStyles(callId, InspectorValue::null());
     return;
   }
 
@@ -1065,60 +1065,58 @@ void InspectorDOMAgent::getStyles(long callId, long nodeId, bool authorOnly) {
       node,
       true);  // Support the viewing of :visited information in computed style.
 
-  ScriptObject result = m_frontend->newScriptObject();
+  RefPtr<InspectorObject> result = InspectorObject::create();
   if (element->style())
-    result.set("inlineStyle", buildObjectForStyle(element->style(), true));
-  result.set("computedStyle",
-             buildObjectForStyle(computedStyleInfo.get(), false));
+    result->set("inlineStyle", buildObjectForStyle(element->style(), true));
+  result->set("computedStyle",
+              buildObjectForStyle(computedStyleInfo.get(), false));
 
   CSSStyleSelector* selector = element->ownerDocument()->styleSelector();
   RefPtr<CSSRuleList> matchedRules =
       selector->styleRulesForElement(element, authorOnly);
-  result.set("matchedCSSRules",
-             buildArrayForCSSRules(node->ownerDocument(), matchedRules.get()));
+  result->set("matchedCSSRules",
+              buildArrayForCSSRules(node->ownerDocument(), matchedRules.get()));
 
-  result.set("styleAttributes", buildObjectForAttributeStyles(element));
-  result.set("pseudoElements",
-             buildArrayForPseudoElements(element, authorOnly));
+  result->set("styleAttributes", buildObjectForAttributeStyles(element));
+  result->set("pseudoElements",
+              buildArrayForPseudoElements(element, authorOnly));
 
-  ScriptObject currentStyle = result;
+  RefPtr<InspectorObject> currentStyle = result;
   Element* parentElement = element->parentElement();
   while (parentElement) {
-    ScriptObject parentStyle = m_frontend->newScriptObject();
-    currentStyle.set("parent", parentStyle);
+    RefPtr<InspectorObject> parentStyle = InspectorObject::create();
+    currentStyle->set("parent", parentStyle);
     if (parentElement->style() && parentElement->style()->length())
-      parentStyle.set("inlineStyle",
-                      buildObjectForStyle(parentElement->style(), true));
+      parentStyle->set("inlineStyle",
+                       buildObjectForStyle(parentElement->style(), true));
 
     CSSStyleSelector* parentSelector =
         parentElement->ownerDocument()->styleSelector();
     RefPtr<CSSRuleList> parentMatchedRules =
         parentSelector->styleRulesForElement(parentElement, authorOnly);
-    parentStyle.set("matchedCSSRules",
-                    buildArrayForCSSRules(parentElement->ownerDocument(),
-                                          parentMatchedRules.get()));
+    parentStyle->set("matchedCSSRules",
+                     buildArrayForCSSRules(parentElement->ownerDocument(),
+                                           parentMatchedRules.get()));
 
     parentElement = parentElement->parentElement();
     currentStyle = parentStyle;
   }
-  m_frontend->didGetStyles(callId, result);
+  m_frontend->didGetStyles(callId, result.release());
 }
 
 void InspectorDOMAgent::getAllStyles(long callId) {
-  ScriptArray result = m_frontend->newScriptArray();
-  unsigned counter = 0;
+  RefPtr<InspectorArray> result = InspectorArray::create();
   for (ListHashSet<RefPtr<Document>>::iterator it = m_documents.begin();
        it != m_documents.end(); ++it) {
     StyleSheetList* list = (*it)->styleSheets();
     for (unsigned i = 0; i < list->length(); ++i) {
       StyleSheet* styleSheet = list->item(i);
       if (styleSheet->isCSSStyleSheet())
-        result.set(counter++,
-                   buildObjectForStyleSheet(
-                       (*it).get(), static_cast<CSSStyleSheet*>(styleSheet)));
+        result->push(buildObjectForStyleSheet(
+            (*it).get(), static_cast<CSSStyleSheet*>(styleSheet)));
     }
   }
-  m_frontend->didGetAllStyles(callId, result);
+  m_frontend->didGetAllStyles(callId, result.release());
 }
 
 void InspectorDOMAgent::getStyleSheet(long callId, long styleSheetId) {
@@ -1127,7 +1125,7 @@ void InspectorDOMAgent::getStyleSheet(long callId, long styleSheetId) {
     m_frontend->didGetStyleSheet(
         callId, buildObjectForStyleSheet(styleSheet->doc(), styleSheet));
   else
-    m_frontend->didGetStyleSheet(callId, ScriptObject::undefined());
+    m_frontend->didGetStyleSheet(callId, InspectorObject::create());
 }
 
 void InspectorDOMAgent::getRuleRangesForStyleSheetId(long callId,
@@ -1137,30 +1135,30 @@ void InspectorDOMAgent::getRuleRangesForStyleSheetId(long callId,
     HashMap<long, SourceRange> ruleRanges =
         cssStore()->getRuleRangesForStyleSheet(styleSheet);
     if (!ruleRanges.size()) {
-      m_frontend->didGetStyleSheet(callId, ScriptObject::undefined());
+      m_frontend->didGetStyleSheet(callId, InspectorObject::create());
       return;
     }
-    ScriptObject result = m_frontend->newScriptObject();
+    RefPtr<InspectorObject> result = InspectorObject::create();
     for (HashMap<long, SourceRange>::iterator it = ruleRanges.begin();
          it != ruleRanges.end(); ++it) {
       if (it->second.second) {
-        ScriptObject ruleRange = m_frontend->newScriptObject();
-        result.set(String::number(it->first).utf8().data(), ruleRange);
-        ScriptObject bodyRange = m_frontend->newScriptObject();
-        ruleRange.set("bodyRange", bodyRange);
-        bodyRange.set("start", it->second.first);
-        bodyRange.set("end", it->second.second);
+        RefPtr<InspectorObject> ruleRange = InspectorObject::create();
+        result->set(String::number(it->first).utf8().data(), ruleRange);
+        RefPtr<InspectorObject> bodyRange = InspectorObject::create();
+        ruleRange->set("bodyRange", bodyRange);
+        bodyRange->setNumber("start", it->second.first);
+        bodyRange->setNumber("end", it->second.second);
       }
     }
     m_frontend->didGetStyleSheet(callId, result);
   } else
-    m_frontend->didGetStyleSheet(callId, ScriptObject::undefined());
+    m_frontend->didGetStyleSheet(callId, InspectorValue::null());
 }
 
 void InspectorDOMAgent::getInlineStyle(long callId, long nodeId) {
   Node* node = nodeForId(nodeId);
   if (!node || node->nodeType() != Node::ELEMENT_NODE) {
-    m_frontend->didGetInlineStyle(callId, ScriptValue::undefined());
+    m_frontend->didGetInlineStyle(callId, InspectorValue::null());
     return;
   }
   Element* element = static_cast<Element*>(node);
@@ -1171,13 +1169,13 @@ void InspectorDOMAgent::getInlineStyle(long callId, long nodeId) {
 void InspectorDOMAgent::getComputedStyle(long callId, long nodeId) {
   Node* node = nodeForId(nodeId);
   if (!node || node->nodeType() != Node::ELEMENT_NODE) {
-    m_frontend->didGetComputedStyle(callId, ScriptValue::undefined());
+    m_frontend->didGetComputedStyle(callId, InspectorValue::null());
     return;
   }
 
   DOMWindow* defaultView = node->ownerDocument()->defaultView();
   if (!defaultView) {
-    m_frontend->didGetComputedStyle(callId, ScriptValue::undefined());
+    m_frontend->didGetComputedStyle(callId, InspectorValue::null());
     return;
   }
 
@@ -1188,42 +1186,40 @@ void InspectorDOMAgent::getComputedStyle(long callId, long nodeId) {
       callId, buildObjectForStyle(computedStyle.get(), false));
 }
 
-ScriptObject InspectorDOMAgent::buildObjectForAttributeStyles(
+PassRefPtr<InspectorObject> InspectorDOMAgent::buildObjectForAttributeStyles(
     Element* element) {
-  ScriptObject styleAttributes = m_frontend->newScriptObject();
+  RefPtr<InspectorObject> styleAttributes = InspectorObject::create();
   NamedNodeMap* attributes = element->attributes();
   for (unsigned i = 0; attributes && i < attributes->length(); ++i) {
     Attribute* attribute = attributes->attributeItem(i);
     if (attribute->style()) {
       String attributeName = attribute->localName();
-      styleAttributes.set(attributeName.utf8().data(),
-                          buildObjectForStyle(attribute->style(), true));
+      styleAttributes->set(attributeName.utf8().data(),
+                           buildObjectForStyle(attribute->style(), true));
     }
   }
   return styleAttributes;
 }
 
-ScriptArray InspectorDOMAgent::buildArrayForCSSRules(
+PassRefPtr<InspectorArray> InspectorDOMAgent::buildArrayForCSSRules(
     Document* ownerDocument,
     CSSRuleList* matchedRules) {
-  ScriptArray matchedCSSRules = m_frontend->newScriptArray();
-  unsigned counter = 0;
+  RefPtr<InspectorArray> matchedCSSRules = InspectorArray::create();
   for (unsigned i = 0; matchedRules && i < matchedRules->length(); ++i) {
     CSSRule* rule = matchedRules->item(i);
     if (rule->type() == CSSRule::STYLE_RULE)
-      matchedCSSRules.set(
-          counter++,
+      matchedCSSRules->push(
           buildObjectForRule(ownerDocument, static_cast<CSSStyleRule*>(rule)));
   }
-  return matchedCSSRules;
+  return matchedCSSRules.release();
 }
 
-ScriptArray InspectorDOMAgent::buildArrayForPseudoElements(Element* element,
-                                                           bool authorOnly) {
-  ScriptArray result = m_frontend->newScriptArray();
+PassRefPtr<InspectorArray> InspectorDOMAgent::buildArrayForPseudoElements(
+    Element* element,
+    bool authorOnly) {
+  RefPtr<InspectorArray> result = InspectorArray::create();
   CSSStyleSelector* selector = element->ownerDocument()->styleSelector();
   RefPtr<RenderStyle> renderStyle = element->styleForRenderer();
-  unsigned counter = 0;
 
   for (PseudoId pseudoId = FIRST_PUBLIC_PSEUDOID;
        pseudoId < AFTER_LAST_INTERNAL_PSEUDOID;
@@ -1231,14 +1227,14 @@ ScriptArray InspectorDOMAgent::buildArrayForPseudoElements(Element* element,
     RefPtr<CSSRuleList> matchedRules =
         selector->pseudoStyleRulesForElement(element, pseudoId, authorOnly);
     if (matchedRules && matchedRules->length()) {
-      ScriptObject pseudoStyles = m_frontend->newScriptObject();
-      pseudoStyles.set("pseudoId", static_cast<int>(pseudoId));
-      pseudoStyles.set("rules", buildArrayForCSSRules(element->ownerDocument(),
-                                                      matchedRules.get()));
-      result.set(counter++, pseudoStyles);
+      RefPtr<InspectorObject> pseudoStyles = InspectorObject::create();
+      pseudoStyles->setNumber("pseudoId", static_cast<int>(pseudoId));
+      pseudoStyles->set("rules", buildArrayForCSSRules(element->ownerDocument(),
+                                                       matchedRules.get()));
+      result->push(pseudoStyles.release());
     }
   }
-  return result;
+  return result.release();
 }
 
 void InspectorDOMAgent::applyStyleText(long callId,
@@ -1247,8 +1243,8 @@ void InspectorDOMAgent::applyStyleText(long callId,
                                        const String& propertyName) {
   CSSStyleDeclaration* style = cssStore()->styleForId(styleId);
   if (!style) {
-    m_frontend->didApplyStyleText(callId, false, ScriptValue::undefined(),
-                                  m_frontend->newScriptArray());
+    m_frontend->didApplyStyleText(callId, false, InspectorValue::null(),
+                                  InspectorArray::create());
     return;
   }
 
@@ -1282,24 +1278,24 @@ void InspectorDOMAgent::applyStyleText(long callId,
       style->removeProperty(propertyName, ec);
 
     if (ec) {
-      m_frontend->didApplyStyleText(callId, false, ScriptValue::undefined(),
-                                    m_frontend->newScriptArray());
+      m_frontend->didApplyStyleText(callId, false, InspectorValue::null(),
+                                    InspectorArray::create());
       return;
     }
   }
 
   // Notify caller that the property was successfully deleted.
   if (!styleTextLength) {
-    ScriptArray changedProperties = m_frontend->newScriptArray();
-    changedProperties.set(0, propertyName);
-    m_frontend->didApplyStyleText(callId, true, ScriptValue::undefined(),
-                                  changedProperties);
+    RefPtr<InspectorArray> changedProperties = InspectorArray::create();
+    changedProperties->pushString(propertyName);
+    m_frontend->didApplyStyleText(callId, true, InspectorValue::null(),
+                                  changedProperties.release());
     return;
   }
 
   if (!tempStyle->length()) {
-    m_frontend->didApplyStyleText(callId, false, ScriptValue::undefined(),
-                                  m_frontend->newScriptArray());
+    m_frontend->didApplyStyleText(callId, false, InspectorValue::null(),
+                                  InspectorArray::create());
     return;
   }
 
@@ -1373,7 +1369,7 @@ void InspectorDOMAgent::toggleStyleEnabled(long callId,
                                            bool disabled) {
   CSSStyleDeclaration* style = cssStore()->styleForId(styleId);
   if (!style) {
-    m_frontend->didToggleStyleEnabled(callId, ScriptValue::undefined());
+    m_frontend->didToggleStyleEnabled(callId, InspectorValue::null());
     return;
   }
 
@@ -1397,7 +1393,7 @@ void InspectorDOMAgent::toggleStyleEnabled(long callId,
       disabledStyle->remove(propertyName);
   }
   if (ec) {
-    m_frontend->didToggleStyleEnabled(callId, ScriptValue::undefined());
+    m_frontend->didToggleStyleEnabled(callId, InspectorValue::null());
     return;
   }
   m_frontend->didToggleStyleEnabled(callId, buildObjectForStyle(style, true));
@@ -1409,7 +1405,7 @@ void InspectorDOMAgent::setRuleSelector(long callId,
                                         long selectedNodeId) {
   CSSStyleRule* rule = cssStore()->ruleForId(ruleId);
   if (!rule) {
-    m_frontend->didSetRuleSelector(callId, ScriptValue::undefined(), false);
+    m_frontend->didSetRuleSelector(callId, InspectorValue::null(), false);
     return;
   }
 
@@ -1419,7 +1415,7 @@ void InspectorDOMAgent::setRuleSelector(long callId,
   ExceptionCode ec = 0;
   styleSheet->addRule(selector, rule->style()->cssText(), ec);
   if (ec) {
-    m_frontend->didSetRuleSelector(callId, ScriptValue::undefined(), false);
+    m_frontend->didSetRuleSelector(callId, InspectorValue::null(), false);
     return;
   }
 
@@ -1433,7 +1429,7 @@ void InspectorDOMAgent::setRuleSelector(long callId,
   }
 
   if (ec) {
-    m_frontend->didSetRuleSelector(callId, ScriptValue::undefined(), false);
+    m_frontend->didSetRuleSelector(callId, InspectorValue::null(), false);
     return;
   }
 
@@ -1447,7 +1443,7 @@ void InspectorDOMAgent::addRule(long callId,
                                 long selectedNodeId) {
   Node* node = nodeForId(selectedNodeId);
   if (!node) {
-    m_frontend->didAddRule(callId, ScriptValue::undefined(), false);
+    m_frontend->didAddRule(callId, InspectorValue::null(), false);
     return;
   }
 
@@ -1459,7 +1455,7 @@ void InspectorDOMAgent::addRule(long callId,
   ExceptionCode ec = 0;
   styleSheet->addRule(selector, "", ec);
   if (ec) {
-    m_frontend->didAddRule(callId, ScriptValue::undefined(), false);
+    m_frontend->didAddRule(callId, InspectorValue::null(), false);
     return;
   }
 
@@ -1470,129 +1466,130 @@ void InspectorDOMAgent::addRule(long callId,
                          ruleAffectsNode(newRule, node));
 }
 
-ScriptObject InspectorDOMAgent::buildObjectForStyle(CSSStyleDeclaration* style,
-                                                    bool bind) {
-  ScriptObject result = m_frontend->newScriptObject();
+PassRefPtr<InspectorObject> InspectorDOMAgent::buildObjectForStyle(
+    CSSStyleDeclaration* style,
+    bool bind) {
+  RefPtr<InspectorObject> result = InspectorObject::create();
   if (bind) {
     long styleId = cssStore()->bindStyle(style);
-    result.set("id", styleId);
+    result->setNumber("id", styleId);
     CSSStyleSheet* parentStyleSheet = getParentStyleSheet(style);
     if (parentStyleSheet)
-      result.set("parentStyleSheetId",
-                 cssStore()->bindStyleSheet(parentStyleSheet));
+      result->setNumber("parentStyleSheetId",
+                        cssStore()->bindStyleSheet(parentStyleSheet));
 
     DisabledStyleDeclaration* disabledStyle =
         cssStore()->disabledStyleForId(styleId, false);
     if (disabledStyle)
-      result.set("disabled",
-                 buildArrayForDisabledStyleProperties(disabledStyle));
+      result->set("disabled",
+                  buildArrayForDisabledStyleProperties(disabledStyle));
   }
-  result.set("width", style->getPropertyValue("width"));
-  result.set("height", style->getPropertyValue("height"));
-  populateObjectWithStyleProperties(style, result);
-  return result;
+  result->setString("width", style->getPropertyValue("width"));
+  result->setString("height", style->getPropertyValue("height"));
+  populateObjectWithStyleProperties(style, result.get());
+  return result.release();
 }
 
 void InspectorDOMAgent::populateObjectWithStyleProperties(
     CSSStyleDeclaration* style,
-    ScriptObject& result) {
-  ScriptArray properties = m_frontend->newScriptArray();
-  ScriptObject shorthandValues = m_frontend->newScriptObject();
-  result.set("properties", properties);
-  result.set("shorthandValues", shorthandValues);
+    InspectorObject* result) {
+  RefPtr<InspectorArray> properties = InspectorArray::create();
+  RefPtr<InspectorObject> shorthandValues = InspectorObject::create();
 
   HashSet<String> foundShorthands;
   for (unsigned i = 0; i < style->length(); ++i) {
-    ScriptObject property = m_frontend->newScriptObject();
+    RefPtr<InspectorObject> property = InspectorObject::create();
     String name = style->item(i);
-    property.set("name", name);
-    property.set("priority", style->getPropertyPriority(name));
-    property.set("implicit", style->isPropertyImplicit(name));
+    property->setString("name", name);
+    property->setString("priority", style->getPropertyPriority(name));
+    property->setBool("implicit", style->isPropertyImplicit(name));
     String shorthand = style->getPropertyShorthand(name);
-    property.set("shorthand", shorthand);
+    property->setString("shorthand", shorthand);
     if (!shorthand.isEmpty() && !foundShorthands.contains(shorthand)) {
       foundShorthands.add(shorthand);
-      shorthandValues.set(shorthand, shorthandValue(style, shorthand));
+      shorthandValues->setString(shorthand, shorthandValue(style, shorthand));
     }
-    property.set("value", style->getPropertyValue(name));
-    properties.set(i, property);
+    property->setString("value", style->getPropertyValue(name));
+    properties->push(property.release());
   }
+  result->set("properties", properties);
+  result->set("shorthandValues", shorthandValues);
 }
 
-ScriptArray InspectorDOMAgent::buildArrayForDisabledStyleProperties(
+PassRefPtr<InspectorArray>
+InspectorDOMAgent::buildArrayForDisabledStyleProperties(
     DisabledStyleDeclaration* declaration) {
-  int counter = 0;
-  ScriptArray properties = m_frontend->newScriptArray();
+  RefPtr<InspectorArray> properties = InspectorArray::create();
   for (DisabledStyleDeclaration::iterator it = declaration->begin();
        it != declaration->end(); ++it) {
-    ScriptObject property = m_frontend->newScriptObject();
-    property.set("name", it->first);
-    property.set("value", it->second.first);
-    property.set("priority", it->second.second);
-    properties.set(counter++, property);
+    RefPtr<InspectorObject> property = InspectorObject::create();
+    property->setString("name", it->first);
+    property->setString("value", it->second.first);
+    property->setString("priority", it->second.second);
+    properties->push(property.release());
   }
-  return properties;
+  return properties.release();
 }
 
-ScriptObject InspectorDOMAgent::buildObjectForStyleSheet(
+PassRefPtr<InspectorObject> InspectorDOMAgent::buildObjectForStyleSheet(
     Document* ownerDocument,
     CSSStyleSheet* styleSheet) {
-  ScriptObject result = m_frontend->newScriptObject();
+  RefPtr<InspectorObject> result = InspectorObject::create();
   long id = cssStore()->bindStyleSheet(styleSheet);
-  result.set("id", id);
-  result.set("disabled", styleSheet->disabled());
-  result.set("href", styleSheet->href());
-  result.set("title", styleSheet->title());
-  result.set("documentElementId", m_documentNodeToIdMap.get(styleSheet->doc()));
-  ScriptArray cssRules = m_frontend->newScriptArray();
-  result.set("cssRules", cssRules);
+  result->setNumber("id", id);
+  result->setBool("disabled", styleSheet->disabled());
+  result->setString("href", styleSheet->href());
+  result->setString("title", styleSheet->title());
+  result->setNumber("documentElementId",
+                    m_documentNodeToIdMap.get(styleSheet->doc()));
+  RefPtr<InspectorArray> cssRules = InspectorArray::create();
   PassRefPtr<CSSRuleList> cssRuleList = CSSRuleList::create(styleSheet, true);
-  if (!cssRuleList)
-    return result;
-  unsigned counter = 0;
-  for (unsigned i = 0; i < cssRuleList->length(); ++i) {
-    CSSRule* rule = cssRuleList->item(i);
-    if (rule->isStyleRule())
-      cssRules.set(
-          counter++,
-          buildObjectForRule(ownerDocument, static_cast<CSSStyleRule*>(rule)));
+  if (cssRuleList) {
+    for (unsigned i = 0; i < cssRuleList->length(); ++i) {
+      CSSRule* rule = cssRuleList->item(i);
+      if (rule->isStyleRule())
+        cssRules->push(buildObjectForRule(ownerDocument,
+                                          static_cast<CSSStyleRule*>(rule)));
+    }
   }
-  return result;
+  result->set("cssRules", cssRules.release());
+  return result.release();
 }
 
-ScriptObject InspectorDOMAgent::buildObjectForRule(Document* ownerDocument,
-                                                   CSSStyleRule* rule) {
+PassRefPtr<InspectorObject> InspectorDOMAgent::buildObjectForRule(
+    Document* ownerDocument,
+    CSSStyleRule* rule) {
   CSSStyleSheet* parentStyleSheet = rule->parentStyleSheet();
 
-  ScriptObject result = m_frontend->newScriptObject();
-  result.set("selectorText", rule->selectorText());
-  result.set("cssText", rule->cssText());
-  result.set("sourceLine", rule->sourceLine());
-  result.set("documentURL", documentURLString(ownerDocument));
+  RefPtr<InspectorObject> result = InspectorObject::create();
+  result->setString("selectorText", rule->selectorText());
+  result->setString("cssText", rule->cssText());
+  result->setNumber("sourceLine", rule->sourceLine());
+  result->setString("documentURL", documentURLString(ownerDocument));
   if (parentStyleSheet) {
-    ScriptObject parentStyleSheetValue = m_frontend->newScriptObject();
-    result.set("parentStyleSheet", parentStyleSheetValue);
-    parentStyleSheetValue.set("href", parentStyleSheet->href());
-    parentStyleSheetValue.set("id",
-                              cssStore()->bindStyleSheet(parentStyleSheet));
+    RefPtr<InspectorObject> parentStyleSheetValue = InspectorObject::create();
+    parentStyleSheetValue->setString("href", parentStyleSheet->href());
+    parentStyleSheetValue->setNumber(
+        "id", cssStore()->bindStyleSheet(parentStyleSheet));
+    result->set("parentStyleSheet", parentStyleSheetValue.release());
   }
   bool isUserAgent = parentStyleSheet && !parentStyleSheet->ownerNode() &&
                      parentStyleSheet->href().isEmpty();
   bool isUser = parentStyleSheet && parentStyleSheet->ownerNode() &&
                 parentStyleSheet->ownerNode()->nodeName() == "#document";
-  result.set("isUserAgent", isUserAgent);
-  result.set("isUser", isUser);
-  result.set("isViaInspector",
-             rule->parentStyleSheet() ==
-                 cssStore()->inspectorStyleSheet(ownerDocument, false, -1));
+  result->setBool("isUserAgent", isUserAgent);
+  result->setBool("isUser", isUser);
+  result->setBool("isViaInspector", rule->parentStyleSheet() ==
+                                        cssStore()->inspectorStyleSheet(
+                                            ownerDocument, false, -1));
 
   // Bind editable scripts only.
   bool bind = !isUserAgent && !isUser;
-  result.set("style", buildObjectForStyle(rule->style(), bind));
+  result->set("style", buildObjectForStyle(rule->style(), bind));
 
   if (bind)
-    result.set("id", cssStore()->bindRule(rule));
-  return result;
+    result->setNumber("id", cssStore()->bindRule(rule));
+  return result.release();
 }
 
 Vector<String> InspectorDOMAgent::longhandProperties(
@@ -1696,11 +1693,12 @@ Node* InspectorDOMAgent::nodeForPath(const String& path) {
   return node;
 }
 
-ScriptArray InspectorDOMAgent::toArray(const Vector<String>& data) {
-  ScriptArray result = m_frontend->newScriptArray();
+PassRefPtr<InspectorArray> InspectorDOMAgent::toArray(
+    const Vector<String>& data) {
+  RefPtr<InspectorArray> result = InspectorArray::create();
   for (unsigned i = 0; i < data.size(); ++i)
-    result.set(i, data[i]);
-  return result;
+    result->pushString(data[i]);
+  return result.release();
 }
 
 CSSStyleSheet* InspectorDOMAgent::getParentStyleSheet(
@@ -1736,16 +1734,15 @@ void InspectorDOMAgent::onMatchJobsTimer(Timer<InspectorDOMAgent>*) {
 
 void InspectorDOMAgent::reportNodesAsSearchResults(
     ListHashSet<Node*>& resultCollector) {
-  ScriptArray nodeIds = m_frontend->newScriptArray();
-  int index = 0;
+  RefPtr<InspectorArray> nodeIds = InspectorArray::create();
   for (ListHashSet<Node*>::iterator it = resultCollector.begin();
        it != resultCollector.end(); ++it) {
     if (m_searchResults.contains(*it))
       continue;
     m_searchResults.add(*it);
-    nodeIds.set(index++, static_cast<long long>(pushNodePathToFrontend(*it)));
+    nodeIds->pushNumber(static_cast<long long>(pushNodePathToFrontend(*it)));
   }
-  m_frontend->addNodesToSearchResult(nodeIds);
+  m_frontend->addNodesToSearchResult(nodeIds.release());
 }
 
 }  // namespace WebCore

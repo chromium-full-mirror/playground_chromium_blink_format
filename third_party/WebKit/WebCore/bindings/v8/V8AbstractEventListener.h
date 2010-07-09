@@ -90,6 +90,8 @@ class V8AbstractEventListener : public EventListener {
   // Dispose listener object and clear the handle.
   void disposeListenerObject();
 
+  const WorldContextHandle& worldContext() const { return m_worldContext; }
+
  protected:
   V8AbstractEventListener(bool isAttribute,
                           const WorldContextHandle& worldContext);
@@ -104,8 +106,6 @@ class V8AbstractEventListener : public EventListener {
 
   // Get the receiver object to use for event listener call.
   v8::Local<v8::Object> getReceiverObject(Event*);
-
-  const WorldContextHandle& worldContext() const { return m_worldContext; }
 
  private:
   // Implementation of EventListener function.

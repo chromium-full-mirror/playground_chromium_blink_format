@@ -46,11 +46,8 @@ class Node;
 PassRefPtr<JSLazyEventListener> createAttributeEventListener(Node*, Attribute*);
 PassRefPtr<JSLazyEventListener> createAttributeEventListener(Frame*,
                                                              Attribute*);
-String eventListenerHandlerBody(ScriptExecutionContext*,
-                                ScriptState*,
-                                EventListener*);
-bool eventListenerHandlerLocation(ScriptExecutionContext*,
-                                  ScriptState*,
+String eventListenerHandlerBody(Document*, EventListener*);
+bool eventListenerHandlerLocation(Document*,
                                   EventListener*,
                                   String& sourceName,
                                   int& lineNumber);
