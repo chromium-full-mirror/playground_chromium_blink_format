@@ -102,6 +102,13 @@ class QScriptValue {
                    const QScriptValue& value,
                    const PropertyFlags& flags = KeepExistingFlags);
 
+  PropertyFlags propertyFlags(
+      const QString& name,
+      const ResolveFlags& mode = ResolvePrototype) const;
+  PropertyFlags propertyFlags(
+      const QScriptString& name,
+      const ResolveFlags& mode = ResolvePrototype) const;
+
   QScriptEngine* engine() const;
 
   bool isValid() const;

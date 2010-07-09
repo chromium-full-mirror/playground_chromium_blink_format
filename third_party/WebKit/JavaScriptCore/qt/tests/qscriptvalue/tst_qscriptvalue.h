@@ -59,6 +59,8 @@ class tst_QScriptValue : public QObject {
   void setProperty();
   void getSetProperty();
   void getPropertyResolveFlag();
+  void propertyFlag_data();
+  void propertyFlag();
 
   // Generated test functions.
   void isBool_data();
