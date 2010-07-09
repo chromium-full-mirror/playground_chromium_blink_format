@@ -1682,6 +1682,8 @@ String Frame::layerTreeAsText() const {
   if (!rootLayer)
     return String();
 
+  document()->updateLayout();
+
   return rootLayer->layerTreeAsText();
 #else
   return String();
