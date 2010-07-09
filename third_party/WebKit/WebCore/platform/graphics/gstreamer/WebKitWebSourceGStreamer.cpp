@@ -333,6 +333,7 @@ static void webKitWebSrcStop(WebKitWebSrc* src, bool seeking) {
   if (priv->frame)
     priv->frame.release();
 
+  GST_OBJECT_LOCK(src);
   if (priv->needDataID)
     g_source_remove(priv->needDataID);
   priv->needDataID = 0;
@@ -346,6 +347,7 @@ static void webKitWebSrcStop(WebKitWebSrc* src, bool seeking) {
   priv->seekID = 0;
 
   priv->paused = FALSE;
+  GST_OBJECT_UNLOCK(src);
 
   g_free(priv->iradioName);
   priv->iradioName = 0;
@@ -540,8 +542,10 @@ static gboolean webKitWebSrcNeedDataMainCb(WebKitWebSrc* src) {
   // Ports not using libsoup need to call the unpause/schedule API of their
   // underlying network implementation here.
 
+  GST_OBJECT_LOCK(src);
   priv->paused = FALSE;
   priv->needDataID = 0;
+  GST_OBJECT_UNLOCK(src);
   return FALSE;
 }
 
@@ -552,12 +556,17 @@ static void webKitWebSrcNeedDataCb(GstAppSrc* appsrc,
   WebKitWebSrcPrivate* priv = src->priv;
 
   GST_DEBUG_OBJECT(src, "Need more data: %u", length);
-  if (priv->needDataID || !priv->paused)
+
+  GST_OBJECT_LOCK(src);
+  if (priv->needDataID || !priv->paused) {
+    GST_OBJECT_UNLOCK(src);
     return;
+  }
 
   priv->needDataID = g_timeout_add_full(
       G_PRIORITY_DEFAULT, 0, (GSourceFunc)webKitWebSrcNeedDataMainCb,
       gst_object_ref(src), (GDestroyNotify)gst_object_unref);
+  GST_OBJECT_UNLOCK(src);
 }
 
 static gboolean webKitWebSrcEnoughDataMainCb(WebKitWebSrc* src) {
@@ -570,8 +579,11 @@ static gboolean webKitWebSrcEnoughDataMainCb(WebKitWebSrc* src) {
   // Ports not using libsoup need to call the pause/unschedule API of their
   // underlying network implementation here.
 
+  GST_OBJECT_LOCK(src);
   priv->paused = TRUE;
   priv->enoughDataID = 0;
+  GST_OBJECT_UNLOCK(src);
+
   return FALSE;
 }
 
@@ -580,12 +592,17 @@ static void webKitWebSrcEnoughDataCb(GstAppSrc* appsrc, gpointer userData) {
   WebKitWebSrcPrivate* priv = src->priv;
 
   GST_DEBUG_OBJECT(src, "Have enough data");
-  if (priv->enoughDataID || priv->paused)
+
+  GST_OBJECT_LOCK(src);
+  if (priv->enoughDataID || priv->paused) {
+    GST_OBJECT_UNLOCK(src);
     return;
+  }
 
   priv->enoughDataID = g_timeout_add_full(
       G_PRIORITY_DEFAULT, 0, (GSourceFunc)webKitWebSrcEnoughDataMainCb,
       gst_object_ref(src), (GDestroyNotify)gst_object_unref);
+  GST_OBJECT_UNLOCK(src);
 }
 
 static gboolean webKitWebSrcSeekMainCb(WebKitWebSrc* src) {
@@ -612,11 +629,14 @@ static gboolean webKitWebSrcSeekDataCb(GstAppSrc* appsrc,
 
   GST_DEBUG_OBJECT(src, "Doing range-request seek");
   priv->requestedOffset = offset;
+
+  GST_OBJECT_LOCK(src);
   if (priv->seekID)
     g_source_remove(priv->seekID);
   priv->seekID = g_timeout_add_full(
       G_PRIORITY_DEFAULT, 0, (GSourceFunc)webKitWebSrcSeekMainCb,
       gst_object_ref(src), (GDestroyNotify)gst_object_unref);
+  GST_OBJECT_UNLOCK(src);
 
   return TRUE;
 }
@@ -752,8 +772,12 @@ void StreamingClient::didReceiveData(ResourceHandle* handle,
 }
 
 void StreamingClient::didFinishLoading(ResourceHandle*) {
+  WebKitWebSrcPrivate* priv = m_src->priv;
+
   GST_DEBUG_OBJECT(m_src, "Have EOS");
-  gst_app_src_end_of_stream(m_src->priv->appsrc);
+
+  if (!priv->seekID)
+    gst_app_src_end_of_stream(m_src->priv->appsrc);
 }
 
 void StreamingClient::didFail(ResourceHandle*, const ResourceError& error) {
