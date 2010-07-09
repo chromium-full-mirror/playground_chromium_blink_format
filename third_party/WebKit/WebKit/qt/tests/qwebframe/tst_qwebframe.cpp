@@ -36,6 +36,7 @@
 #include <qsslerror.h>
 #endif
 #include "../util.h"
+#include "../WebCoreSupport/DumpRenderTreeSupportQt.h"
 
 struct CustomType {
   QString string;
@@ -486,9 +487,11 @@ class tst_QWebFrame : public QObject {
   void cleanup();
 
  private slots:
-  void getSetStaticProperty();
   void getSetDynamicProperty();
+  void getSetDynamicProperty_data();
   void getSetChildren();
+  void getSetChildren_data();
+  void getSetStaticProperty();
   void callQtInvokable();
   void connectAndDisconnect();
   void classEnums();
@@ -587,6 +590,9 @@ class tst_QWebFrame : public QObject {
     }
     evalJS("delete retvalue; delete typevalue");
     return ret;
+  }
+  void garbageCollectJS() {
+    DumpRenderTreeSupportQt::garbageCollectorCollect();
   }
   QObject* firstChildByClassName(QObject* parent, const char* className) {
     const QObjectList& children = parent->children();
@@ -886,6 +892,8 @@ void tst_QWebFrame::getSetStaticProperty() {
 }
 
 void tst_QWebFrame::getSetDynamicProperty() {
+  QFETCH(bool, garbageCollect);
+
   // initially the object does not have the property
   // In WebKit, RuntimeObjects do not inherit Object, so don't have
   // hasOwnProperty
@@ -898,6 +906,10 @@ void tst_QWebFrame::getSetDynamicProperty() {
   // QCOMPARE(evalJS("myObject.hasOwnProperty('dynamicProperty')"), sTrue);
   QCOMPARE(evalJS("typeof myObject.dynamicProperty != 'undefined'"), sTrue);
   QCOMPARE(evalJS("myObject.dynamicProperty == 123"), sTrue);
+  if (garbageCollect) {
+    garbageCollectJS();
+    QCOMPARE(evalJS("typeof myObject.dynamicProperty != 'undefined'"), sTrue);
+  }
 
   // property change in script should be reflected in C++
   QCOMPARE(evalJS("myObject.dynamicProperty = 'foo';"
@@ -905,6 +917,31 @@ void tst_QWebFrame::getSetDynamicProperty() {
            QLatin1String("foo"));
   QCOMPARE(m_myObject->property("dynamicProperty").toString(),
            QLatin1String("foo"));
+  if (garbageCollect) {
+    garbageCollectJS();
+    QCOMPARE(m_myObject->property("dynamicProperty").toString(),
+             QLatin1String("foo"));
+  }
+
+  // add a dynamic property in C++ to another QObject
+  QObject* propertyObject = new QObject(m_myObject);
+  QCOMPARE(m_myObject->setProperty("dynamicObjectProperty",
+                                   qVariantFromValue(propertyObject)),
+           false);
+  QCOMPARE(evalJS("typeof myObject.dynamicObjectProperty != 'undefined'"),
+           sTrue);
+  evalJS("myObject.dynamicObjectProperty.jsProperty = 123");
+  QCOMPARE(evalJS("myObject.dynamicObjectProperty.jsProperty == 123"), sTrue);
+  if (garbageCollect) {
+    garbageCollectJS();
+    QCOMPARE(evalJS("typeof myObject.dynamicObjectProperty != 'undefined'"),
+             sTrue);
+    QCOMPARE(evalJS("myObject.dynamicObjectProperty.jsProperty == 123"), sTrue);
+  }
+  QCOMPARE(m_myObject->setProperty("dynamicObjectProperty", QVariant()), false);
+  delete propertyObject;
+  QCOMPARE(evalJS("typeof myObject.dynamicObjectProperty == 'undefined'"),
+           sTrue);
 
   // delete the property (XFAIL - can't delete properties)
   QEXPECT_FAIL("", "can't delete properties", Continue);
@@ -915,9 +952,19 @@ void tst_QWebFrame::getSetDynamicProperty() {
   //    QCOMPARE(evalJS("myObject.hasOwnProperty('dynamicProperty')"), sFalse);
   QCOMPARE(evalJS("typeof myObject.dynamicProperty"), sUndefined);
   */
+
+  evalJS("myObject.dynamicProperty = undefined");
+}
+
+void tst_QWebFrame::getSetDynamicProperty_data() {
+  QTest::addColumn<bool>("garbageCollect");
+  QTest::newRow("with garbageCollect") << true;
+  QTest::newRow("without garbageCollect") << false;
 }
 
 void tst_QWebFrame::getSetChildren() {
+  QFETCH(bool, garbageCollect);
+
   // initially the object does not have the child
   // (again, no hasOwnProperty)
 
@@ -929,12 +976,27 @@ void tst_QWebFrame::getSetChildren() {
   child->setObjectName("child");
   //  QCOMPARE(evalJS("myObject.hasOwnProperty('child')"), sTrue);
   QCOMPARE(evalJS("typeof myObject.child != 'undefined'"), sTrue);
+  evalJS("myObject.child.jsProperty = 123");
+  QCOMPARE(evalJS("myObject.child.jsProperty == 123"), sTrue);
+
+  if (garbageCollect) {
+    garbageCollectJS();
+    QCOMPARE(evalJS("typeof myObject.child != 'undefined'"), sTrue);
+    QCOMPARE(evalJS("myObject.child.jsProperty == 123"), sTrue);
+  }
 
   // add a grandchild
   MyQObject* grandChild = new MyQObject(child);
   grandChild->setObjectName("grandChild");
   //  QCOMPARE(evalJS("myObject.child.hasOwnProperty('grandChild')"), sTrue);
   QCOMPARE(evalJS("typeof myObject.child.grandChild != 'undefined'"), sTrue);
+  evalJS("myObject.child.grandChild.jsProperty = 123");
+  evalJS("myObject.child.grandChild.jsProperty = 123");
+  if (garbageCollect) {
+    garbageCollectJS();
+    QCOMPARE(evalJS("typeof myObject.child.grandChild != 'undefined'"), sTrue);
+    QCOMPARE(evalJS("myObject.child.grandChild.jsProperty == 123"), sTrue);
+  }
 
   // delete grandchild
   delete grandChild;
@@ -945,6 +1007,16 @@ void tst_QWebFrame::getSetChildren() {
   delete child;
   //  QCOMPARE(evalJS("myObject.hasOwnProperty('child')"), sFalse);
   QCOMPARE(evalJS("typeof myObject.child == 'undefined'"), sTrue);
+  if (garbageCollect) {
+    garbageCollectJS();
+    QCOMPARE(evalJS("typeof myObject.child == 'undefined'"), sTrue);
+  }
+}
+
+void tst_QWebFrame::getSetChildren_data() {
+  QTest::addColumn<bool>("garbageCollect");
+  QTest::newRow("with garbageCollect") << true;
+  QTest::newRow("without garbageCollect") << false;
 }
 
 Q_DECLARE_METATYPE(QVector<int>)
@@ -1728,7 +1800,7 @@ void tst_QWebFrame::connectAndDisconnect() {
   m_myObject->emitMySignal();
   QCOMPARE(m_myObject->qtFunctionInvoked(), 20);
   evalJS("myObject = null");
-  evalJS("gc()");
+  garbageCollectJS();
   m_myObject->resetQtFunctionInvoked();
   m_myObject->emitMySignal();
   QCOMPARE(m_myObject->qtFunctionInvoked(), 20);
