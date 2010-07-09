@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005, 2006 Nikolas Zimmermann <zimmermann@kde.org>
-                  2004, 2005, 2006, 2007 Rob Buis <buis@kde.org>
+                  2004, 2005, 2006, 2007, 2010 Rob Buis <buis@kde.org>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -134,6 +134,8 @@ class SVGSVGElement : public SVGStyledLocatableElement,
   void inheritViewAttributes(SVGViewElement*);
 
   bool isOutermostSVG() const;
+
+  Element* getElementById(const AtomicString&) const;
 
  private:
   virtual bool selfHasRelativeLengths() const;
