@@ -28,6 +28,7 @@
 #include "TranslateTransformOperation.h"
 #include "UnitBezier.h"
 #include <QtCore/qabstractanimation.h>
+#include <QtCore/qdatetime.h>
 #include <QtCore/qdebug.h>
 #include <QtCore/qmetaobject.h>
 #include <QtCore/qset.h>
@@ -43,6 +44,8 @@
 
 #define QT_DEBUG_RECACHE 0
 #define QT_DEBUG_CACHEDUMP 0
+
+#define QT_DEBUG_FPS 0
 
 namespace WebCore {
 
@@ -1380,6 +1383,22 @@ class AnimationQt : public AnimationQtBase {
                           const T& toValue,
                           qreal progress) = 0;
 
+  virtual void updateState(QAbstractAnimation::State newState,
+                           QAbstractAnimation::State oldState) {
+#if QT_DEBUG_FPS
+    if (newState == Running && oldState == Stopped) {
+      qDebug("Animation Started!");
+      m_fps.frames = 0;
+      m_fps.duration.start();
+    } else if (newState == Stopped && oldState == Running) {
+      const int duration = m_fps.duration.elapsed();
+      qDebug("Animation Ended! %dms [%f FPS]", duration,
+             (1000 / (((float)duration) / m_fps.frames)));
+    }
+#endif
+    AnimationQtBase::updateState(newState, oldState);
+  }
+
   virtual void updateCurrentTime(int currentTime) {
     if (!m_layer)
       return;
@@ -1422,9 +1441,18 @@ class AnimationQt : public AnimationQtBase {
                                                          (it2.key() - it.key()),
                                          duration());
     applyFrame(fromValue, toValue, progress);
+#if QT_DEBUG_FPS
+    ++m_fps.frames;
+#endif
   }
 
   QMap<qreal, KeyframeValueQt<T>> m_keyframeValues;
+#if QT_DEBUG_FPS
+  struct {
+    QTime duration;
+    int frames;
+  } m_fps;
+#endif
 };
 
 class TransformAnimationQt : public AnimationQt<TransformOperations> {
@@ -1487,7 +1515,7 @@ class TransformAnimationQt : public AnimationQt<TransformOperations> {
 
   virtual void updateState(QAbstractAnimation::State newState,
                            QAbstractAnimation::State oldState) {
-    AnimationQtBase::updateState(newState, oldState);
+    AnimationQt<TransformOperations>::updateState(newState, oldState);
     if (!m_layer)
       return;
 
@@ -1544,7 +1572,7 @@ class OpacityAnimationQt : public AnimationQt<qreal> {
 
   virtual void updateState(QAbstractAnimation::State newState,
                            QAbstractAnimation::State oldState) {
-    QAbstractAnimation::updateState(newState, oldState);
+    AnimationQt<qreal>::updateState(newState, oldState);
 
     if (m_layer)
       m_layer.data()->m_opacityAnimationRunning =
