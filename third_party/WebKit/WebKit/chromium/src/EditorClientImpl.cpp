@@ -43,9 +43,11 @@
 
 #include "DOMUtilitiesPrivate.h"
 #include "WebEditingAction.h"
+#include "WebElement.h"
 #include "WebFrameImpl.h"
 #include "WebKit.h"
 #include "WebInputElement.h"
+#include "WebInputEventConversion.h"
 #include "WebNode.h"
 #include "WebPasswordAutocompleteListener.h"
 #include "WebRange.h"
@@ -84,7 +86,7 @@ bool EditorClientImpl::shouldShowDeleteInterface(HTMLElement* elem) {
   // Normally, we don't care to show WebCore's deletion UI, so we only enable
   // it if in testing mode and the test specifically requests it by using this
   // magic class name.
-  return WebKit::layoutTestMode() &&
+  return layoutTestMode() &&
          elem->getAttribute(HTMLNames::classAttr) == "needsDeletionUI";
 }
 
@@ -591,9 +593,18 @@ void EditorClientImpl::handleInputMethodKeydown(KeyboardEvent* keyEvent) {
   // We handle IME within chrome.
 }
 
-void EditorClientImpl::textFieldDidBeginEditing(Element*) {}
+void EditorClientImpl::textFieldDidBeginEditing(Element* element) {
+  HTMLInputElement* inputElement = toHTMLInputElement(element);
+  if (m_webView->client() && inputElement)
+    m_webView->client()->textFieldDidBeginEditing(
+        WebInputElement(inputElement));
+}
 
 void EditorClientImpl::textFieldDidEndEditing(Element* element) {
+  HTMLInputElement* inputElement = toHTMLInputElement(element);
+  if (m_webView->client() && inputElement)
+    m_webView->client()->textFieldDidEndEditing(WebInputElement(inputElement));
+
   // Notification that focus was lost.  Be careful with this, it's also sent
   // when the page is being closed.
 
@@ -608,7 +619,6 @@ void EditorClientImpl::textFieldDidEndEditing(Element* element) {
     return;  // The page is getting closed, don't fill the password.
 
   // Notify any password-listener of the focus change.
-  HTMLInputElement* inputElement = WebKit::toHTMLInputElement(element);
   if (!inputElement)
     return;
 
@@ -627,13 +637,17 @@ void EditorClientImpl::textFieldDidEndEditing(Element* element) {
 
 void EditorClientImpl::textDidChangeInTextField(Element* element) {
   ASSERT(element->hasLocalName(HTMLNames::inputTag));
+  HTMLInputElement* inputElement = static_cast<HTMLInputElement*>(element);
+  if (m_webView->client())
+    m_webView->client()->textFieldDidChange(WebInputElement(inputElement));
+
   // Note that we only show the autofill popup in this case if the caret is at
   // the end.  This matches FireFox and Safari but not IE.
-  autofill(static_cast<HTMLInputElement*>(element), false, false, true);
+  autofill(inputElement, false, false, true);
 }
 
 bool EditorClientImpl::showFormAutofillForNode(Node* node) {
-  HTMLInputElement* inputElement = WebKit::toHTMLInputElement(node);
+  HTMLInputElement* inputElement = toHTMLInputElement(node);
   if (inputElement)
     return autofill(inputElement, true, true, false);
   return false;
@@ -734,6 +748,10 @@ void EditorClientImpl::cancelPendingAutofill() {
 
 void EditorClientImpl::onAutocompleteSuggestionAccepted(
     HTMLInputElement* textField) {
+  if (m_webView->client())
+    m_webView->client()->didAcceptAutocompleteSuggestion(
+        WebInputElement(textField));
+
   WebFrameImpl* webframe =
       WebFrameImpl::fromFrame(textField->document()->frame());
   if (!webframe)
@@ -744,6 +762,12 @@ void EditorClientImpl::onAutocompleteSuggestionAccepted(
 
 bool EditorClientImpl::doTextFieldCommandFromEvent(Element* element,
                                                    KeyboardEvent* event) {
+  HTMLInputElement* inputElement = toHTMLInputElement(element);
+  if (m_webView->client() && inputElement) {
+    m_webView->client()->textFieldDidReceiveKeyDown(
+        WebInputElement(inputElement), WebKeyboardEventBuilder(*event));
+  }
+
   // Remember if backspace was pressed for the autofill.  It is not clear how to
   // find if backspace was pressed from textFieldDidBeginEditing and
   // textDidChangeInTextField as when these methods are called the value of the

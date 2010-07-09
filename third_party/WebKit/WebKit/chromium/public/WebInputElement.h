@@ -83,6 +83,7 @@ class WebInputElement : public WebFormControlElement {
   };
 
   WEBKIT_API bool autoComplete() const;
+  WEBKIT_API bool isReadOnly() const;
   WEBKIT_API bool isEnabledFormControl() const;
   WEBKIT_API InputType inputType() const;
   WEBKIT_API int maxLength() const;
@@ -99,6 +100,8 @@ class WebInputElement : public WebFormControlElement {
   WEBKIT_API void setAutofilled(bool);
   WEBKIT_API void dispatchFormControlChangeEvent();
   WEBKIT_API void setSelectionRange(int, int);
+  WEBKIT_API int selectionStart();
+  WEBKIT_API int selectionEnd();
 
 #if WEBKIT_IMPLEMENTATION
   WebInputElement(const WTF::PassRefPtr<WebCore::HTMLInputElement>&);
