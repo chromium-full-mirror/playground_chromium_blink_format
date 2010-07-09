@@ -2954,8 +2954,13 @@ bool AccessibilityRenderObject::renderObjectIsObservable(
     return true;
 
   // AX clients will listen for AXSelectedChildrenChanged on listboxes.
-  if (renderer->isListBox() ||
-      axObjectCache()->nodeHasRole(renderer->node(), "listbox"))
+  AXObjectCache* cache = axObjectCache();
+  Node* node = renderer->node();
+  if (renderer->isListBox() || cache->nodeHasRole(node, "listbox"))
+    return true;
+
+  // Textboxes should send out notifications.
+  if (cache->nodeHasRole(node, "textbox"))
     return true;
 
   return false;
