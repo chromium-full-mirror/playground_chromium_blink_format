@@ -61,9 +61,19 @@ static const int uninitializedLineNumberValue = -1;
 
 namespace {
 
-inline bool isTreeBuilderWhiteSpace(UChar cc) {
+inline bool isTreeBuilderWhitepace(UChar cc) {
   return cc == '\t' || cc == '\x0A' || cc == '\x0C' || cc == '\x0D' ||
          cc == ' ';
+}
+
+inline bool hasNonWhitespace(const String& string) {
+  const UChar* characters = string.characters();
+  const unsigned length = string.length();
+  for (unsigned i = 0; i < length; ++i) {
+    if (!isTreeBuilderWhitepace(characters[i]))
+      return true;
+  }
+  return false;
 }
 
 bool shouldUseLegacyTreeBuilder(Document* document) {
@@ -1945,27 +1955,32 @@ void HTMLTreeBuilder::processCharacter(AtomicHTMLToken& token) {
   switch (insertionMode()) {
     case InitialMode:
       ASSERT(insertionMode() == InitialMode);
-      notImplemented();
+      if (skipLeadingWhitespace(token))
+        return;
       processDefaultForInitialMode(token);
     // Fall through.
     case BeforeHTMLMode:
       ASSERT(insertionMode() == BeforeHTMLMode);
-      notImplemented();
+      if (skipLeadingWhitespace(token))
+        return;
       processDefaultForBeforeHTMLMode(token);
     // Fall through.
     case BeforeHeadMode:
       ASSERT(insertionMode() == BeforeHeadMode);
-      notImplemented();
+      if (skipLeadingWhitespace(token))
+        return;
       processDefaultForBeforeHeadMode(token);
     // Fall through.
     case InHeadMode:
       ASSERT(insertionMode() == InHeadMode);
-      notImplemented();
+      if (m_tree.insertLeadingWhitespace(token))
+        return;
       processDefaultForInHeadMode(token);
     // Fall through.
     case AfterHeadMode:
       ASSERT(insertionMode() == AfterHeadMode);
-      notImplemented();
+      if (m_tree.insertLeadingWhitespace(token))
+        return;
       processDefaultForAfterHeadMode(token);
     // Fall through
     case InBodyMode:
@@ -1975,6 +1990,8 @@ void HTMLTreeBuilder::processCharacter(AtomicHTMLToken& token) {
              insertionMode() == InCaptionMode || insertionMode() == InCellMode);
       m_tree.reconstructTheActiveFormattingElements();
       m_tree.insertTextNode(token);
+      if (m_framesetOk && hasNonWhitespace(token.characters()))
+        m_framesetOk = false;
       break;
     case InTableMode:
     case InTableBodyMode:
@@ -1985,9 +2002,18 @@ void HTMLTreeBuilder::processCharacter(AtomicHTMLToken& token) {
       notImplemented();  // Crazy pending characters.
       m_tree.insertTextNode(token);
       break;
+    case InTableTextMode:
+      notImplemented();  // Crazy pending characters.
+      break;
     case InColumnGroupMode:
       ASSERT(insertionMode() == InColumnGroupMode);
-      notImplemented();
+      if (m_tree.insertLeadingWhitespace(token))
+        return;
+      if (!processColgroupEndTagForInColumnGroup()) {
+        ASSERT(m_isParsingFragment);
+        return;
+      }
+      processCharacter(token);
       break;
     case AfterBodyMode:
     case AfterAfterBodyMode:
@@ -2003,16 +2029,21 @@ void HTMLTreeBuilder::processCharacter(AtomicHTMLToken& token) {
       break;
     case InHeadNoscriptMode:
       ASSERT(insertionMode() == InHeadNoscriptMode);
+      if (m_tree.insertLeadingWhitespace(token))
+        return;
       processDefaultForInHeadNoscriptMode(token);
       processToken(token);
       break;
     case InFramesetMode:
     case AfterFramesetMode:
-    case AfterAfterFramesetMode:
       ASSERT(insertionMode() == InFramesetMode ||
              insertionMode() == AfterFramesetMode ||
              insertionMode() == AfterAfterFramesetMode);
+      if (m_tree.insertLeadingWhitespace(token))
+        return;
       parseError(token);
+      // FIXME: We probably need some sort of loop here. We're basically
+      // filtering out the non-whitespace characters.
       break;
     case InSelectInTableMode:
     case InSelectMode:
@@ -2020,9 +2051,15 @@ void HTMLTreeBuilder::processCharacter(AtomicHTMLToken& token) {
              insertionMode() == InSelectInTableMode);
       m_tree.insertTextNode(token);
       break;
-    case InTableTextMode:
     case InForeignContentMode:
       notImplemented();
+      break;
+    case AfterAfterFramesetMode:
+      if (m_tree.insertLeadingWhitespaceWithActiveFormattingElements(token))
+        return;
+      parseError(token);
+      // FIXME: We probably need some sort of loop here. We're basically
+      // filtering out the non-whitespace characters.
       break;
   }
 }
