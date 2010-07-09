@@ -26,7 +26,7 @@
 #include "WebBackForwardControllerClient.h"
 
 #include "WebPage.h"
-#include <WebCore/BackForwardListImpl.h>
+#include "WebBackForwardListProxy.h"
 
 using namespace WebCore;
 
@@ -37,8 +37,8 @@ void WebBackForwardControllerClient::backForwardControllerDestroyed() {
 }
 
 PassRefPtr<BackForwardList>
-WebBackForwardControllerClient::createBackForwardList(Page* page) {
-  return BackForwardListImpl::create(page);
+WebBackForwardControllerClient::createBackForwardList(Page*) {
+  return WebBackForwardListProxy::create(m_page);
 }
 
 }  // namespace WebKit

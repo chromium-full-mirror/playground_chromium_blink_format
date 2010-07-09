@@ -39,10 +39,14 @@ class WebBackForwardListItem : public RefCounted<WebBackForwardListItem> {
   static PassRefPtr<WebBackForwardListItem> create(
       const WebCore::String& originalURL,
       const WebCore::String& url,
-      const WebCore::String& title) {
-    return adoptRef(new WebBackForwardListItem(originalURL, url, title));
+      const WebCore::String& title,
+      uint64_t itemID) {
+    return adoptRef(
+        new WebBackForwardListItem(originalURL, url, title, itemID));
   }
   ~WebBackForwardListItem();
+
+  uint64_t itemID() const { return m_itemID; }
 
   const WebCore::String& originalURL() const { return m_originalURL; }
   const WebCore::String& url() const { return m_url; }
@@ -51,11 +55,13 @@ class WebBackForwardListItem : public RefCounted<WebBackForwardListItem> {
  private:
   WebBackForwardListItem(const WebCore::String& originalURL,
                          const WebCore::String& url,
-                         const WebCore::String& title);
+                         const WebCore::String& title,
+                         uint64_t itemID);
 
   WebCore::String m_originalURL;
   WebCore::String m_url;
   WebCore::String m_title;
+  uint64_t m_itemID;
 };
 
 }  // namespace WebKit

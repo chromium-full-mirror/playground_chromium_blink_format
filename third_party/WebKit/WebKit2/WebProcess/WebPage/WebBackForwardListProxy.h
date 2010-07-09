@@ -39,6 +39,8 @@ class WebBackForwardListProxy : public WebCore::BackForwardList {
   }
   ~WebBackForwardListProxy();
 
+  static WebCore::HistoryItem* itemForID(uint64_t);
+
   void addItem(PassRefPtr<WebCore::HistoryItem>);
   void goBack();
   void goForward();
@@ -76,6 +78,10 @@ class WebBackForwardListProxy : public WebCore::BackForwardList {
   WebBackForwardListProxy(WebPage*);
 
   WebPage* m_page;
+
+  unsigned m_capacity;
+  bool m_closed;
+  bool m_enabled;
 };
 
 }  // namespace WebKit

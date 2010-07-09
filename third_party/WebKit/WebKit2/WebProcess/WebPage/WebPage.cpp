@@ -30,6 +30,7 @@
 #include "InjectedBundle.h"
 #include "MessageID.h"
 #include "WebBackForwardControllerClient.h"
+#include "WebBackForwardListProxy.h"
 #include "WebChromeClient.h"
 #include "WebContextMenuClient.h"
 #include "WebCoreArgumentCoders.h"
@@ -202,22 +203,9 @@ void WebPage::goBack() {
   m_page->goBack();
 }
 
-void WebPage::backForwardListDidChange() {
-  bool canNowGoBack = !!m_page->backForwardList()->backItem();
-  if (canNowGoBack != m_canGoBack) {
-    m_canGoBack = canNowGoBack;
-    WebProcess::shared().connection()->send(
-        WebPageProxyMessage::DidChangeCanGoBack, m_pageID,
-        CoreIPC::In(m_canGoBack));
-  }
-
-  bool canNowGoForward = !!m_page->backForwardList()->forwardItem();
-  if (canNowGoForward != m_canGoForward) {
-    m_canGoForward = canNowGoForward;
-    WebProcess::shared().connection()->send(
-        WebPageProxyMessage::DidChangeCanGoForward, m_pageID,
-        CoreIPC::In(m_canGoForward));
-  }
+void WebPage::goToBackForwardItem(uint64_t backForwardItemID) {
+  HistoryItem* item = WebBackForwardListProxy::itemForID(backForwardItemID);
+  m_page->goToItem(item, FrameLoadTypeIndexedBackForward);
 }
 
 void WebPage::layoutIfNeeded() {
@@ -448,6 +436,13 @@ void WebPage::didReceiveMessage(CoreIPC::Connection* connection,
     case WebPageMessage::GoBack:
       goBack();
       break;
+    case WebPageMessage::GoToBackForwardItem: {
+      uint64_t backForwardItemID;
+      if (!arguments.decode(CoreIPC::Out(backForwardItemID)))
+        return;
+      goToBackForwardItem(backForwardItemID);
+      break;
+    }
     case WebPageMessage::DidReceivePolicyDecision: {
       uint64_t frameID;
       uint64_t listenerID;
