@@ -3439,9 +3439,15 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
                    (!m_parentNode && valueType == CSSValue::CSS_INHERIT);
 
   // These properties are used to set the correct margins/padding on RTL lists.
-  if (id == CSSPropertyWebkitMarginStart)
+  if (id == CSSPropertyWebkitMarginEnd)
+    id = m_style->direction() == LTR ? CSSPropertyMarginRight
+                                     : CSSPropertyMarginLeft;
+  else if (id == CSSPropertyWebkitMarginStart)
     id = m_style->direction() == LTR ? CSSPropertyMarginLeft
                                      : CSSPropertyMarginRight;
+  else if (id == CSSPropertyWebkitPaddingEnd)
+    id = m_style->direction() == LTR ? CSSPropertyPaddingRight
+                                     : CSSPropertyPaddingLeft;
   else if (id == CSSPropertyWebkitPaddingStart)
     id = m_style->direction() == LTR ? CSSPropertyPaddingLeft
                                      : CSSPropertyPaddingRight;
@@ -6083,7 +6089,9 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
     case CSSPropertyTextUnderlineStyle:
     case CSSPropertyTextUnderlineWidth:
     case CSSPropertyWebkitFontSizeDelta:
+    case CSSPropertyWebkitMarginEnd:
     case CSSPropertyWebkitMarginStart:
+    case CSSPropertyWebkitPaddingEnd:
     case CSSPropertyWebkitPaddingStart:
     case CSSPropertyWebkitTextDecorationsInEffect:
     case CSSPropertyWebkitTextStroke:
