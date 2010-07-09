@@ -392,6 +392,9 @@ class BytecodeGenerator : public FastAllocBase {
   RegisterID* emitPutById(RegisterID* base,
                           const Identifier& property,
                           RegisterID* value);
+  RegisterID* emitDirectPutById(RegisterID* base,
+                                const Identifier& property,
+                                RegisterID* value);
   RegisterID* emitDeleteById(RegisterID* dst,
                              RegisterID* base,
                              const Identifier&);

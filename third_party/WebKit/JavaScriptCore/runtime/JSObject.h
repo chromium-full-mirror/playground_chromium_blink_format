@@ -231,6 +231,9 @@ class JSObject : public JSCell {
   void putDirect(const Identifier& propertyName,
                  JSValue value,
                  unsigned attr = 0);
+  void putDirect(const Identifier& propertyName,
+                 JSValue value,
+                 PutPropertySlot&);
 
   void putDirectFunction(const Identifier& propertyName,
                          JSCell* value,
@@ -735,6 +738,12 @@ inline void JSObject::putDirect(const Identifier& propertyName,
   putDirectInternal(propertyName, value, attributes, false, slot, 0);
 }
 
+inline void JSObject::putDirect(const Identifier& propertyName,
+                                JSValue value,
+                                PutPropertySlot& slot) {
+  putDirectInternal(propertyName, value, 0, false, slot, 0);
+}
+
 inline void JSObject::putDirectFunction(const Identifier& propertyName,
                                         JSCell* value,
                                         unsigned attributes,
@@ -852,6 +861,14 @@ inline void JSValue::put(ExecState* exec,
     return;
   }
   asCell()->put(exec, propertyName, value, slot);
+}
+
+inline void JSValue::putDirect(ExecState*,
+                               const Identifier& propertyName,
+                               JSValue value,
+                               PutPropertySlot& slot) {
+  ASSERT(isCell() && isObject());
+  asObject(asCell())->putDirect(propertyName, value, slot);
 }
 
 inline void JSValue::put(ExecState* exec,

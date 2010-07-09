@@ -273,10 +273,12 @@ class JIT : private JSInterfaceJIT {
                                        Structure* newStructure,
                                        size_t cachedOffset,
                                        StructureChain* chain,
-                                       ReturnAddressPtr returnAddress) {
+                                       ReturnAddressPtr returnAddress,
+                                       bool direct) {
     JIT jit(globalData, codeBlock);
     jit.privateCompilePutByIdTransition(stubInfo, oldStructure, newStructure,
-                                        cachedOffset, chain, returnAddress);
+                                        cachedOffset, chain, returnAddress,
+                                        direct);
   }
 
   static void compileCTIMachineTrampolines(
@@ -304,7 +306,8 @@ class JIT : private JSInterfaceJIT {
                                   StructureStubInfo*,
                                   Structure*,
                                   size_t cachedOffset,
-                                  ReturnAddressPtr returnAddress);
+                                  ReturnAddressPtr returnAddress,
+                                  bool direct);
   static void patchMethodCallProto(CodeBlock* codeblock,
                                    MethodCallLinkInfo&,
                                    JSFunction*,
@@ -398,7 +401,8 @@ class JIT : private JSInterfaceJIT {
                                        Structure*,
                                        size_t cachedOffset,
                                        StructureChain*,
-                                       ReturnAddressPtr returnAddress);
+                                       ReturnAddressPtr returnAddress,
+                                       bool direct);
 
   void privateCompileCTIMachineTrampolines(
       RefPtr<ExecutablePool>* executablePool,

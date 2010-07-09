@@ -867,7 +867,8 @@ NEVER_INLINE void JITThunks::tryCachePutByID(CallFrame* callFrame,
                                              ReturnAddressPtr returnAddress,
                                              JSValue baseValue,
                                              const PutPropertySlot& slot,
-                                             StructureStubInfo* stubInfo) {
+                                             StructureStubInfo* stubInfo,
+                                             bool direct) {
   // The interpreter checks for recursion here; I do not believe this can occur
   // in CTI.
 
@@ -876,8 +877,10 @@ NEVER_INLINE void JITThunks::tryCachePutByID(CallFrame* callFrame,
 
   // Uncacheable: give up.
   if (!slot.isCacheable()) {
-    ctiPatchCallByReturnAddress(codeBlock, returnAddress,
-                                FunctionPtr(cti_op_put_by_id_generic));
+    ctiPatchCallByReturnAddress(
+        codeBlock, returnAddress,
+        FunctionPtr(direct ? cti_op_put_by_id_direct_generic
+                           : cti_op_put_by_id_generic));
     return;
   }
 
@@ -885,15 +888,19 @@ NEVER_INLINE void JITThunks::tryCachePutByID(CallFrame* callFrame,
   Structure* structure = baseCell->structure();
 
   if (structure->isUncacheableDictionary()) {
-    ctiPatchCallByReturnAddress(codeBlock, returnAddress,
-                                FunctionPtr(cti_op_put_by_id_generic));
+    ctiPatchCallByReturnAddress(
+        codeBlock, returnAddress,
+        FunctionPtr(direct ? cti_op_put_by_id_direct_generic
+                           : cti_op_put_by_id_generic));
     return;
   }
 
   // If baseCell != base, then baseCell must be a proxy for another object.
   if (baseCell != slot.base()) {
-    ctiPatchCallByReturnAddress(codeBlock, returnAddress,
-                                FunctionPtr(cti_op_put_by_id_generic));
+    ctiPatchCallByReturnAddress(
+        codeBlock, returnAddress,
+        FunctionPtr(direct ? cti_op_put_by_id_direct_generic
+                           : cti_op_put_by_id_generic));
     return;
   }
 
@@ -902,8 +909,10 @@ NEVER_INLINE void JITThunks::tryCachePutByID(CallFrame* callFrame,
   // Structure transition, cache transition info
   if (slot.type() == PutPropertySlot::NewProperty) {
     if (structure->isDictionary()) {
-      ctiPatchCallByReturnAddress(codeBlock, returnAddress,
-                                  FunctionPtr(cti_op_put_by_id_generic));
+      ctiPatchCallByReturnAddress(
+          codeBlock, returnAddress,
+          FunctionPtr(direct ? cti_op_put_by_id_direct_generic
+                             : cti_op_put_by_id_generic));
       return;
     }
 
@@ -916,14 +925,14 @@ NEVER_INLINE void JITThunks::tryCachePutByID(CallFrame* callFrame,
     JIT::compilePutByIdTransition(callFrame->scopeChain()->globalData,
                                   codeBlock, stubInfo, structure->previousID(),
                                   structure, slot.cachedOffset(),
-                                  prototypeChain, returnAddress);
+                                  prototypeChain, returnAddress, direct);
     return;
   }
 
   stubInfo->initPutByIdReplace(structure);
 
   JIT::patchPutByIdReplace(codeBlock, stubInfo, structure, slot.cachedOffset(),
-                           returnAddress);
+                           returnAddress, direct);
 }
 
 NEVER_INLINE void JITThunks::tryCacheGetByID(CallFrame* callFrame,
@@ -1415,6 +1424,16 @@ DEFINE_STUB_FUNCTION(void, op_put_by_id_generic) {
   CHECK_FOR_EXCEPTION_AT_END();
 }
 
+DEFINE_STUB_FUNCTION(void, op_put_by_id_direct_generic) {
+  STUB_INIT_STACK_FRAME(stackFrame);
+
+  PutPropertySlot slot;
+  stackFrame.args[0].jsValue().putDirect(stackFrame.callFrame,
+                                         stackFrame.args[1].identifier(),
+                                         stackFrame.args[2].jsValue(), slot);
+  CHECK_FOR_EXCEPTION_AT_END();
+}
+
 DEFINE_STUB_FUNCTION(EncodedJSValue, op_get_by_id_generic) {
   STUB_INIT_STACK_FRAME(stackFrame);
 
@@ -1446,7 +1465,29 @@ DEFINE_STUB_FUNCTION(void, op_put_by_id) {
     stubInfo->setSeen();
   else
     JITThunks::tryCachePutByID(callFrame, codeBlock, STUB_RETURN_ADDRESS,
-                               stackFrame.args[0].jsValue(), slot, stubInfo);
+                               stackFrame.args[0].jsValue(), slot, stubInfo,
+                               false);
+
+  CHECK_FOR_EXCEPTION_AT_END();
+}
+
+DEFINE_STUB_FUNCTION(void, op_put_by_id_direct) {
+  STUB_INIT_STACK_FRAME(stackFrame);
+  CallFrame* callFrame = stackFrame.callFrame;
+  Identifier& ident = stackFrame.args[1].identifier();
+
+  PutPropertySlot slot;
+  stackFrame.args[0].jsValue().putDirect(callFrame, ident,
+                                         stackFrame.args[2].jsValue(), slot);
+
+  CodeBlock* codeBlock = stackFrame.callFrame->codeBlock();
+  StructureStubInfo* stubInfo = &codeBlock->getStubInfo(STUB_RETURN_ADDRESS);
+  if (!stubInfo->seenOnce())
+    stubInfo->setSeen();
+  else
+    JITThunks::tryCachePutByID(callFrame, codeBlock, STUB_RETURN_ADDRESS,
+                               stackFrame.args[0].jsValue(), slot, stubInfo,
+                               true);
 
   CHECK_FOR_EXCEPTION_AT_END();
 }
@@ -1460,6 +1501,19 @@ DEFINE_STUB_FUNCTION(void, op_put_by_id_fail) {
   PutPropertySlot slot;
   stackFrame.args[0].jsValue().put(callFrame, ident,
                                    stackFrame.args[2].jsValue(), slot);
+
+  CHECK_FOR_EXCEPTION_AT_END();
+}
+
+DEFINE_STUB_FUNCTION(void, op_put_by_id_direct_fail) {
+  STUB_INIT_STACK_FRAME(stackFrame);
+
+  CallFrame* callFrame = stackFrame.callFrame;
+  Identifier& ident = stackFrame.args[1].identifier();
+
+  PutPropertySlot slot;
+  stackFrame.args[0].jsValue().putDirect(callFrame, ident,
+                                         stackFrame.args[2].jsValue(), slot);
 
   CHECK_FOR_EXCEPTION_AT_END();
 }

@@ -617,11 +617,13 @@ void JIT::emitSlow_op_put_by_id(Instruction* currentInstruction,
                                 Vector<SlowCaseEntry>::iterator& iter) {
   int base = currentInstruction[1].u.operand;
   int ident = currentInstruction[2].u.operand;
+  int direct = currentInstruction[8].u.operand;
 
   linkSlowCaseIfNotJSCell(iter, base);
   linkSlowCase(iter);
 
-  JITStubCall stubCall(this, cti_op_put_by_id);
+  JITStubCall stubCall(this,
+                       direct ? cti_op_put_by_id_direct : cti_op_put_by_id);
   stubCall.addArgument(regT1, regT0);
   stubCall.addArgument(ImmPtr(&(m_codeBlock->identifier(ident))));
   stubCall.addArgument(regT3, regT2);
@@ -701,7 +703,8 @@ void JIT::privateCompilePutByIdTransition(StructureStubInfo* stubInfo,
                                           Structure* newStructure,
                                           size_t cachedOffset,
                                           StructureChain* chain,
-                                          ReturnAddressPtr returnAddress) {
+                                          ReturnAddressPtr returnAddress,
+                                          bool direct) {
   // It is assumed that regT0 contains the basePayload and regT1 contains the
   // baseTag.  The value can be found on the stack.
 
@@ -712,9 +715,12 @@ void JIT::privateCompilePutByIdTransition(StructureStubInfo* stubInfo,
                 ImmPtr(oldStructure)));
   testPrototype(oldStructure, failureCases);
 
-  // Verify that nothing in the prototype chain has a setter for this property.
-  for (RefPtr<Structure>* it = chain->head(); *it; ++it)
-    testPrototype(it->get(), failureCases);
+  if (!direct) {
+    // Verify that nothing in the prototype chain has a setter for this
+    // property.
+    for (RefPtr<Structure>* it = chain->head(); *it; ++it)
+      testPrototype(it->get(), failureCases);
+  }
 
   // Reallocate property storage if needed.
   Call callTarget;
@@ -764,7 +770,9 @@ void JIT::privateCompilePutByIdTransition(StructureStubInfo* stubInfo,
 
   LinkBuffer patchBuffer(this, m_codeBlock->executablePool());
 
-  patchBuffer.link(failureCall, FunctionPtr(cti_op_put_by_id_fail));
+  patchBuffer.link(failureCall,
+                   FunctionPtr(direct ? cti_op_put_by_id_direct_fail
+                                      : cti_op_put_by_id_fail));
 
   if (willNeedStorageRealloc) {
     ASSERT(m_calls.size() == 1);
@@ -852,15 +860,17 @@ void JIT::patchPutByIdReplace(CodeBlock* codeBlock,
                               StructureStubInfo* stubInfo,
                               Structure* structure,
                               size_t cachedOffset,
-                              ReturnAddressPtr returnAddress) {
+                              ReturnAddressPtr returnAddress,
+                              bool direct) {
   RepatchBuffer repatchBuffer(codeBlock);
 
   // We don't want to patch more than once - in future go to
   // cti_op_put_by_id_generic.
   // Should probably go to cti_op_put_by_id_fail, but that doesn't do anything
   // interesting right now.
-  repatchBuffer.relinkCallerToFunction(returnAddress,
-                                       FunctionPtr(cti_op_put_by_id_generic));
+  repatchBuffer.relinkCallerToFunction(
+      returnAddress, FunctionPtr(direct ? cti_op_put_by_id_direct_generic
+                                        : cti_op_put_by_id_generic));
 
   int offset = sizeof(JSValue) * cachedOffset;
 

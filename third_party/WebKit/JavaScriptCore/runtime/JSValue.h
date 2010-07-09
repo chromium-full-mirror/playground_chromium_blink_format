@@ -189,6 +189,10 @@ class JSValue {
            const Identifier& propertyName,
            JSValue,
            PutPropertySlot&);
+  void putDirect(ExecState*,
+                 const Identifier& propertyName,
+                 JSValue,
+                 PutPropertySlot&);
   void put(ExecState*, unsigned propertyName, JSValue);
 
   bool needsThisConversion() const;
