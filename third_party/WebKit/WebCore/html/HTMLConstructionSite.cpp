@@ -74,6 +74,9 @@ PassRefPtr<ChildType> HTMLConstructionSite::attach(
     PassRefPtr<ChildType> prpChild) {
   RefPtr<ChildType> child = prpChild;
 
+  // FIXME: It's confusing that HTMLConstructionSite::attach does the magic
+  // redirection to the foster parent but HTMLConstructionSite::attachAtSite
+  // doesn't.  It feels like we're missing a concept somehow.
   if (m_redirectAttachToFosterParent) {
     fosterParent(child.get());
     return child.release();
@@ -87,6 +90,20 @@ PassRefPtr<ChildType> HTMLConstructionSite::attach(
   // open elements.
   child->attach();
   return child.release();
+}
+
+void HTMLConstructionSite::attachAtSite(const AttachmentSite& site,
+                                        PassRefPtr<Node> child) {
+  if (site.nextChild) {
+    // FIXME: We need an insertElement which does not send mutation events.
+    ExceptionCode ec = 0;
+    site.parent->insertBefore(child, site.nextChild, ec);
+    // FIXME: Do we need to call attach()?
+    ASSERT(!ec);
+    return;
+  }
+  site.parent->parserAddChild(child);
+  // FIXME: Do we need to call attach()?
 }
 
 HTMLConstructionSite::HTMLConstructionSite(
@@ -227,16 +244,23 @@ void HTMLConstructionSite::insertForeignElement(
 }
 
 void HTMLConstructionSite::insertTextNode(const String& characters) {
-  if (Node* lastChild = currentElement()->lastChild()) {
-    if (lastChild->isTextNode()) {
-      // FIXME: We're only supposed to append to this text node if it
-      // was the last text node inserted by the parser.
-      CharacterData* textNode = static_cast<CharacterData*>(lastChild);
-      textNode->parserAppendData(characters);
-      return;
-    }
+  AttachmentSite site;
+  site.parent = currentElement();
+  site.nextChild = 0;
+  if (m_redirectAttachToFosterParent)
+    findFosterSite(site);
+
+  Node* previousChild = site.nextChild ? site.nextChild->previousSibling()
+                                       : site.parent->lastChild();
+  if (previousChild && previousChild->isTextNode()) {
+    // FIXME: We're only supposed to append to this text node if it
+    // was the last text node inserted by the parser.
+    CharacterData* textNode = static_cast<CharacterData*>(previousChild);
+    textNode->parserAppendData(characters);
+    return;
   }
-  attach(currentElement(), Text::create(m_document, characters));
+
+  attachAtSite(site, Text::create(m_document, characters));
 }
 
 PassRefPtr<Element> HTMLConstructionSite::createElement(
@@ -305,28 +329,28 @@ void HTMLConstructionSite::generateImpliedEndTags() {
     m_openElements.pop();
 }
 
-void HTMLConstructionSite::fosterParent(Node* node) {
-  Element* fosterParentElement = 0;
+void HTMLConstructionSite::findFosterSite(AttachmentSite& site) {
   HTMLElementStack::ElementRecord* lastTableElementRecord =
       m_openElements.topmost(tableTag.localName());
   if (lastTableElementRecord) {
     Element* lastTableElement = lastTableElementRecord->element();
-    if (lastTableElement->parent()) {
-      // FIXME: We need an insertHTMLElement which does not send mutation
-      // events.
-      ExceptionCode ec = 0;
-      lastTableElement->parent()->insertBefore(node, lastTableElement, ec);
-      // FIXME: Do we need to call attach()?
-      ASSERT(!ec);
+    if (Node* parent = lastTableElement->parent()) {
+      site.parent = parent;
+      site.nextChild = lastTableElement;
       return;
     }
-    fosterParentElement = lastTableElementRecord->next()->element();
-  } else {
-    // Fragment case
-    fosterParentElement = m_openElements.bottom();  // <html> element
+    site.parent = lastTableElementRecord->next()->element();
+    site.nextChild = 0;
+    return;
   }
+  // Fragment case
+  site.parent = m_openElements.bottom();  // <html> element
+  site.nextChild = 0;
+}
 
-  fosterParentElement->parserAddChild(node);
-  // FIXME: Do we need to call attach()?
+void HTMLConstructionSite::fosterParent(Node* node) {
+  AttachmentSite site;
+  findFosterSite(site);
+  attachAtSite(site, node);
 }
 }
