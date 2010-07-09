@@ -107,8 +107,6 @@ class HTMLConstructionSite : public Noncopyable {
   };
 
  private:
-  friend class RedirectToFosterParentGuard;
-
   struct AttachmentSite {
     Node* parent;
     Node* nextChild;

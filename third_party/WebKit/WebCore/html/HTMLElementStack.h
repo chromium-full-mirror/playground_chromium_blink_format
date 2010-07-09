@@ -108,6 +108,8 @@ class HTMLElementStack : public Noncopyable {
   bool inTableScope(const AtomicString& tagName) const;
   bool inTableScope(const QualifiedName&) const;
 
+  bool hasOnlyHTMLElementsInScope() const;
+
   Element* htmlElement() const;
   Element* headElement() const;
   Element* bodyElement() const;
