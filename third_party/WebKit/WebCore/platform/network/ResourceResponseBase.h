@@ -99,6 +99,9 @@ class ResourceResponseBase : public FastAllocBase {
   double expires() const;
   double lastModified() const;
 
+  unsigned connectionID() const;
+  void setConnectionID(unsigned);
+
   ResourceLoadTiming* resourceLoadTiming() const;
   void setResourceLoadTiming(PassRefPtr<ResourceLoadTiming>);
 
@@ -141,6 +144,7 @@ class ResourceResponseBase : public FastAllocBase {
   String m_httpStatusText;
   HTTPHeaderMap m_httpHeaderFields;
   time_t m_lastModifiedDate;
+  unsigned m_connectionID;
   RefPtr<ResourceLoadTiming> m_resourceLoadTiming;
 
   bool m_isNull : 1;

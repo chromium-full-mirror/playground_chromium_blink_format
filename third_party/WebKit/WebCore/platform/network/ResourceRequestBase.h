@@ -150,6 +150,12 @@ class ResourceRequestBase : public FastAllocBase {
     m_reportUploadProgress = reportUploadProgress;
   }
 
+  // Whether the timing information should be collected for the request.
+  bool reportLoadTiming() const { return m_reportLoadTiming; }
+  void setReportLoadTiming(bool reportLoadTiming) {
+    m_reportLoadTiming = reportLoadTiming;
+  }
+
   // What this request is for.
   TargetType targetType() const { return m_targetType; }
   void setTargetType(TargetType type) { m_targetType = type; }
@@ -161,6 +167,7 @@ class ResourceRequestBase : public FastAllocBase {
       : m_resourceRequestUpdated(false),
         m_platformRequestUpdated(true),
         m_reportUploadProgress(false),
+        m_reportLoadTiming(false),
         m_targetType(TargetIsSubresource) {}
 
   ResourceRequestBase(const KURL& url, ResourceRequestCachePolicy policy)
@@ -172,6 +179,7 @@ class ResourceRequestBase : public FastAllocBase {
         m_resourceRequestUpdated(true),
         m_platformRequestUpdated(false),
         m_reportUploadProgress(false),
+        m_reportLoadTiming(false),
         m_targetType(TargetIsSubresource) {}
 
   void updatePlatformRequest() const;
@@ -190,6 +198,7 @@ class ResourceRequestBase : public FastAllocBase {
   mutable bool m_resourceRequestUpdated;
   mutable bool m_platformRequestUpdated;
   bool m_reportUploadProgress;
+  bool m_reportLoadTiming;
   TargetType m_targetType;
 
  private:

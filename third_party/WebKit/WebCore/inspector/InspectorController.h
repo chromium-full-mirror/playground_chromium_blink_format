@@ -185,7 +185,7 @@ class InspectorController
                                    DocumentLoader*,
                                    const ResourceRequest&);
   void willSendRequest(unsigned long identifier,
-                       const ResourceRequest&,
+                       ResourceRequest&,
                        const ResourceResponse& redirectResponse);
   void didReceiveResponse(unsigned long identifier, const ResourceResponse&);
   void didReceiveContentLength(unsigned long identifier, int lengthReceived);

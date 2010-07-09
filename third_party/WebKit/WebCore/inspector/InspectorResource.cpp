@@ -39,6 +39,7 @@
 #include "DocumentLoader.h"
 #include "Frame.h"
 #include "InspectorFrontend.h"
+#include "ResourceLoadTiming.h"
 #include "ResourceRequest.h"
 #include "ResourceResponse.h"
 #include "TextEncoding.h"
@@ -64,6 +65,7 @@ InspectorResource::InspectorResource(unsigned long identifier,
       m_endTime(-1.0),
       m_loadEventTime(-1.0),
       m_domContentEventTime(-1.0),
+      m_connectionID(0),
       m_isMainResource(false) {}
 
 InspectorResource::~InspectorResource() {}
@@ -131,6 +133,22 @@ void InspectorResource::updateResponse(const ResourceResponse& response) {
   m_responseStatusText = response.httpStatusText();
   m_suggestedFilename = response.suggestedFilename();
 
+  m_connectionID = response.connectionID();
+  m_loadTiming = response.resourceLoadTiming();
+  if (m_loadTiming && m_loadTiming->requestTime) {
+    m_responseReceivedTime = m_loadTiming->requestTime;
+    if (m_loadTiming->proxyDuration != -1)
+      m_responseReceivedTime += m_loadTiming->proxyDuration;
+    if (m_loadTiming->dnsDuration != -1)
+      m_responseReceivedTime += m_loadTiming->dnsDuration;
+    if (m_loadTiming->connectDuration != -1)
+      m_responseReceivedTime += m_loadTiming->connectDuration;
+    m_responseReceivedTime += m_loadTiming->sendDuration;
+    m_responseReceivedTime += m_loadTiming->receiveHeadersDuration;
+  } else
+    m_responseReceivedTime = currentTime();
+
+  m_changes.set(TimingChange);
   m_changes.set(ResponseChange);
   m_changes.set(TypeChange);
 }
@@ -173,6 +191,10 @@ void InspectorResource::updateScriptObject(InspectorFrontend* frontend) {
     ScriptObject responseHeaders = frontend->newScriptObject();
     populateHeadersObject(&responseHeaders, m_responseHeaderFields);
     jsonObject.set("responseHeaders", responseHeaders);
+    jsonObject.set("connectionID", m_connectionID);
+    if (m_loadTiming)
+      jsonObject.set("timing",
+                     buildObjectForTiming(frontend, m_loadTiming.get()));
     jsonObject.set("didResponseChange", true);
   }
 
@@ -334,11 +356,6 @@ void InspectorResource::startTiming() {
   m_changes.set(TimingChange);
 }
 
-void InspectorResource::markResponseReceivedTime() {
-  m_responseReceivedTime = currentTime();
-  m_changes.set(TimingChange);
-}
-
 void InspectorResource::endTiming() {
   m_endTime = currentTime();
   m_finished = true;
@@ -370,6 +387,20 @@ void InspectorResource::addLength(int lengthReceived) {
   // until its loading is completed.
   m_endTime = currentTime();
   m_changes.set(TimingChange);
+}
+
+ScriptObject InspectorResource::buildObjectForTiming(
+    InspectorFrontend* frontend,
+    ResourceLoadTiming* timing) {
+  ScriptObject jsonObject = frontend->newScriptObject();
+  jsonObject.set("requestTime", timing->requestTime);
+  jsonObject.set("proxyDuration", timing->proxyDuration);
+  jsonObject.set("dnsDuration", timing->dnsDuration);
+  jsonObject.set("connectDuration", timing->connectDuration);
+  jsonObject.set("sendDuration", timing->sendDuration);
+  jsonObject.set("receiveHeadersDuration", timing->receiveHeadersDuration);
+  jsonObject.set("sslDuration", timing->sslDuration);
+  return jsonObject;
 }
 
 }  // namespace WebCore

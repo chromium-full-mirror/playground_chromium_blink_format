@@ -502,9 +502,9 @@ void WebDevToolsAgentImpl::identifierForInitialRequest(
 }
 
 void WebDevToolsAgentImpl::willSendRequest(unsigned long resourceId,
-                                           const WebURLRequest& request) {
+                                           WebURLRequest& request) {
   if (InspectorController* ic = inspectorController())
-    ic->willSendRequest(resourceId, request.toResourceRequest(),
+    ic->willSendRequest(resourceId, request.toMutableResourceRequest(),
                         ResourceResponse());
 }
 

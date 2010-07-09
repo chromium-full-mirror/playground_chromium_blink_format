@@ -45,6 +45,7 @@ class WebCString;
 class WebHTTPHeaderVisitor;
 class WebString;
 class WebURL;
+class WebURLLoadTiming;
 class WebURLResponsePrivate;
 
 class WebURLResponse {
@@ -71,6 +72,12 @@ class WebURLResponse {
 
   WEBKIT_API WebURL url() const;
   WEBKIT_API void setURL(const WebURL&);
+
+  WEBKIT_API unsigned connectionID() const;
+  WEBKIT_API void setConnectionID(unsigned);
+
+  WEBKIT_API WebURLLoadTiming loadTiming();
+  WEBKIT_API void setLoadTiming(const WebURLLoadTiming&);
 
   WEBKIT_API double responseTime() const;
   WEBKIT_API void setResponseTime(double);

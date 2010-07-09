@@ -99,7 +99,7 @@ class WebDevToolsAgentImpl : public WebDevToolsAgentPrivate,
   virtual void identifierForInitialRequest(unsigned long,
                                            WebFrame*,
                                            const WebURLRequest&);
-  virtual void willSendRequest(unsigned long, const WebURLRequest&);
+  virtual void willSendRequest(unsigned long, WebURLRequest&);
   virtual void didReceiveData(unsigned long, int length);
   virtual void didReceiveResponse(unsigned long, const WebURLResponse&);
   virtual void didFinishLoading(unsigned long);
