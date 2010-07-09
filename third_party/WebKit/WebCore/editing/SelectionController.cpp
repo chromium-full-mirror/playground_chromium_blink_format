@@ -1527,6 +1527,10 @@ void SelectionController::updateAppearance() {
   }
 #endif
 
+  // We need to update style in case the node containing the selection is made
+  // display:none.
+  m_frame->document()->updateStyleIfNeeded();
+
   RenderView* view = m_frame->contentRenderer();
   if (!view)
     return;
