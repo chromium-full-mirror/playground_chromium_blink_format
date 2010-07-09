@@ -122,8 +122,8 @@ class ApplicationCacheHost : public Noncopyable {
   bool update();
   bool swapCache();
 
-  void setDOMApplicationCache(DOMApplicationCache* domApplicationCache);
-  void notifyDOMApplicationCache(EventID id);
+  void setDOMApplicationCache(DOMApplicationCache*);
+  void notifyDOMApplicationCache(EventID, int progressTotal, int progressDone);
 
   void
   stopDeferringEvents();  // Also raises the events that have been queued up.
@@ -136,10 +136,20 @@ class ApplicationCacheHost : public Noncopyable {
   bool isApplicationCacheEnabled();
   DocumentLoader* documentLoader() const { return m_documentLoader; }
 
+  struct DeferredEvent {
+    EventID eventID;
+    int progressTotal;
+    int progressDone;
+    DeferredEvent(EventID id, int total, int done)
+        : eventID(id), progressTotal(total), progressDone(done) {}
+  };
+
   DOMApplicationCache* m_domApplicationCache;
   DocumentLoader* m_documentLoader;
   bool m_defersEvents;  // Events are deferred until after document onload.
-  Vector<EventID> m_deferredEvents;
+  Vector<DeferredEvent> m_deferredEvents;
+
+  void dispatchDOMEvent(EventID, int progressTotal, int progressDone);
 
 #if PLATFORM(CHROMIUM)
   friend class ApplicationCacheHostInternal;
