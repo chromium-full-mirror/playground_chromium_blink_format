@@ -165,11 +165,6 @@ class HTMLTreeBuilder : public Noncopyable {
   void reparentChildren(Element* oldParent, Element* newParent);
   void callTheAdoptionAgency(AtomicHTMLToken&);
 
-  bool skipLeadingWhitespace(AtomicHTMLToken&) {
-    notImplemented();
-    return false;
-  }
-
   void closeTheCell();
 
   template <bool shouldClose(const Element*)>

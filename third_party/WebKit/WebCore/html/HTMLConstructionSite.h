@@ -56,17 +56,7 @@ class HTMLConstructionSite : public Noncopyable {
   void insertHTMLHeadElement(AtomicHTMLToken&);
   void insertHTMLBodyElement(AtomicHTMLToken&);
   void insertScriptElement(AtomicHTMLToken&);
-  void insertTextNode(AtomicHTMLToken&);
-
-  bool insertLeadingWhitespace(AtomicHTMLToken&) {
-    notImplemented();
-    return false;
-  }
-
-  bool insertLeadingWhitespaceWithActiveFormattingElements(AtomicHTMLToken&) {
-    notImplemented();
-    return false;
-  }
+  void insertTextNode(const String&);
 
   void insertHTMLHtmlStartTagBeforeHTML(AtomicHTMLToken&);
   void insertHTMLHtmlStartTagInBody(AtomicHTMLToken&);
