@@ -114,6 +114,7 @@ class WebPageProxy : public RefCounted<WebPageProxy> {
 
   void setFocused(bool isFocused);
   void setActive(bool active);
+  void setIsInWindow(bool isInWindow);
 
   void mouseEvent(const WebMouseEvent&);
   void wheelEvent(const WebWheelEvent&);
@@ -236,7 +237,6 @@ class WebPageProxy : public RefCounted<WebPageProxy> {
   WebHistoryClient m_historyClient;
 
   OwnPtr<DrawingAreaProxy> m_drawingArea;
-
   RefPtr<WebPageNamespace> m_pageNamespace;
   RefPtr<WebFrameProxy> m_mainFrame;
   HashMap<uint64_t, RefPtr<WebFrameProxy>> m_frameMap;
@@ -248,6 +248,9 @@ class WebPageProxy : public RefCounted<WebPageProxy> {
       m_renderTreeExternalRepresentationCallbacks;
 
   double m_estimatedProgress;
+
+  // Whether the web page is contained in a top-level window.
+  bool m_isInWindow;
 
   bool m_canGoBack;
   bool m_canGoForward;

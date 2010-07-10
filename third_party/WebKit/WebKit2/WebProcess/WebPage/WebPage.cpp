@@ -278,6 +278,16 @@ void WebPage::setFocused(bool isFocused) {
   m_page->focusController()->setFocused(isFocused);
 }
 
+void WebPage::setIsInWindow(bool isInWindow) {
+  if (!isInWindow) {
+    m_page->setCanStartMedia(false);
+    m_page->willMoveOffscreen();
+  } else {
+    m_page->setCanStartMedia(true);
+    m_page->didMoveOnscreen();
+  }
+}
+
 void WebPage::didReceivePolicyDecision(WebFrame* frame,
                                        uint64_t listenerID,
                                        WebCore::PolicyAction policyAction) {
@@ -380,6 +390,14 @@ void WebPage::didReceiveMessage(CoreIPC::Connection* connection,
         return;
 
       setFocused(focused);
+      break;
+    }
+    case WebPageMessage::SetIsInWindow: {
+      bool isInWindow;
+      if (!arguments.decode(isInWindow))
+        return;
+
+      setIsInWindow(isInWindow);
       break;
     }
     case WebPageMessage::MouseEvent: {
