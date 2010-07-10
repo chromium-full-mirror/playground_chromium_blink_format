@@ -56,6 +56,7 @@ class IndentOutdentCommand : public CompositeEditCommand {
   void indentIntoBlockquote(const VisiblePosition&,
                             const VisiblePosition&,
                             RefPtr<Element>&);
+  bool splitTextNodes(const VisiblePosition& start, int numParagraphs);
 
   EIndentType m_typeOfAction;
   int m_marginInPixels;
