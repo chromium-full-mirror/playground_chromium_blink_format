@@ -78,6 +78,7 @@ PassRefPtr<ChildType> HTMLConstructionSite::attach(
   // doesn't.  It feels like we're missing a concept somehow.
   if (m_redirectAttachToFosterParent) {
     fosterParent(child.get());
+    ASSERT(child->attached());
     return child.release();
   }
 
@@ -87,22 +88,33 @@ PassRefPtr<ChildType> HTMLConstructionSite::attach(
   // |parent| to hold a ref at this point.  In the common case (at least
   // for elements), however, we'll get to use this ref in the stack of
   // open elements.
+  ASSERT(parent->attached());
+  ASSERT(!child->attached());
   child->attach();
   return child.release();
 }
 
 void HTMLConstructionSite::attachAtSite(const AttachmentSite& site,
-                                        PassRefPtr<Node> child) {
+                                        PassRefPtr<Node> prpChild) {
+  RefPtr<Node> child = prpChild;
+
   if (site.nextChild) {
     // FIXME: We need an insertElement which does not send mutation events.
     ExceptionCode ec = 0;
     site.parent->insertBefore(child, site.nextChild, ec);
-    // FIXME: Do we need to call attach()?
     ASSERT(!ec);
+    ASSERT(site.parent->attached());
+    if (!child->attached())
+      child->attach();
     return;
   }
   site.parent->parserAddChild(child);
-  // FIXME: Do we need to call attach()?
+  // It's slightly unfortunate that we need to hold a reference to child
+  // here to call attach().  We should investigate whether we can rely on
+  // |site.parent| to hold a ref at this point.
+  ASSERT(site.parent->attached());
+  if (!child->attached())
+    child->attach();
 }
 
 HTMLConstructionSite::HTMLConstructionSite(
