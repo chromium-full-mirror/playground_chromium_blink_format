@@ -815,7 +815,7 @@ PassRefPtr<Widget> WebFrameLoaderClient::createPlugin(
 // parts of NetscapePluginModule implemented.
 #if PLATFORM(MAC)
   RefPtr<NetscapePluginModule> pluginModule =
-      NetscapePluginModule::create(pluginPath);
+      NetscapePluginModule::getOrCreate(pluginPath);
   if (!pluginModule)
     return 0;
 
