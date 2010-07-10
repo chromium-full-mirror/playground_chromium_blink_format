@@ -38,4 +38,22 @@ bool operator==(const CSSProperty& a, const CSSProperty& b) {
          a.m_value == b.m_value;
 }
 
+int CSSProperty::resolveDirectionAwareProperty(int propertyID,
+                                               TextDirection direction) {
+  switch (static_cast<CSSPropertyID>(propertyID)) {
+    case CSSPropertyWebkitMarginEnd:
+      return direction == LTR ? CSSPropertyMarginRight : CSSPropertyMarginLeft;
+    case CSSPropertyWebkitMarginStart:
+      return direction == LTR ? CSSPropertyMarginLeft : CSSPropertyMarginRight;
+    case CSSPropertyWebkitPaddingEnd:
+      return direction == LTR ? CSSPropertyPaddingRight
+                              : CSSPropertyPaddingLeft;
+    case CSSPropertyWebkitPaddingStart:
+      return direction == LTR ? CSSPropertyPaddingLeft
+                              : CSSPropertyPaddingRight;
+    default:
+      return propertyID;
+  }
+}
+
 }  // namespace WebCore

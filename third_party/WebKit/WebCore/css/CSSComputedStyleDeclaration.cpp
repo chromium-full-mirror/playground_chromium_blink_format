@@ -642,6 +642,9 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
   if (!style)
     return 0;
 
+  propertyID = CSSProperty::resolveDirectionAwareProperty(propertyID,
+                                                          style->direction());
+
   switch (static_cast<CSSPropertyID>(propertyID)) {
     case CSSPropertyInvalid:
       break;
@@ -1568,8 +1571,6 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(
     case CSSPropertyWebkitMask:
     case CSSPropertyWebkitMaskRepeatX:
     case CSSPropertyWebkitMaskRepeatY:
-    case CSSPropertyWebkitPaddingEnd:
-    case CSSPropertyWebkitPaddingStart:
     case CSSPropertyWebkitPerspectiveOriginX:
     case CSSPropertyWebkitPerspectiveOriginY:
     case CSSPropertyWebkitTextStroke:
