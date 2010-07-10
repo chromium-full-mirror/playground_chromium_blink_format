@@ -819,11 +819,15 @@ PassRefPtr<Widget> WebFrameLoaderClient::createPlugin(
   if (!pluginModule)
     return 0;
 
-  RefPtr<Plugin> plugin = NetscapePlugin::create(pluginModule.release());
-  if (!plugin->initialize(url, paramNames, paramValues, mimeType, loadManually))
-    return 0;
+  Plugin::Parameters parameters;
+  parameters.url = url;
+  parameters.names = paramNames;
+  parameters.values = paramValues;
+  parameters.mimeType = mimeType;
+  parameters.loadManually = loadManually;
 
-  return PluginView::create(plugin.release(), pluginElement);
+  RefPtr<Plugin> plugin = NetscapePlugin::create(pluginModule.release());
+  return PluginView::create(pluginElement, plugin.release(), parameters);
 #else
   return 0;
 #endif

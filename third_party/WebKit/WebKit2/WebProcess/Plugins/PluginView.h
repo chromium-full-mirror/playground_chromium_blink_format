@@ -40,14 +40,20 @@ namespace WebKit {
 class PluginView : public WebCore::Widget {
  public:
   static PassRefPtr<PluginView> create(
+      WebCore::HTMLPlugInElement* pluginElement,
       PassRefPtr<Plugin> plugin,
-      WebCore::HTMLPlugInElement* pluginElement) {
-    return adoptRef(new PluginView(plugin, pluginElement));
+      const Plugin::Parameters& parameters) {
+    return adoptRef(new PluginView(pluginElement, plugin, parameters));
   }
 
  private:
-  PluginView(PassRefPtr<Plugin>, WebCore::HTMLPlugInElement*);
+  PluginView(WebCore::HTMLPlugInElement*,
+             PassRefPtr<Plugin>,
+             const Plugin::Parameters& parameters);
   virtual ~PluginView();
+
+  void initializePlugin();
+  void destroyPlugin();
 
   void viewGeometryDidChange();
   WebCore::IntRect clipRectInWindowCoordinates() const;
@@ -59,8 +65,11 @@ class PluginView : public WebCore::Widget {
   virtual void frameRectsChanged();
   virtual void setParent(WebCore::ScrollView*);
 
-  RefPtr<Plugin> m_plugin;
   WebCore::HTMLPlugInElement* m_pluginElement;
+  RefPtr<Plugin> m_plugin;
+  Plugin::Parameters m_parameters;
+
+  bool m_isInitialized;
 };
 
 }  // namespace WebKit
