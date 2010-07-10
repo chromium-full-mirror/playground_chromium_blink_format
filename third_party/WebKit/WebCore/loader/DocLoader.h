@@ -71,6 +71,9 @@ class DocLoader : public Noncopyable {
 #if ENABLE(XBL)
   CachedXBLDocument* requestXBLDocument(const String& url);
 #endif
+#if ENABLE(LINK_PREFETCH)
+  CachedResource* requestLinkPrefetch(const String& url);
+#endif
 
   // Logs an access denied message to the console for the specified URL.
   void printAccessDeniedMessage(const KURL& url) const;
@@ -102,8 +105,8 @@ class DocLoader : public Noncopyable {
     m_allowStaleResources = allowStaleResources;
   }
 
-  void incrementRequestCount();
-  void decrementRequestCount();
+  void incrementRequestCount(const CachedResource*);
+  void decrementRequestCount(const CachedResource*);
   int requestCount();
 
   void clearPreloads();

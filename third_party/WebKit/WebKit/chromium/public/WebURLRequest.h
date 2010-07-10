@@ -73,7 +73,8 @@ class WebURLRequest {
     TargetIsObject = 7,
     TargetIsMedia = 8,
     TargetIsWorker = 9,
-    TargetIsSharedWorker = 10
+    TargetIsSharedWorker = 10,
+    TargetIsPrefetch = 11,
   };
 
   ~WebURLRequest() { reset(); }

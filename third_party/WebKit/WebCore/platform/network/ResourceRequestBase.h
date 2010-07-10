@@ -66,7 +66,8 @@ class ResourceRequestBase : public FastAllocBase {
     TargetIsObject,
     TargetIsMedia,
     TargetIsWorker,
-    TargetIsSharedWorker
+    TargetIsSharedWorker,
+    TargetIsPrefetch,
   };
 
   static PassOwnPtr<ResourceRequest> adopt(
