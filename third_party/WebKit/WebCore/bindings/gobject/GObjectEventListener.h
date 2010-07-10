@@ -22,6 +22,7 @@
 
 #include "EventListener.h"
 
+#include "PlatformString.h"
 #include <glib-object.h>
 #include <glib.h>
 #include <wtf/PassRefPtr.h>
