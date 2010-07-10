@@ -55,7 +55,14 @@ enum CharacterTypes {
 
   CharacterLineTerminator,
   CharacterExclamationMark,
-  CharacterSimple,
+  CharacterOpenParen,
+  CharacterCloseParen,
+  CharacterOpenBracket,
+  CharacterCloseBracket,
+  CharacterComma,
+  CharacterColon,
+  CharacterQuestion,
+  CharacterTilde,
   CharacterQuote,
   CharacterDot,
   CharacterSlash,
@@ -80,7 +87,7 @@ enum CharacterTypes {
 };
 
 // 128 ascii codes
-static unsigned char AsciiCharacters[128] = {
+static unsigned short AsciiCharacters[128] = {
     /*   0 - Null               */ CharacterInvalid,
     /*   1 - Start of Heading   */ CharacterInvalid,
     /*   2 - Start of Text      */ CharacterInvalid,
@@ -121,11 +128,11 @@ static unsigned char AsciiCharacters[128] = {
     /*  37 - %                  */ CharacterModulo,
     /*  38 - &                  */ CharacterAnd,
     /*  39 - '                  */ CharacterQuote,
-    /*  40 - (                  */ CharacterSimple,
-    /*  41 - )                  */ CharacterSimple,
+    /*  40 - (                  */ CharacterOpenParen,
+    /*  41 - )                  */ CharacterCloseParen,
     /*  42 - *                  */ CharacterMultiply,
     /*  43 - +                  */ CharacterAdd,
-    /*  44 - ,                  */ CharacterSimple,
+    /*  44 - ,                  */ CharacterComma,
     /*  45 - -                  */ CharacterSub,
     /*  46 - .                  */ CharacterDot,
     /*  47 - /                  */ CharacterSlash,
@@ -139,12 +146,12 @@ static unsigned char AsciiCharacters[128] = {
     /*  55 - 7                  */ CharacterNumber,
     /*  56 - 8                  */ CharacterNumber,
     /*  57 - 9                  */ CharacterNumber,
-    /*  58 - :                  */ CharacterSimple,
+    /*  58 - :                  */ CharacterColon,
     /*  59 - ;                  */ CharacterSemicolon,
     /*  60 - <                  */ CharacterLess,
     /*  61 - =                  */ CharacterEqual,
     /*  62 - >                  */ CharacterGreater,
-    /*  63 - ?                  */ CharacterSimple,
+    /*  63 - ?                  */ CharacterQuestion,
     /*  64 - @                  */ CharacterInvalid,
     /*  65 - A                  */ CharacterAlpha,
     /*  66 - B                  */ CharacterAlpha,
@@ -172,9 +179,9 @@ static unsigned char AsciiCharacters[128] = {
     /*  88 - X                  */ CharacterAlpha,
     /*  89 - Y                  */ CharacterAlpha,
     /*  90 - Z                  */ CharacterAlpha,
-    /*  91 - [                  */ CharacterSimple,
+    /*  91 - [                  */ CharacterOpenBracket,
     /*  92 - \                  */ CharacterBackSlash,
-    /*  93 - ]                  */ CharacterSimple,
+    /*  93 - ]                  */ CharacterCloseBracket,
     /*  94 - ^                  */ CharacterXor,
     /*  95 - _                  */ CharacterAlpha,
     /*  96 - `                  */ CharacterInvalid,
@@ -207,7 +214,7 @@ static unsigned char AsciiCharacters[128] = {
     /* 123 - {                  */ CharacterOpenBrace,
     /* 124 - |                  */ CharacterOr,
     /* 125 - }                  */ CharacterCloseBrace,
-    /* 126 - ~                  */ CharacterSimple,
+    /* 126 - ~                  */ CharacterTilde,
     /* 127 - Delete             */ CharacterInvalid,
 };
 
@@ -453,12 +460,13 @@ ALWAYS_INLINE bool Lexer::parseString(JSTokenData* lvalp) {
   return true;
 }
 
-int Lexer::lex(JSTokenData* lvalp, JSTokenInfo* llocp) {
+JSTokenType Lexer::lex(JSTokenData* lvalp, JSTokenInfo* llocp) {
   ASSERT(!m_error);
   ASSERT(m_buffer8.isEmpty());
   ASSERT(m_buffer16.isEmpty());
 
-  int token = 0;
+  JSTokenType token = ERRORTOK;
+  int identChar = 0;
   m_terminator = false;
 
 start:
@@ -468,7 +476,7 @@ start:
   int startOffset = currentOffset();
 
   if (UNLIKELY(m_current == -1))
-    return 0;
+    return EOFTOK;
 
   m_delimited = false;
 
@@ -503,7 +511,7 @@ start:
           token = GE;
           break;
         }
-        token = '>';
+        token = GT;
         break;
       case CharacterEqual:
         shift();
@@ -517,7 +525,7 @@ start:
           token = EQEQ;
           break;
         }
-        token = '=';
+        token = EQUAL;
         break;
       case CharacterLess:
         shift();
@@ -540,7 +548,7 @@ start:
           token = LE;
           break;
         }
-        token = '<';
+        token = LT;
         break;
       case CharacterExclamationMark:
         shift();
@@ -554,7 +562,7 @@ start:
           token = NE;
           break;
         }
-        token = '!';
+        token = EXCLAMATION;
         break;
       case CharacterAdd:
         shift();
@@ -568,7 +576,7 @@ start:
           token = PLUSEQUAL;
           break;
         }
-        token = '+';
+        token = PLUS;
         break;
       case CharacterSub:
         shift();
@@ -586,7 +594,7 @@ start:
           token = MINUSEQUAL;
           break;
         }
-        token = '-';
+        token = MINUS;
         break;
       case CharacterMultiply:
         shift();
@@ -595,7 +603,7 @@ start:
           token = MULTEQUAL;
           break;
         }
-        token = '*';
+        token = TIMES;
         break;
       case CharacterSlash:
         shift();
@@ -612,7 +620,7 @@ start:
           token = DIVEQUAL;
           break;
         }
-        token = '/';
+        token = DIVIDE;
         break;
       case CharacterAnd:
         shift();
@@ -626,7 +634,7 @@ start:
           token = ANDEQUAL;
           break;
         }
-        token = '&';
+        token = BITAND;
         break;
       case CharacterXor:
         shift();
@@ -635,7 +643,7 @@ start:
           token = XOREQUAL;
           break;
         }
-        token = '^';
+        token = BITXOR;
         break;
       case CharacterModulo:
         shift();
@@ -644,7 +652,7 @@ start:
           token = MODEQUAL;
           break;
         }
-        token = '%';
+        token = MOD;
         break;
       case CharacterOr:
         shift();
@@ -658,7 +666,7 @@ start:
           token = OR;
           break;
         }
-        token = '|';
+        token = BITOR;
         break;
       case CharacterDot:
         shift();
@@ -666,16 +674,44 @@ start:
           record8('.');
           goto inNumberAfterDecimalPoint;
         }
-        token = '.';
+        token = DOT;
         break;
-      case CharacterSimple:
-        token = m_current;
+      case CharacterOpenParen:
+        token = OPENPAREN;
+        shift();
+        break;
+      case CharacterCloseParen:
+        token = CLOSEPAREN;
+        shift();
+        break;
+      case CharacterOpenBracket:
+        token = OPENBRACKET;
+        shift();
+        break;
+      case CharacterCloseBracket:
+        token = CLOSEBRACKET;
+        shift();
+        break;
+      case CharacterComma:
+        token = COMMA;
+        shift();
+        break;
+      case CharacterColon:
+        token = COLON;
+        shift();
+        break;
+      case CharacterQuestion:
+        token = QUESTION;
+        shift();
+        break;
+      case CharacterTilde:
+        token = TILDE;
         shift();
         break;
       case CharacterSemicolon:
         m_delimited = true;
         shift();
-        token = ';';
+        token = SEMICOLON;
         break;
       case CharacterOpenBrace:
         lvalp->intValue = currentOffset();
@@ -710,7 +746,7 @@ start:
         m_atLineStart = true;
         m_terminator = true;
         if (lastTokenWasRestrKeyword()) {
-          token = ';';
+          token = SEMICOLON;
           goto doneSemicolon;
         }
         goto start;
@@ -745,10 +781,10 @@ startIdentifierWithBackslash : {
     goto returnError;
   shift();
 
-  token = getUnicodeCharacter();
-  if (UNLIKELY(token == -1))
+  identChar = getUnicodeCharacter();
+  if (UNLIKELY(identChar == -1))
     goto returnError;
-  if (UNLIKELY(!isIdentStart(token)))
+  if (UNLIKELY(!isIdentStart(identChar)))
     goto returnError;
   goto inIdentifierAfterCharacterCheck;
 }
@@ -772,13 +808,13 @@ startIdentifierOrKeyword : {
     if (UNLIKELY(m_current != 'u'))
       goto returnError;
     shift();
-    token = getUnicodeCharacter();
-    if (UNLIKELY(token == -1))
+    identChar = getUnicodeCharacter();
+    if (UNLIKELY(identChar == -1))
       goto returnError;
-    if (UNLIKELY(!isIdentPart(token)))
+    if (UNLIKELY(!isIdentPart(identChar)))
       goto returnError;
   inIdentifierAfterCharacterCheck:
-    record16(token);
+    record16(identChar);
 
     while (isIdentPart(m_current)) {
       record16(m_current);
@@ -790,7 +826,7 @@ startIdentifierOrKeyword : {
 inSingleLineComment:
   while (!isLineTerminator(m_current)) {
     if (UNLIKELY(m_current == -1))
-      return 0;
+      return EOFTOK;
     shift();
   }
   shiftLineTerminator();
@@ -957,7 +993,7 @@ doneNumeric:
   goto returnToken;
 
 doneSemicolon:
-  token = ';';
+  token = SEMICOLON;
   m_delimited = true;
   goto returnToken;
 
@@ -974,7 +1010,7 @@ doneIdentifierOrKeyword : {
   m_delimited = false;
   m_buffer16.resize(0);
   const HashEntry* entry = m_keywordTable.entry(m_globalData, *lvalp->ident);
-  token = entry ? entry->lexerValue() : static_cast<int>(IDENT);
+  token = entry ? static_cast<JSTokenType>(entry->lexerValue()) : IDENT;
 
   // Fall through into returnToken.
 }
@@ -990,7 +1026,7 @@ returnToken : {
 
 returnError:
   m_error = true;
-  return -1;
+  return ERRORTOK;
 }
 
 bool Lexer::scanRegExp(const Identifier*& pattern,

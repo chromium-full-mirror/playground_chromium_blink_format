@@ -1033,15 +1033,15 @@ ExpressionNode* ASTBuilder::makeBinaryNode(
       return new (m_globalData)
           LogicalOpNode(m_globalData, lhs.first, rhs.first, OpLogicalAnd);
 
-    case '|':
+    case BITOR:
       return new (m_globalData) BitOrNode(m_globalData, lhs.first, rhs.first,
                                           rhs.second.hasAssignment);
 
-    case '^':
+    case BITXOR:
       return new (m_globalData) BitXOrNode(m_globalData, lhs.first, rhs.first,
                                            rhs.second.hasAssignment);
 
-    case '&':
+    case BITAND:
       return new (m_globalData) BitAndNode(m_globalData, lhs.first, rhs.first,
                                            rhs.second.hasAssignment);
 
@@ -1061,11 +1061,11 @@ ExpressionNode* ASTBuilder::makeBinaryNode(
       return new (m_globalData) NotStrictEqualNode(
           m_globalData, lhs.first, rhs.first, rhs.second.hasAssignment);
 
-    case '<':
+    case LT:
       return new (m_globalData) LessNode(m_globalData, lhs.first, rhs.first,
                                          rhs.second.hasAssignment);
 
-    case '>':
+    case GT:
       return new (m_globalData) GreaterNode(m_globalData, lhs.first, rhs.first,
                                             rhs.second.hasAssignment);
 
@@ -1103,19 +1103,19 @@ ExpressionNode* ASTBuilder::makeBinaryNode(
       return new (m_globalData) UnsignedRightShiftNode(
           m_globalData, lhs.first, rhs.first, rhs.second.hasAssignment);
 
-    case '+':
+    case PLUS:
       return makeAddNode(lhs.first, rhs.first, rhs.second.hasAssignment);
 
-    case '-':
+    case MINUS:
       return makeSubNode(lhs.first, rhs.first, rhs.second.hasAssignment);
 
-    case '*':
+    case TIMES:
       return makeMultNode(lhs.first, rhs.first, rhs.second.hasAssignment);
 
-    case '/':
+    case DIVIDE:
       return makeDivNode(lhs.first, rhs.first, rhs.second.hasAssignment);
 
-    case '%':
+    case MOD:
       return new (m_globalData)
           ModNode(m_globalData, lhs.first, rhs.first, rhs.second.hasAssignment);
   }

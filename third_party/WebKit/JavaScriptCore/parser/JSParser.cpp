@@ -110,14 +110,14 @@ class JSParser {
     m_tokenCount++;
   }
 
-  bool consume(int expected) {
+  bool consume(JSTokenType expected) {
     bool result = m_token.m_type == expected;
     failIfFalse(result);
     next();
     return result;
   }
 
-  bool match(int expected) { return m_token.m_type == expected; }
+  bool match(JSTokenType expected) { return m_token.m_type == expected; }
 
   int tokenStart() { return token().m_info.startOffset; }
 
@@ -219,11 +219,11 @@ class JSParser {
                          int& openBrace,
                          int& closeBrace,
                          int& bodyStartLine);
-  int isBinaryOperator(int token);
+  int isBinaryOperator(JSTokenType token);
   bool allowAutomaticSemicolon();
 
   bool autoSemiColon() {
-    if (token().m_type == ';') {
+    if (token().m_type == SEMICOLON) {
       next();
       return true;
     }
@@ -285,7 +285,7 @@ JSParser::JSParser(Lexer* lexer,
 bool JSParser::parseProgram() {
   ASTBuilder context(m_globalData, m_lexer);
   SourceElements* sourceElements = parseSourceElements<ASTBuilder>(context);
-  if (!sourceElements || !consume(0))
+  if (!sourceElements || !consume(EOFTOK))
     return true;
   m_globalData->parser->didFinishParsing(
       sourceElements, context.varDeclarations(), context.funcDeclarations(),
@@ -294,7 +294,7 @@ bool JSParser::parseProgram() {
 }
 
 bool JSParser::allowAutomaticSemicolon() {
-  return match(CLOSEBRACE) || match(0) || m_lexer->prevTerminator();
+  return match(CLOSEBRACE) || match(EOFTOK) || m_lexer->prevTerminator();
 }
 
 template <class TreeBuilder>
@@ -346,11 +346,11 @@ TreeStatement JSParser::parseDoWhileStatement(TreeBuilder& context) {
   failIfFalse(statement);
   int endLine = tokenLine();
   consumeOrFail(WHILE);
-  consumeOrFail('(');
+  consumeOrFail(OPENPAREN);
   TreeExpression expr = parseExpression(context);
   failIfFalse(expr);
-  consumeOrFail(')');
-  if (match(';'))
+  consumeOrFail(CLOSEPAREN);
+  if (match(SEMICOLON))
     next();  // Always performs automatic semicolon insertion.
   return context.createDoWhileStatement(statement, expr, startLine, endLine);
 }
@@ -360,11 +360,11 @@ TreeStatement JSParser::parseWhileStatement(TreeBuilder& context) {
   ASSERT(match(WHILE));
   int startLine = tokenLine();
   next();
-  consumeOrFail('(');
+  consumeOrFail(OPENPAREN);
   TreeExpression expr = parseExpression(context);
   failIfFalse(expr);
   int endLine = tokenLine();
-  consumeOrFail(')');
+  consumeOrFail(CLOSEPAREN);
   TreeStatement statement = parseStatement(context);
   failIfFalse(statement);
   return context.createWhileStatement(expr, statement, startLine, endLine);
@@ -390,7 +390,7 @@ TreeExpression JSParser::parseVarDeclarationList(
     const Identifier* name = token().m_data.ident;
     lastIdent = name;
     next();
-    bool hasInitializer = match('=');
+    bool hasInitializer = match(EQUAL);
     context.addVar(name, (hasInitializer || (!m_allowsIn && match(INTOKEN)))
                              ? DeclarationStacks::HasInitializer
                              : 0);
@@ -412,7 +412,7 @@ TreeExpression JSParser::parseVarDeclarationList(
       else
         varDecls = context.combineCommaNodes(varDecls, node);
     }
-  } while (match(','));
+  } while (match(COMMA));
   return varDecls;
 }
 
@@ -425,7 +425,7 @@ TreeConstDeclList JSParser::parseConstDeclarationList(TreeBuilder& context) {
     matchOrFail(IDENT);
     const Identifier* name = token().m_data.ident;
     next();
-    bool hasInitializer = match('=');
+    bool hasInitializer = match(EQUAL);
     context.addVar(
         name, DeclarationStacks::IsConstant |
                   (hasInitializer ? DeclarationStacks::HasInitializer : 0));
@@ -437,7 +437,7 @@ TreeConstDeclList JSParser::parseConstDeclarationList(TreeBuilder& context) {
     tail = context.appendConstDecl(tail, name, initializer);
     if (!constDecls)
       constDecls = tail;
-  } while (match(','));
+  } while (match(COMMA));
   return constDecls;
 }
 
@@ -446,7 +446,7 @@ TreeStatement JSParser::parseForStatement(TreeBuilder& context) {
   ASSERT(match(FOR));
   int startLine = tokenLine();
   next();
-  consumeOrFail('(');
+  consumeOrFail(OPENPAREN);
   int nonLHSCount = m_nonLHSCount;
   int declarations = 0;
   int declsStart = 0;
@@ -473,7 +473,7 @@ TreeStatement JSParser::parseForStatement(TreeBuilder& context) {
       fail();
 
     // Remainder of a standard for loop is handled identically
-    if (declarations > 1 || match(';'))
+    if (declarations > 1 || match(SEMICOLON))
       goto standardForLoop;
 
     // Handle for-in with var declaration
@@ -486,7 +486,7 @@ TreeStatement JSParser::parseForStatement(TreeBuilder& context) {
     int exprEnd = lastTokenEnd();
 
     int endLine = tokenLine();
-    consumeOrFail(')');
+    consumeOrFail(CLOSEPAREN);
 
     TreeStatement statement = parseStatement(context);
     failIfFalse(statement);
@@ -496,7 +496,7 @@ TreeStatement JSParser::parseForStatement(TreeBuilder& context) {
                                    initStart, initEnd, startLine, endLine);
   }
 
-  if (!match(';')) {
+  if (!match(SEMICOLON)) {
     m_allowsIn = false;
     declsStart = tokenStart();
     decls = parseExpression(context);
@@ -505,25 +505,25 @@ TreeStatement JSParser::parseForStatement(TreeBuilder& context) {
     failIfFalse(decls);
   }
 
-  if (match(';')) {
+  if (match(SEMICOLON)) {
   standardForLoop:
     // Standard for loop
     next();
     TreeExpression condition = 0;
 
-    if (!match(';')) {
+    if (!match(SEMICOLON)) {
       condition = parseExpression(context);
       failIfFalse(condition);
     }
-    consumeOrFail(';');
+    consumeOrFail(SEMICOLON);
 
     TreeExpression increment = 0;
-    if (!match(')')) {
+    if (!match(CLOSEPAREN)) {
       increment = parseExpression(context);
       failIfFalse(increment);
     }
     int endLine = tokenLine();
-    consumeOrFail(')');
+    consumeOrFail(CLOSEPAREN);
     TreeStatement statement = parseStatement(context);
     failIfFalse(statement);
     return context.createForLoop(decls, condition, increment, statement,
@@ -537,7 +537,7 @@ TreeStatement JSParser::parseForStatement(TreeBuilder& context) {
   failIfFalse(expr);
   int exprEnd = lastTokenEnd();
   int endLine = tokenLine();
-  consumeOrFail(')');
+  consumeOrFail(CLOSEPAREN);
   TreeStatement statement = parseStatement(context);
   failIfFalse(statement);
 
@@ -599,14 +599,14 @@ TreeStatement JSParser::parseReturnStatement(TreeBuilder& context) {
   // We do the auto semicolon check before attempting to parse an expression
   // as we need to ensure the a line break after the return correctly terminates
   // the statement
-  if (match(';'))
+  if (match(SEMICOLON))
     endLine = tokenLine();
   if (autoSemiColon())
     return context.createReturnStatement(0, start, end, startLine, endLine);
   TreeExpression expr = parseExpression(context);
   failIfFalse(expr);
   end = lastTokenEnd();
-  if (match(';'))
+  if (match(SEMICOLON))
     endLine = tokenLine();
   failIfFalse(autoSemiColon());
   return context.createReturnStatement(expr, start, end, startLine, endLine);
@@ -633,14 +633,14 @@ TreeStatement JSParser::parseWithStatement(TreeBuilder& context) {
   ASSERT(match(WITH));
   int startLine = tokenLine();
   next();
-  consumeOrFail('(');
+  consumeOrFail(OPENPAREN);
   int start = tokenStart();
   TreeExpression expr = parseExpression(context);
   failIfFalse(expr);
   int end = lastTokenEnd();
 
   int endLine = tokenLine();
-  consumeOrFail(')');
+  consumeOrFail(CLOSEPAREN);
 
   TreeStatement statement = parseStatement(context);
   failIfFalse(statement);
@@ -654,11 +654,11 @@ TreeStatement JSParser::parseSwitchStatement(TreeBuilder& context) {
   ASSERT(match(SWITCH));
   int startLine = tokenLine();
   next();
-  consumeOrFail('(');
+  consumeOrFail(OPENPAREN);
   TreeExpression expr = parseExpression(context);
   failIfFalse(expr);
   int endLine = tokenLine();
-  consumeOrFail(')');
+  consumeOrFail(CLOSEPAREN);
   consumeOrFail(OPENBRACE);
 
   TreeClauseList firstClauses = parseSwitchClauses(context);
@@ -682,7 +682,7 @@ TreeClauseList JSParser::parseSwitchClauses(TreeBuilder& context) {
   next();
   TreeExpression condition = parseExpression(context);
   failIfFalse(condition);
-  consumeOrFail(':');
+  consumeOrFail(COLON);
   TreeSourceElements statements = parseSourceElements(context);
   failIfFalse(statements);
   TreeClause clause = context.createClause(condition, statements);
@@ -693,7 +693,7 @@ TreeClauseList JSParser::parseSwitchClauses(TreeBuilder& context) {
     next();
     TreeExpression condition = parseExpression(context);
     failIfFalse(condition);
-    consumeOrFail(':');
+    consumeOrFail(COLON);
     TreeSourceElements statements = parseSourceElements(context);
     failIfFalse(statements);
     clause = context.createClause(condition, statements);
@@ -707,7 +707,7 @@ TreeClause JSParser::parseSwitchDefaultClause(TreeBuilder& context) {
   if (!match(DEFAULT))
     return 0;
   next();
-  consumeOrFail(':');
+  consumeOrFail(COLON);
   TreeSourceElements statements = parseSourceElements(context);
   failIfFalse(statements);
   return context.createClause(0, statements);
@@ -731,11 +731,11 @@ TreeStatement JSParser::parseTryStatement(TreeBuilder& context) {
 
   if (match(CATCH)) {
     next();
-    consumeOrFail('(');
+    consumeOrFail(OPENPAREN);
     matchOrFail(IDENT);
     ident = token().m_data.ident;
     next();
-    consumeOrFail(')');
+    consumeOrFail(CLOSEPAREN);
     matchOrFail(OPENBRACE);
     int initialEvalCount = context.evalCount();
     catchBlock = parseBlockStatement(context);
@@ -760,7 +760,7 @@ TreeStatement JSParser::parseDebuggerStatement(TreeBuilder& context) {
   int startLine = tokenLine();
   int endLine = startLine;
   next();
-  if (match(';'))
+  if (match(SEMICOLON))
     startLine = tokenLine();
   failIfFalse(autoSemiColon());
   return context.createDebugger(startLine, endLine);
@@ -794,7 +794,7 @@ TreeStatement JSParser::parseStatement(TreeBuilder& context) {
       return parseConstDeclaration(context);
     case FUNCTION:
       return parseFunctionDeclaration(context);
-    case ';':
+    case SEMICOLON:
       next();
       return context.createEmptyStatement();
     case IF:
@@ -821,7 +821,7 @@ TreeStatement JSParser::parseStatement(TreeBuilder& context) {
       return parseTryStatement(context);
     case DEBUGGER:
       return parseDebuggerStatement(context);
-    case 0:
+    case EOFTOK:
     case CASE:
     case CLOSEBRACE:
     case DEFAULT:
@@ -844,7 +844,7 @@ TreeFormalParameterList JSParser::parseFormalParameters(TreeBuilder& context,
       context.createFormalParameterList(*token().m_data.ident);
   TreeFormalParameterList tail = list;
   next();
-  while (match(',')) {
+  while (match(COMMA)) {
     next();
     matchOrFail(IDENT);
     const Identifier* ident = token().m_data.ident;
@@ -878,13 +878,13 @@ bool JSParser::parseFunctionInfo(TreeBuilder& context,
     next();
   } else if (requirements == FunctionNeedsName)
     return false;
-  consumeOrFail('(');
+  consumeOrFail(OPENPAREN);
   bool usesArguments = false;
-  if (!match(')')) {
+  if (!match(CLOSEPAREN)) {
     parameters = parseFormalParameters(context, usesArguments);
     failIfFalse(parameters);
   }
-  consumeOrFail(')');
+  consumeOrFail(CLOSEPAREN);
   matchOrFail(OPENBRACE);
 
   openBracePos = token().m_data.intValue;
@@ -938,7 +938,7 @@ TreeStatement JSParser::parseExpressionOrLabelStatement(TreeBuilder& context) {
     return context.createExprStatement(expression, startLine, m_lastLine);
   failIfFalse(currentToken + 1 == m_tokenCount);
   int end = tokenEnd();
-  consumeOrFail(':');
+  consumeOrFail(COLON);
   TreeStatement statement = parseStatement(context);
   failIfFalse(statement);
   return context.createLabelStatement(ident, statement, start, end);
@@ -960,12 +960,12 @@ TreeStatement JSParser::parseIfStatement(TreeBuilder& context) {
   int start = tokenLine();
   next();
 
-  consumeOrFail('(');
+  consumeOrFail(OPENPAREN);
 
   TreeExpression condition = parseExpression(context);
   failIfFalse(condition);
   int end = tokenLine();
-  consumeOrFail(')');
+  consumeOrFail(CLOSEPAREN);
 
   TreeStatement trueBlock = parseStatement(context);
   failIfFalse(trueBlock);
@@ -989,12 +989,12 @@ TreeStatement JSParser::parseIfStatement(TreeBuilder& context) {
     int innerStart = tokenLine();
     next();
 
-    consumeOrFail('(');
+    consumeOrFail(OPENPAREN);
 
     TreeExpression innerCondition = parseExpression(context);
     failIfFalse(innerCondition);
     int innerEnd = tokenLine();
-    consumeOrFail(')');
+    consumeOrFail(CLOSEPAREN);
 
     TreeStatement innerTrueBlock = parseStatement(context);
     failIfFalse(innerTrueBlock);
@@ -1036,14 +1036,14 @@ TreeExpression JSParser::parseExpression(TreeBuilder& context) {
   failIfStackOverflow();
   TreeExpression node = parseAssignmentExpression(context);
   failIfFalse(node);
-  if (!match(','))
+  if (!match(COMMA))
     return node;
   next();
   m_nonLHSCount++;
   TreeExpression right = parseAssignmentExpression(context);
   failIfFalse(right);
   typename TreeBuilder::Comma commaNode = context.createCommaExpr(node, right);
-  while (match(',')) {
+  while (match(COMMA)) {
     next();
     right = parseAssignmentExpression(context);
     failIfFalse(right);
@@ -1068,7 +1068,7 @@ TreeExpression JSParser::parseAssignmentExpression(TreeBuilder& context) {
   bool hadAssignment = false;
   while (true) {
     switch (token().m_type) {
-      case '=':
+      case EQUAL:
         op = OpEqual;
         break;
       case PLUSEQUAL:
@@ -1136,24 +1136,24 @@ template <class TreeBuilder>
 TreeExpression JSParser::parseConditionalExpression(TreeBuilder& context) {
   TreeExpression cond = parseBinaryExpression(context);
   failIfFalse(cond);
-  if (!match('?'))
+  if (!match(QUESTION))
     return cond;
   m_nonLHSCount++;
   next();
   TreeExpression lhs = parseAssignmentExpression(context);
-  consumeOrFail(':');
+  consumeOrFail(COLON);
 
   TreeExpression rhs = parseAssignmentExpression(context);
   failIfFalse(rhs);
   return context.createConditionalExpr(cond, lhs, rhs);
 }
 
-static bool isUnaryOp(int token) {
+static bool isUnaryOp(JSTokenType token) {
   switch (token) {
-    case '!':
-    case '~':
-    case '-':
-    case '+':
+    case EXCLAMATION:
+    case TILDE:
+    case MINUS:
+    case PLUS:
     case PLUSPLUS:
     case AUTOPLUSPLUS:
     case MINUSMINUS:
@@ -1167,7 +1167,7 @@ static bool isUnaryOp(int token) {
   }
 }
 
-int JSParser::isBinaryOperator(int token) {
+int JSParser::isBinaryOperator(JSTokenType token) {
   switch (token) {
     case OR:
       return 1;
@@ -1175,13 +1175,13 @@ int JSParser::isBinaryOperator(int token) {
     case AND:
       return 2;
 
-    case '|':
+    case BITOR:
       return 3;
 
-    case '^':
+    case BITXOR:
       return 4;
 
-    case '&':
+    case BITAND:
       return 5;
 
     case EQEQ:
@@ -1190,8 +1190,8 @@ int JSParser::isBinaryOperator(int token) {
     case STRNEQ:
       return 6;
 
-    case '<':
-    case '>':
+    case LT:
+    case GT:
     case LE:
     case GE:
     case INSTANCEOF:
@@ -1208,13 +1208,13 @@ int JSParser::isBinaryOperator(int token) {
     case URSHIFT:
       return 8;
 
-    case '+':
-    case '-':
+    case PLUS:
+    case MINUS:
       return 9;
 
-    case '*':
-    case '/':
-    case '%':
+    case TIMES:
+    case DIVIDE:
+    case MOD:
       return 10;
 
     default:
@@ -1279,7 +1279,7 @@ TreeProperty JSParser::parseProperty(TreeBuilder& context) {
     case STRING: {
       const Identifier* ident = token().m_data.ident;
       next();
-      if (match(':')) {
+      if (match(COLON)) {
         next();
         TreeExpression node = parseAssignmentExpression(context);
         failIfFalse(node);
@@ -1311,14 +1311,15 @@ TreeProperty JSParser::parseProperty(TreeBuilder& context) {
     case NUMBER: {
       double propertyName = token().m_data.doubleValue;
       next();
-      consumeOrFail(':');
+      consumeOrFail(COLON);
       TreeExpression node = parseAssignmentExpression(context);
       failIfFalse(node);
       return context.template createProperty<complete>(
           m_globalData, propertyName, node, PropertyNode::Constant);
     }
+    default:
+      fail();
   }
-  fail();
 }
 
 template <class TreeBuilder>
@@ -1341,7 +1342,7 @@ TreeExpression JSParser::parseObjectLiteral(TreeBuilder& context) {
   }
   TreePropertyList propertyList = context.createPropertyList(property);
   TreePropertyList tail = propertyList;
-  while (match(',')) {
+  while (match(COMMA)) {
     next();
     // allow extra comma, see http://bugs.webkit.org/show_bug.cgi?id=5939
     if (match(CLOSEBRACE))
@@ -1384,7 +1385,7 @@ TreeExpression JSParser::parseStrictObjectLiteral(TreeBuilder& context) {
 
   TreePropertyList propertyList = context.createPropertyList(property);
   TreePropertyList tail = propertyList;
-  while (match(',')) {
+  while (match(COMMA)) {
     next();
     // allow extra comma, see http://bugs.webkit.org/show_bug.cgi?id=5939
     if (match(CLOSEBRACE))
@@ -1419,14 +1420,14 @@ TreeExpression JSParser::parseStrictObjectLiteral(TreeBuilder& context) {
 
 template <class TreeBuilder>
 TreeExpression JSParser::parseArrayLiteral(TreeBuilder& context) {
-  consumeOrFail('[');
+  consumeOrFail(OPENBRACKET);
 
   int elisions = 0;
-  while (match(',')) {
+  while (match(COMMA)) {
     next();
     elisions++;
   }
-  if (match(']')) {
+  if (match(CLOSEBRACKET)) {
     next();
     return context.createArray(elisions);
   }
@@ -1437,16 +1438,16 @@ TreeExpression JSParser::parseArrayLiteral(TreeBuilder& context) {
       context.createElementList(elisions, elem);
   typename TreeBuilder::ElementList tail = elementList;
   elisions = 0;
-  while (match(',')) {
+  while (match(COMMA)) {
     next();
     elisions = 0;
 
-    while (match(',')) {
+    while (match(COMMA)) {
       next();
       elisions++;
     }
 
-    if (match(']')) {
+    if (match(CLOSEBRACKET)) {
       next();
       return context.createArray(elisions, elementList);
     }
@@ -1455,7 +1456,7 @@ TreeExpression JSParser::parseArrayLiteral(TreeBuilder& context) {
     tail = context.createElementList(tail, elisions, elem);
   }
 
-  consumeOrFail(']');
+  consumeOrFail(CLOSEBRACKET);
 
   return context.createArray(elementList);
 }
@@ -1465,14 +1466,14 @@ TreeExpression JSParser::parsePrimaryExpression(TreeBuilder& context) {
   switch (token().m_type) {
     case OPENBRACE:
       return parseObjectLiteral(context);
-    case '[':
+    case OPENBRACKET:
       return parseArrayLiteral(context);
-    case '(': {
+    case OPENPAREN: {
       next();
       int oldNonLHSCount = m_nonLHSCount;
       TreeExpression result = parseExpression(context);
       m_nonLHSCount = oldNonLHSCount;
-      consumeOrFail(')');
+      consumeOrFail(CLOSEPAREN);
 
       return result;
     }
@@ -1509,7 +1510,7 @@ TreeExpression JSParser::parsePrimaryExpression(TreeBuilder& context) {
       return context.createBoolean(false);
     }
     case DIVEQUAL:
-    case '/': {
+    case DIVIDE: {
       /* regexp */
       const Identifier* pattern;
       const Identifier* flags;
@@ -1522,14 +1523,15 @@ TreeExpression JSParser::parsePrimaryExpression(TreeBuilder& context) {
       next();
       return context.createRegex(*pattern, *flags, start);
     }
+    default:
+      fail();
   }
-  fail();
 }
 
 template <class TreeBuilder>
 TreeArguments JSParser::parseArguments(TreeBuilder& context) {
-  consumeOrFail('(');
-  if (match(')')) {
+  consumeOrFail(OPENPAREN);
+  if (match(CLOSEPAREN)) {
     next();
     return context.createArguments();
   }
@@ -1538,13 +1540,13 @@ TreeArguments JSParser::parseArguments(TreeBuilder& context) {
 
   TreeArgumentsList argList = context.createArgumentsList(firstArg);
   TreeArgumentsList tail = argList;
-  while (match(',')) {
+  while (match(COMMA)) {
     next();
     TreeExpression arg = parseAssignmentExpression(context);
     failIfFalse(arg);
     tail = context.createArgumentsList(tail, arg);
   }
-  consumeOrFail(')');
+  consumeOrFail(CLOSEPAREN);
   return context.createArguments(argList);
 }
 
@@ -1577,7 +1579,7 @@ TreeExpression JSParser::parseMemberExpression(TreeBuilder& context) {
   failIfFalse(base);
   while (true) {
     switch (token().m_type) {
-      case '[': {
+      case OPENBRACKET: {
         int expressionEnd = lastTokenEnd();
         next();
         int nonLHSCount = m_nonLHSCount;
@@ -1587,15 +1589,15 @@ TreeExpression JSParser::parseMemberExpression(TreeBuilder& context) {
         base = context.createBracketAccess(
             base, property, initialAssignments != m_assignmentCount,
             expressionStart, expressionEnd, tokenEnd());
-        if (!consume(']'))
+        if (!consume(CLOSEBRACKET))
           fail();
         m_nonLHSCount = nonLHSCount;
         break;
       }
-      case '(': {
+      case OPENPAREN: {
         if (newCount) {
           newCount--;
-          if (match('(')) {
+          if (match(OPENPAREN)) {
             int exprEnd = lastTokenEnd();
             TreeArguments arguments = parseArguments(context);
             failIfFalse(arguments);
@@ -1614,7 +1616,7 @@ TreeExpression JSParser::parseMemberExpression(TreeBuilder& context) {
         }
         break;
       }
-      case '.': {
+      case DOT: {
         int expressionEnd = lastTokenEnd();
         next();
         matchOrFail(IDENT);
@@ -1661,6 +1663,8 @@ TreeExpression JSParser::parseUnaryExpression(TreeBuilder& context) {
       m_assignmentCount++;
       next();
       break;
+    default:
+      break;
   }
 
   int end = lastTokenEnd();
@@ -1670,16 +1674,16 @@ TreeExpression JSParser::parseUnaryExpression(TreeBuilder& context) {
 
   while (tokenStackDepth) {
     switch (context.unaryTokenStackLastType(tokenStackDepth)) {
-      case '!':
+      case EXCLAMATION:
         expr = context.createLogicalNot(expr);
         break;
-      case '~':
+      case TILDE:
         expr = context.makeBitwiseNotNode(expr);
         break;
-      case '-':
+      case MINUS:
         expr = context.makeNegateNode(expr);
         break;
-      case '+':
+      case PLUS:
         expr = context.createUnaryPlus(expr);
         break;
       case PLUSPLUS:
