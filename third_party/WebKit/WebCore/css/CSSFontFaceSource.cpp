@@ -42,6 +42,7 @@
 #include "HTMLNames.h"
 #include "SVGFontData.h"
 #include "SVGFontElement.h"
+#include "SVGFontFaceElement.h"
 #include "SVGURIReference.h"
 #endif
 
