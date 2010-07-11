@@ -49,7 +49,7 @@ ASSERT_CLASS_FITS_IN_CELL(JSTestObj);
 #define THUNK_GENERATOR(generator)
 #endif
 
-static const HashTableValue JSTestObjTableValues[30] = {
+static const HashTableValue JSTestObjTableValues[32] = {
     {"readOnlyIntAttr", DontDelete | ReadOnly,
      (intptr_t) static_cast<PropertySlot::GetValueFunc>(
          jsTestObjReadOnlyIntAttr),
@@ -94,6 +94,10 @@ static const HashTableValue JSTestObjTableValues[30] = {
      (intptr_t) static_cast<PropertySlot::GetValueFunc>(
          jsTestObjReflectedURLAttr),
      (intptr_t)setJSTestObjReflectedURLAttr THUNK_GENERATOR(0)},
+    {"reflectedNonEmptyURLAttr", DontDelete,
+     (intptr_t) static_cast<PropertySlot::GetValueFunc>(
+         jsTestObjReflectedNonEmptyURLAttr),
+     (intptr_t)setJSTestObjReflectedNonEmptyURLAttr THUNK_GENERATOR(0)},
     {"reflectedStringAttr", DontDelete,
      (intptr_t) static_cast<PropertySlot::GetValueFunc>(
          jsTestObjReflectedStringAttr),
@@ -106,10 +110,14 @@ static const HashTableValue JSTestObjTableValues[30] = {
      (intptr_t) static_cast<PropertySlot::GetValueFunc>(
          jsTestObjReflectedCustomBooleanAttr),
      (intptr_t)setJSTestObjReflectedCustomBooleanAttr THUNK_GENERATOR(0)},
-    {"reflectedURLAttr", DontDelete,
+    {"reflectedCustomURLAttr", DontDelete,
      (intptr_t) static_cast<PropertySlot::GetValueFunc>(
-         jsTestObjReflectedURLAttr),
-     (intptr_t)setJSTestObjReflectedURLAttr THUNK_GENERATOR(0)},
+         jsTestObjReflectedCustomURLAttr),
+     (intptr_t)setJSTestObjReflectedCustomURLAttr THUNK_GENERATOR(0)},
+    {"reflectedCustomNonEmptyURLAttr", DontDelete,
+     (intptr_t) static_cast<PropertySlot::GetValueFunc>(
+         jsTestObjReflectedCustomNonEmptyURLAttr),
+     (intptr_t)setJSTestObjReflectedCustomNonEmptyURLAttr THUNK_GENERATOR(0)},
     {"attrWithGetterException", DontDelete,
      (intptr_t) static_cast<PropertySlot::GetValueFunc>(
          jsTestObjAttrWithGetterException),
@@ -166,7 +174,7 @@ static const HashTableValue JSTestObjTableValues[30] = {
     {0, 0, 0, 0 THUNK_GENERATOR(0)}};
 
 #undef THUNK_GENERATOR
-static JSC_CONST_HASHTABLE HashTable JSTestObjTable = {69, 63,
+static JSC_CONST_HASHTABLE HashTable JSTestObjTable = {68, 63,
                                                        JSTestObjTableValues, 0};
 /* Hash table for constructor */
 #if ENABLE(JIT)
@@ -545,6 +553,18 @@ JSValue jsTestObjReflectedURLAttr(ExecState* exec,
   return result;
 }
 
+JSValue jsTestObjReflectedNonEmptyURLAttr(ExecState* exec,
+                                          JSValue slotBase,
+                                          const Identifier&) {
+  JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(slotBase));
+  UNUSED_PARAM(exec);
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
+  JSValue result =
+      jsString(exec, imp->getNonEmptyURLAttribute(
+                         WebCore::HTMLNames::reflectednonemptyurlattrAttr));
+  return result;
+}
+
 JSValue jsTestObjReflectedStringAttr(ExecState* exec,
                                      JSValue slotBase,
                                      const Identifier&) {
@@ -579,14 +599,26 @@ JSValue jsTestObjReflectedCustomBooleanAttr(ExecState* exec,
   return result;
 }
 
-JSValue jsTestObjReflectedURLAttr(ExecState* exec,
-                                  JSValue slotBase,
-                                  const Identifier&) {
+JSValue jsTestObjReflectedCustomURLAttr(ExecState* exec,
+                                        JSValue slotBase,
+                                        const Identifier&) {
   JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(slotBase));
   UNUSED_PARAM(exec);
   TestObj* imp = static_cast<TestObj*>(castedThis->impl());
   JSValue result = jsString(
       exec, imp->getURLAttribute(WebCore::HTMLNames::customContentURLAttrAttr));
+  return result;
+}
+
+JSValue jsTestObjReflectedCustomNonEmptyURLAttr(ExecState* exec,
+                                                JSValue slotBase,
+                                                const Identifier&) {
+  JSTestObj* castedThis = static_cast<JSTestObj*>(asObject(slotBase));
+  UNUSED_PARAM(exec);
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
+  JSValue result =
+      jsString(exec, imp->getNonEmptyURLAttribute(
+                         WebCore::HTMLNames::customContentNonEmptyURLAttrAttr));
   return result;
 }
 
@@ -800,6 +832,15 @@ void setJSTestObjReflectedURLAttr(ExecState* exec,
                     valueToStringWithNullCheck(exec, value));
 }
 
+void setJSTestObjReflectedNonEmptyURLAttr(ExecState* exec,
+                                          JSObject* thisObject,
+                                          JSValue value) {
+  JSTestObj* castedThis = static_cast<JSTestObj*>(thisObject);
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
+  imp->setAttribute(WebCore::HTMLNames::reflectednonemptyurlattrAttr,
+                    valueToStringWithNullCheck(exec, value));
+}
+
 void setJSTestObjReflectedStringAttr(ExecState* exec,
                                      JSObject* thisObject,
                                      JSValue value) {
@@ -827,12 +868,21 @@ void setJSTestObjReflectedCustomBooleanAttr(ExecState* exec,
                            value.toBoolean(exec));
 }
 
-void setJSTestObjReflectedURLAttr(ExecState* exec,
-                                  JSObject* thisObject,
-                                  JSValue value) {
+void setJSTestObjReflectedCustomURLAttr(ExecState* exec,
+                                        JSObject* thisObject,
+                                        JSValue value) {
   JSTestObj* castedThis = static_cast<JSTestObj*>(thisObject);
   TestObj* imp = static_cast<TestObj*>(castedThis->impl());
   imp->setAttribute(WebCore::HTMLNames::customContentURLAttrAttr,
+                    valueToStringWithNullCheck(exec, value));
+}
+
+void setJSTestObjReflectedCustomNonEmptyURLAttr(ExecState* exec,
+                                                JSObject* thisObject,
+                                                JSValue value) {
+  JSTestObj* castedThis = static_cast<JSTestObj*>(thisObject);
+  TestObj* imp = static_cast<TestObj*>(castedThis->impl());
+  imp->setAttribute(WebCore::HTMLNames::customContentNonEmptyURLAttrAttr,
                     valueToStringWithNullCheck(exec, value));
 }
 

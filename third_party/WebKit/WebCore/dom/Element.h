@@ -250,7 +250,10 @@ class Element : public ContainerNode {
   virtual void accessKeyAction(bool /*sendToAnyEvent*/) {}
 
   virtual bool isURLAttribute(Attribute*) const;
+
   KURL getURLAttribute(const QualifiedName&) const;
+  KURL getNonEmptyURLAttribute(const QualifiedName&) const;
+
   virtual const QualifiedName& imageSourceAttributeName() const;
   virtual String target() const { return String(); }
 

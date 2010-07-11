@@ -215,6 +215,23 @@ void WebDOMTestObj::setReflectedURLAttr(
                        newReflectedURLAttr);
 }
 
+WebDOMString WebDOMTestObj::reflectedNonEmptyURLAttr() const {
+  if (!impl())
+    return WebDOMString();
+
+  return static_cast<const WebCore::String&>(impl()->getNonEmptyURLAttribute(
+      WebCore::HTMLNames::reflectednonemptyurlattrAttr));
+}
+
+void WebDOMTestObj::setReflectedNonEmptyURLAttr(
+    const WebDOMString& newReflectedNonEmptyURLAttr) {
+  if (!impl())
+    return;
+
+  impl()->setAttribute(WebCore::HTMLNames::reflectednonemptyurlattrAttr,
+                       newReflectedNonEmptyURLAttr);
+}
+
 WebDOMString WebDOMTestObj::reflectedStringAttr() const {
   if (!impl())
     return WebDOMString();
@@ -266,7 +283,7 @@ void WebDOMTestObj::setReflectedCustomBooleanAttr(
                               newReflectedCustomBooleanAttr);
 }
 
-WebDOMString WebDOMTestObj::reflectedURLAttr() const {
+WebDOMString WebDOMTestObj::reflectedCustomURLAttr() const {
   if (!impl())
     return WebDOMString();
 
@@ -274,13 +291,30 @@ WebDOMString WebDOMTestObj::reflectedURLAttr() const {
       impl()->getURLAttribute(WebCore::HTMLNames::customContentURLAttrAttr));
 }
 
-void WebDOMTestObj::setReflectedURLAttr(
-    const WebDOMString& newReflectedURLAttr) {
+void WebDOMTestObj::setReflectedCustomURLAttr(
+    const WebDOMString& newReflectedCustomURLAttr) {
   if (!impl())
     return;
 
   impl()->setAttribute(WebCore::HTMLNames::customContentURLAttrAttr,
-                       newReflectedURLAttr);
+                       newReflectedCustomURLAttr);
+}
+
+WebDOMString WebDOMTestObj::reflectedCustomNonEmptyURLAttr() const {
+  if (!impl())
+    return WebDOMString();
+
+  return static_cast<const WebCore::String&>(impl()->getNonEmptyURLAttribute(
+      WebCore::HTMLNames::customContentNonEmptyURLAttrAttr));
+}
+
+void WebDOMTestObj::setReflectedCustomNonEmptyURLAttr(
+    const WebDOMString& newReflectedCustomNonEmptyURLAttr) {
+  if (!impl())
+    return;
+
+  impl()->setAttribute(WebCore::HTMLNames::customContentNonEmptyURLAttrAttr,
+                       newReflectedCustomNonEmptyURLAttr);
 }
 
 int WebDOMTestObj::attrWithGetterException() const {
