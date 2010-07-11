@@ -48,21 +48,23 @@
 #include "ArchiveResource.h"
 #include "BackForwardList.h"
 #include "DataObjectGtk.h"
-#include <enchant.h>
+#include "DragActions.h"
+#include "Frame.h"
 #include "GOwnPtr.h"
 #include "Geolocation.h"
 #include "HistoryItem.h"
-#include "Settings.h"
-#include "Page.h"
-#include "Frame.h"
 #include "InspectorClientGtk.h"
 #include "IntPoint.h"
 #include "FrameLoaderClient.h"
+#include "Page.h"
 #include "ResourceHandle.h"
 #include "ResourceRequest.h"
 #include "ResourceResponse.h"
 #include "WindowFeatures.h"
 #include "SecurityOrigin.h"
+#include "Settings.h"
+#include <enchant.h>
+#include <wtf/OwnPtr.h>
 #include <wtf/text/CString.h>
 
 #include <atk/atk.h>
@@ -103,7 +105,16 @@ WebCore::SecurityOrigin* core(WebKitSecurityOrigin*);
 
 WebKitHitTestResult* kit(const WebCore::HitTestResult&);
 
-WebKit::PasteboardHelperGtk* pasteboardHelperInstance();
+PasteboardHelperGtk* pasteboardHelperInstance();
+
+typedef struct DroppingContext_ {
+  WebKitWebView* webView;
+  GdkDragContext* gdkContext;
+  RefPtr<WebCore::DataObjectGtk> dataObject;
+  WebCore::IntPoint lastMotionPosition;
+  int pendingDataRequests;
+  bool dropHappened;
+} DroppingContext;
 }
 
 extern "C" {
@@ -165,6 +176,7 @@ struct _WebKitWebViewPrivate {
   guint32 previousClickTime;
 
   HashMap<GdkDragContext*, RefPtr<WebCore::DataObjectGtk>>* draggingDataObjects;
+  HashMap<GdkDragContext*, WebKit::DroppingContext*>* droppingContexts;
 };
 
 #define WEBKIT_WEB_FRAME_GET_PRIVATE(obj)                    \
