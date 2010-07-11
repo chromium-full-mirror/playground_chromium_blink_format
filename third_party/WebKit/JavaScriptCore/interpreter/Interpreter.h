@@ -75,7 +75,7 @@ class Interpreter : public FastAllocBase {
   RegisterFile& registerFile() { return m_registerFile; }
 
   Opcode getOpcode(OpcodeID id) {
-#if HAVE(COMPUTED_GOTO)
+#if ENABLE(COMPUTED_GOTO_INTERPRETER)
     return m_opcodeTable[id];
 #else
     return id;
@@ -83,7 +83,7 @@ class Interpreter : public FastAllocBase {
   }
 
   OpcodeID getOpcodeID(Opcode opcode) {
-#if HAVE(COMPUTED_GOTO)
+#if ENABLE(COMPUTED_GOTO_INTERPRETER)
     ASSERT(isOpcode(opcode));
     return m_opcodeIDTable.get(opcode);
 #else
@@ -236,7 +236,7 @@ class Interpreter : public FastAllocBase {
 
   RegisterFile m_registerFile;
 
-#if HAVE(COMPUTED_GOTO)
+#if ENABLE(COMPUTED_GOTO_INTERPRETER)
   Opcode m_opcodeTable[numOpcodeIDs];  // Maps OpcodeID => Opcode for compiling
   HashMap<Opcode, OpcodeID>
       m_opcodeIDTable;  // Maps Opcode => OpcodeID for decompiling

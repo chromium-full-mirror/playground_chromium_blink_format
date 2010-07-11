@@ -135,7 +135,7 @@ struct PolymorphicAccessStructureList : FastAllocBase {
 
 struct Instruction {
   Instruction(Opcode opcode) {
-#if !HAVE(COMPUTED_GOTO)
+#if !ENABLE(COMPUTED_GOTO_INTERPRETER)
     // We have to initialize one of the pointer members to ensure that
     // the entire struct is initialized, when opcode is not a pointer.
     u.jsCell = 0;
