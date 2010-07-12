@@ -2840,6 +2840,9 @@ String FrameLoader::userAgent(const KURL& url) const {
 
 void FrameLoader::handledOnloadEvents() {
   m_client->dispatchDidHandleOnloadEvents();
+
+  m_loadType = FrameLoadTypeStandard;
+
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
   if (documentLoader())
     documentLoader()->applicationCacheHost()->stopDeferringEvents();
@@ -2911,6 +2914,14 @@ void FrameLoader::addExtraFieldsToRequest(ResourceRequest& request,
 
   applyUserAgent(request);
 
+  // If we inherit cache policy from a main resource, we use the
+  // DocumentLoader's
+  // original request cache policy for two reasons:
+  // 1. For POST requests, we mutate the cache policy for the main resource,
+  //    but we do not want this to apply to subresources
+  // 2. Delegates that modify the cache policy using willSendRequest: should
+  //    not affect any other resources. Such changes need to be done
+  //    per request.
   if (loadType == FrameLoadTypeReload) {
     request.setCachePolicy(ReloadIgnoringCacheData);
     request.setHTTPHeaderField("Cache-Control", "max-age=0");
@@ -2918,9 +2929,13 @@ void FrameLoader::addExtraFieldsToRequest(ResourceRequest& request,
     request.setCachePolicy(ReloadIgnoringCacheData);
     request.setHTTPHeaderField("Cache-Control", "no-cache");
     request.setHTTPHeaderField("Pragma", "no-cache");
-  } else if (isBackForwardLoadType(loadType) &&
-             !request.url().protocolIs("https"))
+  } else if (request.isConditional())
+    request.setCachePolicy(ReloadIgnoringCacheData);
+  else if (isBackForwardLoadType(loadType) &&
+           !request.url().protocolIs("https"))
     request.setCachePolicy(ReturnCacheDataElseLoad);
+  else if (!mainResource && documentLoader()->isLoadingInAPISense())
+    request.setCachePolicy(documentLoader()->originalRequest().cachePolicy());
 
   if (mainResource)
     request.setHTTPAccept(defaultAcceptHeader);
@@ -3041,17 +3056,6 @@ unsigned long FrameLoader::loadResourceSynchronously(
   ResourceRequest initialRequest = request;
   initialRequest.setTimeoutInterval(10);
 
-  // Use the original request's cache policy for two reasons:
-  // 1. For POST requests, we mutate the cache policy for the main resource,
-  //    but we do not want this to apply to subresources
-  // 2. Delegates that modify the cache policy using willSendRequest: should
-  //    not affect any other resources. Such changes need to be done
-  //    per request.
-  if (initialRequest.isConditional())
-    initialRequest.setCachePolicy(ReloadIgnoringCacheData);
-  else
-    initialRequest.setCachePolicy(originalRequest().cachePolicy());
-
   if (!referrer.isEmpty())
     initialRequest.setHTTPReferrer(referrer);
   addHTTPOriginIfNeeded(initialRequest, outgoingOrigin());
@@ -3060,6 +3064,8 @@ unsigned long FrameLoader::loadResourceSynchronously(
     initialRequest.setFirstPartyForCookies(
         page->mainFrame()->loader()->documentLoader()->request().url());
   initialRequest.setHTTPUserAgent(client()->userAgent(request.url()));
+
+  addExtraFieldsToSubresourceRequest(initialRequest);
 
   unsigned long identifier = 0;
   ResourceRequest newRequest(initialRequest);
