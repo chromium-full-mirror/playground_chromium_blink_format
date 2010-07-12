@@ -610,6 +610,10 @@ void CanvasRenderingContext2D::arc(float x,
     ec = INDEX_SIZE_ERR;
     return;
   }
+
+  if (sa == ea)
+    return;
+
   if (!state().m_invertibleCTM)
     return;
   m_path.addArc(FloatPoint(x, y), r, sa, ea, anticlockwise);
