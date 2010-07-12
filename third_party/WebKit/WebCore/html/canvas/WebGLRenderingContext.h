@@ -919,6 +919,9 @@ class WebGLRenderingContext : public CanvasRenderingContext {
                                        int size,
                                        int mod);
 
+  // Helper function to validate usage for bufferData.
+  bool validateBufferDataUsage(unsigned long);
+
   // Helper functions for vertexAttribNf{v}.
   void vertexAttribfImpl(unsigned long index,
                          int expectedSize,
