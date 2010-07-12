@@ -30,11 +30,7 @@ namespace WebCore {
 
 using namespace std;
 
-PageGroupLoadDeferrer::PageGroupLoadDeferrer(
-    Page* page,
-    bool deferSelf,
-    PageGroupLoadDeferrer* nextDeferrer)
-    : m_nextDeferrer(nextDeferrer) {
+PageGroupLoadDeferrer::PageGroupLoadDeferrer(Page* page, bool deferSelf) {
   const HashSet<Page*>& pages = page->group().pages();
 
   HashSet<Page*>::const_iterator end = pages.end();
