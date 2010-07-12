@@ -169,3 +169,8 @@ void MainWindow::openFile() {
       load(QUrl::fromLocalFile(selectedFile));
   }
 }
+
+void MainWindow::openLocation() {
+  urlEdit->selectAll();
+  urlEdit->setFocus();
+}

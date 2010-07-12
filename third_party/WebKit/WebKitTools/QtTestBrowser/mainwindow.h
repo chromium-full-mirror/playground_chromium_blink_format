@@ -55,6 +55,7 @@ class MainWindow : public QMainWindow {
   void setAddressUrl(const QString& url);
   void setAddressUrl(const QUrl& url);
   void openFile();
+  void openLocation();
   void changeLocation();
 
  private:
