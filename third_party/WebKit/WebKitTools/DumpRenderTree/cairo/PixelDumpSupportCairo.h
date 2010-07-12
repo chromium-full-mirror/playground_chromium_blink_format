@@ -36,6 +36,8 @@
 #if PLATFORM(WIN)
 #include <windows.h>
 #include <cairo-win32.h>
+#elif PLATFORM(GTK)
+#include <cairo.h>
 #endif
 
 #if PLATFORM(WIN)
@@ -66,12 +68,7 @@ class BitmapContext : public RefCounted<BitmapContext> {
 
  private:
   BitmapContext(PlatformBitmapBuffer buffer, cairo_t* context)
-      : m_buffer(buffer) {
-    if (m_context)
-      cairo_destroy(m_context);
-
-    m_context = context;
-  }
+      : m_buffer(buffer), m_context(context) {}
 
   PlatformBitmapBuffer m_buffer;
   cairo_t* m_context;
