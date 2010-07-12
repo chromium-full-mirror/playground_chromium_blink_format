@@ -79,6 +79,7 @@
 // Basic types
 
 #include <stddef.h>  // For size_t
+#include <stdint.h>  // For int32_t
 
 namespace WebKit {
 
