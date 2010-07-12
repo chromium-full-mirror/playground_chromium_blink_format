@@ -83,6 +83,7 @@ class HTMLElementStack : public Noncopyable {
 
   void pop();
   void popUntil(const AtomicString& tagName);
+  void popUntilElementWithNamespace(const AtomicString& namespaceURI);
   void popUntil(Element*);
   void popUntilPopped(const AtomicString& tagName);
   void popUntilPopped(Element*);
