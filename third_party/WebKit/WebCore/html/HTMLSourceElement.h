@@ -54,6 +54,7 @@ class HTMLSourceElement : public HTMLElement {
   virtual int tagPriority() const { return 0; }
 
   virtual void insertedIntoDocument();
+  virtual bool isURLAttribute(Attribute*) const;
 
   void errorEventTimerFired(Timer<HTMLSourceElement>*);
 
