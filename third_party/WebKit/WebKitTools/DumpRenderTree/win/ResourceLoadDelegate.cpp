@@ -278,7 +278,7 @@ ResourceLoadDelegate::didReceiveAuthenticationChallenge(
 
   if (!gLayoutTestController->handlesAuthenticationChallenges()) {
     sender->continueWithoutCredentialForAuthenticationChallenge(challenge);
-    return E_FAIL;
+    return S_OK;
   }
 
   const char* user = gLayoutTestController->authenticationUsername().c_str();
