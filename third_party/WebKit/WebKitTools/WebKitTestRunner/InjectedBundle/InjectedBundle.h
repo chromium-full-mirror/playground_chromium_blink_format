@@ -50,6 +50,7 @@ class InjectedBundle {
   LayoutTestController* layoutTestController() {
     return m_layoutTestController.get();
   }
+  InjectedBundlePage* page() { return m_mainPage; }
 
   std::ostringstream& os() { return m_outputStream; }
 
@@ -75,6 +76,7 @@ class InjectedBundle {
 
   WKBundleRef m_bundle;
   HashMap<WKBundlePageRef, InjectedBundlePage*> m_pages;
+  InjectedBundlePage* m_mainPage;
 
   RefPtr<LayoutTestController> m_layoutTestController;
 
