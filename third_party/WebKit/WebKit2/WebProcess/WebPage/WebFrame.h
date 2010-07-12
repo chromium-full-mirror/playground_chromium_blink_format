@@ -72,6 +72,11 @@ class WebFrame : public RefCounted<WebFrame> {
   WebCore::String innerText() const;
   PassRefPtr<ImmutableArray> childFrames();
 
+  unsigned numberOfActiveAnimations();
+  bool pauseAnimationOnElementWithId(const WebCore::String& animationName,
+                                     const WebCore::String& elementID,
+                                     double time);
+
  private:
   static PassRefPtr<WebFrame> create(WebPage*,
                                      const WebCore::String& frameName,

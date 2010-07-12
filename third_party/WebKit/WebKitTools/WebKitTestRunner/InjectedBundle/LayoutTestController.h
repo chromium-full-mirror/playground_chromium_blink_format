@@ -53,6 +53,11 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
   void invalidateWaitToDumpWatchdog();
   void notifyDone();
 
+  unsigned numberOfActiveAnimations() const;
+  bool pauseAnimationAtTimeOnElementWithId(JSStringRef animationName,
+                                           double time,
+                                           JSStringRef elementId);
+
  private:
   LayoutTestController(const std::string& testPathOrURL);
 
