@@ -27,6 +27,8 @@
 #define PluginView_h
 
 #include "Plugin.h"
+#include "PluginController.h"
+
 #include <WebCore/MediaCanStartListener.h>
 #include <WebCore/Widget.h>
 
@@ -38,7 +40,9 @@ class HTMLPlugInElement;
 
 namespace WebKit {
 
-class PluginView : public WebCore::Widget, WebCore::MediaCanStartListener {
+class PluginView : public WebCore::Widget,
+                   WebCore::MediaCanStartListener,
+                   PluginController {
  public:
   static PassRefPtr<PluginView> create(
       WebCore::HTMLPlugInElement* pluginElement,
@@ -68,6 +72,10 @@ class PluginView : public WebCore::Widget, WebCore::MediaCanStartListener {
 
   // WebCore::MediaCanStartListener
   virtual void mediaCanStart();
+
+  // PluginController
+  virtual void invalidate(const WebCore::IntRect&);
+  virtual WebCore::String userAgent(const WebCore::KURL&);
 
   WebCore::HTMLPlugInElement* m_pluginElement;
   RefPtr<Plugin> m_plugin;

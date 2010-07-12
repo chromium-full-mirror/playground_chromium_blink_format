@@ -33,7 +33,7 @@ namespace WebKit {
 
 DummyPlugin::DummyPlugin() {}
 
-bool DummyPlugin::initialize(const Parameters&) {
+bool DummyPlugin::initialize(PluginController*, const Parameters&) {
   return true;
 }
 

@@ -39,7 +39,7 @@ class DummyPlugin : public Plugin {
   DummyPlugin();
 
   // Plugin
-  virtual bool initialize(const Parameters&);
+  virtual bool initialize(PluginController*, const Parameters&);
   virtual void destroy();
   virtual void paint(WebCore::GraphicsContext*,
                      const WebCore::IntRect& dirtyRect);
