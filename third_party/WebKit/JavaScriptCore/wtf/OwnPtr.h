@@ -66,7 +66,7 @@ class OwnPtr : public Noncopyable {
 
   void clear();
   PassOwnPtr<T> release();
-  PtrType leakPtr();
+  PtrType leakPtr() WARN_UNUSED_RETURN;
 
   ValueType& operator*() const {
     ASSERT(m_ptr);

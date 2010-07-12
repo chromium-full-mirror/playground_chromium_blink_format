@@ -93,6 +93,7 @@ class RetainPtr {
     m_ptr = 0;
     return tmp;
   }
+  WARN_UNUSED_RETURN;
 
   PtrType operator->() const { return m_ptr; }
 

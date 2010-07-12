@@ -67,7 +67,7 @@ class PassOwnPtr {
   PtrType get() const { return m_ptr; }
 
   void clear();
-  PtrType leakPtr() const;
+  PtrType leakPtr() const WARN_UNUSED_RETURN;
 
   ValueType& operator*() const {
     ASSERT(m_ptr);
