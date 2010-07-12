@@ -29,7 +29,7 @@
 
 #if PLATFORM(CG) || PLATFORM(QT) || PLATFORM(GTK) ||                         \
     (PLATFORM(CHROMIUM) && (OS(WINDOWS) || OS(LINUX))) || PLATFORM(HAIKU) || \
-    OS(WINCE)
+    OS(WINCE) || PLATFORM(ANDROID)
 #define STORE_FONT_CUSTOM_PLATFORM_DATA
 #endif
 
