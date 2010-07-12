@@ -161,7 +161,7 @@ class HTMLTreeBuilder : public Noncopyable {
   void processDefaultForAfterHeadMode(AtomicHTMLToken&);
   void processDefaultForInTableTextMode(AtomicHTMLToken&);
 
-  void processEndTagUsingSecondaryInsertionModeAndAdjustInsertionMode(
+  void processUsingSecondaryInsertionModeAndAdjustInsertionMode(
       AtomicHTMLToken&);
 
   PassRefPtr<NamedNodeMap> attributesForIsindexInput(AtomicHTMLToken&);
