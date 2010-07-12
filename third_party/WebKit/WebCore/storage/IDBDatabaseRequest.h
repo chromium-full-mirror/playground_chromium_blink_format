@@ -59,7 +59,7 @@ class IDBDatabaseRequest : public RefCounted<IDBDatabaseRequest> {
 
   PassRefPtr<IDBRequest> createObjectStore(ScriptExecutionContext*,
                                            const String& name,
-                                           const String& keyPath = "",
+                                           const String& keyPath = String(),
                                            bool autoIncrement = false);
   PassRefPtr<IDBObjectStoreRequest> objectStore(
       const String& name,

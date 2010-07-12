@@ -34,6 +34,9 @@
 
 namespace WebCore {
 
+template <typename ValueType>
+class IDBKeyTree;
+
 class IDBObjectStoreImpl : public IDBObjectStore {
  public:
   static PassRefPtr<IDBObjectStore> create(const String& name,
@@ -41,11 +44,18 @@ class IDBObjectStoreImpl : public IDBObjectStore {
                                            bool autoIncrement) {
     return adoptRef(new IDBObjectStoreImpl(name, keyPath, autoIncrement));
   }
-  virtual ~IDBObjectStoreImpl();
+  ~IDBObjectStoreImpl();
 
   String name() const { return m_name; }
   String keyPath() const { return m_keyPath; }
   PassRefPtr<DOMStringList> indexNames() const;
+
+  void get(PassRefPtr<IDBKey> key, PassRefPtr<IDBCallbacks>);
+  void put(PassRefPtr<SerializedScriptValue> value,
+           PassRefPtr<IDBKey> key,
+           bool addOnly,
+           PassRefPtr<IDBCallbacks>);
+  void remove(PassRefPtr<IDBKey> key, PassRefPtr<IDBCallbacks>);
 
   void createIndex(const String& name,
                    const String& keyPath,
@@ -65,6 +75,9 @@ class IDBObjectStoreImpl : public IDBObjectStore {
 
   typedef HashMap<String, RefPtr<IDBIndex>> IndexMap;
   IndexMap m_indexes;
+
+  typedef IDBKeyTree<SerializedScriptValue> Tree;
+  RefPtr<Tree> m_tree;
 };
 
 }  // namespace WebCore

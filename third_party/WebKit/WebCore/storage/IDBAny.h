@@ -36,6 +36,7 @@ namespace WebCore {
 
 class IDBDatabaseRequest;
 class IDBIndexRequest;
+class IDBKey;
 class IDBObjectStoreRequest;
 class IndexedDatabaseRequest;
 class SerializedScriptValue;
@@ -50,6 +51,7 @@ class IDBAny : public RefCounted<IDBAny> {
     NullType,
     IDBDatabaseRequestType,
     IDBIndexRequestType,
+    IDBKeyType,
     IDBObjectStoreRequestType,
     IndexedDatabaseRequestType,
     SerializedScriptValueType
@@ -59,6 +61,7 @@ class IDBAny : public RefCounted<IDBAny> {
   // Use type() to figure out which one of these you're allowed to call.
   PassRefPtr<IDBDatabaseRequest> idbDatabaseRequest();
   PassRefPtr<IDBIndexRequest> idbIndexRequest();
+  PassRefPtr<IDBKey> idbKey();
   PassRefPtr<IDBObjectStoreRequest> idbObjectStoreRequest();
   PassRefPtr<IndexedDatabaseRequest> indexedDatabaseRequest();
   PassRefPtr<SerializedScriptValue> serializedScriptValue();
@@ -67,6 +70,7 @@ class IDBAny : public RefCounted<IDBAny> {
   void set();  // For "null".
   void set(PassRefPtr<IDBDatabaseRequest>);
   void set(PassRefPtr<IDBIndexRequest>);
+  void set(PassRefPtr<IDBKey>);
   void set(PassRefPtr<IDBObjectStoreRequest>);
   void set(PassRefPtr<IndexedDatabaseRequest>);
   void set(PassRefPtr<SerializedScriptValue>);
@@ -79,6 +83,7 @@ class IDBAny : public RefCounted<IDBAny> {
   // Only one of the following should ever be in use at any given time.
   RefPtr<IDBDatabaseRequest> m_idbDatabaseRequest;
   RefPtr<IDBIndexRequest> m_idbIndexRequest;
+  RefPtr<IDBKey> m_idbKey;
   RefPtr<IDBObjectStoreRequest> m_idbObjectStoreRequest;
   RefPtr<IndexedDatabaseRequest> m_indexedDatabaseRequest;
   RefPtr<SerializedScriptValue> m_serializedScriptValue;

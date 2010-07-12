@@ -40,6 +40,7 @@ namespace WebCore {
 class DOMStringList;
 class IDBAny;
 class IDBIndexRequest;
+class IDBKey;
 class SerializedScriptValue;
 
 class IDBObjectStoreRequest : public RefCounted<IDBObjectStoreRequest> {
@@ -54,19 +55,15 @@ class IDBObjectStoreRequest : public RefCounted<IDBObjectStoreRequest> {
   String keyPath() const;
   PassRefPtr<DOMStringList> indexNames() const;
 
-  PassRefPtr<IDBRequest> get(ScriptExecutionContext*,
-                             PassRefPtr<SerializedScriptValue> key);
+  PassRefPtr<IDBRequest> get(ScriptExecutionContext*, PassRefPtr<IDBKey> key);
   PassRefPtr<IDBRequest> add(ScriptExecutionContext*,
                              PassRefPtr<SerializedScriptValue> value,
-                             PassRefPtr<SerializedScriptValue> key = 0);
-  PassRefPtr<IDBRequest> modify(ScriptExecutionContext*,
-                                PassRefPtr<SerializedScriptValue> value,
-                                PassRefPtr<SerializedScriptValue> key = 0);
-  PassRefPtr<IDBRequest> addOrModify(ScriptExecutionContext*,
-                                     PassRefPtr<SerializedScriptValue> value,
-                                     PassRefPtr<SerializedScriptValue> key = 0);
+                             PassRefPtr<IDBKey> key = 0);
+  PassRefPtr<IDBRequest> put(ScriptExecutionContext*,
+                             PassRefPtr<SerializedScriptValue> value,
+                             PassRefPtr<IDBKey> key = 0);
   PassRefPtr<IDBRequest> remove(ScriptExecutionContext*,
-                                PassRefPtr<SerializedScriptValue> key);
+                                PassRefPtr<IDBKey> key);
 
   PassRefPtr<IDBRequest> createIndex(ScriptExecutionContext*,
                                      const String& name,
