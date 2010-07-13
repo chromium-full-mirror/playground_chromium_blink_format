@@ -132,21 +132,25 @@ void QWKPagePrivate::updateAction(QWKPage::WebAction action) {
   if (!a)
     return;
 
+  RefPtr<WebKit::WebFrameProxy> mainFrame = page->mainFrame();
+  if (!mainFrame)
+    return;
+
   bool enabled = a->isEnabled();
   bool checked = a->isChecked();
 
   switch (action) {
     case QWKPage::Back:
-      page->canGoBack();
+      enabled = page->canGoBack();
       break;
     case QWKPage::Forward:
-      page->canGoForward();
+      enabled = page->canGoForward();
       break;
     case QWKPage::Stop:
-      // FIXME
+      enabled = !(WebFrameProxy::LoadStateFinished == mainFrame->loadState());
       break;
     case QWKPage::Reload:
-      // FIXME
+      enabled = (WebFrameProxy::LoadStateFinished == mainFrame->loadState());
       break;
     default:
       break;
@@ -159,7 +163,6 @@ void QWKPagePrivate::updateAction(QWKPage::WebAction action) {
 #endif  // QT_NO_ACTION
 }
 
-// FIXME: hook up
 void QWKPagePrivate::updateNavigationActions() {
   updateAction(QWKPage::Back);
   updateAction(QWKPage::Forward);

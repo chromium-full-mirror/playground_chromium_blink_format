@@ -41,6 +41,7 @@ void qt_wk_didStartProvisionalLoadForFrame(WKPageRef page,
   if (!WKFrameIsMainFrame(frame))
     return;
   emit toQWKPage(clientInfo)->loadStarted();
+  QWKPagePrivate::get(toQWKPage(clientInfo))->updateNavigationActions();
 }
 
 void qt_wk_didReceiveServerRedirectForProvisionalLoadForFrame(
@@ -61,6 +62,7 @@ void qt_wk_didCommitLoadForFrame(WKPageRef page,
   QString urlStr(wkframe->url());
   QUrl qUrl = urlStr;
   emit toQWKPage(clientInfo)->urlChanged(qUrl);
+  QWKPagePrivate::get(toQWKPage(clientInfo))->updateNavigationActions();
 }
 
 void qt_wk_didFinishLoadForFrame(WKPageRef page,
@@ -69,6 +71,7 @@ void qt_wk_didFinishLoadForFrame(WKPageRef page,
   if (!WKFrameIsMainFrame(frame))
     return;
   emit toQWKPage(clientInfo)->loadFinished(true);
+  QWKPagePrivate::get(toQWKPage(clientInfo))->updateNavigationActions();
 }
 
 void qt_wk_didFailLoadWithErrorForFrame(WKPageRef page,
@@ -77,6 +80,7 @@ void qt_wk_didFailLoadWithErrorForFrame(WKPageRef page,
   if (!WKFrameIsMainFrame(frame))
     return;
   emit toQWKPage(clientInfo)->loadFinished(false);
+  QWKPagePrivate::get(toQWKPage(clientInfo))->updateNavigationActions();
 }
 
 void qt_wk_didReceiveTitleForFrame(WKPageRef page,
