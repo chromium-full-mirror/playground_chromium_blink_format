@@ -45,6 +45,7 @@
 #include "ResourceError.h"
 #include "ResourceHandle.h"
 #include "Settings.h"
+#include <wtf/CurrentTime.h>
 
 // FIXME: More that is in common with SubresourceLoader should move up into
 // ResourceLoader.
@@ -165,6 +166,8 @@ void MainResourceLoader::willSendRequest(
   // last
   // reference to this object; one example of this is 3266216.
   RefPtr<MainResourceLoader> protect(this);
+
+  frameLoader()->frameLoadTimeline()->fetchStart = currentTime();
 
   // Update cookie policy base URL as URL changes, except for subframes, which
   // use the
