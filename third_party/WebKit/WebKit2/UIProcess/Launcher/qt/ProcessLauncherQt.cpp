@@ -95,7 +95,7 @@ void ProcessLauncherHelper::launch(WebKit::ProcessLauncher* launcher) {
       WorkItem::create(launcher,
                        &WebKit::ProcessLauncher::didFinishLaunchingProcess,
                        webProcess, m_server.serverName())
-          .release());
+          .leakPtr());
 }
 
 QLocalSocket* ProcessLauncherHelper::takePendingConnection() {
