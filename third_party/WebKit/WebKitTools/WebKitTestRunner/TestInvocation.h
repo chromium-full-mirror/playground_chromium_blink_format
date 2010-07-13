@@ -46,6 +46,7 @@ class TestInvocation : public Noncopyable {
   static void runUntil(bool& done);
 
   WKRetainPtr<WKURLRef> m_url;
+  char* m_pathOrURL;
 
   // Invocation state
   bool m_gotInitialResponse;
