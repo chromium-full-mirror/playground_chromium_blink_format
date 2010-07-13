@@ -160,11 +160,6 @@ void BytecodeGenerator::generate() {
       m_codeType == EvalCode)
     symbolTable().clear();
 
-  m_codeBlock->setIsNumericCompareFunction(
-      instructions() ==
-      m_globalData->numericCompareFunction(
-          m_scopeChain->globalObject()->globalExec()));
-
 #if !ENABLE(OPCODE_SAMPLING)
   if (!m_regeneratingForExceptionInfo && !m_usesExceptions &&
       (m_codeType == FunctionCode || m_codeType == EvalCode))
@@ -2223,6 +2218,18 @@ RegisterID* BytecodeGenerator::emitThrowExpressionTooDeepException() {
       newTemporary(), false, jsString(globalData(), "Expression too deep"));
   emitThrow(exception);
   return exception;
+}
+
+void BytecodeGenerator::setIsNumericCompareFunction(
+    bool isNumericCompareFunction) {
+  m_codeBlock->setIsNumericCompareFunction(isNumericCompareFunction);
+}
+
+int BytecodeGenerator::argumentNumberFor(const Identifier& ident) {
+  int parameterCount = m_parameters.size();  // includes 'this'
+  int index = registerFor(ident)->index() + RegisterFile::CallFrameHeaderSize +
+              parameterCount;
+  return (index > 0 && index < parameterCount) ? index : 0;
 }
 
 }  // namespace JSC

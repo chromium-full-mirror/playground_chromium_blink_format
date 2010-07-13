@@ -155,6 +155,7 @@ class ExpressionNode : public Node {
   virtual bool isCommaNode() const { return false; }
   virtual bool isSimpleArray() const { return false; }
   virtual bool isAdd() const { return false; }
+  virtual bool isSubtract() const { return false; }
   virtual bool hasConditionContextCodegen() const { return false; }
 
   virtual void emitBytecodeInConditionContext(BytecodeGenerator&,
@@ -956,6 +957,9 @@ class BinaryOpNode : public ExpressionNode {
                          RegisterID* lhs = 0,
                          ReadModifyResolveNode* emitExpressionInfoForMe = 0);
 
+  ExpressionNode* lhs() { return m_expr1; };
+  ExpressionNode* rhs() { return m_expr2; };
+
  private:
   virtual RegisterID* emitBytecode(BytecodeGenerator&, RegisterID* = 0);
 
@@ -1030,6 +1034,8 @@ class SubNode : public BinaryOpNode {
           ExpressionNode* expr1,
           ExpressionNode* expr2,
           bool rightHasAssignments);
+
+  virtual bool isSubtract() const { return true; }
 };
 
 class LeftShiftNode : public BinaryOpNode {
@@ -1439,6 +1445,7 @@ class BlockNode : public StatementNode {
  public:
   BlockNode(JSGlobalData*, SourceElements* = 0);
 
+  StatementNode* singleStatement() const;
   StatementNode* lastStatement() const;
 
  private:
@@ -1604,6 +1611,8 @@ class BreakNode : public StatementNode, public ThrowableExpressionData {
 class ReturnNode : public StatementNode, public ThrowableExpressionData {
  public:
   ReturnNode(JSGlobalData*, ExpressionNode* value);
+
+  ExpressionNode* value() { return m_value; }
 
  private:
   virtual RegisterID* emitBytecode(BytecodeGenerator&, RegisterID* = 0);

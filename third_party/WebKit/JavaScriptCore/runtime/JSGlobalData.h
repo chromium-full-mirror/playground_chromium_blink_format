@@ -192,10 +192,6 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
   ReturnAddressPtr exceptionLocation;
 #endif
 
-  const Vector<Instruction>& numericCompareFunction(ExecState*);
-  Vector<Instruction> lazyNumericCompareFunction;
-  bool initializingLazyNumericCompareFunction;
-
   HashMap<OpaqueJSClass*, OpaqueJSClassContextData*> opaqueJSClassData;
 
   JSGlobalObject* head;
