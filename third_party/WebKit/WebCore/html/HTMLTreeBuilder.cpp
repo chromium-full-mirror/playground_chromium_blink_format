@@ -963,12 +963,12 @@ bool HTMLTreeBuilder::processColgroupEndTagForInColumnGroup() {
 // http://www.whatwg.org/specs/web-apps/current-work/multipage/tokenization.html#close-the-cell
 void HTMLTreeBuilder::closeTheCell() {
   ASSERT(insertionMode() == InCellMode);
-  if (m_tree.openElements()->inScope(tdTag)) {
-    ASSERT(!m_tree.openElements()->inScope(thTag));
+  if (m_tree.openElements()->inTableScope(tdTag)) {
+    ASSERT(!m_tree.openElements()->inTableScope(thTag));
     processFakeEndTag(tdTag);
     return;
   }
-  ASSERT(m_tree.openElements()->inScope(thTag));
+  ASSERT(m_tree.openElements()->inTableScope(thTag));
   processFakeEndTag(thTag);
   ASSERT(insertionMode() == InRowMode);
 }
