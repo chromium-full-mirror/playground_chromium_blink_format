@@ -781,8 +781,10 @@ class WebGLRenderingContext : public CanvasRenderingContext {
   RefPtr<WebGLTexture> m_blackTexture2D;
   RefPtr<WebGLTexture> m_blackTextureCubeMap;
 
-  long m_maxTextureSize;
-  long m_maxCubeMapTextureSize;
+  int m_maxTextureSize;
+  int m_maxCubeMapTextureSize;
+  int m_maxTextureLevel;
+  int m_maxCubeMapTextureLevel;
 
   int m_packAlignment;
   int m_unpackAlignment;

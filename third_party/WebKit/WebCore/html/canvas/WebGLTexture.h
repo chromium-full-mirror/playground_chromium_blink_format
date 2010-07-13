@@ -30,6 +30,7 @@
 
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
+#include <wtf/Vector.h>
 
 namespace WebCore {
 
@@ -45,22 +46,32 @@ class WebGLTexture : public CanvasObject {
     cubeMapRWrapModeInitialized = initialized;
   }
 
-  void setTarget(unsigned long);
+  void setTarget(unsigned long target, int maxLevel);
   void setParameteri(unsigned long pname, int param);
   void setParameterf(unsigned long pname, float param);
-  void setSize(unsigned long target, unsigned width, unsigned height);
 
-  void setInternalFormat(unsigned long internalformat) {
-    m_internalFormat = internalformat;
-  }
-  unsigned long getInternalFormat() const { return m_internalFormat; }
+  void setLevelInfo(unsigned long target,
+                    int level,
+                    unsigned long internalFormat,
+                    int width,
+                    int height,
+                    unsigned long type);
 
+  bool canGenerateMipmaps();
+  // Generate all level information.
+  void generateMipmapLevelInfo();
+
+  unsigned long getInternalFormat() const;
+
+  // Whether width/height is NotPowerOfTwo.
   static bool isNPOT(unsigned, unsigned);
 
-  bool isNPOT() const { return m_isNPOT; }
+  bool isNPOT() const;
   // Determine if texture sampling should always return [0, 0, 0, 1] (OpenGL ES
   // 2.0 Sec 3.8.2).
-  bool needToUseBlackTexture() const { return m_needToUseBlackTexture; }
+  bool needToUseBlackTexture() const;
+
+  static int computeLevelCount(int width, int height);
 
  protected:
   WebGLTexture(WebGLRenderingContext*);
@@ -70,7 +81,9 @@ class WebGLTexture : public CanvasObject {
  private:
   virtual bool isTexture() const { return true; }
 
-  void updateNPOTStates();
+  void update();
+
+  int mapTargetToIndex(unsigned long);
 
   bool cubeMapRWrapModeInitialized;
 
@@ -81,12 +94,30 @@ class WebGLTexture : public CanvasObject {
   int m_wrapS;
   int m_wrapT;
 
-  unsigned long m_internalFormat;
+  class LevelInfo {
+   public:
+    LevelInfo()
+        : valid(false), internalFormat(0), width(0), height(0), type(0) {}
 
-  unsigned m_width[6];
-  unsigned m_height[6];
+    void setInfo(unsigned long internalFmt, int w, int h, unsigned long tp) {
+      valid = true;
+      internalFormat = internalFmt;
+      width = w;
+      height = h;
+      type = tp;
+    }
+
+    bool valid;
+    unsigned long internalFormat;
+    int width;
+    int height;
+    unsigned long type;
+  };
+
+  Vector<Vector<LevelInfo>> m_info;
 
   bool m_isNPOT;
+  bool m_isComplete;
   bool m_needToUseBlackTexture;
 };
 
