@@ -1463,8 +1463,10 @@ bool RenderObject::repaintAfterLayoutIfNeeded(
   if (v->printing())
     return false;  // Don't repaint if we're printing.
 
-  ASSERT(!newBoundsPtr ||
-         *newBoundsPtr == clippedOverflowRectForRepaint(repaintContainer));
+  // This ASSERT fails due to animations.  See
+  // https://bugs.webkit.org/show_bug.cgi?id=37048
+  // ASSERT(!newBoundsPtr || *newBoundsPtr ==
+  // clippedOverflowRectForRepaint(repaintContainer));
   IntRect newBounds = newBoundsPtr
                           ? *newBoundsPtr
                           : clippedOverflowRectForRepaint(repaintContainer);
@@ -1476,8 +1478,10 @@ bool RenderObject::repaintAfterLayoutIfNeeded(
   if (!fullRepaint && style()->borderFit() == BorderFitLines)
     fullRepaint = true;
   if (!fullRepaint) {
-    ASSERT(!newOutlineBoxRectPtr ||
-           *newOutlineBoxRectPtr == outlineBoundsForRepaint(repaintContainer));
+    // This ASSERT fails due to animations.  See
+    // https://bugs.webkit.org/show_bug.cgi?id=37048
+    // ASSERT(!newOutlineBoxRectPtr || *newOutlineBoxRectPtr ==
+    // outlineBoundsForRepaint(repaintContainer));
     newOutlineBox = newOutlineBoxRectPtr
                         ? *newOutlineBoxRectPtr
                         : outlineBoundsForRepaint(repaintContainer);
