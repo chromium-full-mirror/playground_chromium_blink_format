@@ -71,7 +71,6 @@ class IDBDatabaseRequest : public RefCounted<IDBDatabaseRequest> {
   IDBDatabaseRequest(PassRefPtr<IDBDatabase>);
 
   RefPtr<IDBDatabase> m_database;
-  RefPtr<IDBAny> m_this;
 };
 
 }  // namespace WebCore

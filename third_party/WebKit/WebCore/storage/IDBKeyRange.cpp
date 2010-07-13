@@ -36,10 +36,7 @@ namespace WebCore {
 IDBKeyRange::IDBKeyRange(PassRefPtr<SerializedScriptValue> left,
                          PassRefPtr<SerializedScriptValue> right,
                          unsigned short flags)
-    : m_left(IDBAny::create()), m_right(IDBAny::create()), m_flags(flags) {
-  m_left->set(left);
-  m_right->set(right);
-}
+    : m_left(left), m_right(right), m_flags(flags) {}
 
 }  // namespace WebCore
 

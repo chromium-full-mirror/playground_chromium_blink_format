@@ -77,7 +77,6 @@ class IDBObjectStoreRequest : public RefCounted<IDBObjectStoreRequest> {
   IDBObjectStoreRequest(PassRefPtr<IDBObjectStore>);
 
   RefPtr<IDBObjectStore> m_objectStore;
-  RefPtr<IDBAny> m_this;
 };
 
 }  // namespace WebCore

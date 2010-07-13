@@ -38,10 +38,8 @@ namespace WebCore {
 
 IDBDatabaseRequest::IDBDatabaseRequest(PassRefPtr<IDBDatabase> database)
     : m_database(database) {
-  m_this = IDBAny::create();
   // We pass a reference to this object before it can be adopted.
   relaxAdoptionRequirement();
-  m_this->set(this);
 }
 
 IDBDatabaseRequest::~IDBDatabaseRequest() {}
@@ -51,7 +49,8 @@ PassRefPtr<IDBRequest> IDBDatabaseRequest::createObjectStore(
     const String& name,
     const String& keyPath,
     bool autoIncrement) {
-  RefPtr<IDBRequest> request = IDBRequest::create(context, m_this);
+  RefPtr<IDBRequest> request =
+      IDBRequest::create(context, IDBAny::create(this));
   m_database->createObjectStore(name, keyPath, autoIncrement, request);
   return request;
 }
@@ -68,7 +67,8 @@ PassRefPtr<IDBObjectStoreRequest> IDBDatabaseRequest::objectStore(
 PassRefPtr<IDBRequest> IDBDatabaseRequest::removeObjectStore(
     ScriptExecutionContext* context,
     const String& name) {
-  RefPtr<IDBRequest> request = IDBRequest::create(context, m_this);
+  RefPtr<IDBRequest> request =
+      IDBRequest::create(context, IDBAny::create(this));
   m_database->removeObjectStore(name, request);
   return request;
 }
