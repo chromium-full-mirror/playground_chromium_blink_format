@@ -71,6 +71,7 @@ class RenderTheme;
 class VisibleSelection;
 class SelectionController;
 class Settings;
+class SpeechInputClient;
 
 #if ENABLE(DOM_STORAGE)
 class StorageNamespace;
@@ -183,6 +184,12 @@ class Page : public Noncopyable {
   DeviceOrientationController* deviceOrientationController() const {
     return m_deviceOrientationController.get();
   }
+#endif
+#if ENABLE(INPUT_SPEECH)
+  void setSpeechInputClient(SpeechInputClient* client) {
+    m_speechInputClient = client;
+  }
+  SpeechInputClient* speechInputClient() const { return m_speechInputClient; }
 #endif
   Settings* settings() const { return m_settings.get(); }
   ProgressTracker* progress() const { return m_progress.get(); }
@@ -326,6 +333,9 @@ class Page : public Noncopyable {
 #endif
 #if ENABLE(DEVICE_ORIENTATION)
   OwnPtr<DeviceOrientationController> m_deviceOrientationController;
+#endif
+#if ENABLE(INPUT_SPEECH)
+  SpeechInputClient* m_speechInputClient;
 #endif
   OwnPtr<Settings> m_settings;
   OwnPtr<ProgressTracker> m_progress;
