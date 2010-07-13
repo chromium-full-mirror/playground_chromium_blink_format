@@ -69,6 +69,10 @@ static const int DefaultHeight = 150;
 static const float MaxCanvasArea =
     32768 * 8192;  // Maximum canvas area in CSS pixels
 
+// In Skia, we will also limit width/height to 32767.
+static const float MaxSkiaDim =
+    32767.0F;  // Maximum width/height in CSS pixels.
+
 HTMLCanvasElement::HTMLCanvasElement(const QualifiedName& tagName,
                                      Document* document)
     : HTMLElement(tagName, document),
@@ -353,6 +357,11 @@ IntSize HTMLCanvasElement::convertLogicalToDevice(
 
   if (!(wf >= 1 && hf >= 1 && wf * hf <= MaxCanvasArea))
     return IntSize();
+
+#if PLATFORM(SKIA)
+  if (wf > MaxSkiaDim || hf > MaxSkiaDim)
+    return IntSize();
+#endif
 
   return IntSize(static_cast<unsigned>(wf), static_cast<unsigned>(hf));
 }
