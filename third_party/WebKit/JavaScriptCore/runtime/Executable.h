@@ -437,6 +437,24 @@ class FunctionExecutable : public ScriptExecutable {
     return m_jitCodeForConstruct;
   }
 
+  bool tryJitCodeForCall(ExecState* exec, ScopeChainNode* scopeChainNode) {
+    FunctionCodeBlock* codeBlock = bytecodeForCall(exec, scopeChainNode);
+    if (!codeBlock)
+      return false;
+    if (!m_jitCodeForCall)
+      generateJITCodeForCall(exec, scopeChainNode);
+    return true;
+  }
+
+  bool tryJitCodeForConstruct(ExecState* exec, ScopeChainNode* scopeChainNode) {
+    FunctionCodeBlock* codeBlock = bytecodeForConstruct(exec, scopeChainNode);
+    if (!codeBlock)
+      return false;
+    if (!m_jitCodeForConstruct)
+      generateJITCodeForConstruct(exec, scopeChainNode);
+    return true;
+  }
+
   MacroAssemblerCodePtr generatedJITCodeForCallWithArityCheck() {
     ASSERT(m_jitCodeForCall);
     ASSERT(m_jitCodeForCallWithArityCheck);

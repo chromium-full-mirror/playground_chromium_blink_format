@@ -82,14 +82,14 @@ void JIT::privateCompileCTIMachineTrampolines(
   // VirtualCallLink Trampoline
   // regT0 holds callee, regT1 holds argCount.  regT2 will hold the
   // FunctionExecutable.
-  JumpList callLazyLinkFailures;
+  JumpList callLinkFailures;
   Label virtualCallLinkBegin = align();
   compileOpCallInitializeCallFrame();
   preserveReturnAddressAfterCall(regT3);
   emitPutToCallFrameHeader(regT3, RegisterFile::ReturnPC);
   restoreArgumentReference();
   Call callLazyLinkCall = call();
-  callLazyLinkFailures.append(branchTestPtr(Zero, regT0));
+  callLinkFailures.append(branchTestPtr(Zero, regT0));
   restoreReturnAddressBeforeReturn(regT3);
   emitGetFromCallFrameHeader32(RegisterFile::ArgumentCount, regT1);
   jump(regT0);
@@ -103,23 +103,10 @@ void JIT::privateCompileCTIMachineTrampolines(
   emitPutToCallFrameHeader(regT3, RegisterFile::ReturnPC);
   restoreArgumentReference();
   Call callLazyLinkConstruct = call();
-  callLazyLinkFailures.append(branchTestPtr(Zero, regT0));
+  callLinkFailures.append(branchTestPtr(Zero, regT0));
   restoreReturnAddressBeforeReturn(regT3);
   emitGetFromCallFrameHeader32(RegisterFile::ArgumentCount, regT1);
   jump(regT0);
-
-  // If the parser fails we want to be able to be able to keep going,
-  // So we handle this as a parse failure.
-  callLazyLinkFailures.link(this);
-  emitGetFromCallFrameHeaderPtr(RegisterFile::ReturnPC, regT1);
-  emitGetFromCallFrameHeaderPtr(RegisterFile::CallerFrame, callFrameRegister);
-  restoreReturnAddressBeforeReturn(regT1);
-  move(ImmPtr(&globalData->exceptionLocation), regT2);
-  storePtr(regT1, regT2);
-  poke(callFrameRegister,
-       1 + OBJECT_OFFSETOF(struct JITStackFrame, callFrame) / sizeof(void*));
-  poke(ImmPtr(FunctionPtr(ctiVMThrowTrampoline).value()));
-  ret();
 
   // VirtualCall Trampoline
   // regT0 holds callee, regT1 holds argCount.  regT2 will hold the
@@ -137,6 +124,7 @@ void JIT::privateCompileCTIMachineTrampolines(
   preserveReturnAddressAfterCall(regT3);
   restoreArgumentReference();
   Call callCompileCall = call();
+  callLinkFailures.append(branchTestPtr(Zero, regT0));
   emitGetFromCallFrameHeader32(RegisterFile::ArgumentCount, regT1);
   restoreReturnAddressBeforeReturn(regT3);
   loadPtr(Address(regT0, OBJECT_OFFSETOF(JSFunction, m_executable)), regT2);
@@ -163,6 +151,7 @@ void JIT::privateCompileCTIMachineTrampolines(
   preserveReturnAddressAfterCall(regT3);
   restoreArgumentReference();
   Call callCompileConstruct = call();
+  callLinkFailures.append(branchTestPtr(Zero, regT0));
   emitGetFromCallFrameHeader32(RegisterFile::ArgumentCount, regT1);
   restoreReturnAddressBeforeReturn(regT3);
   loadPtr(Address(regT0, OBJECT_OFFSETOF(JSFunction, m_executable)), regT2);
@@ -172,6 +161,19 @@ void JIT::privateCompileCTIMachineTrampolines(
                                          m_jitCodeForConstructWithArityCheck)),
           regT0);
   jump(regT0);
+
+  // If the parser fails we want to be able to be able to keep going,
+  // So we handle this as a parse failure.
+  callLinkFailures.link(this);
+  emitGetFromCallFrameHeaderPtr(RegisterFile::ReturnPC, regT1);
+  emitGetFromCallFrameHeaderPtr(RegisterFile::CallerFrame, callFrameRegister);
+  restoreReturnAddressBeforeReturn(regT1);
+  move(ImmPtr(&globalData->exceptionLocation), regT2);
+  storePtr(regT1, regT2);
+  poke(callFrameRegister,
+       1 + OBJECT_OFFSETOF(struct JITStackFrame, callFrame) / sizeof(void*));
+  poke(ImmPtr(FunctionPtr(ctiVMThrowTrampoline).value()));
+  ret();
 
   // NativeCall Trampoline
   Label nativeCallThunk = privateCompileCTINativeCall(globalData);
