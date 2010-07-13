@@ -77,6 +77,20 @@ class WebFrame : public RefCounted<WebFrame> {
                                      const WebCore::String& elementID,
                                      double time);
 
+  // Simple listener class used by plug-ins to know when frames finish or fail
+  // loading.
+  class LoadListener {
+   public:
+    virtual ~LoadListener() {}
+
+    virtual void didFinishLoad(WebFrame*) = 0;
+    virtual void didFailLoad(WebFrame*, bool wasCancelled) = 0;
+  };
+  void setLoadListener(LoadListener* loadListener) {
+    m_loadListener = loadListener;
+  }
+  LoadListener* loadListener() const { return m_loadListener; }
+
  private:
   static PassRefPtr<WebFrame> create(WebPage*,
                                      const WebCore::String& frameName,
@@ -92,6 +106,7 @@ class WebFrame : public RefCounted<WebFrame> {
   WebCore::FramePolicyFunction m_policyFunction;
 
   WebFrameLoaderClient m_frameLoaderClient;
+  LoadListener* m_loadListener;
 
   uint64_t m_frameID;
 };

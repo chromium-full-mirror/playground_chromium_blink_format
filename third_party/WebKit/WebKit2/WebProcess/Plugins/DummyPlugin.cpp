@@ -54,4 +54,8 @@ void DummyPlugin::paint(GraphicsContext* context, const IntRect& dirtyRect) {
 void DummyPlugin::geometryDidChange(const IntRect& frameRect,
                                     const IntRect& clipRect) {}
 
+void DummyPlugin::frameDidFinishLoading(uint64_t requestID) {}
+
+void DummyPlugin::frameDidFail(uint64_t requestID, bool wasCancelled) {}
+
 }  // namespace WebKit

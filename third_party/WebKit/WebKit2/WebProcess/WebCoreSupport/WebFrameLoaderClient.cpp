@@ -295,7 +295,7 @@ void WebFrameLoaderClient::dispatchDidCommitLoad() {
 }
 
 void WebFrameLoaderClient::dispatchDidFailProvisionalLoad(
-    const ResourceError&) {
+    const ResourceError& error) {
   WebPage* webPage = m_frame->page();
   if (!webPage)
     return;
@@ -308,9 +308,13 @@ void WebFrameLoaderClient::dispatchDidFailProvisionalLoad(
   WebProcess::shared().connection()->send(
       WebPageProxyMessage::DidFailProvisionalLoadForFrame, webPage->pageID(),
       CoreIPC::In(m_frame->frameID()));
+
+  // If we have a load listener, notify it.
+  if (WebFrame::LoadListener* loadListener = m_frame->loadListener())
+    loadListener->didFailLoad(m_frame, error.isCancellation());
 }
 
-void WebFrameLoaderClient::dispatchDidFailLoad(const ResourceError&) {
+void WebFrameLoaderClient::dispatchDidFailLoad(const ResourceError& error) {
   WebPage* webPage = m_frame->page();
   if (!webPage)
     return;
@@ -323,6 +327,10 @@ void WebFrameLoaderClient::dispatchDidFailLoad(const ResourceError&) {
   WebProcess::shared().connection()->send(
       WebPageProxyMessage::DidFailLoadForFrame, webPage->pageID(),
       CoreIPC::In(m_frame->frameID()));
+
+  // If we have a load listener, notify it.
+  if (WebFrame::LoadListener* loadListener = m_frame->loadListener())
+    loadListener->didFailLoad(m_frame, error.isCancellation());
 }
 
 void WebFrameLoaderClient::dispatchDidFinishDocumentLoad() {
@@ -341,6 +349,10 @@ void WebFrameLoaderClient::dispatchDidFinishLoad() {
   WebProcess::shared().connection()->send(
       WebPageProxyMessage::DidFinishLoadForFrame, webPage->pageID(),
       CoreIPC::In(m_frame->frameID()));
+
+  // If we have a load listener, notify it.
+  if (WebFrame::LoadListener* loadListener = m_frame->loadListener())
+    loadListener->didFinishLoad(m_frame);
 }
 
 void WebFrameLoaderClient::dispatchDidFirstLayout() {
@@ -699,7 +711,9 @@ void WebFrameLoaderClient::provisionalLoadStarted() {
 }
 
 void WebFrameLoaderClient::didFinishLoad() {
-  notImplemented();
+  // If we have a load listener, notify it.
+  if (WebFrame::LoadListener* loadListener = m_frame->loadListener())
+    loadListener->didFinishLoad(m_frame);
 }
 
 void WebFrameLoaderClient::prepareForDataSourceReplacement() {
