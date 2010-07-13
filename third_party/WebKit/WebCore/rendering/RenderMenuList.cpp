@@ -360,6 +360,10 @@ String RenderMenuList::itemText(unsigned listIndex) const {
   return String();
 }
 
+String RenderMenuList::itemLabel(unsigned) const {
+  return String();
+}
+
 String RenderMenuList::itemAccessibilityText(unsigned listIndex) const {
   // Allow the accessible name be changed if necessary.
   SelectElement* select = toSelectElement(static_cast<Element*>(node()));
