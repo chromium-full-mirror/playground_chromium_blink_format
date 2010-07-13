@@ -324,6 +324,7 @@ void HTMLDocumentParser::resumeParsingAfterScriptExecution() {
   ASSERT(!inScriptExecution());
   ASSERT(!m_treeBuilder->isPaused());
 
+  m_preloadScanner.clear();
   pumpTokenizerIfPossible(AllowYield);
   endIfDelayed();
 }
