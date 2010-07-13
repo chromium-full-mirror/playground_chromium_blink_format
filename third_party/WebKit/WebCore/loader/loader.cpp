@@ -602,8 +602,8 @@ void Loader::Host::cancelPendingRequests(RequestQueue& requestsPending,
     Request* request = *it;
     if (request->docLoader() == docLoader) {
       cache()->remove(request->cachedResource());
-      delete request;
       docLoader->decrementRequestCount(request->cachedResource());
+      delete request;
     } else
       remaining.append(request);
   }
