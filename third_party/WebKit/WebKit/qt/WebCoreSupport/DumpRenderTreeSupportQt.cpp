@@ -573,6 +573,10 @@ void DumpRenderTreeSupportQt::setWillSendRequestClearHeaders(
   FrameLoaderClientQt::sendRequestClearHeaders = headers;
 }
 
+void DumpRenderTreeSupportQt::setDeferMainResourceDataLoad(bool b) {
+  FrameLoaderClientQt::deferMainResourceDataLoad = b;
+}
+
 void DumpRenderTreeSupportQt::setCustomPolicyDelegate(bool enabled,
                                                       bool permissive) {
   FrameLoaderClientQt::policyDelegateEnabled = enabled;

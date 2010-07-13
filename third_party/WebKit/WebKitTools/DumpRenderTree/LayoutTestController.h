@@ -83,6 +83,7 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
   void queueBackNavigation(int howFarBackward);
   void queueForwardNavigation(int howFarForward);
   void queueLoad(JSStringRef url, JSStringRef target);
+  void queueLoadHTMLString(JSStringRef content, JSStringRef baseURL);
   void queueLoadingScript(JSStringRef script);
   void queueNonLoadingScript(JSStringRef script);
   void queueReload();
@@ -330,6 +331,11 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
   bool globalFlag() const { return m_globalFlag; }
   void setGlobalFlag(bool globalFlag) { m_globalFlag = globalFlag; }
 
+  bool deferMainResourceDataLoad() const { return m_deferMainResourceDataLoad; }
+  void setDeferMainResourceDataLoad(bool flag) {
+    m_deferMainResourceDataLoad = flag;
+  }
+
   const std::string& testPathOrURL() const { return m_testPathOrURL; }
   const std::string& expectedPixelHash() const { return m_expectedPixelHash; }
 
@@ -440,6 +446,7 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
   bool m_geolocationPermission;
   bool m_handlesAuthenticationChallenges;
   bool m_isPrinting;
+  bool m_deferMainResourceDataLoad;
 
   std::string m_authenticationUsername;
   std::string m_authenticationPassword;

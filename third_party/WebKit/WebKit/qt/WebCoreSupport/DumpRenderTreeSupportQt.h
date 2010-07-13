@@ -149,6 +149,8 @@ class QWEBKIT_EXPORT DumpRenderTreeSupportQt {
   static void setWillSendRequestReturnsNull(bool b);
   static void setWillSendRequestClearHeaders(const QStringList& headers);
 
+  static void setDeferMainResourceDataLoad(bool b);
+
   static void dumpEditingCallbacks(bool b);
   static void dumpSetAcceptsEditing(bool b);
 

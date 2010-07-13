@@ -50,6 +50,18 @@ class LoadItem : public WorkQueueItem {
   JSRetainPtr<JSStringRef> m_target;
 };
 
+class LoadHTMLStringItem : public WorkQueueItem {
+ public:
+  LoadHTMLStringItem(const JSStringRef content, const JSStringRef baseURL)
+      : m_content(content), m_baseURL(baseURL) {}
+
+ private:
+  virtual bool invoke() const;
+
+  JSRetainPtr<JSStringRef> m_content;
+  JSRetainPtr<JSStringRef> m_baseURL;
+};
+
 class ReloadItem : public WorkQueueItem {
  private:
   virtual bool invoke() const;

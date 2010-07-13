@@ -510,6 +510,10 @@ void MainResourceLoader::handleDataLoadNow(MainResourceLoaderTimer*) {
   if (url.isEmpty())
     url = m_initialRequest.url();
 
+  // Clear the initial request here so that subsequent entries into the
+  // loader will not think there's still a deferred load left to do.
+  m_initialRequest = ResourceRequest();
+
   ResourceResponse response(url, m_substituteData.mimeType(),
                             m_substituteData.content()->size(),
                             m_substituteData.textEncoding(), "");

@@ -280,6 +280,7 @@ class FrameLoaderClientQt : public QObject, public FrameLoaderClient {
   static QStringList sendRequestClearHeaders;
   static bool policyDelegateEnabled;
   static bool policyDelegatePermissive;
+  static bool deferMainResourceDataLoad;
 
  private:
   Frame* m_frame;

@@ -58,6 +58,17 @@ bool LoadItem::invoke() const {
   return true;
 }
 
+bool LoadHTMLStringItem::invoke() const {
+  Q_ASSERT(m_webPage);
+
+  QWebFrame* frame = m_webPage->mainFrame();
+  if (!frame)
+    return false;
+
+  frame->setHtml(m_content, QUrl(m_baseURL));
+  return true;
+}
+
 bool ReloadItem::invoke() const {
   // qDebug() << ">>>ReloadItem::invoke";
   Q_ASSERT(m_webPage);

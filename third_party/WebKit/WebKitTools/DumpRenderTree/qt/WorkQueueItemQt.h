@@ -60,6 +60,20 @@ class LoadItem : public WorkQueueItem {
   QString m_target;
 };
 
+class LoadHTMLStringItem : public WorkQueueItem {
+ public:
+  LoadHTMLStringItem(const QString& content,
+                     const QString& baseURL,
+                     QWebPage* page)
+      : WorkQueueItem(page), m_content(content), m_baseURL(baseURL) {}
+
+ private:
+  virtual bool invoke() const;
+
+  QString m_content;
+  QString m_baseURL;
+};
+
 class ReloadItem : public WorkQueueItem {
  public:
   ReloadItem(QWebPage* page) : WorkQueueItem(page) {}

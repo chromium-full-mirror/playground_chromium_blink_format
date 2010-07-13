@@ -35,6 +35,10 @@ bool LoadItem::invoke() const {
   return false;
 }
 
+bool LoadHTMLStringItem::invoke() const {
+  return false;
+}
+
 bool ReloadItem::invoke() const {
   return false;
 }

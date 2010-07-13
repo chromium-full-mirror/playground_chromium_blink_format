@@ -116,6 +116,8 @@ class LayoutTestController : public QObject {
   void queueBackNavigation(int howFarBackward);
   void queueForwardNavigation(int howFarForward);
   void queueLoad(const QString& url, const QString& target = QString());
+  void queueLoadHTMLString(const QString& content,
+                           const QString& baseURL = QString());
   void queueReload();
   void queueLoadingScript(const QString& script);
   void queueNonLoadingScript(const QString& script);
@@ -152,6 +154,7 @@ class LayoutTestController : public QObject {
   void resetLoadFinished() { m_loadFinished = false; }
   void setWindowIsKey(bool isKey);
   void setMainFrameIsFirstResponder(bool isFirst);
+  void setDeferMainResourceDataLoad(bool);
   void setJavaScriptCanAccessClipboard(bool enable);
   void setXSSAuditorEnabled(bool enable);
   void setCaretBrowsingEnabled(bool enable);
