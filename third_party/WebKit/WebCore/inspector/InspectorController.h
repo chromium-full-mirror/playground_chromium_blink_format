@@ -69,7 +69,6 @@ class InspectorCSSStore;
 class InspectorDOMStorageResource;
 class InspectorDatabaseResource;
 class InspectorFrontend;
-class InspectorFrontend2;
 class InspectorFrontendClient;
 class InspectorResource;
 class InspectorTimelineAgent;
@@ -78,6 +77,7 @@ class InspectorWorkerResource;
 class KURL;
 class Node;
 class Page;
+class RemoteInspectorFrontend;
 class ResourceRequest;
 class ResourceResponse;
 class ResourceError;
@@ -254,7 +254,9 @@ class InspectorController
   const ResourcesMap& resources() const { return m_resources; }
   InspectorResource* resourceForURL(const String& url);
   InspectorFrontend* inspectorFrontend() { return m_frontend.get(); }
-  InspectorFrontend2* inspectorFrontend2() { return m_frontend2.get(); }
+  RemoteInspectorFrontend* remoteInspectorFrontend() {
+    return m_remoteFrontend.get();
+  }
 
   void drawNodeHighlight(GraphicsContext&) const;
 
@@ -405,7 +407,7 @@ class InspectorController
   OwnPtr<InspectorFrontendClient> m_inspectorFrontendClient;
   bool m_openingFrontend;
   OwnPtr<InspectorFrontend> m_frontend;
-  OwnPtr<InspectorFrontend2> m_frontend2;
+  OwnPtr<RemoteInspectorFrontend> m_remoteFrontend;
   RefPtr<InspectorDOMAgent> m_domAgent;
   OwnPtr<InspectorCSSStore> m_cssStore;
   OwnPtr<InspectorTimelineAgent> m_timelineAgent;

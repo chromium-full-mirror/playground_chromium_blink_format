@@ -56,7 +56,7 @@ class CSSStyleRule;
 class CSSStyleSheet;
 class Element;
 class Event;
-class InspectorFrontend2;
+class RemoteInspectorFrontend;
 class MatchJob;
 class NameNodeMap;
 class Node;
@@ -77,8 +77,9 @@ struct EventListenerInfo {
 
 class InspectorDOMAgent : public EventListener {
  public:
-  static PassRefPtr<InspectorDOMAgent> create(InspectorCSSStore* cssStore,
-                                              InspectorFrontend2* frontend) {
+  static PassRefPtr<InspectorDOMAgent> create(
+      InspectorCSSStore* cssStore,
+      RemoteInspectorFrontend* frontend) {
     return adoptRef(new InspectorDOMAgent(cssStore, frontend));
   }
 
@@ -88,7 +89,8 @@ class InspectorDOMAgent : public EventListener {
                : 0;
   }
 
-  InspectorDOMAgent(InspectorCSSStore* cssStore, InspectorFrontend2* frontend);
+  InspectorDOMAgent(InspectorCSSStore* cssStore,
+                    RemoteInspectorFrontend* frontend);
   ~InspectorDOMAgent();
 
   void reset();
@@ -226,7 +228,7 @@ class InspectorDOMAgent : public EventListener {
   void discardBindings();
 
   InspectorCSSStore* m_cssStore;
-  InspectorFrontend2* m_frontend;
+  RemoteInspectorFrontend* m_frontend;
   NodeToIdMap m_documentNodeToIdMap;
   // Owns node mappings for dangling nodes.
   Vector<NodeToIdMap*> m_danglingNodeToIdMaps;
