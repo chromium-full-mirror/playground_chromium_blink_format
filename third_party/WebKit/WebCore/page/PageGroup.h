@@ -103,6 +103,7 @@ class PageGroup : public Noncopyable {
 
  private:
   void addVisitedLink(LinkHash stringHash);
+  void resetUserStyleCacheInAllFrames();
 
   String m_name;
 
