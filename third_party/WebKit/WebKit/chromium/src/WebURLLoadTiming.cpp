@@ -58,51 +58,92 @@ void WebURLLoadTiming::setRequestTime(double time) {
   m_private->requestTime = time;
 }
 
-double WebURLLoadTiming::proxyDuration() const {
-  return m_private->proxyDuration;
+int WebURLLoadTiming::proxyStart() const {
+  return m_private->proxyStart;
 }
 
-void WebURLLoadTiming::setProxyDuration(double duration) {
-  m_private->proxyDuration = duration;
-}
-double WebURLLoadTiming::dnsDuration() const {
-  return m_private->dnsDuration;
+void WebURLLoadTiming::setProxyStart(int start) {
+  m_private->proxyStart = start;
 }
 
-void WebURLLoadTiming::setDNSDuration(double duration) {
-  m_private->dnsDuration = duration;
+int WebURLLoadTiming::proxyEnd() const {
+  return m_private->proxyEnd;
 }
 
-double WebURLLoadTiming::connectDuration() const {
-  return m_private->connectDuration;
+void WebURLLoadTiming::setProxyEnd(int end) {
+  m_private->proxyEnd = end;
 }
 
-void WebURLLoadTiming::setConnectDuration(double duration) {
-  m_private->connectDuration = duration;
+int WebURLLoadTiming::dnsStart() const {
+  return m_private->dnsStart;
 }
 
-double WebURLLoadTiming::sendDuration() const {
-  return m_private->sendDuration;
+void WebURLLoadTiming::setDNSStart(int start) {
+  m_private->dnsStart = start;
 }
 
-void WebURLLoadTiming::setSendDuration(double duration) {
-  m_private->sendDuration = duration;
+int WebURLLoadTiming::dnsEnd() const {
+  return m_private->dnsEnd;
 }
 
-double WebURLLoadTiming::receiveHeadersDuration() const {
-  return m_private->receiveHeadersDuration;
+void WebURLLoadTiming::setDNSEnd(int end) {
+  m_private->dnsEnd = end;
 }
 
-void WebURLLoadTiming::setReceiveHeadersDuration(double duration) {
-  m_private->receiveHeadersDuration = duration;
+int WebURLLoadTiming::connectStart() const {
+  return m_private->connectStart;
 }
 
-double WebURLLoadTiming::sslDuration() const {
-  return m_private->sslDuration;
+void WebURLLoadTiming::setConnectStart(int start) {
+  m_private->connectStart = start;
 }
 
-void WebURLLoadTiming::setSSLDuration(double duration) {
-  m_private->sslDuration = duration;
+int WebURLLoadTiming::connectEnd() const {
+  return m_private->connectEnd;
+}
+
+void WebURLLoadTiming::setConnectEnd(int end) {
+  m_private->connectEnd = end;
+}
+
+int WebURLLoadTiming::sendStart() const {
+  return m_private->sendStart;
+}
+
+void WebURLLoadTiming::setSendStart(int start) {
+  m_private->sendStart = start;
+}
+
+int WebURLLoadTiming::sendEnd() const {
+  return m_private->sendEnd;
+}
+
+void WebURLLoadTiming::setSendEnd(int end) {
+  m_private->sendEnd = end;
+}
+
+int WebURLLoadTiming::receiveHeadersEnd() const {
+  return m_private->receiveHeadersEnd;
+}
+
+void WebURLLoadTiming::setReceiveHeadersEnd(int end) {
+  m_private->receiveHeadersEnd = end;
+}
+
+int WebURLLoadTiming::sslStart() const {
+  return m_private->sslStart;
+}
+
+void WebURLLoadTiming::setSSLStart(int start) {
+  m_private->sslStart = start;
+}
+
+int WebURLLoadTiming::sslEnd() const {
+  return m_private->sslEnd;
+}
+
+void WebURLLoadTiming::setSSLEnd(int end) {
+  m_private->sslEnd = end;
 }
 
 WebURLLoadTiming::WebURLLoadTiming(const PassRefPtr<ResourceLoadTiming>& value)

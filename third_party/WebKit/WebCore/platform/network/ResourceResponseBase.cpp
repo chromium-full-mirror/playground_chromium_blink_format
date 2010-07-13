@@ -44,6 +44,8 @@ ResourceResponseBase::ResourceResponseBase()
     : m_expectedContentLength(0),
       m_httpStatusCode(0),
       m_lastModifiedDate(0),
+      m_wasCached(false),
+      m_connectionID(0),
       m_isNull(true),
       m_haveParsedCacheControlHeader(false),
       m_haveParsedAgeHeader(false),
@@ -71,6 +73,8 @@ ResourceResponseBase::ResourceResponseBase(const KURL& url,
       m_suggestedFilename(filename),
       m_httpStatusCode(0),
       m_lastModifiedDate(0),
+      m_wasCached(false),
+      m_connectionID(0),
       m_isNull(false),
       m_haveParsedCacheControlHeader(false),
       m_haveParsedAgeHeader(false),
@@ -435,6 +439,16 @@ time_t ResourceResponseBase::lastModifiedDate() const {
   lazyInit();
 
   return m_lastModifiedDate;
+}
+
+bool ResourceResponseBase::wasCached() const {
+  lazyInit();
+
+  return m_wasCached;
+}
+
+void ResourceResponseBase::setWasCached(bool value) {
+  m_wasCached = value;
 }
 
 unsigned ResourceResponseBase::connectionID() const {
