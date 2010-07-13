@@ -51,6 +51,7 @@ class Timing : public RefCounted<Timing> {
 
   unsigned long long navigationStart() const;
   unsigned long long unloadEventEnd() const;
+  unsigned long long responseEnd() const;
   unsigned long long loadEventStart() const;
   unsigned long long loadEventEnd() const;
 

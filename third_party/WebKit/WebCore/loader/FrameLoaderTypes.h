@@ -73,11 +73,13 @@ struct FrameLoadTimeline {
   FrameLoadTimeline()
       : navigationStart(0),
         unloadEventEnd(0),
+        responseEnd(0),
         loadEventStart(0),
         loadEventEnd(0) {}
 
   double navigationStart;
   double unloadEventEnd;
+  double responseEnd;
   double loadEventStart;
   double loadEventEnd;
 };
