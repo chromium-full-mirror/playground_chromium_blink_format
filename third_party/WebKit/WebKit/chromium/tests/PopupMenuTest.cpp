@@ -66,6 +66,7 @@ class TestPopupMenuClient : public PopupMenuClient {
     str.append(String::number(listIndex));
     return str;
   }
+  virtual String itemLabel(unsigned) const { return String(); }
   virtual String itemToolTip(unsigned listIndex) const {
     return itemText(listIndex);
   }
