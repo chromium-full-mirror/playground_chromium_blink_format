@@ -268,8 +268,8 @@ void ARMAssembler::dataTransfer32(bool isLoad,
       add_r(ARMRegisters::S0, base, OP2_IMM | (offset >> 12) | (10 << 8));
       dtr_u(isLoad, srcDst, ARMRegisters::S0, (offset & 0xfff) | transferFlag);
     } else {
-      ARMWord reg = getImm(offset, ARMRegisters::S0);
-      dtr_ur(isLoad, srcDst, base, reg | transferFlag);
+      moveImm(offset, ARMRegisters::S0);
+      dtr_ur(isLoad, srcDst, base, ARMRegisters::S0 | transferFlag);
     }
   } else {
     offset = -offset;
@@ -279,8 +279,8 @@ void ARMAssembler::dataTransfer32(bool isLoad,
       sub_r(ARMRegisters::S0, base, OP2_IMM | (offset >> 12) | (10 << 8));
       dtr_d(isLoad, srcDst, ARMRegisters::S0, (offset & 0xfff) | transferFlag);
     } else {
-      ARMWord reg = getImm(offset, ARMRegisters::S0);
-      dtr_dr(isLoad, srcDst, base, reg | transferFlag);
+      moveImm(offset, ARMRegisters::S0);
+      dtr_dr(isLoad, srcDst, base, ARMRegisters::S0 | transferFlag);
     }
   }
 }
