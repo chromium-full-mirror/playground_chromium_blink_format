@@ -68,9 +68,9 @@ class WorkQueue::WorkItemQt : public QObject {
 
 void WorkQueue::connectSignal(QObject* o,
                               const char* signal,
-                              std::auto_ptr<WorkItem> workItem) {
+                              PassOwnPtr<WorkItem> workItem) {
   WorkQueue::WorkItemQt* itemQt =
-      new WorkQueue::WorkItemQt(this, o, signal, workItem.release());
+      new WorkQueue::WorkItemQt(this, o, signal, workItem.leakPtr());
   itemQt->moveToThread(m_workThread);
   m_signalListeners.add(o, itemQt);
 }
@@ -106,9 +106,9 @@ void WorkQueue::platformInvalidate() {
   deleteAllValues(m_signalListeners);
 }
 
-void WorkQueue::scheduleWork(std::auto_ptr<WorkItem> item) {
+void WorkQueue::scheduleWork(PassOwnPtr<WorkItem> item) {
   WorkQueue::WorkItemQt* itemQt =
-      new WorkQueue::WorkItemQt(this, item.release());
+      new WorkQueue::WorkItemQt(this, item.leakPtr());
   itemQt->startTimer(0);
   itemQt->moveToThread(m_workThread);
 }

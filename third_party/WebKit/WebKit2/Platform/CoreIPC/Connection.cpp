@@ -83,7 +83,7 @@ void Connection::invalidate() {
 }
 
 bool Connection::sendMessage(MessageID messageID,
-                             auto_ptr<ArgumentEncoder> arguments) {
+                             PassOwnPtr<ArgumentEncoder> arguments) {
   if (!isValid())
     return false;
 
@@ -97,10 +97,9 @@ bool Connection::sendMessage(MessageID messageID,
   return true;
 }
 
-std::auto_ptr<ArgumentDecoder> Connection::waitForMessage(
-    MessageID messageID,
-    uint64_t destinationID,
-    double timeout) {
+PassOwnPtr<ArgumentDecoder> Connection::waitForMessage(MessageID messageID,
+                                                       uint64_t destinationID,
+                                                       double timeout) {
   // First, check if this message is already in the incoming messages queue.
   {
     MutexLocker locker(m_incomingMessagesLock);
@@ -110,11 +109,11 @@ std::auto_ptr<ArgumentDecoder> Connection::waitForMessage(
 
       if (message.messageID() == messageID &&
           message.arguments()->destinationID() == destinationID) {
-        std::auto_ptr<ArgumentDecoder> arguments(message.arguments());
+        OwnPtr<ArgumentDecoder> arguments(message.arguments());
 
         // Erase the incoming message.
         m_incomingMessages.remove(i);
-        return arguments;
+        return arguments.release();
       }
     }
   }
@@ -143,10 +142,10 @@ std::auto_ptr<ArgumentDecoder> Connection::waitForMessage(
     HashMap<std::pair<unsigned, uint64_t>, ArgumentDecoder*>::iterator it =
         m_waitForMessageMap.find(messageAndDestination);
     if (it->second) {
-      std::auto_ptr<ArgumentDecoder> arguments(it->second);
+      OwnPtr<ArgumentDecoder> arguments(it->second);
       m_waitForMessageMap.remove(it);
 
-      return arguments;
+      return arguments.release();
     }
 
     // We didn't find it, keep waiting.
@@ -160,26 +159,25 @@ std::auto_ptr<ArgumentDecoder> Connection::waitForMessage(
     m_waitForMessageMap.remove(messageAndDestination);
   }
 
-  return std::auto_ptr<ArgumentDecoder>();
+  return PassOwnPtr<ArgumentDecoder>();
 }
 
-std::auto_ptr<ArgumentDecoder> Connection::sendSyncMessage(
+PassOwnPtr<ArgumentDecoder> Connection::sendSyncMessage(
     MessageID messageID,
     uint64_t syncRequestID,
-    std::auto_ptr<ArgumentEncoder> encoder,
+    PassOwnPtr<ArgumentEncoder> encoder,
     double timeout) {
   // First send the message.
   if (!sendMessage(messageID, encoder))
-    return std::auto_ptr<ArgumentDecoder>();
+    return PassOwnPtr<ArgumentDecoder>();
 
   // Now wait for a reply and return it.
   return waitForMessage(MessageID(CoreIPCMessage::SyncMessageReply),
                         syncRequestID, timeout);
 }
 
-void Connection::processIncomingMessage(
-    MessageID messageID,
-    std::auto_ptr<ArgumentDecoder> arguments) {
+void Connection::processIncomingMessage(MessageID messageID,
+                                        PassOwnPtr<ArgumentDecoder> arguments) {
   // First, check if we're waiting for this message.
   {
     MutexLocker locker(m_waitForMessageMutex);
@@ -188,7 +186,7 @@ void Connection::processIncomingMessage(
         m_waitForMessageMap.find(
             std::make_pair(messageID.toInt(), arguments->destinationID()));
     if (it != m_waitForMessageMap.end()) {
-      it->second = arguments.release();
+      it->second = arguments.leakPtr();
 
       m_waitForMessageCondition.signal();
       return;
@@ -235,9 +233,8 @@ void Connection::sendOutgoingMessages() {
 
   // Send messages.
   for (size_t i = 0; i < outgoingMessages.size(); ++i)
-    sendOutgoingMessage(
-        outgoingMessages[i].messageID(),
-        std::auto_ptr<ArgumentEncoder>(outgoingMessages[i].arguments()));
+    sendOutgoingMessage(outgoingMessages[i].messageID(),
+                        adoptPtr(outgoingMessages[i].arguments()));
 }
 
 void Connection::dispatchMessages() {
@@ -263,15 +260,15 @@ void Connection::dispatchMessages() {
       }
 
       // Create our reply encoder.
-      std::auto_ptr<ArgumentEncoder> replyEncoder(
-          new ArgumentEncoder(syncRequestID));
+      OwnPtr<ArgumentEncoder> replyEncoder(new ArgumentEncoder(syncRequestID));
 
       // Hand off both the decoder and encoder to the client..
       m_client->didReceiveSyncMessage(this, message.messageID(), arguments,
                                       replyEncoder.get());
 
       // Send the reply.
-      sendMessage(MessageID(CoreIPCMessage::SyncMessageReply), replyEncoder);
+      sendMessage(MessageID(CoreIPCMessage::SyncMessageReply),
+                  replyEncoder.release());
     } else
       m_client->didReceiveMessage(this, message.messageID(), arguments);
 

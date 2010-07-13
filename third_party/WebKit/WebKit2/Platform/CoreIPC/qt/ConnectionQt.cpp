@@ -77,9 +77,9 @@ void Connection::readyReadHandler() {
     unsigned messageID =
         *reinterpret_cast<unsigned*>(m_readBuffer.data() + realBufferSize);
 
-    std::auto_ptr<ArgumentDecoder> arguments(
-        new ArgumentDecoder(m_readBuffer.data(), realBufferSize));
-    processIncomingMessage(MessageID::fromInt(messageID), arguments);
+    processIncomingMessage(
+        MessageID::fromInt(messageID),
+        adoptPtr(new ArgumentDecoder(m_readBuffer.data(), realBufferSize)));
 
     m_currentMessageSize = 0;
   }
@@ -110,7 +110,7 @@ bool Connection::open() {
 }
 
 void Connection::sendOutgoingMessage(MessageID messageID,
-                                     auto_ptr<ArgumentEncoder> arguments) {
+                                     PassOwnPtr<ArgumentEncoder> arguments) {
   if (!m_socket)
     return;
 
