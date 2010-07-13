@@ -92,9 +92,17 @@ class WebGLRenderingContext : public CanvasRenderingContext {
                   unsigned long usage,
                   ExceptionCode&);
   void bufferData(unsigned long target,
+                  ArrayBuffer* data,
+                  unsigned long usage,
+                  ExceptionCode&);
+  void bufferData(unsigned long target,
                   ArrayBufferView* data,
                   unsigned long usage,
                   ExceptionCode&);
+  void bufferSubData(unsigned long target,
+                     long offset,
+                     ArrayBuffer* data,
+                     ExceptionCode&);
   void bufferSubData(unsigned long target,
                      long offset,
                      ArrayBufferView* data,

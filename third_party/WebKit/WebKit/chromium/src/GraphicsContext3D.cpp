@@ -144,9 +144,11 @@ class GraphicsContext3DInternal {
                          unsigned long dstAlpha);
 
   void bufferData(unsigned long target, int size, unsigned long usage);
+  void bufferData(unsigned long target, ArrayBuffer* data, unsigned long usage);
   void bufferData(unsigned long target,
                   ArrayBufferView* data,
                   unsigned long usage);
+  void bufferSubData(unsigned long target, long offset, ArrayBuffer* data);
   void bufferSubData(unsigned long target, long offset, ArrayBufferView* data);
 
   unsigned long checkFramebufferStatus(unsigned long target);
@@ -765,9 +767,21 @@ void GraphicsContext3DInternal::bufferData(unsigned long target,
 }
 
 void GraphicsContext3DInternal::bufferData(unsigned long target,
+                                           ArrayBuffer* array,
+                                           unsigned long usage) {
+  m_impl->bufferData(target, array->byteLength(), array->data(), usage);
+}
+
+void GraphicsContext3DInternal::bufferData(unsigned long target,
                                            ArrayBufferView* array,
                                            unsigned long usage) {
   m_impl->bufferData(target, array->byteLength(), array->baseAddress(), usage);
+}
+
+void GraphicsContext3DInternal::bufferSubData(unsigned long target,
+                                              long offset,
+                                              ArrayBuffer* array) {
+  m_impl->bufferSubData(target, offset, array->byteLength(), array->data());
 }
 
 void GraphicsContext3DInternal::bufferSubData(unsigned long target,
@@ -1270,10 +1284,12 @@ DELEGATE_TO_INTERNAL_4(blendFuncSeparate,
                        unsigned long)
 
 DELEGATE_TO_INTERNAL_3(bufferData, unsigned long, int, unsigned long)
+DELEGATE_TO_INTERNAL_3(bufferData, unsigned long, ArrayBuffer*, unsigned long)
 DELEGATE_TO_INTERNAL_3(bufferData,
                        unsigned long,
                        ArrayBufferView*,
                        unsigned long)
+DELEGATE_TO_INTERNAL_3(bufferSubData, unsigned long, long, ArrayBuffer*)
 DELEGATE_TO_INTERNAL_3(bufferSubData, unsigned long, long, ArrayBufferView*)
 
 DELEGATE_TO_INTERNAL_1R(checkFramebufferStatus, unsigned long, unsigned long)

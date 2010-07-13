@@ -71,6 +71,7 @@ const Platform3DObject NullPlatform3DObject = 0;
 
 namespace WebCore {
 class WebGLActiveInfo;
+class ArrayBuffer;
 class ArrayBufferView;
 class WebGLBuffer;
 class Uint8Array;
@@ -565,9 +566,11 @@ class GraphicsContext3D : public Noncopyable {
                          unsigned long dstAlpha);
 
   void bufferData(unsigned long target, int size, unsigned long usage);
+  void bufferData(unsigned long target, ArrayBuffer* data, unsigned long usage);
   void bufferData(unsigned long target,
                   ArrayBufferView* data,
                   unsigned long usage);
+  void bufferSubData(unsigned long target, long offset, ArrayBuffer* data);
   void bufferSubData(unsigned long target, long offset, ArrayBufferView* data);
 
   unsigned long checkFramebufferStatus(unsigned long target);

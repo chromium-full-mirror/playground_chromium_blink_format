@@ -380,6 +380,35 @@ void WebGLRenderingContext::bufferData(unsigned long target,
 }
 
 void WebGLRenderingContext::bufferData(unsigned long target,
+                                       ArrayBuffer* data,
+                                       unsigned long usage,
+                                       ExceptionCode& ec) {
+  UNUSED_PARAM(ec);
+  if (!isGLES2Compliant()) {
+    if (!validateBufferDataUsage(usage))
+      return;
+  }
+  if (target == GraphicsContext3D::ELEMENT_ARRAY_BUFFER &&
+      m_boundElementArrayBuffer) {
+    if (!m_boundElementArrayBuffer->associateBufferData(data)) {
+      m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
+      return;
+    }
+  } else if (target == GraphicsContext3D::ARRAY_BUFFER && m_boundArrayBuffer) {
+    if (!m_boundArrayBuffer->associateBufferData(data)) {
+      m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
+      return;
+    }
+  } else {
+    m_context->synthesizeGLError(GraphicsContext3D::INVALID_ENUM);
+    return;
+  }
+
+  m_context->bufferData(target, data, usage);
+  cleanupAfterGraphicsCall(false);
+}
+
+void WebGLRenderingContext::bufferData(unsigned long target,
                                        ArrayBufferView* data,
                                        unsigned long usage,
                                        ExceptionCode& ec) {
@@ -405,6 +434,31 @@ void WebGLRenderingContext::bufferData(unsigned long target,
   }
 
   m_context->bufferData(target, data, usage);
+  cleanupAfterGraphicsCall(false);
+}
+
+void WebGLRenderingContext::bufferSubData(unsigned long target,
+                                          long offset,
+                                          ArrayBuffer* data,
+                                          ExceptionCode& ec) {
+  UNUSED_PARAM(ec);
+  if (target == GraphicsContext3D::ELEMENT_ARRAY_BUFFER &&
+      m_boundElementArrayBuffer) {
+    if (!m_boundElementArrayBuffer->associateBufferSubData(offset, data)) {
+      m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
+      return;
+    }
+  } else if (target == GraphicsContext3D::ARRAY_BUFFER && m_boundArrayBuffer) {
+    if (!m_boundArrayBuffer->associateBufferSubData(offset, data)) {
+      m_context->synthesizeGLError(GraphicsContext3D::INVALID_VALUE);
+      return;
+    }
+  } else {
+    m_context->synthesizeGLError(GraphicsContext3D::INVALID_ENUM);
+    return;
+  }
+
+  m_context->bufferSubData(target, offset, data);
   cleanupAfterGraphicsCall(false);
 }
 
