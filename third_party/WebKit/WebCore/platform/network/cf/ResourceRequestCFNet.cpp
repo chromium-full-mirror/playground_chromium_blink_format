@@ -179,6 +179,11 @@ void ResourceRequest::doUpdatePlatformRequest() {
 }
 
 void ResourceRequest::doUpdateResourceRequest() {
+  if (!m_cfRequest) {
+    *this = ResourceRequest();
+    return;
+  }
+
   m_url = CFURLRequestGetURL(m_cfRequest.get());
 
   m_cachePolicy =
