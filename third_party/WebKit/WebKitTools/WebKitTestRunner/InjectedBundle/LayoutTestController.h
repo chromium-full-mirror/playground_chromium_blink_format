@@ -52,11 +52,17 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
   void waitToDumpWatchdogTimerFired();
   void invalidateWaitToDumpWatchdog();
   void notifyDone();
+  void display();
 
   unsigned numberOfActiveAnimations() const;
   bool pauseAnimationAtTimeOnElementWithId(JSStringRef animationName,
                                            double time,
                                            JSStringRef elementId);
+
+  void setTestRepaint() { m_testRepaint = true; }
+  void setTestRepaintSweepHorizontally() {
+    m_testRepaintSweepHorizontally = true;
+  }
 
  private:
   LayoutTestController(const std::string& testPathOrURL);
@@ -64,6 +70,8 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
   bool m_dumpAsText;
   bool m_waitToDump;  // True if waitUntilDone() has been called, but
                       // notifyDone() has not yet been called.
+  bool m_testRepaint;
+  bool m_testRepaintSweepHorizontally;
 
   std::string m_testPathOrURL;
 
