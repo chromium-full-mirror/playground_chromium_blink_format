@@ -1556,12 +1556,8 @@ void HTMLTreeBuilder::callTheAdoptionAgency(AtomicHTMLToken& token) {
       if (node == formattingElementRecord)
         break;
       // 6.5
-      // FIXME: We're supposed to save the original token in the entry.
-      AtomicHTMLToken fakeToken(HTMLToken::StartTag,
-                                node->element()->localName());
-      // Is createHTMLElement correct? (instead of insertHTMLElement)
-      // Does this code ever leave newElement unattached?
-      RefPtr<Element> newElement = m_tree.createHTMLElement(fakeToken);
+      RefPtr<Element> newElement =
+          m_tree.createHTMLElementFromElementRecord(node);
       HTMLFormattingElementList::Entry* nodeEntry =
           m_tree.activeFormattingElements()->find(node->element());
       nodeEntry->replaceElement(newElement.get());
@@ -1591,10 +1587,8 @@ void HTMLTreeBuilder::callTheAdoptionAgency(AtomicHTMLToken& token) {
       ASSERT(!ec);
     }
     // 8
-    // FIXME: We're supposed to save the original token in the entry.
-    AtomicHTMLToken fakeToken(HTMLToken::StartTag,
-                              formattingElement->localName());
-    RefPtr<Element> newElement = m_tree.createHTMLElement(fakeToken);
+    RefPtr<Element> newElement =
+        m_tree.createHTMLElementFromElementRecord(formattingElementRecord);
     // 9
     reparentChildren(furthestBlock->element(), newElement.get());
     // 10

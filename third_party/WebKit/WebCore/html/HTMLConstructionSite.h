@@ -64,6 +64,8 @@ class HTMLConstructionSite : public Noncopyable {
   void insertHTMLBodyStartTagInBody(AtomicHTMLToken&);
 
   PassRefPtr<Element> createHTMLElement(AtomicHTMLToken&);
+  PassRefPtr<Element> createHTMLElementFromElementRecord(
+      HTMLElementStack::ElementRecord*);
 
   void fosterParent(Node*);
 
@@ -114,14 +116,15 @@ class HTMLConstructionSite : public Noncopyable {
 
   template <typename ChildType>
   PassRefPtr<ChildType> attach(Node* parent, PassRefPtr<ChildType> child);
+  PassRefPtr<Element> attachToCurrent(PassRefPtr<Element>);
 
   void attachAtSite(const AttachmentSite&, PassRefPtr<Node> child);
   void findFosterSite(AttachmentSite&);
 
+  PassRefPtr<Element> createHTMLElementFromSavedElement(Element*);
   PassRefPtr<Element> createElement(AtomicHTMLToken&,
                                     const AtomicString& namespaceURI);
 
-  PassRefPtr<Element> createHTMLElementAndAttachToCurrent(AtomicHTMLToken&);
   void mergeAttributesFromTokenIntoElement(AtomicHTMLToken&, Element*);
 
   Document* m_document;
