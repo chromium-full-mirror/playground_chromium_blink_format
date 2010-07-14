@@ -70,6 +70,8 @@ class ScriptDebugServer : JSC::Debugger, public Noncopyable {
   void removeBreakpoint(const String& sourceID, unsigned lineNumber);
   void clearBreakpoints();
   void setBreakpointsActivated(bool activated);
+  void activateBreakpoints() { setBreakpointsActivated(true); }
+  void deactivateBreakpoints() { setBreakpointsActivated(false); }
 
   enum PauseOnExceptionsState {
     DontPauseOnExceptions,
@@ -81,7 +83,7 @@ class ScriptDebugServer : JSC::Debugger, public Noncopyable {
   }
   void setPauseOnExceptionsState(PauseOnExceptionsState);
 
-  void pauseProgram();
+  void pause();
   void continueProgram();
   void stepIntoStatement();
   void stepOverStatement();

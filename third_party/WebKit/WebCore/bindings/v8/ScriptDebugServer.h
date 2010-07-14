@@ -62,6 +62,8 @@ class ScriptDebugServer : public Noncopyable {
   void removeBreakpoint(const String& sourceID, unsigned lineNumber);
   void clearBreakpoints();
   void setBreakpointsActivated(bool activated);
+  void activateBreakpoints() { setBreakpointsActivated(true); }
+  void deactivateBreakpoints() { setBreakpointsActivated(false); }
 
   enum PauseOnExceptionsState {
     DontPauseOnExceptions,
@@ -71,7 +73,7 @@ class ScriptDebugServer : public Noncopyable {
   PauseOnExceptionsState pauseOnExceptionsState();
   void setPauseOnExceptionsState(PauseOnExceptionsState pauseOnExceptionsState);
 
-  void pauseProgram() {}
+  void pause() {}
   void continueProgram();
   void stepIntoStatement();
   void stepOverStatement();
