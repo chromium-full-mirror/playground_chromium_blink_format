@@ -127,7 +127,8 @@ RegExpConstructor::RegExpConstructor(ExecState* exec,
 RegExpMatchesArray::RegExpMatchesArray(ExecState* exec,
                                        RegExpConstructorPrivate* data)
     : JSArray(exec->lexicalGlobalObject()->regExpMatchesArrayStructure(),
-              data->lastNumSubPatterns + 1) {
+              data->lastNumSubPatterns + 1,
+              CreateInitialized) {
   RegExpConstructorPrivate* d = new RegExpConstructorPrivate;
   d->input = data->lastInput;
   d->lastInput = data->lastInput;

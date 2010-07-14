@@ -74,7 +74,8 @@ static inline JSObject* constructArrayWithSizeQuirk(ExecState* exec,
           exec,
           createRangeError(
               exec, "Array size is not a small enough positive integer."));
-    return new (exec) JSArray(exec->lexicalGlobalObject()->arrayStructure(), n);
+    return new (exec) JSArray(exec->lexicalGlobalObject()->arrayStructure(), n,
+                              CreateInitialized);
   }
 
   // otherwise the array is constructed with the arguments in it
