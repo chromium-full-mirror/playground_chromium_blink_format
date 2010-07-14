@@ -34,11 +34,8 @@ class RenderSVGResourceContainer : public RenderSVGHiddenContainer,
  public:
   RenderSVGResourceContainer(SVGStyledElement* node)
       : RenderSVGHiddenContainer(node),
-        RenderSVGResource()
-        // FIXME: Should probably be using getIdAttribute rather than
-        // idForStyleResolution.
-        ,
-        m_id(node->hasID() ? node->idForStyleResolution() : nullAtom) {
+        RenderSVGResource(),
+        m_id(node->hasID() ? node->getIdAttribute() : nullAtom) {
     ASSERT(node->document());
     node->document()->accessSVGExtensions()->addResource(m_id, this);
   }
@@ -57,12 +54,7 @@ class RenderSVGResourceContainer : public RenderSVGHiddenContainer,
 
     // Remove old id, that is guaranteed to be present in cache
     extensions->removeResource(m_id);
-
-    // FIXME: Should probably be using getIdAttribute rather than
-    // idForStyleResolution.
-    m_id = node()->hasID()
-               ? static_cast<Element*>(node())->idForStyleResolution()
-               : nullAtom;
+    m_id = static_cast<Element*>(node())->getIdAttribute();
 
     // It's possible that an element is referencing us with the new id, and has
     // to be notified that we're existing now
@@ -91,6 +83,10 @@ class RenderSVGResourceContainer : public RenderSVGHiddenContainer,
   virtual RenderSVGResourceContainer* toRenderSVGResourceContainer() {
     return this;
   }
+  virtual bool childElementReferencesResource(const SVGRenderStyle*,
+                                              const String&) const {
+    return false;
+  }
 
   static AffineTransform transformOnNonScalingStroke(
       RenderObject* object,
@@ -103,6 +99,40 @@ class RenderSVGResourceContainer : public RenderSVGHiddenContainer,
     AffineTransform transform = resourceTransform;
     transform.multiply(element->getScreenCTM());
     return transform;
+  }
+
+  bool containsCyclicReference(const Node* startNode) const {
+    Document* document = startNode->document();
+    ASSERT(document);
+
+    for (Node* node = startNode->firstChild(); node;
+         node = node->nextSibling()) {
+      if (!node->isSVGElement())
+        continue;
+
+      RenderObject* renderer = node->renderer();
+      if (!renderer)
+        continue;
+
+      RenderStyle* style = renderer->style();
+      if (!style)
+        continue;
+
+      const SVGRenderStyle* svgStyle = style->svgStyle();
+      ASSERT(svgStyle);
+
+      // Let the class inheriting from us decide whether the child element
+      // references ourselves.
+      if (childElementReferencesResource(svgStyle, m_id))
+        return true;
+
+      if (node->hasChildNodes()) {
+        if (containsCyclicReference(node))
+          return true;
+      }
+    }
+
+    return false;
   }
 
  private:

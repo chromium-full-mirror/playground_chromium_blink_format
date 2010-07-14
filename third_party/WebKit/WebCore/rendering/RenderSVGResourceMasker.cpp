@@ -84,6 +84,15 @@ void RenderSVGResourceMasker::invalidateClient(RenderObject* object) {
   markForLayoutAndResourceInvalidation(object);
 }
 
+bool RenderSVGResourceMasker::childElementReferencesResource(
+    const SVGRenderStyle* style,
+    const String& referenceId) const {
+  if (!style->hasMasker())
+    return false;
+
+  return style->maskerResource() == referenceId;
+}
+
 bool RenderSVGResourceMasker::applyResource(RenderObject* object,
                                             RenderStyle*,
                                             GraphicsContext*& context,
@@ -103,6 +112,10 @@ bool RenderSVGResourceMasker::applyResource(RenderObject* object,
   if (!maskerData->maskImage && !maskerData->emptyMask) {
     SVGMaskElement* maskElement = static_cast<SVGMaskElement*>(node());
     if (!maskElement)
+      return false;
+
+    // Early exit, if this resource contains a child which references ourselves.
+    if (containsCyclicReference(node()))
       return false;
 
     createMaskImage(maskerData, maskElement, object);
