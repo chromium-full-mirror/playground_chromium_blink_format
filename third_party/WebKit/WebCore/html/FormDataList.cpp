@@ -21,12 +21,16 @@
 #include "config.h"
 #include "FormDataList.h"
 
+#include "LineEnding.h"
+
 namespace WebCore {
 
 FormDataList::FormDataList(const TextEncoding& c) : m_encoding(c) {}
 
 void FormDataList::appendString(const String& s) {
-  m_items.append(StringBlobItem::create(s, EndingCRLF, m_encoding));
+  CString cstr =
+      m_encoding.encode(s.characters(), s.length(), EntitiesForUnencodables);
+  m_items.append(StringBlobItem::create(normalizeLineEndingsToCRLF(cstr)));
 }
 
 void FormDataList::appendString(const CString& s) {
