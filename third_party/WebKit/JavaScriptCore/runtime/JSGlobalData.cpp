@@ -179,8 +179,11 @@ JSGlobalData::JSGlobalData(GlobalDataType globalDataType,
       0, "JavaScriptCoreUseJIT", kCFStringEncodingMacRoman);
   CFBooleanRef canUseJIT = (CFBooleanRef)CFPreferencesCopyAppValue(
       canUseJITKey, kCFPreferencesCurrentApplication);
-  m_canUseJIT = kCFBooleanTrue == canUseJIT;
-  CFRelease(canUseJIT);
+  if (canUseJIT) {
+    m_canUseJIT = kCFBooleanTrue == canUseJIT;
+    CFRelease(canUseJIT);
+  } else
+    m_canUseJIT = !getenv("JSC_FORCE_INTERPRETER");
   CFRelease(canUseJITKey);
 #elif OS(UNIX)
   m_canUseJIT = !getenv("JSC_FORCE_INTERPRETER");
