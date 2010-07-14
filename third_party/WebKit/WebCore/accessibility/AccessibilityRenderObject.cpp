@@ -486,11 +486,6 @@ bool AccessibilityRenderObject::isPasswordField() const {
   return inputElement->isPasswordField();
 }
 
-bool AccessibilityRenderObject::isCheckboxOrRadio() const {
-  AccessibilityRole role = roleValue();
-  return role == RadioButtonRole || role == CheckBoxRole;
-}
-
 bool AccessibilityRenderObject::isFileUploadButton() const {
   if (m_renderer && m_renderer->node() &&
       m_renderer->node()->hasTagName(inputTag)) {
@@ -659,36 +654,29 @@ bool AccessibilityRenderObject::isOffScreen() const {
 
 int AccessibilityRenderObject::headingLevel() const {
   // headings can be in block flow and non-block flow
-  if (!m_renderer)
+  Node* element = node();
+  if (!element)
     return 0;
 
-  Node* node = m_renderer->node();
-  if (!node)
-    return 0;
+  if (ariaRoleAttribute() == HeadingRole)
+    return getAttribute(aria_levelAttr).toInt();
 
-  if (ariaRoleAttribute() == HeadingRole) {
-    if (!node->isElementNode())
-      return 0;
-    Element* element = static_cast<Element*>(node);
-    return element->getAttribute(aria_levelAttr).toInt();
-  }
-
-  if (node->hasTagName(h1Tag))
+  if (element->hasTagName(h1Tag))
     return 1;
 
-  if (node->hasTagName(h2Tag))
+  if (element->hasTagName(h2Tag))
     return 2;
 
-  if (node->hasTagName(h3Tag))
+  if (element->hasTagName(h3Tag))
     return 3;
 
-  if (node->hasTagName(h4Tag))
+  if (element->hasTagName(h4Tag))
     return 4;
 
-  if (node->hasTagName(h5Tag))
+  if (element->hasTagName(h5Tag))
     return 5;
 
-  if (node->hasTagName(h6Tag))
+  if (element->hasTagName(h6Tag))
     return 6;
 
   return 0;
@@ -752,11 +740,6 @@ AccessibilityObject* AccessibilityRenderObject::selectedTabItem() {
       return object;
   }
   return 0;
-}
-
-const AtomicString& AccessibilityRenderObject::getAttribute(
-    const QualifiedName& attribute) const {
-  return AccessibilityObject::getAttribute(m_renderer->node(), attribute);
 }
 
 Element* AccessibilityRenderObject::anchorElement() const {
@@ -988,13 +971,6 @@ unsigned AccessibilityRenderObject::hierarchicalLevel() const {
   return level;
 }
 
-String AccessibilityRenderObject::language() const {
-  if (!m_renderer)
-    return String();
-
-  return AccessibilityObject::language(m_renderer->node());
-}
-
 String AccessibilityRenderObject::textUnderElement() const {
   if (!m_renderer)
     return String();
@@ -1026,37 +1002,15 @@ String AccessibilityRenderObject::textUnderElement() const {
   return String();
 }
 
-bool AccessibilityRenderObject::hasIntValue() const {
-  if (isHeading())
-    return true;
-
-  if (m_renderer->node() && isCheckboxOrRadio())
-    return true;
-
-  return false;
+Node* AccessibilityRenderObject::node() const {
+  return m_renderer ? m_renderer->node() : 0;
 }
 
 int AccessibilityRenderObject::intValue() const {
-  if (!m_renderer || isPasswordField())
-    return 0;
+  if (isCheckboxOrRadio())
+    return isChecked() ? 1 : 0;
 
-  if (isHeading())
-    return headingLevel();
-
-  Node* node = m_renderer->node();
-  if (!node || !isCheckboxOrRadio())
-    return 0;
-
-  // If this is an ARIA checkbox or radio, check the aria-checked attribute
-  // rather than node()->checked()
-  AccessibilityRole ariaRole = ariaRoleAttribute();
-  if (ariaRole == RadioButtonRole || ariaRole == CheckBoxRole) {
-    if (equalIgnoringCase(getAttribute(aria_checkedAttr), "true"))
-      return true;
-    return false;
-  }
-
-  return static_cast<HTMLInputElement*>(node)->checked();
+  return AccessibilityObject::intValue();
 }
 
 String AccessibilityRenderObject::valueDescription() const {
@@ -1114,10 +1068,12 @@ String AccessibilityRenderObject::stringValue() const {
     Element* selectedOption = 0;
     if (selectedIndex >= 0 && selectedIndex < (int)listItems.size())
       selectedOption = listItems[selectedIndex];
-    String overridenDescription =
-        AccessibilityObject::getAttribute(selectedOption, aria_labelAttr);
-    if (!overridenDescription.isNull())
-      return overridenDescription;
+    if (selectedOption) {
+      String overridenDescription =
+          selectedOption->getAttribute(aria_labelAttr);
+      if (!overridenDescription.isNull())
+        return overridenDescription;
+    }
 
     return toRenderMenuList(m_renderer)->text();
   }
@@ -1355,10 +1311,12 @@ String AccessibilityRenderObject::accessibilityDescription() const {
 
     // Check if the HTML element has an aria-label for the webpage.
     Element* documentElement = document->documentElement();
-    const AtomicString& ariaLabel =
-        AccessibilityObject::getAttribute(documentElement, aria_labelAttr);
-    if (!ariaLabel.isEmpty())
-      return ariaLabel;
+    if (documentElement) {
+      const AtomicString& ariaLabel =
+          documentElement->getAttribute(aria_labelAttr);
+      if (!ariaLabel.isEmpty())
+        return ariaLabel;
+    }
 
     Node* owner = document->ownerElement();
     if (owner) {
