@@ -88,7 +88,10 @@ void WidthIterator::advance(int offset, GlyphBuffer* glyphBuffer) {
       (m_font->letterSpacing() || m_font->wordSpacing() || m_padding) &&
       !m_run.spacingDisabled();
 
-  float runWidthSoFar = m_runWidthSoFar;
+  float widthSinceLastRounding = m_runWidthSoFar;
+  m_runWidthSoFar = floorf(m_runWidthSoFar);
+  widthSinceLastRounding -= m_runWidthSoFar;
+
   float lastRoundingWidth = m_finalRoundingWidth;
   FloatRect bounds;
 
@@ -137,7 +140,9 @@ void WidthIterator::advance(int offset, GlyphBuffer* glyphBuffer) {
     float width;
     if (c == '\t' && m_run.allowTabs()) {
       float tabWidth = m_font->tabWidth();
-      width = tabWidth - fmodf(m_run.xPos() + runWidthSoFar, tabWidth);
+      width = tabWidth -
+              fmodf(m_run.xPos() + m_runWidthSoFar + widthSinceLastRounding,
+                    tabWidth);
     } else {
       width = fontData->widthForGlyph(glyph);
 
@@ -239,11 +244,13 @@ void WidthIterator::advance(int offset, GlyphBuffer* glyphBuffer) {
     if ((m_run.applyWordRounding() && currentCharacter < m_run.length() &&
          Font::isRoundingHackCharacter(*cp)) ||
         (m_run.applyRunRounding() && currentCharacter >= m_end)) {
-      float totalWidth = runWidthSoFar + width;
-      width += ceilf(totalWidth) - totalWidth;
-    }
-
-    runWidthSoFar += width;
+      float totalWidth = widthSinceLastRounding + width;
+      widthSinceLastRounding = ceilf(totalWidth);
+      width += widthSinceLastRounding - totalWidth;
+      m_runWidthSoFar += widthSinceLastRounding;
+      widthSinceLastRounding = 0;
+    } else
+      widthSinceLastRounding += width;
 
     if (glyphBuffer)
       glyphBuffer->add(glyph, fontData,
@@ -259,7 +266,7 @@ void WidthIterator::advance(int offset, GlyphBuffer* glyphBuffer) {
   }
 
   m_currentCharacter = currentCharacter;
-  m_runWidthSoFar = runWidthSoFar;
+  m_runWidthSoFar += widthSinceLastRounding;
   m_finalRoundingWidth = lastRoundingWidth;
 }
 
