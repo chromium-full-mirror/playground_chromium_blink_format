@@ -27,6 +27,7 @@
 
 #include "PluginInfoStore.h"
 #include "ProcessLauncher.h"
+#include "WebBackForwardListItem.h"
 #include "WebContext.h"
 #include "WebPageNamespace.h"
 #include "WebPageProxy.h"
@@ -147,6 +148,11 @@ size_t WebProcessProxy::numberOfPages() {
   return m_pageMap.size();
 }
 
+WebBackForwardListItem* WebProcessProxy::webBackForwardItem(
+    uint64_t itemID) const {
+  return m_backForwardListItemMap.get(itemID).get();
+}
+
 void WebProcessProxy::forwardMessageToWebContext(const String& message) {
   m_context->didRecieveMessageFromInjectedBundle(message);
 }
@@ -170,6 +176,25 @@ void WebProcessProxy::getPluginHostConnection(const String& mimeType,
   pluginPath = plugin.path;
 }
 
+void WebProcessProxy::addOrUpdateBackForwardListItem(uint64_t itemID,
+                                                     const String& originalURL,
+                                                     const String& url,
+                                                     const String& title) {
+  std::pair<WebBackForwardListItemMap::iterator, bool> result =
+      m_backForwardListItemMap.add(itemID, 0);
+  if (result.second) {
+    // New item.
+    result.first->second =
+        WebBackForwardListItem::create(originalURL, url, title, itemID);
+    return;
+  }
+
+  // Update existing item.
+  result.first->second->setOriginalURL(originalURL);
+  result.first->second->setURL(url);
+  result.first->second->setTitle(title);
+}
+
 void WebProcessProxy::didReceiveMessage(CoreIPC::Connection* connection,
                                         CoreIPC::MessageID messageID,
                                         CoreIPC::ArgumentDecoder* arguments) {
@@ -181,6 +206,16 @@ void WebProcessProxy::didReceiveMessage(CoreIPC::Connection* connection,
           return;
 
         forwardMessageToWebContext(message);
+        return;
+      }
+      case WebProcessProxyMessage::AddBackForwardItem: {
+        uint64_t itemID;
+        String originalURL;
+        String url;
+        String title;
+        if (!arguments->decode(CoreIPC::Out(itemID, originalURL, url, title)))
+          return;
+        addOrUpdateBackForwardListItem(itemID, originalURL, url, title);
         return;
       }
 
@@ -240,6 +275,7 @@ void WebProcessProxy::didReceiveSyncMessage(CoreIPC::Connection* connection,
 
       // These are asynchronous messages and should never be handled here.
       case WebProcessProxyMessage::PostMessage:
+      case WebProcessProxyMessage::AddBackForwardItem:
         ASSERT_NOT_REACHED();
         break;
     }

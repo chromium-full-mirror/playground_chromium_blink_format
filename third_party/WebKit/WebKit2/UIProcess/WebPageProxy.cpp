@@ -582,13 +582,9 @@ void WebPageProxy::didReceiveMessage(CoreIPC::Connection* connection,
     }
     case WebPageProxyMessage::BackForwardAddItem: {
       uint64_t itemID;
-      String originalURLString;
-      String urlString;
-      String title;
-      if (!arguments.decode(
-              CoreIPC::Out(itemID, originalURLString, urlString, title)))
+      if (!arguments.decode(CoreIPC::Out(itemID)))
         return;
-      addItemToBackForwardList(itemID, originalURLString, urlString, title);
+      addItemToBackForwardList(process()->webBackForwardItem(itemID));
       break;
     }
     default:
@@ -828,25 +824,11 @@ void WebPageProxy::didUpdateHistoryTitle(WebFrameProxy* frame,
 
 // BackForwardList
 
-void WebPageProxy::addItemToBackForwardList(uint64_t itemID,
-                                            const String& originalURLString,
-                                            const String& urlString,
-                                            const String& title) {
-  std::pair<HashMap<uint64_t, RefPtr<WebBackForwardListItem>>::iterator, bool>
-      result = m_backForwardListItemMap.add(itemID, 0);
-  if (result.second)
-    result.first->second = WebBackForwardListItem::create(
-        originalURLString, urlString, title, itemID);
-
-  ASSERT(result.first->second->originalURL() == originalURLString);
-  ASSERT(result.first->second->url() == urlString);
-  ASSERT(result.first->second->title() == title);
-
-  m_backForwardList->addItem(result.first->second.get());
+void WebPageProxy::addItemToBackForwardList(WebBackForwardListItem* item) {
+  m_backForwardList->addItem(item);
 }
 
-void WebPageProxy::goToItemInBackForwardList(uint64_t itemID) {
-  WebBackForwardListItem* item = m_backForwardListItemMap.get(itemID).get();
+void WebPageProxy::goToItemInBackForwardList(WebBackForwardListItem* item) {
   m_backForwardList->goToItem(item);
 }
 

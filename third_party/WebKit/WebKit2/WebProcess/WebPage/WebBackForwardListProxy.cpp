@@ -29,6 +29,7 @@
 #include "WebPage.h"
 #include "WebPageProxyMessageKinds.h"
 #include "WebProcess.h"
+#include "WebProcessProxyMessageKinds.h"
 #include <WebCore/HistoryItem.h>
 #include <wtf/HashMap.h>
 
@@ -76,6 +77,20 @@ static uint64_t getIDForHistoryItem(HistoryItem* item) {
   return itemID;
 }
 
+static void updateBackForwardItem(HistoryItem* item) {
+  uint64_t itemID = getIDForHistoryItem(item);
+  const String& originalURLString = item->originalURLString();
+  const String& urlString = item->urlString();
+  const String& title = item->title();
+  WebProcess::shared().connection()->send(
+      WebProcessProxyMessage::AddBackForwardItem, 0,
+      CoreIPC::In(itemID, originalURLString, urlString, title));
+}
+
+static void WK2NotifyHistoryItemChanged(HistoryItem* item) {
+  updateBackForwardItem(item);
+}
+
 HistoryItem* WebBackForwardListProxy::itemForID(uint64_t itemID) {
   return idToHistoryItemMap().get(itemID).get();
 }
@@ -84,7 +99,9 @@ WebBackForwardListProxy::WebBackForwardListProxy(WebPage* page)
     : m_page(page),
       m_capacity(DefaultCapacity),
       m_closed(true),
-      m_enabled(true) {}
+      m_enabled(true) {
+  WebCore::notifyHistoryItemChanged = WK2NotifyHistoryItemChanged;
+}
 
 WebBackForwardListProxy::~WebBackForwardListProxy() {}
 
@@ -93,15 +110,10 @@ void WebBackForwardListProxy::addItem(PassRefPtr<HistoryItem> prpItem) {
     return;
 
   RefPtr<HistoryItem> item = prpItem;
-
-  uint64_t itemID = getIDForHistoryItem(item.get());
-  const String& originalURLString = item->originalURLString();
-  const String& urlString = item->urlString();
-  const String& title = item->title();
-
+  uint64_t itemID = historyItemToIDMap().get(item);
   WebProcess::shared().connection()->send(
       WebPageProxyMessage::BackForwardAddItem, m_page->pageID(),
-      CoreIPC::In(itemID, originalURLString, urlString, title));
+      CoreIPC::In(itemID));
 }
 
 void WebBackForwardListProxy::goBack() {

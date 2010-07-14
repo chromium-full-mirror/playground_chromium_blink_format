@@ -211,11 +211,8 @@ class WebPageProxy : public RefCounted<WebPageProxy> {
                              const WebCore::String& title,
                              const WebCore::String& url);
 
-  void addItemToBackForwardList(uint64_t itemID,
-                                const WebCore::String& originalURLString,
-                                const WebCore::String& urlString,
-                                const WebCore::String& title);
-  void goToItemInBackForwardList(uint64_t itemID);
+  void addItemToBackForwardList(WebBackForwardListItem*);
+  void goToItemInBackForwardList(WebBackForwardListItem*);
 
   void takeFocus(bool direction);
   void setToolTip(const WebCore::String&);
@@ -257,7 +254,6 @@ class WebPageProxy : public RefCounted<WebPageProxy> {
   bool m_canGoBack;
   bool m_canGoForward;
   RefPtr<WebBackForwardList> m_backForwardList;
-  HashMap<uint64_t, RefPtr<WebBackForwardListItem>> m_backForwardListItemMap;
 
   WebCore::String m_toolTip;
 

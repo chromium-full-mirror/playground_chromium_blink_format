@@ -43,6 +43,7 @@ class String;
 
 namespace WebKit {
 
+class WebBackForwardListItem;
 class WebContext;
 class WebPageNamespace;
 
@@ -53,6 +54,8 @@ class WebProcessProxy : public RefCounted<WebProcessProxy>,
  public:
   typedef HashMap<uint64_t, RefPtr<WebPageProxy>> WebPageProxyMap;
   typedef WebPageProxyMap::const_iterator::Values pages_const_iterator;
+  typedef HashMap<uint64_t, RefPtr<WebBackForwardListItem>>
+      WebBackForwardListItemMap;
 
   static PassRefPtr<WebProcessProxy> create(WebContext*);
   ~WebProcessProxy();
@@ -81,6 +84,8 @@ class WebProcessProxy : public RefCounted<WebProcessProxy>,
   pages_const_iterator pages_end();
   size_t numberOfPages();
 
+  WebBackForwardListItem* webBackForwardItem(uint64_t itemID) const;
+
   ResponsivenessTimer* responsivenessTimer() { return &m_responsivenessTimer; }
 
   bool isValid() const { return m_connection; }
@@ -103,6 +108,11 @@ class WebProcessProxy : public RefCounted<WebProcessProxy>,
   void getPluginHostConnection(const WebCore::String& mimeType,
                                const WebCore::KURL& url,
                                WebCore::String& pluginPath);
+
+  void addOrUpdateBackForwardListItem(uint64_t itemID,
+                                      const WebCore::String& originalURLString,
+                                      const WebCore::String& urlString,
+                                      const WebCore::String& title);
 
   // CoreIPC::Connection::Client
   void didReceiveMessage(CoreIPC::Connection*,
@@ -130,8 +140,13 @@ class WebProcessProxy : public RefCounted<WebProcessProxy>,
 
   WebContext* m_context;
 
-  // NOTE: This map is for pages in all WebPageNamespaces that use this process.
+  // NOTE: This map is for WebPageProxies in all WebPageNamespaces that use this
+  // process.
   WebPageProxyMap m_pageMap;
+
+  // NOTE: This map is for WebBackForwardListItems in all WebPageNamespaces and
+  // WebPageProxies that use this process.
+  WebBackForwardListItemMap m_backForwardListItemMap;
 };
 
 template <typename E, typename T>
