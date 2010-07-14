@@ -319,10 +319,11 @@ class GraphicsLayer {
   virtual void setContentsToImage(Image*) {}
   virtual void setContentsToMedia(PlatformLayer*) {}  // video or plug-in
   virtual void setContentsBackgroundColor(const Color&) {}
-
 #if ENABLE(3D_CANVAS)
   virtual void setContentsToWebGL(PlatformLayer*) {}
 #endif
+  virtual bool hasContentsLayer() const { return false; }
+
   // Callback from the underlying graphics system to draw layer contents.
   void paintGraphicsLayerContents(GraphicsContext&, const IntRect& clip);
   // Callback from the underlying graphics system when the layer has been
@@ -399,6 +400,8 @@ class GraphicsLayer {
   // string.
   String layerTreeAsText(
       LayerTreeAsTextBehavior = LayerTreeAsTextBehaviorNormal) const;
+
+  bool usingTiledLayer() const { return m_usingTiledLayer; }
 
  protected:
   typedef Vector<TransformOperation::OperationType> TransformOperationList;

@@ -30,8 +30,10 @@
 @interface WebRenderLayer : NSObject {
   NSArray* children;
   NSString* name;
+  NSString* compositingInfo;
   NSRect bounds;
   BOOL composited;
+  BOOL separator;
 }
 
 - (id)initWithWebFrame:(WebFrame*)frame;
@@ -42,6 +44,9 @@
 - (NSString*)positionString;
 - (NSString*)widthString;
 - (NSString*)heightString;
-- (BOOL)composited;
+- (NSString*)compositingInfo;
+
+- (BOOL)isComposited;
+- (BOOL)isSeparator;
 
 @end
