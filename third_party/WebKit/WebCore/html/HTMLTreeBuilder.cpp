@@ -1505,8 +1505,8 @@ void HTMLTreeBuilder::callTheAdoptionAgency(AtomicHTMLToken& token) {
         m_tree.activeFormattingElements()->closestElementInScopeWithName(
             token.name());
     if (!formattingElement ||
-        (m_tree.openElements()->contains(formattingElement)) &&
-            !m_tree.openElements()->inScope(formattingElement)) {
+        ((m_tree.openElements()->contains(formattingElement)) &&
+         !m_tree.openElements()->inScope(formattingElement))) {
       parseError(token);
       notImplemented();  // Check the stack of open elements for a more specific
                          // parse error.
