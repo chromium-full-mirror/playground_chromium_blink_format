@@ -530,7 +530,7 @@ PassRefPtr<ResourceHandle> ApplicationCacheGroup::createResourceHandle(
     InspectorController* inspectorController = page->inspectorController();
     inspectorController->identifierForInitialRequest(
         m_currentResourceIdentifier, m_frame->loader()->documentLoader(),
-        handle->request());
+        handle->firstRequest());
     ResourceResponse redirectResponse = ResourceResponse();
     inspectorController->willSendRequest(m_currentResourceIdentifier, request,
                                          redirectResponse);
@@ -574,7 +574,7 @@ void ApplicationCacheGroup::didReceiveResponse(
 
   ASSERT(handle == m_currentHandle);
 
-  KURL url(handle->request().url());
+  KURL url(handle->firstRequest().url());
   if (url.hasFragmentIdentifier())
     url.removeFragmentIdentifier();
 
@@ -595,7 +595,7 @@ void ApplicationCacheGroup::didReceiveResponse(
       m_cacheBeingUpdated->addResource(ApplicationCacheResource::create(
           url, newestCachedResource->response(), type,
           newestCachedResource->data()));
-      m_pendingEntries.remove(m_currentHandle->request().url());
+      m_pendingEntries.remove(m_currentHandle->firstRequest().url());
       m_currentHandle->cancel();
       m_currentHandle = 0;
       // Load the next resource, if any.
@@ -607,7 +607,7 @@ void ApplicationCacheGroup::didReceiveResponse(
   }
 
   if (response.httpStatusCode() / 100 != 2 ||
-      response.url() != m_currentHandle->request().url()) {
+      response.url() != m_currentHandle->firstRequest().url()) {
     if ((type & ApplicationCacheResource::Explicit) ||
         (type & ApplicationCacheResource::Fallback)) {
       // Note that cacheUpdateFailed() can cause the cache group to be deleted.
@@ -627,12 +627,12 @@ void ApplicationCacheGroup::didReceiveResponse(
       // from the network.
       ASSERT(m_newestCache);
       ApplicationCacheResource* newestCachedResource =
-          m_newestCache->resourceForURL(handle->request().url());
+          m_newestCache->resourceForURL(handle->firstRequest().url());
       ASSERT(newestCachedResource);
       m_cacheBeingUpdated->addResource(ApplicationCacheResource::create(
           url, newestCachedResource->response(), type,
           newestCachedResource->data()));
-      m_pendingEntries.remove(m_currentHandle->request().url());
+      m_pendingEntries.remove(m_currentHandle->firstRequest().url());
       m_currentHandle->cancel();
       m_currentHandle = 0;
       // Load the next resource, if any.
@@ -679,9 +679,9 @@ void ApplicationCacheGroup::didFinishLoading(ResourceHandle* handle) {
   }
 
   ASSERT(m_currentHandle == handle);
-  ASSERT(m_pendingEntries.contains(handle->request().url()));
+  ASSERT(m_pendingEntries.contains(handle->firstRequest().url()));
 
-  m_pendingEntries.remove(handle->request().url());
+  m_pendingEntries.remove(handle->firstRequest().url());
 
   ASSERT(m_cacheBeingUpdated);
 
@@ -709,8 +709,8 @@ void ApplicationCacheGroup::didFail(ResourceHandle* handle,
 
   unsigned type = m_currentResource
                       ? m_currentResource->type()
-                      : m_pendingEntries.get(handle->request().url());
-  KURL url(handle->request().url());
+                      : m_pendingEntries.get(handle->firstRequest().url());
+  KURL url(handle->firstRequest().url());
   if (url.hasFragmentIdentifier())
     url.removeFragmentIdentifier();
 
@@ -753,14 +753,14 @@ void ApplicationCacheGroup::didReceiveManifestResponse(
     return;
 
   if (response.httpStatusCode() / 100 != 2 ||
-      response.url() != m_manifestHandle->request().url() ||
+      response.url() != m_manifestHandle->firstRequest().url() ||
       !equalIgnoringCase(response.mimeType(), "text/cache-manifest")) {
     cacheUpdateFailed();
     return;
   }
 
   m_manifestResource = ApplicationCacheResource::create(
-      m_manifestHandle->request().url(), response,
+      m_manifestHandle->firstRequest().url(), response,
       ApplicationCacheResource::Manifest);
 }
 

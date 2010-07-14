@@ -232,7 +232,7 @@ PassRefPtr<ResourceHandle> ResourceHandle::create(
   return 0;
 }
 
-const ResourceRequest& ResourceHandle::request() const {
+ResourceRequest& ResourceHandle::firstRequest() {
   return d->m_request;
 }
 

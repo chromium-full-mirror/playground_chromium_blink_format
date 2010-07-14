@@ -114,13 +114,13 @@ class ResourceHandle : public RefCounted<ResourceHandle>
                                            Frame*,
                                            bool defersLoading,
                                            bool shouldContentSniff);
-
   static void loadResourceSynchronously(const ResourceRequest&,
                                         StoredCredentials,
                                         ResourceError&,
                                         ResourceResponse&,
                                         Vector<char>& data,
                                         Frame* frame);
+
   static void prepareForURL(const KURL&);
   static bool willLoadFromCache(ResourceRequest&, Frame*);
   static void cacheMetadata(const ResourceResponse&, const Vector<char>&);
@@ -217,7 +217,7 @@ class ResourceHandle : public RefCounted<ResourceHandle>
 
   void setDefersLoading(bool);
 
-  const ResourceRequest& request() const;
+  ResourceRequest& firstRequest();
   const String& lastHTTPMethod() const;
 
   void fireFailure(Timer<ResourceHandle>*);
@@ -234,6 +234,15 @@ class ResourceHandle : public RefCounted<ResourceHandle>
 
   virtual void refAuthenticationClient() { ref(); }
   virtual void derefAuthenticationClient() { deref(); }
+
+#if PLATFORM(MAC)
+  void createNSURLConnection(id delegate,
+                             bool shouldUseCredentialStorage,
+                             bool shouldContentSniff);
+#elif PLATFORM(CF)
+  void createCFURLConnection(bool shouldUseCredentialStorage,
+                             bool shouldContentSniff);
+#endif
 
   friend class ResourceHandleInternal;
   OwnPtr<ResourceHandleInternal> d;
