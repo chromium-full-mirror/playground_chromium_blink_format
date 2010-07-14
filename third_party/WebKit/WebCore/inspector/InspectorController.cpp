@@ -215,7 +215,6 @@ InspectorController::~InspectorController() {
   ASSERT(!m_highlightedNode);
 
   deleteAllValues(m_frameResources);
-  deleteAllValues(m_consoleMessages);
 
   ASSERT(s_inspectorControllerCount);
   --s_inspectorControllerCount;
@@ -340,19 +339,19 @@ void InspectorController::addMessageToConsole(MessageSource source,
                                           lineNumber, sourceID, m_groupLevel));
 }
 
-void InspectorController::addConsoleMessage(ScriptState* scriptState,
-                                            ConsoleMessage* consoleMessage) {
+void InspectorController::addConsoleMessage(
+    ScriptState* scriptState,
+    PassOwnPtr<ConsoleMessage> consoleMessage) {
   ASSERT(enabled());
   ASSERT_ARG(consoleMessage, consoleMessage);
 
   if (m_previousMessage &&
-      m_previousMessage->isEqual(scriptState, consoleMessage)) {
+      m_previousMessage->isEqual(scriptState, consoleMessage.get())) {
     m_previousMessage->incrementCount();
-    delete consoleMessage;
     if (m_frontend)
       m_previousMessage->updateRepeatCountInConsole(m_frontend.get());
   } else {
-    m_previousMessage = consoleMessage;
+    m_previousMessage = consoleMessage.get();
     m_consoleMessages.append(consoleMessage);
     if (m_frontend)
       m_previousMessage->addToFrontend(m_frontend.get(),
@@ -361,14 +360,11 @@ void InspectorController::addConsoleMessage(ScriptState* scriptState,
 
   if (!m_frontend && m_consoleMessages.size() >= maximumConsoleMessages) {
     m_expiredConsoleMessageCount += expireConsoleMessagesStep;
-    for (size_t i = 0; i < expireConsoleMessagesStep; ++i)
-      delete m_consoleMessages[i];
     m_consoleMessages.remove(0, expireConsoleMessagesStep);
   }
 }
 
 void InspectorController::clearConsoleMessages() {
-  deleteAllValues(m_consoleMessages);
   m_consoleMessages.clear();
   m_expiredConsoleMessageCount = 0;
   m_previousMessage = 0;

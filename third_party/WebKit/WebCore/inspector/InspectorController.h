@@ -162,7 +162,7 @@ class InspectorController
                            unsigned lineNumber,
                            const String& sourceID);
   void clearConsoleMessages();
-  const Vector<ConsoleMessage*>& consoleMessages() const {
+  const Vector<OwnPtr<ConsoleMessage>>& consoleMessages() const {
     return m_consoleMessages;
   }
 
@@ -381,7 +381,7 @@ class InspectorController
 
   void focusNode();
 
-  void addConsoleMessage(ScriptState*, ConsoleMessage*);
+  void addConsoleMessage(ScriptState*, PassOwnPtr<ConsoleMessage>);
 
   void addResource(InspectorResource*);
   void removeResource(InspectorResource*);
@@ -421,7 +421,7 @@ class InspectorController
   ResourcesMap m_resources;
   HashSet<String> m_knownResources;
   FrameResourcesMap m_frameResources;
-  Vector<ConsoleMessage*> m_consoleMessages;
+  Vector<OwnPtr<ConsoleMessage>> m_consoleMessages;
   unsigned m_expiredConsoleMessageCount;
   HashMap<String, double> m_times;
   HashMap<String, unsigned> m_counts;
