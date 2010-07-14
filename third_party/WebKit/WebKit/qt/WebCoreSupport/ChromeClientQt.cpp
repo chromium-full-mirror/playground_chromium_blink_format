@@ -505,9 +505,8 @@ void ChromeClientQt::chooseIconForFiles(const Vector<String>& filenames,
   chooser->iconLoaded(Icon::createIconForFiles(filenames));
 }
 
-bool ChromeClientQt::setCursor(PlatformCursorHandle) {
+void ChromeClientQt::setCursor(const Cursor&) {
   notImplemented();
-  return false;
 }
 
 void ChromeClientQt::requestGeolocationPermissionForFrame(

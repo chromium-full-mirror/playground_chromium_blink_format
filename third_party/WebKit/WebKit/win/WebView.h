@@ -966,6 +966,8 @@ class WebView : public IWebView,
   void enterFullscreenForNode(WebCore::Node*);
   void exitFullscreen();
 
+  void setLastCursor(HCURSOR cursor) { m_lastSetCursor = cursor; }
+
  private:
   void setZoomMultiplier(float multiplier, bool isTextOnly);
   float zoomMultiplier(bool isTextOnly);
@@ -1117,6 +1119,8 @@ class WebView : public IWebView,
 #endif
 
   bool m_nextDisplayIsSynchronous;
+
+  HCURSOR m_lastSetCursor;
 };
 
 #endif

@@ -807,21 +807,27 @@ void WebChromeClient::chooseIconForFiles(
   chooser->iconLoaded(Icon::createIconForFiles(filenames));
 }
 
-bool WebChromeClient::setCursor(PlatformCursorHandle cursor) {
-  if (!cursor)
-    return false;
+void WebChromeClient::setCursor(const Cursor& cursor) {
+  HCURSOR platformCursor = cursor.platformCursor()->nativeCursor();
+  if (!platformCursor)
+    return;
 
   if (COMPtr<IWebUIDelegate> delegate = uiDelegate()) {
     COMPtr<IWebUIDelegatePrivate> delegatePrivate(Query, delegate);
     if (delegatePrivate) {
       if (SUCCEEDED(delegatePrivate->webViewSetCursor(
-              m_webView, reinterpret_cast<OLE_HANDLE>(cursor))))
-        return true;
+              m_webView, reinterpret_cast<OLE_HANDLE>(platformCursor))))
+        return;
     }
   }
 
-  ::SetCursor(cursor);
-  return true;
+  m_webView->setLastCursor(platformCursor);
+  ::SetCursor(platformCursor);
+  return;
+}
+
+void WebChromeClient::setLastSetCursorToCurrentCursor() {
+  m_webView->setLastCursor(::GetCursor());
 }
 
 void WebChromeClient::requestGeolocationPermissionForFrame(

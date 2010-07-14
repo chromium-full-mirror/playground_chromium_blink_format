@@ -95,6 +95,7 @@ class WebView : public RefCounted<WebView>,
                             WPARAM,
                             LPARAM,
                             bool& handled);
+  LRESULT onSetCursor(HWND hWnd, UINT message, WPARAM, LPARAM, bool& handled);
 
   bool isActive();
   void updateActiveState();
@@ -112,6 +113,7 @@ class WebView : public RefCounted<WebView>,
   virtual void processDidRevive();
   virtual void takeFocus(bool direction);
   virtual void toolTipChanged(const WebCore::String&, const WebCore::String&);
+  virtual void setCursor(const WebCore::Cursor&);
 
   // WebCore::WindowMessageListener
   virtual void windowReceivedMessage(HWND, UINT message, WPARAM, LPARAM);
@@ -121,6 +123,8 @@ class WebView : public RefCounted<WebView>,
   HWND m_hostWindow;
   HWND m_topLevelParentWindow;
   HWND m_toolTipWindow;
+
+  HCURSOR m_lastCursorSet;
 
   bool m_trackingMouseLeave;
   bool m_isBeingDestroyed;

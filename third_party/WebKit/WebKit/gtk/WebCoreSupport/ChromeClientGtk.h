@@ -132,7 +132,7 @@ class ChromeClient : public WebCore::ChromeClient {
     return 0;
   }
 
-  virtual bool setCursor(WebCore::PlatformCursorHandle);
+  virtual void setCursor(const WebCore::Cursor&);
 
   virtual void scrollRectIntoView(const WebCore::IntRect&,
                                   const WebCore::ScrollView*) const {}

@@ -157,7 +157,7 @@ class ChromeClientHaiku : public ChromeClient {
   void runOpenPanel(Frame*, PassRefPtr<FileChooser>);
   void chooseIconForFiles(const Vector<String>&, FileChooser*);
 
-  bool setCursor(PlatformCursorHandle);
+  void setCursor(const Cursor&);
 
   // Notification that the given form element has changed. This function
   // will be called frequently, so handling should be very fast.

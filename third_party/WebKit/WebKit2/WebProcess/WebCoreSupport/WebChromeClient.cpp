@@ -399,9 +399,9 @@ void WebChromeClient::chooseIconForFiles(const Vector<String>&, FileChooser*) {
   notImplemented();
 }
 
-bool WebChromeClient::setCursor(PlatformCursorHandle) {
-  notImplemented();
-  return false;
+void WebChromeClient::setCursor(const Cursor& cursor) {
+  WebProcess::shared().connection()->send(
+      WebPageProxyMessage::SetCursor, m_page->pageID(), CoreIPC::In(cursor));
 }
 
 void WebChromeClient::formStateDidChange(const Node*) {
@@ -447,6 +447,10 @@ WebCore::NotificationPresenter* WebChromeClient::notificationPresenter() const {
 
 #if ENABLE(TOUCH_EVENTS)
 void WebChromeClient::needTouchEvents(bool) {}
+#endif
+
+#if PLATFORM(WIN)
+void WebChromeClient::setLastSetCursorToCurrentCursor() {}
 #endif
 
 }  // namespace WebKit

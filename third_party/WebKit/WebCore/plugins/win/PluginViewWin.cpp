@@ -30,6 +30,8 @@
 
 #include "BitmapImage.h"
 #include "Bridge.h"
+#include "Chrome.h"
+#include "ChromeClient.h"
 #include "Document.h"
 #include "DocumentLoader.h"
 #include "Element.h"
@@ -671,7 +673,6 @@ void PluginView::handleKeyboardEvent(KeyboardEvent* event) {
 }
 
 #if !OS(WINCE)
-extern HCURSOR lastSetCursor;
 extern bool ignoreNextSetCursor;
 #endif
 
@@ -743,7 +744,8 @@ void PluginView::handleMouseEvent(MouseEvent* event) {
   // and since we don't want that we set ignoreNextSetCursor to true here to
   // prevent that.
   ignoreNextSetCursor = true;
-  lastSetCursor = ::GetCursor();
+  if (Page* page = m_parentFrame->page())
+    page->chrome()->client()->setLastSetCursorToCurrentCursor();
 #endif
 }
 

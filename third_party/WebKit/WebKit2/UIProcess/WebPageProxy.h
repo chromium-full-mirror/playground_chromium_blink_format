@@ -52,6 +52,7 @@ class MessageID;
 
 namespace WebCore {
 class IntSize;
+class Cursor;
 }
 
 struct WKContextStatistics;
@@ -218,6 +219,7 @@ class WebPageProxy : public RefCounted<WebPageProxy> {
 
   void takeFocus(bool direction);
   void setToolTip(const WebCore::String&);
+  void setCursor(const WebCore::Cursor&);
 
   void didReceiveEvent(WebEvent::Type);
   void didRunJavaScriptInMainFrame(const WebCore::String&, uint64_t);

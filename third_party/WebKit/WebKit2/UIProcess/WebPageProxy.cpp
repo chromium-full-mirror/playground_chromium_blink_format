@@ -526,6 +526,13 @@ void WebPageProxy::didReceiveMessage(CoreIPC::Connection* connection,
       setToolTip(toolTip);
       break;
     }
+    case WebPageProxyMessage::SetCursor: {
+      Cursor cursor;
+      if (!arguments.decode(cursor))
+        return;
+      setCursor(cursor);
+      break;
+    }
     case WebPageProxyMessage::ShowPage: {
       showPage();
       break;
@@ -853,6 +860,10 @@ void WebPageProxy::setToolTip(const String& toolTip) {
   String oldToolTip = m_toolTip;
   m_toolTip = toolTip;
   m_pageClient->toolTipChanged(oldToolTip, m_toolTip);
+}
+
+void WebPageProxy::setCursor(const WebCore::Cursor& cursor) {
+  m_pageClient->setCursor(cursor);
 }
 
 void WebPageProxy::didReceiveEvent(WebEvent::Type type) {

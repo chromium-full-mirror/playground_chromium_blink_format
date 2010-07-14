@@ -43,22 +43,23 @@
 
 namespace WebCore {
 
-Cursor::Cursor(PlatformCursor p) : m_impl(p) {}
+Cursor::Cursor(PlatformCursor p) : m_platformCursor(p) {}
 
-Cursor::Cursor(const Cursor& other) : m_impl(other.m_impl) {}
+Cursor::Cursor(const Cursor& other)
+    : m_platformCursor(other.m_platformCursor) {}
 
 Cursor::~Cursor() {}
 
 Cursor::Cursor(Image* image, const IntPoint& hotSpot) {
 #ifndef QT_NO_CURSOR
   IntPoint effectiveHotSpot = determineHotSpot(image, hotSpot);
-  m_impl = QCursor(*(image->nativeImageForCurrentFrame()), effectiveHotSpot.x(),
-                   effectiveHotSpot.y());
+  m_platformCursor = QCursor(*(image->nativeImageForCurrentFrame()),
+                             effectiveHotSpot.x(), effectiveHotSpot.y());
 #endif
 }
 
 Cursor& Cursor::operator=(const Cursor& other) {
-  m_impl = other.m_impl;
+  m_platformCursor = other.m_platformCursor;
   return *this;
 }
 

@@ -136,7 +136,7 @@ class ChromeClientImpl : public WebCore::ChromeClientChromium {
   virtual void runOpenPanel(WebCore::Frame*, PassRefPtr<WebCore::FileChooser>);
   virtual void chooseIconForFiles(const Vector<WebCore::String>&,
                                   WebCore::FileChooser*);
-  virtual bool setCursor(WebCore::PlatformCursorHandle) { return false; }
+  virtual void setCursor(const WebCore::Cursor&) {}
   virtual void formStateDidChange(const WebCore::Node*);
   virtual PassOwnPtr<WebCore::HTMLParserQuirks> createHTMLParserQuirks() {
     return 0;

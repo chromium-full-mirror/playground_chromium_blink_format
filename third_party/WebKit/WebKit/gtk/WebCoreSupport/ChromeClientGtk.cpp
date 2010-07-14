@@ -581,9 +581,8 @@ void ChromeClient::chooseIconForFiles(const Vector<WebCore::String>& filenames,
   chooser->iconLoaded(Icon::createIconForFiles(filenames));
 }
 
-bool ChromeClient::setCursor(PlatformCursorHandle) {
+void ChromeClient::setCursor(const Cursor&) {
   notImplemented();
-  return false;
 }
 
 void ChromeClient::requestGeolocationPermissionForFrame(

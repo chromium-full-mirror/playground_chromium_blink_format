@@ -69,6 +69,7 @@ class Chrome : public HostWindow {
   virtual IntRect windowToScreen(const IntRect&) const;
   virtual PlatformPageClient platformPageClient() const;
   virtual void scrollbarsModeDidChange() const;
+  virtual void setCursor(const Cursor&);
 
   void scrollRectIntoView(const IntRect&) const;
 
@@ -139,8 +140,6 @@ class Chrome : public HostWindow {
 
   void runOpenPanel(Frame*, PassRefPtr<FileChooser>);
   void chooseIconForFiles(const Vector<String>&, FileChooser*);
-
-  bool setCursor(PlatformCursorHandle);
 
 #if PLATFORM(MAC)
   void focusNSView(NSView*);

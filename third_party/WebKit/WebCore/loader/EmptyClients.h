@@ -172,7 +172,7 @@ class EmptyChromeClient : public ChromeClient {
 
   virtual PassOwnPtr<HTMLParserQuirks> createHTMLParserQuirks() { return 0; }
 
-  virtual bool setCursor(PlatformCursorHandle) { return false; }
+  virtual void setCursor(const Cursor&) {}
 
   virtual void scrollRectIntoView(const IntRect&, const ScrollView*) const {}
 
@@ -186,6 +186,9 @@ class EmptyChromeClient : public ChromeClient {
   virtual void scheduleCompositingLayerSync(){};
 #endif
 
+#if PLATFORM(WIN)
+  virtual void setLastSetCursorToCurrentCursor() {}
+#endif
 #if ENABLE(TOUCH_EVENTS)
   virtual void needTouchEvents(bool) {}
 #endif

@@ -153,7 +153,8 @@ class WebChromeClient : public WebCore::ChromeClient {
   virtual void chooseIconForFiles(const Vector<WebCore::String>&,
                                   WebCore::FileChooser*);
 
-  virtual bool setCursor(WebCore::PlatformCursorHandle cursor);
+  virtual void setCursor(const WebCore::Cursor&);
+  virtual void setLastSetCursorToCurrentCursor();
 
   WebView* webView() const { return m_webView; }
 

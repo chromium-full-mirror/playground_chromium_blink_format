@@ -188,7 +188,7 @@ class WebChromeClient : public WebCore::ChromeClient {
   virtual void chooseIconForFiles(const Vector<WebCore::String>&,
                                   WebCore::FileChooser*);
 
-  virtual bool setCursor(WebCore::PlatformCursorHandle);
+  virtual void setCursor(const WebCore::Cursor&);
 
   // Notification that the given form element has changed. This function
   // will be called frequently, so handling should be very fast.
@@ -212,6 +212,10 @@ class WebChromeClient : public WebCore::ChromeClient {
 
 #if ENABLE(TOUCH_EVENTS)
   virtual void needTouchEvents(bool);
+#endif
+
+#if PLATFORM(WIN)
+  virtual void setLastSetCursorToCurrentCursor();
 #endif
 
   WebCore::String m_cachedToolTip;

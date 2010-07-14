@@ -145,7 +145,7 @@ class WebChromeClient : public WebCore::ChromeClient {
   virtual void chooseIconForFiles(const Vector<WebCore::String>&,
                                   WebCore::FileChooser*);
 
-  virtual bool setCursor(WebCore::PlatformCursorHandle) { return false; }
+  virtual void setCursor(const WebCore::Cursor&);
 
   virtual WebCore::FloatRect customHighlightRect(
       WebCore::Node*,

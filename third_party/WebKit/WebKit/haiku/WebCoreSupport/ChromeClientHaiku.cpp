@@ -323,9 +323,8 @@ void ChromeClientHaiku::chooseIconForFiles(const Vector<String>& filenames,
   chooser->iconLoaded(Icon::createIconForFiles(filenames));
 }
 
-bool ChromeClientHaiku::setCursor(PlatformCursorHandle) {
+void ChromeClientHaiku::setCursor(const Cursor&) {
   notImplemented();
-  return false;
 }
 
 // Notification that the given form element has changed. This function

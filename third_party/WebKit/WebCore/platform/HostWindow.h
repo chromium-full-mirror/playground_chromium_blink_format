@@ -31,6 +31,8 @@
 
 namespace WebCore {
 
+class Cursor;
+
 class HostWindow : public Noncopyable {
  public:
   virtual ~HostWindow() {}
@@ -64,6 +66,9 @@ class HostWindow : public Noncopyable {
 
   // To notify WebKit of scrollbar mode changes.
   virtual void scrollbarsModeDidChange() const = 0;
+
+  // Request that the cursor change.
+  virtual void setCursor(const Cursor&) = 0;
 };
 
 }  // namespace WebCore
