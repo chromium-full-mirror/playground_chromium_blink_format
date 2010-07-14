@@ -100,6 +100,7 @@ class HTMLElementStack : public Noncopyable {
   void removeHTMLHeadElement(Element*);
 
   bool contains(Element*) const;
+  bool contains(const AtomicString& tagName) const;
 
   bool inScope(Element*) const;
   bool inScope(const AtomicString& tagName) const;
