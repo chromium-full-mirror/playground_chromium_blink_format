@@ -113,6 +113,7 @@ class RenderTextControlSingleLine : public RenderTextControl,
       const RenderStyle* startStyle) const;
   PassRefPtr<RenderStyle> createCancelButtonStyle(
       const RenderStyle* startStyle) const;
+  PassRefPtr<RenderStyle> createInnerSpinButtonStyle() const;
   PassRefPtr<RenderStyle> createOuterSpinButtonStyle() const;
 #if ENABLE(INPUT_SPEECH)
   PassRefPtr<RenderStyle> createSpeechButtonStyle(
@@ -164,6 +165,7 @@ class RenderTextControlSingleLine : public RenderTextControl,
   RefPtr<TextControlInnerElement> m_innerBlock;
   RefPtr<SearchFieldResultsButtonElement> m_resultsButton;
   RefPtr<SearchFieldCancelButtonElement> m_cancelButton;
+  RefPtr<TextControlInnerElement> m_innerSpinButton;
   RefPtr<TextControlInnerElement> m_outerSpinButton;
 #if ENABLE(INPUT_SPEECH)
   RefPtr<InputFieldSpeechButtonElement> m_speechButton;

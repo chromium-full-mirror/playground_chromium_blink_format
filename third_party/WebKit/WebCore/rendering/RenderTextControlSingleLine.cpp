@@ -70,6 +70,8 @@ RenderTextControlSingleLine::~RenderTextControlSingleLine() {
   if (m_innerBlock)
     m_innerBlock->detach();
 
+  if (m_innerSpinButton)
+    m_innerSpinButton->detach();
   if (m_outerSpinButton)
     m_outerSpinButton->detach();
 }
@@ -257,6 +259,13 @@ void RenderTextControlSingleLine::layout() {
   if (currentHeight < height())
     childBlock->setY((height() - currentHeight) / 2);
 
+  // Ignores the paddings for the inner spin button.
+  if (RenderBox* spinBox =
+          m_innerSpinButton ? m_innerSpinButton->renderBox() : 0) {
+    spinBox->setLocation(spinBox->x() + paddingRight(), borderTop());
+    spinBox->setHeight(height() - borderTop() - borderBottom());
+  }
+
   // Center the spin button vertically, and move it to the right by
   // padding + border of the text fields.
   if (RenderBox* spinBox =
@@ -301,6 +310,8 @@ bool RenderTextControlSingleLine::nodeAtPoint(const HitTestRequest& request,
     hitInnerTextElement(result, xPos, yPos, tx, ty);
 
   // If we found a spin button, we're done.
+  if (m_innerSpinButton && result.innerNode() == m_innerSpinButton)
+    return true;
   if (m_outerSpinButton && result.innerNode() == m_outerSpinButton)
     return true;
   // If we're not a search field, or we already found the speech, results or
@@ -391,6 +402,9 @@ void RenderTextControlSingleLine::forwardEvent(Event* event) {
     m_resultsButton->defaultEventHandler(event);
   else if (m_cancelButton && localPoint.x() > textRight)
     m_cancelButton->defaultEventHandler(event);
+  else if (m_innerSpinButton && localPoint.x() > textRight &&
+           localPoint.x() < textRight + m_innerSpinButton->renderBox()->width())
+    m_innerSpinButton->defaultEventHandler(event);
   else if (m_outerSpinButton && localPoint.x() > textRight)
     m_outerSpinButton->defaultEventHandler(event);
   else
@@ -489,6 +503,13 @@ int RenderTextControlSingleLine::textBlockWidth() const {
              cancelRenderer->marginRight();
   }
 
+  if (RenderBox* spinRenderer =
+          m_innerSpinButton ? m_innerSpinButton->renderBox() : 0) {
+    spinRenderer->calcWidth();
+    width -= spinRenderer->width() + spinRenderer->marginLeft() +
+             spinRenderer->marginRight();
+  }
+
 #if ENABLE(INPUT_SPEECH)
   if (RenderBox* speechRenderer =
           m_speechButton ? m_speechButton->renderBox() : 0) {
@@ -556,6 +577,10 @@ int RenderTextControlSingleLine::preferredContentWidth(float charWidth) const {
           m_cancelButton ? m_cancelButton->renderBox() : 0)
     result += cancelRenderer->borderLeft() + cancelRenderer->borderRight() +
               cancelRenderer->paddingLeft() + cancelRenderer->paddingRight();
+
+  if (RenderBox* spinRenderer =
+          m_innerSpinButton ? m_innerSpinButton->renderBox() : 0)
+    result += spinRenderer->minPrefWidth();
 
 #if ENABLE(INPUT_SPEECH)
   if (RenderBox* speechRenderer =
@@ -628,7 +653,13 @@ void RenderTextControlSingleLine::createSubtreeIfNeeded() {
 #endif
   if (!createSubtree) {
     RenderTextControl::createSubtreeIfNeeded(m_innerBlock.get());
-    if (inputElement()->hasSpinButton() && !m_outerSpinButton) {
+    bool hasSpinButton = inputElement()->hasSpinButton();
+    if (hasSpinButton && !m_innerSpinButton) {
+      m_innerSpinButton = SpinButtonElement::create(node());
+      m_innerSpinButton->attachInnerElement(
+          node(), createInnerSpinButtonStyle(), renderArena());
+    }
+    if (hasSpinButton && !m_outerSpinButton) {
       m_outerSpinButton = SpinButtonElement::create(node());
       m_outerSpinButton->attachInnerElement(
           node(), createOuterSpinButtonStyle(), renderArena());
@@ -815,6 +846,16 @@ PassRefPtr<RenderStyle> RenderTextControlSingleLine::createCancelButtonStyle(
 
   cancelBlockStyle->setVisibility(visibilityForCancelButton());
   return cancelBlockStyle.release();
+}
+
+PassRefPtr<RenderStyle>
+RenderTextControlSingleLine::createInnerSpinButtonStyle() const {
+  ASSERT(node()->isHTMLElement());
+  RefPtr<RenderStyle> buttonStyle = getCachedPseudoStyle(INNER_SPIN_BUTTON);
+  if (!buttonStyle)
+    buttonStyle = RenderStyle::create();
+  buttonStyle->inheritFrom(style());
+  return buttonStyle.release();
 }
 
 PassRefPtr<RenderStyle>
