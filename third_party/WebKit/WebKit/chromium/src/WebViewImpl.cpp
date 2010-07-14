@@ -73,6 +73,7 @@
 #include "PlatformContextSkia.h"
 #include "PlatformKeyboardEvent.h"
 #include "PlatformMouseEvent.h"
+#include "PlatformThemeChromiumGtk.h"
 #include "PlatformWheelEvent.h"
 #include "PopupMenuChromium.h"
 #include "PopupMenuClient.h"
@@ -1783,7 +1784,7 @@ void WebViewImpl::setScrollbarColors(unsigned inactiveColor,
                                      unsigned activeColor,
                                      unsigned trackColor) {
 #if OS(LINUX)
-  RenderThemeChromiumLinux::setScrollbarColors(inactiveColor, activeColor,
+  PlatformThemeChromiumGtk::setScrollbarColors(inactiveColor, activeColor,
                                                trackColor);
 #endif
 }
