@@ -324,6 +324,23 @@ JSC::JSValue jsTestObjHash(JSC::ExecState*,
 JSC::JSValue jsTestObjConstructor(JSC::ExecState*,
                                   JSC::JSValue,
                                   const JSC::Identifier&);
+// Constants
+
+JSC::JSValue jsTestObjCONST_VALUE_0(JSC::ExecState*,
+                                    JSC::JSValue,
+                                    const JSC::Identifier&);
+JSC::JSValue jsTestObjCONST_VALUE_1(JSC::ExecState*,
+                                    JSC::JSValue,
+                                    const JSC::Identifier&);
+JSC::JSValue jsTestObjCONST_VALUE_2(JSC::ExecState*,
+                                    JSC::JSValue,
+                                    const JSC::Identifier&);
+JSC::JSValue jsTestObjCONST_VALUE_4(JSC::ExecState*,
+                                    JSC::JSValue,
+                                    const JSC::Identifier&);
+JSC::JSValue jsTestObjCONST_VALUE_8(JSC::ExecState*,
+                                    JSC::JSValue,
+                                    const JSC::Identifier&);
 
 }  // namespace WebCore
 
