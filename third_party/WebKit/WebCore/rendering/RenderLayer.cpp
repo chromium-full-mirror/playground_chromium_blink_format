@@ -4295,7 +4295,8 @@ void showLayerTree(const WebCore::RenderLayer* layer) {
         frame, WebCore::RenderAsTextShowAllLayers |
                    WebCore::RenderAsTextShowLayerNesting |
                    WebCore::RenderAsTextShowCompositedLayers |
-                   WebCore::RenderAsTextShowAddresses);
+                   WebCore::RenderAsTextShowAddresses |
+                   WebCore::RenderAsTextShowIDAndClass);
     fprintf(stderr, "%s\n", output.utf8().data());
   }
 }

@@ -244,10 +244,10 @@ void RenderTreeAsText::writeRenderObject(TextStream& ts,
   ts << " " << r;
 
   if (!(o.isText() && !o.isBR())) {
-    if (o.isFileUploadControl()) {
+    if (o.isFileUploadControl())
       ts << " " << quoteAndEscapeNonPrintables(
                        toRenderFileUploadControl(&o)->fileTextValue());
-    }
+
     if (o.parent() && (o.parent()->style()->color() != o.style()->color()))
       ts << " [color=" << o.style()->color().name() << "]";
 
@@ -374,6 +374,24 @@ void RenderTreeAsText::writeRenderObject(TextStream& ts,
         }
       }
       ts << ": " << text;
+    }
+  }
+
+  if (behavior & RenderAsTextShowIDAndClass) {
+    if (Node* node = o.node()) {
+      if (node->hasID())
+        ts << " id=\"" + static_cast<Element*>(node)->getIdAttribute() + "\"";
+
+      if (node->hasClass()) {
+        StyledElement* styledElement = static_cast<StyledElement*>(node);
+        String classes;
+        for (size_t i = 0; i < styledElement->classNames().size(); ++i) {
+          if (i > 0)
+            classes += " ";
+          classes += styledElement->classNames()[i];
+        }
+        ts << " class=\"" + classes + "\"";
+      }
     }
   }
 
