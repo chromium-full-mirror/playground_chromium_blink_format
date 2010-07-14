@@ -34,6 +34,7 @@
 #include "OwnArrayPtr.h"
 #include "PlatformString.h"
 #include "ScriptController.h"
+#include "UserGestureIndicator.h"
 #include "V8GCController.h"
 #include "V8Helpers.h"
 #include "V8NPUtils.h"
@@ -312,6 +313,10 @@ bool _NPN_EvaluateHelper(NPP npp,
   String filename;
   if (!popupsAllowed)
     filename = "npscript";
+
+  UserGestureIndicator gestureIndicator(
+      popupsAllowed ? DefinitelyProcessingUserGesture
+                    : DefinitelyNotProcessingUserGesture);
 
   String script =
       String::fromUTF8(npScript->UTF8Characters, npScript->UTF8Length);
