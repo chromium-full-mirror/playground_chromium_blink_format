@@ -350,6 +350,8 @@ class CanvasRenderingContext2D : public CanvasRenderingContext {
   struct State {
     State();
 
+    String m_unparsedStrokeColor;
+    String m_unparsedFillColor;
     RefPtr<CanvasStyle> m_strokeStyle;
     RefPtr<CanvasStyle> m_fillStyle;
     float m_lineWidth;

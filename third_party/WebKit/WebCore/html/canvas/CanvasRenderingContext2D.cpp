@@ -180,6 +180,7 @@ void CanvasRenderingContext2D::setStrokeStyle(PassRefPtr<CanvasStyle> style) {
   if (!c)
     return;
   state().m_strokeStyle->applyStrokeColor(c);
+  state().m_unparsedStrokeColor = String();
 }
 
 CanvasStyle* CanvasRenderingContext2D::fillStyle() const {
@@ -205,6 +206,7 @@ void CanvasRenderingContext2D::setFillStyle(PassRefPtr<CanvasStyle> style) {
   if (!c)
     return;
   state().m_fillStyle->applyFillColor(c);
+  state().m_unparsedFillColor = String();
 }
 
 float CanvasRenderingContext2D::lineWidth() const {
@@ -461,7 +463,10 @@ void CanvasRenderingContext2D::setTransform(float m11,
 }
 
 void CanvasRenderingContext2D::setStrokeColor(const String& color) {
+  if (color == state().m_unparsedStrokeColor)
+    return;
   setStrokeStyle(CanvasStyle::create(color));
+  state().m_unparsedStrokeColor = color;
 }
 
 void CanvasRenderingContext2D::setStrokeColor(float grayLevel) {
@@ -493,7 +498,10 @@ void CanvasRenderingContext2D::setStrokeColor(float c,
 }
 
 void CanvasRenderingContext2D::setFillColor(const String& color) {
+  if (color == state().m_unparsedFillColor)
+    return;
   setFillStyle(CanvasStyle::create(color));
+  state().m_unparsedFillColor = color;
 }
 
 void CanvasRenderingContext2D::setFillColor(float grayLevel) {

@@ -50,10 +50,7 @@ static JSValue toJS(ExecState* exec, CanvasStyle* style) {
   return jsString(exec, style->color());
 }
 
-static PassRefPtr<CanvasStyle> toHTMLCanvasStyle(ExecState* exec,
-                                                 JSValue value) {
-  if (value.isString())
-    return CanvasStyle::create(ustringToString(asString(value)->value(exec)));
+static PassRefPtr<CanvasStyle> toHTMLCanvasStyle(ExecState*, JSValue value) {
   if (!value.isObject())
     return 0;
   JSObject* object = asObject(value);
@@ -74,6 +71,10 @@ void JSCanvasRenderingContext2D::setStrokeStyle(ExecState* exec,
                                                 JSValue value) {
   CanvasRenderingContext2D* context =
       static_cast<CanvasRenderingContext2D*>(impl());
+  if (value.isString()) {
+    context->setStrokeColor(ustringToString(asString(value)->value(exec)));
+    return;
+  }
   context->setStrokeStyle(toHTMLCanvasStyle(exec, value));
 }
 
@@ -86,6 +87,10 @@ JSValue JSCanvasRenderingContext2D::fillStyle(ExecState* exec) const {
 void JSCanvasRenderingContext2D::setFillStyle(ExecState* exec, JSValue value) {
   CanvasRenderingContext2D* context =
       static_cast<CanvasRenderingContext2D*>(impl());
+  if (value.isString()) {
+    context->setFillColor(ustringToString(asString(value)->value(exec)));
+    return;
+  }
   context->setFillStyle(toHTMLCanvasStyle(exec, value));
 }
 
