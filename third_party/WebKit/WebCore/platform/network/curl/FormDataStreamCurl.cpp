@@ -51,8 +51,8 @@ size_t FormDataStream::read(void* ptr,
     return 0;
 
   Vector<FormDataElement> elements;
-  if (m_resourceHandle->request().httpBody())
-    elements = m_resourceHandle->request().httpBody()->elements();
+  if (m_resourceHandle->firstRequest().httpBody())
+    elements = m_resourceHandle->firstRequest().httpBody()->elements();
 
   if (m_formDataElementIndex >= elements.size())
     return 0;
@@ -106,8 +106,8 @@ size_t FormDataStream::read(void* ptr,
 
 bool FormDataStream::hasMoreElements() const {
   Vector<FormDataElement> elements;
-  if (m_resourceHandle->request().httpBody())
-    elements = m_resourceHandle->request().httpBody()->elements();
+  if (m_resourceHandle->firstRequest().httpBody())
+    elements = m_resourceHandle->firstRequest().httpBody()->elements();
 
   return m_formDataElementIndex < elements.size();
 }
