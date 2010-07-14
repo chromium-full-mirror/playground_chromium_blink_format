@@ -306,7 +306,19 @@ void PluginView::performJavaScriptURLRequest(URLRequest* request) {
   String resultString;
   result.getString(scriptState, resultString);
 
-  // FIXME: Send the result string back to the plug-in.
+  if (!request->target().isNull()) {
+    // Just send back whether the frame load succeeded or not.
+    if (resultString.isNull())
+      m_plugin->frameDidFail(request->requestID(), false);
+    else
+      m_plugin->frameDidFinishLoading(request->requestID());
+    return;
+  }
+
+  // Send the result back to the plug-in.
+  plugin->didEvaluateJavaScript(
+      request->requestID(), decodeURLEscapeSequences(request->request().url()),
+      resultString);
 }
 
 void PluginView::invalidateRect(const IntRect& dirtyRect) {

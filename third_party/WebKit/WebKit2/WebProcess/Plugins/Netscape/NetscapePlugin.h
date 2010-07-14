@@ -72,6 +72,10 @@ class NetscapePlugin : public Plugin {
                                  const WebCore::IntRect& clipRect);
   virtual void frameDidFinishLoading(uint64_t requestID);
   virtual void frameDidFail(uint64_t requestID, bool wasCancelled);
+  virtual void didEvaluateJavaScript(uint64_t requestID,
+                                     const WebCore::String& requestURLString,
+                                     const WebCore::String& result);
+
   virtual PluginController* controller();
 
   PluginController* m_pluginController;
