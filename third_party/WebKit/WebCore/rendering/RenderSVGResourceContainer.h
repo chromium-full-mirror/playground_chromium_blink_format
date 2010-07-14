@@ -102,8 +102,7 @@ class RenderSVGResourceContainer : public RenderSVGHiddenContainer,
   }
 
   bool containsCyclicReference(const Node* startNode) const {
-    Document* document = startNode->document();
-    ASSERT(document);
+    ASSERT(startNode->document());
 
     for (Node* node = startNode->firstChild(); node;
          node = node->nextSibling()) {
