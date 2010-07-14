@@ -57,9 +57,8 @@ class SourceProvider : public RefCounted<SourceProvider> {
 class UStringSourceProvider : public SourceProvider {
  public:
   static PassRefPtr<UStringSourceProvider> create(const UString& source,
-                                                  const UString& url,
-                                                  bool hasBOMs = true) {
-    return adoptRef(new UStringSourceProvider(source, url, hasBOMs));
+                                                  const UString& url) {
+    return adoptRef(new UStringSourceProvider(source, url));
   }
 
   UString getRange(int start, int end) const {
@@ -69,13 +68,8 @@ class UStringSourceProvider : public SourceProvider {
   int length() const { return m_source.size(); }
 
  private:
-  UStringSourceProvider(const UString& source, const UString& url, bool hasBOMs)
-      : SourceProvider(url), m_source(source) {
-    if (hasBOMs && m_source.size()) {
-      bool scratch = false;
-      m_source = UString(m_source.rep()->copyStringWithoutBOMs(false, scratch));
-    }
-  }
+  UStringSourceProvider(const UString& source, const UString& url)
+      : SourceProvider(url), m_source(source) {}
 
   UString m_source;
 };
