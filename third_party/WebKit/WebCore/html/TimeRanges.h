@@ -52,6 +52,8 @@ class TimeRanges : public RefCounted<TimeRanges> {
 
   bool contain(float time) const;
 
+  float nearest(float time) const;
+
  private:
   TimeRanges() {}
   TimeRanges(float start, float end);
