@@ -121,10 +121,8 @@ DebuggerAgentManager::AttachedAgentsMap*
     DebuggerAgentManager::s_attachedAgentsMap = 0;
 
 void DebuggerAgentManager::debugAttach(DebuggerAgentImpl* debuggerAgent) {
-#if ENABLE(V8_SCRIPT_DEBUG_SERVER)
   if (!s_exposeV8DebuggerProtocol)
     return;
-#endif
   if (!s_attachedAgentsMap) {
     s_attachedAgentsMap = new AttachedAgentsMap();
     v8::Debug::SetMessageHandler2(&DebuggerAgentManager::onV8DebugMessage);
@@ -137,10 +135,8 @@ void DebuggerAgentManager::debugAttach(DebuggerAgentImpl* debuggerAgent) {
 }
 
 void DebuggerAgentManager::debugDetach(DebuggerAgentImpl* debuggerAgent) {
-#if ENABLE(V8_SCRIPT_DEBUG_SERVER)
   if (!s_exposeV8DebuggerProtocol)
     return;
-#endif
   if (!s_attachedAgentsMap) {
     ASSERT_NOT_REACHED();
     return;
