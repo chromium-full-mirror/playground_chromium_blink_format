@@ -58,4 +58,8 @@ void DummyPlugin::frameDidFinishLoading(uint64_t requestID) {}
 
 void DummyPlugin::frameDidFail(uint64_t requestID, bool wasCancelled) {}
 
+PluginController* DummyPlugin::controller() {
+  return 0;
+}
+
 }  // namespace WebKit
