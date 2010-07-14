@@ -150,7 +150,7 @@ JSValue JSActivation::argumentsGetter(ExecState*,
   JSActivation* activation = asActivation(slotBase);
   CallFrame* callFrame = CallFrame::create(activation->d()->registers);
   int argumentsRegister = activation->d()
-                              ->functionExecutable->generatedByteCode()
+                              ->functionExecutable->generatedBytecode()
                               .argumentsRegister();
   if (!callFrame->r(argumentsRegister).jsValue()) {
     JSValue arguments = JSValue(new (callFrame) Arguments(callFrame));

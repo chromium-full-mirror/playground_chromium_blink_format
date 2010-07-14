@@ -37,6 +37,7 @@ class CodeBlock;
 class ExecState;
 class Identifier;
 class JSGlobalData;
+class JSGlobalObject;
 class JSNotAnObjectErrorStub;
 class JSObject;
 class Node;
@@ -45,6 +46,7 @@ struct Instruction;
 JSValue createInterruptedExecutionException(JSGlobalData*);
 JSValue createTerminatedExecutionException(JSGlobalData*);
 JSObject* createStackOverflowError(ExecState*);
+JSObject* createStackOverflowError(JSGlobalObject*);
 JSValue createUndefinedVariableError(ExecState*,
                                      const Identifier&,
                                      unsigned bytecodeOffset,

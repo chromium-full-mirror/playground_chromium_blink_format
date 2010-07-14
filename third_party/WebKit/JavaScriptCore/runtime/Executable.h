@@ -197,42 +197,39 @@ class EvalExecutable : public ScriptExecutable {
  public:
   ~EvalExecutable();
 
-  EvalCodeBlock& bytecode(ExecState* exec, ScopeChainNode* scopeChainNode) {
-    if (!m_evalCodeBlock) {
-      JSObject* error = compile(exec, scopeChainNode);
-      ASSERT_UNUSED(!error, error);
-    }
-    return *m_evalCodeBlock;
+  JSObject* compile(ExecState* exec, ScopeChainNode* scopeChainNode) {
+    JSObject* error = 0;
+    if (!m_evalCodeBlock)
+      error = compileInternal(exec, scopeChainNode);
+    ASSERT(!error == !!m_evalCodeBlock);
+    return error;
   }
 
-  JSObject* compile(ExecState*, ScopeChainNode*);
+  EvalCodeBlock& generatedBytecode() {
+    ASSERT(m_evalCodeBlock);
+    return *m_evalCodeBlock;
+  }
 
   static PassRefPtr<EvalExecutable> create(ExecState* exec,
                                            const SourceCode& source) {
     return adoptRef(new EvalExecutable(exec, source));
   }
 
+#if ENABLE(JIT)
+  JITCode& generatedJITCode() { return generatedJITCodeForCall(); }
+#endif
+
  private:
   EvalExecutable(ExecState* exec, const SourceCode& source)
       : ScriptExecutable(exec, source), m_evalCodeBlock(0) {}
+
+  JSObject* compileInternal(ExecState*, ScopeChainNode*);
 
   virtual PassOwnPtr<ExceptionInfo> reparseExceptionInfo(JSGlobalData*,
                                                          ScopeChainNode*,
                                                          CodeBlock*);
 
   EvalCodeBlock* m_evalCodeBlock;
-
-#if ENABLE(JIT)
- public:
-  JITCode& jitCode(ExecState* exec, ScopeChainNode* scopeChainNode) {
-    if (!m_jitCodeForCall)
-      generateJITCode(exec, scopeChainNode);
-    return m_jitCodeForCall;
-  }
-
- private:
-  void generateJITCode(ExecState*, ScopeChainNode*);
-#endif
 };
 
 class ProgramExecutable : public ScriptExecutable {
@@ -244,38 +241,36 @@ class ProgramExecutable : public ScriptExecutable {
 
   ~ProgramExecutable();
 
-  ProgramCodeBlock& bytecode(ExecState* exec, ScopeChainNode* scopeChainNode) {
-    if (!m_programCodeBlock) {
-      JSObject* error = compile(exec, scopeChainNode);
-      ASSERT_UNUSED(!error, error);
-    }
+  JSObject* compile(ExecState* exec, ScopeChainNode* scopeChainNode) {
+    JSObject* error = 0;
+    if (!m_programCodeBlock)
+      error = compileInternal(exec, scopeChainNode);
+    ASSERT(!error == !!m_programCodeBlock);
+    return error;
+  }
+
+  ProgramCodeBlock& generatedBytecode() {
+    ASSERT(m_programCodeBlock);
     return *m_programCodeBlock;
   }
 
   JSObject* checkSyntax(ExecState*);
-  JSObject* compile(ExecState*, ScopeChainNode*);
+
+#if ENABLE(JIT)
+  JITCode& generatedJITCode() { return generatedJITCodeForCall(); }
+#endif
 
  private:
   ProgramExecutable(ExecState* exec, const SourceCode& source)
       : ScriptExecutable(exec, source), m_programCodeBlock(0) {}
+
+  JSObject* compileInternal(ExecState*, ScopeChainNode*);
 
   virtual PassOwnPtr<ExceptionInfo> reparseExceptionInfo(JSGlobalData*,
                                                          ScopeChainNode*,
                                                          CodeBlock*);
 
   ProgramCodeBlock* m_programCodeBlock;
-
-#if ENABLE(JIT)
- public:
-  JITCode& jitCode(ExecState* exec, ScopeChainNode* scopeChainNode) {
-    if (!m_jitCodeForCall)
-      generateJITCode(exec, scopeChainNode);
-    return m_jitCodeForCall;
-  }
-
- private:
-  void generateJITCode(ExecState*, ScopeChainNode*);
-#endif
 };
 
 class FunctionExecutable : public ScriptExecutable {
@@ -315,19 +310,19 @@ class FunctionExecutable : public ScriptExecutable {
   // Returns either call or construct bytecode. This can be appropriate
   // for answering questions that that don't vary between call and construct --
   // for example, argumentsRegister().
-  FunctionCodeBlock& generatedByteCode() {
+  FunctionCodeBlock& generatedBytecode() {
     if (m_codeBlockForCall)
       return *m_codeBlockForCall;
     ASSERT(m_codeBlockForConstruct);
     return *m_codeBlockForConstruct;
   }
 
-  FunctionCodeBlock* bytecodeForCall(ExecState* exec,
-                                     ScopeChainNode* scopeChainNode) {
-    ASSERT(scopeChainNode);
+  JSObject* compileForCall(ExecState* exec, ScopeChainNode* scopeChainNode) {
+    JSObject* error = 0;
     if (!m_codeBlockForCall)
-      compileForCall(exec, scopeChainNode);
-    return m_codeBlockForCall;
+      error = compileForCallInternal(exec, scopeChainNode);
+    ASSERT(!error == !!m_codeBlockForCall);
+    return error;
   }
 
   bool isGeneratedForCall() const { return m_codeBlockForCall; }
@@ -337,12 +332,13 @@ class FunctionExecutable : public ScriptExecutable {
     return *m_codeBlockForCall;
   }
 
-  FunctionCodeBlock* bytecodeForConstruct(ExecState* exec,
-                                          ScopeChainNode* scopeChainNode) {
-    ASSERT(scopeChainNode);
+  JSObject* compileForConstruct(ExecState* exec,
+                                ScopeChainNode* scopeChainNode) {
+    JSObject* error = 0;
     if (!m_codeBlockForConstruct)
-      compileForConstruct(exec, scopeChainNode);
-    return m_codeBlockForConstruct;
+      error = compileForConstructInternal(exec, scopeChainNode);
+    ASSERT(!error == !!m_codeBlockForConstruct);
+    return error;
   }
 
   bool isGeneratedForConstruct() const { return m_codeBlockForConstruct; }
@@ -364,8 +360,7 @@ class FunctionExecutable : public ScriptExecutable {
                                                        ExecState*,
                                                        Debugger*,
                                                        const SourceCode&,
-                                                       int* errLine = 0,
-                                                       UString* errMsg = 0);
+                                                       JSObject** exception);
 
  private:
   FunctionExecutable(JSGlobalData* globalData,
@@ -406,8 +401,8 @@ class FunctionExecutable : public ScriptExecutable {
     m_lastLine = lastLine;
   }
 
-  bool compileForCall(ExecState*, ScopeChainNode*);
-  bool compileForConstruct(ExecState*, ScopeChainNode*);
+  JSObject* compileForCallInternal(ExecState*, ScopeChainNode*);
+  JSObject* compileForConstructInternal(ExecState*, ScopeChainNode*);
 
   virtual PassOwnPtr<ExceptionInfo> reparseExceptionInfo(JSGlobalData*,
                                                          ScopeChainNode*,
@@ -424,37 +419,6 @@ class FunctionExecutable : public ScriptExecutable {
 
 #if ENABLE(JIT)
  public:
-  JITCode& jitCodeForCall(ExecState* exec, ScopeChainNode* scopeChainNode) {
-    if (!m_jitCodeForCall)
-      generateJITCodeForCall(exec, scopeChainNode);
-    return m_jitCodeForCall;
-  }
-
-  JITCode& jitCodeForConstruct(ExecState* exec,
-                               ScopeChainNode* scopeChainNode) {
-    if (!m_jitCodeForConstruct)
-      generateJITCodeForConstruct(exec, scopeChainNode);
-    return m_jitCodeForConstruct;
-  }
-
-  bool tryJitCodeForCall(ExecState* exec, ScopeChainNode* scopeChainNode) {
-    FunctionCodeBlock* codeBlock = bytecodeForCall(exec, scopeChainNode);
-    if (!codeBlock)
-      return false;
-    if (!m_jitCodeForCall)
-      generateJITCodeForCall(exec, scopeChainNode);
-    return true;
-  }
-
-  bool tryJitCodeForConstruct(ExecState* exec, ScopeChainNode* scopeChainNode) {
-    FunctionCodeBlock* codeBlock = bytecodeForConstruct(exec, scopeChainNode);
-    if (!codeBlock)
-      return false;
-    if (!m_jitCodeForConstruct)
-      generateJITCodeForConstruct(exec, scopeChainNode);
-    return true;
-  }
-
   MacroAssemblerCodePtr generatedJITCodeForCallWithArityCheck() {
     ASSERT(m_jitCodeForCall);
     ASSERT(m_jitCodeForCallWithArityCheck);
@@ -466,10 +430,6 @@ class FunctionExecutable : public ScriptExecutable {
     ASSERT(m_jitCodeForConstructWithArityCheck);
     return m_jitCodeForConstructWithArityCheck;
   }
-
- private:
-  void generateJITCodeForCall(ExecState*, ScopeChainNode*);
-  void generateJITCodeForConstruct(ExecState*, ScopeChainNode*);
 #endif
 };
 

@@ -164,12 +164,12 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
   ExecutableAllocator executableAllocator;
 #endif
 
-#if ENABLE(JIT)
-#if ENABLE(INTERPRETER)
-  bool canUseJIT() { return m_canUseJIT; }
-#endif
+#if !ENABLE(JIT)
+  bool canUseJIT() { return false; }  // interpreter only
+#elif !ENABLE(INTERPRETER)
+  bool canUseJIT() { return true; }  // jit only
 #else
-  bool canUseJIT() { return false; }
+  bool canUseJIT() { return m_canUseJIT; }
 #endif
   Lexer* lexer;
   Parser* parser;

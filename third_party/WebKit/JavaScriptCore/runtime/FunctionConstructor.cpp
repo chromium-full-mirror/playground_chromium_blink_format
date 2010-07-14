@@ -108,18 +108,17 @@ JSObject* constructFunction(ExecState* exec,
     program = builder.build();
   }
 
-  int errLine;
-  UString errMsg;
   JSGlobalObject* globalObject = exec->lexicalGlobalObject();
   JSGlobalData* globalData = globalObject->globalData();
   SourceCode source = makeSource(program, sourceURL, lineNumber);
+  JSObject* exception = 0;
   RefPtr<FunctionExecutable> function = FunctionExecutable::fromGlobalCode(
       functionName, exec, exec->dynamicGlobalObject()->debugger(), source,
-      &errLine, &errMsg);
-  if (!function)
-    return throwError(
-        exec, addErrorInfo(globalData, createSyntaxError(globalObject, errMsg),
-                           errLine, source));
+      &exception);
+  if (!function) {
+    ASSERT(exception);
+    return throwError(exec, exception);
+  }
 
   ScopeChain scopeChain(globalObject, globalData, globalObject,
                         exec->globalThisValue());
