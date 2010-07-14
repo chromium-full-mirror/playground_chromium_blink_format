@@ -105,9 +105,8 @@ void RenderSVGRoot::layout() {
   // Arbitrary affine transforms are incompatible with LayoutState.
   view()->disableLayoutState();
 
-  bool needsLayout = selfNeedsLayout();
   LayoutRepainter repainter(*this,
-                            checkForRepaintDuringLayout() && needsLayout);
+                            m_everHadLayout && checkForRepaintDuringLayout());
 
   IntSize oldSize(width(), height());
   calcWidth();
@@ -117,7 +116,7 @@ void RenderSVGRoot::layout() {
   SVGSVGElement* svg = static_cast<SVGSVGElement*>(node());
   m_isLayoutSizeChanged = svg->hasRelativeLengths() && oldSize != size();
 
-  SVGRenderSupport::layoutChildren(this, needsLayout);
+  SVGRenderSupport::layoutChildren(this, selfNeedsLayout());
   m_isLayoutSizeChanged = false;
 
   repainter.repaintAfterLayout();
