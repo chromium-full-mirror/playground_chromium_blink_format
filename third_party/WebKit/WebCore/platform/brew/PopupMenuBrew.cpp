@@ -35,7 +35,11 @@ namespace WebCore {
 PopupMenu::PopupMenu(PopupMenuClient* menuList)
     : m_popupClient(menuList), m_view(0) {}
 
-PopupMenu::~PopupMenu() {}
+PopupMenu::~PopupMenu() {
+  // Tell client to destroy data related to this popup since this object is
+  // going away.
+  hide();
+}
 
 void PopupMenu::show(const IntRect& rect, FrameView* view, int index) {
   ASSERT(m_popupClient);
