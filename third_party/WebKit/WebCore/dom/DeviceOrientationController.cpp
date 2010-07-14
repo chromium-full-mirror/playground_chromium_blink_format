@@ -74,7 +74,7 @@ void DeviceOrientationController::removeAllListeners(DOMWindow* window) {
     m_client->stopUpdating();
 }
 
-void DeviceOrientationController::onDeviceOrientationChange(
+void DeviceOrientationController::didChangeDeviceOrientation(
     DeviceOrientation* orientation) {
   RefPtr<DeviceOrientationEvent> event = DeviceOrientationEvent::create(
       eventNames().deviceorientationEvent, orientation);
