@@ -32,7 +32,6 @@
 #if ENABLE(DATABASE)
 #include "DatabaseAuthorizer.h"
 #include "DatabaseTracker.h"
-#include "ExceptionCode.h"
 #include "Logging.h"
 #include "SQLiteStatement.h"
 #include "ScriptExecutionContext.h"
@@ -473,6 +472,17 @@ bool AbstractDatabase::hadDeletes() {
 void AbstractDatabase::resetAuthorizer() {
   if (m_databaseAuthorizer)
     m_databaseAuthorizer->reset();
+}
+
+unsigned long long AbstractDatabase::maximumSize() const {
+  return DatabaseTracker::tracker().getMaxSizeForDatabase(this);
+}
+
+void AbstractDatabase::incrementalVacuumIfNeeded() {
+  int64_t freeSpaceSize = m_sqliteDatabase.freeSpaceSize();
+  int64_t totalSize = m_sqliteDatabase.totalSize();
+  if (totalSize <= 10 * freeSpaceSize)
+    m_sqliteDatabase.runIncrementalVacuumCommand();
 }
 
 }  // namespace WebCore

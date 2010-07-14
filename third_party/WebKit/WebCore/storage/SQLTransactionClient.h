@@ -37,16 +37,16 @@
 
 namespace WebCore {
 
-class SQLTransaction;
+class AbstractDatabase;
 
 // A client to the SQLTransaction class. Allows SQLTransaction to notify
 // interested
 // parties that certain things have happened in a transaction.
 class SQLTransactionClient : public Noncopyable {
  public:
-  void didCommitTransaction(SQLTransaction*);
-  void didExecuteStatement(SQLTransaction*);
-  bool didExceedQuota(SQLTransaction*);
+  void didCommitWriteTransaction(AbstractDatabase*);
+  void didExecuteStatement(AbstractDatabase*);
+  bool didExceedQuota(AbstractDatabase*);
 };
 }
 

@@ -33,41 +33,25 @@
 
 #if ENABLE(DATABASE)
 
-#include "Chrome.h"
-#include "ChromeClient.h"
-#include "Database.h"
-#include "DatabaseThread.h"
+#include "AbstractDatabase.h"
 #include "DatabaseTracker.h"
-#include "Document.h"
-#include "Page.h"
-#include "SQLTransaction.h"
+#include "ScriptExecutionContext.h"
+#include "SecurityOrigin.h"
 
 namespace WebCore {
 
-void SQLTransactionClient::didCommitTransaction(SQLTransaction* transaction) {
-  ASSERT(currentThread() ==
-         transaction->database()
-             ->scriptExecutionContext()
-             ->databaseThread()
-             ->getThreadID());
-  Database* database = transaction->database();
+void SQLTransactionClient::didCommitWriteTransaction(
+    AbstractDatabase* database) {
   DatabaseTracker::tracker().scheduleNotifyDatabaseChanged(
       database->securityOrigin(), database->stringIdentifier());
 }
 
-void SQLTransactionClient::didExecuteStatement(SQLTransaction* transaction) {
-  ASSERT(currentThread() ==
-         transaction->database()
-             ->scriptExecutionContext()
-             ->databaseThread()
-             ->getThreadID());
-  DatabaseTracker::tracker().databaseChanged(transaction->database());
+void SQLTransactionClient::didExecuteStatement(AbstractDatabase* database) {
+  DatabaseTracker::tracker().databaseChanged(database);
 }
 
-bool SQLTransactionClient::didExceedQuota(SQLTransaction* transaction) {
-  ASSERT(transaction->database()->scriptExecutionContext()->isContextThread());
-  Database* database = transaction->database();
-
+bool SQLTransactionClient::didExceedQuota(AbstractDatabase* database) {
+  ASSERT(database->scriptExecutionContext()->isContextThread());
   unsigned long long currentQuota =
       DatabaseTracker::tracker().quotaForOrigin(database->securityOrigin());
   database->scriptExecutionContext()->databaseExceededQuota(

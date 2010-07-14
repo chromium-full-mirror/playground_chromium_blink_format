@@ -31,8 +31,8 @@
 
 #if ENABLE(DATABASE)
 #include "AbstractDatabase.h"
+#include "ExceptionCode.h"
 #include "PlatformString.h"
-#include "SQLiteDatabase.h"
 
 #include <wtf/Deque.h>
 #include <wtf/Forward.h>
@@ -76,7 +76,6 @@ class Database : public AbstractDatabase {
   Vector<String> tableNames();
 
   virtual SecurityOrigin* securityOrigin() const;
-  SQLiteDatabase& sqliteDatabase() { return m_sqliteDatabase; }
 
   virtual void markAsDeletedAndClose();
   bool deleted() const { return m_deleted; }
@@ -92,8 +91,6 @@ class Database : public AbstractDatabase {
 
   SQLTransactionClient* transactionClient() const;
   SQLTransactionCoordinator* transactionCoordinator() const;
-
-  void incrementalVacuumIfNeeded();
 
  private:
   class DatabaseOpenTask;

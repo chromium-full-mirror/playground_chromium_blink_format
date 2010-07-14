@@ -33,7 +33,6 @@
 
 #include "Database.h"
 #include "DatabaseThread.h"
-#include "ExceptionCode.h"
 #include "Logging.h"
 #include "PlatformString.h"
 #include "ScriptExecutionContext.h"
@@ -405,7 +404,7 @@ bool SQLTransaction::runCurrentStatement() {
       // notification
       m_modifiedDatabase = true;
       // Also dirty the size of this database file for calculating quota usage
-      m_database->transactionClient()->didExecuteStatement(this);
+      m_database->transactionClient()->didExecuteStatement(database());
     }
 
     if (m_currentStatement->hasStatementCallback()) {
@@ -475,7 +474,7 @@ void SQLTransaction::deliverQuotaIncreaseCallback() {
   ASSERT(!m_shouldRetryCurrentStatement);
 
   m_shouldRetryCurrentStatement =
-      m_database->transactionClient()->didExceedQuota(this);
+      m_database->transactionClient()->didExceedQuota(database());
 
   m_nextStep = &SQLTransaction::runStatements;
   LOG(StorageAPI, "Scheduling runStatements for transaction %p\n", this);
@@ -520,7 +519,7 @@ void SQLTransaction::postflightAndCommit() {
   // The commit was successful. If the transaction modified this database,
   // notify the delegates.
   if (m_modifiedDatabase)
-    m_database->transactionClient()->didCommitTransaction(this);
+    m_database->transactionClient()->didCommitWriteTransaction(database());
 
   // Now release our unneeded callbacks, to break reference cycles.
   m_callback = 0;
