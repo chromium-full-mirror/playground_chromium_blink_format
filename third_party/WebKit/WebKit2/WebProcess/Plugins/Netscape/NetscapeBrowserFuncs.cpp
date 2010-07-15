@@ -68,11 +68,10 @@ static int32_t NPN_Write(NPP instance,
   return -1;
 }
 
-static NPError NPN_DestroyStream(NPP instance,
-                                 NPStream* stream,
-                                 NPReason reason) {
-  notImplemented();
-  return NPERR_GENERIC_ERROR;
+static NPError NPN_DestroyStream(NPP npp, NPStream* stream, NPReason reason) {
+  RefPtr<NetscapePlugin> plugin = NetscapePlugin::fromNPP(npp);
+
+  return plugin->destroyStream(stream, reason);
 }
 
 static void NPN_Status(NPP instance, const char* message) {

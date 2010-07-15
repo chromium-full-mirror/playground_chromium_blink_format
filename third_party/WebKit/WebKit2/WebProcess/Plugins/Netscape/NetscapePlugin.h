@@ -56,6 +56,7 @@ class NetscapePlugin : public Plugin {
                const WebCore::String& target,
                bool sendNotification,
                void* notificationData);
+  NPError destroyStream(NPStream*, NPReason);
 
   void removePluginStream(NetscapePluginStream*);
 
@@ -111,7 +112,8 @@ class NetscapePlugin : public Plugin {
       PendingURLNotifyMap;
   PendingURLNotifyMap m_pendingURLNotifications;
 
-  HashMap<uint64_t, RefPtr<NetscapePluginStream>> m_streams;
+  typedef HashMap<uint64_t, RefPtr<NetscapePluginStream>> StreamsMap;
+  StreamsMap m_streams;
 
   RefPtr<NetscapePluginModule> m_pluginModule;
   NPP_t m_npp;

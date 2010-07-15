@@ -54,9 +54,12 @@ class NetscapePluginStream : public RefCounted<NetscapePluginStream> {
   ~NetscapePluginStream();
 
   uint64_t streamID() const { return m_streamID; }
+  const NPStream* npStream() const { return &m_npStream; }
 
   void sendJavaScriptStream(const WebCore::String& requestURLString,
                             const WebCore::String& result);
+
+  NPError destroy(NPReason);
 
  private:
   NetscapePluginStream(PassRefPtr<NetscapePlugin>,
