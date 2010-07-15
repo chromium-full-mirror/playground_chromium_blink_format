@@ -83,6 +83,14 @@ class Plugin : public RefCounted<Plugin> {
                                      const WebCore::String& requestURLString,
                                      const WebCore::String& result) = 0;
 
+  // Tells the plug-in that a stream has received its HTTP response.
+  virtual void streamDidReceiveResponse(uint64_t streamID,
+                                        const WebCore::KURL& responseURL,
+                                        uint32_t streamLength,
+                                        uint32_t lastModifiedTime,
+                                        const WebCore::String& mimeType,
+                                        const WebCore::String& headers) = 0;
+
   // Returns the plug-in controller for this plug-in.
   // FIXME: We could just have the controller be a member variable of Plugin.
   virtual PluginController* controller() = 0;

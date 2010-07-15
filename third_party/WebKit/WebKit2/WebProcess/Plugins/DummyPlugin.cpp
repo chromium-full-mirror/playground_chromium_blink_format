@@ -66,4 +66,11 @@ void DummyPlugin::didEvaluateJavaScript(uint64_t requestID,
                                         const WebCore::String& requestURLString,
                                         const WebCore::String& result) {}
 
+void DummyPlugin::streamDidReceiveResponse(uint64_t streamID,
+                                           const WebCore::KURL& responseURL,
+                                           uint32_t streamLength,
+                                           uint32_t lastModifiedTime,
+                                           const WebCore::String& mimeType,
+                                           const WebCore::String& headers) {}
+
 }  // namespace WebKit

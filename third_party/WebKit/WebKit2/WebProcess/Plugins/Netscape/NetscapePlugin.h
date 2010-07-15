@@ -102,6 +102,12 @@ class NetscapePlugin : public Plugin {
   virtual void didEvaluateJavaScript(uint64_t requestID,
                                      const WebCore::String& requestURLString,
                                      const WebCore::String& result);
+  virtual void streamDidReceiveResponse(uint64_t streamID,
+                                        const WebCore::KURL& responseURL,
+                                        uint32_t streamLength,
+                                        uint32_t lastModifiedTime,
+                                        const WebCore::String& mimeType,
+                                        const WebCore::String& headers);
 
   virtual PluginController* controller();
 
