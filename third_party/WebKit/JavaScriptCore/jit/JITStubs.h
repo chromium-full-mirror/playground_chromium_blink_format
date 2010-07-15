@@ -246,7 +246,7 @@ struct JITStackFrame {
 
 #if CPU(X86) && COMPILER(MSVC)
 #define JIT_STUB __fastcall
-#elif CPU(X86) && COMPILER(GCC)
+#elif CPU(X86) && COMPILER(GCC) && !OS(WINDOWS)
 #define JIT_STUB __attribute__((fastcall))
 #else
 #define JIT_STUB
