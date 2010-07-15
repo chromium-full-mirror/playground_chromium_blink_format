@@ -36,6 +36,7 @@
 #include "Vector.h"
 
 #include "SkBitmap.h"
+#include "SkUnPreMultiply.h"
 
 extern "C" {
 #include "png.h"
@@ -54,6 +55,24 @@ static void convertBetweenBGRAandRGBA(const unsigned char* input,
     pixelOut[1] = pixelIn[1];
     pixelOut[2] = pixelIn[0];
     pixelOut[3] = pixelIn[3];
+  }
+}
+
+// Converts BGRA->RGBA and RGBA->BGRA and undoes alpha premultiplication.
+static void preMultipliedBGRAtoRGBA(const unsigned char* input,
+                                    int numberOfPixels,
+                                    unsigned char* output) {
+  SkBitmap inputBitmap;
+  inputBitmap.setConfig(SkBitmap::kARGB_8888_Config, numberOfPixels, 1);
+  inputBitmap.setPixels(const_cast<unsigned char*>(input));
+  for (int x = 0; x < numberOfPixels; x++) {
+    uint32_t srcPixel = *inputBitmap.getAddr32(x, 0);
+    SkColor unmultiplied = SkUnPreMultiply::PMColorToColor(srcPixel);
+    unsigned char* pixelOut = &output[x * 4];
+    pixelOut[0] = SkColorGetR(unmultiplied);
+    pixelOut[1] = SkColorGetG(unmultiplied);
+    pixelOut[2] = SkColorGetB(unmultiplied);
+    pixelOut[3] = SkColorGetA(unmultiplied);
   }
 }
 
@@ -95,25 +114,13 @@ class PNGWriteStructDestroyer {
   png_info** m_pngInfo;
 };
 
-// static
-bool PNGImageEncoder::encode(const SkBitmap& image,
-                             Vector<unsigned char>* output) {
-  if (image.config() != SkBitmap::kARGB_8888_Config)
-    return false;  // Only support ARGB at 8 bpp now.
-
-  image.lockPixels();
-  bool result = PNGImageEncoder::encode(
-      static_cast<unsigned char*>(image.getPixels()),
-      IntSize(image.width(), image.height()), image.rowBytes(), output);
-  image.unlockPixels();
-  return result;
-}
-
-// static
-bool PNGImageEncoder::encode(const unsigned char* input,
-                             const IntSize& size,
-                             int bytesPerRow,
-                             Vector<unsigned char>* output) {
+static bool encodeImpl(const unsigned char* input,
+                       const IntSize& size,
+                       int bytesPerRow,
+                       Vector<unsigned char>* output,
+                       void (*conversionFunc)(const unsigned char*,
+                                              int,
+                                              unsigned char*)) {
   int inputColorComponents = 4;
   int outputColorComponents = 4;
   int pngOutputColorType = PNG_COLOR_TYPE_RGB_ALPHA;
@@ -156,13 +163,35 @@ bool PNGImageEncoder::encode(const unsigned char* input,
   OwnArrayPtr<unsigned char> rowPixels(
       new unsigned char[imageSize.width() * outputColorComponents]);
   for (int y = 0; y < imageSize.height(); y++) {
-    convertBetweenBGRAandRGBA(&input[y * bytesPerRow], imageSize.width(),
-                              rowPixels.get());
+    conversionFunc(&input[y * bytesPerRow], imageSize.width(), rowPixels.get());
     png_write_row(pngPtr, rowPixels.get());
   }
 
   png_write_end(pngPtr, infoPtr);
   return true;
+}
+
+// static
+bool PNGImageEncoder::encode(const SkBitmap& image,
+                             Vector<unsigned char>* output) {
+  if (image.config() != SkBitmap::kARGB_8888_Config)
+    return false;  // Only support ARGB at 8 bpp now.
+
+  image.lockPixels();
+  bool result = encodeImpl(static_cast<unsigned char*>(image.getPixels()),
+                           IntSize(image.width(), image.height()),
+                           image.rowBytes(), output, preMultipliedBGRAtoRGBA);
+  image.unlockPixels();
+  return result;
+}
+
+// static
+bool PNGImageEncoder::encode(const unsigned char* input,
+                             const IntSize& size,
+                             int bytesPerRow,
+                             Vector<unsigned char>* output) {
+  return encodeImpl(input, size, bytesPerRow, output,
+                    convertBetweenBGRAandRGBA);
 }
 
 }  // namespace WebCore
