@@ -50,6 +50,7 @@
 #include <WebCore/Frame.h>
 #include <WebCore/FrameLoaderTypes.h>
 #include <WebCore/FrameView.h>
+#include <WebCore/HistoryItem.h>
 #include <WebCore/KeyboardEvent.h>
 #include <WebCore/Page.h>
 #include <WebCore/PlatformKeyboardEvent.h>
@@ -94,8 +95,6 @@ WebPage::WebPage(uint64_t pageID,
                       new WebBackForwardControllerClient(this))),
       m_viewSize(viewSize),
       m_drawingArea(DrawingArea::create(drawingAreaType, this)),
-      m_canGoBack(false),
-      m_canGoForward(false),
       m_pageID(pageID) {
   ASSERT(m_pageID);
 
@@ -195,12 +194,14 @@ void WebPage::reload(bool reloadFromOrigin) {
   m_mainFrame->coreFrame()->loader()->reload(reloadFromOrigin);
 }
 
-void WebPage::goForward() {
-  m_page->goForward();
+void WebPage::goForward(uint64_t backForwardItemID) {
+  HistoryItem* item = WebBackForwardListProxy::itemForID(backForwardItemID);
+  m_page->goToItem(item, FrameLoadTypeForward);
 }
 
-void WebPage::goBack() {
-  m_page->goBack();
+void WebPage::goBack(uint64_t backForwardItemID) {
+  HistoryItem* item = WebBackForwardListProxy::itemForID(backForwardItemID);
+  m_page->goToItem(item, FrameLoadTypeBack);
 }
 
 void WebPage::goToBackForwardItem(uint64_t backForwardItemID) {
@@ -441,19 +442,28 @@ void WebPage::didReceiveMessage(CoreIPC::Connection* connection,
     case WebPageMessage::StopLoading:
       stopLoading();
       break;
-    case WebPageMessage::Reload:
+    case WebPageMessage::Reload: {
       bool reloadFromOrigin;
       if (!arguments.decode(CoreIPC::Out(reloadFromOrigin)))
         return;
 
       reload(reloadFromOrigin);
       break;
-    case WebPageMessage::GoForward:
-      goForward();
+    }
+    case WebPageMessage::GoForward: {
+      uint64_t backForwardItemID;
+      if (!arguments.decode(CoreIPC::Out(backForwardItemID)))
+        return;
+      goForward(backForwardItemID);
       break;
-    case WebPageMessage::GoBack:
-      goBack();
+    }
+    case WebPageMessage::GoBack: {
+      uint64_t backForwardItemID;
+      if (!arguments.decode(CoreIPC::Out(backForwardItemID)))
+        return;
+      goBack(backForwardItemID);
       break;
+    }
     case WebPageMessage::GoToBackForwardItem: {
       uint64_t backForwardItemID;
       if (!arguments.decode(CoreIPC::Out(backForwardItemID)))
