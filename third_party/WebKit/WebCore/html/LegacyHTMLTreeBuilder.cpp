@@ -908,6 +908,15 @@ bool LegacyHTMLTreeBuilder::nestedStyleCreateErrorCheck(Token* t,
   return allowNestedRedundantTag(t->tagName);
 }
 
+bool LegacyHTMLTreeBuilder::colCreateErrorCheck(Token*, RefPtr<Node>&) {
+  if (!m_current->hasTagName(tableTag))
+    return true;
+  RefPtr<Element> implicitColgroup =
+      HTMLElementFactory::createHTMLElement(colgroupTag, m_document, 0, true);
+  insertNode(implicitColgroup.get());
+  return true;
+}
+
 bool LegacyHTMLTreeBuilder::tableCellCreateErrorCheck(Token*, RefPtr<Node>&) {
   popBlock(tdTag);
   popBlock(thTag);
@@ -1003,6 +1012,8 @@ PassRefPtr<Node> LegacyHTMLTreeBuilder::getNode(Token* t) {
 
     mapTagToFunc(gFunctionMap, bodyTag,
                  &LegacyHTMLTreeBuilder::bodyCreateErrorCheck);
+    mapTagToFunc(gFunctionMap, colTag,
+                 &LegacyHTMLTreeBuilder::colCreateErrorCheck);
     mapTagToFunc(gFunctionMap, ddTag,
                  &LegacyHTMLTreeBuilder::ddCreateErrorCheck);
     mapTagToFunc(gFunctionMap, dtTag,

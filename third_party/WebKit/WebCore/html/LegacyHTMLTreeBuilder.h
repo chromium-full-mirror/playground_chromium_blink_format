@@ -92,6 +92,7 @@ class LegacyHTMLTreeBuilder : public Noncopyable {
   PassRefPtr<Node> getNode(Token*);
   bool bodyCreateErrorCheck(Token*, RefPtr<Node>&);
   bool canvasCreateErrorCheck(Token*, RefPtr<Node>&);
+  bool colCreateErrorCheck(Token*, RefPtr<Node>&);
   bool commentCreateErrorCheck(Token*, RefPtr<Node>&);
   bool ddCreateErrorCheck(Token*, RefPtr<Node>&);
   bool dtCreateErrorCheck(Token*, RefPtr<Node>&);
