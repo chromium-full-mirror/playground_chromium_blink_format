@@ -49,7 +49,10 @@ LayoutTestController::LayoutTestController(const std::string& testPathOrURL)
 
 LayoutTestController::~LayoutTestController() {}
 
-static const CFTimeInterval waitToDumpWatchdogInterval = 30.0;
+// This is lower than DumpRenderTree's timeout, to make it easier to work
+// through the failures
+// Eventually it should be changed to match.
+static const CFTimeInterval waitToDumpWatchdogInterval = 6.0;
 
 void LayoutTestController::display() {
   // FIXME: actually implement, once we want pixel tests
