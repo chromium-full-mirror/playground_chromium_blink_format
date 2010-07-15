@@ -67,6 +67,7 @@ class HTMLConstructionSite : public Noncopyable {
   PassRefPtr<Element> createHTMLElementFromElementRecord(
       HTMLElementStack::ElementRecord*);
 
+  bool shouldFosterParent() const;
   void fosterParent(Node*);
 
   bool indexOfFirstUnopenFormattingElement(

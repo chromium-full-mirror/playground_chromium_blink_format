@@ -65,6 +65,11 @@ bool hasImpliedEndTag(Element* element) {
          element->hasTagName(rpTag) || element->hasTagName(rtTag);
 }
 
+bool causesFosterParenting(const QualifiedName& tagName) {
+  return tagName == tableTag || tagName == tbodyTag || tagName == tfootTag ||
+         tagName == theadTag || tagName == trTag;
+}
+
 }  // namespace
 
 template <typename ChildType>
@@ -76,7 +81,7 @@ PassRefPtr<ChildType> HTMLConstructionSite::attach(
   // FIXME: It's confusing that HTMLConstructionSite::attach does the magic
   // redirection to the foster parent but HTMLConstructionSite::attachAtSite
   // doesn't.  It feels like we're missing a concept somehow.
-  if (m_redirectAttachToFosterParent) {
+  if (shouldFosterParent()) {
     fosterParent(child.get());
     ASSERT(child->attached());
     return child.release();
@@ -196,18 +201,18 @@ PassRefPtr<Element> HTMLConstructionSite::attachToCurrent(
 }
 
 void HTMLConstructionSite::insertHTMLHtmlElement(AtomicHTMLToken& token) {
-  ASSERT(!m_redirectAttachToFosterParent);
+  ASSERT(!shouldFosterParent());
   m_openElements.pushHTMLHtmlElement(attachToCurrent(createHTMLElement(token)));
 }
 
 void HTMLConstructionSite::insertHTMLHeadElement(AtomicHTMLToken& token) {
-  ASSERT(!m_redirectAttachToFosterParent);
+  ASSERT(!shouldFosterParent());
   m_head = attachToCurrent(createHTMLElement(token));
   m_openElements.pushHTMLHeadElement(m_head);
 }
 
 void HTMLConstructionSite::insertHTMLBodyElement(AtomicHTMLToken& token) {
-  ASSERT(!m_redirectAttachToFosterParent);
+  ASSERT(!shouldFosterParent());
   m_openElements.pushHTMLBodyElement(attachToCurrent(createHTMLElement(token)));
 }
 
@@ -254,7 +259,7 @@ void HTMLConstructionSite::insertTextNode(const String& characters) {
   AttachmentSite site;
   site.parent = currentElement();
   site.nextChild = 0;
-  if (m_redirectAttachToFosterParent)
+  if (shouldFosterParent())
     findFosterSite(site);
 
   Node* previousChild = site.nextChild ? site.nextChild->previousSibling()
@@ -396,6 +401,11 @@ void HTMLConstructionSite::findFosterSite(AttachmentSite& site) {
   // Fragment case
   site.parent = m_openElements.bottom();  // <html> element
   site.nextChild = 0;
+}
+
+bool HTMLConstructionSite::shouldFosterParent() const {
+  return m_redirectAttachToFosterParent &&
+         causesFosterParenting(currentElement()->tagQName());
 }
 
 void HTMLConstructionSite::fosterParent(Node* node) {
