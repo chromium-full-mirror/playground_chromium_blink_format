@@ -63,6 +63,7 @@ class NetscapePluginStream : public RefCounted<NetscapePluginStream> {
                           const WebCore::String& mimeType,
                           const WebCore::String& headers);
   void didReceiveData(const char* bytes, int length);
+  void didFinishLoading();
   void didFail(bool wasCancelled);
 
   void sendJavaScriptStream(const WebCore::String& requestURLString,

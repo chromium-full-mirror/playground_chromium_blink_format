@@ -96,6 +96,9 @@ class Plugin : public RefCounted<Plugin> {
                                     const char* bytes,
                                     int length) = 0;
 
+  // Tells the plug-in that a stream has finished loading.
+  virtual void streamDidFinishLoading(uint64_t streamID) = 0;
+
   // Tells the plug-in that a stream has failed to load, either because of
   // network errors or because the load was cancelled.
   virtual void streamDidFail(uint64_t streamID, bool wasCancelled) = 0;

@@ -59,6 +59,7 @@ class DummyPlugin : public Plugin {
   virtual void streamDidReceiveData(uint64_t streamID,
                                     const char* bytes,
                                     int length);
+  virtual void streamDidFinishLoading(uint64_t streamID);
   virtual void streamDidFail(uint64_t streamID, bool wasCancelled);
 
   virtual PluginController* controller();

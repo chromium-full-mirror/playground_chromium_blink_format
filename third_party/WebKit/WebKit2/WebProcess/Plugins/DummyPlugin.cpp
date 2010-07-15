@@ -77,6 +77,8 @@ void DummyPlugin::streamDidReceiveData(uint64_t streamID,
                                        const char* bytes,
                                        int length) {}
 
+void DummyPlugin::streamDidFinishLoading(uint64_t streamID) {}
+
 void DummyPlugin::streamDidFail(uint64_t streamID, bool wasCancelled) {}
 
 }  // namespace WebKit
