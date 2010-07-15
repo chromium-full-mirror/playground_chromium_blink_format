@@ -64,6 +64,9 @@ class AutoFillPopupMenuClient : public WebCore::PopupMenuClient {
   // Removes the suggestion at |listIndex| from the list of suggestions.
   virtual void removeSuggestionAtIndex(unsigned listIndex);
 
+  // Returns true if the suggestion at |listIndex| can be removed.
+  bool canRemoveSuggestionAtIndex(unsigned listIndex);
+
   // WebCore::PopupMenuClient methods:
   virtual void valueChanged(unsigned listIndex, bool fireEvents = true);
   virtual void selectionChanged(unsigned, bool);
