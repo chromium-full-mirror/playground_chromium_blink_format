@@ -45,7 +45,7 @@ void WebPolicyClient::initialize(WKPagePolicyClient* client) {
 
 bool WebPolicyClient::decidePolicyForNavigationAction(
     WebPageProxy* page,
-    uint32_t navigationAction,
+    NavigationType type,
     const String& url,
     WebFrameProxy* frame,
     WebFramePolicyListenerProxy* listener) {
@@ -53,14 +53,14 @@ bool WebPolicyClient::decidePolicyForNavigationAction(
     return false;
 
   m_pagePolicyClient.decidePolicyForNavigationAction(
-      toRef(page), navigationAction, toURLRef(url.impl()), toRef(frame),
+      toRef(page), toWK(type), toURLRef(url.impl()), toRef(frame),
       toRef(listener), m_pagePolicyClient.clientInfo);
   return true;
 }
 
 bool WebPolicyClient::decidePolicyForNewWindowAction(
     WebPageProxy* page,
-    uint32_t navigationAction,
+    NavigationType type,
     const String& url,
     WebFrameProxy* frame,
     WebFramePolicyListenerProxy* listener) {
@@ -68,7 +68,7 @@ bool WebPolicyClient::decidePolicyForNewWindowAction(
     return false;
 
   m_pagePolicyClient.decidePolicyForNewWindowAction(
-      toRef(page), navigationAction, toURLRef(url.impl()), toRef(frame),
+      toRef(page), toWK(type), toURLRef(url.impl()), toRef(frame),
       toRef(listener), m_pagePolicyClient.clientInfo);
   return true;
 }

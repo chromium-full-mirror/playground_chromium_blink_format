@@ -27,6 +27,7 @@
 #define WebPolicyClient_h
 
 #include "WKPage.h"
+#include <WebCore/FrameLoaderTypes.h>
 
 namespace WebCore {
 class String;
@@ -44,12 +45,12 @@ class WebPolicyClient {
   void initialize(WKPagePolicyClient*);
 
   bool decidePolicyForNavigationAction(WebPageProxy*,
-                                       uint32_t,
+                                       WebCore::NavigationType,
                                        const WebCore::String& url,
                                        WebFrameProxy*,
                                        WebFramePolicyListenerProxy*);
   bool decidePolicyForNewWindowAction(WebPageProxy*,
-                                      uint32_t,
+                                      WebCore::NavigationType,
                                       const WebCore::String& url,
                                       WebFrameProxy*,
                                       WebFramePolicyListenerProxy*);

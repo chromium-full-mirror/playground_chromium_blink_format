@@ -488,8 +488,9 @@ void WebPageProxy::didReceiveMessage(CoreIPC::Connection* connection,
       if (!arguments.decode(
               CoreIPC::Out(frameID, navigationType, url, listenerID)))
         return;
-      decidePolicyForNavigationAction(webFrame(frameID), navigationType, url,
-                                      listenerID);
+      decidePolicyForNavigationAction(
+          webFrame(frameID), static_cast<NavigationType>(navigationType), url,
+          listenerID);
       break;
     }
     case WebPageProxyMessage::DecidePolicyForNewWindowAction: {
@@ -500,8 +501,9 @@ void WebPageProxy::didReceiveMessage(CoreIPC::Connection* connection,
       if (!arguments.decode(
               CoreIPC::Out(frameID, navigationType, url, listenerID)))
         return;
-      decidePolicyForNewWindowAction(webFrame(frameID), navigationType, url,
-                                     listenerID);
+      decidePolicyForNewWindowAction(
+          webFrame(frameID), static_cast<NavigationType>(navigationType), url,
+          listenerID);
       break;
     }
     case WebPageProxyMessage::DecidePolicyForMIMEType: {
@@ -759,10 +761,11 @@ void WebPageProxy::didFirstVisuallyNonEmptyLayoutForFrame(
 
 // PolicyClient
 
-void WebPageProxy::decidePolicyForNavigationAction(WebFrameProxy* frame,
-                                                   uint32_t navigationType,
-                                                   const String& url,
-                                                   uint64_t listenerID) {
+void WebPageProxy::decidePolicyForNavigationAction(
+    WebFrameProxy* frame,
+    NavigationType navigationType,
+    const String& url,
+    uint64_t listenerID) {
   RefPtr<WebFramePolicyListenerProxy> listener =
       frame->setUpPolicyListenerProxy(listenerID);
   if (!m_policyClient.decidePolicyForNavigationAction(this, navigationType, url,
@@ -771,7 +774,7 @@ void WebPageProxy::decidePolicyForNavigationAction(WebFrameProxy* frame,
 }
 
 void WebPageProxy::decidePolicyForNewWindowAction(WebFrameProxy* frame,
-                                                  uint32_t navigationType,
+                                                  NavigationType navigationType,
                                                   const String& url,
                                                   uint64_t listenerID) {
   RefPtr<WebFramePolicyListenerProxy> listener =

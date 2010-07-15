@@ -182,11 +182,11 @@ class WebPageProxy : public RefCounted<WebPageProxy> {
   void didFinishProgress();
 
   void decidePolicyForNavigationAction(WebFrameProxy*,
-                                       uint32_t navigationType,
+                                       WebCore::NavigationType navigationType,
                                        const WebCore::String& url,
                                        uint64_t listenerID);
   void decidePolicyForNewWindowAction(WebFrameProxy*,
-                                      uint32_t navigationType,
+                                      WebCore::NavigationType navigationType,
                                       const WebCore::String& url,
                                       uint64_t listenerID);
   void decidePolicyForMIMEType(WebFrameProxy*,
