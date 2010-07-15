@@ -97,6 +97,10 @@ void RenderSVGShadowTreeRootContainer::styleDidChange(
           m_shadowRoot ? m_shadowRoot->renderer() : 0)
     shadowRootRenderer->setStyle(style());
 }
+
+Node* RenderSVGShadowTreeRootContainer::rootElement() const {
+  return m_shadowRoot.get();
+}
 }
 
 #endif

@@ -40,6 +40,8 @@ class RenderSVGShadowTreeRootContainer
   void updateStyle(Node::StyleChange);
   virtual void updateFromElement();
 
+  Node* rootElement() const;
+
  private:
   virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);
 
