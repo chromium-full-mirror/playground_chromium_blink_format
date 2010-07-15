@@ -83,7 +83,7 @@ void AutoFillPopupMenuClient::removeSuggestionAtIndex(unsigned listIndex) {
 
   int index = convertListIndexToInternalIndex(listIndex);
 
-  ASSERT(index < m_names.size());
+  ASSERT(static_cast<unsigned>(index) < m_names.size());
 
   m_names.remove(index);
   m_labels.remove(index);
@@ -98,7 +98,8 @@ bool AutoFillPopupMenuClient::canRemoveSuggestionAtIndex(unsigned listIndex) {
   // have a label (autocomplete).
   int index = convertListIndexToInternalIndex(listIndex);
   return m_labels[index].isEmpty() &&
-         (m_separatorIndex == -1 || listIndex < m_separatorIndex);
+         (m_separatorIndex == -1 ||
+          listIndex < static_cast<unsigned>(m_separatorIndex));
 }
 
 void AutoFillPopupMenuClient::valueChanged(unsigned listIndex,
