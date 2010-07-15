@@ -1671,7 +1671,7 @@ void WebViewImpl::applyAutoFillSuggestions(const WebNode& node,
                                            const WebVector<int>& uniqueIDs,
                                            int separatorIndex) {
   ASSERT(names.size() == labels.size());
-  ASSERT(names.size() == unique_ids.size());
+  ASSERT(names.size() == uniqueIDs.size());
   ASSERT(separatorIndex < static_cast<int>(names.size()));
 
   if (names.isEmpty()) {
