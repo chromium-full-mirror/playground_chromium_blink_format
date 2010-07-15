@@ -73,4 +73,6 @@ void DummyPlugin::streamDidReceiveResponse(uint64_t streamID,
                                            const WebCore::String& mimeType,
                                            const WebCore::String& headers) {}
 
+void DummyPlugin::streamDidFail(uint64_t streamID, bool wasCancelled) {}
+
 }  // namespace WebKit

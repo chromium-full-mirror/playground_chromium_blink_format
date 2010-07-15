@@ -56,6 +56,8 @@ class DummyPlugin : public Plugin {
                                         uint32_t lastModifiedTime,
                                         const WebCore::String& mimeType,
                                         const WebCore::String& headers);
+  virtual void streamDidFail(uint64_t streamID, bool wasCancelled);
+
   virtual PluginController* controller();
 };
 

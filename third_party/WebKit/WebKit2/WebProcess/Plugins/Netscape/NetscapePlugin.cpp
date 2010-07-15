@@ -350,6 +350,11 @@ void NetscapePlugin::streamDidReceiveResponse(uint64_t streamID,
                                      lastModifiedTime, mimeType, headers);
 }
 
+void NetscapePlugin::streamDidFail(uint64_t streamID, bool wasCancelled) {
+  if (NetscapePluginStream* pluginStream = streamFromID(streamID))
+    pluginStream->didFail(wasCancelled);
+}
+
 PluginController* NetscapePlugin::controller() {
   return m_pluginController;
 }

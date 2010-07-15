@@ -86,8 +86,10 @@ class PluginView::Stream : public RefCounted<PluginView::Stream>,
   Stream(PluginView* pluginView,
          uint64_t streamID,
          const ResourceRequest& request)
-      : m_pluginView(pluginView), m_streamID(streamID), m_request(request) {}
-
+      : m_pluginView(pluginView),
+        m_streamID(streamID),
+        m_request(request),
+        m_streamWasCancelled(false) {}
   // NetscapePluginStreamLoaderClient
   virtual void didReceiveResponse(NetscapePlugInStreamLoader*,
                                   const ResourceResponse&);
@@ -98,6 +100,11 @@ class PluginView::Stream : public RefCounted<PluginView::Stream>,
   RefPtr<PluginView> m_pluginView;
   uint64_t m_streamID;
   const ResourceRequest m_request;
+
+  // True if the stream was explicitly cancelled by calling cancel().
+  // (As opposed to being cancelled by the user hitting the stop button for
+  // example.
+  bool m_streamWasCancelled;
 
   RefPtr<NetscapePlugInStreamLoader> m_loader;
 };
@@ -118,6 +125,7 @@ void PluginView::Stream::start() {
 void PluginView::Stream::cancel() {
   ASSERT(m_loader);
 
+  m_streamWasCancelled = true;
   m_loader->cancel(m_loader->cancelledError());
   m_loader = 0;
 }
@@ -179,7 +187,17 @@ void PluginView::Stream::didReceiveData(NetscapePlugInStreamLoader*,
 
 void PluginView::Stream::didFail(NetscapePlugInStreamLoader*,
                                  const ResourceError& error) {
-  // FIXME: Implement.
+  // We don't want to call streamDidFail if the stream was explicitly cancelled
+  // by the plug-in.
+  if (m_streamWasCancelled)
+    return;
+
+  // Calling streamDidFail could cause us to be deleted, so we hold on to a
+  // reference here.
+  RefPtr<Stream> protect(this);
+
+  m_pluginView->m_plugin->streamDidFail(m_streamID, error.isCancellation());
+  m_pluginView->removeStream(this);
 }
 
 void PluginView::Stream::didFinishLoading(NetscapePlugInStreamLoader*) {
