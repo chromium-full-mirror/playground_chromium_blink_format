@@ -46,6 +46,7 @@ ResourceResponseBase::ResourceResponseBase()
       m_lastModifiedDate(0),
       m_wasCached(false),
       m_connectionID(0),
+      m_connectionReused(false),
       m_isNull(true),
       m_haveParsedCacheControlHeader(false),
       m_haveParsedAgeHeader(false),
@@ -75,6 +76,7 @@ ResourceResponseBase::ResourceResponseBase(const KURL& url,
       m_lastModifiedDate(0),
       m_wasCached(false),
       m_connectionID(0),
+      m_connectionReused(false),
       m_isNull(false),
       m_haveParsedCacheControlHeader(false),
       m_haveParsedAgeHeader(false),
@@ -449,6 +451,18 @@ bool ResourceResponseBase::wasCached() const {
 
 void ResourceResponseBase::setWasCached(bool value) {
   m_wasCached = value;
+}
+
+bool ResourceResponseBase::connectionReused() const {
+  lazyInit();
+
+  return m_connectionReused;
+}
+
+void ResourceResponseBase::setConnectionReused(bool connectionReused) {
+  lazyInit();
+
+  m_connectionReused = connectionReused;
 }
 
 unsigned ResourceResponseBase::connectionID() const {

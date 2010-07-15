@@ -173,6 +173,7 @@ class InspectorResource : public RefCounted<InspectorResource> {
   double m_loadEventTime;
   double m_domContentEventTime;
   unsigned m_connectionID;
+  bool m_connectionReused;
   RefPtr<ResourceLoadTiming> m_loadTiming;
   ScriptString m_overrideContent;
   Type m_overrideContentType;
