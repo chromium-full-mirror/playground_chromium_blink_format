@@ -114,10 +114,6 @@ bool RenderSVGResourcePattern::applyResource(RenderObject* object,
 
   PatternData* patternData = m_pattern.get(object);
   if (!patternData->pattern) {
-    // Early exit, if this resource contains a child which references ourselves.
-    if (containsCyclicReference(node()))
-      return false;
-
     // Create tile image
     OwnPtr<ImageBuffer> tileImage =
         createTileImage(patternData, patternElement, object);
@@ -271,6 +267,10 @@ PassOwnPtr<ImageBuffer> RenderSVGResourcePattern::createTileImage(
 
   // If we couldn't determine the pattern content element root, stop here.
   if (!attributes.patternContentElement())
+    return 0;
+
+  // Early exit, if this resource contains a child which references ourselves.
+  if (containsCyclicReference(attributes.patternContentElement()))
     return 0;
 
   FloatRect objectBoundingBox = object->objectBoundingBox();
