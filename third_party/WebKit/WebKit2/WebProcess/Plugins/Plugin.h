@@ -91,6 +91,11 @@ class Plugin : public RefCounted<Plugin> {
                                         const WebCore::String& mimeType,
                                         const WebCore::String& headers) = 0;
 
+  // Tells the plug-in that a stream did receive data.
+  virtual void streamDidReceiveData(uint64_t streamID,
+                                    const char* bytes,
+                                    int length) = 0;
+
   // Tells the plug-in that a stream has failed to load, either because of
   // network errors or because the load was cancelled.
   virtual void streamDidFail(uint64_t streamID, bool wasCancelled) = 0;

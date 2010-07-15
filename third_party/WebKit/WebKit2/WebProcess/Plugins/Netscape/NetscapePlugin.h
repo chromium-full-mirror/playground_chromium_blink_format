@@ -109,6 +109,9 @@ class NetscapePlugin : public Plugin {
                                         uint32_t lastModifiedTime,
                                         const WebCore::String& mimeType,
                                         const WebCore::String& headers);
+  virtual void streamDidReceiveData(uint64_t streamID,
+                                    const char* bytes,
+                                    int length);
   virtual void streamDidFail(uint64_t streamID, bool wasCancelled);
 
   virtual PluginController* controller();

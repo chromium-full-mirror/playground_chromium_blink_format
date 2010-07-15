@@ -182,7 +182,7 @@ void PluginView::Stream::didReceiveResponse(NetscapePlugInStreamLoader*,
 void PluginView::Stream::didReceiveData(NetscapePlugInStreamLoader*,
                                         const char* bytes,
                                         int length) {
-  // FIXME: Implement.
+  m_pluginView->m_plugin->streamDidReceiveData(m_streamID, bytes, length);
 }
 
 void PluginView::Stream::didFail(NetscapePlugInStreamLoader*,
