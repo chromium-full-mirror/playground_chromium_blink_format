@@ -202,6 +202,10 @@ void RenderSVGResourceMasker::createMaskImage(MaskerData* maskerData,
 
   maskImageContext->restore();
 
+#if !PLATFORM(CG)
+  maskerData->maskImage->transformColorSpace(DeviceRGB, LinearRGB);
+#endif
+
   // create the luminance mask
   RefPtr<ImageData> imageData(
       maskerData->maskImage->getUnmultipliedImageData(maskImageRect));
