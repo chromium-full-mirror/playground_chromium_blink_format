@@ -329,6 +329,7 @@ class WebViewClient : virtual public WebWidgetClient {
   virtual void didAcceptAutoFillSuggestion(const WebNode&,
                                            const WebString& name,
                                            const WebString& label,
+                                           int uniqueID,
                                            unsigned index) {}
 
   // Informs the browser that the user has selected an AutoFill suggestion for
@@ -336,10 +337,11 @@ class WebViewClient : virtual public WebWidgetClient {
   // the arrow keys to navigate to a suggestion.
   virtual void didSelectAutoFillSuggestion(const WebNode&,
                                            const WebString& name,
-                                           const WebString& label) {}
+                                           const WebString& label,
+                                           int uniqueID) {}
 
   // Informs the browser that the user has cleared the selection from the
-  // AutoFill suggestions dropdown.  This happens when a user uses the arrow
+  // AutoFill suggestions popup.  This happens when a user uses the arrow
   // keys to navigate outside the range of possible selections.
   virtual void didClearAutoFillSelection(const WebNode&) {}
 
