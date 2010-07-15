@@ -774,9 +774,12 @@ SYMBOL_STRING(ctiOpThrowNotCaught) ":" "\n"
 #endif
 
 JITThunks::JITThunks(JSGlobalData* globalData) {
+  if (!globalData->executableAllocator.isValid())
+    return;
+
   JIT::compileCTIMachineTrampolines(globalData, &m_executablePool,
                                     &m_trampolineStructure);
-
+  ASSERT(m_executablePool);
 #if CPU(ARM_THUMB2)
   // Unfortunate the arm compiler does not like the use of offsetof on
   // JITStackFrame (since it contains non POD types),
@@ -936,7 +939,7 @@ NEVER_INLINE void JITThunks::tryCacheGetByID(CallFrame* callFrame,
     // to pay off, so we currently only do this for arrays.
     ctiPatchCallByReturnAddress(
         codeBlock, returnAddress,
-        globalData->jitStubs.ctiStringLengthTrampoline());
+        globalData->jitStubs->ctiStringLengthTrampoline());
     return;
   }
 
@@ -3752,10 +3755,13 @@ PassRefPtr<NativeExecutable> JITThunks::hostFunctionStub(
     ThunkGenerator generator) {
   std::pair<HostFunctionStubMap::iterator, bool> entry =
       m_hostFunctionStubMap.add(function, 0);
-  if (entry.second)
+  if (entry.second) {
+    MacroAssemblerCodePtr code =
+        globalData->canUseJIT() ? generator(globalData, m_executablePool.get())
+                                : MacroAssemblerCodePtr();
     entry.first->second = NativeExecutable::create(
-        generator(globalData, m_executablePool.get()), function,
-        ctiNativeConstruct(), callHostFunctionAsConstructor);
+        code, function, ctiNativeConstruct(), callHostFunctionAsConstructor);
+  }
   return entry.first->second;
 }
 

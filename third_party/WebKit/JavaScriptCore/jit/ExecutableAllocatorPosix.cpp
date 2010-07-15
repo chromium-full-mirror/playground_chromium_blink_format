@@ -53,6 +53,10 @@ void ExecutablePool::systemRelease(const ExecutablePool::Allocation& alloc) {
   int result = munmap(alloc.pages, alloc.size);
   ASSERT_UNUSED(result, !result);
 }
+
+bool ExecutableAllocator::isValid() const {
+  return true;
+}
 }
 
 #endif

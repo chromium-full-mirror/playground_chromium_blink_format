@@ -1614,7 +1614,7 @@ void jitCompileRegex(JSGlobalData* globalData,
     return;
   numSubpatterns = pattern.m_numSubpatterns;
 
-  if (!pattern.m_containsBackreferences) {
+  if (!pattern.m_containsBackreferences && globalData->canUseJIT()) {
     RegexGenerator generator(pattern);
     generator.compile(globalData, jitObject);
     if (!generator.shouldFallBack())

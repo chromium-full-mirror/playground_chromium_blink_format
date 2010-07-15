@@ -91,7 +91,7 @@ void JIT::compileOpCallVarargs(Instruction* instruction) {
 
   move(regT2, regT1);  // argCount
 
-  emitNakedCall(m_globalData->jitStubs.ctiVirtualCall());
+  emitNakedCall(m_globalData->jitStubs->ctiVirtualCall());
 
   sampleCodeBlock(m_codeBlock);
 }
@@ -249,8 +249,8 @@ void JIT::compileOpCall(OpcodeID opcodeID, Instruction* instruction, unsigned) {
   move(Imm32(argCount), regT1);
 
   emitNakedCall(opcodeID == op_construct
-                    ? m_globalData->jitStubs.ctiVirtualConstruct()
-                    : m_globalData->jitStubs.ctiVirtualCall());
+                    ? m_globalData->jitStubs->ctiVirtualConstruct()
+                    : m_globalData->jitStubs->ctiVirtualCall());
 
   if (opcodeID == op_call_eval)
     wasEval.link(this);
@@ -382,8 +382,8 @@ void JIT::compileOpCallSlowCase(Instruction* instruction,
 
   m_callStructureStubCompilationInfo[callLinkInfoIndex].callReturnLocation =
       emitNakedCall(opcodeID == op_construct
-                        ? m_globalData->jitStubs.ctiVirtualConstructLink()
-                        : m_globalData->jitStubs.ctiVirtualCallLink());
+                        ? m_globalData->jitStubs->ctiVirtualConstructLink()
+                        : m_globalData->jitStubs->ctiVirtualCallLink());
 
   // Done! - return back to the hot path.
   ASSERT(OPCODE_LENGTH(op_call) == OPCODE_LENGTH(op_call_eval));

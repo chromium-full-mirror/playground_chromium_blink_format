@@ -175,9 +175,9 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
   Parser* parser;
   Interpreter* interpreter;
 #if ENABLE(JIT)
-  JITThunks jitStubs;
+  OwnPtr<JITThunks> jitStubs;
   MacroAssemblerCodePtr getCTIStub(ThunkGenerator generator) {
-    return jitStubs.ctiStub(this, generator);
+    return jitStubs->ctiStub(this, generator);
   }
   PassRefPtr<NativeExecutable> getHostFunction(NativeFunction function);
   PassRefPtr<NativeExecutable> getHostFunction(NativeFunction function,
