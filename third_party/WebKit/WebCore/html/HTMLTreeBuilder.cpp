@@ -176,8 +176,13 @@ bool isNotFormattingAndNotPhrasing(const Element* element) {
 class HTMLTreeBuilder::ExternalCharacterTokenBuffer : public Noncopyable {
  public:
   explicit ExternalCharacterTokenBuffer(AtomicHTMLToken& token)
-      : m_current(token.characters().characters()),
-        m_end(m_current + token.characters().length()) {
+      : m_current(token.characters().data()),
+        m_end(m_current + token.characters().size()) {
+    ASSERT(!isEmpty());
+  }
+
+  explicit ExternalCharacterTokenBuffer(const String& string)
+      : m_current(string.characters()), m_end(m_current + string.length()) {
     ASSERT(!isEmpty());
   }
 
@@ -308,7 +313,8 @@ static void convertToOldStyle(AtomicHTMLToken& token, Token& oldStyleToken) {
       break;
     case HTMLToken::Character:
       oldStyleToken.tagName = textAtom;
-      oldStyleToken.text = token.characters().impl();
+      oldStyleToken.text = StringImpl::create(token.characters().data(),
+                                              token.characters().size());
       break;
   }
 }
@@ -487,8 +493,9 @@ void HTMLTreeBuilder::processFakeEndTag(const QualifiedName& tagName) {
 }
 
 void HTMLTreeBuilder::processFakeCharacters(const String& characters) {
-  AtomicHTMLToken fakeToken(characters);
-  processCharacter(fakeToken);
+  ASSERT(!characters.isEmpty());
+  ExternalCharacterTokenBuffer buffer(characters);
+  processCharacterBuffer(buffer);
 }
 
 void HTMLTreeBuilder::processFakePEndTagIfPInScope() {
