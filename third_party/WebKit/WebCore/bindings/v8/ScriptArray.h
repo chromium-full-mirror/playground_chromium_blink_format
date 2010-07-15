@@ -37,6 +37,7 @@
 
 namespace WebCore {
 class ScriptState;
+class SerializedScriptValue;
 
 class ScriptArray : public ScriptObject {
  public:
@@ -45,6 +46,7 @@ class ScriptArray : public ScriptObject {
   virtual ~ScriptArray() {}
 
   bool set(unsigned index, const ScriptObject&);
+  bool set(unsigned index, SerializedScriptValue*);
   bool set(unsigned index, const String&);
   bool set(unsigned index, double);
   bool set(unsigned index, long long);

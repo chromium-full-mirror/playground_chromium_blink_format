@@ -70,10 +70,7 @@ class InspectorFrontend : public Noncopyable {
   void populateSessionSettings(const String& settings);
 
   void updateConsoleMessageExpiredCount(unsigned count);
-  void addConsoleMessage(const ScriptObject& messageObj,
-                         const Vector<ScriptString>& frames,
-                         const Vector<RefPtr<SerializedScriptValue>>& arguments,
-                         const String& message);
+  void addConsoleMessage(const ScriptObject& messageObj);
   void updateConsoleMessageRepeatCount(unsigned count);
   void clearConsoleMessages();
 

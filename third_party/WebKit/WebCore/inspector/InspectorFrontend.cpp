@@ -32,7 +32,6 @@
 
 #if ENABLE(INSPECTOR)
 
-#include "ConsoleMessage.h"
 #include "Frame.h"
 #include "InjectedScript.h"
 #include "InjectedScriptHost.h"
@@ -101,30 +100,10 @@ void InspectorFrontend::updateConsoleMessageExpiredCount(unsigned count) {
   function.call();
 }
 
-void InspectorFrontend::addConsoleMessage(
-    const ScriptObject& messageObj,
-    const Vector<ScriptString>& frames,
-    const Vector<RefPtr<SerializedScriptValue>>& arguments,
-    const String& message) {
+void InspectorFrontend::addConsoleMessage(const ScriptObject& messageObj) {
   ScriptFunctionCall function(m_webInspector, "dispatch");
   function.appendArgument("addConsoleMessage");
   function.appendArgument(messageObj);
-  if (!frames.isEmpty()) {
-    for (unsigned i = 0; i < frames.size(); ++i)
-      function.appendArgument(frames[i]);
-  } else if (!arguments.isEmpty()) {
-    for (unsigned i = 0; i < arguments.size(); ++i) {
-      ScriptValue scriptValue =
-          ScriptValue::deserialize(scriptState(), arguments[i].get());
-      if (scriptValue.hasNoValue()) {
-        ASSERT_NOT_REACHED();
-        return;
-      }
-      function.appendArgument(scriptValue);
-    }
-  } else {
-    function.appendArgument(message);
-  }
   function.call();
 }
 
