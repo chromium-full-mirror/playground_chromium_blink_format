@@ -74,6 +74,8 @@ class NetscapePluginStream : public RefCounted<NetscapePluginStream> {
              const WebCore::String& headers);
   void stop(NPReason);
 
+  void notifyAndDestroyStream(NPReason);
+
   void deliverData(const char* bytes, int length);
   void deliverDataToPlugin();
 
@@ -89,6 +91,10 @@ class NetscapePluginStream : public RefCounted<NetscapePluginStream> {
 
   // Whether NPP_NewStream has successfully been called.
   bool m_isStarted;
+
+#if !ASSERT_DISABLED
+  bool m_urlNotifyHasBeenCalled;
+#endif
 
   CString m_responseURL;
   CString m_mimeType;
