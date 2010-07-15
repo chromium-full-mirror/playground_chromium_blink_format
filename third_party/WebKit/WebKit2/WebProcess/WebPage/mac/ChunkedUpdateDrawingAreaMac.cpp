@@ -37,11 +37,11 @@ namespace WebKit {
 void ChunkedUpdateDrawingArea::paintIntoUpdateChunk(UpdateChunk* updateChunk) {
   RetainPtr<CGColorSpaceRef> colorSpace(AdoptCF, CGColorSpaceCreateDeviceRGB());
   RetainPtr<CGContextRef> bitmapContext(
-      AdoptCF,
-      CGBitmapContextCreate(updateChunk->data(), updateChunk->rect().width(),
-                            updateChunk->rect().height(), 8,
-                            updateChunk->rect().width() * 4, colorSpace.get(),
-                            kCGImageAlphaPremultipliedLast));
+      AdoptCF, CGBitmapContextCreate(
+                   updateChunk->data(), updateChunk->rect().width(),
+                   updateChunk->rect().height(), 8,
+                   updateChunk->rect().width() * 4, colorSpace.get(),
+                   kCGImageAlphaPremultipliedFirst | kCGBitmapByteOrder32Host));
 
   // WebCore expects a flipped coordinate system.
   CGContextTranslateCTM(bitmapContext.get(), 0.0, updateChunk->rect().height());

@@ -57,7 +57,8 @@ RetainPtr<CGImageRef> UpdateChunk::createImage() {
   RetainPtr<CGImageRef> image(
       AdoptCF,
       CGImageCreate(m_rect.width(), m_rect.height(), 8, 32, m_rect.width() * 4,
-                    colorSpace.get(), kCGImageAlphaPremultipliedLast,
+                    colorSpace.get(),
+                    kCGImageAlphaPremultipliedFirst | kCGBitmapByteOrder32Host,
                     provider.get(), 0, false, kCGRenderingIntentDefault));
 
   return image;
