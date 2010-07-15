@@ -97,6 +97,11 @@ bool RenderSVGResourceClipper::applyResource(RenderObject* object,
 #else
   UNUSED_PARAM(resourceMode);
 #endif
+
+  // Early exit, if this resource contains a child which references ourselves.
+  if (containsCyclicReference(node()))
+    return false;
+
   applyClippingToContext(object, object->objectBoundingBox(),
                          object->repaintRectInLocalCoordinates(), context);
   return true;
@@ -309,6 +314,14 @@ void RenderSVGResourceClipper::calculateClipContentRepaintRect() {
 bool RenderSVGResourceClipper::hitTestClipContent(
     const FloatRect& objectBoundingBox,
     const FloatPoint& nodeAtPoint) {
+  // FIXME: We should be able to check whether m_clipper.contains(object) - this
+  // doesn't work at the moment
+  // as resourceBoundingBox() has already created ClipperData, even if
+  // applyResource() returned false.
+  // Early exit, if this resource contains a child which references ourselves.
+  if (containsCyclicReference(node()))
+    return false;
+
   FloatPoint point = nodeAtPoint;
   if (!SVGRenderSupport::pointInClippingArea(this, point))
     return false;
@@ -340,6 +353,15 @@ bool RenderSVGResourceClipper::hitTestClipContent(
   }
 
   return false;
+}
+
+bool RenderSVGResourceClipper::childElementReferencesResource(
+    const SVGRenderStyle* style,
+    const String& referenceId) const {
+  if (!style->hasClipper())
+    return false;
+
+  return style->clipperResource() == referenceId;
 }
 
 FloatRect RenderSVGResourceClipper::resourceBoundingBox(RenderObject* object) {
