@@ -26,6 +26,7 @@
 #ifndef NetscapePluginStream_h
 #define NetscapePluginStream_h
 
+#include "RunLoop.h"
 #include <WebCore/npapi.h>
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
@@ -70,6 +71,9 @@ class NetscapePluginStream : public RefCounted<NetscapePluginStream> {
              const WebCore::String& headers);
   void stop(NPReason);
 
+  void deliverData(const char* bytes, int length);
+  void deliverDataToPlugin();
+
   RefPtr<NetscapePlugin> m_plugin;
   uint64_t m_streamID;
 
@@ -86,6 +90,10 @@ class NetscapePluginStream : public RefCounted<NetscapePluginStream> {
   CString m_responseURL;
   CString m_mimeType;
   CString m_headers;
+
+  RunLoop::Timer<NetscapePluginStream> m_deliveryDataTimer;
+  OwnPtr<Vector<char>> m_deliveryData;
+  bool m_stopStreamWhenDoneDelivering;
 };
 
 }  // namespace WebKit
