@@ -77,6 +77,10 @@ class PluginView : public WebCore::Widget,
   // Perform a URL request where the URL protocol is "javascript:".
   void performJavaScriptURLRequest(URLRequest*);
 
+  class Stream;
+  void addStream(Stream*);
+  void removeStream(Stream*);
+
   // WebCore::Widget
   virtual void setFrameRect(const WebCore::IntRect&);
   virtual void paint(WebCore::GraphicsContext*, const WebCore::IntRect&);
@@ -113,6 +117,9 @@ class PluginView : public WebCore::Widget,
   // Pending frame loads that the plug-in has made.
   typedef HashMap<RefPtr<WebFrame>, RefPtr<URLRequest>> FrameLoadMap;
   FrameLoadMap m_pendingFrameLoads;
+
+  // Streams that the plug-in has requested to load.
+  HashMap<uint64_t, RefPtr<Stream>> m_streams;
 };
 
 }  // namespace WebKit
