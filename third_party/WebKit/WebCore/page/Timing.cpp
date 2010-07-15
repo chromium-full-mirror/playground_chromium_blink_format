@@ -40,6 +40,11 @@
 
 namespace WebCore {
 
+static unsigned long long toIntegerMilliseconds(double milliseconds) {
+  ASSERT(milliseconds >= 0);
+  return static_cast<unsigned long long>(milliseconds * 1000.0);
+}
+
 Timing::Timing(Frame* frame) : m_frame(frame) {}
 
 Frame* Timing::frame() const {
@@ -95,7 +100,14 @@ unsigned long long Timing::domainLookupStart() const {
   if (!timing)
     return 0;
 
-  return toIntegerMilliseconds(timing->dnsStart);
+  // This will be -1 when a DNS request is not performed.
+  // Rather than exposing a special value that indicates no DNS, we "backfill"
+  // with fetchStart.
+  int dnsStart = timing->dnsStart;
+  if (dnsStart < 0)
+    return fetchStart();
+
+  return toIntegerMilliseconds(timing->requestTime + dnsStart);
 }
 
 unsigned long long Timing::domainLookupEnd() const {
@@ -103,7 +115,14 @@ unsigned long long Timing::domainLookupEnd() const {
   if (!timing)
     return 0;
 
-  return toIntegerMilliseconds(timing->dnsEnd);
+  // This will be -1 when a DNS request is not performed.
+  // Rather than exposing a special value that indicates no DNS, we "backfill"
+  // with domainLookupStart.
+  int dnsEnd = timing->dnsEnd;
+  if (dnsEnd < 0)
+    return domainLookupStart();
+
+  return toIntegerMilliseconds(timing->requestTime + dnsEnd);
 }
 
 unsigned long long Timing::connectStart() const {
@@ -111,7 +130,14 @@ unsigned long long Timing::connectStart() const {
   if (!timing)
     return 0;
 
-  return toIntegerMilliseconds(timing->connectStart);
+  // This will be -1 when a new connection is not established.
+  // Rather than exposing a special value that indicates no new connection, we
+  // "backfill" with domainLookupEnd.
+  int connectStart = timing->connectStart;
+  if (connectStart < 0)
+    return domainLookupEnd();
+
+  return toIntegerMilliseconds(timing->requestTime + connectStart);
 }
 
 unsigned long long Timing::connectEnd() const {
@@ -119,7 +145,14 @@ unsigned long long Timing::connectEnd() const {
   if (!timing)
     return 0;
 
-  return toIntegerMilliseconds(timing->connectEnd);
+  // This will be -1 when a new connection is not established.
+  // Rather than exposing a special value that indicates no new connection, we
+  // "backfill" with connectStart.
+  int connectEnd = timing->connectEnd;
+  if (connectEnd < 0)
+    return connectStart();
+
+  return toIntegerMilliseconds(timing->requestTime + connectEnd);
 }
 
 unsigned long long Timing::requestStart() const {
@@ -127,7 +160,8 @@ unsigned long long Timing::requestStart() const {
   if (!timing)
     return 0;
 
-  return toIntegerMilliseconds(timing->sendStart);
+  ASSERT(timing->sendStart >= 0);
+  return toIntegerMilliseconds(timing->requestTime + timing->sendStart);
 }
 
 unsigned long long Timing::requestEnd() const {
@@ -135,7 +169,8 @@ unsigned long long Timing::requestEnd() const {
   if (!timing)
     return 0;
 
-  return toIntegerMilliseconds(timing->sendEnd);
+  ASSERT(timing->sendEnd >= 0);
+  return toIntegerMilliseconds(timing->requestTime + timing->sendEnd);
 }
 
 unsigned long long Timing::responseStart() const {
@@ -149,7 +184,8 @@ unsigned long long Timing::responseStart() const {
   // sized cookies, the HTTP headers fit into a single packet so this time
   // is basically equivalent. But for some responses, particularly those with
   // headers larger than a single packet, this time will be too late.
-  return toIntegerMilliseconds(timing->receiveHeadersEnd);
+  ASSERT(timing->receiveHeadersEnd >= 0);
+  return toIntegerMilliseconds(timing->requestTime + timing->receiveHeadersEnd);
 }
 
 unsigned long long Timing::responseEnd() const {
@@ -182,12 +218,6 @@ ResourceLoadTiming* Timing::resourceLoadTiming() const {
     return 0;
 
   return documentLoader->response().resourceLoadTiming();
-}
-
-unsigned long long Timing::toIntegerMilliseconds(double milliseconds) {
-  if (milliseconds <= 0)
-    return 0;
-  return static_cast<unsigned long long>(milliseconds * 1000.0);
 }
 
 }  // namespace WebCore
