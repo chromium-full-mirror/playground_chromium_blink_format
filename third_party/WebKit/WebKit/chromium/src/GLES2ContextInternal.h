@@ -50,7 +50,7 @@ class GLES2ContextInternal {
  private:
   GLES2ContextInternal(WebKit::WebGLES2Context* impl, bool owns);
 
-  bool m_owns;
   WebKit::WebGLES2Context* m_impl;
+  bool m_owns;
 };
 }
