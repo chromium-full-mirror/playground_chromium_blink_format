@@ -73,6 +73,7 @@ class Blob : public RefCounted<Blob> {
 
  protected:
   Blob(const String& type, const BlobItemList&);
+  Blob(const PassRefPtr<BlobItem>&);
 
   // FIXME: Deprecated constructor.  See also the comment for
   // Blob::create(path).

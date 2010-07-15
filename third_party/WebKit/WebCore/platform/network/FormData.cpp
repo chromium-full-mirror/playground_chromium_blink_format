@@ -226,7 +226,14 @@ void FormData::appendKeyValuePairItems(const BlobItemList& items,
       const FileBlobItem* fileItem = value->toFileBlobItem();
       if (fileItem) {
         const String& path = fileItem->path();
+
+#if ENABLE(DIRECTORY_UPLOAD)
+        String fileName = !fileItem->relativePath().isEmpty()
+                              ? fileItem->relativePath()
+                              : fileItem->name();
+#else
         String fileName = fileItem->name();
+#endif
 
         // Let the application specify a filename if it's going to generate a
         // replacement file for the upload.

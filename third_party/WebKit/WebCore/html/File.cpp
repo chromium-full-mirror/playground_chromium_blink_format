@@ -32,6 +32,17 @@
 namespace WebCore {
 
 File::File(const String& path) : Blob(path) {
+  Init();
+}
+
+#if ENABLE(DIRECTORY_UPLOAD)
+File::File(const String& relativePath, const String& filePath)
+    : Blob(FileBlobItem::create(filePath, relativePath)) {
+  Init();
+}
+#endif
+
+void File::Init() {
   // We don't use MIMETypeRegistry::getMIMETypeForPath() because it returns
   // "application/octet-stream" upon failure.
   const String& fileName = name();
@@ -44,5 +55,11 @@ File::File(const String& path) : Blob(path) {
 const String& File::name() const {
   return items().at(0)->toFileBlobItem()->name();
 }
+
+#if ENABLE(DIRECTORY_UPLOAD)
+const String& File::webkitRelativePath() const {
+  return items().at(0)->toFileBlobItem()->relativePath();
+}
+#endif
 
 }  // namespace WebCore

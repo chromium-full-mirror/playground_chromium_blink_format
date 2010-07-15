@@ -41,6 +41,10 @@ Blob::Blob(const String& type, const BlobItemList& items) : m_type(type) {
     m_items.append(items[i]);
 }
 
+Blob::Blob(const PassRefPtr<BlobItem>& item) {
+  m_items.append(item);
+}
+
 Blob::Blob(const String& path) {
   // Note: this doesn't initialize the type unlike File(path).
   m_items.append(FileBlobItem::create(path));
