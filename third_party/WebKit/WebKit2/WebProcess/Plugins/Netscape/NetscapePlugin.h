@@ -58,6 +58,7 @@ class NetscapePlugin : public Plugin {
                void* notificationData);
   NPError destroyStream(NPStream*, NPReason);
 
+  void cancelStreamLoad(NetscapePluginStream*);
   void removePluginStream(NetscapePluginStream*);
 
   // Member functions for calling into the plug-in.

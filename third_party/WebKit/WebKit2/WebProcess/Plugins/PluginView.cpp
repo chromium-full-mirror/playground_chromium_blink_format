@@ -78,6 +78,7 @@ class PluginView::Stream : public RefCounted<PluginView::Stream>,
   }
 
   void start();
+  void cancel();
 
   uint64_t streamID() const { return m_streamID; }
 
@@ -112,6 +113,13 @@ void PluginView::Stream::start() {
 
   m_loader->documentLoader()->addPlugInStreamLoader(m_loader.get());
   m_loader->load(m_request);
+}
+
+void PluginView::Stream::cancel() {
+  ASSERT(m_loader);
+
+  m_loader->cancel(m_loader->cancelledError());
+  m_loader = 0;
 }
 
 void PluginView::Stream::didReceiveResponse(NetscapePlugInStreamLoader*,
@@ -492,6 +500,15 @@ void PluginView::loadURL(uint64_t requestID,
   m_pendingURLRequests.append(
       URLRequest::create(requestID, frameLoadRequest, allowPopups));
   m_pendingURLRequestsTimer.startOneShot(0);
+}
+
+void PluginView::cancelStreamLoad(uint64_t streamID) {
+  PluginView::Stream* stream = m_streams.get(streamID).get();
+  if (!stream)
+    return;
+
+  stream->cancel();
+  removeStream(stream);
 }
 
 void PluginView::didFinishLoad(WebFrame* webFrame) {

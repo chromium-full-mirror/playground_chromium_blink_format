@@ -50,10 +50,16 @@ class PluginController {
   // Once the URL finishes loading, Plugin::frameDidFinishLoading will be called
   // with the given requestID. If the URL
   // fails to load, Plugin::frameDidFailToLoad will be called.
+  //
+  // If the URL is a JavaScript URL, the JavaScript code will be evaluated and
+  // the result sent back using Plugin::didEvaluateJavaScript.
   virtual void loadURL(uint64_t requestID,
                        const WebCore::String& urlString,
                        const WebCore::String& target,
                        bool allowPopups) = 0;
+
+  /// Cancels the load of a stream that was requested by loadURL.
+  virtual void cancelStreamLoad(uint64_t streamID) = 0;
 
  protected:
   virtual ~PluginController() {}

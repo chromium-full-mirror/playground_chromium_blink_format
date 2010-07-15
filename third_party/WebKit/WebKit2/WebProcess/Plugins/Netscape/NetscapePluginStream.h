@@ -34,6 +34,7 @@
 #include <wtf/text/CString.h>
 
 namespace WebCore {
+class KURL;
 class String;
 }
 
@@ -56,6 +57,12 @@ class NetscapePluginStream : public RefCounted<NetscapePluginStream> {
   uint64_t streamID() const { return m_streamID; }
   const NPStream* npStream() const { return &m_npStream; }
 
+  void didReceiveResponse(const WebCore::KURL& responseURL,
+                          uint32_t streamLength,
+                          uint32_t lastModifiedTime,
+                          const WebCore::String& mimeType,
+                          const WebCore::String& headers);
+
   void sendJavaScriptStream(const WebCore::String& requestURLString,
                             const WebCore::String& result);
 
@@ -68,7 +75,7 @@ class NetscapePluginStream : public RefCounted<NetscapePluginStream> {
                        void* notificationData);
 
   bool start(const WebCore::String& responseURLString,
-             uint32_t expectedContentLength,
+             uint32_t streamLength,
              uint32_t lastModifiedTime,
              const WebCore::String& mimeType,
              const WebCore::String& headers);

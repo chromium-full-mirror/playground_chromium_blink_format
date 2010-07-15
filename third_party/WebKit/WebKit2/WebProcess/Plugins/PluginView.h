@@ -98,6 +98,7 @@ class PluginView : public WebCore::Widget,
                        const WebCore::String& urlString,
                        const WebCore::String& target,
                        bool allowPopups);
+  virtual void cancelStreamLoad(uint64_t streamID);
 
   // WebFrame::LoadListener
   virtual void didFinishLoad(WebFrame*);

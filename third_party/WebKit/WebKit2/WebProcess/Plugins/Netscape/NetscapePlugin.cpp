@@ -147,9 +147,13 @@ NPError NetscapePlugin::destroyStream(NPStream* stream, NPReason reason) {
   return pluginStream->destroy(reason);
 }
 
+void NetscapePlugin::cancelStreamLoad(NetscapePluginStream* pluginStream) {
+  // Ask the plug-in controller to cancel this stream load.
+  m_pluginController->cancelStreamLoad(pluginStream->streamID());
+}
+
 void NetscapePlugin::removePluginStream(NetscapePluginStream* pluginStream) {
   ASSERT(m_streams.get(pluginStream->streamID()) == pluginStream);
-
   m_streams.remove(pluginStream->streamID());
 }
 
@@ -341,7 +345,9 @@ void NetscapePlugin::streamDidReceiveResponse(uint64_t streamID,
                                               uint32_t lastModifiedTime,
                                               const String& mimeType,
                                               const String& headers) {
-  // FIXME: Implement.
+  if (NetscapePluginStream* pluginStream = streamFromID(streamID))
+    pluginStream->didReceiveResponse(responseURL, streamLength,
+                                     lastModifiedTime, mimeType, headers);
 }
 
 PluginController* NetscapePlugin::controller() {
