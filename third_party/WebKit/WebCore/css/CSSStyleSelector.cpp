@@ -6058,6 +6058,24 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
       return;
     case CSSPropertyInvalid:
       return;
+
+    // Directional properties are resolved by resolveDirectionAwareProperty()
+    // before the switch.
+    case CSSPropertyWebkitBorderEnd:
+    case CSSPropertyWebkitBorderEndColor:
+    case CSSPropertyWebkitBorderEndStyle:
+    case CSSPropertyWebkitBorderEndWidth:
+    case CSSPropertyWebkitBorderStart:
+    case CSSPropertyWebkitBorderStartColor:
+    case CSSPropertyWebkitBorderStartStyle:
+    case CSSPropertyWebkitBorderStartWidth:
+    case CSSPropertyWebkitMarginEnd:
+    case CSSPropertyWebkitMarginStart:
+    case CSSPropertyWebkitPaddingEnd:
+    case CSSPropertyWebkitPaddingStart:
+      ASSERT_NOT_REACHED();
+      break;
+
     case CSSPropertyFontStretch:
     case CSSPropertyPage:
     case CSSPropertyQuotes:
@@ -6077,10 +6095,6 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
     case CSSPropertyTextUnderlineStyle:
     case CSSPropertyTextUnderlineWidth:
     case CSSPropertyWebkitFontSizeDelta:
-    case CSSPropertyWebkitMarginEnd:
-    case CSSPropertyWebkitMarginStart:
-    case CSSPropertyWebkitPaddingEnd:
-    case CSSPropertyWebkitPaddingStart:
     case CSSPropertyWebkitTextDecorationsInEffect:
     case CSSPropertyWebkitTextStroke:
     case CSSPropertyWebkitVariableDeclarationBlock:
