@@ -33,6 +33,7 @@
 #include "V8Console.h"
 
 #include "Console.h"
+#include "ScriptCallStack.h"
 #include "ScriptProfile.h"
 #include "V8Binding.h"
 #include "V8Proxy.h"
@@ -59,4 +60,15 @@ v8::Handle<v8::Value> V8Console::profilesAccessorGetter(
 }
 #endif
 
+v8::Handle<v8::Value> V8Console::traceCallback(const v8::Arguments& args) {
+  INC_STATS("DOM.Console.traceCallback");
+  Console* imp = V8Console::toNative(args.Holder());
+  v8::HandleScope handleScope;
+  ScriptState* scriptState = ScriptState::current();
+  v8::Local<v8::StackTrace> stackTrace = v8::StackTrace::CurrentStackTrace(200);
+  OwnPtr<ScriptCallStack> callStack(
+      ScriptCallStack::create(scriptState, stackTrace));
+  imp->trace(callStack.get());
+  return v8::Handle<v8::Value>();
+}
 }  // namespace WebCore
