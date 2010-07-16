@@ -660,6 +660,15 @@ void ChromiumBridge::paintScrollbarTrack(GraphicsContext* gc,
       alignRect);
 }
 
+void ChromiumBridge::paintSpinButton(GraphicsContext* gc,
+                                     int part,
+                                     int state,
+                                     int classicState,
+                                     const IntRect& rect) {
+  webKitClient()->themeEngine()->paintSpinButton(
+      gc->platformContext()->canvas(), part, state, classicState, rect);
+}
+
 void ChromiumBridge::paintTextField(GraphicsContext* gc,
                                     int part,
                                     int state,

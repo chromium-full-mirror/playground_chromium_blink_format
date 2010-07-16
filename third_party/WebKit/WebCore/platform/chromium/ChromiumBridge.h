@@ -283,6 +283,11 @@ class ChromiumBridge {
                                   int classicState,
                                   const IntRect&,
                                   const IntRect& alignRect);
+  static void paintSpinButton(GraphicsContext*,
+                              int part,
+                              int state,
+                              int classicState,
+                              const IntRect&);
   static void paintTextField(GraphicsContext*,
                              int part,
                              int state,

@@ -78,6 +78,12 @@ class WebThemeEngine {
                                    const WebRect&,
                                    const WebRect& alignRect) = 0;
 
+  virtual void paintSpinButton(WebCanvas*,
+                               int part,
+                               int state,
+                               int classicState,
+                               const WebRect&) {}
+
   virtual void paintTextField(WebCanvas*,
                               int part,
                               int state,

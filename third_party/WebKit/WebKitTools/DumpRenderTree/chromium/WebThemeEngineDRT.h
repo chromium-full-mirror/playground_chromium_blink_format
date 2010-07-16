@@ -85,6 +85,12 @@ class WebThemeEngineDRT : public WebKit::WebThemeEngine, public Noncopyable {
                                    const WebKit::WebRect&,
                                    const WebKit::WebRect& alignRect);
 
+  virtual void paintSpinButton(WebKit::WebCanvas*,
+                               int part,
+                               int state,
+                               int classicState,
+                               const WebKit::WebRect&);
+
   virtual void paintTextField(WebKit::WebCanvas*,
                               int part,
                               int state,
