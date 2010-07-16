@@ -138,6 +138,11 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
   bool dumpAsText() const { return m_dumpAsText; }
   void setDumpAsText(bool dumpAsText) { m_dumpAsText = dumpAsText; }
 
+  bool generatePixelResults() const { return m_generatePixelResults; }
+  void setGeneratePixelResults(bool generatePixelResults) {
+    m_generatePixelResults = generatePixelResults;
+  }
+
   bool dumpBackForwardList() const { return m_dumpBackForwardList; }
   void setDumpBackForwardList(bool dumpBackForwardList) {
     m_dumpBackForwardList = dumpBackForwardList;
@@ -427,6 +432,7 @@ class LayoutTestController : public RefCounted<LayoutTestController> {
   bool m_dumpIconChanges;
   bool m_dumpVisitedLinksCallback;
   bool m_dumpWillCacheResponse;
+  bool m_generatePixelResults;
   bool m_callCloseOnWebViews;
   bool m_canOpenWindows;
   bool m_closeRemainingWindowsWhenComplete;

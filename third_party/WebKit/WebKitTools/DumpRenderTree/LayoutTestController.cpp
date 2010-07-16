@@ -61,6 +61,7 @@ LayoutTestController::LayoutTestController(const std::string& testPathOrURL,
       m_dumpIconChanges(false),
       m_dumpVisitedLinksCallback(false),
       m_dumpWillCacheResponse(false),
+      m_generatePixelResults(true),
       m_callCloseOnWebViews(true),
       m_canOpenWindows(false),
       m_closeRemainingWindowsWhenComplete(true),
@@ -112,6 +113,12 @@ static JSValueRef dumpAsTextCallback(JSContextRef context,
   LayoutTestController* controller =
       static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
   controller->setDumpAsText(true);
+
+  // Optional paramater, describing whether it's allowed to dump pixel results
+  // in dumpAsText mode.
+  controller->setGeneratePixelResults(
+      argumentCount > 0 ? JSValueToBoolean(context, arguments[0]) : false);
+
   return JSValueMakeUndefined(context);
 }
 
