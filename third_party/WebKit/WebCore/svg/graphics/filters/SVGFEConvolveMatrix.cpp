@@ -204,25 +204,16 @@ ALWAYS_INLINE void setDestinationPixels(CanvasPixelArray* image,
                                         float divisor,
                                         float bias,
                                         CanvasPixelArray* src) {
-  int numTotals = preserveAlphaValues ? 3 : 4;
-  for (int i = 0; i < numTotals; ++i)
-    totals[i] = totals[i] / divisor + bias;
-
-  unsigned char maxAlpha;
-  if (!preserveAlphaValues)
-    maxAlpha = clampRGBAValue(totals[3]);
-  else
-    maxAlpha = 255;
-
+  unsigned char maxAlpha =
+      preserveAlphaValues ? 255 : clampRGBAValue(totals[3] / divisor + bias);
   for (int i = 0; i < 3; ++i)
-    image->set(pixel++, clampRGBAValue(totals[0], maxAlpha));
+    image->set(pixel++, clampRGBAValue(totals[i] / divisor + bias, maxAlpha));
 
-  if (!preserveAlphaValues)
-    image->set(pixel++, maxAlpha);
-  else {
+  if (preserveAlphaValues) {
     image->set(pixel, src->get(pixel));
     ++pixel;
-  }
+  } else
+    image->set(pixel++, maxAlpha);
 }
 
 // Only for region C
