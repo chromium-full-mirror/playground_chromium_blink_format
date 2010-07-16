@@ -205,6 +205,10 @@ void NetscapePlugin::NPP_URLNotify(const char* url,
   m_pluginModule->pluginFuncs().urlnotify(&m_npp, url, reason, notifyData);
 }
 
+NPError NetscapePlugin::NPP_GetValue(NPPVariable variable, void* value) {
+  return m_pluginModule->pluginFuncs().getvalue(&m_npp, variable, value);
+}
+
 void NetscapePlugin::callSetWindow() {
   m_npWindow.x = m_frameRect.x();
   m_npWindow.y = m_frameRect.y();
@@ -216,6 +220,17 @@ void NetscapePlugin::callSetWindow() {
   m_npWindow.clipRect.right = m_clipRect.right();
 
   NPP_SetWindow(&m_npWindow);
+}
+
+bool NetscapePlugin::shouldLoadSrcURL() {
+  // Check if we should cancel the load
+  NPBool cancelSrcStream = false;
+
+  if (NPP_GetValue(NPPVpluginCancelSrcStream, &cancelSrcStream) !=
+      NPERR_NO_ERROR)
+    return true;
+
+  return !cancelSrcStream;
 }
 
 NetscapePluginStream* NetscapePlugin::streamFromID(uint64_t streamID) {
@@ -270,6 +285,10 @@ bool NetscapePlugin::initialize(PluginController* pluginController,
     destroy();
     return false;
   }
+
+  // Load the src URL if needed.
+  if (!parameters.url.isEmpty() && shouldLoadSrcURL())
+    loadURL(parameters.url.string(), String(), false, 0);
 
   return true;
 }
