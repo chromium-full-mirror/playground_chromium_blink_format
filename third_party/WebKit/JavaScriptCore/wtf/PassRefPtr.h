@@ -111,8 +111,7 @@ class PassRefPtr {
 
   // FIXME: Remove releaseRef once we change all callers to call leakRef
   // instead.
-  T* releaseRef() const { return leakRef(); }
-  WARN_UNUSED_RETURN;
+  T* releaseRef() const WARN_UNUSED_RETURN { return leakRef(); }
 
  private:
   // adopting constructor
@@ -163,20 +162,18 @@ class NonNullPassRefPtr {
   T* get() const { return m_ptr; }
 
   void clear();
-  T* leakRef() const {
+  T* leakRef() const WARN_UNUSED_RETURN {
     T* tmp = m_ptr;
     m_ptr = 0;
     return tmp;
   }
-  WARN_UNUSED_RETURN;
 
   T& operator*() const { return *m_ptr; }
   T* operator->() const { return m_ptr; }
 
   // FIXME: Remove releaseRef once we change all callers to call leakRef
   // instead.
-  T* releaseRef() const { return leakRef(); }
-  WARN_UNUSED_RETURN;
+  T* releaseRef() const WARN_UNUSED_RETURN { return leakRef(); }
 
  private:
   mutable T* m_ptr;
