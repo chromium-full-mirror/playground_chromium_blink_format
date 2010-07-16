@@ -269,7 +269,7 @@ void SearchFieldCancelButtonElement::defaultEventHandler(Event* event) {
 inline SpinButtonElement::SpinButtonElement(Node* shadowParent)
     : TextControlInnerElement(shadowParent->document(), shadowParent),
       m_capturing(false),
-      m_onUpButton(false) {}
+      m_upDownState(Indeterminate) {}
 
 PassRefPtr<SpinButtonElement> SpinButtonElement::create(Node* shadowParent) {
   return adoptRef(new SpinButtonElement(shadowParent));
@@ -325,9 +325,9 @@ void SpinButtonElement::defaultEventHandler(Event* event) {
           m_capturing = true;
         }
       }
-      bool oldOnUpButton = m_onUpButton;
-      m_onUpButton = local.y() < box->height() / 2;
-      if (m_onUpButton != oldOnUpButton)
+      UpDownState oldUpDownState = m_upDownState;
+      m_upDownState = local.y() < box->height() / 2 ? Up : Down;
+      if (m_upDownState != oldUpDownState)
         renderer()->repaint();
     } else {
       if (m_capturing) {
@@ -341,6 +341,12 @@ void SpinButtonElement::defaultEventHandler(Event* event) {
 
   if (!event->defaultHandled())
     HTMLDivElement::defaultEventHandler(event);
+}
+
+void SpinButtonElement::setHovered(bool flag) {
+  if (!hovered() && flag)
+    m_upDownState = Indeterminate;
+  TextControlInnerElement::setHovered(flag);
 }
 
 // ----------------------------
