@@ -30,6 +30,7 @@
 
 #include "AXObjectCache.h"
 #include "Attribute.h"
+#include "BeforeTextInsertedEvent.h"
 #include "CSSPropertyNames.h"
 #include "ChromeClient.h"
 #include "DateComponents.h"
@@ -107,6 +108,11 @@ static const double weekDefaultStepBase =
 
 static const double msecPerMinute = 60 * 1000;
 static const double msecPerSecond = 1000;
+
+static bool isNumberCharacter(UChar ch) {
+  return ch == '+' || ch == '-' || ch == '.' || ch == 'e' || ch == 'E' ||
+         ch >= '0' && ch <= '9';
+}
 
 HTMLInputElement::HTMLInputElement(const QualifiedName& tagName,
                                    Document* document,
@@ -2128,6 +2134,21 @@ void HTMLInputElement::defaultEventHandler(Event* evt) {
     }
   }
 
+  if (hasSpinButton() && evt->type() == eventNames().keydownEvent &&
+      evt->isKeyboardEvent()) {
+    String key = static_cast<KeyboardEvent*>(evt)->keyIdentifier();
+    int step = 0;
+    if (key == "Up")
+      step = 1;
+    else if (key == "Down")
+      step = -1;
+    if (step) {
+      stepUpFromRenderer(step);
+      evt->setDefaultHandled();
+      return;
+    }
+  }
+
   if (isTextField() && evt->type() == eventNames().keydownEvent &&
       evt->isKeyboardEvent() && focused() && document()->frame() &&
       document()->frame()->doTextFieldCommandFromEvent(
@@ -2403,7 +2424,7 @@ void HTMLInputElement::defaultEventHandler(Event* evt) {
   }
 
   if (evt->isBeforeTextInsertedEvent())
-    InputElement::handleBeforeTextInsertedEvent(m_data, this, this, evt);
+    handleBeforeTextInsertedEvent(evt);
 
   if (isTextField() && renderer() &&
       (evt->isMouseEvent() || evt->isDragEvent() || evt->isWheelEvent() ||
@@ -2417,6 +2438,33 @@ void HTMLInputElement::defaultEventHandler(Event* evt) {
 
   if (!callBaseClassEarly && !evt->defaultHandled())
     HTMLFormControlElementWithState::defaultEventHandler(evt);
+}
+
+void HTMLInputElement::handleBeforeTextInsertedEvent(Event* event) {
+  if (inputType() == NUMBER) {
+    BeforeTextInsertedEvent* textEvent =
+        static_cast<BeforeTextInsertedEvent*>(event);
+    unsigned length = textEvent->text().length();
+    bool hasInvalidChar = false;
+    for (unsigned i = 0; i < length; ++i) {
+      if (!isNumberCharacter(textEvent->text()[i])) {
+        hasInvalidChar = true;
+        break;
+      }
+    }
+    if (hasInvalidChar) {
+      Vector<UChar> stripped;
+      stripped.reserveCapacity(length);
+      for (unsigned i = 0; i < length; ++i) {
+        UChar ch = textEvent->text()[i];
+        if (!isNumberCharacter(ch))
+          continue;
+        stripped.append(ch);
+      }
+      textEvent->setText(String::adopt(stripped));
+    }
+  }
+  InputElement::handleBeforeTextInsertedEvent(m_data, this, this, event);
 }
 
 PassRefPtr<HTMLFormElement> HTMLInputElement::createTemporaryFormForIsIndex() {
