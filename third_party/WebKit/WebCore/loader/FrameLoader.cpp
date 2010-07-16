@@ -2844,8 +2844,6 @@ String FrameLoader::userAgent(const KURL& url) const {
 void FrameLoader::handledOnloadEvents() {
   m_client->dispatchDidHandleOnloadEvents();
 
-  m_loadType = FrameLoadTypeStandard;
-
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
   if (documentLoader())
     documentLoader()->applicationCacheHost()->stopDeferringEvents();
@@ -2925,7 +2923,14 @@ void FrameLoader::addExtraFieldsToRequest(ResourceRequest& request,
   // 2. Delegates that modify the cache policy using willSendRequest: should
   //    not affect any other resources. Such changes need to be done
   //    per request.
-  if (loadType == FrameLoadTypeReload) {
+  if (!mainResource) {
+    if (request.isConditional())
+      request.setCachePolicy(ReloadIgnoringCacheData);
+    else if (documentLoader()->isLoadingInAPISense())
+      request.setCachePolicy(documentLoader()->originalRequest().cachePolicy());
+    else
+      request.setCachePolicy(UseProtocolCachePolicy);
+  } else if (loadType == FrameLoadTypeReload) {
     request.setCachePolicy(ReloadIgnoringCacheData);
     request.setHTTPHeaderField("Cache-Control", "max-age=0");
   } else if (loadType == FrameLoadTypeReloadFromOrigin) {
@@ -2938,8 +2943,6 @@ void FrameLoader::addExtraFieldsToRequest(ResourceRequest& request,
            m_stateMachine.committedFirstRealDocumentLoad() &&
            !request.url().protocolIs("https"))
     request.setCachePolicy(ReturnCacheDataElseLoad);
-  else if (!mainResource && documentLoader()->isLoadingInAPISense())
-    request.setCachePolicy(documentLoader()->originalRequest().cachePolicy());
 
   if (mainResource)
     request.setHTTPAccept(defaultAcceptHeader);
