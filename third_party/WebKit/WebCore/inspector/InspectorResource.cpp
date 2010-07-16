@@ -404,7 +404,10 @@ ScriptObject InspectorResource::buildObjectForTiming(
                  timing->connectStart == -1
                      ? -1
                      : (timing->connectEnd - timing->connectStart) / 1000.0);
-  jsonObject.set("sslDuration", (timing->sslEnd - timing->sslStart) / 1000.0);
+  jsonObject.set("sslDuration",
+                 timing->sslStart == -1
+                     ? -1
+                     : (timing->sslEnd - timing->sslStart) / 1000.0);
   jsonObject.set("sendDuration",
                  (timing->sendEnd - timing->sendStart) / 1000.0);
   jsonObject.set("waitDuration",
