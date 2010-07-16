@@ -47,7 +47,6 @@ class CSSSegmentedFontFace : public RefCounted<CSSSegmentedFontFace> {
   }
   ~CSSSegmentedFontFace();
 
-  bool isLoaded() const;
   bool isValid() const;
   CSSFontSelector* fontSelector() const { return m_fontSelector; }
 
