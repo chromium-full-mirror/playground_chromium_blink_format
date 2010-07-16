@@ -570,7 +570,8 @@ void ComplexTextController::adjustGlyphsAndAdvances() {
                        : advances[i];
 
       if (ch == '\t' && m_run.allowTabs()) {
-        float tabWidth = m_font.tabWidth();
+        float tabWidth =
+            8 * ceilf(fontData->adjustedSpaceWidth() + m_font.letterSpacing());
         advance.width = tabWidth - fmodf(m_run.xPos() + m_totalWidth +
                                              widthSinceLastRounding,
                                          tabWidth);
