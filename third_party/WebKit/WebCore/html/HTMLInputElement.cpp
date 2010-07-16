@@ -1183,6 +1183,13 @@ void HTMLInputElement::parseMappedAttribute(Attribute* attr) {
 // FIXME: we need to tell this change to a renderer if the attribute affects the
 // appearance.
 #endif
+#if ENABLE(INPUT_SPEECH)
+  else if (attr->name() == speechAttr) {
+    if (renderer())
+      renderer()->updateFromElement();
+    setNeedsStyleRecalc();
+  }
+#endif
   else
     HTMLTextFormControlElement::parseMappedAttribute(attr);
 }
