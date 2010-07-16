@@ -98,4 +98,7 @@
                               marginTop:(int)
                             marginRight:(int)
                            marginBottom:(int)marginLeft;
+- (void)printToCGContext:(CGContextRef)
+               cgContext:(float)
+       pageWidthInPixels:(float)pageHeightInPixels;
 @end

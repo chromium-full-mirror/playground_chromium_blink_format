@@ -36,6 +36,7 @@
 class BitmapContext;
 
 void computeMD5HashStringForBitmapContext(BitmapContext*, char hashString[33]);
+PassRefPtr<BitmapContext> createPagedBitmapContext();
 PassRefPtr<BitmapContext> createBitmapContextFromWebView(
     bool onscreen,
     bool incrementalRepaint,

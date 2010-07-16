@@ -73,6 +73,13 @@ class PrintContext {
                                            int marginBottom,
                                            int marginLeft);
   static int numberOfPages(Frame*, const FloatSize& pageSizeInPixels);
+  // Draw all pages into a graphics context with lines which mean page
+  // boundaries.
+  // The height of the graphics context should be
+  // (pageSizeInPixels.height() + 1) * number-of-pages - 1
+  static void spoolAllPagesWithBoundaries(Frame*,
+                                          GraphicsContext&,
+                                          const FloatSize& pageSizeInPixels);
 
  protected:
   Frame* m_frame;
