@@ -70,6 +70,7 @@ class RenderSVGModelObject : public RenderObject {
                                    bool useTransforms,
                                    bool fixed,
                                    TransformState&) const;
+  virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);
 
  private:
   // This method should never be called, SVG uses a different nodeAtPoint method

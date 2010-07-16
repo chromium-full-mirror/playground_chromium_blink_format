@@ -54,6 +54,10 @@ void RenderSVGContainer::layout() {
 
   SVGRenderSupport::layoutChildren(this, selfNeedsLayout());
 
+  // Invalidate all resources of this client, if we changed something.
+  if (m_everHadLayout && selfNeedsLayout())
+    RenderSVGResource::invalidateAllResourcesOfRenderer(this);
+
   repainter.repaintAfterLayout();
   setNeedsLayout(false);
 }

@@ -33,6 +33,7 @@
 #include "HTMLNames.h"
 #include "NodeRenderStyle.h"
 #include "RegisteredEventListener.h"
+#include "RenderSVGResource.h"
 #include "RenderSVGShadowTreeRootContainer.h"
 #include "SVGElementInstance.h"
 #include "SVGElementInstanceList.h"
@@ -141,7 +142,8 @@ void SVGUseElement::svgAttributeChanged(const QualifiedName& attrName) {
   if (isXYAttribute || isWidthHeightAttribute)
     updateRelativeLengthsInformation();
 
-  if (!renderer())
+  RenderObject* object = renderer();
+  if (!object)
     return;
 
   if (SVGURIReference::isKnownAttribute(attrName)) {
@@ -173,8 +175,8 @@ void SVGUseElement::svgAttributeChanged(const QualifiedName& attrName) {
   }
 
   if (SVGStyledTransformableElement::isKnownAttribute(attrName)) {
-    renderer()->setNeedsTransformUpdate();
-    renderer()->setNeedsLayout(true);
+    object->setNeedsTransformUpdate();
+    RenderSVGResource::markForLayoutAndParentResourceInvalidation(object);
     return;
   }
 
@@ -264,8 +266,8 @@ void SVGUseElement::updateContainerSizes() {
   // correspond to <svg>/<symbol> tags
   updateContainerSize(this, m_targetElementInstance.get());
 
-  if (renderer())
-    renderer()->setNeedsLayout(true);
+  if (RenderObject* object = renderer())
+    RenderSVGResource::markForLayoutAndParentResourceInvalidation(object);
 }
 
 static void updateContainerOffset(SVGElementInstance* targetInstance) {
@@ -320,8 +322,8 @@ void SVGUseElement::updateContainerOffsets() {
   // cloned use subtree
   updateContainerOffset(m_targetElementInstance.get());
 
-  if (renderer())
-    renderer()->setNeedsLayout(true);
+  if (RenderObject* object = renderer())
+    RenderSVGResource::markForLayoutAndParentResourceInvalidation(object);
 }
 
 void SVGUseElement::recalcStyle(StyleChange change) {

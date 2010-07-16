@@ -25,6 +25,7 @@
 
 #include "Attribute.h"
 #include "RenderObject.h"
+#include "RenderSVGResource.h"
 #include "SVGLengthList.h"
 #include "SVGNames.h"
 #include "SVGNumberList.h"
@@ -70,7 +71,7 @@ void SVGTextPositioningElement::svgAttributeChanged(
     return;
 
   if (isKnownAttribute(attrName))
-    renderer()->setNeedsLayout(true);
+    RenderSVGResource::markForLayoutAndParentResourceInvalidation(renderer());
 }
 
 void SVGTextPositioningElement::synchronizeProperty(

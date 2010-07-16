@@ -88,6 +88,9 @@ class RenderSVGResource {
   static RenderSVGResourceSolidColor* sharedSolidPaintingResource();
 
   static void invalidateAllResourcesOfRenderer(RenderObject*);
+  static void markForLayoutAndParentResourceInvalidation(
+      RenderObject*,
+      bool needsLayout = true);
 
  private:
   static void adjustColorForPseudoRules(const RenderStyle*,
@@ -95,7 +98,8 @@ class RenderSVGResource {
                                         Color&);
 
  protected:
-  void markForLayoutAndResourceInvalidation(RenderObject*);
+  void markForLayoutAndResourceInvalidation(RenderObject*,
+                                            bool needsBoundariesUpdate = true);
 };
 }
 

@@ -28,6 +28,7 @@
 #include "Attribute.h"
 #include "CSSPropertyNames.h"
 #include "RenderForeignObject.h"
+#include "RenderSVGResource.h"
 #include "SVGLength.h"
 #include "SVGNames.h"
 #include <wtf/Assertions.h>
@@ -85,14 +86,14 @@ void SVGForeignObjectElement::svgAttributeChanged(
 
   if (SVGStyledTransformableElement::isKnownAttribute(attrName)) {
     renderer->setNeedsTransformUpdate();
-    renderer->setNeedsLayout(true);
+    RenderSVGResource::markForLayoutAndParentResourceInvalidation(renderer);
     return;
   }
 
   if (isLengthAttribute || SVGTests::isKnownAttribute(attrName) ||
       SVGLangSpace::isKnownAttribute(attrName) ||
       SVGExternalResourcesRequired::isKnownAttribute(attrName))
-    renderer->setNeedsLayout(true);
+    RenderSVGResource::markForLayoutAndParentResourceInvalidation(renderer);
 }
 
 void SVGForeignObjectElement::synchronizeProperty(
