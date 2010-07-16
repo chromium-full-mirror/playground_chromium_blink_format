@@ -1219,6 +1219,8 @@ void CanvasRenderingContext2D::drawImage(HTMLCanvasElement* sourceCanvas,
   if (!sourceCanvas->originClean())
     canvas()->setOriginTainted();
 
+  sourceCanvas->makeRenderingResultsAvailable();
+
   c->drawImage(buffer->image(), DeviceColorSpace, destRect, sourceRect,
                state().m_globalComposite);
   willDraw(destRect);  // This call comes after drawImage, since the buffer we

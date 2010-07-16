@@ -305,6 +305,16 @@ bool HTMLCanvasElement::is3D() const {
 }
 #endif
 
+void HTMLCanvasElement::makeRenderingResultsAvailable() {
+#if ENABLE(3D_CANVAS)
+  if (is3D()) {
+    WebGLRenderingContext* context3d =
+        reinterpret_cast<WebGLRenderingContext*>(renderingContext());
+    context3d->paintRenderingResultsToCanvas();
+  }
+#endif
+}
+
 void HTMLCanvasElement::recalcStyle(StyleChange change) {
   HTMLElement::recalcStyle(change);
 
@@ -334,6 +344,8 @@ String HTMLCanvasElement::toDataURL(const String& mimeType,
     return String("data:,");
 
   String lowercaseMimeType = mimeType.lower();
+
+  makeRenderingResultsAvailable();
 
   // FIXME: Make isSupportedImageMIMETypeForEncoding threadsafe (to allow this
   // method to be used on a worker thread).

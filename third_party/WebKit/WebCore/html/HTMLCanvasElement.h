@@ -32,10 +32,6 @@
 #include "HTMLElement.h"
 #include "IntSize.h"
 
-#if ENABLE(3D_CANVAS)
-#include "GraphicsContext3D.h"
-#endif
-
 namespace WebCore {
 
 class CanvasContextAttributes;
@@ -118,6 +114,8 @@ class HTMLCanvasElement : public HTMLElement {
 #if ENABLE(3D_CANVAS)
   bool is3D() const;
 #endif
+
+  void makeRenderingResultsAvailable();
 
  private:
   HTMLCanvasElement(const QualifiedName&, Document*);
