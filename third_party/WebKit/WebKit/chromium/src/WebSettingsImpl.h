@@ -88,6 +88,7 @@ class WebSettingsImpl : public WebSettings {
   virtual void setEditingBehavior(EditingBehavior);
   virtual void setAcceleratedCompositingEnabled(bool);
   virtual void setHTML5ParserEnabled(bool);
+  virtual void setMemoryInfoEnabled(bool);
 
  private:
   WebCore::Settings* m_settings;

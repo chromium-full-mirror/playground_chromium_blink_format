@@ -31,6 +31,7 @@
 #include "config.h"
 #include "Performance.h"
 
+#include "MemoryInfo.h"
 #include "Navigation.h"
 #include "Timing.h"
 
@@ -47,6 +48,8 @@ Frame* Performance::frame() const {
 }
 
 void Performance::disconnectFrame() {
+  if (m_memory)
+    m_memory = 0;
   if (m_navigation) {
     m_navigation->disconnectFrame();
     m_navigation = 0;
@@ -56,6 +59,11 @@ void Performance::disconnectFrame() {
     m_timing = 0;
   }
   m_frame = 0;
+}
+
+MemoryInfo* Performance::memory() const {
+  m_memory = MemoryInfo::create(m_frame);
+  return m_memory.get();
 }
 
 Navigation* Performance::navigation() const {

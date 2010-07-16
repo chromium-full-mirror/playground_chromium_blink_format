@@ -361,6 +361,9 @@ void WebPreferences::initializeDefaultSettings() {
                        CFSTR(WebKitDNSPrefetchingEnabledPreferenceKey),
                        kCFBooleanTrue);
 
+  CFDictionaryAddValue(defaults, CFSTR(WebKitMemoryInfoEnabledPreferenceKey),
+                       kCFBooleanFalse);
+
   defaultSettings = defaults;
 }
 
@@ -1495,6 +1498,16 @@ HRESULT WebPreferences::setDNSPrefetchingEnabled(BOOL enabled) {
 
 HRESULT WebPreferences::isDNSPrefetchingEnabled(BOOL* enabled) {
   *enabled = boolValueForKey(CFSTR(WebKitDNSPrefetchingEnabledPreferenceKey));
+  return S_OK;
+}
+
+HRESULT WebPreferences::memoryInfoEnabled(BOOL* enabled) {
+  *enabled = boolValueForKey(CFSTR(WebKitMemoryInfoEnabledPreferenceKey));
+  return S_OK;
+}
+
+HRESULT WebPreferences::setMemoryInfoEnabled(BOOL enabled) {
+  setBoolValue(CFSTR(WebKitMemoryInfoEnabledPreferenceKey), enabled);
   return S_OK;
 }
 

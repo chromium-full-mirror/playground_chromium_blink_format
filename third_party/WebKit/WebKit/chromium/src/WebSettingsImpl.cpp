@@ -242,4 +242,8 @@ void WebSettingsImpl::setHTML5ParserEnabled(bool enabled) {
   m_settings->setHTML5ParserEnabled(enabled);
 }
 
+void WebSettingsImpl::setMemoryInfoEnabled(bool enabled) {
+  m_settings->setMemoryInfoEnabled(enabled);
+}
+
 }  // namespace WebKit

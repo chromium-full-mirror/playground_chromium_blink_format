@@ -131,6 +131,7 @@
 #define WebKitPaginateDuringLayoutEnabledPreferenceKey \
   @"WebKitPaginateDuringLayoutEnabled"
 #define WebKitDNSPrefetchingEnabledPreferenceKey @"WebKitDNSPrefetchingEnabled"
+#define WebKitMemoryInfoEnabledPreferenceKey @"WebKitMemoryInfoEnabled"
 
 // These are private both because callers should be using the cover methods and
 // because the

@@ -184,3 +184,5 @@
   "WebKitCustomDragCursorsEnabled"
 
 #define WebKitDNSPrefetchingEnabledPreferenceKey "WebKitDNSPrefetchingEnabled"
+
+#define WebKitMemoryInfoEnabledPreferenceKey "WebKitMemoryInfoEnabled"
