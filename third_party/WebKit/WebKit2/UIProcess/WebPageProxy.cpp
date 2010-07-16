@@ -259,6 +259,10 @@ void WebPageProxy::goToBackForwardItem(WebBackForwardListItem* item) {
                   CoreIPC::In(item->itemID()));
 }
 
+void WebPageProxy::didChangeBackForwardList() {
+  m_loaderClient.didChangeBackForwardList(this);
+}
+
 void WebPageProxy::setFocused(bool isFocused) {
   if (!isValid())
     return;

@@ -112,6 +112,7 @@ class WebPageProxy : public RefCounted<WebPageProxy> {
   bool canGoBack() const;
 
   void goToBackForwardItem(WebBackForwardListItem*);
+  void didChangeBackForwardList();
 
   void setFocused(bool isFocused);
   void setActive(bool active);
