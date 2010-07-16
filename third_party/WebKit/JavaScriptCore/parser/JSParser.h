@@ -34,9 +34,10 @@ class SourceCode;
 
 enum {
   UnaryOpTokenFlag = 64,
-  BinaryOpTokenPrecedenceShift = 7,
+  KeywordTokenFlag = 128,
+  BinaryOpTokenPrecedenceShift = 8,
   BinaryOpTokenAllowsInPrecedenceAdditionalShift = 4,
-  BinaryOpTokenPrecedenceMask = 15 << BinaryOpTokenPrecedenceShift
+  BinaryOpTokenPrecedenceMask = 15 << BinaryOpTokenPrecedenceShift,
 };
 
 #define BINARY_OP_PRECEDENCE(prec)            \
@@ -48,7 +49,7 @@ enum {
               BinaryOpTokenAllowsInPrecedenceAdditionalShift))
 
 enum JSTokenType {
-  NULLTOKEN,
+  NULLTOKEN = KeywordTokenFlag,
   TRUETOKEN,
   FALSETOKEN,
   BREAK,
@@ -74,7 +75,7 @@ enum JSTokenType {
   FINALLY,
   DEBUGGER,
   ELSE,
-  OPENBRACE,
+  OPENBRACE = 0,
   CLOSEBRACE,
   OPENPAREN,
   CLOSEPAREN,
@@ -111,9 +112,9 @@ enum JSTokenType {
   TILDE = 3 | UnaryOpTokenFlag,
   AUTOPLUSPLUS = 4 | UnaryOpTokenFlag,
   AUTOMINUSMINUS = 5 | UnaryOpTokenFlag,
-  TYPEOF = 6 | UnaryOpTokenFlag,
-  VOIDTOKEN = 7 | UnaryOpTokenFlag,
-  DELETETOKEN = 8 | UnaryOpTokenFlag,
+  TYPEOF = 6 | UnaryOpTokenFlag | KeywordTokenFlag,
+  VOIDTOKEN = 7 | UnaryOpTokenFlag | KeywordTokenFlag,
+  DELETETOKEN = 8 | UnaryOpTokenFlag | KeywordTokenFlag,
   OR = 0 | BINARY_OP_PRECEDENCE(1),
   AND = 1 | BINARY_OP_PRECEDENCE(2),
   BITOR = 2 | BINARY_OP_PRECEDENCE(3),
@@ -127,8 +128,8 @@ enum JSTokenType {
   GT = 10 | BINARY_OP_PRECEDENCE(7),
   LE = 11 | BINARY_OP_PRECEDENCE(7),
   GE = 12 | BINARY_OP_PRECEDENCE(7),
-  INSTANCEOF = 13 | BINARY_OP_PRECEDENCE(7),
-  INTOKEN = 14 | IN_OP_PRECEDENCE(7),
+  INSTANCEOF = 13 | BINARY_OP_PRECEDENCE(7) | KeywordTokenFlag,
+  INTOKEN = 14 | IN_OP_PRECEDENCE(7) | KeywordTokenFlag,
   LSHIFT = 15 | BINARY_OP_PRECEDENCE(8),
   RSHIFT = 16 | BINARY_OP_PRECEDENCE(8),
   URSHIFT = 17 | BINARY_OP_PRECEDENCE(8),
