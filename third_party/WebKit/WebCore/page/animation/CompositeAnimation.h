@@ -77,7 +77,9 @@ class CompositeAnimation : public RefCounted<CompositeAnimation> {
   }
 
   void setAnimating(bool);
-  bool isAnimatingProperty(int property, bool isRunningNow) const;
+  bool isAnimatingProperty(int property,
+                           bool acceleratedOnly,
+                           bool isRunningNow) const;
 
   PassRefPtr<KeyframeAnimation> getAnimationForProperty(int property) const;
 

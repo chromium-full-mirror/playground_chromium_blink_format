@@ -67,9 +67,12 @@ class AnimationController {
                              double t);       // To be used only for testing
   unsigned numberOfActiveAnimations() const;  // To be used only for testing
 
-  bool isAnimatingPropertyOnRenderer(RenderObject*,
-                                     CSSPropertyID,
-                                     bool isRunningNow = true) const;
+  bool isRunningAnimationOnRenderer(RenderObject*,
+                                    CSSPropertyID,
+                                    bool isRunningNow = true) const;
+  bool isRunningAcceleratedAnimationOnRenderer(RenderObject*,
+                                               CSSPropertyID,
+                                               bool isRunningNow = true) const;
 
   void suspendAnimations(Document*);
   void resumeAnimations(Document*);

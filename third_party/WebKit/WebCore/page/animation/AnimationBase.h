@@ -173,8 +173,11 @@ class AnimationBase : public RefCounted<AnimationBase> {
 
   // Does this animation/transition involve the given property?
   virtual bool affectsProperty(int /*property*/) const { return false; }
-  bool isAnimatingProperty(int property, bool isRunningNow) const {
-    if (m_fallbackAnimating)
+
+  bool isAnimatingProperty(int property,
+                           bool acceleratedOnly,
+                           bool isRunningNow) const {
+    if (acceleratedOnly && !m_isAccelerated)
       return false;
 
     if (isRunningNow)
@@ -229,7 +232,7 @@ class AnimationBase : public RefCounted<AnimationBase> {
 
   void goIntoEndingOrLoopingState();
 
-  bool isFallbackAnimating() const { return m_fallbackAnimating; }
+  bool isAccelerated() const { return m_isAccelerated; }
 
   static bool propertiesEqual(int prop,
                               const RenderStyle* a,
@@ -259,8 +262,7 @@ class AnimationBase : public RefCounted<AnimationBase> {
 
   RefPtr<Animation> m_animation;
   CompositeAnimation* m_compAnim;
-  bool m_fallbackAnimating;  // true when animating an accelerated property but
-                             // have to fall back to software
+  bool m_isAccelerated;
   bool m_transformFunctionListValid;
   double m_totalDuration, m_nextIterationDuration;
 

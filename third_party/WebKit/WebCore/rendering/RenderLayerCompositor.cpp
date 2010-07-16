@@ -1357,10 +1357,10 @@ bool RenderLayerCompositor::requiresCompositingForIFrame(
 bool RenderLayerCompositor::requiresCompositingForAnimation(
     RenderObject* renderer) const {
   if (AnimationController* animController = renderer->animation()) {
-    return (animController->isAnimatingPropertyOnRenderer(renderer,
-                                                          CSSPropertyOpacity) &&
+    return (animController->isRunningAnimationOnRenderer(renderer,
+                                                         CSSPropertyOpacity) &&
             inCompositingMode()) ||
-           animController->isAnimatingPropertyOnRenderer(
+           animController->isRunningAnimationOnRenderer(
                renderer, CSSPropertyWebkitTransform);
   }
   return false;

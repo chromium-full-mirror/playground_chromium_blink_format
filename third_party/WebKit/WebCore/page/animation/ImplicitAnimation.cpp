@@ -297,7 +297,7 @@ double ImplicitAnimation::timeToNextService() {
   // animation we
   // only need service at the end of the transition.
   if (animationOfPropertyIsAccelerated(m_animatingProperty) &&
-      !isFallbackAnimating()) {
+      isAccelerated()) {
     bool isLooping;
     getTimeToNextEvent(t, isLooping);
   }
