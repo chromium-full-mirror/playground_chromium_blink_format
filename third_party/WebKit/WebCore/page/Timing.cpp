@@ -107,7 +107,7 @@ unsigned long long Timing::domainLookupStart() const {
   if (dnsStart < 0)
     return fetchStart();
 
-  return toIntegerMilliseconds(timing->requestTime + dnsStart);
+  return toIntegerMilliseconds(timing->requestTime) + dnsStart;
 }
 
 unsigned long long Timing::domainLookupEnd() const {
@@ -122,7 +122,7 @@ unsigned long long Timing::domainLookupEnd() const {
   if (dnsEnd < 0)
     return domainLookupStart();
 
-  return toIntegerMilliseconds(timing->requestTime + dnsEnd);
+  return toIntegerMilliseconds(timing->requestTime) + dnsEnd;
 }
 
 unsigned long long Timing::connectStart() const {
@@ -137,7 +137,7 @@ unsigned long long Timing::connectStart() const {
   if (connectStart < 0)
     return domainLookupEnd();
 
-  return toIntegerMilliseconds(timing->requestTime + connectStart);
+  return toIntegerMilliseconds(timing->requestTime) + connectStart;
 }
 
 unsigned long long Timing::connectEnd() const {
@@ -152,7 +152,7 @@ unsigned long long Timing::connectEnd() const {
   if (connectEnd < 0)
     return connectStart();
 
-  return toIntegerMilliseconds(timing->requestTime + connectEnd);
+  return toIntegerMilliseconds(timing->requestTime) + connectEnd;
 }
 
 unsigned long long Timing::requestStart() const {
@@ -161,7 +161,7 @@ unsigned long long Timing::requestStart() const {
     return 0;
 
   ASSERT(timing->sendStart >= 0);
-  return toIntegerMilliseconds(timing->requestTime + timing->sendStart);
+  return toIntegerMilliseconds(timing->requestTime) + timing->sendStart;
 }
 
 unsigned long long Timing::requestEnd() const {
@@ -170,7 +170,7 @@ unsigned long long Timing::requestEnd() const {
     return 0;
 
   ASSERT(timing->sendEnd >= 0);
-  return toIntegerMilliseconds(timing->requestTime + timing->sendEnd);
+  return toIntegerMilliseconds(timing->requestTime) + timing->sendEnd;
 }
 
 unsigned long long Timing::responseStart() const {
@@ -185,7 +185,7 @@ unsigned long long Timing::responseStart() const {
   // is basically equivalent. But for some responses, particularly those with
   // headers larger than a single packet, this time will be too late.
   ASSERT(timing->receiveHeadersEnd >= 0);
-  return toIntegerMilliseconds(timing->requestTime + timing->receiveHeadersEnd);
+  return toIntegerMilliseconds(timing->requestTime) + timing->receiveHeadersEnd;
 }
 
 unsigned long long Timing::responseEnd() const {
