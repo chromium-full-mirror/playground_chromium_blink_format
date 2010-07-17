@@ -541,6 +541,11 @@ void ChromeClientImpl::runOpenPanel(Frame* frame,
 
   WebFileChooserParams params;
   params.multiSelect = fileChooser->allowsMultipleFiles();
+#if ENABLE(DIRECTORY_UPLOAD)
+  params.directory = fileChooser->allowsDirectoryUpload();
+#else
+  params.directory = false;
+#endif
   params.acceptTypes = fileChooser->acceptTypes();
   params.selectedFiles = fileChooser->filenames();
   if (params.selectedFiles.size() > 0)
