@@ -118,6 +118,7 @@ class EditorClientWx : public EditorClient {
   virtual String getAutoCorrectSuggestionForMisspelledWord(
       const WebCore::String&);
 
+  virtual void willSetInputMethodState();
   virtual void setInputMethodState(bool enabled);
 
  private:

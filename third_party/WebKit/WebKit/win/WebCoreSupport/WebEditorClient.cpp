@@ -875,6 +875,8 @@ void WebEditorClient::getGuessesForWord(const String& word,
   }
 }
 
+void WebEditorClient::willSetInputMethodState() {}
+
 void WebEditorClient::setInputMethodState(bool enabled) {
   m_webView->setInputMethodState(enabled);
 }

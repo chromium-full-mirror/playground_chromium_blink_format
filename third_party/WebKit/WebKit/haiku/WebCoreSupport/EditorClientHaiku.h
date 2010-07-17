@@ -116,6 +116,7 @@ class EditorClientHaiku : public EditorClient {
   virtual void showSpellingUI(bool show);
   virtual bool spellingUIIsShowing();
   virtual void getGuessesForWord(const String&, Vector<String>& guesses);
+  virtual void willSetInputMethodState();
   virtual void setInputMethodState(bool enabled);
 
   bool isEditing() const;

@@ -586,6 +586,7 @@ class EmptyEditorClient : public EditorClient, public Noncopyable {
   virtual void showSpellingUI(bool) {}
   virtual bool spellingUIIsShowing() { return false; }
   virtual void getGuessesForWord(const String&, Vector<String>&) {}
+  virtual void willSetInputMethodState() {}
   virtual void setInputMethodState(bool) {}
 };
 
