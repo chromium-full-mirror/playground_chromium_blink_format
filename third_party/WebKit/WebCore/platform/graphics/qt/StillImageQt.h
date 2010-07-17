@@ -38,6 +38,10 @@ class StillImage : public Image {
     return adoptRef(new StillImage(pixmap));
   }
 
+  static PassRefPtr<StillImage> createForRendering(const QPixmap* pixmap) {
+    return adoptRef(new StillImage(pixmap));
+  }
+
   // FIXME: StillImages are underreporting decoded sizes and will be unable
   // to prune because these functions are not implemented yet.
   virtual void destroyDecodedData(bool destroyAll = true) {
@@ -55,8 +59,11 @@ class StillImage : public Image {
 
  private:
   StillImage(const QPixmap& pixmap);
+  StillImage(const QPixmap* pixmap);
+  ~StillImage();
 
-  QPixmap m_pixmap;
+  const QPixmap* m_pixmap;
+  bool m_ownsPixmap;
 };
 }
 
