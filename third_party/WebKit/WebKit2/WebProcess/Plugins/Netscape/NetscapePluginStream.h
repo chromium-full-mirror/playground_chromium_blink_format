@@ -69,6 +69,7 @@ class NetscapePluginStream : public RefCounted<NetscapePluginStream> {
   void sendJavaScriptStream(const WebCore::String& requestURLString,
                             const WebCore::String& result);
 
+  void stop(NPReason);
   NPError destroy(NPReason);
 
  private:
@@ -82,7 +83,6 @@ class NetscapePluginStream : public RefCounted<NetscapePluginStream> {
              uint32_t lastModifiedTime,
              const WebCore::String& mimeType,
              const WebCore::String& headers);
-  void stop(NPReason);
 
   void cancel();
   void notifyAndDestroyStream(NPReason);
