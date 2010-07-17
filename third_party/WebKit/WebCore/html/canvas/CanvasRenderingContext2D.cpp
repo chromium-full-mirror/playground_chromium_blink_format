@@ -552,9 +552,11 @@ void CanvasRenderingContext2D::lineTo(float x, float y) {
     return;
   if (!state().m_invertibleCTM)
     return;
+
+  FloatPoint p1 = FloatPoint(x, y);
   if (!m_path.hasCurrentPoint())
-    m_path.moveTo(FloatPoint(x, y));
-  else
+    m_path.moveTo(p1);
+  else if (p1 != m_path.currentPoint())
     m_path.addLineTo(FloatPoint(x, y));
 }
 
@@ -588,14 +590,14 @@ void CanvasRenderingContext2D::bezierCurveTo(float cp1x,
                           FloatPoint(x, y));
 }
 
-void CanvasRenderingContext2D::arcTo(float x0,
-                                     float y0,
-                                     float x1,
+void CanvasRenderingContext2D::arcTo(float x1,
                                      float y1,
+                                     float x2,
+                                     float y2,
                                      float r,
                                      ExceptionCode& ec) {
   ec = 0;
-  if (!isfinite(x0) | !isfinite(y0) | !isfinite(x1) | !isfinite(y1) |
+  if (!isfinite(x1) | !isfinite(y1) | !isfinite(x2) | !isfinite(y2) |
       !isfinite(r))
     return;
 
@@ -603,9 +605,17 @@ void CanvasRenderingContext2D::arcTo(float x0,
     ec = INDEX_SIZE_ERR;
     return;
   }
+
   if (!state().m_invertibleCTM)
     return;
-  m_path.addArcTo(FloatPoint(x0, y0), FloatPoint(x1, y1), r);
+
+  FloatPoint p1 = FloatPoint(x1, y1);
+  FloatPoint p2 = FloatPoint(x2, y2);
+
+  if (p1 == m_path.currentPoint() || p1 == p2 || !r)
+    lineTo(x1, y1);
+  else
+    m_path.addArcTo(p1, p2, r);
 }
 
 void CanvasRenderingContext2D::arc(float x,

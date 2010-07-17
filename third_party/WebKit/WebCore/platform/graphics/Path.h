@@ -123,6 +123,7 @@ class Path : public FastAllocBase {
   // Note the Path can be empty (isEmpty() == true) and still have a current
   // point.
   bool hasCurrentPoint() const;
+  FloatPoint currentPoint() const;
 
   void moveTo(const FloatPoint&);
   void addLineTo(const FloatPoint&);
