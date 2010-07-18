@@ -316,10 +316,15 @@ static bool NPN_Evaluate(NPP npp,
 }
 
 static bool NPN_GetProperty(NPP npp,
-                            NPObject* npobj,
+                            NPObject* npObject,
                             NPIdentifier propertyName,
                             NPVariant* result) {
-  notImplemented();
+  if (npObject->_class->hasProperty && npObject->_class->getProperty) {
+    if (npObject->_class->hasProperty(npObject, propertyName))
+      return npObject->_class->getProperty(npObject, propertyName, result);
+  }
+
+  VOID_TO_NPVARIANT(*result);
   return false;
 }
 
@@ -339,9 +344,11 @@ static bool NPN_RemoveProperty(NPP npp,
 }
 
 static bool NPN_HasProperty(NPP npp,
-                            NPObject* npobj,
+                            NPObject* npObject,
                             NPIdentifier propertyName) {
-  notImplemented();
+  if (npObject->_class->hasProperty)
+    return npObject->_class->hasProperty(npObject, propertyName);
+
   return false;
 }
 
@@ -351,7 +358,7 @@ static bool NPN_HasMethod(NPP npp, NPObject* npobj, NPIdentifier methodName) {
 }
 
 static void NPN_ReleaseVariantValue(NPVariant* variant) {
-  notImplemented();
+  releaseNPVariantValue(variant);
 }
 
 static void NPN_SetException(NPObject* npobj, const NPUTF8* message) {
