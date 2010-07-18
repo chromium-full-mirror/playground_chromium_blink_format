@@ -100,6 +100,8 @@ class PluginView : public WebCore::Widget,
                        const WebCore::String& target,
                        bool allowPopups);
   virtual void cancelStreamLoad(uint64_t streamID);
+  virtual NPObject* windowScriptNPObject();
+  virtual NPObject* pluginElementNPObject();
 
   // WebFrame::LoadListener
   virtual void didFinishLoad(WebFrame*);

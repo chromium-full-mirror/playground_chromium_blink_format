@@ -58,6 +58,10 @@ class NetscapePlugin : public Plugin {
                void* notificationData);
   NPError destroyStream(NPStream*, NPReason);
 
+  // These return retained objects.
+  NPObject* windowScriptNPObject();
+  NPObject* pluginElementNPObject();
+
   void cancelStreamLoad(NetscapePluginStream*);
   void removePluginStream(NetscapePluginStream*);
 
