@@ -25,6 +25,7 @@
 
 #include "NetscapeBrowserFuncs.h"
 
+#include "NPRuntimeUtilities.h"
 #include "NetscapePlugin.h"
 #include "NotImplemented.h"
 #include <WebCore/IdentifierRep.h>
@@ -275,27 +276,16 @@ static int32_t NPN_IntFromIdentifier(NPIdentifier identifier) {
 }
 
 static NPObject* NPN_CreateObject(NPP npp, NPClass* npClass) {
-  ASSERT(npClass);
-
-  NPObject* object;
-  if (npClass->allocate)
-    object = npClass->allocate(npp, npClass);
-  else
-    object = static_cast<NPObject*>(NPN_MemAlloc(sizeof(NPObject)));
-
-  object->_class = npClass;
-  object->referenceCount = 1;
-
-  return object;
+  return createNPObject(npp, npClass);
 }
 
-static NPObject* NPN_RetainObject(NPObject* npobj) {
-  notImplemented();
-  return 0;
+static NPObject* NPN_RetainObject(NPObject* npObject) {
+  retainNPObject(npObject);
+  return npObject;
 }
 
-static void NPN_ReleaseObject(NPObject* npobj) {
-  notImplemented();
+static void NPN_ReleaseObject(NPObject* npObject) {
+  releaseNPObject(npObject);
 }
 
 static bool NPN_Invoke(NPP npp,
