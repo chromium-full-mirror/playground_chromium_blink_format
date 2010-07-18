@@ -52,7 +52,8 @@ InjectedBundlePage::InjectedBundlePage(WKBundlePageRef page)
       _didClearWindowForFrame};
   WKBundlePageSetLoaderClient(m_page, &loaderClient);
 
-  WKBundlePageUIClient uiClient = {0, this, _addMessageToConsole};
+  WKBundlePageUIClient uiClient = {0, this, _addMessageToConsole,
+                                   _setStatusbarText};
   WKBundlePageSetUIClient(m_page, &uiClient);
 }
 
@@ -217,12 +218,29 @@ void InjectedBundlePage::_addMessageToConsole(WKBundlePageRef page,
       ->addMessageToConsole(message, lineNumber);
 }
 
+void InjectedBundlePage::_setStatusbarText(WKBundlePageRef page,
+                                           WKStringRef statusbarText,
+                                           const void* clientInfo) {
+  static_cast<InjectedBundlePage*>(const_cast<void*>(clientInfo))
+      ->setStatusbarText(statusbarText);
+}
+
 void InjectedBundlePage::addMessageToConsole(WKStringRef message,
                                              uint32_t lineNumber) {
   // FIXME: Strip file: urls.
   OwnPtr<Vector<char>> utf8Message = WKStringToUTF8(message);
   InjectedBundle::shared().os() << "CONSOLE MESSAGE: line " << lineNumber
                                 << ": " << utf8Message->data() << "\n";
+}
+
+void InjectedBundlePage::setStatusbarText(WKStringRef statusbarText) {
+  if (!InjectedBundle::shared().layoutTestController()->dumpStatusCallbacks())
+    return;
+
+  OwnPtr<Vector<char>> utf8StatusbarText = WKStringToUTF8(statusbarText);
+  InjectedBundle::shared().os()
+      << "UI DELEGATE STATUS CALLBACK: setStatusText:" << utf8StatusbarText
+      << "\n";
 }
 
 }  // namespace WTR

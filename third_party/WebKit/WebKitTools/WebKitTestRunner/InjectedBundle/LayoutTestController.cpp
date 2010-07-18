@@ -42,6 +42,7 @@ PassRefPtr<LayoutTestController> LayoutTestController::create(
 
 LayoutTestController::LayoutTestController(const std::string& testPathOrURL)
     : m_dumpAsText(false),
+      m_dumpStatusCallbacks(false),
       m_waitToDump(false),
       m_testRepaint(false),
       m_testRepaintSweepHorizontally(false),
@@ -144,6 +145,18 @@ static JSValueRef dumpAsTextCallback(JSContextRef context,
   LayoutTestController* controller =
       static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
   controller->setDumpAsText(true);
+  return JSValueMakeUndefined(context);
+}
+
+static JSValueRef dumpStatusCallbacksCallback(JSContextRef context,
+                                              JSObjectRef function,
+                                              JSObjectRef thisObject,
+                                              size_t argumentCount,
+                                              const JSValueRef arguments[],
+                                              JSValueRef* exception) {
+  LayoutTestController* controller =
+      static_cast<LayoutTestController*>(JSObjectGetPrivate(thisObject));
+  controller->setDumpStatusCallbacks(true);
   return JSValueMakeUndefined(context);
 }
 
@@ -292,6 +305,8 @@ JSStaticFunction* LayoutTestController::staticFunctions() {
       {"display", displayCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"dumpAsText", dumpAsTextCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"dumpStatusCallbacks", dumpStatusCallbacksCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"notifyDone", notifyDoneCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
