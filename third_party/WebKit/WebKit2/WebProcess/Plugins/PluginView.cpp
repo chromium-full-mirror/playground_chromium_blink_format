@@ -37,6 +37,7 @@
 #include <WebCore/RenderLayer.h>
 #include <WebCore/ScrollView.h>
 
+using namespace JSC;
 using namespace WebCore;
 
 namespace WebKit {
@@ -226,7 +227,8 @@ PluginView::PluginView(WebCore::HTMLPlugInElement* pluginElement,
       m_isWaitingUntilMediaCanStart(false),
       m_pendingURLRequestsTimer(RunLoop::main(),
                                 this,
-                                &PluginView::pendingURLRequestsTimerFired) {}
+                                &PluginView::pendingURLRequestsTimerFired),
+      m_npJSObjectMap(this) {}
 
 PluginView::~PluginView() {
   if (m_isWaitingUntilMediaCanStart)
@@ -242,8 +244,15 @@ PluginView::~PluginView() {
   if (m_plugin && m_isInitialized)
     m_plugin->destroy();
 
+  // Invalidate the NPObject map.
+  m_npJSObjectMap.invalidate();
+
   // Cancel all streams.
   cancelAllStreams();
+}
+
+Frame* PluginView::frame() {
+  return m_pluginElement->document()->frame();
 }
 
 void PluginView::initializePlugin() {
@@ -558,13 +567,26 @@ void PluginView::cancelStreamLoad(uint64_t streamID) {
 }
 
 NPObject* PluginView::windowScriptNPObject() {
-  // FIXME: Implement.
-  return 0;
+  if (!frame())
+    return 0;
+
+  // FIXME: Handle JavaScript being disabled.
+  ASSERT(frame()->script()->canExecuteScripts(NotAboutToExecuteScript));
+
+  return m_npJSObjectMap.getOrCreateObject(
+      frame()->script()->windowShell(pluginWorld())->window());
 }
 
 NPObject* PluginView::pluginElementNPObject() {
-  // FIXME: Implement.
-  return 0;
+  if (!frame())
+    return 0;
+
+  // FIXME: Handle JavaScript being disabled.
+  JSObject* object =
+      frame()->script()->jsObjectForPluginElement(m_pluginElement);
+  ASSERT(object);
+
+  return m_npJSObjectMap.getOrCreateObject(object);
 }
 
 void PluginView::didFinishLoad(WebFrame* webFrame) {
