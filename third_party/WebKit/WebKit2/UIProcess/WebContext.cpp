@@ -167,4 +167,11 @@ void WebContext::getStatistics(WKContextStatistics* statistics) {
     (*it)->getStatistics(statistics);
 }
 
+void WebContext::setAdditionalPluginPath(const WebCore::String& pluginPath) {
+  Vector<String> pluginPaths;
+  pluginPaths.append(pluginPath);
+
+  m_pluginInfoStore.setAdditionalPluginPaths(pluginPaths);
+}
+
 }  // namespace WebKit

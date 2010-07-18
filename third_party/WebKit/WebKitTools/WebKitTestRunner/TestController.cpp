@@ -27,6 +27,7 @@
 
 #include "PlatformWebView.h"
 #include "TestInvocation.h"
+#include <WebKit2/WKContextPrivate.h>
 #include <getopt.h>
 
 namespace WTR {
@@ -96,6 +97,8 @@ void TestController::initialize(int argc, const char* argv[]) {
   WKContextInjectedBundleClient injectedBundlePathClient = {
       0, this, _didRecieveMessageFromInjectedBundle};
   WKContextSetInjectedBundleClient(m_context.get(), &injectedBundlePathClient);
+
+  _WKContextSetAdditionalPluginPath(m_context.get(), testPluginPath().get());
 
   m_pageNamespace.adopt(WKPageNamespaceCreate(m_context.get()));
   m_mainWebView = new PlatformWebView(m_pageNamespace.get());
