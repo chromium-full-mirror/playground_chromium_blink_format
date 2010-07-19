@@ -99,8 +99,17 @@ static void sizeWebViewForCurrentTest(char* pathOrURL) {
     TestController::shared().mainWebView()->resizeTo(normalWidth, normalHeight);
 }
 
+void TestInvocation::resetPreferencesToConsistentValues() {
+  WKPreferencesRef preferences =
+      WKContextGetPreferences(TestController::shared().context());
+
+  WKPreferencesSetOfflineWebApplicationCacheEnabled(preferences, true);
+}
+
 void TestInvocation::invoke() {
   sizeWebViewForCurrentTest(m_pathOrURL);
+  resetPreferencesToConsistentValues();
+
   WKRetainPtr<WKStringRef> message(
       AdoptWK, WKStringCreateWithCFString(CFSTR("BeginTest")));
   WKContextPostMessageToInjectedBundle(TestController::shared().context(),

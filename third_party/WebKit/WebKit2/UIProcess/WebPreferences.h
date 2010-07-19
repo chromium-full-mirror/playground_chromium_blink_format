@@ -59,6 +59,9 @@ class WebPreferences : public RefCounted<WebPreferences> {
   void setLoadsImagesAutomatically(bool);
   bool loadsImagesAutomatically() const;
 
+  void setOfflineWebApplicationCacheEnabled(bool);
+  bool offlineWebApplicationCacheEnabled() const;
+
  private:
   WebPreferences();
   WebPreferences(WebPreferences*);
