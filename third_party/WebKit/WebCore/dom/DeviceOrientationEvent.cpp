@@ -32,6 +32,8 @@
 
 namespace WebCore {
 
+DeviceOrientationEvent::~DeviceOrientationEvent() {}
+
 DeviceOrientationEvent::DeviceOrientationEvent()
     : m_orientation(DeviceOrientation::create()) {}
 
