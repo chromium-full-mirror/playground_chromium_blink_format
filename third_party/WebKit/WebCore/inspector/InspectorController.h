@@ -158,7 +158,8 @@ class InspectorController
   void addMessageToConsole(MessageSource,
                            MessageType,
                            MessageLevel,
-                           ScriptCallStack*);
+                           ScriptCallStack*,
+                           const String& message = String());
   void addMessageToConsole(MessageSource,
                            MessageType,
                            MessageLevel,

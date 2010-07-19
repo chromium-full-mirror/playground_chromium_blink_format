@@ -130,6 +130,10 @@ class ScriptController {
 
   static bool canAccessFromCurrentOrigin(Frame*);
 
+#if ENABLE(INSPECTOR)
+  static void setCaptureCallStackForUncaughtExceptions(bool);
+#endif
+
   bool canExecuteScripts(ReasonForCallingCanExecuteScripts);
 
   // FIXME: void* is a compile hack.

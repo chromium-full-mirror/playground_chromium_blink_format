@@ -64,7 +64,8 @@ enum MessageType {
   StartGroupMessageType,
   StartGroupCollapsedMessageType,
   EndGroupMessageType,
-  AssertMessageType
+  AssertMessageType,
+  UncaughtExceptionMessageType
 };
 
 enum MessageLevel {
@@ -89,7 +90,8 @@ class Console : public RefCounted<Console> {
                   MessageLevel,
                   const String& message,
                   unsigned lineNumber,
-                  const String& sourceURL);
+                  const String& sourceURL,
+                  ScriptCallStack* callStack = 0);
 
   void debug(ScriptCallStack*);
   void error(ScriptCallStack*);

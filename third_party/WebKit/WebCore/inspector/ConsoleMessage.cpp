@@ -81,12 +81,14 @@ ConsoleMessage::ConsoleMessage(MessageSource s,
 ConsoleMessage::ConsoleMessage(MessageSource s,
                                MessageType t,
                                MessageLevel l,
+                               const String& m,
                                ScriptCallStack* callStack,
                                unsigned g,
                                bool storeTrace)
     : m_source(s),
       m_type(t),
-      m_level(l)
+      m_level(l),
+      m_message(m)
 #if ENABLE(INSPECTOR)
       ,
       m_arguments(callStack->at(0).argumentCount()),

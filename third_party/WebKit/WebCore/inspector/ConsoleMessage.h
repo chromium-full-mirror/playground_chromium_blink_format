@@ -57,6 +57,7 @@ class ConsoleMessage : public Noncopyable {
   ConsoleMessage(MessageSource,
                  MessageType,
                  MessageLevel,
+                 const String& m,
                  ScriptCallStack*,
                  unsigned g,
                  bool storeTrace = false);

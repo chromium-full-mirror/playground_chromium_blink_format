@@ -146,7 +146,8 @@ void Console::addMessage(MessageSource source,
                          MessageLevel level,
                          const String& message,
                          unsigned lineNumber,
-                         const String& sourceURL) {
+                         const String& sourceURL,
+                         ScriptCallStack* callStack) {
   Page* page = this->page();
   if (!page)
     return;
@@ -156,8 +157,12 @@ void Console::addMessage(MessageSource source,
                                                   lineNumber, sourceURL);
 
 #if ENABLE(INSPECTOR)
-  page->inspectorController()->addMessageToConsole(source, type, level, message,
-                                                   lineNumber, sourceURL);
+  if (callStack)
+    page->inspectorController()->addMessageToConsole(source, type, level,
+                                                     callStack, message);
+  else
+    page->inspectorController()->addMessageToConsole(
+        source, type, level, message, lineNumber, sourceURL);
 #endif
 
   if (!Console::shouldPrintExceptions())

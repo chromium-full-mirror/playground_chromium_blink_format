@@ -36,6 +36,7 @@
 #include "Frame.h"
 #include "OwnPtr.h"
 #include "Page.h"
+#include "ScriptCallStack.h"
 #include "V8Binding.h"
 #include "V8Proxy.h"
 
@@ -49,15 +50,7 @@ V8ConsoleMessage::V8ConsoleMessage(const String& string,
     : m_string(string), m_sourceID(sourceID), m_lineNumber(lineNumber) {}
 
 void V8ConsoleMessage::dispatchNow(Page* page) {
-  ASSERT(page);
-
-  // Process any delayed messages to make sure that messages
-  // appear in the right order in the console.
-  processDelayed();
-
-  Console* console = page->mainFrame()->domWindow()->console();
-  console->addMessage(JSMessageSource, LogMessageType, ErrorMessageLevel,
-                      m_string, m_lineNumber, m_sourceID);
+  dispatchNow(page, 0);
 }
 
 void V8ConsoleMessage::dispatchLater() {
@@ -114,13 +107,36 @@ void V8ConsoleMessage::handler(v8::Handle<v8::Message> message,
   ASSERT(!errorMessageString.IsEmpty());
   String errorMessage = toWebCoreString(errorMessageString);
 
+  v8::Handle<v8::StackTrace> stackTrace = message->GetStackTrace();
+  OwnPtr<ScriptCallStack> callStack;
+  // Currently stack trace is only collected when inspector is open.
+  if (!stackTrace.IsEmpty()) {
+    v8::Local<v8::Context> context = v8::Context::GetEntered();
+    ScriptState* scriptState = ScriptState::forContext(context);
+    callStack = ScriptCallStack::create(scriptState, stackTrace);
+  }
+
   v8::Handle<v8::Value> resourceName = message->GetScriptResourceName();
   bool useURL = resourceName.IsEmpty() || !resourceName->IsString();
   String resourceNameString =
       useURL ? frame->document()->url() : toWebCoreString(resourceName);
   V8ConsoleMessage consoleMessage(errorMessage, resourceNameString,
                                   message->GetLineNumber());
-  consoleMessage.dispatchNow(page);
+  consoleMessage.dispatchNow(page, callStack.get());
+}
+
+void V8ConsoleMessage::dispatchNow(Page* page, ScriptCallStack* callStack) {
+  ASSERT(page);
+
+  // Process any delayed messages to make sure that messages
+  // appear in the right order in the console.
+  processDelayed();
+
+  Console* console = page->mainFrame()->domWindow()->console();
+  MessageType messageType =
+      callStack ? UncaughtExceptionMessageType : LogMessageType;
+  console->addMessage(JSMessageSource, messageType, ErrorMessageLevel, m_string,
+                      m_lineNumber, m_sourceID, callStack);
 }
 
 }  // namespace WebCore

@@ -132,6 +132,8 @@ static const char* const inspectorAttachedHeightName =
 static const char* const lastActivePanelSettingName = "lastActivePanel";
 static const char* const monitoringXHRSettingName = "xhrMonitor";
 
+int connectedFrontendCount = 0;
+
 const String& InspectorController::frontendSettingsSettingName() {
   DEFINE_STATIC_LOCAL(String, settingName, ("frontendSettings"));
   return settingName;
@@ -327,13 +329,16 @@ bool InspectorController::windowVisible() {
 void InspectorController::addMessageToConsole(MessageSource source,
                                               MessageType type,
                                               MessageLevel level,
-                                              ScriptCallStack* callStack) {
+                                              ScriptCallStack* callStack,
+                                              const String& message) {
   if (!enabled())
     return;
 
-  addConsoleMessage(callStack->state(),
-                    new ConsoleMessage(source, type, level, callStack,
-                                       m_groupLevel, type == TraceMessageType));
+  addConsoleMessage(
+      callStack->state(),
+      new ConsoleMessage(
+          source, type, level, message, callStack, m_groupLevel,
+          type == TraceMessageType || type == UncaughtExceptionMessageType));
 }
 
 void InspectorController::addMessageToConsole(MessageSource source,
@@ -396,7 +401,7 @@ void InspectorController::startGroup(MessageSource source,
       callStack->state(),
       new ConsoleMessage(source, collapsed ? StartGroupCollapsedMessageType
                                            : StartGroupMessageType,
-                         LogMessageLevel, callStack, m_groupLevel));
+                         LogMessageLevel, String(), callStack, m_groupLevel));
 }
 
 void InspectorController::endGroup(MessageSource source,
@@ -536,6 +541,10 @@ void InspectorController::connectFrontend(const ScriptObject& webInspector) {
   m_applicationCacheAgent =
       new InspectorApplicationCacheAgent(this, m_frontend.get());
 #endif
+
+  if (!connectedFrontendCount)
+    ScriptController::setCaptureCallStackForUncaughtExceptions(true);
+  connectedFrontendCount++;
 }
 
 void InspectorController::show() {
@@ -580,6 +589,10 @@ void InspectorController::disconnectFrontend() {
   if (!m_frontend)
     return;
   m_frontend.clear();
+
+  connectedFrontendCount--;
+  if (!connectedFrontendCount)
+    ScriptController::setCaptureCallStackForUncaughtExceptions(false);
 
 #if ENABLE(JAVASCRIPT_DEBUGGER)
   // If the window is being closed with the debugger enabled,

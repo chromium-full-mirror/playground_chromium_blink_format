@@ -386,6 +386,10 @@ PassRefPtr<Bindings::RootObject> ScriptController::createRootObject(
   return rootObject.release();
 }
 
+#if ENABLE(INSPECTOR)
+void ScriptController::setCaptureCallStackForUncaughtExceptions(bool) {}
+#endif
+
 #if ENABLE(NETSCAPE_PLUGIN_API)
 
 NPObject* ScriptController::windowScriptNPObject() {
