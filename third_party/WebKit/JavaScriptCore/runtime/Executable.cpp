@@ -41,18 +41,51 @@ NativeExecutable::~NativeExecutable() {}
 
 VPtrHackExecutable::~VPtrHackExecutable() {}
 
-EvalExecutable::~EvalExecutable() {
-  delete m_evalCodeBlock;
+EvalExecutable::EvalExecutable(ExecState* exec, const SourceCode& source)
+    : ScriptExecutable(exec, source) {}
+
+EvalExecutable::~EvalExecutable() {}
+
+ProgramExecutable::ProgramExecutable(ExecState* exec, const SourceCode& source)
+    : ScriptExecutable(exec, source) {}
+
+ProgramExecutable::~ProgramExecutable() {}
+
+FunctionExecutable::FunctionExecutable(JSGlobalData* globalData,
+                                       const Identifier& name,
+                                       const SourceCode& source,
+                                       bool forceUsesArguments,
+                                       FunctionParameters* parameters,
+                                       int firstLine,
+                                       int lastLine)
+    : ScriptExecutable(globalData, source),
+      m_numVariables(0),
+      m_forceUsesArguments(forceUsesArguments),
+      m_parameters(parameters),
+      m_name(name),
+      m_symbolTable(0) {
+  m_firstLine = firstLine;
+  m_lastLine = lastLine;
 }
 
-ProgramExecutable::~ProgramExecutable() {
-  delete m_programCodeBlock;
+FunctionExecutable::FunctionExecutable(ExecState* exec,
+                                       const Identifier& name,
+                                       const SourceCode& source,
+                                       bool forceUsesArguments,
+                                       FunctionParameters* parameters,
+                                       int firstLine,
+                                       int lastLine)
+    : ScriptExecutable(exec, source),
+      m_numVariables(0),
+      m_forceUsesArguments(forceUsesArguments),
+      m_parameters(parameters),
+      m_name(name),
+      m_symbolTable(0) {
+  m_firstLine = firstLine;
+  m_lastLine = lastLine;
 }
 
-FunctionExecutable::~FunctionExecutable() {
-  delete m_codeBlockForCall;
-  delete m_codeBlockForConstruct;
-}
+FunctionExecutable::~FunctionExecutable() {}
 
 JSObject* EvalExecutable::compileInternal(ExecState* exec,
                                           ScopeChainNode* scopeChainNode) {
@@ -72,11 +105,11 @@ JSObject* EvalExecutable::compileInternal(ExecState* exec,
   JSGlobalObject* globalObject = scopeChain.globalObject();
 
   ASSERT(!m_evalCodeBlock);
-  m_evalCodeBlock = new EvalCodeBlock(this, globalObject, source().provider(),
-                                      scopeChain.localDepth());
+  m_evalCodeBlock = adoptPtr(new EvalCodeBlock(
+      this, globalObject, source().provider(), scopeChain.localDepth()));
   OwnPtr<BytecodeGenerator> generator(adoptPtr(new BytecodeGenerator(
       evalNode.get(), globalObject->debugger(), scopeChain,
-      m_evalCodeBlock->symbolTable(), m_evalCodeBlock)));
+      m_evalCodeBlock->symbolTable(), m_evalCodeBlock.get())));
   generator->generate();
 
   evalNode->destroyData();
@@ -84,7 +117,7 @@ JSObject* EvalExecutable::compileInternal(ExecState* exec,
 #if ENABLE(JIT)
   if (exec->globalData().canUseJIT()) {
     m_jitCodeForCall =
-        JIT::compile(scopeChainNode->globalData, m_evalCodeBlock);
+        JIT::compile(scopeChainNode->globalData, m_evalCodeBlock.get());
 #if !ENABLE(OPCODE_SAMPLING)
     if (!BytecodeGenerator::dumpsGeneratedCode())
       m_evalCodeBlock->discardBytecode();
@@ -128,11 +161,11 @@ JSObject* ProgramExecutable::compileInternal(ExecState* exec,
   ScopeChain scopeChain(scopeChainNode);
   JSGlobalObject* globalObject = scopeChain.globalObject();
 
-  m_programCodeBlock =
-      new ProgramCodeBlock(this, GlobalCode, globalObject, source().provider());
+  m_programCodeBlock = adoptPtr(new ProgramCodeBlock(
+      this, GlobalCode, globalObject, source().provider()));
   OwnPtr<BytecodeGenerator> generator(adoptPtr(new BytecodeGenerator(
       programNode.get(), globalObject->debugger(), scopeChain,
-      &globalObject->symbolTable(), m_programCodeBlock)));
+      &globalObject->symbolTable(), m_programCodeBlock.get())));
   generator->generate();
 
   programNode->destroyData();
@@ -140,7 +173,7 @@ JSObject* ProgramExecutable::compileInternal(ExecState* exec,
 #if ENABLE(JIT)
   if (exec->globalData().canUseJIT()) {
     m_jitCodeForCall =
-        JIT::compile(scopeChainNode->globalData, m_programCodeBlock);
+        JIT::compile(scopeChainNode->globalData, m_programCodeBlock.get());
 #if !ENABLE(OPCODE_SAMPLING)
     if (!BytecodeGenerator::dumpsGeneratedCode())
       m_programCodeBlock->discardBytecode();
@@ -171,11 +204,11 @@ JSObject* FunctionExecutable::compileForCallInternal(
   JSGlobalObject* globalObject = scopeChain.globalObject();
 
   ASSERT(!m_codeBlockForCall);
-  m_codeBlockForCall = new FunctionCodeBlock(
-      this, FunctionCode, source().provider(), source().startOffset(), false);
+  m_codeBlockForCall = adoptPtr(new FunctionCodeBlock(
+      this, FunctionCode, source().provider(), source().startOffset(), false));
   OwnPtr<BytecodeGenerator> generator(adoptPtr(new BytecodeGenerator(
       body.get(), globalObject->debugger(), scopeChain,
-      m_codeBlockForCall->symbolTable(), m_codeBlockForCall)));
+      m_codeBlockForCall->symbolTable(), m_codeBlockForCall.get())));
   generator->generate();
   m_numParametersForCall = m_codeBlockForCall->m_numParameters;
   ASSERT(m_numParametersForCall);
@@ -187,7 +220,7 @@ JSObject* FunctionExecutable::compileForCallInternal(
 #if ENABLE(JIT)
   if (exec->globalData().canUseJIT()) {
     m_jitCodeForCall =
-        JIT::compile(scopeChainNode->globalData, m_codeBlockForCall,
+        JIT::compile(scopeChainNode->globalData, m_codeBlockForCall.get(),
                      &m_jitCodeForCallWithArityCheck);
 #if !ENABLE(OPCODE_SAMPLING)
     if (!BytecodeGenerator::dumpsGeneratedCode())
@@ -219,11 +252,11 @@ JSObject* FunctionExecutable::compileForConstructInternal(
   JSGlobalObject* globalObject = scopeChain.globalObject();
 
   ASSERT(!m_codeBlockForConstruct);
-  m_codeBlockForConstruct = new FunctionCodeBlock(
-      this, FunctionCode, source().provider(), source().startOffset(), true);
+  m_codeBlockForConstruct = adoptPtr(new FunctionCodeBlock(
+      this, FunctionCode, source().provider(), source().startOffset(), true));
   OwnPtr<BytecodeGenerator> generator(adoptPtr(new BytecodeGenerator(
       body.get(), globalObject->debugger(), scopeChain,
-      m_codeBlockForConstruct->symbolTable(), m_codeBlockForConstruct)));
+      m_codeBlockForConstruct->symbolTable(), m_codeBlockForConstruct.get())));
   generator->generate();
   m_numParametersForConstruct = m_codeBlockForConstruct->m_numParameters;
   ASSERT(m_numParametersForConstruct);
@@ -235,7 +268,7 @@ JSObject* FunctionExecutable::compileForConstructInternal(
 #if ENABLE(JIT)
   if (exec->globalData().canUseJIT()) {
     m_jitCodeForConstruct =
-        JIT::compile(scopeChainNode->globalData, m_codeBlockForConstruct,
+        JIT::compile(scopeChainNode->globalData, m_codeBlockForConstruct.get(),
                      &m_jitCodeForConstructWithArityCheck);
 #if !ENABLE(OPCODE_SAMPLING)
     if (!BytecodeGenerator::dumpsGeneratedCode())
@@ -335,10 +368,8 @@ PassOwnPtr<ExceptionInfo> EvalExecutable::reparseExceptionInfo(
 }
 
 void FunctionExecutable::recompile(ExecState*) {
-  delete m_codeBlockForCall;
-  m_codeBlockForCall = 0;
-  delete m_codeBlockForConstruct;
-  m_codeBlockForConstruct = 0;
+  m_codeBlockForCall.clear();
+  m_codeBlockForConstruct.clear();
   m_numParametersForCall = NUM_PARAMETERS_NOT_COMPILED;
   m_numParametersForConstruct = NUM_PARAMETERS_NOT_COMPILED;
 #if ENABLE(JIT)

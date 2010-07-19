@@ -223,8 +223,7 @@ class EvalExecutable : public ScriptExecutable {
 #endif
 
  private:
-  EvalExecutable(ExecState* exec, const SourceCode& source)
-      : ScriptExecutable(exec, source), m_evalCodeBlock(0) {}
+  EvalExecutable(ExecState*, const SourceCode&);
 
   JSObject* compileInternal(ExecState*, ScopeChainNode*);
 
@@ -232,7 +231,7 @@ class EvalExecutable : public ScriptExecutable {
                                                          ScopeChainNode*,
                                                          CodeBlock*);
 
-  EvalCodeBlock* m_evalCodeBlock;
+  OwnPtr<EvalCodeBlock> m_evalCodeBlock;
 };
 
 class ProgramExecutable : public ScriptExecutable {
@@ -264,8 +263,7 @@ class ProgramExecutable : public ScriptExecutable {
 #endif
 
  private:
-  ProgramExecutable(ExecState* exec, const SourceCode& source)
-      : ScriptExecutable(exec, source), m_programCodeBlock(0) {}
+  ProgramExecutable(ExecState*, const SourceCode&);
 
   JSObject* compileInternal(ExecState*, ScopeChainNode*);
 
@@ -273,7 +271,7 @@ class ProgramExecutable : public ScriptExecutable {
                                                          ScopeChainNode*,
                                                          CodeBlock*);
 
-  ProgramCodeBlock* m_programCodeBlock;
+  OwnPtr<ProgramCodeBlock> m_programCodeBlock;
 };
 
 class FunctionExecutable : public ScriptExecutable {
@@ -358,7 +356,7 @@ class FunctionExecutable : public ScriptExecutable {
   SharedSymbolTable* symbolTable() const { return m_symbolTable; }
 
   void recompile(ExecState*);
-  void markAggregate(MarkStack& markStack);
+  void markAggregate(MarkStack&);
   static PassRefPtr<FunctionExecutable> fromGlobalCode(const Identifier&,
                                                        ExecState*,
                                                        Debugger*,
@@ -366,43 +364,20 @@ class FunctionExecutable : public ScriptExecutable {
                                                        JSObject** exception);
 
  private:
-  FunctionExecutable(JSGlobalData* globalData,
+  FunctionExecutable(JSGlobalData*,
                      const Identifier& name,
-                     const SourceCode& source,
+                     const SourceCode&,
                      bool forceUsesArguments,
-                     FunctionParameters* parameters,
+                     FunctionParameters*,
                      int firstLine,
-                     int lastLine)
-      : ScriptExecutable(globalData, source),
-        m_numVariables(0),
-        m_forceUsesArguments(forceUsesArguments),
-        m_parameters(parameters),
-        m_codeBlockForCall(0),
-        m_codeBlockForConstruct(0),
-        m_name(name),
-        m_symbolTable(0) {
-    m_firstLine = firstLine;
-    m_lastLine = lastLine;
-  }
-
-  FunctionExecutable(ExecState* exec,
+                     int lastLine);
+  FunctionExecutable(ExecState*,
                      const Identifier& name,
-                     const SourceCode& source,
+                     const SourceCode&,
                      bool forceUsesArguments,
-                     FunctionParameters* parameters,
+                     FunctionParameters*,
                      int firstLine,
-                     int lastLine)
-      : ScriptExecutable(exec, source),
-        m_numVariables(0),
-        m_forceUsesArguments(forceUsesArguments),
-        m_parameters(parameters),
-        m_codeBlockForCall(0),
-        m_codeBlockForConstruct(0),
-        m_name(name),
-        m_symbolTable(0) {
-    m_firstLine = firstLine;
-    m_lastLine = lastLine;
-  }
+                     int lastLine);
 
   JSObject* compileForCallInternal(ExecState*, ScopeChainNode*);
   JSObject* compileForConstructInternal(ExecState*, ScopeChainNode*);
@@ -415,8 +390,8 @@ class FunctionExecutable : public ScriptExecutable {
   bool m_forceUsesArguments : 1;
 
   RefPtr<FunctionParameters> m_parameters;
-  FunctionCodeBlock* m_codeBlockForCall;
-  FunctionCodeBlock* m_codeBlockForConstruct;
+  OwnPtr<FunctionCodeBlock> m_codeBlockForCall;
+  OwnPtr<FunctionCodeBlock> m_codeBlockForConstruct;
   Identifier m_name;
   SharedSymbolTable* m_symbolTable;
 
