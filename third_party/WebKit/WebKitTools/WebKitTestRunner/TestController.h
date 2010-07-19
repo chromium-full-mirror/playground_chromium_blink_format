@@ -49,6 +49,7 @@ class TestController {
   bool verbose() const { return m_verbose; }
 
   WKStringRef injectedBundlePath() { return m_injectedBundlePath.get(); }
+  WKStringRef testPluginPath() { return m_testPluginPath.get(); }
 
   PlatformWebView* mainWebView() { return m_mainWebView; }
   WKPageNamespaceRef pageNamespace() { return m_pageNamespace.get(); }
@@ -61,8 +62,9 @@ class TestController {
   void runTestingServerLoop();
   void runTest(const char* pathOrURL);
 
+  void platformInitialize();
   void initializeInjectedBundlePath();
-  WKRetainPtr<WKStringRef> testPluginPath();
+  void initializeTestPluginPath();
 
   // WKContextInjectedBundleClient
   static void _didRecieveMessageFromInjectedBundle(WKContextRef context,
@@ -72,15 +74,13 @@ class TestController {
 
   OwnPtr<TestInvocation> m_currentInvocation;
 
-  bool m_dumpTree;
   bool m_dumpPixels;
-  bool m_threaded;
-  bool m_forceComplexText;
   bool m_verbose;
   bool m_printSeparators;
   bool m_usingServerMode;
   std::vector<std::string> m_paths;
   WKRetainPtr<WKStringRef> m_injectedBundlePath;
+  WKRetainPtr<WKStringRef> m_testPluginPath;
 
   PlatformWebView* m_mainWebView;
   WKRetainPtr<WKContextRef> m_context;
