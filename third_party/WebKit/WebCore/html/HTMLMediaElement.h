@@ -96,7 +96,6 @@ class HTMLMediaElement : public HTMLElement,
     NETWORK_EMPTY,
     NETWORK_IDLE,
     NETWORK_LOADING,
-    NETWORK_LOADED,
     NETWORK_NO_SOURCE
   };
   NetworkState networkState() const;
@@ -401,6 +400,7 @@ class HTMLMediaElement : public HTMLElement,
 
   bool m_dispatchingCanPlayEvent : 1;
   bool m_loadInitiatedByUserGesture : 1;
+  bool m_completelyLoaded : 1;
 };
 
 }  // namespace
