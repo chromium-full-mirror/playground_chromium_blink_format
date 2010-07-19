@@ -43,7 +43,7 @@
 #include "MouseEvent.h"
 #include "Page.h"
 #include "Path.h"
-#include "PluginWidget.h"
+#include "PluginViewBase.h"
 #include "RenderTheme.h"
 #include "RenderView.h"
 #include "RenderWidgetProtector.h"
@@ -52,10 +52,6 @@
 
 #if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
 #include "HTMLVideoElement.h"
-#endif
-
-#if USE(ACCELERATED_COMPOSITING)
-#include "PluginWidget.h"
 #endif
 
 namespace WebCore {
@@ -98,8 +94,8 @@ bool RenderEmbeddedObject::requiresLayer() const {
 }
 
 bool RenderEmbeddedObject::allowsAcceleratedCompositing() const {
-  return widget() && widget()->isPluginWidget() &&
-         static_cast<PluginWidget*>(widget())->platformLayer();
+  return widget() && widget()->isPluginViewBase() &&
+         static_cast<PluginViewBase*>(widget())->platformLayer();
 }
 #endif
 

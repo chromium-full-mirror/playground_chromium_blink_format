@@ -43,7 +43,7 @@
 #include "HTMLNames.h"
 #include "InspectorTimelineAgent.h"
 #include "KeyframeList.h"
-#include "PluginWidget.h"
+#include "PluginViewBase.h"
 #include "RenderBox.h"
 #include "RenderIFrame.h"
 #include "RenderImage.h"
@@ -279,9 +279,9 @@ bool RenderLayerBacking::updateGraphicsLayerConfiguration() {
 
   if (renderer()->isEmbeddedObject() &&
       toRenderEmbeddedObject(renderer())->allowsAcceleratedCompositing()) {
-    PluginWidget* pluginWidget = static_cast<PluginWidget*>(
+    PluginViewBase* pluginViewBase = static_cast<PluginViewBase*>(
         toRenderEmbeddedObject(renderer())->widget());
-    m_graphicsLayer->setContentsToMedia(pluginWidget->platformLayer());
+    m_graphicsLayer->setContentsToMedia(pluginViewBase->platformLayer());
   }
 #if ENABLE(VIDEO)
   else if (renderer()->isVideo()) {
