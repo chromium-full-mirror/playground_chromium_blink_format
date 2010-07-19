@@ -79,7 +79,7 @@ class WebPage : public RefCounted<WebPage> {
   void setSize(const WebCore::IntSize&);
   const WebCore::IntSize& size() const { return m_viewSize; }
 
-  DrawingArea* drawingArea() const { return m_drawingArea; }
+  DrawingArea* drawingArea() const { return m_drawingArea.get(); }
 
   // -- Called by the DrawingArea.
   // FIXME: We could genericize these into a DrawingArea client interface. Would
@@ -143,7 +143,7 @@ class WebPage : public RefCounted<WebPage> {
   HashMap<uint64_t, WebFrame*> m_frameMap;
 
   WebCore::IntSize m_viewSize;
-  DrawingArea* m_drawingArea;
+  OwnPtr<DrawingArea> m_drawingArea;
 
   InjectedBundlePageLoaderClient m_loaderClient;
   InjectedBundlePageUIClient m_uiClient;
