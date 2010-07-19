@@ -206,7 +206,8 @@ void BitmapImage::draw(GraphicsContext* ctxt,
     p.setCompositionMode(QPainter::CompositionMode_Source);
     p.fillRect(shadowImage.rect(), shadowColor);
     p.setCompositionMode(QPainter::CompositionMode_DestinationIn);
-    p.drawPixmap(normalizedDst, *image, normalizedSrc);
+    p.drawPixmap(QRect(0, 0, normalizedDst.width(), normalizedDst.height()),
+                 *image, normalizedSrc);
     p.end();
     painter->drawImage(shadowImageRect, shadowImage, normalizedSrc);
   }
