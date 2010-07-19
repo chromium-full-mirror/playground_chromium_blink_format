@@ -38,6 +38,8 @@
 
 namespace WebCore {
 
+struct DocumentLoadTiming;
+class DocumentLoader;
 class Frame;
 class ResourceLoadTiming;
 
@@ -69,7 +71,10 @@ class Timing : public RefCounted<Timing> {
  private:
   Timing(Frame*);
 
+  DocumentLoader* documentLoader() const;
+  DocumentLoadTiming* documentLoadTiming() const;
   ResourceLoadTiming* resourceLoadTiming() const;
+  unsigned long long resourceLoadTimeRelativeToAbsolute(int) const;
 
   Frame* m_frame;
 };

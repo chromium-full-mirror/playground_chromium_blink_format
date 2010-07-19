@@ -234,6 +234,8 @@ class DocumentLoader : public RefCounted<DocumentLoader> {
   void recordMemoryCacheLoadForFutureClientNotification(const String& url);
   void takeMemoryCacheLoadsForClientNotification(Vector<String>& loads);
 
+  DocumentLoadTiming* timing() { return &m_documentLoadTiming; }
+
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
   ApplicationCacheHost* applicationCacheHost() const {
     return m_applicationCacheHost.get();
@@ -325,6 +327,8 @@ class DocumentLoader : public RefCounted<DocumentLoader> {
 
   String m_clientRedirectSourceForHistory;
   bool m_didCreateGlobalHistoryEntry;
+
+  DocumentLoadTiming m_documentLoadTiming;
 
 #if ENABLE(OFFLINE_WEB_APPLICATIONS)
   friend class ApplicationCacheHost;  // for substitute resource delivery

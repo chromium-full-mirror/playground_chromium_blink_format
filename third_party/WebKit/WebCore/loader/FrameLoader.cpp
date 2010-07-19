@@ -511,7 +511,13 @@ void FrameLoader::stopLoading(UnloadEventPolicy unloadEventPolicy,
             m_frame->domWindow()->dispatchEvent(
                 Event::create(eventNames().unloadEvent, false, false),
                 m_frame->domWindow()->document());
-          m_frameLoadTimeline.unloadEventEnd = currentTime();
+          if (m_provisionalDocumentLoader) {
+            DocumentLoadTiming* timing = m_provisionalDocumentLoader->timing();
+            ASSERT(timing->navigationStart);
+            ASSERT(!timing->unloadEventEnd);
+            timing->unloadEventEnd = currentTime();
+            ASSERT(timing->unloadEventEnd >= timing->navigationStart);
+          }
         }
         m_pageDismissalEventBeingDispatched = false;
         if (m_frame->document())
@@ -1654,9 +1660,6 @@ void FrameLoader::loadWithDocumentLoader(DocumentLoader* loader,
   if (m_pageDismissalEventBeingDispatched)
     return;
 
-  m_frameLoadTimeline = FrameLoadTimeline();
-  m_frameLoadTimeline.navigationStart = currentTime();
-
   policyChecker()->setLoadType(type);
   RefPtr<FormState> formState = prpFormState;
   bool isFormSubmission = formState;
@@ -2441,10 +2444,9 @@ void FrameLoader::finishedLoading() {
   // Retain because the stop may release the last reference to it.
   RefPtr<Frame> protect(m_frame);
 
-  ASSERT(!m_frameLoadTimeline.responseEnd);
-  m_frameLoadTimeline.responseEnd = currentTime();
-
   RefPtr<DocumentLoader> dl = activeDocumentLoader();
+  ASSERT(!dl->timing()->responseEnd);
+  dl->timing()->responseEnd = currentTime();
   dl->finishedLoading();
   if (!dl->mainDocumentError().isNull() || !dl->frameLoader())
     return;
@@ -2746,6 +2748,9 @@ void FrameLoader::continueLoadAfterWillSubmitForm() {
         identifier, m_provisionalDocumentLoader.get(),
         m_provisionalDocumentLoader->originalRequest());
   }
+
+  ASSERT(!m_provisionalDocumentLoader->timing()->navigationStart);
+  m_provisionalDocumentLoader->timing()->navigationStart = currentTime();
 
   if (!m_provisionalDocumentLoader->startLoadingMainResource(identifier))
     m_provisionalDocumentLoader->updateLoading();
