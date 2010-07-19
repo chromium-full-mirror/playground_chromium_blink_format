@@ -914,7 +914,7 @@ class CursorTrackedPage : public QWebPage {
 void tst_QWebPage::cursorMovements() {
   CursorTrackedPage* page = new CursorTrackedPage;
   QString content(
-      "<html><body<p id=one>The quick brown fox</p><p id=two>jumps over the "
+      "<html><body><p id=one>The quick brown fox</p><p id=two>jumps over the "
       "lazy dog</p><p>May the source<br/>be with you!</p></body></html>");
   page->mainFrame()->setHtml(content);
 
@@ -1109,7 +1109,7 @@ void tst_QWebPage::cursorMovements() {
 void tst_QWebPage::textSelection() {
   CursorTrackedPage* page = new CursorTrackedPage;
   QString content(
-      "<html><body<p id=one>The quick brown fox</p>"
+      "<html><body><p id=one>The quick brown fox</p>"
       "<p id=two>jumps over the lazy dog</p>"
       "<p>May the source<br/>be with you!</p></body></html>");
   page->mainFrame()->setHtml(content);
@@ -1199,7 +1199,7 @@ void tst_QWebPage::textSelection() {
 void tst_QWebPage::textEditing() {
   CursorTrackedPage* page = new CursorTrackedPage;
   QString content(
-      "<html><body<p id=one>The quick brown fox</p>"
+      "<html><body><p id=one>The quick brown fox</p>"
       "<p id=two>jumps over the lazy dog</p>"
       "<p>May the source<br/>be with you!</p></body></html>");
   page->mainFrame()->setHtml(content);
