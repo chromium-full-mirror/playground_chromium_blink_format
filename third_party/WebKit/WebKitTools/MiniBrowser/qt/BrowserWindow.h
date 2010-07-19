@@ -64,6 +64,7 @@ class BrowserWindow : public QMainWindow {
 
  protected slots:
   void changeLocation();
+  void loadProgress(int progress);
   void titleChanged(const QString&);
   void urlChanged(const QUrl&);
 
