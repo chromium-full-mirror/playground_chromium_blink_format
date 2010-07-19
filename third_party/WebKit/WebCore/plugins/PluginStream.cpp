@@ -374,6 +374,8 @@ void PluginStream::deliverData() {
                                            dataLength, (void*)data);
       if (deliveryBytes < 0) {
         LOG_PLUGIN_NET_ERROR();
+        if (m_loader)
+          m_loader->setDefersLoading(false);
         cancelAndDestroyStream(NPRES_NETWORK_ERR);
         return;
       }
