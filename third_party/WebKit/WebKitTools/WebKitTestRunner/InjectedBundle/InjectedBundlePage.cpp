@@ -159,7 +159,7 @@ void InjectedBundlePage::dump() {
       .layoutTestController()
       ->invalidateWaitToDumpWatchdog();
 
-  if (InjectedBundle::shared().layoutTestController()->dumpAsText()) {
+  if (InjectedBundle::shared().layoutTestController()->shouldDumpAsText()) {
     // FIXME: Support dumping subframes when
     // layoutTestController()->dumpChildFramesAsText() is true.
     WKRetainPtr<WKStringRef> innerText(
@@ -234,7 +234,9 @@ void InjectedBundlePage::addMessageToConsole(WKStringRef message,
 }
 
 void InjectedBundlePage::setStatusbarText(WKStringRef statusbarText) {
-  if (!InjectedBundle::shared().layoutTestController()->dumpStatusCallbacks())
+  if (!InjectedBundle::shared()
+           .layoutTestController()
+           ->shouldDumpStatusCallbacks())
     return;
 
   OwnPtr<Vector<char>> utf8StatusbarText = WKStringToUTF8(statusbarText);
