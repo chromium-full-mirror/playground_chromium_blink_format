@@ -77,9 +77,6 @@ class WebRuntimeFeatures {
   WEBKIT_API static void enableTouch(bool);
   WEBKIT_API static bool isTouchEnabled();
 
-  WEBKIT_API static void enableDeviceOrientation(bool);
-  WEBKIT_API static bool isDeviceOrientationEnabled();
-
  private:
   WebRuntimeFeatures();
 };

@@ -58,7 +58,6 @@
 #include "ProgressTracker.h"
 #include "RenderTheme.h"
 #include "RenderWidget.h"
-#include "RuntimeEnabledFeatures.h"
 #include "ScriptController.h"
 #include "SelectionController.h"
 #include "Settings.h"
@@ -162,9 +161,7 @@ Page::Page(ChromeClient* chromeClient,
 #if ENABLE(DEVICE_ORIENTATION)
       ,
       m_deviceOrientationController(
-          RuntimeEnabledFeatures::deviceOrientationEnabled()
-              ? new DeviceOrientationController(this, deviceOrientationClient)
-              : 0)
+          new DeviceOrientationController(this, deviceOrientationClient))
 #endif
 #if ENABLE(INPUT_SPEECH)
       ,
