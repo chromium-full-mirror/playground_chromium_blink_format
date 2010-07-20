@@ -100,8 +100,11 @@ class PluginView : public WebCore::Widget,
   virtual void invalidate(const WebCore::IntRect&);
   virtual WebCore::String userAgent(const WebCore::KURL&);
   virtual void loadURL(uint64_t requestID,
+                       const WebCore::String& method,
                        const WebCore::String& urlString,
                        const WebCore::String& target,
+                       const WebCore::HTTPHeaderMap& headerFields,
+                       const Vector<char>& httpBody,
                        bool allowPopups);
   virtual void cancelStreamLoad(uint64_t streamID);
   virtual NPObject* windowScriptNPObject();

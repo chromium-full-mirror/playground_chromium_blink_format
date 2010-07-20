@@ -29,6 +29,7 @@
 struct NPObject;
 
 namespace WebCore {
+class HTTPHeaderMap;
 class IntRect;
 class KURL;
 class String;
@@ -56,8 +57,11 @@ class PluginController {
   // If the URL is a JavaScript URL, the JavaScript code will be evaluated and
   // the result sent back using Plugin::didEvaluateJavaScript.
   virtual void loadURL(uint64_t requestID,
+                       const WebCore::String& method,
                        const WebCore::String& urlString,
                        const WebCore::String& target,
+                       const WebCore::HTTPHeaderMap& headerFields,
+                       const Vector<char>& httpBody,
                        bool allowPopups) = 0;
 
   /// Cancels the load of a stream that was requested by loadURL.

@@ -31,6 +31,10 @@
 #include <WebCore/IntRect.h>
 #include <WebCore/StringHash.h>
 
+namespace WebCore {
+class HTTPHeaderMap;
+}
+
 namespace WebKit {
 
 class NetscapePluginStream;
@@ -52,8 +56,11 @@ class NetscapePlugin : public Plugin {
 
   void invalidate(const NPRect*);
   const char* userAgent();
-  void loadURL(const WebCore::String& urlString,
+  void loadURL(const WebCore::String& method,
+               const WebCore::String& urlString,
                const WebCore::String& target,
+               const WebCore::HTTPHeaderMap& headerFields,
+               const Vector<char>& httpBody,
                bool sendNotification,
                void* notificationData);
   NPError destroyStream(NPStream*, NPReason);
@@ -90,12 +97,12 @@ class NetscapePlugin : public Plugin {
   void callSetWindow();
   bool shouldLoadSrcURL();
   NetscapePluginStream* streamFromID(uint64_t streamID);
+  void stopAllStreams();
+  bool allowPopups() const;
 
   bool platformPostInitialize();
   void platformPaint(WebCore::GraphicsContext*,
                      const WebCore::IntRect& dirtyRect);
-
-  void stopAllStreams();
 
   // Plugin
   virtual bool initialize(PluginController*, const Parameters&);
