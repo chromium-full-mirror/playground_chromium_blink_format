@@ -31,6 +31,8 @@
 #ifndef WebURLResponsePrivate_h
 #define WebURLResponsePrivate_h
 
+#include "WebString.h"
+
 namespace WebCore {
 class ResourceResponse;
 }
@@ -45,6 +47,9 @@ class WebURLResponsePrivate {
   virtual void dispose() = 0;
 
   WebCore::ResourceResponse* m_resourceResponse;
+
+  // FIXME: Move this to ResourceResponse once we have an internal consumer.
+  WebString m_downloadFilePath;
 };
 
 }  // namespace WebKit
