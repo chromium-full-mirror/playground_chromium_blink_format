@@ -58,12 +58,13 @@ void CSSSegmentedFontFace::pruneTable() {
 }
 
 bool CSSSegmentedFontFace::isValid() const {
+  // Valid if at least one font face is valid.
   unsigned size = m_fontFaces.size();
   for (unsigned i = 0; i < size; i++) {
-    if (!m_fontFaces[i]->isValid())
-      return false;
+    if (m_fontFaces[i]->isValid())
+      return true;
   }
-  return true;
+  return false;
 }
 
 void CSSSegmentedFontFace::fontLoaded(CSSFontFace*) {
@@ -94,6 +95,8 @@ FontData* CSSSegmentedFontFace::getFontData(
 
   unsigned size = m_fontFaces.size();
   for (unsigned i = 0; i < size; i++) {
+    if (!m_fontFaces[i]->isValid())
+      continue;
     FontTraitsMask traitsMask = m_fontFaces[i]->traitsMask();
     bool syntheticBold =
         !(traitsMask & (FontWeight600Mask | FontWeight700Mask |

@@ -47,7 +47,6 @@ class CSSSegmentedFontFace : public RefCounted<CSSSegmentedFontFace> {
   }
   ~CSSSegmentedFontFace();
 
-  bool isValid() const;
   CSSFontSelector* fontSelector() const { return m_fontSelector; }
 
   void fontLoaded(CSSFontFace*);
@@ -60,6 +59,7 @@ class CSSSegmentedFontFace : public RefCounted<CSSSegmentedFontFace> {
   CSSSegmentedFontFace(CSSFontSelector*);
 
   void pruneTable();
+  bool isValid() const;
 
   CSSFontSelector* m_fontSelector;
   HashMap<unsigned, SegmentedFontData*> m_fontDataTable;
