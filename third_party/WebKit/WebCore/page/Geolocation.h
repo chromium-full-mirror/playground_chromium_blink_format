@@ -187,8 +187,7 @@ class Geolocation : public RefCounted<Geolocation>
   Frame* m_frame;
 #if !ENABLE(CLIENT_BASED_GEOLOCATION)
   OwnPtr<GeolocationService> m_service;
-#endif
-#if USE(PREEMPT_GEOLOCATION_PERMISSION)
+#else
   RefPtr<GeoNotifier> m_startRequestPermissionNotifier;
 #endif
   RefPtr<Geoposition> m_lastPosition;
