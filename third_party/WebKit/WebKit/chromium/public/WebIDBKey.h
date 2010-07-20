@@ -38,7 +38,7 @@ namespace WebKit {
 
 class WebIDBKey {
  public:
-  ~WebIDBKey();
+  ~WebIDBKey() { reset(); }
 
   WEBKIT_API static WebIDBKey createNull();
   WEBKIT_API static WebIDBKey createInvalid();
@@ -56,6 +56,7 @@ class WebIDBKey {
   WEBKIT_API void assign(const WebString&);
   WEBKIT_API void assign(int32_t);
   WEBKIT_API void assignInvalid();
+  WEBKIT_API void reset();
 
   enum Type {
     NullType = 0,

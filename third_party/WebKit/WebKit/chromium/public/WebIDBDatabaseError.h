@@ -42,7 +42,7 @@ namespace WebKit {
 // See comment in WebIndexedDatabase for a high level overview these classes.
 class WebIDBDatabaseError {
  public:
-  WEBKIT_API ~WebIDBDatabaseError();
+  ~WebIDBDatabaseError() { reset(); }
 
   WEBKIT_API WebIDBDatabaseError(unsigned short code,
                                  const WebString& message) {
@@ -55,6 +55,7 @@ class WebIDBDatabaseError {
   }
 
   WEBKIT_API void assign(const WebIDBDatabaseError&);
+  WEBKIT_API void reset();
 
   WEBKIT_API unsigned short code() const;
   WEBKIT_API WebString message() const;
