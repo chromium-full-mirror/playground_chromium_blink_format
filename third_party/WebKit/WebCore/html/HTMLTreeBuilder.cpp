@@ -145,12 +145,6 @@ bool isNonAnchorFormattingTag(const AtomicString& tagName) {
   return tagName == nobrTag || isNonAnchorNonNobrFormattingTag(tagName);
 }
 
-bool requiresRedirectToFosterParent(Element* element) {
-  return element->hasTagName(tableTag) ||
-         isTableBodyContextTag(element->localName()) ||
-         element->hasTagName(trTag);
-}
-
 // http://www.whatwg.org/specs/web-apps/current-work/multipage/parsing.html#formatting
 bool isFormattingTag(const AtomicString& tagName) {
   return tagName == aTag || isNonAnchorFormattingTag(tagName);
@@ -1043,8 +1037,7 @@ void HTMLTreeBuilder::processStartTagForInTable(AtomicHTMLToken& token) {
     return;
   }
   parseError(token);
-  HTMLConstructionSite::RedirectToFosterParentGuard redirecter(
-      m_tree, requiresRedirectToFosterParent(m_tree.currentElement()));
+  HTMLConstructionSite::RedirectToFosterParentGuard redirecter(m_tree);
   processStartTagForInBody(token);
 }
 
@@ -1958,8 +1951,7 @@ void HTMLTreeBuilder::processEndTagForInTable(AtomicHTMLToken& token) {
     return;
   }
   // Is this redirection necessary here?
-  HTMLConstructionSite::RedirectToFosterParentGuard redirecter(
-      m_tree, requiresRedirectToFosterParent(m_tree.currentElement()));
+  HTMLConstructionSite::RedirectToFosterParentGuard redirecter(m_tree);
   processEndTagForInBody(token);
 }
 
@@ -2576,8 +2568,7 @@ void HTMLTreeBuilder::defaultForInTableText() {
   String characters = String::adopt(m_pendingTableCharacters);
   if (hasNonWhitespace(characters)) {
     // FIXME: parse error
-    HTMLConstructionSite::RedirectToFosterParentGuard redirecter(
-        m_tree, requiresRedirectToFosterParent(m_tree.currentElement()));
+    HTMLConstructionSite::RedirectToFosterParentGuard redirecter(m_tree);
     m_tree.reconstructTheActiveFormattingElements();
     m_tree.insertTextNode(characters);
     m_framesetOk = false;
