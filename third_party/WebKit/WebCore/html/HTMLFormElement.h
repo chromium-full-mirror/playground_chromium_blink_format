@@ -100,6 +100,8 @@ class HTMLFormElement : public HTMLElement {
 
   virtual String target() const;
 
+  FormSubmissionTrigger submissionTrigger() const;
+
   HTMLFormControlElement* defaultButton() const;
 
   bool checkValidity();
@@ -162,6 +164,8 @@ class HTMLFormElement : public HTMLElement {
 
   Vector<HTMLFormControlElement*> m_associatedElements;
   Vector<HTMLImageElement*> m_imageElements;
+
+  FormSubmissionTrigger m_submissionTrigger;
 
   bool m_autocomplete : 1;
   bool m_insubmit : 1;

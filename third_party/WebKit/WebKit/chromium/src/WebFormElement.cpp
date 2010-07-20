@@ -31,6 +31,7 @@
 #include "config.h"
 #include "WebFormElement.h"
 
+#include "FormState.h"
 #include "HTMLFormControlElement.h"
 #include "HTMLFormElement.h"
 #include "HTMLInputElement.h"
@@ -59,6 +60,11 @@ WebString WebFormElement::name() const {
 
 WebString WebFormElement::method() const {
   return constUnwrap<HTMLFormElement>()->method();
+}
+
+bool WebFormElement::wasUserSubmitted() const {
+  return constUnwrap<HTMLFormElement>()->submissionTrigger() ==
+         NotSubmittedByJavaScript;
 }
 
 void WebFormElement::submit() {
