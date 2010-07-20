@@ -140,11 +140,8 @@ void InsertLineBreakCommand::doApply() {
     insertNodeAt(nodeToInsert.get(), pos);
     setEndingSelection(VisibleSelection(
         positionInParentAfterNode(nodeToInsert.get()), DOWNSTREAM));
-  } else {
+  } else if (pos.node()->isTextNode()) {
     // Split a text node
-    ASSERT(pos.node()->isTextNode());
-
-    // Do the split
     Text* textNode = static_cast<Text*>(pos.node());
     splitTextNode(textNode, pos.deprecatedEditingOffset());
     insertNodeBefore(nodeToInsert, textNode);

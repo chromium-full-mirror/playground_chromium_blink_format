@@ -640,7 +640,8 @@ void DeleteSelectionCommand::fixupWhitespace() {
   // FIXME: isRenderedCharacter should be removed, and we should use
   // VisiblePosition::characterAfter and VisiblePosition::characterBefore
   if (m_leadingWhitespace.isNotNull() &&
-      !m_leadingWhitespace.isRenderedCharacter()) {
+      !m_leadingWhitespace.isRenderedCharacter() &&
+      m_leadingWhitespace.node()->isTextNode()) {
     Text* textNode = static_cast<Text*>(m_leadingWhitespace.node());
     ASSERT(!textNode->renderer() ||
            textNode->renderer()->style()->collapseWhiteSpace());
@@ -648,7 +649,8 @@ void DeleteSelectionCommand::fixupWhitespace() {
                       1, nonBreakingSpaceString());
   }
   if (m_trailingWhitespace.isNotNull() &&
-      !m_trailingWhitespace.isRenderedCharacter()) {
+      !m_trailingWhitespace.isRenderedCharacter() &&
+      m_trailingWhitespace.node()->isTextNode()) {
     Text* textNode = static_cast<Text*>(m_trailingWhitespace.node());
     ASSERT(!textNode->renderer() ||
            textNode->renderer()->style()->collapseWhiteSpace());
