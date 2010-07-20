@@ -143,7 +143,7 @@
 // We can remove this once the new ColorSync APIs are available in an internal
 // Safari SDK.
 #include <ColorSync/ColorSync.h>
-#ifdef COLORSYNC_CORE_SERVICES_H_
+#ifdef __COLORSYNCDEPRECATED__
 #define COREGRAPHICS_INCLUDES_CORESERVICES_HEADER
 #define OBSOLETE_COLORSYNC_API
 #endif
