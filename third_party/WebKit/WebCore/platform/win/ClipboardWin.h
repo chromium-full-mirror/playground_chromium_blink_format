@@ -26,9 +26,9 @@
 #ifndef ClipboardWin_h
 #define ClipboardWin_h
 
+#include "COMPtr.h"
 #include "CachedResourceClient.h"
 #include "Clipboard.h"
-#include "COMPtr.h"
 
 struct IDataObject;
 

@@ -109,9 +109,8 @@ static inline void pathRemoveBadFSCharacters(PWSTR psz, size_t length) {
   size_t readFrom = 0;
   while (readFrom < length) {
     UINT type = PathGetCharType(psz[readFrom]);
-    if (psz[readFrom] == 0 || type & (GCT_LFNCHAR | GCT_SHORTCHAR)) {
+    if (!psz[readFrom] || type & (GCT_LFNCHAR | GCT_SHORTCHAR))
       psz[writeTo++] = psz[readFrom];
-    }
 
     readFrom++;
   }
@@ -471,7 +470,7 @@ static bool writeURL(WCDataObject* data,
 
   if (withHTML) {
     Vector<char> cfhtmlData;
-    markupToCF_HTML(urlToMarkup(url, title), "", cfhtmlData);
+    markupToCFHTML(urlToMarkup(url, title), "", cfhtmlData);
     medium.hGlobal = createGlobalData(cfhtmlData);
     if (medium.hGlobal && FAILED(data->SetData(htmlFormat(), &medium, TRUE)))
       ::GlobalFree(medium.hGlobal);
@@ -524,14 +523,13 @@ void ClipboardWin::clearAllData() {
 
 String ClipboardWin::getData(const String& type, bool& success) const {
   success = false;
-  if (policy() != ClipboardReadable || !m_dataObject) {
+  if (policy() != ClipboardReadable || !m_dataObject)
     return "";
-  }
 
   ClipboardDataType dataType = clipboardTypeFromMIMEType(type);
   if (dataType == ClipboardDataTypeText)
     return getPlainText(m_dataObject.get(), success);
-  else if (dataType == ClipboardDataTypeURL)
+  if (dataType == ClipboardDataTypeURL)
     return getURL(m_dataObject.get(), DragData::DoNotConvertFilenames, success);
 
   return "";
@@ -605,9 +603,8 @@ HashSet<String> ClipboardWin::types() const {
   FORMATETC data;
 
   // IEnumFORMATETC::Next returns S_FALSE if there are no more items.
-  while (itr->Next(1, &data, 0) == S_OK) {
+  while (itr->Next(1, &data, 0) == S_OK)
     addMimeTypesForFormat(results, data);
-  }
 
   return results;
 }
@@ -758,7 +755,7 @@ void ClipboardWin::declareAndWriteDragImage(Element* element,
 
   // Put img tag on the clipboard referencing the image
   Vector<char> data;
-  markupToCF_HTML(imageToMarkup(fullURL), "", data);
+  markupToCFHTML(imageToMarkup(fullURL), "", data);
   medium.hGlobal = createGlobalData(data);
   if (medium.hGlobal &&
       FAILED(m_writableDataObject->SetData(htmlFormat(), &medium, TRUE)))
@@ -796,9 +793,9 @@ void ClipboardWin::writeRange(Range* selectedRange, Frame* frame) {
   ExceptionCode ec = 0;
 
   Vector<char> data;
-  markupToCF_HTML(createMarkup(selectedRange, 0, AnnotateForInterchange),
-                  selectedRange->startContainer(ec)->document()->url().string(),
-                  data);
+  markupToCFHTML(createMarkup(selectedRange, 0, AnnotateForInterchange),
+                 selectedRange->startContainer(ec)->document()->url().string(),
+                 data);
   medium.hGlobal = createGlobalData(data);
   if (medium.hGlobal &&
       FAILED(m_writableDataObject->SetData(htmlFormat(), &medium, TRUE)))

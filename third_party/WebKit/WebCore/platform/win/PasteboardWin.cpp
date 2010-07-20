@@ -119,7 +119,7 @@ void Pasteboard::writeSelection(Range* selectedRange,
   if (::OpenClipboard(m_owner)) {
     ExceptionCode ec = 0;
     Vector<char> data;
-    markupToCF_HTML(
+    markupToCFHTML(
         createMarkup(selectedRange, 0, AnnotateForInterchange),
         selectedRange->startContainer(ec)->document()->url().string(), data);
     HGLOBAL cbData = createGlobalData(data);
@@ -142,7 +142,7 @@ void Pasteboard::writeSelection(Range* selectedRange,
   // enable smart-replacing later on by putting dummy data on the pasteboard
   if (canSmartCopyOrDelete) {
     if (::OpenClipboard(m_owner)) {
-      ::SetClipboardData(WebSmartPasteFormat, NULL);
+      ::SetClipboardData(WebSmartPasteFormat, 0);
       ::CloseClipboard();
     }
   }
@@ -189,7 +189,7 @@ void Pasteboard::writeURL(const KURL& url,
   // contenteditable areas as a link
   if (::OpenClipboard(m_owner)) {
     Vector<char> data;
-    markupToCF_HTML(urlToMarkup(url, title), "", data);
+    markupToCFHTML(urlToMarkup(url, title), "", data);
     HGLOBAL cbData = createGlobalData(data);
     if (!::SetClipboardData(HTMLClipboardFormat, cbData))
       ::GlobalFree(cbData);
@@ -263,8 +263,8 @@ String Pasteboard::plainText(Frame* frame) {
       ::GlobalUnlock(cbData);
       ::CloseClipboard();
       return fromClipboard;
-    } else
-      ::CloseClipboard();
+    }
+    ::CloseClipboard();
   }
 
   if (::IsClipboardFormatAvailable(CF_TEXT) && ::OpenClipboard(m_owner)) {
@@ -275,8 +275,8 @@ String Pasteboard::plainText(Frame* frame) {
       ::GlobalUnlock(cbData);
       ::CloseClipboard();
       return fromClipboard;
-    } else
-      ::CloseClipboard();
+    }
+    ::CloseClipboard();
   }
 
   return String();
@@ -295,13 +295,13 @@ PassRefPtr<DocumentFragment> Pasteboard::documentFragment(
     HANDLE cbData = ::GetClipboardData(HTMLClipboardFormat);
     if (cbData) {
       SIZE_T dataSize = ::GlobalSize(cbData);
-      String cf_html(
+      String cfhtml(
           UTF8Encoding().decode((char*)::GlobalLock(cbData), dataSize));
       ::GlobalUnlock(cbData);
       ::CloseClipboard();
 
       PassRefPtr<DocumentFragment> fragment =
-          fragmentFromCF_HTML(frame->document(), cf_html);
+          fragmentFromCFHTML(frame->document(), cfhtml);
       if (fragment)
         return fragment;
     } else
