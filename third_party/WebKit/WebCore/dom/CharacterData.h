@@ -47,7 +47,7 @@ class CharacterData : public Node {
   StringImpl* dataImpl() { return m_data.get(); }
 
   // Like appendData, but optimized for the parser (e.g., no mutation events).
-  PassRefPtr<StringImpl> parserAppendData(const String&);
+  void parserAppendData(const String&);
 
  protected:
   CharacterData(Document* document, const String& text, ConstructionType type)
@@ -69,6 +69,7 @@ class CharacterData : public Node {
   virtual bool offsetInCharacters() const;
 
   void checkCharDataOperation(unsigned offset, ExceptionCode&);
+  PassRefPtr<StringImpl> appendDataCommon(const String& arg);
 
   RefPtr<StringImpl> m_data;
 };
