@@ -83,12 +83,7 @@ class WeakReferenceMap : public AbstractWeakReferenceMap<KeyType, ValueType> {
  public:
   typedef AbstractWeakReferenceMap<KeyType, ValueType> Parent;
   WeakReferenceMap(v8::WeakReferenceCallback callback) : Parent(callback) {}
-  virtual ~WeakReferenceMap() {
-#ifndef NDEBUG
-    if (m_map.size() > 0)
-      fprintf(stderr, "Leak %d JS wrappers.\n", m_map.size());
-#endif
-  }
+  virtual ~WeakReferenceMap() {}
 
   // Get the JS wrapper object of an object.
   virtual v8::Persistent<ValueType> get(KeyType* obj) {
@@ -137,7 +132,6 @@ class WeakReferenceMap : public AbstractWeakReferenceMap<KeyType, ValueType> {
 
  protected:
   HashMap<KeyType*, ValueType*> m_map;
-  v8::WeakReferenceCallback m_weakReferenceCallback;
 };
 
 template <class KeyType>

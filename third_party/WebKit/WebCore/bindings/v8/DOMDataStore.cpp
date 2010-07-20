@@ -165,9 +165,16 @@ void DOMDataStore::weakNodeCallback(v8::Persistent<v8::Value> v8Object,
     if (store->domNodeMap().removeIfPresent(node, v8Object)) {
       ASSERT(store->domData()->owningThread() == WTF::currentThread());
       node->deref();  // Nobody overrides Node::deref so it's safe
-      break;  // There might be at most one wrapper for the node in world's maps
+      return;  // There might be at most one wrapper for the node in world's
+               // maps
     }
   }
+
+  // If not found, it means map for the wrapper has been already destroyed, just
+  // dispose the
+  // handle and deref the object to fight memory leak.
+  v8Object.Dispose();
+  node->deref();  // Nobody overrides Node::deref so it's safe
 }
 
 bool DOMDataStore::IntrusiveDOMWrapperMap::removeIfPresent(
