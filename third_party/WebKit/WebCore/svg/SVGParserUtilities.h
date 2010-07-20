@@ -30,15 +30,14 @@ typedef Vector<UnicodeRange> UnicodeRanges;
 
 namespace WebCore {
 
-class Path;
 class SVGPointList;
-class SVGPathSegList;
 
 bool parseNumber(const UChar*& ptr,
                  const UChar* end,
                  float& number,
                  bool skip = true);
 bool parseNumberOptionalNumber(const String& s, float& h, float& v);
+bool parseArcFlag(const UChar*& ptr, const UChar* end, bool& flag);
 
 // SVG allows several different whitespace characters:
 // http://www.w3.org/TR/SVG/paths.html#PathDataBNF
@@ -67,10 +66,6 @@ inline bool skipOptionalSpacesOrDelimiter(const UChar*& ptr,
 }
 
 bool pointsListFromSVGData(SVGPointList* pointsList, const String& points);
-bool pathFromSVGData(Path& path, const String& d);
-bool pathSegListFromSVGData(SVGPathSegList* pathSegList,
-                            const String& d,
-                            bool process = false);
 Vector<String> parseDelimitedString(const String& input, const char seperator);
 bool parseKerningUnicodeString(const String& input,
                                UnicodeRanges&,
