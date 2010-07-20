@@ -71,6 +71,17 @@ id createJSWrapper(JSC::JSObject*,
 - (JSC::Bindings::RootObject*)_originRootObject;
 @end
 
+@interface WebScriptObject (StagedForPublic)
+/*!
+ @method hasWebScriptKey:
+ @param name The name of the property to check for.
+ @discussion Checks for the existence of the property on the object in the
+ script environment.
+ @result Returns YES if the property exists, NO otherwise.
+ */
+- (BOOL)hasWebScriptKey:(NSString*)name;
+@end
+
 @interface WebScriptObjectPrivate : NSObject {
  @public
   JSC::JSObject* imp;
