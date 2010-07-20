@@ -208,6 +208,7 @@ class ResourceHandle : public RefCounted<ResourceHandle>
   // callbacks until you return from the one you're in.
   static bool loadsBlocked();
 
+  bool hasAuthenticationChallenge() const;
   void clearAuthentication();
   void cancel();
 
