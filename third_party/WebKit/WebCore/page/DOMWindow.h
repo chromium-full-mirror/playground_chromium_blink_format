@@ -256,6 +256,8 @@ class DOMWindow : public RefCounted<DOMWindow>, public EventTarget {
   NotificationCenter* webkitNotifications() const;
 #endif
 
+  void pageDestroyed();
+
 #if ENABLE(INDEXED_DATABASE)
   IndexedDatabaseRequest* indexedDB() const;
 #endif
