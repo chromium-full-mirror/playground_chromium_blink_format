@@ -77,7 +77,9 @@ class AnimationBase : public RefCounted<AnimationBase> {
                             // running, waiting for fire
     AnimationStateEnding,   // received, animation running, end timer running,
                             // waiting for fire
-    AnimationStatePausedWaitTimer,     // in pause mode when animation started
+    AnimationStatePausedWaitTimer,  // in pause mode when animation started
+    AnimationStatePausedWaitStyleAvailable,  // in pause mode when waiting for
+                                             // style setup
     AnimationStatePausedWaitResponse,  // animation paused when in STARTING
                                        // state
     AnimationStatePausedRun,  // animation paused when in LOOPING or ENDING
