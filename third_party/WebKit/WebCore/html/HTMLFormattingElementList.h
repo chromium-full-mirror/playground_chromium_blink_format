@@ -72,20 +72,19 @@ class HTMLFormattingElementList : public Noncopyable {
 
   class Bookmark {
    public:
-    Bookmark(Element* before, Element* after)
-        : m_before(before), m_after(after) {}
+    Bookmark(Entry* entry) : m_hasBeenMoved(false), m_mark(entry) {}
 
-    void moveToAfter(Element* before) {
-      m_before = before;
-      m_after = 0;
+    void moveToAfter(Entry* before) {
+      m_hasBeenMoved = true;
+      m_mark = before;
     }
 
-    Element* elementBefore() const { return m_before; }
-    Element* elementAfter() const { return m_after; }
+    bool hasBeenMoved() const { return m_hasBeenMoved; }
+    Entry* mark() const { return m_mark; }
 
    private:
-    Element* m_before;
-    Element* m_after;
+    bool m_hasBeenMoved;
+    Entry* m_mark;
   };
 
   bool isEmpty() const { return !size(); }
@@ -99,7 +98,7 @@ class HTMLFormattingElementList : public Noncopyable {
   void remove(Element*);
 
   Bookmark bookmarkFor(Element*);
-  void insertAt(Element*, const Bookmark&);
+  void swapTo(Element* oldElement, Element* newElement, const Bookmark&);
 
   void appendMarker();
   // clearToLastMarker also clears the marker (per the HTML5 spec).
@@ -113,6 +112,8 @@ class HTMLFormattingElementList : public Noncopyable {
 #endif
 
  private:
+  Entry* first() { return &at(0); }
+
   Vector<Entry> m_entries;
 };
 }
