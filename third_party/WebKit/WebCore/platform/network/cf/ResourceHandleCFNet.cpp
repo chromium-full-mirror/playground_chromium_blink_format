@@ -659,8 +659,10 @@ void ResourceHandle::didReceiveAuthenticationChallenge(
           CredentialStorage::set(credential, challenge.protectionSpace(),
                                  firstRequest().url());
         }
-        [challenge.sender() useCredential:mac(credential)
-               forAuthenticationChallenge:mac(challenge)];
+        RetainPtr<CFURLCredentialRef> cfCredential(AdoptCF,
+                                                   createCF(credential));
+        CFURLConnectionUseCredential(d->m_connection.get(), cfCredential.get(),
+                                     challenge.cfURLAuthChallengeRef());
         return;
       }
     }
