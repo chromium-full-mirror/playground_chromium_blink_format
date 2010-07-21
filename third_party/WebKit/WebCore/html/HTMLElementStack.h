@@ -95,6 +95,7 @@ class HTMLElementStack : public Noncopyable {
                                         // context" in the spec.
   void popHTMLHeadElement();
   void popHTMLBodyElement();
+  void popAll();
 
   void remove(Element*);
   void removeHTMLHeadElement(Element*);

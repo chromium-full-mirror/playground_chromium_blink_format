@@ -2480,8 +2480,8 @@ void HTMLTreeBuilder::processEndOfFile(AtomicHTMLToken& token) {
     case InHeadNoscriptMode:
       ASSERT(insertionMode() == InHeadNoscriptMode);
       defaultForInHeadNoscript();
-      processToken(token);
-      break;
+      processEndOfFile(token);
+      return;
     case AfterFramesetMode:
     case AfterAfterFramesetMode:
       ASSERT(insertionMode() == AfterFramesetMode ||
@@ -2510,7 +2510,7 @@ void HTMLTreeBuilder::processEndOfFile(AtomicHTMLToken& token) {
         return;
       }
       processEndOfFile(token);
-      break;
+      return;
     case InForeignContentMode:
       parseError(token);
       // FIXME: Following the spec would infinitely recurse on <svg><svg>
@@ -2518,17 +2518,19 @@ void HTMLTreeBuilder::processEndOfFile(AtomicHTMLToken& token) {
       m_tree.openElements()->popUntilElementWithNamespace(xhtmlNamespaceURI);
       setInsertionMode(m_secondaryInsertionMode);
       processEndOfFile(token);
-      break;
+      return;
     case InTableTextMode:
       defaultForInTableText();
       processEndOfFile(token);
-      break;
+      return;
     case TextMode:
     case InCaptionMode:
     case InRowMode:
       notImplemented();
       break;
   }
+  ASSERT(m_tree.openElements()->top());
+  m_tree.openElements()->popAll();
 }
 
 void HTMLTreeBuilder::defaultForInitial() {
