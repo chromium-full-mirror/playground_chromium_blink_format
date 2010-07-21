@@ -281,7 +281,9 @@ class GraphicsContext : public Noncopyable {
                           const IntSize& bottomRight);
   void clipPath(WindRule);
   void clipToImageBuffer(const FloatRect&, const ImageBuffer*);
-  void clipConvexPolygon(size_t numPoints, const FloatPoint*);
+  void clipConvexPolygon(size_t numPoints,
+                         const FloatPoint*,
+                         bool antialias = true);
 
   int textDrawingMode();
   void setTextDrawingMode(int);

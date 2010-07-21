@@ -529,7 +529,8 @@ void GraphicsContext::drawConvexPolygon(size_t npoints,
 }
 
 void GraphicsContext::clipConvexPolygon(size_t numPoints,
-                                        const FloatPoint* points) {
+                                        const FloatPoint* points,
+                                        bool antialiased) {
   if (paintingDisabled())
     return;
 

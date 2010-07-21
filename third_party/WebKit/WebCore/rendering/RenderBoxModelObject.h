@@ -183,6 +183,8 @@ class RenderBoxModelObject : public RenderObject {
                              const IntSize& bottomLeft,
                              const IntSize& bottomRight,
                              const BoxSide side,
+                             bool firstEdgeMatches,
+                             bool secondEdgeMatches,
                              const RenderStyle* style);
 
   friend class RenderView;
