@@ -28,6 +28,7 @@
 
 #include "DragActions.h"
 #include "FocusDirection.h"
+#include "HitTestRequest.h"
 #include "PlatformMouseEvent.h"
 #include "ScrollTypes.h"
 #include "Timer.h"
@@ -111,7 +112,8 @@ class EventHandler : public Noncopyable {
       const IntPoint&,
       bool allowShadowContent,
       bool ignoreClipping = false,
-      HitTestScrollbars scrollbars = DontHitTestScrollbars);
+      HitTestScrollbars scrollbars = DontHitTestScrollbars,
+      int hitType = HitTestRequest::ReadOnly | HitTestRequest::Active);
 
   bool mousePressed() const { return m_mousePressed; }
   void setMousePressed(bool pressed) { m_mousePressed = pressed; }
@@ -480,6 +482,7 @@ class EventHandler : public Noncopyable {
 #if ENABLE(TOUCH_EVENTS)
   typedef HashMap<int, RefPtr<EventTarget>> TouchTargetMap;
   TouchTargetMap m_originatingTouchPointTargets;
+  bool m_touchPressed;
 #endif
 };
 
