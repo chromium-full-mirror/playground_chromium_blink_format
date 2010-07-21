@@ -45,6 +45,11 @@ class PageClient {
                               const WebCore::String&) = 0;
 
   virtual void setCursor(const WebCore::Cursor&) = 0;
+
+#if USE(ACCELERATED_COMPOSITING)
+  virtual void pageDidEnterAcceleratedCompositing() = 0;
+  virtual void pageDidLeaveAcceleratedCompositing() = 0;
+#endif
 };
 
 }  // namespace WebKit

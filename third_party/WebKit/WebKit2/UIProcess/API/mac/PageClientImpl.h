@@ -49,6 +49,11 @@ class PageClientImpl : public PageClient {
                               const WebCore::String& newToolTip);
   virtual void setCursor(const WebCore::Cursor&);
 
+#if USE(ACCELERATED_COMPOSITING)
+  void pageDidEnterAcceleratedCompositing();
+  void pageDidLeaveAcceleratedCompositing();
+#endif
+
   WKView* m_wkView;
 };
 

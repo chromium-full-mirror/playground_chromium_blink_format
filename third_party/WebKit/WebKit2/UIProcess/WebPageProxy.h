@@ -84,6 +84,7 @@ class WebPageProxy : public RefCounted<WebPageProxy> {
   WebFrameProxy* mainFrame() const { return m_mainFrame.get(); }
 
   DrawingAreaProxy* drawingArea() { return m_drawingArea.get(); }
+  void setDrawingArea(PassOwnPtr<DrawingAreaProxy>);
 
   WebBackForwardList* backForwardList() { return m_backForwardList.get(); }
 
@@ -150,6 +151,11 @@ class WebPageProxy : public RefCounted<WebPageProxy> {
   void processDidBecomeResponsive();
   void processDidExit();
   void processDidRevive();
+
+#if USE(ACCELERATED_COMPOSITING)
+  void didEnterAcceleratedCompositing();
+  void didLeaveAcceleratedCompositing();
+#endif
 
   WebProcessProxy* process() const;
   WebPageNamespace* pageNamespace() const { return m_pageNamespace.get(); }
@@ -222,6 +228,10 @@ class WebPageProxy : public RefCounted<WebPageProxy> {
   void didReceiveEvent(WebEvent::Type);
   void didRunJavaScriptInMainFrame(const WebCore::String&, uint64_t);
   void didGetRenderTreeExternalRepresentation(const WebCore::String&, uint64_t);
+
+#if USE(ACCELERATED_COMPOSITING)
+  void didChangeAcceleratedCompositing(bool compositing);
+#endif
 
 #if PLATFORM(WIN)
   PageClient* m_pageClient;
