@@ -34,6 +34,7 @@ class String;
 
 namespace WebKit {
 
+class WebFrame;
 class WebPage;
 
 class InjectedBundlePageUIClient {
@@ -41,10 +42,16 @@ class InjectedBundlePageUIClient {
   InjectedBundlePageUIClient();
   void initialize(WKBundlePageUIClient*);
 
-  void addMessageToConsole(WebPage*,
-                           const WebCore::String& message,
-                           int32_t lineNumber);
-  void setStatusbarText(WebPage*, const WebCore::String&);
+  void willAddMessageToConsole(WebPage*,
+                               const WebCore::String& message,
+                               int32_t lineNumber);
+  void willSetStatusbarText(WebPage*, const WebCore::String&);
+  void willRunJavaScriptAlert(WebPage*, const WebCore::String&, WebFrame*);
+  void willRunJavaScriptConfirm(WebPage*, const WebCore::String&, WebFrame*);
+  void willRunJavaScriptPrompt(WebPage*,
+                               const WebCore::String&,
+                               const WebCore::String&,
+                               WebFrame*);
 
  private:
   WKBundlePageUIClient m_client;
