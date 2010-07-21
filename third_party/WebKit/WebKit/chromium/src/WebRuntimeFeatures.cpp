@@ -202,4 +202,12 @@ bool WebRuntimeFeatures::isTouchEnabled() {
 #endif
 }
 
+void WebRuntimeFeatures::enableDeviceOrientation(bool enable) {
+  RuntimeEnabledFeatures::setDeviceOrientationEnabled(enable);
+}
+
+bool WebRuntimeFeatures::isDeviceOrientationEnabled() {
+  return RuntimeEnabledFeatures::deviceOrientationEnabled();
+}
+
 }  // namespace WebKit

@@ -1388,8 +1388,8 @@ bool DOMWindow::addEventListener(const AtomicString& eventType,
     addBeforeUnloadEventListener(this);
 #if ENABLE(DEVICE_ORIENTATION)
   else if (eventType == eventNames().deviceorientationEvent && frame() &&
-           frame()->page())
-    frame()->page()->deviceOrientation()->addListener(this);
+           frame()->page() && frame()->page()->deviceOrientationController())
+    frame()->page()->deviceOrientationController()->addListener(this);
 #endif
 
   return true;
@@ -1408,8 +1408,8 @@ bool DOMWindow::removeEventListener(const AtomicString& eventType,
     removeBeforeUnloadEventListener(this);
 #if ENABLE(DEVICE_ORIENTATION)
   else if (eventType == eventNames().deviceorientationEvent && frame() &&
-           frame()->page())
-    frame()->page()->deviceOrientation()->removeListener(this);
+           frame()->page() && frame()->page()->deviceOrientationController())
+    frame()->page()->deviceOrientationController()->removeListener(this);
 #endif
 
   return true;
@@ -1493,8 +1493,9 @@ void DOMWindow::removeAllEventListeners() {
   EventTarget::removeAllEventListeners();
 
 #if ENABLE(DEVICE_ORIENTATION)
-  if (frame() && frame()->page())
-    frame()->page()->deviceOrientation()->removeAllListeners(this);
+  if (frame() && frame()->page() &&
+      frame()->page()->deviceOrientationController())
+    frame()->page()->deviceOrientationController()->removeAllListeners(this);
 #endif
 
   removeAllUnloadEventListeners(this);
