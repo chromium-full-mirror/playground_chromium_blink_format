@@ -86,6 +86,7 @@
 #include "ProgressTracker.h"
 #include "ResourceHandle.h"
 #include "ResourceRequest.h"
+#include "SchemeRegistry.h"
 #include "ScriptController.h"
 #include "ScriptSourceCode.h"
 #include "ScriptString.h"
@@ -1156,7 +1157,7 @@ bool FrameLoader::isMixedContent(SecurityOrigin* context, const KURL& url) {
     return false;  // We only care about HTTPS security origins.
 
   if (!url.isValid() ||
-      SecurityOrigin::shouldTreatURLSchemeAsSecure(url.protocol()))
+      SchemeRegistry::shouldTreatURLSchemeAsSecure(url.protocol()))
     return false;  // Loading these protocols is secure.
 
   return true;
@@ -1436,7 +1437,7 @@ void FrameLoader::loadFrameRequest(const FrameLoadRequest& request,
     referrer = m_outgoingReferrer;
 
   ASSERT(frame()->document());
-  if (SecurityOrigin::shouldTreatURLAsLocal(url.string()) &&
+  if (SchemeRegistry::shouldTreatURLAsLocal(url.string()) &&
       !isFeedWithNestedProtocolInHTTPFamily(url)) {
     if (!SecurityOrigin::canLoad(url, String(), frame()->document()) &&
         !SecurityOrigin::canLoad(url, referrer, 0)) {

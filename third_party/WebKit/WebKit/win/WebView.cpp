@@ -118,6 +118,7 @@
 #include <WebCore/RenderWidget.h>
 #include <WebCore/ResourceHandle.h>
 #include <WebCore/ResourceHandleClient.h>
+#include <WebCore/SchemeRegistry.h>
 #include <WebCore/ScriptValue.h>
 #include <WebCore/Scrollbar.h>
 #include <WebCore/ScrollbarTheme.h>
@@ -3770,7 +3771,7 @@ HRESULT STDMETHODCALLTYPE WebView::registerURLSchemeAsLocal(
   if (!scheme)
     return E_POINTER;
 
-  SecurityOrigin::registerURLSchemeAsLocal(
+  SchemeRegistry::registerURLSchemeAsLocal(
       String(scheme, ::SysStringLen(scheme)));
 
   return S_OK;
@@ -6487,7 +6488,7 @@ HRESULT WebView::setDomainRelaxationForbiddenForURLScheme(BOOL forbidden,
 }
 
 HRESULT WebView::registerURLSchemeAsSecure(BSTR scheme) {
-  SecurityOrigin::registerURLSchemeAsSecure(toString(scheme));
+  SchemeRegistry::registerURLSchemeAsSecure(toString(scheme));
   return S_OK;
 }
 
