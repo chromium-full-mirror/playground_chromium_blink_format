@@ -308,6 +308,8 @@ class FrameLoaderClient {
                                                           const Vector<String>&,
                                                           const Vector<String>&,
                                                           const String&) = 0;
+  virtual void hideMediaPlayerProxyPlugin(Widget*) = 0;
+  virtual void showMediaPlayerProxyPlugin(Widget*) = 0;
 #endif
 
   virtual ObjectContentType objectContentType(const KURL& url,

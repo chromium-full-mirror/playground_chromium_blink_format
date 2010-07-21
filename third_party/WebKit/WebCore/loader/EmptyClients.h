@@ -424,6 +424,8 @@ class EmptyFrameLoaderClient : public FrameLoaderClient, public Noncopyable {
                                                           const String&) {
     return 0;
   }
+  virtual void hideMediaPlayerProxyPlugin(Widget*) {}
+  virtual void showMediaPlayerProxyPlugin(Widget*) {}
 #endif
 
   virtual ObjectContentType objectContentType(const KURL&, const String&) {

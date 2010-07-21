@@ -134,6 +134,7 @@ class NullMediaPlayerPrivate : public MediaPlayerPrivateInterface {
 #if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
   virtual void deliverNotification(MediaPlayerProxyNotificationType) {}
   virtual void setMediaPlayerProxy(WebMediaPlayerProxy*) {}
+  virtual void setControls(bool) {}
 #endif
 
   virtual bool hasSingleSecurityOrigin() const { return true; }
@@ -525,6 +526,18 @@ void MediaPlayer::deliverNotification(
 void MediaPlayer::setMediaPlayerProxy(WebMediaPlayerProxy* proxy) {
   m_playerProxy = proxy;
   m_private->setMediaPlayerProxy(proxy);
+}
+
+void MediaPlayer::setControls(bool controls) {
+  m_private->setControls(controls);
+}
+
+void MediaPlayer::enterFullscreen() {
+  m_private->enterFullscreen();
+}
+
+void MediaPlayer::exitFullscreen() {
+  m_private->exitFullscreen();
 }
 #endif
 
