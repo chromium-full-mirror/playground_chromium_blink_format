@@ -334,11 +334,12 @@ void InspectorController::addMessageToConsole(MessageSource source,
   if (!enabled())
     return;
 
-  addConsoleMessage(
-      callStack->state(),
-      new ConsoleMessage(
-          source, type, level, message, callStack, m_groupLevel,
-          type == TraceMessageType || type == UncaughtExceptionMessageType));
+  bool storeStackTrace = type == TraceMessageType ||
+                         type == UncaughtExceptionMessageType ||
+                         type == AssertMessageType;
+  addConsoleMessage(callStack->state(),
+                    new ConsoleMessage(source, type, level, message, callStack,
+                                       m_groupLevel, storeStackTrace));
 }
 
 void InspectorController::addMessageToConsole(MessageSource source,

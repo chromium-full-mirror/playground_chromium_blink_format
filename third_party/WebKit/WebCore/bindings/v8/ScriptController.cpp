@@ -34,6 +34,7 @@
 
 #include "PlatformBridge.h"
 #include "Document.h"
+#include "ScriptCallStack.h"
 #include "ScriptableDocumentParser.h"
 #include "DOMWindow.h"
 #include "Event.h"
@@ -449,7 +450,8 @@ void ScriptController::clearWindowShell(bool) {
 
 #if ENABLE(INSPECTOR)
 void ScriptController::setCaptureCallStackForUncaughtExceptions(bool) {
-  v8::V8::SetCaptureStackTraceForUncaughtExceptions(true, 200);
+  v8::V8::SetCaptureStackTraceForUncaughtExceptions(
+      true, ScriptCallStack::maxCallStackSizeToCapture);
 }
 #endif
 
