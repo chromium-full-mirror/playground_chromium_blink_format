@@ -71,7 +71,11 @@ class WebProcess : CoreIPC::Connection::Client {
   WebProcess();
   void shutdown();
 
+#if ENABLE(WEB_PROCESS_SANDBOX)
+  void loadInjectedBundle(const WebCore::String&, const WebCore::String&);
+#else
   void loadInjectedBundle(const WebCore::String&);
+#endif
   void setApplicationCacheDirectory(const WebCore::String&);
   void forwardMessageToInjectedBundle(const WebCore::String&);
 
