@@ -32,6 +32,8 @@
 #include "Element.h"
 #include "Frame.h"
 #include "HTMLDocument.h"
+#include "HTMLElementFactory.h"
+#include "HTMLFormElement.h"
 #include "HTMLHtmlElement.h"
 #include "HTMLNames.h"
 #include "HTMLScriptElement.h"
@@ -132,6 +134,10 @@ HTMLConstructionSite::HTMLConstructionSite(
 
 HTMLConstructionSite::~HTMLConstructionSite() {}
 
+PassRefPtr<HTMLFormElement> HTMLConstructionSite::takeForm() {
+  return m_form.release();
+}
+
 void HTMLConstructionSite::dispatchDocumentElementAvailableIfNeeded() {
   if (m_document->frame() && !m_isParsingFragment)
     m_document->frame()->loader()->dispatchDocumentElementAvailable();
@@ -224,6 +230,13 @@ void HTMLConstructionSite::insertHTMLBodyElement(AtomicHTMLToken& token) {
   m_openElements.pushHTMLBodyElement(attachToCurrent(createHTMLElement(token)));
 }
 
+void HTMLConstructionSite::insertHTMLFormElement(AtomicHTMLToken& token) {
+  insertHTMLElement(token);
+  ASSERT(currentElement()->isHTMLElement());
+  ASSERT(currentElement()->hasTagName(formTag));
+  m_form = static_cast<HTMLFormElement*>(currentElement());
+}
+
 void HTMLConstructionSite::insertHTMLElement(AtomicHTMLToken& token) {
   m_openElements.push(attachToCurrent(createHTMLElement(token)));
 }
@@ -299,7 +312,14 @@ PassRefPtr<Element> HTMLConstructionSite::createElement(
 
 PassRefPtr<Element> HTMLConstructionSite::createHTMLElement(
     AtomicHTMLToken& token) {
-  RefPtr<Element> element = createElement(token, xhtmlNamespaceURI);
+  QualifiedName tagName(nullAtom, token.name(), xhtmlNamespaceURI);
+  // FIXME: This can't use HTMLConstructionSite::createElement because we
+  // have to pass the current form element.  We should rework form association
+  // to occur after construction to allow better code sharing here.
+  RefPtr<Element> element =
+      HTMLElementFactory::createHTMLElement(tagName, m_document, form(), true);
+  element->setAttributeMap(token.takeAtributes(),
+                           m_fragmentScriptingPermission);
   ASSERT(element->isHTMLElement());
   return element.release();
 }
