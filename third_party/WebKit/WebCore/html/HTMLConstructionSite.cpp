@@ -306,12 +306,7 @@ PassRefPtr<Element> HTMLConstructionSite::createHTMLElement(
 
 PassRefPtr<Element> HTMLConstructionSite::createHTMLElementFromElementRecord(
     HTMLElementStack::ElementRecord* record) {
-  // FIXME: This will change to use
-  // return createHTMLElementFromSavedElement(record->element());
-  // in a later patch once tested.
-  AtomicHTMLToken fakeToken(HTMLToken::StartTag,
-                            record->element()->localName());
-  return createHTMLElement(fakeToken);
+  return createHTMLElementFromSavedElement(record->element());
 }
 
 namespace {
