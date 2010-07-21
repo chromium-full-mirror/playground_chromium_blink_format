@@ -77,8 +77,6 @@ class CachedImage : public CachedResource, public ImageObserver {
     return m_httpStatusCodeErrorOccurred;
   }
 
-  virtual bool schedule() const { return true; }
-
   void checkNotify();
 
   virtual bool isImage() const { return true; }

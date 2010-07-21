@@ -49,8 +49,6 @@ class CachedScript : public CachedResource {
   virtual void data(PassRefPtr<SharedBuffer> data, bool allDataReceived);
   virtual void error();
 
-  virtual bool schedule() const { return false; }
-
   void checkNotify();
 
   virtual void destroyDecodedData();

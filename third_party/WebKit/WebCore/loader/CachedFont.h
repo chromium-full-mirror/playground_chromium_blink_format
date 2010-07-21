@@ -57,8 +57,6 @@ class CachedFont : public CachedResource {
 
   virtual void allClientsRemoved();
 
-  virtual bool schedule() const { return true; }
-
   void checkNotify();
 
   void beginLoadIfNeeded(DocLoader* dl);
