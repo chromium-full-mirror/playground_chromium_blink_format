@@ -40,7 +40,7 @@ namespace WebKit {
 ChunkedUpdateDrawingArea::ChunkedUpdateDrawingArea(WebPage* webPage)
     : DrawingArea(ChunkedUpdateDrawingAreaType, webPage),
       m_isWaitingForUpdate(false),
-      m_shouldPaint(true),
+      m_paintingIsSuspended(false),
       m_displayTimer(WebProcess::shared().runLoop(),
                      this,
                      &ChunkedUpdateDrawingArea::display) {}
@@ -78,7 +78,7 @@ void ChunkedUpdateDrawingArea::setNeedsDisplay(const IntRect& rect) {
 void ChunkedUpdateDrawingArea::display() {
   ASSERT(!m_isWaitingForUpdate);
 
-  if (!m_shouldPaint)
+  if (m_paintingIsSuspended)
     return;
 
   if (m_dirtyRect.isEmpty())
@@ -103,10 +103,13 @@ void ChunkedUpdateDrawingArea::display() {
 }
 
 void ChunkedUpdateDrawingArea::scheduleDisplay() {
-  if (!m_shouldPaint)
+  if (m_paintingIsSuspended)
     return;
 
   if (m_isWaitingForUpdate)
+    return;
+
+  if (m_dirtyRect.isEmpty())
     return;
 
   if (m_displayTimer.isActive())
@@ -116,7 +119,6 @@ void ChunkedUpdateDrawingArea::scheduleDisplay() {
 }
 
 void ChunkedUpdateDrawingArea::setSize(const IntSize& viewSize) {
-  ASSERT(m_shouldPaint);
   ASSERT_ARG(viewSize, !viewSize.isEmpty());
 
   // We don't want to wait for an update until we display.
@@ -126,6 +128,16 @@ void ChunkedUpdateDrawingArea::setSize(const IntSize& viewSize) {
 
   // Layout if necessary.
   m_webPage->layoutIfNeeded();
+
+  if (m_paintingIsSuspended) {
+    ASSERT(!m_displayTimer.isActive());
+
+    // Painting is suspended, just send back an empty update chunk.
+    WebProcess::shared().connection()->send(DrawingAreaProxyMessage::DidSetSize,
+                                            m_webPage->pageID(),
+                                            CoreIPC::In(UpdateChunk()));
+    return;
+  }
 
   // Create a new UpdateChunk and paint into it.
   UpdateChunk updateChunk(IntRect(0, 0, viewSize.width(), viewSize.height()));
@@ -139,19 +151,24 @@ void ChunkedUpdateDrawingArea::setSize(const IntSize& viewSize) {
 }
 
 void ChunkedUpdateDrawingArea::suspendPainting() {
-  ASSERT(m_shouldPaint);
+  ASSERT(!m_paintingIsSuspended);
 
-  m_shouldPaint = false;
+  m_paintingIsSuspended = true;
   m_displayTimer.stop();
 }
 
-void ChunkedUpdateDrawingArea::resumePainting() {
-  ASSERT(!m_shouldPaint);
+void ChunkedUpdateDrawingArea::resumePainting(bool forceRepaint) {
+  ASSERT(m_paintingIsSuspended);
 
-  m_shouldPaint = true;
+  m_paintingIsSuspended = false;
 
-  // Display if needed.
-  display();
+  if (forceRepaint) {
+    // Just set the dirty rect to the entire page size.
+    m_dirtyRect = IntRect(IntPoint(0, 0), m_webPage->size());
+  }
+
+  // Schedule a display.
+  scheduleDisplay();
 }
 
 void ChunkedUpdateDrawingArea::didUpdate() {
@@ -179,10 +196,14 @@ void ChunkedUpdateDrawingArea::didReceiveMessage(
       suspendPainting();
       break;
 
-    case DrawingAreaMessage::ResumePainting:
-      resumePainting();
-      break;
+    case DrawingAreaMessage::ResumePainting: {
+      bool forceRepaint;
+      if (!arguments.decode(CoreIPC::Out(forceRepaint)))
+        return;
 
+      resumePainting(forceRepaint);
+      break;
+    }
     case DrawingAreaMessage::DidUpdate:
       didUpdate();
       break;
