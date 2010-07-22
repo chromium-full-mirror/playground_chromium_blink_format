@@ -376,17 +376,17 @@ void JSGlobalObject::reset(JSValue prototype) {
   putDirectFunctionWithoutTransition(Identifier(exec, "Error"),
                                      d()->errorConstructor, DontEnum);
   putDirectFunctionWithoutTransition(Identifier(exec, "EvalError"),
-                                     d()->evalErrorConstructor);
+                                     d()->evalErrorConstructor, DontEnum);
   putDirectFunctionWithoutTransition(Identifier(exec, "RangeError"),
-                                     d()->rangeErrorConstructor);
+                                     d()->rangeErrorConstructor, DontEnum);
   putDirectFunctionWithoutTransition(Identifier(exec, "ReferenceError"),
-                                     d()->referenceErrorConstructor);
+                                     d()->referenceErrorConstructor, DontEnum);
   putDirectFunctionWithoutTransition(Identifier(exec, "SyntaxError"),
-                                     d()->syntaxErrorConstructor);
+                                     d()->syntaxErrorConstructor, DontEnum);
   putDirectFunctionWithoutTransition(Identifier(exec, "TypeError"),
-                                     d()->typeErrorConstructor);
+                                     d()->typeErrorConstructor, DontEnum);
   putDirectFunctionWithoutTransition(Identifier(exec, "URIError"),
-                                     d()->URIErrorConstructor);
+                                     d()->URIErrorConstructor, DontEnum);
 
   // Set global values.
   GlobalPropertyInfo staticGlobals[] = {
