@@ -227,7 +227,7 @@ class WebViewImpl : public WebView, public RefCounted<WebViewImpl> {
   void mouseUp(const WebMouseEvent&);
   void mouseContextMenu(const WebMouseEvent&);
   void mouseDoubleClick(const WebMouseEvent&);
-  void mouseWheel(const WebMouseWheelEvent&);
+  bool mouseWheel(const WebMouseWheelEvent&);
   bool keyEvent(const WebKeyboardEvent&);
   bool charEvent(const WebKeyboardEvent&);
   bool touchEvent(const WebTouchEvent&);
