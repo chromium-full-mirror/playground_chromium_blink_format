@@ -58,6 +58,8 @@ WK_EXPORT bool WKBundleFramePauseAnimationOnElementWithId(
     WKStringRef elementID,
     double time);
 
+WK_EXPORT WKStringRef WKBundleFrameCopyName(WKBundleFrameRef frame);
+
 #ifdef __cplusplus
 }
 #endif

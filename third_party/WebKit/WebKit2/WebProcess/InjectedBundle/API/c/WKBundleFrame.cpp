@@ -75,3 +75,9 @@ JSGlobalContextRef WKBundleFrameGetJavaScriptContext(
                 ->globalObject(mainThreadNormalWorld())
                 ->globalExec()));
 }
+
+WKStringRef WKBundleFrameCopyName(WKBundleFrameRef frameRef) {
+  WebCore::String string = toWK(frameRef)->name();
+  string.impl()->ref();
+  return toRef(string.impl());
+}
