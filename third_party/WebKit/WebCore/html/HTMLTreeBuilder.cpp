@@ -717,11 +717,12 @@ void HTMLTreeBuilder::processStartTagForInBody(AtomicHTMLToken& token) {
       token.name() == centerTag || token.name() == "details" ||
       token.name() == dirTag || token.name() == divTag ||
       token.name() == dlTag || token.name() == fieldsetTag ||
-      token.name() == "figure" || token.name() == footerTag ||
-      token.name() == headerTag || token.name() == hgroupTag ||
-      token.name() == menuTag || token.name() == navTag ||
-      token.name() == olTag || token.name() == pTag ||
-      token.name() == sectionTag || token.name() == ulTag) {
+      token.name() == "figcaption" || token.name() == "figure" ||
+      token.name() == footerTag || token.name() == headerTag ||
+      token.name() == hgroupTag || token.name() == menuTag ||
+      token.name() == navTag || token.name() == olTag || token.name() == pTag ||
+      token.name() == sectionTag || token.name() == "summary" ||
+      token.name() == ulTag) {
     processFakePEndTagIfPInButtonScope();
     m_tree.insertHTMLElement(token);
     return;
