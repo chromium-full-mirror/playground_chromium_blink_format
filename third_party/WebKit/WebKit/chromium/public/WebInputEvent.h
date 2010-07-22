@@ -86,6 +86,7 @@ class WebInputEvent {
     MouseMove,
     MouseEnter,
     MouseLeave,
+    ContextMenu,
 
     // WebMouseWheelEvent
     MouseWheel,
@@ -128,7 +129,7 @@ class WebInputEvent {
   // Returns true if the WebInputEvent |type| is a mouse event.
   static bool isMouseEventType(int type) {
     return type == MouseDown || type == MouseUp || type == MouseMove ||
-           type == MouseEnter || type == MouseLeave;
+           type == MouseEnter || type == MouseLeave || type == ContextMenu;
   }
 
   // Returns true if the WebInputEvent |type| is a keyboard event.
