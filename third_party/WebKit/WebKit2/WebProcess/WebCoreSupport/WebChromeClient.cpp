@@ -423,8 +423,10 @@ void WebChromeClient::chooseIconForFiles(const Vector<String>&, FileChooser*) {
 }
 
 void WebChromeClient::setCursor(const Cursor& cursor) {
+#if USE(LAZY_NATIVE_CURSOR)
   WebProcess::shared().connection()->send(
       WebPageProxyMessage::SetCursor, m_page->pageID(), CoreIPC::In(cursor));
+#endif
 }
 
 void WebChromeClient::formStateDidChange(const Node*) {

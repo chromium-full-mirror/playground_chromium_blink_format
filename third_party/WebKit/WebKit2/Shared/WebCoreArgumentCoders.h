@@ -121,6 +121,7 @@ struct ArgumentCoder<WebCore::PluginInfo> {
   }
 };
 
+#if USE(LAZY_NATIVE_CURSOR)
 template <>
 struct ArgumentCoder<WebCore::Cursor> {
   static void encode(ArgumentEncoder* encoder, const WebCore::Cursor& cursor) {
@@ -143,6 +144,7 @@ struct ArgumentCoder<WebCore::Cursor> {
     return true;
   }
 };
+#endif
 
 }  // namespace CoreIPC
 

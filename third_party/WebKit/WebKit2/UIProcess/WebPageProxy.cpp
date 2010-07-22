@@ -551,10 +551,12 @@ void WebPageProxy::didReceiveMessage(CoreIPC::Connection* connection,
       break;
     }
     case WebPageProxyMessage::SetCursor: {
+#if USE(LAZY_NATIVE_CURSOR)
       Cursor cursor;
       if (!arguments.decode(cursor))
         return;
       setCursor(cursor);
+#endif
       break;
     }
     case WebPageProxyMessage::ShowPage: {
