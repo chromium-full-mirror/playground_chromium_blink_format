@@ -273,7 +273,8 @@ unsigned long long Timing::resourceLoadTimeRelativeToAbsolute(
   // check them for skew because they may be from another thread/process.
   double baseTime = getPossiblySkewedTimeInKnownRange(
       resourceTiming->requestTime, documentTiming->fetchStart,
-      documentTiming->responseEnd);
+      documentTiming->responseEnd -
+          (resourceTiming->receiveHeadersEnd / 1000.0));
   return toIntegerMilliseconds(baseTime) + relativeSeconds;
 }
 

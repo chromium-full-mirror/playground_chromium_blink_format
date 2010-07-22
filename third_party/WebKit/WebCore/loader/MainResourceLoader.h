@@ -116,6 +116,7 @@ class MainResourceLoader : public ResourceLoader {
 
   bool m_loadingMultipartContent;
   bool m_waitingForContentPolicy;
+  double m_timeOfLastDataReceived;
 };
 }
 
