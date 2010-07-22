@@ -124,7 +124,7 @@ class InspectorDOMAgent : public EventListener {
   void getInlineStyle(long callId, long nodeId);
   void getComputedStyle(long callId, long nodeId);
   void getStyleSheet(long callId, long styleSheetId);
-  void getRuleRangesForStyleSheetId(long callId, long styleSheetId);
+  void getRuleRanges(long callId, long styleSheetId);
   void applyStyleText(long callId,
                       long styleId,
                       const String& styleText,
