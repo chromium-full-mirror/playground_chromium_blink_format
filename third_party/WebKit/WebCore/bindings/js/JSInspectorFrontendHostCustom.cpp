@@ -89,8 +89,8 @@ JSValue JSInspectorFrontendHost::showContextMenu(ExecState* exec) {
     JSValue label = item->get(exec, Identifier(exec, "label"));
     JSValue id = item->get(exec, Identifier(exec, "id"));
     if (label.isUndefined() || id.isUndefined())
-      items.append(new ContextMenuItem(SeparatorType,
-                                       ContextMenuItemTagNoAction, String()));
+      items.append(new ContextMenuItem(
+          SeparatorType, ContextMenuItemCustomTagNoAction, String()));
     else {
       ContextMenuAction typedId = static_cast<ContextMenuAction>(
           ContextMenuItemBaseCustomTag + id.toInt32(exec));

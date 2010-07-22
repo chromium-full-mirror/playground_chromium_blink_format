@@ -289,7 +289,7 @@ void ContextMenuClientImpl::populateCustomMenuItems(
     ContextMenuItem* inputItem =
         defaultMenu->itemAtIndex(i, defaultMenu->platformDescription());
     if (inputItem->action() < ContextMenuItemBaseCustomTag ||
-        inputItem->action() >= ContextMenuItemBaseApplicationTag)
+        inputItem->action() > ContextMenuItemLastCustomTag)
       continue;
 
     WebMenuItemInfo outputItem;
