@@ -684,7 +684,8 @@ void HTMLTreeBuilder::processStartTagForInBody(AtomicHTMLToken& token) {
     m_tree.insertHTMLHtmlStartTagInBody(token);
     return;
   }
-  if (token.name() == baseTag || token.name() == "command" ||
+  if (token.name() == baseTag || token.name() == basefontTag ||
+      token.name() == "bgsound" || token.name() == "command" ||
       token.name() == linkTag || token.name() == metaTag ||
       token.name() == noframesTag || token.name() == scriptTag ||
       token.name() == styleTag || token.name() == titleTag) {
@@ -831,8 +832,7 @@ void HTMLTreeBuilder::processStartTagForInBody(AtomicHTMLToken& token) {
     token.setName(imgTag.localName());
     // Note the fall through to the imgTag handling below!
   }
-  if (token.name() == areaTag || token.name() == basefontTag ||
-      token.name() == "bgsound" || token.name() == brTag ||
+  if (token.name() == areaTag || token.name() == brTag ||
       token.name() == embedTag || token.name() == imgTag ||
       token.name() == inputTag || token.name() == keygenTag ||
       token.name() == wbrTag) {
@@ -1120,7 +1120,8 @@ void HTMLTreeBuilder::processStartTag(AtomicHTMLToken& token) {
         setInsertionMode(InFramesetMode);
         return;
       }
-      if (token.name() == baseTag || token.name() == linkTag ||
+      if (token.name() == baseTag || token.name() == basefontTag ||
+          token.name() == "bgsound" || token.name() == linkTag ||
           token.name() == metaTag || token.name() == noframesTag ||
           token.name() == scriptTag || token.name() == styleTag ||
           token.name() == titleTag) {
@@ -1267,7 +1268,8 @@ void HTMLTreeBuilder::processStartTag(AtomicHTMLToken& token) {
         m_tree.insertHTMLHtmlStartTagInBody(token);
         return;
       }
-      if (token.name() == linkTag || token.name() == metaTag ||
+      if (token.name() == basefontTag || token.name() == "bgsound" ||
+          token.name() == linkTag || token.name() == metaTag ||
           token.name() == noframesTag || token.name() == styleTag) {
         bool didProcess = processStartTagForInHead(token);
         ASSERT_UNUSED(didProcess, didProcess);
@@ -2600,7 +2602,8 @@ bool HTMLTreeBuilder::processStartTagForInHead(AtomicHTMLToken& token) {
     return true;
   }
   // FIXME: Atomize "command".
-  if (token.name() == baseTag || token.name() == "command" ||
+  if (token.name() == baseTag || token.name() == basefontTag ||
+      token.name() == "bgsound" || token.name() == "command" ||
       token.name() == linkTag || token.name() == metaTag) {
     m_tree.insertSelfClosingHTMLElement(token);
     // Note: The custom processing for the <meta> tag is done in
