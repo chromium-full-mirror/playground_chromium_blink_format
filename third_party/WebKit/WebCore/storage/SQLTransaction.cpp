@@ -317,8 +317,7 @@ void SQLTransaction::deliverTransactionCallback() {
     shouldDeliverErrorCallback =
         !m_callback->handleEvent(m_database->scriptExecutionContext(), this);
     m_executeSqlAllowed = false;
-  } else
-    shouldDeliverErrorCallback = true;
+  }
 
   // Transaction Step 5 - If the transaction callback was null or raised an
   // exception, jump to the error callback
