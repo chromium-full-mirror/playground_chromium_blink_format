@@ -48,7 +48,7 @@ class PlatformStrategies {
   }
 
  protected:
-  PlatformStrategies() : m_pluginStrategy(0) {}
+  PlatformStrategies() : m_pluginStrategy(0), m_localizationStrategy(0) {}
 
   virtual ~PlatformStrategies() {}
 
