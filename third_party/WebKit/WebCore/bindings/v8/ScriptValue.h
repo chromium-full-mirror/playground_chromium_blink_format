@@ -43,6 +43,7 @@
 
 namespace WebCore {
 
+class InspectorValue;
 class SerializedScriptValue;
 
 class ScriptValue {
@@ -128,6 +129,8 @@ class ScriptValue {
   }
   bool getString(String& result) const;
   String toString(ScriptState*) const;
+
+  PassRefPtr<InspectorValue> toInspectorValue(ScriptState*) const;
 
  private:
   mutable v8::Persistent<v8::Value> m_value;

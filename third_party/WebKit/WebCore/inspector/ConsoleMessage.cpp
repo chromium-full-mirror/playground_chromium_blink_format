@@ -34,9 +34,10 @@
 #include "InjectedScript.h"
 #include "InjectedScriptHost.h"
 #include "InspectorFrontend.h"
+#include "InspectorValues.h"
+#include "RemoteInspectorFrontend.h"
 #include "ScriptCallStack.h"
 #include "ScriptObject.h"
-#include "SerializedScriptValue.h"
 
 namespace WebCore {
 
@@ -53,12 +54,12 @@ bool ConsoleMessage::CallFrame::isEqual(
          m_lineNumber == o.m_lineNumber;
 }
 
-ScriptObject ConsoleMessage::CallFrame::buildObject(
-    InspectorFrontend* frontend) const {
-  ScriptObject frame = frontend->newScriptObject();
-  frame.set("functionName", m_functionName);
-  frame.set("sourceURL", m_sourceURL.string());
-  frame.set("lineNumber", m_lineNumber);
+PassRefPtr<InspectorObject> ConsoleMessage::CallFrame::buildInspectorObject()
+    const {
+  RefPtr<InspectorObject> frame = InspectorObject::create();
+  frame->setString("functionName", m_functionName);
+  frame->setString("sourceURL", m_sourceURL.string());
+  frame->setNumber("lineNumber", m_lineNumber);
   return frame;
 }
 
@@ -114,41 +115,43 @@ ConsoleMessage::ConsoleMessage(MessageSource s,
 }
 
 #if ENABLE(INSPECTOR)
-void ConsoleMessage::addToFrontend(InspectorFrontend* frontend,
+void ConsoleMessage::addToFrontend(RemoteInspectorFrontend* frontend,
                                    InjectedScriptHost* injectedScriptHost) {
-  ScriptObject jsonObj = frontend->newScriptObject();
-  jsonObj.set("source", static_cast<int>(m_source));
-  jsonObj.set("type", static_cast<int>(m_type));
-  jsonObj.set("level", static_cast<int>(m_level));
-  jsonObj.set("line", static_cast<int>(m_line));
-  jsonObj.set("url", m_url);
-  jsonObj.set("groupLevel", static_cast<int>(m_groupLevel));
-  jsonObj.set("repeatCount", static_cast<int>(m_repeatCount));
-  jsonObj.set("message", m_message);
+  RefPtr<InspectorObject> jsonObj = InspectorObject::create();
+  jsonObj->setNumber("source", static_cast<int>(m_source));
+  jsonObj->setNumber("type", static_cast<int>(m_type));
+  jsonObj->setNumber("level", static_cast<int>(m_level));
+  jsonObj->setNumber("line", static_cast<int>(m_line));
+  jsonObj->setString("url", m_url);
+  jsonObj->setNumber("groupLevel", static_cast<int>(m_groupLevel));
+  jsonObj->setNumber("repeatCount", static_cast<int>(m_repeatCount));
+  jsonObj->setString("message", m_message);
   if (!m_arguments.isEmpty()) {
-    ScriptArray jsonArgs = frontend->newScriptArray();
+    RefPtr<InspectorArray> jsonArgs = InspectorArray::create();
     InjectedScript injectedScript =
         injectedScriptHost->injectedScriptFor(m_scriptState.get());
     for (unsigned i = 0; i < m_arguments.size(); ++i) {
-      RefPtr<SerializedScriptValue> serializedValue =
+      RefPtr<InspectorValue> inspectorValue =
           injectedScript.wrapForConsole(m_arguments[i]);
-      if (!jsonArgs.set(i, serializedValue.get())) {
+      if (!inspectorValue) {
         ASSERT_NOT_REACHED();
         return;
       }
+      jsonArgs->push(inspectorValue);
     }
-    jsonObj.set("parameters", jsonArgs);
+    jsonObj->set("parameters", jsonArgs);
   }
   if (!m_frames.isEmpty()) {
-    ScriptArray frames = frontend->newScriptArray();
+    RefPtr<InspectorArray> frames = InspectorArray::create();
     for (unsigned i = 0; i < m_frames.size(); i++)
-      frames.set(i, m_frames.at(i).buildObject(frontend));
-    jsonObj.set("stackTrace", frames);
+      frames->push(m_frames.at(i).buildInspectorObject());
+    jsonObj->set("stackTrace", frames);
   }
   frontend->addConsoleMessage(jsonObj);
 }
 
-void ConsoleMessage::updateRepeatCountInConsole(InspectorFrontend* frontend) {
+void ConsoleMessage::updateRepeatCountInConsole(
+    RemoteInspectorFrontend* frontend) {
   frontend->updateConsoleMessageRepeatCount(m_repeatCount);
 }
 #endif  // ENABLE(INSPECTOR)

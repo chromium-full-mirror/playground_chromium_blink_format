@@ -49,6 +49,7 @@
 #include "InspectorResource.h"
 #include "Page.h"
 #include "Pasteboard.h"
+#include "RemoteInspectorFrontend.h"
 #include "ScriptArray.h"
 #include "ScriptBreakpoint.h"
 #include "SerializedScriptValue.h"
@@ -388,9 +389,12 @@ void InspectorBackend::pushNodeByPathToFrontend(long callId,
     domAgent->pushNodeByPathToFrontend(callId, path);
 }
 
-void InspectorBackend::clearConsoleMessages() {
-  if (m_inspectorController)
+void InspectorBackend::clearConsoleMessages(long callId) {
+  if (m_inspectorController) {
     m_inspectorController->clearConsoleMessages();
+    if (RemoteInspectorFrontend* frontend = remoteFrontend())
+      frontend->didClearConsoleMessages(callId);
+  }
 }
 
 void InspectorBackend::getStyles(long callId, long nodeId, bool authorOnly) {
@@ -570,6 +574,12 @@ InspectorFrontend* InspectorBackend::inspectorFrontend() {
   if (!m_inspectorController)
     return 0;
   return m_inspectorController->m_frontend.get();
+}
+
+RemoteInspectorFrontend* InspectorBackend::remoteFrontend() {
+  if (!m_inspectorController)
+    return 0;
+  return m_inspectorController->m_remoteFrontend.get();
 }
 
 void InspectorBackend::addScriptToEvaluateOnLoad(const String& source) {
