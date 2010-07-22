@@ -129,10 +129,10 @@ bool isSpecialTag(const AtomicString& tagName) {
 // Same as isScopingTag in LegacyHTMLTreeBuilder.cpp
 // and isScopeMarker in HTMLElementStack.cpp
 bool isScopingTag(const AtomicString& tagName) {
-  return tagName == appletTag || tagName == buttonTag ||
-         tagName == captionTag || tagName == SVGNames::foreignObjectTag ||
-         tagName == htmlTag || tagName == marqueeTag || tagName == objectTag ||
-         tagName == tableTag || isTableCellContextTag(tagName);
+  return tagName == appletTag || tagName == captionTag ||
+         tagName == SVGNames::foreignObjectTag || tagName == htmlTag ||
+         tagName == marqueeTag || tagName == objectTag || tagName == tableTag ||
+         isTableCellContextTag(tagName);
 }
 
 bool isNonAnchorNonNobrFormattingTag(const AtomicString& tagName) {
@@ -493,8 +493,8 @@ void HTMLTreeBuilder::processFakeCharacters(const String& characters) {
   processCharacterBuffer(buffer);
 }
 
-void HTMLTreeBuilder::processFakePEndTagIfPInScope() {
-  if (!m_tree.openElements()->inScope(pTag.localName()))
+void HTMLTreeBuilder::processFakePEndTagIfPInButtonScope() {
+  if (!m_tree.openElements()->inButtonScope(pTag.localName()))
     return;
   AtomicHTMLToken endP(HTMLToken::EndTag, pTag.localName());
   processEndTag(endP);
@@ -572,7 +572,7 @@ void HTMLTreeBuilder::processCloseWhenNestedTag(AtomicHTMLToken& token) {
       break;
     nodeRecord = nodeRecord->next();
   }
-  processFakePEndTagIfPInScope();
+  processFakePEndTagIfPInButtonScope();
   m_tree.insertHTMLElement(token);
 }
 
@@ -722,12 +722,12 @@ void HTMLTreeBuilder::processStartTagForInBody(AtomicHTMLToken& token) {
       token.name() == menuTag || token.name() == navTag ||
       token.name() == olTag || token.name() == pTag ||
       token.name() == sectionTag || token.name() == ulTag) {
-    processFakePEndTagIfPInScope();
+    processFakePEndTagIfPInButtonScope();
     m_tree.insertHTMLElement(token);
     return;
   }
   if (isNumberedHeaderTag(token.name())) {
-    processFakePEndTagIfPInScope();
+    processFakePEndTagIfPInButtonScope();
     if (isNumberedHeaderTag(m_tree.currentElement()->localName())) {
       parseError(token);
       m_tree.openElements()->pop();
@@ -736,7 +736,7 @@ void HTMLTreeBuilder::processStartTagForInBody(AtomicHTMLToken& token) {
     return;
   }
   if (token.name() == preTag || token.name() == listingTag) {
-    processFakePEndTagIfPInScope();
+    processFakePEndTagIfPInButtonScope();
     m_tree.insertHTMLElement(token);
     m_tokenizer->skipLeadingNewLineForListing();
     m_framesetOk = false;
@@ -747,7 +747,7 @@ void HTMLTreeBuilder::processStartTagForInBody(AtomicHTMLToken& token) {
       parseError(token);
       return;
     }
-    processFakePEndTagIfPInScope();
+    processFakePEndTagIfPInButtonScope();
     m_tree.insertHTMLFormElement(token);
     return;
   }
@@ -760,7 +760,7 @@ void HTMLTreeBuilder::processStartTagForInBody(AtomicHTMLToken& token) {
     return;
   }
   if (token.name() == plaintextTag) {
-    processFakePEndTagIfPInScope();
+    processFakePEndTagIfPInButtonScope();
     m_tree.insertHTMLElement(token);
     m_tokenizer->setState(HTMLTokenizer::PLAINTEXTState);
     return;
@@ -846,7 +846,7 @@ void HTMLTreeBuilder::processStartTagForInBody(AtomicHTMLToken& token) {
     return;
   }
   if (token.name() == hrTag) {
-    processFakePEndTagIfPInScope();
+    processFakePEndTagIfPInButtonScope();
     m_tree.insertSelfClosingHTMLElement(token);
     m_framesetOk = false;
     return;
@@ -865,7 +865,7 @@ void HTMLTreeBuilder::processStartTagForInBody(AtomicHTMLToken& token) {
     return;
   }
   if (token.name() == xmpTag) {
-    processFakePEndTagIfPInScope();
+    processFakePEndTagIfPInButtonScope();
     m_tree.reconstructTheActiveFormattingElements();
     m_framesetOk = false;
     processGenericRawTextStartTag(token);
@@ -1836,7 +1836,7 @@ void HTMLTreeBuilder::processEndTagForInBody(AtomicHTMLToken& token) {
     m_tree.openElements()->remove(node.get());
   }
   if (token.name() == pTag) {
-    if (!m_tree.openElements()->inScope(token.name())) {
+    if (!m_tree.openElements()->inButtonScope(token.name())) {
       parseError(token);
       processFakeStartTag(pTag);
       ASSERT(m_tree.openElements()->inScope(token.name()));

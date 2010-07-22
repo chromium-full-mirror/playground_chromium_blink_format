@@ -147,7 +147,7 @@ class HTMLTreeBuilder : public Noncopyable {
                            PassRefPtr<NamedNodeMap> attributes = 0);
   void processFakeEndTag(const QualifiedName&);
   void processFakeCharacters(const String&);
-  void processFakePEndTagIfPInScope();
+  void processFakePEndTagIfPInButtonScope();
 
   void processGenericRCDATAStartTag(AtomicHTMLToken&);
   void processGenericRawTextStartTag(AtomicHTMLToken&);

@@ -41,8 +41,7 @@ using namespace HTMLNames;
 namespace {
 
 inline bool isScopeMarker(Element* element) {
-  return element->hasTagName(appletTag) || element->hasTagName(buttonTag) ||
-         element->hasTagName(captionTag)
+  return element->hasTagName(appletTag) || element->hasTagName(captionTag)
 #if ENABLE(SVG_FOREIGN_OBJECT)
          || element->hasTagName(SVGNames::foreignObjectTag)
 #endif
@@ -67,6 +66,10 @@ inline bool isTableBodyScopeMarker(Element* element) {
 
 inline bool isTableRowScopeMarker(Element* element) {
   return element->hasTagName(trTag) || element->hasTagName(htmlTag);
+}
+
+inline bool isButtonScopeMarker(Element* element) {
+  return isScopeMarker(element) || element->hasTagName(buttonTag);
 }
 }
 
@@ -358,6 +361,15 @@ bool HTMLElementStack::inTableScope(const AtomicString& targetTag) const {
 bool HTMLElementStack::inTableScope(const QualifiedName& tagName) const {
   // FIXME: Is localName() right for non-html elements?
   return inTableScope(tagName.localName());
+}
+
+bool HTMLElementStack::inButtonScope(const AtomicString& targetTag) const {
+  return inScopeCommon<isButtonScopeMarker>(m_top.get(), targetTag);
+}
+
+bool HTMLElementStack::inButtonScope(const QualifiedName& tagName) const {
+  // FIXME: Is localName() right for non-html elements?
+  return inButtonScope(tagName.localName());
 }
 
 Element* HTMLElementStack::htmlElement() const {
