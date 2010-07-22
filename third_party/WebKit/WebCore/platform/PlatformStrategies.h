@@ -31,24 +31,33 @@
 namespace WebCore {
 
 class PluginStrategy;
+class LocalizationStrategy;
 
 class PlatformStrategies {
  public:
   PluginStrategy* pluginStrategy() {
     if (!m_pluginStrategy)
       m_pluginStrategy = createPluginStrategy();
-
     return m_pluginStrategy;
+  }
+
+  LocalizationStrategy* localizationStrategy() {
+    if (!m_localizationStrategy)
+      m_localizationStrategy = createLocalizationStrategy();
+    return m_localizationStrategy;
   }
 
  protected:
   PlatformStrategies() : m_pluginStrategy(0) {}
+
   virtual ~PlatformStrategies() {}
 
  private:
   virtual PluginStrategy* createPluginStrategy() = 0;
+  virtual LocalizationStrategy* createLocalizationStrategy() = 0;
 
   PluginStrategy* m_pluginStrategy;
+  LocalizationStrategy* m_localizationStrategy;
 };
 
 PlatformStrategies* platformStrategies();
