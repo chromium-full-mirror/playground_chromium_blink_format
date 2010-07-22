@@ -47,6 +47,7 @@ class UpdateChunk {
 
   uint8_t* data();
   const WebCore::IntRect& rect() const { return m_rect; }
+  bool isEmpty() const { return m_rect.isEmpty(); }
 
   void encode(CoreIPC::ArgumentEncoder&) const;
   static bool decode(CoreIPC::ArgumentDecoder&, UpdateChunk&);

@@ -40,6 +40,10 @@ class QWKPagePrivate : public WebKit::PageClient {
 
   void init(const QSize& viewportSize, WebKit::DrawingAreaProxy*);
 
+#if USE(ACCELERATED_COMPOSITING)
+  void pageDidEnterAcceleratedCompositing() {}
+  void pageDidLeaveAcceleratedCompositing() {}
+#endif  // USE(ACCELERATED_COMPOSITING)
   virtual void processDidExit() {}
   virtual void processDidRevive() {}
   virtual void setCursor(const WebCore::Cursor&) {}
