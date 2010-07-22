@@ -42,6 +42,7 @@ class QWKPagePrivate : public WebKit::PageClient {
 
   virtual void processDidExit() {}
   virtual void processDidRevive() {}
+  virtual void setCursor(const WebCore::Cursor&) {}
   virtual void takeFocus(bool direction) {}
   virtual void toolTipChanged(const WebCore::String&, const WebCore::String&);
 
