@@ -110,6 +110,7 @@ class InjectedBundlePage {
                                WKStringRef defaultValue,
                                WKBundleFrameRef);
 
+  void dumpAllFramesText();
   void dumpAllFrameScrollPositions();
 
   WKBundlePageRef m_page;
