@@ -424,7 +424,8 @@ static VisiblePosition positionAvoidingFirstPositionInTable(
     const VisiblePosition& c) {
   // return table offset 0 instead of the first VisiblePosition inside the table
   VisiblePosition previous = c.previous();
-  if (isLastPositionBeforeTable(previous))
+  if (isLastPositionBeforeTable(previous) &&
+      isEditablePosition(previous.deepEquivalent()))
     return previous;
 
   return c;
