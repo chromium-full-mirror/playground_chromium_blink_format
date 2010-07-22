@@ -70,8 +70,6 @@
 
 using namespace WebCore;
 
-CheckPermissionFunctionType* checkPermissionFunction = 0;
-RequestPermissionFunctionType* requestPermissionFunction = 0;
 QMap<int, QWebScriptWorld*> m_worldMap;
 
 DumpRenderTreeSupportQt::DumpRenderTreeSupportQt() {}
@@ -597,20 +595,6 @@ void DumpRenderTreeSupportQt::dumpNotification(bool b) {
 #endif
 }
 
-void DumpRenderTreeSupportQt::setNotificationsReceiver(QObject* receiver) {
-#if ENABLE(NOTIFICATIONS)
-  NotificationPresenterClientQt::notificationPresenter()->setReceiver(receiver);
-#endif
-}
-
-void DumpRenderTreeSupportQt::allowNotificationForOrigin(
-    const QString& origin) {
-#if ENABLE(NOTIFICATIONS)
-  NotificationPresenterClientQt::notificationPresenter()
-      ->allowNotificationForOrigin(origin);
-#endif
-}
-
 void DumpRenderTreeSupportQt::setMockGeolocationPosition(double latitude,
                                                          double longitude,
                                                          double accuracy) {
@@ -630,16 +614,6 @@ void DumpRenderTreeSupportQt::setMockGeolocationError(int errorCode,
       static_cast<PositionError::ErrorCode>(errorCode), message);
   GeolocationServiceMock::setError(positionError);
 #endif
-}
-
-void DumpRenderTreeSupportQt::setCheckPermissionFunction(
-    CheckPermissionFunctionType* f) {
-  checkPermissionFunction = f;
-}
-
-void DumpRenderTreeSupportQt::setRequestPermissionFunction(
-    RequestPermissionFunctionType* f) {
-  requestPermissionFunction = f;
 }
 
 bool DumpRenderTreeSupportQt::isTargetItem(const QWebHistoryItem& historyItem) {

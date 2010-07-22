@@ -72,6 +72,7 @@ class LayoutTestController : public QObject {
   bool canOpenWindows() const { return m_canOpenWindows; }
   bool shouldDumpTitleChanges() const { return m_dumpTitleChanges; }
   bool waitForPolicy() const { return m_waitForPolicy; }
+  bool ignoreReqestForPermission() const { return m_ignoreDesktopNotification; }
 
   void reset();
 
@@ -125,6 +126,7 @@ class LayoutTestController : public QObject {
   void setCloseRemainingWindowsWhenComplete(bool = false) {}
   int windowCount();
   void grantDesktopNotificationPermission(const QString& origin);
+  void ignoreDesktopNotificationPermissionRequests();
   bool checkDesktopNotificationPermission(const QString& origin);
   void display();
   void clearBackForwardList();
@@ -287,6 +289,7 @@ class LayoutTestController : public QObject {
   WebCore::DumpRenderTree* m_drt;
   QWebHistory* m_webHistory;
   QStringList m_desktopNotificationAllowedOrigins;
+  bool m_ignoreDesktopNotification;
 };
 
 #endif  // LayoutTestControllerQt_h

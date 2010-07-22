@@ -66,6 +66,12 @@ class WebPage : public QWebPage {
   void setUserAgent(const QString& ua) { m_userAgent = ua; }
   bool shouldInterruptJavaScript();
   void authenticationRequired(QNetworkReply*, QAuthenticator*);
+  void requestPermission(QWebFrame* frame, QWebPage::PermissionDomain domain);
+  void checkPermission(QWebFrame* frame,
+                       QWebPage::PermissionDomain domain,
+                       QWebPage::PermissionPolicy& policy);
+  void cancelRequestsForPermission(QWebFrame* frame,
+                                   QWebPage::PermissionDomain domain);
 
  private:
   void applyProxy();

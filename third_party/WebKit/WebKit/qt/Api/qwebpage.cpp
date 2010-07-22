@@ -2232,6 +2232,22 @@ bool QWebPage::allowGeolocationRequest(QWebFrame* frame) {
 #endif
 }
 
+void QWebPage::setUserPermission(QWebFrame* frame,
+                                 PermissionDomain domain,
+                                 PermissionPolicy policy) {
+  switch (domain) {
+    case NotificationsPermissionDomain:
+#if ENABLE(NOTIFICATIONS)
+      if (policy == PermissionGranted)
+        NotificationPresenterClientQt::notificationPresenter()
+            ->allowNotificationForFrame(frame);
+#endif
+      break;
+    default:
+      break;
+  }
+}
+
 /*!
     This function is called whenever WebKit wants to create a new window of the
    given \a type, for

@@ -196,6 +196,14 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
 
   enum WebWindowType { WebBrowserWindow, WebModalDialog };
 
+  enum PermissionPolicy {
+    PermissionGranted,
+    PermissionUnknown,
+    PermissionDenied
+  };
+
+  enum PermissionDomain { NotificationsPermissionDomain };
+
   class ViewportHints {
    public:
     ViewportHints();
@@ -290,6 +298,10 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
 
   QMenu* createStandardContextMenu();
 
+  void setUserPermission(QWebFrame* frame,
+                         PermissionDomain domain,
+                         PermissionPolicy policy);
+
   enum Extension { ChooseMultipleFilesExtension, ErrorPageExtension };
   class ExtensionOption {};
   class ExtensionReturn {};
@@ -370,6 +382,14 @@ class QWEBKIT_EXPORT QWebPage : public QObject {
   void restoreFrameStateRequested(QWebFrame* frame);
 
   void viewportChangeRequested(const QWebPage::ViewportHints& hints);
+
+  void requestPermissionFromUser(QWebFrame* frame,
+                                 QWebPage::PermissionDomain domain);
+  void checkPermissionFromUser(QWebFrame* frame,
+                               QWebPage::PermissionDomain domain,
+                               QWebPage::PermissionPolicy& policy);
+  void cancelRequestsForPermission(QWebFrame* frame,
+                                   QWebPage::PermissionDomain domain);
 
  protected:
   virtual QWebPage* createWindow(WebWindowType type);
