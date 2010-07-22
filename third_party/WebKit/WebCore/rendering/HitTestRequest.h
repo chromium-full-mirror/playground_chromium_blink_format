@@ -35,7 +35,9 @@ class HitTestRequest {
     SVGClipContent = 1 << 6
   };
 
-  HitTestRequest(int requestType) : m_requestType(requestType) {}
+  typedef unsigned HitTestRequestType;
+
+  HitTestRequest(HitTestRequestType requestType) : m_requestType(requestType) {}
 
   bool readOnly() const { return m_requestType & ReadOnly; }
   bool active() const { return m_requestType & Active; }
@@ -45,7 +47,7 @@ class HitTestRequest {
   bool svgClipContent() const { return m_requestType & SVGClipContent; }
 
  private:
-  int m_requestType;
+  HitTestRequestType m_requestType;
 };
 
 }  // namespace WebCore

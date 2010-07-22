@@ -909,7 +909,7 @@ HitTestResult EventHandler::hitTestResultAtPoint(
     bool allowShadowContent,
     bool ignoreClipping,
     HitTestScrollbars testScrollbars,
-    int hitType) {
+    HitTestRequest::HitTestRequestType hitType) {
   HitTestResult result(point);
   if (!m_frame->contentRenderer())
     return result;
@@ -1531,7 +1531,7 @@ bool EventHandler::handleMouseMoveEvent(const PlatformMouseEvent& mouseEvent,
   // the mouse
   // was pressed, rather than updating for nodes the mouse moves over as you
   // hold the mouse down.
-  int hitType = HitTestRequest::MouseMove;
+  HitTestRequest::HitTestRequestType hitType = HitTestRequest::MouseMove;
   if (m_mousePressed && m_mouseDownMayStartSelect)
     hitType |= HitTestRequest::ReadOnly;
   if (m_mousePressed)
@@ -3120,7 +3120,8 @@ bool EventHandler::handleTouchEvent(const PlatformTouchEvent& event) {
     const PlatformTouchPoint& point = points[i];
     IntPoint pagePoint = documentPointForWindowPoint(m_frame, point.pos());
 
-    int hitType = HitTestRequest::Active | HitTestRequest::ReadOnly;
+    HitTestRequest::HitTestRequestType hitType =
+        HitTestRequest::Active | HitTestRequest::ReadOnly;
     // The HitTestRequest types used for mouse events map quite adequately
     // to touch events. Note that in addition to meaning that the hit test
     // should affect the active state of the current node if necessary,

@@ -113,7 +113,8 @@ class EventHandler : public Noncopyable {
       bool allowShadowContent,
       bool ignoreClipping = false,
       HitTestScrollbars scrollbars = DontHitTestScrollbars,
-      int hitType = HitTestRequest::ReadOnly | HitTestRequest::Active);
+      HitTestRequest::HitTestRequestType hitType = HitTestRequest::ReadOnly |
+                                                   HitTestRequest::Active);
 
   bool mousePressed() const { return m_mousePressed; }
   void setMousePressed(bool pressed) { m_mousePressed = pressed; }
