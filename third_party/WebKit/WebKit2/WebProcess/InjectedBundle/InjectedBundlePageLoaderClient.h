@@ -52,7 +52,7 @@ class InjectedBundlePageLoaderClient {
   void didReceiveTitleForFrame(WebPage*, const WebCore::String&, WebFrame*);
   void didClearWindowObjectForFrame(WebPage*,
                                     WebFrame*,
-                                    JSContextRef,
+                                    JSGlobalContextRef,
                                     JSObjectRef);
 
  private:

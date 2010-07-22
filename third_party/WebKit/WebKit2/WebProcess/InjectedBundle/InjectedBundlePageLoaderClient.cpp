@@ -103,10 +103,10 @@ void InjectedBundlePageLoaderClient::didReceiveTitleForFrame(
 void InjectedBundlePageLoaderClient::didClearWindowObjectForFrame(
     WebPage* page,
     WebFrame* frame,
-    JSContextRef ctx,
+    JSGlobalContextRef context,
     JSObjectRef window) {
   if (m_client.didClearWindowObjectForFrame)
-    m_client.didClearWindowObjectForFrame(toRef(page), toRef(frame), ctx,
+    m_client.didClearWindowObjectForFrame(toRef(page), toRef(frame), context,
                                           window, m_client.clientInfo);
 }
 

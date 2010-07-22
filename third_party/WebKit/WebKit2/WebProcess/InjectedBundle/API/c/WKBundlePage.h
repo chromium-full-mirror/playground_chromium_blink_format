@@ -69,7 +69,7 @@ typedef void (*WKBundlePageDidReceiveTitleForFrameCallback)(
 typedef void (*WKBundlePageDidClearWindowObjectForFrameCallback)(
     WKBundlePageRef page,
     WKBundleFrameRef frame,
-    JSContextRef ctx,
+    JSGlobalContextRef context,
     JSObjectRef window,
     const void* clientInfo);
 

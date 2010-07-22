@@ -127,6 +127,19 @@ bool LayoutTestController::pauseAnimationAtTimeOnElementWithId(
                                                     idWK.get(), time);
 }
 
+bool LayoutTestController::shouldDumpDOMAsWebArchive() const {
+  return false;
+}
+
+bool LayoutTestController::shouldDumpSourceAsWebArchive() const {
+  return false;
+}
+
+bool LayoutTestController::shouldDumpFrameScrollPositions() const {
+  return !shouldDumpAsText() && !shouldDumpDOMAsWebArchive() &&
+         !shouldDumpSourceAsWebArchive();
+}
+
 // Object Creation
 
 void LayoutTestController::makeWindowObject(JSContextRef context,

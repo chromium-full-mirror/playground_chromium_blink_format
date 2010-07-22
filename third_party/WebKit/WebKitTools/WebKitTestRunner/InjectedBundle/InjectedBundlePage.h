@@ -42,63 +42,62 @@ class InjectedBundlePage {
 
  private:
   // Loader Client
-  static void _didStartProvisionalLoadForFrame(WKBundlePageRef page,
-                                               WKBundleFrameRef frame,
+  static void _didStartProvisionalLoadForFrame(WKBundlePageRef,
+                                               WKBundleFrameRef,
                                                const void* clientInfo);
   static void _didReceiveServerRedirectForProvisionalLoadForFrame(
-      WKBundlePageRef page,
-      WKBundleFrameRef frame,
+      WKBundlePageRef,
+      WKBundleFrameRef,
       const void* clientInfo);
-  static void _didFailProvisionalLoadWithErrorForFrame(WKBundlePageRef page,
-                                                       WKBundleFrameRef frame,
+  static void _didFailProvisionalLoadWithErrorForFrame(WKBundlePageRef,
+                                                       WKBundleFrameRef,
                                                        const void* clientInfo);
-  static void _didCommitLoadForFrame(WKBundlePageRef page,
-                                     WKBundleFrameRef frame,
+  static void _didCommitLoadForFrame(WKBundlePageRef,
+                                     WKBundleFrameRef,
                                      const void* clientInfo);
-  static void _didFinishLoadForFrame(WKBundlePageRef page,
-                                     WKBundleFrameRef frame,
+  static void _didFinishLoadForFrame(WKBundlePageRef,
+                                     WKBundleFrameRef,
                                      const void* clientInfo);
-  static void _didFailLoadWithErrorForFrame(WKBundlePageRef page,
-                                            WKBundleFrameRef frame,
+  static void _didFailLoadWithErrorForFrame(WKBundlePageRef,
+                                            WKBundleFrameRef,
                                             const void* clientInfo);
-  static void _didReceiveTitleForFrame(WKBundlePageRef page,
+  static void _didReceiveTitleForFrame(WKBundlePageRef,
                                        WKStringRef title,
-                                       WKBundleFrameRef frame,
+                                       WKBundleFrameRef,
                                        const void* clientInfo);
-  static void _didClearWindowForFrame(WKBundlePageRef page,
-                                      WKBundleFrameRef frame,
-                                      JSContextRef ctx,
+  static void _didClearWindowForFrame(WKBundlePageRef,
+                                      WKBundleFrameRef,
+                                      JSGlobalContextRef,
                                       JSObjectRef window,
                                       const void* clientInfo);
-  void didStartProvisionalLoadForFrame(WKBundleFrameRef frame);
-  void didReceiveServerRedirectForProvisionalLoadForFrame(
-      WKBundleFrameRef frame);
-  void didFailProvisionalLoadWithErrorForFrame(WKBundleFrameRef frame);
-  void didCommitLoadForFrame(WKBundleFrameRef frame);
-  void didFinishLoadForFrame(WKBundleFrameRef frame);
-  void didFailLoadWithErrorForFrame(WKBundleFrameRef frame);
-  void didReceiveTitleForFrame(WKStringRef title, WKBundleFrameRef frame);
-  void didClearWindowForFrame(WKBundleFrameRef frame,
-                              JSContextRef ctx,
+  void didStartProvisionalLoadForFrame(WKBundleFrameRef);
+  void didReceiveServerRedirectForProvisionalLoadForFrame(WKBundleFrameRef);
+  void didFailProvisionalLoadWithErrorForFrame(WKBundleFrameRef);
+  void didCommitLoadForFrame(WKBundleFrameRef);
+  void didFinishLoadForFrame(WKBundleFrameRef);
+  void didFailLoadWithErrorForFrame(WKBundleFrameRef);
+  void didReceiveTitleForFrame(WKStringRef title, WKBundleFrameRef);
+  void didClearWindowForFrame(WKBundleFrameRef,
+                              JSGlobalContextRef,
                               JSObjectRef window);
 
   // UI Client
-  static void _willAddMessageToConsole(WKBundlePageRef page,
+  static void _willAddMessageToConsole(WKBundlePageRef,
                                        WKStringRef message,
                                        uint32_t lineNumber,
                                        const void* clientInfo);
-  static void _willSetStatusbarText(WKBundlePageRef page,
+  static void _willSetStatusbarText(WKBundlePageRef,
                                     WKStringRef statusbarText,
                                     const void* clientInfo);
-  static void _willRunJavaScriptAlert(WKBundlePageRef page,
+  static void _willRunJavaScriptAlert(WKBundlePageRef,
                                       WKStringRef message,
                                       WKBundleFrameRef frame,
                                       const void* clientInfo);
-  static void _willRunJavaScriptConfirm(WKBundlePageRef page,
+  static void _willRunJavaScriptConfirm(WKBundlePageRef,
                                         WKStringRef message,
                                         WKBundleFrameRef frame,
                                         const void* clientInfo);
-  static void _willRunJavaScriptPrompt(WKBundlePageRef page,
+  static void _willRunJavaScriptPrompt(WKBundlePageRef,
                                        WKStringRef message,
                                        WKStringRef defaultValue,
                                        WKBundleFrameRef frame,
@@ -110,6 +109,8 @@ class InjectedBundlePage {
   void willRunJavaScriptPrompt(WKStringRef message,
                                WKStringRef defaultValue,
                                WKBundleFrameRef);
+
+  void dumpFrameScrollPosition(WKBundleFrameRef);
 
   WKBundlePageRef m_page;
   bool m_isLoading;

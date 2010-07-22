@@ -47,11 +47,14 @@ class LayoutTestController : public JSWrappable {
                         JSObjectRef windowObject,
                         JSValueRef* exception);
 
-  bool shouldDumpAsText() const { return m_dumpAsText; }
   void dumpAsText() { m_dumpAsText = true; }
-
-  bool shouldDumpStatusCallbacks() const { return m_dumpStatusCallbacks; }
   void dumpStatusCallbacks() { m_dumpStatusCallbacks = true; }
+
+  bool shouldDumpAsText() const { return m_dumpAsText; }
+  bool shouldDumpDOMAsWebArchive() const;
+  bool shouldDumpFrameScrollPositions() const;
+  bool shouldDumpSourceAsWebArchive() const;
+  bool shouldDumpStatusCallbacks() const { return m_dumpStatusCallbacks; }
 
   bool waitToDump() const { return m_waitToDump; }
   void waitToDumpWatchdogTimerFired();
