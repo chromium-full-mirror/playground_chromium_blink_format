@@ -66,6 +66,16 @@ void SVGFilterPrimitiveStandardAttributes::parseMappedAttribute(
     return SVGStyledElement::parseMappedAttribute(attr);
 }
 
+void SVGFilterPrimitiveStandardAttributes::svgAttributeChanged(
+    const QualifiedName& attrName) {
+  SVGStyledElement::svgAttributeChanged(attrName);
+
+  if (attrName == SVGNames::xAttr || attrName == SVGNames::yAttr ||
+      attrName == SVGNames::widthAttr || attrName == SVGNames::heightAttr ||
+      attrName == SVGNames::resultAttr)
+    invalidateFilter();
+}
+
 void SVGFilterPrimitiveStandardAttributes::synchronizeProperty(
     const QualifiedName& attrName) {
   SVGStyledElement::synchronizeProperty(attrName);
@@ -89,6 +99,18 @@ void SVGFilterPrimitiveStandardAttributes::synchronizeProperty(
     synchronizeHeight();
   else if (attrName == SVGNames::resultAttr)
     synchronizeResult();
+}
+
+void SVGFilterPrimitiveStandardAttributes::childrenChanged(
+    bool changedByParser,
+    Node* beforeChange,
+    Node* afterChange,
+    int childCountDelta) {
+  SVGStyledElement::childrenChanged(changedByParser, beforeChange, afterChange,
+                                    childCountDelta);
+
+  if (!changedByParser)
+    invalidateResourceClients();
 }
 
 void SVGFilterPrimitiveStandardAttributes::setStandardAttributes(
