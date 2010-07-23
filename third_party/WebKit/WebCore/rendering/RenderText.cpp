@@ -142,10 +142,10 @@ bool RenderText::isWordBreak() const {
 }
 
 void RenderText::updateNeedsTranscoding() {
-  const AtomicString& fontFamily = style()->font().family().family();
   const TextEncoding* encoding =
       document()->decoder() ? &document()->decoder()->encoding() : 0;
-  m_needsTranscoding = fontTranscoder().needsTranscoding(fontFamily, encoding);
+  m_needsTranscoding = fontTranscoder().needsTranscoding(
+      style()->font().fontDescription(), encoding);
 }
 
 void RenderText::styleDidChange(StyleDifference diff,
@@ -1110,10 +1110,10 @@ void RenderText::setTextInternal(PassRefPtr<StringImpl> text) {
   ASSERT(text);
   m_text = text;
   if (m_needsTranscoding) {
-    const AtomicString& fontFamily = style()->font().family().family();
     const TextEncoding* encoding =
         document()->decoder() ? &document()->decoder()->encoding() : 0;
-    fontTranscoder().convert(m_text, fontFamily, encoding);
+    fontTranscoder().convert(m_text, style()->font().fontDescription(),
+                             encoding);
   }
   ASSERT(m_text);
 

@@ -94,8 +94,7 @@ Font::Font(const FontDescription& fd, short letterSpacing, short wordSpacing)
       m_letterSpacing(letterSpacing),
       m_wordSpacing(wordSpacing),
       m_isPlatformFont(false),
-      m_needsTranscoding(
-          fontTranscoder().needsTranscoding(family().family().string())) {}
+      m_needsTranscoding(fontTranscoder().needsTranscoding(fd)) {}
 
 Font::Font(const FontPlatformData& fontData,
            bool isPrinterFont,
@@ -103,11 +102,10 @@ Font::Font(const FontPlatformData& fontData,
     : m_fontList(FontFallbackList::create()),
       m_letterSpacing(0),
       m_wordSpacing(0),
-      m_isPlatformFont(true),
-      m_needsTranscoding(
-          fontTranscoder().needsTranscoding(family().family().string())) {
+      m_isPlatformFont(true) {
   m_fontDescription.setUsePrinterFont(isPrinterFont);
   m_fontDescription.setFontSmoothing(fontSmoothingMode);
+  m_needsTranscoding = fontTranscoder().needsTranscoding(fontDescription());
   m_fontList->setPlatformFont(fontData);
 }
 
@@ -118,7 +116,7 @@ Font::Font(const Font& other)
       m_wordSpacing(other.m_wordSpacing),
       m_isPlatformFont(other.m_isPlatformFont),
       m_needsTranscoding(
-          fontTranscoder().needsTranscoding(family().family().string())) {}
+          fontTranscoder().needsTranscoding(other.m_fontDescription)) {}
 
 Font& Font::operator=(const Font& other) {
   m_fontDescription = other.m_fontDescription;

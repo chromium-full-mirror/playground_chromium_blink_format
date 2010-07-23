@@ -72,7 +72,8 @@ class FontDescription {
         m_renderingMode(NormalRenderingMode),
         m_keywordSize(0),
         m_fontSmoothing(AutoSmoothing),
-        m_textRendering(AutoTextRendering) {}
+        m_textRendering(AutoTextRendering),
+        m_isSpecifiedFont(false) {}
 
   bool operator==(const FontDescription&) const;
   bool operator!=(const FontDescription& other) const {
@@ -112,6 +113,7 @@ class FontDescription {
   }
 
   FontTraitsMask traitsMask() const;
+  bool isSpecifiedFont() const { return m_isSpecifiedFont; }
 
   void setFamily(const FontFamily& family) { m_familyList = family; }
   void setComputedSize(float s) { m_computedSize = s; }
@@ -131,6 +133,9 @@ class FontDescription {
   }
   void setTextRenderingMode(TextRenderingMode rendering) {
     m_textRendering = rendering;
+  }
+  void setIsSpecifiedFont(bool isSpecifiedFont) {
+    m_isSpecifiedFont = isSpecifiedFont;
   }
 
  private:
@@ -163,6 +168,8 @@ class FontDescription {
 
   unsigned m_fontSmoothing : 2;  // FontSmoothingMode
   unsigned m_textRendering : 2;  // TextRenderingMode
+  bool m_isSpecifiedFont : 1;    // True if a web page specifies a non-generic
+                                 // font family as the first font family.
 };
 
 inline bool FontDescription::operator==(const FontDescription& other) const {
@@ -177,7 +184,8 @@ inline bool FontDescription::operator==(const FontDescription& other) const {
          m_renderingMode == other.m_renderingMode &&
          m_keywordSize == other.m_keywordSize &&
          m_fontSmoothing == other.m_fontSmoothing &&
-         m_textRendering == other.m_textRendering;
+         m_textRendering == other.m_textRendering &&
+         m_isSpecifiedFont == other.m_isSpecifiedFont;
 }
 }
 

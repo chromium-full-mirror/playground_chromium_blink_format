@@ -4738,6 +4738,8 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
         FontDescription fontDescription = m_style->fontDescription();
         fontDescription.setGenericFamily(parentFontDescription.genericFamily());
         fontDescription.setFamily(parentFontDescription.firstFamily());
+        fontDescription.setIsSpecifiedFont(
+            parentFontDescription.isSpecifiedFont());
         if (m_style->setFontDescription(fontDescription))
           m_fontDirty = true;
         return;
@@ -4823,6 +4825,8 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
             firstFamily.appendFamily(
                 0);  // Remove any inherited family-fallback list.
             currFamily = &firstFamily;
+            fontDescription.setIsSpecifiedFont(
+                fontDescription.genericFamily() == FontDescription::NoFamily);
           } else {
             RefPtr<SharedFontFamily> newFamily = SharedFontFamily::create();
             newFamily->setFamily(face);
@@ -5093,6 +5097,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValue* value) {
         FontDescription fontDescription;
         RenderTheme::defaultTheme()->systemFont(primitiveValue->getIdent(),
                                                 fontDescription);
+        fontDescription.setIsSpecifiedFont(true);
 
         // Double-check and see if the theme did anything.  If not, don't bother
         // updating the font.

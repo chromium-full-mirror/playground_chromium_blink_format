@@ -37,15 +37,15 @@
 
 namespace WebCore {
 
+class FontDescription;
 class TextEncoding;
 
 class FontTranscoder : public Noncopyable {
  public:
   void convert(String& text,
-               const AtomicString& fontFamily,
+               const FontDescription&,
                const TextEncoding* = 0) const;
-  bool needsTranscoding(const AtomicString& fontFamily,
-                        const TextEncoding* = 0) const;
+  bool needsTranscoding(const FontDescription&, const TextEncoding* = 0) const;
 
  private:
   FontTranscoder();
@@ -57,7 +57,7 @@ class FontTranscoder : public Noncopyable {
     BackslashToYenSign,
   };
 
-  ConverterType converterType(const AtomicString& fontFamily,
+  ConverterType converterType(const FontDescription&,
                               const TextEncoding*) const;
 
   HashMap<AtomicString, ConverterType> m_converterTypes;
