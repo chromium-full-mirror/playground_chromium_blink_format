@@ -138,6 +138,11 @@ WebPage::~WebPage() {
 #endif
 }
 
+void WebPage::initializeInjectedBundleEditorClient(
+    WKBundlePageEditorClient* client) {
+  m_editorClient.initialize(client);
+}
+
 void WebPage::initializeInjectedBundleLoaderClient(
     WKBundlePageLoaderClient* client) {
   m_loaderClient.initialize(client);

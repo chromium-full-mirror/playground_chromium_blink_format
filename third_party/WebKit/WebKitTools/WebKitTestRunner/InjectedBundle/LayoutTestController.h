@@ -57,6 +57,7 @@ class LayoutTestController : public JSWrappable {
   void dumpChildFrameScrollPositions() {
     m_shouldDumpAllFrameScrollPositions = true;
   }
+  void dumpEditingCallbacks() { m_dumpEditingCallbacks = true; }
   void dumpStatusCallbacks() { m_dumpStatusCallbacks = true; }
 
   // Repaint testing.
@@ -70,12 +71,16 @@ class LayoutTestController : public JSWrappable {
                                            double time,
                                            JSStringRef elementId);
 
+  void setAcceptsEditing(bool value) { m_acceptsEditing = value; }
+  bool acceptsEditing() const { return m_acceptsEditing; }
+
   enum WhatToDump { RenderTree, MainFrameText, AllFramesText };
   WhatToDump whatToDump() const { return m_whatToDump; }
 
   bool shouldDumpAllFrameScrollPositions() const {
     return m_shouldDumpAllFrameScrollPositions;
   }
+  bool shouldDumpEditingCallbacks() const { return m_dumpEditingCallbacks; }
   bool shouldDumpMainFrameScrollPosition() const {
     return m_whatToDump == RenderTree;
   }
@@ -91,6 +96,8 @@ class LayoutTestController : public JSWrappable {
 
   WhatToDump m_whatToDump;
   bool m_shouldDumpAllFrameScrollPositions;
+  bool m_acceptsEditing;
+  bool m_dumpEditingCallbacks;
   bool m_dumpStatusCallbacks;
   bool m_waitToDump;  // True if waitUntilDone() has been called, but
                       // notifyDone() has not yet been called.

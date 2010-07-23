@@ -110,6 +110,12 @@ class InjectedBundlePage {
                                WKStringRef defaultValue,
                                WKBundleFrameRef);
 
+  // Editor client
+  static bool _shouldBeginEditing(WKBundlePageRef,
+                                  WKBundleRangeRef,
+                                  const void* clientInfo);
+  bool shouldBeginEditing(WKBundleRangeRef);
+
   void dumpAllFramesText();
   void dumpAllFrameScrollPositions();
 

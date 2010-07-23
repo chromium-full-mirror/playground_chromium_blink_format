@@ -89,9 +89,11 @@ bool WebEditorClient::isEditable() {
   return false;
 }
 
-bool WebEditorClient::shouldBeginEditing(Range*) {
+bool WebEditorClient::shouldBeginEditing(Range* range) {
+  bool result =
+      m_page->injectedBundleEditorClient().shouldBeginEditing(m_page, range);
   notImplemented();
-  return true;
+  return result;
 }
 
 bool WebEditorClient::shouldEndEditing(Range*) {
