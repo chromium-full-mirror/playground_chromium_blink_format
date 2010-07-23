@@ -107,6 +107,8 @@ struct _Ewk_View_Smart_Class {
       Eina_Bool javascript,
       const Ewk_Window_Features*
           window_features); /**< creates a new window, requested by webkit */
+  void (*window_close)(Ewk_View_Smart_Data* sd); /**< creates a new window,
+                                                    requested by webkit */
   // hooks to allow different backing stores
   Evas_Object* (*backing_store_add)(
       Ewk_View_Smart_Data* sd);                          /**< must be defined */
@@ -198,7 +200,7 @@ struct _Ewk_View_Smart_Class {
 #define EWK_VIEW_SMART_CLASS_INIT(smart_class_init)                            \
   {                                                                            \
     smart_class_init, EWK_VIEW_SMART_CLASS_VERSION, 0, 0, 0, 0, 0, 0, 0, 0, 0, \
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0                   \
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0                \
   }
 
 /**
