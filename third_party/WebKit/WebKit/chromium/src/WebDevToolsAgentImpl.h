@@ -75,11 +75,6 @@ class WebDevToolsAgentImpl : public WebDevToolsAgentPrivate,
   // ToolsAgent implementation.
   virtual void dispatchOnInspectorController(int callId,
                                              const WebCore::String& message);
-  virtual void dispatchOnInjectedScript(int callId,
-                                        int injectedScriptId,
-                                        const WebCore::String& functionName,
-                                        const WebCore::String& jsonArgs,
-                                        bool async);
 
   // WebDevToolsAgentPrivate implementation.
   virtual void didClearWindowObject(WebFrameImpl* frame);

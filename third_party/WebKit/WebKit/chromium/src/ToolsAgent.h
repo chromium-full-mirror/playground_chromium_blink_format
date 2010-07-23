@@ -41,12 +41,7 @@ namespace WebKit {
                            METHOD5)                                     \
   /* Dispatches given function on the InspectorController object */     \
   METHOD2(dispatchOnInspectorController, int /* call_id */,             \
-          String /* message */)                                         \
-                                                                        \
-  /* Dispatches given function on the InjectedScript object */          \
-  METHOD5(dispatchOnInjectedScript, int /* call_id */,                  \
-          int /* injected_script_id */, String /* function_name */,     \
-          String /* json_args */, bool /* async */)
+          String /* message */)
 
 DEFINE_RPC_CLASS(ToolsAgent, TOOLS_AGENT_STRUCT)
 
