@@ -158,6 +158,13 @@ void InsertListCommand::doApplyForSingleParagraph(bool forceCreateList) {
     m_listElement = listifyParagraph(endingSelection().visibleStart(), listTag);
 }
 
+static Node* enclosingListChild(Node* node, Node* listNode) {
+  Node* listChild = enclosingListChild(node);
+  if (enclosingList(listChild) != listNode)
+    return 0;
+  return listChild;
+}
+
 void InsertListCommand::unlistifyParagraph(const VisiblePosition& originalStart,
                                            HTMLElement* listNode,
                                            Node* listChildNode) {
@@ -175,15 +182,12 @@ void InsertListCommand::unlistifyParagraph(const VisiblePosition& originalStart,
     // will be moved.
     start = startOfParagraph(originalStart);
     end = endOfParagraph(start);
-    nextListChild = enclosingListChild(end.next().deepEquivalent().node());
+    nextListChild =
+        enclosingListChild(end.next().deepEquivalent().node(), listNode);
     ASSERT(nextListChild != listChildNode);
-    if (enclosingList(nextListChild) != listNode)
-      nextListChild = 0;
     previousListChild =
-        enclosingListChild(start.previous().deepEquivalent().node());
+        enclosingListChild(start.previous().deepEquivalent().node(), listNode);
     ASSERT(previousListChild != listChildNode);
-    if (enclosingList(previousListChild) != listNode)
-      previousListChild = 0;
   }
   // When removing a list, we must always create a placeholder to act as a point
   // of insertion
@@ -233,6 +237,26 @@ void InsertListCommand::unlistifyParagraph(const VisiblePosition& originalStart,
   moveParagraphs(start, end, insertionPoint, true);
 }
 
+static Element* adjacentEnclosingList(const VisiblePosition& pos,
+                                      const VisiblePosition& adjacentPos,
+                                      const QualifiedName& listTag) {
+  Element* listNode =
+      outermostEnclosingList(adjacentPos.deepEquivalent().node());
+
+  if (!listNode)
+    return 0;
+
+  Node* previousCell = enclosingTableCell(pos.deepEquivalent());
+  Node* currentCell = enclosingTableCell(adjacentPos.deepEquivalent());
+
+  if (!listNode->hasTagName(listTag) ||
+      listNode->contains(pos.deepEquivalent().node()) ||
+      previousCell != currentCell)
+    return 0;
+
+  return listNode;
+}
+
 PassRefPtr<HTMLElement> InsertListCommand::listifyParagraph(
     const VisiblePosition& originalStart,
     const QualifiedName& listTag) {
@@ -240,28 +264,15 @@ PassRefPtr<HTMLElement> InsertListCommand::listifyParagraph(
   VisiblePosition end = endOfParagraph(start);
 
   // Check for adjoining lists.
-  VisiblePosition previousPosition = start.previous(true);
-  VisiblePosition nextPosition = end.next(true);
   RefPtr<HTMLElement> listItemElement = createListItemElement(document());
   RefPtr<HTMLElement> placeholder = createBreakElement(document());
   appendNode(placeholder, listItemElement);
-  Element* previousList =
-      outermostEnclosingList(previousPosition.deepEquivalent().node());
-  Element* nextList =
-      outermostEnclosingList(nextPosition.deepEquivalent().node());
-  Node* startNode = start.deepEquivalent().node();
-  Node* previousCell = enclosingTableCell(previousPosition.deepEquivalent());
-  Node* nextCell = enclosingTableCell(nextPosition.deepEquivalent());
-  Node* currentCell = enclosingTableCell(start.deepEquivalent());
-  if (previousList &&
-      (!previousList->hasTagName(listTag) ||
-       startNode->isDescendantOf(previousList) || previousCell != currentCell))
-    previousList = 0;
-  if (nextList &&
-      (!nextList->hasTagName(listTag) || startNode->isDescendantOf(nextList) ||
-       nextCell != currentCell))
-    nextList = 0;
+
   // Place list item into adjoining lists.
+  Element* previousList = adjacentEnclosingList(start.deepEquivalent(),
+                                                start.previous(true), listTag);
+  Element* nextList =
+      adjacentEnclosingList(start.deepEquivalent(), end.next(true), listTag);
   RefPtr<HTMLElement> listElement;
   if (previousList)
     appendNode(listItemElement, previousList);
@@ -299,11 +310,6 @@ PassRefPtr<HTMLElement> InsertListCommand::listifyParagraph(
     // itself.  bug 19066
     if (insertionPos == start.deepEquivalent())
       start = startOfParagraph(originalStart);
-    previousList =
-        outermostEnclosingList(previousPosition.deepEquivalent().node(),
-                               enclosingList(listElement.get()));
-    nextList = outermostEnclosingList(nextPosition.deepEquivalent().node(),
-                                      enclosingList(listElement.get()));
   }
 
   moveParagraph(start, end, VisiblePosition(Position(placeholder.get(), 0)),
@@ -318,6 +324,8 @@ PassRefPtr<HTMLElement> InsertListCommand::listifyParagraph(
     listElement = m_listElement;
 
   if (listElement) {
+    previousList = listElement->previousElementSibling();
+    nextList = listElement->nextElementSibling();
     if (canMergeLists(previousList, listElement.get()))
       mergeIdenticalElements(previousList, listElement.get());
     if (canMergeLists(listElement.get(), nextList))
