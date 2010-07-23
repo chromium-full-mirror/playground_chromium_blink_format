@@ -1538,7 +1538,7 @@ void RenderLayer::scrollRectToVisible(const IntRect& rect,
         newRect.setX(rect.x() - frameView->scrollX() + frameView->x());
         newRect.setY(rect.y() - frameView->scrollY() + frameView->y());
       } else {
-        IntRect viewRect = frameView->visibleContentRect(true);
+        IntRect viewRect = frameView->visibleContentRect();
         IntRect r = getRectToExpose(viewRect, rect, alignX, alignY);
 
         frameView->setScrollPosition(r.location());
