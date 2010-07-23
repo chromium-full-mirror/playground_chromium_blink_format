@@ -68,6 +68,8 @@ class InspectorValue : public RefCounted<InspectorValue> {
 
   virtual bool asBool(bool* output) const;
   virtual bool asNumber(double* output) const;
+  virtual bool asNumber(long* output) const;
+  virtual bool asNumber(unsigned long* output) const;
   virtual bool asString(String* output) const;
   virtual PassRefPtr<InspectorObject> asObject();
   virtual PassRefPtr<InspectorArray> asArray();
@@ -100,6 +102,8 @@ class InspectorBasicValue : public InspectorValue {
 
   virtual bool asBool(bool* output) const;
   virtual bool asNumber(double* output) const;
+  virtual bool asNumber(long* output) const;
+  virtual bool asNumber(unsigned long* output) const;
 
   virtual void writeJSON(Vector<UChar>* output) const;
 

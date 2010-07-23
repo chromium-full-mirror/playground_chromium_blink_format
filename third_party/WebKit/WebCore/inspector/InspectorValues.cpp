@@ -501,6 +501,14 @@ bool InspectorValue::asNumber(double*) const {
   return false;
 }
 
+bool InspectorValue::asNumber(long*) const {
+  return false;
+}
+
+bool InspectorValue::asNumber(unsigned long*) const {
+  return false;
+}
+
 bool InspectorValue::asString(String*) const {
   return false;
 }
@@ -546,6 +554,20 @@ bool InspectorBasicValue::asNumber(double* output) const {
   if (type() != TypeDouble)
     return false;
   *output = m_doubleValue;
+  return true;
+}
+
+bool InspectorBasicValue::asNumber(long* output) const {
+  if (type() != TypeDouble)
+    return false;
+  *output = static_cast<long>(m_doubleValue);
+  return true;
+}
+
+bool InspectorBasicValue::asNumber(unsigned long* output) const {
+  if (type() != TypeDouble)
+    return false;
+  *output = static_cast<unsigned long>(m_doubleValue);
   return true;
 }
 

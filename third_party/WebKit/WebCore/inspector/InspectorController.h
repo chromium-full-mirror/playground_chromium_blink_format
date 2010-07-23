@@ -64,6 +64,7 @@ class HitTestResult;
 class InjectedScript;
 class InjectedScriptHost;
 class InspectorBackend;
+class InspectorBackendDispatcher;
 class InspectorClient;
 class InspectorCSSStore;
 class InspectorDOMStorageResource;
@@ -122,6 +123,9 @@ class InspectorController
   ~InspectorController();
 
   InspectorBackend* inspectorBackend() { return m_inspectorBackend.get(); }
+  InspectorBackendDispatcher* inspectorBackendDispatcher() {
+    return m_inspectorBackendDispatcher.get();
+  }
   InjectedScriptHost* injectedScriptHost() {
     return m_injectedScriptHost.get();
   }
@@ -457,6 +461,7 @@ class InspectorController
   bool m_resourceTrackingEnabled;
   bool m_settingsLoaded;
   RefPtr<InspectorBackend> m_inspectorBackend;
+  OwnPtr<InspectorBackendDispatcher> m_inspectorBackendDispatcher;
   RefPtr<InjectedScriptHost> m_injectedScriptHost;
 
   typedef HashMap<String, String> Settings;
