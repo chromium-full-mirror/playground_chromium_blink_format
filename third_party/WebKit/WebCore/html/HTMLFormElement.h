@@ -26,8 +26,8 @@
 #define HTMLFormElement_h
 
 #include "CheckedRadioButtons.h"
-#include "FormDataBuilder.h"
 #include "FormState.h"
+#include "FormSubmission.h"
 #include "HTMLElement.h"
 #include <wtf/OwnPtr.h>
 
@@ -35,7 +35,6 @@ namespace WebCore {
 
 class Event;
 class FormData;
-class FormSubmission;
 class HTMLFormControlElement;
 class HTMLImageElement;
 class HTMLInputElement;
@@ -56,10 +55,10 @@ class HTMLFormElement : public HTMLElement {
   unsigned length() const;
   Node* item(unsigned index);
 
-  String enctype() const { return m_formDataBuilder.encodingType(); }
+  String enctype() const { return m_attributes.encodingType(); }
   void setEnctype(const String&);
 
-  String encoding() const { return m_formDataBuilder.encodingType(); }
+  String encoding() const { return m_attributes.encodingType(); }
   void setEncoding(const String& value) { setEnctype(value); }
 
   bool autoComplete() const { return m_autocomplete; }
@@ -90,7 +89,8 @@ class HTMLFormElement : public HTMLElement {
 
   bool noValidate() const;
 
-  String acceptCharset() const { return m_formDataBuilder.acceptCharset(); }
+  String acceptCharset() const { return m_attributes.acceptCharset(); }
+  void setAcceptCharset(const String&);
 
   String action() const;
   void setAction(const String&);
@@ -141,9 +141,6 @@ class HTMLFormElement : public HTMLElement {
               bool lockHistory,
               FormSubmissionTrigger);
 
-  PassRefPtr<FormSubmission> prepareFormSubmission(Event*,
-                                                   bool lockHistory,
-                                                   FormSubmissionTrigger);
   unsigned formElementIndex(HTMLFormControlElement*);
   // Returns true if the submission should be proceeded.
   bool validateInteractively(Event*);
@@ -156,7 +153,7 @@ class HTMLFormElement : public HTMLElement {
   typedef HashMap<RefPtr<AtomicStringImpl>, RefPtr<HTMLFormControlElement>>
       AliasMap;
 
-  FormDataBuilder m_formDataBuilder;
+  FormSubmission::Attributes m_attributes;
   OwnPtr<AliasMap> m_elementAliases;
   OwnPtr<CollectionCache> m_collectionCache;
 
