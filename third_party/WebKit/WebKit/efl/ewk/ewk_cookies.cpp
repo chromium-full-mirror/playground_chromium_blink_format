@@ -21,14 +21,18 @@
 #include "config.h"
 #include "ewk_cookies.h"
 
+#ifdef WTF_USE_SOUP
 #include "CookieJarSoup.h"
+#endif
 #include "EWebKit.h"
 #include "ResourceHandle.h"
 
 #include <Eina.h>
 #include <eina_safety_checks.h>
 #include <glib.h>
+#ifdef WTF_USE_SOUP
 #include <libsoup/soup.h>
+#endif
 #include <wtf/text/CString.h>
 
 /**
@@ -41,6 +45,7 @@
  *          EINA_FALSE otherwise.
  */
 EAPI Eina_Bool ewk_cookies_file_set(const char* filename) {
+#ifdef WTF_USE_SOUP
   SoupCookieJar* cookieJar = 0;
   if (filename)
     cookieJar = soup_cookie_jar_text_new(filename, FALSE);
@@ -65,12 +70,16 @@ EAPI Eina_Bool ewk_cookies_file_set(const char* filename) {
   soup_session_add_feature(session, SOUP_SESSION_FEATURE(cookieJar));
 
   return EINA_TRUE;
+#else
+  return EINA_FALSE;
+#endif
 }
 
 /**
  * Clear all the cookies from the cookie jar.
  */
 EAPI void ewk_cookies_clear() {
+#ifdef WTF_USE_SOUP
   GSList* l;
   GSList* p;
   SoupCookieJar* cookieJar = WebCore::defaultCookieJar();
@@ -80,6 +89,7 @@ EAPI void ewk_cookies_clear() {
     soup_cookie_jar_delete_cookie(cookieJar, (SoupCookie*)p->data);
 
   soup_cookies_free(l);
+#endif
 }
 
 /**
@@ -88,9 +98,10 @@ EAPI void ewk_cookies_clear() {
  * @returns an Eina_List with all the cookies in the cookie jar.
  */
 EAPI Eina_List* ewk_cookies_get_all(void) {
+  Eina_List* el = 0;
+#ifdef WTF_USE_SOUP
   GSList* l;
   GSList* p;
-  Eina_List* el = 0;
   SoupCookieJar* cookieJar = WebCore::defaultCookieJar();
 
   l = soup_cookie_jar_all_cookies(cookieJar);
@@ -108,6 +119,7 @@ EAPI Eina_List* ewk_cookies_get_all(void) {
   }
 
   soup_cookies_free(l);
+#endif
   return el;
 }
 
@@ -120,6 +132,7 @@ EAPI Eina_List* ewk_cookies_get_all(void) {
  * @param cookie an Ewk_Cookie that has the info relative to that cookie.
  */
 EAPI void ewk_cookies_cookie_del(Ewk_Cookie* cookie) {
+#ifdef WTF_USE_SOUP
   EINA_SAFETY_ON_NULL_RETURN(cookie);
   GSList* l;
   GSList* p;
@@ -138,6 +151,7 @@ EAPI void ewk_cookies_cookie_del(Ewk_Cookie* cookie) {
 
   soup_cookie_free(c1);
   soup_cookies_free(l);
+#endif
 }
 
 /*
@@ -146,12 +160,14 @@ EAPI void ewk_cookies_cookie_del(Ewk_Cookie* cookie) {
  * @param cookie the Ewk_Cookie struct that will be freed.
  */
 EAPI void ewk_cookies_cookie_free(Ewk_Cookie* cookie) {
+#ifdef WTF_USE_SOUP
   EINA_SAFETY_ON_NULL_RETURN(cookie);
   free(cookie->name);
   free(cookie->value);
   free(cookie->domain);
   free(cookie->path);
   free(cookie);
+#endif
 }
 
 /*
@@ -165,6 +181,7 @@ EAPI void ewk_cookies_cookie_free(Ewk_Cookie* cookie) {
  * @param p the acceptance policy
  */
 EAPI void ewk_cookies_policy_set(Ewk_Cookie_Policy p) {
+#ifdef WTF_USE_SOUP
 #ifdef HAVE_LIBSOUP_2_29_90
   SoupCookieJar* cookieJar = WebCore::defaultCookieJar();
   SoupCookieJarAcceptPolicy policy;
@@ -184,6 +201,7 @@ EAPI void ewk_cookies_policy_set(Ewk_Cookie_Policy p) {
 
   soup_cookie_jar_set_accept_policy(cookieJar, policy);
 #endif
+#endif
 }
 
 /*
@@ -193,6 +211,7 @@ EAPI void ewk_cookies_policy_set(Ewk_Cookie_Policy p) {
  */
 EAPI Ewk_Cookie_Policy ewk_cookies_policy_get() {
   Ewk_Cookie_Policy ewk_policy = EWK_COOKIE_JAR_ACCEPT_ALWAYS;
+#ifdef WTF_USE_SOUP
 #ifdef HAVE_LIBSOUP_2_29_90
   SoupCookieJar* cookieJar = WebCore::defaultCookieJar();
   SoupCookieJarAcceptPolicy policy;
@@ -209,6 +228,7 @@ EAPI Ewk_Cookie_Policy ewk_cookies_policy_get() {
       ewk_policy = EWK_COOKIE_JAR_ACCEPT_NO_THIRD_PARTY;
       break;
   }
+#endif
 #endif
 
   return ewk_policy;
