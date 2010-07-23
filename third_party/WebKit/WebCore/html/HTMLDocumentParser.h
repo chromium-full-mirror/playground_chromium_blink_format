@@ -70,6 +70,7 @@ class HTMLDocumentParser : public ScriptableDocumentParser,
 
  private:
   // DocumentParser
+  virtual bool hasInsertionPoint();
   virtual void insert(const SegmentedString&);
   virtual void append(const SegmentedString&);
   virtual void finish();

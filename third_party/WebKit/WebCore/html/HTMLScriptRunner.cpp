@@ -153,7 +153,7 @@ void HTMLScriptRunner::executeScript(Element* element,
   ASSERT(scriptElement);
   if (!scriptElement->shouldExecuteAsJavaScript())
     return;
-  ASSERT(inScriptExecution());
+  ASSERT(isExecutingScript());
   if (!m_document->frame())
     return;
   m_document->frame()->script()->executeScript(sourceCode);
