@@ -39,7 +39,6 @@
 namespace WebCore {
 
 String ScriptProfile::title() const {
-  v8::HandleScope scope;
   return toWebCoreString(m_profile->GetTitle());
 }
 
