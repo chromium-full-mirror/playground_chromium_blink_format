@@ -148,7 +148,7 @@ class HTMLTokenizer : public Noncopyable {
     // Returns whether we succeeded in peeking at the next character.
     // The only way we can fail to peek is if there are no more
     // characters in |source| (after collapsing \r\n, etc).
-    bool peek(SegmentedString& source, int& lineNumber) {
+    ALWAYS_INLINE bool peek(SegmentedString& source, int& lineNumber) {
       m_nextInputCharacter = *source;
       if (m_nextInputCharacter == '\n' && m_skipNextNewLine) {
         m_skipNextNewLine = false;
