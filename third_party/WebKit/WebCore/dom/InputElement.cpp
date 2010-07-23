@@ -228,7 +228,9 @@ void InputElement::handleBeforeTextInsertedEvent(InputElementData& data,
   // Selected characters will be removed by the next text event.
   unsigned baseLength = oldLength - selectionLength;
   unsigned maxLength = static_cast<unsigned>(
-      data.maxLength());  // maxLength() can never be negative.
+      inputElement->supportsMaxLength()
+          ? data.maxLength()
+          : s_maximumLength);  // maxLength() can never be negative.
   unsigned appendableLength =
       maxLength > baseLength ? maxLength - baseLength : 0;
 

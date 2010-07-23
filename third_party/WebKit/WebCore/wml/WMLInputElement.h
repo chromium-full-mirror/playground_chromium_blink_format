@@ -99,6 +99,7 @@ class WMLInputElement : public WMLFormControlElement, public InputElement {
   friend class WMLCardElement;
   void initialize();
 
+  virtual bool supportsMaxLength() const { return true; }
   String validateInputMask(const String&);
   unsigned cursorPositionToMaskIndex(unsigned);
   String constrainValue(const String&) const;
