@@ -144,7 +144,7 @@ bool AccessibilityTable::isTableExposableThroughAccessibility() {
   for (int row = 0; row < numRows; ++row) {
     int headersInFirstRowCount = 0;
     for (int col = 0; col < numCols; ++col) {
-      RenderTableCell* cell = firstBody->cellAt(row, col).cell;
+      RenderTableCell* cell = firstBody->primaryCellAt(row, col);
       if (!cell)
         continue;
       Node* cellNode = cell->node();
@@ -293,7 +293,7 @@ void AccessibilityTable::addChildren() {
     unsigned numCols = tableSection->numColumns();
     for (unsigned rowIndex = 0; rowIndex < numRows; ++rowIndex) {
       for (unsigned colIndex = 0; colIndex < numCols; ++colIndex) {
-        RenderTableCell* cell = tableSection->cellAt(rowIndex, colIndex).cell;
+        RenderTableCell* cell = tableSection->primaryCellAt(rowIndex, colIndex);
         if (!cell)
           continue;
 
@@ -446,14 +446,14 @@ AccessibilityTableCell* AccessibilityTable::cellForColumnAndRow(unsigned column,
 
     unsigned sectionSpecificRow = row - rowOffset;
     if (row < rowCount && column < numCols && sectionSpecificRow < numRows) {
-      cell = tableSection->cellAt(sectionSpecificRow, column).cell;
+      cell = tableSection->primaryCellAt(sectionSpecificRow, column);
 
       // we didn't find the cell, which means there's spanning happening
       // search backwards to find the spanning cell
       if (!cell) {
         // first try rows
         for (int testRow = sectionSpecificRow - 1; testRow >= 0; --testRow) {
-          cell = tableSection->cellAt(testRow, column).cell;
+          cell = tableSection->primaryCellAt(testRow, column);
           // cell overlapped. use this one
           if (cell && ((cell->row() + (cell->rowSpan() - 1)) >=
                        (int)sectionSpecificRow))
@@ -464,7 +464,7 @@ AccessibilityTableCell* AccessibilityTable::cellForColumnAndRow(unsigned column,
         if (!cell) {
           // try cols
           for (int testCol = column - 1; testCol >= 0; --testCol) {
-            cell = tableSection->cellAt(sectionSpecificRow, testCol).cell;
+            cell = tableSection->primaryCellAt(sectionSpecificRow, testCol);
             // cell overlapped. use this one
             if (cell && ((cell->col() + (cell->colSpan() - 1)) >= (int)column))
               break;

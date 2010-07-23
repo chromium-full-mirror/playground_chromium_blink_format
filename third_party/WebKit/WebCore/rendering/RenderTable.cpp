@@ -602,7 +602,7 @@ void RenderTable::splitColumn(int pos, int firstSpan) {
   for (RenderObject* child = firstChild(); child;
        child = child->nextSibling()) {
     if (child->isTableSection())
-      toRenderTableSection(child)->splitColumn(pos, oldSize + 1);
+      toRenderTableSection(child)->splitColumn(pos, firstSpan);
   }
 
   m_columnPos.grow(numEffCols() + 1);
@@ -800,12 +800,13 @@ int RenderTable::calcBorderLeft() const {
       const RenderTableSection::CellStruct& cs =
           firstNonEmptySection->cellAt(0, leftmostColumn);
 
-      if (cs.cell) {
-        const BorderValue& cb = cs.cell->style()->borderLeft();
+      if (cs.hasCells()) {
+        const BorderValue& cb = cs.primaryCell()->style()->borderLeft();
         if (cb.style() == BHIDDEN)
           return 0;
 
-        const BorderValue& rb = cs.cell->parent()->style()->borderLeft();
+        const BorderValue& rb =
+            cs.primaryCell()->parent()->style()->borderLeft();
         if (rb.style() == BHIDDEN)
           return 0;
 
@@ -861,12 +862,13 @@ int RenderTable::calcBorderRight() const {
       const RenderTableSection::CellStruct& cs =
           firstNonEmptySection->cellAt(0, rightmostColumn);
 
-      if (cs.cell) {
-        const BorderValue& cb = cs.cell->style()->borderRight();
+      if (cs.hasCells()) {
+        const BorderValue& cb = cs.primaryCell()->style()->borderRight();
         if (cb.style() == BHIDDEN)
           return 0;
 
-        const BorderValue& rb = cs.cell->parent()->style()->borderRight();
+        const BorderValue& rb =
+            cs.primaryCell()->parent()->style()->borderRight();
         if (rb.style() == BHIDDEN)
           return 0;
 
@@ -1078,8 +1080,8 @@ RenderTableCell* RenderTable::cellAbove(const RenderTableCell* cell) const {
     do {
       aboveCell = section->cellAt(rAbove, effCol);
       effCol--;
-    } while (!aboveCell.cell && aboveCell.inColSpan && effCol >= 0);
-    return aboveCell.cell;
+    } while (!aboveCell.hasCells() && aboveCell.inColSpan && effCol >= 0);
+    return aboveCell.primaryCell();
   } else
     return 0;
 }
@@ -1109,8 +1111,8 @@ RenderTableCell* RenderTable::cellBelow(const RenderTableCell* cell) const {
     do {
       belowCell = section->cellAt(rBelow, effCol);
       effCol--;
-    } while (!belowCell.cell && belowCell.inColSpan && effCol >= 0);
-    return belowCell.cell;
+    } while (!belowCell.hasCells() && belowCell.inColSpan && effCol >= 0);
+    return belowCell.primaryCell();
   } else
     return 0;
 }
@@ -1128,8 +1130,8 @@ RenderTableCell* RenderTable::cellBefore(const RenderTableCell* cell) const {
   do {
     prevCell = section->cellAt(cell->row(), effCol - 1);
     effCol--;
-  } while (!prevCell.cell && prevCell.inColSpan && effCol >= 0);
-  return prevCell.cell;
+  } while (!prevCell.hasCells() && prevCell.inColSpan && effCol >= 0);
+  return prevCell.primaryCell();
 }
 
 RenderTableCell* RenderTable::cellAfter(const RenderTableCell* cell) const {
@@ -1138,7 +1140,7 @@ RenderTableCell* RenderTable::cellAfter(const RenderTableCell* cell) const {
   int effCol = colToEffCol(cell->col() + cell->colSpan());
   if (effCol >= numEffCols())
     return 0;
-  return cell->section()->cellAt(cell->row(), effCol).cell;
+  return cell->section()->primaryCellAt(cell->row(), effCol);
 }
 
 RenderBlock* RenderTable::firstLineBlock() const {
