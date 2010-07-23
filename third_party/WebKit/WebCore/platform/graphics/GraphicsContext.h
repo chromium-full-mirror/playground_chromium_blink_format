@@ -377,8 +377,8 @@ class GraphicsContext : public Noncopyable {
 
 #if OS(WINCE) && !PLATFORM(QT)
   void setBitmap(PassRefPtr<SharedBitmap>);
-  const TransformationMatrix& affineTransform() const;
-  TransformationMatrix& affineTransform();
+  const AffineTransform& affineTransform() const;
+  AffineTransform& affineTransform();
   void resetAffineTransform();
   void fillRect(const FloatRect&, const Gradient*);
   void drawText(const SimpleFontData* fontData,
@@ -392,11 +392,13 @@ class GraphicsContext : public Noncopyable {
   void drawBitmap(SharedBitmap*,
                   const IntRect& dstRect,
                   const IntRect& srcRect,
+                  ColorSpace styleColorSpace,
                   CompositeOperator compositeOp);
   void drawBitmapPattern(SharedBitmap*,
                          const FloatRect& tileRectIn,
                          const AffineTransform& patternTransform,
                          const FloatPoint& phase,
+                         ColorSpace styleColorSpace,
                          CompositeOperator op,
                          const FloatRect& destRect,
                          const IntSize& origSourceSize);

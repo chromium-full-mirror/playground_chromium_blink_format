@@ -1182,11 +1182,11 @@ void GraphicsContext::concatCTM(const AffineTransform& transform) {
   m_data->concatCTM(transform);
 }
 
-TransformationMatrix& GraphicsContext::affineTransform() {
+AffineTransform& GraphicsContext::affineTransform() {
   return m_data->m_transform;
 }
 
-const TransformationMatrix& GraphicsContext::affineTransform() const {
+const AffineTransform& GraphicsContext::affineTransform() const {
   return m_data->m_transform;
 }
 
@@ -1277,8 +1277,9 @@ void GraphicsContext::fillRoundedRect(const IntRect& fillRect,
 
   IntRect dstRect = fillRect;
 
-  dstRect.move(shadowSize);
-  dstRect.inflate(shadowBlur);
+  dstRect.move(stableRound(shadowSize.width()),
+               stableRound(shadowSize.height()));
+  dstRect.inflate(stableRound(shadowBlur));
   dstRect = m_data->mapRect(dstRect);
 
   FloatSize newTopLeft(m_data->mapSize(topLeft));
@@ -1920,6 +1921,7 @@ void GraphicsContext::paintTextField(const IntRect& rect, unsigned state) {
 void GraphicsContext::drawBitmap(SharedBitmap* bmp,
                                  const IntRect& dstRectIn,
                                  const IntRect& srcRect,
+                                 ColorSpace styleColorSpace,
                                  CompositeOperator compositeOp) {
   if (!m_data->m_opacity)
     return;
@@ -1945,6 +1947,7 @@ void GraphicsContext::drawBitmapPattern(SharedBitmap* bmp,
                                         const FloatRect& tileRectIn,
                                         const AffineTransform& patternTransform,
                                         const FloatPoint& phase,
+                                        ColorSpace styleColorSpace,
                                         CompositeOperator op,
                                         const FloatRect& destRectIn,
                                         const IntSize& origSourceSize) {
@@ -1968,8 +1971,8 @@ void GraphicsContext::drawBitmapPattern(SharedBitmap* bmp,
   AffineTransform transform = m_data->m_transform;
   transform.translate(moved.width(), moved.height());
 
-  bmp->drawPattern(dc, transform, tileRectIn, patternTransform, phase, op,
-                   destRectIn, origSourceSize);
+  bmp->drawPattern(dc, transform, tileRectIn, patternTransform, phase,
+                   styleColorSpace, op, destRectIn, origSourceSize);
 
   if (!bmp->hasAlpha())
     transparentDC.fillAlphaChannel();
