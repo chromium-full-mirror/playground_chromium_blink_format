@@ -253,6 +253,8 @@ struct JITStackFrame {
 #error \
     "JIT_STUB function calls require fastcall conventions on x86, add appropriate directive/attribute here for your compiler!"
 #endif
+#else
+#define JIT_STUB
 #endif
 
 extern "C" void ctiVMThrowTrampoline();
