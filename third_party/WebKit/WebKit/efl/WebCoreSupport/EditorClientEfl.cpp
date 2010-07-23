@@ -46,7 +46,7 @@ void EditorClientEfl::willSetInputMethodState() {
 }
 
 void EditorClientEfl::setInputMethodState(bool active) {
-  notImplemented();
+  ewk_view_input_method_state_set(m_view, active);
 }
 
 bool EditorClientEfl::shouldDeleteRange(Range*) {
