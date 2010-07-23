@@ -68,6 +68,7 @@
 #include "Text.h"
 #include "TextIterator.h"
 #include "TypingCommand.h"
+#include "UserTypingGestureIndicator.h"
 #include "htmlediting.h"
 #include "markup.h"
 #include "visible_units.h"
@@ -1409,6 +1410,8 @@ void Editor::confirmComposition(const String& text) {
 }
 
 void Editor::confirmComposition(const String& text, bool preserveSelection) {
+  UserTypingGestureIndicator typingGestureIndicator(m_frame);
+
   setIgnoreCompositionSelectionChange(true);
 
   VisibleSelection oldSelection = m_frame->selection()->selection();
@@ -1457,6 +1460,8 @@ void Editor::setComposition(const String& text,
                             const Vector<CompositionUnderline>& underlines,
                             unsigned selectionStart,
                             unsigned selectionEnd) {
+  UserTypingGestureIndicator typingGestureIndicator(m_frame);
+
   setIgnoreCompositionSelectionChange(true);
 
   selectComposition();
