@@ -35,9 +35,12 @@
 #include "InjectedScriptHost.h"
 #include "InspectorFrontend.h"
 #include "InspectorValues.h"
-#include "RemoteInspectorFrontend.h"
 #include "ScriptCallStack.h"
 #include "ScriptObject.h"
+
+#if ENABLE(INSPECTOR)
+#include "RemoteInspectorFrontend.h"
+#endif
 
 namespace WebCore {
 
@@ -54,6 +57,7 @@ bool ConsoleMessage::CallFrame::isEqual(
          m_lineNumber == o.m_lineNumber;
 }
 
+#if ENABLE(INSPECTOR)
 PassRefPtr<InspectorObject> ConsoleMessage::CallFrame::buildInspectorObject()
     const {
   RefPtr<InspectorObject> frame = InspectorObject::create();
@@ -62,6 +66,7 @@ PassRefPtr<InspectorObject> ConsoleMessage::CallFrame::buildInspectorObject()
   frame->setNumber("lineNumber", m_lineNumber);
   return frame;
 }
+#endif
 
 ConsoleMessage::ConsoleMessage(MessageSource s,
                                MessageType t,
