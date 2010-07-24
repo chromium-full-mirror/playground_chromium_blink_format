@@ -239,6 +239,42 @@ static JSValueRef stringForRangeCallback(JSContextRef context,
   return JSValueMakeString(context, stringDescription.get());
 }
 
+static JSValueRef attributedStringForRangeCallback(JSContextRef context,
+                                                   JSObjectRef function,
+                                                   JSObjectRef thisObject,
+                                                   size_t argumentCount,
+                                                   const JSValueRef arguments[],
+                                                   JSValueRef* exception) {
+  unsigned location = UINT_MAX, length = 0;
+  if (argumentCount == 2) {
+    location = JSValueToNumber(context, arguments[0], exception);
+    length = JSValueToNumber(context, arguments[1], exception);
+  }
+
+  JSRetainPtr<JSStringRef> stringDescription(
+      Adopt,
+      toAXElement(thisObject)->attributedStringForRange(location, length));
+  return JSValueMakeString(context, stringDescription.get());
+}
+
+static JSValueRef attributedStringRangeIsMisspelledCallback(
+    JSContextRef context,
+    JSObjectRef function,
+    JSObjectRef thisObject,
+    size_t argumentCount,
+    const JSValueRef arguments[],
+    JSValueRef* exception) {
+  unsigned location = UINT_MAX, length = 0;
+  if (argumentCount == 2) {
+    location = JSValueToNumber(context, arguments[0], exception);
+    length = JSValueToNumber(context, arguments[1], exception);
+  }
+
+  return JSValueMakeBoolean(
+      context, toAXElement(thisObject)
+                   ->attributedStringRangeIsMisspelled(location, length));
+}
+
 static JSValueRef indexOfChildCallback(JSContextRef context,
                                        JSObjectRef function,
                                        JSObjectRef thisObject,
@@ -1078,6 +1114,11 @@ JSClassRef AccessibilityUIElement::getJSClass() {
       {"boundsForRange", boundsForRangeCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"stringForRange", stringForRangeCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"attributedStringForRange", attributedStringForRangeCallback,
+       kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
+      {"attributedStringRangeIsMisspelled",
+       attributedStringRangeIsMisspelledCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},
       {"childAtIndex", childAtIndexCallback,
        kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete},

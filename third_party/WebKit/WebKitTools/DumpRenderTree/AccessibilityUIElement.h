@@ -183,6 +183,8 @@ class AccessibilityUIElement {
   JSStringRef boundsForRange(unsigned location, unsigned length);
   void setSelectedTextRange(unsigned location, unsigned length);
   JSStringRef stringForRange(unsigned location, unsigned length);
+  JSStringRef attributedStringForRange(unsigned location, unsigned length);
+  bool attributedStringRangeIsMisspelled(unsigned location, unsigned length);
 
   // Table-specific
   AccessibilityUIElement cellForColumnAndRow(unsigned column, unsigned row);
