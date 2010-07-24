@@ -34,8 +34,9 @@
 #include "GraphicsTypes.h"
 #include "Path.h"
 #include "PlatformString.h"
-#include <wtf/text/StringHash.h>
+
 #include <wtf/Vector.h>
+#include <wtf/text/StringHash.h>
 
 #if PLATFORM(CG)
 #include <ApplicationServices/ApplicationServices.h>

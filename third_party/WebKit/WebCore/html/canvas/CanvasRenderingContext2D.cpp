@@ -33,14 +33,14 @@
 #include "CanvasRenderingContext2D.h"
 
 #include "AffineTransform.h"
+#include "CSSMutableStyleDeclaration.h"
 #include "CSSParser.h"
+#include "CSSPropertyNames.h"
+#include "CSSStyleSelector.h"
 #include "CachedImage.h"
 #include "CanvasGradient.h"
 #include "CanvasPattern.h"
 #include "CanvasStyle.h"
-#include "CSSMutableStyleDeclaration.h"
-#include "CSSPropertyNames.h"
-#include "CSSStyleSelector.h"
 #include "ExceptionCode.h"
 #include "FloatConversion.h"
 #include "GraphicsContext.h"
@@ -48,6 +48,7 @@
 #include "HTMLImageElement.h"
 #include "HTMLMediaElement.h"
 #include "HTMLNames.h"
+#include "HTMLVideoElement.h"
 #include "ImageBuffer.h"
 #include "ImageData.h"
 #include "KURL.h"
@@ -57,8 +58,9 @@
 #include "Settings.h"
 #include "StrokeStyleApplier.h"
 #include "TextMetrics.h"
-#include "HTMLVideoElement.h"
+
 #include <stdio.h>
+
 #include <wtf/ByteArray.h>
 #include <wtf/MathExtras.h>
 #include <wtf/OwnPtr.h>
@@ -1126,8 +1128,8 @@ void CanvasRenderingContext2D::drawImage(HTMLImageElement* image,
     return;
 
   FloatRect imageRect = FloatRect(FloatPoint(), size(image));
-  if (!imageRect.contains(normalizeRect(srcRect)) || srcRect.width() == 0 ||
-      srcRect.height() == 0) {
+  if (!imageRect.contains(normalizeRect(srcRect)) || !srcRect.width() ||
+      !srcRect.height()) {
     ec = INDEX_SIZE_ERR;
     return;
   }
@@ -1213,8 +1215,8 @@ void CanvasRenderingContext2D::drawImage(HTMLCanvasElement* sourceCanvas,
     return;
   }
 
-  if (!srcCanvasRect.contains(normalizeRect(srcRect)) || srcRect.width() == 0 ||
-      srcRect.height() == 0) {
+  if (!srcCanvasRect.contains(normalizeRect(srcRect)) || !srcRect.width() ||
+      !srcRect.height()) {
     ec = INDEX_SIZE_ERR;
     return;
   }
@@ -1309,8 +1311,8 @@ void CanvasRenderingContext2D::drawImage(HTMLVideoElement* video,
     return;
 
   FloatRect videoRect = FloatRect(FloatPoint(), size(video));
-  if (!videoRect.contains(normalizeRect(srcRect)) || srcRect.width() == 0 ||
-      srcRect.height() == 0) {
+  if (!videoRect.contains(normalizeRect(srcRect)) || !srcRect.width() ||
+      !srcRect.height()) {
     ec = INDEX_SIZE_ERR;
     return;
   }
