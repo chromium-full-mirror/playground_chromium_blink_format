@@ -181,9 +181,6 @@ class HTMLTreeBuilder : public Noncopyable {
   // FIXME: Implement error reporting.
   void parseError(AtomicHTMLToken&) {}
 
-  void handleScriptStartTag();
-  void handleScriptEndTag(Element*, int scriptStartLine);
-
   InsertionMode insertionMode() const { return m_insertionMode; }
   void setInsertionMode(InsertionMode mode) {
     m_insertionMode = mode;
