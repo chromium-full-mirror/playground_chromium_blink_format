@@ -530,16 +530,6 @@
 #endif
 
 #if OS(WINCE) && !PLATFORM(QT)
-#undef ENABLE_JSC_MULTIPLE_THREADS
-#define ENABLE_JSC_MULTIPLE_THREADS 0
-#define USE_SYSTEM_MALLOC 0
-#define ENABLE_ICONDATABASE 0
-#define ENABLE_JAVASCRIPT_DEBUGGER 0
-#define ENABLE_FTPDIR 0
-#define ENABLE_PAN_SCROLLING 0
-#define ENABLE_WML 1
-#define HAVE_ACCESSIBILITY 0
-
 #define NOMINMAX  /* Windows min and max conflict with standard macros */
 #define NOSHLWAPI /* shlwapi.h not available on WinCe */
 
@@ -1073,7 +1063,7 @@ on MinGW. See https://bugs.webkit.org/show_bug.cgi?id=29268 */
    with WTF_USE_ACCELERATED_COMPOSITING, and it allows the feature to be turned
    on and
    off in one place. */
-#if PLATFORM(WIN)
+#if PLATFORM(WIN) && !OS(WINCE)
 #include "QuartzCorePresent.h"
 #if QUARTZCORE_PRESENT
 #define WTF_USE_ACCELERATED_COMPOSITING 1
