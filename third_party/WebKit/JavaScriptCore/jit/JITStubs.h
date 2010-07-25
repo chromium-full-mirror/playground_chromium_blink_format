@@ -184,6 +184,10 @@ struct JITStackFrame {
   ReturnAddressPtr* returnAddressSlot() { return &thunkReturnAddress; }
 };
 #elif CPU(ARM_TRADITIONAL)
+#if COMPILER(MSVC)
+#pragma pack(push)
+#pragma pack(4)
+#endif  // COMPILER(MSVC)
 struct JITStackFrame {
   JITStubArg padding;  // Unused
   JITStubArg args[7];
@@ -209,6 +213,9 @@ struct JITStackFrame {
   // rest of the stack.
   ReturnAddressPtr* returnAddressSlot() { return &thunkReturnAddress; }
 };
+#if COMPILER(MSVC)
+#pragma pack(pop)
+#endif  // COMPILER(MSVC)
 #elif CPU(MIPS)
 struct JITStackFrame {
   void* reserved;  // Unused
