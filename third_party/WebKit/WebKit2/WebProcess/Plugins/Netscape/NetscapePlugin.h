@@ -190,6 +190,16 @@ inline bool NetscapePlugin::platformHandleWheelEvent(const WebWheelEvent&) {
 
 inline void NetscapePlugin::platformSetFocus(bool) {}
 
+inline bool NetscapePlugin::platformHandleMouseEnterEvent(
+    const WebMouseEvent&) {
+  return false;
+}
+
+inline bool NetscapePlugin::platformHandleMouseLeaveEvent(
+    const WebMouseEvent&) {
+  return false;
+}
+
 #endif
 
 }  // namespace WebKit
