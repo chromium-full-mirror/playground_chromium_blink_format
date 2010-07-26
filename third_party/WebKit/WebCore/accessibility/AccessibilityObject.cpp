@@ -1021,31 +1021,17 @@ bool AccessibilityObject::supportsARIALiveRegion() const {
          equalIgnoringCase(liveRegion, "assertive");
 }
 
-int AccessibilityObject::intValue() const {
-  if (isPasswordField())
-    return 0;
-
-  if (isHeading())
-    return headingLevel();
-
+AccessibilityButtonState AccessibilityObject::checkboxOrRadioValue() const {
   // If this is a real checkbox or radio button, AccessibilityRenderObject will
   // handle.
   // If it's an ARIA checkbox or radio, the aria-checked attribute should be
   // used.
-  if (isCheckboxOrRadio())
-    return equalIgnoringCase(getAttribute(aria_checkedAttr), "true");
 
-  return 0;
-}
+  const AtomicString& result = getAttribute(aria_checkedAttr);
+  if (equalIgnoringCase(result, "true"))
+    return ButtonStateOn;
 
-bool AccessibilityObject::hasIntValue() const {
-  if (isHeading())
-    return true;
-
-  if (isCheckboxOrRadio())
-    return true;
-
-  return false;
+  return ButtonStateOff;
 }
 
 }  // namespace WebCore

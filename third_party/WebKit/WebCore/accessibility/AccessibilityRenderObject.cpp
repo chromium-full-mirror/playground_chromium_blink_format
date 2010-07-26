@@ -719,7 +719,8 @@ AccessibilityObject* AccessibilityRenderObject::selectedRadioButton() {
   int count = m_children.size();
   for (int i = 0; i < count; ++i) {
     AccessibilityObject* object = m_children[i].get();
-    if (object->roleValue() == RadioButtonRole && object->intValue() == 1)
+    if (object->roleValue() == RadioButtonRole &&
+        object->checkboxOrRadioValue() == ButtonStateOn)
       return object;
   }
   return 0;
@@ -736,7 +737,7 @@ AccessibilityObject* AccessibilityRenderObject::selectedTabItem() {
   int count = tabs.size();
   for (int i = 0; i < count; ++i) {
     AccessibilityObject* object = m_children[i].get();
-    if (object->isTabItem() && object->intValue() == 1)
+    if (object->isTabItem() && object->isChecked())
       return object;
   }
   return 0;
@@ -1006,11 +1007,9 @@ Node* AccessibilityRenderObject::node() const {
   return m_renderer ? m_renderer->node() : 0;
 }
 
-int AccessibilityRenderObject::intValue() const {
-  if (isCheckboxOrRadio())
-    return isChecked() ? 1 : 0;
-
-  return AccessibilityObject::intValue();
+AccessibilityButtonState AccessibilityRenderObject::checkboxOrRadioValue()
+    const {
+  return isChecked() ? ButtonStateOn : ButtonStateOff;
 }
 
 String AccessibilityRenderObject::valueDescription() const {

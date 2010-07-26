@@ -118,7 +118,7 @@ class AccessibilityRenderObject : public AccessibilityObject {
   virtual bool accessibilityIsIgnored() const;
 
   virtual int headingLevel() const;
-  virtual int intValue() const;
+  virtual AccessibilityButtonState checkboxOrRadioValue() const;
   virtual String valueDescription() const;
   virtual float valueForRange() const;
   virtual float maxValueForRange() const;
