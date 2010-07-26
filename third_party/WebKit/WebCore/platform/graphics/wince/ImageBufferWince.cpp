@@ -26,8 +26,10 @@
 #include "Image.h"
 #include "ImageData.h"
 #include "JPEGEncoder.h"
+#include "NotImplemented.h"
 #include "PNGEncoder.h"
 #include "SharedBitmap.h"
+#include "UnusedParam.h"
 #include <wtf/UnusedParam.h>
 
 namespace WebCore {
@@ -44,11 +46,13 @@ class BufferedImage : public Image {
   virtual void draw(GraphicsContext*,
                     const FloatRect& dstRect,
                     const FloatRect& srcRect,
+                    ColorSpace styleColorSpace,
                     CompositeOperator);
   virtual void drawPattern(GraphicsContext*,
                            const FloatRect& srcRect,
                            const AffineTransform& patternTransform,
                            const FloatPoint& phase,
+                           ColorSpace styleColorSpace,
                            CompositeOperator,
                            const FloatRect& destRect);
 
@@ -58,20 +62,23 @@ class BufferedImage : public Image {
 void BufferedImage::draw(GraphicsContext* ctxt,
                          const FloatRect& dstRect,
                          const FloatRect& srcRect,
+                         ColorSpace styleColorSpace,
                          CompositeOperator compositeOp) {
   IntRect intDstRect = enclosingIntRect(dstRect);
   IntRect intSrcRect(srcRect);
-  m_data->m_bitmap->draw(ctxt, intDstRect, intSrcRect, compositeOp);
+  m_data->m_bitmap->draw(ctxt, intDstRect, intSrcRect, styleColorSpace,
+                         compositeOp);
 }
 
 void BufferedImage::drawPattern(GraphicsContext* ctxt,
                                 const FloatRect& tileRectIn,
                                 const AffineTransform& patternTransform,
                                 const FloatPoint& phase,
+                                ColorSpace styleColorSpace,
                                 CompositeOperator op,
                                 const FloatRect& destRect) {
-  m_data->m_bitmap->drawPattern(ctxt, tileRectIn, patternTransform, phase, op,
-                                destRect, size());
+  m_data->m_bitmap->drawPattern(ctxt, tileRectIn, patternTransform, phase,
+                                styleColorSpace, op, destRect, size());
 }
 
 ImageBufferData::ImageBufferData(const IntSize& size)
@@ -231,6 +238,11 @@ void ImageBuffer::putPremultipliedImageData(ImageData* source,
                                             const IntRect& sourceRect,
                                             const IntPoint& destPoint) {
   putImageData<true>(source, sourceRect, destPoint, m_data.m_bitmap.get());
+}
+
+void ImageBuffer::platformTransformColorSpace(const Vector<int>& lookUpTable) {
+  UNUSED_PARAM(lookUpTable);
+  notImplemented();
 }
 
 String ImageBuffer::toDataURL(const String& mimeType, const double*) const {
