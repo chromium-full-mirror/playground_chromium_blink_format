@@ -39,6 +39,7 @@
 #include "FrameView.h"
 #include "DocumentLoader.h"
 #include "HitTestResult.h"
+#include "JSDOMWindowBase.h"
 #include "MIMETypeRegistry.h"
 #include "MouseEvent.h"
 #include "ResourceResponse.h"
@@ -824,8 +825,19 @@ FrameLoaderClientQt::createDocumentLoader(
     const SubstituteData& substituteData) {
   RefPtr<DocumentLoader> loader =
       DocumentLoader::create(request, substituteData);
-  if (!deferMainResourceDataLoad || substituteData.isValid())
+  if (!deferMainResourceDataLoad || substituteData.isValid()) {
     loader->setDeferMainResourceDataLoad(false);
+    // Use the default timeout interval for JS as the HTML tokenizer delay. This
+    // ensures
+    // that long-running JavaScript will still allow setHtml() to be
+    // synchronous, while
+    // still giving a reasonable timeout to prevent deadlock.
+    double delay = JSDOMWindowBase::commonJSGlobalData()
+                       ->timeoutChecker.timeoutInterval() /
+                   1000.0f;
+    m_frame->page()->setCustomHTMLTokenizerTimeDelay(delay);
+  } else
+    m_frame->page()->setCustomHTMLTokenizerTimeDelay(-1);
   return loader.release();
 }
 

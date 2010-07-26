@@ -42,6 +42,7 @@ class TimeoutChecker {
   void setTimeoutInterval(unsigned timeoutInterval) {
     m_timeoutInterval = timeoutInterval;
   }
+  unsigned timeoutInterval() const { return m_timeoutInterval; }
 
   unsigned ticksUntilNextCheck() { return m_ticksUntilNextCheck; }
 
