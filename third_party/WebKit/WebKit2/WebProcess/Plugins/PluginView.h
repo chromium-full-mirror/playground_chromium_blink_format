@@ -70,6 +70,7 @@ class PluginView : public WebCore::Widget,
 
   void viewGeometryDidChange();
   WebCore::IntRect clipRectInWindowCoordinates() const;
+  void focusPluginElement();
 
   void pendingURLRequestsTimerFired();
   class URLRequest;
@@ -90,6 +91,7 @@ class PluginView : public WebCore::Widget,
   virtual void setFrameRect(const WebCore::IntRect&);
   virtual void paint(WebCore::GraphicsContext*, const WebCore::IntRect&);
   virtual void invalidateRect(const WebCore::IntRect&);
+  virtual void setFocus(bool);
   virtual void frameRectsChanged();
   virtual void setParent(WebCore::ScrollView*);
   virtual void handleEvent(WebCore::Event*);

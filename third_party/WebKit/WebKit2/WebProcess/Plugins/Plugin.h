@@ -114,6 +114,17 @@ class Plugin : public RefCounted<Plugin> {
   // return true if it processed the event.
   virtual bool handleWheelEvent(const WebWheelEvent&) = 0;
 
+  // Tells the plug-in to handle the passed in mouse over event. The plug-in
+  // should return true if it processed the event.
+  virtual bool handleMouseEnterEvent(const WebMouseEvent&) = 0;
+
+  // Tells the plug-in to handle the passed in mouse leave event. The plug-in
+  // should return true if it processed the event.
+  virtual bool handleMouseLeaveEvent(const WebMouseEvent&) = 0;
+
+  // Tells the focus about focus changes.
+  virtual void setFocus(bool) = 0;
+
   // Returns the plug-in controller for this plug-in.
   // FIXME: We could just have the controller be a member variable of Plugin.
   virtual PluginController* controller() = 0;

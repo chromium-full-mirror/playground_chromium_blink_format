@@ -108,6 +108,9 @@ class NetscapePlugin : public Plugin {
 
   bool platformHandleMouseEvent(const WebMouseEvent&);
   bool platformHandleWheelEvent(const WebWheelEvent&);
+  bool platformHandleMouseEnterEvent(const WebMouseEvent&);
+  bool platformHandleMouseLeaveEvent(const WebMouseEvent&);
+  void platformSetFocus(bool);
 
   // Plugin
   virtual bool initialize(PluginController*, const Parameters&);
@@ -134,6 +137,9 @@ class NetscapePlugin : public Plugin {
   virtual void streamDidFail(uint64_t streamID, bool wasCancelled);
   virtual bool handleMouseEvent(const WebMouseEvent&);
   virtual bool handleWheelEvent(const WebWheelEvent&);
+  virtual bool handleMouseEnterEvent(const WebMouseEvent&);
+  virtual bool handleMouseLeaveEvent(const WebMouseEvent&);
+  virtual void setFocus(bool);
 
   virtual PluginController* controller();
 
@@ -174,13 +180,15 @@ inline bool NetscapePlugin::platformPostInitialize() {
 inline void NetscapePlugin::platformPaint(WebCore::GraphicsContext*,
                                           const WebCore::IntRect&) {}
 
-bool NetscapePlugin::platformHandleMouseEvent(const WebMouseEvent&) {
+inline bool NetscapePlugin::platformHandleMouseEvent(const WebMouseEvent&) {
   return false;
 }
 
-bool NetscapePlugin::platformHandleWheelEvent(const WebWheelEvent&) {
+inline bool NetscapePlugin::platformHandleWheelEvent(const WebWheelEvent&) {
   return false;
 }
+
+inline void NetscapePlugin::platformSetFocus(bool) {}
 
 #endif
 
