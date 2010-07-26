@@ -1137,7 +1137,8 @@ bool CompositeEditCommand::breakOutOfEmptyListItem() {
   // node?
   if (!listNode ||
       (!listNode->hasTagName(ulTag) && !listNode->hasTagName(olTag)) ||
-      !listNode->isContentEditable())
+      !listNode->isContentEditable() ||
+      listNode == emptyListItem->rootEditableElement())
     return false;
 
   RefPtr<Element> newBlock = 0;
