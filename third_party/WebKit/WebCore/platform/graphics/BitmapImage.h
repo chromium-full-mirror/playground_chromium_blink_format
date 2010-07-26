@@ -187,7 +187,7 @@ class BitmapImage : public Image {
 #if (OS(WINCE) && !PLATFORM(QT))
   virtual void drawPattern(GraphicsContext*,
                            const FloatRect& srcRect,
-                           const TransformationMatrix& patternTransform,
+                           const AffineTransform& patternTransform,
                            const FloatPoint& phase,
                            ColorSpace styleColorSpace,
                            CompositeOperator,
