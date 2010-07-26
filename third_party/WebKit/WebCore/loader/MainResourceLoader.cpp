@@ -45,6 +45,7 @@
 #endif
 #include "ResourceError.h"
 #include "ResourceHandle.h"
+#include "SchemeRegistry.h"
 #include "Settings.h"
 #include <wtf/CurrentTime.h>
 
@@ -225,7 +226,8 @@ static bool shouldLoadAsEmptyDocument(const KURL& url) {
   return url.isEmpty() ||
          (url.protocolIs("about") && equalIgnoringRef(url, blankURL()));
 #else
-  return url.isEmpty() || url.protocolIs("about");
+  return url.isEmpty() ||
+         SchemeRegistry::shouldLoadURLSchemeAsEmptyDocument(url.protocol());
 #endif
 }
 
