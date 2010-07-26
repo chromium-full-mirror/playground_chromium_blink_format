@@ -81,4 +81,12 @@ void DummyPlugin::streamDidFinishLoading(uint64_t streamID) {}
 
 void DummyPlugin::streamDidFail(uint64_t streamID, bool wasCancelled) {}
 
+bool DummyPlugin::handleMouseEvent(const WebMouseEvent&) {
+  return false;
+}
+
+bool DummyPlugin::handleWheelEvent(const WebWheelEvent&) {
+  return false;
+}
+
 }  // namespace WebKit

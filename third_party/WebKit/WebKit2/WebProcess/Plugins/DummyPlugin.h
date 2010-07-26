@@ -61,6 +61,8 @@ class DummyPlugin : public Plugin {
                                     int length);
   virtual void streamDidFinishLoading(uint64_t streamID);
   virtual void streamDidFail(uint64_t streamID, bool wasCancelled);
+  virtual bool handleMouseEvent(const WebMouseEvent&);
+  virtual bool handleWheelEvent(const WebWheelEvent&);
 
   virtual PluginController* controller();
 };

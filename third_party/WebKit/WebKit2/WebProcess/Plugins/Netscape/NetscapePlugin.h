@@ -87,9 +87,9 @@ class NetscapePlugin : public Plugin {
                         uint16_t* stype);
   NPError NPP_DestroyStream(NPStream*, NPReason);
   void NPP_StreamAsFile(NPStream*, const char* filename);
-
   int32_t NPP_WriteReady(NPStream*);
   int32_t NPP_Write(NPStream*, int32_t offset, int32_t len, void* buffer);
+  int16_t NPP_HandleEvent(void* event);
   void NPP_URLNotify(const char* url, NPReason, void* notifyData);
   NPError NPP_GetValue(NPPVariable, void* value);
 
@@ -105,6 +105,9 @@ class NetscapePlugin : public Plugin {
   bool platformPostInitialize();
   void platformPaint(WebCore::GraphicsContext*,
                      const WebCore::IntRect& dirtyRect);
+
+  bool platformHandleMouseEvent(const WebMouseEvent&);
+  bool platformHandleWheelEvent(const WebWheelEvent&);
 
   // Plugin
   virtual bool initialize(PluginController*, const Parameters&);
@@ -129,6 +132,8 @@ class NetscapePlugin : public Plugin {
                                     int length);
   virtual void streamDidFinishLoading(uint64_t streamID);
   virtual void streamDidFail(uint64_t streamID, bool wasCancelled);
+  virtual bool handleMouseEvent(const WebMouseEvent&);
+  virtual bool handleWheelEvent(const WebWheelEvent&);
 
   virtual PluginController* controller();
 
@@ -168,6 +173,15 @@ inline bool NetscapePlugin::platformPostInitialize() {
 
 inline void NetscapePlugin::platformPaint(WebCore::GraphicsContext*,
                                           const WebCore::IntRect&) {}
+
+bool NetscapePlugin::platformHandleMouseEvent(const WebMouseEvent&) {
+  return false;
+}
+
+bool NetscapePlugin::platformHandleWheelEvent(const WebWheelEvent&) {
+  return false;
+}
+
 #endif
 
 }  // namespace WebKit

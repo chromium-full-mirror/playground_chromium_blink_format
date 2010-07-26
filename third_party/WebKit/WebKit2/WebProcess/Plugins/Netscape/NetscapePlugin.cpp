@@ -214,6 +214,10 @@ int32_t NetscapePlugin::NPP_Write(NPStream* stream,
                                              buffer);
 }
 
+int16_t NetscapePlugin::NPP_HandleEvent(void* event) {
+  return m_pluginModule->pluginFuncs().event(&m_npp, event);
+}
+
 void NetscapePlugin::NPP_URLNotify(const char* url,
                                    NPReason reason,
                                    void* notifyData) {
@@ -416,6 +420,14 @@ void NetscapePlugin::streamDidFinishLoading(uint64_t streamID) {
 void NetscapePlugin::streamDidFail(uint64_t streamID, bool wasCancelled) {
   if (NetscapePluginStream* pluginStream = streamFromID(streamID))
     pluginStream->didFail(wasCancelled);
+}
+
+bool NetscapePlugin::handleMouseEvent(const WebMouseEvent& mouseEvent) {
+  return platformHandleMouseEvent(mouseEvent);
+}
+
+bool NetscapePlugin::handleWheelEvent(const WebWheelEvent& wheelEvent) {
+  return platformHandleWheelEvent(wheelEvent);
 }
 
 PluginController* NetscapePlugin::controller() {

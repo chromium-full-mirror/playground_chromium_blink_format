@@ -404,7 +404,8 @@ WebMouseEvent WebEventFactory::createWebMouseEvent(HWND hWnd,
   WebEvent::Modifiers modifiers = modifiersForEvent(wParam);
 
   return WebMouseEvent(type, button, positionX, positionY, globalPositionX,
-                       globalPositionY, clickCount, modifiers, timestamp);
+                       globalPositionY, 0, 0, 0, clickCount, modifiers,
+                       timestamp);
 }
 
 WebWheelEvent WebEventFactory::createWebWheelEvent(HWND hWnd,

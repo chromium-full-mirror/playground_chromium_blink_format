@@ -54,6 +54,7 @@ class String;
 namespace WebKit {
 
 class DrawingArea;
+class WebEvent;
 class WebFrame;
 class WebKeyboardEvent;
 class WebMouseEvent;
@@ -118,6 +119,8 @@ class WebPage : public RefCounted<WebPage> {
   void enterAcceleratedCompositingMode(WebCore::GraphicsLayer*);
   void exitAcceleratedCompositingMode();
 #endif
+
+  static const WebEvent* currentEvent();
 
  private:
   WebPage(uint64_t pageID,

@@ -37,6 +37,9 @@ class IntRect;
 
 namespace WebKit {
 
+class WebMouseEvent;
+class WebWheelEvent;
+
 class PluginController;
 
 class Plugin : public RefCounted<Plugin> {
@@ -102,6 +105,14 @@ class Plugin : public RefCounted<Plugin> {
   // Tells the plug-in that a stream has failed to load, either because of
   // network errors or because the load was cancelled.
   virtual void streamDidFail(uint64_t streamID, bool wasCancelled) = 0;
+
+  // Tells the plug-in to handle the passed in mouse event. The plug-in should
+  // return true if it processed the event.
+  virtual bool handleMouseEvent(const WebMouseEvent&) = 0;
+
+  // Tells the plug-in to handle the passed in wheel event. The plug-in should
+  // return true if it processed the event.
+  virtual bool handleWheelEvent(const WebWheelEvent&) = 0;
 
   // Returns the plug-in controller for this plug-in.
   // FIXME: We could just have the controller be a member variable of Plugin.
