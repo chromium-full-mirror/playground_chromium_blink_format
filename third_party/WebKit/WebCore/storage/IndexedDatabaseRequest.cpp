@@ -70,30 +70,30 @@ PassRefPtr<IDBRequest> IndexedDatabaseRequest::open(
 }
 
 PassRefPtr<IDBKeyRange> IndexedDatabaseRequest::makeSingleKeyRange(
-    PassRefPtr<SerializedScriptValue> prpValue) {
-  RefPtr<SerializedScriptValue> value = prpValue;
+    PassRefPtr<IDBKey> prpValue) {
+  RefPtr<IDBKey> value = prpValue;
   return IDBKeyRange::create(value, value, IDBKeyRange::SINGLE);
 }
 
 PassRefPtr<IDBKeyRange> IndexedDatabaseRequest::makeLeftBoundKeyRange(
-    PassRefPtr<SerializedScriptValue> bound,
+    PassRefPtr<IDBKey> bound,
     bool open) {
   return IDBKeyRange::create(
-      bound, SerializedScriptValue::create(),
+      bound, IDBKey::create(),
       open ? IDBKeyRange::LEFT_OPEN : IDBKeyRange::LEFT_BOUND);
 }
 
 PassRefPtr<IDBKeyRange> IndexedDatabaseRequest::makeRightBoundKeyRange(
-    PassRefPtr<SerializedScriptValue> bound,
+    PassRefPtr<IDBKey> bound,
     bool open) {
   return IDBKeyRange::create(
-      SerializedScriptValue::create(), bound,
+      IDBKey::create(), bound,
       open ? IDBKeyRange::RIGHT_OPEN : IDBKeyRange::RIGHT_BOUND);
 }
 
 PassRefPtr<IDBKeyRange> IndexedDatabaseRequest::makeBoundKeyRange(
-    PassRefPtr<SerializedScriptValue> left,
-    PassRefPtr<SerializedScriptValue> right,
+    PassRefPtr<IDBKey> left,
+    PassRefPtr<IDBKey> right,
     bool openLeft,
     bool openRight) {
   unsigned short flags =

@@ -28,8 +28,7 @@
 
 #if ENABLE(INDEXED_DATABASE)
 
-#include "IDBAny.h"
-#include "SerializedScriptValue.h"
+#include "IDBKey.h"
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 
@@ -46,24 +45,24 @@ class IDBKeyRange : public RefCounted<IDBKeyRange> {
     RIGHT_BOUND = 8,
   };
 
-  static PassRefPtr<IDBKeyRange> create(PassRefPtr<SerializedScriptValue> left,
-                                        PassRefPtr<SerializedScriptValue> right,
+  static PassRefPtr<IDBKeyRange> create(PassRefPtr<IDBKey> left,
+                                        PassRefPtr<IDBKey> right,
                                         unsigned short flags) {
     return adoptRef(new IDBKeyRange(left, right, flags));
   }
   ~IDBKeyRange() {}
 
-  PassRefPtr<IDBAny> left() const { return IDBAny::create(m_left.get()); }
-  PassRefPtr<IDBAny> right() const { return IDBAny::create(m_right.get()); }
+  PassRefPtr<IDBKey> left() const { return m_left; }
+  PassRefPtr<IDBKey> right() const { return m_right; }
   unsigned short flags() const { return m_flags; }
 
  private:
-  IDBKeyRange(PassRefPtr<SerializedScriptValue> left,
-              PassRefPtr<SerializedScriptValue> right,
+  IDBKeyRange(PassRefPtr<IDBKey> left,
+              PassRefPtr<IDBKey> right,
               unsigned short flags);
 
-  RefPtr<SerializedScriptValue> m_left;
-  RefPtr<SerializedScriptValue> m_right;
+  RefPtr<IDBKey> m_left;
+  RefPtr<IDBKey> m_right;
   unsigned short m_flags;
 };
 
