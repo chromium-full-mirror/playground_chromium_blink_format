@@ -1746,6 +1746,11 @@ void ApplyStyleCommand::splitTextAtEnd(const Position& start,
 
 void ApplyStyleCommand::splitTextElementAtStart(const Position& start,
                                                 const Position& end) {
+  Node* parent = start.node()->parentNode();
+  if (!parent || !parent->parentElement() ||
+      !parent->parentElement()->isContentEditable())
+    return splitTextAtStart(start, end);
+
   int endOffsetAdjustment =
       start.node() == end.node() ? start.deprecatedEditingOffset() : 0;
   Text* text = static_cast<Text*>(start.node());
@@ -1758,6 +1763,11 @@ void ApplyStyleCommand::splitTextElementAtStart(const Position& start,
 
 void ApplyStyleCommand::splitTextElementAtEnd(const Position& start,
                                               const Position& end) {
+  Node* parent = end.node()->parentNode();
+  if (!parent || !parent->parentElement() ||
+      !parent->parentElement()->isContentEditable())
+    return splitTextAtEnd(start, end);
+
   Text* text = static_cast<Text*>(end.node());
   splitTextNodeContainingElement(text, end.deprecatedEditingOffset());
 
