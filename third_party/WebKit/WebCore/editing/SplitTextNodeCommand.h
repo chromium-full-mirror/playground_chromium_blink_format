@@ -44,6 +44,8 @@ class SplitTextNodeCommand : public SimpleEditCommand {
 
   virtual void doApply();
   virtual void doUnapply();
+  virtual void doReapply();
+  void insertText1AndTrimText2();
 
   RefPtr<Text> m_text1;
   RefPtr<Text> m_text2;
