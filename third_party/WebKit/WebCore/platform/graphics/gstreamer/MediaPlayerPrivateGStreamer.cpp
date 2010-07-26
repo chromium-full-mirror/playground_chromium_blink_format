@@ -1228,6 +1228,7 @@ static HashSet<String> mimeTypeCache() {
             g_str_equal(name, "audio/x-m4a")) {
           cache.add(String("video/mp4"));
           cache.add(String("audio/aac"));
+          cache.add(String("audio/mp4"));
           cached = true;
         }
 
@@ -1249,6 +1250,7 @@ static HashSet<String> mimeTypeCache() {
 
         if (g_str_equal(name, "audio/mpeg")) {
           cache.add(String(name));
+          cache.add(String("audio/x-mpeg"));
           cached = true;
 
           // This is what we are handling:
@@ -1264,8 +1266,10 @@ static HashSet<String> mimeTypeCache() {
                 cache.add(String("audio/mp1"));
               if (minLayer <= 2 && 2 <= maxLayer)
                 cache.add(String("audio/mp2"));
-              if (minLayer <= 3 && 3 <= maxLayer)
+              if (minLayer <= 3 && 3 <= maxLayer) {
+                cache.add(String("audio/x-mp3"));
                 cache.add(String("audio/mp3"));
+              }
             }
           }
         }
