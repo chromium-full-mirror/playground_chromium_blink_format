@@ -57,7 +57,7 @@ class SpeechInput : public Noncopyable, public SpeechInputClientListener {
   virtual bool startRecognition();
 
   // SpeechInputClient::Listener methods.
-  virtual void recordingComplete();
+  virtual void didCompleteRecording();
   virtual void setRecognitionResult(const String&);
 
  protected:

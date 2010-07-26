@@ -43,8 +43,8 @@ SpeechInput::SpeechInput(SpeechInputClient* client,
                          SpeechInputListener* listener)
     : m_client(client), m_listener(listener) {}
 
-void SpeechInput::recordingComplete() {
-  m_listener->recordingComplete();
+void SpeechInput::didCompleteRecording() {
+  m_listener->didCompleteRecording();
 }
 
 void SpeechInput::setRecognitionResult(const String& result) {
