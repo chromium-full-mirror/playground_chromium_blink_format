@@ -44,13 +44,13 @@ void WebContextInjectedBundleClient::initialize(
     memset(&m_client, 0, sizeof(m_client));
 }
 
-void WebContextInjectedBundleClient::didRecieveMessageFromInjectedBundle(
+void WebContextInjectedBundleClient::didReceiveMessageFromInjectedBundle(
     WebContext* context,
     const String& message) {
-  if (!m_client.didRecieveMessageFromInjectedBundle)
+  if (!m_client.didReceiveMessageFromInjectedBundle)
     return;
 
-  m_client.didRecieveMessageFromInjectedBundle(
+  m_client.didReceiveMessageFromInjectedBundle(
       toRef(context), toRef(message.impl()), m_client.clientInfo);
 }
 

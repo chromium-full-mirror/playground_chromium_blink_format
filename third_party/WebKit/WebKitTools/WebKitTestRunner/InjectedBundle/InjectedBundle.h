@@ -54,6 +54,8 @@ class InjectedBundle {
 
   std::ostringstream& os() { return m_outputStream; }
 
+  void setShouldTrackVisitedLinks();
+
  private:
   InjectedBundle();
   ~InjectedBundle();
@@ -64,13 +66,13 @@ class InjectedBundle {
   static void _willDestroyPage(WKBundleRef bundle,
                                WKBundlePageRef page,
                                const void* clientInfo);
-  static void _didRecieveMessage(WKBundleRef bundle,
+  static void _didReceiveMessage(WKBundleRef bundle,
                                  WKStringRef message,
                                  const void* clientInfo);
 
   void didCreatePage(WKBundlePageRef page);
   void willDestroyPage(WKBundlePageRef page);
-  void didRecieveMessage(WKStringRef message);
+  void didReceiveMessage(WKStringRef message);
 
   void reset();
 

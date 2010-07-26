@@ -76,7 +76,7 @@ void TestController::initialize(int argc, const char* argv[]) {
   m_context.adopt(WKContextCreateWithInjectedBundlePath(injectedBundlePath()));
 
   WKContextInjectedBundleClient injectedBundlePathClient = {
-      0, this, _didRecieveMessageFromInjectedBundle};
+      0, this, _didReceiveMessageFromInjectedBundle};
   WKContextSetInjectedBundleClient(m_context.get(), &injectedBundlePathClient);
 
   _WKContextSetAdditionalPluginPath(m_context.get(), testPluginPath());
@@ -116,16 +116,16 @@ bool TestController::run() {
   return true;
 }
 
-void TestController::_didRecieveMessageFromInjectedBundle(
+void TestController::_didReceiveMessageFromInjectedBundle(
     WKContextRef context,
     WKStringRef message,
     const void* clientInfo) {
   static_cast<TestController*>(const_cast<void*>(clientInfo))
-      ->didRecieveMessageFromInjectedBundle(message);
+      ->didReceiveMessageFromInjectedBundle(message);
 }
 
-void TestController::didRecieveMessageFromInjectedBundle(WKStringRef message) {
-  m_currentInvocation->didRecieveMessageFromInjectedBundle(message);
+void TestController::didReceiveMessageFromInjectedBundle(WKStringRef message) {
+  m_currentInvocation->didReceiveMessageFromInjectedBundle(message);
 }
 
 }  // namespace WTR

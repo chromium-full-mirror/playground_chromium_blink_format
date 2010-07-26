@@ -41,7 +41,7 @@ class WebContextInjectedBundleClient {
   WebContextInjectedBundleClient();
   void initialize(WKContextInjectedBundleClient*);
 
-  void didRecieveMessageFromInjectedBundle(WebContext*, const WebCore::String&);
+  void didReceiveMessageFromInjectedBundle(WebContext*, const WebCore::String&);
 
  private:
   WKContextInjectedBundleClient m_client;

@@ -79,7 +79,7 @@ class WebContext : public RefCounted<WebContext> {
   }
 
   // InjectedBundle client
-  void didRecieveMessageFromInjectedBundle(const WebCore::String&);
+  void didReceiveMessageFromInjectedBundle(const WebCore::String&);
 
   void postMessageToInjectedBundle(WebCore::StringImpl*);
 

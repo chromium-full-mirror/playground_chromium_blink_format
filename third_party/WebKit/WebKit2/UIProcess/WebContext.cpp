@@ -143,9 +143,9 @@ void WebContext::preferencesDidChange() {
 
 // InjectedBundle client
 
-void WebContext::didRecieveMessageFromInjectedBundle(
+void WebContext::didReceiveMessageFromInjectedBundle(
     const WebCore::String& message) {
-  m_injectedBundleClient.didRecieveMessageFromInjectedBundle(this, message);
+  m_injectedBundleClient.didReceiveMessageFromInjectedBundle(this, message);
 }
 
 void WebContext::postMessageToInjectedBundle(WebCore::StringImpl* message) {

@@ -57,18 +57,18 @@ void InjectedBundle::_willDestroyPage(WKBundleRef bundle,
       ->willDestroyPage(page);
 }
 
-void InjectedBundle::_didRecieveMessage(WKBundleRef bundle,
+void InjectedBundle::_didReceiveMessage(WKBundleRef bundle,
                                         WKStringRef message,
                                         const void* clientInfo) {
   static_cast<InjectedBundle*>(const_cast<void*>(clientInfo))
-      ->didRecieveMessage(message);
+      ->didReceiveMessage(message);
 }
 
 void InjectedBundle::initialize(WKBundleRef bundle) {
   m_bundle = bundle;
 
   WKBundleClient client = {0, this, _didCreatePage, _willDestroyPage,
-                           _didRecieveMessage};
+                           _didReceiveMessage};
   WKBundleSetClient(m_bundle, &client);
 
   activateFonts();
@@ -94,7 +94,7 @@ void InjectedBundle::willDestroyPage(WKBundlePageRef page) {
   delete m_pages.take(page);
 }
 
-void InjectedBundle::didRecieveMessage(WKStringRef message) {
+void InjectedBundle::didReceiveMessage(WKStringRef message) {
   CFStringRef cfMessage = WKStringCopyCFString(0, message);
   if (CFEqual(cfMessage, CFSTR("BeginTest"))) {
     WKRetainPtr<WKStringRef> ackMessage(
@@ -112,7 +112,13 @@ void InjectedBundle::didRecieveMessage(WKStringRef message) {
 
 void InjectedBundle::reset() {
   m_outputStream.str("");
-  m_layoutTestController = LayoutTestController::create(std::string(""));
+  m_layoutTestController = LayoutTestController::create();
+  WKBundleSetShouldTrackVisitedLinks(m_bundle, false);
+  WKBundleRemoveAllVisitedLinks(m_bundle);
+}
+
+void InjectedBundle::setShouldTrackVisitedLinks() {
+  WKBundleSetShouldTrackVisitedLinks(m_bundle, true);
 }
 
 }  // namespace WTR

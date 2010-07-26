@@ -30,6 +30,7 @@
 #include "WebCoreArgumentCoders.h"
 #include "WebProcess.h"
 #include "WebProcessProxyMessageKinds.h"
+#include <WebCore/PageGroup.h>
 
 using namespace WebCore;
 
@@ -54,6 +55,14 @@ void InjectedBundle::postMessage(StringImpl* message) {
                                           0, CoreIPC::In(String(message)));
 }
 
+void InjectedBundle::setShouldTrackVisitedLinks(bool shouldTrackVisitedLinks) {
+  PageGroup::setShouldTrackVisitedLinks(shouldTrackVisitedLinks);
+}
+
+void InjectedBundle::removeAllVisitedLinks() {
+  PageGroup::removeAllVisitedLinks();
+}
+
 void InjectedBundle::didCreatePage(WebPage* page) {
   if (m_client.didCreatePage)
     m_client.didCreatePage(toRef(this), toRef(page), m_client.clientInfo);
@@ -64,9 +73,9 @@ void InjectedBundle::willDestroyPage(WebPage* page) {
     m_client.willDestroyPage(toRef(this), toRef(page), m_client.clientInfo);
 }
 
-void InjectedBundle::didRecieveMessage(const WebCore::String& message) {
-  if (m_client.didRecieveMessage)
-    m_client.didRecieveMessage(toRef(this), toRef(message.impl()),
+void InjectedBundle::didReceiveMessage(const WebCore::String& message) {
+  if (m_client.didReceiveMessage)
+    m_client.didReceiveMessage(toRef(this), toRef(message.impl()),
                                m_client.clientInfo);
 }
 

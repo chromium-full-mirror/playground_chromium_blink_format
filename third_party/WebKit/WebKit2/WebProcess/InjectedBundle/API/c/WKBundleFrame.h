@@ -39,24 +39,24 @@ extern "C" {
 #endif
 
 WK_EXPORT bool WKBundleFrameIsMainFrame(WKBundleFrameRef frame);
+WK_EXPORT WKArrayRef WKBundleFrameCopyChildFrames(WKBundleFrameRef frame);
+
+WK_EXPORT WKStringRef WKBundleFrameCopyName(WKBundleFrameRef frame);
+WK_EXPORT WKURLRef WKBundleFrameGetURL(WKBundleFrameRef frame);
 
 WK_EXPORT JSGlobalContextRef
 WKBundleFrameGetJavaScriptContext(WKBundleFrameRef frame);
-
-WK_EXPORT WKURLRef WKBundleFrameGetURL(WKBundleFrameRef frame);
-
-WK_EXPORT WKArrayRef WKBundleFrameCopyChildFrames(WKBundleFrameRef frame);
+WK_EXPORT JSValueRef
+WKBundleFrameGetComputedStyleIncludingVisitedInfo(WKBundleFrameRef frame,
+                                                  JSObjectRef element);
 
 WK_EXPORT unsigned WKBundleFrameGetNumberOfActiveAnimations(
     WKBundleFrameRef frame);
-
 WK_EXPORT bool WKBundleFramePauseAnimationOnElementWithId(
     WKBundleFrameRef frame,
     WKStringRef name,
     WKStringRef elementID,
     double time);
-
-WK_EXPORT WKStringRef WKBundleFrameCopyName(WKBundleFrameRef frame);
 
 #ifdef __cplusplus
 }
