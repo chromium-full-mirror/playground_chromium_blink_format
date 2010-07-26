@@ -920,7 +920,11 @@ static WebKitWebView* createWebView() {
       0, "signal::document-load-finished", webViewDocumentLoadFinished, 0,
       "signal::geolocation-policy-decision-requested",
       geolocationPolicyDecisionRequested, 0, "signal::onload-event",
-      webViewOnloadEvent, 0, NULL);
+      webViewOnloadEvent, 0, "signal::drag-begin", dragBeginCallback, 0,
+      "signal::drag-end", dragEndCallback, 0, "signal::drag-failed",
+      dragFailedCallback, 0,
+
+      NULL);
 
   g_signal_connect(view, "notify::load-status",
                    G_CALLBACK(webViewLoadStatusNotified), NULL);
