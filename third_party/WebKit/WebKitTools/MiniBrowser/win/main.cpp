@@ -39,24 +39,29 @@
 #define PROCESSORARCHITECTURE "*"
 #endif
 
-#pragma comment(linker, "/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='" PROCESSORARCHITECTURE "' publicKeyToken='6595b64144ccf1df' language='*'\"")
+#pragma comment(                                                                                                                                  \
+    linker,                                                                                                                                       \
+    "/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='" PROCESSORARCHITECTURE \
+    "' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
-int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpstrCmdLine, int nCmdShow)
-{
-    MiniBrowser::shared().initialize(hInstance);
+int WINAPI _tWinMain(HINSTANCE hInstance,
+                     HINSTANCE hPrevInstance,
+                     LPTSTR lpstrCmdLine,
+                     int nCmdShow) {
+  MiniBrowser::shared().initialize(hInstance);
 
-    // Create and show our initial window.
-    MiniBrowser::shared().createNewWindow();
+  // Create and show our initial window.
+  MiniBrowser::shared().createNewWindow();
 
-    MSG message;
-    while (BOOL result = ::GetMessage(&message, 0, 0, 0)) {
-        if (result == -1)
-            break;
-        ::TranslateMessage(&message);
+  MSG message;
+  while (BOOL result = ::GetMessage(&message, 0, 0, 0)) {
+    if (result == -1)
+      break;
+    ::TranslateMessage(&message);
 
-        if (!MiniBrowser::shared().handleMessage(&message))
-            ::DispatchMessage(&message);
-    }
+    if (!MiniBrowser::shared().handleMessage(&message))
+      ::DispatchMessage(&message);
+  }
 
-    return 0;
+  return 0;
 }
