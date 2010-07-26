@@ -97,7 +97,6 @@ void HTMLVideoElement::parseMappedAttribute(Attribute* attr) {
   const QualifiedName& attrName = attr->name();
 
   if (attrName == posterAttr) {
-    m_posterURL = getNonEmptyURLAttribute(posterAttr);
     updatePosterImage();
     if (m_shouldDisplayPosterImage) {
 #if !ENABLE(PLUGIN_PROXY_FOR_VIDEO)
@@ -106,7 +105,7 @@ void HTMLVideoElement::parseMappedAttribute(Attribute* attr) {
       m_imageLoader->updateFromElementIgnoringPreviousError();
 #else
       if (player())
-        player()->setPoster(poster());
+        player()->setPoster(getNonEmptyURLAttribute(posterAttr));
 #endif
     }
   } else if (attrName == widthAttr)
@@ -167,7 +166,8 @@ void HTMLVideoElement::updatePosterImage() {
   bool oldShouldShowPosterImage = m_shouldDisplayPosterImage;
 #endif
 
-  m_shouldDisplayPosterImage = !poster().isEmpty() && !hasAvailableVideoFrame();
+  m_shouldDisplayPosterImage =
+      !getAttribute(posterAttr).isEmpty() && !hasAvailableVideoFrame();
 
 #if !ENABLE(PLUGIN_PROXY_FOR_VIDEO)
   if (renderer() && oldShouldShowPosterImage != m_shouldDisplayPosterImage)

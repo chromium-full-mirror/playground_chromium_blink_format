@@ -44,8 +44,6 @@ class HTMLVideoElement : public HTMLMediaElement {
   unsigned videoWidth() const;
   unsigned videoHeight() const;
 
-  virtual const KURL poster() const { return m_posterURL; }
-
   // Fullscreen
   void webkitEnterFullscreen(bool isUserGesture, ExceptionCode&);
   void webkitExitFullscreen();
@@ -87,7 +85,6 @@ class HTMLVideoElement : public HTMLMediaElement {
   virtual void willMoveToNewOwnerDocument();
 
   OwnPtr<HTMLImageLoader> m_imageLoader;
-  KURL m_posterURL;
   bool m_shouldDisplayPosterImage;
 };
 

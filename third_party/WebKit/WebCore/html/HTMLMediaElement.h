@@ -68,7 +68,6 @@ class HTMLMediaElement : public HTMLElement,
 
   // Eventually overloaded in HTMLVideoElement
   virtual bool supportsFullscreen() const { return false; };
-  virtual const KURL poster() const { return KURL(); }
 
   virtual bool supportsSave() const;
 
@@ -88,7 +87,6 @@ class HTMLMediaElement : public HTMLElement,
   PassRefPtr<MediaError> error() const;
 
   // network state
-  KURL src() const;
   void setSrc(const String&);
   String currentSrc() const;
 
