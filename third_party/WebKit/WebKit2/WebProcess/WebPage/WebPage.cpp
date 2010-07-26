@@ -278,19 +278,27 @@ void WebPage::drawRect(GraphicsContext& graphicsContext, const IntRect& rect) {
 
 // Events
 
-void WebPage::mouseEvent(const PlatformMouseEvent& event) {
+void WebPage::mouseEvent(const WebMouseEvent& mouseEvent) {
+  WebProcess::shared().connection()->send(
+      WebPageProxyMessage::DidReceiveEvent, m_pageID,
+      CoreIPC::In(static_cast<uint32_t>(mouseEvent.type())));
+
   if (!m_mainFrame->coreFrame()->view())
     return;
 
-  switch (event.eventType()) {
+  PlatformMouseEvent platformMouseEvent = platform(mouseEvent);
+
+  switch (platformMouseEvent.eventType()) {
     case WebCore::MouseEventPressed:
-      m_mainFrame->coreFrame()->eventHandler()->handleMousePressEvent(event);
+      m_mainFrame->coreFrame()->eventHandler()->handleMousePressEvent(
+          platformMouseEvent);
       break;
     case WebCore::MouseEventReleased:
-      m_mainFrame->coreFrame()->eventHandler()->handleMouseReleaseEvent(event);
+      m_mainFrame->coreFrame()->eventHandler()->handleMouseReleaseEvent(
+          platformMouseEvent);
       break;
     case WebCore::MouseEventMoved:
-      m_mainFrame->coreFrame()->eventHandler()->mouseMoved(event);
+      m_mainFrame->coreFrame()->eventHandler()->mouseMoved(platformMouseEvent);
       break;
     default:
       ASSERT_NOT_REACHED();
@@ -298,19 +306,29 @@ void WebPage::mouseEvent(const PlatformMouseEvent& event) {
   }
 }
 
-void WebPage::wheelEvent(PlatformWheelEvent& event) {
+void WebPage::wheelEvent(const WebWheelEvent& wheelEvent) {
+  WebProcess::shared().connection()->send(
+      WebPageProxyMessage::DidReceiveEvent, m_pageID,
+      CoreIPC::In(static_cast<uint32_t>(wheelEvent.type())));
   if (!m_mainFrame->coreFrame()->view())
     return;
 
-  m_mainFrame->coreFrame()->eventHandler()->handleWheelEvent(event);
+  PlatformWheelEvent platformWheelEvent = platform(wheelEvent);
+  m_mainFrame->coreFrame()->eventHandler()->handleWheelEvent(
+      platformWheelEvent);
 }
 
-void WebPage::keyEvent(const PlatformKeyboardEvent& event) {
+void WebPage::keyEvent(const WebKeyboardEvent& keyboardEvent) {
+  WebProcess::shared().connection()->send(
+      WebPageProxyMessage::DidReceiveEvent, m_pageID,
+      CoreIPC::In(static_cast<uint32_t>(keyboardEvent.type())));
+
   if (!m_mainFrame->coreFrame()->view())
     return;
 
+  PlatformKeyboardEvent platformKeyboardEvent = platform(keyboardEvent);
   m_page->focusController()->focusedOrMainFrame()->eventHandler()->keyEvent(
-      event);
+      platformKeyboardEvent);
 }
 
 void WebPage::setActive(bool isActive) {
@@ -450,10 +468,7 @@ void WebPage::didReceiveMessage(CoreIPC::Connection* connection,
       WebMouseEvent event;
       if (!arguments.decode(event))
         return;
-      connection->send(WebPageProxyMessage::DidReceiveEvent, m_pageID,
-                       CoreIPC::In((uint32_t)event.type()));
-      PlatformMouseEvent platformEvent = platform(event);
-      mouseEvent(platformEvent);
+      mouseEvent(event);
       return;
     }
     case WebPageMessage::PreferencesDidChange: {
@@ -468,20 +483,16 @@ void WebPage::didReceiveMessage(CoreIPC::Connection* connection,
       WebWheelEvent event;
       if (!arguments.decode(event))
         return;
-      connection->send(WebPageProxyMessage::DidReceiveEvent, m_pageID,
-                       CoreIPC::In((uint32_t)event.type()));
-      PlatformWheelEvent platformEvent = platform(event);
-      wheelEvent(platformEvent);
+
+      wheelEvent(event);
       return;
     }
     case WebPageMessage::KeyEvent: {
       WebKeyboardEvent event;
       if (!arguments.decode(event))
         return;
-      connection->send(WebPageProxyMessage::DidReceiveEvent, m_pageID,
-                       CoreIPC::In((uint32_t)event.type()));
-      PlatformKeyboardEvent platformEvent = platform(event);
-      keyEvent(platformEvent);
+
+      keyEvent(event);
       return;
     }
     case WebPageMessage::LoadURL: {
