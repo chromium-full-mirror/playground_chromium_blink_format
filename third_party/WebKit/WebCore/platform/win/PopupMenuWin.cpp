@@ -200,7 +200,8 @@ void PopupMenu::show(const IntRect& r, FrameView* view, int index) {
         }
         break;
 
-      // Steal mouse messages.
+// Steal mouse messages.
+#if !OS(WINCE)
       case WM_NCMOUSEMOVE:
       case WM_NCLBUTTONDOWN:
       case WM_NCLBUTTONUP:
@@ -211,6 +212,7 @@ void PopupMenu::show(const IntRect& r, FrameView* view, int index) {
       case WM_NCMBUTTONDOWN:
       case WM_NCMBUTTONUP:
       case WM_NCMBUTTONDBLCLK:
+#endif
       case WM_MOUSEWHEEL:
         msg.hwnd = m_popup;
         break;
@@ -786,9 +788,10 @@ LRESULT PopupMenu::wndProc(HWND hWnd,
   LRESULT lResult = 0;
 
   switch (message) {
+#if !OS(WINCE)
     case WM_MOUSEACTIVATE:
       return MA_NOACTIVATE;
-
+#endif
     case WM_SIZE: {
       if (!scrollbar())
         break;
