@@ -65,6 +65,7 @@ class FrameView : public ScrollView {
   virtual HostWindow* hostWindow() const;
 
   virtual void invalidateRect(const IntRect&);
+  virtual void setFrameRect(const IntRect&);
 
   Frame* frame() const { return m_frame.get(); }
   void clearFrame();

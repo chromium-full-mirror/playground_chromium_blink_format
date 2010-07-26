@@ -191,8 +191,8 @@ class RenderLayerCompositor {
 
   // Update the geometry of the layers used for clipping and scrolling in
   // frames.
-  void updateContentLayerOffset(const IntPoint& contentsOffset);
-  void updateContentLayerScrollPosition(const IntPoint&);
+  void frameViewDidChangeSize(const IntPoint& contentsOffset = IntPoint());
+  void frameViewDidScroll(const IntPoint& = IntPoint());
 
  private:
   // Whether the given RL needs a compositing layer.
@@ -259,6 +259,8 @@ class RenderLayerCompositor {
   bool requiresCompositingForPlugin(RenderObject*) const;
   bool requiresCompositingForIFrame(RenderObject*) const;
   bool requiresCompositingWhenDescendantsAreCompositing(RenderObject*) const;
+
+  bool requiresScrollLayer(RootLayerAttachment) const;
 
  private:
   RenderView* m_renderView;

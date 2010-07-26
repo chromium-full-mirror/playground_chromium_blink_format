@@ -219,7 +219,7 @@ void RenderLayerBacking::updateAfterWidgetResize() {
     if (RenderLayerCompositor* innerCompositor =
             RenderLayerCompositor::iframeContentsCompositor(
                 toRenderIFrame(renderer())))
-      innerCompositor->updateContentLayerOffset(contentsBox().location());
+      innerCompositor->frameViewDidChangeSize(contentsBox().location());
   }
 }
 
