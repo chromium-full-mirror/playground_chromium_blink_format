@@ -205,6 +205,10 @@ class WebPageProxy : public RefCounted<WebPageProxy> {
   void showPage();
   void closePage();
   void runJavaScriptAlert(WebFrameProxy*, const WebCore::String&);
+  bool runJavaScriptConfirm(WebFrameProxy* frame, const WebCore::String&);
+  WebCore::String runJavaScriptPrompt(WebFrameProxy* frame,
+                                      const WebCore::String&,
+                                      const WebCore::String&);
 
   void didNavigateWithNavigationData(WebFrameProxy*,
                                      const WebNavigationDataStore&);
