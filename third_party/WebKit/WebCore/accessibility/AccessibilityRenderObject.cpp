@@ -182,7 +182,7 @@ AccessibilityObject* AccessibilityRenderObject::firstChild() const {
   if (!firstChild)
     return 0;
 
-  return m_renderer->document()->axObjectCache()->getOrCreate(firstChild);
+  return axObjectCache()->getOrCreate(firstChild);
 }
 
 AccessibilityObject* AccessibilityRenderObject::lastChild() const {
@@ -194,7 +194,7 @@ AccessibilityObject* AccessibilityRenderObject::lastChild() const {
   if (!lastChild)
     return 0;
 
-  return m_renderer->document()->axObjectCache()->getOrCreate(lastChild);
+  return axObjectCache()->getOrCreate(lastChild);
 }
 
 static inline RenderInline* startOfContinuations(RenderObject* r) {
@@ -305,7 +305,7 @@ AccessibilityObject* AccessibilityRenderObject::previousSibling() const {
   if (!previousSibling)
     return 0;
 
-  return m_renderer->document()->axObjectCache()->getOrCreate(previousSibling);
+  return axObjectCache()->getOrCreate(previousSibling);
 }
 
 static inline bool lastChildHasContinuation(RenderObject* renderer) {
@@ -366,7 +366,7 @@ AccessibilityObject* AccessibilityRenderObject::nextSibling() const {
   if (!nextSibling)
     return 0;
 
-  return m_renderer->document()->axObjectCache()->getOrCreate(nextSibling);
+  return axObjectCache()->getOrCreate(nextSibling);
 }
 
 AccessibilityObject* AccessibilityRenderObject::parentObjectIfExists() const {
@@ -392,7 +392,7 @@ AccessibilityObject* AccessibilityRenderObject::parentObjectIfExists() const {
   if (!parent)
     return 0;
 
-  return m_renderer->document()->axObjectCache()->get(parent);
+  return axObjectCache()->get(parent);
 }
 
 AccessibilityObject* AccessibilityRenderObject::parentObject() const {
@@ -419,7 +419,7 @@ AccessibilityObject* AccessibilityRenderObject::parentObject() const {
     return 0;
 
   if (ariaRoleAttribute() == MenuBarRole)
-    return m_renderer->document()->axObjectCache()->getOrCreate(parent);
+    return axObjectCache()->getOrCreate(parent);
 
   // menuButton and its corresponding menu are DOM siblings, but Accessibility
   // needs them to be parent/child
@@ -429,7 +429,7 @@ AccessibilityObject* AccessibilityRenderObject::parentObject() const {
       return parent;
   }
 
-  return m_renderer->document()->axObjectCache()->getOrCreate(parent);
+  return axObjectCache()->getOrCreate(parent);
 }
 
 bool AccessibilityRenderObject::isWebArea() const {
@@ -885,8 +885,7 @@ Element* AccessibilityRenderObject::menuElementForMenuButton() const {
 AccessibilityObject* AccessibilityRenderObject::menuForMenuButton() const {
   Element* menu = menuElementForMenuButton();
   if (menu && menu->renderer())
-    return m_renderer->document()->axObjectCache()->getOrCreate(
-        menu->renderer());
+    return axObjectCache()->getOrCreate(menu->renderer());
   return 0;
 }
 
@@ -904,8 +903,7 @@ AccessibilityObject* AccessibilityRenderObject::menuButtonForMenu() const {
     // ARIA just has generic menu items.  AppKit needs to know if this is a top
     // level items like MenuBarButton or MenuBarItem
     AccessibilityObject* menuItemAX =
-        m_renderer->document()->axObjectCache()->getOrCreate(
-            menuItem->renderer());
+        axObjectCache()->getOrCreate(menuItem->renderer());
     if (menuItemAX->isMenuButton())
       return menuItemAX;
   }
@@ -1478,8 +1476,7 @@ void AccessibilityRenderObject::addRadioButtonGroupMembers(
     for (unsigned i = 0; i < len; ++i) {
       Node* associateElement = formElements[i].get();
       if (AccessibilityObject* object =
-              m_renderer->document()->axObjectCache()->getOrCreate(
-                  associateElement->renderer()))
+              axObjectCache()->getOrCreate(associateElement->renderer()))
         linkedUIElements.append(object);
     }
   } else {
@@ -1492,8 +1489,7 @@ void AccessibilityRenderObject::addRadioButtonGroupMembers(
         if (associateElement->isRadioButton() &&
             associateElement->name() == input->name()) {
           if (AccessibilityObject* object =
-                  m_renderer->document()->axObjectCache()->getOrCreate(
-                      associateElement->renderer()))
+                  axObjectCache()->getOrCreate(associateElement->renderer()))
             linkedUIElements.append(object);
         }
       }
@@ -2285,6 +2281,7 @@ Widget* AccessibilityRenderObject::widget() const {
 }
 
 AXObjectCache* AccessibilityRenderObject::axObjectCache() const {
+  ASSERT(m_renderer);
   return m_renderer->document()->axObjectCache();
 }
 
@@ -3232,7 +3229,7 @@ bool AccessibilityRenderObject::canSetTextRangeAttributes() const {
 
 void AccessibilityRenderObject::contentChanged() {
   // If this element supports ARIA live regions, then notify the AT of changes.
-  AXObjectCache* cache = m_renderer->document()->axObjectCache();
+  AXObjectCache* cache = axObjectCache();
   for (RenderObject* renderParent = m_renderer; renderParent;
        renderParent = renderParent->parent()) {
     AccessibilityObject* parent = cache->get(renderParent);
@@ -3366,8 +3363,7 @@ void AccessibilityRenderObject::addChildren() {
         if (current->hasTagName(areaTag) && current->isLink()) {
           AccessibilityImageMapLink* areaObject =
               static_cast<AccessibilityImageMapLink*>(
-                  m_renderer->document()->axObjectCache()->getOrCreate(
-                      ImageMapLinkRole));
+                  axObjectCache()->getOrCreate(ImageMapLinkRole));
           areaObject->setHTMLAreaElement(
               static_cast<HTMLAreaElement*>(current));
           areaObject->setHTMLMapElement(map);
