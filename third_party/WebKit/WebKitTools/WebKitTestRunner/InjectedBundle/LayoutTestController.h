@@ -28,6 +28,7 @@
 
 #include "JSWrappable.h"
 #include <JavaScriptCore/JavaScriptCore.h>
+#include <JavaScriptCore/JSRetainPtr.h>
 #include <wtf/PassRefPtr.h>
 #include <wtf/RetainPtr.h>
 #include <string>
@@ -66,7 +67,9 @@ class LayoutTestController : public JSWrappable {
   void setAcceptsEditing(bool value) { m_shouldAllowEditing = value; }
 
   // Special DOM functions.
-  JSValueRef computedStyleIncludingVisitedInfo(JSValueRef);
+  JSValueRef computedStyleIncludingVisitedInfo(JSValueRef element);
+  JSRetainPtr<JSStringRef> counterValueForElementById(JSStringRef elementId);
+  JSRetainPtr<JSStringRef> markerTextForListItem(JSValueRef element);
 
   // Repaint testing.
   void testRepaint() { m_testRepaint = true; }

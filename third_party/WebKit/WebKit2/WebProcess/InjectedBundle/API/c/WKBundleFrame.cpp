@@ -34,6 +34,12 @@
 using namespace WebCore;
 using namespace WebKit;
 
+static WKStringRef copiedString(const WebCore::String& string) {
+  StringImpl* impl = string.impl() ? string.impl() : StringImpl::empty();
+  impl->ref();
+  return toRef(impl);
+}
+
 bool WKBundleFrameIsMainFrame(WKBundleFrameRef frameRef) {
   return toWK(frameRef)->isMainFrame();
 }
@@ -64,13 +70,21 @@ JSGlobalContextRef WKBundleFrameGetJavaScriptContext(
 }
 
 WKStringRef WKBundleFrameCopyName(WKBundleFrameRef frameRef) {
-  WebCore::String string = toWK(frameRef)->name();
-  string.impl()->ref();
-  return toRef(string.impl());
+  return copiedString(toWK(frameRef)->name());
 }
 
 JSValueRef WKBundleFrameGetComputedStyleIncludingVisitedInfo(
     WKBundleFrameRef frameRef,
     JSObjectRef element) {
   return toWK(frameRef)->computedStyleIncludingVisitedInfo(element);
+}
+
+WKStringRef WKBundleFrameCopyCounterValue(WKBundleFrameRef frameRef,
+                                          JSObjectRef element) {
+  return copiedString(toWK(frameRef)->counterValue(element));
+}
+
+WKStringRef WKBundleFrameCopyMarkerText(WKBundleFrameRef frameRef,
+                                        JSObjectRef element) {
+  return copiedString(toWK(frameRef)->markerText(element));
 }

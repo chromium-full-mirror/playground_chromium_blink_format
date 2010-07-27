@@ -37,6 +37,12 @@ class JSWrappable : public RefCounted<JSWrappable> {
   virtual JSClassRef wrapperClass() = 0;
 };
 
+inline JSValueRef JSValueMakeStringOrNull(JSContextRef context,
+                                          JSStringRef stringOrNull) {
+  return stringOrNull ? JSValueMakeString(context, stringOrNull)
+                      : JSValueMakeNull(context);
+}
+
 }  // namespace WTR
 
 #endif  // JSWrappable_h
