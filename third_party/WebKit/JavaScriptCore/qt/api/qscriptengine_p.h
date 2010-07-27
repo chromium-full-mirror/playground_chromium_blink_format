@@ -83,6 +83,14 @@ class QScriptEnginePrivate : public QSharedData {
   inline JSValueRef makeJSValue(bool number) const;
   inline JSValueRef makeJSValue(QScriptValue::SpecialValue value) const;
 
+  QScriptValuePrivate* newFunction(QScriptEngine::FunctionSignature fun,
+                                   QScriptValuePrivate* prototype,
+                                   int length);
+  QScriptValuePrivate* newFunction(QScriptEngine::FunctionWithArgSignature fun,
+                                   void* arg);
+  QScriptValuePrivate* newFunction(JSObjectRef funObject,
+                                   QScriptValuePrivate* prototype);
+
   QScriptValuePrivate* newObject() const;
   QScriptValuePrivate* newArray(uint length);
   QScriptValuePrivate* globalObject() const;
@@ -104,6 +112,9 @@ class QScriptEnginePrivate : public QSharedData {
   JSValueRef m_exception;
 
   QScriptOriginalGlobalObject m_originalGlobalObject;
+
+  JSClassRef m_nativeFunctionClass;
+  JSClassRef m_nativeFunctionWithArgClass;
 };
 
 /*!
