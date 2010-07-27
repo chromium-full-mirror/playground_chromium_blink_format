@@ -301,7 +301,7 @@ JSObject* PluginView::scriptObject(ExecState* exec,
     return 0;
 
   JSObject* jsObject = m_npRuntimeObjectMap.getOrCreateJSObject(
-      scriptableNPObject, exec, globalObject);
+      exec, globalObject, scriptableNPObject);
   releaseNPObject(scriptableNPObject);
 
   return jsObject;

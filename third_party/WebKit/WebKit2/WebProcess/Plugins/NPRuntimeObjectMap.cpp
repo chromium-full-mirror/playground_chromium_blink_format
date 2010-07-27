@@ -25,6 +25,7 @@
 
 #include "NPRuntimeObjectMap.h"
 
+#include "JSNPObject.h"
 #include "NPJSObject.h"
 #include "NPRuntimeUtilities.h"
 #include "PluginView.h"
@@ -57,11 +58,11 @@ void NPRuntimeObjectMap::npJSObjectDestroyed(NPJSObject* npJSObject) {
   m_objects.remove(npJSObject->jsObject());
 }
 
-JSObject* NPRuntimeObjectMap::getOrCreateJSObject(NPObject*,
-                                                  ExecState*,
-                                                  JSGlobalObject*) {
-  // FIXME: Implement.
-  return 0;
+JSObject* NPRuntimeObjectMap::getOrCreateJSObject(ExecState* exec,
+                                                  JSGlobalObject* globalObject,
+                                                  NPObject* npObject) {
+  // FIXME: Check if we already have a wrapper for this NPObject!
+  return new (exec) JSNPObject(exec, globalObject, this, npObject);
 }
 
 void NPRuntimeObjectMap::invalidate() {
