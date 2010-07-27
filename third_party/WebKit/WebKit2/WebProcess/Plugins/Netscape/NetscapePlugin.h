@@ -140,6 +140,7 @@ class NetscapePlugin : public Plugin {
   virtual bool handleMouseEnterEvent(const WebMouseEvent&);
   virtual bool handleMouseLeaveEvent(const WebMouseEvent&);
   virtual void setFocus(bool);
+  virtual NPObject* pluginScriptableNPObject();
 
   virtual PluginController* controller();
 

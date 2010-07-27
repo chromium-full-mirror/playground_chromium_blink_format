@@ -49,7 +49,7 @@ class PluginViewBase : public Widget {
   virtual PlatformLayer* platformLayer() const { return 0; }
 #endif
 
-  JSC::JSObject* scriptObject(JSC::ExecState*, JSC::JSGlobalObject*) {
+  virtual JSC::JSObject* scriptObject(JSC::ExecState*, JSC::JSGlobalObject*) {
     return 0;
   }
 

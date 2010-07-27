@@ -33,7 +33,7 @@
 #include "WebFrame.h"
 
 #include <WebCore/MediaCanStartListener.h>
-#include <WebCore/Widget.h>
+#include <WebCore/PluginViewBase.h>
 #include <wtf/Deque.h>
 
 // FIXME: Eventually this should move to WebCore.
@@ -45,7 +45,7 @@ class HTMLPlugInElement;
 
 namespace WebKit {
 
-class PluginView : public WebCore::Widget,
+class PluginView : public WebCore::PluginViewBase,
                    WebCore::MediaCanStartListener,
                    PluginController,
                    WebFrame::LoadListener {
@@ -86,6 +86,9 @@ class PluginView : public WebCore::Widget,
   void addStream(Stream*);
   void removeStream(Stream*);
   void cancelAllStreams();
+
+  // WebCore::PluginViewBase
+  virtual JSC::JSObject* scriptObject(JSC::ExecState*, JSC::JSGlobalObject*);
 
   // WebCore::Widget
   virtual void setFrameRect(const WebCore::IntRect&);
