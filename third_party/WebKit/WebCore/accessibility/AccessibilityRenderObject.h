@@ -297,6 +297,7 @@ class AccessibilityRenderObject : public AccessibilityObject {
   AccessibilityObject* accessibilityParentForImageMap(
       HTMLMapElement* map) const;
   bool renderObjectIsObservable(RenderObject*) const;
+  RenderObject* renderParentObject() const;
 
   void ariaSelectedRows(AccessibilityChildrenVector&);
 
