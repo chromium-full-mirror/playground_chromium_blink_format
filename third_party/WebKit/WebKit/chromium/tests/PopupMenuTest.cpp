@@ -67,6 +67,7 @@ class TestPopupMenuClient : public PopupMenuClient {
     return str;
   }
   virtual String itemLabel(unsigned) const { return String(); }
+  virtual String itemIcon(unsigned) const { return String(); }
   virtual String itemToolTip(unsigned listIndex) const {
     return itemText(listIndex);
   }
