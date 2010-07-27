@@ -28,6 +28,7 @@
 
 #include "RegexCompiler.h"
 #include "RegexPattern.h"
+#include <wtf/BumpPointerAllocator.h>
 
 #ifndef NDEBUG
 #include <stdio.h>
@@ -98,12 +99,17 @@ class Interpreter {
   };
 
   DisjunctionContext* allocDisjunctionContext(ByteDisjunction* disjunction) {
-    return new (malloc(sizeof(DisjunctionContext) +
-                       (disjunction->m_frameSize - 1) * sizeof(uintptr_t)))
-        DisjunctionContext();
+    size_t size = sizeof(DisjunctionContext) - sizeof(uintptr_t) +
+                  disjunction->m_frameSize * sizeof(uintptr_t);
+    allocatorPool = allocatorPool->ensureCapacity(size);
+    if (!allocatorPool)
+      CRASH();
+    return new (allocatorPool->alloc(size)) DisjunctionContext();
   }
 
-  void freeDisjunctionContext(DisjunctionContext* context) { free(context); }
+  void freeDisjunctionContext(DisjunctionContext* context) {
+    allocatorPool = allocatorPool->dealloc(context);
+  }
 
   struct ParenthesesDisjunctionContext {
     ParenthesesDisjunctionContext(int* output, ByteTerm& term) : next(0) {
@@ -142,18 +148,21 @@ class Interpreter {
       ByteDisjunction* disjunction,
       int* output,
       ByteTerm& term) {
-    return new (malloc(
-        sizeof(ParenthesesDisjunctionContext) +
-        (((term.atom.parenthesesDisjunction->m_numSubpatterns << 1) - 1) *
-         sizeof(int)) +
-        sizeof(DisjunctionContext) +
-        (disjunction->m_frameSize - 1) * sizeof(uintptr_t)))
+    size_t size = sizeof(ParenthesesDisjunctionContext) - sizeof(int) +
+                  (term.atom.parenthesesDisjunction->m_numSubpatterns << 1) *
+                      sizeof(int) +
+                  sizeof(DisjunctionContext) - sizeof(uintptr_t) +
+                  disjunction->m_frameSize * sizeof(uintptr_t);
+    allocatorPool = allocatorPool->ensureCapacity(size);
+    if (!allocatorPool)
+      CRASH();
+    return new (allocatorPool->alloc(size))
         ParenthesesDisjunctionContext(output, term);
   }
 
   void freeParenthesesDisjunctionContext(
       ParenthesesDisjunctionContext* context) {
-    free(context);
+    allocatorPool = allocatorPool->dealloc(context);
   }
 
   class InputStream {
@@ -1259,6 +1268,10 @@ class Interpreter {
   }
 
   int interpret() {
+    allocatorPool = pattern->m_allocator->startAllocator();
+    if (!allocatorPool)
+      CRASH();
+
     for (unsigned i = 0; i < ((pattern->m_body->m_numSubpatterns + 1) << 1);
          ++i)
       output[i] = -1;
@@ -1273,6 +1286,8 @@ class Interpreter {
 
     freeDisjunctionContext(context);
 
+    pattern->m_allocator->stopAllocator();
+
     return output[0];
   }
 
@@ -1281,12 +1296,16 @@ class Interpreter {
               const UChar* inputChar,
               unsigned start,
               unsigned length)
-      : pattern(pattern), output(output), input(inputChar, start, length) {}
+      : pattern(pattern),
+        output(output),
+        input(inputChar, start, length),
+        allocatorPool(0) {}
 
  private:
   BytecodePattern* pattern;
   int* output;
   InputStream input;
+  BumpPointerPool* allocatorPool;
 };
 
 class ByteCompiler {
@@ -1305,13 +1324,14 @@ class ByteCompiler {
     m_currentAlternativeIndex = 0;
   }
 
-  PassOwnPtr<BytecodePattern> compile() {
+  PassOwnPtr<BytecodePattern> compile(BumpPointerAllocator* allocator) {
     regexBegin(m_pattern.m_numSubpatterns, m_pattern.m_body->m_callFrameSize);
     emitDisjunction(m_pattern.m_body);
     regexEnd();
 
     return adoptPtr(new BytecodePattern(m_bodyDisjunction.release(),
-                                        m_allParenthesesInfo, m_pattern));
+                                        m_allParenthesesInfo, m_pattern,
+                                        allocator));
   }
 
   void checkInput(unsigned count) {
@@ -1743,6 +1763,7 @@ class ByteCompiler {
 PassOwnPtr<BytecodePattern> byteCompileRegex(const UString& patternString,
                                              unsigned& numSubpatterns,
                                              const char*& error,
+                                             BumpPointerAllocator* allocator,
                                              bool ignoreCase,
                                              bool multiline) {
   RegexPattern pattern(ignoreCase, multiline);
@@ -1752,7 +1773,7 @@ PassOwnPtr<BytecodePattern> byteCompileRegex(const UString& patternString,
 
   numSubpatterns = pattern.m_numSubpatterns;
 
-  return ByteCompiler(pattern).compile();
+  return ByteCompiler(pattern).compile(allocator);
 }
 
 int interpretRegex(BytecodePattern* regex,

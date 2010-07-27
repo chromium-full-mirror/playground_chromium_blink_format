@@ -87,10 +87,9 @@ void RegExp::compile(JSGlobalData* globalData) {
                         m_numSubpatterns, m_constructionError, ignoreCase(),
                         multiline());
 #else
-  UNUSED_PARAM(globalData);
-  m_regExpBytecode.set(Yarr::byteCompileRegex(m_pattern, m_numSubpatterns,
-                                              m_constructionError, ignoreCase(),
-                                              multiline()));
+  m_regExpBytecode = Yarr::byteCompileRegex(
+      m_pattern, m_numSubpatterns, m_constructionError,
+      &globalData->m_regexAllocator, ignoreCase(), multiline());
 #endif
 }
 

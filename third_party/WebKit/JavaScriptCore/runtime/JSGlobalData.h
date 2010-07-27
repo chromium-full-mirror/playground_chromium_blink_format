@@ -41,6 +41,7 @@
 #include "Terminator.h"
 #include "TimeoutChecker.h"
 #include "WeakRandom.h"
+#include <wtf/BumpPointerAllocator.h>
 #include <wtf/Forward.h>
 #include <wtf/HashMap.h>
 #include <wtf/RefCounted.h>
@@ -215,6 +216,8 @@ class JSGlobalData : public RefCounted<JSGlobalData> {
   int maxReentryDepth;
 
   RegExpCache* m_regExpCache;
+
+  BumpPointerAllocator m_regexAllocator;
 
 #ifndef NDEBUG
   ThreadIdentifier exclusiveThread;
