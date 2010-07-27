@@ -31,8 +31,8 @@
 
 namespace WebCore {
 
-PassRefPtr<Clipboard> Editor::newGeneralClipboard(
-    ClipboardAccessPolicy policy) {
+PassRefPtr<Clipboard> Editor::newGeneralClipboard(ClipboardAccessPolicy policy,
+                                                  Frame*) {
   return new ClipboardAndroid(policy, false);
 }
 

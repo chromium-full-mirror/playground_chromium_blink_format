@@ -42,6 +42,7 @@ class DeleteButtonController;
 class EditCommand;
 class EditorClient;
 class EditorInternalCommand;
+class Frame;
 class HTMLElement;
 class HitTestResult;
 class KillRing;
@@ -359,7 +360,7 @@ class Editor {
 
   bool canDeleteRange(Range*) const;
   bool canSmartReplaceWithPasteboard(Pasteboard*);
-  PassRefPtr<Clipboard> newGeneralClipboard(ClipboardAccessPolicy);
+  PassRefPtr<Clipboard> newGeneralClipboard(ClipboardAccessPolicy, Frame*);
   void pasteAsPlainTextWithPasteboard(Pasteboard*);
   void pasteWithPasteboard(Pasteboard*, bool allowPlainText);
   void replaceSelectionWithFragment(PassRefPtr<DocumentFragment>,

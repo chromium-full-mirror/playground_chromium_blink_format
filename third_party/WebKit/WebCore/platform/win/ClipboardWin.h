@@ -35,6 +35,7 @@ struct IDataObject;
 namespace WebCore {
 
 class CachedImage;
+class Frame;
 class IntPoint;
 class WCDataObject;
 
@@ -43,13 +44,15 @@ class ClipboardWin : public Clipboard, public CachedResourceClient {
  public:
   static PassRefPtr<ClipboardWin> create(bool isForDragging,
                                          IDataObject* dataObject,
-                                         ClipboardAccessPolicy policy) {
-    return adoptRef(new ClipboardWin(isForDragging, dataObject, policy));
+                                         ClipboardAccessPolicy policy,
+                                         Frame* frame) {
+    return adoptRef(new ClipboardWin(isForDragging, dataObject, policy, frame));
   }
   static PassRefPtr<ClipboardWin> create(bool isForDragging,
                                          WCDataObject* dataObject,
-                                         ClipboardAccessPolicy policy) {
-    return adoptRef(new ClipboardWin(isForDragging, dataObject, policy));
+                                         ClipboardAccessPolicy policy,
+                                         Frame* frame) {
+    return adoptRef(new ClipboardWin(isForDragging, dataObject, policy, frame));
   }
   ~ClipboardWin();
 
@@ -81,8 +84,11 @@ class ClipboardWin : public Clipboard, public CachedResourceClient {
   void setExternalDataObject(IDataObject* dataObject);
 
  private:
-  ClipboardWin(bool isForDragging, IDataObject*, ClipboardAccessPolicy);
-  ClipboardWin(bool isForDragging, WCDataObject*, ClipboardAccessPolicy);
+  ClipboardWin(bool isForDragging, IDataObject*, ClipboardAccessPolicy, Frame*);
+  ClipboardWin(bool isForDragging,
+               WCDataObject*,
+               ClipboardAccessPolicy,
+               Frame*);
 
   void resetFromClipboard();
   void setDragImage(CachedImage*, Node*, const IntPoint&);

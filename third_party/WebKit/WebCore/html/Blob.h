@@ -39,19 +39,23 @@
 
 namespace WebCore {
 
+class ScriptExecutionContext;
+
 class Blob : public RefCounted<Blob> {
  public:
-  static PassRefPtr<Blob> create(const String& type,
+  static PassRefPtr<Blob> create(ScriptExecutionContext* scriptExecutionContext,
+                                 const String& type,
                                  const BlobItemList& items) {
-    return adoptRef(new Blob(type, items));
+    return adoptRef(new Blob(scriptExecutionContext, type, items));
   }
 
   // FIXME: Deprecated method.  This is called only from
   // bindings/v8/SerializedScriptValue.cpp and the usage in it will become
   // invalid once
   // BlobBuilder is introduced.
-  static PassRefPtr<Blob> create(const String& path) {
-    return adoptRef(new Blob(path));
+  static PassRefPtr<Blob> create(ScriptExecutionContext* scriptExecutionContext,
+                                 const String& path) {
+    return adoptRef(new Blob(scriptExecutionContext, path));
   }
 
   virtual ~Blob() {}
@@ -66,18 +70,19 @@ class Blob : public RefCounted<Blob> {
   const BlobItemList& items() const { return m_items; }
 
 #if ENABLE(BLOB_SLICE)
-  PassRefPtr<Blob> slice(long long start,
+  PassRefPtr<Blob> slice(ScriptExecutionContext*,
+                         long long start,
                          long long length,
                          const String& contentType = String()) const;
 #endif
 
  protected:
-  Blob(const String& type, const BlobItemList&);
-  Blob(const PassRefPtr<BlobItem>&);
+  Blob(ScriptExecutionContext*, const String& type, const BlobItemList&);
+  Blob(ScriptExecutionContext*, const PassRefPtr<BlobItem>&);
 
   // FIXME: Deprecated constructor.  See also the comment for
   // Blob::create(path).
-  Blob(const String& path);
+  Blob(ScriptExecutionContext*, const String& path);
 
   BlobItemList m_items;
   String m_type;

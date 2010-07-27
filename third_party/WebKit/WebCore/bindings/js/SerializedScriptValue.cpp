@@ -687,19 +687,30 @@ struct DeserializingTreeWalker : public BaseWalker {
       case SerializedScriptValueData::DateType:
         return new (m_exec) DateInstance(
             m_exec, m_globalObject->dateStructure(), value.asDouble());
-      case SerializedScriptValueData::FileType:
+      case SerializedScriptValueData::FileType: {
         if (!m_isDOMGlobalObject)
           return jsNull();
+        ScriptExecutionContext* scriptExecutionContext =
+            static_cast<JSDOMGlobalObject*>(m_exec->lexicalGlobalObject())
+                ->scriptExecutionContext();
+        ASSERT(scriptExecutionContext);
         return toJS(m_exec, static_cast<JSDOMGlobalObject*>(m_globalObject),
-                    File::create(value.asString().crossThreadString()));
+                    File::create(scriptExecutionContext,
+                                 value.asString().crossThreadString()));
+      }
       case SerializedScriptValueData::FileListType: {
         if (!m_isDOMGlobalObject)
           return jsNull();
         RefPtr<FileList> result = FileList::create();
         SerializedFileList* serializedFileList = value.asFileList();
         unsigned length = serializedFileList->length();
+        ScriptExecutionContext* scriptExecutionContext =
+            static_cast<JSDOMGlobalObject*>(m_exec->lexicalGlobalObject())
+                ->scriptExecutionContext();
+        ASSERT(scriptExecutionContext);
         for (unsigned i = 0; i < length; i++)
-          result->append(File::create(serializedFileList->item(i)));
+          result->append(File::create(scriptExecutionContext,
+                                      serializedFileList->item(i)));
         return toJS(m_exec, static_cast<JSDOMGlobalObject*>(m_globalObject),
                     result.get());
       }

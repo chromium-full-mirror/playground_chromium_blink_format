@@ -426,19 +426,29 @@ exit:
   return hr;
 }
 
+PassRefPtr<Clipboard> Clipboard::create(ClipboardAccessPolicy policy,
+                                        DragData* dragData,
+                                        Frame* frame) {
+  return ClipboardWin::create(true, dragData->platformData(), policy, frame);
+}
+
 ClipboardWin::ClipboardWin(bool isForDragging,
                            IDataObject* dataObject,
-                           ClipboardAccessPolicy policy)
+                           ClipboardAccessPolicy policy,
+                           Frame* frame)
     : Clipboard(policy, isForDragging),
       m_dataObject(dataObject),
-      m_writableDataObject(0) {}
+      m_writableDataObject(0),
+      m_frame(frame) {}
 
 ClipboardWin::ClipboardWin(bool isForDragging,
                            WCDataObject* dataObject,
-                           ClipboardAccessPolicy policy)
+                           ClipboardAccessPolicy policy,
+                           Frame* frame)
     : Clipboard(policy, isForDragging),
       m_dataObject(dataObject),
-      m_writableDataObject(dataObject) {}
+      m_writableDataObject(dataObject),
+      m_frame(frame) {}
 
 ClipboardWin::~ClipboardWin() {}
 
@@ -625,12 +635,15 @@ PassRefPtr<FileList> ClipboardWin::files() const {
   if (!hdrop)
     return files.release();
 
+  ScriptExecutionContext* scriptExecutionContext =
+      m_frame->document()->scriptExecutionContext();
   WCHAR filename[MAX_PATH];
   UINT fileCount = DragQueryFileW(hdrop, 0xFFFFFFFF, 0, 0);
   for (UINT i = 0; i < fileCount; i++) {
     if (!DragQueryFileW(hdrop, i, filename, ARRAYSIZE(filename)))
       continue;
-    files->append(File::create(reinterpret_cast<UChar*>(filename)));
+    files->append(File::create(scriptExecutionContext,
+                               reinterpret_cast<UChar*>(filename)));
   }
 
   GlobalUnlock(medium.hGlobal);

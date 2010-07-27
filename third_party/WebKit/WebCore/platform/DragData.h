@@ -26,7 +26,6 @@
 #ifndef DragData_h
 #define DragData_h
 
-#include "ClipboardAccessPolicy.h"
 #include "Color.h"
 #include "DragActions.h"
 #include "IntPoint.h"
@@ -67,7 +66,6 @@ typedef void* DragDataRef;
 
 namespace WebCore {
 
-class Clipboard;
 class Document;
 class DocumentFragment;
 class KURL;
@@ -103,7 +101,6 @@ class DragData {
   DragOperation draggingSourceOperationMask() const {
     return m_draggingSourceOperationMask;
   }
-  PassRefPtr<Clipboard> createClipboard(ClipboardAccessPolicy) const;
   bool containsURL(
       FilenameConversionPolicy filenamePolicy = ConvertFilenames) const;
   bool containsPlainText() const;

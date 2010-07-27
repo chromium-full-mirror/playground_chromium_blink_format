@@ -31,6 +31,7 @@
 #include "CSSHelper.h"
 #include "CachedImage.h"
 #include "Document.h"
+#include "DragData.h"
 #include "Element.h"
 #include "FileList.h"
 #include "Frame.h"
@@ -64,6 +65,12 @@ static bool isTextMimeType(const String& type) {
 
 static bool isHtmlMimeType(const String& type) {
   return type == "text/html" || type.startsWith("text/html;");
+}
+
+PassRefPtr<Clipboard> Clipboard::create(ClipboardAccessPolicy policy,
+                                        DragData* dragData,
+                                        Frame*) {
+  return ClipboardQt::create(policy, dragData->platformData());
 }
 
 ClipboardQt::ClipboardQt(ClipboardAccessPolicy policy,

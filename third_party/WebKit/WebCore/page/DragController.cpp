@@ -171,7 +171,8 @@ void DragController::dragExited(DragData* dragData) {
          m_documentUnderMouse->securityOrigin()->isLocal())
             ? ClipboardReadable
             : ClipboardTypesReadable;
-    RefPtr<Clipboard> clipboard = dragData->createClipboard(policy);
+    RefPtr<Clipboard> clipboard =
+        Clipboard::create(policy, dragData, mainFrame);
     clipboard->setSourceOperation(dragData->draggingSourceOperationMask());
     mainFrame->eventHandler()->cancelDragAndDrop(createMouseEvent(dragData),
                                                  clipboard.get());
@@ -197,7 +198,7 @@ bool DragController::performDrag(DragData* dragData) {
     if (mainFrame->view()) {
       // Sending an event can result in the destruction of the view and part.
       RefPtr<Clipboard> clipboard =
-          dragData->createClipboard(ClipboardReadable);
+          Clipboard::create(ClipboardReadable, dragData, mainFrame.get());
       clipboard->setSourceOperation(dragData->draggingSourceOperationMask());
       mainFrame->eventHandler()->performDragAndDrop(createMouseEvent(dragData),
                                                     clipboard.get());
@@ -572,7 +573,8 @@ bool DragController::tryDHTMLDrag(DragData* dragData,
       m_documentUnderMouse->securityOrigin()->isLocal()
           ? ClipboardReadable
           : ClipboardTypesReadable;
-  RefPtr<Clipboard> clipboard = dragData->createClipboard(policy);
+  RefPtr<Clipboard> clipboard =
+      Clipboard::create(policy, dragData, mainFrame.get());
   DragOperation srcOpMask = dragData->draggingSourceOperationMask();
   clipboard->setSourceOperation(srcOpMask);
 

@@ -26,7 +26,6 @@
 #include "config.h"
 #include "DragData.h"
 
-#include "Clipboard.h"
 #include "Document.h"
 #include "DocumentFragment.h"
 
@@ -56,10 +55,6 @@ String DragData::asPlainText() const {
 
 Color DragData::asColor() const {
   return Color();
-}
-
-PassRefPtr<Clipboard> DragData::createClipboard(ClipboardAccessPolicy) const {
-  return 0;
 }
 
 bool DragData::containsCompatibleContent() const {
