@@ -43,7 +43,7 @@ void TestController::initializeInjectedBundlePath() {
       kCFURLWindowsPathStyle);
   CFMutableStringRef bundlePath =
       CFStringCreateMutableCopy(0, 0, exeContainerPath);
-#ifndef NDEBUG
+#ifdef DEBUG_ALL
   CFStringAppendCString(bundlePath, "\\InjectedBundle_debug.dll",
                         kCFStringEncodingWindowsLatin1);
 #else
