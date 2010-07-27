@@ -133,6 +133,7 @@ class RenderTextControlSingleLine : public RenderTextControl,
   virtual void selectionCleared() {}
   virtual String itemText(unsigned listIndex) const;
   virtual String itemLabel(unsigned listIndex) const;
+  virtual String itemIcon(unsigned listIndex) const;
   virtual String itemToolTip(unsigned) const { return String(); }
   virtual String itemAccessibilityText(unsigned) const { return String(); }
   virtual bool itemIsEnabled(unsigned listIndex) const;

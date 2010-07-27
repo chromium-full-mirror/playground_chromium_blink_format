@@ -244,6 +244,7 @@ class WebView : public WebWidget {
   virtual void applyAutoFillSuggestions(const WebNode&,
                                         const WebVector<WebString>& names,
                                         const WebVector<WebString>& labels,
+                                        const WebVector<int>& uniqueIDs,
                                         int separatorIndex) = 0;
 
   // Notifies the WebView that AutoFill suggestions are available for a node.
@@ -252,6 +253,7 @@ class WebView : public WebWidget {
   virtual void applyAutoFillSuggestions(const WebNode&,
                                         const WebVector<WebString>& names,
                                         const WebVector<WebString>& labels,
+                                        const WebVector<WebString>& icons,
                                         const WebVector<int>& uniqueIDs,
                                         int separatorIndex) = 0;
 

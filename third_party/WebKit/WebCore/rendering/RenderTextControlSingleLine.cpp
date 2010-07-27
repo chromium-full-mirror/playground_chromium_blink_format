@@ -970,6 +970,10 @@ String RenderTextControlSingleLine::itemLabel(unsigned) const {
   return String();
 }
 
+String RenderTextControlSingleLine::itemIcon(unsigned) const {
+  return String();
+}
+
 bool RenderTextControlSingleLine::itemIsEnabled(unsigned listIndex) const {
   if (!listIndex || itemIsSeparator(listIndex))
     return false;
