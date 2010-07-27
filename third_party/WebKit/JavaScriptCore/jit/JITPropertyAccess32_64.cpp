@@ -333,18 +333,16 @@ void JIT::emit_op_get_by_val(Instruction* currentInstruction) {
   addSlowCase(
       branchPtr(NotEqual, Address(regT0), ImmPtr(m_globalData->jsArrayVPtr)));
 
-  loadPtr(Address(regT0, OBJECT_OFFSETOF(JSArray, m_storage)), regT3);
+  loadPtr(Address(regT0, OBJECT_OFFSETOF(JSArray, m_vector)), regT3);
   addSlowCase(
       branch32(AboveOrEqual, regT2,
                Address(regT0, OBJECT_OFFSETOF(JSArray, m_vectorLength))));
 
   load32(BaseIndex(regT3, regT2, TimesEight,
-                   OBJECT_OFFSETOF(ArrayStorage, m_vector[0]) +
-                       OBJECT_OFFSETOF(JSValue, u.asBits.tag)),
+                   OBJECT_OFFSETOF(JSValue, u.asBits.tag)),
          regT1);  // tag
   load32(BaseIndex(regT3, regT2, TimesEight,
-                   OBJECT_OFFSETOF(ArrayStorage, m_vector[0]) +
-                       OBJECT_OFFSETOF(JSValue, u.asBits.payload)),
+                   OBJECT_OFFSETOF(JSValue, u.asBits.payload)),
          regT0);  // payload
   addSlowCase(branch32(Equal, regT1, Imm32(JSValue::EmptyValueTag)));
 
@@ -397,34 +395,34 @@ void JIT::emit_op_put_by_val(Instruction* currentInstruction) {
       branch32(AboveOrEqual, regT2,
                Address(regT0, OBJECT_OFFSETOF(JSArray, m_vectorLength))));
 
-  loadPtr(Address(regT0, OBJECT_OFFSETOF(JSArray, m_storage)), regT3);
+  loadPtr(Address(regT0, OBJECT_OFFSETOF(JSArray, m_vector)), regT3);
 
   Jump empty =
       branch32(Equal, BaseIndex(regT3, regT2, TimesEight,
-                                OBJECT_OFFSETOF(ArrayStorage, m_vector[0]) +
-                                    OBJECT_OFFSETOF(JSValue, u.asBits.tag)),
+                                OBJECT_OFFSETOF(JSValue, u.asBits.tag)),
                Imm32(JSValue::EmptyValueTag));
 
   Label storeResult(this);
   emitLoad(value, regT1, regT0);
-  store32(regT0, BaseIndex(regT3, regT2, TimesEight,
-                           OBJECT_OFFSETOF(ArrayStorage, m_vector[0]) +
-                               OBJECT_OFFSETOF(JSValue,
-                                               u.asBits.payload)));  // payload
+  store32(regT0,
+          BaseIndex(regT3, regT2, TimesEight,
+                    OBJECT_OFFSETOF(JSValue, u.asBits.payload)));  // payload
   store32(regT1, BaseIndex(regT3, regT2, TimesEight,
-                           OBJECT_OFFSETOF(ArrayStorage, m_vector[0]) +
-                               OBJECT_OFFSETOF(JSValue, u.asBits.tag)));  // tag
+                           OBJECT_OFFSETOF(JSValue, u.asBits.tag)));  // tag
   Jump end = jump();
 
   empty.link(this);
   add32(Imm32(1),
-        Address(regT3, OBJECT_OFFSETOF(ArrayStorage, m_numValuesInVector)));
+        Address(regT3, OBJECT_OFFSETOF(ArrayStorage, m_numValuesInVector) -
+                           OBJECT_OFFSETOF(ArrayStorage, m_vector)));
   branch32(Below, regT2,
-           Address(regT3, OBJECT_OFFSETOF(ArrayStorage, m_length)))
+           Address(regT3, OBJECT_OFFSETOF(ArrayStorage, m_length) -
+                              OBJECT_OFFSETOF(ArrayStorage, m_vector)))
       .linkTo(storeResult, this);
 
   add32(Imm32(1), regT2, regT0);
-  store32(regT0, Address(regT3, OBJECT_OFFSETOF(ArrayStorage, m_length)));
+  store32(regT0, Address(regT3, OBJECT_OFFSETOF(ArrayStorage, m_length) -
+                                    OBJECT_OFFSETOF(ArrayStorage, m_vector)));
   jump().linkTo(storeResult, this);
 
   end.link(this);
@@ -907,8 +905,10 @@ void JIT::privateCompilePatchGetArrayLength(ReturnAddressPtr returnAddress) {
       branchPtr(NotEqual, Address(regT0), ImmPtr(m_globalData->jsArrayVPtr));
 
   // Checks out okay! - get the length from the storage
-  loadPtr(Address(regT0, OBJECT_OFFSETOF(JSArray, m_storage)), regT2);
-  load32(Address(regT2, OBJECT_OFFSETOF(ArrayStorage, m_length)), regT2);
+  loadPtr(Address(regT0, OBJECT_OFFSETOF(JSArray, m_vector)), regT2);
+  load32(Address(regT2, OBJECT_OFFSETOF(ArrayStorage, m_length) -
+                            OBJECT_OFFSETOF(ArrayStorage, m_vector)),
+         regT2);
 
   Jump failureCases2 = branch32(Above, regT2, Imm32(INT_MAX));
   move(regT2, regT0);
