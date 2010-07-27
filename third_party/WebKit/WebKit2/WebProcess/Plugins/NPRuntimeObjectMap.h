@@ -29,15 +29,18 @@
 #include <wtf/HashMap.h>
 
 struct NPObject;
+typedef struct _NPVariant NPVariant;
 
 namespace JSC {
 class ExecState;
 class JSGlobalObject;
 class JSObject;
+class JSValue;
 }
 
 namespace WebKit {
 
+class JSNPObject;
 class NPJSObject;
 class PluginView;
 
@@ -57,6 +60,10 @@ class NPRuntimeObjectMap {
   JSC::JSObject* getOrCreateJSObject(JSC::ExecState*,
                                      JSC::JSGlobalObject*,
                                      NPObject*);
+
+  void jsNPObjectDestroyed(JSNPObject*);
+
+  JSC::JSValue convertNPVariantToValue(JSC::ExecState*, const NPVariant&);
 
   // Called when the plug-in is destroyed. Will invalidate all the NPObjects.
   void invalidate();
