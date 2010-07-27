@@ -34,8 +34,7 @@ using namespace WebCore;
 using namespace WebKit;
 
 WKStringRef WKBundleNodeCopyNodeName(WKBundleNodeRef node) {
-  RefPtr<StringImpl> name = toWK(node)->nodeName().impl();
-  return toRef(name.release().releaseRef());
+  return toCopiedRef(toWK(node)->nodeName());
 }
 
 WKBundleNodeRef WKBundleNodeGetParent(WKBundleNodeRef node) {

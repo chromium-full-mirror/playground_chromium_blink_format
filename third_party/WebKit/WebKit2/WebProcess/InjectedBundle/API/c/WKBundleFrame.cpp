@@ -34,18 +34,12 @@
 using namespace WebCore;
 using namespace WebKit;
 
-static WKStringRef copiedString(const WebCore::String& string) {
-  StringImpl* impl = string.impl() ? string.impl() : StringImpl::empty();
-  impl->ref();
-  return toRef(impl);
-}
-
 bool WKBundleFrameIsMainFrame(WKBundleFrameRef frameRef) {
   return toWK(frameRef)->isMainFrame();
 }
 
-WKURLRef WKBundleFrameGetURL(WKBundleFrameRef frameRef) {
-  return toURLRef(toWK(frameRef)->url().impl());
+WKURLRef WKBundleFrameCopyURL(WKBundleFrameRef frameRef) {
+  return toCopiedURLRef(toWK(frameRef)->url());
 }
 
 WKArrayRef WKBundleFrameCopyChildFrames(WKBundleFrameRef frameRef) {
@@ -70,7 +64,7 @@ JSGlobalContextRef WKBundleFrameGetJavaScriptContext(
 }
 
 WKStringRef WKBundleFrameCopyName(WKBundleFrameRef frameRef) {
-  return copiedString(toWK(frameRef)->name());
+  return toCopiedRef(toWK(frameRef)->name());
 }
 
 JSValueRef WKBundleFrameGetComputedStyleIncludingVisitedInfo(
@@ -81,10 +75,10 @@ JSValueRef WKBundleFrameGetComputedStyleIncludingVisitedInfo(
 
 WKStringRef WKBundleFrameCopyCounterValue(WKBundleFrameRef frameRef,
                                           JSObjectRef element) {
-  return copiedString(toWK(frameRef)->counterValue(element));
+  return toCopiedRef(toWK(frameRef)->counterValue(element));
 }
 
 WKStringRef WKBundleFrameCopyMarkerText(WKBundleFrameRef frameRef,
                                         JSObjectRef element) {
-  return copiedString(toWK(frameRef)->markerText(element));
+  return toCopiedRef(toWK(frameRef)->markerText(element));
 }
