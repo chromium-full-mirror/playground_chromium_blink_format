@@ -53,9 +53,9 @@ bool runtimeObjectCustomGetOwnPropertyDescriptor(JSC::ExecState*,
 bool runtimeObjectCustomPut(JSC::ExecState*,
                             const JSC::Identifier&,
                             JSC::JSValue,
-                            HTMLElement*,
+                            JSHTMLElement*,
                             JSC::PutPropertySlot&);
-JSC::CallType runtimeObjectGetCallData(HTMLElement*, JSC::CallData&);
+JSC::CallType runtimeObjectGetCallData(JSHTMLElement*, JSC::CallData&);
 
 }  // namespace WebCore
 

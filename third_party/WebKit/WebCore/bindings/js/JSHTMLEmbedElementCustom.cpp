@@ -52,11 +52,11 @@ bool JSHTMLEmbedElement::putDelegate(ExecState* exec,
                                      const Identifier& propertyName,
                                      JSValue value,
                                      PutPropertySlot& slot) {
-  return runtimeObjectCustomPut(exec, propertyName, value, impl(), slot);
+  return runtimeObjectCustomPut(exec, propertyName, value, this, slot);
 }
 
 CallType JSHTMLEmbedElement::getCallData(CallData& callData) {
-  return runtimeObjectGetCallData(impl(), callData);
+  return runtimeObjectGetCallData(this, callData);
 }
 
 }  // namespace WebCore

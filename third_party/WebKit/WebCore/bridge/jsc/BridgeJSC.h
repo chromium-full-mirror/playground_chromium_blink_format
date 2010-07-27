@@ -88,7 +88,7 @@ class Instance : public RefCounted<Instance> {
   void end();
 
   virtual Class* getClass() const = 0;
-  RuntimeObject* createRuntimeObject(ExecState*);
+  JSObject* createRuntimeObject(ExecState*);
   void willInvalidateRuntimeObject();
   void willDestroyRuntimeObject();
 
