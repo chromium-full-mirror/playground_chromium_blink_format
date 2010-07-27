@@ -31,10 +31,12 @@
 #ifndef QuotaTracker_h
 #define QuotaTracker_h
 
+#if ENABLE(DATABASE)
+
+#include "PlatformString.h"
 #include "SecurityOrigin.h"
 #include "StringHash.h"
 #include <wtf/HashMap.h>
-#include <wtf/text/CString.h>
 
 namespace WebCore {
 
@@ -62,5 +64,7 @@ class QuotaTracker {
   Mutex m_dataGuard;
 };
 }
+
+#endif  // ENABLE(DATABASE)
 
 #endif  // QuotaTracker_h

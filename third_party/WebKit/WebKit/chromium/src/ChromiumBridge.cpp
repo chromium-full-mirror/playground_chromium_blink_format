@@ -454,9 +454,8 @@ GeolocationServiceBridge* ChromiumBridge::createGeolocationServiceBridge(
   return createGeolocationServiceBridgeImpl(geolocationServiceChromium);
 }
 
-// HTML5 DB -------------------------------------------------------------------
+// Databases ------------------------------------------------------------------
 
-#if ENABLE(DATABASE)
 PlatformFileHandle ChromiumBridge::databaseOpenFile(const String& vfsFileName,
                                                     int desiredFlags) {
   return webKitClient()->databaseOpenFile(WebString(vfsFileName), desiredFlags);
@@ -474,7 +473,6 @@ long ChromiumBridge::databaseGetFileAttributes(const String& vfsFileName) {
 long long ChromiumBridge::databaseGetFileSize(const String& vfsFileName) {
   return webKitClient()->databaseGetFileSize(WebString(vfsFileName));
 }
-#endif
 
 // Indexed Database -----------------------------------------------------------
 

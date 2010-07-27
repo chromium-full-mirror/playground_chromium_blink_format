@@ -838,6 +838,7 @@ v8::Handle<v8::Value> V8DOMWindow::setIntervalCallback(
   return WindowSetTimeoutImpl(args, false);
 }
 
+#if ENABLE(DATABASE)
 v8::Handle<v8::Value> V8DOMWindow::openDatabaseCallback(
     const v8::Arguments& args) {
   INC_STATS("DOM.DOMWindow.openDatabase");
@@ -870,6 +871,7 @@ v8::Handle<v8::Value> V8DOMWindow::openDatabaseCallback(
   V8Proxy::setDOMException(ec);
   return result;
 }
+#endif  // ENABLE(DATABASE)
 
 bool V8DOMWindow::namedSecurityCheck(v8::Local<v8::Object> host,
                                      v8::Local<v8::Value> key,

@@ -31,6 +31,8 @@
 #ifndef DatabaseObserver_h
 #define DatabaseObserver_h
 
+#if ENABLE(DATABASE)
+
 namespace WebCore {
 
 class AbstractDatabase;
@@ -50,5 +52,7 @@ class DatabaseObserver {
   static void databaseClosed(AbstractDatabase*);
 };
 }
+
+#endif  // ENABLE(DATABASE)
 
 #endif  // DatabaseObserver_h
