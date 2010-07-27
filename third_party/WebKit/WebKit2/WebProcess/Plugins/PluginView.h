@@ -26,7 +26,7 @@
 #ifndef PluginView_h
 #define PluginView_h
 
-#include "NPJSObjectMap.h"
+#include "NPRuntimeObjectMap.h"
 #include "Plugin.h"
 #include "PluginController.h"
 #include "RunLoop.h"
@@ -135,8 +135,8 @@ class PluginView : public WebCore::Widget,
   // Streams that the plug-in has requested to load.
   HashMap<uint64_t, RefPtr<Stream>> m_streams;
 
-  // NPObjects wrapping JavaScript objects.
-  NPJSObjectMap m_npJSObjectMap;
+  // A map of all related NPObjects for this plug-in view.
+  NPRuntimeObjectMap m_npRuntimeObjectMap;
 };
 
 }  // namespace WebKit

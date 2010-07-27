@@ -23,7 +23,7 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "NPJSObjectMap.h"
+#include "NPRuntimeObjectMap.h"
 
 #include "NPRuntimeUtilities.h"
 #include "PluginView.h"
@@ -41,7 +41,7 @@ namespace WebKit {
 
 class NPJSObject : public NPObject, Noncopyable {
  public:
-  static NPJSObject* create(NPJSObjectMap* objectMap, JSObject* jsObject);
+  static NPJSObject* create(NPRuntimeObjectMap* objectMap, JSObject* jsObject);
 
  private:
   NPJSObject() : m_objectMap(0) {}
@@ -59,7 +59,7 @@ class NPJSObject : public NPObject, Noncopyable {
     return static_cast<NPJSObject*>(npObject);
   }
 
-  void initialize(NPJSObjectMap*, JSObject* jsObject);
+  void initialize(NPRuntimeObjectMap*, JSObject* jsObject);
 
   bool hasProperty(NPIdentifier);
   bool getProperty(NPIdentifier, NPVariant* result);
@@ -72,11 +72,12 @@ class NPJSObject : public NPObject, Noncopyable {
                              NPIdentifier name,
                              NPVariant* result);
 
-  NPJSObjectMap* m_objectMap;
+  NPRuntimeObjectMap* m_objectMap;
   ProtectedPtr<JSObject> m_jsObject;
 };
 
-NPJSObject* NPJSObject::create(NPJSObjectMap* objectMap, JSObject* jsObject) {
+NPJSObject* NPJSObject::create(NPRuntimeObjectMap* objectMap,
+                               JSObject* jsObject) {
   NPJSObject* npJSObject = toNPJSObject(createNPObject(0, npClass()));
   npJSObject->initialize(objectMap, jsObject);
 
@@ -87,7 +88,7 @@ bool NPJSObject::isNPJSObject(NPObject* npObject) {
   return npObject->_class == npClass();
 }
 
-void NPJSObject::initialize(NPJSObjectMap* objectMap, JSObject* jsObject) {
+void NPJSObject::initialize(NPRuntimeObjectMap* objectMap, JSObject* jsObject) {
   ASSERT(!m_objectMap);
   ASSERT(!m_jsObject);
 
@@ -170,10 +171,10 @@ bool NPJSObject::NP_GetProperty(NPObject* npObject,
   return toNPJSObject(npObject)->getProperty(propertyName, result);
 }
 
-NPJSObjectMap::NPJSObjectMap(PluginView* pluginView)
+NPRuntimeObjectMap::NPRuntimeObjectMap(PluginView* pluginView)
     : m_pluginView(pluginView) {}
 
-NPObject* NPJSObjectMap::getOrCreateObject(JSObject* jsObject) {
+NPObject* NPRuntimeObjectMap::getOrCreateNPObject(JSObject* jsObject) {
   // First, check if we already know about this object.
   if (NPJSObject* npJSObject = m_objects.get(jsObject)) {
     retainNPObject(npJSObject);
@@ -186,7 +187,7 @@ NPObject* NPJSObjectMap::getOrCreateObject(JSObject* jsObject) {
   return npJSObject;
 }
 
-void NPJSObjectMap::invalidate() {
+void NPRuntimeObjectMap::invalidate() {
   Vector<NPJSObject*> npJSObjects;
   copyValuesToVector(m_objects, npJSObjects);
 

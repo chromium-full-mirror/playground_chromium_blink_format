@@ -232,7 +232,7 @@ PluginView::PluginView(WebCore::HTMLPlugInElement* pluginElement,
       m_pendingURLRequestsTimer(RunLoop::main(),
                                 this,
                                 &PluginView::pendingURLRequestsTimerFired),
-      m_npJSObjectMap(this) {}
+      m_npRuntimeObjectMap(this) {}
 
 PluginView::~PluginView() {
   if (m_isWaitingUntilMediaCanStart)
@@ -248,8 +248,8 @@ PluginView::~PluginView() {
   if (m_plugin && m_isInitialized)
     m_plugin->destroy();
 
-  // Invalidate the NPObject map.
-  m_npJSObjectMap.invalidate();
+  // Invalidate the object map.
+  m_npRuntimeObjectMap.invalidate();
 
   // Cancel all streams.
   cancelAllStreams();
@@ -641,7 +641,7 @@ NPObject* PluginView::windowScriptNPObject() {
   // FIXME: Handle JavaScript being disabled.
   ASSERT(frame()->script()->canExecuteScripts(NotAboutToExecuteScript));
 
-  return m_npJSObjectMap.getOrCreateObject(
+  return m_npRuntimeObjectMap.getOrCreateNPObject(
       frame()->script()->windowShell(pluginWorld())->window());
 }
 
@@ -654,7 +654,7 @@ NPObject* PluginView::pluginElementNPObject() {
       frame()->script()->jsObjectForPluginElement(m_pluginElement);
   ASSERT(object);
 
-  return m_npJSObjectMap.getOrCreateObject(object);
+  return m_npRuntimeObjectMap.getOrCreateNPObject(object);
 }
 
 void PluginView::didFinishLoad(WebFrame* webFrame) {
