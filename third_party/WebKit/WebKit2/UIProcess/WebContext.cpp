@@ -133,6 +133,9 @@ WebPreferences* WebContext::preferences() const {
 }
 
 void WebContext::preferencesDidChange() {
+  if (!m_process)
+    return;
+
   for (HashSet<WebPageNamespace *>::iterator it = m_pageNamespaces.begin(),
                                              end = m_pageNamespaces.end();
        it != end; ++it) {
