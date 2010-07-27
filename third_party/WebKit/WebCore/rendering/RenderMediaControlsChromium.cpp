@@ -99,7 +99,7 @@ static bool paintMediaPlayButton(RenderObject* object,
     return paintMediaButton(paintInfo.context, rect, mediaPlayDisabled);
 
   return paintMediaButton(paintInfo.context, rect,
-                          mediaElement->paused() ? mediaPlay : mediaPause);
+                          mediaElement->canPlay() ? mediaPlay : mediaPause);
 }
 
 static Image* getMediaSliderThumb() {
