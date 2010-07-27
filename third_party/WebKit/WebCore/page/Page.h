@@ -71,6 +71,7 @@ class RenderTheme;
 class VisibleSelection;
 class SelectionController;
 class Settings;
+class SpeechInput;
 class SpeechInputClient;
 
 #if ENABLE(DOM_STORAGE)
@@ -189,7 +190,7 @@ class Page : public Noncopyable {
   void setSpeechInputClient(SpeechInputClient* client) {
     m_speechInputClient = client;
   }
-  SpeechInputClient* speechInputClient() const { return m_speechInputClient; }
+  SpeechInput* speechInput();
 #endif
   Settings* settings() const { return m_settings.get(); }
   ProgressTracker* progress() const { return m_progress.get(); }
@@ -336,6 +337,7 @@ class Page : public Noncopyable {
 #endif
 #if ENABLE(INPUT_SPEECH)
   SpeechInputClient* m_speechInputClient;
+  OwnPtr<SpeechInput> m_speechInput;
 #endif
   OwnPtr<Settings> m_settings;
   OwnPtr<ProgressTracker> m_progress;

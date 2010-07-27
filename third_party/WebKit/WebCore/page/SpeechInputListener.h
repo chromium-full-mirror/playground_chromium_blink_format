@@ -43,6 +43,15 @@ class SpeechInputListener {
   // Informs that audio recording has completed and recognition is underway.
   virtual void didCompleteRecording() = 0;
 
+  // Informs that speech recognition has completed. This gets invoked
+  // irrespective of whether
+  // recognition was succesful or not, whether setRecognitionResult() was
+  // invoked or not. The
+  // handler typically frees up any temporary resources allocated and waits for
+  // the next speech
+  // recognition request.
+  virtual void didCompleteRecognition() = 0;
+
   // Gives results from speech recognition, either partial or the final results.
   // This method can potentially get called multiple times if there are partial
   // results

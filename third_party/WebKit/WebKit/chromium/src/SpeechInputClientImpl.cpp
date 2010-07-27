@@ -35,7 +35,7 @@
 #include "WebSpeechInputController.h"
 #include "WebString.h"
 #include "WebViewClient.h"
-#include "page/SpeechInputClientListener.h"
+#include "page/SpeechInputListener.h"
 
 #if ENABLE(INPUT_SPEECH)
 
@@ -50,12 +50,7 @@ SpeechInputClientImpl::SpeechInputClientImpl(WebViewClient* web_view_client)
 SpeechInputClientImpl::~SpeechInputClientImpl() {}
 
 bool SpeechInputClientImpl::startRecognition(
-    WebCore::SpeechInputClientListener* listener) {
-  // Cancel any ongoing recognition first. No callbacks will be issued to that
-  // listener.
-  if (m_listener)
-    m_controller->cancelRecognition();
-
+    WebCore::SpeechInputListener* listener) {
   m_listener = listener;
   return m_controller->startRecognition();
 }
@@ -65,21 +60,25 @@ void SpeechInputClientImpl::stopRecording() {
   m_controller->stopRecording();
 }
 
+void SpeechInputClientImpl::cancelRecognition() {
+  ASSERT(m_listener);
+  m_controller->cancelRecognition();
+}
+
 void SpeechInputClientImpl::didCompleteRecording() {
   ASSERT(m_listener);
-  if (m_listener)
-    m_listener->didCompleteRecording();
+  m_listener->didCompleteRecording();
 }
 
 void SpeechInputClientImpl::didCompleteRecognition() {
   ASSERT(m_listener);
+  m_listener->didCompleteRecognition();
   m_listener = 0;
 }
 
 void SpeechInputClientImpl::setRecognitionResult(const WebString& result) {
   ASSERT(m_listener);
-  if (m_listener)
-    m_listener->setRecognitionResult(result);
+  m_listener->setRecognitionResult(result);
 }
 
 }  // namespace WebKit

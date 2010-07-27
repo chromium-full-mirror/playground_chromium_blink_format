@@ -39,22 +39,40 @@
 
 namespace WebCore {
 
-SpeechInput::SpeechInput(SpeechInputClient* client,
-                         SpeechInputListener* listener)
-    : m_client(client), m_listener(listener) {}
+SpeechInput::SpeechInput(SpeechInputClient* client)
+    : m_client(client), m_listener(0) {}
 
 void SpeechInput::didCompleteRecording() {
+  ASSERT(m_listener);
   m_listener->didCompleteRecording();
 }
 
+void SpeechInput::didCompleteRecognition() {
+  ASSERT(m_listener);
+  m_listener->didCompleteRecognition();
+  m_listener = 0;
+}
+
 void SpeechInput::setRecognitionResult(const String& result) {
+  ASSERT(m_listener);
   m_listener->setRecognitionResult(result);
 }
 
-bool SpeechInput::startRecognition() {
-  if (m_client)
-    return m_client->startRecognition(this);
-  return false;
+bool SpeechInput::startRecognition(SpeechInputListener* listener) {
+  // Cancel any ongoing recognition first.
+  if (m_listener) {
+    m_listener->didCompleteRecognition();
+    m_listener = 0;
+    m_client->cancelRecognition();
+  }
+
+  m_listener = listener;
+  return m_client->startRecognition(this);
+}
+
+void SpeechInput::stopRecording() {
+  ASSERT(m_listener);
+  m_client->stopRecording();
 }
 
 }  // namespace WebCore

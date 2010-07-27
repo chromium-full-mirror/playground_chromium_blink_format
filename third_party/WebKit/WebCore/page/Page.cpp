@@ -63,6 +63,7 @@
 #include "SelectionController.h"
 #include "Settings.h"
 #include "SharedBuffer.h"
+#include "SpeechInput.h"
 #include "SpeechInputClient.h"
 #include "StringHash.h"
 #include "TextResourceDecoder.h"
@@ -805,6 +806,15 @@ bool Page::javaScriptURLsAreAllowed() const {
 #if ENABLE(INSPECTOR)
 InspectorTimelineAgent* Page::inspectorTimelineAgent() const {
   return m_inspectorController->timelineAgent();
+}
+#endif
+
+#if ENABLE(INPUT_SPEECH)
+SpeechInput* Page::speechInput() {
+  ASSERT(m_speechInputClient);
+  if (!m_speechInput.get())
+    m_speechInput.set(new SpeechInput(m_speechInputClient));
+  return m_speechInput.get();
 }
 #endif
 
