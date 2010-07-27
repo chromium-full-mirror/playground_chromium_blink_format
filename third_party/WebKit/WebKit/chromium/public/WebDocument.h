@@ -36,6 +36,7 @@
 #if WEBKIT_IMPLEMENTATION
 namespace WebCore {
 class Document;
+class DocumentType;
 }
 namespace WTF {
 template <typename T>
@@ -44,6 +45,7 @@ class PassRefPtr;
 #endif
 
 namespace WebKit {
+class WebDocumentType;
 class WebElement;
 class WebFrame;
 class WebNodeCollection;
@@ -79,6 +81,7 @@ class WebDocument : public WebNode {
   WEBKIT_API WebURL completeURL(const WebString&) const;
   WEBKIT_API WebElement getElementById(const WebString&) const;
   WEBKIT_API WebNode focusedNode() const;
+  WEBKIT_API WebDocumentType doctype() const;
 
 #if WEBKIT_IMPLEMENTATION
   WebDocument(const WTF::PassRefPtr<WebCore::Document>&);
