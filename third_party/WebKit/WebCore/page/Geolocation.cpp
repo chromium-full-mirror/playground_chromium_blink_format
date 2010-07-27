@@ -408,6 +408,8 @@ void Geolocation::setIsAllowed(bool allowed) {
     if (isAllowed()) {
       // Permission request was made during the startUpdating process
       m_startRequestPermissionNotifier->startTimerIfNeeded();
+      // The notifier is always ref'ed by m_oneShots or m_watchers.
+      GeoNotifier* notifier = m_startRequestPermissionNotifier.get();
       m_startRequestPermissionNotifier = 0;
 #if ENABLE(CLIENT_BASED_GEOLOCATION)
       if (!m_frame)
@@ -415,7 +417,8 @@ void Geolocation::setIsAllowed(bool allowed) {
       Page* page = m_frame->page();
       if (!page)
         return;
-      page->geolocationController()->addObserver(this);
+      page->geolocationController()->addObserver(
+          this, notifier->m_options->enableHighAccuracy());
 #else
 // TODO: Handle startUpdate() for non-client based implementations using
 // pre-emptive policy
@@ -629,8 +632,8 @@ bool Geolocation::startUpdating(GeoNotifier* notifier) {
   if (!page)
     return false;
 
-  // FIXME: Pass options to client.
-  page->geolocationController()->addObserver(this);
+  page->geolocationController()->addObserver(
+      this, notifier->m_options->enableHighAccuracy());
   return true;
 #else
   return m_service->startUpdating(notifier->m_options.get());

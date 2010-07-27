@@ -40,6 +40,7 @@ class WebGeolocationControllerClient
   void geolocationDestroyed();
   void startUpdating();
   void stopUpdating();
+  void setEnableHighAccuracy(bool) {}
 
   WebCore::GeolocationPosition* lastPosition();
 
