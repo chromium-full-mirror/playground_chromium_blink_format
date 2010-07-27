@@ -37,6 +37,7 @@
 #include "FloatRect.h"
 #include "Frame.h"
 #include "FrameView.h"
+#include "InspectorBackendDispatcher.h"
 #include "InspectorController.h"
 #include "InspectorFrontend.h"
 #include "InspectorFrontendHost.h"
@@ -71,8 +72,6 @@ InspectorFrontendClientLocal::~InspectorFrontendClientLocal() {
 void InspectorFrontendClientLocal::windowObjectCleared() {
   // FIXME: don't keep reference to the script state
   m_frontendScriptState = scriptStateFromPage(debuggerWorld(), m_frontendPage);
-  ScriptGlobalObject::set(m_frontendScriptState, "InspectorBackend",
-                          m_inspectorController->inspectorBackend());
   m_frontendHost = InspectorFrontendHost::create(this, m_frontendPage);
   ScriptGlobalObject::set(m_frontendScriptState, "InspectorFrontendHost",
                           m_frontendHost.get());
@@ -177,6 +176,10 @@ unsigned InspectorFrontendClientLocal::constrainedAttachedWindowHeight(
       max(minimumAttachedHeight,
           min<float>(preferredHeight,
                      totalWindowHeight * maximumAttachedHeightRatio)));
+}
+
+void InspectorFrontendClientLocal::sendMessageToBackend(const String& message) {
+  m_inspectorController->inspectorBackendDispatcher()->dispatch(message);
 }
 
 }  // namespace WebCore

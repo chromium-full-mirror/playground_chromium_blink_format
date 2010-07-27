@@ -70,6 +70,8 @@ class InspectorFrontendClientImpl : public WebCore::InspectorFrontendClient,
 
   virtual void inspectedURLChanged(const WebCore::String&);
 
+  virtual void sendMessageToBackend(const WebCore::String&);
+
  private:
   WebCore::Page* m_frontendPage;
   WebDevToolsFrontendClient* m_client;
