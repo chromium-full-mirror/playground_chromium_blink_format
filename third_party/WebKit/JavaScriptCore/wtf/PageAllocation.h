@@ -73,6 +73,9 @@ class PageAllocation {
         m_chunk(parent.chunk)
 #endif
   {
+#if defined(NDEBUG) && !OS(SYMBIAN)
+    UNUSED_PARAM(parent);
+#endif
     ASSERT(base >= parent.m_base);
     ASSERT(size <= parent.m_size);
     ASSERT(static_cast<char*>(base) + size <=
