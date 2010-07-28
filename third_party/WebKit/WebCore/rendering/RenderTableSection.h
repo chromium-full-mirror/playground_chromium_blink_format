@@ -56,12 +56,8 @@ class RenderTableSection : public RenderBox {
   struct CellStruct {
     Vector<RenderTableCell*, 1> cells;
     bool inColSpan;  // true for columns after the first in a colspan
-    bool empty;
 
-    CellStruct() : inColSpan(false), empty(false) {}
-
-    CellStruct(const CellStruct& other)
-        : cells(other.cells), inColSpan(other.inColSpan), empty(other.empty) {}
+    CellStruct() : inColSpan(false) {}
 
     RenderTableCell* primaryCell() {
       return hasCells() ? cells[cells.size() - 1] : 0;
