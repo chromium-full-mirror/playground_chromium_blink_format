@@ -536,13 +536,16 @@ static void NPN_ReleaseObject(NPObject* npObject) {
   releaseNPObject(npObject);
 }
 
-static bool NPN_Invoke(NPP npp,
-                       NPObject* npobj,
+static bool NPN_Invoke(NPP,
+                       NPObject* npObject,
                        NPIdentifier methodName,
-                       const NPVariant* args,
-                       uint32_t argCount,
+                       const NPVariant* arguments,
+                       uint32_t argumentCount,
                        NPVariant* result) {
-  notImplemented();
+  if (npObject->_class->invoke)
+    return npObject->_class->invoke(npObject, methodName, arguments,
+                                    argumentCount, result);
+
   return false;
 }
 
