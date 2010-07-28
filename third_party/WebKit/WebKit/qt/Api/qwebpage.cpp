@@ -1445,7 +1445,11 @@ bool QWebPagePrivate::touchEvent(QTouchEvent* event) {
   if (!frame->view())
     return false;
 
+  // Always accept the QTouchEvent so that we'll receive also TouchUpdate and
+  // TouchEnd events
   event->setAccepted(true);
+
+  // Return whether the default action was cancelled in the JS event handler
   return frame->eventHandler()->handleTouchEvent(PlatformTouchEvent(event));
 }
 #endif
@@ -2988,6 +2992,7 @@ bool QWebPage::event(QEvent* ev) {
     case QEvent::TouchBegin:
     case QEvent::TouchUpdate:
     case QEvent::TouchEnd:
+      // Return whether the default action was cancelled in the JS event handler
       return d->touchEvent(static_cast<QTouchEvent*>(ev));
 #endif
 #ifndef QT_NO_PROPERTIES
