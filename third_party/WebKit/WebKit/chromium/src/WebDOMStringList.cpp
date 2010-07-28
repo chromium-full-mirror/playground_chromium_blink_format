@@ -38,6 +38,10 @@ using namespace WebCore;
 
 namespace WebKit {
 
+WebDOMStringList::WebDOMStringList() {
+  m_private = WebCore::DOMStringList::create();
+}
+
 void WebDOMStringList::reset() {
   m_private.reset();
 }
