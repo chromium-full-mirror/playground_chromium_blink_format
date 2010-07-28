@@ -62,6 +62,13 @@ class JSNPObject : public JSC::JSObjectWithGlobalObject {
   virtual bool getOwnPropertySlot(JSC::ExecState*,
                                   const JSC::Identifier& propertyName,
                                   JSC::PropertySlot&);
+  virtual bool getOwnPropertyDescriptor(JSC::ExecState*,
+                                        const JSC::Identifier& propertyName,
+                                        JSC::PropertyDescriptor&);
+  virtual void put(JSC::ExecState*,
+                   const JSC::Identifier& propertyName,
+                   JSC::JSValue,
+                   JSC::PutPropertySlot&);
 
   static JSC::JSValue propertyGetter(JSC::ExecState*,
                                      JSC::JSValue,
