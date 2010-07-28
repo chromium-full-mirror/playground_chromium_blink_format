@@ -93,6 +93,7 @@ class HTMLElementStack : public Noncopyable {
   void popUntil(Element*);
   void popUntilPopped(const AtomicString& tagName);
   void popUntilPopped(Element*);
+  void popUntilNumberedHeaderElementPopped();
   void popUntilTableScopeMarker();  // "clear the stack back to a table context"
                                     // in the spec.
   void popUntilTableBodyScopeMarker();  // "clear the stack back to a table body
@@ -120,6 +121,7 @@ class HTMLElementStack : public Noncopyable {
   bool inButtonScope(const QualifiedName&) const;
 
   bool hasOnlyHTMLElementsInScope() const;
+  bool hasNumberedHeaderElementInScope() const;
 
   Element* htmlElement() const;
   Element* headElement() const;
