@@ -70,6 +70,7 @@ class RuntimeEnabledFeatures {
     isIndexedDBEnabled = isEnabled;
   }
   static bool indexedDBEnabled() { return isIndexedDBEnabled; }
+  static bool iDBKeyRangeEnabled() { return indexedDBEnabled(); }
 
 #if ENABLE(VIDEO)
   static bool audioEnabled();
