@@ -33,8 +33,7 @@ class SVGLength;
 class SVGForeignObjectElement : public SVGStyledTransformableElement,
                                 public SVGTests,
                                 public SVGLangSpace,
-                                public SVGExternalResourcesRequired,
-                                public SVGURIReference {
+                                public SVGExternalResourcesRequired {
  public:
   SVGForeignObjectElement(const QualifiedName&, Document*);
   virtual ~SVGForeignObjectElement();
