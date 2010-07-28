@@ -107,8 +107,6 @@ JSValue JSNPObject::propertyGetter(ExecState* exec,
     return jsUndefined();
 
   return thisObj->m_objectMap->convertNPVariantToValue(exec, property);
-  // FIXME: Implement.
-  return jsUndefined();
 }
 
 JSObject* JSNPObject::throwInvalidAccessError(ExecState* exec) {
