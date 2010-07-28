@@ -38,11 +38,10 @@ class RenderSVGHiddenContainer : public RenderSVGContainer {
  public:
   RenderSVGHiddenContainer(SVGStyledElement*);
 
- private:
-  virtual bool isSVGHiddenContainer() const { return true; }
-
   virtual const char* renderName() const { return "RenderSVGHiddenContainer"; }
 
+ private:
+  virtual bool isSVGHiddenContainer() const { return true; }
   virtual bool requiresLayer() const { return false; }
 
   virtual void layout();
