@@ -26,11 +26,11 @@
 #ifndef WebView_h
 #define WebView_h
 
+#include "APIObject.h"
 #include "PageClient.h"
 #include "WebPageProxy.h"
 #include <WebCore/WindowMessageListener.h>
 #include <wtf/PassRefPtr.h>
-#include <wtf/RefCounted.h>
 #include <wtf/RefPtr.h>
 
 namespace WebCore {
@@ -42,7 +42,7 @@ namespace WebKit {
 class DrawingAreaProxy;
 class WebPageNamespace;
 
-class WebView : public RefCounted<WebView>,
+class WebView : public APIObject,
                 public PageClient,
                 WebCore::WindowMessageListener {
  public:

@@ -94,14 +94,14 @@ String WebUIClient::runJavaScriptPrompt(WebPageProxy* page,
   if (!m_pageUIClient.runJavaScriptPrompt)
     return String();
 
-  StringImpl* impl = toWK(m_pageUIClient.runJavaScriptPrompt(
+  WebString* string = toWK(m_pageUIClient.runJavaScriptPrompt(
       toRef(page), toRef(message.impl()), toRef(defaultValue.impl()),
       toRef(frame), m_pageUIClient.clientInfo));
-  if (!impl)
+  if (!string)
     return String();
 
-  String result = impl;
-  impl->deref();
+  String result = string->string();
+  string->deref();
 
   return result;
 }

@@ -60,7 +60,7 @@ class InjectedBundle : public RefCounted<InjectedBundle> {
 
   // API
   void initializeClient(WKBundleClient*);
-  void postMessage(WebCore::StringImpl*);
+  void postMessage(const WebCore::String&);
   void setShouldTrackVisitedLinks(bool);
   void removeAllVisitedLinks();
 
