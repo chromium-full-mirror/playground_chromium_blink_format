@@ -38,6 +38,8 @@ class Node;
 // Runtime object support code for JSHTMLAppletElement, JSHTMLEmbedElement and
 // JSHTMLObjectElement.
 JSC::Bindings::Instance* pluginInstance(Node*);
+JSC::JSObject* pluginScriptObject(JSC::ExecState* exec,
+                                  JSHTMLElement* jsHTMLElement);
 
 JSC::JSValue runtimeObjectPropertyGetter(JSC::ExecState*,
                                          JSC::JSValue,

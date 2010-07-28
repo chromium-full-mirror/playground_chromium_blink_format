@@ -28,6 +28,7 @@
 
 #include <JavaScriptCore/JSObjectWithGlobalObject.h>
 
+typedef void* NPIdentifier;
 struct NPObject;
 
 namespace WebKit {
@@ -43,6 +44,10 @@ class JSNPObject : public JSC::JSObjectWithGlobalObject {
              NPRuntimeObjectMap* objectMap,
              NPObject* npObject);
   ~JSNPObject();
+
+  JSC::JSValue callMethod(JSC::ExecState*, NPIdentifier methodName);
+
+  static const JSC::ClassInfo s_info;
 
  private:
   static const unsigned StructureFlags =
@@ -61,7 +66,12 @@ class JSNPObject : public JSC::JSObjectWithGlobalObject {
   static JSC::JSValue propertyGetter(JSC::ExecState*,
                                      JSC::JSValue,
                                      const JSC::Identifier&);
+  static JSC::JSValue methodGetter(JSC::ExecState*,
+                                   JSC::JSValue,
+                                   const JSC::Identifier&);
   static JSC::JSObject* throwInvalidAccessError(JSC::ExecState*);
+
+  virtual const JSC::ClassInfo* classInfo() const { return &s_info; }
 
   NPRuntimeObjectMap* m_objectMap;
   NPObject* m_npObject;
