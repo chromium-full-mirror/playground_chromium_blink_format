@@ -74,7 +74,8 @@ static const char szShellDotUrlTemplate[] = "[InternetShortcut]\r\nURL=%s\r\n";
 enum ClipboardDataType {
   ClipboardDataTypeNone,
   ClipboardDataTypeURL,
-  ClipboardDataTypeText
+  ClipboardDataTypeText,
+  ClipboardDataTypeTextHTML
 };
 
 static ClipboardDataType clipboardTypeFromMIMEType(const String& type) {
@@ -86,6 +87,8 @@ static ClipboardDataType clipboardTypeFromMIMEType(const String& type) {
     return ClipboardDataTypeText;
   if (qType == "url" || qType == "text/uri-list")
     return ClipboardDataTypeURL;
+  if (qType == "text/html")
+    return ClipboardDataTypeTextHTML;
 
   return ClipboardDataTypeNone;
 }
@@ -541,6 +544,12 @@ String ClipboardWin::getData(const String& type, bool& success) const {
     return getPlainText(m_dataObject.get(), success);
   if (dataType == ClipboardDataTypeURL)
     return getURL(m_dataObject.get(), DragData::DoNotConvertFilenames, success);
+  else if (dataType == ClipboardDataTypeTextHTML) {
+    String data = getTextHTML(m_dataObject.get(), success);
+    if (success)
+      return data;
+    return getCFHTML(m_dataObject.get(), success);
+  }
 
   return "";
 }

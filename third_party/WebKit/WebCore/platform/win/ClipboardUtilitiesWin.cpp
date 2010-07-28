@@ -170,12 +170,40 @@ HGLOBAL createGlobalData(const Vector<char>& vector) {
   return globalData;
 }
 
+static String getFullCFHTML(IDataObject* data, bool& success) {
+  STGMEDIUM store;
+  if (SUCCEEDED(data->GetData(htmlFormat(), &store))) {
+    // MS HTML Format parsing
+    char* data = static_cast<char*>(GlobalLock(store.hGlobal));
+    SIZE_T dataSize = ::GlobalSize(store.hGlobal);
+    String cfhtml(UTF8Encoding().decode(data, dataSize));
+    GlobalUnlock(store.hGlobal);
+    ReleaseStgMedium(&store);
+    success = true;
+    return cfhtml;
+  }
+  success = false;
+  return String();
+}
+
 static void append(Vector<char>& vector, const char* string) {
   vector.append(string, strlen(string));
 }
 
 static void append(Vector<char>& vector, const CString& string) {
   vector.append(string.data(), string.length());
+}
+
+// Find the markup between "<!--StartFragment -->" and "<!--EndFragment -->",
+// accounting for browser quirks.
+static String extractMarkupFromCFHTML(const String& cfhtml) {
+  unsigned markupStart = cfhtml.find("<html", 0, false);
+  unsigned tagStart = cfhtml.find("startfragment", markupStart, false);
+  unsigned fragmentStart = cfhtml.find('>', tagStart) + 1;
+  unsigned tagEnd = cfhtml.find("endfragment", fragmentStart, false);
+  unsigned fragmentEnd = cfhtml.reverseFind('<', tagEnd);
+  return cfhtml.substring(fragmentStart, fragmentEnd - fragmentStart)
+      .stripWhiteSpace();
 }
 
 // Documentation for the CF_HTML format is available at
@@ -403,6 +431,13 @@ String getTextHTML(IDataObject* data, bool& success) {
   return html;
 }
 
+String getCFHTML(IDataObject* data, bool& success) {
+  String cfhtml = getFullCFHTML(data, success);
+  if (success)
+    return extractMarkupFromCFHTML(cfhtml);
+  return String();
+}
+
 PassRefPtr<DocumentFragment> fragmentFromFilenames(Document*,
                                                    const IDataObject*) {
   // FIXME: We should be able to create fragments from files
@@ -429,16 +464,7 @@ PassRefPtr<DocumentFragment> fragmentFromCFHTML(Document* doc,
     srcURL = rawSrcURL.stripWhiteSpace();
   }
 
-  // find the markup between "<!--StartFragment -->" and "<!--EndFragment -->",
-  // accounting for browser quirks
-  unsigned markupStart = cfhtml.find("<html", 0, false);
-  unsigned tagStart = cfhtml.find("startfragment", markupStart, false);
-  unsigned fragmentStart = cfhtml.find('>', tagStart) + 1;
-  unsigned tagEnd = cfhtml.find("endfragment", fragmentStart, false);
-  unsigned fragmentEnd = cfhtml.reverseFind('<', tagEnd);
-  String markup = cfhtml.substring(fragmentStart, fragmentEnd - fragmentStart)
-                      .stripWhiteSpace();
-
+  String markup = extractMarkupFromCFHTML(cfhtml);
   return createFragmentFromMarkup(doc, markup, srcURL,
                                   FragmentScriptingNotAllowed);
 }
@@ -448,21 +474,15 @@ PassRefPtr<DocumentFragment> fragmentFromHTML(Document* doc,
   if (!doc || !data)
     return 0;
 
-  STGMEDIUM store;
-  String html;
-  String srcURL;
-  if (SUCCEEDED(data->GetData(htmlFormat(), &store))) {
-    // MS HTML Format parsing
-    char* data = static_cast<char*>(GlobalLock(store.hGlobal));
-    SIZE_T dataSize = ::GlobalSize(store.hGlobal);
-    String cfhtml(UTF8Encoding().decode(data, dataSize));
-    GlobalUnlock(store.hGlobal);
-    ReleaseStgMedium(&store);
+  bool success = false;
+  String cfhtml = getFullCFHTML(data, success);
+  if (success) {
     if (PassRefPtr<DocumentFragment> fragment = fragmentFromCFHTML(doc, cfhtml))
       return fragment;
   }
-  bool success = false;
-  html = getTextHTML(data, success);
+
+  String html = getTextHTML(data, success);
+  String srcURL;
   if (success)
     return createFragmentFromMarkup(doc, html, srcURL,
                                     FragmentScriptingNotAllowed);

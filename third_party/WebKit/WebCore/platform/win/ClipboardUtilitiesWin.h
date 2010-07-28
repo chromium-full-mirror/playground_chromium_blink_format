@@ -71,6 +71,7 @@ String getURL(IDataObject*,
               String* title = 0);
 String getPlainText(IDataObject*, bool& success);
 String getTextHTML(IDataObject*, bool& success);
+String getCFHTML(IDataObject*, bool& success);
 
 }  // namespace WebCore
 
