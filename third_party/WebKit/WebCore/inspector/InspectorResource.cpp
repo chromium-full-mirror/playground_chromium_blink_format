@@ -286,7 +286,7 @@ InspectorResource::Type InspectorResource::type() const {
   if (!m_overrideContent.isNull())
     return m_overrideContentType;
 
-  if (m_requestURL == m_loader->requestURL()) {
+  if (equalIgnoringFragmentIdentifier(m_requestURL, m_loader->requestURL())) {
     InspectorResource::Type resourceType = cachedResourceType();
     if (resourceType == Other)
       return Doc;
@@ -295,7 +295,8 @@ InspectorResource::Type InspectorResource::type() const {
   }
 
   if (m_loader->frameLoader() &&
-      m_requestURL == m_loader->frameLoader()->iconURL())
+      equalIgnoringFragmentIdentifier(m_requestURL,
+                                      m_loader->frameLoader()->iconURL()))
     return Image;
 
   return cachedResourceType();
@@ -325,7 +326,7 @@ String InspectorResource::sourceString() const {
 
 PassRefPtr<SharedBuffer> InspectorResource::resourceData(
     String* textEncodingName) const {
-  if (m_requestURL == m_loader->requestURL()) {
+  if (equalIgnoringFragmentIdentifier(m_requestURL, m_loader->requestURL())) {
     *textEncodingName = m_frame->document()->inputEncoding();
     return m_loader->mainResourceData();
   }
