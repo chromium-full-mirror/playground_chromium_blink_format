@@ -33,8 +33,9 @@
 #include "wx/wx.h"
 #endif
 
-#include "WebFrame.h"
 #include "WebKitDefines.h"
+#include "WebDOMSelection.h"
+#include "WebFrame.h"
 #include "WebSettings.h"
 
 class WebViewPrivate;
@@ -162,10 +163,18 @@ class WXDLLIMPEXP_WEBKIT wxWebView : public wxWindow {
   wxString GetAsMarkup();
   wxString GetExternalRepresentation();
 
+  wxWebKitSelection GetSelection();
+  wxString GetSelectionAsHTML();
+  wxString GetSelectionAsText();
+
   void SetTransparent(bool transparent);
   bool IsTransparent() const;
 
   wxString RunScript(const wxString& javascript);
+  bool ExecuteEditCommand(const wxString& command,
+                          const wxString& parameter = wxEmptyString);
+  EditState GetEditCommandState(const wxString& command) const;
+  wxString GetEditCommandValue(const wxString& command) const;
 
   bool FindString(const wxString& string,
                   bool forward = true,
@@ -179,7 +188,7 @@ class WXDLLIMPEXP_WEBKIT wxWebView : public wxWindow {
   void DecreaseTextSize();
   void ResetTextSize();
   void MakeEditable(bool enable);
-  bool IsEditable() const { return m_isEditable; }
+  bool IsEditable() const;
 
   wxString GetPageTitle() const { return m_title; }
   void SetPageTitle(const wxString& title) { m_title = title; }

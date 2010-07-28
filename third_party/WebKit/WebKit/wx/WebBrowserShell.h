@@ -78,6 +78,8 @@ class WXDLLIMPEXP_WEBKIT wxWebBrowserShell : public wxFrame {
   // debug menu items
   void OnSetSource(wxCommandEvent& event);
   void OnRunScript(wxCommandEvent& myEvent);
+  void OnEditCommand(wxCommandEvent& myEvent);
+  void OnGetEditCommandState(wxCommandEvent& myEvent);
 
  private:
   wxTextCtrl* addressBar;

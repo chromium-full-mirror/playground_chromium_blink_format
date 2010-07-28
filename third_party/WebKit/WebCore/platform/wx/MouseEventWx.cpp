@@ -39,7 +39,7 @@ PlatformMouseEvent::PlatformMouseEvent(const wxMouseEvent& event,
     : m_position(event.GetPosition()),
       m_globalPosition(globalPoint),
       m_shiftKey(event.ShiftDown()),
-      m_ctrlKey(event.CmdDown()),
+      m_ctrlKey(event.CmdDown() || event.ControlDown()),
       m_altKey(event.AltDown()),
       m_metaKey(event.MetaDown())  // FIXME: We'll have to test other browsers
 {

@@ -59,6 +59,9 @@
 #include "wx/wx.h"
 #endif
 
+#include "WebDOMNode.h"
+
+#include "WebDOMSelection.h"
 #include "WebFrame.h"
 #include "WebView.h"
 #include "WebFramePrivate.h"
@@ -192,6 +195,27 @@ wxString wxWebFrame::GetExternalRepresentation() {
   return externalRepresentation(m_impl->frame);
 }
 
+wxString wxWebFrame::GetSelectionAsHTML() {
+  if (m_impl->frame)
+    return m_impl->frame->selection()->toNormalizedRange()->toHTML();
+
+  return wxEmptyString;
+}
+
+wxString wxWebFrame::GetSelectionAsText() {
+  if (m_impl->frame)
+    return m_impl->frame->selection()->toNormalizedRange()->text();
+
+  return wxEmptyString;
+}
+
+wxWebKitSelection wxWebFrame::GetSelection() {
+  if (m_impl->frame)
+    return wxWebKitSelection(m_impl->frame->selection());
+
+  return 0;
+}
+
 wxString wxWebFrame::RunScript(const wxString& javascript) {
   wxString returnValue = wxEmptyString;
   if (m_impl->frame && m_impl->frame->loader()) {
@@ -220,6 +244,33 @@ wxString wxWebFrame::RunScript(const wxString& javascript) {
     }
   }
   return returnValue;
+}
+
+bool wxWebFrame::ExecuteEditCommand(const wxString& command,
+                                    const wxString& parameter) {
+  if (m_impl->frame && IsEditable())
+    return m_impl->frame->editor()->command(command).execute(parameter);
+}
+
+EditState wxWebFrame::GetEditCommandState(const wxString& command) const {
+  if (m_impl->frame && IsEditable()) {
+    WebCore::TriState state = m_impl->frame->editor()->command(command).state();
+    if (state == WebCore::TrueTriState)
+      return EditStateTrue;
+    if (state == WebCore::FalseTriState)
+      return EditStateFalse;
+
+    return EditStateMixed;
+  }
+
+  return EditStateFalse;
+}
+
+wxString wxWebFrame::GetEditCommandValue(const wxString& command) const {
+  if (m_impl->frame && IsEditable())
+    return m_impl->frame->editor()->command(command).value();
+
+  return wxEmptyString;
 }
 
 bool wxWebFrame::FindString(const wxString& string,
@@ -399,6 +450,7 @@ wxWebViewDOMElementInfo wxWebFrame::HitTest(const wxPoint& pos) const {
         m_impl->frame->eventHandler()->hitTestResultAtPoint(
             m_impl->frame->view()->windowToContents(pos), false);
     if (result.innerNode()) {
+      domInfo.SetInnerNode(new WebDOMNode(result.innerNode()));
       domInfo.SetLink(result.absoluteLinkURL().string());
       domInfo.SetText(result.textContent());
       domInfo.SetImageSrc(result.absoluteImageURL().string());
