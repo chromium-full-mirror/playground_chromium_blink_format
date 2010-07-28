@@ -140,6 +140,7 @@ Settings::Settings(Page* page)
       m_showRepaintCounter(false),
       m_experimentalNotificationsEnabled(false),
       m_webGLEnabled(false),
+      m_acceleratedCanvas2dEnabled(false),
       m_loadDeferringEnabled(true),
       m_tiledBackingStoreEnabled(false),
       m_html5ParserEnabled(true),
@@ -559,6 +560,10 @@ void Settings::setShouldUseHighResolutionTimers(
 
 void Settings::setWebGLEnabled(bool enabled) {
   m_webGLEnabled = enabled;
+}
+
+void Settings::setAccelerated2dCanvasEnabled(bool enabled) {
+  m_acceleratedCanvas2dEnabled = enabled;
 }
 
 void Settings::setLoadDeferringEnabled(bool enabled) {

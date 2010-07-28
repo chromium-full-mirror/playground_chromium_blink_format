@@ -87,6 +87,7 @@ class WebSettingsImpl : public WebSettings {
   virtual void setShowDebugBorders(bool);
   virtual void setEditingBehavior(EditingBehavior);
   virtual void setAcceleratedCompositingEnabled(bool);
+  virtual void setAccelerated2dCanvasEnabled(bool);
   virtual void setHTML5ParserEnabled(bool);
   virtual void setMemoryInfoEnabled(bool);
 

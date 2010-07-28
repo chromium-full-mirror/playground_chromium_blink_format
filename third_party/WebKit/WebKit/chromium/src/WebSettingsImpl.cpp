@@ -238,6 +238,10 @@ void WebSettingsImpl::setAcceleratedCompositingEnabled(bool enabled) {
   m_settings->setAcceleratedCompositingEnabled(enabled);
 }
 
+void WebSettingsImpl::setAccelerated2dCanvasEnabled(bool enabled) {
+  m_settings->setAccelerated2dCanvasEnabled(enabled);
+}
+
 void WebSettingsImpl::setHTML5ParserEnabled(bool enabled) {
   m_settings->setHTML5ParserEnabled(enabled);
 }
