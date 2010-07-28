@@ -112,6 +112,8 @@ class Connection : public ThreadSafeShared<Connection> {
   template <typename T>
   class Message {
    public:
+    Message() : m_arguments(0) {}
+
     Message(MessageID messageID, PassOwnPtr<T> arguments)
         : m_messageID(messageID), m_arguments(arguments.leakPtr()) {}
 
@@ -145,8 +147,10 @@ class Connection : public ThreadSafeShared<Connection> {
 
   // Called on the connection work queue.
   void processIncomingMessage(MessageID, PassOwnPtr<ArgumentDecoder>);
+  bool canSendOutgoingMessages() const;
+  bool platformCanSendOutgoingMessages() const;
   void sendOutgoingMessages();
-  void sendOutgoingMessage(MessageID, PassOwnPtr<ArgumentEncoder>);
+  bool sendOutgoingMessage(MessageID, PassOwnPtr<ArgumentEncoder>);
   void connectionDidClose();
 
   // Called on the listener thread.
@@ -169,7 +173,7 @@ class Connection : public ThreadSafeShared<Connection> {
 
   // Outgoing messages.
   Mutex m_outgoingMessagesLock;
-  Vector<OutgoingMessage> m_outgoingMessages;
+  Deque<OutgoingMessage> m_outgoingMessages;
 
   ThreadCondition m_waitForMessageCondition;
   Mutex m_waitForMessageMutex;
@@ -185,9 +189,12 @@ class Connection : public ThreadSafeShared<Connection> {
 #elif PLATFORM(WIN)
   // Called on the connection queue.
   void readEventHandler();
+  void writeEventHandler();
 
   Vector<uint8_t> m_readBuffer;
   OVERLAPPED m_readState;
+  OwnPtr<ArgumentEncoder> m_pendingWriteArguments;
+  OVERLAPPED m_writeState;
   HANDLE m_connectionPipe;
 #elif PLATFORM(QT)
   // Called on the connection queue.

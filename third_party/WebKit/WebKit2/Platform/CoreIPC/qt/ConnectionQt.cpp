@@ -109,10 +109,13 @@ bool Connection::open() {
   return m_isConnected;
 }
 
-void Connection::sendOutgoingMessage(MessageID messageID,
+bool Connection::platformCanSendOutgoingMessages() const {
+  return m_socket;
+}
+
+bool Connection::sendOutgoingMessage(MessageID messageID,
                                      PassOwnPtr<ArgumentEncoder> arguments) {
-  if (!m_socket)
-    return;
+  ASSERT(m_socket);
 
   // We put the message ID last.
   arguments->encodeUInt32(messageID.toInt());
@@ -127,6 +130,7 @@ void Connection::sendOutgoingMessage(MessageID messageID,
       reinterpret_cast<char*>(arguments->buffer()), arguments->bufferSize());
 
   ASSERT(bytesWritten == arguments->bufferSize());
+  return true;
 }
 
 }  // namespace CoreIPC

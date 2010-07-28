@@ -116,7 +116,11 @@ static inline size_t machMessageSize(size_t bodySize,
   return round_msg(size);
 }
 
-void Connection::sendOutgoingMessage(MessageID messageID,
+bool Connection::platformCanSendOutgoingMessages() const {
+  return true;
+}
+
+bool Connection::sendOutgoingMessage(MessageID messageID,
                                      PassOwnPtr<ArgumentEncoder> arguments) {
   Vector<Attachment> attachments = arguments->releaseAttachments();
 
@@ -211,8 +215,9 @@ void Connection::sendOutgoingMessage(MessageID messageID,
                MACH_MSG_TIMEOUT_NONE, MACH_PORT_NULL);
   if (kr != KERN_SUCCESS) {
     // FIXME: What should we do here?
-    return;
   }
+
+  return true;
 }
 
 void Connection::initializeDeadNameSource() {
