@@ -38,7 +38,7 @@ class PluginInfoStore {
  public:
   PluginInfoStore();
 
-  void setAdditionalPluginPaths(const Vector<WebCore::String>& paths);
+  void setAdditionalPluginDirectories(const Vector<WebCore::String>&);
 
   void refresh();
   void getPlugins(Vector<WebCore::PluginInfo>& plugins);
@@ -78,7 +78,7 @@ class PluginInfoStore {
   static bool shouldUsePlugin(const Plugin& plugin,
                               const Vector<Plugin>& loadedPlugins);
 
-  Vector<WebCore::String> m_additionalPluginPaths;
+  Vector<WebCore::String> m_additionalPluginDirectories;
   Vector<Plugin> m_plugins;
   bool m_pluginListIsUpToDate;
 };

@@ -218,11 +218,12 @@ void WebContext::getStatistics(WKContextStatistics* statistics) {
     (*it)->getStatistics(statistics);
 }
 
-void WebContext::setAdditionalPluginPath(const WebCore::String& pluginPath) {
-  Vector<String> pluginPaths;
-  pluginPaths.append(pluginPath);
+void WebContext::setAdditionalPluginDirectory(
+    const WebCore::String& directory) {
+  Vector<String> directories;
+  directories.append(directory);
 
-  m_pluginInfoStore.setAdditionalPluginPaths(pluginPaths);
+  m_pluginInfoStore.setAdditionalPluginDirectories(directories);
 }
 
 void WebContext::registerURLSchemeAsEmptyDocument(const String& urlScheme) {
