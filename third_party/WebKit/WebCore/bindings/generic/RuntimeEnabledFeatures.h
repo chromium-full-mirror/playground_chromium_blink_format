@@ -141,6 +141,12 @@ class RuntimeEnabledFeatures {
     return isDeviceOrientationEnabled;
   }
 
+  static void setSpeechInputEnabled(bool isEnabled) {
+    isSpeechInputEnabled = isEnabled;
+  }
+  static bool speechInputEnabled() { return isSpeechInputEnabled; }
+  static bool speechEnabled() { return isSpeechInputEnabled; }
+
  private:
   // Never instantiate.
   RuntimeEnabledFeatures() {}
@@ -155,6 +161,7 @@ class RuntimeEnabledFeatures {
   static bool isPushStateEnabled;
   static bool isTouchEnabled;
   static bool isDeviceOrientationEnabled;
+  static bool isSpeechInputEnabled;
 };
 
 }  // namespace WebCore

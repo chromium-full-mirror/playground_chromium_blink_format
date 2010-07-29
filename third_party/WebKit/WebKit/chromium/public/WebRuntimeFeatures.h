@@ -80,6 +80,9 @@ class WebRuntimeFeatures {
   WEBKIT_API static void enableDeviceOrientation(bool);
   WEBKIT_API static bool isDeviceOrientationEnabled();
 
+  WEBKIT_API static void enableSpeechInput(bool);
+  WEBKIT_API static bool isSpeechInputEnabled();
+
  private:
   WebRuntimeFeatures();
 };
