@@ -284,9 +284,6 @@ class LayoutTestController : public CppBoundClass {
   void addUserScript(const CppArgumentList&, CppVariant*);
   void addUserStyleSheet(const CppArgumentList&, CppVariant*);
 
-  // DeviceOrientation related functions
-  void setMockDeviceOrientation(const CppArgumentList&, CppVariant*);
-
   // Geolocation related functions.
   void setGeolocationPermission(const CppArgumentList&, CppVariant*);
   void setMockGeolocationPosition(const CppArgumentList&, CppVariant*);
