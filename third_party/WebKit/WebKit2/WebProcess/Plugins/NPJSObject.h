@@ -64,8 +64,20 @@ class NPJSObject : public NPObject, Noncopyable {
               const NPVariant* arguments,
               uint32_t argumentCount,
               NPVariant* result);
+  bool invokeDefault(const NPVariant* arguments,
+                     uint32_t argumentCount,
+                     NPVariant* result);
   bool hasProperty(NPIdentifier propertyName);
   bool getProperty(NPIdentifier propertyName, NPVariant* result);
+  bool construct(const NPVariant* arguments,
+                 uint32_t argumentCount,
+                 NPVariant* result);
+
+  bool invoke(JSC::ExecState*,
+              JSC::JSValue function,
+              const NPVariant* arguments,
+              uint32_t argumentCount,
+              NPVariant* result);
 
   static NPClass* npClass();
   static NPObject* NP_Allocate(NPP, NPClass*);
@@ -87,6 +99,10 @@ class NPJSObject : public NPObject, Noncopyable {
   static bool NP_SetProperty(NPObject*,
                              NPIdentifier propertyName,
                              const NPVariant* value);
+  static bool NP_Construct(NPObject*,
+                           const NPVariant* arguments,
+                           uint32_t argumentCount,
+                           NPVariant* result);
 
   NPRuntimeObjectMap* m_objectMap;
   JSC::ProtectedPtr<JSC::JSObject> m_jsObject;
