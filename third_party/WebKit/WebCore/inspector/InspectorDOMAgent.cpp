@@ -806,6 +806,7 @@ PassRefPtr<InspectorObject> InspectorDOMAgent::buildObjectForNode(
   switch (node->nodeType()) {
     case Node::TEXT_NODE:
     case Node::COMMENT_NODE:
+    case Node::CDATA_SECTION_NODE:
       nodeValue = node->nodeValue();
       break;
     case Node::ATTRIBUTE_NODE:
