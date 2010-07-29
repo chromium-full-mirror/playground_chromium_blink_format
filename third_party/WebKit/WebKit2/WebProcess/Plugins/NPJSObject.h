@@ -70,6 +70,7 @@ class NPJSObject : public NPObject, Noncopyable {
                      NPVariant* result);
   bool hasProperty(NPIdentifier propertyName);
   bool getProperty(NPIdentifier propertyName, NPVariant* result);
+  bool setProperty(NPIdentifier propertyName, const NPVariant* value);
   bool enumerate(NPIdentifier** identifiers, uint32_t* identifierCount);
   bool construct(const NPVariant* arguments,
                  uint32_t argumentCount,
