@@ -35,6 +35,11 @@ extern "C" {
 
 WK_EXPORT WKStringRef
 WKBundlePageCopyRenderTreeExternalRepresentation(WKBundlePageRef page);
+WK_EXPORT void WKBundlePageExecuteEditingCommand(WKBundlePageRef page,
+                                                 WKStringRef commandName,
+                                                 WKStringRef argument);
+WK_EXPORT bool WKBundlePageIsEditingCommandEnabled(WKBundlePageRef page,
+                                                   WKStringRef commandName);
 
 #ifdef __cplusplus
 }

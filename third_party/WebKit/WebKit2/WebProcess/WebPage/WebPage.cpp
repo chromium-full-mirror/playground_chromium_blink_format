@@ -161,6 +161,15 @@ String WebPage::renderTreeExternalRepresentation() const {
                                 RenderAsTextBehaviorNormal);
 }
 
+void WebPage::executeEditingCommand(const String& commandName,
+                                    const String& argument) {
+  m_mainFrame->coreFrame()->editor()->command(commandName).execute(argument);
+}
+
+bool WebPage::isEditingCommandEnabled(const String& commandName) {
+  return m_mainFrame->coreFrame()->editor()->command(commandName).isEnabled();
+}
+
 #if USE(ACCELERATED_COMPOSITING)
 void WebPage::changeAcceleratedCompositingMode(WebCore::GraphicsLayer* layer) {
   bool compositing = layer;

@@ -59,3 +59,15 @@ WKStringRef WKBundlePageCopyRenderTreeExternalRepresentation(
     WKBundlePageRef pageRef) {
   return toCopiedRef(toWK(pageRef)->renderTreeExternalRepresentation());
 }
+
+void WKBundlePageExecuteEditingCommand(WKBundlePageRef pageRef,
+                                       WKStringRef name,
+                                       WKStringRef argument) {
+  toWK(pageRef)->executeEditingCommand(toWK(name)->string(),
+                                       toWK(argument)->string());
+}
+
+bool WKBundlePageIsEditingCommandEnabled(WKBundlePageRef pageRef,
+                                         WKStringRef name) {
+  return toWK(pageRef)->isEditingCommandEnabled(toWK(name)->string());
+}
