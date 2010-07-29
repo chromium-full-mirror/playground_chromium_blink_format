@@ -75,6 +75,9 @@ class PluginController {
   // retained object.
   virtual NPObject* pluginElementNPObject() = 0;
 
+  // Set the statusbar text.
+  virtual void setStatusbarText(const WebCore::String&) = 0;
+
  protected:
   virtual ~PluginController() {}
 };

@@ -64,6 +64,7 @@ class NetscapePlugin : public Plugin {
                bool sendNotification,
                void* notificationData);
   NPError destroyStream(NPStream*, NPReason);
+  void setStatusbarText(const WebCore::String&);
 
   // These return retained objects.
   NPObject* windowScriptNPObject();
