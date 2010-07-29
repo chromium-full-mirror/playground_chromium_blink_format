@@ -113,6 +113,8 @@ class WebAccessibilityObject {
 
   WEBKIT_API WebNode node() const;
   WEBKIT_API WebDocument document() const;
+  WEBKIT_API bool hasComputedStyle() const;
+  WEBKIT_API WebString computedStyleDisplay() const;
 
 #if WEBKIT_IMPLEMENTATION
   WebAccessibilityObject(const WTF::PassRefPtr<WebCore::AccessibilityObject>&);
