@@ -803,9 +803,16 @@ void QWebFrame::load(const QNetworkRequest& req,
   It is also possible
   for the encoding to be specified by web server.
 
+  This is a convenience function equivalent to setContent(html, "text/html",
+  baseUrl).
+
   \note This method will not affect session or global history for the frame.
 
-  \sa toHtml(), setContent()
+  \warning This function works only for HTML, for other mime types (i.e. XHTML,
+  SVG)
+  setContent() should be used instead.
+
+  \sa toHtml(), setContent(), load()
 */
 void QWebFrame::setHtml(const QString& html, const QUrl& baseUrl) {
   KURL kurl(baseUrl);
