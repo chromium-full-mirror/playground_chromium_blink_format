@@ -73,6 +73,11 @@ class JSNPObject : public JSC::JSObjectWithGlobalObject {
                    JSC::JSValue,
                    JSC::PutPropertySlot&);
 
+  virtual void getOwnPropertyNames(
+      JSC::ExecState*,
+      JSC::PropertyNameArray&,
+      JSC::EnumerationMode mode = JSC::ExcludeDontEnumProperties);
+
   static JSC::JSValue propertyGetter(JSC::ExecState*,
                                      JSC::JSValue,
                                      const JSC::Identifier&);
