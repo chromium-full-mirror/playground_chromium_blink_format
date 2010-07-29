@@ -173,6 +173,8 @@ class WebPageProxy : public APIObject {
  private:
   WebPageProxy(WebPageNamespace*, uint64_t pageID);
 
+  virtual Type type() const { return TypePage; }
+
   void didCreateMainFrame(uint64_t frameID);
   void didCreateSubFrame(uint64_t frameID);
 

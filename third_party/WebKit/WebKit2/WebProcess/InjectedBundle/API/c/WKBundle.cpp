@@ -32,6 +32,10 @@
 
 using namespace WebKit;
 
+WKTypeID WKBundleGetTypeID() {
+  return toRef(APIObject::TypeBundle);
+}
+
 void WKBundleSetClient(WKBundleRef bundleRef, WKBundleClient* wkClient) {
   if (wkClient && !wkClient->version)
     toWK(bundleRef)->initializeClient(wkClient);

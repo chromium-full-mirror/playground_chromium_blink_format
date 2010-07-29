@@ -104,6 +104,8 @@ class WebFrame : public APIObject {
            const WebCore::String& frameName,
            WebCore::HTMLFrameOwnerElement*);
 
+  virtual Type type() const { return TypeBundleFrame; }
+
   WebPage* m_page;
   WebCore::Frame* m_coreFrame;
 

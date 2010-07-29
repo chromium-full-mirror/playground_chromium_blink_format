@@ -48,6 +48,8 @@ class WebString : public APIObject {
  private:
   WebString(const WebCore::String& string) : m_string(string) {}
 
+  virtual Type type() const { return TypeString; }
+
   WebCore::String m_string;
 };
 

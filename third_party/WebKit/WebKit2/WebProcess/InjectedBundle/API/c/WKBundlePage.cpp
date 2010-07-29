@@ -33,6 +33,10 @@
 
 using namespace WebKit;
 
+WKTypeID WKBundlePageGetTypeID() {
+  return toRef(APIObject::TypeBundlePage);
+}
+
 void WKBundlePageSetEditorClient(WKBundlePageRef pageRef,
                                  WKBundlePageEditorClient* wkClient) {
   if (wkClient && !wkClient->version)

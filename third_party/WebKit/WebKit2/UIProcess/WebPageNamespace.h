@@ -58,6 +58,8 @@ class WebPageNamespace : public APIObject {
  private:
   WebPageNamespace(WebContext*);
 
+  virtual Type type() const { return TypePageNamespace; }
+
   RefPtr<WebContext> m_context;
 };
 

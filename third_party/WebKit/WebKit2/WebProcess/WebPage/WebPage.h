@@ -132,6 +132,8 @@ class WebPage : public APIObject {
           const WebPreferencesStore&,
           DrawingArea::Type);
 
+  virtual Type type() const { return TypeBundlePage; }
+
   void platformInitialize();
   static const char* interpretKeyEvent(const WebCore::KeyboardEvent*);
   void performDefaultBehaviorForKeyEvent(const WebKeyboardEvent&);

@@ -195,6 +195,8 @@ struct WKBundlePageEditorClient {
 };
 typedef struct WKBundlePageEditorClient WKBundlePageEditorClient;
 
+WK_EXPORT WKTypeID WKBundlePageGetTypeID();
+
 WK_EXPORT void WKBundlePageSetEditorClient(WKBundlePageRef page,
                                            WKBundlePageEditorClient* client);
 WK_EXPORT void WKBundlePageSetLoaderClient(WKBundlePageRef page,

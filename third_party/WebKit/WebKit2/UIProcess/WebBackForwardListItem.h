@@ -65,6 +65,8 @@ class WebBackForwardListItem : public APIObject {
                          const WebCore::String& title,
                          uint64_t itemID);
 
+  virtual Type type() const { return TypeBackForwardListItem; }
+
   WebCore::String m_originalURL;
   WebCore::String m_url;
   WebCore::String m_title;
