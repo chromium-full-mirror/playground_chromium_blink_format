@@ -28,8 +28,6 @@
 
 #include "DeviceOrientation.h"
 
-#if ENABLE(DEVICE_ORIENTATION)
-
 namespace WebCore {
 
 DeviceOrientationEvent::~DeviceOrientationEvent() {}
@@ -56,5 +54,3 @@ void DeviceOrientationEvent::initDeviceOrientationEvent(
 }
 
 }  // namespace WebCore
-
-#endif  // ENABLE(DEVICE_ORIENTATION)
