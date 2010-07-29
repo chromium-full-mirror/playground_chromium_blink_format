@@ -26,6 +26,7 @@
 #include "config.h"
 #include "RenderHTMLCanvas.h"
 
+#include "CanvasRenderingContext.h"
 #include "Document.h"
 #include "GraphicsContext.h"
 #include "HTMLCanvasElement.h"
@@ -46,12 +47,9 @@ bool RenderHTMLCanvas::requiresLayer() const {
   if (RenderReplaced::requiresLayer())
     return true;
 
-#if ENABLE(3D_CANVAS)
   HTMLCanvasElement* canvas = static_cast<HTMLCanvasElement*>(node());
-  return canvas && canvas->is3D();
-#else
-  return false;
-#endif
+  return canvas && canvas->renderingContext() &&
+         canvas->renderingContext()->isAccelerated();
 }
 
 void RenderHTMLCanvas::paintReplaced(PaintInfo& paintInfo, int tx, int ty) {

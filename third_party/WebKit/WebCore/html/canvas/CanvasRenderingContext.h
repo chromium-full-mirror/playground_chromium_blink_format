@@ -46,6 +46,7 @@ class CanvasRenderingContext : public Noncopyable {
 
   virtual bool is2d() const { return false; }
   virtual bool is3d() const { return false; }
+  virtual bool isAccelerated() const { return false; }
 
  private:
   HTMLCanvasElement* m_canvas;
