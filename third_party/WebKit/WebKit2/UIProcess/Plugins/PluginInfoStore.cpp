@@ -37,9 +37,9 @@ namespace WebKit {
 
 PluginInfoStore::PluginInfoStore() : m_pluginListIsUpToDate(false) {}
 
-void PluginInfoStore::setAdditionalPluginDirectories(
+void PluginInfoStore::setAdditionalPluginsDirectories(
     const Vector<WebCore::String>& directories) {
-  m_additionalPluginDirectories = directories;
+  m_additionalPluginsDirectories = directories;
   refresh();
 }
 
@@ -53,11 +53,11 @@ void PluginInfoStore::loadPluginsIfNecessary() {
 
   m_plugins.clear();
 
-  // First, load plug-ins from the additional plug-in directories specified.
-  for (size_t i = 0; i < m_additionalPluginDirectories.size(); ++i)
-    loadPluginsInDirectory(m_additionalPluginDirectories[i]);
+  // First, load plug-ins from the additional plug-ins directories specified.
+  for (size_t i = 0; i < m_additionalPluginsDirectories.size(); ++i)
+    loadPluginsInDirectory(m_additionalPluginsDirectories[i]);
 
-  Vector<String> directories = pluginDirectories();
+  Vector<String> directories = pluginsDirectories();
   for (size_t i = 0; i < directories.size(); ++i)
     loadPluginsInDirectory(directories[i]);
 
