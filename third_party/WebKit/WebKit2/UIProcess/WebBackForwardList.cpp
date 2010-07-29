@@ -171,7 +171,7 @@ static void webBackForwardListItemDeref(const void* item) {
 
 PassRefPtr<ImmutableArray>
 WebBackForwardList::backListAsImmutableArrayWithLimit(unsigned limit) {
-  unsigned size = std::min(backListCount(), static_cast<int>(limit));
+  unsigned size = std::min(static_cast<unsigned>(backListCount()), limit);
   if (!size)
     return ImmutableArray::create();
 
@@ -190,7 +190,7 @@ WebBackForwardList::backListAsImmutableArrayWithLimit(unsigned limit) {
 
 PassRefPtr<ImmutableArray>
 WebBackForwardList::forwardListAsImmutableArrayWithLimit(unsigned limit) {
-  unsigned size = std::min(forwardListCount(), static_cast<int>(limit));
+  unsigned size = std::min(static_cast<unsigned>(forwardListCount()), limit);
   if (!size)
     return ImmutableArray::create();
 
