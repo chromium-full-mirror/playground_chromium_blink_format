@@ -938,8 +938,8 @@ FloatPoint RenderLayerBacking::contentsToGraphicsLayerCoordinates(
 
 bool RenderLayerBacking::paintingGoesToWindow() const {
   if (m_owningLayer->isRootLayer())
-    return compositor()->rootLayerAttachment() ==
-           RenderLayerCompositor::RootLayerAttachedViaChromeClient;
+    return compositor()->rootLayerAttachment() !=
+           RenderLayerCompositor::RootLayerAttachedViaEnclosingIframe;
 
   return false;
 }
