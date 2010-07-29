@@ -1049,8 +1049,9 @@ struct StackHack {
   ReturnAddressPtr savedReturnAddress;
 };
 
-#define STUB_INIT_STACK_FRAME(stackFrame)                                   \
-  JITStackFrame& stackFrame = *reinterpret_cast<JITStackFrame*>(STUB_ARGS); \
+#define STUB_INIT_STACK_FRAME(stackFrame)               \
+  JITStackFrame& stackFrame =                           \
+      *reinterpret_cast_ptr<JITStackFrame*>(STUB_ARGS); \
   StackHack stackHack(stackFrame)
 #define STUB_SET_RETURN_ADDRESS(returnAddress) \
   stackHack.savedReturnAddress = ReturnAddressPtr(returnAddress)
@@ -1059,7 +1060,7 @@ struct StackHack {
 #else
 
 #define STUB_INIT_STACK_FRAME(stackFrame) \
-  JITStackFrame& stackFrame = *reinterpret_cast<JITStackFrame*>(STUB_ARGS)
+  JITStackFrame& stackFrame = *reinterpret_cast_ptr<JITStackFrame*>(STUB_ARGS)
 #define STUB_SET_RETURN_ADDRESS(returnAddress) \
   *stackFrame.returnAddressSlot() = ReturnAddressPtr(returnAddress)
 #define STUB_RETURN_ADDRESS *stackFrame.returnAddressSlot()
