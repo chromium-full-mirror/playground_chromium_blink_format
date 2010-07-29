@@ -910,8 +910,9 @@ HitTestResult EventHandler::hitTestResultAtPoint(
     bool allowShadowContent,
     bool ignoreClipping,
     HitTestScrollbars testScrollbars,
-    HitTestRequest::HitTestRequestType hitType) {
-  HitTestResult result(point);
+    HitTestRequest::HitTestRequestType hitType,
+    const IntSize& padding) {
+  HitTestResult result(point, padding);
   if (!m_frame->contentRenderer())
     return result;
   if (ignoreClipping)
@@ -936,7 +937,7 @@ HitTestResult EventHandler::hitTestResultAtPoint(
             renderWidget->paddingLeft(),
         result.localPoint().y() + view->scrollY() - renderWidget->borderTop() -
             renderWidget->paddingTop());
-    HitTestResult widgetHitTestResult(widgetPoint);
+    HitTestResult widgetHitTestResult(widgetPoint, padding);
     frame->contentRenderer()->layer()->hitTest(HitTestRequest(hitType),
                                                widgetHitTestResult);
     result = widgetHitTestResult;
@@ -965,7 +966,8 @@ HitTestResult EventHandler::hitTestResultAtPoint(
         IntPoint windowPoint = resultView->contentsToWindow(result.point());
         IntPoint mainFramePoint = mainView->windowToContents(windowPoint);
         result = mainFrame->eventHandler()->hitTestResultAtPoint(
-            mainFramePoint, allowShadowContent, ignoreClipping);
+            mainFramePoint, allowShadowContent, ignoreClipping, testScrollbars,
+            hitType, padding);
       }
     }
   }

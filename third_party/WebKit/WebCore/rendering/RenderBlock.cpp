@@ -4297,7 +4297,7 @@ bool RenderBlock::nodeAtPoint(const HitTestRequest& request,
     // Check if we need to do anything at all.
     IntRect overflowBox = visibleOverflowRect();
     overflowBox.move(tx, ty);
-    if (!overflowBox.contains(_x, _y))
+    if (!overflowBox.intersects(result.rectFromPoint(_x, _y)))
       return false;
   }
 
@@ -4305,16 +4305,19 @@ bool RenderBlock::nodeAtPoint(const HitTestRequest& request,
        hitTestAction == HitTestChildBlockBackground) &&
       isPointInOverflowControl(result, _x, _y, tx, ty)) {
     updateHitTestResult(result, IntPoint(_x - tx, _y - ty));
-    return true;
+    // FIXME: isPointInOverflowControl() doesn't handle rect-based tests yet.
+    if (!result.addNodeToRectBasedTestResult(node(), _x, _y))
+      return true;
   }
 
   // If we have clipping, then we can't have any spillout.
   bool useOverflowClip = hasOverflowClip() && !hasSelfPaintingLayer();
   bool useClip = (hasControlClip() || useOverflowClip);
+  IntRect hitTestArea(result.rectFromPoint(_x, _y));
   bool checkChildren =
       !useClip ||
-      (hasControlClip() ? controlClipRect(tx, ty).contains(_x, _y)
-                        : overflowClipRect(tx, ty).contains(_x, _y));
+      (hasControlClip() ? controlClipRect(tx, ty).intersects(hitTestArea)
+                        : overflowClipRect(tx, ty).intersects(hitTestArea));
   if (checkChildren) {
     // Hit test descendants first.
     int scrolledX = tx;
@@ -4368,9 +4371,11 @@ bool RenderBlock::nodeAtPoint(const HitTestRequest& request,
   if (hitTestAction == HitTestBlockBackground ||
       hitTestAction == HitTestChildBlockBackground) {
     IntRect boundsRect(tx, ty, width(), height());
-    if (visibleToHitTesting() && boundsRect.contains(_x, _y)) {
+    if (visibleToHitTesting() &&
+        boundsRect.intersects(result.rectFromPoint(_x, _y))) {
       updateHitTestResult(result, IntPoint(_x - tx, _y - ty));
-      return true;
+      if (!result.addNodeToRectBasedTestResult(node(), _x, _y, boundsRect))
+        return true;
     }
   }
 
@@ -4400,14 +4405,18 @@ bool RenderBlock::hitTestColumns(const HitTestRequest& request,
     currYOffset += colRect.height();
     colRect.move(tx, ty);
 
-    if (colRect.contains(x, y)) {
+    if (colRect.intersects(result.rectFromPoint(x, y))) {
       // The point is inside this column.
       // Adjust tx and ty to change where we hit test.
 
       int finalX = tx + currXOffset;
       int finalY = ty + currYOffset;
-      return hitTestContents(request, result, x, y, finalX, finalY,
-                             hitTestAction);
+      if (result.isRectBasedTest() &&
+          !colRect.contains(result.rectFromPoint(x, y)))
+        hitTestContents(request, result, x, y, finalX, finalY, hitTestAction);
+      else
+        return hitTestContents(request, result, x, y, finalX, finalY,
+                               hitTestAction);
     }
   }
 

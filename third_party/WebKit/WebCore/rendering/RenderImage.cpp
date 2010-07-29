@@ -397,11 +397,11 @@ bool RenderImage::nodeAtPoint(const HitTestRequest& request,
                               int tx,
                               int ty,
                               HitTestAction hitTestAction) {
-  HitTestResult tempResult(result.point());
+  HitTestResult tempResult(result.point(), result.padding());
   bool inside = RenderReplaced::nodeAtPoint(request, tempResult, x, y, tx, ty,
                                             hitTestAction);
 
-  if (inside && node()) {
+  if (tempResult.innerNode() && node()) {
     if (HTMLMapElement* map = imageMap()) {
       IntRect contentBox = contentBoxRect();
       float zoom = style()->effectiveZoom();
@@ -412,6 +412,8 @@ bool RenderImage::nodeAtPoint(const HitTestRequest& request,
     }
   }
 
+  if (!inside && result.isRectBasedTest())
+    result.append(tempResult);
   if (inside)
     result = tempResult;
   return inside;

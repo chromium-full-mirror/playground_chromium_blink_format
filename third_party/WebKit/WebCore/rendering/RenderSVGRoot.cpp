@@ -26,6 +26,7 @@
 #include "RenderSVGRoot.h"
 
 #include "GraphicsContext.h"
+#include "HitTestResult.h"
 #include "RenderSVGContainer.h"
 #include "RenderSVGResource.h"
 #include "RenderView.h"
@@ -354,6 +355,8 @@ bool RenderSVGRoot::nodeAtPoint(const HitTestRequest& request,
       // FIXME: CSS/HTML assumes the local point is relative to the border box,
       // right?
       updateHitTestResult(result, pointInBorderBox);
+      // FIXME: nodeAtFloatPoint() doesn't handle rect-based hit tests yet.
+      result.addNodeToRectBasedTestResult(child->node(), _x, _y);
       return true;
     }
   }

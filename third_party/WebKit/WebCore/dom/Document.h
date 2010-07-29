@@ -89,6 +89,7 @@ class HTMLInputElement;
 class HTMLMapElement;
 class HistoryItem;
 class HitTestRequest;
+class HitTestResult;
 class InspectorTimelineAgent;
 class IntPoint;
 class DOMWrapperWorld;
@@ -323,6 +324,25 @@ class Document : public ContainerNode, public ScriptExecutionContext {
     return m_duplicateIds.contains(elementId.impl());
   }
 
+  /**
+   * Retrieve all nodes that intersect a rect in the window's document, until it
+   * is fully enclosed by
+   * the boundaries of node.
+   *
+   * @param centerX x reference for the rectangle in CSS pixels
+   * @param centerY y reference for the rectangle in CSS pixels
+   * @param hPadding How much to expand the rectangle horizontally
+   * @param vPadding How much to expand the rectangle vertically
+   * @param ignoreClipping whether or not to ignore the root scroll frame when
+   * retrieving the element.
+   *        If false, this method returns null for coordinates outside of the
+   * viewport.
+   */
+  PassRefPtr<NodeList> nodesFromRect(int centerX,
+                                     int centerY,
+                                     unsigned hPadding,
+                                     unsigned vPadding,
+                                     bool ignoreClipping) const;
   Element* elementFromPoint(int x, int y) const;
   PassRefPtr<Range> caretRangeFromPoint(int x, int y);
 
@@ -1204,6 +1224,9 @@ class Document : public ContainerNode, public ScriptExecutionContext {
 
   void enqueuePopstateEvent(PassRefPtr<SerializedScriptValue> stateObject);
   void pendingEventTimerFired(Timer<Document>*);
+
+  PassRefPtr<NodeList> handleZeroPadding(const HitTestRequest&,
+                                         HitTestResult&) const;
 
   OwnPtr<CSSStyleSelector> m_styleSelector;
   bool m_didCalculateStyleSelector;
