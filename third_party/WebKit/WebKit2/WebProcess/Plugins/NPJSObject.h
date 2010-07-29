@@ -31,6 +31,7 @@
 #include <wtf/Noncopyable.h>
 
 namespace JSC {
+class JSGlobalObject;
 class JSObject;
 }
 
@@ -46,16 +47,16 @@ class NPJSObject : public NPObject, Noncopyable {
 
   JSC::JSObject* jsObject() const { return m_jsObject.get(); }
 
- private:
-  NPJSObject();
-  ~NPJSObject();
-
   static bool isNPJSObject(NPObject*);
 
   static NPJSObject* toNPJSObject(NPObject* npObject) {
     ASSERT(isNPJSObject(npObject));
     return static_cast<NPJSObject*>(npObject);
   }
+
+ private:
+  NPJSObject();
+  ~NPJSObject();
 
   void initialize(NPRuntimeObjectMap*, JSC::JSObject* jsObject);
 
@@ -74,6 +75,7 @@ class NPJSObject : public NPObject, Noncopyable {
                  NPVariant* result);
 
   bool invoke(JSC::ExecState*,
+              JSC::JSGlobalObject*,
               JSC::JSValue function,
               const NPVariant* arguments,
               uint32_t argumentCount,

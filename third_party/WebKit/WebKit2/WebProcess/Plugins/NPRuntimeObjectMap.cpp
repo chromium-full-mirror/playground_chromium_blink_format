@@ -74,6 +74,7 @@ void NPRuntimeObjectMap::jsNPObjectDestroyed(JSNPObject* jsNPObject) {
 
 JSValue NPRuntimeObjectMap::convertNPVariantToJSValue(
     JSC::ExecState* exec,
+    JSC::JSGlobalObject* globalObject,
     const NPVariant& variant) {
   switch (variant.type) {
     case NPVariantType_Void:
@@ -95,12 +96,20 @@ JSValue NPRuntimeObjectMap::convertNPVariantToJSValue(
       return jsString(exec, String::fromUTF8WithLatin1Fallback(
                                 variant.value.stringValue.UTF8Characters,
                                 variant.value.stringValue.UTF8Length));
-    case NPVariantType_Object:
-    default:
-      notImplemented();
-      break;
+    case NPVariantType_Object: {
+      NPObject* npObject = variant.value.objectValue;
+
+      // Just get the object from the NPJSObject.
+      if (NPJSObject::isNPJSObject(npObject))
+        return NPJSObject::toNPJSObject(npObject)->jsObject();
+
+      ASSERT(globalObject);
+
+      return getOrCreateJSObject(exec, globalObject, npObject);
+    }
   }
 
+  ASSERT_NOT_REACHED();
   return jsUndefined();
 }
 
@@ -171,12 +180,20 @@ void NPRuntimeObjectMap::invalidate() {
   ASSERT(m_objects.isEmpty());
 }
 
-ExecState* NPRuntimeObjectMap::globalExec() const {
+JSGlobalObject* NPRuntimeObjectMap::globalObject() const {
   Frame* frame = m_pluginView->frame();
   if (!frame)
     return 0;
 
-  return frame->script()->globalObject(pluginWorld())->globalExec();
+  return frame->script()->globalObject(pluginWorld());
+}
+
+ExecState* NPRuntimeObjectMap::globalExec() const {
+  JSGlobalObject* globalObject = this->globalObject();
+  if (!globalObject)
+    return 0;
+
+  return globalObject->globalExec();
 }
 
 }  // namespace WebKit
