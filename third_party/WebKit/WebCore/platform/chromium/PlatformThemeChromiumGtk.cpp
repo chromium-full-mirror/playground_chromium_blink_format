@@ -183,8 +183,9 @@ void PlatformThemeChromiumGtk::paintArrowButton(GraphicsContext* gc,
   paint.setColor(outlineColor(trackHSV, thumbHSV));
   canvas->drawPath(outline, paint);
 
-  // If the button is disabled, the arrow is drawn with the outline color.
-  if (states & EnabledState)
+  // If the button is disabled or read-only, the arrow is drawn with the outline
+  // color.
+  if (states & EnabledState && !(states & ReadOnlyState))
     paint.setColor(SK_ColorBLACK);
 
   paint.setAntiAlias(false);
