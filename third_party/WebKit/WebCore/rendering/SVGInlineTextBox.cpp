@@ -333,18 +333,18 @@ void SVGInlineTextBox::paint(PaintInfo& paintInfo, int, int) {
 }
 
 bool SVGInlineTextBox::acquirePaintingResource(GraphicsContext*& context,
+                                               RenderObject* renderer,
                                                RenderStyle* style) {
+  ASSERT(renderer);
+  ASSERT(style);
   ASSERT(m_paintingResourceMode != ApplyToDefaultMode);
-
-  RenderObject* parentRenderer = parent()->renderer();
-  ASSERT(parentRenderer);
 
   if (m_paintingResourceMode & ApplyToFillMode)
     m_paintingResource =
-        RenderSVGResource::fillPaintingResource(parentRenderer, style);
+        RenderSVGResource::fillPaintingResource(renderer, style);
   else if (m_paintingResourceMode & ApplyToStrokeMode)
     m_paintingResource =
-        RenderSVGResource::strokePaintingResource(parentRenderer, style);
+        RenderSVGResource::strokePaintingResource(renderer, style);
   else {
     // We're either called for stroking or filling.
     ASSERT_NOT_REACHED();
@@ -353,7 +353,7 @@ bool SVGInlineTextBox::acquirePaintingResource(GraphicsContext*& context,
   if (!m_paintingResource)
     return false;
 
-  m_paintingResource->applyResource(parentRenderer, style, context,
+  m_paintingResource->applyResource(renderer, style, context,
                                     m_paintingResourceMode);
   return true;
 }
@@ -373,7 +373,8 @@ bool SVGInlineTextBox::prepareGraphicsContextForTextPainting(
     GraphicsContext*& context,
     TextRun& textRun,
     RenderStyle* style) {
-  bool acquiredResource = acquirePaintingResource(context, style);
+  bool acquiredResource =
+      acquirePaintingResource(context, parent()->renderer(), style);
 
 #if ENABLE(SVG_FONTS)
   // SVG Fonts need access to the painting resource used to draw the current
@@ -582,22 +583,28 @@ void SVGInlineTextBox::paintDecoration(GraphicsContext* context,
 
   if (hasDecorationFill) {
     m_paintingResourceMode = ApplyToFillMode;
-    paintDecorationWithStyle(context, textOrigin, decorationStyle, decoration);
+    paintDecorationWithStyle(context, textOrigin, decorationRenderer,
+                             decoration);
   }
 
   if (hasDecorationStroke) {
     m_paintingResourceMode = ApplyToStrokeMode;
-    paintDecorationWithStyle(context, textOrigin, decorationStyle, decoration);
+    paintDecorationWithStyle(context, textOrigin, decorationRenderer,
+                             decoration);
   }
 }
 
-void SVGInlineTextBox::paintDecorationWithStyle(GraphicsContext* context,
-                                                const FloatPoint& textOrigin,
-                                                RenderStyle* decorationStyle,
-                                                ETextDecoration decoration) {
+void SVGInlineTextBox::paintDecorationWithStyle(
+    GraphicsContext* context,
+    const FloatPoint& textOrigin,
+    RenderObject* decorationRenderer,
+    ETextDecoration decoration) {
   ASSERT(!m_paintingResource);
   ASSERT(m_paintingResourceMode != ApplyToDefaultMode);
   ASSERT(m_currentChunkPart.isValid());
+
+  RenderStyle* decorationStyle = decorationRenderer->style();
+  ASSERT(decorationStyle);
 
   const Font& font = decorationStyle->font();
 
@@ -612,7 +619,7 @@ void SVGInlineTextBox::paintDecorationWithStyle(GraphicsContext* context,
   context->addPath(Path::createRectangle(
       FloatRect(x, y, m_currentChunkPart.width, thickness)));
 
-  if (acquirePaintingResource(context, decorationStyle))
+  if (acquirePaintingResource(context, decorationRenderer, decorationStyle))
     releasePaintingResource(context);
 
   context->restore();
@@ -711,9 +718,17 @@ void SVGInlineTextBox::paintText(GraphicsContext* context,
 
   // Draw text using selection style from the start to the end position of the
   // selection
+  if (style != selectionStyle)
+    SVGResourcesCache::clientStyleChanged(
+        parent()->renderer(), StyleDifferenceRepaint, selectionStyle);
+
   TextRun selectionTextRun(constructTextRun(selectionStyle));
   paintTextWithShadows(context, textOrigin, selectionStyle, textRun, startPos,
                        endPos);
+
+  if (style != selectionStyle)
+    SVGResourcesCache::clientStyleChanged(parent()->renderer(),
+                                          StyleDifferenceRepaint, style);
 
   // Eventually draw text using regular style from the end position of the
   // selection to the end of the current chunk part

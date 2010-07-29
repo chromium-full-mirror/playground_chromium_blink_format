@@ -43,6 +43,8 @@ class SVGFilterElement : public SVGStyledElement,
   SVGFilterElement(const QualifiedName&, Document*);
   virtual ~SVGFilterElement();
 
+  virtual bool needsPendingResourceHandling() const { return false; }
+
   void setFilterRes(unsigned long filterResX, unsigned long filterResY);
   FloatRect filterBoundingBox(const FloatRect&) const;
 
@@ -56,8 +58,13 @@ class SVGFilterElement : public SVGStyledElement,
 
   virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
 
+  // FIXME: Add xlink:href support for filters, and use this property
+  void setFollowLink(bool followLink) { m_followLink = followLink; }
+
  private:
   virtual bool selfHasRelativeLengths() const;
+
+  bool m_followLink;
 
   DECLARE_ANIMATED_PROPERTY(SVGFilterElement,
                             SVGNames::filterUnitsAttr,

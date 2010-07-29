@@ -117,8 +117,15 @@ static inline String targetReferenceFromResource(SVGElement* element,
   return SVGURIReference::getTarget(target);
 }
 
-static inline void setFollowLinkForChainableResource(SVGElement*, bool) {
-  // FIXME: Enable once the follow-up patch for bug 43031 lands
+static inline void setFollowLinkForChainableResource(SVGElement* element,
+                                                     bool followLink) {
+  if (element->hasTagName(SVGNames::patternTag))
+    static_cast<SVGPatternElement*>(element)->setFollowLink(followLink);
+  else if (element->hasTagName(SVGNames::linearGradientTag) ||
+           element->hasTagName(SVGNames::radialGradientTag))
+    static_cast<SVGGradientElement*>(element)->setFollowLink(followLink);
+  else if (element->hasTagName(SVGNames::filterTag))
+    static_cast<SVGFilterElement*>(element)->setFollowLink(followLink);
 }
 
 bool SVGResourcesCycleSolver::chainableResourceContainsCycles(

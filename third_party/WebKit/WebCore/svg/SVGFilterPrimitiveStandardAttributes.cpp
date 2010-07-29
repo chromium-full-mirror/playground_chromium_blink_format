@@ -110,7 +110,7 @@ void SVGFilterPrimitiveStandardAttributes::childrenChanged(
                                     childCountDelta);
 
   if (!changedByParser)
-    invalidateResourceClients();
+    invalidateFilter();
 }
 
 void SVGFilterPrimitiveStandardAttributes::setStandardAttributes(

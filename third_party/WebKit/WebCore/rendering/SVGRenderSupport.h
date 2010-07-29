@@ -62,7 +62,7 @@ class SVGRenderSupport {
                                                 FloatRect&);
 
   // Determines whether the passed point lies in a clipping area
-  static bool pointInClippingArea(const RenderObject*, const FloatPoint&);
+  static bool pointInClippingArea(RenderObject*, const FloatPoint&);
 
   enum ContainerBoundingBoxMode {
     ObjectBoundingBox,

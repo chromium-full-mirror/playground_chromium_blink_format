@@ -61,6 +61,7 @@ class SVGStyledElement : public SVGElement, public SVGStylable {
   virtual void svgAttributeChanged(const QualifiedName&);
   virtual void synchronizeProperty(const QualifiedName&);
 
+  virtual void attach();
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
   virtual void childrenChanged(bool changedByParser = false,
@@ -71,8 +72,6 @@ class SVGStyledElement : public SVGElement, public SVGStylable {
   // Centralized place to force a manual style resolution. Hacky but needed for
   // now.
   PassRefPtr<RenderStyle> resolveStyle(RenderStyle* parentStyle);
-
-  void invalidateResourceClients();
 
   bool instanceUpdatesBlocked() const;
   void setInstanceUpdatesBlocked(bool);

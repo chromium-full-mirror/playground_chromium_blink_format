@@ -104,9 +104,9 @@ void RenderSVGText::layout() {
   ASSERT(childrenInline());
   forceLayoutInlineChildren();
 
-  // Invalidate all resources of this client, if we changed something.
+  // Invalidate all resources of this client if our layout changed.
   if (m_everHadLayout && selfNeedsLayout())
-    RenderSVGResource::invalidateAllResourcesOfRenderer(this);
+    SVGResourcesCache::clientLayoutChanged(this);
 
   repainter.repaintAfterLayout();
   setNeedsLayout(false);
@@ -142,11 +142,6 @@ bool RenderSVGText::nodeAtFloatPoint(const HitTestRequest& request,
   }
 
   return false;
-}
-
-void RenderSVGText::destroy() {
-  RenderSVGResource::invalidateAllResourcesOfRenderer(this);
-  RenderSVGBlock::destroy();
 }
 
 bool RenderSVGText::nodeAtPoint(const HitTestRequest&,

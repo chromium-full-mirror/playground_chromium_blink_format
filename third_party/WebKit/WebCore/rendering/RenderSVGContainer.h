@@ -79,7 +79,7 @@ class RenderSVGContainer : public RenderSVGModelObject {
     return true;
   }
 
-  bool selfWillPaint() const;
+  bool selfWillPaint();
 
  private:
   RenderObjectChildList m_children;

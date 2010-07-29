@@ -82,9 +82,6 @@ class RenderSVGResourceClipper : public RenderSVGResourceContainer {
   bool createClipData(ClipperData*, const FloatRect&, const FloatRect&);
   void calculateClipContentRepaintRect();
 
-  virtual bool childElementReferencesResource(const SVGRenderStyle*,
-                                              const String&) const;
-
   bool m_invalidationBlocked;
   FloatRect m_clipBoundaries;
   HashMap<RenderObject*, ClipperData*> m_clipper;

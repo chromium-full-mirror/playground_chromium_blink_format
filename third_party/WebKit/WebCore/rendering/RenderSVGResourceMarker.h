@@ -41,7 +41,6 @@ class RenderSVGResourceMarker : public RenderSVGResourceContainer {
 
   virtual const char* renderName() const { return "RenderSVGResourceMarker"; }
 
-  void addClient(const RenderObject*);
   virtual void invalidateClients();
   virtual void invalidateClient(RenderObject*);
 
@@ -89,9 +88,6 @@ class RenderSVGResourceMarker : public RenderSVGResourceContainer {
       float strokeWidth = -1) const;
 
   AffineTransform viewportTransform() const;
-
-  // Save objects using this marker for invalidation.
-  HashSet<const RenderObject*> m_marker;
 
   mutable AffineTransform m_localToParentTransform;
   FloatRect m_viewport;

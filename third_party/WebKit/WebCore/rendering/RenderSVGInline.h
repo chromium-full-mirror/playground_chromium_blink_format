@@ -60,6 +60,10 @@ class RenderSVGInline : public RenderInline {
 
  private:
   virtual InlineFlowBox* createInlineFlowBox();
+
+  virtual void destroy();
+  virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);
+  virtual void updateFromElement();
 };
 }
 

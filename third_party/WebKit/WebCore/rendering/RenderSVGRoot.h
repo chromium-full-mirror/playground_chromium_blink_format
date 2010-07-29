@@ -60,6 +60,8 @@ class RenderSVGRoot : public RenderBox {
   virtual void paint(PaintInfo&, int parentX, int parentY);
 
   virtual void destroy();
+  virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);
+  virtual void updateFromElement();
 
   virtual const AffineTransform& localToParentTransform() const;
 
@@ -91,7 +93,7 @@ class RenderSVGRoot : public RenderBox {
 
   void calcViewport();
 
-  bool selfWillPaint() const;
+  bool selfWillPaint();
 
   IntSize parentOriginToBorderBox() const;
   IntSize borderOriginToContentBox() const;

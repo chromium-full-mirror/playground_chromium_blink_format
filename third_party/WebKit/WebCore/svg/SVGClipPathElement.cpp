@@ -64,12 +64,16 @@ void SVGClipPathElement::parseMappedAttribute(Attribute* attr) {
 void SVGClipPathElement::svgAttributeChanged(const QualifiedName& attrName) {
   SVGStyledTransformableElement::svgAttributeChanged(attrName);
 
+  RenderObject* object = renderer();
+  if (!object)
+    return;
+
   if (attrName == SVGNames::clipPathUnitsAttr ||
       SVGTests::isKnownAttribute(attrName) ||
       SVGLangSpace::isKnownAttribute(attrName) ||
       SVGExternalResourcesRequired::isKnownAttribute(attrName) ||
       SVGStyledTransformableElement::isKnownAttribute(attrName))
-    invalidateResourceClients();
+    object->setNeedsLayout(true);
 }
 
 void SVGClipPathElement::synchronizeProperty(const QualifiedName& attrName) {
@@ -94,8 +98,11 @@ void SVGClipPathElement::childrenChanged(bool changedByParser,
   SVGStyledTransformableElement::childrenChanged(changedByParser, beforeChange,
                                                  afterChange, childCountDelta);
 
-  if (!changedByParser)
-    invalidateResourceClients();
+  if (changedByParser)
+    return;
+
+  if (RenderObject* object = renderer())
+    object->setNeedsLayout(true);
 }
 
 RenderObject* SVGClipPathElement::createRenderer(RenderArena* arena,

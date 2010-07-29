@@ -47,6 +47,7 @@ SVGFilterElement::SVGFilterElement(const QualifiedName& tagName, Document* doc)
       SVGURIReference(),
       SVGLangSpace(),
       SVGExternalResourcesRequired(),
+      m_followLink(true),
       m_filterUnits(SVGUnitTypes::SVG_UNIT_TYPE_OBJECTBOUNDINGBOX),
       m_primitiveUnits(SVGUnitTypes::SVG_UNIT_TYPE_USERSPACEONUSE),
       m_x(LengthModeWidth, "-10%"),
@@ -65,7 +66,9 @@ void SVGFilterElement::setFilterRes(unsigned long filterResX,
                                     unsigned long filterResY) {
   setFilterResXBaseValue(filterResX);
   setFilterResYBaseValue(filterResY);
-  invalidateResourceClients();
+
+  if (RenderObject* object = renderer())
+    object->setNeedsLayout(true);
 }
 
 void SVGFilterElement::parseMappedAttribute(Attribute* attr) {
@@ -116,6 +119,10 @@ void SVGFilterElement::svgAttributeChanged(const QualifiedName& attrName) {
     updateRelativeLengthsInformation();
   }
 
+  RenderObject* object = renderer();
+  if (!object)
+    return;
+
   if (invalidateClients || attrName == SVGNames::filterUnitsAttr ||
       attrName == SVGNames::primitiveUnitsAttr ||
       attrName == SVGNames::filterResAttr ||
@@ -123,7 +130,7 @@ void SVGFilterElement::svgAttributeChanged(const QualifiedName& attrName) {
       SVGURIReference::isKnownAttribute(attrName) ||
       SVGLangSpace::isKnownAttribute(attrName) ||
       SVGExternalResourcesRequired::isKnownAttribute(attrName))
-    invalidateResourceClients();
+    object->setNeedsLayout(true);
 }
 
 void SVGFilterElement::synchronizeProperty(const QualifiedName& attrName) {
@@ -171,8 +178,11 @@ void SVGFilterElement::childrenChanged(bool changedByParser,
   SVGStyledElement::childrenChanged(changedByParser, beforeChange, afterChange,
                                     childCountDelta);
 
-  if (!changedByParser)
-    invalidateResourceClients();
+  if (changedByParser)
+    return;
+
+  if (RenderObject* object = renderer())
+    object->setNeedsLayout(true);
 }
 
 FloatRect SVGFilterElement::filterBoundingBox(

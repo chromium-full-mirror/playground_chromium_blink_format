@@ -94,7 +94,7 @@ class SVGInlineTextBox : public InlineTextBox {
   TextRun constructTextRun(RenderStyle*) const;
   AffineTransform buildChunkTransformation(SVGChar& firstCharacter) const;
 
-  bool acquirePaintingResource(GraphicsContext*&, RenderStyle*);
+  bool acquirePaintingResource(GraphicsContext*&, RenderObject*, RenderStyle*);
   void releasePaintingResource(GraphicsContext*&);
 
   bool prepareGraphicsContextForTextPainting(GraphicsContext*&,
@@ -109,7 +109,7 @@ class SVGInlineTextBox : public InlineTextBox {
                        bool hasSelection);
   void paintDecorationWithStyle(GraphicsContext*,
                                 const FloatPoint& textOrigin,
-                                RenderStyle*,
+                                RenderObject*,
                                 ETextDecoration);
   void paintSelection(GraphicsContext*,
                       const FloatPoint& textOrigin,

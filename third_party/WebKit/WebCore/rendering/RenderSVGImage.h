@@ -73,6 +73,8 @@ class RenderSVGImage : public RenderImage {
   virtual void paint(PaintInfo&, int parentX, int parentY);
 
   virtual void destroy();
+  virtual void styleDidChange(StyleDifference, const RenderStyle* oldStyle);
+  virtual void updateFromElement();
 
   virtual bool requiresLayer() const { return false; }
 

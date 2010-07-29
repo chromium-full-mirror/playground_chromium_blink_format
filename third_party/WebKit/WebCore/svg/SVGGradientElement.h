@@ -37,6 +37,8 @@ class SVGGradientElement : public SVGStyledElement,
   SVGGradientElement(const QualifiedName&, Document*);
   virtual ~SVGGradientElement();
 
+  virtual bool needsPendingResourceHandling() const { return false; }
+
   virtual void parseMappedAttribute(Attribute*);
   virtual void svgAttributeChanged(const QualifiedName&);
   virtual void synchronizeProperty(const QualifiedName&);
@@ -48,7 +50,11 @@ class SVGGradientElement : public SVGStyledElement,
 
   Vector<Gradient::ColorStop> buildStops();
 
+  void setFollowLink(bool followLink) { m_followLink = followLink; }
+
  protected:
+  bool m_followLink;
+
   DECLARE_ANIMATED_PROPERTY(SVGGradientElement,
                             SVGNames::spreadMethodAttr,
                             int,

@@ -72,7 +72,12 @@ void SVGLinearGradientElement::svgAttributeChanged(
   if (attrName == SVGNames::x1Attr || attrName == SVGNames::y1Attr ||
       attrName == SVGNames::x2Attr || attrName == SVGNames::y2Attr) {
     updateRelativeLengthsInformation();
-    invalidateResourceClients();
+
+    RenderObject* object = renderer();
+    if (!object)
+      return;
+
+    object->setNeedsLayout(true);
   }
 }
 
@@ -152,15 +157,19 @@ LinearGradientAttributes SVGLinearGradientElement::collectGradientProperties() {
     processedGradients.add(current);
 
     // Respect xlink:href, take attributes from referenced element
-    Node* refNode = ownerDocument()->getElementById(
-        SVGURIReference::getTarget(current->href()));
+    Node* refNode = m_followLink
+                        ? ownerDocument()->getElementById(
+                              SVGURIReference::getTarget(current->href()))
+                        : 0;
     if (refNode && (refNode->hasTagName(SVGNames::linearGradientTag) ||
                     refNode->hasTagName(SVGNames::radialGradientTag))) {
       current = static_cast<SVGGradientElement*>(refNode);
 
       // Cycle detection
-      if (processedGradients.contains(current))
-        return LinearGradientAttributes();
+      if (processedGradients.contains(current)) {
+        current = 0;
+        break;
+      }
 
       isLinear = current->hasTagName(SVGNames::linearGradientTag);
     } else

@@ -357,7 +357,8 @@ static void writeStyle(TextStream& ts, const RenderObject& object) {
     const RenderPath& path = static_cast<const RenderPath&>(object);
 
     if (RenderSVGResource* strokePaintingResource =
-            RenderSVGResource::strokePaintingResource(&path, path.style())) {
+            RenderSVGResource::strokePaintingResource(
+                const_cast<RenderPath*>(&path), path.style())) {
       TextStreamSeparator s(" ");
       ts << " [stroke={" << s;
       writeSVGPaintingResource(ts, strokePaintingResource);
@@ -383,7 +384,8 @@ static void writeStyle(TextStream& ts, const RenderObject& object) {
     }
 
     if (RenderSVGResource* fillPaintingResource =
-            RenderSVGResource::fillPaintingResource(&path, path.style())) {
+            RenderSVGResource::fillPaintingResource(
+                const_cast<RenderPath*>(&path), path.style())) {
       TextStreamSeparator s(" ");
       ts << " [fill={" << s;
       writeSVGPaintingResource(ts, fillPaintingResource);
@@ -779,6 +781,10 @@ void writeResources(TextStream& ts, const RenderObject& object, int indent) {
   const RenderStyle* style = object.style();
   const SVGRenderStyle* svgStyle = style->svgStyle();
 
+  // FIXME: We want to use SVGResourcesCache to determine which resources are
+  // present, instead of quering the resource <-> id cache.
+  // For now leave the DRT output as is, but later on we should change this so
+  // cycles are properly ignored in the DRT output.
   RenderObject& renderer = const_cast<RenderObject&>(object);
   if (!svgStyle->maskerResource().isEmpty()) {
     if (RenderSVGResourceMasker* masker =

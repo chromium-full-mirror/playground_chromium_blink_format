@@ -25,8 +25,10 @@
 #if ENABLE(SVG)
 #include "RenderSVGGradientStop.h"
 
+#include "RenderSVGResourceContainer.h"
 #include "SVGGradientElement.h"
 #include "SVGNames.h"
+#include "SVGResourcesCache.h"
 #include "SVGStopElement.h"
 
 namespace WebCore {
@@ -46,8 +48,18 @@ void RenderSVGGradientStop::styleDidChange(StyleDifference diff,
   // elements
   // but I can imagine a few cases we might not be catching, so let's not crash
   // if our parent isn't a gradient.
-  if (SVGGradientElement* gradient = gradientElement())
-    gradient->invalidateResourceClients();
+  SVGGradientElement* gradient = gradientElement();
+  if (!gradient)
+    return;
+
+  RenderObject* renderer = gradient->renderer();
+  if (!renderer)
+    return;
+
+  ASSERT(renderer->isSVGResourceContainer());
+  RenderSVGResourceContainer* container =
+      renderer->toRenderSVGResourceContainer();
+  container->invalidateClients();
 }
 
 void RenderSVGGradientStop::layout() {
