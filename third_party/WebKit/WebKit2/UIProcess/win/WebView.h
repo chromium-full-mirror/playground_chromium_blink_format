@@ -65,6 +65,8 @@ class WebView : public APIObject,
  private:
   WebView(RECT, WebPageNamespace*, HWND hostWindow);
 
+  virtual Type type() const { return TypeView; }
+
   static bool registerWebViewWindowClass();
   static LRESULT CALLBACK WebViewWndProc(HWND, UINT, WPARAM, LPARAM);
   LRESULT wndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
