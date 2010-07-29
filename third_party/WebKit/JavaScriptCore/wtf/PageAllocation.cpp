@@ -48,48 +48,32 @@ namespace WTF {
 
 #if HAVE(MMAP)
 
+bool PageAllocation::commit(void* start, size_t size, bool, bool) const {
 #if HAVE(MADV_FREE_REUSE)
-bool PageAllocation::commit(void* start,
-                            size_t size,
-                            bool writable,
-                            bool executable) const {
-  UNUSED_PARAM(writable);
-  UNUSED_PARAM(executable);
   while (madvise(start, size, MADV_FREE_REUSE) == -1 && errno == EAGAIN) {
   }
+#else
+  UNUSED_PARAM(start);
+  UNUSED_PARAM(size);
+#endif
   return true;
 }
 
 void PageAllocation::decommit(void* start, size_t size) const {
+#if HAVE(MADV_FREE_REUSE)
   while (madvise(start, size, MADV_FREE_REUSABLE) == -1 && errno == EAGAIN) {
   }
-}
+#elif HAVE(MADV_FREE)
+  while (madvise(start, size, MADV_FREE) == -1 && errno == EAGAIN) {
+  }
 #elif HAVE(MADV_DONTNEED)
-bool PageAllocation::commit(void* start,
-                            size_t size,
-                            bool writable,
-                            bool executable) const {
-  UNUSED_PARAM(writable);
-  UNUSED_PARAM(executable);
-  return true;
-}
-
-void PageAllocation::decommit(void*, size_t) const {
   while (madvise(start, size, MADV_DONTNEED) == -1 && errno == EAGAIN) {
   }
-}
 #else
-bool PageAllocation::commit(void*,
-                            size_t,
-                            bool writable,
-                            bool executable) const {
-  UNUSED_PARAM(writable);
-  UNUSED_PARAM(executable);
-  return true;
-}
-
-void PageAllocation::decommit(void*, size_t) const {}
+  UNUSED_PARAM(start);
+  UNUSED_PARAM(size);
 #endif
+}
 
 PageAllocation PageAllocation::allocate(size_t size,
                                         Usage usage,
