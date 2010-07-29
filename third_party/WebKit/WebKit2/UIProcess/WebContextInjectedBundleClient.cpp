@@ -37,7 +37,7 @@ WebContextInjectedBundleClient::WebContextInjectedBundleClient() {
 }
 
 void WebContextInjectedBundleClient::initialize(
-    WKContextInjectedBundleClient* client) {
+    const WKContextInjectedBundleClient* client) {
   if (client && !client->version)
     m_client = *client;
   else
