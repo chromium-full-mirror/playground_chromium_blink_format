@@ -26,7 +26,7 @@
 #ifndef WebHistoryClient_h
 #define WebHistoryClient_h
 
-#include "WKPage.h"
+#include "WKContext.h"
 
 namespace WebCore {
 class String;
@@ -34,6 +34,7 @@ class String;
 
 namespace WebKit {
 
+class WebContext;
 class WebFrameProxy;
 struct WebNavigationDataStore;
 class WebPageProxy;
@@ -41,26 +42,35 @@ class WebPageProxy;
 class WebHistoryClient {
  public:
   WebHistoryClient();
-  void initialize(WKPageHistoryClient*);
+  void initialize(WKContextHistoryClient*);
 
-  void didNavigateWithNavigationData(WebPageProxy*,
+  void didNavigateWithNavigationData(WebContext*,
+                                     WebPageProxy*,
                                      const WebNavigationDataStore&,
                                      WebFrameProxy*);
-  void didPerformClientRedirect(WebPageProxy*,
+  void didPerformClientRedirect(WebContext*,
+                                WebPageProxy*,
                                 const WebCore::String& sourceURL,
                                 const WebCore::String& destinationURL,
                                 WebFrameProxy*);
-  void didPerformServerRedirect(WebPageProxy*,
+  void didPerformServerRedirect(WebContext*,
+                                WebPageProxy*,
                                 const WebCore::String& sourceURL,
                                 const WebCore::String& destinationURL,
                                 WebFrameProxy*);
-  void didUpdateHistoryTitle(WebPageProxy*,
+  void didUpdateHistoryTitle(WebContext*,
+                             WebPageProxy*,
                              const WebCore::String& title,
                              const WebCore::String& url,
                              WebFrameProxy*);
+  void populateVisitedLinks(WebContext*);
+
+  bool shouldTrackVisitedLinks() const {
+    return m_contextHistoryClient.populateVisitedLinks;
+  }
 
  private:
-  WKPageHistoryClient m_pageHistoryClient;
+  WKContextHistoryClient m_contextHistoryClient;
 };
 
 }  // namespace WebKit

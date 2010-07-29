@@ -574,8 +574,8 @@ void WebFrameLoaderClient::updateGlobalHistory() {
   data.title = loader->title();
 
   WebProcess::shared().connection()->send(
-      WebPageProxyMessage::DidNavigateWithNavigationData, webPage->pageID(),
-      CoreIPC::In(data, m_frame->frameID()));
+      WebProcessProxyMessage::DidNavigateWithNavigationData, 0,
+      CoreIPC::In(webPage->pageID(), data, m_frame->frameID()));
 }
 
 void WebFrameLoaderClient::updateGlobalHistoryRedirectLinks() {
@@ -589,8 +589,8 @@ void WebFrameLoaderClient::updateGlobalHistoryRedirectLinks() {
   // Client redirect
   if (!loader->clientRedirectSourceForHistory().isNull()) {
     WebProcess::shared().connection()->send(
-        WebPageProxyMessage::DidPerformClientRedirect, webPage->pageID(),
-        CoreIPC::In(loader->clientRedirectSourceForHistory(),
+        WebProcessProxyMessage::DidPerformClientRedirect, 0,
+        CoreIPC::In(webPage->pageID(), loader->clientRedirectSourceForHistory(),
                     loader->clientRedirectDestinationForHistory(),
                     m_frame->frameID()));
   }
@@ -598,8 +598,8 @@ void WebFrameLoaderClient::updateGlobalHistoryRedirectLinks() {
   // Server redirect
   if (!loader->serverRedirectSourceForHistory().isNull()) {
     WebProcess::shared().connection()->send(
-        WebPageProxyMessage::DidPerformServerRedirect, webPage->pageID(),
-        CoreIPC::In(loader->serverRedirectSourceForHistory(),
+        WebProcessProxyMessage::DidPerformServerRedirect, 0,
+        CoreIPC::In(webPage->pageID(), loader->serverRedirectSourceForHistory(),
                     loader->serverRedirectDestinationForHistory(),
                     m_frame->frameID()));
   }
@@ -732,8 +732,8 @@ void WebFrameLoaderClient::setTitle(const String& title, const KURL& url) {
     return;
 
   WebProcess::shared().connection()->send(
-      WebPageProxyMessage::DidUpdateHistoryTitle, webPage->pageID(),
-      CoreIPC::In(title, url.string(), m_frame->frameID()));
+      WebProcessProxyMessage::DidUpdateHistoryTitle, 0,
+      CoreIPC::In(webPage->pageID(), title, url.string(), m_frame->frameID()));
 }
 
 String WebFrameLoaderClient::userAgent(const KURL&) {

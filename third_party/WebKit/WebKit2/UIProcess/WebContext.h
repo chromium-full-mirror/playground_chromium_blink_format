@@ -30,6 +30,8 @@
 #include "PluginInfoStore.h"
 #include "ProcessModel.h"
 #include "WebContextInjectedBundleClient.h"
+#include "WebHistoryClient.h"
+#include "WebProcessProxy.h"
 #include <WebCore/PlatformString.h>
 #include <wtf/Forward.h>
 #include <wtf/HashSet.h>
@@ -43,7 +45,6 @@ namespace WebKit {
 class WebPageNamespace;
 class WebPageProxy;
 class WebPreferences;
-class WebProcessProxy;
 
 class WebContext : public APIObject {
  public:
@@ -59,6 +60,7 @@ class WebContext : public APIObject {
   ~WebContext();
 
   void initializeInjectedBundleClient(WKContextInjectedBundleClient*);
+  void initializeHistoryClient(WKContextHistoryClient*);
 
   ProcessModel processModel() const { return m_processModel; }
   WebProcessProxy* process() const { return m_process.get(); }
@@ -80,8 +82,21 @@ class WebContext : public APIObject {
 
   // InjectedBundle client
   void didReceiveMessageFromInjectedBundle(const WebCore::String&);
-
   void postMessageToInjectedBundle(const WebCore::String&);
+
+  // History client
+  void didNavigateWithNavigationData(WebFrameProxy*,
+                                     const WebNavigationDataStore&);
+  void didPerformClientRedirect(WebFrameProxy*,
+                                const WebCore::String& sourceURLString,
+                                const WebCore::String& destinationURLString);
+  void didPerformServerRedirect(WebFrameProxy*,
+                                const WebCore::String& sourceURLString,
+                                const WebCore::String& destinationURLString);
+  void didUpdateHistoryTitle(WebFrameProxy*,
+                             const WebCore::String& title,
+                             const WebCore::String& url);
+  void populateVisitedLinks();
 
   void getStatistics(WKContextStatistics* statistics);
   void setAdditionalPluginPath(const WebCore::String&);
@@ -95,6 +110,7 @@ class WebContext : public APIObject {
   WebContext(ProcessModel, const WebCore::String& injectedBundlePath);
 
   void ensureWebProcess();
+  bool hasValidProcess() const { return m_process && m_process->isValid(); }
 
   ProcessModel m_processModel;
 
@@ -106,6 +122,8 @@ class WebContext : public APIObject {
 
   WebCore::String m_injectedBundlePath;
   WebContextInjectedBundleClient m_injectedBundleClient;
+
+  WebHistoryClient m_historyClient;
 
   PluginInfoStore m_pluginInfoStore;
 };
