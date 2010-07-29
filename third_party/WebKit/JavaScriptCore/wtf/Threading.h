@@ -111,6 +111,8 @@ ThreadIdentifier currentThread();
 int waitForThreadCompletion(ThreadIdentifier, void**);
 void detachThread(ThreadIdentifier);
 
+void yield();
+
 void lockAtomicallyInitializedStaticMutex();
 void unlockAtomicallyInitializedStaticMutex();
 
@@ -121,5 +123,6 @@ using WTF::createThread;
 using WTF::currentThread;
 using WTF::detachThread;
 using WTF::waitForThreadCompletion;
+using WTF::yield;
 
 #endif  // Threading_h
