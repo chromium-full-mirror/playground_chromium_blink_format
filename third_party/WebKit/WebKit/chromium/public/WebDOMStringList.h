@@ -51,7 +51,7 @@ class WebDOMStringList {
  public:
   ~WebDOMStringList() { reset(); }
 
-  WebDOMStringList();
+  WEBKIT_API WebDOMStringList();
   WebDOMStringList(const WebDOMStringList& l) { assign(l); }
   WebDOMStringList& operator=(const WebDOMStringList& l) {
     assign(l);
