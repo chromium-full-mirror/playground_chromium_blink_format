@@ -125,10 +125,19 @@ static void pluginDeallocate(NPObject*);
 NPNetscapeFuncs* browser;
 
 static NPClass pluginClass = {
-    NP_CLASS_STRUCT_VERSION, pluginAllocate,    pluginDeallocate,
-    pluginInvalidate,        pluginHasMethod,   pluginInvoke,
-    pluginInvokeDefault,     pluginHasProperty, pluginGetProperty,
+    NP_CLASS_STRUCT_VERSION,
+    pluginAllocate,
+    pluginDeallocate,
+    pluginInvalidate,
+    pluginHasMethod,
+    pluginInvoke,
+    pluginInvokeDefault,
+    pluginHasProperty,
+    pluginGetProperty,
     pluginSetProperty,
+    0,  // NPClass::removeProperty
+    0,  // NPClass::enumerate
+    0   // NPClass::construct
 };
 
 NPClass* getPluginClass(void) {
