@@ -69,8 +69,9 @@ bool RenderSVGContainer::selfWillPaint() {
   SVGResources* resources =
       SVGResourcesCache::cachedResourcesForRenderObject(this);
   return resources && resources->filter();
-#endif
+#else
   return false;
+#endif
 }
 
 void RenderSVGContainer::paint(PaintInfo& paintInfo, int, int) {
