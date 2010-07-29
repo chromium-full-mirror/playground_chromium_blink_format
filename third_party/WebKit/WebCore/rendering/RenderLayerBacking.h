@@ -202,7 +202,7 @@ class RenderLayerBacking : public GraphicsLayerClient, public Noncopyable {
   bool rendererHasBackground() const;
   const Color rendererBackgroundColor() const;
 
-  bool hasNonCompositingContent() const;
+  bool hasNonCompositingDescendants() const;
 
   void paintIntoLayer(RenderLayer* rootLayer,
                       GraphicsContext*,
