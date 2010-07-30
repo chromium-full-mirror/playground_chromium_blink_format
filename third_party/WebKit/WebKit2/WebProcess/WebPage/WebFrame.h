@@ -48,6 +48,8 @@ class WebPage;
 
 class WebFrame : public APIObject {
  public:
+  static const Type APIType = TypeBundleFrame;
+
   static PassRefPtr<WebFrame> createMainFrame(WebPage*);
   static PassRefPtr<WebFrame> createSubframe(WebPage*,
                                              const WebCore::String& frameName,
@@ -104,7 +106,7 @@ class WebFrame : public APIObject {
            const WebCore::String& frameName,
            WebCore::HTMLFrameOwnerElement*);
 
-  virtual Type type() const { return TypeBundleFrame; }
+  virtual Type type() const { return APIType; }
 
   WebPage* m_page;
   WebCore::Frame* m_coreFrame;

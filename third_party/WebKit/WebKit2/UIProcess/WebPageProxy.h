@@ -77,6 +77,8 @@ typedef GenericCallback<WKStringRef, WebCore::StringImpl*>
 
 class WebPageProxy : public APIObject {
  public:
+  static const Type APIType = TypePage;
+
   static PassRefPtr<WebPageProxy> create(WebPageNamespace*, uint64_t pageID);
   ~WebPageProxy();
 
@@ -173,7 +175,7 @@ class WebPageProxy : public APIObject {
  private:
   WebPageProxy(WebPageNamespace*, uint64_t pageID);
 
-  virtual Type type() const { return TypePage; }
+  virtual Type type() const { return APIType; }
 
   void didCreateMainFrame(uint64_t frameID);
   void didCreateSubFrame(uint64_t frameID);

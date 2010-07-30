@@ -33,7 +33,7 @@
 using namespace WebKit;
 
 WKTypeID WKBundleGetTypeID() {
-  return toRef(APIObject::TypeBundle);
+  return toRef(InjectedBundle::APIType);
 }
 
 void WKBundleSetClient(WKBundleRef bundleRef, WKBundleClient* wkClient) {

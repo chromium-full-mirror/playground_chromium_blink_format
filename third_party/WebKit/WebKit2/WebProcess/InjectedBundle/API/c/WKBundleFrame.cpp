@@ -35,7 +35,7 @@ using namespace WebCore;
 using namespace WebKit;
 
 WKTypeID WKBundleFrameGetTypeID() {
-  return toRef(APIObject::TypeBundleFrame);
+  return toRef(WebFrame::APIType);
 }
 
 bool WKBundleFrameIsMainFrame(WKBundleFrameRef frameRef) {

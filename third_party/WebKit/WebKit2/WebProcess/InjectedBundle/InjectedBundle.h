@@ -51,6 +51,8 @@ class WebPage;
 
 class InjectedBundle : public APIObject {
  public:
+  static const Type APIType = TypeBundle;
+
   static PassRefPtr<InjectedBundle> create(const WebCore::String& path) {
     return adoptRef(new InjectedBundle(path));
   }
@@ -82,7 +84,7 @@ class InjectedBundle : public APIObject {
  private:
   InjectedBundle(const WebCore::String&);
 
-  virtual Type type() const { return TypeBundle; }
+  virtual Type type() const { return APIType; }
 
   WebCore::String m_path;
   PlatformBundle m_platformBundle;  // This is leaked right now, since we never

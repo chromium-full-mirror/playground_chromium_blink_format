@@ -35,6 +35,8 @@ namespace WebKit {
 
 class ImmutableArray : public APIObject {
  public:
+  static const Type APIType = TypeArray;
+
   static PassRefPtr<ImmutableArray> create() {
     return adoptRef(new ImmutableArray);
   }
@@ -45,6 +47,14 @@ class ImmutableArray : public APIObject {
     return adoptRef(new ImmutableArray(entries, size, Adopt));
   }
   ~ImmutableArray();
+
+  template <typename T>
+  T* at(size_t i) {
+    ASSERT(i < m_size);
+    if (m_entries[i]->type() != T::APIType)
+      return 0;
+    return m_entries[i];
+  }
 
   APIObject* at(size_t i) {
     ASSERT(i < m_size);
@@ -58,7 +68,7 @@ class ImmutableArray : public APIObject {
   enum AdoptTag { Adopt };
   ImmutableArray(APIObject** entries, size_t size, AdoptTag);
 
-  virtual Type type() const { return TypeArray; }
+  virtual Type type() const { return APIType; }
 
   APIObject** m_entries;
   size_t m_size;

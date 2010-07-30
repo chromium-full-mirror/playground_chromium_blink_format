@@ -49,6 +49,8 @@ class WebPreferences;
 
 class WebContext : public APIObject {
  public:
+  static const Type APIType = TypeContext;
+
   static WebContext* sharedProcessContext();
   static WebContext* sharedThreadContext();
 
@@ -111,7 +113,7 @@ class WebContext : public APIObject {
  private:
   WebContext(ProcessModel, const WebCore::String& injectedBundlePath);
 
-  virtual Type type() const { return TypeContext; }
+  virtual Type type() const { return APIType; }
 
   void ensureWebProcess();
   bool hasValidProcess() const { return m_process && m_process->isValid(); }
