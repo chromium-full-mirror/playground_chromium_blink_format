@@ -52,8 +52,12 @@ class InsertListCommand : public CompositeEditCommand {
   virtual EditAction editingAction() const { return EditActionInsertList; }
 
   HTMLElement* fixOrphanedListChild(Node*);
-  bool modifyRange();
-  void doApplyForSingleParagraph(bool forceCreateList);
+  bool selectionHasListOfType(const VisibleSelection& selection,
+                              const QualifiedName&);
+  PassRefPtr<HTMLElement> mergeWithNeighboringLists(PassRefPtr<HTMLElement>);
+  void doApplyForSingleParagraph(bool forceCreateList,
+                                 const QualifiedName&,
+                                 Range* currentSelection);
   void unlistifyParagraph(const VisiblePosition& originalStart,
                           HTMLElement* listNode,
                           Node* listChildNode);
