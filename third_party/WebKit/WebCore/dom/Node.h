@@ -344,7 +344,10 @@ class Node : public EventTarget,
 
   void setInActiveChain() { setFlag(InActiveChainFlag); }
   void clearInActiveChain() { clearFlag(InActiveChainFlag); }
+
   void setNeedsStyleRecalc(StyleChangeType changeType = FullStyleChange);
+  void clearNeedsStyleRecalc() { m_nodeFlags &= ~StyleChangeMask; }
+
   void setIsLink(bool f) { setFlag(f, IsLinkFlag); }
   void setIsLink() { setFlag(IsLinkFlag); }
   void clearIsLink() { clearFlag(IsLinkFlag); }

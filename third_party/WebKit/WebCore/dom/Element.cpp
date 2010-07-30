@@ -913,7 +913,7 @@ void Element::recalcStyle(StyleChange change) {
       attach();  // FIXME: The style gets computed twice by calling attach. We
                  // could do better if we passed the style along.
       // attach recalulates the style for all children. No need to do it twice.
-      setNeedsStyleRecalc(NoStyleChange);
+      clearNeedsStyleRecalc();
       clearChildNeedsStyleRecalc();
       return;
     }
@@ -999,7 +999,7 @@ void Element::recalcStyle(StyleChange change) {
           childRulesChanged && hasDirectAdjacentRules;
   }
 
-  setNeedsStyleRecalc(NoStyleChange);
+  clearNeedsStyleRecalc();
   clearChildNeedsStyleRecalc();
 }
 

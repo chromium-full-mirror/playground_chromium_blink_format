@@ -283,7 +283,7 @@ void Text::recalcStyle(StyleChange change) {
       attach();
     }
   }
-  setNeedsStyleRecalc(NoStyleChange);
+  clearNeedsStyleRecalc();
 }
 
 bool Text::childTypeAllowed(NodeType) {
