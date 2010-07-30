@@ -39,13 +39,13 @@ class NPRuntimeObjectMap;
 
 class JSNPObject : public JSC::JSObjectWithGlobalObject {
  public:
-  JSNPObject(JSC::ExecState*,
-             JSC::JSGlobalObject*,
+  JSNPObject(JSC::JSGlobalObject*,
              NPRuntimeObjectMap* objectMap,
              NPObject* npObject);
   ~JSNPObject();
 
   JSC::JSValue callMethod(JSC::ExecState*, NPIdentifier methodName);
+  JSC::JSValue callObject(JSC::ExecState*);
   JSC::JSValue callConstructor(JSC::ExecState*);
 
   static const JSC::ClassInfo s_info;
@@ -60,6 +60,7 @@ class JSNPObject : public JSC::JSObjectWithGlobalObject {
         AnonymousSlotCount);
   }
 
+  virtual JSC::CallType getCallData(JSC::CallData&);
   virtual JSC::ConstructType getConstructData(JSC::ConstructData&);
 
   virtual bool getOwnPropertySlot(JSC::ExecState*,

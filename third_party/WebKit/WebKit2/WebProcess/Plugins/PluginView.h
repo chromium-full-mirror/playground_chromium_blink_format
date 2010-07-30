@@ -88,7 +88,7 @@ class PluginView : public WebCore::PluginViewBase,
   void cancelAllStreams();
 
   // WebCore::PluginViewBase
-  virtual JSC::JSObject* scriptObject(JSC::ExecState*, JSC::JSGlobalObject*);
+  virtual JSC::JSObject* scriptObject(JSC::JSGlobalObject*);
 
   // WebCore::Widget
   virtual void setFrameRect(const WebCore::IntRect&);
