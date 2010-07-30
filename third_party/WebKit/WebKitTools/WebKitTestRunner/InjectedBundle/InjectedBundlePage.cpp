@@ -306,10 +306,8 @@ static void dumpDescendantFrameScrollPositions(WKBundleFrameRef frame) {
                                       WKBundleFrameCopyChildFrames(frame));
   size_t size = WKArrayGetSize(childFrames.get());
   for (size_t i = 0; i < size; ++i) {
-    // FIXME: I don't like that we have to const_cast here. Can we change
-    // WKArray?
     WKBundleFrameRef subframe = static_cast<WKBundleFrameRef>(
-        const_cast<void*>(WKArrayGetItemAtIndex(childFrames.get(), i)));
+        WKArrayGetItemAtIndex(childFrames.get(), i));
     dumpFrameScrollPosition(subframe, ShouldIncludeFrameName);
     dumpDescendantFrameScrollPositions(subframe);
   }
@@ -336,10 +334,8 @@ static void dumpDescendantFramesText(WKBundleFrameRef frame) {
                                       WKBundleFrameCopyChildFrames(frame));
   size_t size = WKArrayGetSize(childFrames.get());
   for (size_t i = 0; i < size; ++i) {
-    // FIXME: I don't like that we have to const_cast here. Can we change
-    // WKArray?
     WKBundleFrameRef subframe = static_cast<WKBundleFrameRef>(
-        const_cast<void*>(WKArrayGetItemAtIndex(childFrames.get(), i)));
+        WKArrayGetItemAtIndex(childFrames.get(), i));
     WKRetainPtr<WKStringRef> subframeName(AdoptWK,
                                           WKBundleFrameCopyName(subframe));
     InjectedBundle::shared().os() << "\n--------\nFrame: '" << subframeName
